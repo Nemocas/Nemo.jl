@@ -1,7 +1,7 @@
 VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module Nemo
- 
+
 import Base: Array, abs, asin, asinh, atan, atanh, base, bin, call,
              checkbounds, convert, cmp, contains, cos, cosh, dec, deepcopy,
              den, deserialize, div, divrem, exp, factor, gcd, gcdx, getindex,
@@ -32,7 +32,7 @@ export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
        MaximalRealSubfield, MaximalOrder, Ideal, PermutationGroup
 
 export create_accessors, get_handle, package_handle, allocatemem, zeros,
-       Array, method_with_sig_exists
+       Array
 
 export flint_cleanup, flint_set_num_threads
 
@@ -75,21 +75,23 @@ function __init__()
        push!(Libdl.DL_LOAD_PATH, "/usr/local/lib")
    elseif on_linux
        push!(Libdl.DL_LOAD_PATH, libdir)
-       Libdl.dlopen(libgmp)
+       global const _libgmp_ = Libdl.dlopen(libgmp)
        Libdl.dlopen(libmpfr)
        Libdl.dlopen(libflint)
        Libdl.dlopen(libpari)
        Libdl.dlopen(libarb)
    else
-      push!(Libdl.DL_LOAD_PATH, libdir)
+       push!(Libdl.DL_LOAD_PATH, libdir)
    end
  
-   ccall((:pari_set_memory_functions, libpari), Void,
-      (Ptr{Void},Ptr{Void},Ptr{Void},Ptr{Void}),
+   @linux ? begin
+      ccall((:pari_set_memory_functions, libpari), Void,
+         (Ptr{Void},Ptr{Void},Ptr{Void},Ptr{Void}),
       cglobal(:jl_malloc),
       cglobal(:jl_calloc),
       cglobal(:jl_realloc),
       cglobal(:jl_free))
+   end : nothing
 
    ccall((:pari_init, libpari), Void, (Int, Int), 300000000, 10000)
   
@@ -103,18 +105,21 @@ function __init__()
 
    unsafe_store!(pari_sigint, cfunction(pari_sigint_handler, Void, ()), 1)
 
-   ccall((:__gmp_set_memory_functions, libgmp), Void,
-      (Ptr{Void},Ptr{Void},Ptr{Void}),
-      cglobal(:jl_gc_counted_malloc),
-      cglobal(:jl_gc_counted_realloc_with_old_size),
-      cglobal(:jl_gc_counted_free))
-
-   ccall((:__flint_set_memory_functions, libflint), Void,
-      (Ptr{Void},Ptr{Void},Ptr{Void},Ptr{Void}),
-      cglobal(:jl_malloc),
-      cglobal(:jl_calloc),
-      cglobal(:jl_realloc),
-      cglobal(:jl_free))
+   @linux ? begin
+      smf = Libdl.dlsym(_libgmp_, :__gmp_set_memory_functions)
+      ccall(smf, Void,
+         (Ptr{Void},Ptr{Void},Ptr{Void}),
+         cglobal(:jl_gc_counted_malloc),
+         cglobal(:jl_gc_counted_realloc_with_old_size),
+         cglobal(:jl_gc_counted_free))
+  
+      ccall((:__flint_set_memory_functions, :libflint), Void,
+         (Ptr{Void},Ptr{Void},Ptr{Void},Ptr{Void}),
+         cglobal(:jl_malloc),
+         cglobal(:jl_calloc),
+         cglobal(:jl_realloc),
+         cglobal(:jl_free))
+   end : nothing
 
    println("")
    println("Welcome to Nemo version 0.4.0")
@@ -249,3 +254,4 @@ include("../test/Nemo-test.jl")
 include("../benchmarks/runbenchmarks.jl")
 
 end # module
+
