@@ -59,9 +59,9 @@ cd(wdir)
 
 # install GMP/MPIR
 
-if !ispath(Pkg.dir("Nemo", "local", "mpir-2.7.2"))
-   download("http://mpir.org/mpir-2.7.2.tar.bz2", joinpath(wdir, "mpir-2.7.2.tar.bz2"))
-end
+#if !ispath(Pkg.dir("Nemo", "local", "mpir-2.7.2"))
+#   download("http://mpir.org/mpir-2.7.2.tar.bz2", joinpath(wdir, "mpir-2.7.2.tar.bz2"))
+#end
 
 if on_windows
    if Int == Int32
@@ -89,9 +89,9 @@ cd(wdir)
 
 # install MPFR
 
-if !ispath(Pkg.dir("Nemo", "local", "mpfr-3.1.4"))
-   download("http://ftp.gnu.org/gnu/mpfr/mpfr-3.1.4.tar.bz2", joinpath(wdir, "mpfr-3.1.4.tar.bz2"))
-end
+#if !ispath(Pkg.dir("Nemo", "local", "mpfr-3.1.4"))
+#   download("http://ftp.gnu.org/gnu/mpfr/mpfr-3.1.4.tar.bz2", joinpath(wdir, "mpfr-3.1.4.tar.bz2"))
+#end
 
 if on_windows
    if Int == Int32
