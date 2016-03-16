@@ -1,7 +1,7 @@
 environment:
   matrix:
   # Releases
-  - JULIAVERSION: "stable/win32"
+#  - JULIAVERSION: "stable/win32"
   - JULIAVERSION: "stable/win64"
   # Nightlies
 #  - JULIAVERSION: "download/win32"
