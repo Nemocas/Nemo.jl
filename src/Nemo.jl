@@ -249,10 +249,6 @@ Ideal = PariIdeal
 #
 ###############################################################################
 
-println("libarb: $(Libdl.find_library(["libarb"]))")
-println("libflint: $(Libdl.find_library(["libflint"]))")
-println("libpari: $(Libdl.find_library(["libpari"]))")
-
 include("../test/Nemo-test.jl")
 
 include("../benchmarks/runbenchmarks.jl")
