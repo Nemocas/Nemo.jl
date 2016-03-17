@@ -31,8 +31,10 @@ end
 
 if on_windows
    if Int == Int32
+      println("Downloading http://nemocas.org/binaries/w32-libwinpthread-1.dll ... ")
       download_dll("http://nemocas.org/binaries/w32-libwinpthread-1.dll", joinpath(vdir, "lib", "libwinpthread-1.dll"))
    else
+      println("Downloading http://nemocas.org/binaries/w64-libwinpthread-1.dll ... ")
       download_dll("http://nemocas.org/binaries/w64-libwinpthread-1.dll", joinpath(vdir, "lib", "libwinpthread-1.dll"))
    end
 end
@@ -65,8 +67,10 @@ end
 
 if on_windows
    if Int == Int32
+      println("Downloading http://nemocas.org/binaries/w32-libgmp-16.dll ... ")
       download_dll("http://nemocas.org/binaries/w32-libgmp-16.dll", joinpath(vdir, "lib", "libgmp-16.dll"))
    else
+      println("Downloading http://nemocas.org/binaries/w64-libgmp-16.dll ... ")
       download_dll("http://nemocas.org/binaries/w64-libgmp-16.dll", joinpath(vdir, "lib", "libgmp-16.dll"))
    end
 else
@@ -95,8 +99,10 @@ end
 
 if on_windows
    if Int == Int32
+      println("Downloading http://nemocas.org/binaries/w32-libmpfr-4.dll ... ")
       download_dll("http://nemocas.org/binaries/w32-libmpfr-4.dll", joinpath(vdir, "lib", "libmpfr-4.dll"))
    else
+      println("Downloading http://nemocas.org/binaries/w64-libmpfr-4.dll ... ")
       download_dll("http://nemocas.org/binaries/w64-libmpfr-4.dll", joinpath(vdir, "lib", "libmpfr-4.dll"))
    end
 else
@@ -134,8 +140,10 @@ end
 
 if on_windows
    if Int == Int32
+      println("Downloading http://nemocas.org/binaries/w32-libflint.dll ... ")
       download_dll("http://nemocas.org/binaries/w32-libflint.dll", joinpath(vdir, "lib", "libflint.dll"))
    else
+      println("Downloading http://nemocas.org/binaries/w64-libflint.dll ... ")
       download_dll("http://nemocas.org/binaries/w64-libflint.dll", joinpath(vdir, "lib", "libflint.dll"))
    end
    try
@@ -164,8 +172,10 @@ end
  
 if on_windows
    if Int == Int32
+      println("Downloading http://nemocas.org/binaries/w32-libarb.dll ... ")
       download_dll("http://nemocas.org/binaries/w32-libarb.dll", joinpath(vdir, "lib", "libarb.dll"))
    else
+      println("Downloading http://nemocas.org/binaries/w64-libarb.dll ... ")
       download_dll("http://nemocas.org/binaries/w64-libarb.dll", joinpath(vdir, "lib", "libarb.dll"))
    end
 else
@@ -191,8 +201,10 @@ end
 
 if on_windows
    if Int == Int32
+      println("Downloading http://nemocas.org/binaries/w32-libpari.dll ... ")
       download_dll("http://nemocas.org/binaries/w32-libpari.dll", joinpath(vdir, "lib", "libpari.dll"))
    else
+      println("Downloading http://nemocas.org/binaries/w64-libpari.dll ... ")
       download_dll("http://nemocas.org/binaries/w64-libpari.dll", joinpath(vdir, "lib", "libpari.dll"))
    end
 elseif on_osx
