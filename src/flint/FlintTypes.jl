@@ -314,7 +314,7 @@ const NmodPolyRingID = ObjectIdDict()
 type NmodPolyRing <: Ring{Flint}
   base_ring::GenResidueRing{fmpz}
   S::Symbol
-  _n::UInt
+  n::UInt
 
   function NmodPolyRing(R::GenResidueRing{fmpz}, s::Symbol, cached=true)
     m = UInt(modulus(R))
@@ -331,12 +331,12 @@ type NmodPolyRing <: Ring{Flint}
 end
 
 type nmod_poly <: PolyElem{GenResidue{fmpz}}
-   _coeffs::Ptr{Void}
-   _alloc::Int
-   _length::Int
-   _mod_n::UInt
-   _mod_ninv::UInt
-   _mod_norm::UInt
+   coeffs::Ptr{Void}
+   alloc::Int
+   length::Int
+   mod_n::UInt
+   mod_ninv::UInt
+   mod_norm::UInt
    parent::NmodPolyRing
 
    function nmod_poly(n::UInt)
@@ -430,15 +430,15 @@ end
 type nmod_poly_factor
   poly::Ptr{nmod_poly}  # array of flint nmod_poly_struct's
   exp::Ptr{Int} 
-  _num::Int
-  _alloc::Int
-  _n::UInt
+  num::Int
+  alloc::Int
+  n::UInt
     
   function nmod_poly_factor(n::UInt)
     z = new()
     ccall((:nmod_poly_factor_init, :libflint), Void,
             (Ptr{nmod_poly_factor}, ), &z)
-    z._n = n
+    z.n = n
     finalizer(z, _nmod_poly_factor_clear_fn)
     return z
   end
@@ -460,7 +460,7 @@ const FmpzModPolyRingID = ObjectIdDict()
 type FmpzModPolyRing <: Ring{Flint}
   base_ring::GenResidueRing{fmpz}
   S::Symbol
-  _n::fmpz
+  n::fmpz
 
   function FmpzModPolyRing(R::GenResidueRing{fmpz}, s::Symbol, cached=true)
     m = modulus(R)
@@ -477,10 +477,10 @@ type FmpzModPolyRing <: Ring{Flint}
 end
 
 type fmpz_mod_poly <: PolyElem{GenResidue{fmpz}}
-   _coeffs::Ptr{Void}
-   _alloc::Int
-   _length::Int
-   _p::Int
+   coeffs::Ptr{Void}
+   alloc::Int
+   length::Int
+   p::Int
    parent::FmpzModPolyRing
 
    function fmpz_mod_poly(n::fmpz)
@@ -564,15 +564,15 @@ end
 type fmpz_mod_poly_factor
   poly::Ptr{fmpz_mod_poly}
   exp::Ptr{Int} 
-  _num::Int
-  _alloc::Int
-  _n::fmpz
+  num::Int
+  alloc::Int
+  n::fmpz
     
   function fmpz_mod_poly_factor(n::fmpz)
     z = new()
     ccall((:fmpz_mod_poly_factor_init, :libflint), Void,
             (Ptr{fmpz_mod_poly_factor}, ), &z)
-    z._n = n
+    z.n = n
     finalizer(z, _fmpz_mod_poly_factor_clear_fn)
     return z
   end
@@ -1470,7 +1470,7 @@ const NmodMatID = ObjectIdDict()
 
 type NmodMatSpace <: Ring{Flint}
   base_ring::GenResidueRing{fmpz}
-  _n::UInt
+  n::UInt
   rows::Int
   cols::Int
 
@@ -1498,9 +1498,9 @@ type nmod_mat <: MatElem{GenResidue{fmpz}}
   r::Int                  # Int
   c::Int                  # Int
   rows::Ptr{Void}
-  _n::UInt                # mp_limb_t / Culong
-  _ninv::UInt             # mp_limb_t / Culong
-  _norm::UInt             # mp_limb_t / Culong
+  n::UInt                # mp_limb_t / Culong
+  ninv::UInt             # mp_limb_t / Culong
+  norm::UInt             # mp_limb_t / Culong
   parent::NmodMatSpace
 
   function nmod_mat(r::Int, c::Int, n::UInt)

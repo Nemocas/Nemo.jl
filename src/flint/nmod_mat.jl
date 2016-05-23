@@ -74,13 +74,13 @@ setindex_t!{T<:Union{RingElem, Integer}}(a::nmod_mat, u::T, i::Int, j::Int) =
 
 function set_entry!(a::nmod_mat, i::Int, j::Int, u::UInt)
   ccall((:nmod_mat_set_entry, :libflint), Void,
-          (Ptr{nmod_mat}, Int, Int, UInt), &a, i-1, j-1, u)
+          (Ptr{nmod_mat}, Int, Int, UInt), &a, i - 1, j - 1, u)
 end
 
 function set_entry!(a::nmod_mat, i::Int, j::Int, u::fmpz)
   t = fmpz()
   ccall((:fmpz_mod_ui, :libflint), UInt,
-          (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &u, a._n)
+          (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &u, a.n)
   tt = ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &t)
   set_entry!(a, i, j, tt)
 end
@@ -92,7 +92,7 @@ set_entry_t!{T<:Union{RingElem, Integer}}(a::nmod_mat, i::Int, j::Int, u::T) =
   set_entry!(a, j, i, u)
  
 function deepcopy(a::nmod_mat)
-  z = nmod_mat(rows(a), cols(a), a._n)
+  z = nmod_mat(rows(a), cols(a), a.n)
   if isdefined(a, :parent)
     z.parent = a.parent
   end
@@ -246,7 +246,7 @@ end
 function *(x::nmod_mat, y::fmpz)
   t = fmpz()
   ccall((:fmpz_mod_ui, :libflint), UInt,
-          (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &y, parent(x)._n)
+          (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &y, parent(x).n)
   tt = ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &t)
   return x*tt
 end
@@ -590,7 +590,7 @@ Base.promote_rule(::Type{nmod_mat}, ::Type{fmpz}) = nmod_mat
 ################################################################################
 
 function Base.call(a::NmodMatSpace)
-  z = nmod_mat(a.rows, a.cols, a._n)
+  z = nmod_mat(a.rows, a.cols, a.n)
   z.parent = a
   return z
 end
@@ -640,21 +640,21 @@ end
 
 function Base.call(a::NmodMatSpace, arr::Array{BigInt, 2}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr, transpose)
-  z = nmod_mat(a.rows, a.cols, a._n, arr, transpose)
+  z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
   z.parent = a
   return z
 end
 
 function Base.call(a::NmodMatSpace, arr::Array{fmpz, 2}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr, transpose)
-  z = nmod_mat(a.rows, a.cols, a._n, arr, transpose)
+  z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
   z.parent = a
   return z
 end
 
 function Base.call(a::NmodMatSpace, arr::Array{Int, 2}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr, transpose)
-  z = nmod_mat(a.rows, a.cols, a._n, arr, transpose)
+  z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
   z.parent = a
   return z
 end
@@ -663,7 +663,7 @@ function Base.call(a::NmodMatSpace, arr::Array{GenResidue{fmpz}, 2}, transpose::
   _check_dim(a.rows, a.cols, arr, transpose)
   length(arr) == 0 && error("Array must be nonempty")
   (base_ring(a) != parent(arr[1])) && error("Elements must have same base ring")
-  z = nmod_mat(a.rows, a.cols, a._n, arr, transpose)
+  z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
   z.parent = a
   return z
 end
@@ -693,7 +693,7 @@ end
 function Base.call(a::NmodMatSpace, arr::Array{GenResidue{fmpz}, 1})
   (length(arr) != a.cols * a.rows) &&
           error("Array must be of length ", a.cols * a.rows)
-  z = nmod_mat(a.rows, a.cols, a._n, arr)
+  z = nmod_mat(a.rows, a.cols, a.n, arr)
   z.parent = a
 
   return z
@@ -701,7 +701,7 @@ end
 
 function Base.call(a::NmodMatSpace, b::fmpz_mat)
   (a.cols != b.c || a.rows != b.r) && error("Dimensions do not fit")
-  z = nmod_mat(a._n, b)
+  z = nmod_mat(a.n, b)
   z.parent = a
   return z
 end

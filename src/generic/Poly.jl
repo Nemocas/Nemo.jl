@@ -52,14 +52,14 @@ function Base.hash(a::PolyElem, h::UInt)
    return b
 end
 
-function normalise(a::GenPoly, len::Int)
+function normalise(a::PolyElem, len::Int)
    while len > 0 && iszero(a.coeffs[len]) 
       len -= 1
    end
    return len
 end
 
-function set_length!(a::GenPoly, len::Int)
+function set_length!(a::PolyElem, len::Int)
    a.length = len
 end
 
@@ -67,7 +67,7 @@ length(x::PolyElem) = x.length
 
 degree(x::PolyElem) = length(x) - 1
 
-coeff{T <: RingElem}(a::GenPoly{T}, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
+coeff(a::PolyElem, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 
 lead(a::PolyElem) = length(a) == 0 ? base_ring(a)(0) : coeff(a, length(a) - 1)
 
@@ -87,7 +87,7 @@ end
 
 isunit(a::PolyElem) = length(a) == 1 && isunit(coeff(a, 0))
 
-function deepcopy{T <: RingElem}(a::GenPoly{T})
+function deepcopy{T <: RingElem}(a::PolyElem{T})
    coeffs = Array(T, length(a))
    for i = 1:length(a)
       coeffs[i] = deepcopy(coeff(a, i - 1))
@@ -171,7 +171,7 @@ needs_parentheses(x::PolyElem) = length(x) > 1
 
 is_negative(x::PolyElem) = length(x) <= 1 && is_negative(coeff(x, 0))
 
-show_minus_one{T <: RingElem}(::Type{GenPoly{T}}) = show_minus_one(T)
+show_minus_one{T <: RingElem}(::Type{PolyElem{T}}) = show_minus_one(T)
 
 ###############################################################################
 #
@@ -179,7 +179,7 @@ show_minus_one{T <: RingElem}(::Type{GenPoly{T}}) = show_minus_one(T)
 #
 ###############################################################################
 
-function -{T <: RingElem}(a::GenPoly{T})
+function -{T <: RingElem}(a::PolyElem{T})
    len = length(a)
    d = Array(T, len)
    for i = 1:len
@@ -196,7 +196,7 @@ end
 #
 ###############################################################################
 
-function +{T <: RingElem}(a::GenPoly{T}, b::GenPoly{T})
+function +{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -226,7 +226,7 @@ function +{T <: RingElem}(a::GenPoly{T}, b::GenPoly{T})
    return z
 end
 
-function -{T <: RingElem}(a::GenPoly{T}, b::GenPoly{T})
+function -{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -419,7 +419,7 @@ function mul_classical{T <: RingElem}(a::GenPoly{T}, b::GenPoly{T})
    return z
 end
 
-function *{T <: RingElem}(a::GenPoly{T}, b::GenPoly{T})
+function *{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    check_parent(a, b)
    return mul_classical(a, b)
 end
@@ -430,7 +430,7 @@ end
 #
 ###############################################################################
 
-function *{T <: RingElem}(a::Int, b::GenPoly{T})
+function *{T <: RingElem}(a::Integer, b::PolyElem{T})
    len = length(b)
    d = Array(T, len)
    for i = 1:len
@@ -441,7 +441,7 @@ function *{T <: RingElem}(a::Int, b::GenPoly{T})
    return z
 end
 
-function *{T <: RingElem}(a::fmpz, b::GenPoly{T})
+function *{T <: RingElem}(a::fmpz, b::PolyElem{T})
    len = length(b)
    d = Array(T, len)
    for i = 1:len
@@ -452,9 +452,9 @@ function *{T <: RingElem}(a::fmpz, b::GenPoly{T})
    return z
 end
 
-*(a::GenPoly, b::Int) = b*a
+*(a::PolyElem, b::Integer) = b*a
 
-*(a::GenPoly, b::fmpz) = b*a
+*(a::PolyElem, b::fmpz) = b*a
 
 ###############################################################################
 #
@@ -575,10 +575,10 @@ end
 #
 ###############################################################################
 
-==(x::GenPoly, y::Integer) = ((length(x) == 0 && y == 0)
+==(x::PolyElem, y::Integer) = ((length(x) == 0 && y == 0)
                         || (length(x) == 1 && coeff(x, 0) == y))
 
-==(x::Integer, y::GenPoly) = y == x
+==(x::Integer, y::PolyElem) = y == x
 
 ###############################################################################
 #
@@ -799,7 +799,7 @@ end
 #
 ###############################################################################
 
-function divexact{T <: RingElem}(a::GenPoly{T}, b::T)
+function divexact{T <: RingElem}(a::PolyElem{T}, b::T)
    b == 0 && throw(DivideError())
    d = Array(T, length(a))
    for i = 1:length(a)
@@ -810,7 +810,7 @@ function divexact{T <: RingElem}(a::GenPoly{T}, b::T)
    return z
 end
 
-function divexact{T <: RingElem}(a::GenPoly{T}, b::Integer)
+function divexact{T <: RingElem}(a::PolyElem{T}, b::Integer)
    b == 0 && throw(DivideError())
    d = Array(T, length(a))
    for i = 1:length(a)
@@ -1040,7 +1040,7 @@ function evaluate{T <: RingElem}(a::PolyElem{T}, b::fmpz)
    return evaluate(a, base_ring(a)(b))
 end
 
-function compose(a::GenPoly, b::GenPoly)
+function compose(a::PolyElem, b::PolyElem)
    i = length(a)
    if i == 0
        return zero(parent(a))
@@ -1571,7 +1571,7 @@ end
 #
 ###############################################################################
 
-function fit!{T <: RingElem}(c::GenPoly{T}, n::Int)
+function fit!{T <: RingElem}(c::PolyElem{T}, n::Int)
    if length(c) < n
       t = c.coeffs
       c.coeffs = Array(T, n)
@@ -1584,7 +1584,7 @@ function fit!{T <: RingElem}(c::GenPoly{T}, n::Int)
    end
 end
 
-function setcoeff!{T <: RingElem}(c::GenPoly{T}, n::Int, a::T)
+function setcoeff!{T <: RingElem}(c::PolyElem{T}, n::Int, a::T)
    if a != 0 || n + 1 <= length(c)
       fit!(c, n + 1)
       c.coeffs[n + 1] = a
@@ -1593,7 +1593,7 @@ function setcoeff!{T <: RingElem}(c::GenPoly{T}, n::Int, a::T)
    end
 end
 
-function mul!{T <: RingElem}(c::GenPoly{T}, a::GenPoly{T}, b::GenPoly{T})
+function mul!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T}, b::PolyElem{T})
    lena = length(a)
    lenb = length(b)
 
@@ -1631,7 +1631,7 @@ function mul!{T <: RingElem}(c::GenPoly{T}, a::GenPoly{T}, b::GenPoly{T})
    end
 end
 
-function addeq!{T <: RingElem}(c::GenPoly{T}, a::GenPoly{T})
+function addeq!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T})
    lenc = length(c)
    lena = length(a)
    len = max(lenc, lena)
@@ -1728,7 +1728,7 @@ function Base.call{T <: RingElem}(a::GenPolynomialRing{T}, b::T)
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenPolynomialRing{T}, b::GenPoly{T})
+function Base.call{T <: RingElem}(a::GenPolynomialRing{T}, b::PolyElem{T})
    parent(b) != a && error("Unable to coerce polynomial")
    return b
 end
