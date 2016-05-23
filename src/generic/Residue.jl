@@ -52,7 +52,7 @@ function modulus(a::ResidueElem)
    return modulus(parent(a))
 end
 
-data(a::GenResidue) = a.data
+data(a::ResidueElem) = a.data
 
 zero(R::GenResidueRing) = R(0)
 
@@ -75,7 +75,7 @@ deepcopy(a::ResidueElem) = parent(a)(deepcopy(data(a)))
 #
 ###############################################################################
 
-canonical_unit(a::GenResidue) = a
+canonical_unit(a::ResidueElem) = a
 
 ###############################################################################
 #
@@ -95,7 +95,7 @@ needs_parentheses(x::ResidueElem) = needs_parentheses(data(x))
 
 is_negative(x::ResidueElem) = is_negative(data(x))
 
-show_minus_one{T <: RingElem}(::Type{GenResidue{T}}) = true
+show_minus_one{T <: RingElem}(::Type{ResidueElem{T}}) = true
 
 ###############################################################################
 #
@@ -113,17 +113,17 @@ end
 #
 ###############################################################################
 
-function +{T <: RingElem}(a::GenResidue{T}, b::GenResidue{T})
+function +{T <: RingElem}(a::ResidueElem{T}, b::ResidueElem{T})
    check_parent(a, b)
    return parent(a)(data(a) + data(b))
 end
 
-function -{T <: RingElem}(a::GenResidue{T}, b::GenResidue{T})
+function -{T <: RingElem}(a::ResidueElem{T}, b::ResidueElem{T})
    check_parent(a, b)
    return parent(a)(data(a) - data(b))
 end
 
-function *{T <: RingElem}(a::GenResidue{T}, b::GenResidue{T})
+function *{T <: RingElem}(a::ResidueElem{T}, b::ResidueElem{T})
    check_parent(a, b)
    return parent(a)(data(a) * data(b))
 end
@@ -134,17 +134,17 @@ end
 #
 ###############################################################################
 
-*{T <: RingElem}(a::GenResidue{T}, b::Integer) = parent(a)(data(a) * b)
+*{T <: RingElem}(a::ResidueElem{T}, b::Integer) = parent(a)(data(a) * b)
 
-*{T <: RingElem}(a::Integer, b::GenResidue{T}) = parent(b)(a * data(b))
+*{T <: RingElem}(a::Integer, b::ResidueElem{T}) = parent(b)(a * data(b))
 
-+{T <: RingElem}(a::GenResidue{T}, b::Integer) = parent(a)(data(a) + b)
++{T <: RingElem}(a::ResidueElem{T}, b::Integer) = parent(a)(data(a) + b)
 
-+{T <: RingElem}(a::Integer, b::GenResidue{T}) = parent(b)(a + data(b))
++{T <: RingElem}(a::Integer, b::ResidueElem{T}) = parent(b)(a + data(b))
 
--{T <: RingElem}(a::GenResidue{T}, b::Integer) = parent(a)(data(a) - b)
+-{T <: RingElem}(a::ResidueElem{T}, b::Integer) = parent(a)(data(a) - b)
 
--{T <: RingElem}(a::Integer, b::GenResidue{T}) = parent(b)(a - data(b))
+-{T <: RingElem}(a::Integer, b::ResidueElem{T}) = parent(b)(a - data(b))
 
 ###############################################################################
 #
@@ -229,11 +229,11 @@ end
 #
 ###############################################################################
 
-function mul!{T <: RingElem}(c::GenResidue{T}, a::GenResidue{T}, b::GenResidue{T})
+function mul!{T <: RingElem}(c::ResidueElem{T}, a::ResidueElem{T}, b::ResidueElem{T})
    c.data = mod(data(a)*data(b), modulus(a))
 end
 
-function addeq!{T <: RingElem}(c::GenResidue{T}, a::GenResidue{T})
+function addeq!{T <: RingElem}(c::ResidueElem{T}, a::ResidueElem{T})
    c.data = mod(c.data + data(a), modulus(a))
 end
 
