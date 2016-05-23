@@ -262,6 +262,10 @@ end
 
 +(x::Integer, y::fmpz_mat) = y + x
 
++(x::fmpz, y::fmpz_mat) = parent(y)(x) + y
+
++(x::fmpz_mat, y::fmpz) = x + parent(x)(y)
+
 function -(x::fmpz_mat, y::Integer)
    z = deepcopy(x)
    for i = 1:min(rows(x), cols(x))
@@ -277,6 +281,10 @@ function -(x::Integer, y::fmpz_mat)
    end
    return z
 end
+
+-(x::fmpz, y::fmpz_mat) = parent(y)(x) - y
+
+-(x::fmpz_mat, y::fmpz) = x - parent(x)(y)
 
 ###############################################################################
 #
