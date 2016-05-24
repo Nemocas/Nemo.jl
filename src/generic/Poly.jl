@@ -22,15 +22,15 @@ export GenPoly, GenPolynomialRing, PolynomialRing, hash, coeff, isgen, lead,
 
 parent_type{T}(::Type{GenPoly{T}}) = GenPolynomialRing{T}
 
-elem_type{T <: RingElem}(::GenPolynomialRing{T}) = GenPoly{T}
+elem_type{T <: RingElem}(::PolyRing{T}) = GenPoly{T}
 
-base_ring{T}(a::GenPolynomialRing{T}) = a.base_ring::parent_type(T)
+base_ring{T}(a::PolyRing{T}) = a.base_ring::parent_type(T)
 
 base_ring(a::PolyElem) = base_ring(parent(a))
 
 parent(a::PolyElem) = a.parent
 
-var(a::GenPolynomialRing) = a.S
+var(a::PolyRing) = a.S
 
 function check_parent(a::PolyElem, b::PolyElem)
    parent(a) != parent(b) && 
@@ -71,11 +71,11 @@ coeff(a::PolyElem, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 
 lead(a::PolyElem) = length(a) == 0 ? base_ring(a)(0) : coeff(a, length(a) - 1)
 
-zero(a::GenPolynomialRing) = a(0)
+zero(a::PolyRing) = a(0)
 
-one(a::GenPolynomialRing) = a(1)
+one(a::PolyRing) = a(1)
 
-gen(a::GenPolynomialRing) = a([zero(base_ring(a)), one(base_ring(a))])
+gen(a::PolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
 
 iszero(a::PolyElem) = length(a) == 0
 
@@ -1460,7 +1460,7 @@ end
 #
 ###############################################################################
 
-function interpolate{T <: RingElem}(S::GenPolynomialRing, x::Array{T, 1}, y::Array{T, 1})
+function interpolate{T <: RingElem}(S::PolyRing, x::Array{T, 1}, y::Array{T, 1})
    length(x) != length(y) && error("Array lengths don't match in interpolate")
    n = length(x)
    if n == 0
@@ -1744,7 +1744,7 @@ end
 
 ###############################################################################
 #
-#   GenPolynomialRing constructor
+#   PolynomialRing constructor
 #
 ###############################################################################
 

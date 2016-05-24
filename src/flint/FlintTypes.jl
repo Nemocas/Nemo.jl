@@ -68,7 +68,7 @@ end
 #
 ###############################################################################
 
-type FlintRationalField <: Field{Flint}
+type FlintRationalField <: FracField{fmpz}
 end
 
 const FlintQQ = FlintRationalField()
@@ -134,7 +134,7 @@ _fmpq_clear_fn(a::fmpq) = ccall((:fmpq_clear, :libflint), Void, (Ptr{fmpq},), &a
 
 const FmpzPolyID = ObjectIdDict()
 
-type FmpzPolyRing <: Ring{Flint}
+type FmpzPolyRing <: PolyRing{fmpz}
    base_ring::FlintIntegerRing
    S::Symbol
 
@@ -213,7 +213,7 @@ end
 
 const FmpqPolyID = ObjectIdDict()
 
-type FmpqPolyRing <: Ring{Flint}
+type FmpqPolyRing <: PolyRing{fmpq}
    base_ring::FlintRationalField
    S::Symbol
 
@@ -311,7 +311,7 @@ end
 
 const NmodPolyRingID = ObjectIdDict()
 
-type NmodPolyRing <: Ring{Flint}
+type NmodPolyRing <: PolyRing{GenResidue{fmpz}}
   base_ring::GenResidueRing{fmpz}
   S::Symbol
   n::UInt
@@ -457,7 +457,7 @@ end
 
 const FmpzModPolyRingID = ObjectIdDict()
 
-type FmpzModPolyRing <: Ring{Flint}
+type FmpzModPolyRing <: PolyRing{GenResidue{fmpz}}
   base_ring::GenResidueRing{fmpz}
   S::Symbol
   n::fmpz
@@ -873,7 +873,7 @@ end
 
 const FmpzSeriesID = ObjectIdDict()
 
-type FmpzSeriesRing <: Ring{Flint}
+type FmpzSeriesRing <: SeriesRing{fmpz}
    base_ring::FlintIntegerRing
    prec_max::Int
    S::Symbol
@@ -939,7 +939,7 @@ end
 
 const FmpqSeriesID = ObjectIdDict()
 
-type FmpqSeriesRing <: Ring{Flint}
+type FmpqSeriesRing <: SeriesRing{fmpq}
    base_ring::FlintRationalField
    prec_max::Int
    S::Symbol
@@ -1006,7 +1006,7 @@ end
 
 const FmpzModSeriesID = ObjectIdDict()
 
-type FmpzModSeriesRing <: Ring{Flint}
+type FmpzModSeriesRing <: SeriesRing{GenResidue{fmpz}}
    base_ring::GenResidueRing{fmpz}
    prec_max::Int
    S::Symbol
@@ -1087,7 +1087,7 @@ end
 
 const FqSeriesID = ObjectIdDict()
 
-type FqSeriesRing <: Ring{Flint}
+type FqSeriesRing <: SeriesRing{fq}
    base_ring::FqFiniteField
    prec_max::Int
    S::Symbol
@@ -1157,7 +1157,7 @@ end
 
 const FqNmodSeriesID = ObjectIdDict()
 
-type FqNmodSeriesRing <: Ring{Flint}
+type FqNmodSeriesRing <: SeriesRing{fq_nmod}
    base_ring::FqNmodFiniteField
    prec_max::Int
    S::Symbol
@@ -1228,7 +1228,7 @@ end
 const FmpqMatID = ObjectIdDict()
 
 # not really a mathematical ring
-type FmpqMatSpace <: Ring{Flint}
+type FmpqMatSpace <: MatSpace{fmpq}
    rows::Int
    cols::Int
    base_ring::FlintRationalField
@@ -1348,7 +1348,7 @@ end
 const FmpzMatID = ObjectIdDict()
 
 # not really a mathematical ring
-type FmpzMatSpace <: Ring{Flint}
+type FmpzMatSpace <: MatSpace{fmpz}
    rows::Int
    cols::Int
    base_ring::FlintIntegerRing
@@ -1468,7 +1468,7 @@ end
 const NmodMatID = ObjectIdDict()
 
 
-type NmodMatSpace <: Ring{Flint}
+type NmodMatSpace <: MatSpace{GenResidue{fmpz}}
   base_ring::GenResidueRing{fmpz}
   n::UInt
   rows::Int
@@ -1628,7 +1628,7 @@ end
 
 const FqPolyID = ObjectIdDict()
 
-type FqPolyRing <: Ring{Flint}
+type FqPolyRing <: PolyRing{fq}
    base_ring::FqFiniteField
    S::Symbol
 
@@ -1762,7 +1762,7 @@ end
 
 const FqNmodPolyID = ObjectIdDict()
 
-type FqNmodPolyRing <: Ring{Flint}
+type FqNmodPolyRing <: PolyRing{fq_nmod}
    base_ring::FqNmodFiniteField
    S::Symbol
 
@@ -1930,4 +1930,3 @@ type perm <: PermElem
       return new(d)
    end
 end
-

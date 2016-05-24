@@ -37,6 +37,25 @@ abstract Generic
 
    abstract FieldElem <: RingElem
 
+# rings, fields etc, parameterised by an element type
+# these are the type classes of different kinds of
+# mathematical rings/fields/etc, which have a base ring,
+# and for which a generic implementation is possible
+# over that base ring
+
+abstract PolyRing{T} <: Ring
+
+abstract SeriesRing{T} <: Ring
+
+abstract ResRing{T} <: Ring
+
+abstract FracField{T} <: Field
+
+# not always really mathematical rings
+# later we'll distinguish matrix algebras
+# from the generic case
+abstract MatSpace{T} <: Ring
+
 # mathematical objects parameterised by an element type
 # these are the type classes of mathematical objects
 # that have some kind of base ring, and a generic 

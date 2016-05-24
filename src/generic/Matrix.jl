@@ -19,7 +19,7 @@ parent_type{T}(::Type{GenMat{T}}) = GenMatrixSpace{T}
 
 elem_type{T <: RingElem}(::GenMatrixSpace{T}) = GenMat{T}
 
-base_ring{T}(a::GenMatrixSpace{T}) = a.base_ring::parent_type(T)
+base_ring{T}(a::MatSpace{T}) = a.base_ring::parent_type(T)
 
 base_ring(a::MatElem) = base_ring(parent(a))
 
@@ -61,9 +61,9 @@ end
 
 setindex_t!{T <: RingElem}(a::MatElem{T}, d::T, r::Int, c::Int) = setindex!(a, d, c, r)
 
-zero(a::GenMatrixSpace) = a()
+zero(a::MatSpace) = a()
 
-one(a::GenMatrixSpace) = a(1)
+one(a::MatSpace) = a(1)
 
 function iszero(a::MatElem)
    for i = 1:rows(a)
@@ -117,7 +117,7 @@ canonical_unit(a::MatElem) = canonical_unit(a[1, 1])
 #
 ###############################################################################
 
-function show(io::IO, a::GenMatrixSpace)
+function show(io::IO, a::MatSpace)
    print(io, "Matrix Space of ")
    print(io, a.rows, " rows and ", a.cols, " columns over ")
    print(io, base_ring(a))

@@ -12,7 +12,7 @@
 
 const GenPolyID = ObjectIdDict()
 
-type GenPolynomialRing{T <: RingElem} <: Ring{Generic}
+type GenPolynomialRing{T <: RingElem} <: PolyRing{T}
    base_ring :: Ring
    S::Symbol
 
@@ -49,7 +49,7 @@ end
 
 const ModulusDict = Dict{Tuple{Ring, RingElem}, Ring}()
 
-type GenResidueRing{T <: RingElem} <: Ring{Generic}
+type GenResidueRing{T <: RingElem} <: ResRing{T}
    base_ring::Ring
    modulus::T
 
@@ -81,7 +81,7 @@ end
 
 const GenCapRelSeriesID = ObjectIdDict()
 
-type GenCapRelPowerSeriesRing{T <: RingElem} <: Ring{Generic}
+type GenCapRelPowerSeriesRing{T <: RingElem} <: SeriesRing{T}
    base_ring::Ring
    prec_max::Int
    S::Symbol
@@ -117,7 +117,7 @@ end
 
 const GenFractionDict = ObjectIdDict()
 
-type GenFractionField{T <: RingElem} <: Field{Generic}
+type GenFractionField{T <: RingElem} <: FracField{T}
    base_ring::Ring
 
    function GenFractionField(R::Ring, cached=true)
@@ -150,7 +150,7 @@ end
 const GenMatrixDict = ObjectIdDict()
 
 # not really a mathematical ring
-type GenMatrixSpace{T <: RingElem} <: Ring{Generic}
+type GenMatrixSpace{T <: RingElem} <: MatSpace{T}
    rows::Int
    cols::Int
    base_ring::Ring

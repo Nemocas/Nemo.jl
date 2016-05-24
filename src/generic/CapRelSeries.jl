@@ -27,11 +27,11 @@ parent(a::SeriesElem) = a.parent
 
 elem_type{T <: RingElem}(::GenCapRelPowerSeriesRing{T}) = GenCapRelSeries{T}
 
-base_ring{T}(R::GenCapRelPowerSeriesRing{T}) = R.base_ring::parent_type(T)
+base_ring{T}(R::SeriesRing{T}) = R.base_ring::parent_type(T)
 
 base_ring(a::SeriesElem) = base_ring(parent(a))
 
-var(a::GenCapRelPowerSeriesRing) = a.S
+var(a::SeriesRing) = a.S
 
 function check_parent(a::SeriesElem, b::SeriesElem)
    parent(a) != parent(b) && 
@@ -57,7 +57,7 @@ length(x::SeriesElem) = x.length
 
 precision(x::SeriesElem) = x.prec
 
-max_precision(R::GenCapRelPowerSeriesRing) = R.prec_max
+max_precision(R::SeriesRing) = R.prec_max
 
 function normalise(a::SeriesElem, len::Int)
    while len > 0 && iszero(a.coeffs[len])
@@ -80,11 +80,11 @@ function coeff(a::SeriesElem, n::Int)
    return n >= length(a) ? zero(base_ring(a)) : a.coeffs[n + 1]
 end
 
-zero(R::GenCapRelPowerSeriesRing) = R(0)
+zero(R::SeriesRing) = R(0)
 
-one(R::GenCapRelPowerSeriesRing) = R(1)
+one(R::SeriesRing) = R(1)
 
-function gen{T}(R::GenCapRelPowerSeriesRing{T})
+function gen{T}(R::SeriesRing{T})
    S = base_ring(R)
    z = GenCapRelSeries{T}([S(0), S(1)], 2, max_precision(R) + 1)
    z.parent = R
@@ -180,7 +180,7 @@ function show{T <: RingElem}(io::IO, x::SeriesElem{T})
    print(io, "+O(", string(var(parent(x))), "^", precision(x), ")")
 end
 
-function show{T <: RingElem}(io::IO, a::GenCapRelPowerSeriesRing{T})
+function show{T <: RingElem}(io::IO, a::SeriesRing{T})
    print(io, "Univariate power series ring in ", var(a), " over ")
    show(io, base_ring(a))
 end
@@ -792,7 +792,7 @@ function Base.call{T <: RingElem}(a::GenCapRelPowerSeriesRing{T}, b::T)
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenCapRelPowerSeriesRing{T}, b::GenCapRelSeries{T})
+function Base.call{T <: RingElem}(a::GenCapRelPowerSeriesRing{T}, b::SeriesElem{T})
    parent(b) != a && error("Unable to coerce power series")
    return b
 end

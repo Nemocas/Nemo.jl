@@ -16,7 +16,7 @@ parent_type{T}(::Type{GenFraction{T}}) = GenFractionField{T}
 
 elem_type{T <: RingElem}(::GenFractionField{T}) = GenFraction{T}
 
-base_ring{T}(a::GenFractionField{T}) = a.base_ring::parent_type(T)
+base_ring{T}(a::FracField{T}) = a.base_ring::parent_type(T)
 
 base_ring(a::FractionElem) = base_ring(parent(a))
 
@@ -76,9 +76,9 @@ function den(a::FractionElem)
    return divexact(a.den, u)
 end
 
-zero(R::GenFractionField) = R(0)
+zero(R::FracField) = R(0)
 
-one(R::GenFractionField) = R(1)
+one(R::FracField) = R(1)
 
 iszero(a::FractionElem) = iszero(num(a))
 
@@ -129,7 +129,7 @@ function show(io::IO, x::FractionElem)
    end
 end
 
-function show(io::IO, a::GenFractionField)
+function show(io::IO, a::FracField)
    print(io, "Fraction field of ", base_ring(a))
 end
 

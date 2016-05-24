@@ -16,13 +16,13 @@ parent_type{T}(::Type{GenResidue{T}}) = GenResidueRing{T}
 
 elem_type{T <: RingElem}(::GenResidueRing{T}) = GenResidue{T}
 
-base_ring{T}(a::GenResidueRing{T}) = a.base_ring::parent_type(T)
+base_ring{T}(a::ResRing{T}) = a.base_ring::parent_type(T)
 
 base_ring(a::ResidueElem) = base_ring(parent(a))
 
 parent(a::ResidueElem) = a.parent
 
-function check_parent_type{T <: RingElem}(a::GenResidueRing{T}, b::GenResidueRing{T})
+function check_parent_type{T <: RingElem}(a::ResRing{T}, b::ResRing{T})
    # exists only to check types of parents agree
 end
    
@@ -44,7 +44,7 @@ function Base.hash(a::ResidueElem, h::UInt)
    return b $ hash(data(a), h) $ h
 end
 
-function modulus(R::GenResidueRing)
+function modulus(R::ResRing)
    return R.modulus
 end
 
@@ -54,9 +54,9 @@ end
 
 data(a::ResidueElem) = a.data
 
-zero(R::GenResidueRing) = R(0)
+zero(R::ResRing) = R(0)
 
-one(R::GenResidueRing) = R(1)
+one(R::ResRing) = R(1)
 
 iszero(a::ResidueElem) = iszero(data(a))
 
@@ -87,7 +87,7 @@ function show(io::IO, x::ResidueElem)
    print(io, data(x))
 end
 
-function show(io::IO, a::GenResidueRing)
+function show(io::IO, a::ResRing)
    print(io, "Residue ring of ", base_ring(a), " modulo ", modulus(a))
 end
 
@@ -284,7 +284,7 @@ function Base.call{T <: RingElem}(a::GenResidueRing{T}, b::T)
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenResidueRing{T}, b::GenResidue{T})
+function Base.call{T <: RingElem}(a::GenResidueRing{T}, b::ResidueElem{T})
    a != parent(b) && error("Operation on incompatible objects")
    return b
 end

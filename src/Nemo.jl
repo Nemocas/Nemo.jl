@@ -27,6 +27,8 @@ export SetElem, GroupElem, RingElem, FieldElem, Pari, Flint, Antic,
 
 export PolyElem, SeriesElem, ResidueElem, FractionElem, MatElem,
        NumberFieldElem, PermElem
+       
+export PolyRing, SeriesRing, ResRing, FracField, MatSpace
 
 export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
        MaximalRealSubfield, MaximalOrder, Ideal, PermutationGroup
