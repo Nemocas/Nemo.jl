@@ -476,7 +476,7 @@ Base.promote_rule{T <: Integer}(::Type{fmpz_mod_series}, ::Type{T}) = fmpz_mod_s
 
 Base.promote_rule(::Type{fmpz_mod_series}, ::Type{fmpz}) = fmpz_mod_series
 
-Base.promote_rule(::Type{fmpz_mod_series}, ::Type{GenResidue{fmpz}}) = fmpz_mod_series
+Base.promote_rule(::Type{fmpz_mod_series}, ::Type{GenRes{fmpz}}) = fmpz_mod_series
 
 ###############################################################################
 #
@@ -513,7 +513,7 @@ function Base.call(a::FmpzModSeriesRing, b::fmpz)
    return z
 end
 
-function Base.call(a::FmpzModSeriesRing, b::GenResidue{fmpz})
+function Base.call(a::FmpzModSeriesRing, b::GenRes{fmpz})
    if b == 0
       z = fmpz_mod_series(modulus(base_ring(a)))
       z.prec = a.prec_max
@@ -535,7 +535,7 @@ function Base.call(a::FmpzModSeriesRing, b::Array{fmpz, 1}, len::Int, prec::Int)
    return z
 end
 
-function Base.call(a::FmpzModSeriesRing, b::Array{GenResidue{fmpz}, 1}, len::Int, prec::Int)
+function Base.call(a::FmpzModSeriesRing, b::Array{GenRes{fmpz}, 1}, len::Int, prec::Int)
    z = fmpz_mod_series(modulus(base_ring(a)), b, len, prec)
    z.parent = a
    return z
@@ -547,7 +547,7 @@ end
 #
 ###############################################################################
 
-function PowerSeriesRing(R::GenResidueRing{fmpz}, prec::Int, s::AbstractString{})
+function PowerSeriesRing(R::GenResRing{fmpz}, prec::Int, s::AbstractString{})
    S = Symbol(s)
 
    parent_obj = FmpzModSeriesRing(R, prec, S)

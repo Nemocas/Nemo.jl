@@ -311,12 +311,12 @@ end
 
 const NmodPolyRingID = ObjectIdDict()
 
-type NmodPolyRing <: PolyRing{GenResidue{fmpz}}
-  base_ring::GenResidueRing{fmpz}
+type NmodPolyRing <: PolyRing{GenRes{fmpz}}
+  base_ring::GenResRing{fmpz}
   S::Symbol
   n::UInt
 
-  function NmodPolyRing(R::GenResidueRing{fmpz}, s::Symbol, cached=true)
+  function NmodPolyRing(R::GenResRing{fmpz}, s::Symbol, cached=true)
     m = UInt(modulus(R))
     if haskey(NmodPolyRingID, (m, s))
        return NmodPolyRingID[m, s]::NmodPolyRing
@@ -330,7 +330,7 @@ type NmodPolyRing <: PolyRing{GenResidue{fmpz}}
   end
 end
 
-type nmod_poly <: PolyElem{GenResidue{fmpz}}
+type nmod_poly <: PolyElem{GenRes{fmpz}}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -389,7 +389,7 @@ type nmod_poly <: PolyElem{GenResidue{fmpz}}
       return z
    end
 
-   function nmod_poly(n::UInt, arr::Array{GenResidue{fmpz}, 1})
+   function nmod_poly(n::UInt, arr::Array{GenRes{fmpz}, 1})
       z = new()
       ccall((:nmod_poly_init2, :libflint), Void,
             (Ptr{nmod_poly}, UInt, Int), &z, n, length(arr))
@@ -457,12 +457,12 @@ end
 
 const FmpzModPolyRingID = ObjectIdDict()
 
-type FmpzModPolyRing <: PolyRing{GenResidue{fmpz}}
-  base_ring::GenResidueRing{fmpz}
+type FmpzModPolyRing <: PolyRing{GenRes{fmpz}}
+  base_ring::GenResRing{fmpz}
   S::Symbol
   n::fmpz
 
-  function FmpzModPolyRing(R::GenResidueRing{fmpz}, s::Symbol, cached=true)
+  function FmpzModPolyRing(R::GenResRing{fmpz}, s::Symbol, cached=true)
     m = modulus(R)
     if haskey(FmpzModPolyRingID, (m, s))
        return FmpzModPolyRingID[m, s]::FmpzModPolyRing
@@ -476,7 +476,7 @@ type FmpzModPolyRing <: PolyRing{GenResidue{fmpz}}
   end
 end
 
-type fmpz_mod_poly <: PolyElem{GenResidue{fmpz}}
+type fmpz_mod_poly <: PolyElem{GenRes{fmpz}}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -524,7 +524,7 @@ type fmpz_mod_poly <: PolyElem{GenResidue{fmpz}}
       return z
    end
 
-   function fmpz_mod_poly(n::fmpz, arr::Array{GenResidue{fmpz}, 1})
+   function fmpz_mod_poly(n::fmpz, arr::Array{GenRes{fmpz}, 1})
       z = new()
       ccall((:fmpz_mod_poly_init2, :libflint), Void,
             (Ptr{fmpz_mod_poly}, Ptr{fmpz}, Int), &z, &n, length(arr))
@@ -1006,8 +1006,8 @@ end
 
 const FmpzModSeriesID = ObjectIdDict()
 
-type FmpzModSeriesRing <: SeriesRing{GenResidue{fmpz}}
-   base_ring::GenResidueRing{fmpz}
+type FmpzModSeriesRing <: SeriesRing{GenRes{fmpz}}
+   base_ring::GenResRing{fmpz}
    prec_max::Int
    S::Symbol
 
@@ -1021,7 +1021,7 @@ type FmpzModSeriesRing <: SeriesRing{GenResidue{fmpz}}
    end
 end
 
-type fmpz_mod_series <: SeriesElem{GenResidue{fmpz}}
+type fmpz_mod_series <: SeriesElem{GenRes{fmpz}}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -1050,7 +1050,7 @@ type fmpz_mod_series <: SeriesElem{GenResidue{fmpz}}
       return z
    end
    
-   function fmpz_mod_series(p::fmpz, a::Array{GenResidue{fmpz}, 1}, len::Int, prec::Int)
+   function fmpz_mod_series(p::fmpz, a::Array{GenRes{fmpz}, 1}, len::Int, prec::Int)
       z = new()
       ccall((:fmpz_mod_poly_init2, :libflint), Void, 
             (Ptr{fmpz_mod_series}, Ptr{fmpz}, Int), &z, &p, len)
@@ -1468,13 +1468,13 @@ end
 const NmodMatID = ObjectIdDict()
 
 
-type NmodMatSpace <: MatSpace{GenResidue{fmpz}}
-  base_ring::GenResidueRing{fmpz}
+type NmodMatSpace <: MatSpace{GenRes{fmpz}}
+  base_ring::GenResRing{fmpz}
   n::UInt
   rows::Int
   cols::Int
 
-  function NmodMatSpace(R::GenResidueRing{fmpz}, r::Int, c::Int)
+  function NmodMatSpace(R::GenResRing{fmpz}, r::Int, c::Int)
     (r < 0 || c < 0) && throw(error_dim_negative)
     R.modulus > typemax(UInt) && 
       error("Modulus of ResidueRing must less then ", fmpz(typemax(UInt)))
@@ -1493,7 +1493,7 @@ function _check_dim{T}(r::Int, c::Int, arr::Array{T, 2}, transpose::Bool)
   (size(arr) != (transpose ? (c,r) : (r,c))) && error("Array of wrong dimension")
 end
 
-type nmod_mat <: MatElem{GenResidue{fmpz}}
+type nmod_mat <: MatElem{GenRes{fmpz}}
   entries::Ptr{Void}
   r::Int                  # Int
   c::Int                  # Int
@@ -1555,7 +1555,7 @@ type nmod_mat <: MatElem{GenResidue{fmpz}}
     return nmod_mat(r, c, n, arr, transpose)
   end
 
-  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{GenResidue{fmpz}, 2}, transpose::Bool = false)
+  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{GenRes{fmpz}, 2}, transpose::Bool = false)
     z = new()
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
@@ -1574,7 +1574,7 @@ type nmod_mat <: MatElem{GenResidue{fmpz}}
     return z
   end
 
-  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{GenResidue{fmpz}, 1}, transpose::Bool = false)
+  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{GenRes{fmpz}, 1}, transpose::Bool = false)
     z = new()
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)

@@ -1,10 +1,10 @@
-###############################################################################
+  ###############################################################################
 #
 #   Matrix.jl : Generic mxn matrices over rings
 #
 ###############################################################################
 
-export MatricSpace, GenMat, GenMatrixSpace, fflu!, fflu, solve_triu, is_rref,
+export MatricSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, is_rref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
        is_hessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat,
        powers, similarity!
@@ -15,9 +15,9 @@ export MatricSpace, GenMat, GenMatrixSpace, fflu!, fflu, solve_triu, is_rref,
 #
 ###############################################################################
 
-parent_type{T}(::Type{GenMat{T}}) = GenMatrixSpace{T}
+parent_type{T}(::Type{GenMat{T}}) = GenMatSpace{T}
 
-elem_type{T <: RingElem}(::GenMatrixSpace{T}) = GenMat{T}
+elem_type{T <: RingElem}(::GenMatSpace{T}) = GenMat{T}
 
 base_ring{T}(a::MatSpace{T}) = a.base_ring::parent_type(T)
 
@@ -158,7 +158,7 @@ function transpose(x::MatElem)
    if rows(x) == cols(x)
       par = parent(x)
    else
-      par = GenMatrixSpace(base_ring(x), cols(x), rows(x))
+      par = GenMatSpace(base_ring(x), cols(x), rows(x))
    end
    return par(x.entries')
 end
@@ -2376,11 +2376,11 @@ end
 #
 ###############################################################################
 
-function Base.call{T <: RingElem}(a::GenMatrixSpace{T}, b::RingElem)
+function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::RingElem)
    return a(base_ring(a)(b))
 end
 
-function Base.call{T <: RingElem}(a::GenMatrixSpace{T})
+function Base.call{T <: RingElem}(a::GenMatSpace{T})
    entries = Array(T, a.rows, a.cols)
    for i = 1:a.rows
       for j = 1:a.cols
@@ -2392,7 +2392,7 @@ function Base.call{T <: RingElem}(a::GenMatrixSpace{T})
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenMatrixSpace{T}, b::Integer)
+function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::Integer)
    entries = Array(T, a.rows, a.cols)
    for i = 1:a.rows
       for j = 1:a.cols
@@ -2408,7 +2408,7 @@ function Base.call{T <: RingElem}(a::GenMatrixSpace{T}, b::Integer)
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenMatrixSpace{T}, b::T)
+function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::T)
    parent(b) != base_ring(a) && error("Unable to coerce to matrix")
    entries = Array(T, a.rows, a.cols)
    for i = 1:a.rows
@@ -2425,12 +2425,12 @@ function Base.call{T <: RingElem}(a::GenMatrixSpace{T}, b::T)
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenMatrixSpace{T}, b::GenMat{T})
+function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::GenMat{T})
    parent(b) != a && error("Unable to coerce matrix")
    return b
 end
 
-function Base.call{T <: RingElem}(a::GenMatrixSpace{T}, b::Array{T, 2})
+function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::Array{T, 2})
    if length(b) > 0
       parent(b[1, 1]) != base_ring(a) && error("Unable to coerce to matrix")
    end
@@ -2447,7 +2447,7 @@ end
 
 function MatrixSpace(R::Ring, r::Int, c::Int; cached=true)
    T = elem_type(R)
-   return GenMatrixSpace{T}(R, r, c, cached)
+   return GenMatSpace{T}(R, r, c, cached)
 end
 
 function typed_hvcat(R::Ring, dims, d...)

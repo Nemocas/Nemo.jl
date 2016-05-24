@@ -14,7 +14,7 @@ function test_fields()
    test_arb()
    test_acb()
 
-   test_gen_fraction()
+   test_gen_frac()
 
    test_fmpq()
    test_fq()

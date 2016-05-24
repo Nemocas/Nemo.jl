@@ -217,12 +217,12 @@ end
 
 *(x::Integer, y::nmod_poly) = y*x
 
-function *(x::nmod_poly, y::GenResidue{fmpz})
+function *(x::nmod_poly, y::GenRes{fmpz})
   (base_ring(x) != parent(y)) && error("Must have same parent")
   return x*y.data
 end
 
-*(x::GenResidue{fmpz}, y::nmod_poly) = y*x
+*(x::GenRes{fmpz}, y::nmod_poly) = y*x
 
 function +(x::nmod_poly, y::UInt)
   z = parent(x)()
@@ -249,12 +249,12 @@ end
 
 +(x::Integer, y::nmod_poly) = y + x 
 
-function +(x::nmod_poly, y::GenResidue{fmpz})
+function +(x::nmod_poly, y::GenRes{fmpz})
   (base_ring(x) != parent(y)) && error("Elements must have same parent")
   return +(x,y.data)
 end
 
-+(x::GenResidue{fmpz}, y::nmod_poly) = y + x
++(x::GenRes{fmpz}, y::nmod_poly) = y + x
 
 function -(x::nmod_poly, y::UInt)
   z = parent(x)()
@@ -281,12 +281,12 @@ end
 
 -(x::Integer, y::nmod_poly) = -(y - x)
 
-function -(x::nmod_poly, y::GenResidue{fmpz})
+function -(x::nmod_poly, y::GenRes{fmpz})
   (base_ring(x) != parent(y)) && error("Elements must have same parent")
   return -(x,y.data)
 end
 
--(x::GenResidue{fmpz}, y::nmod_poly) = -(y - x)
+-(x::GenRes{fmpz}, y::nmod_poly) = -(y - x)
 
 ################################################################################
 #
@@ -320,7 +320,7 @@ end
 #
 ################################################################################
 
-function ==(x::nmod_poly, y::GenResidue{fmpz})
+function ==(x::nmod_poly, y::GenRes{fmpz})
   base_ring(x) != parent(y) && error("Incompatible base rings in comparison")
   if length(x) > 1
     return false
@@ -335,7 +335,7 @@ end
 
 isequal(x::nmod_poly, y::nmod_poly) = x == y
 
-==(x::GenResidue{fmpz}, y::nmod_poly) = y == x
+==(x::GenRes{fmpz}, y::nmod_poly) = y == x
 
 ################################################################################
 #
@@ -421,7 +421,7 @@ end
 #
 ################################################################################
 
-function divexact(x::nmod_poly, y::GenResidue{fmpz})
+function divexact(x::nmod_poly, y::GenRes{fmpz})
   base_ring(x) != parent(y) && error("Elements must have same parent")
   iszero(y) && throw(DivideError())
   return divexact(x, parent(x)(y))
@@ -568,7 +568,7 @@ end
 #
 ################################################################################
 
-function evaluate(x::nmod_poly, y::GenResidue{fmpz})
+function evaluate(x::nmod_poly, y::GenRes{fmpz})
   base_ring(x) != parent(y) && error("Elements must have same parent")
   u = ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &y.data)
   z = ccall((:nmod_poly_evaluate_nmod, :libflint), UInt,
@@ -622,8 +622,8 @@ end
 #
 ################################################################################
 
-function interpolate(R::NmodPolyRing, x::Array{GenResidue{fmpz}, 1},
-                                      y::Array{GenResidue{fmpz}, 1})
+function interpolate(R::NmodPolyRing, x::Array{GenRes{fmpz}, 1},
+                                      y::Array{GenRes{fmpz}, 1})
   z = R()
 
   ax = Array(UInt, length(x))
@@ -852,7 +852,7 @@ end
   
 setcoeff!(x::nmod_poly, n::Int, y::Integer) = setcoeff!(x, n, fmpz(y))
   
-function setcoeff!(x::nmod_poly, n::Int, y::GenResidue{fmpz})
+function setcoeff!(x::nmod_poly, n::Int, y::GenRes{fmpz})
   setcoeff!(x, n, y.data)
 end
 
@@ -902,7 +902,7 @@ Base.promote_rule(::Type{nmod_poly}, ::Type{fmpz}) = nmod_poly
 #
 ###############################################################################
 
-function Base.call(f::nmod_poly, a::GenResidue{fmpz})
+function Base.call(f::nmod_poly, a::GenRes{fmpz})
    if parent(a) != base_ring(f)
       return subst(f, a)
    end
@@ -940,7 +940,7 @@ function Base.call(R::NmodPolyRing, x::Integer)
   return z
 end
 
-function Base.call(R::NmodPolyRing, x::GenResidue{fmpz})
+function Base.call(R::NmodPolyRing, x::GenRes{fmpz})
   base_ring(R) != parent(x) && error("Wrong parents")
   z = nmod_poly(R.n, UInt(x.data))
   z.parent = R
@@ -959,7 +959,7 @@ function Base.call(R::NmodPolyRing, arr::Array{UInt, 1})
   return z
 end
 
-function Base.call(R::NmodPolyRing, arr::Array{GenResidue{fmpz}, 1})
+function Base.call(R::NmodPolyRing, arr::Array{GenRes{fmpz}, 1})
   if length(arr) > 0
      (base_ring(R) != parent(arr[1])) && error("Wrong parents")
   end

@@ -4,7 +4,7 @@
 #
 ###############################################################################    
 
-export GenCapRelSeries, GenCapRelPowerSeriesRing, PowerSeriesRing, O, valuation, exp,
+export GenRelSeries, GenRelSeriesRing, PowerSeriesRing, O, valuation, exp,
        precision, max_precision, set_prec!
 
 ###############################################################################
@@ -16,16 +16,16 @@ export GenCapRelSeries, GenCapRelPowerSeriesRing, PowerSeriesRing, O, valuation,
 function O{T}(a::SeriesElem{T})
    prec = length(a) - 1
    prec < 0 && throw(DomainError())
-   z = GenCapRelSeries{T}(Array(T, 0), 0, prec)
+   z = GenRelSeries{T}(Array(T, 0), 0, prec)
    z.parent = parent(a)
    return z
 end
 
-parent_type{T}(::Type{GenCapRelSeries{T}}) = GenCapRelPowerSeriesRing{T}
+parent_type{T}(::Type{GenRelSeries{T}}) = GenRelSeriesRing{T}
 
 parent(a::SeriesElem) = a.parent
 
-elem_type{T <: RingElem}(::GenCapRelPowerSeriesRing{T}) = GenCapRelSeries{T}
+elem_type{T <: RingElem}(::GenRelSeriesRing{T}) = GenRelSeries{T}
 
 base_ring{T}(R::SeriesRing{T}) = R.base_ring::parent_type(T)
 
@@ -86,7 +86,7 @@ one(R::SeriesRing) = R(1)
 
 function gen{T}(R::SeriesRing{T})
    S = base_ring(R)
-   z = GenCapRelSeries{T}([S(0), S(1)], 2, max_precision(R) + 1)
+   z = GenRelSeries{T}([S(0), S(1)], 2, max_precision(R) + 1)
    z.parent = R
    return z
 end
@@ -739,20 +739,20 @@ end
 #
 ###############################################################################
 
-function Base.promote_rule{T <: RingElem, V <: Integer}(::Type{GenCapRelSeries{T}}, ::Type{V})
-   return GenCapRelSeries{T}
+function Base.promote_rule{T <: RingElem, V <: Integer}(::Type{GenRelSeries{T}}, ::Type{V})
+   return GenRelSeries{T}
 end
 
-function Base.promote_rule{T <: RingElem}(::Type{GenCapRelSeries{T}}, ::Type{T})
-   return GenCapRelSeries{T}
+function Base.promote_rule{T <: RingElem}(::Type{GenRelSeries{T}}, ::Type{T})
+   return GenRelSeries{T}
 end
 
-function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenCapRelSeries{T}}, ::Type{GenCapRelSeries{U}})
-   Base.promote_rule(T, GenCapRelSeries{U}) == T ? GenCapRelSeries{T} : Union{}
+function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenRelSeries{T}}, ::Type{GenRelSeries{U}})
+   Base.promote_rule(T, GenRelSeries{U}) == T ? GenRelSeries{T} : Union{}
 end
 
-function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenCapRelSeries{T}}, ::Type{U})
-   Base.promote_rule(T, U) == T ? GenCapRelSeries{T} : promote_rule1(U, GenCapRelSeries{T})
+function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenRelSeries{T}}, ::Type{U})
+   Base.promote_rule(T, U) == T ? GenRelSeries{T} : promote_rule1(U, GenRelSeries{T})
 end
 
 ###############################################################################
@@ -761,47 +761,47 @@ end
 #
 ###############################################################################
 
-function Base.call{T <: RingElem}(a::GenCapRelPowerSeriesRing{T}, b::RingElem)
+function Base.call{T <: RingElem}(a::GenRelSeriesRing{T}, b::RingElem)
    return a(base_ring(a)(b))
 end
 
-function Base.call{T <: RingElem}(a::GenCapRelPowerSeriesRing{T})
-   z = GenCapRelSeries{T}(Array(T, 0), 0, a.prec_max)
+function Base.call{T <: RingElem}(a::GenRelSeriesRing{T})
+   z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max)
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenCapRelPowerSeriesRing{T}, b::Integer)
+function Base.call{T <: RingElem}(a::GenRelSeriesRing{T}, b::Integer)
    if b == 0
-      z = GenCapRelSeries{T}(Array(T, 0), 0, a.prec_max)
+      z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max)
    else
-      z = GenCapRelSeries{T}([base_ring(a)(b)], 1, a.prec_max)
+      z = GenRelSeries{T}([base_ring(a)(b)], 1, a.prec_max)
    end
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenCapRelPowerSeriesRing{T}, b::T)
+function Base.call{T <: RingElem}(a::GenRelSeriesRing{T}, b::T)
    parent(b) != base_ring(a) && error("Unable to coerce to power series")
    if b == 0
-      z = GenCapRelSeries{T}(Array(T, 0), 0, a.prec_max)
+      z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max)
    else
-      z = GenCapRelSeries{T}([b], 1, a.prec_max)
+      z = GenRelSeries{T}([b], 1, a.prec_max)
    end
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenCapRelPowerSeriesRing{T}, b::SeriesElem{T})
+function Base.call{T <: RingElem}(a::GenRelSeriesRing{T}, b::SeriesElem{T})
    parent(b) != a && error("Unable to coerce power series")
    return b
 end
 
-function Base.call{T <: RingElem}(a::GenCapRelPowerSeriesRing{T}, b::Array{T, 1}, len::Int, prec::Int)
+function Base.call{T <: RingElem}(a::GenRelSeriesRing{T}, b::Array{T, 1}, len::Int, prec::Int)
    if length(b) > 0
       parent(b[1]) != base_ring(a) && error("Unable to coerce to power series")
    end
-   z = GenCapRelSeries{T}(b, len, prec)
+   z = GenRelSeries{T}(b, len, prec)
    z.parent = a
    return z
 end
@@ -815,7 +815,7 @@ end
 function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString{}; cached=true)
    S = Symbol(s)
    T = elem_type(R)
-   parent_obj = GenCapRelPowerSeriesRing{T}(R, prec, S, cached)
+   parent_obj = GenRelSeriesRing{T}(R, prec, S, cached)
 
    return parent_obj, parent_obj([R(0), R(1)], 2, prec + 1)
 end

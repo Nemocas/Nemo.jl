@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export FractionField, GenFraction, GenFractionField, num, den
+export FractionField, GenFrac, GenFracField, num, den
 
 ###############################################################################
 #
@@ -12,9 +12,9 @@ export FractionField, GenFraction, GenFractionField, num, den
 #
 ###############################################################################
 
-parent_type{T}(::Type{GenFraction{T}}) = GenFractionField{T}
+parent_type{T}(::Type{GenFrac{T}}) = GenFracField{T}
 
-elem_type{T <: RingElem}(::GenFractionField{T}) = GenFraction{T}
+elem_type{T <: RingElem}(::GenFracField{T}) = GenFrac{T}
 
 base_ring{T}(a::FracField{T}) = a.base_ring::parent_type(T)
 
@@ -35,9 +35,9 @@ end
 function //{T <: RingElem}(x::T, y::T)
    y == 0 && throw(DivideError())
    g = gcd(x, y)
-   z = GenFraction{T}(divexact(x, g), divexact(y, g))
+   z = GenFrac{T}(divexact(x, g), divexact(y, g))
    try
-      z.parent = GenFractionDict[R]
+      z.parent = GenFracDict[R]
    catch
       z.parent = FractionField(parent(x))
    end
@@ -87,7 +87,7 @@ isone(a::FracElem) = num(a) == den(a)
 isunit(a::FracElem) = num(a) != 0
 
 function deepcopy{T <: RingElem}(a::FracElem{T})
-   v = GenFraction{T}(deepcopy(num(a)), deepcopy(den(a)))
+   v = GenFrac{T}(deepcopy(num(a)), deepcopy(den(a)))
    v.parent = parent(a)
    return v
 end 
@@ -425,16 +425,16 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: RingElem}(::Type{GenFraction{T}}, ::Type{T}) = GenFraction{T}
+Base.promote_rule{T <: RingElem}(::Type{GenFrac{T}}, ::Type{T}) = GenFrac{T}
 
-Base.promote_rule{T <: RingElem, U <: Integer}(::Type{GenFraction{T}}, ::Type{U}) = GenFraction{T}
+Base.promote_rule{T <: RingElem, U <: Integer}(::Type{GenFrac{T}}, ::Type{U}) = GenFrac{T}
 
-function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenFraction{T}}, ::Type{GenFraction{U}})
-   Base.promote_rule(T, GenFraction{U}) == T ? GenFraction{T} : Union{}
+function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenFrac{T}}, ::Type{GenFrac{U}})
+   Base.promote_rule(T, GenFrac{U}) == T ? GenFrac{T} : Union{}
 end
 
-function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenFraction{T}}, ::Type{U})
-   Base.promote_rule(T, U) == T ? GenFraction{T} : promote_rule1(U, GenFraction{T})
+function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenFrac{T}}, ::Type{U})
+   Base.promote_rule(T, U) == T ? GenFrac{T} : promote_rule1(U, GenFrac{T})
 end
 
 ###############################################################################
@@ -443,58 +443,58 @@ end
 #
 ###############################################################################
 
-function Base.call{T <: RingElem}(a::GenFractionField{T}, b::RingElem)
+function Base.call{T <: RingElem}(a::GenFracField{T}, b::RingElem)
    return a(base_ring(a)(b))
 end
 
-function Base.call{T <: RingElem}(a::GenFractionField{T})
-   z = GenFraction{T}(zero(base_ring(a)), one(base_ring(a)))
+function Base.call{T <: RingElem}(a::GenFracField{T})
+   z = GenFrac{T}(zero(base_ring(a)), one(base_ring(a)))
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenFractionField{T}, b::T)
+function Base.call{T <: RingElem}(a::GenFracField{T}, b::T)
    parent(b) != base_ring(a) && error("Could not coerce to fraction")
-   z = GenFraction{T}(b, one(base_ring(a)))
+   z = GenFrac{T}(b, one(base_ring(a)))
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenFractionField{T}, b::T, c::T)
+function Base.call{T <: RingElem}(a::GenFracField{T}, b::T, c::T)
    parent(b) != base_ring(a) && error("Could not coerce to fraction")
    parent(c) != base_ring(a) && error("Could not coerce to fraction")
-   z = GenFraction{T}(b, c)
+   z = GenFrac{T}(b, c)
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenFractionField{T}, b::T, c::Integer)
+function Base.call{T <: RingElem}(a::GenFracField{T}, b::T, c::Integer)
    parent(b) != base_ring(a) && error("Could not coerce to fraction")
-   z = GenFraction{T}(b, base_ring(a)(c))
+   z = GenFrac{T}(b, base_ring(a)(c))
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenFractionField{T}, b::Integer, c::T)
+function Base.call{T <: RingElem}(a::GenFracField{T}, b::Integer, c::T)
    parent(c) != base_ring(a) && error("Could not coerce to fraction")
-   z = GenFraction{T}(base_ring(a)(b), c)
+   z = GenFrac{T}(base_ring(a)(b), c)
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenFractionField{T}, b::Integer)
-   z = GenFraction{T}(base_ring(a)(b), one(base_ring(a)))
+function Base.call{T <: RingElem}(a::GenFracField{T}, b::Integer)
+   z = GenFrac{T}(base_ring(a)(b), one(base_ring(a)))
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenFractionField{T}, b::Integer, c::Integer)
-   z = GenFraction{T}(base_ring(a)(b), base_ring(a)(c))
+function Base.call{T <: RingElem}(a::GenFracField{T}, b::Integer, c::Integer)
+   z = GenFrac{T}(base_ring(a)(b), base_ring(a)(c))
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenFractionField{T}, b::GenFraction{T})
+function Base.call{T <: RingElem}(a::GenFracField{T}, b::GenFrac{T})
    a != parent(b) && error("Could not coerce to fraction")
    return b
 end
@@ -509,6 +509,6 @@ function FractionField(R::Ring; cached=true)
    R2 = R
    T = elem_type(R)
    
-   return GenFractionField{T}(R, cached)
+   return GenFracField{T}(R, cached)
 end
 

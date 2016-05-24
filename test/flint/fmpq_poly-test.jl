@@ -9,7 +9,7 @@ function test_fmpq_poly_constructors()
 
    T, z = PolynomialRing(S, "z")
 
-   @test typeof(T) <: GenPolynomialRing
+   @test typeof(T) <: GenPolyRing
 
    @test isa(z, PolyElem)
 

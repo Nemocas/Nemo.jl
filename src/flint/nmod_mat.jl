@@ -60,7 +60,7 @@ function setindex!(a::nmod_mat, u::fmpz, i::Int, j::Int)
   set_entry!(a, i, j, u)
 end
 
-function setindex!(a::nmod_mat, u::GenResidue{fmpz}, i::Int, j::Int)
+function setindex!(a::nmod_mat, u::GenRes{fmpz}, i::Int, j::Int)
   _checkbounds(a, i, j)
   (base_ring(a) != parent(u)) && error("Parent objects must coincide") 
   set_entry!(a, i, j, u)
@@ -85,7 +85,7 @@ function set_entry!(a::nmod_mat, i::Int, j::Int, u::fmpz)
   set_entry!(a, i, j, tt)
 end
 
-set_entry!(a::nmod_mat, i::Int, j::Int, u::GenResidue{fmpz}) =
+set_entry!(a::nmod_mat, i::Int, j::Int, u::GenRes{fmpz}) =
         set_entry!(a, i, j, u.data)
 
 set_entry_t!{T<:Union{RingElem, Integer}}(a::nmod_mat, i::Int, j::Int, u::T) =
@@ -259,12 +259,12 @@ end
 
 *(x::Integer, y::nmod_mat) = y*x
 
-function *(x::nmod_mat, y::GenResidue{fmpz})
+function *(x::nmod_mat, y::GenRes{fmpz})
   (base_ring(x) != parent(y)) && error("Parent objects must coincide")
   return x*y.data
 end
 
-*(x::GenResidue{fmpz}, y::nmod_mat) = y*x
+*(x::GenRes{fmpz}, y::nmod_mat) = y*x
 
 ################################################################################
 #
@@ -516,7 +516,7 @@ end
 ################################################################################
 
 function Array(b::nmod_mat)
-  a = Array(GenResidue{fmpz}, b.r, b.c)
+  a = Array(GenRes{fmpz}, b.r, b.c)
   for i = 1:b.r
     for j = 1:b.c
       a[i,j] = b[i,j]
@@ -579,7 +579,7 @@ end
 
 Base.promote_rule{V <: Integer}(::Type{nmod_mat}, ::Type{V}) = nmod_mat
 
-Base.promote_rule(::Type{nmod_mat}, ::Type{GenResidue{fmpz}}) = nmod_mat
+Base.promote_rule(::Type{nmod_mat}, ::Type{GenRes{fmpz}}) = nmod_mat
 
 Base.promote_rule(::Type{nmod_mat}, ::Type{fmpz}) = nmod_mat
 
@@ -623,7 +623,7 @@ function Base.call(a::NmodMatSpace, b::fmpz)
    return M
 end
 
-function Base.call(a::NmodMatSpace, b::GenResidue{fmpz})
+function Base.call(a::NmodMatSpace, b::GenRes{fmpz})
    parent(b) != base_ring(a) && error("Unable to coerce to matrix")
    M = a()
    for i = 1:a.rows
@@ -659,7 +659,7 @@ function Base.call(a::NmodMatSpace, arr::Array{Int, 2}, transpose::Bool = false)
   return z
 end
 
-function Base.call(a::NmodMatSpace, arr::Array{GenResidue{fmpz}, 2}, transpose::Bool = false)
+function Base.call(a::NmodMatSpace, arr::Array{GenRes{fmpz}, 2}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr, transpose)
   length(arr) == 0 && error("Array must be nonempty")
   (base_ring(a) != parent(arr[1])) && error("Elements must have same base ring")
@@ -690,7 +690,7 @@ function Base.call(a::NmodMatSpace, arr::Array{fmpz, 1})
   return a(arr, true)
 end
 
-function Base.call(a::NmodMatSpace, arr::Array{GenResidue{fmpz}, 1})
+function Base.call(a::NmodMatSpace, arr::Array{GenRes{fmpz}, 1})
   (length(arr) != a.cols * a.rows) &&
           error("Array must be of length ", a.cols * a.rows)
   z = nmod_mat(a.rows, a.cols, a.n, arr)
@@ -712,12 +712,12 @@ end
 #
 ################################################################################
 
-function MatrixSpace(R::GenResidueRing{fmpz}, r::Int, c::Int)
+function MatrixSpace(R::GenResRing{fmpz}, r::Int, c::Int)
   return try
     NmodMatSpace(R, r, c)
   catch
     T = elem_type(R)
-    return GenMatrixSpace{T}(R, r, c)
+    return GenMatSpace{T}(R, r, c)
   end
 end
 

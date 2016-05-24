@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export ResidueRing, GenResidue, GenResidueRing, inv, modulus, data
+export ResidueRing, GenRes, GenResRing, inv, modulus, data
 
 ###############################################################################
 #
@@ -12,9 +12,9 @@ export ResidueRing, GenResidue, GenResidueRing, inv, modulus, data
 #
 ###############################################################################
 
-parent_type{T}(::Type{GenResidue{T}}) = GenResidueRing{T}
+parent_type{T}(::Type{GenRes{T}}) = GenResRing{T}
 
-elem_type{T <: RingElem}(::GenResidueRing{T}) = GenResidue{T}
+elem_type{T <: RingElem}(::GenResRing{T}) = GenRes{T}
 
 base_ring{T}(a::ResRing{T}) = a.base_ring::parent_type(T)
 
@@ -243,16 +243,16 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: RingElem}(::Type{GenResidue{T}}, ::Type{T}) = GenResidue{T}
+Base.promote_rule{T <: RingElem}(::Type{GenRes{T}}, ::Type{T}) = GenRes{T}
 
-Base.promote_rule{T <: RingElem, U <: Integer}(::Type{GenResidue{T}}, ::Type{U}) = GenResidue{T}
+Base.promote_rule{T <: RingElem, U <: Integer}(::Type{GenRes{T}}, ::Type{U}) = GenRes{T}
 
-function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenResidue{T}}, ::Type{GenResidue{U}})
-   Base.promote_rule(T, GenResidue{U}) == T ? GenResidue{T} : Union{}
+function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenRes{T}}, ::Type{GenRes{U}})
+   Base.promote_rule(T, GenRes{U}) == T ? GenRes{T} : Union{}
 end
 
-function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenResidue{T}}, ::Type{U})
-   Base.promote_rule(T, U) == T ? GenResidue{T} : promote_rule1(U, GenResidue{T})
+function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenRes{T}}, ::Type{U})
+   Base.promote_rule(T, U) == T ? GenRes{T} : promote_rule1(U, GenRes{T})
 end
 
 ###############################################################################
@@ -261,30 +261,30 @@ end
 #
 ###############################################################################
 
-function Base.call{T <: RingElem}(a::GenResidueRing{T}, b::RingElem)
+function Base.call{T <: RingElem}(a::GenResRing{T}, b::RingElem)
    return a(base_ring(a)(b))
 end
 
-function Base.call{T <: RingElem}(a::GenResidueRing{T})
-   z = GenResidue{T}(zero(base_ring(a)))
+function Base.call{T <: RingElem}(a::GenResRing{T})
+   z = GenRes{T}(zero(base_ring(a)))
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenResidueRing{T}, b::Integer)
-   z = GenResidue{T}(mod(base_ring(a)(b), modulus(a)))
+function Base.call{T <: RingElem}(a::GenResRing{T}, b::Integer)
+   z = GenRes{T}(mod(base_ring(a)(b), modulus(a)))
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenResidueRing{T}, b::T)
+function Base.call{T <: RingElem}(a::GenResRing{T}, b::T)
    base_ring(a) != parent(b) && error("Operation on incompatible objects")
-   z = GenResidue{T}(mod(b, modulus(a)))
+   z = GenRes{T}(mod(b, modulus(a)))
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenResidueRing{T}, b::ResElem{T})
+function Base.call{T <: RingElem}(a::GenResRing{T}, b::ResElem{T})
    a != parent(b) && error("Operation on incompatible objects")
    return b
 end
@@ -299,11 +299,11 @@ function ResidueRing{T <: RingElem}(R::Ring, el::T; cached=true)
    parent(el) != R && error("Modulus is not an element of the specified ring")
    el == 0 && throw(DivideError())
    
-   return GenResidueRing{T}(el, cached)
+   return GenResRing{T}(el, cached)
 end
 
 function ResidueRing(R::FlintIntegerRing, el::Integer; cached=true)
    el == 0 && throw(DivideError())
    
-   return GenResidueRing{fmpz}(R(el), cached)
+   return GenResRing{fmpz}(R(el), cached)
 end

@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export GenPoly, GenPolynomialRing, PolynomialRing, hash, coeff, isgen, lead,
+export GenPoly, GenPolyRing, PolynomialRing, hash, coeff, isgen, lead,
        var, truncate, mullow, reverse, shift_left, shift_right, divexact,
        pseudorem, pseudodivrem, gcd, degree, content, primpart, evaluate, 
        compose, derivative, integral, resultant, discriminant, gcdx, zero, one,
@@ -20,7 +20,7 @@ export GenPoly, GenPolynomialRing, PolynomialRing, hash, coeff, isgen, lead,
 #
 ###############################################################################
 
-parent_type{T}(::Type{GenPoly{T}}) = GenPolynomialRing{T}
+parent_type{T}(::Type{GenPoly{T}}) = GenPolyRing{T}
 
 elem_type{T <: RingElem}(::PolyRing{T}) = GenPoly{T}
 
@@ -160,7 +160,7 @@ function show{T <: RingElem}(io::IO, x::PolyElem{T})
    end
 end
 
-function show{T <: RingElem}(io::IO, p::GenPolynomialRing{T})
+function show{T <: RingElem}(io::IO, p::GenPolyRing{T})
    print(io, "Univariate Polynomial Ring in ")
    print(io, string(var(p)))
    print(io, " over ")
@@ -1705,35 +1705,35 @@ end
 #
 ###############################################################################
 
-function Base.call{T <: RingElem}(a::GenPolynomialRing{T}, b::RingElem)
+function Base.call{T <: RingElem}(a::GenPolyRing{T}, b::RingElem)
    return a(base_ring(a)(b))
 end
 
-function Base.call{T <: RingElem}(a::GenPolynomialRing{T})
+function Base.call{T <: RingElem}(a::GenPolyRing{T})
    z = GenPoly{T}()
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenPolynomialRing{T}, b::Integer)
+function Base.call{T <: RingElem}(a::GenPolyRing{T}, b::Integer)
    z = GenPoly{T}(base_ring(a)(b))
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenPolynomialRing{T}, b::T)
+function Base.call{T <: RingElem}(a::GenPolyRing{T}, b::T)
    parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
    z = GenPoly{T}(b)
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenPolynomialRing{T}, b::PolyElem{T})
+function Base.call{T <: RingElem}(a::GenPolyRing{T}, b::PolyElem{T})
    parent(b) != a && error("Unable to coerce polynomial")
    return b
 end
 
-function Base.call{T <: RingElem}(a::GenPolynomialRing{T}, b::Array{T, 1})
+function Base.call{T <: RingElem}(a::GenPolyRing{T}, b::Array{T, 1})
    if length(b) > 0
       parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
    end
@@ -1751,7 +1751,7 @@ end
 function PolynomialRing(R::Ring, s::AbstractString{}; cached::Bool = true)
    S = Symbol(s)
    T = elem_type(R)
-   parent_obj = GenPolynomialRing{T}(R, S, cached)
+   parent_obj = GenPolyRing{T}(R, S, cached)
 
    return parent_obj, parent_obj([R(0), R(1)])
 end

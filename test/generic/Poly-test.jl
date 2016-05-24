@@ -5,20 +5,20 @@ function test_gen_poly_constructors()
    S, y = R["y"]
 
    @test typeof(R) <: Nemo.Ring
-   @test typeof(S) <: GenPolynomialRing
+   @test typeof(S) <: GenPolyRing
 
    @test isa(y, PolyElem)
 
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
 
-   @test typeof(S) <: GenPolynomialRing
+   @test typeof(S) <: GenPolyRing
 
    @test isa(y, PolyElem)
 
    T, z = PolynomialRing(S, "z")
 
-   @test typeof(T) <: GenPolynomialRing
+   @test typeof(T) <: GenPolyRing
 
    @test isa(z, PolyElem)
 
