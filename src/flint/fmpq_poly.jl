@@ -96,7 +96,7 @@ function show(io::IO, p::FmpqPolyRing)
    show(io, p.base_ring)
 end
 
-show_minus_one(::Type{fmpq_poly}) = show_minus_one(FractionElem{fmpz})
+show_minus_one(::Type{fmpq_poly}) = show_minus_one(FracElem{fmpz})
 
 ###############################################################################
 #

@@ -6,35 +6,35 @@ function test_gen_fraction_constructors()
 
    @test isa(T, GenFractionField)
 
-   @test isa(T(3), FractionElem)
+   @test isa(T(3), GenFraction)
 
-   @test isa(T(fmpz(7)), FractionElem)
+   @test isa(T(fmpz(7)), GenFraction)
 
-   @test isa(T(x + 2), FractionElem)
+   @test isa(T(x + 2), GenFraction)
 
-   @test isa(T(3, 7), FractionElem)
+   @test isa(T(3, 7), GenFraction)
 
-   @test isa(T(x + 2, x + 1), FractionElem)
+   @test isa(T(x + 2, x + 1), GenFraction)
 
-   @test isa(T(x + 2, 4), FractionElem)
+   @test isa(T(x + 2, 4), GenFraction)
 
-   @test isa(T(3, x + 1), FractionElem)
+   @test isa(T(3, x + 1), GenFraction)
 
-   @test isa(T(T(x + 2)), FractionElem)
+   @test isa(T(T(x + 2)), GenFraction)
 
-   @test isa(T(), FractionElem)
+   @test isa(T(), GenFraction)
 
-   @test isa((x + 3)//(x^2 + 2), FractionElem)
+   @test isa((x + 3)//(x^2 + 2), GenFraction)
 
-   @test isa((x + 3)//12, FractionElem)
+   @test isa((x + 3)//12, GenFraction)
 
-   @test isa(12//(x + 2), FractionElem)
+   @test isa(12//(x + 2), GenFraction)
 
-   @test isa((x + 1)//T(x + 2, x + 1), FractionElem)
+   @test isa((x + 1)//T(x + 2, x + 1), GenFraction)
 
-   @test isa(T(x + 2, x + 1)//(x + 1), FractionElem)
+   @test isa(T(x + 2, x + 1)//(x + 1), GenFraction)
 
-   @test isa(T(x + 2, x + 1)//T(x, x + 2), FractionElem) 
+   @test isa(T(x + 2, x + 1)//T(x, x + 2), GenFraction) 
 
    println("PASS")
 end

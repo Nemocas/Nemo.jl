@@ -73,7 +73,7 @@ end
 
 const FlintQQ = FlintRationalField()
 
-type fmpq <: FractionElem{fmpz}
+type fmpq <: FracElem{fmpz}
    num::Int
    den::Int
 

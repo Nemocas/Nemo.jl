@@ -5,37 +5,37 @@ function test_fmpq_constructors()
 
    @test isa(R, FlintRationalField)
 
-   @test isa(R(2), FractionElem)
+   @test isa(R(2), fmpq)
 
-   @test isa(R(), FractionElem)
+   @test isa(R(), fmpq)
 
-   @test isa(R(BigInt(1)//2), FractionElem)
+   @test isa(R(BigInt(1)//2), fmpq)
 
-   @test isa(R(2, 3), FractionElem)
+   @test isa(R(2, 3), fmpq)
 
-   @test isa(R(fmpz(2), 3), FractionElem)
+   @test isa(R(fmpz(2), 3), fmpq)
 
-   @test isa(R(2, fmpz(3)), FractionElem)
+   @test isa(R(2, fmpz(3)), fmpq)
 
-   @test isa(R(fmpz(2), fmpz(3)), FractionElem)
+   @test isa(R(fmpz(2), fmpz(3)), fmpq)
 
-   @test isa(R(R(2)), FractionElem)
+   @test isa(R(R(2)), fmpq)
 
-   @test isa(fmpq(2), FractionElem)
+   @test isa(fmpq(2), fmpq)
 
-   @test isa(fmpq(), FractionElem)
+   @test isa(fmpq(), fmpq)
 
-   @test isa(fmpq(BigInt(1)//2), FractionElem)
+   @test isa(fmpq(BigInt(1)//2), fmpq)
 
-   @test isa(fmpq(2, 3), FractionElem)
+   @test isa(fmpq(2, 3), fmpq)
 
-   @test isa(fmpq(fmpz(2), 3), FractionElem)
+   @test isa(fmpq(fmpz(2), 3), fmpq)
 
-   @test isa(fmpq(2, fmpz(3)), FractionElem)
+   @test isa(fmpq(2, fmpz(3)), fmpq)
 
-   @test isa(fmpq(fmpz(2), fmpz(3)), FractionElem)
+   @test isa(fmpq(fmpz(2), fmpz(3)), fmpq)
 
-   @test isa(fmpq(R(2)), FractionElem)
+   @test isa(fmpq(R(2)), fmpq)
 
    println("PASS")
 end

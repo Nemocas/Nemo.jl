@@ -37,7 +37,7 @@ end
 type PariRationalField <: Field{Pari}
 end
 
-type pari_rat <: FractionElem{pari_int}
+type pari_rat <: FracElem{pari_int}
    d::Ptr{Int}
 
    function pari_rat(s::Int)
@@ -149,7 +149,7 @@ type PariPolModRing{S <: PolyElem} <: Ring{Pari}
    end
 end
 
-type pari_polmod{S <: PolyElem} <: ResidueElem{S}
+type pari_polmod{S <: PolyElem} <: ResElem{S}
    data::Ptr{Int}
    parent::PariPolModRing{S}
 

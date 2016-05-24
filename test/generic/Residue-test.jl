@@ -7,19 +7,19 @@ function test_gen_residue_constructors()
 
    a = R(123)
 
-   @test isa(a, ResidueElem)
+   @test isa(a, GenResidue)
 
    b = R(a)
 
-   @test isa(b, ResidueElem)
+   @test isa(b, GenResidue)
 
    c = R(fmpz(12))
 
-   @test isa(c, ResidueElem)
+   @test isa(c, GenResidue)
 
    d = R()
 
-   @test isa(d, ResidueElem)
+   @test isa(d, GenResidue)
 
    S, x = PolynomialRing(R, "x")
    T = ResidueRing(S, x^3 + 3x + 1)
@@ -28,11 +28,11 @@ function test_gen_residue_constructors()
 
    f = T(x^4)
 
-   @test isa(f, ResidueElem)
+   @test isa(f, GenResidue)
 
    g = T(f)
 
-   @test isa(g, ResidueElem)
+   @test isa(g, GenResidue)
 
    println("PASS")
 end

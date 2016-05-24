@@ -66,7 +66,7 @@ type GenResidueRing{T <: RingElem} <: ResRing{T}
    end
 end
 
-type GenResidue{T <: RingElem} <: ResidueElem{T}
+type GenResidue{T <: RingElem} <: ResElem{T}
    data::T
    parent::GenResidueRing{T}
 
@@ -133,7 +133,7 @@ type GenFractionField{T <: RingElem} <: FracField{T}
    end
 end
 
-type GenFraction{T <: RingElem} <: FractionElem{T}
+type GenFraction{T <: RingElem} <: FracElem{T}
    num::T
    den::T
    parent::GenFractionField{T}

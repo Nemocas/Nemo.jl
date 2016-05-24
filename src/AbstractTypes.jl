@@ -63,9 +63,9 @@ abstract MatSpace{T} <: Ring
 
    abstract PolyElem{T} <: RingElem
 
-   abstract ResidueElem{T} <: RingElem
+   abstract ResElem{T} <: RingElem
 
-   abstract FractionElem{T} <: FieldElem
+   abstract FracElem{T} <: FieldElem
 
    abstract SeriesElem{T} <: RingElem
 
