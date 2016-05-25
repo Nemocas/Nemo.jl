@@ -4,8 +4,8 @@
 #
 ###############################################################################
 
-export AnticNumberField, norm, trace, CyclotomicField, MaximalRealSubfield,
-       add!, sub!, mul!, signature
+export AnticNumberField, nf_elem, norm, trace, CyclotomicField,
+       MaximalRealSubfield, add!, sub!, mul!, signature
 
 ###############################################################################
 #

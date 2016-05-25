@@ -8,27 +8,27 @@ function test_nf_elem_constructors()
 
    a = K(123)
 
-   @test isa(a, NumberFieldElem)
+   @test isa(a, nf_elem)
 
    b = K(a)
 
-   @test isa(b, NumberFieldElem)
+   @test isa(b, nf_elem)
 
    c = K(fmpz(12))
 
-   @test isa(c, NumberFieldElem)
+   @test isa(c, nf_elem)
 
    d = K()
 
-   @test isa(d, NumberFieldElem)
+   @test isa(d, nf_elem)
 
    f = K(fmpq(2, 3))
 
-   @test isa(f, NumberFieldElem)
+   @test isa(f, nf_elem)
 
    g = K(x^2 + 2x - 7)
 
-   @test isa(g, NumberFieldElem)
+   @test isa(g, nf_elem)
 
    println("PASS")
 end

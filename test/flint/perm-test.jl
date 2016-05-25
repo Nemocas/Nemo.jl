@@ -17,9 +17,9 @@ function test_perm_constructors()
    b = R([2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
    c = R(a)
 
-   @test isa(a, PermElem)
-   @test isa(b, PermElem)
-   @test isa(c, PermElem)
+   @test isa(a, GroupElem)
+   @test isa(b, GroupElem)
+   @test isa(c, GroupElem)
 
    println("PASS")
 end

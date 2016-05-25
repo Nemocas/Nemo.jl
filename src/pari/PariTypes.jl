@@ -10,10 +10,10 @@
 #
 ###############################################################################
 
-type PariIntegerRing <: Ring{Pari}
+type PariIntegerRing <: Ring
 end
 
-type pari_int <: IntegerRingElem
+type pari_int <: RingElem
    d::Ptr{Int}
 
    function pari_int(s::Int)
@@ -34,7 +34,7 @@ end
 #
 ###############################################################################
 
-type PariRationalField <: Field{Pari}
+type PariRationalField <: FracField{pari_int}
 end
 
 type pari_rat <: FracElem{pari_int}
@@ -58,14 +58,14 @@ _pari_rat_clear_fn(g::pari_rat) = ccall((:pari_free, :libpari), Void,
 ###############################################################################
 
 type PariVector{T <: SetElem}
-   base_ring::Set{Pari}
+   base_ring::Set
 end
 
 type pari_vec{T <: SetElem}
    data::Ptr{Int}
    parent::PariVector{T}
 
-   function pari_vec{R <: Set{Pari}}(v::Ptr{Int}, par::R)
+   function pari_vec{R <: Set}(v::Ptr{Int}, par::R)
       r = new(gclone(v), PariVector{T}(par))
       finalizer(r, _pari_vec_unclone)
       return r
@@ -82,7 +82,7 @@ _pari_vec_unclone(a::pari_vec) = gunclone(a.data)
 
 const PariPolyID = ObjectIdDict()
 
-type PariPolyRing{T <: RingElem} <: Ring{Pari}
+type PariPolyRing{T <: RingElem} <: PolyRing{T}
    base_ring::Ring
    pol_0::Ptr{Int}
    S::Symbol
@@ -137,7 +137,7 @@ _pari_poly_unclone(g::pari_poly) = gunclone(g.d)
 
 const PariPolModID = Dict{Tuple{DataType, Symbol}, Ring}()
 
-type PariPolModRing{S <: PolyElem} <: Ring{Pari}
+type PariPolModRing{S <: PolyElem} <: ResRing{S}
    T::Symbol
 
    function PariPolModRing(t::Symbol)
@@ -170,7 +170,7 @@ _pari_polmod_unclone(a::pari_polmod) = gunclone(a.data)
 
 const PariNumberFieldID = Dict{fmpq_poly, Ring}()
 
-type PariNumberField <: Ring{Pari}
+type PariNumberField <: Field
    data::Ptr{Int}
    nf::AnticNumberField
    
@@ -198,11 +198,11 @@ _pari_nf_unclone(a::PariNumberField) = gunclone(a.data)
 #
 ###############################################################################
 
-type PariMaximalOrder <: Ring{Pari}
+type PariMaximalOrder <: Ring
    pari_nf::PariNumberField
 end
 
-type pari_maximal_order_elem <: MaximalOrderElem
+type pari_maximal_order_elem <: RingElem
    data::Ptr{Int}
    parent::PariMaximalOrder
 
@@ -223,7 +223,7 @@ _pari_maximal_order_elem_clear_fn(a::pari_maximal_order_elem) = gunclone(a.data)
 
 const PariIdealSetID = ObjectIdDict()
 
-type PariIdealSet <: Set{Pari}
+type PariIdealSet <: Set
    order::PariMaximalOrder
 
    function PariIdealSet(ord::PariMaximalOrder)

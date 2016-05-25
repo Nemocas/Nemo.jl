@@ -10,12 +10,12 @@
 #
 ###############################################################################
 
-type FlintIntegerRing <: Ring{Flint}
+type FlintIntegerRing <: Ring
 end
 
 const FlintZZ = FlintIntegerRing()
 
-type fmpz <: IntegerRingElem
+type fmpz <: RingElem
     d::Int
 
     function fmpz()
@@ -592,7 +592,7 @@ end
 const FqNmodFiniteFieldID = Dict{Tuple{fmpz, Int, Symbol}, Field}()
 const FqNmodFiniteFieldIDPol = Dict{Tuple{NmodPolyRing, nmod_poly, Symbol}, Field}()
 
-type FqNmodFiniteField <: Field{Flint}
+type FqNmodFiniteField <: Field
    p :: Int 
    n :: Int
    ninv :: Int
@@ -648,7 +648,7 @@ function _FqNmodFiniteField_clear_fn(a :: FqNmodFiniteField)
    ccall((:fq_nmod_ctx_clear, :libflint), Void, (Ptr{FqNmodFiniteField},), &a)
 end
 
-type fq_nmod <: FiniteFieldElem
+type fq_nmod <: FieldElem
    coeffs :: Ptr{Void}
    alloc :: Int
    length :: Int
@@ -711,7 +711,7 @@ const FqFiniteFieldID = Dict{Tuple{fmpz, Int, Symbol}, Field}()
 
 const FqFiniteFieldIDPol = Dict{Tuple{fmpz_mod_poly, Symbol}, Field}()
 
-type FqFiniteField <: Field{Flint}
+type FqFiniteField <: Field
    p::Int # fmpz
    sparse_modulus::Int
    a::Ptr{Void}
@@ -760,7 +760,7 @@ function _FqFiniteField_clear_fn(a :: FqFiniteField)
    ccall((:fq_ctx_clear, :libflint), Void, (Ptr{FqFiniteField},), &a)
 end
 
-type fq <: FiniteFieldElem
+type fq <: FieldElem
    coeffs :: Ptr{Void}
    alloc :: Int
    length :: Int
@@ -822,7 +822,7 @@ end
 
 const PadicBase = ObjectIdDict()
 
-type FlintPadicField <: Field{Flint}
+type FlintPadicField <: Field
    p::Int 
    pinv::Float64
    pow::Ptr{Void}
@@ -847,7 +847,7 @@ function _padic_ctx_clear_fn(a::FlintPadicField)
    ccall((:padic_ctx_clear, :libflint), Void, (Ptr{FlintPadicField},), &a)
 end
 
-type padic <: PadicFieldElem
+type padic <: FieldElem
    u :: Int
    v :: Int
    N :: Int
@@ -1896,7 +1896,7 @@ end
 
 const FlintPermID = ObjectIdDict()
 
-type FlintPermGroup <: Group{Flint}
+type FlintPermGroup <: Group
    n::Int
 
    function FlintPermGroup(n::Int)
@@ -1910,7 +1910,7 @@ type FlintPermGroup <: Group{Flint}
    end
 end
 
-type perm <: PermElem
+type perm <: GroupElem
    d::Array{Int, 1}
    parent::FlintPermGroup
 

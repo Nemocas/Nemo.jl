@@ -4,28 +4,16 @@
 #
 ###############################################################################
 
-# libraries
+# broad mathematical domains
+# these contain the type classes of parent objects
 
-abstract Pari
+   abstract Set
 
-abstract Flint
+   abstract Group <: Set
 
-abstract Antic
+   abstract Ring <: Group
 
-abstract Arb
-
-abstract Generic
-
-# mathematical domains, parameterised by a library
-# these are the type classes of parent objects
-
-   abstract Set{T}
-
-   abstract Group{T} <: Set{T}
-
-   abstract Ring{T} <: Group{T}
-
-   abstract Field{T} <: Ring{T}
+   abstract Field <: Ring
 
 # elements of mathematical domains
 
@@ -43,18 +31,18 @@ abstract Generic
 # and for which a generic implementation is possible
 # over that base ring
 
-abstract PolyRing{T} <: Ring
+   abstract PolyRing{T} <: Ring
 
-abstract SeriesRing{T} <: Ring
+   abstract SeriesRing{T} <: Ring
 
-abstract ResRing{T} <: Ring
+   abstract ResRing{T} <: Ring
 
-abstract FracField{T} <: Field
+   abstract FracField{T} <: Field
 
 # not always really mathematical rings
 # later we'll distinguish matrix algebras
 # from the generic case
-abstract MatSpace{T} <: Ring
+   abstract MatSpace{T} <: Ring
 
 # mathematical objects parameterised by an element type
 # these are the type classes of mathematical objects
@@ -72,20 +60,3 @@ abstract MatSpace{T} <: Ring
    # not always mathematical ring elements
    # later we'll maybe distinguish MatAlgebraElem, MatModuleElem
    abstract MatElem{T} <: RingElem
-
-# leaf objects, with no parameterisation
-# these are also type classes of mathematical objects
-# usually provided by a C library and not by generic
-
-   abstract PermElem <: GroupElem
-
-   abstract IntegerRingElem <: RingElem
-
-   abstract FiniteFieldElem <: FieldElem
-
-   abstract NumberFieldElem <: FieldElem
-
-   abstract MaximalOrderElem <: RingElem
-
-   abstract PadicFieldElem <: FieldElem
-
