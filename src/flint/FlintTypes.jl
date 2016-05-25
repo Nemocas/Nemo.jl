@@ -592,7 +592,7 @@ end
 const FqNmodFiniteFieldID = Dict{Tuple{fmpz, Int, Symbol}, Field}()
 const FqNmodFiniteFieldIDPol = Dict{Tuple{NmodPolyRing, nmod_poly, Symbol}, Field}()
 
-type FqNmodFiniteField <: Field
+type FqNmodFiniteField <: FinField
    p :: Int 
    n :: Int
    ninv :: Int
@@ -648,7 +648,7 @@ function _FqNmodFiniteField_clear_fn(a :: FqNmodFiniteField)
    ccall((:fq_nmod_ctx_clear, :libflint), Void, (Ptr{FqNmodFiniteField},), &a)
 end
 
-type fq_nmod <: FieldElem
+type fq_nmod <: FinFieldElem
    coeffs :: Ptr{Void}
    alloc :: Int
    length :: Int
@@ -711,7 +711,7 @@ const FqFiniteFieldID = Dict{Tuple{fmpz, Int, Symbol}, Field}()
 
 const FqFiniteFieldIDPol = Dict{Tuple{fmpz_mod_poly, Symbol}, Field}()
 
-type FqFiniteField <: Field
+type FqFiniteField <: FinField
    p::Int # fmpz
    sparse_modulus::Int
    a::Ptr{Void}
@@ -760,7 +760,7 @@ function _FqFiniteField_clear_fn(a :: FqFiniteField)
    ccall((:fq_ctx_clear, :libflint), Void, (Ptr{FqFiniteField},), &a)
 end
 
-type fq <: FieldElem
+type fq <: FinFieldElem
    coeffs :: Ptr{Void}
    alloc :: Int
    length :: Int

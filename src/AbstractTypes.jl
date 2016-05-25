@@ -60,3 +60,14 @@
    # not always mathematical ring elements
    # later we'll maybe distinguish MatAlgebraElem, MatModuleElem
    abstract MatElem{T} <: RingElem
+
+# additional abstract types for parents, added ad hoc to form
+# collections of types as needed by applications
+
+   abstract FinField <: Field     # for fq, fq_nmod, etc
+   
+# additional abstract types for elements, added ad hoc to form
+# collections of types as needed by applications
+
+   abstract FinFieldElem <: FieldElem # for fq, fq_nmod, etc
+  

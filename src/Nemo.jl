@@ -25,9 +25,9 @@ import Base: floor, ceil, hypot, sqrt,
 export SetElem, GroupElem, RingElem, FieldElem, Pari, Flint, Antic,
        Generic
 
-export PolyElem, SeriesElem, ResElem, FracElem, MatElem
+export PolyElem, SeriesElem, ResElem, FracElem, MatElem, FinFieldElem
 
-export PolyRing, SeriesRing, ResRing, FracField, MatSpace
+export PolyRing, SeriesRing, ResRing, FracField, MatSpace, FinField
 
 export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
        MaximalRealSubfield, MaximalOrder, Ideal, PermutationGroup
