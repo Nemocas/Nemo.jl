@@ -81,7 +81,7 @@ Nemo which is designed to work with ring objects will certainly also work with f
 
 In Nemo we also distinguish between the elements of a field, say, and the field itself, and similarly
 for groups and rings and all other kinds of domains in Nemo. For example, we have an object of type
-`GenPolynomialRing` to model a generic polynomial ring, and elements of that polynomial ring would have
+`GenPolyRing` to model a generic polynomial ring, and elements of that polynomial ring would have
 type `GenPoly`. 
 
 In order to model this distinction between elements and the domains they belong to, Nemo has two main
@@ -168,7 +168,7 @@ Nemo.fmpz_poly
 julia> parent(f)
 Univariate Polynomial Ring in x over Integer Ring
 
-julia> typeof(R) <: FmpzPolyRing
+julia> typeof(R) <: PolyRing
 true
 
 julia> typeof(f) <: PolyElem
@@ -192,19 +192,18 @@ objects respectively, not the abstract types to which these types belong, which 
 guess. 
 
 For example, `fmpz` belongs to the abstract type `RingElem` and `FlintIntegerRing` belongs to `Ring`.
-Similarly `Poly{T}` belongs to `PolyElem` whereas `PolynomialRing{T}` belongs to `Ring`. We also have
-that `fmpz_poly` belongs to `PolyElem` and `FmpzPolyRing` belongs to `Ring`, and so on.
+Similarly `Poly{T}` belongs to `PolyElem` whereas `PolynomialRing{T}` belongs to `PolyRing`. We also
+have that `fmpz_poly` belongs to `PolyElem` and `FmpzPolyRing` belongs to `PolyRing`, and so on.
 
 All the generic types are parameterised by a type `T` which is the type of the *elements* of the ring
-they are defined over. For example, a polynomial ring over the Flint integers `fmpz` would have type
-`PolynomialRing{fmpz}`, thus in that example the type parameter `T` would be instantiated as `fmpz`.
+they are defined over. 
 
   - Generic
-     - `GenPoly{T}` (`GenPolynomialRing{T}`)
-     - `GenCapRelSeries{T}` (`GenCapRelPowerSeriesRing{T}`)
-     - `GenResidue{T}` (`GenResidueRing{T}`)
-     - `GenFraction{T}` (`GenFractionField{T}`)
-     - `GenMat{T}` (`GenMatrixSpace{T}`)
+     - `GenPoly{T}` (`GenPolyRing{T}`)
+     - `GenRelSeries{T}` (`GenRelSeriesRing{T}`)
+     - `GenRes{T}` (`GenResRing{T}`)
+     - `GenFrac{T}` (`GenFracField{T}`)
+     - `GenMat{T}` (`GenMatSpace{T}`)
 
   - Flint
      - `fmpz` (`FlintIntegerRing`)
