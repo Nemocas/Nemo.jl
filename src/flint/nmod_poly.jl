@@ -479,7 +479,7 @@ mod(x::nmod_poly, y::nmod_poly) = rem(x,y)
 
 function gcd(x::nmod_poly, y::nmod_poly)
   check_parent(x,y)
-  !isprime(modulus(x)) && error("Modulus not prime in gcd")
+  !is_prime(modulus(x)) && error("Modulus not prime in gcd")
   z = parent(x)()
   ccall((:nmod_poly_gcd, :libflint), Void,
           (Ptr{nmod_poly}, Ptr{nmod_poly}, Ptr{nmod_poly}), &z, &x, &y)
@@ -488,7 +488,7 @@ end
 
 function gcdx(x::nmod_poly, y::nmod_poly)
   check_parent(x,y)
-  !isprime(modulus(x)) && error("Modulus not prime in gcdx")
+  !is_prime(modulus(x)) && error("Modulus not prime in gcdx")
   g = parent(x)()
   s = parent(x)()
   t = parent(x)()
@@ -500,7 +500,7 @@ end
 
 function gcdinv(x::nmod_poly, y::nmod_poly)
   check_parent(x,y)
-  !isprime(modulus(x)) && error("Modulus not prime in gcdinv")
+  !is_prime(modulus(x)) && error("Modulus not prime in gcdinv")
   length(y) <= 1 && error("Length of second argument must be >= 2")
   g = parent(x)()
   s = parent(x)()
@@ -555,7 +555,7 @@ end
 
 function resultant(x::nmod_poly, y::nmod_poly)
   check_parent(x,y)
-  !isprime(modulus(x)) && error("Modulus not prime in resultant")
+  !is_prime(modulus(x)) && error("Modulus not prime in resultant")
   z = parent(x)()
   r = ccall((:nmod_poly_resultant, :libflint), UInt,
           (Ptr{nmod_poly}, Ptr{nmod_poly}), &x, &y)
@@ -692,7 +692,7 @@ end
 ################################################################################
 
 function isirreducible(x::nmod_poly)
-  !isprime(modulus(x)) && error("Modulus not prime in isirreducible")
+  !is_prime(modulus(x)) && error("Modulus not prime in isirreducible")
   return Bool(ccall((:nmod_poly_is_irreducible, :libflint), Int32,
           (Ptr{nmod_poly}, ), &x))
 end
@@ -704,7 +704,7 @@ end
 ################################################################################
 
 function issquarefree(x::nmod_poly)
-   !isprime(modulus(x)) && error("Modulus not prime in issquarefree")
+   !is_prime(modulus(x)) && error("Modulus not prime in issquarefree")
    return Bool(ccall((:nmod_poly_is_squarefree, :libflint), Int32, 
        (Ptr{nmod_poly}, ), &x))
 end
@@ -716,7 +716,7 @@ end
 ################################################################################
 
 function factor(x::nmod_poly)
-  !isprime(modulus(x)) && error("Modulus not prime in factor")
+  !is_prime(modulus(x)) && error("Modulus not prime in factor")
   fac = nmod_poly_factor(x.mod_n)
   ccall((:nmod_poly_factor, :libflint), UInt,
           (Ptr{nmod_poly_factor}, Ptr{nmod_poly}), &fac, &x)
@@ -732,7 +732,7 @@ function factor(x::nmod_poly)
 end  
 
 function factor_squarefree(x::nmod_poly)
-  !isprime(modulus(x)) && error("Modulus not prime in factor_squarefree")
+  !is_prime(modulus(x)) && error("Modulus not prime in factor_squarefree")
   fac = nmod_poly_factor(x.mod_n)
   ccall((:nmod_poly_factor_squarefree, :libflint), UInt,
           (Ptr{nmod_poly_factor}, Ptr{nmod_poly}), &fac, &x)
@@ -749,7 +749,7 @@ end
 
 function factor_distinct_deg(x::nmod_poly)
   !issquarefree(x) && error("Polynomial must be squarefree")
-  !isprime(modulus(x)) && error("Modulus not prime in factor_distinct_deg")
+  !is_prime(modulus(x)) && error("Modulus not prime in factor_distinct_deg")
   degs = Array(Int, degree(x))
   degss = [ pointer(degs) ]
   fac = nmod_poly_factor(x.mod_n)

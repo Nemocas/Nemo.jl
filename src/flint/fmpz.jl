@@ -811,6 +811,7 @@ end
 issquare(x::fmpz) = Bool(ccall((:fmpz_is_square, :libflint), Cint, 
                                (Ptr{fmpz},), &x))
 
+is_prime(x::UInt) = Bool(ccall((:n_is_prime, :libflint), Cint, (UInt,), x))
 # flint's fmpz_is_prime doesn't work yet
 isprime(x::fmpz) = Bool(ccall((:fmpz_is_probabprime, :libflint), Cint, 
                               (Ptr{fmpz},), &x))
