@@ -26,6 +26,11 @@ var(a::FmpqPolyRing) = a.S
 #
 ###############################################################################    
   
+doc"""
+    den(a::fmpq_poly)
+> Return the least common denominator of the coefficients of the polynomial
+> $a$.
+"""
 function den(a::fmpq_poly)
    z = fmpz()
    ccall((:fmpq_poly_get_denominator, :libflint), Void,
@@ -530,6 +535,19 @@ end
 
 ###############################################################################
 #
+#   Integral
+#
+###############################################################################
+
+function integral(x::fmpq_poly)
+   z = parent(x)()
+   ccall((:fmpq_poly_integral, :libflint), Void, 
+                (Ptr{fmpq_poly}, Ptr{fmpq_poly}), &z, &x)
+   return z
+end
+
+###############################################################################
+#
 #   Resultant
 #
 ###############################################################################
@@ -565,6 +583,11 @@ end
 #
 ###############################################################################
 
+doc"""
+    signature(f::fmpq_poly)
+> Return the signature of $f$, i.e. a tuple $(r, s)$ where $r$ is the number of
+> real roots of $f$ and $s$ is half the number of complex roots.
+"""
 function signature(f::fmpq_poly)
    r = Array(Int, 1)
    s = Array(Int, 1)

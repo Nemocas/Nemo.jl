@@ -677,11 +677,17 @@ end
 #
 ################################################################################
 
-function lift(x::FmpzPolyRing, y::nmod_poly)
+doc"""
+    function lift(R::FmpzPolyRing, y::nmod_poly)
+> Lift from a polynomial over $\mathbb{Z}/n\mathbb{Z}$ to a polynomial over
+> $\mathbb{Z}$ with minimal reduced nonnegative coefficients. The ring `R`
+> specifies the ring to lift into.
+"""
+function lift(R::FmpzPolyRing, y::nmod_poly)
   z = fmpz_poly()
   ccall((:fmpz_poly_set_nmod_poly, :libflint), Void,
           (Ptr{fmpz_poly}, Ptr{nmod_poly}), &z, &y)
-  z.parent = x
+  z.parent = R
   return z
 end
 
@@ -691,6 +697,10 @@ end
 #
 ################################################################################
 
+doc"""
+    isirreducible(x::nmod_poly)
+> Return `true` if $x$ is irreducible, otherwise return `false`.
+"""
 function isirreducible(x::nmod_poly)
   !is_prime(modulus(x)) && error("Modulus not prime in isirreducible")
   return Bool(ccall((:nmod_poly_is_irreducible, :libflint), Int32,
@@ -703,6 +713,10 @@ end
 #
 ################################################################################
 
+doc"""
+    issquarefree(x::nmod_poly)
+> Return `true` if $x$ is squarefree, otherwise return `false`.
+"""
 function issquarefree(x::nmod_poly)
    !is_prime(modulus(x)) && error("Modulus not prime in issquarefree")
    return Bool(ccall((:nmod_poly_is_squarefree, :libflint), Int32, 
@@ -715,6 +729,10 @@ end
 #
 ################################################################################
 
+doc"""
+    factor(x::nmod_poly)
+> Return the factorisation of $x$.
+"""
 function factor(x::nmod_poly)
   !is_prime(modulus(x)) && error("Modulus not prime in factor")
   fac = nmod_poly_factor(x.mod_n)
@@ -731,6 +749,10 @@ function factor(x::nmod_poly)
   return res 
 end  
 
+doc"""
+    factor_squarefree(x::nmod_poly)
+> Return the squarefree factorisation of $x$.
+"""
 function factor_squarefree(x::nmod_poly)
   !is_prime(modulus(x)) && error("Modulus not prime in factor_squarefree")
   fac = nmod_poly_factor(x.mod_n)
@@ -747,6 +769,10 @@ function factor_squarefree(x::nmod_poly)
   return res 
 end  
 
+doc"""
+    factor_distinct_deg(x::nmod_poly)
+> Return the distinct degree factorisation of a squarefree polynomial $x$.
+"""
 function factor_distinct_deg(x::nmod_poly)
   !issquarefree(x) && error("Polynomial must be squarefree")
   !is_prime(modulus(x)) && error("Modulus not prime in factor_distinct_deg")

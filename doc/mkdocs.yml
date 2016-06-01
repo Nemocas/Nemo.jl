@@ -10,6 +10,7 @@ pages:
 - About Nemo:                  about.md
 - Types in Nemo:               types.md
 - Parent object constructors:  constructors.md
+- Univariate polynomials:      src/polynomial.md
 
 markdown_extensions:
 - extra

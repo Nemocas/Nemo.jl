@@ -438,14 +438,14 @@ function divexact(x::fmpz_mod_poly, y::GenRes{fmpz})
   return q
 end
    
-#function divexact(x::fmpz_mod_poly, y::Int)
-#  y == 0 && throw(DivideError())
-#  q = parent(x)()
-#  ccall((:fmpz_mod_poly_scalar_div_fmpz, :libflint), Void, 
-#          (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz}), 
-#               &q, &x, &fmpz(y))
-#  return q
-#end
+function divexact(x::fmpz_mod_poly, y::Int)
+  y == 0 && throw(DivideError())
+  q = parent(x)()
+  ccall((:fmpz_mod_poly_scalar_div_fmpz, :libflint), Void, 
+          (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz}), 
+               &q, &x, &fmpz(y))
+  return q
+end
    
 ################################################################################
 #
@@ -559,6 +559,10 @@ function powmod(x::fmpz_mod_poly, e::Int, y::fmpz_mod_poly)
   return z
 end
 
+doc"""
+    powmod(x::fmpz_mod_poly, e::fmpz, y::fmpz_mod_poly)
+> Return $x^e \pmod{y}$.
+"""
 function powmod(x::fmpz_mod_poly, e::fmpz, y::fmpz_mod_poly)
   e < 0 && error("Exponent must be positive")
   z = parent(x)()
@@ -648,11 +652,18 @@ end
 #
 ################################################################################
 
-function lift(x::FmpzPolyRing, y::fmpz_mod_poly)
+
+doc"""
+    function lift(R::FmpzPolyRing, y::fmpz_mod_poly)
+> Lift from a polynomial over $\mathbb{Z}/n\mathbb{Z}$ to a polynomial over
+> $\mathbb{Z}$ with minimal reduced nonnegative coefficients. The ring `R`
+> specifies the ring to lift into.
+"""
+function lift(R::FmpzPolyRing, y::fmpz_mod_poly)
    z = fmpz_poly()
    ccall((:fmpz_mod_poly_get_fmpz_poly, :libflint), Void,
           (Ptr{fmpz_poly}, Ptr{fmpz_mod_poly}), &z, &y)
-   z.parent = x
+   z.parent = R
   return z
 end
 
@@ -662,6 +673,10 @@ end
 #
 ################################################################################
 
+doc"""
+    isirreducible(x::fmpz_mod_poly)
+> Return `true` if $x$ is irreducible, otherwise return `false`.
+"""
 function isirreducible(x::fmpz_mod_poly)
   !isprobabprime(modulus(x)) && error("Modulus not prime in isirreducible")
   return Bool(ccall((:fmpz_mod_poly_is_irreducible, :libflint), Int32,
@@ -674,6 +689,10 @@ end
 #
 ################################################################################
 
+doc"""
+    issquarefree(x::fmpz_mod_poly)
+> Return `true` if $x$ is squarefree, otherwise return `false`.
+"""
 function issquarefree(x::fmpz_mod_poly)
    !isprobabprime(modulus(x)) && error("Modulus not prime in issquarefree")
    return Bool(ccall((:fmpz_mod_poly_is_squarefree, :libflint), Int32, 
@@ -686,6 +705,10 @@ end
 #
 ################################################################################
 
+doc"""
+    factor(x::fmpz_mod_poly)
+> Return the factorisation of $x$.
+"""
 function factor(x::fmpz_mod_poly)
   !isprobabprime(modulus(x)) && error("Modulus not prime in factor")
   fac = fmpz_mod_poly_factor(parent(x).n)
@@ -702,6 +725,10 @@ function factor(x::fmpz_mod_poly)
   return res 
 end  
 
+doc"""
+    factor_squarefree(x::fmpz_mod_poly)
+> Return the squarefree factorisation of $x$.
+"""
 function factor_squarefree(x::fmpz_mod_poly)
   !isprobabprime(modulus(x)) && error("Modulus not prime in factor_squarefree")
   fac = fmpz_mod_poly_factor(parent(x).n)
@@ -718,6 +745,10 @@ function factor_squarefree(x::fmpz_mod_poly)
   return res 
 end  
 
+doc"""
+    factor_distinct_deg(x::fmpz_mod_poly)
+> Return the distinct degree factorisation of a squarefree polynomial $x$.
+"""
 function factor_distinct_deg(x::fmpz_mod_poly)
   !issquarefree(x) && error("Polynomial must be squarefree")
   !isprobabprime(modulus(x)) && error("Modulus not prime in factor_distinct_deg")
