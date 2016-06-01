@@ -286,7 +286,7 @@ Also see the section on basic functionality above.
 
 @{degree(::PolyElem)}
 
-@{modulus{T <: ResElem}(a::PolyElem{T})}
+@{modulus{T <: ResElem}(::PolyElem{T})}
 
 @{lead(::PolyElem)}
 
@@ -298,7 +298,7 @@ Also see the section on basic functionality above.
 
 @{isunit(::PolyElem)}
 
-@den(a::fmpq_poly)
+@den(::fmpq_poly)
 
 Here are some examples of basic manipulation of polynomials.
 
@@ -420,9 +420,9 @@ t = f^3
 
 The following comparison operators are implemented for polynomials in Nemo.
 
-@{=={T <: RingElem}(x::PolyElem{T}, y::PolyElem{T})}
+@{=={T <: RingElem}(::PolyElem{T}, ::PolyElem{T})}
 
-@{isequal{T <: RingElem}(x::PolyElem{T}, y::PolyElem{T})}
+@{isequal{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})}
 
 In addition we have the following ad hoc comparison operators.
 
@@ -494,9 +494,9 @@ h = reverse(f)
 
 ## Shifting
 
-@{shift_left(x::PolyElem, n::Int)}
+@{shift_left(::PolyElem, ::Int)}
 
-@{shift_right(f::PolyElem, n::Int)}
+@{shift_right(::PolyElem, ::Int)}
 
 Here are some examples of shifting.
 
@@ -521,7 +521,7 @@ an impossible inverse, an exception will be raised.
 
 @{powmod{T <: Union{ResElem, FieldElem}}(::PolyElem{T}, ::Int, ::PolyElem{T})}
 
-@{powmod(x::fmpz_mod_poly, e::fmpz, y::fmpz_mod_poly)}
+@{powmod(::fmpz_mod_poly, ::fmpz, ::fmpz_mod_poly)}
 
 @{invmod{T <: Union{ResElem, FieldElem}}(::PolyElem{T}, ::PolyElem{T})}
 
@@ -617,7 +617,7 @@ divisor, an exception is thrown.
 
 @{gcdx{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})}
 
-@{gcdx{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})}
+@{gcdx{T <: Union{ResElem, FieldElem}}(::PolyElem{T}, ::PolyElem{T})}
 
 @{gcdinv{T <: Union{ResElem, FieldElem}}(::PolyElem{T}, ::PolyElem{T})}
 
@@ -781,9 +781,9 @@ f = x^3 + 3x + 1
 When working over a residue ring it is useful to be able to lift to the base
 ring of the residue ring, e.g. from $\mathbb{Z}/n\mathbb{Z}$ to $\mathbb{Z}$.
 
-@{function lift(R::FmpzPolyRing, y::nmod_poly)}
+@{lift(::FmpzPolyRing, ::nmod_poly)}
 
-@{function lift(R::FmpzPolyRing, y::fmpz_mod_poly)}
+@{lift(::FmpzPolyRing, ::fmpz_mod_poly)}
 
 Here is an example of lifting.
 
@@ -803,25 +803,25 @@ Polynomials can only be factorised over certain rings. In general we use the
 same format for the output as the Julia factorisation function, namely an
 associative array with polynomial factors as keys and exponents as values.
 
-@{isirreducible(x::nmod_poly)}
+@{isirreducible(::nmod_poly)}
 
-@{isirreducible(x::fmpz_mod_poly)}
+@{isirreducible(::fmpz_mod_poly)}
 
-@{issquarefree(x::nmod_poly)}
+@{issquarefree(::nmod_poly)}
 
-@{issquarefree(x::fmpz_mod_poly)}
+@{issquarefree(::fmpz_mod_poly)}
 
-@{factor(x::nmod_poly)}
+@{factor(::nmod_poly)}
 
-@{factor(x::fmpz_mod_poly)}
+@{factor(::fmpz_mod_poly)}
 
-@{factor_squarefree(x::nmod_poly)}
+@{factor_squarefree(::nmod_poly)}
 
-@{factor_squarefree(x::fmpz_mod_poly)}
+@{factor_squarefree(::fmpz_mod_poly)}
 
-@{factor_distinct_deg(x::nmod_poly)}
+@{factor_distinct_deg(::nmod_poly)}
 
-@{factor_distinct_deg(x::fmpz_mod_poly)}
+@{factor_distinct_deg(::fmpz_mod_poly)}
 
 Here are some examples of factorisation.
 
@@ -843,7 +843,7 @@ The following special functions can be computed for any polynomial ring.
 Typically one uses the generator $x$ of a polynomial ring to get the respective
 special polynomials expressed in terms of that generator.
 
-@{chebyshev_t(n::Int, x::PolyElem)}
+@{chebyshev_t(::Int, ::PolyElem)}
 
 @{chebyshev_u(::Int, ::PolyElem)}
 
