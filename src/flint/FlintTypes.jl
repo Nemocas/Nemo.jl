@@ -616,8 +616,8 @@ type FqNmodFiniteField <: FinField
    var :: Ptr{Void}
 
    function FqNmodFiniteField(c::fmpz, deg::Int, s::Symbol)
-      if haskey(FqNmodFiniteFieldID, (char, deg, s))
-         return FqNmodFiniteFieldID[char, deg, s]::FqNmodFiniteField
+      if haskey(FqNmodFiniteFieldID, (c, deg, s))
+         return FqNmodFiniteFieldID[c, deg, s]::FqNmodFiniteField
       else
          d = new()
          ccall((:fq_nmod_ctx_init, :libflint), Void, 
