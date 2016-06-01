@@ -1,3 +1,7 @@
+```@meta
+CurrentModule = Nemo
+```
+
 # Univariate polynomials
 
 Nemo allow the creation of dense, univariate polynomials over any ring $R$.
@@ -214,7 +218,9 @@ to create polynomials of the custom type they are implementing.
 In order to construct polynomials, one must first construct the polynomial ring
 itself. This is accomplished with the following constructor.
 
-@{PolynomialRing(::Ring, ::AbstractString{}, ::Bool)}
+```@docs
+PolynomialRing(::Ring, ::AbstractString{}, ::Bool)
+```
 
 A shorthand version of this function is provided. Given a base ring `R`, we can
 abbreviate the above constructor as follows.
@@ -250,11 +256,17 @@ quite flexible notation for the construction of polynomials in this way.
 In addition we provide the following functions for constructing certain useful
 polynomials.
 
-@{zero(::PolyRing)}
+```@docs
+zero(::PolyRing)
+```
 
-@{one(::PolyRing)}
+```@docs
+one(::PolyRing)
+```
 
-@{gen(::PolyRing)}
+```@docs
+gen(::PolyRing)
+```
 
 Here are some examples of constructing polynomials.
 
@@ -276,29 +288,53 @@ Numerous functions are provided to manipulate polynomials and to set and
 retrieve coefficients and other basic data associated with the polynomials.
 Also see the section on basic functionality above.
 
-@{base_ring(::PolyRing)}
+```@docs
+base_ring(::PolyRing)
+```
 
-@{base_ring(::PolyElem)}
+```@docs
+base_ring(::PolyElem)
+```
 
-@{parent(::PolyElem)}
+```@docs
+parent(::PolyElem)
+```
 
-@{var(::PolyRing)}
+```@docs
+var(::PolyRing)
+```
 
-@{degree(::PolyElem)}
+```@docs
+degree(::PolyElem)
+```
 
-@{modulus{T <: ResElem}(::PolyElem{T})}
+```@docs
+modulus{T <: ResElem}(::PolyElem{T})
+```
 
-@{lead(::PolyElem)}
+```@docs
+lead(::PolyElem)
+```
 
-@{iszero(::PolyElem)}
+```@docs
+iszero(::PolyElem)
+```
 
-@{isone(::PolyElem)}
+```@docs
+isone(::PolyElem)
+```
 
-@{isgen(::PolyElem)}
+```@docs
+isgen(::PolyElem)
+```
 
-@{isunit(::PolyElem)}
+```@docs
+isunit(::PolyElem)
+```
 
-@den(::fmpq_poly)
+```@docs
+den(::fmpq_poly)
+```
 
 Here are some examples of basic manipulation of polynomials.
 
@@ -336,61 +372,115 @@ that Julia uses the single slash for floating point division. Therefore to
 perform exact division in a ring we use `divexact`. To construct an element
 of a fraction field one can use the double slash operator `//`.
 
-@{-(::PolyElem)}
+```@docs
+-(::PolyElem)}
+```
 
-@{+{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})}
+```@docs
++{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+```
 
-@{-{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})}
+```@docs
+-{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+```
 
-@{*{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})}
+```@docs
+*{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+```
 
-@{divexact(::PolyElem, ::PolyElem)}
+```@docs
+divexact(::PolyElem, ::PolyElem)
+```
 
 The following ad hoc operators are also provided.
 
-@{+(::Integer, ::PolyElem)}
+```@docs
++(::Integer, ::PolyElem)
+```
 
-@{+(::PolyElem, ::Integer)} 
+```@docs
++(::PolyElem, ::Integer)
+```
 
-@{+(::fmpz, ::PolyElem)}
+```@docs
++(::fmpz, ::PolyElem)
+```
 
-@{+(::PolyElem, ::fmpz)}
+```@docs
++(::PolyElem, ::fmpz)
+```
 
-@{+{T <: RingElem}(::T, ::PolyElem{T})}
+```@docs
++{T <: RingElem}(::T, ::PolyElem{T})
+```
 
-@{+{T <: RingElem}(::PolyElem, ::T)} 
+```@docs
++{T <: RingElem}(::PolyElem, ::T)
+```
 
-@{-(::Integer, ::PolyElem)}
+```@docs
+-(::Integer, ::PolyElem)
+```
 
-@{-(::PolyElem, ::Integer)} 
+```@docs
+-(::PolyElem, ::Integer)
+```
 
-@{-(::fmpz, ::PolyElem)}
+```@docs
+-(::fmpz, ::PolyElem)
+```
 
-@{-(::PolyElem, ::fmpz)}
+```@docs
+-(::PolyElem, ::fmpz)
+```
 
-@{-{T <: RingElem}(::T, ::PolyElem{T})}
+```@docs
+-{T <: RingElem}(::T, ::PolyElem{T})
+```
 
-@{-{T <: RingElem}(::PolyElem, ::T)} 
+```@docs
+-{T <: RingElem}(::PolyElem, ::T)
+``` 
 
-@{*(::Integer, ::PolyElem)}
+```@docs
+*(::Integer, ::PolyElem)
+```
 
-@{*(::PolyElem, ::Integer)} 
+```@docs
+*(::PolyElem, ::Integer)
+``` 
 
-@{*(::fmpz, ::PolyElem)}
+```@docs
+*(::fmpz, ::PolyElem)
+```
 
-@{*(::PolyElem, ::fmpz)}
+```@docs
+*(::PolyElem, ::fmpz)
+```
 
-@{*{T <: RingElem}(::T, ::PolyElem{T})}
+```@docs
+*{T <: RingElem}(::T, ::PolyElem{T})
+```
 
-@{*{T <: RingElem}(::PolyElem, ::T)} 
+```@docs
+*{T <: RingElem}(::PolyElem, ::T)
+``` 
 
-@{divexact(::PolyElem, ::Integer)} 
+```@docs
+divexact(::PolyElem, ::Integer)
+```
 
-@{divexact(::PolyElem, ::fmpz)}
+```@docs
+divexact(::PolyElem, ::fmpz)
+```
 
-@{divexact{T <: RingElem}(::PolyElem{T}, ::T)} 
+```@docs
+divexact{T <: RingElem}(::PolyElem{T}, ::T)
+```
 
-@{^(::PolyElem, ::Int)}
+```@docs
+^(::PolyElem, ::Int)
+```
 
 If the appropriate `promote_rule` and coercion exists, these operators can also
 be used with elements of other rings. Nemo will try to coerce the operands to
@@ -420,23 +510,39 @@ t = f^3
 
 The following comparison operators are implemented for polynomials in Nemo.
 
-@{=={T <: RingElem}(::PolyElem{T}, ::PolyElem{T})}
+```@docs
+=={T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+```
 
-@{isequal{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})}
+```@docs
+isequal{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+```
 
 In addition we have the following ad hoc comparison operators.
 
-@{=={T <: RingElem}(::PolyElem{T}, ::T)}
+```@docs
+=={T <: RingElem}(::PolyElem{T}, ::T)
+```
 
-@{=={T <: RingElem}(::T, ::PolyElem{T})}
+```@docs
+=={T <: RingElem}(::T, ::PolyElem{T})
+```
 
-@{==(::PolyElem, ::Integer)}
+```@docs
+==(::PolyElem, ::Integer)
+```
 
-@{==(::Integer, ::PolyElem)}
+```@docs
+==(::Integer, ::PolyElem)
+```
 
-@{==(::PolyElem, ::fmpz)}
+```@docs
+==(::PolyElem, ::fmpz)
+```
 
-@{==(::fmpz, ::PolyElem)}
+```@docs
+==(::fmpz, ::PolyElem)
+```
 
 Here are some examples of comparisons.
 
@@ -457,9 +563,13 @@ h == fmpz(3)
 
 ## Truncation
 
-@{truncate(::PolyElem, ::Int)}
+```@docs
+truncate(::PolyElem, ::Int)
+```
 
-@{mullow{T <: RingElem}(::PolyElem{T}, ::PolyElem{T}, ::Int)}
+```@docs
+mullow{T <: RingElem}(::PolyElem{T}, ::PolyElem{T}, ::Int)
+```
 
 Here are some examples of truncated operations.
 
@@ -476,9 +586,13 @@ k = mullow(f, g, 4)
 
 ## Reversal
 
-@{reverse(::PolyElem, ::Int)}
+```@docs
+reverse(::PolyElem, ::Int)
+```
 
-@{reverse(::PolyElem)}
+```@docs
+reverse(::PolyElem)
+```
 
 Here are some examples of reversal.
 
@@ -494,9 +608,13 @@ h = reverse(f)
 
 ## Shifting
 
-@{shift_left(::PolyElem, ::Int)}
+```@docs
+shift_left(::PolyElem, ::Int)
+```
 
-@{shift_right(::PolyElem, ::Int)}
+```@docs
+shift_right(::PolyElem, ::Int)
+```
 
 Here are some examples of shifting.
 
@@ -517,13 +635,21 @@ polynomial. This isn't always well-defined in the case of a residue ring,
 but when it is well-defined, we obtain the correct result. If Nemo encounters
 an impossible inverse, an exception will be raised.
 
-@{mulmod{T <: Union{ResElem, FieldElem}}(::PolyElem{T}, ::PolyElem{T}, ::PolyElem{T})}
+```@docs
+mulmod{T <: Union{ResElem, FieldElem}}(::PolyElem{T}, ::PolyElem{T}, ::PolyElem{T})
+```
 
-@{powmod{T <: Union{ResElem, FieldElem}}(::PolyElem{T}, ::Int, ::PolyElem{T})}
+```@docs
+powmod{T <: Union{ResElem, FieldElem}}(::PolyElem{T}, ::Int, ::PolyElem{T})
+```
 
-@{powmod(::fmpz_mod_poly, ::fmpz, ::fmpz_mod_poly)}
+```@docs
+powmod(::fmpz_mod_poly, ::fmpz, ::fmpz_mod_poly)
+```
 
-@{invmod{T <: Union{ResElem, FieldElem}}(::PolyElem{T}, ::PolyElem{T})}
+```@docs
+invmod{T <: Union{ResElem, FieldElem}}(::PolyElem{T}, ::PolyElem{T})
+```
 
 Here are some examples of modular arithmetic.
 
@@ -549,9 +675,13 @@ domain so long as we don't hit an impossible inverse. For such rings we define
 euclidean division of polynomials. If an impossible inverse is hit, we raise an
 exception.
 
-@{mod{T <: Union{ResElem, FieldElem}}(::PolyElem{T}, ::PolyElem{T})}
+```@docs
+mod{T <: Union{ResElem, FieldElem}}(::PolyElem{T}, ::PolyElem{T})
+```
 
-@{divrem{T <: Union{ResElem, FieldElem}}(::PolyElem{T}, ::PolyElem{T})}
+```@docs
+divrem{T <: Union{ResElem, FieldElem}}(::PolyElem{T}, ::PolyElem{T})
+```
 
 Here are some examples of euclidean division.
 
@@ -578,9 +708,13 @@ of $b$.
 
 We call $q$ the pseudoquotient and $r$ the pseudoremainder.
 
-@{pseudorem{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})}
+```@docs
+pseudorem{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+```
 
-@{pseudodivrem{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})}
+```@docs
+pseudodivrem{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+```
 
 Here are some examples of pseudodivision.
 
@@ -607,19 +741,33 @@ necessarily unique, or even well-defined.
 If an impossible inverse is encountered whilst computing the greatest common
 divisor, an exception is thrown.
 
-@{gcd{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})}
+```@docs
+gcd{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+```
 
-@{lcm{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})}
+```@docs
+lcm{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+```
 
-@{content(::PolyElem)}
+```@docs
+content(::PolyElem)
+```
 
-@{primpart(::PolyElem)}
+```@docs
+primpart(::PolyElem)
+```
 
-@{gcdx{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})}
+```@docs
+gcdx{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+```
 
-@{gcdx{T <: Union{ResElem, FieldElem}}(::PolyElem{T}, ::PolyElem{T})}
+```@docs
+gcdx{T <: Union{ResElem, FieldElem}}(::PolyElem{T}, ::PolyElem{T})
+```
 
-@{gcdinv{T <: Union{ResElem, FieldElem}}(::PolyElem{T}, ::PolyElem{T})}
+```@docs
+gcdinv{T <: Union{ResElem, FieldElem}}(::PolyElem{T}, ::PolyElem{T})
+```
 
 Here are some examples of content, primitive part and GCD.
 
@@ -649,15 +797,25 @@ u, v = gcdinv(g, h)
 
 ## Evaluation, composition and substitution
 
-@{evaluate{T <: RingElem}(::PolyElem{T}, ::T)}
+```@docs
+evaluate{T <: RingElem}(::PolyElem{T}, ::T)
+```
 
-@{evaluate(::PolyElem, ::Integer)}
+```@docs
+evaluate(::PolyElem, ::Integer)
+```
 
-@{evaluate(::PolyElem, ::fmpz)}
+```@docs
+evaluate(::PolyElem, ::fmpz)
+```
 
-@{compose(::PolyElem, ::PolyElem)}
+```@docs
+compose(::PolyElem, ::PolyElem)
+```
 
-@{subst{T <: RingElem}(::PolyElem{T}, ::Any)}
+```@docs
+subst{T <: RingElem}(::PolyElem{T}, ::Any)
+```
 
 We also overload the functional notation so that the polynomial $f$ can be
 evaluated at $a$ by writing $f(a)$. This feature is only available with 
@@ -683,9 +841,13 @@ k = f(23)
 
 ## Derivative and integral
 
-@{derivative(::PolyElem)}
+```@docs
+derivative(::PolyElem)
+```
 
-@{integral{T <: Union{ResElem, FieldElem}}(::PolyElem{T})}
+```@docs
+integral{T <: Union{ResElem, FieldElem}}(::PolyElem{T})
+```
 
 Here are some examples of integral and derivative.
 
@@ -705,9 +867,13 @@ k = integral(g)
 
 ## Resultant and discriminant
 
-@{resultant{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})}
+```@docs
+resultant{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+```
 
-@{discriminant(a::PolyElem)}
+```@docs
+discriminant(a::PolyElem)
+```
 
 Here are some examples of computing the resultant and discriminant.
 
@@ -724,9 +890,13 @@ k = discriminant(f)
 
 ## Newton representation
 
-@{monomial_to_newton!{T <: RingElem}(::Array{T, 1}, ::Array{T, 1})}
+```@docs
+monomial_to_newton!{T <: RingElem}(::Array{T, 1}, ::Array{T, 1})
+```
 
-@{newton_to_monomial!{T <: RingElem}(::Array{T, 1}, ::Array{T, 1})}
+```@docs
+newton_to_monomial!{T <: RingElem}(::Array{T, 1}, ::Array{T, 1})
+```
 
 Here are some examples of conversion to and from Newton representation.
 
@@ -744,7 +914,9 @@ newton_to_monomial!(g.coeffs, roots)
 
 ## Interpolation
 
-@{interpolate{T <: RingElem}(::PolyRing, ::Array{T, 1}, ::Array{T, 1})}
+```@docs
+interpolate{T <: RingElem}(::PolyRing, ::Array{T, 1}, ::Array{T, 1})
+```
 
 Here is an example of interpolation.
 
@@ -762,9 +934,13 @@ f = interpolate(S, xs, ys)
 
 Signature is only available for certain coefficient rings.
 
-@{signature(::fmpz_poly)}
+```@docs
+signature(::fmpz_poly)
+```
 
-@{signature(::fmpq_poly)}
+```@docs
+signature(::fmpq_poly)
+```
 
 Here is an example of signature.
 
@@ -781,9 +957,13 @@ f = x^3 + 3x + 1
 When working over a residue ring it is useful to be able to lift to the base
 ring of the residue ring, e.g. from $\mathbb{Z}/n\mathbb{Z}$ to $\mathbb{Z}$.
 
-@{lift(::FmpzPolyRing, ::nmod_poly)}
+```@docs
+lift(::FmpzPolyRing, ::nmod_poly)
+```
 
-@{lift(::FmpzPolyRing, ::fmpz_mod_poly)}
+```@docs
+lift(::FmpzPolyRing, ::fmpz_mod_poly)
+```
 
 Here is an example of lifting.
 
@@ -803,25 +983,45 @@ Polynomials can only be factorised over certain rings. In general we use the
 same format for the output as the Julia factorisation function, namely an
 associative array with polynomial factors as keys and exponents as values.
 
-@{isirreducible(::nmod_poly)}
+```@docs
+isirreducible(::nmod_poly)
+```
 
-@{isirreducible(::fmpz_mod_poly)}
+```@docs
+isirreducible(::fmpz_mod_poly)
+```
 
-@{issquarefree(::nmod_poly)}
+```@docs
+issquarefree(::nmod_poly)
+```
 
-@{issquarefree(::fmpz_mod_poly)}
+```@docs
+issquarefree(::fmpz_mod_poly)
+```
 
-@{factor(::nmod_poly)}
+```@docs
+factor(::nmod_poly)
+```
 
-@{factor(::fmpz_mod_poly)}
+```@docs
+factor(::fmpz_mod_poly)
+```
 
-@{factor_squarefree(::nmod_poly)}
+```@docs
+factor_squarefree(::nmod_poly)
+```
 
-@{factor_squarefree(::fmpz_mod_poly)}
+```@docs
+factor_squarefree(::fmpz_mod_poly)
+```
 
-@{factor_distinct_deg(::nmod_poly)}
+```@docs
+factor_distinct_deg(::nmod_poly)
+```
 
-@{factor_distinct_deg(::fmpz_mod_poly)}
+```@docs
+factor_distinct_deg(::fmpz_mod_poly)
+```
 
 Here are some examples of factorisation.
 
@@ -843,21 +1043,35 @@ The following special functions can be computed for any polynomial ring.
 Typically one uses the generator $x$ of a polynomial ring to get the respective
 special polynomials expressed in terms of that generator.
 
-@{chebyshev_t(::Int, ::PolyElem)}
+```@docs
+chebyshev_t(::Int, ::PolyElem)
+```
 
-@{chebyshev_u(::Int, ::PolyElem)}
+```@docs
+chebyshev_u(::Int, ::PolyElem)
+```
 
 The following special polynomials are only available for certain base rings.
 
-@{cyclotomic(::Int, ::fmpz_poly)}
+```@docs
+cyclotomic(::Int, ::fmpz_poly)
+```
 
-@{swinnerton_dyer(::Int, ::fmpz_poly)}
+```@docs
+swinnerton_dyer(::Int, ::fmpz_poly)
+```
 
-@{cos_minpoly(::Int, ::fmpz_poly)}
+```@docs
+cos_minpoly(::Int, ::fmpz_poly)
+```
 
-@{theta_qexp(::Int, ::Int, ::fmpz_poly)}
+```@docs
+theta_qexp(::Int, ::Int, ::fmpz_poly)
+```
 
-@{eta_qexp(::Int, ::Int, ::fmpz_poly)}
+```@docs
+eta_qexp(::Int, ::Int, ::fmpz_poly)
+```
 
 Here are some examples of special functions.
 
