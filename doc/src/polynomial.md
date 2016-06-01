@@ -2,26 +2,17 @@
 CurrentModule = Nemo
 ```
 
-# Univariate polynomials
+## Introduction
 
-Nemo allow the creation of dense, univariate polynomials over any ring $R$.
+Nemo allow the creation of dense, univariate polynomials over any computable
+ring $R$. There are two different kinds of implementation: a generic one for
+the case where no specific implementation exists, and efficient implementations
+of polynomials over numerous specific rings, usually provided by C/C++
+libraries.
 
-## Polynomial types
-
-Although the user rarely needs to deal directly with Julia types for Nemo
-objects, we provide the relevant information here for developers.
-
-Generic univariate polynomials in Nemo have type `GenPoly{T}`, where `T` is the
-type of the coefficients of the polynomial.
-
-The string representation of the variable and the base ring $R$ of a generic
-polynomial is stored in its parent object. Parent objects of generic univariate
-polynomials have type `GenPolyRing{T}`.
-
-In addition to generic polynomials, Nemo provides access to numerous polynomial
-implementations over specific rings, provided by C/C++ libraries. The following
-table shows each of the polynomial types available in Nemo, their base ring $R$,
-the type of their parent objects and the library providing those types.
+The following table shows each of the polynomial types available in Nemo, the
+base ring $R$, and the Julia/Nemo types for that kind of polynomial (the type
+information is mainly of concern to developers).
 
 Base ring                             | Library             | Element type        | Parent type
 --------------------------------------|---------------------|---------------------|----------------------
@@ -33,14 +24,86 @@ $\mathbb{Q}$                          | Flint               | `fmpq_poly`       
 $\mathbb{F}_{p^n}$ (small $n$)        | Flint               | `fq_nmod_poly`      | `FqNmodPolyRing`
 $\mathbb{F}_{p^n}$ (large $n$)        | Flint               | `fq_poly`           | `FqPolyRing`
 
+The string representation of the variable and the base ring $R$ of a generic
+polynomial is stored in its parent object. 
+
 All polynomial element types belong to the abstract type `PolyElem` and all of
 the polynomial ring types belong to the abstract type `PolyRing`. This enables
 one to write generic functions that can accept any Nemo polynomial type.
 
+## Polynomial ring constructors
+
+In order to construct polynomials in Nemo, one must first construct the
+polynomial ring itself. This is accomplished with the following constructor.
+
+```@docs
+PolynomialRing(::Ring, ::AbstractString{}, ::Bool)
+```
+
+A shorthand version of this function is provided: given a base ring `R`, we
+abbreviate the constructor as follows.
+
+```
+R["x"]
+```
+
+Here are some examples of creating polynomial rings and making use of the
+resulting parent objects to coerce various elements into the polynomial ring.
+
+```
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+T, z = QQ["z"]
+
+f = R()
+g = R(123)
+h = S(ZZ(1234))
+k = S(x + 1)
+m = T(z + 1)
+```
+
+## Polynomial element constructors
+
+Once a polynomial ring is constructed, there are various ways to construct
+polynomials in that ring.
+
+The easiest way is simply using the generator returned by the `PolynomialRing`
+constructor and and build up the polynomial using basic arithmetic. Julia has
+quite flexible notation for the construction of polynomials in this way.
+
+In addition we provide the following functions for constructing certain useful
+polynomials.
+
+```@docs
+zero(::PolyRing)
+```
+
+```@docs
+one(::PolyRing)
+```
+
+```@docs
+gen(::PolyRing)
+```
+
+Here are some examples of constructing polynomials.
+
+```
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x^3 + 3x + 21
+g = (x + 1)*y^2 + 2x + 1
+
+h = zero(S)
+k = one(R)
+m = gen(S)
+```
+
 ## Basic functionality
 
 All univariate polynomial modules in Nemo must provide the functionality listed
-below. Note that only some of these functions are useful to a user.
+in this section. (Note that only some of these functions are useful to a user.)
 
 Developers who are writing their own polynomial module, whether as an interface
 to a C library, or as some kind of generic module, must provide all of these
@@ -213,75 +276,6 @@ the polynomial.
 Typically a developer will also overload the `PolynomialRing` generic function
 to create polynomials of the custom type they are implementing.
 
-## Polynomial ring constructors
-
-In order to construct polynomials, one must first construct the polynomial ring
-itself. This is accomplished with the following constructor.
-
-```@docs
-PolynomialRing(::Ring, ::AbstractString{}, ::Bool)
-```
-
-A shorthand version of this function is provided. Given a base ring `R`, we can
-abbreviate the above constructor as follows.
-
-```
-R["x"]
-```
-
-Here are some examples of creating polynomial rings and making use of the
-resulting parent objects to coerce various elements into the polynomial ring.
-
-```
-R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
-T, z = QQ["z"]
-
-f = R()
-g = R(123)
-h = S(ZZ(1234))
-k = S(x + 1)
-m = T(z + 1)
-```
-
-## Polynomial element constructors
-
-Once a polynomial ring is constructed, there are various ways to construct
-polynomials in that ring.
-
-The easiest way is simply using the generator returned by the `PolynomialRing`
-constructor and and build up the polynomial using basic arithmetic. Julia has
-quite flexible notation for the construction of polynomials in this way.
-
-In addition we provide the following functions for constructing certain useful
-polynomials.
-
-```@docs
-zero(::PolyRing)
-```
-
-```@docs
-one(::PolyRing)
-```
-
-```@docs
-gen(::PolyRing)
-```
-
-Here are some examples of constructing polynomials.
-
-```
-R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
-
-f = x^3 + 3x + 21
-g = (x + 1)*y^2 + 2x + 1
-
-h = zero(S)
-k = one(R)
-m = gen(S)
-```
-
 ## Basic manipulation
 
 Numerous functions are provided to manipulate polynomials and to set and
@@ -396,85 +390,34 @@ The following ad hoc operators are also provided.
 
 ```@docs
 +(::Integer, ::PolyElem)
-```
-
-```@docs
 +(::PolyElem, ::Integer)
-```
-
-```@docs
 +(::fmpz, ::PolyElem)
-```
-
-```@docs
 +(::PolyElem, ::fmpz)
-```
-
-```@docs
 +{T <: RingElem}(::T, ::PolyElem{T})
-```
-
-```@docs
 +{T <: RingElem}(::PolyElem, ::T)
 ```
 
 ```@docs
 -(::Integer, ::PolyElem)
-```
-
-```@docs
 -(::PolyElem, ::Integer)
-```
-
-```@docs
 -(::fmpz, ::PolyElem)
-```
-
-```@docs
 -(::PolyElem, ::fmpz)
-```
-
-```@docs
 -{T <: RingElem}(::T, ::PolyElem{T})
-```
-
-```@docs
 -{T <: RingElem}(::PolyElem, ::T)
 ``` 
 
 ```@docs
 *(::Integer, ::PolyElem)
-```
-
-```@docs
 *(::PolyElem, ::Integer)
-``` 
-
-```@docs
 *(::fmpz, ::PolyElem)
-```
-
-```@docs
 *(::PolyElem, ::fmpz)
-```
-
-```@docs
 *{T <: RingElem}(::T, ::PolyElem{T})
-```
-
-```@docs
 *{T <: RingElem}(::PolyElem, ::T)
 ``` 
 
 ```@docs
 divexact(::PolyElem, ::Integer)
-```
-
-```@docs
 divexact(::PolyElem, ::fmpz)
-```
-
-```@docs
 divexact{T <: RingElem}(::PolyElem{T}, ::T)
 ```
 
@@ -522,25 +465,10 @@ In addition we have the following ad hoc comparison operators.
 
 ```@docs
 =={T <: RingElem}(::PolyElem{T}, ::T)
-```
-
-```@docs
 =={T <: RingElem}(::T, ::PolyElem{T})
-```
-
-```@docs
 ==(::PolyElem, ::Integer)
-```
-
-```@docs
 ==(::Integer, ::PolyElem)
-```
-
-```@docs
 ==(::PolyElem, ::fmpz)
-```
-
-```@docs
 ==(::fmpz, ::PolyElem)
 ```
 
@@ -588,9 +516,6 @@ k = mullow(f, g, 4)
 
 ```@docs
 reverse(::PolyElem, ::Int)
-```
-
-```@docs
 reverse(::PolyElem)
 ```
 
@@ -759,9 +684,6 @@ primpart(::PolyElem)
 
 ```@docs
 gcdx{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
-```
-
-```@docs
 gcdx{T <: Union{ResElem, FieldElem}}(::PolyElem{T}, ::PolyElem{T})
 ```
 
@@ -799,13 +721,7 @@ u, v = gcdinv(g, h)
 
 ```@docs
 evaluate{T <: RingElem}(::PolyElem{T}, ::T)
-```
-
-```@docs
 evaluate(::PolyElem, ::Integer)
-```
-
-```@docs
 evaluate(::PolyElem, ::fmpz)
 ```
 
@@ -936,9 +852,6 @@ Signature is only available for certain coefficient rings.
 
 ```@docs
 signature(::fmpz_poly)
-```
-
-```@docs
 signature(::fmpq_poly)
 ```
 
@@ -959,9 +872,6 @@ ring of the residue ring, e.g. from $\mathbb{Z}/n\mathbb{Z}$ to $\mathbb{Z}$.
 
 ```@docs
 lift(::FmpzPolyRing, ::nmod_poly)
-```
-
-```@docs
 lift(::FmpzPolyRing, ::fmpz_mod_poly)
 ```
 
@@ -985,41 +895,26 @@ associative array with polynomial factors as keys and exponents as values.
 
 ```@docs
 isirreducible(::nmod_poly)
-```
-
-```@docs
 isirreducible(::fmpz_mod_poly)
 ```
 
 ```@docs
 issquarefree(::nmod_poly)
-```
-
-```@docs
 issquarefree(::fmpz_mod_poly)
 ```
 
 ```@docs
 factor(::nmod_poly)
-```
-
-```@docs
 factor(::fmpz_mod_poly)
 ```
 
 ```@docs
 factor_squarefree(::nmod_poly)
-```
-
-```@docs
 factor_squarefree(::fmpz_mod_poly)
 ```
 
 ```@docs
 factor_distinct_deg(::nmod_poly)
-```
-
-```@docs
 factor_distinct_deg(::fmpz_mod_poly)
 ```
 
