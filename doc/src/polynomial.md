@@ -373,7 +373,7 @@ perform exact division in a ring we use `divexact`. To construct an element
 of a fraction field one can use the double slash operator `//`.
 
 ```@docs
--(::PolyElem)}
+-(::PolyElem)
 ```
 
 ```@docs
