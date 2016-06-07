@@ -249,9 +249,9 @@ include("flint/fmpz_mod_poly.jl")
 
 include("generic/RelSeries.jl")
 
-include("flint/fmpz_series.jl")
+include("flint/fmpz_rel_series.jl")
 
-include("flint/fmpz_mod_series.jl")
+include("flint/fmpz_mod_rel_series.jl")
 
 include("generic/Matrix.jl")
 
@@ -279,11 +279,11 @@ include("flint/fmpq_poly.jl")
 
 include("flint/padic.jl")
 
-include("flint/fmpq_series.jl")
+include("flint/fmpq_rel_series.jl")
 
-include("flint/fq_series.jl")
+include("flint/fq_rel_series.jl")
 
-include("flint/fq_nmod_series.jl")
+include("flint/fq_nmod_rel_series.jl")
 
 include("flint/fq_poly.jl")
 

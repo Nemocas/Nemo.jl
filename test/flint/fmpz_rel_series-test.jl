@@ -1,9 +1,9 @@
-function test_fmpz_series_constructors()
-   print("fmpz_series.constructors...")
+function test_fmpz_rel_series_constructors()
+   print("fmpz_rel_series.constructors...")
 
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
-   @test isa(R, FmpzSeriesRing)
+   @test isa(R, FmpzRelSeriesRing)
 
    a = x^3 + 2x + 1
    b = x^2 + 3x + O(x^4)
@@ -23,8 +23,8 @@ function test_fmpz_series_constructors()
    println("PASS")
 end
 
-function test_fmpz_series_manipulation()
-   print("fmpz_series.manipulation...")
+function test_fmpz_rel_series_manipulation()
+   print("fmpz_rel_series.manipulation...")
 
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
@@ -46,8 +46,8 @@ function test_fmpz_series_manipulation()
    println("PASS")
 end
 
-function test_fmpz_series_unary_ops()
-   print("fmpz_series.unary_ops...")
+function test_fmpz_rel_series_unary_ops()
+   print("fmpz_rel_series.unary_ops...")
 
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
@@ -61,8 +61,8 @@ function test_fmpz_series_unary_ops()
    println("PASS")
 end
 
-function test_fmpz_series_binary_ops()
-   print("fmpz_series.binary_ops...")
+function test_fmpz_rel_series_binary_ops()
+   print("fmpz_rel_series.binary_ops...")
 
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
@@ -84,8 +84,8 @@ function test_fmpz_series_binary_ops()
    println("PASS")
 end
 
-function test_fmpz_series_adhoc_binary_ops()
-   print("fmpz_series.adhoc_binary_ops...")
+function test_fmpz_rel_series_adhoc_binary_ops()
+   print("fmpz_rel_series.adhoc_binary_ops...")
 
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
@@ -105,8 +105,8 @@ function test_fmpz_series_adhoc_binary_ops()
    println("PASS")
 end
 
-function test_fmpz_series_comparison()
-   print("fmpz_series.comparison...")
+function test_fmpz_rel_series_comparison()
+   print("fmpz_rel_series.comparison...")
 
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
@@ -124,8 +124,8 @@ function test_fmpz_series_comparison()
    println("PASS")
 end
 
-function test_fmpz_series_adhoc_comparison()
-   print("fmpz_series.adhoc_comparison...")
+function test_fmpz_rel_series_adhoc_comparison()
+   print("fmpz_rel_series.adhoc_comparison...")
 
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
@@ -147,8 +147,8 @@ function test_fmpz_series_adhoc_comparison()
    println("PASS")
 end
 
-function test_fmpz_series_powering()
-   print("fmpz_series.powering...")
+function test_fmpz_rel_series_powering()
+   print("fmpz_rel_series.powering...")
 
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
@@ -168,8 +168,8 @@ function test_fmpz_series_powering()
    println("PASS")
 end
 
-function test_fmpz_series_shift()
-   print("fmpz_series.shift...")
+function test_fmpz_rel_series_shift()
+   print("fmpz_rel_series.shift...")
 
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
@@ -189,8 +189,8 @@ function test_fmpz_series_shift()
    println("PASS")
 end
 
-function test_fmpz_series_truncation()
-   print("fmpz_series.truncation...")
+function test_fmpz_rel_series_truncation()
+   print("fmpz_rel_series.truncation...")
 
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
@@ -210,8 +210,8 @@ function test_fmpz_series_truncation()
    println("PASS")
 end
 
-function test_fmpz_series_exact_division()
-   print("fmpz_series.exact_division...")
+function test_fmpz_rel_series_exact_division()
+   print("fmpz_rel_series.exact_division...")
 
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
@@ -231,8 +231,8 @@ function test_fmpz_series_exact_division()
    println("PASS")
 end
 
-function test_fmpz_series_adhoc_exact_division()
-   print("fmpz_series.adhoc_exact_division...")
+function test_fmpz_rel_series_adhoc_exact_division()
+   print("fmpz_rel_series.adhoc_exact_division...")
 
    R, x = PolynomialRing(ZZ, "x")
    
@@ -254,8 +254,8 @@ function test_fmpz_series_adhoc_exact_division()
    println("PASS")
 end
 
-function test_fmpz_series_inversion()
-   print("fmpz_series.inversion...")
+function test_fmpz_rel_series_inversion()
+   print("fmpz_rel_series.inversion...")
 
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
@@ -268,19 +268,19 @@ function test_fmpz_series_inversion()
 
    println("PASS")
 end
-function test_fmpz_series()
-   test_fmpz_series_constructors()
-   test_fmpz_series_manipulation()
-   test_fmpz_series_unary_ops()
-   test_fmpz_series_binary_ops()
-   test_fmpz_series_adhoc_binary_ops()
-   test_fmpz_series_comparison()
-   test_fmpz_series_adhoc_comparison()
-   test_fmpz_series_powering()
-   test_fmpz_series_shift()
-   test_fmpz_series_truncation()
-   test_fmpz_series_exact_division()
-   test_fmpz_series_inversion()
+function test_fmpz_rel_series()
+   test_fmpz_rel_series_constructors()
+   test_fmpz_rel_series_manipulation()
+   test_fmpz_rel_series_unary_ops()
+   test_fmpz_rel_series_binary_ops()
+   test_fmpz_rel_series_adhoc_binary_ops()
+   test_fmpz_rel_series_comparison()
+   test_fmpz_rel_series_adhoc_comparison()
+   test_fmpz_rel_series_powering()
+   test_fmpz_rel_series_shift()
+   test_fmpz_rel_series_truncation()
+   test_fmpz_rel_series_exact_division()
+   test_fmpz_rel_series_inversion()
 
    println("")
 end

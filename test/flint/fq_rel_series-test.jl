@@ -1,25 +1,22 @@
-function test_fmpz_mod_series_constructors()
-   print("fmpz_mod_series.constructors...")
+function test_fq_rel_series_constructors()
+   print("fq_rel_series.constructors...")
 
-   R = ResidueRing(ZZ, 123456789012345678949)
+   R, t = FiniteField(fmpz(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
-   @test isa(S, FmpzModSeriesRing)
+   @test isa(S, FqRelSeriesRing)
 
    a = x^3 + 2x + 1
-   b = x^2 + x + O(x^4)
+   b = (t^2 + 1)*x^2 + (t + 3)x + O(x^4)
 
    @test isa(a, SeriesElem)
    @test isa(b, SeriesElem)
 
    c = S(a)
-   d = S([fmpz(0), fmpz(3), fmpz(1)], 3, 5)
-
-   f = S([R(0), R(3), R(1)], 3, 5)
+   d = S([t + 1, t, R(1)], 3, 5)
 
    @test isa(c, SeriesElem)
    @test isa(d, SeriesElem)
-   @test isa(f, SeriesElem)
 
    g = S(1)
    h = S(fmpz(2))
@@ -29,17 +26,17 @@ function test_fmpz_mod_series_constructors()
    @test isa(h, SeriesElem)
    @test isa(k, SeriesElem)
 
-   l = S(R(4))
+   l = S(t)
 
    @test isa(l, SeriesElem)
 
    println("PASS")
 end
 
-function test_fmpz_mod_series_manipulation()
-   print("fmpz_mod_series.manipulation...")
+function test_fq_rel_series_manipulation()
+   print("fq_rel_series.manipulation...")
 
-   R = ResidueRing(ZZ, 123456789012345678949)
+   R, t = FiniteField(fmpz(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
    
    @test max_precision(S) == 30
@@ -80,10 +77,10 @@ function test_fmpz_mod_series_manipulation()
    println("PASS")
 end
 
-function test_fmpz_mod_series_unary_ops()
-   print("fmpz_mod_series.unary_ops...")
+function test_fq_rel_series_unary_ops()
+   print("fq_rel_series.unary_ops...")
 
-   R = ResidueRing(ZZ, 123456789012345678949)
+   R, t = FiniteField(fmpz(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -96,10 +93,10 @@ function test_fmpz_mod_series_unary_ops()
    println("PASS")
 end
 
-function test_fmpz_mod_series_binary_ops()
-   print("fmpz_mod_series.binary_ops...")
+function test_fq_rel_series_binary_ops()
+   print("fq_rel_series.binary_ops...")
 
-   R = ResidueRing(ZZ, 123456789012345678949)
+   R, t = FiniteField(fmpz(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -120,10 +117,10 @@ function test_fmpz_mod_series_binary_ops()
    println("PASS")
 end
 
-function test_fmpz_mod_series_adhoc_binary_ops()
-   print("fmpz_mod_series.adhoc_binary_ops...")
+function test_fq_rel_series_adhoc_binary_ops()
+   print("fq_rel_series.adhoc_binary_ops...")
 
-   R = ResidueRing(ZZ, 123456789012345678949)
+   R, t = FiniteField(fmpz(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -142,10 +139,10 @@ function test_fmpz_mod_series_adhoc_binary_ops()
    println("PASS")
 end
 
-function test_fmpz_mod_series_comparison()
-   print("fmpz_mod_series.comparison...")
+function test_fq_rel_series_comparison()
+   print("fq_rel_series.comparison...")
 
-   R = ResidueRing(ZZ, 123456789012345678949)
+   R, t = FiniteField(fmpz(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -166,10 +163,10 @@ function test_fmpz_mod_series_comparison()
    println("PASS")
 end
 
-function test_fmpz_mod_series_adhoc_comparison()
-   print("fmpz_mod_series.adhoc_comparison...")
+function test_fq_rel_series_adhoc_comparison()
+   print("fq_rel_series.adhoc_comparison...")
 
-   R = ResidueRing(ZZ, 123456789012345678949)
+   R, t = FiniteField(fmpz(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -190,10 +187,10 @@ function test_fmpz_mod_series_adhoc_comparison()
    println("PASS")
 end
 
-function test_fmpz_mod_series_powering()
-   print("fmpz_mod_series.powering...")
+function test_fq_rel_series_powering()
+   print("fq_rel_series.powering...")
 
-   R = ResidueRing(ZZ, 123456789012345678949)
+   R, t = FiniteField(fmpz(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -212,10 +209,10 @@ function test_fmpz_mod_series_powering()
    println("PASS")
 end
 
-function test_fmpz_mod_series_shift()
-   print("fmpz_mod_series.shift...")
+function test_fq_rel_series_shift()
+   print("fq_rel_series.shift...")
 
-   R = ResidueRing(ZZ, 123456789012345678949)
+   R, t = FiniteField(fmpz(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -234,10 +231,10 @@ function test_fmpz_mod_series_shift()
    println("PASS")
 end
 
-function test_fmpz_mod_series_truncation()
-   print("fmpz_mod_series.truncation...")
+function test_fq_rel_series_truncation()
+   print("fq_rel_series.truncation...")
 
-   R = ResidueRing(ZZ, 123456789012345678949)
+   R, t = FiniteField(fmpz(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -256,10 +253,10 @@ function test_fmpz_mod_series_truncation()
    println("PASS")
 end
 
-function test_fmpz_mod_series_inversion()
-   print("fmpz_mod_series.inversion...")
+function test_fq_rel_series_inversion()
+   print("fq_rel_series.inversion...")
 
-   R = ResidueRing(ZZ, 123456789012345678949)
+   R, t = FiniteField(fmpz(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 1 + x + 2x^2 + O(x^5)
@@ -272,10 +269,10 @@ function test_fmpz_mod_series_inversion()
    println("PASS")
 end
 
-function test_fmpz_mod_series_exact_division()
-   print("fmpz_mod_series.exact_division...")
+function test_fq_rel_series_exact_division()
+   print("fq_rel_series.exact_division...")
 
-   R = ResidueRing(ZZ, 123456789012345678949)
+   R, t = FiniteField(fmpz(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = x + x^3
@@ -294,10 +291,10 @@ function test_fmpz_mod_series_exact_division()
    println("PASS")
 end
 
-function test_fmpz_mod_series_adhoc_exact_division()
-   print("fmpz_mod_series.adhoc_exact_division...")
+function test_fq_rel_series_adhoc_exact_division()
+   print("fq_rel_series.adhoc_exact_division...")
 
-   R = ResidueRing(ZZ, 123456789012345678949)
+   R, t = FiniteField(fmpz(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = x + x^3
@@ -305,49 +302,49 @@ function test_fmpz_mod_series_adhoc_exact_division()
    c = 1 + x + 2x^2 + O(x^5)
    d = x + x^3 + O(x^6)
 
-   @test isequal(divexact(a, 7), 35273368289241622557*x^3+35273368289241622557*x+O(x^31))
+   @test isequal(divexact(a, 7), 10*x+10*x^3+O(x^31))
 
    @test isequal(divexact(b, fmpz(11)), 0+O(x^4))
 
-   @test isequal(divexact(c, fmpz(2)), x^2+61728394506172839475*x+61728394506172839475+O(x^5))
+   @test isequal(divexact(c, fmpz(2)), 12 + 12*x+x^2+O(x^5))
 
-   @test isequal(divexact(d, 9), 27434842002743484211*x^3+27434842002743484211*x+O(x^6))
+   @test isequal(divexact(d, 9), 18*x+18*x^3+O(x^6))
 
    @test isequal(divexact(94872394861923874346987123694871329847a, 94872394861923874346987123694871329847), a)
 
-   @test isequal(divexact(R(5)*a, R(5)), a)
+   @test isequal(divexact((t + 1)*a, t + 1), a)
 
    println("PASS")
 end
 
-function test_fmpz_mod_series_special_functions()
-   print("fmpz_mod_series.special_functions...")
+function test_fq_rel_series_special_functions()
+   print("fq_rel_series.special_functions...")
 
-   R = ResidueRing(ZZ, 123456789012345678949)
+   R, t = FiniteField(fmpz(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
-   @test isequal(exp(x + O(x^5)), 56584361630658436185*x^4+102880657510288065791*x^3+61728394506172839475*x^2+x+1+O(x^5))
+   @test isequal(exp(x + O(x^10)), 18*x^9+x^8+8*x^7+10*x^6+14*x^5+x^4+4*x^3+12*x^2+x+1+O(x^10))
 
-   @test isequal(divexact(x, exp(x + O(x^5)) - 1), 113168723261316872370*x^2+61728394506172839474*x+1+O(x^4))
+   @test isequal(divexact(x, exp(x + O(x^10)) - 1), 13*x^8+9*x^6+13*x^4+2*x^2+11*x+1+O(x^9))
 
    println("PASS")
 end
 
-function test_fmpz_mod_series()
-   test_fmpz_mod_series_constructors()
-   test_fmpz_mod_series_manipulation()
-   test_fmpz_mod_series_unary_ops()
-   test_fmpz_mod_series_binary_ops()
-   test_fmpz_mod_series_adhoc_binary_ops()
-   test_fmpz_mod_series_comparison()
-   test_fmpz_mod_series_adhoc_comparison()
-   test_fmpz_mod_series_powering()
-   test_fmpz_mod_series_shift()
-   test_fmpz_mod_series_truncation()
-   test_fmpz_mod_series_exact_division()
-   test_fmpz_mod_series_adhoc_exact_division()
-   test_fmpz_mod_series_inversion()
-   test_fmpz_mod_series_special_functions()
+function test_fq_rel_series()
+   test_fq_rel_series_constructors()
+   test_fq_rel_series_manipulation()
+   test_fq_rel_series_unary_ops()
+   test_fq_rel_series_binary_ops()
+   test_fq_rel_series_adhoc_binary_ops()
+   test_fq_rel_series_comparison()
+   test_fq_rel_series_adhoc_comparison()
+   test_fq_rel_series_powering()
+   test_fq_rel_series_shift()
+   test_fq_rel_series_truncation()
+   test_fq_rel_series_exact_division()
+   test_fq_rel_series_adhoc_exact_division()
+   test_fq_rel_series_inversion()
+   test_fq_rel_series_special_functions()
 
    println("")
 end

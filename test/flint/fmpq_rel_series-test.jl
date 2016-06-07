@@ -1,9 +1,9 @@
-function test_fmpq_series_constructors()
-   print("fmpq_series.constructors...")
+function test_fmpq_rel_series_constructors()
+   print("fmpq_rel_series.constructors...")
 
    R, x = PowerSeriesRing(QQ, 30, "x")
 
-   @test isa(R, FmpqSeriesRing)
+   @test isa(R, FmpqRelSeriesRing)
 
    a = x^3 + 2x + 1
    b = x^2 + 3x + O(x^4)
@@ -25,8 +25,8 @@ function test_fmpq_series_constructors()
    println("PASS")
 end
 
-function test_fmpq_series_manipulation()
-   print("fmpq_series.manipulation...")
+function test_fmpq_rel_series_manipulation()
+   print("fmpq_rel_series.manipulation...")
 
    R, x = PowerSeriesRing(QQ, 30, "x")
 
@@ -48,8 +48,8 @@ function test_fmpq_series_manipulation()
    println("PASS")
 end
 
-function test_fmpq_series_unary_ops()
-   print("fmpq_series.unary_ops...")
+function test_fmpq_rel_series_unary_ops()
+   print("fmpq_rel_series.unary_ops...")
 
    R, x = PowerSeriesRing(QQ, 30, "x")
 
@@ -63,8 +63,8 @@ function test_fmpq_series_unary_ops()
    println("PASS")
 end
 
-function test_fmpq_series_binary_ops()
-   print("fmpq_series.binary_ops...")
+function test_fmpq_rel_series_binary_ops()
+   print("fmpq_rel_series.binary_ops...")
 
    R, x = PowerSeriesRing(QQ, 30, "x")
 
@@ -86,8 +86,8 @@ function test_fmpq_series_binary_ops()
    println("PASS")
 end
 
-function test_fmpq_series_adhoc_binary_ops()
-   print("fmpq_series.adhoc_binary_ops...")
+function test_fmpq_rel_series_adhoc_binary_ops()
+   print("fmpq_rel_series.adhoc_binary_ops...")
 
    R, x = PowerSeriesRing(QQ, 30, "x")
 
@@ -111,8 +111,8 @@ function test_fmpq_series_adhoc_binary_ops()
    println("PASS")
 end
 
-function test_fmpq_series_comparison()
-   print("fmpq_series.comparison...")
+function test_fmpq_rel_series_comparison()
+   print("fmpq_rel_series.comparison...")
 
    R, x = PowerSeriesRing(QQ, 30, "x")
 
@@ -130,8 +130,8 @@ function test_fmpq_series_comparison()
    println("PASS")
 end
 
-function test_fmpq_series_adhoc_comparison()
-   print("fmpq_series.adhoc_comparison...")
+function test_fmpq_rel_series_adhoc_comparison()
+   print("fmpq_rel_series.adhoc_comparison...")
 
    R, x = PowerSeriesRing(QQ, 30, "x")
 
@@ -153,8 +153,8 @@ function test_fmpq_series_adhoc_comparison()
    println("PASS")
 end
 
-function test_fmpq_series_powering()
-   print("fmpq_series.powering...")
+function test_fmpq_rel_series_powering()
+   print("fmpq_rel_series.powering...")
 
    R, x = PowerSeriesRing(QQ, 30, "x")
 
@@ -174,8 +174,8 @@ function test_fmpq_series_powering()
    println("PASS")
 end
 
-function test_fmpq_series_shift()
-   print("fmpq_series.shift...")
+function test_fmpq_rel_series_shift()
+   print("fmpq_rel_series.shift...")
 
    R, x = PowerSeriesRing(QQ, 30, "x")
 
@@ -195,8 +195,8 @@ function test_fmpq_series_shift()
    println("PASS")
 end
 
-function test_fmpq_series_truncation()
-   print("fmpq_series.truncation...")
+function test_fmpq_rel_series_truncation()
+   print("fmpq_rel_series.truncation...")
 
    R, x = PowerSeriesRing(QQ, 30, "x")
 
@@ -216,8 +216,8 @@ function test_fmpq_series_truncation()
    println("PASS")
 end
 
-function test_fmpq_series_exact_division()
-   print("fmpq_series.exact_division...")
+function test_fmpq_rel_series_exact_division()
+   print("fmpq_rel_series.exact_division...")
 
    R, x = PowerSeriesRing(QQ, 30, "x")
 
@@ -237,8 +237,8 @@ function test_fmpq_series_exact_division()
    println("PASS")
 end
 
-function test_fmpq_series_adhoc_exact_division()
-   print("fmpq_series.adhoc_exact_division...")
+function test_fmpq_rel_series_adhoc_exact_division()
+   print("fmpq_rel_series.adhoc_exact_division...")
 
    R, x = PolynomialRing(QQ, "x")
    
@@ -260,8 +260,8 @@ function test_fmpq_series_adhoc_exact_division()
    println("PASS")
 end
 
-function test_fmpq_series_inversion()
-   print("fmpq_series.inversion...")
+function test_fmpq_rel_series_inversion()
+   print("fmpq_rel_series.inversion...")
 
    R, x = PowerSeriesRing(QQ, 30, "x")
 
@@ -275,8 +275,8 @@ function test_fmpq_series_inversion()
    println("PASS")
 end
 
-function test_fmpq_series_special()
-   print("fmpq_series.special...")
+function test_fmpq_rel_series_special()
+   print("fmpq_rel_series.special...")
  
    R, x = PowerSeriesRing(QQ, 30, "x")
 
@@ -295,20 +295,20 @@ function test_fmpq_series_special()
    println("PASS")
 end
 
-function test_fmpq_series()
-   test_fmpq_series_constructors()
-   test_fmpq_series_manipulation()
-   test_fmpq_series_unary_ops()
-   test_fmpq_series_binary_ops()
-   test_fmpq_series_adhoc_binary_ops()
-   test_fmpq_series_comparison()
-   test_fmpq_series_adhoc_comparison()
-   test_fmpq_series_powering()
-   test_fmpq_series_shift()
-   test_fmpq_series_truncation()
-   test_fmpq_series_exact_division()
-   test_fmpq_series_inversion()
-   test_fmpq_series_special()
+function test_fmpq_rel_series()
+   test_fmpq_rel_series_constructors()
+   test_fmpq_rel_series_manipulation()
+   test_fmpq_rel_series_unary_ops()
+   test_fmpq_rel_series_binary_ops()
+   test_fmpq_rel_series_adhoc_binary_ops()
+   test_fmpq_rel_series_comparison()
+   test_fmpq_rel_series_adhoc_comparison()
+   test_fmpq_rel_series_powering()
+   test_fmpq_rel_series_shift()
+   test_fmpq_rel_series_truncation()
+   test_fmpq_rel_series_exact_division()
+   test_fmpq_rel_series_inversion()
+   test_fmpq_rel_series_special()
 
    println("")
 end

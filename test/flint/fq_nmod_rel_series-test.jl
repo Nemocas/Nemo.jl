@@ -1,10 +1,10 @@
-function test_fq_series_constructors()
-   print("fq_series.constructors...")
+function test_fq_nmod_rel_series_constructors()
+   print("fq_nmod_rel_series.constructors...")
 
-   R, t = FiniteField(fmpz(23), 5, "t")
+   R, t = FiniteField(23, 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
-   @test isa(S, FqSeriesRing)
+   @test isa(S, FqNmodRelSeriesRing)
 
    a = x^3 + 2x + 1
    b = (t^2 + 1)*x^2 + (t + 3)x + O(x^4)
@@ -33,10 +33,10 @@ function test_fq_series_constructors()
    println("PASS")
 end
 
-function test_fq_series_manipulation()
-   print("fq_series.manipulation...")
+function test_fq_nmod_rel_series_manipulation()
+   print("fq_nmod_rel_series.manipulation...")
 
-   R, t = FiniteField(fmpz(23), 5, "t")
+   R, t = FiniteField(23, 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
    
    @test max_precision(S) == 30
@@ -77,10 +77,10 @@ function test_fq_series_manipulation()
    println("PASS")
 end
 
-function test_fq_series_unary_ops()
-   print("fq_series.unary_ops...")
+function test_fq_nmod_rel_series_unary_ops()
+   print("fq_nmod_rel_series.unary_ops...")
 
-   R, t = FiniteField(fmpz(23), 5, "t")
+   R, t = FiniteField(23, 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -93,10 +93,10 @@ function test_fq_series_unary_ops()
    println("PASS")
 end
 
-function test_fq_series_binary_ops()
-   print("fq_series.binary_ops...")
+function test_fq_nmod_rel_series_binary_ops()
+   print("fq_nmod_rel_series.binary_ops...")
 
-   R, t = FiniteField(fmpz(23), 5, "t")
+   R, t = FiniteField(23, 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -117,10 +117,10 @@ function test_fq_series_binary_ops()
    println("PASS")
 end
 
-function test_fq_series_adhoc_binary_ops()
-   print("fq_series.adhoc_binary_ops...")
+function test_fq_nmod_rel_series_adhoc_binary_ops()
+   print("fq_nmod_rel_series.adhoc_binary_ops...")
 
-   R, t = FiniteField(fmpz(23), 5, "t")
+   R, t = FiniteField(23, 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -139,10 +139,10 @@ function test_fq_series_adhoc_binary_ops()
    println("PASS")
 end
 
-function test_fq_series_comparison()
-   print("fq_series.comparison...")
+function test_fq_nmod_rel_series_comparison()
+   print("fq_nmod_rel_series.comparison...")
 
-   R, t = FiniteField(fmpz(23), 5, "t")
+   R, t = FiniteField(23, 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -163,10 +163,10 @@ function test_fq_series_comparison()
    println("PASS")
 end
 
-function test_fq_series_adhoc_comparison()
-   print("fq_series.adhoc_comparison...")
+function test_fq_nmod_rel_series_adhoc_comparison()
+   print("fq_nmod_rel_series.adhoc_comparison...")
 
-   R, t = FiniteField(fmpz(23), 5, "t")
+   R, t = FiniteField(23, 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -187,10 +187,10 @@ function test_fq_series_adhoc_comparison()
    println("PASS")
 end
 
-function test_fq_series_powering()
-   print("fq_series.powering...")
+function test_fq_nmod_rel_series_powering()
+   print("fq_nmod_rel_series.powering...")
 
-   R, t = FiniteField(fmpz(23), 5, "t")
+   R, t = FiniteField(23, 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -209,10 +209,10 @@ function test_fq_series_powering()
    println("PASS")
 end
 
-function test_fq_series_shift()
-   print("fq_series.shift...")
+function test_fq_nmod_rel_series_shift()
+   print("fq_nmod_rel_series.shift...")
 
-   R, t = FiniteField(fmpz(23), 5, "t")
+   R, t = FiniteField(23, 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -231,10 +231,10 @@ function test_fq_series_shift()
    println("PASS")
 end
 
-function test_fq_series_truncation()
-   print("fq_series.truncation...")
+function test_fq_nmod_rel_series_truncation()
+   print("fq_nmod_rel_series.truncation...")
 
-   R, t = FiniteField(fmpz(23), 5, "t")
+   R, t = FiniteField(23, 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -253,10 +253,10 @@ function test_fq_series_truncation()
    println("PASS")
 end
 
-function test_fq_series_inversion()
-   print("fq_series.inversion...")
+function test_fq_nmod_rel_series_inversion()
+   print("fq_nmod_rel_series.inversion...")
 
-   R, t = FiniteField(fmpz(23), 5, "t")
+   R, t = FiniteField(23, 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 1 + x + 2x^2 + O(x^5)
@@ -269,10 +269,10 @@ function test_fq_series_inversion()
    println("PASS")
 end
 
-function test_fq_series_exact_division()
-   print("fq_series.exact_division...")
+function test_fq_nmod_rel_series_exact_division()
+   print("fq_nmod_rel_series.exact_division...")
 
-   R, t = FiniteField(fmpz(23), 5, "t")
+   R, t = FiniteField(23, 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = x + x^3
@@ -291,10 +291,10 @@ function test_fq_series_exact_division()
    println("PASS")
 end
 
-function test_fq_series_adhoc_exact_division()
-   print("fq_series.adhoc_exact_division...")
+function test_fq_nmod_rel_series_adhoc_exact_division()
+   print("fq_nmod_rel_series.adhoc_exact_division...")
 
-   R, t = FiniteField(fmpz(23), 5, "t")
+   R, t = FiniteField(23, 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = x + x^3
@@ -317,10 +317,10 @@ function test_fq_series_adhoc_exact_division()
    println("PASS")
 end
 
-function test_fq_series_special_functions()
-   print("fq_series.special_functions...")
+function test_fq_nmod_rel_series_special_functions()
+   print("fq_nmod_rel_series.special_functions...")
 
-   R, t = FiniteField(fmpz(23), 5, "t")
+   R, t = FiniteField(23, 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    @test isequal(exp(x + O(x^10)), 18*x^9+x^8+8*x^7+10*x^6+14*x^5+x^4+4*x^3+12*x^2+x+1+O(x^10))
@@ -330,21 +330,21 @@ function test_fq_series_special_functions()
    println("PASS")
 end
 
-function test_fq_series()
-   test_fq_series_constructors()
-   test_fq_series_manipulation()
-   test_fq_series_unary_ops()
-   test_fq_series_binary_ops()
-   test_fq_series_adhoc_binary_ops()
-   test_fq_series_comparison()
-   test_fq_series_adhoc_comparison()
-   test_fq_series_powering()
-   test_fq_series_shift()
-   test_fq_series_truncation()
-   test_fq_series_exact_division()
-   test_fq_series_adhoc_exact_division()
-   test_fq_series_inversion()
-   test_fq_series_special_functions()
+function test_fq_nmod_rel_series()
+   test_fq_nmod_rel_series_constructors()
+   test_fq_nmod_rel_series_manipulation()
+   test_fq_nmod_rel_series_unary_ops()
+   test_fq_nmod_rel_series_binary_ops()
+   test_fq_nmod_rel_series_adhoc_binary_ops()
+   test_fq_nmod_rel_series_comparison()
+   test_fq_nmod_rel_series_adhoc_comparison()
+   test_fq_nmod_rel_series_powering()
+   test_fq_nmod_rel_series_shift()
+   test_fq_nmod_rel_series_truncation()
+   test_fq_nmod_rel_series_exact_division()
+   test_fq_nmod_rel_series_adhoc_exact_division()
+   test_fq_nmod_rel_series_inversion()
+   test_fq_nmod_rel_series_special_functions()
 
    println("")
 end
