@@ -109,12 +109,13 @@ Developers who are writing their own polynomial module, whether as an interface
 to a C library, or as some kind of generic module, must provide all of these
 functions for custom univariate polynomial types in Nemo. 
 
-We write `T` for the type of the polynomials in the polynomial ring.
+We write `U` for the type of the polynomials in the polynomial ring and `T` for
+the type of elements of the coefficient ring.
 
 All of these functions are provided for all existing polynomial types in Nemo.
 
 ```
-parent_type{T <: PolyElem}(::Type{T})
+parent_type{U <: PolyElem}(::Type{U})
 ```
 
 Given the type of polynomial elements, should return the type of the
@@ -173,7 +174,7 @@ length(a::PolyElem)
 
 Return the current length (not the number of allocated coefficients), of the
 given polynomial. Note that this function only needs to be provided by a
-developer for a custome polynomial type if the Julia type definition for
+developer for a custom polynomial type if the Julia type definition for
 polynomial elements doesn't contain a field `length` corresponding to the
 current length of the polynomial. Otherwise the supplied generic implementation
 will work.

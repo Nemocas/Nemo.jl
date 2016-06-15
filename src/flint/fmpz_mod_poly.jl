@@ -22,6 +22,8 @@ elem_type(::fmpz_mod_poly) = fmpz_mod_poly
 
 elem_type(::FmpzModPolyRing) = fmpz_mod_poly
 
+parent_type(::Type{fmpz_mod_poly}) = FmpzModPolyRing
+
 function check_parent(x::fmpz_mod_poly, y::fmpz_mod_poly)
   parent(x) != parent(y) && error("Parents must coincide")
   nothing

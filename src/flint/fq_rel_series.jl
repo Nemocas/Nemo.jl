@@ -428,6 +428,12 @@ end
 #
 ###############################################################################
 
+function fit!(z::fq_rel_series, n::Int)
+   ccall((:fq_poly_fit_length, :libflint), Void, 
+         (Ptr{fq_rel_series}, Int, Ptr{FqFiniteField}),
+         &z, n, &base_ring(parent(z)))
+end
+
 function setcoeff!(z::fq_rel_series, n::Int, x::fq)
    ctx = base_ring(z)
    ccall((:fq_poly_set_coeff, :libflint), Void, 

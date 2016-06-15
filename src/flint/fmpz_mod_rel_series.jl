@@ -22,6 +22,8 @@ end
 
 elem_type(::FmpzModRelSeriesRing) = fmpz_mod_rel_series
 
+parent_type(::Type{fmpz_mod_rel_series}) = FmpzModRelSeriesRing
+
 base_ring(R::FmpzModRelSeriesRing) = R.base_ring
 
 var(a::FmpzModRelSeriesRing) = a.S
@@ -421,10 +423,21 @@ end
 #
 ###############################################################################
 
+function fit!(x::fmpz_mod_rel_series, n::Int)
+  ccall((:fmpz_mod_poly_fit_length, :libflint), Void, 
+                   (Ptr{fmpz_mod_rel_series}, Int), &x, n)
+end
+
 function setcoeff!(z::fmpz_mod_rel_series, n::Int, x::fmpz)
    ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, 
                 (Ptr{fmpz_mod_rel_series}, Int, Ptr{fmpz}), 
                &z, n, &x)
+end
+
+function setcoeff!(z::fmpz_mod_rel_series, n::Int, x::GenRes{fmpz})
+   ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, 
+                (Ptr{fmpz_mod_rel_series}, Int, Ptr{fmpz}), 
+               &z, n, &x.data)
 end
 
 function mul!(z::fmpz_mod_rel_series, a::fmpz_mod_rel_series, b::fmpz_mod_rel_series)

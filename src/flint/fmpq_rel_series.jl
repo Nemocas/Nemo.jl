@@ -24,6 +24,8 @@ end
 
 elem_type(::FmpqRelSeriesRing) = fmpq_rel_series
 
+parent_type(::Type{fmpq_rel_series}) = FmpqRelSeriesRing
+
 base_ring(R::FmpqRelSeriesRing) = R.base_ring
 
 var(a::FmpqRelSeriesRing) = a.S

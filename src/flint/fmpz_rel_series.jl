@@ -22,6 +22,8 @@ end
 
 elem_type(::FmpzRelSeriesRing) = fmpz_rel_series
 
+parent_type(::Type{fmpz_rel_series}) = FmpzRelSeriesRing
+
 base_ring(R::FmpzRelSeriesRing) = R.base_ring
 
 var(a::FmpzRelSeriesRing) = a.S
@@ -331,6 +333,32 @@ function isequal(x::fmpz_rel_series, y::fmpz_rel_series)
                 (Ptr{fmpz_rel_series}, Ptr{fmpz_rel_series}, Int), 
                &x, &y, length(x)))
 end
+
+###############################################################################
+#
+#   Ad hoc comparisons
+#
+###############################################################################
+
+function ==(x::fmpz_rel_series, y::fmpz) 
+   if length(x) > 1
+      return false
+   elseif length(x) == 1 
+      z = fmpz()
+      ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, 
+                       (Ptr{fmpz}, Ptr{fmpz_rel_series}, Int), &z, &x, 0)
+      return ccall((:fmpz_equal, :libflint), Bool, 
+               (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &y, 0)
+   else
+      return precision(x) == 0 || y == 0
+   end 
+end
+
+==(x::fmpz, y::fmpz_rel_series) = y == x
+
+==(x::fmpz_rel_series, y::Integer) = x == fmpz(y)
+
+==(x::Integer, y::fmpz_rel_series) = y == x
 
 ###############################################################################
 #
