@@ -834,6 +834,8 @@ Base.promote_rule{V <: Integer}(::Type{fmpz_mod_poly}, ::Type{V}) = fmpz_mod_pol
 
 Base.promote_rule(::Type{fmpz_mod_poly}, ::Type{fmpz}) = fmpz_mod_poly
 
+Base.promote_rule(::Type{fmpz_mod_poly}, ::Type{GenRes{fmpz}}) = fmpz_mod_poly
+
 ###############################################################################
 #
 #   Polynomial substitution
