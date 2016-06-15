@@ -11,6 +11,7 @@ pages:
 - Types in Nemo:               types.md
 - Parent object constructors:  constructors.md
 - Univariate polynomials:      build/polynomial.md
+- Capped relative power series build/series.md
 
 markdown_extensions:
 - extra
