@@ -461,6 +461,10 @@ function exp(a::fmpq_rel_series)
    return z
 end
 
+doc"""
+   log(a::fmpq_rel_series)
+> Return log$(a)$. Requires the constant term to be one.
+"""
 function log(a::fmpq_rel_series)
    coeff(a, 0) != 1 && error("Constant term not one in log")
    if length(a) == 1 || a.prec < 2
@@ -474,6 +478,10 @@ function log(a::fmpq_rel_series)
    return z
 end
 
+doc"""
+   tan(a::fmpq_rel_series)
+> Return tan$(a)$. Requires a zero constant term.
+"""
 function tan(a::fmpq_rel_series)
    coeff(a, 0) != 0 && error("Constant term not zero in tan")
    if a == 0 || a.prec < 2
@@ -487,6 +495,10 @@ function tan(a::fmpq_rel_series)
    return z
 end
 
+doc"""
+   tanh(a::fmpq_rel_series)
+> Return tanh$(a)$. Requires a zero constant term.
+"""
 function tanh(a::fmpq_rel_series)
    coeff(a, 0) != 0 && error("Constant term not zero in tanh")
    if a == 0 || a.prec < 2
@@ -500,6 +512,10 @@ function tanh(a::fmpq_rel_series)
    return z
 end
 
+doc"""
+   sin(a::fmpq_rel_series)
+> Return sin$(a)$. Requires a zero constant term.
+"""
 function sin(a::fmpq_rel_series)
    coeff(a, 0) != 0 && error("Constant term not zero in sin")
    if a == 0 || a.prec < 2
@@ -513,6 +529,10 @@ function sin(a::fmpq_rel_series)
    return z
 end
 
+doc"""
+   sinh(a::fmpq_rel_series)
+> Return sinh$(a)$. Requires a zero constant term.
+"""
 function sinh(a::fmpq_rel_series)
    coeff(a, 0) != 0 && error("Constant term not zero in sinh")
    if a == 0 || a.prec < 2
@@ -526,6 +546,10 @@ function sinh(a::fmpq_rel_series)
    return z
 end
 
+doc"""
+   cos(a::fmpq_rel_series)
+> Return cos$(a)$. Requires a zero constant term.
+"""
 function cos(a::fmpq_rel_series)
    coeff(a, 0) != 0 && error("Constant term not zero in cos")
    if length(a) == 0 || a.prec == 1
@@ -539,6 +563,10 @@ function cos(a::fmpq_rel_series)
    return z
 end
 
+doc"""
+   cosh(a::fmpq_rel_series)
+> Return cosh$(a)$. Requires a zero constant term.
+"""
 function cosh(a::fmpq_rel_series)
    coeff(a, 0) != 0 && error("Constant term not zero in cosh")
    if length(a) == 0 || a.prec == 1
@@ -552,6 +580,10 @@ function cosh(a::fmpq_rel_series)
    return z
 end
 
+doc"""
+   asin(a::fmpq_rel_series)
+> Return asin$(a)$. Requires a zero constant term.
+"""
 function asin(a::fmpq_rel_series)
    coeff(a, 0) != 0 && error("Constant term not zero in asin")
    if a == 0 || a.prec < 2
@@ -565,6 +597,10 @@ function asin(a::fmpq_rel_series)
    return z
 end
 
+doc"""
+   asinh(a::fmpq_rel_series)
+> Return asinh$(a)$. Requires a zero constant term.
+"""
 function asinh(a::fmpq_rel_series)
    coeff(a, 0) != 0 && error("Constant term not zero in asinh")
    if a == 0 || a.prec < 2
@@ -578,6 +614,10 @@ function asinh(a::fmpq_rel_series)
    return z
 end
 
+doc"""
+   atan(a::fmpq_rel_series)
+> Return atan$(a)$. Requires a zero constant term.
+"""
 function atan(a::fmpq_rel_series)
    coeff(a, 0) != 0 && error("Constant term not zero in atan")
    if a == 0 || a.prec < 2
@@ -591,6 +631,10 @@ function atan(a::fmpq_rel_series)
    return z
 end
 
+doc"""
+   atanh(a::fmpq_rel_series)
+> Return atanh$(a)$. Requires a zero constant term.
+"""
 function atanh(a::fmpq_rel_series)
    coeff(a, 0) != 0 && error("Constant term not zero in atanh")
    if a == 0 || a.prec < 2
@@ -604,6 +648,11 @@ function atanh(a::fmpq_rel_series)
    return z
 end
 
+doc"""
+   sqrt(a::fmpq_rel_series)
+> Return the power series square root of $a$. Requires a constant term equal to
+> one.
+"""
 function sqrt(a::fmpq_rel_series)
    coeff(a, 0) != 1 && error("Constant term not one in sqrt")
    z = parent(a)()
