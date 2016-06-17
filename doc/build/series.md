@@ -955,6 +955,55 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 
 
 ```
+divexact{T <: RingElem}(a::T, b::FracElem{T})
+```
+
+> Return $a/b$.
+
+
+```
+divexact{T <: RingElem}(a::FracElem{T}, b::T)
+```
+
+> Return $a/b$.
+
+
+```
+divexact(a::fmpz, b::FracElem)
+```
+
+> Return $a/b$.
+
+
+```
+divexact(a::FracElem, b::fmpz)
+```
+
+> Return $a/b$.
+
+
+```
+divexact(a::Integer, b::FracElem)
+```
+
+> Return $a/b$.
+
+
+```
+divexact(a::FracElem, b::Integer)
+```
+
+> Return $a/b$.
+
+
+```
+divexact{T <: RingElem}(a::FracElem{T}, b::FracElem{T})
+```
+
+> Return $a/b$.
+
+
+```
 divexact{T <: RingElem}(a::SeriesElem{T}, b::T)
 ```
 
@@ -1011,7 +1060,7 @@ divexact{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
 
 
 ```
-divexact{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+divexact{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
 ```
 
 > Return $a/b$ where the quotient is expected to be exact.
@@ -1023,6 +1072,55 @@ divexact{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
 
 
 ```
+divexact{T <: RingElem}(a::T, b::FracElem{T})
+```
+
+> Return $a/b$.
+
+
+```
+divexact{T <: RingElem}(a::FracElem{T}, b::T)
+```
+
+> Return $a/b$.
+
+
+```
+divexact(a::fmpz, b::FracElem)
+```
+
+> Return $a/b$.
+
+
+```
+divexact(a::FracElem, b::fmpz)
+```
+
+> Return $a/b$.
+
+
+```
+divexact(a::Integer, b::FracElem)
+```
+
+> Return $a/b$.
+
+
+```
+divexact(a::FracElem, b::Integer)
+```
+
+> Return $a/b$.
+
+
+```
+divexact{T <: RingElem}(a::FracElem{T}, b::FracElem{T})
+```
+
+> Return $a/b$.
+
+
+```
 divexact{T <: RingElem}(a::SeriesElem{T}, b::T)
 ```
 
@@ -1079,7 +1177,7 @@ divexact{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
 
 
 ```
-divexact{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+divexact{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
 ```
 
 > Return $a/b$ where the quotient is expected to be exact.

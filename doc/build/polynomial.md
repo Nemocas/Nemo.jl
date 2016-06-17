@@ -551,14 +551,14 @@ Unary minus operator.
 
 
 ```
--{T <: RingElem}(a::T, b::PolyElem{T})
+-{T <: RingElem}(a::PolyElem{T}, b::T)
 ```
 
 > Return $a - b$.
 
 
 ```
--{T <: RingElem}(a::PolyElem{T}, b::T)
+-{T <: RingElem}(a::T, b::PolyElem{T})
 ```
 
 > Return $a - b$.

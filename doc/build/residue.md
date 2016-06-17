@@ -471,7 +471,7 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 
 
 ```
-divexact{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+divexact{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
 ```
 
 > Return $a/b$ where the quotient is expected to be exact.

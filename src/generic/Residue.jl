@@ -439,7 +439,7 @@ end
 ###############################################################################
 
 doc"""
-    divexact{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+    divexact{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
 > Return $a/b$ where the quotient is expected to be exact.
 """
 function divexact{T <: RingElem}(a::ResElem{T}, b::ResElem{T})

@@ -13,6 +13,7 @@ pages:
 - Univariate polynomials:       build/polynomial.md
 - Capped relative power series: build/series.md
 - Residue rings:                build/residue.md             
+- Fraction fields:              build/fraction.md
 
 markdown_extensions:
 - extra
