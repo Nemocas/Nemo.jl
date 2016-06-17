@@ -783,7 +783,7 @@ doc"""
 ###############################################################################
 
 doc"""
-    divexact(a::SeriesElem, b::SeriesElem)
+    divexact{T <: RingElem}(a::SeriesElem{T}, b::SeriesElem{T})
 > Return $a/b$. Requires $b$ to be invertible.
 """
 function divexact{T <: RingElem}(x::SeriesElem{T}, y::SeriesElem{T})

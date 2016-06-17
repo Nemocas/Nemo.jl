@@ -12,6 +12,7 @@ pages:
 - Parent object constructors:   constructors.md
 - Univariate polynomials:       build/polynomial.md
 - Capped relative power series: build/series.md
+- Residue rings:                build/residue.md             
 
 markdown_extensions:
 - extra

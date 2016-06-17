@@ -384,7 +384,7 @@ of a fraction field one can use the double slash operator `//`.
 ```
 
 ```@docs
-divexact(::PolyElem, ::PolyElem)
+divexact{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
 ```
 
 The following ad hoc operators are also provided.
@@ -395,7 +395,7 @@ The following ad hoc operators are also provided.
 +(::fmpz, ::PolyElem)
 +(::PolyElem, ::fmpz)
 +{T <: RingElem}(::T, ::PolyElem{T})
-+{T <: RingElem}(::PolyElem, ::T)
++{T <: RingElem}(::PolyElem{T}, ::T)
 ```
 
 ```@docs
@@ -404,7 +404,7 @@ The following ad hoc operators are also provided.
 -(::fmpz, ::PolyElem)
 -(::PolyElem, ::fmpz)
 -{T <: RingElem}(::T, ::PolyElem{T})
--{T <: RingElem}(::PolyElem, ::T)
+-{T <: RingElem}(::PolyElem{T}, ::T)
 ``` 
 
 ```@docs
@@ -413,7 +413,7 @@ The following ad hoc operators are also provided.
 *(::fmpz, ::PolyElem)
 *(::PolyElem, ::fmpz)
 *{T <: RingElem}(::T, ::PolyElem{T})
-*{T <: RingElem}(::PolyElem, ::T)
+*{T <: RingElem}(::PolyElem{T}, ::T)
 ``` 
 
 ```@docs

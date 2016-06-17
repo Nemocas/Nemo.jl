@@ -467,7 +467,7 @@ of a fraction field one can use the double slash operator `//`.
 ```
 
 ```@docs
-divexact(::SeriesElem, ::SeriesElem)
+divexact{T <: RingElem}(::SeriesElem{T}, ::SeriesElem{T})
 ```
 
 The following ad hoc operators are also provided.
@@ -478,7 +478,7 @@ The following ad hoc operators are also provided.
 +(::fmpz, ::SeriesElem)
 +(::SeriesElem, ::fmpz)
 +{T <: RingElem}(::T, ::SeriesElem{T})
-+{T <: RingElem}(::SeriesElem, ::T)
++{T <: RingElem}(::SeriesElem{T}, ::T)
 ```
 
 ```@docs
@@ -487,7 +487,7 @@ The following ad hoc operators are also provided.
 -(::fmpz, ::SeriesElem)
 -(::SeriesElem, ::fmpz)
 -{T <: RingElem}(::T, ::SeriesElem{T})
--{T <: RingElem}(::SeriesElem, ::T)
+-{T <: RingElem}(::SeriesElem{T}, ::T)
 ``` 
 
 ```@docs
@@ -496,7 +496,7 @@ The following ad hoc operators are also provided.
 *(::fmpz, ::SeriesElem)
 *(::SeriesElem, ::fmpz)
 *{T <: RingElem}(::T, ::SeriesElem{T})
-*{T <: RingElem}(::SeriesElem, ::T)
+*{T <: RingElem}(::SeriesElem{T}, ::T)
 ``` 
 
 ```@docs
