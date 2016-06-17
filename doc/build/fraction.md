@@ -62,6 +62,14 @@ nothing
 Note: it is also possible to construct fractions directly in Nemo without manually constructing the fraction field. In such cases, Nemo creates the relevant fraction field internally.
 
 
+For convenience, the rational fraction field is constructed automatically in Nemo. We have the definition
+
+
+```
+QQ = FractionField(ZZ)
+```
+
+
 Here are some examples of creating fraction fields and making use of the resulting parent objects to coerce various elements into those fields.
 
 
@@ -73,6 +81,7 @@ T = FractionField(S)
 a = R(1)
 b = T(fmpz(3))
 c = T(x)
+d = QQ(11)
 ```
 
 
