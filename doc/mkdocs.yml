@@ -6,12 +6,12 @@ site_author:         William Hart
 theme:               readthedocs
 
 pages:
-- Getting Started:             index.md
-- About Nemo:                  about.md
-- Types in Nemo:               types.md
-- Parent object constructors:  constructors.md
-- Univariate polynomials:      build/polynomial.md
-- Capped relative power series build/series.md
+- Getting Started:              index.md
+- About Nemo:                   about.md
+- Types in Nemo:                types.md
+- Parent object constructors:   constructors.md
+- Univariate polynomials:       build/polynomial.md
+- Capped relative power series: build/series.md
 
 markdown_extensions:
 - extra
