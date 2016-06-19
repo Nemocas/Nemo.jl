@@ -431,6 +431,10 @@ end
 #
 ###############################################################################
 
+doc"""
+    gso(x::fmpq_mat)
+> Return the Gram-Schmidt Orthogonalisation of the matrix $x$.
+"""
 function gso(x::fmpq_mat)
    z = parent(x)()
    ccall((:fmpq_mat_gso, :libflint), Void,
@@ -444,6 +448,11 @@ end
 #
 ###############################################################################
 
+doc"""
+    hilbert(R::FmpqMatSpace)
+> Return the Hilbert matrix in the given matrix space. This is the matrix with
+> entries $H_{i,j} = 1/(i + j - 1)$.
+"""
 function hilbert(R::FmpqMatSpace)
    z = R()
    ccall((:fmpq_mat_hilbert_matrix, :libflint), Bool,
@@ -493,6 +502,11 @@ function solve(a::fmpq_mat, b::fmpq_mat)
    return z
 end
 
+doc"""
+    solve_dixon(a::fmpq_mat, b::fmpq_mat)
+> Solve $ax = b$ by clearing denominators and using Dixon's algorithm. This is
+> usually faster for large systems.
+"""
 function solve_dixon(a::fmpq_mat, b::fmpq_mat)
    rows(a) != cols(a) && error("Not a square matrix in solve")
    rows(b) != rows(a) && error("Incompatible dimensions in solve")

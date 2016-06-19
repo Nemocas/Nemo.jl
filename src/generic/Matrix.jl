@@ -1,4 +1,4 @@
-  ###############################################################################
+###############################################################################
 #
 #   Matrix.jl : Generic mxn matrices over rings
 #
@@ -19,10 +19,23 @@ parent_type{T}(::Type{GenMat{T}}) = GenMatSpace{T}
 
 elem_type{T <: RingElem}(::GenMatSpace{T}) = GenMat{T}
 
-base_ring{T}(a::MatSpace{T}) = a.base_ring::parent_type(T)
+doc"""
+    base_ring{T <: RingElem}(S::MatSpace{T})
+> Return the base ring $R$ of the given matrix space.
+"""
+base_ring{T <: RingElem}(a::MatSpace{T}) = a.base_ring::parent_type(T)
 
+doc"""
+    base_ring(r::MatElem)
+> Return the base ring $R$ of the matrix space that the supplied matrix $r$
+> belongs to.
+"""
 base_ring(a::MatElem) = base_ring(parent(a))
 
+doc"""
+    parent(a::MatElem)
+> Return the parent object of the given matrix.
+"""
 parent(a::MatElem) = a.parent
 
 function check_parent(a::MatElem, b::MatElem)
@@ -47,8 +60,16 @@ function Base.hash(a::MatElem, h::UInt)
    return b
 end
 
+doc"""
+    rows(a::MatElem)
+> Return the number of rows of the given matrix.
+"""
 rows(a::MatElem) = parent(a).rows
 
+doc"""
+    cols(a::MatElem)
+> Return the number of columns of the given matrix.
+"""
 cols(a::MatElem) = parent(a).cols
 
 function getindex{T <: RingElem}(a::MatElem{T}, r::Int, c::Int)
@@ -61,10 +82,24 @@ end
 
 setindex_t!{T <: RingElem}(a::MatElem{T}, d::T, r::Int, c::Int) = setindex!(a, d, c, r)
 
+doc"""
+    zero(a::MatSpace)
+> Construct the zero matrix in the given matrix space.
+"""
 zero(a::MatSpace) = a()
 
+doc"""
+    one(a::MatSpace)
+> Construct the matrix in the given matrix space with ones down the diagonal
+> and zeroes elsewhere.
+"""
 one(a::MatSpace) = a(1)
 
+doc"""
+    iszero(a::MatElem)
+> Return `true` if the supplied matrix $a$ is the zero matrix, otherwise
+> return `false`.
+"""
 function iszero(a::MatElem)
    for i = 1:rows(a)
       for j = 1:cols(a)
@@ -76,6 +111,11 @@ function iszero(a::MatElem)
   return true
 end
 
+doc"""
+    isone(a::MatElem)
+> Return `true` if the supplied matrix $a$ is diagonal with ones along the
+> diagonal, otherwise return `false`.
+"""
 function isone(a::MatElem)
    for i = 1:rows(a)
       for j = 1:cols(a)
@@ -149,18 +189,13 @@ show_minus_one{T <: RingElem}(::Type{MatElem{T}}) = false
 #
 ###############################################################################
 
+doc"""
+    -(a::MatElem)
+> Return $-a$.
+"""
 function -(x::MatElem)
    par = parent(x)
    return par(-x.entries)
-end
-
-function transpose(x::MatElem)
-   if rows(x) == cols(x)
-      par = parent(x)
-   else
-      par = GenMatSpace(base_ring(x), cols(x), rows(x))
-   end
-   return par(x.entries')
 end
 
 ###############################################################################
@@ -169,18 +204,30 @@ end
 #
 ###############################################################################
 
+doc"""
+    +{T <: RingElem}(a::MatElem{T}, b::MatElem{T})
+> Return $a + b$.
+"""
 function +{T <: RingElem}(x::MatElem{T}, y::MatElem{T})
    check_parent(x, y)
    parz = parent(x)
    return parz(x.entries + y.entries)
 end
 
+doc"""
+    -{T <: RingElem}(a::MatElem{T}, b::MatElem{T})
+> Return $a - b$.
+"""
 function -{T <: RingElem}(x::MatElem{T}, y::MatElem{T})
    check_parent(x, y)
    parz = parent(x)
    return parz(x.entries - y.entries)
 end
 
+doc"""
+    *{T <: RingElem}(a::MatElem{T}, b::MatElem{T})
+> Return $a\times b$.
+"""
 function *{T <: RingElem}(x::MatElem{T}, y::MatElem{T})
    cols(x) != rows(y) && error("Incompatible matrix dimensions")
    if rows(x) == cols(y) && rows(x) == cols(x)
@@ -208,7 +255,11 @@ end
 #
 ###############################################################################
 
-function *{T <: RingElem}(x::Integer, y::MatElem{T})
+doc"""
+    *(x::Integer, y::MatElem)
+> Return $x\times y$.
+"""
+function *(x::Integer, y::MatElem)
    z = similar(y.entries)
    parz = parent(y)
    for i = 1:rows(y)
@@ -219,7 +270,11 @@ function *{T <: RingElem}(x::Integer, y::MatElem{T})
    return parz(z)
 end
 
-function *{T <: RingElem}(x::fmpz, y::MatElem{T})
+doc"""
+    *(x::fmpz, y::MatElem)
+> Return $x\times y$.
+"""
+function *(x::fmpz, y::MatElem)
    z = similar(y.entries)
    parz = parent(y)
    for i = 1:rows(y)
@@ -230,6 +285,10 @@ function *{T <: RingElem}(x::fmpz, y::MatElem{T})
    return parz(z)
 end
 
+doc"""
+    *{T <: RingElem}(x::T, y::MatElem{T})
+> Return $x\times y$.
+"""
 function *{T <: RingElem}(x::T, y::MatElem{T})
    z = similar(y.entries)
    parz = parent(y)
@@ -241,13 +300,29 @@ function *{T <: RingElem}(x::T, y::MatElem{T})
    return parz(z)
 end
 
-*{T <: RingElem}(x::MatElem{T}, y::Integer) = y*x
+doc"""
+    *(x::MatElem, y::Integer)
+> Return $x\times y$.
+"""
+*(x::MatElem, y::Integer) = y*x
 
-*{T <: RingElem}(x::MatElem{T}, y::fmpz) = y*x
+doc"""
+    *(x::MatElem, y::fmpz)
+> Return $x\times y$.
+"""
+*(x::MatElem, y::fmpz) = y*x
 
+doc"""
+    *{T <: RingElem}(x::MatElem{T}, y::T)
+> Return $x\times y$.
+"""
 *{T <: RingElem}(x::MatElem{T}, y::T) = y*x
 
-function +{T <: RingElem}(x::Integer, y::MatElem{T})
+doc"""
+    +(x::Integer, y::MatElem)
+> Return $S(x) + y$ where $S$ is the parent of $y$.
+"""
+function +(x::Integer, y::MatElem)
    z = similar(y.entries)
    parz = parent(y)
    R = base_ring(y)
@@ -263,9 +338,17 @@ function +{T <: RingElem}(x::Integer, y::MatElem{T})
    return parz(z)
 end
 
-+{T <: RingElem}(x::MatElem{T}, y::Integer) = y + x
+doc"""
+    +(x::MatElem, y::Integer)
+> Return $x + S(y)$ where $S$ is the parent of $x$.
+"""
++(x::MatElem, y::Integer) = y + x
 
-function +{T <: RingElem}(x::fmpz, y::MatElem{T})
+doc"""
+    +(x::fmpz, y::MatElem)
+> Return $S(x) + y$ where $S$ is the parent of $y$.
+"""
+function +(x::fmpz, y::MatElem)
    z = similar(y.entries)
    parz = parent(y)
    R = base_ring(y)
@@ -281,8 +364,16 @@ function +{T <: RingElem}(x::fmpz, y::MatElem{T})
    return parz(z)
 end
 
-+{T <: RingElem}(x::MatElem{T}, y::fmpz) = y + x
+doc"""
+    +(x::MatElem, y::fmpz)
+> Return $x + S(y)$ where $S$ is the parent of $x$.
+"""
++(x::MatElem, y::fmpz) = y + x
 
+doc"""
+    +{T <: RingElem}(x::T, y::MatElem{T})
+> Return $S(x) + y$ where $S$ is the parent of $y$.
+"""
 function +{T <: RingElem}(x::T, y::MatElem{T})
    z = similar(y.entries)
    parz = parent(y)
@@ -298,9 +389,17 @@ function +{T <: RingElem}(x::T, y::MatElem{T})
    return parz(z)
 end
 
+doc"""
+    +{T <: RingElem}(x::MatElem{T}, y::T)
+> Return $x + S(y)$ where $S$ is the parent of $x$.
+"""
 +{T <: RingElem}(x::MatElem{T}, y::T) = y + x
 
-function -{T <: RingElem}(x::Integer, y::MatElem{T})
+doc"""
+    -(x::Integer, y::MatElem)
+> Return $S(x) - y$ where $S$ is the parent of $y$.
+"""
+function -(x::Integer, y::MatElem)
    z = similar(y.entries)
    parz = parent(y)
    R = base_ring(y)
@@ -316,7 +415,11 @@ function -{T <: RingElem}(x::Integer, y::MatElem{T})
    return parz(z)
 end
 
-function -{T <: RingElem}(x::MatElem{T}, y::Integer) 
+doc"""
+    -(x::MatElem, y::Integer)
+> Return $x - S(y)$, where $S$ is the parent of $x$
+"""
+function -(x::MatElem, y::Integer) 
    z = similar(x.entries)
    parz = parent(x)
    R = base_ring(x)
@@ -332,7 +435,11 @@ function -{T <: RingElem}(x::MatElem{T}, y::Integer)
    return parz(z)
 end
 
-function -{T <: RingElem}(x::fmpz, y::MatElem{T})
+doc"""
+    -(x::fmpz, y::MatElem)
+> Return $S(x) - y$ where $S$ is the parent of $y$.
+"""
+function -(x::fmpz, y::MatElem)
    z = similar(y.entries)
    parz = parent(y)
    R = base_ring(y)
@@ -348,7 +455,11 @@ function -{T <: RingElem}(x::fmpz, y::MatElem{T})
    return parz(z)
 end
 
-function -{T <: RingElem}(x::MatElem{T}, y::fmpz) 
+doc"""
+    -(x::MatElem, y::fmpz)
+> Return $x - S(y)$, where $S$ is the parent of $x$
+"""
+function -(x::MatElem, y::fmpz) 
    z = similar(x.entries)
    parz = parent(x)
    R = base_ring(x)
@@ -364,6 +475,10 @@ function -{T <: RingElem}(x::MatElem{T}, y::fmpz)
    return parz(z)
 end
 
+doc"""
+    -{T <: RingElem}(x::T, y::MatElem{T})
+> Return $S(x) - y$ where $S$ is the parent of $y$.
+"""
 function -{T <: RingElem}(x::T, y::MatElem{T})
    z = similar(y.entries)
    parz = parent(y)
@@ -380,6 +495,10 @@ function -{T <: RingElem}(x::T, y::MatElem{T})
    return parz(z)
 end
 
+doc"""
+    -{T <: RingElem}(x::MatElem{T}, y::T)
+> Return $x - S(y)$, where $S$ is the parent of $a$.
+"""
 function -{T <: RingElem}(x::MatElem{T}, y::T) 
    z = similar(x.entries)
    parz = parent(x)
@@ -402,6 +521,10 @@ end
 #
 ###############################################################################
 
+doc"""
+    ^(a::MatElem, b::Int)
+> Return $a^b$. We require $b \geq 0$ and that the matrix $a$ is square.
+"""
 function ^{T <: RingElem}(a::MatElem{T}, b::Int)
    b < 0 && throw(DomainError())
    rows(a) != cols(a) && error("Incompatible matrix dimensions in power")
@@ -428,6 +551,10 @@ function ^{T <: RingElem}(a::MatElem{T}, b::Int)
    end
 end
 
+doc"""
+    powers{T <: RingElem}(a::MatElem{T}, d::Int)
+> Return an array of matrices $M$ wher $M[i + 1] = a^i$ for $i = 0..d$
+"""
 function powers{T <: RingElem}(a::MatElem{T}, d::Int)
    rows(a) != cols(a) && error("Dimensions do not match in powers")
    d <= 0 && throw(DomainError())
@@ -451,11 +578,36 @@ end
 #
 ###############################################################################
 
+doc"""
+    =={T <: RingElem}(x::MatElem{T}, y::MatElem{T})
+> Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
+> that power series to different precisions may still be arithmetically
+> equal to the minimum of the two precisions.
+"""
 function =={T <: RingElem}(x::MatElem{T}, y::MatElem{T})
    check_parent(x, y)
    for i = 1:rows(x)
       for j = 1:cols(x)
          if x[i, j] != y[i, j]
+            return false
+         end
+      end
+   end
+   return true
+end
+
+doc"""
+    isequal{T <: RingElem}(x::MatElem{T}, y::MatElem{T})
+> Return `true` if $x == y$ exactly, otherwise return `false`. This function is
+> useful in cases where the entries of the matrices are inexact, e.g. power
+> series. Only if the power series are precisely the same, to the same precision,
+> are they declared equal by this function.
+"""
+function isequal{T <: RingElem}(x::MatElem{T}, y::MatElem{T})
+   check_parent(x, y)
+   for i = 1:rows(x)
+      for j = 1:cols(x)
+         if !isequal(x[i, j], y[i, j])
             return false
          end
       end
@@ -469,7 +621,12 @@ end
 #
 ###############################################################################
 
-function =={T <: RingElem}(x::MatElem{T}, y::Integer) 
+doc"""
+    ==(x::MatElem, y::Integer)
+> Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
+> otherwise return `false`.
+"""
+function ==(x::MatElem, y::Integer) 
    for i = 1:min(rows(x), cols(x))
       if x[i, i] != y
          return false
@@ -485,9 +642,19 @@ function =={T <: RingElem}(x::MatElem{T}, y::Integer)
    return true
 end
 
-=={T <: RingElem}(x::Integer, y::MatElem{T}) = y == x
+doc"""
+    ==(x::Integer, y::MatElem)
+> Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
+> otherwise return `false`.
+"""
+==(x::Integer, y::MatElem) = y == x
 
-function =={T <: RingElem}(x::MatElem{T}, y::fmpz) 
+doc"""
+    ==(x::MatElem, y::fmpz)
+> Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
+> otherwise return `false`.
+"""
+function ==(x::MatElem, y::fmpz) 
    for i = 1:min(rows(x), cols(x))
       if x[i, i] != y
          return false
@@ -503,7 +670,40 @@ function =={T <: RingElem}(x::MatElem{T}, y::fmpz)
    return true
 end
 
+doc"""
+    ==(x::fmpz, y::MatElem)
+> Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
+> otherwise return `false`.
+"""
 =={T <: RingElem}(x::fmpz, y::MatElem{T}) = y == x
+
+doc"""
+    =={T <: RingElem}(x::MatElem{T}, y::T)
+> Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
+> otherwise return `false`.
+"""
+function =={T <: RingElem}(x::MatElem{T}, y::T) 
+   for i = 1:min(rows(x), cols(x))
+      if x[i, i] != y
+         return false
+      end
+   end
+   for i = 1:rows(x)
+      for j = 1:cols(x)
+         if i != j && x[i, j] != 0
+            return false
+         end
+      end
+   end
+   return true
+end
+
+doc"""
+    =={T <: RingElem}(x::T, y::MatElem{T})
+> Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
+> otherwise return `false`.
+"""
+=={T <: RingElem}(x::T, y::MatElem{T}) = y == x
 
 ###############################################################################
 #
@@ -511,7 +711,12 @@ end
 #
 ###############################################################################
 
-function divexact{T <: RingElem}(x::MatElem{T}, y::Integer)
+doc"""
+    divexact(x::MatElem, y::Integer)
+> Return $x/y$, i.e. the matrix where each of the entries has been divided by
+> $y$. Each division is expected to be exact.
+"""
+function divexact(x::MatElem, y::Integer)
    z = similar(x.entries)
    parz = parent(x)
    for i = 1:rows(x)
@@ -522,7 +727,12 @@ function divexact{T <: RingElem}(x::MatElem{T}, y::Integer)
    return parz(z)
 end
 
-function divexact{T <: RingElem}(x::MatElem{T}, y::fmpz)
+doc"""
+    divexact(x::MatElem, y::fmpz)
+> Return $x/y$, i.e. the matrix where each of the entries has been divided by
+> $y$. Each division is expected to be exact.
+"""
+function divexact(x::MatElem, y::fmpz)
    z = similar(x.entries)
    parz = parent(x)
    for i = 1:rows(x)
@@ -533,6 +743,11 @@ function divexact{T <: RingElem}(x::MatElem{T}, y::fmpz)
    return parz(z)
 end
 
+doc"""
+    divexact{T <: RingElem}(x::MatElem{T}, y::T)
+> Return $x/y$, i.e. the matrix where each of the entries has been divided by
+> $y$. Each division is expected to be exact.
+"""
 function divexact{T <: RingElem}(x::MatElem{T}, y::T)
    z = similar(x.entries)
    parz = parent(x)
@@ -546,11 +761,36 @@ end
 
 ###############################################################################
 #
+#   Transpose
+#
+###############################################################################
+
+doc"""
+    transpose(x::MatElem)
+> Return the transpose of the given matrix.
+"""
+function transpose(x::MatElem)
+   if rows(x) == cols(x)
+      par = parent(x)
+   else
+      par = MatrixSpace(base_ring(x), cols(x), rows(x))
+   end
+   return par(x.entries')
+end
+
+###############################################################################
+#
 #   Gram matrix
 #
 ###############################################################################
 
-function gram{T <: RingElem}(x::MatElem{T})
+doc"""
+    gram(x::MatElem)
+> Return the Gram matrix of $x$, i.e. if $x$ is an $r\times c$ matrix return
+> the $r\times r$ matrix whose entries $i, j$ are the dot products of the
+> $i$-th and $j$-th rows, respectively.
+"""
+function gram(x::MatElem)
    if rows(x) == cols(x)
       parz = parent(x)
    else
@@ -574,7 +814,12 @@ end
 #
 ###############################################################################
 
-function trace{T <: RingElem}(x::MatElem{T})
+doc"""
+    trace(x::MatElem)
+> Return the trace of the matrix $a$, i.e. the sum of the diagonal elements. We
+> require the matrix to be square.
+"""
+function trace(x::MatElem)
    rows(x) != cols(x) && error("Not a square matrix in trace")
    d = zero(base_ring(x))
    for i = 1:rows(x)
@@ -589,7 +834,12 @@ end
 #
 ###############################################################################
 
-function content{T <: RingElem}(x::MatElem{T})
+doc"""
+    content(x::MatElem)
+> Return the content of the matrix $a$, i.e. the greatest common divisor of all
+> its entries, assuming it exists.
+"""
+function content(x::MatElem)
   d = zero(base_ring(x))
   for i = 1:rows(x)
      for j = 1:cols(x)
@@ -608,7 +858,11 @@ end
 #
 ###############################################################################
 
-function *{T <: RingElem}(P::perm, x::MatElem{T})
+doc"""
+    *(P::perm, x::MatElem)
+> Apply the pemutation $P$ to the rows of the matrix $x$ and return the result.
+"""
+function *(P::perm, x::MatElem)
    z = parent(x)()
    m = rows(x)
    n = cols(x)
@@ -671,6 +925,13 @@ function lufact!{T <: FieldElem}(P::perm, A::MatElem{T})
    return rank
 end
 
+doc"""
+    lufact{T <: FieldElem}(A::MatElem{T}, P = FlintPermGroup(rows(A)))
+> Return a tuple $r, p, L, U$ consisting of the rank of $A$, a permutation
+> $p$ of $A$ belonging to $P$, a lower triangular matrix $L$ and an upper
+> triangular matrix $U$ such that $p(A) = LU$, where $p(A)$ stands for the
+> matrix whose rows are the given permutation $p$ of the rows of $A$.
+"""
 function lufact{T <: FieldElem}(A::MatElem{T}, P = FlintPermGroup(rows(A)))
    m = rows(A)
    n = cols(A)
@@ -808,6 +1069,18 @@ function fflu!{T <: FieldElem}(P::perm, A::MatElem{T})
    return rank, d2
 end
 
+doc"""
+    fflu{T <: RingElem}(A::MatElem{T}, P = FlintPermGroup(rows(A)))
+> Return a tuple $r, d, p, L, U$ consisting of the rank of $A$, a
+> denominator $d$, a permutation $p$ of $A$ belonging to $P$, a lower
+> triangular matrix $L$ and an upper triangular matrix $U$ such that
+> $p(A) = LD^1U$, where $p(A)$ stands for the matrix whose rows are the given
+> permutation $p$ of the rows of $A$ and such that $D$ is the diagonal matrix
+> diag$(p_1, p_1p_2, \ldots, p_{n-2}p_{n-1}, p_{n-1}$ where the $p_i$ are the
+> inverses of the diagonal entries of $U$. The denominator $d$ is set to
+> $\pm \mbox{det}(S)$ where $S$ is an appropriate submatrix of $A$ ($S = A$ if
+> $A$ is square) and the sign is decided by the parity of the permutation.
+"""
 function fflu{T <: RingElem}(A::MatElem{T}, P = FlintPermGroup(rows(A)))
    m = rows(A)
    n = cols(A)
@@ -901,6 +1174,13 @@ function rref!{T <: RingElem}(A::MatElem{T})
    return rank, d
 end
 
+doc"""
+    rref{T <: RingElem}(M::MatElem{T})
+> Returns a tuple $(r, d, A)$ consisting of the rank $r$ of $M$ and a
+> denominator $d$ in the base ring of $M$ and a matrix $A$ such that $A/d$ is
+> the reduced row echelon form of $M$. Note that the denominator is not usually
+> minimal.
+"""
 function rref{T <: RingElem}(M::MatElem{T})
    A = deepcopy(M)
    r, d = rref!(A)
@@ -967,12 +1247,22 @@ function rref!{T <: FieldElem}(A::MatElem{T})
    return rnk
 end
 
+doc"""
+    rref{T <: FieldElem}(M::MatElem{T})
+> Returns a tuple $(r, A)$ consisting of the rank $r$ of $M$ and a reduced row
+> echelon form $A$ of $M$.
+"""
 function rref{T <: FieldElem}(M::MatElem{T})
    A = deepcopy(M)
    r = rref!(A)
    return r, A
 end
 
+doc"""
+    is_rref{T <: RingElem}(M::MatElem{T})
+> Return `true` if $M$ is in reduced row echelon form, otherwise return
+> `false`.
+"""
 function is_rref{T <: RingElem}(M::MatElem{T})
    m = rows(M)
    n = cols(M)
@@ -997,6 +1287,11 @@ function is_rref{T <: RingElem}(M::MatElem{T})
    return true
 end
 
+doc"""
+    is_rref{T <: FieldElem}(M::MatElem{T})
+> Return `true` if $M$ is in reduced row echelon form, otherwise return
+> `false`.
+"""
 function is_rref{T <: FieldElem}(M::MatElem{T})
    m = rows(M)
    n = cols(M)
@@ -1192,11 +1487,19 @@ function det_fflu{T <: RingElem}(M::MatElem{T})
    return r < n ? base_ring(M)() : (parity(P) == 0 ? d : -d)
 end
 
+doc"""
+    det{T <: FieldElem}(M::MatElem{T})
+> Return the determinant of the matrix $M$. We assume $M$ is square.
+"""
 function det{T <: FieldElem}(M::MatElem{T})
    rows(M) != cols(M) && error("Not a square matrix in det")
    return det_fflu(M)
 end
 
+doc"""
+    det{T <: RingElem}(M::MatElem{T})
+> Return the determinant of the matrix $M$. We assume $M$ is square.
+"""
 function det{T <: RingElem}(M::MatElem{T})
    try
       return det_fflu(M)
@@ -1257,6 +1560,10 @@ end
 #
 ###############################################################################
 
+doc"""
+    rank{T <: RingElem}(M::MatElem{T})
+> Return the rank of the matrix $M$.
+"""
 function rank{T <: RingElem}(M::MatElem{T})
    n = rows(M)
    if n == 0
@@ -1268,6 +1575,10 @@ function rank{T <: RingElem}(M::MatElem{T})
    return r
 end
 
+doc"""
+    rank{T <: FieldElem}(M::MatElem{T})
+> Return the rank of the matrix $M$.
+"""
 function rank{T <: FieldElem}(M::MatElem{T})
    n = rows(M)
    if n == 0
@@ -1560,6 +1871,14 @@ function solve_interpolation{T <: RingElem}(M::MatElem{PolyElem{T}}, b::MatElem{
    return x, interpolate(R, y, d)
 end
 
+doc"""
+    solve{T <: RingElem}(M::MatElem{T}, b::MatElem{T})
+> Given a non-singular $n\times n$ matrix over a ring and an $n\times m$
+> matrix over the same ring, return a tuple $x, d$ consisting of an
+> $n\times m$ matrix $x$ and a denominator $d$ such that $Ax = db$. The
+> denominator will be the determinant of $A$ up to sign. If $A$ is singular an
+> exception is raised.
+"""
 function solve{T <: RingElem}(M::MatElem{T}, b::MatElem{T})
    base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
    rows(M) != cols(M) && error("Non-square matrix in solve")
@@ -1584,6 +1903,14 @@ end
 #
 ###############################################################################
 
+doc"""
+    solve_triu{T <: FieldElem}(U::MatElem{T}, b::MatElem{T}, unit=false)
+> Given a non-singular $n\times n$ matrix over a field which is upper
+> triangular, and an $n\times m$ matrix over the same field, return an
+> $n\times m$ matrix $x$ such that $Ax = b$. If $A$ is singular an exception
+> is raised. If unit is true then $U$ is assumed to have ones on its
+> diagonal, and the diagonal will not be read.
+"""
 function solve_triu{T <: FieldElem}(U::MatElem{T}, b::MatElem{T}, unit=false)
    n = rows(U)
    m = cols(b)
@@ -1626,6 +1953,14 @@ end
 #
 ###############################################################################
 
+doc"""
+    inv{T <: RingElem}(M::MatElem{T})
+> Given a non-singular $n\times n$ matrix over a ring the tuple $X, d$
+> consisting of an $n\times n$ matrix $X$ and a denominator $d$ such that
+> $AX = dI_n$, where $I_n$ is the $n\times n$ identity matrix. The denominator
+> will be the determinant of $A$ up to sign. If $A$ is singular an exception 
+> is raised.
+"""
 function inv{T <: RingElem}(M::MatElem{T})
    cols(M) != rows(M) && error("Matrix not square in invert")
    n = cols(M)
@@ -1635,6 +1970,12 @@ function inv{T <: RingElem}(M::MatElem{T})
    return X, d
 end
 
+doc"""
+    inv{T <: FieldElem}(M::MatElem{T})
+> Given a non-singular $n\times n$ matrix over a field, return an
+> $n\times n$ matrix $X$ such that $AX = I_n$ where $I_n$ is the $n\times n$
+> identity matrix. If $A$ is singular an exception is raised.
+"""
 function inv{T <: FieldElem}(M::MatElem{T})
    cols(M) != rows(M) && error("Matrix not square in invert")
    n = cols(M)
@@ -1650,6 +1991,16 @@ end
 #
 ###############################################################################
 
+doc"""
+    nullspace{T <: RingElem}(M::MatElem{T})
+> Returns a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and
+> a basis $N$ (consisting of column vectors) for the right nullspace of $M$,
+> i.e. such that $MN$ is the zero matrix. If $M$ is an $m\times n$ matrix
+> $N$ will be an $n\times \nu$ matrix. Note that the nullspace is taken to be
+> the vector space kernel over the fraction field of the base ring if the
+> latter is not a field. In Nemo we use the name ``kernel'' for a function to
+> compute an integral kernel.
+"""
 function nullspace{T <: RingElem}(M::MatElem{T})
    n = cols(M)
    rank, d, A = rref(M)
@@ -1689,6 +2040,16 @@ function nullspace{T <: RingElem}(M::MatElem{T})
    return nullity, U
 end
 
+doc"""
+    nullspace{T <: FieldElem}(M::MatElem{T})
+> Returns a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and
+> a basis $N$ (consisting of column vectors) for the right nullspace of $M$,
+> i.e. such that $MN$ is the zero matrix. If $M$ is an $m\times n$ matrix
+> $N$ will be an $n\times \nu$ matrix. Note that the nullspace is taken to be
+> the vector space kernel over the fraction field of the base ring if the
+> latter is not a field. In Nemo we use the name ``kernel'' for a function to
+> compute an integral kernel.
+"""
 function nullspace{T <: FieldElem}(M::MatElem{T})
    m = rows(M)
    n = cols(M)
@@ -1781,6 +2142,13 @@ function hessenberg!{T <: RingElem}(A::MatElem{T})
    end
 end
 
+doc"""
+    hessenberg{T <: RingElem}(A::MatElem{T})
+> Returns the Hessenberg form of $M$, i.e. an upper Hessenberg matrix
+> which is similar to $M$. The upper Hessenberg form has nonzero entries
+> above and on the diagonal and in the diagonal line immediately below the
+> diagonal.
+"""
 function hessenberg{T <: RingElem}(A::MatElem{T})
    rows(A) != cols(A) && error("Dimensions don't match in hessenberg")
    M = deepcopy(A)
@@ -1788,6 +2156,10 @@ function hessenberg{T <: RingElem}(A::MatElem{T})
    return M
 end
 
+doc"""
+    is_hessenberg{T <: RingElem}(A::MatElem{T})
+> Returns `true` if $M$ is in Hessenberg form, otherwise returns `false`.
+"""
 function is_hessenberg{T <: RingElem}(A::MatElem{T})
    n = rows(A)
    for i = 3:n
@@ -2053,8 +2425,14 @@ function charpoly_danilevsky!{T <: RingElem}(S::Ring, A::MatElem{T})
    return pol*b
 end
 
+doc"""
+    charpoly{T <: RingElem}(V::Ring, Y::MatElem{T})
+> Returns the characteristic polynomial $p$ of the matrix $M$. The
+> polynomial ring $R$ of the resulting polynomial must be supplied
+> and the matrix is assumed to be square.
+"""
 function charpoly{T <: RingElem}(V::Ring, Y::MatElem{T})
-   rows(Y) != cols(Y) && error("Dimensions don't match in det")
+   rows(Y) != cols(Y) && error("Dimensions don't match in charpoly")
    R = base_ring(Y)
    base_ring(V) != base_ring(Y) && error("Cannot coerce into polynomial ring")
    n = rows(Y)
@@ -2128,6 +2506,11 @@ end
 # charpoly iff it has degree n. Otherwise it is meaningless (but it is
 # extremely fast to compute over some fields).
 
+doc"""
+    minpoly{T <: FieldElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
+> Returns the minimal polynomial $p$ of the matrix $M$. The polynomial ring $R$
+> of the resulting polynomial must be supplied and the matrix must be square.
+"""
 function minpoly{T <: FieldElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
    rows(M) != cols(M) && error("Not a square matrix in minpoly")
    base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
@@ -2219,6 +2602,11 @@ function minpoly{T <: FieldElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
    return p
 end
 
+doc"""
+    minpoly{T <: RingElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
+> Returns the minimal polynomial $p$ of the matrix $M$. The polynomial ring $R$
+> of the resulting polynomial must be supplied and the matrix must be square.
+"""
 function minpoly{T <: RingElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
    rows(M) != cols(M) && error("Not a square matrix in minpoly")
    base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
@@ -2318,6 +2706,14 @@ end
 #
 ###############################################################################
 
+doc"""
+    similarity!{T <: RingElem}(A::MatElem{T}, r::Int, d::T)
+> Applies a similarity transform to the $n\times n$ matrix $M$ in-place. Let
+> $P$ be the $n\times n$ identity matrix that has had all zero entries of row
+> $r$ replaced with $d$, then the transform applied is equivalent to
+> $M = P^{-1}MP$. We require $M$ to be a square matrix. A similarity transform
+> preserves the minimal and characteristic polynomials of a matrix.
+"""
 function similarity!{T <: RingElem}(A::MatElem{T}, r::Int, d::T)
    n = rows(A)
    t = base_ring(A)()
@@ -2348,6 +2744,54 @@ function similarity!{T <: RingElem}(A::MatElem{T}, r::Int, d::T)
       end
       A[r, i] = s
    end
+end
+
+###############################################################################
+#
+#   Concatenation
+#
+###############################################################################
+
+doc"""
+    hcat(a::MatElem, b::MatElem)
+> Return the horizontal concatenation of $a$ and $b$. Assumes that the
+> number of rows is the same in $a$ and $b$.
+"""
+function hcat(a::MatElem, b::MatElem)
+   rows(a) != rows(b) && error("Incompatible number of rows in hcat")
+   c = MatrixSpace(base_ring(a), rows(a), cols(a) + cols(b))()
+   n = cols(a)
+   for i = 1:rows(a)
+      for j = 1:cols(a)
+         c[i, j] = a[i, j]
+      end
+      for j = 1:cols(b)
+         c[i, n + j] = b[i, j]
+      end
+   end 
+   return c
+end
+
+doc"""
+    vcat(a::MatElem, b::MatElem)
+> Return the vertical concatenation of $a$ and $b$. Assumes that the
+> number of columns is the same in $a$ and $b$.
+"""
+function vcat(a::MatElem, b::MatElem)
+   cols(a) != cols(b) && error("Incompatible number of columns in vcat")
+   c = MatrixSpace(base_ring(a), rows(a) + rows(b), cols(a))()
+   n = rows(a)
+   for i = 1:rows(a)
+      for j = 1:cols(a)
+         c[i, j] = a[i, j]
+      end
+   end
+   for i = 1:rows(b)
+      for j = 1:cols(a)
+         c[n + i, j] = b[i, j]
+      end
+   end
+   return c
 end
 
 ###############################################################################
@@ -2408,6 +2852,22 @@ function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::Integer)
    return z
 end
 
+function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::fmpz)
+   entries = Array(T, a.rows, a.cols)
+   for i = 1:a.rows
+      for j = 1:a.cols
+         if i != j
+            entries[i, j] = zero(base_ring(a))
+         else
+            entries[i, j] = base_ring(a)(b)
+         end
+      end
+   end
+   z = GenMat{T}(entries)
+   z.parent = a
+   return z
+end
+
 function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::T)
    parent(b) != base_ring(a) && error("Unable to coerce to matrix")
    entries = Array(T, a.rows, a.cols)
@@ -2445,6 +2905,13 @@ end
 #
 ###############################################################################
 
+doc"""
+    MatrixSpace(R::Ring, r::Int, c::Int; cached=true)
+> Return parent object corresponding to the space of $r\times c$ matrices over
+> the ring $R$. If `cached == true` (the default), the returned parent object
+> is cached so that it can returned by future calls to the constructor with the
+> same dimensions and base ring.
+"""
 function MatrixSpace(R::Ring, r::Int, c::Int; cached=true)
    T = elem_type(R)
    return GenMatSpace{T}(R, r, c, cached)

@@ -244,7 +244,70 @@ Numerous functions are provided to manipulate residues. Also see the section on 
 
 
 ```
-base_ring{T}(S::ResRing{T})
+base_ring{T}(r::FracElem)
+```
+
+> Return the base ring $R$ of the fraction field that the supplied element $a$ belongs to.
+
+
+```
+base_ring{T}(S::FracField{T})
+```
+
+> Return the base ring $R$ of the given fraction field.
+
+
+```
+base_ring(r::MatElem)
+```
+
+> Return the base ring $R$ of the matrix space that the supplied matrix $r$ belongs to.
+
+
+```
+base_ring{T <: RingElem}(S::MatSpace{T})
+```
+
+> Return the base ring $R$ of the given matrix space.
+
+
+```
+base_ring(a::SeriesElem)
+```
+
+> Return the base ring of the power series ring of the given power series.
+
+
+```
+base_ring(R::SeriesRing)
+```
+
+> Return the base ring of the given power series ring.
+
+
+```
+base_ring(a::PolyElem)
+```
+
+> Return the base ring of the polynomial ring of the given polynomial.
+
+
+```
+base_ring(R::PolyRing)
+```
+
+> Return the base ring of the given polynomial ring.
+
+
+```
+base_ring(r::ResElem)
+```
+
+> Return the base ring $R$ of the residue ring $R/(a)$ that the supplied element $r$ belongs to.
+
+
+```
+base_ring{T <: RingElem}(S::ResRing{T})
 ```
 
 > Return the base ring $R$ of the given residue ring $S = R/(a)$.
@@ -256,7 +319,7 @@ base_ring{T}(S::ResRing{T})
 
 
 ```
-base_ring{T}(r::ResElem)
+base_ring(r::ResElem)
 ```
 
 > Return the base ring $R$ of the residue ring $R/(a)$ that the supplied element $r$ belongs to.
@@ -316,7 +379,7 @@ iszero(a::ResElem)
 
 
 ```
-iszero(a::ResElem)
+isone(a::ResElem)
 ```
 
 > Return `true` if the supplied element $a$ is one in the residue ring it belongs to, otherwise return `false`.

@@ -1467,7 +1467,6 @@ end
 
 const NmodMatID = ObjectIdDict()
 
-
 type NmodMatSpace <: MatSpace{GenRes{fmpz}}
   base_ring::GenResRing{fmpz}
   n::UInt

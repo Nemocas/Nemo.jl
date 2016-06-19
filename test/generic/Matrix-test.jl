@@ -1056,6 +1056,28 @@ function test_gen_mat_minpoly()
    println("PASS")   
 end
 
+function test_gen_concat()
+   print("GenMat.concat...")
+
+   R, x = PolynomialRing(ZZ, "x")
+      
+   for i = 1:10
+      r = rand(0:10)
+      c1 = rand(0:10)
+      c2 = rand(0:10)
+
+      S1 = MatrixSpace(R, r, c1)
+      S2 = MatrixSpace(R, r, c2)
+
+      M1 = randmat(S1, 3, 100)
+      M2 = randmat(S2, 3, 100)
+
+      @test vcat(transpose(M1), transpose(M2)) == transpose(hcat(M1, M2))
+   end
+
+   println("PASS")   
+end
+
 function test_gen_mat()
    test_gen_mat_constructors()
    test_gen_mat_manipulation()
@@ -1082,6 +1104,7 @@ function test_gen_mat()
    test_gen_mat_hessenberg()
    test_gen_mat_charpoly()
    test_gen_mat_minpoly()
+   test_gen_concat()
 
    println("")
 end

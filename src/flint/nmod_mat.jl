@@ -318,9 +318,14 @@ function strong_echelon_form!(a::nmod_mat)
   ccall((:nmod_mat_strong_echelon_form, :libflint), Void, (Ptr{nmod_mat}, ), &a)
 end
 
+doc"""
+    strong_echelon_form(a::nmod_mat)
+> Return the strong echeleon form of $a$. The matrix $a$ must have at least as
+> many rows as columns.
+"""
 function strong_echelon_form(a::nmod_mat)
   (rows(a) < cols(a)) &&
-              error("Matrix must have at least as many rows as columsn")
+              error("Matrix must have at least as many rows as columns")
   z = deepcopy(a)
   strong_echelon_form!(z)
   return z
@@ -330,9 +335,14 @@ function howell_form!(a::nmod_mat)
   ccall((:nmod_mat_howell_form, :libflint), Void, (Ptr{nmod_mat}, ), &a)
 end
 
+doc"""
+    howell_form(a::nmod_mat)
+> Return the Howell normal form of $a$. The matrix $a$ must have at least as
+> many rows as columns.
+"""
 function howell_form(a::nmod_mat)
   (rows(a) < cols(a)) &&
-              error("Matrix must have at least as many rows as columsn")
+              error("Matrix must have at least as many rows as columns")
 
   z = deepcopy(a)
   howell_form!(z)
@@ -531,6 +541,11 @@ end
 #
 ################################################################################
 
+doc"""
+    lift(a::nmod_mat)
+> Return a lift of the matrix $a$ to a matrix over $\mathbb{Z}$, i.e. where the
+> entries of the returned matrix are those of $a$ lifted to $\mathbb{Z}$.
+"""
 function lift(a::nmod_mat)
   z = MatrixSpace(FlintZZ, rows(a), cols(a))()
   ccall((:fmpz_mat_set_nmod_mat, :libflint), Void,

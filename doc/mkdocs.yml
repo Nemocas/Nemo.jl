@@ -14,6 +14,7 @@ pages:
 - Capped relative power series: build/series.md
 - Residue rings:                build/residue.md             
 - Fraction fields:              build/fraction.md
+- Matrices:                     build/matrix.md
 
 markdown_extensions:
 - extra

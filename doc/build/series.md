@@ -1004,6 +1004,27 @@ divexact{T <: RingElem}(a::FracElem{T}, b::FracElem{T})
 
 
 ```
+divexact{T <: RingElem}(x::MatElem{T}, y::T)
+```
+
+> Return $x/y$, i.e. the matrix where each of the entries has been divided by $y$. Each division is expected to be exact.
+
+
+```
+divexact(x::MatElem, y::fmpz)
+```
+
+> Return $x/y$, i.e. the matrix where each of the entries has been divided by $y$. Each division is expected to be exact.
+
+
+```
+divexact(x::MatElem, y::Integer)
+```
+
+> Return $x/y$, i.e. the matrix where each of the entries has been divided by $y$. Each division is expected to be exact.
+
+
+```
 divexact{T <: RingElem}(a::SeriesElem{T}, b::T)
 ```
 
@@ -1118,6 +1139,27 @@ divexact{T <: RingElem}(a::FracElem{T}, b::FracElem{T})
 ```
 
 > Return $a/b$.
+
+
+```
+divexact{T <: RingElem}(x::MatElem{T}, y::T)
+```
+
+> Return $x/y$, i.e. the matrix where each of the entries has been divided by $y$. Each division is expected to be exact.
+
+
+```
+divexact(x::MatElem, y::fmpz)
+```
+
+> Return $x/y$, i.e. the matrix where each of the entries has been divided by $y$. Each division is expected to be exact.
+
+
+```
+divexact(x::MatElem, y::Integer)
+```
+
+> Return $x/y$, i.e. the matrix where each of the entries has been divided by $y$. Each division is expected to be exact.
 
 
 ```

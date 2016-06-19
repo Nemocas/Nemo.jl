@@ -17,13 +17,13 @@ parent_type{T}(::Type{GenRes{T}}) = GenResRing{T}
 elem_type{T <: RingElem}(::GenResRing{T}) = GenRes{T}
 
 doc"""
-    base_ring{T}(S::ResRing{T})
+    base_ring{T <: RingElem}(S::ResRing{T})
 > Return the base ring $R$ of the given residue ring $S = R/(a)$.
 """
-base_ring{T}(S::ResRing{T}) = S.base_ring::parent_type(T)
+base_ring{T <: RingElem}(S::ResRing{T}) = S.base_ring::parent_type(T)
 
 doc"""
-    base_ring{T}(r::ResElem)
+    base_ring(r::ResElem)
 > Return the base ring $R$ of the residue ring $R/(a)$ that the supplied
 > element $r$ belongs to.
 """
@@ -97,7 +97,7 @@ doc"""
 iszero(a::ResElem) = iszero(data(a))
 
 doc"""
-    iszero(a::ResElem)
+    isone(a::ResElem)
 > Return `true` if the supplied element $a$ is one in the residue ring it
 > belongs to, otherwise return `false`.
 """
