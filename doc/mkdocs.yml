@@ -15,6 +15,7 @@ pages:
 - Residue rings:                build/residue.md             
 - Fraction fields:              build/fraction.md
 - Matrices:                     build/matrix.md
+- Integers:                     build/integer.md
 
 markdown_extensions:
 - extra

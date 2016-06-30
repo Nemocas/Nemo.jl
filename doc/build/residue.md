@@ -313,6 +313,20 @@ base_ring{T <: RingElem}(S::ResRing{T})
 > Return the base ring $R$ of the given residue ring $S = R/(a)$.
 
 
+```
+base_ring(a::fmpz)
+```
+
+> Returns `Union{}` as the parent ring is not dependent on another ring.
+
+
+```
+base_ring(a::FlintIntegerRing)
+```
+
+> Returns `Union{}` as this ring is not dependent on another ring.
+
+
 <a id='Nemo.base_ring-Tuple{Nemo.ResElem{T}}' href='#Nemo.base_ring-Tuple{Nemo.ResElem{T}}'>#</a>
 **`Nemo.base_ring`** &mdash; *Method*.
 
