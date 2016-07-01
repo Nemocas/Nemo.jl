@@ -16,6 +16,7 @@ pages:
 - Fraction fields:              build/fraction.md
 - Matrices:                     build/matrix.md
 - Integers:                     build/integer.md
+- Rationals:                    build/rational.md
 
 markdown_extensions:
 - extra
