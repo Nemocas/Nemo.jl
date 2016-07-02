@@ -670,7 +670,7 @@ end
 
 doc"""
     powmod(x::fmpz, p::fmpz, m::fmpz)
-> Return $x^p \pmod{m}$. The remainder will be in the range $[0, m)$
+> Return $x^p (\mod m)$. The remainder will be in the range $[0, m)$
 """
 function powmod(x::fmpz, p::fmpz, m::fmpz)
     m <= 0 && throw(DomainError())
@@ -687,7 +687,7 @@ end
 
 doc"""
     powmod(x::fmpz, p::Int, m::fmpz)
-> Return $x^p \pmod{m}$. The remainder will be in the range $[0, m)$
+> Return $x^p (\mod m)$. The remainder will be in the range $[0, m)$
 """
 function powmod(x::fmpz, p::Int, m::fmpz)
     m <= 0 && throw(DomainError())
@@ -704,7 +704,7 @@ end
 
 doc"""
     invmod(x::fmpz, m::fmpz)
-> Return $x^{-1} \pmod{m}$. The remainder will be in the range $[0, m)$
+> Return $x^{-1} (\mod m)$. The remainder will be in the range $[0, m)$
 """
 function invmod(x::fmpz, m::fmpz)
     m <= 0 && throw(DomainError())
@@ -721,7 +721,7 @@ end
 
 doc"""
     sqrtmod(x::fmpz, m::fmpz)
-> Return a square root of $x \pmod{m}$ if one exists. The remainder will be in
+> Return a square root of $x (\mod m)$ if one exists. The remainder will be in
 > the range $[0, m)$. We require that $m$ is prime, otherwise the algorithm may
 > not terminate.
 """
@@ -737,7 +737,7 @@ end
 
 doc"""
     crt(r1::fmpz, m1::fmpz, r2::fmpz, m2::fmpz, signed=false)
-> Find $r$ such that $r \equiv r_1 \pmod {m_1}$ and $r \equiv r_2 \pmod{m_2}$.
+> Find $r$ such that $r \equiv r_1 (\mod m_1)$ and $r \equiv r_2 (\mod m_2)$.
 > If `signed = true`, $r$ will be in the range $-m_1m_2/2 < r \leq m_1m_2/2$.
 > If `signed = false` the value will be in the range $0 \leq r < m_1m_2$.
 """
@@ -751,7 +751,7 @@ end
 
 doc"""
     crt(r1::fmpz, m1::fmpz, r2::Int, m2::Int, signed=false)
-> Find $r$ such that $r \equiv r_1 \pmod {m_1}$ and $r \equiv r_2 \pmod{m_2}$.
+> Find $r$ such that $r \equiv r_1 (\mod m_1)$ and $r \equiv r_2 (\mod m_2)$.
 > If `signed = true`, $r$ will be in the range $-m_1m_2/2 < r \leq m_1m_2/2$.
 > If `signed = false` the value will be in the range $0 \leq r < m_1m_2$.
 """
@@ -1003,7 +1003,7 @@ end
 
 doc"""
     divisor_lenstra(n::fmpz, r::fmpz, m::fmpz)
-> If $n$ has a factor which lies in the residue class $r \pmod{m}$ for
+> If $n$ has a factor which lies in the residue class $r (\mod m)$ for
 > $0 < r < m < n$, this function returns such a factor. Otherwise it returns
 > $0$. This is only efficient if $m$ is at least the cube root of $n$. We
 > require gcd$(r, m) = 1$ and this condition is not checked.

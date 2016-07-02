@@ -95,11 +95,11 @@ The following basic functionality is provided by the default integer implementat
 
 
 ```
-parent_type::Type{fmpz}
+parent_type(::Type{fmpz})
 ```
 
 
-Given the type of the parent object of a Flint integer.
+Gives the type of the parent object of a Flint integer.
 
 
 ```
@@ -127,7 +127,7 @@ Construct a copy of the given integer and return it. This function must recursiv
 
 
 ```
-mul!(c::ResElem, a::ResElem, b::ResElem)
+mul!(c::fmpz, a::fmpz, b::fmpz)
 ```
 
 
@@ -135,7 +135,7 @@ Multiply $a$ by $b$ and set the existing integer $c$ to the result. This functio
 
 
 ```
-addeq!(c::ResElem, a::ResElem)
+addeq!(c::fmpz, a::fmpz)
 ```
 
 
@@ -500,6 +500,14 @@ cmp(a::fmpz, b::fmpz) cmpabs(a::fmpz, b::fmpz)
 We also provide the following ad hoc comparisons which again provide all of the comparison operators mentioned above.
 
 
+<a id='Function-2'></a>
+
+## Function
+
+
+cmp(a::fmpz, b::Int) cmp(a::Int, b::fmpz) cmp(a::fmpz, b::UInt) cmp(a::UInt, b::fmpz)
+
+
 Here are some examples of comparisons.
 
 
@@ -513,14 +521,6 @@ a > 4
 5 <= b
 cmpabs(a, b)
 ```
-
-
-<a id='Function-2'></a>
-
-## Function
-
-
-cmp(a::fmpz, b::Int) cmp(a::Int, b::fmpz) cmp(a::fmpz, b::UInt) cmp(a::UInt, b::fmpz)
 
 
 <a id='Shifting-1'></a>
@@ -600,7 +600,7 @@ mod(x::fmpz, y::Int)
 powmod(x::fmpz, p::fmpz, m::fmpz)
 ```
 
-> Return $x^p \pmod{m}$. The remainder will be in the range $[0, m)$
+> Return $x^p (\mod m)$. The remainder will be in the range $[0, m)$
 
 
 <a id='Nemo.powmod-Tuple{Nemo.fmpz,Int64,Nemo.fmpz}' href='#Nemo.powmod-Tuple{Nemo.fmpz,Int64,Nemo.fmpz}'>#</a>
@@ -612,7 +612,7 @@ powmod(x::fmpz, p::fmpz, m::fmpz)
 powmod(x::fmpz, p::Int, m::fmpz)
 ```
 
-> Return $x^p \pmod{m}$. The remainder will be in the range $[0, m)$
+> Return $x^p (\mod m)$. The remainder will be in the range $[0, m)$
 
 
 <a id='Base.invmod-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Base.invmod-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
@@ -624,7 +624,7 @@ powmod(x::fmpz, p::Int, m::fmpz)
 invmod(x::fmpz, m::fmpz)
 ```
 
-> Return $x^{-1} \pmod{m}$. The remainder will be in the range $[0, m)$
+> Return $x^{-1} (\mod m)$. The remainder will be in the range $[0, m)$
 
 
 <a id='Nemo.sqrtmod-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Nemo.sqrtmod-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
@@ -636,7 +636,7 @@ invmod(x::fmpz, m::fmpz)
 sqrtmod(x::fmpz, m::fmpz)
 ```
 
-> Return a square root of $x \pmod{m}$ if one exists. The remainder will be in the range $[0, m)$. We require that $m$ is prime, otherwise the algorithm may not terminate.
+> Return a square root of $x (\mod m)$ if one exists. The remainder will be in the range $[0, m)$. We require that $m$ is prime, otherwise the algorithm may not terminate.
 
 
 <a id='Nemo.crt-Tuple{Nemo.fmpz,Nemo.fmpz,Nemo.fmpz,Nemo.fmpz,Bool}' href='#Nemo.crt-Tuple{Nemo.fmpz,Nemo.fmpz,Nemo.fmpz,Nemo.fmpz,Bool}'>#</a>
@@ -648,7 +648,7 @@ sqrtmod(x::fmpz, m::fmpz)
 crt(r1::fmpz, m1::fmpz, r2::fmpz, m2::fmpz, signed=false)
 ```
 
-> Find $r$ such that $r \equiv r_1 \pmod {m_1}$ and $r \equiv r_2 \pmod{m_2}$. If `signed = true`, $r$ will be in the range $-m_1m_2/2 < r \leq m_1m_2/2$. If `signed = false` the value will be in the range $0 \leq r < m_1m_2$.
+> Find $r$ such that $r \equiv r_1 (\mod m_1)$ and $r \equiv r_2 (\mod m_2)$. If `signed = true`, $r$ will be in the range $-m_1m_2/2 < r \leq m_1m_2/2$. If `signed = false` the value will be in the range $0 \leq r < m_1m_2$.
 
 
 <a id='Nemo.crt-Tuple{Nemo.fmpz,Nemo.fmpz,Int64,Int64,Bool}' href='#Nemo.crt-Tuple{Nemo.fmpz,Nemo.fmpz,Int64,Int64,Bool}'>#</a>
@@ -660,7 +660,7 @@ crt(r1::fmpz, m1::fmpz, r2::fmpz, m2::fmpz, signed=false)
 crt(r1::fmpz, m1::fmpz, r2::Int, m2::Int, signed=false)
 ```
 
-> Find $r$ such that $r \equiv r_1 \pmod {m_1}$ and $r \equiv r_2 \pmod{m_2}$. If `signed = true`, $r$ will be in the range $-m_1m_2/2 < r \leq m_1m_2/2$. If `signed = false` the value will be in the range $0 \leq r < m_1m_2$.
+> Find $r$ such that $r \equiv r_1 (\mod m_1)$ and $r \equiv r_2 (\mod m_2)$. If `signed = true`, $r$ will be in the range $-m_1m_2/2 < r \leq m_1m_2/2$. If `signed = false` the value will be in the range $0 \leq r < m_1m_2$.
 
 
 
@@ -958,7 +958,7 @@ remove(x::fmpz, y::fmpz)
 divisor_lenstra(n::fmpz, r::fmpz, m::fmpz)
 ```
 
-> If $n$ has a factor which lies in the residue class $r \pmod{m}$ for $0 < r < m < n$, this function returns such a factor. Otherwise it returns $0$. This is only efficient if $m$ is at least the cube root of $n$. We require gcd$(r, m) = 1$ and this condition is not checked.
+> If $n$ has a factor which lies in the residue class $r (\mod m)$ for $0 < r < m < n$, this function returns such a factor. Otherwise it returns $0$. This is only efficient if $m$ is at least the cube root of $n$. We require gcd$(r, m) = 1$ and this condition is not checked.
 
 
 <a id='Nemo.fac-Tuple{Int64}' href='#Nemo.fac-Tuple{Int64}'>#</a>
@@ -973,235 +973,362 @@ fac(x::Int)
 > Return the factorial of $x$, i.e. $x! = 1.2.3\ldots x$. We require $x \geq 0$.
 
 
+<a id='Nemo.risingfac-Tuple{Nemo.fmpz,Int64}' href='#Nemo.risingfac-Tuple{Nemo.fmpz,Int64}'>#</a>
+**`Nemo.risingfac`** &mdash; *Method*.
 
-```
-
-```
-
-
-@docs risingfac(::fmpz, ::Int) risingfac(::Int, ::Int)
 
 
 ```
-
+risingfac(x::fmpz, y::Int)
 ```
 
-
-@docs primorial(::Int)
-
-
-```
-
-```
+> Return the rising factorial of $x$, i.e. $x(x + 1)(x + 2)\ldots (x + n - 1)$. If $n < 0$ we throw a `DomainError()`.
 
 
-@docs fib(::Int)
+<a id='Nemo.risingfac-Tuple{Int64,Int64}' href='#Nemo.risingfac-Tuple{Int64,Int64}'>#</a>
+**`Nemo.risingfac`** &mdash; *Method*.
+
 
 
 ```
-
+risingfac(x::Int, y::Int)
 ```
 
-
-@docs bell(::Int)
-
-
-```
-
-```
+> Return the rising factorial of $x$, i.e. $x(x + 1)(x + 2)\ldots (x + n - 1)$. If $n < 0$ we throw a `DomainError()`.
 
 
-@docs binom(::Int, ::Int)
+<a id='Nemo.primorial-Tuple{Int64}' href='#Nemo.primorial-Tuple{Int64}'>#</a>
+**`Nemo.primorial`** &mdash; *Method*.
+
 
 
 ```
-
+primorial(x::Int)
 ```
 
-
-@docs moebiusmu(::fmpz)
-
-
-```
-
-```
+> Return the primorial of $n$, i.e. the product of all primes less than or equal to $n$. If $n < 0$ we throw a `DomainError()`.
 
 
-@docs jacobi(::fmpz, ::fmpz)
+<a id='Nemo.fib-Tuple{Int64}' href='#Nemo.fib-Tuple{Int64}'>#</a>
+**`Nemo.fib`** &mdash; *Method*.
+
 
 
 ```
-
+fib(x::Int)
 ```
 
-
-@docs sigma(::fmpz, ::Int)
-
-
-```
-
-```
+> Return the $n$-th Fibonacci number $F_n$. We define $F_1 = 1$, $F_2 = 1$ and $F_{i + 1} = F_i + F_{i - 1}$ for all $i > 2$. We require $n \geq 0$. For convenience, we define $F_0 = 0$.
 
 
-@docs eulerphi(::fmpz)
+<a id='Nemo.bell-Tuple{Int64}' href='#Nemo.bell-Tuple{Int64}'>#</a>
+**`Nemo.bell`** &mdash; *Method*.
+
 
 
 ```
-
+bell(x::Int)
 ```
 
+> Return the Bell number $B_n$.
 
-@docs numpart(::Int) numpart(::fmpz) 
+
+<a id='Nemo.binom-Tuple{Int64,Int64}' href='#Nemo.binom-Tuple{Int64,Int64}'>#</a>
+**`Nemo.binom`** &mdash; *Method*.
+
 
 
 ```
+binom(n::Int, k::Int)
+```
+
+> Return the binomial coefficient $\frac{n!}{(n - k)!k!}$. If $n, k < 0$ or $k > n$ we return $0$.
+
+
+<a id='Nemo.moebiusmu-Tuple{Nemo.fmpz}' href='#Nemo.moebiusmu-Tuple{Nemo.fmpz}'>#</a>
+**`Nemo.moebiusmu`** &mdash; *Method*.
+
+
+
+```
+moebiusmu(x::fmpz)
+```
+
+> Returns the Moebius mu function of $x$ as an \code{Int}. The value returned is either $-1$, $0$ or $1$. If $x < 0$ we throw a `DomainError()`.
+
+
+<a id='Nemo.jacobi-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Nemo.jacobi-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
+**`Nemo.jacobi`** &mdash; *Method*.
+
+
+
+```
+jacobi(x::fmpz, y::fmpz)
+```
+
+> Return the value of the Jacobi symbol $\left(\frac{x}{y}\right)$. If $y \leq x$ or $x < 0$, we throw a `DomainError()`.
+
+
+<a id='Nemo.sigma-Tuple{Nemo.fmpz,Int64}' href='#Nemo.sigma-Tuple{Nemo.fmpz,Int64}'>#</a>
+**`Nemo.sigma`** &mdash; *Method*.
+
+
+
+```
+sigma(x::fmpz, y::Int)
+```
+
+> Return the value of the sigma function, i.e. $\sum_{0 < d \;| x} d^y$. If $y < 0$ we throw a `DomainError()`.
+
+
+<a id='Nemo.eulerphi-Tuple{Nemo.fmpz}' href='#Nemo.eulerphi-Tuple{Nemo.fmpz}'>#</a>
+**`Nemo.eulerphi`** &mdash; *Method*.
+
+
+
+```
+eulerphi(x::fmpz)
+```
+
+> Return the value of the Euler phi function at $x$, i.e. the number of positive integers less than $x$ that are coprime with $x$.
+
+
+<a id='Nemo.numpart-Tuple{Int64}' href='#Nemo.numpart-Tuple{Int64}'>#</a>
+**`Nemo.numpart`** &mdash; *Method*.
+
+
+
+```
+numpart(x::Int)
+```
+
+> Return the number of partitions of $x$. This function is not available on Windows 64.
+
+
+<a id='Nemo.numpart-Tuple{Nemo.fmpz}' href='#Nemo.numpart-Tuple{Nemo.fmpz}'>#</a>
+**`Nemo.numpart`** &mdash; *Method*.
+
+
+
+```
+numpart(x::fmpz)
+```
+
+> Return the number of partitions of $x$. This function is not available on Windows 64.
+
+
 
 Here are some examples of number theoretic functionality.
 
+
+```
+isprime(ZZ(13))
+n = fac(100)
+s = sigma(ZZ(128), 10)
+a = eulerphi(ZZ(12480))
+p = numpart(1000)
 ```
 
 
-isprime(ZZ(13)) n = fac(100) s = sigma(ZZ(128), 10) a = eulerphi(ZZ(12480)) p = numpart(1000)
-
-
-```
+<a id='Number-digits-and-bases-1'></a>
 
 ## Number digits and bases
 
-```
+<a id='Base.bin-Tuple{Nemo.fmpz}' href='#Base.bin-Tuple{Nemo.fmpz}'>#</a>
+**`Base.bin`** &mdash; *Method*.
 
-
-@docs bin(::fmpz)
-
-
-```
-
-```
-
-
-@docs oct(::fmpz)
 
 
 ```
-
+bin(n::fmpz)
 ```
 
-
-@docs dec(::fmpz)
-
-
-```
-
-```
+> Return $n$ as a binary string.
 
 
-@docs hex(::fmpz)
+<a id='Base.oct-Tuple{Nemo.fmpz}' href='#Base.oct-Tuple{Nemo.fmpz}'>#</a>
+**`Base.oct`** &mdash; *Method*.
+
 
 
 ```
-
+oct(n::fmpz)
 ```
 
-
-@docs base(::fmpz, ::Integer)
-
-
-```
-
-```
+> Return $n$ as a octal string.
 
 
-@docs ndigits(::fmpz, ::Integer)
+<a id='Base.dec-Tuple{Nemo.fmpz}' href='#Base.dec-Tuple{Nemo.fmpz}'>#</a>
+**`Base.dec`** &mdash; *Method*.
+
 
 
 ```
-
+dec(n::fmpz)
 ```
 
+> Return $n$ as a decimal string.
 
-@docs nbits(::fmpz)
+
+<a id='Base.hex-Tuple{Nemo.fmpz}' href='#Base.hex-Tuple{Nemo.fmpz}'>#</a>
+**`Base.hex`** &mdash; *Method*.
+
 
 
 ```
+hex(n::fmpz) = base(n, 16)
+```
+
+> Return $n$ as a hexadecimal string.
+
+
+<a id='Base.base-Tuple{Nemo.fmpz,Integer}' href='#Base.base-Tuple{Nemo.fmpz,Integer}'>#</a>
+**`Base.base`** &mdash; *Method*.
+
+
+
+```
+base(n::fmpz, b::Integer)
+```
+
+> Return $n$ as a string in base $b$. We require $2 \leq b \leq 62$.
+
+
+<a id='Base.ndigits-Tuple{Nemo.fmpz,Integer}' href='#Base.ndigits-Tuple{Nemo.fmpz,Integer}'>#</a>
+**`Base.ndigits`** &mdash; *Method*.
+
+
+
+```
+ndigits(x::fmpz, b::Integer = 10)
+```
+
+> Return the number of digits of $x$ in the base $b$ (default is $b = 10$).
+
+
+<a id='Nemo.nbits-Tuple{Nemo.fmpz}' href='#Nemo.nbits-Tuple{Nemo.fmpz}'>#</a>
+**`Nemo.nbits`** &mdash; *Method*.
+
+
+
+```
+nbits(x::fmpz)
+```
+
+> Return the number of binary bits of $x$. We return zero if $x = 0$.
+
+
 
 Here are some examples of writing numbers in various bases.
 
+
 ```
-
-
 a = fmpz(12)
 
-
-s1 = bin(a) s2 = base(a, 13) n1 = nbits(a) n2 = ndigits(a, 3)
-
-
+s1 = bin(a)
+s2 = base(a, 13)
+n1 = nbits(a)
+n2 = ndigits(a, 3)
 ```
+
+
+<a id='Bit-twiddling-1'></a>
 
 ### Bit twiddling
 
-```
+<a id='Nemo.popcount-Tuple{Nemo.fmpz}' href='#Nemo.popcount-Tuple{Nemo.fmpz}'>#</a>
+**`Nemo.popcount`** &mdash; *Method*.
 
-
-@docs popcount(::fmpz)
-
-
-```
-
-```
-
-
-@docs prevpow2(::fmpz)
 
 
 ```
-
+popcount(x::fmpz)
 ```
 
-
-@docs nextpow2(::fmpz)
-
-
-```
-
-```
+> Return the number of ones in the binary representation of $x$.
 
 
-@docs trailing_zeros(::fmpz)
+<a id='Base.prevpow2-Tuple{Nemo.fmpz}' href='#Base.prevpow2-Tuple{Nemo.fmpz}'>#</a>
+**`Base.prevpow2`** &mdash; *Method*.
+
 
 
 ```
-
+prevpow2(x::fmpz)
 ```
 
-
-@docs clrbit!(::fmpz, ::Int)
-
-
-```
-
-```
+> Return the previous power of $2$ up to including $x$.
 
 
-@docs setbit!(::fmpz, ::Int)
+<a id='Base.nextpow2-Tuple{Nemo.fmpz}' href='#Base.nextpow2-Tuple{Nemo.fmpz}'>#</a>
+**`Base.nextpow2`** &mdash; *Method*.
+
 
 
 ```
-
+nextpow2(x::fmpz)
 ```
 
+> Return the next power of $2$ that is at least $x$.
 
-@docs combit!(::fmpz, ::Int)
+
+<a id='Base.trailing_zeros-Tuple{Nemo.fmpz}' href='#Base.trailing_zeros-Tuple{Nemo.fmpz}'>#</a>
+**`Base.trailing_zeros`** &mdash; *Method*.
+
 
 
 ```
+trailing_zeros(x::fmpz)
+```
+
+> Count the trailing zeros in the binary representation of $x$.
+
+
+<a id='Nemo.clrbit!-Tuple{Nemo.fmpz,Int64}' href='#Nemo.clrbit!-Tuple{Nemo.fmpz,Int64}'>#</a>
+**`Nemo.clrbit!`** &mdash; *Method*.
+
+
+
+```
+clrbit!(x::fmpz, c::Int)
+```
+
+> Clear bit $c$ of $x$, where the least significant bit is the $0$-th bit. Note that this function modifies its input in-place.
+
+
+<a id='Nemo.setbit!-Tuple{Nemo.fmpz,Int64}' href='#Nemo.setbit!-Tuple{Nemo.fmpz,Int64}'>#</a>
+**`Nemo.setbit!`** &mdash; *Method*.
+
+
+
+```
+setbit!(x::fmpz, c::Int)
+```
+
+> Set bit $c$ of $x$, where the least significant bit is the $0$-th bit. Note that this function modifies its input in-place.
+
+
+<a id='Nemo.combit!-Tuple{Nemo.fmpz,Int64}' href='#Nemo.combit!-Tuple{Nemo.fmpz,Int64}'>#</a>
+**`Nemo.combit!`** &mdash; *Method*.
+
+
+
+```
+combit!(x::fmpz, c::Int)
+```
+
+> Complement bit $c$ of $x$, where the least significant bit is the $0$-th bit. Note that this function modifies its input in-place.
+
+
 
 Here are some examples of bit twiddling.
 
+
 ```
-
-
 a = fmpz(12)
 
-
-p = popcount(a) b = nextpow2(a) combit!(a, 2) ```
+p = popcount(a)
+b = nextpow2(a)
+combit!(a, 2)
+```
 

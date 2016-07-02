@@ -271,6 +271,20 @@ Numerous functions are provided to manipulate matricess and to set and retrieve 
 
 
 ```
+base_ring(a::fq)
+```
+
+> Returns `Union{}` as this field is not dependent on another field.
+
+
+```
+base_ring(a::FlintIntegerRing)
+```
+
+> Returns `Union{}` as this field is not dependent on another field.
+
+
+```
 base_ring{T}(r::FracElem)
 ```
 

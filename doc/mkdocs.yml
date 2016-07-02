@@ -17,6 +17,7 @@ pages:
 - Matrices:                     build/matrix.md
 - Integers:                     build/integer.md
 - Rationals:                    build/rational.md
+- Finite fields:                build/finitefield.md
 
 markdown_extensions:
 - extra

@@ -214,6 +214,22 @@ end
 
 *(x::fq_nmod, y::fmpz) = y*x
 
++(x::fq_nmod, y::Integer) = x + parent(x)(y)
+
++(x::Integer, y::fq_nmod) = y + x
+
++(x::fq_nmod, y::fmpz) = x + parent(x)(y)
+
++(x::fmpz, y::fq_nmod) = y + x
+
+-(x::fq_nmod, y::Integer) = x - parent(x)(y)
+
+-(x::Integer, y::fq_nmod) = parent(y)(x) - y
+
+-(x::fq_nmod, y::fmpz) = x - parent(x)(y)
+
+-(x::fmpz, y::fq_nmod) = parent(y)(x) - y
+
 ###############################################################################
 #
 #   Powering
@@ -258,6 +274,20 @@ end
 
 ###############################################################################
 #
+#   Ad hoc comparison
+#
+###############################################################################
+
+==(x::fq_nmod, y::Integer) = x == parent(x)(y)
+
+==(x::fq_nmod, y::fmpz) = x == parent(x)(y)
+
+==(x::Integer, y::fq_nmod) = parent(y)(x) == y
+
+==(x::fmpz, y::fq_nmod) = parent(y)(x) == y
+
+###############################################################################
+#
 #   Inversion
 #
 ###############################################################################
@@ -285,6 +315,20 @@ function divexact(x::fq_nmod, y::fq_nmod)
                                                        &z, &x, &y, &y.parent)
    return z
 end
+
+###############################################################################
+#
+#   Ad hoc exact division
+#
+###############################################################################
+
+divexact(x::fq_nmod, y::Integer) = divexact(x, parent(x)(y))
+
+divexact(x::fq_nmod, y::fmpz) = divexact(x, parent(x)(y))
+
+divexact(x::Integer, y::fq_nmod) = divexact(parent(y)(x), y)
+
+divexact(x::fmpz, y::fq_nmod) = divexact(parent(y)(x), y)
 
 ###############################################################################
 #

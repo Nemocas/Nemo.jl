@@ -70,10 +70,10 @@ functions along with the usual arithmetic operations and greatest common
 divisor.
 
 ```
-parent_type::Type{fmpz}
+parent_type(::Type{fmpz})
 ```
 
-Given the type of the parent object of a Flint integer.
+Gives the type of the parent object of a Flint integer.
 
 ```
 elem_type(R::FlintIntegerRing)
@@ -101,7 +101,7 @@ integer. Nemo integers are mutable and so returning shallow copies is not
 sufficient.
 
 ```
-mul!(c::ResElem, a::ResElem, b::ResElem)
+mul!(c::fmpz, a::fmpz, b::fmpz)
 ```
 
 Multiply $a$ by $b$ and set the existing integer $c$ to the result. This
@@ -109,7 +109,7 @@ function is provided for performance reasons as it saves allocating a new
 object for the result and eliminates associated garbage collection.
 
 ```
-addeq!(c::ResElem, a::ResElem)
+addeq!(c::fmpz, a::fmpz)
 ```
 
 In-place addition. Adds $a$ to $c$ and sets $c$ to the result. This function
@@ -356,6 +356,13 @@ cmpabs(a::fmpz, b::fmpz)
 We also provide the following ad hoc comparisons which again provide all of the
 comparison operators mentioned above.
 
+Function
+-------------------------
+cmp(a::fmpz, b::Int)
+cmp(a::Int, b::fmpz)
+cmp(a::fmpz, b::UInt)
+cmp(a::UInt, b::fmpz)
+
 Here are some examples of comparisons.
 
 ```
@@ -368,13 +375,6 @@ a > 4
 5 <= b
 cmpabs(a, b)
 ```
-
-Function
--------------------------
-cmp(a::fmpz, b::Int)
-cmp(a::Int, b::fmpz)
-cmp(a::fmpz, b::UInt)
-cmp(a::UInt, b::fmpz)
 
 ## Shifting
 
@@ -536,8 +536,6 @@ divisor_lenstra(::fmpz, ::fmpz, ::fmpz)
 
 ```@docs
 fac(::Int)
-```
-
 ```
 
 ```@docs

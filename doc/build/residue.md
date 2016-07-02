@@ -244,6 +244,20 @@ Numerous functions are provided to manipulate residues. Also see the section on 
 
 
 ```
+base_ring(a::fq)
+```
+
+> Returns `Union{}` as this field is not dependent on another field.
+
+
+```
+base_ring(a::FlintIntegerRing)
+```
+
+> Returns `Union{}` as this field is not dependent on another field.
+
+
+```
 base_ring{T}(r::FracElem)
 ```
 
