@@ -244,6 +244,20 @@ Numerous functions are provided to manipulate residues. Also see the section on 
 
 
 ```
+base_ring(a::padic)
+```
+
+> Returns `Union{}` as this field is not dependent on another field.
+
+
+```
+base_ring(a::FlintPadicField)
+```
+
+> Returns `Union{}` as this field is not dependent on another field.
+
+
+```
 base_ring(a::fq)
 ```
 
@@ -251,7 +265,7 @@ base_ring(a::fq)
 
 
 ```
-base_ring(a::FlintIntegerRing)
+base_ring(a::FqFiniteField)
 ```
 
 > Returns `Union{}` as this field is not dependent on another field.

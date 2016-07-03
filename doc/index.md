@@ -8,7 +8,7 @@ contributors.
 
 - [http://nemocas.org](http://nemocas.org) (Website)
 - [https://github.com/Nemocas/Nemo.jl](https://github.com/Nemocas/Nemo.jl) (Source code)
-- [http://nemo.readthedocs.org/en/latest/](http://nemo.readthedocs.org/en/latest/) (Online documentation)
+- [http://nemocas.github.io/Nemo.jl/latest/](http://nemocas.github.io/Nemo.jl/latest/) (Online documentation)
 
 The features of Nemo so far include:
 

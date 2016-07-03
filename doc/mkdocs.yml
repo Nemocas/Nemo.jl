@@ -18,6 +18,7 @@ pages:
 - Integers:                     build/integer.md
 - Rationals:                    build/rational.md
 - Finite fields:                build/finitefield.md
+- P-adic fields:                build/padic.md
 
 markdown_extensions:
 - extra

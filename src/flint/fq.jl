@@ -18,7 +18,7 @@ parent_type(::Type{fq}) = FqFiniteField
 elem_type(::FqFiniteField) = fq
 
 doc"""
-    base_ring(a::FlintIntegerRing)
+    base_ring(a::FqFiniteField)
 > Returns `Union{}` as this field is not dependent on another field.
 """
 base_ring(a::FqFiniteField) = Union{}

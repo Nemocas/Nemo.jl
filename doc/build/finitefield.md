@@ -87,7 +87,7 @@ Here are some examples of creating finite fields and making use of the resulting
 
 ```
 R, x = FiniteField(7, 3, "x")
-S, y = FiniteField(fmpz(12431351431561), 2, "y")
+S, y = FiniteField(ZZ(12431351431561), 2, "y")
 T, t = PolynomialRing(ResidueRing(ZZ, 12431351431561), "t")
 U, z = FiniteField(t^2 + 7, "z")
 
@@ -103,7 +103,7 @@ d = U(7)
 ## Finite field element constructors
 
 
-Once a finite is constructed, there are various ways to construct elements in that field.
+Once a finite field is constructed, there are various ways to construct elements in that field.
 
 
 Apart from coercing elements into the finite field as above, we offer the following functions.
@@ -241,7 +241,7 @@ R(f::fq)
 Take a finite field element that is already in the finite field and simply return it. A copy of the original is not made.
 
 
-In addition to the above, developers of custom finite field types must ensure that they provide the equivalent of the function `base_ring(R::FqFiniteField)` which should return `Union{}`. In addition to this they should ensure that each integer element contains a field `parent` specifying the parent object of the finite field element, or at least supply the equivalent of the function  `parent(a::fq)` to return the parent object of a finite field element.
+In addition to the above, developers of custom finite field types must ensure that they provide the equivalent of the function `base_ring(R::FqFiniteField)` which should return `Union{}`. In addition to this they should ensure that each finite field element contains a field `parent` specifying the parent object of the finite field element, or at least supply the equivalent of the function `parent(a::fq)` to return the parent object of a finite field element.
 
 
 <a id='Basic-manipulation-1'></a>
@@ -257,7 +257,7 @@ Numerous functions are provided to manipulate finite field elements. Also see th
 
 
 ```
-base_ring(a::FlintIntegerRing)
+base_ring(a::FqFiniteField)
 ```
 
 > Returns `Union{}` as this field is not dependent on another field.
@@ -388,7 +388,7 @@ Here are some examples of basic manipulation of finite field elements.
 
 
 ```
-R, x = FiniteField(fmpz(7), 5, "x")
+R, x = FiniteField(ZZ(7), 5, "x")
 
 a = zero(R)
 b = one(R)
@@ -600,7 +600,7 @@ Here are some examples of special functions.
 
 
 ```
-R, x = FiniteField(fmpz(7), 5, "x")
+R, x = FiniteField(ZZ(7), 5, "x")
 
 a = x^4 + 3x^2 + 6x + 1
 
