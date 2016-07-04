@@ -8,10 +8,24 @@ export FlintPermGroup, perm, parity
 
 ###############################################################################
 #
+#   Type and parent object methods
+#
+###############################################################################
+
+parent_type(::Type{perm}) = FlintPermGroup
+
+elem_type(R::FlintPermGroup) = perm
+
+###############################################################################
+#
 #   Basic manipulation
 #
 ###############################################################################
 
+doc"""
+    parent(a::perm)
+> Return the parent of the given permutation group element.
+"""
 parent(a::perm) = a.parent
 
 function deepcopy(a::perm)
@@ -31,6 +45,12 @@ function Base.hash(a::perm, h::UInt)
    return b
 end
 
+doc"""
+    parity(a::perm)
+> Return the parity of the given permutation, i.e. the parity of the number of
+> transpositions that compose it. The function returns $1$ if the parity is odd
+> otherwise it returns $0$.
+"""
 function parity(a::perm)
    R = parent(a)
    return Int(ccall((:_perm_parity, :libflint), Cint, 
@@ -44,6 +64,12 @@ end
 function setindex!(a::perm, d::Int, n::Int)
    a.d[n] = d - 1
 end
+
+doc"""
+    eye(R::FlintPermGroup)
+> Return the identity permutation for the given permutation group.
+"""
+eye(R::FlintPermGroup) = R()
 
 ###############################################################################
 #
@@ -75,6 +101,10 @@ end
 #
 ###############################################################################
 
+doc"""
+    ==(a::perm, b::perm)
+> Return `true` if the given permutations are equal, otherwise return `false`.
+"""
 function ==(a::perm, b::perm)
    R = parent(a)
    return Bool(ccall((:_perm_equal, :libflint), Cint, 
@@ -87,6 +117,11 @@ end
 #
 ###############################################################################
 
+doc"""
+> Return the composition of the two permutations, i.e. $a\circ b$. In other
+> words, the permutation corresponding to applying $b$ first, then $a$, is
+> returned.
+"""
 function *(a::perm, b::perm)
    R = parent(a)
    p = R()
@@ -101,6 +136,11 @@ end
 #
 ###############################################################################
 
+doc"""
+    inv(a::perm)
+> Return the inverse of the given permutation, i.e. the permuation $a^{-1}$
+> such that $a\circ a^{-1} = a^{-1}\circ a$ is the identity permutation.
+"""
 function inv(a::perm)
    R = parent(a)
    p = R()

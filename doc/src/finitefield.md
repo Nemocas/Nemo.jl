@@ -20,8 +20,9 @@ so that finite fields can be constructed using `FiniteField` rather than
 `FlintFiniteField`. Note that this is the name of the constructor, but not of
 finite field type.
 
-The types of finite fields in Nemo are given in the following table, along with
-the libraries that provide them and the associated types of the parent objects.
+The types of finite field elements in Nemo are given in the following table,
+along with the libraries that provide them and the associated types of the
+parent objects.
 
  Library | Field                          | Element type  | Parent type
 ---------|--------------------------------|---------------|---------------------

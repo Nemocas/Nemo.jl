@@ -1353,6 +1353,13 @@ New numeric types should implement this function for two arguments of the new ty
 > Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall that power series to different precisions may still be arithmetically equal to the minimum of the two precisions.
 
 
+```
+==(a::perm, b::perm)
+```
+
+> Return `true` if the given permutations are equal, otherwise return `false`.
+
+
 
 Here are some examples of comparisons.
 
