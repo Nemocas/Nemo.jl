@@ -210,8 +210,13 @@ doc"""
 """
 function +{T <: RingElem}(x::MatElem{T}, y::MatElem{T})
    check_parent(x, y)
-   parz = parent(x)
-   return parz(x.entries + y.entries)
+   r = parent(x)()
+   for i = 1:rows(x)
+      for j = 1:cols(x)
+         r[i, j] = x[i, j] + y[i, j]
+      end
+   end
+   return r
 end
 
 doc"""
@@ -220,8 +225,13 @@ doc"""
 """
 function -{T <: RingElem}(x::MatElem{T}, y::MatElem{T})
    check_parent(x, y)
-   parz = parent(x)
-   return parz(x.entries - y.entries)
+   r = parent(x)()
+   for i = 1:rows(x)
+      for j = 1:cols(x)
+         r[i, j] = x[i, j] - y[i, j]
+      end
+   end
+   return r
 end
 
 doc"""
