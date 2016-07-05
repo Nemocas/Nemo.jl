@@ -19,6 +19,7 @@ pages:
 - Rationals:                    build/rational.md
 - Finite fields:                build/finitefield.md
 - P-adic fields:                build/padic.md
+- Number fields:                build/numberfield.md
 - Permutation groups:           build/perm.md
 
 markdown_extensions:

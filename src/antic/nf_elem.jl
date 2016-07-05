@@ -15,12 +15,31 @@ export AnticNumberField, nf_elem, norm, trace, CyclotomicField,
 
 parent_type(::Type{nf_elem}) = AnticNumberField
 
+doc"""
+    parent(a::nf_elem)
+> Return the parent of the given number field element.
+"""
 parent(a::nf_elem) = a.parent
 
 elem_type(::AnticNumberField) = nf_elem
 
+doc"""
+    base_ring(a::AnticNumberField)
+> Returns `Union{}` since a number field doesn't depend on any ring.
+"""
 base_ring(a::AnticNumberField) = Union{}
 
+doc"""
+    base_ring(a::nf_elem)
+> Returns `Union{}` since a number field doesn't depend on any ring.
+"""
+base_ring(a::nf_elem) = Union{}
+
+doc"""
+    var(a::AnticNumberField)
+> Returns the identifier (as a symbol, not a string), that is used for printing
+> the generator of the given number field.
+"""
 var(a::AnticNumberField) = a.S
 
 function check_parent(a::nf_elem, b::nf_elem)
@@ -45,6 +64,12 @@ function hash(a::nf_elem, h::UInt)
    return b
 end
 
+doc"""
+    coeff(x::nf_elem, n::Int)
+> Return the $n$-th coefficient of the polynomial representation of the given
+> number field element. Coefficients are numbered from $0$, starting with the
+> constant coefficient.
+"""
 function coeff(x::nf_elem, n::Int)
    n < 0 && throw(DomainError())
    z = fmpq()
@@ -60,8 +85,10 @@ function num_coeff!(z::fmpz, x::nf_elem, n::Int)
    return z
 end
 
-
-
+doc"""
+    gen(a::AnticNumberField)
+> Return the generator of the given number field.
+"""
 function gen(a::AnticNumberField)
    r = nf_elem(a)
    ccall((:nf_elem_gen, :libflint), Void,
@@ -69,6 +96,10 @@ function gen(a::AnticNumberField)
    return r
 end
 
+doc"""
+    one(a::AnticNumberField)
+> Return the multiplicative identity, i.e. one, in the given number field.
+"""
 function one(a::AnticNumberField)
    r = nf_elem(a)
    ccall((:nf_elem_one, :libflint), Void,
@@ -76,6 +107,10 @@ function one(a::AnticNumberField)
    return r
 end
 
+doc"""
+    zero(a::AnticNumberField)
+> Return the multiplicative identity, i.e. one, in the given number field.
+"""
 function zero(a::AnticNumberField)
    r = nf_elem(a)
    ccall((:nf_elem_zero, :libflint), Void,
@@ -83,21 +118,48 @@ function zero(a::AnticNumberField)
    return r
 end
 
+doc"""
+    isgen(a::nf_elem)
+> Return `true` if the given number field element is the generator of the
+> number field, otherwise return `false`.
+"""
 function isgen(a::nf_elem)
    return ccall((:nf_elem_is_gen, :libflint), Bool,
                 (Ptr{nf_elem}, Ptr{AnticNumberField}), &a, &a.parent)
 end
 
+doc"""
+    isone(a::nf_elem)
+> Return `true` if the given number field element is the multiplicative
+> identity of the number field, i.e. one, otherwise return `false`.
+"""
 function isone(a::nf_elem)
    return ccall((:nf_elem_is_one, :libflint), Bool,
                 (Ptr{nf_elem}, Ptr{AnticNumberField}), &a, &a.parent)
 end
 
+doc"""
+    iszero(a::nf_elem)
+> Return `true` if the given number field element is the additive
+> identity of the number field, i.e. zero, otherwise return `false`.
+"""
 function iszero(a::nf_elem)
    return ccall((:nf_elem_is_zero, :libflint), Bool,
                 (Ptr{nf_elem}, Ptr{AnticNumberField}), &a, &a.parent)
 end
 
+doc"""
+    isunit(a::nf_elem)
+> Return `true` if the given number field element is invertible, i.e. nonzero,
+> otherwise return `false`.
+"""
+isunit(a::nf_elem) = a != 0
+
+doc"""
+    den(a::nf_elem)
+> Return the denominator of the polynomial representation of the given number
+> field element.
+"""
 function den(a::nf_elem)
    z = fmpz()
    ccall((:nf_elem_get_den, :libflint), Void,
@@ -123,8 +185,19 @@ function elem_to_mat_row!(a::fmpz_mat, i::Int, d::fmpz, b::nf_elem)
    nothing
  end
 
+doc"""
+    degree(a::AnticNumberField)
+> Return the degree of the given number field, i.e. the degree of its
+> defining polynomial.
+"""
 degree(a::AnticNumberField) = degree(a.pol)
 
+doc"""
+    signature(a::AnticNumberField)
+> Return the signature of the given number field, i.e. a tuple $r, s$
+> consisting of $r$, the number of real embeddings and $s$, half the number of
+> complex embeddings. 
+"""
 signature(a::AnticNumberField) = signature(a.pol)
 
 function deepcopy(d::nf_elem)
@@ -318,6 +391,8 @@ end
 
 *(a::Integer, b::nf_elem) = b * a
 
+*(a::fmpz, b::nf_elem) = b * a
+
 *(a::fmpq, b::nf_elem) = b * a
 
 //(a::nf_elem, b::Int) = divexact(a, b)
@@ -327,6 +402,12 @@ end
 //(a::nf_elem, b::Integer) = a//fmpz(b)
 
 //(a::nf_elem, b::fmpq) = divexact(a, b)
+
+//(a::Integer, b::nf_elem) = divexact(a, b)
+
+//(a::fmpz, b::nf_elem) = divexact(a, b)
+
+//(a::fmpq, b::nf_elem) = divexact(a, b)
 
 ###############################################################################
 #
@@ -359,10 +440,32 @@ end
 
 ###############################################################################
 #
+#   Ad hoc comparison
+#
+###############################################################################
+
+==(a::nf_elem, b::Integer) = a == parent(a)(b)
+
+==(a::nf_elem, b::fmpz) = a == parent(a)(b)
+
+==(a::nf_elem, b::fmpq) = a == parent(a)(b)
+
+==(a::Integer, b::nf_elem) = parent(b)(a) == b
+
+==(a::fmpz, b::nf_elem) = parent(b)(a) == b
+
+==(a::fmpq, b::nf_elem) = parent(b)(a) == b
+
+###############################################################################
+#
 #   Inversion
 #
 ###############################################################################
 
+doc"""
+    inv(a::nf_elem)
+> Return $a^{-1}$. Requires $a \neq 0$.
+"""
 function inv(a::nf_elem)
    iszero(a) && throw(DivideError())
    r = a.parent()
@@ -412,6 +515,8 @@ function divexact(a::nf_elem, b::fmpz)
    return r
 end
 
+divexact(a::nf_elem, b::Integer) = divexact(a, fmpz(b))
+
 function divexact(a::nf_elem, b::fmpq)
    b == 0 && throw(DivideError())
    r = a.parent()
@@ -421,12 +526,22 @@ function divexact(a::nf_elem, b::fmpq)
    return r
 end
 
+divexact(a::Integer, b::nf_elem) = inv(b)*a
+
+divexact(a::fmpz, b::nf_elem) = inv(b)*a
+
+divexact(a::fmpq, b::nf_elem) = inv(b)*a
+
 ###############################################################################
 #
 #   Norm and trace
 #
 ###############################################################################
 
+doc"""
+    norm(a::nf_elem)
+> Return the absolute norm of $a$. The result will be a rational number.
+"""
 function norm(a::nf_elem)
    z = fmpq()
    ccall((:nf_elem_norm, :libflint), Void,
@@ -435,6 +550,10 @@ function norm(a::nf_elem)
    return z
 end
 
+doc"""
+    norm(a::nf_elem)
+> Return the absolute trace of $a$. The result will be a rational number.
+"""
 function trace(a::nf_elem)
    z = fmpq()
    ccall((:nf_elem_trace, :libflint), Void,
@@ -727,6 +846,8 @@ function Base.call(a::AnticNumberField, c::Int)
    return z
 end
 
+Base.call(a::AnticNumberField, c::Integer) = a(fmpz(c))
+
 function Base.call(a::AnticNumberField, c::fmpz)
    z = nf_elem(a)
    ccall((:nf_elem_set_fmpz, :libflint), Void,
@@ -771,13 +892,29 @@ end
 #
 ###############################################################################
 
-function AnticNumberField(pol::fmpq_poly, s::AbstractString{})
+doc"""
+    AnticNumberField(f::fmpq_poly, s::AbstractString{})
+> Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$
+> of the number field $\mathbb{Q}/(f)$ where $f$ is the supplied polynomial.
+> The supplied string `s` specifies how the generator of the number field
+> should be printed.
+"""
+function AnticNumberField(f::fmpq_poly, s::AbstractString{})
    S = Symbol(s)
-   parent_obj = AnticNumberField(pol, S)
+   parent_obj = AnticNumberField(f, S)
 
    return parent_obj, gen(parent_obj)
 end
 
+doc"""
+    AnticCyclotomicField(n::Int, s::AbstractString{}, t = "\$")
+> Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$
+> of the $n$-th cyclotomic field, $\mathbb{Q}(\zeta_n)$. The supplied string
+> `s` specifies how the generator of the number field should be printed. If
+> provided, the string `t` specifies how the generator of the polynomial ring
+> from which the number field is constructed, should be printed. If it is not
+> supplied, a default dollar sign will be used to represent the variable.
+"""
 function AnticCyclotomicField(n::Int, s::AbstractString{}, t = "\$")
    Zx, x = PolynomialRing(FlintZZ, string(gensym()))
    Qx, = PolynomialRing(FlintQQ, t)
@@ -785,6 +922,16 @@ function AnticCyclotomicField(n::Int, s::AbstractString{}, t = "\$")
    return AnticNumberField(Qx(f), s)
 end
 
+doc"""
+    AnticMaximalRealSubfield(n::Int, s::AbstractString{}, t = "\$")
+> Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$
+> of the totally real subfield of the $n$-th cyclotomic field,
+> $\mathbb{Q}(\zeta_n)$. The supplied string `s` specifies how the generator of
+> the number field should be printed. If provided, the string `t` specifies how
+> the generator of the polynomial ring from which the number field is
+> constructed, should be printed. If it is not supplied, a default dollar sign
+> will be used to represent the variable.
+"""
 function AnticMaximalRealSubfield(n::Int, s::AbstractString{}, t = "\$")
    Zx, x = PolynomialRing(FlintZZ, string(gensym()))
    Qx, = PolynomialRing(FlintQQ, t)

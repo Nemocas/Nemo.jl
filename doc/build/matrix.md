@@ -285,6 +285,20 @@ base_ring(a::FlintPadicField)
 
 
 ```
+base_ring(a::nf_elem)
+```
+
+> Returns `Union{}` since a number field doesn't depend on any ring.
+
+
+```
+base_ring(a::AnticNumberField)
+```
+
+> Returns `Union{}` since a number field doesn't depend on any ring.
+
+
+```
 base_ring(a::fq)
 ```
 
