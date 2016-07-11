@@ -21,7 +21,7 @@ const ArbFieldID = ObjectIdDict()
 
 type ArbField <: Field
   prec::Int
-  
+
   function ArbField(p::Int = 256)
     arb_check_prec(p)
     try
@@ -39,8 +39,8 @@ prec(x::ArbField) = x.prec
 type arf_struct
   exp::Int # fmpz
   size::UInt # mp_size_t
-  d1::Int # mantissa_struct
-  d2::Int
+  d1::UInt # mantissa_struct
+  d2::UInt
 end
 
 type mag_struct
@@ -51,8 +51,8 @@ end
 type arb_struct
   mid_exp::Int # fmpz
   mid_size::UInt # mp_size_t
-  mid_d1::Int # mantissa_struct
-  mid_d2::Int
+  mid_d1::UInt # mantissa_struct
+  mid_d2::UInt
   rad_exp::Int # fmpz
   rad_man::UInt
 end
@@ -60,8 +60,8 @@ end
 type arb <: FieldElem
   mid_exp::Int # fmpz
   mid_size::UInt # mp_size_t
-  mid_d1::Int # mantissa_struct
-  mid_d2::Int
+  mid_d1::UInt # mantissa_struct
+  mid_d2::UInt
   rad_exp::Int # fmpz
   rad_man::UInt
   parent::ArbField
@@ -130,7 +130,7 @@ const AcbFieldID = ObjectIdDict()
 
 type AcbField <: Field
   prec::Int
-  
+
   function AcbField(p::Int = 256)
     arb_check_prec(p)
     try
@@ -146,14 +146,14 @@ prec(x::AcbField) = x.prec
 type acb <: FieldElem
   real_mid_exp::Int     # fmpz
   real_mid_size::UInt # mp_size_t
-  real_mid_d1::Int    # mantissa_struct
-  real_mid_d2::Int
+  real_mid_d1::UInt    # mantissa_struct
+  real_mid_d2::UInt
   real_rad_exp::Int     # fmpz
   real_rad_man::UInt
   imag_mid_exp::Int     # fmpz
   imag_mid_size::UInt # mp_size_t
-  imag_mid_d1::Int    # mantissa_struct
-  imag_mid_d2::Int
+  imag_mid_d1::UInt    # mantissa_struct
+  imag_mid_d2::UInt
   imag_rad_exp::Int     # fmpz
   imag_rad_man::UInt
   parent::AcbField
@@ -189,7 +189,7 @@ type acb <: FieldElem
     finalizer(z, _acb_clear_fn)
     return z
   end
-   
+
   function acb{T <: Union{Int, UInt, Float64, fmpz, fmpq,
                           BigFloat, AbstractString, arb}}(x::T, y::T, p::Int)
     z = new()
