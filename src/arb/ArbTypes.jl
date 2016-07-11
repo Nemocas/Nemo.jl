@@ -39,8 +39,8 @@ prec(x::ArbField) = x.prec
 type arf_struct
   exp::Int # fmpz
   size::UInt # mp_size_t
-  d1::Int # mantissa_struct
-  d2::Int
+  d1::UInt # mantissa_struct
+  d2::UInt
 end
 
 type mag_struct
@@ -51,8 +51,8 @@ end
 type arb_struct
   mid_exp::Int # fmpz
   mid_size::UInt # mp_size_t
-  mid_d1::Int # mantissa_struct
-  mid_d2::Int
+  mid_d1::UInt # mantissa_struct
+  mid_d2::UInt
   rad_exp::Int # fmpz
   rad_man::UInt
 end
