@@ -36,7 +36,7 @@ elem_type(::ArbField) = arb
 
 parent_type(::Type{arb}) = ArbField
 
-base_ring(R::ArbField) = Union{} 
+base_ring(R::ArbField) = Union{}
 
 zero(R::ArbField) = R(0)
 
@@ -77,7 +77,7 @@ function call(r::ArbField, x::fmpq)
   z.parent = r
   return z
 end
-  
+
 #function call(r::ArbField, x::arf)
 #  z = arb(arb(x), r.prec)
 #  z.parent = r
