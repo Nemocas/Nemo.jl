@@ -20,6 +20,7 @@ pages:
 - Finite fields:                build/finitefield.md
 - P-adic fields:                build/padic.md
 - Number fields:                build/numberfield.md
+- Real balls:                   build/arb.md
 - Permutation groups:           build/perm.md
 
 markdown_extensions:

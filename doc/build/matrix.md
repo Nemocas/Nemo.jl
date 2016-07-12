@@ -285,6 +285,20 @@ base_ring(a::FlintPadicField)
 
 
 ```
+base_ring(x::arb)
+```
+
+> Returns `Union{}` since an Arb field does not depend on any other ring.
+
+
+```
+base_ring(R::ArbField)
+```
+
+> Returns `Union{}` since an Arb field does not depend on any other ring.
+
+
+```
 base_ring(a::nf_elem)
 ```
 

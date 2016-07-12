@@ -65,8 +65,8 @@ function test_arb_comparison()
    @test !(exact3 < approx3)
    @test !(exact3 <= approx3)
 
-   @test strongequal(approx3, approx3)
-   @test !strongequal(approx3, exact3)
+   @test isequal(approx3, approx3)
+   @test !isequal(approx3, exact3)
 
    @test overlaps(approx3, exact3)
    @test overlaps(exact3, approx3)

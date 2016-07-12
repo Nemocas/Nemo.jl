@@ -14,7 +14,7 @@ import Base: real, imag, abs, conj, angle,
        erf, erfi, erfc, gamma,
        besselj, bessely, besseli, besselk
 
-export one, onei, real, imag, conj, abs, inv, angle, strongequal
+export one, onei, real, imag, conj, abs, inv, angle
 
 export sqrt, rsqrt, log, log1p, exp, exppii, sin, cos, tan, cot,
        sinpi, cospi, tanpi, cotpi, sincos, sincospi, sinh, cosh, tanh, coth,
@@ -101,7 +101,7 @@ end
 #
 ################################################################################
 
-function strongequal(x::acb, y::acb)
+function isequal(x::acb, y::acb)
   r = ccall((:acb_equal, :libarb), Cint, (Ptr{acb}, Ptr{acb}), &x, &y)
   return Bool(r)
 end
