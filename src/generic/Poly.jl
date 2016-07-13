@@ -2149,6 +2149,6 @@ function PolynomialRing(R::Ring, s::AbstractString{}; cached::Bool = true)
 end
 
 # S, x = R["x"] syntax
-getindex(R::Ring, s::ASCIIString) = PolynomialRing(R, s)
+getindex(R::Ring, s::String) = PolynomialRing(R, s)
 
-getindex{T}(R::Tuple{Ring,T}, s::ASCIIString) = PolynomialRing(R[1], s)
+getindex{T}(R::Tuple{Ring,T}, s::String) = PolynomialRing(R[1], s)
