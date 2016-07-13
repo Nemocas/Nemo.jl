@@ -717,6 +717,9 @@ doc"""
 """
 function lll(x::fmpz_mat, ctx=lll_ctx(0.99, 0.51))
    z = deepcopy(x)
+   if rows(z)==0 
+     return z
+   end
    if rows(x) == cols(x)
       parz = parent(x)
    else
