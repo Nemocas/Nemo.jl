@@ -59,7 +59,7 @@ cd(wdir)
 
 # install GMP/MPIR
 
-if !ispath(Pkg.dir("Nemo", "local", "mpir-2.7.2"))
+if !ispath(Pkg.dir("Nemo", "local", "mpir-2.7.2")) && !on_windows
    download("http://mpir.org/mpir-2.7.2.tar.bz2", joinpath(wdir, "mpir-2.7.2.tar.bz2"))
 end
 
@@ -139,7 +139,9 @@ if on_windows
       download_dll("http://nemocas.org/binaries/w64-libflint.dll", joinpath(vdir, "lib", "libflint.dll"))
    end
    try
-      run(`ln -sf $vdir\\lib\\libflint.dll $vdir\\lib\\libflint-13.dll`)
+      symlink(joinpath(vdir, "lib", "libflint.dll"), joinpath(vdir, "lib", "libflint-13.dll"))
+   catch
+      cp(joinpath(vdir, "lib", "libflint.dll"), joinpath(vdir, "lib", "libflint-13.dll"))
    end
 else
    cd("$wdir/flint2")
