@@ -25,6 +25,14 @@
 
    abstract FieldElem <: RingElem
 
+# parameterized domains
+
+   abstract Module{T <: RingElem} <: Group
+
+# elements of parameterised domains
+
+   abstract ModuleElem{T <: RingElem} <: GroupElem
+
 # rings, fields etc, parameterised by an element type
 # these are the type classes of different kinds of
 # mathematical rings/fields/etc, which have a base ring,
