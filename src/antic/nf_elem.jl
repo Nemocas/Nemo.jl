@@ -52,8 +52,11 @@ end
 #
 ###############################################################################
 
+const hash_seed = UInt==UInt64 ? 0xc2a44fbe466a1827 : 0xc2a44fb
+
 function hash(a::nf_elem, h::UInt)
-   b = 0xc2a44fbe466a1827
+   global hash_seed
+   b = hash_seed
    d = den(a)
    b = hash(d, b)
    for i in 1:degree(parent(a)) + 1
