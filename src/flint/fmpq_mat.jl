@@ -627,7 +627,7 @@ function (a::FmpqMatSpace)(arr::Array{fmpq, 1})
    return z
 end
 
-(a::FmpqMatSpace){T <: Integer}(arr::Array{T, 1}) = a(arr'')
+(a::FmpqMatSpace){T <: Integer}(arr::Array{T, 1}) = a(reshape(arr, (a.rows, a.cols)))
 
 function (a::FmpqMatSpace)(d::fmpq)
    z = fmpq_mat(a.rows, a.cols, d)

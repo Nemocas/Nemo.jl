@@ -644,12 +644,13 @@ function (x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, a
   return z
 end
 
-(x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, AbstractString,
-                arb}}(y::Array{Tuple{T, T}, 1}) = x(y'')
+(x::AcbMatSpace){T <: Union{BigFloat, AbstractString, arb}}(y::Array{Tuple{T, T}, 1}) = x(y'')
 
+(x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq}}(y::Array{Tuple{T, T}, 1}) = x(y'')
 
-(x::ArbMatSpace){T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, acb,
-                AbstractString}}(y::Array{T, 1}) = x(y'')
+(x::ArbMatSpace){T <: Union{Int, UInt, fmpz, fmpq, Float64}}(y::Array{T, 1}) = x(y'')
+
+(x::ArbMatSpace){T <: Union{BigFloat, arb, acb, AbstractString}}(y::Array{T, 1}) = x(y'')
 
 function (x::AcbMatSpace)(y::Union{Int, UInt, fmpz, fmpq, Float64,
                           BigFloat, arb, acb, AbstractString})

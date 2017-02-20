@@ -18,7 +18,7 @@ function O(a::fmpz_abs_series)
    end
    prec = length(a) - 1
    prec < 0 && throw(DomainError())
-   z = fmpz_abs_series(Array(fmpz, 0), 0, prec)
+   z = fmpz_abs_series(Array{fmpz}(0), 0, prec)
    z.parent = parent(a)
    return z
 end

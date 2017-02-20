@@ -39,7 +39,7 @@ In order to construct polynomials in Nemo, one must first construct the
 polynomial ring itself. This is accomplished with the following constructor.
 
 ```@docs
-PolynomialRing(::Ring, ::AbstractString{}, ::Bool)
+PolynomialRing(::Ring, ::AbstractString, ::Bool)
 ```
 
 A shorthand version of this function is provided: given a base ring `R`, we
@@ -299,6 +299,10 @@ parent(::PolyElem)
 
 ```@docs
 var(::PolyRing)
+```
+
+```@docs
+vars(::PolyRing)
 ```
 
 ```@docs

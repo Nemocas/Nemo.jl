@@ -1,0 +1,39 @@
+site_name:           Nemo.jl
+repo_url:            https://github.com/Nemocas/Nemo.jl
+site_description:    Nemo
+site_author:         William Hart
+
+theme:               readthedocs
+
+pages:
+- Getting Started:              index.md
+- About Nemo:                   about.md
+- Types in Nemo:                types.md
+- Parent object constructors:   constructors.md
+- Univariate polynomials:       polynomial.md
+- Capped relative power series: series.md
+- Residue rings:                residue.md             
+- Fraction fields:              fraction.md
+- Matrices:                     matrix.md
+- Integers:                     integer.md
+- Rationals:                    rational.md
+- Finite fields:                finitefield.md
+- P-adic fields:                padic.md
+- Real balls:                   arb.md
+- Complex boxes:                acb.md
+- Number fields:                numberfield.md
+- Maximal orders:               maximalorder.md
+- Class groups:                 classgroup.md
+- Permutation groups:           perm.md
+- Factorization:                factor.md
+
+markdown_extensions:
+  - extra
+  - tables
+  - fenced_code
+  - mdx_math:
+      enable_dollar_delimiter: True
+
+docs_dir: 'build'
+
+extra_javascript: ['mathjaxhelper.js', 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML']

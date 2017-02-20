@@ -625,7 +625,7 @@ end
 
 function integral(x::fmpz_mod_poly)
    len = length(x)
-   v = Array(GenRes{fmpz}, len + 1)
+   v = Array{GenRes{fmpz}}(len + 1)
    v[1] = zero(base_ring(x))
    for i = 1:len
       v[i + 1] = divexact(coeff(x, i - 1), base_ring(x)(i))
@@ -764,7 +764,7 @@ doc"""
 function factor_distinct_deg(x::fmpz_mod_poly)
   !issquarefree(x) && error("Polynomial must be squarefree")
   !isprobabprime(modulus(x)) && error("Modulus not prime in factor_distinct_deg")
-  degs = Array(Int, degree(x))
+  degs = Array{Int}(degree(x))
   degss = [ pointer(degs) ]
   fac = fmpz_mod_poly_factor(parent(x).n)
   ccall((:fmpz_mod_poly_factor_distinct_deg, :libflint), UInt,
@@ -785,6 +785,11 @@ end
 #  Unsafe functions
 #
 ################################################################################
+
+function zero!(x::fmpz_mod_poly)
+  ccall((:fmpz_mod_poly_zero, :libflint), Void, 
+                   (Ptr{fmpz_mod_poly}, ), &x)
+end
 
 function fit!(x::fmpz_mod_poly, n::Int)
   ccall((:fmpz_mod_poly_fit_length, :libflint), Void, 

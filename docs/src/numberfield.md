@@ -35,15 +35,15 @@ the number field itself. This is accomplished with one of the following
 constructors.
 
 ```@docs
-AnticNumberField(::fmpq_poly, ::AbstractString{})
+AnticNumberField(::fmpq_poly, ::AbstractString)
 ```
 
 ```@docs
-AnticCyclotomicField(::Int, ::AbstractString{}, AbstractString{})
+AnticCyclotomicField(::Int, ::AbstractString, AbstractString)
 ```
 
 ```@docs
-AnticMaximalRealSubfield(::Int, ::AbstractString{}, ::AbstractString{})
+AnticMaximalRealSubfield(::Int, ::AbstractString, ::AbstractString)
 ```
 
 For convenience we define

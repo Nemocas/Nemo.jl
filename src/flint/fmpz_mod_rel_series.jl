@@ -15,7 +15,7 @@ export fmpz_mod_rel_series, FmpzModRelSeriesRing
 function O(a::fmpz_mod_rel_series)
    val = pol_length(a) + valuation(a) - 1
    val < 0 && throw(DomainError())
-   z = fmpz_mod_rel_series(modulus(a), Array(fmpz, 0), 0, val, val)
+   z = fmpz_mod_rel_series(modulus(a), Array{fmpz}(0), 0, val, val)
    z.parent = parent(a)
    return z
 end
@@ -580,7 +580,7 @@ function exp(a::fmpz_mod_rel_series)
    R = base_ring(a)
    vala = valuation(a)
    preca = precision(a)
-   d = Array(fmpz, preca)
+   d = Array{fmpz}(preca)
    c = vala == 0 ? polcoeff(a, 0) : R()
    d[1] = exp(c).data
    len = pol_length(a) + vala
@@ -605,6 +605,17 @@ end
 #   Unsafe functions
 #
 ###############################################################################
+
+function zero!(x::fmpz_mod_rel_series)
+  ccall((:fmpz_mod_poly_zero, :libflint), Void, 
+                   (Ptr{fmpz_mod_rel_series},), &x)
+  x.prec = parent(x).prec_max
+end
+
+function fit!(x::fmpz_mod_rel_series, n::Int)
+  ccall((:fmpz_mod_poly_fit_length, :libflint), Void, 
+                   (Ptr{fmpz_mod_rel_series}, Int), &x, n)
+end
 
 function setcoeff!(z::fmpz_mod_rel_series, n::Int, x::fmpz)
    ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, 
@@ -680,6 +691,22 @@ function addeq!(a::fmpz_mod_rel_series, b::fmpz_mod_rel_series)
    a.val = val
    renormalize!(a)
    return nothing
+end
+
+function add!(c::fmpz_mod_rel_series, a::fmpz_mod_rel_series, b::fmpz_mod_rel_series)
+   lena = length(a)
+   lenb = length(b)
+         
+   prec = min(a.prec, b.prec)
+ 
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+
+   lenc = max(lena, lenb)
+   c.prec = prec
+   ccall((:fmpz_mod_poly_add_series, :libflint), Void, 
+                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int), 
+               &c, &a, &b, lenc)
 end
 
 ###############################################################################

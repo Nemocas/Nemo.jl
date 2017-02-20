@@ -607,7 +607,7 @@ function acb_vec(b::Array{acb, 1})
 end
 
 function array(R::AcbField, v::Ptr{acb_struct}, n::Int)
-   r = Array(acb, n)
+   r = Array{acb}(n)
    for i=1:n
        r[i] = R()
        ccall((:acb_set, :libarb), Void, (Ptr{acb}, Ptr{acb_struct}),
@@ -720,7 +720,7 @@ doc"""
 function roots(x::acb_poly; target=0, isolate_real=false, initial_prec=0, max_prec=0, max_iter=0)
     deg = degree(x)
     if deg <= 0
-        return Array(acb, 0)
+        return Array{acb}(0)
     end
 
     initial_prec = (initial_prec >= 2) ? initial_prec : 32
@@ -806,31 +806,48 @@ end
 #
 ###############################################################################
 
+function zero!(z::acb_poly)
+   ccall((:acb_poly_zero, :libarb), Void, (Ptr{acb_poly},), &z)
+   nothing
+end
+
 function fit!(z::acb_poly, n::Int)
    ccall((:acb_poly_fit_length, :libarb), Void, 
                     (Ptr{acb_poly}, Int), &z, n)
+   nothing
 end
 
 function setcoeff!(z::acb_poly, n::Int, x::fmpz)
    ccall((:acb_poly_set_coeff_fmpz, :libarb), Void, 
                     (Ptr{acb_poly}, Int, Ptr{fmpz}), &z, n, &x)
+   nothing
 end
 
 function setcoeff!(z::acb_poly, n::Int, x::acb)
    ccall((:acb_poly_set_coeff_acb, :libarb), Void, 
                     (Ptr{acb_poly}, Int, Ptr{acb}), &z, n, &x)
+   nothing
 end
 
 function mul!(z::acb_poly, x::acb_poly, y::acb_poly)
    ccall((:acb_poly_mul, :libarb), Void, 
                 (Ptr{acb_poly}, Ptr{acb_poly}, Ptr{acb_poly}, Int),
                     &z, &x, &y, prec(parent(z)))
+   nothing
 end
 
 function addeq!(z::acb_poly, x::acb_poly)
    ccall((:acb_poly_add, :libarb), Void, 
                 (Ptr{acb_poly}, Ptr{acb_poly}, Ptr{acb_poly}, Int),
                     &z, &z, &x, prec(parent(z)))
+   nothing
+end
+
+function add!(z::acb_poly, x::acb_poly, y::acb_poly)
+   ccall((:acb_poly_add, :libarb), Void, 
+                (Ptr{acb_poly}, Ptr{acb_poly}, Ptr{acb_poly}, Int),
+                    &z, &x, &y, prec(parent(z)))
+   nothing
 end
 
 ###############################################################################

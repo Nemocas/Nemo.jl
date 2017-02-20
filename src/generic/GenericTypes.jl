@@ -13,7 +13,7 @@
 const GenPolyID = ObjectIdDict()
 
 type GenPolyRing{T <: RingElem} <: PolyRing{T}
-   base_ring :: Ring
+   base_ring::Ring
    S::Symbol
 
    function GenPolyRing(R::Ring, s::Symbol, cached=true)
@@ -38,7 +38,96 @@ type GenPoly{T <: RingElem} <: PolyElem{T}
    
    GenPoly(a::Array{T, 1}) = new(a, length(a))
 
-   GenPoly(a::T) = a == 0 ? new(Array(T, 0), 0) : new([a], 1)
+   GenPoly(a::T) = a == 0 ? new(Array{T}(0), 0) : new([a], 1)
+end
+
+###############################################################################
+#
+#   GenMPolyRing / GenMPoly / Monomial
+#
+###############################################################################
+
+# S is a Symbol which can take the values:
+# :lex
+# :revlex
+# :deglex
+# :degrevlex
+# 
+# T is an Int which is the number of variables
+# (plus one if ordered by total degree)
+
+const GenMPolyID = ObjectIdDict()
+
+type GenMPolyRing{T <: RingElem, S, N} <: PolyRing{T}
+   base_ring::Ring
+   S::Array{Symbol, 1}
+   num_vars::Int
+
+   function GenMPolyRing(R::Ring, s::Array{Symbol, 1}, cached=true)
+      if haskey(GenMPolyID, (R, s, S, N))
+         return GenMPolyID[R, s, S, N]::GenMPolyRing{T, S, N}
+      else 
+         z = new(R, s, length(s))
+         if cached
+           GenMPolyID[R, s, S, N] = z
+         end
+         return z
+      end
+   end
+end
+
+type GenMPoly{T <: RingElem, S, N} <: PolyElem{T}
+   coeffs::Array{T, 1}
+   exps::Array{NTuple{N, UInt}}
+   length::Int
+   parent::GenMPolyRing{T, S, N}
+
+   GenMPoly() = new(Array(T, 0), Array(NTuple{N, UInt}, 0), 0)
+   
+   GenMPoly(a::Array{T, 1}, b::Array{NTuple{N, UInt}, 1}) = new(a, b, length(a))
+
+   GenMPoly(a::T) = a == 0 ? new(Array(T, 0), Array(NTuple{N, UInt}, 0), 0) : 
+                                      new([a], [zero(NTuple{N, UInt})], 1)
+end
+
+###############################################################################
+#
+#   GenSparsePolyRing / GenSparsePoly
+#
+###############################################################################
+
+const GenSparsePolyID = ObjectIdDict()
+
+type GenSparsePolyRing{T <: RingElem} <: Ring
+   base_ring::Ring
+   S::Symbol
+   num_vars::Int
+
+   function GenSparsePolyRing(R::Ring, s::Symbol, cached=true)
+      if haskey(GenSparsePolyID, (R, s))
+         return GenSparsePolyID[R, s]::GenSparsePolyRing{T}
+      else 
+         z = new(R, s)
+         if cached
+           GenSparsePolyID[R, s] = z
+         end
+         return z
+      end
+   end
+end
+
+type GenSparsePoly{T <: RingElem} <: RingElem
+   coeffs::Array{T, 1}
+   exps::Array{UInt}
+   length::Int
+   parent::GenSparsePolyRing{T}
+
+   GenSparsePoly() = new(Array(T, 0), Array(UInt, 0), 0)
+   
+   GenSparsePoly(a::Array{T, 1}, b::Array{UInt, 1}) = new(a, b, length(a))
+
+   GenSparsePoly(a::T) = a == 0 ? new(Array(T, 0), Array(UInt, 0), 0) : 
+                                      new([a], [UInt(0)], 1)
 end
 
 ###############################################################################
@@ -148,7 +237,6 @@ type GenAbsSeries{T <: RingElem} <: AbsSeriesElem{T}
    GenAbsSeries(a::Array{T, 1}, length::Int, prec::Int) = new(a, length, prec)   
    GenAbsSeries(a::GenAbsSeries{T}) = a
 end
-
 ###############################################################################
 #
 #   GenFracField / GenFrac

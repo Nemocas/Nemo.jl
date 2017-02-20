@@ -385,9 +385,9 @@ divexact(x::fmpz_poly, y::Integer) = divexact(x, fmpz(y))
 function pseudorem(x::fmpz_poly, y::fmpz_poly)
    check_parent(x, y)
    y == 0 && throw(DivideError())
-   diff = length(x) - length(y)
+   diff = length(x) - length(y) + 1
    r = parent(x)()
-   d = Array(Int, 1)
+   d = Array{Int}(1)
    ccall((:fmpz_poly_pseudo_rem, :libflint), Void, 
      (Ptr{fmpz_poly}, Ptr{Int}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &r, d, &x, &y)
    if (diff > d[1])
@@ -400,10 +400,10 @@ end
 function pseudodivrem(x::fmpz_poly, y::fmpz_poly)
    check_parent(x, y)
    y == 0 && throw(DivideError())
-   diff = length(x) - length(y)
+   diff = length(x) - length(y) + 1
    q = parent(x)()
    r = parent(x)()
-   d = Array(Int, 1)
+   d = Array{Int}(1)
    ccall((:fmpz_poly_pseudo_divrem_divconquer, :libflint), Void, 
     (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{Int}, Ptr{fmpz_poly}, Ptr{fmpz_poly}),
                &q, &r, d, &x, &y)
@@ -552,8 +552,8 @@ doc"""
 > roots.
 """
 function signature(f::fmpz_poly)
-   r = Array(Int, 1)
-   s = Array(Int, 1)
+   r = Array{Int}(1)
+   s = Array{Int}(1)
    ccall((:fmpz_poly_signature, :libflint), Void,
          (Ptr{Int}, Ptr{Int}, Ptr{fmpz_poly}), r, s, &f)
    return (r[1], s[1])
@@ -569,8 +569,8 @@ function interpolate(R::FmpzPolyRing, x::Array{fmpz, 1},
                                       y::Array{fmpz, 1})
   z = R()
 
-  ax = Array(Int, length(x))
-  ay = Array(Int, length(y))
+  ax = Array{Int}(length(x))
+  ay = Array{Int}(length(y))
 
   t = fmpz()
 
@@ -737,6 +737,11 @@ end
 #
 ###############################################################################
 
+function zero!(z::fmpz_poly)
+   ccall((:fmpz_poly_zero, :libflint), Void, 
+                    (Ptr{fmpz_poly},), &z)
+end
+
 function fit!(z::fmpz_poly, n::Int)
    ccall((:fmpz_poly_fit_length, :libflint), Void, 
                     (Ptr{fmpz_poly}, Int), &z, n)
@@ -755,6 +760,11 @@ end
 function addeq!(z::fmpz_poly, x::fmpz_poly)
    ccall((:fmpz_poly_add, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &z, &x)
+end
+
+function add!(z::fmpz_poly, x::fmpz_poly, y::fmpz_poly)
+   ccall((:fmpz_poly_add, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &x, &y)
 end
 
 ###############################################################################

@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Nemo
+DocTestSetup = quote
+  using Nemo
+end
 ```
 
 ## Introduction
@@ -8,9 +11,9 @@ Nemo provides a unified interface to handle factorizations using the
 `Fact` objects. These can only be constructed using the factor function for
 the respective ring elements. This is best illustrated by an example.
 
-```julia
-julia> fac = factor(-6000361807272228723606)
--1 * 2 * 229^100 * 43669^100 * 3
+```jldoctest
+julia> fac = factor(ZZ(-6000361807272228723606))
+-1 * 2 * 229^3 * 43669^3 * 3
 
 julia> unit(fac)
 -1

@@ -553,6 +553,12 @@ end
 #
 ################################################################################
 
+function zero!(z::fq_poly)
+   ccall((:fq_poly_zero, :libflint), Void, 
+         (Ptr{fq_poly}, Ptr{FqFiniteField}),
+         &z, &base_ring(parent(z)))
+end
+
 function fit!(z::fq_poly, n::Int)
    ccall((:fq_poly_fit_length, :libflint), Void, 
          (Ptr{fq_poly}, Int, Ptr{FqFiniteField}),

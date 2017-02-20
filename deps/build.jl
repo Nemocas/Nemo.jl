@@ -142,7 +142,7 @@ if is_windows()
    try
       run(`ln -sf $vdir\\lib\\libflint.dll $vdir\\lib\\libflint-13.dll`)
    catch
-      cp(joinpath(vdir, "lib", "libflint.dll"), joinpath(vdir, "lib", "libflint-13.dll"))
+      cp(joinpath(vdir, "lib", "libflint.dll"), joinpath(vdir, "lib", "libflint-13.dll"), remove_destination=true)
    end
 else
    cd(joinpath("$wdir", "flint2"))
@@ -184,47 +184,6 @@ end
 
 cd(wdir)
 
-# install PARI
-
-if !ispath(Pkg.dir("Nemo", "local", "pari-2.7.4"))
-   # git clone pari doesn't seem to work on Windows
-   # bison is too old on OSX for pari git
-   # so we use the 2.7.4 tarball
-
-   download("http://nemocas.org/binaries/pari-2.7.4.tar.gz", joinpath(wdir, "pari-2.7.4.tar.gz"))
-end
-
-if is_windows()
-   if Int == Int32
-      download_dll("http://nemocas.org/binaries/w32-libpari.dll", joinpath(vdir, "lib", "libpari.dll"))
-   else
-      download_dll("http://nemocas.org/binaries/w64-libpari.dll", joinpath(vdir, "lib", "libpari.dll"))
-   end
-elseif is_apple()
-   run(`tar -xvf pari-2.7.4.tar.gz`)
-   run(`rm pari-2.7.4.tar.gz`)
-   cd(joinpath("$wdir", "pari-2.7.4"))
-   run(`patch -p1 -i ../patch-alloc-2.7.4`)
-   withenv("DYLD_LIBRARY_PATH"=>"$vdir/lib", "DLCFLAGS"=>DLCFLAGS) do
-      run(`./Configure --prefix=$vdir --with-gmp=$vdir`)
-      run(`make -j4 gp`)
-      run(`make install`)
-   end
-else
-   run(`tar -xvf pari-2.7.4.tar.gz`)
-   run(`rm pari-2.7.4.tar.gz`)
-   cd(joinpath("$wdir", "pari-2.7.4"))
-   run(`patch -p1 -i ../patch-alloc-2.7.4`)
-   withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "DLLDFLAGS"=>LDFLAGS) do
-      run(`./Configure --prefix=$vdir --with-gmp=$vdir`)
-      run(`make -j4 gp`)
-      run(`make install`)
-   end
-end
-
-cd(wdir)
-
 push!(Libdl.DL_LOAD_PATH, Pkg.dir("Nemo", "local", "lib"))
 
 cd(oldwdir)
-

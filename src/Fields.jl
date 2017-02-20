@@ -14,8 +14,6 @@ include("flint/fq_nmod.jl")
 
 include("antic/nf_elem.jl")
 
-include("pari/pari_nf.jl")
-
 include("arb/arb.jl")
 
 include("arb/acb.jl")

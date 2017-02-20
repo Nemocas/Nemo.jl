@@ -626,6 +626,11 @@ function divexact{T <: RingElem}(a::T, b::FracElem{T})
    return parent(b)(n, d)
 end
 
+function divides{T <: RingElem}(a::FracElem{T}, b::FracElem{T})
+   b == 0 && error("Division by zero in divides")
+   return true, divexact(a, b)
+end
+
 ###############################################################################
 #
 #   Powering
@@ -671,20 +676,49 @@ end
 #
 ###############################################################################
 
+function zero!{T <: RingElem}(c::FracElem{T})
+   zero!(c.num)
+   if !isone(c.den)
+      c.den = one(parent(c))
+   end
+   nothing
+end
+
 function mul!{T <: RingElem}(c::FracElem{T}, a::FracElem{T}, b::FracElem{T})
    g1 = gcd(num(a), den(b))
    g2 = gcd(num(b), den(a))
    c.num = divexact(num(a), g1)*divexact(num(b), g2)
    c.den = divexact(den(a), g2)*divexact(den(b), g1)
+   nothing
 end
 
 function addeq!{T <: RingElem}(c::FracElem{T}, a::FracElem{T})
+   n = c.num*den(a) + num(a)*c.den
+   mul!(c.den, c.den, den(a))
+   g = gcd(n, d)
+   c.num = divexact(n, g)
+   c.den = divexact(c.den, g)
+   nothing
+end
+
+function add!{T <: RingElem}(c::FracElem{T}, a::FracElem{T}, b::FracElem{T})
    n = c.num*den(a) + num(a)*c.den
    d = c.den*den(a)
    g = gcd(n, d)
    c.num = divexact(n, g)
    c.den = divexact(d, g)
+   nothing
 end
+
+function addeq!{T <: RingElem}(c::FracElem{T}, a::FracElem{T}, b::FracElem{T})
+   n = num(b)*den(a) + num(a)*den(b)
+   mul!(c.den, den(b), den(a))
+   g = gcd(n, d)
+   c.num = divexact(n, g)
+   c.den = divexact(c.den, g)
+   nothing
+end
+
 
 ###############################################################################
 #

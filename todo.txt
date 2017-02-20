@@ -3,8 +3,6 @@ Build
 
 * Remove dependency on git on Windows
 
-* Remove Pari module (once factorisation of integers and Z[x] is done)
-
 General
 -------
 
@@ -19,6 +17,8 @@ General
 * Optimise for monomials in polynomial modules, especially powering
 
 * introduce CapRelSeries abstract type
+
+* extend documentation for absolute power series
 
 fq_poly.jl / fq_nmod_poly.jl
 ----------------------------
@@ -64,6 +64,10 @@ Poly.jl/fmpz_poly.jl
 arb_poly function from_roots.
 
 * implement Sylvester matrix version of generic resultant
+
+* add the tricks used in SparsePoly for gcd (subresultant algorithm) to Poly.jl.These include finding obvious content and removing it using exact divisions, 
+and evaluating at random points at the start to determine the likely degree of
+the gcd, then replacing the last pseudorem with divides.
 
 Residue.jl
 ----------

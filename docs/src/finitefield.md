@@ -49,12 +49,12 @@ the finite field itself. This is accomplished with one of the following
 constructors.
 
 ```@docs
-FlintFiniteField(::fmpz, ::Int, ::AbstractString{})
-FlintFiniteField(::Integer, ::Int, ::AbstractString{})
+FlintFiniteField(::fmpz, ::Int, ::AbstractString)
+FlintFiniteField(::Integer, ::Int, ::AbstractString)
 ```
 
 ```@docs
-FlintFiniteField(::fmpz_mod_poly, ::AbstractString{})
+FlintFiniteField(::fmpz_mod_poly, ::AbstractString)
 ```
 
 Here are some examples of creating finite fields and making use of the

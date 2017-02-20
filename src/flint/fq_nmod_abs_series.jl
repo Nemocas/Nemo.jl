@@ -18,7 +18,7 @@ function O(a::fq_nmod_abs_series)
    end
    prec = length(a) - 1
    prec < 0 && throw(DomainError())
-   z = fq_nmod_abs_series(base_ring(a), Array(fq_nmod, 0), 0, prec)
+   z = fq_nmod_abs_series(base_ring(a), Array{fq_nmod}(0), 0, prec)
    z.parent = parent(a)
    return z
 end

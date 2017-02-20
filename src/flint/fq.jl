@@ -355,6 +355,11 @@ function divexact(x::fq, y::fq)
    return z
 end
 
+function divides(a::fq, b::fq)
+   b == 0 && error("Division by zero in divides")
+   return true, divexact(a, b)
+end
+
 ###############################################################################
 #
 #   Ad hoc exact division
@@ -449,6 +454,11 @@ end
 #
 ###############################################################################
 
+function zero!(z::fq)
+   ccall((:fq_zero, :libflint), Void, 
+        (Ptr{fq}, Ptr{FqFiniteField}), &z, &z.parent)
+end
+
 function mul!(z::fq, x::fq, y::fq)
    ccall((:fq_mul, :libflint), Void, 
         (Ptr{fq}, Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &z, &x, &y, &y.parent)
@@ -457,6 +467,11 @@ end
 function addeq!(z::fq, x::fq)
    ccall((:fq_add, :libflint), Void, 
         (Ptr{fq}, Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &z, &z, &x, &x.parent)
+end
+
+function add!(z::fq, x::fq, y::fq)
+   ccall((:fq_add, :libflint), Void, 
+        (Ptr{fq}, Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &z, &x, &y, &x.parent)
 end
 
 ###############################################################################

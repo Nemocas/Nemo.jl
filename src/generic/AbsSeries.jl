@@ -25,7 +25,7 @@ function O{T}(a::AbsSeriesElem{T})
    end
    prec = length(a) - 1
    prec < 0 && throw(DomainError())
-   return parent(a)(Array(T, 0), 0, prec)
+   return parent(a)(Array{T}(0), 0, prec)
 end
 
 parent_type{T}(::Type{GenAbsSeries{T}}) = GenAbsSeriesRing{T}
@@ -120,7 +120,7 @@ function valuation(a::AbsSeriesElem)
 end
 
 function deepcopy_internal{T <: RingElem}(a::GenAbsSeries{T}, dict::ObjectIdDict)
-   coeffs = Array(T, length(a))
+   coeffs = Array{T}(length(a))
    for i = 1:length(a)
       coeffs[i] = deepcopy(coeff(a, i - 1))
    end
@@ -281,11 +281,11 @@ function *{T <: RingElem}(a::AbsSeriesElem{T}, b::AbsSeriesElem{T})
    lenb = min(lenb, prec)
 
    if lena == 0 || lenb == 0
-      return parent(a)(Array(T, 0), 0, prec)
+      return parent(a)(Array{T}(0), 0, prec)
    end
    t = base_ring(a)()
    lenz = min(lena + lenb - 1, prec)
-   d = Array(T, lenz)
+   d = Array{T}(lenz)
    for i = 1:min(lena, lenz)
       d[i] = coeff(a, i - 1)*coeff(b, 0)
    end
@@ -837,7 +837,7 @@ end
 function fit!{T <: RingElem}(c::GenAbsSeries{T}, n::Int)
    if length(c.coeffs) < n
       t = c.coeffs
-      c.coeffs = Array(T, n)
+      c.coeffs = Array{T}(n)
       for i = 1:c.length
          c.coeffs[i] = t[i]
       end
@@ -952,14 +952,14 @@ function (a::GenAbsSeriesRing{T}){T <: RingElem}(b::RingElem)
 end
 
 function (a::GenAbsSeriesRing{T}){T <: RingElem}()
-   z = GenAbsSeries{T}(Array(T, 0), 0, a.prec_max)
+   z = GenAbsSeries{T}(Array{T}(0), 0, a.prec_max)
    z.parent = a
    return z
 end
 
 function (a::GenAbsSeriesRing{T}){T <: RingElem}(b::Integer)
    if b == 0
-      z = GenAbsSeries{T}(Array(T, 0), 0, a.prec_max)
+      z = GenAbsSeries{T}(Array{T}(0), 0, a.prec_max)
    else
       z = GenAbsSeries{T}([base_ring(a)(b)], 1, a.prec_max)
    end
@@ -969,7 +969,7 @@ end
 
 function (a::GenAbsSeriesRing{T}){T <: RingElem}(b::fmpz)
    if b == 0
-      z = GenAbsSeries{T}(Array(T, 0), 0, a.prec_max)
+      z = GenAbsSeries{T}(Array{T}(0), 0, a.prec_max)
    else
       z = GenAbsSeries{T}([base_ring(a)(b)], 1, a.prec_max)
    end
@@ -980,7 +980,7 @@ end
 function (a::GenAbsSeriesRing{T}){T <: RingElem}(b::T)
    parent(b) != base_ring(a) && error("Unable to coerce to power series")
    if b == 0
-      z = GenAbsSeries{T}(Array(T, 0), 0, a.prec_max)
+      z = GenAbsSeries{T}(Array{T}(0), 0, a.prec_max)
    else
       z = GenAbsSeries{T}([b], 1, a.prec_max)
    end

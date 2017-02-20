@@ -42,7 +42,7 @@ type AnticNumberField <: Field
             (Ptr{AnticNumberField}, Ptr{fmpq_poly}), &nf, &pol)
          finalizer(nf, _AnticNumberField_clear_fn)
          nf.S = s
-         nf.auxilliary_data = Array(Any, 5)
+         nf.auxilliary_data = Array{Any}(5)
          return nf
       end
    end

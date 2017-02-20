@@ -18,7 +18,7 @@ function O(a::fq_abs_series)
    end
    prec = length(a) - 1
    prec < 0 && throw(DomainError())
-   z = fq_abs_series(base_ring(a), Array(fq, 0), 0, prec)
+   z = fq_abs_series(base_ring(a), Array{fq}(0), 0, prec)
    z.parent = parent(a)
    return z
 end

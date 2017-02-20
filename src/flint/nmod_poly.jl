@@ -77,14 +77,6 @@ function coeff(x::nmod_poly, n::Int)
           (Ptr{nmod_poly}, Int), &x, n))
 end
 
-function zero!(a::nmod_poly)
-  ccall((:nmod_poly_zero, :libflint), Void, (Ptr{nmod_poly}, ), &a)
-end
-
-function one!(a::nmod_poly)
-  ccall((:nmod_poly_one, :libflint), Void, (Ptr{nmod_poly}, ), &a)
-end
-
 zero(R::NmodPolyRing) = R(UInt(0))
 
 one(R::NmodPolyRing) = R(UInt(1))
@@ -626,8 +618,8 @@ function interpolate(R::NmodPolyRing, x::Array{GenRes{fmpz}, 1},
                                       y::Array{GenRes{fmpz}, 1})
   z = R()
 
-  ax = Array(UInt, length(x))
-  ay = Array(UInt, length(y))
+  ax = Array{UInt}(length(x))
+  ay = Array{UInt}(length(y))
 
   t = fmpz()
 
@@ -785,7 +777,7 @@ doc"""
 function factor_distinct_deg(x::nmod_poly)
   !issquarefree(x) && error("Polynomial must be squarefree")
   !is_prime(modulus(x)) && error("Modulus not prime in factor_distinct_deg")
-  degs = Array(Int, degree(x))
+  degs = Array{Int}(degree(x))
   degss = [ pointer(degs) ]
   fac = nmod_poly_factor(x.mod_n)
   ccall((:nmod_poly_factor_distinct_deg, :libflint), UInt,
@@ -863,6 +855,15 @@ end
 #  Unsafe functions
 #
 ################################################################################
+
+function zero!(x::nmod_poly)
+  ccall((:nmod_poly_zero, :libflint), Void, 
+                   (Ptr{nmod_poly},), &x)
+end
+
+function one!(a::nmod_poly)
+  ccall((:nmod_poly_one, :libflint), Void, (Ptr{nmod_poly}, ), &a)
+end
 
 function fit!(x::nmod_poly, n::Int)
   ccall((:nmod_poly_fit_length, :libflint), Void, 

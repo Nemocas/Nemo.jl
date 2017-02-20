@@ -194,13 +194,13 @@ type acb <: FieldElem
     return z
   end
 
-  function acb{T <: Union{Int, UInt, Float64, fmpz, BigFloat, arb}}(x::T, y::T)
-    z = new()
-    ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
-    _acb_set(z, x, y)
-    finalizer(z, _acb_clear_fn)
-    return z
-  end
+  #function acb{T <: Union{Int, UInt, Float64, fmpz, BigFloat, arb}}(x::T, y::T)
+  #  z = new()
+  #  ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
+  #  _acb_set(z, x, y)
+  #  finalizer(z, _acb_clear_fn)
+  #  return z
+  #end
 
   function acb{T <: Union{Int, UInt, Float64, fmpz, fmpq,
                           BigFloat, AbstractString, arb}}(x::T, y::T, p::Int)

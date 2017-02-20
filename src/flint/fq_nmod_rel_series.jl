@@ -15,7 +15,7 @@ export fq_nmod_rel_series, FqNmodRelSeriesRing
 function O(a::fq_nmod_rel_series)
    val = pol_length(a) + valuation(a) - 1
    val < 0 && throw(DomainError())
-   z = fq_nmod_rel_series(base_ring(a), Array(fq_nmod, 0), 0, val, val)
+   z = fq_nmod_rel_series(base_ring(a), Array{fq_nmod}(0), 0, val, val)
    z.parent = parent(a)
    return z
 end
@@ -506,6 +506,12 @@ end
 #
 ###############################################################################
 
+function zero!(x::fq_nmod_rel_series)
+  ccall((:fq_nmod_poly_zero, :libflint), Void, 
+                   (Ptr{fq_nmod_rel_series}, Ptr{FqNmodFiniteField}), &x, &base_ring(x))
+  x.prec = parent(x).prec_max
+end
+
 function fit!(z::fq_nmod_rel_series, n::Int)
    ccall((:fq_nmod_poly_fit_length, :libflint), Void, 
          (Ptr{fq_nmod_rel_series}, Int, Ptr{FqNmodFiniteField}),
@@ -589,6 +595,23 @@ function addeq!(a::fq_nmod_rel_series, b::fq_nmod_rel_series)
    a.val = val
    renormalize!(a)
    return nothing
+end
+
+function add!(c::fq_nmod_rel_series, a::fq_nmod_rel_series, b::fq_nmod_rel_series)
+   ctx = base_ring(a)
+   lena = length(a)
+   lenb = length(b)
+         
+   prec = min(a.prec, b.prec)
+ 
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+
+   lenc = max(lena, lenb)
+   c.prec = prec
+   ccall((:fq_nmod_poly_add_series, :libflint), Void, 
+     (Ptr{fq_nmod_rel_series}, Ptr{fq_nmod_rel_series}, Ptr{fq_nmod_rel_series}, Int, Ptr{FqNmodFiniteField}),
+               &c, &a, &b, lenc, &ctx)
 end
 
 ###############################################################################

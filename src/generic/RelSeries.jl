@@ -22,7 +22,7 @@ doc"""
 function O{T}(a::RelSeriesElem{T})
    val = pol_length(a) + valuation(a) - 1
    val < 0 && throw(DomainError())
-   return parent(a)(Array(T, 0), 0, val, val)
+   return parent(a)(Array{T}(0), 0, val, val)
 end
 
 parent_type{T}(::Type{GenRelSeries{T}}) = GenRelSeriesRing{T}
@@ -188,7 +188,7 @@ doc"""
 modulus{T <: ResElem}(a::SeriesElem{T}) = modulus(base_ring(a))
 
 function deepcopy_internal{T <: RingElem}(a::GenRelSeries{T}, dict::ObjectIdDict)
-   coeffs = Array(T, pol_length(a))
+   coeffs = Array{T}(pol_length(a))
    for i = 1:pol_length(a)
       coeffs[i] = deepcopy(polcoeff(a, i - 1))
    end
@@ -437,11 +437,11 @@ function *{T <: RingElem}(a::RelSeriesElem{T}, b::RelSeriesElem{T})
    lena = min(lena, prec)
    lenb = min(lenb, prec)
    if lena == 0 || lenb == 0
-      return parent(a)(Array(T, 0), 0, prec + zval, zval)
+      return parent(a)(Array{T}(0), 0, prec + zval, zval)
    end
    t = base_ring(a)()
    lenz = min(lena + lenb - 1, prec)
-   d = Array(T, lenz)
+   d = Array{T}(lenz)
    for i = 1:min(lena, lenz)
       d[i] = polcoeff(a, i - 1)*polcoeff(b, 0)
    end
@@ -1027,10 +1027,15 @@ end
 #
 ###############################################################################
 
+function zero!{T <: RingElem}(a::GenRelSeries{T})
+   a.length = 0
+   a.prec = parent(a).prec_max
+end
+
 function fit!{T <: RingElem}(c::GenRelSeries{T}, n::Int)
    if length(c.coeffs) < n
       t = c.coeffs
-      c.coeffs = Array(T, n)
+      c.coeffs = Array{T}(n)
       for i = 1:c.length
          c.coeffs[i] = t[i]
       end
@@ -1133,6 +1138,31 @@ function addeq!{T <: RingElem}(c::GenRelSeries{T}, a::GenRelSeries{T})
    renormalise!(c)
 end
 
+function add!{T <: RingElem}(c::SeriesElem{T}, a::SeriesElem{T}, b::SeriesElem{T})
+   lena = length(a)
+   lenb = length(b)
+   prec = min(precision(a), precision(b))
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+   lenc = max(lena, lenb)
+   fit!(c, lenc)
+   set_prec!(c, prec)
+   i = 1
+   while i <= min(lena, lenb)
+      setcoeff!(c, i - 1, coeff(a, i - 1) + coeff(b, i - 1))
+      i += 1
+   end
+   while i <= lena
+      setcoeff!(c, i - 1, coeff(a, i - 1))
+      i += 1
+   end
+   while i <= lenb
+      setcoeff!(c, i - 1, coeff(b, i - 1))
+      i += 1
+   end
+   set_length!(c, normalise(c, i - 1))
+   nothing
+end
 ###############################################################################
 #
 #   Promotion rules
@@ -1166,14 +1196,14 @@ function (a::GenRelSeriesRing{T}){T <: RingElem}(b::RingElem)
 end
 
 function (a::GenRelSeriesRing{T}){T <: RingElem}()
-   z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max, a.prec_max)
+   z = GenRelSeries{T}(Array{T}(0), 0, a.prec_max, a.prec_max)
    z.parent = a
    return z
 end
 
 function (a::GenRelSeriesRing{T}){T <: RingElem}(b::Integer)
    if b == 0
-      z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max, a.prec_max)
+      z = GenRelSeries{T}(Array{T}(0), 0, a.prec_max, a.prec_max)
    else
       z = GenRelSeries{T}([base_ring(a)(b)], 1, a.prec_max, 0)
    end
@@ -1183,7 +1213,7 @@ end
 
 function (a::GenRelSeriesRing{T}){T <: RingElem}(b::fmpz)
    if b == 0
-      z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max, a.prec_max)
+      z = GenRelSeries{T}(Array{T}(0), 0, a.prec_max, a.prec_max)
    else
       z = GenRelSeries{T}([base_ring(a)(b)], 1, a.prec_max, 0)
    end
@@ -1194,7 +1224,7 @@ end
 function (a::GenRelSeriesRing{T}){T <: RingElem}(b::T)
    parent(b) != base_ring(a) && error("Unable to coerce to power series")
    if b == 0
-      z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max, a.prec_max)
+      z = GenRelSeries{T}(Array{T}(0), 0, a.prec_max, a.prec_max)
    else
       z = GenRelSeries{T}([b], 1, a.prec_max, 0)
    end

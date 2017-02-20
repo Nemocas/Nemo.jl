@@ -84,7 +84,7 @@ end
 function num_coeff!(z::fmpz, x::nf_elem, n::Int)
    n < 0 && throw(DomainError())
    ccall((:nf_elem_get_coeff_fmpz, :libflint), Void,
-     (Ptr{fmpq}, Ptr{nf_elem}, Int, Ptr{AnticNumberField}), &z, &x, n, &parent(x))
+     (Ptr{fmpz}, Ptr{nf_elem}, Int, Ptr{AnticNumberField}), &z, &x, n, &parent(x))
    return z
 end
 
@@ -589,33 +589,44 @@ end
 #
 ###############################################################################
 
+function zero!(a::nf_elem)
+   ccall((:nf_elem_zero, :libflint), Void,
+         (Ptr{nf_elem}, Ptr{AnticNumberField}), &a, &parent(a))
+   nothing
+end
+
 function mul!(z::nf_elem, x::nf_elem, y::nf_elem)
    ccall((:nf_elem_mul, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}),
                                                   &z, &x, &y, &parent(x))
+   nothing
 end
 
 function mul_red!(z::nf_elem, x::nf_elem, y::nf_elem, red::Bool)
    ccall((:nf_elem_mul_red, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}, Cint),
                                                 &z, &x, &y, &parent(x), red)
+   nothing
 end
 
 function addeq!(z::nf_elem, x::nf_elem)
    ccall((:nf_elem_add, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}),
                                                   &z, &z, &x, &parent(x))
+   nothing
 end
 
 function add!(a::nf_elem, b::nf_elem, c::nf_elem)
    ccall((:nf_elem_add, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}),
          &a, &b, &c, &a.parent)
+   nothing
 end
 
 function reduce!(x::nf_elem)
    ccall((:nf_elem_reduce, :libflint), Void,
          (Ptr{nf_elem}, Ptr{AnticNumberField}), &x, &parent(x))
+   nothing
 end
 
 ###############################################################################
@@ -716,7 +727,7 @@ function sqr_classical(a::GenPoly{nf_elem})
    t = base_ring(a)()
 
    lenz = 2*lena - 1
-   d = Array(nf_elem, lenz)
+   d = Array{nf_elem}(lenz)
 
    for i = 1:lena - 1
       d[2i - 1] = base_ring(a)()
@@ -761,7 +772,7 @@ function mul_classical(a::GenPoly{nf_elem}, b::GenPoly{nf_elem})
    t = base_ring(a)()
 
    lenz = lena + lenb - 1
-   d = Array(nf_elem, lenz)
+   d = Array{nf_elem}(lenz)
 
    for i = 1:lena
       d[i] = base_ring(a)()

@@ -1070,7 +1070,7 @@ function (a::FmpzMatSpace)(arr::Array{fmpz, 1})
    return z
 end
 
-(a::FmpzMatSpace){T <: Integer}(arr::Array{T, 1}) = a(arr'')
+(a::FmpzMatSpace){T <: Integer}(arr::Array{T, 1}) = a(reshape(arr, (a.rows, a.cols)))
 
 function (a::FmpzMatSpace)(d::fmpz)
    z = fmpz_mat(a.rows, a.cols, d)

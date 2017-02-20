@@ -4,6 +4,7 @@ makedocs()
 
 deploydocs(
    deps   = Deps.pip("mkdocs", "python-markdown-math"),
-   repo = "github.com/Nemocas/Nemo.jl.git"
+   repo = "github.com/Nemocas/Nemo.jl.git",
+   julia = "0.5"
 )
 

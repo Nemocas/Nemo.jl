@@ -526,7 +526,7 @@ end
 ################################################################################
 
 function Array(b::nmod_mat)
-  a = Array(GenRes{fmpz}, b.r, b.c)
+  a = Array{GenRes{fmpz}}(b.r, b.c)
   for i = 1:b.r
     for j = 1:b.c
       a[i,j] = b[i,j]

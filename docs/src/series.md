@@ -4,11 +4,14 @@ CurrentModule = Nemo
 
 ## Introduction
 
-Nemo allows the creation of capped relative power series over any computable
-ring $R$. These are power series of the form
+Nemo allows the creation of capped relative and absolute power series over any computable
+ring $R$. Capped relative power series are power series of the form
 $a_jx^j + a_{j+1}x^{j+1} + \cdots + a_{k-1}x^{k-1} + O(x^k)$
 where $i \geq 0$, $a_i \in R$ and the relative precision $k - j$ is at most
 equal to some specified precision $n$.
+On the other hand capped absolute power series are power series of the form
+$a_jx^j + a_{j+1}x^{j+1} + \cdots + a_{n-1}x^{n-1} + O(x^n)$
+where $j \geq 0$, $a_j \in R$ and the precision $n$ is fixed.
 
 There are two different kinds of implementation: a generic one for
 the case where no specific implementation exists, and efficient implementations
@@ -28,7 +31,27 @@ $\mathbb{Q}$                          | Flint           | `fmpq_rel_series`     
 $\mathbb{F}_{p^n}$ (small $n$)        | Flint           | `fq_nmod_rel_series`  | `FqNmodRelSeriesRing`
 $\mathbb{F}_{p^n}$ (large $n$)        | Flint           | `fq_rel_series`       | `FqRelSeriesRing`
 
+All relative power series elements belong to the abstract type `RelSeriesElem` and all
+of the relative power series ring types belong to the abstract type `RelSeriesRing`.
+
 The maximum relative precision, the string representation of the variable and
+the base ring $R$ of a generic power series are stored in its parent object. 
+
+Here is the corresponding table for the absolute power series types.
+
+Base ring                             | Library         | Element type          | Parent type
+--------------------------------------|-----------------|-----------------------|----------------------
+Generic ring $R$                      | Nemo            | `GenAbsSeries{T}`     | `GenAbsSeriesRing{T}`
+$\mathbb{Z}$                          | Flint           | `fmpz_abs_series`     | `FmpzAbsSeriesRing`
+$\mathbb{Z}/n\mathbb{Z}$              | Flint           | `fmpz_mod_abs_series` | `FmpzModAbsSeriesRing`
+$\mathbb{Q}$                          | Flint           | `fmpq_abs_series`     | `FmpqAbsSerieRing`
+$\mathbb{F}_{p^n}$ (small $n$)        | Flint           | `fq_nmod_abs_series`  | `FqNmodAbsSeriesRing`
+$\mathbb{F}_{p^n}$ (large $n$)        | Flint           | `fq_abs_series`       | `FqAbsSeriesRing`
+
+All absolute power series elements belong to the abstract type `AbsSeriesElem` and all
+of the absolute power series ring types belong to the abstract type `AbsSeriesRing`.
+
+The absolute precision, the string representation of the variable and
 the base ring $R$ of a generic power series are stored in its parent object. 
 
 All power series element types belong to the abstract type `SeriesElem` and all
@@ -54,7 +77,7 @@ do not always have $(f + g) - g = f$.
 
 In the capped relative model we say that two power series are equal if they
 agree up to the minimum *absolute* precision of the two power series.
-Thus, for example, $x^5 + O(x^10) == 0 + O(x^5)$, since the minimum absolute
+Thus, for example, $x^5 + O(x^{10}) == 0 + O(x^5)$, since the minimum absolute
 precision is $5$.
 
 During computations, it is possible for power series to lose relative
@@ -63,8 +86,8 @@ $g = x^3 + x^6 + O(x^8)$ then $f - g = x^5 - x^6 + O(x^8)$ which now has
 relative precision $3$ instead of relative precision $5$.
 
 Amongst other things, this means that equality is not transitive. For example
-$x^6 + O(x^11) == 0 + O(x^5)$ and $x^7 + O(x^12) == 0 + O(x^5)$ but
-$x^6 + O(x^11) \neq x^7 + O(x^12)$.
+$x^6 + O(x^{11}) == 0 + O(x^5)$ and $x^7 + O(x^{12}) == 0 + O(x^5)$ but
+$x^6 + O(x^{11}) \neq x^7 + O(x^{12})$.
 
 Sometimes it is necessary to compare power series not just for arithmetic
 equality, as above, but to see if they have precisely the same precision and
@@ -78,9 +101,9 @@ then $f == g$, $f == h$ and $g == h$, but `isequal(f, g)`, `isequal(f, h)` and
 There are further difficulties if we construct polynomial over power series.
 For example, consider the polynomial in $y$ over the power series ring in $x$
 over the rationals. Normalisation of such polynomials is problematic. For
-instance, what is the leading coefficient of $(0 + O(x^10))y + (1 + O(x^10))$?
+instance, what is the leading coefficient of $(0 + O(x^{10}))y + (1 + O(x^{10}))$?
 
-If one takes it to be $(0 + O(x^10))$ then some functions may not terminate
+If one takes it to be $(0 + O(x^{10}))$ then some functions may not terminate
 due to the fact that algorithms may require the degree of polynomials to
 decrease with each iteration. Instead, the degree may remain constant and
 simply accumulate leading terms which are arithmetically zero but not
@@ -100,13 +123,18 @@ Simply increasing the precision will not necessarily give a "more correct"
 answer and some computations may not even terminate due to the presence of
 arithmetic zeroes!
 
+## Capped absolute power series
+
+An absolute power series ring over a ring $R$ with precision $p$ behaves 
+very much like the quotient $R[x]/(x^p)$ of the polynomial ring over $R$.
+
 ## Power series ring constructors
 
 In order to construct power series in Nemo, one must first construct the
 power series ring itself. This is accomplished with the following constructor.
 
 ```@docs
-PowerSeriesRing(::Ring, ::Int, ::AbstractString{}, ::Bool)
+PowerSeriesRing(::Ring, ::Int, ::AbstractString; ::Bool, ::Symbol)
 ```
 
 Here are some examples of creating a power series ring using the constructor

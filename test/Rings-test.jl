@@ -24,9 +24,6 @@ include("arb/acb_poly-test.jl")
 include("arb/arb_mat-test.jl")
 include("arb/acb_mat-test.jl")
 
-include("pari/pari_maximal_order_elem-test.jl")
-include("pari/PariIdeal-test.jl")
-
 include("generic/Poly-test.jl")
 include("generic/Residue-test.jl")
 include("generic/RelSeries-test.jl")
@@ -54,9 +51,6 @@ function test_rings()
 
    test_arb_poly()
    test_acb_poly()
-
-   test_pari_maximal_order_elem()
-   test_PariIdeal()
 
    test_gen_poly()
    test_gen_res()

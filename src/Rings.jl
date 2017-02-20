@@ -196,6 +196,21 @@ function =={S <: Integer, T <: RingElem}(x::S, y::T)
    end
 end
 
+function addmul!{T <: RingElem}(z::T, x::T, y::T, c::T)
+   mul!(c, x, y)
+   addeq!(z, c)
+   return
+end
+
+function divides{T <: RingElem}(x::T, y::T)
+   q, r = divrem(x, y)
+   if r == 0
+      return true, q
+   else
+      return false, q
+   end
+end
+
 ###############################################################################
 #
 #   Baby-steps giant-steps powering
@@ -205,7 +220,7 @@ end
 function powers{T <: RingElem}(a::T, d::Int)
    d <= 0 && throw(DomainError())
    S = parent(a)
-   A = Array(T, d + 1)
+   A = Array{T}(d + 1)
    A[1] = one(S)
    if d > 1
       c = a
@@ -255,6 +270,12 @@ include("flint/nmod_poly.jl")
 
 include("flint/fmpz_mod_poly.jl")
 
+#include("flint/fmpz_mpoly.jl")
+
+include("generic/MPoly.jl")
+
+include("generic/SparsePoly.jl")
+
 include("generic/RelSeries.jl")
 
 include("generic/AbsSeries.jl")
@@ -275,19 +296,7 @@ include("flint/fmpq_mat.jl")
 
 include("flint/nmod_mat.jl")
 
-include("pari/pari_int.jl")
-
-include("pari/pari_poly.jl")
-
-include("pari/pari_polmod.jl")
-
-include("pari/pari_vec.jl")
-
-include("pari/PariFactor.jl")
-
 include("Fields.jl")
-
-include("pari/pari_frac.jl")
 
 include("flint/fmpq_poly.jl")
 
@@ -316,12 +325,6 @@ include("arb/acb_poly.jl")
 include("arb/arb_mat.jl")
 
 include("arb/acb_mat.jl")
-
-include("pari/pari_poly2.jl")
-
-include("pari/pari_maximal_order_elem.jl")
-
-include("pari/PariIdeal.jl")
 
 include("Factor.jl")
 
