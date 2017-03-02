@@ -527,6 +527,12 @@ function test_fmpz_number_theoretic()
 
    @test remove(fmpz(12), fmpz(2)) == (2, 3)
 
+   @test valuation(fmpz(12), fmpz(2)) == 2
+
+   @test valuation(fmpz(12), 2) == 2
+
+   @test valuation(12, 2) == 2
+
    @test divisor_lenstra(fmpz(12), fmpz(4), fmpz(5)) == 4
 
    @test risingfac(fmpz(12), 5) == 524160

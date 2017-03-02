@@ -680,16 +680,17 @@ function test_nmod_poly_canonicalization()
   println("PASS")
 end
 
-function test_nmod_poly_valuation()
-  print("nmod_poly.valuation...")
+function test_nmod_poly_remove_valuation()
+  print("nmod_poly.remove_valuation...")
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
   f = (x + 1)^10 * (x + 2) * (x + 3)
   g = x + 1
 
-  n, p = valuation(f, g)
+  n, p = remove(f, g)
 
+  @test n == valuation(f, g)
   @test n == 10
   @test p == (x+2)*(x+3)
   println("PASS")
@@ -726,7 +727,7 @@ function test_nmod_poly()
   test_nmod_poly_issquarefree()
   test_nmod_poly_factor()
   test_nmod_poly_canonicalization()
-  test_nmod_poly_valuation()
+  test_nmod_poly_remove_valuation()
 
   println("")
 end

@@ -400,6 +400,25 @@ p = divexact(ZZ(2), b)
 q = a^3
 ```
 
+## Remove and valuation
+
+In case the base ring supports the functions `remove` and `valuation`,
+the same is true for fractions.
+
+```@docs
+remove{T <: RingElem}(::RingElem{T}, T)
+valuation{T <: RingElem}(::RingElem{T}, T)
+```
+
+Here is an example:
+```
+a = QQ(2, 3)
+b = ZZ(3)
+remove(a, b)
+valuation(a, b)
+```
+
+
 ## Comparison operators
 
 The following comparison operators are implemented for fractions in Nemo.

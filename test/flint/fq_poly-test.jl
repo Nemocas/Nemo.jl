@@ -513,8 +513,8 @@ function test_fq_poly_factor()
    println("PASS")
 end
 
-function test_fq_poly_valuation()
-   print("fq_poly.valuation()...")
+function test_fq_poly_remove_valuation()
+   print("fq_poly.remove_valuation()...")
 
    R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
@@ -522,8 +522,9 @@ function test_fq_poly_valuation()
    f = 7y^2 + 3y + 2
    g = f^5*(11y^3 - 2y^2 + 5)
 
-   v, h = valuation(g, f)
+   v, h = remove(g, f)
 
+   @test valuation(g, f) == 5
    @test v == 5
    @test h == (11y^3 - 2y^2 + 5)
 
@@ -558,7 +559,7 @@ function test_fq_poly()
    test_fq_poly_special()
    test_fq_poly_inflation_deflation()
    test_fq_poly_factor()
-   test_fq_poly_valuation()
+   test_fq_poly_remove_valuation()
 
    println("")
 end

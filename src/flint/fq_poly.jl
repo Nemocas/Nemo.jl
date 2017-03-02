@@ -372,27 +372,30 @@ function divrem(x::fq_poly, y::fq_poly)
    ccall((:fq_poly_divrem, :libflint), Void, (Ptr{fq_poly},
          Ptr{fq_poly}, Ptr{fq_poly}, Ptr{fq_poly},
          Ptr{FqFiniteField}), &z, &r, &x, &y, &base_ring(parent(x)))
-   return z,r
+   return z, r
 end
 
 ################################################################################
 #
-#   valuation/ remove
+#   Remove
 #
 ################################################################################
+
 doc"""
-  valuation(x::fq_poly, y::fq_poly)
-> Computes the valuation of $x$ at $y$, ie. the largest $k$ s.th. 
-> $mod(x, y^k)==0$ holds. 
-> Additionally, $div(x, y^k)$ is returned as well.
+    remove(z::fq_poly, p::fq_poly)
+> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
+>
+> See also `valuation`, which only returns the valuation.
 """
-function valuation(z::fq_poly, p::fq_poly)
-  check_parent(z,p)
-  z == 0 && error("Not yet implemented")
-  z = deepcopy(z)
-  v = ccall((:fq_poly_remove, :libflint), Int, (Ptr{fq_poly}, Ptr{fq_poly}, Ptr{FqFiniteField}), &z,  &p, &base_ring(parent(z)))
-   
-  return v, z
+function remove(z::fq_poly, p::fq_poly)
+   check_parent(z,p)
+   z == 0 && error("Not yet implemented")
+   z = deepcopy(z)
+   v = ccall((:fq_poly_remove, :libflint), Int,
+            (Ptr{fq_poly}, Ptr{fq_poly}, Ptr{FqFiniteField}),
+             &z,  &p, &base_ring(parent(z)))
+   return v, z
 end
 
 ################################################################################

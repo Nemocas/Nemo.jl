@@ -406,35 +406,6 @@ function divrem(x::fmpq_poly, y::fmpq_poly)
    return q, r
 end
 
-################################################################################
-#
-#   valuation/ remove
-#
-################################################################################
-
-doc"""
-  valuation(z::fmpq_poly, p::fmpq_poly)
-> Computes the valuation of $x$ at $y$, ie. the largest $k$ s.th. 
-> $mod(x, y^k)==0$ holds. 
-> Additionally, $div(x, y^k)$ is returned as well.
-"""
-function valuation(z::fmpq_poly, p::fmpq_poly)
-  check_parent(z,p)
-  z == 0 && error("Not yet implemented")
-  q, r = divrem(z, p)
-  if !iszero(r)
-    return 0, z
-  end
-  v = 0
-  qn = q
-  while iszero(r)
-    q = qn
-    qn, r = divrem(q, p)
-    v += 1
-  end
-  return v, q
-end
-
 ###############################################################################
 #
 #   Exact division

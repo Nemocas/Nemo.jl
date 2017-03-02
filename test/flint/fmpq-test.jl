@@ -331,6 +331,17 @@ function test_fmpq_special_functions()
    println("PASS")
 end
 
+function test_fmpq_adhoc_remove_valuation()
+   print("fmpq.adhoc_remove_valuation()...")
+
+   a = fmpq(2, 3)
+
+   @test remove(a, 3) == (-1, fmpq(2, 1))
+   @test valuation(a, 3) == -1
+
+   println("PASS")
+end
+
 function test_fmpq()
    test_fmpq_constructors()
    test_fmpq_printing()
@@ -351,6 +362,7 @@ function test_fmpq()
    test_fmpq_rational_reconstruction()
    test_fmpq_rational_enumeration()
    test_fmpq_special_functions()
+   test_fmpq_adhoc_remove_valuation()
 
    println("")
 end

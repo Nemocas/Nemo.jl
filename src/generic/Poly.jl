@@ -1221,17 +1221,20 @@ end
 
 ################################################################################
 #
-#   valuation/ remove
+#   Remove and valuation
 #
 ################################################################################
 
+#CF TODO: use squaring for fast large valuation
+
 doc"""
-  valuation{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
-> Computes the valuation of $z$ at $p$, ie. the largest $k$ s.th. 
-> $divrem(z, p^k)$ computes a remainder of $0$.
-> Additionally, $div(z, p^k)$ is returned as well.
+    remove{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
+> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
+>
+> See also `valuation`, which only returns the valuation.
 """
-function valuation{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
+function remove{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
   check_parent(z,p)
   z == 0 && error("Not yet implemented")
   q, r = divrem(z, p)
@@ -1246,6 +1249,18 @@ function valuation{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
     v += 1
   end
   return v, q
+end
+
+doc"""
+    valuation{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
+> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> $p^k$ divides $z$.
+>
+> See also `remove`, which also returns $z/p^k$.
+"""
+function valuation{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
+  v, _ = remove(z, p)
+  return v
 end
 
 ###############################################################################

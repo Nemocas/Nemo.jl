@@ -715,6 +715,12 @@ evaluate(::PolyElem, ::Integer)
 evaluate(::PolyElem, ::fmpz)
 ```
 
+## Remove and valuation
+```@docs
+remove{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+valuation{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+```
+
 ```@docs
 evaluate2(::arb_poly, ::Integer)
 evaluate2(::arb_poly, ::Float64)

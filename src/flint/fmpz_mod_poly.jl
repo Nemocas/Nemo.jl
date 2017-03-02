@@ -483,35 +483,6 @@ mod(x::fmpz_mod_poly, y::fmpz_mod_poly) = rem(x,y)
 
 ################################################################################
 #
-#   valuation/ remove
-#
-################################################################################
-
-doc"""
-  valuation(x::fmpz_mod_poly, y::fmpz_mod_poly)
-> Computes the valuation of $x$ at $y$, ie. the largest $k$ s.th. 
-> $mod(x, y^k)==0$ holds. 
-> Additionally, $div(x, y^k)$ is returned as well.
-"""
-function valuation(z::fmpz_mod_poly, p::fmpz_mod_poly)
-  check_parent(z,p)
-  z == 0 && error("Not yet implemented")
-  q, r = divrem(z, p)
-  if !iszero(r)
-    return 0, z
-  end
-  v = 0
-  qn = q
-  while iszero(r)
-    q = qn
-    qn, r = divrem(q, p)
-    v += 1
-  end
-  return v, q
-end
-
-################################################################################
-#
 #  GCD 
 #
 ################################################################################

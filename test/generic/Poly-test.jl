@@ -513,8 +513,8 @@ function test_gen_poly_mul_ks()
    println("PASS")
 end
 
-function test_gen_poly_valuation()
-   print("GenPoly.valuation...")
+function test_gen_poly_remove_valuation()
+   print("GenPoly.remove_valuation...")
 
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3-2, "a");
@@ -523,8 +523,9 @@ function test_gen_poly_valuation()
    f = 3a*y^2 + (a + 1)*y + 3
    g = 6(a + 1)*y + (a^3 + 2x + 2)
 
-   v, q = valuation(f^3*g^4, g)
+   v, q = remove(f^3*g^4, g)
 
+   @test valuation(f^3*g^4, g) == 4
    @test q == f^3
    @test v == 4
 
@@ -588,10 +589,10 @@ function test_gen_poly()
    test_gen_poly_special()
    test_gen_poly_mul_karatsuba()
    test_gen_poly_mul_ks()
-if VERSION >= v"0.5.0-dev+3171"
-   test_gen_poly_generic_eval()
-end
-   test_gen_poly_valuation()
+   if VERSION >= v"0.5.0-dev+3171"
+      test_gen_poly_generic_eval()
+   end
+   test_gen_poly_remove_valuation()
    
 
    println("")

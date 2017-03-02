@@ -1819,33 +1819,45 @@ end
 
 ################################################################################
 #
-#   valuation/ remove
+#   Remove and valuation
 #
 ################################################################################
 
 doc"""
-  valuation{T <: RingElem, S, N}(z::GenMPoly{T, S, N}, p::GenMPoly{T, S, N})
-> Computes the valuation of $z$ at $p$, ie. the largest $k$ s.th. 
-> $divides(z, p^k)==true$ holds. 
-> Additionally, $exactdiv(z, p^k)$ is returned as well.
+    remove(z::GenMPoly, p::GenMPoly)
+> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
+>
+> See also `valuation`, which only returns the valuation.
 """
-function valuation{T <: RingElem, S, N}(z::GenMPoly{T, S, N}, p::GenMPoly{T, S, N})
-  check_parent(z,p)
-  z == 0 && error("Not yet implemented")
-  fl, q = divides(z, p)
-  if !fl
-    return 0, z
-  end
-  v = 0
-  qn = q
-  while fl
-    q = qn
-    fl, qn = divides(q, p)
-    v += 1
-  end
-  return v, q
+function remove{T <: RingElem, S, N}(z::GenMPoly{T, S, N}, p::GenMPoly{T, S, N})
+   check_parent(z,p)
+   z == 0 && error("Not yet implemented")
+   fl, q = divides(z, p)
+   if !fl
+      return 0, z
+   end
+   v = 0
+   qn = q
+   while fl
+      q = qn
+      fl, qn = divides(q, p)
+      v += 1
+   end
+   return v, q
 end
 
+doc"""
+    valuation(z::GenMPoly, p::GenMPoly)
+> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> $p^k$ divides $z$.
+>
+> See also `remove`, which also returns $z/p^k$.
+"""
+function valuation{T <: RingElem, S, N}(z::GenMPoly{T, S, N}, p::GenMPoly{T, S, N})
+  v, _ = remove(z, p)
+  return v
+end
 
 ###############################################################################
 #

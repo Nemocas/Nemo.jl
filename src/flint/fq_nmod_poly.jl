@@ -377,24 +377,26 @@ end
 
 ################################################################################
 #
-#   valuation/ remove
+#   Remove
 #
 ################################################################################
-doc"""
-  valuation(x::fq_nmod_poly, y::fq_nmod_poly)
-> Computes the valuation of $x$ at $y$, ie. the largest $k$ s.th. 
-> $mod(x, y^k)==0$ holds. 
-> Additionally, $div(x, y^k)$ is returned as well.
-"""
-function valuation(z::fq_nmod_poly, p::fq_nmod_poly)
-  check_parent(z,p)
-  z == 0 && error("Not yet implemented")
-  z = deepcopy(z)
-  v = ccall((:fq_nmod_poly_remove, :libflint), Int, (Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly}, Ptr{FqNmodFiniteField}), &z,  &p, &base_ring(parent(z)))
-   
-  return v, z
-end
 
+doc"""
+    remove(z::fq_nmod_poly, p::fq_nmod_poly)
+> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
+>
+> See also `valuation`, which only returns the valuation.
+"""
+function remove(z::fq_nmod_poly, p::fq_nmod_poly)
+   check_parent(z,p)
+   z == 0 && error("Not yet implemented")
+   z = deepcopy(z)
+   v = ccall((:fq_nmod_poly_remove, :libflint), Int,
+            (Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly}, Ptr{FqNmodFiniteField}),
+             &z,  &p, &base_ring(parent(z)))
+   return v, z
+end
 
 ################################################################################
 #

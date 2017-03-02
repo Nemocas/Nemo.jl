@@ -11,7 +11,7 @@ export NmodPolyRing, nmod_poly, parent, base_ring, elem_type, length, zero,
        isirreducible, issquarefree, factor, factor_squarefree,
        factor_distinct_deg, factor_shape, setcoeff!, canonical_unit,
        add!, sub!, mul!, call, PolynomialRing, check_parent, gcdx, mod,
-       invmod, gcdinv, mulmod, powmod, zero!, one!, valuation
+       invmod, gcdinv, mulmod, powmod, zero!, one!
 
 ################################################################################
 #
@@ -813,25 +813,26 @@ end
 
 ################################################################################
 #
-#    Valuation
+#   Remove
 #
 ################################################################################
-#CF TODO: use squaring for fast large valuation
 #
 ################################################################################
 
 doc"""
-    valuation(x::nmod_poly, y::nmod_poly)
-> Computes the valuation of $x$ at $y$, ie. the largest $k$ s.th. 
-> $mod(x, y^k)==0$ holds. 
-> Additionally, $div(x, y^k)$ is returned as well.
+    remove(z::nmod_poly, p::nmod_poly)
+> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
+>
+> See also `valuation`, which only returns the valuation.
 """
-function valuation(z::nmod_poly, p::nmod_poly)
-  check_parent(z,p)
-  z == 0 && error("Not yet implemented")
-  z = deepcopy(z)
-  v = ccall((:nmod_poly_remove, :libflint), Int, (Ptr{nmod_poly}, Ptr{nmod_poly}), &z,  &p)
-  return v, z
+function remove(z::nmod_poly, p::nmod_poly)
+   check_parent(z,p)
+   z == 0 && error("Not yet implemented")
+   z = deepcopy(z)
+   v = ccall((:nmod_poly_remove, :libflint), Int,
+               (Ptr{nmod_poly}, Ptr{nmod_poly}), &z,  &p)
+   return v, z
 end
 
 ################################################################################

@@ -1034,6 +1034,27 @@ function remove(x::fmpz, y::fmpz)
    return num, z
 end
 
+remove(x::fmpz, y::Integer) = remove(x, fmpz(y))
+
+remove(x::Integer, y::fmpz) = remove(fmpz(x), y)
+
+remove(x::Integer, y::Integer) = remove(fmpz(x), fmpz(y))
+
+doc"""
+    valuation(x::fmpz, y::fmpz)
+> Return the largest $n$ such that $y^n$ divides $x$.
+"""
+function valuation(x::fmpz, y::fmpz)
+   n, _ = remove(x, y)
+   return n
+end
+
+valuation(x::fmpz, y::Integer) = valuation(x, fmpz(y))
+
+valuation(x::Integer, y::fmpz) = valuation(fmpz(x), y)
+
+valuation(x::Integer, y::Integer) = valuation(fmpz(x), fmpz(y))
+
 doc"""
     divisor_lenstra(n::fmpz, r::fmpz, m::fmpz)
 > If $n$ has a factor which lies in the residue class $r (\mod m)$ for
