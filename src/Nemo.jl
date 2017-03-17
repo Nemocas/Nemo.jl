@@ -38,8 +38,6 @@ export error_dim_negative, ErrorConstrDimMismatch
 
 export is_windows64
 
-export test_module
-
 if VERSION >= v"0.6.0-dev.2024" # julia started exporting iszero (again?)
    import Base: iszero
 end
