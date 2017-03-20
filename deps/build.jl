@@ -115,9 +115,14 @@ cd(wdir)
 if !is_windows()
   try
     run(`git clone https://github.com/wbhart/antic.git`)
+    cd(joinpath("$wdir", "antic"))
+    run(`git checkout 119d15d686436d94f39fd3badf5eea4acf94ab72`)
+    cd(wdir)
   catch
     cd(joinpath("$wdir", "antic"))
     run(`git pull`)
+    run(`git checkout 119d15d686436d94f39fd3badf5eea4acf94ab72`)
+    cd(wdir)
   end          
 end
 
@@ -127,9 +132,14 @@ cd(wdir)
 if !is_windows()
   try
     run(`git clone https://github.com/wbhart/flint2.git`)
+    cd(joinpath("$wdir", "flint2"))
+    run(`git checkout f81d8805b9fb79fcd2a6a9eef61c525e58ef425b`)
+    cd(wdir)
   catch
     cd(joinpath("$wdir", "flint2"))
     run(`git pull`)
+    run(`git checkout f81d8805b9fb79fcd2a6a9eef61c525e58ef425b`)
+    cd(wdir)
   end          
 end
 
@@ -160,9 +170,13 @@ cd(wdir)
 if !is_windows()
   try
     run(`git clone https://github.com/fredrik-johansson/arb.git`)
+    cd(joinpath("$wdir", "arb"))
+    run(`git checkout b30933ace9762d1de6ffd56fb579230604267330`)
+    cd(wdir)
   catch
     cd(joinpath("$wdir", "arb"))
     run(`git pull`)
+    run(`git checkout b30933ace9762d1de6ffd56fb579230604267330`)
     cd(wdir)
   end          
 end
