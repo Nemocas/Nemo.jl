@@ -115,42 +115,6 @@ end
 #
 ###############################################################################
 
-zero{N}(::Type{NTuple{N, UInt}}) = ntuple(i -> UInt(0), Val{N})
-
-function iszero{N}(a::NTuple{N, UInt})
-   for i = 1:N
-      if a[i] != UInt(0)
-         return false
-      end
-   end
-   return true
-end
-
-function =={N}(a::NTuple{N, UInt}, b::NTuple{N, UInt})
-   for i = 1:N
-      if a[i] != b[i]
-         return false
-      end
-   end
-   return true
-end
-
-function min{N}(a::NTuple{N, UInt}, b::NTuple{N, UInt})
-   return ntuple(i -> min(a[i], b[i]), Val{N})
-end
-
-function +{N}(a::NTuple{N, UInt}, b::NTuple{N, UInt})
-   return ntuple(i -> a[i] + b[i], Val{N})
-end
-
-function -{N}(a::NTuple{N, UInt}, b::NTuple{N, UInt})
-   return ntuple(i -> a[i] - b[i], Val{N})
-end
-
-function *{N}(a::NTuple{N, UInt}, n::Int)
-   return ntuple(i -> a[i]*reinterpret(UInt, n), Val{N})
-end
-
 function divides{N}(a::NTuple{N, UInt}, b::NTuple{N, UInt}, mask::UInt)
    diff = ntuple(i -> reinterpret(UInt, reinterpret(Int, a[i])
                     - reinterpret(Int, b[i])), Val{N})
