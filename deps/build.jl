@@ -162,10 +162,12 @@ if !is_windows()
     run(`git checkout 119d15d686436d94f39fd3badf5eea4acf94ab72`)
     cd(wdir)
   catch
-    cd(joinpath("$wdir", "antic"))
-    run(`git pull`)
-    run(`git checkout 119d15d686436d94f39fd3badf5eea4acf94ab72`)
-    cd(wdir)
+    if ispath(joinpath("$wdir", "antic"))
+      cd(joinpath("$wdir", "antic"))
+      run(`git pull`)
+      run(`git checkout 119d15d686436d94f39fd3badf5eea4acf94ab72`)
+      cd(wdir)
+    end
   end          
   println("DONE")
 end
@@ -181,12 +183,14 @@ if !is_windows()
     run(`git checkout 768d1aaa54516ddb351a06683e532ead54d47470`)
     cd(wdir)
   catch
-    cd(joinpath("$wdir", "flint2"))
-    run(`git pull`)
-    run(`git checkout 768d1aaa54516ddb351a06683e532ead54d47470`)
-    cd(wdir)
-    println("DONE")
+    if ispath(joinpath("$wdir", "flint2"))
+      cd(joinpath("$wdir", "flint2"))
+      run(`git pull`)
+      run(`git checkout 768d1aaa54516ddb351a06683e532ead54d47470`)
+      cd(wdir)
+    end
   end          
+  println("DONE")
 end
 
 if is_windows()
@@ -225,10 +229,12 @@ if !is_windows()
     run(`git checkout 99c1696b48de74959ccb6bd88187e8b15262ff4d`)
     cd(wdir)
   catch
-    cd(joinpath("$wdir", "arb"))
-    run(`git pull`)
-    run(`git checkout 99c1696b48de74959ccb6bd88187e8b15262ff4d`)
-    cd(wdir)
+    if ispath(joinpath("$wdir", "arb"))
+      cd(joinpath("$wdir", "arb"))
+      run(`git pull`)
+      run(`git checkout 99c1696b48de74959ccb6bd88187e8b15262ff4d`)
+      cd(wdir)
+    end
   end
   println("DONE")
 end
