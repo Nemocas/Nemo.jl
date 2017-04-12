@@ -87,7 +87,7 @@ cd(wdir)
 # install GMP/MPIR
 
 if !ispath(Pkg.dir("Nemo", "local", "mpir-3.0.0"))
-   print("Downloading mpir ... ")
+   print("Downloading MPIR sources ... ")
    download("http://mpir.org/mpir-3.0.0.tar.bz2", joinpath(wdir, "mpir-3.0.0.tar.bz2"))
    println("DONE")
 end
@@ -123,7 +123,7 @@ cd(wdir)
 # install MPFR
 
 if !ispath(Pkg.dir("Nemo", "local", "mpfr-3.1.5"))
-   print("Downloading MPFR ... ")
+   print("Downloading MPFR sources ... ")
    download("http://www.mpfr.org/mpfr-current/mpfr-3.1.5.tar.bz2", joinpath(wdir, "mpfr-3.1.5.tar.bz2"))
    println("DONE")
 end
