@@ -15,6 +15,7 @@ export Fac, factors, unit
 type Fac{T <: RingElem}
    unit::T
    fac::Dict{T, Int}
+
    function Fac()
      f = new()
      f.fac = Dict{T, Int}()
@@ -23,10 +24,10 @@ type Fac{T <: RingElem}
 end
 
 function Fac{T}(u::T, d::Dict{T, Int})
- f = Fac{T}()
- f.unit = u
- f.fac = d
- return f
+   f = Fac{T}()
+   f.unit = u
+   f.fac = d
+   return f
 end
 
 doc"""

@@ -562,13 +562,13 @@ end
 #
 ###############################################################################
 
-function PowerSeriesRing(R::FlintIntegerRing, prec::Int, s::AbstractString; model=:capped_relative)
+function PowerSeriesRing(R::FlintIntegerRing, prec::Int, s::AbstractString;  model=:capped_relative, cached = true)
    S = Symbol(s)
 
    if model == :capped_relative
-      parent_obj = FmpzRelSeriesRing(prec, S)
+      parent_obj = FmpzRelSeriesRing(prec, S, cached)
    elseif model == :capped_absolute
-      parent_obj = FmpzAbsSeriesRing(prec, S)
+      parent_obj = FmpzAbsSeriesRing(prec, S, cached)
    end
 
    return parent_obj, gen(parent_obj)

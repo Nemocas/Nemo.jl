@@ -134,7 +134,7 @@ end
 
 needs_parentheses(x::fq_nmod) = x.length > 1
 
-is_negative(x::fq_nmod) = false
+isnegative(x::fq_nmod) = false
 
 show_minus_one(::Type{fq_nmod}) = true
 
@@ -446,16 +446,16 @@ end
 #
 ###############################################################################
 
-function FlintFiniteField(char::Int, deg::Int, s::AbstractString)
+function FlintFiniteField(char::Int, deg::Int, s::AbstractString; cached = true)
    S = Symbol(s)
-   parent_obj = FqNmodFiniteField(fmpz(char), deg, S)
+   parent_obj = FqNmodFiniteField(fmpz(char), deg, S, cached)
 
    return parent_obj, gen(parent_obj) 
 end
 
-function FlintFiniteField(pol::nmod_poly, s::AbstractString)
+function FlintFiniteField(pol::nmod_poly, s::AbstractString; cached = true)
    S = Symbol(s)
-   parent_obj = FqNmodFiniteField(pol, S)
+   parent_obj = FqNmodFiniteField(pol, S, cached)
 
    return parent_obj, gen(parent_obj) 
 end

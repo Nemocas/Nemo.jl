@@ -39,7 +39,7 @@ export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash, fac, bell,
        combit!, crt, divisible, divisor_lenstra, fdivrem, tdivrem, fmodpow2,
        gcdinv, isprobabprime, issquare, jacobi, remove, root, size, isqrtrem,
        sqrtmod, trailing_zeros, sigma, eulerphi, fib, moebiusmu, primorial,
-       risingfac, numpart, canonical_unit, needs_parentheses, is_negative,
+       risingfac, numpart, canonical_unit, needs_parentheses, isnegative,
        show_minus_one, parseint, addeq!, mul!, isunit, isequal, num, den,
        iszero
 
@@ -223,7 +223,7 @@ show(io::IO, a::FlintIntegerRing) = print(io, "Integer Ring")
 
 needs_parentheses(x::fmpz) = false
 
-is_negative(x::fmpz) = x < 0
+isnegative(x::fmpz) = x < 0
 
 show_minus_one(::Type{fmpz}) = false
 
@@ -835,6 +835,34 @@ function gcd(x::fmpz, y::fmpz)
 end
 
 doc"""
+    gcd(x::Array{fmpz, 1})
+> Return the greatest common divisor of the elements of $x$. The returned
+> result will always be nonnegative and will be zero iff all elements of $x$
+> are zero.
+"""
+function gcd(x::Array{fmpz, 1})
+   if length(x) == 0
+     return fmpz(1)
+   elseif length(x) == 1
+     return x[1]
+   end
+
+   z = fmpz()
+   ccall((:fmpz_gcd, :libflint), Void, 
+         (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &x[1], &x[2])
+
+   for i in 3:length(x)
+      ccall((:fmpz_gcd, :libflint), Void, 
+            (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &z, &x[i])
+      if z == 1
+        return z
+      end
+   end
+
+   return z
+end
+
+doc"""
     lcm(x::fmpz, y::fmpz)
 > Return the least common multiple of $x$ and $y$. The returned result will
 > always be nonnegative and will be zero iff $x$ and $y$ are zero. 
@@ -843,6 +871,30 @@ function lcm(x::fmpz, y::fmpz)
    z = fmpz()
    ccall((:fmpz_lcm, :libflint), Void, 
          (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &x, &y)
+   return z
+end
+
+doc"""
+    lcm(x::Array{fmpz, 1})
+> Return the least common multiple of the elements of $x$. The returned result
+> will always be nonnegative and will be zero iff the elements of $x$ are zero.
+"""
+function lcm(x::Array{fmpz, 1})
+   if length(x) == 0
+      return fmpz(1)
+   elseif length(x) == 1
+      return x[1]
+   end
+
+   z = fmpz()
+   ccall((:fmpz_lcm, :libflint), Void, 
+         (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &x[1], &x[2])
+   
+   for i in 3:length(x)
+      ccall((:fmpz_lcm, :libflint), Void, 
+            (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &z, &x[i])
+   end
+
    return z
 end
 
@@ -1033,6 +1085,27 @@ function remove(x::fmpz, y::fmpz)
                (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &x, &y)
    return num, z
 end
+
+remove(x::fmpz, y::Integer) = remove(x, fmpz(y))
+
+remove(x::Integer, y::fmpz) = remove(fmpz(x), y)
+
+remove(x::Integer, y::Integer) = remove(fmpz(x), fmpz(y))
+
+doc"""
+    valuation(x::fmpz, y::fmpz)
+> Return the largest $n$ such that $y^n$ divides $x$.
+"""
+function valuation(x::fmpz, y::fmpz)
+   n, _ = remove(x, y)
+   return n
+end
+
+valuation(x::fmpz, y::Integer) = valuation(x, fmpz(y))
+
+valuation(x::Integer, y::fmpz) = valuation(fmpz(x), y)
+
+valuation(x::Integer, y::Integer) = valuation(fmpz(x), fmpz(y))
 
 doc"""
     divisor_lenstra(n::fmpz, r::fmpz, m::fmpz)

@@ -48,7 +48,31 @@ function test_fmpq_poly_constructors()
    n = S(fmpz(12))
 
    @test isa(n, PolyElem)
-   
+
+   n2 = S(12//1)
+
+   @test isa(n2, PolyElem)
+
+   n2 = S(BigInt(12)//BigInt(1))
+
+   @test isa(n2, PolyElem)
+
+   o = S([1, 2, 3])
+
+   @test isa(o, PolyElem)
+
+   o2 = S([1//1, 2//1, 3//1])
+
+   @test isa(o2, PolyElem)
+
+   o3 = S([BigInt(1)//BigInt(1), BigInt(2)//BigInt(1), BigInt(3)//BigInt(1)])
+
+   @test isa(o3, PolyElem)
+
+   p = S([ZZ(1), ZZ(2), ZZ(3)])
+
+   @test isa(p, PolyElem)
+
    println("PASS")
 end
 
@@ -133,6 +157,14 @@ function test_fmpq_poly_adhoc_binary()
 
    @test g*fmpq(5, 7) == fmpz(10)//7*y+fmpz(55)//7
 
+   @test (5//7)*g == fmpz(10)//7*y+fmpz(55)//7
+
+   @test g*(5//7) == fmpz(10)//7*y+fmpz(55)//7
+
+   @test (BigInt(5)//BigInt(7))*g == fmpz(10)//7*y+fmpz(55)//7
+
+   @test g*(BigInt(5)//BigInt(7)) == fmpz(10)//7*y+fmpz(55)//7
+ 
    @test f + 4 == 3*y^2 + 7*y + 7
 
    @test 7 + f == 3*y^2 + 7*y + 10
@@ -143,7 +175,15 @@ function test_fmpq_poly_adhoc_binary()
 
    @test fmpq(5, 7) + g == 2*y+fmpz(82)//7
 
-   @test g + fmpq(5, 7) == 2*y+fmpz(82)//7
+   @test g + (5//7) == 2*y+fmpz(82)//7
+
+   @test (5//7) + g == 2*y+fmpz(82)//7
+
+   @test g + (BigInt(5)//BigInt(7)) == 2*y+fmpz(82)//7
+
+   @test (BigInt(5)//BigInt(7)) + g == 2*y+fmpz(82)//7
+
+   @test g + (BigInt(5)//BigInt(7)) == 2*y+fmpz(82)//7
 
    @test f - 4 == 3*y^2 + 7*y - 1
 
@@ -157,6 +197,14 @@ function test_fmpq_poly_adhoc_binary()
 
    @test g - fmpq(5, 7) == 2*y+fmpz(72)//7
 
+   @test (5//7) - g == -2*y-fmpz(72)//7
+
+   @test g - (5//7) == 2*y+fmpz(72)//7
+
+   @test (BigInt(5)//BigInt(7)) - g == -2*y-fmpz(72)//7
+
+   @test g - (BigInt(5)//BigInt(7)) == 2*y+fmpz(72)//7
+ 
    println("PASS")
 end
 
@@ -182,11 +230,25 @@ function test_fmpq_poly_adhoc_comparison()
 
    @test S(1) == 1 
 
+   @test S(1) == BigInt(1)
+
+   @test S(1) == fmpz(1)
+
+   @test S(1) == fmpq(1, 1)
+
+   @test S(1) == 1//1
+
+   @test S(1) == BigInt(1)//BigInt(1)
+
    @test 1 != fmpz(11)//7 + y
 
    @test S(fmpz(3)//5) == fmpq(3, 5)
 
    @test fmpq(3, 5) != y + 1
+
+   @test (3//5) != y + 1
+
+   @test BigInt(3)//BigInt(5) != y + 1
 
    println("PASS")
 end
@@ -300,6 +362,10 @@ function test_fmpq_poly_adhoc_exact_division()
 
    @test divexact(fmpz(12)//7*f, fmpz(12)//7) == f
 
+   @test divexact(fmpz(12)//7*f, (12//7)) == f
+
+   @test divexact(fmpz(12)//7*f, BigInt(12)//BigInt(7)) == f
+
    println("PASS")
 end
 
@@ -350,6 +416,12 @@ function test_fmpq_poly_evaluation()
 
    @test evaluate(g, fmpz(3)) == 63
 
+   @test evaluate(g, fmpq(3, 1)) == 63
+
+   @test evaluate(g, 3//1) == 63
+
+   @test evaluate(g, BigInt(3)//BigInt(1)) == 63
+
    @test evaluate(g, f) == fmpz(1503)//49
 
 if VERSION >= v"0.5.0-dev+3171"
@@ -357,6 +429,12 @@ if VERSION >= v"0.5.0-dev+3171"
    @test g(3) == 63
 
    @test g(fmpz(3)) == 63
+
+   @test g(fmpq(3, 1)) == 63
+
+   @test g(3//1) == 63
+
+   @test g(BigInt(3)//BigInt(1)) == 63
 
    @test g(f) == fmpz(1503)//49
 end
@@ -489,6 +567,32 @@ function test_fmpq_poly_Polynomials()
    println("PASS")
 end
 
+function test_fmpq_poly_remove_valuation()
+   print("fmpq_poly.remove_valuation()...")
+
+   S, y = PolynomialRing(FlintQQ, "y")
+
+   f = 7y^2 + 3y + 2
+   g = f^5*(11y^3 - 2y^2 + 5)
+
+   v, h = remove(g, f)
+
+   @test valuation(g, f) == 5
+   @test v == 5
+   @test h == (11y^3 - 2y^2 + 5)
+
+   v, q = divides(f*g, f)
+
+   @test v
+   @test q == g
+
+   v, q = divides(f*g + 1, f)
+
+   @test !v
+
+   println("PASS")
+end
+
 function test_fmpq_poly()
    test_fmpq_poly_constructors()
    test_fmpq_poly_printing()
@@ -518,6 +622,7 @@ function test_fmpq_poly()
    test_fmpq_poly_signature()
    test_fmpq_poly_special()
    test_fmpq_poly_Polynomials()
+   test_fmpq_poly_remove_valuation()
 
    println("")
 end

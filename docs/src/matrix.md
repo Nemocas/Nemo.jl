@@ -596,8 +596,8 @@ rref{T <: FieldElem}(::MatElem{T})
 ```
 
 ```@docs
-is_rref{T <: RingElem}(::MatElem{T})
-is_rref{T <: FieldElem}(::MatElem{T})
+isrref{T <: RingElem}(::MatElem{T})
+isrref{T <: FieldElem}(::MatElem{T})
 ```
 
 Here are some examples of computing reduced row echelon form.
@@ -610,7 +610,7 @@ S = MatrixSpace(K, 3, 3)
 M = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
    
 r, d, A = rref(M)
-is_rref(A)
+isrref(A)
 
 R, x = PolynomialRing(ZZ, "x")
 S = MatrixSpace(R, 3, 3)
@@ -619,7 +619,7 @@ U = MatrixSpace(R, 3, 2)
 M = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
 
 r, A = rref(M)
-is_rref(A)
+isrref(A)
 ```
 
 ## Determinant
@@ -811,7 +811,7 @@ hessenberg{T <: RingElem}(::MatElem{T})
 ```
 
 ```@docs
-is_hessenberg{T <: RingElem}(::MatElem{T})
+ishessenberg{T <: RingElem}(::MatElem{T})
 ```
 
 Here are some examples of computing the Hessenberg form.
@@ -824,7 +824,7 @@ M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
        R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
    
 A = hessenberg(M)
-is_hessenberg(A) == true
+ishessenberg(A) == true
 ```
 
 ## Characteristic polynomial
@@ -926,7 +926,7 @@ hadamard(::FmpzMatSpace)
 ```
 
 ```@docs
-is_hadamard(::fmpz_mat)
+ishadamard(::fmpz_mat)
 ```
 
 ```@docs
@@ -940,7 +940,7 @@ R = MatrixSpace(ZZ, 3, 3)
 S = MatrixSpace(QQ, 3, 3)
 
 A = hadamard(R)
-is_hadamard(A)
+ishadamard(A)
 B = hilbert(R)
 ```
 
@@ -963,7 +963,7 @@ hnf_modular_eldiv(::fmpz_mat, ::fmpz)
 ```
 
 ```@docs
-is_hnf(::fmpz_mat)
+ishnf(::fmpz_mat)
 ```
 
 Here are some examples of computing the Hermite Normal Form.
@@ -977,7 +977,7 @@ B = hnf(A)
 H, T = hnf_with_transform(A)
 M = hnf_modular(A, fmpz(27))
 N = hnf_modular_eldiv(A, fmpz(27))
-is_hnf(M)
+ishnf(M)
 ```
 
 ## Lattice basis reduction
@@ -1045,7 +1045,7 @@ snf_diagonal(::fmpz_mat)
 ```
 
 ```@docs
-is_snf(::fmpz_mat)
+issnf(::fmpz_mat)
 ```
 
 Here are some examples of computing the Smith Normal Form.
@@ -1056,7 +1056,7 @@ S = MatrixSpace(ZZ, 3, 3)
 A = S([fmpz(2) 3 5; 1 4 7; 19 3 7])
    
 B = snf(A)
-is_snf(B) == true
+issnf(B) == true
 
 B = S([fmpz(2) 0 0; 0 4 0; 0 0 7])
 

@@ -231,7 +231,7 @@ end
 
 needs_parentheses(::Nemo.nf_elem) = true
 
-is_negative(::nf_elem) = false
+isnegative(::nf_elem) = false
 
 ###############################################################################
 #
@@ -555,6 +555,23 @@ divexact(a::fmpq, b::nf_elem) = inv(b)*a
 
 ###############################################################################
 #
+#   Removal and valuation
+#
+###############################################################################
+
+doc"""
+    divides(f::nf_elem, g::nf_elem)
+> Returns a pair consisting of a flag which is set to `true` if $g$ divides
+> $f$ and `false` otherwise, and a number field element $h$ such that $f = gh$
+> if such exists. If not, the value of $h$ is undetermined.
+"""
+function divides(a::nf_elem, b::nf_elem)
+   b == 0 && throw(DivideError())
+   return true, divexact(a, b)
+end
+
+###############################################################################
+#
 #   Norm and trace
 #
 ###############################################################################
@@ -650,7 +667,7 @@ end
 function add!(c::nf_elem, a::nf_elem, b::Int)
    ccall((:nf_elem_add_si, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Int, Ptr{AnticNumberField}),
-         &c, &a, &b, &a.parent)
+         &c, &a, b, &a.parent)
 end
 
 add!(c::nf_elem, a::nf_elem, b::Integer) = add!(c, a, fmpz(b))
@@ -670,7 +687,7 @@ end
 function sub!(c::nf_elem, a::nf_elem, b::Int)
    ccall((:nf_elem_sub_si, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Int, Ptr{AnticNumberField}),
-         &c, &a, &b, &a.parent)
+         &c, &a, b, &a.parent)
 end
 
 sub!(c::nf_elem, a::nf_elem, b::Integer) = sub!(c, a, fmpz(b))
@@ -690,7 +707,7 @@ end
 function sub!(c::nf_elem, a::Int, b::nf_elem)
    ccall((:nf_elem_si_sub, :libflint), Void,
          (Ptr{nf_elem}, Int, Ptr{nf_elem}, Ptr{AnticNumberField}),
-         &c, &a, &b, &a.parent)
+         &c, a, &b, &b.parent)
 end
 
 sub!(c::nf_elem, a::Integer, b::nf_elem) = sub!(c, fmpz(a), b)
@@ -931,9 +948,9 @@ doc"""
 > The supplied string `s` specifies how the generator of the number field
 > should be printed.
 """
-function AnticNumberField(f::fmpq_poly, s::AbstractString)
+function AnticNumberField(f::fmpq_poly, s::AbstractString; cached = true)
    S = Symbol(s)
-   parent_obj = AnticNumberField(f, S)
+   parent_obj = AnticNumberField(f, S, cached)
 
    return parent_obj, gen(parent_obj)
 end
@@ -947,11 +964,11 @@ doc"""
 > from which the number field is constructed, should be printed. If it is not
 > supplied, a default dollar sign will be used to represent the variable.
 """
-function AnticCyclotomicField(n::Int, s::AbstractString, t = "\$")
-   Zx, x = PolynomialRing(FlintZZ, string(gensym()))
-   Qx, = PolynomialRing(FlintQQ, t)
+function AnticCyclotomicField(n::Int, s::AbstractString, t = "\$"; cached = true)
+   Zx, x = PolynomialRing(FlintZZ, string(gensym()); cached = cached)
+   Qx, = PolynomialRing(FlintQQ, t; cached = cached)
    f = cyclotomic(n, x)
-   return AnticNumberField(Qx(f), s)
+   return AnticNumberField(Qx(f), s; cached = cached)
 end
 
 doc"""
@@ -964,9 +981,9 @@ doc"""
 > constructed, should be printed. If it is not supplied, a default dollar sign
 > will be used to represent the variable.
 """
-function AnticMaximalRealSubfield(n::Int, s::AbstractString, t = "\$")
-   Zx, x = PolynomialRing(FlintZZ, string(gensym()))
-   Qx, = PolynomialRing(FlintQQ, t)
+function AnticMaximalRealSubfield(n::Int, s::AbstractString, t = "\$"; cached = true)
+   Zx, x = PolynomialRing(FlintZZ, string(gensym()); cached = cached)
+   Qx, = PolynomialRing(FlintQQ, t; cached = cached)
    f = cos_minpoly(n, x)
-   return AnticNumberField(Qx(f), s)
+   return AnticNumberField(Qx(f), s; cached = cached)
 end

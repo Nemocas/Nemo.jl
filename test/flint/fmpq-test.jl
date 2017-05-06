@@ -145,6 +145,34 @@ function test_fmpq_adhoc_binary()
 
    @test fmpz(3)*a == -2
 
+   @test fmpq(1, 2) + 1//2 == 1
+
+   @test 1//2 + fmpq(1, 2) == 1
+
+   @test BigInt(1)//BigInt(2) + fmpq(1, 2) == 1
+
+   @test fmpq(1, 2) + BigInt(1)//BigInt(2) == 1
+
+   @test fmpq(1, 2) - 1//2 == 0
+
+   @test 1//2 - fmpq(1, 2) == 0
+
+   @test BigInt(1)//BigInt(2) - fmpq(1, 2) == 0
+
+   @test fmpq(1, 2) - BigInt(1)//BigInt(2) == 0
+
+   @test fmpq(1, 2) * 1//2 == 1//4
+
+   @test 1//2 * fmpq(1, 2) == 1//4
+
+   @test BigInt(1)//BigInt(2) * fmpq(1, 2) == 1//4
+
+   @test fmpq(1, 2) * BigInt(1)//BigInt(2) == 1//4
+
+   @test fmpq(1, 2) // (BigInt(1)//BigInt(2)) == 1
+
+   @test fmpq(1, 2) // (1//2) == 1
+
    println("PASS")
 end
 
@@ -182,6 +210,14 @@ function test_fmpq_adhoc_comparison()
 
    @test fmpz(1) > a
 
+   @test a < 1//1
+
+   @test 1//1 > a
+
+   @test a < BigInt(1)//BigInt(1)
+
+   @test BigInt(1)//BigInt(1) > a
+
    @test a <= 0
 
    @test 0 >= a
@@ -189,6 +225,14 @@ function test_fmpq_adhoc_comparison()
    @test a <= fmpz(0)
 
    @test fmpz(0) >= a
+
+   @test a <= 0//1
+
+   @test 0//1 >= a
+
+   @test a <= BigInt(0)//BigInt(1)
+
+   @test BigInt(0)//BigInt(1) >= a
    
    @test a != 1
 
@@ -198,7 +242,19 @@ function test_fmpq_adhoc_comparison()
 
    @test fmpz(1) != a
 
+   @test a != 1//1
+
+   @test a != BigInt(1)//1
+
    @test a == fmpq(-2, 3)
+
+   @test fmpq(1, 2) == 1//2
+
+   @test 1//2 == fmpq(1, 2)
+
+   @test fmpq(1, 2) == BigInt(1)//BigInt(2)
+
+   @test BigInt(1)//BigInt(2) == fmpq(1, 2)
 
    println("PASS")
 end
@@ -259,7 +315,15 @@ function test_fmpq_adhoc_exact_division()
    @test divexact(3, a) == fmpz(-9)//2
    
    @test divexact(fmpz(3), a) == fmpz(-9)//2
+
+   @test divexact(a, 2//1) == -fmpz(2)//6
    
+   @test divexact(a, BigInt(2)//BigInt(1)) == -fmpz(2)//6
+
+   @test divexact(2//1, a) == -fmpz(6)//2
+
+   @test divexact(BigInt(2)//BigInt(1), a) == -fmpz(6)//2
+
    println("PASS")
 end
 
@@ -331,6 +395,17 @@ function test_fmpq_special_functions()
    println("PASS")
 end
 
+function test_fmpq_adhoc_remove_valuation()
+   print("fmpq.adhoc_remove_valuation()...")
+
+   a = fmpq(2, 3)
+
+   @test remove(a, 3) == (-1, fmpq(2, 1))
+   @test valuation(a, 3) == -1
+
+   println("PASS")
+end
+
 function test_fmpq()
    test_fmpq_constructors()
    test_fmpq_printing()
@@ -351,6 +426,7 @@ function test_fmpq()
    test_fmpq_rational_reconstruction()
    test_fmpq_rational_enumeration()
    test_fmpq_special_functions()
+   test_fmpq_adhoc_remove_valuation()
 
    println("")
 end

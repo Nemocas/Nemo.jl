@@ -162,6 +162,14 @@ function *{S, N}(a::fmpz_mpoly{S, N}, b::fmpz_mpoly{S, N})
    return z
 end
 
+function mul_array{S, N}(a::fmpz_mpoly{S, N}, b::fmpz_mpoly{S, N})
+   z = parent(a)()
+   ccall((:fmpz_mpoly_mul_array, :libflint), Void, 
+       (Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing}),
+       &z, &a, &b, &a.parent)
+   return z
+end
+
 ###############################################################################
 #
 #   Ad hoc arithmetic
@@ -287,6 +295,46 @@ end
 #
 ###############################################################################
 
+function divides_array{S, N}(a::fmpz_mpoly{S, N}, b::fmpz_mpoly{S, N})
+   z = parent(a)()
+   d = ccall((:fmpz_mpoly_divides_array, :libflint), Cint, 
+       (Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing}),
+       &z, &a, &b, &a.parent)
+   d == -1 && error("Polynomial too large for divides_array")
+   return d == 1, z
+end
+
+function divides_monagan_pearce{S, N}(a::fmpz_mpoly{S, N}, b::fmpz_mpoly{S, N})
+   z = parent(a)()
+   d = Bool(ccall((:fmpz_mpoly_divides_monagan_pearce, :libflint), Cint, 
+       (Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing}),
+       &z, &a, &b, &a.parent))
+   return d, z
+end
+
+###############################################################################
+#
+#   Division with remainder
+#
+###############################################################################
+
+function divrem_monagan_pearce{S, N}(a::fmpz_mpoly{S, N}, b::fmpz_mpoly{S, N})
+   q = parent(a)()
+   r = parent(a)()
+   ccall((:fmpz_mpoly_divrem_monagan_pearce, :libflint), Cint, 
+       (Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly},
+        Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing}),
+       &q, &r, &a, &b, &a.parent)
+   return q, r
+end
+
+
+###############################################################################
+#
+#   Ad hoc exact division
+#
+###############################################################################
+
 function divexact(a::fmpz_mpoly, b::Int)
    r = parent(a)()
    ccall((:fmpz_mpoly_scalar_divexact_si, :libflint), Void,
@@ -393,7 +441,7 @@ function PolynomialRing(R::FlintIntegerRing, s::Array{String, 1}; cached::Bool =
    N = (ordering == :deglex || ordering == :degrevlex) ? length(U) + 1 : length(U)
    # default to 8 bit exponent fields
    parent_obj = FmpzMPolyRing{ordering, N}(U, cached)
-   return tuple(parent_obj, gens(parent_obj)...)
+   return tuple(parent_obj, gens(parent_obj))
 end
 
 

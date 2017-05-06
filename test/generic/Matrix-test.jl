@@ -199,7 +199,11 @@ function test_gen_mat_constructors()
    m = S()
 
    @test isa(m, MatElem)
-
+   
+   @test_throws ErrorConstrDimMismatch S([t t^2 ; t^3 t^4])
+   @test_throws ErrorConstrDimMismatch S([t t^2 t^3 ; t^4 t^5 t^6 ; t^7 t^8 t^9 ; t t^2 t^3])
+   @test_throws ErrorConstrDimMismatch S([t, t^2])
+   @test_throws ErrorConstrDimMismatch S([t, t^2, t^3, t^4, t^5, t^6, t^7, t^8, t^9, t^10]) 
    println("PASS")
 end
 
@@ -705,7 +709,7 @@ function test_gen_mat_rref()
       r, d, A = rref(M)
 
       @test r == i
-      @test is_rref(A)
+      @test isrref(A)
    end
 
    S, z = PolynomialRing(ZZ, "z")
@@ -717,7 +721,7 @@ function test_gen_mat_rref()
       r, d, A = rref(M)
 
       @test r == i
-      @test is_rref(A)
+      @test isrref(A)
    end
 
    R, x = PolynomialRing(QQ, "x")
@@ -730,7 +734,7 @@ function test_gen_mat_rref()
       r, A = rref(M)
 
       @test r == i
-      @test is_rref(A)
+      @test isrref(A)
    end
 
    R, x = PolynomialRing(ZZ, "x")
@@ -743,7 +747,7 @@ function test_gen_mat_rref()
       r, d, A = rref(M)
 
       @test r == i
-      @test is_rref(A)
+      @test isrref(A)
    end
 
    println("PASS")   
@@ -879,7 +883,7 @@ function test_gen_mat_hessenberg()
 
          A = hessenberg(M)
 
-         @test is_hessenberg(A)
+         @test ishessenberg(A)
       end
    end
 
@@ -1056,6 +1060,23 @@ function test_gen_mat_minpoly()
    println("PASS")   
 end
 
+function test_gen_row_swapping()
+   print("GenMat.row_swapping...")
+
+   R, x = PolynomialRing(ZZ, "x")
+   M = MatrixSpace(R, 3, 2)
+
+   a = M(map(R, [1 2; 3 4; 5 6]))
+
+   @test swap_rows(a, 1, 3) == M(map(R, [5 6; 3 4; 1 2]))
+
+   swap_rows!(a, 2, 3)
+
+   @test a == M(map(R, [1 2; 5 6; 3 4]))
+
+   println("PASS")
+end
+
 function test_gen_concat()
    print("GenMat.concat...")
 
@@ -1104,6 +1125,7 @@ function test_gen_mat()
    test_gen_mat_hessenberg()
    test_gen_mat_charpoly()
    test_gen_mat_minpoly()
+   test_gen_row_swapping()
    test_gen_concat()
 
    println("")

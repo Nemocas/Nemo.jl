@@ -90,7 +90,7 @@ function show(io::IO, x::fmpz_mod_poly)
          c = coeff(x, len - i)
          bracket = needs_parentheses(c)
          if !iszero(c)
-            if i != 1 && !is_negative(c)
+            if i != 1 && !isnegative(c)
                print(io, "+")
             end
             if !isone(c) && (c != -1 || show_minus_one(typeof(c)))
@@ -116,7 +116,7 @@ function show(io::IO, x::fmpz_mod_poly)
       c = coeff(x, 0)
       bracket = needs_parentheses(c)
       if !iszero(c)
-         if len != 1 && !is_negative(c)
+         if len != 1 && !isnegative(c)
             print(io, "+")
          end
          if bracket
@@ -479,7 +479,18 @@ function rem(x::fmpz_mod_poly, y::fmpz_mod_poly)
   return r
 end
 
-mod(x::fmpz_mod_poly, y::fmpz_mod_poly) = rem(x,y)
+mod(x::fmpz_mod_poly, y::fmpz_mod_poly) = rem(x, y)
+
+################################################################################
+#
+#  Removal and valuation
+#
+################################################################################
+
+function divides(z::fmpz_mod_poly, x::fmpz_mod_poly)
+   q, r = divrem(z, x)
+   return r == 0, q
+end
 
 ################################################################################
 #
@@ -554,10 +565,20 @@ function mulmod(x::fmpz_mod_poly, y::fmpz_mod_poly, z::fmpz_mod_poly)
 end
 
 function powmod(x::fmpz_mod_poly, e::Int, y::fmpz_mod_poly)
-  e < 0 && error("Exponent must be positive")
+  check_parent(x, y)
   z = parent(x)()
+  
+  if e < 0
+    g, x = gcdinv(x, y)
+    if g != 1
+      error("Element not invertible")
+    end
+    e = -e
+  end
+
   ccall((:fmpz_mod_poly_powmod_ui_binexp, :libflint), Void,
-  (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Int, Ptr{fmpz_mod_poly}), &z, &x, e, &y)
+        (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Int, Ptr{fmpz_mod_poly}), &z, &x, e, &y)
+
   return z
 end
 
@@ -566,8 +587,16 @@ doc"""
 > Return $x^e \pmod{y}$.
 """
 function powmod(x::fmpz_mod_poly, e::fmpz, y::fmpz_mod_poly)
-  e < 0 && error("Exponent must be positive")
   z = parent(x)()
+  
+  if e < 0
+    g, x = gcdinv(x, y)
+    if g != 1
+      error("Element not invertible")
+    end
+    e = -e
+  end
+
   ccall((:fmpz_mod_poly_powmod_fmpz_binexp, :libflint), Void,
         (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz}, Ptr{fmpz_mod_poly}), 
             &z, &x, &e, &y)
@@ -909,6 +938,8 @@ function (R::FmpzModPolyRing)(arr::Array{GenRes{fmpz}, 1})
   z.parent = R
   return z
 end
+
+(R::FmpzModPolyRing){T <: Integer}(arr::Array{T, 1}) = R(map(base_ring(R), arr))
 
 function (R::FmpzModPolyRing)(x::fmpz_poly)
   z = fmpz_mod_poly(R.n, x)

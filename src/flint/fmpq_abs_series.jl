@@ -253,6 +253,18 @@ end
 
 *(x::fmpq_abs_series, y::fmpq) = y*x
 
+*(x::fmpq_abs_series, y::Integer) = x*fmpz(y)
+
+*(x::Integer, y::fmpq_abs_series) = fmpz(x)*y
+
+*(x::fmpq_abs_series, y::Rational) = x*fmpq(y)
+
+*(x::Rational, y::fmpq_abs_series) = fmpq(x)*y
+
++(x::fmpq_abs_series, y::Rational) = x + fmpq(y)
+
++(x::Rational, y::fmpq_abs_series) = fmpq(x) + y
+
 ###############################################################################
 #
 #   Shifting
@@ -373,6 +385,20 @@ end
 
 ###############################################################################
 #
+#   Ad hoc comparison
+#
+###############################################################################
+
+==(x::fmpq_abs_series, y::Rational) = x == fmpq(y)
+
+==(x::fmpq_abs_series, y::Integer) = x == fmpz(y)
+
+==(x::Rational, y::fmpq_abs_series) = y == x
+
+==(x::Integer, y::fmpq_abs_series) = y == x
+
+###############################################################################
+#
 #   Exact division
 #
 ###############################################################################
@@ -435,6 +461,8 @@ function divexact(x::fmpq_abs_series, y::fmpq)
 end
 
 divexact(x::fmpq_abs_series, y::Integer) = divexact(x, fmpz(y))
+
+divexact(x::fmpq_abs_series, y::Rational) = divexact(x, fmpq(y))
 
 ###############################################################################
 #
@@ -734,6 +762,8 @@ end
 
 Base.promote_rule{T <: Integer}(::Type{fmpq_abs_series}, ::Type{T}) = fmpq_abs_series
 
+Base.promote_rule{T <: Integer}(::Type{fmpq_abs_series}, ::Type{Rational{T}}) = fmpq_abs_series
+
 Base.promote_rule(::Type{fmpq_abs_series}, ::Type{fmpz}) = fmpq_abs_series
 
 Base.promote_rule(::Type{fmpq_abs_series}, ::Type{fmpq}) = fmpq_abs_series
@@ -784,6 +814,8 @@ function (a::FmpqAbsSeriesRing)(b::fmpq)
    return z
 end
 
+(a::FmpqAbsSeriesRing)(b::Rational) = a(fmpq(b))
+
 function (a::FmpqAbsSeriesRing)(b::fmpq_abs_series)
    parent(b) != a && error("Unable to coerce power series")
    return b
@@ -801,13 +833,13 @@ end
 #
 ###############################################################################
 
-function PowerSeriesRing(R::FlintRationalField, prec::Int, s::AbstractString; model=:capped_relative)
+function PowerSeriesRing(R::FlintRationalField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
    S = Symbol(s)
 
    if model == :capped_relative
-      parent_obj = FmpqRelSeriesRing(prec, S)
+      parent_obj = FmpqRelSeriesRing(prec, S, cached)
    elseif model == :capped_absolute
-      parent_obj = FmpqAbsSeriesRing(prec, S)
+      parent_obj = FmpqAbsSeriesRing(prec, S, cached)
    end
 
    return parent_obj, gen(parent_obj)

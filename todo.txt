@@ -1,3 +1,13 @@
+mpoly
+-----
+
+* setting coefficients to zero should result in a shift of coefficients
+
+* setting a coefficient beyond the end of a polynomial should throw
+
+* scalar multiplication and multiplication should remove any resulting
+zero terms when working over a residue ring
+
 Build
 -----
 
@@ -127,7 +137,7 @@ Fraction.jl
 nf.jl
 -----
 
-* fix needs_parentheses and is_negative
+* fix needs_parentheses and isnegative
 
 * find way of allowing NumberField to take a polynomial over Z instead of
   over Q, and yet allow all the coercions from that ring into number fields

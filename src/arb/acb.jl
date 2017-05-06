@@ -520,7 +520,7 @@ function isreal(x::acb)
    return Bool(ccall((:acb_is_real, :libarb), Cint, (Ptr{acb},), &x))
 end
 
-is_negative(x::acb) = isreal(x) && is_negative(real(x))
+isnegative(x::acb) = isreal(x) && isnegative(real(x))
 
 ################################################################################
 #

@@ -20,6 +20,12 @@ function test_fmpq_abs_series_constructors()
 
    @test isa(R(fmpq(2)), SeriesElem)
 
+   @test isa(R(BigInt(2)), SeriesElem)
+
+   @test isa(R(2//1), SeriesElem)
+
+   @test isa(R(BigInt(2)//1), SeriesElem)
+
    @test isa(R(), SeriesElem)
 
    println("PASS")
@@ -69,7 +75,7 @@ function test_fmpq_abs_series_unary_ops()
    b = 1 + 2x + x^2 + O(x^3)
 
    @test -a == -2x - x^3
-   
+
    @test -b == -1 - 2x - x^2 + O(x^3)
 
    println("PASS")
@@ -108,17 +114,57 @@ function test_fmpq_abs_series_adhoc_binary_ops()
    c = 1 + x + 3x^2 + O(x^5)
    d = x^2 + 3x^3 - x^4
 
+   @test a + 2 == 2x + x^3 + 2
+
+   @test 2 + a == 2x + x^3 + 2
+
+   @test a + BigInt(2) == 2x + x^3 + 2
+
+   @test BigInt(2) + a == 2x + x^3 + 2
+
+   @test a + fmpq(2) == 2x + x^3 + 2
+
+   @test fmpq(2) + a == 2x + x^3 + 2
+
+   @test a + fmpz(2) == 2x + x^3 + 2
+
+   @test fmpz(2) + a == 2x + x^3 + 2
+
+   @test a + 2//1 == 2x + x^3 + 2
+
+   @test 2//1 + a == 2x + x^3 + 2
+
+   @test a + BigInt(2)//1 == 2x + x^3 + 2
+
+   @test BigInt(2)//1 + a == 2x + x^3 + 2
+
    @test 2a == 4x + 2x^3
+
+   @test a*2 == 4x + 2x^3
 
    @test ZZ(3)*b == O(x^4)
 
+   @test b*ZZ(3) == O(x^4)
+
+   @test 2c == 2 + 2*x + 6*x^2 + O(x^5)
+
    @test c*2 == 2 + 2*x + 6*x^2 + O(x^5)
+
+   @test ZZ(3)*d == 3x^2 + 9x^3 - 3x^4
 
    @test d*ZZ(3) == 3x^2 + 9x^3 - 3x^4
 
    @test c*fmpq(2, 3) == 2*x^2 + fmpz(2)//3*x + fmpz(2)//3+O(x^5)
 
    @test fmpq(2, 3)*c == 2*x^2 + fmpz(2)//3*x + fmpz(2)//3+O(x^5)
+
+   @test c*(2//3) == 2*x^2 + fmpz(2)//3*x + fmpz(2)//3+O(x^5)
+
+   @test (2//3)*c == 2*x^2 + fmpz(2)//3*x + fmpz(2)//3+O(x^5)
+
+   @test c*(BigInt(2)//3) == 2*x^2 + fmpz(2)//3*x + fmpz(2)//3+O(x^5)
+
+   @test (BigInt(2)//3)*c == 2*x^2 + fmpz(2)//3*x + fmpz(2)//3+O(x^5)
 
    println("PASS")
 end
@@ -153,6 +199,22 @@ function test_fmpq_abs_series_adhoc_comparison()
    d = R(3)
 
    @test d == 3
+   @test 3 == d
+
+   @test d == BigInt(3)
+   @test BigInt(3) == d
+
+   @test d == fmpz(3)
+   @test fmpz(3) == d
+
+   @test d == fmpq(3)
+   @test fmpq(3) == d
+
+   @test d == 3//1
+   @test 3//1 == d
+
+   @test d == BigInt(3)//1
+   @test BigInt(3)//1 == d
 
    @test c == ZZ(1)
 
@@ -253,13 +315,15 @@ function test_fmpq_abs_series_adhoc_exact_division()
    print("fmpq_abs_series.adhoc_exact_division...")
 
    R, x = PolynomialRing(QQ, "x", model=:capped_absolute)
-   
+
    a = x + x^3
    b = O(x^4)
    c = 1 + x + 2x^2 + O(x^5)
    d = x + x^3 + O(x^6)
 
    @test isequal(divexact(7a, 7), a)
+
+   @test isequal(divexact(7a, BigInt(7)), a)
 
    @test isequal(divexact(11b, fmpz(11)), b)
 
@@ -268,6 +332,10 @@ function test_fmpq_abs_series_adhoc_exact_division()
    @test isequal(divexact(9d, 9), d)
 
    @test isequal(divexact(94872394861923874346987123694871329847a, 94872394861923874346987123694871329847), a)
+
+   @test isequal(divexact(9d, 9//1), d)
+
+   @test isequal(divexact(9d, BigInt(9)//1), d)
 
    println("PASS")
 end
@@ -289,7 +357,7 @@ end
 
 function test_fmpq_abs_series_special()
    print("fmpq_abs_series.special...")
- 
+
    R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
 
    a = 1 + x + 3x^2 + O(x^5)

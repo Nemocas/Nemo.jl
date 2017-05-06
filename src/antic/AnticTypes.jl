@@ -31,18 +31,20 @@ type AnticNumberField <: Field
    S::Symbol
    auxilliary_data::Array{Any, 1}
 
-   function AnticNumberField(pol::fmpq_poly, s::Symbol)
+   function AnticNumberField(pol::fmpq_poly, s::Symbol, cached=true)
       if haskey(AnticNumberFieldID, (parent(pol), pol, s))
          return AnticNumberFieldID[parent(pol), pol, s]::AnticNumberField
       else
          nf = new()
-         AnticNumberFieldID[parent(pol), pol, s] = nf
          nf.pol = pol
          ccall((:nf_init, :libflint), Void, 
             (Ptr{AnticNumberField}, Ptr{fmpq_poly}), &nf, &pol)
          finalizer(nf, _AnticNumberField_clear_fn)
          nf.S = s
          nf.auxilliary_data = Array{Any}(5)
+         if cached
+            AnticNumberFieldID[parent(pol), pol, s] = nf
+         end
          return nf
       end
    end

@@ -295,6 +295,23 @@ function test_nf_elem_adhoc_exact_division()
    println("PASS")
 end
 
+function test_nf_elem_divides()
+   print("nf_elem.divides...")
+ 
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+
+   c = 3a^2 - a + 1
+   d = a^2 + 2a - 7
+
+   flag, q = divides(c, d)
+
+   @test flag
+   @test q == divexact(c, d)
+
+   println("PASS")
+end
+
 function test_nf_elem_norm_trace()
    print("nf_elem.norm_trace...")
  
@@ -343,6 +360,7 @@ function test_nf_elem()
    test_nf_elem_inversion()
    test_nf_elem_exact_division()
    test_nf_elem_adhoc_exact_division()
+   test_nf_elem_divides()
    test_nf_elem_norm_trace()
    test_nf_elem_Polynomials()
 

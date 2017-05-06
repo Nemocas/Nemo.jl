@@ -171,7 +171,7 @@ end
 
 needs_parentheses(x::FracElem) = den(x) == 1 && needs_parentheses(num(x))
 
-is_negative(x::FracElem) = !needs_parentheses(num(x)) && is_negative(num(x))
+isnegative(x::FracElem) = !needs_parentheses(num(x)) && isnegative(num(x))
 
 show_minus_one{T <: RingElem}(::Type{FracElem{T}}) = show_minus_one(T)
 
@@ -670,6 +670,33 @@ function gcd{T <: RingElem}(a::FracElem{T}, b::FracElem{T})
    return parent(a)(divexact(n, g), divexact(d, g))
 end
 
+################################################################################
+#
+#   Remove and valuation
+#
+################################################################################
+
+doc"""
+    remove{T <: RingElem}(z::FracElem{T}, p::T)
+> Return the tuple $n, x$ such that $z = p^nx$ where $x$ has valuation $0$ at
+> $p$.
+"""
+function remove{T <: RingElem}(z::FracElem{T}, p::T)
+   z == 0 && error("Not yet implemented")
+   v, d = remove(den(z), p)
+   w, n = remove(num(z), p)
+   return w-v, n//d
+end 
+
+doc"""
+    valuation{T <: RingElem}(z::FracElem{T}, p::T)
+> Return the valuation of $z$ at $p$.
+"""
+function valuation{T <: RingElem}(z::FracElem{T}, p::T)
+   v, _ = remove(z, p)
+   return v
+end
+  
 ###############################################################################
 #
 #   Unsafe operators and functions

@@ -44,6 +44,11 @@ function test_arb_mat_constructors()
 
    @test isa(r, MatElem)
 
+   @test_throws ErrorConstrDimMismatch S([1 2])
+   @test_throws ErrorConstrDimMismatch S([1, 2])
+   @test_throws ErrorConstrDimMismatch S([1 2 3; 4 5 6; 7 8 9; 10 11 12])
+   @test_throws ErrorConstrDimMismatch S([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
    println("PASS")
 end
 

@@ -46,6 +46,14 @@ function test_gen_poly_constructors()
 
    @test isa(l, PolyElem)
 
+   m = S([1, 2, 3])
+
+   @test isa(m, PolyElem)
+
+   n = S([ZZ(1), ZZ(2), ZZ(3)])
+
+   @test isa(n, PolyElem)
+
    println("PASS")
 end
 
@@ -67,6 +75,8 @@ function test_gen_poly_manipulation()
 
    @test lead(f) == 2x
 
+   @test trail(2x*y + x^2) == x^2
+
    @test degree(f) == 1
 
    h = x*y^2 + (x + 1)*y + 3
@@ -78,6 +88,10 @@ function test_gen_poly_manipulation()
    @test canonical_unit(-x*y + x + 1) == -1
 
    @test deepcopy(h) == h
+
+   @test ismonomial(2*x*y^2)
+
+   @test !ismonomial(2*x*y^2 + y + 1)
 
    println("PASS")
 end
@@ -513,6 +527,34 @@ function test_gen_poly_mul_ks()
    println("PASS")
 end
 
+function test_gen_poly_remove_valuation()
+   print("GenPoly.remove_valuation...")
+
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3-2, "a");
+   S, y = PolynomialRing(K, "y")
+
+   f = 3a*y^2 + (a + 1)*y + 3
+   g = 6(a + 1)*y + (a^3 + 2x + 2)
+
+   v, q = remove(f^3*g^4, g)
+
+   @test valuation(f^3*g^4, g) == 4
+   @test q == f^3
+   @test v == 4
+
+   v, q = divides(f*g, f)
+
+   @test v
+   @test q == g
+
+   v, q = divides(f*g + 1, f)
+
+   @test !v
+   
+   println("PASS")
+end
+
 function test_gen_poly_generic_eval()
    print("GenPoly.generic_eval...")
 
@@ -570,9 +612,11 @@ function test_gen_poly()
    test_gen_poly_special()
    test_gen_poly_mul_karatsuba()
    test_gen_poly_mul_ks()
-if VERSION >= v"0.5.0-dev+3171"
-   test_gen_poly_generic_eval()
-end
+   if VERSION >= v"0.5.0-dev+3171"
+      test_gen_poly_generic_eval()
+   end
+   test_gen_poly_remove_valuation()
+   
 
    println("")
 end

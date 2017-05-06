@@ -140,7 +140,7 @@ end
 
 needs_parentheses(x::ResElem) = needs_parentheses(data(x))
 
-is_negative(x::ResElem) = is_negative(data(x))
+isnegative(x::ResElem) = isnegative(data(x))
 
 show_minus_one{T <: RingElem}(::Type{GenRes{T}}) = true
 

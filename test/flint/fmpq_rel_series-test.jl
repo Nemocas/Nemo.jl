@@ -12,13 +12,25 @@ function test_fmpq_rel_series_constructors()
 
    @test isa(R([fmpz(1), fmpz(2), fmpq(3)], 3, 5, 0), SeriesElem)
 
-   @test isa(R([fmpq(1), fmpq(2), fmpq(3)], 3, 3, 0), SeriesElem)
+   @test isa(R([fmpz(1), 2, 3], 3, 3, 0), SeriesElem)
+
+   @test isa(R([BigInt(1), 2, 3], 3, 3, 0), SeriesElem)
+
+   @test isa(R([1//1, 2, 3], 3, 3, 0), SeriesElem)
+
+   @test isa(R([BigInt(1)//1, 2, 3], 3, 3, 0), SeriesElem)
 
    @test isa(R(1), SeriesElem)
 
    @test isa(R(fmpz(2)), SeriesElem)
 
+   @test isa(R(BigInt(2)), SeriesElem)
+
    @test isa(R(fmpq(2)), SeriesElem)
+
+   @test isa(R(2//1), SeriesElem)
+
+   @test isa(R(BigInt(2)//1), SeriesElem)
 
    @test isa(R(), SeriesElem)
 
@@ -226,13 +238,24 @@ function test_fmpq_rel_series_adhoc_binary_ops()
    c = 1 + x + 3x^2 + O(x^5)
    d = x^2 + 3x^3 - x^4
 
-   @test 2a == 4x + 2x^3
+   for T in [Int, BigInt, Rational{Int}, Rational{BigInt}, fmpz, fmpq]
+      @test T(2) + a == 2x + x^3 + 2
+      @test a + T(2) == 2x + x^3 + 2
+   end
+
+   for T in [Int, BigInt, Rational{Int}, Rational{BigInt}, fmpz, fmpq]
+     @test T(2) * a == 4x + 2x^3
+     @test a * T(2) == 4x + 2x^3
+   end
 
    @test ZZ(3)*b == O(x^4)
 
    @test c*2 == 2 + 2*x + 6*x^2 + O(x^5)
 
-   @test d*ZZ(3) == 3x^2 + 9x^3 - 3x^4
+   for T in [Int, BigInt, Rational{Int}, Rational{BigInt}, fmpz, fmpq]
+     @test d * T(3) == 3x^2 + 9x^3 - 3x^4
+     @test T(3) * d== 3x^2 + 9x^3 - 3x^4
+   end
 
    @test c*fmpq(2, 3) == 2*x^2 + fmpz(2)//3*x + fmpz(2)//3+O(x^5)
 
@@ -270,15 +293,18 @@ function test_fmpq_rel_series_adhoc_comparison()
    c = 1 + O(x^5)
    d = R(3)
 
-   @test d == 3
+   
+   for T in [Int, BigInt, Rational{Int}, Rational{BigInt}, fmpz, fmpq]
+      @test d == T(3)
 
-   @test c == ZZ(1)
+      @test c == T(1)
 
-   @test ZZ(0) != a
+      @test T(0) != a
 
-   @test 2 == b
+      @test T(2) == b
 
-   @test ZZ(1) == c
+      @test T(1) == c
+   end
 
    println("PASS")
 end
@@ -377,13 +403,15 @@ function test_fmpq_rel_series_adhoc_exact_division()
    c = 1 + x + 2x^2 + O(x^5)
    d = x + x^3 + O(x^6)
 
-   @test isequal(divexact(7a, 7), a)
+   for T in [Int, BigInt, Rational{Int}, Rational{BigInt}, fmpz, fmpq]
+      @test isequal(divexact(7a, T(7)), a)
 
-   @test isequal(divexact(11b, fmpz(11)), b)
+      @test isequal(divexact(11b, T(11)), b)
 
-   @test isequal(divexact(2c, fmpz(2)), c)
+      @test isequal(divexact(2c, T(2)), c)
 
-   @test isequal(divexact(9d, 9), d)
+      @test isequal(divexact(9d, T(9)), d)
+   end
 
    @test isequal(divexact(94872394861923874346987123694871329847a, 94872394861923874346987123694871329847), a)
 

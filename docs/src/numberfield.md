@@ -421,6 +421,24 @@ ZZ(4) == d
 ZZ(5)//7 != c
 ```
 
+## Divisibility
+
+```@docs
+divides(::nf_elem, ::nf_elem)
+```
+
+Here are some examples of divisibility testing.
+
+```
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+
+c = 3a^2 - a + 1
+d = a^2 + 2a - 7
+
+flag, q = divides(c*d, c)
+```
+
 ## Inversion
 
 ```@docs

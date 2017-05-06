@@ -902,6 +902,10 @@ function (a::AcbPolyRing)(b::Array{acb, 1})
    return z
 end
 
+(a::AcbPolyRing){T <: Integer}(b::Array{T, 1}) = a(map(base_ring(a), b))
+
+(a::AcbPolyRing)(b::Array{fmpz, 1}) = a(map(base_ring(a), b))
+
 function (a::AcbPolyRing)(b::fmpz_poly)
    z = acb_poly(b, a.base_ring.prec)
    z.parent = a
@@ -932,9 +936,9 @@ end
 #
 ################################################################################
 
-function PolynomialRing(R::AcbField, s::AbstractString)
+function PolynomialRing(R::AcbField, s::AbstractString; cached = true)
   S = Symbol(s)
-  parent_obj = AcbPolyRing(R, S)
+  parent_obj = AcbPolyRing(R, S, cached)
   return parent_obj, parent_obj(fmpz_poly([fmpz(0), fmpz(1)]))
 end
 

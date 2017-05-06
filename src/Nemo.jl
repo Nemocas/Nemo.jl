@@ -34,11 +34,9 @@ export create_accessors, get_handle, package_handle, zeros,
 
 export flint_cleanup, flint_set_num_threads
 
-export error_dim_negative
+export error_dim_negative, ErrorConstrDimMismatch
 
 export is_windows64
-
-export test_module
 
 if VERSION >= v"0.6.0-dev.2024" # julia started exporting iszero (again?)
    import Base: iszero
@@ -122,6 +120,51 @@ end
 
 ###############################################################################
 #
+#  Version information
+#
+################################################################################
+
+function versioninfo()
+  print("Nemo version 0.6.0 \n")
+  nemorepo = Pkg.dir("Nemo")
+
+  print("Nemo: ")
+  prepo = Base.LibGit2.GitRepo(nemorepo)
+  Base.LibGit2.with(LibGit2.head(prepo)) do phead
+    print("commit: ")
+    print(string(LibGit2.Oid(phead))[1:8])
+    print(" date: ")
+    commit = Base.LibGit2.get(Base.LibGit2.GitCommit, prepo, LibGit2.Oid(phead))
+    print(Base.Dates.unix2datetime(Base.LibGit2.author(commit).time))
+    print(")\n")
+  end
+
+  finalize(prepo)
+
+  for deps in ["flint2", "arb", "antic"]
+    if ispath(joinpath(nemorepo, "deps", deps))
+      print("$deps: ")
+      repo = joinpath(nemorepo, "deps", deps)
+
+      prepo = Base.LibGit2.GitRepo(repo)
+
+      Base.LibGit2.with(LibGit2.head(prepo)) do phead
+        print("commit: ")
+        print(string(LibGit2.Oid(phead))[1:8])
+        print(" date: ")
+        commit = Base.LibGit2.get(Base.LibGit2.GitCommit, prepo, LibGit2.Oid(phead))
+        print(Base.Dates.unix2datetime(Base.LibGit2.author(commit).time))
+        print(")\n")
+      end
+      finalize(prepo)
+    end
+  end
+
+  return nothing
+end
+
+###############################################################################
+#
 #   Load Nemo Rings/Fields/etc
 #
 ###############################################################################
@@ -163,7 +206,7 @@ function create_accessors(T, S, handle)
    end
    set = function(a, b)
       if handle > length(a.auxilliary_data)
-         resize(a.auxilliary_data, handle)
+         resize!(a.auxilliary_data, handle)
       end
       a.auxilliary_data[handle] = b
    end
@@ -255,6 +298,44 @@ MaximalRealSubfield = AnticMaximalRealSubfield
 #   Error objects
 #
 ###############################################################################
+
+type ErrorConstrDimMismatch <: Exception
+  expect_r::Int
+  expect_c::Int
+  get_r::Int
+  get_c::Int
+  get_l::Int
+
+  function ErrorConstrDimMismatch(er::Int, ec::Int, gr::Int, gc::Int)
+    e = new(er, ec, gr, gc, -1)
+    return e
+  end
+
+  function ErrorConstrDimMismatch(er::Int, ec::Int, gl::Int)
+    e = new(er, ec, -1, -1, gl)
+    return e
+  end
+
+  function ErrorConstrDimMismatch{T}(er::Int, ec::Int, a::Array{T, 2})
+    gr, gc = size(a)
+    return ErrorConstrDimMismatch(er, ec, gr, gc)
+  end
+
+  function ErrorConstrDimMismatch{T}(er::Int, ec::Int, a::Array{T, 1})
+    gl = length(a)
+    return ErrorConstrDimMismatch(er, ec, gl)
+  end
+end
+
+function Base.showerror(io::IO, e::ErrorConstrDimMismatch)
+  if e.get_l == -1
+    print(io, "Expected dimension $(e.expect_r) x $(e.expect_c), ")
+    print(io, "got $(e.get_r) x $(e.get_c)")
+  else
+    print(io, "Expected an array of length $(e.expect_r * e.expect_c), ")
+    print(io, "got $(e.get_l)")
+  end
+end
 
 const error_dim_negative = ErrorException("Dimensions must be non-negative")
 

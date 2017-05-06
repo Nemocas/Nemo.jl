@@ -50,6 +50,12 @@ function getindex(a::nmod_mat, i::Int, j::Int)
   return base_ring(a)(u)
 end
 
+#as above, but as a plain UInt
+function getindex_raw(a::nmod_mat, i::Int, j::Int)
+  return ccall((:nmod_mat_get_entry, :libflint), UInt,
+                 (Ptr{nmod_mat}, Int, Int), &a, i - 1, j - 1)
+end
+
 function setindex!(a::nmod_mat, u::UInt, i::Int, j::Int)
   _checkbounds(a, i, j)
   set_entry!(a, i, j, u)
@@ -226,6 +232,25 @@ function *(x::nmod_mat, y::nmod_mat)
   ccall((:nmod_mat_mul, :libflint), Void,
           (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &z, &x, &y)
   return z
+end
+
+
+################################################################################
+#
+#  Unsafe operations
+#
+################################################################################
+
+function mul!(a::nmod_mat, b::nmod_mat, c::nmod_mat)
+  ccall((:nmod_mat_mul, :libflint), Void, (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &a, &b, &c)
+end
+
+function add!(a::nmod_mat, b::nmod_mat, c::nmod_mat)
+  ccall((:nmod_mat_add, :libflint), Void, (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &a, &b, &c)
+end
+
+function zero!(a::nmod_mat)
+  ccall((:nmod_mat_zero, :libflint), Void, (Ptr{nmod_mat}, ), &a)
 end
 
 ################################################################################
@@ -660,8 +685,22 @@ function (a::NmodMatSpace)(arr::Array{BigInt, 2}, transpose::Bool = false)
   return z
 end
 
+function (a::NmodMatSpace)(arr::Array{BigInt, 1}, transpose::Bool = false)
+  _check_dim(a.rows, a.cols, arr)
+  z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
+  z.parent = a
+  return z
+end
+
 function (a::NmodMatSpace)(arr::Array{fmpz, 2}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr, transpose)
+  z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
+  z.parent = a
+  return z
+end
+
+function (a::NmodMatSpace)(arr::Array{fmpz, 1}, transpose::Bool = false)
+  _check_dim(a.rows, a.cols, arr)
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
   z.parent = a
   return z
@@ -674,43 +713,26 @@ function (a::NmodMatSpace)(arr::Array{Int, 2}, transpose::Bool = false)
   return z
 end
 
+function (a::NmodMatSpace)(arr::Array{Int, 1}, transpose::Bool = false)
+  _check_dim(a.rows, a.cols, arr)
+  z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
+  z.parent = a
+  return z
+end
+
 function (a::NmodMatSpace)(arr::Array{GenRes{fmpz}, 2}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr, transpose)
-  length(arr) == 0 && error("Array must be nonempty")
   (base_ring(a) != parent(arr[1])) && error("Elements must have same base ring")
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
   z.parent = a
   return z
 end
 
-function (a::NmodMatSpace)(arr::Array{Int, 1})
-  (length(arr) != a.cols * a.rows) &&
-          error("Array must be of length ", a.cols * a.rows)
-
-  arr = reshape(arr,a.cols,a.rows)
-  return a(arr, true)
-end
-
-function (a::NmodMatSpace)(arr::Array{BigInt, 1})
-  (length(arr) != a.cols * a.rows) &&
-          error("Array must be of length ", a.cols * a.rows)
-  arr = reshape(arr,a.cols,a.rows)
-  return a(arr, true)
-end
-
-function (a::NmodMatSpace)(arr::Array{fmpz, 1})
-  (length(arr) != a.cols * a.rows) &&
-          error("Array must be of length ", a.cols * a.rows)
-  arr = reshape(arr,a.cols,a.rows)
-  return a(arr, true)
-end
-
-function (a::NmodMatSpace)(arr::Array{GenRes{fmpz}, 1})
-  (length(arr) != a.cols * a.rows) &&
-          error("Array must be of length ", a.cols * a.rows)
-  z = nmod_mat(a.rows, a.cols, a.n, arr)
+function (a::NmodMatSpace)(arr::Array{GenRes{fmpz}, 1}, transpose::Bool = false)
+  _check_dim(a.rows, a.cols, arr)
+  (base_ring(a) != parent(arr[1])) && error("Elements must have same base ring")
+  z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
   z.parent = a
-
   return z
 end
 
@@ -727,12 +749,12 @@ end
 #
 ################################################################################
 
-function MatrixSpace(R::GenResRing{fmpz}, r::Int, c::Int)
+function MatrixSpace(R::GenResRing{fmpz}, r::Int, c::Int; cached = true)
   return try
-    NmodMatSpace(R, r, c)
+    NmodMatSpace(R, r, c, cached)
   catch
     T = elem_type(R)
-    return GenMatSpace{T}(R, r, c)
+    return GenMatSpace{T}(R, r, c, cached)
   end
 end
 

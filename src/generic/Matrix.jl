@@ -4,9 +4,9 @@
 #
 ###############################################################################
 
-export MatricSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, is_rref,
+export MatricSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, isrref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
-       is_hessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat,
+       ishessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat,
        powers, similarity!
 
 ###############################################################################
@@ -1269,11 +1269,11 @@ function rref{T <: FieldElem}(M::MatElem{T})
 end
 
 doc"""
-    is_rref{T <: RingElem}(M::MatElem{T})
+    isrref{T <: RingElem}(M::MatElem{T})
 > Return `true` if $M$ is in reduced row echelon form, otherwise return
 > `false`.
 """
-function is_rref{T <: RingElem}(M::MatElem{T})
+function isrref{T <: RingElem}(M::MatElem{T})
    m = rows(M)
    n = cols(M)
    c = 1
@@ -1298,11 +1298,11 @@ function is_rref{T <: RingElem}(M::MatElem{T})
 end
 
 doc"""
-    is_rref{T <: FieldElem}(M::MatElem{T})
+    isrref{T <: FieldElem}(M::MatElem{T})
 > Return `true` if $M$ is in reduced row echelon form, otherwise return
 > `false`.
 """
-function is_rref{T <: FieldElem}(M::MatElem{T})
+function isrref{T <: FieldElem}(M::MatElem{T})
    m = rows(M)
    n = cols(M)
    c = 1
@@ -2171,10 +2171,10 @@ function hessenberg{T <: RingElem}(A::MatElem{T})
 end
 
 doc"""
-    is_hessenberg{T <: RingElem}(A::MatElem{T})
+    ishessenberg{T <: RingElem}(A::MatElem{T})
 > Returns `true` if $M$ is in Hessenberg form, otherwise returns `false`.
 """
-function is_hessenberg{T <: RingElem}(A::MatElem{T})
+function ishessenberg{T <: RingElem}(A::MatElem{T})
    n = rows(A)
    for i = 3:n
       for j = 1:i - 2
@@ -2762,6 +2762,37 @@ end
 
 ###############################################################################
 #
+#   Row swapping
+#
+###############################################################################
+
+doc"""
+    swap_rows(a::MatElem, i::Int, j::Int)
+> Return a matrix $b$ with the entries of $a$, where the $i$th and $j$th 
+> row are swapped.
+"""
+function swap_rows(a::MatElem, i::Int, j::Int)
+   (1<=i<=rows(a) && 1<=j<=rows(a)) || throw(BoundsError())  
+   b = deepcopy(a)
+   swap_rows!(b, i, j)
+   return b
+end
+
+doc"""
+    swap_rows!(a::MatElem, i::Int, j::Int)
+> Swap the $i$th and $j$th row of $a$.
+"""
+function swap_rows!(a::MatElem, i::Int, j::Int)
+   (1<=i<=rows(a) && 1<=j<=rows(a)) || throw(BoundsError())
+   for k=1:cols(a)
+      x = a[i,k]
+      a[i,k] = a[j,k]
+      a[j,k] = x
+   end
+end
+
+###############################################################################
+#
 #   Concatenation
 #
 ###############################################################################
@@ -2922,9 +2953,39 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::Array{T, 2})
    if length(b) > 0
       parent(b[1, 1]) != base_ring(a) && error("Unable to coerce to matrix")
    end
+   _check_dim(a.rows, a.cols, b)
    z = GenMat{T}(b)
    z.parent = a
    return z
+end
+
+function (a::GenMatSpace{T}){T <: RingElem}(b::Array{T, 1})
+   if length(b) > 0
+      parent(b[1]) != base_ring(a) && error("Unable to coerce to matrix")
+   end
+   _check_dim(a.rows, a.cols, b)
+   b = reshape(b, a.rows, a.cols)'
+   z = GenMat{T}(b)
+   z.parent = a
+   return z
+end
+
+(a::GenMatSpace)(b::Array{fmpz, 2}) = a(map(base_ring(a), b))
+
+(a::GenMatSpace)(b::Array{fmpz, 1}) = a(map(base_ring(a), b))
+
+(a::GenMatSpace){T <: Integer}(b::Array{T, 2}) = a(map(base_ring(a), b))
+
+(a::GenMatSpace){T <: Integer}(b::Array{T, 1}) = a(map(base_ring(a), b))
+
+function Base.Matrix{T}(R::Ring, r::Int, c::Int, a::Array{T,2})
+   M = MatrixSpace(R, r, c)
+   return M(a)
+end
+
+function Base.Matrix{T}(R::Ring, r::Int, c::Int, a::Array{T,1})
+   M = MatrixSpace(R, r, c)
+   return M(a)
 end
 
 ###############################################################################

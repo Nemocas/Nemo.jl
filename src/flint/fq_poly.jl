@@ -372,7 +372,40 @@ function divrem(x::fq_poly, y::fq_poly)
    ccall((:fq_poly_divrem, :libflint), Void, (Ptr{fq_poly},
          Ptr{fq_poly}, Ptr{fq_poly}, Ptr{fq_poly},
          Ptr{FqFiniteField}), &z, &r, &x, &y, &base_ring(parent(x)))
-   return z,r
+   return z, r
+end
+
+################################################################################
+#
+#   Remove and valuation
+#
+################################################################################
+
+doc"""
+    remove(z::fq_poly, p::fq_poly)
+> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
+>
+> See also `valuation`, which only returns the valuation.
+"""
+function remove(z::fq_poly, p::fq_poly)
+   check_parent(z,p)
+   z == 0 && error("Not yet implemented")
+   z = deepcopy(z)
+   v = ccall((:fq_poly_remove, :libflint), Int,
+            (Ptr{fq_poly}, Ptr{fq_poly}, Ptr{FqFiniteField}),
+             &z,  &p, &base_ring(parent(z)))
+   return v, z
+end
+
+function divides(z::fq_poly, x::fq_poly)
+   check_parent(z, x)
+   q = parent(z)()
+   v = Bool(ccall((:fq_poly_divides, :libflint), Cint,
+            (Ptr{fq_poly}, Ptr{fq_poly},
+             Ptr{fq_poly}, Ptr{FqFiniteField}),
+             &q, &z, &x, &base_ring(parent(z))))
+   return v, q
 end
 
 ################################################################################
@@ -384,6 +417,15 @@ end
 function powmod(x::fq_poly, n::Int, y::fq_poly)
    check_parent(x,y)
    z = parent(x)()
+
+   if n < 0
+      g, x = gcdinv(x, y)
+      if g != 1
+         error("Element not invertible")
+      end
+      n = -n
+   end
+
    ccall((:fq_poly_powmod_ui_binexp, :libflint), Void,
          (Ptr{fq_poly}, Ptr{fq_poly}, Int, Ptr{fq_poly},
          Ptr{FqFiniteField}), &z, &x, n, &y, &base_ring(parent(x)))
@@ -684,9 +726,9 @@ end
 #
 ################################################################################
 
-function PolynomialRing(R::FqFiniteField, s::AbstractString)
+function PolynomialRing(R::FqFiniteField, s::AbstractString; cached = true)
    S = Symbol(s)
-   parent_obj = FqPolyRing(R, S)
+   parent_obj = FqPolyRing(R, S, cached)
    return parent_obj, parent_obj([R(0), R(1)])
 end
 

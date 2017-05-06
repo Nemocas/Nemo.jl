@@ -11,7 +11,7 @@ export NmodPolyRing, nmod_poly, parent, base_ring, elem_type, length, zero,
        isirreducible, issquarefree, factor, factor_squarefree,
        factor_distinct_deg, factor_shape, setcoeff!, canonical_unit,
        add!, sub!, mul!, call, PolynomialRing, check_parent, gcdx, mod,
-       invmod, gcdinv, mulmod, powmod, zero!, one!, valuation
+       invmod, gcdinv, mulmod, powmod, zero!, one!
 
 ################################################################################
 #
@@ -42,7 +42,7 @@ end
 #
 ################################################################################
 
-function lead_is_unit(a::nmod_poly)
+function lead_isunit(a::nmod_poly)
   d = degree(a)
   u = ccall((:nmod_poly_get_coeff_ui, :libflint), UInt, (Ptr{nmod_poly}, Int), &a, d)
   n = ccall((:n_gcd, :libflint), UInt, (UInt, UInt), u, modulus(a))
@@ -75,6 +75,11 @@ function coeff(x::nmod_poly, n::Int)
   n < 0 && throw(DomainError())
   return base_ring(x)(ccall((:nmod_poly_get_coeff_ui, :libflint), UInt,
           (Ptr{nmod_poly}, Int), &x, n))
+end
+
+function coeff_raw(x::nmod_poly, n::Int)
+  return ccall((:nmod_poly_get_coeff_ui, :libflint), UInt,
+                (Ptr{nmod_poly}, Int), &x, n)
 end
 
 zero(R::NmodPolyRing) = R(UInt(0))
@@ -400,7 +405,7 @@ end
 function divexact(x::nmod_poly, y::nmod_poly)
   check_parent(x, y)
   iszero(y) && throw(DivideError())
-  !lead_is_unit(y) && error("Impossible inverse in divexact")
+  !lead_isunit(y) && error("Impossible inverse in divexact")
   z = parent(x)()
   ccall((:nmod_poly_div, :libflint), Void, 
           (Ptr{nmod_poly}, Ptr{nmod_poly}, Ptr{nmod_poly}), &z, &x, &y)
@@ -436,7 +441,7 @@ end
 function divrem(x::nmod_poly, y::nmod_poly)
   check_parent(x,y)
   iszero(y) && throw(DivideError())
-  !lead_is_unit(y) && error("Impossible inverse in divrem")
+  !lead_isunit(y) && error("Impossible inverse in divrem")
   q = parent(x)()
   r = parent(x)()
   ccall((:nmod_poly_divrem, :libflint), Void,
@@ -454,7 +459,7 @@ end
 function rem(x::nmod_poly, y::nmod_poly)
   check_parent(x,y)
   iszero(y) && throw(DivideError()) 
-  !lead_is_unit(y) && error("Impossible inverse in rem")
+  !lead_isunit(y) && error("Impossible inverse in rem")
   z = parent(x)()
   ccall((:nmod_poly_rem, :libflint), Void,
           (Ptr{nmod_poly}, Ptr{nmod_poly}, Ptr{nmod_poly}), &z, &x, &y)
@@ -531,10 +536,19 @@ function mulmod(x::nmod_poly, y::nmod_poly, z::nmod_poly)
 end
 
 function powmod(x::nmod_poly, e::Int, y::nmod_poly)
-  e < 0 && error("Exponent must be positive")
+  check_parent(x,y)
   z = parent(x)()
+
+  if e < 0
+    g, x = gcdinv(x, y)
+    if g != 1
+      error("Element not invertible")
+    end
+    e = -e
+  end
+
   ccall((:nmod_poly_powmod_ui_binexp, :libflint), Void,
-  (Ptr{nmod_poly}, Ptr{nmod_poly}, Int, Ptr{nmod_poly}), &z, &x, e, &y)
+        (Ptr{nmod_poly}, Ptr{nmod_poly}, Int, Ptr{nmod_poly}), &z, &x, e, &y)
 
   return z
 end
@@ -545,10 +559,11 @@ end
 #
 ################################################################################
 
-function resultant(x::nmod_poly, y::nmod_poly)
-  check_parent(x,y)
-  !is_prime(modulus(x)) && error("Modulus not prime in resultant")
-  z = parent(x)()
+function resultant(x::nmod_poly, y::nmod_poly,  check::Bool = true)
+  if check
+    check_parent(x,y)
+    !is_prime(modulus(x)) && error("Modulus not prime in resultant")
+  end
   r = ccall((:nmod_poly_resultant, :libflint), UInt,
           (Ptr{nmod_poly}, Ptr{nmod_poly}), &x, &y)
   return base_ring(x)(r)
@@ -812,27 +827,29 @@ end
 
 ################################################################################
 #
-#    Valuation
-#
-################################################################################
-#CF TODO: use squaring for fast large valuation
+#   Remove and valuation
 #
 ################################################################################
 
-function valuation(z::nmod_poly, p::nmod_poly)
-  check_parent(z,p)
-  z == 0 && error("Not yet implemented")
-  v = 0
-  zz = z
-  z, r = divrem(zz, p)
+doc"""
+    remove(z::nmod_poly, p::nmod_poly)
+> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
+>
+> See also `valuation`, which only returns the valuation.
+"""
+function remove(z::nmod_poly, p::nmod_poly)
+   check_parent(z,p)
+   z == 0 && error("Not yet implemented")
+   z = deepcopy(z)
+   v = ccall((:nmod_poly_remove, :libflint), Int,
+               (Ptr{nmod_poly}, Ptr{nmod_poly}), &z,  &p)
+   return v, z
+end
 
-  while r == 0
-    zz = z
-    z, r = divrem(zz, p)
-    v += 1
-  end
-
-  return v, zz
+function divides(z::nmod_poly, x::nmod_poly)
+   q, r = divrem(z, x)
+   return r == 0, q
 end
 
 ################################################################################
@@ -996,6 +1013,8 @@ function (R::NmodPolyRing)(arr::Array{UInt, 1})
   z.parent = R
   return z
 end
+
+(R::NmodPolyRing){T <: Integer}(arr::Array{T, 1}) = R(map(base_ring(R), arr))
 
 function (R::NmodPolyRing)(arr::Array{GenRes{fmpz}, 1})
   if length(arr) > 0

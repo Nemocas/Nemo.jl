@@ -23,6 +23,10 @@ function test_fmpz_poly_constructors()
 
    @test isa(k, PolyElem)
 
+   l = R([1, 2, 3])
+
+   @test isa(l, PolyElem)
+
    println("PASS")
 end
 
@@ -259,6 +263,26 @@ function test_fmpz_poly_pseudodivision()
    println("PASS")
 end
 
+function test_fmpz_poly_remove_valuation()
+   print("fmpz_poly.remove_valuation...")
+
+   R, x = PolynomialRing(ZZ, "x")
+
+   f = x^2 + 2x + 1
+   g = x^3 + 3x + 1
+
+   v, q = divides(f*g, f)
+
+   @test v
+   @test q == g
+
+   v, q = divides(f*g + 1, f)
+
+   @test !v
+
+   println("PASS")
+end
+
 function test_fmpz_poly_content_primpart_gcd()
    print("fmpz_poly.content_primpart_gcd...")
 
@@ -466,6 +490,7 @@ function test_fmpz_poly()
    test_fmpz_poly_exact_division()
    test_fmpz_poly_adhoc_exact_division()
    test_fmpz_poly_pseudodivision()
+   test_fmpz_poly_remove_valuation()
    test_fmpz_poly_content_primpart_gcd()
    test_fmpz_poly_evaluation()
    test_fmpz_poly_composition()

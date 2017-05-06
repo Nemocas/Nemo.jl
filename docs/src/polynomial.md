@@ -315,6 +315,7 @@ modulus{T <: ResElem}(::PolyElem{T})
 
 ```@docs
 lead(::PolyElem)
+trail(::PolyElem)
 ```
 
 ```@docs
@@ -331,6 +332,10 @@ isgen(::PolyElem)
 
 ```@docs
 isunit(::PolyElem)
+```
+
+```@docs
+isonomial(::PolyElem)
 ```
 
 ```@docs
@@ -713,6 +718,14 @@ u, v = gcdinv(g, h)
 evaluate{T <: RingElem}(::PolyElem{T}, ::T)
 evaluate(::PolyElem, ::Integer)
 evaluate(::PolyElem, ::fmpz)
+```
+
+## Remove and valuation
+```@docs
+remove{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+valuation{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+divides{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+divides{T <: RingElem}(::PolyElem{T}, ::T)
 ```
 
 ```@docs

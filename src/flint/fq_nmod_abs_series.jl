@@ -221,7 +221,7 @@ function *(x::fq_nmod, y::fq_nmod_abs_series)
    z.prec = y.prec
    ccall((:fq_nmod_poly_scalar_mul_fq_nmod, :libflint), Void, 
          (Ptr{fq_nmod_abs_series}, Ptr{fq_nmod_abs_series}, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), 
-               &z, &y, &x, &base_ring(x))
+               &z, &y, &x, &parent(x))
    return z
 end
 
@@ -574,13 +574,13 @@ end
 #
 ###############################################################################
 
-function PowerSeriesRing(R::FqNmodFiniteField, prec::Int, s::AbstractString; model=:capped_relative)
+function PowerSeriesRing(R::FqNmodFiniteField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
    S = Symbol(s)
 
    if model == :capped_relative
-      parent_obj = FqNmodRelSeriesRing(R, prec, S)
+      parent_obj = FqNmodRelSeriesRing(R, prec, S, cached)
    elseif model == :capped_absolute
-      parent_obj = FqNmodAbsSeriesRing(R, prec, S)
+      parent_obj = FqNmodAbsSeriesRing(R, prec, S, cached)
    end
 
    return parent_obj, gen(parent_obj)

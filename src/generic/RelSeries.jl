@@ -233,7 +233,7 @@ function show{T <: RingElem}(io::IO, x::RelSeriesElem{T})
          c = polcoeff(x, i)
          bracket = needs_parentheses(c)
          if !iszero(c)
-            if coeff_printed && !is_negative(c)
+            if coeff_printed && !isnegative(c)
                print(io, "+")
             end
             if i + valuation(x) != 0
@@ -274,7 +274,7 @@ end
 
 needs_parentheses(x::SeriesElem) = pol_length(x) > 1
 
-is_negative(x::SeriesElem) = pol_length(x) <= 1 && is_negative(polcoeff(x, 0))
+isnegative(x::SeriesElem) = pol_length(x) <= 1 && isnegative(polcoeff(x, 0))
 
 show_minus_one{T <: RingElem}(::Type{SeriesElem{T}}) = show_minus_one(T)
 

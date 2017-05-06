@@ -52,6 +52,10 @@ function test_fq_nmod_poly_constructors()
 
    @test isa(p, PolyElem)
 
+   r = S([ZZ(1), ZZ(2), ZZ(3)])
+
+   @test isa(r, PolyElem)
+
    println("PASS")
 end
 
@@ -281,6 +285,8 @@ function test_fq_nmod_poly_modular_arithmetic()
    @test mulmod(f, g, h) == (15*x^4+11*x^3+15*x^2+5*x+2)*y^3+(5*x^4+8*x^3+8*x^2+6*x+1)*y^2+(5*x^3+4*x^2+5*x+2)*y+(x^3+x^2+x+1)
    
    @test powmod(f, 3, h) == (17*x^4+14*x^3+7*x^2+20*x+5)*y^3+(20*x^4+7*x^3+16*x^2+x+10)*y^2+(x^4+6*x^3+17*x^2+16*x+21)*y+(3*x^4+5*x+1)
+
+   @test powmod(f, -3, g) == (18*x^4+x^3+7*x^2+15*x+5)*y+(16*x^4+14*x^3+15*x^2+5*x+21)
    
    println("PASS")
 end
@@ -528,6 +534,34 @@ function test_fq_nmod_poly_factor()
    println("PASS")
 end
 
+function test_fq_nmod_poly_remove_valuation()
+   print("fq_nmod_poly.remove_valuation()...")
+
+   R, x = FiniteField(23, 5, "x")
+   S, y = PolynomialRing(R, "y")
+
+   f = 7y^2 + 3y + 2
+   g = f^5*(11y^3 - 2y^2 + 5)
+
+   v, h = remove(g, f)
+
+   @test valuation(g, f) == 5 
+   @test v == 5
+   @test h == (11y^3 - 2y^2 + 5)
+
+   v, q = divides(f*g, f)
+
+   @test v
+   @test q == g
+
+   v, q = divides(f*g + 1, f)
+
+   @test !v
+
+   println("PASS")
+end
+
+
 function test_fq_nmod_poly()
    test_fq_nmod_poly_constructors()
    test_fq_nmod_poly_printing()
@@ -557,6 +591,7 @@ function test_fq_nmod_poly()
    test_fq_nmod_poly_inflation_deflation()
    test_fq_nmod_poly_issquarefree()
    test_fq_nmod_poly_factor()
+   test_fq_nmod_poly_remove_valuation()
 
    println("")
 end

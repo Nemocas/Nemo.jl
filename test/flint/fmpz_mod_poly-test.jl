@@ -43,6 +43,10 @@ function test_fmpz_mod_poly_constructors()
 
    @test isa(q, PolyElem)
 
+   r = S([1, 2, 3])
+
+   @test isa(r, PolyElem)
+
    println("PASS")
 end
 
@@ -317,6 +321,10 @@ function test_fmpz_mod_poly_modular_arithmetic()
 
    @test powmod(f, fmpz(10), h) == 118470346535924950143*x^2+97790722831392543222*x+115967716915690326718
 
+   @test powmod(f, -10, g) == 78305338116088931412*x+91239060941924718463
+
+   @test powmod(f, -fmpz(10), g) == 78305338116088931412*x+91239060941924718463
+
    println("PASS")
 end
 
@@ -532,6 +540,35 @@ function test_fmpz_mod_poly_factor()
    println("PASS")
 end
 
+function test_fmpz_mod_poly_remove_valuation()
+   print("fmpz_mod_poly.remove_valuation()...")
+
+   R = ResidueRing(ZZ, 123456789012345678949)
+   S, y = PolynomialRing(R, "y")
+
+   f = 7y^2 + 3y + 2
+   g = f^5*(11y^3 - 2y^2 + 5)
+
+   v, h = remove(g, f)
+
+   @test valuation(g, f) == 5
+   @test v == 5
+   @test h == (11y^3 - 2y^2 + 5)
+
+   v, q = divides(f*g, f)
+
+   @test v
+   @test q == g
+
+   v, q = divides(f*g + 1, f)
+
+   @test !v
+
+   println("PASS")
+end
+
+
+
 function test_fmpz_mod_poly()
    test_fmpz_mod_poly_constructors()
    test_fmpz_mod_poly_printing()
@@ -560,6 +597,7 @@ function test_fmpz_mod_poly()
    test_fmpz_mod_poly_isirreducible()
    test_fmpz_mod_poly_issquarefree()
    test_fmpz_mod_poly_factor()
+   test_fmpz_mod_poly_remove_valuation()
 
    println("")
 end

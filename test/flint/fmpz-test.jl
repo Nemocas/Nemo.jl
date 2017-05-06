@@ -168,8 +168,27 @@ function test_fmpz_gcd_lcm()
 
    @test gcd(a, b) == 2
 
+   @test gcd(fmpz[]) == 1
+
+   @test gcd(fmpz[8]) == 8
+
+   @test gcd([fmpz(10), fmpz(2)]) == 2
+
+   @test gcd([fmpz(1), fmpz(2), fmpz(3)]) == 1
+
+   @test gcd([fmpz(9), fmpz(27), fmpz(3)]) == 3
+
    @test lcm(a, b) == 156
  
+   @test lcm(fmpz[]) == 1
+
+   @test lcm(fmpz[2]) == 2
+
+   @test lcm(fmpz[2, 3]) == 6
+
+   @test lcm(fmpz[2, 2, 2]) == 2
+
+   @test lcm(fmpz[2, 3, 2]) == 6
    println("PASS")
 end
 
@@ -526,6 +545,12 @@ function test_fmpz_number_theoretic()
    @test eulerphi(fmpz(12480)) == 3072
 
    @test remove(fmpz(12), fmpz(2)) == (2, 3)
+
+   @test valuation(fmpz(12), fmpz(2)) == 2
+
+   @test valuation(fmpz(12), 2) == 2
+
+   @test valuation(12, 2) == 2
 
    @test divisor_lenstra(fmpz(12), fmpz(4), fmpz(5)) == 4
 

@@ -626,31 +626,41 @@ end
 
 function (x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, arb, acb,
                          AbstractString}}(y::Array{T, 2})
-  (x.rows, x.cols) != size(y) && error("Dimensions are wrong")
+  _check_dim(x.rows, x.cols, y)
   z = acb_mat(x.rows, x.cols, y, prec(x))
   z.parent = x
   return z
 end
 
-(x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, arb, acb,
-                AbstractString}}(y::Array{T, 1}) = x(y'')
-
+function (x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, arb, acb,
+                         AbstractString}}(y::Array{T, 1})
+  _check_dim(x.rows, x.cols, y)
+  z = acb_mat(x.rows, x.cols, y, prec(x))
+  z.parent = x
+  return z
+end
 
 function (x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, arb,
                          AbstractString}}(y::Array{Tuple{T, T}, 2})
-  (x.rows, x.cols) != size(y) && error("Dimensions are wrong")
+  _check_dim(x.rows, x.cols, y)
   z = acb_mat(x.rows, x.cols, y, prec(x))
   z.parent = x
   return z
 end
 
-(x::AcbMatSpace){T <: Union{BigFloat, AbstractString, arb}}(y::Array{Tuple{T, T}, 1}) = x(y'')
+function (x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq}}(y::Array{Tuple{T, T}, 1})
+  _check_dim(x.rows, x.cols, y)
+  z = acb_mat(x.rows, x.cols, y, prec(x))
+  z.parent = x
+  return z
+end
 
-(x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq}}(y::Array{Tuple{T, T}, 1}) = x(y'')
-
-(x::ArbMatSpace){T <: Union{Int, UInt, fmpz, fmpq, Float64}}(y::Array{T, 1}) = x(y'')
-
-(x::ArbMatSpace){T <: Union{BigFloat, arb, acb, AbstractString}}(y::Array{T, 1}) = x(y'')
+function (x::AcbMatSpace){T <: Union{BigFloat, arb, AbstractString}}(y::Array{Tuple{T, T}, 1})
+  _check_dim(x.rows, x.cols, y)
+  z = acb_mat(x.rows, x.cols, y, prec(x))
+  z.parent = x
+  return z
+end
 
 function (x::AcbMatSpace)(y::Union{Int, UInt, fmpz, fmpq, Float64,
                           BigFloat, arb, acb, AbstractString})
@@ -697,7 +707,7 @@ Base.promote_rule(::Type{acb_mat}, ::Type{arb_mat}) = acb_mat
 #
 ###############################################################################
 
-function MatrixSpace(R::AcbField, r::Int, c::Int)
+function MatrixSpace(R::AcbField, r::Int, c::Int; cached = true)
   (r <= 0 || c <= 0) && error("Dimensions must be positive")
-  return AcbMatSpace(R, r, c)
+  return AcbMatSpace(R, r, c, cached)
 end

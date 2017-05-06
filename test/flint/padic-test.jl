@@ -265,6 +265,22 @@ function test_padic_adhoc_exact_division()
    println("PASS")
 end
 
+function test_padic_divides()
+   print("padic.divides()...")  
+
+   R = PadicField(7, 30)
+
+   a = 1 + 7 + 2*7^2 + O(R, 7^3)
+   b = 2 + 3*7 + O(R, 7^5)
+   
+   flag, q = divides(a, b)
+
+   @test flag
+   @test q == divexact(a, b)
+
+   println("PASS")
+end
+
 function test_padic_gcd()
    print("padic.adhoc_gcd()...")  
 
@@ -335,6 +351,7 @@ function test_padic()
    test_padic_inversion()
    test_padic_exact_division()
    test_padic_adhoc_exact_division()
+   test_padic_divides()
    test_padic_gcd()
    test_padic_square_root()
    test_padic_special_functions()

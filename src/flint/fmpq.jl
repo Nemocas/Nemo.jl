@@ -23,6 +23,8 @@ function fmpq(a::Rational{Int})
   return r
 end
 
+fmpq{T <: Integer}(a::Rational{T}) = fmpq(num(a), den(a))
+
 fmpq(a::Integer) = fmpq(fmpz(a), fmpz(1))
 
 fmpq(a::Integer, b::Integer) = fmpq(fmpz(a), fmpz(b))
@@ -157,7 +159,7 @@ end
 
 needs_parentheses(x::fmpq) = false
 
-is_negative(x::fmpq) = x < 0
+isnegative(x::fmpq) = x < 0
 
 show_minus_one(::Type{fmpq}) = false
 
@@ -224,6 +226,10 @@ end
 
 +(a::fmpz, b::fmpq) = b + a
 
++{T <: Integer}(a::fmpq, b::Rational{T}) = a + fmpq(b)
+
++{T <: Integer}(a::Rational{T}, b::fmpq) = b + a
+
 function -(a::fmpq, b::Int)
    z = fmpq()
    ccall((:fmpq_sub_si, :libflint), Void, 
@@ -237,6 +243,10 @@ function -(a::fmpq, b::fmpz)
          (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpz}), &z, &a, &b)
    return z
 end
+
+-{T <: Integer}(a::fmpq, b::Rational{T}) = a - fmpq(b)
+
+-{T <: Integer}(a::Rational{T}, b::fmpq) = fmpq(b) - a
 
 function *(a::fmpq, b::fmpz)
    z = fmpq()
@@ -253,6 +263,13 @@ function -(a::fmpz, b::fmpq)
    g = gcd(n, d)
    return parent(b)(divexact(n, g), divexact(d, g))
 end
+
+*{T <: Integer}(a::fmpq, b::Rational{T}) = a * fmpq(b)
+
+*{T <: Integer}(a::Rational{T}, b::fmpq) = b * a
+
+//{T <: Integer}(a::fmpq, b::Rational{T}) = a//fmpq(b)
+
 ###############################################################################
 #
 #   Comparison
@@ -291,6 +308,10 @@ function ==(a::fmpq, b::fmpz)
 end
 
 ==(a::fmpz, b::fmpq) = b == a
+
+=={T <: Integer}(a::fmpq, b::Rational{T}) = a == fmpq(b)
+
+=={T <: Integer}(a::Rational{T}, b::fmpq) = b == a
 
 doc"""
     isless(a::fmpq, b::Integer)
@@ -331,6 +352,10 @@ function isless(a::fmpz, b::fmpq)
    return ccall((:fmpq_cmp, :libflint), Cint,
                 (Ptr{fmpq}, Ptr{fmpq}), &z, &b) < 0
 end
+
+isless{T <: Integer}(a::Rational{T}, b::fmpq) = isless(fmpq(a), b)
+
+isless{T <: Integer}(a::fmpq, b::Rational{T}) = isless(a, fmpq(b))
 
 ###############################################################################
 #
@@ -424,6 +449,10 @@ divexact(a::fmpq, b::Integer) = divexact(a, fmpz(b))
 
 divexact(a::Integer, b::fmpq) = inv(b)*a
 
+divexact{T <: Integer}(a::fmpq, b::Rational{T}) = divexact(a, fmpq(b))
+
+divexact{T <: Integer}(a::Rational{T}, b::fmpq) = divexact(fmpq(a), b)
+
 ###############################################################################
 #
 #   Modular arithmetic
@@ -461,6 +490,16 @@ function gcd(a::fmpq, b::fmpq)
          (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &z, &a, &b)
    return z
 end
+
+################################################################################
+#
+#   Ad hoc Remove and valuation
+#
+################################################################################
+
+remove(a::fmpq, b::Integer) = remove(a, fmpz(b))
+
+valuation(a::fmpq, b::Integer) = valuation(a, fmpz(b))
 
 ###############################################################################
 #
@@ -708,9 +747,7 @@ end
 
 (a::FlintRationalField)() = fmpq(fmpz(0), fmpz(1))
 
-(a::FlintRationalField)(b::Rational{BigInt}) = fmpq(num(b), den(b)) 
-
-(::FlintRationalField)(x::Rational) = fmpq(x.num, x.den)
+(a::FlintRationalField)(b::Rational) = fmpq(num(b), den(b)) 
 
 (a::FlintRationalField)(b::Integer) = fmpq(b)
 
@@ -741,6 +778,8 @@ convert(::Type{fmpq}, a::fmpz) = fmpq(a)
 Base.promote_rule{T <: Integer}(::Type{fmpq}, ::Type{T}) = fmpq
 
 Base.promote_rule(::Type{fmpq}, ::Type{fmpz}) = fmpq
+
+Base.promote_rule{T <: Integer}(::Type{fmpq}, ::Type{Rational{T}}) = fmpq
 
 convert(::Type{Rational{BigInt}}, a::fmpq) = Rational(a)
 

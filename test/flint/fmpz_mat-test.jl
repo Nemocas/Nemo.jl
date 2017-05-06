@@ -25,6 +25,11 @@ function test_fmpz_mat_constructors()
 
    @test isa(m, MatElem)
 
+   @test_throws ErrorConstrDimMismatch (S([fmpz(1) 2; 3 4]))
+   @test_throws ErrorConstrDimMismatch (S([fmpz(1), 2, 3, 4]))
+   @test_throws ErrorConstrDimMismatch (S([fmpz(1) 2 3 4; 5 6 7 8; 1 2 3 4]))
+   @test_throws ErrorConstrDimMismatch (S([fmpz(1), 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4]))
+
    println("PASS")
 end
 
@@ -316,7 +321,7 @@ function test_fmpz_mat_hadamard()
 
    S = MatrixSpace(ZZ, 4, 4)
 
-   @test is_hadamard(hadamard(S))
+   @test ishadamard(hadamard(S))
 
    println("PASS")
 end
@@ -338,11 +343,11 @@ function test_fmpz_mat_hnf()
 
    M = hnf_modular(A, fmpz(27))
 
-   @test is_hnf(M)
+   @test ishnf(M)
 
    MM = hnf_modular_eldiv(B, fmpz(4))
 
-   @test is_hnf(MM)
+   @test ishnf(MM)
    @test S([1 0 0; 0 2 0; 0 0 4]) == MM
 
    println("PASS")
@@ -426,11 +431,11 @@ function test_fmpz_mat_snf()
    
    @test snf(A) == S([1 0 0; 0 1 0; 0 0 27])
 
-   @test is_snf(snf(A))
+   @test issnf(snf(A))
 
    B = S([fmpz(2) 0 0; 0 4 0; 0 0 7])
 
-   @test is_snf(snf_diagonal(B))
+   @test issnf(snf_diagonal(B))
 
    println("PASS")
 end

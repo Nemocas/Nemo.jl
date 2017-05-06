@@ -49,9 +49,13 @@ function test_nmod_mat_constructors()
   @test isa(b, nmod_mat)
   @test parent(b) == R
   @test rows(b) == 2 && cols(b) == 2
-  @test_throws ErrorException R(reshape(ar,1,4))
+  @test_throws ErrorConstrDimMismatch R(reshape(ar,1,4))
   @test b == R([BigInt(1), BigInt(1), BigInt(1), BigInt(1)])
-  @test_throws ErrorException R([ BigInt(1), BigInt(1),
+  @test_throws ErrorConstrDimMismatch R([BigInt(1) BigInt(1)])
+  @test_throws ErrorConstrDimMismatch R([BigInt(1) BigInt(1) ; BigInt(1) BigInt(1) ;
+                                 BigInt(1) BigInt(1)])
+  @test_throws ErrorConstrDimMismatch R([BigInt(1), BigInt(1), BigInt(1)])
+  @test_throws ErrorConstrDimMismatch R([BigInt(1), BigInt(1),
                                   BigInt(1), BigInt(1), BigInt(1)])
 
   ar = [ ZZ(1) ZZ(1); ZZ(1) ZZ(1) ]
@@ -60,9 +64,12 @@ function test_nmod_mat_constructors()
   @test isa(c, nmod_mat)
   @test parent(c) == R
   @test rows(c) == 2 && cols(c) == 2
-  @test_throws ErrorException R(reshape(ar,4,1))
+  @test_throws ErrorConstrDimMismatch R(reshape(ar,4,1))
   @test c == R([ ZZ(1), ZZ(1), ZZ(1), ZZ(1)])
-  @test_throws ErrorException R([ ZZ(1), ZZ(1), ZZ(1), ZZ(1), ZZ(1)])
+  @test_throws ErrorConstrDimMismatch R([ZZ(1) ZZ(1)])
+  @test_throws ErrorConstrDimMismatch R([ZZ(1) ZZ(1) ; ZZ(1) ZZ(1) ; ZZ(1) ZZ(1)])
+  @test_throws ErrorConstrDimMismatch R([ZZ(1), ZZ(1), ZZ(1)])
+  @test_throws ErrorConstrDimMismatch R([ZZ(1), ZZ(1), ZZ(1), ZZ(1), ZZ(1)])
 
   ar = [ 1 1; 1 1]
 
@@ -71,10 +78,12 @@ function test_nmod_mat_constructors()
   @test isa(d, nmod_mat)
   @test parent(d) == R
   @test rows(d) == 2 && cols(d) == 2
-  @test_throws ErrorException R(reshape(ar,1,4))
+  @test_throws ErrorConstrDimMismatch R(reshape(ar,1,4))
   @test d == R([1,1,1,1])
-  @test_throws ErrorException R([ 1, 1, 1, 1, 1])
-
+  @test_throws ErrorConstrDimMismatch R([1 1 ])
+  @test_throws ErrorConstrDimMismatch R([1 1 ; 1 1 ; 1 1 ])
+  @test_throws ErrorConstrDimMismatch R([1, 1, 1])
+  @test_throws ErrorConstrDimMismatch R([1, 1, 1, 1, 1])
 
   ar = MatrixSpace(ZZ, 2, 2)([ 1 1; 1 1])
 
@@ -95,9 +104,13 @@ function test_nmod_mat_constructors()
   @test isa(f, nmod_mat)
   @test parent(f) == R
   @test rows(f) == 2 && cols(f) == 2
-  @test_throws ErrorException R(reshape(ar,4,1))
+  @test_throws ErrorConstrDimMismatch R(reshape(ar,4,1))
   @test f == R([Z2(1), Z2(1), Z2(1), Z2(1)])
-  @test_throws ErrorException R([ Z2(1), Z2(1), Z2(1), Z2(1), Z2(1)])
+  @test_throws ErrorConstrDimMismatch R([Z2(1) Z2(1) ])
+  @test_throws ErrorConstrDimMismatch R([Z2(1) Z2(1) ; Z2(1) Z2(1) ; Z2(1) Z2(1) ])
+  @test_throws ErrorConstrDimMismatch R([Z2(1), Z2(1), Z2(1)])
+  @test_throws ErrorConstrDimMismatch R([Z2(1), Z2(1), Z2(1), Z2(1), Z2(1)])
+
 
   @test isa(S(1), nmod_mat)
   
@@ -199,7 +212,7 @@ function test_nmod_mat_manipulation()
   @test transpose(MatrixSpace(Z10,1,2)([ 1 2; ])) ==
           MatrixSpace(Z10,2,1)(reshape([ 1 ; 2],2,1))
 
-  @test_throws ErrorException transpose!(R([ 1 2 ;]))
+  @test_throws ErrorConstrDimMismatch transpose!(R([ 1 2 ;]))
 
   println("PASS")
 end

@@ -212,6 +212,20 @@ function test_gen_frac_gcd()
    println("PASS")
 end
 
+function test_gen_frac_remove_valuation()
+   print("GenFrac.remove_valuation...")
+
+   a = fmpq(2, 3)
+
+   @test remove(a, fmpz(2)) == (1, fmpq(1, 3))
+   @test valuation(a, fmpz(2)) == 1
+
+   @test remove(a, fmpz(3)) == (-1, fmpq(2, 1))
+   @test valuation(a, fmpz(3)) == 1
+
+   println("PASS")
+end
+
 function test_gen_frac()
    test_gen_frac_constructors()
    test_gen_frac_manipulation()

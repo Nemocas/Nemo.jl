@@ -58,36 +58,44 @@ end
 
 const GenMPolyID = ObjectIdDict()
 
-type GenMPolyRing{T <: RingElem, S, N} <: PolyRing{T}
+type GenMPolyRing{T <: RingElem} <: PolyRing{T}
    base_ring::Ring
    S::Array{Symbol, 1}
+   ord::Symbol
    num_vars::Int
+   N::Int
 
-   function GenMPolyRing(R::Ring, s::Array{Symbol, 1}, cached=true)
-      if haskey(GenMPolyID, (R, s, S, N))
-         return GenMPolyID[R, s, S, N]::GenMPolyRing{T, S, N}
+   function GenMPolyRing(R::Ring, s::Array{Symbol, 1}, ord::Symbol, N::Int, cached=true)
+      if haskey(GenMPolyID, (R, s, ord, N))
+         return GenMPolyID[R, s, ord, N]::GenMPolyRing{T}
       else 
-         z = new(R, s, length(s))
+         z = new(R, s, ord, length(s), N)
          if cached
-           GenMPolyID[R, s, S, N] = z
+           GenMPolyID[R, s, ord, N] = z
          end
          return z
       end
    end
 end
 
-type GenMPoly{T <: RingElem, S, N} <: PolyElem{T}
+type GenMPoly{T <: RingElem} <: PolyElem{T}
    coeffs::Array{T, 1}
-   exps::Array{NTuple{N, UInt}}
+   exps::Array{UInt, 2}
    length::Int
-   parent::GenMPolyRing{T, S, N}
+   parent::GenMPolyRing{T}
 
-   GenMPoly() = new(Array(T, 0), Array(NTuple{N, UInt}, 0), 0)
+   function GenMPoly(R::GenMPolyRing)
+      N = R.N
+      return new(Array(T, 0), Array(UInt, N, 0), 0, R)
+   end
    
-   GenMPoly(a::Array{T, 1}, b::Array{NTuple{N, UInt}, 1}) = new(a, b, length(a))
+   GenMPoly(R::GenMPolyRing, a::Array{T, 1}, b::Array{UInt, 2}) = new(a, b, length(a), R)
 
-   GenMPoly(a::T) = a == 0 ? new(Array(T, 0), Array(NTuple{N, UInt}, 0), 0) : 
-                                      new([a], [zero(NTuple{N, UInt})], 1)
+   function GenMPoly(R::GenMPolyRing, a::T)
+      N = R.N
+      return a == 0 ? new(Array(T, 0), Array(UInt, N, 0), 0, R) : 
+                                      new([a], zeros(UInt, N, 1), 1, R)
+   end
 end
 
 ###############################################################################

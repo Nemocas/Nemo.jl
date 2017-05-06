@@ -21,6 +21,10 @@ function test_fmpq_mat_constructors()
 
    @test isa(k, MatElem)
 
+   k = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
+
+   @test isa(k, MatElem)
+
    l = S(k)
 
    @test isa(l, MatElem)
@@ -28,6 +32,47 @@ function test_fmpq_mat_constructors()
    m = S()
 
    @test isa(m, MatElem)
+
+   n = S([1 2 3; 4 5 6; 7 8 9])
+
+   @test isa(n, MatElem)
+
+   o = S([1//1 2 3; 4 5 6; 7 8 9])
+
+   @test isa(o, MatElem)
+
+   p = S([BigInt(1)//BigInt(1) 2 3; 4 5 6; 7 8 9])
+
+   @test isa(p, MatElem)
+
+   o = S([1, 2, 3, 4, 5, 6, 7, 8, 9])
+
+   @test isa(o, MatElem)
+
+   o = S([fmpz(1), 2, 3, 4, 5, 6, 7, 8, 9])
+
+   @test isa(o, MatElem)
+
+   o = S([BigInt(1), 2, 3, 4, 5, 6, 7, 8, 9])
+
+   @test isa(o, MatElem)
+
+   o = S([fmpq(1), 2, 3, 4, 5, 6, 7, 8, 9])
+
+   @test isa(o, MatElem)
+
+   o = S([1//1, 2, 3, 4, 5, 6, 7, 8, 9])
+
+   @test isa(o, MatElem)
+
+   o = S([BigInt(1)//BigInt(1), 2, 3, 4, 5, 6, 7, 8, 9])
+
+   @test isa(o, MatElem)
+
+   @test_throws ErrorConstrDimMismatch (S([fmpq(1) 2; 3 4]))
+   @test_throws ErrorConstrDimMismatch (S([fmpq(1), 2, 3, 4]))
+   @test_throws ErrorConstrDimMismatch (S([fmpq(1) 2 3 4; 5 6 7 8; 1 2 3 4]))
+   @test_throws ErrorConstrDimMismatch (S([fmpq(1), 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4]))
 
    println("PASS")
 end
@@ -55,6 +100,22 @@ function test_fmpq_mat_manipulation()
    B[1, 1] = fmpz(3)
 
    @test B[1, 1] == fmpz(3)
+
+   B[1, 1] = fmpq(4)
+
+   @test B[1, 1] == fmpq(4)
+
+   B[1, 1] = BigInt(5)
+
+   @test B[1, 1] == BigInt(5)
+
+   B[1, 1] = 4//1
+
+   @test B[1, 1] == 4//1
+
+   B[1, 1] = BigInt(5)//1
+
+   @test B[1, 1] == BigInt(5)//1
 
    @test rows(B) == 3
    @test cols(B) == 3
@@ -102,14 +163,23 @@ function test_fmpq_mat_adhoc_binary()
    A = S([fmpq(2) 3 5; 1 4 7; 9 6 3])
 
    @test 12 + A == A + 12
+   @test BigInt(12) + A == A + 12
    @test fmpz(11) + A == A + fmpz(11)
    @test fmpq(11) + A == A + fmpq(11)
+   @test 11//1 + A == A + fmpq(11)
+   @test BigInt(11)//1 + A == A + fmpq(11)
    @test A - 3 == -(3 - A)
+   @test A - BigInt(3) == -(3 - A)
    @test A - fmpz(7) == -(fmpz(7) - A)
    @test A - fmpq(7) == -(fmpq(7) - A)
+   @test A - 7//1 == -(fmpq(7) - A)
+   @test A - BigInt(7)//1 == -(fmpq(7) - A)
    @test 3*A == A*3
+   @test BigInt(3)*A == A*3
    @test fmpz(3)*A == A*fmpz(3)
    @test fmpq(3)*A == A*fmpq(3)
+   @test (3//1)*A == A*fmpq(3)
+   @test (BigInt(3)//1)*A == A*fmpq(3)
   
    println("PASS")
 end
@@ -137,11 +207,17 @@ function test_fmpq_mat_adhoc_comparison()
    A = S([fmpq(2) 3 5; 1 4 7; 9 6 3])
 
    @test S(12) == 12
+   @test S(12) == BigInt(12)
    @test S(5) == fmpz(5)
    @test S(5) == fmpq(5)
+   @test S(5) == 5//1
+   @test S(5) == BigInt(5)//1
    @test 12 == S(12)
+   @test BigInt(12) == S(12)
    @test fmpz(5) == S(5)
    @test fmpq(5) == S(5)
+   @test 5//1 == S(5)
+   @test BigInt(5)//1 == S(5)
    @test A != one(S)
    @test one(S) == one(S)
 
@@ -172,6 +248,9 @@ function test_fmpq_mat_adhoc_exact_division()
    @test divexact(5*A, 5) == A
    @test divexact(12*A, fmpz(12)) == A
    @test divexact(3*A, fmpq(3)) == A
+   @test divexact(3*A, BigInt(3)) == A
+   @test divexact(3*A, 3//1) == A
+   @test divexact(3*A, BigInt(3)//1) == A
    
    println("PASS")
 end

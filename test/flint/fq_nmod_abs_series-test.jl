@@ -120,6 +120,11 @@ function test_fq_nmod_abs_series_adhoc_binary_ops()
 
    @test d*ZZ(3) == 3x^2 + 9x^3 - 3x^4
 
+   F, x = FiniteField(23, 1, "x")
+   R, t = PowerSeriesRing(F, 6, "t", model=:capped_absolute)
+
+   @test F(1) * t == t
+
    println("PASS")
 end
 

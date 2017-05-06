@@ -2,7 +2,7 @@
 #
 #   AbsSeries.jl : Power series over rings, capped relative precision
 #
-###############################################################################    
+###############################################################################
 
 export GenAbsSeries, GenAbsSeriesRing, O, valuation, exp,
        precision, max_precision, set_prec!
@@ -36,8 +36,8 @@ elem_type{T <: RingElem}(::GenAbsSeriesRing{T}) = GenAbsSeries{T}
 #
 #   Basic manipulation
 #
-###############################################################################    
-   
+###############################################################################
+
 length(x::AbsSeriesElem) = x.length
 
 precision(x::AbsSeriesElem) = x.prec
@@ -94,7 +94,7 @@ doc"""
 > `false`.
 """
 function isgen(a::GenAbsSeries)
-   return (valuation(a) == 1 && length(a) == 2 && isone(coeff(a, 1))) || 
+   return (valuation(a) == 1 && length(a) == 2 && isone(coeff(a, 1))) ||
            precision(a) == 0
 end
 
@@ -228,7 +228,7 @@ function +{T <: RingElem}(a::AbsSeriesElem{T}, b::AbsSeriesElem{T})
    set_length!(z, normalise(z, i - 1))
    return z
 end
-  
+
 doc"""
     -{T <: RingElem}(a::AbsSeriesElem{T}, b::AbsSeriesElem{T})
 > Return $a - b$.
@@ -301,7 +301,7 @@ function *{T <: RingElem}(a::AbsSeriesElem{T}, b::AbsSeriesElem{T})
             addeq!(d[i + j - 1], t)
          end
       end
-   end        
+   end
    z = parent(a)(d, lenz, prec)
    set_length!(z, normalise(z, lenz))
    return z
@@ -895,7 +895,7 @@ function mul!{T <: RingElem}(c::GenAbsSeries{T}, a::GenAbsSeries{T}, b::GenAbsSe
             end
          end
       end
-        
+
       c.length = normalise(c, lenc)
    end
    c.prec = prec
@@ -904,9 +904,9 @@ end
 function addeq!{T <: RingElem}(c::GenAbsSeries{T}, a::GenAbsSeries{T})
    lenc = length(c)
    lena = length(a)
-   
+
    prec = min(precision(a), precision(c))
-   
+
    lena = min(lena, prec)
    lenc = min(lenc, prec)
 

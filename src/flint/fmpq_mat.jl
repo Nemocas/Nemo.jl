@@ -102,6 +102,8 @@ function setindex!(a::fmpq_mat, d::Int, r::Int, c::Int)
    ccall((:fmpq_set_si, :libflint), Void, (Ptr{fmpq}, Int, Int), z, d, 1)
 end
 
+setindex!(a::fmpq_mat, d::Rational, r::Int, c::Int) = setindex!(a, fmpq(d), r, c)
+
 rows(a::fmpq_mat) = a.r
 
 cols(a::fmpq_mat) = a.c
@@ -256,6 +258,10 @@ end
 
 *(x::fmpq_mat, y::Integer) = fmpz(y)*x
 
+*(x::Rational, y::fmpq_mat) = fmpq(x)*y
+
+*(x::fmpq_mat, y::Rational) = fmpq(y)*x
+
 function +(x::fmpq_mat, y::Integer)
    z = deepcopy(x)
    for i = 1:min(rows(x), cols(x))
@@ -273,6 +279,10 @@ end
 +(x::fmpq, y::fmpq_mat) = parent(y)(x) + y
 
 +(x::fmpq_mat, y::fmpq) = x + parent(x)(y)
+
++(x::Rational, y::fmpq_mat) = fmpq(x) + y
+
++(x::fmpq_mat, y::Rational) = x + fmpq(y)
 
 function -(x::fmpq_mat, y::Integer)
    z = deepcopy(x)
@@ -297,6 +307,10 @@ end
 -(x::fmpq, y::fmpq_mat) = parent(y)(x) - y
 
 -(x::fmpq_mat, y::fmpq) = x - parent(x)(y)
+
+-(x::Rational, y::fmpq_mat) = fmpq(x) - y
+
+-(x::fmpq_mat, y::Rational) = x - fmpq(y)
 
 ###############################################################################
 #
@@ -333,6 +347,10 @@ function ==(x::fmpq_mat, y::Integer)
 end
 
 ==(x::Integer, y::fmpq_mat) = y == x
+
+==(x::fmpq_mat, y::Rational) = x == fmpq(y)
+
+==(x::Rational, y::fmpq_mat) = y == x
 
 ###############################################################################
 #
@@ -382,6 +400,8 @@ function divexact(x::fmpq_mat, y::fmpz)
 end
 
 divexact(x::fmpq_mat, y::Integer) = divexact(x, fmpz(y))
+
+divexact(x::fmpq_mat, y::Rational) = divexact(x, fmpq(y))
 
 ###############################################################################
 #
@@ -610,24 +630,61 @@ function (a::FmpqMatSpace)()
 end
 
 function (a::FmpqMatSpace)(arr::Array{fmpq, 2})
+   _check_dim(a.rows, a.cols, arr)
    z = fmpq_mat(a.rows, a.cols, arr)
    z.parent = a
    return z
 end
 
-function (a::FmpqMatSpace){T <: Integer}(arr::Array{T, 2})
+function (a::FmpqMatSpace)(arr::Array{fmpz, 2})
+   _check_dim(a.rows, a.cols, arr)
    z = fmpq_mat(a.rows, a.cols, arr)
+   z.parent = a
+   return z
+end
+
+
+function (a::FmpqMatSpace){T <: Integer}(arr::Array{T, 2})
+   _check_dim(a.rows, a.cols, arr)
+   z = fmpq_mat(a.rows, a.cols, arr)
+   z.parent = a
+   return z
+end
+
+function (a::FmpqMatSpace){T <: Integer}(arr::Array{Rational{T}, 2})
+   _check_dim(a.rows, a.cols, arr)
+   z = fmpq_mat(a.rows, a.cols, map(fmpq, arr))
    z.parent = a
    return z
 end
 
 function (a::FmpqMatSpace)(arr::Array{fmpq, 1})
+   _check_dim(a.rows, a.cols, arr)
    z = fmpq_mat(a.rows, a.cols, arr)
    z.parent = a
    return z
 end
 
-(a::FmpqMatSpace){T <: Integer}(arr::Array{T, 1}) = a(reshape(arr, (a.rows, a.cols)))
+function (a::FmpqMatSpace)(arr::Array{fmpz, 1})
+   _check_dim(a.rows, a.cols, arr)
+   z = fmpq_mat(a.rows, a.cols, arr)
+   z.parent = a
+   return z
+end
+
+function (a::FmpqMatSpace){T <: Integer}(arr::Array{T, 1})
+   _check_dim(a.rows, a.cols, arr)
+   z = fmpq_mat(a.rows, a.cols, arr)
+   z.parent = a
+   return z
+end
+
+function (a::FmpqMatSpace){T <: Integer}(arr::Array{Rational{T}, 1})
+   _check_dim(a.rows, a.cols, arr)
+   z = fmpq_mat(a.rows, a.cols, map(fmpq, arr))
+   z.parent = a
+   return z
+end
 
 function (a::FmpqMatSpace)(d::fmpq)
    z = fmpq_mat(a.rows, a.cols, d)
@@ -646,6 +703,8 @@ function (a::FmpqMatSpace)(d::Integer)
    z.parent = a
    return z
 end
+
+(a::FmpqMatSpace)(d::Rational) = a(fmpq(d))
 
 function (a::FmpqMatSpace)(M::fmpz_mat)
    (a.cols == cols(M) && a.rows == rows(M)) || error("wrong matrix dimension")
@@ -668,12 +727,14 @@ Base.promote_rule(::Type{fmpq_mat}, ::Type{fmpq}) = fmpq_mat
 
 Base.promote_rule(::Type{fmpq_mat}, ::Type{fmpz}) = fmpq_mat
 
+Base.promote_rule{T <: Integer}(::Type{fmpq_mat}, ::Type{Rational{T}}) = fmpq_mat
+
 ###############################################################################
 #
 #   MatrixSpace constructor
 #
 ###############################################################################
 
-function MatrixSpace(R::FlintRationalField, r::Int, c::Int)
-   return FmpqMatSpace(r, c)
+function MatrixSpace(R::FlintRationalField, r::Int, c::Int; cached = true)
+   return FmpqMatSpace(r, c, cached)
 end

@@ -26,6 +26,14 @@ function test_acb_poly_constructors()
 
    @test isa(k, PolyElem)
 
+   l = R([1, 2, 3])
+
+   @test isa(l, PolyElem)
+
+   m = R([ZZ(1), ZZ(2), ZZ(3)])
+
+   @test isa(m, PolyElem)
+
    println("PASS")
 end
 

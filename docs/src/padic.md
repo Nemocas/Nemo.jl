@@ -404,6 +404,23 @@ k = inv(d)
 l = inv(R(1))
 ```
 
+## Divisibility
+
+```@docs
+divides(::padic, ::padic)
+```
+
+Here are some examples of divisibility testing.
+
+```
+R = PadicField(7, 30)
+
+a = 1 + 7 + 2*7^2 + O(R, 7^3)
+b = 2 + 3*7 + O(R, 7^5)
+
+flag, q = divides(a, b)
+```
+
 ## GCD
 
 ```@docs

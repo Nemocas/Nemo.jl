@@ -221,7 +221,7 @@ end
 
 needs_parentheses(x::padic) = true
 
-is_negative(x::padic) = false
+isnegative(x::padic) = false
 
 show_minus_one(::FlintPadicField) = true
 
@@ -445,6 +445,23 @@ function inv(a::padic)
    ccall((:padic_inv, :libflint), Cint, 
          (Ptr{padic}, Ptr{padic}, Ptr{FlintPadicField}), &z, &a, &ctx)
    return z
+end
+
+###############################################################################
+#
+#   Divides
+#
+###############################################################################
+
+doc"""
+    divides(f::padic, g::padic)
+> Returns a pair consisting of a flag which is set to `true` if $g$ divides
+> $f$ and `false` otherwise, and a value $h$ such that $f = gh$ if
+> such a value exists. If not, the value of $h$ is undetermined.
+"""
+function divides(a::padic, b::padic)
+   b == 0 && throw(DivideError())
+   return true, divexact(a, b)   
 end
 
 ###############################################################################

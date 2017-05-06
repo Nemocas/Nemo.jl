@@ -160,6 +160,11 @@ function divexact{S <: Integer, T <: RingElem}(x::S, y::T)
    end
 end
 
+function divides{T <: RingElem}(x::T, y::T)
+   q, r = divrem(x, y)
+   return r == 0, q
+end
+
 function =={S <: RingElem, T <: RingElem}(x::S, y::T) 
    T1 = Base.promote_rule(S, T)
    if S == T1
@@ -200,15 +205,6 @@ function addmul!{T <: RingElem}(z::T, x::T, y::T, c::T)
    mul!(c, x, y)
    addeq!(z, c)
    return
-end
-
-function divides{T <: RingElem}(x::T, y::T)
-   q, r = divrem(x, y)
-   if r == 0
-      return true, q
-   else
-      return false, q
-   end
 end
 
 ###############################################################################

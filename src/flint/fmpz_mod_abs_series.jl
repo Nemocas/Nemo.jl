@@ -602,13 +602,13 @@ end
 #
 ###############################################################################
 
-function PowerSeriesRing(R::GenResRing{fmpz}, prec::Int, s::AbstractString; model=:capped_relative)
+function PowerSeriesRing(R::GenResRing{fmpz}, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
    S = Symbol(s)
 
    if model == :capped_relative
-      parent_obj = FmpzModRelSeriesRing(R, prec, S)
+      parent_obj = FmpzModRelSeriesRing(R, prec, S, cached)
    elseif model == :capped_absolute
-      parent_obj = FmpzModAbsSeriesRing(R, prec, S)
+      parent_obj = FmpzModAbsSeriesRing(R, prec, S, cached)
    end
    return parent_obj, gen(parent_obj)
 end

@@ -32,8 +32,8 @@ var(a::FmpqRelSeriesRing) = a.S
 #
 #   Basic manipulation
 #
-###############################################################################    
-   
+###############################################################################
+
 max_precision(R::FmpqRelSeriesRing) = R.prec_max
 
 function normalise(a::fmpq_rel_series, len::Int)
@@ -293,6 +293,22 @@ end
 
 *(x::fmpq_rel_series, y::fmpq) = y * x
 
+*(x::fmpq_rel_series, y::Integer) = x * fmpz(y)
+
+*(x::Integer, y::fmpq_rel_series) = fmpz(x) * y
+
+*(x::fmpq_rel_series, y::Rational) = x * fmpq(y)
+
+*(x::Rational, y::fmpq_rel_series) = fmpq(x) * y
+
++(x::fmpq_rel_series, y::Integer) = x + fmpz(y)
+
++(x::Integer, y::fmpq_rel_series) = fmpz(x) + y
+
++(x::fmpq_rel_series, y::Rational) = x + fmpq(y)
+
++(x::Rational, y::fmpq_rel_series) = fmpq(x) + y
+
 ###############################################################################
 #
 #   Shifting
@@ -489,6 +505,10 @@ end
 
 ==(x::Integer, y::fmpq_rel_series) = y == x
 
+==(x::fmpq_rel_series, y::Rational) = x == fmpq(y)
+
+==(x::Rational, y::fmpq_rel_series) = y == x
+
 ###############################################################################
 #
 #   Exact division
@@ -561,6 +581,8 @@ function divexact(x::fmpq_rel_series, y::fmpq)
 end
 
 divexact(x::fmpq_rel_series, y::Integer) = divexact(x, fmpz(y))
+
+divexact(x::fmpq_rel_series, y::Rational) = divexact(x, fmpq(y))
 
 ###############################################################################
 #
@@ -969,6 +991,8 @@ end
 
 Base.promote_rule{T <: Integer}(::Type{fmpq_rel_series}, ::Type{T}) = fmpq_rel_series
 
+Base.promote_rule{T <: Integer}(::Type{fmpq_rel_series}, ::Type{Rational{T}}) = fmpq_rel_series
+
 Base.promote_rule(::Type{fmpq_rel_series}, ::Type{fmpz}) = fmpq_rel_series
 
 Base.promote_rule(::Type{fmpq_rel_series}, ::Type{fmpq}) = fmpq_rel_series
@@ -1020,6 +1044,8 @@ function (a::FmpqRelSeriesRing)(b::fmpq)
    return z
 end
 
+(a::FmpqRelSeriesRing)(b::Rational) = a(fmpq(b))
+
 function (a::FmpqRelSeriesRing)(b::fmpq_rel_series)
    parent(b) != a && error("Unable to coerce power series")
    return b
@@ -1031,3 +1057,11 @@ function (a::FmpqRelSeriesRing)(b::Array{fmpq, 1}, len::Int, prec::Int, val::Int
    return z
 end
 
+(a::FmpqRelSeriesRing)(b::Array{fmpz, 1}, len::Int, prec::Int, val::Int) =
+    a(map(fmpq, b), len, prec, val)
+
+(a::FmpqRelSeriesRing){T <: Integer}(b::Array{T, 1}, len::Int, prec::Int, val::Int) =
+    a(map(fmpq, b), len, prec, val)
+    
+(a::FmpqRelSeriesRing){T <: Integer}(b::Array{Rational{T}, 1}, len::Int, prec::Int, val::Int) =
+    a(map(fmpq, b), len, prec, val)
