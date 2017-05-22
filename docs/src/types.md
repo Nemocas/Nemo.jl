@@ -224,7 +224,7 @@ they are defined over.
      - `fq_rel_series` (`FqRelSeriesRing`)
      - `fmpz_mat` (`FmpzMatSpace`)
      - `nmod_mat` (`NmodMatSpace`)
-     - `perm` (`FlintPermGroup`)
+     - `perm` (`PermGroup`)
 
   - Antic
      - `nf_elem` (`AnticNumberField`)

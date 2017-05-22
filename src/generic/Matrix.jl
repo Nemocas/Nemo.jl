@@ -4,10 +4,11 @@
 #
 ###############################################################################
 
-export MatricSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, isrref,
+export MatrixSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, isrref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
        ishessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat,
-       powers, similarity!
+       powers, similarity!, solve, solve_rational, hnf, hnf_with_trafo, snf,
+       snf_with_trafo
 
 ###############################################################################
 #
@@ -137,10 +138,11 @@ function deepcopy_internal{T <: RingElem}(d::MatElem{T}, dict::ObjectIdDict)
    entries = Array{T}(rows(d), cols(d))
    for i = 1:rows(d)
       for j = 1:cols(d)
-         entries[i, j] = deepcopy(d[i, j])
+         entries[i, j] = deepcopy_internal(d[i, j], dict)
       end
    end
-   return parent(d)(entries)
+   M = parent(d)
+   return M(entries)
 end
 
 ###############################################################################
@@ -936,13 +938,13 @@ function lufact!{T <: FieldElem}(P::perm, A::MatElem{T})
 end
 
 doc"""
-    lufact{T <: FieldElem}(A::MatElem{T}, P = FlintPermGroup(rows(A)))
+    lufact{T <: FieldElem}(A::MatElem{T}, P = PermGroup(rows(A)))
 > Return a tuple $r, p, L, U$ consisting of the rank of $A$, a permutation
 > $p$ of $A$ belonging to $P$, a lower triangular matrix $L$ and an upper
 > triangular matrix $U$ such that $p(A) = LU$, where $p(A)$ stands for the
 > matrix whose rows are the given permutation $p$ of the rows of $A$.
 """
-function lufact{T <: FieldElem}(A::MatElem{T}, P = FlintPermGroup(rows(A)))
+function lufact{T <: FieldElem}(A::MatElem{T}, P = PermGroup(rows(A)))
    m = rows(A)
    n = cols(A)
    P.n != m && error("Permutation does not match matrix")
@@ -1080,7 +1082,7 @@ function fflu!{T <: FieldElem}(P::perm, A::MatElem{T})
 end
 
 doc"""
-    fflu{T <: RingElem}(A::MatElem{T}, P = FlintPermGroup(rows(A)))
+    fflu{T <: RingElem}(A::MatElem{T}, P = PermGroup(rows(A)))
 > Return a tuple $r, d, p, L, U$ consisting of the rank of $A$, a
 > denominator $d$, a permutation $p$ of $A$ belonging to $P$, a lower
 > triangular matrix $L$ and an upper triangular matrix $U$ such that
@@ -1091,7 +1093,7 @@ doc"""
 > $\pm \mbox{det}(S)$ where $S$ is an appropriate submatrix of $A$ ($S = A$ if
 > $A$ is square) and the sign is decided by the parity of the permutation.
 """
-function fflu{T <: RingElem}(A::MatElem{T}, P = FlintPermGroup(rows(A)))
+function fflu{T <: RingElem}(A::MatElem{T}, P = PermGroup(rows(A)))
    m = rows(A)
    n = cols(A)
    P.n != m && error("Permutation does not match matrix")
@@ -1132,7 +1134,7 @@ function rref!{T <: RingElem}(A::MatElem{T})
    m = rows(A)
    n = cols(A)
    R = base_ring(A)
-   P = FlintPermGroup(m)()
+   P = PermGroup(m)()
    rank, d = fflu!(P, A)
    for i = rank + 1:m
       for j = 1:n
@@ -1201,7 +1203,7 @@ function rref!{T <: FieldElem}(A::MatElem{T})
    m = rows(A)
    n = cols(A)
    R = base_ring(A)
-   P = FlintPermGroup(m)()
+   P = PermGroup(m)()
    rnk = lufact!(P, A)
    if rnk == 0
       return 0
@@ -1492,7 +1494,7 @@ function det_fflu{T <: RingElem}(M::MatElem{T})
       return base_ring(M)()
    end
    A = deepcopy(M)
-   P = FlintPermGroup(n)()
+   P = PermGroup(n)()
    r, d = fflu!(P, A)
    return r < n ? base_ring(M)() : (parity(P) == 0 ? d : -d)
 end
@@ -1580,7 +1582,7 @@ function rank{T <: RingElem}(M::MatElem{T})
       return 0
    end
    A = deepcopy(M)
-   P = FlintPermGroup(n)()
+   P = PermGroup(n)()
    r, d = fflu!(P, A)
    return r
 end
@@ -1595,7 +1597,7 @@ function rank{T <: FieldElem}(M::MatElem{T})
       return 0
    end
    A = deepcopy(M)
-   P = FlintPermGroup(n)()
+   P = PermGroup(n)()
    return lufact!(P, A)   
 end
 
@@ -1882,14 +1884,25 @@ function solve_interpolation{T <: PolyElem}(M::MatElem{T}, b::MatElem{T})
 end
 
 doc"""
-    solve{T <: RingElem}(M::MatElem{T}, b::MatElem{T})
+    solve{T <: FieldElem}(M::MatElem{T}, b::MatElem{T})
+> Given a non-singular $n\times n$ matrix over a field and an $n\times m$
+> matrix over the same field, return $x$ an
+> $n\times m$ matrix $x$ such that $Ax = b$. 
+> If $A$ is singular an exception is raised.
+"""
+function solve{T <: FieldElem}(M::MatElem{T}, b::MatElem{T})
+    return solve_ringelem(M, b)
+end
+
+doc"""
+    solve_rational{T <: RingElem}(M::MatElem{T}, b::MatElem{T})
 > Given a non-singular $n\times n$ matrix over a ring and an $n\times m$
 > matrix over the same ring, return a tuple $x, d$ consisting of an
 > $n\times m$ matrix $x$ and a denominator $d$ such that $Ax = db$. The
 > denominator will be the determinant of $A$ up to sign. If $A$ is singular an
 > exception is raised.
 """
-function solve{T}(M::MatElem{T}, b::MatElem{T})
+function solve_rational{T}(M::MatElem{T}, b::MatElem{T})
    return solve_ringelem(M, b)
 end
 
@@ -1900,7 +1913,7 @@ function solve_ringelem{T <: RingElem}(M::MatElem{T}, b::MatElem{T})
    return solve_ff(M, b)
 end
 
-function solve{T <: PolyElem}(M::MatElem{T}, b::MatElem{T})
+function solve_rational{T <: PolyElem}(M::MatElem{T}, b::MatElem{T})
    base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
    rows(M) != cols(M) && error("Non-square matrix in solve")
    rows(M) != rows(b) && error("Dimensions don't match in solve")
@@ -2712,6 +2725,438 @@ function minpoly{T <: RingElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
       first_poly = false
    end
    return divexact(p, canonical_unit(p))
+end
+
+###############################################################################
+#
+#   Hermite Normal Form
+#
+###############################################################################
+
+function hnf_cohen{T <: RingElem}(A::GenMat{T})
+   H, U = hnf_cohen_with_trafo(A)
+   return H
+end
+
+function hnf_cohen_with_trafo{T <: RingElem}(A::GenMat{T})
+   H = deepcopy(A)
+   m = rows(H)
+   U = one(MatrixSpace(base_ring(H), m, m))
+   hnf_cohen!(H, U)
+   return H, U
+end
+
+function hnf_cohen!{T <: RingElem}(H::GenMat{T}, U::GenMat{T})
+   m = rows(H)
+   n = cols(H)
+   l = min(m, n)
+   k = 1
+   t = base_ring(H)()
+   t1 = base_ring(H)()
+   t2 = base_ring(H)()
+   for i = 1:l
+      for j = k+1:m
+         if H[j,i] == 0
+            continue
+         end
+         d, u, v = gcdx(H[k,i], H[j,i])
+         a = divexact(H[k,i], d)
+         b = -divexact(H[j,i], d)
+         for c = i:n
+            t = deepcopy(H[j,c])
+            mul!(t1, a, H[j,c])
+            mul!(t2, b, H[k,c])
+            add!(H[j,c], t1, t2)
+            mul!(t1, u, H[k,c])
+            mul!(t2, v, t)
+            add!(H[k,c], t1, t2)
+         end
+         for c = 1:m
+            t = deepcopy(U[j,c])
+            mul!(t1, a, U[j,c])
+            mul!(t2, b, U[k,c])
+            add!(U[j,c], t1, t2)
+            mul!(t1, u, U[k,c])
+            mul!(t2, v, t)
+            add!(U[k,c], t1, t2)
+         end
+      end
+      if H[k,i] == 0
+         continue
+      end
+      cu = canonical_unit(H[k,i])
+      if cu != 1
+         for c = i:n
+            H[k,c] = divexact(H[k,c],cu)
+        end
+         for c = 1:m
+            U[k,c] = divexact(U[k,c],cu)
+         end
+      end
+      for j = 1:k-1
+         q = -div(H[j,i], H[k, i])
+         for c = i:n
+            mul!(t, q, H[k,c])
+            addeq!(H[j,c], t)
+         end
+         for c = 1:m
+            mul!(t, q, U[k,c])
+            addeq!(U[j,c], t)
+         end
+      end
+      k += 1
+   end
+   return nothing
+end
+
+function hnf_kb(A::GenMat)
+   return _hnf_kb(A, Val{false})
+end
+
+function hnf_kb_with_trafo(A::GenMat)
+   return _hnf_kb(A, Val{true})
+end
+
+function _hnf_kb{T}(A::GenMat, trafo::Type{Val{T}} = Val{false})
+   H = deepcopy(A)
+   m = rows(H)
+   if trafo == Val{true}
+      U = one(MatrixSpace(base_ring(H), m, m))
+      hnf_kb!(H, U, true)
+      return H, U
+   else
+      U = zero(MatrixSpace(base_ring(H), 0, 0))
+      hnf_kb!(H, U, false)
+      return H
+   end
+end
+
+function kb_search_first_pivot(H::GenMat, start_element::Int = 1)
+   for r = start_element:rows(H)
+      for c = start_element:cols(H)
+         if H[r,c] != 0
+            return r, c
+         end
+      end
+   end
+   return 0, 0
+end
+
+function kb_reduce_row!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int, 1}, c::Int, with_trafo::Bool)
+   r = pivot[c]
+   t = base_ring(H)()
+   for i = c+1:cols(H)
+      p = pivot[i]
+      if p == 0
+         continue
+      end
+      q = -div(H[r,i], H[p,i])
+      for j = i:cols(H)
+         mul!(t, q, H[p,j])
+         addeq!(H[r,j], t)
+      end
+      if with_trafo
+         for j = 1:cols(U)
+            mul!(t, q, U[p,j])
+            addeq!(U[r,j], t)
+         end
+      end
+   end
+   return nothing
+end
+
+function kb_reduce_column!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int, 1}, c::Int, with_trafo::Bool, start_element::Int = 1)
+   r = pivot[c]
+   t = base_ring(H)()
+   for i = start_element:c-1
+      p = pivot[i]
+      if p == 0
+         continue
+      end
+      q = -div(H[p,c],H[r,c])
+      for j = c:cols(H)
+         mul!(t, q, H[r,j])
+         addeq!(H[p,j], t)
+      end
+      if with_trafo
+         for j = 1:cols(U)
+            mul!(t, q, U[r,j])
+            addeq!(U[p,j], t)
+         end
+      end
+   end
+   return nothing
+end
+
+function kb_canonical_row!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, r::Int, c::Int, with_trafo::Bool)
+   cu = canonical_unit(H[r,c])
+   if cu != 1
+      for j = c:cols(H)
+         H[r,j] = divexact(H[r,j],cu)
+      end
+      if with_trafo
+         for j = 1:cols(U)
+            U[r,j] = divexact(U[r,j],cu)
+         end
+      end
+   end
+   return nothing
+end
+
+function kb_sort_rows!{T <:RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int, 1}, with_trafo::Bool, start_element::Int = 1)
+   m = rows(H)
+   n = cols(H)
+   pivot2 = zeros(Int, m)
+   for i = 1:n
+      if pivot[i] == 0
+         continue
+      end
+      pivot2[pivot[i]] = i
+   end
+   
+   r1 = start_element
+   for i = start_element:n
+      r2 = pivot[i]
+      if r2 == 0
+         continue
+      end
+      if r1 != r2
+         swap_rows!(H, r1, r2)
+         with_trafo ? swap_rows!(U, r1, r2) : nothing
+         p = pivot2[r1]
+         pivot[i] = r1
+         if p != 0
+            pivot[p] = r2
+         end
+         pivot2[r1] = i
+         pivot2[r2] = p
+      end
+      r1 += 1
+      if r1 == m
+         break
+      end 
+   end
+   return nothing
+end
+
+function hnf_kb!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, with_trafo::Bool = false, start_element::Int = 1)
+   m = rows(H)
+   n = cols(H)
+   pivot = zeros(Int, n)
+   row1, col1 = kb_search_first_pivot(H, start_element)
+   if row1 == 0
+      return nothing
+   end
+   pivot[col1] = row1
+   kb_canonical_row!(H, U, row1, col1, with_trafo)
+   pivot_max = col1
+   t = base_ring(H)()
+   t1 = base_ring(H)()
+   t2 = base_ring(H)()
+   for i=row1:m-1
+      new_pivot = false
+      for j = start_element:pivot_max
+         if H[i+1,j] == 0
+            continue
+         end
+         if pivot[j] == 0
+            pivot[j] = i+1
+            kb_reduce_row!(H, U, pivot, j, with_trafo)
+            pivot_max = max(pivot_max, j)
+            new_pivot = true
+         else
+            p = pivot[j]
+            d, u, v = gcdx(H[p,j],H[i+1,j])
+            a = divexact(H[p,j],d)
+            b = -divexact(H[i+1,j],d)
+            for c = j:n
+               t = deepcopy(H[i+1,c])
+               mul!(t1, a, H[i+1,c])
+               mul!(t2, b, H[p,c])
+               add!(H[i+1,c], t1, t2)
+               mul!(t1, u, H[p,c])
+               mul!(t2, v, t)
+               add!(H[p,c], t1, t2)
+            end
+            if with_trafo
+               for c = 1:m
+                  t = deepcopy(U[i+1,c])
+                  mul!(t1, a, U[i+1,c])
+                  mul!(t2, b, U[p,c])
+                  add!(U[i+1,c], t1, t2)
+                  mul!(t1, u, U[p,c])
+                  mul!(t2, v, t)
+                  add!(U[p,c], t1, t2)
+               end
+            end
+         end
+         kb_canonical_row!(H, U, pivot[j], j, with_trafo)
+         kb_reduce_column!(H, U, pivot, j, with_trafo, start_element)
+         if new_pivot
+            break
+         end
+      end
+      if !new_pivot
+         for c = pivot_max+1:n
+            if H[i+1,c] != 0
+               pivot[c] = i+1 
+               kb_canonical_row!(H, U, pivot[c], c, with_trafo)
+               kb_reduce_column!(H, U, pivot, c, with_trafo, start_element)
+               pivot_max = max(pivot_max, c)
+               break
+            end
+         end
+      end
+   end
+   kb_sort_rows!(H, U, pivot, with_trafo, start_element)
+   return nothing
+end
+
+doc"""
+    hnf{T <: RingElem}(A::GenMat{T}) -> GenMat{T}
+> Return the upper right row Hermite normal form of $A$.
+"""
+function hnf{T <: RingElem}(A::GenMat{T})
+  return hnf_kb(A)
+end
+
+doc"""
+    hnf{T <: RingElem}(A::GenMat{T}) -> GenMaT{T}, GenMat{T}
+> Return the upper right row Hermite normal form $H$ of $A$ together with
+> invertible matrix $U$ such that $UA = H$.
+"""
+function hnf_with_trafo{T <: RingElem}(A::GenMat{T})
+  return hnf_kb_with_trafo(A)
+end
+
+###############################################################################
+#
+#   Smith Normal Form
+#
+###############################################################################
+
+function snf_kb{T <: RingElem}(A::GenMat{T})
+   return _snf_kb(A, Val{false})
+end
+
+function snf_kb_with_trafo{T <: RingElem}(A::GenMat{T})
+   return _snf_kb(A, Val{true})
+end
+
+function _snf_kb{V, T <: RingElem}(A::GenMat{T}, trafo::Type{Val{V}} = Val{false})
+   S = deepcopy(A)
+   m = rows(S)
+   n = cols(S)
+   if trafo == Val{true}
+      U = one(MatrixSpace(base_ring(S), m, m))
+      K = one(MatrixSpace(base_ring(S), n, n))
+      snf_kb!(S, U, K, true)
+      return S, U, K
+   else
+      U = zero(MatrixSpace(base_ring(S), 0, 0))
+      K = U
+      snf_kb!(S, U, K, false)
+      return S
+   end
+end
+
+function kb_clear_row!{T <: RingElem}(S::GenMat{T}, K::GenMat{T}, i::Int, with_trafo::Bool)
+   m = rows(S)
+   n = cols(S)
+   t = base_ring(S)()
+   t1 = base_ring(S)()
+   t2 = base_ring(S)()
+   for j = i+1:n
+      if S[i,j] == 0
+         continue
+      end
+      d, u, v = gcdx(S[i,i], S[i,j])
+      a = divexact(S[i,i], d)
+      b = -divexact(S[i,j], d)
+      for r = i:m
+         t = deepcopy(S[r,j])
+         mul!(t1, a, S[r,j])
+         mul!(t2, b, S[r,i])
+         add!(S[r,j], t1, t2)
+         mul!(t1, u, S[r,i])
+         mul!(t2, v, t)
+         add!(S[r,i], t1, t2)
+      end
+      if with_trafo
+         for r = 1:n
+            t = deepcopy(K[r,j])
+            mul!(t1, a, K[r,j])
+            mul!(t2, b, K[r,i])
+            add!(K[r,j], t1, t2)
+            mul!(t1, u, K[r,i])
+            mul!(t2, v, t)
+            add!(K[r,i], t1, t2)
+         end
+      end
+   end
+   return nothing
+end
+
+function snf_kb!{T <: RingElem}(S::GenMat{T}, U::GenMat{T}, K::GenMat{T}, with_trafo::Bool = false)
+   m = rows(S)
+   n = cols(S)
+   l = min(m,n)
+   i = 1
+   t = base_ring(S)()
+   t1 = base_ring(S)()
+   t2 = base_ring(S)()
+   while i<=l
+      kb_clear_row!(S, K, i, with_trafo)
+      hnf_kb!(S, U, with_trafo, i)
+      c = i+1
+      while c <= n && S[i, c] == 0
+         c+=1
+      end
+      if c != n+1
+         continue
+      end
+      i+=1
+   end
+   for i = 1:l-1
+      if S[i,i] == 0 && S[i+1,i+1] == 0
+         continue
+      end
+      d, u, v = gcdx(S[i,i], S[i+1,i+1])
+      if with_trafo
+         q = -divexact(S[i+1,i+1], d)
+         mul!(t1, q, v)
+         for c = 1:m
+            t = deepcopy(U[i,c])
+            addeq!(U[i,c], U[i+1,c])
+            mul!(t2, t1, U[i+1,c])
+            addeq!(U[i+1,c], t2)
+            mul!(t2, t1, t)
+            addeq!(U[i+1,c], t2)
+         end
+         q1 = -divexact(S[i+1,i+1], d)
+         q2 = divexact(S[i,i], d)
+         for r = 1:n
+            t = deepcopy(K[r,i])
+            mul!(t1, K[r,i], u)
+            mul!(t2, K[r,i+1], v)
+            add!(K[r,i], t1, t2)
+            mul!(t1, t, q1)
+            mul!(t2, K[r,i+1], q2)
+            add!(K[r,i+1], t1, t2)
+         end
+      end
+      S[i+1,i+1] = divexact(S[i,i]*S[i+1,i+1],d)
+      S[i,i] = d
+   end
+   return nothing
+end
+
+function snf{T <: RingElem}(a::GenMat{T})
+  return snf_kb(a)
+end
+
+function snf_with_trafo{T <: RingElem}(a::GenMat{T})
+  return snf_kb_with_trafo(a)
 end
 
 ###############################################################################

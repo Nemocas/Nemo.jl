@@ -557,7 +557,7 @@ Here is an example of applying a permutation to a matrix.
 ```
 R, t = PolynomialRing(QQ, "t")
 S = MatrixSpace(R, 3, 3)
-G = FlintPermGroup(3)
+G = PermGroup(3)
 
 A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 P = G([1, 3, 2])
@@ -568,11 +568,11 @@ B = P*A
 ## LU factorisation
 
 ```@docs
-lufact{T <: FieldElem}(::MatElem{T}, ::FlintPermGroup)
+lufact{T <: FieldElem}(::MatElem{T}, ::PermGroup)
 ```
 
 ```@docs
-fflu{T <: RingElem}(::MatElem{T}, ::FlintPermGroup)
+fflu{T <: RingElem}(::MatElem{T}, ::PermGroup)
 ```
 
 Here are some examples of LU factorisation.
@@ -581,7 +581,7 @@ Here are some examples of LU factorisation.
 R, x = PolynomialRing(QQ, "x")
 K, a = NumberField(x^3 + 3x + 1, "a")
 S = MatrixSpace(K, 3, 3)
-   
+
 A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 - 2 a - 1 2a])
 
 r, P, L, U = lufact(A)
@@ -620,6 +620,13 @@ M = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
 
 r, A = rref(M)
 isrref(A)
+```
+
+## Hermite normal form
+
+```@docs
+hnf{T <: RingElem}(::GenMat{T})
+hnf_with_trafo{T <: RingElem}(::GenMat{T})
 ```
 
 ## Determinant
@@ -683,6 +690,14 @@ solve{T <: RingElem}(::MatElem{T}, ::MatElem{T})
 ```
 
 ```@docs
+cansolve(::fmpz_mat, ::fmpz_mat)
+```
+
+```@docs
+solve_rational{T <: RingElem}(::MatElem{T}, ::MatElem{T})
+```
+
+```@docs
 solve_triu{T <: FieldElem}(::MatElem{T}, ::MatElem{T}, ::Bool)
 ```
 
@@ -716,7 +731,7 @@ U = MatrixSpace(R, 3, 2)
 A = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
 b = U([2x x + 1 (-x - 1); x + 1 (-x) x^2]')
 
-x, d = solve(A, b)
+x, d = solve_rational(A, b)
 
 S = MatrixSpace(ZZ, 3, 3)
 T = MatrixSpace(ZZ, 3, 1)
@@ -724,7 +739,7 @@ T = MatrixSpace(ZZ, 3, 1)
 A = S([fmpz(2) 3 5; 1 4 7; 9 2 2])   
 B = T([fmpz(4), 5, 7])
 
-X, d = solve(A, B)
+X, d = solve_rational(A, B)
 X, m = solve_dixon(A, B)
 ```
 

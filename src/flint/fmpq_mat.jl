@@ -14,6 +14,8 @@ export fmpq_mat, FmpqMatSpace, gso, hilbert
 
 elem_type(::FmpqMatSpace) = fmpq_mat
 
+parent_type(::Type{fmpq_mat}) = FmpqMatSpace
+
 base_ring(a::FmpqMatSpace) = a.base_ring
 
 parent(a::fmpq_mat) = a.parent

@@ -440,8 +440,8 @@ function test_fmpz_mat_snf()
    println("PASS")
 end
 
-function test_fmpz_mat_solve()
-   print("fmpz_mat.solve...")
+function test_fmpz_mat_solve_rational()
+   print("fmpz_mat.solve_rational...")
 
    S = MatrixSpace(ZZ, 3, 3)
 
@@ -451,7 +451,7 @@ function test_fmpz_mat_solve()
 
    B = T([fmpz(4), 5, 7])
 
-   X, d = solve(A, B)
+   X, d = solve_rational(A, B)
 
    @test (X, d) == (T([3, -24, 14]), 1)
 
@@ -465,6 +465,26 @@ function test_fmpz_mat_solve()
  
    println("PASS")
 end
+
+function test_fmpz_mat_solve()
+   print("fmpz_mat.solve...")
+
+   S = MatrixSpace(ZZ, 3, 3)
+
+   A = S([fmpz(2) 3 5; 1 4 7; 9 2 2])
+   
+   T = MatrixSpace(ZZ, 3, 1)
+
+   B = T([fmpz(4), 5, 7])
+
+   X = solve(A, B)
+
+   @test X == T([3, -24, 14])
+   @test A*X == B
+
+   println("PASS")
+end
+
 
 function test_fmpz_mat_concat()
    print("fmpz_mat.concat...")
@@ -512,6 +532,7 @@ function test_fmpz_mat()
    test_fmpz_mat_rank()
    test_fmpz_mat_rref()
    test_fmpz_mat_snf()
+   test_fmpz_mat_solve_rational()
    test_fmpz_mat_solve()
    test_fmpz_mat_concat()
 

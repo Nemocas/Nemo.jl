@@ -168,6 +168,48 @@ function randmat_with_rank{T <: RingElem}(S::GenMatSpace{T}, c::Int, rank::Int)
    return M
 end
 
+function istriu(A::GenMat)
+   m = rows(A)
+   n = cols(A)
+   d = 0
+   for c = 1:n
+      for r = m:-1:1
+         if !iszero(A[r,c])
+            if r < d
+               return false
+            end
+            d = r
+            break
+         end
+      end
+   end
+   return true
+end
+
+function is_snf(A::GenMat)
+   m = rows(A)
+   n = cols(A)
+   a = A[1,1]
+   for i = 2:min(m,n)
+      q, r = divrem(A[i,i], a)
+      if !iszero(r)
+         return false
+      end
+      a = A[i,i]
+   end
+   for i = 1:n
+      for j = 1:m
+         if i == j
+            continue
+         end
+         if !iszero(A[j,i])
+            return false
+         end
+      end
+   end
+   return true
+end
+
 function test_gen_mat_constructors()
    print("GenMat.constructors...")
  
@@ -599,8 +641,8 @@ function test_gen_mat_rank()
    println("PASS")   
 end
 
-function test_gen_mat_solve()
-   print("GenMat.solve...")
+function test_gen_mat_solve_rational()
+   print("GenMat.solve_rational...")
 
    S, x = PolynomialRing(ResidueRing(ZZ, 20011*10007), "x")
 
@@ -611,7 +653,7 @@ function test_gen_mat_solve()
       M = randmat_with_rank(R, 5, 100, dim);
       b = randmat(U, 5, 100);
 
-      x, d = solve(M, b)
+      x, d = solve_rational(M, b)
 
       @test M*x == d*b
    end
@@ -625,7 +667,7 @@ function test_gen_mat_solve()
       M = randmat_with_rank(R, 3, 20, dim);
       b = randmat(U, 3, 20);
 
-      x, d = solve(M, b)
+      x, d = solve_rational(M, b)
 
       @test M*x == d*b
    end
@@ -655,7 +697,7 @@ function test_gen_mat_solve()
       M = randmat_with_rank(T, 20, dim)
       b = randmat(U, 20)
  
-      x, d = solve(M, b)
+      x, d = solve_rational(M, b)
 
       @test M*x == d*b
    end
@@ -669,7 +711,7 @@ function test_gen_mat_solve()
    M = T([3y*a^2 + (y + 1)*a + 2y (5y+1)*a^2 + 2a + y - 1 a^2 + (-a) + 2y; (y + 1)*a^2 + 2y - 4 3y*a^2 + (2y - 1)*a + y (4y - 1)*a^2 + (y - 1)*a + 5; 2a + y + 1 (2y + 2)*a^2 + 3y*a + 3y a^2 + (-y-1)*a + (-y - 3)])
    b = U(permutedims([4y*a^2 + 4y*a + 2y + 1 5y*a^2 + (2y + 1)*a + 6y + 1 (y + 1)*a^2 + 3y*a + 2y + 4], [2, 1]))
 
-   x, d = solve(M, b)
+   x, d = solve_rational(M, b)
 
    @test M*x == d*b
 
@@ -1099,6 +1141,190 @@ function test_gen_concat()
    println("PASS")   
 end
 
+function test_gen_mat_hnf_kb()
+   print("GenMat.hnf_kb...")
+
+   R, x = PolynomialRing(QQ, "x")
+
+   M = MatrixSpace(R, 4, 3)
+
+   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
+
+   H = Nemo.hnf_kb(A)
+   @test istriu(H)
+
+   H, U = Nemo.hnf_kb_with_trafo(A)
+   @test istriu(H)
+   @test isunit(det(U))
+   @test U*A == H
+
+   F, a = FiniteField(7, 2, "a")
+
+   S, y = PolynomialRing(F, "y")
+
+   N = MatrixSpace(S, 3, 4)
+
+   B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
+
+   H = Nemo.hnf_kb(B)
+   @test istriu(H)
+
+   H, U = Nemo.hnf_kb_with_trafo(B)
+   @test istriu(H)
+   @test isunit(det(U))
+   @test U*B == H
+
+   println("PASS")
+end
+
+function test_gen_mat_hnf_cohen()
+   print("GenMat.hnf_cohen...")
+
+   R, x = PolynomialRing(QQ, "x")
+
+   M = MatrixSpace(R, 4, 3)
+
+   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
+
+   H = Nemo.hnf_cohen(A)
+   @test istriu(H)
+
+   H, U = Nemo.hnf_cohen_with_trafo(A)
+   @test istriu(H)
+   @test isunit(det(U))
+   @test U*A == H
+
+   F, a = FiniteField(7, 2, "a")
+
+   S, y = PolynomialRing(F, "y")
+
+   N = MatrixSpace(S, 3, 4)
+
+   B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
+
+   H = Nemo.hnf_cohen(B)
+   @test istriu(H)
+
+   H, U = Nemo.hnf_cohen_with_trafo(B)
+   @test istriu(H)
+   @test isunit(det(U))
+   @test U*B == H
+
+   println("PASS")
+end
+
+function test_gen_mat_hnf()
+   print("GenMat.hnf...")
+
+   R, x = PolynomialRing(QQ, "x")
+
+   M = MatrixSpace(R, 4, 3)
+
+   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
+
+   H = hnf(A)
+   @test istriu(H)
+
+   H, U = hnf_with_trafo(A)
+   @test istriu(H)
+   @test isunit(det(U))
+   @test U*A == H
+
+   F, a = FiniteField(7, 2, "a")
+
+   S, y = PolynomialRing(F, "y")
+
+   N = MatrixSpace(S, 3, 4)
+
+   B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
+
+   H = hnf(B)
+   @test istriu(H)
+
+   H, U = hnf_with_trafo(B)
+   @test istriu(H)
+   @test isunit(det(U))
+   @test U*B == H
+
+   println("PASS")
+end
+
+function test_gen_mat_snf_kb()
+   print("GenMat.snf_kb...")
+
+   R, x = PolynomialRing(QQ, "x")
+
+   M = MatrixSpace(R, 4, 3)
+
+   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
+
+   T = Nemo.snf_kb(A)
+   @test is_snf(T)
+
+   T, U, K = Nemo.snf_kb_with_trafo(A)
+   @test is_snf(T)
+   @test isunit(det(U))
+   @test isunit(det(K))
+   @test U*A*K == T
+
+   F, a = FiniteField(7, 2, "a")
+
+   S, y = PolynomialRing(F, "y")
+
+   N = MatrixSpace(S, 3, 4)
+
+   B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
+
+   T = Nemo.snf_kb(B)
+   @test is_snf(T)
+
+   T, U, K = Nemo.snf_kb_with_trafo(B)
+   @test is_snf(T)
+   @test isunit(det(U))
+   @test isunit(det(K))
+   @test U*B*K == T
+
+   println("PASS")
+end
+
+function test_gen_mat_snf()
+   print("GenMat.snf...")
+
+   R, x = PolynomialRing(QQ, "x")
+
+   M = MatrixSpace(R, 4, 3)
+
+   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
+
+   T = snf(A)
+   @test is_snf(T)
+
+   T, U, K = snf_with_trafo(A)
+   @test is_snf(T)
+   @test isunit(det(U))
+   @test isunit(det(K))
+   @test U*A*K == T
+
+   F, a = FiniteField(7, 2, "a")
+
+   S, y = PolynomialRing(F, "y")
+
+   N = MatrixSpace(S, 3, 4)
+
+   B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
+
+   T = snf(B)
+   @test is_snf(T)
+
+   T, U, K = snf_with_trafo(B)
+   @test is_snf(T)
+   @test isunit(det(U))
+   @test isunit(det(K))
+   @test U*B*K == T
+
+   println("PASS")
+end
+
 function test_gen_mat()
    test_gen_mat_constructors()
    test_gen_mat_manipulation()
@@ -1117,7 +1343,7 @@ function test_gen_mat()
    test_gen_mat_fflu()
    test_gen_mat_det()
    test_gen_mat_rank()
-   test_gen_mat_solve()
+   test_gen_mat_solve_rational()
    test_gen_mat_solve_triu()
    test_gen_mat_rref()
    test_gen_mat_nullspace()
@@ -1127,6 +1353,11 @@ function test_gen_mat()
    test_gen_mat_minpoly()
    test_gen_row_swapping()
    test_gen_concat()
+   test_gen_mat_hnf_kb()
+   test_gen_mat_hnf_cohen()
+   test_gen_mat_hnf()
+   test_gen_mat_snf_kb()
+   test_gen_mat_snf()
 
    println("")
 end

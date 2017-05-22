@@ -89,6 +89,8 @@ function check_parent(a::padic, b::padic)
       error("Incompatible padic rings in padic operation")
 end
 
+parent_type(::Type{padic}) = FlintPadicField
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -223,7 +225,7 @@ needs_parentheses(x::padic) = true
 
 isnegative(x::padic) = false
 
-show_minus_one(::FlintPadicField) = true
+show_minus_one(::Type{padic}) = true
 
 ###############################################################################
 #

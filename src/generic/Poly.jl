@@ -1664,10 +1664,10 @@ function resultant{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
          sgn = -sgn
       end
    end
-   lena = length(a)
-   lenb = length(b)
+   la = lena = length(a)
+   lb = lenb = length(b)
    if lenb == 1
-      return coeff(b, 0)^(lena - 1)
+      return coeff(b, 0)^(la - 1)
    end
    c1 = content(a)
    c2 = content(b)
@@ -1692,7 +1692,7 @@ function resultant{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
       h = divexact(h*g^d, s)
    end
    s = divexact(h*lead(B)^(lena - 1), h^(lena - 1))
-   res = c1^(lenb - 1)*c2^(lena - 1)*s*sgn
+   res = c1^(lb - 1)*c2^(la - 1)*s*sgn
 end
 
 function resultant_lehmer{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
@@ -1709,10 +1709,10 @@ function resultant_lehmer{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::Pol
          sgn = -sgn
       end
    end
-   lenA = length(a)
-   lenB = length(b)
+   lA = lenA = length(a)
+   lB = lenB = length(b)
    if lenB == 1
-      return coeff(b, 0)^(lenA - 1)
+      return coeff(b, 0)^(lA - 1)
    end
    c1 = content(a)
    c2 = content(b)
@@ -1768,7 +1768,7 @@ function resultant_lehmer{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::Pol
       end
    end
    s *= lead(B)^(lenA - 1)
-   return c1^(lenB - 1)*c2^(lenA - 1)*s*sgn
+   return c1^(lB - 1)*c2^(lA - 1)*s*sgn
 end
 
 function resultant{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
@@ -1783,18 +1783,18 @@ function resultant{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T
          sgn = -sgn
       end
    end
-   lena = length(a)
-   lenb = length(b)
+   la = lena = length(a)
+   lb = lenb = length(b)
    if lenb == 1
-      return coeff(b, 0)^(lena - 1)
+      return coeff(b, 0)^(la - 1)
    end
    c1 = content(a)
    c2 = content(b)
    A = divexact(a, c1)
    B = divexact(b, c2)
    s = base_ring(A)(1)
-   lena = length(A)
-   lenb = length(B)
+   la = lena = length(A)
+   lb = lenb = length(B)
    while lenb > 1
       if iseven(lena) && iseven(lenb)
          sgn = -sgn
@@ -1808,7 +1808,7 @@ function resultant{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T
       end
    end
    s *= lead(B)^(lena - 1)
-   return c1^(lenb - 1)*c2^(lena - 1)*s*sgn
+   return c1^(lb - 1)*c2^(la - 1)*s*sgn
 end
 
 ###############################################################################

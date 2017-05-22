@@ -10,6 +10,7 @@ export fmpz_mat, FmpzMatSpace, getindex, getindex!, setindex!, rows, cols,
        hnf_modular, lll, lll_gram, lll_with_transform, lll_gram_with_transform,
        lll_with_removal, lll_with_removal_transform,
        nullspace, rank, rref, reduce_mod, snf, snf_diagonal, issnf, solve,
+       solve_rational, cansolve, cansolve_with_nullspace,
        solve_dixon, trace, transpose, content, hcat, vcat, addmul!, zero!,
        window, pseudo_inv, hnf_modular_eldiv, nullspace_right_rational
 
@@ -20,6 +21,8 @@ export fmpz_mat, FmpzMatSpace, getindex, getindex!, setindex!, rows, cols,
 ###############################################################################
 
 elem_type(::FmpzMatSpace) = fmpz_mat
+
+parent_type(::Type{fmpz_mat}) = FmpzMatSpace
 
 base_ring(a::FmpzMatSpace) = a.base_ring
 
@@ -917,23 +920,132 @@ end
 #
 ###############################################################################
 
+doc"""
+    solve(a::fmpz_mat, b::fmpz_mat) -> fmpz_mat
+> Return a matrix $x$ such that $ax = b$. An exception is raised
+> if this is not possible.
+"""
 function solve(a::fmpz_mat, b::fmpz_mat)
-   rows(a) != cols(a) && error("Not a square matrix in solve")
    rows(b) != rows(a) && error("Incompatible dimensions in solve")
+   fl, z = cansolve(a, b)
+   if !fl
+     error("system is inconsistent")
+   end
+   return z
+end
+
+doc"""
+    cansolve(a::fmpz_mat, b::fmpz_mat) -> Bool, fmpz_mat
+> Return true and a matrix $x$ such that $ax = b$, or false and some matrix
+> in case $x$ does not exist.
+"""
+function cansolve(a::fmpz_mat, b::fmpz_mat)
+   rows(b) != rows(a) && error("Incompatible dimensions in cansolve")
+   H, T = hnf_with_transform(a')
+   b = deepcopy(b)
+   z = MatrixSpace(FlintZZ, cols(b), cols(a))()
+   l = min(rows(a), cols(a))
+   for i=1:cols(b)
+     for j=1:l
+       k = 1
+       while k <= cols(H) && iszero(H[j, k])
+         k += 1
+       end
+       if k > cols(H)
+         continue
+       end
+       q, r = divrem(b[k, i], H[j, k])
+       if !iszero(r)
+         return false, b
+       end
+       for h=k:cols(H)
+         b[h, i] -= q*H[j, h]
+       end
+       z[i, k] = q
+     end
+   end
+   if !iszero(b)
+     return false, b
+   end
+   return true, (z*T)'
+end
+
+doc"""
+    cansolve_with_nullspace(a::fmpz_mat, b::fmpz_mat) -> Bool, fmpz_mat, fmpz_mat
+> Return true, a matrix $x$ and a matrix $k$ such that $ax = b$ and the columns
+> of $k$ form a basis for the nullspace of $a$. In case $x$ does not exist, false
+> and two arbitrary matrices are returned.
+"""
+function cansolve_with_nullspace(a::fmpz_mat, b::fmpz_mat)
+   rows(b) != rows(a) && error("Incompatible dimensions in cansolve_with_nullspace")
+   H, T = hnf_with_transform(a')
+   z = MatrixSpace(FlintZZ, cols(b), cols(a))()
+   l = min(rows(a), cols(a))
+   for i=1:cols(b)
+     for j=1:l
+       k = 1
+       while k <= cols(H) && iszero(H[j, k])
+         k += 1
+       end
+       if k > cols(H)
+         continue
+       end
+       q, r = divrem(b[k, i], H[j, k])
+       if !iszero(r)
+         return false, b, b
+       end
+       for h=k:cols(H)
+         b[h, i] -= q*H[j, h]
+       end
+       z[i, k] = q
+     end
+   end
+   if !iszero(b)
+     return false, b, b
+   end
+
+   for i = rows(H):-1:1
+     for j = 1:cols(H)
+       if !iszero(H[i,j])
+         N = MatrixSpace(FlintZZ, cols(a), rows(H) -i)()
+         for k = 1:rows(N)
+           for l = 1:cols(N)
+             N[k,l] = T[rows(T) - l + 1, k]
+           end
+         end
+         return true, (z*T)', N
+       end
+     end
+   end
+   N =  MatrixSpace(FlintZZ, cols(a), 0)()
+
+   return true, (z*T), N
+end
+
+doc"""
+    solve_rational(a::fmpz_mat, b::fmpz_mat)
+> If it exists, return a tuple $(x, d)$ consisting of a column vector $x$ such
+> that $ax = db$. The element $b$ must be a column vector with the same number
+> of rows as $a$ and $a$ must be a square matrix. If these conditions are not
+> met or $(x, d)$ does not exist, an exception is raised.
+"""
+function solve_rational(a::fmpz_mat, b::fmpz_mat)
+   rows(a) != cols(a) && error("Not a square matrix in solve_rational")
+   rows(b) != rows(a) && error("Incompatible dimensions in solve_rational")
    z = parent(b)()
    d = fmpz()
    nonsing = ccall((:fmpz_mat_solve, :libflint), Bool,
       (Ptr{fmpz_mat}, Ptr{fmpz}, Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &d, &a, &b)
-   !nonsing && error("Singular matrix in solve")
+   !nonsing && error("Singular matrix in solve_rational")
    return z, d
 end
 
 doc"""
     solve_dixon(a::fmpz_mat, b::fmpz_mat)
-> Return a tuple $(x, m)$ consisting of the column vector $x$ such that
-> $ax = b \pmod{m}$ where $x$ and $b$ are column vectors with the same number
-> of rows as the $a$. Note that $a$ must be a square matrix. If these
-> conditions are not met, an exception is raised.
+> Return a tuple $(x, m)$ consisting of a column vector $x$ such that $ax = b
+> \pmod{m}$. The element  $b$ must be a column vector with the same number > of
+> rows as $a$ and $a$ must be a square matrix. If these conditions are not met
+> or $(x, d)$ does not exist, an exception is raised.
 """
 function solve_dixon(a::fmpz_mat, b::fmpz_mat)
    rows(a) != cols(a) && error("Not a square matrix in solve")

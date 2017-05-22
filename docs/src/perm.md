@@ -4,25 +4,25 @@ CurrentModule = Nemo
 
 ## Introduction
 
-Nemo provides rudimentary support for permutation groups via Flint. These are
+Nemo provides rudimentary support for permutation groups. These are
 mainly used for permutations of rows of matrices.
 
-Permutation groups are created using the `FlintPermGroup` (inner) constructor.
+Permutation groups are created using the `PermGroup` (inner) constructor.
 However, for convenience we define
 
 ```
-PermutationGroup = FlintPermGroup
+PermutationGroup = PermGroup
 ```
 
 so that permutation groups can be created using `PermutationGroup` instead of
-`FlintPermGroup`.
+`PermGroup`.
 
 The types of permutations in Nemo are given by the following table, along with
 the libraries that provide them and the associated types of the parent objects.
 
  Library | Group                          | Element type  | Parent type
 ---------|--------------------------------|---------------|---------------------
-Flint    | $S_n$                          | `perm`        | `FlintPermGroup`
+Native   | $S_n$                          | `perm`        | `PermGroup`
 
 All the permutation group types belong to the `Group` abstract type and the
 corresponding permutation element types belong to the `GroupElem` abstract
@@ -35,7 +35,7 @@ permutation group they belong to. This is accomplished with the following
 constructor.
 
 ```
-FlintPermGroup(n::Int)
+PermGroup(n::Int)
 ```
 
 Construct the permutation group on $n$ points. The function returns the parent
@@ -59,7 +59,7 @@ Apart from the identity permutation coercion as above, we offer the following
 functions.
 
 ```@docs
-eye(::FlintPermGroup)
+eye(::PermGroup)
 ```
 
 Note that permutations consist of lists of $n$ integers numbered from $1$ to
@@ -85,10 +85,10 @@ should provide these  functions along with the usual group element arithmetic.
 parent_type(::Type{perm})
 ```
 
-Gives the type of the parent object of a Flint permutation group element.
+Gives the type of the parent object of a permutation group element.
 
 ```
-elem_type(R::FlintPermGroup)
+elem_type(R::PermGroup)
 ```
 
 Given the parent object for a permutation group, return the type of elements

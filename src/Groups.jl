@@ -4,6 +4,6 @@
 #
 ###############################################################################
 
-include("flint/perm.jl")
+include("generic/PermGroups.jl")
 
 include("Rings.jl")

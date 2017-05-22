@@ -15,6 +15,8 @@ export rows, cols, zero, one, deepcopy, -, transpose, +, *, &, ==, !=,
 #
 ###############################################################################
 
+parent_type(::Type{arb_mat}) = ArbMatSpace
+
 function getindex!(z::arb, x::arb_mat, r::Int, c::Int)
   v = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
               (Ptr{arb_mat}, Int, Int), &x, r - 1, c - 1)
@@ -436,15 +438,17 @@ end
 function lufact!(P::perm, x::arb_mat)
   cols(x) != rows(x) && error("Matrix must be square")
   parent(P).n != rows(x) && error("Permutation does not match matrix")
+  P.d .-= 1
   r = ccall((:arb_mat_lu, :libarb), Cint,
               (Ptr{Int}, Ptr{arb_mat}, Ptr{arb_mat}, Int),
               P.d, &x, &x, prec(parent(x)))
   r == 0 && error("Could not find $(rows(x)) invertible pivot elements")
+  P.d .+= 1
   inv!(P)
   return rows(x)
 end
 
-function lufact(x::arb_mat, P = FlintPermGroup(rows(x)))
+function lufact(x::arb_mat, P = PermGroup(rows(x)))
   p = P()
   R = base_ring(x)
   L = parent(x)()
@@ -486,7 +490,7 @@ function solve_lu_precomp!(z::arb_mat, P::perm, LU::arb_mat, y::arb_mat)
   Q = inv(P)
   ccall((:arb_mat_solve_lu_precomp, :libarb), Void,
               (Ptr{arb_mat}, Ptr{Int}, Ptr{arb_mat}, Ptr{arb_mat}, Int),
-              &z, Q.d, &LU, &y, prec(parent(LU)))
+              &z, Q.d .- 1, &LU, &y, prec(parent(LU)))
   nothing
 end
 

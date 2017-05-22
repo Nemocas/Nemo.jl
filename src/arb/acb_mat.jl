@@ -15,6 +15,8 @@ export rows, cols, zero, one, deepcopy, -, transpose, +, *, &, ==, !=,
 #
 ###############################################################################
 
+parent_type(::Type{acb_mat}) = AcbMatSpace
+
 function getindex!(z::acb, x::acb_mat, r::Int, c::Int)
   v = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
               (Ptr{acb_mat}, Int, Int), &x, r - 1, c - 1)
@@ -472,10 +474,12 @@ end
 ###############################################################################
 
 function lufact!(P::perm, x::acb_mat)
+  P.d .-= 1
   r = ccall((:acb_mat_lu, :libarb), Cint,
               (Ptr{Int}, Ptr{acb_mat}, Ptr{acb_mat}, Int),
               P.d, &x, &x, prec(parent(x)))
   r == 0 && error("Could not find $(rows(x)) invertible pivot elements")
+  P.d .+= 1
   inv!(P)
   return rows(x)
 end
@@ -523,7 +527,7 @@ function solve_lu_precomp!(z::acb_mat, P::perm, LU::acb_mat, y::acb_mat)
   Q = inv(P)
   ccall((:acb_mat_solve_lu_precomp, :libarb), Void,
               (Ptr{acb_mat}, Ptr{Int}, Ptr{acb_mat}, Ptr{acb_mat}, Int),
-              &z, Q.d, &LU, &y, prec(parent(LU)))
+              &z, Q.d .- 1, &LU, &y, prec(parent(LU)))
   nothing
 end
 

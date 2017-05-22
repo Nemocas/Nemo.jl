@@ -192,7 +192,8 @@ if !is_windows()
        run(`git checkout 768d1aaa54516ddb351a06683e532ead54d47470`)
        cd(wdir)
     end
-  end          
+  end
+  open(`patch --forward -d flint2 -r -`, "r", open("../deps-PIE-ftbfs.patch"))
   println("DONE")
 end
 
@@ -239,6 +240,7 @@ if !is_windows()
       cd(wdir)
     end
   end
+  open(`patch --forward -d arb -r -`, "r", open("../deps-PIE-ftbfs.patch"))
   println("DONE")
 end
  

@@ -14,6 +14,8 @@ export AcbPolyRing, acb_poly, isreal, derivative, integral, evaluate,
 #   Basic manipulation
 #
 ###############################################################################    
+
+parent_type(::Type{acb_poly}) = AcbPolyRing
   
 length(x::acb_poly) = ccall((:acb_poly_length, :libarb), Int, 
                                    (Ptr{acb_poly},), &x)

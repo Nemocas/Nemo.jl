@@ -1,18 +1,19 @@
 VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module Nemo
- 
+
 import Base: Array, abs, asin, asinh, atan, atanh, base, bin, checkbounds,
              convert, cmp, contains, cos, cosh, dec, deepcopy,
-             deepcopy_internal, den, deserialize, det, div, divrem, exp, gcd,
-             gcdx, getindex, hash, hcat, hex, intersect, inv, invmod, isequal,
-             isfinite, isless, isqrt, isreal, lcm, ldexp, length, log, lufact,
-             lufact!, mod, ndigits, nextpow2, norm, nullspace, num, oct, one,
-             parent, parse, precision, prevpow2, promote_rule, rank, Rational,
-             rem, reverse, serialize, setindex!, show, sign, sin, sinh, size,
-             sqrt, string, tan, tanh, trace, trailing_zeros, transpose,
-             transpose!, truncate, typed_hvcat, typed_hcat, var, vcat, zero,
-             zeros, +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //, /, !=
+             deepcopy_internal, den, deserialize, det, div, divrem, exp, eye,
+             gcd, gcdx, getindex, hash, hcat, hex, intersect, inv, invmod,
+             isequal, isfinite, isless, isqrt, isreal, lcm, ldexp, length, log,
+             lufact, lufact!, mod, ndigits, nextpow2, norm, nullspace, num,
+             oct, one, parent, parse, precision, prevpow2, promote_rule, rank,
+             Rational, rem, reverse, serialize, setindex!, show, sign, sin,
+             sinh, size, sqrt, string, tan, tanh, trace, trailing_zeros,
+             transpose, transpose!, truncate, typed_hvcat, typed_hcat, var,
+             vcat, zero, zeros, +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <,
+             >, //, /, !=
 
 import Base: floor, ceil, hypot, sqrt, log, log1p, exp, expm1, sin, cos, sinpi,
              cospi, tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh,
@@ -20,7 +21,8 @@ import Base: floor, ceil, hypot, sqrt, log, log1p, exp, expm1, sin, cos, sinpi,
 
 export SetElem, GroupElem, RingElem, FieldElem
 
-export PolyElem, SeriesElem, AbsSeriesElem, ResElem, FracElem, MatElem, FinFieldElem
+export PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
+       MatElem, FinFieldElem
 
 export PolyRing, SeriesRing, AbsSeriesRing, ResRing, FracField, MatSpace, FinField
 
@@ -66,7 +68,7 @@ end
 const libmpfr = joinpath(pkgdir, "local", "lib", "libmpfr")
 const libflint = joinpath(pkgdir, "local", "lib", "libflint")
 const libarb = joinpath(pkgdir, "local", "lib", "libarb")
-  
+
 function flint_abort()
   error("Problem in the Flint-Subsystem")
 end
@@ -99,7 +101,7 @@ function __init__()
          cglobal(:jl_realloc),
          cglobal(:jl_free))
    end
-   
+
    ccall((:flint_set_abort, libflint), Void,
       (Ptr{Void},), cfunction(flint_abort, Void, ()))
 
@@ -261,7 +263,7 @@ end
 #
 ###############################################################################
 
-PermutationGroup = FlintPermGroup
+PermutationGroup = PermGroup
 
 ###############################################################################
 #
@@ -356,7 +358,7 @@ function test_module(x, y)
    if x in ["flint", "arb", "antic"]
      test_function_name *= y
    else x == "generic"
-     if y == "RelSeries" 
+     if y == "RelSeries"
        test_function_name *= "gen_rel_series"
      elseif y == "AbsSeries"
        test_function_name *= "gen_abs_series"

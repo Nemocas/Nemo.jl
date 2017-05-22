@@ -46,6 +46,8 @@ function check_parent(a::nf_elem, b::nf_elem)
    a.parent != b.parent && error("Incompatible number field elements")
 end
 
+show_minus_one(::Type{nf_elem}) = false
+
 ###############################################################################
 #
 #   Basic manipulation
