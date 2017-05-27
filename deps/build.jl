@@ -1,21 +1,21 @@
 oldwdir = pwd()
 
-pkgdir = Pkg.dir("Nemo") 
-wdir = Pkg.dir("Nemo", "deps")
-vdir = Pkg.dir("Nemo", "local")
+pkgdir = dirname(dirname(@__FILE__))
+wdir = joinpath(pkgdir, "deps")
+vdir = joinpath(pkgdir, "local")
 
-if !ispath(Pkg.dir("Nemo", "local"))
+if !ispath(vdir)
 
-    mkdir(Pkg.dir("Nemo", "local"))
+    mkdir(vdir)
 
-    if !ispath(Pkg.dir("Nemo", "local", "lib"))
-        mkdir(Pkg.dir("Nemo", "local", "lib"))
+    if !ispath(joinpath(vdir, "lib"))
+        mkdir(joinpath(vdir, "lib"))
     end
 else
     println("Deleting old $vdir")
     rm(vdir, force=true, recursive=true)
-    mkdir(Pkg.dir("Nemo", "local"))
-    mkdir(Pkg.dir("Nemo", "local", "lib"))
+    mkdir(vdir)
+    mkdir(joinpath(vdir, "lib"))
 end
 
 LDFLAGS = "-Wl,-rpath,$vdir/lib -Wl,-rpath,\$\$ORIGIN/../share/julia/site/v$(VERSION.major).$(VERSION.minor)/Nemo/local/lib"
@@ -265,6 +265,6 @@ end
 
 cd(wdir)
 
-push!(Libdl.DL_LOAD_PATH, Pkg.dir("Nemo", "local", "lib"))
+push!(Libdl.DL_LOAD_PATH, joinpath(vdir, "lib"))
 
 cd(oldwdir)
