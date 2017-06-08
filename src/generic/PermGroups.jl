@@ -308,8 +308,8 @@ end
 Base.start(A::AllPerms) = (collect(1:A.n), 1, 1, ones(Int, A.n))
 Base.next(A::AllPerms, state) = all_perms(state...)
 Base.done(A::AllPerms, state) = state[2] > A.all
-Base.eltype(::AllPerms) = Vector{Int}
-Base.length(A::AllPerms) = factorial(A.n)
+Base.eltype(::Type{AllPerms}) = Vector{Int}
+Base.length(A::AllPerms) = A.all
 
 function all_perms(elts, counter, i, c)
    if counter == 1
