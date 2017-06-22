@@ -1,6 +1,6 @@
 function test_fmpz_mat_constructors()
    print("fmpz_mat.constructors...")
- 
+
    S = MatrixSpace(ZZ, 3, 3)
 
    @test isa(S, FmpzMatSpace)
@@ -35,11 +35,30 @@ end
 
 function test_fmpz_mat_printing()
    print("fmpz_mat.printing...")
- 
+
    S = MatrixSpace(ZZ, 3, 3)
    f = S(fmpz(3))
 
    @test string(f) == "[3 0 0]\n[0 3 0]\n[0 0 3]"
+
+   println("PASS")
+end
+
+function test_fmpz_mat_convert()
+   print("fmpz_mat.convert...")
+
+   # Basic tests.
+   A = [[1 2 3]; [4 5 6]]
+   Abig = BigInt[[1 2 3]; [4 5 6]]
+   S = MatrixSpace(ZZ, 2, 3)
+   B = S(A)
+
+   @test Matrix{Int}(B) == A
+   @test Matrix{BigInt}(B) == Abig
+
+   # Tests when elements do not fit a simple Int.
+   B[1, 1] = 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+   @test_throws ErrorException Matrix{Int}(B)
 
    println("PASS")
 end
@@ -109,7 +128,7 @@ function test_fmpz_mat_adhoc_binary()
    @test A - fmpz(7) == -(fmpz(7) - A)
    @test 3*A == A*3
    @test fmpz(3)*A == A*fmpz(3)
-  
+
    println("PASS")
 end
 
@@ -168,7 +187,7 @@ function test_fmpz_mat_adhoc_exact_division()
 
    @test divexact(5*A, 5) == A
    @test divexact(12*A, fmpz(12)) == A
-  
+
    println("PASS")
 end
 
@@ -190,7 +209,7 @@ function test_fmpz_mat_trace()
    S = MatrixSpace(ZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
- 
+
    @test trace(A) == 9
 
    println("PASS")
@@ -203,7 +222,7 @@ function test_fmpz_mat_content()
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
 
-   @test content(17*A) == 17 
+   @test content(17*A) == 17
    println("PASS")
 end
 
@@ -244,7 +263,7 @@ function test_fmpz_mat_inversion()
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 2 2])
    B = S([-6 4 1; 61 (-41) (-9); -34 23 5])
- 
+
    @test inv(inv(A)) == A
 
    @test inv(A) == B
@@ -277,7 +296,7 @@ function test_fmpz_mat_exact_division()
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 2 2])
    B = S([2 3 4; 7 9 1; 5 4 5])
- 
+
    @test divexact(B*A, A) == B
 
    println("PASS")
@@ -290,7 +309,7 @@ function test_fmpz_mat_modular_reduction()
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 2 2])
    B = S([2 0 2; 1 1 1; 0 2 2])
- 
+
    @test reduce_mod(A, 3) == B
 
    @test reduce_mod(A, fmpz(3)) == B
@@ -304,7 +323,7 @@ function test_fmpz_mat_det()
    S = MatrixSpace(ZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 19 3 7])
-   
+
    @test det(A) == 27
 
    @test det_divisor(A) == 27
@@ -334,7 +353,7 @@ function test_fmpz_mat_hnf()
    A = S([fmpz(2) 3 5; 1 4 7; 19 3 7])
 
    B = S([1 0 0; 10 2 0; 0 0 4])
-   
+
    @test hnf(A) == S([1 0 16; 0 1 18; 0 0 27])
 
    H, T = hnf_with_transform(A)
@@ -359,7 +378,7 @@ function test_fmpz_mat_lll()
    S = MatrixSpace(ZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 19 3 7])
-   
+
    @test lll(A) == S([-1 1 2; -1 (-2) 2; 4 1 1])
 
    L, T = lll_with_transform(A)
@@ -377,7 +396,7 @@ function test_fmpz_mat_lll()
    r, L, T = lll_with_removal_transform(A, fmpz(100))
 
    @test T*A == L
-   
+
    println("PASS")
 end
 
@@ -388,7 +407,7 @@ function test_fmpz_mat_nullspace()
    T = MatrixSpace(ZZ, 3, 1)
 
    A = S([fmpz(2) 3 5; 1 4 7; 4 1 1])
-   
+
    @test nullspace(A) == (T([1; -9; 5]), 1)
 
    N, r = nullspace(A)
@@ -404,7 +423,7 @@ function test_fmpz_mat_rank()
    S = MatrixSpace(ZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 4 1 1])
-   
+
    @test rank(A) == 2
 
    println("PASS")
@@ -416,7 +435,7 @@ function test_fmpz_mat_rref()
    S = MatrixSpace(ZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 4 1 1])
-   
+
    @test rref(A) == (S([5 0 (-1); 0 5 9; 0 0 0]), 5)
 
    println("PASS")
@@ -428,7 +447,7 @@ function test_fmpz_mat_snf()
    S = MatrixSpace(ZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 19 3 7])
-   
+
    @test snf(A) == S([1 0 0; 0 1 0; 0 0 27])
 
    @test issnf(snf(A))
@@ -446,7 +465,7 @@ function test_fmpz_mat_solve_rational()
    S = MatrixSpace(ZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 2 2])
-   
+
    T = MatrixSpace(ZZ, 3, 1)
 
    B = T([fmpz(4), 5, 7])
@@ -462,7 +481,7 @@ function test_fmpz_mat_solve_rational()
    (Y, k) = solve_dixon(A, B)
 
    @test reduce_mod(Y, k) == reduce_mod(X, k)
- 
+
    println("PASS")
 end
 
@@ -472,7 +491,7 @@ function test_fmpz_mat_solve()
    S = MatrixSpace(ZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 2 2])
-   
+
    T = MatrixSpace(ZZ, 3, 1)
 
    B = T([fmpz(4), 5, 7])
@@ -506,6 +525,7 @@ end
 function test_fmpz_mat()
    test_fmpz_mat_constructors()
    test_fmpz_mat_printing()
+   test_fmpz_mat_convert()
    test_fmpz_mat_manipulation()
    test_fmpz_mat_unary_ops()
    test_fmpz_mat_binary_ops()

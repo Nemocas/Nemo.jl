@@ -26,7 +26,7 @@ parent_type(::Type{fmpz_mat}) = FmpzMatSpace
 
 base_ring(a::FmpzMatSpace) = a.base_ring
 
-parent(a::fmpz_mat, cached::Bool = true) = 
+parent(a::fmpz_mat, cached::Bool = true) =
     FmpzMatSpace(rows(a), cols(a), cached)
 
 function check_parent(a::fmpz_mat, b::fmpz_mat)
@@ -733,7 +733,7 @@ doc"""
 """
 function lll(x::fmpz_mat, ctx::lll_ctx = lll_ctx(0.99, 0.51))
    z = deepcopy(x)
-   if rows(z) == 0 
+   if rows(z) == 0
      return z
    end
    u = similar(x, rows(x), rows(x))
@@ -1200,13 +1200,32 @@ end
 
 ###############################################################################
 #
-#   Promotions
+#   Conversions and promotions
 #
 ###############################################################################
 
 promote_rule{T <: Integer}(::Type{fmpz_mat}, ::Type{T}) = fmpz_mat
 
 promote_rule(::Type{fmpz_mat}, ::Type{fmpz}) = fmpz_mat
+
+function convert(::Type{Matrix{Int}}, A::fmpz_mat)
+    m, n = size(A)
+
+    fittable = [fits(Int, A[i, j]) for i in 1:m, j in 1:n]
+    if ! all(fittable)
+        error("When trying to convert a fmpz_mat to a Matrix{Int}, some elements were too large to fit the standard Int type: try to convert to a matrix of BigInt.")
+    end
+
+    mat::Matrix{Int} = Int[A[i,j] for i in 1:m, j in 1:n]
+    return mat
+end
+
+function convert(::Type{Matrix{BigInt}}, A::fmpz_mat)
+    m, n = size(A)
+    # No check: always ensured to fit a BigInt.
+    mat::Matrix{BigInt} = BigInt[A[i,j] for i in 1:m, j in 1:n]
+    return mat
+end
 
 ###############################################################################
 #
