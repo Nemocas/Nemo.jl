@@ -997,7 +997,7 @@ ishnf(M)
 
 ## (Weak) Popov form
 
-Nemo provdes algorithms for computing the (weak) Popov of a matrix with entries
+Nemo provides algorithms for computing the (weak) Popov of a matrix with entries
 in a univariate polynomial ring over a field.
 
 ```@docs
@@ -1212,4 +1212,17 @@ isreal(A)
 
 isreal(onei(CC)*A)
 ```
+
+## Conversion to Julia matrices
+
+Julia matrices use a different data structure than Nemo matrices. Conversion to Julia matrices is usually only required for interfacing with other packages. It isn't necessary to convert Nemo matrices to Julia matrices in order to manipulate them.
+
+This conversion can be performed with standard Julia syntax, such as the following, where `A` is a `fmpz_mat`: 
+
+```
+Matrix{Int}(A)
+Matrix{BigInt}(A)
+```
+
+In case the matrix cannot be converted without loss 
 

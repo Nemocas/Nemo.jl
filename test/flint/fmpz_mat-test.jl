@@ -58,7 +58,7 @@ function test_fmpz_mat_convert()
 
    # Tests when elements do not fit a simple Int.
    B[1, 1] = 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-   @test_throws ErrorException Matrix{Int}(B)
+   @test_throws InexactError Matrix{Int}(B)
 
    println("PASS")
 end

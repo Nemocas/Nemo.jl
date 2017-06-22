@@ -1213,7 +1213,8 @@ function convert(::Type{Matrix{Int}}, A::fmpz_mat)
 
     fittable = [fits(Int, A[i, j]) for i in 1:m, j in 1:n]
     if ! all(fittable)
-        error("When trying to convert a fmpz_mat to a Matrix{Int}, some elements were too large to fit the standard Int type: try to convert to a matrix of BigInt.")
+        warn("When trying to convert a fmpz_mat to a Matrix{Int}, some elements were too large to fit the standard Int type: try to convert to a matrix of BigInt.")
+        throw(InexactError())
     end
 
     mat::Matrix{Int} = Int[A[i,j] for i in 1:m, j in 1:n]
