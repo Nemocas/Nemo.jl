@@ -1224,5 +1224,5 @@ Matrix{Int}(A)
 Matrix{BigInt}(A)
 ```
 
-In case the matrix cannot be converted without loss 
+In case the matrix cannot be converted without loss, an `InexactError` is thrown: in this case, cast to a matrix of `BigInt`s rather than `Int`s. 
 
