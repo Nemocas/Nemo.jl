@@ -54,7 +54,7 @@ show_minus_one(::Type{nf_elem}) = false
 #
 ###############################################################################
 
-const hash_seed = UInt==UInt64 ? 0xc2a44fbe466a1827 : 0xc2a44fb
+const hash_seed = UInt == UInt64 ? 0xc2a44fbe466a1827 : 0xc2a44fb
 
 function hash(a::nf_elem, h::UInt)
    global hash_seed
@@ -158,7 +158,7 @@ doc"""
 > Return `true` if the given number field element is invertible, i.e. nonzero,
 > otherwise return `false`.
 """
-isunit(a::nf_elem) = a != 0
+isunit(a::nf_elem) = !iszero(a)
 
 doc"""
     den(a::nf_elem)
@@ -432,6 +432,8 @@ end
 
 //(a::nf_elem, b::Rational) = divexact(a, fmpq(b))
 
+divexact(a::nf_elem, b::Rational) = divexact(a, fmpq(b))
+
 ###############################################################################
 #
 #   Powering
@@ -473,11 +475,15 @@ end
 
 ==(a::nf_elem, b::fmpq) = a == parent(a)(b)
 
+==(a::nf_elem, b::Rational) = a == parent(a)(b)
+
 ==(a::Integer, b::nf_elem) = parent(b)(a) == b
 
 ==(a::fmpz, b::nf_elem) = parent(b)(a) == b
 
 ==(a::fmpq, b::nf_elem) = parent(b)(a) == b
+
+==(a::Rational, b::nf_elem) = parent(b)(a) == b
 
 ###############################################################################
 #
@@ -554,6 +560,8 @@ divexact(a::Integer, b::nf_elem) = inv(b)*a
 divexact(a::fmpz, b::nf_elem) = inv(b)*a
 
 divexact(a::fmpq, b::nf_elem) = inv(b)*a
+
+divexact(a::Rational, b::nf_elem) = inv(b)*a
 
 ###############################################################################
 #
@@ -883,6 +891,8 @@ end
 
 promote_rule{T <: Integer}(::Type{nf_elem}, ::Type{T}) = nf_elem
 
+promote_rule{T <: Integer}(::Type{nf_elem}, ::Type{Rational{T}}) = nf_elem
+
 promote_rule(::Type{nf_elem}, ::Type{fmpz}) = nf_elem
 
 promote_rule(::Type{nf_elem}, ::Type{fmpq}) = nf_elem
@@ -924,6 +934,8 @@ function (a::AnticNumberField)(c::fmpq)
          (Ptr{nf_elem}, Ptr{fmpq}, Ptr{AnticNumberField}), &z, &c, &a)
    return z
 end
+
+(a::AnticNumberField)(c::Rational) = a(fmpq(c))
 
 function (a::AnticNumberField)(b::nf_elem)
    parent(b) != a && error("Cannot coerce number field element")

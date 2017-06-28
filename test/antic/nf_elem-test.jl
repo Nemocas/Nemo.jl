@@ -195,15 +195,17 @@ function test_nf_elem_adhoc_binary()
 
    d = 3a^2 - a + 1
 
-   @test d + 3 == 3 + d
-   @test d + fmpz(3) == fmpz(3) + d
-   @test d + fmpq(2, 3) == fmpq(2, 3) + d
-   @test d - 3 == -(3 - d)
-   @test d - fmpz(3) == -(fmpz(3) - d)
-   @test d - fmpq(2, 3) == -(fmpq(2, 3) - d)
-   @test d*3 == 3d
-   @test d*fmpz(3) == fmpz(3)*d
-   @test d*fmpq(2, 3) == fmpq(2, 3)*d
+   for T in [Int, BigInt, Rational{Int}, Rational{BigInt}, fmpq, fmpz]
+      @test d + T(3) == T(3) + d
+      @test d - T(3) == -(T(3) - d)
+      @test d * T(3) == T(3) * d
+      @test d + fmpq(2, 3) == fmpq(2, 3) + d
+   end
+
+   for T in [Rational{Int}, Rational{BigInt}, fmpq]
+      @test d - T(2, 3) == -(T(2, 3) - d)
+      @test d * T(2, 3) == T(2, 3) * d
+   end
    
    println("PASS")
 end
@@ -246,13 +248,16 @@ function test_nf_elem_adhoc_comparison()
 
    c = 3a^2 - a + 1
 
-   @test c != 5
-   @test K(5) == 5
-   @test K(5) == fmpz(5)
-   @test K(fmpq(2, 3)) == fmpq(2, 3)
-   @test 5 == K(5)
-   @test fmpz(5) == K(5)
-   @test fmpq(2, 3) == K(fmpq(2, 3))
+   for T in [Int, BigInt, Rational{Int}, Rational{BigInt}, fmpz, fmpq]
+      @test c != T(5)
+      @test K(5) == T(5)
+      @test T(5) == K(5)
+   end
+
+   for T in [Rational{Int}, Rational{BigInt}, fmpq]
+      @test K(fmpq(2, 3)) == T(2, 3)
+      @test T(2, 3) == K(fmpq(2, 3))
+   end
 
    println("PASS")
 end
@@ -292,9 +297,13 @@ function test_nf_elem_adhoc_exact_division()
 
    c = 3a^2 - a + 1
    
-   @test divexact(7c, 7) == c
-   @test divexact(7c, fmpz(7)) == c
-   @test divexact(fmpq(2, 3)*c, fmpq(2, 3)) == c
+   for T in [Int, BigInt, Rational{Int}, Rational{BigInt}, fmpz, fmpq]
+      @test divexact(7*c, T(7)) == c
+   end
+
+   for T in [Rational{Int}, Rational{BigInt}, fmpq]
+      @test divexact(fmpq(2, 3)*c, T(2, 3)) == c
+   end
   
    println("PASS")
 end
@@ -330,7 +339,7 @@ function test_nf_elem_norm_trace()
    println("PASS")
 end
 
-function test_nf_elem_Polynomials()
+function test_nf_elem_polynomials()
    print("nf_elem.Polynomials...")
  
    R, x = PolynomialRing(QQ, "x")
@@ -366,7 +375,7 @@ function test_nf_elem()
    test_nf_elem_adhoc_exact_division()
    test_nf_elem_divides()
    test_nf_elem_norm_trace()
-   test_nf_elem_Polynomials()
+   test_nf_elem_polynomials()
 
    println("")
 end
