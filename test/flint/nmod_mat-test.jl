@@ -18,6 +18,10 @@ function test_nmod_mat_constructors()
   
   R = NmodMatSpace(Z2, 2, 2)
 
+  @test elem_type(R) == nmod_mat
+  @test elem_type(NmodMatSpace) == nmod_mat
+  @test parent_type(nmod_mat) == NmodMatSpace
+
   @test isa(R, NmodMatSpace)
 
   @test base_ring(R) == Z2

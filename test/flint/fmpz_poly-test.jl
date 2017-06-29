@@ -3,6 +3,10 @@ function test_fmpz_poly_constructors()
  
    R, x = PolynomialRing(ZZ, "x")
 
+   @test elem_type(R) == fmpz_poly
+   @test elem_type(FmpzPolyRing) == fmpz_poly
+   @test parent_type(fmpz_poly) == FmpzPolyRing
+
    @test typeof(R) <: FmpzPolyRing
 
    @test isa(x, PolyElem)

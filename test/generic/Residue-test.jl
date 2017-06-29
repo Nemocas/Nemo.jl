@@ -1,7 +1,13 @@
 function test_gen_res_constructors()
    print("GenRes.constructors...")
  
-   R = ResidueRing(ZZ, 16453889)
+   B = FlintZZ
+
+   R = ResidueRing(B, 16453889)
+
+   @test elem_type(R) == GenRes{elem_type(B)}
+   @test elem_type(GenResRing{elem_type(B)}) == GenRes{elem_type(B)}
+   @test parent_type(GenRes{elem_type(B)}) == GenResRing{elem_type(B)}
 
    @test isa(R, GenResRing)
 

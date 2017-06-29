@@ -3,6 +3,10 @@ function test_fmpq_rel_series_constructors()
 
    R, x = PowerSeriesRing(QQ, 30, "x")
 
+   @test elem_type(R) == fmpq_rel_series
+   @test elem_type(FmpqRelSeriesRing) == fmpq_rel_series
+   @test parent_type(fmpq_rel_series) == FmpqRelSeriesRing
+
    @test isa(R, FmpqRelSeriesRing)
 
    a = x^3 + 2x + 1

@@ -4,6 +4,10 @@ function test_nmod_poly_constructors()
   R = ResidueRing(ZZ, 17)
   Rx, x = PolynomialRing(R, "x")
 
+  @test elem_type(Rx) == nmod_poly
+  @test elem_type(NmodPolyRing) == nmod_poly
+  @test parent_type(nmod_poly) == NmodPolyRing
+
   S = ResidueRing(ZZ, 19)
   Sy, y = PolynomialRing(R, "y")
 
@@ -68,7 +72,7 @@ function test_nmod_poly_constructors()
   @test isa(k, PolyElem)
   @test parent(k) == Rx
 
-  l = x^2 + x^2 + x^2 + x^1 + x^1 + R(1) 
+  l = x^2 + x^2 + x^2 + x^1 + x^1 + R(1)
 
   @test isa(l, PolyElem)
   @test parent(l) == Rx
@@ -145,7 +149,7 @@ function test_nmod_poly_unary_ops()
 
   println("PASS")
 end
- 
+
 function test_nmod_poly_binary_ops()
   print("nmod_poly.binary_ops...")
 
@@ -246,9 +250,9 @@ function test_nmod_poly_adhoc_comparison()
 
    f = x^2 + 2x + 1
 
-   @test f != 1 
+   @test f != 1
 
-   @test 1 != f 
+   @test 1 != f
 
    @test S(5) == fmpz(5)
 
@@ -303,7 +307,7 @@ function test_nmod_poly_reverse()
 
   f = x^5 + x^4 + 2 *x^2 + 1
 
-  g = reverse(f) 
+  g = reverse(f)
 
   @test parent(g) == parent(f)
   @test g == x^5 + 2*x^3 + x + 1
@@ -311,7 +315,7 @@ function test_nmod_poly_reverse()
 
   println("PASS")
 end
- 
+
 function test_nmod_poly_shift()
   print("nmod_poly.shift...")
 
@@ -389,13 +393,13 @@ function test_nmod_poly_adhoc_exact_division()
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
- 
+
    @test divexact(3*f, fmpz(3)) == f
 
    @test divexact(3*f, 3) == f
 
    @test divexact(R(7)*f, R(7)) == f
- 
+
    println("PASS")
 end
 
@@ -432,7 +436,7 @@ function test_nmod_poly_modular_arithmetic()
 
   @test gcdinv(f, g) == (1,84344969*x+234291581)
 
-  @test invmod(f, h) == 40508247*x^2+341251293*x+416130174 
+  @test invmod(f, h) == 40508247*x^2+341251293*x+416130174
 
   @test mulmod(f, g, h) == 324884334*x^2+162442132*x+162442162
 
@@ -549,7 +553,7 @@ function test_nmod_poly_interpolate()
 
   xval = [ R(0), R(1), R(2), R(3) ]
 
-  yval = [ R(0), R(1), R(4), R(9) ] 
+  yval = [ R(0), R(1), R(4), R(9) ]
 
   f = interpolate(Rx,xval,yval)
 
@@ -565,7 +569,7 @@ function test_nmod_poly_inflate()
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
-  f = x^6 + x^4 + 2 *x^2 
+  f = x^6 + x^4 + 2 *x^2
 
   g = inflate(f,2)
 
@@ -583,7 +587,7 @@ function test_nmod_poly_deflate()
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
-  f = x^6 + x^4 + 2 *x^2 
+  f = x^6 + x^4 + 2 *x^2
 
   g = deflate(f,2)
 
@@ -602,7 +606,7 @@ function test_nmod_poly_lifting()
   Rx, x = PolynomialRing(R, "x")
   Zy,y = PolynomialRing(ZZ, "y")
 
-  f = x^6 + x^4 + 2 *x^2 
+  f = x^6 + x^4 + 2 *x^2
 
   Zf = lift(Zy, f)
 
@@ -611,14 +615,13 @@ function test_nmod_poly_lifting()
   println("PASS")
 end
 
-
 function test_nmod_poly_isirreducible()
   print("nmod_poly.isirreducible...")
 
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
-  f = x^6 + x^4 + 2 *x^2 
+  f = x^6 + x^4 + 2 *x^2
 
   @test !isirreducible(f)
 
@@ -635,7 +638,7 @@ function test_nmod_poly_issquarefree()
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
-  f = x^6 + x^4 + 2 *x^2 
+  f = x^6 + x^4 + 2 *x^2
 
   @test !issquarefree(f)
 
@@ -661,7 +664,7 @@ function test_nmod_poly_factor()
 
   @test sh == Dict(36=>1,1=>1,4=>1,19=>1)
 
-  f = 5*(x^6 + x^4 + 2 *x^2 )^10 
+  f = 5*(x^6 + x^4 + 2 *x^2 )^10
 
   fac = factor_squarefree(f)
 

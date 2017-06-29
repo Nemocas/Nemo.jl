@@ -14,7 +14,7 @@ export FmpqPolyRing, fmpq_poly
 
 parent_type(::Type{fmpq_poly}) = FmpqPolyRing
 
-elem_type(::FmpqPolyRing) = fmpq_poly
+elem_type(::Type{FmpqPolyRing}) = fmpq_poly
 
 base_ring(a::FmpqPolyRing) = a.base_ring
 
@@ -687,36 +687,43 @@ end
 function zero!(z::fmpq_poly)
    ccall((:fmpq_poly_zero, :libflint), Void, 
                     (Ptr{fmpq_poly},), &z)
+   return z
 end
 
 function fit!(z::fmpq_poly, n::Int)
    ccall((:fmpq_poly_fit_length, :libflint), Void, 
                     (Ptr{fmpq_poly}, Int), &z, n)
+   return nothing
 end
 
 function setcoeff!(z::fmpq_poly, n::Int, x::fmpz)
    ccall((:fmpq_poly_set_coeff_fmpz, :libflint), Void, 
                     (Ptr{fmpq_poly}, Int, Ptr{fmpz}), &z, n, &x)
+   return z
 end
 
 function setcoeff!(z::fmpq_poly, n::Int, x::fmpq)
    ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, 
                     (Ptr{fmpq_poly}, Int, Ptr{fmpq}), &z, n, &x)
+   return z
 end
 
 function mul!(z::fmpq_poly, x::fmpq_poly, y::fmpq_poly)
    ccall((:fmpq_poly_mul, :libflint), Void, 
                 (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Ptr{fmpq_poly}), &z, &x, &y)
+   return z
 end
 
 function addeq!(z::fmpq_poly, x::fmpq_poly)
    ccall((:fmpq_poly_add, :libflint), Void, 
                 (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Ptr{fmpq_poly}), &z, &z, &x)
+   return z
 end
 
 function add!(z::fmpq_poly, x::fmpq_poly, y::fmpq_poly)
    ccall((:fmpq_poly_add, :libflint), Void, 
                 (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Ptr{fmpq_poly}), &z, &x, &y)
+   return z
 end
 
 ###############################################################################
@@ -725,13 +732,13 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{fmpq_poly}, ::Type{T}) = fmpq_poly
+promote_rule{T <: Integer}(::Type{fmpq_poly}, ::Type{T}) = fmpq_poly
 
-Base.promote_rule(::Type{fmpq_poly}, ::Type{fmpz}) = fmpq_poly
+promote_rule(::Type{fmpq_poly}, ::Type{fmpz}) = fmpq_poly
 
-Base.promote_rule(::Type{fmpq_poly}, ::Type{fmpq}) = fmpq_poly
+promote_rule(::Type{fmpq_poly}, ::Type{fmpq}) = fmpq_poly
 
-Base.promote_rule{T <: Integer}(::Type{fmpq_poly}, ::Type{Rational{T}}) = fmpq_poly
+promote_rule{T <: Integer}(::Type{fmpq_poly}, ::Type{Rational{T}}) = fmpq_poly
 
 ###############################################################################
 #

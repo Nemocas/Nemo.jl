@@ -20,7 +20,7 @@ function O(a::fmpz_mod_rel_series)
    return z
 end
 
-elem_type(::FmpzModRelSeriesRing) = fmpz_mod_rel_series
+elem_type(::Type{FmpzModRelSeriesRing}) = fmpz_mod_rel_series
 
 parent_type(::Type{fmpz_mod_rel_series}) = FmpzModRelSeriesRing
 
@@ -367,7 +367,7 @@ function ^(a::fmpz_mod_rel_series, b::Int)
    b < 0 && throw(DomainError())
    if isgen(a)
       z = parent(a)()
-      setcoeff!(z, 0, fmpz(1))
+      z = setcoeff!(z, 0, fmpz(1))
       z.prec = a.prec + b - 1
       z.val = b
    elseif pol_length(a) == 0
@@ -610,23 +610,27 @@ function zero!(x::fmpz_mod_rel_series)
   ccall((:fmpz_mod_poly_zero, :libflint), Void, 
                    (Ptr{fmpz_mod_rel_series},), &x)
   x.prec = parent(x).prec_max
+  return x
 end
 
 function fit!(x::fmpz_mod_rel_series, n::Int)
   ccall((:fmpz_mod_poly_fit_length, :libflint), Void, 
                    (Ptr{fmpz_mod_rel_series}, Int), &x, n)
+  return nothing
 end
 
 function setcoeff!(z::fmpz_mod_rel_series, n::Int, x::fmpz)
    ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, 
                 (Ptr{fmpz_mod_rel_series}, Int, Ptr{fmpz}), 
                &z, n, &x)
+   return z
 end
 
 function setcoeff!(z::fmpz_mod_rel_series, n::Int, x::GenRes{fmpz})
    ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, 
                 (Ptr{fmpz_mod_rel_series}, Int, Ptr{fmpz}), 
                &z, n, &x.data)
+   return z
 end
 
 function mul!(z::fmpz_mod_rel_series, a::fmpz_mod_rel_series, b::fmpz_mod_rel_series)
@@ -647,7 +651,7 @@ function mul!(z::fmpz_mod_rel_series, a::fmpz_mod_rel_series, b::fmpz_mod_rel_se
                 (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int), 
                &z, &a, &b, lenz)
    renormalize!(z)
-   return nothing
+   return z
 end
 
 function addeq!(a::fmpz_mod_rel_series, b::fmpz_mod_rel_series)
@@ -690,7 +694,7 @@ function addeq!(a::fmpz_mod_rel_series, b::fmpz_mod_rel_series)
    a.prec = prec
    a.val = val
    renormalize!(a)
-   return nothing
+   return a
 end
 
 function add!(c::fmpz_mod_rel_series, a::fmpz_mod_rel_series, b::fmpz_mod_rel_series)
@@ -707,6 +711,7 @@ function add!(c::fmpz_mod_rel_series, a::fmpz_mod_rel_series, b::fmpz_mod_rel_se
    ccall((:fmpz_mod_poly_add_series, :libflint), Void, 
                 (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int), 
                &c, &a, &b, lenc)
+   return c
 end
 
 ###############################################################################
@@ -715,11 +720,11 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{fmpz_mod_rel_series}, ::Type{T}) = fmpz_mod_rel_series
+promote_rule{T <: Integer}(::Type{fmpz_mod_rel_series}, ::Type{T}) = fmpz_mod_rel_series
 
-Base.promote_rule(::Type{fmpz_mod_rel_series}, ::Type{fmpz}) = fmpz_mod_rel_series
+promote_rule(::Type{fmpz_mod_rel_series}, ::Type{fmpz}) = fmpz_mod_rel_series
 
-Base.promote_rule(::Type{fmpz_mod_rel_series}, ::Type{GenRes{fmpz}}) = fmpz_mod_rel_series
+promote_rule(::Type{fmpz_mod_rel_series}, ::Type{GenRes{fmpz}}) = fmpz_mod_rel_series
 
 ###############################################################################
 #

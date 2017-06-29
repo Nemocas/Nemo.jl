@@ -8,7 +8,61 @@ export MatrixSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, isrref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
        ishessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat,
        powers, similarity!, solve, solve_rational, hnf, hnf_with_trafo, snf,
-       snf_with_trafo
+       snf_with_trafo, weak_popov, weak_popov_with_trafo, extended_weak_popov,
+       extended_weak_popov_with_trafo, rank_profile_popov, hnf_via_popov, 
+       hnf_via_popov_with_trafo, popov, det_popov
+
+###############################################################################
+#
+#   Similar and eye
+#
+###############################################################################
+
+function similar{T}(x::GenMat{T})
+   z = GenMat{T}(similar(x.entries))
+   for i in 1:rows(z)
+      for j in 1:cols(z)
+         z[i, j] = zero(base_ring(x))
+      end
+   end
+   z.base_ring = base_ring(x)
+   return z
+end
+
+function similar{T}(x::GenMat{T}, r::Int, c::Int)
+   z = GenMat{T}(similar(x.entries, r, c))
+   for i in 1:rows(z)
+      for j in 1:cols(z)
+         z[i, j] = zero(base_ring(x))
+      end
+   end
+   z.base_ring = base_ring(x)
+   return z
+end
+
+doc"""
+    eye(x::MatElem)
+> Return the identity matrix with the same shape as $x$.
+"""
+function eye(x::MatElem)
+  z = similar(x)
+  for i in 1:rows(x)
+    z[i, i] = one(base_ring(x))
+  end
+  return z
+end
+
+doc"""
+    eye(x::MatElem, d::Int)
+> Return the $d$-by-$d$ identity matrix with the same base ring as $x$.
+"""
+function eye(x::MatElem, d::Int)
+  z = similar(x, d, d)
+  for i in 1:rows(z)
+    z[i, i] = one(base_ring(x))
+  end
+  return z
+end
 
 ###############################################################################
 #
@@ -18,7 +72,7 @@ export MatrixSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, isrref,
 
 parent_type{T}(::Type{GenMat{T}}) = GenMatSpace{T}
 
-elem_type{T <: RingElem}(::GenMatSpace{T}) = GenMat{T}
+elem_type{T <: RingElem}(::Type{GenMatSpace{T}}) = GenMat{T}
 
 doc"""
     base_ring{T <: RingElem}(S::MatSpace{T})
@@ -31,16 +85,17 @@ doc"""
 > Return the base ring $R$ of the matrix space that the supplied matrix $r$
 > belongs to.
 """
-base_ring(a::MatElem) = base_ring(parent(a))
+base_ring(a::MatElem) = a.base_ring
 
 doc"""
     parent(a::MatElem)
 > Return the parent object of the given matrix.
 """
-parent(a::MatElem) = a.parent
+parent{T}(a::MatElem{T}, cached::Bool = true) =
+    GenMatSpace{T}(a.base_ring, size(a.entries)..., cached)
 
 function check_parent(a::MatElem, b::MatElem)
-   parent(a) != parent(b) && 
+  (base_ring(a) != base_ring(b) || rows(a) != rows(b) || cols(a) != cols(b)) && 
                 error("Incompatible matrix spaces in matrix operation")
 end
 
@@ -65,13 +120,13 @@ doc"""
     rows(a::MatElem)
 > Return the number of rows of the given matrix.
 """
-rows(a::MatElem) = parent(a).rows
+rows(a::MatElem) = size(a.entries, 1)
 
 doc"""
     cols(a::MatElem)
 > Return the number of columns of the given matrix.
 """
-cols(a::MatElem) = parent(a).cols
+cols(a::MatElem) = size(a.entries, 2)
 
 function getindex{T <: RingElem}(a::MatElem{T}, r::Int, c::Int)
    return a.entries[r, c]
@@ -135,14 +190,13 @@ function isone(a::MatElem)
 end
 
 function deepcopy_internal{T <: RingElem}(d::MatElem{T}, dict::ObjectIdDict)
-   entries = Array{T}(rows(d), cols(d))
+   c = similar(d)
    for i = 1:rows(d)
       for j = 1:cols(d)
-         entries[i, j] = deepcopy_internal(d[i, j], dict)
+         c[i, j] = deepcopy_internal(d[i, j], dict)
       end
    end
-   M = parent(d)
-   return M(entries)
+   return c
 end
 
 ###############################################################################
@@ -196,8 +250,13 @@ doc"""
 > Return $-a$.
 """
 function -(x::MatElem)
-   par = parent(x)
-   return par(-x.entries)
+   z = similar(x)
+   for i in 1:rows(x)
+      for j in 1:cols(x)
+         z[i, j] = -x[i, j]
+      end
+   end
+   return z
 end
 
 ###############################################################################
@@ -212,7 +271,7 @@ doc"""
 """
 function +{T <: RingElem}(x::MatElem{T}, y::MatElem{T})
    check_parent(x, y)
-   r = parent(x)()
+   r = similar(x)
    for i = 1:rows(x)
       for j = 1:cols(x)
          r[i, j] = x[i, j] + y[i, j]
@@ -227,7 +286,7 @@ doc"""
 """
 function -{T <: RingElem}(x::MatElem{T}, y::MatElem{T})
    check_parent(x, y)
-   r = parent(x)()
+   r = similar(x)
    for i = 1:rows(x)
       for j = 1:cols(x)
          r[i, j] = x[i, j] - y[i, j]
@@ -242,23 +301,18 @@ doc"""
 """
 function *{T <: RingElem}(x::MatElem{T}, y::MatElem{T})
    cols(x) != rows(y) && error("Incompatible matrix dimensions")
-   if rows(x) == cols(y) && rows(x) == cols(x)
-      parz = parent(x)
-   else
-      parz = MatrixSpace(base_ring(x), rows(x), cols(y))
-   end
-   A = Array{T}(rows(x), cols(y))
+   A = similar(x, rows(x), cols(y))
    C = base_ring(x)()
    for i = 1:rows(x)
       for j = 1:cols(y)
          A[i, j] = base_ring(x)()
          for k = 1:cols(x)
-            mul!(C, x[i, k], y[k, j])
-            addeq!(A[i, j], C)
+            C = mul!(C, x[i, k], y[k, j])
+            A[i, j] = addeq!(A[i, j], C)
          end
       end
    end
-   return parz(A)
+   return A
 end
 
 ###############################################################################
@@ -272,14 +326,13 @@ doc"""
 > Return $x\times y$.
 """
 function *(x::Integer, y::MatElem)
-   z = similar(y.entries)
-   parz = parent(y)
+   z = similar(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
          z[i, j] = x*y[i, j]
       end
    end
-   return parz(z)
+   return z
 end
 
 doc"""
@@ -287,14 +340,13 @@ doc"""
 > Return $x\times y$.
 """
 function *(x::fmpz, y::MatElem)
-   z = similar(y.entries)
-   parz = parent(y)
+   z = similar(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
          z[i, j] = x*y[i, j]
       end
    end
-   return parz(z)
+   return z
 end
 
 doc"""
@@ -302,14 +354,13 @@ doc"""
 > Return $x\times y$.
 """
 function *{T <: RingElem}(x::T, y::MatElem{T})
-   z = similar(y.entries)
-   parz = parent(y)
+   z = similar(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
          z[i, j] = x*y[i, j]
       end
    end
-   return parz(z)
+   return z
 end
 
 doc"""
@@ -335,8 +386,7 @@ doc"""
 > Return $S(x) + y$ where $S$ is the parent of $y$.
 """
 function +(x::Integer, y::MatElem)
-   z = similar(y.entries)
-   parz = parent(y)
+   z = similar(y)
    R = base_ring(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
@@ -347,7 +397,7 @@ function +(x::Integer, y::MatElem)
          end
       end
    end
-   return parz(z)
+   return z
 end
 
 doc"""
@@ -361,8 +411,7 @@ doc"""
 > Return $S(x) + y$ where $S$ is the parent of $y$.
 """
 function +(x::fmpz, y::MatElem)
-   z = similar(y.entries)
-   parz = parent(y)
+   z = similar(y)
    R = base_ring(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
@@ -373,7 +422,7 @@ function +(x::fmpz, y::MatElem)
          end
       end
    end
-   return parz(z)
+   return z
 end
 
 doc"""
@@ -387,8 +436,7 @@ doc"""
 > Return $S(x) + y$ where $S$ is the parent of $y$.
 """
 function +{T <: RingElem}(x::T, y::MatElem{T})
-   z = similar(y.entries)
-   parz = parent(y)
+   z = similar(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
          if i != j
@@ -398,7 +446,7 @@ function +{T <: RingElem}(x::T, y::MatElem{T})
          end
       end
    end
-   return parz(z)
+   return z
 end
 
 doc"""
@@ -412,8 +460,7 @@ doc"""
 > Return $S(x) - y$ where $S$ is the parent of $y$.
 """
 function -(x::Integer, y::MatElem)
-   z = similar(y.entries)
-   parz = parent(y)
+   z = similar(y)
    R = base_ring(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
@@ -424,16 +471,15 @@ function -(x::Integer, y::MatElem)
          end
       end
    end
-   return parz(z)
+   return z
 end
 
 doc"""
     -(x::MatElem, y::Integer)
-> Return $x - S(y)$, where $S$ is the parent of $x$
+> Return $x - S(y)$, where $S$ is the parent of $x$.
 """
 function -(x::MatElem, y::Integer) 
-   z = similar(x.entries)
-   parz = parent(x)
+   z = similar(x)
    R = base_ring(x)
    for i = 1:rows(x)
       for j = 1:cols(x)
@@ -444,7 +490,7 @@ function -(x::MatElem, y::Integer)
          end
       end
    end
-   return parz(z)
+   return z
 end
 
 doc"""
@@ -452,48 +498,7 @@ doc"""
 > Return $S(x) - y$ where $S$ is the parent of $y$.
 """
 function -(x::fmpz, y::MatElem)
-   z = similar(y.entries)
-   parz = parent(y)
-   R = base_ring(y)
-   for i = 1:rows(y)
-      for j = 1:cols(y)
-         if i != j
-            z[i, j] = -y[i, j]
-         else
-            z[i, j] = R(x) - y[i, j] 
-         end
-      end
-   end
-   return parz(z)
-end
-
-doc"""
-    -(x::MatElem, y::fmpz)
-> Return $x - S(y)$, where $S$ is the parent of $x$
-"""
-function -(x::MatElem, y::fmpz) 
-   z = similar(x.entries)
-   parz = parent(x)
-   R = base_ring(x)
-   for i = 1:rows(x)
-      for j = 1:cols(x)
-         if i != j
-            z[i, j] = deepcopy(x[i, j])
-         else
-            z[i, j] = x[i, j] - R(y)
-         end
-      end
-   end
-   return parz(z)
-end
-
-doc"""
-    -{T <: RingElem}(x::T, y::MatElem{T})
-> Return $S(x) - y$ where $S$ is the parent of $y$.
-"""
-function -{T <: RingElem}(x::T, y::MatElem{T})
-   z = similar(y.entries)
-   parz = parent(y)
+   z = similar(y)
    R = base_ring(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
@@ -504,16 +509,15 @@ function -{T <: RingElem}(x::T, y::MatElem{T})
          end
       end
    end
-   return parz(z)
+   return z
 end
 
 doc"""
-    -{T <: RingElem}(x::MatElem{T}, y::T)
-> Return $x - S(y)$, where $S$ is the parent of $a$.
+    -(x::MatElem, y::fmpz)
+> Return $x - S(y)$, where $S$ is the parent of $x$
 """
-function -{T <: RingElem}(x::MatElem{T}, y::T) 
-   z = similar(x.entries)
-   parz = parent(x)
+function -(x::MatElem, y::fmpz) 
+   z = similar(x)
    R = base_ring(x)
    for i = 1:rows(x)
       for j = 1:cols(x)
@@ -524,7 +528,45 @@ function -{T <: RingElem}(x::MatElem{T}, y::T)
          end
       end
    end
-   return parz(z)
+   return z
+end
+
+doc"""
+    -{T <: RingElem}(x::T, y::MatElem{T})
+> Return $S(x) - y$ where $S$ is the parent of $y$.
+"""
+function -{T <: RingElem}(x::T, y::MatElem{T})
+   z = similar(y)
+   R = base_ring(y)
+   for i = 1:rows(y)
+      for j = 1:cols(y)
+         if i != j
+            z[i, j] = -y[i, j]
+         else
+            z[i, j] = x - y[i, j] 
+         end
+      end
+   end
+   return z
+end
+
+doc"""
+    -{T <: RingElem}(x::MatElem{T}, y::T)
+> Return $x - S(y)$, where $S$ is the parent of $a$.
+"""
+function -{T <: RingElem}(x::MatElem{T}, y::T) 
+   z = similar(x)
+   R = base_ring(x)
+   for i = 1:rows(x)
+      for j = 1:cols(x)
+         if i != j
+            z[i, j] = deepcopy(x[i, j])
+         else
+            z[i, j] = x[i, j] - y
+         end
+      end
+   end
+   return z
 end
 
 ###############################################################################
@@ -542,7 +584,7 @@ function ^{T <: RingElem}(a::MatElem{T}, b::Int)
    rows(a) != cols(a) && error("Incompatible matrix dimensions in power")
    # special case powers of x for constructing polynomials efficiently
    if b == 0
-      return one(parent(a))
+      return eye(a)
    elseif b == 1
       return deepcopy(a)
    else
@@ -570,9 +612,8 @@ doc"""
 function powers{T <: RingElem}(a::MatElem{T}, d::Int)
    rows(a) != cols(a) && error("Dimensions do not match in powers")
    d <= 0 && throw(DomainError())
-   S = parent(a)
    A = Array{MatElem{T}}(d + 1)
-   A[1] = one(S)
+   A[1] = eye(a)
    if d > 1
       c = a
       A[2] = a
@@ -729,14 +770,13 @@ doc"""
 > $y$. Each division is expected to be exact.
 """
 function divexact(x::MatElem, y::Integer)
-   z = similar(x.entries)
-   parz = parent(x)
+   z = similar(x)
    for i = 1:rows(x)
       for j = 1:cols(x)
          z[i, j] = divexact(x[i, j], y)
       end
    end
-   return parz(z)
+   return z
 end
 
 doc"""
@@ -745,14 +785,13 @@ doc"""
 > $y$. Each division is expected to be exact.
 """
 function divexact(x::MatElem, y::fmpz)
-   z = similar(x.entries)
-   parz = parent(x)
+   z = similar(x)
    for i = 1:rows(x)
       for j = 1:cols(x)
          z[i, j] = divexact(x[i, j], y)
       end
    end
-   return parz(z)
+   return z
 end
 
 doc"""
@@ -761,14 +800,13 @@ doc"""
 > $y$. Each division is expected to be exact.
 """
 function divexact{T <: RingElem}(x::MatElem{T}, y::T)
-   z = similar(x.entries)
-   parz = parent(x)
+   z = similar(x)
    for i = 1:rows(x)
       for j = 1:cols(x)
          z[i, j] = divexact(x[i, j], y)
       end
    end
-   return parz(z)
+   return z
 end
 
 ###############################################################################
@@ -803,17 +841,12 @@ doc"""
 > $i$-th and $j$-th rows, respectively.
 """
 function gram(x::MatElem)
-   if rows(x) == cols(x)
-      parz = parent(x)
-   else
-      parz = MatrixSpace(base_ring(x), rows(x), rows(x))
-   end
-   z = parz()   
+   z = similar(x, rows(x), rows(x))
    for i = 1:rows(x)
       for j = 1:rows(x)
          z[i, j] = zero(base_ring(x))
          for k = 1:cols(x)
-            z[i, j] += x[i, k]*x[j, k]
+            z[i, j] += x[i, k] * x[j, k]
          end
       end
    end
@@ -835,7 +868,7 @@ function trace(x::MatElem)
    rows(x) != cols(x) && error("Not a square matrix in trace")
    d = zero(base_ring(x))
    for i = 1:rows(x)
-      addeq!(d, x[i, i])
+      d = addeq!(d, x[i, i])
    end
    return d
 end
@@ -875,7 +908,7 @@ doc"""
 > Apply the pemutation $P$ to the rows of the matrix $x$ and return the result.
 """
 function *(P::perm, x::MatElem)
-   z = parent(x)()
+  z = similar(x)
    m = rows(x)
    n = cols(x)
    for i = 1:m
@@ -923,10 +956,8 @@ function lufact!{T <: FieldElem}(P::perm, A::MatElem{T})
       for i = r + 1:m
          q = A[i, c]*d
          for j = c + 1:n
-            mul!(t, A[r, j], q)
-            u = A[i, j]
-            addeq!(u, t)
-            A[i, j] = u
+            t = mul!(t, A[r, j], q)
+            A[i, j] = addeq!(A[i, j], t)
          end
          A[i, c] = R()
          A[i, rank] = -q
@@ -951,11 +982,7 @@ function lufact{T <: FieldElem}(A::MatElem{T}, P = PermGroup(rows(A)))
    p = P()
    R = base_ring(A)
    U = deepcopy(A)
-   if m == n
-      L = parent(A)()
-   else
-      L = MatrixSpace(R, m, m)()
-   end
+   L = similar(A, m, m)
    rank = lufact!(p, U)
    for i = 1:m
       for j = 1:n
@@ -1007,14 +1034,13 @@ function fflu!{T <: RingElem}(P::perm, A::MatElem{T})
       q = -A[r, c]
       for i = r + 1:m
          for j = c + 1:n
-            u = A[i, j]
-            mul!(u, u, q)
-            mul!(t, A[i, c], A[r, j])
-            addeq!(u, t)
+            A[i, j] = mul!(A[i, j], A[i, j], q)
+            t = mul!(t, A[i, c], A[r, j])
+            A[i, j] = addeq!(A[i, j], t)
             if r > 1
-               A[i, j] = divexact(u, d)
+               A[i, j] = divexact(A[i, j], d)
             else
-               A[i, j] = -u
+               A[i, j] = -A[i, j]
             end
          end
       end
@@ -1061,15 +1087,13 @@ function fflu!{T <: FieldElem}(P::perm, A::MatElem{T})
       q = -A[r, c]
       for i = r + 1:m
          for j = c + 1:n
-            u = A[i, j]
-            mul!(u, u, q)
-            mul!(t, A[i, c], A[r, j])
-            addeq!(u, t)
+            A[i, j] = mul!(A[i, j], A[i, j], q)
+            t = mul!(t, A[i, c], A[r, j])
+            A[i, j] = addeq!(A[i, j], t)
             if r > 1
-               mul!(u, u, d)
-               A[i, j] = u
+               A[i, j] = mul!(A[i, j], A[i, j], d)
             else
-               A[i, j] = -u
+               A[i, j] = -A[i, j]
             end
          end
       end
@@ -1100,11 +1124,7 @@ function fflu{T <: RingElem}(A::MatElem{T}, P = PermGroup(rows(A)))
    p = P()
    R = base_ring(A)
    U = deepcopy(A)
-   if m == n
-      L = parent(A)()
-   else
-      L = MatrixSpace(R, m, m)()
-   end
+   L = similar(A, m, m)
    rank, d = fflu!(p, U)
    for i = 1:m
       for j = 1:n
@@ -1164,10 +1184,10 @@ function rref!{T <: RingElem}(A::MatElem{T})
       end
       for k = 1:n - rank
          for i = rank - 1:-1:1
-            mul!(t, A[i, pivots[np + k]], d)
+            t = mul!(t, A[i, pivots[np + k]], d)
             for j = i + 1:rank
-               mul!(q, A[i, pivots[j]], A[j, pivots[np + k]])
-               addeq!(t, q)
+               q = mul!(q, A[i, pivots[j]], A[j, pivots[np + k]])
+               t = addeq!(t, q)
             end
             A[i, pivots[np + k]] = divexact(-t, A[i, pivots[i]])
          end
@@ -1213,8 +1233,8 @@ function rref!{T <: FieldElem}(A::MatElem{T})
          A[i, j] = R()
       end
    end
-   U = MatrixSpace(R, rnk, rnk)()
-   V = MatrixSpace(R, rnk, n - rnk)()
+   U = similar(A, rnk, rnk)
+   V = similar(A, rnk, n - rnk)
    pivots = Array{Int}(n)
    np = rnk
    j = k = 1
@@ -1353,18 +1373,14 @@ function reduce_row!{T <: FieldElem}(A::MatElem{T}, P::Array{Int}, L::Array{Int}
          if r != 0
             A[m, i] = R()
             for j = i + 1:L[r]
-               mul!(t, A[r, j], h)
-               s = A[m, j]
-               addeq!(s, t)
-               A[m, j] = s
+               t = mul!(t, A[r, j], h)
+               A[m, j] = addeq!(A[m, j], t)
             end 
          else
             h = inv(A[m, i])
             A[m, i] = R(1)
             for j = i + 1:L[m]
-               s = A[m, j]
-               mul!(s, s, h)
-               A[m, j] = s
+               A[m, j] = mul!(A[m, j], A[m, j], h)
             end
             P[i] = m
             return i
@@ -1388,16 +1404,12 @@ function reduce_row!{T <: RingElem}(A::MatElem{T}, P::Array{Int}, L::Array{Int},
             d = A[r, i]
             A[m, i] = R()
             for j = i + 1:L[r]
-               mul!(t, A[r, j], h)
-               s = A[m, j]
-               mul!(s, s, d)
-               addeq!(s, t)
-               A[m, j] = s
+               t = mul!(t, A[r, j], h)
+               A[m, j] = mul!(A[m, j], A[m, j], d)
+               A[m, j] = addeq!(A[m, j], t)
             end 
             for j = L[r] + 1:L[m]
-               s = A[m, j]
-               mul!(s, s, d)
-               A[m, j] = s
+               A[m, j] = mul!(A[m, j], A[m, j], d)
             end
             if c1 > 0 && P[c1] < P[i]
                for j = i + 1:L[m]
@@ -1414,9 +1426,7 @@ function reduce_row!{T <: RingElem}(A::MatElem{T}, P::Array{Int}, L::Array{Int},
          r = P[i]
          if r != 0
             for j = i + 1:L[m]
-               s = A[m, j]
-               mul!(s, s, A[r, i])
-               A[m, j] = s
+               A[m, j] = mul!(A[m, j], A[m, j], A[r, i])
             end
          end
       end
@@ -1447,12 +1457,12 @@ function det_clow{T <: RingElem}(M::MatElem{T})
          for j = 1:i
             if !iszero(A[i, j])
                for m = j + 1:n
-                  mul!(C, A[i, j], M[i, m])
-                  addeq!(B[m, j], C)
+                  C = mul!(C, A[i, j], M[i, m])
+                  B[m, j] = addeq!(B[m, j], C)
                end
                for m = j + 1:n
-                  mul!(C, A[i, j], M[i, j])
-                  addeq!(B[m, m], -C)
+                  C = mul!(C, A[i, j], M[i, j])
+                  B[m, m] = addeq!(B[m, m], -C)
                end
             end
          end
@@ -1538,8 +1548,7 @@ function det_interpolation{T <: PolyElem}(M::MatElem{T})
    bound = n*(maxlen - 1) + 1
    x = Array{elem_type(base_ring(R))}(bound)
    d = Array{elem_type(base_ring(R))}(bound)
-   S = MatrixSpace(base_ring(R), n, n)
-   X = S()
+   X = similar(M, n, n)
    b2 = div(bound, 2)
    pt1 = base_ring(R)(1 - b2)
    for i = 1:bound
@@ -1553,6 +1562,13 @@ function det_interpolation{T <: PolyElem}(M::MatElem{T})
       d[i] = det(X)
    end
    return interpolate(R, x, d)
+end
+
+if VERSION >= v"0.6-"
+   function det{S <: FinFieldElem, T <: PolyElem{S}}(M::MatElem{T})
+      rows(M) != cols(M) && error("Not a square matrix in det")
+      return det_popov(M)
+   end
 end
 
 function det{T <: PolyElem}(M::MatElem{T})
@@ -1615,13 +1631,12 @@ function backsolve!{T <: FieldElem}(A::MatElem{T}, b::MatElem{T})
    for i = m:-1:1
       d = -inv(A[i, i])
       for k = 1:h
-         u = -b[i, k]
+         b[i, k] = -b[i, k]
          for j = i + 1:m
-            mul!(t, A[i, j], b[j, k])
-            addeq!(u, t)
+            t = mul!(t, A[i, j], b[j, k])
+            b[i, k] = addeq!(b[i, k], t)
          end
-         mul!(u, u, d)
-         b[i, k] = u
+         b[i, k] = mul!(b[i, k], b[i, k], d)
       end 
    end
 end
@@ -1658,29 +1673,23 @@ function solve!{T <: FieldElem}(A::MatElem{T}, b::MatElem{T})
       q = -A[r, c]
       for i = r + 1:m
          for j = 1:h
-            mul!(t, A[i, c], b[r, j])
-            u = b[i, j]
-            mul!(u, u, A[r, c])
-            addeq!(u, -t)
-            b[i, j] = u 
+            t = mul!(t, A[i, c], b[r, j])
+            b[i, j] = mul!(b[i, j], b[i, j], A[r, c])
+            b[i, j] = addeq!(b[i, j], -t)
          end
          for j = c + 1:n
-            u = A[i, j]
-            mul!(u, u, q)
-            mul!(t, A[i, c], A[r, j])
-            addeq!(u, t)
+            A[i, j] = mul!(A[i, j], A[i, j], q)
+            t = mul!(t, A[i, c], A[r, j])
+            A[i, j] = addeq!(A[i, j], t)
             if r > 1
-               mul!(u, u, d)
-               A[i, j] = u
+               A[i, j] = mul!(A[i, j], A[i, j], d)
             else
-               A[i, j] = -u
+               A[i, j] = -A[i, j]
             end
          end
          if r > 1
             for j = 1:h
-               u = b[i, j]
-               mul!(u, u, -d)
-               b[i, j] = u
+               b[i, j] = mul!(b[i, j], b[i, j], -d)
             end
          end
       end
@@ -1711,9 +1720,7 @@ function solve_with_det{T <: FieldElem}(M::MatElem{T}, b::MatElem{T})
    d = A[m, m]
    for i = 1:m
       for j = 1:h
-         u = x[i, j]
-         mul!(u, u, d)
-         x[i, j] = u
+         x[i, j] = mul!(x[i, j], x[i, j], d)
       end
    end   
    return x, d
@@ -1735,13 +1742,12 @@ function backsolve!{T <: RingElem}(A::MatElem{T}, b::MatElem{T})
    for i = m - 1:-1:1
       q = -A[i, i]
       for k = 1:h
-         u = b[i, k]
-         mul!(u, u, d)
+         b[i, k] = mul!(b[i, k], b[i, k], d)
          for j = i + 1:m
-            mul!(t, A[i, j], b[j, k])
-            addeq!(u, t)
+            t = mul!(t, A[i, j], b[j, k])
+            b[i, k] = addeq!(b[i, k], t)
          end
-         b[i, k] = divexact(u, q)
+         b[i, k] = divexact(b[i, k], q)
       end 
    end
    for i = 1:m
@@ -1784,21 +1790,18 @@ function solve!{T <: RingElem}(A::MatElem{T}, b::MatElem{T})
       q = -A[r, c]
       for i = r + 1:m
          for j = 1:h
-            mul!(t, A[i, c], b[r, j])
-            u = b[i, j]
-            mul!(u, u, A[r, c])
-            addeq!(u, -t)
-            b[i, j] = u
+            t = mul!(t, A[i, c], b[r, j])
+            b[i, j] = mul!(b[i, j], b[i, j], A[r, c])
+            b[i, j] = addeq!(b[i, j], -t)
          end 
          for j = c + 1:n
-            u = A[i, j]
-            mul!(u, u, q)
-            mul!(t, A[i, c], A[r, j])
-            addeq!(u, t)
+            A[i, j] = mul!(A[i, j], A[i, j], q)
+            t = mul!(t, A[i, c], A[r, j])
+            A[i, j] = addeq!(A[i, j], t)
             if r > 1
-               A[i, j] = divexact(u, d)
+               A[i, j] = divexact(A[i, j], d)
             else
-               A[i, j] = -u
+               A[i, j] = -A[i, j]
             end
          end
          if r > 1
@@ -1833,8 +1836,6 @@ function solve_interpolation{T <: PolyElem}(M::MatElem{T}, b::MatElem{T})
       return b, base_ring(M)()
    end  
    R = base_ring(M)
-   S = MatrixSpace(base_ring(R), m, m)
-   U = MatrixSpace(base_ring(R), m, h)
    maxlen = 0
    for i = 1:m
       for j = 1:m
@@ -1854,9 +1855,9 @@ function solve_interpolation{T <: PolyElem}(M::MatElem{T}, b::MatElem{T})
    d = Array{elem_type(base_ring(R))}(bound)
    y = Array{elem_type(base_ring(R))}(bound)
    bj = Array{elem_type(base_ring(R))}(bound)
-   X = S()
-   Y = U()
-   x = parent(b)()
+   X = similar(M, m, m)
+   Y = similar(M, m, h)
+   x = similar(b)
    b2 = div(bound, 2)
    pt1 = base_ring(R)(1 - b2)
    for i = 1:bound
@@ -1942,7 +1943,7 @@ function solve_triu{T <: FieldElem}(U::MatElem{T}, b::MatElem{T}, unit=false)
    n = rows(U)
    m = cols(b)
    R = base_ring(U)
-   X = parent(b)()
+   X = similar(b)
    Tinv = Array{elem_type(R)}(n)
    tmp = Array{elem_type(R)}(n)
    if unit == false
@@ -1958,12 +1959,12 @@ function solve_triu{T <: FieldElem}(U::MatElem{T}, b::MatElem{T}, unit=false)
       for j = n:-1:1
          s = R()
          for k = j + 1:n
-            mul!(t, U[j, k], tmp[k])
-            addeq!(s, t)
+            t = mul!(t, U[j, k], tmp[k])
+            s = addeq!(s, t)
          end
          s = b[j, i] - s
          if unit == false
-            mul!(s, s, Tinv[j])
+            s = mul!(s, s, Tinv[j])
          end
          tmp[j] = s 
       end
@@ -1991,7 +1992,7 @@ doc"""
 function inv{T <: RingElem}(M::MatElem{T})
    cols(M) != rows(M) && error("Matrix not square in invert")
    n = cols(M)
-   X = one(parent(M))
+   X = eye(M)
    A = deepcopy(M)
    d = solve!(A, X)
    return X, d
@@ -2006,7 +2007,7 @@ doc"""
 function inv{T <: FieldElem}(M::MatElem{T})
    cols(M) != rows(M) && error("Matrix not square in invert")
    n = cols(M)
-   X = one(parent(M))
+   X = eye(M)
    A = deepcopy(M)
    solve!(A, X)
    return X
@@ -2033,7 +2034,7 @@ function nullspace{T <: RingElem}(M::MatElem{T})
    rank, d, A = rref(M)
    nullity = n - rank
    R = base_ring(M)
-   U = MatrixSpace(R, n, nullity)()
+   U = similar(M, n, nullity)
    if rank == 0
       for i = 1:nullity
          U[i, i] = R(1)
@@ -2083,7 +2084,7 @@ function nullspace{T <: FieldElem}(M::MatElem{T})
    rank, A = rref(M)
    nullity = n - rank
    R = base_ring(M)
-   X = MatrixSpace(R, n, nullity)()
+   X = similar(M, n, nullity)
    if rank == 0
       for i = 1:nullity
          X[i, i] = R(1)
@@ -2148,19 +2149,15 @@ function hessenberg!{T <: RingElem}(A::MatElem{T})
          end
          for i = m + 1:n
             if A[i, m - 1] != 0
-               mul!(u, A[i, m - 1], h)
+               u = mul!(u, A[i, m - 1], h)
                for j = m:n
-                  mul!(t, u, A[m, j])
-                  s = A[i, j]
-                  addeq!(s, t)
-                  A[i, j] = s
+                  t = mul!(t, u, A[m, j])
+                  A[i, j] = addeq!(A[i, j], t)
                end
                u = -u
                for j = 1:n
-                  mul!(t, u, A[j, i])
-                  s = A[j, m]
-                  addeq!(s, t)
-                  A[j, m] = s
+                  t = mul!(t, u, A[j, i])
+                  A[j, m] = addeq!(A[j, m], t)
                end
                A[i, m - 1] = R()
             end
@@ -2224,7 +2221,7 @@ function charpoly_hessenberg!{T <: RingElem}(S::Ring, A::MatElem{T})
       P[m + 1] = (x - A[m, m])*P[m]
       t = R(1)
       for i = 1:m - 1
-         mul!(t, t, A[m - i + 1, m - i])
+         t = mul!(t, t, A[m - i + 1, m - i])
          P[m + 1] -= t*A[m - i, m]*P[m - i]
       end
    end
@@ -2258,9 +2255,9 @@ function charpoly_danilevsky_ff!{T <: RingElem}(S::Ring, A::MatElem{T})
          if k == n - i
             b = S()
             fit!(b, i + 1)
-            setcoeff!(b, i, R(1))
+            b = setcoeff!(b, i, R(1))
             for k = 1:i
-               setcoeff!(b, k - 1, -A[n - i + 1, n - k + 1]*d)
+               b = setcoeff!(b, k - 1, -A[n - i + 1, n - k + 1]*d)
             end
             pol *= b
             n -= i
@@ -2285,16 +2282,14 @@ function charpoly_danilevsky_ff!{T <: RingElem}(S::Ring, A::MatElem{T})
       end
       for j = 1:n - i
          for k = 1:n - i - 1
-            mul!(t, A[j, n - i], V[k])
-            u = A[j, k]*h
-            addeq!(u, t)
-            A[j, k] = u
+            t = mul!(t, A[j, n - i], V[k])
+            A[j, k] = mul!(A[j, k], A[j, k], h)
+            A[j, k] = addeq!(A[j, k], t)
          end
          for k = n - i + 1:n
-            mul!(t, A[j, n - i], V[k])
-            u = A[j, k]*h
-            addeq!(u, t)
-            A[j, k] = u
+            t = mul!(t, A[j, n - i], V[k])
+            A[j, k] = mul!(A[j, k], A[j, k], h)
+            A[j, k] = addeq!(A[j, k], t)
          end
       end
       for k = 1:n
@@ -2302,48 +2297,48 @@ function charpoly_danilevsky_ff!{T <: RingElem}(S::Ring, A::MatElem{T})
       end
       for j = 1:n - i
          for k = 1:n - i - 1
-            mul!(A[j, k], A[j, k], d)
+            A[j, k] = mul!(A[j, k], A[j, k], d)
          end
          for k = n - i + 1:n
-            mul!(A[j, k], A[j, k], d)
+            A[j, k] = mul!(A[j, k], A[j, k], d)
          end
       end
       A[n - i + 1, n - i] = deepcopy(h)
       for j = 1:n - i - 1
          s = R()
          for k = 1:n - i
-            mul!(t, A[k, j], W[k])
-            addeq!(s, t)
+            t = mul!(t, A[k, j], W[k])
+            s = addeq!(s, t)
          end
          A[n - i, j] = s
       end
       for j = n - i:n - 1
          s = R()
          for k = 1:n - i
-            mul!(t, A[k, j], W[k])
-            addeq!(s, t)
+            t = mul!(t, A[k, j], W[k])
+            s = addeq!(s, t)
          end
-         mul!(t, h, W[j + 1])
-         addeq!(s, t)
+         t = mul!(t, h, W[j + 1])
+         s = addeq!(s, t)
          A[n - i, j] = s
       end
       s = R()
       for k = 1:n - i
-         mul!(t, A[k, n], W[k])
-         addeq!(s, t)
+         t = mul!(t, A[k, n], W[k])
+         s = addeq!(s, t)
       end
       A[n - i, n] = s
       for k = 1:n
-         mul!(A[n - i, k], A[n - i, k], d)
+         A[n - i, k] = mul!(A[n - i, k], A[n - i, k], d)
       end
       d = inv(h)
       i += 1
    end
    b = S()
    fit!(b, n + 1)
-   setcoeff!(b, n, R(1))
+   b = setcoeff!(b, n, R(1))
    for i = 1:n
-      setcoeff!(b, i - 1, -A[1, n - i + 1]*d)
+      b = setcoeff!(b, i - 1, -A[1, n - i + 1]*d)
    end
    return pol*b
 end
@@ -2374,9 +2369,9 @@ function charpoly_danilevsky!{T <: RingElem}(S::Ring, A::MatElem{T})
          if k == n - i
             b = S()
             fit!(b, i + 1)
-            setcoeff!(b, i, R(1))
+            b = setcoeff!(b, i, R(1))
             for k = 1:i
-               setcoeff!(b, k - 1, -A[n - i + 1, n - k + 1])
+               b = setcoeff!(b, k - 1, -A[n - i + 1, n - k + 1])
             end
             pol *= b
             n -= i
@@ -2403,51 +2398,45 @@ function charpoly_danilevsky!{T <: RingElem}(S::Ring, A::MatElem{T})
       h = -h
       for j = 1:n - i
          for k = 1:n - i - 1
-            mul!(t, A[j, n - i], V[k])
-            u = A[j, k]
-            addeq!(u, t)
-            A[j, k] = u
+            t = mul!(t, A[j, n - i], V[k])
+            A[j, k] = addeq!(A[j, k], t)
          end
          for k = n - i + 1:n
-            mul!(t, A[j, n - i], V[k])
-            u = A[j, k]
-            addeq!(u, t)
-            A[j, k] = u
+            t = mul!(t, A[j, n - i], V[k])
+            A[j, k] = addeq!(A[j, k], t)
          end
-         u = A[j, n - i]
-         mul!(u, u, h)
-         A[j, n - i] = u
+         A[j, n - i] = mul!(A[j, n - i], A[j, n - i], h)
       end
       for j = 1:n - i - 1
          s = R()
          for k = 1:n - i
-            mul!(t, A[k, j], W[k])
-            addeq!(s, t)
+            t = mul!(t, A[k, j], W[k])
+            s = addeq!(s, t)
          end
          A[n - i, j] = s
       end
       for j = n - i:n - 1
          s = R()
          for k = 1:n - i
-            mul!(t, A[k, j], W[k])
-            addeq!(s, t)
+            t = mul!(t, A[k, j], W[k])
+            s = addeq!(s, t)
          end
-         addeq!(s, W[j + 1])
+         s = addeq!(s, W[j + 1])
          A[n - i, j] = s
       end
       s = R()
       for k = 1:n - i
-         mul!(t, A[k, n], W[k])
-         addeq!(s, t)
+         t = mul!(t, A[k, n], W[k])
+         s = addeq!(s, t)
       end
       A[n - i, n] = s
       i += 1
    end
    b = S()
    fit!(b, n + 1)
-   setcoeff!(b, n, R(1))
+   b = setcoeff!(b, n, R(1))
    for i = 1:n
-      setcoeff!(b, i - 1, -A[1, n - i + 1])
+      b = setcoeff!(b, i - 1, -A[1, n - i + 1])
    end
    return pol*b
 end
@@ -2481,8 +2470,8 @@ function charpoly{T <: RingElem}(V::Ring, Y::MatElem{T})
          for k = 1:i
             s = R()
             for l = 1:i
-               mul!(p, Y[k, l], M[j - 1, l])
-               addeq!(s, p)
+               p = mul!(p, Y[k, l], M[j - 1, l])
+               s = addeq!(s, p)
             end
             M[j, k] = s
          end
@@ -2490,15 +2479,15 @@ function charpoly{T <: RingElem}(V::Ring, Y::MatElem{T})
       end 
       s = R()
       for j = 1:i
-         mul!(p, Y[i, j], M[i - 1, j])
-         addeq!(s, p)
+         p = mul!(p, Y[i, j], M[i - 1, j])
+         s = addeq!(s, p)
       end
       A[i] = s
       for j = 1:i
          s = -F[j]
          for k = 1:j - 1
-            mul!(p, A[k], F[j - k])
-            addeq!(s, p)
+            p = mul!(p, A[k], F[j - k])
+            s = addeq!(s, p)
          end
          F[j] = -s - A[j]
      end
@@ -2506,7 +2495,7 @@ function charpoly{T <: RingElem}(V::Ring, Y::MatElem{T})
    z = gen(V)
    f = z^n
    for i = 1:n
-      setcoeff!(f, n - i, F[i])
+      f = setcoeff!(f, n - i, F[i])
    end
    return f
 end
@@ -2547,9 +2536,8 @@ function minpoly{T <: FieldElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
    end
    R = base_ring(M)
    p = S(1)
-   A = MatrixSpace(R, n + 1, 2n + 1)()
-   B = MatrixSpace(R, n, n)()
-   U = MatrixSpace(R, n, 1)
+   A = similar(M, n + 1, 2n + 1)
+   B = similar(M, n, n)
    L1 = [n + i for i in 1:n + 1]
    L2 = [n for i in 1:n]
    P2 = zeros(Int, n)
@@ -2559,7 +2547,7 @@ function minpoly{T <: FieldElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
    first_poly = true
    while r2 <= n
       P1 = [0 for i in 1:2n + 1]
-      v = zero(U)
+      v = similar(M, n, 1)
       for j = 1:n
          B[r2, j] = v[j, 1]
          A[1, j] = R()
@@ -2611,7 +2599,7 @@ function minpoly{T <: FieldElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
       fit!(b, r1)
       h = inv(A[r1, n + r1])
       for i = 1:r1
-         setcoeff!(b, i - 1, A[r1, n + i]*h)
+         b = setcoeff!(b, i - 1, A[r1, n + i]*h)
       end
       p = lcm(p, b)
       if charpoly_only == true
@@ -2643,9 +2631,8 @@ function minpoly{T <: RingElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
    end
    R = base_ring(M)
    p = S(1)
-   A = MatrixSpace(R, n + 1, 2n + 1)()
-   B = MatrixSpace(R, n, n)()
-   U = MatrixSpace(R, n, 1)
+   A = similar(M, n + 1, 2n + 1)
+   B = similar(M, n, n)
    L1 = [n + i for i in 1:n + 1]
    L2 = [n for i in 1:n]
    P2 = zeros(Int, n)
@@ -2655,7 +2642,7 @@ function minpoly{T <: RingElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
    first_poly = true
    while r2 <= n
       P1 = [0 for i in 1:2n + 1]
-      v = zero(U)
+      v = similar(M, n, 1)
       for j = 1:n
          B[r2, j] = v[j, 1]
          A[1, j] = R()
@@ -2706,7 +2693,7 @@ function minpoly{T <: RingElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
       b = S()
       fit!(b, r1)
       for i = 1:r1
-         setcoeff!(b, i - 1, A[r1, n + i])
+         b = setcoeff!(b, i - 1, A[r1, n + i])
       end
       b = reverse(b, r1)
       b = primpart(b)
@@ -2741,7 +2728,7 @@ end
 function hnf_cohen_with_trafo{T <: RingElem}(A::GenMat{T})
    H = deepcopy(A)
    m = rows(H)
-   U = one(MatrixSpace(base_ring(H), m, m))
+   U = eye(A, m)
    hnf_cohen!(H, U)
    return H, U
 end
@@ -2764,21 +2751,21 @@ function hnf_cohen!{T <: RingElem}(H::GenMat{T}, U::GenMat{T})
          b = -divexact(H[j,i], d)
          for c = i:n
             t = deepcopy(H[j,c])
-            mul!(t1, a, H[j,c])
-            mul!(t2, b, H[k,c])
-            add!(H[j,c], t1, t2)
-            mul!(t1, u, H[k,c])
-            mul!(t2, v, t)
-            add!(H[k,c], t1, t2)
+            t1 = mul!(t1, a, H[j,c])
+            t2 = mul!(t2, b, H[k,c])
+            H[j,c] = add!(H[j,c], t1, t2)
+            t1 = mul!(t1, u, H[k,c])
+            t2 = mul!(t2, v, t)
+            H[k,c] = add!(H[k,c], t1, t2)
          end
          for c = 1:m
             t = deepcopy(U[j,c])
-            mul!(t1, a, U[j,c])
-            mul!(t2, b, U[k,c])
-            add!(U[j,c], t1, t2)
-            mul!(t1, u, U[k,c])
-            mul!(t2, v, t)
-            add!(U[k,c], t1, t2)
+            t1 = mul!(t1, a, U[j,c])
+            t2 = mul!(t2, b, U[k,c])
+            U[j,c] = add!(U[j,c], t1, t2)
+            t1 = mul!(t1, u, U[k,c])
+            t2 = mul!(t2, v, t)
+            U[k,c] = add!(U[k,c], t1, t2)
          end
       end
       if H[k,i] == 0
@@ -2796,12 +2783,12 @@ function hnf_cohen!{T <: RingElem}(H::GenMat{T}, U::GenMat{T})
       for j = 1:k-1
          q = -div(H[j,i], H[k, i])
          for c = i:n
-            mul!(t, q, H[k,c])
-            addeq!(H[j,c], t)
+            t = mul!(t, q, H[k,c])
+            H[j,c] = addeq!(H[j,c], t)
          end
          for c = 1:m
-            mul!(t, q, U[k,c])
-            addeq!(U[j,c], t)
+            t = mul!(t, q, U[k,c])
+            U[j,c] = addeq!(U[j,c], t)
          end
       end
       k += 1
@@ -2821,11 +2808,11 @@ function _hnf_kb{T}(A::GenMat, trafo::Type{Val{T}} = Val{false})
    H = deepcopy(A)
    m = rows(H)
    if trafo == Val{true}
-      U = one(MatrixSpace(base_ring(H), m, m))
+      U = eye(A, m)
       hnf_kb!(H, U, true)
       return H, U
    else
-      U = zero(MatrixSpace(base_ring(H), 0, 0))
+      U = similar(A, 0, 0)
       hnf_kb!(H, U, false)
       return H
    end
@@ -2852,13 +2839,13 @@ function kb_reduce_row!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{
       end
       q = -div(H[r,i], H[p,i])
       for j = i:cols(H)
-         mul!(t, q, H[p,j])
-         addeq!(H[r,j], t)
+         t = mul!(t, q, H[p,j])
+         H[r,j] = addeq!(H[r,j], t)
       end
       if with_trafo
          for j = 1:cols(U)
-            mul!(t, q, U[p,j])
-            addeq!(U[r,j], t)
+            t = mul!(t, q, U[p,j])
+            U[r,j] = addeq!(U[r,j], t)
          end
       end
    end
@@ -2875,13 +2862,13 @@ function kb_reduce_column!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Arr
       end
       q = -div(H[p,c],H[r,c])
       for j = c:cols(H)
-         mul!(t, q, H[r,j])
-         addeq!(H[p,j], t)
+         t = mul!(t, q, H[r,j])
+         H[p,j] = addeq!(H[p,j], t)
       end
       if with_trafo
          for j = 1:cols(U)
-            mul!(t, q, U[r,j])
-            addeq!(U[p,j], t)
+            t = mul!(t, q, U[r,j])
+            U[p,j] = addeq!(U[p,j], t)
          end
       end
    end
@@ -2971,22 +2958,22 @@ function hnf_kb!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, with_trafo::Bool = f
             b = -divexact(H[i+1,j],d)
             for c = j:n
                t = deepcopy(H[i+1,c])
-               mul!(t1, a, H[i+1,c])
-               mul!(t2, b, H[p,c])
-               add!(H[i+1,c], t1, t2)
-               mul!(t1, u, H[p,c])
-               mul!(t2, v, t)
-               add!(H[p,c], t1, t2)
+               t1 = mul!(t1, a, H[i+1,c])
+               t2 = mul!(t2, b, H[p,c])
+               H[i+1,c] = add!(H[i+1,c], t1, t2)
+               t1 = mul!(t1, u, H[p,c])
+               t2 = mul!(t2, v, t)
+               H[p,c] = add!(H[p,c], t1, t2)
             end
             if with_trafo
                for c = 1:m
                   t = deepcopy(U[i+1,c])
-                  mul!(t1, a, U[i+1,c])
-                  mul!(t2, b, U[p,c])
-                  add!(U[i+1,c], t1, t2)
-                  mul!(t1, u, U[p,c])
-                  mul!(t2, v, t)
-                  add!(U[p,c], t1, t2)
+                  t1 = mul!(t1, a, U[i+1,c])
+                  t2 = mul!(t2, b, U[p,c])
+                  U[i+1,c] = add!(U[i+1,c], t1, t2)
+                  t1 = mul!(t1, u, U[p,c])
+                  t2 = mul!(t2, v, t)
+                  U[p,c] = add!(U[p,c], t1, t2)
                end
             end
          end
@@ -3048,12 +3035,12 @@ function _snf_kb{V, T <: RingElem}(A::GenMat{T}, trafo::Type{Val{V}} = Val{false
    m = rows(S)
    n = cols(S)
    if trafo == Val{true}
-      U = one(MatrixSpace(base_ring(S), m, m))
-      K = one(MatrixSpace(base_ring(S), n, n))
+      U = eye(A, m)
+      K = eye(A, n)
       snf_kb!(S, U, K, true)
       return S, U, K
    else
-      U = zero(MatrixSpace(base_ring(S), 0, 0))
+      U = similar(A, 0, 0)
       K = U
       snf_kb!(S, U, K, false)
       return S
@@ -3075,22 +3062,22 @@ function kb_clear_row!{T <: RingElem}(S::GenMat{T}, K::GenMat{T}, i::Int, with_t
       b = -divexact(S[i,j], d)
       for r = i:m
          t = deepcopy(S[r,j])
-         mul!(t1, a, S[r,j])
-         mul!(t2, b, S[r,i])
-         add!(S[r,j], t1, t2)
-         mul!(t1, u, S[r,i])
-         mul!(t2, v, t)
-         add!(S[r,i], t1, t2)
+         t1 = mul!(t1, a, S[r,j])
+         t2 = mul!(t2, b, S[r,i])
+         S[r,j] = add!(S[r,j], t1, t2)
+         t1 = mul!(t1, u, S[r,i])
+         t2 = mul!(t2, v, t)
+         S[r,i] = add!(S[r,i], t1, t2)
       end
       if with_trafo
          for r = 1:n
             t = deepcopy(K[r,j])
-            mul!(t1, a, K[r,j])
-            mul!(t2, b, K[r,i])
-            add!(K[r,j], t1, t2)
-            mul!(t1, u, K[r,i])
-            mul!(t2, v, t)
-            add!(K[r,i], t1, t2)
+            t1 = mul!(t1, a, K[r,j])
+            t2 = mul!(t2, b, K[r,i])
+            K[r,j] = add!(K[r,j], t1, t2)
+            t1 = mul!(t1, u, K[r,i])
+            t2 = mul!(t2, v, t)
+            K[r,i] = add!(K[r,i], t1, t2)
          end
       end
    end
@@ -3124,25 +3111,25 @@ function snf_kb!{T <: RingElem}(S::GenMat{T}, U::GenMat{T}, K::GenMat{T}, with_t
       d, u, v = gcdx(S[i,i], S[i+1,i+1])
       if with_trafo
          q = -divexact(S[i+1,i+1], d)
-         mul!(t1, q, v)
+         t1 = mul!(t1, q, v)
          for c = 1:m
             t = deepcopy(U[i,c])
-            addeq!(U[i,c], U[i+1,c])
-            mul!(t2, t1, U[i+1,c])
-            addeq!(U[i+1,c], t2)
-            mul!(t2, t1, t)
-            addeq!(U[i+1,c], t2)
+            U[i,c] = addeq!(U[i,c], U[i+1,c])
+            t2 = mul!(t2, t1, U[i+1,c])
+            U[i+1,c] = addeq!(U[i+1,c], t2)
+            t2 = mul!(t2, t1, t)
+            U[i+1,c] = addeq!(U[i+1,c], t2)
          end
          q1 = -divexact(S[i+1,i+1], d)
          q2 = divexact(S[i,i], d)
          for r = 1:n
             t = deepcopy(K[r,i])
-            mul!(t1, K[r,i], u)
-            mul!(t2, K[r,i+1], v)
-            add!(K[r,i], t1, t2)
-            mul!(t1, t, q1)
-            mul!(t2, K[r,i+1], q2)
-            add!(K[r,i+1], t1, t2)
+            t1 = mul!(t1, K[r,i], u)
+            t2 = mul!(t2, K[r,i+1], v)
+            K[r,i] = add!(K[r,i], t1, t2)
+            t1 = mul!(t1, t, q1)
+            t2 = mul!(t2, K[r,i+1], q2)
+            K[r,i+1] = add!(K[r,i+1], t1, t2)
          end
       end
       S[i+1,i+1] = divexact(S[i,i]*S[i+1,i+1],d)
@@ -3157,6 +3144,528 @@ end
 
 function snf_with_trafo{T <: RingElem}(a::GenMat{T})
   return snf_kb_with_trafo(a)
+end
+
+################################################################################
+#
+#   Popov Form
+#
+################################################################################
+
+doc"""
+    weak_popov{T <: PolyElem}(A::GenMat{T})
+> Return the weak Popov form of $A$.
+"""
+function weak_popov{T <: PolyElem}(A::GenMat{T})
+   return _weak_popov(A, Val{false})
+end
+
+doc"""
+    weak_popov_with_trafo{T <: PolyElem}(A::GenMat{T})
+> Compute a tuple $(P, U)$ where $P$ is the weak Popov form of $A$ and $U$
+> is a transformation matrix so that $P = UA$.
+"""
+function weak_popov_with_trafo{T <: PolyElem}(A::GenMat{T})
+   return _weak_popov(A, Val{true})
+end
+
+function _weak_popov{T <: PolyElem, S}(A::GenMat{T}, trafo::Type{Val{S}} = Val{false})
+   P = deepcopy(A)
+   m = rows(P)
+   W = similar(A, 0, 0)
+   if trafo == Val{true}
+      U = eye(A, m)
+      weak_popov!(P, W, U, false, true)
+      return P, U
+   else
+      U = similar(A, 0, 0)
+      weak_popov!(P, W, U, false, false)
+      return P
+   end
+end
+
+doc"""
+    extended_weak_popov{T <: PolyElem}(A::GenMat{T}, V::GenMat{T})
+> Compute the weak Popov form $P$ of $A$ by applying simple row transformations
+> on $A$ and a vector $W$ by applying the same transformations on the vector $V$.
+> Return the tuple $(P, W)$.
+"""
+function extended_weak_popov{T <: PolyElem}(A::GenMat{T}, V::GenMat{T})
+   return _extended_weak_popov(A, V, Val{false})
+end
+
+doc"""
+    extended_weak_popov_with_trafo{T <: PolyElem}(A::GenMat{T}, V::GenMat{T})
+> Compute the weak Popov form $P$ of $A$ by applying simple row transformations
+> on $A$, a vector $W$ by applying the same transformations on the vector $V$,
+> and a transformation matrix $U$ so that $P = UA$.
+> Return the tuple $(P, W, U)$.
+"""
+function extended_weak_popov_with_trafo{T <: PolyElem}(A::GenMat{T}, V::GenMat{T})
+   return _extended_weak_popov(A, V, Val{true})
+end
+
+function _extended_weak_popov{T <: PolyElem, S}(A::GenMat{T}, V::GenMat{T}, trafo::Type{Val{S}} = Val{false})
+   @assert rows(V) == rows(A) && cols(V) == 1
+   P = deepcopy(A)
+   W = deepcopy(V)
+   m = rows(P)
+   if trafo == Val{true}
+      U = eye(A)
+      weak_popov!(P, W, U, true, true)
+      return P, W, U
+   else
+      U = similar(A, 0, 0)
+      weak_popov!(P, W, U, true, false)
+      return P, W
+   end
+end
+
+function find_pivot_popov{T <: PolyElem}(P::GenMat{T}, r::Int, last_col::Int = 0)
+   last_col == 0 ? n = cols(P) : n = last_col
+   pivot = n
+   for c = n-1:-1:1
+      if degree(P[r,c]) > degree(P[r,pivot])
+         pivot = c
+      end
+   end
+   return pivot
+end
+
+function init_pivots_popov{T <: PolyElem}(P::GenMat{T}, last_row::Int = 0, last_col::Int = 0)
+   last_row == 0 ? m = rows(P) : m = last_row
+   last_col == 0 ? n = cols(P) : n = last_col
+   pivots = Array{Array{Int,1}}(n)
+   for i = 1:n
+      pivots[i] = Array{Int}(0)
+   end
+   # pivots[i] contains the indices of the rows in which the pivot element is in the ith column.
+   for r = 1:m
+      pivot = find_pivot_popov(P, r, last_col)
+      P[r,pivot] != 0 ? push!(pivots[pivot], r) : nothing
+   end
+   return pivots
+end
+
+function weak_popov!{T <: PolyElem}(P::GenMat{T}, W::GenMat{T}, U::GenMat{T}, extended::Bool = false,
+                                       with_trafo::Bool = false, last_row::Int = 0, last_col::Int = 0)
+   pivots = init_pivots_popov(P, last_row, last_col)
+   weak_popov_with_pivots!(P, W, U, pivots, extended, with_trafo, last_row, last_col)
+   return nothing
+end
+
+#=
+The weak Popov form is defined by T. Mulders and A. Storjohann in
+"On lattice reduction for polynomial matrices"
+=#
+function weak_popov_with_pivots!{T <: PolyElem}(P::GenMat{T}, W::GenMat{T}, U::GenMat{T}, pivots::Array{Array{Int,1}},
+                                                   extended::Bool = false, with_trafo::Bool = false, last_row::Int = 0, last_col::Int = 0)
+   last_row == 0 ? m = rows(P) : m = last_row
+   last_col == 0 ? n = cols(P) : n = last_col
+   @assert length(pivots) >= n
+
+   t = base_ring(P)()
+   change = true
+   while change
+      change = false
+      for i = 1:n
+         if length(pivots[i]) <= 1
+            continue
+         end
+         change = true
+         # Reduce with the pivot of minimal degree.
+         pivotInd = indmin(degree(P[j, i]) for j in pivots[i])
+         pivot = pivots[i][pivotInd]
+         for j = 1:length(pivots[i])
+            if j == pivotInd
+               continue
+            end
+            q = -div(P[pivots[i][j],i],P[pivot,i])
+            for c = 1:n
+               t = mul!(t, q, P[pivot,c])
+               P[pivots[i][j],c] = addeq!(P[pivots[i][j],c], t)
+            end
+            if with_trafo
+               for c = 1:cols(U)
+                  t = mul!(t, q, U[pivot,c])
+                  U[pivots[i][j],c] = addeq!(U[pivots[i][j],c], t)
+               end
+            end
+            if extended
+               t = mul!(t, q, W[pivot,1])
+               W[pivots[i][j],1] = addeq!(W[pivots[i][j],1], t)
+            end
+         end
+         old_pivots = pivots[i]
+         pivots[i] = [pivot]
+         for j = 1:length(old_pivots)
+            if j == pivotInd
+               continue
+            end
+            p = find_pivot_popov(P, old_pivots[j], last_col)
+            P[old_pivots[j],p] != 0 ? push!(pivots[p], old_pivots[j]) : nothing
+         end
+      end
+   end
+   return nothing
+end
+
+doc"""
+    rank_profile_popov{T <: PolyElem}(A::GenMat{T})
+> Return an array of $r$ row indices such that these rows of $A$ are linearly
+> independent, where $r$ is the rank of $A$.
+"""
+function rank_profile_popov{T <: PolyElem}(A::GenMat{T})
+   B = deepcopy(A)
+   m = rows(A)
+   n = cols(A)
+   U = similar(A, 0, 0)
+   V = U
+   r = 0
+   rank_profile = Array{Int,1}(0)
+   pivots = Array{Array{Int,1}}(n)
+   for i = 1:n
+      pivots[i] = Array{Int}(0)
+   end
+   p = find_pivot_popov(B, 1)
+   if B[1,p] != 0
+      push!(pivots[p], 1)
+      r = 1
+      push!(rank_profile, 1)
+   end
+   for i = 2:m
+      p = find_pivot_popov(B, i)
+      B[i,p] != 0 ? push!(pivots[p], i) : nothing
+      weak_popov_with_pivots!(B, V, U, pivots, false, false, i)
+      s = 0
+      for j = 1:n
+         # length(pivots[j]) is either 1 or 0, since B is in weak
+         # Popov form.
+         s += length(pivots[j])
+      end
+      if s != r
+         push!(rank_profile, i)
+         r = s
+      end
+   end
+   return rank_profile
+end
+
+function det_popov{T <: PolyElem}(A::GenMat{T})
+   rows(A) != cols(A) && error("Not a square matrix in det_popov.")
+   B = deepcopy(A)
+   n = cols(B)
+   R = base_ring(B)
+   det = one(R)
+   U = similar(A, 0, 0)
+   V = U
+   t = R()
+   pivots1 = init_pivots_popov(B)
+   weak_popov_with_pivots!(B, V, U, pivots1, false, false)
+   pivots = zeros(Int, n)
+   diag_elems = zeros(Int, n)
+   for i = 1:n
+      try pivots[i] = pivots1[i][1]
+      catch
+         # If there is no pivot in the ith column, A has not full rank.
+         return R(0)
+      end
+   end
+   for i = n-1:-1:1
+      # "Remove" the column i+1 and compute a weak Popov Form of the
+      # remaining matrix.
+      r1 = pivots[i+1]
+      c = find_pivot_popov(B, r1, i)
+      # If the pivot B[r1,c] is zero then the row is zero.
+      while !iszero(B[r1,c])
+         r2 = pivots[c]
+         if degree(B[r2,c]) > degree(B[r1,c])
+            r1, r2 = r2, r1
+            pivots[c] = r2
+         end
+         q = -div(B[r1,c],B[r2,c])
+         for j = 1:i+1
+            t = mul!(t, q, B[r2,j])
+            B[r1,j] = addeq!(B[r1,j], t)
+         end
+         c = find_pivot_popov(B, r1, i)
+      end
+      if iszero(B[r1, i+1])
+         return R(0)
+      end
+      diag_elems[i+1] = r1
+      det = mul!(det, det, B[r1,i+1])
+   end
+   det = mul!(det, det, B[pivots[1],1])
+   diag_elems[1] = pivots[1]
+   number_of_swaps = 0
+   # Adjust the sign of det by sorting the diagonal elements.
+   for i = 1:n
+      while diag_elems[i] != i
+         r = diag_elems[i]
+         diag_elems[i] = diag_elems[r]
+         diag_elems[r] = r
+         number_of_swaps += 1
+      end
+   end
+   if number_of_swaps%2 == 1
+      det = mul!(det, det, R(-1))
+   end
+   return det
+end
+
+doc"""
+    popov{T <: PolyElem}(A::GenMat{T})
+> Return the Popov form of $A$.
+"""
+function popov{T <: PolyElem}(A::GenMat{T})
+   return _popov(A, Val{false})
+end
+
+doc"""
+    popov_with_trafo{T <: PolyElem}(A::GenMat{T})
+> Compute a tuple $(P, U)$ where $P$ is the Popov form of $A$ and $U$
+> is a transformation matrix so that $P = UA$.
+"""
+function popov_with_trafo{T <: PolyElem}(A::GenMat{T})
+   return _popov(A, Val{true})
+end
+
+function _popov{T <: PolyElem, S}(A::GenMat{T}, trafo::Type{Val{S}} = Val{false})
+   P = deepcopy(A)
+   m = rows(P)
+   if trafo == Val{true}
+      U = eye(A, m)
+      popov!(P, U, true)
+      return P, U
+   else
+      U = similar(A, 0, 0)
+      popov!(P, U, false)
+      return P
+   end
+end
+
+function asc_order_popov!{T <: PolyElem}(P::GenMat{T}, U::GenMat{T}, pivots::Array{Array{Int,1}}, with_trafo::Bool)
+   m = rows(P)
+   n = cols(P)
+   pivots2 = Array{NTuple{3,Int},1}(m)
+   for r = 1:m
+      pivots2[r] = (r,n,-1)
+   end
+   for c = 1:n
+      if length(pivots[c]) == 0
+         continue
+      end
+      r = pivots[c][1]
+      pivots2[r] = (r, c, degree(P[r,c]))
+   end
+   sort!(pivots2, lt = (x,y) -> ( x[3] < y[3] || ( x[3] == y[3] && x[2] <= y[2] ) ))
+   row_nums = [ i for i = 1:m ]
+   for r = 1:m
+      if pivots2[r][3] != -1
+         c = pivots2[r][2]
+         pivots[c] = [r]
+      end
+      i = pivots2[r][1]
+      r2 = row_nums[i]
+      if r == r2
+         continue
+      end
+      swap_rows!(P, r, r2)
+      with_trafo ? swap_rows!(U, r, r2) : nothing
+      j = findfirst(row_nums, r)
+      row_nums[i] = r
+      row_nums[j] = r2
+   end
+   return nothing
+end
+
+function popov!{T <: PolyElem}(P::GenMat{T}, U::GenMat{T}, with_trafo::Bool = false)
+   m = rows(P)
+   n = cols(P)
+   W = similar(U, 0, 0)
+   pivots = init_pivots_popov(P)
+   weak_popov_with_pivots!(P, W, U, pivots, false, with_trafo)
+   asc_order_popov!(P, U, pivots, with_trafo)
+   t = base_ring(P)()
+   for i = 1:n
+      if length(pivots[i]) == 0
+         continue
+      end
+      pivot = pivots[i][1]
+      d = degree(P[pivot,i])
+      for r = 1:pivot-1
+         if degree(P[r,i]) < d
+            continue
+         end
+         q = -div(P[r,i],P[pivot,i])
+         for c = 1:n
+            t = mul!(t, q, P[pivot,c])
+            P[r,c] = addeq!(P[r,c], t)
+         end
+         if with_trafo
+            for c = 1:cols(U)
+               t = mul!(t, q, U[pivot,c])
+               U[r,c] = addeq!(U[r,c], t)
+            end
+         end
+      end
+   end
+   for i = 1:n
+      if length(pivots[i]) == 0
+         continue
+      end
+      r = pivots[i][1]
+      cu = canonical_unit(P[r,i])
+      if cu != 1
+         for j = 1:n
+            P[r,j] = divexact(P[r,j],cu)
+         end
+         if with_trafo
+            for j = 1:cols(U)
+               U[r,j] = divexact(U[r,j],cu)
+            end
+         end
+      end
+   end
+   return nothing
+end
+
+function hnf_via_popov{T <: PolyElem}(A::GenMat{T})
+   return _hnf_via_popov(A, Val{false})
+end
+
+function hnf_via_popov_with_trafo{T <: PolyElem}(A::GenMat{T})
+   return _hnf_via_popov(A, Val{true})
+end
+
+function _hnf_via_popov{T <: PolyElem, S}(A::GenMat{T}, trafo::Type{Val{S}} = Val{false})
+   H = deepcopy(A)
+   m = rows(H)
+   if trafo == Val{true}
+      U = eye(A, m)
+      hnf_via_popov!(H, U, true)
+      return H, U
+   else
+      U = similar(A, 0, 0)
+      hnf_via_popov!(H, U, false)
+      return H
+   end
+end
+
+function hnf_via_popov_reduce_row!{T <: PolyElem}(H::GenMat{T}, U::GenMat{T}, pivots_hermite::Array{Int}, r::Int, with_trafo::Bool)
+   n = cols(H)
+   t = base_ring(H)()
+   for c = 1:n
+      if pivots_hermite[c] == 0
+         continue
+      end
+      pivot = pivots_hermite[c]
+      q = -div(H[r,c],H[pivot,c])
+      for j = c:n
+         t = mul!(t, q, H[pivot,j])
+         H[r,j] = addeq!(H[r,j], t)
+      end
+      if with_trafo
+         for j = 1:cols(U)
+            t = mul!(t, q, U[pivot,j])
+            U[r,j] = addeq!(U[r,j], t)
+         end
+      end
+   end
+   return nothing
+end
+
+function hnf_via_popov_reduce_column!{T <: PolyElem}(H::GenMat{T}, U::GenMat{T}, pivots_hermite::Array{Int}, c::Int, with_trafo::Bool)
+   m = rows(H)
+   n = cols(H)
+   t = base_ring(H)()
+   r = pivots_hermite[c]
+   for i = 1:m
+      if i == r
+         continue
+      end
+      if degree(H[i,c]) < degree(H[r,c])
+         continue
+      end
+      q = -div(H[i,c],H[r,c])
+      for j = 1:n
+         t = mul!(t, q, H[r,j])
+         H[i,j] = addeq!(H[i,j], t)
+      end
+      if with_trafo
+         for j = 1:cols(U)
+            t = mul!(t, q, U[r,j])
+            U[i,j] = addeq!(U[i,j], t)
+         end
+      end
+   end
+   return nothing
+end
+
+function hnf_via_popov!{T <: PolyElem}(H::GenMat{T}, U::GenMat{T}, with_trafo::Bool = false)
+   m = rows(H)
+   n = cols(H)
+   R = base_ring(H)
+   W = similar(H, 0, 0)
+   t = R()
+   pivots = init_pivots_popov(H)
+   weak_popov_with_pivots!(H, W, U, pivots, false, with_trafo)
+   pivots_popov = zeros(Int, n)
+   for j = 1:n
+      try pivots_popov[j] = pivots[j][1] end
+   end
+   pivots_hermite = zeros(Int, n)
+   for i = n-1:-1:1
+      # "Remove" the column i+1 and compute a weak Popov Form of the
+      # remaining matrix.
+      r1 = pivots_popov[i+1]
+      if r1 == 0
+         continue
+      end
+      c = find_pivot_popov(H, r1, i)
+      new_pivot = true
+      # If the pivot H[r1,c] is zero then the row is zero.
+      while !iszero(H[r1,c])
+         r2 = pivots_popov[c]
+         if r2 == 0
+            pivots_popov[c] = r1
+            new_pivot = false
+            break
+         end
+         if degree(H[r2,c]) > degree(H[r1,c])
+            r1, r2 = r2, r1
+            pivots_popov[c] = r2
+         end
+         q = -div(H[r1,c],H[r2,c])
+         for j = 1:n
+            t = mul!(t, q, H[r2,j])
+            H[r1,j] = addeq!(H[r1,j], t)
+         end
+         if with_trafo
+            for j = 1:cols(U)
+               t = mul!(t, q, U[r2,j])
+               U[r1,j] = addeq!(U[r1,j], t)
+            end
+         end
+         hnf_via_popov_reduce_row!(H, U, pivots_hermite, r1, with_trafo)
+         c = find_pivot_popov(H, r1, i)
+      end
+      new_pivot ? nothing : continue
+      pivots_hermite[i+1] = r1
+      hnf_via_popov_reduce_column!(H, U, pivots_hermite, i+1, with_trafo)
+      l = pivots_popov[i]
+      hnf_via_popov_reduce_row!(H, U, pivots_hermite, l, with_trafo)
+   end
+   pivots_hermite[1] = pivots_popov[1]
+   kb_sort_rows!(H, U, pivots_hermite, with_trafo)
+   for c = 1:n
+      if pivots_hermite[c] == 0
+         continue
+      end
+      kb_canonical_row!(H, U, pivots_hermite[c], c, with_trafo)
+   end
+   return nothing
 end
 
 ###############################################################################
@@ -3178,30 +3687,24 @@ function similarity!{T <: RingElem}(A::MatElem{T}, r::Int, d::T)
    t = base_ring(A)()
    for i = 1:n
       for j = 1:r - 1
-         mul!(t, A[i, r], d)
-         s = A[i, j]
-         addeq!(s, t)
-         A[i, j] = s
+         t = mul!(t, A[i, r], d)
+         A[i, j] = addeq!(A[i, j], t)
       end
       for j = r + 1:n
-         mul!(t, A[i, r], d)
-         s = A[i, j]
-         addeq!(s, t)
-         A[i, j] = s
+         t = mul!(t, A[i, r], d)
+         A[i, j] = addeq!(A[i, j], t)
       end
    end
    d = -d
    for i = 1:n
-      s = A[r, i]
       for j = 1:r - 1
-         mul!(t, A[j, i], d)
-         addeq!(s, t)
+         t = mul!(t, A[j, i], d)
+         A[r, i] = addeq!(A[r, i], t)
       end
       for j = r + 1:n
-         mul!(t, A[j, i], d)
-         addeq!(s, t)
+         t = mul!(t, A[j, i], d)
+         A[r, i] = addeq!(A[r, i], t)
       end
-      A[r, i] = s
    end
 end
 
@@ -3249,7 +3752,7 @@ doc"""
 """
 function hcat(a::MatElem, b::MatElem)
    rows(a) != rows(b) && error("Incompatible number of rows in hcat")
-   c = MatrixSpace(base_ring(a), rows(a), cols(a) + cols(b))()
+   c = similar(a, rows(a), cols(a) + cols(b))
    n = cols(a)
    for i = 1:rows(a)
       for j = 1:cols(a)
@@ -3269,7 +3772,7 @@ doc"""
 """
 function vcat(a::MatElem, b::MatElem)
    cols(a) != cols(b) && error("Incompatible number of columns in vcat")
-   c = MatrixSpace(base_ring(a), rows(a) + rows(b), cols(a))()
+   c = similar(a, rows(a) + rows(b), cols(a))
    n = rows(a)
    for i = 1:rows(a)
       for j = 1:cols(a)
@@ -3290,18 +3793,18 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: RingElem, V <: Integer}(::Type{GenMat{T}}, ::Type{V}) = GenMat{T}
+promote_rule{T <: RingElem, V <: Integer}(::Type{GenMat{T}}, ::Type{V}) = GenMat{T}
 
-Base.promote_rule{T <: RingElem}(::Type{GenMat{T}}, ::Type{T}) = GenMat{T}
+promote_rule{T <: RingElem}(::Type{GenMat{T}}, ::Type{T}) = GenMat{T}
 
-Base.promote_rule{T <: RingElem}(::Type{GenMat{T}}, ::Type{fmpz}) = GenMat{T}
+promote_rule{T <: RingElem}(::Type{GenMat{T}}, ::Type{fmpz}) = GenMat{T}
 
 function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenMat{T}}, ::Type{GenMat{U}})
    U == T ? GenMat{T} : Union{}
 end
 
-function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenMat{T}}, ::Type{U})
-   Base.promote_rule(T, U) == T ? GenMat{T} : promote_rule1(U, GenMat{T})
+function promote_rule{T <: RingElem, U <: RingElem}(::Type{GenMat{T}}, ::Type{U})
+   promote_rule(T, U) == T ? GenMat{T} : promote_rule1(U, GenMat{T})
 end
 
 ###############################################################################
@@ -3336,7 +3839,7 @@ function (a::GenMatSpace{T}){T <: RingElem}()
       end
    end
    z = GenMat{T}(entries)
-   z.parent = a
+   z.base_ring = a.base_ring
    return z
 end
 
@@ -3352,7 +3855,7 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::Integer)
       end
    end
    z = GenMat{T}(entries)
-   z.parent = a
+   z.base_ring = a.base_ring
    return z
 end
 
@@ -3368,7 +3871,7 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::fmpz)
       end
    end
    z = GenMat{T}(entries)
-   z.parent = a
+   z.base_ring = a.base_ring
    return z
 end
 
@@ -3385,7 +3888,7 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::T)
       end
    end
    z = GenMat{T}(entries)
-   z.parent = a
+   z.base_ring = base_ring(a)
    return z
 end
 
@@ -3400,7 +3903,7 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::Array{T, 2})
    end
    _check_dim(a.rows, a.cols, b)
    z = GenMat{T}(b)
-   z.parent = a
+   z.base_ring = a.base_ring
    return z
 end
 
@@ -3409,9 +3912,9 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::Array{T, 1})
       parent(b[1]) != base_ring(a) && error("Unable to coerce to matrix")
    end
    _check_dim(a.rows, a.cols, b)
-   b = reshape(b, a.rows, a.cols)'
+   b = reshape(b, a.cols, a.rows)'
    z = GenMat{T}(b)
-   z.parent = a
+   z.base_ring = a.base_ring
    return z
 end
 
@@ -3440,13 +3943,13 @@ end
 ###############################################################################
 
 doc"""
-    MatrixSpace(R::Ring, r::Int, c::Int; cached=true)
+    MatrixSpace(R::Ring, r::Int, c::Int, cached::Bool = true)
 > Return parent object corresponding to the space of $r\times c$ matrices over
 > the ring $R$. If `cached == true` (the default), the returned parent object
 > is cached so that it can returned by future calls to the constructor with the
 > same dimensions and base ring.
 """
-function MatrixSpace(R::Ring, r::Int, c::Int; cached=true)
+function MatrixSpace(R::Ring, r::Int, c::Int, cached::Bool = true)
    T = elem_type(R)
    return GenMatSpace{T}(R, r, c, cached)
 end
@@ -3462,8 +3965,8 @@ function typed_hvcat(R::Ring, dims, d...)
          A[i, j] = R(d[(i - 1)*c + j])
       end
    end 
-   S = MatrixSpace(R, r, c)
-   return S(A)
+   S = MatrixSpace(R, r, c)(A)
+   return S
 end
 
 function typed_hcat(R::Ring, d...)

@@ -14,7 +14,7 @@ export ResidueRing, GenRes, GenResRing, inv, modulus, data
 
 parent_type{T}(::Type{GenRes{T}}) = GenResRing{T}
 
-elem_type{T <: RingElem}(::GenResRing{T}) = GenRes{T}
+elem_type{T <: RingElem}(::Type{GenResRing{T}}) = GenRes{T}
 
 doc"""
     base_ring{T <: RingElem}(S::ResRing{T})
@@ -481,23 +481,23 @@ end
 ###############################################################################
 
 function zero!{T <: RingElem}(a::ResElem{T})
-   zero!(a.data)
-   nothing
+   a.data = zero!(a.data)
+   return a
 end
 
 function mul!{T <: RingElem}(c::ResElem{T}, a::ResElem{T}, b::ResElem{T})
    c.data = mod(data(a)*data(b), modulus(a))
-   nothing
+   return c
 end
 
 function addeq!{T <: RingElem}(c::ResElem{T}, a::ResElem{T})
    c.data = mod(c.data + data(a), modulus(a))
-   nothing
+   return c
 end
 
 function add!{T <: RingElem}(c::ResElem{T}, a::ResElem{T}, b::ResElem{T})
    c.data = mod(data(a) + data(b), modulus(a))
-   nothing
+   return c
 end
 
 ###############################################################################
@@ -506,16 +506,18 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: RingElem}(::Type{GenRes{T}}, ::Type{T}) = GenRes{T}
+promote_rule(::Type{GenRes{fmpz}}, ::Type{fmpz}) = GenRes{fmpz}
 
-Base.promote_rule{T <: RingElem, U <: Integer}(::Type{GenRes{T}}, ::Type{U}) = GenRes{T}
+promote_rule{T <: RingElem}(::Type{GenRes{T}}, ::Type{T}) = GenRes{T}
+
+promote_rule{T <: RingElem, U <: Integer}(::Type{GenRes{T}}, ::Type{U}) = GenRes{T}
 
 function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenRes{T}}, ::Type{GenRes{U}})
-   Base.promote_rule(T, GenRes{U}) == T ? GenRes{T} : Union{}
+   promote_rule(T, GenRes{U}) == T ? GenRes{T} : Union{}
 end
 
-function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenRes{T}}, ::Type{U})
-   Base.promote_rule(T, U) == T ? GenRes{T} : promote_rule1(U, GenRes{T})
+function promote_rule{T <: RingElem, U <: RingElem}(::Type{GenRes{T}}, ::Type{U})
+   promote_rule(T, U) == T ? GenRes{T} : promote_rule1(U, GenRes{T})
 end
 
 ###############################################################################

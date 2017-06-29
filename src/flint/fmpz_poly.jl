@@ -15,7 +15,7 @@ export FmpzPolyRing, fmpz_poly, cyclotomic, theta_qexp, eta_qexp, cos_minpoly,
 
 parent_type(::Type{fmpz_poly}) = FmpzPolyRing
 
-elem_type(::FmpzPolyRing) = fmpz_poly
+elem_type(::Type{FmpzPolyRing}) = fmpz_poly
 
 base_ring(a::FmpzPolyRing) = a.base_ring
 
@@ -749,31 +749,37 @@ end
 function zero!(z::fmpz_poly)
    ccall((:fmpz_poly_zero, :libflint), Void, 
                     (Ptr{fmpz_poly},), &z)
+   return z
 end
 
 function fit!(z::fmpz_poly, n::Int)
    ccall((:fmpz_poly_fit_length, :libflint), Void, 
                     (Ptr{fmpz_poly}, Int), &z, n)
+   return nothing
 end
 
 function setcoeff!(z::fmpz_poly, n::Int, x::fmpz)
    ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, 
                     (Ptr{fmpz_poly}, Int, Ptr{fmpz}), &z, n, &x)
+   return z
 end
 
 function mul!(z::fmpz_poly, x::fmpz_poly, y::fmpz_poly)
    ccall((:fmpz_poly_mul, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &x, &y)
+   return z
 end
 
 function addeq!(z::fmpz_poly, x::fmpz_poly)
    ccall((:fmpz_poly_add, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &z, &x)
+   return z
 end
 
 function add!(z::fmpz_poly, x::fmpz_poly, y::fmpz_poly)
    ccall((:fmpz_poly_add, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &x, &y)
+   return z
 end
 
 ###############################################################################
@@ -782,9 +788,9 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{fmpz_poly}, ::Type{T}) = fmpz_poly
+promote_rule{T <: Integer}(::Type{fmpz_poly}, ::Type{T}) = fmpz_poly
 
-Base.promote_rule(::Type{fmpz_poly}, ::Type{fmpz}) = fmpz_poly
+promote_rule(::Type{fmpz_poly}, ::Type{fmpz}) = fmpz_poly
 
 ###############################################################################
 #

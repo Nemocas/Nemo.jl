@@ -20,7 +20,7 @@ function O(a::fq_nmod_rel_series)
    return z
 end
 
-elem_type(::FqNmodRelSeriesRing) = fq_nmod_rel_series
+elem_type(::Type{FqNmodRelSeriesRing}) = fq_nmod_rel_series
 
 parent_type(::Type{fq_nmod_rel_series}) = FqNmodRelSeriesRing
 
@@ -363,7 +363,7 @@ function ^(a::fq_nmod_rel_series, b::Int)
    b < 0 && throw(DomainError())
    if isgen(a)
       z = parent(a)()
-      setcoeff!(z, 0, base_ring(a)(1))
+      z = setcoeff!(z, 0, base_ring(a)(1))
       z.prec = a.prec + b - 1
       z.val = b
    elseif pol_length(a) == 0
@@ -510,24 +510,28 @@ function zero!(x::fq_nmod_rel_series)
   ccall((:fq_nmod_poly_zero, :libflint), Void, 
                    (Ptr{fq_nmod_rel_series}, Ptr{FqNmodFiniteField}), &x, &base_ring(x))
   x.prec = parent(x).prec_max
+  return x
 end
 
 function fit!(z::fq_nmod_rel_series, n::Int)
    ccall((:fq_nmod_poly_fit_length, :libflint), Void, 
          (Ptr{fq_nmod_rel_series}, Int, Ptr{FqNmodFiniteField}),
          &z, n, &base_ring(z))
+   return nothing
 end
 
 function setcoeff!(z::fq_nmod_rel_series, n::Int, x::fmpz)
    ccall((:fq_nmod_poly_set_coeff_fmpz, :libflint), Void, 
                 (Ptr{fq_nmod_rel_series}, Int, Ptr{fmpz}, Ptr{FqNmodFiniteField}), 
                &z, n, &x, &base_ring(z))
+   return z
 end
 
 function setcoeff!(z::fq_nmod_rel_series, n::Int, x::fq_nmod)
    ccall((:fq_nmod_poly_set_coeff, :libflint), Void, 
                 (Ptr{fq_nmod_rel_series}, Int, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), 
                &z, n, &x, &base_ring(z))
+   return z
 end
 
 function mul!(z::fq_nmod_rel_series, a::fq_nmod_rel_series, b::fq_nmod_rel_series)
@@ -548,7 +552,7 @@ function mul!(z::fq_nmod_rel_series, a::fq_nmod_rel_series, b::fq_nmod_rel_serie
          (Ptr{fq_nmod_rel_series}, Ptr{fq_nmod_rel_series},
           Ptr{fq_nmod_rel_series}, Int, Ptr{FqNmodFiniteField}), 
                &z, &a, &b, lenz, &base_ring(z))
-   return nothing
+   return z
 end
 
 function addeq!(a::fq_nmod_rel_series, b::fq_nmod_rel_series)
@@ -594,7 +598,7 @@ function addeq!(a::fq_nmod_rel_series, b::fq_nmod_rel_series)
    a.prec = prec
    a.val = val
    renormalize!(a)
-   return nothing
+   return a
 end
 
 function add!(c::fq_nmod_rel_series, a::fq_nmod_rel_series, b::fq_nmod_rel_series)
@@ -612,6 +616,7 @@ function add!(c::fq_nmod_rel_series, a::fq_nmod_rel_series, b::fq_nmod_rel_serie
    ccall((:fq_nmod_poly_add_series, :libflint), Void, 
      (Ptr{fq_nmod_rel_series}, Ptr{fq_nmod_rel_series}, Ptr{fq_nmod_rel_series}, Int, Ptr{FqNmodFiniteField}),
                &c, &a, &b, lenc, &ctx)
+   return c
 end
 
 ###############################################################################
@@ -620,11 +625,11 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{fq_nmod_rel_series}, ::Type{T}) = fq_nmod_rel_series
+promote_rule{T <: Integer}(::Type{fq_nmod_rel_series}, ::Type{T}) = fq_nmod_rel_series
 
-Base.promote_rule(::Type{fq_nmod_rel_series}, ::Type{fmpz}) = fq_nmod_rel_series
+promote_rule(::Type{fq_nmod_rel_series}, ::Type{fmpz}) = fq_nmod_rel_series
 
-Base.promote_rule(::Type{fq_nmod_rel_series}, ::Type{fq_nmod}) = fq_nmod_rel_series
+promote_rule(::Type{fq_nmod_rel_series}, ::Type{fq_nmod}) = fq_nmod_rel_series
 
 ###############################################################################
 #

@@ -1,7 +1,11 @@
 function test_fq_nmod_constructors()
-   print("fq_nmod.constructors()...")
+   print("fq_nmod.constructors...")
 
    R, x = FiniteField(7, 5, "x")
+
+   @test elem_type(R) == fq_nmod
+   @test elem_type(FqNmodFiniteField) == fq_nmod
+   @test parent_type(fq_nmod) == FqNmodFiniteField
 
    Sy, y = PolynomialRing(ResidueRing(FlintZZ, 3), "y")
 
@@ -32,7 +36,7 @@ function test_fq_nmod_constructors()
 end
 
 function test_fq_nmod_printing()
-   print("fq_nmod.printing()...")
+   print("fq_nmod.printing...")
 
    R, x = FiniteField(7, 5, "x")
 
@@ -44,7 +48,7 @@ function test_fq_nmod_printing()
 end
 
 function test_fq_nmod_manipulation()
-   print("fq_nmod.manipulation()...")
+   print("fq_nmod.manipulation...")
 
    R, x = FiniteField(7, 5, "x")
 
@@ -70,7 +74,7 @@ function test_fq_nmod_manipulation()
 end
 
 function test_fq_nmod_unary_ops()
-   print("fq_nmod.unary_ops()...")
+   print("fq_nmod.unary_ops...")
 
    R, x = FiniteField(7, 5, "x")
 
@@ -82,7 +86,7 @@ function test_fq_nmod_unary_ops()
 end
 
 function test_fq_nmod_binary_ops()
-   print("fq_nmod.binary_ops()...")
+   print("fq_nmod.binary_ops...")
 
    R, x = FiniteField(7, 5, "x")
 
@@ -99,7 +103,7 @@ function test_fq_nmod_binary_ops()
 end
 
 function test_fq_nmod_adhoc_binary()
-   print("fq_nmod.adhoc_binary()...")
+   print("fq_nmod.adhoc_binary...")
 
    R, x = FiniteField(7, 5, "x")
 
@@ -121,7 +125,7 @@ function test_fq_nmod_adhoc_binary()
 end
 
 function test_fq_nmod_powering()
-   print("fq_nmod.powering()...")
+   print("fq_nmod.powering...")
 
    R, x = FiniteField(7, 5, "x")
 
@@ -135,7 +139,7 @@ function test_fq_nmod_powering()
 end
 
 function test_fq_nmod_comparison()
-   print("fq_nmod.comparison()...")
+   print("fq_nmod.comparison...")
   
    R, x = FiniteField(7, 5, "x")
 
@@ -150,7 +154,7 @@ function test_fq_nmod_comparison()
 end
 
 function test_fq_nmod_inversion()
-   print("fq_nmod.inversion()...")
+   print("fq_nmod.inversion...")
   
    R, x = FiniteField(7, 5, "x")
 
@@ -166,7 +170,7 @@ function test_fq_nmod_inversion()
 end
 
 function test_fq_nmod_exact_division()
-   print("fq_nmod.exact_division()...")
+   print("fq_nmod.exact_division...")
   
    R, x = FiniteField(7, 5, "x")
 
@@ -181,7 +185,7 @@ function test_fq_nmod_exact_division()
 end
 
 function test_fq_nmod_gcd()
-   print("fq_nmod.gcd()...")
+   print("fq_nmod.gcd...")
 
    R, x = FiniteField(7, 5, "x")
 
@@ -196,7 +200,7 @@ function test_fq_nmod_gcd()
 end
 
 function test_fq_nmod_special_functions()
-   print("fq_nmod.special_functions()...")
+   print("fq_nmod.special_functions...")
   
    R, x = FiniteField(7, 5, "x")
 

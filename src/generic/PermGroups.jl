@@ -24,6 +24,7 @@ end
 
 type perm <: GroupElem
    d::Array{Int, 1}
+   cycles::Vector{Vector{Int}}
    parent::PermGroup
 
    function perm(n::Int)
@@ -45,7 +46,7 @@ export PermGroup, perm, parity, elements, cycles
 
 parent_type(::Type{perm}) = PermGroup
 
-elem_type(::PermGroup) = perm
+elem_type(::Type{PermGroup}) = perm
 
 ###############################################################################
 #
@@ -179,6 +180,7 @@ end
 ###############################################################################
 
 doc"""
+    *(a::perm, b::perm)
 > Return the composition of the two permutations, i.e. $a\circ b$. In other
 > words, the permutation corresponding to applying $b$ first, then $a$, is
 > returned.
@@ -190,6 +192,71 @@ function *(a::perm, b::perm)
    end
    G = parent(a)
    return G(d)
+end
+
+doc"""
+    ^(a::perm, n::Int)
+> Return the `n`-th power of a permutation `a`. By default Nemo computes powers
+> by cycle decomposition of `a`. `Nemo.power_by_squaring` provides a different
+> method for powering which may or may not be faster, depending on the
+> particuar case. Due to caching of cycle structure repeatedly powering should
+> be faster with the default method. NOTE: cycle structure is not computed
+> for `n<4`.
+"""
+function ^(a::perm, n::Int)
+   if n <0
+      return inv(a)^-n
+   elseif n == 0
+      return parent(a)()
+   elseif n == 1
+      return deepcopy(a)
+   elseif n == 2
+      return parent(a)(a.d[a.d])
+   elseif n == 3
+      return parent(a)(a.d[a.d[a.d]])
+   else
+      new_perm = similar(a.d)
+      cyls = cycles(a)
+      for cycle in cyls
+         k = n % length(cycle)
+         shifted = circshift(cycle, -k)
+         for (idx,j) in enumerate(cycle)
+            new_perm[j] = shifted[idx]
+         end
+      end
+      return parent(a)(new_perm)
+   end
+end
+
+function power_by_squaring(a::perm, b::Int)
+   if n <0
+      return inv(a)^-n
+   elseif n == 0
+      return parent(a)()
+   elseif n == 1
+      return deepcopy(a)
+   elseif n == 2
+      return parent(a)(a.d[a.d])
+   elseif n == 3
+      return parent(a)(a.d[a.d[a.d]])
+   else
+      bit = ~((~UInt(0)) >> 1)
+      while (UInt(bit) & b) == 0
+         bit >>= 1
+      end
+      cache1 = deepcopy(a.d)
+      cache2 = deepcopy(a.d)
+      bit >>= 1
+      while bit != 0
+         cache2 = cache1[cache1]
+         cache1 = cache2
+         if (UInt(bit) & b) != 0
+            cache1 = cache1[a.d]
+         end
+         bit >>= 1
+      end
+      return parent(a)(cache1)
+   end
 end
 
 ###############################################################################
@@ -290,24 +357,35 @@ doc"""
 > Decomposes permutation into disjoint cycles.
 """
 function cycles(a::perm)
-   to_visit = trues(a.d)
-   cycles = Vector{Vector{Int}}()
-   k = 1
-   while any(to_visit)
-      cycle = Vector{Int}()
-      k = findnext(to_visit, k)
-      to_visit[k] = false
-      push!(cycle, k)
-      next = a[k]
-      while next != k
-         push!(cycle, next)
-         to_visit[next] = false
-         next = a[next]
+   if isdefined(a, :cycles)
+      return a.cycles
+   else
+      to_visit = trues(a.d)
+      cycles = Vector{Vector{Int}}()
+      k = 1
+      while any(to_visit)
+         cycle = Vector{Int}()
+         k = findnext(to_visit, k)
+         to_visit[k] = false
+         push!(cycle, k)
+         next = a[k]
+         while next != k
+            push!(cycle, next)
+            to_visit[next] = false
+            next = a[next]
+         end
+         push!(cycles, cycle)
       end
-      push!(cycles, cycle)
+      a.cycles = cycles
+      return cycles
    end
-   return cycles
 end
+
+doc"""
+    order(a::perm)
+> Returns the order of permutation `a`.
+"""
+order(a::perm) = lcm([length(c) for c in cycles(a)])
 
 doc"""
     matrix_repr(a::perm)
@@ -331,11 +409,11 @@ function (G::PermGroup)()
    return z
 end
 
-function (G::PermGroup)(a::Array{Int, 1}; checked=true)
-   length(a) != G.n && error("Unable to coerce to permutation")
-   if checked
+function (G::PermGroup)(a::Array{Int, 1}, check::Bool=true)
+   length(a) != G.n && error("Unable to coerce to permutation: lengths differ")
+   if check
       Base.Set(a) != Base.Set(1:length(a)) && error("Unable to coerce to
-         permutation")
+         permutation: non-unique elements in array")
    end
    z = perm(a)
    z.parent = G
@@ -343,7 +421,7 @@ function (G::PermGroup)(a::Array{Int, 1}; checked=true)
 end
 
 function (G::PermGroup)(a::perm)
-   parent(a) != G && error("Unable to coerce to permutation")
+   parent(a) != G && error("Unable to coerce to permutation: wrong parent")
    return a
 end
 

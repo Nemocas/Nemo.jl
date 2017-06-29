@@ -14,7 +14,7 @@ export fq_poly, FqPolyRing
 
 parent_type(::Type{fq_poly}) = FqPolyRing
 
-elem_type(::FqPolyRing) = fq_poly
+elem_type(::Type{FqPolyRing}) = fq_poly
 
 base_ring(a::FqPolyRing) = a.base_ring
 
@@ -537,10 +537,45 @@ end
 
 ################################################################################
 #
+#  Irreducibility
+#
+################################################################################
+
+doc"""
+    isirreducible(x::fq_poly)
+> Return `true` if $x$ is irreducible, otherwise return `false`.
+"""
+function isirreducible(x::fq_poly)
+  return Bool(ccall((:fq_poly_is_irreducible, :libflint), Int32,
+                    (Ptr{fq_poly}, Ptr{FqFiniteField} ),
+                    &x, &base_ring(parent(x))))
+end
+
+################################################################################
+#
+#  Squarefree testing
+#
+################################################################################
+
+doc"""
+    issquarefree(x::fq_poly)
+> Return `true` if $x$ is squarefree, otherwise return `false`.
+"""
+function issquarefree(x::fq_poly)
+   return Bool(ccall((:fq_poly_is_squarefree, :libflint), Int32, 
+       (Ptr{fq_poly}, Ptr{FqFiniteField}), &x, &base_ring(parent(x))))
+end
+
+################################################################################
+#
 #  Factorization
 #
 ################################################################################
 
+doc"""
+    factor(x::fq_poly)
+> Return the factorisation of $x$.
+"""
 function factor(x::fq_poly)
    fac, z = _factor(x)
    return Fac(parent(x)(z), fac)
@@ -564,8 +599,38 @@ function _factor(x::fq_poly)
       res[f] = e
    end
    return res, a
-end  
+end
 
+doc"""
+    factor_squarefree(x::fq_poly)
+> Return the squarefree factorisation of $x$.
+"""
+function factor_squarefree(x::fq_poly)
+  # _factor_squareefree does weird things if the polynomial is not monic
+  return Fac(parent(x)(lead(x)), _factor_squarefree(divexact(x, lead(x))))
+end
+
+function _factor_squarefree(x::fq_poly)
+  F = base_ring(parent(x))
+  fac = fq_poly_factor(F)
+  ccall((:fq_poly_factor_squarefree, :libflint), UInt,
+        (Ptr{fq_poly_factor}, Ptr{fq_poly}, Ptr{FqFiniteField}), &fac, &x, &F)
+  res = Dict{fq_poly,Int}()
+  for i in 1:fac.num
+    f = parent(x)()
+    ccall((:fq_poly_factor_get_poly, :libflint), Void,
+          (Ptr{fq_poly}, Ptr{fq_poly_factor}, Int,
+          Ptr{FqFiniteField}), &f, &fac, i-1, &F)
+    e = unsafe_load(fac.exp, i)
+    res[f] = e
+  end
+  return res
+end
+
+doc"""
+    factor_distinct_deg(x::fq_poly)
+> Return the distinct degree factorisation of a squarefree polynomial $x$.
+"""
 function factor_distinct_deg(x::fq_poly)
    R = parent(x)
    F = base_ring(R)
@@ -599,36 +664,42 @@ function zero!(z::fq_poly)
    ccall((:fq_poly_zero, :libflint), Void, 
          (Ptr{fq_poly}, Ptr{FqFiniteField}),
          &z, &base_ring(parent(z)))
+   return z
 end
 
 function fit!(z::fq_poly, n::Int)
    ccall((:fq_poly_fit_length, :libflint), Void, 
          (Ptr{fq_poly}, Int, Ptr{FqFiniteField}),
          &z, n, &base_ring(parent(z)))
+   return nothing
 end
 
 function setcoeff!(z::fq_poly, n::Int, x::fq)
    ccall((:fq_poly_set_coeff, :libflint), Void, 
          (Ptr{fq_poly}, Int, Ptr{fq}, Ptr{FqFiniteField}),
          &z, n, &x, &base_ring(parent(z)))
+   return z
 end
 
 function mul!(z::fq_poly, x::fq_poly, y::fq_poly)
    ccall((:fq_poly_mul, :libflint), Void, 
          (Ptr{fq_poly}, Ptr{fq_poly}, Ptr{fq_poly},
          Ptr{FqFiniteField}), &z, &x, &y, &base_ring(parent(x)))
+   return z
 end
 
 function add!(z::fq_poly, x::fq_poly, y::fq_poly)
    ccall((:fq_poly_add, :libflint), Void, 
          (Ptr{fq_poly}, Ptr{fq_poly}, Ptr{fq_poly},
          Ptr{FqFiniteField}), &z, &x, &y, &base_ring(parent(x)))
+   return z
 end
 
 function sub!(z::fq_poly, x::fq_poly, y::fq_poly)
    ccall((:fq_poly_sub, :libflint), Void, 
          (Ptr{fq_poly}, Ptr{fq_poly}, Ptr{fq_poly},
          Ptr{FqFiniteField}), &z, &x, &y, &base_ring(parent(x)))
+   return z
 end
 
 
@@ -636,6 +707,7 @@ function addeq!(z::fq_poly, x::fq_poly)
    ccall((:fq_poly_add, :libflint), Void, 
          (Ptr{fq_poly}, Ptr{fq_poly}, Ptr{fq_poly},
          Ptr{FqFiniteField}), &z, &z, &x, &base_ring(parent(x)))
+   return z
 end
 
 ################################################################################
@@ -644,11 +716,11 @@ end
 #
 ################################################################################
 
-Base.promote_rule{V <: Integer}(::Type{fq_poly}, ::Type{V}) = fq_poly
+promote_rule{V <: Integer}(::Type{fq_poly}, ::Type{V}) = fq_poly
 
-Base.promote_rule(::Type{fq_poly}, ::Type{fmpz}) = fq_poly
+promote_rule(::Type{fq_poly}, ::Type{fmpz}) = fq_poly
 
-Base.promote_rule(::Type{fq_poly}, ::Type{fq}) = fq_poly
+promote_rule(::Type{fq_poly}, ::Type{fq}) = fq_poly
 
 ###############################################################################
 #

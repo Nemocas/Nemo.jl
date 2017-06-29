@@ -20,7 +20,7 @@ function O(a::fmpq_rel_series)
    return z
 end
 
-elem_type(::FmpqRelSeriesRing) = fmpq_rel_series
+elem_type(::Type{FmpqRelSeriesRing}) = fmpq_rel_series
 
 parent_type(::Type{fmpq_rel_series}) = FmpqRelSeriesRing
 
@@ -384,7 +384,7 @@ function ^(a::fmpq_rel_series, b::Int)
    b < 0 && throw(DomainError())
    if isgen(a)
       z = parent(a)()
-      setcoeff!(z, 0, fmpq(1))
+      z = setcoeff!(z, 0, fmpq(1))
       z.prec = a.prec + b - 1
       z.val = b
    elseif pol_length(a) == 0
@@ -897,12 +897,14 @@ function zero!(z::fmpq_rel_series)
    ccall((:fmpq_poly_zero, :libflint), Void, 
                 (Ptr{fmpq_rel_series},), &z)
    z.prec = parent(z).prec_max
+   return z
 end
 
 function setcoeff!(z::fmpq_rel_series, n::Int, x::fmpq)
    ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, 
                 (Ptr{fmpq_rel_series}, Int, Ptr{fmpq}), 
                &z, n, &x)
+   return z
 end
 
 function mul!(z::fmpq_rel_series, a::fmpq_rel_series, b::fmpq_rel_series)
@@ -922,7 +924,7 @@ function mul!(z::fmpq_rel_series, a::fmpq_rel_series, b::fmpq_rel_series)
    ccall((:fmpq_poly_mullow, :libflint), Void, 
                 (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
                &z, &a, &b, lenz)
-   return nothing
+   return z
 end
 
 function addeq!(a::fmpq_rel_series, b::fmpq_rel_series)
@@ -964,7 +966,7 @@ function addeq!(a::fmpq_rel_series, b::fmpq_rel_series)
    a.prec = prec
    a.val = val
    renormalize!(a)
-   return nothing
+   return a
 end
 
 function add!(c::fmpq_rel_series, a::fmpq_rel_series, b::fmpq_rel_series)
@@ -981,6 +983,7 @@ function add!(c::fmpq_rel_series, a::fmpq_rel_series, b::fmpq_rel_series)
    ccall((:fmpq_poly_add_series, :libflint), Void, 
                 (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
                &c, &a, &b, lenc)
+   return c
 end
 
 ###############################################################################
@@ -989,13 +992,13 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{fmpq_rel_series}, ::Type{T}) = fmpq_rel_series
+promote_rule{T <: Integer}(::Type{fmpq_rel_series}, ::Type{T}) = fmpq_rel_series
 
-Base.promote_rule{T <: Integer}(::Type{fmpq_rel_series}, ::Type{Rational{T}}) = fmpq_rel_series
+promote_rule{T <: Integer}(::Type{fmpq_rel_series}, ::Type{Rational{T}}) = fmpq_rel_series
 
-Base.promote_rule(::Type{fmpq_rel_series}, ::Type{fmpz}) = fmpq_rel_series
+promote_rule(::Type{fmpq_rel_series}, ::Type{fmpz}) = fmpq_rel_series
 
-Base.promote_rule(::Type{fmpq_rel_series}, ::Type{fmpq}) = fmpq_rel_series
+promote_rule(::Type{fmpq_rel_series}, ::Type{fmpq}) = fmpq_rel_series
 
 ###############################################################################
 #

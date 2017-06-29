@@ -23,7 +23,7 @@ function O(a::fq_abs_series)
    return z
 end
 
-elem_type(::FqAbsSeriesRing) = fq_abs_series
+elem_type(::Type{FqAbsSeriesRing}) = fq_abs_series
 
 parent_type(::Type{fq_abs_series}) = FqAbsSeriesRing
 
@@ -452,12 +452,14 @@ function fit!(z::fq_abs_series, n::Int)
    ccall((:fq_poly_fit_length, :libflint), Void, 
          (Ptr{fq_abs_series}, Int, Ptr{FqFiniteField}),
          &z, n, &base_ring(z))
+   return nothing
 end
 
 function setcoeff!(z::fq_abs_series, n::Int, x::fq)
    ccall((:fq_poly_set_coeff, :libflint), Void, 
                 (Ptr{fq_abs_series}, Int, Ptr{fq}, Ptr{FqFiniteField}), 
                &z, n, &x, &base_ring(z))
+   return z
 end
 
 function mul!(z::fq_abs_series, a::fq_abs_series, b::fq_abs_series)
@@ -478,6 +480,7 @@ function mul!(z::fq_abs_series, a::fq_abs_series, b::fq_abs_series)
          (Ptr{fq_abs_series}, Ptr{fq_abs_series},
           Ptr{fq_abs_series}, Int, Ptr{FqFiniteField}), 
                &z, &a, &b, lenz, &base_ring(z))
+   return z
 end
 
 function addeq!(a::fq_abs_series, b::fq_abs_series)
@@ -492,6 +495,7 @@ function addeq!(a::fq_abs_series, b::fq_abs_series)
          (Ptr{fq_abs_series}, Ptr{fq_abs_series},
           Ptr{fq_abs_series}, Int, Ptr{FqFiniteField}), 
                &a, &a, &b, lenz, &base_ring(a))
+   return a
 end
 
 ###############################################################################
@@ -500,11 +504,11 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{fq_abs_series}, ::Type{T}) = fq_abs_series
+promote_rule{T <: Integer}(::Type{fq_abs_series}, ::Type{T}) = fq_abs_series
 
-Base.promote_rule(::Type{fq_abs_series}, ::Type{fq}) = fq_abs_series
+promote_rule(::Type{fq_abs_series}, ::Type{fq}) = fq_abs_series
 
-Base.promote_rule(::Type{fq_abs_series}, ::Type{fmpz}) = fq_abs_series
+promote_rule(::Type{fq_abs_series}, ::Type{fmpz}) = fq_abs_series
 
 ###############################################################################
 #

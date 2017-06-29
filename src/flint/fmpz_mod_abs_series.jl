@@ -23,7 +23,7 @@ function O(a::fmpz_mod_abs_series)
    return z
 end
 
-elem_type(::FmpzModAbsSeriesRing) = fmpz_mod_abs_series
+elem_type(::Type{FmpzModAbsSeriesRing}) = fmpz_mod_abs_series
 
 parent_type(::Type{fmpz_mod_abs_series}) = FmpzModAbsSeriesRing
 
@@ -480,6 +480,7 @@ function setcoeff!(z::fmpz_mod_abs_series, n::Int, x::fmpz)
    ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, 
                 (Ptr{fmpz_mod_abs_series}, Int, Ptr{fmpz}), 
                &z, n, &x)
+   return z
 end
 
 function mul!(z::fmpz_mod_abs_series, a::fmpz_mod_abs_series, b::fmpz_mod_abs_series)
@@ -504,6 +505,7 @@ function mul!(z::fmpz_mod_abs_series, a::fmpz_mod_abs_series, b::fmpz_mod_abs_se
    ccall((:fmpz_mod_poly_mullow, :libflint), Void, 
                 (Ptr{fmpz_mod_abs_series}, Ptr{fmpz_mod_abs_series}, Ptr{fmpz_mod_abs_series}, Int), 
                &z, &a, &b, lenz)
+   return z
 end
 
 function addeq!(a::fmpz_mod_abs_series, b::fmpz_mod_abs_series)
@@ -520,6 +522,7 @@ function addeq!(a::fmpz_mod_abs_series, b::fmpz_mod_abs_series)
    ccall((:fmpz_mod_poly_add_series, :libflint), Void, 
                 (Ptr{fmpz_mod_abs_series}, Ptr{fmpz_mod_abs_series}, Ptr{fmpz_mod_abs_series}, Int), 
                &a, &a, &b, lenz)
+   return a
 end
 
 ###############################################################################
@@ -528,11 +531,11 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{fmpz_mod_abs_series}, ::Type{T}) = fmpz_mod_abs_series
+promote_rule{T <: Integer}(::Type{fmpz_mod_abs_series}, ::Type{T}) = fmpz_mod_abs_series
 
-Base.promote_rule(::Type{fmpz_mod_abs_series}, ::Type{fmpz}) = fmpz_mod_abs_series
+promote_rule(::Type{fmpz_mod_abs_series}, ::Type{fmpz}) = fmpz_mod_abs_series
 
-Base.promote_rule(::Type{fmpz_mod_abs_series}, ::Type{GenRes{fmpz}}) = fmpz_mod_abs_series
+promote_rule(::Type{fmpz_mod_abs_series}, ::Type{GenRes{fmpz}}) = fmpz_mod_abs_series
 
 ###############################################################################
 #

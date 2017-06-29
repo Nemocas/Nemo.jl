@@ -7,6 +7,39 @@ function randpoly(S, d::Int, n::Int)
    return r
 end
 
+function randpoly(S, d::Int)
+   r = S()
+   x = gen(S)
+   for i = 0:rand(0:d)
+      r += randelem(base_ring(S))*x^i
+   end
+   return r
+end
+
+function randprime(n::Int)
+   r = rand(-n:n)
+   while !isprime(fmpz(r))
+      r = rand(-n:n)
+   end
+   return r
+end
+
+function randprime(n::fmpz)
+   r = rand(-BigInt(n):BigInt(n))
+   while !isprime(fmpz(r))
+       r = rand(-BigInt(n):BigInt(n))
+   end
+   return fmpz(r)
+end
+
+function randprime(n::fmpz, m::fmpz)
+   r = rand(-BigInt(n):BigInt(m))
+   while !isprime(fmpz(r))
+       r = rand(-BigInt(n):BigInt(m))
+   end
+   return fmpz(r)
+end
+
 function randelem(K::AnticNumberField, n)
    s = K(0)
    a = gen(K)
@@ -25,6 +58,21 @@ function randelem(R::FmpzPolyRing, n)
    return s
 end
 
+function randelem(R::FinField)
+   p = characteristic(R)
+   d = degree(R)
+   x = gen(R)
+   z = zero(R)
+   for i in 0:d-1
+      z += fmpz(rand((BigInt(0):BigInt(p))))*x^i
+   end
+   return z
+end
+
+function randelem(R::GenResRing{fmpz})
+   return R(rand(-BigInt(R.modulus):BigInt(R.modulus)))
+end
+
 function randelem(R::GenResRing{fmpz}, n)
    return R(rand(-n:n))
 end
@@ -38,6 +86,18 @@ function randelem(R, n)
    return s
 end
 
+function randpolymat{T <: RingElem}(R::GenMatSpace{T}, d::Int)
+   m = R.rows
+   n = R.cols
+   r = R()
+   for i = 1:m
+      for j = 1:n
+         r[i, j] = randpoly(base_ring(R), d)
+      end
+   end
+   return r
+end
+
 function randmat{T <: RingElem}(R::GenMatSpace{T}, d::Int, c::Int)
    m = R.rows
    n = R.cols
@@ -48,6 +108,18 @@ function randmat{T <: RingElem}(R::GenMatSpace{T}, d::Int, c::Int)
       end
    end
    return r
+end
+
+function randmat{T <: RingElem}(S::GenMatSpace{T})
+   M = S()
+   m = rows(M)
+   n = cols(M)
+   for i = 1:m
+      for j = 1:n
+         M[i, j] = randelem(base_ring(S))
+      end
+   end
+   return M
 end
 
 function randmat{T <: RingElem}(S::GenMatSpace{T}, c::Int)
@@ -168,7 +240,7 @@ function randmat_with_rank{T <: RingElem}(S::GenMatSpace{T}, c::Int, rank::Int)
    return M
 end
 
-function istriu(A::GenMat)
+function Base.istriu(A::GenMat)
    m = rows(A)
    n = cols(A)
    d = 0
@@ -210,11 +282,35 @@ function is_snf(A::GenMat)
    return true
 end
 
+function is_weak_popov(P::GenMat, rank::Int)
+   zero_rows = 0
+   pivots = zeros(cols(P))
+   for r = 1:rows(P)
+      p = Nemo.find_pivot_popov(P, r)
+      if P[r,p] == 0
+         zero_rows += 1
+         continue
+      end
+      if pivots[p] != 0
+         return false
+      end
+      pivots[p] = r
+   end
+   if zero_rows != rows(P)-rank
+      return false
+   end
+   return true
+end
+
 function test_gen_mat_constructors()
    print("GenMat.constructors...")
  
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
+
+   @test elem_type(S) == GenMat{elem_type(R)}
+   @test elem_type(GenMatSpace{elem_type(R)}) == GenMat{elem_type(R)}
+   @test parent_type(GenMat{elem_type(R)}) == GenMatSpace{elem_type(R)}
 
    @test typeof(S) <: GenMatSpace
 
@@ -1325,6 +1421,75 @@ function test_gen_mat_snf()
    println("PASS")
 end
 
+function test_gen_mat_weak_popov()
+   print("GenMat.weak_popov...")
+
+   R, x = PolynomialRing(QQ, "x")
+
+   A = Matrix(R, 3, 4, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
+   r = rank(A)
+
+   P = weak_popov(A)
+   @test is_weak_popov(P, r)
+
+   P, U = weak_popov_with_trafo(A)
+   @test is_weak_popov(P, r)
+   @test U*A == P
+   @test isunit(det(U))
+
+   F, a = FiniteField(7, 1, "a")
+
+   S, y = PolynomialRing(F, "y")
+
+   B = Matrix(S, 3, 3, map(S, Any[ 4*y^2+3*y+5 4*y^2+3*y+4 6*y^2+1; 3*y+6 3*y+5 y+3; 6*y^2+4*y+2 6*y^2 2*y^2+y]))
+   s = rank(B)
+
+   P = weak_popov(B)
+   @test is_weak_popov(P, s)
+
+   P, U = weak_popov_with_trafo(B)
+   @test is_weak_popov(P, s)
+   @test U*B == P
+   @test isunit(det(U))
+
+   # some random tests
+
+   for i in 1:5
+      M = MatrixSpace(PolynomialRing(QQ, "x")[1], rand(1:5), rand(1:5))
+      A = randmat(M, 5, 5)
+      r = rank(A)
+      P = weak_popov(A)
+      @test is_weak_popov(P, r)
+
+      P, U = weak_popov_with_trafo(A)
+      @test is_weak_popov(P, r)
+      @test U*A == P
+      @test isunit(det(U))
+   end
+   
+   F = FiniteField(randprime(1000), rand(1:5), "a")[1]
+   FF = FiniteField(fmpz(randprime(1000)), rand(1:5), "a")[1]
+   FFF = ResidueRing(ZZ, randprime(1000))
+   FFFF = ResidueRing(ZZ, randprime(fmpz(2)^100, fmpz(2)^200))
+
+   for R in (F, FF, FFF, FFFF)
+      M = MatrixSpace(PolynomialRing(R, "x")[1], rand(1:5), rand(1:5))
+
+      for i in 1:2
+         A = randpolymat(M, rand(1:5))
+         r = rank(A)
+         P = weak_popov(A)
+         @test is_weak_popov(P, r)
+
+         P, U = weak_popov_with_trafo(A)
+         @test is_weak_popov(P, r)
+         @test U*A == P
+         @test isunit(det(U))
+      end
+   end
+   println("PASS")
+end
+
 function test_gen_mat()
    test_gen_mat_constructors()
    test_gen_mat_manipulation()
@@ -1358,6 +1523,7 @@ function test_gen_mat()
    test_gen_mat_hnf()
    test_gen_mat_snf_kb()
    test_gen_mat_snf()
+   test_gen_mat_weak_popov()
 
    println("")
 end

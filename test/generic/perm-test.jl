@@ -13,6 +13,10 @@ function test_perm_constructors()
 
    R = PermutationGroup(10)
 
+   @test elem_type(R) == perm
+   @test elem_type(PermGroup) == perm
+   @test parent_type(perm) == PermGroup
+
    a = R()
    b = R([2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
    c = R(a)
@@ -94,6 +98,14 @@ function test_perm_binary_ops()
       @test parity(a*b) == (parity(b)+parity(a)) % 2
    end
 
+   G = PermutationGroup(10)
+   p = G([9,5,4,7,3,8,2,10,1,6]) # (1,9)(2,5,3,4,7)(6,8,10)
+   @test p^0 == G()
+   @test p^1 == p
+   @test p^-1 == inv(p)
+   @test p^5 == p*p*p*p*p
+   @test p^-4 == inv(p)*inv(p)*inv(p)*inv(p)
+   @test p^2 * p^-2 == G()
    println("PASS")
 end
 
@@ -122,8 +134,22 @@ function test_misc_functions()
    G = PermutationGroup(10)
    a = G([2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
 
-   @test cycles(a) == [[1,2,3,5,6,7], [4], [8,9,10]]
    @test cycles(G()) == [[i] for i in 1:10]
+   @test order(G()) == 1
+   @test cycles(a) == [[1,2,3,5,6,7], [4], [8,9,10]]
+   @test order(a) == 6
+   @test a^6 == G()
+
+   p = G([9,5,4,7,3,8,2,10,1,6])
+
+   @test cycles(p) == [[1,9],[2,5,3,4,7],[6,8,10]]
+   @test order(p) == 30
+   @test cycles(p^2) == [[1], [2,3,7,5,4], [6,10,8], [9]]
+   @test order(p^2) == 15
+   @test cycles(p^3) == [[1,9], [2,4,5,7,3], [6], [8], [10]]
+   @test order(p^3) == 10
+   @test cycles(p^5) == [[1,9], [2], [3], [4], [5], [6,10,8], [7]]
+   @test order(p^5) == 6
 
    M = Nemo.matrix_repr(a)
    for (i,j) in enumerate(a.d)

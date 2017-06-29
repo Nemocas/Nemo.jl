@@ -335,7 +335,7 @@ isunit(::PolyElem)
 ```
 
 ```@docs
-isonomial(::PolyElem)
+ismonomial(::PolyElem)
 ```
 
 ```@docs
@@ -1019,27 +1019,37 @@ associative array with polynomial factors as keys and exponents as values.
 ```@docs
 isirreducible(::nmod_poly)
 isirreducible(::fmpz_mod_poly)
+isirreducible(::fq_poly)
+isirreducible(::fq_nmod_poly)
 ```
 
 ```@docs
 issquarefree(::nmod_poly)
 issquarefree(::fmpz_mod_poly)
+issquarefree(::fq_poly)
+issquarefree(::fq_nmod_poly)
 ```
 
 ```@docs
 factor(::fmpz_poly)
 factor(::nmod_poly)
 factor(::fmpz_mod_poly)
+factor(::fq_poly)
+factor(::fq_nmod_poly)
 ```
 
 ```@docs
 factor_squarefree(::nmod_poly)
 factor_squarefree(::fmpz_mod_poly)
+factor_squarefree(::fq_poly)
+factor_squarefree(::fq_nmod_poly)
 ```
 
 ```@docs
 factor_distinct_deg(::nmod_poly)
 factor_distinct_deg(::fmpz_mod_poly)
+factor_distinct_deg(::fq_poly)
+factor_distinct_deg(::fq_nmod_poly)
 ```
 
 Here are some examples of factorisation.

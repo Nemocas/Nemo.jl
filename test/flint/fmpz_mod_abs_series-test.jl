@@ -4,6 +4,10 @@ function test_fmpz_mod_abs_series_constructors()
    S = ResidueRing(ZZ, 123456789012345678949)
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
+   @test elem_type(R) == fmpz_mod_abs_series
+   @test elem_type(FmpzModAbsSeriesRing) == fmpz_mod_abs_series
+   @test parent_type(fmpz_mod_abs_series) == FmpzModAbsSeriesRing
+
    @test isa(R, FmpzModAbsSeriesRing)
 
    a = x^3 + 2x + 1

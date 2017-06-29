@@ -20,7 +20,7 @@ function O(a::fq_rel_series)
    return z
 end
 
-elem_type(::FqRelSeriesRing) = fq_rel_series
+elem_type(::Type{FqRelSeriesRing}) = fq_rel_series
 
 parent_type(::Type{fq_rel_series}) = FqRelSeriesRing
 
@@ -363,7 +363,7 @@ function ^(a::fq_rel_series, b::Int)
    b < 0 && throw(DomainError())
    if isgen(a)
       z = parent(a)()
-      setcoeff!(z, 0, base_ring(a)(1))
+      z = setcoeff!(z, 0, base_ring(a)(1))
       z.prec = a.prec + b - 1
       z.val = b
    elseif pol_length(a) == 0
@@ -510,24 +510,28 @@ function zero!(x::fq_rel_series)
   ccall((:fq_poly_zero, :libflint), Void, 
                    (Ptr{fq_rel_series}, Ptr{FqFiniteField}), &x, &base_ring(x))
   x.prec = parent(x).prec_max
+  return x
 end
 
 function fit!(z::fq_rel_series, n::Int)
    ccall((:fq_poly_fit_length, :libflint), Void, 
          (Ptr{fq_rel_series}, Int, Ptr{FqFiniteField}),
          &z, n, &base_ring(z))
+   return nothing
 end
 
 function setcoeff!(z::fq_rel_series, n::Int, x::fmpz)
    ccall((:fq_poly_set_coeff_fmpz, :libflint), Void, 
                 (Ptr{fq_rel_series}, Int, Ptr{fmpz}, Ptr{FqFiniteField}), 
                &z, n, &x, &base_ring(z))
+   return z
 end
 
 function setcoeff!(z::fq_rel_series, n::Int, x::fq)
    ccall((:fq_poly_set_coeff, :libflint), Void, 
                 (Ptr{fq_rel_series}, Int, Ptr{fq}, Ptr{FqFiniteField}), 
                &z, n, &x, &base_ring(z))
+   return z
 end
 
 function mul!(z::fq_rel_series, a::fq_rel_series, b::fq_rel_series)
@@ -548,7 +552,7 @@ function mul!(z::fq_rel_series, a::fq_rel_series, b::fq_rel_series)
          (Ptr{fq_rel_series}, Ptr{fq_rel_series},
           Ptr{fq_rel_series}, Int, Ptr{FqFiniteField}), 
                &z, &a, &b, lenz, &base_ring(z))
-   return nothing
+   return z
 end
 
 function addeq!(a::fq_rel_series, b::fq_rel_series)
@@ -594,7 +598,7 @@ function addeq!(a::fq_rel_series, b::fq_rel_series)
    a.prec = prec
    a.val = val
    renormalize!(a)
-   return nothing
+   return a
 end
 
 function add!(c::fq_rel_series, a::fq_rel_series, b::fq_rel_series)
@@ -612,6 +616,7 @@ function add!(c::fq_rel_series, a::fq_rel_series, b::fq_rel_series)
    ccall((:fq_poly_add_series, :libflint), Void, 
      (Ptr{fq_rel_series}, Ptr{fq_rel_series}, Ptr{fq_rel_series}, Int, Ptr{FqFiniteField}),
                &c, &a, &b, lenc, &ctx)
+   return c
 end
 
 ###############################################################################
@@ -620,11 +625,11 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{fq_rel_series}, ::Type{T}) = fq_rel_series
+promote_rule{T <: Integer}(::Type{fq_rel_series}, ::Type{T}) = fq_rel_series
 
-Base.promote_rule(::Type{fq_rel_series}, ::Type{fmpz}) = fq_rel_series
+promote_rule(::Type{fq_rel_series}, ::Type{fmpz}) = fq_rel_series
 
-Base.promote_rule(::Type{fq_rel_series}, ::Type{fq}) = fq_rel_series
+promote_rule(::Type{fq_rel_series}, ::Type{fq}) = fq_rel_series
 
 ###############################################################################
 #

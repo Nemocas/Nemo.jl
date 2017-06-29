@@ -8,22 +8,45 @@ function isequal(a::RingElem, b::RingElem)
    return parent(a) == parent(b) && a == b
 end
 
+################################################################################
+#
+#   Promotion system
+#
+# The promote_rule functions are not extending Base.promote_rule. The Nemo
+# promotion system is orthogonal to the built-in julia promotion system. The
+# julia system assumes that whenever you have a method signature of the form  
+# Base.promote_rule(::Type{T}, ::Type{S}) = R, then there is also a
+# correesponding Base.convert(::Type{R}, ::T) and similar for S. Since we
+# cannot use the julia convert system (we need an instance of the type and not
+# the type), we cannot use the julia promotion system.
+#
+# The Nemo promotion system is used to define catch all functions for
+# arithmetic between arbitrary ring elements. 
+#
+################################################################################
+
+promote_rule(T, U) = Union{}
+
+promote_rule{T <: RingElem}(::Type{T}, ::Type{fmpz}) = T
+
+promote_rule{T <: RingElem, S <: Integer}(::Type{T}, ::Type{S}) = T
+
+promote_rule1{T <: RingElem, U <: RingElem}(::Type{T}, ::Type{U}) = promote_rule(T, U)
+
 ###############################################################################
 #
 #   Generic catchall functions
 #
 ###############################################################################
 
-promote_rule1{T <: RingElem, U <: RingElem}(::Type{T}, ::Type{U}) = Base.promote_rule(T, U)
-
 function +{S <: RingElem, T <: RingElem}(x::S, y::T) 
-   T1 = Base.promote_rule(S, T)
+   T1 = promote_rule(S, T)
    if S == T1
       +(x, parent(x)(y))
    elseif T == T1
       +(parent(y)(x), y)
    else
-      T1 = Base.promote_rule(T, S)
+      T1 = promote_rule(T, S)
       if S == T1
          +(x, parent(x)(y))
       elseif T == T1
@@ -35,7 +58,7 @@ function +{S <: RingElem, T <: RingElem}(x::S, y::T)
 end
 
 function +{S <: RingElem, T <: Integer}(x::S, y::T) 
-   T1 = Base.promote_rule(S, T)
+   T1 = promote_rule(S, T)
    if S == T1
       +(x, parent(x)(y))
    else
@@ -44,7 +67,7 @@ function +{S <: RingElem, T <: Integer}(x::S, y::T)
 end
 
 function +{S <: Integer, T <: RingElem}(x::S, y::T) 
-   T1 = Base.promote_rule(T, S)
+   T1 = promote_rule(T, S)
    if T == T1
       +(parent(y)(x), y)
    else
@@ -53,13 +76,13 @@ function +{S <: Integer, T <: RingElem}(x::S, y::T)
 end
 
 function -{S <: RingElem, T <: RingElem}(x::S, y::T) 
-   T1 = Base.promote_rule(S, T)
+   T1 = promote_rule(S, T)
    if S == T1
       -(x, parent(x)(y))
    elseif T == T1
       -(parent(y)(x), y)
    else
-      T1 = Base.promote_rule(T, S)
+      T1 = promote_rule(T, S)
       if S == T1
          -(x, parent(x)(y))
       elseif T == T1
@@ -71,7 +94,7 @@ function -{S <: RingElem, T <: RingElem}(x::S, y::T)
 end
 
 function -{S <: RingElem, T <: Integer}(x::S, y::T) 
-   T1 = Base.promote_rule(S, T)
+   T1 = promote_rule(S, T)
    if S == T1
       -(x, parent(x)(y))
    else
@@ -80,7 +103,7 @@ function -{S <: RingElem, T <: Integer}(x::S, y::T)
 end
 
 function -{S <: Integer, T <: RingElem}(x::S, y::T) 
-   T1 = Base.promote_rule(T, S)
+   T1 = promote_rule(T, S)
    if T == T1
       -(parent(y)(x), y)
    else
@@ -89,13 +112,13 @@ function -{S <: Integer, T <: RingElem}(x::S, y::T)
 end
 
 function *{S <: RingElem, T <: RingElem}(x::S, y::T) 
-   T1 = Base.promote_rule(S, T)
+   T1 = promote_rule(S, T)
    if S == T1
       *(x, parent(x)(y))
    elseif T == T1
       *(parent(y)(x), y)
    else
-      T1 = Base.promote_rule(T, S)
+      T1 = promote_rule(T, S)
       if S == T1
          *(x, parent(x)(y))
       elseif T == T1
@@ -107,7 +130,7 @@ function *{S <: RingElem, T <: RingElem}(x::S, y::T)
 end
 
 function *{S <: RingElem, T <: Integer}(x::S, y::T) 
-   T1 = Base.promote_rule(S, T)
+   T1 = promote_rule(S, T)
    if S == T1
       *(x, parent(x)(y))
    else
@@ -116,7 +139,7 @@ function *{S <: RingElem, T <: Integer}(x::S, y::T)
 end
 
 function *{S <: Integer, T <: RingElem}(x::S, y::T) 
-   T1 = Base.promote_rule(T, S)
+   T1 = promote_rule(T, S)
    if T == T1
       *(parent(y)(x), y)
    else
@@ -125,13 +148,13 @@ function *{S <: Integer, T <: RingElem}(x::S, y::T)
 end
 
 function divexact{S <: RingElem, T <: RingElem}(x::S, y::T) 
-   T1 = Base.promote_rule(S, T)
+   T1 = promote_rule(S, T)
    if S == T1
       divexact(x, parent(x)(y))
    elseif T == T1
       divexact(parent(y)(x), y)
    else
-      T1 = Base.promote_rule(T, S)
+      T1 = promote_rule(T, S)
       if S == T1
          divexact(x, parent(x)(y))
       elseif T == T1
@@ -143,7 +166,7 @@ function divexact{S <: RingElem, T <: RingElem}(x::S, y::T)
 end
 
 function divexact{S <: RingElem, T <: Integer}(x::S, y::T) 
-   T1 = Base.promote_rule(S, T)
+   T1 = promote_rule(S, T)
    if S == T1
       divexact(x, parent(x)(y))
    else
@@ -152,7 +175,7 @@ function divexact{S <: RingElem, T <: Integer}(x::S, y::T)
 end
 
 function divexact{S <: Integer, T <: RingElem}(x::S, y::T) 
-   T1 = Base.promote_rule(T, S)
+   T1 = promote_rule(T, S)
    if T == T1
       divexact(parent(y)(x), y)
    else
@@ -166,13 +189,13 @@ function divides{T <: RingElem}(x::T, y::T)
 end
 
 function =={S <: RingElem, T <: RingElem}(x::S, y::T) 
-   T1 = Base.promote_rule(S, T)
+   T1 = promote_rule(S, T)
    if S == T1
       ==(x, parent(x)(y))
    elseif T == T1
       ==(parent(y)(x), y)
    else
-      T1 = Base.promote_rule(T, S)
+      T1 = promote_rule(T, S)
       if S == T1
          ==(x, parent(x)(y))
       elseif T == T1
@@ -184,7 +207,7 @@ function =={S <: RingElem, T <: RingElem}(x::S, y::T)
 end
 
 function =={S <: RingElem, T <: Integer}(x::S, y::T) 
-   T1 = Base.promote_rule(S, T)
+   T1 = promote_rule(S, T)
    if S == T1
       ==(x, parent(x)(y))
    else
@@ -193,7 +216,7 @@ function =={S <: RingElem, T <: Integer}(x::S, y::T)
 end
 
 function =={S <: Integer, T <: RingElem}(x::S, y::T) 
-   T1 = Base.promote_rule(T, S)
+   T1 = promote_rule(T, S)
    if T == T1
       ==(parent(y)(x), y)
    else
@@ -202,9 +225,9 @@ function =={S <: Integer, T <: RingElem}(x::S, y::T)
 end
 
 function addmul!{T <: RingElem}(z::T, x::T, y::T, c::T)
-   mul!(c, x, y)
-   addeq!(z, c)
-   return
+   c = mul!(c, x, y)
+   z = addeq!(z, c)
+   return z
 end
 
 ###############################################################################

@@ -2,7 +2,7 @@ RR = ArbField(64)
 CC = AcbField(64)
 
 function test_acb_constructors()
-   print("acb.constructors()...")
+   print("acb.constructors...")
 
    @test isa(CC, AcbField)
    @test isa(CC(2), FieldElem)
@@ -10,11 +10,14 @@ function test_acb_constructors()
    @test elem_type(CC) == acb
    @test base_ring(CC) == Union{} 
 
+   @test elem_type(AcbField) == acb
+   @test parent_type(acb) == AcbField
+
    println("PASS")
 end
 
 function test_acb_printing()
-   print("acb.printing()...")
+   print("acb.printing...")
 
    a = CC(1) + onei(CC)
 
@@ -24,7 +27,7 @@ function test_acb_printing()
 end
 
 function test_acb_basic_ops()
-   print("acb.basic_ops()...")
+   print("acb.basic_ops...")
 
    @test one(CC) == 1
    @test zero(CC) == 0
@@ -35,6 +38,9 @@ function test_acb_basic_ops()
    @test CC(QQ(1)) == a
    @test CC(RR(1)) == a
    @test CC(UInt(1)) == a
+   @test CC(BigInt(1)) == a
+   @test CC(Rational{Int}(1)) == a
+   @test CC(Rational{BigInt}(1)) == a
    @test CC(RR(1)) == a
    @test CC("1.0") == a
    @test CC("1.0 +/- 0") == a
@@ -45,6 +51,9 @@ function test_acb_basic_ops()
    @test CC("2","3") == b
    @test CC(RR(2),RR(3)) == b
    @test CC(UInt(2), UInt(3)) == b
+   @test CC(BigInt(2), BigInt(3)) == b
+   @test CC(Rational{Int}(2), Rational{Int}(3)) == b
+   @test CC(Rational{BigInt}(2), Rational{BigInt}(3)) == b
    @test CC(2.0, 3.0) == b
    @test CC(BigFloat(2), BigFloat(3)) == b
    @test real(b) == 2
@@ -54,7 +63,7 @@ function test_acb_basic_ops()
 end
 
 function test_acb_comparison()
-   print("acb.comparison()...")
+   print("acb.comparison...")
 
    exact3 = CC(3)
    exact4 = CC(4)
@@ -92,7 +101,7 @@ end
 
 
 function test_acb_predicates()
-   print("acb.predicates()...")
+   print("acb.predicates...")
 
    @test iszero(CC(0))
    @test !iszero(CC(1))
@@ -121,7 +130,7 @@ function test_acb_predicates()
 end
 
 function test_acb_unary_ops()
-   print("acb.unary_ops()...")
+   print("acb.unary_ops...")
 
    @test -CC(3) == CC(-3)
    @test abs(-CC(3)) == 3
@@ -132,7 +141,7 @@ function test_acb_unary_ops()
 end
 
 function test_acb_binary_ops()
-   print("acb.binary_ops()...")
+   print("acb.binary_ops...")
 
    x = CC(2)
    y = CC(4)
@@ -142,59 +151,36 @@ function test_acb_binary_ops()
    @test x * y == 8
    @test x // y == 0.5
 
-   @test x + UInt(4) == 6
-   @test x - UInt(4) == -2
-   @test x * UInt(4) == 8
-   @test x // UInt(4) == 0.5
-   @test UInt(2) + y == 6
-   @test UInt(2) - y == -2
-   @test UInt(2) * y == 8
-   @test UInt(2) // y == 0.5
+   for T in [fmpz, fmpq, Int, BigInt, Rational{Int}, Rational{BigInt}]
 
-   @test x + Int(4) == 6
-   @test x - Int(4) == -2
-   @test x * Int(4) == 8
-   @test x // Int(4) == 0.5
-   @test Int(2) + y == 6
-   @test Int(2) - y == -2
-   @test Int(2) * y == 8
-   @test Int(2) // y == 0.5
+      @test x + T(4) == 6
+      @test x - T(4) == -2
+      @test x * T(4) == 8
+      @test x // T(4) == 0.5
+      @test T(2) + y == 6
+      @test T(2) - y == -2
+      @test T(2) * y == 8
+      @test T(2) // y == 0.5
+      @test x ^ T(4) == 16
+   end
 
-   @test x + ZZ(4) == 6
-   @test x - ZZ(4) == -2
-   @test x * ZZ(4) == 8
-   @test x // ZZ(4) == 0.5
-   @test ZZ(2) + y == 6
-   @test ZZ(2) - y == -2
-   @test ZZ(2) * y == 8
-   @test ZZ(2) // y == 0.5
-
-   @test x + QQ(4) == 6
-   @test x - QQ(4) == -2
-   @test x * QQ(4) == 8
-   @test x // QQ(4) == 0.5
-   @test QQ(2) + y == 6
-   @test QQ(2) - y == -2
-   @test QQ(2) * y == 8
-   @test QQ(2) // y == 0.5
-
-   @test x ^ y == 16
-   @test x ^ ZZ(4) == 16
-   @test x ^ UInt(4) == 16
-   @test x ^ Int(4) == 16
-   @test x ^ QQ(4) == 16
-
-   @test ZZ(2) ^ y == 16
-   @test UInt(2) ^ y == 16
-   @test Int(2) ^ y == 16
-   @test QQ(2) ^ y == 16
-
+   for T in [Float64, BigFloat, arb]
+      @test contains(x + T(4), 6)
+      @test contains(x - T(4), -2)
+      @test contains(x * T(4), 8)
+      @test contains(x // T(4), fmpq(1, 2))
+      @test contains(T(2) + y, 6)
+      @test contains(T(2) - y, -2)
+      @test contains(T(2) * y, 8)
+      @test contains(T(2) // y, fmpq(1, 2))
+      @test contains(x ^ T(4), 16)
+   end
 
    println("PASS")
 end
 
 function test_acb_misc_ops()
-   print("acb.misc_ops()...")
+   print("acb.misc_ops...")
 
    @test ldexp(CC(3), 2) == 12
    @test ldexp(CC(3), ZZ(2)) == 12
@@ -218,7 +204,7 @@ function test_acb_misc_ops()
 end
 
 function test_acb_unsafe_ops()
-   print("acb.unsafe_ops()...")
+   print("acb.unsafe_ops...")
 
    z = CC(1)
    x = CC(2)
@@ -240,7 +226,7 @@ function test_acb_unsafe_ops()
 end
 
 function test_acb_constants()
-   print("acb.constants()...")
+   print("acb.constants...")
 
    @test overlaps(const_pi(CC), CC("3.141592653589793238462643 +/- 4.03e-25"))
 
@@ -248,7 +234,7 @@ function test_acb_constants()
 end
 
 function test_acb_functions()
-   print("acb.functions()...")
+   print("acb.functions...")
 
    z = CC("0.2", "0.3")
    a = CC("0.3", "0.4")

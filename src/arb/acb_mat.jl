@@ -11,11 +11,40 @@ export rows, cols, zero, one, deepcopy, -, transpose, +, *, &, ==, !=,
 
 ###############################################################################
 #
+#   Similar
+#
+###############################################################################
+
+function similar(x::acb_mat)
+   z = acb_mat(rows(x), cols(x))
+   z.base_ring = x.base_ring
+   return z
+end
+
+function similar(x::acb_mat, r::Int, c::Int)
+   z = acb_mat(r, c)
+   z.base_ring = x.base_ring
+   return z
+end
+
+###############################################################################
+#
 #   Basic manipulation
 #
 ###############################################################################
 
 parent_type(::Type{acb_mat}) = AcbMatSpace
+
+elem_type(::Type{AcbMatSpace}) = acb_mat
+
+parent(x::acb_mat, cached::Bool = true) =
+      MatrixSpace(base_ring(x), rows(x), cols(x))
+
+prec(x::AcbMatSpace) = prec(x.base_ring)
+
+base_ring(a::AcbMatSpace) = a.base_ring
+
+base_ring(a::acb_mat) = a.base_ring
 
 function getindex!(z::acb, x::acb_mat, r::Int, c::Int)
   v = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
@@ -35,28 +64,37 @@ function getindex(x::acb_mat, r::Int, c::Int)
   return z
 end
 
-function setindex!(x::acb_mat,
-                   y::Union{Int, UInt, Float64, fmpz, fmpq, arb, BigFloat,
-                            acb, AbstractString},
-                   r::Int, c::Int)
-  _checkbounds(rows(x), r) || throw(BoundsError())
-  _checkbounds(cols(x), c) || throw(BoundsError())
+for T in [Integer, Float64, fmpz, fmpq, arb, BigFloat, acb, AbstractString]
+   @eval begin
+      function setindex!(x::acb_mat, y::$T, r::Int, c::Int)
+         _checkbounds(rows(x), r) || throw(BoundsError())
+         _checkbounds(cols(x), c) || throw(BoundsError())
 
-  z = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
-              (Ptr{acb_mat}, Int, Int), &x, r - 1, c - 1)
-  _acb_set(z, y, prec(base_ring(x)))
+         z = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
+                   (Ptr{acb_mat}, Int, Int), &x, r - 1, c - 1)
+         _acb_set(z, y, prec(base_ring(x)))
+      end
+   end
 end
 
-function setindex!{T <: Union{Int, UInt, Float64, fmpz, fmpq, arb, BigFloat,
-                              AbstractString}}(x::acb_mat, y::Tuple{T, T},
-                              r::Int, c::Int)
-  _checkbounds(rows(x), r) || throw(BoundsError())
-  _checkbounds(cols(x), c) || throw(BoundsError())
+setindex!{T <: Integer}(x::acb_mat, y::Rational{T}, r::Int, c::Int) =
+         setindex!(x, fmpq(y), r, c)
 
-  z = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
-              (Ptr{acb_mat}, Int, Int), &x, r - 1, c - 1)
-  _acb_set(z, y[1], y[2], prec(base_ring(x)))
+for T in [Integer, Float64, fmpz, fmpq, arb, BigFloat, AbstractString]
+   @eval begin
+      function setindex!(x::acb_mat, y::Tuple{$T, $T}, r::Int, c::Int)
+         _checkbounds(rows(x), r) || throw(BoundsError())
+         _checkbounds(cols(x), c) || throw(BoundsError())
+
+         z = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
+                   (Ptr{acb_mat}, Int, Int), &x, r - 1, c - 1)
+         _acb_set(z, y[1], y[2], prec(base_ring(x)))
+      end
+   end
 end
+
+setindex!{T <: Integer}(x::acb_mat, y::Tuple{Rational{T}, Rational{T}}, r::Int, c::Int) =
+         setindex!(x, map(fmpq, y), r, c)
 
 zero(x::AcbMatSpace) = x()
 
@@ -71,7 +109,7 @@ rows(a::acb_mat) = a.r
 cols(a::acb_mat) = a.c
 
 function deepcopy_internal(x::acb_mat, dict::ObjectIdDict)
-  z = parent(x)()
+  z = similar(x)
   ccall((:acb_mat_set, :libarb), Void, (Ptr{acb_mat}, Ptr{acb_mat}), &z, &x)
   return z
 end
@@ -89,18 +127,18 @@ function show(io::IO, a::AcbMatSpace)
 end
 
 function show(io::IO, a::acb_mat)
-   rows = a.parent.rows
-   cols = a.parent.cols
-   for i = 1:rows
+   r = rows(a)
+   c = cols(a)
+   for i = 1:r
       print(io, "[")
-      for j = 1:cols
+      for j = 1:c
          print(io, a[i, j])
-         if j != cols
+         if j != c
             print(io, " ")
          end
       end
       print(io, "]")
-      if i != rows
+      if i != r
          println(io, "")
       end
    end
@@ -113,7 +151,7 @@ end
 ################################################################################
 
 function -(x::acb_mat)
-  z = parent(x)()
+  z = similar(x)
   ccall((:acb_mat_neg, :libarb), Void, (Ptr{acb_mat}, Ptr{acb_mat}), &z, &x)
   return z
 end
@@ -125,7 +163,7 @@ end
 ################################################################################
 
 function transpose(x::acb_mat)
-  z = MatrixSpace(base_ring(x), cols(x), rows(x))()
+  z = similar(x, cols(x), rows(x))
   ccall((:acb_mat_transpose, :libarb), Void,
               (Ptr{acb_mat}, Ptr{acb_mat}), &z, &x)
   return z
@@ -139,28 +177,28 @@ end
 
 function +(x::acb_mat, y::acb_mat)
   check_parent(x, y)
-  z = parent(x)()
+  z = similar(x)
   ccall((:acb_mat_add, :libarb), Void,
               (Ptr{acb_mat}, Ptr{acb_mat}, Ptr{acb_mat}, Int),
-              &z, &x, &y, prec(parent(x)))
+              &z, &x, &y, prec(base_ring(x)))
   return z
 end
 
 function -(x::acb_mat, y::acb_mat)
   check_parent(x, y)
-  z = parent(x)()
+  z = similar(x)
   ccall((:acb_mat_sub, :libarb), Void,
               (Ptr{acb_mat}, Ptr{acb_mat}, Ptr{acb_mat}, Int),
-              &z, &x, &y, prec(parent(x)))
+              &z, &x, &y, prec(base_ring(x)))
   return z
 end
 
 function *(x::acb_mat, y::acb_mat)
   cols(x) != rows(y) && error("Matrices have wrong dimensions")
-  z = MatrixSpace(base_ring(x), rows(x), cols(y))()
+  z = similar(x, rows(x), cols(y))
   ccall((:acb_mat_mul, :libarb), Void,
               (Ptr{acb_mat}, Ptr{acb_mat}, Ptr{acb_mat}, Int),
-              &z, &x, &y, prec(parent(x)))
+              &z, &x, &y, prec(base_ring(x)))
   return z
 end
 
@@ -172,68 +210,128 @@ end
 
 function ^(x::acb_mat, y::UInt)
   rows(x) != cols(x) && error("Matrix must be square")
-  z = parent(x)()
+  z = similar(x)
   ccall((:acb_mat_pow_ui, :libarb), Void,
               (Ptr{acb_mat}, Ptr{acb_mat}, UInt, Int),
-              &z, &x, y, prec(parent(x)))
+              &z, &x, y, prec(base_ring(x)))
   return z
 end
 
 function *(x::acb_mat, y::Int)
-  z = parent(x)()
+  z = similar(x)
   ccall((:acb_mat_scalar_mul_si, :libarb), Void,
               (Ptr{acb_mat}, Ptr{acb_mat}, Int, Int),
-              &z, &x, y, prec(parent(x)))
+              &z, &x, y, prec(base_ring(x)))
   return z
 end
 
 *(x::Int, y::acb_mat) = y*x
 
 function *(x::acb_mat, y::fmpz)
-  z = parent(x)()
+  z = similar(x)
   ccall((:acb_mat_scalar_mul_fmpz, :libarb), Void,
               (Ptr{acb_mat}, Ptr{acb_mat}, Ptr{fmpz}, Int),
-              &z, &x, &y, prec(parent(x)))
+              &z, &x, &y, prec(base_ring(x)))
   return z
 end
 
 *(x::fmpz, y::acb_mat) = y*x
 
 function *(x::acb_mat, y::arb)
-  z = parent(x)()
+  z = similar(x)
   ccall((:acb_mat_scalar_mul_arb, :libarb), Void,
               (Ptr{acb_mat}, Ptr{acb_mat}, Ptr{arb}, Int),
-              &z, &x, &y, prec(parent(x)))
+              &z, &x, &y, prec(base_ring(x)))
   return z
 end
 
 *(x::arb, y::acb_mat) = y*x
 
 function *(x::acb_mat, y::acb)
-  z = parent(x)()
+  z = similar(x)
   ccall((:acb_mat_scalar_mul_acb, :libarb), Void,
               (Ptr{acb_mat}, Ptr{acb_mat}, Ptr{acb}, Int),
-              &z, &x, &y, prec(parent(x)))
+              &z, &x, &y, prec(base_ring(x)))
   return z
 end
 
 *(x::acb, y::acb_mat) = y*x
 
-+(x::Integer, y::acb_mat) = parent(y)(x) + y
+*(x::Integer, y::acb_mat) = fmpz(x) * y
 
-+(x::acb_mat, y::Integer) = y + x
+*(x::acb_mat, y::Integer) = y * x
 
-+(x::fmpz, y::acb_mat) = parent(y)(x) + y
+*(x::fmpq, y::acb_mat) = base_ring(y)(x) * y
 
-+(x::acb_mat, y::fmpz) = y + x
+*(x::acb_mat, y::fmpq) = y * x
 
--(x::Integer, y::acb_mat) = parent(y)(x) - y
+*(x::Float64, y::acb_mat) = base_ring(y)(x) * y
 
--(x::acb_mat, y::Integer) = -(y - x)
+*(x::acb_mat, y::Float64) = y * x
 
--(x::fmpz, y::acb_mat) = parent(y)(x) - y
+*(x::BigFloat, y::acb_mat) = base_ring(y)(x) * y
 
--(x::acb_mat, y::fmpz) = -(y - x)
+*(x::acb_mat, y::BigFloat) = y * x
+
+*{T <: Integer}(x::Rational{T}, y::acb_mat) = fmpq(x) * y
+
+*{T <: Integer}(x::acb_mat, y::Rational{T}) = y * x
+
+for T in [Integer, fmpz, fmpq, arb, acb]
+   @eval begin
+      function +(x::acb_mat, y::$T)
+         z = deepcopy(x)
+         for i = 1:min(rows(x), cols(x))
+            z[i, i] += y
+         end
+         return z
+      end
+
+      +(x::$T, y::acb_mat) = y + x
+
+      function -(x::acb_mat, y::$T)
+         z = deepcopy(x)
+         for i = 1:min(rows(x), cols(x))
+            z[i, i] -= y
+         end
+         return z
+      end
+
+      function -(x::$T, y::acb_mat)
+         z = -y
+         for i = 1:min(rows(y), cols(y))
+            z[i, i] += x
+         end
+         return z
+      end
+   end
+end
+
+function +{T <: Integer}(x::acb_mat, y::Rational{T})
+   z = deepcopy(x)
+   for i = 1:min(rows(x), cols(x))
+      z[i, i] += y
+   end
+   return z
+end
+
++{T <: Integer}(x::Rational{T}, y::acb_mat) = y + x
+
+function -{T <: Integer}(x::acb_mat, y::Rational{T})
+   z = deepcopy(x)
+   for i = 1:min(rows(x), cols(x))
+      z[i, i] -= y
+   end
+   return z
+end
+
+function -{T <: Integer}(x::Rational{T}, y::acb_mat)
+   z = -y
+   for i = 1:min(rows(y), cols(y))
+      z[i, i] += x
+   end
+   return z
+end
 
 ###############################################################################
 #
@@ -246,7 +344,7 @@ doc"""
 > Return $2^yx$. Note that $y$ can be positive, zero or negative.
 """
 function ldexp(x::acb_mat, y::Int)
-  z = parent(x)()
+  z = similar(x)
   ccall((:acb_mat_scalar_mul_2exp_si, :libarb), Void,
               (Ptr{acb_mat}, Ptr{acb_mat}, Int), &z, &x, y)
   return z
@@ -365,9 +463,9 @@ doc"""
 """
 function inv(x::acb_mat)
   cols(x) != rows(x) && error("Matrix must be square")
-  z = parent(x)()
+  z = similar(x)
   r = ccall((:acb_mat_inv, :libarb), Cint,
-              (Ptr{acb_mat}, Ptr{acb_mat}, Int), &z, &x, prec(parent(x)))
+              (Ptr{acb_mat}, Ptr{acb_mat}, Int), &z, &x, prec(base_ring(x)))
   Bool(r) ? (return z) : error("Matrix cannot be inverted numerically")
 end
 
@@ -390,36 +488,44 @@ end
 
 function divexact(x::acb_mat, y::Int)
   y == 0 && throw(DivideError())
-  z = parent(x)()
+  z = similar(x)
   ccall((:acb_mat_scalar_div_si, :libarb), Void,
               (Ptr{acb_mat}, Ptr{acb_mat}, Int, Int),
-              &z, &x, y, prec(parent(x)))
+              &z, &x, y, prec(base_ring(x)))
   return z
 end
 
 function divexact(x::acb_mat, y::fmpz)
-  z = parent(x)()
+  z = similar(x)
   ccall((:acb_mat_scalar_div_fmpz, :libarb), Void,
               (Ptr{acb_mat}, Ptr{acb_mat}, Ptr{fmpz}, Int),
-              &z, &x, &y, prec(parent(x)))
+              &z, &x, &y, prec(base_ring(x)))
   return z
 end
 
 function divexact(x::acb_mat, y::arb)
-  z = parent(x)()
+  z = similar(x)
   ccall((:acb_mat_scalar_div_arb, :libarb), Void,
               (Ptr{acb_mat}, Ptr{acb_mat}, Ptr{arb}, Int),
-              &z, &x, &y, prec(parent(x)))
+              &z, &x, &y, prec(base_ring(x)))
   return z
 end
 
 function divexact(x::acb_mat, y::acb)
-  z = parent(x)()
+  z = similar(x)
   ccall((:acb_mat_scalar_div_acb, :libarb), Void,
               (Ptr{acb_mat}, Ptr{acb_mat}, Ptr{acb}, Int),
-              &z, &x, &y, prec(parent(x)))
+              &z, &x, &y, prec(base_ring(x)))
   return z
 end
+
+divexact(x::acb_mat, y::Float64) = divexact(x, base_ring(x)(y))
+
+divexact(x::acb_mat, y::BigFloat) = divexact(x, base_ring(x)(y))
+
+divexact(x::acb_mat, y::Integer) = divexact(x, fmpz(y))
+
+divexact{T <: Integer}(x::acb_mat, y::Rational{T}) = divexact(x, fmpq(y))
 
 ################################################################################
 #
@@ -431,7 +537,7 @@ function charpoly(x::AcbPolyRing, y::acb_mat)
   base_ring(x) != base_ring(y) && error("Base rings must coincide")
   z = x()
   ccall((:acb_mat_charpoly, :libarb), Void,
-              (Ptr{acb_poly}, Ptr{acb_mat}, Int), &z, &y, prec(parent(y)))
+              (Ptr{acb_poly}, Ptr{acb_mat}, Int), &z, &y, prec(base_ring(y)))
   return z
 end
 
@@ -445,7 +551,7 @@ function det(x::acb_mat)
   cols(x) != rows(x) && error("Matrix must be square")
   z = base_ring(x)()
   ccall((:acb_mat_det, :libarb), Void,
-              (Ptr{acb}, Ptr{acb_mat}, Int), &z, &x, prec(parent(x)))
+              (Ptr{acb}, Ptr{acb_mat}, Int), &z, &x, prec(base_ring(x)))
   return z
 end
 
@@ -461,9 +567,9 @@ doc"""
 """
 function exp(x::acb_mat)
   cols(x) != rows(x) && error("Matrix must be square")
-  z = parent(x)()
+  z = similar(x)
   ccall((:acb_mat_exp, :libarb), Void,
-              (Ptr{acb_mat}, Ptr{acb_mat}, Int), &z, &x, prec(parent(x)))
+              (Ptr{acb_mat}, Ptr{acb_mat}, Int), &z, &x, prec(base_ring(x)))
   return z
 end
 
@@ -477,7 +583,7 @@ function lufact!(P::perm, x::acb_mat)
   P.d .-= 1
   r = ccall((:acb_mat_lu, :libarb), Cint,
               (Ptr{Int}, Ptr{acb_mat}, Ptr{acb_mat}, Int),
-              P.d, &x, &x, prec(parent(x)))
+              P.d, &x, &x, prec(base_ring(x)))
   r == 0 && error("Could not find $(rows(x)) invertible pivot elements")
   P.d .+= 1
   inv!(P)
@@ -488,7 +594,7 @@ function lufact(P::perm, x::acb_mat)
   cols(x) != rows(x) && error("Matrix must be square")
   parent(P).n != rows(x) && error("Permutation does not match matrix")
   R = base_ring(x)
-  L = parent(x)()
+  L = similar(x)
   U = deepcopy(x)
   n = cols(x)
   lufact!(P, U)
@@ -510,7 +616,7 @@ end
 function solve!(z::acb_mat, x::acb_mat, y::acb_mat)
   r = ccall((:acb_mat_solve, :libarb), Cint,
               (Ptr{acb_mat}, Ptr{acb_mat}, Ptr{acb_mat}, Int),
-              &z, &x, &y, prec(parent(x)))
+              &z, &x, &y, prec(base_ring(x)))
   r == 0 && error("Matrix cannot be inverted numerically")
   nothing
 end
@@ -518,7 +624,7 @@ end
 function solve(x::acb_mat, y::acb_mat)
   cols(x) != rows(x) && error("First argument must be square")
   cols(x) != rows(y) && error("Matrix dimensions are wrong")
-  z = parent(y)()
+  z = similar(y)
   solve!(z, x, y)
   return z
 end
@@ -527,13 +633,13 @@ function solve_lu_precomp!(z::acb_mat, P::perm, LU::acb_mat, y::acb_mat)
   Q = inv(P)
   ccall((:acb_mat_solve_lu_precomp, :libarb), Void,
               (Ptr{acb_mat}, Ptr{Int}, Ptr{acb_mat}, Ptr{acb_mat}, Int),
-              &z, Q.d .- 1, &LU, &y, prec(parent(LU)))
+              &z, Q.d .- 1, &LU, &y, prec(base_ring(LU)))
   nothing
 end
 
 function solve_lu_precomp(P::perm, LU::acb_mat, y::acb_mat)
   cols(LU) != rows(y) && error("Matrix dimensions are wrong")
-  z = parent(y)()
+  z = similar(y)
   solve_lu_precomp!(z, P, LU, y)
   return z
 end
@@ -594,7 +700,8 @@ for (s,f) in (("add!","acb_mat_add"), ("mul!","acb_mat_mul"),
     function ($(Symbol(s)))(z::acb_mat, x::acb_mat, y::acb_mat)
       ccall(($f, :libarb), Void,
                   (Ptr{acb_mat}, Ptr{acb_mat}, Ptr{acb_mat}, Int),
-                  &z, &x, &y, prec(parent(x)))
+                  &z, &x, &y, prec(base_ring(x)))
+      return z
     end
   end
 end
@@ -607,7 +714,7 @@ end
 
 function (x::AcbMatSpace)()
   z = acb_mat(x.rows, x.cols)
-  z.parent = x
+  z.base_ring = x.base_ring
   return z
 end
 
@@ -615,7 +722,7 @@ function (x::AcbMatSpace)(y::fmpz_mat)
   (x.cols != cols(y) || x.rows != rows(y)) &&
       error("Dimensions are wrong")
   z = acb_mat(y, prec(x))
-  z.parent = x
+  z.base_ring = x.base_ring
   return z
 end
 
@@ -623,63 +730,85 @@ function (x::AcbMatSpace)(y::arb_mat)
   (x.cols != cols(y) || x.rows != rows(y)) &&
       error("Dimensions are wrong")
   z = acb_mat(y, prec(x))
-  z.parent = x
+  z.base_ring = x.base_ring
   return z
 end
 
-
-function (x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, arb, acb,
-                         AbstractString}}(y::Array{T, 2})
-  _check_dim(x.rows, x.cols, y)
-  z = acb_mat(x.rows, x.cols, y, prec(x))
-  z.parent = x
-  return z
-end
-
-function (x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, arb, acb,
-                         AbstractString}}(y::Array{T, 1})
-  _check_dim(x.rows, x.cols, y)
-  z = acb_mat(x.rows, x.cols, y, prec(x))
-  z.parent = x
-  return z
-end
-
-function (x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, arb,
-                         AbstractString}}(y::Array{Tuple{T, T}, 2})
-  _check_dim(x.rows, x.cols, y)
-  z = acb_mat(x.rows, x.cols, y, prec(x))
-  z.parent = x
-  return z
-end
-
-function (x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq}}(y::Array{Tuple{T, T}, 1})
-  _check_dim(x.rows, x.cols, y)
-  z = acb_mat(x.rows, x.cols, y, prec(x))
-  z.parent = x
-  return z
-end
-
-function (x::AcbMatSpace){T <: Union{BigFloat, arb, AbstractString}}(y::Array{Tuple{T, T}, 1})
-  _check_dim(x.rows, x.cols, y)
-  z = acb_mat(x.rows, x.cols, y, prec(x))
-  z.parent = x
-  return z
-end
-
-function (x::AcbMatSpace)(y::Union{Int, UInt, fmpz, fmpq, Float64,
-                          BigFloat, arb, acb, AbstractString})
-  z = x()
-  for i in 1:rows(z)
-      for j = 1:cols(z)
-         if i != j
-            z[i, j] = zero(base_ring(x))
-         else
-            z[i, j] = y
-         end
+for T in [Float64, fmpz, fmpq, BigFloat, arb, acb, String]
+   @eval begin
+      function (x::AcbMatSpace)(y::Array{$T, 2})
+         _check_dim(x.rows, x.cols, y)
+         z = acb_mat(x.rows, x.cols, y, prec(x))
+         z.base_ring = x.base_ring
+         return z
+      end
+      
+      function (x::AcbMatSpace)(y::Array{$T, 1})
+         _check_dim(x.rows, x.cols, y)
+         z = acb_mat(x.rows, x.cols, y, prec(x))
+         z.base_ring = x.base_ring
+         return z
       end
    end
-   return z
 end
+
+(x::AcbMatSpace){T <: Integer}(y::Array{T, 2}) = x(map(fmpz, y))
+
+(x::AcbMatSpace){T <: Integer}(y::Array{T, 1}) = x(map(fmpz, y))
+
+(x::AcbMatSpace){T <: Integer}(y::Array{Rational{T}, 2}) = x(map(fmpq, y))
+
+(x::AcbMatSpace){T <: Integer}(y::Array{Rational{T}, 1}) = x(map(fmpq, y))
+
+for T in [Float64, fmpz, fmpq, BigFloat, arb, String]
+   @eval begin
+      function (x::AcbMatSpace)(y::Array{Tuple{$T, $T}, 2})
+         _check_dim(x.rows, x.cols, y)
+         z = acb_mat(x.rows, x.cols, y, prec(x))
+         z.base_ring = x.base_ring
+         return z
+      end
+      
+      function (x::AcbMatSpace)(y::Array{Tuple{$T, $T}, 1})
+         _check_dim(x.rows, x.cols, y)
+         z = acb_mat(x.rows, x.cols, y, prec(x))
+         z.base_ring = x.base_ring
+         return z
+      end
+   end
+end
+
+(x::AcbMatSpace){T <: Integer}(y::Array{Tuple{T, T}, 2}) = 
+         x(map(z -> (fmpz(z[1]), fmpz(z[2])), y))
+
+(x::AcbMatSpace){T <: Integer}(y::Array{Tuple{T, T}, 1}) = 
+         x(map(z -> (fmpz(z[1]), fmpz(z[2])), y))
+
+(x::AcbMatSpace){T <: Integer}(y::Array{Tuple{Rational{T}, Rational{T}}, 2}) = 
+         x(map(z -> (fmpq(z[1]), fmpq(z[2])), y))
+
+(x::AcbMatSpace){T <: Integer}(y::Array{Tuple{Rational{T}, Rational{T}}, 1}) = 
+         x(map(z -> (fmpq(z[1]), fmpq(z[2])), y))
+
+for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb, acb, String]
+   @eval begin
+      function (x::AcbMatSpace)(y::$T)
+         z = x()
+         for i in 1:rows(z)
+            for j = 1:cols(z)
+               if i != j
+                  z[i, j] = zero(base_ring(x))
+               else
+                  z[i, j] = y
+               end
+            end
+         end
+         return z
+      end
+   end
+end
+
+(x::AcbMatSpace){T <: Integer}(y::Rational{T}) = x(fmpq(y))
 
 (x::AcbMatSpace)(y::acb_mat) = y
 
@@ -689,21 +818,23 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{acb_mat}, ::Type{T}) = acb_mat
+promote_rule{T <: Integer}(::Type{acb_mat}, ::Type{T}) = acb_mat
 
-Base.promote_rule(::Type{acb_mat}, ::Type{fmpz}) = acb_mat
+promote_rule{T <: Integer}(::Type{acb_mat}, ::Type{Rational{T}}) = acb_mat
 
-Base.promote_rule(::Type{acb_mat}, ::Type{fmpq}) = acb_mat
+promote_rule(::Type{acb_mat}, ::Type{fmpz}) = acb_mat
 
-Base.promote_rule(::Type{acb_mat}, ::Type{arb}) = acb_mat
+promote_rule(::Type{acb_mat}, ::Type{fmpq}) = acb_mat
 
-Base.promote_rule(::Type{acb_mat}, ::Type{acb}) = acb_mat
+promote_rule(::Type{acb_mat}, ::Type{arb}) = acb_mat
 
-Base.promote_rule(::Type{acb_mat}, ::Type{fmpz_mat}) = acb_mat
+promote_rule(::Type{acb_mat}, ::Type{acb}) = acb_mat
 
-Base.promote_rule(::Type{acb_mat}, ::Type{fmpq_mat}) = acb_mat
+promote_rule(::Type{acb_mat}, ::Type{fmpz_mat}) = acb_mat
 
-Base.promote_rule(::Type{acb_mat}, ::Type{arb_mat}) = acb_mat
+promote_rule(::Type{acb_mat}, ::Type{fmpq_mat}) = acb_mat
+
+promote_rule(::Type{acb_mat}, ::Type{arb_mat}) = acb_mat
 
 ###############################################################################
 #

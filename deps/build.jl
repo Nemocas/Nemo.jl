@@ -1,21 +1,26 @@
 oldwdir = pwd()
 
-pkgdir = Pkg.dir("Nemo") 
-wdir = Pkg.dir("Nemo", "deps")
-vdir = Pkg.dir("Nemo", "local")
+pkgdir = dirname(dirname(@__FILE__))
+wdir = joinpath(pkgdir, "deps")
+vdir = joinpath(pkgdir, "local")
 
-if !ispath(Pkg.dir("Nemo", "local"))
+if is_apple() && !("CC" in keys(ENV))
+   ENV["CC"] = "clang"
+   ENV["CXX"] = "clang++"
+end
 
-    mkdir(Pkg.dir("Nemo", "local"))
+if !ispath(vdir)
 
-    if !ispath(Pkg.dir("Nemo", "local", "lib"))
-        mkdir(Pkg.dir("Nemo", "local", "lib"))
+    mkdir(vdir)
+
+    if !ispath(joinpath(vdir, "lib"))
+        mkdir(joinpath(vdir, "lib"))
     end
 else
     println("Deleting old $vdir")
     rm(vdir, force=true, recursive=true)
-    mkdir(Pkg.dir("Nemo", "local"))
-    mkdir(Pkg.dir("Nemo", "local", "lib"))
+    mkdir(vdir)
+    mkdir(joinpath(vdir, "lib"))
 end
 
 LDFLAGS = "-Wl,-rpath,$vdir/lib -Wl,-rpath,\$\$ORIGIN/../share/julia/site/v$(VERSION.major).$(VERSION.minor)/Nemo/local/lib"
@@ -125,7 +130,7 @@ cd(wdir)
 
 if !ispath(joinpath(wdir, "mpfr-3.1.5"))
    println("Downloading MPFR sources ... ")
-   download("http://www.mpfr.org/mpfr-current/mpfr-3.1.5.tar.bz2", joinpath(wdir, "mpfr-3.1.5.tar.bz2"))
+   download("http://ftp.gnu.org/gnu/mpfr/mpfr-3.1.5.tar.bz2", joinpath(wdir, "mpfr-3.1.5.tar.bz2"))
    println("DONE")
 end
 
@@ -265,6 +270,6 @@ end
 
 cd(wdir)
 
-push!(Libdl.DL_LOAD_PATH, Pkg.dir("Nemo", "local", "lib"))
+push!(Libdl.DL_LOAD_PATH, joinpath(vdir, "lib"))
 
 cd(oldwdir)

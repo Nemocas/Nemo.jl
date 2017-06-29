@@ -995,6 +995,19 @@ N = hnf_modular_eldiv(A, fmpz(27))
 ishnf(M)
 ```
 
+## (Weak) Popov form
+
+Nemo provides algorithms for computing the (weak) Popov of a matrix with entries
+in a univariate polynomial ring over a field.
+
+```@docs
+weak_popov{T <: PolyElem}(::GenMat{T})
+weak_popov_with_trafo{T <: PolyElem}(::GenMat{T})
+popov{T <: PolyElem}(::GenMat{T})
+popov_with_trafo{T <: PolyElem}(::GenMat{T})
+det_popov{T <: PolyElem}(::GenMat{T})
+```
+
 ## Lattice basis reduction
 
 Nemo provides LLL lattice basis reduction. Optionally one can specify the setup
@@ -1199,4 +1212,17 @@ isreal(A)
 
 isreal(onei(CC)*A)
 ```
+
+## Conversion to Julia matrices
+
+Julia matrices use a different data structure than Nemo matrices. Conversion to Julia matrices is usually only required for interfacing with other packages. It isn't necessary to convert Nemo matrices to Julia matrices in order to manipulate them.
+
+This conversion can be performed with standard Julia syntax, such as the following, where `A` is a `fmpz_mat`: 
+
+```
+Matrix{Int}(A)
+Matrix{BigInt}(A)
+```
+
+In case the matrix cannot be converted without loss, an `InexactError` is thrown: in this case, cast to a matrix of `BigInt`s rather than `Int`s. 
 

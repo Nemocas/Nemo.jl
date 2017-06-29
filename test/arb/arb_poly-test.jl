@@ -5,6 +5,10 @@ function test_arb_poly_constructors()
 
    R, x = PolynomialRing(RR, "x")
 
+   @test elem_type(R) == arb_poly
+   @test elem_type(ArbPolyRing) == arb_poly
+   @test parent_type(arb_poly) == ArbPolyRing
+
    @test typeof(R) <: ArbPolyRing
 
    @test isa(x, PolyElem)
@@ -25,13 +29,11 @@ function test_arb_poly_constructors()
 
    @test isa(k, PolyElem)
 
-   l = R([1, 2, 3])
+   for T in [Int, UInt, BigInt, Float64, BigFloat, fmpz, fmpq, Rational{Int}, Rational{BigInt}]
+      l = R(T[1, 2, 3])
 
-   @test isa(l, PolyElem)
-
-   m = R([ZZ(1), ZZ(2), ZZ(3)])
-
-   @test isa(m, PolyElem)
+      @test isa(l, arb_poly)
+   end 
 
    println("PASS")
 end
@@ -102,53 +104,25 @@ function test_arb_poly_adhoc_binary()
    f = x^2 + 2x + 1
    g = x^3 + 3x + 2
 
-   @test f*12 == 12*x^2+24*x+12
+   for T in [Int, BigInt, RR, fmpz, fmpq, Rational{Int}, Rational{BigInt}]
+      @test f * T(12) == 12*x^2+24*x+12
 
-   @test 7*g == 7*x^3+21*x+14
+      @test T(7) * g == 7*x^3+21*x+14
 
-   @test fmpz(3)*g == 3*x^3+9*x+6
+      @test T(3) * g == 3*x^3+9*x+6
 
-   @test f*fmpz(2) == 2*x^2+4*x+2
+      @test f * T(2) == 2*x^2+4*x+2
 
-   @test f * fmpq(2) == 2*x^2+4*x+2
+      @test T(2) * f == 2*x^2+4*x+2
 
-   @test f * RR(2) == 2*x^2+4*x+2
+      @test f + T(12) == x^2+2*x+13
 
-   @test fmpq(2) * f == 2*x^2+4*x+2
+      @test f - T(12) == x^2+2*x-11
 
-   @test RR(2) * f == 2*x^2+4*x+2
+      @test T(12) + g == x^3+3*x+14
 
-   @test f + 12 == x^2+2*x+13
-
-   @test f + fmpz(12) == x^2+2*x+13
-
-   @test f + fmpq(12) == x^2+2*x+13
-
-   @test f + RR(12) == x^2+2*x+13
-
-   @test f - 12 == x^2+2*x-11
-
-   @test f - fmpz(12) == x^2+2*x-11
-
-   @test f - fmpq(12) == x^2+2*x-11
-
-   @test f - RR(12) == x^2+2*x-11
-
-   @test 12 + g == x^3+3*x+14
-
-   @test fmpz(12) + g == x^3+3*x+14
-
-   @test fmpq(12) + g == x^3+3*x+14
-
-   @test RR(12) + g == x^3+3*x+14
-
-   @test 12 - g == -x^3-3*x+10
-
-   @test fmpz(12) - g == -x^3-3*x+10
-
-   @test fmpq(12) - g == -x^3-3*x+10
-
-   @test RR(12) - g == -x^3-3*x+10
+      @test T(12) - g == -x^3-3*x+10
+   end
 
    println("PASS")
 end

@@ -4,6 +4,10 @@ function test_gen_frac_constructors()
    S, x = PolynomialRing(ZZ, "x")
    T = FractionField(S)
 
+   @test elem_type(T) == GenFrac{elem_type(S)}
+   @test elem_type(GenFracField{elem_type(S)}) == GenFrac{elem_type(S)}
+   @test parent_type(GenFrac{elem_type(S)}) == GenFracField{elem_type(S)}
+
    @test isa(T, GenFracField)
 
    @test isa(T(3), GenFrac)
