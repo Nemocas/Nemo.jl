@@ -20,7 +20,7 @@ function O(a::fmpz_rel_series)
    return z
 end
 
-elem_type(::FmpzRelSeriesRing) = fmpz_rel_series
+elem_type(::Type{FmpzRelSeriesRing}) = fmpz_rel_series
 
 parent_type(::Type{fmpz_rel_series}) = FmpzRelSeriesRing
 
@@ -357,7 +357,7 @@ function ^(a::fmpz_rel_series, b::Int)
    b < 0 && throw(DomainError())
    if isgen(a)
       z = parent(a)()
-      setcoeff!(z, 0, fmpz(1))
+      z = setcoeff!(z, 0, fmpz(1))
       z.prec = a.prec + b - 1
       z.val = b
    elseif pol_length(a) == 0
@@ -538,12 +538,14 @@ function zero!(x::fmpz_rel_series)
   ccall((:fmpz_poly_zero, :libflint), Void, 
                    (Ptr{fmpz_rel_series},), &x)
   x.prec = parent(x).prec_max
+  return x
 end
 
 function setcoeff!(z::fmpz_rel_series, n::Int, x::fmpz)
    ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, 
                 (Ptr{fmpz_rel_series}, Int, Ptr{fmpz}), 
                &z, n, &x)
+   return z
 end
 
 function mul!(z::fmpz_rel_series, a::fmpz_rel_series, b::fmpz_rel_series)
@@ -563,7 +565,7 @@ function mul!(z::fmpz_rel_series, a::fmpz_rel_series, b::fmpz_rel_series)
    ccall((:fmpz_poly_mullow, :libflint), Void, 
                 (Ptr{fmpz_rel_series}, Ptr{fmpz_rel_series}, Ptr{fmpz_rel_series}, Int), 
                &z, &a, &b, lenz)
-   return nothing
+   return z
 end
 
 function addeq!(a::fmpz_rel_series, b::fmpz_rel_series)
@@ -605,7 +607,7 @@ function addeq!(a::fmpz_rel_series, b::fmpz_rel_series)
    a.prec = prec
    a.val = val
    renormalize!(a)
-   return nothing
+   return a
 end
 
 function add!(c::fmpz_rel_series, a::fmpz_rel_series, b::fmpz_rel_series)
@@ -622,6 +624,7 @@ function add!(c::fmpz_rel_series, a::fmpz_rel_series, b::fmpz_rel_series)
    ccall((:fmpz_poly_add_series, :libflint), Void, 
                 (Ptr{fmpz_rel_series}, Ptr{fmpz_rel_series}, Ptr{fmpz_rel_series}, Int), 
                &c, &a, &b, lenc)
+   return c
 end
 
 ###############################################################################
@@ -630,9 +633,9 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{fmpz_rel_series}, ::Type{T}) = fmpz_rel_series
+promote_rule{T <: Integer}(::Type{fmpz_rel_series}, ::Type{T}) = fmpz_rel_series
 
-Base.promote_rule(::Type{fmpz_rel_series}, ::Type{fmpz}) = fmpz_rel_series
+promote_rule(::Type{fmpz_rel_series}, ::Type{fmpz}) = fmpz_rel_series
 
 ###############################################################################
 #

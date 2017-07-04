@@ -4,6 +4,11 @@ pkgdir = dirname(dirname(@__FILE__))
 wdir = joinpath(pkgdir, "deps")
 vdir = joinpath(pkgdir, "local")
 
+if is_apple() && !("CC" in keys(ENV))
+   ENV["CC"] = "clang"
+   ENV["CXX"] = "clang++"
+end
+
 if !ispath(vdir)
 
     mkdir(vdir)

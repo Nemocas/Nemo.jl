@@ -1,7 +1,11 @@
 function test_fq_constructors()
-   print("fq.constructors()...")
+   print("fq.constructors...")
 
    R, x = FiniteField(fmpz(7), 5, "x")
+
+   @test elem_type(R) == fq
+   @test elem_type(FqFiniteField) == fq
+   @test parent_type(fq) == FqFiniteField
    
    Sy, y = PolynomialRing(ResidueRing(FlintZZ, 36893488147419103363), "y")
 
@@ -32,7 +36,7 @@ function test_fq_constructors()
 end
 
 function test_fq_printing()
-   print("fq.printing()...")
+   print("fq.printing...")
 
    R, x = FiniteField(fmpz(7), 5, "x")
 
@@ -44,7 +48,7 @@ function test_fq_printing()
 end
 
 function test_fq_manipulation()
-   print("fq.manipulation()...")
+   print("fq.manipulation...")
 
    R, x = FiniteField(fmpz(7), 5, "x")
 
@@ -70,7 +74,7 @@ function test_fq_manipulation()
 end
 
 function test_fq_unary_ops()
-   print("fq.unary_ops()...")
+   print("fq.unary_ops...")
 
    R, x = FiniteField(fmpz(7), 5, "x")
 
@@ -82,7 +86,7 @@ function test_fq_unary_ops()
 end
 
 function test_fq_binary_ops()
-   print("fq.binary_ops()...")
+   print("fq.binary_ops...")
 
    R, x = FiniteField(fmpz(7), 5, "x")
 
@@ -99,7 +103,7 @@ function test_fq_binary_ops()
 end
 
 function test_fq_adhoc_binary()
-   print("fq.adhoc_binary()...")
+   print("fq.adhoc_binary...")
 
    R, x = FiniteField(fmpz(7), 5, "x")
 
@@ -121,7 +125,7 @@ function test_fq_adhoc_binary()
 end
 
 function test_fq_powering()
-   print("fq.powering()...")
+   print("fq.powering...")
 
    R, x = FiniteField(fmpz(7), 5, "x")
 
@@ -135,7 +139,7 @@ function test_fq_powering()
 end
 
 function test_fq_comparison()
-   print("fq.comparison()...")
+   print("fq.comparison...")
   
    R, x = FiniteField(fmpz(7), 5, "x")
 
@@ -150,7 +154,7 @@ function test_fq_comparison()
 end
 
 function test_fq_inversion()
-   print("fq.inversion()...")
+   print("fq.inversion...")
   
    R, x = FiniteField(fmpz(7), 5, "x")
 
@@ -166,7 +170,7 @@ function test_fq_inversion()
 end
 
 function test_fq_exact_division()
-   print("fq.exact_division()...")
+   print("fq.exact_division...")
   
    R, x = FiniteField(fmpz(7), 5, "x")
 
@@ -181,7 +185,7 @@ function test_fq_exact_division()
 end
 
 function test_fq_gcd()
-   print("fq.gcd()...")
+   print("fq.gcd...")
 
    R, x = FiniteField(fmpz(7), 5, "x")
 
@@ -196,7 +200,7 @@ function test_fq_gcd()
 end
 
 function test_fq_special_functions()
-   print("fq.special_functions()...")
+   print("fq.special_functions...")
   
    R, x = FiniteField(fmpz(7), 5, "x")
 

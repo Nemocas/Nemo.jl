@@ -37,7 +37,7 @@ parent(a::fmpq) = FlintQQ
 
 parent_type(::Type{fmpq}) = FlintRationalField
 
-elem_type(::FlintRationalField) = fmpq
+elem_type(::Type{FlintRationalField}) = fmpq
 
 base_ring(a::FlintRationalField) = FlintZZ
 
@@ -705,21 +705,25 @@ dedekind_sum(h::Integer, k::Integer) = dedekind_sum(fmpz(h), fmpz(k))
 function zero!(c::fmpq)
    ccall((:fmpq_zero, :libflint), Void,
          (Ptr{fmpq},), &c)
+   return c
 end
 
 function mul!(c::fmpq, a::fmpq, b::fmpq)
    ccall((:fmpq_mul, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &c, &a, &b)
+   return c
 end
 
 function addeq!(c::fmpq, a::fmpq)
    ccall((:fmpq_add, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &c, &c, &a)
+   return c
 end
 
 function add!(c::fmpq, a::fmpq, b::fmpq)
    ccall((:fmpq_add, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &c, &a, &b)
+   return c
 end
 
 ###############################################################################
@@ -778,6 +782,8 @@ convert(::Type{fmpq}, a::fmpz) = fmpq(a)
 Base.promote_rule{T <: Integer}(::Type{fmpq}, ::Type{T}) = fmpq
 
 Base.promote_rule(::Type{fmpq}, ::Type{fmpz}) = fmpq
+
+promote_rule(::Type{fmpq}, ::Type{fmpz}) = fmpq
 
 Base.promote_rule{T <: Integer}(::Type{fmpq}, ::Type{Rational{T}}) = fmpq
 

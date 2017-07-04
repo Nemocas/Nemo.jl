@@ -1,7 +1,11 @@
 function test_fmpq_constructors()
-   print("fmpq.constructors()...")
+   print("fmpq.constructors...")
 
    R = FractionField(ZZ)
+
+   @test elem_type(R) == fmpq
+   @test elem_type(FlintRationalField) == fmpq
+   @test parent_type(fmpq) == FlintRationalField
 
    @test isa(R, FlintRationalField)
 
@@ -41,7 +45,7 @@ function test_fmpq_constructors()
 end
 
 function test_fmpq_printing()
-   print("fmpq.constructors()...")
+   print("fmpq.constructors...")
 
    a = FlintQQ(1, 2)
 
@@ -51,7 +55,7 @@ function test_fmpq_printing()
 end
 
 function test_fmpq_conversions()
-   print("fmpq.conversions()...")
+   print("fmpq.conversions...")
 
    @test Rational(fmpz(12)) == 12
 
@@ -61,7 +65,7 @@ function test_fmpq_conversions()
 end
 
 function test_fmpq_manipulation()
-   print("fmpq.manipulation()...")
+   print("fmpq.manipulation...")
 
    R = FractionField(ZZ)
 
@@ -92,7 +96,7 @@ function test_fmpq_manipulation()
 end
 
 function test_fmpq_unary_ops()
-   print("fmpq.unary_ops()...")
+   print("fmpq.unary_ops...")
 
    a = fmpq(-2, 3)
 
@@ -102,7 +106,7 @@ function test_fmpq_unary_ops()
 end
 
 function test_fmpq_binary_ops()
-   print("fmpq.binary_ops()...")
+   print("fmpq.binary_ops...")
 
    a = fmpq(-2, 3)
    b = fmpz(5)//7
@@ -117,7 +121,7 @@ function test_fmpq_binary_ops()
 end
 
 function test_fmpq_adhoc_binary()
-   print("fmpq.adhoc_binary()...")
+   print("fmpq.adhoc_binary...")
 
    a = fmpq(-2, 3)
    
@@ -177,7 +181,7 @@ function test_fmpq_adhoc_binary()
 end
 
 function test_fmpq_comparison()
-   print("fmpq.comparison()...")
+   print("fmpq.comparison...")
 
    a = fmpq(-2, 3)
    b = fmpz(1)//2
@@ -198,7 +202,7 @@ function test_fmpq_comparison()
 end
 
 function test_fmpq_adhoc_comparison()
-   print("fmpq.adhoc_comparison()...")
+   print("fmpq.adhoc_comparison...")
 
    a = -fmpz(2)//3
    
@@ -260,7 +264,7 @@ function test_fmpq_adhoc_comparison()
 end
 
 function test_fmpq_shifting()
-   print("fmpq.shifting()...")
+   print("fmpq.shifting...")
 
    a = -fmpz(2)//3
    b = fmpq(1, 2)
@@ -273,7 +277,7 @@ function test_fmpq_shifting()
 end
 
 function test_fmpq_powering()
-   print("fmpq.powering()...")
+   print("fmpq.powering...")
 
    a = -fmpz(2)//3
    
@@ -283,7 +287,7 @@ function test_fmpq_powering()
 end
 
 function test_fmpq_inversion()
-   print("fmpq.inversion()...")
+   print("fmpq.inversion...")
 
    a = -fmpz(2)//3
    
@@ -293,7 +297,7 @@ function test_fmpq_inversion()
 end
 
 function test_fmpq_exact_division()
-   print("fmpq.exact_division()...")
+   print("fmpq.exact_division...")
 
    a = -fmpz(2)//3
    b = fmpz(1)//2
@@ -304,7 +308,7 @@ function test_fmpq_exact_division()
 end
 
 function test_fmpq_adhoc_exact_division()
-   print("fmpq.adhoc_exact_division()...")
+   print("fmpq.adhoc_exact_division...")
 
    a = -fmpz(2)//3
 
@@ -328,7 +332,7 @@ function test_fmpq_adhoc_exact_division()
 end
 
 function test_fmpq_modular_arithmetic()
-   print("fmpq.modular_arithmetic()...")
+   print("fmpq.modular_arithmetic...")
 
    a = -fmpz(2)//3
    b = fmpz(1)//2
@@ -341,7 +345,7 @@ function test_fmpq_modular_arithmetic()
 end
 
 function test_fmpq_gcd()
-   print("fmpq.gcd()...")
+   print("fmpq.gcd...")
 
    a = -fmpz(2)//3
    b = fmpz(1)//2
@@ -352,7 +356,7 @@ function test_fmpq_gcd()
 end
 
 function test_fmpq_rational_reconstruction()
-   print("fmpq.rational_reconstruction()...")
+   print("fmpq.rational_reconstruction...")
 
    @test reconstruct(7, 13) == fmpz(1)//2
    
@@ -366,7 +370,7 @@ function test_fmpq_rational_reconstruction()
 end
 
 function test_fmpq_rational_enumeration()
-   print("fmpq.rational_enumeration()...")
+   print("fmpq.rational_enumeration...")
 
    @test next_minimal(fmpz(2)//3) == fmpz(3)//2
 
@@ -380,7 +384,7 @@ function test_fmpq_rational_enumeration()
 end
 
 function test_fmpq_special_functions()
-   print("fmpq.special_functions()...")
+   print("fmpq.special_functions...")
 
    @test harmonic(12) == fmpz(86021)//27720
    
@@ -396,7 +400,7 @@ function test_fmpq_special_functions()
 end
 
 function test_fmpq_adhoc_remove_valuation()
-   print("fmpq.adhoc_remove_valuation()...")
+   print("fmpq.adhoc_remove_valuation...")
 
    a = fmpq(2, 3)
 

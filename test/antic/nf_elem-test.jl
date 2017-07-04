@@ -14,9 +14,13 @@ end
 
 function test_nf_elem_constructors()
    print("nf_elem.constructors...")
- 
+
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
+
+   @test elem_type(K) == nf_elem
+   @test elem_type(AnticNumberField) == nf_elem
+   @test parent_type(nf_elem) == AnticNumberField
 
    @test isa(K, AnticNumberField)
 

@@ -7,3 +7,11 @@
 include("generic/PermGroups.jl")
 
 include("Rings.jl")
+
+################################################################################
+#
+#  Element types for instances of rings
+#
+################################################################################
+
+elem_type{T <: Group}(::T) = elem_type(T)

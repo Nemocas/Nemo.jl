@@ -2,6 +2,10 @@ function test_fmpq_poly_constructors()
    print("fmpq_poly.constructors...")
  
    S, y = PolynomialRing(QQ, "y")
+ 
+   @test elem_type(S) == fmpq_poly
+   @test elem_type(FmpqPolyRing) == fmpq_poly
+   @test parent_type(fmpq_poly) == FmpqPolyRing
 
    @test isa(S, FmpqPolyRing)
 
@@ -568,7 +572,7 @@ function test_fmpq_poly_Polynomials()
 end
 
 function test_fmpq_poly_remove_valuation()
-   print("fmpq_poly.remove_valuation()...")
+   print("fmpq_poly.remove_valuation...")
 
    S, y = PolynomialRing(FlintQQ, "y")
 

@@ -46,7 +46,7 @@ export PermGroup, perm, parity, elements, cycles
 
 parent_type(::Type{perm}) = PermGroup
 
-elem_type(::PermGroup) = perm
+elem_type(::Type{PermGroup}) = perm
 
 ###############################################################################
 #

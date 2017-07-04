@@ -18,6 +18,10 @@ function test_nmod_mat_constructors()
   
   R = NmodMatSpace(Z2, 2, 2)
 
+  @test elem_type(R) == nmod_mat
+  @test elem_type(NmodMatSpace) == nmod_mat
+  @test parent_type(nmod_mat) == NmodMatSpace
+
   @test isa(R, NmodMatSpace)
 
   @test base_ring(R) == Z2
@@ -560,11 +564,13 @@ function test_nmod_mat_lu()
 
   r, P, l, u = lufact(a)
 
-  @test l*u == a
+  @test l*u == P*a
 
   r, P, l, u = lufact(b)
 
   @test l*u == S([ 2 1 0 1; 0 1 2 0; 0 0 0 0])
+
+  @test l*u == P*b
 
   println("PASS")
 end

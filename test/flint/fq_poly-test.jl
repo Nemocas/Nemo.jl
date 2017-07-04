@@ -4,6 +4,10 @@ function test_fq_poly_constructors()
    R, x = FiniteField(fmpz(23), 5, "x")
    S, y = PolynomialRing(R, "y")
 
+   @test elem_type(S) == fq_poly
+   @test elem_type(FqPolyRing) == fq_poly
+   @test parent_type(fq_poly) == FqPolyRing
+
    @test typeof(S) <: FqPolyRing
 
    @test isa(y, PolyElem)
@@ -485,7 +489,7 @@ function test_fq_poly_special()
 end
 
 function test_fq_poly_inflation_deflation()
-   print("fq_poly.inflation_deflation()...")
+   print("fq_poly.inflation_deflation...")
 
    R, x = FiniteField(fmpz(23), 5, "x")
    S, y = PolynomialRing(R, "y")
@@ -530,7 +534,7 @@ function test_fq_poly_issquarefree()
 end
 
 function test_fq_poly_factor()
-   print("fq_poly.factor()...")
+   print("fq_poly.factor...")
 
    R, x = FiniteField(fmpz(23), 5, "x")
    S, y = PolynomialRing(R, "y")
@@ -564,7 +568,7 @@ function test_fq_poly_factor()
 end
 
 function test_fq_poly_remove_valuation()
-   print("fq_poly.remove_valuation()...")
+   print("fq_poly.remove_valuation...")
 
    R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")

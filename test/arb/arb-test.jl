@@ -1,19 +1,21 @@
 RR = ArbField(64)
 
 function test_arb_constructors()
-   print("arb.constructors()...")
+   print("arb.constructors...")
 
    @test isa(RR, ArbField)
    @test isa(RR(2), FieldElem)
 
    @test elem_type(RR) == arb
+   @test elem_type(ArbField) == arb
+   @test parent_type(arb) == ArbField
    @test base_ring(RR) == Union{} 
 
    println("PASS")
 end
 
 function test_arb_printing()
-   print("arb.printing()...")
+   print("arb.printing...")
 
    a = RR(2)
 
@@ -23,7 +25,7 @@ function test_arb_printing()
 end
 
 function test_arb_basic_ops()
-   print("arb.basic_ops()...")
+   print("arb.basic_ops...")
 
    @test one(RR) == 1
    @test zero(RR) == 0
@@ -39,6 +41,8 @@ function test_arb_basic_ops()
    @test RR("1.0 +/- 0") == a
    @test RR("+1.00000e+0") == a
    @test RR(BigFloat(1)) == a
+   @test RR(Rational{Int}(1)) == a
+   @test RR(Rational{BigInt}(1)) == a
 
    @test contains(ball(RR(1), RR(0.0001)), 1)
 
@@ -49,7 +53,7 @@ function test_arb_basic_ops()
 end
 
 function test_arb_comparison()
-   print("arb.comparison()...")
+   print("arb.comparison...")
 
    exact3 = RR(3)
    exact4 = RR(4)
@@ -114,105 +118,32 @@ function test_arb_comparison()
 end
 
 function test_arb_adhoc_comparison()
-   print("arb.adhoc_comparison()...")
+   print("arb.adhoc_comparison...")
 
    a = RR(3)
 
-   @test a == 3
-   @test !(a == 4)
-   @test a != 4
-   @test !(a != 3)
-   @test a >= 3
-   @test a >= 2
-   @test !(a >= 4)
-   @test a > 2
-   @test !(a > 3)
-   @test a <= 3
-   @test a <= 4
-   @test !(a <= 2)
-   @test a < 4
-   @test !(a < 3)
-
-   @test 3 == a
-   @test !(4 == a)
-   @test 4 != a
-   @test !(3 != a)
-   @test 3 <= a
-   @test 2 <= a
-   @test !(4 <= a)
-   @test 2 < a
-   @test !(3 < a)
-   @test 3 >= a
-   @test 4 >= a
-   @test !(2 >= a)
-   @test 4 > a
-   @test !(3 > a)
-
-   @test a == ZZ(3)
-   @test !(a == ZZ(4))
-   @test a != ZZ(4)
-   @test !(a != ZZ(3))
-   @test a >= ZZ(3)
-   @test a >= ZZ(2)
-   @test !(a >= ZZ(4))
-   @test a > ZZ(2)
-   @test !(a > ZZ(3))
-   @test a <= ZZ(3)
-   @test a <= ZZ(4)
-   @test !(a <= ZZ(2))
-   @test a < ZZ(4)
-   @test !(a < ZZ(3))
-
-   @test ZZ(3) == a
-   @test !(ZZ(4) == a)
-   @test ZZ(4) != a
-   @test !(ZZ(3) != a)
-   @test ZZ(3) <= a
-   @test ZZ(2) <= a
-   @test !(ZZ(4) <= a)
-   @test ZZ(2) < a
-   @test !(ZZ(3) < a)
-   @test ZZ(3) >= a
-   @test ZZ(4) >= a
-   @test !(ZZ(2) >= a)
-   @test ZZ(4) > a
-   @test !(ZZ(3) > a)
-
-   @test a == 3.0
-   @test !(a == 4.0)
-   @test a != 4.0
-   @test !(a != 3.0)
-   @test a >= 3.0
-   @test a >= 2.0
-   @test !(a >= 4.0)
-   @test a > 2.0
-   @test !(a > 3.0)
-   @test a <= 3.0
-   @test a <= 4.0
-   @test !(a <= 2.0)
-   @test a < 4.0
-   @test !(a < 3.0)
-
-   @test 3.0 == a
-   @test !(4.0 == a)
-   @test 4.0 != a
-   @test !(3.0 != a)
-   @test 3.0 <= a
-   @test 2.0 <= a
-   @test !(4.0 <= a)
-   @test 2.0 < a
-   @test !(3.0 < a)
-   @test 3.0 >= a
-   @test 4.0 >= a
-   @test !(2.0 >= a)
-   @test 4.0 > a
-   @test !(3.0 > a)
+   for T in [fmpz, fmpq, Int, BigInt, Float64, BigFloat, Rational{Int}, Rational{BigInt}]
+      @test a == T(3)
+      @test !(a == T(4))
+      @test a != T(4)
+      @test !(a != T(3))
+      @test a >= T(3)
+      @test a >= T(2)
+      @test !(a >= T(4))
+      @test a > T(2)
+      @test !(a > T(3))
+      @test a <= T(3)
+      @test a <= T(4)
+      @test !(a <= T(2))
+      @test a < T(4)
+      @test !(a < T(3))
+   end
 
    println("PASS")
 end
 
 function test_arb_predicates()
-   print("arb.predicates()...")
+   print("arb.predicates...")
 
    @test iszero(RR(0))
    @test !iszero(RR(1))
@@ -251,7 +182,7 @@ function test_arb_predicates()
 end
 
 function test_arb_parts()
-   print("arb.parts()...")
+   print("arb.parts...")
 
    @test midpoint(RR(3)) == 3
    @test radius(RR(3)) == 0
@@ -262,7 +193,7 @@ function test_arb_parts()
 end
 
 function test_arb_unary_ops()
-   print("arb.unary_ops()...")
+   print("arb.unary_ops...")
 
    @test -RR(3) == RR(-3)
    @test abs(-RR(3)) == 3
@@ -273,7 +204,7 @@ function test_arb_unary_ops()
 end
 
 function test_arb_binary_ops()
-   print("arb.binary_ops()...")
+   print("arb.binary_ops...")
 
    x = RR(2)
    y = RR(4)
@@ -282,45 +213,38 @@ function test_arb_binary_ops()
    @test x - y == -2
    @test x * y == 8
    @test x // y == 0.5
-
-   @test x + UInt(4) == 6
-   @test x - UInt(4) == -2
-   @test x * UInt(4) == 8
-   @test x // UInt(4) == 0.5
-   @test UInt(2) + y == 6
-   @test UInt(2) - y == -2
-   @test UInt(2) * y == 8
-   @test UInt(2) // y == 0.5
-
-   @test x + Int(4) == 6
-   @test x - Int(4) == -2
-   @test x * Int(4) == 8
-   @test x // Int(4) == 0.5
-   @test Int(2) + y == 6
-   @test Int(2) - y == -2
-   @test Int(2) * y == 8
-   @test Int(2) // y == 0.5
-
-   @test x + ZZ(4) == 6
-   @test x - ZZ(4) == -2
-   @test x * ZZ(4) == 8
-   @test x // ZZ(4) == 0.5
-   @test ZZ(2) + y == 6
-   @test ZZ(2) - y == -2
-   @test ZZ(2) * y == 8
-   @test ZZ(2) // y == 0.5
-
    @test x ^ y == 16
-   @test x ^ ZZ(4) == 16
-   @test x ^ UInt(4) == 16
-   @test x ^ Int(4) == 16
-   @test x ^ QQ(4) == 16
+
+   for T in [fmpz, fmpq, Int, BigInt, Rational{Int}, Rational{BigInt}]
+
+      @test x + T(4) == 6
+      @test x - T(4) == -2
+      @test x * T(4) == 8
+      @test x // T(4) == 0.5
+      @test T(2) + y == 6
+      @test T(2) - y == -2
+      @test T(2) * y == 8
+      @test T(2) // y == 0.5
+      @test x ^ T(4) == 16
+   end
+
+   for T in [Float64, BigFloat]
+      @test contains(x + T(4), 6)
+      @test contains(x - T(4), -2)
+      @test contains(x * T(4), 8)
+      @test contains(x // T(4), fmpq(1, 2))
+      @test contains(T(2) + y, 6)
+      @test contains(T(2) - y, -2)
+      @test contains(T(2) * y, 8)
+      @test contains(T(2) // y, fmpq(1, 2))
+      @test contains(x ^ T(4), 16)
+   end
 
    println("PASS")
 end
 
 function test_arb_misc_ops()
-   print("arb.misc_ops()...")
+   print("arb.misc_ops...")
 
    @test ldexp(RR(3), 2) == 12
    @test ldexp(RR(3), ZZ(2)) == 12
@@ -344,7 +268,7 @@ function test_arb_misc_ops()
 end
 
 function test_arb_unsafe_ops()
-   print("arb.unsafe_ops()...")
+   print("arb.unsafe_ops...")
 
    z = RR(1)
    x = RR(2)
@@ -366,7 +290,7 @@ function test_arb_unsafe_ops()
 end
 
 function test_arb_constants()
-   print("arb.constants()...")
+   print("arb.constants...")
 
    @test overlaps(const_pi(RR), RR("3.141592653589793238462643 +/- 4.03e-25"))
    @test overlaps(const_e(RR), RR("2.718281828459045235360287 +/- 4.96e-25"))
@@ -381,7 +305,7 @@ function test_arb_constants()
 end
 
 function test_arb_functions()
-   print("arb.functions()...")
+   print("arb.functions...")
 
    @test floor(RR(2.5)) == 2
    @test ceil(RR(2.5)) == 3
@@ -521,7 +445,7 @@ function test_arb_functions()
 end
 
 function test_fmpq_arb_special_functions()
-   print("fmpq.arb_special_functions()...")
+   print("fmpq.arb_special_functions...")
 
    @test bernoulli(10) == fmpz(5)//66
 

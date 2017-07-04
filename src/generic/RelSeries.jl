@@ -33,7 +33,7 @@ doc"""
 """
 parent(a::SeriesElem) = a.parent
 
-elem_type{T <: RingElem}(::GenRelSeriesRing{T}) = GenRelSeries{T}
+elem_type{T <: RingElem}(::Type{GenRelSeriesRing{T}}) = GenRelSeries{T}
 
 doc"""
     base_ring(R::SeriesRing)
@@ -210,7 +210,7 @@ function renormalize!(z::RelSeriesElem)
    else
       set_val!(z, zval + i)
       for j = 1:zlen - i
-         setcoeff!(z, j - 1, polcoeff(z, j + i - 1))
+         z = setcoeff!(z, j - 1, polcoeff(z, j + i - 1))
       end
       set_length!(z, zlen - i)
    end
@@ -295,7 +295,7 @@ function -{T <: RingElem}(a::RelSeriesElem{T})
    set_val!(z, valuation(a))
    fit!(z, len)
    for i = 1:len
-      setcoeff!(z, i - 1, -polcoeff(a, i - 1))
+      z = setcoeff!(z, i - 1, -polcoeff(a, i - 1))
    end
    return z
 end
@@ -328,35 +328,35 @@ function +{T <: RingElem}(a::RelSeriesElem{T}, b::RelSeriesElem{T})
    set_val!(z, valz)
    if vala >= valb
       for i = 1:min(lenb, vala - valb)
-         setcoeff!(z, i - 1, polcoeff(b, i - 1))
+         z = setcoeff!(z, i - 1, polcoeff(b, i - 1))
       end
       for i = lenb + 1:vala - valb
-         setcoeff!(z, i - 1, R())
+         z = setcoeff!(z, i - 1, R())
       end
       for i = vala - valb + 1:lenb
-         setcoeff!(z, i - 1, polcoeff(a, i - vala + valb - 1) + polcoeff(b, i - 1))
+         z = setcoeff!(z, i - 1, polcoeff(a, i - vala + valb - 1) + polcoeff(b, i - 1))
       end
       for i = max(lenb, vala - valb) + 1:lena + vala - valb
-         setcoeff!(z, i - 1, polcoeff(a, i - vala + valb - 1))
+         z = setcoeff!(z, i - 1, polcoeff(a, i - vala + valb - 1))
       end
       for i = lena + vala - valb + 1:lenb
-         setcoeff!(z, i - 1, polcoeff(b, i - 1))
+         z = setcoeff!(z, i - 1, polcoeff(b, i - 1))
       end
    else
       for i = 1:min(lena, valb - vala)
-         setcoeff!(z, i - 1, polcoeff(a, i - 1))
+         z = setcoeff!(z, i - 1, polcoeff(a, i - 1))
       end
       for i = lena + 1:valb - vala
-         setcoeff!(z, i - 1, R())
+         z = setcoeff!(z, i - 1, R())
       end
       for i = valb - vala + 1:lena
-         setcoeff!(z, i - 1, polcoeff(a, i - 1) + polcoeff(b, i - valb + vala - 1))
+         z = setcoeff!(z, i - 1, polcoeff(a, i - 1) + polcoeff(b, i - valb + vala - 1))
       end
       for i = max(lena, valb - vala) + 1:lenb + valb - vala
-         setcoeff!(z, i - 1, polcoeff(b, i - valb + vala - 1))
+         z = setcoeff!(z, i - 1, polcoeff(b, i - valb + vala - 1))
       end
       for i = lenb + valb - vala + 1:lena
-         setcoeff!(z, i - 1, polcoeff(a, i - 1))
+         z = setcoeff!(z, i - 1, polcoeff(a, i - 1))
       end
    end
    set_length!(z, normalise(z, lenz))
@@ -386,35 +386,35 @@ function -{T <: RingElem}(a::RelSeriesElem{T}, b::RelSeriesElem{T})
    set_val!(z, valz)
    if vala >= valb
       for i = 1:min(lenb, vala - valb)
-         setcoeff!(z, i - 1, -polcoeff(b, i - 1))
+         z = setcoeff!(z, i - 1, -polcoeff(b, i - 1))
       end
       for i = lenb + 1:vala - valb
-         setcoeff!(z, i - 1, R())
+         z = setcoeff!(z, i - 1, R())
       end
       for i = vala - valb + 1:lenb
-         setcoeff!(z, i - 1, polcoeff(a, i - vala + valb - 1) - polcoeff(b, i - 1))
+         z = setcoeff!(z, i - 1, polcoeff(a, i - vala + valb - 1) - polcoeff(b, i - 1))
       end
       for i = max(lenb, vala - valb) + 1:lena + vala - valb
-         setcoeff!(z, i - 1, polcoeff(a, i - vala + valb - 1))
+         z = setcoeff!(z, i - 1, polcoeff(a, i - vala + valb - 1))
       end
       for i = lena + vala - valb + 1:lenb
-         setcoeff!(z, i - 1, -polcoeff(b, i - 1))
+         z = setcoeff!(z, i - 1, -polcoeff(b, i - 1))
       end
    else
       for i = 1:min(lena, valb - vala)
-         setcoeff!(z, i - 1, polcoeff(a, i - 1))
+         z = setcoeff!(z, i - 1, polcoeff(a, i - 1))
       end
       for i = lena + 1:valb - vala
-         setcoeff!(z, i - 1, R())
+         z = setcoeff!(z, i - 1, R())
       end
       for i = valb - vala + 1:lena
-         setcoeff!(z, i - 1, polcoeff(a, i - 1) - polcoeff(b, i - valb + vala - 1))
+         z = setcoeff!(z, i - 1, polcoeff(a, i - 1) - polcoeff(b, i - valb + vala - 1))
       end
       for i = max(lena, valb - vala) + 1:lenb + valb - vala
-         setcoeff!(z, i - 1, -polcoeff(b, i - valb + vala - 1))
+         z = setcoeff!(z, i - 1, -polcoeff(b, i - valb + vala - 1))
       end
       for i = lenb + valb - vala + 1:lena
-         setcoeff!(z, i - 1, polcoeff(a, i - 1))
+         z = setcoeff!(z, i - 1, polcoeff(a, i - 1))
       end
    end
    set_length!(z, normalise(z, lenz))
@@ -453,8 +453,8 @@ function *{T <: RingElem}(a::RelSeriesElem{T}, b::RelSeriesElem{T})
    for i = 1:lena - 1
       if lenz > i
          for j = 2:min(lenb, lenz - i + 1)
-            mul!(t, polcoeff(a, i - 1), polcoeff(b, j - 1))
-            addeq!(d[i + j - 1], t)
+            t = mul!(t, polcoeff(a, i - 1), polcoeff(b, j - 1))
+            d[i + j - 1] = addeq!(d[i + j - 1], t)
          end
       end
    end        
@@ -481,7 +481,7 @@ function *{T <: RingElem}(a::T, b::RelSeriesElem{T})
    set_prec!(z, precision(b))
    set_val!(z, valuation(b))
    for i = 1:len
-      setcoeff!(z, i - 1, a*polcoeff(b, i - 1))
+      z = setcoeff!(z, i - 1, a*polcoeff(b, i - 1))
    end
    set_length!(z, normalise(z, len))
    renormalize!(z)
@@ -499,7 +499,7 @@ function *{T <: RingElem}(a::Integer, b::RelSeriesElem{T})
    set_prec!(z, precision(b))
    set_val!(z, valuation(b))
    for i = 1:len
-      setcoeff!(z, i - 1, a*polcoeff(b, i - 1))
+      z = setcoeff!(z, i - 1, a*polcoeff(b, i - 1))
    end
    set_length!(z, normalise(z, len))
    renormalize!(z)
@@ -517,7 +517,7 @@ function *{T <: RingElem}(a::fmpz, b::RelSeriesElem{T})
    set_prec!(z, precision(b))
    set_val!(z, valuation(b))
    for i = 1:len
-      setcoeff!(z, i - 1, a*polcoeff(b, i - 1))
+      z = setcoeff!(z, i - 1, a*polcoeff(b, i - 1))
    end
    set_length!(z, normalise(z, len))
    renormalize!(z)
@@ -639,7 +639,7 @@ function shift_left{T <: RingElem}(x::RelSeriesElem{T}, len::Int)
    set_prec!(z, precision(x) + len)
    set_val!(z, valuation(x) + len)
    for i = 1:xlen
-      setcoeff!(z, i - 1, polcoeff(x, i - 1))
+      z = setcoeff!(z, i - 1, polcoeff(x, i - 1))
    end
    return z
 end
@@ -664,7 +664,7 @@ function shift_right{T <: RingElem}(x::RelSeriesElem{T}, len::Int)
       set_prec!(z, max(0, xprec - len))
       set_val!(z, max(0, xval - len))
       for i = 1:zlen
-         setcoeff!(z, i - 1, polcoeff(x, i + xlen  - zlen - 1))
+         z = setcoeff!(z, i - 1, polcoeff(x, i + xlen  - zlen - 1))
       end
       renormalize!(z)
    end
@@ -697,7 +697,7 @@ function truncate{T <: RingElem}(a::RelSeriesElem{T}, prec::Int)
    else
       fit!(z, prec - aval)
       for i = 1:min(prec - aval, alen)
-         setcoeff!(z, i - 1, polcoeff(a, i - 1))
+         z = setcoeff!(z, i - 1, polcoeff(a, i - 1))
       end
       set_length!(z, normalise(z, prec - aval))
       set_val!(z, aval)
@@ -722,7 +722,7 @@ function ^{T <: RingElem}(a::RelSeriesElem{T}, b::Int)
       z = parent(a)()
       fit!(z, 1)
       set_prec!(z, b + precision(a) - 1)
-      setcoeff!(z, 0, polcoeff(a, 0))
+      z = setcoeff!(z, 0, polcoeff(a, 0))
       set_val!(z, b)
       set_length!(z, 1)
       return z
@@ -909,7 +909,7 @@ function divexact{T <: RingElem}(x::RelSeriesElem{T}, y::Integer)
    set_prec!(z, precision(x))
    set_val!(z, valuation(x))
    for i = 1:lenx
-      setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y))
+      z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y))
    end
    return z
 end
@@ -926,7 +926,7 @@ function divexact{T <: RingElem}(x::RelSeriesElem{T}, y::fmpz)
    set_prec!(z, precision(x))
    set_val!(z, valuation(x))
    for i = 1:lenx
-      setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y))
+      z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y))
    end
    return z
 end
@@ -943,7 +943,7 @@ function divexact{T <: RingElem}(x::RelSeriesElem{T}, y::T)
    set_prec!(z, precision(x))
    set_val!(z, valuation(x))
    for i = 1:lenx
-      setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y))
+      z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y))
    end
    return z
 end
@@ -966,7 +966,7 @@ function inv(a::RelSeriesElem)
    fit!(ainv, precision(a))
    set_prec!(ainv, precision(a))
    if precision(a) != 0
-      setcoeff!(ainv, 0, divexact(one(base_ring(a)), a1))
+      ainv = setcoeff!(ainv, 0, divexact(one(base_ring(a)), a1))
    end
    a1 = -a1
    for n = 2:precision(a)
@@ -974,7 +974,7 @@ function inv(a::RelSeriesElem)
       for i = 2:min(n, pol_length(a)) - 1
          s += polcoeff(a, i)*polcoeff(ainv, n - i - 1)
       end
-      setcoeff!(ainv, n - 1, divexact(s, a1))
+      ainv = setcoeff!(ainv, n - 1, divexact(s, a1))
    end
    set_length!(ainv, normalise(ainv, precision(a)))
    set_val!(ainv, 0)
@@ -1005,7 +1005,7 @@ function exp(a::RelSeriesElem)
    fit!(z, preca)
    set_prec!(z, preca)
    c = vala == 0 ? polcoeff(a, 0) : R()
-   setcoeff!(z, 0, exp(c))
+   z = setcoeff!(z, 0, exp(c))
    len = pol_length(a) + vala
    for k = 1 : preca - 1
       s = R()
@@ -1014,7 +1014,7 @@ function exp(a::RelSeriesElem)
          s += j * c * polcoeff(z, k - j)
       end
       !isunit(R(k)) && error("Unable to divide in exp")
-      setcoeff!(z, k, divexact(s, k))
+      z = setcoeff!(z, k, divexact(s, k))
    end
    set_length!(z, normalise(z, preca))
    set_val!(z, 0)
@@ -1030,6 +1030,7 @@ end
 function zero!{T <: RingElem}(a::GenRelSeries{T})
    a.length = 0
    a.prec = parent(a).prec_max
+   return a
 end
 
 function fit!{T <: RingElem}(c::GenRelSeries{T}, n::Int)
@@ -1043,6 +1044,7 @@ function fit!{T <: RingElem}(c::GenRelSeries{T}, n::Int)
          c.coeffs[i] = zero(base_ring(c))
       end
    end
+   return nothing
 end
 
 function setcoeff!{T <: RingElem}(c::GenRelSeries{T}, n::Int, a::T)
@@ -1052,6 +1054,7 @@ function setcoeff!{T <: RingElem}(c::GenRelSeries{T}, n::Int, a::T)
       c.length = max(pol_length(c), n + 1)
       # don't normalise
    end
+   return c
 end
 
 function mul!{T <: RingElem}(c::GenRelSeries{T}, a::GenRelSeries{T}, b::GenRelSeries{T})
@@ -1069,18 +1072,18 @@ function mul!{T <: RingElem}(c::GenRelSeries{T}, a::GenRelSeries{T}, b::GenRelSe
       lenc = min(lena + lenb - 1, prec)
       fit!(c, lenc)
       for i = 1:min(lena, lenc)
-         mul!(c.coeffs[i], polcoeff(a, i - 1), polcoeff(b, 0))
+         c.coeffs[i] = mul!(c.coeffs[i], polcoeff(a, i - 1), polcoeff(b, 0))
       end
       if lenc > lena
          for i = 2:min(lenb, lenc - lena + 1)
-            mul!(c.coeffs[lena + i - 1], polcoeff(a, lena - 1), polcoeff(b, i - 1))
+            c.coeffs[lena + i - 1] = mul!(c.coeffs[lena + i - 1], polcoeff(a, lena - 1), polcoeff(b, i - 1))
          end
       end
       for i = 1:lena - 1
          if lenc > i
             for j = 2:min(lenb, lenc - i + 1)
-               mul!(t, polcoeff(a, i - 1), polcoeff(b, j - 1))
-               addeq!(c.coeffs[i + j - 1], t)
+               t = mul!(t, polcoeff(a, i - 1), polcoeff(b, j - 1))
+               c.coeffs[i + j - 1] = addeq!(c.coeffs[i + j - 1], t)
             end
          end
       end        
@@ -1089,7 +1092,7 @@ function mul!{T <: RingElem}(c::GenRelSeries{T}, a::GenRelSeries{T}, b::GenRelSe
    c.val = a.val + b.val
    c.prec = prec + c.val
    renormalize!(z)
-   return nothing
+   return c
 end
 
 function addeq!{T <: RingElem}(c::GenRelSeries{T}, a::GenRelSeries{T})
@@ -1119,14 +1122,14 @@ function addeq!{T <: RingElem}(c::GenRelSeries{T}, a::GenRelSeries{T})
          c.coeffs[i] = R()
       end
       for i = valc + 1:min(lena, lenc + valc - vala)
-         addeq!(c.coeffs[i], a.coeffs[i])
+         c.coeffs[i] = addeq!(c.coeffs[i], a.coeffs[i])
       end
       for i = lenc + valc - vala + 1:lena
          c.coeffs[i] = a.coeffs[i]
       end
    else
       for i = 1:min(lena, lenc - vala + valc)
-         addeq!(c.coeffs[i + vala - valc], a.coeffs[i])
+         c.coeffs[i + vala - valc] = addeq!(c.coeffs[i + vala - valc], a.coeffs[i])
       end
       for i = lenc + 1:lena + vala - valc
          c.coeffs[i] = a.coeffs[i - vala + valc]
@@ -1136,6 +1139,7 @@ function addeq!{T <: RingElem}(c::GenRelSeries{T}, a::GenRelSeries{T})
    c.prec = prec
    c.val = valr
    renormalise!(c)
+   return c
 end
 
 function add!{T <: RingElem}(c::SeriesElem{T}, a::SeriesElem{T}, b::SeriesElem{T})
@@ -1149,19 +1153,19 @@ function add!{T <: RingElem}(c::SeriesElem{T}, a::SeriesElem{T}, b::SeriesElem{T
    set_prec!(c, prec)
    i = 1
    while i <= min(lena, lenb)
-      setcoeff!(c, i - 1, coeff(a, i - 1) + coeff(b, i - 1))
+      c = setcoeff!(c, i - 1, coeff(a, i - 1) + coeff(b, i - 1))
       i += 1
    end
    while i <= lena
-      setcoeff!(c, i - 1, coeff(a, i - 1))
+      c = setcoeff!(c, i - 1, coeff(a, i - 1))
       i += 1
    end
    while i <= lenb
-      setcoeff!(c, i - 1, coeff(b, i - 1))
+      c = setcoeff!(c, i - 1, coeff(b, i - 1))
       i += 1
    end
    set_length!(c, normalise(c, i - 1))
-   nothing
+   return c
 end
 ###############################################################################
 #
@@ -1169,20 +1173,20 @@ end
 #
 ###############################################################################
 
-function Base.promote_rule{T <: RingElem, V <: Integer}(::Type{GenRelSeries{T}}, ::Type{V})
+function promote_rule{T <: RingElem, V <: Integer}(::Type{GenRelSeries{T}}, ::Type{V})
    return GenRelSeries{T}
 end
 
-function Base.promote_rule{T <: RingElem}(::Type{GenRelSeries{T}}, ::Type{T})
+function promote_rule{T <: RingElem}(::Type{GenRelSeries{T}}, ::Type{T})
    return GenRelSeries{T}
 end
 
 function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenRelSeries{T}}, ::Type{GenRelSeries{U}})
-   Base.promote_rule(T, GenRelSeries{U}) == T ? GenRelSeries{T} : Union{}
+   promote_rule(T, GenRelSeries{U}) == T ? GenRelSeries{T} : Union{}
 end
 
-function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenRelSeries{T}}, ::Type{U})
-   Base.promote_rule(T, U) == T ? GenRelSeries{T} : promote_rule1(U, GenRelSeries{T})
+function promote_rule{T <: RingElem, U <: RingElem}(::Type{GenRelSeries{T}}, ::Type{U})
+   promote_rule(T, U) == T ? GenRelSeries{T} : promote_rule1(U, GenRelSeries{T})
 end
 
 ###############################################################################

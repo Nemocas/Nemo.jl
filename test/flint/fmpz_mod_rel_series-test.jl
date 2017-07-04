@@ -4,6 +4,10 @@ function test_fmpz_mod_rel_series_constructors()
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PowerSeriesRing(R, 30, "x")
 
+   @test elem_type(S) == fmpz_mod_rel_series
+   @test elem_type(FmpzModRelSeriesRing) == fmpz_mod_rel_series
+   @test parent_type(fmpz_mod_rel_series) == FmpzModRelSeriesRing
+
    @test isa(S, FmpzModRelSeriesRing)
 
    a = x^3 + 2x + 1

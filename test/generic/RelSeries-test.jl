@@ -4,6 +4,10 @@ function test_rel_series_constructors()
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
+   @test elem_type(S) == GenRelSeries{elem_type(R)}
+   @test elem_type(GenRelSeriesRing{elem_type(R)}) == GenRelSeries{elem_type(R)}
+   @test parent_type(GenRelSeries{elem_type(R)}) == GenRelSeriesRing{elem_type(R)}
+
    @test isa(S, GenRelSeriesRing)
 
    a = x^3 + 2x + 1

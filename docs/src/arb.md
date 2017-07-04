@@ -381,6 +381,7 @@ contains(::arb, ::arb)
 contains(::arb, ::Integer)
 contains(::arb, ::fmpz)
 contains(::arb, ::fmpq)
+contains{T <: Integer}(::arb, ::Rational{T})
 contains(::arb, ::BigFloat)
 ```
 
@@ -464,6 +465,10 @@ Function
 `isless(x::fmpz, y::arb)`
 `isless(x::arb, y::Float64)`
 `isless(x::Float64, y::arb)`
+`isless(x::arb, y::BigFloat)`
+`isless(x::BigFloat, y::arb)`
+`isless(x::arb, y::fmpq)`
+`isless(x::fmpq, y::arb)`
 
 Here are some examples of comparison.
 

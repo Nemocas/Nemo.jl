@@ -14,7 +14,7 @@ export FractionField, GenFrac, GenFracField, num, den
 
 parent_type{T}(::Type{GenFrac{T}}) = GenFracField{T}
 
-elem_type{T <: RingElem}(::GenFracField{T}) = GenFrac{T}
+elem_type{T <: RingElem}(::Type{GenFracField{T}}) = GenFrac{T}
 
 doc"""
     base_ring{T}(S::FracField{T})
@@ -704,11 +704,11 @@ end
 ###############################################################################
 
 function zero!{T <: RingElem}(c::FracElem{T})
-   zero!(c.num)
+   c.num = zero!(c.num)
    if !isone(c.den)
       c.den = one(parent(c))
    end
-   nothing
+   return c
 end
 
 function mul!{T <: RingElem}(c::FracElem{T}, a::FracElem{T}, b::FracElem{T})
@@ -716,16 +716,16 @@ function mul!{T <: RingElem}(c::FracElem{T}, a::FracElem{T}, b::FracElem{T})
    g2 = gcd(num(b), den(a))
    c.num = divexact(num(a), g1)*divexact(num(b), g2)
    c.den = divexact(den(a), g2)*divexact(den(b), g1)
-   nothing
+   return c
 end
 
 function addeq!{T <: RingElem}(c::FracElem{T}, a::FracElem{T})
    n = c.num*den(a) + num(a)*c.den
-   mul!(c.den, c.den, den(a))
+   c.den = mul!(c.den, c.den, den(a))
    g = gcd(n, d)
    c.num = divexact(n, g)
    c.den = divexact(c.den, g)
-   nothing
+   return c
 end
 
 function add!{T <: RingElem}(c::FracElem{T}, a::FracElem{T}, b::FracElem{T})
@@ -734,16 +734,16 @@ function add!{T <: RingElem}(c::FracElem{T}, a::FracElem{T}, b::FracElem{T})
    g = gcd(n, d)
    c.num = divexact(n, g)
    c.den = divexact(d, g)
-   nothing
+   return c
 end
 
 function addeq!{T <: RingElem}(c::FracElem{T}, a::FracElem{T}, b::FracElem{T})
    n = num(b)*den(a) + num(a)*den(b)
-   mul!(c.den, den(b), den(a))
+   c.den = mul!(c.den, den(b), den(a))
    g = gcd(n, d)
    c.num = divexact(n, g)
    c.den = divexact(c.den, g)
-   nothing
+   return c
 end
 
 
@@ -753,16 +753,16 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: RingElem}(::Type{GenFrac{T}}, ::Type{T}) = GenFrac{T}
+promote_rule{T <: RingElem}(::Type{GenFrac{T}}, ::Type{T}) = GenFrac{T}
 
-Base.promote_rule{T <: RingElem, U <: Integer}(::Type{GenFrac{T}}, ::Type{U}) = GenFrac{T}
+promote_rule{T <: RingElem, U <: Integer}(::Type{GenFrac{T}}, ::Type{U}) = GenFrac{T}
 
 function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenFrac{T}}, ::Type{GenFrac{U}})
-   Base.promote_rule(T, GenFrac{U}) == T ? GenFrac{T} : Union{}
+   promote_rule(T, GenFrac{U}) == T ? GenFrac{T} : Union{}
 end
 
-function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenFrac{T}}, ::Type{U})
-   Base.promote_rule(T, U) == T ? GenFrac{T} : promote_rule1(U, GenFrac{T})
+function promote_rule{T <: RingElem, U <: RingElem}(::Type{GenFrac{T}}, ::Type{U})
+   promote_rule(T, U) == T ? GenFrac{T} : promote_rule1(U, GenFrac{T})
 end
 
 ###############################################################################

@@ -4,6 +4,10 @@ function test_fq_nmod_rel_series_constructors()
    R, t = FiniteField(23, 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
+   @test elem_type(S) == fq_nmod_rel_series
+   @test elem_type(FqNmodRelSeriesRing) == fq_nmod_rel_series
+   @test parent_type(fq_nmod_rel_series) == FqNmodRelSeriesRing
+
    @test isa(S, FqNmodRelSeriesRing)
 
    a = x^3 + 2x + 1

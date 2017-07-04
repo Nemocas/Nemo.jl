@@ -4,6 +4,10 @@ function test_nmod_poly_constructors()
   R = ResidueRing(ZZ, 17)
   Rx, x = PolynomialRing(R, "x")
 
+  @test elem_type(Rx) == nmod_poly
+  @test elem_type(NmodPolyRing) == nmod_poly
+  @test parent_type(nmod_poly) == NmodPolyRing
+
   S = ResidueRing(ZZ, 19)
   Sy, y = PolynomialRing(R, "y")
 

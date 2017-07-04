@@ -5,6 +5,10 @@ function test_fmpz_abstract_types()
 
    @test FlintIntegerRing <: Nemo.Ring
 
+   @test elem_type(FlintIntegerRing()) == fmpz
+   @test elem_type(FlintIntegerRing) == fmpz
+   @test parent_type(fmpz) == FlintIntegerRing
+
    println("PASS")
 end
 

@@ -153,15 +153,13 @@ _fmpq_clear_fn(a::fmpq) = ccall((:fmpq_clear, :libflint), Void, (Ptr{fmpq},), &a
 #
 ###############################################################################
 
-const FmpzPolyID = ObjectIdDict()
-
 type FmpzPolyRing <: PolyRing{fmpz}
    base_ring::FlintIntegerRing
    S::Symbol
 
-   function FmpzPolyRing(s::Symbol, cached=true)
+   function FmpzPolyRing(s::Symbol, cached::Bool = true)
       if haskey(FmpzPolyID, s)
-         return FmpzPolyID[s]::FmpzPolyRing
+         return FmpzPolyID[s]
       else
          z = new(FlintZZ, s)
          if cached
@@ -171,6 +169,8 @@ type FmpzPolyRing <: PolyRing{fmpz}
       end
    end
 end
+
+const FmpzPolyID = Dict{Symbol, FmpzPolyRing}()
 
 type fmpz_poly <: PolyElem{fmpz}
    coeffs::Ptr{Void}
@@ -256,15 +256,13 @@ end
 #
 ###############################################################################
 
-const FmpqPolyID = ObjectIdDict()
-
 type FmpqPolyRing <: PolyRing{fmpq}
    base_ring::FlintRationalField
    S::Symbol
 
-   function FmpqPolyRing(R::FlintRationalField, s::Symbol, cached=true)
+   function FmpqPolyRing(R::FlintRationalField, s::Symbol, cached::Bool = true)
       if haskey(FmpqPolyID, s)
-         return FmpqPolyID[s]::FmpqPolyRing
+         return FmpqPolyID[s]
       else
          z = new(R, s)
          if cached
@@ -274,6 +272,8 @@ type FmpqPolyRing <: PolyRing{fmpq}
       end
    end
 end
+
+const FmpqPolyID = Dict{Symbol, FmpqPolyRing}()
 
 type fmpq_poly <: PolyElem{fmpq}
    coeffs::Ptr{Int}
@@ -356,17 +356,15 @@ end
 #
 ###############################################################################
 
-const NmodPolyRingID = ObjectIdDict()
-
 type NmodPolyRing <: PolyRing{GenRes{fmpz}}
   base_ring::GenResRing{fmpz}
   S::Symbol
   n::UInt
 
-  function NmodPolyRing(R::GenResRing{fmpz}, s::Symbol, cached=true)
+  function NmodPolyRing(R::GenResRing{fmpz}, s::Symbol, cached::Bool = true)
     m = UInt(modulus(R))
     if haskey(NmodPolyRingID, (m, s))
-       return NmodPolyRingID[m, s]::NmodPolyRing
+       return NmodPolyRingID[m, s]
     else
        z = new(R, s, m)
        if cached
@@ -376,6 +374,8 @@ type NmodPolyRing <: PolyRing{GenRes{fmpz}}
     end
   end
 end
+
+const NmodPolyRingID = Dict{Tuple{UInt, Symbol}, NmodPolyRing}()
 
 type nmod_poly <: PolyElem{GenRes{fmpz}}
    coeffs::Ptr{Void}
@@ -502,17 +502,15 @@ end
 #
 ###############################################################################
 
-const FmpzModPolyRingID = ObjectIdDict()
-
 type FmpzModPolyRing <: PolyRing{GenRes{fmpz}}
   base_ring::GenResRing{fmpz}
   S::Symbol
   n::fmpz
 
-  function FmpzModPolyRing(R::GenResRing{fmpz}, s::Symbol, cached=true)
+  function FmpzModPolyRing(R::GenResRing{fmpz}, s::Symbol, cached::Bool = true)
     m = modulus(R)
     if haskey(FmpzModPolyRingID, (m, s))
-       return FmpzModPolyRingID[m, s]::FmpzModPolyRing
+       return FmpzModPolyRingID[m, s]
     else
        z = new(R, s, m)
        if cached
@@ -522,6 +520,8 @@ type FmpzModPolyRing <: PolyRing{GenRes{fmpz}}
     end
   end
 end
+
+const FmpzModPolyRingID = Dict{Tuple{fmpz, Symbol}, FmpzModPolyRing}()
 
 type fmpz_mod_poly <: PolyElem{GenRes{fmpz}}
    coeffs::Ptr{Void}
@@ -645,8 +645,6 @@ end
 # T is an Int which is the number of variables
 # (plus one if ordered by total degree)
 
-const FmpzMPolyID = ObjectIdDict()
-
 type FmpzMPolyRing{S, N} <: PolyRing{fmpz}
    n::Int
    ord::Cint
@@ -654,9 +652,9 @@ type FmpzMPolyRing{S, N} <: PolyRing{fmpz}
    S::Array{Symbol, 1}
    num_vars::Int
 
-   function FmpzMPolyRing(s::Array{Symbol, 1}, cached=true)
+   function FmpzMPolyRing(s::Array{Symbol, 1}, cached::Bool = true)
       if haskey(FmpzMPolyID, (s, S, N))
-         return FmpzMPolyID[s, S, N]::FmpzMPolyRing{S, N}
+         return FmpzMPolyID[s, S, N]
       else 
          if S == :lex
             ord = 0
@@ -683,6 +681,8 @@ type FmpzMPolyRing{S, N} <: PolyRing{fmpz}
       end
    end
 end
+
+const FmpzMPolyID = Dict{Tuple{Array{Symbol, 1}, Symbol, Int}, PolyRing{fmpz}}()
 
 type fmpz_mpoly{S, N} <: PolyElem{fmpz}
    coeffs::Ptr{Void}
@@ -773,9 +773,6 @@ end
 #
 ###############################################################################
 
-const FqNmodFiniteFieldID = Dict{Tuple{fmpz, Int, Symbol}, Field}()
-const FqNmodFiniteFieldIDPol = Dict{Tuple{NmodPolyRing, nmod_poly, Symbol}, Field}()
-
 type FqNmodFiniteField <: FinField
    p :: Int 
    n :: Int
@@ -799,9 +796,9 @@ type FqNmodFiniteField <: FinField
    inv_norm :: Int
    var :: Ptr{Void}
 
-   function FqNmodFiniteField(c::fmpz, deg::Int, s::Symbol, cached=true)
+   function FqNmodFiniteField(c::fmpz, deg::Int, s::Symbol, cached::Bool = true)
       if haskey(FqNmodFiniteFieldID, (c, deg, s))
-         return FqNmodFiniteFieldID[c, deg, s]::FqNmodFiniteField
+         return FqNmodFiniteFieldID[c, deg, s]
       else
          d = new()
          ccall((:fq_nmod_ctx_init, :libflint), Void, 
@@ -815,9 +812,9 @@ type FqNmodFiniteField <: FinField
       end
    end
 
-   function FqNmodFiniteField(f::nmod_poly, s::Symbol, cached=true)
+   function FqNmodFiniteField(f::nmod_poly, s::Symbol, cached::Bool = true)
       if haskey(FqNmodFiniteFieldIDPol, (parent(f), f, s))
-         return FqNmodFiniteFieldIDPol[parent(f), f, s]::FqNmodFiniteField
+         return FqNmodFiniteFieldIDPol[parent(f), f, s]
       else
          z = new()
          ccall((:fq_nmod_ctx_init_modulus, :libflint), Void, 
@@ -831,6 +828,11 @@ type FqNmodFiniteField <: FinField
       end
    end
 end
+
+const FqNmodFiniteFieldID = Dict{Tuple{fmpz, Int, Symbol}, FqNmodFiniteField}()
+
+const FqNmodFiniteFieldIDPol = Dict{Tuple{NmodPolyRing, nmod_poly, Symbol},
+                                    FqNmodFiniteField}()
 
 function _FqNmodFiniteField_clear_fn(a :: FqNmodFiniteField)
    ccall((:fq_nmod_ctx_clear, :libflint), Void, (Ptr{FqNmodFiniteField},), &a)
@@ -895,10 +897,6 @@ end
 #
 ###############################################################################
 
-const FqFiniteFieldID = Dict{Tuple{fmpz, Int, Symbol}, Field}()
-
-const FqFiniteFieldIDPol = Dict{Tuple{fmpz_mod_poly, Symbol}, Field}()
-
 type FqFiniteField <: FinField
    p::Int # fmpz
    sparse_modulus::Int
@@ -915,9 +913,9 @@ type FqFiniteField <: FinField
    inv_p::Int # fmpz
    var::Ptr{Void}
 
-   function FqFiniteField(char::fmpz, deg::Int, s::Symbol, cached=true)
+   function FqFiniteField(char::fmpz, deg::Int, s::Symbol, cached::Bool = true)
       if haskey(FqFiniteFieldID, (char, deg, s))
-         return FqFiniteFieldID[char, deg, s]::FqFiniteField
+         return FqFiniteFieldID[char, deg, s]
       else
          d = new()
          finalizer(d, _FqFiniteField_clear_fn)
@@ -931,9 +929,9 @@ type FqFiniteField <: FinField
       end
    end
    
-   function FqFiniteField(f::fmpz_mod_poly, s::Symbol, cached=true)
+   function FqFiniteField(f::fmpz_mod_poly, s::Symbol, cached::Bool = true)
       if haskey(FqFiniteFieldIDPol, (f, s))
-         return FqFiniteFieldIDPol[f, s]::FqFiniteField
+         return FqFiniteFieldIDPol[f, s]
       else
          z = new()
          ccall((:fq_ctx_init_modulus, :libflint), Void,
@@ -947,6 +945,10 @@ type FqFiniteField <: FinField
       end
    end
 end
+
+const FqFiniteFieldID = Dict{Tuple{fmpz, Int, Symbol}, FqFiniteField}()
+
+const FqFiniteFieldIDPol = Dict{Tuple{fmpz_mod_poly, Symbol}, FqFiniteField}()
 
 function _FqFiniteField_clear_fn(a :: FqFiniteField)
    ccall((:fq_ctx_clear, :libflint), Void, (Ptr{FqFiniteField},), &a)
@@ -1012,7 +1014,6 @@ end
 #
 ###############################################################################
 
-const PadicBase = ObjectIdDict()
 
 type FlintPadicField <: Field
    p::Int 
@@ -1034,6 +1035,8 @@ type FlintPadicField <: Field
       return d
    end
 end
+
+const PadicBase = Dict{Tuple{fmpz, Int}, FlintPadicField}()
 
 function _padic_ctx_clear_fn(a::FlintPadicField)
    ccall((:padic_ctx_clear, :libflint), Void, (Ptr{FlintPadicField},), &a)
@@ -1063,16 +1066,14 @@ end
 #
 ###############################################################################
 
-const FmpzRelSeriesID = ObjectIdDict()
-
 type FmpzRelSeriesRing <: SeriesRing{fmpz}
    base_ring::FlintIntegerRing
    prec_max::Int
    S::Symbol
 
-   function FmpzRelSeriesRing(prec::Int, s::Symbol, cached=true)
+   function FmpzRelSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
       if haskey(FmpzRelSeriesID, (prec, s))
-         FmpzRelSeriesID[prec, s]::FmpzRelSeriesRing
+         FmpzRelSeriesID[prec, s]
       else
          z = new(FlintZZ, prec, s)
          if cached
@@ -1082,6 +1083,8 @@ type FmpzRelSeriesRing <: SeriesRing{fmpz}
       end
    end
 end
+
+const FmpzRelSeriesID = Dict{Tuple{Int, Symbol}, FmpzRelSeriesRing}()
 
 type fmpz_rel_series <: RelSeriesElem{fmpz}
    coeffs::Ptr{Void}
@@ -1133,16 +1136,14 @@ end
 #
 ###############################################################################
 
-const FmpzAbsSeriesID = ObjectIdDict()
-
 type FmpzAbsSeriesRing <: SeriesRing{fmpz}
    base_ring::FlintIntegerRing
    prec_max::Int
    S::Symbol
 
-   function FmpzAbsSeriesRing(prec::Int, s::Symbol, cached=true)
+   function FmpzAbsSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
       if haskey(FmpzAbsSeriesID, (prec, s))
-         FmpzAbsSeriesID[prec, s]::FmpzAbsSeriesRing
+         FmpzAbsSeriesID[prec, s]
       else
          z = new(FlintZZ, prec, s)
          if cached
@@ -1152,6 +1153,8 @@ type FmpzAbsSeriesRing <: SeriesRing{fmpz}
       end
    end
 end
+
+const FmpzAbsSeriesID = Dict{Tuple{Int, Symbol}, FmpzAbsSeriesRing}()
 
 type fmpz_abs_series <: AbsSeriesElem{fmpz}
    coeffs::Ptr{Void}
@@ -1201,16 +1204,14 @@ end
 #
 ###############################################################################
 
-const FmpqRelSeriesID = ObjectIdDict()
-
 type FmpqRelSeriesRing <: SeriesRing{fmpq}
    base_ring::FlintRationalField
    prec_max::Int
    S::Symbol
 
-   function FmpqRelSeriesRing(prec::Int, s::Symbol, cached=true)
+   function FmpqRelSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
       if haskey(FmpqRelSeriesID, (prec, s))
-         return FmpqRelSeriesID[prec, s]::FmpqRelSeriesRing
+         return FmpqRelSeriesID[prec, s]
       else
          z = new(FlintQQ, prec, s)
          if cached
@@ -1220,6 +1221,8 @@ type FmpqRelSeriesRing <: SeriesRing{fmpq}
       end
    end
 end
+
+const FmpqRelSeriesID = Dict{Tuple{Int, Symbol}, FmpqRelSeriesRing}()
 
 type fmpq_rel_series <: RelSeriesElem{fmpq}
    coeffs::Ptr{Void}
@@ -1272,16 +1275,14 @@ end
 #
 ###############################################################################
 
-const FmpqAbsSeriesID = ObjectIdDict()
-
 type FmpqAbsSeriesRing <: SeriesRing{fmpq}
    base_ring::FlintRationalField
    prec_max::Int
    S::Symbol
 
-   function FmpqAbsSeriesRing(prec::Int, s::Symbol, cached=true)
+   function FmpqAbsSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
       if haskey(FmpqAbsSeriesID, (prec, s))
-         return FmpqAbsSeriesID[prec, s]::FmpqAbsSeriesRing
+         return FmpqAbsSeriesID[prec, s]
       else
          z = new(FlintQQ, prec, s)
          if cached
@@ -1291,6 +1292,8 @@ type FmpqAbsSeriesRing <: SeriesRing{fmpq}
       end
    end
 end
+
+const FmpqAbsSeriesID = Dict{Tuple{Int, Symbol}, FmpqAbsSeriesRing}()
 
 type fmpq_abs_series <: AbsSeriesElem{fmpq}
    coeffs::Ptr{Void}
@@ -1341,16 +1344,15 @@ end
 #
 ###############################################################################
 
-const FmpzModRelSeriesID = ObjectIdDict()
-
 type FmpzModRelSeriesRing <: SeriesRing{GenRes{fmpz}}
    base_ring::GenResRing{fmpz}
    prec_max::Int
    S::Symbol
 
-   function FmpzModRelSeriesRing(R::Ring, prec::Int, s::Symbol, cached=true)
+   function FmpzModRelSeriesRing(R::Ring, prec::Int, s::Symbol,
+                                 cached::Bool = true)
       if haskey(FmpzModRelSeriesID, (R, prec, s))
-         return FmpzModRelSeriesID[R, prec, s]::FmpzModRelSeriesRing
+         return FmpzModRelSeriesID[R, prec, s]
       else
          z = new(R, prec, s)
          if cached
@@ -1360,6 +1362,9 @@ type FmpzModRelSeriesRing <: SeriesRing{GenRes{fmpz}}
       end
    end
 end
+
+const FmpzModRelSeriesID = Dict{Tuple{GenResRing{fmpz}, Int, Symbol},
+                                FmpzModRelSeriesRing}()
 
 type fmpz_mod_rel_series <: RelSeriesElem{GenRes{fmpz}}
    coeffs::Ptr{Void}
@@ -1428,16 +1433,15 @@ end
 #
 ###############################################################################
 
-const FmpzModAbsSeriesID = ObjectIdDict()
-
 type FmpzModAbsSeriesRing <: SeriesRing{GenRes{fmpz}}
    base_ring::GenResRing{fmpz}
    prec_max::Int
    S::Symbol
 
-   function FmpzModAbsSeriesRing(R::Ring, prec::Int, s::Symbol, cached=true)
+   function FmpzModAbsSeriesRing(R::Ring, prec::Int, s::Symbol,
+                                 cached::Bool = true)
       if haskey(FmpzModAbsSeriesID, (R, prec, s))
-         return FmpzModAbsSeriesID[R, prec, s]::FmpzModAbsSeriesRing
+         return FmpzModAbsSeriesID[R, prec, s]
       else
          z = new(R, prec, s)
          if cached
@@ -1447,6 +1451,9 @@ type FmpzModAbsSeriesRing <: SeriesRing{GenRes{fmpz}}
       end
    end
 end
+
+const FmpzModAbsSeriesID = Dict{Tuple{GenResRing{fmpz}, Int, Symbol},
+                                FmpzModAbsSeriesRing}()
 
 type fmpz_mod_abs_series <: AbsSeriesElem{GenRes{fmpz}}
    coeffs::Ptr{Void}
@@ -1512,16 +1519,15 @@ end
 #
 ###############################################################################
 
-const FqRelSeriesID = ObjectIdDict()
-
 type FqRelSeriesRing <: SeriesRing{fq}
    base_ring::FqFiniteField
    prec_max::Int
    S::Symbol
 
-   function FqRelSeriesRing(R::FqFiniteField, prec::Int, s::Symbol, cached=true)
+   function FqRelSeriesRing(R::FqFiniteField, prec::Int, s::Symbol,
+                            cached::Bool = true)
       if haskey(FqRelSeriesID, (R, prec, s))
-         return FqRelSeriesID[R, prec, s]::FqRelSeriesRing
+         return FqRelSeriesID[R, prec, s]
       else
          z = new(R, prec, s)
          if cached
@@ -1531,6 +1537,8 @@ type FqRelSeriesRing <: SeriesRing{fq}
       end
    end
 end
+
+const FqRelSeriesID = Dict{Tuple{FqFiniteField, Int, Symbol}, FqRelSeriesRing}()
 
 type fq_rel_series <: RelSeriesElem{fq}
    coeffs::Ptr{Void}
@@ -1586,16 +1594,15 @@ end
 #
 ###############################################################################
 
-const FqAbsSeriesID = ObjectIdDict()
-
 type FqAbsSeriesRing <: SeriesRing{fq}
    base_ring::FqFiniteField
    prec_max::Int
    S::Symbol
 
-   function FqAbsSeriesRing(R::FqFiniteField, prec::Int, s::Symbol, cached=true)
+   function FqAbsSeriesRing(R::FqFiniteField, prec::Int, s::Symbol,
+                            cached::Bool = true)
       if haskey(FqAbsSeriesID, (R, prec, s))
-         return FqAbsSeriesID[R, prec, s]::FqAbsSeriesRing
+         return FqAbsSeriesID[R, prec, s]
       else
          z = new(R, prec, s)
          if cached
@@ -1605,6 +1612,8 @@ type FqAbsSeriesRing <: SeriesRing{fq}
       end
    end
 end
+
+const FqAbsSeriesID = Dict{Tuple{FqFiniteField, Int, Symbol}, FqAbsSeriesRing}()
 
 type fq_abs_series <: AbsSeriesElem{fq}
    coeffs::Ptr{Void}
@@ -1658,16 +1667,15 @@ end
 #
 ###############################################################################
 
-const FqNmodRelSeriesID = ObjectIdDict()
-
 type FqNmodRelSeriesRing <: SeriesRing{fq_nmod}
    base_ring::FqNmodFiniteField
    prec_max::Int
    S::Symbol
 
-   function FqNmodRelSeriesRing(R::FqNmodFiniteField, prec::Int, s::Symbol, cached=true)
+   function FqNmodRelSeriesRing(R::FqNmodFiniteField, prec::Int, s::Symbol,
+                                cached::Bool = true)
       if haskey(FqNmodRelSeriesID, (R, prec, s))
-         return FqNmodRelSeriesID[R, prec, s]::FqNmodRelSeriesRing
+         return FqNmodRelSeriesID[R, prec, s]
       else
          z = new(R, prec, s)
          if cached
@@ -1677,6 +1685,9 @@ type FqNmodRelSeriesRing <: SeriesRing{fq_nmod}
       end
    end
 end
+
+const FqNmodRelSeriesID = Dict{Tuple{FqNmodFiniteField, Int, Symbol},
+                               FqNmodRelSeriesRing}()
 
 type fq_nmod_rel_series <: RelSeriesElem{fq_nmod}
    coeffs::Ptr{Void}
@@ -1732,16 +1743,15 @@ end
 #
 ###############################################################################
 
-const FqNmodAbsSeriesID = ObjectIdDict()
-
 type FqNmodAbsSeriesRing <: SeriesRing{fq_nmod}
    base_ring::FqNmodFiniteField
    prec_max::Int
    S::Symbol
 
-   function FqNmodAbsSeriesRing(R::FqNmodFiniteField, prec::Int, s::Symbol, cached=true)
+   function FqNmodAbsSeriesRing(R::FqNmodFiniteField, prec::Int, s::Symbol,
+                                cached::Bool = true)
       if haskey(FqNmodAbsSeriesID, (R, prec, s))
-         return FqNmodAbsSeriesID[R, prec, s]::FqNmodAbsSeriesRing
+         return FqNmodAbsSeriesID[R, prec, s]
       else
          z = new(R, prec, s)
          if cached
@@ -1751,6 +1761,9 @@ type FqNmodAbsSeriesRing <: SeriesRing{fq_nmod}
       end
    end
 end
+
+const FqNmodAbsSeriesID = Dict{Tuple{FqNmodFiniteField, Int, Symbol},
+                               FqNmodAbsSeriesRing}()
 
 type fq_nmod_abs_series <: AbsSeriesElem{fq_nmod}
    coeffs::Ptr{Void}
@@ -1804,17 +1817,15 @@ end
 #
 ###############################################################################
 
-const FmpqMatID = ObjectIdDict()
-
 # not really a mathematical ring
 type FmpqMatSpace <: MatSpace{fmpq}
    rows::Int
    cols::Int
    base_ring::FlintRationalField
 
-   function FmpqMatSpace(r::Int, c::Int, cached=true)
+   function FmpqMatSpace(r::Int, c::Int, cached::Bool = true)
       if haskey(FmpqMatID, (r, c))
-         return FmpqMatID[r, c]::FmpqMatSpace
+         return FmpqMatID[r, c]
       else
          z = new(r, c, FlintQQ)
          if cached
@@ -1825,12 +1836,14 @@ type FmpqMatSpace <: MatSpace{fmpq}
    end
 end
 
+const FmpqMatID = Dict{Tuple{Int, Int}, FmpqMatSpace}()
+
 type fmpq_mat <: MatElem{fmpq}
    entries::Ptr{Void}
    r::Int
    c::Int
    rows::Ptr{Void}
-   parent::FmpqMatSpace
+   base_ring::FlintRationalField
 
    # used by windows, not finalised!!
    function fmpq_mat()
@@ -1978,17 +1991,15 @@ end
 #
 ###############################################################################
 
-const FmpzMatID = ObjectIdDict()
-
 # not really a mathematical ring
 type FmpzMatSpace <: MatSpace{fmpz}
    rows::Int
    cols::Int
    base_ring::FlintIntegerRing
 
-   function FmpzMatSpace(r::Int, c::Int, cached=true)
+   function FmpzMatSpace(r::Int, c::Int, cached::Bool = true)
       if haskey(FmpzMatID, (r, c))
-         return FmpzMatID[r, c]::FmpzMatSpace
+         return FmpzMatID[r, c]
       else
          z = new(r, c, FlintZZ)
          if cached
@@ -1999,12 +2010,14 @@ type FmpzMatSpace <: MatSpace{fmpz}
    end
 end
 
+const FmpzMatID = Dict{Tuple{Int, Int}, FmpzMatSpace}()
+
 type fmpz_mat <: MatElem{fmpz}
    entries::Ptr{Void}
    r::Int
    c::Int
    rows::Ptr{Void}
-   parent::FmpzMatSpace
+   base_ring::FlintIntegerRing
 
    # used by windows, not finalised!!
    function fmpz_mat()
@@ -2116,20 +2129,19 @@ end
 #
 ###############################################################################
 
-const NmodMatID = ObjectIdDict()
-
 type NmodMatSpace <: MatSpace{GenRes{fmpz}}
   base_ring::GenResRing{fmpz}
   n::UInt
   rows::Int
   cols::Int
 
-  function NmodMatSpace(R::GenResRing{fmpz}, r::Int, c::Int, cached=true)
+  function NmodMatSpace(R::GenResRing{fmpz}, r::Int, c::Int,
+                        cached::Bool = true)
     (r < 0 || c < 0) && throw(error_dim_negative)
     R.modulus > typemax(UInt) && 
       error("Modulus of ResidueRing must less then ", fmpz(typemax(UInt)))
     if haskey(NmodMatID, (R, r, c))
-      return NmodMatID[R, r, c]::NmodMatSpace
+      return NmodMatID[R, r, c]
     else
       z = new(R, UInt(R.modulus), r, c)
       if cached
@@ -2139,6 +2151,8 @@ type NmodMatSpace <: MatSpace{GenRes{fmpz}}
     end
   end
 end
+
+const NmodMatID = Dict{Tuple{GenResRing{fmpz}, Int, Int}, NmodMatSpace}()
 
 function _check_dim{T}(r::Int, c::Int, arr::Array{T, 2}, transpose::Bool = false)
   if !transpose
@@ -2162,7 +2176,7 @@ type nmod_mat <: MatElem{GenRes{fmpz}}
   n::UInt                # mp_limb_t / Culong
   ninv::UInt             # mp_limb_t / Culong
   norm::UInt             # mp_limb_t / Culong
-  parent::NmodMatSpace
+  base_ring::GenResRing{fmpz}
 
   function nmod_mat(r::Int, c::Int, n::UInt)
     z = new()
@@ -2331,24 +2345,24 @@ end
 #
 ###############################################################################
 
-const FqPolyID = ObjectIdDict()
-
 type FqPolyRing <: PolyRing{fq}
    base_ring::FqFiniteField
    S::Symbol
 
-   function FqPolyRing(R::FqFiniteField, s::Symbol, cached=true)
+   function FqPolyRing(R::FqFiniteField, s::Symbol, cached::Bool = true)
       if haskey(FqPolyID, (R, s))
-         return FqPolyID[(R,s)]::FqPolyRing
+         return FqPolyID[(R, s)]
       else
          z = new(R,s)
          if cached
-            FqPolyID[(R,s)] = z
+            FqPolyID[(R, s)] = z
          end
          return z
       end
    end
 end
+
+const FqPolyID = Dict{Tuple{FqFiniteField, Symbol}, FqPolyRing}()
 
 type fq_poly <: PolyElem{fq}
    coeffs::Ptr{Void}
@@ -2467,24 +2481,24 @@ end
 #
 ###############################################################################
 
-const FqNmodPolyID = ObjectIdDict()
-
 type FqNmodPolyRing <: PolyRing{fq_nmod}
    base_ring::FqNmodFiniteField
    S::Symbol
 
-   function FqNmodPolyRing(R::FqNmodFiniteField, s::Symbol, cached=true)
+   function FqNmodPolyRing(R::FqNmodFiniteField, s::Symbol, cached::Bool = true)
       if haskey(FqNmodPolyID, (R, s))
-         return FqNmodPolyID[(R,s)]::FqNmodPolyRing
+         return FqNmodPolyID[(R, s)]
       else
          z = new(R,s)
          if cached
-            FqNmodPolyID[(R,s)] = z
+            FqNmodPolyID[(R, s)] = z
          end
          return z
       end
    end
 end
+
+const FqNmodPolyID = Dict{Tuple{FqNmodFiniteField, Symbol}, FqNmodPolyRing}()
 
 type fq_nmod_poly <: PolyElem{fq_nmod}
    coeffs::Ptr{Void}

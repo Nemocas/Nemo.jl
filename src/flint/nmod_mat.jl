@@ -18,7 +18,7 @@ export nmod_mat, NmodMatSpace, getindex, setindex!, set_entry!, deepcopy, rows,
 
 parent_type(::Type{nmod_mat}) = NmodMatSpace
 
-elem_type(::NmodMatSpace) = nmod_mat
+elem_type(::Type{NmodMatSpace}) = nmod_mat
 
 function _checkbounds(I::Int, J::Int)
    J >= 1 && J <= I
@@ -40,6 +40,24 @@ size(x::nmod_mat) = tuple(x.r, x.c)
 size(t::nmod_mat, d) = d <= 2 ? size(t)[d] : 1
 
 issquare(a::nmod_mat) = (rows(a) == cols(a))
+
+###############################################################################
+#
+#   Similar
+#
+###############################################################################
+
+function similar(x::nmod_mat)
+   z = nmod_mat(rows(x), cols(x), x.n)
+   z.base_ring = x.base_ring
+   return z
+end
+
+function similar(x::nmod_mat, r::Int, c::Int)
+   z = nmod_mat(r, c, x.n)
+   z.base_ring = x.base_ring
+   return z
+end
 
 ################################################################################
 #
@@ -103,8 +121,8 @@ set_entry_t!{T<:Union{RingElem, Integer}}(a::nmod_mat, i::Int, j::Int, u::T) =
  
 function deepcopy_internal(a::nmod_mat, dict::ObjectIdDict)
   z = nmod_mat(rows(a), cols(a), a.n)
-  if isdefined(a, :parent)
-    z.parent = a.parent
+  if isdefined(a, :base_ring)
+    z.base_ring = a.base_ring
   end
   ccall((:nmod_mat_set, :libflint), Void,
           (Ptr{nmod_mat}, Ptr{nmod_mat}), &z, &a)
@@ -115,11 +133,11 @@ rows(a::nmod_mat) = a.r
 
 cols(a::nmod_mat) = a.c
 
-parent(a::nmod_mat) = a.parent
+parent(a::nmod_mat, cached::Bool = true) = MatrixSpace(base_ring(a), rows(a), cols(a), cached)
 
 base_ring(a::NmodMatSpace) = a.base_ring
 
-base_ring(a::nmod_mat) = a.parent.base_ring
+base_ring(a::nmod_mat) = a.base_ring
 
 zero(a::NmodMatSpace) = a()
 
@@ -171,7 +189,7 @@ end
 #
 ################################################################################
 
-==(a::nmod_mat, b::nmod_mat) = (a.parent == b.parent) &&
+==(a::nmod_mat, b::nmod_mat) = (a.base_ring == b.base_ring) &&
         Bool(ccall((:nmod_mat_equal, :libflint), Cint,
                 (Ptr{nmod_mat}, Ptr{nmod_mat}), &a, &b))
 
@@ -182,7 +200,7 @@ end
 ################################################################################
 
 function transpose(a::nmod_mat)
-  z = NmodMatSpace(base_ring(a), parent(a).cols, parent(a).rows)()
+  z = NmodMatSpace(base_ring(a), cols(a), rows(a))()
   ccall((:nmod_mat_transpose, :libflint), Void,
           (Ptr{nmod_mat}, Ptr{nmod_mat}), &z, &a)
   return z
@@ -201,7 +219,7 @@ end
 ################################################################################
 
 function -(x::nmod_mat)
-  z = parent(x)()
+  z = similar(x)
   ccall((:nmod_mat_neg, :libflint), Void,
           (Ptr{nmod_mat}, Ptr{nmod_mat}), &z, &x)
   return z
@@ -215,7 +233,7 @@ end
 
 function +(x::nmod_mat, y::nmod_mat)
   check_parent(x,y)
-  z = parent(x)()
+  z = similar(x)
   ccall((:nmod_mat_add, :libflint), Void,
           (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &z, &x, &y)
   return z
@@ -223,7 +241,7 @@ end
 
 function -(x::nmod_mat, y::nmod_mat)
   check_parent(x,y)
-  z = parent(x)()
+  z = similar(x)
   ccall((:nmod_mat_sub, :libflint), Void,
           (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &z, &x, &y)
   return z
@@ -232,7 +250,7 @@ end
 function *(x::nmod_mat, y::nmod_mat)
   (base_ring(x) != base_ring(y)) && error("Base ring must be equal")
   (cols(x) != rows(y)) && error("Dimensions are wrong")
-  z = MatrixSpace(base_ring(x), rows(x), cols(y))()
+  z = similar(x, rows(x), cols(y))
   ccall((:nmod_mat_mul, :libflint), Void,
           (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &z, &x, &y)
   return z
@@ -247,14 +265,17 @@ end
 
 function mul!(a::nmod_mat, b::nmod_mat, c::nmod_mat)
   ccall((:nmod_mat_mul, :libflint), Void, (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &a, &b, &c)
+  return a
 end
 
 function add!(a::nmod_mat, b::nmod_mat, c::nmod_mat)
   ccall((:nmod_mat_add, :libflint), Void, (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &a, &b, &c)
+  return a
 end
 
 function zero!(a::nmod_mat)
   ccall((:nmod_mat_zero, :libflint), Void, (Ptr{nmod_mat}, ), &a)
+  return a
 end
 
 ################################################################################
@@ -264,7 +285,7 @@ end
 ################################################################################
 
 function *(x::nmod_mat, y::UInt)
-  z = parent(x)()
+  z = similar(x)
   ccall((:nmod_mat_scalar_mul, :libflint), Void,
           (Ptr{nmod_mat}, Ptr{nmod_mat}, UInt), &z, &x, y)
   return z
@@ -275,7 +296,7 @@ end
 function *(x::nmod_mat, y::fmpz)
   t = fmpz()
   ccall((:fmpz_mod_ui, :libflint), UInt,
-          (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &y, parent(x).n)
+          (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &y, x.n)
   tt = ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &t)
   return x*tt
 end
@@ -302,7 +323,7 @@ end
 ################################################################################
 
 function ^(x::nmod_mat, y::UInt)
-  z = parent(x)()
+  z = similar(x)
   ccall((:nmod_mat_pow, :libflint), Void,
           (Ptr{nmod_mat}, Ptr{nmod_mat}, UInt), &z, &x, y)
   return z
@@ -429,7 +450,7 @@ end
 
 function inv(a::nmod_mat)
   !issquare(a) && error("Matrix must be a square matrix")
-  z = parent(a)()
+  z = similar(a)
   r = ccall((:nmod_mat_inv, :libflint), Int,
           (Ptr{nmod_mat}, Ptr{nmod_mat}), &z, &a)
   !Bool(r) && error("Matrix not invertible")
@@ -446,7 +467,7 @@ function solve(x::nmod_mat, y::nmod_mat)
   (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
   !issquare(x)&& error("First argument not a square matrix in solve")
   (y.r != x.r) || y.c != 1 && ("Not a column vector in solve")
-  z = parent(y)()
+  z = similar(y)
   r = ccall((:nmod_mat_solve, :libflint), Int,
           (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &z, &x, &y)
   !Bool(r) && error("Singular matrix in solve")
@@ -462,6 +483,11 @@ end
 function lufact!(P::perm, x::nmod_mat)
   rank = ccall((:nmod_mat_lu, :libflint), Cint, (Ptr{Int}, Ptr{nmod_mat}, Cint),
            P.d, &x, 0)
+
+  for i in 1:length(P.d)
+    P.d[i] += 1
+  end
+
   return rank
 end
 
@@ -473,11 +499,7 @@ function lufact(x::nmod_mat, P = PermGroup(rows(x)))
   R = base_ring(x)
   U = deepcopy(x)
 
-  if m == n
-    L = parent(x)()
-  else
-    L = MatrixSpace(R, m, m)()::nmod_mat
-  end
+  L = similar(x, m, m)
 
   rank = lufact!(p, U)
 
@@ -506,7 +528,7 @@ function window(x::nmod_mat, r1::Int, c1::Int, r2::Int, c2::Int)
   _checkbounds(x, r1, c1)
   _checkbounds(x, r2, c2)
   (r1 > r2 || c1 > c2) && error("Invalid parameters")
-  temp = MatrixSpace(parent(x).base_ring, r2 - r1 + 1, c2 - c1 + 1)()
+  temp = similar(x, r2 - r1 + 1, c2 - c1 + 1)
   ccall((:nmod_mat_window_init, :libflint), Void,
           (Ptr{nmod_mat}, Ptr{nmod_mat}, Int, Int, Int, Int),
           &temp, &x, r1-1, c1-1, r2, c2)
@@ -533,7 +555,7 @@ sub(x::nmod_mat, r::UnitRange{Int}, c::UnitRange{Int}) = window(x, r, c)
 function hcat(x::nmod_mat, y::nmod_mat)
   (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
   (x.r != y.r) && error("Matrices must have same number of rows")
-  z = MatrixSpace(base_ring(x), x.r, x.c + y.c)()
+  z = similar(x, rows(x), cols(x) + cols(y))
   ccall((:nmod_mat_concat_horizontal, :libflint), Void,
           (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &z, &x, &y)
   return z
@@ -542,7 +564,7 @@ end
 function vcat(x::nmod_mat, y::nmod_mat)
   (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
   (x.c != y.c) && error("Matrices must have same number of columns")
-  z = MatrixSpace(base_ring(x), x.r + y.r, x.c)()
+  z = similar(x, rows(x) + rows(y), cols(x))
   ccall((:nmod_mat_concat_vertical, :libflint), Void,
           (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &z, &x, &y)
   return z
@@ -576,7 +598,8 @@ doc"""
 > entries of the returned matrix are those of $a$ lifted to $\mathbb{Z}$.
 """
 function lift(a::nmod_mat)
-  z = MatrixSpace(FlintZZ, rows(a), cols(a))()
+  z = fmpz_mat(rows(a), cols(a))
+  z.base_ring = FlintIntegerRing()
   ccall((:fmpz_mat_set_nmod_mat, :libflint), Void,
           (Ptr{fmpz_mat}, Ptr{nmod_mat}), &z, &a)
   return z 
@@ -621,11 +644,11 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{V <: Integer}(::Type{nmod_mat}, ::Type{V}) = nmod_mat
+promote_rule{V <: Integer}(::Type{nmod_mat}, ::Type{V}) = nmod_mat
 
-Base.promote_rule(::Type{nmod_mat}, ::Type{GenRes{fmpz}}) = nmod_mat
+promote_rule(::Type{nmod_mat}, ::Type{GenRes{fmpz}}) = nmod_mat
 
-Base.promote_rule(::Type{nmod_mat}, ::Type{fmpz}) = nmod_mat
+promote_rule(::Type{nmod_mat}, ::Type{fmpz}) = nmod_mat
 
 ################################################################################
 #
@@ -635,7 +658,7 @@ Base.promote_rule(::Type{nmod_mat}, ::Type{fmpz}) = nmod_mat
 
 function (a::NmodMatSpace)()
   z = nmod_mat(a.rows, a.cols, a.n)
-  z.parent = a
+  z.base_ring = a.base_ring
   return z
 end
 
@@ -685,42 +708,42 @@ end
 function (a::NmodMatSpace)(arr::Array{BigInt, 2}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr, transpose)
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
-  z.parent = a
+  z.base_ring = a.base_ring
   return z
 end
 
 function (a::NmodMatSpace)(arr::Array{BigInt, 1}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr)
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
-  z.parent = a
+  z.base_ring = a.base_ring
   return z
 end
 
 function (a::NmodMatSpace)(arr::Array{fmpz, 2}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr, transpose)
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
-  z.parent = a
+  z.base_ring = a.base_ring
   return z
 end
 
 function (a::NmodMatSpace)(arr::Array{fmpz, 1}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr)
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
-  z.parent = a
+  z.base_ring = a.base_ring
   return z
 end
 
 function (a::NmodMatSpace)(arr::Array{Int, 2}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr, transpose)
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
-  z.parent = a
+  z.base_ring = a.base_ring
   return z
 end
 
 function (a::NmodMatSpace)(arr::Array{Int, 1}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr)
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
-  z.parent = a
+  z.base_ring = a.base_ring
   return z
 end
 
@@ -728,7 +751,7 @@ function (a::NmodMatSpace)(arr::Array{GenRes{fmpz}, 2}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr, transpose)
   (base_ring(a) != parent(arr[1])) && error("Elements must have same base ring")
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
-  z.parent = a
+  z.base_ring = a.base_ring
   return z
 end
 
@@ -736,14 +759,14 @@ function (a::NmodMatSpace)(arr::Array{GenRes{fmpz}, 1}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr)
   (base_ring(a) != parent(arr[1])) && error("Elements must have same base ring")
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
-  z.parent = a
+  z.base_ring = a.base_ring
   return z
 end
 
 function (a::NmodMatSpace)(b::fmpz_mat)
   (a.cols != b.c || a.rows != b.r) && error("Dimensions do not fit")
   z = nmod_mat(a.n, b)
-  z.parent = a
+  z.base_ring = a.base_ring
   return z
 end
 
@@ -753,7 +776,7 @@ end
 #
 ################################################################################
 
-function MatrixSpace(R::GenResRing{fmpz}, r::Int, c::Int; cached = true)
+function MatrixSpace(R::GenResRing{fmpz}, r::Int, c::Int, cached::Bool = true)
   return try
     NmodMatSpace(R, r, c, cached)
   catch

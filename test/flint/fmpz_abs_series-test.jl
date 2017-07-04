@@ -3,6 +3,10 @@ function test_fmpz_abs_series_constructors()
 
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
+   @test elem_type(R) == fmpz_abs_series
+   @test elem_type(FmpzAbsSeriesRing) == fmpz_abs_series
+   @test parent_type(fmpz_abs_series) == FmpzAbsSeriesRing
+
    @test isa(R, FmpzAbsSeriesRing)
 
    a = x^3 + 2x + 1

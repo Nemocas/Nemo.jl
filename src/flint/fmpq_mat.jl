@@ -12,16 +12,38 @@ export fmpq_mat, FmpqMatSpace, gso, hilbert
 #
 ###############################################################################
 
-elem_type(::FmpqMatSpace) = fmpq_mat
+elem_type(::Type{FmpqMatSpace}) = fmpq_mat
 
 parent_type(::Type{fmpq_mat}) = FmpqMatSpace
 
 base_ring(a::FmpqMatSpace) = a.base_ring
 
-parent(a::fmpq_mat) = a.parent
+base_ring(a::fmpq_mat) = a.base_ring
+
+parent(a::fmpq_mat, cached::Bool = true) =
+      FmpqMatSpace(rows(a), cols(a), cached)
 
 function check_parent(a::fmpq_mat, b::fmpq_mat)
-   parent(a) != parent(b) && error("Incompatible matrices")
+   (rows(a) != rows(b) || cols(a) != cols(b) || base_ring(a) != base_ring(b)) &&
+      error("Incompatible matrices")
+end
+
+###############################################################################
+#
+#   Similar
+#
+###############################################################################
+
+function similar(x::fmpq_mat)
+   z = fmpq_mat(rows(x), cols(x))
+   z.base_ring = x.base_ring
+   return z
+end
+
+function similar(x::fmpq_mat, r::Int, c::Int)
+   z = fmpq_mat(r, c)
+   z.base_ring = x.base_ring
+   return z
 end
 
 ###############################################################################
@@ -37,10 +59,10 @@ function window(x::fmpq_mat, r1::Int, c1::Int, r2::Int, c2::Int)
   _checkbounds(x.c, c2) || throw(BoundsError())
   (r1 > r2 || c1 > c2) && error("Invalid parameters")
   b = fmpq_mat()
-  b.parent = MatrixSpace(parent(x).base_ring, r2 - r1 + 1, c2 - c1 + 1)
+  b.base_ring = x.base_ring
   ccall((:fmpq_mat_window_init, :libflint), Void,
         (Ptr{fmpq_mat}, Ptr{fmpq_mat}, Int, Int, Int, Int),
-            &b, &x, r1-1, c1-1, r2, c2)
+            &b, &x, r1 - 1, c1 - 1, r2, c2)
   finalizer(b, _fmpq_mat_window_clear_fn)
   return b
 end
@@ -53,7 +75,7 @@ function _fmpq_mat_window_clear_fn(a::fmpq_mat)
    ccall((:fmpq_mat_window_clear, :libflint), Void, (Ptr{fmpq_mat},), &a)
 end
 
-size(x::fmpq_mat) = tuple(x.parent.rows, x.parent.cols)
+size(x::fmpq_mat) = tuple(rows(x), cols(x))
 
 size(t::fmpq_mat, d) = d <= 2 ? size(t)[d] : 1
 
@@ -70,8 +92,8 @@ function getindex!(v::fmpq, a::fmpq_mat, r::Int, c::Int)
 end
 
 function getindex(a::fmpq_mat, r::Int, c::Int)
-   _checkbounds(a.parent.rows, r) || throw(BoundsError())
-   _checkbounds(a.parent.cols, c) || throw(BoundsError())
+   _checkbounds(rows(a), r) || throw(BoundsError())
+   _checkbounds(cols(a), c) || throw(BoundsError())
    v = fmpq()
    z = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
              (Ptr{fmpq_mat}, Int, Int), &a, r - 1, c - 1)
@@ -97,8 +119,8 @@ end
 setindex!(a::fmpq_mat, d::Integer, r::Int, c::Int) = setindex!(a, fmpq(d), r, c)
 
 function setindex!(a::fmpq_mat, d::Int, r::Int, c::Int)
-   _checkbounds(a.parent.rows, r) || throw(BoundsError())
-   _checkbounds(a.parent.cols, c) || throw(BoundsError())
+   _checkbounds(rows(a), r) || throw(BoundsError())
+   _checkbounds(cols(a), c) || throw(BoundsError())
    z = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
              (Ptr{fmpq_mat}, Int, Int), &a, r - 1, c - 1)
    ccall((:fmpq_set_si, :libflint), Void, (Ptr{fmpq}, Int, Int), z, d, 1)
@@ -122,7 +144,7 @@ isone(a::fmpq_mat) = ccall((:fmpq_mat_is_one, :libflint), Bool,
 
 function deepcopy_internal(d::fmpq_mat, dict::ObjectIdDict)
    z = fmpq_mat(d)
-   z.parent = d.parent
+   z.base_ring = d.base_ring
    return z
 end
 
@@ -147,18 +169,18 @@ function show(io::IO, a::FmpqMatSpace)
 end
 
 function show(io::IO, a::fmpq_mat)
-   rows = a.parent.rows
-   cols = a.parent.cols
-   for i = 1:rows
+   r = rows(a)
+   c = cols(a)
+   for i = 1:r
       print(io, "[")
-      for j = 1:cols
+      for j = 1:c
          print(io, a[i, j])
-         if j != cols
+         if j != c
             print(io, " ")
          end
       end
       print(io, "]")
-      if i != rows
+      if i != r
          println(io, "")
       end
    end
@@ -173,7 +195,7 @@ show_minus_one(::Type{fmpq_mat}) = show_minus_one(fmpq)
 ###############################################################################
 
 function -(x::fmpq_mat)
-   z = parent(x)()
+   z = similar(x)
    ccall((:fmpq_mat_neg, :libflint), Void,
          (Ptr{fmpq_mat}, Ptr{fmpq_mat}), &z, &x)
    return z
@@ -186,7 +208,7 @@ end
 ###############################################################################
 
 function transpose(x::fmpq_mat)
-   z = MatrixSpace(FlintQQ, cols(x), rows(x))()
+   z = similar(x, cols(x), rows(x))
    ccall((:fmpq_mat_transpose, :libflint), Void,
          (Ptr{fmpq_mat}, Ptr{fmpq_mat}), &z, &x)
    return z
@@ -200,7 +222,7 @@ end
 
 function +(x::fmpq_mat, y::fmpq_mat)
    check_parent(x, y)
-   z = parent(x)()
+   z = similar(x)
    ccall((:fmpq_mat_add, :libflint), Void,
                 (Ptr{fmpq_mat}, Ptr{fmpq_mat},  Ptr{fmpq_mat}),
                &z, &x, &y)
@@ -209,7 +231,7 @@ end
 
 function -(x::fmpq_mat, y::fmpq_mat)
    check_parent(x, y)
-   z = parent(x)()
+   z = similar(x)
    ccall((:fmpq_mat_sub, :libflint), Void,
                 (Ptr{fmpq_mat}, Ptr{fmpq_mat},  Ptr{fmpq_mat}),
                &z, &x, &y)
@@ -218,12 +240,7 @@ end
 
 function *(x::fmpq_mat, y::fmpq_mat)
    cols(x) != rows(y) && error("Incompatible matrix dimensions")
-   if rows(x) == cols(y) && rows(x) == cols(x)
-      parz = parent(x)
-   else
-      parz = FmpqMatSpace(rows(x), cols(y))
-   end
-   z = parz()
+   z = similar(x, rows(x), cols(y))
    ccall((:fmpq_mat_mul, :libflint), Void,
                 (Ptr{fmpq_mat}, Ptr{fmpq_mat},  Ptr{fmpq_mat}),
                &z, &x, &y)
@@ -237,14 +254,14 @@ end
 ###############################################################################
 
 function *(x::fmpz, y::fmpq_mat)
-   z = parent(y)()
+   z = similar(y)
    ccall((:fmpq_mat_scalar_mul_fmpz, :libflint), Void,
                 (Ptr{fmpq_mat}, Ptr{fmpq_mat}, Ptr{fmpz}), &z, &y, &x)
    return z
 end
 
 function *(x::fmpq, y::fmpq_mat)
-   z = parent(y)()
+   z = similar(y)
    ccall((:fmpq_mat_scalar_mul_fmpz, :libflint), Void,
                 (Ptr{fmpq_mat}, Ptr{fmpq_mat}, Ptr{fmpq}), &z, &y, &num(x))
    ccall((:fmpq_mat_scalar_div_fmpz, :libflint), Void,
@@ -264,55 +281,35 @@ end
 
 *(x::fmpq_mat, y::Rational) = fmpq(y)*x
 
-function +(x::fmpq_mat, y::Integer)
-   z = deepcopy(x)
-   for i = 1:min(rows(x), cols(x))
-      z[i, i] += y
+for T in [Integer, Rational, fmpz, fmpq]
+   @eval begin
+      function +(x::fmpq_mat, y::$T)
+         z = deepcopy(x)
+         for i = 1:min(rows(x), cols(x))
+            z[i, i] += y
+         end
+         return z
+      end
+
+      +(x::$T, y::fmpq_mat) = y + x
+
+      function -(x::fmpq_mat, y::$T)
+         z = deepcopy(x)
+         for i = 1:min(rows(x), cols(x))
+            z[i, i] -= y
+         end
+         return z
+      end
+
+      function -(x::$T, y::fmpq_mat)
+         z = -y
+         for i = 1:min(rows(y), cols(y))
+            z[i, i] += x
+         end
+         return z
+      end
    end
-   return z
 end
-
-+(x::Integer, y::fmpq_mat) = y + x
-
-+(x::fmpz, y::fmpq_mat) = parent(y)(x) + y
-
-+(x::fmpq_mat, y::fmpz) = x + parent(x)(y)
-
-+(x::fmpq, y::fmpq_mat) = parent(y)(x) + y
-
-+(x::fmpq_mat, y::fmpq) = x + parent(x)(y)
-
-+(x::Rational, y::fmpq_mat) = fmpq(x) + y
-
-+(x::fmpq_mat, y::Rational) = x + fmpq(y)
-
-function -(x::fmpq_mat, y::Integer)
-   z = deepcopy(x)
-   for i = 1:min(rows(x), cols(x))
-      z[i, i] -= y
-   end
-   return z
-end
-
-function -(x::Integer, y::fmpq_mat)
-   z = -y
-   for i = 1:min(rows(y), cols(y))
-      z[i, i] += x
-   end
-   return z
-end
-
--(x::fmpz, y::fmpq_mat) = parent(y)(x) - y
-
--(x::fmpq_mat, y::fmpz) = x - parent(x)(y)
-
--(x::fmpq, y::fmpq_mat) = parent(y)(x) - y
-
--(x::fmpq_mat, y::fmpq) = x - parent(x)(y)
-
--(x::Rational, y::fmpq_mat) = fmpq(x) - y
-
--(x::fmpq_mat, y::Rational) = x - fmpq(y)
 
 ###############################################################################
 #
@@ -361,7 +358,7 @@ end
 ###############################################################################
 
 function inv(x::fmpq_mat)
-   z = parent(x)()
+   z = similar(x)
    success = ccall((:fmpq_mat_inv, :libflint), Cint,
          (Ptr{fmpq_mat}, Ptr{fmpq_mat}), &z, &x)
    success == 0 && error("Matrix not invertible")
@@ -386,7 +383,7 @@ end
 ###############################################################################
 
 function divexact(x::fmpq_mat, y::fmpq)
-   z = parent(x)()
+   z = similar(x)
    ccall((:fmpq_mat_scalar_div_fmpz, :libflint), Void,
                 (Ptr{fmpq_mat}, Ptr{fmpq_mat}, Ptr{fmpz}), &z, &x, &num(y))
    ccall((:fmpq_mat_scalar_mul_fmpz, :libflint), Void,
@@ -395,7 +392,7 @@ function divexact(x::fmpq_mat, y::fmpq)
 end
 
 function divexact(x::fmpq_mat, y::fmpz)
-   z = parent(x)()
+   z = similar(x)
    ccall((:fmpq_mat_scalar_div_fmpz, :libflint), Void,
                 (Ptr{fmpq_mat}, Ptr{fmpq_mat}, Ptr{fmpz}), &z, &x, &y)
    return z
@@ -458,7 +455,7 @@ doc"""
 > Return the Gram-Schmidt Orthogonalisation of the matrix $x$.
 """
 function gso(x::fmpq_mat)
-   z = parent(x)()
+   z = similar(x)
    ccall((:fmpq_mat_gso, :libflint), Void,
                 (Ptr{fmpq_mat}, Ptr{fmpq_mat}), &z, &x)
    return z
@@ -489,7 +486,7 @@ end
 ###############################################################################
 
 function rank(x::fmpq_mat)
-   z = parent(x)()
+   z = similar(x)
    r = ccall((:fmpq_mat_rref, :libflint), Int,
          (Ptr{fmpq_mat}, Ptr{fmpq_mat}), &z, &x)
    return r
@@ -502,7 +499,7 @@ end
 ###############################################################################
 
 function rref(x::fmpq_mat)
-   z = parent(x)()
+   z = similar(x)
    r = ccall((:fmpq_mat_rref, :libflint), Int,
          (Ptr{fmpq_mat}, Ptr{fmpq_mat}), &z, &x)
    return r, z
@@ -517,7 +514,7 @@ end
 function solve(a::fmpq_mat, b::fmpq_mat)
    rows(a) != cols(a) && error("Not a square matrix in solve")
    rows(b) != rows(a) && error("Incompatible dimensions in solve")
-   z = parent(b)()
+   z = similar(b)
    nonsing = ccall((:fmpq_mat_solve_fraction_free, :libflint), Bool,
       (Ptr{fmpq_mat}, Ptr{fmpq_mat}, Ptr{fmpq_mat}), &z, &a, &b)
    !nonsing && error("Singular matrix in solve")
@@ -532,7 +529,7 @@ doc"""
 function solve_dixon(a::fmpq_mat, b::fmpq_mat)
    rows(a) != cols(a) && error("Not a square matrix in solve")
    rows(b) != rows(a) && error("Incompatible dimensions in solve")
-   z = parent(b)()
+   z = similar(b)
    nonsing = ccall((:fmpq_mat_solve_dixon, :libflint), Bool,
       (Ptr{fmpq_mat}, Ptr{fmpq_mat}, Ptr{fmpq_mat}), &z, &a, &b)
    !nonsing && error("Singular matrix in solve")
@@ -561,7 +558,7 @@ end
 
 function hcat(a::fmpq_mat, b::fmpq_mat)
   rows(a) != rows(b) && error("Incompatible number of rows in hcat")
-  c = MatrixSpace(FlintQQ, rows(a), cols(a) + cols(b))()
+  c = similar(a, rows(a), cols(a) + cols(b))
   ccall((:fmpq_mat_concat_horizontal, :libflint), Void,
         (Ptr{fmpq_mat}, Ptr{fmpq_mat}, Ptr{fmpq_mat}), &c, &a, &b)
   return c
@@ -569,7 +566,7 @@ end
 
 function vcat(a::fmpq_mat, b::fmpq_mat)
   cols(a) != cols(b) && error("Incompatible number of columns in vcat")
-  c = MatrixSpace(FlintQQ, rows(a) + rows(b), cols(a))()
+  c = similar(a, rows(a) + rows(b), cols(a))
   ccall((:fmpq_mat_concat_vertical, :libflint), Void,
         (Ptr{fmpq_mat}, Ptr{fmpq_mat}, Ptr{fmpq_mat}), &c, &a, &b)
   return c
@@ -595,6 +592,7 @@ end
 function mul!(z::fmpq_mat, x::fmpq_mat, y::fmpq_mat)
    ccall((:fmpq_mat_mul, :libflint), Void,
                 (Ptr{fmpq_mat}, Ptr{fmpq_mat}, Ptr{fmpq_mat}), &z, &x, &y)
+   return z
 end
 
 function mul!(y::fmpq_mat, x::Int)
@@ -612,11 +610,13 @@ end
 function addeq!(z::fmpq_mat, x::fmpq_mat)
    ccall((:fmpq_mat_add, :libflint), Void,
                 (Ptr{fmpq_mat}, Ptr{fmpq_mat}, Ptr{fmpq_mat}), &z, &z, &x)
+   return z
 end
 
 function zero!(z::fmpq_mat)
    ccall((:fmpq_mat_zero, :libflint), Void,
                 (Ptr{fmpq_mat},), &z)
+   return z
 end
 
 ###############################################################################
@@ -627,21 +627,21 @@ end
 
 function (a::FmpqMatSpace)()
    z = fmpq_mat(a.rows, a.cols)
-   z.parent = a
+   z.base_ring = a.base_ring
    return z
 end
 
 function (a::FmpqMatSpace)(arr::Array{fmpq, 2})
    _check_dim(a.rows, a.cols, arr)
    z = fmpq_mat(a.rows, a.cols, arr)
-   z.parent = a
+   z.base_ring = a.base_ring
    return z
 end
 
 function (a::FmpqMatSpace)(arr::Array{fmpz, 2})
    _check_dim(a.rows, a.cols, arr)
    z = fmpq_mat(a.rows, a.cols, arr)
-   z.parent = a
+   z.base_ring = a.base_ring
    return z
 end
 
@@ -649,60 +649,60 @@ end
 function (a::FmpqMatSpace){T <: Integer}(arr::Array{T, 2})
    _check_dim(a.rows, a.cols, arr)
    z = fmpq_mat(a.rows, a.cols, arr)
-   z.parent = a
+   z.base_ring = a.base_ring
    return z
 end
 
 function (a::FmpqMatSpace){T <: Integer}(arr::Array{Rational{T}, 2})
    _check_dim(a.rows, a.cols, arr)
    z = fmpq_mat(a.rows, a.cols, map(fmpq, arr))
-   z.parent = a
+   z.base_ring = a.base_ring
    return z
 end
 
 function (a::FmpqMatSpace)(arr::Array{fmpq, 1})
    _check_dim(a.rows, a.cols, arr)
    z = fmpq_mat(a.rows, a.cols, arr)
-   z.parent = a
+   z.base_ring = a.base_ring
    return z
 end
 
 function (a::FmpqMatSpace)(arr::Array{fmpz, 1})
    _check_dim(a.rows, a.cols, arr)
    z = fmpq_mat(a.rows, a.cols, arr)
-   z.parent = a
+   z.base_ring = a.base_ring
    return z
 end
 
 function (a::FmpqMatSpace){T <: Integer}(arr::Array{T, 1})
    _check_dim(a.rows, a.cols, arr)
    z = fmpq_mat(a.rows, a.cols, arr)
-   z.parent = a
+   z.base_ring = a.base_ring
    return z
 end
 
 function (a::FmpqMatSpace){T <: Integer}(arr::Array{Rational{T}, 1})
    _check_dim(a.rows, a.cols, arr)
    z = fmpq_mat(a.rows, a.cols, map(fmpq, arr))
-   z.parent = a
+   z.base_ring = a.base_ring
    return z
 end
 
 function (a::FmpqMatSpace)(d::fmpq)
    z = fmpq_mat(a.rows, a.cols, d)
-   z.parent = a
+   z.base_ring = a.base_ring
    return z
 end
 
 function (a::FmpqMatSpace)(d::fmpz)
    z = fmpq_mat(a.rows, a.cols, fmpq(d))
-   z.parent = a
+   z.base_ring = a.base_ring
    return z
 end
 
 function (a::FmpqMatSpace)(d::Integer)
    z = fmpq_mat(a.rows, a.cols, fmpq(d))
-   z.parent = a
+   z.base_ring = a.base_ring
    return z
 end
 
@@ -723,13 +723,13 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{fmpq_mat}, ::Type{T}) = fmpq_mat
+promote_rule{T <: Integer}(::Type{fmpq_mat}, ::Type{T}) = fmpq_mat
 
-Base.promote_rule(::Type{fmpq_mat}, ::Type{fmpq}) = fmpq_mat
+promote_rule(::Type{fmpq_mat}, ::Type{fmpq}) = fmpq_mat
 
-Base.promote_rule(::Type{fmpq_mat}, ::Type{fmpz}) = fmpq_mat
+promote_rule(::Type{fmpq_mat}, ::Type{fmpz}) = fmpq_mat
 
-Base.promote_rule{T <: Integer}(::Type{fmpq_mat}, ::Type{Rational{T}}) = fmpq_mat
+promote_rule{T <: Integer}(::Type{fmpq_mat}, ::Type{Rational{T}}) = fmpq_mat
 
 ###############################################################################
 #

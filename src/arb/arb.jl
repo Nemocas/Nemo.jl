@@ -32,7 +32,7 @@ export ball, radius, midpoint, contains, contains_zero,
 #
 ###############################################################################
 
-elem_type(::ArbField) = arb
+elem_type(::Type{ArbField}) = arb
 
 parent_type(::Type{arb}) = ArbField
 
@@ -175,6 +175,13 @@ doc"""
 contains(x::arb, y::Integer) = contains(x, fmpz(y))
 
 doc"""
+    contains(x::arb, y::Rational{Integer})
+> Returns `true` if the ball $x$ contains the given rational value, otherwise
+> return `false`.
+"""
+contains{T <: Integer}(x::arb, y::Rational{T}) = contains(x, fmpq(y))
+
+doc"""
     contains(x::arb, y::BigFloat)
 > Returns `true` if the ball $x$ contains the given floating point value, 
 > otherwise return `false`.
@@ -305,6 +312,13 @@ end
 <(x::arb, y::fmpz) = x < arb(y)
 >(x::arb, y::fmpz) = x > arb(y)
 
+==(x::fmpz, y::arb) = arb(x) == y
+!=(x::fmpz, y::arb) = arb(x) != y
+<=(x::fmpz, y::arb) = arb(x) <= y
+>=(x::fmpz, y::arb) = arb(x) >= y
+<(x::fmpz, y::arb) = arb(x) < y
+>(x::fmpz, y::arb) = arb(x) > y
+
 ==(x::arb, y::Integer) = x == fmpz(y)
 !=(x::arb, y::Integer) = x != fmpz(y)
 <=(x::arb, y::Integer) = x <= fmpz(y)
@@ -312,12 +326,6 @@ end
 <(x::arb, y::Integer) = x < fmpz(y)
 >(x::arb, y::Integer) = x > fmpz(y)
 
-==(x::fmpz, y::arb) = arb(x) == y
-!=(x::fmpz, y::arb) = arb(x) != y
-<=(x::fmpz, y::arb) = arb(x) <= y
->=(x::fmpz, y::arb) = arb(x) >= y
-<(x::fmpz, y::arb) = arb(x) < y
->(x::fmpz, y::arb) = arb(x) > y
 
 ==(x::Integer, y::arb) = fmpz(x) == y
 !=(x::Integer, y::arb) = fmpz(x) != y
@@ -339,6 +347,48 @@ end
 >=(x::Float64, y::arb) = arb(x) >= y
 <(x::Float64, y::arb) = arb(x) < y
 >(x::Float64, y::arb) = arb(x) > y
+
+==(x::arb, y::BigFloat) = x == arb(y)
+!=(x::arb, y::BigFloat) = x != arb(y)
+<=(x::arb, y::BigFloat) = x <= arb(y)
+>=(x::arb, y::BigFloat) = x >= arb(y)
+<(x::arb, y::BigFloat) = x < arb(y)
+>(x::arb, y::BigFloat) = x > arb(y)
+
+==(x::BigFloat, y::arb) = arb(x) == y
+!=(x::BigFloat, y::arb) = arb(x) != y
+<=(x::BigFloat, y::arb) = arb(x) <= y
+>=(x::BigFloat, y::arb) = arb(x) >= y
+<(x::BigFloat, y::arb) = arb(x) < y
+>(x::BigFloat, y::arb) = arb(x) > y
+
+==(x::arb, y::fmpq) = x == arb(y, prec(parent(x)))
+!=(x::arb, y::fmpq) = x != arb(y, prec(parent(x)))
+<=(x::arb, y::fmpq) = x <= arb(y, prec(parent(x)))
+>=(x::arb, y::fmpq) = x >= arb(y, prec(parent(x)))
+<(x::arb, y::fmpq) = x < arb(y, prec(parent(x)))
+>(x::arb, y::fmpq) = x > arb(y, prec(parent(x)))
+
+==(x::fmpq, y::arb) = arb(x, prec(parent(y))) == y
+!=(x::fmpq, y::arb) = arb(x, prec(parent(y))) != y
+<=(x::fmpq, y::arb) = arb(x, prec(parent(y))) <= y
+>=(x::fmpq, y::arb) = arb(x, prec(parent(y))) >= y
+<(x::fmpq, y::arb) = arb(x, prec(parent(y))) < y
+>(x::fmpq, y::arb) = arb(x, prec(parent(y))) > y
+
+=={T <: Integer}(x::arb, y::Rational{T}) = x == fmpq(y)
+!={T <: Integer}(x::arb, y::Rational{T}) = x != fmpq(y)
+<={T <: Integer}(x::arb, y::Rational{T}) = x <= fmpq(y)
+>={T <: Integer}(x::arb, y::Rational{T}) = x >= fmpq(y)
+<{T <: Integer}(x::arb, y::Rational{T}) = x < fmpq(y)
+>{T <: Integer}(x::arb, y::Rational{T}) = x > fmpq(y)
+
+=={T <: Integer}(x::Rational{T}, y::arb) = fmpq(x) == y
+!={T <: Integer}(x::Rational{T}, y::arb) = fmpq(x) != y
+<={T <: Integer}(x::Rational{T}, y::arb) = fmpq(x) <= y
+>={T <: Integer}(x::Rational{T}, y::arb) = fmpq(x) >= y
+<{T <: Integer}(x::Rational{T}, y::arb) = fmpq(x) < y
+>{T <: Integer}(x::Rational{T}, y::arb) = fmpq(x) > y
 
 ################################################################################
 #
@@ -683,10 +733,45 @@ end
 +(x::fmpq, y::arb) = parent(y)(x) + y
 +(x::arb, y::fmpq) = x + parent(x)(y)
 -(x::fmpq, y::arb) = parent(y)(x) - y
+//(x::arb, y::fmpq) = x//parent(x)(y)
+//(x::fmpq, y::arb) = parent(y)(x)//y
 -(x::arb, y::fmpq) = x - parent(x)(y)
 *(x::fmpq, y::arb) = parent(y)(x) * y
 *(x::arb, y::fmpq) = x * parent(x)(y)
 ^(x::fmpq, y::arb) = parent(y)(x) ^ y
+
++(x::Float64, y::arb) = parent(y)(x) + y
++(x::arb, y::Float64) = x + parent(x)(y)
+-(x::Float64, y::arb) = parent(y)(x) - y
+//(x::arb, y::Float64) = x//parent(x)(y)
+//(x::Float64, y::arb) = parent(y)(x)//y
+-(x::arb, y::Float64) = x - parent(x)(y)
+*(x::Float64, y::arb) = parent(y)(x) * y
+*(x::arb, y::Float64) = x * parent(x)(y)
+^(x::Float64, y::arb) = parent(y)(x) ^ y
+^(x::arb, y::Float64) = x ^ parent(x)(y)
+
++(x::BigFloat, y::arb) = parent(y)(x) + y
++(x::arb, y::BigFloat) = x + parent(x)(y)
+-(x::BigFloat, y::arb) = parent(y)(x) - y
+//(x::arb, y::BigFloat) = x//parent(x)(y)
+//(x::BigFloat, y::arb) = parent(y)(x)//y
+-(x::arb, y::BigFloat) = x - parent(x)(y)
+*(x::BigFloat, y::arb) = parent(y)(x) * y
+*(x::arb, y::BigFloat) = x * parent(x)(y)
+^(x::BigFloat, y::arb) = parent(y)(x) ^ y
+^(x::arb, y::BigFloat) = x ^ parent(x)(y)
+
++{T <: Integer}(x::Rational{T}, y::arb) = fmpq(x) + y
++{T <: Integer}(x::arb, y::Rational{T}) = x + fmpq(y)
+-{T <: Integer}(x::Rational{T}, y::arb) = fmpq(x) - y
+-{T <: Integer}(x::arb, y::Rational{T}) = x - fmpq(y)
+//{T <: Integer}(x::Rational{T}, y::arb) = fmpq(x)//y
+//{T <: Integer}(x::arb, y::Rational{T}) = x//fmpq(y)
+*{T <: Integer}(x::Rational{T}, y::arb) = fmpq(x) * y
+*{T <: Integer}(x::arb, y::Rational{T}) = x * fmpq(y)
+^{T <: Integer}(x::Rational{T}, y::arb) = fmpq(x) ^ y
+^{T <: Integer}(x::arb, y::Rational{T}) = x ^ fmpq(y)
 
 /(x::arb, y::arb) = x // y
 /(x::fmpz, y::arb) = x // y
@@ -697,6 +782,8 @@ end
 /(x::arb, y::UInt) = x // y
 /(x::fmpq, y::arb) = x // y
 /(x::arb, y::fmpq) = x // y
+/{T <: Integer}(x::Rational{T}, y::arb) = x // y
+/{T <: Integer}(x::arb, y::Rational{T}) = x // y
 
 divexact(x::arb, y::arb) = x // y
 divexact(x::fmpz, y::arb) = x // y
@@ -707,6 +794,8 @@ divexact(x::UInt, y::arb) = x // y
 divexact(x::arb, y::UInt) = x // y
 divexact(x::fmpq, y::arb) = x // y
 divexact(x::arb, y::fmpq) = x // y
+divexact{T <: Integer}(x::Rational{T}, y::arb) = x // y
+divexact{T <: Integer}(x::arb, y::Rational{T}) = x // y
 
 ################################################################################
 #
@@ -1631,7 +1720,7 @@ numpart(n::Int, r::ArbField) = numpart(fmpz(n), r)
 
 function zero!(z::arb)
    ccall((:arb_zero, :libarb), Void, (Ptr{arb},), &z)
-   nothing
+   return z
 end
 
 for (s,f) in (("add!","arb_add"), ("mul!","arb_mul"), ("div!", "arb_div"),
@@ -1640,7 +1729,7 @@ for (s,f) in (("add!","arb_add"), ("mul!","arb_mul"), ("div!", "arb_div"),
     function ($(Symbol(s)))(z::arb, x::arb, y::arb)
       ccall(($f, :libarb), Void, (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int),
                            &z, &x, &y, parent(x).prec)
-      nothing
+      return z
     end
   end
 end
@@ -1648,7 +1737,7 @@ end
 function addeq!(z::arb, x::arb)
     ccall((:arb_add, :libarb), Void, (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int),
                            &z, &z, &x, parent(x).prec)
-    nothing
+    return z
 end
 
 ################################################################################
@@ -1689,7 +1778,7 @@ for (typeofx, passtoc) in ((arb, Ref{arb}), (Ptr{arb}, Ptr{arb}))
     end
 
     function _arb_set(x::($typeofx), y::arb)
-      ccall((:arb_set, :libarb), Void, (($passtoc), Ptr{arb}, Int), x, &y)
+      ccall((:arb_set, :libarb), Void, (($passtoc), Ptr{arb}), x, &y)
     end
 
     function _arb_set(x::($typeofx), y::arb, p::Int)
@@ -1764,6 +1853,8 @@ function (r::ArbField)(x::fmpq)
   return z
 end
   
+(r::ArbField){T <: Integer}(x::Rational{T}) = r(fmpq(x))
+
 #function call(r::ArbField, x::arf)
 #  z = arb(arb(x), r.prec)
 #  z.parent = r

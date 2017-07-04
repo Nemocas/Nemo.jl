@@ -4,6 +4,10 @@ function test_fq_nmod_abs_series_constructors()
    S, t = FiniteField(23, 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
+   @test elem_type(R) == fq_nmod_abs_series
+   @test elem_type(FqNmodAbsSeriesRing) == fq_nmod_abs_series
+   @test parent_type(fq_nmod_abs_series) == FqNmodAbsSeriesRing
+
    @test isa(R, FqNmodAbsSeriesRing)
 
    a = x^3 + 2x + 1

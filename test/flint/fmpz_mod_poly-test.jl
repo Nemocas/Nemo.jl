@@ -4,6 +4,10 @@ function test_fmpz_mod_poly_constructors()
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
+   @test elem_type(S) == fmpz_mod_poly
+   @test elem_type(FmpzModPolyRing) == fmpz_mod_poly
+   @test parent_type(fmpz_mod_poly) == FmpzModPolyRing
+
    @test typeof(S) <: FmpzModPolyRing
 
    @test isa(x, PolyElem)
@@ -541,7 +545,7 @@ function test_fmpz_mod_poly_factor()
 end
 
 function test_fmpz_mod_poly_remove_valuation()
-   print("fmpz_mod_poly.remove_valuation()...")
+   print("fmpz_mod_poly.remove_valuation...")
 
    R = ResidueRing(ZZ, 123456789012345678949)
    S, y = PolynomialRing(R, "y")

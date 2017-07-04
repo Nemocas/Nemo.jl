@@ -4,6 +4,10 @@ function test_abs_series_constructors()
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
 
+   @test elem_type(S) == GenAbsSeries{elem_type(R)}
+   @test elem_type(GenAbsSeriesRing{elem_type(R)}) == GenAbsSeries{elem_type(R)}
+   @test parent_type(GenAbsSeries{elem_type(R)}) == GenAbsSeriesRing{elem_type(R)}
+
    @test isa(S, GenAbsSeriesRing)
 
    a = x^3 + 2x + 1

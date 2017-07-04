@@ -8,9 +8,9 @@ import Base: Array, abs, asin, asinh, atan, atanh, base, bin, checkbounds,
              gcd, gcdx, getindex, hash, hcat, hex, intersect, inv, invmod,
              isequal, isfinite, isless, isqrt, isreal, lcm, ldexp, length, log,
              lufact, lufact!, mod, ndigits, nextpow2, norm, nullspace, num,
-             oct, one, parent, parse, precision, prevpow2, promote_rule, rank,
-             Rational, rem, reverse, serialize, setindex!, show, sign, sin,
-             sinh, size, sqrt, string, tan, tanh, trace, trailing_zeros,
+             oct, one, parent, parse, precision, prevpow2, rank,
+             Rational, rem, reverse, serialize, setindex!, show, similar, sign,
+             sin, sinh, size, sqrt, string, tan, tanh, trace, trailing_zeros,
              transpose, transpose!, truncate, typed_hvcat, typed_hcat, var,
              vcat, zero, zeros, +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <,
              >, //, /, !=
@@ -19,7 +19,9 @@ import Base: floor, ceil, hypot, sqrt, log, log1p, exp, expm1, sin, cos, sinpi,
              cospi, tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh,
              asinh, acosh, gamma, lgamma, digamma, zeta, sinpi, cospi, atan2
 
-export SetElem, GroupElem, RingElem, FieldElem
+export elem_type, parent_type
+
+export SetElem, GroupElem, RingElem, FieldElem, AccessorNotSetError
 
 export PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
        MatElem, FinFieldElem
@@ -206,8 +208,15 @@ end
 #
 ###############################################################################
 
+type AccessorNotSetError <: Exception
+end
+
 function create_accessors(T, S, handle)
    get = function(a)
+      if handle > length(a.auxilliary_data) || 
+         !isdefined(a.auxilliary_data, handle)
+        throw(AccessorNotSetError())
+      end
       return a.auxilliary_data[handle]
    end
    set = function(a, b)

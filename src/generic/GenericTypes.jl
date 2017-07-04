@@ -10,13 +10,11 @@
 #
 ###############################################################################
 
-const GenPolyID = ObjectIdDict()
-
 type GenPolyRing{T <: RingElem} <: PolyRing{T}
    base_ring::Ring
    S::Symbol
 
-   function GenPolyRing(R::Ring, s::Symbol, cached=true)
+   function GenPolyRing(R::Ring, s::Symbol, cached::Bool = true)
       if haskey(GenPolyID, (R, s))
          return GenPolyID[R, s]::GenPolyRing{T}
       else 
@@ -28,6 +26,8 @@ type GenPolyRing{T <: RingElem} <: PolyRing{T}
       end
    end
 end
+
+const GenPolyID = Dict{Tuple{Ring, Symbol}, Ring}()
 
 type GenPoly{T <: RingElem} <: PolyElem{T}
    coeffs::Array{T, 1}
@@ -56,8 +56,6 @@ end
 # T is an Int which is the number of variables
 # (plus one if ordered by total degree)
 
-const GenMPolyID = ObjectIdDict()
-
 type GenMPolyRing{T <: RingElem} <: PolyRing{T}
    base_ring::Ring
    S::Array{Symbol, 1}
@@ -65,7 +63,8 @@ type GenMPolyRing{T <: RingElem} <: PolyRing{T}
    num_vars::Int
    N::Int
 
-   function GenMPolyRing(R::Ring, s::Array{Symbol, 1}, ord::Symbol, N::Int, cached=true)
+   function GenMPolyRing(R::Ring, s::Array{Symbol, 1}, ord::Symbol, N::Int,
+                         cached::Bool = true)
       if haskey(GenMPolyID, (R, s, ord, N))
          return GenMPolyID[R, s, ord, N]::GenMPolyRing{T}
       else 
@@ -77,6 +76,8 @@ type GenMPolyRing{T <: RingElem} <: PolyRing{T}
       end
    end
 end
+
+const GenMPolyID = Dict{Tuple{Ring, Array{Symbol, 1}, Symbol, Int}, Ring}()
 
 type GenMPoly{T <: RingElem} <: PolyElem{T}
    coeffs::Array{T, 1}
@@ -104,14 +105,12 @@ end
 #
 ###############################################################################
 
-const GenSparsePolyID = ObjectIdDict()
-
 type GenSparsePolyRing{T <: RingElem} <: Ring
    base_ring::Ring
    S::Symbol
    num_vars::Int
 
-   function GenSparsePolyRing(R::Ring, s::Symbol, cached=true)
+   function GenSparsePolyRing(R::Ring, s::Symbol, cached::Bool = true)
       if haskey(GenSparsePolyID, (R, s))
          return GenSparsePolyID[R, s]::GenSparsePolyRing{T}
       else 
@@ -123,6 +122,8 @@ type GenSparsePolyRing{T <: RingElem} <: Ring
       end
    end
 end
+
+const GenSparsePolyID = Dict{Tuple{Ring, Symbol}, GenSparsePolyRing}()
 
 type GenSparsePoly{T <: RingElem} <: RingElem
    coeffs::Array{T, 1}
@@ -144,13 +145,11 @@ end
 #
 ###############################################################################
 
-const ModulusDict = Dict{Tuple{Ring, RingElem}, Ring}()
-
 type GenResRing{T <: RingElem} <: ResRing{T}
    base_ring::Ring
    modulus::T
 
-   function GenResRing(modulus::T, cached=true)
+   function GenResRing(modulus::T, cached::Bool = true)
       if haskey(ModulusDict, (parent(modulus), modulus))
          return ModulusDict[parent(modulus), modulus]::GenResRing{T}
       else
@@ -162,6 +161,8 @@ type GenResRing{T <: RingElem} <: ResRing{T}
       end
    end
 end
+
+const ModulusDict = Dict{Tuple{Ring, RingElem}, Ring}()
 
 type GenRes{T <: RingElem} <: ResElem{T}
    data::T
@@ -176,14 +177,12 @@ end
 #
 ###############################################################################
 
-const GenRelSeriesID = ObjectIdDict()
-
 type GenRelSeriesRing{T <: RingElem} <: SeriesRing{T}
    base_ring::Ring
    prec_max::Int
    S::Symbol
 
-   function GenRelSeriesRing(R::Ring, prec::Int, s::Symbol, cached=true)
+   function GenRelSeriesRing(R::Ring, prec::Int, s::Symbol, cached::Bool = true)
       if haskey(GenRelSeriesID, (R, prec, s))
          return GenRelSeriesID[R, prec, s]::GenRelSeriesRing{T}
       else
@@ -195,6 +194,8 @@ type GenRelSeriesRing{T <: RingElem} <: SeriesRing{T}
       end
    end
 end
+
+const GenRelSeriesID = Dict{Tuple{Ring, Int, Symbol}, Ring}()
 
 type GenRelSeries{T <: RingElem} <: RelSeriesElem{T}
    coeffs::Array{T, 1}
@@ -216,14 +217,12 @@ end
 #
 ###############################################################################
 
-const GenAbsSeriesID = ObjectIdDict()
-
 type GenAbsSeriesRing{T <: RingElem} <: SeriesRing{T}
    base_ring::Ring
    prec_max::Int
    S::Symbol
 
-   function GenAbsSeriesRing(R::Ring, prec::Int, s::Symbol, cached=true)
+   function GenAbsSeriesRing(R::Ring, prec::Int, s::Symbol, cached::Bool = true)
       if haskey(GenAbsSeriesID, (R, prec, s))
          return GenAbsSeriesID[R, prec, s]::GenAbsSeriesRing{T}
       else
@@ -236,6 +235,8 @@ type GenAbsSeriesRing{T <: RingElem} <: SeriesRing{T}
    end
 end
 
+const GenAbsSeriesID = Dict{Tuple{Ring, Int, Symbol}, Ring}()
+
 type GenAbsSeries{T <: RingElem} <: AbsSeriesElem{T}
    coeffs::Array{T, 1}
    length::Int
@@ -245,18 +246,17 @@ type GenAbsSeries{T <: RingElem} <: AbsSeriesElem{T}
    GenAbsSeries(a::Array{T, 1}, length::Int, prec::Int) = new(a, length, prec)   
    GenAbsSeries(a::GenAbsSeries{T}) = a
 end
+
 ###############################################################################
 #
 #   GenFracField / GenFrac
 #
 ###############################################################################
 
-const GenFracDict = ObjectIdDict()
-
 type GenFracField{T <: RingElem} <: FracField{T}
    base_ring::Ring
 
-   function GenFracField(R::Ring, cached=true)
+   function GenFracField(R::Ring, cached::Bool = true)
       if haskey(GenFracDict, R)
          return GenFracDict[R]::GenFracField{T}
       else
@@ -268,6 +268,8 @@ type GenFracField{T <: RingElem} <: FracField{T}
       end
    end
 end
+
+const GenFracDict = Dict{Ring, Ring}()
 
 type GenFrac{T <: RingElem} <: FracElem{T}
    num::T
@@ -283,15 +285,13 @@ end
 #
 ###############################################################################
 
-const GenMatDict = ObjectIdDict()
-
 # not really a mathematical ring
 type GenMatSpace{T <: RingElem} <: MatSpace{T}
    rows::Int
    cols::Int
    base_ring::Ring
 
-   function GenMatSpace(R::Ring, r::Int, c::Int, cached=true)
+   function GenMatSpace(R::Ring, r::Int, c::Int, cached::Bool = true)
       if haskey(GenMatDict, (R, r, c))
          return GenMatDict[R, r, c]::GenMatSpace{T}
       else
@@ -304,9 +304,11 @@ type GenMatSpace{T <: RingElem} <: MatSpace{T}
    end
 end
 
+const GenMatDict = Dict{Tuple{Ring, Int, Int}, Ring}()
+
 type GenMat{T <: RingElem} <: MatElem{T}
    entries::Array{T, 2}
-   parent::GenMatSpace{T}
+   base_ring::Ring
 
    GenMat(a::Array{T, 2}) = new(a) 
 end

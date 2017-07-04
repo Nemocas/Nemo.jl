@@ -13,6 +13,10 @@ function test_perm_constructors()
 
    R = PermutationGroup(10)
 
+   @test elem_type(R) == perm
+   @test elem_type(PermGroup) == perm
+   @test parent_type(perm) == PermGroup
+
    a = R()
    b = R([2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
    c = R(a)

@@ -21,7 +21,7 @@ doc"""
 """
 parent(a::nf_elem) = a.parent
 
-elem_type(::AnticNumberField) = nf_elem
+elem_type(::Type{AnticNumberField}) = nf_elem
 
 doc"""
     base_ring(a::AnticNumberField)
@@ -174,8 +174,8 @@ function den(a::nf_elem)
 end
 
 function elem_from_mat_row(a::AnticNumberField, b::fmpz_mat, i::Int, d::fmpz)
-   _checkbounds(b.parent.rows, i) || throw(BoundsError())
-   b.parent.cols == degree(a) || error("Wrong number of columns")
+   _checkbounds(rows(b), i) || throw(BoundsError())
+   cols(b) == degree(a) || error("Wrong number of columns")
    z = a()
    ccall((:nf_elem_set_fmpz_mat_row, :libflint), Void,
         (Ptr{nf_elem}, Ptr{fmpz_mat}, Cint, Ptr{fmpz}, Ptr{AnticNumberField}),
@@ -611,41 +611,41 @@ end
 function zero!(a::nf_elem)
    ccall((:nf_elem_zero, :libflint), Void,
          (Ptr{nf_elem}, Ptr{AnticNumberField}), &a, &parent(a))
-   nothing
+   return a
 end
 
 function mul!(z::nf_elem, x::nf_elem, y::nf_elem)
    ccall((:nf_elem_mul, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}),
                                                   &z, &x, &y, &parent(x))
-   nothing
+   return z
 end
 
 function mul_red!(z::nf_elem, x::nf_elem, y::nf_elem, red::Bool)
    ccall((:nf_elem_mul_red, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}, Cint),
                                                 &z, &x, &y, &parent(x), red)
-   nothing
+   return z
 end
 
 function addeq!(z::nf_elem, x::nf_elem)
    ccall((:nf_elem_add, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}),
                                                   &z, &z, &x, &parent(x))
-   nothing
+   return z
 end
 
 function add!(a::nf_elem, b::nf_elem, c::nf_elem)
    ccall((:nf_elem_add, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}),
          &a, &b, &c, &a.parent)
-   nothing
+  return a
 end
 
 function reduce!(x::nf_elem)
    ccall((:nf_elem_reduce, :libflint), Void,
          (Ptr{nf_elem}, Ptr{AnticNumberField}), &x, &parent(x))
-   nothing
+   return x
 end
 
 ###############################################################################
@@ -658,18 +658,21 @@ function add!(c::nf_elem, a::nf_elem, b::fmpq)
    ccall((:nf_elem_add_fmpq, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{fmpq}, Ptr{AnticNumberField}),
          &c, &a, &b, &a.parent)
+   return c
 end
 
 function add!(c::nf_elem, a::nf_elem, b::fmpz)
    ccall((:nf_elem_add_fmpz, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{fmpz}, Ptr{AnticNumberField}),
          &c, &a, &b, &a.parent)
+   return c
 end
 
 function add!(c::nf_elem, a::nf_elem, b::Int)
    ccall((:nf_elem_add_si, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Int, Ptr{AnticNumberField}),
          &c, &a, b, &a.parent)
+   return c
 end
 
 add!(c::nf_elem, a::nf_elem, b::Integer) = add!(c, a, fmpz(b))
@@ -678,18 +681,21 @@ function sub!(c::nf_elem, a::nf_elem, b::fmpq)
    ccall((:nf_elem_sub_fmpq, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{fmpq}, Ptr{AnticNumberField}),
          &c, &a, &b, &a.parent)
+   return c
 end
 
 function sub!(c::nf_elem, a::nf_elem, b::fmpz)
    ccall((:nf_elem_sub_fmpz, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{fmpz}, Ptr{AnticNumberField}),
          &c, &a, &b, &a.parent)
+   return c
 end
 
 function sub!(c::nf_elem, a::nf_elem, b::Int)
    ccall((:nf_elem_sub_si, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Int, Ptr{AnticNumberField}),
          &c, &a, b, &a.parent)
+   return c
 end
 
 sub!(c::nf_elem, a::nf_elem, b::Integer) = sub!(c, a, fmpz(b))
@@ -698,18 +704,21 @@ function sub!(c::nf_elem, a::fmpq, b::nf_elem)
    ccall((:nf_elem_fmpq_sub, :libflint), Void,
          (Ptr{nf_elem}, Ptr{fmpq}, Ptr{nf_elem}, Ptr{AnticNumberField}),
          &c, &a, &b, &a.parent)
+   return c
 end
 
 function sub!(c::nf_elem, a::fmpz, b::nf_elem)
    ccall((:nf_elem_fmpz_sub, :libflint), Void,
          (Ptr{nf_elem}, Ptr{fmpz}, Ptr{nf_elem}, Ptr{AnticNumberField}),
          &c, &a, &b, &a.parent)
+   return c
 end
 
 function sub!(c::nf_elem, a::Int, b::nf_elem)
    ccall((:nf_elem_si_sub, :libflint), Void,
          (Ptr{nf_elem}, Int, Ptr{nf_elem}, Ptr{AnticNumberField}),
          &c, a, &b, &b.parent)
+   return c
 end
 
 sub!(c::nf_elem, a::Integer, b::nf_elem) = sub!(c, fmpz(a), b)
@@ -718,18 +727,21 @@ function mul!(c::nf_elem, a::nf_elem, b::fmpq)
    ccall((:nf_elem_scalar_mul_fmpq, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{fmpq}, Ptr{AnticNumberField}),
          &c, &a, &b, &a.parent)
+   return c
 end
 
 function mul!(c::nf_elem, a::nf_elem, b::fmpz)
    ccall((:nf_elem_scalar_mul_fmpz, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{fmpz}, Ptr{AnticNumberField}),
          &c, &a, &b, &a.parent)
+   return c
 end
 
 function mul!(c::nf_elem, a::nf_elem, b::Int)
    ccall((:nf_elem_scalar_mul_si, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Int, Ptr{AnticNumberField}),
          &c, &a, b, &a.parent)
+   return c
 end
 
 mul!(c::nf_elem, a::nf_elem, b::Integer) = mul!(c, a, fmpz(b))
@@ -751,21 +763,21 @@ function sqr_classical(a::GenPoly{nf_elem})
    for i = 1:lena - 1
       d[2i - 1] = base_ring(a)()
       d[2i] = base_ring(a)()
-      mul_red!(d[2i - 1], coeff(a, i - 1), coeff(a, i - 1), false)
+      d[2i - 1] = mul_red!(d[2i - 1], coeff(a, i - 1), coeff(a, i - 1), false)
    end
    d[2*lena - 1] = base_ring(a)()
-   mul_red!(d[2*lena - 1], coeff(a, lena - 1), coeff(a, lena - 1), false)
+   d[2*lena - 1] = mul_red!(d[2*lena - 1], coeff(a, lena - 1), coeff(a, lena - 1), false)
 
    for i = 1:lena
       for j = i + 1:lena
-         mul_red!(t, coeff(a, i - 1), coeff(a, j - 1), false)
-         addeq!(d[i + j - 1], t)
-         addeq!(d[i + j - 1], t)
+         t = mul_red!(t, coeff(a, i - 1), coeff(a, j - 1), false)
+         d[i + j - 1] = addeq!(d[i + j - 1], t)
+         d[i + j - 1] = addeq!(d[i + j - 1], t)
       end
    end
 
    for i = 1:lenz
-      reduce!(d[i])
+      d[i] = reduce!(d[i])
    end
 
    z = parent(a)(d)
@@ -795,23 +807,23 @@ function mul_classical(a::GenPoly{nf_elem}, b::GenPoly{nf_elem})
 
    for i = 1:lena
       d[i] = base_ring(a)()
-      mul_red!(d[i], coeff(a, i - 1), coeff(b, 0), false)
+      d[i] = mul_red!(d[i], coeff(a, i - 1), coeff(b, 0), false)
    end
 
    for i = 2:lenb
       d[lena + i - 1] = base_ring(a)()
-      mul_red!(d[lena + i - 1], a.coeffs[lena], coeff(b, i - 1), false)
+      d[lena + i - 1] = mul_red!(d[lena + i - 1], a.coeffs[lena], coeff(b, i - 1), false)
    end
 
    for i = 1:lena - 1
       for j = 2:lenb
-         mul_red!(t, coeff(a, i - 1), b.coeffs[j], false)
-         addeq!(d[i + j - 1], t)
+         t = mul_red!(t, coeff(a, i - 1), b.coeffs[j], false)
+         d[i + j - 1] = addeq!(d[i + j - 1], t)
       end
    end
 
    for i = 1:lenz
-      reduce!(d[i])
+      d[i] = reduce!(d[i])
    end
 
    z = parent(a)(d)
@@ -841,14 +853,14 @@ function *(a::GenPoly{nf_elem}, b::GenPoly{nf_elem})
    f = S()
    fit!(f, lena)
    for i = 1:lena
-      setcoeff!(f, i - 1, R(coeff(a, i - 1)))
+      f = setcoeff!(f, i - 1, R(coeff(a, i - 1)))
    end
    set_length!(f, lena)
    if a !== b
       g = S()
       fit!(g, lenb)
       for i = 1:lenb
-         setcoeff!(g, i - 1, R(coeff(b, i - 1)))
+         g = setcoeff!(g, i - 1, R(coeff(b, i - 1)))
       end
       set_length!(g, lenb)
    else
@@ -869,13 +881,13 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{nf_elem}, ::Type{T}) = nf_elem
+promote_rule{T <: Integer}(::Type{nf_elem}, ::Type{T}) = nf_elem
 
-Base.promote_rule(::Type{nf_elem}, ::Type{fmpz}) = nf_elem
+promote_rule(::Type{nf_elem}, ::Type{fmpz}) = nf_elem
 
-Base.promote_rule(::Type{nf_elem}, ::Type{fmpq}) = nf_elem
+promote_rule(::Type{nf_elem}, ::Type{fmpq}) = nf_elem
 
-Base.promote_rule(::Type{nf_elem}, ::Type{fmpq_poly}) = nf_elem
+promote_rule(::Type{nf_elem}, ::Type{fmpq_poly}) = nf_elem
 
 ###############################################################################
 #

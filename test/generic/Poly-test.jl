@@ -4,6 +4,10 @@ function test_gen_poly_constructors()
    R, x = ZZ["x"]
    S, y = R["y"]
 
+   @test elem_type(S) == GenPoly{elem_type(R)}
+   @test elem_type(GenPolyRing{elem_type(R)}) == GenPoly{elem_type(R)}
+   @test parent_type(GenPoly{elem_type(R)}) == GenPolyRing{elem_type(R)}
+
    @test typeof(R) <: Nemo.Ring
    @test typeof(S) <: GenPolyRing
 

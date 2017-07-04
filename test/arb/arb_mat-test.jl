@@ -6,6 +6,10 @@ function test_arb_mat_constructors()
    S = MatrixSpace(RR, 3, 3)
    R = MatrixSpace(ZZ, 3, 3)
 
+   @test elem_type(S) == arb_mat
+   @test elem_type(ArbMatSpace) == arb_mat
+   @test parent_type(arb_mat) == ArbMatSpace
+
    @test isa(S, ArbMatSpace)
 
    f = S(fmpz(3))
@@ -53,7 +57,7 @@ function test_arb_mat_constructors()
 end
 
 function test_arb_mat_printing()
-   print("arb_mat.constructors...")
+   print("arb_mat.printing...")
  
    S = MatrixSpace(RR, 3, 3)
    f = S(fmpz(3))
@@ -73,9 +77,13 @@ function test_arb_mat_manipulation()
    @test iszero(zero(S))
    @test isone(one(S))
 
-   B[1, 1] = fmpz(3)
+   i = 0
+   for T in [Int, UInt, fmpz, fmpq, Float64, BigFloat, fmpz, fmpq]
+      i += 1
+      B[1, 1] = T(i)
 
-   @test B[1, 1] == RR(3)
+      @test B[1, 1] == RR(i)
+   end
 
    @test rows(B) == 3
    @test cols(B) == 3
