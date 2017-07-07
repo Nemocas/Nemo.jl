@@ -98,6 +98,13 @@ function parity(a::perm)
    return parity%2
 end
 
+doc"""
+    sign(a::perm)
+> Returns the sign of the given permutations, i.e. `1` if `a` is even and `-1`
+> if `a` is odd.
+"""
+sign(a::perm) = (-1)^parity(a)
+
 function getindex(a::perm, n::Int)
    return a.d[n]
 end
