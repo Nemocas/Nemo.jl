@@ -404,6 +404,30 @@ function matrix_repr(a::perm)
    return A[a.d,:]
 end
 
+doc"""
+    emb!(result::perm, p::perm, V::Vector{Int})
+> Embedds permutation `p` into `result` on the indices given by `V`. This
+> corresponds to natural embedding of $S_k$ into $S_n$ as the subgroup
+> permuting points indexed by `V`.
+"""
+function emb!(result::perm, p::perm, V::Vector{Int})
+    result.d[V] = (result.d[V])[p.d]
+    return result
+end
+
+doc"""
+    emb(G::PermGroup, V::Vector{Int})
+> Returns the natural embedding of a permutation group into `G` as the
+> subgroup permuting points indexed by `V`.
+"""
+function emb(G::PermGroup, V::Vector{Int}, check=true)
+   if check
+      @assert length(Base.Set(V)) == length(V)
+      @assert all(V .<= G.n)
+   end
+   return p -> Nemo.emb!(G(), p, V)
+end
+
 ###############################################################################
 #
 #   Parent object call overloads
