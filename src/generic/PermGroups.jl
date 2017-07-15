@@ -302,7 +302,7 @@ end
 ###############################################################################
 
 doc"""
-   AllPerms(n::Int)
+    AllPerms(n::Int)
 > Returns an iterator over arrays representing all permutations of `1:n`.
 > Similar to `Combinatorics.permutations(1:n)`
 """
