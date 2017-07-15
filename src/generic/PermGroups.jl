@@ -395,6 +395,14 @@ doc"""
 order(a::perm) = lcm([length(c) for c in cycles(a)])
 
 doc"""
+    permtype(a::perm, rev=true)
+> Returns the type of permutation `a`, i.e. lengths of disjoint cycles building
+> `a`. This fully determines conjugacy class of `a`. the lengths are sorted in
+> reverse order by default.
+"""
+permtype(a::perm) = sort([length(c) for c in cycles(a)], rev=true)
+
+doc"""
     matrix_repr(a::perm)
 > Return the permutation matrix representing `a` via natural embedding of the
 > permutation group into general linear group over ZZ
