@@ -25,23 +25,6 @@ function test_partition_type()
    println("PASS")
 end
 
-function test_intpartitions()
-   print("youngtabs.intpartitions...")
-   prts =  collect(IntPartitions(4))
-   @test length(prts) == 5
-   @test all(sum.(prts) .== 4)
-
-   prts = collect(IntPartitions(1))
-   @test prts == [[1]]
-
-   @test length(collect(IntPartitions(0))) == 1
-
-   @test length(IntPartitions(10)) == 42
-   @test all(sum.([p for p in IntPartitions(10)]) .== 10)
-
-   println("PASS")
-end
-
 function test_youngtabs()
    print("youngtabs.YoungTableau...")
 
@@ -176,7 +159,7 @@ end
 
 function test_ytabs()
    test_partition_type()
-   test_intpartitions()
+   # test_intpartitions()
    test_youngtabs()
    test_skewdiags()
    test_rimhooks()

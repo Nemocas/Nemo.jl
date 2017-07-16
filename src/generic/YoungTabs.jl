@@ -54,39 +54,6 @@ convert(::Type{Partition}, p::Vector{Int}) = Partition(p)
 #
 ##############################################################################
 
-const _noPartsTable = Dict{Int, Int}(0 => 1, 1 => 1, 2 => 2)
-const _noPartsTableBig = Dict{Int, BigInt}()
-
-doc"""
-    noPartitions(n::Int)
-> Returns the number of all distinct integer partitions of `n`. The function
-> uses Euler pentagonal number theorem for recursive formula. For more details
-> see OEIS sequence [A000041](http://oeis.org/A000041). Note that
-> `noPartitions(0) = 1` by convention.
-"""
-function noPartitions(n::Int)
-   if n < 0
-      return 0
-   end
-   if n < 395
-      lookuptable = _noPartsTable
-      s = 0
-   else
-      lookuptable = _noPartsTableBig
-      s = big(0)
-   end
-
-   if !haskey(lookuptable, n)
-      for j in 1:floor(Int, (1 + sqrt(1+24n))/6)
-         p1 = noPartitions(n - div(j*(3j-1),2))
-         p2 = noPartitions(n - div(j*(3j+1),2))
-         s += (-1)^(j-1)*(p1 + p2)
-      end
-      lookuptable[n] = s
-   end
-   return lookuptable[n]
-end
-
 # Implemented following RuleAsc (Algorithm 3.1) from
 #    "Generating All Partitions: A Comparison Of Two Encodings"
 # by Jerome Kelleher and Barry O’Sullivan, ArXiv:0909.2331
@@ -115,7 +82,7 @@ end
 Base.next(parts::IntPartitions, state) = nextpart_asc(state...)
 Base.done(parts::IntPartitions, state) = state[2] == 1
 Base.eltype(::Type{IntPartitions}) = Partition
-length(parts::IntPartitions) = noPartitions(parts.n)
+length(parts::IntPartitions) = numpart(parts.n)
 
 function nextpart_asc(part, k)
     if k == 0
