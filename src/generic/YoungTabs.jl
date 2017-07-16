@@ -233,7 +233,6 @@ function dimension(Y::YoungTableau)
    return Int(num/den)
 end
 
-
 ##############################################################################
 #
 #   SkewDiagrams
@@ -265,3 +264,27 @@ SkewDiagram(λ::Vector{Int}, μ::Vector{Int}) = SkewDiagram(Partition(λ), Parti
 
 ==(ξ::SkewDiagram, ψ::SkewDiagram) = ξ.λ == ψ.λ && ξ.μ == ψ.μ
 hash(ξ::SkewDiagram, h::UInt) = hash(ξ.λ, hash(ξ.μ, hash(SkewDiagram, h)))
+
+###############################################################################
+#
+#   String I/O
+#
+###############################################################################
+
+doc"""
+    matrix_repr(ξ::SkewDiagram)
+> Returns a binary representation of the diagram `ξ`, i.e. a binary array `A`
+> where `A[i,j] == 1` if and only if `(i,j)` is in `ξ.λ` but not in `ξ.μ`.
+"""
+function matrix_repr(ξ::SkewDiagram)
+   ydiag = zeros(Int,length(ξ.λ), maximum(ξ.λ))
+   for i in 1:length(ξ.μ)
+      ydiag[i, ξ.μ[i]+1:ξ.λ[i]] .= 1
+   end
+   for i in length(ξ.μ)+1:length(ξ.λ)
+      ydiag[i,1:ξ.λ[i]] .= 1
+   end
+   return ydiag
+end
+
+show(io::IO, ξ::SkewDiagram) = show(io, MIME("text/plain"), matrix_repr(ξ))
