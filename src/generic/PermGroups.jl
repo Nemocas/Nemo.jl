@@ -471,3 +471,60 @@ end
 ###############################################################################
 
 # handled by inner constructors
+
+##############################################################################
+#
+#   Irreducible Characters
+#
+##############################################################################
+
+doc"""
+    character(λ::Partition)
+> Returns the λ-th irreducible character of permutation group on `sum(λ)`
+> generators. The returned character function `χ(p::perm, check=true)` can be
+> evaluated on a permutation `p::perm` of length `sum(λ)`. Checking this
+> condition can be switched off by calling `χ(p, false)`.
+> The values computed by `χ` are stored in look-up table.
+>
+> `χ` computes its values using the Murnaghan-Nakayama formula:
+> $$\chi_\lambda(\sigma) = \sum_{\text{rimhook }\xi\subset \lambda}
+(-1)^{ll(\lambda\backslash\xi)} \chi_{\lambda \backslash\xi}(\tilde\sigma)$$
+> where $\lambda\backslash\xi$ denotes partition associated with Young Diagram
+> of $\lambda$ with $\xi$ removed, $ll$ denotes the leg-length (i.e. number of
+> rows - 1) and $\tilde\sigma$ is permutation obtained from $\sigma$ by the
+> removal of the longest cycle. For more details see e.g. Chapter 2.8 of _Group
+> Theory and Physics_ by S.Sternberg.
+"""
+function character(λ::Partition)
+   R = partitionseq(λ)
+
+   function char(p::perm, check=true)
+      if check
+         length(p.d) == sum(λ) || throw("Can't evaluate character on $p : lengths differ.")
+      end
+      μ = Partition(permtype(p))
+      return MN1inner(R, Partition(μ), 1, _charvalsTable)
+   end
+
+   return char
+end
+
+doc"""
+    character(λ::Partition, p::perm, check=true)
+> Returns the value of `λ-th` irreducible character on permutation `p`.
+"""
+function character(λ::Partition, p::perm, check=true)
+   if check
+      sum(λ) == length(p.d) || throw("λ-th irreducible character can be evaluated only on permutations of length $(sum(λ)).")
+   end
+
+   return MN1inner(partitionseq(λ), permtype(p), 1, _charvalsTable)
+end
+
+doc"""
+    character(λ::Partition, μ::Partition)
+> Returns the value of `λ-th` irreducible character on the conjugacy class
+> represented by partition `μ`. Values of characters computed by this method
+> are NOT globally cached.
+"""
+character(λ::Partition, μ::Partition) = MN1inner(partitionseq(λ), μ, 1)
