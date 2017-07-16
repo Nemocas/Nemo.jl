@@ -48,6 +48,12 @@ hash(p::Partition, h::UInt) = hash(p.part, hash(Partition, h))
 
 convert(::Type{Partition}, p::Vector{Int}) = Partition(p)
 
+##############################################################################
+#
+#   Iterator interface for Integer Partitions
+#
+##############################################################################
+
 const _noPartsTable = Dict{Int, Int}(0 => 1, 1 => 1, 2 => 2)
 const _noPartsTableBig = Dict{Int, BigInt}()
 
@@ -80,3 +86,49 @@ function noPartitions(n::Int)
    end
    return lookuptable[n]
 end
+
+# Implemented following RuleAsc (Algorithm 3.1) from
+#    "Generating All Partitions: A Comparison Of Two Encodings"
+# by Jerome Kelleher and Barry O’Sullivan, ArXiv:0909.2331
+
+doc"""
+   IntPartitions(n::Int)
+> Returns an iterator over all integer `Partition`s of `n`. They come in
+> ascending order. See also `Combinatorics.partitions(n)`.
+"""
+immutable IntPartitions
+    n::Int
+end
+
+function start(parts::IntPartitions)
+    if parts.n < 1
+        return (Int[], 0)
+    elseif parts.n == 1
+        return ([1], 0)
+    else
+        p = zeros(Int, parts.n)
+        p[2] = parts.n
+        return (p, 2)
+    end
+end
+
+function nextpart_asc(part, k)
+    if k == 0
+        return Partition(part, false), (part, 1)
+    end
+    y = part[k] - 1
+    k -= 1
+    x = part[k] + 1
+    while x <= y
+        part[k] = x
+        y -= x
+        k += 1
+    end
+    part[k] = x + y
+    return Partition(reverse(part[1:k]), false), (part, k)
+end
+
+next(parts::IntPartitions, state) = nextpart_asc(state...)
+done(parts::IntPartitions, state) = state[2] == 1
+eltype(::Type{IntPartitions}) = Partition
+length(parts::IntPartitions) = noPartitions(parts.n)
