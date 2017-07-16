@@ -198,3 +198,37 @@ doc"""
 > diagonal.
 """
 conj(Y::YoungTableau) = YoungTableau(Y.n, conj(Y.part), transpose(Y.tab))
+
+##############################################################################
+#
+#   Misc functions for YoungTableaux
+#
+##############################################################################
+
+rowlen(Y::YoungTableau, i, j) = sum(Y[i, j:end] .> 0)
+collen(Y::YoungTableau, i, j) = sum(Y[i:end, j] .> 0)
+
+doc"""
+    hooklength(Y::YoungTableau, i, j)
+> Returns the hooklength of an element in `Y` at position `(i,j)`. `hooklength`
+> will return `0` for `(i,j)` not in the tableau `Y`.
+"""
+function hooklength(Y::YoungTableau, i, j)
+   if Y[i,j] == 0
+      return 0
+   else
+      return rowlen(Y, i, j) + collen(Y, i, j) - 1
+   end
+end
+
+doc"""
+    dimension(Y::YoungTableau)
+> Returns the dimension of the irreducible representation of
+> `PermutationGroup(sum(Y))` associated to `Y`.
+"""
+function dimension(Y::YoungTableau)
+   n, m = size(Y)
+   num = factorial(maximum(Y))
+   den = reduce(*, 1, hooklength(Y,i,j) for i in 1:n, j in 1:m if j <= Y.part[i])
+   return Int(num/den)
+end
