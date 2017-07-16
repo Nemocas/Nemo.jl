@@ -45,10 +45,10 @@ end
 function test_youngtabs()
    print("youngtabs.YoungTableau...")
 
-   λ = [4,3,1]
-   Y = YoungTableau(λ)
+   lambda = [4,3,1]
+   Y = YoungTableau(lambda)
 
-   for i in 1:sum(λ)
+   for i in 1:sum(lambda)
        @test Y[findfirst(Y, i)...] == i
    end
 
@@ -69,8 +69,8 @@ end
 function test_auts()
    print("youngtabs.automorphisms...")
 
-   λ = [4,3,1]
-   Y = YoungTableau(λ)
+   lambda = [4,3,1]
+   Y = YoungTableau(lambda)
 
    @test length(colauts(Y)) == 4
    @test length(rowauts(Y)) == 3
@@ -89,13 +89,13 @@ function test_skewdiags()
 
    l = [5,3,2,2,2,1,1]
    m = [2,2,1]
-   λ = Partition(l)
-   μ = Partition(m)
-   ξ = λ/μ
-   @test isa(ξ, SkewDiagram)
-   ψ = SkewDiagram(l,m)
-   @test isa(ψ, SkewDiagram)
-   @test ξ == ψ
+   lambda = Partition(l)
+   mu = Partition(m)
+   xi = lambda/mu
+   @test isa(xi, SkewDiagram)
+   psi = SkewDiagram(l,m)
+   @test isa(psi, SkewDiagram)
+   @test xi == psi
 
    # 7×5 Array{Int64,2}:
    #  0  0  1  1  1
@@ -106,69 +106,69 @@ function test_skewdiags()
    #  1  0  0  0  0
    #  1  0  0  0  0
 
-   @test Nemo.inskewdiag(ξ, 1, 5) == true
-   @test Nemo.inskewdiag(ξ, 1, 3) == true
-   @test Nemo.inskewdiag(ξ, 2, 3) == true
-   @test Nemo.inskewdiag(ξ, 2, 2) == false
-   @test Nemo.inskewdiag(ξ, 5, 2) == true
-   @test Nemo.inskewdiag(ξ, 6, 2) == false
+   @test Nemo.inskewdiag(xi, 1, 5) == true
+   @test Nemo.inskewdiag(xi, 1, 3) == true
+   @test Nemo.inskewdiag(xi, 2, 3) == true
+   @test Nemo.inskewdiag(xi, 2, 2) == false
+   @test Nemo.inskewdiag(xi, 5, 2) == true
+   @test Nemo.inskewdiag(xi, 6, 2) == false
 
-   @test Nemo.inskewdiag(ξ, 8, 9) == false
-   @test Nemo.inskewdiag(ξ, -1, 1) == false
-   @test Nemo.inskewdiag(ξ, 1, -1) == false
-   @test Nemo.inskewdiag(ξ, -1, -1) == false
+   @test Nemo.inskewdiag(xi, 8, 9) == false
+   @test Nemo.inskewdiag(xi, -1, 1) == false
+   @test Nemo.inskewdiag(xi, 1, -1) == false
+   @test Nemo.inskewdiag(xi, -1, -1) == false
 
    @test Nemo.inskewdiag(SkewDiagram([4,3,1], [2]), 1, 4) == true
 
    @test Nemo.matrix_repr(Partition([1], false)/Partition(Int[], false)) == ones(Int, 1,1)
-   @test Nemo.matrix_repr(ξ) == [(Nemo.inskewdiag(ξ, i,j)? 1:0) for i in 1:size(ξ.λ,1), j in 1:maximum(ξ.λ)]
+   @test Nemo.matrix_repr(xi) == [(Nemo.inskewdiag(xi, i,j)? 1:0) for i in 1:size(xi.lam,1), j in 1:maximum(xi.lam)]
 
-   @test Nemo.haslneigh(ξ, 1, 5) == true
-   @test Nemo.haslneigh(ξ, 1, 3) == false
-   @test Nemo.haslneigh(ξ, 2, 3) == false
-   @test Nemo.haslneigh(ξ, 3, 3) == false
-   @test Nemo.haslneigh(ξ, 4, 2) == true
-   @test Nemo.haslneigh(ξ, 5, 2) == true
-   @test Nemo.haslneigh(ξ, 6, 1) == false
-   @test Nemo.haslneigh(ξ, 7, 1) == false
+   @test Nemo.haslneigh(xi, 1, 5) == true
+   @test Nemo.haslneigh(xi, 1, 3) == false
+   @test Nemo.haslneigh(xi, 2, 3) == false
+   @test Nemo.haslneigh(xi, 3, 3) == false
+   @test Nemo.haslneigh(xi, 4, 2) == true
+   @test Nemo.haslneigh(xi, 5, 2) == true
+   @test Nemo.haslneigh(xi, 6, 1) == false
+   @test Nemo.haslneigh(xi, 7, 1) == false
 
-   @test Nemo.hasdneigh(ξ, 1, 5) == false
-   @test Nemo.hasdneigh(ξ, 1, 3) == true
-   @test Nemo.hasdneigh(ξ, 2, 3) == false
-   @test Nemo.hasdneigh(ξ, 3, 3) == false
-   @test Nemo.hasdneigh(ξ, 4, 2) == true
-   @test Nemo.hasdneigh(ξ, 5, 2) == false
-   @test Nemo.hasdneigh(ξ, 6, 1) == true
-   @test Nemo.hasdneigh(ξ, 7, 1) == false
+   @test Nemo.hasdneigh(xi, 1, 5) == false
+   @test Nemo.hasdneigh(xi, 1, 3) == true
+   @test Nemo.hasdneigh(xi, 2, 3) == false
+   @test Nemo.hasdneigh(xi, 3, 3) == false
+   @test Nemo.hasdneigh(xi, 4, 2) == true
+   @test Nemo.hasdneigh(xi, 5, 2) == false
+   @test Nemo.hasdneigh(xi, 6, 1) == true
+   @test Nemo.hasdneigh(xi, 7, 1) == false
    println("PASS")
 end
 
 function test_rimhooks()
    print("youngtabs.rimhooks...")
 
-   ξ = Partition([2,1])/Partition(Int[], false)
-   @test isrimhook(ξ) == true
+   xi = Partition([2,1])/Partition(Int[], false)
+   @test isrimhook(xi) == true
 
-   ξ = SkewDiagram([2,1], [1])
-   @test isrimhook(ξ) == false
+   xi = SkewDiagram([2,1], [1])
+   @test isrimhook(xi) == false
 
-   ξ = Partition([2,2])/Partition(Int[], false)
-   @test isrimhook(ξ) == false
+   xi = Partition([2,2])/Partition(Int[], false)
+   @test isrimhook(xi) == false
 
-   ξ = SkewDiagram([2,2], [1])
-   @test isrimhook(ξ) == true
+   xi = SkewDiagram([2,2], [1])
+   @test isrimhook(xi) == true
 
-   ξ = SkewDiagram([4,3,1], [2,2])
-   @test isrimhook(ξ) == false
+   xi = SkewDiagram([4,3,1], [2,2])
+   @test isrimhook(xi) == false
 
-   ξ = SkewDiagram([4,3,1], [2,1])
-   @test isrimhook(ξ) == false
+   xi = SkewDiagram([4,3,1], [2,1])
+   @test isrimhook(xi) == false
 
-   ξ = SkewDiagram([4,3,1], [1])
-   @test isrimhook(ξ) == false
+   xi = SkewDiagram([4,3,1], [1])
+   @test isrimhook(xi) == false
 
-   ξ = SkewDiagram([4,3,1], [2])
-   @test isrimhook(ξ) == true
+   xi = SkewDiagram([4,3,1], [2])
+   @test isrimhook(xi) == true
 
    println("PASS")
 end
