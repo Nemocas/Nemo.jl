@@ -166,6 +166,8 @@ function test_characters()
    G = PermutationGroup(N)
    @test all(character(p)(G()) == dim(YoungTableau(p)) for p=IntPartitions(N))
 
+   @test character(Partition([2,2,2,2]), Partition([8])) == 0
+
    N = 3
    G = PermutationGroup(N)
    ps = Partition.([[1,1,1], [2,1], [3]])
