@@ -312,11 +312,11 @@ function hooklength(Y::YoungTableau, i, j)
 end
 
 doc"""
-    dimension(Y::YoungTableau)
+    dim(Y::YoungTableau)
 > Returns the dimension of the irreducible representation of
 > `PermutationGroup(sum(Y))` associated to `Y`.
 """
-function dimension(Y::YoungTableau)
+function dim(Y::YoungTableau)
    n, m = size(Y)
    num = factorial(maximum(Y))
    den = reduce(*, 1, hooklength(Y,i,j) for i in 1:n, j in 1:m if j <= Y.part[i])
@@ -401,7 +401,11 @@ function inskewdiag(ξ::SkewDiagram, i::Int, j::Int)
    end
 end
 
-function hasleftneighbour(ξ::SkewDiagram, i::Int, j::Int)
+doc"""
+    haslneigh(ξ::SkewDiagram, i::Int, j::Int)
+> Checks if box at position `(i,j)` has neighbour in `ξ` to the left.
+"""
+function haslneigh(ξ::SkewDiagram, i::Int, j::Int)
    if j == 1
       return false
    else
@@ -409,7 +413,11 @@ function hasleftneighbour(ξ::SkewDiagram, i::Int, j::Int)
    end
 end
 
-function hasdownneighbour(ξ::SkewDiagram, i::Int, j::Int)
+doc"""
+    hasdneig(ξ::SkewDiagram, i::Int, j::Int)
+> Checks if box at position `(i,j)` has neighbour in `ξ` below.
+"""
+function hasdneigh(ξ::SkewDiagram, i::Int, j::Int)
    if i == length(ξ.λ)
       return false
    else
@@ -426,8 +434,8 @@ function isrimhook(ξ::SkewDiagram)
    i = 1
    j = ξ.λ[1]
    while i ≠ length(ξ.λ) && j ≠ 1
-      left = hasleftneighbour(ξ, i,j)
-      down = hasdownneighbour(ξ, i,j)
+      left = haslneigh(ξ, i,j)
+      down = hasdneigh(ξ, i,j)
       if left && down # there is 2×2 square in ξ
          return false
       elseif left
