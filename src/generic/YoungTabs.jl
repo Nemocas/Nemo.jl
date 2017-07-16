@@ -25,7 +25,7 @@ end
 
 length(p::Partition) = length(p.part)
 size(p::Partition) = size(p.part)
-linearindexing{T<:Partition}(::Type{T}) = Base.LinearFast()
+Base.linearindexing{T<:Partition}(::Type{T}) = Base.LinearFast()
 getindex(p::Partition, i::Int) = p.part[i]
 function setindex!(p::Partition, v::Int, i::Int)
    prev = Inf
@@ -100,7 +100,7 @@ immutable IntPartitions
     n::Int
 end
 
-function start(parts::IntPartitions)
+function Base.start(parts::IntPartitions)
     if parts.n < 1
         return (Int[], 0)
     elseif parts.n == 1
@@ -111,6 +111,11 @@ function start(parts::IntPartitions)
         return (p, 2)
     end
 end
+
+Base.next(parts::IntPartitions, state) = nextpart_asc(state...)
+Base.done(parts::IntPartitions, state) = state[2] == 1
+Base.eltype(::Type{IntPartitions}) = Partition
+length(parts::IntPartitions) = noPartitions(parts.n)
 
 function nextpart_asc(part, k)
     if k == 0
@@ -127,11 +132,6 @@ function nextpart_asc(part, k)
     part[k] = x + y
     return Partition(reverse(part[1:k]), false), (part, k)
 end
-
-next(parts::IntPartitions, state) = nextpart_asc(state...)
-done(parts::IntPartitions, state) = state[2] == 1
-eltype(::Type{IntPartitions}) = Partition
-length(parts::IntPartitions) = noPartitions(parts.n)
 
 doc"""
     conj(part::Partition)
@@ -270,7 +270,7 @@ end
 YoungTableau(p::Vector{Int}) = YoungTableau(Partition(p))
 
 size(Y::YoungTableau) = size(Y.tab)
-linearindexing{T<:YoungTableau}(::Type{T}) = Base.LinearFast()
+Base.linearindexing{T<:YoungTableau}(::Type{T}) = Base.LinearFast()
 getindex(Y::YoungTableau, i::Int) = Y.tab[i]
 
 function ==(Y1::YoungTableau,Y2::YoungTableau)
