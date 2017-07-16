@@ -461,7 +461,7 @@ function leglength(xi::SkewDiagram, check=true)
    end
    m = zeros(length(xi.lam))
    m[1:length(xi.mu)] = xi.mu
-   return sum((xi.lam .- m) .> 0)
+   return sum((xi.lam .- m) .> 0) - 1
 end
 
 export Partition, IntPartitions, YoungTableau, SkewDiagram
