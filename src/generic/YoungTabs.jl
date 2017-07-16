@@ -132,3 +132,47 @@ next(parts::IntPartitions, state) = nextpart_asc(state...)
 done(parts::IntPartitions, state) = state[2] == 1
 eltype(::Type{IntPartitions}) = Partition
 length(parts::IntPartitions) = noPartitions(parts.n)
+
+##############################################################################
+#
+#   YoungTableau type, AbstractVector interface
+#
+##############################################################################
+
+doc"""
+    YoungTableau(part::Partition, fill::Vector{Int}=collect(1:sum(part)))
+> Returns the Young tableaux of partition `part`, filled linearly (row-major)
+> by `fill` vector.
+"""
+immutable YoungTableau <: AbstractArray{Int, 2}
+   n::Int
+   part::Partition
+   tab::Array{Int,2}
+end
+
+function YoungTableau(part::Partition, fill=collect(1:sum(part)))
+   sum(part) == length(fill) || throw("Can't fill Young digaram of $part with $fill: different number of elemnets.")
+   n = sum(part)
+   tab = zeros(Int, length(part), maximum(part))
+   k=1
+   for (idx, p) in enumerate(part)
+      tab[idx, 1:p] = fill[k:k+p-1]
+      k += p
+   end
+   return YoungTableau(n, part, tab)
+end
+
+YoungTableau(p::Vector{Int}) = YoungTableau(Partition(p))
+
+size(Y::YoungTableau) = size(Y.tab)
+linearindexing{T<:YoungTableau}(::Type{T}) = Base.LinearFast()
+getindex(Y::YoungTableau, i::Int) = Y.tab[i]
+
+function ==(Y1::YoungTableau,Y2::YoungTableau)
+   Y1.n == Y2.n || return false
+   Y1.part == Y2.part || return false
+   Y1.tab == Y2.tab || return false
+   return true
+end
+
+hash(Y::YoungTableau, h::UInt) = hash(Y.n, hash(Y.part, hash(Y.tab, hash(YoungTableau, h))))
