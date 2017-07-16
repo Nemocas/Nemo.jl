@@ -133,6 +133,21 @@ done(parts::IntPartitions, state) = state[2] == 1
 eltype(::Type{IntPartitions}) = Partition
 length(parts::IntPartitions) = noPartitions(parts.n)
 
+doc"""
+    conj(part::Partition)
+> Returns the conjugated partition of `part`, i.e. the partition corresponding
+> to the Young tableau of `part` reflected through the main diagonal.
+"""
+function conj(part::Partition)
+    p = Int[]
+    for i in 1:sum(part)
+        n = sum(part .>= i)
+        n == 0 && break
+        push!(p, n)
+    end
+    return Partition(p, false)
+end
+
 ##############################################################################
 #
 #   YoungTableau type, AbstractVector interface
@@ -176,3 +191,10 @@ function ==(Y1::YoungTableau,Y2::YoungTableau)
 end
 
 hash(Y::YoungTableau, h::UInt) = hash(Y.n, hash(Y.part, hash(Y.tab, hash(YoungTableau, h))))
+
+doc"""
+    conj(Y::YoungTableau)
+> Returns the conjugated tableau, i.e. the tableau reflected through the main
+> diagonal.
+"""
+conj(Y::YoungTableau) = YoungTableau(Y.n, conj(Y.part), transpose(Y.tab))
