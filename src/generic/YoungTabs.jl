@@ -82,7 +82,7 @@ end
 Base.next(parts::IntPartitions, state) = nextpart_asc(state...)
 Base.done(parts::IntPartitions, state) = state[2] == 1
 Base.eltype(::Type{IntPartitions}) = Partition
-length(parts::IntPartitions) = numpart(parts.n)
+length(parts::IntPartitions) = BigInt(numpart(parts.n))
 
 function nextpart_asc(part, k)
     if k == 0
