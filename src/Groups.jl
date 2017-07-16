@@ -4,6 +4,8 @@
 #
 ###############################################################################
 
+include("generic/YoungTabs.jl")
+
 include("generic/PermGroups.jl")
 
 include("Rings.jl")
