@@ -232,3 +232,36 @@ function dimension(Y::YoungTableau)
    den = reduce(*, 1, hooklength(Y,i,j) for i in 1:n, j in 1:m if j <= Y.part[i])
    return Int(num/den)
 end
+
+
+##############################################################################
+#
+#   SkewDiagrams
+#
+##############################################################################
+
+doc"""
+    SkewDiagram(λ::Partition, μ::Partition)
+> Implements a skew diagram, i.e. a difference of two Young diagrams
+> represented by partitions `λ` and `μ`.
+"""
+immutable SkewDiagram
+   λ::Partition
+   μ::Partition
+
+   function SkewDiagram(λ, μ)
+      sum(λ) >= sum(μ) || throw("Can't create SkewDiagram: μ is partition of  $(sum(μ)) > $(sum(λ)).")
+      length(λ) >= length(μ) || throw("Can't create SkewDiagram: $μ is longer than $(λ)!")
+      for (l,m) in zip(λ, μ)
+         l >= m || throw("a row of $μ is longer than a row of $λ")
+      end
+      return new(λ, μ)
+   end
+end
+
+SkewDiagram(λ::Vector{Int}, μ::Vector{Int}) = SkewDiagram(Partition(λ), Partition(μ))
+
+/(λ::Partition, μ::Partition) = SkewDiagram(λ, μ)
+
+==(ξ::SkewDiagram, ψ::SkewDiagram) = ξ.λ == ψ.λ && ξ.μ == ψ.μ
+hash(ξ::SkewDiagram, h::UInt) = hash(ξ.λ, hash(ξ.μ, hash(SkewDiagram, h)))
