@@ -66,24 +66,6 @@ function test_youngtabs()
    println("PASS")
 end
 
-function test_auts()
-   print("youngtabs.automorphisms...")
-
-   lambda = [4,3,1]
-   Y = YoungTableau(lambda)
-
-   @test length(colauts(Y)) == 4
-   @test length(rowauts(Y)) == 3
-   @test length(colauts(Y)[1]) == 6
-   @test length(rowauts(Y)[1]) == 24
-
-   @test length(automorphisms(Y, :rows)) == 144
-   @test length(automorphisms(Y, :columns)) == 24
-
-   println("PASS")
-end
-
-
 function test_skewdiags()
    print("youngtabs.skewdiags...")
 
@@ -196,7 +178,6 @@ function test_ytabs()
    test_partition_type()
    test_intpartitions()
    test_youngtabs()
-   # test_auts()
    test_skewdiags()
    test_rimhooks()
    test_partitionseqs()
