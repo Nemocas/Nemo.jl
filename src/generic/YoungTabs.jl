@@ -150,6 +150,96 @@ end
 
 ##############################################################################
 #
+#   Partition sequences and Murnaghan-Nakayama formula
+#
+##############################################################################
+
+doc"""
+    partitionseq(λ::Partition)
+> Returns a sequence (as `BitVector`) of `false`s and `trues`s constructed from
+> `λ`: tracing the lower contour of the Young Diagram associated to `λ` from
+> left to right a `true` is inserted for every horizontal and `false` for every
+> vertical step. The sequence always starts with `true` and ends with `false`.
+"""
+function partitionseq(λ::Partition)
+   seq = trues(maximum(λ) + length(λ))
+   j = λ[end]
+   for i in (length(λ)-1):-1:1
+      seq[j+1] = false
+      j += λ[i] - λ[i+1] + 1
+   end
+   seq[j+1] = false
+   return seq
+end
+
+partitionseq(v::Vector{Int}) = partitionseq(Partition(v))
+
+doc"""
+    partitionseq(seq::BitVector)
+> Returns the essential part of the sequence `seq`, i.e. a subsequence starting
+> at first `true` and ending at last `false`.
+"""
+partitionseq(seq::BitVector) = seq[findfirst(seq, true):findlast(seq, false)]
+
+doc"""
+    isrimhook(R::BitVector, idx::Int, len::Int)
+> `R[idx:idx+len]` forms a rim hook in the Young Diagram of parition
+> corresponding to `R` iff `R[idx] == true` and `R[idx+len] == false`.
+"""
+function isrimhook(R::BitVector, idx::Int, len::Int)
+   return (R[idx+len] == false) && (R[idx] == true)
+end
+
+const _charvalsTable = Dict{Tuple{BitVector,Vector{Int}}, Int}()
+
+doc"""
+    MN1inner(R::BitVector, μ::Partition, t::Int, [charvals])
+> Returns the value of `λ`-th irreducible character on conjugacy class of
+> permutations represented by partition `μ`, where `R` is the (binary)
+> partition sequence representing `λ`. Values already computed are stored in
+> `charvals::Dict{Tuple{BitVector,Vector{Int}}, Int}`.
+> This is an implementation (with slight modifications) of the
+> Murnaghan-Nakayama formula as described in
+>
+>     Dan Bernstein,
+>     "The computational complexity of rules for the character table of Sn"
+>     _Journal of Symbolic Computation_, 37(6), 2004, p. 727-748.
+"""
+function MN1inner(R::BitVector, μ::Partition, t::Int,
+        charvals=Dict{Tuple{BitVector,Vector{Int}}, Int}())
+    if t > length(μ)
+        chi = 1
+    elseif μ[t] > length(R)
+        chi = 0
+    else
+        chi = 0
+        sgn = false
+
+        for j in 1:μ[t]-1
+            if R[j] == false
+                sgn = !sgn
+            end
+        end
+        for i in 1:length(R)-μ[t]
+            if R[i] != R[i+μ[t]-1]
+                sgn = !sgn
+            end
+            if isrimhook(R, i, μ[t])
+                R[i], R[i+μ[t]] = R[i+μ[t]], R[i]
+                essR = (partitionseq(R), μ[t+1:end])
+                if !haskey(charvals, essR)
+                    charvals[essR] = MN1inner(R, μ, t+1, charvals)
+                end
+                chi += (-1)^Int(sgn)*charvals[essR]
+                R[i], R[i+μ[t]] = R[i+μ[t]], R[i]
+            end
+        end
+    end
+    return chi
+end
+
+##############################################################################
+#
 #   YoungTableau type, AbstractVector interface
 #
 ##############################################################################
