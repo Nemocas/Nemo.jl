@@ -288,3 +288,80 @@ function matrix_repr(ξ::SkewDiagram)
 end
 
 show(io::IO, ξ::SkewDiagram) = show(io, MIME("text/plain"), matrix_repr(ξ))
+
+##############################################################################
+#
+#   Misc functions for SkewDiagrams
+#
+##############################################################################
+
+doc"""
+    inskewdiag(ξ::SkewDiagram, i::Int, j::Int)
+> Checks if box at position `(i,j)` belongs to the skew diagram `ξ`.
+"""
+function inskewdiag(ξ::SkewDiagram, i::Int, j::Int)
+   if i <= 0 || j <= 0
+      return false
+   elseif i > length(ξ.λ) || j > maximum(ξ.λ)
+      return false
+   elseif length(ξ.μ) >= i
+      return ξ.μ[i] < j ≤ ξ.λ[i]
+   else
+      return j ≤ ξ.λ[i]
+   end
+end
+
+function hasleftneighbour(ξ::SkewDiagram, i::Int, j::Int)
+   if j == 1
+      return false
+   else
+      return inskewdiag(ξ, i, j) && inskewdiag(ξ, i, j-1)
+   end
+end
+
+function hasdownneighbour(ξ::SkewDiagram, i::Int, j::Int)
+   if i == length(ξ.λ)
+      return false
+   else
+      return inskewdiag(ξ, i, j) && inskewdiag(ξ, i+1, j)
+   end
+end
+
+doc"""
+    isrimhook(ξ::SkewDiagram)
+> Checks if `ξ` represents a rim-hook diagram, i.e. its diagram is
+> edge-connected and contains no $2\times 2$ squares.
+"""
+function isrimhook(ξ::SkewDiagram)
+   i = 1
+   j = ξ.λ[1]
+   while i ≠ length(ξ.λ) && j ≠ 1
+      left = hasleftneighbour(ξ, i,j)
+      down = hasdownneighbour(ξ, i,j)
+      if left && down # there is 2×2 square in ξ
+         return false
+      elseif left
+         j -= 1
+      elseif down
+         i += 1
+      else # ξ is disconnected
+         return false
+      end
+   end
+   return true
+end
+
+doc"""
+    leglength(ξ::SkewDiagram, check=true)
+> Computes the leglength of a rim-hook `ξ`, i.e. the number of rows with
+> non-zero entries minus one. If `check` is `false` function will not check
+> whether `ξ` is actually a rim-hook.
+"""
+function leglength(ξ::SkewDiagram, check=true)
+   if check
+      isrimhook(ξ) || throw("$ξ is not a rimhook. leglength is defined only for rim hooks")
+   end
+   m = zeros(length(ξ.λ))
+   m[1:length(ξ.μ)] = ξ.μ
+   return sum((ξ.λ .- m) .> 0)
+end
