@@ -414,7 +414,7 @@ function haslneigh(xi::SkewDiagram, i::Int, j::Int)
 end
 
 doc"""
-    hasdneig(xi::SkewDiagram, i::Int, j::Int)
+    hasdneigh(xi::SkewDiagram, i::Int, j::Int)
 > Checks if box at position `(i,j)` has neighbour in `xi` below.
 """
 function hasdneigh(xi::SkewDiagram, i::Int, j::Int)

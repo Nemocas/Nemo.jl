@@ -397,7 +397,7 @@ order(a::perm) = lcm([length(c) for c in cycles(a)])
 doc"""
     permtype(a::perm, rev=true)
 > Returns the type of permutation `a`, i.e. lengths of disjoint cycles building
-> `a`. This fully determines conjugacy class of `a`. the lengths are sorted in
+> `a`. This fully determines conjugacy class of `a`. The lengths are sorted in
 > reverse order by default.
 """
 permtype(a::perm) = sort([length(c) for c in cycles(a)], rev=true)
