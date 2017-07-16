@@ -463,3 +463,6 @@ function leglength(ξ::SkewDiagram, check=true)
    m[1:length(ξ.μ)] = ξ.μ
    return sum((ξ.λ .- m) .> 0)
 end
+
+export Partition, IntPartitions, YoungTableau, SkewDiagram
+export dim, noPartitions, isrimhook, hooklength, leglength
