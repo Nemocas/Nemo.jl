@@ -1,4 +1,4 @@
-include("generic/perm-test.jl")
+include("generic/Perm-test.jl")
 
 function test_groups()
    test_perm()
