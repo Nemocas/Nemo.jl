@@ -197,8 +197,7 @@ function *(a::perm, b::perm)
    for i in 1:length(d)
       d[i] = a[b[i]]
    end
-   G = parent(a)
-   return G(d)
+   return parent(a)(d, false)
 end
 
 doc"""
@@ -231,7 +230,7 @@ function ^(a::perm, n::Int)
             new_perm[j] = shifted[idx]
          end
       end
-      return parent(a)(new_perm)
+      return parent(a)(new_perm, false)
    end
 end
 
@@ -262,7 +261,7 @@ function power_by_squaring(a::perm, b::Int)
          end
          bit >>= 1
       end
-      return parent(a)(cache1)
+      return parent(a)(cache1, false)
    end
 end
 
@@ -283,7 +282,7 @@ function inv(a::perm)
       d[a[i]] = i
    end
    G = parent(a)
-   return G(d)
+   return G(d, false)
 end
 
 # TODO: can we do that in place??
@@ -345,7 +344,7 @@ doc"""
 > Returns an iterator over all elements in the group $G$. You may use
 > `collect(elements(G))` to get an array of all elements.
 """
-elements(G::PermGroup) = (G(p) for p in AllPerms(G.n))
+elements(G::PermGroup) = (G(p, false) for p in AllPerms(G.n))
 
 ###############################################################################
 #
