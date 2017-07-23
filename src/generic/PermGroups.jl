@@ -520,7 +520,7 @@ function character(lambda::Partition, p::perm, check=true)
       sum(lambda) == length(p.d) || throw("lambda-th irreducible character can be evaluated only on permutations of length $(sum(lambda)).")
    end
 
-   return MN1inner(partitionseq(lambda), permtype(p), 1, _charvalsTable)
+   return MN1inner(partitionseq(lambda), Partition(permtype(p)), 1, _charvalsTable)
 end
 
 doc"""
