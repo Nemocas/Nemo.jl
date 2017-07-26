@@ -213,6 +213,10 @@ function test_characters()
    l = Partition([5])
    @test [character(l, m) for m in ps] == [   1,   1,   1,   1,   1,   1,   1 ]
 
+   # test for overflow
+   p = Partition(collect(10:-1:1))
+   @test character(p, PermutationGroup(55)()) == 44261486084874072183645699204710400
+
    println("PASS")
 end
 
