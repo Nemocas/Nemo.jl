@@ -157,7 +157,7 @@ function isrimhook(R::BitVector, idx::Int, len::Int)
    return (R[idx+len] == false) && (R[idx] == true)
 end
 
-const _charvalsTable = Dict{Tuple{BitVector,Vector{Int}}, Int}()
+const _charvalsTable = Dict{Tuple{BitVector,Vector{Int}}, fmpz}()
 
 doc"""
     MN1inner(R::BitVector, mu::Partition, t::Int, [charvals])
@@ -173,7 +173,7 @@ doc"""
 >     _Journal of Symbolic Computation_, 37(6), 2004, p. 727-748.
 """
 function MN1inner(R::BitVector, mu::Partition, t::Int,
-        charvals=Dict{Tuple{BitVector,Vector{Int}}, Int}())
+        charvals=Dict{Tuple{BitVector,Vector{Int}}, fmpz}())
     if t > length(mu)
         chi = 1
     elseif mu[t] > length(R)
