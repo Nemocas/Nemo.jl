@@ -165,7 +165,6 @@ end
 
 function test_ytabs()
    test_partition_type()
-   # test_intpartitions()
    test_youngtabs()
    test_skewdiags()
    test_rimhooks()
