@@ -123,10 +123,11 @@ end
 
 doc"""
     partitionseq(lambda::Partition)
-> Returns a sequence (as `BitVector`) of `false`s and `trues`s constructed from
-> `lambda`: tracing the lower contour of the Young Diagram associated to `lambda` from
-> left to right a `true` is inserted for every horizontal and `false` for every
-> vertical step. The sequence always starts with `true` and ends with `false`.
+> Returns a sequence (as `BitVector`) of `false`s and `true`s constructed from
+> `lambda`: tracing the lower contour of the Young Diagram associated to
+> `lambda` from left to right a `true` is inserted for every horizontal and
+> `false` for every vertical step. The sequence always starts with `true` and
+> ends with `false`.
 """
 function partitionseq(lambda::Partition)
    seq = trues(maximum(lambda) + length(lambda))
@@ -163,8 +164,8 @@ doc"""
     MN1inner(R::BitVector, mu::Partition, t::Int, [charvals])
 > Returns the value of $\lambda$-th irreducible character on conjugacy class of
 > permutations represented by partition `mu`, where `R` is the (binary)
-> partition sequence representing $\lambda$. Values already computed are stored in
-> `charvals::Dict{Tuple{BitVector,Vector{Int}}, Int}`.
+> partition sequence representing $\lambda$. Values already computed are stored
+> in `charvals::Dict{Tuple{BitVector,Vector{Int}}, Int}`.
 > This is an implementation (with slight modifications) of the
 > Murnaghan-Nakayama formula as described in
 >
