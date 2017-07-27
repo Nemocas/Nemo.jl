@@ -164,7 +164,7 @@ function test_characters()
 
    N = 8
    G = PermutationGroup(N)
-   @test all(character(p)(G()) == dim(YoungTableau(p)) for p=IntPartitions(N))
+   @test all(character(p)(G()) == dim(YoungTableau(p)) for p=Partitions(N))
 
    @test character(Partition([2,2,2,2]), Partition([8])) == 0
 
@@ -194,7 +194,7 @@ function test_characters()
 
    # values taken from GAP; note that we specify the order of partitions to be
    # compatible with GAP numbering of conjugacy classes. This is NOT the order
-   # of partitions given by IntPartitions.
+   # of partitions given by Partitions.
    N = 5
    G = PermutationGroup(N)
    ps = Partition.([[1,1,1,1,1], [2,1,1,1], [2,2,1], [3,1,1], [3,2], [4,1], [5]])
