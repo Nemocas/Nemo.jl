@@ -410,8 +410,16 @@ function isrimhook(xi::SkewDiagram)
          j -= 1
       elseif bottom
          i += 1
-      else # xi is disconnected
-         return false
+      else
+         lam_tail = xi.lam[i+1:end]
+         mu_tail = zeros(Int, length(lam_tail))
+         mu_tail[1:length(xi.mu)-i] = xi.mu[i+1:end]
+
+         if any(lam_tail .- mu_tail .> 0)
+            return false # xi is disconnected
+         else
+            return true # we arrived at the end of xi
+         end
       end
    end
    return true

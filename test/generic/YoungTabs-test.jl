@@ -105,6 +105,10 @@ function test_skewdiags()
    @test Nemo.hasdneigh(xi, 5, 2) == false
    @test Nemo.hasdneigh(xi, 6, 1) == true
    @test Nemo.hasdneigh(xi, 7, 1) == false
+
+   xi = Partition([4,3,2,1])/Partition([2,2,2,1])
+   @test isrimhook(xi) == true
+
    println("PASS")
 end
 
