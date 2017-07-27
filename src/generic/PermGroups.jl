@@ -504,8 +504,7 @@ function character(lambda::Partition)
       if check
          length(p.d) == sum(lambda) || throw("Can't evaluate character on $p : lengths differ.")
       end
-      mu = Partition(permtype(p))
-      return MN1inner(R, Partition(mu), 1, _charvalsTable)
+      return MN1inner(R, Partition(permtype(p)), 1, _charvalsTable)
    end
 
    return char
