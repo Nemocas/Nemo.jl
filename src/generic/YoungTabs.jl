@@ -59,15 +59,15 @@ convert(::Type{Partition}, p::Vector{Int}) = Partition(p)
 # by Jerome Kelleher and Barry O’Sullivan, ArXiv:0909.2331
 
 doc"""
-   IntPartitions(n::Int)
+   Partitions(n::Int)
 > Returns an iterator over all integer `Partition`s of `n`. They come in
 > ascending order. See also `Combinatorics.partitions(n)`.
 """
-immutable IntPartitions
+immutable Partitions
     n::Int
 end
 
-function Base.start(parts::IntPartitions)
+function Base.start(parts::Partitions)
     if parts.n < 1
         return (Int[], 0)
     elseif parts.n == 1
@@ -79,10 +79,10 @@ function Base.start(parts::IntPartitions)
     end
 end
 
-Base.next(parts::IntPartitions, state) = nextpart_asc(state...)
-Base.done(parts::IntPartitions, state) = state[2] == 1
-Base.eltype(::Type{IntPartitions}) = Partition
-length(parts::IntPartitions) = BigInt(numpart(parts.n))
+Base.next(parts::Partitions, state) = nextpart_asc(state...)
+Base.done(parts::Partitions, state) = state[2] == 1
+Base.eltype(::Type{Partitions}) = Partition
+length(parts::Partitions) = BigInt(numpart(parts.n))
 
 function nextpart_asc(part, k)
     if k == 0
@@ -431,5 +431,5 @@ function leglength(xi::SkewDiagram, check=true)
    return sum((xi.lam .- m) .> 0) - 1
 end
 
-export Partition, IntPartitions, YoungTableau, SkewDiagram
+export Partition, Partitions, YoungTableau, SkewDiagram
 export dim, noPartitions, isrimhook, hooklength, leglength
