@@ -88,23 +88,23 @@ function test_skewdiags()
    @test Nemo.matrix_repr(Partition([1], false)/Partition(Int[], false)) == ones(Int, 1,1)
    @test Nemo.matrix_repr(xi) == [(Nemo.inskewdiag(xi, i,j)? 1:0) for i in 1:size(xi.lam,1), j in 1:maximum(xi.lam)]
 
-   @test Nemo.haslneigh(xi, 1, 5) == true
-   @test Nemo.haslneigh(xi, 1, 3) == false
-   @test Nemo.haslneigh(xi, 2, 3) == false
-   @test Nemo.haslneigh(xi, 3, 3) == false
-   @test Nemo.haslneigh(xi, 4, 2) == true
-   @test Nemo.haslneigh(xi, 5, 2) == true
-   @test Nemo.haslneigh(xi, 6, 1) == false
-   @test Nemo.haslneigh(xi, 7, 1) == false
+   @test Nemo.has_left_neighbor(xi, 1, 5) == true
+   @test Nemo.has_left_neighbor(xi, 1, 3) == false
+   @test Nemo.has_left_neighbor(xi, 2, 3) == false
+   @test Nemo.has_left_neighbor(xi, 3, 3) == false
+   @test Nemo.has_left_neighbor(xi, 4, 2) == true
+   @test Nemo.has_left_neighbor(xi, 5, 2) == true
+   @test Nemo.has_left_neighbor(xi, 6, 1) == false
+   @test Nemo.has_left_neighbor(xi, 7, 1) == false
 
-   @test Nemo.hasdneigh(xi, 1, 5) == false
-   @test Nemo.hasdneigh(xi, 1, 3) == true
-   @test Nemo.hasdneigh(xi, 2, 3) == false
-   @test Nemo.hasdneigh(xi, 3, 3) == false
-   @test Nemo.hasdneigh(xi, 4, 2) == true
-   @test Nemo.hasdneigh(xi, 5, 2) == false
-   @test Nemo.hasdneigh(xi, 6, 1) == true
-   @test Nemo.hasdneigh(xi, 7, 1) == false
+   @test Nemo.has_bottom_neighbor(xi, 1, 5) == false
+   @test Nemo.has_bottom_neighbor(xi, 1, 3) == true
+   @test Nemo.has_bottom_neighbor(xi, 2, 3) == false
+   @test Nemo.has_bottom_neighbor(xi, 3, 3) == false
+   @test Nemo.has_bottom_neighbor(xi, 4, 2) == true
+   @test Nemo.has_bottom_neighbor(xi, 5, 2) == false
+   @test Nemo.has_bottom_neighbor(xi, 6, 1) == true
+   @test Nemo.has_bottom_neighbor(xi, 7, 1) == false
 
    xi = Partition([4,3,2,1])/Partition([2,2,2,1])
    @test isrimhook(xi) == true
