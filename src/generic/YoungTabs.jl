@@ -370,10 +370,10 @@ function inskewdiag(xi::SkewDiagram, i::Int, j::Int)
 end
 
 doc"""
-    haslneigh(xi::SkewDiagram, i::Int, j::Int)
+    has_left_neighbor(xi::SkewDiagram, i::Int, j::Int)
 > Checks if box at position `(i,j)` has neighbour in `xi` to the left.
 """
-function haslneigh(xi::SkewDiagram, i::Int, j::Int)
+function has_left_neighbor(xi::SkewDiagram, i::Int, j::Int)
    if j == 1
       return false
    else
@@ -382,10 +382,10 @@ function haslneigh(xi::SkewDiagram, i::Int, j::Int)
 end
 
 doc"""
-    hasdneigh(xi::SkewDiagram, i::Int, j::Int)
+    has_bottom_neighbor(xi::SkewDiagram, i::Int, j::Int)
 > Checks if box at position `(i,j)` has neighbour in `xi` below.
 """
-function hasdneigh(xi::SkewDiagram, i::Int, j::Int)
+function has_bottom_neighbor(xi::SkewDiagram, i::Int, j::Int)
    if i == length(xi.lam)
       return false
    else
@@ -401,14 +401,14 @@ doc"""
 function isrimhook(xi::SkewDiagram)
    i = 1
    j = xi.lam[1]
-   while i ≠ length(xi.lam) && j ≠ 1
-      left = haslneigh(xi, i,j)
-      down = hasdneigh(xi, i,j)
-      if left && down # there is 2×2 square in xi
+   while i != length(xi.lam) && j != 1
+      left = has_left_neighbor(xi, i,j)
+      bottom = has_bottom_neighbor(xi, i,j)
+      if left && bottom # there is 2×2 square in xi
          return false
       elseif left
          j -= 1
-      elseif down
+      elseif bottom
          i += 1
       else # xi is disconnected
          return false
