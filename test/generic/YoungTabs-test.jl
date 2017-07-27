@@ -46,6 +46,8 @@ function test_youngtabs()
 
    @test dim(YoungTableau([4])) == 1
 
+   @test dim(YoungTableau(collect(10:-1:1))) == 44261486084874072183645699204710400
+
    println("PASS")
 end
 
