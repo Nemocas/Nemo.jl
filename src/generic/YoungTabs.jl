@@ -9,7 +9,7 @@ doc"""
 > Partition represents integer partition into numbers in non-increasing order.
 > It is a thin wrapper over `Vector{Int}`
 """
-immutable Partition <: AbstractVector{Int}
+type Partition <: AbstractVector{Int}
    n::Int
    part::Vector{Int}
 
@@ -40,6 +40,7 @@ function setindex!(p::Partition, v::Int, i::Int)
       nex = p[i+1]
    end
    nex <= v <= prev || throw("Partition must be positive and non-increasing")
+   p.n += v - p.part[i]
    p.part[i] = v
    return p
 end
