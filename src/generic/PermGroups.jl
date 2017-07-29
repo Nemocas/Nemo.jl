@@ -480,8 +480,8 @@ end
 doc"""
     character(lambda::Partition)
 > Returns the $\lambda$-th irreducible character of permutation group on
-> `sum(lambda)` generators. The returned character function
 >     `chi(p::perm, check=true)`
+> `lambda.n` generators. The returned character function
 > can be evaluated on a permutation `p::perm`. Checking in $\chi$ if `p`
 > belongs to the appropriate group can be switched off by calling
 > `chi(p, false)`. The values computed by $\chi$ are stored in look-up table.
@@ -502,7 +502,7 @@ function character(lambda::Partition)
 
    function char(p::perm, check=true)
       if check
-         length(p.d) == sum(lambda) || throw("Can't evaluate character on $p : lengths differ.")
+         lambda.n == length(p.d) || throw("Can't evaluate character on $p : lengths differ.")
       end
       return MN1inner(R, Partition(permtype(p)), 1, _charvalsTable)
    end
@@ -516,7 +516,7 @@ doc"""
 """
 function character(lambda::Partition, p::perm, check=true)
    if check
-      sum(lambda) == length(p.d) || throw("lambda-th irreducible character can be evaluated only on permutations of length $(sum(lambda)).")
+      lambda.n == length(p.d) || throw("lambda-th irreducible character can be evaluated only on permutations of length $(lambda.n).")
    end
 
    return MN1inner(partitionseq(lambda), Partition(permtype(p)), 1, _charvalsTable)

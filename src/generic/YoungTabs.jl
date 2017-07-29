@@ -10,6 +10,7 @@ doc"""
 > It is a thin wrapper over `Vector{Int}`
 """
 immutable Partition <: AbstractVector{Int}
+   n::Int
    part::Vector{Int}
 
    function Partition(part::Vector{Int}, check=true)
@@ -19,7 +20,7 @@ immutable Partition <: AbstractVector{Int}
             part[end] >=1 || throw("Found non-positive entry in partition!")
          end
       end
-      return new(part)
+      return new(sum(part), part)
    end
 end
 
@@ -43,7 +44,7 @@ function setindex!(p::Partition, v::Int, i::Int)
    return p
 end
 
-==(p::Partition, m::Partition) = p.part == m.part
+==(p::Partition, m::Partition) = p.n ==m.n && p.part == m.part
 hash(p::Partition, h::UInt) = hash(p.part, hash(Partition, h))
 
 convert(::Type{Partition}, p::Vector{Int}) = Partition(p)
@@ -107,7 +108,7 @@ doc"""
 """
 function conj(part::Partition)
     p = Int[]
-    for i in 1:sum(part)
+    for i in 1:part.n
         n = sum(part .>= i)
         n == 0 && break
         push!(p, n)
@@ -213,9 +214,9 @@ end
 ##############################################################################
 
 doc"""
-    YoungTableau(part::Partition, fill::Vector{Int}=collect(1:sum(part)))
-> Returns the Young tableaux of partition `part`, filled linearly (row-major)
-> by `fill` vector.
+    YoungTableau(part::Partition, fill::Vector{Int}=collect(1:n))
+> Returns the Young tableaux of partition `part` of `n`, filled linearly
+> (row-major) by `fill` vector.
 """
 immutable YoungTableau <: AbstractArray{Int, 2}
    n::Int
@@ -223,16 +224,15 @@ immutable YoungTableau <: AbstractArray{Int, 2}
    tab::Array{Int,2}
 end
 
-function YoungTableau(part::Partition, fill=collect(1:sum(part)))
-   sum(part) == length(fill) || throw("Can't fill Young digaram of $part with $fill: different number of elemnets.")
-   n = sum(part)
+function YoungTableau(part::Partition, fill::Vector{Int}=collect(1:part.n))
+   part.n == length(fill) || throw("Can't fill Young digaram of $part with $fill: different number of elemnets.")
    tab = zeros(Int, length(part), maximum(part))
    k=1
    for (idx, p) in enumerate(part)
       tab[idx, 1:p] = fill[k:k+p-1]
       k += p
    end
-   return YoungTableau(n, part, tab)
+   return YoungTableau(part.n, part, tab)
 end
 
 YoungTableau(p::Vector{Int}) = YoungTableau(Partition(p))
@@ -282,7 +282,7 @@ end
 doc"""
     dim(Y::YoungTableau)
 > Returns the dimension of the irreducible representation of
-> `PermutationGroup(sum(Y))` associated to `Y`.
+> `PermutationGroup(n)` associated to YoungTableau `Y` of a partition of `n`.
 """
 function dim(Y::YoungTableau)
    n, m = size(Y)
@@ -307,7 +307,7 @@ immutable SkewDiagram
    mu::Partition
 
    function SkewDiagram(lambda, mu)
-      sum(lambda) >= sum(mu) || throw("Can't create SkewDiagram: $mu is partition of  $(sum(mu)) > $(sum(lambda)).")
+      lambda.n >= mu.n || throw("Can't create SkewDiagram: $mu is partition of  $(mu.n) > $(lambda.n).")
       length(lambda) >= length(mu) || throw("Can't create SkewDiagram: $mu is longer than $(lambda)!")
       for (l, m) in zip(lambda, mu)
          l >= m || throw("a row of $mu is longer than a row of $lambda")
