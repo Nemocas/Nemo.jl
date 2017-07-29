@@ -5,7 +5,7 @@
 ##############################################################################
 
 doc"""
-    Partition(part::Vector{Int}, check=true)
+    Partition(part::Vector{Int}, check::Bool=true)
 > Partition represents integer partition into numbers in non-increasing order.
 > It is a thin wrapper over `Vector{Int}`
 """
@@ -13,7 +13,7 @@ type Partition <: AbstractVector{Int}
    n::Int
    part::Vector{Int}
 
-   function Partition(part::Vector{Int}, check=true)
+   function Partition(part::Vector{Int}, check::Bool=true)
       if check
          all(diff(part) .<= 0) || throw("Partition must be decreasing!")
          if length(part) > 0
@@ -443,12 +443,12 @@ function isrimhook(xi::SkewDiagram)
 end
 
 doc"""
-    leglength(xi::SkewDiagram, check=true)
+    leglength(xi::SkewDiagram, check::Bool=true)
 > Computes the leglength of a rim-hook `xi`, i.e. the number of rows with
 > non-zero entries minus one. If `check` is `false` function will not check
 > whether `xi` is actually a rim-hook.
 """
-function leglength(xi::SkewDiagram, check=true)
+function leglength(xi::SkewDiagram, check::Bool=true)
    if check
       isrimhook(xi) || throw("$xi is not a rimhook. leglength is defined only for rim hooks")
    end

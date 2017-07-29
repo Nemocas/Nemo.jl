@@ -427,7 +427,7 @@ doc"""
 > Returns the natural embedding of a permutation group into `G` as the
 > subgroup permuting points indexed by `V`.
 """
-function emb(G::PermGroup, V::Vector{Int}, check=true)
+function emb(G::PermGroup, V::Vector{Int}, check::Bool=true)
    if check
       @assert length(Base.Set(V)) == length(V)
       @assert all(V .<= G.n)
@@ -480,8 +480,8 @@ end
 doc"""
     character(lambda::Partition)
 > Returns the $\lambda$-th irreducible character of permutation group on
->     `chi(p::perm, check=true)`
 > `lambda.n` generators. The returned character function
+>     `chi(p::perm, check::Bool=true)`
 > can be evaluated on a permutation `p::perm`. Checking in $\chi$ if `p`
 > belongs to the appropriate group can be switched off by calling
 > `chi(p, false)`. The values computed by $\chi$ are stored in look-up table.
@@ -500,7 +500,7 @@ doc"""
 function character(lambda::Partition)
    R = partitionseq(lambda)
 
-   function char(p::perm, check=true)
+   function char(p::perm, check::Bool=true)
       if check
          lambda.n == length(p.d) || throw("Can't evaluate character on $p : lengths differ.")
       end
@@ -511,10 +511,10 @@ function character(lambda::Partition)
 end
 
 doc"""
-    character(lambda::Partition, p::perm, check=true)
-> Returns the value of `lambda-th` irreducible character on permutation `p`.
+    character(lambda::Partition, p::perm, check::Bool=true)
+> Returns the value of `lambda`-th irreducible character on permutation `p`.
 """
-function character(lambda::Partition, p::perm, check=true)
+function character(lambda::Partition, p::perm, check::Bool=true)
    if check
       lambda.n == length(p.d) || throw("lambda-th irreducible character can be evaluated only on permutations of length $(lambda.n).")
    end
