@@ -52,6 +52,24 @@ convert(::Type{Partition}, p::Vector{Int}) = Partition(p)
 
 ##############################################################################
 #
+#   IO for Partition
+#
+##############################################################################
+
+function subscriptify(n::Int)
+   subscript_0 = Int(0x2080) # Char(0x2080) -> subscript 0
+   return join([Char(subscript_0 + i) for i in reverse(digits(n))])
+end
+
+function show(io::IO, p::Partition)
+   uniq = unique(p.part)
+   mults = [count(i -> i == u, p.part) for u in uniq]
+   str = join((string(u)*subscriptify(m) for (u,m) in zip(uniq, mults)))
+   print(io, str)
+end
+
+##############################################################################
+#
 #   Iterator interface for Integer Partitions
 #
 ##############################################################################
