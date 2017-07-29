@@ -220,7 +220,6 @@ doc"""
 > (row-major) by `fill` vector.
 """
 immutable YoungTableau <: AbstractArray{Int, 2}
-   n::Int
    part::Partition
    tab::Array{Int,2}
 end
@@ -233,7 +232,7 @@ function YoungTableau(part::Partition, fill::Vector{Int}=collect(1:part.n))
       tab[idx, 1:p] = fill[k:k+p-1]
       k += p
    end
-   return YoungTableau(part.n, part, tab)
+   return YoungTableau(part, tab)
 end
 
 YoungTableau(p::Vector{Int}) = YoungTableau(Partition(p))
@@ -243,20 +242,19 @@ Base.linearindexing{T<:YoungTableau}(::Type{T}) = Base.LinearFast()
 getindex(Y::YoungTableau, i::Int) = Y.tab[i]
 
 function ==(Y1::YoungTableau,Y2::YoungTableau)
-   Y1.n == Y2.n || return false
    Y1.part == Y2.part || return false
    Y1.tab == Y2.tab || return false
    return true
 end
 
-hash(Y::YoungTableau, h::UInt) = hash(Y.n, hash(Y.part, hash(Y.tab, hash(YoungTableau, h))))
+hash(Y::YoungTableau, h::UInt) = hash(Y.part, hash(Y.tab, hash(YoungTableau, h)))
 
 doc"""
     conj(Y::YoungTableau)
 > Returns the conjugated tableau, i.e. the tableau reflected through the main
 > diagonal.
 """
-conj(Y::YoungTableau) = YoungTableau(Y.n, conj(Y.part), transpose(Y.tab))
+conj(Y::YoungTableau) = YoungTableau(conj(Y.part), transpose(Y.tab))
 
 ##############################################################################
 #
