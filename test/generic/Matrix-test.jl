@@ -308,9 +308,9 @@ function test_gen_mat_constructors()
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
-   @test elem_type(S) == GenMat{elem_type(R)}
-   @test elem_type(GenMatSpace{elem_type(R)}) == GenMat{elem_type(R)}
-   @test parent_type(GenMat{elem_type(R)}) == GenMatSpace{elem_type(R)}
+   @test elem_type(S) == GenMat{elem_type(R), Array{elem_type(R), 2}}
+   @test elem_type(GenMatSpace{elem_type(R)}) == GenMat{elem_type(R), Array{elem_type(R), 2}}
+   @test parent_type(GenMat{elem_type(R), Array{elem_type(R), 2}}) == GenMatSpace{elem_type(R)}
 
    @test typeof(S) <: GenMatSpace
 

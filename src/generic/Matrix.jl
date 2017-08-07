@@ -18,8 +18,8 @@ export MatrixSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, isrref,
 #
 ###############################################################################
 
-function similar{T}(x::GenMat{T})
-   z = GenMat{T}(similar(x.entries))
+function similar{T, S}(x::GenMat{T, S})
+   z = GenMat{T, S}(similar(x.entries))
    for i in 1:rows(z)
       for j in 1:cols(z)
          z[i, j] = zero(base_ring(x))
@@ -29,8 +29,8 @@ function similar{T}(x::GenMat{T})
    return z
 end
 
-function similar{T}(x::GenMat{T}, r::Int, c::Int)
-   z = GenMat{T}(similar(x.entries, r, c))
+function similar{T, S}(x::GenMat{T, S}, r::Int, c::Int)
+   z = GenMat{T, S}(similar(x.entries, r, c))
    for i in 1:rows(z)
       for j in 1:cols(z)
          z[i, j] = zero(base_ring(x))
@@ -64,15 +64,28 @@ function eye(x::MatElem, d::Int)
   return z
 end
 
+################################################################################
+#
+#  View
+#
+################################################################################
+
+function Base.view{T}(x::GenMat{T}, r::UnitRange{Int}, c::UnitRange{Int})
+  arr = Base.view(x.entries, r, c)
+  z = GenMat{T, typeof(arr)}(arr)
+  z.base_ring = x.base_ring
+  return z
+end
+
 ###############################################################################
 #
 #   Data type and parent object methods
 #
 ###############################################################################
 
-parent_type{T}(::Type{GenMat{T}}) = GenMatSpace{T}
+parent_type{T, S}(::Type{GenMat{T, S}}) = GenMatSpace{T}
 
-elem_type{T <: RingElem}(::Type{GenMatSpace{T}}) = GenMat{T}
+elem_type{T <: RingElem}(::Type{GenMatSpace{T}}) = GenMat{T, Array{T, 2}}
 
 doc"""
     base_ring{T <: RingElem}(S::MatSpace{T})
@@ -3826,18 +3839,18 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: RingElem, V <: Integer}(::Type{GenMat{T}}, ::Type{V}) = GenMat{T}
+promote_rule{T <: RingElem, S, V <: Integer}(::Type{GenMat{T, S}}, ::Type{V}) = GenMat{T, S}
 
-promote_rule{T <: RingElem}(::Type{GenMat{T}}, ::Type{T}) = GenMat{T}
+promote_rule{T <: RingElem, S}(::Type{GenMat{T, S}}, ::Type{T}) = GenMat{T, S}
 
-promote_rule{T <: RingElem}(::Type{GenMat{T}}, ::Type{fmpz}) = GenMat{T}
+promote_rule{T <: RingElem, S}(::Type{GenMat{T, S}}, ::Type{fmpz}) = GenMat{T, S}
 
-function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenMat{T}}, ::Type{GenMat{U}})
-   U == T ? GenMat{T} : Union{}
+function promote_rule1{T <: RingElem, S, U <: RingElem}(::Type{GenMat{T, S}}, ::Type{GenMat{U, S}})
+   U == T ? GenMat{T, S} : Union{}
 end
 
-function promote_rule{T <: RingElem, U <: RingElem}(::Type{GenMat{T}}, ::Type{U})
-   promote_rule(T, U) == T ? GenMat{T} : promote_rule1(U, GenMat{T})
+function promote_rule{T <: RingElem, S, U <: RingElem}(::Type{GenMat{T, S}}, ::Type{U})
+   promote_rule(T, U) == T ? GenMat{T, S} : promote_rule1(U, GenMat{T})
 end
 
 ###############################################################################
@@ -3871,7 +3884,7 @@ function (a::GenMatSpace{T}){T <: RingElem}()
          entries[i, j] = zero(base_ring(a))
       end
    end
-   z = GenMat{T}(entries)
+   z = GenMat{T, Array{T, 2}}(entries)
    z.base_ring = a.base_ring
    return z
 end
@@ -3887,7 +3900,7 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::Integer)
          end
       end
    end
-   z = GenMat{T}(entries)
+   z = GenMat{T, Array{T, 2}}(entries)
    z.base_ring = a.base_ring
    return z
 end
@@ -3903,7 +3916,7 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::fmpz)
          end
       end
    end
-   z = GenMat{T}(entries)
+   z = GenMat{T, Array{T, 2}}(entries)
    z.base_ring = a.base_ring
    return z
 end
@@ -3920,7 +3933,7 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::T)
          end
       end
    end
-   z = GenMat{T}(entries)
+   z = GenMat{T, Array{T, 2}}(entries)
    z.base_ring = base_ring(a)
    return z
 end
@@ -3935,7 +3948,7 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::Array{T, 2})
       parent(b[1, 1]) != base_ring(a) && error("Unable to coerce to matrix")
    end
    _check_dim(a.rows, a.cols, b)
-   z = GenMat{T}(b)
+   z = GenMat{T, Array{T, 2}}(b)
    z.base_ring = a.base_ring
    return z
 end
@@ -3946,7 +3959,7 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::Array{T, 1})
    end
    _check_dim(a.rows, a.cols, b)
    b = reshape(b, a.cols, a.rows)'
-   z = GenMat{T}(b)
+   z = GenMat{T, Array{T, 2}}(b)
    z.base_ring = a.base_ring
    return z
 end

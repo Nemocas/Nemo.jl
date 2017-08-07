@@ -306,10 +306,11 @@ end
 
 const GenMatDict = Dict{Tuple{Ring, Int, Int}, Ring}()
 
-type GenMat{T <: RingElem} <: MatElem{T}
-   entries::Array{T, 2}
+type GenMat{T <: RingElem, S <: AbstractArray} <: MatElem{T}
+   entries::S#Array{T, 2}
    base_ring::Ring
 
-   GenMat(a::Array{T, 2}) = new(a) 
+   GenMat(a::Array{T, 2}) = new{T, Array{T, 2}}(a) 
+   GenMat(a::S) = new{T, S}(a)
 end
 
