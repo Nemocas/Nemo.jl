@@ -30,7 +30,7 @@ function similar{T}(x::GenMat{T})
 end
 
 function similar{T}(x::GenMat{T}, r::Int, c::Int)
-   z = GenMat{T}(similar(x.entries, r, c))
+   z = GenMat{T}(similar(x.entries, c, r))
    for i in 1:rows(z)
       for j in 1:cols(z)
          z[i, j] = zero(base_ring(x))
@@ -92,7 +92,7 @@ doc"""
 > Return the parent object of the given matrix.
 """
 parent{T}(a::MatElem{T}, cached::Bool = true) =
-    GenMatSpace{T}(a.base_ring, size(a.entries)..., cached)
+         GenMatSpace{T}(a.base_ring, rows(a), cols(a), cached)
 
 function check_parent(a::MatElem, b::MatElem)
   (base_ring(a) != base_ring(b) || rows(a) != rows(b) || cols(a) != cols(b)) && 
@@ -120,20 +120,20 @@ doc"""
     rows(a::MatElem)
 > Return the number of rows of the given matrix.
 """
-rows(a::MatElem) = size(a.entries, 1)
+rows(a::MatElem) = size(a.entries, 2)
 
 doc"""
     cols(a::MatElem)
 > Return the number of columns of the given matrix.
 """
-cols(a::MatElem) = size(a.entries, 2)
+cols(a::MatElem) = size(a.entries, 1)
 
 function getindex{T <: RingElem}(a::MatElem{T}, r::Int, c::Int)
-   return a.entries[r, c]
+   return a.entries[c, r]
 end
  
 function setindex!{T <: RingElem}(a::MatElem{T}, d::T, r::Int, c::Int)
-   a.entries[r, c] = d
+   a.entries[c, r] = d
 end
 
 function setindex!{T <: RingElem}(a::MatElem{T}, d::Integer, r::Int, c::Int)
@@ -832,12 +832,180 @@ doc"""
 > Return the transpose of the given matrix.
 """
 function transpose(x::MatElem)
-   if rows(x) == cols(x)
-      par = parent(x)
-   else
-      par = MatrixSpace(base_ring(x), cols(x), rows(x))
+   y = deepcopy(x)
+   transpose!(y)
+   return y
+end
+
+doc"""
+    transpose!(x::MatElem)
+> Transpose the given matrix in-place.
+"""
+function transpose!(x::MatElem)
+   _transpose!(x.entries)
+   if rows(x) != cols(x)
+      x.entries = reshape(x.entries, rows(x), cols(x))
    end
-   return par(permutedims(x.entries, [2, 1]))
+   return nothing
+end
+
+doc"""
+    _transpose!{T}(A::Array{T,2})
+> Transpose a given $m\times n$ array $A$ by rearranging it's elements in-place.
+> An $m\cdot n$ BitArray is used to determine wether an element has already been
+> moved. Note that $A$ will stay an $m\times n$ array. Use A = reshape(A, n, m)
+> to obtain the right dimensions.
+"""
+function _transpose!{T}(A::Array{T,2})
+   m = size(A,1)
+   n = size(A,2)
+
+   if m<2 || n<2
+      return nothing
+   end
+
+   # If A is square, we just swap A[i,j] and A[j,i]
+   if m == n
+      for i = 1:m
+         for j = 1:i-1
+            t = A[i,j]
+            A[i,j] = A[j,i]
+            A[j,i] = t
+         end
+      end
+      return nothing
+   end
+
+   ncount = 2 # number of elements which are in the right position
+   mn = m*n
+   moved = falses(mn)
+   k = mn - 1
+
+   # We don't need to move the first and the last element
+   for i = 2:k
+      @inbounds if moved[i]
+         continue
+      end
+      i1 = i
+      t = A[i1]
+      i2 = m*(i1 - 1) - k*div(i1 - 1, n) + 1
+      while i2 != i
+         A[i1] = A[i2]
+         @inbounds moved[i1] = true
+         ncount += 1
+         i1 = i2
+         i2 = m*(i1 - 1) - k*div(i1 - 1, n) + 1
+      end
+      A[i1] = t
+      @inbounds moved[i1] = true
+      ncount += 1
+      if ncount >= mn
+         break
+      end
+   end
+   return nothing
+end
+
+doc"""
+    _less_memory_transpose!{T}(A::Array{T,2})
+> Transpose a given $m\times n$ array $A$ by rearranging it's elements in-place.
+> A BitArray of length $(m + n)/2$ is used to determine wether an element has
+> already been moved. Note that $A$ will stay an $m\times n$ array. Use
+> A = reshape(A, n, m) to obtain the right dimensions.
+"""
+#=
+   We use an algorithm due to S. Laflin and M. A. Brebner.
+   "In-situ transposition of a rectangular matrix."
+=#
+function _less_memory_transpose!{T}(A::Array{T,2})
+   m = size(A,1)
+   n = size(A,2)
+
+   if m<2 || n<2
+      return nothing
+   end
+
+   # If A is square, we just swap A[i,j] and A[j,i]
+   if m == n
+      for i = 1:m
+         for j = 1:i-1
+            t = A[i,j]
+            A[i,j] = A[j,i]
+            A[j,i] = t
+         end
+      end
+      return nothing
+   end
+
+   ncount = 2 # number of elements which are in the right position
+   m1 = m - 1
+   n1 = n - 1
+   m2 = m - 2
+   mn = m*n
+   iwrk = cld(m + n, 2)
+   moved = falses(iwrk)
+
+   # Check for "single points" which don't need to be moved.
+   for ia = 1:m2
+      ib, r = divrem(ia*n1, m1)
+      r != 0 ? continue : nothing
+      ncount += 1
+      i = ia*n + ib
+      if i <= iwrk
+         @inbounds moved[i] = true
+      end
+   end
+
+   k = mn - 1
+   kmi = k - 1
+   max = mn
+   for i = 1:mn
+      # At least one loop must be rearranged.
+      if i != 1
+         # search for the next loop
+         kmi = k - i
+         max = kmi + 1
+         if i <= iwrk
+            @inbounds moved[i] ? continue : nothing
+         else
+            i1 = i
+            i2 = m*i1 - k*div(i1, n)
+            i1 == i2 ? continue : nothing
+            while i2 > i && i2 < max
+               i1 = i2
+               i2 = m*i1 - k*div(i1, n)
+            end
+            i2 != i ? continue : nothing
+         end
+      end
+
+      # rearrange the elements
+      i1 = i
+      t = A[i1 + 1]
+      while true
+         i2 = m*i1 - k*div(i1, n)
+         if i1 <= iwrk
+            @inbounds moved[i1] = true
+         end
+         ncount += 1
+         if i2 == i || i2 >= kmi
+            if max == kmi || i2 == i
+               A[i1 + 1] = t
+               if ncount >= mn
+                  return nothing
+               end
+               i2 == max || max == kmi ? break : nothing
+               max = kmi
+               i1 = max
+               t = A[i1 + 1]
+               continue
+            end
+            max = kmi
+         end
+         A[i1 + 1] = A[i2 + 1]
+         i1 = i2
+      end
+   end
 end
 
 ###############################################################################
@@ -3865,10 +4033,10 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::RingElem)
 end
 
 function (a::GenMatSpace{T}){T <: RingElem}()
-   entries = Array{T}(a.rows, a.cols)
+   entries = Array{T}(a.cols, a.rows)
    for i = 1:a.rows
       for j = 1:a.cols
-         entries[i, j] = zero(base_ring(a))
+         entries[j, i] = zero(base_ring(a))
       end
    end
    z = GenMat{T}(entries)
@@ -3877,13 +4045,13 @@ function (a::GenMatSpace{T}){T <: RingElem}()
 end
 
 function (a::GenMatSpace{T}){T <: RingElem}(b::Integer)
-   entries = Array{T}(a.rows, a.cols)
+   entries = Array{T}(a.cols, a.rows)
    for i = 1:a.rows
       for j = 1:a.cols
          if i != j
-            entries[i, j] = zero(base_ring(a))
+            entries[j, i] = zero(base_ring(a))
          else
-            entries[i, j] = base_ring(a)(b)
+            entries[j, i] = base_ring(a)(b)
          end
       end
    end
@@ -3893,13 +4061,13 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::Integer)
 end
 
 function (a::GenMatSpace{T}){T <: RingElem}(b::fmpz)
-   entries = Array{T}(a.rows, a.cols)
+   entries = Array{T}(a.cols, a.rows)
    for i = 1:a.rows
       for j = 1:a.cols
          if i != j
-            entries[i, j] = zero(base_ring(a))
+            entries[j, i] = zero(base_ring(a))
          else
-            entries[i, j] = base_ring(a)(b)
+            entries[j, i] = base_ring(a)(b)
          end
       end
    end
@@ -3910,13 +4078,13 @@ end
 
 function (a::GenMatSpace{T}){T <: RingElem}(b::T)
    parent(b) != base_ring(a) && error("Unable to coerce to matrix")
-   entries = Array{T}(a.rows, a.cols)
+   entries = Array{T}(a.cols, a.rows)
    for i = 1:a.rows
       for j = 1:a.cols
          if i != j
-            entries[i, j] = zero(base_ring(a))
+            entries[j, i] = zero(base_ring(a))
          else
-            entries[i, j] = deepcopy(b)
+            entries[j, i] = deepcopy(b)
          end
       end
    end
@@ -3935,8 +4103,12 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::Array{T, 2})
       parent(b[1, 1]) != base_ring(a) && error("Unable to coerce to matrix")
    end
    _check_dim(a.rows, a.cols, b)
+   _transpose!(b)
+   if a.cols != a.rows
+      b = reshape(b, a.cols, a.rows)
+   end
    z = GenMat{T}(b)
-   z.base_ring = a.base_ring
+   z.base_ring = parent(b[1, 1])
    return z
 end
 
@@ -3945,7 +4117,7 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::Array{T, 1})
       parent(b[1]) != base_ring(a) && error("Unable to coerce to matrix")
    end
    _check_dim(a.rows, a.cols, b)
-   b = reshape(b, a.cols, a.rows)'
+   b = reshape(b, a.cols, a.rows)
    z = GenMat{T}(b)
    z.base_ring = a.base_ring
    return z
