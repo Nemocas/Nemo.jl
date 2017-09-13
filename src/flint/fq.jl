@@ -48,8 +48,8 @@ end
 function Base.hash(a::fq, h::UInt)
    b = 0xb310fb6ea97e1f1a%UInt
    for i in 1:degree(parent(a)) + 1
-         b $= hash(coeff(a, i), h) $ h
-         b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+      b = xor(b, xor(hash(coeff(a, i), h), h))
+      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
    return b
 end
@@ -356,7 +356,7 @@ function divexact(x::fq, y::fq)
 end
 
 function divides(a::fq, b::fq)
-   b == 0 && error("Division by zero in divides")
+   iszero(b) && error("Division by zero in divides")
    return true, divexact(a, b)
 end
 
@@ -478,13 +478,33 @@ function add!(z::fq, x::fq, y::fq)
    return z
 end
 
+
+###############################################################################
+#
+#   Random functions
+#
+###############################################################################
+
+function rand(K::FinField)
+	p = characteristic(K)
+	r = degree(K)
+	alpha = gen(K)
+	res = zero(K)
+	for i = 0 : (r-1)
+		c = rand(BigInt(0) : BigInt(p - 1))
+		res += c * alpha^i
+	end
+	return res
+end
+
+
 ###############################################################################
 #
 #   Promotions
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(::Type{fq}, ::Type{T}) = fq
+promote_rule(::Type{fq}, ::Type{T}) where {T <: Integer} = fq
 
 promote_rule(::Type{fq}, ::Type{fmpz}) = fq
 

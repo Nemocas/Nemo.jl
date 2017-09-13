@@ -68,7 +68,7 @@ precision(x::fq_abs_series) = x.prec
 
 function coeff(x::fq_abs_series, n::Int)
    if n < 0
-      return fmpz(0)
+      return base_ring(x)()
    end
    z = base_ring(x)()
    ccall((:fq_poly_get_coeff, :libflint), Void, 
@@ -355,7 +355,7 @@ function ==(x::fq_abs_series, y::fq)
              &z, &x, 0, &base_ring(x))
       return z == y
    else
-      return precision(x) == 0 || y == 0
+      return precision(x) == 0 || iszero(y)
    end 
 end
 
@@ -371,7 +371,7 @@ function ==(x::fq_abs_series, y::fmpz)
              &z, &x, 0, &base_ring(x))
       return z == y
    else
-      return precision(x) == 0 || y == 0
+      return precision(x) == 0 || iszero(y)
    end 
 end
 
@@ -389,7 +389,7 @@ end
 
 function divexact(x::fq_abs_series, y::fq_abs_series)
    check_parent(x, y)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    v2 = valuation(y)
    v1 = valuation(x)
    if v2 != 0
@@ -416,7 +416,7 @@ end
 ###############################################################################
 
 function divexact(x::fq_abs_series, y::fq)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
    ccall((:fq_poly_scalar_div_fq, :libflint), Void, 
@@ -504,7 +504,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(::Type{fq_abs_series}, ::Type{T}) = fq_abs_series
+promote_rule(::Type{fq_abs_series}, ::Type{T}) where {T <: Integer} = fq_abs_series
 
 promote_rule(::Type{fq_abs_series}, ::Type{fq}) = fq_abs_series
 

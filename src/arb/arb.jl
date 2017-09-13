@@ -7,7 +7,8 @@
 #
 ###############################################################################
 
-import Base: ceil
+import Base: ceil, digamma, zeta, polygamma, erf, erfi, erfc, besselj, bessely,
+             besseli, besselk
 
 export ball, radius, midpoint, contains, contains_zero,
        contains_negative, contains_positive, contains_nonnegative,
@@ -179,7 +180,7 @@ doc"""
 > Returns `true` if the ball $x$ contains the given rational value, otherwise
 > return `false`.
 """
-contains{T <: Integer}(x::arb, y::Rational{T}) = contains(x, fmpq(y))
+contains(x::arb, y::Rational{T}) where {T <: Integer} = contains(x, fmpq(y))
 
 doc"""
     contains(x::arb, y::BigFloat)
@@ -376,19 +377,19 @@ end
 <(x::fmpq, y::arb) = arb(x, prec(parent(y))) < y
 >(x::fmpq, y::arb) = arb(x, prec(parent(y))) > y
 
-=={T <: Integer}(x::arb, y::Rational{T}) = x == fmpq(y)
-!={T <: Integer}(x::arb, y::Rational{T}) = x != fmpq(y)
-<={T <: Integer}(x::arb, y::Rational{T}) = x <= fmpq(y)
->={T <: Integer}(x::arb, y::Rational{T}) = x >= fmpq(y)
-<{T <: Integer}(x::arb, y::Rational{T}) = x < fmpq(y)
->{T <: Integer}(x::arb, y::Rational{T}) = x > fmpq(y)
+==(x::arb, y::Rational{T}) where {T <: Integer} = x == fmpq(y)
+!=(x::arb, y::Rational{T}) where {T <: Integer} = x != fmpq(y)
+<=(x::arb, y::Rational{T}) where {T <: Integer} = x <= fmpq(y)
+>=(x::arb, y::Rational{T}) where {T <: Integer} = x >= fmpq(y)
+<(x::arb, y::Rational{T}) where {T <: Integer} = x < fmpq(y)
+>(x::arb, y::Rational{T}) where {T <: Integer} = x > fmpq(y)
 
-=={T <: Integer}(x::Rational{T}, y::arb) = fmpq(x) == y
-!={T <: Integer}(x::Rational{T}, y::arb) = fmpq(x) != y
-<={T <: Integer}(x::Rational{T}, y::arb) = fmpq(x) <= y
->={T <: Integer}(x::Rational{T}, y::arb) = fmpq(x) >= y
-<{T <: Integer}(x::Rational{T}, y::arb) = fmpq(x) < y
->{T <: Integer}(x::Rational{T}, y::arb) = fmpq(x) > y
+==(x::Rational{T}, y::arb) where {T <: Integer} = fmpq(x) == y
+!=(x::Rational{T}, y::arb) where {T <: Integer} = fmpq(x) != y
+<=(x::Rational{T}, y::arb) where {T <: Integer} = fmpq(x) <= y
+>=(x::Rational{T}, y::arb) where {T <: Integer} = fmpq(x) >= y
+<(x::Rational{T}, y::arb) where {T <: Integer} = fmpq(x) < y
+>(x::Rational{T}, y::arb) where {T <: Integer} = fmpq(x) > y
 
 ################################################################################
 #
@@ -762,16 +763,16 @@ end
 ^(x::BigFloat, y::arb) = parent(y)(x) ^ y
 ^(x::arb, y::BigFloat) = x ^ parent(x)(y)
 
-+{T <: Integer}(x::Rational{T}, y::arb) = fmpq(x) + y
-+{T <: Integer}(x::arb, y::Rational{T}) = x + fmpq(y)
--{T <: Integer}(x::Rational{T}, y::arb) = fmpq(x) - y
--{T <: Integer}(x::arb, y::Rational{T}) = x - fmpq(y)
-//{T <: Integer}(x::Rational{T}, y::arb) = fmpq(x)//y
-//{T <: Integer}(x::arb, y::Rational{T}) = x//fmpq(y)
-*{T <: Integer}(x::Rational{T}, y::arb) = fmpq(x) * y
-*{T <: Integer}(x::arb, y::Rational{T}) = x * fmpq(y)
-^{T <: Integer}(x::Rational{T}, y::arb) = fmpq(x) ^ y
-^{T <: Integer}(x::arb, y::Rational{T}) = x ^ fmpq(y)
++(x::Rational{T}, y::arb) where {T <: Integer} = fmpq(x) + y
++(x::arb, y::Rational{T}) where {T <: Integer} = x + fmpq(y)
+-(x::Rational{T}, y::arb) where {T <: Integer} = fmpq(x) - y
+-(x::arb, y::Rational{T}) where {T <: Integer} = x - fmpq(y)
+//(x::Rational{T}, y::arb) where {T <: Integer} = fmpq(x)//y
+//(x::arb, y::Rational{T}) where {T <: Integer} = x//fmpq(y)
+*(x::Rational{T}, y::arb) where {T <: Integer} = fmpq(x) * y
+*(x::arb, y::Rational{T}) where {T <: Integer} = x * fmpq(y)
+^(x::Rational{T}, y::arb) where {T <: Integer} = fmpq(x) ^ y
+^(x::arb, y::Rational{T}) where {T <: Integer} = x ^ fmpq(y)
 
 /(x::arb, y::arb) = x // y
 /(x::fmpz, y::arb) = x // y
@@ -782,8 +783,8 @@ end
 /(x::arb, y::UInt) = x // y
 /(x::fmpq, y::arb) = x // y
 /(x::arb, y::fmpq) = x // y
-/{T <: Integer}(x::Rational{T}, y::arb) = x // y
-/{T <: Integer}(x::arb, y::Rational{T}) = x // y
+/(x::Rational{T}, y::arb) where {T <: Integer} = x // y
+/(x::arb, y::Rational{T}) where {T <: Integer} = x // y
 
 divexact(x::arb, y::arb) = x // y
 divexact(x::fmpz, y::arb) = x // y
@@ -794,8 +795,8 @@ divexact(x::UInt, y::arb) = x // y
 divexact(x::arb, y::UInt) = x // y
 divexact(x::fmpq, y::arb) = x // y
 divexact(x::arb, y::fmpq) = x // y
-divexact{T <: Integer}(x::Rational{T}, y::arb) = x // y
-divexact{T <: Integer}(x::arb, y::Rational{T}) = x // y
+divexact(x::Rational{T}, y::arb) where {T <: Integer} = x // y
+divexact(x::arb, y::Rational{T}) where {T <: Integer} = x // y
 
 ################################################################################
 #
@@ -1853,7 +1854,7 @@ function (r::ArbField)(x::fmpq)
   return z
 end
   
-(r::ArbField){T <: Integer}(x::Rational{T}) = r(fmpq(x))
+(r::ArbField)(x::Rational{T}) where {T <: Integer} = r(fmpq(x))
 
 #function call(r::ArbField, x::arf)
 #  z = arb(arb(x), r.prec)

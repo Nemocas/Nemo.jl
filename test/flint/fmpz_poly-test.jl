@@ -379,15 +379,15 @@ function test_fmpz_poly_discriminant()
    println("PASS")
 end
 
-function test_fmpz_poly_gcdx()
-   print("fmpz_poly.gcdx...")
+function test_fmpz_poly_resx()
+   print("fmpz_poly.resx...")
 
    R, x = PolynomialRing(ZZ, "x")
    
    f = 5x^2 + 2x + 1
    g = 2x^3 + 3x + 1
 
-   @test gcdx(f, g) == (212, 146*x^2-58*x+213, -365*x-1)
+   @test resx(f, g) == (212, 146*x^2-58*x+213, -365*x-1)
 
    println("PASS")
 end
@@ -501,7 +501,7 @@ function test_fmpz_poly()
    test_fmpz_poly_derivative()
    test_fmpz_poly_resultant()
    test_fmpz_poly_discriminant()
-   test_fmpz_poly_gcdx()
+   test_fmpz_poly_resx()
    test_fmpz_poly_signature()
    test_fmpz_poly_interpolate()
    test_fmpz_poly_factor()

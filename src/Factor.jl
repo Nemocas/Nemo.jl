@@ -12,18 +12,18 @@ export Fac, factors, unit
 #
 ################################################################################
 
-type Fac{T <: RingElem}
+mutable struct Fac{T <: RingElem}
    unit::T
    fac::Dict{T, Int}
 
-   function Fac()
+   function Fac{T}() where {T}
      f = new()
      f.fac = Dict{T, Int}()
      return f
    end
 end
 
-function Fac{T}(u::T, d::Dict{T, Int})
+function Fac(u::T, d::Dict{T, Int}) where {T}
    f = Fac{T}()
    f.unit = u
    f.fac = d
@@ -50,7 +50,7 @@ doc"""
 
 > Test whether `a` is a factor of `b`.
 """
-function Base.in{T <: RingElem}(a::T, b::Fac{T})
+function Base.in(a::T, b::Fac{T}) where {T}
    a in keys(b.fac)
 end
 
@@ -60,7 +60,7 @@ doc"""
 > If `b` is a factor of `a`, the corresponding exponent is returned. Otherwise
 > an error is thrown.
 """
-function getindex{T}(a::Fac{T}, b::T)
+function getindex(a::Fac{T}, b::T) where {T}
   if haskey(a.fac, b)
     return a.fac[b]
   else
@@ -73,7 +73,7 @@ doc"""
 
 > If `b` is a factor of `a`, the corresponding entry is set to c.
 """
-function setindex!{T}(a::Fac{T}, c::Int, b::T)
+function setindex!(a::Fac{T}, c::Int, b::T) where {T}
   if haskey(a.fac, b)
     error("$b is already set (to $(a[b]))")
   else

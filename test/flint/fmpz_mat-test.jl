@@ -89,6 +89,33 @@ function test_fmpz_mat_manipulation()
    println("PASS")
 end
 
+function test_fmpz_mat_view()
+   print("fmpz_mat.view...")
+
+   S = MatrixSpace(ZZ, 3, 3)
+
+   A = S([1 2 3; 4 5 6; 7 8 9])
+
+   B = @inferred view(A, 1, 1, 2, 2)
+
+   @test typeof(B) == fmpz_mat
+   @test B == MatrixSpace(ZZ, 2, 2)([1 2; 4 5])
+
+   B[1, 1] = 10
+   @test A[1, 1] == 10
+
+   C = @inferred view(B, 1:2, 1:2)
+
+   @test typeof(C) == fmpz_mat
+   @test C == MatrixSpace(ZZ, 2, 2)([10 2; 4 5])
+
+   C[1, 1] = 20
+   @test B[1, 1] == 20
+   @test A[1, 1] == 20
+
+   println("PASS")
+end
+
 function test_fmpz_mat_unary_ops()
    print("fmpz_mat.unary_ops...")
 
@@ -531,6 +558,7 @@ function test_fmpz_mat()
    test_fmpz_mat_printing()
    test_fmpz_mat_convert()
    test_fmpz_mat_manipulation()
+   test_fmpz_mat_view()
    test_fmpz_mat_unary_ops()
    test_fmpz_mat_binary_ops()
    test_fmpz_mat_adhoc_binary()

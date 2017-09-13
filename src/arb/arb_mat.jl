@@ -79,7 +79,7 @@ end
 
 setindex!(x::arb_mat, y::Integer, r::Int, c::Int) = setindex!(x, fmpz(y), r, c)
 
-setindex!{T <: Rational}(x::arb_mat, y::Rational{T}, r::Int, c::Int) =
+setindex!(x::arb_mat, y::Rational{T}, r::Int, c::Int) where {T <: Integer} =
          setindex!(x, fmpz(y), r, c)
 
 zero(a::ArbMatSpace) = a()
@@ -264,7 +264,7 @@ for T in [Integer, fmpz, fmpq, arb]
    end
 end
 
-function +{T <: Integer}(x::arb_mat, y::Rational{T})
+function +(x::arb_mat, y::Rational{T}) where T <: Union{Int, BigInt}
    z = deepcopy(x)
    for i = 1:min(rows(x), cols(x))
       z[i, i] += y
@@ -272,9 +272,9 @@ function +{T <: Integer}(x::arb_mat, y::Rational{T})
    return z
 end
 
-+{T <: Integer}(x::Rational{T}, y::arb_mat) = y + x
++(x::Rational{T}, y::arb_mat) where T <: Union{Int, BigInt} = y + x
 
-function -{T <: Integer}(x::arb_mat, y::Rational{T})
+function -(x::arb_mat, y::Rational{T}) where T <: Union{Int, BigInt}
    z = deepcopy(x)
    for i = 1:min(rows(x), cols(x))
       z[i, i] -= y
@@ -282,7 +282,7 @@ function -{T <: Integer}(x::arb_mat, y::Rational{T})
    return z
 end
 
-function -{T <: Integer}(x::Rational{T}, y::arb_mat)
+function -(x::Rational{T}, y::arb_mat) where T <: Union{Int, BigInt}
    z = -y
    for i = 1:min(rows(y), cols(y))
       z[i, i] += x
@@ -512,7 +512,7 @@ end
 #
 ###############################################################################
 
-function lufact!(P::perm, x::arb_mat)
+function lufact!(P::Generic.perm, x::arb_mat)
   cols(x) != rows(x) && error("Matrix must be square")
   parent(P).n != rows(x) && error("Permutation does not match matrix")
   P.d .-= 1
@@ -563,7 +563,7 @@ function solve(x::arb_mat, y::arb_mat)
   return z
 end
 
-function solve_lu_precomp!(z::arb_mat, P::perm, LU::arb_mat, y::arb_mat)
+function solve_lu_precomp!(z::arb_mat, P::Generic.perm, LU::arb_mat, y::arb_mat)
   Q = inv(P)
   ccall((:arb_mat_solve_lu_precomp, :libarb), Void,
               (Ptr{arb_mat}, Ptr{Int}, Ptr{arb_mat}, Ptr{arb_mat}, Int),
@@ -571,7 +571,7 @@ function solve_lu_precomp!(z::arb_mat, P::perm, LU::arb_mat, y::arb_mat)
   nothing
 end
 
-function solve_lu_precomp(P::perm, LU::arb_mat, y::arb_mat)
+function solve_lu_precomp(P::Generic.perm, LU::arb_mat, y::arb_mat)
   cols(LU) != rows(y) && error("Matrix dimensions are wrong")
   z = similar(y)
   solve_lu_precomp!(z, P, LU, y)
@@ -660,16 +660,14 @@ function (x::ArbMatSpace)(y::fmpz_mat)
   return z
 end
 
-function (x::ArbMatSpace){T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat,
-                                     arb, AbstractString}}(y::Array{T, 2})
+function (x::ArbMatSpace)(y::Array{T, 2}) where {T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, AbstractString}}
   _check_dim(x.rows, x.cols, y)
   z = arb_mat(x.rows, x.cols, y, prec(x))
   z.base_ring = x.base_ring
   return z
 end
 
-function (x::ArbMatSpace){T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat,
-                                     arb, AbstractString}}(y::Array{T, 1})
+function (x::ArbMatSpace)(y::Array{T, 1}) where {T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, AbstractString}}
   _check_dim(x.rows, x.cols, y)
   z = arb_mat(x.rows, x.cols, y, prec(x))
   z.base_ring = x.base_ring
@@ -699,9 +697,9 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(::Type{arb_mat}, ::Type{T}) = arb_mat
+promote_rule(::Type{arb_mat}, ::Type{T}) where {T <: Integer} = arb_mat
 
-promote_rule{T <: Integer}(::Type{arb_mat}, ::Type{Rational{T}}) = arb_mat
+promote_rule(::Type{arb_mat}, ::Type{Rational{T}}) where T <: Union{Int, BigInt} = arb_mat
 
 promote_rule(::Type{arb_mat}, ::Type{fmpz}) = arb_mat
 

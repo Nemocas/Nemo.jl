@@ -257,7 +257,7 @@ function ==(x::fq_poly, y::fq)
                 &x, &y, &base_ring(parent(x)))
       return Bool(r)
    else
-      return y == 0
+      return iszero(y)
   end 
 end
 
@@ -390,7 +390,7 @@ doc"""
 """
 function remove(z::fq_poly, p::fq_poly)
    check_parent(z,p)
-   z == 0 && error("Not yet implemented")
+   iszero(z) && error("Not yet implemented")
    z = deepcopy(z)
    v = ccall((:fq_poly_remove, :libflint), Int,
             (Ptr{fq_poly}, Ptr{fq_poly}, Ptr{FqFiniteField}),
@@ -716,7 +716,7 @@ end
 #
 ################################################################################
 
-promote_rule{V <: Integer}(::Type{fq_poly}, ::Type{V}) = fq_poly
+promote_rule(::Type{fq_poly}, ::Type{V}) where {V <: Integer} = fq_poly
 
 promote_rule(::Type{fq_poly}, ::Type{fmpz}) = fq_poly
 
@@ -776,7 +776,7 @@ function (R::FqPolyRing)(x::Array{fmpz, 1})
    return z
 end
 
-function (R::FqPolyRing){T <: Integer}(x::Array{T, 1})
+function (R::FqPolyRing)(x::Array{T, 1}) where {T <: Integer}
    length(x) == 0 && error("Array must be non-empty")
    return R(map(fmpz, x))
 end

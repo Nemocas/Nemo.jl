@@ -91,7 +91,7 @@ function renormalize!(z::fmpq_rel_series)
    zlen = pol_length(z)
    zval = valuation(z)
    zprec = precision(z)
-   while i < zlen && polcoeff(z, i) == 0
+   while i < zlen && iszero(polcoeff(z, i))
       i += 1
    end
    z.prec = zprec
@@ -297,17 +297,17 @@ end
 
 *(x::Integer, y::fmpq_rel_series) = fmpz(x) * y
 
-*(x::fmpq_rel_series, y::Rational) = x * fmpq(y)
+*(x::fmpq_rel_series, y::Rational{T}) where T <: Union{Int, BigInt} = x * fmpq(y)
 
-*(x::Rational, y::fmpq_rel_series) = fmpq(x) * y
+*(x::Rational{T}, y::fmpq_rel_series) where T <: Union{Int, BigInt} = fmpq(x) * y
 
 +(x::fmpq_rel_series, y::Integer) = x + fmpz(y)
 
 +(x::Integer, y::fmpq_rel_series) = fmpz(x) + y
 
-+(x::fmpq_rel_series, y::Rational) = x + fmpq(y)
++(x::fmpq_rel_series, y::Rational{T}) where T <: Union{Int, BigInt} = x + fmpq(y)
 
-+(x::Rational, y::fmpq_rel_series) = fmpq(x) + y
++(x::Rational{T}, y::fmpq_rel_series) where T <: Union{Int, BigInt} = fmpq(x) + y
 
 ###############################################################################
 #
@@ -473,7 +473,7 @@ function ==(x::fmpq_rel_series, y::fmpq)
          return false
       end
    else
-      return y == 0
+      return iszero(y)
    end 
 end
 
@@ -487,13 +487,13 @@ function ==(x::fmpq_rel_series, y::fmpz)
          z = fmpq()
          ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void, 
                        (Ptr{fmpq}, Ptr{fmpq_rel_series}, Int), &z, &x, 0)
-         return den(z) == 1 && ccall((:fmpz_equal, :libflint), Bool, 
+         return isone(den(z)) && ccall((:fmpz_equal, :libflint), Bool, 
                (Ptr{fmpz}, Ptr{fmpz}, Int), &num(z), &y, 0)
       else
          return false
       end
    else
-      return y == 0
+      return iszero(y)
    end 
 end
 
@@ -505,9 +505,9 @@ end
 
 ==(x::Integer, y::fmpq_rel_series) = y == x
 
-==(x::fmpq_rel_series, y::Rational) = x == fmpq(y)
+==(x::fmpq_rel_series, y::Rational{T}) where T <: Union{Int, BigInt} = x == fmpq(y)
 
-==(x::Rational, y::fmpq_rel_series) = y == x
+==(x::Rational{T}, y::fmpq_rel_series) where T <: Union{Int, BigInt} = y == x
 
 ###############################################################################
 #
@@ -517,7 +517,7 @@ end
 
 function divexact(x::fmpq_rel_series, y::fmpq_rel_series)
    check_parent(x, y)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    yval = valuation(y)
    xval = valuation(x)
    if yval != 0
@@ -557,7 +557,7 @@ function divexact(x::fmpq_rel_series, y::Int)
 end
 
 function divexact(x::fmpq_rel_series, y::fmpz)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
    z.prec = x.prec
@@ -569,7 +569,7 @@ function divexact(x::fmpq_rel_series, y::fmpz)
 end
 
 function divexact(x::fmpq_rel_series, y::fmpq)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
    z.prec = x.prec
@@ -582,7 +582,7 @@ end
 
 divexact(x::fmpq_rel_series, y::Integer) = divexact(x, fmpz(y))
 
-divexact(x::fmpq_rel_series, y::Rational) = divexact(x, fmpq(y))
+divexact(x::fmpq_rel_series, y::Rational{T}) where T <: Union{Int, BigInt} = divexact(x, fmpq(y))
 
 ###############################################################################
 #
@@ -591,7 +591,7 @@ divexact(x::fmpq_rel_series, y::Rational) = divexact(x, fmpq(y))
 ###############################################################################
 
 function inv(a::fmpq_rel_series)
-   a == 0 && throw(DivideError())
+   iszero(a) && throw(DivideError())
    !isunit(a) && error("Unable to invert power series")
    ainv = parent(a)()
    ainv.prec = a.prec
@@ -651,7 +651,7 @@ doc"""
 """
 function tan(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in tan")
-   if a == 0 || a.prec < 2
+   if iszero(a) || a.prec < 2
       return parent(a)()
    end
    z = parent(a)()
@@ -673,7 +673,7 @@ doc"""
 """
 function tanh(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in tanh")
-   if a == 0 || a.prec < 2
+   if iszero(a) || a.prec < 2
       return parent(a)()
    end
    z = parent(a)()
@@ -695,7 +695,7 @@ doc"""
 """
 function sin(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in sin")
-   if a == 0 || a.prec < 2
+   if iszero(a) || a.prec < 2
       return parent(a)()
    end
    z = parent(a)()
@@ -720,7 +720,7 @@ doc"""
 """
 function sinh(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in sinh")
-   if a == 0 || a.prec < 2
+   if iszero(a) || a.prec < 2
       return parent(a)()
    end
    z = parent(a)()
@@ -789,7 +789,7 @@ doc"""
 """
 function asin(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in asin")
-   if a == 0 || a.prec < 2
+   if iszero(a) || a.prec < 2
       return parent(a)()
    end
    z = parent(a)()
@@ -811,7 +811,7 @@ doc"""
 """
 function asinh(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in asinh")
-   if a == 0 || a.prec < 2
+   if iszero(a) || a.prec < 2
       return parent(a)()
    end
    z = parent(a)()
@@ -833,7 +833,7 @@ doc"""
 """
 function atan(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in atan")
-   if a == 0 || a.prec < 2
+   if iszero(a) || a.prec < 2
       return parent(a)()
    end
    z = parent(a)()
@@ -855,7 +855,7 @@ doc"""
 """
 function atanh(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in atanh")
-   if a == 0 || a.prec < 2
+   if iszero(a) || a.prec < 2
       return parent(a)()
    end
    z = parent(a)()
@@ -992,9 +992,9 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(::Type{fmpq_rel_series}, ::Type{T}) = fmpq_rel_series
+promote_rule(::Type{fmpq_rel_series}, ::Type{T}) where {T <: Integer} = fmpq_rel_series
 
-promote_rule{T <: Integer}(::Type{fmpq_rel_series}, ::Type{Rational{T}}) = fmpq_rel_series
+promote_rule(::Type{fmpq_rel_series}, ::Type{Rational{T}}) where T <: Union{Int, BigInt} = fmpq_rel_series
 
 promote_rule(::Type{fmpq_rel_series}, ::Type{fmpz}) = fmpq_rel_series
 
@@ -1026,7 +1026,7 @@ function (a::FmpqRelSeriesRing)(b::Integer)
 end
 
 function (a::FmpqRelSeriesRing)(b::fmpz)
-   if b == 0
+   if iszero(b)
       z = fmpq_rel_series()
       z.prec = a.prec_max
    else
@@ -1037,7 +1037,7 @@ function (a::FmpqRelSeriesRing)(b::fmpz)
 end
 
 function (a::FmpqRelSeriesRing)(b::fmpq)
-   if b == 0
+   if iszero(b)
       z = fmpq_rel_series()
       z.prec = a.prec_max
    else
@@ -1047,7 +1047,7 @@ function (a::FmpqRelSeriesRing)(b::fmpq)
    return z
 end
 
-(a::FmpqRelSeriesRing)(b::Rational) = a(fmpq(b))
+(a::FmpqRelSeriesRing)(b::Rational{T}) where T <: Union{Int, BigInt} = a(fmpq(b))
 
 function (a::FmpqRelSeriesRing)(b::fmpq_rel_series)
    parent(b) != a && error("Unable to coerce power series")
@@ -1063,8 +1063,8 @@ end
 (a::FmpqRelSeriesRing)(b::Array{fmpz, 1}, len::Int, prec::Int, val::Int) =
     a(map(fmpq, b), len, prec, val)
 
-(a::FmpqRelSeriesRing){T <: Integer}(b::Array{T, 1}, len::Int, prec::Int, val::Int) =
+(a::FmpqRelSeriesRing)(b::Array{T, 1}, len::Int, prec::Int, val::Int) where {T <: Integer} =
     a(map(fmpq, b), len, prec, val)
     
-(a::FmpqRelSeriesRing){T <: Integer}(b::Array{Rational{T}, 1}, len::Int, prec::Int, val::Int) =
+(a::FmpqRelSeriesRing)(b::Array{Rational{T}, 1}, len::Int, prec::Int, val::Int) where {T <: Integer} =
     a(map(fmpq, b), len, prec, val)

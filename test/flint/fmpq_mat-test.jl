@@ -129,6 +129,33 @@ function test_fmpq_mat_manipulation()
    println("PASS")
 end
 
+function test_fmpq_mat_view()
+   print("fmpq_mat.view...")
+
+   S = MatrixSpace(QQ, 3, 3)
+
+   A = S([1 2 3; 4 5 6; 7 8 9])
+
+   B = @inferred view(A, 1, 1, 2, 2)
+
+   @test typeof(B) == fmpq_mat
+   @test B == MatrixSpace(QQ, 2, 2)([1 2; 4 5])
+
+   B[1, 1] = 10
+   @test A[1, 1] == 10
+
+   C = @inferred view(B, 1:2, 1:2)
+
+   @test typeof(C) == fmpq_mat
+   @test C == MatrixSpace(QQ, 2, 2)([10 2; 4 5])
+
+   C[1, 1] = 20
+   @test B[1, 1] == 20
+   @test A[1, 1] == 20
+
+   println("PASS")
+end
+
 function test_fmpq_mat_unary_ops()
    print("fmpq_mat.unary_ops...")
 
@@ -487,6 +514,7 @@ function test_fmpq_mat()
    test_fmpq_mat_constructors()
    test_fmpq_mat_printing()
    test_fmpq_mat_manipulation()
+   test_fmpq_mat_view()
    test_fmpq_mat_unary_ops()
    test_fmpq_mat_binary_ops()
    test_fmpq_mat_adhoc_binary()

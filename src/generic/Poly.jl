@@ -4,15 +4,18 @@
 #
 ###############################################################################
 
-export GenPoly, GenPolyRing, PolynomialRing, hash, coeff, isgen, lead,
+export PolynomialRing, hash, coeff, isgen, lead,
        var, truncate, mullow, reverse, shift_left, shift_right, divexact,
        pseudorem, pseudodivrem, gcd, degree, content, primpart, evaluate, 
        compose, derivative, integral, resultant, discriminant, gcdx, zero, one,
        gen, length, iszero, normalise, isone, isunit, addeq!, mul!, fit!,
-       setcoeff!, mulmod, powmod, invmod, lcm, divrem, mod, gcdinv,
+       setcoeff!, mulmod, powmod, invmod, lcm, divrem, mod, gcdinv, resx,
        canonical_unit, var, chebyshev_t, chebyshev_u, set_length!,
-       mul_classical, sqr_classical, mul_ks, subst, mul_karatsuba, trail,
-       pow_multinomial, monomial_to_newton!, newton_to_monomial!, ismonomial
+       mul_classical, mul_ks, subst, mul_karatsuba, trail,
+       pow_multinomial, monomial_to_newton!, newton_to_monomial!, ismonomial,
+       base_ring, parent_type, elem_type, check_parent, promote_rule,
+       needs_parentheses, isnegative, show_minus_one, remove, zero!, add!,
+       interpolate
 
 ###############################################################################
 #
@@ -20,43 +23,43 @@ export GenPoly, GenPolyRing, PolynomialRing, hash, coeff, isgen, lead,
 #
 ###############################################################################
 
-parent_type{T}(::Type{GenPoly{T}}) = GenPolyRing{T}
+parent_type(::Type{Poly{T}}) where T <: RingElement = PolyRing{T}
 
-elem_type{T <: RingElem}(::Type{GenPolyRing{T}}) = GenPoly{T}
+elem_type(::Type{PolyRing{T}}) where T <: RingElement = Poly{T}
 
 doc"""
-    base_ring(R::PolyRing)
+    base_ring(R::Nemo.PolyRing)
 > Return the base ring of the given polynomial ring.
 """
-base_ring{T}(R::PolyRing{T}) = R.base_ring::parent_type(T)
+base_ring(R::Nemo.PolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
 doc"""
-    base_ring(a::PolyElem)
+    base_ring(a::Nemo.PolyElem)
 > Return the base ring of the polynomial ring of the given polynomial.
 """
-base_ring(a::PolyElem) = base_ring(parent(a))
+base_ring(a::Nemo.PolyElem) = base_ring(parent(a))
 
 doc"""
-    parent(a::PolyElem)
+    parent(a::Nemo.PolyElem)
 > Return the parent of the given polynomial.
 """
-parent(a::PolyElem) = a.parent
+parent(a::Nemo.PolyElem) = a.parent
 
 doc"""
-    var(a::PolyRing)
+    var(a::Nemo.PolyRing)
 > Return the internal name of the generator of the polynomial ring. Note that
 > this is returned as a `Symbol` not a `String`.
 """
-var(a::PolyRing) = a.S
+var(a::Nemo.PolyRing) = a.S
 
 doc"""
-    vars(a::PolyRing)
+    vars(a::Nemo.PolyRing)
 > Return an array of the variable names for the polynomial ring. Note that
 > this is returned as an array of `Symbol` not `String`.
 """
-vars(a::PolyRing) = [a.S]
+vars(a::Nemo.PolyRing) = [a.S]
 
-function check_parent(a::PolyElem, b::PolyElem)
+function check_parent(a::Nemo.PolyElem, b::Nemo.PolyElem)
    parent(a) != parent(b) && 
                 error("Incompatible polynomial rings in polynomial operation")
 end
@@ -67,64 +70,70 @@ end
 #
 ###############################################################################    
 
-function Base.hash(a::PolyElem, h::UInt)
+function Base.hash(a::Nemo.PolyElem, h::UInt)
    b = 0x53dd43cd511044d1%UInt
    for i in 0:length(a) - 1
-      b $= hash(coeff(a, i), h) $ h
+      b = xor(b, xor(hash(coeff(a, i), h), h))
       b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
    return b
 end
 
-function normalise(a::GenPoly, n::Int)
+function setcoeff!(c::Poly{T}, n::Int, a::T) where {T <: RingElement}
+   if !iszero(a) || n + 1 <= length(c)
+      fit!(c, n + 1)
+      c.coeffs[n + 1] = a
+      c.length = max(length(c), n + 1)
+      # don't normalise
+   end
+   return c
+end
+
+function normalise(a::Poly, n::Int)
    while n > 0 && iszero(a.coeffs[n]) 
       n -= 1
    end
    return n
 end
 
-function set_length!(a::PolyElem, n::Int)
-   a.length = n
-end
-
-length(a::PolyElem) = a.length
+length(a::Nemo.PolyElem) = a.length
 
 doc"""
-    degree(a::PolyElem)
+    degree(a::Nemo.PolyElem)
 > Return the degree of the given polynomial. This is defined to be one less
 > than the length, even for constant polynomials.
 """
-degree(a::PolyElem) = length(a) - 1
+degree(a::Nemo.PolyElem) = length(a) - 1
 
 doc"""
-    modulus{T <: ResElem}(a::PolyElem{T})
+    modulus{T <: ResElem}(a::Nemo.PolyElem{T})
 > Return the modulus of the coefficients of the given polynomial.
 """
-modulus{T <: ResElem}(a::PolyElem{T}) = modulus(base_ring(a))
+modulus(a::Nemo.PolyElem{T}) where {T <: ResElem} = modulus(base_ring(a))
 
-coeff(a::GenPoly, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
+coeff(a::Poly, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 
 doc"""
-    lead(x::PolyElem)
+    lead(x::Nemo.PolyElem)
 > Return the leading coefficient of the given polynomial. This will be the
 > nonzero coefficient of the term with highest degree unless the polynomial
 > in the zero polynomial, in which case a zero coefficient is returned.
 """
-lead(a::PolyElem) = length(a) == 0 ? base_ring(a)(0) : coeff(a, length(a) - 1)
+lead(a::Nemo.PolyElem) = length(a) == 0 ? base_ring(a)(0) : coeff(a, length(a) - 1)
 
 doc"""
-    trail(x::PolyElem)
+    trail(x::Nemo.PolyElem)
 > Return the trailing coefficient of the given polynomial. This will be the
 > nonzero coefficient of the term with lowest degree unless the polynomial
 > in the zero polynomial, in which case a zero coefficient is returned.
 """
-function trail(a::PolyElem)
-   if a == 0
+function trail(a::Nemo.PolyElem)
+   if iszero(a)
       return base_ring(a)(0)
    else
       for i = 1:length(a)
          c = coeff(a, i - 1)
-         if c != 0
+         if !iszero(c)
             return c
          end
       end
@@ -133,72 +142,90 @@ function trail(a::PolyElem)
 end
 
 doc"""
-    zero(R::PolyRing)
+    zero(R::Nemo.PolyRing)
 > Return the zero polynomial in the given polynomial ring.
 """
-zero(R::PolyRing) = R(0)
+zero(R::Nemo.PolyRing) = R(0)
 
 doc"""
-    one(R::PolyRing)
+    one(R::Nemo.PolyRing)
 > Return the constant polynomial $1$ in the given polynomial ring.
 """
-one(R::PolyRing) = R(1)
+one(R::Nemo.PolyRing) = R(1)
 
 doc"""
-    gen(R::PolyRing)
+    gen(R::Nemo.PolyRing)
 > Return the generator of the given polynomial ring.
 """
-gen(R::PolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
+gen(R::Nemo.PolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
 
 doc"""
-    iszero(a::PolyElem)
+    iszero(a::Nemo.PolyElem)
 > Return `true` if the given polynomial is zero, otherwise return `false`.
 """
-iszero(a::PolyElem) = length(a) == 0
+iszero(a::Nemo.PolyElem) = length(a) == 0
 
 doc"""
-    isone(a::PolyElem)
+    isone(a::Nemo.PolyElem)
 > Return `true` if the given polynomial is the constant polynomial $1$,
 > otherwise return `false`.
 """
-isone(a::PolyElem) = length(a) == 1 && isone(coeff(a, 0))
+isone(a::Nemo.PolyElem) = length(a) == 1 && isone(coeff(a, 0))
 
 doc"""
-    isgen(a::PolyElem)
+    isgen(a::Nemo.PolyElem)
 > Return `true` if the given polynomial is the constant generator of its
 > polynomial ring, otherwise return `false`.
 """
-function isgen(a::PolyElem)
+function isgen(a::Nemo.PolyElem)
     return length(a) == 2 && iszero(coeff(a, 0)) && isone(coeff(a, 1))
 end
 
 doc"""
-    isunit(a::PolyElem)
+    isunit(a::Nemo.PolyElem)
 > Return `true` if the given polynomial is a unit in its polynomial ring,
 > otherwise return `false`.
 """
-isunit(a::PolyElem) = length(a) == 1 && isunit(coeff(a, 0))
+isunit(a::Nemo.PolyElem) = length(a) == 1 && isunit(coeff(a, 0))
 
-ismonomial{T<:RingElem}(a::T) = true
+isterm(a::T) where {T <: RingElement} = true
 
 doc"""
-    ismonomial(a::PolyElem)
-> Return `true` if the given polynomial is a monomial. This function is
+    isterm(a::Nemo.PolyElem)
+> Return `true` if the given polynomial is has one term. This function is
 > recursive, with all scalar types returning true.
 """
-function ismonomial(a::PolyElem)
-   if !ismonomial(lead(a))
+function isterm(a::Nemo.PolyElem)
+   if !isterm(lead(a))
       return false
    end
    for i = 1:length(a) - 1
-      if coeff(a, i - 1) != 0
+      if !iszero(coeff(a, i - 1))
          return false
       end
    end
    return true
 end
 
-function deepcopy_internal{T <: RingElem}(a::GenPoly{T}, dict::ObjectIdDict)
+ismonomial(a::T) where {T <: RingElement} = isone(a)
+
+doc"""
+    ismonomial(a::Nemo.PolyElem)
+> Return `true` if the given polynomial is a monomial. 
+"""
+function ismonomial(a::Nemo.PolyElem)
+   if !ismonomial(lead(a))
+      return false
+   end
+   for i = 1:length(a) - 1
+      if !iszero(coeff(a, i - 1))
+         return false
+      end
+   end
+   return true
+end
+
+function deepcopy_internal(a::Poly{T}, dict::ObjectIdDict) where {T <: RingElement} 
    coeffs = Array{T}(length(a))
    for i = 1:length(a)
       coeffs[i] = deepcopy(a.coeffs[i])
@@ -212,7 +239,7 @@ end
 #
 ###############################################################################
 
-canonical_unit(x::PolyElem) = canonical_unit(lead(x))
+canonical_unit(x::Nemo.PolyElem) = canonical_unit(lead(x))
 
 ###############################################################################
 #
@@ -220,7 +247,7 @@ canonical_unit(x::PolyElem) = canonical_unit(lead(x))
 #
 ###############################################################################
 
-function show(io::IO, x::PolyElem)
+function show(io::IO, x::Nemo.PolyElem)
    len = length(x)
    S = var(parent(x))
    if len == 0
@@ -270,18 +297,18 @@ function show(io::IO, x::PolyElem)
    end
 end
 
-function show(io::IO, p::PolyRing)
+function show(io::IO, p::Nemo.PolyRing)
    print(io, "Univariate Polynomial Ring in ")
    print(io, string(var(p)))
    print(io, " over ")
    show(io, base_ring(p))
 end
 
-needs_parentheses(x::PolyElem) = length(x) > 1
+needs_parentheses(x::Nemo.PolyElem) = length(x) > 1
 
-isnegative(x::PolyElem) = length(x) <= 1 && isnegative(coeff(x, 0))
+isnegative(x::Nemo.PolyElem) = length(x) <= 1 && isnegative(coeff(x, 0))
 
-show_minus_one{T <: RingElem}(::Type{GenPoly{T}}) = show_minus_one(T)
+show_minus_one(::Type{Poly{T}}) where {T <: RingElement} = show_minus_one(T)
 
 ###############################################################################
 #
@@ -290,10 +317,10 @@ show_minus_one{T <: RingElem}(::Type{GenPoly{T}}) = show_minus_one(T)
 ###############################################################################
 
 doc"""
-    -(a::PolyElem)
+    -(a::Nemo.PolyElem)
 > Return $-a$.
 """
-function -(a::PolyElem)
+function -(a::Nemo.PolyElem)
    len = length(a)
    z = parent(a)()
    fit!(z, len)
@@ -311,10 +338,10 @@ end
 ###############################################################################
 
 doc"""
-    +{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+    +{T <: RingElement}(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T})
 > Return $a + b$.
 """
-function +{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+function +(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: RingElement}
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -327,11 +354,11 @@ function +{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
       i += 1
    end
    while i <= lena
-      z = setcoeff!(z, i - 1, coeff(a, i - 1))
+      z = setcoeff!(z, i - 1, deepcopy(coeff(a, i - 1)))
       i += 1
    end
    while i <= lenb
-      z = setcoeff!(z, i - 1, coeff(b, i - 1))
+      z = setcoeff!(z, i - 1, deepcopy(coeff(b, i - 1)))
       i += 1
    end
    set_length!(z, normalise(z, i - 1))
@@ -339,10 +366,10 @@ function +{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
 end
 
 doc"""
-    -{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+    -{T <: RingElement}(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T})
 > Return $a - b$.
 """
-function -{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+function -(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: RingElement}
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -355,7 +382,7 @@ function -{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
       i += 1
    end
    while i <= lena
-      z = setcoeff!(z, i - 1, coeff(a, i - 1))
+      z = setcoeff!(z, i - 1, deepcopy(coeff(a, i - 1)))
       i += 1
    end
    while i <= lenb
@@ -366,7 +393,7 @@ function -{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    return z
 end
 
-function mul_karatsuba{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+function mul_karatsuba(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: RingElement}
    # we assume len(a) != 0 != lenb and parent(a) == parent(b)
    lena = length(a)
    lenb = length(b)
@@ -408,12 +435,14 @@ function mul_karatsuba{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
       r = setcoeff!(r, 2m + i - 1, coeff(z2, i - 1))
    end
    for i = 1:length(z1)
-      r.coeffs[i + m] = addeq!(r.coeffs[i + m], coeff(z1, i - 1))
+      u = coeff(r, i + m - 1)
+      u = addeq!(u, coeff(z1, i - 1))
+      setcoeff!(r, i + m - 1, u)
    end
    return r
 end
 
-function mul_ks{T <: PolyElem}(a::PolyElem{T}, b::PolyElem{T})
+function mul_ks(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Nemo.PolyElem}
    lena = length(a)
    lenb = length(b)
    if lena == 0 || lenb == 0
@@ -474,16 +503,18 @@ function mul_ks{T <: PolyElem}(a::PolyElem{T}, b::PolyElem{T})
    lenr = lena + lenb - 1
    fit!(r, lenr)
    for i = 1:lenr
-      fit!(r.coeffs[i], m)
+      u = coeff(r, i - 1)
+      fit!(u, m)
       for j = 1:m
-         r.coeffs[i] = setcoeff!(r.coeffs[i], j - 1, coeff(p, (i - 1)*m + j - 1))
+         u = setcoeff!(u, j - 1, coeff(p, (i - 1)*m + j - 1))
       end
+      setcoeff!(r, i - 1, u)
    end
    set_length!(r, normalise(r, lenr))
    return r
 end
 
-function mul_classical{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+function mul_classical(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: RingElement}
    lena = length(a)
    lenb = length(b)
    if lena == 0 || lenb == 0
@@ -510,10 +541,10 @@ function mul_classical{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
 end
 
 doc"""
-    *{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+    *{T <: RingElement}(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T})
 > Return $a\times b$.
 """
-function *{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+function *(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return mul_classical(a, b)
 end
@@ -525,10 +556,10 @@ end
 ###############################################################################
 
 doc"""
-    *{T <: RingElem}(a::T, b::PolyElem{T})
+    *{T <: RingElem}(a::T, b::Nemo.PolyElem{T})
 > Return $a\times b$.
 """
-function *{T <: RingElem}(a::T, b::PolyElem{T})
+function *(a::T, b::Nemo.PolyElem{T}) where {T <: RingElem}
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -540,10 +571,10 @@ function *{T <: RingElem}(a::T, b::PolyElem{T})
 end
 
 doc"""
-    *(a::Integer, b::PolyElem)
+    *(a::Union{Integer, Rational}, b::Nemo.PolyElem)
 > Return $a\times b$.
 """
-function *(a::Integer, b::PolyElem)
+function *(a::Union{Integer, Rational}, b::Nemo.PolyElem)
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -555,109 +586,16 @@ function *(a::Integer, b::PolyElem)
 end
 
 doc"""
-    *(a::fmpz, b::PolyElem)
+    *{T <: RingElem}(a::Nemo.PolyElem{T}, b::T)
 > Return $a\times b$.
 """
-function *(a::fmpz, b::PolyElem)
-   len = length(b)
-   z = parent(b)()
-   fit!(z, len)
-   for i = 1:len
-      z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
-   end
-   set_length!(z, normalise(z, len))
-   return z
-end
+*(a::Nemo.PolyElem{T}, b::T) where {T <: RingElem} = b*a
 
 doc"""
-    *{T <: RingElem}(a::PolyElem{T}, b::T)
+    *(a::Nemo.PolyElem, b::Union{Integer, Rational})
 > Return $a\times b$.
 """
-*{T <: RingElem}(a::PolyElem{T}, b::T) = b*a
-
-doc"""
-    *(a::PolyElem, b::Integer)
-> Return $a\times b$.
-"""
-*(a::PolyElem, b::Integer) = b*a
-
-doc"""
-    *(a::PolyElem, b::fmpz)
-> Return $a\times b$.
-"""
-*(a::PolyElem, b::fmpz) = b*a
-
-doc"""
-    +{T <: RingElem}(a::T, b::PolyElem{T})
-> Return $a + b$.
-"""
-+{T <: RingElem}(a::T, b::PolyElem{T}) = parent(b)(a) + b
-
-doc"""
-    +(a::Integer, b::PolyElem)
-> Return $a + b$.
-"""
-+(a::Integer, b::PolyElem) = parent(b)(a) + b
-
-doc"""
-    +(a::fmpz, b::PolyElem)
-> Return $a + b$.
-"""
-+(a::fmpz, b::PolyElem) = parent(b)(a) + b
-
-doc"""
-    +{T <: RingElem}(a::PolyElem{T}, b::T)
-> Return $a + b$.
-"""
-+{T <: RingElem}(a::PolyElem{T}, b::T) = b + a
-
-doc"""
-    +(a::PolyElem, b::Integer)
-> Return $a + b$.
-"""
-+(a::PolyElem, b::Integer) = b + a
-
-doc"""
-    +(a::PolyElem, b::fmpz)
-> Return $a + b$.
-"""
-+(a::PolyElem, b::fmpz) = b + a
-
-doc"""
-    -{T <: RingElem}(a::T, b::PolyElem{T})
-> Return $a - b$.
-"""
--{T <: RingElem}(a::T, b::PolyElem{T}) = parent(b)(a) - b
-
-doc"""
-    -(a::Integer, b::PolyElem)
-> Return $a - b$.
-"""
--(a::Integer, b::PolyElem) = parent(b)(a) - b
-
-doc"""
-    -(a::fmpz, b::PolyElem)
-> Return $a - b$.
-"""
--(a::fmpz, b::PolyElem) = parent(b)(a) - b
-
-doc"""
-    -{T <: RingElem}(a::PolyElem{T}, b::T)
-> Return $a - b$.
-"""
--{T <: RingElem}(a::PolyElem{T}, b::T) = a - parent(a)(b)
-
-doc"""
-    -(a::PolyElem, b::Integer)
-> Return $a - b$.
-"""
--(a::PolyElem, b::Integer) = a - parent(a)(b)
-
-doc"""
-    -(a::PolyElem, b::fmpz)
-> Return $a - b$.
-"""
--(a::PolyElem, b::fmpz) = a - parent(a)(b)
+*(a::Nemo.PolyElem, b::Union{Integer, Rational}) = b*a
 
 ###############################################################################
 #
@@ -665,7 +603,7 @@ doc"""
 #
 ###############################################################################
 
-function pow_multinomial{T <: RingElem}(a::PolyElem{T}, e::Int)
+function pow_multinomial(a::Nemo.PolyElem{T}, e::Int) where {T <: RingElement}
    e < 0 && throw(DomainError())
    lena = length(a)
    lenz = (lena - 1) * e + 1
@@ -692,10 +630,10 @@ function pow_multinomial{T <: RingElem}(a::PolyElem{T}, e::Int)
 end
 
 doc"""
-    ^{T <: RingElem}(a::PolyElem{T}, b::Int)
+    ^{T <: RingElement}(a::Nemo.PolyElem{T}, b::Int)
 > Return $a^b$. We require $b \geq 0$.
 """
-function ^{T <: RingElem}(a::PolyElem{T}, b::Int)
+function ^(a::Nemo.PolyElem{T}, b::Int) where {T <: RingElement}
    b < 0 && throw(DomainError())
    # special case powers of x for constructing polynomials efficiently
    if isgen(a)
@@ -714,7 +652,7 @@ function ^{T <: RingElem}(a::PolyElem{T}, b::Int)
    elseif b == 0
       return one(parent(a))
    else
-      if T <: FieldElem
+      if T <: FieldElement
          zn = 0
          while iszero(coeff(a, zn))
             zn += 1
@@ -748,12 +686,12 @@ end
 ###############################################################################
 
 doc"""
-    =={T <: RingElem}(x::PolyElem{T}, y::PolyElem{T})
+    =={T <: RingElement}(x::Nemo.PolyElem{T}, y::Nemo.PolyElem{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 > that power series to different precisions may still be arithmetically
 > equal to the minimum of the two precisions.
 """
-function =={T <: RingElem}(x::PolyElem{T}, y::PolyElem{T})
+function ==(x::Nemo.PolyElem{T}, y::Nemo.PolyElem{T}) where {T <: RingElement}
    check_parent(x, y)
    if length(x) != length(y)
       return false
@@ -768,13 +706,13 @@ function =={T <: RingElem}(x::PolyElem{T}, y::PolyElem{T})
 end
 
 doc"""
-    isequal{T <: RingElem}(x::PolyElem{T}, y::PolyElem{T})
+    isequal{T <: RingElement}(x::Nemo.PolyElem{T}, y::Nemo.PolyElem{T})
 > Return `true` if $x == y$ exactly, otherwise return `false`. This function is
 > useful in cases where the coefficients of the polynomial are inexact, e.g.
 > power series. Only if the power series are precisely the same, to the same
 > precision, are they declared equal by this function.
 """
-function isequal{T <: RingElem}(x::PolyElem{T}, y::PolyElem{T})
+function isequal(x::Nemo.PolyElem{T}, y::Nemo.PolyElem{T}) where {T <: RingElement}
    if parent(x) != parent(y)
       return false
    end
@@ -796,43 +734,30 @@ end
 ###############################################################################
 
 doc"""
-    =={T <: RingElem}(x::PolyElem{T}, y::T)
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
+    =={T <: RingElem}(x::Nemo.PolyElem{T}, y::T)
+> Return `true` if $x == y$.
 """
-=={T <: RingElem}(x::PolyElem{T}, y::T) = ((length(x) == 0 && y == 0)
+==(x::Nemo.PolyElem{T}, y::T) where T <: RingElem = ((length(x) == 0 && y == 0)
                         || (length(x) == 1 && coeff(x, 0) == y))
 
 doc"""
-    =={T <: RingElem}(x::T, y::PolyElem{T})
+    ==(x::Nemo.PolyElem, y::Union{Integer, Rational})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-=={T <: RingElem}(x::T, y::PolyElem{T}) = y == x
-
-doc"""
-    ==(x::PolyElem, y::Integer)
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-==(x::PolyElem, y::Integer) = ((length(x) == 0 && y == 0)
+==(x::Nemo.PolyElem, y::Union{Integer, Rational}) = ((length(x) == 0 && y == 0)
                         || (length(x) == 1 && coeff(x, 0) == y))
 
 doc"""
-    ==(x::Integer, y::PolyElem)
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
+    =={T <: RingElem}(x::T, y::Nemo.PolyElem{T})
+> Return `true` if $x = y$.
 """
-==(x::Integer, y::PolyElem) = y == x
+==(x::T, y::Nemo.PolyElem{T}) where T <: RingElem = y == x
 
 doc"""
-    ==(x::PolyElem, y::fmpz)
+    ==(x::Union{Integer, Rational}, y::Nemo.PolyElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::PolyElem, y::fmpz) = ((length(x) == 0 && y == 0)
-                        || (length(x) == 1 && coeff(x, 0) == y))
-
-doc"""
-    ==(x::fmpz, y::PolyElem)
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-==(x::fmpz, y::PolyElem) = y == x
+==(x::Union{Integer, Rational}, y::Nemo.PolyElem) = y == x
 
 ###############################################################################
 #
@@ -841,10 +766,10 @@ doc"""
 ###############################################################################
 
 doc"""
-    truncate(a::PolyElem, n::Int)
+    truncate(a::Nemo.PolyElem, n::Int)
 > Return $a$ truncated to $n$ terms.
 """
-function truncate(a::PolyElem, n::Int)
+function truncate(a::Nemo.PolyElem, n::Int)
    n < 0 && throw(DomainError())
    lena = length(a)
    if lena <= n
@@ -852,7 +777,7 @@ function truncate(a::PolyElem, n::Int)
    end
    lenz = min(lena, n)
    z = parent(a)()
-   fit!(a, lenz)
+   fit!(z, lenz)
    for i = 1:lenz
       z = setcoeff!(z, i - 1, coeff(a, i - 1))
    end
@@ -861,10 +786,10 @@ function truncate(a::PolyElem, n::Int)
 end
 
 doc"""
-    mullow{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T}, n::Int)
+    mullow{T <: RingElement}(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}, n::Int)
 > Return $a\times b$ truncated to $n$ terms.
 """
-function mullow{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T}, n::Int)
+function mullow(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}, n::Int) where {T <: RingElement}
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -905,14 +830,14 @@ end
 ###############################################################################
 
 doc"""
-    reverse(x::PolyElem, len::Int)
+    reverse(x::Nemo.PolyElem, len::Int)
 > Return the reverse of the polynomial $x$, thought of as a polynomial of
 > the given length (the polynomial will be notionally truncated or padded with
 > zeroes before the leading term if necessary to match the specified length). 
 > The resulting polynomial is normalised. If `len` is negative we throw a
 > `DomainError()`.
 """
-function reverse(x::PolyElem, len::Int)
+function reverse(x::Nemo.PolyElem, len::Int)
    len < 0 && throw(DomainError())
    r = parent(x)()
    fit!(r, len)
@@ -924,12 +849,12 @@ function reverse(x::PolyElem, len::Int)
 end
 
 doc"""
-    reverse(x::PolyElem)
+    reverse(x::Nemo.PolyElem)
 > Return the reverse of the polynomial $x$, i.e. the leading coefficient
 > of $x$ becomes the constant coefficient of the result, etc. The resulting
 > polynomial is normalised.
 """
-function reverse(x::PolyElem)
+function reverse(x::Nemo.PolyElem)
    reverse(x, length(x))
 end
 
@@ -940,11 +865,11 @@ end
 ###############################################################################
 
 doc"""
-    shift_left(x::PolyElem, n::Int)
+    shift_left(x::Nemo.PolyElem, n::Int)
 > Return the polynomial $f$ shifted left by $n$ terms, i.e. multiplied by
 > $x^n$.
 """
-function shift_left(f::PolyElem, n::Int)
+function shift_left(f::Nemo.PolyElem, n::Int)
    n < 0 && throw(DomainError())
    if n == 0
       return f
@@ -962,11 +887,11 @@ function shift_left(f::PolyElem, n::Int)
 end
 
 doc"""
-    shift_right(f::PolyElem, n::Int)
+    shift_right(f::Nemo.PolyElem, n::Int)
 > Return the polynomial $f$ shifted right by $n$ terms, i.e. divided by
 > $x^n$.
 """
-function shift_right(f::PolyElem, n::Int)
+function shift_right(f::Nemo.PolyElem, n::Int)
    n < 0 && throw(DomainError())
    flen = length(f)
    if n >= flen
@@ -990,27 +915,27 @@ end
 ###############################################################################
 
 doc"""
-    mulmod{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T}, d::PolyElem{T})
+    mulmod{T <: Union{Nemo.ResElem, FieldElement}}(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}, d::Nemo.PolyElem{T})
 > Return $a\times b \pmod{d}$.
 """
-function mulmod{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T}, d::PolyElem{T})
+function mulmod(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}, d::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
    check_parent(a, b)
    check_parent(a, d)
    return mod(a*b, d)
 end
 
 doc"""
-    powmod{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::Int, d::PolyElem{T})
+    powmod{T <: Union{Nemo.ResElem, FieldElement}}(a::Nemo.PolyElem{T}, b::Int, d::Nemo.PolyElem{T})
 > Return $a^b \pmod{d}$. There are no restrictions on $b$.
 """
-function powmod{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::Int, d::PolyElem{T})
+function powmod(a::Nemo.PolyElem{T}, b::Int, d::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
    check_parent(a, d)
    if length(a) == 0
-      return zero(parent(a))
+      z = zero(parent(a))
    elseif length(a) == 1
-      return parent(a)(coeff(a, 0)^b)
+      z = parent(a)(coeff(a, 0)^b)
    elseif b == 0
-      return one(parent(a))
+      z = one(parent(a))
    else
       if b < 0
          a = invmod(a, d)
@@ -1029,15 +954,18 @@ function powmod{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::Int, d::PolyE
          end
          bit >>= 1
       end
-      return z
    end
+   if length(z) >= length(d)
+      z = mod(z, d)
+   end
+   return z
 end
 
 doc"""
-    invmod{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
+    invmod{T <: Union{Nemo.ResElem, FieldElement}}(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T})
 > Return $a^{-1} \pmod{d}$.
 """
-function invmod{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
+function invmod(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
    check_parent(a, b)
    g, z = gcdinv(a, b)
    if g != 1
@@ -1053,13 +981,13 @@ end
 ###############################################################################
 
 doc"""
-    divexact{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+    divexact{T <: RingElement}(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T})
 > Return $a/b$ where the quotient is expected to be exact.
 """
-function divexact{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
+function divexact(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T}) where {T <: RingElement}
    check_parent(f, g)
-   g == 0 && throw(DivideError())
-   if f == 0
+   iszero(g) && throw(DivideError())
+   if iszero(f)
       return zero(parent(f))
    end
    lenq = length(f) - length(g) + 1
@@ -1086,11 +1014,11 @@ end
 ###############################################################################
 
 doc"""
-    divexact{T <: RingElem}(a::PolyElem{T}, b::T)
+    divexact{T <: RingElem}(a::Nemo.PolyElem{T}, b::T)
 > Return $a/b$ where the quotient is expected to be exact.
 """
-function divexact{T <: RingElem}(a::PolyElem{T}, b::T)
-   b == 0 && throw(DivideError())
+function divexact(a::Nemo.PolyElem{T}, b::T) where {T <: RingElem}
+   iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
    for i = 1:length(a)
@@ -1101,26 +1029,11 @@ function divexact{T <: RingElem}(a::PolyElem{T}, b::T)
 end
 
 doc"""
-    divexact(a::PolyElem, b::Integer)
+    divexact(a::Nemo.PolyElem, b::Union{Integer, Rational})
 > Return $a/b$ where the quotient is expected to be exact.
 """
-function divexact(a::PolyElem, b::Integer)
-   b == 0 && throw(DivideError())
-   z = parent(a)()
-   fit!(z, length(a))
-   for i = 1:length(a)
-      z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b))
-   end
-   set_length!(z, length(a))
-   return z
-end
-
-doc"""
-    divexact(a::PolyElem, b::fmpz)
-> Return $a/b$ where the quotient is expected to be exact.
-"""
-function divexact(a::PolyElem, b::fmpz)
-   b == 0 && throw(DivideError())
+function divexact(a::Nemo.PolyElem, b::Union{Integer, Rational})
+   iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
    for i = 1:length(a)
@@ -1137,10 +1050,10 @@ end
 ###############################################################################
 
 doc"""
-    mod{T <: Union{ResElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{T})
+    mod{T <: Union{Nemo.ResElem, FieldElement}}(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T})
 > Return $f \pmod{g}$.
 """
-function mod{T <: Union{ResElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{T})
+function mod(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
    check_parent(f, g)
    if length(g) == 0
       raise(DivideError())
@@ -1166,11 +1079,11 @@ function mod{T <: Union{ResElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{T})
 end
 
 doc"""
-    divrem{T <: Union{ResElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{T})
+    divrem{T <: Union{Nemo.ResElem, FieldElement}}(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T})
 > Return a tuple $(q, r)$ such that $f = qg + r$ where $q$ is the euclidean
 > quotient of $f$ by $g$.
 """
-function divrem{T <: Union{ResElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{T})
+function divrem(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
    check_parent(f, g)
    if length(g) == 0
       raise(DivideError())
@@ -1201,6 +1114,16 @@ function divrem{T <: Union{ResElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{T})
    return q, f
 end
 
+doc"""
+    div{T <: Union{Nemo.ResElem, FieldElement}}(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T})
+> Return a tuple $q$ such that $f = qg + r$ where $q$ is the euclidean
+> quotient of $f$ by $g$.
+"""
+function div(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
+   q, r = divrem(f, g)
+   return q
+end
+
 ###############################################################################
 #
 #   Pseudodivision
@@ -1208,13 +1131,16 @@ end
 ###############################################################################
 
 doc"""
-    pseudorem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
+    pseudorem{T <: RingElement}(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T})
 > Return the pseudoremainder of $a$ divided by $b$. If $b = 0$ we throw a 
 > `DivideError()`.
 """
-function pseudorem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
+function pseudorem(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T}) where {T <: RingElement}
    check_parent(f, g)
    g == 0 && throw(DivideError())
+   if length(f) < length(g)
+      return f
+   end
    k = length(f) - length(g) + 1
    b = coeff(g, length(g) - 1)
    x = gen(parent(f))
@@ -1226,11 +1152,11 @@ function pseudorem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
 end
 
 doc"""
-    pseudodivrem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
+    pseudodivrem{T <: RingElement}(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T})
 > Return a tuple $(q, r)$ consisting of the pseudoquotient and pseudoremainder 
 > of $a$ divided by $b$. If $b = 0$ we throw a `DivideError()`.
 """
-function pseudodivrem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
+function pseudodivrem(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T}) where {T <: RingElement}
    check_parent(f, g)
    g == 0 && throw(DivideError())
    if length(f) < length(g)
@@ -1267,13 +1193,13 @@ end
 #CF TODO: use squaring for fast large valuation
 
 doc"""
-    remove{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
+    remove{T <: RingElement}(z::Nemo.PolyElem{T}, p::Nemo.PolyElem{T})
 > Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
 > $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
 >
 > See also `valuation`, which only returns the valuation.
 """
-function remove{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
+function remove(z::Nemo.PolyElem{T}, p::Nemo.PolyElem{T}) where {T <: RingElement}
   check_parent(z,p)
   z == 0 && error("Not yet implemented")
   q, r = divrem(z, p)
@@ -1291,24 +1217,24 @@ function remove{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
 end
 
 doc"""
-    valuation{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
+    valuation{T <: RingElement}(z::Nemo.PolyElem{T}, p::Nemo.PolyElem{T})
 > Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
 > $p^k$ divides $z$.
 >
 > See also `remove`, which also returns $z/p^k$.
 """
-function valuation{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
+function valuation(z::Nemo.PolyElem{T}, p::Nemo.PolyElem{T}) where {T <: RingElement}
   v, _ = remove(z, p)
   return v
 end
 
 doc"""
-    divides{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
+    divides{T <: RingElement}(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T})
 > Returns a pair consisting of a flag which is set to `true` if $f$ divides
 > $g$ and `false` otherwise, and a polynomial $h$ such that $f = gh$ if
 > such a polynomial exists. If not, the value of $h$ is undetermined.
 """
-function divides{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
+function divides(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T}) where {T <: RingElement}
    check_parent(f, g)
    if length(g) == 0
       raise(DivideError())
@@ -1345,12 +1271,12 @@ function divides{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
 end
 
 doc"""
-    divides{T <: RingElem}(f::PolyElem{T}, g::T)
+    divides{T <: RingElement}(f::Nemo.PolyElem{T}, g::T)
 > Returns a pair consisting of a flag which is set to `true` if $g$ divides
 > $f$ and `false` otherwise, and a polynomial $h$ such that $f = gh$ if
 > such a polynomial exists. If not, the value of $h$ is undetermined.
 """
-function divides{T <: RingElem}(z::PolyElem{T}, x::T)
+function divides(z::Nemo.PolyElem{T}, x::T) where {T <: RingElement}
    parent(x) != base_ring(z) && error("Wrong parents in divides")
    q = parent(z)()
    fit!(q, length(z))
@@ -1362,7 +1288,7 @@ function divides{T <: RingElem}(z::PolyElem{T}, x::T)
       end
       q = setcoeff!(q, i - 1, c)
    end
-   set_length!(q, length(z))
+   set_length!(q, flag ? length(z) : 0)
    return flag, q
 end
 
@@ -1372,28 +1298,28 @@ end
 #
 ###############################################################################
 
-function term_gcd{T <: RingElem}(a::T, b::T)
+function term_gcd(a::T, b::T) where {T <: RingElement}
    return gcd(a, b)
 end
 
-function term_content{T <: RingElem}(a::T)
+function term_content(a::T) where {T <: RingElement}
    return a
 end
 
-function term_gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+function term_gcd(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: RingElement}
    d = min(degree(a), degree(b))
    x = gen(parent(a))
    return term_gcd(coeff(a, degree(a)), coeff(b, degree(b)))*x^d
 end
 
-function term_content{T <: RingElem}(a::PolyElem{T})
+function term_content(a::Nemo.PolyElem{T}) where {T <: RingElement}
    for i = 1:length(a)
       c = coeff(a, i - 1)
-      if c != 0
+      if !iszero(c)
          g = term_content(c)
          for j = i + 1:length(a)
             c = coeff(a, j - 1)
-            if c != 0
+            if !iszero(c)
                g = term_gcd(g, term_content(c))
             end
          end
@@ -1405,18 +1331,22 @@ function term_content{T <: RingElem}(a::PolyElem{T})
 end
 
 doc"""
-    gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+    gcd{T <: RingElement}(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T})
 > Return a greatest common divisor of $a$ and $b$ if it exists.
 """
-function gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T}, ignore_content=false)
+function gcd(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}, ignore_content::Bool = false) where {T <: RingElement}
    check_parent(a, b)
    if length(b) > length(a)
       (a, b) = (b, a)
    end
-   if b == 0
-      return a
+   if iszero(b)
+      if a == 0
+         return a
+      else
+         return divexact(a, canonical_unit(lead(a)))
+      end
    end
-   if b == 1
+   if isone(b)
       return b
    end
    if !ignore_content
@@ -1426,8 +1356,8 @@ function gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T}, ignore_content=false
       b = divexact(b, c2)
       c = gcd(c1, c2)
    end
-   lead_monomial = ismonomial(lead(a)) || ismonomial(lead(b))
-   trail_monomial = ismonomial(trail(a)) || ismonomial(trail(b))
+   lead_monomial = isterm(lead(a)) || isterm(lead(b))
+   trail_monomial = isterm(trail(a)) || isterm(trail(b))
    lead_a = lead(a)
    lead_b = lead(b)
    g = one(parent(a))
@@ -1451,7 +1381,7 @@ function gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T}, ignore_content=false
       end
    end
    if !ignore_content
-      if !ismonomial(lead(b)) && !ismonomial(trail(b))
+      if !isterm(lead(b)) && !isterm(trail(b))
          if lead_monomial # lead term monomial, so content contains rest
             d = divexact(lead(b), term_content(lead(b)))
             b = divexact(b, d)
@@ -1460,7 +1390,7 @@ function gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T}, ignore_content=false
             b = divexact(b, d)
          else
             glead = gcd(lead_a, lead_b)
-            if ismonomial(glead)
+            if isterm(glead)
                d = divexact(lead(b), term_content(lead(b)))
                b = divexact(b, d)
             else # last ditched attempt to find easy content
@@ -1473,25 +1403,28 @@ function gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T}, ignore_content=false
             end
          end
       end
-      b = divexact(b, term_content(b))
-   else
-      return b
+      b = divexact(b, content(b))
    end
+   b = c*b
+   return divexact(b, canonical_unit(lead(b)))
 end
 
-
-function gcd{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
+function gcd(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
    check_parent(a, b)
    if length(a) > length(b)
       (a, b) = (b, a)
    end
-   if b == 0
-      return a
+   if iszero(b)
+      if iszero(a)
+         return(a)
+      else
+         return inv(lead(a))*a
+      end
    end
    g = gcd(content(a), content(b))
    a = divexact(a, g)
    b = divexact(b, g)
-   while a != 0
+   while !iszero(a)
       (a, b) = (mod(b, a), a)
    end
    b = g*b
@@ -1499,34 +1432,42 @@ function gcd{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
 end
 
 doc"""
-    lcm{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+    lcm{T <: RingElement}(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T})
 > Return a least common multiple of $a$ and $b$ if it exists.
 """
-function lcm{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+function lcm(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return a*divexact(b, gcd(a, b))
 end
 
 doc"""
-    content(a::PolyElem)
+    content(a::Nemo.PolyElem)
 > Return the content of $a$, i.e. the greatest common divisor of its
 > coefficients.
 """
-function content(a::PolyElem)
+function content(a::Nemo.PolyElem)
    z = coeff(a, 0)
    for i = 2:length(a)
       z = gcd(z, coeff(a, i - 1))
    end
-   return z
+   if z == 0
+      return z
+   else
+      return divexact(z, canonical_unit(z))
+   end
 end
 
 doc"""
-    primpart(a::PolyElem)
+    primpart(a::Nemo.PolyElem)
 > Return the primitive part of $a$, i.e. the polynomial divided by its content.
 """
-function primpart(a::PolyElem)
+function primpart(a::Nemo.PolyElem)
    d = content(a)
-   return divexact(a, d)
+   if d == 0
+      return 0
+   else
+      return divexact(a, d)
+   end
 end
 
 ###############################################################################
@@ -1536,55 +1477,41 @@ end
 ###############################################################################
 
 doc"""
-    evaluate{T <: RingElem}(a::PolyElem{T}, b::T)
+    evaluate{T <: RingElement}(a::Nemo.PolyElem{T}, b::T)
 > Evaluate the polynomial $a$ at the value $b$ and return the result.
 """
-function evaluate{T <: RingElem}(a::PolyElem{T}, b::T)
+function evaluate(a::Nemo.PolyElem, b::T) where {T <: RingElement}
    i = length(a)
+   R = base_ring(a)
    if i == 0
-       return zero(base_ring(a))
+       return zero(R)
    end
    if i > 25
       return subst(a, b)
    end
-   z = coeff(a, i - 1)
+   z = R(coeff(a, i - 1))
    while i > 1
       i -= 1
-      z = z*b + coeff(a, i - 1)
+      z = z*b + R(coeff(a, i - 1))
    end
    return z
 end
 
 doc"""
-    evaluate(a::PolyElem, b::Integer)
-> Evaluate the polynomial $a$ at the value $b$ and return the result.
-"""
-function evaluate(a::PolyElem, b::Integer)
-   return evaluate(a, base_ring(a)(b))
-end
-
-doc"""
-    evaluate(a::PolyElem, b::fmpz)
-> Evaluate the polynomial $a$ at the value $b$ and return the result.
-"""
-function evaluate(a::PolyElem, b::fmpz)
-   return evaluate(a, base_ring(a)(b))
-end
-
-doc"""
-    compose(a::PolyElem, b::PolyElem)
+    compose(a::Nemo.PolyElem, b::Nemo.PolyElem)
 > Compose the polynomial $a$ with the polynomial $b$ and return the result,
 > i.e. return $a\circ b$.
 """
-function compose(a::PolyElem, b::PolyElem)
+function compose(a::Nemo.PolyElem, b::Nemo.PolyElem)
    i = length(a)
+   R = parent(a)
    if i == 0
-       return zero(parent(a))
+       return zero(R)
    end
    if i*length(b) > 25
       return subst(a, b)
    end
-   z = coeff(a, i - 1)
+   z = R(coeff(a, i - 1))
    while i > 1
       i -= 1
       z = z*b + coeff(a, i - 1)
@@ -1599,10 +1526,10 @@ end
 ###############################################################################
 
 doc"""
-    derivative(a::PolyElem)
+    derivative(a::Nemo.PolyElem)
 > Return the derivative of the polynomial $a$.
 """
-function derivative(a::PolyElem)
+function derivative(a::Nemo.PolyElem)
    if a == 0
       return zero(parent(a))
    end
@@ -1623,10 +1550,10 @@ end
 ###############################################################################
 
 doc"""
-    integral{T <: Union{ResElem, FieldElem}}(x::PolyElem{T})
+    integral{T <: Union{Nemo.ResElem, FieldElement}}(x::Nemo.PolyElem{T})
 > Return the integral of the polynomial $a$.
 """
-function integral{T <: Union{ResElem, FieldElem}}(x::PolyElem{T})
+function integral(x::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
    len = length(x)
    p = parent(x)()
    fit!(p, len + 1)
@@ -1649,10 +1576,10 @@ end
 ###############################################################################
 
 doc"""
-    resultant{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+    resultant{T <: RingElement}(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T})
 > Return the resultant of the $a$ and $b$.
 """
-function resultant{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+function resultant(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: RingElement}
    check_parent(a, b)
    if length(a) == 0 || length(b) == 0
       return zero(base_ring(a))
@@ -1695,7 +1622,7 @@ function resultant{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    res = c1^(lb - 1)*c2^(la - 1)*s*sgn
 end
 
-function resultant_lehmer{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
+function resultant_lehmer(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
    const crossover = 40
    R = base_ring(a)
    check_parent(a, b)
@@ -1771,7 +1698,7 @@ function resultant_lehmer{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::Pol
    return c1^(lB - 1)*c2^(lA - 1)*s*sgn
 end
 
-function resultant{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
+function resultant(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
    check_parent(a, b)
    if length(a) == 0 || length(b) == 0
       return zero(base_ring(a))
@@ -1818,10 +1745,10 @@ end
 ###############################################################################
 
 doc"""
-    discriminant(a::PolyElem)
+    discriminant(a::Nemo.PolyElem)
 > Return the discrimnant of the given polynomial.
 """
-function discriminant(a::PolyElem)
+function discriminant(a::Nemo.PolyElem)
    d = derivative(a)
    z = resultant(a, d)
    if length(a) - length(d) == 1
@@ -1835,16 +1762,16 @@ end
 
 ###############################################################################
 #
-#   GCDX
+#   RESX
 #
 ###############################################################################
 
 doc"""
-    gcdx{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+    resx{T <: RingElement}(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T})
 > Return a tuple $(r, s, t)$ such that $r$ is the resultant of $a$ and $b$ and
 > such that $r = a\times s + b\times t$.
 """
-function gcdx{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+function resx(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: RingElement}
    check_parent(a, b)
    sgn = 1
    swap = false
@@ -1857,7 +1784,10 @@ function gcdx{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    end
    lena = length(a)
    lenb = length(b)
-   (lena <= 1 || lenb <= 1) && error("Constant polynomial in gcdx")  
+   if lenb == 0
+      return zero(base_ring(a)), zero(parent(a)), zero(parent(a))
+   end
+   (lena <= 1 && lenb <= 1) && error("Constant polynomials in resx")
    c1 = content(a)
    c2 = content(b)
    A = divexact(a, c1)
@@ -1887,20 +1817,51 @@ function gcdx{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    end
    s = divexact(h*lead(B)^(lena - 1), h^(lena - 1))
    res = c1^(length(b) - 1)*c2^(length(a) - 1)*s*sgn
-   u2 *= c1^(length(b) - 2)*c2^(length(a) - 1)
-   v2 *= c1^(length(b) - 1)*c2^(length(a) - 2)
+   if length(b) > 1
+      u2 *= c1^(length(b) - 2)*c2^(length(a) - 1)*sgn
+   else
+      u2 *= c2^(length(a) - 1)*sgn
+      u2 = divexact(u2, c1)
+   end
+   if length(a) > 1
+      v2 *= c1^(length(b) - 1)*c2^(length(a) - 2)*sgn
+   else
+      v2 *= c1^(length(b) - 1)*sgn
+      v2 = divexact(v2, c2)
+   end
+   if lena != 2
+      if lena > 1
+         d1 = lead(B)^(lena - 2)
+         d2 = h^(lena - 2)
+         u2 = divexact(u2*d1, d2)
+         v2 = divexact(v2*d1, d2)
+      else
+         u2 = divexact(u2*h, lead(B))
+         v2 = divexact(v2*h, lead(B))
+      end
+   end
    if swap
       u2, v2 = v2, u2
    end
+   u = canonical_unit(res)
+   res = divexact(res, u)
+   u2 = divexact(u2, u)
+   v2 = divexact(v2, u)
    return res, u2, v2
 end
 
+###############################################################################
+#
+#   GCDX
+#
+###############################################################################
+
 doc"""
-    gcdx{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
+    gcdx{T <: Union{Nemo.ResElem, FieldElement}}(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T})
 > Return a tuple $(g, s, t)$ such that $g$ is the greatest common divisor of
 > $a$ and $b$ and such that $r = a\times s + b\times t$.
 """
-function gcdx{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
+function gcdx(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
    check_parent(a, b)
    if length(a) == 0
       return b, zero(parent(a)), one(parent(a))
@@ -1919,8 +1880,8 @@ function gcdx{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
    c2 = content(b)
    A = divexact(a, c1)
    B = divexact(b, c2)
-   u1, u2 = inv(c1), zero(parent(a))
-   v1, v2 = zero(parent(a)), inv(c2)
+   u1, u2 = parent(a)(inv(c1)), zero(parent(a))
+   v1, v2 = zero(parent(a)), parent(a)(inv(c2))
    while lenb > 0
       d = lena - lenb
       (Q, B), A = divrem(A, B), B
@@ -1939,12 +1900,12 @@ function gcdx{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
 end
 
 doc"""
-    gcdinv{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
+    gcdinv{T <: Union{Nemo.ResElem, FieldElement}}(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T})
 > Return a tuple $(g, s)$ such that $g$ is the greatest common divisor of $a$
 > and $b$ and such that $s = a^{-1} \pmod{b}$. This function is useful for
 > inverting modulo a polynomial and checking that it really was invertible.
 """
-function gcdinv{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
+function gcdinv(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
    check_parent(a, b)
    if length(a) == 0
       if length(b) == 0
@@ -1992,7 +1953,7 @@ end
 ###############################################################################
 
 doc"""
-    monomial_to_newton!{T <: RingElem}(P::Array{T, 1}, roots::Array{T, 1})
+    monomial_to_newton!{T <: RingElement}(P::Array{T, 1}, roots::Array{T, 1})
 > Converts a polynomial $p$, given as an array of coefficients, in-place
 > from its coefficients given in the standard monomial basis to the Newton
 > basis for the roots $r_0, r_1, \ldots, r_{n-2}$. In other words, this
@@ -2000,7 +1961,7 @@ doc"""
 > $$c_0 + c_1(x-r_0) + c_2(x-r_0)(x-r_1) + \ldots + c_{n-1}(x-r_0)(x-r_1)\cdots(x-r_{n-2})$$
 > is equal to the input polynomial.
 """
-function monomial_to_newton!{T <: RingElem}(P::Array{T, 1}, roots::Array{T, 1})
+function monomial_to_newton!(P::Array{T, 1}, roots::Array{T, 1}) where {T <: RingElement}
    n = length(roots)
    if n > 0
       R = parent(roots[1])
@@ -2016,7 +1977,7 @@ function monomial_to_newton!{T <: RingElem}(P::Array{T, 1}, roots::Array{T, 1})
 end
 
 doc"""
-    newton_to_monomial!{T <: RingElem}(P::Array{T, 1}, roots::Array{T, 1})
+    newton_to_monomial!{T <: RingElement}(P::Array{T, 1}, roots::Array{T, 1})
 > Converts a polynomial $p$, given as an array of coefficients, in-place
 > from its coefficients given in the Newton basis for the roots
 > $r_0, r_1, \ldots, r_{n-2}$ to the standard monomial basis. In other words,
@@ -2024,7 +1985,7 @@ doc"""
 > $$c_0 + c_1(x-r_0) + c_2(x-r_0)(x-r_1) + \ldots + c_{n-1}(x-r_0)(x-r_1)\cdots(x-r_{n-2})$$
 > where $c_i$ are the input coefficients given by $p$.
 """
-function newton_to_monomial!{T <: RingElem}(P::Array{T, 1}, roots::Array{T, 1})
+function newton_to_monomial!(P::Array{T, 1}, roots::Array{T, 1}) where {T <: RingElement}
    n = length(roots)
    if n > 0
       R = parent(roots[1])
@@ -2047,13 +2008,14 @@ end
 ###############################################################################
 
 doc"""
-    interpolate{T <: RingElem}(S::PolyRing, x::Array{T, 1}, y::Array{T, 1})
+    interpolate{T <: RingElement}(S::Nemo.PolyRing, x::Array{T, 1}, y::Array{T, 1})
 > Given two arrays of values $xs$ and $ys$ of the same length $n$, find
 > the polynomial $f$ in the polynomial ring $R$ of length at most $n$ such that
 > $f$ has the value $ys$ at the points $xs$. The values in the arrays $xs$ and
-> $ys$ must belong to the base ring of the polynomial ring $R$.
+> $ys$ must belong to the base ring of the polynomial ring $R$. If no such
+> polynomial exists, an exception is raised.
 """
-function interpolate{T <: RingElem}(S::PolyRing, x::Array{T, 1}, y::Array{T, 1})
+function interpolate(S::Nemo.PolyRing, x::Array{T, 1}, y::Array{T, 1}) where {T <: RingElement}
    length(x) != length(y) && error("Array lengths don't match in interpolate")
    n = length(x)
    if n == 0
@@ -2073,7 +2035,8 @@ function interpolate{T <: RingElem}(S::PolyRing, x::Array{T, 1}, y::Array{T, 1})
          p = P[j] - t
          q = x[j] - x[j - i + 1]
          t = P[j]
-         P[j] = divexact(p, q)
+         flag, P[j] = divides(p, q)
+         flag == false && error("Not an exact division in interpolate")
       end
    end
    newton_to_monomial!(P, x)
@@ -2088,7 +2051,7 @@ end
 #
 ###############################################################################
 
-function chebyshev_t_pair(n::Int, x::PolyElem)
+function chebyshev_t_pair(n::Int, x::Nemo.PolyElem)
    if n == 0
       return one(parent(x)), x
    elseif n == 1
@@ -2106,11 +2069,11 @@ function chebyshev_t_pair(n::Int, x::PolyElem)
 end
 
 doc"""
-    chebyshev_t(n::Int, x::PolyElem)
+    chebyshev_t(n::Int, x::Nemo.PolyElem)
 > Return the Chebyshev polynomial of the first kind $T_n(x)$, defined by 
 > $T_n(x) = \cos(n \cos^{-1}(x))$.
 """
-function chebyshev_t(n::Int, x::PolyElem)
+function chebyshev_t(n::Int, x::Nemo.PolyElem)
    if n == 0
       return one(parent(x))
    elseif n == 1
@@ -2126,7 +2089,7 @@ function chebyshev_t(n::Int, x::PolyElem)
    end
 end
 
-function chebyshev_u_pair(n::Int, x::PolyElem)
+function chebyshev_u_pair(n::Int, x::Nemo.PolyElem)
    if n == 0
       return one(parent(x)), zero(parent(x))
    elseif n == 1
@@ -2146,11 +2109,11 @@ function chebyshev_u_pair(n::Int, x::PolyElem)
 end
 
 doc"""
-    chebyshev_u(n::Int, x::PolyElem)
+    chebyshev_u(n::Int, x::Nemo.PolyElem)
 > Return the Chebyshev polynomial of the first kind $U_n(x)$, defined by 
 > $(n+1) U_n(x) = T'_{n+1}(x)$.
 """
-function chebyshev_u(n::Int, x::PolyElem)
+function chebyshev_u(n::Int, x::Nemo.PolyElem)
    if n == 0
       return one(parent(x))
    elseif n == 1
@@ -2174,7 +2137,16 @@ end
 #
 ###############################################################################
 
-function fit!{T <: RingElem}(c::GenPoly{T}, n::Int)
+function set_length!(c::Poly{T}, n::Int) where T <: RingElement
+   if n < c.length
+      for i = n + 1:c.length
+         c.coeffs[i] = zero!(c.coeffs[i])
+      end
+   end
+   c.length = n
+end
+   
+function fit!(c::Poly{T}, n::Int) where {T <: RingElement}
    if length(c.coeffs) < n
       t = c.coeffs
       c.coeffs = Array{T}(n)
@@ -2188,27 +2160,17 @@ function fit!{T <: RingElem}(c::GenPoly{T}, n::Int)
    return nothing
 end
 
-function zero!{T <: RingElem}(c::GenPoly{T})
-   c.length = 0
+function zero!(c::Poly{T}) where {T <: RingElement}
+   set_length!(c, 0)
    return c
 end
 
-function setcoeff!{T <: RingElem}(c::GenPoly{T}, n::Int, a::T)
-   if a != 0 || n + 1 <= length(c)
-      fit!(c, n + 1)
-      c.coeffs[n + 1] = a
-      c.length = max(length(c), n + 1)
-      # don't normalise
-   end
-   return c
-end
-
-function mul!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T}, b::PolyElem{T})
+function mul!(c::Nemo.PolyElem{T}, a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: RingElement}
    lena = length(a)
    lenb = length(b)
 
    if lena == 0 || lenb == 0
-      c.length = 0
+      set_length!(c, 0)
    else
       if a === c
          a = deepcopy(a)
@@ -2227,22 +2189,22 @@ function mul!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T}, b::PolyElem{T})
       end
 
       for i = 2:lenb
-         c.coeffs[lena + i - 1] = mul!(c.coeffs[lena + i - 1], a.coeffs[lena], coeff(b, i - 1))
+         c.coeffs[lena + i - 1] = mul!(c.coeffs[lena + i - 1], coeff(a, lena - 1), coeff(b, i - 1))
       end
 
       for i = 1:lena - 1
          for j = 2:lenb
-            t = mul!(t, coeff(a, i - 1), b.coeffs[j])
+            t = mul!(t, coeff(a, i - 1), coeff(b, j - 1))
             c.coeffs[i + j - 1] = addeq!(c.coeffs[i + j - 1], t)
          end
       end
         
-      c.length = normalise(c, lenc)
+      set_length!(c, normalise(c, lenc))
    end
    return c
 end
 
-function addeq!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T})
+function addeq!(c::Nemo.PolyElem{T}, a::Nemo.PolyElem{T}) where {T <: RingElement}
    lenc = length(c)
    lena = length(a)
    len = max(lenc, lena)
@@ -2250,18 +2212,19 @@ function addeq!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T})
    for i = 1:lena
       c.coeffs[i] = addeq!(c.coeffs[i], coeff(a, i - 1))
    end
-   c.length = normalise(c, len)
+   set_length!(c, normalise(c, len))
    return c
 end
 
-function add!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T}, b::PolyElem{T})
+function add!(c::Nemo.PolyElem{T}, a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: RingElement}
    lena = length(a)
    lenb = length(b)
    len = max(lena, lenb)
    fit!(c, len)
    i = 1
-   while i <= 1:min(lena, lenb)
+   while i <= min(lena, lenb)
       c.coeffs[i] = add!(c.coeffs[i], coeff(a, i - 1), coeff(b, i - 1))
+      i += 1
    end
    while i <= lena
       c = setcoeff!(c, i - 1, coeff(a, i - 1))
@@ -2271,8 +2234,30 @@ function add!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T}, b::PolyElem{T})
       c = setcoeff!(c, i - 1, coeff(b, i - 1))
       i += 1
    end
-   c.length = normalise(c, len)
+   set_length!(c, normalise(c, len))
    return c
+end
+
+function addmul!(z::Nemo.PolyElem{T}, x::Nemo.PolyElem{T}, y::Nemo.PolyElem{T}, c::Nemo.PolyElem{T}) where {T <: RingElement}
+   c = mul!(c, x, y)
+   z = addeq!(z, c)
+   return z
+end
+
+###############################################################################
+#
+#   Random elements
+#
+###############################################################################
+
+function rand(S::Nemo.PolyRing, deg_range::UnitRange{Int}, v...)
+   R = base_ring(S)
+   f = S()
+   x = gen(S)
+   for i = 0:rand(deg_range)
+      f += rand(R, v...)*x^i
+   end
+   return f
 end
 
 ###############################################################################
@@ -2281,16 +2266,10 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: RingElem, V <: Integer}(::Type{GenPoly{T}}, ::Type{V}) = GenPoly{T}
-
-promote_rule{T <: RingElem}(::Type{GenPoly{T}}, ::Type{T}) = GenPoly{T}
-
-function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenPoly{T}}, ::Type{GenPoly{U}})
-   promote_rule(T, GenPoly{U}) == T ? GenPoly{T} : Union{}
-end
-
-function promote_rule{T <: RingElem, U <: RingElem}(::Type{GenPoly{T}}, ::Type{U})
-   promote_rule(T, U) == T ? GenPoly{T} : promote_rule1(U, GenPoly{T})
+promote_rule(::Type{Poly{T}}, ::Type{Poly{T}}) where T <: RingElement = Poly{T}
+  
+function promote_rule(::Type{Poly{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
+   promote_rule(T, U) == T ? Poly{T} : Union{}
 end
 
 ###############################################################################
@@ -2300,11 +2279,11 @@ end
 ###############################################################################
 
 doc"""
-    subst{T <: RingElem}(f::PolyElem{T}, a::Any)
+    subst{T <: RingElement}(f::Nemo.PolyElem{T}, a::Any)
 > Evaluate the polynomial $f$ at $a$. Note that $a$ can be anything, whether
 > a ring element or not.
 """
-function subst{T <: RingElem}(f::PolyElem{T}, a::Any)
+function subst(f::Nemo.PolyElem{T}, a::Any) where {T <: RingElement}
    S = parent(a)
    n = degree(f)
    if n < 0
@@ -2320,7 +2299,7 @@ function subst{T <: RingElem}(f::PolyElem{T}, a::Any)
    s = coeff(f, d1*d)*A[1]
    for j = 1:min(n - d1*d, d - 1)
       c = coeff(f, d1*d + j)
-      if c != 0
+      if !iszero(c)
          s += c*A[j + 1]
       end
    end
@@ -2329,7 +2308,7 @@ function subst{T <: RingElem}(f::PolyElem{T}, a::Any)
       s += coeff(f, (d1 - i)*d)*A[1]
       for j = 1:min(n - (d1 - i)*d, d - 1)
          c = coeff(f, (d1 - i)*d + j)
-         if c != 0
+         if !iszero(c)
             s += c*A[j + 1]
          end
       end
@@ -2343,46 +2322,55 @@ end
 #
 ###############################################################################
 
-function (a::GenPolyRing{T}){T <: RingElem}(b::RingElem)
+function (a::PolyRing{T})(b::RingElement) where {T <: RingElement}
    return a(base_ring(a)(b))
 end
 
-function (a::GenPolyRing{T}){T <: RingElem}()
-   z = GenPoly{T}()
+function (a::PolyRing{T})() where {T <: RingElement}
+   z = Poly{T}()
    z.parent = a
    return z
 end
 
-function (a::GenPolyRing{T}){T <: RingElem}(b::Integer)
-   z = GenPoly{T}(base_ring(a)(b))
+function (a::PolyRing{T})(b::Union{Integer, Rational}) where {T <: RingElement}
+   z = Poly{T}(base_ring(a)(b))
    z.parent = a
    return z
 end
 
-function (a::GenPolyRing{T}){T <: RingElem}(b::T)
+function (a::PolyRing{T})(b::T) where {T <: RingElement}
    parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
-   z = GenPoly{T}(b)
+   z = Poly{T}(b)
    z.parent = a
    return z
 end
 
-function (a::GenPolyRing{T}){T <: RingElem}(b::PolyElem{T})
+function (a::PolyRing{T})(b::Nemo.PolyElem{T}) where {T <: RingElement}
    parent(b) != a && error("Unable to coerce polynomial")
    return b
 end
 
-function (a::GenPolyRing{T}){T <: RingElem}(b::Array{T, 1})
-   if length(b) > 0
-      parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
+function (a::PolyRing{T})(b::Array{T, 1}) where T <: RingElement
+   R = base_ring(a)
+   for i = 1:length(b)
+      b[i] = R(b[i])
    end
-   z = GenPoly{T}(b)
+   z = Poly{T}(b)
    z.parent = a
    return z
 end
 
-(a::GenPolyRing){T <: Integer}(b::Array{T, 1}) = a(map(base_ring(a), b))
-
-(a::GenPolyRing)(b::Array{fmpz, 1}) = a(map(base_ring(a), b))
+function (a::PolyRing{T})(b::Array{S, 1}) where {S <: RingElement, T <: RingElement}
+   R = base_ring(a)
+   len = length(b)
+   entries = Array{T}(len)
+   for i = 1:length(b)
+      entries[i] = R(b[i])
+   end
+   z = Poly{T}(entries)
+   z.parent = a
+   return z
+end
 
 ###############################################################################
 #
@@ -2391,7 +2379,7 @@ end
 ###############################################################################
 
 doc"""
-    PolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
+    PolynomialRing(R::Nemo.Ring, s::AbstractString; cached::Bool = true)
 > Given a base ring `R` and string `s` specifying how the generator (variable)
 > should be printed, return a tuple `S, x` representing the new polynomial
 > ring $S = R[x]$ and the generator $x$ of the ring. By default the parent
@@ -2399,15 +2387,10 @@ doc"""
 > optional argument `cached` to `false` will prevent the parent object `S` from
 > being cached.
 """
-function PolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
+function PolynomialRing(R::Nemo.Ring, s::AbstractString; cached::Bool = true)
    S = Symbol(s)
    T = elem_type(R)
-   parent_obj = GenPolyRing{T}(R, S, cached)
+   parent_obj = PolyRing{T}(R, S, cached)
 
    return parent_obj, parent_obj([R(0), R(1)])
 end
-
-# S, x = R["x"] syntax
-getindex(R::Ring, s::String) = PolynomialRing(R, s)
-
-getindex{T}(R::Tuple{Ring,T}, s::String) = PolynomialRing(R[1], s)

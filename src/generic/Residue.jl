@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export ResidueRing, GenRes, GenResRing, inv, modulus, data
+export ResidueRing, inv, modulus, data
 
 ###############################################################################
 #
@@ -12,34 +12,34 @@ export ResidueRing, GenRes, GenResRing, inv, modulus, data
 #
 ###############################################################################
 
-parent_type{T}(::Type{GenRes{T}}) = GenResRing{T}
+parent_type(::Type{Res{T}}) where T <: RingElement = ResRing{T}
 
-elem_type{T <: RingElem}(::Type{GenResRing{T}}) = GenRes{T}
+elem_type(::Type{ResRing{T}}) where {T <: RingElement} = Res{T}
 
 doc"""
-    base_ring{T <: RingElem}(S::ResRing{T})
+    base_ring{T <: RingElement}(S::Nemo.ResRing{T})
 > Return the base ring $R$ of the given residue ring $S = R/(a)$.
 """
-base_ring{T <: RingElem}(S::ResRing{T}) = S.base_ring::parent_type(T)
+base_ring(S::Nemo.ResRing{T}) where {T <: RingElement} = S.base_ring::parent_type(T)
 
 doc"""
-    base_ring(r::ResElem)
+    base_ring(r::Nemo.ResElem)
 > Return the base ring $R$ of the residue ring $R/(a)$ that the supplied
 > element $r$ belongs to.
 """
-base_ring(r::ResElem) = base_ring(parent(r))
+base_ring(r::Nemo.ResElem) = base_ring(parent(r))
 
 doc"""
-    parent(a::ResElem)
+    parent(a::Nemo.ResElem)
 > Return the parent object of the given residue element.
 """
-parent(a::ResElem) = a.parent
+parent(a::Nemo.ResElem) = a.parent
 
-function check_parent_type{T <: RingElem}(a::ResRing{T}, b::ResRing{T})
+function check_parent_type(a::Nemo.ResRing{T}, b::Nemo.ResRing{T}) where {T <: RingElement}
    # exists only to check types of parents agree
 end
    
-function check_parent(a::ResElem, b::ResElem)
+function check_parent(a::Nemo.ResElem, b::Nemo.ResElem)
    if parent(a) != parent(b)
       check_parent_type(parent(a), parent(b))
       a.hash != b.hash && error("Incompatible moduli in residue operation")
@@ -52,68 +52,68 @@ end
 #
 ###############################################################################
 
-function Base.hash(a::ResElem, h::UInt)
+function Base.hash(a::Nemo.ResElem, h::UInt)
    b = 0x539c1c8715c1adc2%UInt
-   return b $ hash(data(a), h) $ h
+   return xor(b, xor(hash(data(a), h), h))
 end
 
 doc"""
-    modulus(R::ResRing)
+    modulus(R::Nemo.ResRing)
 > Return the modulus $a$ of the given residue ring $S = R/(a)$.
 """
-function modulus(S::ResRing)
+function modulus(S::Nemo.ResRing)
    return S.modulus
 end
 
 doc"""
-    modulus(R::ResRing)
+    modulus(R::Nemo.ResRing)
 > Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
 > residue $r$ belongs to.
 """
-function modulus(r::ResElem)
+function modulus(r::Nemo.ResElem)
    return modulus(parent(r))
 end
 
-data(a::ResElem) = a.data
+data(a::Nemo.ResElem) = a.data
 
 doc"""
-    zero(R::ResRing)
+    zero(R::Nemo.ResRing)
 > Return the zero element of the given residue ring, i.e. $0 \pmod{a}$ where
 > $a$ is the modulus of the residue ring.
 """
-zero(R::ResRing) = R(0)
+zero(R::Nemo.ResRing) = R(0)
 
 doc"""
-    zero(R::ResRing)
+    one(R::Nemo.ResRing)
 > Return $1 \pmod{a}$ where $a$ is the modulus of the residue ring.
 """
-one(R::ResRing) = R(1)
+one(R::Nemo.ResRing) = R(1)
 
 doc"""
-    iszero(a::ResElem)
+    iszero(a::Nemo.ResElem)
 > Return `true` if the supplied element $a$ is zero in the residue ring it
 > belongs to, otherwise return `false`.
 """
-iszero(a::ResElem) = iszero(data(a))
+iszero(a::Nemo.ResElem) = iszero(data(a))
 
 doc"""
-    isone(a::ResElem)
+    isone(a::Nemo.ResElem)
 > Return `true` if the supplied element $a$ is one in the residue ring it
 > belongs to, otherwise return `false`.
 """
-isone(a::ResElem) = isone(data(a))
+isone(a::Nemo.ResElem) = isone(data(a))
 
 doc"""
-    iszero(a::ResElem)
+    isunit(a::Nemo.ResElem)
 > Return `true` if the supplied element $a$ is invertible in the residue ring
 > it belongs to, otherwise return `false`.
 """
-function isunit(a::ResElem)
+function isunit(a::Nemo.ResElem)
    g, ainv = gcdinv(data(a), modulus(a))
-   return g == 1
+   return isone(g)
 end
 
-deepcopy_internal(a::ResElem, dict::ObjectIdDict) =
+deepcopy_internal(a::Nemo.ResElem, dict::ObjectIdDict) =
    parent(a)(deepcopy(data(a)))
 
 ###############################################################################
@@ -122,7 +122,7 @@ deepcopy_internal(a::ResElem, dict::ObjectIdDict) =
 #
 ###############################################################################
 
-canonical_unit(a::ResElem) = a
+canonical_unit(a::Nemo.ResElem) = a
 
 ###############################################################################
 #
@@ -130,19 +130,19 @@ canonical_unit(a::ResElem) = a
 #
 ###############################################################################
 
-function show(io::IO, x::ResElem)
+function show(io::IO, x::Nemo.ResElem)
    print(io, data(x))
 end
 
-function show(io::IO, a::ResRing)
+function show(io::IO, a::Nemo.ResRing)
    print(io, "Residue ring of ", base_ring(a), " modulo ", modulus(a))
 end
 
-needs_parentheses(x::ResElem) = needs_parentheses(data(x))
+needs_parentheses(x::Nemo.ResElem) = needs_parentheses(data(x))
 
-isnegative(x::ResElem) = isnegative(data(x))
+isnegative(x::Nemo.ResElem) = isnegative(data(x))
 
-show_minus_one{T <: RingElem}(::Type{GenRes{T}}) = true
+show_minus_one(::Type{Res{T}}) where {T <: RingElement} = true
 
 ###############################################################################
 #
@@ -151,10 +151,10 @@ show_minus_one{T <: RingElem}(::Type{GenRes{T}}) = true
 ###############################################################################
 
 doc"""
-    -(a::ResElem)
+    -(a::Nemo.ResElem)
 > Return $-a$.
 """
-function -{T <: RingElem}(a::ResElem{T})
+function -(a::Nemo.ResElem)
    parent(a)(-data(a))
 end
 
@@ -165,28 +165,28 @@ end
 ###############################################################################
 
 doc"""
-    +{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
+    +{T <: RingElement}(a::Nemo.ResElem{T}, b::Nemo.ResElem{T})
 > Return $a + b$.
 """
-function +{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
+function +(a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return parent(a)(data(a) + data(b))
 end
 
 doc"""
-    -{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
+    -{T <: RingElement}(a::Nemo.ResElem{T}, b::Nemo.ResElem{T})
 > Return $a - b$.
 """
-function -{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
+function -(a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return parent(a)(data(a) - data(b))
 end
 
 doc"""
-    *{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
+    *{T <: RingElement}(a::Nemo.ResElem{T}, b::Nemo.ResElem{T})
 > Return $a\times b$.
 """
-function *{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
+function *(a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return parent(a)(data(a) * data(b))
 end
@@ -198,112 +198,76 @@ end
 ###############################################################################
 
 doc"""
-    *(a::ResElem, b::Integer)
+    *(a::Nemo.ResElem, b::Union{Integer, Rational})
 > Return $a\times b$.
 """
-*(a::ResElem, b::Integer) = parent(a)(data(a) * b)
+*(a::Nemo.ResElem, b::Union{Integer, Rational}) = parent(a)(data(a) * b)
 
 doc"""
-    *(a::ResElem, b::fmpz)
+    *{T <: RingElem}(a::Nemo.ResElem{T}, b::T)
 > Return $a\times b$.
 """
-*(a::ResElem, b::fmpz) = parent(a)(data(a) * b)
+*(a::Nemo.ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) * b)
 
 doc"""
-    *{T <: RingElem}(a::ResElem{T}, b::T)
+    *(a::Union{Integer, Rational}, b::Nemo.ResElem)
 > Return $a\times b$.
 """
-*{T <: RingElem}(a::ResElem{T}, b::T) = parent(a)(data(a) * b)
+*(a::Union{Integer, Rational}, b::Nemo.ResElem) = parent(b)(a * data(b))
 
 doc"""
-    *(a::Integer, b::ResElem)
+    *{T <: RingElem}(a::T, b::Nemo.ResElem{T})
 > Return $a\times b$.
 """
-*(a::Integer, b::ResElem) = parent(b)(a * data(b))
+*(a::T, b::Nemo.ResElem{T}) where {T <: RingElem} = parent(b)(a * data(b))
 
 doc"""
-    *(a::fmpz, b::ResElem)
-> Return $a\times b$.
-"""
-*(a::fmpz, b::ResElem) = parent(b)(a * data(b))
-
-doc"""
-    *{T <: RingElem}(a::T, b::ResElem{T})
-> Return $a\times b$.
-"""
-*{T <: RingElem}(a::T, b::ResElem{T}) = parent(b)(a * data(b))
-
-doc"""
-    +(a::ResElem, b::Integer)
+    +(a::Nemo.ResElem, b::Union{Integer, Rational})
 > Return $a + b$.
 """
-+(a::ResElem, b::Integer) = parent(a)(data(a) + b)
++(a::Nemo.ResElem, b::Union{Integer, Rational}) = parent(a)(data(a) + b)
 
 doc"""
-    +(a::ResElem, b::Integer)
+    +{T <: RingElem}(a::Nemo.ResElem{T}, b::T)
 > Return $a + b$.
 """
-+(a::ResElem, b::fmpz) = parent(a)(data(a) + b)
++(a::Nemo.ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) + b)
 
 doc"""
-    +{T <: RingElem}(a::ResElem{T}, b::T)
+    +(a::Union{Integer, Rational}, b::Nemo.ResElem)
 > Return $a + b$.
 """
-+{T <: RingElem}(a::ResElem{T}, b::T) = parent(a)(data(a) + b)
++(a::Union{Integer, Rational}, b::Nemo.ResElem) = parent(b)(a + data(b))
 
 doc"""
-    +(a::Integer, b::ResElem)
+    +{T <: RingElem}(a::T, b::Nemo.ResElem{T})
 > Return $a + b$.
 """
-+(a::Integer, b::ResElem) = parent(b)(a + data(b))
++(a::T, b::Nemo.ResElem{T}) where {T <: RingElem} = parent(b)(a + data(b))
 
 doc"""
-    +(a::fmpz, b::ResElem)
-> Return $a + b$.
-"""
-+(a::fmpz, b::ResElem) = parent(b)(a + data(b))
-
-doc"""
-    +{T <: RingElem}(a::T, b::ResElem{T})
-> Return $a + b$.
-"""
-+{T <: RingElem}(a::T, b::ResElem{T}) = parent(b)(a + data(b))
-
-doc"""
-    -(a::ResElem, b::Integer)
+    -(a::Nemo.ResElem, b::Union{Integer, Rational})
 > Return $a - b$.
 """
--(a::ResElem, b::Integer) = parent(a)(data(a) - b)
+-(a::Nemo.ResElem, b::Union{Integer, Rational}) = parent(a)(data(a) - b)
 
 doc"""
-    -(a::ResElem, b::fmpz)
+    -{T <: RingElem}(a::Nemo.ResElem{T}, b::T)
 > Return $a - b$.
 """
--(a::ResElem, b::fmpz) = parent(a)(data(a) - b)
+-(a::Nemo.ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) - b)
 
 doc"""
-    -{T <: RingElem}(a::ResElem{T}, b::T)
+    -(a::Union{Integer, Rational}, b::Nemo.ResElem)
 > Return $a - b$.
 """
--{T <: RingElem}(a::ResElem{T}, b::T) = parent(a)(data(a) - b)
+-(a::Union{Integer, Rational}, b::Nemo.ResElem) = parent(b)(a - data(b))
 
 doc"""
-    -(a::Integer, b::ResElem)
+    -{T <: RingElem}(a::T, b::Nemo.ResElem{T})
 > Return $a - b$.
 """
--(a::Integer, b::ResElem) = parent(b)(a - data(b))
-
-doc"""
-    -(a::fmpz, b::ResElem)
-> Return $a - b$.
-"""
--(a::fmpz, b::ResElem) = parent(b)(a - data(b))
-
-doc"""
-    -{T <: RingElem}(a::T, b::ResElem{T})
-> Return $a - b$.
-"""
--{T <: RingElem}(a::T, b::ResElem{T}) = parent(b)(a - data(b))
+-(a::T, b::Nemo.ResElem{T}) where {T <: RingElem} = parent(b)(a - data(b))
 
 ###############################################################################
 #
@@ -312,10 +276,10 @@ doc"""
 ###############################################################################
 
 doc"""
-    ^(a::ResElem, b::Int)
+    ^(a::Nemo.ResElem, b::Int)
 > Return $a^b$.
 """
-function ^(a::ResElem, b::Int)
+function ^(a::Nemo.ResElem, b::Int)
    parent(a)(powmod(data(a), b, modulus(a)))
 end
 
@@ -326,24 +290,24 @@ end
 ###############################################################################
 
 doc"""
-    =={T <: RingElem}(x::ResElem{T}, y::ResElem{T})
+    =={T <: RingElement}(x::Nemo.ResElem{T}, y::Nemo.ResElem{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 > that power series to different precisions may still be arithmetically
 > equal to the minimum of the two precisions.
 """
-function =={T <: RingElem}(a::ResElem{T}, b::ResElem{T})
+function ==(a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return data(a) == data(b)
 end
 
 doc"""
-    isequal{T <: RingElem}(x::ResElem{T}, y::ResElem{T})
+    isequal{T <: RingElement}(x::Nemo.ResElem{T}, y::Nemo.ResElem{T})
 > Return `true` if $x == y$ exactly, otherwise return `false`. This function is
 > useful in cases where the data of the residues are inexact, e.g. power series
 > Only if the power series are precisely the same, to the same precision, are
 > they declared equal by this function.
 """
-function isequal{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
+function isequal(a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return isequal(data(a), data(b))
 end
@@ -355,64 +319,40 @@ end
 ###############################################################################
 
 doc"""
-    ==(x::ResElem, y::Integer)
+    ==(x::Nemo.ResElem, y::Union{Integer, Rational})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(a::ResElem, b::Integer)
+function ==(a::Nemo.ResElem, b::Union{Integer, Rational})
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
 doc"""
-    ==(x::Integer, y::ResElem)
+    ==(x::Union{Integer, Rational}, y::Nemo.ResElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(a::Integer, b::ResElem)
+function ==(a::Union{Integer, Rational}, b::Nemo.ResElem)
    z = base_ring(b)(a)
    return data(b) == mod(z, modulus(b))
 end
 
 doc"""
-    ==(x::ResElem, y::fmpz)
+    =={T <: RingElem}(x::Nemo.ResElem{T}, y::T)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(a::ResElem, b::fmpz)
+function ==(a::Nemo.ResElem{T}, b::T) where {T <: RingElem}
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
 doc"""
-    ==(x::fmpz, y::ResElem)
+    =={T <: RingElem}(x::T, y::Nemo.ResElem{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(a::fmpz, b::ResElem)
+function ==(a::T, b::Nemo.ResElem{T}) where {T <: RingElem}
    z = base_ring(b)(a)
    return data(b) == mod(z, modulus(b))
 end
-
-doc"""
-    =={T <: RingElem}(x::ResElem{T}, y::T)
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-function =={T <: RingElem}(a::ResElem{T}, b::T)
-   z = base_ring(a)(b)
-   return data(a) == mod(z, modulus(a))
-end
-
-doc"""
-    =={T <: RingElem}(x::T, y::ResElem{T})
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-function =={T <: RingElem}(a::T, b::ResElem{T})
-   z = base_ring(b)(a)
-   return data(b) == mod(z, modulus(b))
-end
-
-# Prevent ambiguities
-
-==(a::GenRes{fmpz}, b::fmpz) = a.data == mod(b, modulus(a))
-
-==(a::fmpz, b::GenRes{fmpz}) = mod(a, modulus(b)) == b.data
 
 ###############################################################################
 #
@@ -421,11 +361,11 @@ end
 ###############################################################################
 
 doc"""
-    inv(a::ResElem)
+    inv(a::Nemo.ResElem)
 > Return the inverse of the element $a$ in the residue ring. If an impossible
 > inverse is encountered, an exception is raised.
 """
-function inv(a::ResElem)
+function inv(a::Nemo.ResElem)
    g, ainv = gcdinv(data(a), modulus(a))
    if g != 1
       error("Impossible inverse in inv")
@@ -440,10 +380,10 @@ end
 ###############################################################################
 
 doc"""
-    divexact{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
+    divexact{T <: RingElement}(a::Nemo.ResElem{T}, b::Nemo.ResElem{T})
 > Return $a/b$ where the quotient is expected to be exact.
 """
-function divexact{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
+function divexact(a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
    g, binv = gcdinv(data(b), modulus(b))
    if g != 1
@@ -452,8 +392,8 @@ function divexact{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
    return parent(a)(data(a) * binv)
 end
 
-function divides{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
-   b == 0 && error("Division by zero in divides")
+function divides(a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
+   iszero(b) && error("Division by zero in divides")
    return true, divexact(a, b)
 end
 
@@ -464,12 +404,12 @@ end
 ###############################################################################
 
 doc"""
-    gcd{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
+    gcd{T <: RingElement}(a::Nemo.ResElem{T}, b::Nemo.ResElem{T})
 > Return a greatest common divisor of $a$ and $b$ if one exists. This is done
 > by taking the greatest common divisor of the data associated with the
 > supplied residues and taking its greatest common divisor with the modulus.
 """
-function gcd{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
+function gcd(a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return parent(a)(gcd(gcd(data(a), modulus(a)), data(b)))
 end
@@ -480,24 +420,35 @@ end
 #
 ###############################################################################
 
-function zero!{T <: RingElem}(a::ResElem{T})
+function zero!(a::Nemo.ResElem{T}) where {T <: RingElement}
    a.data = zero!(a.data)
    return a
 end
 
-function mul!{T <: RingElem}(c::ResElem{T}, a::ResElem{T}, b::ResElem{T})
+function mul!(c::Nemo.ResElem{T}, a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
    c.data = mod(data(a)*data(b), modulus(a))
    return c
 end
 
-function addeq!{T <: RingElem}(c::ResElem{T}, a::ResElem{T})
+function addeq!(c::Nemo.ResElem{T}, a::Nemo.ResElem{T}) where {T <: RingElement}
    c.data = mod(c.data + data(a), modulus(a))
    return c
 end
 
-function add!{T <: RingElem}(c::ResElem{T}, a::ResElem{T}, b::ResElem{T})
+function add!(c::Nemo.ResElem{T}, a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
    c.data = mod(data(a) + data(b), modulus(a))
    return c
+end
+
+###############################################################################
+#
+#   Random functions
+#
+###############################################################################
+
+function rand(S::Nemo.ResRing{T}, v...) where {T <: RingElement}
+   R = base_ring(S)
+   return S(rand(R, v...))
 end
 
 ###############################################################################
@@ -506,18 +457,10 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{GenRes{fmpz}}, ::Type{fmpz}) = GenRes{fmpz}
-
-promote_rule{T <: RingElem}(::Type{GenRes{T}}, ::Type{T}) = GenRes{T}
-
-promote_rule{T <: RingElem, U <: Integer}(::Type{GenRes{T}}, ::Type{U}) = GenRes{T}
-
-function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenRes{T}}, ::Type{GenRes{U}})
-   promote_rule(T, GenRes{U}) == T ? GenRes{T} : Union{}
-end
-
-function promote_rule{T <: RingElem, U <: RingElem}(::Type{GenRes{T}}, ::Type{U})
-   promote_rule(T, U) == T ? GenRes{T} : promote_rule1(U, GenRes{T})
+promote_rule(::Type{Res{T}}, ::Type{Res{T}}) where T <: RingElement = Res{T}
+   
+function promote_rule(::Type{Res{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
+   promote_rule(T, U) == T ? Res{T} : Union{}
 end
 
 ###############################################################################
@@ -526,42 +469,30 @@ end
 #
 ###############################################################################
 
-function (a::GenResRing{T}){T <: RingElem}(b::RingElem)
+function (a::ResRing{T})(b::RingElement) where {T <: RingElement}
    return a(base_ring(a)(b))
 end
 
-function (a::GenResRing{T}){T <: RingElem}()
-   z = GenRes{T}(zero(base_ring(a)))
+function (a::ResRing{T})() where {T <: RingElement}
+   z = Res{T}(zero(base_ring(a)))
    z.parent = a
    return z
 end
 
-function (a::GenResRing{T}){T <: RingElem}(b::Integer)
-   z = GenRes{T}(mod(base_ring(a)(b), modulus(a)))
+function (a::ResRing{T})(b::Integer) where {T <: RingElement}
+   z = Res{T}(mod(base_ring(a)(b), modulus(a)))
    z.parent = a
    return z
 end
 
-function (a::GenResRing{T}){T <: RingElem}(b::fmpz)
-   z = GenRes{T}(mod(base_ring(a)(b), modulus(a)))
-   z.parent = a
-   return z
-end
-
-function (a::GenResRing{fmpz})(b::fmpz)
-   z = GenRes{fmpz}(mod(base_ring(a)(b), modulus(a)))
-   z.parent = a
-   return z
-end
-
-function (a::GenResRing{T}){T <: RingElem}(b::T)
+function (a::ResRing{T})(b::T) where {T <: RingElem}
    base_ring(a) != parent(b) && error("Operation on incompatible objects")
-   z = GenRes{T}(mod(b, modulus(a)))
+   z = Res{T}(mod(b, modulus(a)))
    z.parent = a
    return z
 end
 
-function (a::GenResRing{T}){T <: RingElem}(b::ResElem{T})
+function (a::ResRing{T})(b::Nemo.ResElem{T}) where {T <: RingElement}
    a != parent(b) && error("Operation on incompatible objects")
    return b
 end
@@ -573,21 +504,15 @@ end
 ###############################################################################
 
 doc"""
-    ResidueRing{T <: RingElem}(R::Ring, a::T; cached=true)
+    ResidueRing{T <: RingElement}(R::Nemo.Ring, a::RingElement; cached::Bool=true)
 > Create the residue ring $R/(a)$ where $a$ is an element of the ring $R$. We
 > require $a \neq 0$. If `cached == true` (the default) then the resulting
 > residue ring parent object is cached and returned for any subsequent calls
 > to the constructor with the same base ring $R$ and element $a$. 
 """
-function ResidueRing{T <: RingElem}(R::Ring, a::T; cached=true)
-   parent(a) != R && error("Modulus is not an element of the specified ring")
-   a == 0 && throw(DivideError())
-   
-   return GenResRing{T}(a, cached)
-end
+function ResidueRing(R::Nemo.Ring, a::RingElement; cached::Bool = true)
+   iszero(a) && throw(DivideError())
+   T = elem_type(R)
 
-function ResidueRing(R::FlintIntegerRing, a::Integer; cached=true)
-   a == 0 && throw(DivideError())
-   
-   return GenResRing{fmpz}(R(a), cached)
+   return ResRing{T}(R(a), cached)
 end

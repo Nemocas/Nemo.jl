@@ -366,7 +366,7 @@ function ==(x::fmpz_abs_series, y::fmpz)
       return ccall((:fmpz_equal, :libflint), Bool, 
                (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &y, 0)
    else
-      return precision(x) == 0 || y == 0
+      return precision(x) == 0 || iszero(y)
    end 
 end
 
@@ -384,7 +384,7 @@ end
 
 function divexact(x::fmpz_abs_series, y::fmpz_abs_series)
    check_parent(x, y)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    v2 = valuation(y)
    v1 = valuation(x)
    if v2 != 0
@@ -420,7 +420,7 @@ function divexact(x::fmpz_abs_series, y::Int)
 end
 
 function divexact(x::fmpz_abs_series, y::fmpz)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
    ccall((:fmpz_poly_scalar_divexact_fmpz, :libflint), Void, 
@@ -438,7 +438,7 @@ divexact(x::fmpz_abs_series, y::Integer) = divexact(x, fmpz(y))
 ###############################################################################
 
 function inv(a::fmpz_abs_series)
-   a == 0 && throw(DivideError())
+   iszero(a) && throw(DivideError())
    !isunit(a) && error("Unable to invert power series")
    ainv = parent(a)()
    ainv.prec = a.prec
@@ -509,7 +509,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(::Type{fmpz_abs_series}, ::Type{T}) = fmpz_abs_series
+promote_rule(::Type{fmpz_abs_series}, ::Type{T}) where {T <: Integer} = fmpz_abs_series
 
 promote_rule(::Type{fmpz_abs_series}, ::Type{fmpz}) = fmpz_abs_series
 
@@ -538,7 +538,7 @@ function (a::FmpzAbsSeriesRing)(b::Integer)
 end
 
 function (a::FmpzAbsSeriesRing)(b::fmpz)
-   if b == 0
+   if iszero(b)
       z = fmpz_abs_series()
       z.prec = a.prec_max
    else

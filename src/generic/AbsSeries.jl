@@ -4,8 +4,7 @@
 #
 ###############################################################################
 
-export GenAbsSeries, GenAbsSeriesRing, O, valuation, exp,
-       precision, max_precision, set_prec!
+export O, valuation, exp, precision, max_precision, set_prec!
 
 ###############################################################################
 #
@@ -14,12 +13,12 @@ export GenAbsSeries, GenAbsSeriesRing, O, valuation, exp,
 ###############################################################################
 
 doc"""
-    O{T}(a::AbsSeriesElem{T})
+    O{T <: RingElement}(a::Nemo.AbsSeriesElem{T})
 > Returns $0 + O(x^\mbox{deg}(a))$. Usually this function is called with $x^n$
 > as parameter. Then the function returns the power series $0 + O(x^n)$, which
 > can be used to set the precision of a power series when constructing it.
 """
-function O{T}(a::AbsSeriesElem{T})
+function O(a::Nemo.AbsSeriesElem{T}) where T <: RingElement
    if iszero(a)
       return deepcopy(a)    # 0 + O(x^n)
    end
@@ -28,9 +27,9 @@ function O{T}(a::AbsSeriesElem{T})
    return parent(a)(Array{T}(0), 0, prec)
 end
 
-parent_type{T <: RingElem}(::Type{GenAbsSeries{T}}) = GenAbsSeriesRing{T}
+parent_type(::Type{AbsSeries{T}}) where {T <: RingElement} = AbsSeriesRing{T}
 
-elem_type{T <: RingElem}(::Type{GenAbsSeriesRing{T}}) = GenAbsSeries{T}
+elem_type(::Type{AbsSeriesRing{T}}) where {T <: RingElement} = AbsSeries{T}
 
 ###############################################################################
 #
@@ -38,35 +37,35 @@ elem_type{T <: RingElem}(::Type{GenAbsSeriesRing{T}}) = GenAbsSeries{T}
 #
 ###############################################################################
 
-length(x::AbsSeriesElem) = x.length
+length(x::Nemo.AbsSeriesElem) = x.length
 
-precision(x::AbsSeriesElem) = x.prec
+precision(x::Nemo.AbsSeriesElem) = x.prec
 
 doc"""
     max_precision(R::SeriesRing)
 > Return the maximum absolute precision of power series in the given power
 > series ring.
 """
-max_precision(R::GenAbsSeriesRing) = R.prec_max
+max_precision(R::AbsSeriesRing) = R.prec_max
 
-function normalise(a::GenAbsSeries, len::Int)
+function normalise(a::AbsSeries, len::Int)
    while len > 0 && iszero(a.coeffs[len])
       len -= 1
    end
    return len
 end
 
-function coeff(a::GenAbsSeries, n::Int)
+function coeff(a::AbsSeries, n::Int)
    n < 0  && throw(DomainError())
    return n >= length(a) ? zero(base_ring(a)) : a.coeffs[n + 1]
 end
 
 doc"""
-    gen{T}(R::GenAbsSeriesRing{T})
+    gen{T <: RingElement}(R::AbsSeriesRing{T})
 > Return the generator of the power series ring, i.e. $x + O(x^n)$ where
 > $n$ is the precision of the power series ring $R$.
 """
-function gen{T}(R::GenAbsSeriesRing{T})
+function gen(R::AbsSeriesRing{T}) where T <: RingElement
    S = base_ring(R)
    return R([S(0), S(1)], 2, max_precision(R))
 end
@@ -79,38 +78,38 @@ doc"""
 iszero(a::SeriesElem) = length(a) == 0
 
 doc"""
-    isone(a::GenAbsSeries)
+    isone(a::AbsSeries)
 > Return `true` if the given power series is arithmetically equal to one to
 > its current precision, otherwise return `false`.
 """
-function isone(a::GenAbsSeries)
+function isone(a::AbsSeries)
    return (length(a) == 1 && isone(coeff(a, 0))) || precision(a) == 0
 end
 
 doc"""
-    isgen(a::GenAbsSeries)
+    isgen(a::AbsSeries)
 > Return `true` if the given power series is arithmetically equal to the
 > generator of its power series ring to its current precision, otherwise return
 > `false`.
 """
-function isgen(a::GenAbsSeries)
+function isgen(a::AbsSeries)
    return (valuation(a) == 1 && length(a) == 2 && isone(coeff(a, 1))) ||
            precision(a) == 0
 end
 
 doc"""
-    isunit(a::AbsSeriesElem)
+    isunit(a::Nemo.AbsSeriesElem)
 > Return `true` if the given power series is arithmetically equal to a unit,
 > i.e. is invertible, otherwise return `false`.
 """
-isunit(a::AbsSeriesElem) = valuation(a) == 0 && isunit(coeff(a, 0))
+isunit(a::Nemo.AbsSeriesElem) = valuation(a) == 0 && isunit(coeff(a, 0))
 
 doc"""
-    valuation(a::AbsSeriesElem)
+    valuation(a::Nemo.AbsSeriesElem)
 > Return the valuation of the given power series, i.e. the degree of the first
 > nonzero term (or the precision if it is arithmetically zero).
 """
-function valuation(a::AbsSeriesElem)
+function valuation(a::Nemo.AbsSeriesElem)
    for i = 1:length(a)
       if !iszero(coeff(a, i - 1))
          return i - 1
@@ -119,7 +118,7 @@ function valuation(a::AbsSeriesElem)
    return precision(a)
 end
 
-function deepcopy_internal{T <: RingElem}(a::GenAbsSeries{T}, dict::ObjectIdDict)
+function deepcopy_internal(a::AbsSeries{T}, dict::ObjectIdDict) where {T <: RingElement}
    coeffs = Array{T}(length(a))
    for i = 1:length(a)
       coeffs[i] = deepcopy(coeff(a, i - 1))
@@ -133,7 +132,7 @@ end
 #
 ###############################################################################
 
-function show{T <: RingElem}(io::IO, x::AbsSeriesElem{T})
+function show(io::IO, x::Nemo.AbsSeriesElem)
    len = length(x)
 
    if len == 0
@@ -177,10 +176,10 @@ end
 ###############################################################################
 
 doc"""
-    -(a::AbsSeriesElem)
+    -(a::Nemo.AbsSeriesElem)
 > Return $-a$.
 """
-function -{T <: RingElem}(a::AbsSeriesElem{T})
+function -(a::Nemo.AbsSeriesElem)
    len = length(a)
    z = parent(a)()
    set_prec!(z, precision(a))
@@ -198,10 +197,10 @@ end
 ###############################################################################
 
 doc"""
-    +{T <: RingElem}(a::AbsSeriesElem{T}, b::AbsSeriesElem{T})
+    +{T <: RingElement}(a::Nemo.AbsSeriesElem{T}, b::Nemo.AbsSeriesElem{T})
 > Return $a + b$.
 """
-function +{T <: RingElem}(a::AbsSeriesElem{T}, b::AbsSeriesElem{T})
+function +(a::Nemo.AbsSeriesElem{T}, b::Nemo.AbsSeriesElem{T}) where {T <: RingElement}
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -230,10 +229,10 @@ function +{T <: RingElem}(a::AbsSeriesElem{T}, b::AbsSeriesElem{T})
 end
 
 doc"""
-    -{T <: RingElem}(a::AbsSeriesElem{T}, b::AbsSeriesElem{T})
+    -{T <: RingElement}(a::Nemo.AbsSeriesElem{T}, b::Nemo.AbsSeriesElem{T})
 > Return $a - b$.
 """
-function -{T <: RingElem}(a::AbsSeriesElem{T}, b::AbsSeriesElem{T})
+function -(a::Nemo.AbsSeriesElem{T}, b::Nemo.AbsSeriesElem{T}) where {T <: RingElement}
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -262,10 +261,10 @@ function -{T <: RingElem}(a::AbsSeriesElem{T}, b::AbsSeriesElem{T})
 end
 
 doc"""
-    *{T <: RingElem}(a::AbsSeriesElem{T}, b::AbsSeriesElem{T})
+    *{T <: RingElement}(a::Nemo.AbsSeriesElem{T}, b::Nemo.AbsSeriesElem{T})
 > Return $a\times b$.
 """
-function *{T <: RingElem}(a::AbsSeriesElem{T}, b::AbsSeriesElem{T})
+function *(a::Nemo.AbsSeriesElem{T}, b::Nemo.AbsSeriesElem{T}) where {T <: RingElement}
    check_parent(a, b)
 
    lena = length(a)
@@ -314,10 +313,10 @@ end
 ###############################################################################
 
 doc"""
-    *{T <: RingElem}(a::T, b::AbsSeriesElem{T})
+    *{T <: RingElem}(a::T, b::Nemo.AbsSeriesElem{T})
 > Return $a\times b$.
 """
-function *{T <: RingElem}(a::T, b::AbsSeriesElem{T})
+function *(a::T, b::Nemo.AbsSeriesElem{T}) where {T <: RingElem}
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -330,10 +329,10 @@ function *{T <: RingElem}(a::T, b::AbsSeriesElem{T})
 end
 
 doc"""
-    *{T <: RingElem}(a::Integer, b::AbsSeriesElem{T})
+    *(a::Union{Integer, Rational}, b::Nemo.AbsSeriesElem)
 > Return $a\times b$.
 """
-function *{T <: RingElem}(a::Integer, b::AbsSeriesElem{T})
+function *(a::Union{Integer, Rational}, b::Nemo.AbsSeriesElem) 
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -346,110 +345,16 @@ function *{T <: RingElem}(a::Integer, b::AbsSeriesElem{T})
 end
 
 doc"""
-    *{T <: RingElem}(a::fmpz, b::AbsSeriesElem{T})
+    *{T <: RingElem}(a::Nemo.AbsSeriesElem{T}, b::T)
 > Return $a\times b$.
 """
-function *{T <: RingElem}(a::fmpz, b::AbsSeriesElem{T})
-   len = length(b)
-   z = parent(b)()
-   fit!(z, len)
-   set_prec!(z, precision(b))
-   for i = 1:len
-      z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
-   end
-   set_length!(z, normalise(z, len))
-   return z
-end
+*(a::Nemo.AbsSeriesElem{T}, b::T) where {T <: RingElem} = b*a
 
 doc"""
-    *{T <: RingElem}(a::AbsSeriesElem{T}, b::T)
+    *(a::Nemo.AbsSeriesElem, b::Union{Integer, Rational})
 > Return $a\times b$.
 """
-*{T <: RingElem}(a::AbsSeriesElem{T}, b::T) = b*a
-
-doc"""
-    *{T <: RingElem}(a::AbsSeriesElem{T}, b::Integer)
-> Return $a\times b$.
-"""
-*(a::AbsSeriesElem, b::Integer) = b*a
-
-doc"""
-    *{T <: RingElem}(a::AbsSeriesElem{T}, b::fmpz)
-> Return $a\times b$.
-"""
-*(a::AbsSeriesElem, b::fmpz) = b*a
-
-doc"""
-    +{T <: RingElem}(a::T, b::AbsSeriesElem{T})
-> Return $a + b$.
-"""
-+{T <: RingElem}(a::T, b::AbsSeriesElem{T}) = parent(b)(a) + b
-
-doc"""
-    +(a::Integer, b::AbsSeriesElem)
-> Return $a + b$.
-"""
-+(a::Integer, b::AbsSeriesElem) = parent(b)(a) + b
-
-doc"""
-    +(a::fmpz, b::AbsSeriesElem)
-> Return $a + b$.
-"""
-+(a::fmpz, b::AbsSeriesElem) = parent(b)(a) + b
-
-doc"""
-    +{T <: RingElem}(a::AbsSeriesElem{T}, b::T)
-> Return $a + b$.
-"""
-+{T <: RingElem}(a::AbsSeriesElem{T}, b::T) = b + a
-
-doc"""
-    +(a::AbsSeriesElem, b::Integer)
-> Return $a + b$.
-"""
-+(a::AbsSeriesElem, b::Integer) = b + a
-
-doc"""
-    +(a::AbsSeriesElem, b::fmpz)
-> Return $a + b$.
-"""
-+(a::AbsSeriesElem, b::fmpz) = b + a
-
-doc"""
-    -{T <: RingElem}(a::T, b::AbsSeriesElem{T})
-> Return $a - b$.
-"""
--{T <: RingElem}(a::T, b::AbsSeriesElem{T}) = parent(b)(a) - b
-
-doc"""
-    -(a::Integer, b::AbsSeriesElem)
-> Return $a - b$.
-"""
--(a::Integer, b::AbsSeriesElem) = parent(b)(a) - b
-
-doc"""
-    -(a::fmpz, b::AbsSeriesElem)
-> Return $a - b$.
-"""
--(a::fmpz, b::AbsSeriesElem) = parent(b)(a) - b
-
-doc"""
-    -{T <: RingElem}(a::AbsSeriesElem{T}, b::T)
-> Return $a - b$.
-"""
--{T <: RingElem}(a::AbsSeriesElem{T}, b::T) = a - parent(a)(b)
-
-doc"""
-    -(a::AbsSeriesElem, b::Integer)
-> Return $a - b$.
-"""
--(a::AbsSeriesElem, b::Integer) = a - parent(a)(b)
-
-doc"""
-    -(a::AbsSeriesElem, b::fmpz)
-> Return $a - b$.
-"""
--(a::AbsSeriesElem, b::fmpz) = a - parent(a)(b)
+*(a::Nemo.AbsSeriesElem, b::Union{Integer, Rational}) = b*a
 
 ###############################################################################
 #
@@ -458,11 +363,11 @@ doc"""
 ###############################################################################
 
 doc"""
-    shift_left(x::AbsSeriesElem, n::Int)
+    shift_left(x::Nemo.AbsSeriesElem, n::Int)
 > Return the power series $f$ shifted left by $n$ terms, i.e. multiplied by
 > $x^n$.
 """
-function shift_left{T <: RingElem}(x::AbsSeriesElem{T}, len::Int)
+function shift_left(x::Nemo.AbsSeriesElem{T}, len::Int) where {T <: RingElement}
    len < 0 && throw(DomainError())
    xlen = length(x)
    prec = precision(x) + len
@@ -487,11 +392,11 @@ function shift_left{T <: RingElem}(x::AbsSeriesElem{T}, len::Int)
 end
 
 doc"""
-    shift_right(f::AbsSeriesElem, n::Int)
+    shift_right(f::Nemo.AbsSeriesElem, n::Int)
 > Return the power series $f$ shifted right by $n$ terms, i.e. divided by
 > $x^n$.
 """
-function shift_right{T <: RingElem}(x::AbsSeriesElem{T}, len::Int)
+function shift_right(x::Nemo.AbsSeriesElem{T}, len::Int) where {T <: RingElement}
    len < 0 && throw(DomainError())
    xlen = length(x)
    if len >= xlen
@@ -515,10 +420,10 @@ end
 ###############################################################################
 
 doc"""
-    truncate(a::AbsSeriesElem, n::Int)
+    truncate(a::Nemo.AbsSeriesElem, n::Int)
 > Return $a$ truncated to $n$ terms.
 """
-function truncate{T <: RingElem}(a::AbsSeriesElem{T}, prec::Int)
+function truncate(a::Nemo.AbsSeriesElem{T}, prec::Int) where {T <: RingElement}
    prec < 0 && throw(DomainError())
    len = length(a)
    if precision(a) <= prec
@@ -544,10 +449,10 @@ end
 ###############################################################################
 
 doc"""
-    ^{T <: RingElem}(a::AbsSeriesElem{T}, b::Int)
+    ^{T <: RingElement}(a::Nemo.AbsSeriesElem{T}, b::Int)
 > Return $a^b$. We require $b \geq 0$.
 """
-function ^{T <: RingElem}(a::AbsSeriesElem{T}, b::Int)
+function ^(a::Nemo.AbsSeriesElem{T}, b::Int) where {T <: RingElement}
    b < 0 && throw(DomainError())
    # special case powers of x for constructing power series efficiently
    if precision(a) > 0 && isgen(a) && b > 0
@@ -585,12 +490,12 @@ end
 ###############################################################################
 
 doc"""
-    =={T <: RingElem}(x::AbsSeriesElem{T}, y::AbsSeriesElem{T})
+    =={T <: RingElement}(x::Nemo.AbsSeriesElem{T}, y::Nemo.AbsSeriesElem{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 > that power series to different precisions may still be arithmetically
 > equal to the minimum of the two precisions.
 """
-function =={T <: RingElem}(x::AbsSeriesElem{T}, y::AbsSeriesElem{T})
+function ==(x::Nemo.AbsSeriesElem{T}, y::Nemo.AbsSeriesElem{T}) where {T <: RingElement}
    check_parent(x, y)
    prec = min(precision(x), precision(y))
    m1 = min(length(x), length(y))
@@ -599,13 +504,13 @@ function =={T <: RingElem}(x::AbsSeriesElem{T}, y::AbsSeriesElem{T})
    m2 = min(m2, prec)
    if length(x) >= m2
       for i = m1 + 1: m2
-         if coeff(x, i - 1) != 0
+         if !iszero(coeff(x, i - 1))
             return false
           end
       end
    else
       for i = m1 + 1: m2
-         if coeff(y, i - 1) != 0
+         if !iszero(coeff(y, i - 1))
             return false
           end
       end
@@ -619,12 +524,12 @@ function =={T <: RingElem}(x::AbsSeriesElem{T}, y::AbsSeriesElem{T})
 end
 
 doc"""
-    isequal{T <: RingElem}(x::AbsSeriesElem{T}, y::AbsSeriesElem{T})
+    isequal{T <: RingElement}(x::Nemo.AbsSeriesElem{T}, y::Nemo.AbsSeriesElem{T})
 > Return `true` if $x == y$ exactly, otherwise return `false`. Only if the
 > power series are precisely the same, to the same precision, are they declared
 > equal by this function.
 """
-function isequal{T <: RingElem}(x::AbsSeriesElem{T}, y::AbsSeriesElem{T})
+function isequal(x::Nemo.AbsSeriesElem{T}, y::Nemo.AbsSeriesElem{T}) where {T <: RingElement}
    if parent(x) != parent(y)
       return false
    end
@@ -646,43 +551,30 @@ end
 ###############################################################################
 
 doc"""
-    =={T <: RingElem}(x::AbsSeriesElem{T}, y::T)
+    =={T <: RingElem}(x::Nemo.AbsSeriesElem{T}, y::T)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-=={T <: RingElem}(x::AbsSeriesElem{T}, y::T) = precision(x) == 0 ||
-           ((length(x) == 0 && y == 0) || (length(x) == 1 && coeff(x, 0) == y))
+==(x::Nemo.AbsSeriesElem{T}, y::T) where {T <: RingElem} = precision(x) == 0 ||
+      ((length(x) == 0 && iszero(y)) || (length(x) == 1 && coeff(x, 0) == y))
 
 doc"""
-    =={T <: RingElem}(x::T, y::AbsSeriesElem{T})
+    =={T <: RingElem}(x::T, y::Nemo.AbsSeriesElem{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-=={T <: RingElem}(x::T, y::AbsSeriesElem{T}) = y == x
+==(x::T, y::Nemo.AbsSeriesElem{T}) where {T <: RingElem} = y == x
 
 doc"""
-    ==(x::AbsSeriesElem, y::Integer)
+    ==(x::Nemo.AbsSeriesElem, y::Union{Integer, Rational})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::AbsSeriesElem, y::Integer) = precision(x) == 0 || ((length(x) == 0 && y == 0)
+==(x::Nemo.AbsSeriesElem, y::Union{Integer, Rational}) = precision(x) == 0 || ((length(x) == 0 && iszero(y))
                                        || (length(x) == 1 && coeff(x, 0) == y))
 
 doc"""
-    ==(x::AbsSeriesElem, y::fmpz)
+    ==(x::Union{Integer, Rational}, y::Nemo.AbsSeriesElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::AbsSeriesElem, y::fmpz) = precision(x) == 0 || ((length(x) == 0 && y == 0)
-                                       || (length(x) == 1 && coeff(x, 0) == y))
-
-doc"""
-    ==(x::Integer, y::AbsSeriesElem)
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-==(x::Integer, y::AbsSeriesElem) = y == x
-
-doc"""
-    ==(x::fmpz, y::AbsSeriesElem)
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-==(x::fmpz, y::AbsSeriesElem) = y == x
+==(x::Union{Integer, Rational}, y::Nemo.AbsSeriesElem) = y == x
 
 ###############################################################################
 #
@@ -691,12 +583,12 @@ doc"""
 ###############################################################################
 
 doc"""
-    divexact{T <: RingElem}(a::AbsSeriesElem{T}, b::AbsSeriesElem{T})
+    divexact{T <: RingElement}(a::Nemo.AbsSeriesElem{T}, b::Nemo.AbsSeriesElem{T})
 > Return $a/b$. Requires $b$ to be invertible.
 """
-function divexact{T <: RingElem}(x::AbsSeriesElem{T}, y::AbsSeriesElem{T})
+function divexact(x::Nemo.AbsSeriesElem{T}, y::Nemo.AbsSeriesElem{T}) where {T <: RingElement}
    check_parent(x, y)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    v2 = valuation(y)
    if v2 != 0
       v1 = valuation(x)
@@ -716,10 +608,10 @@ end
 ###############################################################################
 
 doc"""
-    divexact{T <: RingElem}(a::AbsSeriesElem{T}, b::Integer)
+    divexact(a::Nemo.AbsSeriesElem, b::Union{Integer, Rational})
 > Return $a/b$ where the quotient is expected to be exact.
 """
-function divexact{T <: RingElem}(x::AbsSeriesElem{T}, y::Integer)
+function divexact(x::Nemo.AbsSeriesElem, y::Union{Integer, Rational})
    y == 0 && throw(DivideError())
    lenx = length(x)
    z = parent(x)()
@@ -732,27 +624,11 @@ function divexact{T <: RingElem}(x::AbsSeriesElem{T}, y::Integer)
 end
 
 doc"""
-    divexact{T <: RingElem}(a::AbsSeriesElem{T}, b::fmpz)
+    divexact{T <: RingElem}(a::Nemo.AbsSeriesElem{T}, b::T)
 > Return $a/b$ where the quotient is expected to be exact.
 """
-function divexact{T <: RingElem}(x::AbsSeriesElem{T}, y::fmpz)
-   y == 0 && throw(DivideError())
-   lenx = length(x)
-   z = parent(x)()
-   fit!(z, lenx)
-   set_prec!(z, precision(x))
-   for i = 1:lenx
-      z = setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y))
-   end
-   return z
-end
-
-doc"""
-    divexact{T <: RingElem}(a::AbsSeriesElem{T}, b::T)
-> Return $a/b$ where the quotient is expected to be exact.
-"""
-function divexact{T <: RingElem}(x::AbsSeriesElem{T}, y::T)
-   y == 0 && throw(DivideError())
+function divexact(x::Nemo.AbsSeriesElem{T}, y::T) where {T <: RingElem}
+   iszero(y) && throw(DivideError())
    lenx = length(x)
    z = parent(x)()
    fit!(z, lenx)
@@ -770,11 +646,11 @@ end
 ###############################################################################
 
 doc"""
-   inv(a::AbsSeriesElem)
+   inv(a::Nemo.AbsSeriesElem)
 > Return the inverse of the power series $a$, i.e. $1/a$.
 """
-function inv(a::AbsSeriesElem)
-   a == 0 && throw(DivideError())
+function inv(a::Nemo.AbsSeriesElem)
+   iszero(a) && throw(DivideError())
    !isunit(a) && error("Unable to invert power series")
    a1 = coeff(a, 0)
    ainv = parent(a)()
@@ -802,11 +678,11 @@ end
 ###############################################################################
 
 doc"""
-    exp(a::AbsSeriesElem)
+    exp(a::Nemo.AbsSeriesElem)
 > Return the exponential of the power series $a$.
 """
-function exp(a::AbsSeriesElem)
-   if a == 0
+function exp(a::Nemo.AbsSeriesElem)
+   if iszero(a)
       z = one(parent(a))
       set_prec!(z, precision(a))
       return z
@@ -834,7 +710,7 @@ end
 #
 ###############################################################################
 
-function fit!{T <: RingElem}(c::GenAbsSeries{T}, n::Int)
+function fit!(c::AbsSeries{T}, n::Int) where {T <: RingElement}
    if length(c.coeffs) < n
       t = c.coeffs
       c.coeffs = Array{T}(n)
@@ -848,8 +724,8 @@ function fit!{T <: RingElem}(c::GenAbsSeries{T}, n::Int)
    return nothing
 end
 
-function setcoeff!{T <: RingElem}(c::GenAbsSeries{T}, n::Int, a::T)
-   if (a != 0 && precision(c) > n) || n + 1 <= c.length
+function setcoeff!(c::AbsSeries{T}, n::Int, a::T) where {T <: RingElement}
+   if (!iszero(a) && precision(c) > n) || n + 1 <= c.length
       fit!(c, n + 1)
       c.coeffs[n + 1] = a
       c.length = max(length(c), n + 1)
@@ -858,7 +734,7 @@ function setcoeff!{T <: RingElem}(c::GenAbsSeries{T}, n::Int, a::T)
    return c
 end
 
-function mul!{T <: RingElem}(c::GenAbsSeries{T}, a::GenAbsSeries{T}, b::GenAbsSeries{T})
+function mul!(c::AbsSeries{T}, a::AbsSeries{T}, b::AbsSeries{T}) where {T <: RingElement}
    lena = length(a)
    lenb = length(b)
 
@@ -904,7 +780,7 @@ function mul!{T <: RingElem}(c::GenAbsSeries{T}, a::GenAbsSeries{T}, b::GenAbsSe
    return c
 end
 
-function addeq!{T <: RingElem}(c::GenAbsSeries{T}, a::GenAbsSeries{T})
+function addeq!(c::AbsSeries{T}, a::AbsSeries{T}) where {T <: RingElement}
    lenc = length(c)
    lena = length(a)
 
@@ -929,20 +805,10 @@ end
 #
 ###############################################################################
 
-function promote_rule{T <: RingElem, V <: Integer}(::Type{GenAbsSeries{T}}, ::Type{V})
-   return GenAbsSeries{T}
-end
+promote_rule(::Type{AbsSeries{T}}, ::Type{AbsSeries{T}}) where T <: RingElement = AbsSeries{T}
 
-function promote_rule{T <: RingElem}(::Type{GenAbsSeries{T}}, ::Type{T})
-   return GenAbsSeries{T}
-end
-
-function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenAbsSeries{T}}, ::Type{GenAbsSeries{U}})
-   promote_rule(T, GenAbsSeries{U}) == T ? GenAbsSeries{T} : Union{}
-end
-
-function promote_rule{T <: RingElem, U <: RingElem}(::Type{GenAbsSeries{T}}, ::Type{U})
-   promote_rule(T, U) == T ? GenAbsSeries{T} : promote_rule1(U, GenAbsSeries{T})
+function promote_rule(::Type{AbsSeries{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
+   promote_rule(T, U) == T ? AbsSeries{T} : Union{}
 end
 
 ###############################################################################
@@ -951,57 +817,47 @@ end
 #
 ###############################################################################
 
-function (a::GenAbsSeriesRing{T}){T <: RingElem}(b::RingElem)
+function (a::AbsSeriesRing{T} where {T <: RingElement})(b::RingElement)
    return a(base_ring(a)(b))
 end
 
-function (a::GenAbsSeriesRing{T}){T <: RingElem}()
-   z = GenAbsSeries{T}(Array{T}(0), 0, a.prec_max)
+function (a::AbsSeriesRing{T})() where {T <: RingElement}
+   z = AbsSeries{T}(Array{T}(0), 0, a.prec_max)
    z.parent = a
    return z
 end
 
-function (a::GenAbsSeriesRing{T}){T <: RingElem}(b::Integer)
+function (a::AbsSeriesRing{T})(b::Union{Integer, Rational}) where {T <: RingElement}
    if b == 0
-      z = GenAbsSeries{T}(Array{T}(0), 0, a.prec_max)
+      z = AbsSeries{T}(Array{T}(0), 0, a.prec_max)
    else
-      z = GenAbsSeries{T}([base_ring(a)(b)], 1, a.prec_max)
+      z = AbsSeries{T}([base_ring(a)(b)], 1, a.prec_max)
    end
    z.parent = a
    return z
 end
 
-function (a::GenAbsSeriesRing{T}){T <: RingElem}(b::fmpz)
-   if b == 0
-      z = GenAbsSeries{T}(Array{T}(0), 0, a.prec_max)
-   else
-      z = GenAbsSeries{T}([base_ring(a)(b)], 1, a.prec_max)
-   end
-   z.parent = a
-   return z
-end
-
-function (a::GenAbsSeriesRing{T}){T <: RingElem}(b::T)
+function (a::AbsSeriesRing{T})(b::T) where {T <: RingElement}
    parent(b) != base_ring(a) && error("Unable to coerce to power series")
    if b == 0
-      z = GenAbsSeries{T}(Array{T}(0), 0, a.prec_max)
+      z = AbsSeries{T}(Array{T}(0), 0, a.prec_max)
    else
-      z = GenAbsSeries{T}([b], 1, a.prec_max)
+      z = AbsSeries{T}([b], 1, a.prec_max)
    end
    z.parent = a
    return z
 end
 
-function (a::GenAbsSeriesRing{T}){T <: RingElem}(b::AbsSeriesElem{T})
+function (a::AbsSeriesRing{T})(b::Nemo.AbsSeriesElem{T}) where {T <: RingElement}
    parent(b) != a && error("Unable to coerce power series")
    return b
 end
 
-function (a::GenAbsSeriesRing{T}){T <: RingElem}(b::Array{T, 1}, len::Int, prec::Int)
+function (a::AbsSeriesRing{T})(b::Array{T, 1}, len::Int, prec::Int) where {T <: RingElement}
    if length(b) > 0
       parent(b[1]) != base_ring(a) && error("Unable to coerce to power series")
    end
-   z = GenAbsSeries{T}(b, len, prec)
+   z = AbsSeries{T}(b, len, prec)
    z.parent = a
    return z
 end

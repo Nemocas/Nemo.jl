@@ -19,11 +19,11 @@ fmpq(a::Rational{BigInt}) = fmpq(fmpz(a.num), fmpz(a.den))
 
 function fmpq(a::Rational{Int})
   r = fmpq()
-  ccall((:fmpq_set_si, :libflint), Void, (Ptr{fmpq}, Int64, UInt64), &r, num(a), den(a))
+  ccall((:fmpq_set_si, :libflint), Void, (Ptr{fmpq}, Int64, UInt64), &r, numerator(a), denominator(a))
   return r
 end
 
-fmpq{T <: Integer}(a::Rational{T}) = fmpq(num(a), den(a))
+fmpq(a::Rational{T}) where {T <: Integer} = fmpq(numerator(a), denominator(a))
 
 fmpq(a::Integer) = fmpq(fmpz(a), fmpz(1))
 
@@ -60,7 +60,7 @@ end
 ###############################################################################
 
 function //(x::fmpz, y::fmpz)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    g = gcd(x, y)
    return fmpq(divexact(x, g), divexact(y, g))
 end
@@ -101,11 +101,15 @@ zero(a::FlintRationalField) = fmpq(0)
 
 one(a::FlintRationalField) = fmpq(1)
 
-isone(a::fmpq) = a == 1
+function isone(a::fmpq)
+   return Bool(ccall((:fmpq_is_one, :libflint), Cint, (Ptr{fmpq}, ), &a))  
+end
 
-iszero(a::fmpq) = a == 0
+function iszero(a::fmpq)
+   return Bool(ccall((:fmpq_is_zero, :libflint), Cint, (Ptr{fmpq}, ), &a))  
+end
 
-isunit(a::fmpq) = a != 0
+isunit(a::fmpq) = !iszero(a)
 
 doc"""
     height(a::fmpq)
@@ -226,9 +230,9 @@ end
 
 +(a::fmpz, b::fmpq) = b + a
 
-+{T <: Integer}(a::fmpq, b::Rational{T}) = a + fmpq(b)
-
-+{T <: Integer}(a::Rational{T}, b::fmpq) = b + a
++(a::fmpq, b::Rational{T}) where {T <: Integer} = a + fmpq(b)
+                                               
++(a::Rational{T}, b::fmpq) where {T <: Integer} = b + a
 
 function -(a::fmpq, b::Int)
    z = fmpq()
@@ -244,9 +248,9 @@ function -(a::fmpq, b::fmpz)
    return z
 end
 
--{T <: Integer}(a::fmpq, b::Rational{T}) = a - fmpq(b)
-
--{T <: Integer}(a::Rational{T}, b::fmpq) = fmpq(b) - a
+-(a::fmpq, b::Rational{T}) where {T <: Integer} = a - fmpq(b)
+                                               
+-(a::Rational{T}, b::fmpq) where {T <: Integer} = fmpq(b) - a
 
 function *(a::fmpq, b::fmpz)
    z = fmpq()
@@ -264,11 +268,11 @@ function -(a::fmpz, b::fmpq)
    return parent(b)(divexact(n, g), divexact(d, g))
 end
 
-*{T <: Integer}(a::fmpq, b::Rational{T}) = a * fmpq(b)
+*(a::fmpq, b::Rational{T}) where {T <: Integer} = a * fmpq(b)
 
-*{T <: Integer}(a::Rational{T}, b::fmpq) = b * a
+*(a::Rational{T}, b::fmpq) where {T <: Integer} = b * a
 
-//{T <: Integer}(a::fmpq, b::Rational{T}) = a//fmpq(b)
+//(a::fmpq, b::Rational{T}) where {T <: Integer} = a//fmpq(b)
 
 ###############################################################################
 #
@@ -309,9 +313,9 @@ end
 
 ==(a::fmpz, b::fmpq) = b == a
 
-=={T <: Integer}(a::fmpq, b::Rational{T}) = a == fmpq(b)
-
-=={T <: Integer}(a::Rational{T}, b::fmpq) = b == a
+==(a::fmpq, b::Rational{T}) where {T <: Integer} = a == fmpq(b)
+                                                
+==(a::Rational{T}, b::fmpq) where {T <: Integer} = b == a
 
 doc"""
     isless(a::fmpq, b::Integer)
@@ -353,9 +357,9 @@ function isless(a::fmpz, b::fmpq)
                 (Ptr{fmpq}, Ptr{fmpq}), &z, &b) < 0
 end
 
-isless{T <: Integer}(a::Rational{T}, b::fmpq) = isless(fmpq(a), b)
-
-isless{T <: Integer}(a::fmpq, b::Rational{T}) = isless(a, fmpq(b))
+isless(a::Rational{T}, b::fmpq) where {T <: Integer} = isless(fmpq(a), b)
+                                                    
+isless(a::fmpq, b::Rational{T}) where {T <: Integer} = isless(a, fmpq(b))
 
 ###############################################################################
 #
@@ -426,7 +430,7 @@ end
 div(a::fmpq, b::fmpq) = divexact(a, b)
 
 function rem(a::fmpq, b::fmpq)
-   b == 0 && throw("Divide by zero in rem")
+   iszero(b) && throw("Divide by zero in rem")
    return fmpq(0)
 end
 
@@ -449,9 +453,9 @@ divexact(a::fmpq, b::Integer) = divexact(a, fmpz(b))
 
 divexact(a::Integer, b::fmpq) = inv(b)*a
 
-divexact{T <: Integer}(a::fmpq, b::Rational{T}) = divexact(a, fmpq(b))
-
-divexact{T <: Integer}(a::Rational{T}, b::fmpq) = divexact(fmpq(a), b)
+divexact(a::fmpq, b::Rational{T}) where {T <: Integer} = divexact(a, fmpq(b))
+                                                      
+divexact(a::Rational{T}, b::fmpq) where {T <: Integer} = divexact(fmpq(a), b)
 
 ###############################################################################
 #
@@ -751,7 +755,7 @@ end
 
 (a::FlintRationalField)() = fmpq(fmpz(0), fmpz(1))
 
-(a::FlintRationalField)(b::Rational) = fmpq(num(b), den(b)) 
+(a::FlintRationalField)(b::Rational) = fmpq(numerator(b), denominator(b)) 
 
 (a::FlintRationalField)(b::Integer) = fmpq(b)
 
@@ -779,13 +783,13 @@ convert(::Type{fmpq}, a::Integer) = fmpq(a)
 
 convert(::Type{fmpq}, a::fmpz) = fmpq(a)
 
-Base.promote_rule{T <: Integer}(::Type{fmpq}, ::Type{T}) = fmpq
+Base.promote_rule(::Type{fmpq}, ::Type{T}) where {T <: Integer} = fmpq
 
 Base.promote_rule(::Type{fmpq}, ::Type{fmpz}) = fmpq
 
 promote_rule(::Type{fmpq}, ::Type{fmpz}) = fmpq
 
-Base.promote_rule{T <: Integer}(::Type{fmpq}, ::Type{Rational{T}}) = fmpq
+Base.promote_rule(::Type{fmpq}, ::Type{Rational{T}}) where {T <: Integer} = fmpq
 
 convert(::Type{Rational{BigInt}}, a::fmpq) = Rational(a)
 

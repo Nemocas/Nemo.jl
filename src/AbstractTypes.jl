@@ -7,31 +7,31 @@
 # broad mathematical domains
 # these contain the type classes of parent objects
 
-   abstract Set
+abstract type Set end
 
-   abstract Group <: Set
+abstract type Group <: Set end
 
-   abstract Ring <: Group
+abstract type Ring <: Group end
 
-   abstract Field <: Ring
+abstract type Field <: Ring end
 
 # elements of mathematical domains
 
-   abstract SetElem
+abstract type SetElem end
 
-   abstract GroupElem <: SetElem
+abstract type GroupElem <: SetElem end
 
-   abstract RingElem <: GroupElem
+abstract type RingElem <: GroupElem end
 
-   abstract FieldElem <: RingElem
+abstract type FieldElem <: RingElem end
 
 # parameterized domains
 
-   abstract Module{T <: RingElem} <: Group
+abstract type Module{T <: RingElem} <: Group end
 
 # elements of parameterised domains
 
-   abstract ModuleElem{T <: RingElem} <: GroupElem
+abstract type ModuleElem{T <: RingElem} <: GroupElem end
 
 # rings, fields etc, parameterised by an element type
 # these are the type classes of different kinds of
@@ -39,47 +39,69 @@
 # and for which a generic implementation is possible
 # over that base ring
 
-   abstract PolyRing{T} <: Ring
+abstract type PolyRing{T} <: Ring end
 
-   abstract SeriesRing{T} <: Ring
+abstract type MPolyRing{T} <: Ring end
 
-   abstract ResRing{T} <: Ring
+abstract type SeriesRing{T} <: Ring end
 
-   abstract FracField{T} <: Field
+abstract type ResRing{T} <: Ring end
+
+abstract type FracField{T} <: Field end
 
 # not always really mathematical rings
 # later we'll distinguish matrix algebras
 # from the generic case
-   abstract MatSpace{T} <: Ring
+abstract type MatSpace{T} <: Ring end
 
 # mathematical objects parameterised by an element type
 # these are the type classes of mathematical objects
 # that have some kind of base ring, and a generic 
 # implementation is meaningful over that base ring
 
-   abstract PolyElem{T} <: RingElem
+abstract type PolyElem{T} <: RingElem end
 
-   abstract ResElem{T} <: RingElem
+abstract type MPolyElem{T} <: RingElem end
 
-   abstract FracElem{T} <: FieldElem
+abstract type ResElem{T} <: RingElem end
 
-   abstract SeriesElem{T} <: RingElem
+abstract type FracElem{T} <: FieldElem end
 
-   abstract RelSeriesElem{T} <: SeriesElem{T}
+abstract type SeriesElem{T} <: RingElem end
 
-   abstract AbsSeriesElem{T} <: SeriesElem{T}
+abstract type RelSeriesElem{T} <: SeriesElem{T} end
+
+abstract type AbsSeriesElem{T} <: SeriesElem{T} end
    
    # not always mathematical ring elements
    # later we'll maybe distinguish MatAlgebraElem, MatModuleElem
-   abstract MatElem{T} <: RingElem
+abstract type MatElem{T} <: RingElem end
 
 # additional abstract types for parents, added ad hoc to form
 # collections of types as needed by applications
 
-   abstract FinField <: Field     # for fq, fq_nmod, etc
+abstract type FinField <: Field end    # for fq, fq_nmod, etc
    
 # additional abstract types for elements, added ad hoc to form
 # collections of types as needed by applications
 
-   abstract FinFieldElem <: FieldElem # for fq, fq_nmod, etc
-  
+abstract type FinFieldElem <: FieldElem end # for fq, fq_nmod, etc
+
+################################################################################
+#
+#   Promotion system
+#
+# The promote_rule functions are not extending Base.promote_rule. The Nemo
+# promotion system is orthogonal to the built-in julia promotion system. The
+# julia system assumes that whenever you have a method signature of the form  
+# Base.promote_rule(::Type{T}, ::Type{S}) = R, then there is also a
+# corresponding Base.convert(::Type{R}, ::T) and similar for S. Since we
+# cannot use the julia convert system (we need an instance of the type and not
+# the type), we cannot use the julia promotion system.
+#
+# The Nemo promotion system is used to define catch all functions for
+# arithmetic between arbitrary ring elements. 
+#
+################################################################################
+
+promote_rule(T, U) = Union{}

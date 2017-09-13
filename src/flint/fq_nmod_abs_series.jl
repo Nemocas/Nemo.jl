@@ -68,7 +68,7 @@ precision(x::fq_nmod_abs_series) = x.prec
 
 function coeff(x::fq_nmod_abs_series, n::Int)
    if n < 0
-      return fmpz(0)
+      return base_ring(x)()
    end
    z = base_ring(x)()
    ccall((:fq_nmod_poly_get_coeff, :libflint), Void, 
@@ -355,7 +355,7 @@ function ==(x::fq_nmod_abs_series, y::fq_nmod)
              &z, &x, 0, &base_ring(x))
       return z == y
    else
-      return precision(x) == 0 || y == 0
+      return precision(x) == 0 || iszero(y)
    end 
 end
 
@@ -371,7 +371,7 @@ function ==(x::fq_nmod_abs_series, y::fmpz)
              &z, &x, 0, &base_ring(x))
       return z == y
    else
-      return precision(x) == 0 || y == 0
+      return precision(x) == 0 || iszero(y)
    end 
 end
 
@@ -389,7 +389,7 @@ end
 
 function divexact(x::fq_nmod_abs_series, y::fq_nmod_abs_series)
    check_parent(x, y)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    v2 = valuation(y)
    v1 = valuation(x)
    if v2 != 0
@@ -416,7 +416,7 @@ end
 ###############################################################################
 
 function divexact(x::fq_nmod_abs_series, y::fq_nmod)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
    ccall((:fq_nmod_poly_scalar_div_fq_nmod, :libflint), Void, 
@@ -432,7 +432,7 @@ end
 ###############################################################################
 
 function inv(a::fq_nmod_abs_series)
-   a == 0 && throw(DivideError())
+   iszero(a) && throw(DivideError())
    !isunit(a) && error("Unable to invert power series")
    ainv = parent(a)()
    ainv.prec = a.prec
@@ -504,7 +504,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(::Type{fq_nmod_abs_series}, ::Type{T}) = fq_nmod_abs_series
+promote_rule(::Type{fq_nmod_abs_series}, ::Type{T}) where {T <: Integer} = fq_nmod_abs_series
 
 promote_rule(::Type{fq_nmod_abs_series}, ::Type{fq_nmod}) = fq_nmod_abs_series
 
@@ -538,7 +538,7 @@ end
 
 function (a::FqNmodAbsSeriesRing)(b::fmpz)
    ctx = base_ring(a)
-   if b == 0
+   if iszero(b)
       z = fq_nmod_abs_series(ctx)
       z.prec = a.prec_max
    else
@@ -550,7 +550,7 @@ end
 
 function (a::FqNmodAbsSeriesRing)(b::fq_nmod)
    ctx = base_ring(a)
-   if b == 0
+   if iszero(b)
       z = fq_nmod_abs_series(ctx)
       z.prec = a.prec_max
    else

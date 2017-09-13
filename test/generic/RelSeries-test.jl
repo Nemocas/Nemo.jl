@@ -1,44 +1,44 @@
 function test_rel_series_constructors()
-   print("GenRelSeries.constructors...")
+   print("Generic.RelSeries.constructors...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
-   @test elem_type(S) == GenRelSeries{elem_type(R)}
-   @test elem_type(GenRelSeriesRing{elem_type(R)}) == GenRelSeries{elem_type(R)}
-   @test parent_type(GenRelSeries{elem_type(R)}) == GenRelSeriesRing{elem_type(R)}
+   @test elem_type(S) == Generic.RelSeries{elem_type(R)}
+   @test elem_type(Generic.RelSeriesRing{elem_type(R)}) == Generic.RelSeries{elem_type(R)}
+   @test parent_type(Generic.RelSeries{elem_type(R)}) == Generic.RelSeriesRing{elem_type(R)}
 
-   @test isa(S, GenRelSeriesRing)
+   @test isa(S, Generic.RelSeriesRing)
 
    a = x^3 + 2x + 1
    b = (t^2 + 1)*x^2 + (t + 3)x + O(x^4)
 
-   @test isa(a, GenRelSeries)
-   @test isa(b, GenRelSeries)
+   @test isa(a, Generic.RelSeries)
+   @test isa(b, Generic.RelSeries)
 
    c = S(a)
    d = S([t + 1, t, R(1)], 3, 5, 0)
 
-   @test isa(c, GenRelSeries)
-   @test isa(d, GenRelSeries)
+   @test isa(c, Generic.RelSeries)
+   @test isa(d, Generic.RelSeries)
 
    g = S(1)
    h = S(fmpz(2))
    k = S()
 
-   @test isa(g, GenRelSeries)
-   @test isa(h, GenRelSeries)
-   @test isa(k, GenRelSeries)
+   @test isa(g, Generic.RelSeries)
+   @test isa(h, Generic.RelSeries)
+   @test isa(k, Generic.RelSeries)
 
    l = S(t)
 
-   @test isa(l, GenRelSeries)
+   @test isa(l, Generic.RelSeries)
 
    println("PASS")
 end
 
 function test_rel_series_manipulation()
-   print("GenRelSeries.manipulation...")
+   print("Generic.RelSeries.manipulation...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -78,7 +78,7 @@ function test_rel_series_manipulation()
 end
 
 function test_rel_series_unary_ops()
-   print("GenRelSeries.unary_ops...")
+   print("Generic.RelSeries.unary_ops...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -94,7 +94,7 @@ function test_rel_series_unary_ops()
 end
 
 function test_rel_series_binary_ops()
-   print("GenRelSeries.binary_ops...")
+   print("Generic.RelSeries.binary_ops...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -118,7 +118,7 @@ function test_rel_series_binary_ops()
 end
 
 function test_rel_series_adhoc_binary_ops()
-   print("GenRelSeries.adhoc_binary_ops...")
+   print("Generic.RelSeries.adhoc_binary_ops...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -140,7 +140,7 @@ function test_rel_series_adhoc_binary_ops()
 end
 
 function test_rel_series_comparison()
-   print("GenRelSeries.comparison...")
+   print("Generic.RelSeries.comparison...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -164,7 +164,7 @@ function test_rel_series_comparison()
 end
 
 function test_rel_series_adhoc_comparison()
-   print("GenRelSeries.adhoc_comparison...")
+   print("Generic.RelSeries.adhoc_comparison...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -188,7 +188,7 @@ function test_rel_series_adhoc_comparison()
 end
 
 function test_rel_series_powering()
-   print("GenRelSeries.powering...")
+   print("Generic.RelSeries.powering...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -210,7 +210,7 @@ function test_rel_series_powering()
 end
 
 function test_rel_series_shift()
-   print("GenRelSeries.shift...")
+   print("Generic.RelSeries.shift...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -232,7 +232,7 @@ function test_rel_series_shift()
 end
 
 function test_rel_series_truncation()
-   print("GenRelSeries.truncation...")
+   print("Generic.RelSeries.truncation...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -254,7 +254,7 @@ function test_rel_series_truncation()
 end
 
 function test_rel_series_inversion()
-   print("GenRelSeries.inversion...")
+   print("Generic.RelSeries.inversion...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -270,7 +270,7 @@ function test_rel_series_inversion()
 end
 
 function test_rel_series_exact_division()
-   print("GenRelSeries.exact_division...")
+   print("Generic.RelSeries.exact_division...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -292,7 +292,7 @@ function test_rel_series_exact_division()
 end
 
 function test_rel_series_adhoc_exact_division()
-   print("GenRelSeries.adhoc_exact_division...")
+   print("Generic.RelSeries.adhoc_exact_division...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -318,7 +318,7 @@ function test_rel_series_adhoc_exact_division()
 end
 
 function test_rel_series_special_functions()
-   print("GenRelSeries.special_functions...")
+   print("Generic.RelSeries.special_functions...")
 
    R = ResidueRing(ZZ, 17)
    T, t = PolynomialRing(R, "t")

@@ -263,17 +263,17 @@ end
 
 *(x::fmpq_poly, y::Integer) = fmpz(y)*x
 
-+(x::Rational, y::fmpq_poly) = fmpq(x) + y
++(x::Rational{T}, y::fmpq_poly) where T <: Union{Int, BigInt} = fmpq(x) + y
 
--(x::Rational, y::fmpq_poly) = fmpq(x) - y
+-(x::Rational{T}, y::fmpq_poly) where T <: Union{Int, BigInt} = fmpq(x) - y
 
-*(x::Rational, y::fmpq_poly) = fmpq(x) * y
+*(x::Rational{T}, y::fmpq_poly) where T <: Union{Int, BigInt} = fmpq(x) * y
 
-+(x::fmpq_poly, y::Rational) = x + fmpq(y)
++(x::fmpq_poly, y::Rational{T}) where T <: Union{Int, BigInt} = x + fmpq(y)
 
--(x::fmpq_poly, y::Rational) = x - fmpq(y)
+-(x::fmpq_poly, y::Rational{T}) where T <: Union{Int, BigInt} = x - fmpq(y)
 
-*(x::fmpq_poly, y::Rational) = x * fmpq(y)
+*(x::fmpq_poly, y::Rational{T}) where T <: Union{Int, BigInt} = x * fmpq(y)
 
 ###############################################################################
 #
@@ -318,15 +318,15 @@ function ==(x::fmpq_poly, y::fmpq)
       return ccall((:fmpq_equal, :libflint), Bool, 
                (Ptr{fmpq}, Ptr{fmpq}, Int), &z, &y, 0)
    else
-      return y == 0
+      return iszero(y)
    end 
 end
 
 ==(x::fmpq, y::fmpq_poly) = y == x
 
-==(x::fmpq_poly, y::Rational) = x == fmpq(y)
+==(x::fmpq_poly, y::Rational{T}) where T <: Union{Int, BigInt} = x == fmpq(y)
 
-==(x::Rational, y::fmpq_poly) = y == x
+==(x::Rational{T}, y::fmpq_poly) where T <: Union{Int, BigInt} = y == x
 
 ###############################################################################
 #
@@ -401,7 +401,7 @@ end
 
 function mod(x::fmpq_poly, y::fmpq_poly)
    check_parent(x, y)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    r = parent(x)()
    ccall((:fmpq_poly_rem, :libflint), Void, 
                 (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Ptr{fmpq_poly}), 
@@ -413,7 +413,7 @@ rem(x::fmpq_poly, y::fmpq_poly) = mod(x, y)
 
 function divrem(x::fmpq_poly, y::fmpq_poly)
    check_parent(x, y)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    q = parent(x)()
    r = parent(x)()
    ccall((:fmpq_poly_divrem, :libflint), Void, 
@@ -430,7 +430,7 @@ end
 
 function div(x::fmpq_poly, y::fmpq_poly)
    check_parent(x, y)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    z = parent(x)()
    ccall((:fmpq_poly_div, :libflint), Void, 
             (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Ptr{fmpq_poly}), &z, &x, &y)
@@ -446,7 +446,7 @@ divexact(x::fmpq_poly, y::fmpq_poly) = div(x,y)
 ###############################################################################
 
 function divexact(x::fmpq_poly, y::fmpz)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    z = parent(x)()
    ccall((:fmpq_poly_scalar_div_fmpz, :libflint), Void, 
           (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Ptr{fmpz}), &z, &x, &y)
@@ -454,7 +454,7 @@ function divexact(x::fmpq_poly, y::fmpz)
 end
 
 function divexact(x::fmpq_poly, y::fmpq)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    z = parent(x)()
    ccall((:fmpq_poly_scalar_div_fmpq, :libflint), Void, 
           (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Ptr{fmpq}), &z, &x, &y)
@@ -471,7 +471,7 @@ end
 
 divexact(x::fmpq_poly, y::Integer) = divexact(x, fmpz(y)) 
 
-divexact(x::fmpq_poly, y::Rational) = divexact(x, fmpq(y))
+divexact(x::fmpq_poly, y::Rational{T}) where T <: Union{Int, BigInt} = divexact(x, fmpq(y))
 
 ###############################################################################
 #
@@ -481,7 +481,7 @@ divexact(x::fmpq_poly, y::Rational) = divexact(x, fmpq(y))
 
 function divides(z::fmpq_poly, x::fmpq_poly)
    q, r = divrem(z, x)
-   return r == 0, q
+   return iszero(r), q
 end
 
 ###############################################################################
@@ -669,7 +669,7 @@ end
 #
 ###############################################################################
 
-function *(a::GenPoly{fmpq_poly}, b::GenPoly{fmpq_poly})
+function *(a::Generic.Poly{fmpq_poly}, b::Generic.Poly{fmpq_poly})
    check_parent(a, b)
    if min(length(a), length(b)) < 40
       return mul_classical(a, b)
@@ -732,13 +732,13 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(::Type{fmpq_poly}, ::Type{T}) = fmpq_poly
+promote_rule(::Type{fmpq_poly}, ::Type{T}) where {T <: Integer} = fmpq_poly
 
 promote_rule(::Type{fmpq_poly}, ::Type{fmpz}) = fmpq_poly
 
 promote_rule(::Type{fmpq_poly}, ::Type{fmpq}) = fmpq_poly
 
-promote_rule{T <: Integer}(::Type{fmpq_poly}, ::Type{Rational{T}}) = fmpq_poly
+promote_rule(::Type{fmpq_poly}, ::Type{Rational{T}}) where T <: Union{Int, BigInt} = fmpq_poly
 
 ###############################################################################
 #
@@ -794,11 +794,11 @@ end
 
 (a::FmpqPolyRing)(b::Rational) = a(fmpq(b))
 
-(a::FmpqPolyRing){T <: Integer}(b::Array{T, 1}) = a(map(fmpq, b))
+(a::FmpqPolyRing)(b::Array{T, 1}, copy::Bool=true) where {T <: Integer} = a(map(fmpq, b))
 
-(a::FmpqPolyRing){T <: Integer}(b::Array{Rational{T}, 1}) = a(map(fmpq, b))
+(a::FmpqPolyRing)(b::Array{Rational{T}, 1}, copy::Bool=true) where {T <: Integer} = a(map(fmpq, b))
 
-(a::FmpqPolyRing)(b::Array{fmpz, 1}) = a(map(fmpq, b))
+(a::FmpqPolyRing)(b::Array{fmpz, 1}, copy::Bool=true) = a(map(fmpq, b))
 
 (a::FmpqPolyRing)(b::fmpq_poly) = b
 

@@ -18,7 +18,7 @@ doc"""
 > is not found to be a power of `p = prime(R)`.
 """
 function O(R::FlintPadicField, m::fmpz)
-   if m == 1
+   if isone(m)
       N = 0
    else
       p = prime(R)
@@ -41,10 +41,10 @@ doc"""
 """
 function O(R::FlintPadicField, m::fmpq)
    d = den(m)
-   if d == 1
+   if isone(d)
       return O(R, num(m))
    end
-   num(m) != 1 && error("Not a power of p in p-adic O()")
+   !isone(num(m)) && error("Not a power of p in p-adic O()")
    p = prime(R)
    if d == p
       N = -1
@@ -98,7 +98,7 @@ parent_type(::Type{padic}) = FlintPadicField
 ###############################################################################
 
 function Base.hash(a::padic, h::UInt)
-   return hash(lift(FlintQQ, a), h) $ hash(prime(parent(a)), h) $ h
+   return xor(hash(lift(FlintQQ, a), h), xor(hash(prime(parent(a)), h), h))
 end
 
 doc"""
@@ -400,7 +400,7 @@ end
 ###############################################################################
 
 function divexact(a::padic, b::padic)
-   b == 0 && throw(DivideError())
+   iszero(b) && throw(DivideError())
    check_parent(a, b)
    ctx = parent(a)
    z = padic(min(a.N - b.v, b.N - 2*b.v + a.v))
@@ -440,7 +440,7 @@ doc"""
 > Returns $a^{-1}$. If $a = 0$ a `DivideError()` is thrown.
 """
 function inv(a::padic)
-   a == 0 && throw(DivideError())
+   iszero(a) && throw(DivideError())
    ctx = parent(a)
    z = padic(a.N - 2*a.v)
    z.parent = ctx
@@ -462,7 +462,7 @@ doc"""
 > such a value exists. If not, the value of $h$ is undetermined.
 """
 function divides(a::padic, b::padic)
-   b == 0 && throw(DivideError())
+   iszero(b) && throw(DivideError())
    return true, divexact(a, b)   
 end
 
@@ -479,7 +479,7 @@ doc"""
 """
 function gcd(x::padic, y::padic)
    check_parent(x, y)
-   if x == 0 && y == 0 
+   if iszero(x) && iszero(y)
       z = zero(parent(x))
    else
       z = one(parent(x))
@@ -525,7 +525,7 @@ doc"""
 > exception is thrown.
 """
 function exp(a::padic) 
-   a != 0 && a.v <= 0 && throw(DomainError())
+   !iszero(a) && a.v <= 0 && throw(DomainError())
    ctx = parent(a)
    z = padic(a.N)
    z.parent = ctx
@@ -543,7 +543,7 @@ doc"""
 > exception is thrown.
 """
 function log(a::padic) 
-   (a.v > 0 || a.v < 0 || a == 0) && throw(DomainError())
+   (a.v > 0 || a.v < 0 || iszero(a)) && throw(DomainError())
    ctx = parent(a)
    z = padic(a.N)
    z.parent = ctx
@@ -618,7 +618,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T<:Integer}(::Type{padic}, ::Type{T}) = padic
+promote_rule(::Type{padic}, ::Type{T}) where {T <: Integer} = padic
 
 promote_rule(::Type{padic}, ::Type{fmpz}) = padic
 
@@ -637,7 +637,7 @@ function (R::FlintPadicField)()
 end
 
 function (R::FlintPadicField)(n::fmpz)
-   if n == 1
+   if isone(n)
       N = 0
    else
       p = prime(R)
@@ -652,7 +652,7 @@ end
 
 function (R::FlintPadicField)(n::fmpq)
    m = den(n)
-   if m == 1
+   if isone(m)
       return R(num(n))
    end
    p = prime(R)

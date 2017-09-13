@@ -1,14 +1,14 @@
 function test_abs_series_constructors()
-   print("GenAbsSeries.constructors...")
+   print("Generic.AbsSeries.constructors...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
 
-   @test elem_type(S) == GenAbsSeries{elem_type(R)}
-   @test elem_type(GenAbsSeriesRing{elem_type(R)}) == GenAbsSeries{elem_type(R)}
-   @test parent_type(GenAbsSeries{elem_type(R)}) == GenAbsSeriesRing{elem_type(R)}
+   @test elem_type(S) == Generic.AbsSeries{elem_type(R)}
+   @test elem_type(Generic.AbsSeriesRing{elem_type(R)}) == Generic.AbsSeries{elem_type(R)}
+   @test parent_type(Generic.AbsSeries{elem_type(R)}) == Generic.AbsSeriesRing{elem_type(R)}
 
-   @test isa(S, GenAbsSeriesRing)
+   @test isa(S, Generic.AbsSeriesRing)
 
    a = x^3 + 2x + 1
    b = (t^2 + 1)*x^2 + (t + 3)x + O(x^4)
@@ -38,7 +38,7 @@ function test_abs_series_constructors()
 end
 
 function test_abs_series_manipulation()
-   print("GenAbsSeries.manipulation...")
+   print("Generic.AbsSeries.manipulation...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
@@ -82,7 +82,7 @@ function test_abs_series_manipulation()
 end
 
 function test_abs_series_unary_ops()
-   print("GenAbsSeries.unary_ops...")
+   print("Generic.AbsSeries.unary_ops...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
@@ -98,7 +98,7 @@ function test_abs_series_unary_ops()
 end
 
 function test_abs_series_binary_ops()
-   print("GenAbsSeries.binary_ops...")
+   print("Generic.AbsSeries.binary_ops...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
@@ -122,7 +122,7 @@ function test_abs_series_binary_ops()
 end
 
 function test_abs_series_adhoc_binary_ops()
-   print("GenAbsSeries.adhoc_binary_ops...")
+   print("Generic.AbsSeries.adhoc_binary_ops...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
@@ -144,7 +144,7 @@ function test_abs_series_adhoc_binary_ops()
 end
 
 function test_abs_series_comparison()
-   print("GenAbsSeries.comparison...")
+   print("Generic.AbsSeries.comparison...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
@@ -168,7 +168,7 @@ function test_abs_series_comparison()
 end
 
 function test_abs_series_adhoc_comparison()
-   print("GenAbsSeries.adhoc_comparison...")
+   print("Generic.AbsSeries.adhoc_comparison...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
@@ -192,7 +192,7 @@ function test_abs_series_adhoc_comparison()
 end
 
 function test_abs_series_powering()
-   print("GenAbsSeries.powering...")
+   print("Generic.AbsSeries.powering...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
@@ -214,7 +214,7 @@ function test_abs_series_powering()
 end
 
 function test_abs_series_shift()
-   print("GenAbsSeries.shift...")
+   print("Generic.AbsSeries.shift...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
@@ -236,7 +236,7 @@ function test_abs_series_shift()
 end
 
 function test_abs_series_truncation()
-   print("GenAbsSeries.truncation...")
+   print("Generic.AbsSeries.truncation...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
@@ -258,7 +258,7 @@ function test_abs_series_truncation()
 end
 
 function test_abs_series_inversion()
-   print("GenAbsSeries.inversion...")
+   print("Generic.AbsSeries.inversion...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
@@ -274,7 +274,7 @@ function test_abs_series_inversion()
 end
 
 function test_abs_series_exact_division()
-   print("GenAbsSeries.exact_division...")
+   print("Generic.AbsSeries.exact_division...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
@@ -296,7 +296,7 @@ function test_abs_series_exact_division()
 end
 
 function test_abs_series_adhoc_exact_division()
-   print("GenAbsSeries.adhoc_exact_division...")
+   print("Generic.AbsSeries.adhoc_exact_division...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
@@ -322,7 +322,7 @@ function test_abs_series_adhoc_exact_division()
 end
 
 function test_abs_series_special_functions()
-   print("GenAbsSeries.special_functions...")
+   print("Generic.AbsSeries.special_functions...")
 
    R = ResidueRing(ZZ, 17)
    T, t = PolynomialRing(R, "t")

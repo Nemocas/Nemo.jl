@@ -429,6 +429,22 @@ function test_acb_poly_evaluation_interpolation()
    println("PASS")
 end
 
+function test_acb_poly_root_bound()
+   print("acb_poly.root_bound...")
+
+   Rx, x = PolynomialRing(CC, "x")
+
+   for i in 1:2
+      r = rand(1:10)
+      z = map(CC, rand(-BigInt(2)^60:BigInt(2)^60, r))
+      f = prod([ x - (z[i]  + onei(CC)) for i in 1:r])
+      b = roots_upper_bound(f)
+      @test all([ abs(z[i] + onei(CC)) <= b for i in 1:r])
+   end
+
+   println("PASS")
+end
+
 function test_acb_poly()
    test_acb_poly_constructors()
    test_acb_poly_printing()
@@ -449,6 +465,7 @@ function test_acb_poly()
    test_acb_poly_composition()
    test_acb_poly_derivative_integral()
    test_acb_poly_evaluation_interpolation()
+   test_acb_poly_root_bound()
 
    println("")
 end

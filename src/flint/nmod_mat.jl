@@ -7,7 +7,7 @@
 export nmod_mat, NmodMatSpace, getindex, setindex!, set_entry!, deepcopy, rows, 
        cols, parent, base_ring, zero, one, issquare, show, transpose,
        transpose!, rref, rref!, trace, det, rank, inv, solve, lufact,
-       sub, window, hcat, vcat, Array, lift, lift!, MatrixSpace, check_parent,
+       sub, hcat, vcat, Array, lift, lift!, MatrixSpace, check_parent,
        howell_form, howell_form!, strong_echelon_form, strong_echelon_form!
 
 ################################################################################
@@ -88,7 +88,7 @@ function setindex!(a::nmod_mat, u::fmpz, i::Int, j::Int)
   set_entry!(a, i, j, u)
 end
 
-function setindex!(a::nmod_mat, u::GenRes{fmpz}, i::Int, j::Int)
+function setindex!(a::nmod_mat, u::Generic.Res{fmpz}, i::Int, j::Int)
   _checkbounds(a, i, j)
   (base_ring(a) != parent(u)) && error("Parent objects must coincide") 
   set_entry!(a, i, j, u)
@@ -97,7 +97,7 @@ end
 setindex!(a::nmod_mat, u::Integer, i::Int, j::Int) =
         setindex!(a, fmpz(u), i, j)
 
-setindex_t!{T<:Union{RingElem, Integer}}(a::nmod_mat, u::T, i::Int, j::Int) =
+setindex_t!(a::nmod_mat, u::T, i::Int, j::Int) where {T<:Union{RingElem, Integer}} =
   setindex!(a, u, j, i)
 
 function set_entry!(a::nmod_mat, i::Int, j::Int, u::UInt)
@@ -113,10 +113,10 @@ function set_entry!(a::nmod_mat, i::Int, j::Int, u::fmpz)
   set_entry!(a, i, j, tt)
 end
 
-set_entry!(a::nmod_mat, i::Int, j::Int, u::GenRes{fmpz}) =
+set_entry!(a::nmod_mat, i::Int, j::Int, u::Generic.Res{fmpz}) =
         set_entry!(a, i, j, u.data)
 
-set_entry_t!{T<:Union{RingElem, Integer}}(a::nmod_mat, i::Int, j::Int, u::T) =
+set_entry_t!(a::nmod_mat, i::Int, j::Int, u::T) where {T<:Union{RingElem, Integer}} =
   set_entry!(a, j, i, u)
  
 function deepcopy_internal(a::nmod_mat, dict::ObjectIdDict)
@@ -309,12 +309,12 @@ end
 
 *(x::Integer, y::nmod_mat) = y*x
 
-function *(x::nmod_mat, y::GenRes{fmpz})
+function *(x::nmod_mat, y::Generic.Res{fmpz})
   (base_ring(x) != parent(y)) && error("Parent objects must coincide")
   return x*y.data
 end
 
-*(x::GenRes{fmpz}, y::nmod_mat) = y*x
+*(x::Generic.Res{fmpz}, y::nmod_mat) = y*x
 
 ################################################################################
 #
@@ -480,9 +480,14 @@ end
 #
 ################################################################################
 
-function lufact!(P::perm, x::nmod_mat)
+function lufact!(P::Generic.perm, x::nmod_mat)
   rank = ccall((:nmod_mat_lu, :libflint), Cint, (Ptr{Int}, Ptr{nmod_mat}, Cint),
            P.d, &x, 0)
+
+  for i in 1:length(P.d)
+    P.d[i] += 1
+  end
+
   return rank
 end
 
@@ -519,7 +524,7 @@ end
 #
 ################################################################################
 
-function window(x::nmod_mat, r1::Int, c1::Int, r2::Int, c2::Int)
+function Base.view(x::nmod_mat, r1::Int, c1::Int, r2::Int, c2::Int)
   _checkbounds(x, r1, c1)
   _checkbounds(x, r2, c2)
   (r1 > r2 || c1 > c2) && error("Invalid parameters")
@@ -532,14 +537,14 @@ function window(x::nmod_mat, r1::Int, c1::Int, r2::Int, c2::Int)
   return z
 end
 
-function window(x::nmod_mat, r::UnitRange{Int}, c::UnitRange{Int})
-  return window(x, r.start, c.start, r.stop, c.stop)
+function Base.view(x::nmod_mat, r::UnitRange{Int}, c::UnitRange{Int})
+  return Base.view(x, r.start, c.start, r.stop, c.stop)
 end
 
 sub(x::nmod_mat, r1::Int, c1::Int, r2::Int, c2::Int) =
-        window(x, r1, c1, r2, c2)
+        Base.view(x, r1, c1, r2, c2)
 
-sub(x::nmod_mat, r::UnitRange{Int}, c::UnitRange{Int}) = window(x, r, c)
+sub(x::nmod_mat, r::UnitRange{Int}, c::UnitRange{Int}) = Base.view(x, r, c)
   
 ################################################################################
 #
@@ -572,7 +577,7 @@ end
 ################################################################################
 
 function Array(b::nmod_mat)
-  a = Array{GenRes{fmpz}}(b.r, b.c)
+  a = Array{Generic.Res{fmpz}}(b.r, b.c)
   for i = 1:b.r
     for j = 1:b.c
       a[i,j] = b[i,j]
@@ -639,9 +644,9 @@ end
 #
 ###############################################################################
 
-promote_rule{V <: Integer}(::Type{nmod_mat}, ::Type{V}) = nmod_mat
+promote_rule(::Type{nmod_mat}, ::Type{V}) where {V <: Integer} = nmod_mat
 
-promote_rule(::Type{nmod_mat}, ::Type{GenRes{fmpz}}) = nmod_mat
+promote_rule(::Type{nmod_mat}, ::Type{Generic.Res{fmpz}}) = nmod_mat
 
 promote_rule(::Type{nmod_mat}, ::Type{fmpz}) = nmod_mat
 
@@ -685,7 +690,7 @@ function (a::NmodMatSpace)(b::fmpz)
    return M
 end
 
-function (a::NmodMatSpace)(b::GenRes{fmpz})
+function (a::NmodMatSpace)(b::Generic.Res{fmpz})
    parent(b) != base_ring(a) && error("Unable to coerce to matrix")
    M = a()
    for i = 1:a.rows
@@ -742,17 +747,17 @@ function (a::NmodMatSpace)(arr::Array{Int, 1}, transpose::Bool = false)
   return z
 end
 
-function (a::NmodMatSpace)(arr::Array{GenRes{fmpz}, 2}, transpose::Bool = false)
+function (a::NmodMatSpace)(arr::Array{Generic.Res{fmpz}, 2}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr, transpose)
-  (base_ring(a) != parent(arr[1])) && error("Elements must have same base ring")
+  (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
   z.base_ring = a.base_ring
   return z
 end
 
-function (a::NmodMatSpace)(arr::Array{GenRes{fmpz}, 1}, transpose::Bool = false)
+function (a::NmodMatSpace)(arr::Array{Generic.Res{fmpz}, 1}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr)
-  (base_ring(a) != parent(arr[1])) && error("Elements must have same base ring")
+  (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
   z.base_ring = a.base_ring
   return z
@@ -771,7 +776,7 @@ end
 #
 ################################################################################
 
-function MatrixSpace(R::GenResRing{fmpz}, r::Int, c::Int, cached::Bool = true)
+function MatrixSpace(R::Generic.ResRing{fmpz}, r::Int, c::Int, cached::Bool = true)
   return try
     NmodMatSpace(R, r, c, cached)
   catch

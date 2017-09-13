@@ -16,7 +16,7 @@ end
 # promotion system is orthogonal to the built-in julia promotion system. The
 # julia system assumes that whenever you have a method signature of the form  
 # Base.promote_rule(::Type{T}, ::Type{S}) = R, then there is also a
-# correesponding Base.convert(::Type{R}, ::T) and similar for S. Since we
+# corresponding Base.convert(::Type{R}, ::T) and similar for S. Since we
 # cannot use the julia convert system (we need an instance of the type and not
 # the type), we cannot use the julia promotion system.
 #
@@ -25,13 +25,7 @@ end
 #
 ################################################################################
 
-promote_rule(T, U) = Union{}
-
-promote_rule{T <: RingElem}(::Type{T}, ::Type{fmpz}) = T
-
-promote_rule{T <: RingElem, S <: Integer}(::Type{T}, ::Type{S}) = T
-
-promote_rule1{T <: RingElem, U <: RingElem}(::Type{T}, ::Type{U}) = promote_rule(T, U)
+promote_rule(::Type{T}, ::Type{T}) where T <: RingElement = T
 
 ###############################################################################
 #
@@ -39,192 +33,72 @@ promote_rule1{T <: RingElem, U <: RingElem}(::Type{T}, ::Type{U}) = promote_rule
 #
 ###############################################################################
 
-function +{S <: RingElem, T <: RingElem}(x::S, y::T) 
-   T1 = promote_rule(S, T)
-   if S == T1
-      +(x, parent(x)(y))
-   elseif T == T1
-      +(parent(y)(x), y)
-   else
-      T1 = promote_rule(T, S)
-      if S == T1
-         +(x, parent(x)(y))
-      elseif T == T1
-         +(parent(y)(x), y)
-      else
-         error("Unable to promote ", S, " and ", T, " to common type")
-      end
-   end
-end
-
-function +{S <: RingElem, T <: Integer}(x::S, y::T) 
-   T1 = promote_rule(S, T)
-   if S == T1
+function +(x::S, y::T) where {S <: RingElem, T <: RingElem}
+   if S == promote_rule(S, T)
       +(x, parent(x)(y))
    else
-      error("Unable to promote ", S, " and ", T, " to common type")
-   end
-end
-
-function +{S <: Integer, T <: RingElem}(x::S, y::T) 
-   T1 = promote_rule(T, S)
-   if T == T1
       +(parent(y)(x), y)
-   else
-      error("Unable to promote ", S, " and ", T, " to common type")
    end
 end
 
-function -{S <: RingElem, T <: RingElem}(x::S, y::T) 
-   T1 = promote_rule(S, T)
-   if S == T1
-      -(x, parent(x)(y))
-   elseif T == T1
-      -(parent(y)(x), y)
-   else
-      T1 = promote_rule(T, S)
-      if S == T1
-         -(x, parent(x)(y))
-      elseif T == T1
-         -(parent(y)(x), y)
-      else
-         error("Unable to promote ", S, " and ", T, " to common type")
-      end
-   end
-end
++(x::RingElem, y::RingElement) = x + parent(x)(y)
 
-function -{S <: RingElem, T <: Integer}(x::S, y::T) 
-   T1 = promote_rule(S, T)
-   if S == T1
++(x::RingElement, y::RingElem) = parent(y)(x) + y
+
+function -(x::S, y::T) where {S <: RingElem, T <: RingElem}
+   if S == promote_rule(S, T)
       -(x, parent(x)(y))
    else
-      error("Unable to promote ", S, " and ", T, " to common type")
-   end
-end
-
-function -{S <: Integer, T <: RingElem}(x::S, y::T) 
-   T1 = promote_rule(T, S)
-   if T == T1
       -(parent(y)(x), y)
-   else
-      error("Unable to promote ", S, " and ", T, " to common type")
    end
 end
 
-function *{S <: RingElem, T <: RingElem}(x::S, y::T) 
-   T1 = promote_rule(S, T)
-   if S == T1
-      *(x, parent(x)(y))
-   elseif T == T1
-      *(parent(y)(x), y)
-   else
-      T1 = promote_rule(T, S)
-      if S == T1
-         *(x, parent(x)(y))
-      elseif T == T1
-         *(parent(y)(x), y)
-      else
-         error("Unable to promote ", S, " and ", T, " to common type")
-      end
-   end
-end
+-(x::RingElem, y::RingElement) = x - parent(x)(y)
 
-function *{S <: RingElem, T <: Integer}(x::S, y::T) 
-   T1 = promote_rule(S, T)
-   if S == T1
+-(x::RingElement, y::RingElem) = parent(y)(x) - y
+
+function *(x::S, y::T) where {S <: RingElem, T <: RingElem}
+   if S == promote_rule(S, T)
       *(x, parent(x)(y))
    else
-      error("Unable to promote ", S, " and ", T, " to common type")
-   end
-end
-
-function *{S <: Integer, T <: RingElem}(x::S, y::T) 
-   T1 = promote_rule(T, S)
-   if T == T1
       *(parent(y)(x), y)
-   else
-      error("Unable to promote ", S, " and ", T, " to common type")
    end
 end
 
-function divexact{S <: RingElem, T <: RingElem}(x::S, y::T) 
-   T1 = promote_rule(S, T)
-   if S == T1
-      divexact(x, parent(x)(y))
-   elseif T == T1
-      divexact(parent(y)(x), y)
-   else
-      T1 = promote_rule(T, S)
-      if S == T1
-         divexact(x, parent(x)(y))
-      elseif T == T1
-         divexact(parent(y)(x), y)
-      else
-         error("Unable to promote ", S, " and ", T, " to common type")
-      end
-   end
-end
+*(x::RingElem, y::RingElement) = x*parent(x)(y)
 
-function divexact{S <: RingElem, T <: Integer}(x::S, y::T) 
-   T1 = promote_rule(S, T)
-   if S == T1
+*(x::RingElement, y::RingElem) = parent(y)(x)*y
+
+function divexact(x::S, y::T) where {S <: RingElem, T <: RingElem}
+   if S == promote_rule(S, T)
       divexact(x, parent(x)(y))
    else
-      error("Unable to promote ", S, " and ", T, " to common type")
-   end
-end
-
-function divexact{S <: Integer, T <: RingElem}(x::S, y::T) 
-   T1 = promote_rule(T, S)
-   if T == T1
       divexact(parent(y)(x), y)
-   else
-      error("Unable to promote ", S, " and ", T, " to common type")
    end
 end
 
-function divides{T <: RingElem}(x::T, y::T)
+divexact(x::RingElem, y::RingElement) = divexact(x, parent(x)(y))
+
+divexact(x::RingElement, y::RingElem) = divexact(parent(y)(x), y)
+
+function divides(x::T, y::T) where {T <: RingElem}
    q, r = divrem(x, y)
-   return r == 0, q
+   return iszero(r), q
 end
 
-function =={S <: RingElem, T <: RingElem}(x::S, y::T) 
-   T1 = promote_rule(S, T)
-   if S == T1
-      ==(x, parent(x)(y))
-   elseif T == T1
-      ==(parent(y)(x), y)
-   else
-      T1 = promote_rule(T, S)
-      if S == T1
-         ==(x, parent(x)(y))
-      elseif T == T1
-         ==(parent(y)(x), y)
-      else
-         error("Unable to promote ", S, " and ", T, " to common type")
-      end
-   end
-end
-
-function =={S <: RingElem, T <: Integer}(x::S, y::T) 
-   T1 = promote_rule(S, T)
-   if S == T1
+function ==(x::S, y::T) where {S <: RingElem, T <: RingElem}
+   if S == promote_rule(S, T)
       ==(x, parent(x)(y))
    else
-      error("Unable to promote ", S, " and ", T, " to common type")
-   end
-end
-
-function =={S <: Integer, T <: RingElem}(x::S, y::T) 
-   T1 = promote_rule(T, S)
-   if T == T1
       ==(parent(y)(x), y)
-   else
-      error("Unable to promote ", S, " and ", T, " to common type")
    end
 end
 
-function addmul!{T <: RingElem}(z::T, x::T, y::T, c::T)
+==(x::RingElem, y::RingElement) = x == parent(x)(y)
+
+==(x::RingElement, y::RingElem) = parent(y)(x) == y
+
+function addmul!(z::T, x::T, y::T, c::T) where {T <: RingElem}
    c = mul!(c, x, y)
    z = addeq!(z, c)
    return z
@@ -236,7 +110,7 @@ end
 #
 ###############################################################################
 
-function powers{T <: RingElem}(a::T, d::Int)
+function powers(a::T, d::Int) where {T <: RingElement}
    d <= 0 && throw(DomainError())
    S = parent(a)
    A = Array{T}(d + 1)
@@ -258,7 +132,7 @@ end
 #
 ###############################################################################
 
-function exp{T <: RingElem}(a::T)
+function exp(a::T) where {T <: RingElem}
    a != 0 && error("Exponential of nonzero element")
    return one(parent(a))
 end
@@ -269,7 +143,7 @@ end
 #
 ################################################################################
 
-transpose{T <: RingElem}(x::T) = deepcopy(x)
+transpose(x::T) where {T <: RingElem} = deepcopy(x)
 
 ###############################################################################
 #
@@ -277,11 +151,11 @@ transpose{T <: RingElem}(x::T) = deepcopy(x)
 #
 ###############################################################################
 
+include("julia/JuliaInteger.jl")
+
+include("julia/JuliaRational.jl")
+
 include("flint/fmpz.jl")
-
-include("generic/Residue.jl")
-
-include("generic/Poly.jl")
 
 include("flint/fmpz_poly.jl")
 
@@ -291,14 +165,6 @@ include("flint/fmpz_mod_poly.jl")
 
 #include("flint/fmpz_mpoly.jl")
 
-include("generic/MPoly.jl")
-
-include("generic/SparsePoly.jl")
-
-include("generic/RelSeries.jl")
-
-include("generic/AbsSeries.jl")
-
 include("flint/fmpz_rel_series.jl")
 
 include("flint/fmpz_abs_series.jl")
@@ -306,8 +172,6 @@ include("flint/fmpz_abs_series.jl")
 include("flint/fmpz_mod_rel_series.jl")
 
 include("flint/fmpz_mod_abs_series.jl")
-
-include("generic/Matrix.jl")
 
 include("flint/fmpz_mat.jl")
 
@@ -353,8 +217,5 @@ include("Factor.jl")
 #
 ###############################################################################
 
-if VERSION >= v"0.5.0-dev+3171"
-
 include("polysubst.jl")
 
-end

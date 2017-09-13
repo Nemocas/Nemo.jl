@@ -318,16 +318,46 @@ end
 #
 ###############################################################################
 
+function div_monagan_pearce{S, N}(a::fmpz_mpoly{S, N}, b::fmpz_mpoly{S, N})
+   q = parent(a)()
+   ccall((:fmpz_mpoly_div_monagan_pearce, :libflint), Void, 
+       (Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly},
+        Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing}),
+       &q, &a, &b, &a.parent)
+   return q
+end
+
 function divrem_monagan_pearce{S, N}(a::fmpz_mpoly{S, N}, b::fmpz_mpoly{S, N})
    q = parent(a)()
    r = parent(a)()
-   ccall((:fmpz_mpoly_divrem_monagan_pearce, :libflint), Cint, 
+   ccall((:fmpz_mpoly_divrem_monagan_pearce, :libflint), Void, 
        (Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly},
         Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing}),
        &q, &r, &a, &b, &a.parent)
    return q, r
 end
 
+function divrem_array{S, N}(a::fmpz_mpoly{S, N}, b::fmpz_mpoly{S, N})
+   q = parent(a)()
+   r = parent(a)()
+   d = ccall((:fmpz_mpoly_divrem_array, :libflint), Cint, 
+       (Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly},
+        Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing}),
+       &q, &r, &a, &b, &a.parent)
+   d == 0 && error("Polynomials too large for divrem_array")
+   return q, r
+end
+
+function divrem_monagan_pearce{S, N}(a::fmpz_mpoly{S, N}, b::Array{fmpz_mpoly{S, N}, 1})
+   len = length(b)
+   q = [parent(a)() for i in 1:len]
+   r = parent(a)()
+   ccall((:fmpz_mpoly_divrem_ideal, :libflint), Void, 
+       (Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly},
+        Ptr{fmpz_mpoly}, Int, Ptr{FmpzMPolyRing}),
+       q, &r, &a, b, len, &a.parent)
+   return q, r
+end
 
 ###############################################################################
 #
@@ -402,32 +432,32 @@ promote_rule(::Type{fmpz_mpoly}, ::Type{fmpz}) = fmpz_mpoly
 #
 ###############################################################################
 
-function Base.call{S, N}(R::FmpzMPolyRing{S, N})
-   z = fmpz_mpoly{S, N}(R)
+function (R::FmpzMPolyRing{S, N}){S, N}()
+   z = fmpz_mpoly(R)
    z.parent = R
    return z
 end
 
-function Base.call{S, N}(R::FmpzMPolyRing{S, N}, b::Int)
-   z = fmpz_mpoly{S, N}(R, b)
+function (R::FmpzMPolyRing{S, N}){S, N}(b::Int)
+   z = fmpz_mpoly(R, b)
    z.parent = R
    return z
 end
 
-function Base.call{S, N}(R::FmpzMPolyRing{S, N}, b::fmpz)
-   z = fmpz_mpoly{S, N}(R, b)
+function (R::FmpzMPolyRing{S, N}){S, N}(b::fmpz)
+   z = fmpz_mpoly(R, b)
    z.parent = R
    return z
 end
 
-function Base.call{S, N}(R::FmpzMPolyRing{S, N}, b::Integer)
-   z = fmpz_mpoly{S, N}(R, fmpz(b))
+function (R::FmpzMPolyRing{S, N}){S, N}(b::Integer)
+   z = fmpz_mpoly(R, fmpz(b))
    z.parent = R
    return z
 end
 
-function Base.call{S, N}(R::FmpzMPolyRing{S, N}, a::Array{fmpz, 1}, b::Array{NTuple{N, Int}, 1})
-   z = fmpz_mpoly{S, N}(R, a, b)
+function (R::FmpzMPolyRing{S, N}){S, N}(a::Array{fmpz, 1}, b::Array{NTuple{N, Int}, 1})
+   z = fmpz_mpoly(R, a, b)
    z.parent = R
    return z
 end

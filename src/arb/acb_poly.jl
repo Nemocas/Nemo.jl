@@ -282,17 +282,17 @@ for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb, acb, fmpz_poly, fmpq_poly
    end
 end
 
-+{T <: Integer}(x::acb_poly, y::Rational{T}) = x + parent(x)(y)
++(x::acb_poly, y::Rational{T}) where T <: Union{Int, BigInt} = x + parent(x)(y)
 
-+{T <: Integer}(x::Rational{T}, y::acb_poly) = y + x
++(x::Rational{T}, y::acb_poly) where T <: Union{Int, BigInt} = y + x
 
--{T <: Integer}(x::acb_poly, y::Rational{T}) = x - parent(x)(y)
+-(x::acb_poly, y::Rational{T}) where T <: Union{Int, BigInt} = x - parent(x)(y)
 
--{T <: Integer}(x::Rational{T}, y::acb_poly) = parent(y)(x) - y
+-(x::Rational{T}, y::acb_poly) where T <: Union{Int, BigInt} = parent(y)(x) - y
 
-*{T <: Integer}(x::acb_poly, y::Rational{T}) = x * parent(x)(y)
+*(x::acb_poly, y::Rational{T}) where T <: Union{Int, BigInt} = x * parent(x)(y)
 
-*{T <: Integer}(x::Rational{T}, y::acb_poly) = y * x
+*(x::Rational{T}, y::acb_poly) where T <: Union{Int, BigInt} = y * x
 
 ###############################################################################
 #
@@ -308,9 +308,9 @@ for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb, acb]
    end
 end
 
-divexact{T <: Integer}(x::acb_poly, y::Rational{T}) = x * inv(base_ring(parent(x))(y))
+divexact(x::acb_poly, y::Rational{T}) where {T <: Integer} = x * inv(base_ring(parent(x))(y))
 
-//{T <: Integer}(x::acb_poly, y::Rational{T}) = divexact(x, y)
+//(x::acb_poly, y::Rational{T}) where {T <: Integer} = divexact(x, y)
 
 ###############################################################################
 #
@@ -710,6 +710,31 @@ end
 
 ###############################################################################
 #
+#   Root bounds
+#
+###############################################################################
+
+doc"""
+    roots_upper_bound(f::acb_poly) -> arb
+
+> Returns an upper bound for the absolute value of all complex roots of $f$.
+"""
+function roots_upper_bound(x::acb_poly)
+   z = ArbField(prec(base_ring(x)))()
+   p = prec(base_ring(x))
+   t = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct}, (Ptr{arb}, ), &z)
+   ccall((:acb_poly_root_bound_fujiwara, :libarb), Void,
+         (Ptr{mag_struct}, Ptr{acb_poly}), t, &x)
+   s = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), &z)
+   ccall((:arf_set_mag, :libarb), Void, (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
+   ccall((:arf_set_round, :libarb), Void,
+         (Ptr{arf_struct}, Ptr{arf_struct}, Int, Cint), s, s, p, ARB_RND_CEIL)
+   ccall((:mag_zero, :libarb), Void, (Ptr{mag_struct},), t)
+   return z
+end
+
+###############################################################################
+#
 #   Unsafe functions
 #
 ###############################################################################
@@ -768,9 +793,9 @@ promote_rule(::Type{acb_poly}, ::Type{Float64}) = acb_poly
 
 promote_rule(::Type{acb_poly}, ::Type{Complex{Float64}}) = acb_poly
 
-promote_rule{T <: Integer}(::Type{acb_poly}, ::Type{T}) = acb_poly
+promote_rule(::Type{acb_poly}, ::Type{T}) where {T <: Integer} = acb_poly
 
-promote_rule{T <: Integer}(::Type{acb_poly}, ::Type{Rational{T}}) = acb_poly
+promote_rule(::Type{acb_poly}, ::Type{Rational{T}}) where T <: Union{Int, BigInt} = acb_poly
 
 promote_rule(::Type{acb_poly}, ::Type{Complex{Int}}) = acb_poly
 
@@ -811,7 +836,7 @@ for T in [Integer, fmpz, fmpq, Float64, Complex{Float64},
   end
 end
 
-(a::AcbPolyRing){T <: Integer}(b::Rational{T}) = a(fmpq(b))
+(a::AcbPolyRing)(b::Rational{T}) where {T <: Integer} = a(fmpq(b))
 
 function (a::AcbPolyRing)(b::Array{acb, 1})
    z = acb_poly(b, a.base_ring.prec)
@@ -825,9 +850,9 @@ for T in [fmpz, fmpq, Float64, Complex{Float64}, Complex{Int}, arb]
   end
 end
 
-(a::AcbPolyRing){T <: Integer}(b::Array{T, 1}) = a(map(base_ring(a), b))
+(a::AcbPolyRing)(b::Array{T, 1}) where {T <: Integer} = a(map(base_ring(a), b))
 
-(a::AcbPolyRing){T <: Integer}(b::Array{Rational{T}, 1}) = a(map(base_ring(a), b))
+(a::AcbPolyRing)(b::Array{Rational{T}, 1}) where {T <: Integer} = a(map(base_ring(a), b))
 
 function (a::AcbPolyRing)(b::fmpz_poly)
    z = acb_poly(b, a.base_ring.prec)

@@ -1,50 +1,50 @@
 function test_gen_frac_constructors()
-   print("GenFrac.constructors...")
+   print("Generic.Frac.constructors...")
 
    S, x = PolynomialRing(ZZ, "x")
    T = FractionField(S)
 
-   @test elem_type(T) == GenFrac{elem_type(S)}
-   @test elem_type(GenFracField{elem_type(S)}) == GenFrac{elem_type(S)}
-   @test parent_type(GenFrac{elem_type(S)}) == GenFracField{elem_type(S)}
+   @test elem_type(T) == Generic.Frac{elem_type(S)}
+   @test elem_type(Generic.FracField{elem_type(S)}) == Generic.Frac{elem_type(S)}
+   @test parent_type(Generic.Frac{elem_type(S)}) == Generic.FracField{elem_type(S)}
 
-   @test isa(T, GenFracField)
+   @test isa(T, Generic.FracField)
 
-   @test isa(T(3), GenFrac)
+   @test isa(T(3), Generic.Frac)
 
-   @test isa(T(fmpz(7)), GenFrac)
+   @test isa(T(fmpz(7)), Generic.Frac)
 
-   @test isa(T(x + 2), GenFrac)
+   @test isa(T(x + 2), Generic.Frac)
 
-   @test isa(T(3, 7), GenFrac)
+   @test isa(T(3, 7), Generic.Frac)
 
-   @test isa(T(x + 2, x + 1), GenFrac)
+   @test isa(T(x + 2, x + 1), Generic.Frac)
 
-   @test isa(T(x + 2, 4), GenFrac)
+   @test isa(T(x + 2, 4), Generic.Frac)
 
-   @test isa(T(3, x + 1), GenFrac)
+   @test isa(T(3, x + 1), Generic.Frac)
 
-   @test isa(T(T(x + 2)), GenFrac)
+   @test isa(T(T(x + 2)), Generic.Frac)
 
-   @test isa(T(), GenFrac)
+   @test isa(T(), Generic.Frac)
 
-   @test isa((x + 3)//(x^2 + 2), GenFrac)
+   @test isa((x + 3)//(x^2 + 2), Generic.Frac)
 
-   @test isa((x + 3)//12, GenFrac)
+   @test isa((x + 3)//12, Generic.Frac)
 
-   @test isa(12//(x + 2), GenFrac)
+   @test isa(12//(x + 2), Generic.Frac)
 
-   @test isa((x + 1)//T(x + 2, x + 1), GenFrac)
+   @test isa((x + 1)//T(x + 2, x + 1), Generic.Frac)
 
-   @test isa(T(x + 2, x + 1)//(x + 1), GenFrac)
+   @test isa(T(x + 2, x + 1)//(x + 1), Generic.Frac)
 
-   @test isa(T(x + 2, x + 1)//T(x, x + 2), GenFrac) 
+   @test isa(T(x + 2, x + 1)//T(x, x + 2), Generic.Frac) 
 
    println("PASS")
 end
 
 function test_gen_frac_manipulation()
-   print("GenFrac.manipulation...")
+   print("Generic.Frac.manipulation...")
 
    R = FractionField(ZZ)
    S, x = PolynomialRing(ZZ, "x")
@@ -66,7 +66,7 @@ function test_gen_frac_manipulation()
 end
 
 function test_gen_frac_unary_ops()
-   print("GenFrac.unary_ops...")
+   print("Generic.Frac.unary_ops...")
 
    S, x = PolynomialRing(ZZ, "x")
 
@@ -76,7 +76,7 @@ function test_gen_frac_unary_ops()
 end
 
 function test_gen_frac_binary_ops()
-   print("GenFrac.binary_ops...")
+   print("Generic.Frac.binary_ops...")
 
    S, x = PolynomialRing(ZZ, "x")
 
@@ -94,7 +94,7 @@ function test_gen_frac_binary_ops()
 end
 
 function test_gen_frac_adhoc_binary()
-   print("GenFrac.adhoc_binary...")
+   print("Generic.Frac.adhoc_binary...")
 
    S, x = PolynomialRing(ZZ, "x")
 
@@ -117,7 +117,7 @@ function test_gen_frac_adhoc_binary()
 end
 
 function test_gen_frac_comparison()
-   print("GenFrac.comparison...")
+   print("Generic.Frac.comparison...")
 
    S, x = PolynomialRing(ZZ, "x")
 
@@ -131,7 +131,7 @@ function test_gen_frac_comparison()
 end
 
 function test_gen_frac_adhoc_comparison()
-   print("GenFrac.adhoc_comparison...")
+   print("Generic.Frac.adhoc_comparison...")
 
    S, x = PolynomialRing(ZZ, "x")
 
@@ -149,7 +149,7 @@ function test_gen_frac_adhoc_comparison()
 end
 
 function test_gen_frac_powering()
-   print("GenFrac.powering()...")
+   print("Generic.Frac.powering()...")
 
    S, x = PolynomialRing(ZZ, "x")
 
@@ -161,7 +161,7 @@ function test_gen_frac_powering()
 end
 
 function test_gen_frac_inversion()
-   print("GenFrac.inversion()...")
+   print("Generic.Frac.inversion()...")
 
    S, x = PolynomialRing(ZZ, "x")
 
@@ -173,7 +173,7 @@ function test_gen_frac_inversion()
 end
 
 function test_gen_frac_exact_division()
-   print("GenFrac.exact_division...")
+   print("Generic.Frac.exact_division...")
 
    S, x = PolynomialRing(ZZ, "x")
 
@@ -186,7 +186,7 @@ function test_gen_frac_exact_division()
 end
 
 function test_gen_frac_adhoc_exact_division()
-   print("GenFrac.adhoc_exact_division...")
+   print("Generic.Frac.adhoc_exact_division...")
 
    S, x = PolynomialRing(ZZ, "x")
 
@@ -205,7 +205,7 @@ function test_gen_frac_adhoc_exact_division()
 end
 
 function test_gen_frac_gcd()
-   print("GenFrac.gcd...")
+   print("Generic.Frac.gcd...")
 
    S, x = PolynomialRing(ZZ, "x")
 
@@ -217,7 +217,7 @@ function test_gen_frac_gcd()
 end
 
 function test_gen_frac_remove_valuation()
-   print("GenFrac.remove_valuation...")
+   print("Generic.Frac.remove_valuation...")
 
    a = fmpq(2, 3)
 

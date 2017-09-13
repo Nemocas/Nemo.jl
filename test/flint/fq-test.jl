@@ -219,6 +219,16 @@ function test_fq_special_functions()
    println("PASS")
 end
 
+function test_fq_rand()
+   print("fq.rand...")
+   
+   R, x = FiniteField(fmpz(17), 3, "x")
+   
+   @inferred rand(R)
+   
+   println("PASS")
+end
+
 function test_fq()
    test_fq_constructors()
    test_fq_printing()
@@ -232,6 +242,7 @@ function test_fq()
    test_fq_exact_division()
    test_fq_gcd()
    test_fq_special_functions()
-
+   test_fq_rand()
+   
    println("")
 end

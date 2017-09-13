@@ -57,7 +57,7 @@ end
 #
 ###############################################################################
 
-function window(x::fmpz_mat, r1::Int, c1::Int, r2::Int, c2::Int)
+function Base.view(x::fmpz_mat, r1::Int, c1::Int, r2::Int, c2::Int)
   _checkbounds(x.r, r1) || throw(BoundsError())
   _checkbounds(x.r, r2) || throw(BoundsError())
   _checkbounds(x.c, c1) || throw(BoundsError())
@@ -72,8 +72,8 @@ function window(x::fmpz_mat, r1::Int, c1::Int, r2::Int, c2::Int)
   return b
 end
 
-function window(x::fmpz_mat, r::UnitRange{Int}, c::UnitRange{Int})
-  return window(x, r.start, c.start, r.stop, c.stop)
+function Base.view(x::fmpz_mat, r::UnitRange{Int}, c::UnitRange{Int})
+  return Base.view(x, r.start, c.start, r.stop, c.stop)
 end
 
 function _fmpz_mat_window_clear_fn(a::fmpz_mat)
@@ -692,7 +692,7 @@ end
 #
 ###############################################################################
 
-type lll_ctx
+mutable struct lll_ctx
    delta::Float64
    eta::Float64
    rep_type::Int
@@ -1163,7 +1163,7 @@ function (a::FmpzMatSpace)(arr::Array{fmpz, 2})
    return z
 end
 
-function (a::FmpzMatSpace){T <: Integer}(arr::Array{T, 2})
+function (a::FmpzMatSpace)(arr::Array{T, 2}) where {T <: Integer}
    _check_dim(a.rows, a.cols, arr)
    z = fmpz_mat(a.rows, a.cols, arr)
    z.base_ring = FlintZZ
@@ -1177,7 +1177,7 @@ function (a::FmpzMatSpace)(arr::Array{fmpz, 1})
    return z
 end
 
-function (a::FmpzMatSpace){T <: Integer}(arr::Array{T, 1})
+function (a::FmpzMatSpace)(arr::Array{T, 1}) where {T <: Integer}
    _check_dim(a.rows, a.cols, arr)
    z = fmpz_mat(a.rows, a.cols, arr)
    z.base_ring = FlintZZ
@@ -1204,7 +1204,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(::Type{fmpz_mat}, ::Type{T}) = fmpz_mat
+promote_rule(::Type{fmpz_mat}, ::Type{T}) where {T <: Integer} = fmpz_mat
 
 promote_rule(::Type{fmpz_mat}, ::Type{fmpz}) = fmpz_mat
 

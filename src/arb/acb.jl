@@ -7,12 +7,9 @@
 #
 ###############################################################################
 
-import Base: real, imag, abs, conj, angle,
-       sqrt, log, log1p, exp, sin, cos, tan, cot,
-       sinpi, cospi, sinh, cosh, tanh, coth,
-       atan, gamma, lgamma, digamma, polygamma,
-       erf, erfi, erfc, gamma,
-       besselj, bessely, besseli, besselk
+import Base: real, imag, abs, conj, angle, sqrt, log, log1p, exp, sin, cos,
+             tan, cot, sinpi, cospi, sinh, cosh, tanh, coth, atan, gamma,
+             lgamma, gamma
 
 export one, onei, real, imag, conj, abs, inv, angle, isreal
 
@@ -332,8 +329,8 @@ divexact(x::BigFloat, y::acb) = x // y
 divexact(x::acb, y::BigFloat) = x // y
 divexact(x::Integer, y::acb) = x // y
 divexact(x::acb, y::Integer) = x // y
-divexact{T <: Integer}(x::Rational{T}, y::acb) = x // y
-divexact{T <: Integer}(x::acb, y::Rational{T}) = x // y
+divexact(x::Rational{T}, y::acb) where {T <: Integer} = x // y
+divexact(x::acb, y::Rational{T}) where {T <: Integer} = x // y
 
 /(x::acb, y::acb) = x // y
 /(x::fmpz, y::acb) = x // y
@@ -347,16 +344,16 @@ divexact{T <: Integer}(x::acb, y::Rational{T}) = x // y
 /(x::arb, y::acb) = x // y
 /(x::acb, y::arb) = x // y
 
-+{T <: Integer}(x::Rational{T}, y::acb) = fmpq(x) + y
-+{T <: Integer}(x::acb, y::Rational{T}) = x + fmpq(y)
--{T <: Integer}(x::Rational{T}, y::acb) = fmpq(x) - y
--{T <: Integer}(x::acb, y::Rational{T}) = x - fmpq(y)
-*{T <: Integer}(x::Rational{T}, y::acb) = fmpq(x) * y
-*{T <: Integer}(x::acb, y::Rational{T}) = x * fmpq(y)
-//{T <: Integer}(x::Rational{T}, y::acb) = fmpq(x) // y
-//{T <: Integer}(x::acb, y::Rational{T}) = x // fmpq(y)
-^{T <: Integer}(x::Rational{T}, y::acb) = fmpq(x)^y
-^{T <: Integer}(x::acb, y::Rational{T}) = x ^ fmpq(y)
++(x::Rational{T}, y::acb) where {T <: Integer} = fmpq(x) + y
++(x::acb, y::Rational{T}) where {T <: Integer} = x + fmpq(y)
+-(x::Rational{T}, y::acb) where {T <: Integer} = fmpq(x) - y
+-(x::acb, y::Rational{T}) where {T <: Integer} = x - fmpq(y)
+*(x::Rational{T}, y::acb) where {T <: Integer} = fmpq(x) * y
+*(x::acb, y::Rational{T}) where {T <: Integer} = x * fmpq(y)
+//(x::Rational{T}, y::acb) where {T <: Integer} = fmpq(x) // y
+//(x::acb, y::Rational{T}) where {T <: Integer} = x // fmpq(y)
+^(x::Rational{T}, y::acb) where {T <: Integer} = fmpq(x)^y
+^(x::acb, y::Rational{T}) where {T <: Integer} = x ^ fmpq(y)
 
 +(x::Float64, y::acb) = parent(y)(x) + y
 +(x::acb, y::Float64) = x + parent(x)(y)
@@ -497,7 +494,7 @@ doc"""
 > Returns `true` if the box $x$ contains the given rational value, otherwise
 > return `false`.
 """
-contains{T <: Integer}(x::acb, y::Rational{T}) = contains(x, fmpz(y))
+contains(x::acb, y::Rational{T}) where {T <: Integer} = contains(x, fmpz(y))
 
 doc"""
     contains_zero(x::acb)
@@ -1553,7 +1550,7 @@ for (typeofx, passtoc) in ((acb, Ref{acb}), (Ptr{acb}, Ptr{acb}))
       _arb_set(i, z, p)
     end
     
-    function _acb_set{T <: AbstractString}(x::($typeofx), y::T, z::T, p::Int)
+    function _acb_set(x::($typeofx), y::T, z::T, p::Int) where {T <: AbstractString}
       r = ccall((:acb_real_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
       _arb_set(r, y, p)
       i = ccall((:acb_imag_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
@@ -1602,10 +1599,9 @@ end
 
 (r::AcbField)(x::Integer) = r(fmpz(x))
 
-(r::AcbField){T <: Integer}(x::Rational{T}) = r(fmpq(x))
+(r::AcbField)(x::Rational{T}) where {T <: Integer} = r(fmpq(x))
 
-function (r::AcbField){T <: Union{Int, UInt,fmpz, fmpq, arb, Float64,
-                                              BigFloat, AbstractString}}(x::T, y::T)
+function (r::AcbField)(x::T, y::T) where {T <: Union{Int, UInt,fmpz, fmpq, arb, Float64, BigFloat, AbstractString}}
   z = acb(x, y, r.prec)
   z.parent = r
   return z
@@ -1613,7 +1609,7 @@ end
 
 (r::AcbField)(x::BigInt, y::BigInt) = r(fmpz(x), fmpz(y))
 
-(r::AcbField){S <: Integer, T <: Integer}(x::Rational{S}, y::Rational{T}) =
+(r::AcbField)(x::Rational{S}, y::Rational{T}) where {S <: Integer, T <: Integer} =
       r(fmpq(x), fmpq(y))
 
 ################################################################################

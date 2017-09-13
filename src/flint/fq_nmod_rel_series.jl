@@ -96,7 +96,7 @@ function renormalize!(z::fq_nmod_rel_series)
    zlen = pol_length(z)
    zval = valuation(z)
    zprec = precision(z)
-   while i < zlen && polcoeff(z, i) == 0
+   while i < zlen && iszero(polcoeff(z, i))
       i += 1
    end
    z.prec = zprec
@@ -440,7 +440,7 @@ end
 
 function divexact(x::fq_nmod_rel_series, y::fq_nmod_rel_series)
    check_parent(x, y)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    yval = valuation(y)
    xval = valuation(x)
    if yval != 0
@@ -470,7 +470,7 @@ end
 ###############################################################################
 
 function divexact(x::fq_nmod_rel_series, y::fq_nmod)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
    z.prec = x.prec
@@ -489,7 +489,7 @@ end
 ###############################################################################
 
 function inv(a::fq_nmod_rel_series)
-   a == 0 && throw(DivideError())
+   iszero(a) && throw(DivideError())
    !isunit(a) && error("Unable to invert power series")
    ainv = parent(a)()
    ainv.prec = a.prec
@@ -625,7 +625,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(::Type{fq_nmod_rel_series}, ::Type{T}) = fq_nmod_rel_series
+promote_rule(::Type{fq_nmod_rel_series}, ::Type{T}) where {T <: Integer} = fq_nmod_rel_series
 
 promote_rule(::Type{fq_nmod_rel_series}, ::Type{fmpz}) = fq_nmod_rel_series
 
@@ -660,7 +660,7 @@ end
 
 function (a::FqNmodRelSeriesRing)(b::fmpz)
    ctx = base_ring(a)
-   if b == 0
+   if iszero(b)
       z = fq_nmod_rel_series(ctx)
       z.prec = a.prec_max
    else
@@ -672,7 +672,7 @@ end
 
 function (a::FqNmodRelSeriesRing)(b::fq_nmod)
    ctx = base_ring(a)
-   if b == 0
+   if iszero(b)
       z = fq_nmod_rel_series(ctx)
       z.prec = a.prec_max
    else

@@ -41,7 +41,7 @@ export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash, fac, bell,
        sqrtmod, trailing_zeros, sigma, eulerphi, fib, moebiusmu, primorial,
        risingfac, numpart, canonical_unit, needs_parentheses, isnegative,
        show_minus_one, parseint, addeq!, mul!, isunit, isequal, num, den,
-       iszero
+       iszero, rand
 
 ###############################################################################
 #
@@ -114,9 +114,9 @@ function _hash_integer(a::Int, h::UInt)
    d = convert(Ptr{Ptr{UInt}}, unsigned(a) << 2) + 2*sizeof(Cint)
    p = unsafe_load(d)
    b = unsafe_load(p)
-   h = Base.hash_uint(ifelse(s < 0, -b, b) $ h) $ h
+   h = xor(Base.hash_uint(xor(ifelse(s < 0, -b, b), h)), h)
    for k = 2:abs(s)
-      h = Base.hash_uint(unsafe_load(p, k) $ h) $ h
+      h = xor(Base.hash_uint(xor(unsafe_load(p, k), h)), h)
    end
    return h
 end
@@ -286,7 +286,7 @@ for (fJ, fC) in ((:fdiv, :fdiv_q), (:cdiv, :cdiv_q), (:tdiv, :tdiv_q),
                  (:div, :tdiv_q))
     @eval begin
         function ($fJ)(x::fmpz, y::fmpz)
-            y == 0 && throw(DivideError())
+            iszero(y) && throw(DivideError())
             z = fmpz()
             ccall(($(string(:fmpz_, fC)), :libflint), Void, 
                   (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &x, &y)
@@ -296,7 +296,7 @@ for (fJ, fC) in ((:fdiv, :fdiv_q), (:cdiv, :cdiv_q), (:tdiv, :tdiv_q),
 end
 
 function divexact(x::fmpz, y::fmpz)
-    y == 0 && throw(DivideError())
+    iszero(y) && throw(DivideError())
     z = fmpz()
     ccall((:fmpz_divexact, :libflint), Void, 
           (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &x, &y)
@@ -304,7 +304,7 @@ function divexact(x::fmpz, y::fmpz)
 end
 
 function rem(x::fmpz, c::fmpz)
-    c == 0 && throw(DivideError())
+    iszero(c) && throw(DivideError())
     q = fmpz()
     r = fmpz()
     ccall((:fmpz_tdiv_qr, :libflint), Void, 
@@ -480,7 +480,7 @@ end
 ###############################################################################
 
 function divrem(x::fmpz, y::fmpz)
-    y == 0 && throw(DivideError())
+    iszero(y) && throw(DivideError())
     z1 = fmpz()
     z2 = fmpz()
     ccall((:fmpz_tdiv_qr, :libflint), Void, 
@@ -489,7 +489,7 @@ function divrem(x::fmpz, y::fmpz)
 end
 
 function tdivrem(x::fmpz, y::fmpz)
-    y == 0 && throw(DivideError())
+    iszero(y) && throw(DivideError())
     z1 = fmpz()
     z2 = fmpz()
     ccall((:fmpz_tdiv_qr, :libflint), Void,
@@ -498,7 +498,7 @@ function tdivrem(x::fmpz, y::fmpz)
 end
 
 function fdivrem(x::fmpz, y::fmpz)
-    y == 0 && throw(DivideError())
+    iszero(y) && throw(DivideError())
     z1 = fmpz()
     z2 = fmpz()
     ccall((:fmpz_fdiv_qr, :libflint), Void, 
@@ -514,7 +514,7 @@ end
 
 function ^(x::fmpz, y::Int)
     if y < 0; throw(DomainError()); end
-    if x == 1; return x; end
+    if isone(x); return x; end
     if x == -1; return isodd(y) ? x : -x; end
     if y > typemax(UInt); throw(DomainError()); end
     if y == 0; return one(FlintZZ); end
@@ -712,7 +712,7 @@ doc"""
 function invmod(x::fmpz, m::fmpz)
     m <= 0 && throw(DomainError())
     z = fmpz()
-    if m == 1
+    if isone(m)
         return fmpz(0)
     end
     if ccall((:fmpz_invmod, :libflint), Cint, 
@@ -854,7 +854,7 @@ function gcd(x::Array{fmpz, 1})
    for i in 3:length(x)
       ccall((:fmpz_gcd, :libflint), Void, 
             (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &z, &x[i])
-      if z == 1
+      if isone(z)
          return z
       end
    end
@@ -1028,7 +1028,7 @@ doc"""
 > require $x \neq 0$.
 """
 function divisible(x::fmpz, y::fmpz)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    Bool(ccall((:fmpz_divisible, :libflint), Cint, 
               (Ptr{fmpz}, Ptr{fmpz}), &x, &y))
 end
@@ -1079,7 +1079,7 @@ doc"""
 > Return the tuple $n, z$ such that $x = y^nz$ where $y$ and $z$ are coprime.
 """
 function remove(x::fmpz, y::fmpz) 
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    z = fmpz()
    num = ccall((:fmpz_remove, :libflint), Int, 
                (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &x, &y)
@@ -1359,13 +1359,13 @@ doc"""
     ndigits(x::fmpz, b::Integer = 10)
 > Return the number of digits of $x$ in the base $b$ (default is $b = 10$).
 """
-ndigits(x::fmpz, b::Integer = 10) = x == 0 ? 1 : ndigits_internal(x, b)
+ndigits(x::fmpz, b::Integer = 10) = iszero(x) ? 1 : ndigits_internal(x, b)
 
 doc"""
     nbits(x::fmpz)
 > Return the number of binary bits of $x$. We return zero if $x = 0$.
 """
-nbits(x::fmpz) = x == 0 ? 0 : Int(ccall((:fmpz_sizeinbase, :libflint), UInt,
+nbits(x::fmpz) = iszero(x) ? 0 : Int(ccall((:fmpz_sizeinbase, :libflint), UInt,
                   (Ptr{fmpz}, Int32), &x, 2))  # docu states: always correct
                                 #if base is power of 2
 
@@ -1517,6 +1517,16 @@ end
 
 ###############################################################################
 #
+#   Random generation
+#
+###############################################################################
+
+function rand(R::FlintIntegerRing, n::UnitRange{Int})
+   return R(rand(n))
+end
+   
+###############################################################################
+#
 #   Constructors
 #
 ###############################################################################
@@ -1566,6 +1576,6 @@ convert(::Type{Float16}, n::fmpz) = Float16(Float64(n))
 
 convert(::Type{BigFloat}, n::fmpz) = BigFloat(BigInt(n))
 
-Base.promote_rule{T <: Integer}(::Type{fmpz}, ::Type{T}) = fmpz
+Base.promote_rule(::Type{fmpz}, ::Type{T}) where {T <: Integer} = fmpz
 
-promote_rule{T <: Integer}(::Type{fmpz}, ::Type{T}) = fmpz
+promote_rule(::Type{fmpz}, ::Type{T}) where {T <: Integer} = fmpz

@@ -1,42 +1,5 @@
-###############################################################################
-#
-#   PermGroup / perm
-#
-###############################################################################
-
-const PermID = ObjectIdDict()
-
-type PermGroup <: Group
-   n::Int
-
-   function PermGroup(n::Int, cached=true)
-      if haskey(PermID, n)
-         return PermID[n]::PermGroup
-      else
-         z = new(n)
-         if cached
-            PermID[n] = z
-         end
-         return z
-      end
-   end
-end
-
-type perm <: GroupElem
-   d::Array{Int, 1}
-   cycles::Vector{Vector{Int}}
-   parent::PermGroup
-
-   function perm(n::Int)
-      return new(collect(1:n))
-   end
-
-   function perm(a::Array{Int, 1})
-      return new(a)
-   end
-end
-
-export PermGroup, perm, parity, elements, cycles
+export PermGroup, perm, parity, elements, cycles, character, setpermstyle,
+       order
 
 ###############################################################################
 #
@@ -68,7 +31,7 @@ end
 function Base.hash(a::perm, h::UInt)
    b = 0x595dee0e71d271d0%UInt
    for i in 1:length(a.d)
-      b $= hash(a[i], h) $ h
+      b = xor(b, xor(hash(a[i], h), h))
       b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
    return b
@@ -98,6 +61,13 @@ function parity(a::perm)
    return parity%2
 end
 
+doc"""
+    sign(a::perm)
+> Returns the sign of the given permutations, i.e. `1` if `a` is even and `-1`
+> if `a` is odd.
+"""
+sign(a::perm) = (-1)^parity(a)
+
 function getindex(a::perm, n::Int)
    return a.d[n]
 end
@@ -122,7 +92,7 @@ function show(io::IO, G::PermGroup)
    print(io, "Permutation group over $(G.n) elements")
 end
 
-type PermDisplayStyle
+mutable struct PermDisplayStyle
    format::Symbol
 end
 
@@ -190,8 +160,7 @@ function *(a::perm, b::perm)
    for i in 1:length(d)
       d[i] = a[b[i]]
    end
-   G = parent(a)
-   return G(d)
+   return parent(a)(d, false)
 end
 
 doc"""
@@ -224,7 +193,7 @@ function ^(a::perm, n::Int)
             new_perm[j] = shifted[idx]
          end
       end
-      return parent(a)(new_perm)
+      return parent(a)(new_perm, false)
    end
 end
 
@@ -255,7 +224,7 @@ function power_by_squaring(a::perm, b::Int)
          end
          bit >>= 1
       end
-      return parent(a)(cache1)
+      return parent(a)(cache1, false)
    end
 end
 
@@ -276,7 +245,7 @@ function inv(a::perm)
       d[a[i]] = i
    end
    G = parent(a)
-   return G(d)
+   return G(d, false)
 end
 
 # TODO: can we do that in place??
@@ -294,22 +263,11 @@ end
 #
 ###############################################################################
 
-doc"""
-   AllPerms(n::Int)
-> Returns an iterator over arrays representing all permutations of `1:n`.
-> Similar to `Combinatorics.permutations(1:n)`
-"""
-immutable AllPerms
-   n::Int
-   all::Int
-   AllPerms(n::Int) = new(n, factorial(n))
-end
-
 Base.start(A::AllPerms) = (collect(1:A.n), 1, 1, ones(Int, A.n))
 Base.next(A::AllPerms, state) = all_perms(state...)
 Base.done(A::AllPerms, state) = state[2] > A.all
-Base.eltype(::AllPerms) = Vector{Int}
-Base.length(A::AllPerms) = factorial(A.n)
+Base.eltype(::Type{AllPerms}) = Vector{Int}
+length(A::AllPerms) = A.all
 
 function all_perms(elts, counter, i, c)
    if counter == 1
@@ -338,7 +296,7 @@ doc"""
 > Returns an iterator over all elements in the group $G$. You may use
 > `collect(elements(G))` to get an array of all elements.
 """
-elements(G::PermGroup) = (G(p) for p in AllPerms(G.n))
+elements(G::PermGroup) = (G(p, false) for p in AllPerms(G.n))
 
 ###############################################################################
 #
@@ -388,6 +346,14 @@ doc"""
 order(a::perm) = lcm([length(c) for c in cycles(a)])
 
 doc"""
+    permtype(a::perm, rev=true)
+> Returns the type of permutation `a`, i.e. lengths of disjoint cycles building
+> `a`. This fully determines the conjugacy class of `a`. The lengths are sorted
+> in reverse order by default.
+"""
+permtype(a::perm) = sort([length(c) for c in cycles(a)], rev=true)
+
+doc"""
     matrix_repr(a::perm)
 > Return the permutation matrix representing `a` via natural embedding of the
 > permutation group into general linear group over ZZ
@@ -396,6 +362,36 @@ function matrix_repr(a::perm)
    A = eye(Int, parent(a).n)
    return A[a.d,:]
 end
+
+doc"""
+    emb!(result::perm, p::perm, V::Vector{Int})
+> Embedds permutation `p` into `result` on the indices given by `V`. This
+> corresponds to natural embedding of $S_k$ into $S_n$ as the subgroup
+> permuting points indexed by `V`.
+"""
+function emb!(result::perm, p::perm, V::Vector{Int})
+    result.d[V] = (result.d[V])[p.d]
+    return result
+end
+
+doc"""
+    emb(G::PermGroup, V::Vector{Int})
+> Returns the natural embedding of a permutation group into `G` as the
+> subgroup permuting points indexed by `V`.
+"""
+function emb(G::PermGroup, V::Vector{Int}, check::Bool=true)
+   if check
+      @assert length(Base.Set(V)) == length(V)
+      @assert all(V .<= G.n)
+   end
+   return p -> Nemo.emb!(G(), p, V)
+end
+
+doc"""
+    rand(G::PermGroup)
+> Returns a random element from group `G`.
+"""
+rand(G::PermGroup) = G(randperm(G.n), false)
 
 ###############################################################################
 #
@@ -432,3 +428,62 @@ end
 ###############################################################################
 
 # handled by inner constructors
+
+##############################################################################
+#
+#   Irreducible Characters
+#
+##############################################################################
+
+doc"""
+    character(lambda::Partition)
+> Returns the $\lambda$-th irreducible character of permutation group on
+> `lambda.n` generators. The returned character function
+>     `chi(p::perm, check::Bool=true)`
+> can be evaluated on a permutation `p::perm`. Checking in $\chi$ if `p`
+> belongs to the appropriate group can be switched off by calling
+> `chi(p, false)`. The values computed by $\chi$ are stored in look-up table.
+>
+> The computation follows the Murnaghan-Nakayama formula:
+> $$\chi_\lambda(\sigma) = \sum_{\text{rimhook }\xi\subset \lambda}
+(-1)^{ll(\lambda\backslash\xi)} \chi_{\lambda \backslash\xi}(\tilde\sigma)$$
+> where $\lambda\backslash\xi$ denotes partition associated with Young Diagram
+> of $\lambda$ with $\xi$ removed, $ll$ denotes the leg-length (i.e. number of
+> rows - 1) and $\tilde\sigma$ is permutation obtained from $\sigma$ by the
+> removal of the longest cycle.
+>
+> For more details see e.g. Chapter 2.8 of _Group Theory and Physics_ by
+> S.Sternberg.
+"""
+function character(lambda::Partition)
+   R = partitionseq(lambda)
+
+   function char(p::perm, check::Bool=true)
+      if check
+         lambda.n == length(p.d) || throw("Can't evaluate character on $p : lengths differ.")
+      end
+      return MN1inner(R, Partition(permtype(p)), 1, _charvalsTable)
+   end
+
+   return char
+end
+
+doc"""
+    character(lambda::Partition, p::perm, check::Bool=true)
+> Returns the value of `lambda`-th irreducible character on permutation `p`.
+"""
+function character(lambda::Partition, p::perm, check::Bool=true)
+   if check
+      lambda.n == length(p.d) || throw("lambda-th irreducible character can be evaluated only on permutations of length $(lambda.n).")
+   end
+
+   return MN1inner(partitionseq(lambda), Partition(permtype(p)), 1, _charvalsTable)
+end
+
+doc"""
+    character(lambda::Partition, mu::Partition)
+> Returns the value of `lambda-th` irreducible character on the conjugacy class
+> represented by partition `mu`. Values of characters computed by this method
+> are not cached _globally_.
+"""
+character(lambda::Partition, mu::Partition) = MN1inner(partitionseq(lambda), mu, 1)

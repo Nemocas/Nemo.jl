@@ -197,7 +197,7 @@ setcoeff!{T <: RingElem}(a::PolyElem{T}, n::Int, c::T)
 Set the coefficient of the degree $n$ term of the given polynomial to the given
 value `a`. The polynomial is not normalised automatically after this operation,
 however the polynomial is automatically resized if there is not sufficient
-allocated space.
+allocated space. 
 
 ```
 deepcopy(a::PolyElem)
@@ -336,6 +336,10 @@ isunit(::PolyElem)
 
 ```@docs
 ismonomial(::PolyElem)
+```
+
+```@docs
+isterm(::PolyElem)
 ```
 
 ```@docs
@@ -678,7 +682,6 @@ primpart(::PolyElem)
 ```
 
 ```@docs
-gcdx{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
 gcdx{T <: Union{ResElem, FieldElem}}(::PolyElem{T}, ::PolyElem{T})
 ```
 
@@ -813,6 +816,10 @@ resultant{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
 ```
 
 ```@docs
+resx{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+```
+
+```@docs
 discriminant(a::PolyElem)
 ```
 
@@ -927,6 +934,13 @@ R, x = PolynomialRing(RR, "x")
 
 xs = arb[inv(RR(i)) for i=1:5]
 f = from_roots(R, xs)
+```
+
+## Bounding absolute values of roots
+
+```@docs
+roots_upper_bound(::arb_poly)
+roots_upper_bound(::acb_poly)
 ```
 
 ## Lifting

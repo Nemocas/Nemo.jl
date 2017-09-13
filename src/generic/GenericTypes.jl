@@ -6,44 +6,173 @@
 
 ###############################################################################
 #
-#   GenPolyRing / GenPoly
+#   PermGroup / perm
 #
 ###############################################################################
 
-type GenPolyRing{T <: RingElem} <: PolyRing{T}
-   base_ring::Ring
-   S::Symbol
+const PermID = ObjectIdDict()
 
-   function GenPolyRing(R::Ring, s::Symbol, cached::Bool = true)
-      if haskey(GenPolyID, (R, s))
-         return GenPolyID[R, s]::GenPolyRing{T}
-      else 
-         z = new{T}(R, s)
+mutable struct PermGroup <: Nemo.Group
+   n::Int
+
+   function PermGroup(n::Int, cached=true)
+      if haskey(PermID, n)
+         return PermID[n]::PermGroup
+      else
+         z = new(n)
          if cached
-           GenPolyID[R, s] = z
+            PermID[n] = z
          end
          return z
       end
    end
 end
 
-const GenPolyID = Dict{Tuple{Ring, Symbol}, Ring}()
+mutable struct perm <: Nemo.GroupElem
+   d::Array{Int, 1}
+   cycles::Vector{Vector{Int}}
+   parent::PermGroup
 
-type GenPoly{T <: RingElem} <: PolyElem{T}
-   coeffs::Array{T, 1}
-   length::Int
-   parent::GenPolyRing{T}
+   function perm(n::Int)
+      return new(collect(1:n))
+   end
 
-   GenPoly() = new(Array(T, 0), 0)
-   
-   GenPoly(a::Array{T, 1}) = new(a, length(a))
+   function perm(a::Array{Int, 1})
+      return new(a)
+   end
+end
 
-   GenPoly(a::T) = a == 0 ? new(Array{T}(0), 0) : new([a], 1)
+doc"""
+    AllPerms(n::Int)
+> Returns an iterator over arrays representing all permutations of `1:n`.
+> Similar to `Combinatorics.permutations(1:n)`
+"""
+struct AllPerms
+   n::Int
+   all::Int
+   AllPerms(n::Int) = new(n, factorial(n))
 end
 
 ###############################################################################
 #
-#   GenMPolyRing / GenMPoly / Monomial
+#   Partition
+#
+###############################################################################
+
+doc"""
+    Partition(part::Vector{Int}, check::Bool=true)
+> Partition represents integer partition into numbers in non-increasing order.
+> It is a thin wrapper over `Vector{Int}`
+"""
+mutable struct Partition <: AbstractVector{Int}
+   n::Int
+   part::Vector{Int}
+
+   function Partition(part::Vector{Int}, check::Bool=true)
+      if check
+         all(diff(part) .<= 0) || throw("Partition must be decreasing!")
+         if length(part) > 0
+            part[end] >=1 || throw("Found non-positive entry in partition!")
+         end
+      end
+      return new(sum(part), part)
+   end
+end
+
+doc"""
+   Partitions(n::Int)
+> Returns an iterator over all integer `Partition`s of `n`. They come in
+> ascending order. See also `Combinatorics.partitions(n)`.
+"""
+struct Partitions
+    n::Int
+end
+
+###############################################################################
+#
+#   SkewDiagram
+#
+###############################################################################
+
+doc"""
+    SkewDiagram(lambda::Partition, mu::Partition)
+> Implements a skew diagram, i.e. a difference of two Young diagrams
+> represented by partitions `lambda` and `mu`.
+"""
+struct SkewDiagram
+   lam::Partition
+   mu::Partition
+
+   function SkewDiagram(lambda, mu)
+      lambda.n >= mu.n || throw("Can't create SkewDiagram: $mu is partition of  $(mu.n) > $(lambda.n).")
+      length(lambda) >= length(mu) || throw("Can't create SkewDiagram: $mu is longer than $(lambda)!")
+      for (l, m) in zip(lambda, mu)
+         l >= m || throw("a row of $mu is longer than a row of $lambda")
+      end
+      return new(lambda, mu)
+   end
+end
+
+###############################################################################
+#
+#   Young Tableau
+#
+###############################################################################
+
+doc"""
+    YoungTableau(part::Partition, tab::Array{Int, 2})
+> Returns the Young tableaux of partition `part` of `n`, filled linearly
+> (row-major) by `fill` vector.
+"""
+struct YoungTableau <: AbstractArray{Int, 2}
+   part::Partition
+   tab::Array{Int,2}
+end
+
+###############################################################################
+#
+#   PolyRing / Poly
+#
+###############################################################################
+
+mutable struct PolyRing{T <: RingElement} <: Nemo.PolyRing{T}
+   base_ring::Ring
+   S::Symbol
+
+   function PolyRing{T}(R::Ring, s::Symbol, cached::Bool = true) where T <: RingElement
+      if haskey(PolyID, (R, s))
+         return PolyID[R, s]::PolyRing{T}
+      else 
+         z = new{T}(R, s)
+         if cached
+           PolyID[R, s] = z
+         end
+         return z
+      end
+   end
+end
+
+const PolyID = Dict{Tuple{Ring, Symbol}, Ring}()
+
+mutable struct Poly{T <: RingElement} <: Nemo.PolyElem{T}
+   coeffs::Array{T, 1}
+   length::Int
+   parent::PolyRing{T}
+
+   Poly{T}() where T <: RingElement = new{T}(Array{T}(0), 0)
+   
+   function Poly{T}(b::Array{T, 1}) where T <: RingElement
+      z = new{T}(b)
+      z.length = normalise(z, length(b))
+      return z
+   end
+
+   Poly{T}(a::T) where T <: RingElement = iszero(a) ? new{T}(Array{T}(0), 0) : new{T}([a], 1)
+end
+
+###############################################################################
+#
+#   MPolyRing / MPoly 
 #
 ###############################################################################
 
@@ -56,102 +185,102 @@ end
 # T is an Int which is the number of variables
 # (plus one if ordered by total degree)
 
-type GenMPolyRing{T <: RingElem} <: PolyRing{T}
+mutable struct MPolyRing{T <: RingElement} <: Nemo.MPolyRing{T}
    base_ring::Ring
    S::Array{Symbol, 1}
    ord::Symbol
    num_vars::Int
    N::Int
 
-   function GenMPolyRing(R::Ring, s::Array{Symbol, 1}, ord::Symbol, N::Int,
-                         cached::Bool = true)
-      if haskey(GenMPolyID, (R, s, ord, N))
-         return GenMPolyID[R, s, ord, N]::GenMPolyRing{T}
+   function MPolyRing{T}(R::Ring, s::Array{Symbol, 1}, ord::Symbol, N::Int,
+                         cached::Bool = true) where T <: RingElement
+      if haskey(MPolyID, (R, s, ord, N))
+         return MPolyID[R, s, ord, N]::MPolyRing{T}
       else 
-         z = new(R, s, ord, length(s), N)
+         z = new{T}(R, s, ord, length(s), N)
          if cached
-           GenMPolyID[R, s, ord, N] = z
+           MPolyID[R, s, ord, N] = z
          end
          return z
       end
    end
 end
 
-const GenMPolyID = Dict{Tuple{Ring, Array{Symbol, 1}, Symbol, Int}, Ring}()
+const MPolyID = Dict{Tuple{Ring, Array{Symbol, 1}, Symbol, Int}, Ring}()
 
-type GenMPoly{T <: RingElem} <: PolyElem{T}
+mutable struct MPoly{T <: RingElement} <: Nemo.MPolyElem{T}
    coeffs::Array{T, 1}
    exps::Array{UInt, 2}
    length::Int
-   parent::GenMPolyRing{T}
+   parent::MPolyRing{T}
 
-   function GenMPoly(R::GenMPolyRing)
+   function MPoly{T}(R::MPolyRing) where T <: RingElement
       N = R.N
-      return new(Array(T, 0), Array(UInt, N, 0), 0, R)
+      return new{T}(Array{T}(0), Array{UInt}(N, 0), 0, R)
    end
    
-   GenMPoly(R::GenMPolyRing, a::Array{T, 1}, b::Array{UInt, 2}) = new(a, b, length(a), R)
+   MPoly{T}(R::MPolyRing, a::Array{T, 1}, b::Array{UInt, 2}) where T <: RingElement = new{T}(a, b, length(a), R)
 
-   function GenMPoly(R::GenMPolyRing, a::T)
+   function MPoly{T}(R::MPolyRing, a::T) where T <: RingElement
       N = R.N
-      return a == 0 ? new(Array(T, 0), Array(UInt, N, 0), 0, R) : 
-                                      new([a], zeros(UInt, N, 1), 1, R)
+      return iszero(a) ? new{T}(Array{T}(0), Array{UInt}(N, 0), 0, R) : 
+                                          new{T}([a], zeros(UInt, N, 1), 1, R)
    end
 end
 
 ###############################################################################
 #
-#   GenSparsePolyRing / GenSparsePoly
+#   SparsePolyRing / SparsePoly
 #
 ###############################################################################
 
-type GenSparsePolyRing{T <: RingElem} <: Ring
+mutable struct SparsePolyRing{T <: RingElement} <: Nemo.Ring
    base_ring::Ring
    S::Symbol
    num_vars::Int
 
-   function GenSparsePolyRing(R::Ring, s::Symbol, cached::Bool = true)
-      if haskey(GenSparsePolyID, (R, s))
-         return GenSparsePolyID[R, s]::GenSparsePolyRing{T}
+   function SparsePolyRing{T}(R::Ring, s::Symbol, cached::Bool = true) where T <: RingElement
+      if haskey(SparsePolyID, (R, s))
+         return SparsePolyID[R, s]::SparsePolyRing{T}
       else 
-         z = new(R, s)
+         z = new{T}(R, s)
          if cached
-           GenSparsePolyID[R, s] = z
+           SparsePolyID[R, s] = z
          end
          return z
       end
    end
 end
 
-const GenSparsePolyID = Dict{Tuple{Ring, Symbol}, GenSparsePolyRing}()
+const SparsePolyID = Dict{Tuple{Ring, Symbol}, SparsePolyRing}()
 
-type GenSparsePoly{T <: RingElem} <: RingElem
+mutable struct SparsePoly{T <: RingElement} <: Nemo.RingElem
    coeffs::Array{T, 1}
    exps::Array{UInt}
    length::Int
-   parent::GenSparsePolyRing{T}
+   parent::SparsePolyRing{T}
 
-   GenSparsePoly() = new(Array(T, 0), Array(UInt, 0), 0)
+   SparsePoly{T}() where T <: RingElement = new{T}(Array{T}(0), Array{UInt}(0), 0)
    
-   GenSparsePoly(a::Array{T, 1}, b::Array{UInt, 1}) = new(a, b, length(a))
+   SparsePoly{T}(a::Array{T, 1}, b::Array{UInt, 1}) where T <: RingElement = new{T}(a, b, length(a))
 
-   GenSparsePoly(a::T) = a == 0 ? new(Array(T, 0), Array(UInt, 0), 0) : 
-                                      new([a], [UInt(0)], 1)
+   SparsePoly{T}(a::T) where T <: RingElement = iszero(a) ? new{T}(Array{T}(0), Array{UInt}(0), 0) : 
+                                               new{T}([a], [UInt(0)], 1)
 end
 
 ###############################################################################
 #
-#   GenResRing / GenRes
+#   ResRing / Res
 #
 ###############################################################################
 
-type GenResRing{T <: RingElem} <: ResRing{T}
+mutable struct ResRing{T <: RingElement} <: Nemo.ResRing{T}
    base_ring::Ring
    modulus::T
 
-   function GenResRing(modulus::T, cached::Bool = true)
+   function ResRing{T}(modulus::T, cached::Bool = true) where T <: RingElement
       if haskey(ModulusDict, (parent(modulus), modulus))
-         return ModulusDict[parent(modulus), modulus]::GenResRing{T}
+         return ModulusDict[parent(modulus), modulus]::ResRing{T}
       else
          z = new{T}(parent(modulus), modulus)
          if cached
@@ -162,154 +291,155 @@ type GenResRing{T <: RingElem} <: ResRing{T}
    end
 end
 
-const ModulusDict = Dict{Tuple{Ring, RingElem}, Ring}()
+const ModulusDict = Dict{Tuple{Ring, RingElement}, Ring}()
 
-type GenRes{T <: RingElem} <: ResElem{T}
+mutable struct Res{T <: RingElement} <: Nemo.ResElem{T}
    data::T
-   parent::GenResRing{T}
+   parent::ResRing{T}
 
-   GenRes(a::T) = new(a)
+   Res{T}(a::T) where T <: RingElement = new{T}(a)
 end
 
 ###############################################################################
 #
-#   GenRelSeriesRing / GenRelSeries
+#   RelSeriesRing / RelSeries
 #
 ###############################################################################
 
-type GenRelSeriesRing{T <: RingElem} <: SeriesRing{T}
+mutable struct RelSeriesRing{T <: RingElement} <: Nemo.SeriesRing{T}
    base_ring::Ring
    prec_max::Int
    S::Symbol
 
-   function GenRelSeriesRing(R::Ring, prec::Int, s::Symbol, cached::Bool = true)
-      if haskey(GenRelSeriesID, (R, prec, s))
-         return GenRelSeriesID[R, prec, s]::GenRelSeriesRing{T}
+   function RelSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
+      if haskey(RelSeriesID, (R, prec, s))
+         return RelSeriesID[R, prec, s]::RelSeriesRing{T}
       else
          z = new{T}(R, prec, s)
          if cached
-            GenRelSeriesID[R, prec, s] = z
+            RelSeriesID[R, prec, s] = z
          end
          return z
       end
    end
 end
 
-const GenRelSeriesID = Dict{Tuple{Ring, Int, Symbol}, Ring}()
+const RelSeriesID = Dict{Tuple{Ring, Int, Symbol}, Ring}()
 
-type GenRelSeries{T <: RingElem} <: RelSeriesElem{T}
+mutable struct RelSeries{T <: RingElement} <: Nemo.RelSeriesElem{T}
    coeffs::Array{T, 1}
    length::Int
    prec::Int
    val::Int
-   parent::GenRelSeriesRing{T}
+   parent::RelSeriesRing{T}
 
-   function GenRelSeries(a::Array{T, 1}, length::Int, prec::Int, val::Int)
-      new(a, length, prec, val)
+   function RelSeries{T}(a::Array{T, 1}, length::Int, prec::Int, val::Int) where T <: RingElement
+      new{T}(a, length, prec, val)
    end
 
-   GenRelSeries(a::GenRelSeries{T}) = a
+   RelSeries{T}(a::RelSeries{T}) where T <: RingElement = a
 end
 
 ###############################################################################
 #
-#   GenAbsSeriesRing / GenAbsSeries
+#   AbsSeriesRing / AbsSeries
 #
 ###############################################################################
 
-type GenAbsSeriesRing{T <: RingElem} <: SeriesRing{T}
+mutable struct AbsSeriesRing{T <: RingElement} <: Nemo.SeriesRing{T}
    base_ring::Ring
    prec_max::Int
    S::Symbol
 
-   function GenAbsSeriesRing(R::Ring, prec::Int, s::Symbol, cached::Bool = true)
-      if haskey(GenAbsSeriesID, (R, prec, s))
-         return GenAbsSeriesID[R, prec, s]::GenAbsSeriesRing{T}
+   function AbsSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
+      if haskey(AbsSeriesID, (R, prec, s))
+         return AbsSeriesID[R, prec, s]::AbsSeriesRing{T}
       else
          z = new{T}(R, prec, s)
          if cached
-            GenAbsSeriesID[R, prec, s] = z
+            AbsSeriesID[R, prec, s] = z
          end
          return z
       end
    end
 end
 
-const GenAbsSeriesID = Dict{Tuple{Ring, Int, Symbol}, Ring}()
+const AbsSeriesID = Dict{Tuple{Ring, Int, Symbol}, Ring}()
 
-type GenAbsSeries{T <: RingElem} <: AbsSeriesElem{T}
+mutable struct AbsSeries{T <: RingElement} <: Nemo.AbsSeriesElem{T}
    coeffs::Array{T, 1}
    length::Int
    prec::Int
-   parent::GenAbsSeriesRing{T}
+   parent::AbsSeriesRing{T}
 
-   GenAbsSeries(a::Array{T, 1}, length::Int, prec::Int) = new(a, length, prec)   
-   GenAbsSeries(a::GenAbsSeries{T}) = a
+   AbsSeries{T}(a::Array{T, 1}, length::Int, prec::Int) where T <: RingElement = new{T}(a, length, prec)   
+   AbsSeries{T}(a::AbsSeries{T}) where T <: RingElement = a
 end
 
 ###############################################################################
 #
-#   GenFracField / GenFrac
+#   FracField / Frac
 #
 ###############################################################################
 
-type GenFracField{T <: RingElem} <: FracField{T}
+mutable struct FracField{T <: RingElem} <: Nemo.FracField{T}
    base_ring::Ring
 
-   function GenFracField(R::Ring, cached::Bool = true)
-      if haskey(GenFracDict, R)
-         return GenFracDict[R]::GenFracField{T}
+   function FracField{T}(R::Ring, cached::Bool = true) where T <: RingElem
+      if haskey(FracDict, R)
+         return FracDict[R]::FracField{T}
       else
          z = new{T}(R)
          if cached
-            GenFracDict[R] = z
+            FracDict[R] = z
          end
          return z
       end
    end
 end
 
-const GenFracDict = Dict{Ring, Ring}()
+const FracDict = Dict{Ring, Ring}()
 
-type GenFrac{T <: RingElem} <: FracElem{T}
+mutable struct Frac{T <: RingElem} <: Nemo.FracElem{T}
    num::T
    den::T
-   parent::GenFracField{T}
+   parent::FracField{T}
 
-   GenFrac(num::T, den::T) = new(num, den) 
+   Frac{T}(num::T, den::T) where T <: RingElem = new{T}(num, den) 
 end
 
 ###############################################################################
 #
-#   GenMatSpace / GenMat
+#   MatSpace / Mat
 #
 ###############################################################################
 
 # not really a mathematical ring
-type GenMatSpace{T <: RingElem} <: MatSpace{T}
+mutable struct MatSpace{T <: RingElement} <: Nemo.MatSpace{T}
    rows::Int
    cols::Int
    base_ring::Ring
 
-   function GenMatSpace(R::Ring, r::Int, c::Int, cached::Bool = true)
-      if haskey(GenMatDict, (R, r, c))
-         return GenMatDict[R, r, c]::GenMatSpace{T}
+   function MatSpace{T}(R::Ring, r::Int, c::Int, cached::Bool = true) where T <: RingElement
+      if haskey(MatDict, (R, r, c))
+         return MatDict[R, r, c]::MatSpace{T}
       else
          z = new{T}(r, c, R)
          if cached
-            GenMatDict[R, r, c] = z
+            MatDict[R, r, c] = z
          end
          return z
       end
    end
 end
 
-const GenMatDict = Dict{Tuple{Ring, Int, Int}, Ring}()
+const MatDict = Dict{Tuple{Ring, Int, Int}, Ring}()
 
-type GenMat{T <: RingElem} <: MatElem{T}
+mutable struct Mat{T <: RingElement} <: Nemo.MatElem{T}
    entries::Array{T, 2}
    base_ring::Ring
 
-   GenMat(a::Array{T, 2}) = new(a) 
+   function Mat{T}(A::Array{T, 2}) where T <: RingElement
+      return new{T}(A)
+   end
 end
-

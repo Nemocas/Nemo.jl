@@ -5,7 +5,7 @@
 ###############################################################################
 
 export AnticNumberField, nf_elem, norm, trace, CyclotomicField,
-       MaximalRealSubfield, add!, sub!, mul!, signature
+       MaximalRealSubfield, add!, sub!, mul!, signature, sqr_classical
 
 ###############################################################################
 #
@@ -63,7 +63,7 @@ function hash(a::nf_elem, h::UInt)
    b = hash(d, b)
    for i in 1:degree(parent(a)) + 1
          num_coeff!(d, a, i)
-         b $= hash(d, h) $ h
+         b = xor(b, xor(hash(d, h), h))
          b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
    return b
@@ -178,14 +178,14 @@ function elem_from_mat_row(a::AnticNumberField, b::fmpz_mat, i::Int, d::fmpz)
    cols(b) == degree(a) || error("Wrong number of columns")
    z = a()
    ccall((:nf_elem_set_fmpz_mat_row, :libflint), Void,
-        (Ptr{nf_elem}, Ptr{fmpz_mat}, Cint, Ptr{fmpz}, Ptr{AnticNumberField}),
+        (Ptr{nf_elem}, Ptr{fmpz_mat}, Int, Ptr{fmpz}, Ptr{AnticNumberField}),
         &z, &b, i - 1, &d, &a)
    return z
 end
 
 function elem_to_mat_row!(a::fmpz_mat, i::Int, d::fmpz, b::nf_elem)
    ccall((:nf_elem_get_fmpz_mat_row, :libflint), Void,
-         (Ptr{fmpz_mat}, Cint, Ptr{fmpz}, Ptr{nf_elem}, Ptr{AnticNumberField}),
+         (Ptr{fmpz_mat}, Int, Ptr{fmpz}, Ptr{nf_elem}, Ptr{AnticNumberField}),
          &a, i - 1, &d, &b, &b.parent)
    nothing
  end
@@ -530,7 +530,7 @@ function divexact(a::nf_elem, b::Int)
 end
 
 function divexact(a::nf_elem, b::fmpz)
-   b == 0 && throw(DivideError())
+   iszero(b) && throw(DivideError())
    r = a.parent()
    ccall((:nf_elem_scalar_div_fmpz, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{fmpz}, Ptr{AnticNumberField}),
@@ -541,7 +541,7 @@ end
 divexact(a::nf_elem, b::Integer) = divexact(a, fmpz(b))
 
 function divexact(a::nf_elem, b::fmpq)
-   b == 0 && throw(DivideError())
+   iszero(b) && throw(DivideError())
    r = a.parent()
    ccall((:nf_elem_scalar_div_fmpq, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{fmpq}, Ptr{AnticNumberField}),
@@ -568,7 +568,7 @@ doc"""
 > if such exists. If not, the value of $h$ is undetermined.
 """
 function divides(a::nf_elem, b::nf_elem)
-   b == 0 && throw(DivideError())
+  iszero(b) && throw(DivideError())
    return true, divexact(a, b)
 end
 
@@ -752,7 +752,7 @@ mul!(c::nf_elem, a::nf_elem, b::Integer) = mul!(c, a, fmpz(b))
 #
 ###############################################################################
 
-function sqr_classical(a::GenPoly{nf_elem})
+function sqr_classical(a::Generic.Poly{nf_elem})
    lena = length(a)
 
    t = base_ring(a)()
@@ -787,7 +787,7 @@ function sqr_classical(a::GenPoly{nf_elem})
    return z
 end
 
-function mul_classical(a::GenPoly{nf_elem}, b::GenPoly{nf_elem})
+function mul_classical(a::Generic.Poly{nf_elem}, b::Generic.Poly{nf_elem})
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -833,7 +833,7 @@ function mul_classical(a::GenPoly{nf_elem}, b::GenPoly{nf_elem})
    return z
 end
 
-function *(a::GenPoly{nf_elem}, b::GenPoly{nf_elem})
+function *(a::Generic.Poly{nf_elem}, b::Generic.Poly{nf_elem})
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -849,7 +849,7 @@ function *(a::GenPoly{nf_elem}, b::GenPoly{nf_elem})
    K = base_ring(a)
    R = parent(pol)
    T = elem_type(R)
-   S = GenPolyRing{T}(R, :y)
+   S = Generic.PolyRing{T}(R, :y)
    f = S()
    fit!(f, lena)
    for i = 1:lena
@@ -881,7 +881,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(::Type{nf_elem}, ::Type{T}) = nf_elem
+promote_rule(::Type{nf_elem}, ::Type{T}) where {T <: Integer} = nf_elem
 
 promote_rule(::Type{nf_elem}, ::Type{fmpz}) = nf_elem
 

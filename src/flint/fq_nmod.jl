@@ -35,8 +35,8 @@ end
 function Base.hash(a::fq_nmod, h::UInt)
    b = 0x78e5f766c8ace18d%UInt
    for i in 1:degree(parent(a)) + 1
-         b $= hash(coeff(a, i), h) $ h
-         b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+      b = xor(b, xor(hash(coeff(a, i), h), h))
+      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
    return b
 end
@@ -317,7 +317,7 @@ function divexact(x::fq_nmod, y::fq_nmod)
 end
 
 function divides(a::fq_nmod, b::fq_nmod)
-   b == 0 && error("Division by zero in divides")
+   iszero(b) && error("Division by zero in divides")
    return true, divexact(a, b)
 end
 
@@ -409,7 +409,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(::Type{fq_nmod}, ::Type{T}) = fq_nmod
+promote_rule(::Type{fq_nmod}, ::Type{T}) where {T <: Integer} = fq_nmod
 
 promote_rule(::Type{fq_nmod}, ::Type{fmpz}) = fq_nmod
 

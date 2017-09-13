@@ -406,6 +406,22 @@ function test_arb_poly_evaluation_interpolation()
    println("PASS")
 end
 
+function test_arb_poly_root_bound()
+   print("arb_poly.root_bound...")
+
+   Rx, x = PolynomialRing(RR, "x")
+
+   for i in 1:2
+      r = rand(1:10)
+      z = map(RR, rand(-BigInt(2)^60:BigInt(2)^60, r))
+      f = prod([ x - z[i] for i in 1:r])
+      b = roots_upper_bound(f)
+      @test all([ abs(z[i]) <= b for i in 1:r])
+   end
+
+   println("PASS")
+end
+
 function test_arb_poly()
    test_arb_poly_constructors()
    test_arb_poly_printing()
@@ -425,6 +441,7 @@ function test_arb_poly()
    test_arb_poly_composition()
    test_arb_poly_derivative_integral()
    test_arb_poly_evaluation_interpolation()
+   test_arb_poly_root_bound()
 
    println("")
 end

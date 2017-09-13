@@ -77,7 +77,7 @@ for T in [Integer, Float64, fmpz, fmpq, arb, BigFloat, acb, AbstractString]
    end
 end
 
-setindex!{T <: Integer}(x::acb_mat, y::Rational{T}, r::Int, c::Int) =
+setindex!(x::acb_mat, y::Rational{T}, r::Int, c::Int) where {T <: Integer} =
          setindex!(x, fmpq(y), r, c)
 
 for T in [Integer, Float64, fmpz, fmpq, arb, BigFloat, AbstractString]
@@ -93,7 +93,7 @@ for T in [Integer, Float64, fmpz, fmpq, arb, BigFloat, AbstractString]
    end
 end
 
-setindex!{T <: Integer}(x::acb_mat, y::Tuple{Rational{T}, Rational{T}}, r::Int, c::Int) =
+setindex!(x::acb_mat, y::Tuple{Rational{T}, Rational{T}}, r::Int, c::Int) where {T <: Integer} =
          setindex!(x, map(fmpq, y), r, c)
 
 zero(x::AcbMatSpace) = x()
@@ -273,9 +273,9 @@ end
 
 *(x::acb_mat, y::BigFloat) = y * x
 
-*{T <: Integer}(x::Rational{T}, y::acb_mat) = fmpq(x) * y
+*(x::Rational{T}, y::acb_mat) where T <: Union{Int, BigInt} = fmpq(x) * y
 
-*{T <: Integer}(x::acb_mat, y::Rational{T}) = y * x
+*(x::acb_mat, y::Rational{T}) where T <: Union{Int, BigInt} = y * x
 
 for T in [Integer, fmpz, fmpq, arb, acb]
    @eval begin
@@ -307,7 +307,7 @@ for T in [Integer, fmpz, fmpq, arb, acb]
    end
 end
 
-function +{T <: Integer}(x::acb_mat, y::Rational{T})
+function +(x::acb_mat, y::Rational{T}) where T <: Union{Int, BigInt}
    z = deepcopy(x)
    for i = 1:min(rows(x), cols(x))
       z[i, i] += y
@@ -315,9 +315,9 @@ function +{T <: Integer}(x::acb_mat, y::Rational{T})
    return z
 end
 
-+{T <: Integer}(x::Rational{T}, y::acb_mat) = y + x
++(x::Rational{T}, y::acb_mat) where T <: Union{Int, BigInt} = y + x
 
-function -{T <: Integer}(x::acb_mat, y::Rational{T})
+function -(x::acb_mat, y::Rational{T}) where T <: Union{Int, BigInt}
    z = deepcopy(x)
    for i = 1:min(rows(x), cols(x))
       z[i, i] -= y
@@ -325,7 +325,7 @@ function -{T <: Integer}(x::acb_mat, y::Rational{T})
    return z
 end
 
-function -{T <: Integer}(x::Rational{T}, y::acb_mat)
+function -(x::Rational{T}, y::acb_mat) where T <: Union{Int, BigInt}
    z = -y
    for i = 1:min(rows(y), cols(y))
       z[i, i] += x
@@ -525,7 +525,7 @@ divexact(x::acb_mat, y::BigFloat) = divexact(x, base_ring(x)(y))
 
 divexact(x::acb_mat, y::Integer) = divexact(x, fmpz(y))
 
-divexact{T <: Integer}(x::acb_mat, y::Rational{T}) = divexact(x, fmpq(y))
+divexact(x::acb_mat, y::Rational{T}) where T <: Union{Int, BigInt} = divexact(x, fmpq(y))
 
 ################################################################################
 #
@@ -579,7 +579,7 @@ end
 #
 ###############################################################################
 
-function lufact!(P::perm, x::acb_mat)
+function lufact!(P::Generic.perm, x::acb_mat)
   P.d .-= 1
   r = ccall((:acb_mat_lu, :libarb), Cint,
               (Ptr{Int}, Ptr{acb_mat}, Ptr{acb_mat}, Int),
@@ -590,7 +590,7 @@ function lufact!(P::perm, x::acb_mat)
   return rows(x)
 end
 
-function lufact(P::perm, x::acb_mat)
+function lufact(P::Generic.perm, x::acb_mat)
   cols(x) != rows(x) && error("Matrix must be square")
   parent(P).n != rows(x) && error("Permutation does not match matrix")
   R = base_ring(x)
@@ -629,7 +629,7 @@ function solve(x::acb_mat, y::acb_mat)
   return z
 end
 
-function solve_lu_precomp!(z::acb_mat, P::perm, LU::acb_mat, y::acb_mat)
+function solve_lu_precomp!(z::acb_mat, P::Generic.perm, LU::acb_mat, y::acb_mat)
   Q = inv(P)
   ccall((:acb_mat_solve_lu_precomp, :libarb), Void,
               (Ptr{acb_mat}, Ptr{Int}, Ptr{acb_mat}, Ptr{acb_mat}, Int),
@@ -637,7 +637,7 @@ function solve_lu_precomp!(z::acb_mat, P::perm, LU::acb_mat, y::acb_mat)
   nothing
 end
 
-function solve_lu_precomp(P::perm, LU::acb_mat, y::acb_mat)
+function solve_lu_precomp(P::Generic.perm, LU::acb_mat, y::acb_mat)
   cols(LU) != rows(y) && error("Matrix dimensions are wrong")
   z = similar(y)
   solve_lu_precomp!(z, P, LU, y)
@@ -752,13 +752,13 @@ for T in [Float64, fmpz, fmpq, BigFloat, arb, acb, String]
    end
 end
 
-(x::AcbMatSpace){T <: Integer}(y::Array{T, 2}) = x(map(fmpz, y))
+(x::AcbMatSpace)(y::Array{T, 2}) where {T <: Integer} = x(map(fmpz, y))
 
-(x::AcbMatSpace){T <: Integer}(y::Array{T, 1}) = x(map(fmpz, y))
+(x::AcbMatSpace)(y::Array{T, 1}) where {T <: Integer} = x(map(fmpz, y))
 
-(x::AcbMatSpace){T <: Integer}(y::Array{Rational{T}, 2}) = x(map(fmpq, y))
+(x::AcbMatSpace)(y::Array{Rational{T}, 2}) where {T <: Integer} = x(map(fmpq, y))
 
-(x::AcbMatSpace){T <: Integer}(y::Array{Rational{T}, 1}) = x(map(fmpq, y))
+(x::AcbMatSpace)(y::Array{Rational{T}, 1}) where {T <: Integer} = x(map(fmpq, y))
 
 for T in [Float64, fmpz, fmpq, BigFloat, arb, String]
    @eval begin
@@ -778,16 +778,16 @@ for T in [Float64, fmpz, fmpq, BigFloat, arb, String]
    end
 end
 
-(x::AcbMatSpace){T <: Integer}(y::Array{Tuple{T, T}, 2}) = 
+(x::AcbMatSpace)(y::Array{Tuple{T, T}, 2}) where {T <: Integer} = 
          x(map(z -> (fmpz(z[1]), fmpz(z[2])), y))
 
-(x::AcbMatSpace){T <: Integer}(y::Array{Tuple{T, T}, 1}) = 
+(x::AcbMatSpace)(y::Array{Tuple{T, T}, 1}) where {T <: Integer} = 
          x(map(z -> (fmpz(z[1]), fmpz(z[2])), y))
 
-(x::AcbMatSpace){T <: Integer}(y::Array{Tuple{Rational{T}, Rational{T}}, 2}) = 
+(x::AcbMatSpace)(y::Array{Tuple{Rational{T}, Rational{T}}, 2}) where {T <: Integer} = 
          x(map(z -> (fmpq(z[1]), fmpq(z[2])), y))
 
-(x::AcbMatSpace){T <: Integer}(y::Array{Tuple{Rational{T}, Rational{T}}, 1}) = 
+(x::AcbMatSpace)(y::Array{Tuple{Rational{T}, Rational{T}}, 1}) where {T <: Integer} = 
          x(map(z -> (fmpq(z[1]), fmpq(z[2])), y))
 
 for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb, acb, String]
@@ -808,7 +808,7 @@ for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb, acb, String]
    end
 end
 
-(x::AcbMatSpace){T <: Integer}(y::Rational{T}) = x(fmpq(y))
+(x::AcbMatSpace)(y::Rational{T}) where {T <: Integer} = x(fmpq(y))
 
 (x::AcbMatSpace)(y::acb_mat) = y
 
@@ -818,9 +818,9 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(::Type{acb_mat}, ::Type{T}) = acb_mat
+promote_rule(::Type{acb_mat}, ::Type{T}) where {T <: Integer} = acb_mat
 
-promote_rule{T <: Integer}(::Type{acb_mat}, ::Type{Rational{T}}) = acb_mat
+promote_rule(::Type{acb_mat}, ::Type{Rational{T}}) where T <: Union{Int, BigInt} = acb_mat
 
 promote_rule(::Type{acb_mat}, ::Type{fmpz}) = acb_mat
 

@@ -8,8 +8,11 @@ to cover commutative algebra, number theory and group theory.
 It is currently developed by William Hart, Tommy Hofmann, Fredrik Johansson,
 Claus Fieker and Oleksandr Motsak with contributions from others.
 
+- [http://nemocas.org/](http://nemocas.org)(Website)
+- [http://nemocas.github.io/Nemo.jl/latest/](http://nemocas.github.io/Nemo.jl/latest/) (Online documentation)
+
 Nemo currently provides:
 
 * Wrappers of MPIR, Flint, Arb and Antic
 * Generic polynomial rings, matrix spaces, fraction fields, residue rings, power series
-* finite fields, p-adics, integers, rationals, permutations, number fields
+* finite fields, p-adics, integers, rationals, permutations and characters, number fields

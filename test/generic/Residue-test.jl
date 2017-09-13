@@ -1,50 +1,50 @@
 function test_gen_res_constructors()
-   print("GenRes.constructors...")
+   print("Generic.Res.constructors...")
  
    B = FlintZZ
 
    R = ResidueRing(B, 16453889)
 
-   @test elem_type(R) == GenRes{elem_type(B)}
-   @test elem_type(GenResRing{elem_type(B)}) == GenRes{elem_type(B)}
-   @test parent_type(GenRes{elem_type(B)}) == GenResRing{elem_type(B)}
+   @test elem_type(R) == Generic.Res{elem_type(B)}
+   @test elem_type(Generic.ResRing{elem_type(B)}) == Generic.Res{elem_type(B)}
+   @test parent_type(Generic.Res{elem_type(B)}) == Generic.ResRing{elem_type(B)}
 
-   @test isa(R, GenResRing)
+   @test isa(R, Generic.ResRing)
 
    a = R(123)
 
-   @test isa(a, GenRes)
+   @test isa(a, Generic.Res)
 
    b = R(a)
 
-   @test isa(b, GenRes)
+   @test isa(b, Generic.Res)
 
    c = R(fmpz(12))
 
-   @test isa(c, GenRes)
+   @test isa(c, Generic.Res)
 
    d = R()
 
-   @test isa(d, GenRes)
+   @test isa(d, Generic.Res)
 
    S, x = PolynomialRing(R, "x")
    T = ResidueRing(S, x^3 + 3x + 1)
 
-   @test isa(T, GenResRing)
+   @test isa(T, Generic.ResRing)
 
    f = T(x^4)
 
-   @test isa(f, GenRes)
+   @test isa(f, Generic.Res)
 
    g = T(f)
 
-   @test isa(g, GenRes)
+   @test isa(g, Generic.Res)
 
    println("PASS")
 end
 
 function test_gen_res_manipulation()
-   print("GenRes.manipulation...")
+   print("Generic.Res.manipulation...")
  
    R = ResidueRing(ZZ, 16453889)
 
@@ -77,7 +77,7 @@ function test_gen_res_manipulation()
 end
 
 function test_gen_res_unary_ops()
-   print("GenRes.unary_ops...")
+   print("Generic.Res.unary_ops...")
  
    R = ResidueRing(ZZ, 16453889)
 
@@ -92,7 +92,7 @@ function test_gen_res_unary_ops()
 end
 
 function test_gen_res_binary_ops()
-   print("GenRes.binary_ops...")
+   print("Generic.Res.binary_ops...")
  
    R = ResidueRing(ZZ, 12)
 
@@ -122,7 +122,7 @@ function test_gen_res_binary_ops()
 end
 
 function test_gen_res_gcd()
-   print("GenRes.gcd...")
+   print("Generic.Res.gcd...")
  
    R = ResidueRing(ZZ, 12)
 
@@ -144,7 +144,7 @@ function test_gen_res_gcd()
 end
 
 function test_gen_res_adhoc_binary()
-   print("GenRes.adhoc_binary...")
+   print("Generic.Res.adhoc_binary...")
  
    R = ResidueRing(ZZ, 7)
 
@@ -171,7 +171,7 @@ function test_gen_res_adhoc_binary()
 end
 
 function test_gen_res_comparison()
-   print("GenRes.comparison...")
+   print("Generic.Res.comparison...")
  
    R = ResidueRing(ZZ, 7)
 
@@ -201,7 +201,7 @@ function test_gen_res_comparison()
 end
 
 function test_gen_res_adhoc_comparison()
-   print("GenRes.adhoc_comparison...")
+   print("Generic.Res.adhoc_comparison...")
  
    R = ResidueRing(ZZ, 7)
 
@@ -221,7 +221,7 @@ function test_gen_res_adhoc_comparison()
 end
 
 function test_gen_res_powering()
-   print("GenRes.powering...")
+   print("Generic.Res.powering...")
  
    R = ResidueRing(ZZ, 7)
 
@@ -240,7 +240,7 @@ function test_gen_res_powering()
 end
 
 function test_gen_res_inversion()
-   print("GenRes.inversion...")
+   print("Generic.Res.inversion...")
  
    R = ResidueRing(ZZ, 49)
 
@@ -260,7 +260,7 @@ function test_gen_res_inversion()
 end
 
 function test_gen_res_exact_division()
-   print("GenRes.exact_division...")
+   print("Generic.Res.exact_division...")
  
    R = ResidueRing(ZZ, 49)
 
