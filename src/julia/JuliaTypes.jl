@@ -40,6 +40,33 @@ const RationalsID = Dict{DataType, Ring}()
 
 ###############################################################################
 #
+#   GFField/gfelem
+#
+###############################################################################
+
+mutable struct GFField{T <: Integer} <: FinField
+   p::T
+
+   function GFField{T}(p::T) where T <: Integer
+      if haskey(GFFieldID, (T, p))
+         z = GFFieldID[T, p]::GFField{T}
+      else
+         z = new{T}(p)
+         GFFieldID[T, p] = z
+      end
+      return z
+   end
+end
+
+const GFFieldID = Dict{Tuple{DataType, Integer}, Field}()
+
+struct gfelem{T <: Integer} <: FinFieldElem
+   d::T
+   parent::GFField{T}
+end
+
+###############################################################################
+#
 #   Unions of Nemo abstract types and Julia types
 #
 ###############################################################################

@@ -197,12 +197,12 @@ include("julia/JuliaTypes.jl")
 include("Generic.jl")
 
 import .Generic: add!, addeq!, addmul!, base_ring, canonical_unit, character,
-                 charpoly, charpoly_danilevsky!, charpoly_danilevsky_ff!,
-                 charpoly_hessenberg!, chebyshev_t, chebyshev_u, _check_dim,
-                 check_parent, coeff, cols, compose, content, cycles, data,
-                 degree, den, derivative, det, det_clow, det_popov, dim,
-                 discriminant, divexact, divides, divrem, elem_type, elements, 
-                 evaluate, exp, extended_weak_popov,
+                 characteristic, charpoly, charpoly_danilevsky!,
+                 charpoly_danilevsky_ff!, charpoly_hessenberg!, chebyshev_t,
+                 chebyshev_u, _check_dim, check_parent, coeff, cols, compose,
+                 content, cycles, data, degree, den, derivative, det, det_clow,
+                 det_popov, dim, discriminant, divexact, divides, divrem,
+                 elem_type, elements, evaluate, exp, extended_weak_popov,
                  extended_weak_popov_with_trafo, fflu!, fflu, find_pivot_popov,
                  fit!, gcd, gen, gens, gcdinv, gcdx, gram, has_left_neighbor,
                  has_bottom_neighbor, hash, hessenberg!, hessenberg, hnf,
@@ -220,22 +220,22 @@ import .Generic: add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  O, one, order, ordering, parent_type, parity, partitionseq,
                  polcoeff, pol_length, powmod, pow_multinomial, popov, powers,
                  precision, primpart, pseudodivrem, pseudorem, rand_ordering,
-                 rank_profile_popov, remove, renormalize!, resultant, resx,
-                 reverse, rows, rref, rref!, setcoeff!, set_length!,
-                 setpermstyle, set_prec!, set_val!, shift_left, shift_right,
-                 show_minus_one, similarity!,  snf, snf_kb, snf_kb_with_trafo,
-                 snf_with_trafo, solve, solve_rational, solve_triu, subst,
-                 swap_rows, swap_rows!, trail, truncate, typed_hcat,
-                 typed_hvcat, valuation, var, vars, weak_popov,
+                 rank_profile_popov, remove, renormalize!, resultant,
+                 resultant_brown, resx, reverse, rows, rref, rref!, setcoeff!,
+                 set_length!, setpermstyle, set_prec!, set_val!, shift_left,
+                 shift_right, show_minus_one, similarity!,  snf, snf_kb,
+                 snf_kb_with_trafo, snf_with_trafo, solve, solve_rational,
+                 solve_triu, subst, swap_rows, swap_rows!, trail, truncate,
+                 typed_hcat, typed_hvcat, valuation, var, vars, weak_popov,
                  weak_popov_with_trafo, zero, zero!
 
 export add!, addeq!, addmul!, base_ring, canonical_unit, character,
-                 charpoly, charpoly_danilevsky!, charpoly_danilevsky_ff!,
-                 charpoly_hessenberg!, chebyshev_t, chebyshev_u, _check_dim,
-                 check_parent, coeff, cols, compose, content, cycles, data,
-                 degree, den, derivative, det, det_clow, det_popov, dim,
-                 discriminant, divexact, divides, divrem, elem_type, elements,
-                 evaluate, exp, extended_weak_popov,
+                 characteristic, charpoly, charpoly_danilevsky!,
+                 charpoly_danilevsky_ff!, charpoly_hessenberg!, chebyshev_t,
+                 chebyshev_u, _check_dim, check_parent, coeff, cols, compose,
+                 content, cycles, data, degree, den, derivative, det, det_clow,
+                 det_popov, dim, discriminant, divexact, divides, divrem,
+                 elem_type, elements, evaluate, exp, extended_weak_popov,
                  extended_weak_popov_with_trafo, fflu!, fflu, find_pivot_popov,
                  fit!, gcd, gen, gens, gcdinv, gcdx, gram, has_left_neighbor,
                  has_bottom_neighbor, hash, hessenberg!, hessenberg, hnf,
@@ -253,13 +253,13 @@ export add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  O, one, order, ordering, parent_type, parity, partitionseq,
                  polcoeff, pol_length, powmod, pow_multinomial, popov, powers,
                  precision, primpart, pseudodivrem, pseudorem, rand_ordering,
-                 rank_profile_popov, remove, renormalize!, resultant, resx,
-                 reverse, rows, rref, rref!, setcoeff!, set_length!,
-                 setpermstyle, set_prec!, set_val!, shift_left, shift_right,
-                 show_minus_one, similarity!, snf, snf_kb, snf_kb_with_trafo,
-                 snf_with_trafo, solve, solve_rational, solve_triu, subst,
-                 swap_rows, swap_rows!, trail, truncate, typed_hcat,
-                 typed_hvcat, valuation, var, vars, weak_popov,
+                 rank_profile_popov, remove, renormalize!, resultant, 
+                 resultant_brown, resx, reverse, rows, rref, rref!, setcoeff!,
+                 set_length!, setpermstyle, set_prec!, set_val!, shift_left,
+                 shift_right, show_minus_one, similarity!, snf, snf_kb,
+                 snf_kb_with_trafo, snf_with_trafo, solve, solve_rational,
+                 solve_triu, subst, swap_rows, swap_rows!, trail, truncate,
+                 typed_hcat, typed_hvcat, valuation, var, vars, weak_popov,
                  weak_popov_with_trafo, zero, zero!
 
 function PermGroup(n::Int, cached=true)
@@ -352,7 +352,7 @@ getindex(R::Tuple{Ring, T}, s::String) where {T} = PolynomialRing(R[1], s)
 
 ###############################################################################
 #
-#   Matrix M = R[...] syntax
+#   Matrix M = R[...] syntax and Matrix constructor
 #
 ################################################################################
 
@@ -380,6 +380,16 @@ function typed_hcat(R::Ring, d...)
    end
    S = MatrixSpace(R, 1, r)
    return S(A)
+end
+
+function Base.Matrix(R::Nemo.Ring, r::Int, c::Int, a::Array{T, 2}) where T <: RingElement
+   M = MatrixSpace(R, r, c)
+   return M(a)
+end
+
+function Base.Matrix(R::Nemo.Ring, r::Int, c::Int, a::Array{T, 1}) where T <: RingElement
+   M = MatrixSpace(R, r, c)
+   return M(a)
 end
 
 ###############################################################################

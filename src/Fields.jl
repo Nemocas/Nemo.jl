@@ -4,6 +4,8 @@
 #
 ################################################################################
 
+include("julia/GF.jl")
+
 include("flint/fmpq.jl")
 
 include("flint/fq.jl")
@@ -23,5 +25,6 @@ function gcd(x::T, y::T) where {T <: FieldElem}
    return iszero(x) && iszero(y) ? zero(parent(y)) : one(parent(y))
 end
 
+characteristic(R::Field) = 0
 
 

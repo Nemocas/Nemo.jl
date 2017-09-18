@@ -40,6 +40,8 @@ function randprime(n::fmpz, m::fmpz)
    return fmpz(r)
 end
 
+randelem(R::Nemo.NmodRing) = rand(R)
+
 function randelem(K::AnticNumberField, n)
    s = K(0)
    a = gen(K)
@@ -82,6 +84,10 @@ function randelem(R::Generic.ResRing{fmpz}, n)
 end
 
 function randelem(R::Generic.ResRing{BigInt}, n)
+   return rand(R, -n:n)
+end
+
+function randelem(R::Nemo.NmodRing, n)
    return rand(R, -n:n)
 end
 
@@ -1116,7 +1122,7 @@ end
 function test_gen_mat_minpoly()
    print("Generic.Mat.minpoly...")
 
-   R, x = FiniteField(103, 1, "x")
+   R = GF(103)
    T, y = PolynomialRing(R, "y")
 
    M = R[92 97 8;
@@ -1125,7 +1131,7 @@ function test_gen_mat_minpoly()
 
    @test minpoly(T, M) == y^2+96*y+8
 
-   R, x = FiniteField(3, 1, "x")
+   R = GF(3)
    T, y = PolynomialRing(R, "y")
 
    M = R[1 2 0 2;
@@ -1135,7 +1141,7 @@ function test_gen_mat_minpoly()
 
    @test minpoly(T, M) == y^2 + 2y
 
-   R, x = FiniteField(13, 1, "x")
+   R = GF(13)
    T, y = PolynomialRing(R, "y")
 
    M = R[7 6 1;
@@ -1460,8 +1466,8 @@ function test_gen_mat_weak_popov()
    @test U*A == P
    @test isunit(det(U))
 
-   F, a = FiniteField(7, 1, "a")
-
+   F = GF(7)
+   
    S, y = PolynomialRing(F, "y")
 
    B = Matrix(S, 3, 3, map(S, Any[ 4*y^2+3*y+5 4*y^2+3*y+4 6*y^2+1; 3*y+6 3*y+5 y+3; 6*y^2+4*y+2 6*y^2 2*y^2+y]))

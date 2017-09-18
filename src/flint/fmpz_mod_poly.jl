@@ -975,11 +975,7 @@ end
 ################################################################################
 
 function PolynomialRing(R::Generic.ResRing{fmpz}, s::AbstractString; cached=true)
-   if modulus(R) <= typemax(UInt)
-      parent_obj = NmodPolyRing(R, Symbol(s), cached)
-   else
-      parent_obj = FmpzModPolyRing(R, Symbol(s), cached)
-   end
+   parent_obj = FmpzModPolyRing(R, Symbol(s), cached)
 
    return parent_obj, parent_obj([R(0), R(1)])
 end

@@ -3796,22 +3796,6 @@ end
 
 ###############################################################################
 #
-#   Matrix constructors
-#
-###############################################################################
-
-function Base.Matrix(R::Nemo.Ring, r::Int, c::Int, a::Array{T, 2}) where T <: RingElement
-   M = MatrixSpace(R, r, c)
-   return M(a)
-end
-
-function Base.Matrix(R::Nemo.Ring, r::Int, c::Int, a::Array{T, 1}) where T <: RingElement
-   M = MatrixSpace(R, r, c)
-   return M(a)
-end
-
-###############################################################################
-#
 #   MatrixSpace constructor
 #
 ###############################################################################

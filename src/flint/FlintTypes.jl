@@ -352,16 +352,47 @@ end
 
 ###############################################################################
 #
+#   NmodRing / nmod
+#
+###############################################################################
+
+mutable struct NmodRing <: Ring
+   n::UInt
+   ninv::UInt
+
+   function NmodRing(n::UInt, cached::Bool=true)
+      if haskey(NmodRingID, n)
+         return NmodRingID[n]
+      else
+         ninv = ccall((:n_preinvert_limb, :libflint), UInt, (UInt,), n)
+         z = new(n, ninv)
+         if cached
+            NmodRingID[n] = z
+         end
+         return z
+      end
+   end
+end
+
+const NmodRingID = Dict{UInt, NmodRing}()
+
+struct nmod <: ResElem{UInt}
+   data::UInt
+   parent::NmodRing
+end
+
+###############################################################################
+#
 #   NmodPolyRing / nmod_poly
 #
 ###############################################################################
 
-mutable struct NmodPolyRing <: PolyRing{Generic.Res{fmpz}}
-  base_ring::Generic.ResRing{fmpz}
+mutable struct NmodPolyRing <: PolyRing{nmod}
+  base_ring::NmodRing
   S::Symbol
   n::UInt
 
-  function NmodPolyRing(R::Generic.ResRing{fmpz}, s::Symbol, cached::Bool = true)
+  function NmodPolyRing(R::NmodRing, s::Symbol, cached::Bool = true)
     m = UInt(modulus(R))
     if haskey(NmodPolyRingID, (m, s))
        return NmodPolyRingID[m, s]
@@ -377,7 +408,7 @@ end
 
 const NmodPolyRingID = Dict{Tuple{UInt, Symbol}, NmodPolyRing}()
 
-mutable struct nmod_poly <: PolyElem{Generic.Res{fmpz}}
+mutable struct nmod_poly <: PolyElem{nmod}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -436,14 +467,13 @@ mutable struct nmod_poly <: PolyElem{Generic.Res{fmpz}}
       return z
    end
 
-   function nmod_poly(n::UInt, arr::Array{Generic.Res{fmpz}, 1})
+   function nmod_poly(n::UInt, arr::Array{nmod, 1})
       z = new()
       ccall((:nmod_poly_init2, :libflint), Void,
             (Ptr{nmod_poly}, UInt, Int), &z, n, length(arr))
       for i in 1:length(arr)
-         tt = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt), &(arr[i]).data, n)
          ccall((:nmod_poly_set_coeff_ui, :libflint), Void,
-              (Ptr{nmod_poly}, Int, UInt), &z, i-1, tt)
+              (Ptr{nmod_poly}, Int, UInt), &z, i-1, arr[i].data)
       end
       finalizer(z, _nmod_poly_clear_fn)
       return z
@@ -2126,21 +2156,19 @@ end
 #
 ###############################################################################
 
-mutable struct NmodMatSpace <: MatSpace{Generic.Res{fmpz}}
-  base_ring::Generic.ResRing{fmpz}
+mutable struct NmodMatSpace <: MatSpace{nmod}
+  base_ring::NmodRing
   n::UInt
   rows::Int
   cols::Int
 
-  function NmodMatSpace(R::Generic.ResRing{fmpz}, r::Int, c::Int,
+  function NmodMatSpace(R::NmodRing, r::Int, c::Int,
                         cached::Bool = true)
     (r < 0 || c < 0) && throw(error_dim_negative)
-    R.modulus > typemax(UInt) && 
-      error("Modulus of ResidueRing must less then ", fmpz(typemax(UInt)))
     if haskey(NmodMatID, (R, r, c))
       return NmodMatID[R, r, c]
     else
-      z = new(R, UInt(R.modulus), r, c)
+      z = new(R, R.n, r, c)
       if cached
         NmodMatID[R, r, c] = z
       end
@@ -2149,9 +2177,9 @@ mutable struct NmodMatSpace <: MatSpace{Generic.Res{fmpz}}
   end
 end
 
-const NmodMatID = Dict{Tuple{Generic.ResRing{fmpz}, Int, Int}, NmodMatSpace}()
+const NmodMatID = Dict{Tuple{NmodRing, Int, Int}, NmodMatSpace}()
 
-mutable struct nmod_mat <: MatElem{Generic.Res{fmpz}}
+mutable struct nmod_mat <: MatElem{nmod}
   entries::Ptr{Void}
   r::Int                  # Int
   c::Int                  # Int
@@ -2159,7 +2187,7 @@ mutable struct nmod_mat <: MatElem{Generic.Res{fmpz}}
   n::UInt                # mp_limb_t / Culong
   ninv::UInt             # mp_limb_t / Culong
   norm::UInt             # mp_limb_t / Culong
-  base_ring::Generic.ResRing{fmpz}
+  base_ring::NmodRing
 
   function nmod_mat(r::Int, c::Int, n::UInt)
     z = new()
@@ -2257,7 +2285,7 @@ mutable struct nmod_mat <: MatElem{Generic.Res{fmpz}}
     return nmod_mat(r, c, n, arr, transpose)
   end
 
-  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{Generic.Res{fmpz}, 2}, transpose::Bool = false)
+  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{nmod, 2}, transpose::Bool = false)
     z = new()
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
@@ -2276,7 +2304,7 @@ mutable struct nmod_mat <: MatElem{Generic.Res{fmpz}}
     return z
   end
 
-  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{Generic.Res{fmpz}, 1}, transpose::Bool = false)
+  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{nmod, 1}, transpose::Bool = false)
     z = new()
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)

@@ -636,8 +636,9 @@ doc"""
 function ^(a::Nemo.PolyElem{T}, b::Int) where {T <: RingElement}
    b < 0 && throw(DomainError())
    # special case powers of x for constructing polynomials efficiently
+   R = parent(a)
    if isgen(a)
-      z = parent(a)()
+      z = R()
       fit!(z, b + 1)
       z = setcoeff!(z, b, coeff(a, 1))
       for i = 1:b
@@ -646,13 +647,13 @@ function ^(a::Nemo.PolyElem{T}, b::Int) where {T <: RingElement}
       set_length!(z, b + 1)
       return z
    elseif length(a) == 0
-      return zero(parent(a))
+      return zero(R)
    elseif length(a) == 1
-      return parent(a)(coeff(a, 0)^b)
+      return R(coeff(a, 0)^b)
    elseif b == 0
-      return one(parent(a))
+      return one(R)
    else
-      if T <: FieldElement
+      if T <: FieldElement && characteristic(base_ring(R)) == 0
          zn = 0
          while iszero(coeff(a, zn))
             zn += 1
@@ -1620,6 +1621,38 @@ function resultant(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: RingEle
    end
    s = divexact(h*lead(B)^(lena - 1), h^(lena - 1))
    res = c1^(lb - 1)*c2^(la - 1)*s*sgn
+end
+
+# details can be found in, "Optimizations of the subresultant algorithm" by
+# Lionel Ducos, J. Pure and Appl. Algebra 2000. Note, the resultant is
+# the constant coefficient of S_0 (aka S_00 in other sources)
+function resultant_brown(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where {T <: RingElement}
+   check_parent(p, q)
+   s = lead(q)^(length(p) - length(q))
+   S = parent(p)()
+   A = q
+   B = pseudorem(p, -q)
+   while true
+      d1 = length(A)
+      e1 = length(B)
+      if e1 == 0
+         return coeff(S, 0)
+      end
+      S = B
+      delta = d1 - e1
+      if delta > 1
+         C = divexact(lead(B)^(delta - 1)*B, s^(delta - 1))
+         S = C
+      else
+         C = B
+      end
+      if e1 == 1
+         return coeff(S, 0)
+      end
+      B = divexact(pseudorem(A, -B), s^delta*lead(A))
+      A = C
+      s = lead(A)
+   end
 end
 
 function resultant_lehmer(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}

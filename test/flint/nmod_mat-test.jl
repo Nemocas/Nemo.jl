@@ -39,7 +39,6 @@ function test_nmod_mat_constructors()
   @test_throws ErrorException NmodMatSpace(Z2, 2, -1)
   @test_throws ErrorException NmodMatSpace(Z2, -1, 2)
   @test_throws ErrorException NmodMatSpace(Z2, -1, -1)
-  @test_throws ErrorException NmodMatSpace(ResidueRing(ZZ, ZZ(2)^1000), 1, 1)
 
   a = R()
 

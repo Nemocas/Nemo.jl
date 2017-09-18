@@ -35,6 +35,14 @@ doc"""
 """
 parent(a::Nemo.FracElem) = a.parent
 
+doc"""
+    characteristic{T <: RingElem}(R::Nemo.FracField{T})
+> Return the characteristic of the given field.
+"""
+function characteristic(R::Nemo.FracField{T}) where T <: RingElem
+   return characteristic(base_ring(R))
+end
+
 function check_parent(a::Nemo.FracElem, b::Nemo.FracElem)
    parent(a) != parent(b) && error("Incompatible rings in fraction field operation")
 end

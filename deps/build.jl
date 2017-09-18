@@ -168,13 +168,13 @@ if !is_windows()
   try
     run(`git clone https://github.com/wbhart/antic.git`)
     cd(joinpath("$wdir", "antic"))
-    run(`git checkout 119d15d686436d94f39fd3badf5eea4acf94ab72`)
+    run(`git checkout fb237532f6772fc04d6d57cc7cf015e444eb2cf4`)
     cd(wdir)
   catch
     if ispath(joinpath("$wdir", "antic"))
       cd(joinpath("$wdir", "antic"))
       run(`git fetch origin`)
-      run(`git checkout 119d15d686436d94f39fd3badf5eea4acf94ab72`)
+      run(`git checkout fb237532f6772fc04d6d57cc7cf015e444eb2cf4`)
       cd(wdir)
     end
   end          

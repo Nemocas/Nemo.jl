@@ -3,7 +3,7 @@ function test_gen_res_constructors()
  
    B = FlintZZ
 
-   R = ResidueRing(B, 16453889)
+   R = Generic.ResidueRing(B, 16453889)
 
    @test elem_type(R) == Generic.Res{elem_type(B)}
    @test elem_type(Generic.ResRing{elem_type(B)}) == Generic.Res{elem_type(B)}
@@ -46,7 +46,7 @@ end
 function test_gen_res_manipulation()
    print("Generic.Res.manipulation...")
  
-   R = ResidueRing(ZZ, 16453889)
+   R = Generic.ResidueRing(ZZ, 16453889)
 
    @test modulus(R) == 16453889
 
@@ -79,7 +79,7 @@ end
 function test_gen_res_unary_ops()
    print("Generic.Res.unary_ops...")
  
-   R = ResidueRing(ZZ, 16453889)
+   R = Generic.ResidueRing(ZZ, 16453889)
 
    @test -R(12345) == R(16441544)
 
@@ -94,7 +94,7 @@ end
 function test_gen_res_binary_ops()
    print("Generic.Res.binary_ops...")
  
-   R = ResidueRing(ZZ, 12)
+   R = Generic.ResidueRing(ZZ, 12)
 
    f = R(4)
    g = R(6)
@@ -105,7 +105,7 @@ function test_gen_res_binary_ops()
 
    @test f*g == R(0)
 
-   Q = ResidueRing(ZZ, 7)
+   Q = Generic.ResidueRing(ZZ, 7)
    S, x = PolynomialRing(Q, "x")
    T = ResidueRing(S, x^3 + 3x + 1)
 
@@ -124,14 +124,14 @@ end
 function test_gen_res_gcd()
    print("Generic.Res.gcd...")
  
-   R = ResidueRing(ZZ, 12)
+   R = Generic.ResidueRing(ZZ, 12)
 
    f = R(4)
    g = R(6)
 
    @test gcd(f, g) == R(2)
 
-   Q = ResidueRing(ZZ, 7)
+   Q = Generic.ResidueRing(ZZ, 7)
    S, x = PolynomialRing(Q, "x")
    T = ResidueRing(S, x^3 + 3x + 1)
 
@@ -146,7 +146,7 @@ end
 function test_gen_res_adhoc_binary()
    print("Generic.Res.adhoc_binary...")
  
-   R = ResidueRing(ZZ, 7)
+   R = Generic.ResidueRing(ZZ, 7)
 
    a = R(3)
 
@@ -173,7 +173,7 @@ end
 function test_gen_res_comparison()
    print("Generic.Res.comparison...")
  
-   R = ResidueRing(ZZ, 7)
+   R = Generic.ResidueRing(ZZ, 7)
 
    a = R(3)
    b = a
@@ -203,7 +203,7 @@ end
 function test_gen_res_adhoc_comparison()
    print("Generic.Res.adhoc_comparison...")
  
-   R = ResidueRing(ZZ, 7)
+   R = Generic.ResidueRing(ZZ, 7)
 
    a = R(3)
 
@@ -223,7 +223,7 @@ end
 function test_gen_res_powering()
    print("Generic.Res.powering...")
  
-   R = ResidueRing(ZZ, 7)
+   R = Generic.ResidueRing(ZZ, 7)
 
    a = R(3)
 
@@ -242,13 +242,13 @@ end
 function test_gen_res_inversion()
    print("Generic.Res.inversion...")
  
-   R = ResidueRing(ZZ, 49)
+   R = Generic.ResidueRing(ZZ, 49)
 
    a = R(5)
 
    @test inv(a) == 10
 
-   R = ResidueRing(ZZ, 41)
+   R = Generic.ResidueRing(ZZ, 41)
    S, x = PolynomialRing(R, "x")
    T = ResidueRing(S, x^3 + 3x + 1)
 
@@ -262,14 +262,14 @@ end
 function test_gen_res_exact_division()
    print("Generic.Res.exact_division...")
  
-   R = ResidueRing(ZZ, 49)
+   R = Generic.ResidueRing(ZZ, 49)
 
    a = R(5)
    b = R(3)
 
    @test divexact(a, b) == 18
 
-   R = ResidueRing(ZZ, 41)
+   R = Generic.ResidueRing(ZZ, 41)
    S, x = PolynomialRing(R, "x")
    T = ResidueRing(S, x^3 + 3x + 1)
 
