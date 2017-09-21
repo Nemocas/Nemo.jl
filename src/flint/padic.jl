@@ -84,6 +84,8 @@ doc"""
 """
 parent(a::padic) = a.parent
 
+isexact(R::FlintPadicField) = false
+
 function check_parent(a::padic, b::padic)
    parent(a) != parent(b) && 
       error("Incompatible padic rings in padic operation")

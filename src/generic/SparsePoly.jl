@@ -16,6 +16,8 @@ parent_type(::Type{SparsePoly{T}}) where {T <: RingElement} = SparsePolyRing{T}
 
 elem_type(::Type{SparsePolyRing{T}}) where {T <: RingElement} = SparsePoly{T}
 
+isexact(R::SparsePolyRing) = isexact(base_ring(R))
+
 var(a::SparsePolyRing) = a.S
 
 function gen(a::SparsePolyRing)

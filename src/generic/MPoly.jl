@@ -25,6 +25,8 @@ base_ring(R::MPolyRing{T}) where T <: RingElement = R.base_ring
 
 base_ring(a::MPoly{T}) where T <: RingElement = base_ring(parent(a))
 
+isexact(R::MPolyRing) = isexact(base_ring(R))
+
 doc"""
     vars(a::MPolyRing)
 > Return an array of symbols representing the variable names for the given

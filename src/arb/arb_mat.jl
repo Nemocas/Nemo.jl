@@ -44,6 +44,8 @@ base_ring(a::arb_mat) = a.base_ring
 parent(x::arb_mat, cached::Bool = true) =
       MatrixSpace(base_ring(x), rows(x), cols(x))
 
+isexact(R::ArbMatSpace) = false
+
 prec(x::ArbMatSpace) = prec(x.base_ring)
 
 function getindex!(z::arb, x::arb_mat, r::Int, c::Int)

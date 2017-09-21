@@ -55,6 +55,8 @@ doc"""
 """
 parent(x::arb) = x.parent
 
+isexact(R::ArbField) = false
+
 doc"""
     zero(R::ArbField)
 > Return exact zero in the given Arb field. 

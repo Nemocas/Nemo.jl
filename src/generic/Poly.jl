@@ -45,6 +45,8 @@ doc"""
 """
 parent(a::Nemo.PolyElem) = a.parent
 
+isexact(R::Nemo.PolyRing) = isexact(base_ring(R))
+
 doc"""
     var(a::Nemo.PolyRing)
 > Return the internal name of the generator of the polynomial ring. Note that
@@ -1576,59 +1578,139 @@ end
 #
 ###############################################################################
 
+# Dichotomous Lazard, computes Se0 from Sd0 and Sd1. See the paper,
+# "Optimizations of the subresultant algorithm" by Lionel Ducos, J. Pure and
+# Appl. Algebra 2000.
+function subresultant_lazard(Sd0::Nemo.PolyElem{T}, Sd1::Nemo.PolyElem{T}) where T <: RingElement
+   n = length(Sd0) - length(Sd1) - 1
+   if n == 0
+      return Sd1
+   end
+   x = lead(Sd1)
+   y = lead(Sd0)
+   a = 1 << (ndigits(n, 2) - 1) # floor(log_2(a))
+   c = x
+   n = n - 1
+   while a != 1
+      a = a >> 1
+      c = divexact(c*c, y)
+      if n >= a
+         c = divexact(c*x, y)
+         n -= a
+      end
+   end
+   return divexact(c*Sd1, y)
+end
+
+# Ducos optimised calculation of Se1. See the paper, "Optimizations of the
+# subresultant algorithm" by Lionel Ducos, J. Pure and Appl. Algebra 2000.
+function subresultant_ducos(A::Nemo.PolyElem{T}, Sd1::Nemo.PolyElem{T}, Se0::Nemo.PolyElem{T}, sd::T) where T <: RingElement
+   d1 = length(A)
+   e1 = length(Sd1)
+   cd1 = lead(Sd1)
+   se = lead(Se0)
+   D = parent(A)()
+   fit!(D, d1 - 1)
+   for j = 0:e1 - 2
+      setcoeff!(D, j, se*coeff(A, j))
+   end
+   set_length!(D, normalise(D, e1 - 1))
+   Hj = parent(A)()
+   fit!(Hj, e1)
+   setcoeff!(Hj, e1 - 1, se)
+   Hj -= Se0
+   D += coeff(A, e1 - 1)*Hj
+   for j = e1:d1 - 2
+      Hj = shift_left(Hj, 1)
+      Hj -= divexact(coeff(Hj, e1 - 1)*Sd1, cd1)
+      D += coeff(A, j)*Hj
+   end
+   D = divexact(D, lead(A))
+   Hj = shift_left(Hj, 1)
+   r = divexact((Hj + D)*cd1 - coeff(Hj, e1 - 1)*Sd1, sd)
+   return iseven(d1 - e1) ? -r : r
+end
+
 doc"""
     resultant{T <: RingElement}(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T})
 > Return the resultant of the $a$ and $b$.
 """
-function resultant(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: RingElement}
-   check_parent(a, b)
-   if length(a) == 0 || length(b) == 0
-      return zero(base_ring(a))
+# See the paper, "Optimizations of the subresultant algorithm" by Lionel
+# Ducos, J. Pure and Appl. Algebra 2000.
+function resultant_ducos(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where {T <: RingElement}
+   check_parent(p, q)
+   if length(p) == 0 || length(q) == 0
+      return zero(base_ring(p))
    end
    sgn = 1
-   if length(a) < length(b)
-      a, b = b, a
-      if iseven(length(a)) && iseven(length(b))
+   if length(p) < length(q)
+      p, q = q, p
+      if iseven(length(p)) && iseven(length(q))
          sgn = -sgn
       end
    end
-   la = lena = length(a)
-   lb = lenb = length(b)
-   if lenb == 1
-      return coeff(b, 0)^(la - 1)
+   lp = length(p)
+   lq = length(q)
+   if lq == 1
+      return coeff(q, 0)^(lp - 1)
    end
-   c1 = content(a)
-   c2 = content(b)
-   A = divexact(a, c1)
-   B = divexact(b, c2)
-   g = one(base_ring(a))
-   h = one(base_ring(a))
-   while lenb > 1
-      d = lena - lenb
-      if iseven(lena) && iseven(lenb)
-         sgn = -sgn
+   c1 = content(p)
+   c2 = content(q)
+   p = divexact(p, c1)
+   q = divexact(q, c2)
+   sd = lead(q)^(lp - lq)
+   Sd0 = parent(p)()
+   A = q
+   B = pseudorem(p, -A)
+   while true
+      d1 = length(A)
+      e1 = length(B)
+      if e1 == 0
+         return zero(base_ring(p))
       end
-      B, A = pseudorem(A, B), B
-      lena = lenb
-      lenb = length(B)
-      if lenb == 0
-         return zero(base_ring(a)) 
+      Sd1 = B
+      delta = d1 - e1
+      if delta > 1
+         if length(Sd0) == 0
+            C = divexact(lead(B)^(delta - 1)*B, sd^(delta - 1))
+         else
+            C = subresultant_lazard(Sd0, Sd1)
+         end
+      else
+         C = B
       end
-      s = h^d
-      B = divexact(B, g*s)
-      g = lead(A)
-      h = divexact(h*g^d, s)
+      if e1 == 1
+         return coeff(C, 0)*c1^(lq - 1)*c2^(lp - 1)*sgn
+      end
+      B = subresultant_ducos(A, Sd1, C, sd)
+      Sd0 = C
+      Sd1 = B
+      A = C
+      sd = lead(A)
    end
-   s = divexact(h*lead(B)^(lena - 1), h^(lena - 1))
-   res = c1^(lb - 1)*c2^(la - 1)*s*sgn
 end
 
 # details can be found in, "Optimizations of the subresultant algorithm" by
 # Lionel Ducos, J. Pure and Appl. Algebra 2000. Note, the resultant is
 # the constant coefficient of S_0 (aka S_00 in other sources)
-function resultant_brown(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where {T <: RingElement}
+function resultant_subresultant(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where {T <: RingElement}
    check_parent(p, q)
-   s = lead(q)^(length(p) - length(q))
+   if length(p) == 0 || length(q) == 0
+      return zero(base_ring(p))
+   end
+   sgn = 1
+   if length(p) < length(q)
+      p, q = q, p
+      if iseven(length(p)) && iseven(length(q))
+         sgn = -sgn
+      end
+   end
+   lp = length(p)
+   lq = length(q)
+   if lq == 1
+      return coeff(q, 0)^(lp - 1)
+   end
+   s = lead(q)^(lp - lq)
    S = parent(p)()
    A = q
    B = pseudorem(p, -q)
@@ -1636,7 +1718,7 @@ function resultant_brown(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where {T <: R
       d1 = length(A)
       e1 = length(B)
       if e1 == 0
-         return coeff(S, 0)
+         return zero(base_ring(p))
       end
       S = B
       delta = d1 - e1
@@ -1647,7 +1729,7 @@ function resultant_brown(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where {T <: R
          C = B
       end
       if e1 == 1
-         return coeff(S, 0)
+         return coeff(S, 0)*sgn
       end
       B = divexact(pseudorem(A, -B), s^delta*lead(A))
       A = C
@@ -1731,7 +1813,41 @@ function resultant_lehmer(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: 
    return c1^(lB - 1)*c2^(lA - 1)*s*sgn
 end
 
-function resultant(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
+function resultant_sylvester(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where T <: RingElement
+   check_parent(p, q)
+   R = base_ring(p)
+   if length(p) == 0 || length(q) == 0
+      return zero(R)
+   end
+   m = degree(p)
+   n = degree(q)
+   M = Nemo.MatrixSpace(R, m + n, m + n)()
+   for i = 1:n
+      for j = m:-1:0
+         M[i, m - j + i] = coeff(p, j)
+      end
+   end
+   for i = 1:m
+      for j = n:-1:0
+         M[i + n, n - j + i] = coeff(q, j)
+       end 
+   end
+   return det_df(M)
+end
+
+function resultant(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where {T <: RingElement}
+  R = parent(p)
+  if !isexact(R)
+     return resultant_sylvester(p, q)
+  end
+  try
+     return resultant_ducos(p, q)
+  catch 
+     return resultant_sylvester(p, q) 
+  end
+end
+
+function resultant_euclidean(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where T <: Union{Nemo.ResElem, FieldElement}
    check_parent(a, b)
    if length(a) == 0 || length(b) == 0
       return zero(base_ring(a))
@@ -1769,6 +1885,14 @@ function resultant(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Union{N
    end
    s *= lead(B)^(lena - 1)
    return c1^(lb - 1)*c2^(la - 1)*s*sgn
+end
+
+function resultant(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
+   try
+      return resultant_euclidean(a, b)
+   catch
+      return resultant_sylvester(a, b)
+   end
 end
 
 ###############################################################################

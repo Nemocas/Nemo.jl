@@ -26,6 +26,8 @@ parent_type(::Type{fmpq_rel_series}) = FmpqRelSeriesRing
 
 base_ring(R::FmpqRelSeriesRing) = R.base_ring
 
+isexact(R::FmpqRelSeriesRing) = false
+
 var(a::FmpqRelSeriesRing) = a.S
 
 ###############################################################################
@@ -297,17 +299,25 @@ end
 
 *(x::Integer, y::fmpq_rel_series) = fmpz(x) * y
 
-*(x::fmpq_rel_series, y::Rational{T}) where T <: Union{Int, BigInt} = x * fmpq(y)
+*(x::fmpq_rel_series, y::Rational) = x * fmpq(y)
 
-*(x::Rational{T}, y::fmpq_rel_series) where T <: Union{Int, BigInt} = fmpq(x) * y
+*(x::Rational, y::fmpq_rel_series) = fmpq(x) * y
 
 +(x::fmpq_rel_series, y::Integer) = x + fmpz(y)
 
 +(x::Integer, y::fmpq_rel_series) = fmpz(x) + y
 
-+(x::fmpq_rel_series, y::Rational{T}) where T <: Union{Int, BigInt} = x + fmpq(y)
++(x::fmpq_rel_series, y::Rational) = x + fmpq(y)
 
-+(x::Rational{T}, y::fmpq_rel_series) where T <: Union{Int, BigInt} = fmpq(x) + y
++(x::Rational, y::fmpq_rel_series) = fmpq(x) + y
+
+-(x::fmpq_rel_series, y::Integer) = x - fmpz(y)
+
+-(x::Integer, y::fmpq_rel_series) = fmpz(x) - y
+
+-(x::fmpq_rel_series, y::Rational) = x - fmpq(y)
+
+-(x::Rational, y::fmpq_rel_series) = fmpq(x) - y
 
 ###############################################################################
 #
@@ -574,7 +584,7 @@ function divexact(x::fmpq_rel_series, y::fmpq)
    z.prec = x.prec
    z.prec = x.prec
    z.val = x.val
-   ccall((:fmpq_poly_scalar_divexact_fmpq, :libflint), Void, 
+   ccall((:fmpq_poly_scalar_div_fmpq, :libflint), Void, 
                 (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq}), 
                &z, &x, &y)
    return z

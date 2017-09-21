@@ -816,6 +816,8 @@ function test_gen_poly_resultant()
 
       @test resultant(f*g, h) == resultant(f, h) * resultant(g, h)
       @test resultant(f, g*h) == resultant(f, g) * resultant(f, h)
+
+      @test resultant(f, g) == resultant_subresultant(f, g)
    end
 
    println("PASS")

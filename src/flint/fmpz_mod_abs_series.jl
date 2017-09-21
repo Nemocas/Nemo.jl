@@ -29,6 +29,8 @@ parent_type(::Type{fmpz_mod_abs_series}) = FmpzModAbsSeriesRing
 
 base_ring(R::FmpzModAbsSeriesRing) = R.base_ring
 
+isexact(R::FmpzModAbsSeriesRing) = false
+
 var(a::FmpzModAbsSeriesRing) = a.S
 
 ###############################################################################

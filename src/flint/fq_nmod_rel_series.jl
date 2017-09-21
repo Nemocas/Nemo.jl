@@ -26,6 +26,8 @@ parent_type(::Type{fq_nmod_rel_series}) = FqNmodRelSeriesRing
 
 base_ring(R::FqNmodRelSeriesRing) = R.base_ring
 
+isexact(R::FqNmodRelSeriesRing) = false
+
 var(a::FqNmodRelSeriesRing) = a.S
 
 ###############################################################################

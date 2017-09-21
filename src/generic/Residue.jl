@@ -35,6 +35,8 @@ doc"""
 """
 parent(a::Nemo.ResElem) = a.parent
 
+isexact(R::Nemo.ResRing) = isexact(base_ring(R))
+
 function check_parent_type(a::Nemo.ResRing{T}, b::Nemo.ResRing{T}) where {T <: RingElement}
    # exists only to check types of parents agree
 end

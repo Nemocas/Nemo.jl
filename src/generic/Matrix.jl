@@ -106,6 +106,8 @@ function check_parent(a::Nemo.MatElem, b::Nemo.MatElem)
                 error("Incompatible matrix spaces in matrix operation")
 end
 
+isexact(R::Nemo.MatSpace) = isexact(base_ring(R))
+
 function _check_dim(r::Int, c::Int, arr::Array{T, 2}, transpose::Bool = false) where {T}
   if !transpose
     size(arr) != (r, c) && throw(ErrorConstrDimMismatch(r, c, size(arr)...))

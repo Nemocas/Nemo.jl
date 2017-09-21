@@ -48,6 +48,8 @@ doc"""
 """
 max_precision(R::AbsSeriesRing) = R.prec_max
 
+isexact(R::AbsSeriesRing) = false
+
 function normalise(a::AbsSeries, len::Int)
    while len > 0 && iszero(a.coeffs[len])
       len -= 1

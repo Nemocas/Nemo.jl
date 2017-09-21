@@ -35,6 +35,8 @@ doc"""
 """
 parent(a::Nemo.FracElem) = a.parent
 
+isexact(R::Nemo.FracField) = isexact(base_ring(R))
+
 doc"""
     characteristic{T <: RingElem}(R::Nemo.FracField{T})
 > Return the characteristic of the given field.
@@ -64,10 +66,6 @@ function //(x::T, y::T) where {T <: RingElem}
    end
    return z
 end
-
-//(x::T, y::Union{Integer, Rational}) where {T <: RingElem} = x//parent(x)(y)
-                                          
-//(x::Union{Integer, Rational}, y::T) where {T <: RingElem} = parent(y)(x)//y
 
 //(x::T, y::Nemo.FracElem{T}) where {T <: RingElem} = parent(y)(x)//y
 

@@ -52,6 +52,8 @@ doc"""
 """
 parent(x::acb) = x.parent
 
+isexact(R::AcbField) = false
+
 doc"""
     zero(R::AcbField)
 > Return exact zero in the given Arb complex field. 

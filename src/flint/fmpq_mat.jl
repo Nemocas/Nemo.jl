@@ -277,9 +277,9 @@ end
 
 *(x::fmpq_mat, y::Integer) = fmpz(y)*x
 
-*(x::Rational{T}, y::fmpq_mat) where T <: Union{Int, BigInt} = fmpq(x)*y
+*(x::Rational, y::fmpq_mat) = fmpq(x)*y
 
-*(x::fmpq_mat, y::Rational{T}) where T <: Union{Int, BigInt} = fmpq(y)*x
+*(x::fmpq_mat, y::Rational) = fmpq(y)*x
 
 for T in [Integer, fmpz, fmpq]
    @eval begin
@@ -311,7 +311,7 @@ for T in [Integer, fmpz, fmpq]
    end
 end
 
-function +(x::fmpq_mat, y::Rational{T}) where T <: Union{Int, BigInt}
+function +(x::fmpq_mat, y::Rational)
    z = deepcopy(x)
    for i = 1:min(rows(x), cols(x))
       z[i, i] += y
@@ -319,9 +319,9 @@ function +(x::fmpq_mat, y::Rational{T}) where T <: Union{Int, BigInt}
    return z
 end
 
-+(x::Rational{T}, y::fmpq_mat) where T <: Union{Int, BigInt} = y + x
++(x::Rational, y::fmpq_mat) = y + x
 
-function -(x::fmpq_mat, y::Rational{T}) where T <: Union{Int, BigInt}
+function -(x::fmpq_mat, y::Rational)
    z = deepcopy(x)
    for i = 1:min(rows(x), cols(x))
       z[i, i] -= y
@@ -329,7 +329,7 @@ function -(x::fmpq_mat, y::Rational{T}) where T <: Union{Int, BigInt}
    return z
 end
 
-function -(x::Rational{T}, y::fmpq_mat) where T <: Union{Int, BigInt}
+function -(x::Rational, y::fmpq_mat)
    z = -y
    for i = 1:min(rows(y), cols(y))
       z[i, i] += x

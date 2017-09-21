@@ -47,6 +47,8 @@ doc"""
 """
 base_ring(a::Nemo.SeriesElem) = base_ring(parent(a))
 
+isexact(R::RelSeriesRing) = false
+
 doc"""
     var(a::SeriesRing)
 > Return the internal name of the generator of the power series ring. Note that
