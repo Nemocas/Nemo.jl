@@ -102,6 +102,8 @@ function getindex(a::fmpq_mat, r::Int, c::Int)
 end
 
 function setindex!(a::fmpq_mat, d::fmpz, r::Int, c::Int)
+   _checkbounds(rows(a), r) || throw(BoundsError())
+   _checkbounds(cols(a), c) || throw(BoundsError())
    z = ccall((:fmpq_mat_entry_num, :libflint), Ptr{fmpz},
              (Ptr{fmpq_mat}, Int, Int), &a, r - 1, c - 1)
    ccall((:fmpz_set, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}), z, &d)
@@ -111,6 +113,8 @@ function setindex!(a::fmpq_mat, d::fmpz, r::Int, c::Int)
 end
 
 function setindex!(a::fmpq_mat, d::fmpq, r::Int, c::Int)
+   _checkbounds(rows(a), r) || throw(BoundsError())
+   _checkbounds(cols(a), c) || throw(BoundsError())
    z = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
              (Ptr{fmpq_mat}, Int, Int), &a, r - 1, c - 1)
    ccall((:fmpq_set, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), z, &d)

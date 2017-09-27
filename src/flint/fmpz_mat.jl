@@ -107,6 +107,8 @@ function getindex(a::fmpz_mat, r::Int, c::Int)
 end
 
 function setindex!(a::fmpz_mat, d::fmpz, r::Int, c::Int)
+   _checkbounds(rows(a), r) || throw(BoundsError())
+   _checkbounds(cols(a), c) || throw(BoundsError())
    z = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
              (Ptr{fmpz_mat}, Int, Int), &a, r - 1, c - 1)
    ccall((:fmpz_set, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}), z, &d)
@@ -934,8 +936,8 @@ function cansolve(a::fmpz_mat, b::fmpz_mat)
    b = deepcopy(b)
    z = similar(a, cols(b), cols(a))
    l = min(rows(a), cols(a))
-   for i=1:cols(b)
-     for j=1:l
+   for i = 1:cols(b)
+     for j = 1:l
        k = 1
        while k <= cols(H) && iszero(H[j, k])
          k += 1
@@ -947,10 +949,10 @@ function cansolve(a::fmpz_mat, b::fmpz_mat)
        if !iszero(r)
          return false, b
        end
-       for h=k:cols(H)
+       for h = k:cols(H)
          b[h, i] -= q*H[j, h]
        end
-       z[i, k] = q
+       z[i, j] = q
      end
    end
    if !iszero(b)
