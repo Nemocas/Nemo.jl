@@ -200,10 +200,10 @@ end
 ###############################################################################
 
 doc"""
-    *(a::Nemo.ResElem, b::Union{Integer, Rational})
+    *(a::Nemo.ResElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a\times b$.
 """
-*(a::Nemo.ResElem, b::Union{Integer, Rational}) = parent(a)(data(a) * b)
+*(a::Nemo.ResElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) * b)
 
 doc"""
     *{T <: RingElem}(a::Nemo.ResElem{T}, b::T)
@@ -212,10 +212,10 @@ doc"""
 *(a::Nemo.ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) * b)
 
 doc"""
-    *(a::Union{Integer, Rational}, b::Nemo.ResElem)
+    *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResElem)
 > Return $a\times b$.
 """
-*(a::Union{Integer, Rational}, b::Nemo.ResElem) = parent(b)(a * data(b))
+*(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResElem) = parent(b)(a * data(b))
 
 doc"""
     *{T <: RingElem}(a::T, b::Nemo.ResElem{T})
@@ -224,10 +224,10 @@ doc"""
 *(a::T, b::Nemo.ResElem{T}) where {T <: RingElem} = parent(b)(a * data(b))
 
 doc"""
-    +(a::Nemo.ResElem, b::Union{Integer, Rational})
+    +(a::Nemo.ResElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a + b$.
 """
-+(a::Nemo.ResElem, b::Union{Integer, Rational}) = parent(a)(data(a) + b)
++(a::Nemo.ResElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) + b)
 
 doc"""
     +{T <: RingElem}(a::Nemo.ResElem{T}, b::T)
@@ -236,10 +236,10 @@ doc"""
 +(a::Nemo.ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) + b)
 
 doc"""
-    +(a::Union{Integer, Rational}, b::Nemo.ResElem)
+    +(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResElem)
 > Return $a + b$.
 """
-+(a::Union{Integer, Rational}, b::Nemo.ResElem) = parent(b)(a + data(b))
++(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResElem) = parent(b)(a + data(b))
 
 doc"""
     +{T <: RingElem}(a::T, b::Nemo.ResElem{T})
@@ -248,10 +248,10 @@ doc"""
 +(a::T, b::Nemo.ResElem{T}) where {T <: RingElem} = parent(b)(a + data(b))
 
 doc"""
-    -(a::Nemo.ResElem, b::Union{Integer, Rational})
+    -(a::Nemo.ResElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a - b$.
 """
--(a::Nemo.ResElem, b::Union{Integer, Rational}) = parent(a)(data(a) - b)
+-(a::Nemo.ResElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) - b)
 
 doc"""
     -{T <: RingElem}(a::Nemo.ResElem{T}, b::T)
@@ -260,10 +260,10 @@ doc"""
 -(a::Nemo.ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) - b)
 
 doc"""
-    -(a::Union{Integer, Rational}, b::Nemo.ResElem)
+    -(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResElem)
 > Return $a - b$.
 """
--(a::Union{Integer, Rational}, b::Nemo.ResElem) = parent(b)(a - data(b))
+-(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResElem) = parent(b)(a - data(b))
 
 doc"""
     -{T <: RingElem}(a::T, b::Nemo.ResElem{T})
@@ -321,19 +321,19 @@ end
 ###############################################################################
 
 doc"""
-    ==(x::Nemo.ResElem, y::Union{Integer, Rational})
+    ==(x::Nemo.ResElem, y::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(a::Nemo.ResElem, b::Union{Integer, Rational})
+function ==(a::Nemo.ResElem, b::Union{Integer, Rational, AbstractFloat})
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
 doc"""
-    ==(x::Union{Integer, Rational}, y::Nemo.ResElem)
+    ==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.ResElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(a::Union{Integer, Rational}, b::Nemo.ResElem)
+function ==(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResElem)
    z = base_ring(b)(a)
    return data(b) == mod(z, modulus(b))
 end

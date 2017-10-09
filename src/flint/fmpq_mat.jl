@@ -53,10 +53,8 @@ end
 ###############################################################################
 
 function Base.view(x::fmpq_mat, r1::Int, c1::Int, r2::Int, c2::Int)
-  _checkbounds(x.r, r1) || throw(BoundsError())
-  _checkbounds(x.r, r2) || throw(BoundsError())
-  _checkbounds(x.c, c1) || throw(BoundsError())
-  _checkbounds(x.c, c2) || throw(BoundsError())
+  Generic._checkbounds(x, r1, c1)
+  Generic._checkbounds(x, r2, c2)
   (r1 > r2 || c1 > c2) && error("Invalid parameters")
   b = fmpq_mat()
   b.base_ring = x.base_ring
@@ -91,9 +89,8 @@ function getindex!(v::fmpq, a::fmpq_mat, r::Int, c::Int)
    ccall((:fmpq_set, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &v, z)
 end
 
-function getindex(a::fmpq_mat, r::Int, c::Int)
-   _checkbounds(rows(a), r) || throw(BoundsError())
-   _checkbounds(cols(a), c) || throw(BoundsError())
+@inline function getindex(a::fmpq_mat, r::Int, c::Int)
+   @boundscheck Generic._checkbounds(a, r, c)
    v = fmpq()
    z = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
              (Ptr{fmpq_mat}, Int, Int), &a, r - 1, c - 1)
@@ -101,9 +98,8 @@ function getindex(a::fmpq_mat, r::Int, c::Int)
    return v
 end
 
-function setindex!(a::fmpq_mat, d::fmpz, r::Int, c::Int)
-   _checkbounds(rows(a), r) || throw(BoundsError())
-   _checkbounds(cols(a), c) || throw(BoundsError())
+@inline function setindex!(a::fmpq_mat, d::fmpz, r::Int, c::Int)
+   @boundscheck Generic._checkbounds(a, r, c)
    z = ccall((:fmpq_mat_entry_num, :libflint), Ptr{fmpz},
              (Ptr{fmpq_mat}, Int, Int), &a, r - 1, c - 1)
    ccall((:fmpz_set, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}), z, &d)
@@ -112,25 +108,27 @@ function setindex!(a::fmpq_mat, d::fmpz, r::Int, c::Int)
    ccall((:fmpz_set_si, :libflint), Void, (Ptr{fmpz}, Int), z, 1)
 end
 
-function setindex!(a::fmpq_mat, d::fmpq, r::Int, c::Int)
-   _checkbounds(rows(a), r) || throw(BoundsError())
-   _checkbounds(cols(a), c) || throw(BoundsError())
+@inline function setindex!(a::fmpq_mat, d::fmpq, r::Int, c::Int)
+   @boundscheck Generic._checkbounds(a, r, c)
    z = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
              (Ptr{fmpq_mat}, Int, Int), &a, r - 1, c - 1)
    ccall((:fmpq_set, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), z, &d)
 end
 
-setindex!(a::fmpq_mat, d::Integer, r::Int, c::Int) = setindex!(a, fmpq(d), r, c)
+Base.@propagate_inbounds setindex!(a::fmpq_mat, d::Integer,
+                                 r::Int, c::Int) =
+         setindex!(a, fmpq(d), r, c)
 
-function setindex!(a::fmpq_mat, d::Int, r::Int, c::Int)
-   _checkbounds(rows(a), r) || throw(BoundsError())
-   _checkbounds(cols(a), c) || throw(BoundsError())
+@inline function setindex!(a::fmpq_mat, d::Int, r::Int, c::Int)
+   @boundscheck Generic._checkbounds(a, r, c)
    z = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
              (Ptr{fmpq_mat}, Int, Int), &a, r - 1, c - 1)
    ccall((:fmpq_set_si, :libflint), Void, (Ptr{fmpq}, Int, Int), z, d, 1)
 end
 
-setindex!(a::fmpq_mat, d::Rational, r::Int, c::Int) = setindex!(a, fmpq(d), r, c)
+Base.@propagate_inbounds setindex!(a::fmpq_mat, d::Rational,
+                                 r::Int, c::Int) =
+         setindex!(a, fmpq(d), r, c)
 
 rows(a::fmpq_mat) = a.r
 

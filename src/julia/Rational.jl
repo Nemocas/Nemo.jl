@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   JuliaRational.jl : Additional Nemo functionality for Julia Rationals
+#   Rational.jl : Additional Nemo functionality for Julia Rationals
 #
 ###############################################################################
 
@@ -16,7 +16,7 @@ qq = Rationals{Int}()
 
 parent(a::Rational{T}) where T <: Integer = Rationals{T}()
 
-elem_type(::Rationals{T}) where T <: Integer = Rational{T}
+elem_type(::Type{Rationals{T}}) where T <: Integer = Rational{T}
   
 parent_type(::Type{Rational{T}}) where T <: Integer = Rationals{T}
 

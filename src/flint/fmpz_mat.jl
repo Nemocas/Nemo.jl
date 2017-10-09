@@ -58,16 +58,14 @@ end
 ###############################################################################
 
 function Base.view(x::fmpz_mat, r1::Int, c1::Int, r2::Int, c2::Int)
-  _checkbounds(x.r, r1) || throw(BoundsError())
-  _checkbounds(x.r, r2) || throw(BoundsError())
-  _checkbounds(x.c, c1) || throw(BoundsError())
-  _checkbounds(x.c, c2) || throw(BoundsError())
+  Generic._checkbounds(x, r1, c1)
+  Generic._checkbounds(x, r2, c2)
   (r1 > r2 || c1 > c2) && error("Invalid parameters")
   b = fmpz_mat()
   b.base_ring = FlintZZ
   ccall((:fmpz_mat_window_init, :libflint), Void,
         (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Int, Int, Int, Int),
-            &b, &x, r1-1, c1-1, r2, c2)
+            &b, &x, r1 - 1, c1 - 1, r2, c2)
   finalizer(b, _fmpz_mat_window_clear_fn)
   return b
 end
@@ -96,9 +94,8 @@ function getindex!(v::fmpz, a::fmpz_mat, r::Int, c::Int)
    ccall((:fmpz_set, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}), &v, z)
 end
 
-function getindex(a::fmpz_mat, r::Int, c::Int)
-   _checkbounds(rows(a), r) || throw(BoundsError())
-   _checkbounds(cols(a), c) || throw(BoundsError())
+@inline function getindex(a::fmpz_mat, r::Int, c::Int)
+   @boundscheck Generic._checkbounds(a, r, c)
    v = fmpz()
    z = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
              (Ptr{fmpz_mat}, Int, Int), &a, r - 1, c - 1)
@@ -106,27 +103,25 @@ function getindex(a::fmpz_mat, r::Int, c::Int)
    return v
 end
 
-function setindex!(a::fmpz_mat, d::fmpz, r::Int, c::Int)
-   _checkbounds(rows(a), r) || throw(BoundsError())
-   _checkbounds(cols(a), c) || throw(BoundsError())
+@inline function setindex!(a::fmpz_mat, d::fmpz, r::Int, c::Int)
+   @boundscheck Generic._checkbounds(a, r, c)
    z = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
              (Ptr{fmpz_mat}, Int, Int), &a, r - 1, c - 1)
    ccall((:fmpz_set, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}), z, &d)
 end
 
-setindex!(a::fmpz_mat, d::Integer, r::Int, c::Int) = setindex!(a, fmpz(d), r, c)
+@inline setindex!(a::fmpz_mat, d::Integer, r::Int, c::Int) = setindex!(a, fmpz(d), r, c)
 
-function setindex!(a::fmpz_mat, d::Int, r::Int, c::Int)
-   _checkbounds(rows(a), r) || throw(BoundsError())
-   _checkbounds(cols(a), c) || throw(BoundsError())
+@inline function setindex!(a::fmpz_mat, d::Int, r::Int, c::Int)
+   @boundscheck Generic._checkbounds(a, r, c)
    z = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
              (Ptr{fmpz_mat}, Int, Int), &a, r - 1, c - 1)
    ccall((:fmpz_set_si, :libflint), Void, (Ptr{fmpz}, Int), z, d)
 end
 
-rows(a::fmpz_mat) = a.r
+@inline rows(a::fmpz_mat) = a.r
 
-cols(a::fmpz_mat) = a.c
+@inline cols(a::fmpz_mat) = a.c
 
 zero(a::FmpzMatSpace) = a()
 

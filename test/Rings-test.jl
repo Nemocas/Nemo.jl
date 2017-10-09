@@ -1,3 +1,4 @@
+include("julia/Integers-test.jl")
 include("flint/fmpz-test.jl")
 include("flint/fmpz_poly-test.jl")
 include("flint/fmpz_mod_poly-test.jl")
@@ -33,6 +34,8 @@ include("generic/Matrix-test.jl")
 include("generic/MPoly-test.jl")
 
 function test_rings()
+   test_Integers()
+
    test_fmpz()
    test_fmpz_poly()
    test_fmpz_mod_poly()

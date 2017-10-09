@@ -122,6 +122,15 @@ function _check_dim(r::Int, c::Int, arr::Array{T, 1}) where {T}
   return nothing
 end
 
+function _checkbounds(i::Int, j::Int)
+   j >= 1 && j <= i
+end
+
+function _checkbounds(A, i::Int, j::Int)
+  (_checkbounds(rows(A), i) && _checkbounds(cols(A), j)) ||
+            Base.throw_boundserror(A, (i, j))
+end
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -151,11 +160,12 @@ doc"""
 """
 cols(a::Nemo.MatElem) = size(a.entries, 2)
 
-function getindex(a::Nemo.MatElem, r::Int, c::Int)
+Base.@propagate_inbounds function getindex(a::Nemo.MatElem, r::Int, c::Int)
    return a.entries[r, c]
 end
  
-function setindex!(a::Nemo.MatElem, d::T, r::Int, c::Int) where T <: RingElement
+Base.@propagate_inbounds function setindex!(a::Nemo.MatElem, d::T, r::Int,
+                                            c::Int) where T <: RingElement
     a.entries[r, c] = base_ring(a)(d)
 end
 
@@ -343,10 +353,10 @@ end
 ###############################################################################
 
 doc"""
-    *(x::Union{Integer, Rational}, y::Nemo.MatElem)
+    *(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
 > Return $x\times y$.
 """
-function *(x::Union{Integer, Rational}, y::Nemo.MatElem)
+function *(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
    z = similar(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
@@ -371,10 +381,10 @@ function *(x::T, y::Nemo.MatElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    *(x::Nemo.MatElem, y::Union{Integer, Rational})
+    *(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x\times y$.
 """
-*(x::Nemo.MatElem, y::Union{Integer, Rational}) = y*x
+*(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat}) = y*x
 
 doc"""
     *{T <: RingElem}(x::Nemo.MatElem{T}, y::T)
@@ -383,10 +393,10 @@ doc"""
 *(x::Nemo.MatElem{T}, y::T) where {T <: RingElem} = y*x
 
 doc"""
-    +(x::Union{Integer, Rational}, y::Nemo.MatElem)
+    +(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
 > Return $S(x) + y$ where $S$ is the parent of $y$.
 """
-function +(x::Union{Integer, Rational}, y::Nemo.MatElem)
+function +(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
    z = similar(y)
    R = base_ring(y)
    for i = 1:rows(y)
@@ -402,10 +412,10 @@ function +(x::Union{Integer, Rational}, y::Nemo.MatElem)
 end
 
 doc"""
-    +(x::Nemo.MatElem, y::Union{Integer, Rational})
+    +(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x + S(y)$ where $S$ is the parent of $x$.
 """
-+(x::Nemo.MatElem, y::Union{Integer, Rational}) = y + x
++(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat}) = y + x
 
 doc"""
     +{T <: RingElem}(x::T, y::Nemo.MatElem{T})
@@ -432,10 +442,10 @@ doc"""
 +(x::Nemo.MatElem{T}, y::T) where {T <: RingElem} = y + x
 
 doc"""
-    -(x::Union{Integer, Rational}, y::Nemo.MatElem)
+    -(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
 > Return $S(x) - y$ where $S$ is the parent of $y$.
 """
-function -(x::Union{Integer, Rational}, y::Nemo.MatElem)
+function -(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
    z = similar(y)
    R = base_ring(y)
    for i = 1:rows(y)
@@ -451,10 +461,10 @@ function -(x::Union{Integer, Rational}, y::Nemo.MatElem)
 end
 
 doc"""
-    -(x::Nemo.MatElem, y::Union{Integer, Rational})
+    -(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x - S(y)$, where $S$ is the parent of $x$.
 """
-function -(x::Nemo.MatElem, y::Union{Integer, Rational}) 
+function -(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat}) 
    z = similar(x)
    R = base_ring(x)
    for i = 1:rows(x)
@@ -613,11 +623,11 @@ end
 ###############################################################################
 
 doc"""
-    ==(x::Nemo.MatElem, y::Union{Integer, Rational})
+    ==(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 > otherwise return `false`.
 """
-function ==(x::Nemo.MatElem, y::Union{Integer, Rational}) 
+function ==(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat}) 
    for i = 1:min(rows(x), cols(x))
       if x[i, i] != y
          return false
@@ -634,11 +644,11 @@ function ==(x::Nemo.MatElem, y::Union{Integer, Rational})
 end
 
 doc"""
-    ==(x::Union{Integer, Rational}, y::Nemo.MatElem)
+    ==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
 > Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
 > otherwise return `false`.
 """
-==(x::Union{Integer, Rational}, y::Nemo.MatElem) = y == x
+==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem) = y == x
 
 doc"""
     =={T <: RingElem}(x::Nemo.MatElem{T}, y::T)
@@ -675,11 +685,11 @@ doc"""
 ###############################################################################
 
 doc"""
-    divexact(x::Nemo.MatElem, y::Union{Integer, Rational})
+    divexact(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x/y$, i.e. the matrix where each of the entries has been divided by
 > $y$. Each division is expected to be exact.
 """
-function divexact(x::Nemo.MatElem, y::Union{Integer, Rational})
+function divexact(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
    z = similar(x)
    for i = 1:rows(x)
       for j = 1:cols(x)

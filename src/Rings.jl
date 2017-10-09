@@ -164,6 +164,8 @@ include("julia/Integer.jl")
 
 include("julia/Rational.jl")
 
+include("julia/Float.jl")
+
 include("flint/fmpz.jl")
 
 include("flint/fmpz_poly.jl")

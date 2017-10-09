@@ -55,9 +55,8 @@ function getindex!(z::arb, x::arb_mat, r::Int, c::Int)
   return z
 end
 
-function getindex(x::arb_mat, r::Int, c::Int)
-  _checkbounds(rows(x), r) || throw(BoundsError())
-  _checkbounds(cols(x), c) || throw(BoundsError())
+@inline function getindex(x::arb_mat, r::Int, c::Int)
+  @boundscheck Generic._checkbounds(x, r, c)
 
   z = base_ring(x)()
   v = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
@@ -68,9 +67,8 @@ end
 
 for T in [Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, AbstractString]
    @eval begin
-      function setindex!(x::arb_mat, y::$T, r::Int, c::Int)
-         _checkbounds(rows(x), r) || throw(BoundsError())
-         _checkbounds(cols(x), c) || throw(BoundsError())
+      @inline function setindex!(x::arb_mat, y::$T, r::Int, c::Int)
+         @boundscheck Generic._checkbounds(x, r, c)
 
          z = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
                    (Ptr{arb_mat}, Int, Int), &x, r - 1, c - 1)
@@ -79,9 +77,12 @@ for T in [Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, AbstractString]
    end
 end
 
-setindex!(x::arb_mat, y::Integer, r::Int, c::Int) = setindex!(x, fmpz(y), r, c)
+Base.@propagate_inbounds setindex!(x::arb_mat, y::Integer,
+                                 r::Int, c::Int) =
+         setindex!(x, fmpz(y), r, c)
 
-setindex!(x::arb_mat, y::Rational{T}, r::Int, c::Int) where {T <: Integer} =
+Base.@propagate_inbounds setindex!(x::arb_mat, y::Rational{T},
+                                 r::Int, c::Int) where {T <: Integer} =
          setindex!(x, fmpz(y), r, c)
 
 zero(a::ArbMatSpace) = a()
@@ -587,8 +588,8 @@ end
 ################################################################################
 
 function swap_rows(x::arb_mat, i::Int, j::Int)
-  _checkbounds(rows(x), i) || throw(BoundsError())
-  _checkbounds(rows(x), j) || throw(BoundsError())
+  Generic._checkbounds(rows(x), i) || throw(BoundsError())
+  Generic._checkbounds(rows(x), j) || throw(BoundsError())
   z = deepcopy(x)
   swap_rows!(z, i, j)
   return z

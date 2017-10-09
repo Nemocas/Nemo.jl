@@ -33,7 +33,7 @@ export PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
 export PolyRing, SeriesRing, AbsSeriesRing, ResRing, FracField, MatSpace,
        FinField, MPolyRing
 
-export JuliaZZ, JuliaQQ, zz, qq
+export JuliaZZ, JuliaQQ, zz, qq, JuliaRealField, RDF
 
 export PermutationGroup, ZZ, QQ, PadicField, FiniteField, RealField, ComplexField,
        CyclotomicField, MaximalRealSubfield, NumberField

@@ -55,9 +55,8 @@ function getindex!(z::acb, x::acb_mat, r::Int, c::Int)
   return z
 end
 
-function getindex(x::acb_mat, r::Int, c::Int)
-  _checkbounds(rows(x), r) || throw(BoundsError())
-  _checkbounds(cols(x), c) || throw(BoundsError())
+@inline function getindex(x::acb_mat, r::Int, c::Int)
+  @boundscheck Generic._checkbounds(x, r, c)
 
   z = base_ring(x)()
   v = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
@@ -68,9 +67,8 @@ end
 
 for T in [Integer, Float64, fmpz, fmpq, arb, BigFloat, acb, AbstractString]
    @eval begin
-      function setindex!(x::acb_mat, y::$T, r::Int, c::Int)
-         _checkbounds(rows(x), r) || throw(BoundsError())
-         _checkbounds(cols(x), c) || throw(BoundsError())
+      @inline function setindex!(x::acb_mat, y::$T, r::Int, c::Int)
+         @boundscheck Generic._checkbounds(x, r, c)
 
          z = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
                    (Ptr{acb_mat}, Int, Int), &x, r - 1, c - 1)
@@ -79,14 +77,14 @@ for T in [Integer, Float64, fmpz, fmpq, arb, BigFloat, acb, AbstractString]
    end
 end
 
-setindex!(x::acb_mat, y::Rational{T}, r::Int, c::Int) where {T <: Integer} =
+Base.@propagate_inbounds setindex!(x::acb_mat, y::Rational{T},
+                                   r::Int, c::Int) where {T <: Integer} =
          setindex!(x, fmpq(y), r, c)
 
 for T in [Integer, Float64, fmpz, fmpq, arb, BigFloat, AbstractString]
    @eval begin
-      function setindex!(x::acb_mat, y::Tuple{$T, $T}, r::Int, c::Int)
-         _checkbounds(rows(x), r) || throw(BoundsError())
-         _checkbounds(cols(x), c) || throw(BoundsError())
+      @inline function setindex!(x::acb_mat, y::Tuple{$T, $T}, r::Int, c::Int)
+         @boundscheck Generic._checkbounds(x, r, c)
 
          z = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
                    (Ptr{acb_mat}, Int, Int), &x, r - 1, c - 1)
@@ -653,8 +651,8 @@ end
 ################################################################################
 
 function swap_rows(x::acb_mat, i::Int, j::Int)
-  _checkbounds(rows(x), i) || throw(BoundsError())
-  _checkbounds(rows(x), j) || throw(BoundsError())
+  Generic._checkbounds(rows(x), i) || throw(BoundsError())
+  Generic._checkbounds(rows(x), j) || throw(BoundsError())
   z = deepcopy(x)
   swap_rows!(z, i, j)
   return z

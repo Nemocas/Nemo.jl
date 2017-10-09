@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   Integers / BigInt
+#   Integers / Integer
 #
 ###############################################################################
 
@@ -40,6 +40,27 @@ const RationalsID = Dict{DataType, Ring}()
 
 ###############################################################################
 #
+#   Floats / AbstractFloat
+#
+###############################################################################
+
+mutable struct Floats{T <: AbstractFloat} <: Field
+   function Floats{T}() where T <: AbstractFloat
+      if haskey(FloatsID, T)
+         z = FloatsID[T]::Floats{T}
+      else 
+         z = new{T}()
+         FloatsID[T] = z
+      end
+      return z
+   end
+end
+
+const FloatsID = Dict{DataType, Field}()
+
+
+###############################################################################
+#
 #   GFField/gfelem
 #
 ###############################################################################
@@ -71,7 +92,7 @@ end
 #
 ###############################################################################
 
-const RingElement = Union{RingElem, Integer, Rational}
+const RingElement = Union{RingElem, Integer, Rational, AbstractFloat}
 
-const FieldElement = Union{FieldElem, Rational}
+const FieldElement = Union{FieldElem, Rational, AbstractFloat}
 

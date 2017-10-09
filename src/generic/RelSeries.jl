@@ -160,7 +160,7 @@ function isone(a::Nemo.RelSeriesElem)
 end
 
 doc"""
-    isgen(a::RelSeries)
+    isgen(a::RelSeriesElem)
 > Return `true` if the given power series is arithmetically equal to the
 > generator of its power series ring to its current precision, otherwise return
 > `false`.
@@ -332,7 +332,7 @@ function +(a::Nemo.RelSeriesElem{T}, b::Nemo.RelSeriesElem{T}) where {T <: RingE
       for i = 1:min(lenb, vala - valb)
          z = setcoeff!(z, i - 1, polcoeff(b, i - 1))
       end
-      for i = lenb + 1:vala - valb
+      for i = lenb + 1:min(vala - valb, lenz)
          z = setcoeff!(z, i - 1, R())
       end
       for i = vala - valb + 1:lenb
@@ -348,7 +348,7 @@ function +(a::Nemo.RelSeriesElem{T}, b::Nemo.RelSeriesElem{T}) where {T <: RingE
       for i = 1:min(lena, valb - vala)
          z = setcoeff!(z, i - 1, polcoeff(a, i - 1))
       end
-      for i = lena + 1:valb - vala
+      for i = lena + 1:min(valb - vala, lenz)
          z = setcoeff!(z, i - 1, R())
       end
       for i = valb - vala + 1:lena
@@ -390,7 +390,7 @@ function -(a::Nemo.RelSeriesElem{T}, b::Nemo.RelSeriesElem{T}) where {T <: RingE
       for i = 1:min(lenb, vala - valb)
          z = setcoeff!(z, i - 1, -polcoeff(b, i - 1))
       end
-      for i = lenb + 1:vala - valb
+      for i = lenb + 1:min(vala - valb, lenz)
          z = setcoeff!(z, i - 1, R())
       end
       for i = vala - valb + 1:lenb
@@ -406,7 +406,7 @@ function -(a::Nemo.RelSeriesElem{T}, b::Nemo.RelSeriesElem{T}) where {T <: RingE
       for i = 1:min(lena, valb - vala)
          z = setcoeff!(z, i - 1, polcoeff(a, i - 1))
       end
-      for i = lena + 1:valb - vala
+      for i = lena + 1:min(valb - vala, lenz)
          z = setcoeff!(z, i - 1, R())
       end
       for i = valb - vala + 1:lena
@@ -491,10 +491,10 @@ function *(a::T, b::Nemo.RelSeriesElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    *(a::Union{Integer, Rational}, b::Nemo.RelSeriesElem)
+    *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.RelSeriesElem)
 > Return $a\times b$.
 """
-function *(a::Union{Integer, Rational}, b::Nemo.RelSeriesElem)
+function *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.RelSeriesElem)
    len = pol_length(b)
    z = parent(b)()
    fit!(z, len)
@@ -515,10 +515,10 @@ doc"""
 *(a::Nemo.RelSeriesElem{T}, b::T) where {T <: RingElem} = b*a
 
 doc"""
-    *(a::Nemo.RelSeriesElem, b::Union{Integer, Rational})
+    *(a::Nemo.RelSeriesElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a\times b$.
 """
-*(a::Nemo.RelSeriesElem, b::Union{Integer, Rational}) = b*a
+*(a::Nemo.RelSeriesElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
 
 ###############################################################################
 #
@@ -745,18 +745,18 @@ doc"""
 ==(x::T, y::Nemo.RelSeriesElem{T}) where {T <: RingElem} = y == x
 
 doc"""
-    ==(x::Nemo.RelSeriesElem, y::Union{Integer, Rational})
+    ==(x::Nemo.RelSeriesElem, y::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Nemo.RelSeriesElem, y::Union{Integer, Rational}) = precision(x) == 0 ||
+==(x::Nemo.RelSeriesElem, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 ||
                   ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 && 
                     valuation(x) == 0 && polcoeff(x, 0) == y))
 
 doc"""
-    ==(x::Union{Integer, Rational}, y::Nemo.RelSeriesElem)
+    ==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.RelSeriesElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Union{Integer, Rational}, y::Nemo.RelSeriesElem) = y == x
+==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.RelSeriesElem) = y == x
 
 ###############################################################################
 #
@@ -790,10 +790,10 @@ end
 ###############################################################################
 
 doc"""
-    divexact(a::Nemo.RelSeriesElem, b::Union{Integer, Rational})
+    divexact(a::Nemo.RelSeriesElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a/b$ where the quotient is expected to be exact.
 """
-function divexact(x::Nemo.RelSeriesElem, y::Union{Integer, Rational})
+function divexact(x::Nemo.RelSeriesElem, y::Union{Integer, Rational, AbstractFloat})
    y == 0 && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
@@ -973,74 +973,126 @@ end
 function addeq!(c::RelSeries{T}, a::RelSeries{T}) where {T <: RingElement}
    lenc = pol_length(c)
    lena = pol_length(a)
-   precc = precision(c)
-   preca = precision(a)
    valc = valuation(c)
    vala = valuation(a)
-   prec = min(precc, preca)
-   vala = min(vala, prec)
-   valc = min(valc, prec)
-   lena = min(lena, max(0, prec - vala))
-   lenc = min(lenc, max(0, prec - valc))
    valr = min(vala, valc)
-   lenr = max(lena + vala, lenc + valc) - valr
+   precc = precision(c)
+   preca = precision(a)
+   prec = min(precc, preca)
+   mina = min(vala + lena, prec)
+   minc = min(valc + lenc, prec)
+   lenr = max(mina, minc) - valr
    R = base_ring(c)
    fit!(c, lenr)
-   if valc > vala
-      for i = lena:-1:1
-         c.coeffs[i + valc - vala] = c.coeffs[i]
+   if valc >= vala
+      for i = lenc + valc - vala:-1:max(lena, valc - vala) + 1
+         t = c.coeffs[i]
+         c.coeffs[i] = c.coeffs[i - valc + vala]
+         c.coeffs[i - valc + vala] = t
       end
-      for i = 1:min(valc, lena)
+      for i = lena:-1:valc - vala + 1
+         c.coeffs[i] = add!(c.coeffs[i], c.coeffs[i - valc + vala], a.coeffs[i])
+      end
+      for i = 1:min(lena, valc - vala)
          c.coeffs[i] = a.coeffs[i]
       end
-      for i = lena + 1:valc
+      for i = lena + 1:min(valc - vala, lenr)
          c.coeffs[i] = R()
-      end
-      for i = valc + 1:min(lena, lenc + valc - vala)
-         c.coeffs[i] = addeq!(c.coeffs[i], a.coeffs[i])
       end
       for i = lenc + valc - vala + 1:lena
          c.coeffs[i] = a.coeffs[i]
       end
    else
-      for i = 1:min(lena, lenc - vala + valc)
-         c.coeffs[i + vala - valc] = addeq!(c.coeffs[i + vala - valc], a.coeffs[i])
+      for i = lenc + 1:min(vala - valc, lenr)
+         c.coeffs[i] = R()
       end
-      for i = lenc + 1:lena + vala - valc
+      for i = vala - valc + 1:lenc
+         c.coeffs[i] = addeq!(c.coeffs[i], a.coeffs[i - vala + valc])
+      end
+      for i = max(lenc, vala - valc) + 1:lena + vala - valc
          c.coeffs[i] = a.coeffs[i - vala + valc]
       end
    end
    c.length = normalise(c, lenr)
    c.prec = prec
    c.val = valr
-   renormalise!(c)
+   renormalize!(c)
    return c
 end
 
-function add!(c::Nemo.SeriesElem{T}, a::Nemo.SeriesElem{T}, b::Nemo.SeriesElem{T}) where {T <: RingElement}
-   lena = length(a)
-   lenb = length(b)
-   prec = min(precision(a), precision(b))
-   lena = min(lena, prec)
-   lenb = min(lenb, prec)
-   lenc = max(lena, lenb)
-   fit!(c, lenc)
-   set_prec!(c, prec)
-   i = 1
-   while i <= min(lena, lenb)
-      c = setcoeff!(c, i - 1, coeff(a, i - 1) + coeff(b, i - 1))
-      i += 1
+function add!(c::RelSeries{T}, a::RelSeries{T}, b::RelSeries{T}) where {T <: RingElement}
+   if c === a
+      return addeq!(c, b)
+   elseif c === b
+      return addeq!(c, a)
    end
-   while i <= lena
-      c = setcoeff!(c, i - 1, coeff(a, i - 1))
-      i += 1
+   lena = pol_length(a)
+   lenb = pol_length(b)
+   valb = valuation(b)
+   vala = valuation(a)
+   valr = min(vala, valb)
+   precb = precision(b)
+   preca = precision(a)
+   prec = min(precb, preca)
+   mina = min(vala + lena, prec)
+   minb = min(valb + lenb, prec)
+   lenr = max(mina, minb) - valr
+   R = base_ring(c)
+   fit!(c, lenr)
+   c.prec = prec
+   c.val = valr
+   if vala > valb
+      for i = 1:min(lenb, vala - valb)
+         c.coeffs[i] = b.coeffs[i]
+      end
+      for i = lenb + 1:vala - valb
+         c.coeffs[i] = R()
+      end
+      for i = vala - valb + 1:lenb
+         c.coeffs[i] = add!(c.coeffs[i], a.coeffs[i - vala + valb], b.coeffs[i])
+      end
+      for i = max(lenb, vala - valb) + 1:lena + vala - valb
+         c.coeffs[i] = a.coeffs[i - vala + valb]
+      end
+      for i = lena + vala - valb + 1:lenb
+         c.coeffs[i] = b.coeffs[i]
+      end
+   else
+      for i = 1:min(lena, valb - vala)
+         c.coeffs[i] = a.coeffs[i]
+      end
+      for i = lena + 1:valb - vala
+         c.coeffs[i] = R()
+      end
+      for i = valb - vala + 1:lena
+         c.coeffs[i] = add!(c.coeffs[i], a.coeffs[i], b.coeffs[i - valb + vala])
+      end
+      for i = max(lena, valb - vala) + 1:lenb + valb - vala
+         c.coeffs[i] = b.coeffs[i - valb + vala]
+      end
+      for i = lenb + valb - vala + 1:lena
+         c.coeffs[i] = a.coeffs[i]
+      end
    end
-   while i <= lenb
-      c = setcoeff!(c, i - 1, coeff(b, i - 1))
-      i += 1
-   end
-   set_length!(c, normalise(c, i - 1))
+   set_length!(c, normalise(c, lenr))
+   renormalize!(c)
    return c
+end
+
+###############################################################################
+#
+#   Random elements
+#
+###############################################################################
+
+function rand(S::SeriesRing, v...)
+   R = base_ring(S)
+   f = S()
+   x = gen(S)
+   for i = 0:S.prec_max - 1
+      f += rand(R, v...)*x^i
+   end
+   return f
 end
 
 ###############################################################################
@@ -1071,7 +1123,7 @@ function (a::RelSeriesRing{T})() where {T <: RingElement}
    return z
 end
 
-function (a::RelSeriesRing{T})(b::Union{Integer, Rational}) where {T <: RingElement}
+function (a::RelSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
    if b == 0
       z = RelSeries{T}(Array{T}(0), 0, a.prec_max, a.prec_max)
    else

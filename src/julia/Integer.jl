@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   JuliaInteger.jl : Additional Nemo functionality for Julia Integer
+#   Integer.jl : Additional Nemo functionality for Julia Integer
 #
 ###############################################################################
 
@@ -16,7 +16,7 @@ zz = Integers{Int}()
 
 parent(a::T) where T <: Integer = Integers{T}()
 
-elem_type(::Integers{T}) where T <: Integer = T
+elem_type(::Type{Integers{T}}) where T <: Integer = T
  
 parent_type(::Type{T}) where T <: Integer = Integers{T}
 
@@ -105,6 +105,8 @@ end
 ###############################################################################
 
 divexact(a::T, b::T) where T <: Integer = div(a, b)
+
+divexact(a::BigInt, b::T) where T <: Integer = div(a, b)
 
 ###############################################################################
 #

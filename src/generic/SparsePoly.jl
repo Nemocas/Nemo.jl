@@ -549,7 +549,7 @@ end
 #
 ###############################################################################
 
-function *(a::SparsePoly, n::Union{Integer, Rational})
+function *(a::SparsePoly, n::Union{Integer, Rational, AbstractFloat})
    r = parent(a)()
    fit!(r, length(a))
    j = 1
@@ -583,7 +583,7 @@ end
 
 *(n::T, a::SparsePoly{T}) where {T <: RingElem} = a*n
 
-*(n::Union{Integer, Rational}, a::SparsePoly) = a*n
+*(n::Union{Integer, Rational, AbstractFloat}, a::SparsePoly) = a*n
 
 ###############################################################################
 #
@@ -609,12 +609,12 @@ end
 #
 ###############################################################################
 
-function ==(a::SparsePoly, b::Union{Integer, Rational})
+function ==(a::SparsePoly, b::Union{Integer, Rational, AbstractFloat})
    return length(a) == 0 ? b == 0 : a.length == 1 && 
           a.exps[1] == 0 && a.coeffs[1] == b
 end
 
-==(a::Union{Integer, Rational}, b::SparsePoly) = b == a
+==(a::Union{Integer, Rational, AbstractFloat}, b::SparsePoly) = b == a
 
 function ==(a::SparsePoly{T}, b::T) where T <: RingElem
    return length(a) == 0 ? b == 0 : a.length == 1 &
@@ -981,7 +981,7 @@ function divexact(a::SparsePoly{T}, b::T) where {T <: RingElem}
    return parent(a)(coeffs, exps)
 end
 
-function divexact(a::SparsePoly, b::Union{Integer, Rational})
+function divexact(a::SparsePoly, b::Union{Integer, Rational, AbstractFloat})
    len = length(a)
    exps = deepcopy(a.exps)
    coeffs = [divexact(a.coeffs[i], b) for i in 1:len]
@@ -1678,7 +1678,7 @@ function (a::SparsePolyRing{T})() where {T <: RingElement}
    return z
 end
 
-function (a::SparsePolyRing{T})(b::Union{Integer, Rational}) where {T <: RingElement}
+function (a::SparsePolyRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
    z = SparsePoly{T}(base_ring(a)(b))
    z.parent = a
    return z
