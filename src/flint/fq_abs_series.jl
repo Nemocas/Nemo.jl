@@ -223,7 +223,7 @@ function *(x::fq, y::fq_abs_series)
    z.prec = y.prec
    ccall((:fq_poly_scalar_mul_fq, :libflint), Void, 
          (Ptr{fq_abs_series}, Ptr{fq_abs_series}, Ptr{fq}, Ptr{FqFiniteField}), 
-               &z, &y, &x, &base_ring(x))
+               &z, &y, &x, &base_ring(y))
    return z
 end
 
