@@ -81,6 +81,8 @@ canonical_unit(a::fmpq_poly) = canonical_unit(lead(a))
 #
 ###############################################################################
 
+#=
+#use the generic one to print //
 function show(io::IO, x::fmpq_poly)
    if length(x) == 0
       print(io, "0")
@@ -93,6 +95,7 @@ function show(io::IO, x::fmpq_poly)
       ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), cstr)
    end
 end
+=#
 
 function show(io::IO, p::FmpqPolyRing)
    print(io, "Univariate Polynomial Ring in ")
