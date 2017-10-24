@@ -1757,7 +1757,7 @@ function test_gen_poly_newton_representation()
       f = rand(R, 0:10, -100:100)
 
       g = deepcopy(f)
-      roots = [rand(JuliaZZ, -10:10) for i in 1:length(f)]
+      roots = BigInt[rand(JuliaZZ, -10:10) for i in 1:length(f)]
       monomial_to_newton!(g.coeffs, roots)
       newton_to_monomial!(g.coeffs, roots)
 

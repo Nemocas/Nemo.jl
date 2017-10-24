@@ -2611,6 +2611,28 @@ function (a::PolyRing{T})(b::Array{S, 1}) where {S <: RingElement, T <: RingElem
    return z
 end
 
+# Functions to remove ambiguities on julia 0.7
+function (a::PolyRing{T})(b::T) where {T <: Rational}
+   parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
+   z = Poly{T}(b)
+   z.parent = a
+   return z
+end
+
+function (a::PolyRing{T})(b::T) where {T <: AbstractFloat}
+   parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
+   z = Poly{T}(b)
+   z.parent = a
+   return z
+end
+
+function (a::PolyRing{T})(b::T) where {T <: Integer}
+   parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
+   z = Poly{T}(b)
+   z.parent = a
+   return z
+end
+
 ###############################################################################
 #
 #   PolynomialRing constructor
