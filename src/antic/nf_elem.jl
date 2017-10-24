@@ -225,10 +225,13 @@ function show(io::IO, x::nf_elem)
    cstr = ccall((:nf_elem_get_str_pretty, :libflint), Ptr{UInt8},
                 (Ptr{nf_elem}, Ptr{UInt8}, Ptr{AnticNumberField}),
                  &x, string(var(parent(x))), &parent(x))
-
-   print(io, unsafe_string(cstr))
-
+   s = unsafe_string(cstr)              
    ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), cstr)
+
+   s = replace(s, "/", "//")
+
+   print(io, s)
+
 end
 
 needs_parentheses(::Nemo.nf_elem) = true
