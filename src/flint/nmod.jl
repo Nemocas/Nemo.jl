@@ -66,7 +66,16 @@ end
 #
 ###############################################################################
 
-canonical_unit(x::nmod) = x
+function canonical_unit(x::nmod)
+  #the simple return x does not work
+  # - if x == 0, this is not a unit
+  # - if R is not a field....
+  if iszero(x)
+    return parent(x)(0)
+  end
+  g = gcd(data(x), fmpz(modulus(x)))
+  return parent(x)(div(data(x), g))
+end
 
 ###############################################################################
 #

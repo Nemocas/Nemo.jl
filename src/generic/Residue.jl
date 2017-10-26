@@ -44,7 +44,7 @@ end
 function check_parent(a::Nemo.ResElem, b::Nemo.ResElem)
    if parent(a) != parent(b)
       check_parent_type(parent(a), parent(b))
-      a.hash != b.hash && error("Incompatible moduli in residue operation")
+      parent(a).modulus != parent(b).modulus && error("Incompatible moduli in residue operation") #CF: maybe extend to divisibility?
    end
 end
 
@@ -124,7 +124,17 @@ deepcopy_internal(a::Nemo.ResElem, dict::ObjectIdDict) =
 #
 ###############################################################################
 
-canonical_unit(a::Nemo.ResElem) = a
+function canonical_unit(a::Nemo.ResElem) 
+  R = parent(a)
+  if iszero(a)
+    return R(1)
+  end
+  m = modulus(a)
+  A = data(a)
+  g = gcd(m, A)
+  return R(divexact(A, g))
+end
+
 
 ###############################################################################
 #
