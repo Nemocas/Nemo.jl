@@ -73,7 +73,7 @@ function canonical_unit(x::nmod)
   if iszero(x)
     return parent(x)(0)
   end
-  g = gcd(data(x), fmpz(modulus(x)))
+  g = gcd(data(x), modulus(x))
   return parent(x)(div(data(x), g))
 end
 
