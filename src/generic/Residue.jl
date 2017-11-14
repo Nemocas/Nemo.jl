@@ -111,7 +111,7 @@ doc"""
 > it belongs to, otherwise return `false`.
 """
 function isunit(a::Nemo.ResElem)
-   g, ainv = gcdinv(data(a), modulus(a))
+   g = gcd(data(a), modulus(a))
    return isone(g)
 end
 
@@ -124,15 +124,24 @@ deepcopy_internal(a::Nemo.ResElem, dict::ObjectIdDict) =
 #
 ###############################################################################
 
-function canonical_unit(a::Nemo.ResElem) 
-  R = parent(a)
-  if iszero(a)
-    return R(1)
+function canonical_unit(x::Nemo.ResElem{<:Union{Integer, RingElem}})
+ #the simple return x does not work
+  # - if x == 0, this is not a unit
+  # - if R is not a field....
+  if iszero(x)
+    return one(parent(x))
   end
-  m = modulus(a)
-  A = data(a)
-  g = gcd(m, A)
-  return R(divexact(A, g))
+  g = gcd(modulus(x), data(x))
+  u = divexact(data(x), g)
+  a, b = ppio(modulus(x), u)
+  if isone(a)
+    r = u
+  elseif isone(b)
+    r = b
+  else
+    r = crt(one(parent(a)), a, u, b)
+  end
+  return parent(x)(r)
 end
 
 
@@ -397,16 +406,32 @@ doc"""
 """
 function divexact(a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
-   g, binv = gcdinv(data(b), modulus(b))
-   if g != 1
+   fl, q = divides(a, b)
+   if !fl
       error("Impossible inverse in divexact")
    end
-   return parent(a)(data(a) * binv)
+   return q
 end
 
 function divides(a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
+   check_parent(a, b)
    iszero(b) && error("Division by zero in divides")
-   return true, divexact(a, b)
+   if iszero(a)
+      return true, a 
+   end
+   A = data(a)
+   B = data(b)
+   R = parent(a)
+   m = modulus(R)
+   gb = gcd(B, m)
+   ub = divexact(B, gb)
+   q, r = divrem(A, gb)
+   if !iszero(r)
+     return false, b
+   end
+   _, x = ppio(m, ub)
+   rs = R(q*invmod(ub, x))
+   return true, rs
 end
 
 ###############################################################################

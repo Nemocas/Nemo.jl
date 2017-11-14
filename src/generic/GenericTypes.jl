@@ -279,6 +279,10 @@ mutable struct ResRing{T <: RingElement} <: Nemo.ResRing{T}
    modulus::T
 
    function ResRing{T}(modulus::T, cached::Bool = true) where T <: RingElement
+      c = canonical_unit(modulus)
+      if !isone(c)
+        modulus = divexact(modulus, c)
+      end
       if haskey(ModulusDict, (parent(modulus), modulus))
          return ModulusDict[parent(modulus), modulus]::ResRing{T}
       else
