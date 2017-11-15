@@ -71,7 +71,7 @@ function canonical_unit(x::nmod)
   # - if x == 0, this is not a unit
   # - if R is not a field....
   if iszero(x)
-    return parent(x)(0)
+    return parent(x)(1)
   end
   g = gcd(modulus(x), data(x))
   u = divexact(data(x), g)

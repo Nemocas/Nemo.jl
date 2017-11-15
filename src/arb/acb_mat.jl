@@ -5,7 +5,7 @@
 ###############################################################################
 
 export rows, cols, zero, one, deepcopy, -, transpose, +, *, &, ==, !=,
-       strongequal, overlaps, contains, inv, divexact, charpoly, det, exp,
+       strongequal, overlaps, contains, inv, divexact, charpoly, det,
        lufact, lufact!, solve, solve!, solve_lu_precomp, solve_lu_precomp!,
        swap_rows, swap_rows!, bound_inf_norm, isreal
 
@@ -458,7 +458,7 @@ isreal(x::acb_mat) =
 doc"""
     inv(M::acb_mat)
 > Given a $n\times n$ matrix of type `acb_mat`, return an
-> $n\times n$ matrix $X$ such that $AX$ contains the 
+> $n\times n$ matrix $X$ such that $AX$ contains the
 > identity matrix. If $A$ cannot be inverted numerically an exception is raised.
 """
 function inv(x::acb_mat)
@@ -565,7 +565,7 @@ doc"""
     exp(x::acb_mat)
 > Returns the exponential of the matrix $x$.
 """
-function exp(x::acb_mat)
+function Base.exp(x::acb_mat)
   cols(x) != rows(x) && error("Matrix must be square")
   z = similar(x)
   ccall((:acb_mat_exp, :libarb), Void,
@@ -742,7 +742,7 @@ for T in [Float64, fmpz, fmpq, BigFloat, arb, acb, String]
          z.base_ring = x.base_ring
          return z
       end
-      
+
       function (x::AcbMatSpace)(y::Array{$T, 1})
          _check_dim(x.rows, x.cols, y)
          z = acb_mat(x.rows, x.cols, y, prec(x))
@@ -768,7 +768,7 @@ for T in [Float64, fmpz, fmpq, BigFloat, arb, String]
          z.base_ring = x.base_ring
          return z
       end
-      
+
       function (x::AcbMatSpace)(y::Array{Tuple{$T, $T}, 1})
          _check_dim(x.rows, x.cols, y)
          z = acb_mat(x.rows, x.cols, y, prec(x))
@@ -778,16 +778,16 @@ for T in [Float64, fmpz, fmpq, BigFloat, arb, String]
    end
 end
 
-(x::AcbMatSpace)(y::Array{Tuple{T, T}, 2}) where {T <: Integer} = 
+(x::AcbMatSpace)(y::Array{Tuple{T, T}, 2}) where {T <: Integer} =
          x(map(z -> (fmpz(z[1]), fmpz(z[2])), y))
 
-(x::AcbMatSpace)(y::Array{Tuple{T, T}, 1}) where {T <: Integer} = 
+(x::AcbMatSpace)(y::Array{Tuple{T, T}, 1}) where {T <: Integer} =
          x(map(z -> (fmpz(z[1]), fmpz(z[2])), y))
 
-(x::AcbMatSpace)(y::Array{Tuple{Rational{T}, Rational{T}}, 2}) where {T <: Integer} = 
+(x::AcbMatSpace)(y::Array{Tuple{Rational{T}, Rational{T}}, 2}) where {T <: Integer} =
          x(map(z -> (fmpq(z[1]), fmpq(z[2])), y))
 
-(x::AcbMatSpace)(y::Array{Tuple{Rational{T}, Rational{T}}, 1}) where {T <: Integer} = 
+(x::AcbMatSpace)(y::Array{Tuple{Rational{T}, Rational{T}}, 1}) where {T <: Integer} =
          x(map(z -> (fmpq(z[1]), fmpq(z[2])), y))
 
 for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb, acb, String]

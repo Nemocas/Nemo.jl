@@ -4,7 +4,7 @@ module Nemo
 
 import Base: Array, abs, asin, asinh, atan, atanh, base, bin, checkbounds,
              conj, convert, cmp, contains, cos, cosh, dec, deepcopy,
-             deepcopy_internal, den, deserialize, det, div, divrem, exp, eye,
+             deepcopy_internal, den, deserialize, det, div, divrem, eye,
              gcd, gcdx, getindex, hash, hcat, hex, intersect, inv, invmod,
              isequal, isfinite, isless, isqrt, isreal, iszero, lcm,
              ldexp, length, log, lufact, lufact!, mod, ndigits, nextpow2, norm,
@@ -19,7 +19,7 @@ if VERSION >= v"0.7.0-DEV.1144"
 import Base: isone
 end
 
-import Base: floor, ceil, hypot, sqrt, log, log1p, exp, expm1, sin, cos, sinpi,
+import Base: floor, ceil, hypot, sqrt, log, log1p, expm1, sin, cos, sinpi,
              cospi, tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh,
              asinh, acosh, gamma, lgamma, sinpi, cospi, atan2
 
@@ -202,7 +202,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  chebyshev_u, _check_dim, check_parent, coeff, cols, compose,
                  content, cycles, data, degree, den, derivative, det, det_clow,
                  det_df, det_fflu, det_popov, dim, discriminant, divexact,
-                 divides, divrem, elem_type, elements, evaluate, exp,
+                 divides, divrem, elem_type, elements, evaluate,
                  extended_weak_popov, extended_weak_popov_with_trafo, fflu!,
                  fflu, find_pivot_popov, fit!, gcd, gen, gens, gcdinv, gcdx,
                  gram, has_left_neighbor, has_bottom_neighbor, hash,
@@ -239,7 +239,7 @@ export add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  chebyshev_u, _check_dim, check_parent, coeff, cols, compose,
                  content, cycles, data, degree, den, derivative, det, det_clow,
                  det_df, det_fflu, det_popov, dim, discriminant, divexact,
-                 divides, divrem, elem_type, elements, evaluate, exp,
+                 divides, divrem, elem_type, elements, evaluate,
                  extended_weak_popov, extended_weak_popov_with_trafo, fflu!,
                  fflu, find_pivot_popov, fit!, gcd, gen, gens, gcdinv, gcdx,
                  gram, has_left_neighbor, has_bottom_neighbor, hash,
@@ -269,6 +269,10 @@ export add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  trail, truncate, typed_hcat, typed_hvcat, valuation, var,
                  vars, weak_popov, weak_popov_with_trafo, zero, zero!,
                  zero_matrix, ppio
+
+function exp(a::T) where T
+   return Base.exp(a)
+end
 
 function PermGroup(n::Int, cached=true)
    Generic.PermGroup(n, cached)
@@ -374,7 +378,7 @@ function typed_hvcat(R::Ring, dims, d...)
       for j = 1:c
          A[i, j] = R(d[(i - 1)*c + j])
       end
-   end 
+   end
    S = matrix(R, A)
    return S
 end
@@ -440,7 +444,7 @@ end
 
 function create_accessors(T, S, handle)
    get = function(a)
-      if handle > length(a.auxilliary_data) || 
+      if handle > length(a.auxilliary_data) ||
          !isassigned(a.auxilliary_data, handle)
         throw(AccessorNotSetError())
       end

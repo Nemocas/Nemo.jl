@@ -87,6 +87,14 @@ function randelem(R::Generic.ResRing{BigInt}, n)
    return rand(R, -n:n)
 end
 
+function randelem(R::Nemo.Rationals{BigInt}, n)
+   z = BigInt(rand(-n:n))
+   while iszero(z)
+      z = BigInt(rand(-n:n))
+   end
+   return BigInt(rand(-n:n))//z
+end
+
 function randelem(R::Nemo.NmodRing, n)
    return rand(R, -n:n)
 end
@@ -128,7 +136,7 @@ function randmat(R::Generic.MatSpace{T}, d::Int, c::Int) where {T <: RingElem}
    return r
 end
 
-function randmat(S::Generic.MatSpace{T}) where {T <: RingElem}
+function randmat(S::Generic.MatSpace{T}) where {T <: Nemo.RingElement}
    M = S()
    m = rows(M)
    n = cols(M)
@@ -140,7 +148,7 @@ function randmat(S::Generic.MatSpace{T}) where {T <: RingElem}
    return M
 end
 
-function randmat(S::Generic.MatSpace{T}, c::Int) where {T <: RingElem}
+function randmat(S::Generic.MatSpace{T}, c::Int) where {T <: Nemo.RingElement}
    M = S()
    m = rows(M)
    n = cols(M)
@@ -188,7 +196,7 @@ function randmat_triu(S::Generic.MatSpace{T}, c::Int) where {T <: RingElem}
    return M
 end
 
-function randmat_with_rank(R::Generic.MatSpace{T}, d::Int, c::Int, rank::Int) where {T <: RingElem}
+function randmat_with_rank(R::Generic.MatSpace{T}, d::Int, c::Int, rank::Int) where {T <: Nemo.RingElement}
    m = R.rows
    n = R.cols
    r = R()
@@ -223,7 +231,7 @@ function randmat_with_rank(R::Generic.MatSpace{T}, d::Int, c::Int, rank::Int) wh
    return r
 end
 
-function randmat_with_rank(S::Generic.MatSpace{T}, c::Int, rank::Int) where {T <: RingElem}
+function randmat_with_rank(S::Generic.MatSpace{T}, c::Int, rank::Int) where {T <: Nemo.RingElement}
    M = S()
    m = rows(M)
    n = cols(M)
@@ -703,6 +711,17 @@ function test_gen_mat_fflu()
    @test r == 2
    @test P*A == L*D*U
 
+   A = matrix(JuliaQQ, 3, 3, [0, 0, 1, 12, 1, 11, 1, 0, 1])
+
+   r, d, P, L, U, = fflu(A)
+
+   D = zero_matrix(JuliaQQ, 3, 3)
+   D[1, 1] = inv(U[1, 1])
+   D[2, 2] = inv(U[1, 1]*U[2, 2])
+   D[3, 3] = inv(U[2, 2])
+   @test r == 3
+   @test P*A == L*D*U
+
    println("PASS")
 end
 
@@ -822,6 +841,44 @@ function test_gen_mat_rank()
    end
 
    println("PASS")   
+end
+
+function test_gen_mat_solve_lu()
+   print("Generic.Mat.solve_lu...")
+
+   S = JuliaQQ
+
+   for dim = 0:5
+      R = MatrixSpace(S, dim, dim)
+      U = MatrixSpace(S, dim, rand(1:5))
+
+      M = randmat_with_rank(R, 100, dim);
+      b = randmat(U, 100);
+
+      x = Generic.solve_lu(M, b)
+
+      @test M*x == b
+   end
+
+   S, y = PolynomialRing(JuliaZZ, "y")
+   K = FractionField(S)
+
+   for dim = 0:5
+      R = MatrixSpace(S, dim, dim)
+      U = MatrixSpace(S, dim, rand(1:5))
+
+      M = randmat_with_rank(R, 5, 100, dim);
+      b = randmat(U, 5, 100);
+
+      MK = matrix(K, elem_type(K)[ K(M[i, j]) for i in 1:rows(M), j in 1:cols(M) ])
+      bK = matrix(K, elem_type(K)[ K(b[i, j]) for i in 1:rows(b), j in 1:cols(b) ])
+
+      x = Generic.solve_lu(MK, bK)
+
+      @test MK*x == bK
+   end
+
+   println("PASS")
 end
 
 function test_gen_mat_solve_rational()
@@ -1632,6 +1689,7 @@ function test_gen_mat()
    test_gen_mat_fflu()
    test_gen_mat_det()
    test_gen_mat_rank()
+   test_gen_mat_solve_lu()
    test_gen_mat_solve_rational()
    test_gen_mat_solve_triu()
    test_gen_mat_rref()

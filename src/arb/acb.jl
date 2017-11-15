@@ -7,13 +7,13 @@
 #
 ###############################################################################
 
-import Base: real, imag, abs, conj, angle, sqrt, log, log1p, exp, sin, cos,
+import Base: real, imag, abs, conj, angle, sqrt, log, log1p, sin, cos,
              tan, cot, sinpi, cospi, sinh, cosh, tanh, coth, atan, gamma,
              lgamma, gamma
 
 export one, onei, real, imag, conj, abs, inv, angle, isreal
 
-export sqrt, rsqrt, log, log1p, exp, exppii, sin, cos, tan, cot,
+export sqrt, rsqrt, log, log1p, exppii, sin, cos, tan, cot,
        sinpi, cospi, tanpi, cotpi, sincos, sincospi, sinh, cosh, tanh, coth,
        sinhcosh, atan, logsinpi, gamma, rgamma, lgamma, digamma, risingfac,
        risingfac2, polygamma, polylog, zeta, barnesg, logbarnesg, agm,
@@ -37,14 +37,14 @@ doc"""
 > Returns `Union{}` since an Arb complex field does not depend on any other
 > ring.
 """
-base_ring(R::AcbField) = Union{} 
+base_ring(R::AcbField) = Union{}
 
 doc"""
     base_ring(a::acb)
 > Returns `Union{}` since an Arb complex field does not depend on any other
 > ring.
 """
-base_ring(a::acb) = Union{} 
+base_ring(a::acb) = Union{}
 
 doc"""
     parent(x::acb)
@@ -56,7 +56,7 @@ isexact(R::AcbField) = false
 
 doc"""
     zero(R::AcbField)
-> Return exact zero in the given Arb complex field. 
+> Return exact zero in the given Arb complex field.
 """
 function zero(r::AcbField)
   z = acb()
@@ -66,7 +66,7 @@ end
 
 doc"""
     one(R::AcbField)
-> Return exact one in the given Arb complex field. 
+> Return exact one in the given Arb complex field.
 """
 function one(r::AcbField)
   z = acb()
@@ -77,7 +77,7 @@ end
 
 doc"""
     onei(R::AcbField)
-> Return exact one times $i$ in the given Arb complex field. 
+> Return exact one times $i$ in the given Arb complex field.
 """
 function onei(r::AcbField)
   z = acb()
@@ -102,7 +102,7 @@ function deepcopy_internal(a::acb, dict::ObjectIdDict)
   return b
 end
 
-# TODO: implement hash 
+# TODO: implement hash
 
 ################################################################################
 #
@@ -366,7 +366,7 @@ divexact(x::acb, y::Rational{T}) where {T <: Integer} = x // y
 //(x::Float64, y::acb) = parent(y)(x) // y
 //(x::acb, y::Float64) = x // parent(x)(y)
 ^(x::Float64, y::acb) = parent(y)(x)^y
-^(x::acb, y::Float64) = x ^ parent(x)(y) 
+^(x::acb, y::Float64) = x ^ parent(x)(y)
 
 +(x::BigFloat, y::acb) = parent(y)(x) + y
 +(x::acb, y::BigFloat) = x + parent(x)(y)
@@ -377,7 +377,7 @@ divexact(x::acb, y::Rational{T}) where {T <: Integer} = x // y
 //(x::BigFloat, y::acb) = parent(y)(x) // y
 //(x::acb, y::BigFloat) = x // parent(x)(y)
 ^(x::BigFloat, y::acb) = parent(y)(x)^y
-^(x::acb, y::BigFloat) = x ^ parent(x)(y) 
+^(x::acb, y::BigFloat) = x ^ parent(x)(y)
 
 ################################################################################
 #
@@ -750,7 +750,7 @@ doc"""
     exp(x::acb)
 > Return the exponential of $x$.
 """
-function exp(x::acb)
+function Base.exp(x::acb)
    z = parent(x)()
    ccall((:acb_exp, :libarb), Void, (Ptr{acb}, Ptr{acb}, Int), &z, &x, parent(x).prec)
    return z
@@ -1106,7 +1106,7 @@ function moddelta(x::acb)
    ccall((:acb_modular_delta, :libarb), Void, (Ptr{acb}, Ptr{acb}, Int), &z, &x, parent(x).prec)
    return z
 end
-  
+
 doc"""
     ellipk(x::acb)
 > Return the complete elliptic integral $K(x)$.
@@ -1215,7 +1215,7 @@ risingfac2(x::acb, n::Int) = n < 0 ? throw(DomainError()) : risingfac2(x, UInt(n
 
 doc"""
     polylog(s::acb, a::acb)
-> 
+>
 """
 function polylog(s::acb, a::acb)
   z = parent(s)()
@@ -1551,7 +1551,7 @@ for (typeofx, passtoc) in ((acb, Ref{acb}), (Ptr{acb}, Ptr{acb}))
       i = ccall((:acb_imag_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
       _arb_set(i, z, p)
     end
-    
+
     function _acb_set(x::($typeofx), y::T, z::T, p::Int) where {T <: AbstractString}
       r = ccall((:acb_real_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
       _arb_set(r, y, p)
@@ -1569,7 +1569,7 @@ for (typeofx, passtoc) in ((acb, Ref{acb}), (Ptr{acb}, Ptr{acb}))
         i = ccall((:acb_imag_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
         _arb_set(i, z)
       end
-      
+
       function _acb_set(x::($typeofx), y::($T), z::($T), p::Int)
         r = ccall((:acb_real_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
         _arb_set(r, y, p)

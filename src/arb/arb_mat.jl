@@ -5,7 +5,7 @@
 ###############################################################################
 
 export rows, cols, zero, one, deepcopy, -, transpose, +, *, &, ==, !=,
-       strongequal, overlaps, contains, inv, divexact, charpoly, det, exp,
+       strongequal, overlaps, contains, inv, divexact, charpoly, det,
        lufact, lufact!, solve, solve!, solve_lu_precomp, solve_lu_precomp!,
        swap_rows, swap_rows!, bound_inf_norm
 
@@ -410,7 +410,7 @@ end
 doc"""
     inv(M::arb_mat)
 > Given a  $n\times n$ matrix of type `arb_mat`, return an
-> $n\times n$ matrix $X$ such that $AX$ contains the 
+> $n\times n$ matrix $X$ such that $AX$ contains the
 > identity matrix. If $A$ cannot be inverted numerically an exception is raised.
 """
 function inv(x::arb_mat)
@@ -501,7 +501,7 @@ doc"""
     exp(x::arb_mat)
 > Returns the exponential of the matrix $x$.
 """
-function exp(x::arb_mat)
+function Base.exp(x::arb_mat)
   cols(x) != rows(x) && error("Matrix must be square")
   z = similar(x)
   ccall((:arb_mat_exp, :libarb), Void,
@@ -792,4 +792,3 @@ function MatrixSpace(R::ArbField, r::Int, c::Int; cached = true)
   (r <= 0 || c <= 0) && error("Dimensions must be positive")
   return ArbMatSpace(R, r, c, cached)
 end
-

@@ -17,7 +17,7 @@ qq = Rationals{Int}()
 parent(a::Rational{T}) where T <: Integer = Rationals{T}()
 
 elem_type(::Type{Rationals{T}}) where T <: Integer = Rational{T}
-  
+
 parent_type(::Type{Rational{T}}) where T <: Integer = Rationals{T}
 
 base_ring(a::Rational{Int}) = zz
@@ -110,6 +110,17 @@ function gcd(p::Rational{T}, q::Rational{T}) where T <: Integer
    else
       return Rational{T}(n, d)
    end
+end
+
+###############################################################################
+#
+#   Exponential
+#
+###############################################################################
+
+function exp(a::Rational{T}) where T <: Integer
+   a != 0 && throw(DomainError())
+   return Rational{T}(1)
 end
 
 ###############################################################################

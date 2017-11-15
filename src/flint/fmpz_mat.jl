@@ -1026,6 +1026,10 @@ function solve_rational(a::fmpz_mat, b::fmpz_mat)
    return z, d
 end
 
+function Generic.solve_with_det(a::fmpz_mat, b::fmpz_mat)
+   return solve_rational(a, b)
+end
+
 doc"""
     solve_dixon(a::fmpz_mat, b::fmpz_mat)
 > Return a tuple $(x, m)$ consisting of a column vector $x$ such that $ax = b
