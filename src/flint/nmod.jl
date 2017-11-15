@@ -276,6 +276,11 @@ end
 # or c = gcd(a, b^infty), n = div(a, c)
 # is used in various euclidean domains to initiate crt stuff
 
+doc"""
+   ppio(a::T, b::T) -> T
+
+> Split $a$ into $c*d$ where $c = gcd(a, b^\infty)$.
+"""
 function ppio(a::E, b::E) where E <: Integer
    c = gcd(a, b)
    n = div(a, c)
