@@ -29,7 +29,9 @@ function isdomain_type(::Type{T}) where {S <: RingElement, T <: Nemo.MPolyElem{S
    return isdomain_type(S)
 end
 
-isexact(R::MPolyRing) = isexact(base_ring(R))
+function isexact_type(a::Type{T}) where {S <: RingElement, T <: Nemo.MPolyElem{S}}
+   return isexact_type(S)
+end
 
 doc"""
     vars(a::MPolyRing)

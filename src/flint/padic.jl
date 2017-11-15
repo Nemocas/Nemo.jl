@@ -86,7 +86,7 @@ parent(a::padic) = a.parent
 
 isdomain_type(::Type{padic}) = true
 
-isexact(R::FlintPadicField) = false
+isexact_type(R::Type{padic}) = false
 
 function check_parent(a::padic, b::padic)
    parent(a) != parent(b) &&

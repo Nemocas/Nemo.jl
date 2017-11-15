@@ -24,7 +24,7 @@ base_ring(a::AbstractFloat) = Union{}
 
 isdomain_type(::Type{T}) where T <: AbstractFloat = true
 
-isexact(::Floats{T}) where T <: AbstractFloat = false
+isexact_type(::Type{T}) where T <: AbstractFloat = false
 
 ###############################################################################
 #

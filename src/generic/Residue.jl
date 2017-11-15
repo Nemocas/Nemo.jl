@@ -37,7 +37,9 @@ parent(a::Nemo.ResElem) = a.parent
 
 isdomain_type(a::Type{T}) where T <: Nemo.ResElem = false
 
-isexact(R::Nemo.ResRing) = isexact(base_ring(R))
+function isexact_type(a::Type{T}) where {S <: RingElement, T <: Nemo.ResElem{S}}
+   return isexact_type(S)
+end
 
 function check_parent_type(a::Nemo.ResRing{T}, b::Nemo.ResRing{T}) where {T <: RingElement}
    # exists only to check types of parents agree

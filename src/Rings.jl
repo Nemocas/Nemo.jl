@@ -128,21 +128,17 @@ end
 
 ###############################################################################
 #
-#   isexact
+#   Type traits
 #
 ###############################################################################
 
-# Rings are exact unless otherwise specified
-isexact(R::Ring) = true
+# Type can only represent elements of an exact ring
+# true unless explicitly specified
+isexact_type(R::Type{T}) where T <: RingElem = true
 
-###############################################################################
-#
-#   isdomain_type
-#
-###############################################################################
-
-# Rings are not domain types unless explicitly specified
-isdomain_type(R::RingElem) = false
+# Type can only represent elements of domains
+# false unless explicitly specified
+isdomain_type(R::Type{T}) where T <: RingElem = false
 
 ###############################################################################
 #

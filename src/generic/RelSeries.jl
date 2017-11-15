@@ -51,7 +51,7 @@ function isdomain_type(::Type{T}) where {S <: RingElement, T <: Nemo.SeriesElem{
    return isdomain_type(S)
 end
 
-isexact(R::RelSeriesRing) = false
+isexact_type(a::Type{T}) where T <: Nemo.SeriesElem = false
 
 doc"""
     var(a::SeriesRing)
