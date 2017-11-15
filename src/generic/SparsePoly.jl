@@ -17,10 +17,12 @@ parent_type(::Type{SparsePoly{T}}) where {T <: RingElement} = SparsePolyRing{T}
 elem_type(::Type{SparsePolyRing{T}}) where {T <: RingElement} = SparsePoly{T}
 
 function isdomain_type(a::Type{SparsePoly{T}}) where T <: RingElement
-   return isdomain_type{T}
+   return isdomain_type(T)
 end
 
-isexact(R::SparsePolyRing) = isexact(base_ring(R))
+function isexact_type(a::Type{SparsePoly{T}}) where T <: RingElement
+   return isexact_type(T)
+end
 
 var(a::SparsePolyRing) = a.S
 

@@ -39,7 +39,9 @@ function isdomain_type(::Type{T}) where {S <: RingElement, T <: Nemo.FracElem{S}
    return isdomain_type(S)
 end
 
-isexact(R::Nemo.FracField) = isexact(base_ring(R))
+function isexact_type(a::Type{T}) where {S <: RingElement, T <: Nemo.FracElem{S}}
+   return isexact_type(S)
+end
 
 doc"""
     characteristic{T <: RingElem}(R::Nemo.FracField{T})

@@ -26,8 +26,6 @@ parent_type(::Type{fq_rel_series}) = FqRelSeriesRing
 
 base_ring(R::FqRelSeriesRing) = R.base_ring
 
-isexact(R::FqRelSeriesRing) = false
-
 var(a::FqRelSeriesRing) = a.S
 
 ###############################################################################

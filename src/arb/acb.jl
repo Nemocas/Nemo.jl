@@ -54,7 +54,7 @@ parent(x::acb) = x.parent
 
 isdomain_type(::Type{acb}) = true
 
-isexact(R::AcbField) = false
+isexact_type(::Type{acb}) = false
 
 doc"""
     zero(R::AcbField)

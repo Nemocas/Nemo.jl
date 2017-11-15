@@ -34,6 +34,8 @@ doc"""
 """
 parent(a::gfelem) = a.parent
 
+isexact_type(::Type{gfelem{T}}) where T <: Integer = true
+
 isdomain_type(::Type{gfelem{T}}) where T <: Integer = true
 
 function check_parent(a::gfelem, b::gfelem)

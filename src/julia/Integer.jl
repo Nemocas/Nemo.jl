@@ -22,6 +22,8 @@ parent_type(::Type{T}) where T <: Integer = Integers{T}
 
 base_ring(a::Integer) = Union{}
 
+isexact_type(::Type{T}) where T <: Integer = true
+
 isdomain_type(::Type{T}) where T <: Integer = true
 
 ###############################################################################

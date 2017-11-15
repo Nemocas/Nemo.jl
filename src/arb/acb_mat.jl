@@ -46,8 +46,6 @@ base_ring(a::AcbMatSpace) = a.base_ring
 
 base_ring(a::acb_mat) = a.base_ring
 
-isexact(R::AcbMatSpace) = false
-
 function getindex!(z::acb, x::acb_mat, r::Int, c::Int)
   v = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
               (Ptr{acb_mat}, Int, Int), &x, r - 1, c - 1)

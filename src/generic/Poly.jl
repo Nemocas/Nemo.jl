@@ -49,7 +49,9 @@ function isdomain_type(::Type{T}) where {S <: RingElement, T <: Nemo.PolyElem{S}
    return isdomain_type(S)
 end
 
-isexact(R::Nemo.PolyRing) = isexact(base_ring(R))
+function isexact_type(a::Type{T}) where {S <: RingElement, T <: Nemo.PolyElem{S}}
+   return isexact_type(S)
+end
 
 doc"""
     var(a::Nemo.PolyRing)
@@ -1250,7 +1252,7 @@ doc"""
 """
 function remove(z::Nemo.PolyElem{T}, p::Nemo.PolyElem{T}) where T <: RingElement
   check_parent(z, p)
-  !isexact(parent(z)) && error("remove requires an exact ring")
+  !isexact_type(T) && error("remove requires an exact ring")
   z == 0 && error("Not yet implemented")
   flag, q = divides(z, p)
   if !flag
@@ -1275,7 +1277,7 @@ doc"""
 """
 function remove(z::Nemo.PolyElem{T}, p::Nemo.PolyElem{T}) where T <: Union{Nemo.ResElem, FieldElement}
   check_parent(z, p)
-  !isexact(parent(z)) && error("remove requires an exact ring")
+  !isexact_type(T) && error("remove requires an exact ring")
   z == 0 && error("Not yet implemented")
   q, r = divrem(z, p)
   if !iszero(r)
@@ -1311,7 +1313,7 @@ doc"""
 """
 function divides(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T}) where {T <: RingElement}
    check_parent(f, g)
-   !isexact(parent(f)) && error("divides requires an exact ring")
+   !isexact_type(T) && error("divides requires an exact ring")
    if length(g) == 0
       throw(DivideError())
    end
@@ -1922,7 +1924,7 @@ end
 
 function resultant(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where {T <: RingElement}
   R = parent(p)
-  if !isexact(R)
+  if !isexact_type(T)
      return resultant_sylvester(p, q)
   end
   try
@@ -2101,7 +2103,7 @@ doc"""
 """
 function gcdx(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
    check_parent(a, b)
-   !isexact(base_ring(a)) && error("gcdx requires exact Bezout domain")
+   !isexact_type(T) && error("gcdx requires exact Bezout domain")
    if length(a) == 0
       if length(b) == 0
          return zero(parent(a)), zero(parent(a)), zero(parent(a))

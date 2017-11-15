@@ -26,8 +26,6 @@ parent_type(::Type{fmpq_rel_series}) = FmpqRelSeriesRing
 
 base_ring(R::FmpqRelSeriesRing) = R.base_ring
 
-isexact(R::FmpqRelSeriesRing) = false
-
 var(a::FmpqRelSeriesRing) = a.S
 
 ###############################################################################
