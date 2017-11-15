@@ -231,7 +231,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  solve_rational, solve_triu, subst, swap_rows, swap_rows!,
                  trail, truncate, typed_hcat, typed_hvcat, valuation, var,
                  vars, weak_popov, weak_popov_with_trafo, zero, zero!,
-                 zero_matrix
+                 zero_matrix, ppio
 
 export add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  characteristic, charpoly, charpoly_danilevsky!,
@@ -268,7 +268,7 @@ export add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  solve_rational, solve_triu, subst, swap_rows, swap_rows!,
                  trail, truncate, typed_hcat, typed_hvcat, valuation, var,
                  vars, weak_popov, weak_popov_with_trafo, zero, zero!,
-                 zero_matrix
+                 zero_matrix, ppio
 
 function exp(a::T) where T
    return Base.exp(a)
