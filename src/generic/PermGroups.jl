@@ -41,10 +41,17 @@ doc"""
     parity(a::perm)
 > Return the parity of the given permutation, i.e. the parity of the number of
 > transpositions that compose it. The function returns $1$ if the parity is odd
-> otherwise it returns $0$.
+> and $0$ otherwise. By default `parity` will uses the cycle decomposition if
+> it is already available, but will not compute it on demand. If You intend to
+> use parity, or the cycle decomposition of a permutation later You may force
+> `parity` to compute the cycle structure by calling
+> `parity(a, Val{:cycles})``.
 """
 # TODO: 2x slower than Flint
 function parity(a::perm)
+   if isdefined(a, :cycles)
+      return sum([(length(c)+1)%2 for c in cycles(a)])%2
+   end
    to_visit = trues(a.d)
    parity = length(to_visit)
    k = 1
@@ -61,12 +68,22 @@ function parity(a::perm)
    return parity%2
 end
 
+function parity(a::perm, ::Type{Val{:cycles}})
+   cycles(a)
+   return parity(a)
+end
+
 doc"""
     sign(a::perm)
 > Returns the sign of the given permutations, i.e. `1` if `a` is even and `-1`
 > if `a` is odd.
 """
 sign(a::perm) = (-1)^parity(a)
+
+function sign(a::perm, ::Type{Val{:cycles}})
+   cycles(a)
+   return sign(a)
+end
 
 function getindex(a::perm, n::Int)
    return a.d[n]
