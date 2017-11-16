@@ -173,36 +173,36 @@ doc"""
 >     _Journal of Symbolic Computation_, 37(6), 2004, p. 727-748.
 """
 function MN1inner(R::BitVector, mu::Partition, t::Int,
-        charvals=Dict{Tuple{BitVector,Vector{Int}}, BigInt}())
-    if t > length(mu)
-        chi = 1
-    elseif mu[t] > length(R)
-        chi = 0
-    else
-        chi = 0
-        sgn = false
+   charvals=Dict{Tuple{BitVector,Vector{Int}}, BigInt}())
+   if t > length(mu)
+      chi = 1
+   elseif mu[t] > length(R)
+      chi = 0
+   else
+      chi = 0
+      sgn = false
 
-        for j in 1:mu[t]-1
-            if R[j] == false
-                sgn = !sgn
+      for j in 1:mu[t]-1
+         if R[j] == false
+            sgn = !sgn
+         end
+      end
+      for i in 1:length(R)-mu[t]
+         if R[i] != R[i+mu[t]-1]
+            sgn = !sgn
+         end
+         if isrimhook(R, i, mu[t])
+            R[i], R[i+mu[t]] = R[i+mu[t]], R[i]
+            essR = (partitionseq(R), mu[t+1:end])
+            if !haskey(charvals, essR)
+               charvals[essR] = MN1inner(R, mu, t+1, charvals)
             end
-        end
-        for i in 1:length(R)-mu[t]
-            if R[i] != R[i+mu[t]-1]
-                sgn = !sgn
-            end
-            if isrimhook(R, i, mu[t])
-                R[i], R[i+mu[t]] = R[i+mu[t]], R[i]
-                essR = (partitionseq(R), mu[t+1:end])
-                if !haskey(charvals, essR)
-                    charvals[essR] = MN1inner(R, mu, t+1, charvals)
-                end
-                chi += (-1)^Int(sgn)*charvals[essR]
-                R[i], R[i+mu[t]] = R[i+mu[t]], R[i]
-            end
-        end
-    end
-    return chi
+            chi += (-1)^Int(sgn)*charvals[essR]
+            R[i], R[i+mu[t]] = R[i+mu[t]], R[i]
+         end
+      end
+   end
+   return chi
 end
 
 ##############################################################################
