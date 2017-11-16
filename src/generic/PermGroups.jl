@@ -96,28 +96,28 @@ mutable struct PermDisplayStyle
    format::Symbol
 end
 
-const perm_display_style = PermDisplayStyle(:array)
+const _perm_display_style = PermDisplayStyle(:array)
 
 doc"""
     setpermstyle(format::Symbol)
 > Nemo can display (in REPL or in general as string) permutations by either
 > array of integers whose `n`-th position represents value at `n`, or as
-> (an array of) disjoint cycles, where the value of permutation at `n` is
-> represented as the entry immediately following `n` in the cycle.
+> disjoint cycles, where the value of permutation at `n` is represented as the
+> entry immediately following `n` in the cycle.
 > The style can be switched by calling `setpermstyle` with `:array` or
 > `:cycles` argument.
 """
 function setpermstyle(format::Symbol)
    format in (:array, :cycles) || throw("Permutations can be displayed
    only as :array or :cycles.")
-   perm_display_style.format = format
+   _perm_display_style.format = format
    return format
 end
 
 function show(io::IO, a::perm)
-   if perm_display_style.format == :array
+   if _perm_display_style.format == :array
       print(io, "[" * join(a.d, ", ") * "]")
-   elseif perm_display_style.format == :cycles
+   elseif _perm_display_style.format == :cycles
       if a == parent(a)()
          print(io, "()")
       else
@@ -197,7 +197,7 @@ function ^(a::perm, n::Int)
    end
 end
 
-function power_by_squaring(a::perm, b::Int)
+function power_by_squaring(a::perm, n::Int)
    if n <0
       return inv(a)^-n
    elseif n == 0
@@ -210,7 +210,7 @@ function power_by_squaring(a::perm, b::Int)
       return parent(a)(a.d[a.d[a.d]])
    else
       bit = ~((~UInt(0)) >> 1)
-      while (UInt(bit) & b) == 0
+      while (UInt(bit) & n) == 0
          bit >>= 1
       end
       cache1 = deepcopy(a.d)
@@ -219,7 +219,7 @@ function power_by_squaring(a::perm, b::Int)
       while bit != 0
          cache2 = cache1[cache1]
          cache1 = cache2
-         if (UInt(bit) & b) != 0
+         if (UInt(bit) & n) != 0
             cache1 = cache1[a.d]
          end
          bit >>= 1
@@ -315,9 +315,7 @@ doc"""
 > Decomposes permutation into disjoint cycles.
 """
 function cycles(a::perm)
-   if isdefined(a, :cycles)
-      return a.cycles
-   else
+   if !isdefined(a, :cycles)
       to_visit = trues(a.d)
       cycles = Vector{Vector{Int}}()
       k = 1
@@ -335,8 +333,8 @@ function cycles(a::perm)
          push!(cycles, cycle)
       end
       a.cycles = cycles
-      return cycles
    end
+   return a.cycles
 end
 
 doc"""
