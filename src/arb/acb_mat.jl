@@ -5,7 +5,7 @@
 ###############################################################################
 
 export rows, cols, zero, one, deepcopy, -, transpose, +, *, &, ==, !=,
-       strongequal, overlaps, contains, inv, divexact, charpoly, det, exp,
+       strongequal, overlaps, contains, inv, divexact, charpoly, det,
        lufact, lufact!, solve, solve!, solve_lu_precomp, solve_lu_precomp!,
        swap_rows, swap_rows!, bound_inf_norm, isreal
 
@@ -53,9 +53,8 @@ function getindex!(z::acb, x::acb_mat, r::Int, c::Int)
   return z
 end
 
-function getindex(x::acb_mat, r::Int, c::Int)
-  _checkbounds(rows(x), r) || throw(BoundsError())
-  _checkbounds(cols(x), c) || throw(BoundsError())
+@inline function getindex(x::acb_mat, r::Int, c::Int)
+  @boundscheck Generic._checkbounds(x, r, c)
 
   z = base_ring(x)()
   v = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
@@ -66,9 +65,8 @@ end
 
 for T in [Integer, Float64, fmpz, fmpq, arb, BigFloat, acb, AbstractString]
    @eval begin
-      function setindex!(x::acb_mat, y::$T, r::Int, c::Int)
-         _checkbounds(rows(x), r) || throw(BoundsError())
-         _checkbounds(cols(x), c) || throw(BoundsError())
+      @inline function setindex!(x::acb_mat, y::$T, r::Int, c::Int)
+         @boundscheck Generic._checkbounds(x, r, c)
 
          z = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
                    (Ptr{acb_mat}, Int, Int), &x, r - 1, c - 1)
@@ -77,14 +75,14 @@ for T in [Integer, Float64, fmpz, fmpq, arb, BigFloat, acb, AbstractString]
    end
 end
 
-setindex!(x::acb_mat, y::Rational{T}, r::Int, c::Int) where {T <: Integer} =
+Base.@propagate_inbounds setindex!(x::acb_mat, y::Rational{T},
+                                   r::Int, c::Int) where {T <: Integer} =
          setindex!(x, fmpq(y), r, c)
 
 for T in [Integer, Float64, fmpz, fmpq, arb, BigFloat, AbstractString]
    @eval begin
-      function setindex!(x::acb_mat, y::Tuple{$T, $T}, r::Int, c::Int)
-         _checkbounds(rows(x), r) || throw(BoundsError())
-         _checkbounds(cols(x), c) || throw(BoundsError())
+      @inline function setindex!(x::acb_mat, y::Tuple{$T, $T}, r::Int, c::Int)
+         @boundscheck Generic._checkbounds(x, r, c)
 
          z = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
                    (Ptr{acb_mat}, Int, Int), &x, r - 1, c - 1)
@@ -458,7 +456,7 @@ isreal(x::acb_mat) =
 doc"""
     inv(M::acb_mat)
 > Given a $n\times n$ matrix of type `acb_mat`, return an
-> $n\times n$ matrix $X$ such that $AX$ contains the 
+> $n\times n$ matrix $X$ such that $AX$ contains the
 > identity matrix. If $A$ cannot be inverted numerically an exception is raised.
 """
 function inv(x::acb_mat)
@@ -565,7 +563,7 @@ doc"""
     exp(x::acb_mat)
 > Returns the exponential of the matrix $x$.
 """
-function exp(x::acb_mat)
+function Base.exp(x::acb_mat)
   cols(x) != rows(x) && error("Matrix must be square")
   z = similar(x)
   ccall((:acb_mat_exp, :libarb), Void,
@@ -651,8 +649,8 @@ end
 ################################################################################
 
 function swap_rows(x::acb_mat, i::Int, j::Int)
-  _checkbounds(rows(x), i) || throw(BoundsError())
-  _checkbounds(rows(x), j) || throw(BoundsError())
+  Generic._checkbounds(rows(x), i) || throw(BoundsError())
+  Generic._checkbounds(rows(x), j) || throw(BoundsError())
   z = deepcopy(x)
   swap_rows!(z, i, j)
   return z
@@ -742,7 +740,7 @@ for T in [Float64, fmpz, fmpq, BigFloat, arb, acb, String]
          z.base_ring = x.base_ring
          return z
       end
-      
+
       function (x::AcbMatSpace)(y::Array{$T, 1})
          _check_dim(x.rows, x.cols, y)
          z = acb_mat(x.rows, x.cols, y, prec(x))
@@ -768,7 +766,7 @@ for T in [Float64, fmpz, fmpq, BigFloat, arb, String]
          z.base_ring = x.base_ring
          return z
       end
-      
+
       function (x::AcbMatSpace)(y::Array{Tuple{$T, $T}, 1})
          _check_dim(x.rows, x.cols, y)
          z = acb_mat(x.rows, x.cols, y, prec(x))
@@ -778,16 +776,16 @@ for T in [Float64, fmpz, fmpq, BigFloat, arb, String]
    end
 end
 
-(x::AcbMatSpace)(y::Array{Tuple{T, T}, 2}) where {T <: Integer} = 
+(x::AcbMatSpace)(y::Array{Tuple{T, T}, 2}) where {T <: Integer} =
          x(map(z -> (fmpz(z[1]), fmpz(z[2])), y))
 
-(x::AcbMatSpace)(y::Array{Tuple{T, T}, 1}) where {T <: Integer} = 
+(x::AcbMatSpace)(y::Array{Tuple{T, T}, 1}) where {T <: Integer} =
          x(map(z -> (fmpz(z[1]), fmpz(z[2])), y))
 
-(x::AcbMatSpace)(y::Array{Tuple{Rational{T}, Rational{T}}, 2}) where {T <: Integer} = 
+(x::AcbMatSpace)(y::Array{Tuple{Rational{T}, Rational{T}}, 2}) where {T <: Integer} =
          x(map(z -> (fmpq(z[1]), fmpq(z[2])), y))
 
-(x::AcbMatSpace)(y::Array{Tuple{Rational{T}, Rational{T}}, 1}) where {T <: Integer} = 
+(x::AcbMatSpace)(y::Array{Tuple{Rational{T}, Rational{T}}, 1}) where {T <: Integer} =
          x(map(z -> (fmpq(z[1]), fmpq(z[2])), y))
 
 for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb, acb, String]
@@ -811,6 +809,70 @@ end
 (x::AcbMatSpace)(y::Rational{T}) where {T <: Integer} = x(fmpq(y))
 
 (x::AcbMatSpace)(y::acb_mat) = y
+
+###############################################################################
+#
+#   Matrix constructor
+#
+###############################################################################
+
+function matrix(R::AcbField, arr::Array{T, 2}) where {T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, acb, AbstractString}}
+   z = acb_mat(size(arr, 1), size(arr, 2), arr, prec(R))
+   z.base_ring = R
+   return z
+end
+
+function matrix(R::AcbField, r::Int, c::Int, arr::Array{T, 1}) where {T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, acb, AbstractString}}
+   _check_dim(r, c, arr)
+   z = acb_mat(r, c, arr, prec(R))
+   z.base_ring = R
+   return z
+end
+
+function matrix(R::AcbField, arr::Array{<: Integer, 2})
+   arr_fmpz = map(fmpz, arr)
+   return matrix(R, arr_fmpz)
+end
+
+function matrix(R::AcbField, r::Int, c::Int, arr::Array{<: Integer, 1})
+   arr_fmpz = map(fmpz, arr)
+   return matrix(R, r, c, arr_fmpz)
+end
+
+function matrix(R::AcbField, arr::Array{Rational{T}, 2}) where {T <: Integer}
+   arr_fmpz = map(fmpq, arr)
+   return matrix(R, arr_fmpz)
+end
+
+function matrix(R::AcbField, r::Int, c::Int, arr::Array{Rational{T}, 1}) where {T <: Integer}
+   arr_fmpz = map(fmpq, arr)
+   return matrix(R, r, c, arr_fmpz)
+end
+
+###############################################################################
+#
+#  Zero matrix
+#
+###############################################################################
+
+function zero_matrix(R::AcbField, r::Int, c::Int)
+   z = acb_mat(r, c)
+   z.base_ring = R
+   return z
+end
+
+###############################################################################
+#
+#  Identity matrix
+#
+###############################################################################
+
+function identity_matrix(R::AcbField, n::Int)
+   z = acb_mat(n, n)
+   ccall((:acb_mat_one, :libarb), Void, (Ptr{acb_mat}, ), &z)
+   z.base_ring = R
+   return z
+end
 
 ###############################################################################
 #

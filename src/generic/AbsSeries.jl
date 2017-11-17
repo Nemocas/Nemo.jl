@@ -329,10 +329,10 @@ function *(a::T, b::Nemo.AbsSeriesElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    *(a::Union{Integer, Rational}, b::Nemo.AbsSeriesElem)
+    *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.AbsSeriesElem)
 > Return $a\times b$.
 """
-function *(a::Union{Integer, Rational}, b::Nemo.AbsSeriesElem) 
+function *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.AbsSeriesElem)
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -351,10 +351,10 @@ doc"""
 *(a::Nemo.AbsSeriesElem{T}, b::T) where {T <: RingElem} = b*a
 
 doc"""
-    *(a::Nemo.AbsSeriesElem, b::Union{Integer, Rational})
+    *(a::Nemo.AbsSeriesElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a\times b$.
 """
-*(a::Nemo.AbsSeriesElem, b::Union{Integer, Rational}) = b*a
+*(a::Nemo.AbsSeriesElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
 
 ###############################################################################
 #
@@ -465,6 +465,8 @@ function ^(a::Nemo.AbsSeriesElem{T}, b::Int) where {T <: RingElement}
       z = one(parent(a))
       set_prec!(z, precision(a))
       return z
+   elseif b == 1
+      return deepcopy(a)
    else
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & b) == 0
@@ -564,17 +566,17 @@ doc"""
 ==(x::T, y::Nemo.AbsSeriesElem{T}) where {T <: RingElem} = y == x
 
 doc"""
-    ==(x::Nemo.AbsSeriesElem, y::Union{Integer, Rational})
+    ==(x::Nemo.AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Nemo.AbsSeriesElem, y::Union{Integer, Rational}) = precision(x) == 0 || ((length(x) == 0 && iszero(y))
+==(x::Nemo.AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 || ((length(x) == 0 && iszero(y))
                                        || (length(x) == 1 && coeff(x, 0) == y))
 
 doc"""
-    ==(x::Union{Integer, Rational}, y::Nemo.AbsSeriesElem)
+    ==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.AbsSeriesElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Union{Integer, Rational}, y::Nemo.AbsSeriesElem) = y == x
+==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.AbsSeriesElem) = y == x
 
 ###############################################################################
 #
@@ -608,10 +610,10 @@ end
 ###############################################################################
 
 doc"""
-    divexact(a::Nemo.AbsSeriesElem, b::Union{Integer, Rational})
+    divexact(a::Nemo.AbsSeriesElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a/b$ where the quotient is expected to be exact.
 """
-function divexact(x::Nemo.AbsSeriesElem, y::Union{Integer, Rational})
+function divexact(x::Nemo.AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat})
    y == 0 && throw(DivideError())
    lenx = length(x)
    z = parent(x)()
@@ -681,7 +683,7 @@ doc"""
     exp(a::Nemo.AbsSeriesElem)
 > Return the exponential of the power series $a$.
 """
-function exp(a::Nemo.AbsSeriesElem)
+function Base.exp(a::Nemo.AbsSeriesElem)
    if iszero(a)
       z = one(parent(a))
       set_prec!(z, precision(a))
@@ -690,7 +692,7 @@ function exp(a::Nemo.AbsSeriesElem)
    z = parent(a)()
    fit!(z, precision(a))
    set_prec!(z, precision(a))
-   z = setcoeff!(z, 0, exp(coeff(a, 0)))
+   z = setcoeff!(z, 0, Nemo.exp(coeff(a, 0)))
    len = length(a)
    for k = 1 : precision(a) - 1
       s = zero(base_ring(a))
@@ -827,7 +829,7 @@ function (a::AbsSeriesRing{T})() where {T <: RingElement}
    return z
 end
 
-function (a::AbsSeriesRing{T})(b::Union{Integer, Rational}) where {T <: RingElement}
+function (a::AbsSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
    if b == 0
       z = AbsSeries{T}(Array{T}(0), 0, a.prec_max)
    else

@@ -58,16 +58,14 @@ end
 ###############################################################################
 
 function Base.view(x::fmpz_mat, r1::Int, c1::Int, r2::Int, c2::Int)
-  _checkbounds(x.r, r1) || throw(BoundsError())
-  _checkbounds(x.r, r2) || throw(BoundsError())
-  _checkbounds(x.c, c1) || throw(BoundsError())
-  _checkbounds(x.c, c2) || throw(BoundsError())
+  Generic._checkbounds(x, r1, c1)
+  Generic._checkbounds(x, r2, c2)
   (r1 > r2 || c1 > c2) && error("Invalid parameters")
   b = fmpz_mat()
   b.base_ring = FlintZZ
   ccall((:fmpz_mat_window_init, :libflint), Void,
         (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Int, Int, Int, Int),
-            &b, &x, r1-1, c1-1, r2, c2)
+            &b, &x, r1 - 1, c1 - 1, r2, c2)
   finalizer(b, _fmpz_mat_window_clear_fn)
   return b
 end
@@ -96,9 +94,8 @@ function getindex!(v::fmpz, a::fmpz_mat, r::Int, c::Int)
    ccall((:fmpz_set, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}), &v, z)
 end
 
-function getindex(a::fmpz_mat, r::Int, c::Int)
-   _checkbounds(rows(a), r) || throw(BoundsError())
-   _checkbounds(cols(a), c) || throw(BoundsError())
+@inline function getindex(a::fmpz_mat, r::Int, c::Int)
+   @boundscheck Generic._checkbounds(a, r, c)
    v = fmpz()
    z = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
              (Ptr{fmpz_mat}, Int, Int), &a, r - 1, c - 1)
@@ -106,25 +103,25 @@ function getindex(a::fmpz_mat, r::Int, c::Int)
    return v
 end
 
-function setindex!(a::fmpz_mat, d::fmpz, r::Int, c::Int)
+@inline function setindex!(a::fmpz_mat, d::fmpz, r::Int, c::Int)
+   @boundscheck Generic._checkbounds(a, r, c)
    z = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
              (Ptr{fmpz_mat}, Int, Int), &a, r - 1, c - 1)
    ccall((:fmpz_set, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}), z, &d)
 end
 
-setindex!(a::fmpz_mat, d::Integer, r::Int, c::Int) = setindex!(a, fmpz(d), r, c)
+@inline setindex!(a::fmpz_mat, d::Integer, r::Int, c::Int) = setindex!(a, fmpz(d), r, c)
 
-function setindex!(a::fmpz_mat, d::Int, r::Int, c::Int)
-   _checkbounds(rows(a), r) || throw(BoundsError())
-   _checkbounds(cols(a), c) || throw(BoundsError())
+@inline function setindex!(a::fmpz_mat, d::Int, r::Int, c::Int)
+   @boundscheck Generic._checkbounds(a, r, c)
    z = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
              (Ptr{fmpz_mat}, Int, Int), &a, r - 1, c - 1)
    ccall((:fmpz_set_si, :libflint), Void, (Ptr{fmpz}, Int), z, d)
 end
 
-rows(a::fmpz_mat) = a.r
+@inline rows(a::fmpz_mat) = a.r
 
-cols(a::fmpz_mat) = a.c
+@inline cols(a::fmpz_mat) = a.c
 
 zero(a::FmpzMatSpace) = a()
 
@@ -934,8 +931,8 @@ function cansolve(a::fmpz_mat, b::fmpz_mat)
    b = deepcopy(b)
    z = similar(a, cols(b), cols(a))
    l = min(rows(a), cols(a))
-   for i=1:cols(b)
-     for j=1:l
+   for i = 1:cols(b)
+     for j = 1:l
        k = 1
        while k <= cols(H) && iszero(H[j, k])
          k += 1
@@ -947,10 +944,10 @@ function cansolve(a::fmpz_mat, b::fmpz_mat)
        if !iszero(r)
          return false, b
        end
-       for h=k:cols(H)
+       for h = k:cols(H)
          b[h, i] -= q*H[j, h]
        end
-       z[i, k] = q
+       z[i, j] = q
      end
    end
    if !iszero(b)
@@ -1027,6 +1024,10 @@ function solve_rational(a::fmpz_mat, b::fmpz_mat)
       (Ptr{fmpz_mat}, Ptr{fmpz}, Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &d, &a, &b)
    !nonsing && error("Singular matrix in solve_rational")
    return z, d
+end
+
+function Generic.solve_with_det(a::fmpz_mat, b::fmpz_mat)
+   return solve_rational(a, b)
 end
 
 doc"""
@@ -1212,20 +1213,76 @@ function convert(::Type{Matrix{Int}}, A::fmpz_mat)
     m, n = size(A)
 
     fittable = [fits(Int, A[i, j]) for i in 1:m, j in 1:n]
-    if ! all(fittable)
-        warn("When trying to convert a fmpz_mat to a Matrix{Int}, some elements were too large to fit the standard Int type: try to convert to a matrix of BigInt.")
-        throw(InexactError())
+    if !all(fittable)
+        error("When trying to convert a fmpz_mat to a Matrix{Int}, some elements were too large to fit into Int: try to convert to a matrix of BigInt.")
     end
 
-    mat::Matrix{Int} = Int[A[i,j] for i in 1:m, j in 1:n]
+    mat::Matrix{Int} = Int[A[i, j] for i in 1:m, j in 1:n]
     return mat
 end
 
 function convert(::Type{Matrix{BigInt}}, A::fmpz_mat)
     m, n = size(A)
     # No check: always ensured to fit a BigInt.
-    mat::Matrix{BigInt} = BigInt[A[i,j] for i in 1:m, j in 1:n]
+    mat::Matrix{BigInt} = BigInt[A[i, j] for i in 1:m, j in 1:n]
     return mat
+end
+
+###############################################################################
+#
+#   Matrix constructor
+#
+###############################################################################
+
+function matrix(R::FlintIntegerRing, arr::Array{fmpz, 2})
+   z = fmpz_mat(size(arr, 1), size(arr, 2), arr)
+   z.base_ring = FlintZZ
+   return z
+end
+
+function matrix(R::FlintIntegerRing, arr::Array{<: Integer, 2})
+   z = fmpz_mat(size(arr, 1), size(arr, 2), arr)
+   z.base_ring = FlintZZ
+   return z
+end
+
+function matrix(R::FlintIntegerRing, r::Int, c::Int, arr::Array{fmpz, 1})
+   _check_dim(r, c, arr)
+   z = fmpz_mat(r, c, arr)
+   z.base_ring = FlintZZ
+   return z
+end
+
+function matrix(R::FlintIntegerRing, r::Int, c::Int, arr::Array{<: Integer, 1})
+   _check_dim(r, c, arr)
+   z = fmpz_mat(r, c, arr)
+   z.base_ring = FlintZZ
+   return z
+end
+
+###############################################################################
+#
+#  Zero matrix
+#
+###############################################################################
+
+function zero_matrix(R::FlintIntegerRing, r::Int, c::Int)
+   z = fmpz_mat(r, c)
+   z.base_ring = FlintZZ
+   return z
+end
+
+###############################################################################
+#
+#  Identity matrix
+#
+###############################################################################
+
+function identity_matrix(R::FlintIntegerRing, n::Int)
+   z = fmpz_mat(n, n)
+   ccall((:fmpz_mat_one, :libflint), Void, (Ptr{fmpz_mat}, ), &z)
+   z.base_ring = FlintZZ
+   return z
 end
 
 ###############################################################################

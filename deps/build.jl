@@ -1,5 +1,13 @@
 oldwdir = pwd()
 
+@show M4_VERSION = "1.4.17"
+@show YASM_VERSION = "1.3.0"
+@show MPIR_VERSION = "3.0.0"
+@show MPFR_VERSION = "3.1.6"
+@show ANTIC_VERSION = "fb237532f6772fc04d6d57cc7cf015e444eb2cf4"
+@show FLINT_VERSION = "a83904e34139dc9ac0c4cafca4cabaaad9e85bc1"
+@show ARB_VERSION = "6035ee2420b7a3fa0259c92dcfa5de4bc76a4b95"
+
 pkgdir = dirname(dirname(@__FILE__))
 wdir = joinpath(pkgdir, "deps")
 vdir = joinpath(pkgdir, "local")
@@ -58,10 +66,11 @@ if !is_windows()
       run(`m4 --version`)
    catch
       println("Building m4 ... ")
-      download("http://ftp.gnu.org/gnu/m4/m4-1.4.17.tar.bz2", joinpath(wdir, "m4-1.4.17.tar.bz2"))
-      run(`tar -xvf m4-1.4.17.tar.bz2`)
-      run(`rm m4-1.4.17.tar.bz2`)
-      cd(joinpath("$wdir", "m4-1.4.17"))
+      M4_FILE = "m4-" * M4_VERSION * ".tar.bz2"
+      download("http://ftp.gnu.org/gnu/m4/$M4_FILE", joinpath(wdir, "$M4_FILE"))
+      run(`tar -xvf $M4_FILE`)
+      run(`rm $M4_FILE`)
+      cd(joinpath("$wdir", "m4-$M4_VERSION"))
       run(`./configure --prefix=$vdir`)
       run(`make`)
       run(`make install`)
@@ -74,12 +83,13 @@ cd(wdir)
 # install yasm
 
 if !is_windows()
-   if !ispath(joinpath(wdir, "yasm-1.3.0"))
+   if !ispath(joinpath(wdir, "yasm-$YASM_VERSION"))
       println("Building yasm ... ")
-      download("http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz", "yasm-1.3.0.tar.gz")
-      run(`tar -xvf yasm-1.3.0.tar.gz`)
-      run(`rm yasm-1.3.0.tar.gz`)
-      cd(joinpath("$wdir","yasm-1.3.0"))
+      YASM_FILE = "yasm-" * YASM_VERSION * ".tar.gz"
+      download("http://www.tortall.net/projects/yasm/releases/$YASM_FILE", YASM_FILE)
+      run(`tar -xvf $YASM_FILE`)
+      run(`rm $YASM_FILE`)
+      cd(joinpath("$wdir","yasm-$YASM_VERSION"))
       run(`./configure`)
       run(`make`)
       println("DONE")
@@ -90,9 +100,11 @@ cd(wdir)
 
 # install GMP/MPIR
 
-if !ispath(joinpath(wdir, "mpir-3.0.0"))
+MPIR_FILE = "mpir-" * MPIR_VERSION * ".tar.bz2"
+
+if !ispath(joinpath(wdir, "mpir-$MPIR_VERSION"))
    println("Downloading MPIR sources ... ")
-   download("http://mpir.org/mpir-3.0.0.tar.bz2", joinpath(wdir, "mpir-3.0.0.tar.bz2"))
+   download("http://mpir.org/$MPIR_FILE", joinpath(wdir, MPIR_FILE))
    println("DONE")
 end
 
@@ -106,16 +118,16 @@ if is_windows()
    println("DONE")
 else
    println("Building MPIR ... ")
-   if isfile(joinpath(wdir, "mpir-3.0.0.tar.bz2"))
-      run(`tar -xvf mpir-3.0.0.tar.bz2`)
-      run(`rm mpir-3.0.0.tar.bz2`)
+   if isfile(joinpath(wdir, MPIR_FILE))
+      run(`tar -xvf $MPIR_FILE`)
+      run(`rm $MPIR_FILE`)
    end
-   cd("$wdir/mpir-3.0.0")
+   cd("$wdir/mpir-$MPIR_VERSION")
    try
       run(`m4 --version`)
-      run(`./configure --with-yasm=$wdir/yasm-1.3.0/yasm --prefix=$vdir --enable-gmpcompat --disable-static --enable-shared`)
+      run(`./configure --with-yasm=$wdir/yasm-$YASM_VERSION/yasm --prefix=$vdir --enable-gmpcompat --disable-static --enable-shared`)
    catch
-      run(`./configure --with-yasm=$wdir/yasm-1.3.0/yasm --prefix=$vdir M4=$vdir/bin/m4 --enable-gmpcompat --disable-static --enable-shared`)
+      run(`./configure --with-yasm=$wdir/yasm-$YASM_VERSION/yasm --prefix=$vdir M4=$vdir/bin/m4 --enable-gmpcompat --disable-static --enable-shared`)
    end
    run(`make -j4`)
    run(`make install`)
@@ -128,9 +140,11 @@ cd(wdir)
 
 # install MPFR
 
-if !ispath(joinpath(wdir, "mpfr-3.1.6"))
+MPFR_FILE = "mpfr-" * MPFR_VERSION * ".tar.bz2"
+
+if !ispath(joinpath(wdir, "mpfr-$MPFR_VERSION"))
    println("Downloading MPFR sources ... ")
-   download("http://ftp.gnu.org/gnu/mpfr/mpfr-3.1.6.tar.bz2", joinpath(wdir, "mpfr-3.1.6.tar.bz2"))
+   download("http://ftp.gnu.org/gnu/mpfr/$MPFR_FILE", joinpath(wdir, MPFR_FILE))
 
    println("DONE")
 end
@@ -145,11 +159,11 @@ if is_windows()
    println("DONE")
 else
    println("Building MPFR ... ")
-   if isfile(joinpath(wdir, "mpfr-3.1.6.tar.bz2"))
-      run(`tar -xvf mpfr-3.1.6.tar.bz2`)
-      run(`rm mpfr-3.1.6.tar.bz2`)
+   if isfile(joinpath(wdir, MPFR_FILE))
+      run(`tar -xvf $MPFR_FILE`)
+      run(`rm $MPFR_FILE`)
    end
-   cd("$wdir/mpfr-3.1.6")
+   cd("$wdir/mpfr-$MPFR_VERSION")
    withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS) do
       run(`./configure --prefix=$vdir --with-gmp=$vdir --disable-static --enable-shared`) 
       run(`make -j4`)
@@ -168,13 +182,13 @@ if !is_windows()
   try
     run(`git clone https://github.com/wbhart/antic.git`)
     cd(joinpath("$wdir", "antic"))
-    run(`git checkout fb237532f6772fc04d6d57cc7cf015e444eb2cf4`)
+    run(`git checkout $ANTIC_VERSION`)
     cd(wdir)
   catch
     if ispath(joinpath("$wdir", "antic"))
       cd(joinpath("$wdir", "antic"))
       run(`git fetch origin`)
-      run(`git checkout fb237532f6772fc04d6d57cc7cf015e444eb2cf4`)
+      run(`git checkout $ANTIC_VERSION`)
       cd(wdir)
     end
   end          
@@ -189,13 +203,13 @@ if !is_windows()
     println("Cloning flint2 ... ")
     run(`git clone https://github.com/wbhart/flint2.git`)
     cd(joinpath("$wdir", "flint2"))
-    run(`git checkout da93dd4ff280697376a65684408c1a245f2155cb`)
+    run(`git checkout $FLINT_VERSION`)
     cd(wdir)
   catch
     if ispath(joinpath("$wdir", "flint2"))
        cd(joinpath("$wdir", "flint2"))
        run(`git fetch`)
-       run(`git checkout da93dd4ff280697376a65684408c1a245f2155cb`)
+       run(`git checkout $FLINT_VERSION`)
        cd(wdir)
     end
   end
@@ -236,13 +250,13 @@ if !is_windows()
   try
     run(`git clone https://github.com/fredrik-johansson/arb.git`)
     cd(joinpath("$wdir", "arb"))
-    run(`git checkout 6035ee2420b7a3fa0259c92dcfa5de4bc76a4b95`)
+    run(`git checkout $ARB_VERSION`)
     cd(wdir)
   catch
     if ispath(joinpath("$wdir", "arb"))
       cd(joinpath("$wdir", "arb"))
       run(`git fetch`)
-      run(`git checkout 6035ee2420b7a3fa0259c92dcfa5de4bc76a4b95`)
+      run(`git checkout $ARB_VERSION`)
       cd(wdir)
     end
   end

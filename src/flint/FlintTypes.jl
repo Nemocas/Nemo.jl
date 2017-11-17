@@ -2198,7 +2198,6 @@ mutable struct nmod_mat <: MatElem{nmod}
   end
 
   function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{UInt, 2}, transpose::Bool = false)
-    _check_dim(r, c, arr, transpose)
     z = new()
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
@@ -2211,14 +2210,13 @@ mutable struct nmod_mat <: MatElem{nmod}
     end
     for i = 1:r
       for j = 1:c
-        se(z, i, j, arr[i,j])
+        se(z, i, j, arr[i, j])
       end
     end
     return z
   end
 
   function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{UInt, 1}, transpose::Bool = false)
-    _check_dim(r, c, arr, transpose)
     z = new()
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
@@ -2231,7 +2229,7 @@ mutable struct nmod_mat <: MatElem{nmod}
     end
     for i = 1:r
       for j = 1:c
-        se(z, i, j, arr[(i-1)*c+j])
+        se(z, i, j, arr[(i - 1) * c + j])
       end
     end
     return z
@@ -2250,7 +2248,7 @@ mutable struct nmod_mat <: MatElem{nmod}
     end
     for i = 1:r
       for j = 1:c
-        se(z, i, j, arr[i,j])
+        se(z, i, j, arr[i, j])
       end
     end
     return z
@@ -2269,20 +2267,20 @@ mutable struct nmod_mat <: MatElem{nmod}
     end
     for i = 1:r
       for j = 1:c
-        se(z, i, j, arr[(i-1)*c+j])
+        se(z, i, j, arr[(i - 1) * c + j])
       end
     end
     return z
   end
 
   function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{T, 2}, transpose::Bool = false) where {T <: Integer}
-    arr = map(fmpz, arr)
-    return nmod_mat(r, c, n, arr, transpose)
+    arr_fmpz = map(fmpz, arr)
+    return nmod_mat(r, c, n, arr_fmpz, transpose)
   end
 
   function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{T, 1}, transpose::Bool = false) where {T <: Integer}
-    arr = map(fmpz, arr)
-    return nmod_mat(r, c, n, arr, transpose)
+    arr_fmpz = map(fmpz, arr)
+    return nmod_mat(r, c, n, arr_fmpz, transpose)
   end
 
   function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{nmod, 2}, transpose::Bool = false)
@@ -2298,7 +2296,7 @@ mutable struct nmod_mat <: MatElem{nmod}
     end
     for i = 1:r
       for j = 1:c
-        se(z, i, j, arr[i,j])
+        se(z, i, j, arr[i, j])
       end
     end
     return z
@@ -2311,13 +2309,13 @@ mutable struct nmod_mat <: MatElem{nmod}
     finalizer(z, _nmod_mat_clear_fn)
     if transpose 
       se = set_entry_t!
-      r,c = c,r
+      r, c = c, r
     else
       se = set_entry!
     end
     for i = 1:r
       for j = 1:c
-        se(z, i, j, arr[(i-1)*c+j])
+        se(z, i, j, arr[(i - 1) * c + j])
       end
     end
     return z
@@ -2341,7 +2339,7 @@ mutable struct nmod_mat <: MatElem{nmod}
   function nmod_mat(n::fmpz, b::fmpz_mat)
     (n < 0) && error("Modulus must be positive")
     (n > typemax(UInt)) &&
-          error("Exponent must be smaller than ", fmpz(typemax(UInt)))
+          error("Modulus must be smaller than ", fmpz(typemax(UInt)))
     return nmod_mat(UInt(n), b) 
   end
 end

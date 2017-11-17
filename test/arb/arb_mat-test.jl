@@ -53,6 +53,35 @@ function test_arb_mat_constructors()
    @test_throws ErrorConstrDimMismatch S([1 2 3; 4 5 6; 7 8 9; 10 11 12])
    @test_throws ErrorConstrDimMismatch S([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 
+   arr = [1 2; 3 4]
+   arr2 = [1, 2, 3, 4, 5, 6]
+
+   for T in [fmpz, fmpq, Int, BigInt, Float64, BigFloat, RR, string, Rational{Int}, Rational{BigInt}]
+      M = matrix(RR, map(T, arr))
+      @test isa(M, arb_mat)
+      @test M.base_ring == RR
+      @test rows(M) == 2
+      @test cols(M) == 2
+
+      M2 = matrix(RR, 2, 3, map(T, arr2))
+      @test isa(M2, arb_mat)
+      @test M2.base_ring == RR
+      @test rows(M2) == 2
+      @test cols(M2) == 3
+      @test_throws ErrorConstrDimMismatch matrix(RR, 2, 2, map(T, arr2))
+      @test_throws ErrorConstrDimMismatch matrix(RR, 2, 4, map(T, arr2))
+   end
+
+   M3 = zero_matrix(RR, 2, 3)
+
+   @test isa(M3, arb_mat)
+   @test M3.base_ring == RR
+
+   M4 = identity_matrix(RR, 3)
+
+   @test isa(M4, arb_mat)
+   @test M4.base_ring == RR
+
    println("PASS")
 end
 

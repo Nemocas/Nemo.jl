@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   JuliaInteger.jl : Additional Nemo functionality for Julia Integer
+#   Integer.jl : Additional Nemo functionality for Julia Integer
 #
 ###############################################################################
 
@@ -16,11 +16,15 @@ zz = Integers{Int}()
 
 parent(a::T) where T <: Integer = Integers{T}()
 
-elem_type(::Integers{T}) where T <: Integer = T
- 
+elem_type(::Type{Integers{T}}) where T <: Integer = T
+
 parent_type(::Type{T}) where T <: Integer = Integers{T}
 
 base_ring(a::Integer) = Union{}
+
+isexact_type(::Type{T}) where T <: Integer = true
+
+isdomain_type(::Type{T}) where T <: Integer = true
 
 ###############################################################################
 #
@@ -106,6 +110,8 @@ end
 
 divexact(a::T, b::T) where T <: Integer = div(a, b)
 
+divexact(a::BigInt, b::T) where T <: Integer = div(a, b)
+
 ###############################################################################
 #
 #   GCD
@@ -115,6 +121,17 @@ divexact(a::T, b::T) where T <: Integer = div(a, b)
 function gcdinv(a::T, b::T) where T <: Integer
    g, s, t = gcdx(a, b)
    return g, s
+end
+
+###############################################################################
+#
+#   Exponential
+#
+###############################################################################
+
+function exp(a::T) where T <: Integer
+   a != 0 && throw(DomainError())
+   return T(1)
 end
 
 ###############################################################################

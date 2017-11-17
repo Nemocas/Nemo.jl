@@ -13,8 +13,8 @@ export ArbPolyRing, arb_poly, derivative, integral, evaluate, evaluate2,
 #
 #   Basic manipulation
 #
-###############################################################################    
-  
+###############################################################################
+
 parent_type(::Type{arb_poly}) = ArbPolyRing
 
 elem_type(::Type{ArbPolyRing}) = arb_poly
@@ -100,7 +100,7 @@ end
 ###############################################################################
 
 function isequal(x::arb_poly, y::arb_poly)
-   return ccall((:arb_poly_equal, :libarb), Bool, 
+   return ccall((:arb_poly_equal, :libarb), Bool,
                                       (Ptr{arb_poly}, Ptr{arb_poly}), &x, &y)
 end
 
@@ -110,7 +110,7 @@ doc"""
 > of $y$, otherwise return `false`.
 """
 function overlaps(x::arb_poly, y::arb_poly)
-   return ccall((:arb_poly_overlaps, :libarb), Bool, 
+   return ccall((:arb_poly_overlaps, :libarb), Bool,
                                       (Ptr{arb_poly}, Ptr{arb_poly}), &x, &y)
 end
 
@@ -120,7 +120,7 @@ doc"""
 > coefficient balls of $y$, otherwise return `false`.
 """
 function contains(x::arb_poly, y::arb_poly)
-   return ccall((:arb_poly_contains, :libarb), Bool, 
+   return ccall((:arb_poly_contains, :libarb), Bool,
                                       (Ptr{arb_poly}, Ptr{arb_poly}), &x, &y)
 end
 
@@ -130,7 +130,7 @@ doc"""
 > exact coefficients of $y$, otherwise return `false`.
 """
 function contains(x::arb_poly, y::fmpz_poly)
-   return ccall((:arb_poly_contains_fmpz_poly, :libarb), Bool, 
+   return ccall((:arb_poly_contains_fmpz_poly, :libarb), Bool,
                                       (Ptr{arb_poly}, Ptr{fmpz_poly}), &x, &y)
 end
 
@@ -140,7 +140,7 @@ doc"""
 > exact coefficients of $y$, otherwise return `false`.
 """
 function contains(x::arb_poly, y::fmpq_poly)
-   return ccall((:arb_poly_contains_fmpq_poly, :libarb), Bool, 
+   return ccall((:arb_poly_contains_fmpq_poly, :libarb), Bool,
                                       (Ptr{arb_poly}, Ptr{fmpq_poly}), &x, &y)
 end
 
@@ -266,7 +266,7 @@ for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb, fmpz_poly, fmpq_poly]
       -(x::arb_poly, y::$T) = x - parent(x)(y)
 
       -(x::$T, y::arb_poly) = parent(y)(x) - y
-     
+
       *(x::arb_poly, y::$T) = x * parent(x)(y)
 
       *(x::$T, y::arb_poly) = y * x
@@ -313,8 +313,8 @@ function divrem(x::arb_poly, y::arb_poly)
    iszero(y) && throw(DivideError())
    q = parent(x)()
    r = parent(x)()
-   if (ccall((:arb_poly_divrem, :libarb), Int, 
-         (Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}, Int), 
+   if (ccall((:arb_poly_divrem, :libarb), Int,
+         (Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}, Int),
                &q, &r, &x, &y, prec(parent(x))) == 1)
       return (q, r)
    else
@@ -379,7 +379,7 @@ end
 
 function evaluate(x::arb_poly, y::arb)
    z = parent(y)()
-   ccall((:arb_poly_evaluate, :libarb), Void, 
+   ccall((:arb_poly_evaluate, :libarb), Void,
                 (Ptr{arb}, Ptr{arb_poly}, Ptr{arb}, Int),
                 &z, &x, &y, prec(parent(y)))
    return z
@@ -393,7 +393,7 @@ doc"""
 function evaluate2(x::arb_poly, y::arb)
    z = parent(y)()
    w = parent(y)()
-   ccall((:arb_poly_evaluate2, :libarb), Void, 
+   ccall((:arb_poly_evaluate2, :libarb), Void,
                 (Ptr{arb}, Ptr{arb}, Ptr{arb_poly}, Ptr{arb}, Int),
                 &z, &w, &x, &y, prec(parent(y)))
    return z, w
@@ -401,7 +401,7 @@ end
 
 function evaluate(x::arb_poly, y::acb)
    z = parent(y)()
-   ccall((:arb_poly_evaluate_acb, :libarb), Void, 
+   ccall((:arb_poly_evaluate_acb, :libarb), Void,
                 (Ptr{acb}, Ptr{arb_poly}, Ptr{acb}, Int),
                 &z, &x, &y, prec(parent(y)))
    return z
@@ -415,7 +415,7 @@ doc"""
 function evaluate2(x::arb_poly, y::acb)
    z = parent(y)()
    w = parent(y)()
-   ccall((:arb_poly_evaluate2_acb, :libarb), Void, 
+   ccall((:arb_poly_evaluate2_acb, :libarb), Void,
                 (Ptr{acb}, Ptr{acb}, Ptr{arb_poly}, Ptr{acb}, Int),
                 &z, &w, &x, &y, prec(parent(y)))
    return z, w
@@ -473,7 +473,7 @@ end
 
 function compose(x::arb_poly, y::arb_poly)
    z = parent(x)()
-   ccall((:arb_poly_compose, :libarb), Void, 
+   ccall((:arb_poly_compose, :libarb), Void,
                 (Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}, Int),
                 &z, &x, &y, prec(parent(x)))
    return z
@@ -487,14 +487,14 @@ end
 
 function derivative(x::arb_poly)
    z = parent(x)()
-   ccall((:arb_poly_derivative, :libarb), Void, 
+   ccall((:arb_poly_derivative, :libarb), Void,
                 (Ptr{arb_poly}, Ptr{arb_poly}, Int), &z, &x, prec(parent(x)))
    return z
 end
 
 function integral(x::arb_poly)
    z = parent(x)()
-   ccall((:arb_poly_integral, :libarb), Void, 
+   ccall((:arb_poly_integral, :libarb), Void,
                 (Ptr{arb_poly}, Ptr{arb_poly}, Int), &z, &x, prec(parent(x)))
    return z
 end
@@ -539,7 +539,7 @@ doc"""
 function from_roots(R::ArbPolyRing, b::Array{arb, 1})
    z = R()
    tmp = arb_vec(b)
-   ccall((:arb_poly_product_roots, :libarb), Void, 
+   ccall((:arb_poly_product_roots, :libarb), Void,
                 (Ptr{arb_poly}, Ptr{arb_struct}, Int, Int), &z, tmp, length(b), prec(R))
    arb_vec_clear(tmp, length(b))
    return z
@@ -551,7 +551,7 @@ end
 
 function evaluate_fast(x::arb_poly, b::Array{arb, 1})
    tmp = arb_vec(b)
-   ccall((:arb_poly_evaluate_vec_fast, :libarb), Void, 
+   ccall((:arb_poly_evaluate_vec_fast, :libarb), Void,
                 (Ptr{arb_struct}, Ptr{arb_poly}, Ptr{arb_struct}, Int, Int),
             tmp, &x, tmp, length(b), prec(parent(x)))
    res = array(base_ring(parent(x)), tmp, length(b))
@@ -564,7 +564,7 @@ function interpolate_newton(R::ArbPolyRing, xs::Array{arb, 1}, ys::Array{arb, 1}
    z = R()
    xsv = arb_vec(xs)
    ysv = arb_vec(ys)
-   ccall((:arb_poly_interpolate_newton, :libarb), Void, 
+   ccall((:arb_poly_interpolate_newton, :libarb), Void,
                 (Ptr{arb_poly}, Ptr{arb_struct}, Ptr{arb_struct}, Int, Int),
             &z, xsv, ysv, length(xs), prec(R))
    arb_vec_clear(xsv, length(xs))
@@ -577,7 +577,7 @@ function interpolate_barycentric(R::ArbPolyRing, xs::Array{arb, 1}, ys::Array{ar
    z = R()
    xsv = arb_vec(xs)
    ysv = arb_vec(ys)
-   ccall((:arb_poly_interpolate_barycentric, :libarb), Void, 
+   ccall((:arb_poly_interpolate_barycentric, :libarb), Void,
                 (Ptr{arb_poly}, Ptr{arb_struct}, Ptr{arb_struct}, Int, Int),
             &z, xsv, ysv, length(xs), prec(R))
    arb_vec_clear(xsv, length(xs))
@@ -590,7 +590,7 @@ function interpolate_fast(R::ArbPolyRing, xs::Array{arb, 1}, ys::Array{arb, 1})
    z = R()
    xsv = arb_vec(xs)
    ysv = arb_vec(ys)
-   ccall((:arb_poly_interpolate_fast, :libarb), Void, 
+   ccall((:arb_poly_interpolate_fast, :libarb), Void,
                 (Ptr{arb_poly}, Ptr{arb_struct}, Ptr{arb_struct}, Int, Int),
             &z, xsv, ysv, length(xs), prec(R))
    arb_vec_clear(xsv, length(xs))
@@ -640,45 +640,45 @@ end
 ###############################################################################
 
 function zero!(z::arb_poly)
-   ccall((:arb_poly_zero, :libarb), Void, 
+   ccall((:arb_poly_zero, :libarb), Void,
                     (Ptr{arb_poly}, ), &z)
    return z
 end
 
 function fit!(z::arb_poly, n::Int)
-   ccall((:arb_poly_fit_length, :libarb), Void, 
+   ccall((:arb_poly_fit_length, :libarb), Void,
                     (Ptr{arb_poly}, Int), &z, n)
    return nothing
 end
 
 function setcoeff!(z::arb_poly, n::Int, x::fmpz)
-   ccall((:arb_poly_set_coeff_fmpz, :libarb), Void, 
+   ccall((:arb_poly_set_coeff_fmpz, :libarb), Void,
                     (Ptr{arb_poly}, Int, Ptr{fmpz}), &z, n, &x)
    return z
 end
 
 function setcoeff!(z::arb_poly, n::Int, x::arb)
-   ccall((:arb_poly_set_coeff_arb, :libarb), Void, 
+   ccall((:arb_poly_set_coeff_arb, :libarb), Void,
                     (Ptr{arb_poly}, Int, Ptr{arb}), &z, n, &x)
    return z
 end
 
 function mul!(z::arb_poly, x::arb_poly, y::arb_poly)
-   ccall((:arb_poly_mul, :libarb), Void, 
+   ccall((:arb_poly_mul, :libarb), Void,
                 (Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}, Int),
                     &z, &x, &y, prec(parent(z)))
    return z
 end
 
 function addeq!(z::arb_poly, x::arb_poly)
-   ccall((:arb_poly_add, :libarb), Void, 
+   ccall((:arb_poly_add, :libarb), Void,
                 (Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}, Int),
                     &z, &z, &x, prec(parent(z)))
    return z
 end
 
 function add!(z::arb_poly, x::arb_poly, y::arb_poly)
-   ccall((:arb_poly_add, :libarb), Void, 
+   ccall((:arb_poly_add, :libarb), Void,
                 (Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}, Int),
                     &z, &x, &y, prec(parent(z)))
    return z
@@ -781,4 +781,3 @@ function PolynomialRing(R::ArbField, s::AbstractString; cached = true)
   parent_obj = ArbPolyRing(R, S, cached)
   return parent_obj, parent_obj(fmpz_poly([fmpz(0), fmpz(1)]))
 end
-

@@ -35,14 +35,20 @@ doc"""
 """
 parent(a::Nemo.ResElem) = a.parent
 
+isdomain_type(a::Type{T}) where T <: Nemo.ResElem = false
+
+function isexact_type(a::Type{T}) where {S <: RingElement, T <: Nemo.ResElem{S}}
+   return isexact_type(S)
+end
+
 function check_parent_type(a::Nemo.ResRing{T}, b::Nemo.ResRing{T}) where {T <: RingElement}
    # exists only to check types of parents agree
 end
-   
+
 function check_parent(a::Nemo.ResElem, b::Nemo.ResElem)
    if parent(a) != parent(b)
       check_parent_type(parent(a), parent(b))
-      a.hash != b.hash && error("Incompatible moduli in residue operation")
+      parent(a).modulus != parent(b).modulus && error("Incompatible moduli in residue operation") #CF: maybe extend to divisibility?
    end
 end
 
@@ -109,7 +115,7 @@ doc"""
 > it belongs to, otherwise return `false`.
 """
 function isunit(a::Nemo.ResElem)
-   g, ainv = gcdinv(data(a), modulus(a))
+   g = gcd(data(a), modulus(a))
    return isone(g)
 end
 
@@ -122,7 +128,25 @@ deepcopy_internal(a::Nemo.ResElem, dict::ObjectIdDict) =
 #
 ###############################################################################
 
-canonical_unit(a::Nemo.ResElem) = a
+function canonical_unit(x::Nemo.ResElem{<:Union{Integer, RingElem}})
+ #the simple return x does not work
+  # - if x == 0, this is not a unit
+  # - if R is not a field....
+  if iszero(x)
+    return one(parent(x))
+  end
+  g = gcd(modulus(x), data(x))
+  u = divexact(data(x), g)
+  a, b = ppio(modulus(x), u)
+  if isone(a)
+    r = u
+  elseif isone(b)
+    r = b
+  else
+    r = crt(one(parent(a)), a, u, b)
+  end
+  return parent(x)(r)
+end
 
 ###############################################################################
 #
@@ -198,10 +222,10 @@ end
 ###############################################################################
 
 doc"""
-    *(a::Nemo.ResElem, b::Union{Integer, Rational})
+    *(a::Nemo.ResElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a\times b$.
 """
-*(a::Nemo.ResElem, b::Union{Integer, Rational}) = parent(a)(data(a) * b)
+*(a::Nemo.ResElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) * b)
 
 doc"""
     *{T <: RingElem}(a::Nemo.ResElem{T}, b::T)
@@ -210,10 +234,10 @@ doc"""
 *(a::Nemo.ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) * b)
 
 doc"""
-    *(a::Union{Integer, Rational}, b::Nemo.ResElem)
+    *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResElem)
 > Return $a\times b$.
 """
-*(a::Union{Integer, Rational}, b::Nemo.ResElem) = parent(b)(a * data(b))
+*(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResElem) = parent(b)(a * data(b))
 
 doc"""
     *{T <: RingElem}(a::T, b::Nemo.ResElem{T})
@@ -222,10 +246,10 @@ doc"""
 *(a::T, b::Nemo.ResElem{T}) where {T <: RingElem} = parent(b)(a * data(b))
 
 doc"""
-    +(a::Nemo.ResElem, b::Union{Integer, Rational})
+    +(a::Nemo.ResElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a + b$.
 """
-+(a::Nemo.ResElem, b::Union{Integer, Rational}) = parent(a)(data(a) + b)
++(a::Nemo.ResElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) + b)
 
 doc"""
     +{T <: RingElem}(a::Nemo.ResElem{T}, b::T)
@@ -234,10 +258,10 @@ doc"""
 +(a::Nemo.ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) + b)
 
 doc"""
-    +(a::Union{Integer, Rational}, b::Nemo.ResElem)
+    +(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResElem)
 > Return $a + b$.
 """
-+(a::Union{Integer, Rational}, b::Nemo.ResElem) = parent(b)(a + data(b))
++(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResElem) = parent(b)(a + data(b))
 
 doc"""
     +{T <: RingElem}(a::T, b::Nemo.ResElem{T})
@@ -246,10 +270,10 @@ doc"""
 +(a::T, b::Nemo.ResElem{T}) where {T <: RingElem} = parent(b)(a + data(b))
 
 doc"""
-    -(a::Nemo.ResElem, b::Union{Integer, Rational})
+    -(a::Nemo.ResElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a - b$.
 """
--(a::Nemo.ResElem, b::Union{Integer, Rational}) = parent(a)(data(a) - b)
+-(a::Nemo.ResElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) - b)
 
 doc"""
     -{T <: RingElem}(a::Nemo.ResElem{T}, b::T)
@@ -258,10 +282,10 @@ doc"""
 -(a::Nemo.ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) - b)
 
 doc"""
-    -(a::Union{Integer, Rational}, b::Nemo.ResElem)
+    -(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResElem)
 > Return $a - b$.
 """
--(a::Union{Integer, Rational}, b::Nemo.ResElem) = parent(b)(a - data(b))
+-(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResElem) = parent(b)(a - data(b))
 
 doc"""
     -{T <: RingElem}(a::T, b::Nemo.ResElem{T})
@@ -319,19 +343,19 @@ end
 ###############################################################################
 
 doc"""
-    ==(x::Nemo.ResElem, y::Union{Integer, Rational})
+    ==(x::Nemo.ResElem, y::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(a::Nemo.ResElem, b::Union{Integer, Rational})
+function ==(a::Nemo.ResElem, b::Union{Integer, Rational, AbstractFloat})
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
 doc"""
-    ==(x::Union{Integer, Rational}, y::Nemo.ResElem)
+    ==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.ResElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(a::Union{Integer, Rational}, b::Nemo.ResElem)
+function ==(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResElem)
    z = base_ring(b)(a)
    return data(b) == mod(z, modulus(b))
 end
@@ -385,16 +409,32 @@ doc"""
 """
 function divexact(a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
-   g, binv = gcdinv(data(b), modulus(b))
-   if g != 1
+   fl, q = divides(a, b)
+   if !fl
       error("Impossible inverse in divexact")
    end
-   return parent(a)(data(a) * binv)
+   return q
 end
 
 function divides(a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
+   check_parent(a, b)
    iszero(b) && error("Division by zero in divides")
-   return true, divexact(a, b)
+   if iszero(a)
+      return true, a 
+   end
+   A = data(a)
+   B = data(b)
+   R = parent(a)
+   m = modulus(R)
+   gb = gcd(B, m)
+   ub = divexact(B, gb)
+   q, r = divrem(A, gb)
+   if !iszero(r)
+     return false, b
+   end
+   _, x = ppio(m, ub)
+   rs = R(q*invmod(ub, x))
+   return true, rs
 end
 
 ###############################################################################
@@ -458,7 +498,7 @@ end
 ###############################################################################
 
 promote_rule(::Type{Res{T}}, ::Type{Res{T}}) where T <: RingElement = Res{T}
-   
+
 function promote_rule(::Type{Res{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
    promote_rule(T, U) == T ? Res{T} : Union{}
 end
@@ -508,7 +548,7 @@ doc"""
 > Create the residue ring $R/(a)$ where $a$ is an element of the ring $R$. We
 > require $a \neq 0$. If `cached == true` (the default) then the resulting
 > residue ring parent object is cached and returned for any subsequent calls
-> to the constructor with the same base ring $R$ and element $a$. 
+> to the constructor with the same base ring $R$ and element $a$.
 """
 function ResidueRing(R::Nemo.Ring, a::RingElement; cached::Bool = true)
    iszero(a) && throw(DivideError())

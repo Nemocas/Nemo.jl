@@ -56,6 +56,35 @@ function test_acb_mat_constructors()
    @test_throws ErrorConstrDimMismatch S([(1,1), (2,2), (3,3), (4,4), (5,5), (6,6), (7,7),
                                           (8,8), (9,9), (10,10)])
 
+   arr = [1 2; 3 4]
+   arr2 = [1, 2, 3, 4, 5, 6]
+
+   for T in [fmpz, fmpq, Int, BigInt, Float64, BigFloat, RR, CC, string, Rational{Int}, Rational{BigInt}]
+      M = matrix(CC, map(T, arr))
+      @test isa(M, acb_mat)
+      @test M.base_ring == CC
+      @test rows(M) == 2
+      @test cols(M) == 2
+
+      M2 = matrix(CC, 2, 3, map(T, arr2))
+      @test isa(M2, acb_mat)
+      @test M2.base_ring == CC
+      @test rows(M2) == 2
+      @test cols(M2) == 3
+      @test_throws ErrorConstrDimMismatch matrix(CC, 2, 2, map(T, arr2))
+      @test_throws ErrorConstrDimMismatch matrix(CC, 2, 4, map(T, arr2))
+   end
+
+   M3 = zero_matrix(CC, 2, 3)
+
+   @test isa(M3, acb_mat)
+   @test M3.base_ring == CC
+
+   M4 = identity_matrix(CC, 3)
+
+   @test isa(M4, acb_mat)
+   @test M4.base_ring == CC
+
    println("PASS")
 end
 

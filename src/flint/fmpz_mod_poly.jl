@@ -42,7 +42,7 @@ degree(x::fmpz_mod_poly) = ccall((:fmpz_mod_poly_degree, :libflint), Int,
                                (Ptr{fmpz_mod_poly}, ), &x)
 
 function coeff(x::fmpz_mod_poly, n::Int)
-  (n < 0 || n > degree(x)) && throw(DomainError())
+  n < 0 && throw(DomainError())
   z = fmpz()
   ccall((:fmpz_mod_poly_get_coeff_fmpz, :libflint), Void,
         (Ptr{fmpz}, Ptr{fmpz_mod_poly}, Int), &z, &x, n)

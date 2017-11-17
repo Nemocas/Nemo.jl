@@ -87,6 +87,14 @@ function randelem(R::Generic.ResRing{BigInt}, n)
    return rand(R, -n:n)
 end
 
+function randelem(R::Nemo.Rationals{BigInt}, n)
+   z = BigInt(rand(-n:n))
+   while iszero(z)
+      z = BigInt(rand(-n:n))
+   end
+   return BigInt(rand(-n:n))//z
+end
+
 function randelem(R::Nemo.NmodRing, n)
    return rand(R, -n:n)
 end
@@ -128,7 +136,7 @@ function randmat(R::Generic.MatSpace{T}, d::Int, c::Int) where {T <: RingElem}
    return r
 end
 
-function randmat(S::Generic.MatSpace{T}) where {T <: RingElem}
+function randmat(S::Generic.MatSpace{T}) where {T <: Nemo.RingElement}
    M = S()
    m = rows(M)
    n = cols(M)
@@ -140,7 +148,7 @@ function randmat(S::Generic.MatSpace{T}) where {T <: RingElem}
    return M
 end
 
-function randmat(S::Generic.MatSpace{T}, c::Int) where {T <: RingElem}
+function randmat(S::Generic.MatSpace{T}, c::Int) where {T <: Nemo.RingElement}
    M = S()
    m = rows(M)
    n = cols(M)
@@ -188,7 +196,7 @@ function randmat_triu(S::Generic.MatSpace{T}, c::Int) where {T <: RingElem}
    return M
 end
 
-function randmat_with_rank(R::Generic.MatSpace{T}, d::Int, c::Int, rank::Int) where {T <: RingElem}
+function randmat_with_rank(R::Generic.MatSpace{T}, d::Int, c::Int, rank::Int) where {T <: Nemo.RingElement}
    m = R.rows
    n = R.cols
    r = R()
@@ -223,7 +231,7 @@ function randmat_with_rank(R::Generic.MatSpace{T}, d::Int, c::Int, rank::Int) wh
    return r
 end
 
-function randmat_with_rank(S::Generic.MatSpace{T}, c::Int, rank::Int) where {T <: RingElem}
+function randmat_with_rank(S::Generic.MatSpace{T}, c::Int, rank::Int) where {T <: Nemo.RingElement}
    M = S()
    m = rows(M)
    n = cols(M)
@@ -360,6 +368,36 @@ function test_gen_mat_constructors()
    @test_throws ErrorConstrDimMismatch S([t t^2 t^3 ; t^4 t^5 t^6 ; t^7 t^8 t^9 ; t t^2 t^3])
    @test_throws ErrorConstrDimMismatch S([t, t^2])
    @test_throws ErrorConstrDimMismatch S([t, t^2, t^3, t^4, t^5, t^6, t^7, t^8, t^9, t^10]) 
+
+   arr = [1 2; 3 4]
+   arr2 = [1, 2, 3, 4, 5, 6]
+
+   for T in [R, Int, BigInt, Rational{Int}, Rational{BigInt}]
+      M = matrix(R, map(T, arr))
+      @test isa(M, Generic.Mat{elem_type(R)})
+      @test M.base_ring == R
+      @test rows(M) == 2
+      @test cols(M) == 2
+
+      M2 = matrix(R, 2, 3, map(T, arr2))
+      @test isa(M2, Generic.Mat{elem_type(R)})
+      @test M2.base_ring == R
+      @test rows(M2) == 2
+      @test cols(M2) == 3
+      @test_throws ErrorConstrDimMismatch matrix(R, 2, 2, map(T, arr2))
+      @test_throws ErrorConstrDimMismatch matrix(R, 2, 4, map(T, arr2))
+   end
+
+   M3 = zero_matrix(R, 2, 3)
+
+   @test isa(M3, Generic.Mat{elem_type(R)})
+   @test M3.base_ring == R
+
+   M4 = identity_matrix(R, 3)
+
+   @test isa(M4, Generic.Mat{elem_type(R)})
+   @test M4.base_ring == R
+
    println("PASS")
 end
 
@@ -533,6 +571,23 @@ function test_gen_mat_adhoc_exact_division()
    println("PASS")
 end
 
+function test_gen_mat_transpose()
+   print("Generic.Mat.transpose...")
+
+   R, t = PolynomialRing(JuliaQQ, "t")
+   arr = [t + 1 t R(1); t^2 t t]
+   A = matrix(R, arr)
+   B = matrix(R, permutedims(arr, [2, 1]))
+   @test transpose(A) == B
+
+   arr = [t + 1 t; t^2 t]
+   A = matrix(R, arr)
+   B = matrix(R, permutedims(arr, [2, 1]))
+   @test transpose(A) == B
+
+   println("PASS")   
+end
+
 function test_gen_mat_gram()
    print("Generic.Mat.gram...")
 
@@ -599,6 +654,17 @@ function test_gen_mat_lufact()
    @test r == 2
    @test P*A == L*U
 
+   R, z = PolynomialRing(JuliaZZ, "z")
+   F = FractionField(R)
+   
+   A = matrix(F, 3, 3, [0, 0, 11, 78*z^3-102*z^2+48*z+12, 92, -16*z^2+80*z-149, -377*z^3+493*z^2-232*z-58, -448, 80*z^2-385*z+719])
+
+   r, P, L, U = lufact(A)
+
+   @test r == 3
+   @test P*A == L*U
+
+
    println("PASS")
 end
 
@@ -643,6 +709,17 @@ function test_gen_mat_fflu()
    D[3, 3] = inv(U[2, 2])
    
    @test r == 2
+   @test P*A == L*D*U
+
+   A = matrix(JuliaQQ, 3, 3, [0, 0, 1, 12, 1, 11, 1, 0, 1])
+
+   r, d, P, L, U, = fflu(A)
+
+   D = zero_matrix(JuliaQQ, 3, 3)
+   D[1, 1] = inv(U[1, 1])
+   D[2, 2] = inv(U[1, 1]*U[2, 2])
+   D[3, 3] = inv(U[2, 2])
+   @test r == 3
    @test P*A == L*D*U
 
    println("PASS")
@@ -764,6 +841,44 @@ function test_gen_mat_rank()
    end
 
    println("PASS")   
+end
+
+function test_gen_mat_solve_lu()
+   print("Generic.Mat.solve_lu...")
+
+   S = JuliaQQ
+
+   for dim = 0:5
+      R = MatrixSpace(S, dim, dim)
+      U = MatrixSpace(S, dim, rand(1:5))
+
+      M = randmat_with_rank(R, 100, dim);
+      b = randmat(U, 100);
+
+      x = Generic.solve_lu(M, b)
+
+      @test M*x == b
+   end
+
+   S, y = PolynomialRing(JuliaZZ, "y")
+   K = FractionField(S)
+
+   for dim = 0:5
+      R = MatrixSpace(S, dim, dim)
+      U = MatrixSpace(S, dim, rand(1:5))
+
+      M = randmat_with_rank(R, 5, 100, dim);
+      b = randmat(U, 5, 100);
+
+      MK = matrix(K, elem_type(K)[ K(M[i, j]) for i in 1:rows(M), j in 1:cols(M) ])
+      bK = matrix(K, elem_type(K)[ K(b[i, j]) for i in 1:rows(b), j in 1:cols(b) ])
+
+      x = Generic.solve_lu(MK, bK)
+
+      @test MK*x == bK
+   end
+
+   println("PASS")
 end
 
 function test_gen_mat_solve_rational()
@@ -1244,7 +1359,7 @@ function test_gen_row_swapping()
    println("PASS")
 end
 
-function test_gen_concat()
+function test_gen_mat_concat()
    print("Generic.Mat.concat...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
@@ -1264,6 +1379,42 @@ function test_gen_concat()
    end
 
    println("PASS")   
+end
+
+function test_gen_mat_hnf_minors()
+  print("Generic.Mat.hnf_minors...")
+
+   R, x = PolynomialRing(JuliaQQ, "x")
+
+   M = MatrixSpace(R, 4, 3)
+
+   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
+
+   H = hnf_minors(A)
+   @test istriu(H)
+
+   H, U = hnf_minors_with_trafo(A)
+   @test istriu(H)
+   @test isunit(det(U))
+   @test U*A == H
+
+   F, a = FiniteField(7, 2, "a")
+
+   S, y = PolynomialRing(F, "y")
+
+   N = MatrixSpace(S, 4, 4)
+
+   B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5; y 1 y 2]))
+
+   H = hnf_minors(B)
+   @test istriu(H)
+
+   H, U = hnf_minors_with_trafo(B)
+   @test istriu(H)
+   @test isunit(det(U))
+   @test U*B == H
+
+   println("PASS")
 end
 
 function test_gen_mat_hnf_kb()
@@ -1455,7 +1606,7 @@ function test_gen_mat_weak_popov()
 
    R, x = PolynomialRing(JuliaQQ, "x")
 
-   A = Matrix(R, 3, 4, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
+   A = matrix(R, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
    r = rank(A)
 
    P = weak_popov(A)
@@ -1470,7 +1621,7 @@ function test_gen_mat_weak_popov()
    
    S, y = PolynomialRing(F, "y")
 
-   B = Matrix(S, 3, 3, map(S, Any[ 4*y^2+3*y+5 4*y^2+3*y+4 6*y^2+1; 3*y+6 3*y+5 y+3; 6*y^2+4*y+2 6*y^2 2*y^2+y]))
+   B = matrix(S, map(S, Any[ 4*y^2+3*y+5 4*y^2+3*y+4 6*y^2+1; 3*y+6 3*y+5 y+3; 6*y^2+4*y+2 6*y^2 2*y^2+y]))
    s = rank(B)
 
    P = weak_popov(B)
@@ -1530,6 +1681,7 @@ function test_gen_mat()
    test_gen_mat_adhoc_comparison()
    test_gen_mat_powering()
    test_gen_mat_adhoc_exact_division()
+   test_gen_mat_transpose()
    test_gen_mat_gram()
    test_gen_mat_trace()
    test_gen_mat_content()
@@ -1537,6 +1689,7 @@ function test_gen_mat()
    test_gen_mat_fflu()
    test_gen_mat_det()
    test_gen_mat_rank()
+   test_gen_mat_solve_lu()
    test_gen_mat_solve_rational()
    test_gen_mat_solve_triu()
    test_gen_mat_rref()
@@ -1546,7 +1699,8 @@ function test_gen_mat()
    test_gen_mat_charpoly()
    test_gen_mat_minpoly()
    test_gen_row_swapping()
-   test_gen_concat()
+   test_gen_mat_concat()
+   test_gen_mat_hnf_minors()
    test_gen_mat_hnf_kb()
    test_gen_mat_hnf_cohen()
    test_gen_mat_hnf()

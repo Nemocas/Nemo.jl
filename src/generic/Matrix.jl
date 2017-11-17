@@ -6,14 +6,15 @@
 
 export MatrixSpace, fflu!, fflu, solve_triu, isrref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
-       ishessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat,
-       powers, similarity!, solve, solve_rational, hnf, hnf_with_trafo, snf,
+       ishessenberg, identity_matrix, charpoly_hessenberg!, matrix, minpoly,
+       typed_hvcat, typed_hcat, powers, similarity!, solve, solve_rational,
+       hnf, hnf_minors, hnf_minors_with_trafo, hnf_with_trafo, snf,
        snf_with_trafo, weak_popov, weak_popov_with_trafo, extended_weak_popov,
-       extended_weak_popov_with_trafo, rank_profile_popov, hnf_via_popov, 
+       extended_weak_popov_with_trafo, rank_profile_popov, hnf_via_popov,
        hnf_via_popov_with_trafo, popov, det_popov, _check_dim, rows, cols,
        gram, rref, rref!, swap_rows, swap_rows!, hnf_kb, hnf_kb_with_trafo,
        hnf_cohen, hnf_cohen_with_trafo, snf_kb, snf_kb_with_trafo,
-       find_pivot_popov, inv!
+       find_pivot_popov, inv!, zero_matrix
 
 ###############################################################################
 #
@@ -92,7 +93,7 @@ doc"""
 > Return the base ring $R$ of the matrix space that the supplied matrix $r$
 > belongs to.
 """
-base_ring(a::Nemo.MatElem) = a.base_ring
+base_ring(a::Nemo.MatElem{T}) where {T <: RingElement} = a.base_ring::parent_type(T)
 
 doc"""
     parent(a::Nemo.MatElem)
@@ -102,7 +103,7 @@ parent(a::Nemo.MatElem{T}, cached::Bool = true) where T <: RingElement =
     MatSpace{T}(a.base_ring, size(a.entries)..., cached)
 
 function check_parent(a::Nemo.MatElem, b::Nemo.MatElem)
-  (base_ring(a) != base_ring(b) || rows(a) != rows(b) || cols(a) != cols(b)) && 
+  (base_ring(a) != base_ring(b) || rows(a) != rows(b) || cols(a) != cols(b)) &&
                 error("Incompatible matrix spaces in matrix operation")
 end
 
@@ -120,11 +121,20 @@ function _check_dim(r::Int, c::Int, arr::Array{T, 1}) where {T}
   return nothing
 end
 
+function _checkbounds(i::Int, j::Int)
+   j >= 1 && j <= i
+end
+
+function _checkbounds(A, i::Int, j::Int)
+  (_checkbounds(rows(A), i) && _checkbounds(cols(A), j)) ||
+            Base.throw_boundserror(A, (i, j))
+end
+
 ###############################################################################
 #
 #   Basic manipulation
 #
-###############################################################################    
+###############################################################################
 
 function Base.hash(a::Nemo.MatElem, h::UInt)
    b = 0x3e4ea81eb31d94f4%UInt
@@ -149,11 +159,12 @@ doc"""
 """
 cols(a::Nemo.MatElem) = size(a.entries, 2)
 
-function getindex(a::Nemo.MatElem, r::Int, c::Int)
+Base.@propagate_inbounds function getindex(a::Nemo.MatElem, r::Int, c::Int)
    return a.entries[r, c]
 end
- 
-function setindex!(a::Nemo.MatElem, d::T, r::Int, c::Int) where T <: RingElement
+
+Base.@propagate_inbounds function setindex!(a::Nemo.MatElem, d::T, r::Int,
+                                            c::Int) where T <: RingElement
     a.entries[r, c] = base_ring(a)(d)
 end
 
@@ -341,10 +352,10 @@ end
 ###############################################################################
 
 doc"""
-    *(x::Union{Integer, Rational}, y::Nemo.MatElem)
+    *(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
 > Return $x\times y$.
 """
-function *(x::Union{Integer, Rational}, y::Nemo.MatElem)
+function *(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
    z = similar(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
@@ -369,10 +380,10 @@ function *(x::T, y::Nemo.MatElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    *(x::Nemo.MatElem, y::Union{Integer, Rational})
+    *(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x\times y$.
 """
-*(x::Nemo.MatElem, y::Union{Integer, Rational}) = y*x
+*(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat}) = y*x
 
 doc"""
     *{T <: RingElem}(x::Nemo.MatElem{T}, y::T)
@@ -381,10 +392,10 @@ doc"""
 *(x::Nemo.MatElem{T}, y::T) where {T <: RingElem} = y*x
 
 doc"""
-    +(x::Union{Integer, Rational}, y::Nemo.MatElem)
+    +(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
 > Return $S(x) + y$ where $S$ is the parent of $y$.
 """
-function +(x::Union{Integer, Rational}, y::Nemo.MatElem)
+function +(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
    z = similar(y)
    R = base_ring(y)
    for i = 1:rows(y)
@@ -400,10 +411,10 @@ function +(x::Union{Integer, Rational}, y::Nemo.MatElem)
 end
 
 doc"""
-    +(x::Nemo.MatElem, y::Union{Integer, Rational})
+    +(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x + S(y)$ where $S$ is the parent of $x$.
 """
-+(x::Nemo.MatElem, y::Union{Integer, Rational}) = y + x
++(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat}) = y + x
 
 doc"""
     +{T <: RingElem}(x::T, y::Nemo.MatElem{T})
@@ -430,10 +441,10 @@ doc"""
 +(x::Nemo.MatElem{T}, y::T) where {T <: RingElem} = y + x
 
 doc"""
-    -(x::Union{Integer, Rational}, y::Nemo.MatElem)
+    -(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
 > Return $S(x) - y$ where $S$ is the parent of $y$.
 """
-function -(x::Union{Integer, Rational}, y::Nemo.MatElem)
+function -(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
    z = similar(y)
    R = base_ring(y)
    for i = 1:rows(y)
@@ -441,7 +452,7 @@ function -(x::Union{Integer, Rational}, y::Nemo.MatElem)
          if i != j
             z[i, j] = -y[i, j]
          else
-            z[i, j] = R(x) - y[i, j] 
+            z[i, j] = R(x) - y[i, j]
          end
       end
    end
@@ -449,10 +460,10 @@ function -(x::Union{Integer, Rational}, y::Nemo.MatElem)
 end
 
 doc"""
-    -(x::Nemo.MatElem, y::Union{Integer, Rational})
+    -(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x - S(y)$, where $S$ is the parent of $x$.
 """
-function -(x::Nemo.MatElem, y::Union{Integer, Rational}) 
+function -(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
    z = similar(x)
    R = base_ring(x)
    for i = 1:rows(x)
@@ -479,7 +490,7 @@ function -(x::T, y::Nemo.MatElem{T}) where {T <: RingElem}
          if i != j
             z[i, j] = -y[i, j]
          else
-            z[i, j] = x - y[i, j] 
+            z[i, j] = x - y[i, j]
          end
       end
    end
@@ -611,11 +622,11 @@ end
 ###############################################################################
 
 doc"""
-    ==(x::Nemo.MatElem, y::Union{Integer, Rational})
+    ==(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 > otherwise return `false`.
 """
-function ==(x::Nemo.MatElem, y::Union{Integer, Rational}) 
+function ==(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
    for i = 1:min(rows(x), cols(x))
       if x[i, i] != y
          return false
@@ -632,11 +643,11 @@ function ==(x::Nemo.MatElem, y::Union{Integer, Rational})
 end
 
 doc"""
-    ==(x::Union{Integer, Rational}, y::Nemo.MatElem)
+    ==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
 > Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
 > otherwise return `false`.
 """
-==(x::Union{Integer, Rational}, y::Nemo.MatElem) = y == x
+==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem) = y == x
 
 doc"""
     =={T <: RingElem}(x::Nemo.MatElem{T}, y::T)
@@ -673,11 +684,11 @@ doc"""
 ###############################################################################
 
 doc"""
-    divexact(x::Nemo.MatElem, y::Union{Integer, Rational})
+    divexact(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x/y$, i.e. the matrix where each of the entries has been divided by
 > $y$. Each division is expected to be exact.
 """
-function divexact(x::Nemo.MatElem, y::Union{Integer, Rational})
+function divexact(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
    z = similar(x)
    for i = 1:rows(x)
       for j = 1:cols(x)
@@ -712,13 +723,8 @@ doc"""
     transpose(x::Nemo.MatElem)
 > Return the transpose of the given matrix.
 """
-function transpose(x::Nemo.MatElem)
-   if rows(x) == cols(x)
-      par = parent(x)
-   else
-      par = MatrixSpace(base_ring(x), cols(x), rows(x))
-   end
-   return par(permutedims(x.entries, [2, 1]))
+function transpose(x::Mat)
+   return matrix(base_ring(x), permutedims(x.entries, [2, 1]))
 end
 
 ###############################################################################
@@ -817,7 +823,7 @@ end
 #   LU factorisation
 #
 ###############################################################################
-         
+
 function lufact!(P::Generic.perm, A::Nemo.MatElem{T}) where {T <: FieldElement}
    m = rows(A)
    n = cols(A)
@@ -858,6 +864,7 @@ function lufact!(P::Generic.perm, A::Nemo.MatElem{T}) where {T <: FieldElement}
       r += 1
       c += 1
    end
+   inv!(P)
    return rank
 end
 
@@ -942,6 +949,7 @@ function fflu!(P::Generic.perm, A::Nemo.MatElem{T}) where {T <: RingElement}
       r += 1
       c += 1
    end
+   inv!(P)
    return rank, d2
 end
 
@@ -995,6 +1003,7 @@ function fflu!(P::Generic.perm, A::Nemo.MatElem{T}) where {T <: FieldElement}
       r += 1
       c += 1
    end
+   inv!(P)
    return rank, d2
 end
 
@@ -1207,7 +1216,7 @@ function isrref(M::Nemo.MatElem{T}) where {T <: RingElement}
                return false
             end
          end
-      end   
+      end
    end
    return true
 end
@@ -1239,7 +1248,7 @@ function isrref(M::Nemo.MatElem{T}) where {T <: FieldElement}
                return false
             end
          end
-      end   
+      end
    end
    return true
 end
@@ -1268,7 +1277,7 @@ function reduce_row!(A::Nemo.MatElem{T}, P::Array{Int}, L::Array{Int}, m::Int) w
             for j = i + 1:L[r]
                t = mul!(t, A[r, j], h)
                A[m, j] = addeq!(A[m, j], t)
-            end 
+            end
          else
             h = inv(A[m, i])
             A[m, i] = R(1)
@@ -1300,7 +1309,7 @@ function reduce_row!(A::Nemo.MatElem{T}, P::Array{Int}, L::Array{Int}, m::Int) w
                t = mul!(t, A[r, j], h)
                A[m, j] = mul!(A[m, j], A[m, j], d)
                A[m, j] = addeq!(A[m, j], t)
-            end 
+            end
             for j = L[r] + 1:L[m]
                A[m, j] = mul!(A[m, j], A[m, j], d)
             end
@@ -1428,7 +1437,7 @@ function det_interpolation(M::Nemo.MatElem{T}) where {T <: PolyElem}
    R = base_ring(M)
    if n == 0
       return R()
-   end  
+   end
    maxlen = 0
    for i = 1:n
       for j = 1:n
@@ -1505,7 +1514,7 @@ function rank(M::Nemo.MatElem{T}) where {T <: FieldElement}
    end
    A = deepcopy(M)
    P = PermGroup(n)()
-   return lufact!(P, A)   
+   return lufact!(P, A)
 end
 
 ###############################################################################
@@ -1513,6 +1522,121 @@ end
 #   Linear solving
 #
 ###############################################################################
+
+function solve_fflu(A::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
+   base_ring(A) != base_ring(b) && error("Base rings don't match in solve_fflu")
+   rows(A) != cols(A) && error("Non-square matrix in solve_fflu")
+   rows(A) != rows(b) && error("Dimensions don't match in solve_fflu")
+   FFLU = deepcopy(A)
+   p = PermGroup(rows(A))()
+   r, d = fflu!(p, FFLU)
+   r < rows(A) && error("Singular matrix in solve_fflu")
+   return solve_fflu_precomp(p, FFLU, b), d
+end
+
+function solve_fflu_precomp(p::Generic.perm, FFLU::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
+   x = p * b
+   n = rows(x)
+   m = cols(x)
+   R = base_ring(FFLU)
+
+   t = base_ring(b)()
+   s = base_ring(b)()
+   minus_one = R(-1)
+
+   for k in 1:m
+      for i in 1:(n - 1)
+         t = mul!(t, x[i, k], minus_one)
+         for j in (i + 1):n
+            if i == 1
+              x[j, k] = x[j, k] * FFLU[i, i]
+            else
+              x[j, k] = mul!(x[j, k], x[j, k], FFLU[i, i])
+            end
+            s = mul!(s, FFLU[j, i], t)
+            x[j, k] = addeq!(x[j, k], s)
+            if i > 1
+                x[j, k] = divexact(x[j, k], FFLU[i - 1, i - 1])
+            end
+         end
+      end
+
+      for i in (n - 1):-1:1
+         if i > 1
+            x[i, k] = mul!(x[i, k], x[i, k], FFLU[n, n])
+         else
+            x[i, k] = x[i, k] * FFLU[n, n]
+         end
+         for j in (i + 1):n
+            t = mul!(t, x[j, k], FFLU[i, j])
+            t = mul!(t, t, minus_one)
+            x[i, k] = addeq!(x[i, k], t)
+         end
+         x[i, k] = divexact(x[i, k], FFLU[i, i])
+      end
+   end
+   return x
+end
+
+function solve_lu(A::MatElem{T}, b::MatElem{T}) where {T <: FieldElement}
+   base_ring(A) != base_ring(b) && error("Base rings don't match in solve_lu")
+   rows(A) != cols(A) && error("Non-square matrix in solve_lu")
+   rows(A) != rows(b) && error("Dimensions don't match in solve_lu")
+
+   if rows(A) == 0 || cols(A) == 0
+      return b
+   end
+
+   LU = deepcopy(A)
+   p = PermGroup(rows(A))()
+   r = lufact!(p, LU)
+   r < rows(A) && error("Singular matrix in solve_lu")
+   return solve_lu_precomp(p, LU, b)
+end
+
+function solve_lu_precomp(p::Generic.perm, LU::MatElem{T}, b::MatElem{T}) where {T <: FieldElement}
+   x = p * b
+   n = rows(x)
+   m = cols(x)
+   R = base_ring(LU)
+
+   t = base_ring(b)()
+   s = base_ring(b)()
+   minus_one = R(-1)
+
+   for k in 1:m
+      x[1, k] = deepcopy(x[1, k])
+      for i in 2:n
+         for j in 1:(i - 1)
+            # x[i, k] = x[i, k] - LU[i, j] * x[j, k]
+            t = mul!(t, LU[i, j], x[j, k])
+            t = mul!(t, t, minus_one)
+            if j == 1
+               x[i, k] = x[i, k] + t #LU[i, j] * x[j, k]
+            else
+               x[i, k] = addeq!(x[i, k], t)
+            end
+         end
+      end
+
+      # Now every entry of x is a proper copy, so we can change the entries
+      # as much as we want.
+
+      x[n, k] = divexact(x[n, k], LU[n, n])
+
+      for i in (n - 1):-1:1
+         for j in (i + 1):n
+            #x[i, k] = x[i, k] - x[j, k] * LU[i, j]
+            t = mul!(t, x[j, k], LU[i, j])
+            t = mul!(t, t, minus_one)
+            x[i, k] = addeq!(x[i, k], t)
+         end
+         x[i, k] = divexact(x[i, k], LU[i, i])
+      end
+   end
+   return x
+end
+
 
 function backsolve!(A::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: FieldElement}
    m = rows(A)
@@ -1528,67 +1652,8 @@ function backsolve!(A::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: FieldEle
             b[i, k] = addeq!(b[i, k], t)
          end
          b[i, k] = mul!(b[i, k], b[i, k], d)
-      end 
-   end
-end
-
-function solve!(A::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: FieldElement}
-   m = rows(A)
-   n = cols(A)
-   h = cols(b)
-   r = 1
-   c = 1
-   R = base_ring(A)
-   d = R(1)
-   if m == 0 || n == 0
-      return
-   end
-   t = R()
-   while r <= m && c <= n
-      if A[r, c] == 0
-         i = r + 1
-         while i <= m
-            if !iszero(A[i, c])
-               for j = 1:n
-                  A[i, j], A[r, j] = A[r, j], A[i, j]
-               end
-               for j = 1:h
-                  b[i, j], b[r, j] = b[r, j], b[i, j]
-               end
-               break
-            end
-            i += 1
-         end
-         i > m && error("Matrix is singular in solve")
       end
-      q = -A[r, c]
-      for i = r + 1:m
-         for j = 1:h
-            t = mul!(t, A[i, c], b[r, j])
-            b[i, j] = mul!(b[i, j], b[i, j], A[r, c])
-            b[i, j] = addeq!(b[i, j], -t)
-         end
-         for j = c + 1:n
-            A[i, j] = mul!(A[i, j], A[i, j], q)
-            t = mul!(t, A[i, c], A[r, j])
-            A[i, j] = addeq!(A[i, j], t)
-            if r > 1
-               A[i, j] = mul!(A[i, j], A[i, j], d)
-            else
-               A[i, j] = -A[i, j]
-            end
-         end
-         if r > 1
-            for j = 1:h
-               b[i, j] = mul!(b[i, j], b[i, j], -d)
-            end
-         end
-      end
-      d = -inv(A[r, c])
-      r += 1
-      c += 1
    end
-   backsolve!(A, b)
 end
 
 function solve_ff(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: FieldElement}
@@ -1596,116 +1661,44 @@ function solve_ff(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: FieldEleme
    rows(M) != cols(M) && error("Non-square matrix in solve")
    rows(M) != rows(b) && error("Dimensions don't match in solve")
    m = rows(M)
-   A = deepcopy(M)
-   x = deepcopy(b)
-   solve!(A, x)
+   x, d = solve_fflu(M, b)
+   for i in 1:rows(x)
+      for j in 1:cols(x)
+         x[i, j] = divexact(x[i, j], d)
+      end
+   end
    return x
 end
 
-function solve_with_det(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: FieldElement}
-   m = rows(M)
-   h = cols(b)
-   A = deepcopy(M)
-   x = deepcopy(b)
-   solve!(A, x)
-   d = A[m, m]
-   for i = 1:m
-      for j = 1:h
-         x[i, j] = mul!(x[i, j], x[i, j], d)
+function solve_with_det(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: RingElement}
+   # We cannot use solve_fflu directly, since it forgot about the (parity of
+   # the) permutation.
+   rows(M) != cols(M) && error("Non-square matrix")
+   R = base_ring(M)
+   FFLU = deepcopy(M)
+   p = PermGroup(rows(M))()
+   r, d = fflu!(p, FFLU)
+   if r < rows(M)
+      error("Non-singular matrix in solve_with_det")
+   end
+   x = solve_fflu_precomp(p, FFLU, b)
+   # Now M*x = d*b, but d is only sign(P) * det(M)
+   if parity(p) != 0
+      minus_one = R(-1)
+      for k in 1:cols(x)
+         for i in 1:rows(x)
+            # We are allowed to modify x in-place.
+            x[i, k] = mul!(x[i, k], x[i, k], minus_one)
+         end
       end
-   end   
+      d = mul!(d, d, minus_one)
+   end
    return x, d
 end
 
-function solve_with_det(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: RingElement}
-   return solve_rational(M, b)
-end
-
-function backsolve!(A::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: RingElement}
-   m = rows(A)
-   h = cols(b)
-   R = base_ring(A)
-   t = R()
-   d = A[m, m]
-   for k = 1:h
-      b[m, k] = -b[m, k]
-   end
-   for i = m - 1:-1:1
-      q = -A[i, i]
-      for k = 1:h
-         b[i, k] = mul!(b[i, k], b[i, k], d)
-         for j = i + 1:m
-            t = mul!(t, A[i, j], b[j, k])
-            b[i, k] = addeq!(b[i, k], t)
-         end
-         b[i, k] = divexact(b[i, k], q)
-      end 
-   end
-   for i = 1:m
-      for k = 1:h
-         b[i, k] = -b[i, k]
-      end
-   end
-   return d
-end
-
-function solve!(A::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: RingElement}
-   m = rows(A)
-   n = cols(A)
-   h = cols(b)
-   r = 1
-   c = 1
-   R = base_ring(A)
-   d = R(1)
-   if m == 0 || n == 0
-      return
-   end
-   t = R()
-   while r <= m && c <= n
-      if A[r, c] == 0
-         i = r + 1
-         while i <= m
-            if !iszero(A[i, c])
-               for j = 1:n
-                  A[i, j], A[r, j] = A[r, j], A[i, j]
-               end
-               for j = 1:h
-                  b[i, j], b[r, j] = b[r, j], b[i, j]
-               end
-               break
-            end
-            i += 1
-         end
-         i > m && error("Matrix is singular in solve")
-      end
-      q = -A[r, c]
-      for i = r + 1:m
-         for j = 1:h
-            t = mul!(t, A[i, c], b[r, j])
-            b[i, j] = mul!(b[i, j], b[i, j], A[r, c])
-            b[i, j] = addeq!(b[i, j], -t)
-         end 
-         for j = c + 1:n
-            A[i, j] = mul!(A[i, j], A[i, j], q)
-            t = mul!(t, A[i, c], A[r, j])
-            A[i, j] = addeq!(A[i, j], t)
-            if r > 1
-               A[i, j] = divexact(A[i, j], d)
-            else
-               A[i, j] = -A[i, j]
-            end
-         end
-         if r > 1
-            for j = 1:h
-               b[i, j] = divexact(b[i, j], -d)
-            end
-         end
-      end
-      d = -A[r, c]
-      r += 1
-      c += 1
-   end
-   return backsolve!(A, b)
+function solve_with_det(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: PolyElem}
+   x, d = solve_interpolation(M, b)
+   return x, d
 end
 
 function solve_ff(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: RingElement}
@@ -1714,10 +1707,7 @@ function solve_ff(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: RingElemen
    if m == 0 || n == 0
       return b, base_ring(M)()
    end
-   A = deepcopy(M)
-   x = deepcopy(b)
-   d = solve!(A, x)
-   return x, d
+   return solve_fflu(M, b)
 end
 
 function solve_interpolation(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: PolyElem}
@@ -1725,7 +1715,7 @@ function solve_interpolation(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <:
    h = cols(b)
    if m == 0
       return b, base_ring(M)()
-   end  
+   end
    R = base_ring(M)
    maxlen = 0
    for i = 1:m
@@ -1742,7 +1732,7 @@ function solve_interpolation(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <:
    end
    # bound from xd = (M*)b where d is the det
    bound = (maxlen - 1)*(m - 1) + max(maxlenb, maxlen)
-   tmat = Matrix(base_ring(R), 0, 0, elem_type(base_ring(R))[])
+   tmat = matrix(base_ring(R), 0, 0, elem_type(base_ring(R))[])
    V = Array{typeof(tmat)}(bound)
    d = Array{elem_type(base_ring(R))}(bound)
    y = Array{elem_type(base_ring(R))}(bound)
@@ -1752,18 +1742,28 @@ function solve_interpolation(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <:
    x = similar(b)
    b2 = div(bound, 2)
    pt1 = base_ring(R)(1 - b2)
-   for i = 1:bound
-      y[i] = base_ring(R)(i - b2)
-      (y[i] == pt1 && i != 1) && error("Not enough interpolation points in ring")
+   l = 1
+   i = 1
+   while l <= bound
+      y[l] = base_ring(R)(i - b2)
+      (y[l] == pt1 && i != 1) && error("Not enough interpolation points in ring")
       for j = 1:m
          for k = 1:m
-            X[j, k] = evaluate(M[j, k], y[i])
+            X[j, k] = evaluate(M[j, k], y[l])
          end
          for k = 1:h
-            Y[j, k] = evaluate(b[j, k], y[i])
+            Y[j, k] = evaluate(b[j, k], y[l])
          end
       end
-      V[i], d[i] = solve_with_det(X, Y)
+      try
+         V[l], d[l] = solve_with_det(X, Y)
+         l = l + 1
+      catch e
+         if !(e isa ErrorException)
+            rethrow(e)
+         end
+      end
+      i = i + 1
    end
    for k = 1:h
       for i = 1:m
@@ -1780,7 +1780,7 @@ doc"""
     solve{T <: FieldElement}(M::Nemo.MatElem{T}, b::Nemo.MatElem{T})
 > Given a non-singular $n\times n$ matrix over a field and an $n\times m$
 > matrix over the same field, return $x$ an
-> $n\times m$ matrix $x$ such that $Ax = b$. 
+> $n\times m$ matrix $x$ such that $Ax = b$.
 > If $A$ is singular an exception is raised.
 """
 function solve(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: FieldElement}
@@ -1813,7 +1813,7 @@ function solve_rational(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: Poly
    try
       return solve_interpolation(M, b)
    catch e
-      if !isa(e, ErrorException) 
+      if !isa(e, ErrorException)
          rethrow(e)
       end
       return solve_ff(M, b)
@@ -1861,7 +1861,7 @@ function solve_triu(U::Nemo.MatElem{T}, b::Nemo.MatElem{T}, unit::Bool = false) 
          if unit == false
             s = mul!(s, s, Tinv[j])
          end
-         tmp[j] = s 
+         tmp[j] = s
       end
       for j = 1:n
          X[j, i] = tmp[j]
@@ -1881,7 +1881,7 @@ doc"""
 > Given a non-singular $n\times n$ matrix over a ring the tuple $X, d$
 > consisting of an $n\times n$ matrix $X$ and a denominator $d$ such that
 > $AX = dI_n$, where $I_n$ is the $n\times n$ identity matrix. The denominator
-> will be the determinant of $A$ up to sign. If $A$ is singular an exception 
+> will be the determinant of $A$ up to sign. If $A$ is singular an exception
 > is raised.
 """
 function inv(M::Nemo.MatElem{T}) where {T <: RingElement}
@@ -1889,7 +1889,7 @@ function inv(M::Nemo.MatElem{T}) where {T <: RingElement}
    n = cols(M)
    X = eye(M)
    A = deepcopy(M)
-   d = solve!(A, X)
+   X, d = solve_fflu(A, X)
    return X, d
 end
 
@@ -1903,9 +1903,8 @@ function inv(M::Nemo.MatElem{T}) where {T <: FieldElement}
    cols(M) != rows(M) && error("Matrix not square in invert")
    n = cols(M)
    X = eye(M)
-   A = deepcopy(M)
-   solve!(A, X)
-   return X
+   A = solve_lu(M, X)
+   return A
 end
 
 ###############################################################################
@@ -2371,7 +2370,7 @@ function charpoly(V::Ring, Y::Nemo.MatElem{T}) where {T <: RingElement}
             M[j, k] = s
          end
          A[j] = M[j, i]
-      end 
+      end
       s = R()
       for j = 1:i
          p = mul!(p, Y[i, j], M[i - 1, j])
@@ -2482,7 +2481,7 @@ function minpoly(S::Ring, M::Nemo.MatElem{T}, charpoly_only::Bool = false) where
          end
          r2 = r1
       end
-      c = 0 
+      c = 0
       for j = c2 + 1:n
          if P2[j] == 0
             c = j
@@ -2582,7 +2581,7 @@ function minpoly(S::Ring, M::Nemo.MatElem{T}, charpoly_only::Bool = false) where
          end
          r2 = r1
       end
-      c = 0 
+      c = 0
       for j = c2 + 1:n
          if P2[j] == 0
             c = j
@@ -2620,12 +2619,12 @@ end
 #
 ###############################################################################
 
-function hnf_cohen(A::Mat{T}) where {T <: RingElement}
+function hnf_cohen(A::MatElem{T}) where {T <: RingElement}
    H, U = hnf_cohen_with_trafo(A)
    return H
 end
 
-function hnf_cohen_with_trafo(A::Mat{T}) where {T <: RingElement}
+function hnf_cohen_with_trafo(A::MatElem{T}) where {T <: RingElement}
    H = deepcopy(A)
    m = rows(H)
    U = eye(A, m)
@@ -2633,7 +2632,7 @@ function hnf_cohen_with_trafo(A::Mat{T}) where {T <: RingElement}
    return H, U
 end
 
-function hnf_cohen!(H::Mat{T}, U::Mat{T}) where {T <: RingElement}
+function hnf_cohen!(H::MatElem{T}, U::MatElem{T}) where {T <: RingElement}
    m = rows(H)
    n = cols(H)
    l = min(m, n)
@@ -2696,15 +2695,276 @@ function hnf_cohen!(H::Mat{T}, U::Mat{T}) where {T <: RingElement}
    return nothing
 end
 
-function hnf_kb(A::Mat)
+#  Hermite normal form via Kannan-Bachem for matrices of full column rank
+#
+#  This is the algorithm of Kannan, Bachem, "Polynomial algorithms for computing
+#  the Smith and Hermite normal forms of an integer matrix", Siam J. Comput.,
+#  Vol. 8, No. 4, pp. 499-507.
+
+doc"""
+    hnf_minors(A::Mat) -> Mat
+> Compute the upper right row Hermite normal form of $A$ using the algorithm
+> of Kannan-Bachem.
+"""
+function hnf_minors(A::MatElem{T}) where {T <: RingElement}
+   H = deepcopy(A)
+   _hnf_minors!(H, similar(A, 0, 0), Val{false})
+   return H
+end
+
+doc"""
+    hnf_minors_with_trafo(A::Mat) -> Mat, Mat
+> Compute the upper right row Hermite normal form $H$ of $A$ and an invertible
+> matrix $U$ with $UA = H$ using the algorithm of Kannan-Bachem.
+"""
+function hnf_minors_with_trafo(A::MatElem{T}) where {T <: RingElement}
+   H = deepcopy(A)
+   U = similar(A, rows(A), rows(A))
+   _hnf_minors!(H, U, Val{true})
+   return H, U
+end
+
+function _hnf_minors!(H::MatElem{T}, U::MatElem{T}, with_transform::Type{Val{S}} = Val{false}) where {T <: RingElement, S}
+   m = rows(H)
+   n = cols(H)
+
+   l = m
+   k = 0
+
+   R = base_ring(H)
+
+   with_trafo = with_transform == Val{true} ? true : false
+
+   if with_trafo
+      for i in 1:m
+         for j in 1:m
+            if j == i
+               U[i, j] = one(R)
+            else
+               U[i, j] = zero(R)
+            end
+         end
+      end
+   end
+
+   t = zero(R)
+   b = zero(R)
+   t2 = zero(R)
+   r1d = zero(R)
+   r2d = zero(R)
+   q = zero(R)
+   minus_one = base_ring(H)(-1)
+
+   while k <= n - 1
+      k = k + 1
+      if k == 1 && !iszero(H[k, k])
+         for j2 in 1:n
+            H[k, j2] = deepcopy(H[k, j2])
+         end
+      end
+
+      # We have a matrix of form ( * * * * )
+      #                          ( 0 * * * )
+      #                          ( 0 0 * * ) <- k - 1
+      #                          ( * * * * ) <- k
+      # We want to produce zeroes in the first k entries
+      # of row k.
+
+      for j in 1:k-1
+         # Since we want to mutate the k-th row, first make a copy
+         if j == 1
+            for j2 in j:n
+               H[k, j2] = deepcopy(H[k, j2])
+            end
+         end
+
+         # Shortcuts
+         if iszero(H[k, j])
+            continue
+         end
+
+         di, q = divides(H[k, j], H[j, j])
+         if di
+            q = mul!(q, q, minus_one)
+            for j2 in j:n
+               t = mul!(t, q, H[j, j2])
+               H[k, j2] = add!(H[k, j2], H[k, j2], t)
+            end
+            if with_trafo
+               for j2 in 1:m
+                  t = mul!(t, q, U[j, j2])
+                  U[k, j2] = add!(U[k, j2], U[k, j2], t)
+               end
+            end
+            continue
+         end
+
+         # Generic case
+         d, u, v = gcdx(H[j, j], H[k, j])
+
+         r1d = divexact(H[j, j], d)
+         r2d = divexact(H[k, j], d)
+
+         mul!(r2d, r2d, minus_one)
+         for j2 in j:n
+            b = mul!(b, u, H[j, j2])
+            t2 = mul!(t2, v, H[k, j2])
+            H[k, j2] = mul!(H[k, j2], H[k, j2], r1d)
+            t = mul!(t, r2d, H[j, j2])
+            H[k, j2] = add!(H[k, j2], H[k, j2], t)
+            H[j, j2] = add!(H[j, j2], b, t2)
+         end
+         if with_trafo
+            for j2 in 1:m
+               b = mul!(b, u, U[j, j2])
+               t2 = mul!(t2, v, U[k, j2])
+               U[k, j2] = mul!(U[k, j2], U[k, j2], r1d)
+               t = mul!(t, r2d, U[j, j2])
+               U[k, j2] = add!(U[k, j2], U[k, j2], t)
+               U[j, j2] = add!(U[j, j2], b, t2)
+            end
+         end
+      end
+
+      if iszero(H[k, k])
+         swap_rows!(H, k, l)
+         if with_trafo
+            swap_rows!(U, k, l)
+         end
+         l = l - 1
+         k = k - 1
+         continue
+      end
+
+      u = canonical_unit(H[k, k])
+      if !isone(u)
+         u = R(inv(u))
+         for j in k:n
+            H[k, j] = mul!(H[k, j], H[k, j], u)
+         end
+         if with_trafo
+            for j in 1:m
+               U[k, j] = mul!(U[k, j], U[k, j], u)
+            end
+         end
+      end
+
+      for i in (k - 1):-1:1
+         for j in (i + 1):k
+            q = div(H[i, j], H[j, j])
+            if iszero(q)
+              continue
+            end
+            q = mul!(q, q, minus_one)
+            for j2 in j:n
+               t = mul!(t, q, H[j, j2])
+               H[i, j2] = add!(H[i, j2], H[i, j2], t)
+            end
+            if with_trafo
+               for j2 in 1:m
+                  t = mul!(t, q, U[j, j2])
+                  U[i, j2] = add!(U[i, j2], U[i, j2], t)
+               end
+            end
+         end
+      end
+      l = m
+   end
+
+   # Now the matrix is of form
+   # ( * * * )
+   # ( 0 * * )
+   # ( 0 0 * )
+   # ( * * * ) <- n + 1
+   # ( * * * )
+
+   for k in (n + 1):m
+      for j in 1:n
+         if j == 1
+            for j2 in 1:n
+               H[k, j2] = deepcopy(H[k, j2])
+            end
+         end
+
+         # We do the same shortcuts as above
+         if iszero(H[k, j])
+            continue
+         end
+
+         di, q = divides(H[k, j], H[j, j])
+         if di
+            q = mul!(q, q, minus_one)
+            for j2 in j:n
+               t = mul!(t, q, H[j, j2])
+               H[k, j2] = add!(H[k, j2], H[k, j2], t)
+            end
+            if with_trafo
+               for j2 in 1:m
+                  t = mul!(t, q, U[j, j2])
+                  U[k, j2] = add!(U[k, j2], U[k, j2], t)
+               end
+            end
+            continue
+         end
+
+         d, u, v = gcdx(H[j, j], H[k, j])
+         r1d = divexact(H[j, j], d)
+         r2d = divexact(H[k, j], d)
+         mul!(r2d, r2d, minus_one)
+         for j2 in j:n
+            b = mul!(b, u, H[j, j2])
+            t2 = mul!(t2, v, H[k, j2])
+            H[k, j2] = mul!(H[k, j2], H[k, j2], r1d)
+            t = mul!(t, r2d, H[j, j2])
+            H[k, j2] = add!(H[k, j2], H[k, j2], t)
+            H[j, j2] = add!(H[j, j2], b, t2)
+         end
+         if with_trafo
+            for j2 in 1:m
+               b = mul!(b, u, U[j, j2])
+               t2 = mul!(t2, v, U[k, j2])
+               U[k, j2] = mul!(U[k, j2], U[k, j2], r1d)
+               t = mul!(t, r2d, U[j, j2])
+               U[k, j2] = add!(U[k, j2], U[k, j2], t)
+               U[j, j2] = add!(U[j, j2], b, t2)
+            end
+         end
+      end
+      for i in n:-1:1
+         for j in (i + 1):n
+            q = div(H[i, j], H[j, j])
+            if iszero(q)
+              continue
+            end
+            q = mul!(q, q, minus_one)
+            for j2 in j:n
+               t = mul!(t, q, H[j, j2])
+               H[i, j2] = add!(H[i, j2], H[i, j2], t)
+            end
+            if with_trafo
+               for j2 in 1:m
+                  t = mul!(t, q, U[j, j2])
+                  U[i, j2] = add!(U[i, j2], U[i, j2], t)
+               end
+            end
+         end
+      end
+   end
+   return H
+end
+
+#  Hermite normal form for arbitrary matrices via a modification of the
+#  Kannan-Bachem algorithm
+
+function hnf_kb(A::MatElem{T}) where {T <: RingElement}
    return _hnf_kb(A, Val{false})
 end
 
-function hnf_kb_with_trafo(A::Mat)
+function hnf_kb_with_trafo(A::MatElem{T}) where {T <: RingElement}
    return _hnf_kb(A, Val{true})
 end
 
-function _hnf_kb(A::Mat, trafo::Type{Val{T}} = Val{false}) where T
+function _hnf_kb(A, trafo::Type{Val{T}} = Val{false}) where T
    H = deepcopy(A)
    m = rows(H)
    if trafo == Val{true}
@@ -2718,7 +2978,7 @@ function _hnf_kb(A::Mat, trafo::Type{Val{T}} = Val{false}) where T
    end
 end
 
-function kb_search_first_pivot(H::Mat, start_element::Int = 1)
+function kb_search_first_pivot(H, start_element::Int = 1)
    for r = start_element:rows(H)
       for c = start_element:cols(H)
          if !iszero(H[r,c])
@@ -2729,7 +2989,7 @@ function kb_search_first_pivot(H::Mat, start_element::Int = 1)
    return 0, 0
 end
 
-function kb_reduce_row!(H::Mat{T}, U::Mat{T}, pivot::Array{Int, 1}, c::Int, with_trafo::Bool) where {T <: RingElement}
+function kb_reduce_row!(H::MatElem{T}, U::MatElem{T}, pivot::Array{Int, 1}, c::Int, with_trafo::Bool) where {T <: RingElement}
    r = pivot[c]
    t = base_ring(H)()
    for i = c+1:cols(H)
@@ -2752,7 +3012,7 @@ function kb_reduce_row!(H::Mat{T}, U::Mat{T}, pivot::Array{Int, 1}, c::Int, with
    return nothing
 end
 
-function kb_reduce_column!(H::Mat{T}, U::Mat{T}, pivot::Array{Int, 1}, c::Int, with_trafo::Bool, start_element::Int = 1) where {T <: RingElement}
+function kb_reduce_column!(H::MatElem{T}, U::MatElem{T}, pivot::Array{Int, 1}, c::Int, with_trafo::Bool, start_element::Int = 1) where {T <: RingElement}
    r = pivot[c]
    t = base_ring(H)()
    for i = start_element:c-1
@@ -2775,7 +3035,7 @@ function kb_reduce_column!(H::Mat{T}, U::Mat{T}, pivot::Array{Int, 1}, c::Int, w
    return nothing
 end
 
-function kb_canonical_row!(H::Mat{T}, U::Mat{T}, r::Int, c::Int, with_trafo::Bool) where {T <: RingElement}
+function kb_canonical_row!(H, U, r::Int, c::Int, with_trafo::Bool)
    cu = canonical_unit(H[r,c])
    if cu != 1
       for j = c:cols(H)
@@ -2790,7 +3050,7 @@ function kb_canonical_row!(H::Mat{T}, U::Mat{T}, r::Int, c::Int, with_trafo::Boo
    return nothing
 end
 
-function kb_sort_rows!(H::Mat{T}, U::Mat{T}, pivot::Array{Int, 1}, with_trafo::Bool, start_element::Int = 1) where {T <:RingElement}
+function kb_sort_rows!(H::MatElem{T}, U::MatElem{T}, pivot::Array{Int, 1}, with_trafo::Bool, start_element::Int = 1) where {T <:RingElement}
    m = rows(H)
    n = cols(H)
    pivot2 = zeros(Int, m)
@@ -2800,7 +3060,7 @@ function kb_sort_rows!(H::Mat{T}, U::Mat{T}, pivot::Array{Int, 1}, with_trafo::B
       end
       pivot2[pivot[i]] = i
    end
-   
+
    r1 = start_element
    for i = start_element:n
       r2 = pivot[i]
@@ -2821,12 +3081,12 @@ function kb_sort_rows!(H::Mat{T}, U::Mat{T}, pivot::Array{Int, 1}, with_trafo::B
       r1 += 1
       if r1 == m
          break
-      end 
+      end
    end
    return nothing
 end
 
-function hnf_kb!(H::Mat{T}, U::Mat{T}, with_trafo::Bool = false, start_element::Int = 1) where {T <: RingElement}
+function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
    m = rows(H)
    n = cols(H)
    pivot = zeros(Int, n)
@@ -2886,7 +3146,7 @@ function hnf_kb!(H::Mat{T}, U::Mat{T}, with_trafo::Bool = false, start_element::
       if !new_pivot
          for c = pivot_max+1:n
             if !iszero(H[i+1,c])
-               pivot[c] = i+1 
+               pivot[c] = i+1
                kb_canonical_row!(H, U, pivot[c], c, with_trafo)
                kb_reduce_column!(H, U, pivot, c, with_trafo, start_element)
                pivot_max = max(pivot_max, c)
@@ -2903,7 +3163,7 @@ doc"""
     hnf{T <: RingElement}(A::Mat{T}) -> Mat{T}
 > Return the upper right row Hermite normal form of $A$.
 """
-function hnf(A::Mat{T}) where {T <: RingElement}
+function hnf(A::MatElem{T}) where {T <: RingElement}
   return hnf_kb(A)
 end
 
@@ -2912,7 +3172,7 @@ doc"""
 > Return the upper right row Hermite normal form $H$ of $A$ together with
 > invertible matrix $U$ such that $UA = H$.
 """
-function hnf_with_trafo(A::Mat{T}) where {T <: RingElement}
+function hnf_with_trafo(A)
   return hnf_kb_with_trafo(A)
 end
 
@@ -3618,11 +3878,11 @@ end
 
 doc"""
     swap_rows(a::Nemo.MatElem, i::Int, j::Int)
-> Return a matrix $b$ with the entries of $a$, where the $i$th and $j$th 
+> Return a matrix $b$ with the entries of $a$, where the $i$th and $j$th
 > row are swapped.
 """
 function swap_rows(a::Nemo.MatElem, i::Int, j::Int)
-   (1<=i<=rows(a) && 1<=j<=rows(a)) || throw(BoundsError())  
+   (1<=i<=rows(a) && 1<=j<=rows(a)) || throw(BoundsError())
    b = deepcopy(a)
    swap_rows!(b, i, j)
    return b
@@ -3663,7 +3923,7 @@ function hcat(a::Nemo.MatElem, b::Nemo.MatElem)
       for j = 1:cols(b)
          c[i, n + j] = b[i, j]
       end
-   end 
+   end
    return c
 end
 
@@ -3794,20 +4054,80 @@ function (a::MatSpace{T})(b::Array{S, 1}) where {S <: RingElement, T <: RingElem
    return z
 end
 
-###############################################################################
+################################################################################
 #
 #   Matrix constructors
 #
-###############################################################################
+################################################################################
 
-function Base.Matrix(R::Nemo.Ring, r::Int, c::Int, a::Array{T, 2}) where T <: RingElement
-   M = MatrixSpace(R, r, c)
-   return M(a)
+doc"""
+    matrix(R::Ring, arr::Array{T, 2}) where {T} -> MatElem{T}
+
+> Constructs the matrix over $R$ with entries as in `arr`.
+"""
+function matrix(R::Ring, arr::Array{T, 2}) where {T}
+   arr_coerce = map(R, arr)
+   z = Mat{elem_type(R)}(arr_coerce)
+   z.base_ring = R
+   return z
 end
 
-function Base.Matrix(R::Nemo.Ring, r::Int, c::Int, a::Array{T, 1}) where T <: RingElement
-   M = MatrixSpace(R, r, c)
-   return M(a)
+doc"""
+    matrix(R::Ring, r::Int, c::Int, arr::Array{T, 1}) where {T} -> MatElem{T}
+
+> Constructs the $r \times c$ matrix over $R$, where the entries are taken
+> row-wise from `arr`.
+"""
+function matrix(R::Ring, r::Int, c::Int, arr::Array{T, 1}) where T
+   _check_dim(r, c, arr)
+   arr_coerce = map(R, arr)
+   z = Mat{elem_type(R)}(r, c, arr_coerce)
+   z.base_ring = R
+   return z
+end
+
+################################################################################
+#
+#   Zero matrix
+#
+################################################################################
+
+doc"""
+    zero_matrix(R::Ring, r::Int, c::Int) -> MatElem
+
+> Return the $r \times c$ zero matrix over $R$.
+"""
+function zero_matrix(R::Ring, r::Int, c::Int)
+   arr = Array{elem_type(R)}(r, c)
+   for i in 1:r
+      for j in 1:c
+         arr[i, j] = zero(R)
+      end
+   end
+   z = Mat{elem_type(R)}(arr)
+   z.base_ring = R
+   return z
+end
+
+################################################################################
+#
+#   Identity matrix
+#
+################################################################################
+
+doc"""
+    identity_matrix(R::Ring, n::Int) -> MatElem
+
+> Return the $n \times n$ identity matrix over $R$.
+"""
+function identity_matrix(R::Ring, n::Int)
+   arr = zero_matrix(R, n, n)
+   for i in 1:n
+      arr[i, i] = one(R)
+   end
+   z = Mat{elem_type(R)}(arr)
+   z.base_ring = R
+   return z
 end
 
 ###############################################################################
@@ -3827,4 +4147,3 @@ function MatrixSpace(R::Nemo.Ring, r::Int, c::Int, cached::Bool = true)
    T = elem_type(R)
    return MatSpace{T}(R, r, c, cached)
 end
-

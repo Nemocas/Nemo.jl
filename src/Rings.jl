@@ -14,14 +14,14 @@ end
 #
 # The promote_rule functions are not extending Base.promote_rule. The Nemo
 # promotion system is orthogonal to the built-in julia promotion system. The
-# julia system assumes that whenever you have a method signature of the form  
+# julia system assumes that whenever you have a method signature of the form
 # Base.promote_rule(::Type{T}, ::Type{S}) = R, then there is also a
 # corresponding Base.convert(::Type{R}, ::T) and similar for S. Since we
 # cannot use the julia convert system (we need an instance of the type and not
 # the type), we cannot use the julia promotion system.
 #
 # The Nemo promotion system is used to define catch all functions for
-# arithmetic between arbitrary ring elements. 
+# arithmetic between arbitrary ring elements.
 #
 ################################################################################
 
@@ -128,6 +128,20 @@ end
 
 ###############################################################################
 #
+#   Type traits
+#
+###############################################################################
+
+# Type can only represent elements of an exact ring
+# true unless explicitly specified
+isexact_type(R::Type{T}) where T <: RingElem = true
+
+# Type can only represent elements of domains
+# false unless explicitly specified
+isdomain_type(R::Type{T}) where T <: RingElem = false
+
+###############################################################################
+#
 #   Exponential function for generic rings
 #
 ###############################################################################
@@ -147,6 +161,39 @@ transpose(x::T) where {T <: RingElem} = deepcopy(x)
 
 ###############################################################################
 #
+#   One and zero
+#
+###############################################################################
+
+one(x::T) where {T <: RingElem} = one(parent(x))
+
+zero(x::T) where {T <: RingElem} = zero(parent(x))
+
+###############################################################################
+#
+#   Coprime bases
+#
+###############################################################################
+
+# Bernstein, "Factoring into coprimes in essentially linear time"
+# ppio(a,b) = (c,n) where v_p(c) = v_p(a) if v_p(b) != 0, 0 otherwise
+# c*n = a or c = gcd(a, b^infty), n = div(a, c).
+# This is used in various Euclidean domains for Chinese remaindering.
+
+function ppio(a::E, b::E) where E <: RingElem
+   c = gcd(a, b)
+   n = div(a, c)
+   g = gcd(c, n)
+   while !isone(g) 
+      c *= g
+      n = div(n, g)
+      g = gcd(c, n)
+   end
+   return c, n
+end
+
+###############################################################################
+#
 #   Generic and specific rings and fields
 #
 ###############################################################################
@@ -154,6 +201,8 @@ transpose(x::T) where {T <: RingElem} = deepcopy(x)
 include("julia/Integer.jl")
 
 include("julia/Rational.jl")
+
+include("julia/Float.jl")
 
 include("flint/fmpz.jl")
 
@@ -220,4 +269,3 @@ include("Factor.jl")
 ###############################################################################
 
 include("polysubst.jl")
-

@@ -39,13 +39,13 @@ max_precision(R::FmpqRelSeriesRing) = R.prec_max
 function normalise(a::fmpq_rel_series, len::Int)
    if len > 0
       c = fmpq()
-      ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void, 
+      ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpq_rel_series}, Int), &c, &a, len - 1)
    end
    while len > 0 && iszero(c)
       len -= 1
       if len > 0
-         ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void, 
+         ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void,
             (Ptr{fmpq}, Ptr{fmpq_rel_series}, Int), &c, &a, len - 1)
       end
    end
@@ -63,7 +63,7 @@ function polcoeff(x::fmpq_rel_series, n::Int)
       return fmpq(0)
    end
    z = fmpq()
-   ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void, 
+   ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpq_rel_series}, Int), &z, &x, n)
    return z
 end
@@ -126,8 +126,8 @@ show_minus_one(::Type{fmpq_rel_series}) = show_minus_one(fmpq)
 
 function -(x::fmpq_rel_series)
    z = parent(x)()
-   ccall((:fmpq_poly_neg, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}), 
+   ccall((:fmpq_poly_neg, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}),
                &z, &x)
    z.prec = x.prec
    z.val = x.val
@@ -157,8 +157,8 @@ function +(a::fmpq_rel_series, b::fmpq_rel_series)
       ccall((:fmpq_poly_shift_left, :libflint), Void,
             (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
             &z, &z, b.val - a.val)
-      ccall((:fmpq_poly_add_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+      ccall((:fmpq_poly_add_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &z, &a, lenz)
    elseif b.val < a.val
       lenz = max(lena + a.val - b.val, lenb)
@@ -168,13 +168,13 @@ function +(a::fmpq_rel_series, b::fmpq_rel_series)
       ccall((:fmpq_poly_shift_left, :libflint), Void,
             (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
             &z, &z, a.val - b.val)
-      ccall((:fmpq_poly_add_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+      ccall((:fmpq_poly_add_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &z, &b, lenz)
    else
       lenz = max(lena, lenb)
-      ccall((:fmpq_poly_add_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+      ccall((:fmpq_poly_add_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &a, &b, lenz)
    end
    z.prec = prec
@@ -203,8 +203,8 @@ function -(a::fmpq_rel_series, b::fmpq_rel_series)
             &z, &z, b.val - a.val)
       ccall((:fmpq_poly_neg, :libflint), Void,
             (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}), &z, &z)
-      ccall((:fmpq_poly_add_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+      ccall((:fmpq_poly_add_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &z, &a, lenz)
    elseif b.val < a.val
       lenz = max(lena + a.val - b.val, lenb)
@@ -214,13 +214,13 @@ function -(a::fmpq_rel_series, b::fmpq_rel_series)
       ccall((:fmpq_poly_shift_left, :libflint), Void,
             (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
             &z, &z, a.val - b.val)
-      ccall((:fmpq_poly_sub_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+      ccall((:fmpq_poly_sub_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &z, &b, lenz)
    else
       lenz = max(lena, lenb)
-      ccall((:fmpq_poly_sub_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+      ccall((:fmpq_poly_sub_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &a, &b, lenz)
    end
    z.prec = prec
@@ -232,7 +232,7 @@ end
 function *(a::fmpq_rel_series, b::fmpq_rel_series)
    check_parent(a, b)
    lena = pol_length(a)
-   lenb = pol_length(b) 
+   lenb = pol_length(b)
    aval = valuation(a)
    bval = valuation(b)
    prec = min(a.prec - aval, b.prec - bval)
@@ -245,8 +245,8 @@ function *(a::fmpq_rel_series, b::fmpq_rel_series)
       return z
    end
    lenz = min(lena + lenb - 1, prec)
-   ccall((:fmpq_poly_mullow, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_mullow, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &a, &b, lenz)
    return z
 end
@@ -261,8 +261,8 @@ function *(x::Int, y::fmpq_rel_series)
    z = parent(y)()
    z.prec = y.prec
    z.val = y.val
-   ccall((:fmpq_poly_scalar_mul_si, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_scalar_mul_si, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &y, x)
    return z
 end
@@ -273,8 +273,8 @@ function *(x::fmpz, y::fmpq_rel_series)
    z = parent(y)()
    z.prec = y.prec
    z.val = y.val
-   ccall((:fmpq_poly_scalar_mul_fmpz, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpz}), 
+   ccall((:fmpq_poly_scalar_mul_fmpz, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpz}),
                &z, &y, &x)
    return z
 end
@@ -283,8 +283,8 @@ function *(x::fmpq, y::fmpq_rel_series)
    z = parent(y)()
    z.prec = y.prec
    z.val = y.val
-   ccall((:fmpq_poly_scalar_mul_fmpq, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq}), 
+   ccall((:fmpq_poly_scalar_mul_fmpq, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq}),
                &z, &y, &x)
    return z
 end
@@ -297,17 +297,25 @@ end
 
 *(x::Integer, y::fmpq_rel_series) = fmpz(x) * y
 
-*(x::fmpq_rel_series, y::Rational{T}) where T <: Union{Int, BigInt} = x * fmpq(y)
+*(x::fmpq_rel_series, y::Rational) = x * fmpq(y)
 
-*(x::Rational{T}, y::fmpq_rel_series) where T <: Union{Int, BigInt} = fmpq(x) * y
+*(x::Rational, y::fmpq_rel_series) = fmpq(x) * y
 
 +(x::fmpq_rel_series, y::Integer) = x + fmpz(y)
 
 +(x::Integer, y::fmpq_rel_series) = fmpz(x) + y
 
-+(x::fmpq_rel_series, y::Rational{T}) where T <: Union{Int, BigInt} = x + fmpq(y)
++(x::fmpq_rel_series, y::Rational) = x + fmpq(y)
 
-+(x::Rational{T}, y::fmpq_rel_series) where T <: Union{Int, BigInt} = fmpq(x) + y
++(x::Rational, y::fmpq_rel_series) = fmpq(x) + y
+
+-(x::fmpq_rel_series, y::Integer) = x - fmpz(y)
+
+-(x::Integer, y::fmpq_rel_series) = fmpz(x) - y
+
+-(x::fmpq_rel_series, y::Rational) = x - fmpq(y)
+
+-(x::Rational, y::fmpq_rel_series) = fmpq(x) - y
 
 ###############################################################################
 #
@@ -337,8 +345,8 @@ function shift_right(x::fmpq_rel_series, len::Int)
       z.prec = max(0, x.prec - len)
       z.val = max(0, xval - len)
       zlen = min(xlen + xval - len, xlen)
-      ccall((:fmpq_poly_shift_right, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+      ccall((:fmpq_poly_shift_right, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &x, xlen - zlen)
       renormalize!(z)
    end
@@ -367,8 +375,8 @@ function truncate(x::fmpq_rel_series, prec::Int)
       z.prec = prec
    else
       z.val = xval
-      ccall((:fmpq_poly_set_trunc, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+      ccall((:fmpq_poly_set_trunc, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &x, min(prec - xval, xlen))
    end
    return z
@@ -392,10 +400,10 @@ function ^(a::fmpq_rel_series, b::Int)
       z.prec = b*valuation(a)
       z.val = b*valuation(a)
    elseif pol_length(a) == 1
-      return parent(a)([polcoeff(a, 0)^b], 1, 
+      return parent(a)([polcoeff(a, 0)^b], 1,
                            (b - 1)*valuation(a) + precision(a), b*valuation(a))
    elseif b == 0
-      return parent(a)([fmpq(1)], 1, precision(a) - valuation(a), 0)
+      return one(parent(a))
    else
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & b) == 0
@@ -429,13 +437,13 @@ function ==(x::fmpq_rel_series, y::fmpq_rel_series)
    if x.val != y.val
       return false
    end
-   xlen = min(pol_length(x), prec - x.val)
-   ylen = min(pol_length(y), prec - y.val)
+   xlen = normalise(x, min(pol_length(x), prec - x.val))
+   ylen = normalise(y, min(pol_length(y), prec - y.val))
    if xlen != ylen
       return false
    end
-   return Bool(ccall((:fmpq_poly_equal_trunc, :libflint), Cint, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   return Bool(ccall((:fmpq_poly_equal_trunc, :libflint), Cint,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &x, &y, xlen))
 end
 
@@ -446,8 +454,8 @@ function isequal(x::fmpq_rel_series, y::fmpq_rel_series)
    if x.prec != y.prec || x.val != y.val || pol_length(x) != pol_length(y)
       return false
    end
-   return Bool(ccall((:fmpq_poly_equal, :libflint), Cint, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   return Bool(ccall((:fmpq_poly_equal, :libflint), Cint,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &x, &y, pol_length(x)))
 end
 
@@ -457,44 +465,44 @@ end
 #
 ###############################################################################
 
-function ==(x::fmpq_rel_series, y::fmpq) 
+function ==(x::fmpq_rel_series, y::fmpq)
    if precision(x) == 0
       return true
    elseif pol_length(x) > 1
       return false
-   elseif pol_length(x) == 1 
+   elseif pol_length(x) == 1
       if x.val == 0
          z = fmpq()
-         ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void, 
+         ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void,
                        (Ptr{fmpq}, Ptr{fmpq_rel_series}, Int), &z, &x, 0)
-         return ccall((:fmpq_equal, :libflint), Bool, 
+         return ccall((:fmpq_equal, :libflint), Bool,
                (Ptr{fmpq}, Ptr{fmpq}, Int), &z, &y, 0)
       else
          return false
       end
    else
       return iszero(y)
-   end 
+   end
 end
 
-function ==(x::fmpq_rel_series, y::fmpz) 
+function ==(x::fmpq_rel_series, y::fmpz)
    if precision(x) == 0
       return true
    elseif pol_length(x) > 1
       return false
-   elseif pol_length(x) == 1 
+   elseif pol_length(x) == 1
       if x.val == 0
          z = fmpq()
-         ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void, 
+         ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void,
                        (Ptr{fmpq}, Ptr{fmpq_rel_series}, Int), &z, &x, 0)
-         return isone(den(z)) && ccall((:fmpz_equal, :libflint), Bool, 
+         return isone(den(z)) && ccall((:fmpz_equal, :libflint), Bool,
                (Ptr{fmpz}, Ptr{fmpz}, Int), &num(z), &y, 0)
       else
          return false
       end
    else
       return iszero(y)
-   end 
+   end
 end
 
 ==(x::fmpz, y::fmpq_rel_series) = y == x
@@ -532,8 +540,8 @@ function divexact(x::fmpq_rel_series, y::fmpq_rel_series)
    z.val = xval - yval
    z.prec = prec + z.val
    if prec != 0
-      ccall((:fmpq_poly_div_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+      ccall((:fmpq_poly_div_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &x, &y, prec)
    end
    return z
@@ -550,8 +558,8 @@ function divexact(x::fmpq_rel_series, y::Int)
    z = parent(x)()
    z.prec = x.prec
    z.val = x.val
-   ccall((:fmpq_poly_scalar_divexact_si, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_scalar_divexact_si, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &x, y)
    return z
 end
@@ -562,8 +570,8 @@ function divexact(x::fmpq_rel_series, y::fmpz)
    z.prec = x.prec
    z.prec = x.prec
    z.val = x.val
-   ccall((:fmpq_poly_scalar_divexact_fmpz, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpz}), 
+   ccall((:fmpq_poly_scalar_divexact_fmpz, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpz}),
                &z, &x, &y)
    return z
 end
@@ -574,8 +582,8 @@ function divexact(x::fmpq_rel_series, y::fmpq)
    z.prec = x.prec
    z.prec = x.prec
    z.val = x.val
-   ccall((:fmpq_poly_scalar_divexact_fmpq, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq}), 
+   ccall((:fmpq_poly_scalar_div_fmpq, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq}),
                &z, &x, &y)
    return z
 end
@@ -596,8 +604,8 @@ function inv(a::fmpq_rel_series)
    ainv = parent(a)()
    ainv.prec = a.prec
    ainv.val = 0
-   ccall((:fmpq_poly_inv_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_inv_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &ainv, &a, a.prec)
    return ainv
 end
@@ -608,7 +616,7 @@ end
 #
 ###############################################################################
 
-function exp(a::fmpq_rel_series)
+function Base.exp(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in exp")
    if pol_length(a) + valuation(a) == 0 || a.prec == 1
       return parent(a)([fmpq(1)], 1, a.prec, 0)
@@ -616,11 +624,11 @@ function exp(a::fmpq_rel_series)
    z = parent(a)()
    z.prec = a.prec
    z.val = 0
-   ccall((:fmpq_poly_shift_left, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_shift_left, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &a, a.val)
-   ccall((:fmpq_poly_exp_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_exp_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &z, a.prec)
    renormalize!(z)
    return z
@@ -638,8 +646,8 @@ function log(a::fmpq_rel_series)
    z = parent(a)()
    z.prec = a.prec
    z.val = 0
-   ccall((:fmpq_poly_log_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_log_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &a, a.prec)
    renormalize!(z)
    return z
@@ -657,11 +665,11 @@ function tan(a::fmpq_rel_series)
    z = parent(a)()
    z.prec = a.prec
    z.val = 0
-   ccall((:fmpq_poly_shift_left, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_shift_left, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &a, a.val)
-   ccall((:fmpq_poly_tan_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_tan_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &z, a.prec)
    renormalize!(z)
    return z
@@ -679,11 +687,11 @@ function tanh(a::fmpq_rel_series)
    z = parent(a)()
    z.prec = a.prec
    z.val = 0
-   ccall((:fmpq_poly_shift_left, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_shift_left, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &a, a.val)
-   ccall((:fmpq_poly_tanh_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_tanh_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &z, a.prec)
    renormalize!(z)
    return z
@@ -701,14 +709,14 @@ function sin(a::fmpq_rel_series)
    z = parent(a)()
    z.prec = a.prec
    z.val = 0
-   ccall((:fmpq_poly_shift_left, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_shift_left, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &a, a.val)
-   ccall((:fmpq_poly_truncate, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_truncate, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Int),
                &z, a.prec)
-   ccall((:fmpq_poly_sin_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_sin_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &z, a.prec)
    renormalize!(z)
    return z
@@ -726,11 +734,11 @@ function sinh(a::fmpq_rel_series)
    z = parent(a)()
    z.prec = a.prec
    z.val = 0
-   ccall((:fmpq_poly_shift_left, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_shift_left, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &a, a.val)
-   ccall((:fmpq_poly_sinh_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_sinh_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &z, a.prec)
    renormalize!(z)
    return z
@@ -748,14 +756,14 @@ function cos(a::fmpq_rel_series)
    z = parent(a)()
    z.prec = a.prec
    z.val = 0
-   ccall((:fmpq_poly_shift_left, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_shift_left, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &a, a.val)
-   ccall((:fmpq_poly_truncate, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_truncate, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Int),
                &z, a.prec)
-   ccall((:fmpq_poly_cos_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_cos_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &z, a.prec)
    renormalize!(z)
    return z
@@ -773,11 +781,11 @@ function cosh(a::fmpq_rel_series)
    z = parent(a)()
    z.prec = a.prec
    z.val = 0
-   ccall((:fmpq_poly_shift_left, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_shift_left, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &a, a.val)
-   ccall((:fmpq_poly_cosh_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_cosh_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &z, a.prec)
    renormalize!(z)
    return z
@@ -795,11 +803,11 @@ function asin(a::fmpq_rel_series)
    z = parent(a)()
    z.prec = a.prec
    z.val = 0
-   ccall((:fmpq_poly_shift_left, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_shift_left, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &a, a.val)
-   ccall((:fmpq_poly_asin_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_asin_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &z, a.prec)
    renormalize!(z)
    return z
@@ -817,11 +825,11 @@ function asinh(a::fmpq_rel_series)
    z = parent(a)()
    z.prec = a.prec
    z.val = 0
-   ccall((:fmpq_poly_shift_left, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_shift_left, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &a, a.val)
-   ccall((:fmpq_poly_asinh_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_asinh_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &z, a.prec)
    renormalize!(z)
    return z
@@ -839,11 +847,11 @@ function atan(a::fmpq_rel_series)
    z = parent(a)()
    z.prec = a.prec
    z.val = 0
-   ccall((:fmpq_poly_shift_left, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_shift_left, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &a, a.val)
-   ccall((:fmpq_poly_atan_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_atan_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &z, a.prec)
    renormalize!(z)
    return z
@@ -861,11 +869,11 @@ function atanh(a::fmpq_rel_series)
    z = parent(a)()
    z.prec = a.prec
    z.val = 0
-   ccall((:fmpq_poly_shift_left, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_shift_left, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &a, a.val)
-   ccall((:fmpq_poly_atanh_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_atanh_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &z, a.prec)
    renormalize!(z)
    return z
@@ -881,8 +889,8 @@ function sqrt(a::fmpq_rel_series)
    z = parent(a)()
    z.prec = a.prec
    z.val = 0
-   ccall((:fmpq_poly_sqrt_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_sqrt_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &a, a.prec)
    return z
 end
@@ -894,15 +902,15 @@ end
 ###############################################################################
 
 function zero!(z::fmpq_rel_series)
-   ccall((:fmpq_poly_zero, :libflint), Void, 
+   ccall((:fmpq_poly_zero, :libflint), Void,
                 (Ptr{fmpq_rel_series},), &z)
    z.prec = parent(z).prec_max
    return z
 end
 
 function setcoeff!(z::fmpq_rel_series, n::Int, x::fmpq)
-   ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Int, Ptr{fmpq}), 
+   ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Int, Ptr{fmpq}),
                &z, n, &x)
    return z
 end
@@ -921,15 +929,15 @@ function mul!(z::fmpq_rel_series, a::fmpq_rel_series, b::fmpq_rel_series)
    if lena <= 0 || lenb <= 0
       lenz = 0
    end
-   ccall((:fmpq_poly_mullow, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_mullow, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &z, &a, &b, lenz)
    return z
 end
 
 function addeq!(a::fmpq_rel_series, b::fmpq_rel_series)
    lena = pol_length(a)
-   lenb = pol_length(b)  
+   lenb = pol_length(b)
    prec = min(a.prec, b.prec)
    val = min(a.val, b.val)
    lena = min(lena, prec - a.val)
@@ -943,8 +951,8 @@ function addeq!(a::fmpq_rel_series, b::fmpq_rel_series)
       ccall((:fmpq_poly_shift_left, :libflint), Void,
             (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
             &z, &z, b.val - a.val)
-      ccall((:fmpq_poly_add_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+      ccall((:fmpq_poly_add_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &a, &a, &z, lenz)
    elseif b.val < a.val
       lenz = max(lena + a.val - b.val, lenb)
@@ -954,13 +962,13 @@ function addeq!(a::fmpq_rel_series, b::fmpq_rel_series)
       ccall((:fmpq_poly_shift_left, :libflint), Void,
             (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
             &a, &a, a.val - b.val)
-      ccall((:fmpq_poly_add_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+      ccall((:fmpq_poly_add_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &a, &a, &b, lenz)
    else
       lenz = max(lena, lenb)
-      ccall((:fmpq_poly_add_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+      ccall((:fmpq_poly_add_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &a, &a, &b, lenz)
    end
    a.prec = prec
@@ -972,16 +980,16 @@ end
 function add!(c::fmpq_rel_series, a::fmpq_rel_series, b::fmpq_rel_series)
    lena = length(a)
    lenb = length(b)
-         
+
    prec = min(a.prec, b.prec)
- 
+
    lena = min(lena, prec)
    lenb = min(lenb, prec)
 
    lenc = max(lena, lenb)
    c.prec = prec
-   ccall((:fmpq_poly_add_series, :libflint), Void, 
-                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+   ccall((:fmpq_poly_add_series, :libflint), Void,
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int),
                &c, &a, &b, lenc)
    return c
 end
@@ -1065,6 +1073,6 @@ end
 
 (a::FmpqRelSeriesRing)(b::Array{T, 1}, len::Int, prec::Int, val::Int) where {T <: Integer} =
     a(map(fmpq, b), len, prec, val)
-    
+
 (a::FmpqRelSeriesRing)(b::Array{Rational{T}, 1}, len::Int, prec::Int, val::Int) where {T <: Integer} =
     a(map(fmpq, b), len, prec, val)

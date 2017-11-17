@@ -81,6 +81,8 @@ canonical_unit(a::fmpq_poly) = canonical_unit(lead(a))
 #
 ###############################################################################
 
+#=
+#use the generic one to print //
 function show(io::IO, x::fmpq_poly)
    if length(x) == 0
       print(io, "0")
@@ -93,6 +95,7 @@ function show(io::IO, x::fmpq_poly)
       ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), cstr)
    end
 end
+=#
 
 function show(io::IO, p::FmpqPolyRing)
    print(io, "Univariate Polynomial Ring in ")
@@ -263,17 +266,17 @@ end
 
 *(x::fmpq_poly, y::Integer) = fmpz(y)*x
 
-+(x::Rational{T}, y::fmpq_poly) where T <: Union{Int, BigInt} = fmpq(x) + y
++(x::Rational, y::fmpq_poly) = fmpq(x) + y
 
--(x::Rational{T}, y::fmpq_poly) where T <: Union{Int, BigInt} = fmpq(x) - y
+-(x::Rational, y::fmpq_poly) = fmpq(x) - y
 
-*(x::Rational{T}, y::fmpq_poly) where T <: Union{Int, BigInt} = fmpq(x) * y
+*(x::Rational, y::fmpq_poly) = fmpq(x) * y
 
-+(x::fmpq_poly, y::Rational{T}) where T <: Union{Int, BigInt} = x + fmpq(y)
++(x::fmpq_poly, y::Rational) = x + fmpq(y)
 
--(x::fmpq_poly, y::Rational{T}) where T <: Union{Int, BigInt} = x - fmpq(y)
+-(x::fmpq_poly, y::Rational) = x - fmpq(y)
 
-*(x::fmpq_poly, y::Rational{T}) where T <: Union{Int, BigInt} = x * fmpq(y)
+*(x::fmpq_poly, y::Rational) = x * fmpq(y)
 
 ###############################################################################
 #

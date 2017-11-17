@@ -53,10 +53,8 @@ end
 ###############################################################################
 
 function Base.view(x::fmpq_mat, r1::Int, c1::Int, r2::Int, c2::Int)
-  _checkbounds(x.r, r1) || throw(BoundsError())
-  _checkbounds(x.r, r2) || throw(BoundsError())
-  _checkbounds(x.c, c1) || throw(BoundsError())
-  _checkbounds(x.c, c2) || throw(BoundsError())
+  Generic._checkbounds(x, r1, c1)
+  Generic._checkbounds(x, r2, c2)
   (r1 > r2 || c1 > c2) && error("Invalid parameters")
   b = fmpq_mat()
   b.base_ring = x.base_ring
@@ -91,9 +89,8 @@ function getindex!(v::fmpq, a::fmpq_mat, r::Int, c::Int)
    ccall((:fmpq_set, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &v, z)
 end
 
-function getindex(a::fmpq_mat, r::Int, c::Int)
-   _checkbounds(rows(a), r) || throw(BoundsError())
-   _checkbounds(cols(a), c) || throw(BoundsError())
+@inline function getindex(a::fmpq_mat, r::Int, c::Int)
+   @boundscheck Generic._checkbounds(a, r, c)
    v = fmpq()
    z = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
              (Ptr{fmpq_mat}, Int, Int), &a, r - 1, c - 1)
@@ -101,7 +98,8 @@ function getindex(a::fmpq_mat, r::Int, c::Int)
    return v
 end
 
-function setindex!(a::fmpq_mat, d::fmpz, r::Int, c::Int)
+@inline function setindex!(a::fmpq_mat, d::fmpz, r::Int, c::Int)
+   @boundscheck Generic._checkbounds(a, r, c)
    z = ccall((:fmpq_mat_entry_num, :libflint), Ptr{fmpz},
              (Ptr{fmpq_mat}, Int, Int), &a, r - 1, c - 1)
    ccall((:fmpz_set, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}), z, &d)
@@ -110,23 +108,27 @@ function setindex!(a::fmpq_mat, d::fmpz, r::Int, c::Int)
    ccall((:fmpz_set_si, :libflint), Void, (Ptr{fmpz}, Int), z, 1)
 end
 
-function setindex!(a::fmpq_mat, d::fmpq, r::Int, c::Int)
+@inline function setindex!(a::fmpq_mat, d::fmpq, r::Int, c::Int)
+   @boundscheck Generic._checkbounds(a, r, c)
    z = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
              (Ptr{fmpq_mat}, Int, Int), &a, r - 1, c - 1)
    ccall((:fmpq_set, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), z, &d)
 end
 
-setindex!(a::fmpq_mat, d::Integer, r::Int, c::Int) = setindex!(a, fmpq(d), r, c)
+Base.@propagate_inbounds setindex!(a::fmpq_mat, d::Integer,
+                                 r::Int, c::Int) =
+         setindex!(a, fmpq(d), r, c)
 
-function setindex!(a::fmpq_mat, d::Int, r::Int, c::Int)
-   _checkbounds(rows(a), r) || throw(BoundsError())
-   _checkbounds(cols(a), c) || throw(BoundsError())
+@inline function setindex!(a::fmpq_mat, d::Int, r::Int, c::Int)
+   @boundscheck Generic._checkbounds(a, r, c)
    z = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
              (Ptr{fmpq_mat}, Int, Int), &a, r - 1, c - 1)
    ccall((:fmpq_set_si, :libflint), Void, (Ptr{fmpq}, Int, Int), z, d, 1)
 end
 
-setindex!(a::fmpq_mat, d::Rational, r::Int, c::Int) = setindex!(a, fmpq(d), r, c)
+Base.@propagate_inbounds setindex!(a::fmpq_mat, d::Rational,
+                                 r::Int, c::Int) =
+         setindex!(a, fmpq(d), r, c)
 
 rows(a::fmpq_mat) = a.r
 
@@ -277,9 +279,9 @@ end
 
 *(x::fmpq_mat, y::Integer) = fmpz(y)*x
 
-*(x::Rational{T}, y::fmpq_mat) where T <: Union{Int, BigInt} = fmpq(x)*y
+*(x::Rational, y::fmpq_mat) = fmpq(x)*y
 
-*(x::fmpq_mat, y::Rational{T}) where T <: Union{Int, BigInt} = fmpq(y)*x
+*(x::fmpq_mat, y::Rational) = fmpq(y)*x
 
 for T in [Integer, fmpz, fmpq]
    @eval begin
@@ -311,7 +313,7 @@ for T in [Integer, fmpz, fmpq]
    end
 end
 
-function +(x::fmpq_mat, y::Rational{T}) where T <: Union{Int, BigInt}
+function +(x::fmpq_mat, y::Rational)
    z = deepcopy(x)
    for i = 1:min(rows(x), cols(x))
       z[i, i] += y
@@ -319,9 +321,9 @@ function +(x::fmpq_mat, y::Rational{T}) where T <: Union{Int, BigInt}
    return z
 end
 
-+(x::Rational{T}, y::fmpq_mat) where T <: Union{Int, BigInt} = y + x
++(x::Rational, y::fmpq_mat) = y + x
 
-function -(x::fmpq_mat, y::Rational{T}) where T <: Union{Int, BigInt}
+function -(x::fmpq_mat, y::Rational)
    z = deepcopy(x)
    for i = 1:min(rows(x), cols(x))
       z[i, i] -= y
@@ -329,7 +331,7 @@ function -(x::fmpq_mat, y::Rational{T}) where T <: Union{Int, BigInt}
    return z
 end
 
-function -(x::Rational{T}, y::fmpq_mat) where T <: Union{Int, BigInt}
+function -(x::Rational, y::fmpq_mat)
    z = -y
    for i = 1:min(rows(y), cols(y))
       z[i, i] += x
@@ -756,6 +758,76 @@ promote_rule(::Type{fmpq_mat}, ::Type{fmpq}) = fmpq_mat
 promote_rule(::Type{fmpq_mat}, ::Type{fmpz}) = fmpq_mat
 
 promote_rule(::Type{fmpq_mat}, ::Type{Rational{T}}) where T <: Union{Int, BigInt} = fmpq_mat
+
+###############################################################################
+#
+#   Matrix constructor
+#
+###############################################################################
+
+function matrix(R::FlintRationalField, arr::Array{fmpq, 2})
+   z = fmpq_mat(size(arr, 1), size(arr, 2), arr)
+   z.base_ring = FlintQQ
+   return z
+end
+
+function matrix(R::FlintRationalField, arr::Array{<: Union{fmpz, Int, BigInt}, 2})
+   z = fmpq_mat(size(arr, 1), size(arr, 2), arr)
+   z.base_ring = FlintQQ
+   return z
+end
+
+function matrix(R::FlintRationalField, arr::Array{Rational{T}, 2}) where {T <: Integer}
+   z = fmpq_mat(size(arr, 1), size(arr, 2), map(fmpq, arr))
+   z.base_ring = FlintQQ
+   return z
+end
+
+function matrix(R::FlintRationalField, r::Int, c::Int, arr::Array{fmpq, 1})
+   _check_dim(r, c, arr)
+   z = fmpq_mat(r, c, arr)
+   z.base_ring = FlintQQ
+   return z
+end
+
+function matrix(R::FlintRationalField, r::Int, c::Int, arr::Array{<: Union{fmpz, Int, BigInt}, 1})
+   _check_dim(r, c, arr)
+   z = fmpq_mat(r, c, arr)
+   z.base_ring = FlintQQ
+   return z
+end
+
+function matrix(R::FlintRationalField, r::Int, c::Int, arr::Array{Rational{T}, 1}) where {T <: Union{fmpz, Int, BigInt}}
+   _check_dim(r, c, arr)
+   z = fmpq_mat(r, c, map(fmpq, arr))
+   z.base_ring = FlintQQ
+   return z
+end
+
+###############################################################################
+#
+#  Zero matrix
+#
+###############################################################################
+
+function zero_matrix(R::FlintRationalField, r::Int, c::Int)
+   z = fmpq_mat(r, c)
+   z.base_ring = FlintQQ
+   return z
+end
+
+###############################################################################
+#
+#  Identity matrix
+#
+###############################################################################
+
+function identity_matrix(R::FlintRationalField, n::Int)
+   z = fmpq_mat(n, n)
+   ccall((:fmpq_mat_one, :libflint), Void, (Ptr{fmpq_mat}, ), &z)
+   z.base_ring = FlintQQ
+   return z
+end
 
 ###############################################################################
 #

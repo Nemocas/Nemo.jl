@@ -78,6 +78,33 @@ function test_fmpq_mat_constructors()
    @test_throws ErrorConstrDimMismatch (S([fmpq(1) 2 3 4; 5 6 7 8; 1 2 3 4]))
    @test_throws ErrorConstrDimMismatch (S([fmpq(1), 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4]))
 
+   arr = [1 2; 3 4]
+   arr2 = [1, 2, 3, 4, 5, 6]
+
+   for T in [fmpz, Int, BigInt, Rational{Int}, Rational{BigInt}]
+      M = matrix(FlintQQ, map(T, arr))
+      @test isa(M, fmpq_mat)
+      @test M.base_ring == FlintQQ
+
+      M2 = matrix(FlintQQ, 2, 3, map(T, arr2))
+      @test isa(M2, fmpq_mat)
+      @test M2.base_ring == FlintQQ
+      @test rows(M2) == 2
+      @test cols(M2) == 3
+      @test_throws ErrorConstrDimMismatch matrix(FlintQQ, 2, 2, map(T, arr2))
+      @test_throws ErrorConstrDimMismatch matrix(FlintQQ, 2, 4, map(T, arr2))
+   end
+   
+   M3 = zero_matrix(FlintQQ, 2, 3)
+
+   @test isa(M3, fmpq_mat)
+   @test M3.base_ring == FlintQQ
+
+   M4 = identity_matrix(FlintQQ, 3)
+
+   @test isa(M4, fmpq_mat)
+   @test M4.base_ring == FlintQQ
+
    println("PASS")
 end
 

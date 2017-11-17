@@ -20,14 +20,6 @@ parent_type(::Type{nmod_mat}) = NmodMatSpace
 
 elem_type(::Type{NmodMatSpace}) = nmod_mat
 
-function _checkbounds(I::Int, J::Int)
-   J >= 1 && J <= I
-end
-
-function _checkbounds(A, I::Int, J::Int)
-  (_checkbounds(size(A, 1), I) && _checkbounds(size(A, 2), J)) || (throw(BoundsError(A, I)))
-end
-
 function check_parent(x::nmod_mat, y::nmod_mat)
   base_ring(x) != base_ring(y) && error("Residue rings must be equal")
   (cols(x) != cols(y)) && (rows(x) != rows(y)) &&
@@ -65,8 +57,8 @@ end
 #
 ################################################################################
 
-function getindex(a::nmod_mat, i::Int, j::Int)
-  _checkbounds(a, i, j)
+@inline function getindex(a::nmod_mat, i::Int, j::Int)
+  @boundscheck Generic._checkbounds(a, i, j)
   u = ccall((:nmod_mat_get_entry, :libflint), UInt,
               (Ptr{nmod_mat}, Int, Int), &a, i - 1 , j - 1)
   return base_ring(a)(u)
@@ -78,18 +70,18 @@ function getindex_raw(a::nmod_mat, i::Int, j::Int)
                  (Ptr{nmod_mat}, Int, Int), &a, i - 1, j - 1)
 end
 
-function setindex!(a::nmod_mat, u::UInt, i::Int, j::Int)
-  _checkbounds(a, i, j)
+@inline function setindex!(a::nmod_mat, u::UInt, i::Int, j::Int)
+  @boundscheck Generic._checkbounds(a, i, j)
   set_entry!(a, i, j, u)
 end
 
-function setindex!(a::nmod_mat, u::fmpz, i::Int, j::Int)
-  _checkbounds(a, i, j)
+@inline function setindex!(a::nmod_mat, u::fmpz, i::Int, j::Int)
+  @boundscheck Generic._checkbounds(a, i, j)
   set_entry!(a, i, j, u)
 end
 
-function setindex!(a::nmod_mat, u::nmod, i::Int, j::Int)
-  _checkbounds(a, i, j)
+@inline function setindex!(a::nmod_mat, u::nmod, i::Int, j::Int)
+  @boundscheck Generic._checkbounds(a, i, j)
   (base_ring(a) != parent(u)) && error("Parent objects must coincide") 
   set_entry!(a, i, j, u.data)
 end
@@ -525,8 +517,8 @@ end
 ################################################################################
 
 function Base.view(x::nmod_mat, r1::Int, c1::Int, r2::Int, c2::Int)
-  _checkbounds(x, r1, c1)
-  _checkbounds(x, r2, c2)
+  Generic._checkbounds(x, r1, c1)
+  Generic._checkbounds(x, r2, c2)
   (r1 > r2 || c1 > c2) && error("Invalid parameters")
   temp = similar(x, r2 - r1 + 1, c2 - c1 + 1)
   ccall((:nmod_mat_window_init, :libflint), Void,
@@ -768,6 +760,52 @@ function (a::NmodMatSpace)(b::fmpz_mat)
   z = nmod_mat(a.n, b)
   z.base_ring = a.base_ring
   return z
+end
+
+###############################################################################
+#
+#   Matrix constructor
+#
+###############################################################################
+
+function matrix(R::NmodRing, arr::Array{<: Union{nmod, fmpz, Integer}, 2})
+   z = nmod_mat(size(arr, 1), size(arr, 2), R.n, arr)
+   z.base_ring = R
+   return z
+end
+
+function matrix(R::NmodRing, r::Int, c::Int, arr::Array{<: Union{nmod, fmpz, Integer}, 1})
+   _check_dim(r, c, arr)
+   z = nmod_mat(r, c, R.n, arr)
+   z.base_ring = R
+   return z
+end
+
+###############################################################################
+#
+#  Zero matrix
+#
+###############################################################################
+
+function zero_matrix(R::NmodRing, r::Int, c::Int)
+   z = nmod_mat(r, c, R.n)
+   z.base_ring = R
+   return z
+end
+
+###############################################################################
+#
+#  Identity matrix
+#
+###############################################################################
+
+function identity_matrix(R::NmodRing, n::Int)
+   z = zero_matrix(R, n, n)
+   for i in 1:n
+      z[i, i] = one(R)
+   end
+   z.base_ring = R
+   return z
 end
 
 ################################################################################

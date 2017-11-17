@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   JuliaRational.jl : Additional Nemo functionality for Julia Rationals
+#   Rational.jl : Additional Nemo functionality for Julia Rationals
 #
 ###############################################################################
 
@@ -16,8 +16,8 @@ qq = Rationals{Int}()
 
 parent(a::Rational{T}) where T <: Integer = Rationals{T}()
 
-elem_type(::Rationals{T}) where T <: Integer = Rational{T}
-  
+elem_type(::Type{Rationals{T}}) where T <: Integer = Rational{T}
+
 parent_type(::Type{Rational{T}}) where T <: Integer = Rationals{T}
 
 base_ring(a::Rational{Int}) = zz
@@ -31,6 +31,10 @@ base_ring(a::Rationals{BigInt}) = JuliaZZ
 base_ring(a::Rationals{T}) where T <: Integer = Integers{T}()
 
 base_ring(a::Rational{T}) where T <: Integer = Integers{T}()
+
+isexact_type(::Type{Rational{T}}) where T <: Integer = true
+
+isdomain_type(::Type{Rational{T}}) where T <: Integer = true
 
 ###############################################################################
 #
@@ -110,6 +114,17 @@ function gcd(p::Rational{T}, q::Rational{T}) where T <: Integer
    else
       return Rational{T}(n, d)
    end
+end
+
+###############################################################################
+#
+#   Exponential
+#
+###############################################################################
+
+function exp(a::Rational{T}) where T <: Integer
+   a != 0 && throw(DomainError())
+   return Rational{T}(1)
 end
 
 ###############################################################################

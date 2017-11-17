@@ -311,6 +311,8 @@ function ==(x::nmod_poly, y::nmod_poly)
           (Ptr{nmod_poly}, Ptr{nmod_poly}), &x, &y))
 end
 
+isequal(x::nmod_poly, y::nmod_poly) = x == y
+
 ################################################################################
 #
 #  Ad hoc comparisons
@@ -329,8 +331,6 @@ function ==(x::nmod_poly, y::nmod)
     return iszero(y)
   end 
 end
-
-isequal(x::nmod_poly, y::nmod_poly) = x == y
 
 ==(x::nmod, y::nmod_poly) = y == x
 

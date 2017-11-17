@@ -279,6 +279,10 @@ mutable struct ResRing{T <: RingElement} <: Nemo.ResRing{T}
    modulus::T
 
    function ResRing{T}(modulus::T, cached::Bool = true) where T <: RingElement
+      c = canonical_unit(modulus)
+      if !isone(c)
+        modulus = divexact(modulus, c)
+      end
       if haskey(ModulusDict, (parent(modulus), modulus))
          return ModulusDict[parent(modulus), modulus]::ResRing{T}
       else
@@ -441,5 +445,15 @@ mutable struct Mat{T <: RingElement} <: Nemo.MatElem{T}
 
    function Mat{T}(A::Array{T, 2}) where T <: RingElement
       return new{T}(A)
+   end
+
+   function Mat{T}(r::Int, c::Int, A::Array{T, 1}) where T <: RingElement
+      t = Array{T}(r, c)
+      for i = 1:r
+         for j = 1:c
+            t[i, j] = A[(i - 1) * c + j]
+         end
+      end
+      return new{T}(t)
    end
 end
