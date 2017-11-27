@@ -43,6 +43,8 @@ base_ring(a::FlintRationalField) = FlintZZ
 
 base_ring(a::fmpq) = FlintZZ
 
+isdomain_type(::Type{fmpq}) = true
+
 ###############################################################################
 #
 #   Hashing
@@ -102,11 +104,11 @@ zero(a::FlintRationalField) = fmpq(0)
 one(a::FlintRationalField) = fmpq(1)
 
 function isone(a::fmpq)
-   return Bool(ccall((:fmpq_is_one, :libflint), Cint, (Ptr{fmpq}, ), &a))  
+   return Bool(ccall((:fmpq_is_one, :libflint), Cint, (Ptr{fmpq}, ), &a))
 end
 
 function iszero(a::fmpq)
-   return Bool(ccall((:fmpq_is_zero, :libflint), Cint, (Ptr{fmpq}, ), &a))  
+   return Bool(ccall((:fmpq_is_zero, :libflint), Cint, (Ptr{fmpq}, ), &a))
 end
 
 isunit(a::fmpq) = !iszero(a)
@@ -187,21 +189,21 @@ end
 
 function +(a::fmpq, b::fmpq)
    z = fmpq()
-   ccall((:fmpq_add, :libflint), Void, 
+   ccall((:fmpq_add, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &z, &a, &b)
    return z
 end
 
 function -(a::fmpq, b::fmpq)
    z = fmpq()
-   ccall((:fmpq_sub, :libflint), Void, 
+   ccall((:fmpq_sub, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &z, &a, &b)
    return z
 end
 
 function *(a::fmpq, b::fmpq)
    z = fmpq()
-   ccall((:fmpq_mul, :libflint), Void, 
+   ccall((:fmpq_mul, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &z, &a, &b)
    return z
 end
@@ -214,14 +216,14 @@ end
 
 function +(a::fmpq, b::Int)
    z = fmpq()
-   ccall((:fmpq_add_si, :libflint), Void, 
+   ccall((:fmpq_add_si, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpq}, Int), &z, &a, b)
    return z
 end
 
 function +(a::fmpq, b::fmpz)
    z = fmpq()
-   ccall((:fmpq_add_fmpz, :libflint), Void, 
+   ccall((:fmpq_add_fmpz, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpz}), &z, &a, &b)
    return z
 end
@@ -231,30 +233,30 @@ end
 +(a::fmpz, b::fmpq) = b + a
 
 +(a::fmpq, b::Rational{T}) where {T <: Integer} = a + fmpq(b)
-                                               
+
 +(a::Rational{T}, b::fmpq) where {T <: Integer} = b + a
 
 function -(a::fmpq, b::Int)
    z = fmpq()
-   ccall((:fmpq_sub_si, :libflint), Void, 
+   ccall((:fmpq_sub_si, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpq}, Int), &z, &a, b)
    return z
 end
 
 function -(a::fmpq, b::fmpz)
    z = fmpq()
-   ccall((:fmpq_sub_fmpz, :libflint), Void, 
+   ccall((:fmpq_sub_fmpz, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpz}), &z, &a, &b)
    return z
 end
 
 -(a::fmpq, b::Rational{T}) where {T <: Integer} = a - fmpq(b)
-                                               
+
 -(a::Rational{T}, b::fmpq) where {T <: Integer} = fmpq(b) - a
 
 function *(a::fmpq, b::fmpz)
    z = fmpq()
-   ccall((:fmpq_mul_fmpz, :libflint), Void, 
+   ccall((:fmpq_mul_fmpz, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpz}), &z, &a, &b)
    return z
 end
@@ -281,7 +283,7 @@ end
 ###############################################################################
 
 function ==(a::fmpq, b::fmpq)
-   return ccall((:fmpq_equal, :libflint), Bool, 
+   return ccall((:fmpq_equal, :libflint), Bool,
                 (Ptr{fmpq}, Ptr{fmpq}), &a, &b)
 end
 
@@ -290,7 +292,7 @@ doc"""
 > Return `true` if $a < b$, otherwise return `false`.
 """
 function isless(a::fmpq, b::fmpq)
-   return ccall((:fmpq_cmp, :libflint), Cint, 
+   return ccall((:fmpq_cmp, :libflint), Cint,
                 (Ptr{fmpq}, Ptr{fmpq}), &a, &b) < 0
 end
 
@@ -307,14 +309,14 @@ end
 ==(a::Int, b::fmpq) = b == a
 
 function ==(a::fmpq, b::fmpz)
-   return ccall((:fmpq_equal_fmpz, :libflint), Bool, 
+   return ccall((:fmpq_equal_fmpz, :libflint), Bool,
                 (Ptr{fmpq}, Ptr{fmpz}), &a, &b)
 end
 
 ==(a::fmpz, b::fmpq) = b == a
 
 ==(a::fmpq, b::Rational{T}) where {T <: Integer} = a == fmpq(b)
-                                                
+
 ==(a::Rational{T}, b::fmpq) where {T <: Integer} = b == a
 
 doc"""
@@ -358,7 +360,7 @@ function isless(a::fmpz, b::fmpq)
 end
 
 isless(a::Rational{T}, b::fmpq) where {T <: Integer} = isless(fmpq(a), b)
-                                                    
+
 isless(a::fmpq, b::Rational{T}) where {T <: Integer} = isless(a, fmpq(b))
 
 ###############################################################################
@@ -369,7 +371,7 @@ isless(a::fmpq, b::Rational{T}) where {T <: Integer} = isless(a, fmpq(b))
 
 function ^(a::fmpq, b::Int)
    temp = fmpq()
-   ccall((:fmpq_pow_si, :libflint), Void, 
+   ccall((:fmpq_pow_si, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpq}, Int), &temp, &a, b)
    return temp
 end
@@ -386,7 +388,7 @@ doc"""
 """
 function >>(a::fmpq, b::Int)
    z = fmpq()
-   ccall((:fmpq_div_2exp, :libflint), Void, 
+   ccall((:fmpq_div_2exp, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpq}, Int), &z, &a, b)
    return z
 end
@@ -397,7 +399,7 @@ doc"""
 """
 function <<(a::fmpq, b::Int)
    z = fmpq()
-   ccall((:fmpq_mul_2exp, :libflint), Void, 
+   ccall((:fmpq_mul_2exp, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpq}, Int), &z, &a, b)
    return z
 end
@@ -454,7 +456,7 @@ divexact(a::fmpq, b::Integer) = divexact(a, fmpz(b))
 divexact(a::Integer, b::fmpq) = inv(b)*a
 
 divexact(a::fmpq, b::Rational{T}) where {T <: Integer} = divexact(a, fmpq(b))
-                                                      
+
 divexact(a::Rational{T}, b::fmpq) where {T <: Integer} = divexact(fmpq(a), b)
 
 ###############################################################################
@@ -490,7 +492,7 @@ mod(a::fmpq, b::Integer) = mod(a, fmpz(b))
 
 function gcd(a::fmpq, b::fmpq)
    z = fmpq()
-   ccall((:fmpq_gcd, :libflint), Void, 
+   ccall((:fmpq_gcd, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &z, &a, &b)
    return z
 end
@@ -513,14 +515,14 @@ valuation(a::fmpq, b::Integer) = valuation(a, fmpz(b))
 
 doc"""
     reconstruct(a::fmpz, b::fmpz)
-> Attempt to find a rational number $n/d$ such that 
-> $0 \leq |n| \leq \lfloor\sqrt{m/2}\rfloor$ and 
+> Attempt to find a rational number $n/d$ such that
+> $0 \leq |n| \leq \lfloor\sqrt{m/2}\rfloor$ and
 > $0 < d \leq \lfloor\sqrt{m/2}\rfloor$ such that gcd$(n, d) = 1$ and
 > $a \equiv nd^{-1} \pmod{m}$. If no solution exists, an exception is thrown.
 """
 function reconstruct(a::fmpz, b::fmpz)
    c = fmpq()
-   if !Bool(ccall((:fmpq_reconstruct_fmpz, :libflint), Cint, 
+   if !Bool(ccall((:fmpq_reconstruct_fmpz, :libflint), Cint,
                   (Ptr{fmpq}, Ptr{fmpz}, Ptr{fmpz}), &c, &a, &b))
       error("Impossible rational reconstruction")
    end
@@ -529,8 +531,8 @@ end
 
 doc"""
     reconstruct(a::fmpz, b::Integer)
-> Attempt to find a rational number $n/d$ such that 
-> $0 \leq |n| \leq \lfloor\sqrt{m/2}\rfloor$ and 
+> Attempt to find a rational number $n/d$ such that
+> $0 \leq |n| \leq \lfloor\sqrt{m/2}\rfloor$ and
 > $0 < d \leq \lfloor\sqrt{m/2}\rfloor$ such that gcd$(n, d) = 1$ and
 > $a \equiv nd^{-1} \pmod{m}$. If no solution exists, an exception is thrown.
 """
@@ -538,8 +540,8 @@ reconstruct(a::fmpz, b::Integer) =  reconstruct(a, fmpz(b))
 
 doc"""
     reconstruct(a::Integer, b::fmpz)
-> Attempt to find a rational number $n/d$ such that 
-> $0 \leq |n| \leq \lfloor\sqrt{m/2}\rfloor$ and 
+> Attempt to find a rational number $n/d$ such that
+> $0 \leq |n| \leq \lfloor\sqrt{m/2}\rfloor$ and
 > $0 < d \leq \lfloor\sqrt{m/2}\rfloor$ such that gcd$(n, d) = 1$ and
 > $a \equiv nd^{-1} \pmod{m}$. If no solution exists, an exception is thrown.
 """
@@ -547,8 +549,8 @@ reconstruct(a::Integer, b::fmpz) =  reconstruct(fmpz(a), b)
 
 doc"""
     reconstruct(a::Integer, b::Integer)
-> Attempt to find a rational number $n/d$ such that 
-> $0 \leq |n| \leq \lfloor\sqrt{m/2}\rfloor$ and 
+> Attempt to find a rational number $n/d$ such that
+> $0 \leq |n| \leq \lfloor\sqrt{m/2}\rfloor$ and
 > $0 < d \leq \lfloor\sqrt{m/2}\rfloor$ such that gcd$(n, d) = 1$ and
 > $a \equiv nd^{-1} \pmod{m}$. If no solution exists, an exception is thrown.
 """
@@ -568,7 +570,7 @@ doc"""
 > but skipping all gcd$(p,q) \neq 1$. Starting with zero, this generates
 > every nonnegative rational number once and only once, with the first
 > few entries being $0, 1, 1/2, 2, 1/3, 3, 2/3, 3/2, 1/4, 4, 3/4, 4/3, \ldots$.
-> This enumeration produces the rational numbers in order of minimal height. 
+> This enumeration produces the rational numbers in order of minimal height.
 > It has the disadvantage of being somewhat slower to compute than the
 > Calkin-Wilf enumeration. If $x < 0$ we throw a `DomainError()`.
 """
@@ -581,8 +583,8 @@ end
 
 doc"""
     next_signed_minimal(a::fmpq)
-> Given a signed rational number $x$ assumed to be in canonical form, 
-> returns the next element in the minimal-height sequence generated by 
+> Given a signed rational number $x$ assumed to be in canonical form,
+> returns the next element in the minimal-height sequence generated by
 > `next_minimal` but with negative numbers interleaved. The sequence begins
 > $0, 1, -1, 1/2, -1/2, 2, -2, 1/3, -1/3, \ldots$. Starting with zero, this
 > generates every rational number once and only once, in order of minimal
@@ -590,7 +592,7 @@ doc"""
 """
 function next_signed_minimal(a::fmpq)
    c = fmpq()
-   ccall((:fmpq_next_signed_minimal, :libflint), Void, 
+   ccall((:fmpq_next_signed_minimal, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpq}), &c, &a)
    return c
 end
@@ -601,7 +603,7 @@ doc"""
 > Calkin-Wilf tree. Starting with zero, this generates every nonnegative
 > rational number once and only once, with the first few entries being
 > $0, 1, 1/2, 2, 1/3, 3/2, 2/3, 3, 1/4, 4/3, 3/5, 5/2, 2/5, \ldots$.
-> Despite the appearance of the initial entries, the Calkin-Wilf enumeration 
+> Despite the appearance of the initial entries, the Calkin-Wilf enumeration
 > does not produce the rational numbers in order of height: some small
 > fractions will appear late in the sequence. This order has the advantage of
 > being faster to produce than the minimal-height order.
@@ -609,7 +611,7 @@ doc"""
 function next_calkin_wilf(a::fmpq)
    a < 0 && throw(DomainError())
    c = fmpq()
-   ccall((:fmpq_next_calkin_wilf, :libflint), Void, 
+   ccall((:fmpq_next_calkin_wilf, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpq}), &c, &a)
    return c
 end
@@ -624,7 +626,7 @@ doc"""
 """
 function next_signed_calkin_wilf(a::fmpq)
    c = fmpq()
-   ccall((:fmpq_next_signed_calkin_wilf, :libflint), Void, 
+   ccall((:fmpq_next_signed_calkin_wilf, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpq}), &c, &a)
    return c
 end
@@ -638,7 +640,7 @@ end
 doc"""
     harmonic(n::Int)
 > Computes the harmonic number $H_n = 1 + 1/2 + 1/3 + \cdots + 1/n$.
-> Table lookup is used for $H_n$ whose numerator and denominator 
+> Table lookup is used for $H_n$ whose numerator and denominator
 > fit in a single limb. For larger $n$, a divide and conquer strategy is used.
 """
 function harmonic(n::Int)
@@ -677,7 +679,7 @@ doc"""
 """
 function dedekind_sum(h::fmpz, k::fmpz)
    c = fmpq()
-   ccall((:fmpq_dedekind_sum, :libflint), Void, 
+   ccall((:fmpq_dedekind_sum, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpz}, Ptr{fmpz}), &c, &h, &k)
    return c
 end
@@ -695,7 +697,7 @@ doc"""
 dedekind_sum(h::Integer, k::fmpz) = dedekind_sum(fmpz(h), k)
 
 doc"""
-    dedekind_sum(h::Integer, k::Integer) 
+    dedekind_sum(h::Integer, k::Integer)
 > Computes the Dedekind sum $s(h,k)$ for arbitrary $h$ and $k$.
 """
 dedekind_sum(h::Integer, k::Integer) = dedekind_sum(fmpz(h), fmpz(k))
@@ -735,10 +737,10 @@ end
 #   Conversions to/from flint Julia rationals
 #
 ###############################################################################
-   
+
 function Rational(z::fmpq)
    r = Rational{BigInt}(0)
-   ccall((:fmpq_get_mpz_frac, :libflint), Void, 
+   ccall((:fmpq_get_mpz_frac, :libflint), Void,
          (Ptr{BigInt}, Ptr{BigInt}, Ptr{fmpq}), &r.num, &r.den, &z)
    return r
 end
@@ -755,7 +757,7 @@ end
 
 (a::FlintRationalField)() = fmpq(fmpz(0), fmpz(1))
 
-(a::FlintRationalField)(b::Rational) = fmpq(numerator(b), denominator(b)) 
+(a::FlintRationalField)(b::Rational) = fmpq(numerator(b), denominator(b))
 
 (a::FlintRationalField)(b::Integer) = fmpq(b)
 
@@ -800,4 +802,3 @@ convert(::Type{Rational{BigInt}}, a::fmpq) = Rational(a)
 ###############################################################################
 
 FractionField(base::FlintIntegerRing) = FlintQQ
-

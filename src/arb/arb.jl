@@ -20,7 +20,7 @@ export ball, radius, midpoint, contains, contains_zero,
        const_pi, const_e, const_log2, const_log10, const_euler,
        const_catalan, const_khinchin, const_glaisher,
        floor, ceil, hypot, sqrt, rsqrt, sqrt1pm1, root,
-       log, log1p, exp, expm1, sin, cos, sinpi, cospi, tan, cot,
+       log, log1p, expm1, sin, cos, sinpi, cospi, tan, cot,
        tanpi, cotpi, sinh, cosh, tanh, coth, atan, asin, acos,
        atanh, asinh, acosh, gamma, lgamma, rgamma, digamma, zeta,
        sincos, sincospi, sinhcosh, atan2,
@@ -41,7 +41,7 @@ doc"""
     base_ring(R::ArbField)
 > Returns `Union{}` since an Arb field does not depend on any other ring.
 """
-base_ring(R::ArbField) = Union{} 
+base_ring(R::ArbField) = Union{}
 
 doc"""
     base_ring(x::arb)
@@ -55,17 +55,19 @@ doc"""
 """
 parent(x::arb) = x.parent
 
-isexact(R::ArbField) = false
+isdomain_type(::Type{arb}) = true
+
+isexact_type(::Type{arb}) = false
 
 doc"""
     zero(R::ArbField)
-> Return exact zero in the given Arb field. 
+> Return exact zero in the given Arb field.
 """
 zero(R::ArbField) = R(0)
 
 doc"""
     one(R::ArbField)
-> Return exact one in the given Arb field. 
+> Return exact one in the given Arb field.
 """
 one(R::ArbField) = R(1)
 
@@ -186,7 +188,7 @@ contains(x::arb, y::Rational{T}) where {T <: Integer} = contains(x, fmpq(y))
 
 doc"""
     contains(x::arb, y::BigFloat)
-> Returns `true` if the ball $x$ contains the given floating point value, 
+> Returns `true` if the ball $x$ contains the given floating point value,
 > otherwise return `false`.
 """
 function contains(x::arb, y::BigFloat)
@@ -480,7 +482,7 @@ function isnegative(x::arb)
 end
 
 doc"""
-    isnonpositive(x::arb)    
+    isnonpositive(x::arb)
 > Return `true` if $x$ is certainly nonpositive, otherwise return `false`.
 """
 function isnonpositive(x::arb)
@@ -1074,7 +1076,7 @@ doc"""
     exp(x::arb)
 > Return the exponential of $x$.
 """
-function exp(x::arb)
+function Base.exp(x::arb)
    z = parent(x)()
    ccall((:arb_exp, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
    return z
@@ -1677,7 +1679,7 @@ chebyshev_t2(n::Int, x::arb) = n < 0 ? throw(DomainError()) : chebyshev_t2(UInt(
 
 doc"""
     chebyshev_u2(n::Int, x::arb)
-> Return the tuple $(U_{n}(x), U_{n-1}(x))$ 
+> Return the tuple $(U_{n}(x), U_{n-1}(x))$
 """
 chebyshev_u2(n::Int, x::arb) = n < 0 ? throw(DomainError()) : chebyshev_u2(UInt(n), x)
 
@@ -1855,7 +1857,7 @@ function (r::ArbField)(x::fmpq)
   z.parent = r
   return z
 end
-  
+
 (r::ArbField)(x::Rational{T}) where {T <: Integer} = r(fmpq(x))
 
 #function call(r::ArbField, x::arf)

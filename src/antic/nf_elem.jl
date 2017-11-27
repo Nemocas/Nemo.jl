@@ -35,6 +35,8 @@ doc"""
 """
 base_ring(a::nf_elem) = Union{}
 
+isdomain_type(::Type{nf_elem}) = true
+
 doc"""
     var(a::AnticNumberField)
 > Returns the identifier (as a symbol, not a string), that is used for printing
@@ -201,7 +203,7 @@ doc"""
     signature(a::AnticNumberField)
 > Return the signature of the given number field, i.e. a tuple $r, s$
 > consisting of $r$, the number of real embeddings and $s$, half the number of
-> complex embeddings. 
+> complex embeddings.
 """
 signature(a::AnticNumberField) = signature(a.pol)
 
@@ -225,10 +227,13 @@ function show(io::IO, x::nf_elem)
    cstr = ccall((:nf_elem_get_str_pretty, :libflint), Ptr{UInt8},
                 (Ptr{nf_elem}, Ptr{UInt8}, Ptr{AnticNumberField}),
                  &x, string(var(parent(x))), &parent(x))
-
-   print(io, unsafe_string(cstr))
-
+   s = unsafe_string(cstr)
    ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), cstr)
+
+   s = replace(s, "/", "//")
+
+   print(io, s)
+
 end
 
 needs_parentheses(::Nemo.nf_elem) = true

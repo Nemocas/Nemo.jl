@@ -18,7 +18,7 @@
 
 function test_gen_poly_constructors()
    print("Generic.Poly.constructors...")
- 
+
    R, x = JuliaZZ["x"]
    S, y = R["y"]
 
@@ -86,11 +86,11 @@ function test_gen_poly_manipulation()
    S, y = PolynomialRing(R, "y")
 
    @test iszero(zero(S))
-   
+
    @test isone(one(S))
 
    @test isgen(gen(S))
-   
+
    @test isunit(one(S))
 
    f = 2x*y + x^2 + 1
@@ -168,6 +168,7 @@ function test_gen_poly_binary_ops()
       @test (f + g)*(f - g) == f*f - g*g
       @test f - g == -(g - f)
    end
+
    println("PASS")
 end
 
@@ -261,6 +262,7 @@ function test_gen_poly_adhoc_binary()
       @test f*d1 - f*d2 == f*(d1 - d2)
       @test f*d1 + f*d2 == f*(d1 + d2)
    end
+
    println("PASS")
 end
 
@@ -312,6 +314,7 @@ function test_gen_poly_comparison()
       @test isequal(f, g)
       @test f != g + h
    end
+
    println("PASS")
 end
 
@@ -408,6 +411,7 @@ function test_gen_poly_adhoc_comparison()
       @test S(d1) != d1 + f
       @test d1 != S(d1) + f
    end
+
    println("PASS")
 end
 
@@ -441,6 +445,7 @@ function test_gen_poly_unary_ops()
       @test -(-f) == f
       @test iszero(f + (-f))
    end
+
    println("PASS")
 end
 
@@ -480,6 +485,7 @@ function test_gen_poly_truncation()
       @test truncate(f*g, n) == r
       @test r == 0 || !iszero(lead(r))
    end
+
    println("PASS")
 end
 
@@ -492,7 +498,7 @@ function test_gen_poly_reverse()
       f = rand(R, 0:10, -10:10)
       len = rand(length(f):12)
       frev = reverse(f, len)
-      
+
       shift = 0
       for i = 1:len
          if coeff(f, i - 1) != 0
@@ -511,7 +517,7 @@ function test_gen_poly_reverse()
       f = rand(R, 0:10, -1:1)
       len = rand(length(f):12)
       frev = reverse(f, len)
-      
+
       shift = 0
       for i = 1:len
          if coeff(f, i - 1) != 0
@@ -531,7 +537,7 @@ function test_gen_poly_reverse()
       f = rand(R, 0:10, 0:5)
       len = rand(length(f):12)
       frev = reverse(f, len)
-      
+
       shift = 0
       for i = 1:len
          if coeff(f, i - 1) != 0
@@ -543,6 +549,7 @@ function test_gen_poly_reverse()
       @test length(frev) == len - shift
       @test f == reverse(frev, len)
    end
+
    println("PASS")
 end
 
@@ -554,7 +561,7 @@ function test_gen_poly_shift()
    for iter = 1:300
       f = rand(R, 0:10, -10:10)
       s = rand(0:10)
-      g = s == 0 ? R() : rand(R, 0:s - 1, -1:1)
+      g = s == 0 ? R() : rand(R, 0:s - 1, -10:10)
 
       @test shift_right(shift_left(f, s) + g, s) == f
       @test shift_left(f, s) == x^s*f
@@ -579,7 +586,7 @@ function test_gen_poly_shift()
    for iter = 1:300
       f = rand(R, 0:10, 0:5)
       s = rand(0:10)
-      g = s == 0 ? R() : rand(R, 0:s - 1, -1:1)
+      g = s == 0 ? R() : rand(R, 0:s - 1, 0:5)
 
       @test shift_right(shift_left(f, s) + g, s) == f
       @test shift_left(f, s) == x^s*f
@@ -602,7 +609,7 @@ function test_gen_poly_powering()
       for expn = 0:10
          r1 = f^expn
 
-         @test (f == 0 && expn == 0 && r1 == 0) || r1 == r2        
+         @test (f == 0 && expn == 0 && r1 == 0) || r1 == r2
 
          r2 *= f
       end
@@ -618,7 +625,7 @@ function test_gen_poly_powering()
       for expn = 0:4 # cannot set high power here
          r1 = f^expn
 
-         @test (f == 0 && expn == 0 && r1 == 0) || isapprox(r1, r2)        
+         @test (f == 0 && expn == 0 && r1 == 0) || isapprox(r1, r2)
 
          r2 *= f
       end
@@ -637,12 +644,12 @@ function test_gen_poly_powering()
       for expn = 0:10
          r1 = f^expn
 
-         @test (f == 0 && expn == 0 && r1 == 0) || r1 == r2         
+         @test (f == 0 && expn == 0 && r1 == 0) || r1 == r2
 
          r2 *= f
       end
    end
-   
+
    println("PASS")
 end
 
@@ -945,7 +952,7 @@ function test_gen_poly_euclidean_division()
 
       @test mod(f, g) == r
    end
- 
+
    # Inexact field
    R, x = PolynomialRing(JuliaRealField, "x")
 
@@ -972,7 +979,7 @@ function test_gen_poly_euclidean_division()
 
       @test isapprox(mod(f, g), r)
    end
- 
+
    # Exact field
    R, x = PolynomialRing(JuliaQQ, "x")
 
@@ -999,7 +1006,7 @@ function test_gen_poly_euclidean_division()
 
       @test mod(f, g) == r
    end
- 
+
    println("PASS")
 end
 
@@ -1017,7 +1024,7 @@ function test_gen_poly_pseudodivision()
       end
 
       q, r = pseudodivrem(f, g)
-      
+
       if length(f) < length(g)
          @test f == r && q == 0
       else
@@ -1039,7 +1046,7 @@ function test_gen_poly_pseudodivision()
       end
 
       q, r = pseudodivrem(f, g)
-      
+
       if length(f) < length(g)
          @test f == r && q == 0
       else
@@ -1123,7 +1130,7 @@ function test_gen_poly_content_primpart_gcd()
 
       @test d == gcd(f, g)
 
-      @test mod(f*inv, g) == mod(R(1), g) 
+      @test mod(f*inv, g) == mod(R(1), g)
    end
 
    # Characteristic p ring
@@ -1151,7 +1158,7 @@ function test_gen_poly_content_primpart_gcd()
 
       @test d == gcd(f, g)
 
-      @test mod(f*inv, g) == mod(S(1), g) 
+      @test mod(f*inv, g) == mod(S(1), g)
    end
 
    # Characteristic p field
@@ -1182,7 +1189,7 @@ function test_gen_poly_content_primpart_gcd()
 
       @test d == gcd(f, g)
 
-      @test mod(f*inv, g) == mod(S(1), g) 
+      @test mod(f*inv, g) == mod(S(1), g)
    end
 
    println("PASS")
@@ -1197,19 +1204,19 @@ function test_gen_poly_evaluation()
    for iter in 1:10
       f = rand(R, 0:4, -10:10)
       g = rand(R, 0:4, -10:10)
-      
+
       d = rand(JuliaZZ, -10:10)
 
-      @test evaluate(g, evaluate(f, d)) == evaluate(subst(g, f), d) 
+      @test evaluate(g, evaluate(f, d)) == evaluate(subst(g, f), d)
    end
 
    for iter in 1:10
       f = rand(R, 0:4, -10:10)
       g = rand(R, 0:4, -10:10)
-      
+
       d = rand(-10:10)
 
-      @test evaluate(g, evaluate(f, d)) == evaluate(subst(g, f), d) 
+      @test evaluate(g, evaluate(f, d)) == evaluate(subst(g, f), d)
    end
 
    # Inexact field
@@ -1218,19 +1225,19 @@ function test_gen_poly_evaluation()
    for iter in 1:10
       f = rand(R, 0:4, 0:1)
       g = rand(R, 0:4, 0:1)
-      
+
       d = rand(JuliaRealField, 0:1)
 
-      @test isapprox(evaluate(g, evaluate(f, d)), evaluate(subst(g, f), d)) 
+      @test isapprox(evaluate(g, evaluate(f, d)), evaluate(subst(g, f), d))
    end
 
    for iter in 1:10
       f = rand(R, 0:4, 0:1)
       g = rand(R, 0:4, 0:1)
-      
+
       d = rand(-10:10)
 
-      @test isapprox(evaluate(g, evaluate(f, d)), evaluate(subst(g, f), d)) 
+      @test isapprox(evaluate(g, evaluate(f, d)), evaluate(subst(g, f), d))
    end
 
    # Non-integral domain
@@ -1240,19 +1247,19 @@ function test_gen_poly_evaluation()
    for iter in 1:10
       f = rand(R, 0:4, 0:22)
       g = rand(R, 0:4, 0:22)
-      
+
       d = rand(Zn, 0:22)
 
-      @test evaluate(g, evaluate(f, d)) == evaluate(subst(g, f), d) 
+      @test evaluate(g, evaluate(f, d)) == evaluate(subst(g, f), d)
    end
 
    for iter in 1:10
       f = rand(R, 0:4, 0:22)
       g = rand(R, 0:4, 0:22)
-      
+
       d = rand(-100:100)
 
-      @test evaluate(g, evaluate(f, d)) == evaluate(subst(g, f), d) 
+      @test evaluate(g, evaluate(f, d)) == evaluate(subst(g, f), d)
    end
 
    println("PASS")
@@ -1337,7 +1344,7 @@ function test_gen_poly_derivative()
 
       @test derivative(g*f) == derivative(g)*f + derivative(f)*g
    end
-   
+
    println("PASS")
 end
 
@@ -1405,6 +1412,7 @@ function test_gen_poly_resultant()
       @test resultant(f, g*h) == resultant(f, g) * resultant(f, h)
 
       @test resultant(f, g) == resultant_subresultant(f, g)
+      @test resultant_ducos(f, g) == resultant_subresultant(f, g)
    end
 
    # Exact field
@@ -1419,7 +1427,7 @@ function test_gen_poly_resultant()
       @test resultant(f, g*h) == resultant(f, g) * resultant(f, h)
 
       @test resultant(f, g) == resultant_subresultant(f, g)
-
+      @test resultant_ducos(f, g) == resultant_subresultant(f, g)
       @test resultant(f, g) == Generic.resultant_lehmer(f, g)
    end
 
@@ -1436,6 +1444,7 @@ function test_gen_poly_resultant()
       @test resultant(f, g*h) == resultant(f, g)*resultant(f, h)
 
       @test resultant(f, g) == resultant_subresultant(f, g)
+      @test resultant_ducos(f, g) == resultant_subresultant(f, g)
    end
 
    # Characteristic p field
@@ -1450,6 +1459,7 @@ function test_gen_poly_resultant()
       @test resultant(f, g*h) == resultant(f, g)*resultant(f, h)
 
       @test resultant(f, g) == resultant_subresultant(f, g)
+      @test resultant_ducos(f, g) == resultant_subresultant(f, g)
    end
 
    # Inexact field
@@ -1757,7 +1767,7 @@ function test_gen_poly_newton_representation()
       f = rand(R, 0:10, -100:100)
 
       g = deepcopy(f)
-      roots = [rand(JuliaZZ, -10:10) for i in 1:length(f)]
+      roots = BigInt[rand(JuliaZZ, -10:10) for i in 1:length(f)]
       monomial_to_newton!(g.coeffs, roots)
       newton_to_monomial!(g.coeffs, roots)
 
@@ -1800,7 +1810,7 @@ function test_gen_poly_newton_representation()
       f = rand(R, 0:10, 0:22)
 
       g = deepcopy(f)
-      roots = [rand(Zn, 0:22) for i in 1:length(f)]
+      roots = elem_type(Zn)[rand(Zn, 0:22) for i in 1:length(f)]
       monomial_to_newton!(g.coeffs, roots)
       newton_to_monomial!(g.coeffs, roots)
 
@@ -1854,7 +1864,7 @@ function test_gen_poly_interpolation()
 
       xs = BigInt[i for i in 1:length(p)]
       ys = [p(i) for i in 1:length(p)]
-      
+
       f = interpolate(R, xs, ys)
 
       @test f == p
@@ -1871,7 +1881,7 @@ function test_gen_poly_interpolation()
 
       xs = Rational{BigInt}[i for i in 1:length(p)]
       ys = [p(i) for i in 1:length(p)]
-      
+
       f = interpolate(R, xs, ys)
 
       @test f == p
@@ -1888,7 +1898,7 @@ function test_gen_poly_interpolation()
 
       xs = BigFloat[i for i in 1:length(p)]
       ys = [p(i) for i in 1:length(p)]
-      
+
       f = interpolate(R, xs, ys)
 
       @test isapprox(f, p)
@@ -1906,7 +1916,7 @@ function test_gen_poly_interpolation()
 
       xs = elem_type(Zn)[Zn(i) for i in 1:length(p)]
       ys = [p(i) for i in 1:length(p)]
-      
+
       f = interpolate(R, xs, ys)
 
       @test f == p
@@ -1924,7 +1934,7 @@ function test_gen_poly_interpolation()
 
       xs = elem_type(K)[K(i) for i in 1:length(p)]
       ys = [p(i) for i in 1:length(p)]
-      
+
       f = interpolate(R, xs, ys)
 
       @test f == p
@@ -1943,7 +1953,7 @@ function test_gen_poly_interpolation()
 #
 #      xs = elem_type(Zn)[Zn(i) for i in 1:length(p)]
 #      ys = [p(i) for i in 1:length(p)]
-#      
+#
 #      f = interpolate(R, xs, ys)
 #
 #      @test f == p
@@ -2081,9 +2091,9 @@ function test_gen_poly_mul_karatsuba()
    R, x = PolynomialRing(JuliaZZ, "x")
    S, y = PolynomialRing(R, "y")
    T, z = PolynomialRing(S, "z")
-   
+
    f = x + y + 2z^2 + 1
-   
+
    @test mul_karatsuba(f^10, f^10) == mul_classical(f^10, f^10)
    @test mul_karatsuba(f^10, f^30) == mul_classical(f^10, f^30)
 
@@ -2097,9 +2107,9 @@ function test_gen_poly_mul_ks()
    R, x = PolynomialRing(JuliaZZ, "x")
    S, y = PolynomialRing(R, "y")
    T, z = PolynomialRing(S, "z")
-   
+
    f = x + y + 2z^2 + 1
-   
+
    @test mul_ks(f^10, f^10) == mul_classical(f^10, f^10)
    @test mul_ks(f^10, f^30) == mul_classical(f^10, f^30)
 
@@ -2123,7 +2133,7 @@ function test_gen_poly_remove_valuation()
             f = rand(R, 0:10, -10:10)
             g = rand(R, 0:10, -10:10)
          end
-        
+
          d, q = divides(f, g)
       end
 
@@ -2146,7 +2156,7 @@ function test_gen_poly_remove_valuation()
          @test !v
       end
    end
-   
+
    # Exact field
    R, x = PolynomialRing(JuliaQQ, "x")
 
@@ -2161,7 +2171,7 @@ function test_gen_poly_remove_valuation()
             f = rand(R, 0:10, -10:10)
             g = rand(R, 0:10, -10:10)
          end
-        
+
          d, q = divides(f, g)
       end
 
@@ -2184,7 +2194,7 @@ function test_gen_poly_remove_valuation()
          @test !v
       end
    end
-   
+
    # Characteristic p ring
    Zn = ResidueRing(JuliaZZ, 23)
    R, x = PolynomialRing(Zn, "x")
@@ -2200,7 +2210,7 @@ function test_gen_poly_remove_valuation()
             f = rand(R, 0:10, 0:22)
             g = rand(R, 0:10, 0:22)
          end
-        
+
          d, q = divides(f, g)
       end
 
@@ -2223,7 +2233,7 @@ function test_gen_poly_remove_valuation()
          @test !v
       end
    end
-   
+
    # Characteristic p field
    R, x = PolynomialRing(GF(23), "x")
 
@@ -2238,7 +2248,7 @@ function test_gen_poly_remove_valuation()
             f = rand(R, 0:10)
             g = rand(R, 0:10)
          end
-        
+
          d, q = divides(f, g)
       end
 
@@ -2261,7 +2271,7 @@ function test_gen_poly_remove_valuation()
          @test !v
       end
    end
-   
+
    println("PASS")
 end
 
@@ -2326,7 +2336,7 @@ function test_gen_poly()
    test_gen_poly_mul_ks()
    test_gen_poly_generic_eval()
    test_gen_poly_remove_valuation()
-   
+
 
    println("")
 end

@@ -35,7 +35,13 @@ doc"""
 """
 parent(a::Nemo.FracElem) = a.parent
 
-isexact(R::Nemo.FracField) = isexact(base_ring(R))
+function isdomain_type(::Type{T}) where {S <: RingElement, T <: Nemo.FracElem{S}}
+   return isdomain_type(S)
+end
+
+function isexact_type(a::Type{T}) where {S <: RingElement, T <: Nemo.FracElem{S}}
+   return isexact_type(S)
+end
 
 doc"""
     characteristic{T <: RingElem}(R::Nemo.FracField{T})
@@ -129,7 +135,7 @@ function deepcopy_internal(a::Frac{T}, dict::ObjectIdDict) where {T <: RingElem}
    v = Frac{T}(deepcopy(num(a)), deepcopy(den(a)))
    v.parent = parent(a)
    return v
-end 
+end
 
 ###############################################################################
 #
@@ -580,7 +586,7 @@ function remove(z::Nemo.FracElem{T}, p::T) where {T <: RingElem}
    v, d = remove(den(z), p)
    w, n = remove(num(z), p)
    return w-v, n//d
-end 
+end
 
 doc"""
     valuation{T <: RingElem}(z::Nemo.FracElem{T}, p::T)
@@ -590,7 +596,7 @@ function valuation(z::Nemo.FracElem{T}, p::T) where {T <: RingElem}
    v, _ = remove(z, p)
    return v
 end
-  
+
 ###############################################################################
 #
 #   Unsafe operators and functions
@@ -645,7 +651,7 @@ end
 #   Random functions
 #
 ###############################################################################
-   
+
 function rand(S::Nemo.FracField{T}, v...) where {T <: RingElem}
    R = base_ring(S)
    n = rand(R, v...)
@@ -746,7 +752,6 @@ doc"""
 function FractionField(R::Nemo.Ring; cached=true)
    R2 = R
    T = elem_type(R)
-   
+
    return FracField{T}(R, cached)
 end
-

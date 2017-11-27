@@ -1,7 +1,7 @@
 function test_fmpz_mat_constructors()
    print("fmpz_mat.constructors...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    @test elem_type(S) == fmpz_mat
    @test elem_type(FmpzMatSpace) == fmpz_mat
@@ -34,13 +34,40 @@ function test_fmpz_mat_constructors()
    @test_throws ErrorConstrDimMismatch (S([fmpz(1) 2 3 4; 5 6 7 8; 1 2 3 4]))
    @test_throws ErrorConstrDimMismatch (S([fmpz(1), 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4]))
 
+   arr = [1 2; 3 4]
+   arr2 = [1, 2, 3, 4, 5, 6]
+
+   for T in [fmpz, Int, BigInt]
+      M = matrix(FlintZZ, map(T, arr))
+      @test isa(M, fmpz_mat)
+      @test M.base_ring == FlintZZ
+
+      M2 = matrix(FlintZZ, 2, 3, map(T, arr2))
+      @test isa(M2, fmpz_mat)
+      @test M2.base_ring == FlintZZ
+      @test rows(M2) == 2
+      @test cols(M2) == 3
+      @test_throws ErrorConstrDimMismatch matrix(FlintZZ, 2, 2, map(T, arr2))
+      @test_throws ErrorConstrDimMismatch matrix(FlintZZ, 2, 4, map(T, arr2))
+   end
+
+   M3 = zero_matrix(FlintZZ, 2, 3)
+
+   @test isa(M3, fmpz_mat)
+   @test M3.base_ring == FlintZZ
+
+   M4 = identity_matrix(FlintZZ, 3)
+
+   @test isa(M4, fmpz_mat)
+   @test M4.base_ring == FlintZZ
+
    println("PASS")
 end
 
 function test_fmpz_mat_printing()
    print("fmpz_mat.printing...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
    f = S(fmpz(3))
 
    @test string(f) == "[3 0 0]\n[0 3 0]\n[0 0 3]"
@@ -54,7 +81,7 @@ function test_fmpz_mat_convert()
    # Basic tests.
    A = [[1 2 3]; [4 5 6]]
    Abig = BigInt[[1 2 3]; [4 5 6]]
-   S = MatrixSpace(ZZ, 2, 3)
+   S = MatrixSpace(FlintZZ, 2, 3)
    B = S(A)
 
    @test Matrix{Int}(B) == A
@@ -62,7 +89,7 @@ function test_fmpz_mat_convert()
 
    # Tests when elements do not fit a simple Int.
    B[1, 1] = 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-   @test_throws InexactError Matrix{Int}(B)
+   @test_throws ErrorException Matrix{Int}(B)
 
    println("PASS")
 end
@@ -70,7 +97,7 @@ end
 function test_fmpz_mat_manipulation()
    print("fmpz_mat.manipulation...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
    A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
    B = S([fmpz(1) 4 7; 9 6 7; 4 3 3])
 
@@ -92,14 +119,14 @@ end
 function test_fmpz_mat_view()
    print("fmpz_mat.view...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([1 2 3; 4 5 6; 7 8 9])
 
    B = @inferred view(A, 1, 1, 2, 2)
 
    @test typeof(B) == fmpz_mat
-   @test B == MatrixSpace(ZZ, 2, 2)([1 2; 4 5])
+   @test B == MatrixSpace(FlintZZ, 2, 2)([1 2; 4 5])
 
    B[1, 1] = 10
    @test A[1, 1] == 10
@@ -107,7 +134,7 @@ function test_fmpz_mat_view()
    C = @inferred view(B, 1:2, 1:2)
 
    @test typeof(C) == fmpz_mat
-   @test C == MatrixSpace(ZZ, 2, 2)([10 2; 4 5])
+   @test C == MatrixSpace(FlintZZ, 2, 2)([10 2; 4 5])
 
    C[1, 1] = 20
    @test B[1, 1] == 20
@@ -119,7 +146,7 @@ end
 function test_fmpz_mat_unary_ops()
    print("fmpz_mat.unary_ops...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
    B = S([fmpz(-2) (-3) (-5); (-1) (-4) (-7); (-9) (-6) (-3)])
@@ -132,7 +159,7 @@ end
 function test_fmpz_mat_binary_ops()
    print("fmpz_mat.binary_ops...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
    B = S([fmpz(1) 4 7; 9 6 7; 4 3 3])
@@ -149,7 +176,7 @@ end
 function test_fmpz_mat_adhoc_binary()
    print("fmpz_mat.adhoc_binary...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
 
@@ -166,7 +193,7 @@ end
 function test_fmpz_mat_comparison()
    print("fmpz_mat.comparison...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
    B = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
@@ -181,7 +208,7 @@ end
 function test_fmpz_mat_adhoc_comparison()
    print("fmpz_mat.adhoc_comparison...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
 
@@ -198,7 +225,7 @@ end
 function test_fmpz_mat_powering()
    print("fmpz_mat.powering...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
 
@@ -212,7 +239,7 @@ end
 function test_fmpz_mat_adhoc_exact_division()
    print("fmpz_mat.adhoc_exact_division...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
 
@@ -225,7 +252,7 @@ end
 function test_fmpz_mat_gram()
    print("fmpz_mat.gram...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
 
@@ -237,7 +264,7 @@ end
 function test_fmpz_mat_trace()
    print("fmpz_mat.trace...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
 
@@ -249,7 +276,7 @@ end
 function test_fmpz_mat_content()
    print("fmpz_mat.content...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
 
@@ -260,7 +287,7 @@ end
 function test_fmpz_mat_transpose()
    print("fmpz_mat.transpose...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
 
@@ -278,7 +305,7 @@ end
 function test_fmpz_mat_scaling()
    print("fmpz_mat.scaling...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
 
@@ -290,7 +317,7 @@ end
 function test_fmpz_mat_inversion()
    print("fmpz_mat.inversion...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 2 2])
    B = S([-6 4 1; 61 (-41) (-9); -34 23 5])
@@ -307,7 +334,7 @@ end
 function test_fmpz_mat_pseudo_inversion()
    print("fmpz_mat.pseudo_inversion...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([1 2 3; 1 2 3; 1 2 3])
    B = S([1 0 1; 2 3 1; 5 6 7])
@@ -323,7 +350,7 @@ end
 function test_fmpz_mat_exact_division()
    print("fmpz_mat.exact_division...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 2 2])
    B = S([2 3 4; 7 9 1; 5 4 5])
@@ -336,7 +363,7 @@ end
 function test_fmpz_mat_modular_reduction()
    print("fmpz_mat.modular_reduction...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 2 2])
    B = S([2 0 2; 1 1 1; 0 2 2])
@@ -351,7 +378,7 @@ end
 function test_fmpz_mat_det()
    print("fmpz_mat.det...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 19 3 7])
 
@@ -369,7 +396,7 @@ end
 function test_fmpz_mat_hadamard()
    print("fmpz_mat.hadamard...")
 
-   S = MatrixSpace(ZZ, 4, 4)
+   S = MatrixSpace(FlintZZ, 4, 4)
 
    @test ishadamard(hadamard(S))
 
@@ -379,7 +406,7 @@ end
 function test_fmpz_mat_hnf()
    print("fmpz_mat.hnf...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 19 3 7])
 
@@ -406,7 +433,7 @@ end
 function test_fmpz_mat_lll()
    print("fmpz_mat.lll...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 19 3 7])
 
@@ -434,8 +461,8 @@ end
 function test_fmpz_mat_nullspace()
    print("fmpz_mat.nullspace...")
 
-   S = MatrixSpace(ZZ, 3, 3)
-   T = MatrixSpace(ZZ, 3, 1)
+   S = MatrixSpace(FlintZZ, 3, 3)
+   T = MatrixSpace(FlintZZ, 3, 1)
 
    A = S([fmpz(2) 3 5; 1 4 7; 4 1 1])
 
@@ -451,7 +478,7 @@ end
 function test_fmpz_mat_rank()
    print("fmpz_mat.rank...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 4 1 1])
 
@@ -463,7 +490,7 @@ end
 function test_fmpz_mat_rref()
    print("fmpz_mat.rref...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 4 1 1])
 
@@ -475,7 +502,7 @@ end
 function test_fmpz_mat_snf()
    print("fmpz_mat.snf...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 19 3 7])
 
@@ -493,11 +520,11 @@ end
 function test_fmpz_mat_solve_rational()
    print("fmpz_mat.solve_rational...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 2 2])
 
-   T = MatrixSpace(ZZ, 3, 1)
+   T = MatrixSpace(FlintZZ, 3, 1)
 
    B = T([fmpz(4), 5, 7])
 
@@ -519,11 +546,11 @@ end
 function test_fmpz_mat_solve()
    print("fmpz_mat.solve...")
 
-   S = MatrixSpace(ZZ, 3, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 2 2])
 
-   T = MatrixSpace(ZZ, 3, 1)
+   T = MatrixSpace(FlintZZ, 3, 1)
 
    B = T([fmpz(4), 5, 7])
 
@@ -539,9 +566,9 @@ end
 function test_fmpz_mat_concat()
    print("fmpz_mat.concat...")
 
-   S = MatrixSpace(ZZ, 3, 3)
-   T = MatrixSpace(ZZ, 3, 6)
-   U = MatrixSpace(ZZ, 6, 3)
+   S = MatrixSpace(FlintZZ, 3, 3)
+   T = MatrixSpace(FlintZZ, 3, 6)
+   U = MatrixSpace(FlintZZ, 6, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
    B = S([fmpz(1) 4 7; 9 6 7; 4 3 3])

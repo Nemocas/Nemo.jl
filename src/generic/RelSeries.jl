@@ -2,7 +2,7 @@
 #
 #   RelSeries.jl : Power series over rings, capped relative precision
 #
-###############################################################################    
+###############################################################################
 
 export PowerSeriesRing, O, valuation, exp, precision, max_precision, set_prec!,
        polcoeff, set_val!, pol_length, renormalize!
@@ -47,7 +47,11 @@ doc"""
 """
 base_ring(a::Nemo.SeriesElem) = base_ring(parent(a))
 
-isexact(R::RelSeriesRing) = false
+function isdomain_type(::Type{T}) where {S <: RingElement, T <: Nemo.SeriesElem{S}}
+   return isdomain_type(S)
+end
+
+isexact_type(a::Type{T}) where T <: Nemo.SeriesElem = false
 
 doc"""
     var(a::SeriesRing)
@@ -57,7 +61,7 @@ doc"""
 var(a::SeriesRing) = a.S
 
 function check_parent(a::Nemo.SeriesElem, b::Nemo.SeriesElem)
-   parent(a) != parent(b) && 
+   parent(a) != parent(b) &&
              error("Incompatible power series rings in power series operation")
 end
 
@@ -65,8 +69,8 @@ end
 #
 #   Basic manipulation
 #
-###############################################################################    
-   
+###############################################################################
+
 function Base.hash(a::Nemo.SeriesElem, h::UInt)
    b = 0xb44d6896204881f3%UInt
    for i in 0:pol_length(a) - 1
@@ -76,9 +80,26 @@ function Base.hash(a::Nemo.SeriesElem, h::UInt)
    return b
 end
 
-pol_length(x::Nemo.RelSeriesElem) = x.length
+doc"""
+    pol_length(a::Nemo.RelSeriesElem)
+> Return the length of the polynomial underlying the given power series. This
+> will be zero if the power series has no nonzero terms.
+"""
+pol_length(a::Nemo.RelSeriesElem) = a.length
 
-precision(x::Nemo.RelSeriesElem) = x.prec
+doc"""
+    precision(a::Nemo.RelSeriesElem)
+> Return the precision of the given power series in absolute terms. This will
+> be the sum of the valuation and the length of the underlying polynomial.
+"""
+precision(a::Nemo.RelSeriesElem) = a.prec
+
+doc"""
+    valuation(a::Nemo.RelSeriesElem)
+> Return the valuation of the given power series, i.e. the degree of the first
+> nonzero term (or the precision if it is arithmetically zero).
+"""
+valuation(a::Nemo.RelSeriesElem) = a.val
 
 doc"""
     max_precision(R::SeriesRing)
@@ -177,15 +198,8 @@ doc"""
 isunit(a::Nemo.RelSeriesElem) = valuation(a) == 0 && isunit(polcoeff(a, 0))
 
 doc"""
-    valuation(a::Nemo.RelSeriesElem)
-> Return the valuation of the given power series, i.e. the degree of the first
-> nonzero term (or the precision if it is arithmetically zero).
-"""
-valuation(a::Nemo.RelSeriesElem) = a.val
-
-doc"""
     modulus{T <: ResElem}(a::Nemo.SeriesElem{T})
-> Return the modulus of the coefficients of the given polynomial.
+> Return the modulus of the coefficients of the given power series.
 """
 modulus(a::Nemo.SeriesElem{T}) where {T <: ResElem} = modulus(base_ring(a))
 
@@ -365,7 +379,7 @@ function +(a::Nemo.RelSeriesElem{T}, b::Nemo.RelSeriesElem{T}) where {T <: RingE
    renormalize!(z)
    return z
 end
-  
+
 doc"""
     -{T <: RingElement}(a::Nemo.RelSeriesElem{T}, b::Nemo.RelSeriesElem{T})
 > Return $a - b$.
@@ -459,7 +473,7 @@ function *(a::Nemo.RelSeriesElem{T}, b::Nemo.RelSeriesElem{T}) where {T <: RingE
             d[i + j - 1] = addeq!(d[i + j - 1], t)
          end
       end
-   end        
+   end
    z = parent(a)(d, lenz, prec + zval, zval)
    set_length!(z, normalise(z, lenz))
    renormalize!(z)
@@ -585,14 +599,14 @@ end
 
 doc"""
     truncate(a::Nemo.RelSeriesElem, n::Int)
-> Return $a$ truncated to $n$ terms.
+> Return $a$ truncated to (absolute) precision $n$.
 """
 function truncate(a::Nemo.RelSeriesElem{T}, prec::Int) where {T <: RingElement}
    prec < 0 && throw(DomainError())
    alen = pol_length(a)
    aprec = precision(a)
    aval = valuation(a)
-   if aprec + aval <= prec
+   if aprec <= prec
       return a
    end
    z = parent(a)()
@@ -608,6 +622,39 @@ function truncate(a::Nemo.RelSeriesElem{T}, prec::Int) where {T <: RingElement}
       set_length!(z, normalise(z, prec - aval))
       set_val!(z, aval)
    end
+   return z
+end
+
+# Intended only for internal use, does not renormalize, assumes n >= 0
+# Only efficient if valuation(a) == valuation(b) == 0
+function mullow(a::Nemo.RelSeriesElem{T}, b::Nemo.RelSeriesElem{T}, n::Int) where {T <: RingElement}
+   lena = pol_length(a)
+   lenb = pol_length(b)
+   if lena == 0 || lenb == 0
+      return zero(parent(a))
+   end
+   prec = min(precision(a), precision(b))
+   t = base_ring(a)()
+   lenz = min(lena + lenb - 1, n)
+   d = Array{T}(lenz)
+   for i = 1:min(lena, lenz)
+      d[i] = coeff(a, i - 1)*coeff(b, 0)
+   end
+   if lenz > lena
+      for j = 2:min(lenb, lenz - lena + 1)
+          d[lena + j - 1] = coeff(a, lena - 1)*coeff(b, j - 1)
+      end
+   end
+   for i = 1:lena - 1
+      if lenz > i
+         for j = 2:min(lenb, lenz - i + 1)
+            t = mul!(t, coeff(a, i - 1), coeff(b, j - 1))
+            d[i + j - 1] = addeq!(d[i + j - 1], t)
+         end
+      end
+   end
+   z = parent(a)(d, lenz, prec, 0)
+   set_length!(z, normalise(z, lenz))
    return z
 end
 
@@ -643,23 +690,31 @@ function ^(a::Nemo.RelSeriesElem{T}, b::Int) where {T <: RingElement}
       set_val!(z, b*valuation(a))
       return z
    elseif b == 0
+      # in fact, the result would be exact 1 if we had exact series
       z = one(parent(a))
-      set_prec!(z, precision(a) - valuation(a))
       return z
+   elseif b == 1
+      return deepcopy(a)
    else
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & b) == 0
          bit >>= 1
       end
+      val = valuation(a)
+      a = shift_right(a, val)
+      prec = precision(a)
       z = a
       bit >>= 1
       while bit !=0
-         z = z*z
+         z = mullow(z, z, prec)
          if (UInt(bit) & b) != 0
-            z *= a
+            z = mullow(z, a, prec)
          end
          bit >>= 1
       end
+      set_val!(z, b*val)
+      set_prec!(z, b*val + prec)
+      renormalize!(z)
       return z
    end
 end
@@ -689,8 +744,8 @@ function ==(x::Nemo.RelSeriesElem{T}, y::Nemo.RelSeriesElem{T}) where {T <: Ring
    if xval != yval
       return false
    end
-   xlen = min(pol_length(x), prec - xval)
-   ylen = min(pol_length(y), prec - yval)
+   xlen = normalise(x, min(pol_length(x), prec - xval))
+   ylen = normalise(y, min(pol_length(y), prec - yval))
    if xlen != ylen
       return false
    end
@@ -735,7 +790,7 @@ doc"""
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::Nemo.RelSeriesElem{T}, y::T) where {T <: RingElem} = precision(x) == 0 ||
-           ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 && 
+           ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
              valuation(x) == 0 && polcoeff(x, 0) == y))
 
 doc"""
@@ -749,7 +804,7 @@ doc"""
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::Nemo.RelSeriesElem, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 ||
-                  ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 && 
+                  ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
                     valuation(x) == 0 && polcoeff(x, 0) == y))
 
 doc"""
@@ -757,6 +812,25 @@ doc"""
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.RelSeriesElem) = y == x
+
+###############################################################################
+#
+#   Approximation
+#
+###############################################################################
+
+function Base.isapprox(f::Nemo.RelSeriesElem, g::Nemo.RelSeriesElem; atol::Real=sqrt(eps()))
+   check_parent(f, g)
+   nmin = min(precision(f), precision(g))
+   i = 1
+   while i <= nmin
+      if !isapprox(coeff(f, i - 1), coeff(g, i - 1); atol=atol)
+         return false
+      end
+      i += 1
+   end
+   return true
+end
 
 ###############################################################################
 #
@@ -866,11 +940,10 @@ doc"""
     exp(a::Nemo.RelSeriesElem)
 > Return the exponential of the power series $a$.
 """
-function exp(a::Nemo.RelSeriesElem)
+function Base.exp(a::Nemo.RelSeriesElem)
    if iszero(a)
       z = one(parent(a))
       set_prec!(z, precision(a))
-      set_val!(z, valuation(a))
       return z
    end
    z = parent(a)()
@@ -880,7 +953,7 @@ function exp(a::Nemo.RelSeriesElem)
    fit!(z, preca)
    set_prec!(z, preca)
    c = vala == 0 ? polcoeff(a, 0) : R()
-   z = setcoeff!(z, 0, exp(c))
+   z = setcoeff!(z, 0, Nemo.exp(c))
    len = pol_length(a) + vala
    for k = 1 : preca - 1
       s = R()
@@ -961,7 +1034,7 @@ function mul!(c::RelSeries{T}, a::RelSeries{T}, b::RelSeries{T}) where {T <: Rin
                c.coeffs[i + j - 1] = addeq!(c.coeffs[i + j - 1], t)
             end
          end
-      end        
+      end
       c.length = normalise(c, lenc)
    end
    c.val = a.val + b.val
@@ -1085,14 +1158,14 @@ end
 #
 ###############################################################################
 
-function rand(S::SeriesRing, v...)
+function rand(S::SeriesRing, val_range::UnitRange{Int}, v...)
    R = base_ring(S)
    f = S()
    x = gen(S)
    for i = 0:S.prec_max - 1
       f += rand(R, v...)*x^i
    end
-   return f
+   return shift_left(f, rand(val_range))
 end
 
 ###############################################################################
@@ -1113,48 +1186,48 @@ end
 #
 ###############################################################################
 
-function (a::RelSeriesRing{T})(b::RingElement) where {T <: RingElement}
-   return a(base_ring(a)(b))
+function (R::RelSeriesRing{T})(b::RingElement) where {T <: RingElement}
+   return R(base_ring(R)(b))
 end
 
-function (a::RelSeriesRing{T})() where {T <: RingElement}
-   z = RelSeries{T}(Array{T}(0), 0, a.prec_max, a.prec_max)
-   z.parent = a
+function (R::RelSeriesRing{T})() where {T <: RingElement}
+   z = RelSeries{T}(Array{T}(0), 0, R.prec_max, R.prec_max)
+   z.parent = R
    return z
 end
 
-function (a::RelSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
+function (R::RelSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
    if b == 0
-      z = RelSeries{T}(Array{T}(0), 0, a.prec_max, a.prec_max)
+      z = RelSeries{T}(Array{T}(0), 0, R.prec_max, R.prec_max)
    else
-      z = RelSeries{T}([base_ring(a)(b)], 1, a.prec_max, 0)
+      z = RelSeries{T}([base_ring(R)(b)], 1, R.prec_max, 0)
    end
-   z.parent = a
+   z.parent = R
    return z
 end
 
-function (a::RelSeriesRing{T})(b::T) where {T <: RingElement}
-   parent(b) != base_ring(a) && error("Unable to coerce to power series")
+function (R::RelSeriesRing{T})(b::T) where {T <: RingElem}
+   parent(b) != base_ring(R) && error("Unable to coerce to power series")
    if iszero(b)
-      z = RelSeries{T}(Array{T}(0), 0, a.prec_max, a.prec_max)
+      z = RelSeries{T}(Array{T}(0), 0, R.prec_max, R.prec_max)
    else
-      z = RelSeries{T}([b], 1, a.prec_max, 0)
+      z = RelSeries{T}([b], 1, R.prec_max, 0)
    end
-   z.parent = a
+   z.parent = R
    return z
 end
 
-function (a::RelSeriesRing{T})(b::Nemo.RelSeriesElem{T}) where {T <: RingElement}
-   parent(b) != a && error("Unable to coerce power series")
+function (R::RelSeriesRing{T})(b::Nemo.RelSeriesElem{T}) where {T <: RingElement}
+   parent(b) != R && error("Unable to coerce power series")
    return b
 end
 
-function (a::RelSeriesRing{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int) where {T <: RingElement}
+function (R::RelSeriesRing{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int) where {T <: RingElement}
    if length(b) > 0
-      parent(b[1]) != base_ring(a) && error("Unable to coerce to power series")
+      parent(b[1]) != base_ring(R) && error("Unable to coerce to power series")
    end
    z = RelSeries{T}(b, len, prec, val)
-   z.parent = a
+   z.parent = R
    return z
 end
 
@@ -1170,7 +1243,7 @@ doc"""
 > ring over the given base ring and a generator `x` for the power series ring.
 > The maximum precision of power series in the ring is set to `prec`. If the
 > model is set to `:capped_relative` this is taken as a maximum relative
-> precision, and if it is set to `:capped_absolute` this is take to be a 
+> precision, and if it is set to `:capped_absolute` this is take to be a
 > maximum absolute precision. The supplied string `s` specifies the way the
 > generator of the power series ring will be printed. By default, the parent
 > object `S` will be cached so that supplying the same base ring, string and
@@ -1180,7 +1253,7 @@ doc"""
 function PowerSeriesRing(R::Nemo.Ring, prec::Int, s::AbstractString; cached=true, model=:capped_relative)
    S = Symbol(s)
    T = elem_type(R)
-   
+
    if model == :capped_relative
       parent_obj = RelSeriesRing{T}(R, prec, S, cached)
    elseif model == :capped_absolute

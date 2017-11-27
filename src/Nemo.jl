@@ -4,7 +4,7 @@ module Nemo
 
 import Base: Array, abs, asin, asinh, atan, atanh, base, bin, checkbounds,
              conj, convert, cmp, contains, cos, cosh, dec, deepcopy,
-             deepcopy_internal, den, deserialize, det, div, divrem, exp, eye,
+             deepcopy_internal, den, deserialize, det, div, divrem, eye,
              gcd, gcdx, getindex, hash, hcat, hex, intersect, inv, invmod,
              isequal, isfinite, isless, isqrt, isreal, iszero, lcm,
              ldexp, length, log, lufact, lufact!, mod, ndigits, nextpow2, norm,
@@ -19,7 +19,7 @@ if VERSION >= v"0.7.0-DEV.1144"
 import Base: isone
 end
 
-import Base: floor, ceil, hypot, sqrt, log, log1p, exp, expm1, sin, cos, sinpi,
+import Base: floor, ceil, hypot, sqrt, log, log1p, expm1, sin, cos, sinpi,
              cospi, tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh,
              asinh, acosh, gamma, lgamma, sinpi, cospi, atan2
 
@@ -202,23 +202,24 @@ import .Generic: add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  chebyshev_u, _check_dim, check_parent, coeff, cols, compose,
                  content, cycles, data, degree, den, derivative, det, det_clow,
                  det_df, det_fflu, det_popov, dim, discriminant, divexact,
-                 divides, divrem, elem_type, elements, evaluate, exp,
+                 divides, divrem, elem_type, elements, evaluate,
                  extended_weak_popov, extended_weak_popov_with_trafo, fflu!,
                  fflu, find_pivot_popov, fit!, gcd, gen, gens, gcdinv, gcdx,
                  gram, has_left_neighbor, has_bottom_neighbor, hash,
                  hessenberg!, hessenberg, hnf, hnf_cohen, hnf_cohen_with_trafo,
-                 hnf_kb, hnf_kb_with_trafo, hnf_with_trafo, hnf_via_popov,
-                 hnf_via_popov_with_trafo, hooklength, inskewdiag, integral,
-                 interpolate, inv, inv!, invmod, isconstant, isdegree, isexact,
-                 isgen, ishessenberg, ismonomial, isnegative, isone, isreverse,
-                 isrimhook, isrref, isterm, isunit, lcm, lead, length,
-                 leglength, main_variable, main_variable_extract,
-                 main_variable_insert, matrix_repr, max_degrees, max_precision,
-                 minpoly, mod, modulus, monomial_iszero, monomial_set!,
-                 monomial_to_newton!, mul!, mul_classical, mul_karatsuba,
-                 mul_ks, mullow, mulmod, needs_parentheses,
-                 newton_to_monomial!, normalise, nvars, num, O, one, order,
-                 ordering, parent_type, parity, partitionseq,
+                 hnf_kb, hnf_kb_with_trafo, hnf_minors, hnf_minors_with_trafo,
+                 hnf_with_trafo, hnf_via_popov, hnf_via_popov_with_trafo,
+                 hooklength, identity_matrix, inskewdiag, integral,
+                 interpolate, inv, inv!, invmod, isconstant, isdegree,
+                 isdomain_type, isexact_type, isgen, ishessenberg, ismonomial,
+                 isnegative, isone, isreverse, isrimhook, isrref, isterm,
+                 isunit, lcm, lead, length, leglength, main_variable,
+                 main_variable_extract, main_variable_insert, matrix,
+                 matrix_repr, max_degrees, max_precision, minpoly, mod,
+                 modulus, monomial_iszero, monomial_set!, monomial_to_newton!,
+                 mul!, mul_classical, mul_karatsuba, mul_ks, mullow, mulmod,
+                 needs_parentheses, newton_to_monomial!, normalise, nvars, num,
+                 O, one, order, ordering, parent_type, parity, partitionseq,
                  polcoeff, pol_length, powmod, pow_multinomial, popov, powers,
                  precision, primpart, pseudodivrem, pseudorem, rand_ordering,
                  rank_profile_popov, remove, renormalize!, resultant,
@@ -229,7 +230,8 @@ import .Generic: add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  snf_kb, snf_kb_with_trafo, snf_with_trafo, solve,
                  solve_rational, solve_triu, subst, swap_rows, swap_rows!,
                  trail, truncate, typed_hcat, typed_hvcat, valuation, var,
-                 vars, weak_popov, weak_popov_with_trafo, zero, zero!
+                 vars, weak_popov, weak_popov_with_trafo, zero, zero!,
+                 zero_matrix
 
 export add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  characteristic, charpoly, charpoly_danilevsky!,
@@ -237,34 +239,40 @@ export add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  chebyshev_u, _check_dim, check_parent, coeff, cols, compose,
                  content, cycles, data, degree, den, derivative, det, det_clow,
                  det_df, det_fflu, det_popov, dim, discriminant, divexact,
-                 divides, divrem, elem_type, elements, evaluate, exp,
+                 divides, divrem, elem_type, elements, evaluate,
                  extended_weak_popov, extended_weak_popov_with_trafo, fflu!,
                  fflu, find_pivot_popov, fit!, gcd, gen, gens, gcdinv, gcdx,
                  gram, has_left_neighbor, has_bottom_neighbor, hash,
                  hessenberg!, hessenberg, hnf, hnf_cohen, hnf_cohen_with_trafo,
-                 hnf_kb, hnf_kb_with_trafo, hnf_with_trafo, hnf_via_popov,
-                 hnf_via_popov_with_trafo, hooklength, inskewdiag, integral,
-                 interpolate, inv, inv!, invmod, isconstant, isdegree, isexact,
-                 isgen, ishessenberg, ismonomial, isnegative, isone, isreverse,
-                 isrimhook, isrref, isterm, isunit, iszero, lcm, lead,
-                 leglength, length, main_variable, main_variable_extract,
-                 main_variable_insert, matrix_repr, max_degrees, max_precision,
-                 minpoly, mod, modulus, monomial_iszero, monomial_set!,
-                 monomial_to_newton!, mul!, mul_classical, mul_karatsuba,
-                 mul_ks, mullow, mulmod, needs_parentheses,
-                 newton_to_monomial!, normalise, nvars, num, O, one, order,
-                 ordering, parent_type, parity, partitionseq,
+                 hnf_kb, hnf_kb_with_trafo, hnf_minors, hnf_minors_with_trafo,
+                 hnf_with_trafo, hnf_via_popov, hnf_via_popov_with_trafo,
+                 hooklength, identity_matrix, inskewdiag, integral,
+                 interpolate, inv, inv!, invmod, isconstant, isdegree,
+                 isdomain_type, isexact, isexact_type, isgen, ishessenberg,
+                 ismonomial, isnegative, isone, isreverse, isrimhook, isrref,
+                 isterm, isunit, iszero, lcm, lead, leglength, length,
+                 main_variable, main_variable_extract, main_variable_insert,
+                 matrix, matrix_repr, max_degrees, max_precision, minpoly, mod,
+                 modulus, monomial_iszero, monomial_set!, monomial_to_newton!,
+                 mul!, mul_classical, mul_karatsuba, mul_ks, mullow, mulmod,
+                 needs_parentheses, newton_to_monomial!, normalise, nvars, num,
+                 O, one, order, ordering, parent_type, parity, partitionseq,
                  polcoeff, pol_length, powmod, pow_multinomial, popov, powers,
-                 precision, primpart, pseudodivrem, pseudorem, rand_ordering,
-                 rank_profile_popov, remove, renormalize!, resultant,
-                 resultant_ducos, resultant_euclidean, resultant_subresultant,
-                 resultant_sylvester, resx, reverse, rows, rref, rref!,
-                 setcoeff!, set_length!, setpermstyle, set_prec!, set_val!,
-                 shift_left, shift_right, show_minus_one, similarity!, snf,
-                 snf_kb, snf_kb_with_trafo, snf_with_trafo, solve,
-                 solve_rational, solve_triu, subst, swap_rows, swap_rows!,
-                 trail, truncate, typed_hcat, typed_hvcat, valuation, var,
-                 vars, weak_popov, weak_popov_with_trafo, zero, zero!
+                 ppio, precision, primpart, pseudodivrem, pseudorem,
+                 rand_ordering, rank_profile_popov, remove, renormalize!,
+                 resultant, resultant_ducos, resultant_euclidean,
+                 resultant_subresultant, resultant_sylvester, resx, reverse,
+                 rows, rref, rref!, setcoeff!, set_length!, setpermstyle,
+                 set_prec!, set_val!, shift_left, shift_right, show_minus_one,
+                 similarity!, snf, snf_kb, snf_kb_with_trafo, snf_with_trafo,
+                 solve, solve_rational, solve_triu, subst, swap_rows,
+                 swap_rows!, trail, truncate, typed_hcat, typed_hvcat,
+                 valuation, var, vars, weak_popov, weak_popov_with_trafo, zero,
+                 zero!, zero_matrix
+
+function exp(a::T) where T
+   return Base.exp(a)
+end
 
 function PermGroup(n::Int, cached=true)
    Generic.PermGroup(n, cached)
@@ -356,7 +364,7 @@ getindex(R::Tuple{Ring, T}, s::String) where {T} = PolynomialRing(R[1], s)
 
 ###############################################################################
 #
-#   Matrix M = R[...] syntax and Matrix constructor
+#   Matrix M = R[...] syntax
 #
 ################################################################################
 
@@ -370,8 +378,8 @@ function typed_hvcat(R::Ring, dims, d...)
       for j = 1:c
          A[i, j] = R(d[(i - 1)*c + j])
       end
-   end 
-   S = MatrixSpace(R, r, c)(A)
+   end
+   S = matrix(R, A)
    return S
 end
 
@@ -382,19 +390,17 @@ function typed_hcat(R::Ring, d...)
    for i = 1:r
       A[1, i] = R(d[i])
    end
-   S = MatrixSpace(R, 1, r)
-   return S(A)
+   S = matrix(R, A)
+   return S
 end
 
-function Base.Matrix(R::Nemo.Ring, r::Int, c::Int, a::Array{T, 2}) where T <: RingElement
-   M = MatrixSpace(R, r, c)
-   return M(a)
-end
+###############################################################################
+#
+#   Load error objects
+#
+###############################################################################
 
-function Base.Matrix(R::Nemo.Ring, r::Int, c::Int, a::Array{T, 1}) where T <: RingElement
-   M = MatrixSpace(R, r, c)
-   return M(a)
-end
+include("error.jl")
 
 ###############################################################################
 #
@@ -438,7 +444,7 @@ end
 
 function create_accessors(T, S, handle)
    get = function(a)
-      if handle > length(a.auxilliary_data) || 
+      if handle > length(a.auxilliary_data) ||
          !isassigned(a.auxilliary_data, handle)
         throw(AccessorNotSetError())
       end
@@ -532,52 +538,6 @@ ComplexField = AcbField
 NumberField = AnticNumberField
 CyclotomicField = AnticCyclotomicField
 MaximalRealSubfield = AnticMaximalRealSubfield
-
-###############################################################################
-#
-#   Error objects
-#
-###############################################################################
-
-mutable struct ErrorConstrDimMismatch <: Exception
-  expect_r::Int
-  expect_c::Int
-  get_r::Int
-  get_c::Int
-  get_l::Int
-
-  function ErrorConstrDimMismatch(er::Int, ec::Int, gr::Int, gc::Int)
-    e = new(er, ec, gr, gc, -1)
-    return e
-  end
-
-  function ErrorConstrDimMismatch(er::Int, ec::Int, gl::Int)
-    e = new(er, ec, -1, -1, gl)
-    return e
-  end
-
-  function ErrorConstrDimMismatch(er::Int, ec::Int, a::Array{T, 2}) where {T}
-    gr, gc = size(a)
-    return ErrorConstrDimMismatch(er, ec, gr, gc)
-  end
-
-  function ErrorConstrDimMismatch(er::Int, ec::Int, a::Array{T, 1}) where {T}
-    gl = length(a)
-    return ErrorConstrDimMismatch(er, ec, gl)
-  end
-end
-
-function Base.showerror(io::IO, e::ErrorConstrDimMismatch)
-  if e.get_l == -1
-    print(io, "Expected dimension $(e.expect_r) x $(e.expect_c), ")
-    print(io, "got $(e.get_r) x $(e.get_c)")
-  else
-    print(io, "Expected an array of length $(e.expect_r * e.expect_c), ")
-    print(io, "got $(e.get_l)")
-  end
-end
-
-const error_dim_negative = ErrorException("Dimensions must be non-negative")
 
 ###############################################################################
 #

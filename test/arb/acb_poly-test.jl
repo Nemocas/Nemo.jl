@@ -289,7 +289,7 @@ function test_acb_poly_exact_division()
 end
 
 function test_acb_poly_scalar_division()
-   print("acb_poly_scalar_division...")
+   print("acb_poly.scalar_division...")
 
    R, x = PolynomialRing(CC, "x")
 

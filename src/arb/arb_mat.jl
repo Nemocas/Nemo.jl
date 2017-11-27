@@ -5,7 +5,7 @@
 ###############################################################################
 
 export rows, cols, zero, one, deepcopy, -, transpose, +, *, &, ==, !=,
-       strongequal, overlaps, contains, inv, divexact, charpoly, det, exp,
+       strongequal, overlaps, contains, inv, divexact, charpoly, det,
        lufact, lufact!, solve, solve!, solve_lu_precomp, solve_lu_precomp!,
        swap_rows, swap_rows!, bound_inf_norm
 
@@ -43,8 +43,6 @@ base_ring(a::arb_mat) = a.base_ring
 
 parent(x::arb_mat, cached::Bool = true) =
       MatrixSpace(base_ring(x), rows(x), cols(x))
-
-isexact(R::ArbMatSpace) = false
 
 prec(x::ArbMatSpace) = prec(x.base_ring)
 
@@ -410,7 +408,7 @@ end
 doc"""
     inv(M::arb_mat)
 > Given a  $n\times n$ matrix of type `arb_mat`, return an
-> $n\times n$ matrix $X$ such that $AX$ contains the 
+> $n\times n$ matrix $X$ such that $AX$ contains the
 > identity matrix. If $A$ cannot be inverted numerically an exception is raised.
 """
 function inv(x::arb_mat)
@@ -501,7 +499,7 @@ doc"""
     exp(x::arb_mat)
 > Returns the exponential of the matrix $x$.
 """
-function exp(x::arb_mat)
+function Base.exp(x::arb_mat)
   cols(x) != rows(x) && error("Matrix must be square")
   z = similar(x)
   ccall((:arb_mat_exp, :libarb), Void,
@@ -696,6 +694,70 @@ end
 
 ###############################################################################
 #
+#   Matrix constructor
+#
+###############################################################################
+
+function matrix(R::ArbField, arr::Array{T, 2}) where {T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, AbstractString}}
+   z = arb_mat(size(arr, 1), size(arr, 2), arr, prec(R))
+   z.base_ring = R
+   return z
+end
+
+function matrix(R::ArbField, r::Int, c::Int, arr::Array{T, 1}) where {T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, AbstractString}}
+   _check_dim(r, c, arr)
+   z = arb_mat(r, c, arr, prec(R))
+   z.base_ring = R
+   return z
+end
+
+function matrix(R::ArbField, arr::Array{<: Integer, 2})
+   arr_fmpz = map(fmpz, arr)
+   return matrix(R, arr_fmpz)
+end
+
+function matrix(R::ArbField, r::Int, c::Int, arr::Array{<: Integer, 1})
+   arr_fmpz = map(fmpz, arr)
+   return matrix(R, r, c, arr_fmpz)
+end
+
+function matrix(R::ArbField, arr::Array{Rational{T}, 2}) where {T <: Integer}
+   arr_fmpz = map(fmpq, arr)
+   return matrix(R, arr_fmpz)
+end
+
+function matrix(R::ArbField, r::Int, c::Int, arr::Array{Rational{T}, 1}) where {T <: Integer}
+   arr_fmpz = map(fmpq, arr)
+   return matrix(R, r, c, arr_fmpz)
+end
+
+###############################################################################
+#
+#  Zero matrix
+#
+###############################################################################
+
+function zero_matrix(R::ArbField, r::Int, c::Int)
+   z = arb_mat(r, c)
+   z.base_ring = R
+   return z
+end
+
+###############################################################################
+#
+#  Identity matrix
+#
+###############################################################################
+
+function identity_matrix(R::ArbField, n::Int)
+   z = arb_mat(n, n)
+   ccall((:arb_mat_one, :libarb), Void, (Ptr{arb_mat}, ), &z)
+   z.base_ring = R
+   return z
+end
+
+###############################################################################
+#
 #   Promotions
 #
 ###############################################################################
@@ -728,4 +790,3 @@ function MatrixSpace(R::ArbField, r::Int, c::Int; cached = true)
   (r <= 0 || c <= 0) && error("Dimensions must be positive")
   return ArbMatSpace(R, r, c, cached)
 end
-

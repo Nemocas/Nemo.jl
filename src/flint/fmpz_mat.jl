@@ -1026,6 +1026,10 @@ function solve_rational(a::fmpz_mat, b::fmpz_mat)
    return z, d
 end
 
+function Generic.solve_with_det(a::fmpz_mat, b::fmpz_mat)
+   return solve_rational(a, b)
+end
+
 doc"""
     solve_dixon(a::fmpz_mat, b::fmpz_mat)
 > Return a tuple $(x, m)$ consisting of a column vector $x$ such that $ax = b
@@ -1209,20 +1213,76 @@ function convert(::Type{Matrix{Int}}, A::fmpz_mat)
     m, n = size(A)
 
     fittable = [fits(Int, A[i, j]) for i in 1:m, j in 1:n]
-    if ! all(fittable)
-        warn("When trying to convert a fmpz_mat to a Matrix{Int}, some elements were too large to fit the standard Int type: try to convert to a matrix of BigInt.")
-        throw(InexactError())
+    if !all(fittable)
+        error("When trying to convert a fmpz_mat to a Matrix{Int}, some elements were too large to fit into Int: try to convert to a matrix of BigInt.")
     end
 
-    mat::Matrix{Int} = Int[A[i,j] for i in 1:m, j in 1:n]
+    mat::Matrix{Int} = Int[A[i, j] for i in 1:m, j in 1:n]
     return mat
 end
 
 function convert(::Type{Matrix{BigInt}}, A::fmpz_mat)
     m, n = size(A)
     # No check: always ensured to fit a BigInt.
-    mat::Matrix{BigInt} = BigInt[A[i,j] for i in 1:m, j in 1:n]
+    mat::Matrix{BigInt} = BigInt[A[i, j] for i in 1:m, j in 1:n]
     return mat
+end
+
+###############################################################################
+#
+#   Matrix constructor
+#
+###############################################################################
+
+function matrix(R::FlintIntegerRing, arr::Array{fmpz, 2})
+   z = fmpz_mat(size(arr, 1), size(arr, 2), arr)
+   z.base_ring = FlintZZ
+   return z
+end
+
+function matrix(R::FlintIntegerRing, arr::Array{<: Integer, 2})
+   z = fmpz_mat(size(arr, 1), size(arr, 2), arr)
+   z.base_ring = FlintZZ
+   return z
+end
+
+function matrix(R::FlintIntegerRing, r::Int, c::Int, arr::Array{fmpz, 1})
+   _check_dim(r, c, arr)
+   z = fmpz_mat(r, c, arr)
+   z.base_ring = FlintZZ
+   return z
+end
+
+function matrix(R::FlintIntegerRing, r::Int, c::Int, arr::Array{<: Integer, 1})
+   _check_dim(r, c, arr)
+   z = fmpz_mat(r, c, arr)
+   z.base_ring = FlintZZ
+   return z
+end
+
+###############################################################################
+#
+#  Zero matrix
+#
+###############################################################################
+
+function zero_matrix(R::FlintIntegerRing, r::Int, c::Int)
+   z = fmpz_mat(r, c)
+   z.base_ring = FlintZZ
+   return z
+end
+
+###############################################################################
+#
+#  Identity matrix
+#
+###############################################################################
+
+function identity_matrix(R::FlintIntegerRing, n::Int)
+   z = fmpz_mat(n, n)
+   ccall((:fmpz_mat_one, :libflint), Void, (Ptr{fmpz_mat}, ), &z)
+   z.base_ring = FlintZZ
+   return z
 end
 
 ###############################################################################

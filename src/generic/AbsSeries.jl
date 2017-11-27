@@ -48,8 +48,6 @@ doc"""
 """
 max_precision(R::AbsSeriesRing) = R.prec_max
 
-isexact(R::AbsSeriesRing) = false
-
 function normalise(a::AbsSeries, len::Int)
    while len > 0 && iszero(a.coeffs[len])
       len -= 1
@@ -334,7 +332,7 @@ doc"""
     *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.AbsSeriesElem)
 > Return $a\times b$.
 """
-function *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.AbsSeriesElem) 
+function *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.AbsSeriesElem)
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -467,6 +465,8 @@ function ^(a::Nemo.AbsSeriesElem{T}, b::Int) where {T <: RingElement}
       z = one(parent(a))
       set_prec!(z, precision(a))
       return z
+   elseif b == 1
+      return deepcopy(a)
    else
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & b) == 0
@@ -542,6 +542,25 @@ function isequal(x::Nemo.AbsSeriesElem{T}, y::Nemo.AbsSeriesElem{T}) where {T <:
       if !isequal(coeff(x, i - 1), coeff(y, i - 1))
          return false
       end
+   end
+   return true
+end
+
+###############################################################################
+#
+#   Approximation
+#
+###############################################################################
+
+function Base.isapprox(f::Nemo.AbsSeriesElem, g::Nemo.AbsSeriesElem; atol::Real=sqrt(eps()))
+   check_parent(f, g)
+   nmin = min(precision(f), precision(g))
+   i = 1
+   while i <= nmin
+      if !isapprox(coeff(f, i - 1), coeff(g, i - 1); atol=atol)
+         return false
+      end
+      i += 1
    end
    return true
 end
@@ -683,7 +702,7 @@ doc"""
     exp(a::Nemo.AbsSeriesElem)
 > Return the exponential of the power series $a$.
 """
-function exp(a::Nemo.AbsSeriesElem)
+function Base.exp(a::Nemo.AbsSeriesElem)
    if iszero(a)
       z = one(parent(a))
       set_prec!(z, precision(a))
@@ -692,7 +711,7 @@ function exp(a::Nemo.AbsSeriesElem)
    z = parent(a)()
    fit!(z, precision(a))
    set_prec!(z, precision(a))
-   z = setcoeff!(z, 0, exp(coeff(a, 0)))
+   z = setcoeff!(z, 0, Nemo.exp(coeff(a, 0)))
    len = length(a)
    for k = 1 : precision(a) - 1
       s = zero(base_ring(a))
@@ -839,7 +858,7 @@ function (a::AbsSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where
    return z
 end
 
-function (a::AbsSeriesRing{T})(b::T) where {T <: RingElement}
+function (a::AbsSeriesRing{T})(b::T) where {T <: RingElem}
    parent(b) != base_ring(a) && error("Unable to coerce to power series")
    if b == 0
       z = AbsSeries{T}(Array{T}(0), 0, a.prec_max)

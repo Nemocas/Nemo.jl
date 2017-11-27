@@ -761,6 +761,76 @@ promote_rule(::Type{fmpq_mat}, ::Type{Rational{T}}) where T <: Union{Int, BigInt
 
 ###############################################################################
 #
+#   Matrix constructor
+#
+###############################################################################
+
+function matrix(R::FlintRationalField, arr::Array{fmpq, 2})
+   z = fmpq_mat(size(arr, 1), size(arr, 2), arr)
+   z.base_ring = FlintQQ
+   return z
+end
+
+function matrix(R::FlintRationalField, arr::Array{<: Union{fmpz, Int, BigInt}, 2})
+   z = fmpq_mat(size(arr, 1), size(arr, 2), arr)
+   z.base_ring = FlintQQ
+   return z
+end
+
+function matrix(R::FlintRationalField, arr::Array{Rational{T}, 2}) where {T <: Integer}
+   z = fmpq_mat(size(arr, 1), size(arr, 2), map(fmpq, arr))
+   z.base_ring = FlintQQ
+   return z
+end
+
+function matrix(R::FlintRationalField, r::Int, c::Int, arr::Array{fmpq, 1})
+   _check_dim(r, c, arr)
+   z = fmpq_mat(r, c, arr)
+   z.base_ring = FlintQQ
+   return z
+end
+
+function matrix(R::FlintRationalField, r::Int, c::Int, arr::Array{<: Union{fmpz, Int, BigInt}, 1})
+   _check_dim(r, c, arr)
+   z = fmpq_mat(r, c, arr)
+   z.base_ring = FlintQQ
+   return z
+end
+
+function matrix(R::FlintRationalField, r::Int, c::Int, arr::Array{Rational{T}, 1}) where {T <: Union{fmpz, Int, BigInt}}
+   _check_dim(r, c, arr)
+   z = fmpq_mat(r, c, map(fmpq, arr))
+   z.base_ring = FlintQQ
+   return z
+end
+
+###############################################################################
+#
+#  Zero matrix
+#
+###############################################################################
+
+function zero_matrix(R::FlintRationalField, r::Int, c::Int)
+   z = fmpq_mat(r, c)
+   z.base_ring = FlintQQ
+   return z
+end
+
+###############################################################################
+#
+#  Identity matrix
+#
+###############################################################################
+
+function identity_matrix(R::FlintRationalField, n::Int)
+   z = fmpq_mat(n, n)
+   ccall((:fmpq_mat_one, :libflint), Void, (Ptr{fmpq_mat}, ), &z)
+   z.base_ring = FlintQQ
+   return z
+end
+
+###############################################################################
+#
 #   MatrixSpace constructor
 #
 ###############################################################################

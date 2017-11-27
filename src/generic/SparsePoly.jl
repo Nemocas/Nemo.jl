@@ -16,7 +16,13 @@ parent_type(::Type{SparsePoly{T}}) where {T <: RingElement} = SparsePolyRing{T}
 
 elem_type(::Type{SparsePolyRing{T}}) where {T <: RingElement} = SparsePoly{T}
 
-isexact(R::SparsePolyRing) = isexact(base_ring(R))
+function isdomain_type(a::Type{SparsePoly{T}}) where T <: RingElement
+   return isdomain_type(T)
+end
+
+function isexact_type(a::Type{SparsePoly{T}}) where T <: RingElement
+   return isexact_type(T)
+end
 
 var(a::SparsePolyRing) = a.S
 
@@ -38,7 +44,7 @@ end
 one(R::SparsePolyRing) = R(1)
 
 zero(R::SparsePolyRing) = R(0)
- 
+
 iszero(x::SparsePoly) = length(x) = 0
 
 isone(x::SparsePoly) = x == 1
@@ -50,7 +56,7 @@ lead(x::SparsePoly) = x.length == 0 ? base_ring(x)() : x.coeffs[x.length]
 trail(x::SparsePoly) = x.length == 0 ? base_ring(x)() : x.coeffs[1]
 
 function normalise(a::SparsePoly, n::Int)
-   while n > 0 && iszero(a.coeffs[n]) 
+   while n > 0 && iszero(a.coeffs[n])
       n -= 1
    end
    return n
@@ -363,11 +369,11 @@ function mul_johnson(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement
          v = I[xn]
          if v.j == 1 && v.i < m
             push!(I, heap_t(v.i + 1, 1, 0))
-            Collections.heappush!(H, heap_sr(a.exps[v.i + 1] + b.exps[1], length(I)))       
+            Collections.heappush!(H, heap_sr(a.exps[v.i + 1] + b.exps[1], length(I)))
          end
          if v.j < n
             I[xn] = heap_t(v.i, v.j + 1, 0)
-            heapinsert!(H, I, xn, a.exps[v.i] + b.exps[v.j + 1]) # either chain or insert v into heap   
+            heapinsert!(H, I, xn, a.exps[v.i] + b.exps[v.j + 1]) # either chain or insert v into heap
          end
       end
       if Rc[k] == 0
@@ -475,14 +481,14 @@ function divrem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
          v = I[xn]
          if v.i == 0
             I[xn] = heap_t(0, v.j + 1, 0)
-            heapinsert!(H, I, xn, maxn - a.exps[m - v.j]) # either chain or insert into heap   
+            heapinsert!(H, I, xn, maxn - a.exps[m - v.j]) # either chain or insert into heap
          elseif v.j < k - 1
             I[xn] = heap_t(v.i, v.j + 1, 0)
             heapinsert!(H, I, xn, maxn - b.exps[n + 1 - v.i] - Qe[v.j + 1]) # either chain or insert into heap
          elseif v.j == k - 1
             s += 1
             push!(reuse, xn)
-         end  
+         end
       end
       if qc == 0
          k -= 1
@@ -509,7 +515,7 @@ function divrem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
                   resize!(Re, r_alloc)
                end
                Rc[l] = -tr
-               Re[l] = maxn - exp 
+               Re[l] = maxn - exp
             end
             if tq != 0
                Qc[k] = tq
@@ -523,7 +529,7 @@ function divrem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
                      push!(I, heap_t(i, k, 0))
                      Collections.heappush!(H, heap_sr(maxn - b.exps[n + 1 - i] - Qe[k], length(I)))
                   end
-               end                 
+               end
                s = 1
             else
                k -= 1
@@ -556,7 +562,7 @@ function *(a::SparsePoly, n::Union{Integer, Rational, AbstractFloat})
    for i = 1:length(a)
       c = a.coeffs[i]*n
       if c != 0
-         r.coeffs[j] = c 
+         r.coeffs[j] = c
          r.exps[j] = a.exps[i]
          j += 1
       end
@@ -572,7 +578,7 @@ function *(a::SparsePoly{T}, n::T) where {T <: RingElem}
    for i = 1:length(a)
       c = a.coeffs[i]*n
       if c != 0
-         r.coeffs[j] = c 
+         r.coeffs[j] = c
          r.exps[j] = a.exps[i]
          j += 1
       end
@@ -610,7 +616,7 @@ end
 ###############################################################################
 
 function ==(a::SparsePoly, b::Union{Integer, Rational, AbstractFloat})
-   return length(a) == 0 ? b == 0 : a.length == 1 && 
+   return length(a) == 0 ? b == 0 : a.length == 1 &&
           a.exps[1] == 0 && a.coeffs[1] == b
 end
 
@@ -733,7 +739,7 @@ function pow_fps(f::SparsePoly{T}, k::Int) where {T <: RingElement}
          v = I[xn]
          if v.i < m && largest[v.i + 1] == ((v.j - 1) | topbit)
             I[xn] = heap_t(v.i + 1, v.j, 0)
-            heapinsert!(H, I, xn, f.exps[v.i + 1] + ge[v.j]) # either chain or insert v into heap   
+            heapinsert!(H, I, xn, f.exps[v.i + 1] + ge[v.j]) # either chain or insert v into heap
             largest[v.i + 1] = v.j
          else
             reuse = xn
@@ -742,12 +748,12 @@ function pow_fps(f::SparsePoly{T}, k::Int) where {T <: RingElement}
             if reuse != 0
                I[reuse] = heap_t(v.i, v.j + 1, 0)
                heapinsert!(H, I, reuse, f.exps[v.i] + ge[v.j + 1]) # either chain or insert v into heap
-               reuse = 0   
+               reuse = 0
             else
                push!(I, heap_t(v.i, v.j + 1, 0))
                Collections.heappush!(H, heap_sr(f.exps[v.i] + ge[v.j + 1], length(I)))
             end
-            largest[v.i] = v.j + 1     
+            largest[v.i] = v.j + 1
          end
       end
       if C != 0
@@ -757,7 +763,7 @@ function pow_fps(f::SparsePoly{T}, k::Int) where {T <: RingElement}
          push!(gi, -from_exp(R, ge[gnext]))
          if (largest[2] & topbit) != 0
             push!(I, heap_t(2, gnext, 0))
-            Collections.heappush!(H, heap_sr(f.exps[2] + ge[gnext], length(I)))   
+            Collections.heappush!(H, heap_sr(f.exps[2] + ge[gnext], length(I)))
             largest[2] = gnext
          end
       end
@@ -878,14 +884,14 @@ function divides_monagan_pearce(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: 
          v = I[xn]
          if v.i == 0
             I[xn] = heap_t(0, v.j + 1, 0)
-            heapinsert!(H, I, xn, a.exps[v.j + 1]) # either chain or insert into heap   
+            heapinsert!(H, I, xn, a.exps[v.j + 1]) # either chain or insert into heap
          elseif v.j < k - 1
             I[xn] = heap_t(v.i, v.j + 1, 0)
             heapinsert!(H, I, xn, b.exps[v.i] + Qe[v.j + 1]) # either chain or insert into heap
          elseif v.j == k - 1
             s += 1
             push!(reuse, xn)
-         end  
+         end
       end
       if qc == 0
          k -= 1
@@ -902,7 +908,7 @@ function divides_monagan_pearce(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: 
             else
                push!(I, heap_t(i, k, 0))
                Collections.heappush!(H, heap_sr(b.exps[i] + Qe[k], length(I)))
-            end                 
+            end
          end
          s = 1
       end
@@ -1102,14 +1108,14 @@ function pseudodivrem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElemen
          v = I[xn]
          if v.i == 0
             I[xn] = heap_t(0, v.j + 1, 0)
-            heapinsert!(H, I, xn, maxn - a.exps[m - v.j]) # either chain or insert into heap   
+            heapinsert!(H, I, xn, maxn - a.exps[m - v.j]) # either chain or insert into heap
          elseif v.j < k - 1
             I[xn] = heap_t(v.i, v.j + 1, 0)
             heapinsert!(H, I, xn, maxn - b.exps[n + 1 - v.i] - Qe[v.j + 1]) # either chain or insert into heap
          elseif v.j == k - 1
             s += 1
             push!(reuse, xn)
-         end  
+         end
       end
       if qc == 0
          k -= 1
@@ -1141,7 +1147,7 @@ function pseudodivrem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElemen
                   push!(I, heap_t(i, k, 0))
                   Collections.heappush!(H, heap_sr(maxn - b.exps[n + 1 - i] - Qe[k], length(I)))
                end
-            end                 
+            end
             s = 1
          end
       end
@@ -1278,14 +1284,14 @@ function pseudorem_monagan_pearce(a::SparsePoly{T}, b::SparsePoly{T}) where {T <
          v = I[xn]
          if v.i == 0
             I[xn] = heap_t(0, v.j + 1, 0)
-            heapinsert!(H, I, xn, maxn - a.exps[m - v.j]) # either chain or insert into heap   
+            heapinsert!(H, I, xn, maxn - a.exps[m - v.j]) # either chain or insert into heap
          elseif v.j < k - 1
             I[xn] = heap_t(v.i, v.j + 1, 0)
             heapinsert!(H, I, xn, maxn - b.exps[n + 1 - v.i] - Qe[v.j + 1]) # either chain or insert into heap
          elseif v.j == k - 1
             s += 1
             push!(reuse, xn)
-         end  
+         end
       end
       if qc == 0
          k -= 1
@@ -1317,7 +1323,7 @@ function pseudorem_monagan_pearce(a::SparsePoly{T}, b::SparsePoly{T}) where {T <
                   push!(I, heap_t(i, k, 0))
                   Collections.heappush!(H, heap_sr(maxn - b.exps[n + 1 - i] - Qe[k], length(I)))
                end
-            end                 
+            end
             s = 1
          end
       end
@@ -1532,7 +1538,7 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
          elseif trail_monomial # trail term is monomial, so ditto
             d = divexact(trail(b), term_content(trail(b)))
             b = divexact(b, d)
-         else 
+         else
             glead = gcd(lead_a, lead_b)
             if glead.length == 1 # gcd of lead coeffs monomial
                d = divexact(lead(b), term_content(lead(b)))

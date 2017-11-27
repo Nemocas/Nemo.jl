@@ -17,12 +17,14 @@ RDF = Floats{Float64}()
 parent(a::T) where T <: AbstractFloat = Floats{T}()
 
 elem_type(::Type{Floats{T}}) where T <: AbstractFloat = T
- 
+
 parent_type(::Type{T}) where T <: AbstractFloat = Floats{T}
 
 base_ring(a::AbstractFloat) = Union{}
 
-isexact(::Floats{T}) where T <: AbstractFloat = false
+isdomain_type(::Type{T}) where T <: AbstractFloat = true
+
+isexact_type(::Type{T}) where T <: AbstractFloat = false
 
 ###############################################################################
 #
@@ -139,7 +141,7 @@ function addeq!(a::T, b::T) where T <: AbstractFloat
 end
 
 function addeq!(a::BigFloat, b::BigFloat)
-   ccall((:mpfr_add, :libmpfr), Void, 
+   ccall((:mpfr_add, :libmpfr), Void,
          (Ptr{BigFloat}, Ptr{BigFloat}, Ptr{BigFloat}, Int32),
                  &a, &a, &b, Base.MPFR.ROUNDING_MODE[])
    return a
@@ -210,4 +212,3 @@ end
 function (a::Floats{BigFloat})(b::Rational{BigInt})
    return BigFloat(b)
 end
-

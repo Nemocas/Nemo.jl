@@ -34,7 +34,11 @@ doc"""
 """
 parent(a::gfelem) = a.parent
 
-function check_parent(a::gfelem, b::gfelem) 
+isexact_type(::Type{gfelem{T}}) where T <: Integer = true
+
+isdomain_type(::Type{gfelem{T}}) where T <: Integer = true
+
+function check_parent(a::gfelem, b::gfelem)
    a.parent != b.parent && error("Operations on distinct finite fields not supported")
 end
 
@@ -70,13 +74,13 @@ doc"""
 > Returns true if the given element of the finite field is zero.
 """
 iszero(a::gfelem{T}) where T <: Integer = a.d == 0
-    
+
 doc"""
     isone{T <: Integer}(a::gfelem{T})
 > Returns true if the given element of the finite field is one.
 """
 isone(a::gfelem{T}) where T <: Integer = a.d == 1
-    
+
 doc"""
     isunit(a::gfelem)
 > Return `true` if the given finite field element is invertible, i.e. nonzero,
@@ -251,7 +255,7 @@ end
 #
 ###############################################################################
 
-function ==(x::gfelem{T}, y::gfelem{T}) where T <: Integer 
+function ==(x::gfelem{T}, y::gfelem{T}) where T <: Integer
    check_parent(x, y)
    return x.d == y.d
 end
@@ -268,7 +272,7 @@ function inv(x::gfelem{T}) where T <: Integer
    p = R.p::T
    g, s, t = gcdx(x.d, p)
    g != 1 && error("Characteristic not prime in ", R)
-   return R(s) 
+   return R(s)
 end
 
 ###############################################################################
@@ -332,7 +336,7 @@ function add!(z::gfelem{T}, x::gfelem{T}, y::gfelem{T}) where T <: Integer
       return gfelem{T}(d - p, R)
    end
 end
-   
+
 ###############################################################################
 #
 #   Random functions
@@ -387,4 +391,3 @@ function GF(p::T) where T <: Integer
    p <= 0 && error("Characteristic is not prime in GF(p)")
    return GFField{T}(p)
 end
-   

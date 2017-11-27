@@ -20,7 +20,7 @@ base_ring(a::nmod) = Union{}
 
 parent(a::nmod) = a.parent
 
-function check_parent(a::nmod, b::nmod) 
+function check_parent(a::nmod, b::nmod)
    a.parent != b.parent && error("Operations on distinct residue rings not supported")
 end
 
@@ -66,7 +66,25 @@ end
 #
 ###############################################################################
 
-canonical_unit(x::nmod) = x
+function canonical_unit(x::nmod)
+  #the simple return x does not work
+  # - if x == 0, this is not a unit
+  # - if R is not a field....
+  if iszero(x)
+    return parent(x)(0)
+  end
+  g = gcd(modulus(x), data(x))
+  u = divexact(data(x), g)
+  a, b = ppio(modulus(x), u) 
+  if isone(a)
+    r = u
+  elseif isone(b)
+    r = b
+  else
+    r = crt(fmpz(1), fmpz(a), fmpz(u), fmpz(b))
+  end
+  return parent(x)(r)
+end
 
 ###############################################################################
 #
@@ -209,7 +227,7 @@ end
 #
 ###############################################################################
 
-function ==(x::nmod, y::nmod) 
+function ==(x::nmod, y::nmod)
    check_parent(x, y)
    return x.data == y.data
 end
@@ -244,7 +262,35 @@ function inv(x::nmod)
    g = ccall((:n_gcdinv, :libflint), UInt, (Ptr{UInt}, UInt, UInt),
          pointer(s), x.data, R.n)
    g != 1 && error("Impossible inverse in ", R)
-   return nmod(s[], R) 
+   return nmod(s[], R)
+end
+
+###############################################################################
+#
+#   Coprime bases
+#
+###############################################################################
+
+# Bernstein, "Factoring into coprimes in essentially linear time"
+# ppio(a,b) = (c,n) where v_p(c) = v_p(a) if v_p(b) != 0, 0 otherwise
+# c*n = a or c = gcd(a, b^infty), n = div(a, c).
+# This is used in various Euclidean domains for Chinese remaindering.
+
+doc"""
+   ppio(a::T, b::T)
+
+> Split $a$ into $c*d$ where $c = gcd(a, b^\infty)$.
+"""
+function ppio(a::E, b::E) where E <: Integer
+   c = gcd(a, b)
+   n = div(a, c)
+   g = gcd(c, n)
+   while !isone(g)
+      c *= g
+      n = div(n, g)
+      g = gcd(c, n)
+   end
+   return c, n
 end
 
 ###############################################################################
@@ -255,10 +301,32 @@ end
 
 function divexact(x::nmod, y::nmod)
    check_parent(x, y)
-   return x*inv(y)
+   fl, q = divides(x, y)
+   if !fl
+     error("Impossible inverse in ", R)
+   end
+   return q
 end
 
-divides(a::nmod, b::nmod) = true, divexact(a, b)
+function divides(a::nmod, b::nmod)
+   check_parent(a, b)
+   if iszero(a)
+      return true, a
+   end
+   A = data(a)
+   B = data(b)
+   R = parent(a)
+   m = modulus(R)
+   gb = gcd(B, m)
+   q, r = divrem(A, gb)
+   if r != 0
+      return false, b
+   end
+   ub = div(B, gb)
+   _, x = ppio(m, ub)
+   r = R(q)*inv(R(ub))
+   return true, r
+end
 
 ###############################################################################
 #

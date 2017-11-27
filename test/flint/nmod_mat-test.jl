@@ -114,7 +114,6 @@ function test_nmod_mat_constructors()
   @test_throws ErrorConstrDimMismatch R([Z2(1), Z2(1), Z2(1)])
   @test_throws ErrorConstrDimMismatch R([Z2(1), Z2(1), Z2(1), Z2(1), Z2(1)])
 
-
   @test isa(S(1), nmod_mat)
   
   @test isa(S(fmpz(1)), nmod_mat)
@@ -128,7 +127,34 @@ function test_nmod_mat_constructors()
   @test d == e
   @test e == f
   @test g == e
-  
+
+   arr = [1 2; 3 4]
+   arr2 = [1, 2, 3, 4, 5, 6]
+
+   for T in [Z3, fmpz, Int, BigInt]
+      M = matrix(Z3, map(T, arr))
+      @test isa(M, nmod_mat)
+      @test M.base_ring == Z3
+
+      M2 = matrix(Z3, 2, 3, map(T, arr2))
+      @test isa(M2, nmod_mat)
+      @test M2.base_ring == Z3
+      @test rows(M2) == 2
+      @test cols(M2) == 3
+      @test_throws ErrorConstrDimMismatch matrix(Z3, 2, 2, map(T, arr2))
+      @test_throws ErrorConstrDimMismatch matrix(Z3, 2, 4, map(T, arr2))
+   end
+
+   M3 = zero_matrix(Z3, 2, 3)
+
+   @test isa(M3, nmod_mat)
+   @test M3.base_ring == Z3
+
+   M4 = identity_matrix(Z3, 3)
+
+   @test isa(M4, nmod_mat)
+   @test M4.base_ring == Z3
+
   println("PASS")
 end
 
