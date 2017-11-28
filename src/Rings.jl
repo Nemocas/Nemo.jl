@@ -104,6 +104,8 @@ function addmul!(z::T, x::T, y::T, c::T) where {T <: RingElem}
    return z
 end
 
+Base.literal_pow(::typeof(^), x::T, ::Val{p}) where {p, T <: RingElem} = x^p
+
 ###############################################################################
 #
 #   Baby-steps giant-steps powering
@@ -184,7 +186,7 @@ function ppio(a::E, b::E) where E <: RingElem
    c = gcd(a, b)
    n = div(a, c)
    g = gcd(c, n)
-   while !isone(g) 
+   while !isone(g)
       c *= g
       n = div(n, g)
       g = gcd(c, n)
@@ -219,6 +221,8 @@ include("flint/fmpz_mod_poly.jl")
 include("flint/fmpz_rel_series.jl")
 
 include("flint/fmpz_abs_series.jl")
+
+include("flint/nmod_rel_series.jl")
 
 include("flint/fmpz_mod_rel_series.jl")
 

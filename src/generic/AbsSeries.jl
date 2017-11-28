@@ -548,6 +548,25 @@ end
 
 ###############################################################################
 #
+#   Approximation
+#
+###############################################################################
+
+function Base.isapprox(f::Nemo.AbsSeriesElem, g::Nemo.AbsSeriesElem; atol::Real=sqrt(eps()))
+   check_parent(f, g)
+   nmin = min(precision(f), precision(g))
+   i = 1
+   while i <= nmin
+      if !isapprox(coeff(f, i - 1), coeff(g, i - 1); atol=atol)
+         return false
+      end
+      i += 1
+   end
+   return true
+end
+
+###############################################################################
+#
 #   Ad hoc comparison
 #
 ###############################################################################
@@ -839,7 +858,7 @@ function (a::AbsSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where
    return z
 end
 
-function (a::AbsSeriesRing{T})(b::T) where {T <: RingElement}
+function (a::AbsSeriesRing{T})(b::T) where {T <: RingElem}
    parent(b) != base_ring(a) && error("Unable to coerce to power series")
    if b == 0
       z = AbsSeries{T}(Array{T}(0), 0, a.prec_max)

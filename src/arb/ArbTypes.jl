@@ -33,7 +33,7 @@ const ARB_RND_NEAR = Cint(4)   # to nearest
 mutable struct ArbField <: Field
   prec::Int
 
-  function ArbField(p::Int = 256; cached::Bool = true)
+  function ArbField(p::Int = 256, cached::Bool = true)
     arb_check_prec(p)
     if haskey(ArbFieldID, p)
       return ArbFieldID[p]
@@ -152,7 +152,7 @@ end
 mutable struct AcbField <: Field
   prec::Int
 
-  function AcbField(p::Int = 256; cached::Bool = true)
+  function AcbField(p::Int = 256, cached::Bool = true)
     arb_check_prec(p)
     if haskey(AcbFieldID, p)
       return AcbFieldID[p]

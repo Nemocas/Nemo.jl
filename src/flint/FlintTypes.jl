@@ -187,10 +187,10 @@ mutable struct fmpz_poly <: PolyElem{fmpz}
 
    function fmpz_poly(a::Array{fmpz, 1})
       z = new()
-      ccall((:fmpz_poly_init2, :libflint), Void, 
+      ccall((:fmpz_poly_init2, :libflint), Void,
             (Ptr{fmpz_poly}, Int), &z, length(a))
       for i = 1:length(a)
-         ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, 
+         ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void,
                      (Ptr{fmpz_poly}, Int, Ptr{fmpz}), &z, i - 1, &a[i])
       end
       finalizer(z, _fmpz_poly_clear_fn)
@@ -208,7 +208,7 @@ mutable struct fmpz_poly <: PolyElem{fmpz}
    function fmpz_poly(a::fmpz)
       z = new()
       ccall((:fmpz_poly_init, :libflint), Void, (Ptr{fmpz_poly},), &z)
-      ccall((:fmpz_poly_set_fmpz, :libflint), Void, 
+      ccall((:fmpz_poly_set_fmpz, :libflint), Void,
             (Ptr{fmpz_poly}, Ptr{fmpz}), &z, &a)
       finalizer(z, _fmpz_poly_clear_fn)
       return z
@@ -217,7 +217,7 @@ mutable struct fmpz_poly <: PolyElem{fmpz}
    function fmpz_poly(a::fmpz_poly)
       z = new()
       ccall((:fmpz_poly_init, :libflint), Void, (Ptr{fmpz_poly},), &z)
-      ccall((:fmpz_poly_set, :libflint), Void, 
+      ccall((:fmpz_poly_set, :libflint), Void,
             (Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &a)
       finalizer(z, _fmpz_poly_clear_fn)
       return z
@@ -277,7 +277,7 @@ const FmpqPolyID = Dict{Symbol, FmpqPolyRing}()
 
 mutable struct fmpq_poly <: PolyElem{fmpq}
    coeffs::Ptr{Int}
-   den::Int 
+   den::Int
    alloc::Int
    length::Int
    parent::FmpqPolyRing
@@ -291,10 +291,10 @@ mutable struct fmpq_poly <: PolyElem{fmpq}
 
    function fmpq_poly(a::Array{fmpq, 1})
       z = new()
-      ccall((:fmpq_poly_init2, :libflint), Void, 
+      ccall((:fmpq_poly_init2, :libflint), Void,
             (Ptr{fmpq_poly}, Int), &z, length(a))
       for i = 1:length(a)
-         ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, 
+         ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void,
                      (Ptr{fmpq_poly}, Int, Ptr{fmpq}), &z, i - 1, &a[i])
       end
       finalizer(z, _fmpq_poly_clear_fn)
@@ -312,7 +312,7 @@ mutable struct fmpq_poly <: PolyElem{fmpq}
    function fmpq_poly(a::fmpz)
       z = new()
       ccall((:fmpq_poly_init, :libflint), Void, (Ptr{fmpq_poly},), &z)
-      ccall((:fmpq_poly_set_fmpz, :libflint), Void, 
+      ccall((:fmpq_poly_set_fmpz, :libflint), Void,
             (Ptr{fmpq_poly}, Ptr{fmpz}), &z, &a)
       finalizer(z, _fmpq_poly_clear_fn)
       return z
@@ -330,7 +330,7 @@ mutable struct fmpq_poly <: PolyElem{fmpq}
    function fmpq_poly(a::fmpz_poly)
       z = new()
       ccall((:fmpq_poly_init, :libflint), Void, (Ptr{fmpq_poly},), &z)
-      ccall((:fmpq_poly_set_fmpz_poly, :libflint), Void, 
+      ccall((:fmpq_poly_set_fmpz_poly, :libflint), Void,
             (Ptr{fmpq_poly}, Ptr{fmpz_poly}), &z, &a)
       finalizer(z, _fmpq_poly_clear_fn)
       return z
@@ -339,7 +339,7 @@ mutable struct fmpq_poly <: PolyElem{fmpq}
    function fmpq_poly(a::fmpq_poly)
       z = new()
       ccall((:fmpq_poly_init, :libflint), Void, (Ptr{fmpq_poly},), &z)
-      ccall((:fmpq_poly_set, :libflint), Void, 
+      ccall((:fmpq_poly_set, :libflint), Void,
             (Ptr{fmpq_poly}, Ptr{fmpq_poly}), &z, &a)
       finalizer(z, _fmpq_poly_clear_fn)
       return z
@@ -491,7 +491,7 @@ mutable struct nmod_poly <: PolyElem{nmod}
 
    function nmod_poly(n::UInt, f::nmod_poly)
       z = new()
-      ccall((:nmod_poly_init2, :libflint), Void, 
+      ccall((:nmod_poly_init2, :libflint), Void,
             (Ptr{nmod_poly}, UInt, Int), &z, n, length(f))
       ccall((:nmod_poly_set, :libflint), Void,
             (Ptr{nmod_poly}, Ptr{nmod_poly}), &z, &f)
@@ -506,11 +506,11 @@ end
 
 mutable struct nmod_poly_factor
   poly::Ptr{nmod_poly}  # array of flint nmod_poly_struct's
-  exp::Ptr{Int} 
+  exp::Ptr{Int}
   num::Int
   alloc::Int
   n::UInt
-    
+
   function nmod_poly_factor(n::UInt)
     z = new()
     ccall((:nmod_poly_factor_init, :libflint), Void,
@@ -570,7 +570,7 @@ mutable struct fmpz_mod_poly <: PolyElem{Generic.Res{fmpz}}
 
    function fmpz_mod_poly(n::fmpz, a::UInt)
       z = new()
-      ccall((:fmpz_mod_poly_init, :libflint), Void, 
+      ccall((:fmpz_mod_poly_init, :libflint), Void,
             (Ptr{fmpz_mod_poly}, Ptr{fmpz}), &z, &n)
       ccall((:fmod_poly_set_coeff_ui, :libflint), Void,
               (Ptr{fmpz_mod_poly}, Int, UInt), &z, 0, a)
@@ -580,7 +580,7 @@ mutable struct fmpz_mod_poly <: PolyElem{Generic.Res{fmpz}}
 
    function fmpz_mod_poly(n::fmpz, a::fmpz)
       z = new()
-      ccall((:fmpz_mod_poly_init, :libflint), Void, 
+      ccall((:fmpz_mod_poly_init, :libflint), Void,
             (Ptr{fmpz_mod_poly}, Ptr{fmpz}), &z, &n)
       ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void,
               (Ptr{fmpz_mod_poly}, Int, Ptr{fmpz}), &z, 0, &a)
@@ -640,11 +640,11 @@ end
 
 mutable struct fmpz_mod_poly_factor
   poly::Ptr{fmpz_mod_poly}
-  exp::Ptr{Int} 
+  exp::Ptr{Int}
   num::Int
   alloc::Int
   n::fmpz
-    
+
   function fmpz_mod_poly_factor(n::fmpz)
     z = new()
     ccall((:fmpz_mod_poly_factor_init, :libflint), Void,
@@ -670,7 +670,7 @@ end
 # :lex
 # :deglex
 # :degrevlex
-# 
+#
 # T is an Int which is the number of variables
 # (plus one if ordered by total degree)
 
@@ -684,7 +684,7 @@ mutable struct FmpzMPolyRing{S, N} <: PolyRing{fmpz}
    function FmpzMPolyRing{S, N}(s::Array{Symbol, 1}, cached::Bool = true) where {S, N}
       if haskey(FmpzMPolyID, (s, S, N))
          return FmpzMPolyID[s, S, N]
-      else 
+      else
          if S == :lex
             ord = 0
          elseif S == :deglex
@@ -721,15 +721,15 @@ mutable struct fmpz_mpoly{S, N} <: PolyElem{fmpz}
 
    function fmpz_mpoly(ctx::FmpzMPolyRing{S, N}) where {S, N}
       z = new{S, N}()
-      ccall((:fmpz_mpoly_init, :libflint), Void, 
+      ccall((:fmpz_mpoly_init, :libflint), Void,
             (Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing},), &z, &ctx)
       finalizer(z, _fmpz_mpoly_clear_fn)
       return z
    end
-   
+
    function fmpz_mpoly(ctx::FmpzMPolyRing{S, N}, a::Array{fmpz, 1}, b::Array{NTuple{N, Int}, 1}) where {S, N}
       z = new{S, N}()
-      ccall((:fmpz_mpoly_init, :libflint), Void, 
+      ccall((:fmpz_mpoly_init, :libflint), Void,
             (Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing},), &z, &ctx)
       m = 0
       for i = 1:length(b)
@@ -765,7 +765,7 @@ mutable struct fmpz_mpoly{S, N} <: PolyElem{fmpz}
 
    function fmpz_mpoly(ctx::FmpzMPolyRing{S, N}, a::Int) where {S, N}
       z = new{S, N}()
-      ccall((:fmpz_mpoly_init, :libflint), Void, 
+      ccall((:fmpz_mpoly_init, :libflint), Void,
             (Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing},), &z, &ctx)
       ccall((:fmpz_mpoly_set_si, :libflint), Void,
             (Ptr{fmpz_mpoly}, Int, Ptr{FmpzMPolyRing}), &z, a, &ctx)
@@ -775,7 +775,7 @@ mutable struct fmpz_mpoly{S, N} <: PolyElem{fmpz}
 
    function fmpz_mpoly(ctx::FmpzMPolyRing{S, N}, a::fmpz) where {S, N}
       z = new{S, N}()
-      ccall((:fmpz_mpoly_init, :libflint), Void, 
+      ccall((:fmpz_mpoly_init, :libflint), Void,
             (Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing},), &z, &ctx)
       ccall((:fmpz_mpoly_set_fmpz, :libflint), Void,
             (Ptr{fmpz_mpoly}, Ptr{fmpz}, Ptr{FmpzMPolyRing}), &z, &a, &ctx)
@@ -801,7 +801,7 @@ end
 ###############################################################################
 
 mutable struct FqNmodFiniteField <: FinField
-   p :: Int 
+   p :: Int
    n :: Int
    ninv :: Int
    norm :: Int
@@ -828,8 +828,8 @@ mutable struct FqNmodFiniteField <: FinField
          return FqNmodFiniteFieldID[c, deg, s]
       else
          d = new()
-         ccall((:fq_nmod_ctx_init, :libflint), Void, 
-               (Ptr{FqNmodFiniteField}, Ptr{fmpz}, Int, Ptr{UInt8}), 
+         ccall((:fq_nmod_ctx_init, :libflint), Void,
+               (Ptr{FqNmodFiniteField}, Ptr{fmpz}, Int, Ptr{UInt8}),
 			    &d, &c, deg, string(s))
          if cached
             FqNmodFiniteFieldID[c, deg, s] = d
@@ -844,8 +844,8 @@ mutable struct FqNmodFiniteField <: FinField
          return FqNmodFiniteFieldIDPol[parent(f), f, s]
       else
          z = new()
-         ccall((:fq_nmod_ctx_init_modulus, :libflint), Void, 
-            (Ptr{FqNmodFiniteField}, Ptr{nmod_poly}, Ptr{UInt8}), 
+         ccall((:fq_nmod_ctx_init_modulus, :libflint), Void,
+            (Ptr{FqNmodFiniteField}, Ptr{nmod_poly}, Ptr{UInt8}),
 	      &z, &f, string(s))
          if cached
             FqNmodFiniteFieldIDPol[parent(f), f, s] = z
@@ -876,7 +876,7 @@ mutable struct fq_nmod <: FinFieldElem
 
    function fq_nmod(ctx::FqNmodFiniteField)
       d = new()
-      ccall((:fq_nmod_init2, :libflint), Void, 
+      ccall((:fq_nmod_init2, :libflint), Void,
             (Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), &d, &ctx)
       finalizer(d, _fq_nmod_clear_fn)
       return d
@@ -887,34 +887,34 @@ mutable struct fq_nmod <: FinFieldElem
       ccall((:fq_nmod_init2, :libflint), Void,
             (Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), &d, &ctx)
       finalizer(d, _fq_nmod_clear_fn)
-      ccall((:fq_nmod_set_si, :libflint), Void, 
+      ccall((:fq_nmod_set_si, :libflint), Void,
                 (Ptr{fq_nmod}, Int, Ptr{FqNmodFiniteField}), &d, x, &ctx)
       return d
    end
 
    function fq_nmod(ctx::FqNmodFiniteField, x::fmpz)
       d = new()
-      ccall((:fq_nmod_init2, :libflint), Void, 
+      ccall((:fq_nmod_init2, :libflint), Void,
             (Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), &d, &ctx)
       finalizer(d, _fq_nmod_clear_fn)
-      ccall((:fq_nmod_set_fmpz, :libflint), Void, 
+      ccall((:fq_nmod_set_fmpz, :libflint), Void,
             (Ptr{fq_nmod}, Ptr{fmpz}, Ptr{FqNmodFiniteField}), &d, &x, &ctx)
       return d
    end
 
       function fq_nmod(ctx::FqNmodFiniteField, x::fq_nmod)
       d = new()
-      ccall((:fq_nmod_init2, :libflint), Void, 
+      ccall((:fq_nmod_init2, :libflint), Void,
             (Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), &d, &ctx)
       finalizer(d, _fq_nmod_clear_fn)
-      ccall((:fq_nmod_set, :libflint), Void, 
+      ccall((:fq_nmod_set, :libflint), Void,
             (Ptr{fq_nmod}, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), &d, &x, &ctx)
       return d
    end
 end
 
 function _fq_nmod_clear_fn(a::fq_nmod)
-   ccall((:fq_nmod_clear, :libflint), Void, 
+   ccall((:fq_nmod_clear, :libflint), Void,
          (Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), &a, &a.parent)
 end
 
@@ -955,7 +955,7 @@ mutable struct FqFiniteField <: FinField
          return d
       end
    end
-   
+
    function FqFiniteField(f::fmpz_mod_poly, s::Symbol, cached::Bool = true)
       if haskey(FqFiniteFieldIDPol, (f, s))
          return FqFiniteFieldIDPol[f, s]
@@ -989,7 +989,7 @@ mutable struct fq <: FinFieldElem
 
    function fq(ctx::FqFiniteField)
       d = new()
-      ccall((:fq_init2, :libflint), Void, 
+      ccall((:fq_init2, :libflint), Void,
             (Ptr{fq}, Ptr{FqFiniteField}), &d, &ctx)
       finalizer(d, _fq_clear_fn)
       d.parent = ctx
@@ -998,10 +998,10 @@ mutable struct fq <: FinFieldElem
 
    function fq(ctx::FqFiniteField, x::Int)
       d = new()
-      ccall((:fq_init2, :libflint), Void, 
+      ccall((:fq_init2, :libflint), Void,
             (Ptr{fq}, Ptr{FqFiniteField}), &d, &ctx)
       finalizer(d, _fq_clear_fn)
-      ccall((:fq_set_si, :libflint), Void, 
+      ccall((:fq_set_si, :libflint), Void,
                 (Ptr{fq}, Int, Ptr{FqFiniteField}), &d, x, &ctx)
       d.parent = ctx
       return d
@@ -1009,10 +1009,10 @@ mutable struct fq <: FinFieldElem
 
    function fq(ctx::FqFiniteField, x::fmpz)
       d = new()
-      ccall((:fq_init2, :libflint), Void, 
+      ccall((:fq_init2, :libflint), Void,
             (Ptr{fq}, Ptr{FqFiniteField}), &d, &ctx)
       finalizer(d, _fq_clear_fn)
-      ccall((:fq_set_fmpz, :libflint), Void, 
+      ccall((:fq_set_fmpz, :libflint), Void,
             (Ptr{fq}, Ptr{fmpz}, Ptr{FqFiniteField}), &d, &x, &ctx)
       d.parent = ctx
       return d
@@ -1020,10 +1020,10 @@ mutable struct fq <: FinFieldElem
 
    function fq(ctx::FqFiniteField, x::fq)
       d = new()
-      ccall((:fq_init2, :libflint), Void, 
+      ccall((:fq_init2, :libflint), Void,
             (Ptr{fq}, Ptr{FqFiniteField}), &d, &ctx)
       finalizer(d, _fq_clear_fn)
-      ccall((:fq_set, :libflint), Void, 
+      ccall((:fq_set, :libflint), Void,
             (Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &d, &x, &ctx)
       d.parent = ctx
       return d
@@ -1031,7 +1031,7 @@ mutable struct fq <: FinFieldElem
 end
 
 function _fq_clear_fn(a::fq)
-   ccall((:fq_clear, :libflint), Void, 
+   ccall((:fq_clear, :libflint), Void,
          (Ptr{fq}, Ptr{FqFiniteField}), &a, &a.parent)
 end
 
@@ -1043,7 +1043,7 @@ end
 
 
 mutable struct FlintPadicField <: Field
-   p::Int 
+   p::Int
    pinv::Float64
    pow::Ptr{Void}
    minpre::Int
@@ -1054,8 +1054,8 @@ mutable struct FlintPadicField <: Field
    function FlintPadicField(p::fmpz, prec::Int)
       !isprime(p) && error("Prime base required in FlintPadicField")
       d = new()
-      ccall((:padic_ctx_init, :libflint), Void, 
-           (Ptr{FlintPadicField}, Ptr{fmpz}, Int, Int, Cint), 
+      ccall((:padic_ctx_init, :libflint), Void,
+           (Ptr{FlintPadicField}, Ptr{fmpz}, Int, Int, Cint),
                                      &d, &p, 0, 0, 1)
       finalizer(d, _padic_ctx_clear_fn)
       d.prec_max = prec
@@ -1123,18 +1123,18 @@ mutable struct fmpz_rel_series <: RelSeriesElem{fmpz}
 
    function fmpz_rel_series()
       z = new()
-      ccall((:fmpz_poly_init, :libflint), Void, 
+      ccall((:fmpz_poly_init, :libflint), Void,
             (Ptr{fmpz_rel_series},), &z)
       finalizer(z, _fmpz_rel_series_clear_fn)
       return z
    end
-   
+
    function fmpz_rel_series(a::Array{fmpz, 1}, len::Int, prec::Int, val::Int)
       z = new()
-      ccall((:fmpz_poly_init2, :libflint), Void, 
+      ccall((:fmpz_poly_init2, :libflint), Void,
             (Ptr{fmpz_rel_series}, Int), &z, len)
       for i = 1:len
-         ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, 
+         ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void,
                      (Ptr{fmpz_rel_series}, Int, Ptr{fmpz}), &z, i - 1, &a[i])
       end
       z.prec = prec
@@ -1142,11 +1142,11 @@ mutable struct fmpz_rel_series <: RelSeriesElem{fmpz}
       finalizer(z, _fmpz_rel_series_clear_fn)
       return z
    end
-   
+
    function fmpz_rel_series(a::fmpz_rel_series)
       z = new()
       ccall((:fmpz_poly_init, :libflint), Void, (Ptr{fmpz_rel_series},), &z)
-      ccall((:fmpz_poly_set, :libflint), Void, 
+      ccall((:fmpz_poly_set, :libflint), Void,
             (Ptr{fmpz_rel_series}, Ptr{fmpz_rel_series}), &z, &a)
       finalizer(z, _fmpz_rel_series_clear_fn)
       return z
@@ -1192,29 +1192,29 @@ mutable struct fmpz_abs_series <: AbsSeriesElem{fmpz}
 
    function fmpz_abs_series()
       z = new()
-      ccall((:fmpz_poly_init, :libflint), Void, 
+      ccall((:fmpz_poly_init, :libflint), Void,
             (Ptr{fmpz_abs_series},), &z)
       finalizer(z, _fmpz_abs_series_clear_fn)
       return z
    end
-   
+
    function fmpz_abs_series(a::Array{fmpz, 1}, len::Int, prec::Int)
       z = new()
-      ccall((:fmpz_poly_init2, :libflint), Void, 
+      ccall((:fmpz_poly_init2, :libflint), Void,
             (Ptr{fmpz_abs_series}, Int), &z, len)
       for i = 1:len
-         ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, 
+         ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void,
                      (Ptr{fmpz_abs_series}, Int, Ptr{fmpz}), &z, i - 1, &a[i])
       end
       z.prec = prec
       finalizer(z, _fmpz_abs_series_clear_fn)
       return z
    end
-   
+
    function fmpz_abs_series(a::fmpz_abs_series)
       z = new()
       ccall((:fmpz_poly_init, :libflint), Void, (Ptr{fmpz_abs_series},), &z)
-      ccall((:fmpz_poly_set, :libflint), Void, 
+      ccall((:fmpz_poly_set, :libflint), Void,
             (Ptr{fmpz_abs_series}, Ptr{fmpz_abs_series}), &z, &a)
       finalizer(z, _fmpz_abs_series_clear_fn)
       return z
@@ -1262,18 +1262,18 @@ mutable struct fmpq_rel_series <: RelSeriesElem{fmpq}
 
    function fmpq_rel_series()
       z = new()
-      ccall((:fmpq_poly_init, :libflint), Void, 
+      ccall((:fmpq_poly_init, :libflint), Void,
             (Ptr{fmpq_rel_series},), &z)
       finalizer(z, _fmpq_rel_series_clear_fn)
       return z
    end
-   
+
    function fmpq_rel_series(a::Array{fmpq, 1}, len::Int, prec::Int, val::Int)
       z = new()
-      ccall((:fmpq_poly_init2, :libflint), Void, 
+      ccall((:fmpq_poly_init2, :libflint), Void,
             (Ptr{fmpq_rel_series}, Int), &z, len)
       for i = 1:len
-         ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, 
+         ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void,
                      (Ptr{fmpq_rel_series}, Int, Ptr{fmpq}), &z, i - 1, &a[i])
       end
       z.prec = prec
@@ -1281,11 +1281,11 @@ mutable struct fmpq_rel_series <: RelSeriesElem{fmpq}
       finalizer(z, _fmpq_rel_series_clear_fn)
       return z
    end
-   
+
    function fmpq_rel_series(a::fmpq_rel_series)
       z = new()
       ccall((:fmpq_poly_init, :libflint), Void, (Ptr{fmpq_rel_series},), &z)
-      ccall((:fmpq_poly_set, :libflint), Void, 
+      ccall((:fmpq_poly_set, :libflint), Void,
             (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}), &z, &a)
       finalizer(z, _fmpq_rel_series_clear_fn)
       return z
@@ -1332,29 +1332,29 @@ mutable struct fmpq_abs_series <: AbsSeriesElem{fmpq}
 
    function fmpq_abs_series()
       z = new()
-      ccall((:fmpq_poly_init, :libflint), Void, 
+      ccall((:fmpq_poly_init, :libflint), Void,
             (Ptr{fmpq_abs_series},), &z)
       finalizer(z, _fmpq_abs_series_clear_fn)
       return z
    end
-   
+
    function fmpq_abs_series(a::Array{fmpq, 1}, len::Int, prec::Int)
       z = new()
-      ccall((:fmpq_poly_init2, :libflint), Void, 
+      ccall((:fmpq_poly_init2, :libflint), Void,
             (Ptr{fmpq_abs_series}, Int), &z, len)
       for i = 1:len
-         ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, 
+         ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void,
                      (Ptr{fmpq_abs_series}, Int, Ptr{fmpq}), &z, i - 1, &a[i])
       end
       z.prec = prec
       finalizer(z, _fmpq_abs_series_clear_fn)
       return z
    end
-   
+
    function fmpq_abs_series(a::fmpq_abs_series)
       z = new()
       ccall((:fmpq_poly_init, :libflint), Void, (Ptr{fmpq_abs_series},), &z)
-      ccall((:fmpq_poly_set, :libflint), Void, 
+      ccall((:fmpq_poly_set, :libflint), Void,
             (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}), &z, &a)
       finalizer(z, _fmpq_abs_series_clear_fn)
       return z
@@ -1363,6 +1363,112 @@ end
 
 function _fmpq_abs_series_clear_fn(a::fmpq_abs_series)
    ccall((:fmpq_poly_clear, :libflint), Void, (Ptr{fmpq_abs_series},), &a)
+end
+
+###############################################################################
+#
+#   NmodRelSeriesRing / nmod_rel_series
+#
+###############################################################################
+
+mutable struct NmodRelSeriesRing <: SeriesRing{nmod}
+   base_ring::NmodRing
+   prec_max::Int
+   S::Symbol
+
+   function NmodRelSeriesRing(R::NmodRing, prec::Int, s::Symbol,
+                                 cached::Bool = true)
+      if haskey(NmodRelSeriesID, (R, prec, s))
+         return NmodRelSeriesID[R, prec, s]
+      else
+         z = new(R, prec, s)
+         if cached
+            NmodRelSeriesID[R, prec, s] = z
+         end
+         return z
+      end
+   end
+end
+
+const NmodRelSeriesID = Dict{Tuple{NmodRing, Int, Symbol},
+                                NmodRelSeriesRing}()
+
+mutable struct nmod_rel_series <: RelSeriesElem{nmod}
+   coeffs::Ptr{Void}
+   alloc::Int
+   length::Int
+   mod_n::UInt
+   mod_ninv::UInt
+   mod_norm::UInt
+   prec::Int
+   val::Int
+   parent::NmodRelSeriesRing
+
+   function nmod_rel_series(p::UInt)
+      z = new()
+      ccall((:nmod_poly_init, :libflint), Void,
+            (Ptr{nmod_rel_series}, UInt), &z, p)
+      finalizer(z, _nmod_rel_series_clear_fn)
+      return z
+   end
+
+   function nmod_rel_series(p::UInt, a::Array{fmpz, 1}, len::Int, prec::Int, val::Int)
+      z = new()
+      ccall((:nmod_poly_init2, :libflint), Void,
+            (Ptr{nmod_rel_series}, UInt, Int), &z, p, len)
+      for i = 1:len
+         tt = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt), &a[i], p)
+         ccall((:nmod_poly_set_coeff_ui, :libflint), Void,
+                     (Ptr{nmod_rel_series}, Int, UInt), &z, i - 1, tt)
+      end
+      z.prec = prec
+      z.val = val
+      finalizer(z, _nmod_rel_series_clear_fn)
+      return z
+   end
+
+   function nmod_rel_series(p::UInt, a::Array{UInt, 1}, len::Int, prec::Int, val::Int)
+      z = new()
+      ccall((:nmod_poly_init2, :libflint), Void,
+            (Ptr{nmod_rel_series}, UInt, Int), &z, p, len)
+      for i = 1:len
+         ccall((:nmod_poly_set_coeff_ui, :libflint), Void,
+                     (Ptr{nmod_rel_series}, Int, UInt), &z, i - 1, a[i])
+      end
+      z.prec = prec
+      z.val = val
+      finalizer(z, _nmod_rel_series_clear_fn)
+      return z
+   end
+
+   function nmod_rel_series(p::UInt, a::Array{nmod, 1}, len::Int, prec::Int, val::Int)
+      z = new()
+      ccall((:nmod_poly_init2, :libflint), Void,
+            (Ptr{nmod_rel_series}, UInt, Int), &z, p, len)
+      for i = 1:len
+         ccall((:nmod_poly_set_coeff_ui, :libflint), Void,
+                     (Ptr{nmod_rel_series}, Int, UInt), &z, i - 1, data(a[i]))
+      end
+      z.prec = prec
+      z.val = val
+      finalizer(z, _nmod_rel_series_clear_fn)
+      return z
+   end
+
+   function nmod_rel_series(a::nmod_rel_series)
+      z = new()
+      p = modulus(base_ring(parent(a)))
+      ccall((:nmod_poly_init, :libflint), Void,
+            (Ptr{nmod_rel_series}, UInt), &z, p)
+      ccall((:nmod_poly_set, :libflint), Void,
+            (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}), &z, &a)
+      finalizer(z, _nmod_rel_series_clear_fn)
+      return z
+   end
+end
+
+function _nmod_rel_series_clear_fn(a::nmod_rel_series)
+   ccall((:nmod_poly_clear, :libflint), Void, (Ptr{nmod_rel_series},), &a)
 end
 
 ###############################################################################
@@ -1404,18 +1510,18 @@ mutable struct fmpz_mod_rel_series <: RelSeriesElem{Generic.Res{fmpz}}
 
    function fmpz_mod_rel_series(p::fmpz)
       z = new()
-      ccall((:fmpz_mod_poly_init, :libflint), Void, 
+      ccall((:fmpz_mod_poly_init, :libflint), Void,
             (Ptr{fmpz_mod_rel_series}, Ptr{fmpz}), &z, &p)
       finalizer(z, _fmpz_mod_rel_series_clear_fn)
       return z
    end
-   
+
    function fmpz_mod_rel_series(p::fmpz, a::Array{fmpz, 1}, len::Int, prec::Int, val::Int)
       z = new()
-      ccall((:fmpz_mod_poly_init2, :libflint), Void, 
+      ccall((:fmpz_mod_poly_init2, :libflint), Void,
             (Ptr{fmpz_mod_rel_series}, Ptr{fmpz}, Int), &z, &p, len)
       for i = 1:len
-         ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, 
+         ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void,
                      (Ptr{fmpz_mod_rel_series}, Int, Ptr{fmpz}), &z, i - 1, &a[i])
       end
       z.prec = prec
@@ -1423,13 +1529,13 @@ mutable struct fmpz_mod_rel_series <: RelSeriesElem{Generic.Res{fmpz}}
       finalizer(z, _fmpz_mod_rel_series_clear_fn)
       return z
    end
-   
+
    function fmpz_mod_rel_series(p::fmpz, a::Array{Generic.Res{fmpz}, 1}, len::Int, prec::Int, val::Int)
       z = new()
-      ccall((:fmpz_mod_poly_init2, :libflint), Void, 
+      ccall((:fmpz_mod_poly_init2, :libflint), Void,
             (Ptr{fmpz_mod_rel_series}, Ptr{fmpz}, Int), &z, &p, len)
       for i = 1:len
-         ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, 
+         ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void,
                      (Ptr{fmpz_mod_rel_series}, Int, Ptr{fmpz}), &z, i - 1, &data(a[i]))
       end
       z.prec = prec
@@ -1437,13 +1543,13 @@ mutable struct fmpz_mod_rel_series <: RelSeriesElem{Generic.Res{fmpz}}
       finalizer(z, _fmpz_mod_rel_series_clear_fn)
       return z
    end
-   
+
    function fmpz_mod_rel_series(a::fmpz_mod_rel_series)
       z = new()
       p = modulus(base_ring(parent(a)))
-      ccall((:fmpz_mod_poly_init, :libflint), Void, 
+      ccall((:fmpz_mod_poly_init, :libflint), Void,
             (Ptr{fmpz_mod_rel_series}, Ptr{fmpz}), &z, &p)
-      ccall((:fmpz_mod_poly_set, :libflint), Void, 
+      ccall((:fmpz_mod_poly_set, :libflint), Void,
             (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}), &z, &a)
       finalizer(z, _fmpz_mod_rel_series_clear_fn)
       return z
@@ -1492,44 +1598,44 @@ mutable struct fmpz_mod_abs_series <: AbsSeriesElem{Generic.Res{fmpz}}
 
    function fmpz_mod_abs_series(p::fmpz)
       z = new()
-      ccall((:fmpz_mod_poly_init, :libflint), Void, 
+      ccall((:fmpz_mod_poly_init, :libflint), Void,
             (Ptr{fmpz_mod_abs_series}, Ptr{fmpz}), &z, &p)
       finalizer(z, _fmpz_mod_abs_series_clear_fn)
       return z
    end
-   
+
    function fmpz_mod_abs_series(p::fmpz, a::Array{fmpz, 1}, len::Int, prec::Int)
       z = new()
-      ccall((:fmpz_mod_poly_init2, :libflint), Void, 
+      ccall((:fmpz_mod_poly_init2, :libflint), Void,
             (Ptr{fmpz_mod_abs_series}, Ptr{fmpz}, Int), &z, &p, len)
       for i = 1:len
-         ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, 
+         ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void,
                      (Ptr{fmpz_mod_abs_series}, Int, Ptr{fmpz}), &z, i - 1, &a[i])
       end
       z.prec = prec
       finalizer(z, _fmpz_mod_abs_series_clear_fn)
       return z
    end
-   
+
    function fmpz_mod_abs_series(p::fmpz, a::Array{Generic.Res{fmpz}, 1}, len::Int, prec::Int)
       z = new()
-      ccall((:fmpz_mod_poly_init2, :libflint), Void, 
+      ccall((:fmpz_mod_poly_init2, :libflint), Void,
             (Ptr{fmpz_mod_abs_series}, Ptr{fmpz}, Int), &z, &p, len)
       for i = 1:len
-         ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, 
+         ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void,
                      (Ptr{fmpz_mod_abs_series}, Int, Ptr{fmpz}), &z, i - 1, &data(a[i]))
       end
       z.prec = prec
       finalizer(z, _fmpz_mod_abs_series_clear_fn)
       return z
    end
-   
+
    function fmpz_mod_abs_series(a::fmpz_mod_abs_series)
       z = new()
       p = modulus(base_ring(parent(a)))
-      ccall((:fmpz_mod_poly_init, :libflint), Void, 
+      ccall((:fmpz_mod_poly_init, :libflint), Void,
             (Ptr{fmpz_mod_abs_series}, Ptr{fmpz}), &z, &p)
-      ccall((:fmpz_mod_poly_set, :libflint), Void, 
+      ccall((:fmpz_mod_poly_set, :libflint), Void,
             (Ptr{fmpz_mod_abs_series}, Ptr{fmpz_mod_abs_series}), &z, &a)
       finalizer(z, _fmpz_mod_abs_series_clear_fn)
       return z
@@ -1577,18 +1683,18 @@ mutable struct fq_rel_series <: RelSeriesElem{fq}
 
    function fq_rel_series(ctx::FqFiniteField)
       z = new()
-      ccall((:fq_poly_init, :libflint), Void, 
+      ccall((:fq_poly_init, :libflint), Void,
             (Ptr{fq_rel_series}, Ptr{FqFiniteField}), &z, &ctx)
       finalizer(z, _fq_rel_series_clear_fn)
       return z
    end
-   
+
    function fq_rel_series(ctx::FqFiniteField, a::Array{fq, 1}, len::Int, prec::Int, val::Int)
       z = new()
-      ccall((:fq_poly_init2, :libflint), Void, 
+      ccall((:fq_poly_init2, :libflint), Void,
             (Ptr{fq_rel_series}, Int, Ptr{FqFiniteField}), &z, len, &ctx)
       for i = 1:len
-         ccall((:fq_poly_set_coeff, :libflint), Void, 
+         ccall((:fq_poly_set_coeff, :libflint), Void,
                (Ptr{fq_rel_series}, Int, Ptr{fq}, Ptr{FqFiniteField}),
                                                &z, i - 1, &a[i], &ctx)
       end
@@ -1597,12 +1703,12 @@ mutable struct fq_rel_series <: RelSeriesElem{fq}
       finalizer(z, _fq_rel_series_clear_fn)
       return z
    end
-   
+
    function fq_rel_series(ctx::FqFiniteField, a::fq_rel_series)
       z = new()
-      ccall((:fq_poly_init, :libflint), Void, 
+      ccall((:fq_poly_init, :libflint), Void,
             (Ptr{fq_rel_series}, Ptr{FqFiniteField}), &z, &ctx)
-      ccall((:fq_poly_set, :libflint), Void, 
+      ccall((:fq_poly_set, :libflint), Void,
             (Ptr{fq_rel_series}, Ptr{fq_rel_series}, Ptr{FqFiniteField}), &z, &a, &ctx)
       finalizer(z, _fq_rel_series_clear_fn)
       return z
@@ -1651,18 +1757,18 @@ mutable struct fq_abs_series <: AbsSeriesElem{fq}
 
    function fq_abs_series(ctx::FqFiniteField)
       z = new()
-      ccall((:fq_poly_init, :libflint), Void, 
+      ccall((:fq_poly_init, :libflint), Void,
             (Ptr{fq_abs_series}, Ptr{FqFiniteField}), &z, &ctx)
       finalizer(z, _fq_abs_series_clear_fn)
       return z
    end
-   
+
    function fq_abs_series(ctx::FqFiniteField, a::Array{fq, 1}, len::Int, prec::Int)
       z = new()
-      ccall((:fq_poly_init2, :libflint), Void, 
+      ccall((:fq_poly_init2, :libflint), Void,
             (Ptr{fq_abs_series}, Int, Ptr{FqFiniteField}), &z, len, &ctx)
       for i = 1:len
-         ccall((:fq_poly_set_coeff, :libflint), Void, 
+         ccall((:fq_poly_set_coeff, :libflint), Void,
                (Ptr{fq_abs_series}, Int, Ptr{fq}, Ptr{FqFiniteField}),
                                                &z, i - 1, &a[i], &ctx)
       end
@@ -1670,12 +1776,12 @@ mutable struct fq_abs_series <: AbsSeriesElem{fq}
       finalizer(z, _fq_abs_series_clear_fn)
       return z
    end
-   
+
    function fq_abs_series(ctx::FqFiniteField, a::fq_abs_series)
       z = new()
-      ccall((:fq_poly_init, :libflint), Void, 
+      ccall((:fq_poly_init, :libflint), Void,
             (Ptr{fq_abs_series}, Ptr{FqFiniteField}), &z, &ctx)
-      ccall((:fq_poly_set, :libflint), Void, 
+      ccall((:fq_poly_set, :libflint), Void,
             (Ptr{fq_abs_series}, Ptr{fq_abs_series}, Ptr{FqFiniteField}), &z, &a, &ctx)
       finalizer(z, _fq_abs_series_clear_fn)
       return z
@@ -1726,18 +1832,18 @@ mutable struct fq_nmod_rel_series <: RelSeriesElem{fq_nmod}
 
    function fq_nmod_rel_series(ctx::FqNmodFiniteField)
       z = new()
-      ccall((:fq_nmod_poly_init, :libflint), Void, 
+      ccall((:fq_nmod_poly_init, :libflint), Void,
             (Ptr{fq_nmod_rel_series}, Ptr{FqNmodFiniteField}), &z, &ctx)
       finalizer(z, _fq_nmod_rel_series_clear_fn)
       return z
    end
-   
+
    function fq_nmod_rel_series(ctx::FqNmodFiniteField, a::Array{fq_nmod, 1}, len::Int, prec::Int, val::Int)
       z = new()
-      ccall((:fq_nmod_poly_init2, :libflint), Void, 
+      ccall((:fq_nmod_poly_init2, :libflint), Void,
             (Ptr{fq_nmod_rel_series}, Int, Ptr{FqNmodFiniteField}), &z, len, &ctx)
       for i = 1:len
-         ccall((:fq_nmod_poly_set_coeff, :libflint), Void, 
+         ccall((:fq_nmod_poly_set_coeff, :libflint), Void,
                (Ptr{fq_nmod_rel_series}, Int, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}),
                                                &z, i - 1, &a[i], &ctx)
       end
@@ -1746,12 +1852,12 @@ mutable struct fq_nmod_rel_series <: RelSeriesElem{fq_nmod}
       finalizer(z, _fq_nmod_rel_series_clear_fn)
       return z
    end
-   
+
    function fq_nmod_rel_series(ctx::FqNmodFiniteField, a::fq_nmod_rel_series)
       z = new()
-      ccall((:fq_nmod_poly_init, :libflint), Void, 
+      ccall((:fq_nmod_poly_init, :libflint), Void,
             (Ptr{fq_nmod_rel_series}, Ptr{FqNmodFiniteField}), &z, &ctx)
-      ccall((:fq_nmod_poly_set, :libflint), Void, 
+      ccall((:fq_nmod_poly_set, :libflint), Void,
             (Ptr{fq_nmod_rel_series}, Ptr{fq_nmod_rel_series}, Ptr{FqNmodFiniteField}), &z, &a, &ctx)
       finalizer(z, _fq_nmod_rel_series_clear_fn)
       return z
@@ -1801,18 +1907,18 @@ mutable struct fq_nmod_abs_series <: AbsSeriesElem{fq_nmod}
 
    function fq_nmod_abs_series(ctx::FqNmodFiniteField)
       z = new()
-      ccall((:fq_nmod_poly_init, :libflint), Void, 
+      ccall((:fq_nmod_poly_init, :libflint), Void,
             (Ptr{fq_nmod_abs_series}, Ptr{FqNmodFiniteField}), &z, &ctx)
       finalizer(z, _fq_nmod_abs_series_clear_fn)
       return z
    end
-   
+
    function fq_nmod_abs_series(ctx::FqNmodFiniteField, a::Array{fq_nmod, 1}, len::Int, prec::Int)
       z = new()
-      ccall((:fq_nmod_poly_init2, :libflint), Void, 
+      ccall((:fq_nmod_poly_init2, :libflint), Void,
             (Ptr{fq_nmod_abs_series}, Int, Ptr{FqNmodFiniteField}), &z, len, &ctx)
       for i = 1:len
-         ccall((:fq_nmod_poly_set_coeff, :libflint), Void, 
+         ccall((:fq_nmod_poly_set_coeff, :libflint), Void,
                (Ptr{fq_nmod_abs_series}, Int, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}),
                                                &z, i - 1, &a[i], &ctx)
       end
@@ -1820,12 +1926,12 @@ mutable struct fq_nmod_abs_series <: AbsSeriesElem{fq_nmod}
       finalizer(z, _fq_nmod_abs_series_clear_fn)
       return z
    end
-   
+
    function fq_nmod_abs_series(ctx::FqNmodFiniteField, a::fq_nmod_abs_series)
       z = new()
-      ccall((:fq_nmod_poly_init, :libflint), Void, 
+      ccall((:fq_nmod_poly_init, :libflint), Void,
             (Ptr{fq_nmod_abs_series}, Ptr{FqNmodFiniteField}), &z, &ctx)
-      ccall((:fq_nmod_poly_set, :libflint), Void, 
+      ccall((:fq_nmod_poly_set, :libflint), Void,
             (Ptr{fq_nmod_abs_series}, Ptr{fq_nmod_abs_series}, Ptr{FqNmodFiniteField}), &z, &a, &ctx)
       finalizer(z, _fq_nmod_abs_series_clear_fn)
       return z
@@ -1874,12 +1980,12 @@ mutable struct fmpq_mat <: MatElem{fmpq}
 
    # used by windows, not finalised!!
    function fmpq_mat()
-      return new() 
+      return new()
    end
 
    function fmpq_mat(r::Int, c::Int)
       z = new()
-      ccall((:fmpq_mat_init, :libflint), Void, 
+      ccall((:fmpq_mat_init, :libflint), Void,
             (Ptr{fmpq_mat}, Int, Int), &z, r, c)
       finalizer(z, _fmpq_mat_clear_fn)
       return z
@@ -1887,7 +1993,7 @@ mutable struct fmpq_mat <: MatElem{fmpq}
 
    function fmpq_mat(r::Int, c::Int, arr::Array{fmpq, 2})
       z = new()
-      ccall((:fmpq_mat_init, :libflint), Void, 
+      ccall((:fmpq_mat_init, :libflint), Void,
             (Ptr{fmpq_mat}, Int, Int), &z, r, c)
       finalizer(z, _fmpq_mat_clear_fn)
       for i = 1:r
@@ -1903,7 +2009,7 @@ mutable struct fmpq_mat <: MatElem{fmpq}
 
    function fmpq_mat(r::Int, c::Int, arr::Array{fmpz, 2})
       z = new()
-      ccall((:fmpq_mat_init, :libflint), Void, 
+      ccall((:fmpq_mat_init, :libflint), Void,
             (Ptr{fmpq_mat}, Int, Int), &z, r, c)
       finalizer(z, _fmpq_mat_clear_fn)
       b = fmpz(1)
@@ -1921,7 +2027,7 @@ mutable struct fmpq_mat <: MatElem{fmpq}
 
    function fmpq_mat(r::Int, c::Int, arr::Array{fmpq, 1})
       z = new()
-      ccall((:fmpq_mat_init, :libflint), Void, 
+      ccall((:fmpq_mat_init, :libflint), Void,
             (Ptr{fmpq_mat}, Int, Int), &z, r, c)
       finalizer(z, _fmpq_mat_clear_fn)
       for i = 1:r
@@ -1937,7 +2043,7 @@ mutable struct fmpq_mat <: MatElem{fmpq}
 
    function fmpq_mat(r::Int, c::Int, arr::Array{fmpz, 1})
       z = new()
-      ccall((:fmpq_mat_init, :libflint), Void, 
+      ccall((:fmpq_mat_init, :libflint), Void,
             (Ptr{fmpq_mat}, Int, Int), &z, r, c)
       finalizer(z, _fmpq_mat_clear_fn)
       b = fmpz(1)
@@ -1955,7 +2061,7 @@ mutable struct fmpq_mat <: MatElem{fmpq}
 
    function fmpq_mat(r::Int, c::Int, arr::Array{T, 2}) where {T <: Integer}
       z = new()
-      ccall((:fmpq_mat_init, :libflint), Void, 
+      ccall((:fmpq_mat_init, :libflint), Void,
             (Ptr{fmpq_mat}, Int, Int), &z, r, c)
       finalizer(z, _fmpq_mat_clear_fn)
       for i = 1:r
@@ -1971,7 +2077,7 @@ mutable struct fmpq_mat <: MatElem{fmpq}
 
    function fmpq_mat(r::Int, c::Int, arr::Array{T, 1}) where {T <: Integer}
       z = new()
-      ccall((:fmpq_mat_init, :libflint), Void, 
+      ccall((:fmpq_mat_init, :libflint), Void,
             (Ptr{fmpq_mat}, Int, Int), &z, r, c)
       finalizer(z, _fmpq_mat_clear_fn)
       for i = 1:r
@@ -1987,7 +2093,7 @@ mutable struct fmpq_mat <: MatElem{fmpq}
 
    function fmpq_mat(r::Int, c::Int, d::fmpq)
       z = new()
-      ccall((:fmpq_mat_init, :libflint), Void, 
+      ccall((:fmpq_mat_init, :libflint), Void,
             (Ptr{fmpq_mat}, Int, Int), &z, r, c)
       finalizer(z, _fmpq_mat_clear_fn)
       for i = 1:min(r, c)
@@ -2001,7 +2107,7 @@ mutable struct fmpq_mat <: MatElem{fmpq}
 
    function fmpq_mat(m::fmpq_mat)
       z = new()
-      ccall((:fmpq_mat_init_set, :libflint), Void, 
+      ccall((:fmpq_mat_init_set, :libflint), Void,
             (Ptr{fmpq_mat}, Ptr{fmpq_mat}), &z, &m)
       finalizer(z, _fmpq_mat_clear_fn)
       return z
@@ -2048,12 +2154,12 @@ mutable struct fmpz_mat <: MatElem{fmpz}
 
    # used by windows, not finalised!!
    function fmpz_mat()
-      return new() 
+      return new()
    end
 
    function fmpz_mat(r::Int, c::Int)
       z = new()
-      ccall((:fmpz_mat_init, :libflint), Void, 
+      ccall((:fmpz_mat_init, :libflint), Void,
             (Ptr{fmpz_mat}, Int, Int), &z, r, c)
       finalizer(z, _fmpz_mat_clear_fn)
       return z
@@ -2061,7 +2167,7 @@ mutable struct fmpz_mat <: MatElem{fmpz}
 
    function fmpz_mat(r::Int, c::Int, arr::Array{fmpz, 2})
       z = new()
-      ccall((:fmpz_mat_init, :libflint), Void, 
+      ccall((:fmpz_mat_init, :libflint), Void,
             (Ptr{fmpz_mat}, Int, Int), &z, r, c)
       finalizer(z, _fmpz_mat_clear_fn)
       for i = 1:r
@@ -2077,7 +2183,7 @@ mutable struct fmpz_mat <: MatElem{fmpz}
 
    function fmpz_mat(r::Int, c::Int, arr::Array{fmpz, 1})
       z = new()
-      ccall((:fmpz_mat_init, :libflint), Void, 
+      ccall((:fmpz_mat_init, :libflint), Void,
             (Ptr{fmpz_mat}, Int, Int), &z, r, c)
       finalizer(z, _fmpz_mat_clear_fn)
       for i = 1:r
@@ -2093,7 +2199,7 @@ mutable struct fmpz_mat <: MatElem{fmpz}
 
    function fmpz_mat(r::Int, c::Int, arr::Array{T, 2}) where {T <: Integer}
       z = new()
-      ccall((:fmpz_mat_init, :libflint), Void, 
+      ccall((:fmpz_mat_init, :libflint), Void,
             (Ptr{fmpz_mat}, Int, Int), &z, r, c)
       finalizer(z, _fmpz_mat_clear_fn)
       for i = 1:r
@@ -2125,7 +2231,7 @@ mutable struct fmpz_mat <: MatElem{fmpz}
 
    function fmpz_mat(r::Int, c::Int, d::fmpz)
       z = new()
-      ccall((:fmpz_mat_init, :libflint), Void, 
+      ccall((:fmpz_mat_init, :libflint), Void,
             (Ptr{fmpz_mat}, Int, Int), &z, r, c)
       finalizer(z, _fmpz_mat_clear_fn)
       for i = 1:min(r, c)
@@ -2139,7 +2245,7 @@ mutable struct fmpz_mat <: MatElem{fmpz}
 
    function fmpz_mat(m::fmpz_mat)
       z = new()
-      ccall((:fmpz_mat_init_set, :libflint), Void, 
+      ccall((:fmpz_mat_init_set, :libflint), Void,
             (Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &m)
       finalizer(z, _fmpz_mat_clear_fn)
       return z
@@ -2202,7 +2308,7 @@ mutable struct nmod_mat <: MatElem{nmod}
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
     finalizer(z, _nmod_mat_clear_fn)
-    if transpose 
+    if transpose
       se = set_entry_t!
       r,c = c,r
     else
@@ -2221,7 +2327,7 @@ mutable struct nmod_mat <: MatElem{nmod}
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
     finalizer(z, _nmod_mat_clear_fn)
-    if transpose 
+    if transpose
       se = set_entry_t!
       r,c = c,r
     else
@@ -2240,7 +2346,7 @@ mutable struct nmod_mat <: MatElem{nmod}
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
     finalizer(z, _nmod_mat_clear_fn)
-    if transpose 
+    if transpose
       se = set_entry_t!
       r,c = c,r
     else
@@ -2259,7 +2365,7 @@ mutable struct nmod_mat <: MatElem{nmod}
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
     finalizer(z, _nmod_mat_clear_fn)
-    if transpose 
+    if transpose
       se = set_entry_t!
       r,c = c,r
     else
@@ -2288,7 +2394,7 @@ mutable struct nmod_mat <: MatElem{nmod}
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
     finalizer(z, _nmod_mat_clear_fn)
-    if transpose 
+    if transpose
       se = set_entry_t!
       r,c = c,r
     else
@@ -2307,7 +2413,7 @@ mutable struct nmod_mat <: MatElem{nmod}
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
     finalizer(z, _nmod_mat_clear_fn)
-    if transpose 
+    if transpose
       se = set_entry_t!
       r, c = c, r
     else
@@ -2340,7 +2446,7 @@ mutable struct nmod_mat <: MatElem{nmod}
     (n < 0) && error("Modulus must be positive")
     (n > typemax(UInt)) &&
           error("Modulus must be smaller than ", fmpz(typemax(UInt)))
-    return nmod_mat(UInt(n), b) 
+    return nmod_mat(UInt(n), b)
   end
 end
 
@@ -2381,7 +2487,7 @@ mutable struct fq_poly <: PolyElem{fq}
 
    function fq_poly()
       z = new()
-      ccall((:fq_poly_init, :libflint), Void, (Ptr{fq_poly},), &z)   
+      ccall((:fq_poly_init, :libflint), Void, (Ptr{fq_poly},), &z)
       finalizer(z, _fq_poly_clear_fn)
       return z
    end
@@ -2417,7 +2523,7 @@ mutable struct fq_poly <: PolyElem{fq}
             (Ptr{fq_poly}, Int, Ptr{FqFiniteField}),
             &z, length(a), &ctx)
       for i = 1:length(a)
-         ccall((:fq_poly_set_coeff, :libflint), Void, 
+         ccall((:fq_poly_set_coeff, :libflint), Void,
                (Ptr{fq_poly}, Int, Ptr{fq}, Ptr{FqFiniteField}),
                &z, i - 1, &a[i], &ctx)
       end
@@ -2463,11 +2569,11 @@ end
 
 mutable struct fq_poly_factor
   poly::Ptr{fq_poly}
-  exp::Ptr{Int} 
+  exp::Ptr{Int}
   num::Int
   alloc::Int
   base_field::FqFiniteField
-    
+
   function fq_poly_factor(ctx::FqFiniteField)
     z = new()
     ccall((:fq_poly_factor_init, :libflint), Void,
@@ -2517,7 +2623,7 @@ mutable struct fq_nmod_poly <: PolyElem{fq_nmod}
 
    function fq_nmod_poly()
       z = new()
-      ccall((:fq_nmod_poly_init, :libflint), Void, (Ptr{fq_nmod_poly},), &z)   
+      ccall((:fq_nmod_poly_init, :libflint), Void, (Ptr{fq_nmod_poly},), &z)
       finalizer(z, _fq_nmod_poly_clear_fn)
       return z
    end
@@ -2553,7 +2659,7 @@ mutable struct fq_nmod_poly <: PolyElem{fq_nmod}
             (Ptr{fq_nmod_poly}, Int, Ptr{FqNmodFiniteField}),
             &z, length(a), &ctx)
       for i = 1:length(a)
-         ccall((:fq_nmod_poly_set_coeff, :libflint), Void, 
+         ccall((:fq_nmod_poly_set_coeff, :libflint), Void,
                (Ptr{fq_nmod_poly}, Int, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}),
                &z, i - 1, &a[i], &ctx)
       end
@@ -2599,11 +2705,11 @@ end
 
 mutable struct fq_nmod_poly_factor
   poly::Ptr{fq_nmod_poly}
-  exp::Ptr{Int} 
+  exp::Ptr{Int}
   num::Int
   alloc::Int
   base_field::FqNmodFiniteField
-    
+
   function fq_nmod_poly_factor(ctx::FqNmodFiniteField)
     z = new()
     ccall((:fq_nmod_poly_factor_init, :libflint), Void,

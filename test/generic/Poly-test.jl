@@ -1412,6 +1412,7 @@ function test_gen_poly_resultant()
       @test resultant(f, g*h) == resultant(f, g) * resultant(f, h)
 
       @test resultant(f, g) == resultant_subresultant(f, g)
+      @test resultant_ducos(f, g) == resultant_subresultant(f, g)
    end
 
    # Exact field
@@ -1426,7 +1427,7 @@ function test_gen_poly_resultant()
       @test resultant(f, g*h) == resultant(f, g) * resultant(f, h)
 
       @test resultant(f, g) == resultant_subresultant(f, g)
-
+      @test resultant_ducos(f, g) == resultant_subresultant(f, g)
       @test resultant(f, g) == Generic.resultant_lehmer(f, g)
    end
 
@@ -1443,6 +1444,7 @@ function test_gen_poly_resultant()
       @test resultant(f, g*h) == resultant(f, g)*resultant(f, h)
 
       @test resultant(f, g) == resultant_subresultant(f, g)
+      @test resultant_ducos(f, g) == resultant_subresultant(f, g)
    end
 
    # Characteristic p field
@@ -1457,6 +1459,7 @@ function test_gen_poly_resultant()
       @test resultant(f, g*h) == resultant(f, g)*resultant(f, h)
 
       @test resultant(f, g) == resultant_subresultant(f, g)
+      @test resultant_ducos(f, g) == resultant_subresultant(f, g)
    end
 
    # Inexact field
