@@ -196,18 +196,18 @@ doc"""
 isone(a::fmpz) = ccall((:fmpz_is_one, :libflint), Bool, (Ptr{fmpz},), &a)
 
 doc"""
-    den(a::fmpz)
+    denominator(a::fmpz)
 > Returns the denominator of $a$ thought of as a rational. Always returns $1$.
 """
-function den(a::fmpz)
+function denominator(a::fmpz)
    return fmpz(1)
 end
 
 doc"""
-    num(a::fmpz)
+    numerator(a::fmpz)
 > Returns the numerator of $a$ thought of as a rational. Always returns $a$.
 """
-function num(a::fmpz)
+function numerator(a::fmpz)
    return a
 end
 

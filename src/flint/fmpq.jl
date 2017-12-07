@@ -77,13 +77,13 @@ end
 #
 ###############################################################################
 
-function num(a::fmpq)
+function numerator(a::fmpq)
    z = fmpz()
    ccall((:fmpq_numerator, :libflint), Void, (Ptr{fmpz}, Ptr{fmpq}), &z, &a)
    return z
 end
 
-function den(a::fmpq)
+function denominator(a::fmpq)
    z = fmpz()
    ccall((:fmpq_denominator, :libflint), Void, (Ptr{fmpz}, Ptr{fmpq}), &z, &a)
    return z
@@ -157,9 +157,9 @@ function show(io::IO, a::FlintRationalField)
 end
 
 function show(io::IO, a::fmpq)
-   print(io, num(a))
-   if den(a) != 1
-      print(io, "//", den(a))
+   print(io, numerator(a))
+   if denominator(a) != 1
+      print(io, "//", denominator(a))
    end
 end
 
@@ -264,8 +264,8 @@ end
 *(a::fmpz, b::fmpq) = b*a
 
 function -(a::fmpz, b::fmpq)
-   n = a*den(b) - num(b)
-   d = den(b)
+   n = a*denominator(b) - numerator(b)
+   d = denominator(b)
    g = gcd(n, d)
    return parent(b)(divexact(n, g), divexact(d, g))
 end

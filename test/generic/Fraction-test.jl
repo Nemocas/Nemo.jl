@@ -49,9 +49,9 @@ function test_gen_frac_manipulation()
    R = FractionField(ZZ)
    S, x = PolynomialRing(ZZ, "x")
 
-   @test den((x + 1)//(-x^2 + 1)) == x - 1
+   @test denominator((x + 1)//(-x^2 + 1)) == x - 1
 
-   @test num((x + 1)//(-x^2 + 1)) == -1
+   @test numerator((x + 1)//(-x^2 + 1)) == -1
 
    @test iszero(zero(R))
 

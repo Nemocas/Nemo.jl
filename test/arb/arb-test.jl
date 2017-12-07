@@ -9,7 +9,7 @@ function test_arb_constructors()
    @test elem_type(RR) == arb
    @test elem_type(ArbField) == arb
    @test parent_type(arb) == ArbField
-   @test base_ring(RR) == Union{} 
+   @test base_ring(RR) == Union{}
 
    println("PASS")
 end
@@ -457,7 +457,7 @@ function test_fmpq_arb_special_functions()
 
    flint_cleanup()
 
-   @test den(bernoulli(100)) == 33330
+   @test denominator(bernoulli(100)) == 33330
 
    println("PASS")
 end
@@ -480,4 +480,3 @@ function test_arb()
 
    println("")
 end
-

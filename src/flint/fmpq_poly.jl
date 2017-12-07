@@ -27,11 +27,11 @@ var(a::FmpqPolyRing) = a.S
 ###############################################################################    
   
 doc"""
-    den(a::fmpq_poly)
+    denominator(a::fmpq_poly)
 > Return the least common denominator of the coefficients of the polynomial
 > $a$.
 """
-function den(a::fmpq_poly)
+function denominator(a::fmpq_poly)
    z = fmpz()
    ccall((:fmpq_poly_get_denominator, :libflint), Void,
          (Ptr{fmpz}, Ptr{fmpq_poly}), &z, &a)
@@ -643,7 +643,7 @@ function _factor(x::fmpq_poly)
       e = unsafe_load(fac.exp, i)
       res[parent(x)(f)] = e
    end
-   return res, fmpq(z, den(x))
+   return res, fmpq(z, denominator(x))
 end
 
 ###############################################################################

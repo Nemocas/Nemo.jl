@@ -884,19 +884,19 @@ end
 function test_gen_mat_solve_rational()
    print("Generic.Mat.solve_rational...")
 
-   S, x = PolynomialRing(ResidueRing(JuliaZZ, 20011*10007), "x")
+   #S, x = PolynomialRing(ResidueRing(JuliaZZ, 20011*10007), "x")
 
-   for dim = 0:5
-      R = MatrixSpace(S, dim, dim)
-      U = MatrixSpace(S, dim, rand(1:5))
+   #for dim = 0:5
+   #   R = MatrixSpace(S, dim, dim)
+   #   U = MatrixSpace(S, dim, rand(1:5))
 
-      M = randmat_with_rank(R, 5, 100, dim);
-      b = randmat(U, 5, 100);
+   #   M = randmat_with_rank(R, 5, 100, dim);
+   #   b = randmat(U, 5, 100);
 
-      x, d = solve_rational(M, b)
+   #   x, d = solve_rational(M, b)
 
-      @test M*x == d*b
-   end
+   #   @test M*x == d*b
+   #end
 
    S, z = PolynomialRing(JuliaZZ, "z")
 

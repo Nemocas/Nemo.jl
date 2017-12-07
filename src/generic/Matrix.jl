@@ -1345,6 +1345,9 @@ end
 function det_clow(M::Nemo.MatElem{T}) where {T <: RingElement}
    R = base_ring(M)
    n = rows(M)
+   if n == 0
+      return one(R)
+   end
    A = Array{T}(n, n)
    B = Array{T}(n, n)
    C = R()
@@ -1417,6 +1420,9 @@ doc"""
 """
 function det(M::Nemo.MatElem{T}) where {T <: FieldElement}
    rows(M) != cols(M) && error("Not a square matrix in det")
+   if rows(M) == 0
+      return one(base_ring(M))
+   end
    return det_fflu(M)
 end
 
@@ -1425,6 +1431,10 @@ doc"""
 > Return the determinant of the matrix $M$. We assume $M$ is square.
 """
 function det(M::Nemo.MatElem{T}) where {T <: RingElement}
+   rows(M) != cols(M) && error("Not a square matrix in det")
+   if rows(M) == 0
+      return one(base_ring(M))
+   end
    try
       return det_fflu(M)
    catch
@@ -1434,6 +1444,8 @@ end
 
 function det_interpolation(M::Nemo.MatElem{T}) where {T <: PolyElem}
    n = rows(M)
+   !isdomain_type(elem_type(typeof(base_ring(base_ring(M))))) &&
+          error("Generic interpolation requires a domain type")
    R = base_ring(M)
    if n == 0
       return R()
@@ -1468,11 +1480,17 @@ end
 
 function det(M::Nemo.MatElem{T}) where {S <: FinFieldElem, T <: PolyElem{S}}
    rows(M) != cols(M) && error("Not a square matrix in det")
+   if rows(M) == 0
+      return one(base_ring(M))
+   end
    return det_popov(M)
 end
 
 function det(M::Nemo.MatElem{T}) where {T <: PolyElem}
    rows(M) != cols(M) && error("Not a square matrix in det")
+   if rows(M) == 0
+      return one(base_ring(M))
+   end
    try
       return det_interpolation(M)
    catch

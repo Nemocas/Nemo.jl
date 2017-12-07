@@ -210,7 +210,7 @@ den(::fmpz)
 ```
 
 ```@docs
-num(::fmpz)
+numerator(::fmpz)
 ```
 
 Here are some examples of basic manipulation of integers.
@@ -227,7 +227,7 @@ isunit(a)
 sign(a)
 s = size(a)
 fits(Int, a)
-n = num(a)
+n = numerator(a)
 d = den(a)
 ```
 

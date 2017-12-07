@@ -40,11 +40,11 @@ doc"""
 > is not found to be a power of `p = prime(R)`.
 """
 function O(R::FlintPadicField, m::fmpq)
-   d = den(m)
+   d = denominator(m)
    if isone(d)
-      return O(R, num(m))
+      return O(R, numerator(m))
    end
-   !isone(num(m)) && error("Not a power of p in p-adic O()")
+   !isone(numerator(m)) && error("Not a power of p in p-adic O()")
    p = prime(R)
    if d == p
       N = -1
@@ -655,9 +655,9 @@ function (R::FlintPadicField)(n::fmpz)
 end
 
 function (R::FlintPadicField)(n::fmpq)
-   m = den(n)
+   m = denominator(n)
    if isone(m)
-      return R(num(n))
+      return R(numerator(n))
    end
    p = prime(R)
    if m == p

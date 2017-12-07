@@ -61,7 +61,7 @@ const hash_seed = UInt==UInt64 ? 0xc2a44fbe466a1827 : 0xc2a44fb
 function hash(a::nf_elem, h::UInt)
    global hash_seed
    b = hash_seed
-   d = den(a)
+   d = denominator(a)
    b = hash(d, b)
    for i in 1:degree(parent(a)) + 1
          num_coeff!(d, a, i)
@@ -163,11 +163,11 @@ doc"""
 isunit(a::nf_elem) = a != 0
 
 doc"""
-    den(a::nf_elem)
+    denominator(a::nf_elem)
 > Return the denominator of the polynomial representation of the given number
 > field element.
 """
-function den(a::nf_elem)
+function denominator(a::nf_elem)
    z = fmpz()
    ccall((:nf_elem_get_den, :libflint), Void,
          (Ptr{fmpz}, Ptr{nf_elem}, Ptr{AnticNumberField}),
