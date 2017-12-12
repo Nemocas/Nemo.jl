@@ -846,7 +846,7 @@ end
 
 function setcoeff!(x::fmpz_mod_poly, n::Int, y::Int)
   ccall((:fmpz_mod_poly_set_coeff_ui, :libflint), Void, 
-                   (Ptr{fmpz_mod_poly}, Int, UInt), &x, n, mod(y, x.n))
+                   (Ptr{fmpz_mod_poly}, Int, UInt), &x, n, mod(y, x.p))
   return x
 end
 
