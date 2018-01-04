@@ -605,45 +605,69 @@ function test_rel_series_truncation()
 end
 
 function test_rel_series_inversion()
-   print("Generic.RelSeries.inversion...")
+    print("Generic.RelSeries.inversion...")
+ 
+    # Exact ring
+    R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+    for iter = 1:300
+       f = R()
+       while !isunit(f)
+          f = rand(R, 0:0, -10:10)
+       end
+ 
+       @test f*inv(f) == 1
+    end
+ 
+    # Inexact field
+    R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+    for iter = 1:300
+       f = R()
+       while coeff(f, 0) == 0
+          f = rand(R, 0:0, -1:1)
+       end
+ 
+       @test isapprox(f*inv(f), R(1))
+    end
+ 
+    # Non-integral domain
+    T = ResidueRing(JuliaZZ, 6)
+    R, x = PowerSeriesRing(T, 10, "x")
+    for iter = 1:300
+       f = R()
+       while !isunit(f)
+          f = rand(R, 0:0, 0:5)
+       end
+ 
+       @test f*inv(f) == 1
+    end
+ 
+    println("PASS")
+ end
+ 
+function test_rel_series_square_root()
+    print("Generic.RelSeries.square_root...")
+ 
+    # Exact ring
+    R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+    for iter = 1:300
+       f = rand(R, 0:10, -10:10)
+       g = f^2
 
-   # Exact field
-   R, x = PowerSeriesRing(JuliaZZ, 10, "x")
-   for iter = 1:300
-      f = R()
-      while !isunit(f)
-         f = rand(R, 0:0, -10:10)
-      end
-
-      @test f*inv(f) == 1
-   end
-
-   # Inexact field
-   R, x = PowerSeriesRing(JuliaRealField, 10, "x")
-   for iter = 1:300
-      f = R()
-      while coeff(f, 0) == 0
-         f = rand(R, 0:0, -1:1)
-      end
-
-      @test isapprox(f*inv(f), R(1))
-   end
-
-   # Non-integral domain
-   T = ResidueRing(JuliaZZ, 6)
-   R, x = PowerSeriesRing(T, 10, "x")
-   for iter = 1:300
-      f = R()
-      while !isunit(f)
-         f = rand(R, 0:0, 0:5)
-      end
-
-      @test f*inv(f) == 1
-   end
-
-   println("PASS")
+       @test isequal(sqrt(g)^2, g) 
+    end
+ 
+    # Inexact field
+    R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+    for iter = 1:300
+       f = rand(R, 0:10, -1:1)
+       g = f^2
+ 
+       @test isapprox(sqrt(g)^2, g)
+    end
+ 
+    println("PASS")
 end
-
+ 
 function test_rel_series_exact_division()
    print("Generic.RelSeries.exact_division...")
 
@@ -730,7 +754,7 @@ function test_rel_series_adhoc_exact_division()
    T = ResidueRing(JuliaZZ, 6)
    R, x = PowerSeriesRing(T, 10, "x")
    for iter = 1:300
-      f = rand(R, 0:0, 0:5)
+      f = rand(R, 0:12, 0:5)
       c = T()
       while !isunit(c)
          c = rand(T, 0:5)
@@ -823,6 +847,7 @@ function test_gen_rel_series()
    test_rel_series_exact_division()
    test_rel_series_adhoc_exact_division()
    test_rel_series_inversion()
+   test_rel_series_square_root()
    test_rel_series_special_functions()
 
    println("")

@@ -437,8 +437,8 @@ function (R::NmodRing)(a::UInt)
 end
 
 function (R::NmodRing)(a::fmpz)
-   d = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt),
-             &a, R.n)
+   d = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ref{fmpz}, UInt),
+             a, R.n)
    return nmod(d, R)
 end
 

@@ -50,7 +50,7 @@ function test_fmpq_printing()
    a = FlintQQ(1, 2)
 
    @test string(a) == "1//2"
-   
+
    println("PASS")
 end
 
@@ -88,9 +88,9 @@ function test_fmpq_manipulation()
 
    @test deepcopy(fmpq(2, 3)) == fmpq(2, 3)
 
-   @test num(fmpq(2, 3)) == 2
+   @test numerator(fmpq(2, 3)) == 2
 
-   @test den(fmpq(2, 3)) == 3
+   @test denominator(fmpq(2, 3)) == 3
 
    println("PASS")
 end
@@ -124,7 +124,7 @@ function test_fmpq_adhoc_binary()
    print("fmpq.adhoc_binary...")
 
    a = fmpq(-2, 3)
-   
+
    @test a + 3 == fmpq(7, 3)
 
    @test 3 + a == fmpq(7, 3)
@@ -205,7 +205,7 @@ function test_fmpq_adhoc_comparison()
    print("fmpq.adhoc_comparison...")
 
    a = -fmpz(2)//3
-   
+
    @test a < 1
 
    @test 1 > a
@@ -237,7 +237,7 @@ function test_fmpq_adhoc_comparison()
    @test a <= BigInt(0)//BigInt(1)
 
    @test BigInt(0)//BigInt(1) >= a
-   
+
    @test a != 1
 
    @test a != fmpz(1)
@@ -272,7 +272,7 @@ function test_fmpq_shifting()
    @test a << 3 == -fmpz(16)//3
 
    @test b >> 5 == fmpz(1)//64
-   
+
    println("PASS")
 end
 
@@ -280,9 +280,9 @@ function test_fmpq_powering()
    print("fmpq.powering...")
 
    a = -fmpz(2)//3
-   
+
    @test a^(-12) == fmpz(531441)//4096
-   
+
    println("PASS")
 end
 
@@ -290,9 +290,9 @@ function test_fmpq_inversion()
    print("fmpq.inversion...")
 
    a = -fmpz(2)//3
-   
+
    @test inv(a) == fmpz(-3)//2
-   
+
    println("PASS")
 end
 
@@ -303,7 +303,7 @@ function test_fmpq_exact_division()
    b = fmpz(1)//2
 
    @test divexact(a, b) == fmpz(-4)//3
-   
+
    println("PASS")
 end
 
@@ -313,15 +313,15 @@ function test_fmpq_adhoc_exact_division()
    a = -fmpz(2)//3
 
    @test divexact(a, 3) == fmpz(-2)//9
-   
+
    @test divexact(a, fmpz(3)) == fmpz(-2)//9
 
    @test divexact(3, a) == fmpz(-9)//2
-   
+
    @test divexact(fmpz(3), a) == fmpz(-9)//2
 
    @test divexact(a, 2//1) == -fmpz(2)//6
-   
+
    @test divexact(a, BigInt(2)//BigInt(1)) == -fmpz(2)//6
 
    @test divexact(2//1, a) == -fmpz(6)//2
@@ -340,7 +340,7 @@ function test_fmpq_modular_arithmetic()
    @test mod(a, 7) == 4
 
    @test mod(b, fmpz(5)) == 3
-   
+
    println("PASS")
 end
 
@@ -351,7 +351,19 @@ function test_fmpq_gcd()
    b = fmpz(1)//2
 
    @test gcd(a, b) == fmpz(1)//6
-   
+
+   println("PASS")
+end
+
+function test_fmpq_square_root()
+   print("fmpq.square_root...")
+
+   a = fmpz(4)//9
+   b = fmpz(0)//1
+
+   @test sqrt(a) == fmpz(2)//3
+   @test sqrt(b) == 0
+
    println("PASS")
 end
 
@@ -359,13 +371,13 @@ function test_fmpq_rational_reconstruction()
    print("fmpq.rational_reconstruction...")
 
    @test reconstruct(7, 13) == fmpz(1)//2
-   
+
    @test reconstruct(fmpz(15), 31) == -fmpz(1)//2
-   
+
    @test reconstruct(fmpz(123), fmpz(237)) == fmpz(9)//2
-   
+
    @test reconstruct(123, fmpz(237)) == fmpz(9)//2
-   
+
    println("PASS")
 end
 
@@ -379,7 +391,7 @@ function test_fmpq_rational_enumeration()
    @test next_calkin_wilf(fmpz(321)//113) == fmpz(113)//244
 
    @test next_signed_calkin_wilf(-fmpz(51)//17) == fmpz(1)//4
-   
+
    println("PASS")
 end
 
@@ -387,15 +399,15 @@ function test_fmpq_special_functions()
    print("fmpq.special_functions...")
 
    @test harmonic(12) == fmpz(86021)//27720
-   
+
    @test dedekind_sum(12, 13) == -fmpz(11)//13
 
    @test dedekind_sum(fmpz(12), fmpz(13)) == -fmpz(11)//13
 
    @test dedekind_sum(-120, fmpz(1305)) == -fmpz(575)//522
-  
+
    @test dedekind_sum(fmpz(-120), 1305) == -fmpz(575)//522
-  
+
    println("PASS")
 end
 
@@ -427,6 +439,7 @@ function test_fmpq()
    test_fmpq_adhoc_exact_division()
    test_fmpq_modular_arithmetic()
    test_fmpq_gcd()
+   test_fmpq_square_root()
    test_fmpq_rational_reconstruction()
    test_fmpq_rational_enumeration()
    test_fmpq_special_functions()

@@ -142,7 +142,7 @@ mutable struct PolyRing{T <: RingElement} <: Nemo.PolyRing{T}
    function PolyRing{T}(R::Ring, s::Symbol, cached::Bool = true) where T <: RingElement
       if haskey(PolyID, (R, s))
          return PolyID[R, s]::PolyRing{T}
-      else 
+      else
          z = new{T}(R, s)
          if cached
            PolyID[R, s] = z
@@ -160,7 +160,7 @@ mutable struct Poly{T <: RingElement} <: Nemo.PolyElem{T}
    parent::PolyRing{T}
 
    Poly{T}() where T <: RingElement = new{T}(Array{T}(0), 0)
-   
+
    function Poly{T}(b::Array{T, 1}) where T <: RingElement
       z = new{T}(b)
       z.length = normalise(z, length(b))
@@ -172,7 +172,7 @@ end
 
 ###############################################################################
 #
-#   MPolyRing / MPoly 
+#   MPolyRing / MPoly
 #
 ###############################################################################
 
@@ -181,7 +181,7 @@ end
 # :revlex
 # :deglex
 # :degrevlex
-# 
+#
 # T is an Int which is the number of variables
 # (plus one if ordered by total degree)
 
@@ -196,7 +196,7 @@ mutable struct MPolyRing{T <: RingElement} <: Nemo.MPolyRing{T}
                          cached::Bool = true) where T <: RingElement
       if haskey(MPolyID, (R, s, ord, N))
          return MPolyID[R, s, ord, N]::MPolyRing{T}
-      else 
+      else
          z = new{T}(R, s, ord, length(s), N)
          if cached
            MPolyID[R, s, ord, N] = z
@@ -218,12 +218,12 @@ mutable struct MPoly{T <: RingElement} <: Nemo.MPolyElem{T}
       N = R.N
       return new{T}(Array{T}(0), Array{UInt}(N, 0), 0, R)
    end
-   
+
    MPoly{T}(R::MPolyRing, a::Array{T, 1}, b::Array{UInt, 2}) where T <: RingElement = new{T}(a, b, length(a), R)
 
    function MPoly{T}(R::MPolyRing, a::T) where T <: RingElement
       N = R.N
-      return iszero(a) ? new{T}(Array{T}(0), Array{UInt}(N, 0), 0, R) : 
+      return iszero(a) ? new{T}(Array{T}(0), Array{UInt}(N, 0), 0, R) :
                                           new{T}([a], zeros(UInt, N, 1), 1, R)
    end
 end
@@ -242,7 +242,7 @@ mutable struct SparsePolyRing{T <: RingElement} <: Nemo.Ring
    function SparsePolyRing{T}(R::Ring, s::Symbol, cached::Bool = true) where T <: RingElement
       if haskey(SparsePolyID, (R, s))
          return SparsePolyID[R, s]::SparsePolyRing{T}
-      else 
+      else
          z = new{T}(R, s)
          if cached
            SparsePolyID[R, s] = z
@@ -261,10 +261,10 @@ mutable struct SparsePoly{T <: RingElement} <: Nemo.RingElem
    parent::SparsePolyRing{T}
 
    SparsePoly{T}() where T <: RingElement = new{T}(Array{T}(0), Array{UInt}(0), 0)
-   
+
    SparsePoly{T}(a::Array{T, 1}, b::Array{UInt, 1}) where T <: RingElement = new{T}(a, b, length(a))
 
-   SparsePoly{T}(a::T) where T <: RingElement = iszero(a) ? new{T}(Array{T}(0), Array{UInt}(0), 0) : 
+   SparsePoly{T}(a::T) where T <: RingElement = iszero(a) ? new{T}(Array{T}(0), Array{UInt}(0), 0) :
                                                new{T}([a], [UInt(0)], 1)
 end
 
@@ -302,6 +302,42 @@ mutable struct Res{T <: RingElement} <: Nemo.ResElem{T}
    parent::ResRing{T}
 
    Res{T}(a::T) where T <: RingElement = new{T}(a)
+end
+
+###############################################################################
+#
+#   ResField / ResFieldElem
+#
+###############################################################################
+
+mutable struct ResField{T <: RingElement} <: Nemo.ResField{T}
+   base_ring::Ring
+   modulus::T
+
+   function ResField{T}(modulus::T, cached::Bool = true) where T <: RingElement
+      c = canonical_unit(modulus)
+      if !isone(c)
+        modulus = divexact(modulus, c)
+      end
+      if haskey(ModulusFieldDict, (parent(modulus), modulus))
+         return ModulusFieldDict[parent(modulus), modulus]::ResField{T}
+      else
+         z = new{T}(parent(modulus), modulus)
+         if cached
+            ModulusFieldDict[parent(modulus), modulus] = z
+         end
+         return z
+      end
+   end
+end
+
+const ModulusFieldDict = Dict{Tuple{Ring, RingElement}, Field}()
+
+mutable struct ResF{T <: RingElement} <: Nemo.ResFieldElem{T}
+   data::T
+   parent::ResField{T}
+
+   ResF{T}(a::T) where T <: RingElement = new{T}(a)
 end
 
 ###############################################################################
@@ -376,9 +412,89 @@ mutable struct AbsSeries{T <: RingElement} <: Nemo.AbsSeriesElem{T}
    prec::Int
    parent::AbsSeriesRing{T}
 
-   AbsSeries{T}(a::Array{T, 1}, length::Int, prec::Int) where T <: RingElement = new{T}(a, length, prec)   
+   AbsSeries{T}(a::Array{T, 1}, length::Int, prec::Int) where T <: RingElement = new{T}(a, length, prec)
    AbsSeries{T}(a::AbsSeries{T}) where T <: RingElement = a
 end
+
+###############################################################################
+#
+#   LaurentSeriesRing / LarentSeriesRingElem
+#
+###############################################################################
+
+mutable struct LaurentSeriesRing{T <: RingElement} <: Nemo.Ring
+   base_ring::Ring
+   prec_max::Int
+   S::Symbol
+
+   function LaurentSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
+      if haskey(LaurentSeriesID, (R, prec, s))
+         return LaurentSeriesID[R, prec, s]::LaurentSeriesRing{T}
+      else
+         z = new{T}(R, prec, s)
+         if cached
+            LaurentSeriesID[R, prec, s] = z
+         end
+         return z
+      end
+   end
+end
+
+const LaurentSeriesID = Dict{Tuple{Ring, Int, Symbol}, Ring}()
+
+mutable struct LaurentSeriesRingElem{T <: RingElement} <: Nemo.RingElem
+   coeffs::Array{T, 1}
+   length::Int
+   prec::Int
+   val::Int
+   parent::LaurentSeriesRing{T}
+
+   function LaurentSeriesRingElem{T}(a::Array{T, 1}, length::Int, prec::Int, val::Int) where T <: RingElement
+      new{T}(a, length, prec, val)
+   end
+
+   LaurentSeriesRingElem{T}(a::LaurentSeriesRingElem{T}) where T <: RingElement = a
+end
+
+###############################################################################
+#
+#   LaurentSeriesField / LarentSeriesFieldElem
+#
+###############################################################################
+
+mutable struct LaurentSeriesField{T <: FieldElement} <: Nemo.Field
+   base_ring::Field
+   prec_max::Int
+   S::Symbol
+
+   function LaurentSeriesField{T}(R::Field, prec::Int, s::Symbol, cached::Bool = true) where T <: FieldElement
+      if haskey(LaurentSeriesID, (R, prec, s))
+         return LaurentSeriesID[R, prec, s]::LaurentSeriesField{T}
+      else
+         z = new{T}(R, prec, s)
+         if cached
+            LaurentSeriesID[R, prec, s] = z
+         end
+         return z
+      end
+   end
+end
+
+mutable struct LaurentSeriesFieldElem{T <: FieldElement} <: Nemo.FieldElem
+   coeffs::Array{T, 1}
+   length::Int
+   prec::Int
+   val::Int
+   parent::LaurentSeriesField{T}
+
+   function LaurentSeriesFieldElem{T}(a::Array{T, 1}, length::Int, prec::Int, val::Int) where T <: FieldElement
+      new{T}(a, length, prec, val)
+   end
+
+   LaurentSeriesFieldElem{T}(a::LaurentSeriesFieldElem{T}) where T <: FieldElement = a
+end
+
+const LaurentSeriesElem{T} = Union{LaurentSeriesRingElem{T}, LaurentSeriesFieldElem{T}} where T <: RingElement
 
 ###############################################################################
 #
@@ -409,7 +525,7 @@ mutable struct Frac{T <: RingElem} <: Nemo.FracElem{T}
    den::T
    parent::FracField{T}
 
-   Frac{T}(num::T, den::T) where T <: RingElem = new{T}(num, den) 
+   Frac{T}(num::T, den::T) where T <: RingElem = new{T}(num, den)
 end
 
 ###############################################################################

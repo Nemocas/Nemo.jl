@@ -648,9 +648,9 @@ function ^(a::Nemo.PolyElem{T}, b::Int) where {T <: RingElement}
    if isgen(a)
       z = R()
       fit!(z, b + 1)
-      z = setcoeff!(z, b, coeff(a, 1))
+      z = setcoeff!(z, b, deepcopy(coeff(a, 1)))
       for i = 1:b
-         z = setcoeff!(z, i - 1, coeff(a, 0))
+         z = setcoeff!(z, i - 1, deepcopy(coeff(a, 0)))
       end
       set_length!(z, b + 1)
       return z
@@ -2499,11 +2499,13 @@ function add!(c::Nemo.PolyElem{T}, a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) whe
       i += 1
    end
    while i <= lena
-      c = setcoeff!(c, i - 1, coeff(a, i - 1))
+      # mutating operators must ensure they don't introduce new aliasing
+      c = setcoeff!(c, i - 1, deepcopy(coeff(a, i - 1)))
       i += 1
    end
    while i <= lenb
-      c = setcoeff!(c, i - 1, coeff(b, i - 1))
+      # mutating operators must ensure they don't introduce new aliasing
+      c = setcoeff!(c, i - 1, deepcopy(coeff(b, i - 1)))
       i += 1
    end
    set_length!(c, normalise(c, len))

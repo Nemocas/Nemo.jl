@@ -36,7 +36,7 @@ mutable struct AnticNumberField <: Field
          nf = new()
          nf.pol = pol
          ccall((:nf_init, :libflint), Void, 
-            (Ptr{AnticNumberField}, Ptr{fmpq_poly}), &nf, &pol)
+            (Ref{AnticNumberField}, Ref{fmpq_poly}), nf, pol)
          finalizer(nf, _AnticNumberField_clear_fn)
          nf.S = s
          nf.auxilliary_data = Array{Any}(5)
@@ -48,7 +48,7 @@ mutable struct AnticNumberField <: Field
             nf = new()
             nf.pol = pol
             ccall((:nf_init, :libflint), Void, 
-               (Ptr{AnticNumberField}, Ptr{fmpq_poly}), &nf, &pol)
+               (Ref{AnticNumberField}, Ref{fmpq_poly}), nf, pol)
             finalizer(nf, _AnticNumberField_clear_fn)
             nf.S = s
             nf.auxilliary_data = Array{Any}(5)
@@ -62,7 +62,7 @@ mutable struct AnticNumberField <: Field
 end
 
 function _AnticNumberField_clear_fn(a::AnticNumberField)
-   ccall((:nf_clear, :libflint), Void, (Ptr{AnticNumberField},), &a)
+   ccall((:nf_clear, :libflint), Void, (Ref{AnticNumberField},), a)
 end
 
 mutable struct nf_elem <: FieldElem
@@ -75,7 +75,7 @@ mutable struct nf_elem <: FieldElem
    function nf_elem(p::AnticNumberField)
       r = new()
       ccall((:nf_elem_init, :libflint), Void, 
-            (Ptr{nf_elem}, Ptr{AnticNumberField}), &r, &p)
+            (Ref{nf_elem}, Ref{AnticNumberField}), r, p)
       r.parent = p
       finalizer(r, _nf_elem_clear_fn)
       return r
@@ -84,9 +84,9 @@ mutable struct nf_elem <: FieldElem
    function nf_elem(p::AnticNumberField, a::nf_elem)
       r = new()
       ccall((:nf_elem_init, :libflint), Void, 
-            (Ptr{nf_elem}, Ptr{AnticNumberField}), &r, &p)
+            (Ref{nf_elem}, Ref{AnticNumberField}), r, p)
       ccall((:nf_elem_set, :libflint), Void,
-            (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}), &r, &a, &p)
+            (Ref{nf_elem}, Ref{nf_elem}, Ref{AnticNumberField}), r, a, p)
       r.parent = p
       finalizer(r, _nf_elem_clear_fn)
       return r
@@ -95,5 +95,5 @@ end
 
 function _nf_elem_clear_fn(a::nf_elem)
    ccall((:nf_elem_clear, :libflint), Void, 
-         (Ptr{nf_elem}, Ptr{AnticNumberField}), &a, &a.parent)
+         (Ref{nf_elem}, Ref{AnticNumberField}), a, a.parent)
 end

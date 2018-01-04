@@ -32,7 +32,7 @@ function test_fmpz_constructors()
 
    f = fmpz(BigFloat(10)^100)
    @test isa(f, RingElem)
-   
+
    g = fmpz()
    @test isa(f, RingElem)
 
@@ -73,15 +73,15 @@ function test_fmpz_manipulation()
    b = zero(FlintIntegerRing())
 
    @test isa(a, RingElem)
-   
+
    @test isa(b, RingElem)
 
    @test sign(a) == 1
 
    @test fits(Int, a)
-   
+
    @test fits(UInt, a)
-   
+
    @test size(a) == 1
 
    @test canonical_unit(fmpz(-12)) == -1
@@ -91,10 +91,10 @@ function test_fmpz_manipulation()
    @test iszero(b)
 
    @test isone(a)
-   
-   @test num(fmpz(12)) == fmpz(12)
 
-   @test den(fmpz(12)) == fmpz(1)
+   @test numerator(fmpz(12)) == fmpz(12)
+
+   @test denominator(fmpz(12)) == fmpz(1)
 
    println("PASS")
 end
@@ -183,7 +183,7 @@ function test_fmpz_gcd_lcm()
    @test gcd([fmpz(9), fmpz(27), fmpz(3)]) == 3
 
    @test lcm(a, b) == 156
- 
+
    @test_throws ErrorException lcm(fmpz[])
 
    @test lcm(fmpz[2]) == 2
@@ -247,7 +247,7 @@ function test_fmpz_adhoc_division()
    @test cdiv(a, 7) == -1
 
    @test div(a, 3) == -4
-   
+
    println("PASS")
 end
 
@@ -265,7 +265,7 @@ function test_fmpz_shift()
    @test tdivpow2(a, 2) == -3
 
    @test a << 4 == -192
-   
+
    println("PASS")
 end
 
@@ -275,9 +275,9 @@ function test_fmpz_powering()
    a = fmpz(-12)
 
    @test a^5 == -248832
-  
+
    @test a^UInt(5) == -248832
-   
+
    println("PASS")
 end
 
@@ -312,7 +312,7 @@ function test_fmpz_adhoc_comparison()
    print("fmpz.adhoc_comparison...")
 
    a = fmpz(-12)
-   
+
    @test a < 7
 
    @test a > -40
@@ -338,10 +338,10 @@ function test_fmpz_adhoc_comparison()
    @test 4 != a
 
    a = fmpz(2)
-   
+
    @test a < UInt(7)
 
-   @test a > UInt(1) 
+   @test a > UInt(1)
 
    @test UInt(7) > a
 
@@ -442,7 +442,7 @@ function test_fmpz_bit_twiddling()
    clrbit!(a, 0)
 
    @test a == 8
-   
+
    println("PASS")
 end
 
@@ -510,7 +510,7 @@ function test_fmpz_factor()
    end
 
    @test b == a
-   
+
    @test fac[fmpz(3)] == 1
    @test fac[fmpz(5)] == 1
    @test fac[fmpz(7)] == 1
@@ -583,6 +583,16 @@ function test_fmpz_number_theoretic()
    println("PASS")
 end
 
+function test_fmpz_square_root()
+   print("fmpz.square_root...")
+
+   @test sqrt(fmpz(4)) == 2
+
+   @test sqrt(fmpz(0)) == 0
+
+   println("PASS")
+end
+
 function test_fmpz()
    test_fmpz_abstract_types()
    test_fmpz_constructors()
@@ -612,6 +622,7 @@ function test_fmpz()
    test_fmpz_modular_arithmetic()
    test_fmpz_factor()
    test_fmpz_number_theoretic()
+   test_fmpz_square_root()
 
    println("")
 end

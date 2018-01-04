@@ -2900,6 +2900,11 @@ function (a::MPolyRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T 
    return z
 end
 
+function (a::MPolyRing{T})(b::T) where {T <: Union{Integer, Rational, AbstractFloat}}
+   z = MPoly{T}(a, b)
+   return z
+end
+
 function (a::MPolyRing{T})(b::T) where {T <: RingElement}
    parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
    z = MPoly{T}(a, b)

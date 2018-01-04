@@ -40,20 +40,20 @@ function normalise(a::fmpz_mod_rel_series, len::Int)
    if len > 0
       c = fmpz()
       ccall((:fmpz_mod_poly_get_coeff_fmpz, :libflint), Void,
-         (Ptr{fmpz}, Ptr{fmpz_mod_rel_series}, Int), &c, &a, len - 1)
+         (Ref{fmpz}, Ref{fmpz_mod_rel_series}, Int), c, a, len - 1)
    end
    while len > 0 && iszero(c)
       len -= 1
       if len > 0
          ccall((:fmpz_mod_poly_get_coeff_fmpz, :libflint), Void,
-            (Ptr{fmpz}, Ptr{fmpz_mod_rel_series}, Int), &c, &a, len - 1)
+            (Ref{fmpz}, Ref{fmpz_mod_rel_series}, Int), c, a, len - 1)
       end
    end
    return len
 end
 
 function pol_length(x::fmpz_mod_rel_series)
-   return ccall((:fmpz_mod_poly_length, :libflint), Int, (Ptr{fmpz_mod_rel_series},), &x)
+   return ccall((:fmpz_mod_poly_length, :libflint), Int, (Ref{fmpz_mod_rel_series},), x)
 end
 
 precision(x::fmpz_mod_rel_series) = x.prec
@@ -65,7 +65,7 @@ function polcoeff(x::fmpz_mod_rel_series, n::Int)
    end
    z = fmpz()
    ccall((:fmpz_mod_poly_get_coeff_fmpz, :libflint), Void,
-         (Ptr{fmpz}, Ptr{fmpz_mod_rel_series}, Int), &z, &x, n)
+         (Ref{fmpz}, Ref{fmpz_mod_rel_series}, Int), z, x, n)
    return R(z)
 end
 
@@ -103,7 +103,7 @@ function renormalize!(z::fmpz_mod_rel_series)
    else
       z.val = zval + i
       ccall((:fmpz_mod_poly_shift_right, :libflint), Void,
-            (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int), &z, &z, i)
+            (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int), z, z, i)
    end
    return nothing
 end
@@ -130,8 +130,8 @@ show_minus_one(::Type{fmpz_mod_rel_series}) = show_minus_one(fmpz)
 function -(x::fmpz_mod_rel_series)
    z = parent(x)()
    ccall((:fmpz_mod_poly_neg, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}),
-               &z, &x)
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}),
+               z, x)
    z.prec = x.prec
    z.val = x.val
    return z
@@ -155,30 +155,30 @@ function +(a::fmpz_mod_rel_series, b::fmpz_mod_rel_series)
    if a.val < b.val
       lenz = max(lena, lenb + b.val - a.val)
       ccall((:fmpz_mod_poly_set_trunc, :libflint), Void,
-            (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-            &z, &b, max(0, lenz - b.val + a.val))
+            (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+            z, b, max(0, lenz - b.val + a.val))
       ccall((:fmpz_mod_poly_shift_left, :libflint), Void,
-            (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-            &z, &z, b.val - a.val)
+            (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+            z, z, b.val - a.val)
       ccall((:fmpz_mod_poly_add_series, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-               &z, &z, &a, lenz)
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+               z, z, a, lenz)
    elseif b.val < a.val
       lenz = max(lena + a.val - b.val, lenb)
       ccall((:fmpz_mod_poly_set_trunc, :libflint), Void,
-            (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-            &z, &a, max(0, lenz - a.val + b.val))
+            (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+            z, a, max(0, lenz - a.val + b.val))
       ccall((:fmpz_mod_poly_shift_left, :libflint), Void,
-            (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-            &z, &z, a.val - b.val)
+            (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+            z, z, a.val - b.val)
       ccall((:fmpz_mod_poly_add_series, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-               &z, &z, &b, lenz)
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+               z, z, b, lenz)
    else
       lenz = max(lena, lenb)
       ccall((:fmpz_mod_poly_add_series, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-               &z, &a, &b, lenz)
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+               z, a, b, lenz)
    end
    z.prec = prec
    z.val = val
@@ -199,32 +199,32 @@ function -(a::fmpz_mod_rel_series, b::fmpz_mod_rel_series)
    if a.val < b.val
       lenz = max(lena, lenb + b.val - a.val)
       ccall((:fmpz_mod_poly_set_trunc, :libflint), Void,
-            (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-            &z, &b, max(0, lenz - b.val + a.val))
+            (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+            z, b, max(0, lenz - b.val + a.val))
       ccall((:fmpz_mod_poly_shift_left, :libflint), Void,
-            (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-            &z, &z, b.val - a.val)
+            (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+            z, z, b.val - a.val)
       ccall((:fmpz_mod_poly_neg, :libflint), Void,
-            (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}), &z, &z)
+            (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}), z, z)
       ccall((:fmpz_mod_poly_add_series, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-               &z, &z, &a, lenz)
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+               z, z, a, lenz)
    elseif b.val < a.val
       lenz = max(lena + a.val - b.val, lenb)
       ccall((:fmpz_mod_poly_set_trunc, :libflint), Void,
-            (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-            &z, &a, max(0, lenz - a.val + b.val))
+            (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+            z, a, max(0, lenz - a.val + b.val))
       ccall((:fmpz_mod_poly_shift_left, :libflint), Void,
-            (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-            &z, &z, a.val - b.val)
+            (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+            z, z, a.val - b.val)
       ccall((:fmpz_mod_poly_sub_series, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-               &z, &z, &b, lenz)
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+               z, z, b, lenz)
    else
       lenz = max(lena, lenb)
       ccall((:fmpz_mod_poly_sub_series, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-               &z, &a, &b, lenz)
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+               z, a, b, lenz)
    end
    z.prec = prec
    z.val = val
@@ -249,8 +249,8 @@ function *(a::fmpz_mod_rel_series, b::fmpz_mod_rel_series)
    end
    lenz = min(lena + lenb - 1, prec)
    ccall((:fmpz_mod_poly_mullow, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-               &z, &a, &b, lenz)
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+               z, a, b, lenz)
    renormalize!(z)
    return z
 end
@@ -266,8 +266,8 @@ function *(x::Generic.Res{fmpz}, y::fmpz_mod_rel_series)
    z.prec = y.prec
    z.val = y.val
    ccall((:fmpz_mod_poly_scalar_mul_fmpz, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz}),
-               &z, &y, &x.data)
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Ref{fmpz}),
+               z, y, x.data)
    renormalize!(z)
    return z
 end
@@ -280,8 +280,8 @@ function *(x::fmpz, y::fmpz_mod_rel_series)
    z.val = y.val
    r = mod(x, modulus(y))
    ccall((:fmpz_mod_poly_scalar_mul_fmpz, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz}),
-               &z, &y, &r)
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Ref{fmpz}),
+               z, y, r)
    renormalize!(z)
    return z
 end
@@ -321,8 +321,8 @@ function shift_right(x::fmpz_mod_rel_series, len::Int)
       z.val = max(0, xval - len)
       zlen = min(xlen + xval - len, xlen)
       ccall((:fmpz_mod_poly_shift_right, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-               &z, &x, xlen - zlen)
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+               z, x, xlen - zlen)
       renormalize!(z)
    end
    return z
@@ -351,8 +351,8 @@ function truncate(x::fmpz_mod_rel_series, prec::Int)
    else
       z.val = xval
       ccall((:fmpz_mod_poly_set_trunc, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-               &z, &x, min(prec - xval, xlen))
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+               z, x, min(prec - xval, xlen))
    end
    return z
 end
@@ -386,8 +386,8 @@ function ^(a::fmpz_mod_rel_series, b::Int)
       z.prec = a.prec + (b - 1)*valuation(a)
       z.val = b*valuation(a)
       ccall((:fmpz_mod_poly_pow_trunc, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int, Int),
-               &z, &a, b, z.prec - z.val)
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int, Int),
+               z, a, b, z.prec - z.val)
    end
    renormalize!(z)
    return z
@@ -414,8 +414,8 @@ function ==(x::fmpz_mod_rel_series, y::fmpz_mod_rel_series)
       return false
    end
    return Bool(ccall((:fmpz_mod_poly_equal_trunc, :libflint), Cint,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-               &x, &y, xlen))
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+               x, y, xlen))
 end
 
 function isequal(x::fmpz_mod_rel_series, y::fmpz_mod_rel_series)
@@ -426,8 +426,8 @@ function isequal(x::fmpz_mod_rel_series, y::fmpz_mod_rel_series)
       return false
    end
    return Bool(ccall((:fmpz_mod_poly_equal, :libflint), Cint,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-               &x, &y, pol_length(x)))
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+               x, y, pol_length(x)))
 end
 
 ###############################################################################
@@ -445,9 +445,9 @@ function ==(x::fmpz_mod_rel_series, y::Generic.Res{fmpz})
       if x.val == 0
          z = fmpz()
          ccall((:fmpz_mod_poly_get_coeff_fmpz, :libflint), Void,
-                       (Ptr{fmpz}, Ptr{fmpz_mod_rel_series}, Int), &z, &x, 0)
+                       (Ref{fmpz}, Ref{fmpz_mod_rel_series}, Int), z, x, 0)
          return ccall((:fmpz_equal, :libflint), Bool,
-               (Ptr{fmpz}, Ptr{fmpz}), &z, &y.data)
+               (Ref{fmpz}, Ref{fmpz}), z, y.data)
       else
          return false
       end
@@ -467,10 +467,10 @@ function ==(x::fmpz_mod_rel_series, y::fmpz)
       if x.val == 0
          z = fmpz()
          ccall((:fmpz_mod_poly_get_coeff_fmpz, :libflint), Void,
-                       (Ptr{fmpz}, Ptr{fmpz_mod_rel_series}, Int), &z, &x, 0)
+                       (Ref{fmpz}, Ref{fmpz_mod_rel_series}, Int), z, x, 0)
          r = mod(y, modulus(x))
          return ccall((:fmpz_equal, :libflint), Bool,
-               (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &r, 0)
+               (Ref{fmpz}, Ref{fmpz}, Int), z, r, 0)
       else
          return false
       end
@@ -510,8 +510,8 @@ function divexact(x::fmpz_mod_rel_series, y::fmpz_mod_rel_series)
    z.prec = prec + z.val
    if prec != 0
       ccall((:fmpz_mod_poly_div_series, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-               &z, &x, &y, prec)
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+               z, x, y, prec)
    end
    return z
 end
@@ -528,8 +528,8 @@ function divexact(x::fmpz_mod_rel_series, y::Generic.Res{fmpz})
    z.prec = x.prec
    z.val = x.val
    ccall((:fmpz_mod_poly_scalar_div_fmpz, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz}),
-               &z, &x, &y.data)
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Ref{fmpz}),
+               z, x, y.data)
    return z
 end
 
@@ -541,8 +541,8 @@ function divexact(x::fmpz_mod_rel_series, y::fmpz)
    z.val = x.val
    r = mod(y, modulus(x))
    ccall((:fmpz_mod_poly_scalar_div_fmpz, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz}),
-               &z, &x, &r)
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Ref{fmpz}),
+               z, x, r)
    return z
 end
 
@@ -561,8 +561,8 @@ function inv(a::fmpz_mod_rel_series)
    ainv.prec = a.prec
    ainv.val = 0
    ccall((:fmpz_mod_poly_inv_series, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-               &ainv, &a, a.prec)
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+               ainv, a, a.prec)
    return ainv
 end
 
@@ -572,7 +572,7 @@ end
 #
 ###############################################################################
 
-function exp(a::fmpz_mod_rel_series)
+function Base.exp(a::fmpz_mod_rel_series)
    if iszero(a)
       z = one(parent(a))
       z.prec = precision(a)
@@ -599,7 +599,7 @@ function exp(a::fmpz_mod_rel_series)
    end
    z = parent(a)(d, preca, preca, 0)
    ccall((:_fmpz_mod_poly_set_length, :libflint), Void,
-         (Ptr{fmpz_mod_rel_series}, Int), &z, normalise(z, preca))
+         (Ref{fmpz_mod_rel_series}, Int), z, normalise(z, preca))
    return z
 end
 
@@ -611,28 +611,28 @@ end
 
 function zero!(x::fmpz_mod_rel_series)
   ccall((:fmpz_mod_poly_zero, :libflint), Void,
-                   (Ptr{fmpz_mod_rel_series},), &x)
+                   (Ref{fmpz_mod_rel_series},), x)
   x.prec = parent(x).prec_max
   return x
 end
 
 function fit!(x::fmpz_mod_rel_series, n::Int)
   ccall((:fmpz_mod_poly_fit_length, :libflint), Void,
-                   (Ptr{fmpz_mod_rel_series}, Int), &x, n)
+                   (Ref{fmpz_mod_rel_series}, Int), x, n)
   return nothing
 end
 
 function setcoeff!(z::fmpz_mod_rel_series, n::Int, x::fmpz)
    ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Int, Ptr{fmpz}),
-               &z, n, &x)
+                (Ref{fmpz_mod_rel_series}, Int, Ref{fmpz}),
+               z, n, x)
    return z
 end
 
 function setcoeff!(z::fmpz_mod_rel_series, n::Int, x::Generic.Res{fmpz})
    ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Int, Ptr{fmpz}),
-               &z, n, &x.data)
+                (Ref{fmpz_mod_rel_series}, Int, Ref{fmpz}),
+               z, n, x.data)
    return z
 end
 
@@ -651,8 +651,8 @@ function mul!(z::fmpz_mod_rel_series, a::fmpz_mod_rel_series, b::fmpz_mod_rel_se
       lenz = 0
    end
    ccall((:fmpz_mod_poly_mullow, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-               &z, &a, &b, lenz)
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+               z, a, b, lenz)
    renormalize!(z)
    return z
 end
@@ -669,30 +669,30 @@ function addeq!(a::fmpz_mod_rel_series, b::fmpz_mod_rel_series)
       z = fmpz_mod_rel_series(modulus)
       lenz = max(lena, lenb + b.val - a.val)
       ccall((:fmpz_mod_poly_set_trunc, :libflint), Void,
-            (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-            &z, &b, max(0, lenz - b.val + a.val))
+            (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+            z, b, max(0, lenz - b.val + a.val))
       ccall((:fmpz_mod_poly_shift_left, :libflint), Void,
-            (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-            &z, &z, b.val - a.val)
+            (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+            z, z, b.val - a.val)
       ccall((:fmpz_mod_poly_add_series, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-               &a, &a, &z, lenz)
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+               a, a, z, lenz)
    elseif b.val < a.val
       lenz = max(lena + a.val - b.val, lenb)
       ccall((:fmpz_mod_poly_truncate, :libflint), Void,
-            (Ptr{fmpz_mod_rel_series}, Int),
-            &a, max(0, lenz - a.val + b.val))
+            (Ref{fmpz_mod_rel_series}, Int),
+            a, max(0, lenz - a.val + b.val))
       ccall((:fmpz_mod_poly_shift_left, :libflint), Void,
-            (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-            &a, &a, a.val - b.val)
+            (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+            a, a, a.val - b.val)
       ccall((:fmpz_mod_poly_add_series, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-               &a, &a, &b, lenz)
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+               a, a, b, lenz)
    else
       lenz = max(lena, lenb)
       ccall((:fmpz_mod_poly_add_series, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-               &a, &a, &b, lenz)
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+               a, a, b, lenz)
    end
    a.prec = prec
    a.val = val
@@ -712,8 +712,8 @@ function add!(c::fmpz_mod_rel_series, a::fmpz_mod_rel_series, b::fmpz_mod_rel_se
    lenc = max(lena, lenb)
    c.prec = prec
    ccall((:fmpz_mod_poly_add_series, :libflint), Void,
-                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int),
-               &c, &a, &b, lenc)
+                (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series}, Int),
+               c, a, b, lenc)
    return c
 end
 

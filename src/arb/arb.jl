@@ -19,7 +19,7 @@ export ball, radius, midpoint, contains, contains_zero,
        accuracy_bits, trim, ldexp, setunion,
        const_pi, const_e, const_log2, const_log10, const_euler,
        const_catalan, const_khinchin, const_glaisher,
-       floor, ceil, hypot, sqrt, rsqrt, sqrt1pm1, root,
+       floor, ceil, hypot, rsqrt, sqrt1pm1, root,
        log, log1p, expm1, sin, cos, sinpi, cospi, tan, cot,
        tanpi, cotpi, sinh, cosh, tanh, coth, atan, asin, acos,
        atanh, asinh, acosh, gamma, lgamma, rgamma, digamma, zeta,
@@ -79,12 +79,12 @@ doc"""
 > `typemax(Int)` and `-typemax(Int)`.
 """
 function accuracy_bits(x::arb)
-  return ccall((:arb_rel_accuracy_bits, :libarb), Int, (Ptr{arb},), &x)
+  return ccall((:arb_rel_accuracy_bits, :libarb), Int, (Ref{arb},), x)
 end
 
 function deepcopy_internal(a::arb, dict::ObjectIdDict)
   b = parent(a)()
-  ccall((:arb_set, :libarb), Void, (Ptr{arb}, Ptr{arb}), &b, &a)
+  ccall((:arb_set, :libarb), Void, (Ref{arb}, Ref{arb}), b, a)
   return b
 end
 
@@ -99,7 +99,7 @@ doc"""
 > Return the midpoint of $x$ rounded down to a machine double.
 """
 function convert(::Type{Float64}, x::arb)
-    t = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), &x)
+    t = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ref{arb}, ), x)
     # 4 == round to nearest
     return ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), t, 4)
 end
@@ -118,8 +118,8 @@ end
 
 function show(io::IO, x::arb)
   d = ceil(parent(x).prec * 0.30102999566398119521)
-  cstr = ccall((:arb_get_str, :libarb), Ptr{UInt8}, (Ptr{arb}, Int, UInt),
-                                                  &x, Int(d), UInt(0))
+  cstr = ccall((:arb_get_str, :libarb), Ptr{UInt8}, (Ref{arb}, Int, UInt),
+                                                  x, Int(d), UInt(0))
   print(io, unsafe_string(cstr))
   ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), cstr)
 end
@@ -138,12 +138,12 @@ doc"""
 > otherwise return `false`.
 """
 function overlaps(x::arb, y::arb)
-  r = ccall((:arb_overlaps, :libarb), Cint, (Ptr{arb}, Ptr{arb}), &x, &y)
+  r = ccall((:arb_overlaps, :libarb), Cint, (Ref{arb}, Ref{arb}), x, y)
   return Bool(r)
 end
 
 #function contains(x::arb, y::arf)
-#  r = ccall((:arb_contains_arf, :libarb), Cint, (Ptr{arb}, Ptr{arf}), &x, &y)
+#  r = ccall((:arb_contains_arf, :libarb), Cint, (Ref{arb}, Ref{arf}), x, y)
 #  return Bool(r)
 #end
 
@@ -153,7 +153,7 @@ doc"""
 > return `false`.
 """
 function contains(x::arb, y::fmpq)
-  r = ccall((:arb_contains_fmpq, :libarb), Cint, (Ptr{arb}, Ptr{fmpq}), &x, &y)
+  r = ccall((:arb_contains_fmpq, :libarb), Cint, (Ref{arb}, Ref{fmpq}), x, y)
   return Bool(r)
 end
 
@@ -163,12 +163,12 @@ doc"""
 > return `false`.
 """
 function contains(x::arb, y::fmpz)
-  r = ccall((:arb_contains_fmpz, :libarb), Cint, (Ptr{arb}, Ptr{fmpz}), &x, &y)
+  r = ccall((:arb_contains_fmpz, :libarb), Cint, (Ref{arb}, Ref{fmpz}), x, y)
   return Bool(r)
 end
 
 function contains(x::arb, y::Int)
-  r = ccall((:arb_contains_si, :libarb), Cint, (Ptr{arb}, Int), &x, y)
+  r = ccall((:arb_contains_si, :libarb), Cint, (Ref{arb}, Int), x, y)
   return Bool(r)
 end
 
@@ -193,7 +193,7 @@ doc"""
 """
 function contains(x::arb, y::BigFloat)
   r = ccall((:arb_contains_mpfr, :libarb), Cint,
-              (Ptr{arb}, Ptr{BigFloat}), &x, &y)
+              (Ref{arb}, Ref{BigFloat}), x, y)
   return Bool(r)
 end
 
@@ -203,7 +203,7 @@ doc"""
 > `false`.
 """
 function contains(x::arb, y::arb)
-  r = ccall((:arb_contains, :libarb), Cint, (Ptr{arb}, Ptr{arb}), &x, &y)
+  r = ccall((:arb_contains, :libarb), Cint, (Ref{arb}, Ref{arb}), x, y)
   return Bool(r)
 end
 
@@ -212,7 +212,7 @@ doc"""
 > Returns `true` if the ball $x$ contains zero, otherwise return `false`.
 """
 function contains_zero(x::arb)
-   r = ccall((:arb_contains_zero, :libarb), Cint, (Ptr{arb}, ), &x)
+   r = ccall((:arb_contains_zero, :libarb), Cint, (Ref{arb}, ), x)
    return Bool(r)
 end
 
@@ -222,7 +222,7 @@ doc"""
 > `false`.
 """
 function contains_negative(x::arb)
-   r = ccall((:arb_contains_negative, :libarb), Cint, (Ptr{arb}, ), &x)
+   r = ccall((:arb_contains_negative, :libarb), Cint, (Ref{arb}, ), x)
    return Bool(r)
 end
 
@@ -232,7 +232,7 @@ doc"""
 > `false`.
 """
 function contains_positive(x::arb)
-   r = ccall((:arb_contains_positive, :libarb), Cint, (Ptr{arb}, ), &x)
+   r = ccall((:arb_contains_positive, :libarb), Cint, (Ref{arb}, ), x)
    return Bool(r)
 end
 
@@ -242,7 +242,7 @@ doc"""
 > return `false`.
 """
 function contains_nonnegative(x::arb)
-   r = ccall((:arb_contains_nonnegative, :libarb), Cint, (Ptr{arb}, ), &x)
+   r = ccall((:arb_contains_nonnegative, :libarb), Cint, (Ref{arb}, ), x)
    return Bool(r)
 end
 
@@ -252,7 +252,7 @@ doc"""
 > return `false`.
 """
 function contains_nonpositive(x::arb)
-   r = ccall((:arb_contains_nonpositive, :libarb), Cint, (Ptr{arb}, ), &x)
+   r = ccall((:arb_contains_nonpositive, :libarb), Cint, (Ref{arb}, ), x)
    return Bool(r)
 end
 
@@ -268,32 +268,32 @@ doc"""
 > same midpoints and radii.
 """
 function isequal(x::arb, y::arb)
-  r = ccall((:arb_equal, :libarb), Cint, (Ptr{arb}, Ptr{arb}), &x, &y)
+  r = ccall((:arb_equal, :libarb), Cint, (Ref{arb}, Ref{arb}), x, y)
   return Bool(r)
 end
 
 function ==(x::arb, y::arb)
-    return Bool(ccall((:arb_eq, :libarb), Cint, (Ptr{arb}, Ptr{arb}), &x, &y))
+    return Bool(ccall((:arb_eq, :libarb), Cint, (Ref{arb}, Ref{arb}), x, y))
 end
 
 function !=(x::arb, y::arb)
-    return Bool(ccall((:arb_ne, :libarb), Cint, (Ptr{arb}, Ptr{arb}), &x, &y))
+    return Bool(ccall((:arb_ne, :libarb), Cint, (Ref{arb}, Ref{arb}), x, y))
 end
 
 function >(x::arb, y::arb)
-    return Bool(ccall((:arb_gt, :libarb), Cint, (Ptr{arb}, Ptr{arb}), &x, &y))
+    return Bool(ccall((:arb_gt, :libarb), Cint, (Ref{arb}, Ref{arb}), x, y))
 end
 
 function >=(x::arb, y::arb)
-    return Bool(ccall((:arb_ge, :libarb), Cint, (Ptr{arb}, Ptr{arb}), &x, &y))
+    return Bool(ccall((:arb_ge, :libarb), Cint, (Ref{arb}, Ref{arb}), x, y))
 end
 
 function <(x::arb, y::arb)
-    return Bool(ccall((:arb_lt, :libarb), Cint, (Ptr{arb}, Ptr{arb}), &x, &y))
+    return Bool(ccall((:arb_lt, :libarb), Cint, (Ref{arb}, Ref{arb}), x, y))
 end
 
 function <=(x::arb, y::arb)
-    return Bool(ccall((:arb_le, :libarb), Cint, (Ptr{arb}, Ptr{arb}), &x, &y))
+    return Bool(ccall((:arb_le, :libarb), Cint, (Ref{arb}, Ref{arb}), x, y))
 end
 
 ==(x::arb, y::Int) = x == arb(y)
@@ -410,7 +410,7 @@ doc"""
 > Return `true` if $x$ is certainly zero, otherwise return `false`.
 """
 function iszero(x::arb)
-   return Bool(ccall((:arb_is_zero, :libarb), Cint, (Ptr{arb},), &x))
+   return Bool(ccall((:arb_is_zero, :libarb), Cint, (Ref{arb},), x))
 end
 
 doc"""
@@ -419,7 +419,7 @@ doc"""
 > `false`.
 """
 function isnonzero(x::arb)
-   return Bool(ccall((:arb_is_nonzero, :libarb), Cint, (Ptr{arb},), &x))
+   return Bool(ccall((:arb_is_nonzero, :libarb), Cint, (Ref{arb},), x))
 end
 
 doc"""
@@ -428,7 +428,7 @@ doc"""
 > `false`.
 """
 function isone(x::arb)
-   return Bool(ccall((:arb_is_one, :libarb), Cint, (Ptr{arb},), &x))
+   return Bool(ccall((:arb_is_one, :libarb), Cint, (Ref{arb},), x))
 end
 
 doc"""
@@ -437,7 +437,7 @@ doc"""
 > otherwise return `false`.
 """
 function isfinite(x::arb)
-   return Bool(ccall((:arb_is_finite, :libarb), Cint, (Ptr{arb},), &x))
+   return Bool(ccall((:arb_is_finite, :libarb), Cint, (Ref{arb},), x))
 end
 
 doc"""
@@ -446,7 +446,7 @@ doc"""
 > `false`.
 """
 function isexact(x::arb)
-   return Bool(ccall((:arb_is_exact, :libarb), Cint, (Ptr{arb},), &x))
+   return Bool(ccall((:arb_is_exact, :libarb), Cint, (Ref{arb},), x))
 end
 
 doc"""
@@ -454,7 +454,7 @@ doc"""
 > Return `true` if $x$ is an exact integer, otherwise return `false`.
 """
 function isint(x::arb)
-   return Bool(ccall((:arb_is_int, :libarb), Cint, (Ptr{arb},), &x))
+   return Bool(ccall((:arb_is_int, :libarb), Cint, (Ref{arb},), x))
 end
 
 doc"""
@@ -462,7 +462,7 @@ doc"""
 > Return `true` if $x$ is certainly positive, otherwise return `false`.
 """
 function ispositive(x::arb)
-   return Bool(ccall((:arb_is_positive, :libarb), Cint, (Ptr{arb},), &x))
+   return Bool(ccall((:arb_is_positive, :libarb), Cint, (Ref{arb},), x))
 end
 
 doc"""
@@ -470,7 +470,7 @@ doc"""
 > Return `true` if $x$ is certainly nonnegative, otherwise return `false`.
 """
 function isnonnegative(x::arb)
-   return Bool(ccall((:arb_is_nonnegative, :libarb), Cint, (Ptr{arb},), &x))
+   return Bool(ccall((:arb_is_nonnegative, :libarb), Cint, (Ref{arb},), x))
 end
 
 doc"""
@@ -478,7 +478,7 @@ doc"""
 > Return `true` if $x$ is certainly negative, otherwise return `false`.
 """
 function isnegative(x::arb)
-   return Bool(ccall((:arb_is_negative, :libarb), Cint, (Ptr{arb},), &x))
+   return Bool(ccall((:arb_is_negative, :libarb), Cint, (Ref{arb},), x))
 end
 
 doc"""
@@ -486,7 +486,7 @@ doc"""
 > Return `true` if $x$ is certainly nonpositive, otherwise return `false`.
 """
 function isnonpositive(x::arb)
-   return Bool(ccall((:arb_is_nonpositive, :libarb), Cint, (Ptr{arb},), &x))
+   return Bool(ccall((:arb_is_nonpositive, :libarb), Cint, (Ref{arb},), x))
 end
 
 ################################################################################
@@ -512,7 +512,7 @@ doc"""
 """
 function radius(x::arb)
   z = parent(x)()
-  ccall((:arb_get_rad_arb, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &x)
+  ccall((:arb_get_rad_arb, :libarb), Void, (Ref{arb}, Ref{arb}), z, x)
   return z
 end
 
@@ -522,7 +522,7 @@ doc"""
 """
 function midpoint(x::arb)
   z = parent(x)()
-  ccall((:arb_get_mid_arb, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &x)
+  ccall((:arb_get_mid_arb, :libarb), Void, (Ref{arb}, Ref{arb}), z, x)
   return z
 end
 
@@ -534,7 +534,7 @@ end
 
 function -(x::arb)
   z = parent(x)()
-  ccall((:arb_neg, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &x)
+  ccall((:arb_neg, :libarb), Void, (Ref{arb}, Ref{arb}), z, x)
   return z
 end
 
@@ -548,8 +548,8 @@ for (s,f) in ((:+,"arb_add"), (:*,"arb_mul"), (://, "arb_div"), (:-,"arb_sub"))
   @eval begin
     function ($s)(x::arb, y::arb)
       z = parent(x)()
-      ccall(($f, :libarb), Void, (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int),
-                           &z, &x, &y, parent(x).prec)
+      ccall(($f, :libarb), Void, (Ref{arb}, Ref{arb}, Ref{arb}, Int),
+                           z, x, y, parent(x).prec)
       return z
     end
   end
@@ -560,8 +560,8 @@ for (f,s) in ((:+, "add"), (:*, "mul"))
     #function ($f)(x::arb, y::arf)
     #  z = parent(x)()
     #  ccall(($("arb_"*s*"_arf"), :libarb), Void,
-    #              (Ptr{arb}, Ptr{arb}, Ptr{arf}, Int),
-    #              &z, &x, &y, parent(x).prec)
+    #              (Ref{arb}, Ref{arb}, Ref{arf}, Int),
+    #              z, x, y, parent(x).prec)
     #  return z
     #end
 
@@ -570,8 +570,8 @@ for (f,s) in ((:+, "add"), (:*, "mul"))
     function ($f)(x::arb, y::UInt)
       z = parent(x)()
       ccall(($("arb_"*s*"_ui"), :libarb), Void,
-                  (Ptr{arb}, Ptr{arb}, UInt, Int),
-                  &z, &x, y, parent(x).prec)
+                  (Ref{arb}, Ref{arb}, UInt, Int),
+                  z, x, y, parent(x).prec)
       return z
     end
 
@@ -580,7 +580,7 @@ for (f,s) in ((:+, "add"), (:*, "mul"))
     function ($f)(x::arb, y::Int)
       z = parent(x)()
       ccall(($("arb_"*s*"_si"), :libarb), Void,
-      (Ptr{arb}, Ptr{arb}, Int, Int), &z, &x, y, parent(x).prec)
+      (Ref{arb}, Ref{arb}, Int, Int), z, x, y, parent(x).prec)
       return z
     end
 
@@ -589,8 +589,8 @@ for (f,s) in ((:+, "add"), (:*, "mul"))
     function ($f)(x::arb, y::fmpz)
       z = parent(x)()
       ccall(($("arb_"*s*"_fmpz"), :libarb), Void,
-                  (Ptr{arb}, Ptr{arb}, Ptr{fmpz}, Int),
-                  &z, &x, &y, parent(x).prec)
+                  (Ref{arb}, Ref{arb}, Ref{fmpz}, Int),
+                  z, x, y, parent(x).prec)
       return z
     end
 
@@ -601,7 +601,7 @@ end
 #function -(x::arb, y::arf)
 #  z = parent(x)()
 #  ccall((:arb_sub_arf, :libarb), Void,
-#              (Ptr{arb}, Ptr{arb}, Ptr{arf}, Int), &z, &x, &y, parent(x).prec)
+#              (Ref{arb}, Ref{arb}, Ref{arf}, Int), z, x, y, parent(x).prec)
 #  return z
 #end
 
@@ -610,7 +610,7 @@ end
 function -(x::arb, y::UInt)
   z = parent(x)()
   ccall((:arb_sub_ui, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, UInt, Int), &z, &x, y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, UInt, Int), z, x, y, parent(x).prec)
   return z
 end
 
@@ -619,7 +619,7 @@ end
 function -(x::arb, y::Int)
   z = parent(x)()
   ccall((:arb_sub_si, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Int, Int), &z, &x, y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Int, Int), z, x, y, parent(x).prec)
   return z
 end
 
@@ -628,8 +628,8 @@ end
 function -(x::arb, y::fmpz)
   z = parent(x)()
   ccall((:arb_sub_fmpz, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Ptr{fmpz}, Int),
-              &z, &x, &y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{fmpz}, Int),
+              z, x, y, parent(x).prec)
   return z
 end
 
@@ -654,36 +654,36 @@ end
 #function //(x::arb, y::arf)
 #  z = parent(x)()
 #  ccall((:arb_div_arf, :libarb), Void,
-#              (Ptr{arb}, Ptr{arb}, Ptr{arf}, Int), &z, &x, &y, parent(x).prec)
+#              (Ref{arb}, Ref{arb}, Ref{arf}, Int), z, x, y, parent(x).prec)
 #  return z
 #end
 
 function //(x::arb, y::UInt)
   z = parent(x)()
   ccall((:arb_div_ui, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, UInt, Int), &z, &x, y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, UInt, Int), z, x, y, parent(x).prec)
   return z
 end
 
 function //(x::arb, y::Int)
   z = parent(x)()
   ccall((:arb_div_si, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Int, Int), &z, &x, y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Int, Int), z, x, y, parent(x).prec)
   return z
 end
 
 function //(x::arb, y::fmpz)
   z = parent(x)()
   ccall((:arb_div_fmpz, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Ptr{fmpz}, Int),
-              &z, &x, &y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{fmpz}, Int),
+              z, x, y, parent(x).prec)
   return z
 end
 
 function //(x::UInt, y::arb)
   z = parent(y)()
   ccall((:arb_ui_div, :libarb), Void,
-              (Ptr{arb}, UInt, Ptr{arb}, Int), &z, x, &y, parent(y).prec)
+              (Ref{arb}, UInt, Ref{arb}, Int), z, x, y, parent(y).prec)
   return z
 end
 
@@ -691,7 +691,7 @@ function //(x::Int, y::arb)
   z = parent(y)()
   t = arb(x)
   ccall((:arb_div, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int), &z, &t, &y, parent(y).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, t, y, parent(y).prec)
   return z
 end
 
@@ -699,22 +699,22 @@ function //(x::fmpz, y::arb)
   z = parent(y)()
   t = arb(x)
   ccall((:arb_div, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int), &z, &t, &y, parent(y).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, t, y, parent(y).prec)
   return z
 end
 
 function ^(x::arb, y::arb)
   z = parent(x)()
   ccall((:arb_pow, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int), &z, &x, &y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, parent(x).prec)
   return z
 end
 
 function ^(x::arb, y::fmpz)
   z = parent(x)()
   ccall((:arb_pow_fmpz, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Ptr{fmpz}, Int),
-              &z, &x, &y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{fmpz}, Int),
+              z, x, y, parent(x).prec)
   return z
 end
 
@@ -723,15 +723,15 @@ end
 function ^(x::arb, y::UInt)
   z = parent(x)()
   ccall((:arb_pow_ui, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, UInt, Int), &z, &x, y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, UInt, Int), z, x, y, parent(x).prec)
   return z
 end
 
 function ^(x::arb, y::fmpq)
   z = parent(x)()
   ccall((:arb_pow_fmpq, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Ptr{fmpq}, Int),
-              &z, &x, &y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{fmpq}, Int),
+              z, x, y, parent(x).prec)
   return z
 end
 
@@ -814,7 +814,7 @@ doc"""
 """
 function abs(x::arb)
   z = parent(x)()
-  ccall((:arb_abs, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &x)
+  ccall((:arb_abs, :libarb), Void, (Ref{arb}, Ref{arb}), z, x)
   return z
 end
 
@@ -831,7 +831,7 @@ doc"""
 function inv(x::arb)
   z = parent(x)()
   ccall((:arb_inv, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
   return parent(x)(z)
 end
 
@@ -848,7 +848,7 @@ doc"""
 function ldexp(x::arb, y::Int)
   z = parent(x)()
   ccall((:arb_mul_2exp_si, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Int), &z, &x, y)
+              (Ref{arb}, Ref{arb}, Int), z, x, y)
   return z
 end
 
@@ -859,7 +859,7 @@ doc"""
 function ldexp(x::arb, y::fmpz)
   z = parent(x)()
   ccall((:arb_mul_2exp_fmpz, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Ptr{fmpz}), &z, &x, &y)
+              (Ref{arb}, Ref{arb}, Ref{fmpz}), z, x, y)
   return z
 end
 
@@ -876,7 +876,7 @@ doc"""
 """
 function trim(x::arb)
   z = parent(x)()
-  ccall((:arb_trim, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &x)
+  ccall((:arb_trim, :libarb), Void, (Ref{arb}, Ref{arb}), z, x)
   return z
 end
 
@@ -890,7 +890,7 @@ doc"""
 function unique_integer(x::arb)
   z = fmpz()
   unique = ccall((:arb_get_unique_fmpz, :libarb), Int,
-    (Ptr{fmpz}, Ptr{arb}), &z, &x)
+    (Ref{fmpz}, Ref{arb}), z, x)
   return (unique != 0, z)
 end
 
@@ -902,7 +902,7 @@ doc"""
 function setunion(x::arb, y::arb)
   z = parent(x)()
   ccall((:arb_union, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int), &z, &x, &y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, parent(x).prec)
   return z
 end
 
@@ -918,7 +918,7 @@ doc"""
 """
 function const_pi(r::ArbField)
   z = r()
-  ccall((:arb_const_pi, :libarb), Void, (Ptr{arb}, Int), &z, prec(r))
+  ccall((:arb_const_pi, :libarb), Void, (Ref{arb}, Int), z, prec(r))
   return z
 end
 
@@ -928,7 +928,7 @@ doc"""
 """
 function const_e(r::ArbField)
   z = r()
-  ccall((:arb_const_e, :libarb), Void, (Ptr{arb}, Int), &z, prec(r))
+  ccall((:arb_const_e, :libarb), Void, (Ref{arb}, Int), z, prec(r))
   return z
 end
 
@@ -938,7 +938,7 @@ doc"""
 """
 function const_log2(r::ArbField)
   z = r()
-  ccall((:arb_const_log2, :libarb), Void, (Ptr{arb}, Int), &z, prec(r))
+  ccall((:arb_const_log2, :libarb), Void, (Ref{arb}, Int), z, prec(r))
   return z
 end
 
@@ -948,7 +948,7 @@ doc"""
 """
 function const_log10(r::ArbField)
   z = r()
-  ccall((:arb_const_log10, :libarb), Void, (Ptr{arb}, Int), &z, prec(r))
+  ccall((:arb_const_log10, :libarb), Void, (Ref{arb}, Int), z, prec(r))
   return z
 end
 
@@ -958,7 +958,7 @@ doc"""
 """
 function const_euler(r::ArbField)
   z = r()
-  ccall((:arb_const_euler, :libarb), Void, (Ptr{arb}, Int), &z, prec(r))
+  ccall((:arb_const_euler, :libarb), Void, (Ref{arb}, Int), z, prec(r))
   return z
 end
 
@@ -968,7 +968,7 @@ doc"""
 """
 function const_catalan(r::ArbField)
   z = r()
-  ccall((:arb_const_catalan, :libarb), Void, (Ptr{arb}, Int), &z, prec(r))
+  ccall((:arb_const_catalan, :libarb), Void, (Ref{arb}, Int), z, prec(r))
   return z
 end
 
@@ -978,7 +978,7 @@ doc"""
 """
 function const_khinchin(r::ArbField)
   z = r()
-  ccall((:arb_const_khinchin, :libarb), Void, (Ptr{arb}, Int), &z, prec(r))
+  ccall((:arb_const_khinchin, :libarb), Void, (Ref{arb}, Int), z, prec(r))
   return z
 end
 
@@ -988,7 +988,7 @@ doc"""
 """
 function const_glaisher(r::ArbField)
   z = r()
-  ccall((:arb_const_glaisher, :libarb), Void, (Ptr{arb}, Int), &z, prec(r))
+  ccall((:arb_const_glaisher, :libarb), Void, (Ref{arb}, Int), z, prec(r))
   return z
 end
 
@@ -1007,7 +1007,7 @@ doc"""
 """
 function floor(x::arb)
    z = parent(x)()
-   ccall((:arb_floor, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_floor, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1018,7 +1018,7 @@ doc"""
 """
 function ceil(x::arb)
    z = parent(x)()
-   ccall((:arb_ceil, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_ceil, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1026,9 +1026,9 @@ doc"""
     sqrt(x::arb)
 > Return the square root of $x$.
 """
-function sqrt(x::arb)
+function Base.sqrt(x::arb)
    z = parent(x)()
-   ccall((:arb_sqrt, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_sqrt, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1038,7 +1038,7 @@ doc"""
 """
 function rsqrt(x::arb)
    z = parent(x)()
-   ccall((:arb_rsqrt, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_rsqrt, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1048,7 +1048,7 @@ doc"""
 """
 function sqrt1pm1(x::arb)
    z = parent(x)()
-   ccall((:arb_sqrt1pm1, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_sqrt1pm1, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1058,7 +1058,7 @@ doc"""
 """
 function log(x::arb)
    z = parent(x)()
-   ccall((:arb_log, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_log, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1068,7 +1068,7 @@ doc"""
 """
 function log1p(x::arb)
    z = parent(x)()
-   ccall((:arb_log1p, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_log1p, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1078,7 +1078,7 @@ doc"""
 """
 function Base.exp(x::arb)
    z = parent(x)()
-   ccall((:arb_exp, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_exp, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1088,7 +1088,7 @@ doc"""
 """
 function expm1(x::arb)
    z = parent(x)()
-   ccall((:arb_expm1, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_expm1, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1098,7 +1098,7 @@ doc"""
 """
 function sin(x::arb)
    z = parent(x)()
-   ccall((:arb_sin, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_sin, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1108,7 +1108,7 @@ doc"""
 """
 function cos(x::arb)
    z = parent(x)()
-   ccall((:arb_cos, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_cos, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1118,7 +1118,7 @@ doc"""
 """
 function sinpi(x::arb)
    z = parent(x)()
-   ccall((:arb_sin_pi, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_sin_pi, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1128,7 +1128,7 @@ doc"""
 """
 function cospi(x::arb)
    z = parent(x)()
-   ccall((:arb_cos_pi, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_cos_pi, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1138,7 +1138,7 @@ doc"""
 """
 function tan(x::arb)
    z = parent(x)()
-   ccall((:arb_tan, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_tan, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1148,7 +1148,7 @@ doc"""
 """
 function cot(x::arb)
    z = parent(x)()
-   ccall((:arb_cot, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_cot, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1158,7 +1158,7 @@ doc"""
 """
 function tanpi(x::arb)
    z = parent(x)()
-   ccall((:arb_tan_pi, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_tan_pi, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1168,7 +1168,7 @@ doc"""
 """
 function cotpi(x::arb)
    z = parent(x)()
-   ccall((:arb_cot_pi, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_cot_pi, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1178,7 +1178,7 @@ doc"""
 """
 function sinh(x::arb)
    z = parent(x)()
-   ccall((:arb_sinh, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_sinh, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1188,7 +1188,7 @@ doc"""
 """
 function cosh(x::arb)
    z = parent(x)()
-   ccall((:arb_cosh, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_cosh, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1198,7 +1198,7 @@ doc"""
 """
 function tanh(x::arb)
    z = parent(x)()
-   ccall((:arb_tanh, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_tanh, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1208,7 +1208,7 @@ doc"""
 """
 function coth(x::arb)
    z = parent(x)()
-   ccall((:arb_coth, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_coth, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1218,7 +1218,7 @@ doc"""
 """
 function atan(x::arb)
    z = parent(x)()
-   ccall((:arb_atan, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_atan, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1228,7 +1228,7 @@ doc"""
 """
 function asin(x::arb)
    z = parent(x)()
-   ccall((:arb_asin, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_asin, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1238,7 +1238,7 @@ doc"""
 """
 function acos(x::arb)
    z = parent(x)()
-   ccall((:arb_acos, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_acos, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1248,7 +1248,7 @@ doc"""
 """
 function atanh(x::arb)
    z = parent(x)()
-   ccall((:arb_atanh, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_atanh, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1258,7 +1258,7 @@ doc"""
 """
 function asinh(x::arb)
    z = parent(x)()
-   ccall((:arb_asinh, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_asinh, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1268,7 +1268,7 @@ doc"""
 """
 function acosh(x::arb)
    z = parent(x)()
-   ccall((:arb_acosh, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_acosh, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1278,7 +1278,7 @@ doc"""
 """
 function gamma(x::arb)
    z = parent(x)()
-   ccall((:arb_gamma, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_gamma, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1288,7 +1288,7 @@ doc"""
 """
 function lgamma(x::arb)
    z = parent(x)()
-   ccall((:arb_lgamma, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_lgamma, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1298,7 +1298,7 @@ doc"""
 """
 function rgamma(x::arb)
    z = parent(x)()
-   ccall((:arb_rgamma, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_rgamma, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1309,7 +1309,7 @@ doc"""
 """
 function digamma(x::arb)
    z = parent(x)()
-   ccall((:arb_digamma, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_digamma, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1319,7 +1319,7 @@ doc"""
 """
 function zeta(x::arb)
    z = parent(x)()
-   ccall((:arb_zeta, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+   ccall((:arb_zeta, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -1331,7 +1331,7 @@ function sincos(x::arb)
   s = parent(x)()
   c = parent(x)()
   ccall((:arb_sin_cos, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int), &s, &c, &x, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), s, c, x, parent(x).prec)
   return (s, c)
 end
 
@@ -1343,7 +1343,7 @@ function sincospi(x::arb)
   s = parent(x)()
   c = parent(x)()
   ccall((:arb_sin_cos_pi, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int), &s, &c, &x, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), s, c, x, parent(x).prec)
   return (s, c)
 end
 
@@ -1354,7 +1354,7 @@ doc"""
 function sinpi(x::fmpq, r::ArbField)
   z = r()
   ccall((:arb_sin_pi_fmpq, :libarb), Void,
-        (Ptr{arb}, Ptr{fmpq}, Int), &z, &x, prec(r))
+        (Ref{arb}, Ref{fmpq}, Int), z, x, prec(r))
   return z
 end
 
@@ -1365,7 +1365,7 @@ doc"""
 function cospi(x::fmpq, r::ArbField)
   z = r()
   ccall((:arb_cos_pi_fmpq, :libarb), Void,
-        (Ptr{arb}, Ptr{fmpq}, Int), &z, &x, prec(r))
+        (Ref{arb}, Ref{fmpq}, Int), z, x, prec(r))
   return z
 end
 
@@ -1378,7 +1378,7 @@ function sincospi(x::fmpq, r::ArbField)
   s = r()
   c = r()
   ccall((:arb_sin_cos_pi_fmpq, :libarb), Void,
-        (Ptr{arb}, Ptr{arb}, Ptr{fmpq}, Int), &s, &c, &x, prec(r))
+        (Ref{arb}, Ref{arb}, Ref{fmpq}, Int), s, c, x, prec(r))
   return (s, c)
 end
 
@@ -1390,7 +1390,7 @@ function sinhcosh(x::arb)
   s = parent(x)()
   c = parent(x)()
   ccall((:arb_sinh_cosh, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int), &s, &c, &x, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), s, c, x, parent(x).prec)
   return (s, c)
 end
 
@@ -1401,7 +1401,7 @@ doc"""
 function atan2(x::arb, y::arb)
   z = parent(x)()
   ccall((:arb_atan2, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int), &z, &x, &y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, parent(x).prec)
   return z
 end
 
@@ -1412,7 +1412,7 @@ doc"""
 function agm(x::arb, y::arb)
   z = parent(x)()
   ccall((:arb_agm, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int), &z, &x, &y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, parent(x).prec)
   return z
 end
 
@@ -1423,7 +1423,7 @@ doc"""
 function zeta(s::arb, a::arb)
   z = parent(s)()
   ccall((:arb_hurwitz_zeta, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int), &z, &s, &a, parent(s).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, s, a, parent(s).prec)
   return z
 end
 
@@ -1434,14 +1434,14 @@ doc"""
 function hypot(x::arb, y::arb)
   z = parent(x)()
   ccall((:arb_hypot, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int), &z, &x, &y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, parent(x).prec)
   return z
 end
 
 function root(x::arb, n::UInt)
   z = parent(x)()
   ccall((:arb_root, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, UInt, Int), &z, &x, n, parent(x).prec)
+              (Ref{arb}, Ref{arb}, UInt, Int), z, x, n, parent(x).prec)
   return z
 end
 
@@ -1459,7 +1459,7 @@ fac(x::arb) = gamma(x+1)
 
 function fac(n::UInt, r::ArbField)
   z = r()
-  ccall((:arb_fac_ui, :libarb), Void, (Ptr{arb}, UInt, Int), &z, n, r.prec)
+  ccall((:arb_fac_ui, :libarb), Void, (Ref{arb}, UInt, Int), z, n, r.prec)
   return z
 end
 
@@ -1476,7 +1476,7 @@ doc"""
 function binom(x::arb, n::UInt)
   z = parent(x)()
   ccall((:arb_bin_ui, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, UInt, Int), &z, &x, n, parent(x).prec)
+              (Ref{arb}, Ref{arb}, UInt, Int), z, x, n, parent(x).prec)
   return z
 end
 
@@ -1487,7 +1487,7 @@ doc"""
 function binom(n::UInt, k::UInt, r::ArbField)
   z = r()
   ccall((:arb_bin_uiui, :libarb), Void,
-              (Ptr{arb}, UInt, UInt, Int), &z, n, k, r.prec)
+              (Ref{arb}, UInt, UInt, Int), z, n, k, r.prec)
   return z
 end
 
@@ -1498,14 +1498,14 @@ doc"""
 function fib(n::fmpz, r::ArbField)
   z = r()
   ccall((:arb_fib_fmpz, :libarb), Void,
-              (Ptr{arb}, Ptr{fmpz}, Int), &z, &n, r.prec)
+              (Ref{arb}, Ref{fmpz}, Int), z, n, r.prec)
   return z
 end
 
 function fib(n::UInt, r::ArbField)
   z = r()
   ccall((:arb_fib_ui, :libarb), Void,
-              (Ptr{arb}, UInt, Int), &z, n, r.prec)
+              (Ref{arb}, UInt, Int), z, n, r.prec)
   return z
 end
 
@@ -1522,7 +1522,7 @@ doc"""
 function gamma(x::fmpz, r::ArbField)
   z = r()
   ccall((:arb_gamma_fmpz, :libarb), Void,
-              (Ptr{arb}, Ptr{fmpz}, Int), &z, &x, r.prec)
+              (Ref{arb}, Ref{fmpz}, Int), z, x, r.prec)
   return z
 end
 
@@ -1533,7 +1533,7 @@ doc"""
 function gamma(x::fmpq, r::ArbField)
   z = r()
   ccall((:arb_gamma_fmpq, :libarb), Void,
-              (Ptr{arb}, Ptr{fmpq}, Int), &z, &x, r.prec)
+              (Ref{arb}, Ref{fmpq}, Int), z, x, r.prec)
   return z
 end
 
@@ -1541,7 +1541,7 @@ end
 function zeta(n::UInt, r::ArbField)
   z = r()
   ccall((:arb_zeta_ui, :libarb), Void,
-              (Ptr{arb}, UInt, Int), &z, n, r.prec)
+              (Ref{arb}, UInt, Int), z, n, r.prec)
   return z
 end
 
@@ -1555,7 +1555,7 @@ zeta(n::Int, r::ArbField) = n >= 0 ? zeta(UInt(n), r) : zeta(r(n))
 function bernoulli(n::UInt, r::ArbField)
   z = r()
   ccall((:arb_bernoulli_ui, :libarb), Void,
-              (Ptr{arb}, UInt, Int), &z, n, r.prec)
+              (Ref{arb}, UInt, Int), z, n, r.prec)
   return z
 end
 
@@ -1568,7 +1568,7 @@ bernoulli(n::Int, r::ArbField) = n >= 0 ? bernoulli(UInt(n), r) : throw(DomainEr
 function risingfac(x::arb, n::UInt)
   z = parent(x)()
   ccall((:arb_rising_ui, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, UInt, Int), &z, &x, n, parent(x).prec)
+              (Ref{arb}, Ref{arb}, UInt, Int), z, x, n, parent(x).prec)
   return z
 end
 
@@ -1581,7 +1581,7 @@ risingfac(x::arb, n::Int) = n < 0 ? throw(DomainError()) : risingfac(x, UInt(n))
 function risingfac(x::fmpq, n::UInt, r::ArbField)
   z = r()
   ccall((:arb_rising_fmpq_ui, :libarb), Void,
-              (Ptr{arb}, Ptr{fmpq}, UInt, Int), &z, &x, n, r.prec)
+              (Ref{arb}, Ref{fmpq}, UInt, Int), z, x, n, r.prec)
   return z
 end
 
@@ -1596,7 +1596,7 @@ function risingfac2(x::arb, n::UInt)
   z = parent(x)()
   w = parent(x)()
   ccall((:arb_rising2_ui, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Ptr{arb}, UInt, Int), &z, &w, &x, n, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, UInt, Int), z, w, x, n, parent(x).prec)
   return (z, w)
 end
 
@@ -1614,7 +1614,7 @@ doc"""
 function polylog(s::arb, a::arb)
   z = parent(s)()
   ccall((:arb_polylog, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int), &z, &s, &a, parent(s).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, s, a, parent(s).prec)
   return z
 end
 
@@ -1625,21 +1625,21 @@ doc"""
 function polylog(s::Int, a::arb)
   z = parent(a)()
   ccall((:arb_polylog_si, :libarb), Void,
-              (Ptr{arb}, Int, Ptr{arb}, Int), &z, s, &a, parent(a).prec)
+              (Ref{arb}, Int, Ref{arb}, Int), z, s, a, parent(a).prec)
   return z
 end
 
 function chebyshev_t(n::UInt, x::arb)
   z = parent(x)()
   ccall((:arb_chebyshev_t_ui, :libarb), Void,
-              (Ptr{arb}, UInt, Ptr{arb}, Int), &z, n, &x, parent(x).prec)
+              (Ref{arb}, UInt, Ref{arb}, Int), z, n, x, parent(x).prec)
   return z
 end
 
 function chebyshev_u(n::UInt, x::arb)
   z = parent(x)()
   ccall((:arb_chebyshev_u_ui, :libarb), Void,
-              (Ptr{arb}, UInt, Ptr{arb}, Int), &z, n, &x, parent(x).prec)
+              (Ref{arb}, UInt, Ref{arb}, Int), z, n, x, parent(x).prec)
   return z
 end
 
@@ -1647,7 +1647,7 @@ function chebyshev_t2(n::UInt, x::arb)
   z = parent(x)()
   w = parent(x)()
   ccall((:arb_chebyshev_t2_ui, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, UInt, Ptr{arb}, Int), &z, &w, n, &x, parent(x).prec)
+              (Ref{arb}, Ref{arb}, UInt, Ref{arb}, Int), z, w, n, x, parent(x).prec)
   return z, w
 end
 
@@ -1655,7 +1655,7 @@ function chebyshev_u2(n::UInt, x::arb)
   z = parent(x)()
   w = parent(x)()
   ccall((:arb_chebyshev_u2_ui, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, UInt, Ptr{arb}, Int), &z, &w, n, &x, parent(x).prec)
+              (Ref{arb}, Ref{arb}, UInt, Ref{arb}, Int), z, w, n, x, parent(x).prec)
   return z, w
 end
 
@@ -1690,7 +1690,7 @@ doc"""
 function bell(n::fmpz, r::ArbField)
   z = r()
   ccall((:arb_bell_fmpz, :libarb), Void,
-              (Ptr{arb}, Ptr{fmpz}, Int), &z, &n, r.prec)
+              (Ref{arb}, Ref{fmpz}, Int), z, n, r.prec)
   return z
 end
 
@@ -1707,7 +1707,7 @@ doc"""
 function numpart(n::fmpz, r::ArbField)
   z = r()
   ccall((:arb_partitions_fmpz, :libarb), Void,
-              (Ptr{arb}, Ptr{fmpz}, Int), &z, &n, r.prec)
+              (Ref{arb}, Ref{fmpz}, Int), z, n, r.prec)
   return z
 end
 
@@ -1724,7 +1724,7 @@ numpart(n::Int, r::ArbField) = numpart(fmpz(n), r)
 ################################################################################
 
 function zero!(z::arb)
-   ccall((:arb_zero, :libarb), Void, (Ptr{arb},), &z)
+   ccall((:arb_zero, :libarb), Void, (Ref{arb},), z)
    return z
 end
 
@@ -1732,16 +1732,16 @@ for (s,f) in (("add!","arb_add"), ("mul!","arb_mul"), ("div!", "arb_div"),
               ("sub!","arb_sub"))
   @eval begin
     function ($(Symbol(s)))(z::arb, x::arb, y::arb)
-      ccall(($f, :libarb), Void, (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int),
-                           &z, &x, &y, parent(x).prec)
+      ccall(($f, :libarb), Void, (Ref{arb}, Ref{arb}, Ref{arb}, Int),
+                           z, x, y, parent(x).prec)
       return z
     end
   end
 end
 
 function addeq!(z::arb, x::arb)
-    ccall((:arb_add, :libarb), Void, (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int),
-                           &z, &z, &x, parent(x).prec)
+    ccall((:arb_add, :libarb), Void, (Ref{arb}, Ref{arb}, Ref{arb}, Int),
+                           z, z, x, parent(x).prec)
     return z
 end
 
@@ -1769,26 +1769,26 @@ for (typeofx, passtoc) in ((arb, Ref{arb}), (Ptr{arb}, Ptr{arb}))
 
   @eval begin
     function _arb_set(x::($typeofx), y::fmpz)
-      ccall((:arb_set_fmpz, :libarb), Void, (($passtoc), Ptr{fmpz}), x, &y)
+      ccall((:arb_set_fmpz, :libarb), Void, (($passtoc), Ref{fmpz}), x, y)
     end
 
     function _arb_set(x::($typeofx), y::fmpz, p::Int)
       ccall((:arb_set_round_fmpz, :libarb), Void,
-                  (($passtoc), Ptr{fmpz}, Int), x, &y, p)
+                  (($passtoc), Ref{fmpz}, Int), x, y, p)
     end
 
     function _arb_set(x::($typeofx), y::fmpq, p::Int)
       ccall((:arb_set_fmpq, :libarb), Void,
-                  (($passtoc), Ptr{fmpq}, Int), x, &y, p)
+                  (($passtoc), Ref{fmpq}, Int), x, y, p)
     end
 
     function _arb_set(x::($typeofx), y::arb)
-      ccall((:arb_set, :libarb), Void, (($passtoc), Ptr{arb}), x, &y)
+      ccall((:arb_set, :libarb), Void, (($passtoc), Ref{arb}), x, y)
     end
 
     function _arb_set(x::($typeofx), y::arb, p::Int)
       ccall((:arb_set_round, :libarb), Void,
-                  (($passtoc), Ptr{arb}, Int), x, &y, p)
+                  (($passtoc), Ref{arb}, Int), x, y, p)
     end
 
     function _arb_set(x::($typeofx), y::AbstractString, p::Int)
@@ -1804,7 +1804,7 @@ for (typeofx, passtoc) in ((arb, Ref{arb}), (Ptr{arb}, Ptr{arb}))
       r = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct},
                   (($passtoc), ), x)
       ccall((:arf_set_mpfr, :libarb), Void,
-                  (Ptr{arf_struct}, Ptr{BigFloat}), m, &y)
+                  (Ptr{arf_struct}, Ref{BigFloat}), m, y)
       ccall((:mag_zero, :libarb), Void, (Ptr{mag_struct}, ), r)
     end
 
@@ -1812,7 +1812,7 @@ for (typeofx, passtoc) in ((arb, Ref{arb}), (Ptr{arb}, Ptr{arb}))
       m = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (($passtoc), ), x)
       r = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct}, (($passtoc), ), x)
       ccall((:arf_set_mpfr, :libarb), Void,
-                  (Ptr{arf_struct}, Ptr{BigFloat}), m, &y)
+                  (Ptr{arf_struct}, Ref{BigFloat}), m, y)
       ccall((:mag_zero, :libarb), Void, (Ptr{mag_struct}, ), r)
       ccall((:arb_set_round, :libarb), Void,
                   (($passtoc), ($passtoc), Int), x, x, p)

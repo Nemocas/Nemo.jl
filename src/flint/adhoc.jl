@@ -580,9 +580,9 @@ doc"""
 """
 function *(a::FracElem, b::fmpz)
    c = base_ring(a)(b)
-   g = gcd(den(a), c)
-   n = num(a)*divexact(c, g)
-   d = divexact(den(a), g)
+   g = gcd(denominator(a), c)
+   n = numerator(a)*divexact(c, g)
+   d = divexact(denominator(a), g)
    return parent(a)(n, d)
 end
 
@@ -592,9 +592,9 @@ doc"""
 """
 function *(a::fmpz, b::FracElem)
    c = base_ring(b)(a)
-   g = gcd(den(b), c)
-   n = num(b)*divexact(c, g)
-   d = divexact(den(b), g)
+   g = gcd(denominator(b), c)
+   n = numerator(b)*divexact(c, g)
+   d = divexact(denominator(b), g)
    return parent(b)(n, d)
 end
 
@@ -603,8 +603,8 @@ doc"""
 > Return $a + b$.
 """
 function +(a::FracElem, b::fmpz)
-   n = num(a) + den(a)*b
-   d = den(a)
+   n = numerator(a) + denominator(a)*b
+   d = denominator(a)
    g = gcd(n, d)
    return parent(a)(divexact(n, g), divexact(d, g))
 end
@@ -614,8 +614,8 @@ doc"""
 > Return $a - b$.
 """
 function -(a::FracElem, b::fmpz)
-   n = num(a) - den(a)*b
-   d = den(a)
+   n = numerator(a) - denominator(a)*b
+   d = denominator(a)
    g = gcd(n, d)
    return parent(a)(divexact(n, g), divexact(d, g))
 end
@@ -631,8 +631,8 @@ doc"""
 > Return $a - b$.
 """
 function -(a::fmpz, b::FracElem)
-   n = a*den(b) - num(b)
-   d = den(b)
+   n = a*denominator(b) - numerator(b)
+   d = denominator(b)
    g = gcd(n, d)
    return parent(b)(divexact(n, g), divexact(d, g))
 end
@@ -642,7 +642,7 @@ doc"""
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 function ==(x::FracElem, y::fmpz)
-   return (isone(den(x)) && num(x) == y) || (num(x) == den(x)*y)
+   return (isone(denominator(x)) && numerator(x) == y) || (numerator(x) == denominator(x)*y)
 end
 
 doc"""
@@ -658,9 +658,9 @@ doc"""
 function divexact(a::FracElem, b::fmpz)
    iszero(b) && throw(DivideError())
    c = base_ring(a)(b)
-   g = gcd(num(a), c)
-   n = divexact(num(a), g)
-   d = den(a)*divexact(c, g)
+   g = gcd(numerator(a), c)
+   n = divexact(numerator(a), g)
+   d = denominator(a)*divexact(c, g)
    return parent(a)(n, d)
 end
 
@@ -671,9 +671,9 @@ doc"""
 function divexact(a::fmpz, b::FracElem)
    iszero(b) && throw(DivideError())
    c = base_ring(b)(a)
-   g = gcd(num(b), c)
-   n = den(b)*divexact(c, g)
-   d = divexact(num(b), g)
+   g = gcd(numerator(b), c)
+   n = denominator(b)*divexact(c, g)
+   d = divexact(numerator(b), g)
    return parent(b)(n, d)
 end
 

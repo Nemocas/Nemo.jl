@@ -1,8 +1,8 @@
 function test_fmpq_poly_constructors()
    print("fmpq_poly.constructors...")
- 
+
    S, y = PolynomialRing(QQ, "y")
- 
+
    @test elem_type(S) == fmpq_poly
    @test elem_type(FmpqPolyRing) == fmpq_poly
    @test parent_type(fmpq_poly) == FmpqPolyRing
@@ -82,7 +82,7 @@ end
 
 function test_fmpq_poly_printing()
    print("fmpq_poly.printing...")
- 
+
    S, y = PolynomialRing(QQ, "y")
 
    @test string(y + y^2) == "y^2+y"
@@ -96,11 +96,11 @@ function test_fmpq_poly_manipulation()
    S, y = PolynomialRing(QQ, "y")
 
    @test iszero(zero(S))
-   
+
    @test isone(one(S))
 
    @test isgen(gen(S))
-   
+
    @test isunit(one(S))
 
    f = 2y + fmpz(11)//7 + 1
@@ -119,7 +119,7 @@ function test_fmpq_poly_manipulation()
 
    @test deepcopy(h) == h
 
-   @test den(-fmpz(12)//7*y + 1) == 7
+   @test denominator(-fmpz(12)//7*y + 1) == 7
 
    println("PASS")
 end
@@ -131,7 +131,7 @@ function test_fmpq_poly_binary_ops()
 
    f = 3*y^2 + 7*y + 3
    g = 2*y + 11
-   
+
    @test f - g == 3*y^2 + 5*y - 8
 
    @test f + g == 3*y^2 + 9*y + 14
@@ -148,11 +148,11 @@ function test_fmpq_poly_adhoc_binary()
 
    f = 3*y^2 + 7*y + 3
    g = 2*y + 11
-   
+
    @test f*4 == 12*y^2 + 28*y + 12
 
    @test 7*f == 21*y^2 + 49*y + 21
-   
+
    @test fmpz(5)*g == 10*y+55
 
    @test g*fmpz(3) == 6*y+33
@@ -168,11 +168,11 @@ function test_fmpq_poly_adhoc_binary()
    @test (BigInt(5)//BigInt(7))*g == fmpz(10)//7*y+fmpz(55)//7
 
    @test g*(BigInt(5)//BigInt(7)) == fmpz(10)//7*y+fmpz(55)//7
- 
+
    @test f + 4 == 3*y^2 + 7*y + 7
 
    @test 7 + f == 3*y^2 + 7*y + 10
-   
+
    @test fmpz(5) + g == 2*y+16
 
    @test g + fmpz(3) == 2*y+14
@@ -192,7 +192,7 @@ function test_fmpq_poly_adhoc_binary()
    @test f - 4 == 3*y^2 + 7*y - 1
 
    @test 7 - f == -3*y^2 - 7*y + 4
-   
+
    @test fmpz(5) - g == -2*y-6
 
    @test g - fmpz(3) == 2*y+8
@@ -208,7 +208,7 @@ function test_fmpq_poly_adhoc_binary()
    @test (BigInt(5)//BigInt(7)) - g == -2*y-fmpz(72)//7
 
    @test g - (BigInt(5)//BigInt(7)) == 2*y+fmpz(72)//7
- 
+
    println("PASS")
 end
 
@@ -219,7 +219,7 @@ function test_fmpq_poly_comparison()
 
    f = 3*y^2 + 7*y + 3
    g = 3*y^2 + 7*y + 3
-   
+
    @test f == g
 
    @test isequal(f, g)
@@ -232,7 +232,7 @@ function test_fmpq_poly_adhoc_comparison()
 
    S, y = PolynomialRing(QQ, "y")
 
-   @test S(1) == 1 
+   @test S(1) == 1
 
    @test S(1) == BigInt(1)
 
@@ -276,7 +276,7 @@ function test_fmpq_poly_truncation()
 
    f = 3*y^2 + 7*y + 3
    g = 2*y^2 + 11*y + 1
-   
+
    @test truncate(f, 1) == 3
 
    @test mullow(f, g, 4) == 47*y^3 + 86*y^2 + 40*y + 3
@@ -290,7 +290,7 @@ function test_fmpq_poly_reverse()
    S, y = PolynomialRing(QQ, "y")
 
    f = 3*y^2 + 7*y + 3
-   
+
    @test reverse(f, 7) == 3*y^6 + 7*y^5 + 3*y^4
 
    println("PASS")
@@ -302,7 +302,7 @@ function test_fmpq_poly_shift()
    S, y = PolynomialRing(QQ, "y")
 
    f = 3*y^2 + 7*y + 3
-   
+
    @test shift_left(f, 7) == 3*y^9 + 7*y^8 + 3*y^7
 
    @test shift_right(f, 3) == 0
@@ -316,7 +316,7 @@ function test_fmpq_poly_powering()
    S, y = PolynomialRing(QQ, "y")
 
    f = 3*y^2 + 7*y + 3
-   
+
    @test f^5 == 243*y^10 + 2835*y^9 + 14445*y^8 + 42210*y^7 + 78135*y^6 + 95557*y^5 + 78135*y^4 + 42210*y^3 + 14445*y^2 + 2835*y + 243
 
    println("PASS")
@@ -326,17 +326,17 @@ function test_fmpq_poly_modular_arithmetic()
    print("fmpq_poly.modular_arithmetic...")
 
    S, y = PolynomialRing(QQ, "y")
-   
+
    f = 7y + 1
    g = 11y^2 + 12y + 21
    h = 17y^5 + 2y + 1
 
    @test invmod(f, g) == -fmpz(77)//956*y-fmpz(73)//956
-   
+
    @test mulmod(f, g, h) == 77*y^3 + 95*y^2 + 159*y + 21
-   
+
    @test powmod(f, 3, h) == 343*y^3 + 147*y^2 + 21*y + 1
-   
+
    println("PASS")
 end
 
@@ -347,7 +347,7 @@ function test_fmpq_poly_exact_division()
 
    f = 3*y^2 + 7*y + 3
    g = 11*y^2 + 2*y + 3
-   
+
    @test divexact(f*g, f) == g
 
    println("PASS")
@@ -359,7 +359,7 @@ function test_fmpq_poly_adhoc_exact_division()
    S, y = PolynomialRing(QQ, "y")
 
    f = 3*y^2 + 7*y + 3
-   
+
    @test divexact(3*f, 3) == f
 
    @test divexact(fmpz(3)*f, fmpz(3)) == f
@@ -380,11 +380,11 @@ function test_fmpq_poly_euclidean_division()
 
    f = y^3 + 3*y^2 + 7*y + 3
    g = 11*y^2 + 2*y + 3
-   
+
    @test mod(f, g) == fmpz(752)//121*y+fmpz(270)//121
-   
+
    @test divrem(f, g) == (fmpz(1)//11*y+fmpz(31)//121, fmpz(752)//121*y+fmpz(270)//121)
- 
+
    println("PASS")
 end
 
@@ -475,9 +475,9 @@ function test_fmpq_poly_integral()
    print("fmpq_poly.integral...")
 
    S, y = PolynomialRing(QQ, "y")
-   
+
    f = 17y^2 + 2y - 11
-   
+
    @test integral(f) == fmpz(17)//3*y^3 + y^2 - 11y
 
    println("PASS")

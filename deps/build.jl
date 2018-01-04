@@ -3,9 +3,9 @@ oldwdir = pwd()
 @show M4_VERSION = "1.4.17"
 @show YASM_VERSION = "1.3.0"
 @show MPIR_VERSION = "3.0.0"
-@show MPFR_VERSION = "3.1.6"
-@show ANTIC_VERSION = "fb237532f6772fc04d6d57cc7cf015e444eb2cf4"
-@show FLINT_VERSION = "e22c3fc1f040874dbda43baf802c77e59ed9c1a0"
+@show MPFR_VERSION = "4.0.0"
+@show ANTIC_VERSION = "9fb5b8d5ccfad13d1ec5b59d4fd13a9fde94c78e"
+@show FLINT_VERSION = "b5517519f6a6c6d5c5619fa1412cc092c07dbd82"
 @show ARB_VERSION = "6035ee2420b7a3fa0259c92dcfa5de4bc76a4b95"
 
 pkgdir = dirname(dirname(@__FILE__))
@@ -207,6 +207,7 @@ if !is_windows()
     cd(wdir)
   catch
     if ispath(joinpath("$wdir", "flint2"))
+       open(`patch -R --forward -d flint2 -r -`, "r", open("../deps-PIE-ftbfs.patch"))
        cd(joinpath("$wdir", "flint2"))
        run(`git fetch`)
        run(`git checkout $FLINT_VERSION`)
@@ -254,6 +255,7 @@ if !is_windows()
     cd(wdir)
   catch
     if ispath(joinpath("$wdir", "arb"))
+      open(`patch -R --forward -d arb -r -`, "r", open("../deps-PIE-ftbfs.patch"))
       cd(joinpath("$wdir", "arb"))
       run(`git fetch`)
       run(`git checkout $ARB_VERSION`)

@@ -352,7 +352,7 @@ function test_fmpq_mat_transpose()
 
    C = transpose(A)*A
 
-   @test C' == C
+   @test transpose(C) == C
 
    println("PASS")
 end

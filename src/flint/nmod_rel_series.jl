@@ -39,20 +39,20 @@ max_precision(R::NmodRelSeriesRing) = R.prec_max
 function normalise(a::nmod_rel_series, len::Int)
    if len > 0
       c = ccall((:nmod_poly_get_coeff_ui, :libflint), UInt,
-         (Ptr{nmod_rel_series}, Int), &a, len - 1)
+         (Ref{nmod_rel_series}, Int), a, len - 1)
    end
    while len > 0 && iszero(c)
       len -= 1
       if len > 0
          c = ccall((:nmod_poly_get_coeff_ui, :libflint), UInt,
-            (Ptr{nmod_rel_series}, Int), &a, len - 1)
+            (Ref{nmod_rel_series}, Int), a, len - 1)
       end
    end
    return len
 end
 
 function pol_length(x::nmod_rel_series)
-   return ccall((:nmod_poly_length, :libflint), Int, (Ptr{nmod_rel_series},), &x)
+   return ccall((:nmod_poly_length, :libflint), Int, (Ref{nmod_rel_series},), x)
 end
 
 precision(x::nmod_rel_series) = x.prec
@@ -63,7 +63,7 @@ function polcoeff(x::nmod_rel_series, n::Int)
       return R(0)
    end
    z = ccall((:nmod_poly_get_coeff_ui, :libflint), UInt,
-         (Ptr{nmod_rel_series}, Int), &x, n)
+         (Ref{nmod_rel_series}, Int), x, n)
    return R(z)
 end
 
@@ -101,7 +101,7 @@ function renormalize!(z::nmod_rel_series)
    else
       z.val = zval + i
       ccall((:nmod_poly_shift_right, :libflint), Void,
-            (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int), &z, &z, i)
+            (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int), z, z, i)
    end
    return nothing
 end
@@ -128,8 +128,8 @@ show_minus_one(::Type{nmod_rel_series}) = true
 function -(x::nmod_rel_series)
    z = parent(x)()
    ccall((:nmod_poly_neg, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}),
-               &z, &x)
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}),
+               z, x)
    z.prec = x.prec
    z.val = x.val
    return z
@@ -153,30 +153,30 @@ function +(a::nmod_rel_series, b::nmod_rel_series)
    if a.val < b.val
       lenz = max(lena, lenb + b.val - a.val)
       ccall((:nmod_poly_set_trunc, :libflint), Void,
-            (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-            &z, &b, max(0, lenz - b.val + a.val))
+            (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+            z, b, max(0, lenz - b.val + a.val))
       ccall((:nmod_poly_shift_left, :libflint), Void,
-            (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-            &z, &z, b.val - a.val)
+            (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+            z, z, b.val - a.val)
       ccall((:nmod_poly_add_series, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-               &z, &z, &a, lenz)
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+               z, z, a, lenz)
    elseif b.val < a.val
       lenz = max(lena + a.val - b.val, lenb)
       ccall((:nmod_poly_set_trunc, :libflint), Void,
-            (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-            &z, &a, max(0, lenz - a.val + b.val))
+            (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+            z, a, max(0, lenz - a.val + b.val))
       ccall((:nmod_poly_shift_left, :libflint), Void,
-            (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-            &z, &z, a.val - b.val)
+            (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+            z, z, a.val - b.val)
       ccall((:nmod_poly_add_series, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-               &z, &z, &b, lenz)
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+               z, z, b, lenz)
    else
       lenz = max(lena, lenb)
       ccall((:nmod_poly_add_series, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-               &z, &a, &b, lenz)
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+               z, a, b, lenz)
    end
    z.prec = prec
    z.val = val
@@ -197,32 +197,32 @@ function -(a::nmod_rel_series, b::nmod_rel_series)
    if a.val < b.val
       lenz = max(lena, lenb + b.val - a.val)
       ccall((:nmod_poly_set_trunc, :libflint), Void,
-            (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-            &z, &b, max(0, lenz - b.val + a.val))
+            (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+            z, b, max(0, lenz - b.val + a.val))
       ccall((:nmod_poly_shift_left, :libflint), Void,
-            (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-            &z, &z, b.val - a.val)
+            (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+            z, z, b.val - a.val)
       ccall((:nmod_poly_neg, :libflint), Void,
-            (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}), &z, &z)
+            (Ref{nmod_rel_series}, Ref{nmod_rel_series}), z, z)
       ccall((:nmod_poly_add_series, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-               &z, &z, &a, lenz)
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+               z, z, a, lenz)
    elseif b.val < a.val
       lenz = max(lena + a.val - b.val, lenb)
       ccall((:nmod_poly_set_trunc, :libflint), Void,
-            (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-            &z, &a, max(0, lenz - a.val + b.val))
+            (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+            z, a, max(0, lenz - a.val + b.val))
       ccall((:nmod_poly_shift_left, :libflint), Void,
-            (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-            &z, &z, a.val - b.val)
+            (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+            z, z, a.val - b.val)
       ccall((:nmod_poly_sub_series, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-               &z, &z, &b, lenz)
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+               z, z, b, lenz)
    else
       lenz = max(lena, lenb)
       ccall((:nmod_poly_sub_series, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-               &z, &a, &b, lenz)
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+               z, a, b, lenz)
    end
    z.prec = prec
    z.val = val
@@ -247,8 +247,8 @@ function *(a::nmod_rel_series, b::nmod_rel_series)
    end
    lenz = min(lena + lenb - 1, prec)
    ccall((:nmod_poly_mullow, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-               &z, &a, &b, lenz)
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+               z, a, b, lenz)
    renormalize!(z)
    return z
 end
@@ -264,8 +264,8 @@ function *(x::nmod, y::nmod_rel_series)
    z.prec = y.prec
    z.val = y.val
    ccall((:nmod_poly_scalar_mul_nmod, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, UInt),
-               &z, &y, data(x))
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, UInt),
+               z, y, data(x))
    renormalize!(z)
    return z
 end
@@ -276,10 +276,10 @@ function *(x::fmpz, y::nmod_rel_series)
    z = parent(y)()
    z.prec = y.prec
    z.val = y.val
-   r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt), &x, modulus(y))
+   r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ref{fmpz}, UInt), x, modulus(y))
    ccall((:nmod_poly_scalar_mul_nmod, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, UInt),
-               &z, &y, r)
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, UInt),
+               z, y, r)
    renormalize!(z)
    return z
 end
@@ -289,8 +289,8 @@ function *(x::UInt, y::nmod_rel_series)
    z.prec = y.prec
    z.val = y.val
    ccall((:nmod_poly_scalar_mul_nmod, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, UInt),
-               &z, &y, mod(x, modulus(y)))
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, UInt),
+               z, y, mod(x, modulus(y)))
    renormalize!(z)
    return z
 end
@@ -332,8 +332,8 @@ function shift_right(x::nmod_rel_series, len::Int)
       z.val = max(0, xval - len)
       zlen = min(xlen + xval - len, xlen)
       ccall((:nmod_poly_shift_right, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-               &z, &x, xlen - zlen)
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+               z, x, xlen - zlen)
       renormalize!(z)
    end
    return z
@@ -362,8 +362,8 @@ function truncate(x::nmod_rel_series, prec::Int)
    else
       z.val = xval
       ccall((:nmod_poly_set_trunc, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-               &z, &x, min(prec - xval, xlen))
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+               z, x, min(prec - xval, xlen))
    end
    return z
 end
@@ -397,8 +397,8 @@ function ^(a::nmod_rel_series, b::Int)
       z.prec = a.prec + (b - 1)*valuation(a)
       z.val = b*valuation(a)
       ccall((:nmod_poly_pow_trunc, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int, Int),
-               &z, &a, b, z.prec - z.val)
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int, Int),
+               z, a, b, z.prec - z.val)
    end
    renormalize!(z)
    return z
@@ -425,8 +425,8 @@ function ==(x::nmod_rel_series, y::nmod_rel_series)
       return false
    end
    return Bool(ccall((:nmod_poly_equal_trunc, :libflint), Cint,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-               &x, &y, xlen))
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+               x, y, xlen))
 end
 
 function isequal(x::nmod_rel_series, y::nmod_rel_series)
@@ -437,8 +437,8 @@ function isequal(x::nmod_rel_series, y::nmod_rel_series)
       return false
    end
    return Bool(ccall((:nmod_poly_equal, :libflint), Cint,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-               &x, &y, pol_length(x)))
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+               x, y, pol_length(x)))
 end
 
 ###############################################################################
@@ -455,7 +455,7 @@ function ==(x::nmod_rel_series, y::nmod)
    elseif pol_length(x) == 1
       if x.val == 0
          z = ccall((:nmod_poly_get_coeff_ui, :libflint), UInt,
-                       (Ptr{nmod_rel_series}, Int), &x, 0)
+                       (Ref{nmod_rel_series}, Int), x, 0)
          return data(y) == z
       else
          return false
@@ -474,15 +474,15 @@ function ==(x::nmod_rel_series, y::fmpz)
       return false
    elseif pol_length(x) == 1
       if x.val == 0
-         r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt), &y, modulus(x))
+         r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ref{fmpz}, UInt), y, modulus(x))
          z = ccall((:nmod_poly_get_coeff_ui, :libflint), UInt,
-                       (Ptr{nmod_rel_series}, Int), &x, 0)
+                       (Ref{nmod_rel_series}, Int), x, 0)
          return r == z
       else
          return false
       end
    else
-      r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt), &y, modulus(x))
+      r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ref{fmpz}, UInt), y, modulus(x))
       return r == UInt(0)
    end
 end
@@ -498,7 +498,7 @@ function ==(x::nmod_rel_series, y::UInt)
       if x.val == 0
          r = mod(y, modulus(x))
          z = ccall((:nmod_poly_get_coeff_ui, :libflint), UInt,
-                       (Ptr{nmod_rel_series}, Int), &x, 0)
+                       (Ref{nmod_rel_series}, Int), x, 0)
          return r == z
       else
          return false
@@ -539,8 +539,8 @@ function divexact(x::nmod_rel_series, y::nmod_rel_series)
    z.prec = prec + z.val
    if prec != 0
       ccall((:nmod_poly_div_series, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-               &z, &x, &y, prec)
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+               z, x, y, prec)
    end
    return z
 end
@@ -558,8 +558,8 @@ function divexact(x::nmod_rel_series, y::nmod)
    z.val = x.val
    r = inv(y)
    ccall((:nmod_poly_scalar_mul_nmod, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, UInt),
-               &z, &x, data(r))
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, UInt),
+               z, x, data(r))
    return z
 end
 
@@ -569,11 +569,11 @@ function divexact(x::nmod_rel_series, y::fmpz)
    z.prec = x.prec
    z.prec = x.prec
    z.val = x.val
-   r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt), &y, modulus(x))
+   r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ref{fmpz}, UInt), y, modulus(x))
    rinv = inv(base_ring(x)(r))
    ccall((:nmod_poly_scalar_mul_nmod, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, UInt),
-               &z, &x, data(rinv))
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, UInt),
+               z, x, data(rinv))
    return z
 end
 
@@ -586,8 +586,8 @@ function divexact(x::nmod_rel_series, y::UInt)
    r = mod(y, modulus(x))
    rinv = inv(base_ring(x)(r))
    ccall((:nmod_poly_scalar_mul_nmod, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, UInt),
-               &z, &x, data(rinv))
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, UInt),
+               z, x, data(rinv))
    return z
 end
 
@@ -606,8 +606,8 @@ function inv(a::nmod_rel_series)
    ainv.prec = a.prec
    ainv.val = 0
    ccall((:nmod_poly_inv_series, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-               &ainv, &a, a.prec)
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+               ainv, a, a.prec)
    return ainv
 end
 
@@ -617,7 +617,7 @@ end
 #
 ###############################################################################
 
-function exp(a::nmod_rel_series)
+function Base.exp(a::nmod_rel_series)
    if iszero(a)
       z = one(parent(a))
       z.prec = precision(a)
@@ -644,7 +644,7 @@ function exp(a::nmod_rel_series)
    end
    z = parent(a)(d, preca, preca, 0)
    ccall((:_nmod_poly_set_length, :libflint), Void,
-         (Ptr{nmod_rel_series}, Int), &z, normalise(z, preca))
+         (Ref{nmod_rel_series}, Int), z, normalise(z, preca))
    return z
 end
 
@@ -656,37 +656,37 @@ end
 
 function zero!(x::nmod_rel_series)
   ccall((:nmod_poly_zero, :libflint), Void,
-                   (Ptr{nmod_rel_series},), &x)
+                   (Ref{nmod_rel_series},), x)
   x.prec = parent(x).prec_max
   return x
 end
 
 function fit!(x::nmod_rel_series, n::Int)
   ccall((:nmod_poly_fit_length, :libflint), Void,
-                   (Ptr{nmod_rel_series}, Int), &x, n)
+                   (Ref{nmod_rel_series}, Int), x, n)
   return nothing
 end
 
 function setcoeff!(z::nmod_rel_series, n::Int, x::fmpz)
-   r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt), &x, modulus(z))
+   r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ref{fmpz}, UInt), x, modulus(z))
    ccall((:nmod_poly_set_coeff_ui, :libflint), Void,
-                (Ptr{nmod_rel_series}, Int, UInt),
-               &z, n, r)
+                (Ref{nmod_rel_series}, Int, UInt),
+               z, n, r)
    return z
 end
 
 function setcoeff!(z::nmod_rel_series, n::Int, x::UInt)
    r = mod(x, modulus(z))
    ccall((:nmod_poly_set_coeff_ui, :libflint), Void,
-                (Ptr{nmod_rel_series}, Int, UInt),
-               &z, n, r)
+                (Ref{nmod_rel_series}, Int, UInt),
+               z, n, r)
    return z
 end
 
 function setcoeff!(z::nmod_rel_series, n::Int, x::nmod)
    ccall((:nmod_poly_set_coeff_ui, :libflint), Void,
-                (Ptr{nmod_rel_series}, Int, UInt),
-               &z, n, data(x))
+                (Ref{nmod_rel_series}, Int, UInt),
+               z, n, data(x))
    return z
 end
 
@@ -705,8 +705,8 @@ function mul!(z::nmod_rel_series, a::nmod_rel_series, b::nmod_rel_series)
       lenz = 0
    end
    ccall((:nmod_poly_mullow, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-               &z, &a, &b, lenz)
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+               z, a, b, lenz)
    renormalize!(z)
    return z
 end
@@ -723,30 +723,30 @@ function addeq!(a::nmod_rel_series, b::nmod_rel_series)
       z = nmod_rel_series(modulus)
       lenz = max(lena, lenb + b.val - a.val)
       ccall((:nmod_poly_set_trunc, :libflint), Void,
-            (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-            &z, &b, max(0, lenz - b.val + a.val))
+            (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+            z, b, max(0, lenz - b.val + a.val))
       ccall((:nmod_poly_shift_left, :libflint), Void,
-            (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-            &z, &z, b.val - a.val)
+            (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+            z, z, b.val - a.val)
       ccall((:nmod_poly_add_series, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-               &a, &a, &z, lenz)
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+               a, a, z, lenz)
    elseif b.val < a.val
       lenz = max(lena + a.val - b.val, lenb)
       ccall((:nmod_poly_truncate, :libflint), Void,
-            (Ptr{nmod_rel_series}, Int),
-            &a, max(0, lenz - a.val + b.val))
+            (Ref{nmod_rel_series}, Int),
+            a, max(0, lenz - a.val + b.val))
       ccall((:nmod_poly_shift_left, :libflint), Void,
-            (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-            &a, &a, a.val - b.val)
+            (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+            a, a, a.val - b.val)
       ccall((:nmod_poly_add_series, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-               &a, &a, &b, lenz)
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+               a, a, b, lenz)
    else
       lenz = max(lena, lenb)
       ccall((:nmod_poly_add_series, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-               &a, &a, &b, lenz)
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+               a, a, b, lenz)
    end
    a.prec = prec
    a.val = val
@@ -766,8 +766,8 @@ function add!(c::nmod_rel_series, a::nmod_rel_series, b::nmod_rel_series)
    lenc = max(lena, lenb)
    c.prec = prec
    ccall((:nmod_poly_add_series, :libflint), Void,
-                (Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Ptr{nmod_rel_series}, Int),
-               &c, &a, &b, lenc)
+                (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),
+               c, a, b, lenc)
    return c
 end
 
