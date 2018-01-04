@@ -152,7 +152,7 @@ end
 if is_windows()
    println("Downloading MPFR ... ")
    if Int == Int32
-      download_dll("http://nemocas.org/binaries/w32-libmpfr-4.dll", joinpath(vdir, "lib", "libmpfr-4.dll"))
+      download_dll("http://nemocas.org/binaries/w32-libmpfr-6.dll", joinpath(vdir, "lib", "libmpfr-6.dll"))
    else
       download_dll("http://nemocas.org/binaries/w64-libmpfr-4.dll", joinpath(vdir, "lib", "libmpfr-4.dll"))
    end
