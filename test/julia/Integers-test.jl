@@ -141,6 +141,25 @@ function test_Integers_gcd()
    println("PASS")
 end
 
+function test_Integers_square_root()
+   print("Julia.Integers.square_root...")
+  
+   R = zz
+   S = JuliaZZ
+
+   for iter = 1:1000
+      r = rand(R, 0:1000)
+      s = rand(S, 0:1000)
+
+      f = r^2
+      g = s^2
+
+      @test Nemo.sqrt(f)^2 == f
+      @test Nemo.sqrt(g)^2 == g
+   end
+
+   println("PASS")
+end
 
 function test_Integers()
    test_Integers_constructors()
@@ -148,6 +167,7 @@ function test_Integers()
    test_Integers_modular_arithmetic()
    test_Integers_exact_division()
    test_Integers_gcd()
+   test_Integers_square_root()
    
    println("")
 end

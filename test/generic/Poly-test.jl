@@ -140,6 +140,24 @@ function test_gen_poly_binary_ops()
       @test f - g == -(g - f)
    end
 
+   # Fake finite field of char 7, degree 2
+   S, y = PolynomialRing(GF(7), "y")
+   F = ResidueField(S, y^2 + 6y + 3)
+   a = F(y)
+   R, x = PolynomialRing(F, "x")
+   for iter = 1:100
+      f = rand(R, 0:10, 0:1)
+      g = rand(R, 0:10, 0:1)
+      h = rand(R, 0:10, 0:1)
+      @test f + g == g + f
+      @test f + (g + h) == (f + g) + h
+      @test f*g == g*f
+      @test f*(g + h) == f*g + f*h
+      @test (f - h) + (g + h) == f + g
+      @test (f + g)*(f - g) == f*f - g*g
+      @test f - g == -(g - f)
+   end
+
    #  Inexact field
    R, x = PolynomialRing(JuliaRealField, "x")
    for iter = 1:100
@@ -179,6 +197,29 @@ function test_gen_poly_adhoc_binary()
    R, x = JuliaZZ["x"]
    for iter = 1:500
       f = rand(R, 0:10, -10:10)
+      c1 = rand(JuliaZZ, -10:10)
+      c2 = rand(JuliaZZ, -10:10)
+      d1 = rand(zz, -10:10)
+      d2 = rand(zz, -10:10)
+
+      @test c1*f - c2*f == (c1 - c2)*f
+      @test c1*f + c2*f == (c1 + c2)*f
+      @test d1*f - d2*f == (d1 - d2)*f
+      @test d1*f + d2*f == (d1 + d2)*f
+
+      @test f*c1 - f*c2 == f*(c1 - c2)
+      @test f*c1 + f*c2 == f*(c1 + c2)
+      @test f*d1 - f*d2 == f*(d1 - d2)
+      @test f*d1 + f*d2 == f*(d1 + d2)
+   end
+
+   # Fake finite field of char 7, degree 2
+   S, y = PolynomialRing(GF(7), "y")
+   F = ResidueField(S, y^2 + 6y + 3)
+   a = F(y)
+   R, x = PolynomialRing(F, "x")
+   for iter = 1:500
+      f = rand(R, 0:10, 0:1)
       c1 = rand(JuliaZZ, -10:10)
       c2 = rand(JuliaZZ, -10:10)
       d1 = rand(zz, -10:10)
@@ -284,6 +325,24 @@ function test_gen_poly_comparison()
       @test f != g + h
    end
 
+   # Fake finite field of char 7, degree 2
+   S, y = PolynomialRing(GF(7), "y")
+   F = ResidueField(S, y^2 + 6y + 3)
+   a = F(y)
+   R, x = PolynomialRing(F, "x")
+   for iter = 1:500
+      f = rand(R, 0:10, 0:1)
+      g = deepcopy(f)
+      h = R()
+      while iszero(h)
+         h = rand(R, 0:10, 0:1)
+      end
+
+      @test f == g
+      @test isequal(f, g)
+      @test f != g + h
+   end
+
    # Inexact field
    R, x = JuliaRealField["x"]
    for iter = 1:500
@@ -327,6 +386,30 @@ function test_gen_poly_adhoc_comparison()
       f = R()
       while iszero(f)
          f = rand(R, 0:10, -10:10)
+      end
+      c1 = rand(JuliaZZ, -10:10)
+      d1 = rand(zz, -10:10)
+
+      @test R(c1) == c1
+      @test c1 == R(c1)
+      @test R(d1) == d1
+      @test d1 == R(d1)
+
+      @test R(c1) != c1 + f
+      @test c1 != R(c1) + f
+      @test R(d1) != d1 + f
+      @test d1 != R(d1) + f
+   end
+
+   # Fake finite field of char 7, degree 2
+   S, y = PolynomialRing(GF(7), "y")
+   F = ResidueField(S, y^2 + 6y + 3)
+   a = F(y)
+   R, x = PolynomialRing(F, "x")
+   for iter = 1:500
+      f = R()
+      while iszero(f)
+         f = rand(R, 0:10, 0:1)
       end
       c1 = rand(JuliaZZ, -10:10)
       d1 = rand(zz, -10:10)
@@ -427,6 +510,18 @@ function test_gen_poly_unary_ops()
       @test iszero(f + (-f))
    end
 
+   # Fake finite field of char 7, degree 2
+   S, y = PolynomialRing(GF(7), "y")
+   F = ResidueField(S, y^2 + 6y + 3)
+   a = F(y)
+   R, x = PolynomialRing(F, "x")
+   for iter = 1:300
+      f = rand(R, 0:10, 0:1)
+
+      @test -(-f) == f
+      @test iszero(f + (-f))
+   end
+
    #  Inexact field
    R, x = PolynomialRing(JuliaRealField, "x")
    for iter = 1:300
@@ -457,6 +552,19 @@ function test_gen_poly_truncation()
    for iter = 1:300
       f = rand(R, 0:10, -10:10)
       g = rand(R, 0:10, -10:10)
+      n = rand(0:20)
+
+      @test truncate(f*g, n) == mullow(f, g, n)
+   end
+
+   # Fake finite field of char 7, degree 2
+   S, y = PolynomialRing(GF(7), "y")
+   F = ResidueField(S, y^2 + 6y + 3)
+   a = F(y)
+   R, x = PolynomialRing(F, "x")
+   for iter = 1:300
+      f = rand(R, 0:10, 0:1)
+      g = rand(R, 0:10, 0:1)
       n = rand(0:20)
 
       @test truncate(f*g, n) == mullow(f, g, n)
@@ -496,6 +604,28 @@ function test_gen_poly_reverse()
    R, x = JuliaZZ["x"]
    for iter = 1:300
       f = rand(R, 0:10, -10:10)
+      len = rand(length(f):12)
+      frev = reverse(f, len)
+
+      shift = 0
+      for i = 1:len
+         if coeff(f, i - 1) != 0
+            break
+         end
+         shift += 1
+      end
+
+      @test length(frev) == len - shift
+      @test f == reverse(frev, len)
+   end
+
+   # Fake finite field of char 7, degree 2
+   S, y = PolynomialRing(GF(7), "y")
+   F = ResidueField(S, y^2 + 6y + 3)
+   a = F(y)
+   R, x = PolynomialRing(F, "x")
+   for iter = 1:300
+      f = rand(R, 0:10, 0:1)
       len = rand(length(f):12)
       frev = reverse(f, len)
 
@@ -568,6 +698,21 @@ function test_gen_poly_shift()
       @test length(shift_right(f, s)) == max(0, length(f) - s)
    end
 
+   # Fake finite field of char 7, degree 2
+   S, y = PolynomialRing(GF(7), "y")
+   F = ResidueField(S, y^2 + 6y + 3)
+   a = F(y)
+   R, x = PolynomialRing(F, "x")
+   for iter = 1:300
+      f = rand(R, 0:10, 0:1)
+      s = rand(0:10)
+      g = s == 0 ? R() : rand(R, 0:s - 1, 0:1)
+
+      @test shift_right(shift_left(f, s) + g, s) == f
+      @test shift_left(f, s) == x^s*f
+      @test length(shift_right(f, s)) == max(0, length(f) - s)
+   end
+
    # Inexact field
    R, x = PolynomialRing(JuliaRealField, "x")
    for iter = 1:300
@@ -604,6 +749,25 @@ function test_gen_poly_powering()
 
    for iter = 1:10
       f = rand(R, 0:10, -10:10)
+      r2 = R(1)
+
+      for expn = 0:10
+         r1 = f^expn
+
+         @test (f == 0 && expn == 0 && r1 == 0) || r1 == r2
+
+         r2 *= f
+      end
+   end
+
+   # Fake finite field of char 7, degree 2
+   S, y = PolynomialRing(GF(7), "y")
+   F = ResidueField(S, y^2 + 6y + 3)
+   a = F(y)
+   R, x = PolynomialRing(F, "x")
+
+   for iter = 1:10
+      f = rand(R, 0:10, 0:1)
       r2 = R(1)
 
       for expn = 0:10
@@ -688,6 +852,52 @@ function test_gen_poly_modular_arithmetic()
       g = S()
       while g == 0
          g = rand(S, 0:5, 0:22)
+      end
+      p = mod(S(1), g)
+
+      for expn = 0:5
+         r = powmod(f, expn, g)
+
+         @test (f == 0 && expn == 0 && r == 0) || r == p
+
+         p = mulmod(p, f, g)
+      end
+   end
+
+   # Fake finite field of char 7, degree 2
+   R, y = PolynomialRing(GF(7), "y")
+   F = ResidueField(R, y^2 + 6y + 3)
+   a = F(y)
+   S, x = PolynomialRing(F, "x")
+
+   for iter = 1:100
+      f = rand(S, 0:5, 0:1)
+      g = rand(S, 0:5, 0:1)
+      h = rand(S, 0:5, 0:1)
+      k = S()
+      while k == 0
+         k = rand(S, 0:5, 0:1)
+      end
+
+      @test mulmod(mulmod(f, g, k), h, k) == mulmod(f, mulmod(g, h, k), k)
+   end
+
+   for iter = 1:100
+      f = S()
+      g = S()
+      while f == 0 || g == 0 || gcd(f, g) != 1
+         f = rand(S, 0:5, 0:1)
+         g = rand(S, 0:5, 0:1)
+      end
+
+      @test mulmod(invmod(f, g), f, g) == mod(S(1), g)
+   end
+
+   for iter = 1:100
+      f = rand(S, 0:5, 0:1)
+      g = S()
+      while g == 0
+         g = rand(S, 0:5, 0:1)
       end
       p = mod(S(1), g)
 
@@ -805,6 +1015,22 @@ function test_gen_poly_exact_division()
       @test divexact(f*g, g) == f
    end
 
+   # Fake finite field of char 7, degree 2
+   S, y = PolynomialRing(GF(7), "y")
+   F = ResidueField(S, y^2 + 6y + 3)
+   a = F(y)
+   R, x = PolynomialRing(F, "x")
+
+   for iter = 1:100
+      f = rand(R, 0:10, 0:1)
+      g = R()
+      while g == 0
+         g = rand(R, 0:10, 0:1)
+      end
+
+      @test divexact(f*g, g) == f
+   end
+
    # Inexact field
    R, x = PolynomialRing(JuliaRealField, "x")
 
@@ -854,6 +1080,29 @@ function test_gen_poly_adhoc_exact_division()
       h = 0
       while h == 0
          h = rand(-10:10)
+      end
+
+      @test divexact(f*h, h) == f
+   end
+
+   # Fake finite field of char 7, degree 2
+   S, y = PolynomialRing(GF(7), "y")
+   F = ResidueField(S, y^2 + 6y + 3)
+   a = F(y)
+   R, x = PolynomialRing(F, "x")
+
+   for iter = 1:100
+      f = rand(R, 0:10, 0:1)
+      g = JuliaZZ()
+      while g == 0
+         g = rand(JuliaZZ, 1:6)
+      end
+
+      @test divexact(f*g, g) == f
+
+      h = 0
+      while h == 0
+         h = rand(1:6)
       end
 
       @test divexact(f*h, h) == f
@@ -945,6 +1194,36 @@ function test_gen_poly_euclidean_division()
       g = S()
       while g == 0
          g = rand(S, 0:5, 0:22)
+      end
+
+      q, r = divrem(f, g)
+      @test q*g + r == f
+
+      @test mod(f, g) == r
+   end
+
+   # Fake finite field of char 7, degree 2
+   R, y = PolynomialRing(GF(7), "y")
+   F = ResidueField(R, y^2 + 6y + 3)
+   a = F(y)
+   S, x = PolynomialRing(F, "x")
+
+   for iter = 1:100
+      f = rand(S, 0:5, 0:1)
+      g = rand(S, 0:5, 0:1)
+      h = S()
+      while h == 0
+         h = rand(S, 0:5, 0:1)
+      end
+
+      @test mod(f + g, h) == mod(f, h) + mod(g, h)
+   end
+
+   for iter = 1:10
+      f = rand(S, 0:5, 0:1)
+      g = S()
+      while g == 0
+         g = rand(S, 0:5, 0:1)
       end
 
       q, r = divrem(f, g)
@@ -1754,6 +2033,30 @@ function test_gen_poly_gcdx()
       @test (u*f + v*g)*h == r
    end
 
+   # Fake finite field of char 7, degree 2
+   S, y = PolynomialRing(GF(7), "y")
+   F = ResidueField(S, y^2 + 6y + 3)
+   a = F(y)
+   R, x = PolynomialRing(F, "x")
+
+   for iter in 1:100
+      f = R()
+      g = R()
+      while length(f) <= 1 && length(g) <= 1
+         f = rand(R, 0:5, 0:1)
+         g = rand(R, 0:5, 0:1)
+      end
+      r, u, v = gcdx(f, g)
+
+      @test u*f + v*g == r
+      @test r == gcd(f, g)
+
+      h = rand(R, 0:5, 0:1)
+      r, u, v = gcdx(f*h, g*h)
+
+      @test (u*f + v*g)*h == r
+   end
+   
    println("PASS")
 end
 

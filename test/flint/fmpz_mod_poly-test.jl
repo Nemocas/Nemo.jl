@@ -94,9 +94,21 @@ function test_fmpz_mod_poly_manipulation()
 
    @test deepcopy(f) == f
 
-  @test modulus(x) == 123456789012345678949
+   setcoeff!(f, 1, UInt(2))
 
-  @test modulus(R) == 123456789012345678949
+   @test coeff(f, 1) == 2
+
+   setcoeff!(f, 1, 3)
+
+   @test coeff(f, 1) == 3
+
+   setcoeff!(f, 1, fmpz(2)^100)
+
+   @test coeff(f, 1) == 32146634986640907030
+
+   @test modulus(x) == 123456789012345678949
+
+   @test modulus(R) == 123456789012345678949
 
    println("PASS")
 end

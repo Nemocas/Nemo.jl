@@ -20,10 +20,10 @@ parent_type(::Type{acb_poly}) = AcbPolyRing
 elem_type(::Type{AcbPolyRing}) = acb_poly
 
 length(x::acb_poly) = ccall((:acb_poly_length, :libarb), Int, 
-                                   (Ptr{acb_poly},), &x)
+                                   (Ref{acb_poly},), x)
 
 set_length!(x::acb_poly, n::Int) = ccall((:_acb_poly_set_length, :libarb), Void,
-                                   (Ptr{acb_poly}, Int), &x, n)
+                                   (Ref{acb_poly}, Int), x, n)
 
 degree(x::acb_poly) = length(x) - 1
 
@@ -31,7 +31,7 @@ function coeff(a::acb_poly, n::Int)
   n < 0 && throw(DomainError())
   t = parent(a).base_ring()
   ccall((:acb_poly_get_coeff_acb, :libarb), Void,
-              (Ptr{acb}, Ptr{acb_poly}, Int), &t, &a, n)
+              (Ref{acb}, Ref{acb_poly}, Int), t, a, n)
   return t
 end
 
@@ -42,7 +42,7 @@ one(a::AcbPolyRing) = a(1)
 function gen(a::AcbPolyRing)
    z = acb_poly()
    ccall((:acb_poly_set_coeff_si, :libarb), Void,
-        (Ptr{acb_poly}, Int, Int), &z, 1, 1)
+        (Ref{acb_poly}, Int, Int), z, 1, 1)
    z.parent = a
    return z
 end
@@ -101,7 +101,7 @@ end
 
 function isequal(x::acb_poly, y::acb_poly)
    return ccall((:acb_poly_equal, :libarb), Bool,
-                                      (Ptr{acb_poly}, Ptr{acb_poly}), &x, &y)
+                                      (Ref{acb_poly}, Ref{acb_poly}), x, y)
 end
 
 doc"""
@@ -111,7 +111,7 @@ doc"""
 """
 function overlaps(x::acb_poly, y::acb_poly)
    return ccall((:acb_poly_overlaps, :libarb), Bool,
-                                      (Ptr{acb_poly}, Ptr{acb_poly}), &x, &y)
+                                      (Ref{acb_poly}, Ref{acb_poly}), x, y)
 end
 
 doc"""
@@ -121,7 +121,7 @@ doc"""
 """
 function contains(x::acb_poly, y::acb_poly)
    return ccall((:acb_poly_contains, :libarb), Bool,
-                                      (Ptr{acb_poly}, Ptr{acb_poly}), &x, &y)
+                                      (Ref{acb_poly}, Ref{acb_poly}), x, y)
 end
 
 doc"""
@@ -131,7 +131,7 @@ doc"""
 """
 function contains(x::acb_poly, y::fmpz_poly)
    return ccall((:acb_poly_contains_fmpz_poly, :libarb), Bool,
-                                      (Ptr{acb_poly}, Ptr{fmpz_poly}), &x, &y)
+                                      (Ref{acb_poly}, Ref{fmpz_poly}), x, y)
 end
 
 doc"""
@@ -141,7 +141,7 @@ doc"""
 """
 function contains(x::acb_poly, y::fmpq_poly)
    return ccall((:acb_poly_contains_fmpq_poly, :libarb), Bool,
-                                      (Ptr{acb_poly}, Ptr{fmpq_poly}), &x, &y)
+                                      (Ref{acb_poly}, Ref{fmpq_poly}), x, y)
 end
 
 function ==(x::acb_poly, y::acb_poly)
@@ -174,7 +174,7 @@ doc"""
 function unique_integer(x::acb_poly)
   z = FmpzPolyRing(var(parent(x)))()
   unique = ccall((:acb_poly_get_unique_fmpz_poly, :libarb), Int,
-    (Ptr{fmpz_poly}, Ptr{acb_poly}), &z, &x)
+    (Ref{fmpz_poly}, Ref{acb_poly}), z, x)
   return (unique != 0, z)
 end
 
@@ -184,7 +184,7 @@ doc"""
 > imaginary parts.
 """
 function isreal(x::acb_poly)
-  return ccall((:acb_poly_is_real, :libarb), Cint, (Ptr{acb_poly}, ), &x) != 0
+  return ccall((:acb_poly_is_real, :libarb), Cint, (Ref{acb_poly}, ), x) != 0
 end
 
 ###############################################################################
@@ -197,7 +197,7 @@ function shift_left(x::acb_poly, len::Int)
    len < 0 && throw(DomainError())
    z = parent(x)()
    ccall((:acb_poly_shift_left, :libarb), Void,
-      (Ptr{acb_poly}, Ptr{acb_poly}, Int), &z, &x, len)
+      (Ref{acb_poly}, Ref{acb_poly}, Int), z, x, len)
    return z
 end
 
@@ -205,7 +205,7 @@ function shift_right(x::acb_poly, len::Int)
    len < 0 && throw(DomainError())
    z = parent(x)()
    ccall((:acb_poly_shift_right, :libarb), Void,
-       (Ptr{acb_poly}, Ptr{acb_poly}, Int), &z, &x, len)
+       (Ref{acb_poly}, Ref{acb_poly}, Int), z, x, len)
    return z
 end
 
@@ -217,7 +217,7 @@ end
 
 function -(x::acb_poly)
   z = parent(x)()
-  ccall((:acb_poly_neg, :libarb), Void, (Ptr{acb_poly}, Ptr{acb_poly}), &z, &x)
+  ccall((:acb_poly_neg, :libarb), Void, (Ref{acb_poly}, Ref{acb_poly}), z, x)
   return z
 end
 
@@ -230,24 +230,24 @@ end
 function +(x::acb_poly, y::acb_poly)
   z = parent(x)()
   ccall((:acb_poly_add, :libarb), Void,
-              (Ptr{acb_poly}, Ptr{acb_poly}, Ptr{acb_poly}, Int),
-              &z, &x, &y, prec(parent(x)))
+              (Ref{acb_poly}, Ref{acb_poly}, Ref{acb_poly}, Int),
+              z, x, y, prec(parent(x)))
   return z
 end
 
 function *(x::acb_poly, y::acb_poly)
   z = parent(x)()
   ccall((:acb_poly_mul, :libarb), Void,
-              (Ptr{acb_poly}, Ptr{acb_poly}, Ptr{acb_poly}, Int),
-              &z, &x, &y, prec(parent(x)))
+              (Ref{acb_poly}, Ref{acb_poly}, Ref{acb_poly}, Int),
+              z, x, y, prec(parent(x)))
   return z
 end
 
 function -(x::acb_poly, y::acb_poly)
   z = parent(x)()
   ccall((:acb_poly_sub, :libarb), Void,
-              (Ptr{acb_poly}, Ptr{acb_poly}, Ptr{acb_poly}, Int),
-              &z, &x, &y, prec(parent(x)))
+              (Ref{acb_poly}, Ref{acb_poly}, Ref{acb_poly}, Int),
+              z, x, y, prec(parent(x)))
   return z
 end
 
@@ -255,8 +255,8 @@ function ^(x::acb_poly, y::Int)
   y < 0 && throw(DomainError())
   z = parent(x)()
   ccall((:acb_poly_pow_ui, :libarb), Void,
-              (Ptr{acb_poly}, Ptr{acb_poly}, UInt, Int),
-              &z, &x, y, prec(parent(x)))
+              (Ref{acb_poly}, Ref{acb_poly}, UInt, Int),
+              z, x, y, prec(parent(x)))
   return z
 end
 
@@ -323,8 +323,8 @@ function divrem(x::acb_poly, y::acb_poly)
    q = parent(x)()
    r = parent(x)()
    if (ccall((:acb_poly_divrem, :libarb), Int,
-         (Ptr{acb_poly}, Ptr{acb_poly}, Ptr{acb_poly}, Ptr{acb_poly}, Int),
-               &q, &r, &x, &y, prec(parent(x))) == 1)
+         (Ref{acb_poly}, Ref{acb_poly}, Ref{acb_poly}, Ref{acb_poly}, Int),
+               q, r, x, y, prec(parent(x))) == 1)
       return (q, r)
    else
       throw(DivideError())
@@ -353,7 +353,7 @@ function truncate(a::acb_poly, n::Int)
    # todo: implement set_trunc in arb
    z = deepcopy(a)
    ccall((:acb_poly_truncate, :libarb), Void,
-                (Ptr{acb_poly}, Int), &z, n)
+                (Ref{acb_poly}, Int), z, n)
    return z
 end
 
@@ -361,8 +361,8 @@ function mullow(x::acb_poly, y::acb_poly, n::Int)
    n < 0 && throw(DomainError())
    z = parent(x)()
    ccall((:acb_poly_mullow, :libarb), Void,
-         (Ptr{acb_poly}, Ptr{acb_poly}, Ptr{acb_poly}, Int, Int),
-            &z, &x, &y, n, prec(parent(x)))
+         (Ref{acb_poly}, Ref{acb_poly}, Ref{acb_poly}, Int, Int),
+            z, x, y, n, prec(parent(x)))
    return z
 end
 
@@ -376,7 +376,7 @@ end
 #   len < 0 && throw(DomainError())
 #   z = parent(x)()
 #   ccall((:acb_poly_reverse, :libarb), Void,
-#                (Ptr{acb_poly}, Ptr{acb_poly}, Int), &z, &x, len)
+#                (Ref{acb_poly}, Ref{acb_poly}, Int), z, x, len)
 #   return z
 #end
 
@@ -389,8 +389,8 @@ end
 function evaluate(x::acb_poly, y::acb)
    z = parent(y)()
    ccall((:acb_poly_evaluate, :libarb), Void,
-                (Ptr{acb}, Ptr{acb_poly}, Ptr{acb}, Int),
-                &z, &x, &y, prec(parent(y)))
+                (Ref{acb}, Ref{acb_poly}, Ref{acb}, Int),
+                z, x, y, prec(parent(y)))
    return z
 end
 
@@ -403,8 +403,8 @@ function evaluate2(x::acb_poly, y::acb)
    z = parent(y)()
    w = parent(y)()
    ccall((:acb_poly_evaluate2, :libarb), Void,
-                (Ptr{acb}, Ptr{acb}, Ptr{acb_poly}, Ptr{acb}, Int),
-                &z, &w, &x, &y, prec(parent(y)))
+                (Ref{acb}, Ref{acb}, Ref{acb_poly}, Ref{acb}, Int),
+                z, w, x, y, prec(parent(y)))
    return z, w
 end
 
@@ -470,8 +470,8 @@ end
 function compose(x::acb_poly, y::acb_poly)
    z = parent(x)()
    ccall((:acb_poly_compose, :libarb), Void,
-                (Ptr{acb_poly}, Ptr{acb_poly}, Ptr{acb_poly}, Int),
-                &z, &x, &y, prec(parent(x)))
+                (Ref{acb_poly}, Ref{acb_poly}, Ref{acb_poly}, Int),
+                z, x, y, prec(parent(x)))
    return z
 end
 
@@ -484,14 +484,14 @@ end
 function derivative(x::acb_poly)
    z = parent(x)()
    ccall((:acb_poly_derivative, :libarb), Void,
-                (Ptr{acb_poly}, Ptr{acb_poly}, Int), &z, &x, prec(parent(x)))
+                (Ref{acb_poly}, Ref{acb_poly}, Int), z, x, prec(parent(x)))
    return z
 end
 
 function integral(x::acb_poly)
    z = parent(x)()
    ccall((:acb_poly_integral, :libarb), Void,
-                (Ptr{acb_poly}, Ptr{acb_poly}, Int), &z, &x, prec(parent(x)))
+                (Ref{acb_poly}, Ref{acb_poly}, Int), z, x, prec(parent(x)))
    return z
 end
 
@@ -508,8 +508,8 @@ end
 function acb_vec(b::Array{acb, 1})
    v = ccall((:_acb_vec_init, :libarb), Ptr{acb_struct}, (Int,), length(b))
    for i=1:length(b)
-       ccall((:acb_set, :libarb), Void, (Ptr{acb_struct}, Ptr{acb}),
-           v + (i-1)*sizeof(acb_struct), &b[i])
+       ccall((:acb_set, :libarb), Void, (Ptr{acb_struct}, Ref{acb}),
+           v + (i-1)*sizeof(acb_struct), b[i])
    end
    return v
 end
@@ -518,8 +518,8 @@ function array(R::AcbField, v::Ptr{acb_struct}, n::Int)
    r = Array{acb}(n)
    for i=1:n
        r[i] = R()
-       ccall((:acb_set, :libarb), Void, (Ptr{acb}, Ptr{acb_struct}),
-           &r[i], v + (i-1)*sizeof(acb_struct))
+       ccall((:acb_set, :libarb), Void, (Ref{acb}, Ptr{acb_struct}),
+           r[i], v + (i-1)*sizeof(acb_struct))
    end
    return r
 end
@@ -536,7 +536,7 @@ function from_roots(R::AcbPolyRing, b::Array{acb, 1})
    z = R()
    tmp = acb_vec(b)
    ccall((:acb_poly_product_roots, :libarb), Void,
-                (Ptr{acb_poly}, Ptr{acb_struct}, Int, Int), &z, tmp, length(b), prec(R))
+                (Ref{acb_poly}, Ptr{acb_struct}, Int, Int), z, tmp, length(b), prec(R))
    acb_vec_clear(tmp, length(b))
    return z
 end
@@ -548,8 +548,8 @@ end
 function evaluate_fast(x::acb_poly, b::Array{acb, 1})
    tmp = acb_vec(b)
    ccall((:acb_poly_evaluate_vec_fast, :libarb), Void,
-                (Ptr{acb_struct}, Ptr{acb_poly}, Ptr{acb_struct}, Int, Int),
-            tmp, &x, tmp, length(b), prec(parent(x)))
+                (Ptr{acb_struct}, Ref{acb_poly}, Ptr{acb_struct}, Int, Int),
+            tmp, x, tmp, length(b), prec(parent(x)))
    res = array(base_ring(parent(x)), tmp, length(b))
    acb_vec_clear(tmp, length(b))
    return res
@@ -561,8 +561,8 @@ function interpolate_newton(R::AcbPolyRing, xs::Array{acb, 1}, ys::Array{acb, 1}
    xsv = acb_vec(xs)
    ysv = acb_vec(ys)
    ccall((:acb_poly_interpolate_newton, :libarb), Void,
-                (Ptr{acb_poly}, Ptr{acb_struct}, Ptr{acb_struct}, Int, Int),
-            &z, xsv, ysv, length(xs), prec(R))
+                (Ref{acb_poly}, Ptr{acb_struct}, Ptr{acb_struct}, Int, Int),
+            z, xsv, ysv, length(xs), prec(R))
    acb_vec_clear(xsv, length(xs))
    acb_vec_clear(ysv, length(ys))
    return z
@@ -574,8 +574,8 @@ function interpolate_barycentric(R::AcbPolyRing, xs::Array{acb, 1}, ys::Array{ac
    xsv = acb_vec(xs)
    ysv = acb_vec(ys)
    ccall((:acb_poly_interpolate_barycentric, :libarb), Void,
-                (Ptr{acb_poly}, Ptr{acb_struct}, Ptr{acb_struct}, Int, Int),
-            &z, xsv, ysv, length(xs), prec(R))
+                (Ref{acb_poly}, Ptr{acb_struct}, Ptr{acb_struct}, Int, Int),
+            z, xsv, ysv, length(xs), prec(R))
    acb_vec_clear(xsv, length(xs))
    acb_vec_clear(ysv, length(ys))
    return z
@@ -587,8 +587,8 @@ function interpolate_fast(R::AcbPolyRing, xs::Array{acb, 1}, ys::Array{acb, 1})
    xsv = acb_vec(xs)
    ysv = acb_vec(ys)
    ccall((:acb_poly_interpolate_fast, :libarb), Void,
-                (Ptr{acb_poly}, Ptr{acb_struct}, Ptr{acb_struct}, Int, Int),
-            &z, xsv, ysv, length(xs), prec(R))
+                (Ref{acb_poly}, Ptr{acb_struct}, Ptr{acb_struct}, Int, Int),
+            z, xsv, ysv, length(xs), prec(R))
    acb_vec_clear(xsv, length(xs))
    acb_vec_clear(ysv, length(ys))
    return z
@@ -642,8 +642,8 @@ function roots(x::acb_poly; target=0, isolate_real=false, initial_prec=0, max_pr
         in_roots = (wp == initial_prec) ? C_NULL : roots
         step_max_iter = (max_iter >= 1) ? max_iter : min(max(deg, 32), wp)
         isolated = ccall((:acb_poly_find_roots, :libarb), Int,
-            (Ptr{acb_struct}, Ptr{acb_poly}, Ptr{acb_struct}, Int, Int),
-                roots, &x, in_roots, step_max_iter, wp)
+            (Ptr{acb_struct}, Ref{acb_poly}, Ptr{acb_struct}, Int, Int),
+                roots, x, in_roots, step_max_iter, wp)
 
         wp = wp * 2
 
@@ -666,7 +666,7 @@ function roots(x::acb_poly; target=0, isolate_real=false, initial_prec=0, max_pr
 
             if isreal(x)
                 real_ok = ccall((:acb_poly_validate_real_roots, :libarb),
-                    Bool, (Ptr{acb_struct}, Ptr{acb_poly}, Int), roots, &x, wp)
+                    Bool, (Ptr{acb_struct}, Ref{acb_poly}, Int), roots, x, wp)
 
                 if isolate_real && !real_ok
                     ok = false
@@ -722,10 +722,10 @@ doc"""
 function roots_upper_bound(x::acb_poly)
    z = ArbField(prec(base_ring(x)))()
    p = prec(base_ring(x))
-   t = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct}, (Ptr{arb}, ), &z)
+   t = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct}, (Ref{arb}, ), z)
    ccall((:acb_poly_root_bound_fujiwara, :libarb), Void,
-         (Ptr{mag_struct}, Ptr{acb_poly}), t, &x)
-   s = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), &z)
+         (Ptr{mag_struct}, Ref{acb_poly}), t, x)
+   s = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ref{arb}, ), z)
    ccall((:arf_set_mag, :libarb), Void, (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
    ccall((:arf_set_round, :libarb), Void,
          (Ptr{arf_struct}, Ptr{arf_struct}, Int, Cint), s, s, p, ARB_RND_CEIL)
@@ -740,46 +740,46 @@ end
 ###############################################################################
 
 function zero!(z::acb_poly)
-   ccall((:acb_poly_zero, :libarb), Void, (Ptr{acb_poly},), &z)
+   ccall((:acb_poly_zero, :libarb), Void, (Ref{acb_poly},), z)
    return z
 end
 
 function fit!(z::acb_poly, n::Int)
    ccall((:acb_poly_fit_length, :libarb), Void,
-                    (Ptr{acb_poly}, Int), &z, n)
+                    (Ref{acb_poly}, Int), z, n)
    return nothing
 end
 
 function setcoeff!(z::acb_poly, n::Int, x::fmpz)
    ccall((:acb_poly_set_coeff_fmpz, :libarb), Void,
-                    (Ptr{acb_poly}, Int, Ptr{fmpz}), &z, n, &x)
+                    (Ref{acb_poly}, Int, Ref{fmpz}), z, n, x)
    return z
 end
 
 function setcoeff!(z::acb_poly, n::Int, x::acb)
    ccall((:acb_poly_set_coeff_acb, :libarb), Void,
-                    (Ptr{acb_poly}, Int, Ptr{acb}), &z, n, &x)
+                    (Ref{acb_poly}, Int, Ref{acb}), z, n, x)
    return z
 end
 
 function mul!(z::acb_poly, x::acb_poly, y::acb_poly)
    ccall((:acb_poly_mul, :libarb), Void,
-                (Ptr{acb_poly}, Ptr{acb_poly}, Ptr{acb_poly}, Int),
-                    &z, &x, &y, prec(parent(z)))
+                (Ref{acb_poly}, Ref{acb_poly}, Ref{acb_poly}, Int),
+                    z, x, y, prec(parent(z)))
    return z
 end
 
 function addeq!(z::acb_poly, x::acb_poly)
    ccall((:acb_poly_add, :libarb), Void,
-                (Ptr{acb_poly}, Ptr{acb_poly}, Ptr{acb_poly}, Int),
-                    &z, &z, &x, prec(parent(z)))
+                (Ref{acb_poly}, Ref{acb_poly}, Ref{acb_poly}, Int),
+                    z, z, x, prec(parent(z)))
    return z
 end
 
 function add!(z::acb_poly, x::acb_poly, y::acb_poly)
    ccall((:acb_poly_add, :libarb), Void,
-                (Ptr{acb_poly}, Ptr{acb_poly}, Ptr{acb_poly}, Int),
-                    &z, &x, &y, prec(parent(z)))
+                (Ref{acb_poly}, Ref{acb_poly}, Ref{acb_poly}, Int),
+                    z, x, y, prec(parent(z)))
    return z
 end
 

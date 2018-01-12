@@ -685,7 +685,7 @@ function ^(a::Nemo.RelSeriesElem{T}, b::Int) where {T <: RingElement}
       fit!(z, 1)
       set_prec!(z, b + precision(a) - 1)
       set_val!(z, b)
-      z = setcoeff!(z, 0, polcoeff(a, 0))
+      z = setcoeff!(z, 0, deepcopy(polcoeff(a, 0)))
       set_length!(z, 1)
       return z
    elseif pol_length(a) == 1
@@ -932,6 +932,60 @@ end
 
 ###############################################################################
 #
+#   Square root
+#
+###############################################################################
+
+doc"""
+   sqrt(a::Nemo.RelSeriesElem)
+> Return the square root of the power series $a$.
+"""
+function Base.sqrt(a::Nemo.RelSeriesElem)
+   aval = valuation(a)
+   !iseven(aval) && error("Not a square in sqrt")
+   R = base_ring(a)
+   !isdomain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
+   aval2 = div(aval, 2)
+   prec = precision(a) - aval
+   if prec == 0
+      asqrt = parent(a)()
+      set_prec!(asqrt, aval2)
+      set_val!(asqrt, aval2)
+      return asqrt
+   end
+   asqrt = parent(a)()
+   fit!(asqrt, prec)
+   set_prec!(asqrt, prec + aval2)
+   set_val!(asqrt, aval2)
+   if prec > 0
+      g = Nemo.sqrt(polcoeff(a, 0))
+      asqrt = setcoeff!(asqrt, 0, g)
+      g2 = g + g
+   end
+   p = R()
+   for n = 1:prec - 1
+      c = R()
+      for i = 1:div(n - 1, 2)
+         j = n - i
+         p = mul!(p, polcoeff(asqrt, i), polcoeff(asqrt, j))
+         c = addeq!(c, p)
+      end
+      c *= 2
+      if (n % 2) == 0
+         i = div(n, 2)
+         p = mul!(p, polcoeff(asqrt, i), polcoeff(asqrt, i))
+         c = addeq!(c, p)
+      end
+      c = polcoeff(a, n) - c
+      c = divexact(c, g2)
+      asqrt = setcoeff!(asqrt, n, c)
+   end
+   set_length!(asqrt, normalise(asqrt, prec))
+   return asqrt
+end
+
+###############################################################################
+#
 #   Special functions
 #
 ###############################################################################
@@ -1067,13 +1121,13 @@ function addeq!(c::RelSeries{T}, a::RelSeries{T}) where {T <: RingElement}
          c.coeffs[i] = add!(c.coeffs[i], c.coeffs[i - valc + vala], a.coeffs[i])
       end
       for i = 1:min(lena, valc - vala)
-         c.coeffs[i] = a.coeffs[i]
+         c.coeffs[i] = deepcopy(a.coeffs[i])
       end
       for i = lena + 1:min(valc - vala, lenr)
          c.coeffs[i] = R()
       end
       for i = lenc + valc - vala + 1:lena
-         c.coeffs[i] = a.coeffs[i]
+         c.coeffs[i] = deepcopy(a.coeffs[i])
       end
    else
       for i = lenc + 1:min(vala - valc, lenr)
@@ -1083,7 +1137,7 @@ function addeq!(c::RelSeries{T}, a::RelSeries{T}) where {T <: RingElement}
          c.coeffs[i] = addeq!(c.coeffs[i], a.coeffs[i - vala + valc])
       end
       for i = max(lenc, vala - valc) + 1:lena + vala - valc
-         c.coeffs[i] = a.coeffs[i - vala + valc]
+         c.coeffs[i] = deepcopy(a.coeffs[i - vala + valc])
       end
    end
    c.length = normalise(c, lenr)
@@ -1116,7 +1170,7 @@ function add!(c::RelSeries{T}, a::RelSeries{T}, b::RelSeries{T}) where {T <: Rin
    c.val = valr
    if vala > valb
       for i = 1:min(lenb, vala - valb)
-         c.coeffs[i] = b.coeffs[i]
+         c.coeffs[i] = deepcopy(b.coeffs[i])
       end
       for i = lenb + 1:vala - valb
          c.coeffs[i] = R()
@@ -1125,14 +1179,14 @@ function add!(c::RelSeries{T}, a::RelSeries{T}, b::RelSeries{T}) where {T <: Rin
          c.coeffs[i] = add!(c.coeffs[i], a.coeffs[i - vala + valb], b.coeffs[i])
       end
       for i = max(lenb, vala - valb) + 1:lena + vala - valb
-         c.coeffs[i] = a.coeffs[i - vala + valb]
+         c.coeffs[i] = deepcopy(a.coeffs[i - vala + valb])
       end
       for i = lena + vala - valb + 1:lenb
-         c.coeffs[i] = b.coeffs[i]
+         c.coeffs[i] = deepcopy(b.coeffs[i])
       end
    else
       for i = 1:min(lena, valb - vala)
-         c.coeffs[i] = a.coeffs[i]
+         c.coeffs[i] = deepcopy(a.coeffs[i])
       end
       for i = lena + 1:valb - vala
          c.coeffs[i] = R()
@@ -1141,10 +1195,10 @@ function add!(c::RelSeries{T}, a::RelSeries{T}, b::RelSeries{T}) where {T <: Rin
          c.coeffs[i] = add!(c.coeffs[i], a.coeffs[i], b.coeffs[i - valb + vala])
       end
       for i = max(lena, valb - vala) + 1:lenb + valb - vala
-         c.coeffs[i] = b.coeffs[i - valb + vala]
+         c.coeffs[i] = deepcopy(b.coeffs[i - valb + vala])
       end
       for i = lenb + valb - vala + 1:lena
-         c.coeffs[i] = a.coeffs[i]
+         c.coeffs[i] = deepcopy(a.coeffs[i])
       end
    end
    set_length!(c, normalise(c, lenr))
@@ -1258,6 +1312,8 @@ function PowerSeriesRing(R::Nemo.Ring, prec::Int, s::AbstractString; cached=true
       parent_obj = RelSeriesRing{T}(R, prec, S, cached)
    elseif model == :capped_absolute
       parent_obj = AbsSeriesRing{T}(R, prec, S, cached)
+   else
+      error("Unknown model")
    end
 
    return parent_obj, gen(parent_obj)

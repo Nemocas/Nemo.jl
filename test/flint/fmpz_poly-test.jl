@@ -441,6 +441,19 @@ function test_fmpz_poly_factor()
   println("PASS")
 end
 
+function test_fmpz_poly_square_root()
+  print("fmpz_poly.square_root...")
+
+  R, x = PolynomialRing(ZZ, "x")
+
+  f = rand(R, 0:10, -10:10)
+  g = f^2
+
+  @test sqrt(g)^2 == g
+
+  println("PASS")
+end
+
 function test_fmpz_poly_special()
    print("fmpz_poly.special...")
 
@@ -505,6 +518,7 @@ function test_fmpz_poly()
    test_fmpz_poly_signature()
    test_fmpz_poly_interpolate()
    test_fmpz_poly_factor()
+   test_fmpz_poly_square_root()
    test_fmpz_poly_special()
    #test_fmpz_poly_Polynomials()
 

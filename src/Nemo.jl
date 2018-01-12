@@ -2,26 +2,19 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module Nemo
 
-import Base: Array, abs, asin, asinh, atan, atanh, base, bin, checkbounds,
-             conj, convert, cmp, contains, cos, cosh, dec, deepcopy,
-             deepcopy_internal, deserialize, det, div, divrem, eye,
-             gcd, gcdx, getindex, hash, hcat, hex, intersect, inv, invmod,
-             isequal, isfinite, isless, isqrt, isreal, iszero, lcm,
-             ldexp, length, log, lufact, lufact!, mod, ndigits, nextpow2, norm,
-             nullspace, numerator, oct, one, parent, parse, precision, prevpow2,
-             rand, rank, Rational, rem, reverse, serialize, setindex!, show,
-             similar, sign, sin, sinh, size, sqrt, string, tan, tanh, trace,
-             trailing_zeros, transpose, transpose!, truncate, typed_hvcat,
-             typed_hcat, var, vcat, zero, zeros, +, -, *, ==, ^, &, |, $, <<,
-             >>, ~, <=, >=, <, >, //, /, !=
-
-if VERSION >= v"0.7.0-DEV.1144"
-import Base: isone
-end
-
-import Base: floor, ceil, hypot, sqrt, log, log1p, expm1, sin, cos, sinpi,
-             cospi, tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh,
-             asinh, acosh, gamma, lgamma, sinpi, cospi, atan2
+import Base: Array, abs, acos, acosh, asin, asinh, atan, atan2, atanh, base,
+             bin, ceil, checkbounds, conj, convert, cmp, contains, cos, cosh,
+             cospi, cot, coth, dec, deepcopy, deepcopy_internal, deserialize,
+             det, div, divrem, expm1, eye, floor, gamma, gcd, gcdx, getindex,
+             hash, hcat, hex, hypot, intersect, inv, invmod, isequal,
+             isfinite, isless, isqrt, isreal, iszero, lcm, ldexp, length,
+             lgamma, log, log1p, lufact, lufact!, mod, ndigits, nextpow2, norm,
+             nullspace, numerator, oct, one, parent, parse, precision,
+             prevpow2, rand, rank, Rational, rem, reverse, serialize,
+             setindex!, show, similar, sign, sin, sinh, sinpi, size, string,
+             tan, tanh, trace, trailing_zeros, transpose, transpose!, truncate,
+             typed_hvcat, typed_hcat, var, vcat, zero, zeros, +, -, *, ==, ^,
+             &, |, $, <<, >>, ~, <=, >=, <, >, //, /, !=
 
 export elem_type, parent_type
 
@@ -121,7 +114,7 @@ function __init__()
       (Ptr{Void},), cfunction(flint_abort, Void, ()))
 
    println("")
-   println("Welcome to Nemo version 0.7.0")
+   println("Welcome to Nemo version 0.7.4")
    println("")
    println("Nemo comes with absolutely no warranty whatsoever")
    println("")
@@ -142,7 +135,7 @@ end
 ################################################################################
 
 function versioninfo()
-  print("Nemo version 0.7.0 \n")
+  print("Nemo version 0.7.4 \n")
   nemorepo = dirname(dirname(@__FILE__))
 
   print("Nemo: ")
@@ -221,17 +214,17 @@ import .Generic: add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  needs_parentheses, newton_to_monomial!, normalise, nvars, numerator,
                  O, one, order, ordering, parent_type, parity, partitionseq,
                  polcoeff, pol_length, powmod, pow_multinomial, popov, powers,
-                 precision, primpart, pseudodivrem, pseudorem, rand_ordering,
-                 rank_profile_popov, remove, renormalize!, resultant,
-                 resultant_ducos, resultant_euclidean, resultant_subresultant,
-                 resultant_sylvester, resx, reverse, rows, rref, rref!,
-                 setcoeff!, set_length!, setpermstyle, set_prec!, set_val!,
-                 shift_left, shift_right, show_minus_one, similarity!, snf,
-                 snf_kb, snf_kb_with_trafo, snf_with_trafo, solve,
-                 solve_rational, solve_triu, subst, swap_rows, swap_rows!,
-                 trail, truncate, typed_hcat, typed_hvcat, valuation, var,
-                 vars, weak_popov, weak_popov_with_trafo, zero, zero!,
-                 zero_matrix
+                 precision, primpart, pseudodivrem, pseudorem, randmat_triu,
+                 randmat_with_rank, rand_ordering, rank_profile_popov, remove,
+                 renormalize!, resultant, resultant_ducos, resultant_euclidean,
+                 resultant_subresultant, resultant_sylvester, resx, reverse,
+                 rows, rref, rref!, setcoeff!, set_length!, setpermstyle,
+                 set_prec!, set_val!, shift_left, shift_right, show_minus_one,
+                 similarity!, snf, snf_kb, snf_kb_with_trafo, snf_with_trafo,
+                 solve, solve_rational, solve_triu, sub, subst, swap_rows,
+                 swap_rows!, trail, truncate, typed_hcat, typed_hvcat,
+                 valuation, var, vars, weak_popov, weak_popov_with_trafo, zero,
+                 zero!, zero_matrix
 
 export add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  characteristic, charpoly, charpoly_danilevsky!,
@@ -255,23 +248,28 @@ export add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  matrix, matrix_repr, max_degrees, max_precision, minpoly, mod,
                  modulus, monomial_iszero, monomial_set!, monomial_to_newton!,
                  mul!, mul_classical, mul_karatsuba, mul_ks, mullow, mulmod,
-                 needs_parentheses, newton_to_monomial!, normalise, nvars, numerator,
-                 O, one, order, ordering, parent_type, parity, partitionseq,
-                 polcoeff, pol_length, powmod, pow_multinomial, popov, powers,
-                 ppio, precision, primpart, pseudodivrem, pseudorem,
-                 rand_ordering, rank_profile_popov, remove, renormalize!,
-                 resultant, resultant_ducos, resultant_euclidean,
-                 resultant_subresultant, resultant_sylvester, resx, reverse,
-                 rows, rref, rref!, setcoeff!, set_length!, setpermstyle,
-                 set_prec!, set_val!, shift_left, shift_right, show_minus_one,
-                 similarity!, snf, snf_kb, snf_kb_with_trafo, snf_with_trafo,
-                 solve, solve_rational, solve_triu, subst, swap_rows,
-                 swap_rows!, trail, truncate, typed_hcat, typed_hvcat,
-                 valuation, var, vars, weak_popov, weak_popov_with_trafo, zero,
-                 zero!, zero_matrix
+                 needs_parentheses, newton_to_monomial!, normalise, nvars,
+                 numerator, O, one, order, ordering, parent_type, parity,
+                 partitionseq, polcoeff, pol_length, powmod, pow_multinomial,
+                 popov, powers, ppio, precision, primpart, pseudodivrem,
+                 pseudorem, randmat_triu, randmat_with_rank, rand_ordering,
+                 rank_profile_popov, remove, renormalize!, resultant,
+                 resultant_ducos, resultant_euclidean, resultant_subresultant,
+                 resultant_sylvester, resx, reverse, rows, rref, rref!,
+                 setcoeff!, set_length!, setpermstyle, set_prec!, set_val!,
+                 shift_left, shift_right, show_minus_one, similarity!, snf,
+                 snf_kb, snf_kb_with_trafo, snf_with_trafo, solve,
+                 solve_rational, solve_triu, sub, subst, swap_rows, swap_rows!,
+                 trail, truncate, typed_hcat, typed_hvcat, valuation, var,
+                 vars, weak_popov, weak_popov_with_trafo, zero, zero!,
+                 zero_matrix
 
 function exp(a::T) where T
    return Base.exp(a)
+end
+
+function sqrt(a::T) where T
+  return Base.sqrt(a)
 end
 
 function PermGroup(n::T, cached=true) where T
@@ -358,10 +356,18 @@ function ResidueRing(R::Ring, a::Union{RingElement, Integer}; cached::Bool = tru
    Generic.ResidueRing(R, a; cached=cached)
 end
 
+function ResidueField(R::Ring, a::Union{RingElement, Integer}; cached::Bool = true)
+   Generic.ResidueField(R, a; cached=cached)
+end
+
+function NumberField(a::Nemo.Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
+   Generic.NumberField(a, s, t; cached=cached)
+end
+
 export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        FractionField, ResidueRing, Partition, PermGroup, YoungTableau,
        AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
-       LaurentSeriesField
+       LaurentSeriesField, ResidueField
 
 export Generic
 
@@ -541,16 +547,6 @@ FiniteField = FlintFiniteField
 
 RealField = ArbField
 ComplexField = AcbField
-
-###############################################################################
-#
-#   Set domain for NumberField to Antic
-#
-###############################################################################
-
-NumberField = AnticNumberField
-CyclotomicField = AnticCyclotomicField
-MaximalRealSubfield = AnticMaximalRealSubfield
 
 ###############################################################################
 #

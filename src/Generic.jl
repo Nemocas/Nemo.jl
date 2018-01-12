@@ -8,7 +8,7 @@ import Base: Array, abs, asin, asinh, atan, atanh, base, bin, checkbounds,
              ldexp, length, log, lufact, lufact!, mod, ndigits, nextpow2, norm,
              nullspace, numerator, oct, one, parent, parse, precision,
              prevpow2, rand, rank, Rational, rem, reverse, serialize,
-             setindex!, show, similar, sign, sin, sinh, size, sqrt, string,
+             setindex!, show, similar, sign, sin, sinh, size, string,
              tan, tanh, trace, trailing_zeros, transpose, transpose!, truncate,
              typed_hvcat, typed_hcat, var, vcat, zero, zeros, +, -, *, ==, ^,
              &, |, $, <<, >>, ~, <=, >=, <, >, //, /, !=
@@ -17,7 +17,7 @@ if VERSION >= v"0.7.0-DEV.1144"
 import Base: isone
 end
 
-import Base: floor, ceil, hypot, sqrt, log, log1p, exp, expm1, sin, cos, sinpi,
+import Base: floor, ceil, hypot, log, log1p, exp, expm1, sin, cos, sinpi,
              cospi, tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh,
              asinh, acosh, gamma, lgamma, sinpi, cospi, atan2
 
@@ -33,6 +33,8 @@ include("generic/PermGroups.jl")
 include("generic/YoungTabs.jl")
 
 include("generic/Residue.jl")
+
+include("generic/ResidueField.jl")
 
 include("generic/Poly.jl")
 

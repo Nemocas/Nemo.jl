@@ -19,7 +19,7 @@ fmpq(a::Rational{BigInt}) = fmpq(fmpz(a.num), fmpz(a.den))
 
 function fmpq(a::Rational{Int})
   r = fmpq()
-  ccall((:fmpq_set_si, :libflint), Void, (Ptr{fmpq}, Int64, UInt64), &r, numerator(a), denominator(a))
+  ccall((:fmpq_set_si, :libflint), Void, (Ref{fmpq}, Int64, UInt64), r, numerator(a), denominator(a))
   return r
 end
 
@@ -79,13 +79,13 @@ end
 
 function numerator(a::fmpq)
    z = fmpz()
-   ccall((:fmpq_numerator, :libflint), Void, (Ptr{fmpz}, Ptr{fmpq}), &z, &a)
+   ccall((:fmpq_numerator, :libflint), Void, (Ref{fmpz}, Ref{fmpq}), z, a)
    return z
 end
 
 function denominator(a::fmpq)
    z = fmpz()
-   ccall((:fmpq_denominator, :libflint), Void, (Ptr{fmpz}, Ptr{fmpq}), &z, &a)
+   ccall((:fmpq_denominator, :libflint), Void, (Ref{fmpz}, Ref{fmpq}), z, a)
    return z
 end
 
@@ -95,7 +95,7 @@ doc"""
 """
 function abs(a::fmpq)
    z = fmpq()
-   ccall((:fmpq_abs, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &z, &a)
+   ccall((:fmpq_abs, :libflint), Void, (Ref{fmpq}, Ref{fmpq}), z, a)
    return z
 end
 
@@ -104,11 +104,11 @@ zero(a::FlintRationalField) = fmpq(0)
 one(a::FlintRationalField) = fmpq(1)
 
 function isone(a::fmpq)
-   return Bool(ccall((:fmpq_is_one, :libflint), Cint, (Ptr{fmpq}, ), &a))
+   return Bool(ccall((:fmpq_is_one, :libflint), Cint, (Ref{fmpq}, ), a))
 end
 
 function iszero(a::fmpq)
-   return Bool(ccall((:fmpq_is_zero, :libflint), Cint, (Ptr{fmpq}, ), &a))
+   return Bool(ccall((:fmpq_is_zero, :libflint), Cint, (Ref{fmpq}, ), a))
 end
 
 isunit(a::fmpq) = !iszero(a)
@@ -120,7 +120,7 @@ doc"""
 """
 function height(a::fmpq)
    temp = fmpz()
-   ccall((:fmpq_height, :libflint), Void, (Ptr{fmpz}, Ptr{fmpq}), &temp, &a)
+   ccall((:fmpq_height, :libflint), Void, (Ref{fmpz}, Ref{fmpq}), temp, a)
    return temp
 end
 
@@ -129,12 +129,12 @@ doc"""
 > Return the number of bits of the height of the fraction $a$.
 """
 function height_bits(a::fmpq)
-   return ccall((:fmpq_height_bits, :libflint), Int, (Ptr{fmpq},), &a)
+   return ccall((:fmpq_height_bits, :libflint), Int, (Ref{fmpq},), a)
 end
 
 function deepcopy_internal(a::fmpq, dict::ObjectIdDict)
    z = fmpq()
-   ccall((:fmpq_set, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &z, &a)
+   ccall((:fmpq_set, :libflint), Void, (Ref{fmpq}, Ref{fmpq}), z, a)
    return z
 end
 
@@ -177,7 +177,7 @@ show_minus_one(::Type{fmpq}) = false
 
 function -(a::fmpq)
    z = fmpq()
-   ccall((:fmpq_neg, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &z, &a)
+   ccall((:fmpq_neg, :libflint), Void, (Ref{fmpq}, Ref{fmpq}), z, a)
    return z
 end
 
@@ -190,21 +190,21 @@ end
 function +(a::fmpq, b::fmpq)
    z = fmpq()
    ccall((:fmpq_add, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &z, &a, &b)
+         (Ref{fmpq}, Ref{fmpq}, Ref{fmpq}), z, a, b)
    return z
 end
 
 function -(a::fmpq, b::fmpq)
    z = fmpq()
    ccall((:fmpq_sub, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &z, &a, &b)
+         (Ref{fmpq}, Ref{fmpq}, Ref{fmpq}), z, a, b)
    return z
 end
 
 function *(a::fmpq, b::fmpq)
    z = fmpq()
    ccall((:fmpq_mul, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &z, &a, &b)
+         (Ref{fmpq}, Ref{fmpq}, Ref{fmpq}), z, a, b)
    return z
 end
 
@@ -217,14 +217,14 @@ end
 function +(a::fmpq, b::Int)
    z = fmpq()
    ccall((:fmpq_add_si, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpq}, Int), &z, &a, b)
+         (Ref{fmpq}, Ref{fmpq}, Int), z, a, b)
    return z
 end
 
 function +(a::fmpq, b::fmpz)
    z = fmpq()
    ccall((:fmpq_add_fmpz, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpz}), &z, &a, &b)
+         (Ref{fmpq}, Ref{fmpq}, Ref{fmpz}), z, a, b)
    return z
 end
 
@@ -239,14 +239,14 @@ end
 function -(a::fmpq, b::Int)
    z = fmpq()
    ccall((:fmpq_sub_si, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpq}, Int), &z, &a, b)
+         (Ref{fmpq}, Ref{fmpq}, Int), z, a, b)
    return z
 end
 
 function -(a::fmpq, b::fmpz)
    z = fmpq()
    ccall((:fmpq_sub_fmpz, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpz}), &z, &a, &b)
+         (Ref{fmpq}, Ref{fmpq}, Ref{fmpz}), z, a, b)
    return z
 end
 
@@ -257,7 +257,7 @@ end
 function *(a::fmpq, b::fmpz)
    z = fmpq()
    ccall((:fmpq_mul_fmpz, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpz}), &z, &a, &b)
+         (Ref{fmpq}, Ref{fmpq}, Ref{fmpz}), z, a, b)
    return z
 end
 
@@ -284,7 +284,7 @@ end
 
 function ==(a::fmpq, b::fmpq)
    return ccall((:fmpq_equal, :libflint), Bool,
-                (Ptr{fmpq}, Ptr{fmpq}), &a, &b)
+                (Ref{fmpq}, Ref{fmpq}), a, b)
 end
 
 doc"""
@@ -293,7 +293,7 @@ doc"""
 """
 function isless(a::fmpq, b::fmpq)
    return ccall((:fmpq_cmp, :libflint), Cint,
-                (Ptr{fmpq}, Ptr{fmpq}), &a, &b) < 0
+                (Ref{fmpq}, Ref{fmpq}), a, b) < 0
 end
 
 ###############################################################################
@@ -303,14 +303,14 @@ end
 ###############################################################################
 
 function ==(a::fmpq, b::Int)
-   return ccall((:fmpq_equal_si, :libflint), Bool, (Ptr{fmpq}, Int), &a, b)
+   return ccall((:fmpq_equal_si, :libflint), Bool, (Ref{fmpq}, Int), a, b)
 end
 
 ==(a::Int, b::fmpq) = b == a
 
 function ==(a::fmpq, b::fmpz)
    return ccall((:fmpq_equal_fmpz, :libflint), Bool,
-                (Ptr{fmpq}, Ptr{fmpz}), &a, &b)
+                (Ref{fmpq}, Ref{fmpz}), a, b)
 end
 
 ==(a::fmpz, b::fmpq) = b == a
@@ -326,7 +326,7 @@ doc"""
 function isless(a::fmpq, b::Integer)
    z = fmpq(b)
    return ccall((:fmpq_cmp, :libflint), Cint,
-                (Ptr{fmpq}, Ptr{fmpq}), &a, &z) < 0
+                (Ref{fmpq}, Ref{fmpq}), a, z) < 0
 end
 
 doc"""
@@ -336,7 +336,7 @@ doc"""
 function isless(a::Integer, b::fmpq)
    z = fmpq(a)
    return ccall((:fmpq_cmp, :libflint), Cint,
-                (Ptr{fmpq}, Ptr{fmpq}), &z, &b) < 0
+                (Ref{fmpq}, Ref{fmpq}), z, b) < 0
 end
 
 doc"""
@@ -346,7 +346,7 @@ doc"""
 function isless(a::fmpq, b::fmpz)
    z = fmpq(b)
    return ccall((:fmpq_cmp, :libflint), Cint,
-                (Ptr{fmpq}, Ptr{fmpq}), &a, &z) < 0
+                (Ref{fmpq}, Ref{fmpq}), a, z) < 0
 end
 
 doc"""
@@ -356,7 +356,7 @@ doc"""
 function isless(a::fmpz, b::fmpq)
    z = fmpq(a)
    return ccall((:fmpq_cmp, :libflint), Cint,
-                (Ptr{fmpq}, Ptr{fmpq}), &z, &b) < 0
+                (Ref{fmpq}, Ref{fmpq}), z, b) < 0
 end
 
 isless(a::Rational{T}, b::fmpq) where {T <: Integer} = isless(fmpq(a), b)
@@ -372,7 +372,7 @@ isless(a::fmpq, b::Rational{T}) where {T <: Integer} = isless(a, fmpq(b))
 function ^(a::fmpq, b::Int)
    temp = fmpq()
    ccall((:fmpq_pow_si, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpq}, Int), &temp, &a, b)
+         (Ref{fmpq}, Ref{fmpq}, Int), temp, a, b)
    return temp
 end
 
@@ -389,7 +389,7 @@ doc"""
 function >>(a::fmpq, b::Int)
    z = fmpq()
    ccall((:fmpq_div_2exp, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpq}, Int), &z, &a, b)
+         (Ref{fmpq}, Ref{fmpq}, Int), z, a, b)
    return z
 end
 
@@ -400,7 +400,7 @@ doc"""
 function <<(a::fmpq, b::Int)
    z = fmpq()
    ccall((:fmpq_mul_2exp, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpq}, Int), &z, &a, b)
+         (Ref{fmpq}, Ref{fmpq}, Int), z, a, b)
    return z
 end
 
@@ -410,13 +410,25 @@ end
 #
 ###############################################################################
 
-function inv(a::fmpq)
-   z = fmpq()
-   ccall((:fmpq_inv, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &z, &a)
-   return z
-end
-
+function Base.sqrt(a::fmpq)
+    snum = sqrt(numerator(a))
+    sden = sqrt(denominator(a))
+    return fmpq(snum, sden)
+ end
+ 
+ ###############################################################################
+#
+#   Inversion
+#
 ###############################################################################
+
+function inv(a::fmpq)
+    z = fmpq()
+    ccall((:fmpq_inv, :libflint), Void, (Ref{fmpq}, Ref{fmpq}), z, a)
+    return z
+ end
+ 
+ ###############################################################################
 #
 #   Exact division
 #
@@ -425,7 +437,7 @@ end
 function divexact(a::fmpq, b::fmpq)
    z = fmpq()
    ccall((:fmpq_div, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &z, &a, &b)
+         (Ref{fmpq}, Ref{fmpq}, Ref{fmpq}), z, a, b)
    return z
 end
 
@@ -445,7 +457,7 @@ end
 function divexact(a::fmpq, b::fmpz)
    z = fmpq()
    ccall((:fmpq_div_fmpz, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpz}), &z, &a, &b)
+         (Ref{fmpq}, Ref{fmpq}, Ref{fmpz}), z, a, b)
    return z
 end
 
@@ -473,7 +485,7 @@ doc"""
 function mod(a::fmpq, b::fmpz)
    z = fmpz()
    ccall((:fmpq_mod_fmpz, :libflint), Void,
-         (Ptr{fmpz}, Ptr{fmpq}, Ptr{fmpz}), &z, &a, &b)
+         (Ref{fmpz}, Ref{fmpq}, Ref{fmpz}), z, a, b)
    return z
 end
 
@@ -493,7 +505,7 @@ mod(a::fmpq, b::Integer) = mod(a, fmpz(b))
 function gcd(a::fmpq, b::fmpq)
    z = fmpq()
    ccall((:fmpq_gcd, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &z, &a, &b)
+         (Ref{fmpq}, Ref{fmpq}, Ref{fmpq}), z, a, b)
    return z
 end
 
@@ -523,7 +535,7 @@ doc"""
 function reconstruct(a::fmpz, b::fmpz)
    c = fmpq()
    if !Bool(ccall((:fmpq_reconstruct_fmpz, :libflint), Cint,
-                  (Ptr{fmpq}, Ptr{fmpz}, Ptr{fmpz}), &c, &a, &b))
+                  (Ref{fmpq}, Ref{fmpz}, Ref{fmpz}), c, a, b))
       error("Impossible rational reconstruction")
    end
    return c
@@ -577,7 +589,7 @@ doc"""
 function next_minimal(a::fmpq)
    a < 0 && throw(DomainError())
    c = fmpq()
-   ccall((:fmpq_next_minimal, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &c, &a)
+   ccall((:fmpq_next_minimal, :libflint), Void, (Ref{fmpq}, Ref{fmpq}), c, a)
    return c
 end
 
@@ -593,7 +605,7 @@ doc"""
 function next_signed_minimal(a::fmpq)
    c = fmpq()
    ccall((:fmpq_next_signed_minimal, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpq}), &c, &a)
+         (Ref{fmpq}, Ref{fmpq}), c, a)
    return c
 end
 
@@ -612,7 +624,7 @@ function next_calkin_wilf(a::fmpq)
    a < 0 && throw(DomainError())
    c = fmpq()
    ccall((:fmpq_next_calkin_wilf, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpq}), &c, &a)
+         (Ref{fmpq}, Ref{fmpq}), c, a)
    return c
 end
 
@@ -627,7 +639,7 @@ doc"""
 function next_signed_calkin_wilf(a::fmpq)
    c = fmpq()
    ccall((:fmpq_next_signed_calkin_wilf, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpq}), &c, &a)
+         (Ref{fmpq}, Ref{fmpq}), c, a)
    return c
 end
 
@@ -646,7 +658,7 @@ doc"""
 function harmonic(n::Int)
    n < 0 && throw(DomainError())
    c = fmpq()
-   ccall((:fmpq_harmonic_ui, :libflint), Void, (Ptr{fmpq}, Int), &c, n)
+   ccall((:fmpq_harmonic_ui, :libflint), Void, (Ref{fmpq}, Int), c, n)
    return c
 end
 
@@ -657,7 +669,7 @@ doc"""
 function bernoulli(n::Int)
    n < 0 && throw(DomainError())
    c = fmpq()
-   ccall((:bernoulli_fmpq_ui, :libarb), Void, (Ptr{fmpq}, Int), &c, n)
+   ccall((:bernoulli_fmpq_ui, :libarb), Void, (Ref{fmpq}, Int), c, n)
    return c
 end
 
@@ -680,7 +692,7 @@ doc"""
 function dedekind_sum(h::fmpz, k::fmpz)
    c = fmpq()
    ccall((:fmpq_dedekind_sum, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpz}, Ptr{fmpz}), &c, &h, &k)
+         (Ref{fmpq}, Ref{fmpz}, Ref{fmpz}), c, h, k)
    return c
 end
 
@@ -710,25 +722,25 @@ dedekind_sum(h::Integer, k::Integer) = dedekind_sum(fmpz(h), fmpz(k))
 
 function zero!(c::fmpq)
    ccall((:fmpq_zero, :libflint), Void,
-         (Ptr{fmpq},), &c)
+         (Ref{fmpq},), c)
    return c
 end
 
 function mul!(c::fmpq, a::fmpq, b::fmpq)
    ccall((:fmpq_mul, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &c, &a, &b)
+         (Ref{fmpq}, Ref{fmpq}, Ref{fmpq}), c, a, b)
    return c
 end
 
 function addeq!(c::fmpq, a::fmpq)
    ccall((:fmpq_add, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &c, &c, &a)
+         (Ref{fmpq}, Ref{fmpq}, Ref{fmpq}), c, c, a)
    return c
 end
 
 function add!(c::fmpq, a::fmpq, b::fmpq)
    ccall((:fmpq_add, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &c, &a, &b)
+         (Ref{fmpq}, Ref{fmpq}, Ref{fmpq}), c, a, b)
    return c
 end
 
@@ -741,7 +753,7 @@ end
 function Rational(z::fmpq)
    r = Rational{BigInt}(0)
    ccall((:fmpq_get_mpz_frac, :libflint), Void,
-         (Ptr{BigInt}, Ptr{BigInt}, Ptr{fmpq}), &r.num, &r.den, &z)
+         (Ref{BigInt}, Ref{BigInt}, Ref{fmpq}), r.num, r.den, z)
    return r
 end
 

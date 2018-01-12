@@ -309,6 +309,42 @@ end
 
 ###############################################################################
 #
+#   ResField / ResFieldElem
+#
+###############################################################################
+
+mutable struct ResField{T <: RingElement} <: Nemo.ResField{T}
+   base_ring::Ring
+   modulus::T
+
+   function ResField{T}(modulus::T, cached::Bool = true) where T <: RingElement
+      c = canonical_unit(modulus)
+      if !isone(c)
+        modulus = divexact(modulus, c)
+      end
+      if haskey(ModulusFieldDict, (parent(modulus), modulus))
+         return ModulusFieldDict[parent(modulus), modulus]::ResField{T}
+      else
+         z = new{T}(parent(modulus), modulus)
+         if cached
+            ModulusFieldDict[parent(modulus), modulus] = z
+         end
+         return z
+      end
+   end
+end
+
+const ModulusFieldDict = Dict{Tuple{Ring, RingElement}, Field}()
+
+mutable struct ResF{T <: RingElement} <: Nemo.ResFieldElem{T}
+   data::T
+   parent::ResField{T}
+
+   ResF{T}(a::T) where T <: RingElement = new{T}(a)
+end
+
+###############################################################################
+#
 #   RelSeriesRing / RelSeries
 #
 ###############################################################################

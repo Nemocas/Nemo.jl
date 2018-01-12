@@ -164,3 +164,7 @@ arb/acb(_poly/mat)
 
 * document flags for roots() in acb_poly
 
+Matrix.jl
+---------
+
+* Add rref_with_transform

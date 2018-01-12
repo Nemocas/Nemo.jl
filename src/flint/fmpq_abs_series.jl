@@ -5,7 +5,7 @@
 ###############################################################################
 
 export fmpq_abs_series, FmpqAbsSeriesRing, tan, tanh, sin, sinh, asin, asinh,
-       atan, atanh, sqrt, log
+       atan, atanh, log
 
 ###############################################################################
 #
@@ -42,13 +42,13 @@ function normalise(a::fmpq_abs_series, len::Int)
    if len > 0
       c = fmpq()
       ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpq_abs_series}, Int), &c, &a, len - 1)
+         (Ref{fmpq}, Ref{fmpq_abs_series}, Int), c, a, len - 1)
    end
    while len > 0 && iszero(c)
       len -= 1
       if len > 0
          ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void,
-            (Ptr{fmpq}, Ptr{fmpq_abs_series}, Int), &c, &a, len - 1)
+            (Ref{fmpq}, Ref{fmpq_abs_series}, Int), c, a, len - 1)
       end
    end
 
@@ -61,12 +61,12 @@ function coeff(x::fmpq_abs_series, n::Int)
    end
    z = fmpq()
    ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void,
-         (Ptr{fmpq}, Ptr{fmpq_abs_series}, Int), &z, &x, n)
+         (Ref{fmpq}, Ref{fmpq_abs_series}, Int), z, x, n)
    return z
 end
 
 function length(x::fmpq_abs_series)
-   return ccall((:fmpq_poly_length, :libflint), Int, (Ptr{fmpq_abs_series},), &x)
+   return ccall((:fmpq_poly_length, :libflint), Int, (Ref{fmpq_abs_series},), x)
 end
 
 precision(x::fmpq_abs_series) = x.prec
@@ -90,7 +90,7 @@ end
 
 function isgen(a::fmpq_abs_series)
    return precision(a) == 0 || ccall((:fmpq_poly_is_x, :libflint), Bool,
-                            (Ptr{fmpq_abs_series},), &a)
+                            (Ref{fmpq_abs_series},), a)
 end
 
 iszero(a::fmpq_abs_series) = length(a) == 0
@@ -99,7 +99,7 @@ isunit(a::fmpq_abs_series) = valuation(a) == 0 && isunit(coeff(a, 0))
 
 function isone(a::fmpq_abs_series)
    return precision(a) == 0 || ccall((:fmpq_poly_is_one, :libflint), Bool,
-                                (Ptr{fmpq_abs_series},), &a)
+                                (Ref{fmpq_abs_series},), a)
 end
 
 # todo: write an fmpq_poly_valuation
@@ -134,8 +134,8 @@ show_minus_one(::Type{fmpq_abs_series}) = show_minus_one(fmpq)
 function -(x::fmpq_abs_series)
    z = parent(x)()
    ccall((:fmpq_poly_neg, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}),
-               &z, &x)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}),
+               z, x)
    z.prec = x.prec
    return z
 end
@@ -160,8 +160,8 @@ function +(a::fmpq_abs_series, b::fmpq_abs_series)
    z = parent(a)()
    z.prec = prec
    ccall((:fmpq_poly_add_series, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &a, &b, lenz)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, a, b, lenz)
    return z
 end
 
@@ -179,8 +179,8 @@ function -(a::fmpq_abs_series, b::fmpq_abs_series)
    z = parent(a)()
    z.prec = prec
    ccall((:fmpq_poly_sub_series, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &a, &b, lenz)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, a, b, lenz)
    return z
 end
 
@@ -208,8 +208,8 @@ function *(a::fmpq_abs_series, b::fmpq_abs_series)
    lenz = min(lena + lenb - 1, prec)
 
    ccall((:fmpq_poly_mullow, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &a, &b, lenz)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, a, b, lenz)
    return z
 end
 
@@ -224,8 +224,8 @@ function *(x::Int, y::fmpq_abs_series)
    z = parent(y)()
    z.prec = y.prec
    ccall((:fmpq_poly_scalar_mul_si, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &y, x)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, y, x)
    return z
 end
 
@@ -233,8 +233,8 @@ function *(x::fmpz, y::fmpq_abs_series)
    z = parent(y)()
    z.prec = y.prec
    ccall((:fmpq_poly_scalar_mul_fmpz, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Ptr{fmpz}),
-               &z, &y, &x)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Ref{fmpz}),
+               z, y, x)
    return z
 end
 
@@ -242,8 +242,8 @@ function *(x::fmpq, y::fmpq_abs_series)
    z = parent(y)()
    z.prec = y.prec
    ccall((:fmpq_poly_scalar_mul_fmpq, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Ptr{fmpq}),
-               &z, &y, &x)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Ref{fmpq}),
+               z, y, x)
    return z
 end
 
@@ -281,8 +281,8 @@ function shift_left(x::fmpq_abs_series, len::Int)
    z = parent(x)()
    z.prec = x.prec + len
    ccall((:fmpq_poly_shift_left, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &x, len)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, x, len)
    return z
 end
 
@@ -295,8 +295,8 @@ function shift_right(x::fmpq_abs_series, len::Int)
    else
       z.prec = x.prec - len
       ccall((:fmpq_poly_shift_right, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &x, len)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, x, len)
    end
    return z
 end
@@ -315,8 +315,8 @@ function truncate(x::fmpq_abs_series, prec::Int)
    z = parent(x)()
    z.prec = prec
    ccall((:fmpq_poly_set_trunc, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &x, prec)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, x, prec)
    return z
 end
 
@@ -371,8 +371,8 @@ function ==(x::fmpq_abs_series, y::fmpq_abs_series)
    n = min(n, prec)
 
    return Bool(ccall((:fmpq_poly_equal_trunc, :libflint), Cint,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &x, &y, n))
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               x, y, n))
 end
 
 function isequal(x::fmpq_abs_series, y::fmpq_abs_series)
@@ -383,8 +383,8 @@ function isequal(x::fmpq_abs_series, y::fmpq_abs_series)
       return false
    end
    return Bool(ccall((:fmpq_poly_equal, :libflint), Cint,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &x, &y, length(x)))
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               x, y, length(x)))
 end
 
 ###############################################################################
@@ -423,8 +423,8 @@ function divexact(x::fmpq_abs_series, y::fmpq_abs_series)
    z = parent(x)()
    z.prec = prec
    ccall((:fmpq_poly_div_series, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &x, &y, prec)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, x, y, prec)
    return z
 end
 
@@ -439,8 +439,8 @@ function divexact(x::fmpq_abs_series, y::Int)
    z = parent(x)()
    z.prec = x.prec
    ccall((:fmpq_poly_scalar_div_si, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &x, y)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, x, y)
    return z
 end
 
@@ -449,8 +449,8 @@ function divexact(x::fmpq_abs_series, y::fmpz)
    z = parent(x)()
    z.prec = x.prec
    ccall((:fmpq_poly_scalar_div_fmpz, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Ptr{fmpz}),
-               &z, &x, &y)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Ref{fmpz}),
+               z, x, y)
    return z
 end
 
@@ -459,8 +459,8 @@ function divexact(x::fmpq_abs_series, y::fmpq)
    z = parent(x)()
    z.prec = x.prec
    ccall((:fmpq_poly_scalar_div_fmpq, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Ptr{fmpq}),
-               &z, &x, &y)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Ref{fmpq}),
+               z, x, y)
    return z
 end
 
@@ -480,8 +480,8 @@ function inv(a::fmpq_abs_series)
    ainv = parent(a)()
    ainv.prec = a.prec
    ccall((:fmpq_poly_inv_series, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &ainv, &a, a.prec)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               ainv, a, a.prec)
    return ainv
 end
 
@@ -499,8 +499,8 @@ function Base.exp(a::fmpq_abs_series)
    z = parent(a)()
    z.prec = a.prec
    ccall((:fmpq_poly_exp_series, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &a, a.prec)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, a, a.prec)
    return z
 end
 
@@ -516,8 +516,8 @@ function log(a::fmpq_abs_series)
    z = parent(a)()
    z.prec = a.prec
    ccall((:fmpq_poly_log_series, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &a, a.prec)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, a, a.prec)
    return z
 end
 
@@ -533,8 +533,8 @@ function tan(a::fmpq_abs_series)
    z = parent(a)()
    z.prec = a.prec
    ccall((:fmpq_poly_tan_series, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &a, a.prec)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, a, a.prec)
    return z
 end
 
@@ -550,8 +550,8 @@ function tanh(a::fmpq_abs_series)
    z = parent(a)()
    z.prec = a.prec
    ccall((:fmpq_poly_tanh_series, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &a, a.prec)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, a, a.prec)
    return z
 end
 
@@ -567,8 +567,8 @@ function sin(a::fmpq_abs_series)
    z = parent(a)()
    z.prec = a.prec
    ccall((:fmpq_poly_sin_series, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &a, a.prec)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, a, a.prec)
    return z
 end
 
@@ -584,8 +584,8 @@ function sinh(a::fmpq_abs_series)
    z = parent(a)()
    z.prec = a.prec
    ccall((:fmpq_poly_sinh_series, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &a, a.prec)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, a, a.prec)
    return z
 end
 
@@ -601,8 +601,8 @@ function cos(a::fmpq_abs_series)
    z = parent(a)()
    z.prec = a.prec
    ccall((:fmpq_poly_cos_series, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &a, a.prec)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, a, a.prec)
    return z
 end
 
@@ -618,8 +618,8 @@ function cosh(a::fmpq_abs_series)
    z = parent(a)()
    z.prec = a.prec
    ccall((:fmpq_poly_cosh_series, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &a, a.prec)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, a, a.prec)
    return z
 end
 
@@ -635,8 +635,8 @@ function asin(a::fmpq_abs_series)
    z = parent(a)()
    z.prec = a.prec
    ccall((:fmpq_poly_asin_series, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &a, a.prec)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, a, a.prec)
    return z
 end
 
@@ -652,8 +652,8 @@ function asinh(a::fmpq_abs_series)
    z = parent(a)()
    z.prec = a.prec
    ccall((:fmpq_poly_asinh_series, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &a, a.prec)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, a, a.prec)
    return z
 end
 
@@ -669,8 +669,8 @@ function atan(a::fmpq_abs_series)
    z = parent(a)()
    z.prec = a.prec
    ccall((:fmpq_poly_atan_series, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &a, a.prec)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, a, a.prec)
    return z
 end
 
@@ -686,8 +686,8 @@ function atanh(a::fmpq_abs_series)
    z = parent(a)()
    z.prec = a.prec
    ccall((:fmpq_poly_atanh_series, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &a, a.prec)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, a, a.prec)
    return z
 end
 
@@ -696,13 +696,13 @@ doc"""
 > Return the power series square root of $a$. Requires a constant term equal to
 > one.
 """
-function sqrt(a::fmpq_abs_series)
+function Base.sqrt(a::fmpq_abs_series)
    !isone(coeff(a, 0)) && error("Constant term not one in sqrt")
    z = parent(a)()
    z.prec = a.prec
    ccall((:fmpq_poly_sqrt_series, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &a, a.prec)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, a, a.prec)
    return z
 end
 
@@ -714,8 +714,8 @@ end
 
 function setcoeff!(z::fmpq_abs_series, n::Int, x::fmpq)
    ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Int, Ptr{fmpq}),
-               &z, n, &x)
+                (Ref{fmpq_abs_series}, Int, Ref{fmpq}),
+               z, n, x)
    return z
 end
 
@@ -739,8 +739,8 @@ function mul!(z::fmpq_abs_series, a::fmpq_abs_series, b::fmpq_abs_series)
 
    z.prec = prec
    ccall((:fmpq_poly_mullow, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &z, &a, &b, lenz)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               z, a, b, lenz)
    return z
 end
 
@@ -756,8 +756,8 @@ function addeq!(a::fmpq_abs_series, b::fmpq_abs_series)
    lenz = max(lena, lenb)
    a.prec = prec
    ccall((:fmpq_poly_add_series, :libflint), Void,
-                (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int),
-               &a, &a, &b, lenz)
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Int),
+               a, a, b, lenz)
    return a
 end
 
@@ -847,6 +847,8 @@ function PowerSeriesRing(R::FlintRationalField, prec::Int, s::AbstractString; mo
       parent_obj = FmpqRelSeriesRing(prec, S, cached)
    elseif model == :capped_absolute
       parent_obj = FmpqAbsSeriesRing(prec, S, cached)
+   else
+      error("Unknown model")
    end
 
    return parent_obj, gen(parent_obj)

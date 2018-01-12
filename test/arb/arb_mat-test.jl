@@ -150,7 +150,7 @@ function test_arb_mat_transpose()
 
    C = transpose(A)*A
 
-   @test overlaps(C', C)
+   @test overlaps(transpose(C), C)
 
    println("PASS")
 end
@@ -404,19 +404,19 @@ function test_arb_mat_linear_solving()
    @test overlaps(L*U, p*A)
    @test r == 3
 
-   y = solve(A, b')
+   y = solve(A, transpose(b))
 
-   @test overlaps(A*y, b')
+   @test overlaps(A*y, transpose(b))
 
-   @test contains(y', ZZ[1 1 1])
+   @test contains(transpose(y), ZZ[1 1 1])
 
    Nemo.lufact!(p, A)
 
-   y = solve_lu_precomp(p, A, b')
+   y = solve_lu_precomp(p, A, transpose(b))
 
-   @test overlaps(B*y, b')
+   @test overlaps(B*y, transpose(b))
 
-   @test contains(y', ZZ[1 1 1])
+   @test contains(transpose(y), ZZ[1 1 1])
 
    println("PASS")
 end

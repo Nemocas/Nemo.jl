@@ -121,12 +121,33 @@ function test_Rationals_gcd()
    println("PASS")
 end
 
+function test_Rationals_square_root()
+   print("Julia.Rationals.square_root...")
+  
+   R = qq
+   S = JuliaQQ
+
+   for iter = 1:1000
+      r = rand(R, -100:100)
+      s = rand(R, -100:100)
+      
+      f = r^2
+      g = s^2
+
+      @test Nemo.sqrt(f)^2 == f
+      @test Nemo.sqrt(g)^2 == g
+   end
+
+   println("PASS")
+end
+
 
 function test_Rationals()
    test_Rationals_constructors()
    test_Rationals_manipulation()
    test_Rationals_exact_division()
    test_Rationals_gcd()
+   test_Rationals_square_root()
    
    println("")
 end

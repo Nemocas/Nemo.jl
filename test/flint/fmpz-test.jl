@@ -583,6 +583,16 @@ function test_fmpz_number_theoretic()
    println("PASS")
 end
 
+function test_fmpz_square_root()
+   print("fmpz.square_root...")
+
+   @test sqrt(fmpz(4)) == 2
+
+   @test sqrt(fmpz(0)) == 0
+
+   println("PASS")
+end
+
 function test_fmpz()
    test_fmpz_abstract_types()
    test_fmpz_constructors()
@@ -612,6 +622,7 @@ function test_fmpz()
    test_fmpz_modular_arithmetic()
    test_fmpz_factor()
    test_fmpz_number_theoretic()
+   test_fmpz_square_root()
 
    println("")
 end

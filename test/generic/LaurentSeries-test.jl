@@ -617,7 +617,7 @@ end
 function test_laurent_series_inversion()
    print("Generic.LaurentSeries.inversion...")
 
-   # Exact field
+   # Exact ring
    R, x = LaurentSeriesRing(JuliaZZ, 10, "x")
    for iter = 1:300
       f = R()
@@ -654,6 +654,30 @@ function test_laurent_series_inversion()
    println("PASS")
 end
 
+function test_laurent_series_square_root()
+   print("Generic.LaurentSeries.square_root...")
+ 
+   # Exact ring
+   R, x = LaurentSeriesRing(JuliaZZ, 10, "x")
+   for iter = 1:300
+      f = rand(R, -12:12, -10:10)
+      g = f^2
+ 
+      @test isequal(sqrt(g)^2, g)
+   end
+ 
+   # Inexact field
+   R, x = LaurentSeriesField(JuliaRealField, 10, "x")
+   for iter = 1:300
+      f = rand(R, -12:12, -1:1)
+      g = f^2
+ 
+      @test isapprox(sqrt(g)^2, g)
+   end
+ 
+   println("PASS")
+end
+ 
 function test_laurent_series_exact_division()
    print("Generic.LaurentSeries.exact_division...")
 
@@ -823,6 +847,7 @@ function test_gen_laurent_series()
    test_laurent_series_exact_division()
    test_laurent_series_adhoc_exact_division()
    test_laurent_series_inversion()
+   test_laurent_series_square_root()
    test_laurent_series_special_functions()
 
    println("")

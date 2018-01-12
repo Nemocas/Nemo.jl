@@ -355,6 +355,18 @@ function test_fmpq_gcd()
    println("PASS")
 end
 
+function test_fmpq_square_root()
+   print("fmpq.square_root...")
+
+   a = fmpz(4)//9
+   b = fmpz(0)//1
+
+   @test sqrt(a) == fmpz(2)//3
+   @test sqrt(b) == 0
+
+   println("PASS")
+end
+
 function test_fmpq_rational_reconstruction()
    print("fmpq.rational_reconstruction...")
 
@@ -427,6 +439,7 @@ function test_fmpq()
    test_fmpq_adhoc_exact_division()
    test_fmpq_modular_arithmetic()
    test_fmpq_gcd()
+   test_fmpq_square_root()
    test_fmpq_rational_reconstruction()
    test_fmpq_rational_enumeration()
    test_fmpq_special_functions()

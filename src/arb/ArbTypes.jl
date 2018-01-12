@@ -99,7 +99,7 @@ mutable struct arb <: FieldElem
 
   function arb()
     z = new()
-    ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
+    ccall((:arb_init, :libarb), Void, (Ref{arb}, ), z)
     finalizer(z, _arb_clear_fn)
     return z
   end
@@ -107,7 +107,7 @@ mutable struct arb <: FieldElem
   function arb(x::Union{Int, UInt, Float64, fmpz, fmpq,
                         BigFloat, AbstractString, arb}, p::Int)
     z = new()
-    ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
+    ccall((:arb_init, :libarb), Void, (Ref{arb}, ), z)
     _arb_set(z, x, p)
     finalizer(z, _arb_clear_fn)
     return z
@@ -115,7 +115,7 @@ mutable struct arb <: FieldElem
 
   function arb(x::Union{Int, UInt, Float64, fmpz, BigFloat, arb})
     z = new()
-    ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
+    ccall((:arb_init, :libarb), Void, (Ref{arb}, ), z)
     _arb_set(z, x)
     finalizer(z, _arb_clear_fn)
     return z
@@ -123,24 +123,24 @@ mutable struct arb <: FieldElem
 
   function arb(mid::arb, rad::arb)
     z = new()
-    ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
-    ccall((:arb_set, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &mid)
-    ccall((:arb_add_error, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &rad)
+    ccall((:arb_init, :libarb), Void, (Ref{arb}, ), z)
+    ccall((:arb_set, :libarb), Void, (Ref{arb}, Ref{arb}), z, mid)
+    ccall((:arb_add_error, :libarb), Void, (Ref{arb}, Ref{arb}), z, rad)
     finalizer(z, _arb_clear_fn)
     return z
   end
 
   #function arb(x::arf)
   #  z = new()
-  #  ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
-  #  ccall((:arb_set_arf, :libarb), Void, (Ptr{arb}, Ptr{arf}), &z, &x)
+  #  ccall((:arb_init, :libarb), Void, (Ref{arb}, ), z)
+  #  ccall((:arb_set_arf, :libarb), Void, (Ref{arb}, Ptr{arf}), z, x)
   #  finalizer(z, _arb_clear_fn)
   #  return z
   #end
 end
 
 function _arb_clear_fn(x::arb)
-  ccall((:arb_clear, :libarb), Void, (Ptr{arb}, ), &x)
+  ccall((:arb_clear, :libarb), Void, (Ref{arb}, ), x)
 end
 
 ################################################################################
@@ -187,14 +187,14 @@ mutable struct acb <: FieldElem
 
   function acb()
     z = new()
-    ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
+    ccall((:acb_init, :libarb), Void, (Ref{acb}, ), z)
     finalizer(z, _acb_clear_fn)
     return z
   end
 
   function acb(x::Union{Int, UInt, Float64, fmpz, BigFloat, arb, acb})
     z = new()
-    ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
+    ccall((:acb_init, :libarb), Void, (Ref{acb}, ), z)
     _acb_set(z, x)
     finalizer(z, _acb_clear_fn)
     return z
@@ -203,7 +203,7 @@ mutable struct acb <: FieldElem
   function acb(x::Union{Int, UInt, Float64, fmpz, fmpq,
                         BigFloat, arb, acb, AbstractString}, p::Int)
     z = new()
-    ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
+    ccall((:acb_init, :libarb), Void, (Ref{acb}, ), z)
     _acb_set(z, x, p)
     finalizer(z, _acb_clear_fn)
     return z
@@ -211,7 +211,7 @@ mutable struct acb <: FieldElem
 
   #function acb{T <: Union{Int, UInt, Float64, fmpz, BigFloat, arb}}(x::T, y::T)
   #  z = new()
-  #  ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
+  #  ccall((:acb_init, :libarb), Void, (Ref{acb}, ), z)
   #  _acb_set(z, x, y)
   #  finalizer(z, _acb_clear_fn)
   #  return z
@@ -219,7 +219,7 @@ mutable struct acb <: FieldElem
 
   function acb(x::T, y::T, p::Int) where {T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, AbstractString, arb}}
     z = new()
-    ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
+    ccall((:acb_init, :libarb), Void, (Ref{acb}, ), z)
     _acb_set(z, x, y, p)
     finalizer(z, _acb_clear_fn)
     return z
@@ -227,7 +227,7 @@ mutable struct acb <: FieldElem
 end
 
 function _acb_clear_fn(x::acb)
-  ccall((:acb_clear, :libarb), Void, (Ptr{acb}, ), &x)
+  ccall((:acb_clear, :libarb), Void, (Ref{acb}, ), x)
 end
 
 
@@ -264,26 +264,26 @@ mutable struct arb_poly <: PolyElem{arb}
 
   function arb_poly()
     z = new()
-    ccall((:arb_poly_init, :libarb), Void, (Ptr{arb_poly}, ), &z)
+    ccall((:arb_poly_init, :libarb), Void, (Ref{arb_poly}, ), z)
     finalizer(z, _arb_poly_clear_fn)
     return z
   end
 
   function arb_poly(x::arb, p::Int)
     z = new() 
-    ccall((:arb_poly_init, :libarb), Void, (Ptr{arb_poly}, ), &z)
+    ccall((:arb_poly_init, :libarb), Void, (Ref{arb_poly}, ), z)
     ccall((:arb_poly_set_coeff_arb, :libarb), Void,
-                (Ptr{arb_poly}, Int, Ptr{arb}), &z, 0, &x)
+                (Ref{arb_poly}, Int, Ref{arb}), z, 0, x)
     finalizer(z, _arb_poly_clear_fn)
     return z
   end
 
   function arb_poly(x::Array{arb, 1}, p::Int)
     z = new() 
-    ccall((:arb_poly_init, :libarb), Void, (Ptr{arb_poly}, ), &z)
+    ccall((:arb_poly_init, :libarb), Void, (Ref{arb_poly}, ), z)
     for i = 1:length(x)
         ccall((:arb_poly_set_coeff_arb, :libarb), Void,
-                (Ptr{arb_poly}, Int, Ptr{arb}), &z, i - 1, &x[i])
+                (Ref{arb_poly}, Int, Ref{arb}), z, i - 1, x[i])
     end
     finalizer(z, _arb_poly_clear_fn)
     return z
@@ -291,42 +291,42 @@ mutable struct arb_poly <: PolyElem{arb}
 
   function arb_poly(x::arb_poly)
     z = new() 
-    ccall((:arb_poly_init, :libarb), Void, (Ptr{arb_poly}, ), &z)
-    ccall((:arb_poly_set, :libarb), Void, (Ptr{arb_poly}, Ptr{arb_poly}), &z, &x)
+    ccall((:arb_poly_init, :libarb), Void, (Ref{arb_poly}, ), z)
+    ccall((:arb_poly_set, :libarb), Void, (Ref{arb_poly}, Ref{arb_poly}), z, x)
     finalizer(z, _arb_poly_clear_fn)
     return z
   end
 
   function arb_poly(x::arb_poly, p::Int)
     z = new() 
-    ccall((:arb_poly_init, :libarb), Void, (Ptr{arb_poly}, ), &z)
+    ccall((:arb_poly_init, :libarb), Void, (Ref{arb_poly}, ), z)
     ccall((:arb_poly_set_round, :libarb), Void,
-                (Ptr{arb_poly}, Ptr{arb_poly}, Int), &z, &x, p)
+                (Ref{arb_poly}, Ref{arb_poly}, Int), z, x, p)
     finalizer(z, _arb_poly_clear_fn)
     return z
   end
 
   function arb_poly(x::fmpz_poly, p::Int)
     z = new() 
-    ccall((:arb_poly_init, :libarb), Void, (Ptr{arb_poly}, ), &z)
+    ccall((:arb_poly_init, :libarb), Void, (Ref{arb_poly}, ), z)
     ccall((:arb_poly_set_fmpz_poly, :libarb), Void,
-                (Ptr{arb_poly}, Ptr{fmpz_poly}, Int), &z, &x, p)
+                (Ref{arb_poly}, Ref{fmpz_poly}, Int), z, x, p)
     finalizer(z, _arb_poly_clear_fn)
     return z
   end
 
   function arb_poly(x::fmpq_poly, p::Int)
     z = new() 
-    ccall((:arb_poly_init, :libarb), Void, (Ptr{arb_poly}, ), &z)
+    ccall((:arb_poly_init, :libarb), Void, (Ref{arb_poly}, ), z)
     ccall((:arb_poly_set_fmpq_poly, :libarb), Void,
-                (Ptr{arb_poly}, Ptr{fmpq_poly}, Int), &z, &x, p)
+                (Ref{arb_poly}, Ref{fmpq_poly}, Int), z, x, p)
     finalizer(z, _arb_poly_clear_fn)
     return z
   end
 end
 
 function _arb_poly_clear_fn(x::arb_poly)
-  ccall((:arb_poly_clear, :libarb), Void, (Ptr{arb_poly}, ), &x)
+  ccall((:arb_poly_clear, :libarb), Void, (Ref{arb_poly}, ), x)
 end
 
 parent(x::arb_poly) = x.parent
@@ -372,26 +372,26 @@ mutable struct acb_poly <: PolyElem{acb}
 
   function acb_poly()
     z = new()
-    ccall((:acb_poly_init, :libarb), Void, (Ptr{acb_poly}, ), &z)
+    ccall((:acb_poly_init, :libarb), Void, (Ref{acb_poly}, ), z)
     finalizer(z, _acb_poly_clear_fn)
     return z
   end
 
   function acb_poly(x::acb, p::Int)
     z = new() 
-    ccall((:acb_poly_init, :libarb), Void, (Ptr{acb_poly}, ), &z)
+    ccall((:acb_poly_init, :libarb), Void, (Ref{acb_poly}, ), z)
     ccall((:acb_poly_set_coeff_acb, :libarb), Void,
-                (Ptr{acb_poly}, Int, Ptr{acb}), &z, 0, &x)
+                (Ref{acb_poly}, Int, Ref{acb}), z, 0, x)
     finalizer(z, _acb_poly_clear_fn)
     return z
   end
 
   function acb_poly(x::Array{acb, 1}, p::Int)
     z = new() 
-    ccall((:acb_poly_init, :libarb), Void, (Ptr{acb_poly}, ), &z)
+    ccall((:acb_poly_init, :libarb), Void, (Ref{acb_poly}, ), z)
     for i = 1:length(x)
         ccall((:acb_poly_set_coeff_acb, :libarb), Void,
-                (Ptr{acb_poly}, Int, Ptr{acb}), &z, i - 1, &x[i])
+                (Ref{acb_poly}, Int, Ref{acb}), z, i - 1, x[i])
     end
     finalizer(z, _acb_poly_clear_fn)
     return z
@@ -399,53 +399,53 @@ mutable struct acb_poly <: PolyElem{acb}
 
   function acb_poly(x::acb_poly)
     z = new() 
-    ccall((:acb_poly_init, :libarb), Void, (Ptr{acb_poly}, ), &z)
-    ccall((:acb_poly_set, :libarb), Void, (Ptr{acb_poly}, Ptr{acb_poly}), &z, &x)
+    ccall((:acb_poly_init, :libarb), Void, (Ref{acb_poly}, ), z)
+    ccall((:acb_poly_set, :libarb), Void, (Ref{acb_poly}, Ref{acb_poly}), z, x)
     finalizer(z, _acb_poly_clear_fn)
     return z
   end
 
   function acb_poly(x::arb_poly, p::Int)
     z = new() 
-    ccall((:acb_poly_init, :libarb), Void, (Ptr{acb_poly}, ), &z)
+    ccall((:acb_poly_init, :libarb), Void, (Ref{acb_poly}, ), z)
     ccall((:acb_poly_set_arb_poly, :libarb), Void,
-                (Ptr{acb_poly}, Ptr{arb_poly}, Int), &z, &x, p)
+                (Ref{acb_poly}, Ref{arb_poly}, Int), z, x, p)
     ccall((:acb_poly_set_round, :libarb), Void,
-                (Ptr{acb_poly}, Ptr{acb_poly}, Int), &z, &z, p)
+                (Ref{acb_poly}, Ref{acb_poly}, Int), z, z, p)
     finalizer(z, _acb_poly_clear_fn)
     return z
   end
 
   function acb_poly(x::acb_poly, p::Int)
     z = new() 
-    ccall((:acb_poly_init, :libarb), Void, (Ptr{acb_poly}, ), &z)
+    ccall((:acb_poly_init, :libarb), Void, (Ref{acb_poly}, ), z)
     ccall((:acb_poly_set_round, :libarb), Void,
-                (Ptr{acb_poly}, Ptr{acb_poly}, Int), &z, &x, p)
+                (Ref{acb_poly}, Ref{acb_poly}, Int), z, x, p)
     finalizer(z, _acb_poly_clear_fn)
     return z
   end
 
   function acb_poly(x::fmpz_poly, p::Int)
     z = new() 
-    ccall((:acb_poly_init, :libarb), Void, (Ptr{acb_poly}, ), &z)
+    ccall((:acb_poly_init, :libarb), Void, (Ref{acb_poly}, ), z)
     ccall((:acb_poly_set_fmpz_poly, :libarb), Void,
-                (Ptr{acb_poly}, Ptr{fmpz_poly}, Int), &z, &x, p)
+                (Ref{acb_poly}, Ref{fmpz_poly}, Int), z, x, p)
     finalizer(z, _acb_poly_clear_fn)
     return z
   end
 
   function acb_poly(x::fmpq_poly, p::Int)
     z = new() 
-    ccall((:acb_poly_init, :libarb), Void, (Ptr{acb_poly}, ), &z)
+    ccall((:acb_poly_init, :libarb), Void, (Ref{acb_poly}, ), z)
     ccall((:acb_poly_set_fmpq_poly, :libarb), Void,
-                (Ptr{acb_poly}, Ptr{fmpq_poly}, Int), &z, &x, p)
+                (Ref{acb_poly}, Ref{fmpq_poly}, Int), z, x, p)
     finalizer(z, _acb_poly_clear_fn)
     return z
   end
 end
 
 function _acb_poly_clear_fn(x::acb_poly)
-  ccall((:acb_poly_clear, :libarb), Void, (Ptr{acb_poly}, ), &x)
+  ccall((:acb_poly_clear, :libarb), Void, (Ref{acb_poly}, ), x)
 end
 
 parent(x::acb_poly) = x.parent
@@ -493,7 +493,7 @@ mutable struct arb_mat <: MatElem{arb}
 
   function arb_mat(r::Int, c::Int)
     z = new()
-    ccall((:arb_mat_init, :libarb), Void, (Ptr{arb_mat}, Int, Int), &z, r, c)
+    ccall((:arb_mat_init, :libarb), Void, (Ref{arb_mat}, Int, Int), z, r, c)
     finalizer(z, _arb_mat_clear_fn)
     return z
   end
@@ -501,9 +501,9 @@ mutable struct arb_mat <: MatElem{arb}
   function arb_mat(a::fmpz_mat)
     z = new()
     ccall((:arb_mat_init, :libarb), Void,
-                (Ptr{arb_mat}, Int, Int), &z, a.r, a.c)
+                (Ref{arb_mat}, Int, Int), z, a.r, a.c)
     ccall((:arb_mat_set_fmpz_mat, :libarb), Void,
-                (Ptr{arb_mat}, Ptr{fmpz_mat}), &z, &a)
+                (Ref{arb_mat}, Ref{fmpz_mat}), z, a)
     finalizer(z, _arb_mat_clear_fn)
     return z
   end
@@ -511,9 +511,9 @@ mutable struct arb_mat <: MatElem{arb}
   function arb_mat(a::fmpz_mat, prec::Int)
     z = new()
     ccall((:arb_mat_init, :libarb), Void,
-                (Ptr{arb_mat}, Int, Int), &z, a.r, a.c)
+                (Ref{arb_mat}, Int, Int), z, a.r, a.c)
     ccall((:arb_mat_set_round_fmpz_mat, :libarb), Void,
-                (Ptr{arb_mat}, Ptr{fmpz_mat}, Int), &z, &a, prec)
+                (Ref{arb_mat}, Ref{fmpz_mat}, Int), z, a, prec)
     finalizer(z, _arb_mat_clear_fn)
     return z
   end
@@ -521,12 +521,12 @@ mutable struct arb_mat <: MatElem{arb}
   function arb_mat(r::Int, c::Int, arr::Array{T, 2}) where {T <: Union{Int, UInt, fmpz, Float64, BigFloat, arb}}
     z = new()
     ccall((:arb_mat_init, :libarb), Void, 
-                (Ptr{arb_mat}, Int, Int), &z, r, c)
+                (Ref{arb_mat}, Int, Int), z, r, c)
     finalizer(z, _arb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
         el = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
-                    (Ptr{arb_mat}, Int, Int), &z, i - 1, j - 1)
+                    (Ref{arb_mat}, Int, Int), z, i - 1, j - 1)
         Nemo._arb_set(el, arr[i, j])
       end
     end
@@ -536,12 +536,12 @@ mutable struct arb_mat <: MatElem{arb}
   function arb_mat(r::Int, c::Int, arr::Array{T, 1}) where {T <: Union{Int, UInt, fmpz, Float64, BigFloat, arb}}
     z = new()
     ccall((:arb_mat_init, :libarb), Void, 
-                (Ptr{arb_mat}, Int, Int), &z, r, c)
+                (Ref{arb_mat}, Int, Int), z, r, c)
     finalizer(z, _arb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
         el = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
-                    (Ptr{arb_mat}, Int, Int), &z, i - 1, j - 1)
+                    (Ref{arb_mat}, Int, Int), z, i - 1, j - 1)
         Nemo._arb_set(el, arr[(i-1)*c+j])
       end
     end
@@ -551,12 +551,12 @@ mutable struct arb_mat <: MatElem{arb}
   function arb_mat(r::Int, c::Int, arr::Array{T, 2}, prec::Int) where {T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, AbstractString}}
     z = new()
     ccall((:arb_mat_init, :libarb), Void, 
-                (Ptr{arb_mat}, Int, Int), &z, r, c)
+                (Ref{arb_mat}, Int, Int), z, r, c)
     finalizer(z, _arb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
         el = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
-                    (Ptr{arb_mat}, Int, Int), &z, i - 1, j - 1)
+                    (Ref{arb_mat}, Int, Int), z, i - 1, j - 1)
         _arb_set(el, arr[i, j], prec)
       end
     end
@@ -566,12 +566,12 @@ mutable struct arb_mat <: MatElem{arb}
   function arb_mat(r::Int, c::Int, arr::Array{T, 1}, prec::Int) where {T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, AbstractString}}
     z = new()
     ccall((:arb_mat_init, :libarb), Void, 
-                (Ptr{arb_mat}, Int, Int), &z, r, c)
+                (Ref{arb_mat}, Int, Int), z, r, c)
     finalizer(z, _arb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
         el = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
-                    (Ptr{arb_mat}, Int, Int), &z, i - 1, j - 1)
+                    (Ref{arb_mat}, Int, Int), z, i - 1, j - 1)
         _arb_set(el, arr[(i-1)*c+j], prec)
       end
     end
@@ -581,16 +581,16 @@ mutable struct arb_mat <: MatElem{arb}
   function arb_mat(a::fmpq_mat, prec::Int)
     z = new()
     ccall((:arb_mat_init, :libarb), Void,
-                (Ptr{arb_mat}, Int, Int), &z, a.r, a.c)
+                (Ref{arb_mat}, Int, Int), z, a.r, a.c)
     ccall((:arb_mat_set_fmpq_mat, :libarb), Void,
-                (Ptr{arb_mat}, Ptr{fmpq_mat}, Int), &z, &a, prec)
+                (Ref{arb_mat}, Ref{fmpq_mat}, Int), z, a, prec)
     finalizer(z, _arb_mat_clear_fn)
     return z
   end
 end
 
 function _arb_mat_clear_fn(x::arb_mat)
-  ccall((:arb_mat_clear, :libarb), Void, (Ptr{arb_mat}, ), &x)
+  ccall((:arb_mat_clear, :libarb), Void, (Ref{arb_mat}, ), x)
 end
 
 ################################################################################
@@ -628,7 +628,7 @@ mutable struct acb_mat <: MatElem{acb}
 
   function acb_mat(r::Int, c::Int)
     z = new()
-    ccall((:acb_mat_init, :libarb), Void, (Ptr{acb_mat}, Int, Int), &z, r, c)
+    ccall((:acb_mat_init, :libarb), Void, (Ref{acb_mat}, Int, Int), z, r, c)
     finalizer(z, _acb_mat_clear_fn)
     return z
   end
@@ -636,9 +636,9 @@ mutable struct acb_mat <: MatElem{acb}
   function acb_mat(a::fmpz_mat)
     z = new()
     ccall((:acb_mat_init, :libarb), Void,
-                (Ptr{acb_mat}, Int, Int), &z, a.r, a.c)
+                (Ref{acb_mat}, Int, Int), z, a.r, a.c)
     ccall((:acb_mat_set_fmpz_mat, :libarb), Void,
-                (Ptr{acb_mat}, Ptr{fmpz_mat}), &z, &a)
+                (Ref{acb_mat}, Ref{fmpz_mat}), z, a)
     finalizer(z, _acb_mat_clear_fn)
     return z
   end
@@ -646,9 +646,9 @@ mutable struct acb_mat <: MatElem{acb}
   function acb_mat(a::fmpz_mat, prec::Int)
     z = new()
     ccall((:acb_mat_init, :libarb), Void,
-                (Ptr{acb_mat}, Int, Int), &z, a.r, a.c)
+                (Ref{acb_mat}, Int, Int), z, a.r, a.c)
     ccall((:acb_mat_set_round_fmpz_mat, :libarb), Void,
-                (Ptr{acb_mat}, Ptr{fmpz_mat}, Int), &z, &a, prec)
+                (Ref{acb_mat}, Ref{fmpz_mat}, Int), z, a, prec)
     finalizer(z, _acb_mat_clear_fn)
     return z
   end
@@ -656,9 +656,9 @@ mutable struct acb_mat <: MatElem{acb}
   function acb_mat(a::arb_mat)
     z = new()
     ccall((:acb_mat_init, :libarb), Void,
-                (Ptr{acb_mat}, Int, Int), &z, a.r, a.c)
+                (Ref{acb_mat}, Int, Int), z, a.r, a.c)
     ccall((:acb_mat_set_arb_mat, :libarb), Void,
-                (Ptr{acb_mat}, Ptr{arb_mat}), &z, &a)
+                (Ref{acb_mat}, Ref{arb_mat}), z, a)
     finalizer(z, _acb_mat_clear_fn)
     return z
   end
@@ -666,9 +666,9 @@ mutable struct acb_mat <: MatElem{acb}
   function acb_mat(a::arb_mat, prec::Int)
     z = new()
     ccall((:acb_mat_init, :libarb), Void,
-                (Ptr{acb_mat}, Int, Int), &z, a.r, a.c)
+                (Ref{acb_mat}, Int, Int), z, a.r, a.c)
     ccall((:acb_mat_set_round_arb_mat, :libarb), Void,
-                (Ptr{acb_mat}, Ptr{arb_mat}, Int), &z, &a, prec)
+                (Ref{acb_mat}, Ref{arb_mat}, Int), z, a, prec)
     finalizer(z, _acb_mat_clear_fn)
     return z
   end
@@ -676,12 +676,12 @@ mutable struct acb_mat <: MatElem{acb}
   function acb_mat(r::Int, c::Int, arr::Array{T, 2}) where {T <: Union{Int, UInt, Float64, fmpz}}
     z = new()
     ccall((:acb_mat_init, :libarb), Void, 
-                (Ptr{acb_mat}, Int, Int), &z, r, c)
+                (Ref{acb_mat}, Int, Int), z, r, c)
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
-                    (Ptr{acb_mat}, Int, Int), &z, i - 1, j - 1)
+                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j])
       end
     end
@@ -691,12 +691,12 @@ mutable struct acb_mat <: MatElem{acb}
   function acb_mat(r::Int, c::Int, arr::Array{T, 2}) where {T <: Union{BigFloat, acb, arb}}
     z = new()
     ccall((:acb_mat_init, :libarb), Void, 
-                (Ptr{acb_mat}, Int, Int), &z, r, c)
+                (Ref{acb_mat}, Int, Int), z, r, c)
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
-                    (Ptr{acb_mat}, Int, Int), &z, i - 1, j - 1)
+                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j])
       end
     end
@@ -706,12 +706,12 @@ mutable struct acb_mat <: MatElem{acb}
   function acb_mat(r::Int, c::Int, arr::Array{T, 1}) where {T <: Union{Int, UInt, Float64, fmpz}}
     z = new()
     ccall((:acb_mat_init, :libarb), Void, 
-                (Ptr{acb_mat}, Int, Int), &z, r, c)
+                (Ref{acb_mat}, Int, Int), z, r, c)
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
-                    (Ptr{acb_mat}, Int, Int), &z, i - 1, j - 1)
+                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j])
       end
     end
@@ -721,12 +721,12 @@ mutable struct acb_mat <: MatElem{acb}
   function acb_mat(r::Int, c::Int, arr::Array{T, 1}) where {T <: Union{BigFloat, acb, arb}}
     z = new()
     ccall((:acb_mat_init, :libarb), Void, 
-                (Ptr{acb_mat}, Int, Int), &z, r, c)
+                (Ref{acb_mat}, Int, Int), z, r, c)
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
-                    (Ptr{acb_mat}, Int, Int), &z, i - 1, j - 1)
+                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j])
       end
     end
@@ -736,12 +736,12 @@ mutable struct acb_mat <: MatElem{acb}
   function acb_mat(r::Int, c::Int, arr::Array{T, 2}, prec::Int) where {T <: Union{Int, UInt, fmpz, fmpq, Float64}}
     z = new()
     ccall((:acb_mat_init, :libarb), Void, 
-                (Ptr{acb_mat}, Int, Int), &z, r, c)
+                (Ref{acb_mat}, Int, Int), z, r, c)
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
-                    (Ptr{acb_mat}, Int, Int), &z, i - 1, j - 1)
+                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j], prec)
       end
     end
@@ -751,12 +751,12 @@ mutable struct acb_mat <: MatElem{acb}
   function acb_mat(r::Int, c::Int, arr::Array{T, 2}, prec::Int) where {T <: Union{BigFloat, arb, AbstractString, acb}}
     z = new()
     ccall((:acb_mat_init, :libarb), Void, 
-                (Ptr{acb_mat}, Int, Int), &z, r, c)
+                (Ref{acb_mat}, Int, Int), z, r, c)
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
-                    (Ptr{acb_mat}, Int, Int), &z, i - 1, j - 1)
+                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j], prec)
       end
     end
@@ -766,12 +766,12 @@ mutable struct acb_mat <: MatElem{acb}
   function acb_mat(r::Int, c::Int, arr::Array{T, 1}, prec::Int) where {T <: Union{Int, UInt, fmpz, fmpq, Float64}}
     z = new()
     ccall((:acb_mat_init, :libarb), Void, 
-                (Ptr{acb_mat}, Int, Int), &z, r, c)
+                (Ref{acb_mat}, Int, Int), z, r, c)
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
-                    (Ptr{acb_mat}, Int, Int), &z, i - 1, j - 1)
+                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j], prec)
       end
     end
@@ -781,12 +781,12 @@ mutable struct acb_mat <: MatElem{acb}
   function acb_mat(r::Int, c::Int, arr::Array{T, 1}, prec::Int) where {T <: Union{BigFloat, arb, AbstractString, acb}}
     z = new()
     ccall((:acb_mat_init, :libarb), Void, 
-                (Ptr{acb_mat}, Int, Int), &z, r, c)
+                (Ref{acb_mat}, Int, Int), z, r, c)
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
-                    (Ptr{acb_mat}, Int, Int), &z, i - 1, j - 1)
+                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j], prec)
       end
     end
@@ -797,12 +797,12 @@ mutable struct acb_mat <: MatElem{acb}
 
     z = new()
     ccall((:acb_mat_init, :libarb), Void, 
-                (Ptr{acb_mat}, Int, Int), &z, r, c)
+                (Ref{acb_mat}, Int, Int), z, r, c)
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
-                    (Ptr{acb_mat}, Int, Int), &z, i - 1, j - 1)
+                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j][1], arr[i,j][2], prec)
       end
     end
@@ -813,12 +813,12 @@ mutable struct acb_mat <: MatElem{acb}
 
     z = new()
     ccall((:acb_mat_init, :libarb), Void, 
-                (Ptr{acb_mat}, Int, Int), &z, r, c)
+                (Ref{acb_mat}, Int, Int), z, r, c)
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
-                    (Ptr{acb_mat}, Int, Int), &z, i - 1, j - 1)
+                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j][1], arr[i,j][2], prec)
       end
     end
@@ -829,12 +829,12 @@ mutable struct acb_mat <: MatElem{acb}
 
     z = new()
     ccall((:acb_mat_init, :libarb), Void, 
-                (Ptr{acb_mat}, Int, Int), &z, r, c)
+                (Ref{acb_mat}, Int, Int), z, r, c)
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
-                    (Ptr{acb_mat}, Int, Int), &z, i - 1, j - 1)
+                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j][1], arr[(i-1)*c+j][2], prec)
       end
     end
@@ -845,12 +845,12 @@ mutable struct acb_mat <: MatElem{acb}
 
     z = new()
     ccall((:acb_mat_init, :libarb), Void, 
-                (Ptr{acb_mat}, Int, Int), &z, r, c)
+                (Ref{acb_mat}, Int, Int), z, r, c)
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
-                    (Ptr{acb_mat}, Int, Int), &z, i - 1, j - 1)
+                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j][1], arr[(i-1)*c+j][2], prec)
       end
     end
@@ -860,15 +860,15 @@ mutable struct acb_mat <: MatElem{acb}
   function acb_mat(a::fmpq_mat, prec::Int)
     z = new()
     ccall((:acb_mat_init, :libarb), Void,
-                (Ptr{acb_mat}, Int, Int), &z, a.r, a.c)
+                (Ref{acb_mat}, Int, Int), z, a.r, a.c)
     ccall((:acb_mat_set_fmpq_mat, :libarb), Void,
-                (Ptr{acb_mat}, Ptr{fmpq_mat}, Int), &z, &a, prec)
+                (Ref{acb_mat}, Ref{fmpq_mat}, Int), z, a, prec)
     finalizer(z, _acb_mat_clear_fn)
     return z
   end
 end
 
 function _acb_mat_clear_fn(x::acb_mat)
-  ccall((:acb_mat_clear, :libarb), Void, (Ptr{acb_mat}, ), &x)
+  ccall((:acb_mat_clear, :libarb), Void, (Ref{acb_mat}, ), x)
 end
 

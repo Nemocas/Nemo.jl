@@ -7,9 +7,10 @@
 export MatrixSpace, fflu!, fflu, solve_triu, isrref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
        ishessenberg, identity_matrix, charpoly_hessenberg!, matrix, minpoly,
-       typed_hvcat, typed_hcat, powers, similarity!, solve, solve_rational,
-       hnf, hnf_minors, hnf_minors_with_trafo, hnf_with_trafo, snf,
-       snf_with_trafo, weak_popov, weak_popov_with_trafo, extended_weak_popov,
+       typed_hvcat, typed_hcat, powers, randmat_triu, randmat_with_rank,
+       similarity!, solve, solve_rational, hnf, hnf_minors,
+       hnf_minors_with_trafo, hnf_with_trafo, snf, snf_with_trafo, weak_popov,
+       weak_popov_with_trafo, extended_weak_popov,
        extended_weak_popov_with_trafo, rank_profile_popov, hnf_via_popov,
        hnf_via_popov_with_trafo, popov, det_popov, _check_dim, rows, cols,
        gram, rref, rref!, swap_rows, swap_rows!, hnf_kb, hnf_kb_with_trafo,
@@ -236,6 +237,46 @@ end
 ###############################################################################
 
 canonical_unit(a::Nemo.MatElem) = canonical_unit(a[1, 1])
+
+###############################################################################
+#
+#   Sub
+#
+###############################################################################
+
+function sub(M::Nemo.MatElem, rows::UnitRange{Int}, cols::UnitRange{Int})
+  Generic._checkbounds(M, rows.start, cols.start)
+  Generic._checkbounds(M, rows.stop, cols.stop)
+  z = similar(M, length(rows), length(cols))
+  startr = start(rows)
+  startc = start(cols)
+  for i in rows
+    for j in cols
+      z[i - startr + 1, j - startc + 1] = deepcopy(M[i, j])
+    end
+  end
+  return z
+end
+
+function sub(M::Nemo.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)
+  return sub(M, r1:r2, c1:c2)
+end
+
+getindex(x::Nemo.MatElem, r::UnitRange{Int}, c::UnitRange{Int}) = sub(x, r, c)
+
+getindex(x::Nemo.MatElem, r::UnitRange, ::Colon) = sub(x, r, 1:cols(x))
+
+getindex(x::Nemo.MatElem, ::Colon, c::UnitRange{Int}) = sub(x, 1:rows(x), c)
+
+getindex(x::Nemo.MatElem, ::Colon, ::Colon) = sub(x, 1:rows(x), 1:cols(x))
+
+function Base.view(M::Nemo.MatElem, rows::UnitRange{Int}, ::Colon)
+  return view(M, rows, 1:cols(M))
+end
+
+function Base.view(M::Nemo.MatElem, ::Colon, cols::UnitRange{Int})
+  return view(M, 1:rows(x), cols)
+end
 
 ###############################################################################
 #
@@ -1697,7 +1738,7 @@ function solve_with_det(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: Ring
    p = PermGroup(rows(M))()
    r, d = fflu!(p, FFLU)
    if r < rows(M)
-      error("Non-singular matrix in solve_with_det")
+      error("Singular matrix in solve_with_det")
    end
    x = solve_fflu_precomp(p, FFLU, b)
    # Now M*x = d*b, but d is only sign(P) * det(M)
@@ -1781,6 +1822,14 @@ function solve_interpolation(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <:
             rethrow(e)
          end
       end
+
+      # We tested i values and for each of them it was not solvable.
+      # Thus for i values the matrix X is singular.
+
+      if i > bound
+         error("Singular matrix in solve_interpolation")
+      end
+
       i = i + 1
    end
    for k = 1:h
@@ -3979,6 +4028,58 @@ function rand(S::Nemo.MatSpace, v...)
    for i = 1:rows(M)
       for j = 1:cols(M)
          M[i, j] = rand(R, v...)
+      end
+   end
+   return M
+end
+
+function randmat_triu(S::Nemo.MatSpace, v...)
+   M = S()
+   R = base_ring(S)
+   for i = 1:rows(M)
+      for j = 1:i - 1
+         M[i, j] = R()
+      end
+      for j = i:cols(M)
+         M[i, j] = rand(R, v...)
+      end
+      while M[i, i] == 0
+         M[i, i] = rand(R, v...)
+      end
+   end
+   return M
+end
+
+function randmat_with_rank(S::Generic.MatSpace{T}, rank::Int, v...) where {T <: Nemo.RingElement}
+   M = S()
+   R = base_ring(S)
+   for i = 1:rank
+      for j = 1:i - 1
+         M[i, j] = R()
+      end
+      M[i, i] = rand(R, v...)
+      while M[i, i] == 0
+         M[i, i] = rand(R, v...)
+      end
+      for j = i + 1:cols(M)
+         M[i, j] = rand(R, v...)
+      end
+   end
+   for i = rank + 1:rows(M)
+      for j = 1:cols(M)
+         M[i, j] = R()
+      end
+   end
+   m = rows(M)
+   if m > 1
+      for i = 1:4*m
+         r1 = rand(1:m)
+         r2 = rand(1:m - 1)
+         r2 = r2 >= r1 ? r2 + 1 : r2
+         d = rand(-5:5)
+         for j = 1:cols(M)
+            M[r1, j] = M[r1, j] + d*M[r2, j]
+         end
       end
    end
    return M

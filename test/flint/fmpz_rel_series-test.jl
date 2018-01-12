@@ -401,6 +401,20 @@ function test_fmpz_rel_series_inversion()
 
    println("PASS")
 end
+
+function test_fmpz_rel_series_square_root()
+   print("fmpz_rel_series.square_root...")
+
+   R, x = PowerSeriesRing(ZZ, 30, "x")
+
+   a = rand(R, 0:10, -10:10)
+   b = a^2
+
+   @test isequal(sqrt(b)^2, b)
+
+   println("PASS")
+end
+
 function test_fmpz_rel_series()
    test_fmpz_rel_series_constructors()
    test_fmpz_rel_series_printing()
@@ -415,6 +429,7 @@ function test_fmpz_rel_series()
    test_fmpz_rel_series_truncation()
    test_fmpz_rel_series_exact_division()
    test_fmpz_rel_series_inversion()
+   test_fmpz_rel_series_square_root()
 
    println("")
 end

@@ -1,7 +1,7 @@
 function test_gen_mpoly_constructors()
    print("Generic.MPoly.constructors...")
 
-   R, x = ZZ["y"]
+   R, x = JuliaZZ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -41,12 +41,12 @@ function test_gen_mpoly_constructors()
    end
 
    println("PASS")
-end   
+end
 
 function test_gen_mpoly_manipulation()
    print("Generic.MPoly.manipulation...")
 
-   R, x = ZZ["y"]
+   R, x = JuliaZZ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -111,12 +111,12 @@ function test_gen_mpoly_manipulation()
    end
 
    println("PASS")
-end   
+end
 
 function test_gen_mpoly_unary_ops()
    print("Generic.MPoly.unary_ops...")
 
-   R, x = ZZ["y"]
+   R, x = JuliaZZ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -132,12 +132,12 @@ function test_gen_mpoly_unary_ops()
    end
 
    println("PASS")
-end   
+end
 
 function test_gen_mpoly_binary_ops()
    print("Generic.MPoly.binary_ops...")
 
-   R, x = ZZ["y"]
+   R, x = JuliaZZ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -161,12 +161,12 @@ function test_gen_mpoly_binary_ops()
    end
 
    println("PASS")
-end   
+end
 
 function test_gen_mpoly_adhoc_binary()
    print("Generic.MPoly.adhoc_binary...")
 
-   R, x = ZZ["y"]
+   R, x = JuliaZZ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -183,30 +183,30 @@ function test_gen_mpoly_adhoc_binary()
          g2 = rand(R, 0:2, -10:10)
 
          @test f*d1 + f*d2 == (d1 + d2)*f
-         @test f*ZZ(d1) + f*ZZ(d2) == (ZZ(d1) + ZZ(d2))*f
+         @test f*BigInt(d1) + f*BigInt(d2) == (BigInt(d1) + BigInt(d2))*f
          @test f*g1 + f*g2 == (g1 + g2)*f
-         
+
          @test f + d1 + d2 == d1 + d2 + f
-         @test f + ZZ(d1) + ZZ(d2) == ZZ(d1) + ZZ(d2) + f
+         @test f + BigInt(d1) + BigInt(d2) == BigInt(d1) + BigInt(d2) + f
          @test f + g1 + g2 == g1 + g2 + f
-         
+
          @test f - d1 - d2 == -((d1 + d2) - f)
-         @test f - ZZ(d1) - ZZ(d2) == -((ZZ(d1) + ZZ(d2)) - f)
+         @test f - BigInt(d1) - BigInt(d2) == -((BigInt(d1) + BigInt(d2)) - f)
          @test f - g1 - g2 == -((g1 + g2) - f)
 
          @test f + d1 - d1 == f
-         @test f + ZZ(d1) - ZZ(d1) == f
+         @test f + BigInt(d1) - BigInt(d1) == f
          @test f + g1 - g1 == f
       end
    end
 
    println("PASS")
-end   
+end
 
 function test_gen_mpoly_adhoc_comparison()
    print("Generic.MPoly.adhoc_comparison...")
 
-   R, x = ZZ["y"]
+   R, x = JuliaZZ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -217,23 +217,23 @@ function test_gen_mpoly_adhoc_comparison()
       for iter = 1:100
          d = rand(-100:100)
          g = rand(R, 0:2, -10:10)
-         
+
          @test S(d) == d
          @test d == S(d)
-         @test S(d) == ZZ(d)
-         @test ZZ(d) == S(d)
+         @test S(d) == BigInt(d)
+         @test BigInt(d) == S(d)
          @test S(g) == g
          @test g == S(g)
       end
    end
 
    println("PASS")
-end   
+end
 
 function test_gen_mpoly_powering()
    print("Generic.MPoly.powering...")
 
-   R, x = ZZ["y"]
+   R, x = JuliaZZ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -251,17 +251,17 @@ function test_gen_mpoly_powering()
             r *= f
          end
 
-         @test (f == 0 && expn == 0 && f^expn == 0) || f^expn == r 
+         @test (f == 0 && expn == 0 && f^expn == 0) || f^expn == r
       end
    end
 
    println("PASS")
-end   
+end
 
 function test_gen_mpoly_divides()
    print("Generic.MPoly.divides...")
 
-   R, x = ZZ["y"]
+   R, x = JuliaZZ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -295,7 +295,7 @@ end
 function test_gen_mpoly_euclidean_division()
    print("Generic.MPoly.euclidean_division...")
 
-   R, x = ZZ["y"]
+   R, x = JuliaQQ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -330,12 +330,12 @@ function test_gen_mpoly_euclidean_division()
    end
 
    println("PASS")
-end   
+end
 
 function test_gen_mpoly_ideal_reduction()
    print("Generic.MPoly.ideal_reduction...")
 
-   R, x = ZZ["y"]
+   R, x = JuliaQQ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -360,9 +360,9 @@ function test_gen_mpoly_ideal_reduction()
 
       for iter = 1:10
          num = rand(1:5)
-         
+
          V = Array{elem_type(S)}(num)
-         
+
          for i = 1:num
             V[i] = S(0)
             while iszero(V[i])
@@ -383,7 +383,7 @@ function test_gen_mpoly_ideal_reduction()
    end
 
    println("PASS")
-end   
+end
 
 function test_gen_mpoly_gcd()
    print("Generic.MPoly.gcd...")
@@ -392,7 +392,7 @@ function test_gen_mpoly_gcd()
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(ZZ, var_names, ordering = ord)
+      S, varlist = PolynomialRing(JuliaZZ, var_names, ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:4, 0:5, -10:10)
@@ -407,12 +407,12 @@ function test_gen_mpoly_gcd()
    end
 
    println("PASS")
-end   
+end
 
 function test_gen_mpoly_evaluation()
    print("Generic.MPoly.evaluation...")
 
-   R, x = ZZ["y"]
+   R, x = JuliaZZ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -423,7 +423,7 @@ function test_gen_mpoly_evaluation()
       for iter = 1:100
          f = rand(S, 0:5, 0:100, 0:0, -100:100)
          g = rand(S, 0:5, 0:100, 0:0, -100:100)
-       
+
          V1 = [rand(-10:10) for i in 1:num_vars]
 
          r1 = evaluate(f, V1)
@@ -432,7 +432,7 @@ function test_gen_mpoly_evaluation()
 
          @test r3 == r1 + r2
 
-         V2 = [ZZ(rand(-10:10)) for i in 1:num_vars]
+         V2 = [BigInt(rand(-10:10)) for i in 1:num_vars]
 
          r1 = evaluate(f, V2)
          r2 = evaluate(g, V2)
@@ -451,12 +451,12 @@ function test_gen_mpoly_evaluation()
    end
 
    println("PASS")
-end   
+end
 
 function test_gen_mpoly_valuation()
    print("Generic.MPoly.valuation...")
 
-   R, x = ZZ["y"]
+   R, x = JuliaZZ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -486,14 +486,14 @@ function test_gen_mpoly_valuation()
          @test f == q3*g^d3
 
          d4, q4 = remove(q3*g^expn, g)
-         
+
          @test d4 == expn
          @test q4 == q3
       end
    end
 
    println("PASS")
-end   
+end
 
 function test_gen_mpoly()
    test_gen_mpoly_constructors()

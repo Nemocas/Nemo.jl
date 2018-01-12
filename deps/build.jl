@@ -3,9 +3,9 @@ oldwdir = pwd()
 @show M4_VERSION = "1.4.17"
 @show YASM_VERSION = "1.3.0"
 @show MPIR_VERSION = "3.0.0"
-@show MPFR_VERSION = "3.1.6"
-@show ANTIC_VERSION = "fb237532f6772fc04d6d57cc7cf015e444eb2cf4"
-@show FLINT_VERSION = "e22c3fc1f040874dbda43baf802c77e59ed9c1a0"
+@show MPFR_VERSION = "4.0.0"
+@show ANTIC_VERSION = "9fb5b8d5ccfad13d1ec5b59d4fd13a9fde94c78e"
+@show FLINT_VERSION = "1eb76ed54670bbb6736ce804268d4ee5eb35d860"
 @show ARB_VERSION = "6035ee2420b7a3fa0259c92dcfa5de4bc76a4b95"
 
 pkgdir = dirname(dirname(@__FILE__))

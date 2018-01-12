@@ -183,6 +183,33 @@ function test_fmpq_mat_view()
    println("PASS")
 end
 
+function test_fmpq_mat_sub()
+   print("fmpq_mat.sub...")
+
+   S = MatrixSpace(FlintQQ, 3, 3)
+
+   A = S([1 2 3; 4 5 6; 7 8 9])
+
+   B = @inferred sub(A, 1, 1, 2, 2)
+
+   @test typeof(B) == fmpq_mat
+   @test B == MatrixSpace(FlintQQ, 2, 2)([1 2; 4 5])
+
+   B[1, 1] = 10
+   @test A == S([1 2 3; 4 5 6; 7 8 9])
+
+   C = @inferred sub(B, 1:2, 1:2)
+
+   @test typeof(C) == fmpq_mat
+   @test C == MatrixSpace(FlintQQ, 2, 2)([10 2; 4 5])
+
+   C[1, 1] = 20
+   @test B == MatrixSpace(FlintQQ, 2, 2)([10 2; 4 5])
+   @test A == S([1 2 3; 4 5 6; 7 8 9])
+
+   println("PASS")
+end
+
 function test_fmpq_mat_unary_ops()
    print("fmpq_mat.unary_ops...")
 
@@ -352,7 +379,7 @@ function test_fmpq_mat_transpose()
 
    C = transpose(A)*A
 
-   @test C' == C
+   @test transpose(C) == C
 
    println("PASS")
 end
@@ -542,6 +569,7 @@ function test_fmpq_mat()
    test_fmpq_mat_printing()
    test_fmpq_mat_manipulation()
    test_fmpq_mat_view()
+   test_fmpq_mat_sub()
    test_fmpq_mat_unary_ops()
    test_fmpq_mat_binary_ops()
    test_fmpq_mat_adhoc_binary()

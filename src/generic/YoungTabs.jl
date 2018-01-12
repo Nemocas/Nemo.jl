@@ -274,7 +274,7 @@ doc"""
 """
 function dim(Y::YoungTableau)
    n, m = size(Y)
-   num = fac(maximum(Y))
+   num = factorial(BigInt(maximum(Y)))
    den = reduce(*, 1, BigInt(hooklength(Y,i,j)) for i in 1:n, j in 1:m if j <= Y.part[i])
    return divexact(num, den)
 end
