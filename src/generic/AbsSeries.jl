@@ -455,14 +455,14 @@ doc"""
 function ^(a::Nemo.AbsSeriesElem{T}, b::Int) where {T <: RingElement}
    b < 0 && throw(DomainError())
    # special case powers of x for constructing power series efficiently
-   if precision(a) > 0 && isgen(a) && b > 0
+   if b == 0
+      z = one(parent(a))
+      set_prec!(z, precision(a))
+      return z
+   elseif precision(a) > 0 && isgen(a) && b > 0
       return shift_left(a, b - 1)
    elseif length(a) == 1
       z = parent(a)(coeff(a, 0)^b)
-      set_prec!(z, precision(a))
-      return z
-   elseif b == 0
-      z = one(parent(a))
       set_prec!(z, precision(a))
       return z
    elseif b == 1
@@ -542,6 +542,25 @@ function isequal(x::Nemo.AbsSeriesElem{T}, y::Nemo.AbsSeriesElem{T}) where {T <:
       if !isequal(coeff(x, i - 1), coeff(y, i - 1))
          return false
       end
+   end
+   return true
+end
+
+###############################################################################
+#
+#   Approximation
+#
+###############################################################################
+
+function Base.isapprox(f::Nemo.AbsSeriesElem, g::Nemo.AbsSeriesElem; atol::Real=sqrt(eps()))
+   check_parent(f, g)
+   nmin = min(precision(f), precision(g))
+   i = 1
+   while i <= nmin
+      if !isapprox(coeff(f, i - 1), coeff(g, i - 1); atol=atol)
+         return false
+      end
+      i += 1
    end
    return true
 end
@@ -839,7 +858,7 @@ function (a::AbsSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where
    return z
 end
 
-function (a::AbsSeriesRing{T})(b::T) where {T <: RingElement}
+function (a::AbsSeriesRing{T})(b::T) where {T <: RingElem}
    parent(b) != base_ring(a) && error("Unable to coerce to power series")
    if b == 0
       z = AbsSeries{T}(Array{T}(0), 0, a.prec_max)

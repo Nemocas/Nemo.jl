@@ -747,6 +747,7 @@ function (a::FmpzModRelSeriesRing)(b::Integer)
    if b == 0
       z = fmpz_mod_rel_series(modulus(a))
       z.prec = a.prec_max
+      z.val = a.prec_max
    else
       z = fmpz_mod_rel_series(modulus(a), [fmpz(b)], 1, a.prec_max, 0)
    end
@@ -758,6 +759,7 @@ function (a::FmpzModRelSeriesRing)(b::fmpz)
    if iszero(b)
       z = fmpz_mod_rel_series(modulus(a))
       z.prec = a.prec_max
+      z.val = a.prec_max
    else
       z = fmpz_mod_rel_series(modulus(a), [b], 1, a.prec_max, 0)
    end
@@ -769,6 +771,7 @@ function (a::FmpzModRelSeriesRing)(b::Generic.Res{fmpz})
    if iszero(b)
       z = fmpz_mod_rel_series(modulus(a))
       z.prec = a.prec_max
+      z.val = a.prec_max
    else
       z = fmpz_mod_rel_series(modulus(a), [b], 1, a.prec_max, 0)
    end

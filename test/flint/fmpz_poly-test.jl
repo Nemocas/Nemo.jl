@@ -506,7 +506,7 @@ function test_fmpz_poly()
    test_fmpz_poly_interpolate()
    test_fmpz_poly_factor()
    test_fmpz_poly_special()
-   test_fmpz_poly_Polynomials()
+   #test_fmpz_poly_Polynomials()
 
    println("")
 end

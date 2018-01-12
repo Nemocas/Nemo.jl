@@ -1667,7 +1667,7 @@ function subresultant_lazard(Sd0::Nemo.PolyElem{T}, Sd1::Nemo.PolyElem{T}) where
    y = lead(Sd0)
    a = 1 << (ndigits(n, 2) - 1) # floor(log_2(a))
    c = x
-   n = n - 1
+   n = n - a
    while a != 1
       a = a >> 1
       c = divexact(c*c, y)

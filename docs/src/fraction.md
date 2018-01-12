@@ -152,7 +152,7 @@ the numerator and denominator of a fraction should be xor'd with the supplied
 parameter `h` as part of computing the hash.
 
 ```
-num(a::FracElem)
+numerator(a::FracElem)
 ```
 
 Return the numerator of the given fraction element, i.e. for $a = b/c$ return
@@ -160,7 +160,7 @@ $b$. The returned numerator will be divided by the canonical unit of the
 denominator.
 
 ```
-den(a::FracElem)
+denominator(a::FracElem)
 ```
 
 Return the denominator of the given fraction element, i.e. for $a = b/c$ return

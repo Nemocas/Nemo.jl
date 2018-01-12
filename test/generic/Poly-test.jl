@@ -1412,6 +1412,7 @@ function test_gen_poly_resultant()
       @test resultant(f, g*h) == resultant(f, g) * resultant(f, h)
 
       @test resultant(f, g) == resultant_subresultant(f, g)
+      @test resultant_ducos(f, g) == resultant_subresultant(f, g)
    end
 
    # Exact field
@@ -1426,7 +1427,7 @@ function test_gen_poly_resultant()
       @test resultant(f, g*h) == resultant(f, g) * resultant(f, h)
 
       @test resultant(f, g) == resultant_subresultant(f, g)
-
+      @test resultant_ducos(f, g) == resultant_subresultant(f, g)
       @test resultant(f, g) == Generic.resultant_lehmer(f, g)
    end
 
@@ -1443,6 +1444,7 @@ function test_gen_poly_resultant()
       @test resultant(f, g*h) == resultant(f, g)*resultant(f, h)
 
       @test resultant(f, g) == resultant_subresultant(f, g)
+      @test resultant_ducos(f, g) == resultant_subresultant(f, g)
    end
 
    # Characteristic p field
@@ -1457,6 +1459,7 @@ function test_gen_poly_resultant()
       @test resultant(f, g*h) == resultant(f, g)*resultant(f, h)
 
       @test resultant(f, g) == resultant_subresultant(f, g)
+      @test resultant_ducos(f, g) == resultant_subresultant(f, g)
    end
 
    # Inexact field
@@ -1778,7 +1781,7 @@ function test_gen_poly_newton_representation()
       f = rand(R, 0:10, -100:100)
 
       g = deepcopy(f)
-      roots = [rand(JuliaQQ, -10:10) for i in 1:length(f)]
+      roots = Rational{BigInt}[rand(JuliaQQ, -10:10) for i in 1:length(f)]
       monomial_to_newton!(g.coeffs, roots)
       newton_to_monomial!(g.coeffs, roots)
 
@@ -1792,7 +1795,7 @@ function test_gen_poly_newton_representation()
       f = rand(R, 0:10, 0:1)
 
       g = deepcopy(f)
-      roots = [rand(JuliaRealField, 0:1) for i in 1:length(f)]
+      roots = BigFloat[rand(JuliaRealField, 0:1) for i in 1:length(f)]
       monomial_to_newton!(g.coeffs, roots)
       newton_to_monomial!(g.coeffs, roots)
 

@@ -265,9 +265,9 @@ end
 function *(x::fmpq, y::fmpq_mat)
    z = similar(y)
    ccall((:fmpq_mat_scalar_mul_fmpz, :libflint), Void,
-                (Ptr{fmpq_mat}, Ptr{fmpq_mat}, Ptr{fmpq}), &z, &y, &num(x))
+                (Ptr{fmpq_mat}, Ptr{fmpq_mat}, Ptr{fmpq}), &z, &y, &numerator(x))
    ccall((:fmpq_mat_scalar_div_fmpz, :libflint), Void,
-                (Ptr{fmpq_mat}, Ptr{fmpq_mat}, Ptr{fmpq}), &z, &z, &den(x))
+                (Ptr{fmpq_mat}, Ptr{fmpq_mat}, Ptr{fmpq}), &z, &z, &denominator(x))
    return z
 end
 
@@ -413,9 +413,9 @@ end
 function divexact(x::fmpq_mat, y::fmpq)
    z = similar(x)
    ccall((:fmpq_mat_scalar_div_fmpz, :libflint), Void,
-                (Ptr{fmpq_mat}, Ptr{fmpq_mat}, Ptr{fmpz}), &z, &x, &num(y))
+                (Ptr{fmpq_mat}, Ptr{fmpq_mat}, Ptr{fmpz}), &z, &x, &numerator(y))
    ccall((:fmpq_mat_scalar_mul_fmpz, :libflint), Void,
-                (Ptr{fmpq_mat}, Ptr{fmpq_mat}, Ptr{fmpz}), &z, &z, &den(y))
+                (Ptr{fmpq_mat}, Ptr{fmpq_mat}, Ptr{fmpz}), &z, &z, &denominator(y))
    return z
 end
 

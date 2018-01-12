@@ -5,7 +5,7 @@ oldwdir = pwd()
 @show MPIR_VERSION = "3.0.0"
 @show MPFR_VERSION = "3.1.6"
 @show ANTIC_VERSION = "fb237532f6772fc04d6d57cc7cf015e444eb2cf4"
-@show FLINT_VERSION = "a83904e34139dc9ac0c4cafca4cabaaad9e85bc1"
+@show FLINT_VERSION = "e22c3fc1f040874dbda43baf802c77e59ed9c1a0"
 @show ARB_VERSION = "6035ee2420b7a3fa0259c92dcfa5de4bc76a4b95"
 
 pkgdir = dirname(dirname(@__FILE__))
@@ -207,6 +207,7 @@ if !is_windows()
     cd(wdir)
   catch
     if ispath(joinpath("$wdir", "flint2"))
+       open(`patch -R --forward -d flint2 -r -`, "r", open("../deps-PIE-ftbfs.patch"))
        cd(joinpath("$wdir", "flint2"))
        run(`git fetch`)
        run(`git checkout $FLINT_VERSION`)
@@ -254,6 +255,7 @@ if !is_windows()
     cd(wdir)
   catch
     if ispath(joinpath("$wdir", "arb"))
+      open(`patch -R --forward -d arb -r -`, "r", open("../deps-PIE-ftbfs.patch"))
       cd(joinpath("$wdir", "arb"))
       run(`git fetch`)
       run(`git checkout $ARB_VERSION`)

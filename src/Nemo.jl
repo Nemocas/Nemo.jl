@@ -4,11 +4,11 @@ module Nemo
 
 import Base: Array, abs, asin, asinh, atan, atanh, base, bin, checkbounds,
              conj, convert, cmp, contains, cos, cosh, dec, deepcopy,
-             deepcopy_internal, den, deserialize, det, div, divrem, eye,
+             deepcopy_internal, deserialize, det, div, divrem, eye,
              gcd, gcdx, getindex, hash, hcat, hex, intersect, inv, invmod,
              isequal, isfinite, isless, isqrt, isreal, iszero, lcm,
              ldexp, length, log, lufact, lufact!, mod, ndigits, nextpow2, norm,
-             nullspace, num, oct, one, parent, parse, precision, prevpow2,
+             nullspace, numerator, oct, one, parent, parse, precision, prevpow2,
              rand, rank, Rational, rem, reverse, serialize, setindex!, show,
              similar, sign, sin, sinh, size, sqrt, string, tan, tanh, trace,
              trailing_zeros, transpose, transpose!, truncate, typed_hvcat,
@@ -121,7 +121,7 @@ function __init__()
       (Ptr{Void},), cfunction(flint_abort, Void, ()))
 
    println("")
-   println("Welcome to Nemo version 0.6.3")
+   println("Welcome to Nemo version 0.7.0")
    println("")
    println("Nemo comes with absolutely no warranty whatsoever")
    println("")
@@ -142,7 +142,7 @@ end
 ################################################################################
 
 function versioninfo()
-  print("Nemo version 0.6.3 \n")
+  print("Nemo version 0.7.0 \n")
   nemorepo = dirname(dirname(@__FILE__))
 
   print("Nemo: ")
@@ -200,7 +200,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  characteristic, charpoly, charpoly_danilevsky!,
                  charpoly_danilevsky_ff!, charpoly_hessenberg!, chebyshev_t,
                  chebyshev_u, _check_dim, check_parent, coeff, cols, compose,
-                 content, cycles, data, degree, den, derivative, det, det_clow,
+                 content, cycles, data, degree, denominator, derivative, det, det_clow,
                  det_df, det_fflu, det_popov, dim, discriminant, divexact,
                  divides, divrem, elem_type, elements, evaluate,
                  extended_weak_popov, extended_weak_popov_with_trafo, fflu!,
@@ -218,7 +218,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  matrix_repr, max_degrees, max_precision, minpoly, mod,
                  modulus, monomial_iszero, monomial_set!, monomial_to_newton!,
                  mul!, mul_classical, mul_karatsuba, mul_ks, mullow, mulmod,
-                 needs_parentheses, newton_to_monomial!, normalise, nvars, num,
+                 needs_parentheses, newton_to_monomial!, normalise, nvars, numerator,
                  O, one, order, ordering, parent_type, parity, partitionseq,
                  polcoeff, pol_length, powmod, pow_multinomial, popov, powers,
                  precision, primpart, pseudodivrem, pseudorem, rand_ordering,
@@ -237,7 +237,7 @@ export add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  characteristic, charpoly, charpoly_danilevsky!,
                  charpoly_danilevsky_ff!, charpoly_hessenberg!, chebyshev_t,
                  chebyshev_u, _check_dim, check_parent, coeff, cols, compose,
-                 content, cycles, data, degree, den, derivative, det, det_clow,
+                 content, cycles, data, degree, denominator, derivative, det, det_clow,
                  det_df, det_fflu, det_popov, dim, discriminant, divexact,
                  divides, divrem, elem_type, elements, evaluate,
                  extended_weak_popov, extended_weak_popov_with_trafo, fflu!,
@@ -255,7 +255,7 @@ export add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  matrix, matrix_repr, max_degrees, max_precision, minpoly, mod,
                  modulus, monomial_iszero, monomial_set!, monomial_to_newton!,
                  mul!, mul_classical, mul_karatsuba, mul_ks, mullow, mulmod,
-                 needs_parentheses, newton_to_monomial!, normalise, nvars, num,
+                 needs_parentheses, newton_to_monomial!, normalise, nvars, numerator,
                  O, one, order, ordering, parent_type, parity, partitionseq,
                  polcoeff, pol_length, powmod, pow_multinomial, popov, powers,
                  ppio, precision, primpart, pseudodivrem, pseudorem,
@@ -322,6 +322,18 @@ function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true, mod
    Generic.PowerSeriesRing(R, prec, s; cached=cached, model=model)
 end
 
+function LaurentSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true)
+   Generic.LaurentSeriesRing(R, prec, s; cached=cached)
+end
+
+function LaurentSeriesRing(R::Field, prec::Int, s::AbstractString; cached=true)
+   Generic.LaurentSeriesField(R, prec, s; cached=cached)
+end
+
+function LaurentSeriesField(R::Field, prec::Int, s::AbstractString; cached=true)
+   Generic.LaurentSeriesField(R, prec, s; cached=cached)
+end
+
 function PolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
    Generic.PolynomialRing(R, s; cached=cached)
 end
@@ -348,7 +360,8 @@ end
 
 export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        FractionField, ResidueRing, Partition, PermGroup, YoungTableau,
-       Partitions, SkewDiagram, AllPerms, perm
+       Partitions, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
+       LaurentSeriesField
 
 export Generic
 
