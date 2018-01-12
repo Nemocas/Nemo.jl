@@ -380,7 +380,7 @@ end
 
 doc"""
     emb!(result::perm, p::perm, V::Vector{Int})
-> Embedds permutation `p` into `result` on the indices given by `V`. This
+> Embedds permutation `p` into permutation `result` on the indices given by `V`. This
 > corresponds to natural embedding of $S_k$ into $S_n$ as the subgroup
 > permuting points indexed by `V`.
 """
@@ -464,8 +464,7 @@ doc"""
 > `chi(p, false)`. The values computed by $\chi$ are stored in look-up table.
 >
 > The computation follows the Murnaghan-Nakayama formula:
-> $$\chi_\lambda(\sigma) = \sum_{\text{rimhook }\xi\subset \lambda}
-(-1)^{ll(\lambda\backslash\xi)} \chi_{\lambda \backslash\xi}(\tilde\sigma)$$
+> $$\chi_\lambda(\sigma) = \sum_{\text{rimhook }\xi\subset \lambda}(-1)^{ll(\lambda\backslash\xi)} \chi_{\lambda \backslash\xi}(\tilde\sigma)$$
 > where $\lambda\backslash\xi$ denotes partition associated with Young Diagram
 > of $\lambda$ with $\xi$ removed, $ll$ denotes the leg-length (i.e. number of
 > rows - 1) and $\tilde\sigma$ is permutation obtained from $\sigma$ by the
