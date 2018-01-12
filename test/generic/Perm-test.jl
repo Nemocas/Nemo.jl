@@ -11,14 +11,34 @@ end
 function test_perm_constructors()
    print("perm.constructors...")
 
-   R = PermutationGroup(10)
+   @test elem_type(Generic.PermGroup{Int}) == Generic.perm{Int}
+   @test parent_type(Generic.perm{Int}) == Generic.PermGroup{Int}
 
-   @test elem_type(R) == Generic.perm
-   @test elem_type(Generic.PermGroup) == Generic.perm
-   @test parent_type(Generic.perm) == Generic.PermGroup
+   R = PermutationGroup(10)
+   @test typeof(R) == Generic.PermGroup{Int}
+   @test elem_type(R) == Generic.perm{Int}
 
    a = R()
+   @test typeof(a) == Generic.perm{Int}
+   @test parent_type(typeof(a)) == Generic.PermGroup{Int}
+
    b = R([2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
+   @test typeof(b) == Generic.perm{Int}
+   @test parent_type(typeof(b)) == Generic.PermGroup{Int}
+
+
+   R = PermutationGroup(Int16(10))
+   @test typeof(R) == Generic.PermGroup{Int16}
+   @test elem_type(R) == Generic.perm{Int16}
+
+   a = R()
+   @test typeof(a) == Generic.perm{Int16}
+   @test parent_type(typeof(a)) == Generic.PermGroup{Int16}
+
+   b = R(Int16[2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
+   @test typeof(b) == Generic.perm{Int16}
+   @test parent_type(typeof(b)) == Generic.PermGroup{Int16}
+
    c = R(a)
 
    @test isa(a, GroupElem)

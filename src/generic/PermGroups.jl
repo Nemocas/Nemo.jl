@@ -7,9 +7,9 @@ export PermGroup, perm, parity, elements, cycles, character, setpermstyle,
 #
 ###############################################################################
 
-parent_type(::Type{perm}) = PermGroup
+parent_type(::Type{perm{T}}) where T = PermGroup{T}
 
-elem_type(::Type{PermGroup}) = perm
+elem_type(::Type{PermGroup{T}}) where T = perm{T}
 
 ###############################################################################
 #
@@ -85,12 +85,12 @@ function sign(a::perm, ::Type{Val{:cycles}})
    return sign(a)
 end
 
-function getindex(a::perm, n::Int)
+function getindex(a::perm{T}, n::S) where {T<:Integer, S<:Integer}
    return a.d[n]
 end
 
-function setindex!(a::perm, d::Int, n::Int)
-   a.d[n] = d
+function setindex!(a::perm{T}, v::T, n::S) where {T<:Integer, S<:Integer}
+   a.d[n] = v
 end
 
 doc"""
@@ -331,13 +331,13 @@ doc"""
     cycles(a::perm)
 > Decomposes permutation into disjoint cycles.
 """
-function cycles(a::perm)
+function cycles(a::perm{T}) where T<:Integer
    if !isdefined(a, :cycles)
       to_visit = trues(a.d)
-      cycles = Vector{Vector{Int}}()
+      cycles = Vector{Vector{T}}()
       k = 1
       while any(to_visit)
-         cycle = Vector{Int}()
+         cycle = Vector{T}()
          k = findnext(to_visit, k)
          to_visit[k] = false
          push!(cycle, k)
@@ -366,7 +366,7 @@ doc"""
 > `a`. This fully determines the conjugacy class of `a`. The lengths are sorted
 > in reverse order by default.
 """
-permtype(a::perm) = sort([length(c) for c in cycles(a)], rev=true)
+permtype(a::perm{T}) where T = sort([T(length(c)) for c in cycles(a)], rev=true)
 
 doc"""
     matrix_repr(a::perm)
@@ -420,7 +420,7 @@ function (G::PermGroup)()
    return z
 end
 
-function (G::PermGroup)(a::Array{Int, 1}, check::Bool=true)
+function (G::PermGroup)(a::Array{T, 1}, check::Bool=true) where T<:Integer
    length(a) != G.n && error("Unable to coerce to permutation: lengths differ")
    if check
       Base.Set(a) != Base.Set(1:length(a)) && error("Unable to coerce to
@@ -431,9 +431,13 @@ function (G::PermGroup)(a::Array{Int, 1}, check::Bool=true)
    return z
 end
 
-function (G::PermGroup)(a::perm)
-   parent(a) != G && error("Unable to coerce to permutation: wrong parent")
-   return a
+function (G::PermGroup{T})(p::perm{S}) where {T<:Integer, S<:Integer}
+   parent(p).n != G.n && error("Unable to coerce permutation: lengths differ")
+   if S<:T
+      return G(Vector{T}(p.d))
+   else
+      error("Unable to coerce to permutation: parents coefficints too narrow")
+   end
 end
 
 ###############################################################################

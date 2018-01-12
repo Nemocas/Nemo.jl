@@ -274,7 +274,7 @@ function exp(a::T) where T
    return Base.exp(a)
 end
 
-function PermGroup(n::Int, cached=true)
+function PermGroup(n::T, cached=true) where T
    Generic.PermGroup(n, cached)
 end
 
@@ -282,11 +282,11 @@ function AllPerms(n::Int)
    Generic.AllPerms(n)
 end
 
-function perm(n::Int)
+function perm(n::T) where T
    Generic.perm(n)
 end
 
-function perm(a::Array{Int, 1})
+function perm(a::Array{T, 1}) where T
    Generic.perm(a)
 end
 
