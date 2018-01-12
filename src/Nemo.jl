@@ -302,7 +302,7 @@ function SkewDiagram(lambda::Generic.Partition, mu::Generic.Partition)
    Generic.SkewDiagram(lambda, mu)
 end
 
-function SkewDiagram(lambda::Vector{Int}, mu::Vector{Int})
+function SkewDiagram(lambda::Vector{T}, mu::Vector{T}) where T
    Generic.SkewDiagram(lambda, mu)
 end
 
