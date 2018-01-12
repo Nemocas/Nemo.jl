@@ -1,4 +1,4 @@
-export Partition, Partitions, YoungTableau, SkewDiagram
+export Partition, AllParts, YoungTableau, SkewDiagram
 export dim, has_left_neighbor, has_bottom_neighbor, inskewdiag, isrimhook,
        hooklength, leglength, matrix_repr, partitionseq
 
@@ -58,7 +58,7 @@ end
 
 ##############################################################################
 #
-#   Iterator interface for Integer Partitions
+#   Iterator interface for Integer AllParts
 #
 ##############################################################################
 
@@ -66,22 +66,22 @@ end
 #    "Generating All Partitions: A Comparison Of Two Encodings"
 # by Jerome Kelleher and Barry O’Sullivan, ArXiv:0909.2331
 
-function Base.start(parts::Partitions)
+function Base.start(parts::AllParts{T}) where T<:Integer
     if parts.n < 1
-        return (Int[], 0)
+        return (T[], 0)
     elseif parts.n == 1
-        return ([1], 0)
+        return (T[1], 0)
     else
-        p = zeros(Int, parts.n)
+        p = zeros(T, parts.n)
         p[2] = parts.n
         return (p, 2)
     end
 end
 
-Base.next(parts::Partitions, state) = nextpart_asc(state...)
-Base.done(parts::Partitions, state) = state[2] == 1
-Base.eltype(::Type{Partitions}) = Partition
-length(parts::Partitions) = BigInt(numpart(parts.n))
+Base.next(parts::AllParts, state) = nextpart_asc(state...)
+Base.done(parts::AllParts, state) = state[2] == 1
+Base.eltype(::Type{AllParts{T}}) where T = Partition{T}
+length(parts::AllParts) = BigInt(numpart(parts.n))
 
 function nextpart_asc(part, k)
     if k == 0

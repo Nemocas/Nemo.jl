@@ -78,6 +78,15 @@ function test_perm_iteration()
    @test length(collect(elements(G))) == 120
    @test length(unique(elements(G))) == 120
 
+   G = PermutationGroup(Int8(5))
+   @test length(AllPerms(Int8(5))) == 120
+   @test length(unique(AllPerms(Int8(5)))) == 120
+
+   @test collect(elements(G))[1] == G()
+
+   @test length(collect(elements(G))) == 120
+   @test length(unique(elements(G))) == 120
+
    println("PASS")
 end
 
@@ -164,7 +173,7 @@ function test_characters()
 
    N = 8
    G = PermutationGroup(N)
-   @test all(character(p)(G()) == dim(YoungTableau(p)) for p=Partitions(N))
+   @test all(character(p)(G()) == dim(YoungTableau(p)) for p=AllParts(N))
 
    @test character(Partition([2,2,2,2]), Partition([8])) == 0
 
@@ -194,7 +203,7 @@ function test_characters()
 
    # values taken from GAP; note that we specify the order of partitions to be
    # compatible with GAP numbering of conjugacy classes. This is NOT the order
-   # of partitions given by Partitions.
+   # of partitions given by AllParts.
    N = 5
    G = PermutationGroup(N)
    ps = Partition.([[1,1,1,1,1], [2,1,1,1], [2,2,1], [3,1,1], [3,2], [4,1], [5]])

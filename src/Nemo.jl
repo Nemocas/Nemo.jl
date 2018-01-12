@@ -294,8 +294,8 @@ function Partition(part::Vector{Int}, check::Bool=true)
    Generic.Partition(part, check)
 end
 
-function Partitions(n::Int)
-   Generic.Partitions(n)
+function AllParts(n::T) where T
+   Generic.AllParts(n)
 end
 
 function SkewDiagram(lambda::Generic.Partition, mu::Generic.Partition)
@@ -360,7 +360,7 @@ end
 
 export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        FractionField, ResidueRing, Partition, PermGroup, YoungTableau,
-       Partitions, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
+       AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
        LaurentSeriesField
 
 export Generic

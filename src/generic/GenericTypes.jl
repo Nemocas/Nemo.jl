@@ -80,12 +80,12 @@ mutable struct Partition <: AbstractVector{Int}
 end
 
 doc"""
-   Partitions(n::Int)
+    AllParts(n::Int)
 > Returns an iterator over all integer `Partition`s of `n`. They come in
 > ascending order. See also `Combinatorics.partitions(n)`.
 """
-struct Partitions
-    n::Int
+struct AllParts{T}
+    n::T
 end
 
 ###############################################################################
