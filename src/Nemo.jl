@@ -290,7 +290,7 @@ function perm(a::Array{T, 1}) where T
    Generic.perm(a)
 end
 
-function Partition(part::Vector{Int}, check::Bool=true)
+function Partition(part::Vector{T}, check::Bool=true) where T
    Generic.Partition(part, check)
 end
 

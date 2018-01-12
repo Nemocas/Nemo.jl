@@ -67,18 +67,18 @@ doc"""
 > Partition represents integer partition into numbers in non-increasing order.
 > It is a thin wrapper over `Vector{Int}`
 """
-mutable struct Partition <: AbstractVector{Int}
-   n::Int
-   part::Vector{Int}
+mutable struct Partition{T} <: AbstractVector{Integer}
+   n::T
+   part::Vector{T}
 
-   function Partition(part::Vector{Int}, check::Bool=true)
+   function Partition(part::Vector{T}, check::Bool=true) where T
       if check
-         all(diff(part) .<= 0) || throw("Partition must be decreasing!")
-         if length(part) > 0
-            part[end] >=1 || throw("Found non-positive entry in partition!")
+         all(diff(part) .<= zero(T)) || throw("Partition must be decreasing!")
+         if length(part) > zero(T)
+            part[end] >= one(T) || throw("Found non-positive entry in partition!")
          end
       end
-      return new(sum(part), part)
+      return new{T}(sum(part), part)
    end
 end
 

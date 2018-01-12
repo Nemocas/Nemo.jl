@@ -12,11 +12,11 @@ length(p::Partition) = length(p.part)
 
 size(p::Partition) = size(p.part)
 
-Base.IndexStyle(::Type{T}) where {T <: Partition} = Base.IndexLinear()
+Base.IndexStyle(::Type{T}) where T<:Partition = Base.IndexLinear()
 
-getindex(p::Partition, i::Int) = p.part[i]
+getindex(p::Partition, i::T) where T<:Integer = p.part[i]
 
-function setindex!(p::Partition, v::Int, i::Int)
+function setindex!(p::Partition{T}, v::T, i::T) where T<:Integer
    prev = Inf
    nex = 1
    if i == length(p)
@@ -36,7 +36,7 @@ end
 ==(p::Partition, m::Partition) = p.n ==m.n && p.part == m.part
 hash(p::Partition, h::UInt) = hash(p.part, hash(Partition, h))
 
-convert(::Type{Partition}, p::Vector{Int}) = Partition(p)
+convert(::Type{Partition{T}}, p::Vector{T}) where T = Partition(p)
 
 ##############################################################################
 #
@@ -104,8 +104,8 @@ doc"""
 > Returns the conjugated partition of `part`, i.e. the partition corresponding
 > to the Young tableau of `part` reflected through the main diagonal.
 """
-function conj(part::Partition)
-    p = Int[]
+function conj(part::Partition{T}) where T
+    p = T[]
     for i in 1:part.n
         n = sum(part .>= i)
         n == 0 && break
@@ -139,7 +139,7 @@ function partitionseq(lambda::Partition)
    return seq
 end
 
-partitionseq(v::Vector{Int}) = partitionseq(Partition(v))
+partitionseq(v::Vector{T}) where T<:Integer = partitionseq(Partition(v))
 
 doc"""
     partitionseq(seq::BitVector)
