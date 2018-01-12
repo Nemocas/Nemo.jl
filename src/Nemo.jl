@@ -278,7 +278,7 @@ function PermGroup(n::T, cached=true) where T
    Generic.PermGroup(n, cached)
 end
 
-function AllPerms(n::Int)
+function AllPerms(n::T) where T
    Generic.AllPerms(n)
 end
 
