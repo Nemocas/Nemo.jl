@@ -99,19 +99,10 @@ function sign(a::perm, ::Type{Val{:cycles}})
    return sign(a)
 end
 
-function getindex(a::perm{T}, n::S) where {T<:Integer, S<:Integer}
-   return a.d[n]
-end
-
-function setindex!(a::perm{T}, v::T, n::S) where {T<:Integer, S<:Integer}
-   a.d[n] = v
 end
 
 doc"""
-    eye(G::PermGroup)
-> Return the identity permutation for the given permutation group.
 """
-eye(G::PermGroup) = G()
 
 ###############################################################################
 #
