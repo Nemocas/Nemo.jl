@@ -11,17 +11,17 @@ parent_type(::Type{perm{T}}) where T = PermGroup{T}
 
 elem_type(::Type{PermGroup{T}}) where T = perm{T}
 
-###############################################################################
-#
-#   Basic manipulation
-#
-###############################################################################
-
 doc"""
     parent(a::perm)
 > Return the parent of the given permutation group element.
 """
 parent(a::perm) = a.parent
+
+###############################################################################
+#
+#   Low-level manipulation
+#
+###############################################################################
 
 function deepcopy_internal(a::perm, dict::ObjectIdDict)
    G = parent(a)
@@ -37,6 +37,20 @@ function Base.hash(a::perm, h::UInt)
    return b
 end
 
+function getindex(a::perm{T}, n::S) where {T<:Integer, S<:Integer}
+   return a.d[n]
+end
+
+function setindex!(a::perm{T}, v::T, n::S) where {T<:Integer, S<:Integer}
+   a.d[n] = v
+end
+
+###############################################################################
+#
+#   Basic functions
+#
+###############################################################################
+
 doc"""
     parity(a::perm)
 > Return the parity of the given permutation, i.e. the parity of the number of
@@ -48,15 +62,15 @@ doc"""
 > `parity(a, Val{:cycles})``.
 """
 # TODO: 2x slower than Flint
-function parity(a::perm)
+function parity(a::perm{T}) where T
    if isdefined(a, :cycles)
-      return sum([(length(c)+1)%2 for c in cycles(a)])%2
+      return T(sum([(length(c)+1)%2 for c in cycles(a)])%2)
    end
    to_visit = trues(a.d)
-   parity = length(to_visit)
+   parity = false
    k = 1
-   while any(to_visit)
-      parity -= 1
+   @inbounds while any(to_visit)
+      parity = !parity
       k = findnext(to_visit, k)
       to_visit[k] = false
       next = a[k]
@@ -65,7 +79,7 @@ function parity(a::perm)
          next = a[next]
       end
    end
-   return parity%2
+   return T(parity)
 end
 
 function parity(a::perm, ::Type{Val{:cycles}})
@@ -78,26 +92,47 @@ doc"""
 > Returns the sign of the given permutations, i.e. `1` if `a` is even and `-1`
 > if `a` is odd.
 """
-sign(a::perm) = (-1)^parity(a)
+sign(a::perm{T}) where T = (-one(T))^parity(a)
 
 function sign(a::perm, ::Type{Val{:cycles}})
    cycles(a)
    return sign(a)
 end
 
-function getindex(a::perm{T}, n::S) where {T<:Integer, S<:Integer}
-   return a.d[n]
-end
-
-function setindex!(a::perm{T}, v::T, n::S) where {T<:Integer, S<:Integer}
-   a.d[n] = v
+doc"""
+    cycles(a::perm)
+> Decomposes permutation into disjoint cycles.
+"""
+function cycles(a::perm{T}) where T<:Integer
+   if !isdefined(a, :cycles)
+      to_visit = trues(a.d)
+      cycles = Vector{Vector{T}}()
+      k = 1
+      while any(to_visit)
+         cycle = Vector{T}()
+         k = findnext(to_visit, k)
+         to_visit[k] = false
+         push!(cycle, k)
+         next = a[k]
+         while next != k
+            push!(cycle, next)
+            to_visit[next] = false
+            next = a[next]
+         end
+         push!(cycles, cycle)
+      end
+      a.cycles = cycles
+   end
+   return a.cycles
 end
 
 doc"""
-    eye(G::PermGroup)
-> Return the identity permutation for the given permutation group.
+    permtype(a::perm, rev=true)
+> Returns the type of permutation `a`, i.e. lengths of disjoint cycles building
+> `a`. This fully determines the conjugacy class of `a`. The lengths are sorted
+> in reverse order by default.
 """
-eye(G::PermGroup) = G()
+permtype(a::perm{T}) where T = sort([T(length(c)) for c in cycles(a)], rev=true)
 
 ###############################################################################
 #
@@ -336,7 +371,7 @@ function cycles(a::perm{T}) where T<:Integer
       to_visit = trues(a.d)
       k = one(T)
       clens = Vector{T}(1) # cumulative lengths of cycles
-      clens[1] = 1
+      clens[1] = one(T)
       sizehint!(clens, 5 + ceil(Int, log(length(a.d))))
       # expected length of cycle - (overestimation of) the harmonic
 
@@ -370,14 +405,6 @@ doc"""
 > Returns the order of permutation `a`.
 """
 order(a::perm) = lcm([length(c) for c in cycles(a)])
-
-doc"""
-    permtype(a::perm, rev=true)
-> Returns the type of permutation `a`, i.e. lengths of disjoint cycles building
-> `a`. This fully determines the conjugacy class of `a`. The lengths are sorted
-> in reverse order by default.
-"""
-permtype(a::perm{T}) where T = sort([T(length(c)) for c in cycles(a)], rev=true)
 
 doc"""
     matrix_repr(a::perm)
