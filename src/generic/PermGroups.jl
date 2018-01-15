@@ -62,15 +62,15 @@ doc"""
 > `parity(a, Val{:cycles})``.
 """
 # TODO: 2x slower than Flint
-function parity(a::perm)
+function parity(a::perm{T}) where T
    if isdefined(a, :cycles)
-      return sum([(length(c)+1)%2 for c in cycles(a)])%2
+      return T(sum([(length(c)+1)%2 for c in cycles(a)])%2)
    end
    to_visit = trues(a.d)
-   parity = length(to_visit)
+   parity = false
    k = 1
    while any(to_visit)
-      parity -= 1
+      parity = !parity
       k = findnext(to_visit, k)
       to_visit[k] = false
       next = a[k]
@@ -79,7 +79,7 @@ function parity(a::perm)
          next = a[next]
       end
    end
-   return parity%2
+   return T(parity)
 end
 
 function parity(a::perm, ::Type{Val{:cycles}})
@@ -92,7 +92,7 @@ doc"""
 > Returns the sign of the given permutations, i.e. `1` if `a` is even and `-1`
 > if `a` is odd.
 """
-sign(a::perm) = (-1)^parity(a)
+sign(a::perm{T}) where T = (-one(T))^parity(a)
 
 function sign(a::perm, ::Type{Val{:cycles}})
    cycles(a)
