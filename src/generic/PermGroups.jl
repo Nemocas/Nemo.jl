@@ -99,10 +99,40 @@ function sign(a::perm, ::Type{Val{:cycles}})
    return sign(a)
 end
 
+doc"""
+    cycles(a::perm)
+> Decomposes permutation into disjoint cycles.
+"""
+function cycles(a::perm{T}) where T<:Integer
+   if !isdefined(a, :cycles)
+      to_visit = trues(a.d)
+      cycles = Vector{Vector{T}}()
+      k = 1
+      while any(to_visit)
+         cycle = Vector{T}()
+         k = findnext(to_visit, k)
+         to_visit[k] = false
+         push!(cycle, k)
+         next = a[k]
+         while next != k
+            push!(cycle, next)
+            to_visit[next] = false
+            next = a[next]
+         end
+         push!(cycles, cycle)
+      end
+      a.cycles = cycles
+   end
+   return a.cycles
 end
 
 doc"""
+    permtype(a::perm, rev=true)
+> Returns the type of permutation `a`, i.e. lengths of disjoint cycles building
+> `a`. This fully determines the conjugacy class of `a`. The lengths are sorted
+> in reverse order by default.
 """
+permtype(a::perm{T}) where T = sort([T(length(c)) for c in cycles(a)], rev=true)
 
 ###############################################################################
 #
@@ -333,45 +363,10 @@ doc"""
 order(G::PermGroup) = factorial(G.n)
 
 doc"""
-    cycles(a::perm)
-> Decomposes permutation into disjoint cycles.
-"""
-function cycles(a::perm{T}) where T<:Integer
-   if !isdefined(a, :cycles)
-      to_visit = trues(a.d)
-      cycles = Vector{Vector{T}}()
-      k = 1
-      while any(to_visit)
-         cycle = Vector{T}()
-         k = findnext(to_visit, k)
-         to_visit[k] = false
-         push!(cycle, k)
-         next = a[k]
-         while next != k
-            push!(cycle, next)
-            to_visit[next] = false
-            next = a[next]
-         end
-         push!(cycles, cycle)
-      end
-      a.cycles = cycles
-   end
-   return a.cycles
-end
-
-doc"""
     order(a::perm)
 > Returns the order of permutation `a`.
 """
 order(a::perm) = lcm([length(c) for c in cycles(a)])
-
-doc"""
-    permtype(a::perm, rev=true)
-> Returns the type of permutation `a`, i.e. lengths of disjoint cycles building
-> `a`. This fully determines the conjugacy class of `a`. The lengths are sorted
-> in reverse order by default.
-"""
-permtype(a::perm{T}) where T = sort([T(length(c)) for c in cycles(a)], rev=true)
 
 doc"""
     matrix_repr(a::perm)
