@@ -11,17 +11,17 @@ parent_type(::Type{perm{T}}) where T = PermGroup{T}
 
 elem_type(::Type{PermGroup{T}}) where T = perm{T}
 
-###############################################################################
-#
-#   Basic manipulation
-#
-###############################################################################
-
 doc"""
     parent(a::perm)
 > Return the parent of the given permutation group element.
 """
 parent(a::perm) = a.parent
+
+###############################################################################
+#
+#   Low-level manipulation
+#
+###############################################################################
 
 function deepcopy_internal(a::perm, dict::ObjectIdDict)
    G = parent(a)
@@ -36,6 +36,20 @@ function Base.hash(a::perm, h::UInt)
    end
    return b
 end
+
+function getindex(a::perm{T}, n::S) where {T<:Integer, S<:Integer}
+   return a.d[n]
+end
+
+function setindex!(a::perm{T}, v::T, n::S) where {T<:Integer, S<:Integer}
+   a.d[n] = v
+end
+
+###############################################################################
+#
+#   Basic functions
+#
+###############################################################################
 
 doc"""
     parity(a::perm)
