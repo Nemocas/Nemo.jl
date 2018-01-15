@@ -69,7 +69,7 @@ function parity(a::perm{T}) where T
    to_visit = trues(a.d)
    parity = false
    k = 1
-   while any(to_visit)
+   @inbounds while any(to_visit)
       parity = !parity
       k = findnext(to_visit, k)
       to_visit[k] = false
