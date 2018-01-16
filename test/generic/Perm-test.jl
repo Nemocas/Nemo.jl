@@ -123,7 +123,7 @@ function test_perm_binary_ops()
    @test a*a == G()
    @test b*b*b == G()
 
-   @test parity(G()) == 1
+   @test parity(G()) == 0
    p = parity(a)
    @test p == 1
    cycles(a)
