@@ -67,7 +67,7 @@ function parity(a::perm{T}) where T
       return T(sum([(length(c)+1)%2 for c in cycles(a)])%2)
    end
    to_visit = trues(a.d)
-   parity = false
+   parity = true
    k = 1
    @inbounds while any(to_visit)
       parity = !parity

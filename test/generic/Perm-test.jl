@@ -123,6 +123,12 @@ function test_perm_binary_ops()
    @test a*a == G()
    @test b*b*b == G()
 
+   @test parity(G()) == 1
+   p = parity(a)
+   @test p == 1
+   cycles(a)
+   @test parity(a) == p
+
    for a in elements(G), b in elements(G)
       @test parity(a*b) == (parity(b)+parity(a)) % 2
    end
