@@ -106,22 +106,33 @@ doc"""
 function cycles(a::perm{T}) where T<:Integer
    if !isdefined(a, :cycles)
       to_visit = trues(a.d)
-      cycles = Vector{Vector{T}}()
-      k = 1
-      while any(to_visit)
-         cycle = Vector{T}()
+      k = one(T)
+      clens = Vector{T}(1) # cumulative lengths of cycles
+      clens[1] = one(T)
+      sizehint!(clens, 5 + ceil(Int, log(length(a.d))))
+      # expected length of cycle - (overestimation of) the harmonic
+
+      scycles = similar(a.d) # consecutive cycles entries
+      # scycles[clens[i], clens[i+1]-1] contains i-th cycle
+      i = one(T)
+
+      @inbounds while any(to_visit)
          k = findnext(to_visit, k)
          to_visit[k] = false
-         push!(cycle, k)
          next = a[k]
+
+         scycles[i] = k
+         i += 1
+
          while next != k
-            push!(cycle, next)
+            scycles[i] = next
             to_visit[next] = false
             next = a[next]
+            i += 1
          end
-         push!(cycles, cycle)
+         push!(clens, i)
       end
-      a.cycles = cycles
+      a.cycles = [scycles[clens[i]:clens[i+1]-1] for i in 1:length(clens)-1]
    end
    return a.cycles
 end
@@ -361,44 +372,6 @@ doc"""
 > Returns the order of the full permutation group.
 """
 order(G::PermGroup) = factorial(G.n)
-
-doc"""
-    cycles(a::perm)
-> Decomposes permutation into disjoint cycles.
-"""
-function cycles(a::perm{T}) where T<:Integer
-   if !isdefined(a, :cycles)
-      to_visit = trues(a.d)
-      k = one(T)
-      clens = Vector{T}(1) # cumulative lengths of cycles
-      clens[1] = one(T)
-      sizehint!(clens, 5 + ceil(Int, log(length(a.d))))
-      # expected length of cycle - (overestimation of) the harmonic
-
-      scycles = similar(a.d) # consecutive cycles entries
-      # scycles[clens[i], clens[i+1]-1] contains i-th cycle
-      i = one(T)
-
-      @inbounds while any(to_visit)
-         k = findnext(to_visit, k)
-         to_visit[k] = false
-         next = a[k]
-
-         scycles[i] = k
-         i += 1
-
-         while next != k
-            scycles[i] = next
-            to_visit[next] = false
-            next = a[next]
-            i += 1
-         end
-         push!(clens, i)
-      end
-      a.cycles = [scycles[clens[i]:clens[i+1]-1] for i in 1:length(clens)-1]
-   end
-   return a.cycles
-end
 
 doc"""
     order(a::perm)
