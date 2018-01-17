@@ -31,7 +31,7 @@ end
 mutable struct perm{T<:Integer} <: Nemo.GroupElem
    d::Array{T, 1}
    cycles::Vector{Vector{T}}
-   parent::Nemo.Generic.PermGroup{T}
+   parent::PermGroup{T}
 
    function perm(n::T) where T<:Integer
       return new{T}(collect(1:n))
