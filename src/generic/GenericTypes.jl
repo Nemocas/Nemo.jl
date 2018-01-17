@@ -17,7 +17,7 @@ mutable struct PermGroup{T<:Integer} <: Nemo.Group
 
    function PermGroup(n::T, cached=true) where T<:Integer
       if haskey(PermID, n)
-         return PermID[n]::PermGroup
+         return PermID[n]::PermGroup{T}
       else
          z = new{T}(n)
          if cached
