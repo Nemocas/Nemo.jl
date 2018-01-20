@@ -5,7 +5,7 @@
 ################################################################################
 
 export fq_mat, FqMatSpace, getindex, setindex!, set_entry!, deepcopy, rows, 
-       cols, parent, base_ring, zero, one, issquare, show, transpose,
+       cols, parent, base_ring, zero, one, show, transpose,
        transpose!, rref, rref!, trace, det, rank, inv, solve, lufact,
        sub, hcat, vcat, Array, lift, lift!, MatrixSpace, check_parent,
        howell_form, howell_form!, strong_echelon_form, strong_echelon_form!
@@ -26,12 +26,6 @@ function check_parent(x::fq_mat, y::fq_mat)
    error("Matrices have wrong dimensions")
    return nothing
 end
-
-size(x::fq_mat) = tuple(x.r, x.c)
-
-size(t::fq_mat, d) = d <= 2 ? size(t)[d] : 1
-
-issquare(a::fq_mat) = (rows(a) == cols(a))
 
 ###############################################################################
 #
