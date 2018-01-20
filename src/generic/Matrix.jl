@@ -780,7 +780,7 @@ function kronecker_product(x::MatElem{T}, y::MatElem{T}) where {T <: RingElement
       for jx in 1:cols(x)
          jxc = (jx-1)*cols(y)
          for iy in 1:rows(y)
-            for jy in 1:cols(x)
+            for jy in 1:cols(y)
               z[ixr+iy,jxc+jy] = x[ix,jx]*y[iy,jy]
             end
          end

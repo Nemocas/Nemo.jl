@@ -269,6 +269,21 @@ function test_fmpq_mat_adhoc_binary()
    println("PASS")
 end
 
+function test_fmpq_mat_kronecker_product()
+   print("fmpq_mat.kronecker_product...")
+
+   S = MatrixSpace(QQ, 2, 3)
+   S2 = MatrixSpace(QQ, 2, 2)
+   S3 = MatrixSpace(QQ, 3, 3)
+
+   A = S(fmpq[2 3 5; 9 6 3])
+   B = S2(fmpq[2 3; 1 4])
+   C = S3(fmpq[2 3 5; 1 4 7; 9 6 3])
+
+   @test size(kronecker_product(A, A)) == (4,9)
+   @test kronecker_product(B*A,A*C) == kronecker_product(B,A) * kronecker_product(A,C)
+end
+
 function test_fmpq_mat_comparison()
    print("fmpq_mat.comparison...")
 

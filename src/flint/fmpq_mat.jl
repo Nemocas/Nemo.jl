@@ -444,7 +444,7 @@ divexact(x::fmpq_mat, y::Rational{T}) where T <: Union{Int, BigInt} = divexact(x
 
 function kronecker_product(x::fmpq_mat, y::fmpq_mat)
    base_ring(x) == base_ring(y) || error("Incompatible matrices")
-   z = similar(x, rows(x)*ros(y), cols(x)*cols(y))
+   z = similar(x, rows(x)*rows(y), cols(x)*cols(y))
    ccall((:fmpq_mat_kronecker_product, :libflint), Void,
                 (Ref{fmpq_mat}, Ref{fmpq_mat}, Ref{fmpq_mat}), z, x, y)
    return z
