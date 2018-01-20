@@ -15,7 +15,7 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref,
        hnf_via_popov_with_trafo, popov, det_popov, _check_dim, rows, cols,
        gram, rref, rref!, swap_rows, swap_rows!, hnf_kb, hnf_kb_with_trafo,
        hnf_cohen, hnf_cohen_with_trafo, snf_kb, snf_kb_with_trafo,
-       find_pivot_popov, inv!, zero_matrix
+       find_pivot_popov, inv!, zero_matrix, kronecker_product
 
 ###############################################################################
 #
@@ -749,6 +749,29 @@ function divexact(x::Nemo.MatElem{T}, y::T) where {T <: RingElem}
    for i = 1:rows(x)
       for j = 1:cols(x)
          z[i, j] = divexact(x[i, j], y)
+      end
+   end
+   return z
+end
+
+###############################################################################
+#
+#   Kronecker product
+#
+###############################################################################
+
+function kronecker_product(x::MatElem{T}, y::MatElem{T}) where {T <: RingElement}
+   base_ring(parent(x)) == base_ring(parent(y)) || error("Incompatible matrix spaces in matrix operation")
+   z = similar(x, rows(x)*rows(y), cols(x)*cols(y))
+   for ix in 1:rows(x)
+      ixr = (ix-1)*rows(y)
+      for jx in 1:cols(x)
+         jxc = (jx-1)*cols(y)
+         for iy in 1:rows(y)
+            for jy in 1:cols(x)
+              z[ixr+iy,jxc+jy] = x[ix,jx]*y[iy,jy]
+            end
+         end
       end
    end
    return z

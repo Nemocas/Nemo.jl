@@ -491,6 +491,20 @@ divexact(x::fmpz_mat, y::Integer) = divexact(x, fmpz(y))
 
 ###############################################################################
 #
+#   Kronecker product
+#
+###############################################################################
+
+function kronecker_product(x::fmpz_mat, y::fmpz_mat)
+   base_ring(x) == base_ring(y) || error("Incompatible matrices")
+   z = similar(x, rows(x)*ros(y), cols(x)*cols(y))
+   ccall((:fmpz_mat_kronecker_product, :libflint), Void,
+                (Ref{fmpz_mat}, Ref{fmpz_mat}, Ref{fmpz_mat}), z, x, y)
+   return z
+end
+
+###############################################################################
+#
 #   Modular reduction
 #
 ###############################################################################
