@@ -1345,7 +1345,7 @@ function divides(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T}) where {T <: RingEleme
       end
       set_length!(f, normalise(f, length(f)))
    end
-   return f == 0, q
+   return f == false, q
 end
 
 doc"""
