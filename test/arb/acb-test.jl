@@ -441,6 +441,27 @@ function test_lindep()
    println("PASS")
 end
 
+function test_acb_integration()
+   print("acb.integration...")
+
+   res = Nemo.integrate(x->x,  CC(-1), CC(1))
+   @test contains(res, CC(0))
+   @test imag(res) == CC(0)
+   @test radius(real(res)) < 3e-19
+
+   res = Nemo.integrate(x->x^2,CC(-1), CC(1))
+   @test contains(res, CC(2//3))
+   @test imag(res) == CC(0)
+   @test radius(real(res)) < 7e-19
+
+   res = Nemo.integrate(sin, CC(0), const_pi(CC))
+   @test overlaps(res, CC(2))
+   @test imag(res) == CC(0)
+   @test radius(real(res)) < 4e-18
+
+   println("PASS")
+end
+
 function test_acb()
    test_acb_constructors()
    test_acb_printing()
@@ -454,6 +475,7 @@ function test_acb()
    test_acb_constants()
    test_acb_functions()
    test_lindep()
+   test_acb_integration()
 
    println("")
 end

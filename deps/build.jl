@@ -6,7 +6,7 @@ oldwdir = pwd()
 @show MPFR_VERSION = "4.0.0"
 @show ANTIC_VERSION = "e837cdac411f84a72749561bab5f716e80ed73bb"
 @show FLINT_VERSION = "84ee095d0cdb66ca228cf3ff67f0f3a206184971"
-@show ARB_VERSION = "b0d5ccdb59eeb424ad5e7d8f1911490dd4668a40"
+@show ARB_VERSION = "232135f35eeebb74afcea5dd7be436142bee9227"
 
 pkgdir = dirname(dirname(@__FILE__))
 wdir = joinpath(pkgdir, "deps")
