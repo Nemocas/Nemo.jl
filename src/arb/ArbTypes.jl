@@ -26,32 +26,10 @@ const ARB_RND_NEAR = Cint(4)   # to nearest
 
 ################################################################################
 #
-#  Types and memory management for ArbField
+#  Structs for shallow operations
 #
 ################################################################################
 
-mutable struct ArbField <: Field
-  prec::Int
-
-  function ArbField(p::Int = 256, cached::Bool = true)
-    arb_check_prec(p)
-    if haskey(ArbFieldID, p)
-      return ArbFieldID[p]
-    else
-      z = new(p)
-      if cached
-        ArbFieldID[p] = z
-      end
-      return z
-    end
-  end
-end
-
-const ArbFieldID = Dict{Int, ArbField}()
-
-prec(x::ArbField) = x.prec
-
-# these may be used for shallow operations
 mutable struct arf_struct
   exp::Int # fmpz
   size::UInt # mp_size_t
@@ -62,6 +40,17 @@ end
 mutable struct mag_struct
   exp::Int # fmpz
   man::UInt # mp_limb_t
+
+  function mag_struct()
+    m = new()
+    ccall((:mag_init, :libarb), Void, (Ref{mag_struct},), m)
+    finalizer(m, _mag_struct_fn)
+    return m
+  end
+end
+
+function _mag_struct_fn(m::mag_struct)
+  ccall((:mag_clear, :libarb), Void, (Ref{mag_struct}, ), m)
 end
 
 mutable struct arb_struct
@@ -86,7 +75,45 @@ mutable struct acb_struct
   imag_mid_d2::Int
   imag_rad_exp::Int # fmpz
   imag_rad_man::UInt
+
+  function acb_struct()
+    z = new()
+    ccall((:acb_init, :libarb), Void, (Ref{Nemo.acb_struct},), z)
+    finalizer(z, _acb_clear_fn)
+    return z
+  end
 end
+
+function _acb_clear_fn(x::acb_struct)
+  ccall((:acb_clear, :libarb), Void, (Ref{acb_struct}, ), x)
+end
+
+################################################################################
+#
+#  Types and memory management for ArbField
+#
+################################################################################
+
+mutable struct ArbField <: Field
+  prec::Int
+
+  function ArbField(p::Int = 256, cached::Bool = true)
+    arb_check_prec(p)
+    if haskey(ArbFieldID, p)
+      return ArbFieldID[p]
+    else
+      z = new(p)
+      if cached
+        ArbFieldID[p] = z
+      end
+      return z
+    end
+  end
+end
+
+const ArbFieldID = Dict{Int, ArbField}()
+
+prec(x::ArbField) = x.prec
 
 mutable struct arb <: FieldElem
   mid_exp::Int # fmpz
@@ -230,6 +257,25 @@ function _acb_clear_fn(x::acb)
   ccall((:acb_clear, :libarb), Void, (Ref{acb}, ), x)
 end
 
+mutable struct acb_calc_integrate_opts
+  deg_limit::Int   # <=0: default of 0.5*min(prec, rel_goal) + 10
+  eval_limit::Int  # <=0: default of 1000*prec*prec^2
+  depth_limit::Int # <=0: default of 2*prec
+  use_heap::Int32 # 0 append to the top of a stack; 1 binary heap
+  verbose::Int32 # 1 less verbose; 2 more verbose
+
+  function acb_calc_integrate_opts(deg_limit::Int, eval_limit::Int,
+    depth_limit::Int, use_heap::Int32, verbose::Int32)
+    return new(deg_limit, eval_limit, depth_limit, use_heap, verbose)
+  end
+
+  function acb_calc_integrate_opts()
+    opts = new()
+    ccall((:acb_calc_integrate_opt_init, :libarb),
+      Void, (Ref{acb_calc_integrate_opts}, ), opts)
+    return opts
+  end
+end
 
 ################################################################################
 #
