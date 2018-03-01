@@ -726,6 +726,12 @@ function zero!(c::fmpq)
    return c
 end
 
+function muleq!(c::fmpq, a::fmpq)
+   ccall((:fmpq_mul, :libflint), Void,
+         (Ref{fmpq}, Ref{fmpq}, Ref{fmpq}), c, c, a)
+   return c
+end
+
 function mul!(c::fmpq, a::fmpq, b::fmpq)
    ccall((:fmpq_mul, :libflint), Void,
          (Ref{fmpq}, Ref{fmpq}, Ref{fmpq}), c, a, b)
