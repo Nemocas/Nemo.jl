@@ -1,44 +1,79 @@
-function acb_calc_func_wrap(res::acb_struct, x::acb, param::Ptr{Void}, order::Int, prec::Int)
-
-    acbF = unsafe_pointer_to_objref(param)::Function
-    FF = AcbField(prec)
-    z = acbF(FF(x))
-
-    _acb_set(res, acb_struct(z))
-    return Cint(0)::Cint
+function acb_calc_func_wrap(res::Ptr{acb}, x::Ptr{acb}, param::Ptr{Void}, order::Int, prec::Int)
+    xx = unsafe_load(x)
+    xx.parent = AcbField(prec)
+    F = unsafe_pointer_to_objref(param)
+    w = F(xx)
+    ccall((:acb_set, :libarb), Ptr{Void}, (Ptr{acb}, Ref{acb}), res, w)
+    return zero(Cint)
 end
 
 acb_calc_func_wrap_c() = cfunction(acb_calc_func_wrap, Cint,
-        (Ref{acb_struct}, Ref{acb}, Ptr{Void}, Int, Int))
+        (Ptr{acb}, Ptr{acb}, Ptr{Void}, Int, Int))
 
 const ARB_CALC_SUCCESS = UInt(0)
 const ARB_CALC_NO_CONVERGENCE = UInt(2)
 
-function integrate(F::Function, a::acb, b::acb;
-    rel_goal::Int=prec(parent(a)),
-    abs_tol::mag_struct=mag_set_ui_2exp_si(mag_struct(), 1, -prec(parent(a))),
-    opts::acb_calc_integrate_opts=acb_calc_integrate_opts(),
-    precision::Int=prec(parent(a)))
+function integrate(C::AcbField, F, a, b;
+                   rel_tol = -1.0,
+                   abs_tol = -1.0,
+                   deg_limit::Int = 0,
+                   eval_limit::Int = 0,
+                   depth_limit::Int = 0,
+                   use_heap::Int = 0,
+                   verbose::Int = 0)
 
-    res = AcbField(precision)()
-    ptrF = pointer_from_objref(F)
+   opts = acb_calc_integrate_opts(deg_limit, eval_limit, depth_limit,
+                                  Cint(use_heap), Cint(verbose))
 
-    status = ccall((:acb_calc_integrate, :libarb), UInt,
-        (Ref{acb},   #res
-        Ptr{Void},   #func
-        Ptr{Void},   #params
-        Ref{acb},    #a
-        Ref{acb},    #b
-        Int,         #rel_goal
-        Ref{mag_struct},    #abs_tol
-        Ref{acb_calc_integrate_opts}, #opts
-        Int),
-        res, acb_calc_func_wrap_c(), ptrF, a, b, rel_goal, abs_tol, opts, precision)
+   lower = C(a)
+   upper = C(b)
 
-    if status == ARB_CALC_SUCCESS
-        nothing
-    elseif status == ARB_CALC_NO_CONVERGENCE
-        warn("Integration did not obtained convergence")
-    end
-    return res
+   cgoal = 0
+
+   if rel_tol === -1.0
+      cgoal = prec(C)
+   else
+      t = BigFloat(rel_tol, RoundDown)
+      cgoal_clong = Ref{Clong}()
+      ccall((:mpfr_get_d_2exp, :libmpfr), Float64, (Ref{Clong}, Ref{BigFloat}, Cint), cgoal_clong, t, Base.MPFR.to_mpfr(RoundDown))
+      cgoal = -Int(cgoal_clong[]) + 1
+   end
+
+   ctol = mag_struct(0, 0)
+   ccall((:mag_init, :libarb), Void, (Ref{mag_struct},), ctol)
+
+   if abs_tol === -1.0
+      ccall((:mag_set_ui_2exp_si, libarb), Void, (Ref{mag_struct}, UInt, Int), ctol, 1, -prec(C))
+   else
+      t = BigFloat(abs_tol, RoundDown)
+      expo = Ref{Clong}()
+      d = ccall((:mpfr_get_d_2exp, :libmpfr), Float64, (Ref{Clong}, Ref{BigFloat}, Cint), expo, t, Base.MPFR.to_mpfr(RoundDown))
+      ccall((:mag_set_d, libarb), Void, (Ref{mag_struct}, Float64), ctol, d)
+      ccall((:mag_mul_2exp_si, libarb), Void, (Ref{mag_struct}, Ref{mag_struct}, Int), ctol, ctol, Int(expo[]))
+   end
+
+   res = C()
+
+   ptrF = pointer_from_objref(F)
+
+   status = ccall((:acb_calc_integrate, :libarb), UInt,
+                  (Ref{acb},                       #res
+                   Ptr{Void},                      #func
+                   Ptr{Void},                      #params
+                   Ref{acb},                       #a
+                   Ref{acb},                       #b
+                   Int,                            #rel_goal
+                   Ref{mag_struct},                #abs_tol
+                   Ref{acb_calc_integrate_opts},   #opts
+                   Int),
+      res, acb_calc_func_wrap_c(), ptrF, lower, upper, cgoal, ctol, opts, prec(C))
+
+   ccall((:mag_clear, :libarb), Void, (Ref{mag_struct},), ctol)
+
+   if status == ARB_CALC_SUCCESS
+      nothing
+   elseif status == ARB_CALC_NO_CONVERGENCE
+      warn("Integration did converge")
+   end
+   return res
 end

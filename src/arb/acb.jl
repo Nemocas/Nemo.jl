@@ -1450,7 +1450,7 @@ function agm(x::acb, y::acb)
 end
 
 doc"""
-    lindep(A::Array{arb}, bits::Int)
+    lindep(A::Array{acb}, bits::Int)
 > Find a small linear combination of the entries of the array $A$ that is small
 > using LLL). The entries are first scaled by the given number of bits before
 > truncating the real and imaginary parts to integers for use in LLL. This function can
@@ -1645,16 +1645,6 @@ for (typeofx, passtoc) in ((acb, Ref{acb}), (Ptr{acb}, Ptr{acb}))
   end
 end
 
-function _acb_set(x::acb_struct, y::acb_struct)
-  ccall((:acb_set, :libarb), Void, (Ref{acb_struct}, Ref{acb_struct}), x, y)
-end
-
-function mag_set_ui_2exp_si(m::mag_struct, x::Int, y::Int)
-    ccall((:mag_set_ui_2exp_si, :libarb), Void,
-        (Ref{mag_struct}, UInt, Int), m, abs(x), y)
-    return m
-end
-
 ################################################################################
 #
 #  Parent object overload
@@ -1688,13 +1678,6 @@ end
 
 (r::AcbField)(x::Rational{S}, y::Rational{T}) where {S <: Integer, T <: Integer} =
       r(fmpq(x), fmpq(y))
-
-function (T::Type{acb_struct})(z::acb)
-  res = acb_struct()
-  ccall((:acb_set, :libarb), Void,
-        (Ref{acb_struct}, Ref{acb}), res, z)
-  return res
-end
 
 ################################################################################
 #
