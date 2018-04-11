@@ -41,7 +41,8 @@ for i in names(AbstractAlgebra)
   eval(Expr(:export, i))
 end
 
-import AbstractAlgebra: Set, Module, Ring, Group, Field, promote_rule
+import AbstractAlgebra: Set, Module, Ring, Group, Field, ModuleElem,
+       promote_rule
 
 export flint_cleanup, flint_set_num_threads
 
