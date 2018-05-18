@@ -16,7 +16,7 @@ export ball, radius, midpoint, contains, contains_zero,
        isnonzero, isexact, isint, ispositive, isfinite,
        isnonnegative, isnegative, isnonpositive, add!, mul!,
        sub!, div!, strongequal, prec, overlaps, unique_integer,
-       accuracy_bits, trim, ldexp, setunion,
+       accuracy_bits, trim, ldexp, setunion, setintersection,
        const_pi, const_e, const_log2, const_log10, const_euler,
        const_catalan, const_khinchin, const_glaisher,
        floor, ceil, hypot, rsqrt, sqrt1pm1, root,
@@ -903,6 +903,18 @@ doc"""
 function setunion(x::arb, y::arb)
   z = parent(x)()
   ccall((:arb_union, :libarb), Void,
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, parent(x).prec)
+  return z
+end
+
+doc"""
+    setintersection(x::arb, y::arb)
+> Return an `arb` containing the intersection of the intervals represented by
+> $x$ and $y$.
+"""
+function setintersection(x::arb, y::arb)
+  z = parent(x)()
+  ccall((:arb_intersection, :libarb), Void,
               (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, parent(x).prec)
   return z
 end
