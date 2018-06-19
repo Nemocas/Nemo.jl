@@ -844,7 +844,7 @@ end
 
 doc"""
     ldexp(x::arb, y::Int)
-> Return $2^yx$. Note that $y$ can be positive, zero or negative.
+> Return $x \times 2^y$. Note that $y$ can be positive, zero or negative.
 """
 function ldexp(x::arb, y::Int)
   z = parent(x)()
@@ -855,7 +855,7 @@ end
 
 doc"""
     ldexp(x::arb, y::fmpz)
-> Return $2^yx$. Note that $y$ can be positive, zero or negative.
+> Return $x \times 2^y$. Note that $y$ can be positive, zero or negative.
 """
 function ldexp(x::arb, y::fmpz)
   z = parent(x)()
