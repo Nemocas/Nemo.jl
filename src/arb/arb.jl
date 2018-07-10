@@ -10,6 +10,10 @@
 import Base: ceil, digamma, zeta, polygamma, erf, erfi, erfc, besselj, bessely,
              besseli, besselk
 
+if Pkg.installed("IntervalArithmetic") != nothing
+    import IntervalArithmetic: radius
+end
+
 export ball, radius, midpoint, contains, contains_zero,
        contains_negative, contains_positive, contains_nonnegative,
        contains_nonpositive, iszero,
