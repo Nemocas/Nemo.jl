@@ -1727,7 +1727,7 @@ function numpart(n::fmpz, r::ArbField)
 end
 
 doc"""
-    numpart(n::fmpz, r::ArbField)
+    numpart(n::Int, r::ArbField)
 > Return the number of partitions $p(n)$ as an element of $r$.
 """
 numpart(n::Int, r::ArbField) = numpart(fmpz(n), r)
