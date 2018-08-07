@@ -106,6 +106,11 @@ end
 
 # TODO: implement hash
 
+function check_parent(a::acb, b::acb)
+   parent(a) != parent(b) &&
+             error("Incompatible acb elements")
+end
+
 ################################################################################
 #
 #  Conversions

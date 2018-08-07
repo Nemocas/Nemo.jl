@@ -89,6 +89,11 @@ function deepcopy_internal(a::arb, dict::ObjectIdDict)
   return b
 end
 
+function check_parent(a::arb, b::arb)
+   parent(a) != parent(b) &&
+             error("Incompatible arb elements")
+end
+
 ################################################################################
 #
 #  Conversions
