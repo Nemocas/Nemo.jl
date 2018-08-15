@@ -10,6 +10,10 @@
 import Base: ceil, digamma, zeta, polygamma, erf, erfi, erfc, besselj, bessely,
              besseli, besselk
 
+if Pkg.installed("IntervalArithmetic") != nothing
+    import IntervalArithmetic: radius
+end
+
 export ball, radius, midpoint, contains, contains_zero,
        contains_negative, contains_positive, contains_nonnegative,
        contains_nonpositive, convert, iszero,
@@ -861,7 +865,7 @@ end
 
 doc"""
     ldexp(x::arb, y::Int)
-> Return $2^yx$. Note that $y$ can be positive, zero or negative.
+> Return $x \times 2^y$. Note that $y$ can be positive, zero or negative.
 """
 function ldexp(x::arb, y::Int)
   z = parent(x)()
@@ -872,7 +876,7 @@ end
 
 doc"""
     ldexp(x::arb, y::fmpz)
-> Return $2^yx$. Note that $y$ can be positive, zero or negative.
+> Return $x \times 2^y$. Note that $y$ can be positive, zero or negative.
 """
 function ldexp(x::arb, y::fmpz)
   z = parent(x)()
