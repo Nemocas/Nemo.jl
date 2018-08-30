@@ -57,10 +57,29 @@ end
 #
 ###############################################################################
 
+function _checkrange_or_empty(l::Int, start::Int, stop::Int)
+   (stop < start) || 
+   (Generic._checkbounds(l, start) &&
+    Generic._checkbounds(l, stop)) 
+end
+
 function Base.view(x::fmpz_mat, r1::Int, c1::Int, r2::Int, c2::Int)
-   Generic._checkbounds(x, r1, c1)
-   Generic._checkbounds(x, r2, c2)
-   (r1 > r2 || c1 > c2) && error("Invalid parameters")
+   
+   _checkrange_or_empty(rows(x), r1, r2) ||
+      Base.throw_boundserror(x, (r1:r2, c1:c2))
+
+   _checkrange_or_empty(cols(x), c1, c2) ||
+      Base.throw_boundserror(x, (r1:r2, c1:c2))
+
+   if (r1 > r2) 
+     r1 = 1
+     r2 = 0
+   end
+   if (c1 > c2)
+     c1 = 1
+     c2 = 0
+   end
+       
    b = fmpz_mat()
    b.base_ring = FlintZZ
    b.view_parent = x
