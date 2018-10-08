@@ -6,17 +6,17 @@ function serialise(sValue)
 	return 0
 end
 
-function deSerialise()
+function deSerialise(dType)
 	
 	io = open("objects.dat", "r");
-	dValue = read(io, String);
+	dValue = read(io, dType);
 	close(io);
 	return dValue
 end
 
-
-serialise("sample data");
+data = "sample data";
+serialise(data);
  
-sleep(10);
+sleep(5);
  
-deSerialise()
+deSerialise(typeof(data))
