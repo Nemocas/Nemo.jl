@@ -23,7 +23,6 @@ end
 
 
 
-
 # simple I/O custom serialization
 function serialise(sValue)
 	
