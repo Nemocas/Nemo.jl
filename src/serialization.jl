@@ -10,7 +10,7 @@ function deserialize(s::AbstractSerializer, t::Type{fmpz})
 end
 
 function serialize(s::AbstractSerializer, t::fmpq)
-  serialize_type(s, fmpq)
+  #serialize_type(s, fmpq)
   serialize(s, base(numerator(t), 62))
   return serialize(s, base(denominator(t), 62))
 end
