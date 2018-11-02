@@ -1,40 +1,92 @@
 
-#FlintType serialization
+#Flint serialization code
 
+#--------------fmpz START-----------------
 
-###############################################################################
-#
-#   FmpzPolyRing / fmpz_poly
-#
-###############################################################################
+fmpzByteStream(x) = reinterpret(Int, [x])
+ 
+io = IOBuffer()
 
+struct serializeFmpz
+	
+	function serializeFmpz(sValue::fmpz)
+		write(io, fmpzByteStream(sValue.d))
+	end
 
-#--------------FmpzPolyRing START--------------
-
-function serialize(s::AbstractSerializer, fpr::FmpzPolyRing)
-	serialize(s, fpr)
 end
 
-function deserialize(s::AbstractSerializer, fpr::Type{FmpzPolyRing})
-	deserialize(s)
+function deserialize(t::Type{fmpz})
+	seekstart(io)
+	return fmpz(read(io, Int))
 end
 
-fmpzPolyR = FmpzPolyRing( ::FlintIntegerRing, ::Symbol)
 
-# Serialization
-serialize_iob = IOBuffer()
-serialize(serialize_iob, fmpzPolyR)
-seekstart(serialize_iob)
-data = read(serialize_iob)
-
-# Deserialization
-deserialize_iob = IOBuffer(data)
-fmpzPolyR_rtrv = deserialize(deserialize_iob)
+sr = serializeFmpz(fmpz(13))
+deserialize(fmpz)
 
 
-#--------------FmpzPolyRing END---------------
+#--------------fmpz END-------------------
 
-#--------------fmpz_poly START----------------
+#--------------fmpq START-----------------
+
+
+fmpqByteStream(x) = reinterpret(Int, [x])
+ 
+io = IOBuffer()
+
+struct serializeFmpq
+	
+	function serializeFmpq(sValue::fmpq)
+		write(io, fmpzByteStream(sValue.num))
+		write(io, fmpzByteStream(sValue.den))
+	end
+
+end
+
+function deserialize(t::Type{fmpq})
+	seekstart(io)
+	p1 =  read(io, Int)
+	p2 =  read(io, Int)
+	return fmpq(p1, p2)
+end
+
+
+sr = serializeFmpq(fmpq(13, 13))
+deserialize(fmpq)
+
+
+#--------------fmpq END----------------
+
+#--------------NmodRing START----------
+
+NmodRingByteStream(x) = reinterpret(UInt, [x])
+ 
+io = IOBuffer()
+
+struct serializeNmodRing
+	
+	function serializeNmodRing(sValue::NmodRing)
+		write(io, NmodRingByteStream(sValue.n))
+		write(io, NmodRingByteStream(sValue.ninv))
+	end
+
+end
+
+function deserialize(t::Type{NmodRing})
+	seekstart(io)
+	p1 =  read(io, UInt)
+	p2 =  read(io, UInt)
+	return NmodRing(p1, p2)
+end
+
+
+sr = serializeNmodRing(NmodRing(13, 13))
+deserialize(NmodRing)
+
+
+#--------------NmodRing END----------
+
+
 
 function serialize(s::AbstractSerializer, fpp::fmpz_poly)
 	serialize(s, fpp)
