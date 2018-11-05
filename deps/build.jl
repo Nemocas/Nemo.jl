@@ -8,7 +8,7 @@ oldwdir = pwd()
 @show MPFR_VERSION = "4.0.0"
 @show ANTIC_VERSION = "96b37f6242526f95f68f1f15c925db5a4a19a21c"
 @show FLINT_VERSION = "b44e31c4b456653a54d046b094491039d0cde612"
-@show ARB_VERSION = "4ddd6771d94e602462e1fc470ec9d55b248c04d7"
+@show ARB_VERSION = "987e7a1395d7dd608139b6ac07ba889cc4fadbd9"
 
 pkgdir = dirname(dirname(@__FILE__))
 wdir = joinpath(pkgdir, "deps")
@@ -293,7 +293,7 @@ if Sys.iswindows()
    if Int == Int32
       download_dll("http://nemocas.org/binaries/w32-libarb.dll", joinpath(vdir, "lib", "libarb.dll"))
    else
-      download_dll("http://nemocas.org/binaries/w64-libarb.dll", joinpath(vdir, "lib", "libarb.dll"))
+      download_dll("http://nemocas.org/binaries/w64-libarb.dll.$ARB_VERSION", joinpath(vdir, "lib", "libarb.dll"))
    end
    println("DONE")
 else
