@@ -31,15 +31,14 @@ Nemo depends on AbstractAlgebra.jl which provides Nemo with generic routines for
 
 ## Installation
 
-To use Nemo we require Julia 0.6 or higher. Please see
+To use Nemo we require Julia 1.0 or higher. Please see
 [http://julialang.org/downloads](http://julialang.org/downloads/) for instructions on
 how to obtain julia for your system.
 
 At the Julia prompt simply type
 
 ```
-julia> Pkg.add("Nemo")
-julia> Pkg.build("Nemo")
+julia> using Pkg; Pkg.add("Nemo")
 ```
 
 ## Quick start
@@ -133,3 +132,10 @@ t+O(t^100)
 julia> @time divexact((u*exp(x*u)), (exp(u)-1));
   0.042663 seconds (64.01 k allocations: 1.999 MB, 15.40% gc time)
 ```
+
+## Building dependencies from source
+
+Nemo depends on various C libraries which are installed using binaries by default.
+Building from source can be enabled by setting the environment variable `NEMO_SOURCE_BUILD=1`
+and then doing `Pkg.build("Nemo")` or `Pkg.add("Nemo")` depending on whether Nemo
+was already installed.
