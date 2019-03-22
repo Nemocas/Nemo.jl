@@ -613,7 +613,7 @@ end
 """
 function lift(a::T) where {T <: Zmodn_mat}
   z = fmpz_mat(nrows(a), ncols(a))
-  z.base_ring = FlintIntegerRing()
+  z.base_ring = FlintZZ
   ccall((:fmpz_mat_set_nmod_mat, :libflint), Nothing,
           (Ref{fmpz_mat}, Ref{T}), z, a)
   return z 
