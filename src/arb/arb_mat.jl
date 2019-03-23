@@ -46,6 +46,12 @@ parent(x::arb_mat, cached::Bool = true) =
 
 prec(x::ArbMatSpace) = prec(x.base_ring)
 
+function check_parent(x::arb_mat, y::arb_mat, throw::Bool = true)
+   fl = (nrows(x) != nrows(y) || ncols(x) != ncols(y) || base_ring(x) != base_ring(y))
+   fl && throw && error("Incompatible matrices")
+   return !fl
+end
+
 function getindex!(z::arb, x::arb_mat, r::Int, c::Int)
   GC.@preserve x begin
      v = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
@@ -343,7 +349,8 @@ function isequal(x::arb_mat, y::arb_mat)
 end
 
 function ==(x::arb_mat, y::arb_mat)
-  check_parent(x, y)
+  fl = check_parent(x, y, false)
+  !fl && return false
   r = ccall((:arb_mat_eq, :libarb), Cint, (Ref{arb_mat}, Ref{arb_mat}), x, y)
   return Bool(r)
 end

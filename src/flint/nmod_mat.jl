@@ -20,11 +20,13 @@ parent_type(::Type{nmod_mat}) = NmodMatSpace
 
 elem_type(::Type{NmodMatSpace}) = nmod_mat
 
-function check_parent(x::T, y::T) where T <: Zmodn_mat
-  base_ring(x) != base_ring(y) && error("Residue rings must be equal")
-  (ncols(x) != ncols(y)) && (nrows(x) != nrows(y)) &&
-          error("Matrices have wrong dimensions")
-  return nothing
+function check_parent(x::T, y::T, throw::Bool = true) where T <: Zmodn_mat
+   fl = base_ring(x) != base_ring(y)
+   fl && throw && error("Residue rings must be equal")
+   fl && return false
+   fl = (ncols(x) != ncols(y)) && (nrows(x) != nrows(y))
+   fl && throw && error("Matrices have wrong dimensions")
+   return !fl
 end
 
 ###############################################################################
@@ -187,6 +189,8 @@ end
 ==(a::T, b::T) where T <: Zmodn_mat = (a.base_ring == b.base_ring) &&
         Bool(ccall((:nmod_mat_equal, :libflint), Cint,
                 (Ref{T}, Ref{T}), a, b))
+
+isequal(a::T, b::T) where T <: Zmodn_mat = ==(a, b)
 
 ################################################################################
 #

@@ -29,8 +29,10 @@ base_ring(a::FmpzMatSpace) = a.base_ring
 parent(a::fmpz_mat, cached::Bool = true) =
     FmpzMatSpace(nrows(a), ncols(a), cached)
 
-function check_parent(a::fmpz_mat, b::fmpz_mat)
-   (nrows(a) != nrows(b) || ncols(a) != ncols(b)) && error("Incompatible matrices")
+function check_parent(a::fmpz_mat, b::fmpz_mat, throw::Bool = true)
+   b = (nrows(a) != nrows(b) || ncols(a) != ncols(b))
+   b && throw && error("Incompatible matrices")
+   return !b
 end
 
 ###############################################################################
@@ -406,10 +408,12 @@ end
 ###############################################################################
 
 function ==(x::fmpz_mat, y::fmpz_mat)
-   check_parent(x, y)
-   ccall((:fmpz_mat_equal, :libflint), Bool,
+   b = check_parent(x, y, false)
+   b && ccall((:fmpz_mat_equal, :libflint), Bool,
                                        (Ref{fmpz_mat}, Ref{fmpz_mat}), x, y)
 end
+
+isequal(x::fmpz_mat, y::fmpz_mat) = ==(x, y)
 
 ###############################################################################
 #
@@ -425,7 +429,7 @@ function ==(x::fmpz_mat, y::Integer)
    end
    for i = 1:nrows(x)
       for j = 1:ncols(x)
-         if i != j && x[i, j] != 0
+         if i != j && !iszero(x[i, j])
             return false
          end
       end

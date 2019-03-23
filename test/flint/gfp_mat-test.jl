@@ -167,6 +167,22 @@ function test_gfp_mat_constructors()
    @test isa(M4, gfp_mat)
    @test M4.base_ring == Z3
 
+   a = zero_matrix(Z2, 2, 2)
+   b = zero_matrix(Z2, 2, 3)
+   @test a in [a, b]
+   @test a in [b, a]
+   @test !(a in [b])
+   @test a in keys(Dict(a => 1))
+   @test !(a in keys(Dict(b => 1)))
+
+   a = zero_matrix(Z2, 2, 2)
+   b = zero_matrix(Z3, 2, 2)
+   @test a in [a, b]
+   @test a in [b, a]
+   @test !(a in [b])
+   @test a in keys(Dict(a => 1))
+   @test !(a in keys(Dict(b => 1)))
+
   println("PASS")
 end
 

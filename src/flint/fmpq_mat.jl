@@ -23,9 +23,10 @@ base_ring(a::fmpq_mat) = a.base_ring
 parent(a::fmpq_mat, cached::Bool = true) =
       FmpqMatSpace(nrows(a), ncols(a), cached)
 
-function check_parent(a::fmpq_mat, b::fmpq_mat)
-   (nrows(a) != nrows(b) || ncols(a) != ncols(b) || base_ring(a) != base_ring(b)) &&
-      error("Incompatible matrices")
+function check_parent(a::fmpq_mat, b::fmpq_mat, throw::Bool = true)
+   fl = (nrows(a) != nrows(b) || ncols(a) != ncols(b) || base_ring(a) != base_ring(b))
+   fl && throw && error("Incompatible matrices")
+   return !fl
 end
 
 ###############################################################################
@@ -383,10 +384,12 @@ end
 ###############################################################################
 
 function ==(x::fmpq_mat, y::fmpq_mat)
-   check_parent(x, y)
-   ccall((:fmpq_mat_equal, :libflint), Bool,
+   fl = check_parent(x, y, false)
+   fl && ccall((:fmpq_mat_equal, :libflint), Bool,
                                        (Ref{fmpq_mat}, Ref{fmpq_mat}), x, y)
 end
+
+isequal(x::fmpq_mat, y::fmpq_mat) = ==(x, y)
 
 ###############################################################################
 #

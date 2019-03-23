@@ -20,11 +20,13 @@ parent_type(::Type{fq_mat}) = FqMatSpace
 
 elem_type(::Type{FqMatSpace}) = fq_mat
 
-function check_parent(x::fq_mat, y::fq_mat)
-   base_ring(x) != base_ring(y) && error("Residue rings must be equal")
-   (ncols(x) != ncols(y)) && (nrows(x) != nrows(y)) &&
-   error("Matrices have wrong dimensions")
-   return nothing
+function check_parent(x::fq_mat, y::fq_mat, throw::Bool = true)
+   fl = base_ring(x) != base_ring(y)
+   fl && throw && error("Residue rings must be equal")
+   fl && return false
+   fl = (ncols(x) != ncols(y)) && (nrows(x) != nrows(y))
+   fl && throw && error("Matrices have wrong dimensions")
+   return !fl
 end
 
 ###############################################################################
@@ -163,6 +165,8 @@ function ==(a::fq_mat, b::fq_mat)
              (Ref{fq_mat}, Ref{fq_mat}, Ref{FqFiniteField}), a, b, base_ring(a))
    return Bool(r)
 end
+
+isequal(a::fq_mat, b::fq_mat) = ==(a, b)
 
 ################################################################################
 #

@@ -163,6 +163,22 @@ function test_fq_nmod_mat_constructors()
    @test isa(M4, fq_nmod_mat)
    @test M4.base_ring == F9
 
+   a = zero_matrix(F9, 2, 2)
+   b = zero_matrix(F9, 2, 3)
+   @test a in [a, b]
+   @test a in [b, a]
+   @test !(a in [b])
+   @test a in keys(Dict(a => 1))
+   @test !(a in keys(Dict(b => 1)))
+
+   a = zero_matrix(F4, 2, 2)
+   b = zero_matrix(F9, 2, 2)
+   @test a in [a, b]
+   @test a in [b, a]
+   @test !(a in [b])
+   @test a in keys(Dict(a => 1))
+   @test !(a in keys(Dict(b => 1)))
+
   println("PASS")
 end
 

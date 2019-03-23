@@ -89,6 +89,12 @@ function test_acb_mat_constructors()
    @test isa(M4, acb_mat)
    @test M4.base_ring == CC
 
+   a = zero_matrix(CC, 2, 2)
+   b = zero_matrix(CC, 2, 3)
+   @test a in [a, b]
+   @test a in [b, a]
+   @test !(a in [b])
+
    println("PASS")
 end
 

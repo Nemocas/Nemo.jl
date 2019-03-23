@@ -68,6 +68,14 @@ function test_fmpz_mat_constructors()
    @test isa(M4, fmpz_mat)
    @test M4.base_ring == FlintZZ
 
+   a = zero_matrix(FlintZZ, 2, 2)
+   b = zero_matrix(FlintZZ, 2, 3)
+   @test a in [a, b]
+   @test a in [b, a]
+   @test !(a in [b])
+   @test a in keys(Dict(a => 1))
+   @test !(a in keys(Dict(b => 1)))
+
    println("PASS")
 end
 

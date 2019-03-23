@@ -112,6 +112,14 @@ function test_fmpq_mat_constructors()
    @test isa(M4, fmpq_mat)
    @test M4.base_ring == FlintQQ
 
+   a = zero_matrix(FlintQQ, 2, 2)
+   b = zero_matrix(FlintQQ, 2, 3)
+   @test a in [a, b]
+   @test a in [b, a]
+   @test !(a in [b])
+   @test a in keys(Dict(a => 1))
+   @test !(a in keys(Dict(b => 1)))
+
    println("PASS")
 end
 

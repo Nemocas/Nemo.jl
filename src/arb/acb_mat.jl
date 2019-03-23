@@ -46,6 +46,12 @@ base_ring(a::AcbMatSpace) = a.base_ring
 
 base_ring(a::acb_mat) = a.base_ring
 
+function check_parent(x::acb_mat, y::acb_mat, throw::Bool = true)
+   fl = (nrows(x) != nrows(y) || ncols(x) != ncols(y) || base_ring(x) != base_ring(y))
+   fl && throw && error("Incompatible matrices")
+   return !fl
+end
+
 function getindex!(z::acb, x::acb_mat, r::Int, c::Int)
   GC.@preserve x begin
     v = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
@@ -381,7 +387,8 @@ function isequal(x::acb_mat, y::acb_mat)
 end
 
 function ==(x::acb_mat, y::acb_mat)
-  check_parent(x, y)
+  fl = check_parent(x, y, false)
+  !fl && return false
   r = ccall((:acb_mat_eq, :libarb), Cint, (Ref{acb_mat}, Ref{acb_mat}), x, y)
   return Bool(r)
 end
