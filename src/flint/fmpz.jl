@@ -1082,11 +1082,11 @@ issquare(x::fmpz) = Bool(ccall((:fmpz_is_square, :libflint), Cint,
 """
 is_prime(x::UInt) = Bool(ccall((:n_is_prime, :libflint), Cint, (UInt,), x))
 
+# flint's fmpz_is_prime doesn't work yet
 @doc Markdown.doc"""
     isprime(x::fmpz)
 > Return `true` if $x$ is a prime number, otherwise return `false`.
 """
-# flint's fmpz_is_prime doesn't work yet
 isprime(x::fmpz) = Bool(ccall((:fmpz_is_probabprime, :libflint), Cint,
                               (Ref{fmpz},), x))
 
