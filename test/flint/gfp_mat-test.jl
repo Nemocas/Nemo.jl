@@ -697,8 +697,8 @@ function test_gfp_mat_swap_rows()
   swap_rows!(A, 3, 4)
   @test A == matrix(Z17, 5, 1, [1, 2, 4, 3, 5])
 
-  @test_throws ErrorException swap_rows(A, 0, 5)
-  @test_throws ErrorException swap_rows(A, 4, 6)
+  @test_throws BoundsError swap_rows(A, 0, 5)
+  @test_throws BoundsError swap_rows(A, 4, 6)
 
   println("PASS")
 end

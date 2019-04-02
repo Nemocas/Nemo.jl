@@ -551,27 +551,6 @@ end
 
 ################################################################################
 #
-#  Row swapping
-#
-################################################################################
-
-function swap_rows(x::T, i::Int, j::Int) where T <: Zmodn_mat
-   n = nrows(x)
-   (i < 1 || i > n) && error("Index $i must be between 1 and $n")
-   (j < 1 || j > n) && error("Index $j must be between 1 and $n")
-   z = deepcopy(x)
-   swap_rows!(z, i, j)
-   return z
-end
-
-function swap_rows!(x::T, i::Int, j::Int) where T <: Zmodn_mat
-   ccall((:nmod_mat_swap_rows, :libflint), Nothing,
-         (Ref{T}, Ptr{Nothing}, Int, Int), x, C_NULL, i - 1, j - 1)
-   return x
-end
-
-################################################################################
-#
 #  Windowing
 #
 ################################################################################
