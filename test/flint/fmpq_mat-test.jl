@@ -421,6 +421,47 @@ function test_fmpq_mat_transpose()
    println("PASS")
 end
 
+function test_fmpq_mat_row_col_swapping()
+   print("fmpq_mat.row_col_swapping...")
+
+   a = matrix(FlintQQ, [1 2; 3 4; 5 6])
+
+   @test swap_rows(a, 1, 3) == matrix(FlintQQ, [5 6; 3 4; 1 2])
+
+   swap_rows!(a, 2, 3)
+
+   @test a == matrix(FlintQQ, [1 2; 5 6; 3 4])
+
+   @test swap_cols(a, 1, 2) == matrix(FlintQQ, [2 1; 6 5; 4 3])
+
+   swap_cols!(a, 2, 1)
+
+   @test a == matrix(FlintQQ, [2 1; 6 5; 4 3])
+
+   a = matrix(FlintQQ, [1 2; 3 4])
+   @test invert_rows(a) == matrix(FlintQQ, [3 4; 1 2])
+   invert_rows!(a)
+   @test a == matrix(FlintQQ, [3 4; 1 2])
+
+   a = matrix(FlintQQ, [1 2; 3 4])
+   @test invert_cols(a) == matrix(FlintQQ, [2 1; 4 3])
+   invert_cols!(a)
+   @test a == matrix(FlintQQ, [2 1; 4 3])
+
+   a = matrix(FlintQQ, [1 2 3; 3 4 5; 5 6 7])
+
+   @test invert_rows(a) == matrix(FlintQQ, [5 6 7; 3 4 5; 1 2 3])
+   invert_rows!(a)
+   @test a == matrix(FlintQQ, [5 6 7; 3 4 5; 1 2 3])
+
+   a = matrix(FlintQQ, [1 2 3; 3 4 5; 5 6 7])
+   @test invert_cols(a) == matrix(FlintQQ, [3 2 1; 5 4 3; 7 6 5])
+   invert_cols!(a)
+   @test a == matrix(FlintQQ, [3 2 1; 5 4 3; 7 6 5])
+
+   println("PASS")
+end
+
 function test_fmpq_mat_inversion()
    print("fmpq_mat.inversion...")
 
@@ -618,6 +659,7 @@ function test_fmpq_mat()
    test_fmpq_mat_gso()
    test_fmpq_mat_tr()
    test_fmpq_mat_transpose()
+   test_fmpq_mat_row_col_swapping()
    test_fmpq_mat_inversion()
    test_fmpq_mat_exact_division()
    test_fmpq_mat_det()

@@ -250,6 +250,52 @@ end
 
 ###############################################################################
 #
+#   Row and column swapping
+#
+###############################################################################
+
+function swap_rows!(x::fmpz_mat, i::Int, j::Int)
+  ccall((:fmpz_mat_swap_rows, :libflint), Nothing,
+        (Ref{fmpz_mat}, Ptr{Nothing}, Int, Int), x, C_NULL, i - 1, j - 1)
+  return x
+end
+
+function swap_rows(x::fmpz_mat, i::Int, j::Int)
+   (1 <= i <= nrows(x) && 1 <= j <= nrows(x)) || throw(BoundsError())
+   y = deepcopy(x)
+   return swap_rows!(y, i, j)
+end
+
+function swap_cols!(x::fmpz_mat, i::Int, j::Int)
+  ccall((:fmpz_mat_swap_cols, :libflint), Nothing,
+        (Ref{fmpz_mat}, Ptr{Nothing}, Int, Int), x, C_NULL, i - 1, j - 1)
+  return x
+end
+
+function swap_cols(x::fmpz_mat, i::Int, j::Int)
+   (1 <= i <= ncols(x) && 1 <= j <= ncols(x)) || throw(BoundsError())
+   y = deepcopy(x)
+   return swap_cols!(y, i, j)
+end
+
+function invert_rows!(x::fmpz_mat)
+   ccall((:fmpz_mat_invert_rows, :libflint), Nothing,
+         (Ref{fmpz_mat}, Ptr{Nothing}), x, C_NULL)
+   return x
+end
+
+invert_rows(x::fmpz_mat) = invert_rows!(deepcopy(x))
+
+function invert_cols!(x::fmpz_mat)
+   ccall((:fmpz_mat_invert_cols, :libflint), Nothing,
+         (Ref{fmpz_mat}, Ptr{Nothing}), x, C_NULL)
+   return x
+end
+
+invert_cols(x::fmpz_mat) = invert_cols!(deepcopy(x))
+
+###############################################################################
+#
 #   Binary operations
 #
 ###############################################################################

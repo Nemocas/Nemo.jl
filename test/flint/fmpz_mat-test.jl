@@ -368,6 +368,47 @@ function test_fmpz_mat_transpose()
    println("PASS")
 end
 
+function test_fmpz_mat_row_col_swapping()
+   print("fmpz_mat.row_col_swapping...")
+
+   a = matrix(FlintZZ, [1 2; 3 4; 5 6])
+
+   @test swap_rows(a, 1, 3) == matrix(FlintZZ, [5 6; 3 4; 1 2])
+
+   swap_rows!(a, 2, 3)
+
+   @test a == matrix(FlintZZ, [1 2; 5 6; 3 4])
+
+   @test swap_cols(a, 1, 2) == matrix(FlintZZ, [2 1; 6 5; 4 3])
+
+   swap_cols!(a, 2, 1)
+
+   @test a == matrix(FlintZZ, [2 1; 6 5; 4 3])
+
+   a = matrix(FlintZZ, [1 2; 3 4])
+   @test invert_rows(a) == matrix(FlintZZ, [3 4; 1 2])
+   invert_rows!(a)
+   @test a == matrix(FlintZZ, [3 4; 1 2])
+
+   a = matrix(FlintZZ, [1 2; 3 4])
+   @test invert_cols(a) == matrix(FlintZZ, [2 1; 4 3])
+   invert_cols!(a)
+   @test a == matrix(FlintZZ, [2 1; 4 3])
+
+   a = matrix(FlintZZ, [1 2 3; 3 4 5; 5 6 7])
+
+   @test invert_rows(a) == matrix(FlintZZ, [5 6 7; 3 4 5; 1 2 3])
+   invert_rows!(a)
+   @test a == matrix(FlintZZ, [5 6 7; 3 4 5; 1 2 3])
+
+   a = matrix(FlintZZ, [1 2 3; 3 4 5; 5 6 7])
+   @test invert_cols(a) == matrix(FlintZZ, [3 2 1; 5 4 3; 7 6 5])
+   invert_cols!(a)
+   @test a == matrix(FlintZZ, [3 2 1; 5 4 3; 7 6 5])
+
+   println("PASS")
+end
+
 function test_fmpz_mat_scaling()
    print("fmpz_mat.scaling...")
 
@@ -679,6 +720,7 @@ function test_fmpz_mat()
    test_fmpz_mat_tr()
    test_fmpz_mat_content()
    test_fmpz_mat_transpose()
+   test_fmpz_mat_row_col_swapping()
    test_fmpz_mat_scaling()
    test_fmpz_mat_inversion()
    test_fmpz_mat_pseudo_inversion()

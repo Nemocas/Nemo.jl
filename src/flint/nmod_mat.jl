@@ -211,6 +211,52 @@ function transpose!(a::T) where T <: Zmodn_mat
           (Ref{T}, Ref{T}), a, a)
 end
 
+###############################################################################
+#
+#   Row and column swapping
+#
+###############################################################################
+
+function swap_rows!(x::T, i::Int, j::Int) where T <: Zmodn_mat
+  ccall((:nmod_mat_swap_rows, :libflint), Nothing,
+        (Ref{T}, Ptr{Nothing}, Int, Int), x, C_NULL, i - 1, j - 1)
+  return x
+end
+
+function swap_rows(x::T, i::Int, j::Int) where T <: Zmodn_mat
+   (1 <= i <= nrows(x) && 1 <= j <= nrows(x)) || throw(BoundsError())
+   y = deepcopy(x)
+   return swap_rows!(y, i, j)
+end
+
+function swap_cols!(x::T, i::Int, j::Int) where T <: Zmodn_mat
+  ccall((:nmod_mat_swap_cols, :libflint), Nothing,
+        (Ref{T}, Ptr{Nothing}, Int, Int), x, C_NULL, i - 1, j - 1)
+  return x
+end
+
+function swap_cols(x::T, i::Int, j::Int) where T <: Zmodn_mat
+   (1 <= i <= ncols(x) && 1 <= j <= ncols(x)) || throw(BoundsError())
+   y = deepcopy(x)
+   return swap_cols!(y, i, j)
+end
+
+function invert_rows!(x::T) where T <: Zmodn_mat
+   ccall((:nmod_mat_invert_rows, :libflint), Nothing,
+         (Ref{T}, Ptr{Nothing}), x, C_NULL)
+   return x
+end
+
+invert_rows(x::T) where T <: Zmodn_mat = invert_rows!(deepcopy(x))
+
+function invert_cols!(x::T) where T <: Zmodn_mat
+   ccall((:nmod_mat_invert_cols, :libflint), Nothing,
+         (Ref{T}, Ptr{Nothing}), x, C_NULL)
+   return x
+end
+
+invert_cols(x::T) where T <: Zmodn_mat = invert_cols!(deepcopy(x))
+
 ################################################################################
 #
 #  Unary operators

@@ -1,4 +1,4 @@
-  ###############################################################################
+###############################################################################
 #
 #   fmpq_mat.jl : Flint matrices over the rationals
 #
@@ -253,6 +253,52 @@ function transpose(x::fmpq_mat)
          (Ref{fmpq_mat}, Ref{fmpq_mat}), z, x)
    return z
 end
+
+###############################################################################
+#
+#   Row and column swapping
+#
+###############################################################################
+
+function swap_rows!(x::fmpq_mat, i::Int, j::Int)
+  ccall((:fmpq_mat_swap_rows, :libflint), Nothing,
+        (Ref{fmpq_mat}, Ptr{Nothing}, Int, Int), x, C_NULL, i - 1, j - 1)
+  return x
+end
+
+function swap_rows(x::fmpq_mat, i::Int, j::Int)
+   (1 <= i <= nrows(x) && 1 <= j <= nrows(x)) || throw(BoundsError())
+   y = deepcopy(x)
+   return swap_rows!(y, i, j)
+end
+
+function swap_cols!(x::fmpq_mat, i::Int, j::Int)
+  ccall((:fmpq_mat_swap_cols, :libflint), Nothing,
+        (Ref{fmpq_mat}, Ptr{Nothing}, Int, Int), x, C_NULL, i - 1, j - 1)
+  return x
+end
+
+function swap_cols(x::fmpq_mat, i::Int, j::Int)
+   (1 <= i <= ncols(x) && 1 <= j <= ncols(x)) || throw(BoundsError())
+   y = deepcopy(x)
+   return swap_cols!(y, i, j)
+end
+
+function invert_rows!(x::fmpq_mat)
+   ccall((:fmpq_mat_invert_rows, :libflint), Nothing,
+         (Ref{fmpq_mat}, Ptr{Nothing}), x, C_NULL)
+   return x
+end
+
+invert_rows(x::fmpq_mat) = invert_rows!(deepcopy(x))
+
+function invert_cols!(x::fmpq_mat)
+   ccall((:fmpq_mat_invert_cols, :libflint), Nothing,
+         (Ref{fmpq_mat}, Ptr{Nothing}), x, C_NULL)
+   return x
+end
+
+invert_cols(x::fmpq_mat) = invert_cols!(deepcopy(x))
 
 ###############################################################################
 #

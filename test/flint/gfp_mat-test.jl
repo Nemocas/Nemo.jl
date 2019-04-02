@@ -329,6 +329,49 @@ function test_gfp_mat_binary_ops()
   println("PASS")
 end
 
+function test_gfp_mat_row_col_swapping()
+   print("gfp_mat.row_col_swapping...")
+
+   R = ResidueField(FlintZZ, 17)
+
+   a = matrix(R, [1 2; 3 4; 5 6])
+
+   @test swap_rows(a, 1, 3) == matrix(R, [5 6; 3 4; 1 2])
+
+   swap_rows!(a, 2, 3)
+
+   @test a == matrix(R, [1 2; 5 6; 3 4])
+
+   @test swap_cols(a, 1, 2) == matrix(R, [2 1; 6 5; 4 3])
+
+   swap_cols!(a, 2, 1)
+
+   @test a == matrix(R, [2 1; 6 5; 4 3])
+
+   a = matrix(R, [1 2; 3 4])
+   @test invert_rows(a) == matrix(R, [3 4; 1 2])
+   invert_rows!(a)
+   @test a == matrix(R, [3 4; 1 2])
+
+   a = matrix(R, [1 2; 3 4])
+   @test invert_cols(a) == matrix(R, [2 1; 4 3])
+   invert_cols!(a)
+   @test a == matrix(R, [2 1; 4 3])
+
+   a = matrix(R, [1 2 3; 3 4 5; 5 6 7])
+
+   @test invert_rows(a) == matrix(R, [5 6 7; 3 4 5; 1 2 3])
+   invert_rows!(a)
+   @test a == matrix(R, [5 6 7; 3 4 5; 1 2 3])
+
+   a = matrix(R, [1 2 3; 3 4 5; 5 6 7])
+   @test invert_cols(a) == matrix(R, [3 2 1; 5 4 3; 7 6 5])
+   invert_cols!(a)
+   @test a == matrix(R, [3 2 1; 5 4 3; 7 6 5])
+
+   println("PASS")
+end
+
 function test_gfp_mat_adhoc_binary()
   print("gfp_mat.adhoc_binary...")
 
@@ -843,6 +886,7 @@ function test_gfp_mat()
   test_gfp_mat_manipulation()
   test_gfp_mat_unary_ops()
   test_gfp_mat_binary_ops()
+  test_gfp_mat_row_col_swapping()
   test_gfp_mat_adhoc_binary()
   test_gfp_mat_comparison()
   test_gfp_mat_adhoc_comparison()
