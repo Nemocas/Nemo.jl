@@ -16,7 +16,7 @@ if !issource_build
   dependencies = [
     "https://github.com/JuliaMath/GMPBuilder/releases/download/v6.1.2-2/build_GMP.v6.1.2.jl",
     "https://github.com/JuliaMath/MPFRBuilder/releases/download/v4.0.1-3/build_MPFR.v4.0.1.jl",
-    "https://github.com/thofma/Flint2Builder/releases/download/ecbcda/build_libflint.v0.0.0-ecbcda9cdb871efa3833232e4b274e30fda372d8.jl",
+    "https://github.com/thofma/Flint2Builder/releases/download/8b392f/build_libflint.v0.0.0-8b392f5056b0d4626e7d9ddc472c835ba82926db.jl",
     "https://github.com/thofma/ArbBuilder/releases/download/56ce68/build_libarb.v0.0.0-56ce687ea1ff9a279dc3c8d20f31a4dd09bae6d1.jl",
     "https://github.com/thofma/AnticBuilder/releases/download/1a3b3f/build_libantic.v0.0.0-1a3b3f2c8c498e5f9c2979b201fa4a1c99311543.jl"
    ]
@@ -47,7 +47,7 @@ else
   @show MPIR_VERSION = "3.0.0-90740d8fdf03b941b55723b449831c52fd7f51ca"
   @show MPFR_VERSION = "4.0.0"
   @show ANTIC_VERSION = "1a3b3f2c8c498e5f9c2979b201fa4a1c99311543"
-  @show FLINT_VERSION = "ecbcda9cdb871efa3833232e4b274e30fda372d8"
+  @show FLINT_VERSION = "8b392f5056b0d4626e7d9ddc472c835ba82926db"
   @show ARB_VERSION = "56ce687ea1ff9a279dc3c8d20f31a4dd09bae6d1"
 
   if Sys.iswindows()
