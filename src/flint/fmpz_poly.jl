@@ -670,6 +670,22 @@ function _factor(x::fmpz_poly)
   return res, z
 end  
 
+@doc Markdown.doc"""
+    isirreducible(x::fmpz_poly)
+> Checks if $x$ is irreducible.
+"""
+function isirreducible(x::fmpz_poly)
+   if degree(x) == 0
+     return isprime(coeff(x, 0))
+   end
+   res, z = _factor(x)
+   if abs(z) == 1
+     return length(res) == 1 && first(values(res)) == 1
+   else
+     return false
+   end
+end
+
 ###############################################################################
 #
 #   Special polynomials

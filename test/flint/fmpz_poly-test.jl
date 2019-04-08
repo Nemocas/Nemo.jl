@@ -448,6 +448,13 @@ function test_fmpz_poly_factor()
   @test f in fac
   @test !(x in fac)
 
+  @test isirreducible(Rx(2))
+  @test isirreducible(x^4 + 1)
+  @test isirreducible(x + 1)
+  @test !isirreducible(Rx(4))
+  @test !isirreducible(2x + 2)
+  @test !isirreducible(x^2)
+
   println("PASS")
 end
 
