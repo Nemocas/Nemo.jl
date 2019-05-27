@@ -235,7 +235,7 @@ function test_Matrix_hnf_delayed_reduction()
    for iter = 1:10
       A = rand(S, -10:10)
 
-      H, U = hnf_cohen_with_trafo(A)
+      H, U = hnf_cohen_with_transform(A)
 
       @test istriu(H)
       @test isunit(det(U))
@@ -245,7 +245,7 @@ function test_Matrix_hnf_delayed_reduction()
    for iter = 1:10
       A = rand(S, -10:10)
 
-      H, U = hnf_minors_with_trafo(A)
+      H, U = hnf_minors_with_transform(A)
 
       @test istriu(H)
       @test isunit(det(U))
@@ -255,7 +255,7 @@ function test_Matrix_hnf_delayed_reduction()
    for iter = 1:10
       A = rand(S, -10:10)
 
-      H, U = hnf_kb_with_trafo(A)
+      H, U = hnf_kb_with_transform(A)
 
       @test istriu(H)
       @test isunit(det(U))
@@ -275,7 +275,7 @@ function test_Matrix_snf_delayed_reduction()
    for iter = 1:10
       A = rand(S, -10:10)
 
-      T, U, K = Generic.snf_kb_with_trafo(A)
+      T, U, K = Generic.snf_kb_with_transform(A)
 
       @test is_snf(T)
       @test isunit(det(U))
