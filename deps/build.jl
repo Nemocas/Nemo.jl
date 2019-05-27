@@ -18,7 +18,7 @@ if !issource_build
     "https://github.com/JuliaMath/MPFRBuilder/releases/download/v4.0.1-3/build_MPFR.v4.0.1.jl",
     "https://github.com/thofma/Flint2Builder/releases/download/reentrant2/build_libflint.v0.0.0-5451b53703a529ff76123b7418fe2d624e122db6.jl",
     "https://github.com/thofma/ArbBuilder/releases/download/56ce68/build_libarb.v0.0.0-56ce687ea1ff9a279dc3c8d20f31a4dd09bae6d1.jl",
-    "https://github.com/thofma/AnticBuilder/releases/download/1a3b3f/build_libantic.v0.0.0-1a3b3f2c8c498e5f9c2979b201fa4a1c99311543.jl"
+    "https://github.com/thofma/AnticBuilder/releases/download/e2788/build_libantic.v0.0.0-e2788d9be58dc9850b7557689a6eb05f5cdb746b.jl"
    ]
 
   const prefix = Prefix(get([a for a in ARGS if a != "--verbose"], 1, joinpath(@__DIR__, "usr")))
@@ -56,7 +56,7 @@ else
   @show YASM_VERSION = "1.3.0"
   @show MPIR_VERSION = "3.0.0-90740d8fdf03b941b55723b449831c52fd7f51ca"
   @show MPFR_VERSION = "4.0.0"
-  @show ANTIC_VERSION = "1a3b3f2c8c498e5f9c2979b201fa4a1c99311543"
+  @show ANTIC_VERSION = "e2788d9be58dc9850b7557689a6eb05f5cdb746b"
   @show FLINT_VERSION = "5451b53703a529ff76123b7418fe2d624e122db6"
   @show ARB_VERSION = "56ce687ea1ff9a279dc3c8d20f31a4dd09bae6d1"
 
