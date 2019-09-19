@@ -32,7 +32,7 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash, fac, bell,
-       binom, isprime, fdiv, cdiv, tdiv, div, rem, mod, gcd, xgcd, lcm, invmod,
+       binom, isprime, fdiv, cdiv, tdiv, div, rem, mod, gcd, lcm, invmod,
        powmod, abs, divrem, isqrt, popcount, prevpow2, nextpow2, ndigits, dec,
        bin, oct, hex, base, one, zero, divexact, fits, sign, nbits, deepcopy,
        tdivpow2, fdivpow2, cdivpow2, flog, clog, cmpabs, clrbit!, setbit!,
@@ -40,7 +40,7 @@ export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash, fac, bell,
        gcdinv, isprobabprime, issquare, jacobi, remove, root, size, isqrtrem,
        sqrtmod, trailing_zeros, sigma, eulerphi, fib, moebiusmu, primorial,
        risingfac, numpart, canonical_unit, needs_parentheses, displayed_with_minus_in_front,
-       show_minus_one, parseint, addeq!, mul!, isunit, isequal,
+       show_minus_one, addeq!, mul!, isunit, isequal,
        iszero, rand
 
 ###############################################################################

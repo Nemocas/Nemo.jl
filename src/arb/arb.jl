@@ -14,7 +14,7 @@ export ball, radius, midpoint, contains, contains_zero,
        contains_nonpositive, convert, iszero,
        isnonzero, isexact, isint, ispositive, isfinite,
        isnonnegative, isnegative, isnonpositive, add!, mul!,
-       sub!, div!, strongequal, prec, overlaps, unique_integer,
+       sub!, div!, prec, overlaps, unique_integer,
        accuracy_bits, trim, ldexp, setunion, setintersection,
        const_pi, const_e, const_log2, const_log10, const_euler,
        const_catalan, const_khinchin, const_glaisher,
@@ -1796,7 +1796,7 @@ numpart(n::Int, r::ArbField) = numpart(fmpz(n), r)
 > (using LLL). The entries are first scaled by the given number of bits before
 > truncating to integers for use in LLL. This function can be used to find linear
 > dependence between a list of real numbers. The algorithm is heuristic only and
-> returns an array of Nemo integers representing the linear combination.  
+> returns an array of Nemo integers representing the linear combination.
 """
 function lindep(A::Array{arb, 1}, bits::Int)
   bits < 0 && throw(DomainError("Number of bits must be non-negative: $bits"))

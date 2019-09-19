@@ -1,4 +1,4 @@
-export Fac, unit, factors
+export Fac, unit
 
 ################################################################################
 #
@@ -9,4 +9,3 @@ export Fac, unit, factors
 Base.in(b::Integer, a::Fac{fmpz}) = Base.in(fmpz(b), a)
 
 Base.getindex(a::Fac{fmpz}, b::Integer) = getindex(a, fmpz(b))
-

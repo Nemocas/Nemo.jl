@@ -4,8 +4,8 @@
 #
 ################################################################################
 
-export fq_nmod_mat, FqNmodMatSpace, getindex, setindex!, set_entry!, deepcopy, rows,
-       cols, parent, base_ring, zero, one, show, transpose,
+export fq_nmod_mat, FqNmodMatSpace, getindex, setindex!, set_entry!, deepcopy,
+       parent, base_ring, zero, one, show, transpose,
        transpose!, rref, rref!, tr, det, rank, inv, solve,
        sub, hcat, vcat, Array, lift, lift!, MatrixSpace, check_parent,
        howell_form, howell_form!, strong_echelon_form, strong_echelon_form!
