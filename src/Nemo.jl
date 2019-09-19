@@ -167,7 +167,7 @@ function trace_counted_free(n::UInt, s::UInt)
   global active_mem
 #  @assert haskey(active_mem, n)
   delete!(active_mem, n)
-  ccall(:jl_gc_counted_free, Nothing, (UInt, UInt), n, s)
+  ccall(:jl_gc_counted_free_with_size, Nothing, (UInt, UInt), n, s)
 end
 
 function show_active(l::UInt = UInt(0), frames::Int = 2)
@@ -203,7 +203,7 @@ function trace_memory(b::Bool)
        (Ptr{Nothing},Ptr{Nothing},Ptr{Nothing}),
        cglobal(:jl_gc_counted_malloc),
        cglobal(:jl_gc_counted_realloc_with_old_size),
-       cglobal(:jl_gc_counted_free))
+       cglobal(:jl_gc_counted_free_with_size))
 
     ccall((:__flint_set_memory_functions, libflint), Nothing,
        (Ptr{Nothing},Ptr{Nothing},Ptr{Nothing},Ptr{Nothing}),
@@ -248,7 +248,7 @@ function __init__()
             (Ptr{Nothing},Ptr{Nothing},Ptr{Nothing}),
             cglobal(:jl_gc_counted_malloc),
             cglobal(:jl_gc_counted_realloc_with_old_size),
-            cglobal(:jl_gc_counted_free))
+            cglobal(:jl_gc_counted_free_with_size))
 
          ccall((:__flint_set_memory_functions, libflint), Nothing,
             (Ptr{Nothing},Ptr{Nothing},Ptr{Nothing},Ptr{Nothing}),
