@@ -15,15 +15,9 @@ export zero, one, deepcopy, -, transpose, +, *, &, ==, !=,
 #
 ###############################################################################
 
-function similar(x::arb_mat)
-   z = arb_mat(nrows(x), ncols(x))
-   z.base_ring = x.base_ring
-   return z
-end
-
-function similar(x::arb_mat, r::Int, c::Int)
+function similar(x::arb_mat, R::ArbField, r::Int, c::Int)
    z = arb_mat(r, c)
-   z.base_ring = x.base_ring
+   z.base_ring = R
    return z
 end
 

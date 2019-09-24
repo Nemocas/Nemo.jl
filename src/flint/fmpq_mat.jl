@@ -37,15 +37,9 @@ end
 #
 ###############################################################################
 
-function similar(x::fmpq_mat)
-   z = fmpq_mat(nrows(x), ncols(x))
-   z.base_ring = x.base_ring
-   return z
-end
-
-function similar(x::fmpq_mat, r::Int, c::Int)
+function similar(x::fmpq_mat, R::FlintRationalField, r::Int, c::Int)
    z = fmpq_mat(r, c)
-   z.base_ring = x.base_ring
+   z.base_ring = R
    return z
 end
 

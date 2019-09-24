@@ -37,15 +37,9 @@ end
 #
 ###############################################################################
 
-function similar(x::nmod_mat)
-   z = nmod_mat(nrows(x), ncols(x), x.n)
-   z.base_ring = x.base_ring
-   return z
-end
-
-function similar(x::nmod_mat, r::Int, c::Int)
-   z = nmod_mat(r, c, x.n)
-   z.base_ring = x.base_ring
+function similar(x::nmod_mat, R::NmodRing, r::Int, c::Int)
+   z = nmod_mat(r, c, R.n)
+   z.base_ring = R
    return z
 end
 

@@ -123,6 +123,29 @@ function test_fmpq_mat_constructors()
    println("PASS")
 end
 
+function test_fmpq_mat_similar()
+   print("fmpq_mat.similar...")
+
+   S = MatrixSpace(QQ, 3, 3)
+   s = S(fmpz(3))
+
+   t = similar(s)
+   @test t isa fmpq_mat
+   @test size(t) == size(s)
+   t = similar(s, QQ)
+   @test t isa fmpq_mat
+   @test size(t) == size(s)
+
+   t = similar(s, 2, 3)
+   @test t isa fmpq_mat
+   @test size(t) == (2, 3)
+   t = similar(s, QQ, 2, 3)
+   @test t isa fmpq_mat
+   @test size(t) == (2, 3)
+
+   println("PASS")
+end
+
 function test_fmpq_mat_printing()
    print("fmpq_mat.printing...")
 
@@ -645,6 +668,7 @@ end
 
 function test_fmpq_mat()
    test_fmpq_mat_constructors()
+   test_fmpq_mat_similar()
    test_fmpq_mat_printing()
    test_fmpq_mat_manipulation()
    test_fmpq_mat_view()

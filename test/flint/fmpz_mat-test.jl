@@ -79,6 +79,29 @@ function test_fmpz_mat_constructors()
    println("PASS")
 end
 
+function test_fmpz_mat_similar()
+   print("fmpz_mat.similar...")
+
+   S = MatrixSpace(FlintZZ, 3, 3)
+   s = S(fmpz(3))
+
+   t = similar(s)
+   @test t isa fmpz_mat
+   @test size(t) == size(s)
+   t = similar(s, FlintZZ)
+   @test t isa fmpz_mat
+   @test size(t) == size(s)
+
+   t = similar(s, 2, 3)
+   @test t isa fmpz_mat
+   @test size(t) == (2, 3)
+   t = similar(s, FlintZZ, 2, 3)
+   @test t isa fmpz_mat
+   @test size(t) == (2, 3)
+
+   println("PASS")
+end
+
 function test_fmpz_mat_printing()
    print("fmpz_mat.printing...")
 
@@ -704,6 +727,7 @@ end
 
 function test_fmpz_mat()
    test_fmpz_mat_constructors()
+   test_fmpz_mat_similar()
    test_fmpz_mat_printing()
    test_fmpz_mat_convert()
    test_fmpz_mat_manipulation()

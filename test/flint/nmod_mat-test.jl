@@ -186,6 +186,30 @@ function test_nmod_mat_constructors()
   println("PASS")
 end
 
+function test_nmod_mat_similar()
+   print("nmod_mat.similar...")
+
+   Z13 = ResidueRing(ZZ, 13)
+   S = NmodMatSpace(Z13, 2, 2)
+   s = S(fmpz(3))
+
+   t = similar(s)
+   @test t isa nmod_mat
+   @test size(t) == size(s)
+   t = similar(s, Z13)
+   @test t isa nmod_mat
+   @test size(t) == size(s)
+
+   t = similar(s, 2, 3)
+   @test t isa nmod_mat
+   @test size(t) == (2, 3)
+   t = similar(s, Z13, 2, 3)
+   @test t isa nmod_mat
+   @test size(t) == (2, 3)
+
+   println("PASS")
+end
+
 function test_nmod_mat_printing()
   print("nmod_mat.printing...")
 
@@ -884,6 +908,7 @@ end
 
 function test_nmod_mat()
   test_nmod_mat_constructors()
+  test_nmod_mat_similar()
   test_nmod_mat_printing()
   test_nmod_mat_manipulation()
   test_nmod_mat_unary_ops()

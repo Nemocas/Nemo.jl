@@ -182,6 +182,30 @@ function test_fq_nmod_mat_constructors()
   println("PASS")
 end
 
+function test_fq_nmod_mat_similar()
+   print("fq_nmod_mat.similar...")
+
+   F9, b = FiniteField(3, 2, "b")
+   S = FqNmodMatSpace(F9, 2, 2)
+   s = S(fmpz(3))
+
+   t = similar(s)
+   @test t isa fq_nmod_mat
+   @test size(t) == size(s)
+   t = similar(s, F9)
+   @test t isa fq_nmod_mat
+   @test size(t) == size(s)
+
+   t = similar(s, 2, 3)
+   @test t isa fq_nmod_mat
+   @test size(t) == (2, 3)
+   t = similar(s, F9, 2, 3)
+   @test t isa fq_nmod_mat
+   @test size(t) == (2, 3)
+
+   println("PASS")
+end
+
 function test_fq_nmod_mat_printing()
   print("fq_nmod_mat.printing...")
 
@@ -786,6 +810,7 @@ end
 
 function test_fq_nmod_mat()
   test_fq_nmod_mat_constructors()
+  test_fq_nmod_mat_similar()
   test_fq_nmod_mat_printing()
   test_fq_nmod_mat_manipulation()
   test_fq_nmod_mat_unary_ops()

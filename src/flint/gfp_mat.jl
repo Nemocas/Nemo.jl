@@ -24,15 +24,9 @@ dense_matrix_type(::Type{gfp_elem}) = gfp_mat
 #
 ###############################################################################
 
-function similar(x::gfp_mat)
-   z = gfp_mat(nrows(x), ncols(x), x.n)
-   z.base_ring = x.base_ring
-   return z
-end
-
-function similar(x::gfp_mat, r::Int, c::Int)
-   z = gfp_mat(r, c, x.n)
-   z.base_ring = x.base_ring
+function similar(x::gfp_mat, R::GaloisField, r::Int, c::Int)
+   z = gfp_mat(r, c, R.n)
+   z.base_ring = R
    return z
 end
 

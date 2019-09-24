@@ -98,6 +98,29 @@ function test_acb_mat_constructors()
    println("PASS")
 end
 
+function test_acb_mat_similar()
+   print("acb_mat.similar...")
+
+   S = MatrixSpace(CC, 3, 3)
+   s = S(fmpz(3))
+
+   t = similar(s)
+   @test t isa acb_mat
+   @test size(t) == size(s)
+   t = similar(s, CC)
+   @test t isa acb_mat
+   @test size(t) == size(s)
+
+   t = similar(s, 2, 3)
+   @test t isa acb_mat
+   @test size(t) == (2, 3)
+   t = similar(s, CC, 2, 3)
+   @test t isa acb_mat
+   @test size(t) == (2, 3)
+
+   println("PASS")
+end
+
 function test_acb_mat_printing()
    print("acb_mat.printing...")
 
@@ -513,6 +536,7 @@ end
 
 function test_acb_mat()
    test_acb_mat_constructors()
+   test_acb_mat_similar()
    test_acb_mat_printing()
    test_acb_mat_manipulation()
    test_acb_mat_unary_ops()

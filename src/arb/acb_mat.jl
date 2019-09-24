@@ -15,15 +15,9 @@ export zero, one, deepcopy, -, transpose, +, *, &, ==, !=,
 #
 ###############################################################################
 
-function similar(x::acb_mat)
-   z = acb_mat(nrows(x), ncols(x))
-   z.base_ring = x.base_ring
-   return z
-end
-
-function similar(x::acb_mat, r::Int, c::Int)
+function similar(x::acb_mat, R::AcbField, r::Int, c::Int)
    z = acb_mat(r, c)
-   z.base_ring = x.base_ring
+   z.base_ring = R
    return z
 end
 

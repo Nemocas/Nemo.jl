@@ -97,6 +97,29 @@ function test_arb_mat_constructors()
    println("PASS")
 end
 
+function test_arb_mat_similar()
+   print("arb_mat.similar...")
+
+   S = MatrixSpace(RR, 3, 3)
+   s = S(fmpz(3))
+
+   t = similar(s)
+   @test t isa arb_mat
+   @test size(t) == size(s)
+   t = similar(s, RR)
+   @test t isa arb_mat
+   @test size(t) == size(s)
+
+   t = similar(s, 2, 3)
+   @test t isa arb_mat
+   @test size(t) == (2, 3)
+   t = similar(s, RR, 2, 3)
+   @test t isa arb_mat
+   @test size(t) == (2, 3)
+
+   println("PASS")
+end
+
 function test_arb_mat_printing()
    print("arb_mat.printing...")
 
@@ -454,6 +477,7 @@ end
 
 function test_arb_mat()
    test_arb_mat_constructors()
+   test_arb_mat_similar()
    test_arb_mat_printing()
    test_arb_mat_manipulation()
    test_arb_mat_unary_ops()

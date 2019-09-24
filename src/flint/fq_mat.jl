@@ -37,13 +37,8 @@ end
 #
 ###############################################################################
 
-function similar(x::fq_mat)
-   z = fq_mat(nrows(x), ncols(x), base_ring(x))
-   return z
-end
-
-function similar(x::fq_mat, r::Int, c::Int)
-   z = fq_mat(r, c, base_ring(x))
+function similar(x::fq_mat, R::FqFiniteField, r::Int, c::Int)
+   z = fq_mat(r, c, R)
    return z
 end
 

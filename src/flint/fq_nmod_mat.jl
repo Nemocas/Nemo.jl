@@ -42,8 +42,8 @@ function similar(x::fq_nmod_mat)
    return z
 end
 
-function similar(x::fq_nmod_mat, r::Int, c::Int)
-   z = fq_nmod_mat(r, c, base_ring(x))
+function similar(x::fq_nmod_mat, R::FqNmodFiniteField, r::Int, c::Int)
+   z = fq_nmod_mat(r, c, R)
    return z
 end
 

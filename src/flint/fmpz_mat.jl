@@ -43,15 +43,9 @@ end
 #
 ###############################################################################
 
-function similar(x::fmpz_mat)
-   z = fmpz_mat(nrows(x), ncols(x))
-   z.base_ring = x.base_ring
-   return z
-end
-
-function similar(x::fmpz_mat, r::Int, c::Int)
+function similar(x::fmpz_mat, R::FlintIntegerRing, r::Int, c::Int)
    z = fmpz_mat(r, c)
-   z.base_ring = x.base_ring
+   z.base_ring = R
    return z
 end
 
