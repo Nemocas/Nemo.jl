@@ -210,21 +210,21 @@ function swap_cols(x::T, i::Int, j::Int) where T <: Zmodn_mat
    return swap_cols!(y, i, j)
 end
 
-function invert_rows!(x::T) where T <: Zmodn_mat
+function reverse_rows!(x::T) where T <: Zmodn_mat
    ccall((:nmod_mat_invert_rows, :libflint), Nothing,
          (Ref{T}, Ptr{Nothing}), x, C_NULL)
    return x
 end
 
-invert_rows(x::T) where T <: Zmodn_mat = invert_rows!(deepcopy(x))
+reverse_rows(x::T) where T <: Zmodn_mat = reverse_rows!(deepcopy(x))
 
-function invert_cols!(x::T) where T <: Zmodn_mat
+function reverse_cols!(x::T) where T <: Zmodn_mat
    ccall((:nmod_mat_invert_cols, :libflint), Nothing,
          (Ref{T}, Ptr{Nothing}), x, C_NULL)
    return x
 end
 
-invert_cols(x::T) where T <: Zmodn_mat = invert_cols!(deepcopy(x))
+reverse_cols(x::T) where T <: Zmodn_mat = reverse_cols!(deepcopy(x))
 
 ################################################################################
 #

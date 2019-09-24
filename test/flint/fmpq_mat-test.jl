@@ -440,24 +440,24 @@ function test_fmpq_mat_row_col_swapping()
    @test a == matrix(FlintQQ, [2 1; 6 5; 4 3])
 
    a = matrix(FlintQQ, [1 2; 3 4])
-   @test invert_rows(a) == matrix(FlintQQ, [3 4; 1 2])
-   invert_rows!(a)
+   @test reverse_rows(a) == matrix(FlintQQ, [3 4; 1 2])
+   reverse_rows!(a)
    @test a == matrix(FlintQQ, [3 4; 1 2])
 
    a = matrix(FlintQQ, [1 2; 3 4])
-   @test invert_cols(a) == matrix(FlintQQ, [2 1; 4 3])
-   invert_cols!(a)
+   @test reverse_cols(a) == matrix(FlintQQ, [2 1; 4 3])
+   reverse_cols!(a)
    @test a == matrix(FlintQQ, [2 1; 4 3])
 
    a = matrix(FlintQQ, [1 2 3; 3 4 5; 5 6 7])
 
-   @test invert_rows(a) == matrix(FlintQQ, [5 6 7; 3 4 5; 1 2 3])
-   invert_rows!(a)
+   @test reverse_rows(a) == matrix(FlintQQ, [5 6 7; 3 4 5; 1 2 3])
+   reverse_rows!(a)
    @test a == matrix(FlintQQ, [5 6 7; 3 4 5; 1 2 3])
 
    a = matrix(FlintQQ, [1 2 3; 3 4 5; 5 6 7])
-   @test invert_cols(a) == matrix(FlintQQ, [3 2 1; 5 4 3; 7 6 5])
-   invert_cols!(a)
+   @test reverse_cols(a) == matrix(FlintQQ, [3 2 1; 5 4 3; 7 6 5])
+   reverse_cols!(a)
    @test a == matrix(FlintQQ, [3 2 1; 5 4 3; 7 6 5])
 
    println("PASS")
