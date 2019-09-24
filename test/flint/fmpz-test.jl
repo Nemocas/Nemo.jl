@@ -31,6 +31,15 @@ end
    @test isa(f, RingElem)
 end
 
+@testset "fmpz.rand..." begin
+   @test rand(FlintZZ, 1:9) isa fmpz
+   Random.seed!(rng, 0)
+   t = rand(rng, FlintZZ, 1:9)
+   @test t isa fmpz
+   Random.seed!(rng, 0)
+   @test t == rand(rng, FlintZZ, 1:9)
+end
+
 @testset "fmpz.printing..." begin
    a = fmpz(-123)
 

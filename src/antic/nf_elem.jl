@@ -1136,10 +1136,10 @@ end
 #
 ###############################################################################
 
-function rand(K::AnticNumberField, r::UnitRange{Int})
+function rand(rng::AbstractRNG, K::AnticNumberField, r::UnitRange{Int})
    R = parent(K.pol)
    n = degree(K.pol)
-   return K(rand(R, (n-1):(n-1), r))
+   return K(rand(rng, R, (n-1):(n-1), r))
 end
 
 ###############################################################################

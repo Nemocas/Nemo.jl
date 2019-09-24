@@ -34,8 +34,20 @@
 
       @test a.data < R.n
    end
+end
 
-   @test isa(rand(Random.GLOBAL_RNG, R), Nemo.nmod)
+@testset "nmod.rand..." begin
+   R = ResidueRing(ZZ, 13)
+   @test rand(R) isa Nemo.nmod
+   @test rand(R, 1:9) isa Nemo.nmod
+   Random.seed!(rng, 0)
+   s = rand(rng, R)
+   @test s isa Nemo.nmod
+   t = rand(rng, R, 1:9)
+   @test t isa Nemo.nmod
+   Random.seed!(rng, 0)
+   @test s == rand(rng, R)
+   @test t == rand(rng, R, 1:9)
 end
 
 @testset "nmod.printing..." begin

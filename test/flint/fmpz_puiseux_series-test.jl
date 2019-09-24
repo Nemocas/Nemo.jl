@@ -24,6 +24,24 @@
    @test isa(k1, FlintPuiseuxSeriesElem)
 end
 
+@testset "fmpz_puiseux_series.rand..." begin
+   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   @test rand(R, -12:12, 1:6, -10:10) isa FlintPuiseuxSeriesRingElem{fmpz_laurent_series}
+   Random.seed!(rng, 0)
+   t = rand(rng, R, -12:12, 1:6, -10:10)
+   @test t isa FlintPuiseuxSeriesRingElem{fmpz_laurent_series}
+   Random.seed!(rng, 0)
+   @test t == rand(rng, R, -12:12, 1:6, -10:10)
+
+   R, x = PuiseuxSeriesField(QQ, 10, "x")
+   @test rand(R, -12:12, 1:6, -10:10) isa Generic.PuiseuxSeriesFieldElem{fmpq}
+   Random.seed!(rng, 0)
+   t = rand(rng, R, -12:12, 1:6, -10:10)
+   @test t isa Generic.PuiseuxSeriesFieldElem{fmpq}
+   Random.seed!(rng, 0)
+   @test t == rand(rng, R, -12:12, 1:6, -10:10)
+end
+
 @testset "fmpz_puiseux_series.manipulation..." begin
    S, x = PuiseuxSeriesRing(ZZ, 30, "x")
 

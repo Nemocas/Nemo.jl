@@ -181,4 +181,10 @@ end
    R, x = FiniteField(fmpz(17), 3, "x")
 
    @inferred rand(R)
+   @test rand(R) isa fq
+   Random.seed!(rng, 0)
+   t = rand(rng, R)
+   @test t isa fq
+   Random.seed!(rng, 0)
+   @test t == rand(rng, R)
 end

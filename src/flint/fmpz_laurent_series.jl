@@ -1323,14 +1323,14 @@ end
 #
 ###############################################################################
 
-function rand(S::FmpzLaurentSeriesRing, val_range::UnitRange{Int}, v...)
+function rand(rng::AbstractRNG, S::FmpzLaurentSeriesRing, val_range::UnitRange{Int}, v...)
    R = base_ring(S)
    f = S()
    x = gen(S)
    for i = 0:S.prec_max - 1
-      f += rand(R, v...)*x^i
+      f += rand(rng, R, v...)*x^i
    end
-   return shift_left(f, rand(val_range))
+   return shift_left(f, rand(rng, val_range))
 end
 
 ###############################################################################

@@ -28,6 +28,16 @@
    @test isa(k1, fmpz_laurent_series)
 end
 
+@testset "fmpz_laurent_series.rand..." begin
+   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   @test rand(R, -12:12, -10:10) isa fmpz_laurent_series
+   Random.seed!(rng, 0)
+   t = rand(rng, R, -12:12, -10:10)
+   @test t isa fmpz_laurent_series
+   Random.seed!(rng, 0)
+   @test t == rand(rng, R, -12:12, -10:10)
+end
+
 @testset "fmpz_laurent_series.manipulation..." begin
    R, t = PolynomialRing(ZZ, "t")
    S, x = LaurentSeriesRing(R, 30, "x")

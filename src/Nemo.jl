@@ -374,6 +374,8 @@ include("flint/adhoc.jl")
 
 include("Rings.jl")
 
+include("common.jl")
+
 ################################################################################
 #
 #  Thread local storages

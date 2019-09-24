@@ -59,6 +59,20 @@
    @test !(S === T)
 end
 
+@testset "gfp.rand..." begin
+   R = GF(13)
+   @test rand(R) isa Nemo.gfp_elem
+   @test rand(R, 1:9) isa Nemo.gfp_elem
+   Random.seed!(rng, 0)
+   s = rand(rng, R)
+   @test s isa Nemo.gfp_elem
+   t = rand(rng, R, 1:9)
+   @test t isa Nemo.gfp_elem
+   Random.seed!(rng, 0)
+   @test s == rand(rng, R)
+   @test t == rand(rng, R, 1:9)
+end
+
 @testset "gfp.printing..." begin
    R = GF(13)
 

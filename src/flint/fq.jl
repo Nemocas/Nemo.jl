@@ -491,14 +491,14 @@ end
 #
 ###############################################################################
 
-function rand(K::FinField)
+function rand(rng::AbstractRNG, K::FinField)
 	p = characteristic(K)
 	r = degree(K)
 	alpha = gen(K)
 	res = zero(K)
   range = BigInt(0):BigInt(p - 1)
 	for i = 0 : (r-1)
-		c = rand(range)
+		c = rand(rng, range)
 		res += c * alpha^i
 	end
 	return res

@@ -49,6 +49,18 @@ end
    @test isa(g, nf_elem)
 end
 
+@testset "nf_elem.rand..." begin
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+
+   @test rand(K, 1:9) isa nf_elem
+   Random.seed!(rng, 0)
+   k = rand(rng, K, 1:9)
+   @test k isa nf_elem
+   Random.seed!(rng, 0)
+   @test k == rand(rng, K, 1:9)
+end
+
 @testset "nf_elem.printing..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")

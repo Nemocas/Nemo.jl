@@ -1609,8 +1609,8 @@ end
 #
 ###############################################################################
 
-function rand(R::FlintIntegerRing, n::UnitRange{Int})
-   return R(rand(n))
+function rand(rng::AbstractRNG, R::FlintIntegerRing, n::UnitRange{Int})
+   return R(rand(rng, n))
 end
 
 ###############################################################################

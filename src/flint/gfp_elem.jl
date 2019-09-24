@@ -320,13 +320,13 @@ end
 #
 ###############################################################################
 
-function rand(R::GaloisField)
-   n = rand(UInt(0):R.n - 1)
+function rand(rng::AbstractRNG, R::GaloisField)
+   n = rand(rng, UInt(0):R.n - 1)
    return gfp_elem(n, R)
 end
 
-function rand(R::GaloisField, b::UnitRange{Int})
-   n = rand(b)
+function rand(rng::AbstractRNG, R::GaloisField, b::UnitRange{Int})
+   n = rand(rng, b)
    return R(n)
 end
 

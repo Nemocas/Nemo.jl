@@ -17,7 +17,7 @@ export FlintPuiseuxSeriesRing, FlintPuiseuxSeriesField,
 @doc Markdown.doc"""
     laurent_ring(R::FlintPuiseuxSeriesRing{T}) where T <: RingElem
 > Return the `LaurentSeriesRing` underlying the given `PuiseuxSeriesRing`.
-""" 
+"""
 laurent_ring(R::FlintPuiseuxSeriesRing{T}) where T <: RingElem = R.laurent_ring::parent_type(T)
 
 @doc Markdown.doc"""
@@ -517,7 +517,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    exp(a::FlintPuiseuxSeriesElem{T}) where T <: RingElem 
+    exp(a::FlintPuiseuxSeriesElem{T}) where T <: RingElem
 > Return the exponential of the given Puiseux series.
 """
 function exp(a::FlintPuiseuxSeriesElem{T}) where T <: RingElem
@@ -532,16 +532,16 @@ end
 #
 ###############################################################################
 
-function rand(S::FlintPuiseuxSeriesRing, val_range::UnitRange{Int}, scale_range::UnitRange{Int}
-, v...)
+function rand(rng::AbstractRNG, S::FlintPuiseuxSeriesRing,
+              val_range::UnitRange{Int}, scale_range::UnitRange{Int}, v...)
    (first(scale_range) <= 0 || last(scale_range) <= 0) && error("Scale must be positive")
-   return S(rand(laurent_ring(S), val_range, v...), rand(scale_range))
+   return S(rand(rng, laurent_ring(S), val_range, v...), rand(rng, scale_range))
 end
 
-function rand(S::FlintPuiseuxSeriesField, val_range::UnitRange{Int}, scale_range::UnitRange{Int
-}, v...)
+function rand(rng::AbstractRNG, S::FlintPuiseuxSeriesField,
+              val_range::UnitRange{Int}, scale_range::UnitRange{Int}, v...)
    (first(scale_range) <= 0 || last(scale_range) <= 0) && error("Scale must be positive")
-   return S(rand(laurent_ring(S), val_range, v...), rand(scale_range))
+   return S(rand(rng, laurent_ring(S), val_range, v...), rand(rng, scale_range))
 end
 
 ###############################################################################
@@ -683,4 +683,3 @@ function (R::FlintPuiseuxSeriesField{T})(b::FlintPuiseuxSeriesRingElem{T}) where
    parent(b) != R && error("Unable to coerce Puiseux series")
    return b
 end
-
