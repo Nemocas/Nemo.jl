@@ -435,6 +435,8 @@ function (R::NmodRing)(a::nmod)
    return a
 end
 
+Base.oftype(x::nmod, y::Integer) = x.parent(y)
+
 ###############################################################################
 #
 #   nmod constructor
