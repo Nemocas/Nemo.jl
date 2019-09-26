@@ -37,15 +37,7 @@ end
 #
 ###############################################################################
 
-function similar(x::fq_nmod_mat)
-   z = fq_nmod_mat(nrows(x), ncols(x), base_ring(x))
-   return z
-end
-
-function similar(x::fq_nmod_mat, R::FqNmodFiniteField, r::Int, c::Int)
-   z = fq_nmod_mat(r, c, R)
-   return z
-end
+similar(::NemoMatrix, R::FqNmodFiniteField, r::Int, c::Int) = fq_nmod_mat(r, c, R)
 
 ################################################################################
 #

@@ -37,10 +37,7 @@ end
 #
 ###############################################################################
 
-function similar(x::fq_mat, R::FqFiniteField, r::Int, c::Int)
-   z = fq_mat(r, c, R)
-   return z
-end
+similar(::NemoMatrix, R::FqFiniteField, r::Int, c::Int) = fq_mat(r, c, R)
 
 ################################################################################
 #

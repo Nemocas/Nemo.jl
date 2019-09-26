@@ -15,7 +15,7 @@ export zero, one, deepcopy, -, transpose, +, *, &, ==, !=,
 #
 ###############################################################################
 
-function similar(x::arb_mat, R::ArbField, r::Int, c::Int)
+function similar(::NemoMatrix, R::ArbField, r::Int, c::Int)
    z = arb_mat(r, c)
    z.base_ring = R
    return z

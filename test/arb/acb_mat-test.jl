@@ -101,16 +101,20 @@ end
    t = similar(s)
    @test t isa acb_mat
    @test size(t) == size(s)
-   t = similar(s, CC)
-   @test t isa acb_mat
-   @test size(t) == size(s)
 
    t = similar(s, 2, 3)
    @test t isa acb_mat
    @test size(t) == (2, 3)
-   t = similar(s, CC, 2, 3)
-   @test t isa acb_mat
-   @test size(t) == (2, 3)
+
+   for (R, M) in ring_to_mat
+      t = similar(s, R)
+      @test t isa M
+      @test size(t) == size(s)
+
+      t = similar(s, R, 2, 3)
+      @test t isa M
+      @test size(t) == (2, 3)
+   end
 end
 
 @testset "acb_mat.printing..." begin

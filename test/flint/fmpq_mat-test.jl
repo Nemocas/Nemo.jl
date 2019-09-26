@@ -126,16 +126,20 @@ end
    t = similar(s)
    @test t isa fmpq_mat
    @test size(t) == size(s)
-   t = similar(s, QQ)
-   @test t isa fmpq_mat
-   @test size(t) == size(s)
 
    t = similar(s, 2, 3)
    @test t isa fmpq_mat
    @test size(t) == (2, 3)
-   t = similar(s, QQ, 2, 3)
-   @test t isa fmpq_mat
-   @test size(t) == (2, 3)
+
+   for (R, M) in ring_to_mat
+      t = similar(s, R)
+      @test t isa M
+      @test size(t) == size(s)
+
+      t = similar(s, R, 2, 3)
+      @test t isa M
+      @test size(t) == (2, 3)
+   end
 end
 
 @testset "fmpq_mat.printing..." begin
