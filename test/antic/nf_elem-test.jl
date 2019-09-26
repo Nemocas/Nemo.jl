@@ -1,5 +1,4 @@
-function test_nf_accessor_functions()
-   print("nf_elem.accessors...")
+@testset "nf_elem.accessors..." begin
    t = create_accessors(AnticNumberField, fmpz, get_handle())
    get_test = t[1]
    set_test = t[2]
@@ -9,12 +8,9 @@ function test_nf_accessor_functions()
 
    set_test(K, fmpz(2))
    @test 2 == get_test(K)
-   println("PASS")
 end
 
-function test_nf_elem_constructors()
-   print("nf_elem.constructors...")
-
+@testset "nf_elem.constructors..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
@@ -51,25 +47,17 @@ function test_nf_elem_constructors()
    g = K(x^2 + 2x - 7)
 
    @test isa(g, nf_elem)
-
-   println("PASS")
 end
 
-function test_nf_elem_printing()
-   print("nf_elem.printing...")
-
+@testset "nf_elem.printing..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
    g = K(x^2 + 2x - 7)
 
    @test string(g) == "a^2 + 2*a - 7"
-
-   println("PASS")
 end
 
-function test_nf_elem_fmpz_mat_conversions()
-   print("nf_elem.fmpz_mat_conversions...")
-
+@testset "nf_elem.fmpz_mat_conversions..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
    M = MatrixSpace(FlintZZ, 1, 3)(0)
@@ -87,13 +75,9 @@ function test_nf_elem_fmpz_mat_conversions()
 
    @test d == 3
    @test M == MatrixSpace(FlintZZ, 1, 3)([1 1 5])
-
-   println("PASS")
 end
 
-function test_nf_elem_fmpq_poly_conversion()
-   print("nf_elem.fmpq_poly_conversion...")
-
+@testset "nf_elem.fmpq_poly_conversion..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
@@ -106,39 +90,27 @@ function test_nf_elem_fmpq_poly_conversion()
    K, a = NumberField(x - 7, "a")
 
    @test R(a) == R(7)
-
-   println("PASS")
 end
 
-function test_nf_elem_denominator()
-   print("nf_elem.denominator...")
-
+@testset "nf_elem.denominator..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
    b = a//5
 
    @test denominator(b) == 5
-
-   println("PASS")
 end
 
-function test_nf_elem_conversions()
-   print("nf_elem.conversions...")
-
+@testset "nf_elem.conversions..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
    f = x^2 + 2x - 7
 
    @test R(K(f)) == f
-
-   println("PASS")
 end
 
-function test_nf_elem_manipulation()
-   print("nf_elem.manipulation...")
-
+@testset "nf_elem.manipulation..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
@@ -164,26 +136,18 @@ function test_nf_elem_manipulation()
    @test isrational(K(2))
    @test !isinteger(K(1//2))
    @test isrational(K(1//2))
-
-   println("PASS")
 end
 
-function test_nf_elem_unary_ops()
-   print("nf_elem.unary_ops...")
-
+@testset "nf_elem.unary_ops..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
    d = a^2 + 2a - 7
 
    @test -d == -a^2 - 2a + 7
-
-   println("PASS")
 end
 
-function test_nf_elem_binary_ops()
-   print("nf_elem.binary_ops...")
-
+@testset "nf_elem.binary_ops..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
@@ -195,13 +159,9 @@ function test_nf_elem_binary_ops()
    @test c - d == -2a^2 + 3a - 8
 
    @test c*d == -31*a^2 - 9*a - 12
-
-   println("PASS")
 end
 
-function test_nf_elem_adhoc_binary()
-   print("nf_elem.adhoc_binary...")
-
+@testset "nf_elem.adhoc_binary..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
@@ -216,13 +176,9 @@ function test_nf_elem_adhoc_binary()
    @test d*3 == 3d
    @test d*fmpz(3) == fmpz(3)*d
    @test d*fmpq(2, 3) == fmpq(2, 3)*d
-
-   println("PASS")
 end
 
-function test_nf_elem_powering()
-   print("nf_elem.powering...")
-
+@testset "nf_elem.powering..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
@@ -231,13 +187,9 @@ function test_nf_elem_powering()
    @test d^5 == -13195*a^2 + 72460*a + 336
    @test d^(-2) == fmpz(2773)//703921*a^2 + fmpz(1676)//703921*a + fmpz(12632)//703921
    @test d^0 == 1
-
-   println("PASS")
 end
 
-function test_nf_elem_comparison()
-   print("nf_elem.comparison...")
-
+@testset "nf_elem.comparison..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
@@ -246,13 +198,9 @@ function test_nf_elem_comparison()
 
    @test c != d
    @test c == 3a^2 - a + 1
-
-   println("PASS")
 end
 
-function test_nf_elem_adhoc_comparison()
-   print("nf_elem.adhoc_comparison...")
-
+@testset "nf_elem.adhoc_comparison..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
@@ -271,26 +219,18 @@ function test_nf_elem_adhoc_comparison()
    @test 5 == K(5)
    @test fmpz(5) == K(5)
    @test fmpq(2, 3) == K(fmpq(2, 3))
-
-   println("PASS")
 end
 
-function test_nf_elem_inversion()
-   print("nf_elem.inversion...")
-
+@testset "nf_elem.inversion..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
    c = 3a^2 - a + 1
 
    @test inv(c)*c == 1
-
-   println("PASS")
 end
 
-function test_nf_elem_exact_division()
-   print("nf_elem.exact_division...")
-
+@testset "nf_elem.exact_division..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
@@ -298,13 +238,9 @@ function test_nf_elem_exact_division()
    d = a^2 + 2a - 7
 
    @test divexact(c, d) == c*inv(d)
-
-   println("PASS")
 end
 
-function test_nf_elem_adhoc_exact_division()
-   print("nf_elem.adhoc_exact_division...")
-
+@testset "nf_elem.adhoc_exact_division..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
@@ -313,13 +249,9 @@ function test_nf_elem_adhoc_exact_division()
    @test divexact(7c, 7) == c
    @test divexact(7c, fmpz(7)) == c
    @test divexact(fmpq(2, 3)*c, fmpq(2, 3)) == c
-
-   println("PASS")
 end
 
-function test_nf_elem_divides()
-   print("nf_elem.divides...")
-
+@testset "nf_elem.divides..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
@@ -330,13 +262,9 @@ function test_nf_elem_divides()
 
    @test flag
    @test q == divexact(c, d)
-
-   println("PASS")
 end
 
-function test_nf_elem_norm_tr()
-   print("nf_elem.norm_trace...")
-
+@testset "nf_elem.norm_trace..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
@@ -344,13 +272,9 @@ function test_nf_elem_norm_tr()
 
    @test norm(c) == 113
    @test tr(c) == -15
-
-   println("PASS")
 end
 
-function test_nf_elem_representation_matrix()
-  print("nf_elem.representation_matrix...")
-
+@testset "nf_elem.representation_matrix..." begin
   R, x = PolynomialRing(QQ, "x")
   K, a = NumberField(x^3 + 3x + 1, "a")
 
@@ -373,13 +297,9 @@ function test_nf_elem_representation_matrix()
   @test Mbb == FlintZZ[2 -1; 28 2]
   @test d == 4
   @test base_ring(Mbb) == FlintZZ
-
-  println("PASS")
 end
 
-function test_nf_elem_Polynomials()
-   print("nf_elem.Polynomials...")
-
+@testset "nf_elem.Polynomials..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
    S, y = PolynomialRing(K, "y")
@@ -389,32 +309,4 @@ function test_nf_elem_Polynomials()
    @test f^20*f^30 == f^25*f^25
    @test f^20*f^30 == mul_classical(f^20, f^30)
    @test f^20*f^30 == sqr_classical(f^25)
-
-   println("PASS")
-end
-
-function test_nf_elem()
-   test_nf_accessor_functions()
-   test_nf_elem_constructors()
-   test_nf_elem_printing()
-   test_nf_elem_fmpz_mat_conversions()
-   test_nf_elem_fmpq_poly_conversion()
-   test_nf_elem_denominator()
-   test_nf_elem_conversions()
-   test_nf_elem_manipulation()
-   test_nf_elem_unary_ops()
-   test_nf_elem_binary_ops()
-   test_nf_elem_adhoc_binary()
-   test_nf_elem_powering()
-   test_nf_elem_comparison()
-   test_nf_elem_adhoc_comparison()
-   test_nf_elem_inversion()
-   test_nf_elem_exact_division()
-   test_nf_elem_adhoc_exact_division()
-   test_nf_elem_divides()
-   test_nf_elem_norm_tr()
-   test_nf_elem_representation_matrix()
-   test_nf_elem_Polynomials()
-
-   println("")
 end

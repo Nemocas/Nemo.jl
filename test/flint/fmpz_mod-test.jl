@@ -1,6 +1,4 @@
-function test_fmpz_mod_gcdx()
-   print("fmpz_mod.gcdx...")
-
+@testset "fmpz_mod.gcdx..." begin
    for i = 1:100
       n = rand(1:24)
       R = ResidueRing(ZZ, ZZ(n))
@@ -14,12 +12,4 @@ function test_fmpz_mod_gcdx()
          @test g == s*a + t*b
       end
    end
-
-   println("PASS")
-end
-
-function test_fmpz_mod()
-   test_fmpz_mod_gcdx()
-
-   println("")
 end

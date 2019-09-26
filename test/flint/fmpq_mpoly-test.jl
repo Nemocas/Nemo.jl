@@ -1,6 +1,4 @@
-function test_fmpq_mpoly_constructors()
-   print("fmpq_mpoly.constructors...")
-
+@testset "fmpq_mpoly.constructors..." begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -57,13 +55,9 @@ function test_fmpq_mpoly_constructors()
         @test !isgen(f + 1)
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpq_mpoly_manipulation()
-   print("fmpq_mpoly.manipulation...")
-
+@testset "fmpq_mpoly.manipulation..." begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -143,7 +137,7 @@ function test_fmpq_mpoly_manipulation()
 
       @test isterm(h)
       @test !isterm(h2 + 1 + gen(S, 1))
-      
+
       @test isunit(S(1))
       @test !isunit(gen(S, 1))
 
@@ -172,13 +166,9 @@ function test_fmpq_mpoly_manipulation()
       @test (total_degree_fmpz(h) == max(sum.(monomialexp)...)) || (h == 0 && total_degree(h) == -1)
       @test total_degree_fits_int(h)
    end
-
-   println("PASS")
 end
 
-function test_fmpq_mpoly_multivariate_coeff()
-   print("fmpq_mpoly.multivariate_coeff...")
-
+@testset "fmpq_mpoly.multivariate_coeff..." begin
    R = FlintQQ
 
    for ord in Nemo.flint_orderings
@@ -195,13 +185,9 @@ z^4-4*x*y-10*x*z^2+8*y^2*z^5-9*y^2*z^3
       @test coeff(f, [y, z], [3, 2]) == -10*x^4
       @test coeff(f, [x, z], [4, 5]) == 0
    end
-
-   println("PASS")
 end
 
-function test_fmpq_mpoly_unary_ops()
-   print("fmpq_mpoly.unary_ops...")
-
+@testset "fmpq_mpoly.unary_ops..." begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -216,13 +202,9 @@ function test_fmpq_mpoly_unary_ops()
          @test f == -(-f)
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpq_mpoly_binary_ops()
-   print("fmpq_mpoly.binary_ops...")
-
+@testset "fmpq_mpoly.binary_ops..." begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -243,13 +225,9 @@ function test_fmpq_mpoly_binary_ops()
          @test f*g - f*h == f*(g - h)
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpq_mpoly_adhoc_binary()
-   print("fmpq_mpoly.adhoc_binary...")
-
+@testset "fmpq_mpoly.adhoc_binary..." begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -287,13 +265,9 @@ function test_fmpq_mpoly_adhoc_binary()
          @test f + g1 - g1 == f
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpq_mpoly_adhoc_comparison()
-   print("fmpq_mpoly.adhoc_comparison...")
-
+@testset "fmpq_mpoly.adhoc_comparison..." begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -317,13 +291,9 @@ function test_fmpq_mpoly_adhoc_comparison()
          @test Rational{Int}(d) == S(d)
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpq_mpoly_powering()
-   print("fmpq_mpoly.powering...")
-
+@testset "fmpq_mpoly.powering..." begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -348,13 +318,9 @@ function test_fmpq_mpoly_powering()
          @test_throws DomainError f^fmpz(-1)
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpq_mpoly_divides()
-   print("fmpq_mpoly.divides...")
-
+@testset "fmpq_mpoly.divides..." begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -371,7 +337,7 @@ function test_fmpq_mpoly_divides()
 
          flag, q = divides(p, f)
 
-         if flag 
+         if flag
            @test q * f == p
          end
 
@@ -381,13 +347,9 @@ function test_fmpq_mpoly_divides()
          end
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpq_mpoly_euclidean_division()
-   print("fmpq_mpoly.euclidean_division...")
-
+@testset "fmpq_mpoly.euclidean_division..." begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -421,13 +383,9 @@ function test_fmpq_mpoly_euclidean_division()
          @test (r3 == 0 && flag == true && q5 == q3) || (r3 != 0 && flag == false)
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpq_mpoly_ideal_reduction()
-   print("fmpq_mpoly.ideal_reduction...")
-
+@testset "fmpq_mpoly.ideal_reduction..." begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -474,13 +432,9 @@ function test_fmpq_mpoly_ideal_reduction()
          @test p == g
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpq_mpoly_gcd()
-   print("fmpq_mpoly.gcd...")
-
+@testset "fmpq_mpoly.gcd..." begin
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -502,13 +456,9 @@ function test_fmpq_mpoly_gcd()
          end
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpq_mpoly_evaluation()
-   print("fmpq_mpoly.evaluation...")
-
+@testset "fmpq_mpoly.evaluation..." begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -561,13 +511,9 @@ function test_fmpq_mpoly_evaluation()
    M2 = T([1 1; 2 4])
 
    @test f(M1, M2) == T([124 219; 271 480])
-
-   println("PASS")
 end
 
-function test_fmpq_mpoly_valuation()
-   print("fmpq_mpoly.valuation...")
-
+@testset "fmpq_mpoly.valuation..." begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -603,12 +549,9 @@ function test_fmpq_mpoly_valuation()
          @test q4 == q3
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpq_mpoly_derivative_integral()
-   print("fmpq_mpoly.derivative_integral...")
+@testset "fmpq_mpoly.derivative_integral..." begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -621,18 +564,14 @@ function test_fmpq_mpoly_derivative_integral()
          f = rand(S, 0:5, 0:100, -100:100)
 
          for i in 1:num_vars
-            @test degree((integral(derivative(f, i), i) - f), i) <= 0 # Constant or zero 
+            @test degree((integral(derivative(f, i), i) - f), i) <= 0 # Constant or zero
             @test derivative(integral(f, i), i) == f
          end
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpq_mpoly_combine_like_terms()
-  print("fmpq_mpoly.combine_like_terms...")
-
+@testset "fmpq_mpoly.combine_like_terms..." begin
   for num_vars = 1:10
      var_names = ["x$j" for j in 1:num_vars]
      ord = rand_ordering()
@@ -664,13 +603,9 @@ function test_fmpq_mpoly_combine_like_terms()
         @test length(f) == lenf - 1 - terms_cancel
      end
   end
-
-  println("PASS")
 end
 
-function test_fmpq_mpoly_exponents()
-  print("fmpq_mpoly.exponents...")
-
+@testset "fmpq_mpoly.exponents..." begin
   for num_vars = 1:10
      var_names = ["x$j" for j in 1:num_vars]
      ord = rand_ordering()
@@ -716,29 +651,4 @@ function test_fmpq_mpoly_exponents()
         end
      end
   end
-
-  println("PASS")
-end
-
-
-function test_fmpq_mpoly()
-   test_fmpq_mpoly_constructors()
-   test_fmpq_mpoly_manipulation()
-   test_fmpq_mpoly_multivariate_coeff()
-   test_fmpq_mpoly_unary_ops()
-   test_fmpq_mpoly_binary_ops()
-   test_fmpq_mpoly_adhoc_binary()
-   test_fmpq_mpoly_adhoc_comparison()
-   test_fmpq_mpoly_powering()
-   test_fmpq_mpoly_divides()
-   test_fmpq_mpoly_euclidean_division()
-   test_fmpq_mpoly_ideal_reduction()
-   test_fmpq_mpoly_gcd()
-   test_fmpq_mpoly_evaluation()
-   test_fmpq_mpoly_valuation()
-   test_fmpq_mpoly_derivative_integral()
-   test_fmpq_mpoly_combine_like_terms()
-   test_fmpq_mpoly_exponents()
-
-   println("")
 end

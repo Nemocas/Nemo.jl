@@ -1,6 +1,4 @@
-function test_nmod_rel_series_constructors()
-   print("nmod_rel_series.constructors...")
-
+@testset "nmod_rel_series.constructors..." begin
    R = ResidueRing(ZZ, 17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -40,25 +38,17 @@ function test_nmod_rel_series_constructors()
    l = S(R(4))
 
    @test isa(l, SeriesElem)
-
-   println("PASS")
 end
 
-function test_nmod_rel_series_printing()
-   print("nmod_rel_series.printing...")
-
+@testset "nmod_rel_series.printing..." begin
    R = ResidueRing(ZZ, 17)
    S, x = PowerSeriesRing(R, 30, "x")
    b = x^2 + x + O(x^4)
 
    @test string(b) == "x+x^2+O(x^4)"
-
-   println("PASS")
 end
 
-function test_nmod_rel_series_manipulation()
-   print("nmod_rel_series.manipulation...")
-
+@testset "nmod_rel_series.manipulation..." begin
    R = ResidueRing(ZZ, 17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -90,13 +80,9 @@ function test_nmod_rel_series_manipulation()
    @test coeff(a, 1) == 2
 
    @test coeff(b, 7) == 0
-
-   println("PASS")
 end
 
-function test_nmod_rel_series_unary_ops()
-   print("nmod_rel_series.unary_ops...")
-
+@testset "nmod_rel_series.unary_ops..." begin
    R = ResidueRing(ZZ, 17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -106,13 +92,9 @@ function test_nmod_rel_series_unary_ops()
    @test isequal(-a, -2x - x^3 + O(x^31))
 
    @test isequal(-b, -1 - 2x - x^2 + O(x^3))
-
-   println("PASS")
 end
 
-function test_nmod_rel_series_binary_ops()
-   print("nmod_rel_series.binary_ops...")
-
+@testset "nmod_rel_series.binary_ops..." begin
    R = ResidueRing(ZZ, 17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -248,13 +230,9 @@ function test_nmod_rel_series_binary_ops()
    @test isequal(m1 - m3, 1+O(x^4))
 
    @test isequal(m1 - m4, 1+x+O(x^4))
-
-   println("PASS")
 end
 
-function test_nmod_rel_series_adhoc_binary_ops()
-   print("nmod_rel_series.adhoc_binary_ops...")
-
+@testset "nmod_rel_series.adhoc_binary_ops..." begin
    R = ResidueRing(ZZ, 17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -270,13 +248,9 @@ function test_nmod_rel_series_adhoc_binary_ops()
    @test isequal(c*2, 2 + 2*x + 6*x^2 + O(x^5))
 
    @test isequal(d*fmpz(3), 3x^2 + 9x^3 - 3x^4 + O(x^32))
-
-   println("PASS")
 end
 
-function test_nmod_rel_series_comparison()
-   print("nmod_rel_series.comparison...")
-
+@testset "nmod_rel_series.comparison..." begin
    R = ResidueRing(ZZ, 17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -294,13 +268,9 @@ function test_nmod_rel_series_comparison()
    @test isequal(a, 2x + x^3 + O(x^31))
 
    @test !isequal(b, d)
-
-   println("PASS")
 end
 
-function test_nmod_rel_series_adhoc_comparison()
-   print("nmod_rel_series.adhoc_comparison...")
-
+@testset "nmod_rel_series.adhoc_comparison..." begin
    R = ResidueRing(ZZ, 17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -318,13 +288,9 @@ function test_nmod_rel_series_adhoc_comparison()
    @test 2 == b
 
    @test fmpz(1) == c
-
-   println("PASS")
 end
 
-function test_nmod_rel_series_powering()
-   print("nmod_rel_series.powering...")
-
+@testset "nmod_rel_series.powering..." begin
    R = ResidueRing(ZZ, 17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -342,13 +308,9 @@ function test_nmod_rel_series_powering()
    @test isequal(d^12, 4096*x^12+24576*x^14+O(x^15))
 
    @test_throws DomainError a^-1
-
-   println("PASS")
 end
 
-function test_nmod_rel_series_shift()
-   print("nmod_rel_series.shift...")
-
+@testset "nmod_rel_series.shift..." begin
    R = ResidueRing(ZZ, 17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -368,13 +330,9 @@ function test_nmod_rel_series_shift()
    @test_throws DomainError shift_left(a, -1)
 
    @test_throws DomainError shift_right(a, -1)
-
-   println("PASS")
 end
 
-function test_nmod_rel_series_truncation()
-   print("nmod_rel_series.truncation...")
-
+@testset "nmod_rel_series.truncation..." begin
    R = ResidueRing(ZZ, 17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -392,13 +350,9 @@ function test_nmod_rel_series_truncation()
    @test isequal(truncate(d, 5), x^3+2*x+O(x^4))
 
    @test_throws DomainError truncate(a, -1)
-
-   println("PASS")
 end
 
-function test_nmod_rel_series_inversion()
-   print("nmod_rel_series.inversion...")
-
+@testset "nmod_rel_series.inversion..." begin
    R = ResidueRing(ZZ, 17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -408,13 +362,9 @@ function test_nmod_rel_series_inversion()
    @test isequal(inv(a), -x^4+3*x^3-x^2-x+1+O(x^5))
 
    @test isequal(inv(b), -1+O(x^30))
-
-   println("PASS")
 end
 
-function test_nmod_rel_series_exact_division()
-   print("nmod_rel_series.exact_division...")
-
+@testset "nmod_rel_series.exact_division..." begin
    R = ResidueRing(ZZ, 17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -430,13 +380,9 @@ function test_nmod_rel_series_exact_division()
    @test isequal(divexact(b, c), O(x^4))
 
    @test isequal(divexact(d, c), -2*x^5+2*x^4-x^2+x+O(x^6))
-
-   println("PASS")
 end
 
-function test_nmod_rel_series_adhoc_exact_division()
-   print("nmod_rel_series.adhoc_exact_division...")
-
+@testset "nmod_rel_series.adhoc_exact_division..." begin
    R = ResidueRing(ZZ, 17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -456,39 +402,13 @@ function test_nmod_rel_series_adhoc_exact_division()
    @test isequal(divexact(94872394861923874346987123694871329847a, 94872394861923874346987123694871329847), a)
 
    @test isequal(divexact(R(5)*a, R(5)), a)
-
-   println("PASS")
 end
 
-function test_nmod_rel_series_special_functions()
-   print("nmod_rel_series.special_functions...")
-
+@testset "nmod_rel_series.special_functions..." begin
    R = ResidueRing(ZZ, 17)
    S, x = PowerSeriesRing(R, 30, "x")
 
    @test isequal(exp(x + O(x^5)), 1+x+9*x^2+3*x^3+5*x^4+O(x^5))
 
    @test isequal(divexact(x, exp(x + O(x^5)) - 1), 1+8*x+10*x^2+O(x^4))
-
-   println("PASS")
-end
-
-function test_nmod_rel_series()
-   test_nmod_rel_series_constructors()
-   test_nmod_rel_series_printing()
-   test_nmod_rel_series_manipulation()
-   test_nmod_rel_series_unary_ops()
-   test_nmod_rel_series_binary_ops()
-   test_nmod_rel_series_adhoc_binary_ops()
-   test_nmod_rel_series_comparison()
-   test_nmod_rel_series_adhoc_comparison()
-   test_nmod_rel_series_powering()
-   test_nmod_rel_series_shift()
-   test_nmod_rel_series_truncation()
-   test_nmod_rel_series_exact_division()
-   test_nmod_rel_series_adhoc_exact_division()
-   test_nmod_rel_series_inversion()
-   test_nmod_rel_series_special_functions()
-
-   println("")
 end

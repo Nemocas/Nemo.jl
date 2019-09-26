@@ -1,6 +1,4 @@
-function test_MPoly_binary_ops_delayed_reduction()
-   print("MPoly.binary_ops_delayed_reduction...")
-
+@testset "MPoly.binary_ops_delayed_reduction..." begin
    S, t = PolynomialRing(QQ, "t")
    K, a = NumberField(t^3 + 3t + 1, "a")
 
@@ -22,13 +20,9 @@ function test_MPoly_binary_ops_delayed_reduction()
          @test f*g == Generic.mul_classical(f, g)
       end
    end
-
-   println("PASS")
 end
 
-function test_MPoly_powering_delayed_reduction()
-   print("MPoly.powering_delayed_reduction...")
-
+@testset "MPoly.powering_delayed_reduction..." begin
    S, t = PolynomialRing(QQ, "t")
    K, a = NumberField(t^3 + 3t + 1, "a")
 
@@ -51,13 +45,9 @@ function test_MPoly_powering_delayed_reduction()
          @test (f == 0 && expn == 0 && f^expn == 0) || f^expn == r
       end
    end
-
-   println("PASS")
 end
 
-function test_MPoly_divides_delayed_reduction()
-   print("MPoly.divides_delayed_reduction...")
-
+@testset "MPoly.divides_delayed_reduction..." begin
    S, t = PolynomialRing(QQ, "t")
    K, a = NumberField(t^3 + 3t + 1, "a")
 
@@ -90,13 +80,9 @@ function test_MPoly_divides_delayed_reduction()
          end
       end
    end
-
-   println("PASS")
 end
 
-function test_MPoly_euclidean_division_delayed_reduction()
-   print("MPoly.euclidean_division_delayed_reduction...")
-
+@testset "MPoly.euclidean_division_delayed_reduction..." begin
    S, t = PolynomialRing(QQ, "t")
    K, a = NumberField(t^3 + 3t + 1, "a")
 
@@ -131,16 +117,4 @@ function test_MPoly_euclidean_division_delayed_reduction()
          @test (r3 == 0 && flag == true && q5 == q3) || (r3 != 0 && flag == false)
       end
    end
-
-   println("PASS")
 end
-
-function test_MPoly()
-   test_MPoly_binary_ops_delayed_reduction()
-   test_MPoly_powering_delayed_reduction()
-   test_MPoly_divides_delayed_reduction()
-   test_MPoly_euclidean_division_delayed_reduction()
-
-   println("")
-end
-

@@ -1,8 +1,6 @@
 RR = ArbField(64)
 
-function test_arb_poly_constructors()
-   print("arb_poly.constructors...")
-
+@testset "arb_poly.constructors..." begin
    R, x = PolynomialRing(RR, "x")
 
    @test elem_type(R) == arb_poly
@@ -33,33 +31,25 @@ function test_arb_poly_constructors()
       l = R(T[1, 2, 3])
 
       @test isa(l, arb_poly)
-   end 
-
-   println("PASS")
+   end
 end
 
-function test_arb_poly_printing()
-   print("arb_poly.printing...")
-
+@testset "arb_poly.printing..." begin
    R, x = PolynomialRing(RR, "x")
    f = x^3 + 2x^2 + x + 1
 
    @test string(f) == "x^3+2.0000000000000000000*x^2+x+1.0000000000000000000"
-
-   println("PASS")
 end
 
-function test_arb_poly_manipulation()
-   print("arb_poly.manipulation...")
-
+@testset "arb_poly.manipulation..." begin
    R, x = PolynomialRing(RR, "x")
-   
+
    @test iszero(zero(R))
-   
+
    @test isone(one(R))
 
    @test isgen(gen(R))
-   
+
    # @test isunit(one(R))
 
    f = x^2 + 2x + 1
@@ -77,15 +67,11 @@ function test_arb_poly_manipulation()
    # @test canonical_unit(-x + 1) == -1
 
    @test deepcopy(f) == f
-
-   println("PASS")
 end
 
-function test_arb_poly_binary_ops()
-   print("arb_poly.binary_ops...")
-
+@testset "arb_poly.binary_ops..." begin
    R, x = PolynomialRing(RR, "x")
-   
+
    f = x^2 + 2x + 1
    g = x^3 + 3x + 2
 
@@ -94,15 +80,11 @@ function test_arb_poly_binary_ops()
    @test f*g == x^5+2*x^4+4*x^3+8*x^2+7*x+2
 
    @test f - g == -x^3+x^2-x-1
-
-   println("PASS")
 end
 
-function test_arb_poly_adhoc_binary()
-   print("arb_poly.adhoc_binary...")
-
+@testset "arb_poly.adhoc_binary..." begin
    R, x = PolynomialRing(RR, "x")
-   
+
    f = x^2 + 2x + 1
    g = x^3 + 3x + 2
 
@@ -125,13 +107,9 @@ function test_arb_poly_adhoc_binary()
 
       @test T(12) - g == -x^3-3*x+10
    end
-
-   println("PASS")
 end
 
-function test_arb_poly_comparison()
-   print("arb_poly.comparison...")
-
+@testset "arb_poly.comparison..." begin
    R, x = PolynomialRing(RR, "x")
    Zx, zx = PolynomialRing(ZZ, "x")
    Qx, qx = PolynomialRing(QQ, "x")
@@ -175,20 +153,16 @@ function test_arb_poly_comparison()
 
    uniq, p = unique_integer(f + RR("3 +/- 1.01") * x^4)
    @test !uniq
-
-   println("PASS")
 end
 
-function test_arb_poly_adhoc_comparison()
-   print("arb_poly.adhoc_comparison...")
-
+@testset "arb_poly.adhoc_comparison..." begin
    R, x = PolynomialRing(RR, "x")
-   
+
    f = x^2 + 2x + 1
 
-   @test f != 1 
+   @test f != 1
 
-   @test 1 != f 
+   @test 1 != f
 
    @test R(7) == fmpz(7)
 
@@ -201,27 +175,19 @@ function test_arb_poly_adhoc_comparison()
    @test R(7) == QQ(7)
 
    @test QQ(7) != f
-
-   println("PASS")
 end
 
-function test_arb_poly_unary_ops()
-   print("arb_poly.unary_ops...")
-
+@testset "arb_poly.unary_ops..." begin
    R, x = PolynomialRing(RR, "x")
-   
+
    f = x^2 + 2x + 1
 
    @test -f == -x^2 - 2x - 1
-
-   println("PASS")
 end
 
-function test_arb_poly_truncation()
-   print("arb_poly.truncation...")
-
+@testset "arb_poly.truncation..." begin
    R, x = PolynomialRing(RR, "x")
-  
+
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
 
@@ -232,25 +198,17 @@ function test_arb_poly_truncation()
    @test mullow(f, g, 3) == 7*x^2+5*x+1
 
    @test_throws DomainError mullow(f, g, -1)
-
-   println("PASS")
 end
 
-function test_arb_poly_reverse()
-   print("arb_poly.reverse...")
-
+@testset "arb_poly.reverse..." begin
    R, x = PolynomialRing(RR, "x")
-   
+
    f = x^2 + 2x + 3
 
    #@test reverse(f) == 3x^2 + 2x + 1
-
-   println("PASS")
 end
 
-function test_arb_poly_shift()
-   print("arb_poly.shift...")
-
+@testset "arb_poly.shift..." begin
    R, x = PolynomialRing(RR, "x")
 
    f = x^2 + 2x + 1
@@ -262,40 +220,28 @@ function test_arb_poly_shift()
    @test shift_right(f, 1) == x + 2
 
    @test_throws DomainError shift_right(f, -1)
-
-   println("PASS")
 end
 
-function test_arb_poly_powering()
-   print("arb_poly.powering...")
-
+@testset "arb_poly.powering..." begin
    R, x = PolynomialRing(RR, "x")
-  
+
    f = x^2 + 2x + 1
 
-   @test f^12 == x^24+24*x^23+276*x^22+2024*x^21+10626*x^20+42504*x^19+134596*x^18+346104*x^17+735471*x^16+1307504*x^15+1961256*x^14+2496144*x^13+2704156*x^12+2496144*x^11+1961256*x^10+1307504*x^9+735471*x^8+346104*x^7+134596*x^6+42504*x^5+10626*x^4+2024*x^3+276*x^2+24*x+1 
+   @test f^12 == x^24+24*x^23+276*x^22+2024*x^21+10626*x^20+42504*x^19+134596*x^18+346104*x^17+735471*x^16+1307504*x^15+1961256*x^14+2496144*x^13+2704156*x^12+2496144*x^11+1961256*x^10+1307504*x^9+735471*x^8+346104*x^7+134596*x^6+42504*x^5+10626*x^4+2024*x^3+276*x^2+24*x+1
 
    @test_throws DomainError f^-1
-   
-   println("PASS")
 end
 
-function test_arb_poly_exact_division()
-   print("arb_poly.exact_division...")
-
+@testset "arb_poly.exact_division..." begin
    R, x = PolynomialRing(RR, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
 
    @test divexact(f*g, f) == g
-
-   println("PASS")
 end
 
-function test_arb_poly_scalar_division()
-   print("arb_poly_scalar_division...")
-
+@testset "arb_poly_scalar_division..." begin
    R, x = PolynomialRing(RR, "x")
 
    f = x^2 + 2x + 1
@@ -309,19 +255,15 @@ function test_arb_poly_scalar_division()
    @test divexact(2*f, RR(2)) == f
 
    @test divexact(2*f, 2.0) == f
-
-   println("PASS")
 end
 
-function test_arb_poly_evaluation()
-   print("arb_poly.evaluation...")
-
+@testset "arb_poly.evaluation..." begin
    R, x = PolynomialRing(RR, "x")
-   
+
    f = x^2 + 2x + 1
 
    @test evaluate(f, 3) == 16
-   
+
    @test evaluate(f, 10.0) == 121
 
    @test evaluate(f, ZZ(10)) == 121
@@ -339,40 +281,28 @@ function test_arb_poly_evaluation()
    @test evaluate2(f, QQ(10)) == (121, 22)
 
    @test evaluate2(f, RR(10)) == (121, 22)
-
-   println("PASS")
 end
 
-function test_arb_poly_composition()
-   print("arb_poly.composition...")
-
+@testset "arb_poly.composition..." begin
    R, x = PolynomialRing(RR, "x")
-   
+
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
 
    @test compose(f, g) == x^6+6*x^4+4*x^3+9*x^2+12*x+4
-
-   println("PASS")
 end
 
-function test_arb_poly_derivative_integral()
-   print("arb_poly.derivative_integral...")
-
+@testset "arb_poly.derivative_integral..." begin
    R, x = PolynomialRing(RR, "x")
-   
+
    f = x^2 + 2x + 1
 
    @test derivative(f) == 2x + 2
 
    @test contains(derivative(integral(f)), f)
-
-   println("PASS")
 end
 
-function test_arb_poly_evaluation_interpolation()
-   print("arb_poly.evaluation_interpolation...")
-
+@testset "arb_poly.evaluation_interpolation..." begin
    R, x = PolynomialRing(RR, "x")
 
    n = 5
@@ -414,13 +344,9 @@ function test_arb_poly_evaluation_interpolation()
    for i=1:n
       @test contains_zero(evaluate(f, xs[i]))
    end
-
-   println("PASS")
 end
 
-function test_arb_poly_root_bound()
-   print("arb_poly.root_bound...")
-
+@testset "arb_poly.root_bound..." begin
    Rx, x = PolynomialRing(RR, "x")
 
    for i in 1:2
@@ -430,32 +356,4 @@ function test_arb_poly_root_bound()
       b = roots_upper_bound(f)
       @test all([ abs(z[i]) <= b for i in 1:r])
    end
-
-   println("PASS")
 end
-
-function test_arb_poly()
-   test_arb_poly_constructors()
-   test_arb_poly_printing()
-   test_arb_poly_manipulation()
-   test_arb_poly_binary_ops()
-   test_arb_poly_adhoc_binary()
-   test_arb_poly_comparison()
-   test_arb_poly_adhoc_comparison()
-   test_arb_poly_unary_ops()
-   test_arb_poly_truncation()
-   test_arb_poly_reverse()
-   test_arb_poly_shift()
-   test_arb_poly_powering()
-   test_arb_poly_exact_division()
-   test_arb_poly_scalar_division()
-   test_arb_poly_evaluation()
-   test_arb_poly_composition()
-   test_arb_poly_derivative_integral()
-   test_arb_poly_evaluation_interpolation()
-   test_arb_poly_root_bound()
-
-   println("")
-end
-
-

@@ -1,6 +1,4 @@
-function test_qadic_constructors()
-   print("qadic.constructors...")
-
+@testset "qadic.constructors..." begin
    R = QadicField(7, 1, 30)
 
    @test elem_type(R) == qadic
@@ -34,13 +32,9 @@ function test_qadic_constructors()
    @test isa(t, qadic)
 
    @test parent(t) === R
-
-   println("PASS")
 end
 
-function test_qadic_printing()
-   print("qadic.printing...")
-
+@testset "qadic.printing..." begin
    R = QadicField(7, 1, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
@@ -48,13 +42,9 @@ function test_qadic_printing()
    b = string(a)
 
    @test b isa String
-
-   println("PASS")
 end
 
-function test_qadic_manipulation()
-   print("qadic.manipulation...")
-
+@testset "qadic.manipulation..." begin
    R = QadicField(7, 1, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
@@ -70,13 +60,9 @@ function test_qadic_manipulation()
    @test prime(R) == 7
 
    @test valuation(b) == 2
-
-   println("PASS")
 end
 
-function test_qadic_unary_ops()
-   print("qadic.unary_ops...")
-
+@testset "qadic.unary_ops..." begin
    R = QadicField(7, 1, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
@@ -85,13 +71,9 @@ function test_qadic_unary_ops()
    @test -a == 6 + 4*7^1 + 2*7^2 + O(R, 7^3)
 
    @test iszero(-b)
-
-   println("PASS")
 end
 
-function test_qadic_binary_ops()
-   print("qadic.binary_ops...")
-
+@testset "qadic.binary_ops..." begin
    R = QadicField(7, 1, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
@@ -108,13 +90,9 @@ function test_qadic_binary_ops()
    @test b*c == O(R, 7^5)
 
    @test a*d == 2 + 4*7^1 + 1*7^2 + O(R, 7^3)
-
-   println("PASS")
 end
 
-function test_qadic_adhoc_binary()
-   print("qadic.adhoc_binary...")
-
+@testset "qadic.adhoc_binary..." begin
    R = QadicField(7, 1, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
@@ -141,13 +119,9 @@ function test_qadic_adhoc_binary()
    @test (fmpz(12)//11)*b == 3*7^2 + 3*7^3 + O(R, 7^5)
 
    @test c*(fmpz(1)//7) == O(R, 7^2)
-
-   println("PASS")
 end
 
-function test_qadic_comparison()
-   print("qadic.comparison...")
-
+@testset "qadic.comparison..." begin
    R = QadicField(7, 1, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
@@ -162,13 +136,9 @@ function test_qadic_comparison()
    @test c == R(0)
 
    @test d == R(2)
-
-   println("PASS")
 end
 
-function test_qadic_adhoc_comparison()
-   print("qadic.adhoc_comparison...")
-
+@testset "qadic.adhoc_comparison..." begin
    R = QadicField(7, 1, 30)
 
    a = 1 + O(R, 7^3)
@@ -184,13 +154,9 @@ function test_qadic_adhoc_comparison()
    @test fmpz(2) == c
 
    @test a == fmpz(344)//1
-
-   println("PASS")
 end
 
-function test_qadic_powering()
-   print("qadic.powering...")
-
+@testset "qadic.powering..." begin
    R = QadicField(7, 1, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -202,13 +168,9 @@ function test_qadic_powering()
    @test b^3 == O(R, 7^5)
 
    @test c^7 == 2 + 4*7^1 + 2*7^2
-
-   println("PASS")
 end
 
-function test_qadic_inversion()
-   print("qadic.inversion...")
-
+@testset "qadic.inversion..." begin
    R = QadicField(7, 1, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -225,13 +187,9 @@ function test_qadic_inversion()
    @test inv(d) == fmpz(1)//7 + 5 + 3*7^1 + 6*7^2 + O(R, 7^3)
 
    @test inv(R(1)) == 1
-
-   println("PASS")
 end
 
-function test_qadic_exact_division()
-   print("qadic.exact_division...")
-
+@testset "qadic.exact_division..." begin
    R = QadicField(7, 1, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -246,13 +204,9 @@ function test_qadic_exact_division()
    @test divexact(d, R(7^3)) == fmpz(1)//7^2 + fmpz(2)//7 + O(R, 7^2)
 
    @test divexact(R(34), R(17)) == 2
-
-   println("PASS")
 end
 
-function test_qadic_adhoc_exact_division()
-   print("qadic.adhoc_exact_division...")
-
+@testset "qadic.adhoc_exact_division..." begin
    R = QadicField(7, 1, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -271,13 +225,9 @@ function test_qadic_adhoc_exact_division()
    @test divexact(R(3), 3) == 1
 
    @test divexact(fmpz(5)//7, R(5)) == fmpz(1)//7
-
-   println("PASS")
 end
 
-function test_qadic_divides()
-   print("qadic.divides...")
-
+@testset "qadic.divides..." begin
    R = QadicField(7, 1, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -287,13 +237,9 @@ function test_qadic_divides()
 
    @test flag
    @test q == divexact(a, b)
-
-   println("PASS")
 end
 
-function test_qadic_gcd()
-   print("qadic.adhoc_gcd...")
-
+@testset "qadic.adhoc_gcd..." begin
    R = QadicField(7, 1, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -302,13 +248,9 @@ function test_qadic_gcd()
    @test gcd(a, b) == 1
 
    @test gcd(zero(R), zero(R)) == 0
-
-   println("PASS")
 end
 
-function test_qadic_square_root()
-   print("qadic.square_root...")
-
+@testset "qadic.square_root..." begin
    R = QadicField(7, 1, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -322,13 +264,9 @@ function test_qadic_square_root()
    @test sqrt(c)^2 == c
 
    @test sqrt(R(121))^2 == R(121)
-
-   println("PASS")
 end
 
-function test_qadic_special_functions()
-   print("qadic.special_functions...")
-
+@testset "qadic.special_functions..." begin
    R = QadicField(7, 1, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -344,27 +282,4 @@ function test_qadic_special_functions()
    @test log(R(1)) == 0
 
    @test teichmuller(b) == 2 + 4*7^1 + 6*7^2 + O(R, 7^3)
-
-   println("PASS")
-end
-
-function test_qadic()
-   test_qadic_constructors()
-   test_qadic_printing()
-   test_qadic_manipulation()
-   test_qadic_unary_ops()
-   test_qadic_binary_ops()
-   test_qadic_adhoc_binary()
-   test_qadic_comparison()
-   test_qadic_adhoc_comparison()
-   test_qadic_powering()
-   test_qadic_inversion()
-   test_qadic_exact_division()
-   test_qadic_adhoc_exact_division()
-   test_qadic_divides()
-   test_qadic_gcd()
-   test_qadic_square_root()
-   test_qadic_special_functions()
-
-   println("")
 end

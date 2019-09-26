@@ -1,6 +1,4 @@
-function test_fmpz_rel_series_constructors()
-   print("fmpz_rel_series.constructors...")
-
+@testset "fmpz_rel_series.constructors..." begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    @test elem_type(R) == fmpz_rel_series
@@ -23,24 +21,16 @@ function test_fmpz_rel_series_constructors()
    @test isa(R(ZZ(2)), SeriesElem)
 
    @test isa(R(), SeriesElem)
-
-   println("PASS")
 end
 
-function test_fmpz_rel_series_printing()
-   print("fmpz_rel_series.printing...")
-
+@testset "fmpz_rel_series.printing..." begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
    a = x^3 + 2x + 1
 
    @test string(a) == "1+2*x+x^3+O(x^30)"
-
-   println("PASS")
 end
 
-function test_fmpz_rel_series_manipulation()
-   print("fmpz_rel_series.manipulation...")
-
+@testset "fmpz_rel_series.manipulation..." begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
@@ -57,28 +47,20 @@ function test_fmpz_rel_series_manipulation()
    @test valuation(a) == 1
 
    @test valuation(b) == 4
-
-   println("PASS")
 end
 
-function test_fmpz_rel_series_unary_ops()
-   print("fmpz_rel_series.unary_ops...")
-
+@testset "fmpz_rel_series.unary_ops..." begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
    b = 1 + 2x + x^2 + O(x^3)
 
    @test -a == -2x - x^3
-   
-   @test -b == -1 - 2x - x^2 + O(x^3)
 
-   println("PASS")
+   @test -b == -1 - 2x - x^2 + O(x^3)
 end
 
-function test_fmpz_rel_series_binary_ops()
-   print("fmpz_rel_series.binary_ops...")
-
+@testset "fmpz_rel_series.binary_ops..." begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
@@ -108,7 +90,7 @@ function test_fmpz_rel_series_binary_ops()
 
    @test f1 + f3 == 1+2*x+2*x^2+2*x^3+O(x^30)
    @test f3 + f1 == f1 + f3
-   
+
    @test f1 + f4 == 1+x+2*x^2+2*x^3+x^4+x^5+O(x^30)
    @test f4 + f1 == f1 + f4
 
@@ -177,22 +159,22 @@ function test_fmpz_rel_series_binary_ops()
 
    @test k1 + k2 == x^2+x^5+O(x^32)
    @test k2 + k1 == k1 + k2
-   
+
    @test k1 + k3 == x^2+O(x^32)
    @test k3 + k1 == k1 + k3
-  
+
    @test k1 + k4 == x^2+x^3-x^6-x^7+O(x^32)
    @test k4 + k1 == k1 + k4
-   
+
    @test k1 - k2 == x^2+2*x^3+2*x^4+x^5+O(x^32)
    @test k2 - k1 == -(k1 - k2)
-   
+
    @test k1 - k3 == x^2+2*x^3+2*x^4+2*x^5+O(x^32)
    @test k3 - k1 == -(k1 - k3)
-   
+
    @test k1 - k4 == x^2+x^3+2*x^4+2*x^5+x^6+x^7+O(x^32)
    @test k4 - k1 == -(k1 - k4)
-   
+
    m1 = 1 + x + x^2 + x^3 + O(x^4)
    m2 = x + x^2 + O(x^3)
    m3 = x + x^2 + x^3 + O(x^4)
@@ -201,7 +183,7 @@ function test_fmpz_rel_series_binary_ops()
    @test isequal(m1 + m1, 2+2*x+2*x^2+2*x^3+O(x^4))
 
    @test isequal(m1 + m2, 1+2*x+2*x^2+O(x^3))
- 
+
    @test isequal(m1 + m3, 1+2*x+2*x^2+2*x^3+O(x^4))
 
    @test isequal(m1 + m4, 1+x+2*x^2+2*x^3+O(x^4))
@@ -209,17 +191,13 @@ function test_fmpz_rel_series_binary_ops()
    @test isequal(m1 - m1, 0+O(x^4))
 
    @test isequal(m1 - m2, 1+O(x^3))
- 
+
    @test isequal(m1 - m3, 1+O(x^4))
 
    @test isequal(m1 - m4, 1+x+O(x^4))
-
-   println("PASS")
 end
 
-function test_fmpz_rel_series_adhoc_binary_ops()
-   print("fmpz_rel_series.adhoc_binary_ops...")
-
+@testset "fmpz_rel_series.adhoc_binary_ops..." begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
@@ -234,13 +212,9 @@ function test_fmpz_rel_series_adhoc_binary_ops()
    @test c*2 == 2 + 2*x + 6*x^2 + O(x^5)
 
    @test d*ZZ(3) == 3x^2 + 9x^3 - 3x^4
-
-   println("PASS")
 end
 
-function test_fmpz_rel_series_comparison()
-   print("fmpz_rel_series.comparison...")
-
+@testset "fmpz_rel_series.comparison..." begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
@@ -253,13 +227,9 @@ function test_fmpz_rel_series_comparison()
    @test b == d
 
    @test c != d
-
-   println("PASS")
 end
 
-function test_fmpz_rel_series_adhoc_comparison()
-   print("fmpz_rel_series.adhoc_comparison...")
-
+@testset "fmpz_rel_series.adhoc_comparison..." begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
@@ -276,13 +246,9 @@ function test_fmpz_rel_series_adhoc_comparison()
    @test 2 == b
 
    @test ZZ(1) == c
-
-   println("PASS")
 end
 
-function test_fmpz_rel_series_powering()
-   print("fmpz_rel_series.powering...")
-
+@testset "fmpz_rel_series.powering..." begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
@@ -299,13 +265,9 @@ function test_fmpz_rel_series_powering()
    @test d^12 == 4096*x^12+24576*x^14+O(x^15)
 
    @test_throws DomainError a^-1
-
-   println("PASS")
 end
 
-function test_fmpz_rel_series_shift()
-   print("fmpz_rel_series.shift...")
-
+@testset "fmpz_rel_series.shift..." begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
@@ -324,12 +286,9 @@ function test_fmpz_rel_series_shift()
    @test_throws DomainError shift_left(a, -1)
 
    @test_throws DomainError shift_right(a, -1)
-   println("PASS")
 end
 
-function test_fmpz_rel_series_truncation()
-   print("fmpz_rel_series.truncation...")
-
+@testset "fmpz_rel_series.truncation..." begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
@@ -346,13 +305,9 @@ function test_fmpz_rel_series_truncation()
    @test truncate(d, 5) == x^3+2*x+O(x^4)
 
    @test_throws DomainError truncate(a, -1)
-
-   println("PASS")
 end
 
-function test_fmpz_rel_series_exact_division()
-   print("fmpz_rel_series.exact_division...")
-
+@testset "fmpz_rel_series.exact_division..." begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = x + x^3
@@ -367,36 +322,30 @@ function test_fmpz_rel_series_exact_division()
    @test divexact(b, c) == O(x^4)
 
    @test divexact(d, c) == -2*x^5+2*x^4-x^2+x+O(x^6)
-
-   println("PASS")
 end
 
-function test_fmpz_rel_series_adhoc_exact_division()
-   print("fmpz_rel_series.adhoc_exact_division...")
+if false
+   @testset "fmpz_rel_series.adhoc_exact_division..." begin
+      R, x = PolynomialRing(ZZ, "x")
 
-   R, x = PolynomialRing(ZZ, "x")
-   
-   a = x + x^3
-   b = O(x^4)
-   c = 1 + x + 2x^2 + O(x^5)
-   d = x + x^3 + O(x^6)
+      a = x + x^3
+      b = O(x^4)
+      c = 1 + x + 2x^2 + O(x^5)
+      d = x + x^3 + O(x^6)
 
-   @test isequal(divexact(7a, 7), a)
+      @test isequal(divexact(7a, 7), a)
 
-   @test isequal(divexact(11b, fmpz(11)), b)
+      @test isequal(divexact(11b, fmpz(11)), b)
 
-   @test isequal(divexact(2c, fmpz(2)), c)
+      @test isequal(divexact(2c, fmpz(2)), c)
 
-   @test isequal(divexact(9d, 9), d)
+      @test isequal(divexact(9d, 9), d)
 
-   @test isequal(divexact(94872394861923874346987123694871329847a, 94872394861923874346987123694871329847), a)
-
-   println("PASS")
+      @test isequal(divexact(94872394861923874346987123694871329847a, 94872394861923874346987123694871329847), a)
+   end
 end
 
-function test_fmpz_rel_series_inversion()
-   print("fmpz_rel_series.inversion...")
-
+@testset "fmpz_rel_series.inversion..." begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 1 + x + 2x^2 + O(x^5)
@@ -405,38 +354,13 @@ function test_fmpz_rel_series_inversion()
    @test inv(a) == -x^4+3*x^3-x^2-x+1+O(x^5)
 
    @test inv(b) == -1
-
-   println("PASS")
 end
 
-function test_fmpz_rel_series_square_root()
-   print("fmpz_rel_series.square_root...")
-
+@testset "fmpz_rel_series.square_root..." begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = rand(R, 0:10, -10:10)
    b = a^2
 
    @test isequal(sqrt(b)^2, b)
-
-   println("PASS")
-end
-
-function test_fmpz_rel_series()
-   test_fmpz_rel_series_constructors()
-   test_fmpz_rel_series_printing()
-   test_fmpz_rel_series_manipulation()
-   test_fmpz_rel_series_unary_ops()
-   test_fmpz_rel_series_binary_ops()
-   test_fmpz_rel_series_adhoc_binary_ops()
-   test_fmpz_rel_series_comparison()
-   test_fmpz_rel_series_adhoc_comparison()
-   test_fmpz_rel_series_powering()
-   test_fmpz_rel_series_shift()
-   test_fmpz_rel_series_truncation()
-   test_fmpz_rel_series_exact_division()
-   test_fmpz_rel_series_inversion()
-   test_fmpz_rel_series_square_root()
-
-   println("")
 end

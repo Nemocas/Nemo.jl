@@ -14,9 +14,7 @@ function randmat(R::GFPMatSpace, d::Int)
    return r
 end
 
-function test_gfp_mat_constructors()
-  print("gfp_mat.constructors...")
-
+@testset "gfp_mat.constructors..." begin
   Z2 = GF(2)
   Z3 = GF(3)
 
@@ -182,13 +180,9 @@ function test_gfp_mat_constructors()
    @test !(a in [b])
    @test a in keys(Dict(a => 1))
    @test !(a in keys(Dict(b => 1)))
-
-  println("PASS")
 end
 
-function test_gfp_mat_similar()
-   print("gfp_mat.similar...")
-
+@testset "gfp_mat.similar..." begin
    Z13 = GF(13)
    S = GFPMatSpace(Z13, 2, 2)
    s = S(fmpz(3))
@@ -206,13 +200,9 @@ function test_gfp_mat_similar()
    t = similar(s, Z13, 2, 3)
    @test t isa gfp_mat
    @test size(t) == (2, 3)
-
-   println("PASS")
 end
 
-function test_gfp_mat_printing()
-  print("gfp_mat.printing...")
-
+@testset "gfp_mat.printing..." begin
   Z2 = GF(2)
   R = GFPMatSpace(Z2, 2, 2)
 
@@ -220,12 +210,9 @@ function test_gfp_mat_printing()
 
   # test that default Julia printing is not used
   @test !occursin(string(typeof(a)), string(a))
-
-  println("PASS")
 end
 
-function test_gfp_mat_manipulation()
-  print("gfp_mat.manipulation...")
+@testset "gfp_mat.manipulation..." begin
   Z11 = GF(11)
   R = GFPMatSpace(Z11, 2, 2)
   Z23 = GF(23)
@@ -295,13 +282,9 @@ function test_gfp_mat_manipulation()
           MatrixSpace(Z11,2,1)(reshape([ 1 ; 2],2,1))
 
   @test_throws ErrorConstrDimMismatch transpose!(R([ 1 2 ;]))
-
-  println("PASS")
 end
 
-function test_gfp_mat_unary_ops()
-  print("gfp_mat.unary_ops...")
-
+@testset "gfp_mat.unary_ops..." begin
   Z17 = GF(17)
 
   R = MatrixSpace(Z17, 3, 4)
@@ -318,13 +301,9 @@ function test_gfp_mat_unary_ops()
   d = -b
 
   @test d == R([ 15 16 0 16; 0 0 0 0; 0 16 15 0])
-
-  println("PASS")
 end
 
-function test_gfp_mat_binary_ops()
-  print("gfp_mat.binary_ops...")
-
+@testset "gfp_mat.binary_ops..." begin
   Z17 = GF(17)
 
   R = MatrixSpace(Z17, 3, 4)
@@ -350,13 +329,9 @@ function test_gfp_mat_binary_ops()
   d = transpose(a)*a
 
   @test d == MatrixSpace(Z17, 4, 4)([11 11 8 7; 11 0 14 6; 8 14 14 5; 7 6 5 5])
-
-  println("PASS")
 end
 
-function test_gfp_mat_row_col_swapping()
-   print("gfp_mat.row_col_swapping...")
-
+@testset "gfp_mat.row_col_swapping..." begin
    R = ResidueField(FlintZZ, 17)
 
    a = matrix(R, [1 2; 3 4; 5 6])
@@ -393,13 +368,9 @@ function test_gfp_mat_row_col_swapping()
    @test reverse_cols(a) == matrix(R, [3 2 1; 5 4 3; 7 6 5])
    reverse_cols!(a)
    @test a == matrix(R, [3 2 1; 5 4 3; 7 6 5])
-
-   println("PASS")
 end
 
-function test_gfp_mat_adhoc_binary()
-  print("gfp_mat.adhoc_binary...")
-
+@testset "gfp_mat.adhoc_binary..." begin
   Z17 = GF(17)
 
   R = MatrixSpace(Z17, 3, 4)
@@ -436,13 +407,9 @@ function test_gfp_mat_adhoc_binary()
   @test dd == R([ 2 4 6 2; 6 4 2 4; 2 6 4 0])
 
   @test_throws ErrorException Z2(1)*a
-
-  println("PASS")
 end
 
-function test_gfp_mat_comparison()
-  print("gfp_mat.comparison...")
-
+@testset "gfp_mat.comparison..." begin
   Z17 = GF(17)
 
   R = MatrixSpace(Z17, 3, 4)
@@ -454,13 +421,9 @@ function test_gfp_mat_comparison()
   @test deepcopy(a) == a
 
   @test a != R([0 1 3 1; 2 1 4 2; 1 1 1 1])
-
-  println("PASS")
 end
 
-function test_gfp_mat_adhoc_comparison()
-  print("gfp_mat.adhoc_comparison...")
-
+@testset "gfp_mat.adhoc_comparison..." begin
   Z17 = GF(17)
 
   R = MatrixSpace(Z17, 3, 4)
@@ -472,13 +435,9 @@ function test_gfp_mat_adhoc_comparison()
   @test 5 == R(5)
   @test fmpz(5) == R(5)
   @test Z17(5) == R(5)
-
-  println("PASS")
 end
 
-function test_gfp_mat_powering()
-  print("gfp_mat.powering...")
-
+@testset "gfp_mat.powering..." begin
   Z17 = GF(17)
 
   R = MatrixSpace(Z17, 3, 4)
@@ -496,13 +455,9 @@ function test_gfp_mat_powering()
   @test g == MatrixSpace(Z17, 3, 3)([1 2 2; 2 13 12; 2 12 15])
 
   @test_throws ErrorException f^(ZZ(2)^1000)
-
-  println("PASS")
 end
 
-function test_gfp_mat_row_echelon_form()
-  print("gfp_mat.row_echelon_form...")
-
+@testset "gfp_mat.row_echelon_form..." begin
   Z17 = GF(17)
   R = MatrixSpace(Z17, 3, 4)
   RR = MatrixSpace(Z17, 4, 3)
@@ -531,13 +486,9 @@ function test_gfp_mat_row_echelon_form()
 
   @test d == parent(b)([ 1 0 0 ; 0 0 1; 0 0 0; 0 0 0])
   @test r == 2
-
-  println("PASS")
 end
 
-function test_gfp_mat_howell_form()
-  print("gfp_mat.howell_form...")
-
+@testset "gfp_mat.howell_form..." begin
   Z17 = GF(17)
   R = MatrixSpace(Z17, 3, 3)
 
@@ -555,13 +506,9 @@ function test_gfp_mat_howell_form()
 
   a = matrix(Z17, [0 1 0 0; 0 0 1 0; 0 0 0 1; 0 0 0 0])
   @test strong_echelon_form(a) == matrix(Z17, [0 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 1])
-
-  println("PASS")
 end
 
-function test_gfp_mat_trace_det()
-  print("gfp_mat.trace_det...")
-
+@testset "gfp_mat.trace_det..." begin
   Z17 = GF(17)
   R = MatrixSpace(Z17, 3, 4)
   RR = MatrixSpace(Z17, 4, 3)
@@ -593,13 +540,9 @@ function test_gfp_mat_trace_det()
   @test c == Z17(13)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
-
-  println("PASS")
 end
 
-function test_gfp_mat_rank()
-  print("gfp_mat.rank...")
-
+@testset "gfp_mat.rank..." begin
   Z17 = GF(17)
   R = MatrixSpace(Z17, 3, 4)
   RR = MatrixSpace(Z17, 4, 3)
@@ -623,13 +566,9 @@ function test_gfp_mat_rank()
   c = rank(b)
 
   @test c == 2
-
-  println("PASS")
 end
 
-function test_gfp_mat_inv()
-  print("gfp_mat.inv...")
-
+@testset "gfp_mat.inv..." begin
   Z17 = GF(17)
   R = MatrixSpace(Z17, 3, 4)
   RR = MatrixSpace(Z17, 4, 3)
@@ -649,13 +588,9 @@ function test_gfp_mat_inv()
   @test_throws ErrorException inv(a)
 
   @test_throws ErrorException inv(transpose(a)*a)
-
-  println("PASS")
 end
 
-function test_gfp_mat_solve()
-  print("gfp_mat.solve...")
-
+@testset "gfp_mat.solve..." begin
   Z17 = GF(17)
   R = MatrixSpace(Z17, 3, 3)
   S = MatrixSpace(Z17, 3, 4)
@@ -673,13 +608,9 @@ function test_gfp_mat_solve()
   a = zero(R)
 
   @test_throws ErrorException  solve(a,c)
-
-  println("PASS")
 end
 
-function test_gfp_mat_lu()
-  print("gfp_mat.lu...")
-
+@testset "gfp_mat.lu..." begin
 
   Z17 = GF(17)
   R = MatrixSpace(Z17, 3, 3)
@@ -705,13 +636,9 @@ function test_gfp_mat_lu()
 
   @test r == 3
   @test l*u == P*c
-
-  println("PASS")
 end
 
-function test_gfp_mat_swap_rows()
-  print("gfp_mat.swap_rows...")
-
+@testset "gfp_mat.swap_rows..." begin
   Z17 = GF(17)
 
   A = matrix(Z17, 5, 1, [1, 2, 3, 4, 5])
@@ -724,12 +651,8 @@ function test_gfp_mat_swap_rows()
 
   @test_throws BoundsError swap_rows(A, 0, 5)
   @test_throws BoundsError swap_rows(A, 4, 6)
-
-  println("PASS")
 end
-function test_gfp_mat_view()
-  print("gfp_mat.view...")
-
+@testset "gfp_mat.view..." begin
   Z17 = GF(17)
   R = MatrixSpace(Z17, 3, 3)
   S = MatrixSpace(Z17, 3, 4)
@@ -784,13 +707,9 @@ function test_gfp_mat_view()
   A = 0
   GC.gc()
   @test B[1, 1] == 20
-
-  println("PASS")
 end
 
-function test_gfp_mat_sub()
-   print("gfp_mat.sub...")
-
+@testset "gfp_mat.sub..." begin
    Z17 = GF(17)
    S = MatrixSpace(Z17, 3, 3)
 
@@ -812,13 +731,9 @@ function test_gfp_mat_sub()
    C[1, 1] = 20
    @test B == MatrixSpace(Z17, 2, 2)([10 2; 4 5])
    @test A == S([1 2 3; 4 5 6; 7 8 9])
-
-   println("PASS")
 end
 
-function test_gfp_mat_concatenation()
-  print("gfp_mat.concatenation...")
-
+@testset "gfp_mat.concatenation..." begin
   Z17 = GF(17)
   R = MatrixSpace(Z17, 3, 3)
   S = MatrixSpace(Z17, 3, 4)
@@ -852,13 +767,9 @@ function test_gfp_mat_concatenation()
                                      1, 0, 0])
 
   @test_throws ErrorException vcat(a,b)
-
-  println("PASS")
 end
 
-function test_gfp_mat_conversion()
-  print("gfp_mat.conversion...")
-
+@testset "gfp_mat.conversion..." begin
   Z17 = GF(17)
   R = MatrixSpace(Z17, 3, 3)
   S = MatrixSpace(ZZ, 3, 3)
@@ -879,13 +790,9 @@ function test_gfp_mat_conversion()
   lift!(c,a)
 
   @test c == S([ 1 2 3; 3 2 1; 0 0 2])
-
-  println("PASS")
 end
 
-function test_gfp_mat_charpoly()
-   print("gfp_mat.charpoly...")
-
+@testset "gfp_mat.charpoly..." begin
    R = GF(17)
 
    for dim = 0:5
@@ -901,34 +808,4 @@ function test_gfp_mat_charpoly()
          @test p1 == p2
       end
    end
-
-   println("PASS")
-end
-
-function test_gfp_mat()
-  test_gfp_mat_constructors()
-  test_gfp_mat_similar()
-  test_gfp_mat_printing()
-  test_gfp_mat_manipulation()
-  test_gfp_mat_unary_ops()
-  test_gfp_mat_binary_ops()
-  test_gfp_mat_row_col_swapping()
-  test_gfp_mat_adhoc_binary()
-  test_gfp_mat_comparison()
-  test_gfp_mat_adhoc_comparison()
-  test_gfp_mat_powering()
-  test_gfp_mat_row_echelon_form()
-  test_gfp_mat_howell_form()
-  test_gfp_mat_trace_det()
-  test_gfp_mat_rank()
-  test_gfp_mat_inv()
-  test_gfp_mat_lu()
-  test_gfp_mat_view()
-  test_gfp_mat_swap_rows()
-  test_gfp_mat_sub()
-  test_gfp_mat_concatenation()
-  test_gfp_mat_conversion()
-  test_gfp_mat_charpoly()
-
-  println("")
 end

@@ -1,6 +1,4 @@
-function test_fmpz_mod_rel_series_constructors()
-   print("fmpz_mod_rel_series.constructors...")
-
+@testset "fmpz_mod_rel_series.constructors..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -36,28 +34,20 @@ function test_fmpz_mod_rel_series_constructors()
    l = S(R(4))
 
    @test isa(l, SeriesElem)
-
-   println("PASS")
 end
 
-function test_fmpz_mod_rel_series_printing()
-   print("fmpz_mod_rel_series.printing...")
-
+@testset "fmpz_mod_rel_series.printing..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PowerSeriesRing(R, 30, "x")
    b = x^2 + x + O(x^4)
 
    @test string(b) == "x+x^2+O(x^4)"
-
-   println("PASS")
 end
 
-function test_fmpz_mod_rel_series_manipulation()
-   print("fmpz_mod_rel_series.manipulation...")
-
+@testset "fmpz_mod_rel_series.manipulation..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PowerSeriesRing(R, 30, "x")
-   
+
    @test max_precision(S) == 30
 
    a = 2x + x^3
@@ -86,13 +76,9 @@ function test_fmpz_mod_rel_series_manipulation()
    @test coeff(a, 1) == 2
 
    @test coeff(b, 7) == 0
-
-   println("PASS")
 end
 
-function test_fmpz_mod_rel_series_unary_ops()
-   print("fmpz_mod_rel_series.unary_ops...")
-
+@testset "fmpz_mod_rel_series.unary_ops..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -100,15 +86,11 @@ function test_fmpz_mod_rel_series_unary_ops()
    b = 1 + 2x + x^2 + O(x^3)
 
    @test isequal(-a, -2x - x^3 + O(x^31))
-   
-   @test isequal(-b, -1 - 2x - x^2 + O(x^3))
 
-   println("PASS")
+   @test isequal(-b, -1 - 2x - x^2 + O(x^3))
 end
 
-function test_fmpz_mod_rel_series_binary_ops()
-   print("fmpz_mod_rel_series.binary_ops...")
-
+@testset "fmpz_mod_rel_series.binary_ops..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -139,7 +121,7 @@ function test_fmpz_mod_rel_series_binary_ops()
 
    @test f1 + f3 == 1+2*x+2*x^2+2*x^3+O(x^30)
    @test f3 + f1 == f1 + f3
-   
+
    @test f1 + f4 == 1+x+2*x^2+2*x^3+x^4+x^5+O(x^30)
    @test f4 + f1 == f1 + f4
 
@@ -208,22 +190,22 @@ function test_fmpz_mod_rel_series_binary_ops()
 
    @test k1 + k2 == x^2+x^5+O(x^32)
    @test k2 + k1 == k1 + k2
-   
+
    @test k1 + k3 == x^2+O(x^32)
    @test k3 + k1 == k1 + k3
-  
+
    @test k1 + k4 == x^2+x^3-x^6-x^7+O(x^32)
    @test k4 + k1 == k1 + k4
-   
+
    @test k1 - k2 == x^2+2*x^3+2*x^4+x^5+O(x^32)
    @test k2 - k1 == -(k1 - k2)
-   
+
    @test k1 - k3 == x^2+2*x^3+2*x^4+2*x^5+O(x^32)
    @test k3 - k1 == -(k1 - k3)
-   
+
    @test k1 - k4 == x^2+x^3+2*x^4+2*x^5+x^6+x^7+O(x^32)
    @test k4 - k1 == -(k1 - k4)
-   
+
    m1 = 1 + x + x^2 + x^3 + O(x^4)
    m2 = x + x^2 + O(x^3)
    m3 = x + x^2 + x^3 + O(x^4)
@@ -232,7 +214,7 @@ function test_fmpz_mod_rel_series_binary_ops()
    @test isequal(m1 + m1, 2+2*x+2*x^2+2*x^3+O(x^4))
 
    @test isequal(m1 + m2, 1+2*x+2*x^2+O(x^3))
- 
+
    @test isequal(m1 + m3, 1+2*x+2*x^2+2*x^3+O(x^4))
 
    @test isequal(m1 + m4, 1+x+2*x^2+2*x^3+O(x^4))
@@ -240,17 +222,13 @@ function test_fmpz_mod_rel_series_binary_ops()
    @test isequal(m1 - m1, 0+O(x^4))
 
    @test isequal(m1 - m2, 1+O(x^3))
- 
+
    @test isequal(m1 - m3, 1+O(x^4))
 
    @test isequal(m1 - m4, 1+x+O(x^4))
-
-   println("PASS")
 end
 
-function test_fmpz_mod_rel_series_adhoc_binary_ops()
-   print("fmpz_mod_rel_series.adhoc_binary_ops...")
-
+@testset "fmpz_mod_rel_series.adhoc_binary_ops..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -266,13 +244,9 @@ function test_fmpz_mod_rel_series_adhoc_binary_ops()
    @test isequal(c*2, 2 + 2*x + 6*x^2 + O(x^5))
 
    @test isequal(d*fmpz(3), 3x^2 + 9x^3 - 3x^4 + O(x^32))
-
-   println("PASS")
 end
 
-function test_fmpz_mod_rel_series_comparison()
-   print("fmpz_mod_rel_series.comparison...")
-
+@testset "fmpz_mod_rel_series.comparison..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -290,13 +264,9 @@ function test_fmpz_mod_rel_series_comparison()
    @test isequal(a, 2x + x^3 + O(x^31))
 
    @test !isequal(b, d)
-
-   println("PASS")
 end
 
-function test_fmpz_mod_rel_series_adhoc_comparison()
-   print("fmpz_mod_rel_series.adhoc_comparison...")
-
+@testset "fmpz_mod_rel_series.adhoc_comparison..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -314,13 +284,9 @@ function test_fmpz_mod_rel_series_adhoc_comparison()
    @test 2 == b
 
    @test fmpz(1) == c
-
-   println("PASS")
 end
 
-function test_fmpz_mod_rel_series_powering()
-   print("fmpz_mod_rel_series.powering...")
-
+@testset "fmpz_mod_rel_series.powering..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -338,13 +304,9 @@ function test_fmpz_mod_rel_series_powering()
    @test isequal(d^12, 4096*x^12+24576*x^14+O(x^15))
 
    @test_throws DomainError a^-1
-
-   println("PASS")
 end
 
-function test_fmpz_mod_rel_series_shift()
-   print("fmpz_mod_rel_series.shift...")
-
+@testset "fmpz_mod_rel_series.shift..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -364,13 +326,9 @@ function test_fmpz_mod_rel_series_shift()
    @test_throws DomainError shift_left(a, -1)
 
    @test_throws DomainError shift_right(a, -1)
-
-   println("PASS")
 end
 
-function test_fmpz_mod_rel_series_truncation()
-   print("fmpz_mod_rel_series.truncation...")
-
+@testset "fmpz_mod_rel_series.truncation..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -388,13 +346,9 @@ function test_fmpz_mod_rel_series_truncation()
    @test isequal(truncate(d, 5), x^3+2*x+O(x^4))
 
    @test_throws DomainError truncate(a, -1)
-
-   println("PASS")
 end
 
-function test_fmpz_mod_rel_series_inversion()
-   print("fmpz_mod_rel_series.inversion...")
-
+@testset "fmpz_mod_rel_series.inversion..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -404,13 +358,9 @@ function test_fmpz_mod_rel_series_inversion()
    @test isequal(inv(a), -x^4+3*x^3-x^2-x+1+O(x^5))
 
    @test isequal(inv(b), -1+O(x^30))
-
-   println("PASS")
 end
 
-function test_fmpz_mod_rel_series_exact_division()
-   print("fmpz_mod_rel_series.exact_division...")
-
+@testset "fmpz_mod_rel_series.exact_division..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -426,13 +376,9 @@ function test_fmpz_mod_rel_series_exact_division()
    @test isequal(divexact(b, c), O(x^4))
 
    @test isequal(divexact(d, c), -2*x^5+2*x^4-x^2+x+O(x^6))
-
-   println("PASS")
 end
 
-function test_fmpz_mod_rel_series_adhoc_exact_division()
-   print("fmpz_mod_rel_series.adhoc_exact_division...")
-
+@testset "fmpz_mod_rel_series.adhoc_exact_division..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -452,39 +398,13 @@ function test_fmpz_mod_rel_series_adhoc_exact_division()
    @test isequal(divexact(94872394861923874346987123694871329847a, 94872394861923874346987123694871329847), a)
 
    @test isequal(divexact(R(5)*a, R(5)), a)
-
-   println("PASS")
 end
 
-function test_fmpz_mod_rel_series_special_functions()
-   print("fmpz_mod_rel_series.special_functions...")
-
+@testset "fmpz_mod_rel_series.special_functions..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PowerSeriesRing(R, 30, "x")
 
    @test isequal(exp(x + O(x^5)), 56584361630658436185*x^4+102880657510288065791*x^3+61728394506172839475*x^2+x+1+O(x^5))
 
    @test isequal(divexact(x, exp(x + O(x^5)) - 1), 113168723261316872370*x^2+61728394506172839474*x+1+O(x^4))
-
-   println("PASS")
-end
-
-function test_fmpz_mod_rel_series()
-   test_fmpz_mod_rel_series_constructors()
-   test_fmpz_mod_rel_series_printing()
-   test_fmpz_mod_rel_series_manipulation()
-   test_fmpz_mod_rel_series_unary_ops()
-   test_fmpz_mod_rel_series_binary_ops()
-   test_fmpz_mod_rel_series_adhoc_binary_ops()
-   test_fmpz_mod_rel_series_comparison()
-   test_fmpz_mod_rel_series_adhoc_comparison()
-   test_fmpz_mod_rel_series_powering()
-   test_fmpz_mod_rel_series_shift()
-   test_fmpz_mod_rel_series_truncation()
-   test_fmpz_mod_rel_series_exact_division()
-   test_fmpz_mod_rel_series_adhoc_exact_division()
-   test_fmpz_mod_rel_series_inversion()
-   test_fmpz_mod_rel_series_special_functions()
-
-   println("")
 end

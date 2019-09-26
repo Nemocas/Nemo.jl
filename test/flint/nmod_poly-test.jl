@@ -1,6 +1,4 @@
-function test_nmod_poly_constructors()
-  print("nmod_poly.constructors...")
-
+@testset "nmod_poly.constructors..." begin
   R = ResidueRing(ZZ, 17)
   Rx, x = PolynomialRing(R, "x")
 
@@ -85,26 +83,18 @@ function test_nmod_poly_constructors()
   m = Rx([1, 2, 3])
 
   @test isa(m, PolyElem)
-
-  println("PASS")
 end
 
-function test_nmod_poly_printing()
-  print("nmod_poly.printing...")
-
+@testset "nmod_poly.printing..." begin
   R = ResidueRing(ZZ, 17)
   Rx, x = PolynomialRing(R, "x")
 
   a = x^3 + x + 1
 
   @test string(a) == "x^3+x+1"
-
-  println("PASS")
 end
 
-function test_nmod_poly_manipulation()
-  print("nmod_poly.manipulation...")
-
+@testset "nmod_poly.manipulation..." begin
   R = ResidueRing(ZZ, 17)
   Rx, x = PolynomialRing(R, "x")
 
@@ -133,26 +123,18 @@ function test_nmod_poly_manipulation()
   @test modulus(x) == 17
 
   @test modulus(R) == 17
-
-  println("PASS")
 end
 
-function test_nmod_poly_unary_ops()
-  print("nmod_poly.unary_ops...")
-
+@testset "nmod_poly.unary_ops..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
   f = x^2 + R(13)*x + R(5)
 
   @test -f ==  R(22)*x^2 + R(10)*x + R(18)
-
-  println("PASS")
 end
 
-function test_nmod_poly_binary_ops()
-  print("nmod_poly.binary_ops...")
-
+@testset "nmod_poly.binary_ops..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -167,14 +149,9 @@ function test_nmod_poly_binary_ops()
   @test f - g == R(22)*x^3 + R(13)*x^2 + R(3)*x + R(10)
 
   @test h*(f+g) == x^4 + R(22)*x^3 + R(5)*x^2
-
-
-  println("PASS")
 end
 
-function test_nmod_poly_adhoc_binary()
-  print("nmod_poly.adhoc_binary...")
-
+@testset "nmod_poly.adhoc_binary..." begin
   R = ResidueRing(ZZ, 113)
   Rx, x = PolynomialRing(R, "x")
 
@@ -208,13 +185,9 @@ function test_nmod_poly_adhoc_binary()
   @test R(1) - f == -(f - R(1))
 
   @test_throws ErrorException f - S(1)
-
-  println("PASS")
 end
 
-function test_nmod_poly_powering()
-  print("nmod_poly.powering...")
-
+@testset "nmod_poly.powering..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -225,26 +198,18 @@ function test_nmod_poly_powering()
   @test f^23 == x^46 + 13*x^23 + 5
 
   @test_throws DomainError f^(-1)
-
-  println("PASS")
 end
 
-function test_nmod_poly_comparison()
-  print("nmod_poly.comparison...")
-
+@testset "nmod_poly.comparison..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
   Ry, y = PolynomialRing(R, "y")
 
   @test x^2 + x == x^2 + x
   @test_throws ErrorException x^2 + x != y^2 + y
-
-  println("PASS")
 end
 
-function test_nmod_poly_adhoc_comparison()
-   print("nmod_poly.adhoc_comparison...")
-
+@testset "nmod_poly.adhoc_comparison..." begin
    R = ResidueRing(ZZ, 7)
    S, x = PolynomialRing(R, "x")
 
@@ -261,13 +226,9 @@ function test_nmod_poly_adhoc_comparison()
    @test S(5) == R(5)
 
    @test R(5) != x + 1
-
-   println("PASS")
 end
 
-function test_nmod_poly_truncation()
-  print("nmod_poly.truncation...")
-
+@testset "nmod_poly.truncation..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -280,13 +241,9 @@ function test_nmod_poly_truncation()
   @test truncate(f,2) == R(0)
   @test truncate(f,5) == x^4 + 2*x^2
   @test truncate(f,10) == f
-
-  println("PASS")
 end
 
-function test_nmod_poly_mullow()
-  print("nmod_poly.mullow...")
-
+@testset "nmod_poly.mullow..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -295,13 +252,9 @@ function test_nmod_poly_mullow()
 
   @test mullow(f,g,2) == truncate(f*g,2)
   @test mullow(f,g,7) == truncate(f*g,7)
-
-  println("PASS")
 end
 
-function test_nmod_poly_reverse()
-  print("nmod_poly.reverse...")
-
+@testset "nmod_poly.reverse..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -312,13 +265,9 @@ function test_nmod_poly_reverse()
   @test parent(g) == parent(f)
   @test g == x^5 + 2*x^3 + x + 1
   @test isone(reverse(x))
-
-  println("PASS")
 end
 
-function test_nmod_poly_shift()
-  print("nmod_poly.shift...")
-
+@testset "nmod_poly.shift..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -338,13 +287,9 @@ function test_nmod_poly_shift()
 
   @test_throws DomainError shift_left(f,-1)
   @test_throws DomainError shift_right(f,-1)
-
-  println("PASS")
 end
 
-function test_nmod_poly_division()
-  print("nmod_poly.division...")
-
+@testset "nmod_poly.division..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -382,13 +327,9 @@ function test_nmod_poly_division()
   @test parent(r) == parent(f)
 
   @test r == Rx(14)
-
-  println("PASS")
 end
 
-function test_nmod_poly_adhoc_exact_division()
-   print("nmod_poly.adhoc_exact_division...")
-
+@testset "nmod_poly.adhoc_exact_division..." begin
    R = ResidueRing(ZZ, 23)
    S, x = PolynomialRing(R, "x")
 
@@ -399,13 +340,9 @@ function test_nmod_poly_adhoc_exact_division()
    @test divexact(3*f, 3) == f
 
    @test divexact(R(7)*f, R(7)) == f
-
-   println("PASS")
 end
 
-function test_nmod_poly_gcd()
-  print("nmod_poly.gcd...")
-
+@testset "nmod_poly.gcd..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -420,13 +357,9 @@ function test_nmod_poly_gcd()
   k, s, t = gcdx(f,g)
 
   @test k == s*f + t*g
-
-  println("PASS")
 end
 
-function test_nmod_poly_modular_arithmetic()
-  print("nmod_poly.modular_arithmetic...")
-
+@testset "nmod_poly.modular_arithmetic..." begin
   R = ResidueRing(ZZ, 487326487)
   S, x = PolynomialRing(R, "x")
 
@@ -443,13 +376,9 @@ function test_nmod_poly_modular_arithmetic()
   @test powmod(f, 10, h) == 485924368*x^2+380106591*x+302530457
 
   @test powmod(f, -10, g) == 484381224*x+14566177
-
-  println("PASS")
 end
 
-function test_nmod_poly_resultant()
-  print("nmod_poly.resultant...")
-
+@testset "nmod_poly.resultant..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -462,13 +391,9 @@ function test_nmod_poly_resultant()
   @test parent(g) == R
 
   @test g == 4
-
-  println("PASS")
 end
 
-function test_nmod_poly_evaluate()
-  print("nmod_poly.evaluate...")
-
+@testset "nmod_poly.evaluate..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -491,15 +416,10 @@ if VERSION >= v"0.5.0-dev+3171"
   @test f(20) == R(14)
 
   @test f(fmpz(20)) == R(14)
-
+end
 end
 
-  println("PASS")
-end
-
-function test_nmod_poly_derivative()
-  print("nmod_poly.derivative...")
-
+@testset "nmod_poly.derivative..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -510,26 +430,18 @@ function test_nmod_poly_derivative()
   @test parent(ff) == parent(f)
 
   @test ff == 5*x^4 + 4*x^3 + 4*x + 1
-
-  println("PASS")
 end
 
-function test_nmod_poly_integral()
-  print("nmod_poly.integral...")
-
+@testset "nmod_poly.integral..." begin
   R = ResidueRing(ZZ, 7)
   S, x = PolynomialRing(R, "x")
 
   f = x^2 + 2x + 1
 
   @test integral(f) == 5x^3 + x^2 + x
-
-  println("PASS")
 end
 
-function test_nmod_poly_compose()
-  print("nmod_poly.compose...")
-
+@testset "nmod_poly.compose..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -541,13 +453,9 @@ function test_nmod_poly_compose()
   @test parent(ff) == parent(f)
 
   @test ff == x^5 + 6*x^4 + 14*x^3 + 18*x^2 + 14*x + 5
-
-  println("PASS")
 end
 
-function test_nmod_poly_interpolate()
-  print("nmod_poly.interpolate...")
-
+@testset "nmod_poly.interpolate..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -559,13 +467,9 @@ function test_nmod_poly_interpolate()
 
   @test parent(f) == Rx
   @test f == x^2
-
-  println("PASS")
 end
 
-function test_nmod_poly_inflate()
-  print("nmod_poly.inflate...")
-
+@testset "nmod_poly.inflate..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -577,13 +481,9 @@ function test_nmod_poly_inflate()
   @test g == x^12 + x^8 + 2*x^4
 
   @test_throws DomainError inflate(f,-1)
-
-  println("PASS")
 end
 
-function test_nmod_poly_deflate()
-  print("nmod_poly.deflate...")
-
+@testset "nmod_poly.deflate..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -595,13 +495,9 @@ function test_nmod_poly_deflate()
   @test g == x^3 + x^2 + 2*x
 
   @test_throws DomainError deflate(f,-1)
-
-  println("PASS")
 end
 
-function test_nmod_poly_lifting()
-  print("nmod_poly.lifting...")
-
+@testset "nmod_poly.lifting..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
   Zy,y = PolynomialRing(ZZ, "y")
@@ -611,13 +507,9 @@ function test_nmod_poly_lifting()
   Zf = lift(Zy, f)
 
   @test Rx(Zf) == f
-
-  println("PASS")
 end
 
-function test_nmod_poly_isirreducible()
-  print("nmod_poly.isirreducible...")
-
+@testset "nmod_poly.isirreducible..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -628,13 +520,9 @@ function test_nmod_poly_isirreducible()
   @test isirreducible(x)
 
   @test isirreducible(x^16+2*x^9+x^8+x^2+x+1)
-
-  println("PASS")
 end
 
-function test_nmod_poly_issquarefree()
-  print("nmod_poly.issquarefree...")
-
+@testset "nmod_poly.issquarefree..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -643,13 +531,9 @@ function test_nmod_poly_issquarefree()
   @test !issquarefree(f)
 
   @test issquarefree((x+1)*(x+2)*(x+3))
-
-  println("PASS")
 end
 
-function test_nmod_poly_factor()
-  print("nmod_poly.factor...")
-
+@testset "nmod_poly.factor..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -675,22 +559,16 @@ function test_nmod_poly_factor()
   fac = factor_distinct_deg(x* (x^2 + 1)*(x^2 + 2)*(x+1))
 
   @test fac == Dict(2=>x^4+3*x^2+2,1=>x^2 + x)
-
-  println("PASS")
 end
 
-function test_nmod_poly_canonicalization()
-  print("nmod_poly.canonicalization...")
+@testset "nmod_poly.canonicalization..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
   @test canonical_unit(5*x) == R(5)
-
-  println("PASS")
 end
 
-function test_nmod_poly_remove_valuation()
-  print("nmod_poly.remove_valuation...")
+@testset "nmod_poly.remove_valuation..." begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -711,42 +589,4 @@ function test_nmod_poly_remove_valuation()
    v, q = divides(f*g + 1, f)
 
    @test !v
-
-  println("PASS")
-end
-
-function test_nmod_poly()
-  test_nmod_poly_constructors()
-  test_nmod_poly_printing()
-  test_nmod_poly_manipulation()
-  test_nmod_poly_unary_ops()
-  test_nmod_poly_binary_ops()
-  test_nmod_poly_adhoc_binary()
-  test_nmod_poly_powering()
-  test_nmod_poly_comparison()
-  test_nmod_poly_adhoc_comparison()
-  test_nmod_poly_truncation()
-  test_nmod_poly_mullow()
-  test_nmod_poly_reverse()
-  test_nmod_poly_shift()
-  test_nmod_poly_division()
-  test_nmod_poly_adhoc_exact_division()
-  test_nmod_poly_gcd()
-  test_nmod_poly_modular_arithmetic()
-  test_nmod_poly_resultant()
-  test_nmod_poly_evaluate()
-  test_nmod_poly_derivative()
-  test_nmod_poly_integral()
-  test_nmod_poly_compose()
-  test_nmod_poly_interpolate()
-  test_nmod_poly_inflate()
-  test_nmod_poly_deflate()
-  test_nmod_poly_lifting()
-  test_nmod_poly_isirreducible()
-  test_nmod_poly_issquarefree()
-  test_nmod_poly_factor()
-  test_nmod_poly_canonicalization()
-  test_nmod_poly_remove_valuation()
-
-  println("")
 end

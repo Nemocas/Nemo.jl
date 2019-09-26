@@ -1,12 +1,10 @@
-function test_fq_constructors()
-   print("fq.constructors...")
-
+@testset "fq.constructors..." begin
    R, x = FiniteField(fmpz(7), 5, "x")
 
    @test elem_type(R) == fq
    @test elem_type(FqFiniteField) == fq
    @test parent_type(fq) == FqFiniteField
-   
+
    Sy, y = PolynomialRing(ResidueRing(FlintZZ, 36893488147419103363), "y")
    Syy, yy = PolynomialRing(GF(fmpz(36893488147419103363)), "y")
 
@@ -22,7 +20,7 @@ function test_fq_constructors()
    @test isa(z2^2 + z2 + 1, fq)
 
    a = R()
-   
+
    @test isa(a, fq)
 
    b = R(4)
@@ -35,32 +33,24 @@ function test_fq_constructors()
    d = R(c)
 
    @test isa(d, fq)
-
-   println("PASS")
 end
 
-function test_fq_printing()
-   print("fq.printing...")
-
+@testset "fq.printing..." begin
    R, x = FiniteField(fmpz(7), 5, "x")
 
    a = 3x^4 + 2x^3 + 4x^2 + x + 1
 
    @test string(a) == "3*x^4+2*x^3+4*x^2+x+1"
-
-   println("PASS")
 end
 
-function test_fq_manipulation()
-   print("fq.manipulation...")
-
+@testset "fq.manipulation..." begin
    R, x = FiniteField(fmpz(7), 5, "x")
 
    @test iszero(zero(R))
 
    @test isone(one(R))
 
-   @test isgen(gen(R)) 
+   @test isgen(gen(R))
 
    @test characteristic(R) == 7
 
@@ -75,25 +65,17 @@ function test_fq_manipulation()
    @test coeff(2x + 1, 1) == 2
 
    @test_throws DomainError  coeff(2x + 1, -1)
-
-   println("PASS")
 end
 
-function test_fq_unary_ops()
-   print("fq.unary_ops...")
-
+@testset "fq.unary_ops..." begin
    R, x = FiniteField(fmpz(7), 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
-   
-   @test -a == 6*x^4+4*x^2+x+6
 
-   println("PASS")
+   @test -a == 6*x^4+4*x^2+x+6
 end
 
-function test_fq_binary_ops()
-   print("fq.binary_ops...")
-
+@testset "fq.binary_ops..." begin
    R, x = FiniteField(fmpz(7), 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
@@ -104,13 +86,9 @@ function test_fq_binary_ops()
    @test a - b == 5*x^4+x^2+5*x
 
    @test a*b == 3*x^3+2
-
-   println("PASS")
 end
 
-function test_fq_adhoc_binary()
-   print("fq.adhoc_binary...")
-
+@testset "fq.adhoc_binary..." begin
    R, x = FiniteField(fmpz(7), 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
@@ -126,27 +104,19 @@ function test_fq_adhoc_binary()
    @test 12345678901234567890123*a == 3*x^4+2*x^2+4*x+3
 
    @test a*12345678901234567890123 == 3*x^4+2*x^2+4*x+3
-
-   println("PASS")
 end
 
-function test_fq_powering()
-   print("fq.powering...")
-
+@testset "fq.powering..." begin
    R, x = FiniteField(fmpz(7), 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
 
    @test a^3 == x^4+6*x^3+5*x^2+5*x+6
-   
-   @test a^fmpz(-5) == x^4+4*x^3+6*x^2+6*x+2
 
-   println("PASS")
+   @test a^fmpz(-5) == x^4+4*x^3+6*x^2+6*x+2
 end
 
-function test_fq_comparison()
-   print("fq.comparison...")
-  
+@testset "fq.comparison..." begin
    R, x = FiniteField(fmpz(7), 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
@@ -155,13 +125,9 @@ function test_fq_comparison()
    @test b != a
    @test R(3) == R(3)
    @test isequal(R(3), R(3))
-
-   println("PASS")
 end
 
-function test_fq_inversion()
-   print("fq.inversion...")
-  
+@testset "fq.inversion..." begin
    R, x = FiniteField(fmpz(7), 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
@@ -171,13 +137,9 @@ function test_fq_inversion()
    @test b == x^4+5*x^3+4*x^2+5*x
 
    @test b == a^-1
-
-   println("PASS")
 end
 
-function test_fq_exact_division()
-   print("fq.exact_division...")
-  
+@testset "fq.exact_division..." begin
    R, x = FiniteField(fmpz(7), 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
@@ -186,13 +148,9 @@ function test_fq_exact_division()
    @test divexact(a, b) == 3*x^4+2*x^3+2*x^2+5*x
 
    @test b//a == 4*x^2+6*x+5
-
-   println("PASS")
 end
 
-function test_fq_gcd()
-   print("fq.gcd...")
-
+@testset "fq.gcd..." begin
    R, x = FiniteField(fmpz(7), 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
@@ -201,13 +159,9 @@ function test_fq_gcd()
    @test gcd(a, b) == 1
 
    @test gcd(R(0), R(0)) == 0
-
-   println("PASS")
 end
 
-function test_fq_special_functions()
-   print("fq.special_functions...")
-  
+@testset "fq.special_functions..." begin
    R, x = FiniteField(fmpz(7), 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
@@ -221,34 +175,10 @@ function test_fq_special_functions()
    @test frobenius(a, 3) == 3*x^4+3*x^3+3*x^2+x+4
 
    @test pth_root(a) == 4*x^4+3*x^3+4*x^2+5*x+2
-
-   println("PASS")
 end
 
-function test_fq_rand()
-   print("fq.rand...")
-   
+@testset "fq.rand..." begin
    R, x = FiniteField(fmpz(17), 3, "x")
-   
-   @inferred rand(R)
-   
-   println("PASS")
-end
 
-function test_fq()
-   test_fq_constructors()
-   test_fq_printing()
-   test_fq_manipulation()
-   test_fq_unary_ops()
-   test_fq_binary_ops()
-   test_fq_adhoc_binary()
-   test_fq_powering()
-   test_fq_comparison()
-   test_fq_inversion()
-   test_fq_exact_division()
-   test_fq_gcd()
-   test_fq_special_functions()
-   test_fq_rand()
-   
-   println("")
+   @inferred rand(R)
 end

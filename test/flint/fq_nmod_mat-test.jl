@@ -10,9 +10,7 @@ function randmat(R::FqNmodMatSpace)
    return r
 end
 
-function test_fq_nmod_mat_constructors()
-  print("fq_nmod_mat.constructors...")
-
+@testset "fq_nmod_mat.constructors..." begin
   F4, a = FlintFiniteField(2, 2, "a")
   F9, b = FlintFiniteField(3, 2, "b")
 
@@ -178,13 +176,9 @@ function test_fq_nmod_mat_constructors()
    @test !(a in [b])
    @test a in keys(Dict(a => 1))
    @test !(a in keys(Dict(b => 1)))
-
-  println("PASS")
 end
 
-function test_fq_nmod_mat_similar()
-   print("fq_nmod_mat.similar...")
-
+@testset "fq_nmod_mat.similar..." begin
    F9, b = FiniteField(3, 2, "b")
    S = FqNmodMatSpace(F9, 2, 2)
    s = S(fmpz(3))
@@ -202,13 +196,9 @@ function test_fq_nmod_mat_similar()
    t = similar(s, F9, 2, 3)
    @test t isa fq_nmod_mat
    @test size(t) == (2, 3)
-
-   println("PASS")
 end
 
-function test_fq_nmod_mat_printing()
-  print("fq_nmod_mat.printing...")
-
+@testset "fq_nmod_mat.printing..." begin
   F4, _  = FlintFiniteField(2, 2, "a")
   R = FqNmodMatSpace(F4, 2, 2)
 
@@ -216,12 +206,9 @@ function test_fq_nmod_mat_printing()
 
   # test that default Julia printing is not used
   @test !occursin(string(typeof(a)), string(a))
-
-  println("PASS")
 end
 
-function test_fq_nmod_mat_manipulation()
-  print("fq_nmod_mat.manipulation...")
+@testset "fq_nmod_mat.manipulation..." begin
   F4, _ = FlintFiniteField(2, 2, "a")
   R = FqNmodMatSpace(F4, 2, 2)
   F9, _ = FlintFiniteField(3, 2, "b")
@@ -287,13 +274,9 @@ function test_fq_nmod_mat_manipulation()
           MatrixSpace(F4,2,1)(reshape([ 1 ; 2],2,1))
 
   @test_throws ErrorConstrDimMismatch transpose!(R([ 1 2 ;]))
-
-  println("PASS")
 end
 
-function test_fq_nmod_mat_unary_ops()
-  print("fq_nmod_mat.unary_ops...")
-
+@testset "fq_nmod_mat.unary_ops..." begin
   F17, _ = FlintFiniteField(17, 1, "a")
 
   R = MatrixSpace(F17, 3, 4)
@@ -308,13 +291,9 @@ function test_fq_nmod_mat_unary_ops()
   d = -b
 
   @test d == R([ 15 16 0 16; 0 0 0 0; 0 16 15 0])
-
-  println("PASS")
 end
 
-function test_fq_nmod_mat_row_col_swapping()
-   print("fq_nmod_mat.row_col_swapping...")
-
+@testset "fq_nmod_mat.row_col_swapping..." begin
    R, _ = FlintFiniteField(17, 1, "a")
 
    a = matrix(R, [1 2; 3 4; 5 6])
@@ -351,13 +330,9 @@ function test_fq_nmod_mat_row_col_swapping()
    @test reverse_cols(a) == matrix(R, [3 2 1; 5 4 3; 7 6 5])
    reverse_cols!(a)
    @test a == matrix(R, [3 2 1; 5 4 3; 7 6 5])
-
-   println("PASS")
 end
 
-function test_fq_nmod_mat_binary_ops()
-  print("fq_nmod_mat.binary_ops...")
-
+@testset "fq_nmod_mat.binary_ops..." begin
   F17, _ = FlintFiniteField(17, 1, "a")
 
   R = MatrixSpace(F17, 3, 4)
@@ -383,13 +358,9 @@ function test_fq_nmod_mat_binary_ops()
   d = transpose(a)*a
 
   @test d == MatrixSpace(F17, 4, 4)([11 11 8 7; 11 0 14 6; 8 14 14 5; 7 6 5 5])
-
-  println("PASS")
 end
 
-function test_fq_nmod_mat_adhoc_binary()
-  print("fq_nmod_mat.adhoc_binary...")
-
+@testset "fq_nmod_mat.adhoc_binary..." begin
   F17, _ = FlintFiniteField(17, 1, "a")
 
   R = MatrixSpace(F17, 3, 4)
@@ -426,13 +397,9 @@ function test_fq_nmod_mat_adhoc_binary()
   @test dd == R([ 2 4 6 2; 6 4 2 4; 2 6 4 0])
 
   @test_throws ErrorException F2(1)*a
-
-  println("PASS")
 end
 
-function test_fq_nmod_mat_comparison()
-  print("fq_nmod_mat.comparison...")
-
+@testset "fq_nmod_mat.comparison..." begin
   F17, _ = FlintFiniteField(17, 1, "a")
 
   R = MatrixSpace(F17, 3, 4)
@@ -444,13 +411,9 @@ function test_fq_nmod_mat_comparison()
   @test deepcopy(a) == a
 
   @test a != R([0 1 3 1; 2 1 4 2; 1 1 1 1])
-
-  println("PASS")
 end
 
-function test_fq_nmod_mat_adhoc_comparison()
-  print("fq_nmod_mat.comparison...")
-
+@testset "fq_nmod_mat.comparison..." begin
   F17, _ = FlintFiniteField(17, 1, "a")
 
   R = MatrixSpace(F17, 3, 4)
@@ -462,13 +425,9 @@ function test_fq_nmod_mat_adhoc_comparison()
   @test 5 == R(5)
   @test fmpz(5) == R(5)
   @test F17(5) == R(5)
-
-  println("PASS")
 end
 
-function test_fq_nmod_mat_powering()
-  print("fq_nmod_mat.powering...")
-
+@testset "fq_nmod_mat.powering..." begin
   F17, _ = FlintFiniteField(17, 1, "a")
 
   R = MatrixSpace(F17, 3, 4)
@@ -480,13 +439,9 @@ function test_fq_nmod_mat_powering()
   g = f^1000
 
   @test g == MatrixSpace(F17, 3, 3)([1 2 2; 2 13 12; 2 12 15])
-
-  println("PASS")
 end
 
-function test_fq_nmod_mat_row_echelon_form()
-  print("fq_nmod_mat.row_echelon_form...")
-
+@testset "fq_nmod_mat.row_echelon_form..." begin
   F17, _ = FlintFiniteField(17, 1, "a")
   R = MatrixSpace(F17, 3, 4)
   RR = MatrixSpace(F17, 4, 3)
@@ -513,13 +468,9 @@ function test_fq_nmod_mat_row_echelon_form()
 
   @test d == parent(b)([ 1 0 0 ; 0 0 1; 0 0 0; 0 0 0])
   @test r == 2
-
-  println("PASS")
 end
 
-function test_fq_nmod_mat_trace_det()
-  print("fq_nmod_mat.trace_det...")
-
+@testset "fq_nmod_mat.trace_det..." begin
   F17, _ = FlintFiniteField(17, 1, "a")
   R = MatrixSpace(F17, 3, 4)
   RR = MatrixSpace(F17, 4, 3)
@@ -549,13 +500,9 @@ function test_fq_nmod_mat_trace_det()
   @test c == F17(13)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
-
-  println("PASS")
 end
 
-function test_fq_nmod_mat_rank()
-  print("fq_nmod_mat.rank...")
-
+@testset "fq_nmod_mat.rank..." begin
   F17, _ = FlintFiniteField(17, 1, "a")
   R = MatrixSpace(F17, 3, 4)
   RR = MatrixSpace(F17, 4, 3)
@@ -577,13 +524,9 @@ function test_fq_nmod_mat_rank()
   c = rank(b)
 
   @test c == 2
-
-  println("PASS")
 end
 
-function test_fq_nmod_mat_inv()
-  print("fq_nmod_mat.inv...")
-
+@testset "fq_nmod_mat.inv..." begin
   F17, _ = FlintFiniteField(17, 1, "a")
   R = MatrixSpace(F17, 3, 4)
   RR = MatrixSpace(F17, 4, 3)
@@ -601,13 +544,9 @@ function test_fq_nmod_mat_inv()
   @test_throws ErrorException inv(a)
 
   @test_throws ErrorException inv(transpose(a)*a)
-
-  println("PASS")
 end
 
-function test_fq_nmod_mat_solve()
-  print("fq_nmod_mat.solve...")
-
+@testset "fq_nmod_mat.solve..." begin
   F17, _ = FlintFiniteField(17, 1, "a")
   R = MatrixSpace(F17, 3, 3)
   S = MatrixSpace(F17, 3, 4)
@@ -625,13 +564,9 @@ function test_fq_nmod_mat_solve()
   a = zero(R)
 
   @test_throws ErrorException  solve(a,c)
-
-  println("PASS")
 end
 
-function test_fq_nmod_mat_lu()
-  print("fq_nmod_mat.lu...")
-
+@testset "fq_nmod_mat.lu..." begin
 
   F17, _ = FlintFiniteField(17, 1, "a")
   R = MatrixSpace(F17, 3, 3)
@@ -657,13 +592,9 @@ function test_fq_nmod_mat_lu()
 
   @test r == 3
   @test l*u == P*c
-
-  println("PASS")
 end
 
-function test_fq_nmod_mat_view()
-  print("fq_nmod_mat.view...")
-
+@testset "fq_nmod_mat.view..." begin
   F17, _ = FlintFiniteField(17, 1, "a")
   R = MatrixSpace(F17, 3, 3)
   S = MatrixSpace(F17, 3, 4)
@@ -697,41 +628,35 @@ function test_fq_nmod_mat_view()
   a = 0
   GC.gc()
   @test t[1, 1] == 2
-
-  println("PASS")
 end
 
-function test_fq_nmod_mat_sub()
-   print("fq_nmod_mat.sub...")
+if false
+   @testset "fq_nmod_mat.sub..." begin
+      F17, _ = FlintFiniteField(17, 1, "a")
+      S = MatrixSpace(F17, 3, 3)
 
-   F17, _ = FlintFiniteField(17, 1, "a")
-   S = MatrixSpace(F17, 3, 3)
+      A = S([1 2 3; 4 5 6; 7 8 9])
 
-   A = S([1 2 3; 4 5 6; 7 8 9])
+      B = @inferred sub(A, 1, 1, 2, 2)
 
-   B = @inferred sub(A, 1, 1, 2, 2)
+      @test typeof(B) == nmod_mat
+      @test B == MatrixSpace(F17, 2, 2)([1 2; 4 5])
 
-   @test typeof(B) == nmod_mat
-   @test B == MatrixSpace(F17, 2, 2)([1 2; 4 5])
+      B[1, 1] = 10
+      @test A == S([1 2 3; 4 5 6; 7 8 9])
 
-   B[1, 1] = 10
-   @test A == S([1 2 3; 4 5 6; 7 8 9])
+      C = @inferred sub(B, 1:2, 1:2)
 
-   C = @inferred sub(B, 1:2, 1:2)
+      @test typeof(C) == nmod_mat
+      @test C == MatrixSpace(F17, 2, 2)([10 2; 4 5])
 
-   @test typeof(C) == nmod_mat
-   @test C == MatrixSpace(F17, 2, 2)([10 2; 4 5])
-
-   C[1, 1] = 20
-   @test B == MatrixSpace(F17, 2, 2)([10 2; 4 5])
-   @test A == S([1 2 3; 4 5 6; 7 8 9])
-
-   println("PASS")
+      C[1, 1] = 20
+      @test B == MatrixSpace(F17, 2, 2)([10 2; 4 5])
+      @test A == S([1 2 3; 4 5 6; 7 8 9])
+   end
 end
 
-function test_fq_nmod_mat_concatenation()
-  print("fq_nmod_mat.concatenation...")
-
+@testset "fq_nmod_mat.concatenation..." begin
   F17, _ = FlintFiniteField(17, 1, "a")
   R = MatrixSpace(F17, 3, 3)
   S = MatrixSpace(F17, 3, 4)
@@ -765,13 +690,9 @@ function test_fq_nmod_mat_concatenation()
                                      1, 0, 0])
 
   @test_throws ErrorException vcat(a,b)
-
-  println("PASS")
 end
 
-function test_fq_nmod_mat_conversion()
-  print("fq_nmod_mat.conversion...")
-
+@testset "fq_nmod_mat.conversion..." begin
   F17, _ = FlintFiniteField(17, 1, "a")
   R = MatrixSpace(F17, 3, 3)
 
@@ -780,13 +701,9 @@ function test_fq_nmod_mat_conversion()
   @test Array(a) == [F17(1) F17(2) F17(3);
                      F17(3) F17(2) F17(1);
                      F17(0) F17(0) F17(2) ]
-
-  println("PASS")
 end
 
-function test_fq_nmod_mat_charpoly()
-   print("fq_nmod_mat.charpoly...")
-
+@testset "fq_nmod_mat.charpoly..." begin
    F17, _ = FlintFiniteField(17, 1, "a")
 
    for dim = 0:5
@@ -804,31 +721,4 @@ function test_fq_nmod_mat_charpoly()
          @test iszero(subst(p1, N))
       end
    end
-
-   println("PASS")
-end
-
-function test_fq_nmod_mat()
-  test_fq_nmod_mat_constructors()
-  test_fq_nmod_mat_similar()
-  test_fq_nmod_mat_printing()
-  test_fq_nmod_mat_manipulation()
-  test_fq_nmod_mat_unary_ops()
-  test_fq_nmod_mat_binary_ops()
-  test_fq_nmod_mat_row_col_swapping()
-  test_fq_nmod_mat_adhoc_binary()
-  test_fq_nmod_mat_comparison()
-  test_fq_nmod_mat_adhoc_comparison()
-  test_fq_nmod_mat_powering()
-  test_fq_nmod_mat_row_echelon_form()
-  test_fq_nmod_mat_trace_det()
-  test_fq_nmod_mat_rank()
-  test_fq_nmod_mat_inv()
-  test_fq_nmod_mat_lu()
-  test_fq_nmod_mat_view()
-  test_fq_nmod_mat_concatenation()
-  test_fq_nmod_mat_conversion()
-  test_fq_nmod_mat_charpoly()
-
-  println("")
 end

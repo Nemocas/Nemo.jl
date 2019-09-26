@@ -1,6 +1,4 @@
-function test_gfp_fmpz_poly_constructors()
-   print("gfp_fmpz_poly.constructors...")
- 
+@testset "gfp_fmpz_poly.constructors..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
@@ -50,34 +48,26 @@ function test_gfp_fmpz_poly_constructors()
    r = S([1, 2, 3])
 
    @test isa(r, PolyElem)
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_printing()
-   print("gfp_fmpz_poly.printing...")
- 
+@testset "gfp_fmpz_poly.printing..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
    f = x^3 + 2x^2 + x + 1
 
    @test string(f) == "x^3+2*x^2+x+1"
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_manipulation()
-   print("gfp_fmpz_poly.manipulation...")
-
+@testset "gfp_fmpz_poly.manipulation..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
    @test iszero(zero(S))
-   
+
    @test isone(one(S))
 
    @test isgen(gen(S))
-   
+
    @test isunit(one(S))
 
    f = x^2 + 2x + 1
@@ -111,13 +101,9 @@ function test_gfp_fmpz_poly_manipulation()
    @test modulus(x) == 123456789012345678949
 
    @test modulus(R) == 123456789012345678949
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_binary_ops()
-   print("gfp_fmpz_poly.binary_ops...")
-
+@testset "gfp_fmpz_poly.binary_ops..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
@@ -129,13 +115,9 @@ function test_gfp_fmpz_poly_binary_ops()
    @test f*g == x^5+2*x^4+4*x^3+8*x^2+7*x+2
 
    @test f - g == 123456789012345678948*x^3+x^2+123456789012345678948*x+123456789012345678948
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_adhoc_binary()
-   print("gfp_fmpz_poly.adhoc_binary...")
-
+@testset "gfp_fmpz_poly.adhoc_binary..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
@@ -177,13 +159,9 @@ function test_gfp_fmpz_poly_adhoc_binary()
    @test R(7)*g == 7*x^3+21*x+14
 
    @test f*R(12) == 12*x^2+24*x+12
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_comparison()
-   print("gfp_fmpz_poly.comparison...")
-
+@testset "gfp_fmpz_poly.comparison..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
@@ -193,21 +171,17 @@ function test_gfp_fmpz_poly_comparison()
    @test f != g
 
    @test isequal(f, deepcopy(f))
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_adhoc_comparison()
-   print("gfp_fmpz_poly.adhoc_comparison...")
-
+@testset "gfp_fmpz_poly.adhoc_comparison..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
 
-   @test f != 1 
+   @test f != 1
 
-   @test 1 != f 
+   @test 1 != f
 
    @test S(7) == fmpz(7)
 
@@ -216,26 +190,18 @@ function test_gfp_fmpz_poly_adhoc_comparison()
    @test S(7) == R(7)
 
    @test R(7) != x + 1
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_unary_ops()
-   print("gfp_fmpz_poly.unary_ops...")
-
+@testset "gfp_fmpz_poly.unary_ops..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
 
    @test -f == 123456789012345678948*x^2+123456789012345678947*x+123456789012345678948
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_truncation()
-   print("gfp_fmpz_poly.truncation...")
-
+@testset "gfp_fmpz_poly.truncation..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
@@ -249,26 +215,18 @@ function test_gfp_fmpz_poly_truncation()
    @test mullow(f, g, 3) == 7*x^2+5*x+1
 
    @test_throws DomainError mullow(f, g, -1)
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_reverse()
-   print("gfp_fmpz_poly.reverse...")
-
+@testset "gfp_fmpz_poly.reverse..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 3
 
    @test reverse(f) == 3x^2 + 2x + 1
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_shift()
-   print("gfp_fmpz_poly.shift...")
-
+@testset "gfp_fmpz_poly.shift..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
@@ -281,13 +239,9 @@ function test_gfp_fmpz_poly_shift()
    @test shift_right(f, 1) == x + 2
 
    @test_throws DomainError shift_right(f, -1)
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_powering()
-   print("gfp_fmpz_poly.powering...")
-
+@testset "gfp_fmpz_poly.powering..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
@@ -296,13 +250,9 @@ function test_gfp_fmpz_poly_powering()
    @test f^6 == x^12+12*x^11+66*x^10+220*x^9+495*x^8+792*x^7+924*x^6+792*x^5+495*x^4+220*x^3+66*x^2+12*x+1
 
    @test_throws DomainError f^-1
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_exact_division()
-   print("gfp_fmpz_poly.exact_division...")
-
+@testset "gfp_fmpz_poly.exact_division..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
@@ -310,30 +260,22 @@ function test_gfp_fmpz_poly_exact_division()
    g = x^3 + 3x + 1
 
    @test divexact(f*g, f) == g
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_adhoc_exact_division()
-   print("gfp_fmpz_poly.adhoc_exact_division...")
-
+@testset "gfp_fmpz_poly.adhoc_exact_division..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
-   
+
    @test divexact(3*f, fmpz(3)) == f
 
    @test divexact(3*f, 3) == f
 
    @test divexact(R(7)*f, R(7)) == f
-   
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_modular_arithmetic()
-   print("gfp_fmpz_poly.modular_arithmetic...")
-
+@testset "gfp_fmpz_poly.modular_arithmetic..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
@@ -352,13 +294,9 @@ function test_gfp_fmpz_poly_modular_arithmetic()
    @test powmod(f, -10, g) == 78305338116088931412*x+91239060941924718463
 
    @test powmod(f, -fmpz(10), g) == 78305338116088931412*x+91239060941924718463
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_euclidean_division()
-   print("gfp_fmpz_poly.euclidean_division...")
-
+@testset "gfp_fmpz_poly.euclidean_division..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
@@ -368,13 +306,9 @@ function test_gfp_fmpz_poly_euclidean_division()
    @test mod(g, f) == 6*x+3
 
    @test divrem(g, f) == (x+123456789012345678947, 6*x+3)
- 
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_gcd()
-   print("gfp_fmpz_poly.gcd...")
-
+@testset "gfp_fmpz_poly.gcd..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
@@ -383,14 +317,11 @@ function test_gfp_fmpz_poly_gcd()
    h = x^2 + 1
 
    @test gcd(f*h, g*h) == x^2+1
- 
+
    @test gcdx(f*h, g*h) == (x^2+1, 41152263004115226317*x^2+41152263004115226316*x+2,82304526008230452632*x+123456789012345678948)
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_gcdinv()
-   print("gfp_fmpz_poly.gcdinv...")
-
+@testset "gfp_fmpz_poly.gcdinv..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
@@ -398,20 +329,16 @@ function test_gfp_fmpz_poly_gcdinv()
    g = x^3 + 3x + 1
 
    @test gcdinv(f, g) == (1, 41152263004115226317*x^2+41152263004115226316*x+2)
- 
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_evaluation()
-   print("gfp_fmpz_poly.evaluation...")
-
+@testset "gfp_fmpz_poly.evaluation..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
 
    @test evaluate(f, 3) == 16
-   
+
    @test evaluate(f, fmpz(10)) == 121
 
    @test evaluate(f, R(10)) == 121
@@ -425,13 +352,9 @@ if VERSION >= v"0.5.0-dev+3171"
    @test f(R(10)) == 121
 
 end
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_composition()
-   print("gfp_fmpz_poly.composition...")
-
+@testset "gfp_fmpz_poly.composition..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
@@ -439,39 +362,27 @@ function test_gfp_fmpz_poly_composition()
    g = x^3 + 3x + 1
 
    @test compose(f, g) == x^6+6*x^4+4*x^3+9*x^2+12*x+4
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_derivative()
-   print("gfp_fmpz_poly.derivative...")
-
+@testset "gfp_fmpz_poly.derivative..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
 
    @test derivative(f) == 2x + 2
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_integral()
-   print("gfp_fmpz_poly.integral...")
-
+@testset "gfp_fmpz_poly.integral..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
-   
-   @test integral(f) == 82304526008230452633*x^3+x^2+x
 
-   println("PASS")
+   @test integral(f) == 82304526008230452633*x^3+x^2+x
 end
 
-function test_gfp_fmpz_poly_resultant()
-   print("gfp_fmpz_poly.resultant...")
-
+@testset "gfp_fmpz_poly.resultant..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
@@ -479,26 +390,18 @@ function test_gfp_fmpz_poly_resultant()
    g = 2x^3 + 3x + 1
 
    @test resultant(f, g) == 212
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_discriminant()
-   print("gfp_fmpz_poly.discriminant...")
-
+@testset "gfp_fmpz_poly.discriminant..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
 
    @test discriminant(f) == 0
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_lift()
-   print("gfp_fmpz_poly.lift...")
-
+@testset "gfp_fmpz_poly.lift..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
@@ -507,39 +410,27 @@ function test_gfp_fmpz_poly_lift()
    f = x^2 + 2x + 1
 
    @test lift(T, f) == y^2 + 2y + 1
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_isirreducible()
-   print("gfp_fmpz_poly.isirreducible...")
-
+@testset "gfp_fmpz_poly.isirreducible..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
 
    @test isirreducible(f) == false
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_issquarefree()
-   print("gfp_fmpz_poly.issquarefree...")
-
+@testset "gfp_fmpz_poly.issquarefree..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
 
    @test issquarefree(f) == false
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_factor()
-   print("gfp_fmpz_poly.factor...")
-
+@testset "gfp_fmpz_poly.factor..." begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
@@ -561,16 +452,12 @@ function test_gfp_fmpz_poly_factor()
                 3 => x^6+123456789012345678948*x^5+3*x^4+123456789012345678948*x^3+123456789012345678948*x^2+3*x+1)
 
    R = factor_shape(f*g)
-   
+
    @test length(R) == 2
    @test R == Dict(3=>1, 1=>2)
-
-   println("PASS")
 end
 
-function test_gfp_fmpz_poly_remove_valuation()
-   print("gfp_fmpz_poly.remove_valuation...")
-
+@testset "gfp_fmpz_poly.remove_valuation..." begin
    R = GF(fmpz(123456789012345678949))
    S, y = PolynomialRing(R, "y")
 
@@ -591,42 +478,4 @@ function test_gfp_fmpz_poly_remove_valuation()
    v, q = divides(f*g + 1, f)
 
    @test !v
-
-   println("PASS")
 end
-
-
-
-function test_gfp_fmpz_poly()
-   test_gfp_fmpz_poly_constructors()
-   test_gfp_fmpz_poly_printing()
-   test_gfp_fmpz_poly_manipulation()
-   test_gfp_fmpz_poly_binary_ops()
-   test_gfp_fmpz_poly_adhoc_binary()
-   test_gfp_fmpz_poly_comparison()
-   test_gfp_fmpz_poly_adhoc_comparison()
-   test_gfp_fmpz_poly_unary_ops()
-   test_gfp_fmpz_poly_truncation()
-   test_gfp_fmpz_poly_reverse()
-   test_gfp_fmpz_poly_shift()
-   test_gfp_fmpz_poly_powering()
-   test_gfp_fmpz_poly_exact_division()
-   test_gfp_fmpz_poly_adhoc_exact_division()
-   test_gfp_fmpz_poly_modular_arithmetic()
-   test_gfp_fmpz_poly_euclidean_division()
-   test_gfp_fmpz_poly_gcdinv()
-   test_gfp_fmpz_poly_evaluation()
-   test_gfp_fmpz_poly_composition()
-   test_gfp_fmpz_poly_derivative()
-   test_gfp_fmpz_poly_integral()
-   test_gfp_fmpz_poly_resultant()
-   test_gfp_fmpz_poly_discriminant()
-   test_gfp_fmpz_poly_lift()
-   test_gfp_fmpz_poly_isirreducible()
-   test_gfp_fmpz_poly_issquarefree()
-   test_gfp_fmpz_poly_factor()
-   test_gfp_fmpz_poly_remove_valuation()
-
-   println("")
-end
-

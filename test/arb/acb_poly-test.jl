@@ -1,9 +1,7 @@
 RR = AcbField(64)
 CC = AcbField(64)
 
-function test_acb_poly_constructors()
-   print("acb_poly.constructors...")
-
+@testset "acb_poly.constructors..." begin
    R, x = PolynomialRing(CC, "x")
 
    @test elem_type(R) == acb_poly
@@ -39,24 +37,16 @@ function test_acb_poly_constructors()
 
      @test isa(m, PolyElem)
    end
-
-   println("PASS")
 end
 
-function test_acb_poly_printing()
-   print("acb_poly.printing...")
-
+@testset "acb_poly.printing..." begin
    R, x = PolynomialRing(CC, "x")
    f = x^3 + 2x^2 + x + 1
 
    @test string(f) == "[ 1.0000000000000000000 + i*0, 1.0000000000000000000 + i*0, 2.0000000000000000000 + i*0, 1.0000000000000000000 + i*0 ]"
-
-   println("PASS")
 end
 
-function test_acb_poly_manipulation()
-   print("acb_poly.manipulation...")
-
+@testset "acb_poly.manipulation..." begin
    R, x = PolynomialRing(CC, "x")
 
    @test iszero(zero(R))
@@ -82,13 +72,9 @@ function test_acb_poly_manipulation()
    # @test canonical_unit(-x + 1) == -1
 
    @test deepcopy(f) == f
-
-   println("PASS")
 end
 
-function test_acb_poly_binary_ops()
-   print("acb_poly.binary_ops...")
-
+@testset "acb_poly.binary_ops..." begin
    R, x = PolynomialRing(CC, "x")
 
    f = x^2 + 2x + 1
@@ -99,13 +85,9 @@ function test_acb_poly_binary_ops()
    @test f*g == x^5+2*x^4+4*x^3+8*x^2+7*x+2
 
    @test f - g == -x^3+x^2-x-1
-
-   println("PASS")
 end
 
-function test_acb_poly_adhoc_binary()
-   print("acb_poly.adhoc_binary...")
-
+@testset "acb_poly.adhoc_binary..." begin
    R, x = PolynomialRing(CC, "x")
 
    f = x^2 + 2x + 1
@@ -130,13 +112,9 @@ function test_acb_poly_adhoc_binary()
 
       @test T(12) - g == -x^3-3*x+10
    end
-
-   println("PASS")
 end
 
-function test_acb_poly_comparison()
-   print("acb_poly.comparison...")
-
+@testset "acb_poly.comparison..." begin
    R, x = PolynomialRing(CC, "x")
    Zx, zx = PolynomialRing(ZZ, "x")
    Qx, qx = PolynomialRing(QQ, "x")
@@ -180,13 +158,9 @@ function test_acb_poly_comparison()
 
    uniq, p = unique_integer(f + CC("3 +/- 1.01") * x^4)
    @test !uniq
-
-   println("PASS")
 end
 
-function test_acb_poly_adhoc_comparison()
-   print("acb_poly.adhoc_comparison...")
-
+@testset "acb_poly.adhoc_comparison..." begin
    R, x = PolynomialRing(CC, "x")
 
    f = x^2 + 2x + 1
@@ -208,25 +182,17 @@ function test_acb_poly_adhoc_comparison()
    @test QQ(7) != f
 
    @test R(7) == RR(7.0)
-
-   println("PASS")
 end
 
-function test_acb_poly_unary_ops()
-   print("acb_poly.unary_ops...")
-
+@testset "acb_poly.unary_ops..." begin
    R, x = PolynomialRing(CC, "x")
 
    f = x^2 + 2x + 1
 
    @test -f == -x^2 - 2x - 1
-
-   println("PASS")
 end
 
-function test_acb_poly_truncation()
-   print("acb_poly.truncation...")
-
+@testset "acb_poly.truncation..." begin
    R, x = PolynomialRing(CC, "x")
 
    f = x^2 + 2x + 1
@@ -239,25 +205,17 @@ function test_acb_poly_truncation()
    @test mullow(f, g, 3) == 7*x^2+5*x+1
 
    @test_throws DomainError mullow(f, g, -1)
-
-   println("PASS")
 end
 
-function test_acb_poly_reverse()
-   print("acb_poly.reverse...")
-
+@testset "acb_poly.reverse..." begin
    R, x = PolynomialRing(CC, "x")
 
    f = x^2 + 2x + 3
 
    #@test reverse(f) == 3x^2 + 2x + 1
-
-   println("PASS")
 end
 
-function test_acb_poly_shift()
-   print("acb_poly.shift...")
-
+@testset "acb_poly.shift..." begin
    R, x = PolynomialRing(CC, "x")
 
    f = x^2 + 2x + 1
@@ -269,13 +227,9 @@ function test_acb_poly_shift()
    @test shift_right(f, 1) == x + 2
 
    @test_throws DomainError shift_right(f, -1)
-
-   println("PASS")
 end
 
-function test_acb_poly_powering()
-   print("acb_poly.powering...")
-
+@testset "acb_poly.powering..." begin
    R, x = PolynomialRing(CC, "x")
 
    f = x^2 + 2x + 1
@@ -283,26 +237,18 @@ function test_acb_poly_powering()
    @test f^12 == x^24+24*x^23+276*x^22+2024*x^21+10626*x^20+42504*x^19+134596*x^18+346104*x^17+735471*x^16+1307504*x^15+1961256*x^14+2496144*x^13+2704156*x^12+2496144*x^11+1961256*x^10+1307504*x^9+735471*x^8+346104*x^7+134596*x^6+42504*x^5+10626*x^4+2024*x^3+276*x^2+24*x+1
 
    @test_throws DomainError f^-1
-
-   println("PASS")
 end
 
-function test_acb_poly_exact_division()
-   print("acb_poly.exact_division...")
-
+@testset "acb_poly.exact_division..." begin
    R, x = PolynomialRing(CC, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
 
    @test divexact(f*g, f) == g
-
-   println("PASS")
 end
 
-function test_acb_poly_scalar_division()
-   print("acb_poly.scalar_division...")
-
+@testset "acb_poly.scalar_division..." begin
    R, x = PolynomialRing(CC, "x")
 
    f = x^2 + 2x + 1
@@ -316,13 +262,9 @@ function test_acb_poly_scalar_division()
    @test divexact(2*f, CC(2)) == f
 
    @test divexact(2*f, 2.0) == f
-
-   println("PASS")
 end
 
-function test_acb_poly_evaluation()
-   print("acb_poly.evaluation...")
-
+@testset "acb_poly.evaluation..." begin
    R, x = PolynomialRing(CC, "x")
 
    f = x^2 + 2x + 1
@@ -346,13 +288,9 @@ function test_acb_poly_evaluation()
    @test evaluate2(f, QQ(10)) == (121, 22)
 
    @test evaluate2(f, CC(10)) == (121, 22)
-
-   println("PASS")
 end
 
-function test_acb_poly_roots()
-   print("acb_poly.roots...")
-
+@testset "acb_poly.roots..." begin
    R, x = PolynomialRing(CC, "x")
 
    f = (x - 1)*(x - 2)*(x - CC("5 +/- 0.001"))
@@ -362,26 +300,18 @@ function test_acb_poly_roots()
    @test contains(r[1], 1)
    @test contains(r[2], 2)
    @test contains(r[3], 5)
-
-   println("PASS")
 end
 
-function test_acb_poly_composition()
-   print("acb_poly.composition...")
-
+@testset "acb_poly.composition..." begin
    R, x = PolynomialRing(CC, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
 
    @test compose(f, g) == x^6+6*x^4+4*x^3+9*x^2+12*x+4
-
-   println("PASS")
 end
 
-function test_acb_poly_derivative_integral()
-   print("acb_poly.derivative_integral...")
-
+@testset "acb_poly.derivative_integral..." begin
    R, x = PolynomialRing(CC, "x")
 
    f = x^2 + 2x + 1
@@ -389,13 +319,9 @@ function test_acb_poly_derivative_integral()
    @test derivative(f) == 2x + 2
 
    @test contains(derivative(integral(f)), f)
-
-   println("PASS")
 end
 
-function test_acb_poly_evaluation_interpolation()
-   print("acb_poly.evaluation_interpolation...")
-
+@testset "acb_poly.evaluation_interpolation..." begin
    R, x = PolynomialRing(CC, "x")
 
    n = 5
@@ -437,13 +363,9 @@ function test_acb_poly_evaluation_interpolation()
    for i=1:n
       @test contains_zero(evaluate(f, xs[i]))
    end
-
-   println("PASS")
 end
 
-function test_acb_poly_root_bound()
-   print("acb_poly.root_bound...")
-
+@testset "acb_poly.root_bound..." begin
    Rx, x = PolynomialRing(CC, "x")
 
    for i in 1:2
@@ -453,31 +375,4 @@ function test_acb_poly_root_bound()
       b = roots_upper_bound(f)
       @test all([ abs(z[i] + onei(CC)) <= b for i in 1:r])
    end
-
-   println("PASS")
-end
-
-function test_acb_poly()
-   test_acb_poly_constructors()
-   test_acb_poly_printing()
-   test_acb_poly_manipulation()
-   test_acb_poly_binary_ops()
-   test_acb_poly_adhoc_binary()
-   test_acb_poly_comparison()
-   test_acb_poly_adhoc_comparison()
-   test_acb_poly_unary_ops()
-   test_acb_poly_truncation()
-   test_acb_poly_reverse()
-   test_acb_poly_shift()
-   test_acb_poly_powering()
-   test_acb_poly_exact_division()
-   test_acb_poly_scalar_division()
-   test_acb_poly_evaluation()
-   test_acb_poly_roots()
-   test_acb_poly_composition()
-   test_acb_poly_derivative_integral()
-   test_acb_poly_evaluation_interpolation()
-   test_acb_poly_root_bound()
-
-   println("")
 end

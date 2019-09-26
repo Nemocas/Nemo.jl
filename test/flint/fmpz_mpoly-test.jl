@@ -1,6 +1,4 @@
-function test_fmpz_mpoly_constructors()
-   print("fmpz_mpoly.constructors...")
-
+@testset "fmpz_mpoly.constructors..." begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -57,13 +55,9 @@ function test_fmpz_mpoly_constructors()
         @test !isgen(f + 1)
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpz_mpoly_manipulation()
-   print("fmpz_mpoly.manipulation...")
-
+@testset "fmpz_mpoly.manipulation..." begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -132,7 +126,7 @@ function test_fmpz_mpoly_manipulation()
 
       @test isterm(h)
       @test !isterm(h2 + 1 + gen(S, 1))
-      
+
       @test isunit(S(1))
       @test !isunit(gen(S, 1))
 
@@ -161,15 +155,11 @@ function test_fmpz_mpoly_manipulation()
       @test (total_degree_fmpz(h) == max(sum.(monomialexp)...)) || (h == 0 && total_degree(h) == -1)
       @test total_degree_fits_int(h)
    end
-
-   println("PASS")
 end
 
-function test_fmpz_mpoly_multivariate_coeff()
-   print("fmpz_mpoly.multivariate_coeff...")
-
+@testset "fmpz_mpoly.multivariate_coeff..." begin
    R = FlintZZ
-   
+
    for ord in Nemo.flint_orderings
       S, (x, y, z) = PolynomialRing(R, ["x", "y", "z"]; ordering=ord)
 
@@ -183,13 +173,9 @@ function test_fmpz_mpoly_multivariate_coeff()
       @test coeff(f, [y, z], [3, 2]) == -10*x^4
       @test coeff(f, [x, z], [4, 5]) == 0
    end
-
-   println("PASS")
 end
 
-function test_fmpz_mpoly_unary_ops()
-   print("fmpz_mpoly.unary_ops...")
-
+@testset "fmpz_mpoly.unary_ops..." begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -204,13 +190,9 @@ function test_fmpz_mpoly_unary_ops()
          @test f == -(-f)
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpz_mpoly_binary_ops()
-   print("fmpz_mpoly.binary_ops...")
-
+@testset "fmpz_mpoly.binary_ops..." begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -231,13 +213,9 @@ function test_fmpz_mpoly_binary_ops()
          @test f*g - f*h == f*(g - h)
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpz_mpoly_adhoc_binary()
-   print("fmpz_mpoly.adhoc_binary...")
-
+@testset "fmpz_mpoly.adhoc_binary..." begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -271,13 +249,9 @@ function test_fmpz_mpoly_adhoc_binary()
          @test f + g1 - g1 == f
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpz_mpoly_adhoc_comparison()
-   print("fmpz_mpoly.adhoc_comparison...")
-
+@testset "fmpz_mpoly.adhoc_comparison..." begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -297,13 +271,9 @@ function test_fmpz_mpoly_adhoc_comparison()
          @test BigInt(d) == S(d)
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpz_mpoly_powering()
-   print("fmpz_mpoly.powering...")
-
+@testset "fmpz_mpoly.powering..." begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -328,13 +298,9 @@ function test_fmpz_mpoly_powering()
          @test_throws DomainError f^fmpz(-1)
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpz_mpoly_divides()
-   print("fmpz_mpoly.divides...")
-
+@testset "fmpz_mpoly.divides..." begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -351,7 +317,7 @@ function test_fmpz_mpoly_divides()
 
          flag, q = divides(p, f)
 
-         if flag 
+         if flag
            @test q * f == p
          end
 
@@ -361,13 +327,9 @@ function test_fmpz_mpoly_divides()
          end
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpz_mpoly_euclidean_division()
-   print("fmpz_mpoly.euclidean_division...")
-
+@testset "fmpz_mpoly.euclidean_division..." begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -401,13 +363,9 @@ function test_fmpz_mpoly_euclidean_division()
          @test (r3 == 0 && flag == true && q5 == q3) || (r3 != 0 && flag == false)
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpz_mpoly_ideal_reduction()
-   print("fmpz_mpoly.ideal_reduction...")
-
+@testset "fmpz_mpoly.ideal_reduction..." begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -454,13 +412,9 @@ function test_fmpz_mpoly_ideal_reduction()
          @test p == g
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpz_mpoly_gcd()
-   print("fmpz_mpoly.gcd...")
-
+@testset "fmpz_mpoly.gcd..." begin
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -482,13 +436,9 @@ function test_fmpz_mpoly_gcd()
          end
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpz_mpoly_evaluation()
-   print("fmpz_mpoly.evaluation...")
-
+@testset "fmpz_mpoly.evaluation..." begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -541,13 +491,9 @@ function test_fmpz_mpoly_evaluation()
    M2 = T([1 1; 2 4])
 
    @test f(M1, M2) == T([124 219; 271 480])
-
-   println("PASS")
 end
 
-function test_fmpz_mpoly_valuation()
-   print("fmpz_mpoly.valuation...")
-
+@testset "fmpz_mpoly.valuation..." begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -583,12 +529,9 @@ function test_fmpz_mpoly_valuation()
          @test q4 == q3
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpz_mpoly_derivative()
-   print("fmpz_mpoly.derivative...")
+@testset "fmpz_mpoly.derivative..." begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -606,13 +549,9 @@ function test_fmpz_mpoly_derivative()
          end
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpz_mpoly_combine_like_terms()
-  print("fmpz_mpoly.combine_like_terms...")
-
+@testset "fmpz_mpoly.combine_like_terms..." begin
   for num_vars = 1:10
      var_names = ["x$j" for j in 1:num_vars]
      ord = rand_ordering()
@@ -644,13 +583,9 @@ function test_fmpz_mpoly_combine_like_terms()
         @test length(f) == lenf - 1 - terms_cancel
      end
   end
-
-  println("PASS")
 end
 
-function test_fmpz_mpoly_exponents()
-  print("fmpz_mpoly.exponents...")
-
+@testset "fmpz_mpoly.exponents..." begin
   for num_vars = 1:10
      var_names = ["x$j" for j in 1:num_vars]
      ord = rand_ordering()
@@ -696,29 +631,4 @@ function test_fmpz_mpoly_exponents()
         end
      end
   end
-
-  println("PASS")
-end
-
-
-function test_fmpz_mpoly()
-   test_fmpz_mpoly_constructors()
-   test_fmpz_mpoly_manipulation()
-   test_fmpz_mpoly_multivariate_coeff()
-   test_fmpz_mpoly_unary_ops()
-   test_fmpz_mpoly_binary_ops()
-   test_fmpz_mpoly_adhoc_binary()
-   test_fmpz_mpoly_adhoc_comparison()
-   test_fmpz_mpoly_powering()
-   test_fmpz_mpoly_divides()
-   test_fmpz_mpoly_euclidean_division()
-   test_fmpz_mpoly_ideal_reduction()
-   test_fmpz_mpoly_gcd()
-   test_fmpz_mpoly_evaluation()
-   test_fmpz_mpoly_valuation()
-   test_fmpz_mpoly_derivative()
-   test_fmpz_mpoly_combine_like_terms()
-   test_fmpz_mpoly_exponents()
-
-   println("")
 end

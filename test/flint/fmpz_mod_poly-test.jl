@@ -1,6 +1,4 @@
-function test_fmpz_mod_poly_constructors()
-   print("fmpz_mod_poly.constructors...")
- 
+@testset "fmpz_mod_poly.constructors..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
@@ -50,34 +48,26 @@ function test_fmpz_mod_poly_constructors()
    r = S([1, 2, 3])
 
    @test isa(r, PolyElem)
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_printing()
-   print("fmpz_mod_poly.printing...")
- 
+@testset "fmpz_mod_poly.printing..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
    f = x^3 + 2x^2 + x + 1
 
    @test string(f) == "x^3+2*x^2+x+1"
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_manipulation()
-   print("fmpz_mod_poly.manipulation...")
-
+@testset "fmpz_mod_poly.manipulation..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
    @test iszero(zero(S))
-   
+
    @test isone(one(S))
 
    @test isgen(gen(S))
-   
+
    @test isunit(one(S))
 
    f = x^2 + 2x + 1
@@ -111,13 +101,9 @@ function test_fmpz_mod_poly_manipulation()
    @test modulus(x) == 123456789012345678949
 
    @test modulus(R) == 123456789012345678949
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_binary_ops()
-   print("fmpz_mod_poly.binary_ops...")
-
+@testset "fmpz_mod_poly.binary_ops..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
@@ -129,13 +115,9 @@ function test_fmpz_mod_poly_binary_ops()
    @test f*g == x^5+2*x^4+4*x^3+8*x^2+7*x+2
 
    @test f - g == 123456789012345678948*x^3+x^2+123456789012345678948*x+123456789012345678948
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_adhoc_binary()
-   print("fmpz_mod_poly.adhoc_binary...")
-
+@testset "fmpz_mod_poly.adhoc_binary..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
@@ -177,13 +159,9 @@ function test_fmpz_mod_poly_adhoc_binary()
    @test R(7)*g == 7*x^3+21*x+14
 
    @test f*R(12) == 12*x^2+24*x+12
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_comparison()
-   print("fmpz_mod_poly.comparison...")
-
+@testset "fmpz_mod_poly.comparison..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
@@ -193,21 +171,17 @@ function test_fmpz_mod_poly_comparison()
    @test f != g
 
    @test isequal(f, deepcopy(f))
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_adhoc_comparison()
-   print("fmpz_mod_poly.adhoc_comparison...")
-
+@testset "fmpz_mod_poly.adhoc_comparison..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
 
-   @test f != 1 
+   @test f != 1
 
-   @test 1 != f 
+   @test 1 != f
 
    @test S(7) == fmpz(7)
 
@@ -216,26 +190,18 @@ function test_fmpz_mod_poly_adhoc_comparison()
    @test S(7) == R(7)
 
    @test R(7) != x + 1
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_unary_ops()
-   print("fmpz_mod_poly.unary_ops...")
-
+@testset "fmpz_mod_poly.unary_ops..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
 
    @test -f == 123456789012345678948*x^2+123456789012345678947*x+123456789012345678948
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_truncation()
-   print("fmpz_mod_poly.truncation...")
-
+@testset "fmpz_mod_poly.truncation..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
@@ -249,26 +215,18 @@ function test_fmpz_mod_poly_truncation()
    @test mullow(f, g, 3) == 7*x^2+5*x+1
 
    @test_throws DomainError mullow(f, g, -1)
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_reverse()
-   print("fmpz_mod_poly.reverse...")
-
+@testset "fmpz_mod_poly.reverse..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 3
 
    @test reverse(f) == 3x^2 + 2x + 1
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_shift()
-   print("fmpz_mod_poly.shift...")
-
+@testset "fmpz_mod_poly.shift..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
@@ -281,13 +239,9 @@ function test_fmpz_mod_poly_shift()
    @test shift_right(f, 1) == x + 2
 
    @test_throws DomainError shift_right(f, -1)
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_powering()
-   print("fmpz_mod_poly.powering...")
-
+@testset "fmpz_mod_poly.powering..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
@@ -296,13 +250,9 @@ function test_fmpz_mod_poly_powering()
    @test f^6 == x^12+12*x^11+66*x^10+220*x^9+495*x^8+792*x^7+924*x^6+792*x^5+495*x^4+220*x^3+66*x^2+12*x+1
 
    @test_throws DomainError f^-1
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_exact_division()
-   print("fmpz_mod_poly.exact_division...")
-
+@testset "fmpz_mod_poly.exact_division..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
@@ -310,30 +260,22 @@ function test_fmpz_mod_poly_exact_division()
    g = x^3 + 3x + 1
 
    @test divexact(f*g, f) == g
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_adhoc_exact_division()
-   print("fmpz_mod_poly.adhoc_exact_division...")
-
+@testset "fmpz_mod_poly.adhoc_exact_division..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
-   
+
    @test divexact(3*f, fmpz(3)) == f
 
    @test divexact(3*f, 3) == f
 
    @test divexact(R(7)*f, R(7)) == f
-   
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_modular_arithmetic()
-   print("fmpz_mod_poly.modular_arithmetic...")
-
+@testset "fmpz_mod_poly.modular_arithmetic..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
@@ -352,13 +294,9 @@ function test_fmpz_mod_poly_modular_arithmetic()
    @test powmod(f, -10, g) == 78305338116088931412*x+91239060941924718463
 
    @test powmod(f, -fmpz(10), g) == 78305338116088931412*x+91239060941924718463
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_euclidean_division()
-   print("fmpz_mod_poly.euclidean_division...")
-
+@testset "fmpz_mod_poly.euclidean_division..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
@@ -368,13 +306,9 @@ function test_fmpz_mod_poly_euclidean_division()
    @test mod(g, f) == 6*x+3
 
    @test divrem(g, f) == (x+123456789012345678947, 6*x+3)
- 
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_gcd()
-   print("fmpz_mod_poly.gcd...")
-
+@testset "fmpz_mod_poly.gcd..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
@@ -383,14 +317,11 @@ function test_fmpz_mod_poly_gcd()
    h = x^2 + 1
 
    @test gcd(f*h, g*h) == x^2+1
- 
+
    @test gcdx(f*h, g*h) == (x^2+1, 41152263004115226317*x^2+41152263004115226316*x+2,82304526008230452632*x+123456789012345678948)
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_gcdinv()
-   print("fmpz_mod_poly.gcdinv...")
-
+@testset "fmpz_mod_poly.gcdinv..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
@@ -398,20 +329,16 @@ function test_fmpz_mod_poly_gcdinv()
    g = x^3 + 3x + 1
 
    @test gcdinv(f, g) == (1, 41152263004115226317*x^2+41152263004115226316*x+2)
- 
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_evaluation()
-   print("fmpz_mod_poly.evaluation...")
-
+@testset "fmpz_mod_poly.evaluation..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
 
    @test evaluate(f, 3) == 16
-   
+
    @test evaluate(f, fmpz(10)) == 121
 
    @test evaluate(f, R(10)) == 121
@@ -425,13 +352,9 @@ if VERSION >= v"0.5.0-dev+3171"
    @test f(R(10)) == 121
 
 end
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_composition()
-   print("fmpz_mod_poly.composition...")
-
+@testset "fmpz_mod_poly.composition..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
@@ -439,39 +362,27 @@ function test_fmpz_mod_poly_composition()
    g = x^3 + 3x + 1
 
    @test compose(f, g) == x^6+6*x^4+4*x^3+9*x^2+12*x+4
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_derivative()
-   print("fmpz_mod_poly.derivative...")
-
+@testset "fmpz_mod_poly.derivative..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
 
    @test derivative(f) == 2x + 2
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_integral()
-   print("fmpz_mod_poly.integral...")
-
+@testset "fmpz_mod_poly.integral..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
-   
-   @test integral(f) == 82304526008230452633*x^3+x^2+x
 
-   println("PASS")
+   @test integral(f) == 82304526008230452633*x^3+x^2+x
 end
 
-function test_fmpz_mod_poly_resultant()
-   print("fmpz_mod_poly.resultant...")
-
+@testset "fmpz_mod_poly.resultant..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
@@ -479,26 +390,18 @@ function test_fmpz_mod_poly_resultant()
    g = 2x^3 + 3x + 1
 
    @test resultant(f, g) == 212
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_discriminant()
-   print("fmpz_mod_poly.discriminant...")
-
+@testset "fmpz_mod_poly.discriminant..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
 
    @test discriminant(f) == 0
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_lift()
-   print("fmpz_mod_poly.lift...")
-
+@testset "fmpz_mod_poly.lift..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
@@ -507,39 +410,27 @@ function test_fmpz_mod_poly_lift()
    f = x^2 + 2x + 1
 
    @test lift(T, f) == y^2 + 2y + 1
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_isirreducible()
-   print("fmpz_mod_poly.isirreducible...")
-
+@testset "fmpz_mod_poly.isirreducible..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
 
    @test isirreducible(f) == false
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_issquarefree()
-   print("fmpz_mod_poly.issquarefree...")
-
+@testset "fmpz_mod_poly.issquarefree..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
 
    @test issquarefree(f) == false
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_factor()
-   print("fmpz_mod_poly.factor...")
-
+@testset "fmpz_mod_poly.factor..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
@@ -561,16 +452,12 @@ function test_fmpz_mod_poly_factor()
                 3 => x^6+123456789012345678948*x^5+3*x^4+123456789012345678948*x^3+123456789012345678948*x^2+3*x+1)
 
    R = factor_shape(f*g)
-   
+
    @test length(R) == 2
    @test R == Dict(3=>1, 1=>2)
-
-   println("PASS")
 end
 
-function test_fmpz_mod_poly_remove_valuation()
-   print("fmpz_mod_poly.remove_valuation...")
-
+@testset "fmpz_mod_poly.remove_valuation..." begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, y = PolynomialRing(R, "y")
 
@@ -591,42 +478,4 @@ function test_fmpz_mod_poly_remove_valuation()
    v, q = divides(f*g + 1, f)
 
    @test !v
-
-   println("PASS")
 end
-
-
-
-function test_fmpz_mod_poly()
-   test_fmpz_mod_poly_constructors()
-   test_fmpz_mod_poly_printing()
-   test_fmpz_mod_poly_manipulation()
-   test_fmpz_mod_poly_binary_ops()
-   test_fmpz_mod_poly_adhoc_binary()
-   test_fmpz_mod_poly_comparison()
-   test_fmpz_mod_poly_adhoc_comparison()
-   test_fmpz_mod_poly_unary_ops()
-   test_fmpz_mod_poly_truncation()
-   test_fmpz_mod_poly_reverse()
-   test_fmpz_mod_poly_shift()
-   test_fmpz_mod_poly_powering()
-   test_fmpz_mod_poly_exact_division()
-   test_fmpz_mod_poly_adhoc_exact_division()
-   test_fmpz_mod_poly_modular_arithmetic()
-   test_fmpz_mod_poly_euclidean_division()
-   test_fmpz_mod_poly_gcdinv()
-   test_fmpz_mod_poly_evaluation()
-   test_fmpz_mod_poly_composition()
-   test_fmpz_mod_poly_derivative()
-   test_fmpz_mod_poly_integral()
-   test_fmpz_mod_poly_resultant()
-   test_fmpz_mod_poly_discriminant()
-   test_fmpz_mod_poly_lift()
-   test_fmpz_mod_poly_isirreducible()
-   test_fmpz_mod_poly_issquarefree()
-   test_fmpz_mod_poly_factor()
-   test_fmpz_mod_poly_remove_valuation()
-
-   println("")
-end
-

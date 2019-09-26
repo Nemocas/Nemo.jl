@@ -39,9 +39,8 @@ function is_snf(A::Generic.Mat)
    end
    return true
 end
-function test_Matrix_binary_ops_delayed_reduction()
-   print("Matrix.binary_ops_delayed_reduction...")
 
+@testset "Matrix.binary_ops_delayed_reduction..." begin
    R, t = PolynomialRing(QQ, "t")
    K, a = NumberField(t^3 + 3t + 1, "a")
    S = MatrixSpace(K, 5, 5)
@@ -54,13 +53,9 @@ function test_Matrix_binary_ops_delayed_reduction()
       @test f*(g + h) == f*g + f*h
       @test f*(g - h) == f*g - f*h
    end
-
-   println("PASS")
 end
 
-function test_Matrix_lu_delayed_reduction()
-   print("Matrix.lu_delayed_reduction...")
-
+@testset "Matrix.lu_delayed_reduction..." begin
    R, t = PolynomialRing(QQ, "t")
    K, a = NumberField(t^3 + 3t + 1, "a")
    S = MatrixSpace(K, 5, 5)
@@ -74,13 +69,9 @@ function test_Matrix_lu_delayed_reduction()
       @test r == rk
       @test P*A == L*U
    end
-
-   println("PASS")
 end
 
-function test_Matrix_fflu_delayed_reduction()
-   print("Matrix.fflu_delayed_reduction...")
-
+@testset "Matrix.fflu_delayed_reduction..." begin
    R, t = PolynomialRing(QQ, "t")
    K, a = NumberField(t^3 + 3t + 1, "a")
    S = MatrixSpace(K, 5, 5)
@@ -102,13 +93,9 @@ function test_Matrix_fflu_delayed_reduction()
 
       @test r == rk && (r < 5 || P*A == L*D*U)
    end
-
-   println("PASS")
 end
 
-function test_Matrix_minpoly_delayed_reduction()
-   print("Matrix.minpoly_delayed_reduction...")
-
+@testset "Matrix.minpoly_delayed_reduction..." begin
    # Tests reduce_row!
 
    R, t = PolynomialRing(QQ, "t")
@@ -133,13 +120,9 @@ function test_Matrix_minpoly_delayed_reduction()
    p2 = minpoly(U, M)
 
    @test p1 == p2
-
-   println("PASS")
 end
 
-function test_Matrix_solve_fflu_delayed_reduction()
-   print("Matrix.solve_fflu_delayed_reduction...")
-
+@testset "Matrix.solve_fflu_delayed_reduction..." begin
    R, t = PolynomialRing(QQ, "t")
    K, a = NumberField(t^3 + 3t + 1, "a")
 
@@ -154,13 +137,9 @@ function test_Matrix_solve_fflu_delayed_reduction()
 
       @test divexact(M, d)*x == b
    end
-
-   println("PASS")
 end
 
-function test_Matrix_solve_lu_delayed_reduction()
-   print("Matrix.solve_lu_delayed_reduction...")
-
+@testset "Matrix.solve_lu_delayed_reduction..." begin
    R, t = PolynomialRing(QQ, "t")
    K, a = NumberField(t^3 + 3t + 1, "a")
 
@@ -175,13 +154,9 @@ function test_Matrix_solve_lu_delayed_reduction()
 
       @test M*x == b
    end
-
-   println("PASS")
 end
 
-function test_Matrix_solve_triu_delayed_reduction()
-   print("Matrix.solve_triu_delayed_reduction...")
-
+@testset "Matrix.solve_triu_delayed_reduction..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
@@ -196,13 +171,9 @@ function test_Matrix_solve_triu_delayed_reduction()
 
       @test M*x == b
    end
-
-   println("PASS")
 end
 
-function test_Matrix_charpoly_delayed_reduction()
-   print("Matrix.charpoly_delayed_reduction...")
-
+@testset "Matrix.charpoly_delayed_reduction..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
@@ -221,17 +192,13 @@ function test_Matrix_charpoly_delayed_reduction()
          @test p1 == p3
       end
    end
-
-   println("PASS")
 end
 
-function test_Matrix_hnf_delayed_reduction()
-   print("Matrix.hnf_delayed_reduction...")
-
+@testset "Matrix.hnf_delayed_reduction..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
    S = MatrixSpace(K, 6, 6)
-   
+
    for iter = 1:10
       A = rand(S, -10:10)
 
@@ -261,13 +228,9 @@ function test_Matrix_hnf_delayed_reduction()
       @test isunit(det(U))
       @test U*A == H
    end
-
-   println("PASS")
 end
 
-function test_Matrix_snf_delayed_reduction()
-   print("Matrix.snf_delayed_reduction...")
-
+@testset "Matrix.snf_delayed_reduction..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
    S = MatrixSpace(K, 6, 6)
@@ -282,8 +245,6 @@ function test_Matrix_snf_delayed_reduction()
       @test isunit(det(K))
       @test U*A*K == T
    end
-
-   println("PASS")
 end
 
 #=
@@ -295,19 +256,3 @@ end
 
    Note: backsolve! is also not tested as it appears to be unused.
 =#
-
-function test_Matrix()
-   test_Matrix_binary_ops_delayed_reduction()
-   test_Matrix_lu_delayed_reduction()
-   test_Matrix_fflu_delayed_reduction()
-   test_Matrix_minpoly_delayed_reduction()
-   test_Matrix_solve_fflu_delayed_reduction()
-   test_Matrix_solve_lu_delayed_reduction()
-   test_Matrix_solve_triu_delayed_reduction()
-   test_Matrix_charpoly_delayed_reduction()
-   test_Matrix_hnf_delayed_reduction()
-   test_Matrix_snf_delayed_reduction()
-
-   println("")
-end
-

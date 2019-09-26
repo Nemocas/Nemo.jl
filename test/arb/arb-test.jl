@@ -1,8 +1,6 @@
 RR = ArbField(64)
 
-function test_arb_constructors()
-   print("arb.constructors...")
-
+@testset "arb.constructors..." begin
    @test isa(RR, ArbField)
    @test isa(RR(2), FieldElem)
 
@@ -10,23 +8,15 @@ function test_arb_constructors()
    @test elem_type(ArbField) == arb
    @test parent_type(arb) == ArbField
    @test base_ring(RR) == Union{}
-
-   println("PASS")
 end
 
-function test_arb_printing()
-   print("arb.printing...")
-
+@testset "arb.printing..." begin
    a = RR(2)
 
    @test string(a) == "2.0000000000000000000"
-
-   println("PASS")
 end
 
-function test_arb_basic_ops()
-   print("arb.basic_ops...")
-
+@testset "arb.basic_ops..." begin
    @test one(RR) == 1
    @test zero(RR) == 0
 
@@ -49,13 +39,9 @@ function test_arb_basic_ops()
    @test Float64(RR(0.5)) == 0.5
    @test convert(Float64, RR(0.5)) == 0.5
    @test abs(Float64(RR("2.3")) - 2.3) < 1e-10
-
-   println("PASS")
 end
 
-function test_arb_comparison()
-   print("arb.comparison...")
-
+@testset "arb.comparison..." begin
    exact3 = RR(3)
    exact4 = RR(4)
    approx3 = RR("3 +/- 0.000001")
@@ -114,13 +100,9 @@ function test_arb_comparison()
    @test contains_positive(approx3 - 3)
    @test contains_nonpositive(approx3 - 3)
    @test contains_nonnegative(approx3 - 3)
-
-   println("PASS")
 end
 
-function test_arb_adhoc_comparison()
-   print("arb.adhoc_comparison...")
-
+@testset "arb.adhoc_comparison..." begin
    a = RR(3)
 
    for T in [fmpz, fmpq, Int, BigInt, Float64, BigFloat, Rational{Int}, Rational{BigInt}]
@@ -139,13 +121,9 @@ function test_arb_adhoc_comparison()
       @test a < T(4)
       @test !(a < T(3))
    end
-
-   println("PASS")
 end
 
-function test_arb_predicates()
-   print("arb.predicates...")
-
+@testset "arb.predicates..." begin
    @test iszero(RR(0))
    @test !iszero(RR(1))
    @test !iszero(RR("0 +/- 0.01"))
@@ -178,35 +156,23 @@ function test_arb_predicates()
    @test isnonnegative(RR(0))
    @test !isnegative(RR(0))
    @test isnonpositive(RR(0))
-
-   println("PASS")
 end
 
-function test_arb_parts()
-   print("arb.parts...")
-
+@testset "arb.parts..." begin
    @test midpoint(RR(3)) == 3
    @test radius(RR(3)) == 0
    @test midpoint(RR("3 +/- 0.25")) == 3
    @test radius(RR("3 +/- 0.25")) >= 0.25
-
-   println("PASS")
 end
 
-function test_arb_unary_ops()
-   print("arb.unary_ops...")
-
+@testset "arb.unary_ops..." begin
    @test -RR(3) == RR(-3)
    @test abs(-RR(3)) == 3
    @test abs(RR(3)) == 3
    @test inv(RR(2)) == RR(0.5)
-
-   println("PASS")
 end
 
-function test_arb_binary_ops()
-   print("arb.binary_ops...")
-
+@testset "arb.binary_ops..." begin
    x = RR(2)
    y = RR(4)
 
@@ -240,13 +206,9 @@ function test_arb_binary_ops()
       @test contains(T(2) // y, fmpq(1, 2))
       @test contains(x ^ T(4), 16)
    end
-
-   println("PASS")
 end
 
-function test_arb_misc_ops()
-   print("arb.misc_ops...")
-
+@testset "arb.misc_ops..." begin
    @test ldexp(RR(3), 2) == 12
    @test ldexp(RR(3), ZZ(2)) == 12
    @test contains(trim(RR("1.1 +/- 0.001")), RR("1.1"))
@@ -271,13 +233,9 @@ function test_arb_misc_ops()
    b, i = unique_integer(RRR(2)^1000);
    b, i = unique_integer(RRR(2)^1000);
    b, i = unique_integer(RRR(2)^1000);
-
-   println("PASS")
 end
 
-function test_arb_unsafe_ops()
-   print("arb.unsafe_ops...")
-
+@testset "arb.unsafe_ops..." begin
    z = RR(1)
    x = RR(2)
    y = RR(3)
@@ -293,13 +251,9 @@ function test_arb_unsafe_ops()
 
    div!(z, y, x)
    @test z == 1.5
-
-   println("PASS")
 end
 
-function test_arb_constants()
-   print("arb.constants...")
-
+@testset "arb.constants..." begin
    @test overlaps(const_pi(RR), RR("3.141592653589793238462643 +/- 4.03e-25"))
    @test overlaps(const_e(RR), RR("2.718281828459045235360287 +/- 4.96e-25"))
    @test overlaps(const_log2(RR), RR("0.6931471805599453094172321 +/- 2.28e-26"))
@@ -308,13 +262,9 @@ function test_arb_constants()
    @test overlaps(const_catalan(RR), RR("0.9159655941772190150546035 +/- 1.86e-26"))
    @test overlaps(const_khinchin(RR), RR("2.685452001065306445309715 +/- 2.28e-25"))
    @test overlaps(const_glaisher(RR), RR("1.282427129100622636875343 +/- 4.78e-25"))
-
-   println("PASS")
 end
 
-function test_arb_functions()
-   print("arb.functions...")
-
+@testset "arb.functions..." begin
    @test floor(RR(2.5)) == 2
    @test ceil(RR(2.5)) == 3
    @test sqrt(RR(4)) == 2
@@ -467,13 +417,9 @@ function test_arb_functions()
    @test numpart(ZZ(-10), RR) == 0
    @test numpart(-10, RR) == 0
    @test overlaps(numpart(ZZ(10)^20, RR), RR("1.8381765083448826436e+11140086259 +/- 4.69e+11140086239"))
-
-   println("PASS")
 end
 
-function test_fmpq_arb_special_functions()
-   print("fmpq.arb_special_functions...")
-
+@testset "fmpq.arb_special_functions..." begin
    @test bernoulli(10) == fmpz(5)//66
 
    b = bernoulli(100)
@@ -485,40 +431,14 @@ function test_fmpq_arb_special_functions()
    flint_cleanup()
 
    @test denominator(bernoulli(100)) == 33330
-
-   println("PASS")
 end
 
-function test_arb_lindep()
-   print("arb.lindep...")
-
+@testset "arb.lindep..." begin
    CC = ComplexField(64)
-      
+
    tau = (1 + sqrt(CC(-23)))/2
    a = abs(modweber_f2(tau))^2
    C = lindep([RR(1), a, a^2, a^3, a^4, a^5], 20)
 
    @test C == fmpz[-1, 1, 1, 0, 1, 0]
-
-   println("PASS")
-end
-
-function test_arb()
-   test_arb_constructors()
-   test_arb_printing()
-   test_arb_basic_ops()
-   test_arb_comparison()
-   test_arb_adhoc_comparison()
-   test_arb_predicates()
-   test_arb_parts()
-   test_arb_unary_ops()
-   test_arb_binary_ops()
-   test_arb_misc_ops()
-   test_arb_unsafe_ops()
-   test_arb_constants()
-   test_arb_functions()
-   test_fmpq_arb_special_functions()
-   test_arb_lindep()
-
-   println("")
 end

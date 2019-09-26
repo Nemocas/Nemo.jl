@@ -1,6 +1,4 @@
-function test_fmpq_constructors()
-   print("fmpq.constructors...")
-
+@testset "fmpq.constructors..." begin
    R = FractionField(ZZ)
 
    @test elem_type(R) == fmpq
@@ -42,33 +40,21 @@ function test_fmpq_constructors()
    @test isa(fmpq(R(2)), fmpq)
 
    @test fmpq(3, -5) == -fmpq(3, 5)
-
-   println("PASS")
 end
 
-function test_fmpq_printing()
-   print("fmpq.printing...")
-
+@testset "fmpq.printing..." begin
    a = FlintQQ(1, 2)
 
    @test string(a) == "1//2"
-
-   println("PASS")
 end
 
-function test_fmpq_conversions()
-   print("fmpq.conversions...")
-
+@testset "fmpq.conversions..." begin
    @test Rational(fmpz(12)) == 12
 
    @test Rational(fmpq(3, 7)) == 3//7
-
-   println("PASS")
 end
 
-function test_fmpq_manipulation()
-   print("fmpq.manipulation...")
-
+@testset "fmpq.manipulation..." begin
    R = FractionField(ZZ)
 
    a = -fmpz(2)//3
@@ -93,23 +79,15 @@ function test_fmpq_manipulation()
    @test numerator(fmpq(2, 3)) == 2
 
    @test denominator(fmpq(2, 3)) == 3
-
-   println("PASS")
 end
 
-function test_fmpq_unary_ops()
-   print("fmpq.unary_ops...")
-
+@testset "fmpq.unary_ops..." begin
    a = fmpq(-2, 3)
 
    @test -a == fmpq(2, 3)
-
-   println("PASS")
 end
 
-function test_fmpq_binary_ops()
-   print("fmpq.binary_ops...")
-
+@testset "fmpq.binary_ops..." begin
    a = fmpq(-2, 3)
    b = fmpz(5)//7
 
@@ -118,13 +96,9 @@ function test_fmpq_binary_ops()
    @test a - b == fmpq(-29, 21)
 
    @test a*b == fmpq(-10, 21)
-
-   println("PASS")
 end
 
-function test_fmpq_adhoc_binary()
-   print("fmpq.adhoc_binary...")
-
+@testset "fmpq.adhoc_binary..." begin
    a = fmpq(-2, 3)
 
    @test a + 3 == fmpq(7, 3)
@@ -178,13 +152,9 @@ function test_fmpq_adhoc_binary()
    @test fmpq(1, 2) // (BigInt(1)//BigInt(2)) == 1
 
    @test fmpq(1, 2) // (1//2) == 1
-
-   println("PASS")
 end
 
-function test_fmpq_comparison()
-   print("fmpq.comparison...")
-
+@testset "fmpq.comparison..." begin
    a = fmpq(-2, 3)
    b = fmpz(1)//2
 
@@ -199,13 +169,9 @@ function test_fmpq_comparison()
    @test a == fmpz(-4)//6
 
    @test a != b
-
-   println("PASS")
 end
 
-function test_fmpq_adhoc_comparison()
-   print("fmpq.adhoc_comparison...")
-
+@testset "fmpq.adhoc_comparison..." begin
    a = -fmpz(2)//3
 
    @test a < 1
@@ -261,59 +227,39 @@ function test_fmpq_adhoc_comparison()
    @test fmpq(1, 2) == BigInt(1)//BigInt(2)
 
    @test BigInt(1)//BigInt(2) == fmpq(1, 2)
-
-   println("PASS")
 end
 
-function test_fmpq_shifting()
-   print("fmpq.shifting...")
-
+@testset "fmpq.shifting..." begin
    a = -fmpz(2)//3
    b = fmpq(1, 2)
 
    @test a << 3 == -fmpz(16)//3
 
    @test b >> 5 == fmpz(1)//64
-
-   println("PASS")
 end
 
-function test_fmpq_powering()
-   print("fmpq.powering...")
-
+@testset "fmpq.powering..." begin
    a = -fmpz(2)//3
 
    @test a^(-12) == fmpz(531441)//4096
-
-   println("PASS")
 end
 
-function test_fmpq_inversion()
-   print("fmpq.inversion...")
-
+@testset "fmpq.inversion..." begin
    a = -fmpz(2)//3
 
    @test inv(a) == fmpz(-3)//2
 
    @test_throws ErrorException inv(fmpq(0))
-
-   println("PASS")
 end
 
-function test_fmpq_exact_division()
-   print("fmpq.exact_division...")
-
+@testset "fmpq.exact_division..." begin
    a = -fmpz(2)//3
    b = fmpz(1)//2
 
    @test divexact(a, b) == fmpz(-4)//3
-
-   println("PASS")
 end
 
-function test_fmpq_adhoc_exact_division()
-   print("fmpq.adhoc_exact_division...")
-
+@testset "fmpq.adhoc_exact_division..." begin
    a = -fmpz(2)//3
 
    @test divexact(a, 3) == fmpz(-2)//9
@@ -331,49 +277,33 @@ function test_fmpq_adhoc_exact_division()
    @test divexact(2//1, a) == -fmpz(6)//2
 
    @test divexact(BigInt(2)//BigInt(1), a) == -fmpz(6)//2
-
-   println("PASS")
 end
 
-function test_fmpq_modular_arithmetic()
-   print("fmpq.modular_arithmetic...")
-
+@testset "fmpq.modular_arithmetic..." begin
    a = -fmpz(2)//3
    b = fmpz(1)//2
 
    @test mod(a, 7) == 4
 
    @test mod(b, fmpz(5)) == 3
-
-   println("PASS")
 end
 
-function test_fmpq_gcd()
-   print("fmpq.gcd...")
-
+@testset "fmpq.gcd..." begin
    a = -fmpz(2)//3
    b = fmpz(1)//2
 
    @test gcd(a, b) == fmpz(1)//6
-
-   println("PASS")
 end
 
-function test_fmpq_square_root()
-   print("fmpq.square_root...")
-
+@testset "fmpq.square_root..." begin
    a = fmpz(4)//9
    b = fmpz(0)//1
 
    @test sqrt(a) == fmpz(2)//3
    @test sqrt(b) == 0
-
-   println("PASS")
 end
 
-function test_fmpq_rational_reconstruction()
-   print("fmpq.rational_reconstruction...")
-
+@testset "fmpq.rational_reconstruction..." begin
    @test reconstruct(7, 13) == fmpz(1)//2
 
    @test reconstruct(fmpz(15), 31) == -fmpz(1)//2
@@ -381,13 +311,9 @@ function test_fmpq_rational_reconstruction()
    @test reconstruct(fmpz(123), fmpz(237)) == fmpz(9)//2
 
    @test reconstruct(123, fmpz(237)) == fmpz(9)//2
-
-   println("PASS")
 end
 
-function test_fmpq_rational_enumeration()
-   print("fmpq.rational_enumeration...")
-
+@testset "fmpq.rational_enumeration..." begin
    @test next_minimal(fmpz(2)//3) == fmpz(3)//2
 
    @test_throws DomainError next_minimal(fmpz(-1)//1)
@@ -399,13 +325,9 @@ function test_fmpq_rational_enumeration()
    @test_throws DomainError next_calkin_wilf(fmpz(-1)//1)
 
    @test next_signed_calkin_wilf(-fmpz(51)//17) == fmpz(1)//4
-
-   println("PASS")
 end
 
-function test_fmpq_special_functions()
-   print("fmpq.special_functions...")
-
+@testset "fmpq.special_functions..." begin
    @test harmonic(12) == fmpz(86021)//27720
 
    @test_throws DomainError harmonic(-1)
@@ -417,43 +339,11 @@ function test_fmpq_special_functions()
    @test dedekind_sum(-120, fmpz(1305)) == -fmpz(575)//522
 
    @test dedekind_sum(fmpz(-120), 1305) == -fmpz(575)//522
-
-   println("PASS")
 end
 
-function test_fmpq_adhoc_remove_valuation()
-   print("fmpq.adhoc_remove_valuation...")
-
+@testset "fmpq.adhoc_remove_valuation..." begin
    a = fmpq(2, 3)
 
    @test remove(a, 3) == (-1, fmpq(2, 1))
    @test valuation(a, 3) == -1
-
-   println("PASS")
-end
-
-function test_fmpq()
-   test_fmpq_constructors()
-   test_fmpq_printing()
-   test_fmpq_conversions()
-   test_fmpq_manipulation()
-   test_fmpq_unary_ops()
-   test_fmpq_binary_ops()
-   test_fmpq_adhoc_binary()
-   test_fmpq_comparison()
-   test_fmpq_adhoc_comparison()
-   test_fmpq_shifting()
-   test_fmpq_powering()
-   test_fmpq_inversion()
-   test_fmpq_exact_division()
-   test_fmpq_adhoc_exact_division()
-   test_fmpq_modular_arithmetic()
-   test_fmpq_gcd()
-   test_fmpq_square_root()
-   test_fmpq_rational_reconstruction()
-   test_fmpq_rational_enumeration()
-   test_fmpq_special_functions()
-   test_fmpq_adhoc_remove_valuation()
-
-   println("")
 end

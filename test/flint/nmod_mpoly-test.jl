@@ -1,6 +1,4 @@
-function test_nmod_mpoly_constructors()
-   print("nmod_mpoly.constructors...")
-
+@testset "nmod_mpoly.constructors..." begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -57,13 +55,9 @@ function test_nmod_mpoly_constructors()
         @test !isgen(f + 1)
       end
    end
-
-   println("PASS")
 end
 
-function test_nmod_mpoly_manipulation()
-   print("nmod_mpoly.manipulation...")
-
+@testset "nmod_mpoly.manipulation..." begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -142,7 +136,7 @@ function test_nmod_mpoly_manipulation()
 
       @test isterm(h)
       @test !isterm(h2 + 1 + gen(S, 1))
-      
+
       @test isunit(S(1))
       @test !isunit(gen(S, 1))
 
@@ -176,13 +170,9 @@ function test_nmod_mpoly_manipulation()
       @test (total_degree_fmpz(h) == max(sum.(monomialexp)...)) || (h == 0 && total_degree(h) == -1)
       @test total_degree_fits_int(h)
    end
-
-   println("PASS")
 end
 
-function test_nmod_mpoly_multivariate_coeff()
-   print("nmod_mpoly.multivariate_coeff...")
-
+@testset "nmod_mpoly.multivariate_coeff..." begin
    R = ResidueRing(FlintZZ, 23)
 
    for ord in Nemo.flint_orderings
@@ -198,13 +188,9 @@ function test_nmod_mpoly_multivariate_coeff()
       @test coeff(f, [y, z], [3, 2]) == 13*x^4
       @test coeff(f, [x, z], [4, 5]) == 0
    end
-
-   println("PASS")
 end
 
-function test_nmod_mpoly_unary_ops()
-   print("nmod_mpoly.unary_ops...")
-
+@testset "nmod_mpoly.unary_ops..." begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -219,13 +205,9 @@ function test_nmod_mpoly_unary_ops()
          @test f == -(-f)
       end
    end
-
-   println("PASS")
 end
 
-function test_nmod_mpoly_binary_ops()
-   print("nmod_mpoly.binary_ops...")
-
+@testset "nmod_mpoly.binary_ops..." begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -246,13 +228,9 @@ function test_nmod_mpoly_binary_ops()
          @test f*g - f*h == f*(g - h)
       end
    end
-
-   println("PASS")
 end
 
-function test_nmod_mpoly_adhoc_binary()
-   print("nmod_mpoly.adhoc_binary...")
-
+@testset "nmod_mpoly.adhoc_binary..." begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -286,13 +264,9 @@ function test_nmod_mpoly_adhoc_binary()
          @test f + g1 - g1 == f
       end
    end
-
-   println("PASS")
 end
 
-function test_nmod_mpoly_adhoc_comparison()
-   print("nmod_mpoly.adhoc_comparison...")
-
+@testset "nmod_mpoly.adhoc_comparison..." begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -312,13 +286,9 @@ function test_nmod_mpoly_adhoc_comparison()
          @test BigInt(d) == S(d)
       end
    end
-
-   println("PASS")
 end
 
-function test_nmod_mpoly_powering()
-   print("nmod_mpoly.powering...")
-
+@testset "nmod_mpoly.powering..." begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -343,13 +313,9 @@ function test_nmod_mpoly_powering()
          @test_throws DomainError f^fmpz(-1)
       end
    end
-
-   println("PASS")
 end
 
-function test_nmod_mpoly_divides()
-   print("nmod_mpoly.divides...")
-
+@testset "nmod_mpoly.divides..." begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -366,7 +332,7 @@ function test_nmod_mpoly_divides()
 
          flag, q = divides(p, f)
 
-         if flag 
+         if flag
            @test q * f == p
          end
 
@@ -376,13 +342,9 @@ function test_nmod_mpoly_divides()
          end
       end
    end
-
-   println("PASS")
 end
 
-function test_nmod_mpoly_euclidean_division()
-   print("nmod_mpoly.euclidean_division...")
-
+@testset "nmod_mpoly.euclidean_division..." begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -416,13 +378,9 @@ function test_nmod_mpoly_euclidean_division()
          @test (r3 == 0 && flag == true && q5 == q3) || (r3 != 0 && flag == false)
       end
    end
-
-   println("PASS")
 end
 
-function test_nmod_mpoly_ideal_reduction()
-   print("nmod_mpoly.ideal_reduction...")
-
+@testset "nmod_mpoly.ideal_reduction..." begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -469,13 +427,9 @@ function test_nmod_mpoly_ideal_reduction()
          @test p == g
       end
    end
-
-   println("PASS")
 end
 
-function test_nmod_mpoly_gcd()
-   print("nmod_mpoly.gcd...")
-
+@testset "nmod_mpoly.gcd..." begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:4
@@ -499,13 +453,9 @@ function test_nmod_mpoly_gcd()
          end
       end
    end
-
-   println("PASS")
 end
 
-function test_nmod_mpoly_evaluation()
-   print("nmod_mpoly.evaluation...")
-
+@testset "nmod_mpoly.evaluation..." begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -558,13 +508,9 @@ function test_nmod_mpoly_evaluation()
    M2 = T([1 1; 2 4])
 
    @test f(M1, M2) == T([9 12; 18 20])
-
-   println("PASS")
 end
 
-function test_nmod_mpoly_valuation()
-   print("nmod_mpoly.valuation...")
-
+@testset "nmod_mpoly.valuation..." begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -600,13 +546,9 @@ function test_nmod_mpoly_valuation()
          @test q4 == q3
       end
    end
-
-   println("PASS")
 end
 
-function test_nmod_mpoly_derivative()
-   print("nmod_mpoly.derivative...")
-   
+@testset "nmod_mpoly.derivative..." begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -624,13 +566,9 @@ function test_nmod_mpoly_derivative()
          end
       end
    end
-
-   println("PASS")
 end
 
-function test_nmod_mpoly_combine_like_terms()
-  print("nmod_mpoly.combine_like_terms...")
-
+@testset "nmod_mpoly.combine_like_terms..." begin
   R23 = ResidueRing(FlintZZ, 23)
 
   for num_vars = 1:10
@@ -664,13 +602,9 @@ function test_nmod_mpoly_combine_like_terms()
         @test length(f) == lenf - 1 - terms_cancel
      end
   end
-
-  println("PASS")
 end
 
-function test_nmod_mpoly_exponents()
-  print("nmod_mpoly.exponents...")
-
+@testset "nmod_mpoly.exponents..." begin
   R23 = ResidueRing(FlintZZ, 23)
 
   for num_vars = 1:10
@@ -718,29 +652,4 @@ function test_nmod_mpoly_exponents()
         end
      end
   end
-
-  println("PASS")
-end
-
-
-function test_nmod_mpoly()
-   test_nmod_mpoly_constructors()
-   test_nmod_mpoly_manipulation()
-   test_nmod_mpoly_multivariate_coeff()
-   test_nmod_mpoly_unary_ops()
-   test_nmod_mpoly_binary_ops()
-   test_nmod_mpoly_adhoc_binary()
-   test_nmod_mpoly_adhoc_comparison()
-   test_nmod_mpoly_powering()
-   test_nmod_mpoly_divides()
-   test_nmod_mpoly_euclidean_division()
-   test_nmod_mpoly_ideal_reduction()
-   test_nmod_mpoly_gcd()
-   test_nmod_mpoly_evaluation()
-   test_nmod_mpoly_valuation()
-   test_nmod_mpoly_derivative()
-   test_nmod_mpoly_combine_like_terms()
-   test_nmod_mpoly_exponents()
-
-   println("")
 end

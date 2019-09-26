@@ -1,6 +1,4 @@
-function test_Poly_binary_ops_delayed_reduction()
-   print("Poly.binary_ops_delayed_reduction...")
-
+@testset "Poly.binary_ops_delayed_reduction..." begin
    S, t = PolynomialRing(QQ, "t")
    K, a = NumberField(t^3 + 3t + 1, "a")
    R, x = PolynomialRing(K, "x")
@@ -14,13 +12,9 @@ function test_Poly_binary_ops_delayed_reduction()
       @test f*(g + h) == f*g + f*h
       @test (f + g)*(f - g) == f*f - g*g
    end
-
-   println("PASS")
 end
 
-function test_Poly_truncation_delayed_reduction()
-   print("Poly.truncation_delayed_reduction...")
-
+@testset "Poly.truncation_delayed_reduction..." begin
    S, t = PolynomialRing(QQ, "t")
    K, a = NumberField(t^3 + 3t + 1, "a")
    R, x = PolynomialRing(K, "x")
@@ -32,14 +26,4 @@ function test_Poly_truncation_delayed_reduction()
 
       @test truncate(f*g, n) == mullow(f, g, n)
    end
-
-   println("PASS")
 end
-
-function test_Poly()
-   test_Poly_binary_ops_delayed_reduction()
-   test_Poly_truncation_delayed_reduction()
-
-   println("")
-end
-

@@ -1,6 +1,4 @@
-function test_fmpz_puiseux_series_constructors()
-   print("fmpz_puiseux_series.constructors...")
-
+@testset "fmpz_puiseux_series.constructors..." begin
    R, x = PuiseuxSeriesRing(ZZ, 30, "x")
 
    @test elem_type(R) == FlintPuiseuxSeriesRingElem{fmpz_laurent_series}
@@ -24,13 +22,9 @@ function test_fmpz_puiseux_series_constructors()
    @test isa(g1, FlintPuiseuxSeriesElem)
    @test isa(h1, FlintPuiseuxSeriesElem)
    @test isa(k1, FlintPuiseuxSeriesElem)
-
-   println("PASS")
 end
 
-function test_fmpz_puiseux_series_manipulation()
-   print("fmpz_puiseux_series.manipulation...")
-
+@testset "fmpz_puiseux_series.manipulation..." begin
    S, x = PuiseuxSeriesRing(ZZ, 30, "x")
 
    @test max_precision(S) == 30
@@ -59,13 +53,9 @@ function test_fmpz_puiseux_series_manipulation()
 
    @test isequal(deepcopy(a), a)
    @test isequal(deepcopy(b), b)
-
-   println("PASS")
 end
 
-function test_fmpz_puiseux_series_unary_ops()
-   print("fmpz_puiseux_series.unary_ops...")
-
+@testset "fmpz_puiseux_series.unary_ops..." begin
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6, -10:10)
@@ -73,13 +63,9 @@ function test_fmpz_puiseux_series_unary_ops()
       @test isequal(-(-f), f)
       @test iszero(f + (-f))
    end
-
-   println("PASS")
 end
 
-function test_fmpz_puiseux_series_binary_ops()
-   print("fmpz_puiseux_series.binary_ops...")
-
+@testset "fmpz_puiseux_series.binary_ops..." begin
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:100
       f = rand(R, -12:12, 1:6, -10:10)
@@ -94,13 +80,9 @@ function test_fmpz_puiseux_series_binary_ops()
       @test f*(g + h) == f*g + f*h
       @test f*(g - h) == f*g - f*h
    end
-
-   println("PASS")
 end
 
-function test_fmpz_puiseux_series_adhoc_binary_ops()
-   print("fmpz_puiseux_series.adhoc_binary_ops...")
-
+@testset "fmpz_puiseux_series.adhoc_binary_ops..." begin
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:500
       f = rand(R, -12:12, 1:6, -10:10)
@@ -119,13 +101,9 @@ function test_fmpz_puiseux_series_adhoc_binary_ops()
       @test isequal(f*d1 - f*d2, f*(d1 - d2))
       @test isequal(f*d1 + f*d2, f*(d1 + d2))
    end
-
-   println("PASS")
 end
 
-function test_fmpz_puiseux_series_comparison()
-   print("fmpz_puiseux_series.comparison...")
-
+@testset "fmpz_puiseux_series.comparison..." begin
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:500
       f = rand(R, -12:12, 1:6, -10:10)
@@ -140,13 +118,9 @@ function test_fmpz_puiseux_series_comparison()
       @test (precision(h) > min(precision(f), precision(g)) || f != g + h)
       @test (precision(h) > min(precision(f), precision(g)) || !isequal(f, g + h))
    end
-
-   println("PASS")
 end
 
-function test_fmpz_puiseux_series_adhoc_comparison()
-   print("fmpz_puiseux_series.adhoc_comparison...")
-
+@testset "fmpz_puiseux_series.adhoc_comparison..." begin
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:500
       f = R()
@@ -167,13 +141,9 @@ function test_fmpz_puiseux_series_adhoc_comparison()
       @test R(d1) != d1 + f
       @test d1 != R(d1) + f
    end
-
-   println("PASS")
 end
 
-function test_fmpz_puiseux_series_powering()
-   print("fmpz_puiseux_series.powering...")
-
+@testset "fmpz_puiseux_series.powering..." begin
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
 
    for iter = 1:100
@@ -188,13 +158,9 @@ function test_fmpz_puiseux_series_powering()
          r2 *= f
       end
    end
-
-   println("PASS")
 end
 
-function test_fmpz_puiseux_series_inversion()
-   print("fmpz_puiseux_series.inversion...")
-
+@testset "fmpz_puiseux_series.inversion..." begin
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       f = R()
@@ -204,27 +170,19 @@ function test_fmpz_puiseux_series_inversion()
 
       @test f*inv(f) == 1
    end
-
-   println("PASS")
 end
 
-function test_fmpz_puiseux_series_square_root()
-   print("fmpz_puiseux_series.square_root...")
- 
+@testset "fmpz_puiseux_series.square_root..." begin
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6, -10:10)
       g = f^2
- 
+
       @test isequal(sqrt(g)^2, g)
    end
- 
-   println("PASS")
 end
- 
-function test_fmpz_puiseux_series_exact_division()
-   print("fmpz_puiseux_series.exact_division...")
 
+@testset "fmpz_puiseux_series.exact_division..." begin
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6, -10:10)
@@ -235,13 +193,9 @@ function test_fmpz_puiseux_series_exact_division()
 
       @test divexact(f, g)*g == f
    end
-
-   println("PASS")
 end
 
-function test_fmpz_puiseux_series_adhoc_exact_division()
-   print("fmpz_puiseux_series.adhoc_exact_division...")
-
+@testset "fmpz_puiseux_series.adhoc_exact_division..." begin
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6, -10:10)
@@ -252,36 +206,12 @@ function test_fmpz_puiseux_series_adhoc_exact_division()
 
       @test isequal(divexact(f*c, c), f)
    end
-
-   println("PASS")
 end
 
-function test_fmpz_puiseux_series_special_functions()
-   print("fmpz_puiseux_series.special_functions...")
-
+@testset "fmpz_puiseux_series.special_functions..." begin
    S, x = PuiseuxSeriesRing(ZZ, 100, "x")
 
    @test isequal(exp(2x - x^2 + O(x^3)), 1+2*x+x^2+O(x^3))
 
    @test isequal(eta_qexp(x), x^(1//24)-x^(25//24)-x^(49//24)+O(x^(101//24)))
-
-   println("PASS")
-end
-
-function test_fmpz_puiseux_series()
-   test_fmpz_puiseux_series_constructors()
-   test_fmpz_puiseux_series_manipulation()
-   test_fmpz_puiseux_series_unary_ops()
-   test_fmpz_puiseux_series_binary_ops()
-   test_fmpz_puiseux_series_adhoc_binary_ops()
-   test_fmpz_puiseux_series_comparison()
-   test_fmpz_puiseux_series_adhoc_comparison()
-   test_fmpz_puiseux_series_powering()
-   test_fmpz_puiseux_series_exact_division()
-   test_fmpz_puiseux_series_adhoc_exact_division()
-   test_fmpz_puiseux_series_inversion()
-   test_fmpz_puiseux_series_square_root()
-   test_fmpz_puiseux_series_special_functions()
-
-   println("")
 end

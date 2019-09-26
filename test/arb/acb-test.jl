@@ -1,34 +1,24 @@
 RR = ArbField(64)
 CC = AcbField(64)
 
-function test_acb_constructors()
-   print("acb.constructors...")
-
+@testset "acb.constructors..." begin
    @test isa(CC, AcbField)
    @test isa(CC(2), FieldElem)
 
    @test elem_type(CC) == acb
-   @test base_ring(CC) == Union{} 
+   @test base_ring(CC) == Union{}
 
    @test elem_type(AcbField) == acb
    @test parent_type(acb) == AcbField
-
-   println("PASS")
 end
 
-function test_acb_printing()
-   print("acb.printing...")
-
+@testset "acb.printing..." begin
    a = CC(1) + onei(CC)
 
    @test string(a) == "1.0000000000000000000 + i*1.0000000000000000000"
-
-   println("PASS")
 end
 
-function test_acb_basic_ops()
-   print("acb.basic_ops...")
-
+@testset "acb.basic_ops..." begin
    @test one(CC) == 1
    @test zero(CC) == 0
 
@@ -58,13 +48,9 @@ function test_acb_basic_ops()
    @test CC(BigFloat(2), BigFloat(3)) == b
    @test real(b) == 2
    @test imag(b) == 3
-
-   println("PASS")
 end
 
-function test_acb_comparison()
-   print("acb.comparison...")
-
+@testset "acb.comparison..." begin
    exact3 = CC(3)
    exact4 = CC(4)
    approx3 = CC("3 +/- 0.000001")
@@ -95,14 +81,10 @@ function test_acb_comparison()
    @test !contains_zero(approx3)
    @test !contains_zero(-approx3)
    @test contains_zero(approx3 - 3)
-
-   println("PASS")
 end
 
 
-function test_acb_predicates()
-   print("acb.predicates...")
-
+@testset "acb.predicates..." begin
    @test iszero(CC(0))
    @test !iszero(CC(1))
    @test !iszero(CC("0 +/- 0.01"))
@@ -125,24 +107,16 @@ function test_acb_predicates()
 
    @test isint(CC(3))
    @test !isint(CC("3 +/- 0.01"))
-
-   println("PASS")
 end
 
-function test_acb_unary_ops()
-   print("acb.unary_ops...")
-
+@testset "acb.unary_ops..." begin
    @test -CC(3) == CC(-3)
    @test abs(-CC(3)) == 3
    @test abs(CC(3)) == 3
    @test inv(CC(2)) == CC(QQ(1,2))
-
-   println("PASS")
 end
 
-function test_acb_binary_ops()
-   print("acb.binary_ops...")
-
+@testset "acb.binary_ops..." begin
    x = CC(2)
    y = CC(4)
 
@@ -175,13 +149,9 @@ function test_acb_binary_ops()
       @test contains(T(2) // y, fmpq(1, 2))
       @test contains(x ^ T(4), 16)
    end
-
-   println("PASS")
 end
 
-function test_acb_misc_ops()
-   print("acb.misc_ops...")
-
+@testset "acb.misc_ops..." begin
    @test ldexp(CC(3), 2) == 12
    @test ldexp(CC(3), ZZ(2)) == 12
    @test contains(trim(CC("1.1 +/- 0.001")), CC("1.1"))
@@ -199,13 +169,9 @@ function test_acb_misc_ops()
 
    uniq, n = unique_integer(CC("3", "0.1"))
    @test !uniq
-
-   println("PASS")
 end
 
-function test_acb_unsafe_ops()
-   print("acb.unsafe_ops...")
-
+@testset "acb.unsafe_ops..." begin
    z = CC(1)
    x = CC(2)
    y = CC(3)
@@ -221,21 +187,13 @@ function test_acb_unsafe_ops()
 
    div!(z, y, x)
    @test z == 1.5
-
-   println("PASS")
 end
 
-function test_acb_constants()
-   print("acb.constants...")
-
+@testset "acb.constants..." begin
    @test overlaps(const_pi(CC), CC("3.141592653589793238462643 +/- 4.03e-25"))
-
-   println("PASS")
 end
 
-function test_acb_functions()
-   print("acb.functions...")
-
+@testset "acb.functions..." begin
    z = CC("0.2", "0.3")
    a = CC("0.3", "0.4")
    b = CC("0.4", "0.5")
@@ -421,13 +379,9 @@ function test_acb_functions()
    t = CC(rand(), abs(rand()) + eps())
    prod_sqr = (modweber_f(t)*modweber_f1(t)*modweber_f2(t))^2
    @test overlaps(prod_sqr, CC(2))
-
-   println("PASS")
 end
 
-function test_acb_lindep()
-   print("acb.lindep...")
-
+@testset "acb.lindep..." begin
    CC = ComplexField(512)
    tau1 = CC(rand(), abs(rand()) + eps())
    tau2 = CC(rand(), abs(rand()) + eps())
@@ -456,13 +410,9 @@ function test_acb_lindep()
    @test Phi == x^2*y+16*x-y^2
 
    CC = ComplexField(64)
-
-   println("PASS")
 end
 
-function test_acb_integration()
-   print("acb.integration...")
-
+@testset "acb.integration..." begin
    res = Nemo.integrate(CC, x->x,  -1, 1)
    @test contains(res, CC(0))
    @test imag(res) == CC(0)
@@ -477,24 +427,4 @@ function test_acb_integration()
    @test overlaps(res, CC(2))
    @test imag(res) == CC(0)
    @test radius(real(res)) < 4e-18
-
-   println("PASS")
-end
-
-function test_acb()
-   test_acb_constructors()
-   test_acb_printing()
-   test_acb_basic_ops()
-   test_acb_comparison()
-   test_acb_predicates()
-   test_acb_unary_ops()
-   test_acb_binary_ops()
-   test_acb_misc_ops()
-   test_acb_unsafe_ops()
-   test_acb_constants()
-   test_acb_functions()
-   test_acb_lindep()
-   test_acb_integration()
-
-   println("")
 end

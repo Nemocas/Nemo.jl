@@ -1,14 +1,12 @@
-function test_gfp_constructors()
-   print("gfp.constructors...")
-
+@testset "gfp.constructors..." begin
    R = GF(13)
-   
+
    @test_throws DomainError GF(-13)
 
    @test elem_type(R) == Nemo.gfp_elem
    @test elem_type(Nemo.GaloisField) == Nemo.gfp_elem
    @test parent_type(Nemo.gfp_elem) == Nemo.GaloisField
-   
+
    @test isa(R, Nemo.GaloisField)
 
    @test isa(R(), Nemo.gfp_elem)
@@ -30,7 +28,7 @@ function test_gfp_constructors()
 
          @test a.data < R.n
       end
-   end 
+   end
 
    for i = 1:1000
       p = rand(1:24)
@@ -42,7 +40,7 @@ function test_gfp_constructors()
 
          @test a.data < R.n
       end
-   end 
+   end
 
    S = GF(17)
    T = GF(17)
@@ -59,24 +57,16 @@ function test_gfp_constructors()
    S = GF(fmpz(19), cached = false)
    T = GF(fmpz(19), cached = false)
    @test !(S === T)
-
-   println("PASS")
 end
 
-function test_gfp_printing()
-   print("gfp.printing...")
-
+@testset "gfp.printing..." begin
    R = GF(13)
 
    @test string(R(3)) == "3"
    @test string(R()) == "0"
-
-   println("PASS")
 end
 
-function test_gfp_manipulation()
-   print("gfp.manipulation...")
-
+@testset "gfp.manipulation..." begin
    R = GF(13)
 
    @test iszero(zero(R))
@@ -91,18 +81,14 @@ function test_gfp_manipulation()
    R1 = GF(13)
 
    @test R === R1
-
-   println("PASS")
 end
 
-function test_gfp_unary_ops()
-   print("gfp.unary_ops...")
-
+@testset "gfp.unary_ops..." begin
    for i = 1:100
       p = rand(UInt(1):typemax(UInt))
       if Nemo.isprime(ZZ(p))
          R = GF(p)
-      
+
          for iter = 1:100
             a = rand(R)
 
@@ -123,13 +109,9 @@ function test_gfp_unary_ops()
          end
       end
    end
-
-   println("PASS")
 end
 
-function test_gfp_binary_ops()
-   print("gfp.binary_ops...")
-
+@testset "gfp.binary_ops..." begin
    for i = 1:100
       p = rand(1:24)
       if Nemo.isprime(ZZ(p))
@@ -173,13 +155,9 @@ function test_gfp_binary_ops()
          end
       end
    end
-
-   println("PASS")
 end
 
-function test_gfp_adhoc_binary()
-   print("gfp.adhoc_binary...")
-
+@testset "gfp.adhoc_binary..." begin
    for i = 1:100
       p = rand(1:24)
       if Nemo.isprime(ZZ(p))
@@ -229,13 +207,9 @@ function test_gfp_adhoc_binary()
          end
       end
    end
-
-   println("PASS")
 end
 
-function test_gfp_powering()
-   print("gfp.powering...")
-
+@testset "gfp.powering..." begin
   for i = 1:100
       p = rand(1:24)
       if Nemo.isprime(ZZ(p))
@@ -250,7 +224,7 @@ function test_gfp_powering()
                @test r == 0 || a == r^n
 
                a *= r
-            end   
+            end
          end
 
          for iter = 1:100
@@ -268,7 +242,7 @@ function test_gfp_powering()
 
                a *= rinv
             end
-         end   
+         end
       end
    end
 
@@ -286,7 +260,7 @@ function test_gfp_powering()
                @test r == 0 || a == r^n
 
                a *= r
-            end   
+            end
          end
 
          for iter = 1:100
@@ -303,17 +277,13 @@ function test_gfp_powering()
                @test r == 0 || a == r^(-n)
 
                a *= rinv
-            end   
+            end
          end
       end
    end
-
-   println("PASS")
 end
 
-function test_gfp_comparison()
-   print("gfp.comparison...")
-  
+@testset "gfp.comparison..." begin
   for i = 1:100
       p = rand(1:24)
       if Nemo.isprime(ZZ(p))
@@ -351,13 +321,9 @@ function test_gfp_comparison()
          end
       end
    end
-
-   println("PASS")
 end
 
-function test_gfp_adhoc_comparison()
-   print("gfp.adhoc_comparison...")
-  
+@testset "gfp.adhoc_comparison..." begin
   for i = 1:100
       p = rand(1:24)
       if Nemo.isprime(ZZ(p))
@@ -391,13 +357,9 @@ function test_gfp_adhoc_comparison()
          end
       end
    end
-
-   println("PASS")
 end
 
-function test_gfp_inversion()
-   print("gfp.inversion...")
-  
+@testset "gfp.inversion..." begin
   for i = 1:100
       p = rand(1:24)
       if Nemo.isprime(ZZ(p))
@@ -405,7 +367,7 @@ function test_gfp_inversion()
 
          for iter = 1:100
             a = rand(R)
-         
+
             @test !isunit(a) || inv(inv(a)) == a
 
             @test !isunit(a) || a*inv(a) == one(R)
@@ -420,20 +382,16 @@ function test_gfp_inversion()
 
          for iter = 1:100
             a = rand(R)
-         
+
             @test !isunit(a) || inv(inv(a)) == a
 
             @test !isunit(a) || a*inv(a) == one(R)
          end
       end
    end
-
-   println("PASS")
 end
 
-function test_gfp_exact_division()
-   print("gfp.exact_division...")
-  
+@testset "gfp.exact_division..." begin
   for i = 1:100
       p = rand(1:24)
       if Nemo.isprime(ZZ(p))
@@ -446,7 +404,7 @@ function test_gfp_exact_division()
             p = a1*a2
 
             q = divexact(p, a2)
-         
+
             @test q*a2 == p
          end
       end
@@ -470,22 +428,4 @@ function test_gfp_exact_division()
          end
       end
    end
-
-   println("PASS")
-end
-
-function test_gfp()
-   test_gfp_constructors()
-   test_gfp_printing()
-   test_gfp_manipulation()
-   test_gfp_unary_ops()
-   test_gfp_binary_ops()
-   test_gfp_adhoc_binary()
-   test_gfp_powering()
-   test_gfp_comparison()
-   test_gfp_adhoc_comparison()
-   test_gfp_inversion()
-   test_gfp_exact_division()
-   
-   println("")
 end
