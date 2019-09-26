@@ -37,7 +37,7 @@ end
 #
 ###############################################################################
 
-function similar(::NemoMatrix, R::FlintRationalField, r::Int, c::Int)
+function similar(::MatElem, R::FlintRationalField, r::Int, c::Int)
    z = fmpq_mat(r, c)
    z.base_ring = R
    return z

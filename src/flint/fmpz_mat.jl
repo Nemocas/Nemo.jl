@@ -43,7 +43,7 @@ end
 #
 ###############################################################################
 
-function similar(::NemoMatrix, R::FlintIntegerRing, r::Int, c::Int)
+function similar(::MatElem, R::FlintIntegerRing, r::Int, c::Int)
    z = fmpz_mat(r, c)
    z.base_ring = R
    return z

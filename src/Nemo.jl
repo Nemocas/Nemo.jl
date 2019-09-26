@@ -372,9 +372,6 @@ include("arb/ArbTypes.jl")
 
 include("flint/adhoc.jl")
 
-const NemoMatrix = Union{fmpz_mat, fmpq_mat, nmod_mat, gfp_mat,
-                         fq_nmod_mat, fq_mat, arb_mat, acb_mat}
-
 include("Rings.jl")
 
 ################################################################################

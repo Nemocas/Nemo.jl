@@ -24,7 +24,7 @@ dense_matrix_type(::Type{gfp_elem}) = gfp_mat
 #
 ###############################################################################
 
-function similar(::NemoMatrix, R::GaloisField, r::Int, c::Int)
+function similar(::MatElem, R::GaloisField, r::Int, c::Int)
    z = gfp_mat(r, c, R.n)
    z.base_ring = R
    return z

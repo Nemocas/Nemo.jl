@@ -37,7 +37,7 @@ end
 #
 ###############################################################################
 
-similar(::NemoMatrix, R::FqFiniteField, r::Int, c::Int) = fq_mat(r, c, R)
+similar(::MatElem, R::FqFiniteField, r::Int, c::Int) = fq_mat(r, c, R)
 
 ################################################################################
 #

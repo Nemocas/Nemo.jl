@@ -37,7 +37,7 @@ end
 #
 ###############################################################################
 
-function similar(::NemoMatrix, R::NmodRing, r::Int, c::Int)
+function similar(::MatElem, R::NmodRing, r::Int, c::Int)
    z = nmod_mat(r, c, R.n)
    z.base_ring = R
    return z

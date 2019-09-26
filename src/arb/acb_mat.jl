@@ -15,7 +15,7 @@ export zero, one, deepcopy, -, transpose, +, *, &, ==, !=,
 #
 ###############################################################################
 
-function similar(::NemoMatrix, R::AcbField, r::Int, c::Int)
+function similar(::MatElem, R::AcbField, r::Int, c::Int)
    z = acb_mat(r, c)
    z.base_ring = R
    return z
