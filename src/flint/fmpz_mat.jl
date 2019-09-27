@@ -39,7 +39,7 @@ end
 
 ###############################################################################
 #
-#   Similar
+#   similar & zero
 #
 ###############################################################################
 
@@ -48,6 +48,19 @@ function similar(::MatElem, R::FlintIntegerRing, r::Int, c::Int)
    z.base_ring = R
    return z
 end
+
+const MatrixRing = Union{FlintIntegerRing,
+                         FlintRationalField,
+                         NmodRing,
+                         GaloisField,
+                         FqNmodFiniteField,
+                         FqFiniteField,
+                         ArbField,
+                         AcbField,
+                         }
+
+# Nemo matrices are always initialized to zero
+zero(x::MatElem, R::MatrixRing, r::Int, c::Int) = similar(x, R, r, c)
 
 ###############################################################################
 #
