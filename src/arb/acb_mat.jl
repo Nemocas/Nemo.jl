@@ -562,7 +562,7 @@ end
 #
 ###############################################################################
 
-function lu!(P::Generic.perm, x::acb_mat)
+function lu!(P::Generic.Perm, x::acb_mat)
   P.d .-= 1
   r = ccall((:acb_mat_lu, :libarb), Cint,
               (Ptr{Int}, Ref{acb_mat}, Ref{acb_mat}, Int),
@@ -573,7 +573,7 @@ function lu!(P::Generic.perm, x::acb_mat)
   return nrows(x)
 end
 
-function lu(P::Generic.perm, x::acb_mat)
+function lu(P::Generic.Perm, x::acb_mat)
   ncols(x) != nrows(x) && error("Matrix must be square")
   parent(P).n != nrows(x) && error("Permutation does not match matrix")
   R = base_ring(x)
@@ -612,7 +612,7 @@ function solve(x::acb_mat, y::acb_mat)
   return z
 end
 
-function solve_lu_precomp!(z::acb_mat, P::Generic.perm, LU::acb_mat, y::acb_mat)
+function solve_lu_precomp!(z::acb_mat, P::Generic.Perm, LU::acb_mat, y::acb_mat)
   Q = inv(P)
   ccall((:acb_mat_solve_lu_precomp, :libarb), Nothing,
               (Ref{acb_mat}, Ptr{Int}, Ref{acb_mat}, Ref{acb_mat}, Int),
@@ -620,7 +620,7 @@ function solve_lu_precomp!(z::acb_mat, P::Generic.perm, LU::acb_mat, y::acb_mat)
   nothing
 end
 
-function solve_lu_precomp(P::Generic.perm, LU::acb_mat, y::acb_mat)
+function solve_lu_precomp(P::Generic.Perm, LU::acb_mat, y::acb_mat)
   ncols(LU) != nrows(y) && error("Matrix dimensions are wrong")
   z = similar(y)
   solve_lu_precomp!(z, P, LU, y)

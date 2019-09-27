@@ -351,7 +351,7 @@ end
 
 export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        FractionField, ResidueRing, Partition, PermGroup, YoungTableau,
-       AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
+       AllParts, SkewDiagram, AllPerms, Perm, LaurentSeriesRing,
        LaurentSeriesField, PuiseuxSeriesRing, ResidueField
 
 export Generic

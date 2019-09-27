@@ -471,7 +471,7 @@ end
 #
 ################################################################################
 
-function lu!(P::Generic.perm, x::T) where T <: Zmodn_mat
+function lu!(P::Generic.Perm, x::T) where T <: Zmodn_mat
   rank = Int(ccall((:nmod_mat_lu, :libflint), Cint, (Ptr{Int}, Ref{T}, Cint),
            P.d, x, 0))
 

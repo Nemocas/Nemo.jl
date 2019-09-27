@@ -431,7 +431,7 @@ end
 #
 ################################################################################
 
-function lu!(P::Generic.perm, x::fq_mat)
+function lu!(P::Generic.Perm, x::fq_mat)
    rank = Int(ccall((:fq_mat_lu, :libflint), Cint,
                 (Ptr{Int}, Ref{fq_mat}, Cint, Ref{FqFiniteField}),
                 P.d, x, 0, base_ring(x)))
