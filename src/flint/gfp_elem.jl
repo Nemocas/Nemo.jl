@@ -325,7 +325,7 @@ function rand(R::GaloisField)
    return gfp_elem(n, R)
 end
 
-function rand(R::GaloisField, b::UnitRange{Int64})
+function rand(R::GaloisField, b::UnitRange{Int})
    n = rand(b)
    return R(n)
 end

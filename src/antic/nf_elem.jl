@@ -80,7 +80,7 @@ function hash(a::nf_elem, h::UInt)
              b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
        end
    end
-      
+
    return b
 end
 
@@ -1067,7 +1067,7 @@ promote_rule(::Type{nf_elem}, ::Type{fmpq_poly}) = nf_elem
 @doc Markdown.doc"""
     (a::AnticNumberField)()
 
-> Return an empty (0) element.    
+> Return an empty (0) element.
 """
 function (a::AnticNumberField)()
    z = nf_elem(a)
@@ -1136,10 +1136,10 @@ end
 #
 ###############################################################################
 
-function rand(K::AnticNumberField, r::UnitRange{Int64})
+function rand(K::AnticNumberField, r::UnitRange{Int})
    R = parent(K.pol)
    n = degree(K.pol)
-   return K(rand(R, (n-1):(n-1), r)) 
+   return K(rand(R, (n-1):(n-1), r))
 end
 
 ###############################################################################
@@ -1208,4 +1208,3 @@ end
 function show_maxreal(io::IO, a::AnticNumberField)
   print(io, "Maximal real subfield of cyclotomic field of order $(get_special(a, :maxreal))")
 end
-

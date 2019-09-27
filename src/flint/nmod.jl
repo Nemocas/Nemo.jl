@@ -367,11 +367,11 @@ function rand(r::Random.AbstractRNG, R::NmodRing)
    return nmod(n, R)
 end
 
-function rand(r::Random.AbstractRNG, R::NmodRing, b::UnitRange{Int64})
+function rand(r::Random.AbstractRNG, R::NmodRing, b::UnitRange{Int})
    n = rand(r, b)
    return R(n)
 end
-rand(R::NmodRing, b::UnitRange{Int64}) = rand(Random.GLOBAL_RNG, R, b)
+rand(R::NmodRing, b::UnitRange{Int}) = rand(Random.GLOBAL_RNG, R, b)
 
 ###############################################################################
 #
