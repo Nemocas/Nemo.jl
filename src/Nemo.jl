@@ -38,11 +38,11 @@ import AbstractAlgebra: nullspace
 exclude = try
    AbstractAlgebra.import_exclude
 catch
-   [:import_exclude, :QQ, :ZZ, :RR, :RealField, :FiniteField, :NumberField,
-           :AbstractAlgebra,
-           :exp, :sqrt,
-           :promote_rule,
-           :Set, :Module, :Ring, :Group, :Field]
+   [:import_exclude, :FiniteField, :NumberField,
+    :AbstractAlgebra,
+    :exp, :sqrt,
+    :promote_rule,
+    :Set, :Module, :Ring, :Group, :Field]
 end
 
 for i in names(AbstractAlgebra)
@@ -221,6 +221,11 @@ end
 ################################################################################
 
 function __init__()
+   # Re-set some domains from AbstractAlgebra
+   @eval AbstractAlgebra ZZ = $FlintZZ
+   @eval AbstractAlgebra QQ = $FlintQQ
+   @eval AbstractAlgebra RealField = $ArbField
+
    # In case libgmp picks up the wrong libgmp later on, we "unset" the jl_*
    # functions from the julia :libgmp.
    if __isthreaded
@@ -391,23 +396,20 @@ const _ecm_nCs = Vector{Int}[_ecm_nC]
 
 ###############################################################################
 #
-#   Set domain for ZZ, QQ, PadicField, FiniteField to Flint
+#   Set domain for PadicField, FiniteField to Flint
 #
 ###############################################################################
 
-ZZ = FlintZZ
-QQ = FlintQQ
 PadicField = FlintPadicField
 QadicField = FlintQadicField
 FiniteField = FlintFiniteField
 
 ###############################################################################
 #
-#   Set domain for RR, CC to Arb
+#   Set domain for CC to Arb
 #
 ###############################################################################
 
-RealField = ArbField
 ComplexField = AcbField
 
 ###############################################################################
