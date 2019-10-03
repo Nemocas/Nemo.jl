@@ -35,18 +35,8 @@ import AbstractAlgebra: nullspace
 # is the only place user friendly versions are defined
 # AbstractAlgebra/Nemo has its own promote_rule, distinct from Base
 # Set, Module, Ring, Group and Field are too generic to pollute the users namespace with
-exclude = try
-   AbstractAlgebra.import_exclude
-catch
-   [:import_exclude, :QQ, :ZZ, :RR, :RealField, :FiniteField, :NumberField,
-           :AbstractAlgebra,
-           :exp, :sqrt,
-           :promote_rule,
-           :Set, :Module, :Ring, :Group, :Field]
-end
-
 for i in names(AbstractAlgebra)
-  i in exclude && continue
+  i in AbstractAlgebra.import_exclude && continue
   eval(Meta.parse("import AbstractAlgebra." * string(i)))
   eval(Expr(:export, i))
 end
