@@ -1,16 +1,5 @@
 ###############################################################################
 #
-#   Rings.jl : Generic rings
-#
-###############################################################################
-
-function exp(a::T) where {T <: RingElem}
-   a != 0 && error("Exponential of nonzero element")
-   return one(parent(a))
-end
-
-###############################################################################
-#
 #   Generic and specific rings and fields
 #
 ###############################################################################
@@ -104,4 +93,3 @@ include("arb/acb_mat.jl")
 include("Factor.jl")
 
 include("polysubst.jl")
-
