@@ -17,9 +17,9 @@ if !issource_build
     # This has to be in sync with the corresponding commit in the source build below (for flint, arb, antic)
     "https://github.com/JuliaPackaging/Yggdrasil/releases/download/GMP-v6.1.2-1/build_GMP.v6.1.2.jl",
     "https://github.com/JuliaPackaging/Yggdrasil/releases/download/MPFR-v4.0.2-1/build_MPFR.v4.0.2.jl",
-    "https://github.com/thofma/Flint2Builder/releases/download/16514/build_libflint.v0.0.0-165143e3e4cc54e00471ddab1a9573a8e28477ff.jl",
-    "https://github.com/thofma/ArbBuilder/releases/download/ef5ab3/build_libarb.v0.0.0-ef5ab30492a8810746dba91a3ad95afafe5171bd.jl",
-    "https://github.com/thofma/AnticBuilder/releases/download/a69c142-v2/build_libantic.v0.0.0-a69c142a972e4566e01f5b1d76415b0208405ecb.jl"
+    "https://github.com/thofma/Flint2Builder/releases/download/7e604c/build_libflint.v0.0.0-7e604c849b58c065f9d6aaa31bac6ed790fae241.jl",
+    "https://github.com/thofma/ArbBuilder/releases/download/6c3738/build_libarb.v0.0.0-6c3738555d00b8b8b24a1f5e0065ef787432513c.jl",
+    "https://github.com/thofma/AnticBuilder/releases/download/364f97/build_libantic.v0.0.0-364f97edd9b6af537787113cf910f16d7bbc48a3.jl"
    ]
 
   const prefix = Prefix(get([a for a in ARGS if a != "--verbose"], 1, joinpath(@__DIR__, "usr")))
@@ -64,9 +64,9 @@ else
   @show YASM_VERSION = "1.3.0"
   @show MPIR_VERSION = "3.0.0-90740d8fdf03b941b55723b449831c52fd7f51ca"
   @show MPFR_VERSION = "4.0.0"
-  @show ANTIC_VERSION = "a69c142a972e4566e01f5b1d76415b0208405ecb"
-  @show FLINT_VERSION = "165143e3e4cc54e00471ddab1a9573a8e28477ff"
-  @show ARB_VERSION = "ef5ab30492a8810746dba91a3ad95afafe5171bd"
+  @show FLINT_VERSION = "7e604c849b58c065f9d6aaa31bac6ed790fae241"
+  @show ARB_VERSION = "6c3738555d00b8b8b24a1f5e0065ef787432513c"
+  @show ANTIC_VERSION = "364f97edd9b6af537787113cf910f16d7bbc48a3"
 
   if Sys.iswindows()
     error("Source build not available on Windows")
