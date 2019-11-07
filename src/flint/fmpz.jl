@@ -272,14 +272,14 @@ end
 
 for (fJ, fC) in ((:+, :add), (:-,:sub), (:*, :mul),
                  (:&, :and), (:|, :or), (:xor, :xor))
-    @eval begin
-        function ($fJ)(x::fmpz, y::fmpz)
-            z = fmpz()
-            ccall(($(string(:fmpz_, fC)), :libflint), Nothing,
-                  (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z, x, y)
-            return z
-        end
-    end
+   @eval begin
+      function ($fJ)(x::fmpz, y::fmpz)
+         z = fmpz()
+         ccall(($(string(:fmpz_, fC)), :libflint), Nothing,
+               (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z, x, y)
+         maybe_finalizer(z)
+      end
+   end
 end
 
 # Metaprogram to define functions fdiv, cdiv, tdiv, div, mod
