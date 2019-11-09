@@ -15,38 +15,34 @@ end
 
 const FlintZZ = FlintIntegerRing()
 using Base.GMP: Limb, BITS_PER_LIMB
-const HIGH_BIT = 1 << (BITS_PER_LIMB-2)
+const MPZ_BIT = 1 << (BITS_PER_LIMB-2)
 
 mutable struct fmpz <: RingElem
    d::Int
-   has_finalizer::Bool
    
-   function fmpz()
-      z = new(0, false)
-      return z
-   end
+   fmpz() = new(0)
 
    function fmpz(x::Int)
-      z = new(0, false)
+      z = new()
       ccall((:fmpz_init_set_si, :libflint), Nothing, (Ref{fmpz}, Int), z, x)
       maybe_finalizer(z)
    end
 
    function fmpz(x::UInt)
-      z = new(0, false)
+      z = new()
       ccall((:fmpz_init_set_ui, :libflint), Nothing, (Ref{fmpz}, UInt), z, x)
       maybe_finalizer(z)
    end
 
    function fmpz(x::BigInt)
-      z = new(0, false)
+      z = new()
       ccall((:fmpz_set_mpz, :libflint), Nothing, (Ref{fmpz}, Ref{BigInt}), z, x)
       maybe_finalizer(z)
    end
 
    function fmpz(x::Float64)
       !isinteger(x) && throw(InexactError())
-      z = new(0, false)
+      z = new()
       ccall((:fmpz_init, :libflint), Nothing, (Ref{fmpz},), z)
       ccall((:fmpz_set_d, :libflint), Nothing, (Ref{fmpz}, Cdouble), z, x)
       finalizer(_fmpz_clear_fn, z)
@@ -57,18 +53,22 @@ mutable struct fmpz <: RingElem
 end
 
 
-coeff_is_mpz(d::Int)  = (HIGH_BIT & x)   != 0
-coeff_is_mpz(x::fmpz) = (HIGH_BIT & x.d) != 0
-@inline function maybe_finalizer(x::fmpz)
-   if !x.has_finalizer && coeff_is_mpz(x)
+coeff_is_mpz(d::Int)  = (MPZ_BIT & x)   != 0
+coeff_is_mpz(x::fmpz) = (MPZ_BIT & x.d) != 0
+
+function maybe_finalizer(x::fmpz)
+   if coeff_is_mpz(x)
       finalizer(_fmpz_clear_fn, x)
-      x.has_finalizer = true
    end
    x
 end
 
 function _fmpz_clear_fn(a::fmpz)
-   ccall((:fmpz_clear, :libflint), Nothing, (Ref{fmpz},), a)
+   if coeff_is_mpz(a)
+      ccall((:fmpz_clear, :libflint), Nothing, (Ref{fmpz},), a)
+      a.d = 0
+   end
+   nothing
 end
 
 mutable struct fmpz_factor

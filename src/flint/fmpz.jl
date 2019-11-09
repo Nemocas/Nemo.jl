@@ -630,6 +630,7 @@ function <<(x::fmpz, c::Int)
     z = fmpz()
     ccall((:fmpz_mul_2exp, :libflint), Nothing,
           (Ref{fmpz}, Ref{fmpz}, Int), z, x, c)
+    maybe_finalizer(z)
     return z
 end
 
@@ -1541,8 +1542,11 @@ end
 > Note that this function modifies its input in-place.
 """
 function combit!(x::fmpz, c::Int)
-    c < 0 && throw(DomainError("Second argument must be non-negative: $c"))
-    ccall((:fmpz_combit, :libflint), Nothing, (Ref{fmpz}, Int), x, c)
+   c < 0 && throw(DomainError("Second argument must be non-negative: $c"))
+   hasfinalizer = coeff_is_mpz(x)
+   ccall((:fmpz_combit, :libflint), Nothing, (Ref{fmpz}, Int), x, c)
+   !hasfinalizer && maybe_finalizer(x)
+   nothing
 end
 
 ###############################################################################
