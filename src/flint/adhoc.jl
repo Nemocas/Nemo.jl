@@ -33,11 +33,13 @@ end
 ==(x::AbsSeriesElem, y::fmpz) = precision(x) == 0 || ((length(x) == 0 && iszero(y))
                                        || (length(x) == 1 && coeff(x, 0) == y))
 
+==(x::AbsSeriesElem, y::Integer) = x == fmpz(y)
+
 @doc Markdown.doc"""
     ==(x::fmpz, y::AbsSeriesElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::fmpz, y::AbsSeriesElem) = y == x
+==(x::Integer, y::AbsSeriesElem) = y == x
 
 @doc Markdown.doc"""
     divexact(x::AbsSeriesElem, y::fmpz)
@@ -227,42 +229,6 @@ end
 #   Residue Ring
 #
 ###############################################################################
-
-@doc Markdown.doc"""
-    *(a::ResElem, b::fmpz)
-> Return $a\times b$.
-"""
-*(a::ResElem, b::fmpz) = parent(a)(data(a) * b)
-
-@doc Markdown.doc"""
-    *(a::fmpz, b::ResElem)
-> Return $a\times b$.
-"""
-*(a::fmpz, b::ResElem) = parent(b)(a * data(b))
-
-@doc Markdown.doc"""
-    +(a::ResElem, b::fmpz)
-> Return $a + b$.
-"""
-+(a::ResElem, b::fmpz) = parent(a)(data(a) + b)
-
-@doc Markdown.doc"""
-    +(a::fmpz, b::ResElem)
-> Return $a + b$.
-"""
-+(a::fmpz, b::ResElem) = parent(b)(a + data(b))
-
-@doc Markdown.doc"""
-    -(a::ResElem, b::fmpz)
-> Return $a - b$.
-"""
--(a::ResElem, b::fmpz) = parent(a)(data(a) - b)
-
-@doc Markdown.doc"""
-    -(a::fmpz, b::ResElem)
-> Return $a - b$.
-"""
--(a::fmpz, b::ResElem) = parent(b)(a - data(b))
 
 @doc Markdown.doc"""
     ==(a::ResElem, b::fmpz)
@@ -502,7 +468,7 @@ end
 > Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 > otherwise return `false`.
 """
-function ==(x::MatElem, y::fmpz)
+function ==(x::MatElem, y::Integer)
    for i = 1:min(nrows(x), ncols(x))
       if x[i, i] != y
          return false
@@ -523,7 +489,7 @@ end
 > Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
 > otherwise return `false`.
 """
-==(x::fmpz, y::MatElem) = y == x
+==(x::Integer, y::MatElem) = y == x
 
 @doc Markdown.doc"""
     divexact(x::MatElem, y::fmpz)

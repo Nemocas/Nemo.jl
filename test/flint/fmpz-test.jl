@@ -1,5 +1,5 @@
 @testset "fmpz.abstract_types..." begin
-   @test fmpz <: RingElem
+   @test fmpz <: Signed
 
    @test FlintIntegerRing <: Nemo.Ring
 
@@ -10,25 +10,25 @@ end
 
 @testset "fmpz.constructors..." begin
    a = fmpz(-123)
-   @test isa(a, RingElem)
+   @test isa(a, fmpz)
 
    b = fmpz(12.0)
-   @test isa(b, RingElem)
+   @test isa(b, fmpz)
 
    c = fmpz("-1234567876545678376545678900000000000000000000000000")
-   @test isa(c, RingElem)
+   @test isa(c, fmpz)
 
    d = fmpz(c)
-   @test isa(d, RingElem)
+   @test isa(d, fmpz)
 
    e = deepcopy(c)
-   @test isa(e, RingElem)
+   @test isa(e, fmpz)
 
    f = fmpz(BigFloat(10)^100)
-   @test isa(f, RingElem)
+   @test isa(f, fmpz)
 
    g = fmpz()
-   @test isa(f, RingElem)
+   @test isa(f, fmpz)
 end
 
 @testset "fmpz.rand..." begin
@@ -66,9 +66,9 @@ end
    a = one(FlintIntegerRing())
    b = zero(FlintIntegerRing())
 
-   @test isa(a, RingElem)
+   @test isa(a, fmpz)
 
-   @test isa(b, RingElem)
+   @test isa(b, fmpz)
 
    @test sign(a) == 1
 

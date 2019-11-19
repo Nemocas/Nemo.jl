@@ -513,16 +513,6 @@ function gcd(a::fmpq, b::fmpq)
    return z
 end
 
-################################################################################
-#
-#   Ad hoc Remove and valuation
-#
-################################################################################
-
-remove(a::fmpq, b::Integer) = remove(a, fmpz(b))
-
-valuation(a::fmpq, b::Integer) = valuation(a, fmpz(b))
-
 ###############################################################################
 #
 #   Rational reconstruction

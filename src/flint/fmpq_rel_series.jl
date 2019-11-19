@@ -301,22 +301,6 @@ end
 
 *(x::Rational, y::fmpq_rel_series) = fmpq(x) * y
 
-+(x::fmpq_rel_series, y::Integer) = x + fmpz(y)
-
-+(x::Integer, y::fmpq_rel_series) = fmpz(x) + y
-
-+(x::fmpq_rel_series, y::Rational) = x + fmpq(y)
-
-+(x::Rational, y::fmpq_rel_series) = fmpq(x) + y
-
--(x::fmpq_rel_series, y::Integer) = x - fmpz(y)
-
--(x::Integer, y::fmpq_rel_series) = fmpz(x) - y
-
--(x::fmpq_rel_series, y::Rational) = x - fmpq(y)
-
--(x::Rational, y::fmpq_rel_series) = fmpq(x) - y
-
 ###############################################################################
 #
 #   Shifting

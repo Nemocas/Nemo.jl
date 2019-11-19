@@ -414,24 +414,6 @@ isequal(x::fmpq_mat, y::fmpq_mat) = ==(x, y)
 #
 ###############################################################################
 
-function ==(x::fmpq_mat, y::Integer)
-   for i = 1:min(nrows(x), ncols(x))
-      if x[i, i] != y
-         return false
-      end
-   end
-   for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         if i != j && x[i, j] != 0
-            return false
-         end
-      end
-   end
-   return true
-end
-
-==(x::Integer, y::fmpq_mat) = y == x
-
 ==(x::fmpq_mat, y::Rational{T}) where T <: Union{Int, BigInt} = x == fmpq(y)
 
 ==(x::Rational{T}, y::fmpq_mat) where T <: Union{Int, BigInt} = y == x

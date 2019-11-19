@@ -15,7 +15,7 @@ end
 
 const FlintZZ = FlintIntegerRing()
 
-mutable struct fmpz <: RingElem
+mutable struct fmpz <: Signed
     d::Int
 
     function fmpz()

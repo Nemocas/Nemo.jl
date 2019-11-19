@@ -92,6 +92,4 @@ include("arb/arb_mat.jl")
 
 include("arb/acb_mat.jl")
 
-include("Factor.jl")
-
 include("polysubst.jl")

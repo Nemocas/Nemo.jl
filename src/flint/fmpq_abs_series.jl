@@ -403,11 +403,7 @@ end
 
 ==(x::fmpq_abs_series, y::Rational{T}) where T <: Union{Int, BigInt} = x == fmpq(y)
 
-==(x::fmpq_abs_series, y::Integer) = x == fmpz(y)
-
 ==(x::Rational{T}, y::fmpq_abs_series) where T <: Union{Int, BigInt} = y == x
-
-==(x::Integer, y::fmpq_abs_series) = y == x
 
 ###############################################################################
 #
