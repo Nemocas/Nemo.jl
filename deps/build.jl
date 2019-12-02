@@ -17,7 +17,7 @@ if !issource_build
     # This has to be in sync with the corresponding commit in the source build below (for flint, arb, antic)
     "https://github.com/JuliaPackaging/Yggdrasil/releases/download/GMP-v6.1.2-1/build_GMP.v6.1.2.jl",
     "https://github.com/JuliaPackaging/Yggdrasil/releases/download/MPFR-v4.0.2-1/build_MPFR.v4.0.2.jl",
-    "https://github.com/thofma/Flint2Builder/releases/download/88e468/build_libflint.v0.0.0-88e468ec621222784bcabe8191a3d63340ea9c56.jl",
+    "https://github.com/thofma/Flint2Builder/releases/download/d46056/build_libflint.v0.0.0-d46056d45c6429f58ec63cf3c2e59b00f8431479.jl",
     "https://github.com/thofma/ArbBuilder/releases/download/6c3738-v2/build_libarb.v0.0.0-6c3738555d00b8b8b24a1f5e0065ef787432513c.jl",
     "https://github.com/thofma/AnticBuilder/releases/download/364f97-v2/build_libantic.v0.0.0-364f97edd9b6af537787113cf910f16d7bbc48a3.jl"
    ]
@@ -64,7 +64,7 @@ else
   @show YASM_VERSION = "1.3.0"
   @show MPIR_VERSION = "3.0.0-90740d8fdf03b941b55723b449831c52fd7f51ca"
   @show MPFR_VERSION = "4.0.0"
-  @show FLINT_VERSION = "88e468ec621222784bcabe8191a3d63340ea9c56"
+  @show FLINT_VERSION = "d46056d45c6429f58ec63cf3c2e59b00f8431479"
   @show ARB_VERSION = "6c3738555d00b8b8b24a1f5e0065ef787432513c"
   @show ANTIC_VERSION = "364f97edd9b6af537787113cf910f16d7bbc48a3"
 
