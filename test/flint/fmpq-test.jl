@@ -81,6 +81,14 @@ end
    @test denominator(fmpq(2, 3)) == 3
 
    @test characteristic(R) == 0
+
+   @test floor(fmpq(2, 3)) == 0
+   @test floor(fmpq(-1, 3)) == -1
+   @test floor(fmpq(2, 1)) == 2
+
+   @test ceil(fmpq(2, 3)) == 1
+   @test ceil(fmpq(-1, 3)) == 0
+   @test ceil(fmpq(2, 1)) == 2
 end
 
 @testset "fmpq.unary_ops..." begin

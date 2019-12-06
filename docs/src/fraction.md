@@ -96,6 +96,11 @@ isless(::fmpq, ::fmpz)
 isless(::fmpz, ::fmpq)
 ```
 
+```@docs
+floor(::fmpq)
+ceil(::fmpq)
+```
+
 **Examples**
 
 ```julia

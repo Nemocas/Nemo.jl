@@ -140,6 +140,20 @@ end
 
 characteristic(::FlintRationalField) = 0
 
+@doc Markdown.doc"""
+    floor(a::fmpq)
+> Returns the greatest integer that is less than or equal to $a$. The result is
+> returned as a rational with denominator $1$.
+"""
+Base.floor(a::fmpq) = fmpq(fdiv(numerator(a), denominator(a)), 1)
+
+@doc Markdown.doc""";
+    ceil(a::fmpq)
+> Returns the least integer that is greater than or equal to $a$. The result is
+> returned as a rational with denominator $1$.
+"""
+Base.ceil(a::fmpq) = fmpq(cdiv(numerator(a), denominator(a)), 1)
+
 ###############################################################################
 #
 #   Canonicalisation
