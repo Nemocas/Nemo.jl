@@ -99,8 +99,6 @@ else
    const libantic = joinpath(pkgdir, "deps", "usr", "lib", "libantic")
 end
 
-const __isthreaded =  "NEMO_THREADED" in keys(ENV) && ENV["NEMO_THREADED"] == "1"
-
 function flint_abort()
   error("Problem in the Flint-Subsystem")
 end
@@ -216,10 +214,15 @@ end
 #
 ################################################################################
 
+const __isthreaded = Ref(false)
+
 function __init__()
    # In case libgmp picks up the wrong libgmp later on, we "unset" the jl_*
    # functions from the julia :libgmp.
-   if __isthreaded
+
+   __isthreaded[] =  "NEMO_THREADED" in keys(ENV) && ENV["NEMO_THREADED"] == "1"
+
+   if __isthreaded[]
       ccall((:__gmp_set_memory_functions, :libgmp), Nothing,
             (Int, Int, Int), 0, 0, 0)
    end
@@ -239,7 +242,7 @@ function __init__()
    end
 
    if !Sys.iswindows()
-     if !__isthreaded
+     if !__isthreaded[]
          ccall((:__gmp_set_memory_functions, libgmp), Nothing,
             (Ptr{Nothing},Ptr{Nothing},Ptr{Nothing}),
             cglobal(:jl_gc_counted_malloc),
@@ -286,7 +289,7 @@ function __init__()
 end
 
 function flint_set_num_threads(a::Int)
-   if !__isthreaded
+   if !__isthreaded[]
      error("To use threaded flint, julia has to be started with NEMO_THREADED=1")
    else
      ccall((:flint_set_num_threads, libflint), Nothing, (Int,), a)
