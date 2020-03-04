@@ -220,7 +220,7 @@ function __init__()
    # In case libgmp picks up the wrong libgmp later on, we "unset" the jl_*
    # functions from the julia :libgmp.
 
-   __isthreaded[] =  "NEMO_THREADED" in keys(ENV) && ENV["NEMO_THREADED"] == "1"
+   __isthreaded[] = get(ENV, "NEMO_THREADED", "") == "1"
 
    if __isthreaded[]
       ccall((:__gmp_set_memory_functions, :libgmp), Nothing,
