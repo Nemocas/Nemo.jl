@@ -12,7 +12,8 @@ julia:
   
 branches:
   only:
-  - master
+    - master
+    - /^v\d+\.\d+(\.\d+)?(-\S*)?$/  # release tags
 
 notifications:
   - email: false
