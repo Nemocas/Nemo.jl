@@ -255,17 +255,6 @@ function __init__()
    ccall((:flint_set_abort, libflint), Nothing,
          (Ptr{Nothing},), @cfunction(flint_abort, Nothing, ()))
 
-   if isinteractive() &&
-         !any(x -> x.name in ("Hecke", "Oscar"), keys(Base.package_locks)) &&
-         get(ENV, "NEMO_PRINT_BANNER", "true") != "false"
-
-      println("")
-      println("Welcome to Nemo version $(version())")
-      println("")
-      println("Nemo comes with absolutely no warranty whatsoever")
-      println("")
-   end
-
   t = create_accessors(AnticNumberField, Dict, get_handle())
 
   global _get_Special_of_nf = t[1]
