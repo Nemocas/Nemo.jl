@@ -343,11 +343,11 @@ function ^(a::fmpq_abs_series, b::Int)
       return shift_left(a, b - 1)
    elseif length(a) == 1
       z = parent(a)(coeff(a, 0)^b)
-      set_prec!(z, precision(a))
+      z = set_prec!(z, precision(a))
       return z
    elseif b == 0
       z = one(parent(a))
-      set_prec!(z, precision(a))
+      z = set_prec!(z, precision(a))
       return z
    else
       bit = ~((~UInt(0)) >> 1)

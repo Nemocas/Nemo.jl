@@ -317,7 +317,7 @@ function ^(a::fmpz_mod_abs_series, b::Int)
       return parent(a)([coeff(a, 0)^b], 1, a.prec)
    elseif b == 0
       z = one(parent(a))
-      set_prec!(z, precision(a))
+      z = set_prec!(z, precision(a))
       return z
    else
       z = parent(a)()
