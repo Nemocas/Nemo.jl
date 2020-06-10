@@ -995,7 +995,7 @@ function sqr_classical(a::Generic.Poly{nf_elem})
 
    z = parent(a)(d)
 
-   set_length!(z, normalise(z, lenz))
+   z = set_length!(z, normalise(z, lenz))
 
    return z
 end
@@ -1041,7 +1041,7 @@ function mul_classical(a::Generic.Poly{nf_elem}, b::Generic.Poly{nf_elem})
 
    z = parent(a)(d)
 
-   set_length!(z, normalise(z, lenz))
+   z = set_length!(z, normalise(z, lenz))
 
    return z
 end
@@ -1068,14 +1068,14 @@ function *(a::Generic.Poly{nf_elem}, b::Generic.Poly{nf_elem})
    for i = 1:lena
       f = setcoeff!(f, i - 1, R(coeff(a, i - 1)))
    end
-   set_length!(f, lena)
+   f = set_length!(f, lena)
    if a !== b
       g = S()
       fit!(g, lenb)
       for i = 1:lenb
          g = setcoeff!(g, i - 1, R(coeff(b, i - 1)))
       end
-      set_length!(g, lenb)
+      g = set_length!(g, lenb)
    else
       g = f
    end
@@ -1084,7 +1084,7 @@ function *(a::Generic.Poly{nf_elem}, b::Generic.Poly{nf_elem})
    for i = 1:lenr
       r.coeffs[i] = K(p.coeffs[i])
    end
-   set_length!(r, normalise(r, lenr))
+   r = set_length!(r, normalise(r, lenr))
    return r
 end
 

@@ -46,8 +46,11 @@ function coeff(x::fq_poly, n::Int)
    return temp
 end
 
-set_length!(x::fq_poly, n::Int) = ccall((:_fq_poly_set_length, libflint), Nothing,
+function set_length!(x::fq_poly, n::Int)
+   ccall((:_fq_poly_set_length, libflint), Nothing,
                               (Ref{fq_poly}, Int), x, n)
+   return x
+end
 
 zero(a::FqPolyRing) = a(zero(base_ring(a)))
 

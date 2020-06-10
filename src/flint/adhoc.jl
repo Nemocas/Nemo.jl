@@ -16,7 +16,7 @@ function *(a::fmpz, b::AbsSeriesElem)
    for i = 1:len
       z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
    end
-   set_length!(z, normalise(z, len))
+   z = set_length!(z, normalise(z, len))
    return z
 end
 
@@ -84,7 +84,7 @@ function *(a::fmpz, b::RelSeriesElem)
    for i = 1:len
       z = setcoeff!(z, i - 1, a*polcoeff(b, i - 1))
    end
-   set_length!(z, normalise(z, len))
+   z = set_length!(z, normalise(z, len))
    renormalize!(z)
    return z
 end
@@ -153,7 +153,7 @@ function *(a::fmpz, b::PolyElem)
    for i = 1:len
       z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
    end
-   set_length!(z, normalise(z, len))
+   z = set_length!(z, normalise(z, len))
    return z
 end
 
@@ -187,7 +187,7 @@ function divexact(a::PolyElem, b::fmpz)
    for i = 1:length(a)
       z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b))
    end
-   set_length!(z, length(a))
+   z = set_length!(z, length(a))
    return z
 end
 
@@ -200,7 +200,7 @@ function *(a::fmpz, b::PolyElem{fmpz})
    for i = 1:len
       z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
    end
-   set_length!(z, normalise(z, len))
+   z = set_length!(z, normalise(z, len))
    return z
 end
 
@@ -218,7 +218,7 @@ function divexact(a::PolyElem{fmpz}, b::fmpz)
    for i = 1:length(a)
       z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b))
    end
-   set_length!(z, length(a))
+   z = set_length!(z, length(a))
    return z
 end
 

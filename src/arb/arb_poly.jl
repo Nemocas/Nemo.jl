@@ -22,8 +22,11 @@ elem_type(::Type{ArbPolyRing}) = arb_poly
 length(x::arb_poly) = ccall((:arb_poly_length, libarb), Int,
                                    (Ref{arb_poly},), x)
 
-set_length!(x::arb_poly, n::Int) = ccall((:_arb_poly_set_length, libarb), Nothing,
+function set_length!(x::arb_poly, n::Int)
+   ccall((:_arb_poly_set_length, libarb), Nothing,
                                    (Ref{arb_poly}, Int), x, n)
+   return x
+end
 
 degree(x::arb_poly) = length(x) - 1
 

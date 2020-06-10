@@ -36,8 +36,11 @@ end
 length(x::fq_nmod_poly) = ccall((:fq_nmod_poly_length, libflint), Int,
                                 (Ref{fq_nmod_poly},), x)
 
-set_length!(x::fq_nmod_poly, n::Int) = ccall((:_fq_nmod_poly_set_length, libflint), Nothing,
+function set_length!(x::fq_nmod_poly, n::Int)
+   ccall((:_fq_nmod_poly_set_length, libflint), Nothing,
                               (Ref{fq_nmod_poly}, Int), x, n)
+   return x
+end
 
 function coeff(x::fq_nmod_poly, n::Int)
    n < 0 && throw(DomainError(n, "Index must be non-negative"))

@@ -22,8 +22,11 @@ elem_type(::Type{AcbPolyRing}) = acb_poly
 length(x::acb_poly) = ccall((:acb_poly_length, libarb), Int,
                                    (Ref{acb_poly},), x)
 
-set_length!(x::acb_poly, n::Int) = ccall((:_acb_poly_set_length, libarb), Nothing,
+function set_length!(x::acb_poly, n::Int)
+   ccall((:_acb_poly_set_length, libarb), Nothing,
                                    (Ref{acb_poly}, Int), x, n)
+   return x
+end
 
 degree(x::acb_poly) = length(x) - 1
 
