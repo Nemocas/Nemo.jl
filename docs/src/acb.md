@@ -721,7 +721,7 @@ W = lindep(V1, 20)
 
 # ...or from two
 V2 = [CC(1), b, b^2, b^3, b^4, b^5];
-Vs = [V1 V2]'
+Vs = [V1 V2]
 X = lindep(Vs, 20)
 ```
 
