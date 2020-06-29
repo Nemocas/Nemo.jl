@@ -1,6 +1,9 @@
 @static if VERSION < v"1.3.0"
 
-  using BinaryProvider # requires BinaryProvider 0.3.0 or later
+  using Pkg, BinaryProvider
+
+   # This does not work on julia >= 1.3, but there we use the *jll package anyway.
+  flint_ver = Pkg.API.__installed(PKGMODE_MANIFEST)["FLINT_jll"]
 
   # Parse some basic command-line arguments
   const verbose = "--verbose" in ARGS
@@ -11,10 +14,20 @@
   dependencies = [
   "build_GMP.v6.1.2.jl",
   "build_MPFR.v4.0.2.jl",
-  "build_FLINT.v0.0.1.jl",
-  "build_Arb.v2.17.0.jl",
-  "build_Antic.v0.1.0.jl",
-   ]
+  ]
+
+  if flint_ver == v"2.6.0+0"
+    push!(dependencies, "build_FLINT.v2.6.0.jl")
+  elseif flint_ver == v"2.6.2+0"
+    push!(dependencies, "build_FLINT.v2.6.2.jl")
+  else
+    throw(error("Flint version $ver not supported for julia version <= 1.3"))
+  end
+
+  append!(dependencies, [
+  "build_Arb.v2.18.0.jl",
+  "build_Antic.v0.2.2.jl",
+  ])
 
   for file in dependencies
        build_file = joinpath(@__DIR__, file)

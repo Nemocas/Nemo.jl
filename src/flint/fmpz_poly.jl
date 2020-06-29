@@ -46,7 +46,7 @@ one(a::FmpzPolyRing) = a(1)
 
 gen(a::FmpzPolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
 
-isgen(x::fmpz_poly) = ccall((:fmpz_poly_is_x, libflint), Bool,
+isgen(x::fmpz_poly) = ccall((:fmpz_poly_is_gen, libflint), Bool,
                             (Ref{fmpz_poly},), x)
 
 function deepcopy_internal(a::fmpz_poly, dict::IdDict)

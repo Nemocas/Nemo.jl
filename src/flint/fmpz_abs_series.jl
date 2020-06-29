@@ -90,7 +90,7 @@ function deepcopy_internal(a::fmpz_abs_series, dict::IdDict)
 end
 
 function isgen(a::fmpz_abs_series)
-   return precision(a) == 0 || ccall((:fmpz_poly_is_x, libflint), Bool,
+   return precision(a) == 0 || ccall((:fmpz_poly_is_gen, libflint), Bool,
                             (Ref{fmpz_abs_series},), a)
 end
 
