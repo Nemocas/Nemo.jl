@@ -90,6 +90,10 @@ function show(io::IO, R::GaloisField)
    print(io, "Galois field with characteristic ", signed(widen(R.n)))
 end
 
+function AbstractAlgebra.expressify(a::gfp_elem)
+    return a.data
+end
+
 function show(io::IO, a::gfp_elem)
    print(io, signed(widen(a.data)))
 end

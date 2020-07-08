@@ -27,7 +27,7 @@ end
    R, x = PowerSeriesRing(ZZ, 30, "x")
    a = x^3 + 2x + 1
 
-   @test string(a) == "1+2*x+x^3+O(x^30)"
+   @test sprint(show, "text/plain", a) == "1 + 2*x + x^3 + O(x^30)"
 end
 
 @testset "fmpz_rel_series.manipulation..." begin

@@ -38,7 +38,7 @@ end
    R, x = PolynomialRing(RR, "x")
    f = x^3 + 2x^2 + x + 1
 
-   @test string(f) == "x^3+2.0000000000000000000*x^2+x+1.0000000000000000000"
+   @test sprint(show, "text/plain", f) == "x^3 + 2.0000000000000000000*x^2 + x + 1"
 end
 
 @testset "arb_poly.manipulation..." begin

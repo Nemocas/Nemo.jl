@@ -98,6 +98,10 @@ function show(io::IO, R::NmodRing)
    print(io, "Integers modulo ", signed(widen(R.n)))
 end
 
+function AbstractAlgebra.expressify(a::Nemo.nmod)
+    return a.data
+end
+
 function show(io::IO, a::nmod)
    print(io, signed(widen(a.data)))
 end

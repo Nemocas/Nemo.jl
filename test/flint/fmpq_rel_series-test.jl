@@ -42,7 +42,7 @@ end
 
    a = x^3 + 2x + 1
 
-   @test string(a) == "1+2*x+x^3+O(x^30)"
+   @test sprint(show, "text/plain", a) == "1 + 2*x + x^3 + O(x^30)"
 end
 
 @testset "fmpq_rel_series.manipulation..." begin

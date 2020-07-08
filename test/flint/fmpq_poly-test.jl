@@ -84,7 +84,7 @@ end
 @testset "fmpq_poly.printing..." begin
    S, y = PolynomialRing(QQ, "y")
 
-   @test string(y + y^2) == "y^2+y"
+   @test sprint(show, "text/plain", y + y^2) == "y^2 + y"
 end
 
 @testset "fmpq_poly.manipulation..." begin

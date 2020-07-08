@@ -45,7 +45,7 @@ end
    S, x = PowerSeriesRing(R, 30, "x")
    b = x^2 + x + O(x^4)
 
-   @test string(b) == "x+x^2+O(x^4)"
+   @test sprint(show, "text/plain", b) == "x + x^2 + O(x^4)"
 end
 
 @testset "nmod_rel_series.manipulation..." begin

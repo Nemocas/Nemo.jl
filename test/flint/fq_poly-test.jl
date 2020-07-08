@@ -66,7 +66,7 @@ end
 
    f = x^2 + y^3 + z + 1
 
-   @test string(f) == "z+(y^3+(x^2+1))"
+   @test sprint(show, "text/plain", f) == "z + y^3 + (x^2+1)"
 end
 
 @testset "fq_poly.manipulation..." begin

@@ -177,8 +177,14 @@ canonical_unit(a::fmpq) = a
 #
 ###############################################################################
 
-function show(io::IO, a::FlintRationalField)
-   print(io, "Rational Field")
+function expressify(a::fmpq; context = nothing)::Any
+    n = numerator(a)
+    d = denominator(a)
+    if isone(d)
+        return BigInt(n)
+    else
+        return Expr(:call, ://, BigInt(n), BigInt(d))
+    end
 end
 
 function show(io::IO, a::fmpq)
@@ -186,6 +192,10 @@ function show(io::IO, a::fmpq)
    if denominator(a) != 1
       print(io, "//", denominator(a))
    end
+end
+
+function show(io::IO, a::FlintRationalField)
+   print(io, "Rational Field")
 end
 
 needs_parentheses(x::fmpq) = false

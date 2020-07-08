@@ -30,7 +30,7 @@ end
 
    b = x^2 + 3x + O(x^4)
 
-   @test string(b) == "(3)*x+x^2+O(x^4)"
+   @test sprint(show, "text/plain", b) == "3*x + x^2 + O(x^4)"
 end
 
 @testset "fmpz_mod_abs_series.manipulation..." begin
