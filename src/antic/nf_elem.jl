@@ -342,11 +342,11 @@ function show(io::IO, a::AnticNumberField)
 end
 
 function show(io::IO, x::nf_elem)
-   cstr = ccall((:nf_elem_get_str_pretty, libantic), Ptr{UInt8},
+   cstr = ccall((:nf_elem_get_str_pretty, libantic), Cstring,
                 (Ref{nf_elem}, Ptr{UInt8}, Ref{AnticNumberField}),
                  x, string(var(parent(x))), parent(x))
    s = unsafe_string(cstr)
-   ccall((:flint_free, libflint), Nothing, (Ptr{UInt8},), cstr)
+   ccall((:flint_free, libflint), Nothing, (Cstring, ), cstr)
 
    s = replace(s, "/" => "//")
 
