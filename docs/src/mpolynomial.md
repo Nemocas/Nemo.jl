@@ -25,6 +25,8 @@ $\mathbb{Q}$                                | Flint               | `fmpq_mpoly`
 
 The following are not implemented yet, but will be available soon:
 
+Base ring                                   | Library             | Element type        | Parent type
+--------------------------------------------|---------------------|---------------------|----------------------
 $\mathbb{Z}/p\mathbb{Z}$ (small prime $p$)  | Flint               | `gfp_mpoly`         | `GFPMPolyRing`
 $\mathbb{F}_{p^n}$ (small $p$)              | Flint               | `fq_nmod_mpoly`     | `FqNmodMPolyRing`
 
