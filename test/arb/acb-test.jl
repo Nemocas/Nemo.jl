@@ -163,7 +163,7 @@ end
 
    @test accuracy_bits(CC(0)) == typemax(Int)
    @test accuracy_bits(CC("+/- inf")) == -typemax(Int)
-   @test accuracy_bits(CC("0.1")) > prec(CC) - 4
+   @test accuracy_bits(CC("0.1")) > precision(CC) - 4
 
    uniq, n = unique_integer(CC("3 +/- 0.001"))
    @test uniq

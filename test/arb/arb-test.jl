@@ -219,7 +219,7 @@ end
 
    @test accuracy_bits(RR(0)) == typemax(Int)
    @test accuracy_bits(RR("+/- inf")) == -typemax(Int)
-   @test accuracy_bits(RR("0.1")) > prec(RR) - 4
+   @test accuracy_bits(RR("0.1")) > precision(RR) - 4
 
    uniq, n = unique_integer(RR("3 +/- 0.001"))
    @test uniq
