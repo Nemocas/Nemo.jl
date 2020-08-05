@@ -294,6 +294,87 @@ for (fJ, fC) in ((:+, :add), (:-,:sub), (:*, :mul),
     end
 end
 
+@inline function mul!(z::fmpz, x::fmpz, y::fmpz)
+#  ccall((:fmpz_mul, libflint), Nothing, (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z, x, y)
+#  return z
+  if _fmpz_is_small(x) && _fmpz_is_small(y)
+    a, b = Base.Checked.mul_with_overflow(x.d, y.d)
+    if b
+      ccall((:fmpz_mul, libflint), Nothing, (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z, x, y)
+    else
+      if __fmpz_is_small(a) && _fmpz_is_small(z)
+        z.d = a
+      else
+        ccall((:fmpz_set_si, libflint), Nothing, (Ref{fmpz}, Clong), z, a)
+      end
+    end
+  else
+    ccall((:fmpz_mul, libflint), Nothing, (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z, x, y)
+  end
+  return z
+end
+
+@inline function mul!(z::fmpz, x::fmpz, y::Int)
+#  ccall((:fmpz_mul_si, libflint), Nothing, (Ref{fmpz}, Ref{fmpz}, Clong), z, x, y)
+#  return z
+  if _fmpz_is_small(x) 
+    a, b = Base.Checked.mul_with_overflow(x.d, y)
+    if b
+      ccall((:fmpz_mul_si, libflint), Nothing, (Ref{fmpz}, Ref{fmpz}, Clong), z, x, y)
+    else
+      if __fmpz_is_small(a) && _fmpz_is_small(z)
+        z.d = a
+      else
+        ccall((:fmpz_set_si, libflint), Nothing, (Ref{fmpz}, Clong), z, a)
+      end
+    end
+  else
+    ccall((:fmpz_mul_si, libflint), Nothing, (Ref{fmpz}, Ref{fmpz}, Clong), z, x, y)
+  end
+  return z
+end
+@inline function add!(z::fmpz, x::fmpz, y::fmpz)
+#  ccall((:fmpz_add, libflint), Nothing, (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z, x, y)
+#  return z
+  if _fmpz_is_small(x) && _fmpz_is_small(y)
+    a, b = Base.Checked.add_with_overflow(x.d, y.d)
+    if b
+      ccall((:fmpz_add, libflint), Nothing, (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z, x, y)
+    else
+      if __fmpz_is_small(a) && _fmpz_is_small(z)
+        z.d = a
+      else
+        ccall((:fmpz_set_si, libflint), Nothing, (Ref{fmpz}, Clong), z, a)
+      end
+    end
+  else
+    ccall((:fmpz_add, libflint), Nothing, (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z, x, y)
+  end
+  return z
+end
+
+@inline function add!(z::fmpz, x::fmpz, y::Int)
+#  ccall((:fmpz_add, libflint), Nothing, (Ref{fmpz}, Ref{fmpz}, Clong), z, x, y)
+#  return z
+  if _fmpz_is_small(x) 
+    a, b = Base.Checked.add_with_overflow(x.d, y)
+    if b
+      ccall((:fmpz_add_si, libflint), Nothing, (Ref{fmpz}, Ref{fmpz}, Clong), z, x, y)
+    else
+      if __fmpz_is_small(a) && _fmpz_is_small(z)
+        z.d = a
+      else
+        ccall((:fmpz_set_si, libflint), Nothing, (Ref{fmpz}, Clong), z, a)
+      end
+    end
+  else
+    ccall((:fmpz_add_si, libflint), Nothing, (Ref{fmpz}, Ref{fmpz}, Clong), z, x, y)
+  end
+  return z
+end
+
+
+
 # Metaprogram to define functions fdiv, cdiv, tdiv, div
 
 for (fJ, fC) in ((:fdiv, :fdiv_q), (:cdiv, :cdiv_q), (:tdiv, :tdiv_q),
@@ -1651,12 +1732,13 @@ end
 #   Unsafe operators
 #
 ###############################################################################
-
+#=
 function mul!(z::fmpz, x::fmpz, y::fmpz)
    ccall((:fmpz_mul, libflint), Nothing,
          (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z, x, y)
    return z
 end
+=#
 
 function addmul!(z::fmpz, x::fmpz, y::fmpz, c::fmpz)
    ccall((:fmpz_addmul, libflint), Nothing,
@@ -1670,11 +1752,13 @@ function addeq!(z::fmpz, x::fmpz)
    return z
 end
 
+#=
 function add!(z::fmpz, x::fmpz, y::fmpz)
    ccall((:fmpz_add, libflint), Nothing,
          (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z, x, y)
    return z
 end
+=#
 
 function zero!(z::fmpz)
    ccall((:fmpz_zero, libflint), Nothing,
