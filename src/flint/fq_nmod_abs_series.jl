@@ -299,7 +299,7 @@ function ^(a::fq_nmod_abs_series, b::Int)
       return parent(a)([coeff(a, 0)^b], 1, a.prec)
    elseif b == 0
       z = one(parent(a))
-      z = set_prec!(z, precision(a))
+      z = set_precision!(z, precision(a))
    else
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & b) == 0

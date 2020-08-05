@@ -179,7 +179,7 @@ end
 
 function show(io::IO, x::AcbField)
   print(io, "Complex Field with ")
-  print(io, prec(x))
+  print(io, precision(x))
   print(io, " bits of precision and error bounds")
 end
 
@@ -717,7 +717,7 @@ end
 """
 function const_pi(r::AcbField)
   z = r()
-  ccall((:acb_const_pi, libarb), Nothing, (Ref{acb}, Int), z, prec(r))
+  ccall((:acb_const_pi, libarb), Nothing, (Ref{acb}, Int), z, precision(r))
   return z
 end
 

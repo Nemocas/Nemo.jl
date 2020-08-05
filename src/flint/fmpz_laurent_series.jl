@@ -129,12 +129,12 @@ function exp_gcd(a::fmpz_laurent_series)
    return n
 end
 
-function set_prec!(a::fmpz_laurent_series, prec::Int)
+function set_precision!(a::fmpz_laurent_series, prec::Int)
    a.prec = prec
    return a
 end
 
-function set_val!(a::fmpz_laurent_series, val::Int)
+function set_valuation!(a::fmpz_laurent_series, val::Int)
    a.val = val
    return a
 end
@@ -214,8 +214,8 @@ function downscale(a::fmpz_laurent_series, n::Int)
       end
    end
    S = typeof(a)
-   d = set_prec!(d, precision(a))
-   d = set_val!(d, valuation(a))
+   d = set_precision!(d, precision(a))
+   d = set_valuation!(d, valuation(a))
    d = set_scale!(d, div(scale(a), n))
    d.parent = parent(a)
    return d
@@ -242,8 +242,8 @@ function upscale(a::fmpz_laurent_series, n::Int)
       j += n
    end
    S = typeof(a)
-   d = set_prec!(d, precision(a))
-   d = set_val!(d, valuation(a))
+   d = set_precision!(d, precision(a))
+   d = set_valuation!(d, valuation(a))
    d = set_scale!(d, scale(a)*n)
    d.parent = parent(a)
    return d
@@ -308,8 +308,8 @@ isunit(a::fmpz_laurent_series) = valuation(a) == 0 && isunit(polcoeff(a, 0))
 
 function deepcopy_internal(a::fmpz_laurent_series, dict::IdDict)
    d = fmpz_laurent_series(a)
-   d = set_prec!(d, precision(a))
-   d = set_val!(d, valuation(a))
+   d = set_precision!(d, precision(a))
+   d = set_valuation!(d, valuation(a))
    d = set_scale!(d, scale(a))
    d.parent = parent(a)
    return d
@@ -325,13 +325,13 @@ function renormalize!(z::fmpz_laurent_series)
    end
    if i == zlen
       zero!(z)
-      z = set_prec!(z, zprec)
-      z = set_val!(z, zprec)
+      z = set_precision!(z, zprec)
+      z = set_valuation!(z, zprec)
       z = set_scale!(z, 1)
    elseif i != 0
-      z = set_prec!(z, zprec)
+      z = set_precision!(z, zprec)
       R = base_ring(z)
-      z = set_val!(z, zval + i*scale(z))
+      z = set_valuation!(z, zval + i*scale(z))
       for j = 1:zlen - i
          z = setcoeff!(z, j - 1, polcoeff(z, j + i - 1))
       end
@@ -419,8 +419,8 @@ show_minus_one(::Type{fmpz_laurent_series})  = show_minus_one(T)
 function -(a::fmpz_laurent_series)
    len = pol_length(a)
    z = parent(a)()
-   z = set_prec!(z, precision(a))
-   z = set_val!(z, valuation(a))
+   z = set_precision!(z, precision(a))
+   z = set_valuation!(z, valuation(a))
    z = set_scale!(z, scale(a))
    for i = 1:len
       z = setcoeff!(z, i - 1, -polcoeff(a, i - 1))
@@ -460,8 +460,8 @@ function +(a::fmpz_laurent_series, b::fmpz_laurent_series)
    lenz = div(lenz + sz - 1, sz)
    R = base_ring(a)
    z = parent(a)()
-   z = set_prec!(z, prec)
-   z = set_val!(z, valz)
+   z = set_precision!(z, prec)
+   z = set_valuation!(z, valz)
    z = set_scale!(z, sz)
    pa = vala
    pb = valb
@@ -516,8 +516,8 @@ function -(a::fmpz_laurent_series, b::fmpz_laurent_series)
    lenz = div(lenz + sz - 1, sz)
    R = base_ring(a)
    z = parent(a)()
-   z = set_prec!(z, prec)
-   z = set_val!(z, valz)
+   z = set_precision!(z, prec)
+   z = set_valuation!(z, valz)
    z = set_scale!(z, sz)
    pa = vala
    pb = valb
@@ -586,8 +586,8 @@ function *(a::fmpz_laurent_series, b::fmpz_laurent_series)
    ccall((:fmpz_poly_mullow, libflint), Nothing,
                 (Ref{fmpz_laurent_series}, Ref{fmpz_laurent_series}, Ref{fmpz_laurent_series}, Int),
                z, a, b, lenz)
-   z = set_prec!(z, prec + zval)
-   z = set_val!(z, zval)
+   z = set_precision!(z, prec + zval)
+   z = set_valuation!(z, zval)
    z = set_scale!(z, sz)
    z = rescale!(z)
    return z
@@ -606,8 +606,8 @@ end
 function *(a::fmpz, b::fmpz_laurent_series)
    len = pol_length(b)
    z = parent(b)()
-   z = set_prec!(z, precision(b))
-   z = set_val!(z, valuation(b))
+   z = set_precision!(z, precision(b))
+   z = set_valuation!(z, valuation(b))
    z = set_scale!(z, scale(b))
    for i = 1:len
       z = setcoeff!(z, i - 1, a*polcoeff(b, i - 1))
@@ -623,8 +623,8 @@ end
 function *(a::Integer, b::fmpz_laurent_series)
    len = pol_length(b)
    z = parent(b)()
-   z = set_prec!(z, precision(b))
-   z = set_val!(z, valuation(b))
+   z = set_precision!(z, precision(b))
+   z = set_valuation!(z, valuation(b))
    z = set_scale!(z, scale(b))
    for i = 1:len
       z = setcoeff!(z, i - 1, a*polcoeff(b, i - 1))
@@ -658,8 +658,8 @@ end
 """
 function shift_left(x::fmpz_laurent_series, n::Int)
    z = deepcopy(x)
-   z = set_prec!(z, precision(x) + n)
-   z = set_val!(z, valuation(x) + n)
+   z = set_precision!(z, precision(x) + n)
+   z = set_valuation!(z, valuation(x) + n)
    return z
 end
 
@@ -670,8 +670,8 @@ end
 """
 function shift_right(x::fmpz_laurent_series, n::Int)
    z = deepcopy(x)
-   z = set_prec!(z, precision(x) - n)
-   z = set_val!(z, valuation(x) - n)
+   z = set_precision!(z, precision(x) - n)
+   z = set_valuation!(z, valuation(x) - n)
    return z
 end
 
@@ -693,15 +693,15 @@ function truncate(a::fmpz_laurent_series, n::Int)
       return a
    end
    z = parent(a)()
-   z = set_prec!(z, n)
+   z = set_precision!(z, n)
    if n <= aval
-      z = set_val!(z, n)
+      z = set_valuation!(z, n)
       z = set_scale!(z, 1)
    else
       sa = scale(a)
       zlen = div(n - aval + sa - 1, sa)
       zlen = min(zlen, alen)
-      z = set_val!(z, aval)
+      z = set_valuation!(z, aval)
       for i = 0:zlen - 1
          z = setcoeff!(z, i, polcoeff(a, i))
       end
@@ -719,8 +719,8 @@ function mullow(a::fmpz_laurent_series, b::fmpz_laurent_series, n::Int)
    if lena == 0 || lenb == 0
       z = zero(parent(a))
       zprec = valuation(a) + valuation(b)
-      z = set_val!(z, zprec)
-      z = set_prec!(z, zprec)
+      z = set_valuation!(z, zprec)
+      z = set_precision!(z, zprec)
       z = set_scale!(z, scale(a))
       return z
    end
@@ -731,8 +731,8 @@ function mullow(a::fmpz_laurent_series, b::fmpz_laurent_series, n::Int)
    ccall((:fmpz_poly_mullow, libflint), Nothing,
                 (Ref{fmpz_laurent_series}, Ref{fmpz_laurent_series}, Ref{fmpz_laurent_series}, Int),
                z, a, b, lenz)
-   z = set_prec!(z, prec)
-   z = set_val!(z, valuation(a) + valuation(b))
+   z = set_precision!(z, prec)
+   z = set_valuation!(z, valuation(a) + valuation(b))
    z = set_scale!(z, s)
    return z
 end
@@ -745,8 +745,8 @@ end
 
 function inflate(a::fmpz_laurent_series, b::Int)
     d = fmpz_laurent_series(a)
-    d = set_prec!(d, b*precision(a))
-    d = set_val!(d, b*valuation(a))
+    d = set_precision!(d, b*precision(a))
+    d = set_valuation!(d, b*valuation(a))
     d = set_scale!(d, b*scale(a))
     d.parent = parent(a)
     return d
@@ -754,8 +754,8 @@ end
 
 function deflate(a::fmpz_laurent_series, b::Int)
     d = fmpz_laurent_series(a)
-    d = set_prec!(d, div(precision(a), b))
-    d = set_val!(d, div(valuation(a), b))
+    d = set_precision!(d, div(precision(a), b))
+    d = set_valuation!(d, div(valuation(a), b))
     d = set_scale!(d, div(scale(a), b))
     d.parent = parent(a)
     return d
@@ -775,8 +775,8 @@ function ^(a::fmpz_laurent_series, b::Int)
    # special case powers of x for constructing power series efficiently
    if pol_length(a) == 0
       z = parent(a)()
-      z = set_prec!(z, b*valuation(a))
-      z = set_val!(z, b*valuation(a))
+      z = set_precision!(z, b*valuation(a))
+      z = set_valuation!(z, b*valuation(a))
       z = set_scale!(z, 1)
       return z
    elseif b == 0
@@ -785,15 +785,15 @@ function ^(a::fmpz_laurent_series, b::Int)
       return z
    elseif isgen(a)
       z = parent(a)()
-      z = set_prec!(z, b + precision(a) - 1)
-      z = set_val!(z, b)
+      z = set_precision!(z, b + precision(a) - 1)
+      z = set_valuation!(z, b)
       z = setcoeff!(z, 0, polcoeff(a, 0))
       z = set_scale!(z, 1)
       return z
    elseif pol_length(a) == 1
       z = parent(a)(polcoeff(a, 0)^b)
-      z = set_prec!(z, (b - 1)*valuation(a) + precision(a))
-      z = set_val!(z, b*valuation(a))
+      z = set_precision!(z, (b - 1)*valuation(a) + precision(a))
+      z = set_valuation!(z, b*valuation(a))
       z = set_scale!(z, 1)
       return z
    elseif b == 1
@@ -823,8 +823,8 @@ function ^(a::fmpz_laurent_series, b::Int)
       end
       bit >>= 1
    end
-   z = set_val!(z, b*val)
-   z = set_prec!(z, b*val + prec)
+   z = set_valuation!(z, b*val)
+   z = set_precision!(z, b*val + prec)
    if pol_length(z) <= 1
       z = set_scale!(z, 1)
    end
@@ -994,8 +994,8 @@ function divexact(a::fmpz_laurent_series, b::fmpz_laurent_series)
    ccall((:fmpz_poly_div_series, libflint), Nothing,
                 (Ref{fmpz_laurent_series}, Ref{fmpz_laurent_series}, Ref{fmpz_laurent_series}, Int),
                z, a, b, lenz)
-   z = set_prec!(z, prec + zval)
-   z = set_val!(z, zval)
+   z = set_precision!(z, prec + zval)
+   z = set_valuation!(z, zval)
    z = set_scale!(z, sz)
    z = rescale!(z)
    return z
@@ -1015,8 +1015,8 @@ function divexact(x::fmpz_laurent_series, y::Union{Integer, Rational, AbstractFl
    y == 0 && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
-   z = set_prec!(z, precision(x))
-   z = set_val!(z, valuation(x))
+   z = set_precision!(z, precision(x))
+   z = set_valuation!(z, valuation(x))
    z = set_scale!(z, scale(x))
    for i = 1:lenx
       z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y))
@@ -1032,8 +1032,8 @@ function divexact(x::fmpz_laurent_series, y::T) where {T <: RingElem}
    iszero(y) && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
-   z = set_prec!(z, precision(x))
-   z = set_val!(z, valuation(x))
+   z = set_precision!(z, precision(x))
+   z = set_valuation!(z, valuation(x))
    z = set_scale!(z, scale(x))
    for i = 1:lenx
       z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y))
@@ -1057,8 +1057,8 @@ function inv(a::fmpz_laurent_series)
    ainv = parent(a)()
    sa = scale(a)
    lenz = div(precision(a) - valuation(a) + sa - 1, sa)
-   ainv = set_prec!(ainv, precision(a) - 2*valuation(a))
-   ainv = set_val!(ainv, -valuation(a))
+   ainv = set_precision!(ainv, precision(a) - 2*valuation(a))
+   ainv = set_valuation!(ainv, -valuation(a))
    ainv = set_scale!(ainv, sa)
    !isunit(a1) && error("Unable to invert power series")
    z = parent(a)()
@@ -1088,16 +1088,16 @@ function sqrt(a::fmpz_laurent_series)
    prec = precision(a) - aval
    if prec == 0
       asqrt = parent(a)()
-      asqrt = set_prec!(asqrt, aval2)
-      asqrt = set_val!(asqrt, aval2)
+      asqrt = set_precision!(asqrt, aval2)
+      asqrt = set_valuation!(asqrt, aval2)
       asqrt = set_scale!(asqrt, 1)
       return asqrt
    end
    asqrt = parent(a)()
    s = scale(a)
    zlen = div(prec + s - 1, s)
-   asqrt = set_prec!(asqrt, prec + aval2)
-   asqrt = set_val!(asqrt, aval2)
+   asqrt = set_precision!(asqrt, prec + aval2)
+   asqrt = set_valuation!(asqrt, aval2)
    flag = Bool(ccall((:fmpz_poly_sqrt_series, libflint), Cint,
           (Ref{fmpz_laurent_series}, Ref{fmpz_laurent_series}, Int),
                 asqrt, a, zlen))
@@ -1120,7 +1120,7 @@ end
 function exp(a::fmpz_laurent_series)
    if iszero(a)
       z = one(parent(a))
-      z = set_prec!(z, precision(a))
+      z = set_precision!(z, precision(a))
       return z
    end
    vala = valuation(a)
@@ -1137,15 +1137,15 @@ function exp(a::fmpz_laurent_series)
       vala = div(vala, sc)
       preca = div(preca, sc)
       a = fmpz_laurent_series(a)
-      a = set_val!(a, vala)
-      a = set_prec!(a, preca)
+      a = set_valuation!(a, vala)
+      a = set_precision!(a, preca)
       a = set_scale!(a, 1)
       a.parent = S
    end
    z = parent(a)()
    R = base_ring(a)
-   z = set_prec!(z, preca)
-   z = set_val!(z, 0)
+   z = set_precision!(z, preca)
+   z = set_valuation!(z, 0)
    c = vala == 0 ? polcoeff(a, 0) : R()
    z = setcoeff!(z, 0, exp(c))
    len = pol_length(a) + vala
@@ -1173,8 +1173,8 @@ end
 function zero!(a::fmpz_laurent_series)
   ccall((:fmpz_poly_zero, libflint), Nothing,
                    (Ref{fmpz_laurent_series},), a)
-   a = set_prec!(a, parent(a).prec_max)
-   a = set_val!(a, parent(a).prec_max)
+   a = set_precision!(a, parent(a).prec_max)
+   a = set_valuation!(a, parent(a).prec_max)
    a = set_scale!(a, 1)
    return a
 end
@@ -1208,8 +1208,8 @@ function mul!(c::fmpz_laurent_series, a::fmpz_laurent_series, b::fmpz_laurent_se
    if lena == 0 || lenb == 0
       ccall((:fmpz_poly_zero, libflint), Nothing,
                 (Ref{fmpz_laurent_series},), c)
-      c = set_prec!(c, prec + aval + bval)
-      c = set_val!(c, aval + bval)
+      c = set_precision!(c, prec + aval + bval)
+      c = set_valuation!(c, aval + bval)
       c = set_scale!(c, 1)
       return c
    else
@@ -1224,8 +1224,8 @@ function mul!(c::fmpz_laurent_series, a::fmpz_laurent_series, b::fmpz_laurent_se
       ccall((:fmpz_poly_mullow, libflint), Nothing,
          (Ref{fmpz_laurent_series}, Ref{fmpz_laurent_series}, Ref{fmpz_laurent_series}, Int), c, a, b, lenc)
    end
-   c = set_val!(c, aval + bval)
-   c = set_prec!(c, prec + c.val)
+   c = set_valuation!(c, aval + bval)
+   c = set_precision!(c, prec + c.val)
    c = set_scale!(c, sz)
    renormalize!(c)
    c = rescale!(c)
@@ -1263,8 +1263,8 @@ function add!(c::fmpz_laurent_series, a::fmpz_laurent_series, b::fmpz_laurent_se
    minb = min(valb + lenb*sb, prec)
    lenr = max(mina, minb) - valr
    R = base_ring(c)
-   c = set_prec!(c, prec)
-   c = set_val!(c, valr)
+   c = set_precision!(c, prec)
+   c = set_valuation!(c, valr)
    c = set_scale!(c, sz)
       pa = vala
    pb = valb
@@ -1317,8 +1317,8 @@ function eta_qexp(x::fmpz_laurent_series)
    ccall((:fmpz_poly_eta_qexp, libflint), Nothing,
                                           (Ref{fmpz_laurent_series}, Int, Int), z, 1, div(prec + zscale - 1, zscale))
    z = set_scale!(z, zscale)
-   z = set_val!(z, 0)
-   z = set_prec!(z, prec)
+   z = set_valuation!(z, 0)
+   z = set_precision!(z, prec)
    return z
 end
 

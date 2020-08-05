@@ -14,7 +14,7 @@ export AcbPolyRing, acb_poly
 export ArbMatSpace, arb_mat
 export AcbMatSpace, acb_mat
 
-arb_check_prec(p::Int) = (p >= 2 && p < (typemax(Int) >> 4)) || throw(ArgumentError("invalid precision"))
+arb_check_precision(p::Int) = (p >= 2 && p < (typemax(Int) >> 4)) || throw(ArgumentError("invalid precision"))
 
 # Rounding modes
 
@@ -76,7 +76,7 @@ mutable struct ArbField <: Field
   prec::Int
 
   function ArbField(p::Int = 256; cached::Bool = true)
-    arb_check_prec(p)
+    arb_check_precision(p)
     if cached && haskey(ArbFieldID, p)
       return ArbFieldID[p]
     else
@@ -91,7 +91,7 @@ end
 
 const ArbFieldID = Dict{Int, ArbField}()
 
-prec(x::ArbField) = x.prec
+precision(x::ArbField) = x.prec
 
 mutable struct arb <: FieldElem
   mid_exp::Int # fmpz
@@ -158,7 +158,7 @@ mutable struct AcbField <: Field
   prec::Int
 
   function AcbField(p::Int = 256; cached::Bool = true)
-    arb_check_prec(p)
+    arb_check_precision(p)
     if cached && haskey(AcbFieldID, p)
       return AcbFieldID[p]
     else
@@ -173,7 +173,7 @@ end
 
 const AcbFieldID = Dict{Int, AcbField}()
 
-prec(x::AcbField) = x.prec
+precision(x::AcbField) = x.prec
 
 mutable struct acb <: FieldElem
   real_mid_exp::Int     # fmpz
@@ -359,7 +359,7 @@ elem_type(x::ArbPolyRing) = arb_poly
 
 var(x::ArbPolyRing) = x.S
 
-prec(x::ArbPolyRing) = prec(x.base_ring)
+precision(x::ArbPolyRing) = precision(x.base_ring)
 
 base_ring(a::ArbPolyRing) = a.base_ring
 
@@ -478,7 +478,7 @@ elem_type(x::AcbPolyRing) = acb_poly
 
 var(x::AcbPolyRing) = x.S
 
-prec(x::AcbPolyRing) = prec(x.base_ring)
+precision(x::AcbPolyRing) = precision(x.base_ring)
 
 base_ring(a::AcbPolyRing) = a.base_ring
 

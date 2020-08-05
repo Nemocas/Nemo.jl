@@ -31,7 +31,7 @@ function integrate(C::AcbField, F, a, b;
    cgoal = 0
 
    if rel_tol === -1.0
-      cgoal = prec(C)
+      cgoal = precision(C)
    else
       t = BigFloat(rel_tol, RoundDown)
       cgoal_clong = Ref{Clong}()
@@ -43,7 +43,7 @@ function integrate(C::AcbField, F, a, b;
    ccall((:mag_init, libarb), Nothing, (Ref{mag_struct},), ctol)
 
    if abs_tol === -1.0
-      ccall((:mag_set_ui_2exp_si, libarb), Nothing, (Ref{mag_struct}, UInt, Int), ctol, 1, -prec(C))
+      ccall((:mag_set_ui_2exp_si, libarb), Nothing, (Ref{mag_struct}, UInt, Int), ctol, 1, -precision(C))
    else
       t = BigFloat(abs_tol, RoundDown)
       expo = Ref{Clong}()
@@ -64,7 +64,7 @@ function integrate(C::AcbField, F, a, b;
                    Ref{mag_struct},                #abs_tol
                    Ref{acb_calc_integrate_opts},   #opts
                    Int),
-      res, acb_calc_func_wrap_c(), F, lower, upper, cgoal, ctol, opts, prec(C))
+      res, acb_calc_func_wrap_c(), F, lower, upper, cgoal, ctol, opts, precision(C))
 
    ccall((:mag_clear, libarb), Nothing, (Ref{mag_struct},), ctol)
 

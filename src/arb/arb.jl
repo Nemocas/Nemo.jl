@@ -135,7 +135,7 @@ end
 
 function show(io::IO, x::ArbField)
   print(io, "Real Field with ")
-  print(io, prec(x))
+  print(io, precision(x))
   print(io, " bits of precision and error bounds")
 end
 
@@ -392,19 +392,19 @@ end
 <(x::BigFloat, y::arb) = arb(x) < y
 >(x::BigFloat, y::arb) = arb(x) > y
 
-==(x::arb, y::fmpq) = x == arb(y, prec(parent(x)))
-!=(x::arb, y::fmpq) = x != arb(y, prec(parent(x)))
-<=(x::arb, y::fmpq) = x <= arb(y, prec(parent(x)))
->=(x::arb, y::fmpq) = x >= arb(y, prec(parent(x)))
-<(x::arb, y::fmpq) = x < arb(y, prec(parent(x)))
->(x::arb, y::fmpq) = x > arb(y, prec(parent(x)))
+==(x::arb, y::fmpq) = x == arb(y, precision(parent(x)))
+!=(x::arb, y::fmpq) = x != arb(y, precision(parent(x)))
+<=(x::arb, y::fmpq) = x <= arb(y, precision(parent(x)))
+>=(x::arb, y::fmpq) = x >= arb(y, precision(parent(x)))
+<(x::arb, y::fmpq) = x < arb(y, precision(parent(x)))
+>(x::arb, y::fmpq) = x > arb(y, precision(parent(x)))
 
-==(x::fmpq, y::arb) = arb(x, prec(parent(y))) == y
-!=(x::fmpq, y::arb) = arb(x, prec(parent(y))) != y
-<=(x::fmpq, y::arb) = arb(x, prec(parent(y))) <= y
->=(x::fmpq, y::arb) = arb(x, prec(parent(y))) >= y
-<(x::fmpq, y::arb) = arb(x, prec(parent(y))) < y
->(x::fmpq, y::arb) = arb(x, prec(parent(y))) > y
+==(x::fmpq, y::arb) = arb(x, precision(parent(y))) == y
+!=(x::fmpq, y::arb) = arb(x, precision(parent(y))) != y
+<=(x::fmpq, y::arb) = arb(x, precision(parent(y))) <= y
+>=(x::fmpq, y::arb) = arb(x, precision(parent(y))) >= y
+<(x::fmpq, y::arb) = arb(x, precision(parent(y))) < y
+>(x::fmpq, y::arb) = arb(x, precision(parent(y))) > y
 
 ==(x::arb, y::Rational{T}) where {T <: Integer} = x == fmpq(y)
 !=(x::arb, y::Rational{T}) where {T <: Integer} = x != fmpq(y)
@@ -972,7 +972,7 @@ end
 """
 function const_pi(r::ArbField)
   z = r()
-  ccall((:arb_const_pi, libarb), Nothing, (Ref{arb}, Int), z, prec(r))
+  ccall((:arb_const_pi, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
   return z
 end
 
@@ -982,7 +982,7 @@ end
 """
 function const_e(r::ArbField)
   z = r()
-  ccall((:arb_const_e, libarb), Nothing, (Ref{arb}, Int), z, prec(r))
+  ccall((:arb_const_e, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
   return z
 end
 
@@ -992,7 +992,7 @@ end
 """
 function const_log2(r::ArbField)
   z = r()
-  ccall((:arb_const_log2, libarb), Nothing, (Ref{arb}, Int), z, prec(r))
+  ccall((:arb_const_log2, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
   return z
 end
 
@@ -1002,7 +1002,7 @@ end
 """
 function const_log10(r::ArbField)
   z = r()
-  ccall((:arb_const_log10, libarb), Nothing, (Ref{arb}, Int), z, prec(r))
+  ccall((:arb_const_log10, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
   return z
 end
 
@@ -1012,7 +1012,7 @@ end
 """
 function const_euler(r::ArbField)
   z = r()
-  ccall((:arb_const_euler, libarb), Nothing, (Ref{arb}, Int), z, prec(r))
+  ccall((:arb_const_euler, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
   return z
 end
 
@@ -1022,7 +1022,7 @@ end
 """
 function const_catalan(r::ArbField)
   z = r()
-  ccall((:arb_const_catalan, libarb), Nothing, (Ref{arb}, Int), z, prec(r))
+  ccall((:arb_const_catalan, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
   return z
 end
 
@@ -1032,7 +1032,7 @@ end
 """
 function const_khinchin(r::ArbField)
   z = r()
-  ccall((:arb_const_khinchin, libarb), Nothing, (Ref{arb}, Int), z, prec(r))
+  ccall((:arb_const_khinchin, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
   return z
 end
 
@@ -1042,7 +1042,7 @@ end
 """
 function const_glaisher(r::ArbField)
   z = r()
-  ccall((:arb_const_glaisher, libarb), Nothing, (Ref{arb}, Int), z, prec(r))
+  ccall((:arb_const_glaisher, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
   return z
 end
 
@@ -1420,7 +1420,7 @@ end
 function sinpi(x::fmpq, r::ArbField)
   z = r()
   ccall((:arb_sin_pi_fmpq, libarb), Nothing,
-        (Ref{arb}, Ref{fmpq}, Int), z, x, prec(r))
+        (Ref{arb}, Ref{fmpq}, Int), z, x, precision(r))
   return z
 end
 
@@ -1431,7 +1431,7 @@ end
 function cospi(x::fmpq, r::ArbField)
   z = r()
   ccall((:arb_cos_pi_fmpq, libarb), Nothing,
-        (Ref{arb}, Ref{fmpq}, Int), z, x, prec(r))
+        (Ref{arb}, Ref{fmpq}, Int), z, x, precision(r))
   return z
 end
 
@@ -1444,7 +1444,7 @@ function sincospi(x::fmpq, r::ArbField)
   s = r()
   c = r()
   ccall((:arb_sin_cos_pi_fmpq, libarb), Nothing,
-        (Ref{arb}, Ref{arb}, Ref{fmpq}, Int), s, c, x, prec(r))
+        (Ref{arb}, Ref{arb}, Ref{fmpq}, Int), s, c, x, precision(r))
   return (s, c)
 end
 

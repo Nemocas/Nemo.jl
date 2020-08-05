@@ -12,7 +12,7 @@ function *(a::fmpz, b::AbsSeriesElem)
    len = length(b)
    z = parent(b)()
    fit!(z, len)
-   z = set_prec!(z, precision(b))
+   z = set_precision!(z, precision(b))
    for i = 1:len
       z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
    end
@@ -48,7 +48,7 @@ function divexact(x::AbsSeriesElem, y::fmpz)
    lenx = length(x)
    z = parent(x)()
    fit!(z, lenx)
-   z = set_prec!(z, precision(x))
+   z = set_precision!(z, precision(x))
    for i = 1:lenx
       z = setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y))
    end
@@ -79,8 +79,8 @@ function *(a::fmpz, b::RelSeriesElem)
    len = pol_length(b)
    z = parent(b)()
    fit!(z, len)
-   z = set_prec!(z, precision(b))
-   z = set_val!(z, valuation(b))
+   z = set_precision!(z, precision(b))
+   z = set_valuation!(z, valuation(b))
    for i = 1:len
       z = setcoeff!(z, i - 1, a*polcoeff(b, i - 1))
    end
@@ -118,8 +118,8 @@ function divexact(x::RelSeriesElem, y::fmpz)
    lenx = pol_length(x)
    z = parent(x)()
    fit!(z, lenx)
-   z = set_prec!(z, precision(x))
-   z = set_val!(z, valuation(x))
+   z = set_precision!(z, precision(x))
+   z = set_valuation!(z, valuation(x))
    for i = 1:lenx
       z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y))
    end
