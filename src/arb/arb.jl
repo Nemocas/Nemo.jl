@@ -1834,7 +1834,7 @@ function simplest_rational_inside(x::arb)
 
    ccall((:arb_get_interval_fmpz_2exp, libarb), Nothing,
          (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{arb}), a, b, e, x)
-   @assert fits(Int, e)
+   !fits(Int, e) && throw(error("Result does not fit into an fmpq"))
    _e = Int(e)
    if e >= 0
       return a << _e
