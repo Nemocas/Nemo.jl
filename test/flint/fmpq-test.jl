@@ -397,3 +397,9 @@ end
    @test remove(a, 3) == (-1, fmpq(2, 1))
    @test valuation(a, 3) == -1
 end
+
+@testset "fmpq.simplest_between..." begin
+   @test @inferred simplest_between(fmpq(-2//2), fmpq(1)) == -1
+   @test simplest_between(fmpq(1//10), fmpq(3//10)) == 1//4
+   @test simplest_between(fmpq(11//10), fmpq(21//10)) == 2
+end

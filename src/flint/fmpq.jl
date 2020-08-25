@@ -7,7 +7,7 @@
 export fmpq, FlintQQ, FractionField, Rational, FlintRationalField, height,
        height_bits, isless, reconstruct, next_minimal, next_signed_minimal,
        next_calkin_wilf, next_signed_calkin_wilf, dedekind_sum, harmonic,
-       bernoulli, bernoulli_cache, rand_bits
+       bernoulli, bernoulli_cache, rand_bits, simplest_between
 
 ###############################################################################
 #
@@ -762,6 +762,39 @@ dedekind_sum(h::Integer, k::fmpz) = dedekind_sum(fmpz(h), k)
 > Computes the Dedekind sum $s(h,k)$ for arbitrary $h$ and $k$.
 """
 dedekind_sum(h::Integer, k::Integer) = dedekind_sum(fmpz(h), fmpz(k))
+
+###############################################################################
+#
+#  Simplest between
+#
+###############################################################################
+
+function _fmpq_simplest_between(l_num::fmpz, l_den::fmpz,
+                                r_num::fmpz, r_den::fmpz)
+   n = fmpz()
+   d = fmpz()
+
+   ccall((:_fmpq_simplest_between, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}),
+         n, d, l_num, l_den, r_num, r_den)
+
+   return n//d
+end
+
+@doc Markdown.doc"""
+      simplest_between(l::fmpq, r::fmpq)
+ 
+> Return the simplest fraction in the closed interval `[l, r]`. A canonical >
+> fraction `a_1/b_1` is defined to be simpler than `a_2/b_2` iff `b_1 < b_2` or
+> `b_1 = b_2` and `a_1 < a_2`.
+"""
+function simplest_between(l::fmpq, r::fmpq)
+   z = fmpq()
+   ccall((:fmpq_simplest_between, libflint), Nothing,
+         (Ref{fmpq}, Ref{fmpq}, Ref{fmpq}), z, l, r)
+   return z
+end
+
 
 ###############################################################################
 #

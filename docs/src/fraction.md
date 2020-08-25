@@ -224,3 +224,14 @@ d = bernoulli(12)
 bernoulli_cache(100)
 e = bernoulli(100)
 ```
+
+```@docs
+simplest_between(::fmpq, ::fmpq)
+```
+
+**Examples**
+
+```julia
+simplest_between(fmpq(1//10), fmpq(3//10))
+```
+

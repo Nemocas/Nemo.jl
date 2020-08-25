@@ -682,3 +682,13 @@ V = [RR(1), a, a^2, a^3, a^4, a^5]
 W = lindep(V, 20)
 ```
 
+```@docs
+simplest_rational_inside(::arb)
+```
+
+**Examples**
+
+```julia
+RR = RealField(64)
+simplest_rational_inside(const_pi(R))
+```

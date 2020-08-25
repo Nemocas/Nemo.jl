@@ -25,7 +25,7 @@ export ball, radius, midpoint, contains, contains_zero,
        sincos, sincospi, sinhcosh, atan2,
        agm, fac, binom, fib, bernoulli, risingfac, risingfac2, polylog,
        chebyshev_t, chebyshev_t2, chebyshev_u, chebyshev_u2, bell, numpart,
-       lindep, canonical_unit
+       lindep, canonical_unit, simplest_rational_inside
 
 ###############################################################################
 #
@@ -1812,6 +1812,36 @@ function lindep(A::Array{arb, 1}, bits::Int)
   end
   L = lll(M)
   return [L[1, i] for i = 1:n]
+end
+
+################################################################################
+#
+#  Simplest rational inside
+#
+################################################################################
+
+@doc Markdown.doc"""
+      simplest_between(x::arb)
+ 
+> Return the simplest fraction inside the ball `x`. A canonical fraction
+> `a_1/b_1` is defined to be simpler than `a_2/b_2` iff `b_1 < b_2` or > `b_1 =
+> b_2` and `a_1 < a_2`.
+"""
+function simplest_rational_inside(x::arb)
+   a = fmpz()
+   b = fmpz()
+   e = fmpz()
+
+   ccall((:arb_get_interval_fmpz_2exp, libarb), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{arb}), a, b, e, x)
+   @assert fits(Int, e)
+   _e = Int(e)
+   if e >= 0
+      return a << _e
+   end
+   _e = -_e
+   d = fmpz(1) << _e
+   return _fmpq_simplest_between(a, d, b, d)
 end
 
 ################################################################################
