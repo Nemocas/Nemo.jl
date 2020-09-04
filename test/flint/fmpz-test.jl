@@ -63,6 +63,15 @@ end
    @test_throws DomainError rand_bits_prime(FlintZZ, -1)
    @test_throws DomainError rand_bits_prime(FlintZZ, 0)
    @test_throws DomainError rand_bits_prime(FlintZZ, 1)
+
+   @testset "Nemo seeding" begin
+      seed = rand(UInt128)
+      Nemo.randseed!(seed)
+      a = [rand_bits(ZZ, i) for i = 1:99] # must test for i > 64, to exercise
+                                          # both Flint's RNGs
+      Nemo.randseed!(seed)
+      @test a == [rand_bits(ZZ, i) for i = 1:99]
+   end
 end
 
 @testset "fmpz.printing..." begin

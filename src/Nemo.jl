@@ -391,6 +391,47 @@ include("embedding/embedding.jl")
 
 include("Rings.jl")
 
+
+
+###############################################################################
+#
+#  Random
+#
+################################################################################
+
+"""
+    randseed!([seed])
+
+Reseed Nemo's global RNG with `seed`. Note that each thread has its own global RNG,
+and that `randseed!` reseeds only the RNG from the current thread.
+This is similar to what `Random.seed!(seed)` does for Julia's global RNG.
+
+When `UInt == UInt64`, `seed` must be of type `UInt128`, and of type `UInt64` otherwise.
+When `seed` is not specified, a random seed is generated from Julia's global RNG.
+
+For a fixed seed, the stream of generated numbers is allowed to change between
+different versions of Nemo.
+"""
+randseed!(seed::Union{widen(UInt),Nothing}=nothing) =
+   Random.seed!(_flint_rand_states[Threads.threadid()], seed)
+
+function Random.seed!(a::rand_ctx, s::widen(UInt))
+   flint_randseed!(a, s % UInt, s >> (8*sizeof(UInt)) % UInt)
+   flint_gmp_randseed!(a, big(s))
+end
+
+Random.seed!(a::rand_ctx, s::Nothing=nothing) = Random.seed!(a, rand(widen(UInt)))
+
+flint_randseed!(a::rand_ctx, seed1::UInt, seed2::UInt) =
+   ccall((:flint_randseed, libflint), Cvoid, (Ptr{Cvoid}, UInt, UInt), a.ptr, seed1, seed2)
+
+function flint_gmp_randseed!(a::rand_ctx, seed::BigInt)
+   ccall((:_flint_rand_init_gmp, libflint), Cvoid, (Ptr{Cvoid},), a.ptr)
+   ccall((:__gmp_randseed, :libgmp), Cvoid, (Ptr{Cvoid}, Ref{BigInt}),
+         a.ptr, # gmp_state is the first field of a.ptr (cf. flint.h)
+         seed)
+end
+
 ################################################################################
 #
 #  Thread local storages
