@@ -64,6 +64,28 @@ end
    @test_throws DomainError rand_bits_prime(FlintZZ, 0)
    @test_throws DomainError rand_bits_prime(FlintZZ, 1)
 
+   # in a range
+   for e in [0, 1, 2, 3, 32, 64, 65, 100, 129, 500]
+      for b in [fmpz(2) .^ e ; fmpz(2) .^ e .+ e;]
+         for r in [fmpz(1):fmpz(1):b, fmpz(3):fmpz(1):b, fmpz(1):fmpz(3):b]
+            if isempty(r)
+               @test_throws ArgumentError rand(r)
+            else
+               rb = map(BigInt, r) # in(::fmpz, StepRange{fmpz}) no working
+               @test BigInt(rand(r)) in rb
+               @test rand(r) isa fmpz
+               @test all(in(rb), map(BigInt, rand(r, 9)))
+               @test rand(r, 9) isa Vector{fmpz}
+               seed = rand(rng, UInt128)
+               Random.seed!(rng, seed)
+               x = rand(rng, r)
+               Random.seed!(rng, seed)
+               @test x == rand(rng, r)
+            end
+         end
+      end
+   end
+
    @testset "Nemo seeding" begin
       for seed in (rand(UInt128), abs(rand(Int8)))
          Nemo.randseed!(seed)

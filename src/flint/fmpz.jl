@@ -83,7 +83,7 @@ isdomain_type(::Type{fmpz}) = true
 
 # `length` should return an Integer, so BigInt seems appropriate as fmpz is not <: Integer
 # this method is useful in particular to enable rand(ZZ(n):ZZ(m))
-function Base.length(r::StepRange{fmpz,fmpz})
+function Base.length(r::StepRange{fmpz})
     n = div((r.stop - r.start) + r.step, r.step)
     isempty(r) ? zero(BigInt) : BigInt(n)
 end
@@ -1815,7 +1815,6 @@ rand(rng::AbstractRNG, R::FlintIntegerRing, n::UnitRange{Int}) = R(rand(rng, n))
 
 rand(R::FlintIntegerRing, n::UnitRange{Int}) = rand(Random.GLOBAL_RNG, R, n)
 
-
 @doc Markdown.doc"""
     rand_bits(::FlintIntegerRing, b::Int)
 > Return a random signed integer whose absolute value has $b$ bits.
@@ -1841,6 +1840,87 @@ function rand_bits_prime(::FlintIntegerRing, n::Int, proved::Bool = true)
 	  z, _flint_rand_states[Threads.threadid()].ptr, n, Cint(proved))
    return z
 end
+
+# rand in a range
+# this mirrors the implementation for BigInt in the Random module
+
+using Base.GMP: Limb, MPZ
+
+# "views" a non-small fmpz as a readonly BigInt
+# the caller must call GC.@preserve appropriately
+function _as_bigint(z::fmpz)
+   @assert !_fmpz_is_small(z)
+   unsafe_load(Ptr{BigInt}(z.d << 2))
+end
+
+
+Random.Sampler(::Type{<:AbstractRNG}, r::StepRange{fmpz, fmpz}, ::Random.Repetition) =
+   SamplerFmpz(r)
+
+struct SamplerFmpz <: Random.Sampler{fmpz}
+   a::fmpz           # first
+   m::BigInt         # range length - 1
+   nlimbs::Int       # number of limbs in generated BigInt's (z ∈ [0, m])
+   nlimbsmax::Int    # max number of limbs for z+a
+   mask::Limb        # applied to the highest limb
+
+   ## diverges from Random.SamplerBigInt:
+   step::fmpz
+end
+
+function SamplerFmpz(r::StepRange{fmpz, fmpz})
+   r1 = first(r)
+   r2 = last(r)
+   s = step(r)
+
+   if isone(s)
+      m = BigInt(r2 - r1)
+   else
+      m = length(r)::BigInt # type assertion in case length is changed to return an fmpz
+      MPZ.sub_ui!(m, 1)
+   end
+
+   m < 0 && throw(ArgumentError("range must be non-empty"))
+   nd = ndigits(m, base=2)
+   nlimbs, highbits = divrem(nd, 8*sizeof(Limb))
+   highbits > 0 && (nlimbs += 1)
+   mask = highbits == 0 ? ~zero(Limb) : one(Limb)<<highbits - one(Limb)
+   GC.@preserve r1 r2 begin
+      a1 = _fmpz_is_small(r1) ? 1 : _as_bigint(r1).size
+      a2 = _fmpz_is_small(r2) ? 1 : _as_bigint(r2).size
+   end
+   nlimbsmax = max(nlimbs, abs(a1), abs(a2))
+   return SamplerFmpz(r1, m, nlimbs, nlimbsmax, mask, s)
+end
+
+function rand(rng::AbstractRNG, sp::SamplerFmpz)
+   z = fmpz()
+   # this make sure z is backed up by an mpz_t object:
+   ccall((:fmpz_init2, libflint), Nothing, (Ref{fmpz}, UInt), z, sp.nlimbsmax)
+   @assert !_fmpz_is_small(z)
+   GC.@preserve z begin
+      x = _as_bigint(z)
+      limbs = Random.UnsafeView(x.d, sp.nlimbs)
+      while true
+         rand!(rng, limbs)
+         limbs[end] &= sp.mask
+         MPZ.mpn_cmp(x, sp.m, sp.nlimbs) <= 0 && break
+      end
+      # adjust x.size (normally done by mpz_limbs_finish, in GMP version >= 6)
+      sz = sp.nlimbs
+      while sz > 0
+         limbs[sz] != 0 && break
+         sz -= 1
+      end
+      # write sz in the .size field of the mpz object
+      unsafe_store!(Ptr{Cint}(z.d << 2) + sizeof(Cint), sz)
+   end
+   if !isone(sp.step)
+      mul!(z, z, sp.step)
+   end
+   add!(z, z, sp.a)
+end
+
 
 ###############################################################################
 #
