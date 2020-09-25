@@ -88,10 +88,6 @@ function Base.length(r::StepRange{fmpz,fmpz})
     isempty(r) ? zero(BigInt) : BigInt(n)
 end
 
-using Base.GMP: BITS_PER_LIMB
-
-coeff_is_mpz(x::fmpz) = x.d >>> (BITS_PER_LIMB - 2) == 1
-
 ################################################################################
 #
 #   Hashing
@@ -1641,11 +1637,11 @@ end
 > Return the number of digits of $x$ in the base $b$ (default is $b = 10$).
 """
 function ndigits(x::fmpz, b::Integer = 10)::Int
-   if coeff_is_mpz(x)
+   if _fmpz_is_small(x)
+      ndigits(x.d, base=b)
+   else
       # GMP/Flint's sizeinbase is not reliable for b > 62, so use Julia's implementation
       GC.@preserve x ndigits(unsafe_load(Ptr{BigInt}(x.d << 2)), base=b)
-   else
-      ndigits(x.d, base=b)
    end
 end
 
