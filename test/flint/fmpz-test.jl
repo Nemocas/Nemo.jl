@@ -545,6 +545,10 @@ end
    @test nbits(a) == 4
 
    @test ndigits(a, 3) == 3
+
+   a = fmpz(4611686837384281896) # must not be an "immediate" integer (but a GMP int)
+
+   @test ndigits(a, 257) == 8
 end
 
 @testset "fmpz.string_io..." begin

@@ -88,6 +88,10 @@ function Base.length(r::StepRange{fmpz,fmpz})
     isempty(r) ? zero(BigInt) : BigInt(n)
 end
 
+using Base.GMP: BITS_PER_LIMB
+
+coeff_is_mpz(x::fmpz) = x.d >>> (BITS_PER_LIMB - 2) == 1
+
 ################################################################################
 #
 #   Hashing
@@ -1632,18 +1636,18 @@ function base(n::fmpz, b::Integer)
     return s
 end
 
-function ndigits_internal(x::fmpz, b::Integer = 10)
-    # fmpz_sizeinbase might return an answer 1 too big
-    n = Int(ccall((:fmpz_sizeinbase, libflint), UInt,
-                  (Ref{fmpz}, Int32), x, b))
-    abs(x) < fmpz(b)^(n - 1) ? n - 1 : n
-end
-
 @doc Markdown.doc"""
     ndigits(x::fmpz, b::Integer = 10)
 > Return the number of digits of $x$ in the base $b$ (default is $b = 10$).
 """
-ndigits(x::fmpz, b::Integer = 10) = iszero(x) ? 1 : ndigits_internal(x, b)
+function ndigits(x::fmpz, b::Integer = 10)::Int
+   if coeff_is_mpz(x)
+      # GMP/Flint's sizeinbase is not reliable for b > 62, so use Julia's implementation
+      GC.@preserve x ndigits(unsafe_load(Ptr{BigInt}(x.d << 2)), base=b)
+   else
+      ndigits(x.d, base=b)
+   end
+end
 
 @doc Markdown.doc"""
     nbits(x::fmpz)
