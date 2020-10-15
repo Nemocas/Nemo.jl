@@ -24,6 +24,8 @@ using LoadFlint
 
 using Pkg
 
+import SHA
+
 import AbstractAlgebra: div, divrem
 
 # N.B: do not import div, divrem from Base
@@ -400,27 +402,53 @@ include("Rings.jl")
 ################################################################################
 
 """
-    randseed!([seed])
+    randseed!([seed::Integer])
 
 Reseed Nemo's global RNG with `seed`. Note that each thread has its own global RNG,
 and that `randseed!` reseeds only the RNG from the current thread.
 This is similar to what `Random.seed!(seed)` does for Julia's global RNG.
 
-When `UInt == UInt64`, `seed` must be of type `UInt128`, and of type `UInt64` otherwise.
+The given `seed` must be a non-negative integer.
 When `seed` is not specified, a random seed is generated from Julia's global RNG.
 
 For a fixed seed, the stream of generated numbers is allowed to change between
 different versions of Nemo.
 """
-randseed!(seed::Union{widen(UInt),Nothing}=nothing) =
+randseed!(seed::Union{Integer,Nothing}=nothing) =
    Random.seed!(_flint_rand_states[Threads.threadid()], seed)
 
-function Random.seed!(a::rand_ctx, s::widen(UInt))
-   flint_randseed!(a, s % UInt, s >> (8*sizeof(UInt)) % UInt)
-   flint_gmp_randseed!(a, big(s))
+function Random.seed!(a::rand_ctx, s::Integer)
+   # we hash the seed to obtain better independence of streams for
+   # two given seeds which could be "not very different"
+   # (cf. the documentation of `gmp_randseed`).
+   # Hashing has a negligible cost compared to the call to `gmp_randseed`.
+   ctx = SHA.SHA2_512_CTX()
+   seed = Random.make_seed(s)::Vector{UInt32}
+   SHA.update!(ctx, reinterpret(UInt8, seed))
+   digest = reinterpret(UInt, SHA.digest!(ctx))
+   @assert Base.GMP.Limb == UInt
+
+   # two last words go for flint_randseed!
+   flint_randseed!(a, digest[end], digest[end-1])
+
+   # remaining words (6 or 14) for flint_gmp_randseed!
+   seedbits = 512 - 2*sizeof(UInt)*8
+   n = Int(seedbits / (sizeof(UInt)*8))
+   @assert n == 6 && UInt === UInt64 || n == 14 && UInt === UInt32
+   if VERSION >= v"1.3"
+      b = BigInt(nbits = seedbits)
+   else
+      b = Base.GMP.MPZ.realloc2(seedbits)
+   end
+
+   @assert b.alloc >= n
+   GC.@preserve digest b unsafe_copyto!(b.d, pointer(digest), n)
+   b.size = n
+   flint_gmp_randseed!(a, b)
+   return a
 end
 
-Random.seed!(a::rand_ctx, s::Nothing=nothing) = Random.seed!(a, rand(widen(UInt)))
+Random.seed!(a::rand_ctx, s::Nothing=nothing) = Random.seed!(a, rand(UInt128))
 
 flint_randseed!(a::rand_ctx, seed1::UInt, seed2::UInt) =
    ccall((:flint_randseed, libflint), Cvoid, (Ptr{Cvoid}, UInt, UInt), a.ptr, seed1, seed2)
