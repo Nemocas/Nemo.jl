@@ -71,7 +71,7 @@ function integrate(C::AcbField, F, a, b;
    if status == ARB_CALC_SUCCESS
       nothing
    elseif status == ARB_CALC_NO_CONVERGENCE
-      @warn("Integration did converge")
+      @warn("Integration did not converge")
    end
    return res
 end
