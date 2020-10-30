@@ -18,10 +18,10 @@ struct FinFieldMorphism{T} <: AbstractAlgebra.Map{T, T, AbstractAlgebra.SetMap,
 end
 
 
-domain(f::FinFieldMorphism) = (f.map).domain
-codomain(f::FinFieldMorphism) = (f.map).codomain
-image_fn(f::FinFieldMorphism) = (f.map).image_fn
-inverse_fn(f::FinFieldMorphism) = (f.preimage).image_fn
+domain(f::FinFieldMorphism) = domain(f.map)
+codomain(f::FinFieldMorphism) = codomain(f.map)
+image_fn(f::FinFieldMorphism) = image_fn(f.map)
+inverse_fn(f::FinFieldMorphism) = image_fn(f.preimage)
 
 function (f::FinFieldMorphism)(x)
     return image_fn(f)(x)::elem_type(codomain(f))
@@ -44,10 +44,10 @@ struct FinFieldPreimage{T} <: AbstractAlgebra.Map{T, T, AbstractAlgebra.SetMap,
     end
 end
 
-domain(f::FinFieldPreimage) = (f.map).domain
-codomain(f::FinFieldPreimage) = (f.map).codomain
-image_fn(f::FinFieldPreimage) = (f.map).image_fn
-inverse_fn(f::FinFieldPreimage) = (f.preimage).image_fn
+domain(f::FinFieldPreimage) = domain(f.map)
+codomain(f::FinFieldPreimage) = codomain(f.map)
+image_fn(f::FinFieldPreimage) = image_fn(f.map)
+inverse_fn(f::FinFieldPreimage) = image_fn(f.preimage)
 
 function (f::FinFieldPreimage)(x)
     a = inverse_fn(f)(x)::elem_type(domain(f))
