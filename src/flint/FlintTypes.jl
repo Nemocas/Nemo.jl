@@ -1777,6 +1777,8 @@ mutable struct FqFiniteField <: FinField
          ccall((:fq_ctx_init, libflint), Nothing,
                (Ref{FqFiniteField}, Ref{fmpz}, Int, Ptr{UInt8}),
                   d, char, deg, string(s))
+         d.overfields = Dict{Int, Array{FinFieldMorphism, 1}}()
+         d.subfields = Dict{Int, Array{FinFieldMorphism, 1}}()
          if cached
             FqFiniteFieldID[char, deg, s] = d
          end
@@ -1794,6 +1796,8 @@ mutable struct FqFiniteField <: FinField
          ccall((:fq_ctx_init_modulus, libflint), Nothing,
                (Ref{FqFiniteField}, Ref{fmpz_mod_poly}, Ptr{UInt8}),
                   z, f, string(s))
+         z.overfields = Dict{Int, Array{FinFieldMorphism, 1}}()
+         z.subfields = Dict{Int, Array{FinFieldMorphism, 1}}()
          if cached
             FqFiniteFieldIDFmpzPol[f, s] = z
          end
@@ -1811,6 +1815,8 @@ mutable struct FqFiniteField <: FinField
          ccall((:fq_ctx_init_modulus, libflint), Nothing,
                (Ref{FqFiniteField}, Ref{gfp_fmpz_poly}, Ptr{UInt8}),
                   z, f, string(s))
+         z.overfields = Dict{Int, Array{FinFieldMorphism, 1}}()
+         z.subfields = Dict{Int, Array{FinFieldMorphism, 1}}()
          if cached
             FqFiniteFieldIDGFPPol[f, s] = z
          end

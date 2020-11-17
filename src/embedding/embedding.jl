@@ -21,7 +21,7 @@ subfields(k::FinField) = k.subfields
 Add an overfield to $F$, represented by a morphism $f: F\to G$ where
 $G$ is the codomain of $f$.
 """
-function AddOverfield!(F::T, f::FinFieldMorphism{T}) where T <: FinField
+function AddOverfield!(F::T, f::FinFieldMorphism{T, T}) where T <: FinField
 
     d = degree(codomain(f))
     over = overfields(F)
@@ -29,7 +29,7 @@ function AddOverfield!(F::T, f::FinFieldMorphism{T}) where T <: FinField
     if haskey(over, d)
         push!(over[d], f)
     else
-        a = FinFieldMorphism{T}[f]
+        a = FinFieldMorphism{T, T}[f]
         over[d] = a
     end
 end
@@ -40,7 +40,7 @@ end
 Add a subfield to $F$, represented by a morphism $f: G\to F$ where
 $G$ is the domain of $f$.
 """
-function AddSubfield!(F::T, f::FinFieldMorphism{T}) where T <: FinField
+function AddSubfield!(F::T, f::FinFieldMorphism{T, T}) where T <: FinField
 
     d = degree(domain(f))
     sub = subfields(F)
@@ -48,7 +48,7 @@ function AddSubfield!(F::T, f::FinFieldMorphism{T}) where T <: FinField
     if haskey(sub, d)
         push!(sub[d], f)
     else
-        a = FinFieldMorphism{T}[f]
+        a = FinFieldMorphism{T, T}[f]
         sub[d] = a
     end
 end
