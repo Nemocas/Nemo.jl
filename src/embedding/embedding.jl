@@ -89,74 +89,7 @@ any_root(x::PolyElem) = -coeff(linear_factor(x), 0)
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    berlekamp_massey(a::Array{Y, 1}, n::Int) where Y <: FieldElem
-
-Compute the minimal polynomial of a linear recurring sequence $a$.
-"""
-function berlekamp_massey(a::Array{Y, 1}, n::Int) where Y <: FieldElem
-
-  S, T = PolynomialRing(parent(a[1]), "T")
-  m = 2*n - 1
-  R0 = T^(2*n)
-  R1 = S(reverse(a))
-  V0 = S(0)
-  V1 = S(1)
-
-  while n <= degree(R1)
-    Q, R = divrem(R0,R1)
-    V = V0-Q*V1
-    V0 = V1
-    V1 = V
-    R0 = R1
-    R1 = R
-  end
-
-  return V1*lead(V1)^(-1)
-end
-
-
-#This function assumes that f has been created as a result of the embed_matrices
-#function
-#This is not ok, as it doesn't allow the user to give an embedding.
-#=
-@doc Markdown.doc"""
-    generator_minimum_polynomial(f::FinFieldMorphism)
-
-Compute the minimal polynomial of the generator of the codomain
-of $f$ over the domain of $f$.
-"""
-function generator_minimum_polynomial(f::FinFieldMorphism)
-
-    E = domain(f)
-    F = codomain(f)
-    d::Int = div(degree(F), degree(E))
-    b = 2*d
-
-    # We define `sec`, the preimage of the morphism `f`
-    
-    sec = inverse_fn(f)
-    x = gen(F)
-    y = one(F)
-
-    # We compute the recurring sequence sec(x^j) for j from 0 to 2d - 1
-
-    A = Array{typeof(x)}(undef, b)
-
-    for j in 1:(b - 1)
-        A[j] = sec(y)
-        y *= x
-    end
-    A[b] = sec(y)
-
-    # We apply Berlekamp Massey algorithm to the sequence
-
-    return berlekamp_massey(A, d)
-end
-=#
-
 function generator_minimal_polynomial(f::FinFieldMorphism)
-
     E = domain(f)
     F = codomain(f)
     d = div(degree(F), degree(E))
@@ -200,7 +133,6 @@ function isembedded(k::T, K::T) where T <: FinField
         end
     end
     
-
     # We look for an embedding that has k as domain and K as codomain
     ov = _overfields(k)
     if haskey(ov, dK)
