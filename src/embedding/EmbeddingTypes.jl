@@ -1,3 +1,5 @@
+export FinFieldMorphism
+
 ################################################################################
 #
 #  FinFieldsMorphism : some types needed to work with embeddings
@@ -18,17 +20,27 @@ struct FinFieldMorphism{S, T} <: AbstractAlgebra.Map{S, T, AbstractAlgebra.SetMa
 end
 
 
-domain(f::FinFieldMorphism) = domain(f.map)
-codomain(f::FinFieldMorphism) = codomain(f.map)
+domain(f::FinFieldMorphism{S, T}) where {S, T} = domain(f.map)::S
+codomain(f::FinFieldMorphism{S, T}) where {S, T} = codomain(f.map)::T
 image_fn(f::FinFieldMorphism) = image_fn(f.map)
 inverse_fn(f::FinFieldMorphism) = image_fn(f.preimage)
 
-function (f::FinFieldMorphism)(x)
-    return image_fn(f)(x)::elem_type(codomain(f))
+function (f::FinFieldMorphism{S, T})(x::U) where {S <: FinField, T <: FinField, U<:FinFieldElem}
+    return image_fn(f)(x)::elem_type(T)
+end
+
+function ==(f::FinFieldMorphism{S, T}, g::FinFieldMorphism{S, T}) where {S, T}
+    if domain(f) != domain(g)
+        return false
+    end
+    if codomain(f) != codomain(g)
+        return false
+    end
+    return f(gen(domain(f))) == g(gen(domain(f)))
 end
 
 function Base.show(io::IO, f::FinFieldMorphism)
-    print("Morphism from $(domain(f))\nto $(codomain(f))")
+    print(io, "Morphism from $(domain(f))\nto $(codomain(f))")
 end
 
 struct FinFieldPreimage{S, T} <: AbstractAlgebra.Map{S, T, AbstractAlgebra.SetMap,
@@ -44,14 +56,14 @@ struct FinFieldPreimage{S, T} <: AbstractAlgebra.Map{S, T, AbstractAlgebra.SetMa
     end
 end
 
-domain(f::FinFieldPreimage) = domain(f.map)
-codomain(f::FinFieldPreimage) = codomain(f.map)
+domain(f::FinFieldPreimage{S, T}) where {S, T} = domain(f.map)::S
+codomain(f::FinFieldPreimage{S, T}) where {S, T} = codomain(f.map)::T
 image_fn(f::FinFieldPreimage) = image_fn(f.map)
 inverse_fn(f::FinFieldPreimage) = image_fn(f.preimage)
 
-function (f::FinFieldPreimage)(x)
-    a = inverse_fn(f)(x)::elem_type(domain(f))
-    b = image_fn(f)(a)
+function (f::FinFieldPreimage{S, T})(x) where {S, T}
+    a = inverse_fn(f)(x)::elem_type(S)
+    b = image_fn(f)(a)::elem_type(T)
     if x == b
         return a
     else
@@ -62,7 +74,7 @@ function (f::FinFieldPreimage)(x)
 end
 
 function Base.show(io::IO, f::FinFieldPreimage)
-    print("Preimage of the morphism from $(domain(f))\nto $(codomain(f))")
+    print(io, "Preimage of the morphism from $(domain(f))\nto $(codomain(f))")
 end
 
 @doc Markdown.doc"""

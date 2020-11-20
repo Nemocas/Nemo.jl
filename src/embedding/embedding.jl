@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-export embed, preimage, preimage_map
+export embed, preimage, preimage_map, hom
 
 ################################################################################
 #
@@ -12,8 +12,8 @@ export embed, preimage, preimage_map
 #
 ################################################################################
 
-overfields(k::FinField) = k.overfields
-subfields(k::FinField) = k.subfields
+_overfields(k::FinField) = k.overfields
+_subfields(k::FinField) = k.subfields
 
 @doc Markdown.doc"""
     AddOverfield!(F::T, f::FinFieldMorphism{T}) where T <: FinField
@@ -24,14 +24,25 @@ $G$ is the codomain of $f$.
 function AddOverfield!(F::T, f::FinFieldMorphism{T, T}) where T <: FinField
 
     d = degree(codomain(f))
-    over = overfields(F)
+    over = _overfields(F)
 
     if haskey(over, d)
-        push!(over[d], f)
+        lm = over[d]
+        found = false
+        for j = 1:length(lm)
+            if lm[j] == f
+                found = true
+                break
+            end
+        end
+        if !found
+            push!(over[d], f)
+        end
     else
         a = FinFieldMorphism{T, T}[f]
         over[d] = a
     end
+    return nothing
 end
 
 @doc Markdown.doc"""
@@ -43,10 +54,20 @@ $G$ is the domain of $f$.
 function AddSubfield!(F::T, f::FinFieldMorphism{T, T}) where T <: FinField
 
     d = degree(domain(f))
-    sub = subfields(F)
+    sub = _subfields(F)
 
     if haskey(sub, d)
-        push!(sub[d], f)
+        lm = sub[d]
+        found = false
+        for j = 1:length(lm)
+            if lm[j] == f
+                found = true
+                break
+            end
+        end
+        if !found
+            push!(sub[d], f)
+        end    
     else
         a = FinFieldMorphism{T, T}[f]
         sub[d] = a
@@ -94,6 +115,11 @@ function berlekamp_massey(a::Array{Y, 1}, n::Int) where Y <: FieldElem
   return V1*lead(V1)^(-1)
 end
 
+
+#This function assumes that f has been created as a result of the embed_matrices
+#function
+#This is not ok, as it doesn't allow the user to give an embedding.
+#=
 @doc Markdown.doc"""
     generator_minimum_polynomial(f::FinFieldMorphism)
 
@@ -127,6 +153,28 @@ function generator_minimum_polynomial(f::FinFieldMorphism)
 
     return berlekamp_massey(A, d)
 end
+=#
+
+function generator_minimal_polynomial(f::FinFieldMorphism)
+
+    E = domain(f)
+    F = codomain(f)
+    d = div(degree(F), degree(E))
+    q = order(E)
+    conjs = Vector{elem_type(F)}(undef, d)
+    conjs[1] = gen(F)
+    for i = 2:d
+        conjs[i] = conjs[i-1]^q
+    end
+    x = PolynomialRing(F, "x", cached = false)[2]
+    g = prod(x-a for a in conjs)
+    Ex = PolynomialRing(E, "x", cached = false)[1]
+    coeffs = Vector{elem_type(E)}(undef, length(g))
+    for i = 1:length(coeffs)
+        coeffs[i] = preimage(f, coeff(g, i-1))
+    end
+    return Ex(coeffs)
+end
 
 ################################################################################
 #
@@ -141,18 +189,28 @@ If $k$ is embbeded in $K$, return the corresponding embedding.
 """
 function isembedded(k::T, K::T) where T <: FinField
 
-    d = degree(K)
-    ov = overfields(k)
-
-    # We look for an embedding that has k as domain and K as codomain
-
-    if haskey(ov, d)
-        for f in ov[d]
+    dK = degree(K)
+    dk = degree(k)
+    subf = _subfields(K)
+    if haskey(subf, dk)
+        for f in subf[dk]
             if domain(f) == k && codomain(f) == K
                 return f
             end
         end
     end
+    
+
+    # We look for an embedding that has k as domain and K as codomain
+    ov = _overfields(k)
+    if haskey(ov, dK)
+        for f in ov[dK]
+            if domain(f) == k && codomain(f) == K
+                return f
+            end
+        end
+    end
+    return nothing
 end
 
 @doc Markdown.doc"""
@@ -160,7 +218,7 @@ end
 
 Embed $k$ in $K$ without worrying about compatibility conditions.
 """
-function embed_any(k::T, K::T) where T <: FinField
+function embed_any(k::FqNmodFiniteField, K::FqNmodFiniteField)
 
     # We call the Flint algorithms directly, currently this is based on
     # factorization
@@ -170,6 +228,15 @@ function embed_any(k::T, K::T) where T <: FinField
     inv(y) = embed_pre_mat(y, k, N)
 
     return FinFieldMorphism(k, K, f, inv)
+end
+
+function hom(k::FqNmodFiniteField, K::FqNmodFiniteField, a::fq_nmod)
+    defPol = modulus(k)
+    M, N = embed_matrices_pre(gen(k), a, defPol)
+    f(x) = embed_pre_mat(x, K, M)
+    g(y) = embed_pre_mat(y, k, N)
+    morph = FinFieldMorphism(k, K, f, g)
+    return morph
 end
 
 @doc Markdown.doc"""
@@ -188,11 +255,11 @@ function find_morphism(k::T, K::T) where T <: FinField
     # of the canonical generator of k over S, with coefficient seen in K and we
     # compute the gcd of all these polynomials 
 
-    for l in keys(subfields(k))
-        if haskey(subfields(K), l)
-            f = subfields(k)[l][1]
-            g = subfields(K)[l][1]
-            P = embed_polynomial(generator_minimum_polynomial(f), g)
+    for l in keys(_subfields(k))
+        if haskey(_subfields(K), l)
+            f = _subfields(k)[l][1]
+            g = _subfields(K)[l][1]
+            P = map_coeffs(g, generator_minimal_polynomial(f))
             if needy
                 Q = gcd(Q, P)
             else
@@ -207,12 +274,9 @@ function find_morphism(k::T, K::T) where T <: FinField
     # computed above
 
     if needy
-        defPol = modulus(k)
+        
         t = any_root(Q)
-        M, N = embed_matrices_pre(gen(k), t, defPol)
-        f(x) = embed_pre_mat(x, K, M)
-        g(y) = embed_pre_mat(y, k, N)
-        morph = FinFieldMorphism(k, K, f, g)
+        morph = hom(k, K, t)
 
     # If there is no common subfield, there is no compatibility condition to
     # fulfill
@@ -228,20 +292,25 @@ end
 
 Compute the transitive closure.
 """
-function transitive_closure(f::FinFieldMorphism)
+function transitive_closure(f::FinFieldMorphism{T, T}) where T
 
     k = domain(f)
     K = codomain(f)
 
-    # Subfields
 
-    subk = subfields(k)
-    subK = subfields(K)
+
+    # _subfields
+
+    subk = _subfields(k)
+    subK = _subfields(K)
 
     # We go through all subfields of k and check if they are also subfields of
     # K, we add them if they are not
-
-    for d in keys(subk)
+    ksubk = sort(collect(keys(subk)), rev = true)
+    for d in ksubk
+        if d == degree(k)
+            continue
+        end
         if !haskey(subK, d)
             for g in subk[d]
                 t(y) = f(g(y))
@@ -252,7 +321,7 @@ function transitive_closure(f::FinFieldMorphism)
                 AddOverfield!(domain(g), phi)
             end
         else
-            val = FqNmodFiniteField[codomain(v) for v in subK[d]]
+            val = T[codomain(v) for v in subK[d]]
             
             for g in subk[d]
                 if !(domain(g) in val)
@@ -269,15 +338,21 @@ function transitive_closure(f::FinFieldMorphism)
 
     # Overfields
 
-    ov = overfields(K)
+    ov = _overfields(K)
 
     # We call the same procedure on the overfields
-
-    for d in keys(ov)
+    kov = sort(collect(keys(ov)), rev = true)
+    for d in kov
+        if d == degree(K)
+            continue
+        end
         for g in ov[d]
             transitive_closure(g)
         end
     end
+
+    return nothing
+
 end
 
 @doc Markdown.doc"""
@@ -289,12 +364,13 @@ between $S$ and $k$.
 function intersections(k::T, K::T) where T <: FinField
 
     d = degree(k)
-    subk = subfields(k)
-    subK = subfields(K)
+    subk = _subfields(k)
+    subK = _subfields(K)
     needmore = true
 
     # We loop through the subfields of K and we have different cases
-    for l in keys(subK)
+    ksubK = sort(collect(keys(subK)), rev = true)
+    for l in ksubK
         c = gcd(d, l)
 
         # The intersection may be trivial, I = F_p
@@ -422,4 +498,4 @@ function preimage_map(k::T, K::T) where T <: FinField
     return preimage_map(f)
 end
 
-preimage(f::FinFieldMorphism, x::T) where T <: FinField = preimage_map(f)(x)
+preimage(f::FinFieldMorphism{U, V}, x::T) where {U <: FinField, V<: FinField, T <: FinFieldElem} = preimage_map(f)(x)::elem_type(U)
