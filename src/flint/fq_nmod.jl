@@ -354,6 +354,21 @@ divexact(x::fmpz, y::fq_nmod) = divexact(parent(y)(x), y)
 #
 ###############################################################################
 
+function square_root(x::fq_nmod)
+   z = parent(x)()
+   res = Bool(ccall((:fq_nmod_sqrt, libflint), Cint,
+                    (Ref{fq_nmod}, Ref{fq_nmod}, Ref{FqNmodFiniteField}),
+                    z, x, x.parent))
+   res || error("Not a square in sqrt")
+   return z
+end
+
+function issquare(x::fq_nmod)
+   return Bool(ccall((:fq_nmod_is_square, libflint), Cint,
+                     (Ref{fq_nmod}, Ref{FqNmodFiniteField}),
+                     x, x.parent))
+end
+
 function pth_root(x::fq_nmod)
    z = parent(x)()
    ccall((:fq_nmod_pth_root, libflint), Nothing,

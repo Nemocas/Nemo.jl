@@ -457,6 +457,49 @@ end
    end
 end
 
+@testset "fq_nmod_mpoly.factor..." begin
+   R, a = FiniteField(23, 5, "a")
+   R, (x, y, z) = PolynomialRing(R, ["x", "y", "z"])
+
+   function check_factor(a, esum)
+      f = factor(a)
+      @test a == unit(f) * prod([p^e for (p, e) in f])
+      @test esum == sum(e for (p, e) in f)
+
+      f = factor_squarefree(a)
+      @test a == unit(f) * prod([p^e for (p, e) in f])
+   end
+
+   check_factor(3*a^3*x^23+2*a^2*y^23+a*z^23, 23)
+   check_factor(x^99-a^33*y^99*z^33, 22)
+end
+
+@testset "fq_nmod_mpoly.sqrt..." begin
+   R, a = FiniteField(23, 5, "a")
+
+   for num_vars = 1:4
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+
+      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+
+      for iter = 1:10
+         f = rand(S, 0:4, 0:5, -10:10)
+
+         g = square_root(f^2)
+
+         @test g^2 == f^2
+         @test issquare(f^2)
+
+         if f != 0
+            x = varlist[rand(1:num_vars)]
+            @test_throws ErrorException square_root(f^2*(x^2 - x))
+            @test !issquare(f^2*(x^2 - x))
+         end
+      end
+   end
+end
+
 @testset "fq_nmod_mpoly.evaluation..." begin
    R, a = FiniteField(23, 5, "a")
 

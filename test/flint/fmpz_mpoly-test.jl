@@ -440,6 +440,46 @@ end
    end
 end
 
+@testset "fmpz_mpoly.factor..." begin
+   R, (x, y, z) = PolynomialRing(FlintZZ, ["x", "y", "z"])
+
+   function check_factor(a, esum)
+      f = factor(a)
+      @test a == unit(f) * prod([p^e for (p, e) in f])
+      @test esum == sum(e for (p, e) in f)
+
+      f = factor_squarefree(a)
+      @test a == unit(f) * prod([p^e for (p, e) in f])
+   end
+
+   check_factor((x^2-y^2*z^3)*(x+y+z)*(x+2*y+z)^2*(2*x+y-z)^3, 7)
+   check_factor(x^99-y^99*z^33, 4)
+end
+
+@testset "fmpz_mpoly.sqrt..." begin
+   for num_vars = 1:4
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+
+      S, varlist = PolynomialRing(FlintZZ, var_names, ordering = ord)
+
+      for iter = 1:10
+         f = rand(S, 0:4, 0:5, -10:10)
+
+         g = square_root(f^2)
+
+         @test g^2 == f^2
+         @test issquare(f^2)
+
+         if f != 0
+            x = varlist[rand(1:num_vars)]
+            @test_throws ErrorException square_root(f^2*(x^2 - x))
+            @test !issquare(f^2*(x^2 - x))
+         end
+      end
+   end
+end
+
 @testset "fmpz_mpoly.evaluation..." begin
    R = FlintZZ
 

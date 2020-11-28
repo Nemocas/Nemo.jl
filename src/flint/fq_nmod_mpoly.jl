@@ -410,6 +410,73 @@ function gcd(a::fq_nmod_mpoly, b::fq_nmod_mpoly)
    return z
 end
 
+################################################################################
+#
+#   Factorization and Square Root
+#
+################################################################################
+
+function Base.convert(::Type{Fac{fq_nmod_mpoly}}, fac::fq_nmod_mpoly_factor)
+   R = fac.parent
+   dic = Dict{fq_nmod_mpoly, Int}()
+   for i in 0:fac.num-1
+      f = R()
+      # use get_base instead of swap_base if convert is to preserve input
+      ccall((:fq_nmod_mpoly_factor_swap_base, libflint), Nothing,
+            (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly_factor}, Int, Ref{FqNmodMPolyRing}),
+            f, fac, i, R)
+      dic[f] = ccall((:fq_nmod_mpoly_factor_get_exp_si, libflint), Int,
+                     (Ref{fq_nmod_mpoly_factor}, Int, Ref{FqNmodMPolyRing}),
+                     fac, i, R)
+   end
+   c = base_ring(R)()
+   ccall((:fq_nmod_mpoly_factor_get_constant_fq_nmod, libflint), Nothing,
+         (Ref{fq_nmod}, Ref{fq_nmod_mpoly_factor}),
+         c, fac)
+   return Fac(R(c), dic)
+end
+
+function factor(a::fq_nmod_mpoly)
+   R = parent(a)
+   fac = fq_nmod_mpoly_factor(R)
+   ok = ccall((:fq_nmod_mpoly_factor, libflint), Cint,
+              (Ref{fq_nmod_mpoly_factor}, Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+              fac, a, R)
+   ok == 0 && error("unable to compute factorization")
+   return convert(Fac{fq_nmod_mpoly}, fac)
+end
+
+function factor_squarefree(a::fq_nmod_mpoly)
+   R = parent(a)
+   fac = fq_nmod_mpoly_factor(R)
+   ok = ccall((:fq_nmod_mpoly_factor_squarefree, libflint), Cint,
+              (Ref{fq_nmod_mpoly_factor}, Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+              fac, a, R)
+   ok == 0 && error("unable to compute factorization")
+   return convert(Fac{fq_nmod_mpoly}, fac)
+end
+
+
+function square_root(a::fq_nmod_mpoly)
+   (flag, q) = issquare_with_square_root(a)
+   !flag && error("Not a square in square_root")
+   return q
+end
+
+function issquare(a::fq_nmod_mpoly)
+   return Bool(ccall((:fq_nmod_mpoly_is_square, libflint), Cint,
+                     (Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+                     a, a.parent))
+end
+
+function issquare_with_square_root(a::fq_nmod_mpoly)
+   q = parent(a)()
+   flag = ccall((:fq_nmod_mpoly_sqrt, libflint), Cint,
+                (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+                q, a, a.parent)
+   return (Bool(flag), q)
+end
+
 ###############################################################################
 #
 #   Comparison

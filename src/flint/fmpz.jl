@@ -38,11 +38,12 @@ export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash,
        bin, oct, hex, base, one, zero, divexact, fits, sign, nbits, deepcopy,
        tdivpow2, fdivpow2, cdivpow2, flog, clog, cmpabs, clrbit!, setbit!,
        combit!, crt, divisible, divisor_lenstra, fdivrem, tdivrem, fmodpow2,
-       gcdinv, isprobable_prime, issquare, jacobi_symbol, remove, root, size,
+       gcdinv, isprobable_prime, jacobi_symbol, remove, root, size,
        isqrtrem, sqrtmod, trailing_zeros, divisor_sigma, euler_phi, fibonacci,
        moebius_mu, primorial, rising_factorial, number_of_partitions,
        canonical_unit, needs_parentheses, displayed_with_minus_in_front,
        show_minus_one, addeq!, mul!, isunit, isequal,
+       issquare, square_root, issquare_with_square_root,
        iszero, rand, rand_bits, binomial, factorial, rand_bits_prime
 
 ###############################################################################

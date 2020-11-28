@@ -1560,6 +1560,34 @@ function _fmpq_mpoly_clear_fn(a::fmpq_mpoly)
           (Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}), a, a.parent)
 end
 
+mutable struct fmpq_mpoly_factor
+   constant_num::Int
+   constant_den::Int
+   poly::Ptr{Nothing}
+   exp::Ptr{Nothing}
+   num::Int
+   alloc::Int
+   # end flint struct
+
+   parent::FmpqMPolyRing
+
+   function fmpq_mpoly_factor(ctx::FmpqMPolyRing)
+      z = new()
+      ccall((:fmpq_mpoly_factor_init, libflint), Nothing,
+            (Ref{fmpq_mpoly_factor}, Ref{FmpqMPolyRing}),
+            z, ctx)
+      z.parent = ctx
+      finalizer(_fmpq_mpoly_factor_clear_fn, z)
+      return z
+  end
+end
+
+function _fmpq_mpoly_factor_clear_fn(f::fmpq_mpoly_factor)
+   ccall((:fmpq_mpoly_factor_clear, libflint), Nothing,
+         (Ref{fmpq_mpoly_factor}, Ref{FmpqMPolyRing}),
+         f, f.parent)
+end
+
 ###############################################################################
 #
 #   NmodMPolyRing / nmod_mpoly
@@ -1725,6 +1753,33 @@ end
 function _nmod_mpoly_clear_fn(a::nmod_mpoly)
    ccall((:nmod_mpoly_clear, libflint), Nothing,
           (Ref{nmod_mpoly}, Ref{NmodMPolyRing}), a, a.parent)
+end
+
+mutable struct nmod_mpoly_factor
+   constant::UInt
+   poly::Ptr{Nothing}
+   exp::Ptr{Nothing}
+   num::Int
+   alloc::Int
+   # end flint struct
+
+   parent::NmodMPolyRing
+
+   function nmod_mpoly_factor(ctx::NmodMPolyRing)
+      z = new()
+      ccall((:nmod_mpoly_factor_init, libflint), Nothing,
+            (Ref{nmod_mpoly_factor}, Ref{NmodMPolyRing}),
+            z, ctx)
+      z.parent = ctx
+      finalizer(_nmod_mpoly_factor_clear_fn, z)
+      return z
+  end
+end
+
+function _nmod_mpoly_factor_clear_fn(f::nmod_mpoly_factor)
+   ccall((:nmod_mpoly_factor_clear, libflint), Nothing,
+         (Ref{nmod_mpoly_factor}, Ref{NmodMPolyRing}),
+         f, f.parent)
 end
 
 ###############################################################################
@@ -2229,6 +2284,38 @@ function _fq_nmod_mpoly_clear_fn(a::fq_nmod_mpoly)
           (Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}), a, a.parent)
 end
 
+mutable struct fq_nmod_mpoly_factor
+   constant_coeffs::Ptr{Nothing}
+   constant_alloc::Int
+   constant_length::Int
+   constant_n::UInt
+   constant_ninv::UInt
+   constant_norm::Int
+
+   poly::Ptr{Nothing}
+   exp::Ptr{Nothing}
+   num::Int
+   alloc::Int
+   # end flint struct
+
+   parent::FqNmodMPolyRing
+
+   function fq_nmod_mpoly_factor(ctx::FqNmodMPolyRing)
+      z = new()
+      ccall((:fq_nmod_mpoly_factor_init, libflint), Nothing,
+            (Ref{fq_nmod_mpoly_factor}, Ref{FqNmodMPolyRing}),
+            z, ctx)
+      z.parent = ctx
+      finalizer(_fq_nmod_mpoly_factor_clear_fn, z)
+      return z
+  end
+end
+
+function _fq_nmod_mpoly_factor_clear_fn(f::fq_nmod_mpoly_factor)
+   ccall((:fq_nmod_mpoly_factor_clear, libflint), Nothing,
+         (Ref{fq_nmod_mpoly_factor}, Ref{FqNmodMPolyRing}),
+         f, f.parent)
+end
 
 ###############################################################################
 #

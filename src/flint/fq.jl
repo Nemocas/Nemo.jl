@@ -427,6 +427,30 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
+    square_root(x::fq)
+> Return the square root of $x$ in the finite field. If $x$ is not a square
+> an exception is raised.
+"""
+function square_root(x::fq)
+   z = parent(x)()
+   res = Bool(ccall((:fq_sqrt, libflint), Cint,
+                    (Ref{fq}, Ref{fq}, Ref{FqFiniteField}),
+                    z, x, x.parent))
+   res || error("Not a square in square_root")
+   return z
+end
+
+@doc Markdown.doc"""
+    issquare(x::fq)
+> Returns `true` if $x$ is a square in the finite field (includes zero).
+"""
+function issquare(x::fq)
+   return Bool(ccall((:fq_is_square, libflint), Cint,
+                     (Ref{fq}, Ref{FqFiniteField}),
+                     x, x.parent))
+end
+
+@doc Markdown.doc"""
     pth_root(x::fq)
 
 Return the $p$-th root of $a$ in the finite field of characteristic $p$. This
