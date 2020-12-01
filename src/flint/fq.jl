@@ -428,8 +428,8 @@ end
 
 @doc Markdown.doc"""
     square_root(x::fq)
-> Return the square root of $x$ in the finite field. If $x$ is not a square
-> an exception is raised.
+Return the square root of $x$ in the finite field. If $x$ is not a square
+an exception is raised.
 """
 function square_root(x::fq)
    z = parent(x)()
@@ -442,7 +442,7 @@ end
 
 @doc Markdown.doc"""
     issquare(x::fq)
-> Returns `true` if $x$ is a square in the finite field (includes zero).
+Returns `true` if $x$ is a square in the finite field (includes zero).
 """
 function issquare(x::fq)
    return Bool(ccall((:fq_is_square, libflint), Cint,
@@ -453,7 +453,7 @@ end
 @doc Markdown.doc"""
     pth_root(x::fq)
 
-Return the $p$-th root of $a$ in the finite field of characteristic $p$. This
+Return the $p$-th root of $x$ in the finite field of characteristic $p$. This
 is the inverse operation to the Frobenius map $\sigma_p$.
 """
 function pth_root(x::fq)
@@ -466,7 +466,7 @@ end
 @doc Markdown.doc"""
     tr(x::fq)
 
-Return the trace of $a$. This is an element of $\mathbb{F}_p$, but the value returned
+Return the trace of $x$. This is an element of $\mathbb{F}_p$, but the value returned
 is this value embedded in the original finite field.
 """
 function tr(x::fq)
@@ -479,7 +479,7 @@ end
 @doc Markdown.doc"""
     norm(x::fq)
 
-Return the norm of $a$. This is an element of $\mathbb{F}_p$, but the value returned
+Return the norm of $x$. This is an element of $\mathbb{F}_p$, but the value returned
 is this value embedded in the original finite field.
 """
 function norm(x::fq)
@@ -493,7 +493,7 @@ end
     frobenius(x::fq, n = 1)
 
 Return the iterated Frobenius $\sigma_p^n(a)$ where $\sigma_p$ is the
-Frobenius map sending the element $a$ to $a^p$ in the finite field of
+Frobenius map sending the element $x$ to $x^p$ in the finite field of
 characteristic $p$. By default the Frobenius map is applied $n = 1$ times if
 $n$ is not specified.
 """
