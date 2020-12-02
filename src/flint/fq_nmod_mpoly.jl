@@ -416,24 +416,30 @@ end
 #
 ################################################################################
 
-function Base.convert(::Type{Fac{fq_nmod_mpoly}}, fac::fq_nmod_mpoly_factor)
+function (F::Fac{fq_nmod_mpoly})(fac::fq_nmod_mpoly_factor, preserve_input::Bool = false)
    R = fac.parent
-   dic = Dict{fq_nmod_mpoly, Int}()
+   empty!(F.fac)
    for i in 0:fac.num-1
       f = R()
-      # use get_base instead of swap_base if convert is to preserve input
-      ccall((:fq_nmod_mpoly_factor_swap_base, libflint), Nothing,
-            (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly_factor}, Int, Ref{FqNmodMPolyRing}),
-            f, fac, i, R)
-      dic[f] = ccall((:fq_nmod_mpoly_factor_get_exp_si, libflint), Int,
-                     (Ref{fq_nmod_mpoly_factor}, Int, Ref{FqNmodMPolyRing}),
-                     fac, i, R)
+      if preserve_input
+         ccall((:fq_nmod_mpoly_factor_get_base, libflint), Nothing,
+               (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly_factor}, Int, Ref{FqNmodMPolyRing}),
+               f, fac, i, R)
+      else
+         ccall((:fq_nmod_mpoly_factor_swap_base, libflint), Nothing,
+               (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly_factor}, Int, Ref{FqNmodMPolyRing}),
+               f, fac, i, R)
+      end
+      F.fac[f] = ccall((:fq_nmod_mpoly_factor_get_exp_si, libflint), Int,
+                       (Ref{fq_nmod_mpoly_factor}, Int, Ref{FqNmodMPolyRing}),
+                       fac, i, R)
    end
    c = base_ring(R)()
    ccall((:fq_nmod_mpoly_factor_get_constant_fq_nmod, libflint), Nothing,
          (Ref{fq_nmod}, Ref{fq_nmod_mpoly_factor}),
          c, fac)
-   return Fac(R(c), dic)
+   F.unit = R(c)
+   return F
 end
 
 function factor(a::fq_nmod_mpoly)
@@ -443,7 +449,7 @@ function factor(a::fq_nmod_mpoly)
               (Ref{fq_nmod_mpoly_factor}, Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
               fac, a, R)
    ok == 0 && error("unable to compute factorization")
-   return convert(Fac{fq_nmod_mpoly}, fac)
+   return (Fac{fq_nmod_mpoly}())(fac, false)
 end
 
 function factor_squarefree(a::fq_nmod_mpoly)
@@ -453,7 +459,7 @@ function factor_squarefree(a::fq_nmod_mpoly)
               (Ref{fq_nmod_mpoly_factor}, Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
               fac, a, R)
    ok == 0 && error("unable to compute factorization")
-   return convert(Fac{fq_nmod_mpoly}, fac)
+   return (Fac{fq_nmod_mpoly}())(fac, false)
 end
 
 

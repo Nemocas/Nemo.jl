@@ -448,24 +448,30 @@ end
 #
 ################################################################################
 
-function Base.convert(::Type{Fac{fmpz_mpoly}}, fac::fmpz_mpoly_factor)
+function (F::Fac{fmpz_mpoly})(fac::fmpz_mpoly_factor, preserve_input::Bool = true)
    R = fac.parent
-   dic = Dict{fmpz_mpoly, Int}()
+   empty!(F.fac)
    for i in 0:fac.num-1
       f = R()
-      # use get_base instead of swap_base if convert is to preserve input
-      ccall((:fmpz_mpoly_factor_swap_base, libflint), Nothing,
-            (Ref{fmpz_mpoly}, Ref{fmpz_mpoly_factor}, Int, Ref{FmpzMPolyRing}),
-            f, fac, i, R)
-      dic[f] = ccall((:fmpz_mpoly_factor_get_exp_si, libflint), Int,
-                     (Ref{fmpz_mpoly_factor}, Int, Ref{FmpzMPolyRing}),
-                     fac, i, R)
+      if preserve_input
+         ccall((:fmpz_mpoly_factor_get_base, libflint), Nothing,
+               (Ref{fmpz_mpoly}, Ref{fmpz_mpoly_factor}, Int, Ref{FmpzMPolyRing}),
+               f, fac, i, R)
+      else
+         ccall((:fmpz_mpoly_factor_swap_base, libflint), Nothing,
+               (Ref{fmpz_mpoly}, Ref{fmpz_mpoly_factor}, Int, Ref{FmpzMPolyRing}),
+               f, fac, i, R)
+      end
+      F.fac[f] = ccall((:fmpz_mpoly_factor_get_exp_si, libflint), Int,
+                       (Ref{fmpz_mpoly_factor}, Int, Ref{FmpzMPolyRing}),
+                       fac, i, R)
    end
    c = fmpz()
    ccall((:fmpz_mpoly_factor_get_constant_fmpz, libflint), Nothing,
          (Ref{fmpz}, Ref{fmpz_mpoly_factor}),
          c, fac)
-   return Fac(R(c), dic)
+   F.unit = R(c)
+   return F
 end
 
 function factor(a::fmpz_mpoly)
@@ -475,7 +481,7 @@ function factor(a::fmpz_mpoly)
               (Ref{fmpz_mpoly_factor}, Ref{fmpz_mpoly}, Ref{FmpzMPolyRing}),
               fac, a, R)
    ok == 0 && error("unable to compute factorization")
-   return convert(Fac{fmpz_mpoly}, fac)
+   return (Fac{fmpz_mpoly}())(fac, false)
 end
 
 function factor_squarefree(a::fmpz_mpoly)
@@ -485,7 +491,7 @@ function factor_squarefree(a::fmpz_mpoly)
               (Ref{fmpz_mpoly_factor}, Ref{fmpz_mpoly}, Ref{FmpzMPolyRing}),
               fac, a, R)
    ok == 0 && error("unable to compute factorization")
-   return convert(Fac{fmpz_mpoly}, fac)
+   return (Fac{fmpz_mpoly}())(fac, false)
 end
 
 
