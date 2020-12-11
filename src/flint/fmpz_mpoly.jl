@@ -448,8 +448,9 @@ end
 #
 ################################################################################
 
-function (F::Fac{fmpz_mpoly})(fac::fmpz_mpoly_factor, preserve_input::Bool = true)
+function (::Type{Fac{fmpz_mpoly}})(fac::fmpz_mpoly_factor, preserve_input::Bool = true)
    R = fac.parent
+   F = Fac{fmpz_mpoly}()
    empty!(F.fac)
    for i in 0:fac.num-1
       f = R()
@@ -481,7 +482,7 @@ function factor(a::fmpz_mpoly)
               (Ref{fmpz_mpoly_factor}, Ref{fmpz_mpoly}, Ref{FmpzMPolyRing}),
               fac, a, R)
    ok == 0 && error("unable to compute factorization")
-   return (Fac{fmpz_mpoly}())(fac, false)
+   return Fac{fmpz_mpoly}(fac, false)
 end
 
 function factor_squarefree(a::fmpz_mpoly)
@@ -491,7 +492,7 @@ function factor_squarefree(a::fmpz_mpoly)
               (Ref{fmpz_mpoly_factor}, Ref{fmpz_mpoly}, Ref{FmpzMPolyRing}),
               fac, a, R)
    ok == 0 && error("unable to compute factorization")
-   return (Fac{fmpz_mpoly}())(fac, false)
+   return Fac{fmpz_mpoly}(fac, false)
 end
 
 

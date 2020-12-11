@@ -416,9 +416,9 @@ end
 #
 ################################################################################
 
-function (F::Fac{fq_nmod_mpoly})(fac::fq_nmod_mpoly_factor, preserve_input::Bool = false)
+function (::Type{Fac{fq_nmod_mpoly}})(fac::fq_nmod_mpoly_factor, preserve_input::Bool = false)
    R = fac.parent
-   empty!(F.fac)
+   F = Fac{fq_nmod_mpoly}()
    for i in 0:fac.num-1
       f = R()
       if preserve_input
@@ -449,7 +449,7 @@ function factor(a::fq_nmod_mpoly)
               (Ref{fq_nmod_mpoly_factor}, Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
               fac, a, R)
    ok == 0 && error("unable to compute factorization")
-   return (Fac{fq_nmod_mpoly}())(fac, false)
+   return Fac{fq_nmod_mpoly}(fac, false)
 end
 
 function factor_squarefree(a::fq_nmod_mpoly)
@@ -459,7 +459,7 @@ function factor_squarefree(a::fq_nmod_mpoly)
               (Ref{fq_nmod_mpoly_factor}, Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
               fac, a, R)
    ok == 0 && error("unable to compute factorization")
-   return (Fac{fq_nmod_mpoly}())(fac, false)
+   return Fac{fq_nmod_mpoly}(fac, false)
 end
 
 
