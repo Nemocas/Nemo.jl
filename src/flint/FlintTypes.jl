@@ -1999,8 +1999,8 @@ mutable struct FqFiniteField <: FinField
       else
          z = new()
          ccall((:fq_ctx_init_modulus, libflint), Nothing,
-               (Ref{FqFiniteField}, Ref{fmpz_mod_poly}, Ptr{UInt8}),
-                  z, f, string(s))
+               (Ref{FqFiniteField}, Ref{fmpz_mod_poly}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
+                  z, f, f.parent.base_ring.ninv, string(s))
          if cached
             FqFiniteFieldIDFmpzPol[f, s] = z
          end
@@ -2016,8 +2016,8 @@ mutable struct FqFiniteField <: FinField
       else
          z = new()
          ccall((:fq_ctx_init_modulus, libflint), Nothing,
-               (Ref{FqFiniteField}, Ref{gfp_fmpz_poly}, Ptr{UInt8}),
-                  z, f, string(s))
+               (Ref{FqFiniteField}, Ref{gfp_fmpz_poly}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
+                  z, f, f.parent.base_ring.ninv, string(s))
          if cached
             FqFiniteFieldIDGFPPol[f, s] = z
          end
