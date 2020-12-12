@@ -43,13 +43,13 @@ section of the AbstractAlgebra manual.
 
 All matrix spaces in Nemo follow the AbstractAlgebra.jl matrix interface:
 
-[https://nemocas.github.io/AbstractAlgebra.jl/latest/matrix_spaces](https://nemocas.github.io/AbstractAlgebra.jl/latest/matrix_spaces)
+<https://nemocas.github.io/AbstractAlgebra.jl/latest/matrix_spaces>
 
 In addition, AbstractAlgebra.jl provides a great deal of generic functionality for
 matrices. Some of this functionality is also provided by C libraries, such as Flint,
 for various specific rings.
 
-[https://nemocas.github.io/AbstractAlgebra.jl/latest/matrix](https://nemocas.github.io/AbstractAlgebra.jl/latest/matrix)
+<https://nemocas.github.io/AbstractAlgebra.jl/latest/matrix>
 
 In the following, we list the functionality which is provided in addition to the generic
 matrix functionality, for specific rings in Nemo.

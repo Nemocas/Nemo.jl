@@ -43,11 +43,11 @@ belong to the abstract type `FinField`.
 
 Galois fields in Nemo implement the residue ring interface of AbstractAlgebra.jl:
 
-[https://nemocas.github.io/AbstractAlgebra.jl/latest/residue_rings](https://nemocas.github.io/AbstractAlgebra.jl/latest/residue_rings)
+<https://nemocas.github.io/AbstractAlgebra.jl/latest/residue_rings>
 
 In addition, all the functionality for generic residue rings is available:
 
-[https://nemocas.github.io/AbstractAlgebra.jl/latest/residue](https://nemocas.github.io/AbstractAlgebra.jl/latest/residue)
+<https://nemocas.github.io/AbstractAlgebra.jl/latest/residue>
 
 Below we describe the functionality that is provided in addition to this interface.
 

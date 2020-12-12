@@ -266,7 +266,7 @@ function divexact(x::gfp_fmpz_elem, y::gfp_fmpz_elem)
 end
 
 function divides(a::gfp_fmpz_elem, b::gfp_fmpz_elem)
-   check_parent(x, y)
+   check_parent(a, b)
    if iszero(a)
       return true, a
    end

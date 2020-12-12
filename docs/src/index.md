@@ -3,9 +3,9 @@
 Nemo is a computer algebra package for the Julia programming language, maintained by William Hart, 
 Tommy Hofmann, Claus Fieker, Fredrik Johansson with additional code by Oleksandr Motsak, Marek Kaluba and other contributors.
 
-- [http://nemocas.org](http://nemocas.org) (Website)
-- [https://github.com/Nemocas/Nemo.jl](https://github.com/Nemocas/Nemo.jl) (Source code)
-- [http://nemocas.github.io/Nemo.jl/latest/](http://nemocas.github.io/Nemo.jl/latest/) (Online documentation)
+- <http://nemocas.org> (Website)
+- <https://github.com/Nemocas/Nemo.jl> (Source code)
+- <https://nemocas.github.io/Nemo.jl/latest/> (Online documentation)
 
 The features of Nemo so far include:
 
@@ -32,7 +32,7 @@ Nemo depends on AbstractAlgebra.jl which provides Nemo with generic routines for
 ## Installation
 
 To use Nemo we require Julia 1.0 or higher. Please see
-[http://julialang.org/downloads](http://julialang.org/downloads/) for instructions on
+<https://julialang.org/downloads/> for instructions on
 how to obtain julia for your system.
 
 At the Julia prompt simply type

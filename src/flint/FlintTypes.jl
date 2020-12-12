@@ -47,6 +47,14 @@ mutable struct fmpz <: RingElem
         return z
     end
 
+    function fmpz(x::Ptr{Culong}, len::Clong)
+        z = new()
+        ccall((:fmpz_init, libflint), Nothing, (Ref{fmpz},), z)
+        ccall((:fmpz_set_ui_array, libflint), Nothing, (Ref{fmpz}, Ptr{Culong}, Clong), z, x, len)
+        finalizer(_fmpz_clear_fn, z)
+        return z
+    end
+
     function fmpz(x::Float64)
         !isinteger(x) && throw(InexactError(:convert, fmpz, x))
         z = new()
@@ -404,6 +412,7 @@ end
 mutable struct GaloisField <: FinField
    n::UInt
    ninv::UInt
+   @declare_other
 
    function GaloisField(n::UInt, cached::Bool=true)
       if cached && haskey(GaloisFieldID, n)
@@ -483,6 +492,7 @@ end
 mutable struct GaloisFmpzField <: FinField
    n::fmpz
    ninv::fmpz_mod_ctx_struct
+   @declare_other
 
    function GaloisFmpzField(n::fmpz, cached::Bool=true)
       if cached && haskey(GaloisFmpzFieldID, n)
@@ -1815,6 +1825,7 @@ mutable struct FqNmodFiniteField <: FinField
 
    overfields :: Dict{Int, Array{FinFieldMorphism, 1}}
    subfields :: Dict{Int, Array{FinFieldMorphism, 1}}
+   @declare_other
 
    function FqNmodFiniteField(c::fmpz, deg::Int, s::Symbol, cached::Bool = true)
       if cached && haskey(FqNmodFiniteFieldID, (c, deg, s))
@@ -1974,6 +1985,7 @@ mutable struct FqFiniteField <: FinField
 
    overfields :: Dict{Int, Array{FinFieldMorphism, 1}}
    subfields :: Dict{Int, Array{FinFieldMorphism, 1}}
+   @declare_other
 
    function FqFiniteField(char::fmpz, deg::Int, s::Symbol, cached::Bool = true)
       if cached && haskey(FqFiniteFieldID, (char, deg, s))
@@ -4269,7 +4281,7 @@ mutable struct gfp_mat <: MatElem{gfp_elem}
     for i = 1:r
       for j = 1:c
         ccall((:fmpz_mod_ui, libflint), Nothing,
-              (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), t, arr[i, j], n)
+              (Ref{fmpz}, Ref{fmpz}, UInt), t, arr[i, j], n)
         setindex_raw!(z, t, i, j)
       end
     end

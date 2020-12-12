@@ -413,6 +413,9 @@ end
 
             q = divexact(p, a2)
 
+            fl, y = divides(p, a2)
+            @test fl
+
             @test q*a2 == p
          end
       end

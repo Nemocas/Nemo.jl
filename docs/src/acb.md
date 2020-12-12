@@ -35,7 +35,7 @@ elements in this field, i.e. complex boxes in this case, belong to the
 
 The complex balls in Nemo implement the AbstractAlgebra.jl field interface.
 
-[https://nemocas.github.io/AbstractAlgebra.jl/latest/fields](https://nemocas.github.io/AbstractAlgebra.jl/latest/fields)
+<https://nemocas.github.io/AbstractAlgebra.jl/latest/fields>
 
 Below, we document the additional functionality provided for complex balls.
 

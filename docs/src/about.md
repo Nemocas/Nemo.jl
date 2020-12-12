@@ -9,9 +9,9 @@ Julia programming language. Our aim is to provide a highly performant package co
 
 Nemo consists of wrappers of specialised C/C++ libraries:
 
-  - Flint    [http://flintlib.org/](http://flintlib.org/)
-  - Arb      [http://fredrikj.net/arb/](http://fredrikj.net/arb/)
-  - Antic    [https://github.com/wbhart/antic/](https://github.com/wbhart/antic/)
+  - Flint    <http://flintlib.org/>
+  - Arb      <https://fredrikj.net/arb/>
+  - Antic    <https://github.com/wbhart/antic/>
 
 Nemo also uses AbstractAlgebra.jl to provide generic constructions over the basic rings
 provided by the above packages.

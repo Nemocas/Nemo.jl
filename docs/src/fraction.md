@@ -53,12 +53,12 @@ one to write generic functions that can accept any Nemo fraction type.
 
 All fraction types in Nemo implement the AbstractAlgebra.jl fraction field interface:
 
-[https://nemocas.github.io/AbstractAlgebra.jl/latest/fraction_fields](https://nemocas.github.io/AbstractAlgebra.jl/latest/fraction_fields)
+<https://nemocas.github.io/AbstractAlgebra.jl/latest/fraction_fields>
 
 In addition, generic fractions fields are implemented in AbstractAlgebra.jl, with the
 following functionality:
 
-[https://nemocas.github.io/AbstractAlgebra.jl/latest/fraction](https://nemocas.github.io/AbstractAlgebra.jl/latest/fraction)
+<https://nemocas.github.io/AbstractAlgebra.jl/latest/fraction>
 
 All fraction types in Nemo also implement this generic functionality.
 

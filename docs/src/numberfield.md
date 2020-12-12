@@ -34,13 +34,13 @@ ideals, orders, class groups, relative extensions, class field theory, etc.
 The basic number field element type used in Hecke is the Nemo/antic number field
 element type, making the two libraries tightly integrated.
 
-[http://thofma.github.io/Hecke.jl/latest/](http://thofma.github.io/Hecke.jl/latest/)
+<https://thofma.github.io/Hecke.jl/latest/>
 
 ## Number field functionality
 
 The number fields in Nemo implement the full AbstractAlgebra.jl field interface.
 
-[https://nemocas.github.io/AbstractAlgebra.jl/latest/fields](https://nemocas.github.io/AbstractAlgebra.jl/latest/fields)
+<https://nemocas.github.io/AbstractAlgebra.jl/latest/fields>
 
 Below, we document the additional functionality provided for number field elements.
 

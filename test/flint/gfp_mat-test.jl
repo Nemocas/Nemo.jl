@@ -164,6 +164,10 @@
    @test !(a in [b])
    @test a in keys(Dict(a => 1))
    @test !(a in keys(Dict(b => 1)))
+
+   M = matrix(Z3, Z3.([-1 -2; -3 -4]))
+   @test M == matrix(Z3, [-1 -2; -3 -4])
+   @test M == matrix(Z3, 2, 2, [-1, -2, -3, -4])
 end
 
 @testset "gfp_mat.similar..." begin

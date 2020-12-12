@@ -2,7 +2,7 @@ Various parts of Nemo are licensed differently.
 
 As Nemo links dynamically at runtime with various libraries all of whose licenses are compatible with GPL v3+, you may safely distribute Nemo *as a whole* under the terms of that license (see the MPFR or MPIR source trees downloaded as part of the Nemo package installation for copies of this license, or refer to it online here: 
 
-http://www.gnu.org/copyleft/gpl.txt
+https://www.gnu.org/copyleft/gpl.txt
 
 Individual parts of Nemo may be distributed according to more permissive terms as laid out below:
 
@@ -47,8 +47,8 @@ Individual parts of Nemo may be distributed according to more permissive terms a
 
 External libraries include their own licenses:
 
-- [GMP](http://gmplib.org/manual/Copying.html#Copying)
-- [MPFR](http://www.mpfr.org/mpfr-current/mpfr.html#Copying)
+- [GMP](https://gmplib.org/manual/Copying.html#Copying)
+- [MPFR](https://www.mpfr.org/mpfr-current/mpfr.html#Copying)
 - [MPIR](http://mpir.org/)
 - [FLINT](http://flintlib.org/)
 

@@ -42,7 +42,7 @@ one to write generic functions that can accept any Nemo univariate polynomial ty
 All univariate polynomial types in Nemo follow the AbstractAlgebra.jl univariate
 polynomial interface:
 
-[https://nemocas.github.io/AbstractAlgebra.jl/latest/polynomial_rings](https://nemocas.github.io/AbstractAlgebra.jl/latest/polynomial_rings)
+<https://nemocas.github.io/AbstractAlgebra.jl/latest/polynomial_rings>
 
 Generic polynomials are also available, and Nemo univariate polynomial types also
 implement all of the same functionality.
