@@ -39,18 +39,15 @@ max_precision(R::FmpzModRelSeriesRing) = R.prec_max
 function normalise(a::fmpz_mod_rel_series, len::Int)
    if len > 0
       c = fmpz()
-      ccall((:fmpz_mod_poly_get_coeff_fmpz, libflint), Nothing,
-            (Ref{fmpz}, Ref{fmpz_mod_rel_series}, Int,
-             Ref{fmpz_mod_ctx_struct}),
-            c, a, len - 1, a.parent.base_ring.ninv)
-   end
-   while len > 0 && iszero(c)
-      len -= 1
-      if len > 0
+      while len > 0
          ccall((:fmpz_mod_poly_get_coeff_fmpz, libflint), Nothing,
                (Ref{fmpz}, Ref{fmpz_mod_rel_series}, Int,
                 Ref{fmpz_mod_ctx_struct}),
                c, a, len - 1, a.parent.base_ring.ninv)
+         if !iszero(c)
+            break
+         end
+         len -= 1
       end
    end
    return len

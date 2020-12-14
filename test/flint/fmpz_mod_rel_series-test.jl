@@ -6,6 +6,8 @@
    @test elem_type(FmpzModRelSeriesRing) == fmpz_mod_rel_series
    @test parent_type(fmpz_mod_rel_series) == FmpzModRelSeriesRing
 
+   @test characteristic(S) == fmpz(123456789012345678949)
+
    @test isa(S, FmpzModRelSeriesRing)
 
    a = x^3 + 2x + 1
@@ -34,6 +36,10 @@
    l = S(R(4))
 
    @test isa(l, SeriesElem)
+
+   @test isa(S(0), SeriesElem)
+   @test isa(S(R(0)), SeriesElem)
+   @test isa(S(fmpz(0)), SeriesElem)
 end
 
 @testset "fmpz_mod_rel_series.printing..." begin
@@ -77,6 +83,8 @@ end
 
    @test coeff(b, 7) == 0
 
+   @test iszero(polcoeff(a, -1))
+
    @test characteristic(R) == 123456789012345678949
 end
 
@@ -100,6 +108,8 @@ end
    b = O(x^4)
    c = 1 + x + 3x^2 + O(x^5)
    d = x^2 + 3x^3 - x^4
+
+   @test a*R(2) == R(2)*a
 
    @test isequal(a + b, x^3+2*x+O(x^4))
 
@@ -263,6 +273,8 @@ end
 
    @test c != d
 
+   @test c != 1 + x + 3x^3 + O(x^5)
+
    @test isequal(a, 2x + x^3 + O(x^31))
 
    @test !isequal(b, d)
@@ -276,16 +288,31 @@ end
    b = O(x^0)
    c = 1 + O(x^5)
    d = S(3)
+   e = 2*x + O(x^5)
+   f = O(x^5)
 
    @test d == 3
+   @test d == R(3)
 
    @test c == fmpz(1)
+   @test c == R(1)
 
    @test fmpz() != a
 
    @test 2 == b
+   @test R(2) == b
 
    @test fmpz(1) == c
+   @test R(1) == c
+
+   @test fmpz(2) != e
+   @test R(2) != e
+
+   @test 0 == f
+   @test R(0) == f
+
+   @test 0 != a + O(x^5)
+   @test R(0) != a + O(x^5)
 end
 
 @testset "fmpz_mod_rel_series.powering..." begin
@@ -297,6 +324,8 @@ end
    c = 1 + x + 2x^2 + O(x^5)
    d = 2x + x^3 + O(x^4)
 
+   @test a^0 == one(S)
+
    @test isequal(a^12, x^36+24*x^34+264*x^32+1760*x^30+7920*x^28+25344*x^26+59136*x^24+101376*x^22+126720*x^20+112640*x^18+67584*x^16+24576*x^14+4096*x^12+O(x^42))
 
    @test isequal(b^12, O(x^48))
@@ -304,6 +333,8 @@ end
    @test isequal(c^12, 2079*x^4+484*x^3+90*x^2+12*x+1+O(x^5))
 
    @test isequal(d^12, 4096*x^12+24576*x^14+O(x^15))
+
+   @test isequal((2*x+O(x^5))^2, 4*x^2+O(x^6))
 
    @test_throws DomainError a^-1
 end
@@ -324,6 +355,8 @@ end
    @test isequal(shift_right(c, 1), 1+2*x+O(x^4))
 
    @test isequal(shift_right(d, 3), 1+O(x^1))
+
+   @test isequal(shift_right(d, 4), O(x^0))
 
    @test_throws DomainError shift_left(a, -1)
 

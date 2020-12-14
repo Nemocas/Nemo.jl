@@ -15,6 +15,11 @@
    @test isa(T, FqFiniteField)
    @test isa(T2, FqFiniteField)
 
+   @test characteristic(R) == fmpz(7)
+   @test characteristic(T) == fmpz(36893488147419103363)
+   @test characteristic(T2) == fmpz(36893488147419103363)
+
+
    @test isa(3x^4 + 2x^3 + 4x^2 + x + 1, fq)
    @test isa(z^2 + z + 1, fq)
    @test isa(z2^2 + z2 + 1, fq)
