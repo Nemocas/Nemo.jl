@@ -442,7 +442,8 @@ end
 
 @doc Markdown.doc"""
     issquare(x::fq)
-Returns `true` if $x$ is a square in the finite field (includes zero).
+
+Return `true` if $x$ is a square in the finite field (includes zero).
 """
 function issquare(x::fq)
    return Bool(ccall((:fq_is_square, libflint), Cint,
