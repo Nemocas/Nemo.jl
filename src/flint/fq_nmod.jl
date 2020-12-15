@@ -369,6 +369,14 @@ function issquare(x::fq_nmod)
                      x, x.parent))
 end
 
+function issquare_with_square_root(x::fq_nmod)
+   z = parent(x)()
+   flag = ccall((:fq_nmod_sqrt, libflint), Cint,
+                (Ref{fq_nmod}, Ref{fq_nmod}, Ref{FqNmodFiniteField}),
+                z, x, x.parent)
+   return (Bool(flag), z)
+end
+
 function pth_root(x::fq_nmod)
    z = parent(x)()
    ccall((:fq_nmod_pth_root, libflint), Nothing,
