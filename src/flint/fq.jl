@@ -428,6 +428,7 @@ end
 
 @doc Markdown.doc"""
     square_root(x::fq)
+
 Return the square root of $x$ in the finite field. If $x$ is not a square
 an exception is raised.
 """
