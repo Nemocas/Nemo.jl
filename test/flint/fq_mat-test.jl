@@ -560,6 +560,75 @@ end
   a = zero(R)
 
   @test_throws ErrorException  solve(a,c)
+
+   for i in 1:10
+      m = rand(0:10)
+      n = rand(0:10)
+      k = rand(0:10)
+
+      M = MatrixSpace(F17, n, k)
+      N = MatrixSpace(F17, n, m)
+
+      A = rand(M)
+      B = rand(N)
+
+      fl, X = can_solve_with_solution(A, B)
+
+      if fl
+         @test A * X == B
+      end
+   end
+
+   A = matrix(F17, 2, 2, [1, 2, 2, 5])
+   B = matrix(F17, 2, 1, [1, 2])
+   fl, X = can_solve_with_solution(A, B)
+   @test fl
+   @test A * X == B
+   @test can_solve(A, B)
+
+   A = matrix(F17, 2, 2, [1, 2, 2, 4])
+   B = matrix(F17, 2, 1, [1, 2])
+   fl, X = can_solve_with_solution(A, B)
+   @test fl
+   @test A * X == B
+   @test can_solve(A, B)
+
+   A = matrix(F17, 2, 2, [1, 2, 2, 4])
+   B = matrix(F17, 2, 1, [1, 3])
+   fl, X = can_solve_with_solution(A, B)
+   @test !fl
+   @test !can_solve(A, B)
+
+   A = zero_matrix(F17, 2, 3)
+   B = identity_matrix(F17, 3)
+   @test_throws ErrorException can_solve_with_solution(A, B)
+
+   A = matrix(F17, 2, 2, [1, 2, 2, 5])'
+   B = matrix(F17, 2, 1, [1, 2])'
+   fl, X = can_solve_with_solution(A, B, side = :left)
+   @test fl
+   @test X * A == B
+   @test can_solve(A, B, side = :left)
+
+   A = matrix(F17, 2, 2, [1, 2, 2, 4])'
+   B = matrix(F17, 2, 1, [1, 2])'
+   fl, X = can_solve_with_solution(A, B, side = :left)
+   @test fl
+   @test X * A == B
+   @test can_solve(A, B, side = :left)
+
+   A = matrix(F17, 2, 2, [1, 2, 2, 4])'
+   B = matrix(F17, 2, 1, [1, 3])'
+   fl, X = can_solve_with_solution(A, B, side = :left)
+   @test !fl
+   @test !can_solve(A, B, side = :left)
+
+   A = zero_matrix(F17, 2, 3)'
+   B = identity_matrix(F17, 3)'
+   @test_throws ErrorException can_solve_with_solution(A, B, side = :left)
+
+   @test_throws ErrorException can_solve_with_solution(A, B, side = :garbage)
+   @test_throws ErrorException can_solve(A, B, side = :garbage)
 end
 
 @testset "fq_mat.lu..." begin

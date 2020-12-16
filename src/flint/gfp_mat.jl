@@ -274,6 +274,34 @@ promote_rule(::Type{gfp_mat}, ::Type{fmpz}) = gfp_mat
 
 ################################################################################
 #
+#   Linear solving
+#
+################################################################################
+
+function can_solve_with_solution(a::gfp_mat, b::gfp_mat; side::Symbol = :right)
+   (base_ring(a) != base_ring(b)) && error("Matrices must have same base ring")
+   if side == :left
+      (ncols(a) != ncols(b)) && error("Matrices must have same number of columns")
+      (f, x) = can_solve_with_solution(a', b'; side=:right)
+      return (f, x')
+   elseif side == :right
+      (nrows(a) != nrows(b)) && error("Matrices must have same number of rows")
+      x = similar(a, ncols(a), ncols(b))
+      r = ccall((:nmod_mat_can_solve, libflint), Cint,
+                (Ref{gfp_mat}, Ref{gfp_mat}, Ref{gfp_mat}), x, a, b)
+      return Bool(r), x
+   else
+      error("Unsupported argument :$side for side: Must be :left or :right.")
+   end
+end
+
+function can_solve(a::gfp_mat, b::gfp_mat; side::Symbol = :right)
+   fl, _ = can_solve_with_solution(a, b, side = side)
+   return fl
+end
+
+################################################################################
+#
 #  Parent object overloading
 #
 ################################################################################

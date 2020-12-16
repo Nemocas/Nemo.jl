@@ -426,6 +426,29 @@ function solve(x::fq_mat, y::fq_mat)
    return z
 end
 
+function can_solve_with_solution(a::fq_mat, b::fq_mat; side::Symbol = :right)
+   (base_ring(a) != base_ring(b)) && error("Matrices must have same base ring")
+   if side == :left
+      (ncols(a) != ncols(b)) && error("Matrices must have same number of columns")
+      (f, x) = can_solve_with_solution(a', b'; side=:right)
+      return (f, x')
+   elseif side == :right
+      (nrows(a) != nrows(b)) && error("Matrices must have same number of rows")
+      x = similar(a, ncols(a), ncols(b))
+      r = ccall((:fq_mat_can_solve, libflint), Cint,
+                (Ref{fq_mat}, Ref{fq_mat}, Ref{fq_mat},
+                 Ref{FqFiniteField}), x, a, b, base_ring(a))
+      return Bool(r), x
+   else
+      error("Unsupported argument :$side for side: Must be :left or :right.")
+   end
+end
+
+function can_solve(a::fq_mat, b::fq_mat; side::Symbol = :right)
+   fl, _ = can_solve_with_solution(a, b, side = side)
+   return fl
+end
+
 ################################################################################
 #
 #  LU decomposition
