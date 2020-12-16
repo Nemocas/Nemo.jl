@@ -12,7 +12,7 @@ to cover commutative algebra, number theory and group theory.
 It is currently developed by William Hart, Tommy Hofmann, Fredrik Johansson and
 Claus Fieker with contributions from others.
 
-- <http://nemocas.org> (Website)
+- <https://nemocas.org> (Website)
 - <https://nemocas.github.io/Nemo.jl/latest/> (Online documentation)
 
 The official Nemo repository is at:

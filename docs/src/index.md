@@ -3,7 +3,7 @@
 Nemo is a computer algebra package for the Julia programming language, maintained by William Hart, 
 Tommy Hofmann, Claus Fieker, Fredrik Johansson with additional code by Oleksandr Motsak, Marek Kaluba and other contributors.
 
-- <http://nemocas.org> (Website)
+- <https://nemocas.org> (Website)
 - <https://github.com/Nemocas/Nemo.jl> (Source code)
 - <https://nemocas.github.io/Nemo.jl/latest/> (Online documentation)
 
