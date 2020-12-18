@@ -1,12 +1,12 @@
 using Documenter, Nemo, AbstractAlgebra
 
 makedocs(
-         format   = :html,
+         format = Documenter.HTML(),
          sitename = "Nemo.jl",
          modules = [Nemo, AbstractAlgebra],
          clean = true,
          checkdocs = :none,
-         doctest = false,
+         doctest = true,
          pages    = [
              "index.md",
              "about.md",
@@ -34,10 +34,6 @@ makedocs(
 )
 
 deploydocs(
-   julia = "1.0",
    repo   = "github.com/Nemocas/Nemo.jl.git",
-   target = "build",
-   deps = nothing,
-   make   = nothing,
-   osname = "linux"
+   target = "build"
 )
