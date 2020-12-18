@@ -7,6 +7,7 @@ makedocs(
          clean = true,
          checkdocs = :none,
          doctest = true,
+         strict = true,
          pages    = [
              "index.md",
              "about.md",
