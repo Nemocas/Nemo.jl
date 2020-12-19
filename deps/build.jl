@@ -23,7 +23,7 @@
   end
 
   append!(dependencies, [
-  "build_Arb.v2.18.0.jl",
+  "build_Arb.v200.1900.0.jl",
   "build_Antic.v0.200.300.jl",
   ])
 
