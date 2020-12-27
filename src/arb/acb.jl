@@ -1821,7 +1821,7 @@ end
 
 (r::AcbField)(x::Rational{T}) where {T <: Integer} = r(fmpq(x))
 
-function (r::AcbField)(x::T, y::T) where {T <: Union{Int, UInt,fmpz, fmpq, arb, Float64, BigFloat, AbstractString}}
+function (r::AcbField)(x::T, y::T) where {T <: Union{Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString}}
   z = acb(x, y, r.prec)
   z.parent = r
   return z
