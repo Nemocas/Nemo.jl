@@ -1827,6 +1827,21 @@ function (r::AcbField)(x::T, y::T) where {T <: Union{Int, UInt, fmpz, fmpq, arb,
   return z
 end
 
+for S in (Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString)
+  for T in (Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString)
+    if S != T
+      @eval begin
+        function (r::AcbField)(x::$(S), y::$(T))
+          RR = ArbField(r.prec)
+          z = acb(RR(x), RR(y), r.prec)
+          z.parent = r
+          return z
+        end
+      end
+    end
+  end
+end
+
 (r::AcbField)(x::BigInt, y::BigInt) = r(fmpz(x), fmpz(y))
 
 (r::AcbField)(x::Rational{S}, y::Rational{T}) where {S <: Integer, T <: Integer} =
