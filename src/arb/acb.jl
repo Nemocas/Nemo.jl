@@ -1827,8 +1827,8 @@ function (r::AcbField)(x::T, y::T) where {T <: Union{Int, UInt, fmpz, fmpq, arb,
   return z
 end
 
-for S in (Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString)
-  for T in (Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString)
+for S in (Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString, BigInt)
+  for T in (Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString, BigInt)
     if S != T
       @eval begin
         function (r::AcbField)(x::$(S), y::$(T))
@@ -1838,6 +1838,23 @@ for S in (Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString)
           return z
         end
       end
+    end
+  end
+end
+
+for T in (Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString, BigInt)
+  @eval begin
+    function (r::AcbField)(x::Rational{S}, y::$(T)) where {S <: Integer}
+      RR = ArbField(r.prec)
+      z = acb(RR(x), RR(y), r.prec)
+      z.parent = r
+      return z
+    end
+    function (r::AcbField)(x::$(T), y::Rational{S}) where {S <: Integer}
+      RR = ArbField(r.prec)
+      z = acb(RR(x), RR(y), r.prec)
+      z.parent = r
+      return z
     end
   end
 end
