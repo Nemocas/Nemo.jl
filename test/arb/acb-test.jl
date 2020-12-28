@@ -55,6 +55,7 @@ end
    @test CC(UInt(4), Int(2)) == CC(4.0, ZZ(2))
    @test CC("4 +/- 0", BigFloat(2)) == CC(RR(4), QQ(2))
    @test CC(UInt(8)//UInt(2), BigInt(2)) == CC(4, 2)
+@test CC(2, UInt(8)//UInt(2)) == CC(2, 4)
 
    @test characteristic(CC) == 0
 end

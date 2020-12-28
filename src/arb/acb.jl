@@ -1832,7 +1832,7 @@ for S in (Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString, BigInt)
     if S != T
       @eval begin
         function (r::AcbField)(x::$(S), y::$(T))
-          RR = ArbField(r.prec)
+          RR = ArbField(r.prec, cached = false)
           z = acb(RR(x), RR(y), r.prec)
           z.parent = r
           return z
@@ -1845,13 +1845,13 @@ end
 for T in (Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString, BigInt)
   @eval begin
     function (r::AcbField)(x::Rational{S}, y::$(T)) where {S <: Integer}
-      RR = ArbField(r.prec)
+      RR = ArbField(r.prec, cached = false)
       z = acb(RR(x), RR(y), r.prec)
       z.parent = r
       return z
     end
     function (r::AcbField)(x::$(T), y::Rational{S}) where {S <: Integer}
-      RR = ArbField(r.prec)
+      RR = ArbField(r.prec, cached = false)
       z = acb(RR(x), RR(y), r.prec)
       z.parent = r
       return z
