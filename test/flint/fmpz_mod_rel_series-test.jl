@@ -440,6 +440,8 @@ end
    S, x = PowerSeriesRing(R, 30, "x")
 
    @test isequal(exp(x + O(x^5)), 56584361630658436185*x^4+102880657510288065791*x^3+61728394506172839475*x^2+x+1+O(x^5))
+   @test isequal(exp(O(x^0)), O(x^0))
+   @test isequal(exp(O(x^5)), 1+O(x^5))
 
    @test isequal(divexact(x, exp(x + O(x^5)) - 1), 113168723261316872370*x^2+61728394506172839474*x+1+O(x^4))
 end
