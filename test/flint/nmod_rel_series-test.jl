@@ -411,6 +411,8 @@ end
    S, x = PowerSeriesRing(R, 30, "x")
 
    @test isequal(exp(x + O(x^5)), 1+x+9*x^2+3*x^3+5*x^4+O(x^5))
+   @test isequal(exp(O(x^5)), 1+O(x^5))
+   @test isequal(exp(O(x^0)), O(x^0))
 
    @test isequal(divexact(x, exp(x + O(x^5)) - 1), 1+8*x+10*x^2+O(x^4))
 end
