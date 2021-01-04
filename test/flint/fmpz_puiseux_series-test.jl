@@ -52,6 +52,7 @@ end
 
    @test coeff(a, 1) == 3
    @test coeff(a, 1//3) == 2
+   @test coeff(a, 1//4) == 0
 
    @test isgen(gen(S))
 
@@ -65,6 +66,10 @@ end
    @test isequal(deepcopy(b), b)
 
    @test characteristic(S) == 0
+
+   d = Dict(x => 1, x^2 => 2)
+   @test d[x] == 1
+   @test d[x^2] == 2
 end
 
 @testset "fmpz_puiseux_series.unary_ops..." begin
@@ -170,6 +175,9 @@ end
          r2 *= f
       end
    end
+
+   @test iszero((x-x)^1)
+   @test isone((1-2*x+x^2)*(1-x)^-2)
 end
 
 @testset "fmpz_puiseux_series.inversion..." begin
@@ -192,6 +200,8 @@ end
 
       @test isequal(sqrt(g)^2, g)
    end
+
+   @test sqrt(1+4*x)*x^(1//2) == sqrt(x+4*x^2)
 end
 
 @testset "fmpz_puiseux_series.exact_division..." begin
@@ -226,4 +236,19 @@ end
    @test isequal(exp(2x - x^2 + O(x^3)), 1+2*x+x^2+O(x^3))
 
    @test isequal(eta_qexp(x), x^(1//24)-x^(25//24)-x^(49//24)+O(x^(101//24)))
+end
+
+@testset "fmpz_puiseux_series.unsafe..." begin
+   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   a = x
+   zero!(a)
+   @test iszero(a)
+   mul!(a, a, x)
+   @test iszero(a)
+   add!(a, a, x)
+   @test a == x
+   addeq!(a, x^2)
+   @test a == x+x^2
+   mul!(a, a, x)
+   @test a == x*(x+x^2)
 end

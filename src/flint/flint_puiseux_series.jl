@@ -570,7 +570,7 @@ rand(S::FlintPuiseuxSeriesRingOrField, val_range, scale_range, v...) =
 
 function zero!(a::FlintPuiseuxSeriesElem{T}) where T <: RingElem
    zero!(a.data)
-   a = set_scale(a, 1)
+   a.data = set_scale!(a.data, 1)
    return a
 end
 
