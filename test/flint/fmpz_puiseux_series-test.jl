@@ -24,6 +24,14 @@
    @test isa(k1, FlintPuiseuxSeriesElem)
 end
 
+@testset "fmpz_puiseux_series.printing..." begin
+   R, x = PuiseuxSeriesRing(ZZ, 30, "x")
+
+   @test !occursin(r"{", string(R))
+
+   @test occursin(r"x", string(x^(-1//2) + 1 - x + x^2 + x^5))
+end
+
 @testset "fmpz_puiseux_series.rand..." begin
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    test_rand(R, -12:12, 1:6, -10:10)
