@@ -70,6 +70,9 @@ end
    d = Dict(x => 1, x^2 => 2)
    @test d[x] == 1
    @test d[x^2] == 2
+
+   @test S(gen(laurent_ring(S))) == x
+
 end
 
 @testset "fmpz_puiseux_series.unary_ops..." begin
@@ -177,6 +180,7 @@ end
    end
 
    @test iszero((x-x)^1)
+   @test isone((1-x)*(1-x)^-1)
    @test isone((1-2*x+x^2)*(1-x)^-2)
 end
 

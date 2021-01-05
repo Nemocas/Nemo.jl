@@ -637,6 +637,7 @@ end
 ###############################################################################
 
 function (R::FlintPuiseuxSeriesRing{T})(b::RingElement) where T <: RingElem
+   # TODO this method applies to b::fmpz_poly but is broken
    return R(base_ring(R)(b))
 end
 
@@ -683,14 +684,14 @@ function (R::FlintPuiseuxSeriesField{T})(b::Rational) where T <: RingElem
 end
 
 function (R::FlintPuiseuxSeriesRing{T})(b::T) where T <: RingElem
-   parent(b) != base_ring(R) && error("Unable to coerce to Puiseux series")
+   parent(b) != laurent_ring(R) && error("Unable to coerce to Puiseux series")
    z = FlintPuiseuxSeriesRingElem{T}(b, 1)
    z.parent = R
    return z
 end
 
 function (R::FlintPuiseuxSeriesField{T})(b::T) where T <: FieldElem
-   parent(b) != base_ring(R) && error("Unable to coerce to Puiseux series")
+   parent(b) != laurent_ring(R) && error("Unable to coerce to Puiseux series")
    z = FlintPuiseuxSeriesFieldElem{T}(b, 1)
    z.parent = R
    return z
