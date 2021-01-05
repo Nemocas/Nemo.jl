@@ -482,6 +482,44 @@ rand(R::FqNmodFiniteField, b::UnitRange{Int}) = rand(Random.GLOBAL_RNG, R, b)
 
 ###############################################################################
 #
+#   Iteration
+#
+###############################################################################
+
+Base.iterate(F::FqNmodFiniteField) = zero(F), zeros(UInt, degree(F))
+
+function Base.iterate(F::FqNmodFiniteField, coeffs::Vector{UInt})
+   deg = length(coeffs)
+   char = F.p # cheaper than calling characteristic(F)::fmpz
+
+   allzero = true
+   for d = 1:deg
+      if allzero
+         coeffs[d] += 1
+         if coeffs[d] == char
+            coeffs[d] = 0
+         else
+            allzero = false
+         end
+      else
+         break
+      end
+   end
+   allzero && return nothing
+
+   elt = F()
+   for d = 1:deg
+      ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
+            (Ref{fq_nmod}, Int, UInt), elt, d - 1, coeffs[d])
+   end
+   elt, coeffs
+end
+
+Base.length(F::FqNmodFiniteField) = BigInt(order(F))
+Base.eltype(::Type{FqNmodFiniteField}) = elem_type(FqNmodFiniteField)
+
+###############################################################################
+#
 #   Promotions
 #
 ###############################################################################

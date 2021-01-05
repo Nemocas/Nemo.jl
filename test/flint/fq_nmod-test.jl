@@ -197,3 +197,13 @@ end
 
    @test !issquare_with_square_root(x*a^2)[1]
 end
+
+@testset "fq_nmod.iteration..." begin
+   for n = [2, 3, 5, 13, 31]
+      R, _ = FiniteField(n, 1, "x")
+      elts = Nemo.AbstractAlgebra.test_iterate(R)
+      @test elts == R.(0:n-1)
+      R, _ = FiniteField(n, rand(2:9), "x")
+      Nemo.AbstractAlgebra.test_iterate(R)
+   end
+end
