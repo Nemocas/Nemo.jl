@@ -332,11 +332,15 @@ function Base.show(io::IO, a::FlintPuiseuxSeriesElem)
    print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
-needs_parentheses(x::FlintPuiseuxSeriesElem) = pol_length(x.data) > 1
+function show(io::IO, a::FlintPuiseuxSeriesRing)
+   print(io, "Puiseux series ring in ", var(laurent_ring(a)), " over ")
+   show(io, base_ring(a))
+end
 
-displayed_with_minus_in_front(x::FlintPuiseuxSeriesElem) = pol_length(x) <= 1 && displayed_with_minus_in_front(polcoeff(x.data, 0))
-
-show_minus_one(::Type{FlintPuiseuxSeriesElem{T}}) where T <: RingElem = show_minus_one(T)
+function show(io::IO, a::FlintPuiseuxSeriesField)
+   print(io, "Puiseux series field in ", var(laurent_ring(a)), " over ")
+   show(io, base_ring(a))
+end
 
 ###############################################################################
 #
