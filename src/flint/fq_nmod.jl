@@ -487,11 +487,12 @@ rand(R::FqNmodFiniteField, b::UnitRange{Int}) = rand(Random.GLOBAL_RNG, R, b)
 ###############################################################################
 
 Base.iterate(F::FqNmodFiniteField) = zero(F), zeros(UInt, degree(F))
+Base.iterate(F::FqFiniteField) = zero(F), zeros(fmpz, degree(F))
 
-function Base.iterate(F::FqNmodFiniteField, coeffs::Vector{UInt})
+function Base.iterate(F::Union{FqNmodFiniteField,FqFiniteField}, coeffs::Vector)
    deg = length(coeffs)
-   char = F.p # cheaper than calling characteristic(F)::fmpz
-
+   char = F isa FqNmodFiniteField ? F.p : # cheaper than calling characteristic(F)::fmpz
+                                    characteristic(F)
    allzero = true
    for d = 1:deg
       if allzero
@@ -509,14 +510,18 @@ function Base.iterate(F::FqNmodFiniteField, coeffs::Vector{UInt})
 
    elt = F()
    for d = 1:deg
-      ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-            (Ref{fq_nmod}, Int, UInt), elt, d - 1, coeffs[d])
+      if F isa FqNmodFiniteField
+         ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
+               (Ref{fq_nmod}, Int, UInt), elt, d - 1, coeffs[d])
+      else
+         ccall((:fmpz_poly_set_coeff_fmpz, libflint), Nothing,
+               (Ref{fq}, Int, Ref{fmpz}), elt, d - 1, coeffs[d])
+      end
    end
    elt, coeffs
 end
 
-Base.length(F::FqNmodFiniteField) = BigInt(order(F))
-Base.eltype(::Type{FqNmodFiniteField}) = elem_type(FqNmodFiniteField)
+# Base.length(F) and Base.eltype(F) are defined in AbstractAlgebra
 
 ###############################################################################
 #
