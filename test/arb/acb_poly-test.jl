@@ -43,7 +43,8 @@ end
    R, x = PolynomialRing(CC, "x")
    f = x^3 + 2x^2 + x + 1
 
-   @test string(f) == "[ 1.0000000000000000000 + i*0, 1.0000000000000000000 + i*0, 2.0000000000000000000 + i*0, 1.0000000000000000000 + i*0 ]"
+   @test occursin(r"x", string(f))
+   @test occursin(r"2.[0]+", string(f))
 end
 
 @testset "acb_poly.manipulation..." begin

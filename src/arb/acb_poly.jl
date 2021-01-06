@@ -84,18 +84,8 @@ function show(io::IO, x::AcbPolyRing)
   show(io, x.base_ring)
 end
 
-function show(io::IO, f::acb_poly)
-  if length(f) == 0
-    print(io, "0")
-  else
-    print(io, "[ ")
-    for i in 0:degree(f)-1
-      print(io, coeff(f,i))
-      print(io, ", ")
-    end
-    print(io, coeff(f,degree(f)))
-    print(io, " ]")
-  end
+function Base.show(io::IO, a::acb_poly)
+   print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
 ###############################################################################

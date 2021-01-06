@@ -141,6 +141,27 @@ end
 #
 ################################################################################
 
+function native_string(x::arb)
+   d = ceil(parent(x).prec * 0.30102999566398119521)
+   cstr = ccall((:arb_get_str, libarb), Ptr{UInt8},
+                (Ref{arb}, Int, UInt),
+                x, Int(d), UInt(0))
+   res = unsafe_string(cstr)
+   ccall((:flint_free, libflint), Nothing,
+         (Ptr{UInt8},),
+         cstr)
+   return res
+end
+
+function AbstractAlgebra.expressify(x::arb; context = nothing)
+   if isexact(x) && isnegative(x)
+      # TODO isexact does not imply it is printed without radius
+      return Expr(:call, :-, native_string(-x))
+   else
+      return native_string(x)
+   end
+end
+
 function show(io::IO, x::ArbField)
   print(io, "Real Field with ")
   print(io, precision(x))
@@ -148,16 +169,8 @@ function show(io::IO, x::ArbField)
 end
 
 function show(io::IO, x::arb)
-  d = ceil(parent(x).prec * 0.30102999566398119521)
-  cstr = ccall((:arb_get_str, libarb), Ptr{UInt8}, (Ref{arb}, Int, UInt),
-                                                  x, Int(d), UInt(0))
-  print(io, unsafe_string(cstr))
-  ccall((:flint_free, libflint), Nothing, (Ptr{UInt8},), cstr)
+   print(io, native_string(x))
 end
-
-needs_parentheses(x::arb) = false
-
-show_minus_one(::Type{arb}) = true
 
 ################################################################################
 #
@@ -534,11 +547,6 @@ Return `true` if $x$ is certainly negative, otherwise return `false`.
 """
 function isnegative(x::arb)
    return Bool(ccall((:arb_is_negative, libarb), Cint, (Ref{arb},), x))
-end
-
-# TODO: return true if printed without brackets and x is negative
-function displayed_with_minus_in_front(x::arb)
-   return false
 end
 
 @doc Markdown.doc"""

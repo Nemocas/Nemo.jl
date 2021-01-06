@@ -16,9 +16,11 @@ CC = AcbField(64)
 end
 
 @testset "acb.printing..." begin
-   a = CC(1) + onei(CC)
-
-   @test string(a) == "1.0000000000000000000 + i*1.0000000000000000000"
+   @test occursin(r"\A0\Z", string(CC(0)))
+   @test occursin(r"\A1\.[0]+\Z", string(CC(1)))
+   @test occursin(r"\A1\.[0]+[ ]*\*[ ]*?im\Z", string(onei(CC)))
+   @test occursin(r"\A1\.[0]+[ ]*\+[ ]*1\.[0]+[ ]*?\*[ ]*im\Z",
+                                                      string(CC(1) + onei(CC)))
 end
 
 @testset "acb.basic_ops..." begin
