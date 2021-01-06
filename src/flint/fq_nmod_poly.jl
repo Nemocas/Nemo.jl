@@ -101,8 +101,6 @@ function show(io::IO, R::FqNmodPolyRing)
   show(io, base_ring(R))
 end
 
-show_minus_one(::Type{fq_nmod_poly}) = show_minus_one(fq_nmod)
-
 ################################################################################
 #
 #  Unary operations

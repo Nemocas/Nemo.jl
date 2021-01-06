@@ -57,6 +57,19 @@
    end
 end
 
+@testset "fq_nmod_mpoly.printing..." begin
+   R, a = FiniteField(23, 5, "a")
+   S, (x, y) = PolynomialRing(R, ["x", "y"])
+
+   @test !occursin(r"{", string(S))
+
+   @test string(zero(S)) == "0"
+   @test string(one(S)) == "1"
+   @test string(S(a)) == "a"
+   @test string(x) == "x"
+   @test string(y) == "y"
+end
+
 @testset "fq_nmod_mpoly.manipulation..." begin
    R, a = FiniteField(23, 5, "a")
 

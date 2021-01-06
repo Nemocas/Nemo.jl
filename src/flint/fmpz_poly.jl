@@ -90,8 +90,6 @@ function show(io::IO, p::FmpzPolyRing)
    show(io, p.base_ring)
 end
 
-show_minus_one(::Type{fmpz_poly}) = show_minus_one(fmpz)
-
 ###############################################################################
 #
 #   Unary operations

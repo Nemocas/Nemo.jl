@@ -204,12 +204,6 @@ function show(io::IO, a::FlintRationalField)
    print(io, "Rational Field")
 end
 
-needs_parentheses(x::fmpq) = false
-
-displayed_with_minus_in_front(x::fmpq) = x < 0
-
-show_minus_one(::Type{fmpq}) = false
-
 ###############################################################################
 #
 #   Unary operators

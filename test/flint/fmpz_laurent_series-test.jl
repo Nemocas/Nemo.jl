@@ -28,6 +28,14 @@
    @test isa(k1, fmpz_laurent_series)
 end
 
+@testset "fmpz_laurent_series.printing..." begin
+   R, x = LaurentSeriesRing(ZZ, 30, "x")
+
+   @test !occursin(r"{", string(R))
+
+   @test occursin(r"x", string(x^-1 + 1 - x + x^2 + x^5))
+end
+
 @testset "fmpz_laurent_series.rand..." begin
    R, x = LaurentSeriesRing(ZZ, 10, "x")
 

@@ -98,15 +98,13 @@ function show(io::IO, R::FmpzModRing)
    print(io, "Integers modulo ", R.n)
 end
 
+function AbstractAlgebra.expressify(a::fmpz_mod; context = nothing)
+   return a.data
+end
+
 function show(io::IO, a::fmpz_mod)
    print(io, a.data)
 end
-
-needs_parentheses(x::fmpz_mod) = false
-
-displayed_with_minus_in_front(x::fmpz_mod) = false
-
-show_minus_one(::Type{fmpz_mod}) = true
 
 ###############################################################################
 #

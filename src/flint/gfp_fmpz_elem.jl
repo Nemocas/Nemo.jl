@@ -96,15 +96,13 @@ function show(io::IO, R::GaloisFmpzField)
    print(io, "Galois field with characteristic ", R.n)
 end
 
+function AbstractAlgebra.expressify(a::gfp_fmpz_elem; context = nothing)
+   return a.data
+end
+
 function show(io::IO, a::gfp_fmpz_elem)
    print(io, a.data)
 end
-
-needs_parentheses(x::gfp_fmpz_elem) = false
-
-displayed_with_minus_in_front(x::gfp_fmpz_elem) = false
-
-show_minus_one(::Type{gfp_fmpz_elem}) = true
 
 ###############################################################################
 #

@@ -128,8 +128,6 @@ function show(io::IO, a::FmpzModRelSeriesRing)
    show(io, base_ring(a))
 end
 
-show_minus_one(::Type{fmpz_mod_rel_series}) = show_minus_one(fmpz)
-
 ###############################################################################
 #
 #   Unary operators

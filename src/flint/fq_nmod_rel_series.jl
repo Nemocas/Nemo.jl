@@ -124,8 +124,6 @@ function show(io::IO, a::FqNmodRelSeriesRing)
    show(io, base_ring(a))
 end
 
-show_minus_one(::Type{fq_nmod_rel_series}) = show_minus_one(fq_nmod)
-
 ###############################################################################
 #
 #   Unary operators

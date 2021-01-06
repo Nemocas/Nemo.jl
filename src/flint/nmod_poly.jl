@@ -121,8 +121,6 @@ function show(io::IO, R::NmodPolyRing)
   print(io, base_ring(R))
 end
 
-show_minus_one(::Type{nmod_poly}) = true
-
 ################################################################################
 #
 #  Canonicalization

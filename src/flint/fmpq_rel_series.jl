@@ -118,8 +118,6 @@ function show(io::IO, a::FmpqRelSeriesRing)
    show(io, base_ring(a))
 end
 
-show_minus_one(::Type{fmpq_rel_series}) = show_minus_one(fmpq)
-
 ###############################################################################
 #
 #   Unary operators

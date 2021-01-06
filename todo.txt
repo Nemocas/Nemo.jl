@@ -52,8 +52,6 @@ fmpz_mod_poly.jl
 Poly.jl/fmpz_poly.jl
 --------------------
 
-* Fix printing of monomials, e.g. y + (x), y + (6)
-
 * Fix efficient powering of x in flint specialised polynomials cases
 
 * function to convert poly to array
@@ -136,8 +134,6 @@ Fraction.jl
 
 nf.jl
 -----
-
-* fix needs_parentheses and isnegative
 
 * find way of allowing NumberField to take a polynomial over Z instead of
   over Q, and yet allow all the coercions from that ring into number fields

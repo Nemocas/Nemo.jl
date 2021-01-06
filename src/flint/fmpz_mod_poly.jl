@@ -97,8 +97,6 @@ function show(io::IO, R::ZmodNFmpzPolyRing)
   print(io, base_ring(R))
 end
 
-show_minus_one(::Type{T}) where {T <: Zmodn_fmpz_poly} = true
-
 ################################################################################
 #
 #  Canonicalization

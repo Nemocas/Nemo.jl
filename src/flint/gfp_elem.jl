@@ -102,12 +102,6 @@ function show(io::IO, a::gfp_elem)
    print(io, signed(widen(a.data)))
 end
 
-needs_parentheses(x::gfp_elem) = false
-
-displayed_with_minus_in_front(x::gfp_elem) = false
-
-show_minus_one(::Type{gfp_elem}) = true
-
 ###############################################################################
 #
 #   Unary operations

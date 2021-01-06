@@ -371,61 +371,34 @@ characteristic(::FmpzLaurentSeriesRing) = 0
 #
 ###############################################################################
 
-function show(io::IO, x::fmpz_laurent_series)
-   len = pol_length(x)
-   if len == 0
-      print(io, zero(base_ring(x)))
-   else
-      coeff_printed = false
-      sc = scale(x)
-      for i = 0:len - 1
-         c = polcoeff(x, i)
-         bracket = needs_parentheses(c)
-         if !iszero(c)
-            if coeff_printed && !displayed_with_minus_in_front(c)
-               print(io, "+")
-            end
-            if i*sc + valuation(x) != 0
-               if !isone(c) && (c != -1 || show_minus_one(elem_type(base_ring(x))))
-                  if bracket
-                     print(io, "(")
-                  end
-                  print(io, c)
-                  if bracket
-                     print(io, ")")
-                  end
-                  if i*sc + valuation(x) != 0
-                     print(io, "*")
-                  end
-               end
-               if c == -1 && !show_minus_one(elem_type(base_ring(x)))
-                  print(io, "-")
-               end
-               print(io, string(var(parent(x))))
-               if i*sc + valuation(x) != 1
-                  print(io, "^")
-                  print(io, valuation(x) + i*sc)
-               end
-            else
-               print(io, c)
-            end
-            coeff_printed = true
+function AbstractAlgebra.expressify(a::fmpz_laurent_series,
+                                    x = var(parent(a)); context = nothing)
+   sum = Expr(:call, :+)
+   for i in 0:pol_length(a) - 1
+      c = polcoeff(a, i)
+      if !iszero(c)
+         q = (i*scale(a) + valuation(a))
+         xk = iszero(q) ? 1 : isone(q) ? x : Expr(:call, :^, x, q)
+         if isone(c)
+             push!(sum.args, xk)
+         else
+             push!(sum.args, Expr(:call, :*, expressify(c, context = context), xk))
          end
       end
    end
-   print(io, "+O(", string(var(parent(x))), "^", precision(x), ")")
+   q = precision(a)
+   push!(sum.args, Expr(:call, :O, Expr(:call, :^, x, q)))
+   return sum
+end
+
+function show(io::IO, a::fmpz_laurent_series)
+   print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
 function show(io::IO, a::FmpzLaurentSeriesRing)
    print(io, "Laurent series ring in ", var(a), " over ")
    show(io, base_ring(a))
 end
-
-needs_parentheses(x::fmpz_laurent_series) = pol_length(x) > 1
-
-displayed_with_minus_in_front(x::fmpz_laurent_series) = pol_length(x) <= 1 && displayed_with_minus_in_front(polcoeff(x, 0))
-
-show_minus_one(::Type{fmpz_laurent_series})  = show_minus_one(T)
 
 ###############################################################################
 #

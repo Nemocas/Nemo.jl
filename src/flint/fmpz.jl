@@ -280,12 +280,6 @@ show(io::IO, x::fmpz) = print(io, string(x))
 
 show(io::IO, a::FlintIntegerRing) = print(io, "Integer Ring")
 
-needs_parentheses(x::fmpz) = false
-
-displayed_with_minus_in_front(x::fmpz) = x < 0
-
-show_minus_one(::Type{fmpz}) = false
-
 ###############################################################################
 #
 #   Canonicalisation

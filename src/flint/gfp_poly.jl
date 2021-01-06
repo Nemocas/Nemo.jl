@@ -79,8 +79,6 @@ function show(io::IO, R::GFPPolyRing)
   print(io, base_ring(R))
 end
 
-show_minus_one(::Type{gfp_poly}) = true
-
 ###############################################################################
 #
 #  Ad hoc binary operations

@@ -57,6 +57,17 @@
    end
 end
 
+@testset "fmpq_mpoly.printing..." begin
+   S, (x, y) = PolynomialRing(FlintQQ, ["x", "y"])
+
+   @test !occursin(r"{", string(S))
+
+   @test string(zero(S)) == "0"
+   @test string(one(S)) == "1"
+   @test string(x) == "x"
+   @test string(y) == "y"
+end
+
 @testset "fmpq_mpoly.manipulation..." begin
    R = FlintQQ
 

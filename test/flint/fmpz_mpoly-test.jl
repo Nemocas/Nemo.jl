@@ -57,6 +57,17 @@
    end
 end
 
+@testset "fmpz_mpoly.printing..." begin
+   S, (x, y) = PolynomialRing(FlintZZ, ["x", "y"])
+
+   @test !occursin(r"{", string(S))
+
+   @test string(zero(S)) == "0"
+   @test string(one(S)) == "1"
+   @test string(x) == "x"
+   @test string(y) == "y"
+end
+
 @testset "fmpz_mpoly.manipulation..." begin
    R = FlintZZ
 

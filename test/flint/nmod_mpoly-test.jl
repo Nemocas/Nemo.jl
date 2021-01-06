@@ -60,6 +60,17 @@
    end
 end
 
+@testset "nmod_mpoly.printing..." begin
+   S, (x, y) = PolynomialRing(ResidueRing(FlintZZ, 23), ["x", "y"])
+
+   @test !occursin(r"{", string(S))
+
+   @test string(zero(S)) == "0"
+   @test string(one(S)) == "1"
+   @test string(x) == "x"
+   @test string(y) == "y"
+end
+
 @testset "nmod_mpoly.manipulation..." begin
    R = ResidueRing(FlintZZ, 23)
 

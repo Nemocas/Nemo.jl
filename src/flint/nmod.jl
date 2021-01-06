@@ -106,12 +106,6 @@ function show(io::IO, a::nmod)
    print(io, signed(widen(a.data)))
 end
 
-needs_parentheses(x::nmod) = false
-
-displayed_with_minus_in_front(x::nmod) = false
-
-show_minus_one(::Type{nmod}) = true
-
 ###############################################################################
 #
 #   Unary operations
