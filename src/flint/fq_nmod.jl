@@ -486,8 +486,10 @@ rand(R::FqNmodFiniteField, b::UnitRange{Int}) = rand(Random.GLOBAL_RNG, R, b)
 #
 ###############################################################################
 
-Base.iterate(F::FqNmodFiniteField) = zero(F), zeros(UInt, degree(F))
-Base.iterate(F::FqFiniteField) = zero(F), zeros(fmpz, degree(F))
+# the two definitions are merged (with `Union`) so that this doesn't produce a compilation
+# warning due to similar definitions in Hecke
+Base.iterate(F::Union{FqNmodFiniteField,FqFiniteField}) =
+   zero(F), zeros(F isa FqNmodFiniteField ? UInt : fmpz, degree(F))
 
 function Base.iterate(F::Union{FqNmodFiniteField,FqFiniteField}, coeffs::Vector)
    deg = length(coeffs)
