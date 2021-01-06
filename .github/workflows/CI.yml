@@ -1,6 +1,8 @@
 name: Run tests
 
-on: [push, pull_request]
+on:
+  - push
+  - pull_request
 
 jobs:
   test:
@@ -23,6 +25,10 @@ jobs:
           - windows-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          # For Codecov, we must also fetch the parent of the HEAD commit to
+          # be able to properly deal with PRs / merges
+          fetch-depth: 2
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v1
         with:
@@ -33,19 +39,31 @@ jobs:
         env:
           cache-name: cache-artifacts
         with:
-          path: ~/.julia/artifacts 
+          path: ~/.julia/artifacts
           key: ${{ runner.os }}-test-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
           restore-keys: |
             ${{ runner.os }}-test-${{ env.cache-name }}-
             ${{ runner.os }}-test-
             ${{ runner.os }}-
       - name: "Build package"
-        uses: julia-actions/julia-buildpkg@master
+        uses: julia-actions/julia-buildpkg@latest
       - name: "Run tests"
-        uses: julia-actions/julia-runtest@master
+        uses: julia-actions/julia-runtest@latest
+      - name: "Run doctests"
+        if: ${{ matrix.julia-version == '1.5' }}
+        run: |
+          julia --project=docs --color=yes --code-coverage -e '
+            using Pkg
+            Pkg.develop(PackageSpec(path=pwd()))
+            Pkg.instantiate()
+            using Documenter: doctest
+            using Nemo
+            doctest(Nemo)'
       - name: "Process code coverage"
+        continue-on-error: true
         uses: julia-actions/julia-processcoverage@v1
       - name: "Upload coverage data to Codecov"
+        continue-on-error: true
         uses: codecov/codecov-action@v1
 
   docs:
