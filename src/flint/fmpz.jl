@@ -41,8 +41,7 @@ export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash,
        gcdinv, isprobable_prime, jacobi_symbol, remove, root, size,
        isqrtrem, sqrtmod, trailing_zeros, divisor_sigma, euler_phi, fibonacci,
        moebius_mu, primorial, rising_factorial, number_of_partitions,
-       canonical_unit, needs_parentheses, displayed_with_minus_in_front,
-       show_minus_one, addeq!, mul!, isunit, isequal,
+       canonical_unit, isunit, isequal, addeq!, mul!,
        issquare, square_root, issquare_with_square_root,
        iszero, rand, rand_bits, binomial, factorial, rand_bits_prime
 

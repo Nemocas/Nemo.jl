@@ -264,32 +264,40 @@ function set_printing_mode(::Type{FlintPadicField}, printing::Symbol)
    return printing
 end
 
-function show(io::IO, x::padic)
-   p = prime(parent(x))
-
+function AbstractAlgebra.expressify(x::padic; context = nothing)
+   p = BigInt(prime(parent(x)))
    pmode = PADIC_PRINTING_MODE[]
+   sum = Expr(:call, :+)
+   if iszero(x)
+      push!(sum.args, 0)
+   elseif pmode == 0  # terse
+      push!(sum.args, AbstractAlgebra.expressify(lift(FlintQQ, x)))
+   else
+      pp = prime(parent(x))
+      p = BigInt(pp)
+      v = valuation(x)
+      u = BigInt(lift(FlintZZ, x*parent(x)(pp)^-v))
+      if pmode == 1  # series
+         d = digits(u, base=p)
+      else  # val_unit
+         d = [u]
+      end
+      for i in 0:length(d)-1
+         ppower = Expr(:call, :^, p, i + v)
+         push!(sum.args, Expr(:call, :*, d[i + 1], ppower))
+      end
+   end
+   push!(sum.args, Expr(:call, :O, Expr(:call, :^, p, x.N)))
+   return sum
+end
 
-   cstr = ccall((:_padic_get_str, libflint), Ptr{UInt8},
-                (Ptr{Nothing}, Ref{padic}, Ref{fmpz}, Cint),
-                 C_NULL, x, p, pmode)
-
-   print(io, unsafe_string(cstr))
-
-   ccall((:flint_free, libflint), Nothing, (Ptr{UInt8},), cstr)
-   print(io, " + O(")
-   print(io, p)
-   print(io, "^$(x.N))")
+function show(io::IO, a::padic)
+   print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
 function show(io::IO, R::FlintPadicField)
    print(io, "Field of ", prime(R), "-adic numbers")
 end
-
-needs_parentheses(x::padic) = true
-
-displayed_with_minus_in_front(x::padic) = false
-
-show_minus_one(::Type{padic}) = true
 
 ###############################################################################
 #

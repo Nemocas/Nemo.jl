@@ -41,13 +41,12 @@
 end
 
 @testset "qadic.printing..." begin
-   R = QadicField(7, 1, 30)
+   R = QadicField(7, 3, 30)
 
-   a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
-
-   b = string(a)
-
-   @test b isa String
+   @test string(zero(R)) isa String
+   @test string(one(R)) isa String
+   @test string(gen(R)) isa String
+   @test string(gen(R)^10) isa String
 end
 
 @testset "qadic.manipulation..." begin

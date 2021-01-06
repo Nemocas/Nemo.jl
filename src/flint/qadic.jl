@@ -241,58 +241,38 @@ characteristic(R::FlintQadicField) = 0
 #
 ###############################################################################
 
-function show(io::IO, x::qadic)
-   R = FlintPadicField(prime(parent(x)), parent(x).prec_max)
-   if iszero(x)
-     print(io, "0")
-     return
+function AbstractAlgebra.expressify(b::qadic, x = :a; context = nothing)
+   R = FlintPadicField(prime(parent(b)), parent(b).prec_max)
+   if iszero(b)
+      return 0
    end
-   len = degree(parent(x)) + 1
+   sum = Expr(:call, :+)
    c = R()
-   ccall((:padic_poly_get_coeff_padic, libflint), Nothing, (Ref{padic}, Ref{qadic}, Int, Ref{FlintQadicField}), c, x, len, parent(x))
-   while iszero(c)
-     len = len - 1
-     ccall((:padic_poly_get_coeff_padic, libflint), Nothing, (Ref{padic}, Ref{qadic}, Int, Ref{FlintQadicField}), c, x, len, parent(x))
+   for i in degree(parent(b)):-1:0
+      ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
+            (Ref{padic}, Ref{qadic}, Int, Ref{FlintQadicField}),
+            c, b, i, parent(b))
+      ec = expressify(c)
+      if !iszero(c)
+         if iszero(i)
+            push!(sum.args, ec)
+         elseif isone(i)
+            push!(sum.args, Expr(:call, :*, ec, x))
+         else
+            push!(sum.args, Expr(:call, :*, ec, Expr(:call, :^, x, i)))
+         end
+      end
    end
+   return sum
+end
 
-   for i = 1:len
-     ccall((:padic_poly_get_coeff_padic, libflint), Nothing, (Ref{padic}, Ref{qadic}, Int, Ref{FlintQadicField}), c, x, len - i + 1, parent(x))
-     bracket = true
-     if !iszero(c)
-       if i != 1
-         print(io, " + ")
-       end
-       print(io, "(")
-       show(io, c)
-       print(io, ")")
-       print(io, "*")
-       print(io, "a")
-       if len - i + 1 != 1
-         print(io, "^")
-         print(io, len - i + 1)
-       end
-     end
-   end
-   ccall((:padic_poly_get_coeff_padic, libflint), Nothing, (Ref{padic}, Ref{qadic}, Int, Ref{FlintQadicField}), c, x, 0, parent(x))
-   if !iszero(c)
-     if len + 1 != 1
-       print(io, " + ")
-     end
-     print(io, "(")
-     show(io, c)
-     print(io, ")")
-   end
+function show(io::IO, a::qadic)
+   print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
 function show(io::IO, R::FlintQadicField)
    print(io, "Unramified extension of $(prime(R))-adic numbers of degree $(degree(R))")
 end
-
-needs_parentheses(x::qadic) = true
-
-isnegative(x::qadic) = false
-
-show_minus_one(::Type{qadic}) = true
 
 ###############################################################################
 #
