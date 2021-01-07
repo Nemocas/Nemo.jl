@@ -253,7 +253,8 @@ iseven(a::fmpz) = ccall((:fmpz_is_even, libflint), Cint, (Ref{fmpz},), a) % Bool
 #
 ###############################################################################
 
-expressify(x::fmpz; context = nothing) = BigInt(x)
+# fmpz is allowed as a leaf, and the following code is needed by AA's api
+expressify(x::fmpz; context = nothing) = x
 
 function AbstractAlgebra.get_syntactic_sign_abs(obj::fmpz)
     return obj < 0 ? (-1, -obj) : (1, obj)

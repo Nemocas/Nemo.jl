@@ -187,9 +187,9 @@ function expressify(a::fmpq; context = nothing)::Any
     n = numerator(a)
     d = denominator(a)
     if isone(d)
-        return BigInt(n)
+        return n
     else
-        return Expr(:call, ://, BigInt(n), BigInt(d))
+        return Expr(:call, ://, n, d)
     end
 end
 
