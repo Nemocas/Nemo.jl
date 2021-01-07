@@ -120,7 +120,7 @@ canonical_unit(x::fq_nmod) = x
 #
 ###############################################################################
 
-function AbstractAlgebra.expressify(a::fq_nmod; context = nothing)
+function expressify(a::fq_nmod; context = nothing)
    x = unsafe_string(reinterpret(Cstring, a.parent.var))
    d = degree(a.parent)
 

@@ -264,14 +264,14 @@ function set_printing_mode(::Type{FlintPadicField}, printing::Symbol)
    return printing
 end
 
-function AbstractAlgebra.expressify(x::padic; context = nothing)
+function expressify(x::padic; context = nothing)
    p = BigInt(prime(parent(x)))
    pmode = PADIC_PRINTING_MODE[]
    sum = Expr(:call, :+)
    if iszero(x)
       push!(sum.args, 0)
    elseif pmode == 0  # terse
-      push!(sum.args, AbstractAlgebra.expressify(lift(FlintQQ, x)))
+      push!(sum.args, expressify(lift(FlintQQ, x)), context = context)
    else
       pp = prime(parent(x))
       p = BigInt(pp)

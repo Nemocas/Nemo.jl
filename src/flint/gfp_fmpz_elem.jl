@@ -96,7 +96,7 @@ function show(io::IO, R::GaloisFmpzField)
    print(io, "Galois field with characteristic ", R.n)
 end
 
-function AbstractAlgebra.expressify(a::gfp_fmpz_elem; context = nothing)
+function expressify(a::gfp_fmpz_elem; context = nothing)
    return a.data
 end
 

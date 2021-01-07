@@ -253,7 +253,7 @@ iseven(a::fmpz) = ccall((:fmpz_is_even, libflint), Cint, (Ref{fmpz},), a) % Bool
 #
 ###############################################################################
 
-AbstractAlgebra.expressify(x::fmpz; context = nothing) = BigInt(x)
+expressify(x::fmpz; context = nothing) = BigInt(x)
 
 function AbstractAlgebra.get_syntactic_sign_abs(obj::fmpz)
     return obj < 0 ? (-1, -obj) : (1, obj)
@@ -267,7 +267,7 @@ function AbstractAlgebra.printExpr(S::AbstractAlgebra.printer, obj::fmpz,
                                    left::Int, right::Int)
     if obj < 0
         AbstractAlgebra.printGenericPrefix(S, Expr(:call, :-, string(-obj)),
-                                           left, right, "-", AbstractAlgebra.prec_pre_Minus)
+                              left, right, "-", AbstractAlgebra.prec_pre_Minus)
     else
         AbstractAlgebra.push(S, string(obj))
     end

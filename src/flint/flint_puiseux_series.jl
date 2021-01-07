@@ -304,14 +304,15 @@ end
 #
 ###############################################################################
 
-function AbstractAlgebra.expressify(a::FlintPuiseuxSeriesElem,
+function expressify(a::FlintPuiseuxSeriesElem,
                                     x = var(parent(a.data)); context = nothing)
    sum = Expr(:call, :+)
    for i in 0:pol_length(a.data) - 1
       c = polcoeff(a.data, i)
       if !iszero(c)
          q = (i*scale(a.data) + valuation(a.data))//a.scale
-         xk = iszero(q) ? 1 : isone(q) ? x : Expr(:call, :^, x, expressify(q))
+         xk = iszero(q) ? 1 : isone(q) ? x :
+                           Expr(:call, :^, x, expressify(q, context = context))
          if isone(c)
              push!(sum.args, xk)
          else
@@ -320,7 +321,8 @@ function AbstractAlgebra.expressify(a::FlintPuiseuxSeriesElem,
       end
    end
    q = precision(a.data)//a.scale
-   push!(sum.args, Expr(:call, :O, Expr(:call, :^, x, expressify(q))))
+   push!(sum.args, Expr(:call, :O,
+                         Expr(:call, :^, x, expressify(q, context = context))))
    return sum
 end
 

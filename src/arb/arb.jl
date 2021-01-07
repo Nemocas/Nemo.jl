@@ -153,7 +153,7 @@ function native_string(x::arb)
    return res
 end
 
-function AbstractAlgebra.expressify(x::arb; context = nothing)
+function expressify(x::arb; context = nothing)
    if isexact(x) && isnegative(x)
       # TODO isexact does not imply it is printed without radius
       return Expr(:call, :-, native_string(-x))

@@ -305,9 +305,8 @@ function show(io::IO, a::AnticNumberField)
    print(io, " with defining polynomial ", a.pol)
 end
 
-function AbstractAlgebra.expressify(a::nf_elem; context = nothing)
-   return AbstractAlgebra.expressify(parent(parent(a).pol)(a), var(parent(a)),
-                                     context = context)
+function expressify(a::nf_elem; context = nothing)
+   return expressify(parent(parent(a).pol)(a), var(parent(a)), context = context)
 end
 
 function Base.show(io::IO, a::nf_elem)

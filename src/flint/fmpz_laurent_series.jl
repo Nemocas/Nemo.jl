@@ -371,8 +371,7 @@ characteristic(::FmpzLaurentSeriesRing) = 0
 #
 ###############################################################################
 
-function AbstractAlgebra.expressify(a::fmpz_laurent_series,
-                                    x = var(parent(a)); context = nothing)
+function expressify(a::fmpz_laurent_series, x = var(parent(a)); context = nothing)
    sum = Expr(:call, :+)
    for i in 0:pol_length(a) - 1
       c = polcoeff(a, i)

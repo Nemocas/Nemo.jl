@@ -195,7 +195,7 @@ canonical_unit(x::fq) = x
 #
 ###############################################################################
 
-function AbstractAlgebra.expressify(a::fq; context = nothing)
+function expressify(a::fq; context = nothing)
    x = unsafe_string(reinterpret(Cstring, a.parent.var))
    d = degree(a.parent)
 

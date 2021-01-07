@@ -98,7 +98,7 @@ function show(io::IO, R::FmpzModRing)
    print(io, "Integers modulo ", R.n)
 end
 
-function AbstractAlgebra.expressify(a::fmpz_mod; context = nothing)
+function expressify(a::fmpz_mod; context = nothing)
    return a.data
 end
 

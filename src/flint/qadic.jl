@@ -241,7 +241,7 @@ characteristic(R::FlintQadicField) = 0
 #
 ###############################################################################
 
-function AbstractAlgebra.expressify(b::qadic, x = :a; context = nothing)
+function expressify(b::qadic, x = :a; context = nothing)
    R = FlintPadicField(prime(parent(b)), parent(b).prec_max)
    if iszero(b)
       return 0
@@ -252,7 +252,7 @@ function AbstractAlgebra.expressify(b::qadic, x = :a; context = nothing)
       ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
             (Ref{padic}, Ref{qadic}, Int, Ref{FlintQadicField}),
             c, b, i, parent(b))
-      ec = expressify(c)
+      ec = expressify(c, context = context)
       if !iszero(c)
          if iszero(i)
             push!(sum.args, ec)

@@ -180,17 +180,17 @@ end
 #
 ################################################################################
 
-function AbstractAlgebra.expressify(z::acb; context = nothing)
+function expressify(z::acb; context = nothing)
    x = real(z)
    y = imag(z)
    if iszero(y) # is exact zero!
-      return AbstractAlgebra.expressify(x)
+      return expressify(x, context = context)
    else
-      y = Expr(:call, :*, AbstractAlgebra.expressify(y), :im)
+      y = Expr(:call, :*, expressify(y, context = context), :im)
       if iszero(x)
          return y
       else
-         x = AbstractAlgebra.expressify(x)
+         x = expressify(x, context = context)
          return Expr(:call, :+, x, y)
       end
    end
