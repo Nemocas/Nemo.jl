@@ -632,6 +632,8 @@ end
 
    fact = factor(fmpz(-2))
 
+   @test occursin("2", sprint(show, "text/plain", fact))
+
    @test fact.fac == Dict(fmpz(2) => 1)
    @test unit(fact) == -1
 

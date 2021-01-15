@@ -104,6 +104,8 @@ function show(io::IO, a::gfp_fmpz_elem)
    print(io, a.data)
 end
 
+needs_parentheses(x::gfp_fmpz_elem) = false
+
 ###############################################################################
 #
 #   Unary operations

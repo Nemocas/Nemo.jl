@@ -441,6 +441,8 @@ end
 
    R = factor(f*g)
 
+   @test occursin("x", sprint(show, "text/plain", R))
+
    @test f*g == unit(R) * prod([ p^e for (p, e) in R])
 
    R = factor_squarefree(f*g)

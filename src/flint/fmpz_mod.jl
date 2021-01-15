@@ -106,6 +106,8 @@ function show(io::IO, a::fmpz_mod)
    print(io, a.data)
 end
 
+needs_parentheses(x::fmpz_mod) = false
+
 ###############################################################################
 #
 #   Unary operations

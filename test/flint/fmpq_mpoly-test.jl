@@ -484,6 +484,8 @@ end
    end
 
    check_factor((x^2-y^2*z^3//3)*(x+y+z)^2*(2*x+y-z)^3, 6)
+   fac = factor((x^2-y^2*z^3//3)*(x+y+z)^2*(2*x+y-z)^3)
+   @test occursin("x", sprint(show, "text/plain", fac))
    check_factor(x^99-y^99*z^33//8, 2)
 end
 

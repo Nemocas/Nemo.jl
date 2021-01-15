@@ -493,6 +493,8 @@ end
    end
 
    check_factor(3*x^23+2*y^23+z^23, 23)
+   fac = factor(3*x^23+2*y^23+z^23)
+   @test occursin("x", sprint(show, "text/plain", fac))
    check_factor(x^99-y^99*z^33, 22)
 end
 

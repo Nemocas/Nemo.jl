@@ -204,6 +204,8 @@ function show(io::IO, a::FlintRationalField)
    print(io, "Rational Field")
 end
 
+needs_parentheses(x::fmpq) = false
+
 ###############################################################################
 #
 #   Unary operators

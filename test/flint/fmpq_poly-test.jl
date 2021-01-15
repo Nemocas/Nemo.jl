@@ -454,7 +454,9 @@ end
    fac = factor(f)
 
    @test f == unit(fac) * prod([ p^e for (p, e) in fac])
+   @test occursin("y", sprint(show, "text/plain", fac))
 end
+
 @testset "fmpq_poly.signature..." begin
    R, x = PolynomialRing(QQ, "x")
 

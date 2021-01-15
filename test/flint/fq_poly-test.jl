@@ -449,6 +449,8 @@ end
 
    A = factor(f*g)
 
+   @test occursin("y", sprint(show, "text/plain", A))
+
    @test unit(A)*prod([h^e for (h,e) = A]) == f*g
 
    A = factor_squarefree(f^2*g)

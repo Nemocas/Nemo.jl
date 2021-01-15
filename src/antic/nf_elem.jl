@@ -313,6 +313,27 @@ function Base.show(io::IO, a::nf_elem)
    print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
+function needs_parentheses(a::nf_elem)
+   iszero(a) && return false
+   d = degree(parent(a))
+   if d == 1
+      return false
+   end
+   if d == 2
+     return sign(coeff(a, 0))^2 + sign(coeff(a, 1))^2 == 2
+   end
+   nnz = 0
+   for i = 0:a.elem_length
+      if !iszero(coeff(a, i))
+         nnz += 1
+      end
+      if nnz > 1
+         return true
+      end
+   end
+   return nnz > 1
+end
+
 canonical_unit(x::nf_elem) = x
 
 ###############################################################################

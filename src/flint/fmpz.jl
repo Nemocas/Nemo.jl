@@ -280,6 +280,8 @@ show(io::IO, x::fmpz) = print(io, string(x))
 
 show(io::IO, a::FlintIntegerRing) = print(io, "Integer Ring")
 
+needs_parentheses(x::fmpz) = false
+
 ###############################################################################
 #
 #   Canonicalisation

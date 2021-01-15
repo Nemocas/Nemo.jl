@@ -299,6 +299,8 @@ function show(io::IO, R::FlintPadicField)
    print(io, "Field of ", prime(R), "-adic numbers")
 end
 
+needs_parentheses(x::padic) = true
+
 ###############################################################################
 #
 #   Canonicalisation

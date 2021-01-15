@@ -172,6 +172,8 @@ function show(io::IO, x::arb)
    print(io, native_string(x))
 end
 
+needs_parentheses(x::arb) = false
+
 ################################################################################
 #
 #  Containment
