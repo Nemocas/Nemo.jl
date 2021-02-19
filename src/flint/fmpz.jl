@@ -1378,7 +1378,7 @@ remove(x::Integer, y::Integer) = remove(fmpz(x), fmpz(y))
 Return the largest $n$ such that $y^n$ divides $x$.
 """
 function valuation(x::fmpz, y::fmpz)
-   x == 0 && error("Not yet implemented")
+   iszero(x) && error("Not yet implemented")
    n, _ = remove(x, y)
    return n
 end
