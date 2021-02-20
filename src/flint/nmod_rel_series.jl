@@ -718,9 +718,9 @@ function addeq!(a::nmod_rel_series, b::nmod_rel_series)
    val = min(a.val, b.val)
    lena = min(lena, prec - a.val)
    lenb = min(lenb, prec - b.val)
-   modulus = modulus(a)
+   n = modulus(parent(a))
    if a.val < b.val
-      z = nmod_rel_series(modulus)
+      z = nmod_rel_series(n)
       lenz = max(lena, lenb + b.val - a.val)
       ccall((:nmod_poly_set_trunc, libflint), Nothing,
             (Ref{nmod_rel_series}, Ref{nmod_rel_series}, Int),

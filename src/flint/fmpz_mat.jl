@@ -587,7 +587,7 @@ function fflu(x::fmpz_mat, P = SymmetricGroup(nrows(x)))
    L = similar(x, m, m)
    U = similar(x)
    d = fmpz()
-   p = P()
+   p = one(P)
 
    p.d .-= 1
 

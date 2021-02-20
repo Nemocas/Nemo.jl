@@ -688,3 +688,20 @@ simplest_rational_inside(::arb)
 RR = RealField(64)
 simplest_rational_inside(const_pi(RR))
 ```
+
+### Random generation
+
+```@docs
+rand(::ArbField)
+```
+
+**Examples**
+
+```julia
+RR = RealField(100)
+
+a = rand(RR)
+b = rand(RR; randtype = :null_exact)
+c = rand(RR; randtype = :exact)
+d = rand(RR; randtype = :special)
+```

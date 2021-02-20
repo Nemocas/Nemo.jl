@@ -498,7 +498,7 @@ function lu(x::T, P = SymmetricGroup(nrows(x))) where T <: Zmodn_mat
   m = nrows(x)
   n = ncols(x)
   P.n != m && error("Permutation does not match matrix")
-  p = P()
+  p = one(P)
   R = base_ring(x)
   U = deepcopy(x)
 

@@ -524,7 +524,7 @@ function lu!(P::Generic.Perm, x::arb_mat)
 end
 
 function lu(x::arb_mat, P = SymmetricGroup(nrows(x)))
-  p = P()
+  p = one(P)
   R = base_ring(x)
   L = similar(x)
   U = deepcopy(x)

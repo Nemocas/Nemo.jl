@@ -696,6 +696,8 @@ end
 
    @test valuation(12, 2) == 2
 
+   @test_throws ErrorException valuation(0, 2)
+
    @test divisor_lenstra(fmpz(12), fmpz(4), fmpz(5)) == 4
 
    @test_throws DomainError divisor_lenstra(fmpz(12), -fmpz(4), fmpz(5))

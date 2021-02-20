@@ -753,7 +753,7 @@ function (R::FlintQadicField)(a::Int)
 end
 
 function (R::FlintQadicField)(n::fmpz)
-   if isone(n)
+   if iszero(n) || isone(n)
       N = 0
    else
       p = prime(R)

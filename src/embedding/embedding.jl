@@ -252,7 +252,7 @@ function transitive_closure(f::FinFieldMorphism)
                 AddOverfield!(domain(g), phi)
             end
         else
-            val = FqNmodFiniteField[codomain(v) for v in subK[d]]
+            val = FqNmodFiniteField[domain(v) for v in subK[d]]
             
             for g in subk[d]
                 if !(domain(g) in val)
@@ -375,6 +375,17 @@ function embed(k::T, K::T) where T <: FinField
     tr = isembedded(k, K)
     if tr != nothing
         return tr
+    end
+
+    # If the finite fields are different but have the same degree, we check that
+    # the embedding in the other direction does not exist. This is done in order
+    # to prevent the creation of loops in the lattice
+
+    if degree(k) == degree(K)
+        tr = isembedded(K, k)
+        if tr != nothing
+            return preimage_map(tr)
+        end
     end
 
     # Prior to embed k in K, we compute the needed embeddings

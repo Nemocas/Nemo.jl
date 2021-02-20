@@ -72,3 +72,11 @@ Compute the preimage map corresponding to the embedding $f$.
 """
 preimage_map(f::FinFieldMorphism) = FinFieldPreimage(domain(f), codomain(f),
                                                      image_fn(f), inverse_fn(f))
+
+@doc Markdown.doc"""
+    preimage_map(f::FinFieldPreimage)
+
+Compute the preimage map corresponding to the preimage of the embedding $f$,
+i.e. return the embedding $f$.
+"""
+preimage_map(f::FinFieldPreimage) = embed(domain(f), codomain(f))

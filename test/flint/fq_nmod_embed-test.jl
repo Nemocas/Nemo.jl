@@ -101,3 +101,72 @@ end
         end
     end
 end
+
+@testset "fq_nmod_embed.transitive_closure..." begin
+
+    S = Set(2:997)
+    for i in 1:40
+
+        p = rand(S)
+        while !isprime(p)
+            p = rand(S)
+        end
+        pop!(S, p)
+
+        F = FiniteField(p, 4, "s")[1]
+        Z = ResidueRing(ZZ, p)
+        R, x = PolynomialRing(Z, "x")
+
+        P1 = R(rand(Z, 4)) + x^4
+        F1 = factor(P1)
+        P2 = R(rand(Z, 4)) + x^4
+        F2 = factor(P2)
+        P3 = R(rand(Z, 4)) + x^4
+        F3 = factor(P3)
+        P4 = R(rand(Z, 4)) + x^4
+        F4 = factor(P4)
+
+        while length(F1) != 1 || F1[collect(keys(F1.fac))[1]] != 1
+            P1 = R(rand(Z, 4)) + x^4
+            F1 = factor(P1)
+        end
+
+        while length(F2) != 1 || F2[collect(keys(F2.fac))[1]] != 1
+            P2 = R(rand(Z, 4)) + x^4
+            F2 = factor(P2)
+        end
+
+        while length(F3) != 1 || F3[collect(keys(F3.fac))[1]] != 1
+            P3 = R(rand(Z, 4)) + x^4
+            F3 = factor(P3)
+        end
+
+        while length(F4) != 1 || F4[collect(keys(F4.fac))[1]] != 1
+            P4 = R(rand(Z, 4)) + x^4
+            F4 = factor(P4)
+        end
+
+        K1 = FiniteField(P1, "r1")[1]
+        K2 = FiniteField(P2, "r2")[1]
+        K3 = FiniteField(P3, "r3")[1]
+        K4 = FiniteField(P4, "r4")[1]
+
+        K = Set([K1, K2, K3, K4])
+        while !isempty(K)
+            embed(pop!(K, rand(K)), F)
+        end
+
+        @test length(F.subfields[4]) == 4
+
+        x1 = rand(K1)
+        x2 = rand(K2)
+        x3 = rand(K3)
+        x4 = rand(K4)
+
+        @test F(x1) == F(K2(x1))
+        @test F(x2) == F(K3(x2))
+        @test K4(x3) == K4(K1(x3))
+        @test K1(K2(x4)) == K1(K3(x4))
+
+    end
+end

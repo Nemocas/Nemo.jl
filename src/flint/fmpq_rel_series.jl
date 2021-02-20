@@ -642,7 +642,7 @@ Return log$(a)$. Requires the constant term to be one.
 function log(a::fmpq_rel_series)
    (a.val != 0 || coeff(a, 0) != 1) && error("Constant term not one in log")
    if pol_length(a) + valuation(a) == 1 || a.prec < 2
-      return parent(a)()
+      return parent(a)(fmpq[], 0, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -662,7 +662,7 @@ Return tan$(a)$. Requires a zero constant term.
 function tan(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in tan")
    if iszero(a) || a.prec < 2
-      return parent(a)()
+      return parent(a)(fmpq[], 0, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -685,7 +685,7 @@ Return tanh$(a)$. Requires a zero constant term.
 function tanh(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in tanh")
    if iszero(a) || a.prec < 2
-      return parent(a)()
+      return parent(a)(fmpq[], 0, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -708,7 +708,7 @@ Return sin$(a)$. Requires a zero constant term.
 function sin(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in sin")
    if iszero(a) || a.prec < 2
-      return parent(a)()
+      return parent(a)(fmpq[], 0, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -734,7 +734,7 @@ Return sinh$(a)$. Requires a zero constant term.
 function sinh(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in sinh")
    if iszero(a) || a.prec < 2
-      return parent(a)()
+      return parent(a)(fmpq[], 0, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -757,7 +757,7 @@ Return cos$(a)$. Requires a zero constant term.
 function cos(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in cos")
    if pol_length(a) + valuation(a) == 0 || a.prec == 1
-      return one(parent(a))
+      return parent(a)(fmpq[1], 1, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -783,7 +783,7 @@ Return cosh$(a)$. Requires a zero constant term.
 function cosh(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in cosh")
    if pol_length(a) + valuation(a) == 0 || a.prec == 1
-      return one(parent(a))
+      return parent(a)(fmpq[1], 1, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -806,7 +806,7 @@ Return asin$(a)$. Requires a zero constant term.
 function asin(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in asin")
    if iszero(a) || a.prec < 2
-      return parent(a)()
+      return parent(a)(fmpq[], 0, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -829,7 +829,7 @@ Return asinh$(a)$. Requires a zero constant term.
 function asinh(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in asinh")
    if iszero(a) || a.prec < 2
-      return parent(a)()
+      return parent(a)(fmpq[], 0, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -852,7 +852,7 @@ Return atan$(a)$. Requires a zero constant term.
 function atan(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in atan")
    if iszero(a) || a.prec < 2
-      return parent(a)()
+      return parent(a)(fmpq[], 0, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -875,7 +875,7 @@ Return atanh$(a)$. Requires a zero constant term.
 function atanh(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in atanh")
    if iszero(a) || a.prec < 2
-      return parent(a)()
+      return parent(a)(fmpq[], 0, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
