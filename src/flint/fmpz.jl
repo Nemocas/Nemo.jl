@@ -165,7 +165,7 @@ one(R::FlintIntegerRing) = fmpz(1)
 @doc Markdown.doc"""
     zero(R::FlintIntegerRing)
 
-Return the integer $1$.
+Return the integer $0$.
 """
 zero(R::FlintIntegerRing) = fmpz(0)
 
@@ -175,15 +175,14 @@ zero(::Type{fmpz}) = fmpz(0)
 @doc Markdown.doc"""
     sign(a::fmpz)
 
-Returns the sign of $a$, i.e. $+1$, $0$ or $-1$.
+Return the sign of $a$, i.e. $+1$, $0$ or $-1$.
 """
 sign(a::fmpz) = fmpz(ccall((:fmpz_sgn, libflint), Cint, (Ref{fmpz},), a))
 
 @doc Markdown.doc"""
     fits(::Type{Int}, a::fmpz)
 
-Returns `true` if the given integer fits into an `Int`, otherwise returns
-`false`.
+Return `true` if $a$ fits into an `Int`, otherwise return `false`.
 """
 fits(::Type{Int}, a::fmpz) = ccall((:fmpz_fits_si, libflint), Bool,
                                    (Ref{fmpz},), a)
@@ -191,8 +190,7 @@ fits(::Type{Int}, a::fmpz) = ccall((:fmpz_fits_si, libflint), Bool,
 @doc Markdown.doc"""
     fits(::Type{UInt}, a::fmpz)
 
-Returns `true` if the given integer fits into a `UInt`, otherwise returns
-`false`.
+Return `true` if $a$ fits into a `UInt`, otherwise return `false`.
 """
 fits(::Type{UInt}, a::fmpz) = a < 0 ? false :
               ccall((:fmpz_abs_fits_ui, libflint), Bool, (Ref{fmpz},), a)
@@ -200,36 +198,35 @@ fits(::Type{UInt}, a::fmpz) = a < 0 ? false :
 @doc Markdown.doc"""
     size(a::fmpz)
 
-Returns the number of limbs required to store the absolute value of $a$.
+Return the number of limbs required to store the absolute value of $a$.
 """
 size(a::fmpz) = Int(ccall((:fmpz_size, libflint), Cint, (Ref{fmpz},), a))
 
 @doc Markdown.doc"""
     isunit(a::fmpz)
 
-Return `true` if the given integer is a unit, i.e. $\pm 1$, otherwise return
-`false`.
+Return `true` if $a$ is a unit, i.e. $\pm 1$, otherwise return `false`.
 """
 isunit(a::fmpz) = ccall((:fmpz_is_pm1, libflint), Bool, (Ref{fmpz},), a)
 
 @doc Markdown.doc"""
     iszero(a::fmpz)
 
-Return `true` if the given integer is zero, otherwise return `false`.
+Return `true` if $a$ is zero, otherwise return `false`.
 """
 iszero(a::fmpz) = ccall((:fmpz_is_zero, libflint), Bool, (Ref{fmpz},), a)
 
 @doc Markdown.doc"""
     isone(a::fmpz)
 
-Return `true` if the given integer is one, otherwise return `false`.
+Return `true` if $a$ is one, otherwise return `false`.
 """
 isone(a::fmpz) = ccall((:fmpz_is_one, libflint), Bool, (Ref{fmpz},), a)
 
 @doc Markdown.doc"""
     denominator(a::fmpz)
 
-Returns the denominator of $a$ thought of as a rational. Always returns $1$.
+Return the denominator of $a$ thought of as a rational. Always returns $1$.
 """
 function denominator(a::fmpz)
    return fmpz(1)
@@ -238,7 +235,7 @@ end
 @doc Markdown.doc"""
     numerator(a::fmpz)
 
-Returns the numerator of $a$ thought of as a rational. Always returns $a$.
+Return the numerator of $a$ thought of as a rational. Always returns $a$.
 """
 function numerator(a::fmpz)
    return a
@@ -857,7 +854,7 @@ end
 @doc Markdown.doc"""
     crt(r1::fmpz, m1::fmpz, r2::fmpz, m2::fmpz, signed=false)
 
-Find $r$ such that $r \equiv r_1 (\mod m_1)$ and $r \equiv r_2 (\mod m_2)$.
+Return $r$ such that $r \equiv r_1 (\mod m_1)$ and $r \equiv r_2 (\mod m_2)$.
 If `signed = true`, $r$ will be in the range $-m_1m_2/2 < r \leq m_1m_2/2$.
 If `signed = false` the value will be in the range $0 \leq r < m_1m_2$.
 """
@@ -872,7 +869,7 @@ end
 @doc Markdown.doc"""
     crt(r1::fmpz, m1::fmpz, r2::Int, m2::Int, signed=false)
 
-Find $r$ such that $r \equiv r_1 (\mod m_1)$ and $r \equiv r_2 (\mod m_2)$.
+Return $r$ such that $r \equiv r_1 (\mod m_1)$ and $r \equiv r_2 (\mod m_2)$.
 If `signed = true`, $r$ will be in the range $-m_1m_2/2 < r \leq m_1m_2/2$.
 If `signed = false` the value will be in the range $0 \leq r < m_1m_2$.
 """
@@ -1468,7 +1465,7 @@ end
 @doc Markdown.doc"""
     primorial(x::Int)
 
- Return the primorial of $x$, i.e. the product of all primes less than or
+Return the primorial of $x$, i.e. the product of all primes less than or
 equal to $x$. If $x < 0$ we throw a `DomainError()`.
 """
 function primorial(x::Int)
@@ -1482,7 +1479,7 @@ end
 @doc Markdown.doc"""
     primorial(x::fmpz)
 
- Return the primorial of $x$, i.e. the product of all primes less than or
+Return the primorial of $x$, i.e. the product of all primes less than or
 equal to $x$. If $x < 0$ we throw a `DomainError()`.
 """
 function primorial(x::fmpz)
@@ -1496,7 +1493,7 @@ end
 @doc Markdown.doc"""
     fibonacci(x::Int)
 
- Return the $x$-th Fibonacci number $F_x$. We define $F_1 = 1$, $F_2 = 1$ and
+Return the $x$-th Fibonacci number $F_x$. We define $F_1 = 1$, $F_2 = 1$ and
 $F_{i + 1} = F_i + F_{i - 1}$ for all integers $i$.
 """
 function fibonacci(x::Int)
@@ -1509,7 +1506,7 @@ end
 @doc Markdown.doc"""
     fibonacci(x::fmpz)
 
- Return the $x$-th Fibonacci number $F_x$. We define $F_1 = 1$, $F_2 = 1$ and
+Return the $x$-th Fibonacci number $F_x$. We define $F_1 = 1$, $F_2 = 1$ and
 $F_{i + 1} = F_i + F_{i - 1}$ for all integers $i$.
 """
 function fibonacci(x::fmpz)
@@ -1563,7 +1560,7 @@ end
 @doc Markdown.doc"""
     moebius_mu(x::fmpz)
 
-Returns the Moebius mu function of $x$ as an `Int`. The value
+Return the Moebius mu function of $x$ as an `Int`. The value
 returned is either $-1$, $0$ or $1$. If $x \leq 0$ we throw a `DomainError()`.
 """
 function moebius_mu(x::fmpz)
@@ -1575,7 +1572,7 @@ end
 @doc Markdown.doc"""
     moebius_mu(x::Int)
 
-Returns the Moebius mu function of $x$ as an `Int`. The value
+Return the Moebius mu function of $x$ as an `Int`. The value
 returned is either $-1$, $0$ or $1$. If $x \leq 0$ we throw a `DomainError()`.
 """
 moebius_mu(x::Int) = moebius_mu(fmpz(x))
@@ -1806,7 +1803,7 @@ nextpow2(x::fmpz) = x < 0 ? -nextpow2(-x) :
 @doc Markdown.doc"""
     trailing_zeros(x::fmpz)
 
-Count the trailing zeros in the binary representation of $x$.
+Return the number of trailing zeros in the binary representation of $x$.
 """
 trailing_zeros(x::fmpz) = ccall((:fmpz_val2, libflint), Int,
                                 (Ref{fmpz},), x)
