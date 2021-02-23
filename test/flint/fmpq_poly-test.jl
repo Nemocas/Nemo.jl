@@ -306,7 +306,7 @@ end
 
    @test mulmod(f, g, h) == 77*y^3 + 95*y^2 + 159*y + 21
 
-   @test powmod(f, 3, h) == 343*y^3 + 147*y^2 + 21*y + 1
+   @test powermod(f, 3, h) == 343*y^3 + 147*y^2 + 21*y + 1
 end
 
 @testset "fmpq_poly.exact_division" begin

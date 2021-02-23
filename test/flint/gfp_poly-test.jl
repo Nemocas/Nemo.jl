@@ -375,9 +375,9 @@ end
 
   @test mulmod(f, g, h) == 324884334*x^2+162442132*x+162442162
 
-  @test powmod(f, 10, h) == 485924368*x^2+380106591*x+302530457
+  @test powermod(f, 10, h) == 485924368*x^2+380106591*x+302530457
 
-  @test powmod(f, -10, g) == 484381224*x+14566177
+  @test powermod(f, -10, g) == 484381224*x+14566177
 end
 
 @testset "gfp_poly.resultant" begin

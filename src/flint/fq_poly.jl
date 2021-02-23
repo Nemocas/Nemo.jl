@@ -411,7 +411,7 @@ end
 #
 ################################################################################
 
-function powmod(x::fq_poly, n::Int, y::fq_poly)
+function powermod(x::fq_poly, n::Int, y::fq_poly)
    check_parent(x,y)
    z = parent(x)()
 
@@ -429,7 +429,7 @@ function powmod(x::fq_poly, n::Int, y::fq_poly)
   return z
 end
 
-function powmod(x::fq_poly, n::fmpz, y::fq_poly)
+function powermod(x::fq_poly, n::fmpz, y::fq_poly)
    check_parent(x,y)
    z = parent(x)()
 

@@ -80,7 +80,7 @@ the gcd, then replacing the last pseudorem with divides.
 Residue.jl
 ----------
 
-* Make powering do its own powmod
+* Make powering do its own powermod
 
 * implement divexact by an invertible integer, etc
 

@@ -11,7 +11,7 @@ export NmodPolyRing, nmod_poly, parent, base_ring, elem_type, length, zero,
        isirreducible, issquarefree, factor, factor_squarefree,
        factor_distinct_deg, factor_shape, setcoeff!, canonical_unit,
        add!, sub!, mul!, PolynomialRing, check_parent, gcdx, mod,
-       invmod, gcdinv, mulmod, powmod, zero!, one!
+       invmod, gcdinv, mulmod, powermod, zero!, one!
 
 ################################################################################
 #
@@ -537,7 +537,7 @@ function mulmod(x::T, y::T, z::T) where T <: Zmodn_poly
   return w
 end
 
-function powmod(x::T, e::Int, y::T) where T <: Zmodn_poly
+function powermod(x::T, e::Int, y::T) where T <: Zmodn_poly
   check_parent(x,y)
   z = parent(x)()
 

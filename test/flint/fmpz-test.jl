@@ -595,13 +595,13 @@ end
 end
 
 @testset "fmpz.modular_arithmetic" begin
-   @test powmod(fmpz(12), fmpz(110), fmpz(13)) == 1
+   @test powermod(fmpz(12), fmpz(110), fmpz(13)) == 1
 
-   @test_throws DomainError powmod(fmpz(12), fmpz(110), fmpz(-1))
+   @test_throws DomainError powermod(fmpz(12), fmpz(110), fmpz(-1))
 
-   @test powmod(fmpz(12), 110, fmpz(13)) == 1
+   @test powermod(fmpz(12), 110, fmpz(13)) == 1
 
-   @test_throws DomainError powmod(fmpz(12), 110, fmpz(-1))
+   @test_throws DomainError powermod(fmpz(12), 110, fmpz(-1))
 
    @test invmod(fmpz(12), fmpz(13)) == 12
 

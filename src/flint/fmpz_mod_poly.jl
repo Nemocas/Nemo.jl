@@ -559,7 +559,7 @@ function mulmod(x::T, y::T, z::T) where {T <: Zmodn_fmpz_poly}
   return w
 end
 
-function powmod(x::T, e::Int, y::T) where {T <: Zmodn_fmpz_poly}
+function powermod(x::T, e::Int, y::T) where {T <: Zmodn_fmpz_poly}
   check_parent(x, y)
   z = parent(x)()
 
@@ -579,11 +579,11 @@ function powmod(x::T, e::Int, y::T) where {T <: Zmodn_fmpz_poly}
 end
 
 @doc Markdown.doc"""
-    powmod(x::T, e::fmpz, y::T) where {T <: Zmodn_fmpz_poly}
+    powermod(x::T, e::fmpz, y::T) where {T <: Zmodn_fmpz_poly}
 
 Return $x^e \pmod{y}$.
 """
-function powmod(x::T, e::fmpz, y::T) where {T <: Zmodn_fmpz_poly}
+function powermod(x::T, e::fmpz, y::T) where {T <: Zmodn_fmpz_poly}
   z = parent(x)()
 
   if e < 0

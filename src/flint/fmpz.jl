@@ -34,7 +34,7 @@
 # do not export div and divrem
 export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash,
        bell, isprime, fdiv, cdiv, tdiv, rem, mod, gcd, lcm, invmod,
-       powmod, abs, isqrt, popcount, prevpow2, nextpow2, ndigits, dec,
+       powermod, abs, isqrt, popcount, prevpow2, nextpow2, ndigits, dec,
        bin, oct, hex, base, one, zero, divexact, fits, sign, nbits, deepcopy,
        tdivpow2, fdivpow2, cdivpow2, flog, clog, cmpabs, clrbit!, setbit!,
        combit!, crt, divisible, divisors, prime_divisors, divisor_lenstra,
@@ -777,11 +777,11 @@ function mod(x::fmpz, c::UInt)
 end
 
 @doc Markdown.doc"""
-    powmod(x::fmpz, p::fmpz, m::fmpz)
+    powermod(x::fmpz, p::fmpz, m::fmpz)
 
 Return $x^p (\mod m)$. The remainder will be in the range $[0, m)$
 """
-function powmod(x::fmpz, p::fmpz, m::fmpz)
+function powermod(x::fmpz, p::fmpz, m::fmpz)
     m <= 0 && throw(DomainError(m, "Exponent must be non-negative"))
     if p < 0
        x = invmod(x, m)
@@ -795,11 +795,11 @@ function powmod(x::fmpz, p::fmpz, m::fmpz)
 end
 
 @doc Markdown.doc"""
-    powmod(x::fmpz, p::Int, m::fmpz)
+    powermod(x::fmpz, p::Int, m::fmpz)
 
 Return $x^p (\mod m)$. The remainder will be in the range $[0, m)$
 """
-function powmod(x::fmpz, p::Int, m::fmpz)
+function powermod(x::fmpz, p::Int, m::fmpz)
     m <= 0 && throw(DomainError(m, "Exponent must be non-negative"))
     if p < 0
        x = invmod(x, m)
