@@ -2581,9 +2581,11 @@ mutable struct FlintPadicField <: FlintLocalField
       check && !isprobable_prime(p) && throw(DomainError(p, "Characteristic must be prime"))
 
       if cached
-         a = (p, prec)
+         a = (p,)
          if haskey(PadicBase, a)
-            return PadicBase[a]
+            S = PadicBase[a]
+            S.prec_max = prec
+            return S
          end
       end
 
@@ -2596,15 +2598,15 @@ mutable struct FlintPadicField <: FlintLocalField
       d.prec_max = prec
 
       if cached
-         @assert !haskey(PadicBase, (p, prec))
-         PadicBase[(p, prec)] = d
+         @assert !haskey(PadicBase, (p, ))
+         PadicBase[(p, )] = d
       end
 
       return d
    end
 end
 
-const PadicBase = Dict{Tuple{fmpz, Int}, FlintPadicField}()
+const PadicBase = Dict{Tuple{fmpz, }, FlintPadicField}()
 
 function _padic_ctx_clear_fn(a::FlintPadicField)
    ccall((:padic_ctx_clear, libflint), Nothing, (Ref{FlintPadicField},), a)
@@ -2652,9 +2654,11 @@ mutable struct FlintQadicField <: FlintLocalField
       check && !isprobable_prime(p) && throw(DomainError(p, "Characteristic must be prime"))
 
       if cached
-         a = (p, d, prec)
+         a = (p, d)
          if haskey(QadicBase, a)
-            return QadicBase[a]
+            Q = QadicBase[a]
+            Q.prec_max = prec
+            return Q
          end
       end
 
@@ -2666,15 +2670,15 @@ mutable struct FlintQadicField <: FlintLocalField
       z.prec_max = prec
 
       if cached
-         @assert !haskey(QadicBase, (p, d, prec))
-         QadicBase[(p, d, prec)] = z
+         @assert !haskey(QadicBase, (p, d))
+         QadicBase[(p, d)] = z
       end
 
       return z
    end
 end
 
-const QadicBase = Dict{Tuple{fmpz, Int, Int}, FlintQadicField}()
+const QadicBase = Dict{Tuple{fmpz, Int}, FlintQadicField}()
 
 function _qadic_ctx_clear_fn(a::FlintQadicField)
    ccall((:qadic_ctx_clear, libflint), Nothing, (Ref{FlintQadicField},), a)
@@ -2712,19 +2716,19 @@ mutable struct FmpzRelSeriesRing <: SeriesRing{fmpz}
    S::Symbol
 
    function FmpzRelSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
-      if cached && haskey(FmpzRelSeriesID, (prec, s))
-         FmpzRelSeriesID[prec, s]
+      if cached && haskey(FmpzRelSeriesID, s)
+         FmpzRelSeriesID[s]
       else
          z = new(FlintZZ, prec, s)
          if cached
-            FmpzRelSeriesID[prec, s] = z
+            FmpzRelSeriesID[s] = z
          end
          return z
       end
    end
 end
 
-const FmpzRelSeriesID = Dict{Tuple{Int, Symbol}, FmpzRelSeriesRing}()
+const FmpzRelSeriesID = Dict{Symbol, FmpzRelSeriesRing}()
 
 mutable struct fmpz_rel_series <: RelSeriesElem{fmpz}
    coeffs::Ptr{Nothing}
@@ -2784,19 +2788,21 @@ mutable struct FmpzAbsSeriesRing <: SeriesRing{fmpz}
    S::Symbol
 
    function FmpzAbsSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
-      if cached && haskey(FmpzAbsSeriesID, (prec, s))
-         FmpzAbsSeriesID[prec, s]
+      if cached && haskey(FmpzAbsSeriesID, s)
+         R = FmpzAbsSeriesID[s]
+         R.prec_max = prec
+         return R
       else
          z = new(FlintZZ, prec, s)
          if cached
-            FmpzAbsSeriesID[prec, s] = z
+            FmpzAbsSeriesID[s] = z
          end
          return z
       end
    end
 end
 
-const FmpzAbsSeriesID = Dict{Tuple{Int, Symbol}, FmpzAbsSeriesRing}()
+const FmpzAbsSeriesID = Dict{Symbol, FmpzAbsSeriesRing}()
 
 mutable struct fmpz_abs_series <: AbsSeriesElem{fmpz}
    coeffs::Ptr{Nothing}
@@ -2994,19 +3000,21 @@ mutable struct FmpqRelSeriesRing <: SeriesRing{fmpq}
    S::Symbol
 
    function FmpqRelSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
-      if cached && haskey(FmpqRelSeriesID, (prec, s))
-         return FmpqRelSeriesID[prec, s]
+      if cached && haskey(FmpqRelSeriesID,  s)
+         R = FmpqRelSeriesID[s]
+         R.prec_max = prec
+         return R
       else
          z = new(FlintQQ, prec, s)
          if cached
-            FmpqRelSeriesID[prec, s] = z
+            FmpqRelSeriesID[s] = z
          end
          return z
       end
    end
 end
 
-const FmpqRelSeriesID = Dict{Tuple{Int, Symbol}, FmpqRelSeriesRing}()
+const FmpqRelSeriesID = Dict{Symbol, FmpqRelSeriesRing}()
 
 mutable struct fmpq_rel_series <: RelSeriesElem{fmpq}
    coeffs::Ptr{Nothing}
@@ -3065,19 +3073,21 @@ mutable struct FmpqAbsSeriesRing <: SeriesRing{fmpq}
    S::Symbol
 
    function FmpqAbsSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
-      if cached && haskey(FmpqAbsSeriesID, (prec, s))
-         return FmpqAbsSeriesID[prec, s]
+      if cached && haskey(FmpqAbsSeriesID, s)
+         R = FmpqAbsSeriesID[s]
+         R.prec_max = prec
+         return R
       else
          z = new(FlintQQ, prec, s)
          if cached
-            FmpqAbsSeriesID[prec, s] = z
+            FmpqAbsSeriesID[s] = z
          end
          return z
       end
    end
 end
 
-const FmpqAbsSeriesID = Dict{Tuple{Int, Symbol}, FmpqAbsSeriesRing}()
+const FmpqAbsSeriesID = Dict{Symbol, FmpqAbsSeriesRing}()
 
 mutable struct fmpq_abs_series <: AbsSeriesElem{fmpq}
    coeffs::Ptr{Nothing}
@@ -3135,19 +3145,21 @@ mutable struct NmodRelSeriesRing <: SeriesRing{nmod}
 
    function NmodRelSeriesRing(R::NmodRing, prec::Int, s::Symbol,
                                  cached::Bool = true)
-      if cached && haskey(NmodRelSeriesID, (R, prec, s))
-         return NmodRelSeriesID[R, prec, s]
+      if cached && haskey(NmodRelSeriesID, (R, s))
+         R = NmodRelSeriesID[R, s]
+         R.prec_max = prec
+         return R
       else
          z = new(R, prec, s)
          if cached
-            NmodRelSeriesID[R, prec, s] = z
+            NmodRelSeriesID[R, s] = z
          end
          return z
       end
    end
 end
 
-const NmodRelSeriesID = Dict{Tuple{NmodRing, Int, Symbol},
+const NmodRelSeriesID = Dict{Tuple{NmodRing, Symbol},
                                 NmodRelSeriesRing}()
 
 mutable struct nmod_rel_series <: RelSeriesElem{nmod}
@@ -3241,19 +3253,21 @@ mutable struct FmpzModRelSeriesRing <: SeriesRing{fmpz_mod}
 
    function FmpzModRelSeriesRing(R::Ring, prec::Int, s::Symbol,
                                  cached::Bool = true)
-      if cached && haskey(FmpzModRelSeriesID, (R, prec, s))
-         return FmpzModRelSeriesID[R, prec, s]
+      if cached && haskey(FmpzModRelSeriesID, (R, s))
+         R = FmpzModRelSeriesID[R, s]
+         R.prec_max = prec
+         return R
       else
          z = new(R, prec, s)
          if cached
-            FmpzModRelSeriesID[R, prec, s] = z
+            FmpzModRelSeriesID[R, s] = z
          end
          return z
       end
    end
 end
 
-const FmpzModRelSeriesID = Dict{Tuple{FmpzModRing, Int, Symbol},
+const FmpzModRelSeriesID = Dict{Tuple{FmpzModRing, Symbol},
                                 FmpzModRelSeriesRing}()
 
 mutable struct fmpz_mod_rel_series <: RelSeriesElem{fmpz_mod}
@@ -3359,19 +3373,21 @@ mutable struct FmpzModAbsSeriesRing <: SeriesRing{fmpz_mod}
 
    function FmpzModAbsSeriesRing(R::Ring, prec::Int, s::Symbol,
                                  cached::Bool = true)
-      if cached && haskey(FmpzModAbsSeriesID, (R, prec, s))
-         return FmpzModAbsSeriesID[R, prec, s]
+      if cached && haskey(FmpzModAbsSeriesID, (R, s))
+         R = FmpzModAbsSeriesID[R, s]
+         R.prec_max = prec
+         return R
       else
          z = new(R, prec, s)
          if cached
-            FmpzModAbsSeriesID[R, prec, s]  = z
+            FmpzModAbsSeriesID[R, s]  = z
          end
          return z
       end
    end
 end
 
-const FmpzModAbsSeriesID = Dict{Tuple{FmpzModRing, Int, Symbol},
+const FmpzModAbsSeriesID = Dict{Tuple{FmpzModRing, Symbol},
                                 FmpzModAbsSeriesRing}()
 
 mutable struct fmpz_mod_abs_series <: AbsSeriesElem{fmpz_mod}
@@ -3471,19 +3487,21 @@ mutable struct FqRelSeriesRing <: SeriesRing{fq}
 
    function FqRelSeriesRing(R::FqFiniteField, prec::Int, s::Symbol,
                             cached::Bool = true)
-      if cached && haskey(FqRelSeriesID, (R, prec, s))
-         return FqRelSeriesID[R, prec, s]
+      if cached && haskey(FqRelSeriesID, (R, s))
+         S = FqRelSeriesID[R, s]
+         S.prec_max = prec
+         return S
       else
          z = new(R, prec, s)
          if cached
-            FqRelSeriesID[R, prec, s] = z
+            FqRelSeriesID[R, s] = z
          end
          return z
       end
    end
 end
 
-const FqRelSeriesID = Dict{Tuple{FqFiniteField, Int, Symbol}, FqRelSeriesRing}()
+const FqRelSeriesID = Dict{Tuple{FqFiniteField, Symbol}, FqRelSeriesRing}()
 
 mutable struct fq_rel_series <: RelSeriesElem{fq}
    coeffs::Ptr{Nothing}
@@ -3546,19 +3564,21 @@ mutable struct FqAbsSeriesRing <: SeriesRing{fq}
 
    function FqAbsSeriesRing(R::FqFiniteField, prec::Int, s::Symbol,
                             cached::Bool = true)
-      if cached && haskey(FqAbsSeriesID, (R, prec, s))
-         return FqAbsSeriesID[R, prec, s]
+      if cached && haskey(FqAbsSeriesID, (R, s))
+         S = FqAbsSeriesID[R, s]
+         S.prec_max = prec
+         return S
       else
          z = new(R, prec, s)
          if cached
-            FqAbsSeriesID[R, prec, s] = z
+            FqAbsSeriesID[R, s] = z
          end
          return z
       end
    end
 end
 
-const FqAbsSeriesID = Dict{Tuple{FqFiniteField, Int, Symbol}, FqAbsSeriesRing}()
+const FqAbsSeriesID = Dict{Tuple{FqFiniteField, Symbol}, FqAbsSeriesRing}()
 
 mutable struct fq_abs_series <: AbsSeriesElem{fq}
    coeffs::Ptr{Nothing}
@@ -3619,19 +3639,21 @@ mutable struct FqNmodRelSeriesRing <: SeriesRing{fq_nmod}
 
    function FqNmodRelSeriesRing(R::FqNmodFiniteField, prec::Int, s::Symbol,
                                 cached::Bool = true)
-      if cached && haskey(FqNmodRelSeriesID, (R, prec, s))
-         return FqNmodRelSeriesID[R, prec, s]
+      if cached && haskey(FqNmodRelSeriesID, (R, s))
+         S =  FqNmodRelSeriesID[R, s]
+         S.prec_max = prec
+         return S
       else
          z = new(R, prec, s)
          if cached
-            FqNmodRelSeriesID[R, prec, s] = z
+            FqNmodRelSeriesID[R, s] = z
          end
          return z
       end
    end
 end
 
-const FqNmodRelSeriesID = Dict{Tuple{FqNmodFiniteField, Int, Symbol},
+const FqNmodRelSeriesID = Dict{Tuple{FqNmodFiniteField, Symbol},
                                FqNmodRelSeriesRing}()
 
 mutable struct fq_nmod_rel_series <: RelSeriesElem{fq_nmod}
@@ -3695,19 +3717,21 @@ mutable struct FqNmodAbsSeriesRing <: SeriesRing{fq_nmod}
 
    function FqNmodAbsSeriesRing(R::FqNmodFiniteField, prec::Int, s::Symbol,
                                 cached::Bool = true)
-      if cached && haskey(FqNmodAbsSeriesID, (R, prec, s))
-         return FqNmodAbsSeriesID[R, prec, s]
+      if cached && haskey(FqNmodAbsSeriesID, (R, s))
+         S = FqNmodAbsSeriesID[R, s]
+         S.prec_max = prec
+         return S
       else
          z = new(R, prec, s)
          if cached
-            FqNmodAbsSeriesID[R, prec, s] = z
+            FqNmodAbsSeriesID[R, s] = z
          end
          return z
       end
    end
 end
 
-const FqNmodAbsSeriesID = Dict{Tuple{FqNmodFiniteField, Int, Symbol},
+const FqNmodAbsSeriesID = Dict{Tuple{FqNmodFiniteField, Symbol},
                                FqNmodAbsSeriesRing}()
 
 mutable struct fq_nmod_abs_series <: AbsSeriesElem{fq_nmod}
