@@ -261,14 +261,9 @@ AbstractAlgebra.is_syntactic_one(x::fmpz) = isone(x)
 
 AbstractAlgebra.is_syntactic_zero(x::fmpz) = iszero(x)
 
-function AbstractAlgebra.printExpr(S::AbstractAlgebra.printer, obj::fmpz,
-                                   left::Int, right::Int)
-    if obj < 0
-        AbstractAlgebra.printGenericPrefix(S, Expr(:call, :-, string(-obj)),
-                              left, right, "-", AbstractAlgebra.prec_pre_Minus)
-    else
-        AbstractAlgebra.push(S, string(obj))
-    end
+function AbstractAlgebra.print_obj(S::AbstractAlgebra.printer, mi::MIME,
+                                               obj::fmpz, left::Int, right::Int)
+   AbstractAlgebra.print_integer_string(S, mi, string(obj), left, right)
 end
 
 string(x::fmpz) = dec(x)
