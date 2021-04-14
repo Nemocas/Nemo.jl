@@ -101,7 +101,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
         with:
-          version: '1'
+          version: '1.5'
       - name: Cache artifacts
         uses: actions/cache@v1
         env:
