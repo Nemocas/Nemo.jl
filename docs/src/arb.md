@@ -610,11 +610,11 @@ fac(::Int, ::ArbField)
 ```
 
 ```@docs
-binom(::arb, ::UInt)
+binomial(::arb, ::UInt)
 ```
 
 ```@docs
-binom(::UInt, ::UInt, ::ArbField)
+binomial(::UInt, ::UInt, ::ArbField)
 ```
 
 ```@docs
