@@ -21,7 +21,7 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 AbstractAlgebra = "^0.16.0"
-Antic_jll = "~0.200.300"
+Antic_jll = "~0.200.400"
 Arb_jll = "~200.1900.0"
 BinaryProvider = "0.4, 0.5"
 FLINT_jll = "^200.700.0"
