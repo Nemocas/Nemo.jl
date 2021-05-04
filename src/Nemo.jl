@@ -251,7 +251,14 @@ function __init__()
    ccall((:flint_set_abort, libflint), Nothing,
          (Ptr{Nothing},), @cfunction(flint_abort, Nothing, ()))
 
-   if isinteractive() &&
+   # Check if were are non-interactive
+   bt = Base.process_backtrace(Base.backtrace())
+   isinteractive_manual = all(sf -> sf[1].func != :_tryrequire_from_serialized, bt)
+
+   # Respect the -q flag
+   isquiet = Bool(Base.JLOptions().quiet)
+
+   if !isquiet && isinteractive_manual && isinteractive() &&
          !any(x -> x.name in ("Hecke", "Oscar", "Singular"), keys(Base.package_locks)) &&
          get(ENV, "NEMO_PRINT_BANNER", "true") != "false"
 
