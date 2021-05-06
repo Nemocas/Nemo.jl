@@ -17,6 +17,7 @@ end
    @test elem_type(K) == nf_elem
    @test elem_type(AnticNumberField) == nf_elem
    @test parent_type(nf_elem) == AnticNumberField
+   @test defining_polynomial(K) == x^3 + 3x + 1
 
    @test isa(K, AnticNumberField)
 

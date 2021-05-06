@@ -4,9 +4,10 @@
 #
 ###############################################################################
 
-export AnticNumberField, nf_elem, norm, representation_matrix,
-       representation_matrix_q, tr, CyclotomicField, MaximalRealSubfield,
-       add!, sub!, mul!, signature, sqr_classical, isrational, isinteger
+export AnticNumberField, defining_polynomial, nf_elem, norm,
+       representation_matrix, representation_matrix_q, tr, CyclotomicField,
+       MaximalRealSubfield, add!, sub!, mul!, signature, sqr_classical,
+       isrational, isinteger
 
 ###############################################################################
 #
@@ -54,6 +55,8 @@ function check_parent(a::nf_elem, b::nf_elem)
 end
 
 characteristic(::AnticNumberField) = 0
+
+defining_polynomial(K::AnticNumberField) = K.pol
 
 ###############################################################################
 #
