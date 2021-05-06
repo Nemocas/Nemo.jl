@@ -31,6 +31,7 @@ makedocs(
                            "qadic.md" ],
              "matrix.md",
              "factor.md",
+             "misc.md",
 	     "Developer" => [ "developer/introduction.md",
 			      "developer/conventions.md",
 			      "developer/typesystem.md",
