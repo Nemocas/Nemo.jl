@@ -2,7 +2,7 @@
 
 ## Global variables and precompilation
 
-Due to limitations of the precompilation of modules julia, global variables
+Due to limitations of the precompilation of modules in julia, global variables
 referring to certain Nemo types require special attention when used inside
 modules. As a simple example, the following code for a module called `A` will
 not work as expected:
@@ -36,4 +36,3 @@ end
 
 Alternatively, one can disable precompilation by adding `__precompile__(false)` inside `A`.
 Note that this might have other unwanted side effects.
-
