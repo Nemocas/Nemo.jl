@@ -98,6 +98,7 @@ if VERSION > v"1.3.0-rc4"
   # and imports the libxxx variables
   using Arb_jll
   using Antic_jll
+  using Calcium_jll
 else
   deps_dir = joinpath(@__DIR__, "..", "deps")
   include(joinpath(deps_dir,"deps.jl"))
