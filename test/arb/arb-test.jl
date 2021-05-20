@@ -460,20 +460,15 @@ end
 
    n = 100
    for _ in 1:n
-      r_null = rand(R; randtype = :null)
-      r_null_exact = rand(R; randtype = :null_exact)
-      r_randtype = rand(R; randtype = :randtype)
-      r_exact = rand(R; randtype = :exact)
-      r_precise = rand(R; randtype = :precise)
-      r_wide = rand(R; randtype = :wide)
-      r_special = rand(R; randtype = :special)
+      r_urandom = rand(R; randtype = :urandom)
+      r_randtest = rand(R; randtype = :randtest)
+      r_exact = rand(R; randtype = :randtest_exact)
+      r_precise = rand(R; randtype = :randtest_precise)
+      r_wide = rand(R; randtype = :randtest_wide)
+      r_special = rand(R; randtype = :randtest_special)
 
-      # These first two tests are not as exact, since those rand-methods depend
-      # on conversion from BigFloat to arb.
-      @test contains(R(".5 +/- 1.501"), r_null)
-      @test abs(r_null_exact) <= R(1) + R(2)^(-precision(R)) &&
-            abs(radius(r_null_exact)) <= R(2)^(-precision(R))
-      @test isfinite(r_randtype)
+      @test contains(R(".5 +/- .5"), r_urandom)
+      @test isfinite(r_randtest)
       @test isfinite(r_exact) && isexact(r_exact)
       @test isfinite(r_precise)
       # Does not work for small precisions (< 20) because of radius

@@ -2174,46 +2174,45 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
-    rand(r::ArbField; randtype::Symbol=:null)
+    rand(r::ArbField; randtype::Symbol=:urandom)
 
-Return a random element in the given Arb field. The values are distributed
-non-uniformly in order to exercise corner cases.
+Return a random element in given Arb field.
 
-The `randtype` default is `:null` for which the midpoint and radius lie within
-$[0, 1]$. Another option is `:null_exact` which return a midpoint in $[0, 1]$
-with a zero radius. The rest of the options are based on the option `:randtype`
-whose only contraint is to return finite numbers. The options include `:exact`
-which return a radius that is zero, `precise` which return a radius around
-$2^{-\mathrm{prec}}$ the magnitude of the midpoint, `:wide` whose returned
-radius might be big relative to its midpoint, and `:special` which return a
-midpoint and radius that might be NaN or infinity.
+The `randtype` default is `:urandom` which return an `arb` contained in
+$[0,1]$.
+
+The rest of the methods return non-uniformly distributed values in order to
+exercise corner cases. The option `:randtest` will return a finite number, and
+`:randtest_exact` the same but with a zero radius. The option
+`:randtest_precise` return an `arb` with a radius around $2^{-\mathrm{prec}}$
+the magnitude of the midpoint, while `:randtest_wide` return a radius that
+might be big relative to its midpoint. The `:randtest_special`-option might
+return a midpoint and radius whose values are `NaN` or `inf`.
 """
-function rand(r::ArbField; randtype::Symbol=:null)
+function rand(r::ArbField; randtype::Symbol=:urandom)
   state = _flint_rand_states[Threads.threadid()]
   x = r()
 
-  if randtype == :null
-    a = r.(rand(BigFloat, 2))
-    x = ball(a[1], a[2])
-  elseif randtype == :null_exact
-    x = r(rand(BigFloat))
-  elseif randtype == :randtype
+  if randtype == :urandom
+    ccall((:arb_urandom, libarb), Nothing,
+          (Ref{arb}, Ptr{Cvoid}, Int), x, state.ptr, r.prec)
+  elseif randtype == :randtest
     ccall((:arb_randtest, libarb), Nothing,
           (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
-  elseif randtype == :exact
+  elseif randtype == :randtest_exact
     ccall((:arb_randtest_exact, libarb), Nothing,
           (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
-  elseif randtype == :precise
+  elseif randtype == :randtest_precise
     ccall((:arb_randtest_precise, libarb), Nothing,
           (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
-  elseif randtype == :wide
+  elseif randtype == :randtest_wide
     ccall((:arb_randtest_wide, libarb), Nothing,
           (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
-  elseif randtype == :special
+  elseif randtype == :randtest_special
     ccall((:arb_randtest_special, libarb), Nothing,
           (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
   else
-    error("randtype not defined")
+    error("Arb random generation `" * String(randtype) * "` is not defined")
   end
 
   return x
