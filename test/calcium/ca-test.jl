@@ -133,8 +133,8 @@ end
 
    @test -2*Cext(i)*inf == infinity(Cext(-i))
 
-   @test is_signed_inf(inf)
-   @test !is_signed_inf(uinf)
+   @test issigned_inf(inf)
+   @test !issigned_inf(uinf)
    @test isinf(inf)
    @test isinf(uinf)
    @test !isuinf(inf)
@@ -150,7 +150,7 @@ end
 
    @test !isinf(C(1))
    @test !isuinf(C(1))
-   @test !is_signed_inf(C(1))
+   @test !issigned_inf(C(1))
    @test !isundefined(C(1))
    @test !isunknown(C(1))
 

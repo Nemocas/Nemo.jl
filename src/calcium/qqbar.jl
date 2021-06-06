@@ -4,9 +4,9 @@
 #
 ###############################################################################
 
-export qqbar, CalciumQQBar, CalciumQQBarField, is_algebraic_integer, rand, abs2,
+export qqbar, CalciumQQBar, CalciumQQBarField, isalgebraic_integer, rand, abs2,
        csgn, sign_real, sign_imag, fmpq, fmpz, exp_pi_i, atanpi, asinpi, acospi,
-       conjugates, eigenvalues, guess, root_of_unity_as_args, is_root_of_unity,
+       conjugates, eigenvalues, guess, root_of_unity_as_args, isroot_of_unity,
        log_pi_i, rand
 
 export isequal_real, isequal_imag, isequal_abs, isequal_abs_real,
@@ -230,11 +230,11 @@ function isreal(x::qqbar)
 end
 
 @doc Markdown.doc"""
-    is_algebraic_integer(x::qqbar)
+    isalgebraic_integer(x::qqbar)
 
 Return whether `x` is an algebraic integer.
 """
-function is_algebraic_integer(x::qqbar)
+function isalgebraic_integer(x::qqbar)
    return Bool(ccall((:qqbar_is_algebraic_integer, libcalcium),
         Cint, (Ref{qqbar},), x))
 end
@@ -1027,11 +1027,11 @@ function root_of_unity(C::CalciumQQBarField, n::Int, k::Int)
 end
 
 @doc Markdown.doc"""
-    is_root_of_unity(a::qqbar)
+    isroot_of_unity(a::qqbar)
 
 Return whether the given algebraic number is a root of unity.
 """
-function is_root_of_unity(a::qqbar)
+function isroot_of_unity(a::qqbar)
    return Bool(ccall((:qqbar_is_root_of_unity, libcalcium),
         Cint, (Ptr{Int}, Ptr{Int}, Ref{qqbar}), C_NULL, C_NULL, a))
 end

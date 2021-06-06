@@ -146,7 +146,7 @@ isinteger(x::qqbar)
 isrational(x::qqbar)
 isreal(x::qqbar)
 degree(x::qqbar)
-is_algebraic_integer(x::qqbar)
+isalgebraic_integer(x::qqbar)
 minpoly(R::FmpzPolyRing, x::qqbar)
 minpoly(R::FmpqPolyRing, x::qqbar)
 conjugates(a::qqbar)
@@ -276,10 +276,10 @@ Root 0.309017 - 0.951057*im of x^4 + x^3 + x^2 + x + 1
 julia> w = (1 - sqrt(QQBar(-3)))//2
 Root 0.500000 - 0.866025*im of x^2 - x + 1
 
-julia> is_root_of_unity(w)
+julia> isroot_of_unity(w)
 true
 
-julia> is_root_of_unity(w + 1)
+julia> isroot_of_unity(w + 1)
 false
 
 julia> root_of_unity_as_args(w)
@@ -293,7 +293,7 @@ sqrt(a::qqbar)
 root(a::qqbar, n::Int)
 root_of_unity(C::CalciumQQBarField, n::Int)
 root_of_unity(C::CalciumQQBarField, n::Int, k::Int)
-is_root_of_unity(a::qqbar)
+isroot_of_unity(a::qqbar)
 root_of_unity_as_args(a::qqbar)
 exp_pi_i(a::qqbar)
 log_pi_i(a::qqbar)

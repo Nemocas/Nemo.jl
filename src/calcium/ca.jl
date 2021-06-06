@@ -6,7 +6,7 @@
 
 export ca, CalciumField, complex_normal_form, const_euler, const_pi, csgn, erf,
        erfc, erfi, gamma, infinity, isalgebraic, isimaginary, isinf, isnumber,
-       is_signed_inf, isspecial, isuinf, isundefined, isunknown, onei, pow,
+       issigned_inf, isspecial, isuinf, isundefined, isunknown, onei, pow,
        undefined, unknown, unsigned_infinity
 
 ###############################################################################
@@ -328,11 +328,11 @@ function isuinf(a::ca)
 end
 
 @doc Markdown.doc"""
-    is_signed_inf(a::ca)
+    issigned_inf(a::ca)
 
 Return whether `a` is any signed infinity.
 """
-function is_signed_inf(a::ca)
+function issigned_inf(a::ca)
    C = a.parent
    t = ccall((:ca_check_is_signed_inf, libcalcium), Cint,
         (Ref{ca}, Ref{CalciumField}), a, C)

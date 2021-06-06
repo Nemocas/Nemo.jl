@@ -71,7 +71,7 @@ end
    @test isreal(u)
    @test !isrational(i)
    @test !isreal(i)
-   @test is_algebraic_integer(u)
+   @test isalgebraic_integer(u)
 
    @test denominator(qqbar(3+4im) // 5) == 5
    @test numerator(qqbar(3+4im) // 5) == qqbar(3+4im)
@@ -133,8 +133,8 @@ end
    @test_throws DomainError (root_of_unity(R, 0))
    @test_throws DomainError (root_of_unity(R, 0, 1))
 
-   @test is_root_of_unity(i)
-   @test !is_root_of_unity(qqbar(2))
+   @test isroot_of_unity(i)
+   @test !isroot_of_unity(qqbar(2))
    @test root_of_unity_as_args(-i) == (4, 3)
    @test_throws DomainError root_of_unity_as_args(qqbar(2))
 

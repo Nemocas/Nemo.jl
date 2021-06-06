@@ -365,7 +365,7 @@ isnumber(a::ca)
 isundefined(a::ca)
 isinf(a::ca)
 isuinf(a::ca)
-is_signed_inf(a::ca)
+issigned_inf(a::ca)
 isunknown(a::ca)
 ```
 
