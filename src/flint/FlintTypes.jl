@@ -821,20 +821,19 @@ mutable struct FmpzModPolyRing <: PolyRing{fmpz_mod}
   n::fmpz
 
   function FmpzModPolyRing(R::FmpzModRing, s::Symbol, cached::Bool = true)
-    m = modulus(R)
-    if cached && haskey(FmpzModPolyRingID, (m, s))
-       return FmpzModPolyRingID[m, s]
+    if cached && haskey(FmpzModPolyRingID, (R, s))
+       return FmpzModPolyRingID[R, s]
     else
-       z = new(R, s, m)
+       z = new(R, s, modulus(R))
        if cached
-          FmpzModPolyRingID[m ,s] = z
+          FmpzModPolyRingID[R ,s] = z
        end
        return z
     end
   end
 end
 
-const FmpzModPolyRingID = Dict{Tuple{fmpz, Symbol}, FmpzModPolyRing}()
+const FmpzModPolyRingID = Dict{Tuple{FmpzModRing, Symbol}, FmpzModPolyRing}()
 
 mutable struct fmpz_mod_poly <: PolyElem{fmpz_mod}
    coeffs::Ptr{Nothing}

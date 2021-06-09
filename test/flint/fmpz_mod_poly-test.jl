@@ -51,6 +51,16 @@
    @test isa(r, PolyElem)
 
    @test characteristic(S) == 123456789012345678949
+
+    R = ResidueRing(ZZ, fmpz(132))
+    Rx,  = PolynomialRing(R, "x")
+    @test base_ring(Rx) === R
+    @test Rx === PolynomialRing(R, "x")[1]
+
+    R = ResidueRing(ZZ, fmpz(132), cached = false)
+    Rx,  = PolynomialRing(R, "x")
+    @test base_ring(Rx) === R
+    @test Rx === PolynomialRing(R, "x")[1]
 end
 
 @testset "fmpz_mod_poly.printing" begin
