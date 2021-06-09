@@ -6,8 +6,8 @@
 
 export ca, CalciumField, complex_normal_form, const_euler, const_pi, csgn, erf,
        erfc, erfi, gamma, infinity, isalgebraic, isimaginary, isinf, isnumber,
-       issigned_inf, isspecial, isuinf, isundefined, isunknown, onei, pow,
-       undefined, unknown, unsigned_infinity
+       issigned_inf, isuinf, isundefined, isunknown, onei, pow, undefined,
+       unknown, unsigned_infinity
 
 ###############################################################################
 #

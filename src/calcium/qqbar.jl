@@ -10,8 +10,8 @@ export qqbar, CalciumQQBar, CalciumQQBarField, isalgebraic_integer, rand, abs2,
        log_pi_i, rand
 
 export isequal_real, isequal_imag, isequal_abs, isequal_abs_real,
-       isequal_abs_imag, isequal_root_order, isless_real, isless_imag,
-       isless_abs, isless_abs_real, isless_abs_imag, isless_root_order
+       isequal_abs_imag, isless_real, isless_imag, isless_abs, isless_abs_real,
+       isless_abs_imag, isless_root_order
 
 ###############################################################################
 #
