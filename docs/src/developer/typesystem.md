@@ -44,6 +44,8 @@ For example, Nemo defines `RingElement` to be a union of `RingElem` and all
 the Julia standard types which behave like ring elements, e.g. all `Integer`
 types and types of rationals with `Integer` components.
 
+Other union types are defined in `src/AbstractAlgebra.jl` in AbstractAlgebra.
+
 A second feature we make use of in Nemo is parameterised types. Each concrete
 and abstract type can take one or more parameters. These parameter can be any
 other type, either concrete or abstract. For example, in Julia `Rational{T}`
