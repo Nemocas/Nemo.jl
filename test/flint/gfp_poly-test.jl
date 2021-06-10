@@ -1,5 +1,12 @@
 @testset "gfp_poly.constructors" begin
   R = GF(17)
+  
+  S1 = PolyRing(R)
+  S2 = PolyRing(R)
+
+  @test isa(S1, GFPPolyRing)
+  @test S1 !== S2
+
   Rx, x = PolynomialRing(R, "x")
 
   @test elem_type(Rx) == gfp_poly

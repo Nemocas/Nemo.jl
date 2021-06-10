@@ -1,5 +1,12 @@
 @testset "fmpz_mod_poly.constructors" begin
    R = ResidueRing(ZZ, 123456789012345678949)
+   
+   S1 = PolyRing(R)
+   S2 = PolyRing(R)
+
+   @test isa(S1, FmpzModPolyRing)
+   @test S1 !== S2
+
    S, x = PolynomialRing(R, "x")
 
    @test elem_type(S) == fmpz_mod_poly

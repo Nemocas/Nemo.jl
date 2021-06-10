@@ -1,4 +1,10 @@
 @testset "fmpz_poly.constructors" begin
+   S1 = PolyRing(ZZ)
+   S2 = PolyRing(ZZ)
+
+   @test isa(S1, FmpzPolyRing)
+   @test S1 !== S2
+
    R, x = PolynomialRing(ZZ, "x")
 
    @test elem_type(R) == fmpz_poly

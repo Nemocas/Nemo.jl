@@ -1,5 +1,12 @@
 @testset "fq_nmod_poly.constructors" begin
    R, x = FiniteField(23, 5, "x")
+   
+   S1 = PolyRing(R)
+   S2 = PolyRing(R)
+
+   @test isa(S1, FqNmodPolyRing)
+   @test S1 !== S2
+
    S, y = PolynomialRing(R, "y")
 
    @test elem_type(S) == fq_nmod_poly

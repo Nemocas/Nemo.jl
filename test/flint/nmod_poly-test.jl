@@ -1,5 +1,12 @@
 @testset "nmod_poly.constructors" begin
   R = ResidueRing(ZZ, 17)
+  
+  S1 = PolyRing(R)
+  S2 = PolyRing(R)
+
+  @test isa(S1, NmodPolyRing)
+  @test S1 !== S2
+
   Rx, x = PolynomialRing(R, "x")
 
   @test elem_type(Rx) == nmod_poly
