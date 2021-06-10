@@ -687,6 +687,14 @@ function PowerSeriesRing(R::NmodRing, prec::Int, s::AbstractString; model=:cappe
    return PowerSeriesRing(R, prec, Symbol(s); model=model, cached=cached)
 end
 
+function AbsSeriesRing(R::NmodRing, prec::Int)
+   return NmodAbsSeriesRing(R, prec, :x, false)
+end
+
+function RelSeriesRing(R::NmodRing, prec::Int)
+   return NmodRelSeriesRing(R, prec, :x, false)
+end
+
 function PowerSeriesRing(R::GaloisField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
    if model == :capped_relative
       parent_obj = GFPRelSeriesRing(R, prec, s, cached)
@@ -700,4 +708,12 @@ end
 
 function PowerSeriesRing(R::GaloisField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
    return PowerSeriesRing(R, prec, Symbol(s); model=model, cached=cached)
+end
+
+function AbsSeriesRing(R::GaloisField, prec::Int)
+   return GFPAbsSeriesRing(R, prec, :x, false)
+end
+
+function RelSeriesRing(R::GaloisField, prec::Int)
+   return GFPRelSeriesRing(R, prec, :x, false)
 end

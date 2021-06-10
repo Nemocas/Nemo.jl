@@ -668,6 +668,14 @@ function PowerSeriesRing(R::FqFiniteField, prec::Int, s::AbstractString; model=:
    return PowerSeriesRing(R, prec, Symbol(s); model=model, cached=cached)
 end
 
+function AbsSeriesRing(R::FqFiniteField, prec::Int)
+   return FqAbsSeriesRing(R, prec, :x, false)
+end
+
+function RelSeriesRing(R::FqFiniteField, prec::Int)
+   return FqRelSeriesRing(R, prec, :x, false)
+end
+
 function PowerSeriesRing(R::FqNmodFiniteField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
    if model == :capped_relative
       parent_obj = FqNmodRelSeriesRing(R, prec, s, cached)
@@ -682,4 +690,12 @@ end
 
 function PowerSeriesRing(R::FqNmodFiniteField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
    return PowerSeriesRing(R, prec, Symbol(s); model=model, cached=cached)
+end
+
+function AbsSeriesRing(R::FqNmodFiniteField, prec::Int)
+   return FqNmodAbsSeriesRing(R, prec, :x, false)
+end
+
+function RelSeriesRing(R::FqNmodFiniteField, prec::Int)
+   return FqNmodRelSeriesRing(R, prec, :x, false)
 end

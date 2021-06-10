@@ -670,3 +670,11 @@ end
 function PowerSeriesRing(R::FlintIntegerRing, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
    return PowerSeriesRing(R, prec, Symbol(s); model=model, cached=cached)
 end
+
+function AbsSeriesRing(R::FlintIntegerRing, prec::Int)
+   return FmpzAbsSeriesRing(prec, :x, false)
+end
+
+function RelSeriesRing(R::FlintIntegerRing, prec::Int)
+   return FmpzRelSeriesRing(prec, :x, false)
+end

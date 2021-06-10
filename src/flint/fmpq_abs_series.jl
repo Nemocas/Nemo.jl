@@ -940,3 +940,11 @@ end
 function PowerSeriesRing(R::FlintRationalField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
    return PowerSeriesRing(R, prec, Symbol(s); model=model, cached=cached)
 end
+
+function AbsSeriesRing(R::FlintRationalField, prec::Int)
+   return FmpqAbsSeriesRing(prec, :x, false)
+end
+
+function RelSeriesRing(R::FlintRationalField, prec::Int)
+   return FmpqRelSeriesRing(prec, :x, false)
+end
