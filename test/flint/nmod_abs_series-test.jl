@@ -4,6 +4,13 @@ end
 
 @testset "nmod_abs_series.constructors" begin
    S = ResidueRing(ZZ, 23)
+   
+   R1 = AbsSeriesRing(S, 30)
+   R2 = AbsSeriesRing(S, 30)
+
+   @test isa(R1, NmodAbsSeriesRing)
+   @test R1 !== R2
+
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
    @test elem_type(R) == nmod_abs_series

@@ -4,6 +4,13 @@ end
 
 @testset "fmpz_mod_abs_series.constructors" begin
    S = ResidueRing(ZZ, 123456789012345678949)
+   
+   R1 = AbsSeriesRing(S, 30)
+   R2 = AbsSeriesRing(S, 30)
+
+   @test isa(R1, FmpzModAbsSeriesRing)
+   @test R1 !== R2
+
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
    @test elem_type(R) == fmpz_mod_abs_series

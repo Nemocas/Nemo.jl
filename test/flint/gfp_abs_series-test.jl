@@ -4,6 +4,13 @@ end
 
 @testset "gfp_abs_series.constructors" begin
    S = GF(23)
+   
+   R1 = AbsSeriesRing(S, 30)
+   R2 = AbsSeriesRing(S, 30)
+
+   @test isa(R1,GFPAbsSeriesRing)
+   @test R1 !== R2
+
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
    @test elem_type(R) == gfp_abs_series

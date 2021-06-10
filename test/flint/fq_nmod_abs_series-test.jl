@@ -4,6 +4,13 @@ end
 
 @testset "fq_nmod_abs_series.constructors" begin
    S, t = FiniteField(23, 5, "t")
+   
+   R1 = AbsSeriesRing(S, 30)
+   R2 = AbsSeriesRing(S, 30)
+
+   @test isa(R1, FqNmodAbsSeriesRing)
+   @test R1 !== R2
+
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
    @test elem_type(R) == fq_nmod_abs_series

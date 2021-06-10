@@ -3,6 +3,12 @@
 end
 
 @testset "fmpz_abs_series.constructors" begin
+   S1 = AbsSeriesRing(ZZ, 30)
+   S2 = AbsSeriesRing(ZZ, 30)
+
+   @test isa(S1, FmpzAbsSeriesRing)
+   @test S1 !== S2
+
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
    @test elem_type(R) == fmpz_abs_series
