@@ -3,6 +3,12 @@
 end
 
 @testset "fmpz_rel_series.constructors" begin
+   S1 = RelSeriesRing(ZZ, 30)
+   S2 = RelSeriesRing(ZZ, 30)
+
+   @test isa(S1, FmpzRelSeriesRing)
+   @test S1 !== S2
+
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    @test elem_type(R) == fmpz_rel_series

@@ -4,6 +4,13 @@ end
 
 @testset "gfp_rel_series.constructors" begin
    R = GF(17)
+   
+   S1 = RelSeriesRing(R, 30)
+   S2 = RelSeriesRing(R, 30)
+
+   @test isa(S1, GFPRelSeriesRing)
+   @test S1 !== S2
+
    S, x = PowerSeriesRing(R, 30, "x")
 
    @test elem_type(S) == gfp_rel_series

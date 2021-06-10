@@ -4,6 +4,13 @@ end
 
 @testset "nmod_rel_series.constructors" begin
    R = ResidueRing(ZZ, 17)
+   
+   S1 = RelSeriesRing(R, 30)
+   S2 = RelSeriesRing(R, 30)
+
+   @test isa(S1, NmodRelSeriesRing)
+   @test S1 !== S2
+
    S, x = PowerSeriesRing(R, 30, "x")
 
    @test elem_type(S) == nmod_rel_series

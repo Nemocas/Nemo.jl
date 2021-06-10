@@ -4,6 +4,13 @@ end
 
 @testset "gfp_fmpz_rel_series.constructors" begin
    R = GF(ZZ(123456789012345678949))
+   
+   S1 = RelSeriesRing(R, 30)
+   S2 = RelSeriesRing(R, 30)
+
+   @test isa(S1, GFPFmpzRelSeriesRing)
+   @test S1 !== S2
+
    S, x = PowerSeriesRing(R, 30, "x")
 
    @test elem_type(S) == gfp_fmpz_rel_series

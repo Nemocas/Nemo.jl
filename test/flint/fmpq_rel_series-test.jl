@@ -3,6 +3,12 @@
 end
 
 @testset "fmpq_rel_series.constructors" begin
+   S1 = RelSeriesRing(QQ, 30)
+   S2 = RelSeriesRing(QQ, 30)
+
+   @test isa(S1, FmpqRelSeriesRing)
+   @test S1 !== S2
+
    R, x = PowerSeriesRing(QQ, 30, "x")
 
    @test elem_type(R) == fmpq_rel_series

@@ -4,6 +4,13 @@ end
 
 @testset "fq_nmod_rel_series.constructors" begin
    R, t = FiniteField(23, 5, "t")
+   
+   S1 = RelSeriesRing(R, 30)
+   S2 = RelSeriesRing(R, 30)
+
+   @test isa(S1, FqNmodRelSeriesRing)
+   @test S1 !== S2
+
    S, x = PowerSeriesRing(R, 30, "x")
 
    @test elem_type(S) == fq_nmod_rel_series
