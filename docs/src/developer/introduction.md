@@ -34,11 +34,12 @@ Nowadays we see AbstractAlgebra to provide three things to Nemo:
   required interfaces. These interfaces are documented in the AbstractAlgebra
   documentation.
 
-Nemo itself is now more or less just a wrapper of three C libraries:
+Nemo itself is now more or less just a wrapper of four C libraries:
 
 * Flint : polynomials and matrices over Z, Q, Z/nZ, Qp, Fq
 * Arb : polynomials, matrices and special functions over balls over R and C
 * Antic : algebraic number field element arithmetic
+* Calcium : exact real and complex numbers, including algebraic numbers
 
 Each ring implemented in those C libraries is wrapped in such a way as to
 implement the interfaces described by AbstractAlgebra.
@@ -49,8 +50,8 @@ performant C code (around half a million lines of it).
 
 ## Layout of files
 
-In the `src` directory of Nemo are three directories `flint`, `arb` and
-`antic`, each containing the wrappers for the relevant C libraries. The
+In the `src` directory of Nemo are four directories `flint`, `arb`, `antic` and
+`calcium`, each containing the wrappers for the relevant C libraries. The
 `test` directory is similarly organised.
 
 Within each of these directories is a set of files, one per module within
@@ -75,18 +76,31 @@ arithmetic over the reals. The `acb` prefix is similar but for complex numbers.
 
 The `ArbTypes.jl` file contains the Arb types.
 
+In the `calcium` directory the `ca` prefix is for Calcium's type. There is also
+a `qqbar` file for the field of algebraic numbers.
+
 In the AbstractAlgebra.jl package the `src` directory contains a directory
-called `generic`. This is where a majority of the implementations currently
-reside. Each file such as `Matrix.jl` corresponds to a generic group/ring/field
-or other algebraic construction (typically over a base ring).
+called `generic`. This is where the implementations of generic types, such as
+matrices, polynomials, series, etc. reside. Each file such as `Matrix.jl`
+corresponds to a generic group/ring/field or other algebraic construction
+(typically over a base ring). The files in this directory exist inside a
+submodule of AbstractAlgebra called `Generic`.
 
 The file `GenericTypes.jl` is where all the generic types are implemented.
 
 At the top level of the `src` directory is a file `Generic.jl` which is where
-the `Generic` submodule of AbstractAlgebra resides containing all of the above
-implementations.
+the `Generic` submodule of AbstractAlgebra begins and where imports are made
+from AbstractAlgebra into `Generic`.
 
-Also at that top level is `AbstractTypes.jl` where all the AbstractAlgebra
+In the `src` directory we have implementations that work for every type
+belonging to a given abstract type, e.g. `Matrix.jl` has implementations that
+will work for any matrix type, whether from AbstractAlgebra's `Generic` module
+or even matrix types from Nemo, and so on. So long as they are implemented to
+provide the `Matrix` interface all the functions there will work for them. The
+same applies for `Poly.jl` for polynomial types, `AbsSeries.jl` for absolute
+series types, `RelSeries.jl` for relative series types, etc.
+
+In the `src` directory is `AbstractTypes.jl` where all the AbstractAlgebra
 abstract types are defined.
 
 Also in the `src` directory is a subdirectory called `Julia`. This is where we
@@ -100,7 +114,9 @@ Note that some of the implementations we give there would conflict with `Base`
 and so are only available inside AbstractAlgebra and are not exported!
 
 We try to keep the `test` directory at the top level of the source tree
-organised in the same manner as the other directories just discussed.
+organised in the same manner as the other directories just discussed, though
+there is currently no split between tests for `Generic` and for the
+implementations in `src`. All tests are currently combined in `test/generic`..
 
 ## Git, GitHub and project workflows
 
