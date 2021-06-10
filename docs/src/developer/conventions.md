@@ -176,8 +176,8 @@ The exact order within the file is less important than generally following
 something like the above. This aids in finding functions in a file since all
 files are more or less set out the same way.
 
-For an example to follow, see the `src/generic/Poly.jl` file in AbstractAlgebra
-which is the oldest and most canonical example.
+For an example to follow, see the `src/Poly.jl` and `src/generic/Poly.jl` files
+in AbstractAlgebra which form the oldest and most canonical example.
 
 Headings for sections should be 80 characters wide and formed of hashes in the
 style that can be seen in each Nemo file.
