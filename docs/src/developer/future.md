@@ -34,24 +34,6 @@ nowadays.
 The possibility will always exist to separate the repositories again if the
 experiment is unsuccessful or serves its purpose and is no longer needed.
 
-## Splitting abstract and generic functionality
-
-Currently we have many generic types in Nemo, e.g. `Poly{T}` and `Mat{T}`. We
-also have a lot of generic algorithms implemented. The latter are implemented
-for abstract types.
-
-At the present moment, both the specialised code for our generic types and the
-generic algorithms for abstract types are all implemented inside the
-`src/generic` directory of the AbstractAlgebra package.
-
-We eventually plan to separate the two kinds of implementations to make it
-clearer to developers which code is for generic types only and which are the
-more general implementations for all types belonging to the AbstractAlgebra
-abstract types.
-
-It's not clear at this moment what the new directories will be called when the
-separation happens.
-
 ## Moving implementations from Hecke
 
 In the Hecke.jl project there are a vast number of implementations that were
@@ -68,10 +50,8 @@ A number of things must be taken into account when making such moves:
   until it can finally be integrated fully into the correct place in those
   projects.
 
-* Some of the code calls parent object constructors in generic code. Such calls
-  should be removed where possible. If they are essential, they should have
-  `AbstractAlgebra` prepended to their calls, as per the developer documentation
-  on parent object constructors.
+* Some of the code calls full parent object constructors in generic code. Such
+  calls should be removed where possible.
 
 * Some functions such as `exp` and the like require `Base` to be prepended, as
   we do not import these functions from `Base` into `Generic`.
@@ -104,7 +84,7 @@ A number of things must be taken into account when making such moves:
 * Test code, docstrings and documentation will have to be added where they do
   not already exist.
 
-* Imports and exports of the new functionality will have to be added.
+* Exports of the new functionality will have to be added.
 
 * Some functions should be accompanied by similar functions that don't yet
   exist. For example if there is a `blah_rows` there probably should be a
