@@ -470,3 +470,7 @@ end
 function PolynomialRing(R::GaloisFmpzField, s::AbstractString; cached = true)
    return PolynomialRing(R, Symbol(s); cached=cached)
 end
+
+function PolyRing(R::GaloisFmpzField)
+   return GFPFmpzPolyRing(R, :x, false)
+end

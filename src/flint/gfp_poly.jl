@@ -586,3 +586,7 @@ end
 function PolynomialRing(R::GaloisField, s::AbstractString; cached = true)
    return PolynomialRing(R, Symbol(s); cached=cached)
 end
+
+function PolyRing(R::GaloisField)
+   return GFPPolyRing(R, :x, false)
+end

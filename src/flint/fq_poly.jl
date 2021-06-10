@@ -850,3 +850,7 @@ end
 function PolynomialRing(R::FqFiniteField, s::AbstractString; cached = true)
    return PolynomialRing(R, Symbol(s); cached=cached)
 end
+
+function PolyRing(R::FqFiniteField)
+   return FqPolyRing(R, :x, false)
+end

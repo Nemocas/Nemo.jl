@@ -1029,3 +1029,7 @@ end
 function PolynomialRing(R::FmpzModRing, s::AbstractString; cached = true)
    return PolynomialRing(R, Symbol(s); cached=cached)
 end
+
+function PolyRing(R::FmpzModRing)
+   return FmpzModPolyRing(R, :x, false)
+end

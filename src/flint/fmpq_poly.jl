@@ -859,3 +859,6 @@ function PolynomialRing(R::FlintRationalField, s::AbstractString; cached = true)
    return PolynomialRing(R, Symbol(s); cached=cached)
 end
 
+function PolyRing(R::FlintRationalField)
+   return FmpqPolyRing(R, :x, false)
+end

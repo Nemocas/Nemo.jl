@@ -935,3 +935,7 @@ end
 function PolynomialRing(R::FlintIntegerRing, s::AbstractString; cached = true)
    return PolynomialRing(R, Symbol(s); cached=cached)
 end
+
+function PolyRing(R::FlintIntegerRing)
+   return FmpzPolyRing(R, :x, false)
+end

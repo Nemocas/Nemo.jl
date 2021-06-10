@@ -1095,3 +1095,7 @@ end
 function PolynomialRing(R::NmodRing, s::AbstractString; cached = true)
    return PolynomialRing(R, Symbol(s); cached=cached)
 end
+
+function PolyRing(R::NmodRing)
+   return NmodPolyRing(R, :x, false)
+end

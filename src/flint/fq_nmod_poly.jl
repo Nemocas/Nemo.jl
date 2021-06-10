@@ -852,3 +852,7 @@ end
 function PolynomialRing(R::FqNmodFiniteField, s::AbstractString; cached = true)
    return PolynomialRing(R, Symbol(s); cached=cached)
 end
+
+function PolyRing(R::FqNmodFiniteField)
+   return FqNmodPolyRing(R, :x, false)
+end
