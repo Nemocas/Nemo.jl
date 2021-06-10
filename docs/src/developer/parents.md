@@ -86,6 +86,9 @@ type. For example, if AbstractAlgebra is being used, `dense_matrix_type(ZZ)`
 will return `Mat{BigInt}` whereas if Nemo is being used it will return
 `fmpz_mat`.
 
+We also have `dense_poly_type` for univariate polynomials, `abs_series_type`
+for absolute series and `rel_series_type` for relative series.
+
 In theory such functions should exist for all major object types, however they
 have in most cases not been implemented yet.
 
@@ -137,7 +140,7 @@ possible by checking the types alone. For example elements of $Z/7Z$ and
 $Z/3Z$ would have the same type but different parents (one parameterised by
 the integer 7, the other by the integer 3).
 
-In order to perform such a check in a function one uses `parent_check(a, b)`
+In order to perform such a check in a function one uses `check_parent(a, b)`
 where `a` and `b` are the objects one wishes to assert must have the same
 parent. If not, an exception is raised by `parent_check`.
 
@@ -169,7 +172,8 @@ previously working code.
 
 Thirdly, parent objects must be unique across the system for a given set of
 parameters. This means they must be cached globally. This is problematic for
-any future attempts to parallelise library code.
+any future attempts to parallelise library code and in the worst case memory
+usage can balloon due to swelling caches.
 
 Most parent object constructors take a `cached` keyword which specifies whether
 the parent object should be cached or not, but again it is better overall to
@@ -182,32 +186,44 @@ constructing polynomials and matrices directly.
 There are also functions that provide alternative ways of constructing objects,
 e.g. `matrix` provides a means of creating a matrix over a given ring with
 given dimensions. The constructor `polynomial` allows creation of a polynomial
-over a given base ring with given coefficients. These should be used in
-preference to parent object constructors where possible. Additional functions
-of this type should be added in future.
+over a given base ring with given coefficients and `abs_series` and
+`rel_series` do similar things for absolute and relative series. These should
+be used in preference to parent object constructors where possible. Additional
+functions of this type should be added in future.
 
 However even when using these functions in library code, it is important to
 remember to pass `cached=false` so that the cache is not filled up by calls
 to the library code. But this creates an additional problem, namely that if one
 uses `polynomial` say, to construct two polynomials over the same base ring,
 they will not be compatible in the sense that they will have different parents.
-Instead, the following pattern is encouraged:
+
+When one wishes to construct multiple elements in the same group/ring/field,
+it is convenient to be able to construct a parent just as a user would. For
+this purpose various light-weight and very safe parent constructors are
+provided for use in library code.
+
+For example there are the constructors `PolyRing`, `AbsSeriesRing` and
+`RelSeriesRing`. These functions return the parent ring $R$ only and no
+generator (it can be obtained by calling `gen(R)`). They also set the
+variable for printing to a default (usually `x`). Moreover, these parents
+are not cached, so they are completely safe to use in library code. They
+can be thousands of times faster than the full parent constructors intended
+for users.
+
+Here is an example of their use:
 
 ```julia
-p = polynomial(ZZ, [1, 2, 3], cached=false)
-R = parent(p)
+R = PolyRing(ZZ)
+p = R([1, 2, 3])
 q = R([2, 3, 4])
 s = p + q
 ```
 
-Note that the second polynomial `q` is created from the parent `R` of the first
-without explicitly creating the parent object using the `PolynomialRing`
-constructor.
-
-Naturally functions like `polynomial` and `matrix` are missing for other
-modules in Nemo at present and it is hoped that developers will fill in such
-infrastructure rather than simply push the can down the road for someone else
-to fix. Forcing the creating of parent objects into as few bottlenecks as
-possible will make it much easier for developers to remove problems associated
-with such calls when they arise in future.
+Naturally functions like `polynomial` and `matrix` and the light-weight parent
+constructors are missing for other modules in Nemo at present and it is hoped
+that developers will fill in such infrastructure rather than simply push the
+can down the road for someone else to fix. Forcing the creating of full parent
+objects into as few bottlenecks as possible will make it much easier for
+developers to remove problems associated with such calls when they arise in
+future.
 
