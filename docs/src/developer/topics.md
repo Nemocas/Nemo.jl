@@ -211,7 +211,7 @@ directory of AbstractAlgebra exist for this purpose. However, exporting from
 that submodule will not export the functionality to the Nemo user.
 
 To do this, one must add a function `PolynomialRing` for example, in
-`src/AbstractAlgebra.jl` which calls `Generic.PolynomialRing`. Then one needs
+`src/Poly.jl`, say, which calls `Generic.PolynomialRing`. Then one needs
 to export `PolynomialRing` from AbstractAlgebra (also in that file).
 
 Similarly, all functions provided for generic polynomial rings are not
@@ -219,9 +219,14 @@ automatically available, even when exported from the Generic submodule.
 Two additional things are required, namely an import from Generic into
 AbstractAlgebra and then an export from AbstractAlgebra to the user.
 
-Two large lists exist in `src/AbstractAlgebra.jl` with these imports and
-exports. These are kept in alphabetical order to prevent duplicate
-imports/exports being added over time.
+An exception to this is if there is a function with the same name in
+AbstractAlgebra (i.e. in the top level `src` directory). In this case
+it is sufficient to simply import that function into `Generic` in the
+file `src/Generic.jl`.
+
+In the former case, two large lists exist in `src/AbstractAlgebra.jl` with
+these imports and exports. These are kept in alphabetical order to prevent
+duplicate imports/exports being added over time.
 
 If one wishes to extend a definition provided by Base, one can simply overload
 `Base.blah` inside the Generic submodule directly. Exceptions to this include
@@ -450,6 +455,9 @@ In both these situations one can pass `false` as an additional argument
 to a parent constructor to avoid caching the parent object it creates. This
 parameter normally has a default value of `true` and under normal circumstances
 doesn't need to be supplied.
+
+Note that special light-weight parent constructors, `PolyRing`, `AbsSeriesRing`,
+`RelSeriesRing`, etc. are also provided which do not cache.
 
 ## Throw/nothrow for `check_parent`
 
