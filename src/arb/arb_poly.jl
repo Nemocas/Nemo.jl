@@ -813,8 +813,15 @@ end
 #
 ################################################################################
 
-function PolynomialRing(R::ArbField, s::AbstractString; cached = true)
-  S = Symbol(s)
-  parent_obj = ArbPolyRing(R, S, cached)
+function PolynomialRing(R::ArbField, s::Symbol; cached = true)
+  parent_obj = ArbPolyRing(R, s, cached)
   return parent_obj, parent_obj(fmpz_poly([fmpz(0), fmpz(1)]))
+end
+
+function PolynomialRing(R::ArbField, s::AbstractString; cached = true)
+   return PolynomialRing(R, Symbol(s); cached=cached)
+end
+
+function PolyRing(R::ArbField)
+   return ArbPolyRing(R, :x, false)
 end

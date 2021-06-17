@@ -1,6 +1,12 @@
 RR = ArbField(64)
 
 @testset "arb_poly.constructors" begin
+   S1 = PolyRing(RR)
+   S2 = PolyRing(RR)
+
+   @test isa(S1, ArbPolyRing)
+   @test S1 !== S2
+
    R, x = PolynomialRing(RR, "x")
 
    @test elem_type(R) == arb_poly

@@ -2,6 +2,12 @@ RR = AcbField(64)
 CC = AcbField(64)
 
 @testset "acb_poly.constructors" begin
+   S1 = PolyRing(CC)
+   S2 = PolyRing(CC)
+
+   @test isa(S1, AcbPolyRing)
+   @test S1 !== S2
+
    R, x = PolynomialRing(CC, "x")
 
    @test elem_type(R) == acb_poly
