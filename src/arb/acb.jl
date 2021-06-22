@@ -12,7 +12,8 @@ import Base: real, imag, abs, conj, angle, log, log1p, sin, cos,
 
 
 export one, onei, real, imag, conj, abs, inv, angle, isreal, polygamma, erf,
-       erfi, erfc, bessel_j, bessel_k, bessel_i, bessel_y
+       erfi, erfc, bessel_j, bessel_k, bessel_i, bessel_y, airy_ai, airy_bi,
+       airy_ai_prime, airy_bi_prime
 
 export rsqrt, log, log1p, exppii, sin, cos, tan, cot, sinpi, cospi, tanpi,
        cotpi, sincos, sincospi, sinh, cosh, tanh, coth, sinhcosh, atan,
@@ -1580,6 +1581,58 @@ function bessel_k(nu::acb, x::acb)
   ccall((:acb_hypgeom_bessel_k, libarb), Nothing,
               (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, nu, x, parent(x).prec)
   return z
+end
+
+@doc Markdown.doc"""
+    airy_ai(x::acb)
+
+Return the Airy function $\operatorname{Ai}$ evaluated at $x$.
+"""
+function airy_ai(x::acb)
+  ai = parent(x)()
+  ccall((:acb_hypgeom_airy, libarb), Nothing,
+              (Ref{acb}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{acb}, Int),
+              ai, C_NULL, C_NULL, C_NULL, x, parent(x).prec)
+  return ai
+end
+
+@doc Markdown.doc"""
+    airy_bi(x::acb)
+
+Return the Airy function $\operatorname{Bi}$ evaluated at $x$.
+"""
+function airy_bi(x::acb)
+  bi = parent(x)()
+  ccall((:acb_hypgeom_airy, libarb), Nothing,
+              (Ptr{Cvoid}, Ptr{Cvoid}, Ref{acb}, Ptr{Cvoid}, Ref{acb}, Int),
+              C_NULL, C_NULL, bi, C_NULL, x, parent(x).prec)
+  return bi
+end
+
+@doc Markdown.doc"""
+    airy_ai_prime(x::acb)
+
+Return the derivative of the Airy function $\operatorname{Ai}$ evaluated at $x$.
+"""
+function airy_ai_prime(x::acb)
+  ai_prime = parent(x)()
+  ccall((:acb_hypgeom_airy, libarb), Nothing,
+              (Ptr{Cvoid}, Ref{acb}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{acb}, Int),
+              C_NULL, ai_prime, C_NULL, C_NULL, x, parent(x).prec)
+  return ai_prime
+end
+
+@doc Markdown.doc"""
+    airy_bi_prime(x::acb)
+
+Return the derivative of the Airy function $\operatorname{Bi}$ evaluated at $x$.
+"""
+function airy_bi_prime(x::acb)
+  bi_prime = parent(x)()
+  ccall((:acb_hypgeom_airy, libarb), Nothing,
+              (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{acb}, Ref{acb}, Int),
+              C_NULL, C_NULL, C_NULL, bi_prime, x, parent(x).prec)
+  return bi_prime
 end
 
 @doc Markdown.doc"""

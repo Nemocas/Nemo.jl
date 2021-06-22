@@ -22,8 +22,8 @@ export ball, radius, midpoint, contains, contains_zero, contains_negative,
        gamma_lower_regularized, zeta, sincos, sincospi, sinhcosh, atan2, agm,
        factorial, binomial, fibonacci, bernoulli, rising_factorial,
        rising_factorial2, polylog, chebyshev_t, chebyshev_t2, chebyshev_u,
-       chebyshev_u2, bell, numpart, lindep, canonical_unit,
-       simplest_rational_inside
+       chebyshev_u2, bell, numpart, lindep, airy_ai, airy_bi, airy_ai_prime,
+       airy_bi_prime, canonical_unit, simplest_rational_inside
 
 ###############################################################################
 #
@@ -2001,6 +2001,64 @@ end
 Return the number of partitions $p(n)$ as an element of $r$.
 """
 numpart(n::Int, r::ArbField) = numpart(fmpz(n), r)
+
+################################################################################
+#
+#  Hypergeometric and related functions
+#
+################################################################################
+
+@doc Markdown.doc"""
+    airy_ai(x::arb)
+
+Return the Airy function $\operatorname{Ai}$ evaluated at $x$.
+"""
+function airy_ai(x::arb)
+  ai = parent(x)()
+  ccall((:arb_hypgeom_airy, libarb), Nothing,
+              (Ref{arb}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{arb}, Int),
+              ai, C_NULL, C_NULL, C_NULL, x, parent(x).prec)
+  return ai
+end
+
+@doc Markdown.doc"""
+    airy_bi(x::arb)
+
+Return the Airy function $\operatorname{Bi}$ evaluated at $x$.
+"""
+function airy_bi(x::arb)
+  bi = parent(x)()
+  ccall((:arb_hypgeom_airy, libarb), Nothing,
+              (Ptr{Cvoid}, Ptr{Cvoid}, Ref{arb}, Ptr{Cvoid}, Ref{arb}, Int),
+              C_NULL, C_NULL, bi, C_NULL, x, parent(x).prec)
+  return bi
+end
+
+@doc Markdown.doc"""
+    airy_ai_prime(x::arb)
+
+Return the derivative of the Airy function $\operatorname{Ai}$ evaluated at $x$.
+"""
+function airy_ai_prime(x::arb)
+  ai_prime = parent(x)()
+  ccall((:arb_hypgeom_airy, libarb), Nothing,
+              (Ptr{Cvoid}, Ref{arb}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{arb}, Int),
+              C_NULL, ai_prime, C_NULL, C_NULL, x, parent(x).prec)
+  return ai_prime
+end
+
+@doc Markdown.doc"""
+    airy_bi_prime(x::arb)
+
+Return the derivative of the Airy function $\operatorname{Bi}$ evaluated at $x$.
+"""
+function airy_bi_prime(x::arb)
+  bi_prime = parent(x)()
+  ccall((:arb_hypgeom_airy, libarb), Nothing,
+              (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{arb}, Ref{arb}, Int),
+              C_NULL, C_NULL, C_NULL, bi_prime, x, parent(x).prec)
+  return bi_prime
+end
 
 ################################################################################
 #
