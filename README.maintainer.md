@@ -8,7 +8,7 @@ entry (replace `/usr/local` with the location of your installation)
 FLINT = "/usr/local"
 ```
 
-The UUID is that of `FLINT_jll`.
+The UUID is that of `FLINT_jll`, which is available in Nemo's `Project.toml`.
 Note the case sensitivity of the artifact name: if the jll is called `XxX_jll`, the entry should be `XxX = `.
 This is all that is needed to override the flint location. If it has worked:
 
