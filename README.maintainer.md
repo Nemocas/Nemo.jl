@@ -8,6 +8,8 @@ entry (replace `/usr/local` with the location of your installation)
 FLINT = "/usr/local"
 ```
 
+The UUID is that of `FLINT_jll`.
+Note the case sensitivity of the artifact name: if the jll is called `XxX_jll`, the entry should be `XxX = `.
 This is all that is needed to override the flint location. If it has worked:
 
 ```
@@ -21,4 +23,15 @@ Troubleshooting guide:
 - If setting up the override for the first time, Nemo should be re-precompiled. This can be triggered by touching a source file.
 - Serveral of the other libraries depending on flint might want a specific so version. This can be tweaked by hacking the flint makefile.
 
-(Please add directions for the other libraries (antic, arb, calcium) as investigated)
+## arb
+
+This should set `Nemo.libarb`.
+
+```
+[d9960996-1013-53c9-9ba4-74a4155039c3]
+Arb = "/usr/local"
+```
+
+## antic
+
+## calcium
