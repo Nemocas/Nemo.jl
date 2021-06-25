@@ -125,6 +125,7 @@ Function                    | Return | Rounding
 `divrem(a::fmpz, b::fmpz)`  | q, r   | towards minus infinity 
 `tdivrem(a::fmpz, b::fmpz)` | q, r   | towards zero
 `fdivrem(a::fmpz, b::fmpz)` | q, r   | towards minus infinity 
+`ndivrem(a::fmpz, b::fmpz)` | q, r   | nearest integer, ties rounds toward zero
 
 N.B: the internal definition of `Nemo.div` and `Nemo.divrem` are the same as
 `fdiv` and `fdivrem`. The definitions in the table are of `Base.div` and

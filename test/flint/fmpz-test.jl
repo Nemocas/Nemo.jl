@@ -489,6 +489,10 @@ end
 
    @test tdivrem(fmpz(12), fmpz(5)) == (fmpz(2), fmpz(2))
 
+   @test ndivrem(fmpz(12), fmpz(5)) == (fmpz(2), fmpz(2))
+   @test ndivrem(fmpz(13), fmpz(5)) == (fmpz(3), fmpz(-2))
+   @test ndivrem(fmpz(6), fmpz(-4)) == (fmpz(-1), fmpz(2))
+
    @test divrem(fmpz(12), fmpz(5)) == (fmpz(2), fmpz(2))
 
    @test divrem(-fmpz(2), fmpz(3)) == (fmpz(0), -fmpz(2))

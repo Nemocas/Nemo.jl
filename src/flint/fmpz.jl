@@ -32,18 +32,18 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 # do not export div and divrem
-export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash,
-       bell, isprime, fdiv, cdiv, tdiv, rem, mod, gcd, lcm, invmod,
-       powermod, abs, isqrt, popcount, prevpow2, nextpow2, ndigits, dec,
-       bin, oct, hex, base, one, zero, divexact, fits, sign, nbits, deepcopy,
-       tdivpow2, fdivpow2, cdivpow2, flog, clog, cmpabs, clrbit!, setbit!,
-       combit!, crt, divisible, divisors, prime_divisors, divisor_lenstra,
-       fdivrem, tdivrem, fmodpow2, gcdinv, isprobable_prime, jacobi_symbol,
-       remove, root, size, isqrtrem, sqrtmod, trailing_zeros, divisor_sigma,
-       euler_phi, fibonacci, moebius_mu, primorial, rising_factorial,
-       number_of_partitions, canonical_unit, isunit, isequal, addeq!, mul!,
-       issquare, square_root, issquare_with_square_root,
-       iszero, rand, rand_bits, binomial, factorial, rand_bits_prime
+export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash, bell,
+       isprime, fdiv, cdiv, tdiv, rem, mod, gcd, lcm, invmod, powermod, abs,
+       isqrt, popcount, prevpow2, nextpow2, ndigits, dec, bin, oct, hex, base,
+       one, zero, divexact, fits, sign, nbits, deepcopy, tdivpow2, fdivpow2,
+       cdivpow2, flog, clog, cmpabs, clrbit!, setbit!, combit!, crt, divisible,
+       divisors, prime_divisors, divisor_lenstra, fdivrem, tdivrem, ndivrem,
+       fmodpow2, gcdinv, isprobable_prime, jacobi_symbol, remove, root, size,
+       isqrtrem, sqrtmod, trailing_zeros, divisor_sigma, euler_phi, fibonacci,
+       moebius_mu, primorial, rising_factorial, number_of_partitions,
+       canonical_unit, isunit, isequal, addeq!, mul!, issquare, square_root,
+       issquare_with_square_root, iszero, rand, rand_bits, binomial, factorial,
+       rand_bits_prime
 
 ###############################################################################
 #
@@ -582,6 +582,15 @@ function fdivrem(x::fmpz, y::fmpz)
     z1 = fmpz()
     z2 = fmpz()
     ccall((:fmpz_fdiv_qr, libflint), Nothing,
+          (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z1, z2, x, y)
+    z1, z2
+end
+
+function ndivrem(x::fmpz, y::fmpz)
+    iszero(y) && throw(DivideError())
+    z1 = fmpz()
+    z2 = fmpz()
+    ccall((:fmpz_ndiv_qr, libflint), Nothing,
           (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z1, z2, x, y)
     z1, z2
 end
