@@ -303,7 +303,7 @@ end
 
    @test log(a) == 1*7^1 + 5*7^2 + O(R, 7^3)
 
-   @test_throws DomainError log(c)
+   @test_throws ErrorException log(c)
 
    @test exp(R(0)) == 1
 

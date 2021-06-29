@@ -622,13 +622,12 @@ end
 @doc Markdown.doc"""
     log(a::padic)
 
-Return the $p$-adic logarithm of $a$. We define this only when the valuation
-of $a$ is zero (but not for $a == 0$). The precision of the output will be
-the same as the precision of the input. If the input is not valid an
+Return the $p$-adic logarithm of $a$. We define this only when `ord_p(a)` is
+at least 2 when `p = 2` or art least 1 otherwise. The precision of the output
+will be the same as the precision of the input. If the input is not valid an
 exception is thrown.
 """
 function log(a::padic)
-   (a.v > 0 || a.v < 0 || iszero(a)) && throw(DomainError(a, "Valuation must be zero"))
    ctx = parent(a)
    z = padic(a.N)
    z.parent = ctx
