@@ -663,6 +663,22 @@ gamma_lower_regularized(::acb, ::acb)
 ```
 
 ```@docs
+airy_ai(::acb)
+```
+
+```@docs
+airy_ai_prime(::acb)
+```
+
+```@docs
+airy_bi(::acb)
+```
+
+```@docs
+airy_bi_prime(::acb)
+```
+
+```@docs
 bessel_j(::acb, ::acb)
 ```
 

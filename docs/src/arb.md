@@ -705,6 +705,22 @@ numpart(::fmpz, ::ArbField)
 numpart(::Int, ::ArbField)
 ```
 
+```@docs
+airy_ai(::arb)
+```
+
+```@docs
+airy_ai_prime(::arb)
+```
+
+```@docs
+airy_bi(::arb)
+```
+
+```@docs
+airy_bi_prime(::arb)
+```
+
 **Examples**
 
 ```julia

@@ -447,6 +447,12 @@ end
    @test numpart(ZZ(-10), RR) == 0
    @test numpart(-10, RR) == 0
    @test overlaps(numpart(ZZ(10)^20, RR), RR("1.8381765083448826436e+11140086259 +/- 4.69e+11140086239"))
+
+   x = RR(1)
+   @test overlaps(airy_ai(x),       RR("[0.1352924163128814155 +/- 2.42e-20]"))
+   @test overlaps(airy_ai_prime(x), RR("[-0.1591474412967932128 +/- 2.88e-20]"))
+   @test overlaps(airy_bi(x),       RR("[1.207423594952871259 +/- 5.27e-19]"))
+   @test overlaps(airy_bi_prime(x), RR("[0.9324359333927756329 +/- 7.75e-20]"))
 end
 
 @testset "fmpq.arb_special_functions" begin

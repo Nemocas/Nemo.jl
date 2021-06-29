@@ -358,6 +358,15 @@ end
    @test overlaps(gamma_lower(a,z), gamma(a) - gamma(a,z))
    @test overlaps(gamma_lower_regularized(a,z), gamma_lower(a,z) / gamma(a))
 
+   @test overlaps(airy_ai(z),       CC("[0.3008026290149675024 +/- 8.54e-20]",
+                                       "[-0.0768563196244970504 +/- 6.98e-20]"))
+   @test overlaps(airy_ai_prime(z), CC("[-0.2637194140647885059 +/- 8.11e-20]",
+                                       "[0.0204576180267513109 +/- 4.42e-20]"))
+   @test overlaps(airy_bi(z),       CC("[0.699432839434338965 +/- 1.26e-19]",
+                                       "[0.1349581783797491604 +/- 7.70e-20]"))
+   @test overlaps(airy_bi_prime(z), CC("[0.4260791047001445693 +/- 5.46e-20]",
+                                       "[0.0381130644790292983 +/- 6.48e-20]"))
+
    @test overlaps(bessel_j(a,z), CC("0.46117305056699182297843 +/- 5.61e-24",
                               "-0.172953644007776862353437 +/- 6.92e-25"))
    @test overlaps(bessel_y(a,z), CC("-1.18656154996325105251999 +/- 4.72e-24",
