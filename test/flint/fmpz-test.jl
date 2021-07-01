@@ -722,6 +722,21 @@ end
    @test all([k in divsr for k in d])
    @test all([k in pdivsr for k in p])
 
+   @test next_prime(ZZ(-9)) == 2
+   @test next_prime(ZZ(2)^30 - 1) == next_prime(ZZ(2)^30) == 1073741827
+   @test next_prime(ZZ(2)^31 - 1) == next_prime(ZZ(2)^31) == 2147483659
+   @test next_prime(ZZ(2)^32 - 1) == next_prime(ZZ(2)^32) == 4294967311
+   @test next_prime(ZZ(2)^62 - 1) == next_prime(ZZ(2)^62) == 4611686018427388039
+   @test next_prime(ZZ(2)^63 - 1) == next_prime(ZZ(2)^63) == 9223372036854775837
+   @test next_prime(ZZ(2)^64 - 1) == next_prime(ZZ(2)^64) == 18446744073709551629
+
+   @test next_prime(-9) == 2
+   @test next_prime(2) == 3
+   @test_throws Exception next_prime(typemax(Int))
+
+   @test next_prime(UInt(10)) == 11
+   @test_throws Exception next_prime(typemax(UInt))
+
    @test issquare(fmpz(36))
 
    @test factorial(ZZ(100)) == fmpz("93326215443944152681699238856266700490715968264381621468592963895217599993229915608941463976156518286253697920827223758251185210916864000000000000000000000000")
