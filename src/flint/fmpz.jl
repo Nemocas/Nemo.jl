@@ -1360,12 +1360,12 @@ isprobable_prime(x::fmpz) = Bool(ccall((:fmpz_is_probabprime, libflint), Cint,
                                       (Ref{fmpz},), x))
 
 @doc Markdown.doc"""
-    next_prime(x::fmpz; proved = true)
+    next_prime(x::fmpz, proved = true)
 
 Return the smallest prime strictly greater than $x$.
-If `proved = false` is specified, the return is only probably prime.
+If a second argument of `false` is specified, the return is only probably prime.
 """
-function next_prime(x::fmpz; proved::Bool = true)
+function next_prime(x::fmpz, proved::Bool = true)
    z = fmpz()
    ccall((:fmpz_nextprime, libflint), Nothing,
          (Ref{fmpz}, Ref{fmpz}, Cint),
@@ -1373,14 +1373,14 @@ function next_prime(x::fmpz; proved::Bool = true)
    return z
 end
 
-function next_prime(x::UInt)
+function next_prime(x::UInt, proved::Bool = true)
    return ccall((:n_nextprime, libflint), UInt,
                 (UInt, Cint),
-                x, 1)
+                x, proved)
 end
 
-function next_prime(x::Int)
-   return x < 2 ? 2 : Int(next_prime(x % UInt))
+function next_prime(x::Int, proved::Bool = true)
+   return x < 2 ? 2 : Int(next_prime(x % UInt, proved))
 end
 
 @doc Markdown.doc"""

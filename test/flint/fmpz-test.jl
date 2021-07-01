@@ -729,12 +729,15 @@ end
    @test next_prime(ZZ(2)^62 - 1) == next_prime(ZZ(2)^62) == 4611686018427388039
    @test next_prime(ZZ(2)^63 - 1) == next_prime(ZZ(2)^63) == 9223372036854775837
    @test next_prime(ZZ(2)^64 - 1) == next_prime(ZZ(2)^64) == 18446744073709551629
+   @test next_prime(ZZ(10)^50, false) == ZZ(10)^50 + 151
 
    @test next_prime(-9) == 2
    @test next_prime(2) == 3
+   @test next_prime(3, false) == 5
    @test_throws Exception next_prime(typemax(Int))
 
    @test next_prime(UInt(10)) == 11
+   @test next_prime(UInt(11), false) == 13
    @test_throws Exception next_prime(typemax(UInt))
 
    @test issquare(fmpz(36))
