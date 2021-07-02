@@ -1586,7 +1586,7 @@ end
 @doc Markdown.doc"""
     airy_ai(x::acb)
 
-Return the Airy function $\operatorname{Ai}$ evaluated at $x$.
+Return the Airy function $\operatorname{Ai}(x)$.
 """
 function airy_ai(x::acb)
   ai = parent(x)()
@@ -1599,7 +1599,7 @@ end
 @doc Markdown.doc"""
     airy_bi(x::acb)
 
-Return the Airy function $\operatorname{Bi}$ evaluated at $x$.
+Return the Airy function $\operatorname{Bi}(x)$.
 """
 function airy_bi(x::acb)
   bi = parent(x)()
@@ -1612,7 +1612,7 @@ end
 @doc Markdown.doc"""
     airy_ai_prime(x::acb)
 
-Return the derivative of the Airy function $\operatorname{Ai}$ evaluated at $x$.
+Return the derivative of the Airy function $\operatorname{Ai}^\prime(x)$.
 """
 function airy_ai_prime(x::acb)
   ai_prime = parent(x)()
@@ -1625,7 +1625,7 @@ end
 @doc Markdown.doc"""
     airy_bi_prime(x::acb)
 
-Return the derivative of the Airy function $\operatorname{Bi}$ evaluated at $x$.
+Return the derivative of the Airy function $\operatorname{Bi}^\prime(x)$.
 """
 function airy_bi_prime(x::acb)
   bi_prime = parent(x)()
@@ -1638,7 +1638,7 @@ end
 @doc Markdown.doc"""
     hypergeometric_1f1(a::acb, b::acb, x::acb)
 
-Return the confluent hypergeometric function ${}_1F1(a,b,x)$.
+Return the confluent hypergeometric function ${}_1F_1(a,b,x)$.
 """
 function hypergeometric_1f1(a::acb, b::acb, x::acb)
   z = parent(x)()
@@ -1651,7 +1651,7 @@ end
     hypergeometric_1f1_regularized(a::acb, b::acb, x::acb)
 
 Return the regularized confluent hypergeometric function
-${}_1F1(a,b,x) / \Gamma(b)$.
+${}_1F_1(a,b,x) / \Gamma(b)$.
 """
 function hypergeometric_1f1_regularized(a::acb, b::acb, x::acb)
   z = parent(x)()
