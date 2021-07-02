@@ -1653,14 +1653,14 @@ function sinhcosh(x::arb)
 end
 
 @doc Markdown.doc"""
-    atan2(x::arb, y::arb)
+    atan2(y::arb, x::arb)
 
-Return atan2$(b,a) = \arg(a+bi)$.
+Return $\operatorname{atan2}(y,x) = \arg(x+yi)$.
 """
-function atan2(x::arb, y::arb)
-  z = parent(x)()
+function atan2(y::arb, x::arb)
+  z = parent(y)()
   ccall((:arb_atan2, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, y, x, parent(y).prec)
   return z
 end
 
@@ -2011,7 +2011,7 @@ numpart(n::Int, r::ArbField) = numpart(fmpz(n), r)
 @doc Markdown.doc"""
     airy_ai(x::arb)
 
-Return the Airy function $\operatorname{Ai}$ evaluated at $x$.
+Return the Airy function $\operatorname{Ai}(x)$.
 """
 function airy_ai(x::arb)
   ai = parent(x)()
@@ -2024,7 +2024,7 @@ end
 @doc Markdown.doc"""
     airy_bi(x::arb)
 
-Return the Airy function $\operatorname{Bi}$ evaluated at $x$.
+Return the Airy function $\operatorname{Bi}(x)$.
 """
 function airy_bi(x::arb)
   bi = parent(x)()
@@ -2037,7 +2037,7 @@ end
 @doc Markdown.doc"""
     airy_ai_prime(x::arb)
 
-Return the derivative of the Airy function $\operatorname{Ai}$ evaluated at $x$.
+Return the derivative of the Airy function $\operatorname{Ai}^\prime(x)$.
 """
 function airy_ai_prime(x::arb)
   ai_prime = parent(x)()
@@ -2050,7 +2050,7 @@ end
 @doc Markdown.doc"""
     airy_bi_prime(x::arb)
 
-Return the derivative of the Airy function $\operatorname{Bi}$ evaluated at $x$.
+Return the derivative of the Airy function $\operatorname{Bi}^\prime(x)$.
 """
 function airy_bi_prime(x::arb)
   bi_prime = parent(x)()
