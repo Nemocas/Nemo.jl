@@ -388,8 +388,8 @@ function isequal(x::fmpz_abs_series, y::fmpz_abs_series)
       return false
    end
    return Bool(ccall((:fmpz_poly_equal, libflint), Cint,
-                (Ref{fmpz_abs_series}, Ref{fmpz_abs_series}, Int),
-               x, y, length(x)))
+                (Ref{fmpz_abs_series}, Ref{fmpz_abs_series}),
+               x, y))
 end
 
 ###############################################################################
@@ -591,6 +591,12 @@ function add!(c::fmpz_abs_series, a::fmpz_abs_series, b::fmpz_abs_series)
                 (Ref{fmpz_abs_series}, Ref{fmpz_abs_series}, Ref{fmpz_abs_series}, Int),
                c, a, b, lenc)
    return c
+end
+
+function set_length!(a::fmpz_abs_series, n::Int)
+   ccall((:_fmpz_poly_set_length, libflint), Nothing,
+         (Ref{fmpz_abs_series}, Int), a, n)
+   return a
 end
 
 ###############################################################################

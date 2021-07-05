@@ -481,8 +481,7 @@ function isequal(x::($etype), y::($etype))
       return false
    end
    return Bool(ccall(($(flint_fn*"_equal"), libflint), Cint,
-                (Ref{($etype)}, Ref{($etype)}, Int),
-               x, y, pol_length(x)))
+                (Ref{($etype)}, Ref{($etype)}), x, y))
 end
 
 ###############################################################################
@@ -844,6 +843,12 @@ function add!(c::($etype), a::($etype), b::($etype))
    c.val = val
    renormalize!(c)
    return c
+end
+
+function set_length!(a::($etype), n::Int)
+   ccall(($("_"*flint_fn*"_set_length"), libflint), Nothing,
+         (Ref{$(etype)}, Int), a, n::Int)
+   return a
 end
 
 ###############################################################################

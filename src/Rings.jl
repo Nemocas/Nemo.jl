@@ -34,15 +34,11 @@ include("flint/fmpz_rel_series.jl")
 
 include("flint/fmpz_abs_series.jl")
 
-include("flint/fq_abs_series.jl")
-
 include("flint/fmpz_laurent_series.jl")
 
 include("flint/flint_puiseux_series.jl")
 
 include("flint/fmpz_puiseux_series.jl")
-
-include("flint/nmod_rel_series.jl")
 
 include("flint/fmpz_mod_rel_series.jl")
 
@@ -64,6 +60,8 @@ include("flint/fq_mat.jl")
 
 include("flint/fq_nmod_mat.jl")
 
+include("flint/fq_default_mat.jl")
+
 include("Fields.jl")
 
 include("flint/fmpq_poly.jl")
@@ -82,9 +80,19 @@ include("flint/fmpq_abs_series.jl")
 
 include("flint/fq_rel_series.jl")
 
+include("flint/fq_abs_series.jl")
+
+include("flint/nmod_rel_series.jl")
+
+include("flint/fq_default_rel_series.jl")
+
+include("flint/fq_default_abs_series.jl")
+
 include("flint/fq_poly.jl")
 
 include("flint/fq_nmod_poly.jl")
+
+include("flint/fq_default_poly.jl")
 
 include("arb/arb_poly.jl")
 

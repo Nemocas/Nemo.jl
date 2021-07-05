@@ -422,9 +422,8 @@ function isequal(x::($etype), y::($etype))
       return false
    end
    return Bool(ccall(($(flint_fn*"_equal"), libflint), Cint,
-                     (Ref{($etype)}, Ref{($etype)}, Int,
-                      Ref{($ctype)}),
-                     x, y, length(x), x.parent.base_ring.ninv))
+                     (Ref{($etype)}, Ref{($etype)}, Ref{($ctype)}),
+                     x, y, x.parent.base_ring.ninv))
 end
 
 ###############################################################################
@@ -644,6 +643,13 @@ function add!(c::($etype), a::($etype), b::($etype))
           Ref{($etype)}, Int, Ref{($ctype)}),
          c, a, b, lenc, a.parent.base_ring.ninv)
    return c
+end
+
+function set_length!(a::($etype), n::Int)
+   ccall(($("_"*flint_fn*"_set_length"), libflint), Nothing,
+         (Ref{($etype)}, Int, Ref{$(ctype)}),
+         a, n, a.parent.base_ring.ninv)
+   return a
 end
 
 ###############################################################################

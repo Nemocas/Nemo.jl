@@ -451,8 +451,8 @@ function isequal(x::fmpz_rel_series, y::fmpz_rel_series)
       return false
    end
    return Bool(ccall((:fmpz_poly_equal, libflint), Cint,
-                (Ref{fmpz_rel_series}, Ref{fmpz_rel_series}, Int),
-               x, y, pol_length(x)))
+                (Ref{fmpz_rel_series}, Ref{fmpz_rel_series}),
+               x, y))
 end
 
 ###############################################################################
@@ -719,6 +719,12 @@ function add!(c::fmpz_rel_series, a::fmpz_rel_series, b::fmpz_rel_series)
    c.val = val
    renormalize!(c)
    return c
+end
+
+function set_length!(a::fmpz_rel_series, n::Int)
+   ccall((:_fmpz_poly_set_length, libflint), Nothing,
+         (Ref{fmpz_rel_series}, Int), a, n)
+   return a
 end
 
 ###############################################################################

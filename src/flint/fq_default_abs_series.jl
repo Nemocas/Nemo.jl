@@ -1,19 +1,10 @@
 ###############################################################################
 #
-#   fq_abs_series.jl: Absolute series over finite fields
-#
-#   fq_abs_series, fq_nmod_abs_series
+#   fq_default_abs_series.jl : Power series over flint fmpz integers
 #
 ###############################################################################
 
-export fq_abs_series, FqAbsSeriesRing,
-       fq_nmod_abs_series, FqNmodAbsSeriesRing,
-       PowerSeriesRing
-
-for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
-   (fq_abs_series, FqAbsSeriesRing, FqFiniteField, fq, "fq_poly", "fq"),
-   (fq_nmod_abs_series, FqNmodAbsSeriesRing, FqNmodFiniteField, fq_nmod, "fq_nmod_poly", "fq_nmod"))
-@eval begin
+export fq_default_abs_series, FqDefaultAbsSeriesRing
 
 ###############################################################################
 #
@@ -21,26 +12,26 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
 #
 ###############################################################################
 
-function O(a::($etype))
+function O(a::fq_default_abs_series)
    if iszero(a)
       return deepcopy(a)    # 0 + O(x^n)
    end
    prec = length(a) - 1
    prec < 0 && throw(DomainError(prec, "Valuation must be non-negative"))
-   z = ($etype)(base_ring(a), Vector{$(btype)}(undef, 0), 0, prec)
+   z = fq_default_abs_series(base_ring(a), Vector{fq_default}(undef, 0), 0, prec)
    z.parent = parent(a)
    return z
 end
 
-elem_type(::Type{($rtype)}) = ($etype)
+elem_type(::Type{FqDefaultAbsSeriesRing}) = fq_default_abs_series
 
-parent_type(::Type{($etype)}) = ($rtype)
+parent_type(::Type{fq_default_abs_series}) = FqDefaultAbsSeriesRing
 
-base_ring(R::($rtype)) = R.base_ring
+base_ring(R::FqDefaultAbsSeriesRing) = R.base_ring
 
-abs_series_type(::Type{($btype)}) = ($etype)
+abs_series_type(::Type{fq_default}) = fq_default_abs_series
 
-var(a::($rtype)) = a.S
+var(a::FqDefaultAbsSeriesRing) = a.S
 
 ###############################################################################
 #
@@ -48,21 +39,21 @@ var(a::($rtype)) = a.S
 #
 ###############################################################################
 
-max_precision(R::($rtype)) = R.prec_max
+max_precision(R::FqDefaultAbsSeriesRing) = R.prec_max
 
-function normalise(a::($etype), len::Int)
+function normalise(a::fq_default_abs_series, len::Int)
    ctx = base_ring(a)
    if len > 0
       c = base_ring(a)()
-      ccall(($(flint_fn*"_get_coeff"), libflint), Nothing,
-         (Ref{($btype)}, Ref{($etype)}, Int, Ref{($ctype)}),
+      ccall((:fq_default_poly_get_coeff, libflint), Nothing,
+         (Ref{fq_default}, Ref{fq_default_abs_series}, Int, Ref{FqDefaultFiniteField}),
           c, a, len - 1, ctx)
    end
    while len > 0 && iszero(c)
       len -= 1
       if len > 0
-         ccall(($(flint_fn*"_get_coeff"), libflint), Nothing,
-            (Ref{($btype)}, Ref{($etype)}, Int, Ref{($ctype)}),
+         ccall((:fq_default_poly_get_coeff, libflint), Nothing,
+            (Ref{fq_default}, Ref{fq_default_abs_series}, Int, Ref{FqDefaultFiniteField}),
              c, a, len - 1, ctx)
       end
    end
@@ -70,58 +61,58 @@ function normalise(a::($etype), len::Int)
    return len
 end
 
-function length(x::($etype))
-   return ccall(($(flint_fn*"_length"), libflint), Int,
-                (Ref{($etype)}, Ref{($ctype)}), x, base_ring(x))
+function length(x::fq_default_abs_series)
+   return ccall((:fq_default_poly_length, libflint), Int,
+                (Ref{fq_default_abs_series}, Ref{FqDefaultFiniteField}), x, base_ring(x))
 end
 
-precision(x::($etype)) = x.prec
+precision(x::fq_default_abs_series) = x.prec
 
-function coeff(x::($etype), n::Int)
+function coeff(x::fq_default_abs_series, n::Int)
    if n < 0
       return base_ring(x)()
    end
    z = base_ring(x)()
-   ccall(($(flint_fn*"_get_coeff"), libflint), Nothing,
-         (Ref{($btype)}, Ref{($etype)}, Int, Ref{($ctype)}),
+   ccall((:fq_default_poly_get_coeff, libflint), Nothing,
+         (Ref{fq_default}, Ref{fq_default_abs_series}, Int, Ref{FqDefaultFiniteField}),
           z, x, n, base_ring(x))
    return z
 end
 
-zero(R::($rtype)) = R(0)
+zero(R::FqDefaultAbsSeriesRing) = R(0)
 
-one(R::($rtype)) = R(1)
+one(R::FqDefaultAbsSeriesRing) = R(1)
 
-function gen(R::($rtype))
+function gen(R::FqDefaultAbsSeriesRing)
    S = base_ring(R)
-   z = ($etype)(S, [S(0), S(1)], 2, max_precision(R))
+   z = fq_default_abs_series(S, [S(0), S(1)], 2, max_precision(R))
    z.parent = R
    return z
 end
 
-function deepcopy_internal(a::($etype), dict::IdDict)
-   z = ($etype)(base_ring(a), a)
+function deepcopy_internal(a::fq_default_abs_series, dict::IdDict)
+   z = fq_default_abs_series(base_ring(a), a)
    z.prec = a.prec
    z.parent = parent(a)
    return z
 end
 
-function isgen(a::($etype))
-   return precision(a) == 0 || ccall(($(flint_fn*"_is_gen"), libflint), Bool,
-                   (Ref{($etype)}, Ref{($ctype)}), a, base_ring(a))
+function isgen(a::fq_default_abs_series)
+   return precision(a) == 0 || ccall((:fq_default_poly_is_gen, libflint), Bool,
+                   (Ref{fq_default_abs_series}, Ref{FqDefaultFiniteField}), a, base_ring(a))
 end
 
-iszero(a::($etype)) = length(a) == 0
+iszero(a::fq_default_abs_series) = length(a) == 0
 
-isunit(a::($etype)) = valuation(a) == 0 && isunit(coeff(a, 0))
+isunit(a::fq_default_abs_series) = valuation(a) == 0 && isunit(coeff(a, 0))
 
-function isone(a::($etype))
-   return precision(a) == 0 || ccall(($(flint_fn*"_is_one"), libflint), Bool,
-                   (Ref{($etype)}, Ref{($ctype)}), a, base_ring(a))
+function isone(a::fq_default_abs_series)
+   return precision(a) == 0 || ccall((:fq_default_poly_is_one, libflint), Bool,
+                   (Ref{fq_default_abs_series}, Ref{FqDefaultFiniteField}), a, base_ring(a))
 end
 
-# todo: write an fq_poly_valuation
-function valuation(a::($etype))
+# todo: write an fq_default_poly_valuation
+function valuation(a::fq_default_abs_series)
    for i = 1:length(a)
       if !iszero(coeff(a, i - 1))
          return i - 1
@@ -130,7 +121,7 @@ function valuation(a::($etype))
    return precision(a)
 end
 
-characteristic(R::($rtype)) = characteristic(base_ring(R))
+characteristic(R::FqDefaultAbsSeriesRing) = characteristic(base_ring(R))
 
 ###############################################################################
 #
@@ -138,11 +129,10 @@ characteristic(R::($rtype)) = characteristic(base_ring(R))
 #
 ###############################################################################
 
-function similar(f::AbsSeriesElem, R::($ctype), max_prec::Int,
+function similar(f::AbsSeriesElem, R::FqDefaultFiniteField, max_prec::Int,
                                  var::Symbol=var(parent(f)); cached::Bool=true)
-   par = ($rtype)(R, max_prec, var, cached)
-   z = ($etype)(R)
-   z.parent = par
+   z = fq_default_abs_series(R)
+   z.parent = FqDefaultAbsSeriesRing(R, max_prec, var, cached)
    z.prec = max_prec
    return z
 end
@@ -153,15 +143,14 @@ end
 #
 ###############################################################################
 
-function abs_series(R::($ctype), arr::Vector{T},
+function abs_series(R::FqDefaultFiniteField, arr::Vector{T},
                            len::Int, prec::Int, var::String="x";
                             max_precision::Int=prec, cached::Bool=true) where T
    prec < len && error("Precision too small for given data")
-   coeffs = T == ($btype) ? arr : map(R, arr)
-   coeffs = length(coeffs) == 0 ? ($btype)[] : coeffs
-   par = ($rtype)(R, max_precision, Symbol(var), cached)
-   z = ($etype)(R, coeffs, len, prec)
-   z.parent = par
+   coeffs = T == fq_default ? arr : map(R, arr)
+   coeffs = length(coeffs) == 0 ? fq_default[] : coeffs
+   z = fq_default_abs_series(R, coeffs, len, prec)
+   z.parent = FqDefaultAbsSeriesRing(R, max_precision, Symbol(var), cached)
    return z
 end
 
@@ -171,7 +160,7 @@ end
 #
 ###############################################################################
 
-function show(io::IO, a::($rtype))
+function show(io::IO, a::FqDefaultAbsSeriesRing)
    print(io, "Univariate power series ring in ", var(a), " over ")
    show(io, base_ring(a))
 end
@@ -182,10 +171,10 @@ end
 #
 ###############################################################################
 
-function -(x::($etype))
+function -(x::fq_default_abs_series)
    z = parent(x)()
-   ccall(($(flint_fn*"_neg"), libflint), Nothing,
-                (Ref{($etype)}, Ref{($etype)}, Ref{($ctype)}),
+   ccall((:fq_default_poly_neg, libflint), Nothing,
+                (Ref{fq_default_abs_series}, Ref{fq_default_abs_series}, Ref{FqDefaultFiniteField}),
                z, x, base_ring(x))
    z.prec = x.prec
    return z
@@ -197,7 +186,7 @@ end
 #
 ###############################################################################
 
-function +(a::($etype), b::($etype))
+function +(a::fq_default_abs_series, b::fq_default_abs_series)
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -207,14 +196,14 @@ function +(a::($etype), b::($etype))
    lenz = max(lena, lenb)
    z = parent(a)()
    z.prec = prec
-   ccall(($(flint_fn*"_add_series"), libflint), Nothing,
-         (Ref{($etype)}, Ref{($etype)},
-          Ref{($etype)}, Int, Ref{($ctype)}),
+   ccall((:fq_default_poly_add_series, libflint), Nothing,
+         (Ref{fq_default_abs_series}, Ref{fq_default_abs_series},
+          Ref{fq_default_abs_series}, Int, Ref{FqDefaultFiniteField}),
                z, a, b, lenz, base_ring(a))
    return z
 end
 
-function -(a::($etype), b::($etype))
+function -(a::fq_default_abs_series, b::fq_default_abs_series)
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -224,14 +213,14 @@ function -(a::($etype), b::($etype))
    lenz = max(lena, lenb)
    z = parent(a)()
    z.prec = prec
-   ccall(($(flint_fn*"_sub_series"), libflint), Nothing,
-         (Ref{($etype)}, Ref{($etype)},
-          Ref{($etype)}, Int, Ref{($ctype)}),
+   ccall((:fq_default_poly_sub_series, libflint), Nothing,
+         (Ref{fq_default_abs_series}, Ref{fq_default_abs_series},
+          Ref{fq_default_abs_series}, Int, Ref{FqDefaultFiniteField}),
                z, a, b, lenz, base_ring(a))
    return z
 end
 
-function *(a::($etype), b::($etype))
+function *(a::fq_default_abs_series, b::fq_default_abs_series)
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -247,9 +236,9 @@ function *(a::($etype), b::($etype))
       return z
    end
    lenz = min(lena + lenb - 1, prec)
-   ccall(($(flint_fn*"_mullow"), libflint), Nothing,
-         (Ref{($etype)}, Ref{($etype)},
-          Ref{($etype)}, Int, Ref{($ctype)}),
+   ccall((:fq_default_poly_mullow, libflint), Nothing,
+         (Ref{fq_default_abs_series}, Ref{fq_default_abs_series},
+          Ref{fq_default_abs_series}, Int, Ref{FqDefaultFiniteField}),
                z, a, b, lenz, base_ring(a))
    return z
 end
@@ -260,16 +249,16 @@ end
 #
 ###############################################################################
 
-function *(x::($btype), y::($etype))
+function *(x::fq_default, y::fq_default_abs_series)
    z = parent(y)()
    z.prec = y.prec
-   ccall(($(flint_fn*"_scalar_mul_"*flint_tail), libflint), Nothing,
-         (Ref{($etype)}, Ref{($etype)}, Ref{($btype)}, Ref{($ctype)}),
+   ccall((:fq_default_poly_scalar_mul_fq_default, libflint), Nothing,
+         (Ref{fq_default_abs_series}, Ref{fq_default_abs_series}, Ref{fq_default}, Ref{FqDefaultFiniteField}),
                z, y, x, base_ring(y))
    return z
 end
 
-*(x::($etype), y::($btype)) = y * x
+*(x::fq_default_abs_series, y::fq_default) = y * x
 
 ###############################################################################
 #
@@ -277,23 +266,23 @@ end
 #
 ###############################################################################
 
-function shift_left(x::($etype), len::Int)
+function shift_left(x::fq_default_abs_series, len::Int)
    len < 0 && throw(DomainError(len, "Shift must be non-negative"))
    xlen = length(x)
    z = parent(x)()
    z.prec = x.prec + len
    z.prec = min(z.prec, max_precision(parent(x)))
    zlen = min(z.prec, xlen + len)
-   ccall(($(flint_fn*"_shift_left"), libflint), Nothing,
-         (Ref{($etype)}, Ref{($etype)}, Int, Ref{($ctype)}),
+   ccall((:fq_default_poly_shift_left, libflint), Nothing,
+         (Ref{fq_default_abs_series}, Ref{fq_default_abs_series}, Int, Ref{FqDefaultFiniteField}),
                z, x, len, base_ring(x))
-   ccall(($(flint_fn*"_set_trunc"), libflint), Nothing,
-                (Ref{($etype)}, Ref{($etype)}, Int, Ref{($ctype)}),
+   ccall((:fq_default_poly_set_trunc, libflint), Nothing,
+                (Ref{fq_default_abs_series}, Ref{fq_default_abs_series}, Int, Ref{FqDefaultFiniteField}),
                z, z, zlen, base_ring(x))
    return z
 end
 
-function shift_right(x::($etype), len::Int)
+function shift_right(x::fq_default_abs_series, len::Int)
    len < 0 && throw(DomainError(len, "Shift must be non-negative"))
    xlen = length(x)
    z = parent(x)()
@@ -301,8 +290,8 @@ function shift_right(x::($etype), len::Int)
       z.prec = max(0, x.prec - len)
    else
       z.prec = x.prec - len
-      ccall(($(flint_fn*"_shift_right"), libflint), Nothing,
-            (Ref{($etype)}, Ref{($etype)}, Int, Ref{($ctype)}),
+      ccall((:fq_default_poly_shift_right, libflint), Nothing,
+            (Ref{fq_default_abs_series}, Ref{fq_default_abs_series}, Int, Ref{FqDefaultFiniteField}),
                z, x, len, base_ring(x))
    end
    return z
@@ -314,15 +303,15 @@ end
 #
 ###############################################################################
 
-function truncate(x::($etype), prec::Int)
+function truncate(x::fq_default_abs_series, prec::Int)
    prec < 0 && throw(DomainError(prec, "Index must be non-negative"))
    if x.prec <= prec
       return x
    end
    z = parent(x)()
    z.prec = prec
-   ccall(($(flint_fn*"_set_trunc"), libflint), Nothing,
-         (Ref{($etype)}, Ref{($etype)}, Int, Ref{($ctype)}),
+   ccall((:fq_default_poly_set_trunc, libflint), Nothing,
+         (Ref{fq_default_abs_series}, Ref{fq_default_abs_series}, Int, Ref{FqDefaultFiniteField}),
                z, x, prec, base_ring(x))
    return z
 end
@@ -333,7 +322,7 @@ end
 #
 ###############################################################################
 
-function ^(a::($etype), b::Int)
+function ^(a::fq_default_abs_series, b::Int)
    b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
    if precision(a) > 0 && isgen(a) && b > 0
       return shift_left(a, b - 1)
@@ -366,26 +355,27 @@ end
 #
 ###############################################################################
 
-function ==(x::($etype), y::($etype))
+function ==(x::fq_default_abs_series, y::fq_default_abs_series)
    check_parent(x, y)
    prec = min(x.prec, y.prec)
    n = max(length(x), length(y))
    n = min(n, prec)
-   return Bool(ccall(($(flint_fn*"_equal_trunc"), libflint), Cint,
-             (Ref{($etype)}, Ref{($etype)}, Int, Ref{($ctype)}),
+   return Bool(ccall((:fq_default_poly_equal_trunc, libflint), Cint,
+             (Ref{fq_default_abs_series}, Ref{fq_default_abs_series}, Int, Ref{FqDefaultFiniteField}),
                x, y, n, base_ring(x)))
 end
 
-function isequal(x::($etype), y::($etype))
+function isequal(x::fq_default_abs_series, y::fq_default_abs_series)
    if parent(x) != parent(y)
       return false
    end
    if x.prec != y.prec || length(x) != length(y)
       return false
    end
-   return Bool(ccall(($(flint_fn*"_equal"), libflint), Cint,
-             (Ref{($etype)}, Ref{($etype)}, Ref{($ctype)}),
-               x, y, base_ring(x)))
+   return Bool(ccall((:fq_default_poly_equal, libflint), Cint,
+             (Ref{fq_default_abs_series}, Ref{fq_default_abs_series},
+              Ref{FqDefaultFiniteField}),
+              x, y, base_ring(x)))
 end
 
 ###############################################################################
@@ -394,13 +384,13 @@ end
 #
 ###############################################################################
 
-function ==(x::($etype), y::($btype))
+function ==(x::fq_default_abs_series, y::fq_default)
    if length(x) > 1
       return false
    elseif length(x) == 1
       z = base_ring(x)()
-      ccall(($(flint_fn*"_get_coeff"), libflint), Nothing,
-            (Ref{($btype)}, Ref{($etype)}, Int, Ref{($ctype)}),
+      ccall((:fq_default_poly_get_coeff, libflint), Nothing,
+            (Ref{fq_default}, Ref{fq_default_abs_series}, Int, Ref{FqDefaultFiniteField}),
              z, x, 0, base_ring(x))
       return z == y
    else
@@ -408,15 +398,15 @@ function ==(x::($etype), y::($btype))
    end
 end
 
-==(x::($btype), y::($etype)) = y == x
+==(x::fq_default, y::fq_default_abs_series) = y == x
 
-function ==(x::($etype), y::fmpz)
+function ==(x::fq_default_abs_series, y::fmpz)
    if length(x) > 1
       return false
    elseif length(x) == 1
       z = base_ring(x)()
-      ccall(($(flint_fn*"_get_coeff"), libflint), Nothing,
-            (Ref{($btype)}, Ref{($etype)}, Int, Ref{($ctype)}),
+      ccall((:fq_default_poly_get_coeff, libflint), Nothing,
+            (Ref{fq_default}, Ref{fq_default_abs_series}, Int, Ref{FqDefaultFiniteField}),
              z, x, 0, base_ring(x))
       return z == y
    else
@@ -424,11 +414,11 @@ function ==(x::($etype), y::fmpz)
    end
 end
 
-==(x::fmpz, y::($etype)) = y == x
+==(x::fmpz, y::fq_default_abs_series) = y == x
 
-==(x::($etype), y::Integer) = x == fmpz(y)
+==(x::fq_default_abs_series, y::Integer) = x == fmpz(y)
 
-==(x::Integer, y::($etype)) = y == x
+==(x::Integer, y::fq_default_abs_series) = y == x
 
 ###############################################################################
 #
@@ -436,7 +426,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::($etype), y::($etype))
+function divexact(x::fq_default_abs_series, y::fq_default_abs_series)
    check_parent(x, y)
    iszero(y) && throw(DivideError())
    v2 = valuation(y)
@@ -451,9 +441,9 @@ function divexact(x::($etype), y::($etype))
    prec = min(x.prec, y.prec - v2 + v1)
    z = parent(x)()
    z.prec = prec
-   ccall(($(flint_fn*"_div_series"), libflint), Nothing,
-         (Ref{($etype)}, Ref{($etype)},
-          Ref{($etype)}, Int, Ref{($ctype)}),
+   ccall((:fq_default_poly_div_series, libflint), Nothing,
+         (Ref{fq_default_abs_series}, Ref{fq_default_abs_series},
+          Ref{fq_default_abs_series}, Int, Ref{FqDefaultFiniteField}),
                z, x, y, prec, base_ring(x))
    return z
 end
@@ -464,12 +454,12 @@ end
 #
 ###############################################################################
 
-function divexact(x::($etype), y::($btype))
+function divexact(x::fq_default_abs_series, y::fq_default)
    iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
-   ccall(($(flint_fn*"_scalar_div_"*flint_tail), libflint), Nothing,
-         (Ref{($etype)}, Ref{($etype)}, Ref{($btype)}, Ref{($ctype)}),
+   ccall((:fq_default_poly_scalar_div_fq_default, libflint), Nothing,
+         (Ref{fq_default_abs_series}, Ref{fq_default_abs_series}, Ref{fq_default}, Ref{FqDefaultFiniteField}),
                z, x, y, base_ring(x))
    return z
 end
@@ -480,13 +470,13 @@ end
 #
 ###############################################################################
 
-function inv(a::($etype))
+function inv(a::fq_default_abs_series)
    iszero(a) && throw(DivideError())
    !isunit(a) && error("Unable to invert power series")
    ainv = parent(a)()
    ainv.prec = a.prec
-   ccall(($(flint_fn*"_inv_series"), libflint), Nothing,
-         (Ref{($etype)}, Ref{($etype)}, Int, Ref{($ctype)}),
+   ccall((:fq_default_poly_inv_series, libflint), Nothing,
+         (Ref{fq_default_abs_series}, Ref{fq_default_abs_series}, Int, Ref{FqDefaultFiniteField}),
                ainv, a, a.prec, base_ring(a))
    return ainv
 end
@@ -497,28 +487,28 @@ end
 #
 ###############################################################################
 
-function zero!(z::($etype))
-   ccall(($(flint_fn*"_zero"), libflint), Nothing,
-                (Ref{($etype)}, Ref{($ctype)}), z, base_ring(z))
+function zero!(z::fq_default_abs_series)
+   ccall((:fq_default_poly_zero, libflint), Nothing,
+                (Ref{fq_default_abs_series}, Ref{FqDefaultFiniteField}), z, base_ring(z))
    z.prec = parent(z).prec_max
    return z
 end
 
-function fit!(z::($etype), n::Int)
-   ccall(($(flint_fn*"_fit_length"), libflint), Nothing,
-         (Ref{($etype)}, Int, Ref{($ctype)}),
+function fit!(z::fq_default_abs_series, n::Int)
+   ccall((:fq_default_poly_fit_length, libflint), Nothing,
+         (Ref{fq_default_abs_series}, Int, Ref{FqDefaultFiniteField}),
          z, n, base_ring(z))
    return nothing
 end
 
-function setcoeff!(z::($etype), n::Int, x::($btype))
-   ccall(($(flint_fn*"_set_coeff"), libflint), Nothing,
-                (Ref{($etype)}, Int, Ref{($btype)}, Ref{($ctype)}),
+function setcoeff!(z::fq_default_abs_series, n::Int, x::fq_default)
+   ccall((:fq_default_poly_set_coeff, libflint), Nothing,
+                (Ref{fq_default_abs_series}, Int, Ref{fq_default}, Ref{FqDefaultFiniteField}),
                z, n, x, base_ring(z))
    return z
 end
 
-function mul!(z::($etype), a::($etype), b::($etype))
+function mul!(z::fq_default_abs_series, a::fq_default_abs_series, b::fq_default_abs_series)
    lena = length(a)
    lenb = length(b)
    aval = valuation(a)
@@ -532,14 +522,14 @@ function mul!(z::($etype), a::($etype), b::($etype))
       lenz = 0
    end
    z.prec = prec
-   ccall(($(flint_fn*"_mullow"), libflint), Nothing,
-         (Ref{($etype)}, Ref{($etype)},
-          Ref{($etype)}, Int, Ref{($ctype)}),
+   ccall((:fq_default_poly_mullow, libflint), Nothing,
+         (Ref{fq_default_abs_series}, Ref{fq_default_abs_series},
+          Ref{fq_default_abs_series}, Int, Ref{FqDefaultFiniteField}),
                z, a, b, lenz, base_ring(z))
    return z
 end
 
-function addeq!(a::($etype), b::($etype))
+function addeq!(a::fq_default_abs_series, b::fq_default_abs_series)
    lena = length(a)
    lenb = length(b)
    prec = min(a.prec, b.prec)
@@ -547,14 +537,19 @@ function addeq!(a::($etype), b::($etype))
    lenb = min(lenb, prec)
    lenz = max(lena, lenb)
    a.prec = prec
-   ccall(($(flint_fn*"_add_series"), libflint), Nothing,
-         (Ref{($etype)}, Ref{($etype)},
-          Ref{($etype)}, Int, Ref{($ctype)}),
+   ccall((:fq_default_poly_add_series, libflint), Nothing,
+         (Ref{fq_default_abs_series}, Ref{fq_default_abs_series},
+          Ref{fq_default_abs_series}, Int, Ref{FqDefaultFiniteField}),
                a, a, b, lenz, base_ring(a))
    return a
 end
 
-function add!(c::($etype), a::($etype), b::($etype))
+function add!(c::fq_default_abs_series, a::fq_default_abs_series, b::fq_default_abs_series)
+   if c === a
+      return addeq!(c, b)
+   elseif c === b
+      return addeq!(c, a)
+   end
    lena = length(a)
    lenb = length(b)
    prec = min(a.prec, b.prec)
@@ -562,16 +557,16 @@ function add!(c::($etype), a::($etype), b::($etype))
    lenb = min(lenb, prec)
    lenc = max(lena, lenb)
    c.prec = prec
-   ccall(($(flint_fn*"_add_series"), libflint), Nothing,
-         (Ref{($etype)}, Ref{($etype)},
-          Ref{($etype)}, Int, Ref{($ctype)}),
+   ccall((:fq_default_poly_add_series, libflint), Nothing,
+         (Ref{fq_default_abs_series}, Ref{fq_default_abs_series},
+          Ref{fq_default_abs_series}, Int, Ref{FqDefaultFiniteField}),
                c, a, b, lenc, base_ring(a))
    return c
 end
 
-function set_length!(a::($etype), n::Int)
-   ccall(($("_"*flint_fn*"_set_length"), libflint), Nothing,
-         (Ref{($etype)}, Int, Ref{($ctype)}),
+function set_length!(a::fq_default_abs_series, n::Int64)
+   ccall((:_fq_default_poly_set_length, libflint), Nothing,
+         (Ref{fq_default_abs_series}, Int, Ref{FqDefaultFiniteField}),
           a, n, base_ring(a))
    return a
 end
@@ -582,11 +577,11 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{($etype)}, ::Type{T}) where {T <: Integer} = ($etype)
+promote_rule(::Type{fq_default_abs_series}, ::Type{T}) where {T <: Integer} = fq_default_abs_series
 
-promote_rule(::Type{($etype)}, ::Type{$(btype)}) = ($etype)
+promote_rule(::Type{fq_default_abs_series}, ::Type{fq_default}) = fq_default_abs_series
 
-promote_rule(::Type{($etype)}, ::Type{fmpz}) = ($etype)
+promote_rule(::Type{fq_default_abs_series}, ::Type{fmpz}) = fq_default_abs_series
 
 ###############################################################################
 #
@@ -594,64 +589,61 @@ promote_rule(::Type{($etype)}, ::Type{fmpz}) = ($etype)
 #
 ###############################################################################
 
-function (a::($rtype))()
+function (a::FqDefaultAbsSeriesRing)()
    ctx = base_ring(a)
-   z = ($etype)(ctx)
+   z = fq_default_abs_series(ctx)
    z.prec = a.prec_max
    z.parent = a
    return z
 end
 
-function (a::($rtype))(b::Integer)
+function (a::FqDefaultAbsSeriesRing)(b::Integer)
    ctx = base_ring(a)
    if b == 0
-      z = ($etype)(ctx)
+      z = fq_default_abs_series(ctx)
       z.prec = a.prec_max
    else
-      z = ($etype)(ctx, [base_ring(a)(b)], 1, a.prec_max)
+      z = fq_default_abs_series(ctx, [base_ring(a)(b)], 1, a.prec_max)
    end
    z.parent = a
    return z
 end
 
-function (a::($rtype))(b::fmpz)
+function (a::FqDefaultAbsSeriesRing)(b::fmpz)
    ctx = base_ring(a)
    if iszero(b)
-      z = ($etype)(ctx)
+      z = fq_default_abs_series(ctx)
       z.prec = a.prec_max
    else
-      z = ($etype)(ctx, [base_ring(a)(b)], 1, a.prec_max)
+      z = fq_default_abs_series(ctx, [base_ring(a)(b)], 1, a.prec_max)
    end
    z.parent = a
    return z
 end
 
-function (a::($rtype))(b::($btype))
+function (a::FqDefaultAbsSeriesRing)(b::fq_default)
    ctx = base_ring(a)
    if iszero(b)
-      z = ($etype)(ctx)
+      z = fq_default_abs_series(ctx)
       z.prec = a.prec_max
    else
-      z = ($etype)(ctx, [b], 1, a.prec_max)
+      z = fq_default_abs_series(ctx, [b], 1, a.prec_max)
    end
    z.parent = a
    return z
 end
 
-function (a::($rtype))(b::($etype))
+function (a::FqDefaultAbsSeriesRing)(b::fq_default_abs_series)
    parent(b) != a && error("Unable to coerce power series")
    return b
 end
 
-function (a::($rtype))(b::Array{$(btype), 1}, len::Int, prec::Int)
+function (a::FqDefaultAbsSeriesRing)(b::Array{fq_default, 1}, len::Int, prec::Int)
    ctx = base_ring(a)
-   z = ($etype)(ctx, b, len, prec)
+   z = fq_default_abs_series(ctx, b, len, prec)
    z.parent = a
    return z
 end
-
-end # eval
-end # for
 
 ###############################################################################
 #
@@ -659,50 +651,16 @@ end # for
 #
 ###############################################################################
 
-function PowerSeriesRing(R::FqFiniteField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
+function PowerSeriesRing(R::FqDefaultFiniteField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
+   S = Symbol(s)
+
    if model == :capped_relative
-      parent_obj = FqRelSeriesRing(R, prec, s, cached)
+      parent_obj = FqDefaultRelSeriesRing(R, prec, S, cached)
    elseif model == :capped_absolute
-      parent_obj = FqAbsSeriesRing(R, prec, s, cached)
+      parent_obj = FqDefaultAbsSeriesRing(R, prec, S, cached)
    else
       error("Unknown model")
    end
 
    return parent_obj, gen(parent_obj)
-end
-
-function PowerSeriesRing(R::FqFiniteField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
-   return PowerSeriesRing(R, prec, Symbol(s); model=model, cached=cached)
-end
-
-function AbsSeriesRing(R::FqFiniteField, prec::Int)
-   return FqAbsSeriesRing(R, prec, :x, false)
-end
-
-function RelSeriesRing(R::FqFiniteField, prec::Int)
-   return FqRelSeriesRing(R, prec, :x, false)
-end
-
-function PowerSeriesRing(R::FqNmodFiniteField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
-   if model == :capped_relative
-      parent_obj = FqNmodRelSeriesRing(R, prec, s, cached)
-   elseif model == :capped_absolute
-      parent_obj = FqNmodAbsSeriesRing(R, prec, s, cached)
-   else
-      error("Unknown model")
-   end
-
-   return parent_obj, gen(parent_obj)
-end
-
-function PowerSeriesRing(R::FqNmodFiniteField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
-   return PowerSeriesRing(R, prec, Symbol(s); model=model, cached=cached)
-end
-
-function AbsSeriesRing(R::FqNmodFiniteField, prec::Int)
-   return FqNmodAbsSeriesRing(R, prec, :x, false)
-end
-
-function RelSeriesRing(R::FqNmodFiniteField, prec::Int)
-   return FqNmodRelSeriesRing(R, prec, :x, false)
 end

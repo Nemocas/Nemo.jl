@@ -2166,6 +2166,236 @@ end
 
 ###############################################################################
 #
+#   FqDefaultFiniteField / fq_default
+#
+###############################################################################
+
+mutable struct FqDefaultFiniteField <: FinField
+   # fq_default_ctx_struct is 200 bytes on 64 bit machine
+   opaque::NTuple{200, Int8} 
+   # end of flint struct
+
+   var::String
+   
+   overfields :: Dict{Int, Array{FinFieldMorphism, 1}}
+   subfields :: Dict{Int, Array{FinFieldMorphism, 1}}
+   @declare_other
+
+   function FqDefaultFiniteField(char::fmpz, deg::Int, s::Symbol, cached::Bool = true)
+      if cached && haskey(FqDefaultFiniteFieldID, (char, deg, s))
+         return FqDefaultFiniteFieldID[char, deg, s]
+      else
+         d = new()
+         d.var = string(s)
+         finalizer(_FqDefaultFiniteField_clear_fn, d)
+         ccall((:fq_default_ctx_init, libflint), Nothing,
+               (Ref{FqDefaultFiniteField}, Ref{fmpz}, Int, Ptr{UInt8}),
+                  d, char, deg, d.var)
+         if cached
+            FqDefaultFiniteFieldID[char, deg, s] = d
+         end
+         return d
+      end
+   end
+
+   function FqDefaultFiniteField(f::fmpz_mod_poly, s::Symbol, cached::Bool = true; check::Bool = true)
+      check && !isprobable_prime(modulus(f)) &&
+         throw(DomainError(base_ring(f), "the base ring of the polynomial must be a field"))
+      if cached && haskey(FqDefaultFiniteFieldIDFmpzPol, (f, s))
+         return FqDefaultFiniteFieldIDFmpzPol[f, s]
+      else
+         z = new()
+         z.var = string(s)
+         ccall((:fq_default_ctx_init_modulus, libflint), Nothing,
+               (Ref{FqDefaultFiniteField}, Ref{fmpz_mod_poly}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
+                  z, f, f.parent.base_ring.ninv, string(s))
+         if cached
+            FqDefaultFiniteFieldIDFmpzPol[f, s] = z
+         end
+         finalizer(_FqDefaultFiniteField_clear_fn, z)
+         return z
+      end
+   end
+
+   function FqDefaultFiniteField(f::gfp_fmpz_poly, s::Symbol, cached::Bool = true; check::Bool = true)
+      # check ignored
+      if cached && haskey(FqDefaultFiniteFieldIDGFPPol, (f, s))
+         return FqDefaultFiniteFieldIDGFPPol[f, s]
+      else
+         z = new()
+         z.var = string(s)
+         ccall((:fq_default_ctx_init_modulus, libflint), Nothing,
+               (Ref{FqDefaultFiniteField}, Ref{gfp_fmpz_poly}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
+                  z, f, f.parent.base_ring.ninv, string(s))
+         if cached
+            FqDefaultFiniteFieldIDGFPPol[f, s] = z
+         end
+         finalizer(_FqDefaultFiniteField_clear_fn, z)
+         return z
+      end
+   end
+
+   function FqDefaultFiniteField(f::nmod_poly, s::Symbol, cached::Bool = true; check::Bool = true)
+      check && !isprime(modulus(f)) &&
+         throw(DomainError(base_ring(f), "the base ring of the polynomial must be a field"))
+      if cached && haskey(FqDefaultFiniteFieldIDNmodPol, (f, s))
+         return FqDefaultFiniteFieldIDNmodPol[f, s]
+      else
+         z = new()
+         z.var = string(s)
+         ccall((:fq_default_ctx_init_modulus_nmod, libflint), Nothing,
+               (Ref{FqDefaultFiniteField}, Ref{nmod_poly}, Ptr{UInt8}),
+                  z, f, string(s))
+         if cached
+            FqDefaultFiniteFieldIDNmodPol[f, s] = z
+         end
+         finalizer(_FqDefaultFiniteField_clear_fn, z)
+         return z
+      end
+   end
+
+   function FqDefaultFiniteField(f::gfp_poly, s::Symbol, cached::Bool = true; check::Bool = true)
+      # check ignored
+      if cached && haskey(FqDefaultFiniteFieldIDGFPNmodPol, (f, s))
+         return FqDefaultFiniteFieldIDGFPNmodPol[f, s]
+      else
+         z = new()
+         z.var = string(s)
+         ccall((:fq_default_ctx_init_modulus_nmod, libflint), Nothing,
+               (Ref{FqDefaultFiniteField}, Ref{gfp_poly}, Ptr{UInt8}),
+                  z, f, string(s))
+         if cached
+            FqDefaultFiniteFieldIDGFPNmodPol[f, s] = z
+         end
+         finalizer(_FqDefaultFiniteField_clear_fn, z)
+         return z
+      end
+   end
+end
+
+const FqDefaultFiniteFieldID = Dict{Tuple{fmpz, Int, Symbol}, FqDefaultFiniteField}()
+
+const FqDefaultFiniteFieldIDFmpzPol = Dict{Tuple{fmpz_mod_poly, Symbol}, FqDefaultFiniteField}()
+
+const FqDefaultFiniteFieldIDGFPPol = Dict{Tuple{gfp_fmpz_poly, Symbol}, FqDefaultFiniteField}()
+
+const FqDefaultFiniteFieldIDNmodPol = Dict{Tuple{nmod_poly, Symbol}, FqDefaultFiniteField}()
+
+const FqDefaultFiniteFieldIDGFPNmodPol = Dict{Tuple{gfp_poly, Symbol}, FqDefaultFiniteField}()
+
+function _FqDefaultFiniteField_clear_fn(a :: FqDefaultFiniteField)
+   ccall((:fq_default_ctx_clear, libflint), Nothing, (Ref{FqDefaultFiniteField},), a)
+end
+
+mutable struct fq_default <: FinFieldElem
+   opaque::NTuple{48, Int8} # fq_default_struct is 48 bytes on a 64 bit machine
+   parent::FqDefaultFiniteField
+
+   function fq_default(ctx::FqDefaultFiniteField)
+      d = new()
+      ccall((:fq_default_init2, libflint), Nothing,
+            (Ref{fq_default}, Ref{FqDefaultFiniteField}), d, ctx)
+      finalizer(_fq_default_clear_fn, d)
+      d.parent = ctx
+      return d
+   end
+
+   function fq_default(ctx::FqDefaultFiniteField, x::Int)
+      d = new()
+      ccall((:fq_default_init2, libflint), Nothing,
+            (Ref{fq_default}, Ref{FqDefaultFiniteField}), d, ctx)
+      finalizer(_fq_default_clear_fn, d)
+      ccall((:fq_default_set_si, libflint), Nothing,
+                (Ref{fq_default}, Int, Ref{FqDefaultFiniteField}), d, x, ctx)
+      d.parent = ctx
+      return d
+   end
+
+   function fq_default(ctx::FqDefaultFiniteField, x::fmpz)
+      d = new()
+      ccall((:fq_default_init2, libflint), Nothing,
+            (Ref{fq_default}, Ref{FqDefaultFiniteField}), d, ctx)
+      finalizer(_fq_default_clear_fn, d)
+      ccall((:fq_default_set_fmpz, libflint), Nothing,
+            (Ref{fq_default}, Ref{fmpz}, Ref{FqDefaultFiniteField}), d, x, ctx)
+      d.parent = ctx
+      return d
+   end
+
+   function fq_default(ctx::FqDefaultFiniteField, x::fmpz_poly)
+      d = new()
+      ccall((:fq_default_init2, libflint), Nothing,
+            (Ref{fq_default}, Ref{FqDefaultFiniteField}), d, ctx)
+      finalizer(_fq_default_clear_fn, d)
+      ccall((:fq_default_set_fmpz_poly, libflint), Nothing,
+            (Ref{fq_default}, Ref{fmpz_poly}, Ref{FqDefaultFiniteField}), d, x, ctx)
+      d.parent = ctx
+      return d
+   end
+
+   function fq_default(ctx::FqDefaultFiniteField, x::nmod_poly)
+      d = new()
+      ccall((:fq_default_init2, libflint), Nothing,
+            (Ref{fq_default}, Ref{FqDefaultFiniteField}), d, ctx)
+      finalizer(_fq_default_clear_fn, d)
+      ccall((:fq_default_set_nmod_poly, libflint), Nothing,
+            (Ref{fq_default}, Ref{nmod_poly}, Ref{FqDefaultFiniteField}), d, x, ctx)
+      d.parent = ctx
+      return d
+   end
+
+   function fq_default(ctx::FqDefaultFiniteField, x::gfp_poly)
+      d = new()
+      ccall((:fq_default_init2, libflint), Nothing,
+            (Ref{fq_default}, Ref{FqDefaultFiniteField}), d, ctx)
+      finalizer(_fq_default_clear_fn, d)
+      ccall((:fq_default_set_nmod_poly, libflint), Nothing,
+            (Ref{fq_default}, Ref{gfp_poly}, Ref{FqDefaultFiniteField}), d, x, ctx)
+      d.parent = ctx
+      return d
+   end
+
+   function fq_default(ctx::FqDefaultFiniteField, x::fmpz_mod_poly)
+      d = new()
+      ccall((:fq_default_init2, libflint), Nothing,
+            (Ref{fq_default}, Ref{FqDefaultFiniteField}), d, ctx)
+      finalizer(_fq_default_clear_fn, d)
+      ccall((:fq_default_set_fmpz_mod_poly, libflint), Nothing,
+            (Ref{fq_default}, Ref{fmpz_mod_poly}, Ref{FqDefaultFiniteField}), d, x, ctx)
+      d.parent = ctx
+      return d
+   end
+
+   function fq_default(ctx::FqDefaultFiniteField, x::gfp_fmpz_poly)
+      d = new()
+      ccall((:fq_default_init2, libflint), Nothing,
+            (Ref{fq_default}, Ref{FqDefaultFiniteField}), d, ctx)
+      finalizer(_fq_default_clear_fn, d)
+      ccall((:fq_default_set_fmpz_mod_poly, libflint), Nothing,
+            (Ref{fq_default}, Ref{gfp_fmpz_poly}, Ref{FqDefaultFiniteField}), d, x, ctx)
+      d.parent = ctx
+      return d
+   end
+
+   function fq_default(ctx::FqDefaultFiniteField, x::fq_default)
+      d = new()
+      ccall((:fq_default_init2, libflint), Nothing,
+            (Ref{fq_default}, Ref{FqDefaultFiniteField}), d, ctx)
+      finalizer(_fq_default_clear_fn, d)
+      ccall((:fq_default_set, libflint), Nothing,
+            (Ref{fq_default}, Ref{fq_default}, Ref{FqDefaultFiniteField}), d, x, ctx)
+      d.parent = ctx
+      return d
+   end
+end
+
+function _fq_default_clear_fn(a::fq_default)
+   ccall((:fq_default_clear, libflint), Nothing,
+         (Ref{fq_default}, Ref{FqDefaultFiniteField}), a, a.parent)
+end
+
+###############################################################################
+#
 #   FqFiniteField / fq
 #
 ###############################################################################
@@ -4016,6 +4246,83 @@ end
 
 ###############################################################################
 #
+#   FqDefaultRelSeriesRing / fq_default_rel_series
+#
+###############################################################################
+
+mutable struct FqDefaultRelSeriesRing <: SeriesRing{fq_default}
+   base_ring::FqDefaultFiniteField
+   prec_max::Int
+   S::Symbol
+ 
+   function FqDefaultRelSeriesRing(R::FqDefaultFiniteField, prec::Int, s::Symbol,
+                             cached::Bool = true)
+      if cached && haskey(FqDefaultRelSeriesID, (R, prec, s))
+         return FqDefaultRelSeriesID[R, prec, s]
+      else
+         z = new(R, prec, s)
+         if cached
+            FqDefaultRelSeriesID[R, prec, s] = z
+         end
+         return z
+      end
+   end
+end
+ 
+const FqDefaultRelSeriesID = Dict{Tuple{FqDefaultFiniteField, Int, Symbol}, FqDefaultRelSeriesRing}()
+ 
+mutable struct fq_default_rel_series <: RelSeriesElem{fq_default}
+   # fq_default_poly_struct is 24 bytes on 64 bit machine
+   opaque::NTuple{24, Int8} 
+   # end of flint struct
+
+   prec::Int
+   val::Int
+   parent::FqDefaultRelSeriesRing
+ 
+   function fq_default_rel_series(ctx::FqDefaultFiniteField)
+      z = new()
+      ccall((:fq_default_poly_init, libflint), Nothing,
+            (Ref{fq_default_rel_series}, Ref{FqDefaultFiniteField}), z, ctx)
+      finalizer(_fq_default_rel_series_clear_fn, z)
+      return z
+   end
+ 
+   function fq_default_rel_series(ctx::FqDefaultFiniteField, a::Array{fq_default, 1}, len::Int, prec::Int, val::Int)
+      z = new()
+      ccall((:fq_default_poly_init2, libflint), Nothing,
+            (Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}), z, len, ctx)
+      for i = 1:len
+         ccall((:fq_default_poly_set_coeff, libflint), Nothing,
+               (Ref{fq_default_rel_series}, Int, Ref{fq_default},
+                Ref{FqDefaultFiniteField}), z, i - 1, a[i], ctx)
+      end
+      z.prec = prec
+      z.val = val
+      finalizer(_fq_default_rel_series_clear_fn, z)
+      return z
+   end
+ 
+   function fq_default_rel_series(ctx::FqDefaultFiniteField, a::fq_default_rel_series)
+      z = new()
+      ccall((:fq_default_poly_init, libflint), Nothing,
+            (Ref{fq_default_rel_series}, Ref{FqDefaultFiniteField}), z, ctx)
+      ccall((:fq_default_poly_set, libflint), Nothing,
+            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
+             Ref{FqDefaultFiniteField}), z, a, ctx)
+      finalizer(_fq_default_rel_series_clear_fn, z)
+      return z
+   end
+end
+ 
+function _fq_default_rel_series_clear_fn(a::fq_default_rel_series)
+   ctx = base_ring(a)
+   ccall((:fq_default_poly_clear, libflint), Nothing,
+         (Ref{fq_default_rel_series}, Ref{FqDefaultFiniteField}), a, ctx)
+end
+
+###############################################################################
+#
 #   FqRelSeriesRing / fq_rel_series
 #
 ###############################################################################
@@ -4087,6 +4394,80 @@ function _fq_rel_series_clear_fn(a::fq_rel_series)
    ctx = base_ring(a)
    ccall((:fq_poly_clear, libflint), Nothing,
          (Ref{fq_rel_series}, Ref{FqFiniteField}), a, ctx)
+end
+
+###############################################################################
+#
+#   FqDefaultAbsSeriesRing / fq_default_abs_series
+#
+###############################################################################
+
+mutable struct FqDefaultAbsSeriesRing <: SeriesRing{fq_default}
+   base_ring::FqDefaultFiniteField
+   prec_max::Int
+   S::Symbol
+ 
+   function FqDefaultAbsSeriesRing(R::FqDefaultFiniteField, prec::Int, s::Symbol,
+                             cached::Bool = true)
+      if cached && haskey(FqDefaultAbsSeriesID, (R, prec, s))
+         return FqDefaultAbsSeriesID[R, prec, s]
+      else
+         z = new(R, prec, s)
+         if cached
+            FqDefaultAbsSeriesID[R, prec, s] = z
+         end
+         return z
+      end
+   end
+end
+ 
+const FqDefaultAbsSeriesID = Dict{Tuple{FqDefaultFiniteField, Int, Symbol}, FqDefaultAbsSeriesRing}()
+ 
+mutable struct fq_default_abs_series <: AbsSeriesElem{fq_default}
+   # fq_default_poly_struct is 24 bytes on 64 bit machine
+   opaque::NTuple{24, Int8} 
+   # end of flint struct
+
+   prec::Int
+   parent::FqDefaultAbsSeriesRing
+ 
+   function fq_default_abs_series(ctx::FqDefaultFiniteField)
+      z = new()
+      ccall((:fq_default_poly_init, libflint), Nothing,
+            (Ref{fq_default_abs_series}, Ref{FqDefaultFiniteField}), z, ctx)
+      finalizer(_fq_default_abs_series_clear_fn, z)
+      return z
+   end
+ 
+   function fq_default_abs_series(ctx::FqDefaultFiniteField, a::Array{fq_default, 1}, len::Int, prec::Int)
+      z = new()
+      ccall((:fq_default_poly_init2, libflint), Nothing,
+            (Ref{fq_default_abs_series}, Int, Ref{FqDefaultFiniteField}), z, len, ctx)
+      for i = 1:len
+         ccall((:fq_default_poly_set_coeff, libflint), Nothing,
+               (Ref{fq_default_abs_series}, Int, Ref{fq_default}, Ref{FqDefaultFiniteField}),
+                                                z, i - 1, a[i], ctx)
+      end
+      z.prec = prec
+      finalizer(_fq_default_abs_series_clear_fn, z)
+      return z
+   end
+ 
+   function fq_default_abs_series(ctx::FqDefaultFiniteField, a::fq_default_abs_series)
+      z = new()
+      ccall((:fq_default_poly_init, libflint), Nothing,
+            (Ref{fq_default_abs_series}, Ref{FqDefaultFiniteField}), z, ctx)
+      ccall((:fq_default_poly_set, libflint), Nothing,
+            (Ref{fq_default_abs_series}, Ref{fq_default_abs_series}, Ref{FqDefaultFiniteField}), z, a, ctx)
+      finalizer(_fq_default_abs_series_clear_fn, z)
+      return z
+   end
+end
+ 
+function _fq_default_abs_series_clear_fn(a::fq_default_abs_series)
+   ctx = base_ring(a)
+   ccall((:fq_default_poly_clear, libflint), Nothing,
+         (Ref{fq_default_abs_series}, Ref{FqDefaultFiniteField}), a, ctx)
 end
 
 ###############################################################################
@@ -5143,6 +5524,187 @@ const Zmodn_mat = Union{nmod_mat, gfp_mat}
 
 ###############################################################################
 #
+#   FqDefaultPolyRing / fq_default_poly
+#
+###############################################################################
+
+mutable struct FqDefaultPolyRing <: PolyRing{fq_default}
+   base_ring::FqDefaultFiniteField
+   S::Symbol
+ 
+   function FqDefaultPolyRing(R::FqDefaultFiniteField, s::Symbol, cached::Bool = true)
+      if cached && haskey(FqDefaultPolyID, (R, s))
+         return FqDefaultPolyID[(R, s)]
+      else
+         z = new(R,s)
+         if cached
+            FqDefaultPolyID[(R, s)] = z
+         end
+         return z
+      end
+   end
+end
+ 
+const FqDefaultPolyID = Dict{Tuple{FqDefaultFiniteField, Symbol}, FqDefaultPolyRing}()
+ 
+mutable struct fq_default_poly <: PolyElem{fq_default}
+   # fq_default_poly_struct is 24 bytes on 64 bit machine
+   opaque::NTuple{24, Int8} 
+   # end of flint struct
+
+   parent::FqDefaultPolyRing
+ 
+   function fq_default_poly(ctx::FqDefaultFiniteField)
+      z = new()
+      ccall((:fq_default_poly_init, libflint), Nothing,
+            (Ref{fq_default_poly}, Ref{FqDefaultFiniteField}), z, ctx)
+      finalizer(_fq_default_poly_clear_fn, z)
+      return z
+   end
+ 
+   function fq_default_poly(a::fq_default_poly, ctx::FqDefaultFiniteField)
+      z = new()
+      ccall((:fq_default_poly_init, libflint), Nothing,
+            (Ref{fq_default_poly}, Ref{FqDefaultFiniteField}), z, ctx)
+      ccall((:fq_default_poly_set, libflint), Nothing,
+            (Ref{fq_default_poly}, Ref{fq_default_poly}, Ref{FqDefaultFiniteField}),
+            z, a, ctx)
+       finalizer(_fq_default_poly_clear_fn, z)
+       return z
+   end
+ 
+   function fq_default_poly(a::fq_default, ctx::FqDefaultFiniteField)
+      z = new()
+      ccall((:fq_default_poly_init, libflint), Nothing,
+            (Ref{fq_default_poly}, Ref{FqDefaultFiniteField}), z, ctx)
+      ccall((:fq_default_poly_set_fq_default, libflint), Nothing,
+            (Ref{fq_default_poly}, Ref{fq_default}, Ref{FqDefaultFiniteField}),
+             z, a, ctx)
+      finalizer(_fq_default_poly_clear_fn, z)
+      return z
+   end
+ 
+   function fq_default_poly(a::Array{fq_default, 1}, ctx::FqDefaultFiniteField)
+      z = new()
+      ccall((:fq_default_poly_init2, libflint), Nothing,
+            (Ref{fq_default_poly}, Int, Ref{FqDefaultFiniteField}),
+            z, length(a), ctx)
+      for i = 1:length(a)
+         ccall((:fq_default_poly_set_coeff, libflint), Nothing,
+               (Ref{fq_default_poly}, Int, Ref{fq_default}, Ref{FqDefaultFiniteField}),
+                z, i - 1, a[i], ctx)
+      end
+      finalizer(_fq_default_poly_clear_fn, z)
+      return z
+   end
+ 
+   function fq_default_poly(a::Array{fmpz, 1}, ctx::FqDefaultFiniteField)
+      z = new()
+      temp = ctx()
+      ccall((:fq_default_poly_init2, libflint), Nothing,
+            (Ref{fq_default_poly}, Int, Ref{FqDefaultFiniteField}),
+             z, length(a), ctx)
+      for i = 1:length(a)
+         temp = ctx(a[i])
+         ccall((:fq_default_poly_set_coeff, libflint), Nothing,
+               (Ref{fq_default_poly}, Int, Ref{fq_default}, Ref{FqDefaultFiniteField}),
+                z, i - 1, temp, ctx)
+      end
+      finalizer(_fq_default_poly_clear_fn, z)
+      return z
+   end
+ 
+   function fq_default_poly(a::fmpz_poly, ctx::FqDefaultFiniteField)
+      z = new()
+      ccall((:fq_default_poly_init2, libflint), Nothing,
+             (Ref{fq_default_poly}, Int, Ref{FqDefaultFiniteField}),
+              z, length(a), ctx)
+      ccall((:fq_default_poly_set_fmpz_poly, libflint), Nothing,
+               (Ref{fq_default_poly}, Ref{fmpz_poly}, Ref{FqDefaultFiniteField}),
+                z, a, ctx)
+      finalizer(_fq_default_poly_clear_fn, z)
+      return z
+   end
+
+   function fq_default_poly(a::nmod_poly, ctx::FqDefaultFiniteField)
+      z = new()
+      ccall((:fq_default_poly_init2, libflint), Nothing,
+             (Ref{fq_default_poly}, Int, Ref{FqDefaultFiniteField}),
+              z, length(a), ctx)
+      ccall((:fq_default_poly_set_nmod_poly, libflint), Nothing,
+               (Ref{fq_default_poly}, Ref{nmod_poly}, Ref{FqDefaultFiniteField}),
+                z, a, ctx)
+      finalizer(_fq_default_poly_clear_fn, z)
+      return z
+   end
+
+   function fq_default_poly(a::gfp_poly, ctx::FqDefaultFiniteField)
+      z = new()
+      ccall((:fq_default_poly_init2, libflint), Nothing,
+             (Ref{fq_default_poly}, Int, Ref{FqDefaultFiniteField}),
+              z, length(a), ctx)
+      ccall((:fq_default_poly_set_nmod_poly, libflint), Nothing,
+               (Ref{fq_default_poly}, Ref{gfp_poly}, Ref{FqDefaultFiniteField}),
+                z, a, ctx)
+      finalizer(_fq_default_poly_clear_fn, z)
+      return z
+   end
+
+   function fq_default_poly(a::fmpz_mod_poly, ctx::FqDefaultFiniteField)
+      z = new()
+      ccall((:fq_default_poly_init2, libflint), Nothing,
+             (Ref{fq_default_poly}, Int, Ref{FqDefaultFiniteField}),
+              z, length(a), ctx)
+      ccall((:fq_default_poly_set_fmpz_mod_poly, libflint), Nothing,
+               (Ref{fq_default_poly}, Ref{fmpz_mod_poly}, Ref{FqDefaultFiniteField}),
+                z, a, ctx)
+      finalizer(_fq_default_poly_clear_fn, z)
+      return z
+   end
+
+   function fq_default_poly(a::gfp_fmpz_poly, ctx::FqDefaultFiniteField)
+      z = new()
+      ccall((:fq_default_poly_init2, libflint), Nothing,
+             (Ref{fq_default_poly}, Int, Ref{FqDefaultFiniteField}),
+              z, length(a), ctx)
+      ccall((:fq_default_poly_set_fmpz_mod_poly, libflint), Nothing,
+               (Ref{fq_default_poly}, Ref{gfp_fmpz_poly}, Ref{FqDefaultFiniteField}),
+                z, a, ctx)
+      finalizer(_fq_default_poly_clear_fn, z)
+      return z
+   end
+end
+ 
+function _fq_default_poly_clear_fn(a::fq_default_poly)
+   ccall((:fq_default_poly_clear, libflint), Nothing,
+         (Ref{fq_default_poly}, Ref{FqDefaultFiniteField}),
+          a, base_ring(a))
+end
+ 
+mutable struct fq_default_poly_factor
+   # fq_default_ctx_struct is 32 bytes on 64 bit machine
+   opaque::NTuple{32, Int8} 
+   # end of flint struct
+   base_field::FqDefaultFiniteField
+ 
+   function fq_default_poly_factor(ctx::FqDefaultFiniteField)
+      z = new()
+      ccall((:fq_default_poly_factor_init, libflint), Nothing,
+            (Ref{fq_default_poly_factor}, Ref{FqDefaultFiniteField}), z, ctx)
+      z.base_field = ctx
+      finalizer(_fq_default_poly_factor_clear_fn, z)
+      return z
+   end
+end
+ 
+function _fq_default_poly_factor_clear_fn(a::fq_default_poly_factor)
+   ccall((:fq_default_poly_factor_clear, libflint), Nothing,
+         (Ref{fq_default_poly_factor}, Ref{FqDefaultFiniteField}),
+          a, a.base_field)
+end
+
+###############################################################################
+#
 #   FqPolyRing / fq_poly
 #
 ###############################################################################
@@ -5412,6 +5974,246 @@ function _fq_nmod_poly_factor_clear_fn(a::fq_nmod_poly_factor)
          (Ref{fq_nmod_poly_factor}, Ref{FqNmodFiniteField}),
          a, a.base_field)
 end
+
+###############################################################################
+#
+#   FqDefaultMatSpace/fq_default_mat
+#
+###############################################################################
+
+mutable struct FqDefaultMatSpace <: MatSpace{fq_default}
+   base_ring::FqDefaultFiniteField
+   nrows::Int
+   ncols::Int
+ 
+   function FqDefaultMatSpace(R::FqDefaultFiniteField, r::Int, c::Int, cached::Bool = true)
+     (r < 0 || c < 0) && throw(error_dim_negative)
+     if cached && haskey(FqDefaultMatID, (R, r, c))
+       return FqDefaultMatID[R, r, c]
+     else
+       z = new(R, r, c)
+       if cached
+         FqDefaultMatID[R, r, c] = z
+       end
+       return z
+     end
+   end
+ end
+ 
+ const FqDefaultMatID = Dict{Tuple{FqDefaultFiniteField, Int, Int}, FqDefaultMatSpace}()
+ 
+ mutable struct fq_default_mat <: MatElem{fq_default}
+    # fq_default_mat_struct is 32 bytes on 64 bit machine
+    opaque::NTuple{32, Int8} 
+    # end of flint struct
+    
+    base_ring::FqDefaultFiniteField
+    view_parent
+ 
+    # used by windows, not finalised!!
+    function fq_default_mat()
+       return new()
+    end
+ 
+    function fq_default_mat(r::Int, c::Int, ctx::FqDefaultFiniteField)
+       z = new()
+       ccall((:fq_default_mat_init, libflint), Nothing,
+             (Ref{fq_default_mat}, Int, Int, Ref{FqDefaultFiniteField}),
+              z, r, c, ctx)
+       z.base_ring = ctx
+       finalizer(_fq_default_mat_clear_fn, z)
+       return z
+    end
+ 
+    function fq_default_mat(r::Int, c::Int, arr::AbstractArray{fq_default, 2}, ctx::FqDefaultFiniteField)
+       z = new()
+       ccall((:fq_default_mat_init, libflint), Nothing,
+             (Ref{fq_default_mat}, Int, Int, Ref{FqDefaultFiniteField}),
+              z, r, c, ctx)
+       for i = 1:r
+          for j = 1:c
+             ccall((:fq_default_mat_entry_set, libflint), Nothing,
+                   (Ref{fq_default_mat}, Int, Int, Ref{fq_default},
+                    Ref{FqDefaultFiniteField}),
+                    z, i - 1, j - 1, arr[i, j], ctx)
+          end
+       end
+       z.base_ring = ctx
+       finalizer(_fq_default_mat_clear_fn, z)
+       return z
+    end
+ 
+    function fq_default_mat(r::Int, c::Int, arr::AbstractArray{fq_default, 1}, ctx::FqDefaultFiniteField)
+       z = new()
+       ccall((:fq_default_mat_init, libflint), Nothing,
+             (Ref{fq_default_mat}, Int, Int, Ref{FqDefaultFiniteField}),
+              z, r, c, ctx)
+       for i = 1:r
+          for j = 1:c
+             ccall((:fq_default_mat_entry_set, libflint), Nothing,
+                   (Ref{fq_default_mat}, Int, Int, Ref{fq_default},
+                    Ref{FqDefaultFiniteField}),
+                    z, i - 1, j - 1, arr[(i - 1) * c + j], ctx)
+          end
+       end
+       z.base_ring = ctx
+       finalizer(_fq_default_mat_clear_fn, z)
+       return z
+    end
+ 
+    function fq_default_mat(r::Int, c::Int, arr::AbstractArray{fmpz, 2}, ctx::FqDefaultFiniteField)
+       z = new()
+       ccall((:fq_default_mat_init, libflint), Nothing,
+             (Ref{fq_default_mat}, Int, Int, Ref{FqDefaultFiniteField}),
+              z, r, c, ctx)
+       for i = 1:r
+          for j = 1:c
+             ccall((:fq_default_mat_entry_set_fmpz, libflint), Nothing,
+                  (Ref{fq_default_mat}, Int, Int, Ref{fmpz},
+                   Ref{FqDefaultFiniteField}),
+                   z, i - 1, j - 1, arr[i, j], ctx)
+          end
+       end
+       z.base_ring = ctx
+       finalizer(_fq_default_mat_clear_fn, z)
+       return z
+    end
+ 
+    function fq_default_mat(r::Int, c::Int, arr::AbstractArray{fmpz, 1}, ctx::FqDefaultFiniteField)
+       z = new()
+       ccall((:fq_default_mat_init, libflint), Nothing,
+             (Ref{fq_default_mat}, Int, Int, Ref{FqDefaultFiniteField}),
+              z, r, c, ctx)
+       for i = 1:r
+          for j = 1:c
+             ccall((:fq_default_mat_entry_set_fmpz, libflint), Nothing,
+                   (Ref{fq_default_mat}, Int, Int, Ref{fmpz},
+                    Ref{FqDefaultFiniteField}),
+                    z, i - 1, j - 1, arr[(i - 1) * c + j], ctx)
+          end
+       end
+       z.base_ring = ctx
+       finalizer(_fq_default_mat_clear_fn, z)
+       return z
+    end
+ 
+    function fq_default_mat(r::Int, c::Int, arr::AbstractArray{T, 2}, ctx::FqDefaultFiniteField) where {T <: Integer}
+       z = new()
+       ccall((:fq_default_mat_init, libflint), Nothing,
+             (Ref{fq_default_mat}, Int, Int, Ref{FqDefaultFiniteField}),
+              z, r, c, ctx)
+       for i = 1:r
+          for j = 1:c
+             ccall((:fq_default_mat_entry_set, libflint), Nothing,
+                     (Ref{fq_default_mat}, Int, Int, Ref{fq_default},
+                      Ref{FqDefaultFiniteField}),
+                      z, i - 1, j - 1, ctx(arr[i, j]), ctx)
+          end
+       end
+       z.base_ring = ctx
+       finalizer(_fq_default_mat_clear_fn, z)
+       return z
+    end
+ 
+    function fq_default_mat(r::Int, c::Int, arr::AbstractArray{T, 1}, ctx::FqDefaultFiniteField) where {T <: Integer}
+       z = new()
+       ccall((:fq_default_mat_init, libflint), Nothing,
+             (Ref{fq_default_mat}, Int, Int, Ref{FqDefaultFiniteField}),
+              z, r, c, ctx)
+       for i = 1:r
+          for j = 1:c
+             ccall((:fq_default_mat_entry_set, libflint), Nothing,
+                   (Ref{fq_default_mat}, Int, Int, Ref{fq_default},
+                    Ref{FqDefaultFiniteField}),
+                    z, i - 1, j - 1, ctx(arr[(i - 1) * c + j]), ctx)
+          end
+       end
+       z.base_ring = ctx
+       finalizer(_fq_default_mat_clear_fn, z)
+       return z
+    end
+ 
+    function fq_default_mat(r::Int, c::Int, d::fq_default)
+       z = new()
+       ctx = parent(d)
+       ccall((:fq_default_mat_init, libflint), Nothing,
+             (Ref{fq_default_mat}, Int, Int, Ref{FqDefaultFiniteField}),
+              z, r, c, ctx)
+       for i = 1:min(r, c)
+          ccall((:fq_default_mat_entry_set, libflint), Nothing,
+                (Ref{fq_default_mat}, Int, Int, Ref{fq_default},
+                 Ref{FqDefaultFiniteField}), z, i - 1, i - 1, d, ctx)
+       end
+       z.base_ring = ctx
+       finalizer(_fq_default_mat_clear_fn, z)
+       return z
+    end
+ 
+    function fq_default_mat(m::fmpz_mat, ctx::FqDefaultFiniteField)
+       z = new()
+       r = nrows(m)
+       c = ncols(m)
+       ccall((:fq_default_mat_init, libflint), Nothing,
+             (Ref{fq_default_mat}, Int, Int, Ref{FqDefaultFiniteField}),
+              z, r, c, ctx)
+       ccall((:fq_default_mat_set_fmpz_mat, libflint), Nothing,
+             (Ref{fq_default_mat}, Ref{fmpz_mat}, Ref{FqDefaultFiniteField}),
+             z, m, ctx)
+       z.base_ring = ctx
+       finalizer(_fq_default_mat_clear_fn, z)
+       return z
+    end
+
+    function fq_default_mat(m::fmpz_mod_mat, ctx::FqDefaultFiniteField)
+      z = new()
+      r = nrows(m)
+      c = ncols(m)
+      ccall((:fq_default_mat_init, libflint), Nothing,
+            (Ref{fq_default_mat}, Int, Int, Ref{FqDefaultFiniteField}),
+             z, r, c, ctx)
+      ccall((:fq_default_mat_set_fmpz_mod_mat, libflint), Nothing,
+            (Ref{fq_default_mat}, Ref{fmpz_mod_mat}, Ref{FqDefaultFiniteField}),
+            z, m, ctx)
+      z.base_ring = ctx
+      finalizer(_fq_default_mat_clear_fn, z)
+      return z
+   end
+
+   function fq_default_mat(m::nmod_mat, ctx::FqDefaultFiniteField)
+      z = new()
+      r = nrows(m)
+      c = ncols(m)
+      ccall((:fq_default_mat_init, libflint), Nothing,
+            (Ref{fq_default_mat}, Int, Int, Ref{FqDefaultFiniteField}),
+             z, r, c, ctx)
+      ccall((:fq_default_mat_set_nmod_mat, libflint), Nothing,
+            (Ref{fq_default_mat}, Ref{nmod_mat}, Ref{FqDefaultFiniteField}),
+            z, m, ctx)
+      z.base_ring = ctx
+      finalizer(_fq_default_mat_clear_fn, z)
+      return z
+   end
+
+   function fq_default_mat(m::gfp_mat, ctx::FqDefaultFiniteField)
+      z = new()
+      r = nrows(m)
+      c = ncols(m)
+      ccall((:fq_default_mat_init, libflint), Nothing,
+            (Ref{fq_default_mat}, Int, Int, Ref{FqDefaultFiniteField}),
+             z, r, c, ctx)
+      ccall((:fq_default_mat_set_nmod_mat, libflint), Nothing,
+            (Ref{fq_default_mat}, Ref{gfp_mat}, Ref{FqDefaultFiniteField}),
+            z, m, ctx)
+      z.base_ring = ctx
+      finalizer(_fq_default_mat_clear_fn, z)
+      return z
+   end
+ end
+ 
+ function _fq_default_mat_clear_fn(a::fq_default_mat)
+    ccall((:fq_default_mat_clear, libflint), Nothing,
+          (Ref{fq_default_mat}, Ref{FqDefaultFiniteField}), a, base_ring(a))
+ end
 
 ###############################################################################
 #
