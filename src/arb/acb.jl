@@ -25,7 +25,8 @@ export rsqrt, log, log1p, exppii, sin, cos, tan, cot, sinpi, cospi, tanpi,
        hypergeometric_1f1_regularized, hypergeometric_u, hypergeometric_2f1,
        jacobi_theta, modular_delta, dedekind_eta, eisenstein_g, j_invariant,
        modular_lambda, modular_weber_f, modular_weber_f1, modular_weber_f2,
-       weierstrass_p, elliptic_k, elliptic_e, canonical_unit, root_of_unity
+       weierstrass_p, elliptic_k, elliptic_e, canonical_unit, root_of_unity,
+       hilbert_class_polynomial
 
 ###############################################################################
 #
@@ -1306,6 +1307,21 @@ function eisenstein_g(k::Int, x::acb)
   z = array(CC, vec, len)
   acb_vec_clear(vec, len)
   return z[end]
+end
+
+@doc Markdown.doc"""
+    hilbert_class_polynomial(D::Int, R::FmpzPolyRing)
+
+Return in the ring $R$ the Hilbert class polynomial of discriminant $D$,
+which is only defined for $D < 0$ and $D \equiv 0, 1 \pmod 4$.
+"""
+function hilbert_class_polynomial(D::Int, R::FmpzPolyRing)
+   D < 0 && mod(D, 4) < 2 || throw(ArgumentError("$D is not a negative discriminant"))
+   z = R()
+   ccall((:acb_modular_hilbert_class_poly, Nemo.libarb), Nothing,
+         (Ref{fmpz_poly}, Int),
+         z, D)
+   return z
 end
 
 @doc Markdown.doc"""

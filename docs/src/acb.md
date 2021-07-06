@@ -590,6 +590,10 @@ eisenstein_g(::Int, ::acb)
 ```
 
 ```@docs
+hilbert_class_polynomial(::Int, ::FmpzPolyRing)
+```
+
+```@docs
 elliptic_k(::acb)
 ```
 

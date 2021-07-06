@@ -428,6 +428,13 @@ end
    @test overlaps(prod_sqr, CC(2))
 end
 
+@testset "acb.fmpz_poly" begin
+   R, x = PolynomialRing(ZZ, "x")
+   @test hilbert_class_polynomial(-3, R) == x
+   @test_throws ArgumentError hilbert_class_polynomial(2, R)
+   @test_throws ArgumentError hilbert_class_polynomial(-2, R)
+end
+
 @testset "acb.lindep" begin
    CC = ComplexField(512)
    tau1 = CC(1//3, 8//7)
