@@ -1050,8 +1050,15 @@ Return a tuple $g, s, t$ such that $g$ is the greatest common divisor of $a$
 and $b$ and integers $s$ and $t$ such that $g = as + bt$.
 """
 function gcdx(a::fmpz, b::fmpz)
-   g, s, t = gcdx(BigInt(a), BigInt(b))
-   return fmpz(g), fmpz(s), fmpz(t)
+  # Just to conform with Julia's definition
+  a == b == 0 && return zero(FlintZZ), one(FlintZZ), zero(FlintZZ)
+
+  d = FlintZZ()
+  x = FlintZZ()
+  y = FlintZZ()
+  ccall((:fmpz_xgcd_canonical_bezout, :libflint), Nothing,
+        (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), d, x, y, a, b)
+  return d, x, y
 end
 
 @doc Markdown.doc"""

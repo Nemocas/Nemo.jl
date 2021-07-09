@@ -1,9 +1,13 @@
+using Nemo
+import Random
+
 include("bernoulli_polynomials.jl")
 include("charpoly_integers.jl")
 include("det_commutative_ring.jl")
 include("det_field.jl")
 include("det_polynomials.jl")
 include("fateman.jl")
+include("gcdx.jl")
 include("minpoly_integers.jl")
 include("minpoly_finite_field.jl")
 include("minpoly_gcd_domain.jl")
@@ -14,6 +18,7 @@ include("solve_polynomials.jl")
 
 function benchmark_all()
    benchmark_fateman()
+   benchmark_gcdx()
    benchmark_pearce()
    benchmark_resultant()
    benchmark_poly_nf_elem()
