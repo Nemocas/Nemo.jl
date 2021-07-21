@@ -311,8 +311,6 @@ end
 
 *(a::Rational{T}, b::fmpq) where {T <: Integer} = b * a
 
-//(a::fmpq, b::Rational{T}) where {T <: Integer} = a//fmpq(b)
-
 ###############################################################################
 #
 #   Comparison
@@ -527,6 +525,14 @@ end
 divexact(a::fmpq, b::Rational{T}) where {T <: Integer} = divexact(a, fmpq(b))
 
 divexact(a::Rational{T}, b::fmpq) where {T <: Integer} = divexact(fmpq(a), b)
+
+//(a::fmpq, b::fmpz) = divexact(a, b)
+
+//(a::fmpq, b::fmpq) = divexact(a, b)
+
+//(a::fmpq, b::Integer) = divexact(a, b)
+
+//(a::fmpq, b::Rational{<:Integer}) = divexact(a, b)
 
 ###############################################################################
 #

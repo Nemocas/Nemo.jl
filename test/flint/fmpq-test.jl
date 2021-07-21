@@ -333,6 +333,11 @@ end
    @test_throws DivideError divexact(12, QQ(0))
 
    @test_throws DivideError divexact(ZZ(12), QQ(0))
+
+   for T in [fmpz, Int, BigInt, Rational{Int}, Rational{BigInt}]
+     @test divexact(a, T(3)) == fmpq(-2, 9)
+     @test a//T(3) == fmpq(-2, 9)
+   end
 end
 
 @testset "fmpq.modular_arithmetic" begin
