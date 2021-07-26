@@ -688,36 +688,36 @@ function (a::FqMatSpace)(b::fq)
    return fq_mat(nrows(a), ncols(a), b)
 end
 
-function (a::FqMatSpace)(arr::AbstractArray{T, 2}) where {T <: Integer}
+function (a::FqMatSpace)(arr::AbstractMatrix{T}) where {T <: Integer}
   _check_dim(nrows(a), ncols(a), arr)
   return fq_mat(nrows(a), ncols(a), arr, base_ring(a))
 end
 
-function (a::FqMatSpace)(arr::AbstractArray{T, 1}) where {T <: Integer}
-  _check_dim(nrows(a), ncols(a), arr)
-  return fq_mat(nrows(a), ncols(a), arr, base_ring(a))
-  return z
-end
-
-function (a::FqMatSpace)(arr::AbstractArray{fmpz, 2})
+function (a::FqMatSpace)(arr::AbstractVector{T}) where {T <: Integer}
   _check_dim(nrows(a), ncols(a), arr)
   return fq_mat(nrows(a), ncols(a), arr, base_ring(a))
   return z
 end
 
-function (a::FqMatSpace)(arr::AbstractArray{fmpz, 1})
+function (a::FqMatSpace)(arr::AbstractMatrix{fmpz})
   _check_dim(nrows(a), ncols(a), arr)
   return fq_mat(nrows(a), ncols(a), arr, base_ring(a))
   return z
 end
 
-function (a::FqMatSpace)(arr::AbstractArray{fq, 2})
+function (a::FqMatSpace)(arr::AbstractVector{fmpz})
+  _check_dim(nrows(a), ncols(a), arr)
+  return fq_mat(nrows(a), ncols(a), arr, base_ring(a))
+  return z
+end
+
+function (a::FqMatSpace)(arr::AbstractMatrix{fq})
   _check_dim(nrows(a), ncols(a), arr)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
   return fq_mat(nrows(a), ncols(a), arr, base_ring(a))
 end
 
-function (a::FqMatSpace)(arr::AbstractArray{fq, 1})
+function (a::FqMatSpace)(arr::AbstractVector{fq})
   _check_dim(nrows(a), ncols(a), arr)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
   return fq_mat(nrows(a), ncols(a), arr, base_ring(a))
@@ -734,12 +734,12 @@ end
 #
 ###############################################################################
 
-function matrix(R::FqFiniteField, arr::AbstractArray{<: Union{fq, fmpz, Integer}, 2})
+function matrix(R::FqFiniteField, arr::AbstractMatrix{<: Union{fq, fmpz, Integer}})
    z = fq_mat(size(arr, 1), size(arr, 2), arr, R)
    return z
 end
 
-function matrix(R::FqFiniteField, r::Int, c::Int, arr::AbstractArray{<: Union{fq, fmpz, Integer}, 1})
+function matrix(R::FqFiniteField, r::Int, c::Int, arr::AbstractVector{<: Union{fq, fmpz, Integer}})
    _check_dim(r, c, arr)
    z = fq_mat(r, c, arr, R)
    return z

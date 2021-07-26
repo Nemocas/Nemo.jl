@@ -1154,17 +1154,17 @@ function (a::FmpqRelSeriesRing)(b::fmpq_rel_series)
    return b
 end
 
-function (a::FmpqRelSeriesRing)(b::Array{fmpq, 1}, len::Int, prec::Int, val::Int)
+function (a::FmpqRelSeriesRing)(b::Vector{fmpq}, len::Int, prec::Int, val::Int)
    z = fmpq_rel_series(b, len, prec, val)
    z.parent = a
    return z
 end
 
-(a::FmpqRelSeriesRing)(b::Array{fmpz, 1}, len::Int, prec::Int, val::Int) =
+(a::FmpqRelSeriesRing)(b::Vector{fmpz}, len::Int, prec::Int, val::Int) =
     a(map(fmpq, b), len, prec, val)
 
-(a::FmpqRelSeriesRing)(b::Array{T, 1}, len::Int, prec::Int, val::Int) where {T <: Integer} =
+(a::FmpqRelSeriesRing)(b::Vector{T}, len::Int, prec::Int, val::Int) where {T <: Integer} =
     a(map(fmpq, b), len, prec, val)
 
-(a::FmpqRelSeriesRing)(b::Array{Rational{T}, 1}, len::Int, prec::Int, val::Int) where {T <: Integer} =
+(a::FmpqRelSeriesRing)(b::Vector{Rational{T}}, len::Int, prec::Int, val::Int) where {T <: Integer} =
     a(map(fmpq, b), len, prec, val)

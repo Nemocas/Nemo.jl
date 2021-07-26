@@ -302,7 +302,7 @@ mutable struct arb_poly <: PolyElem{arb}
     return z
   end
 
-  function arb_poly(x::Array{arb, 1}, p::Int)
+  function arb_poly(x::Vector{arb}, p::Int)
     z = new() 
     ccall((:arb_poly_init, libarb), Nothing, (Ref{arb_poly}, ), z)
     for i = 1:length(x)
@@ -410,7 +410,7 @@ mutable struct acb_poly <: PolyElem{acb}
     return z
   end
 
-  function acb_poly(x::Array{acb, 1}, p::Int)
+  function acb_poly(x::Vector{acb}, p::Int)
     z = new() 
     ccall((:acb_poly_init, libarb), Nothing, (Ref{acb_poly}, ), z)
     for i = 1:length(x)
@@ -542,7 +542,7 @@ mutable struct arb_mat <: MatElem{arb}
     return z
   end
 
-  function arb_mat(r::Int, c::Int, arr::AbstractArray{T, 2}) where {T <: Union{Int, UInt, fmpz, Float64, BigFloat, arb}}
+  function arb_mat(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, fmpz, Float64, BigFloat, arb}}
     z = new()
     ccall((:arb_mat_init, libarb), Nothing, 
                 (Ref{arb_mat}, Int, Int), z, r, c)
@@ -557,7 +557,7 @@ mutable struct arb_mat <: MatElem{arb}
     return z
   end
 
-  function arb_mat(r::Int, c::Int, arr::AbstractArray{T, 1}) where {T <: Union{Int, UInt, fmpz, Float64, BigFloat, arb}}
+  function arb_mat(r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, fmpz, Float64, BigFloat, arb}}
     z = new()
     ccall((:arb_mat_init, libarb), Nothing, 
                 (Ref{arb_mat}, Int, Int), z, r, c)
@@ -572,7 +572,7 @@ mutable struct arb_mat <: MatElem{arb}
     return z
   end
 
-  function arb_mat(r::Int, c::Int, arr::AbstractArray{T, 2}, prec::Int) where {T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, AbstractString}}
+  function arb_mat(r::Int, c::Int, arr::AbstractMatrix{T}, prec::Int) where {T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, AbstractString}}
     z = new()
     ccall((:arb_mat_init, libarb), Nothing, 
                 (Ref{arb_mat}, Int, Int), z, r, c)
@@ -587,7 +587,7 @@ mutable struct arb_mat <: MatElem{arb}
     return z
   end
      
-  function arb_mat(r::Int, c::Int, arr::AbstractArray{T, 1}, prec::Int) where {T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, AbstractString}}
+  function arb_mat(r::Int, c::Int, arr::AbstractVector{T}, prec::Int) where {T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, AbstractString}}
     z = new()
     ccall((:arb_mat_init, libarb), Nothing, 
                 (Ref{arb_mat}, Int, Int), z, r, c)
@@ -697,7 +697,7 @@ mutable struct acb_mat <: MatElem{acb}
     return z
   end
    
-  function acb_mat(r::Int, c::Int, arr::AbstractArray{T, 2}) where {T <: Union{Int, UInt, Float64, fmpz}}
+  function acb_mat(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, Float64, fmpz}}
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
                 (Ref{acb_mat}, Int, Int), z, r, c)
@@ -712,7 +712,7 @@ mutable struct acb_mat <: MatElem{acb}
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractArray{T, 2}) where {T <: Union{BigFloat, acb, arb}}
+  function acb_mat(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: Union{BigFloat, acb, arb}}
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
                 (Ref{acb_mat}, Int, Int), z, r, c)
@@ -727,7 +727,7 @@ mutable struct acb_mat <: MatElem{acb}
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractArray{T, 1}) where {T <: Union{Int, UInt, Float64, fmpz}}
+  function acb_mat(r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, Float64, fmpz}}
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
                 (Ref{acb_mat}, Int, Int), z, r, c)
@@ -742,7 +742,7 @@ mutable struct acb_mat <: MatElem{acb}
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractArray{T, 1}) where {T <: Union{BigFloat, acb, arb}}
+  function acb_mat(r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{BigFloat, acb, arb}}
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
                 (Ref{acb_mat}, Int, Int), z, r, c)
@@ -757,7 +757,7 @@ mutable struct acb_mat <: MatElem{acb}
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractArray{T, 2}, prec::Int) where {T <: Union{Int, UInt, fmpz, fmpq, Float64}}
+  function acb_mat(r::Int, c::Int, arr::AbstractMatrix{T}, prec::Int) where {T <: Union{Int, UInt, fmpz, fmpq, Float64}}
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
                 (Ref{acb_mat}, Int, Int), z, r, c)
@@ -772,7 +772,7 @@ mutable struct acb_mat <: MatElem{acb}
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractArray{T, 2}, prec::Int) where {T <: Union{BigFloat, arb, AbstractString, acb}}
+  function acb_mat(r::Int, c::Int, arr::AbstractMatrix{T}, prec::Int) where {T <: Union{BigFloat, arb, AbstractString, acb}}
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
                 (Ref{acb_mat}, Int, Int), z, r, c)
@@ -787,7 +787,7 @@ mutable struct acb_mat <: MatElem{acb}
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractArray{T, 1}, prec::Int) where {T <: Union{Int, UInt, fmpz, fmpq, Float64}}
+  function acb_mat(r::Int, c::Int, arr::AbstractVector{T}, prec::Int) where {T <: Union{Int, UInt, fmpz, fmpq, Float64}}
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
                 (Ref{acb_mat}, Int, Int), z, r, c)
@@ -802,7 +802,7 @@ mutable struct acb_mat <: MatElem{acb}
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractArray{T, 1}, prec::Int) where {T <: Union{BigFloat, arb, AbstractString, acb}}
+  function acb_mat(r::Int, c::Int, arr::AbstractVector{T}, prec::Int) where {T <: Union{BigFloat, arb, AbstractString, acb}}
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
                 (Ref{acb_mat}, Int, Int), z, r, c)
@@ -817,7 +817,7 @@ mutable struct acb_mat <: MatElem{acb}
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractArray{Tuple{T, T}, 2}, prec::Int) where {T <: Union{Int, UInt, Float64, fmpz}}
+  function acb_mat(r::Int, c::Int, arr::AbstractMatrix{Tuple{T, T}}, prec::Int) where {T <: Union{Int, UInt, Float64, fmpz}}
 
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
@@ -833,7 +833,7 @@ mutable struct acb_mat <: MatElem{acb}
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractArray{Tuple{T, T}, 2}, prec::Int) where {T <: Union{fmpq, BigFloat, arb, AbstractString}}
+  function acb_mat(r::Int, c::Int, arr::AbstractMatrix{Tuple{T, T}}, prec::Int) where {T <: Union{fmpq, BigFloat, arb, AbstractString}}
 
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
@@ -849,7 +849,7 @@ mutable struct acb_mat <: MatElem{acb}
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractArray{Tuple{T, T}, 1}, prec::Int) where {T <: Union{Int, UInt, Float64, fmpz}}
+  function acb_mat(r::Int, c::Int, arr::AbstractVector{Tuple{T, T}}, prec::Int) where {T <: Union{Int, UInt, Float64, fmpz}}
 
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
@@ -865,7 +865,7 @@ mutable struct acb_mat <: MatElem{acb}
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractArray{Tuple{T, T}, 1}, prec::Int) where {T <: Union{fmpq, BigFloat, arb, AbstractString}}
+  function acb_mat(r::Int, c::Int, arr::AbstractVector{Tuple{T, T}}, prec::Int) where {T <: Union{fmpq, BigFloat, arb, AbstractString}}
 
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 

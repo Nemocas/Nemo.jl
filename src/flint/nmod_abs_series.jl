@@ -647,19 +647,19 @@ function (a::($rtype))(b::($etype))
    return b
 end
 
-function (a::($rtype))(b::Array{fmpz, 1}, len::Int, prec::Int)
+function (a::($rtype))(b::Vector{fmpz}, len::Int, prec::Int)
    z = ($etype)(a.n, b, len, prec)
    z.parent = a
    return z
 end
 
-function (a::($rtype))(b::Array{UInt, 1}, len::Int, prec::Int)
+function (a::($rtype))(b::Vector{UInt}, len::Int, prec::Int)
    z = ($etype)(a.n, b, len, prec)
    z.parent = a
    return z
 end
 
-function (a::($rtype))(b::Array{($mtype), 1}, len::Int, prec::Int)
+function (a::($rtype))(b::Vector{($mtype)}, len::Int, prec::Int)
    if length(b) > 0
       (base_ring(a) != parent(b[1])) && error("Wrong parents")
    end

@@ -66,7 +66,7 @@ Poly.jl/fmpz_poly.jl
 
 * implement fmpz_mod_poly_get_str_pretty and use it in show
 
-* Add generic multipoint evaluation a la arb_poly evaluate(x::arb_poly, b::Array{arb, 1}).
+* Add generic multipoint evaluation a la arb_poly evaluate(x::arb_poly, b::Vector{arb}).
 
 * Add generic function for constructing a polynomial from its roots, a la the
 arb_poly function from_roots.

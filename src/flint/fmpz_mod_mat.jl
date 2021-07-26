@@ -766,49 +766,49 @@ function (a::FmpzModMatSpace)(b::fmpz_mod)
    return M
 end
 
-function (a::FmpzModMatSpace)(arr::AbstractArray{BigInt, 2}, transpose::Bool = false)
+function (a::FmpzModMatSpace)(arr::AbstractMatrix{BigInt}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
   z = fmpz_mod_mat(nrows(a), ncols(a), a.n, arr, transpose)
   z.base_ring = a.base_ring
   return z
 end
 
-function (a::FmpzModMatSpace)(arr::AbstractArray{BigInt, 1})
+function (a::FmpzModMatSpace)(arr::AbstractVector{BigInt})
   _check_dim(nrows(a), ncols(a), arr)
   z = fmpz_mod_mat(nrows(a), ncols(a), a.n, arr)
   z.base_ring = a.base_ring
   return z
 end
 
-function (a::FmpzModMatSpace)(arr::AbstractArray{fmpz, 2}, transpose::Bool = false)
+function (a::FmpzModMatSpace)(arr::AbstractMatrix{fmpz}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
   z = fmpz_mod_mat(nrows(a), ncols(a), a.n, arr, transpose)
   z.base_ring = a.base_ring
   return z
 end
 
-function (a::FmpzModMatSpace)(arr::AbstractArray{fmpz, 1})
+function (a::FmpzModMatSpace)(arr::AbstractVector{fmpz})
   _check_dim(nrows(a), ncols(a), arr)
   z = fmpz_mod_mat(nrows(a), ncols(a), a.n, arr)
   z.base_ring = a.base_ring
   return z
 end
 
-function (a::FmpzModMatSpace)(arr::AbstractArray{Int, 2}, transpose::Bool = false)
+function (a::FmpzModMatSpace)(arr::AbstractMatrix{Int}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
   z = fmpz_mod_mat(nrows(a), ncols(a), a.n, arr, transpose)
   z.base_ring = a.base_ring
   return z
 end
 
-function (a::FmpzModMatSpace)(arr::AbstractArray{Int, 1})
+function (a::FmpzModMatSpace)(arr::AbstractVector{Int})
   _check_dim(nrows(a), ncols(a), arr)
   z = fmpz_mod_mat(nrows(a), ncols(a), a.n, arr)
   z.base_ring = a.base_ring
   return z
 end
 
-function (a::FmpzModMatSpace)(arr::AbstractArray{fmpz_mod, 2}, transpose::Bool = false)
+function (a::FmpzModMatSpace)(arr::AbstractMatrix{fmpz_mod}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
   z = fmpz_mod_mat(nrows(a), ncols(a), a.n, arr, transpose)
@@ -816,7 +816,7 @@ function (a::FmpzModMatSpace)(arr::AbstractArray{fmpz_mod, 2}, transpose::Bool =
   return z
 end
 
-function (a::FmpzModMatSpace)(arr::AbstractArray{fmpz_mod, 1})
+function (a::FmpzModMatSpace)(arr::AbstractVector{fmpz_mod})
   _check_dim(nrows(a), ncols(a), arr)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
   z = fmpz_mod_mat(nrows(a), ncols(a), a.n, arr)
@@ -830,13 +830,13 @@ end
 #
 ###############################################################################
 
-function matrix(R::FmpzModRing, arr::AbstractArray{<: Union{fmpz_mod, fmpz, Integer}, 2})
+function matrix(R::FmpzModRing, arr::AbstractMatrix{<: Union{fmpz_mod, fmpz, Integer}})
    z = fmpz_mod_mat(size(arr, 1), size(arr, 2), R.n, arr)
    z.base_ring = R
    return z
 end
 
-function matrix(R::FmpzModRing, r::Int, c::Int, arr::AbstractArray{<: Union{fmpz_mod, fmpz, Integer}, 1})
+function matrix(R::FmpzModRing, r::Int, c::Int, arr::AbstractVector{<: Union{fmpz_mod, fmpz, Integer}})
    _check_dim(r, c, arr)
    z = fmpz_mod_mat(r, c, R.n, arr)
    z.base_ring = R

@@ -661,7 +661,7 @@ function Base.divrem(a::fmpq_mpoly, b::fmpq_mpoly)
    return q, r
 end
 
-function Base.divrem(a::fmpq_mpoly, b::Array{fmpq_mpoly, 1})
+function Base.divrem(a::fmpq_mpoly, b::Vector{fmpq_mpoly})
    len = length(b)
    q = [parent(a)() for i in 1:len]
    r = parent(a)()
@@ -762,7 +762,7 @@ f values")
    # First work out types of products
    r = R()
    c = zero(R)
-   U = Array{Any, 1}(undef, length(vals))
+   U = Vector{Any}(undef, length(vals))
    for j = 1:length(vals)
       W = typeof(vals[j])
       if ((W <: Integer && W != BigInt) ||
@@ -1156,12 +1156,12 @@ end
 #
 ###############################################################################
 
-function PolynomialRing(R::FlintRationalField, s::Array{Symbol, 1}; cached::Bool = true, ordering::Symbol = :lex)
+function PolynomialRing(R::FlintRationalField, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
    parent_obj = FmpqMPolyRing(s, ordering, cached)
    return tuple(parent_obj, gens(parent_obj))
 end
 
-function PolynomialRing(R::FlintRationalField, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
+function PolynomialRing(R::FlintRationalField, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
    return PolynomialRing(R, [Symbol(x) for x in s]; cached=cached, ordering=ordering)
 end
 

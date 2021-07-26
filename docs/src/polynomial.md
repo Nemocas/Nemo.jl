@@ -122,8 +122,8 @@ r = roots(n, isolate_real = true)
 ### Construction from roots
 
 ```@docs
-from_roots(::ArbPolyRing, ::Array{arb, 1})
-from_roots(::AcbPolyRing, ::Array{acb, 1})
+from_roots(::ArbPolyRing, ::Vector{arb})
+from_roots(::AcbPolyRing, ::Vector{acb})
 ```
 
 **Examples**

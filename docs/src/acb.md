@@ -739,11 +739,11 @@ d = hypergeometric_1f1(s, s+1, z)
 ### Linear dependence
 
 ```@docs
-lindep(::Array{acb, 1}, n::Int)
+lindep(::Vector{acb}, n::Int)
 ```
 
 ```@docs
-lindep(A::Array{acb, 2}, bits::Int)
+lindep(A::Matrix{acb}, bits::Int)
 ```
 
 **Examples**

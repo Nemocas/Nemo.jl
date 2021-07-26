@@ -362,7 +362,7 @@ function ==(a::Generic.MPoly{T}, n::fmpz) where T <: RingElem
    return false
 end
 
-function evaluate(a::Generic.MPoly{T}, A::Array{fmpz, 1}) where {T <: RingElement}
+function evaluate(a::Generic.MPoly{T}, A::Vector{fmpz}) where {T <: RingElement}
    if iszero(a)
       return base_ring(a)()
    end

@@ -719,7 +719,7 @@ function (a::($rtype))(b::($etype))
    return b
 end
 
-function (a::($rtype))(b::Array{fmpz, 1}, len::Int, prec::Int)
+function (a::($rtype))(b::Vector{fmpz}, len::Int, prec::Int)
    m = base_ring(a)
    z = ($etype)(m, b, len, prec)
    z.parent = a

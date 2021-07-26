@@ -42,6 +42,6 @@
   end
 
   # Finally, write out a deps.jl file
-  write_deps_file(joinpath(@__DIR__, "deps.jl"), Array{Product,1}(products), verbose=verbose)
+  write_deps_file(joinpath(@__DIR__, "deps.jl"), Vector{Product}(products), verbose=verbose)
 
 end # VERSION

@@ -780,7 +780,7 @@ function (a::FmpzRelSeriesRing)(b::fmpz_rel_series)
    return b
 end
 
-function (a::FmpzRelSeriesRing)(b::Array{fmpz, 1}, len::Int, prec::Int, val::Int)
+function (a::FmpzRelSeriesRing)(b::Vector{fmpz}, len::Int, prec::Int, val::Int)
    z = fmpz_rel_series(b, len, prec, val)
    z.parent = a
    return z

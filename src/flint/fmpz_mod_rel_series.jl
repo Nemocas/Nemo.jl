@@ -926,13 +926,13 @@ function (a::($rtype))(b::($etype))
    return b
 end
 
-function (a::($rtype))(b::Array{fmpz, 1}, len::Int, prec::Int, val::Int)
+function (a::($rtype))(b::Vector{fmpz}, len::Int, prec::Int, val::Int)
    z = ($etype)(base_ring(a), b, len, prec, val)
    z.parent = a
    return z
 end
 
-function (a::($rtype))(b::Array{($mtype), 1}, len::Int, prec::Int, val::Int)
+function (a::($rtype))(b::Vector{($mtype)}, len::Int, prec::Int, val::Int)
    z = ($etype)(base_ring(a), b, len, prec, val)
    z.parent = a
    return z

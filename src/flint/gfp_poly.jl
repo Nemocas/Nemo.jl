@@ -299,8 +299,8 @@ end
 #
 ################################################################################
 
-function interpolate(R::GFPPolyRing, x::Array{gfp_elem, 1},
-                                      y::Array{gfp_elem, 1})
+function interpolate(R::GFPPolyRing, x::Vector{gfp_elem},
+                                      y::Vector{gfp_elem})
   z = R()
 
   ax = Vector{UInt}(undef, length(x))
@@ -547,21 +547,21 @@ function (R::GFPPolyRing)(x::gfp_elem)
   return z
 end
 
-function (R::GFPPolyRing)(arr::Array{fmpz, 1})
+function (R::GFPPolyRing)(arr::Vector{fmpz})
   z = gfp_poly(R.n, arr)
   z.parent = R
   return z
 end
 
-function (R::GFPPolyRing)(arr::Array{UInt, 1})
+function (R::GFPPolyRing)(arr::Vector{UInt})
   z = gfp_poly(R.n, arr)
   z.parent = R
   return z
 end
 
-(R::GFPPolyRing)(arr::Array{T, 1}) where {T <: Integer} = R(map(base_ring(R), arr))
+(R::GFPPolyRing)(arr::Vector{T}) where {T <: Integer} = R(map(base_ring(R), arr))
 
-function (R::GFPPolyRing)(arr::Array{gfp_elem, 1})
+function (R::GFPPolyRing)(arr::Vector{gfp_elem})
   if length(arr) > 0
      (base_ring(R) != parent(arr[1])) && error("Wrong parents")
   end

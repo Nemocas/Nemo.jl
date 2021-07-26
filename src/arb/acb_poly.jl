@@ -540,7 +540,7 @@ function acb_vec(n::Int)
    return ccall((:_acb_vec_init, libarb), Ptr{acb_struct}, (Int,), n)
 end
 
-function acb_vec(b::Array{acb, 1})
+function acb_vec(b::Vector{acb})
    v = ccall((:_acb_vec_init, libarb), Ptr{acb_struct}, (Int,), length(b))
    for i=1:length(b)
        ccall((:acb_set, libarb), Nothing, (Ptr{acb_struct}, Ref{acb}),
@@ -564,11 +564,11 @@ function acb_vec_clear(v::Ptr{acb_struct}, n::Int)
 end
 
 @doc Markdown.doc"""
-    from_roots(R::AcbPolyRing, b::Array{acb, 1})
+    from_roots(R::AcbPolyRing, b::Vector{acb})
 
 Construct a polynomial in the given polynomial ring from a list of its roots.
 """
-function from_roots(R::AcbPolyRing, b::Array{acb, 1})
+function from_roots(R::AcbPolyRing, b::Vector{acb})
    z = R()
    tmp = acb_vec(b)
    ccall((:acb_poly_product_roots, libarb), Nothing,
@@ -577,11 +577,11 @@ function from_roots(R::AcbPolyRing, b::Array{acb, 1})
    return z
 end
 
-function evaluate_iter(x::acb_poly, b::Array{acb, 1})
+function evaluate_iter(x::acb_poly, b::Vector{acb})
    return acb[evaluate(x, b[i]) for i=1:length(b)]
 end
 
-function evaluate_fast(x::acb_poly, b::Array{acb, 1})
+function evaluate_fast(x::acb_poly, b::Vector{acb})
    tmp = acb_vec(b)
    ccall((:acb_poly_evaluate_vec_fast, libarb), Nothing,
                 (Ptr{acb_struct}, Ref{acb_poly}, Ptr{acb_struct}, Int, Int),
@@ -591,7 +591,7 @@ function evaluate_fast(x::acb_poly, b::Array{acb, 1})
    return res
 end
 
-function interpolate_newton(R::AcbPolyRing, xs::Array{acb, 1}, ys::Array{acb, 1})
+function interpolate_newton(R::AcbPolyRing, xs::Vector{acb}, ys::Vector{acb})
    length(xs) != length(ys) && error()
    z = R()
    xsv = acb_vec(xs)
@@ -604,7 +604,7 @@ function interpolate_newton(R::AcbPolyRing, xs::Array{acb, 1}, ys::Array{acb, 1}
    return z
 end
 
-function interpolate_barycentric(R::AcbPolyRing, xs::Array{acb, 1}, ys::Array{acb, 1})
+function interpolate_barycentric(R::AcbPolyRing, xs::Vector{acb}, ys::Vector{acb})
    length(xs) != length(ys) && error()
    z = R()
    xsv = acb_vec(xs)
@@ -617,7 +617,7 @@ function interpolate_barycentric(R::AcbPolyRing, xs::Array{acb, 1}, ys::Array{ac
    return z
 end
 
-function interpolate_fast(R::AcbPolyRing, xs::Array{acb, 1}, ys::Array{acb, 1})
+function interpolate_fast(R::AcbPolyRing, xs::Vector{acb}, ys::Vector{acb})
    length(xs) != length(ys) && error()
    z = R()
    xsv = acb_vec(xs)
@@ -631,12 +631,12 @@ function interpolate_fast(R::AcbPolyRing, xs::Array{acb, 1}, ys::Array{acb, 1})
 end
 
 # todo: cutoffs for fast algorithm
-function interpolate(R::AcbPolyRing, xs::Array{acb, 1}, ys::Array{acb, 1})
+function interpolate(R::AcbPolyRing, xs::Vector{acb}, ys::Vector{acb})
    return interpolate_newton(R, xs, ys)
 end
 
 # todo: cutoffs for fast algorithm
-function evaluate(x::acb_poly, b::Array{acb, 1})
+function evaluate(x::acb_poly, b::Vector{acb})
    return evaluate_iter(x, b)
 end
 
@@ -877,7 +877,7 @@ end
 
 (a::AcbPolyRing)(b::Rational{T}) where {T <: Integer} = a(fmpq(b))
 
-function (a::AcbPolyRing)(b::Array{acb, 1})
+function (a::AcbPolyRing)(b::Vector{acb})
    z = acb_poly(b, a.base_ring.prec)
    z.parent = a
    return z
@@ -885,13 +885,13 @@ end
 
 for T in [fmpz, fmpq, Float64, Complex{Float64}, Complex{Int}, arb]
   @eval begin
-    (a::AcbPolyRing)(b::Array{$T, 1}) = a(map(base_ring(a), b))
+    (a::AcbPolyRing)(b::Vector{$T}) = a(map(base_ring(a), b))
   end
 end
 
-(a::AcbPolyRing)(b::Array{T, 1}) where {T <: Integer} = a(map(base_ring(a), b))
+(a::AcbPolyRing)(b::Vector{T}) where {T <: Integer} = a(map(base_ring(a), b))
 
-(a::AcbPolyRing)(b::Array{Rational{T}, 1}) where {T <: Integer} = a(map(base_ring(a), b))
+(a::AcbPolyRing)(b::Vector{Rational{T}}) where {T <: Integer} = a(map(base_ring(a), b))
 
 function (a::AcbPolyRing)(b::fmpz_poly)
    z = acb_poly(b, a.base_ring.prec)

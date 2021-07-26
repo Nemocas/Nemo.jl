@@ -69,11 +69,11 @@ any_root(x::PolyElem) = -coeff(linear_factor(x), 0)
 ################################################################################
 
 @doc Markdown.doc"""
-    berlekamp_massey(a::Array{Y, 1}, n::Int) where Y <: FieldElem
+    berlekamp_massey(a::Vector{Y}, n::Int) where Y <: FieldElem
 
 Compute the minimal polynomial of a linear recurring sequence $a$.
 """
-function berlekamp_massey(a::Array{Y, 1}, n::Int) where Y <: FieldElem
+function berlekamp_massey(a::Vector{Y}, n::Int) where Y <: FieldElem
 
   S, T = PolynomialRing(parent(a[1]), "T")
   m = 2*n - 1

@@ -919,7 +919,7 @@ function (a::FmpqAbsSeriesRing)(b::fmpq_abs_series)
    return b
 end
 
-function (a::FmpqAbsSeriesRing)(b::Array{fmpq, 1}, len::Int, prec::Int)
+function (a::FmpqAbsSeriesRing)(b::Vector{fmpq}, len::Int, prec::Int)
    z = fmpq_abs_series(b, len, prec)
    z.parent = a
    return z

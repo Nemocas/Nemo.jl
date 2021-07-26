@@ -665,8 +665,8 @@ end
 #
 ################################################################################
 
-function interpolate(R::NmodPolyRing, x::Array{nmod, 1},
-                                      y::Array{nmod, 1})
+function interpolate(R::NmodPolyRing, x::Vector{nmod},
+                                      y::Vector{nmod})
   z = R()
 
   ax = Vector{UInt}(undef, length(x))
@@ -1056,21 +1056,21 @@ function (R::NmodPolyRing)(x::nmod)
   return z
 end
 
-function (R::NmodPolyRing)(arr::Array{fmpz, 1})
+function (R::NmodPolyRing)(arr::Vector{fmpz})
   z = nmod_poly(R.n, arr)
   z.parent = R
   return z
 end
 
-function (R::NmodPolyRing)(arr::Array{UInt, 1})
+function (R::NmodPolyRing)(arr::Vector{UInt})
   z = nmod_poly(R.n, arr)
   z.parent = R
   return z
 end
 
-(R::NmodPolyRing)(arr::Array{T, 1}) where {T <: Integer} = R(map(base_ring(R), arr))
+(R::NmodPolyRing)(arr::Vector{T}) where {T <: Integer} = R(map(base_ring(R), arr))
 
-function (R::NmodPolyRing)(arr::Array{nmod, 1})
+function (R::NmodPolyRing)(arr::Vector{nmod})
   if length(arr) > 0
      (base_ring(R) != parent(arr[1])) && error("Wrong parents")
   end

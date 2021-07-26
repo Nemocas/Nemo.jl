@@ -1343,28 +1343,28 @@ function (a::FmpzMatSpace)()
    return z
 end
 
-function (a::FmpzMatSpace)(arr::AbstractArray{fmpz, 2})
+function (a::FmpzMatSpace)(arr::AbstractMatrix{fmpz})
    _check_dim(nrows(a), ncols(a), arr)
    z = fmpz_mat(nrows(a), ncols(a), arr)
    z.base_ring = FlintZZ
    return z
 end
 
-function (a::FmpzMatSpace)(arr::AbstractArray{T, 2}) where {T <: Integer}
+function (a::FmpzMatSpace)(arr::AbstractMatrix{T}) where {T <: Integer}
    _check_dim(nrows(a), ncols(a), arr)
    z = fmpz_mat(nrows(a), ncols(a), arr)
    z.base_ring = FlintZZ
    return z
 end
 
-function (a::FmpzMatSpace)(arr::AbstractArray{fmpz, 1})
+function (a::FmpzMatSpace)(arr::AbstractVector{fmpz})
    _check_dim(nrows(a), ncols(a), arr)
    z = fmpz_mat(nrows(a), ncols(a), arr)
    z.base_ring = FlintZZ
    return z
 end
 
-function (a::FmpzMatSpace)(arr::AbstractArray{T, 1}) where {T <: Integer}
+function (a::FmpzMatSpace)(arr::AbstractVector{T}) where {T <: Integer}
    _check_dim(nrows(a), ncols(a), arr)
    z = fmpz_mat(nrows(a), ncols(a), arr)
    z.base_ring = FlintZZ
@@ -1395,7 +1395,7 @@ promote_rule(::Type{fmpz_mat}, ::Type{T}) where {T <: Integer} = fmpz_mat
 
 promote_rule(::Type{fmpz_mat}, ::Type{fmpz}) = fmpz_mat
 
-function (::Type{Base.Array{Int, 2}})(A::fmpz_mat)
+function (::Type{Base.Matrix{Int}})(A::fmpz_mat)
     m, n = size(A)
 
     fittable = [fits(Int, A[i, j]) for i in 1:m, j in 1:n]
@@ -1407,7 +1407,7 @@ function (::Type{Base.Array{Int, 2}})(A::fmpz_mat)
     return mat
 end
 
-function (::Type{Base.Array{BigInt, 2}})(A::fmpz_mat)
+function (::Type{Base.Matrix{BigInt}})(A::fmpz_mat)
     m, n = size(A)
     # No check: always ensured to fit a BigInt.
     mat::Matrix{BigInt} = BigInt[A[i, j] for i in 1:m, j in 1:n]
@@ -1420,26 +1420,26 @@ end
 #
 ###############################################################################
 
-function matrix(R::FlintIntegerRing, arr::AbstractArray{fmpz, 2})
+function matrix(R::FlintIntegerRing, arr::AbstractMatrix{fmpz})
    z = fmpz_mat(size(arr, 1), size(arr, 2), arr)
    z.base_ring = FlintZZ
    return z
 end
 
-function matrix(R::FlintIntegerRing, arr::AbstractArray{<: Integer, 2})
+function matrix(R::FlintIntegerRing, arr::AbstractMatrix{<: Integer})
    z = fmpz_mat(size(arr, 1), size(arr, 2), arr)
    z.base_ring = FlintZZ
    return z
 end
 
-function matrix(R::FlintIntegerRing, r::Int, c::Int, arr::AbstractArray{fmpz, 1})
+function matrix(R::FlintIntegerRing, r::Int, c::Int, arr::AbstractVector{fmpz})
    _check_dim(r, c, arr)
    z = fmpz_mat(r, c, arr)
    z.base_ring = FlintZZ
    return z
 end
 
-function matrix(R::FlintIntegerRing, r::Int, c::Int, arr::AbstractArray{<: Integer, 1})
+function matrix(R::FlintIntegerRing, r::Int, c::Int, arr::AbstractVector{<: Integer})
    _check_dim(r, c, arr)
    z = fmpz_mat(r, c, arr)
    z.base_ring = FlintZZ

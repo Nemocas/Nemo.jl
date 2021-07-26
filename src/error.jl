@@ -21,12 +21,12 @@ mutable struct ErrorConstrDimMismatch <: Exception
     return e
   end
 
-  function ErrorConstrDimMismatch(er::Int, ec::Int, a::Array{T, 2}) where {T}
+  function ErrorConstrDimMismatch(er::Int, ec::Int, a::Matrix{T}) where {T}
     gr, gc = size(a)
     return ErrorConstrDimMismatch(er, ec, gr, gc)
   end
 
-  function ErrorConstrDimMismatch(er::Int, ec::Int, a::Array{T, 1}) where {T}
+  function ErrorConstrDimMismatch(er::Int, ec::Int, a::Vector{T}) where {T}
     gl = length(a)
     return ErrorConstrDimMismatch(er, ec, gl)
   end

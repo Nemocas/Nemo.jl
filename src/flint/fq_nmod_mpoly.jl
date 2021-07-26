@@ -582,7 +582,7 @@ function Base.divrem(a::fq_nmod_mpoly, b::fq_nmod_mpoly)
    return q, r
 end
 
-function Base.divrem(a::fq_nmod_mpoly, b::Array{fq_nmod_mpoly, 1})
+function Base.divrem(a::fq_nmod_mpoly, b::Vector{fq_nmod_mpoly})
    len = length(b)
    if len < 1
       error("need at least one divisor in divrem")
@@ -694,7 +694,7 @@ function (a::fq_nmod_mpoly)(vals::Union{NCRingElem, RingElement}...)
    # First work out types of products
    r = R()
    c = zero(R)
-   U = Array{Any, 1}(undef, length(vals))
+   U = Vector{Any}(undef, length(vals))
    for j = 1:length(vals)
       W = typeof(vals[j])
       if ((W <: Integer && W != BigInt) ||
@@ -1048,12 +1048,12 @@ end
 #
 ###############################################################################
 
-function PolynomialRing(R::FqNmodFiniteField, s::Array{Symbol, 1}; cached::Bool = true, ordering::Symbol = :lex)
+function PolynomialRing(R::FqNmodFiniteField, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
    parent_obj = FqNmodMPolyRing(R, s, ordering, cached)
    return tuple(parent_obj, gens(parent_obj))
 end
 
-function PolynomialRing(R::FqNmodFiniteField, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
+function PolynomialRing(R::FqNmodFiniteField, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
    return PolynomialRing(R, [Symbol(x) for x in s]; cached=cached, ordering=ordering)
 end
 

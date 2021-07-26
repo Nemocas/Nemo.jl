@@ -758,14 +758,14 @@ function (a::FmpqMatSpace)()
    return z
 end
 
-function (a::FmpqMatSpace)(arr::AbstractArray{fmpq, 2})
+function (a::FmpqMatSpace)(arr::AbstractMatrix{fmpq})
    _check_dim(nrows(a), ncols(a), arr)
    z = fmpq_mat(nrows(a), ncols(a), arr)
    z.base_ring = a.base_ring
    return z
 end
 
-function (a::FmpqMatSpace)(arr::AbstractArray{fmpz, 2})
+function (a::FmpqMatSpace)(arr::AbstractMatrix{fmpz})
    _check_dim(nrows(a), ncols(a), arr)
    z = fmpq_mat(nrows(a), ncols(a), arr)
    z.base_ring = a.base_ring
@@ -773,42 +773,42 @@ function (a::FmpqMatSpace)(arr::AbstractArray{fmpz, 2})
 end
 
 
-function (a::FmpqMatSpace)(arr::AbstractArray{T, 2}) where {T <: Integer}
+function (a::FmpqMatSpace)(arr::AbstractMatrix{T}) where {T <: Integer}
    _check_dim(nrows(a), ncols(a), arr)
    z = fmpq_mat(nrows(a), ncols(a), arr)
    z.base_ring = a.base_ring
    return z
 end
 
-function (a::FmpqMatSpace)(arr::AbstractArray{Rational{T}, 2}) where {T <: Integer}
+function (a::FmpqMatSpace)(arr::AbstractMatrix{Rational{T}}) where {T <: Integer}
    _check_dim(nrows(a), ncols(a), arr)
    z = fmpq_mat(nrows(a), ncols(a), map(fmpq, arr))
    z.base_ring = a.base_ring
    return z
 end
 
-function (a::FmpqMatSpace)(arr::AbstractArray{fmpq, 1})
+function (a::FmpqMatSpace)(arr::AbstractVector{fmpq})
    _check_dim(nrows(a), ncols(a), arr)
    z = fmpq_mat(nrows(a), ncols(a), arr)
    z.base_ring = a.base_ring
    return z
 end
 
-function (a::FmpqMatSpace)(arr::AbstractArray{fmpz, 1})
+function (a::FmpqMatSpace)(arr::AbstractVector{fmpz})
    _check_dim(nrows(a), ncols(a), arr)
    z = fmpq_mat(nrows(a), ncols(a), arr)
    z.base_ring = a.base_ring
    return z
 end
 
-function (a::FmpqMatSpace)(arr::AbstractArray{T, 1}) where {T <: Integer}
+function (a::FmpqMatSpace)(arr::AbstractVector{T}) where {T <: Integer}
    _check_dim(nrows(a), ncols(a), arr)
    z = fmpq_mat(nrows(a), ncols(a), arr)
    z.base_ring = a.base_ring
    return z
 end
 
-function (a::FmpqMatSpace)(arr::AbstractArray{Rational{T}, 1}) where {T <: Integer}
+function (a::FmpqMatSpace)(arr::AbstractVector{Rational{T}}) where {T <: Integer}
    _check_dim(nrows(a), ncols(a), arr)
    z = fmpq_mat(nrows(a), ncols(a), map(fmpq, arr))
    z.base_ring = a.base_ring
@@ -864,39 +864,39 @@ promote_rule(::Type{fmpq_mat}, ::Type{Rational{T}}) where T <: Union{Int, BigInt
 #
 ###############################################################################
 
-function matrix(R::FlintRationalField, arr::AbstractArray{fmpq, 2})
+function matrix(R::FlintRationalField, arr::AbstractMatrix{fmpq})
    z = fmpq_mat(size(arr, 1), size(arr, 2), arr)
    z.base_ring = FlintQQ
    return z
 end
 
-function matrix(R::FlintRationalField, arr::AbstractArray{<: Union{fmpz, Int, BigInt}, 2})
+function matrix(R::FlintRationalField, arr::AbstractMatrix{<: Union{fmpz, Int, BigInt}})
    z = fmpq_mat(size(arr, 1), size(arr, 2), arr)
    z.base_ring = FlintQQ
    return z
 end
 
-function matrix(R::FlintRationalField, arr::AbstractArray{Rational{T}, 2}) where {T <: Integer}
+function matrix(R::FlintRationalField, arr::AbstractMatrix{Rational{T}}) where {T <: Integer}
    z = fmpq_mat(size(arr, 1), size(arr, 2), map(fmpq, arr))
    z.base_ring = FlintQQ
    return z
 end
 
-function matrix(R::FlintRationalField, r::Int, c::Int, arr::AbstractArray{fmpq, 1})
+function matrix(R::FlintRationalField, r::Int, c::Int, arr::AbstractVector{fmpq})
    _check_dim(r, c, arr)
    z = fmpq_mat(r, c, arr)
    z.base_ring = FlintQQ
    return z
 end
 
-function matrix(R::FlintRationalField, r::Int, c::Int, arr::AbstractArray{<: Union{fmpz, Int, BigInt}, 1})
+function matrix(R::FlintRationalField, r::Int, c::Int, arr::AbstractVector{<: Union{fmpz, Int, BigInt}})
    _check_dim(r, c, arr)
    z = fmpq_mat(r, c, arr)
    z.base_ring = FlintQQ
    return z
 end
 
-function matrix(R::FlintRationalField, r::Int, c::Int, arr::AbstractArray{Rational{T}, 1}) where {T <: Union{fmpz, Int, BigInt}}
+function matrix(R::FlintRationalField, r::Int, c::Int, arr::AbstractVector{Rational{T}}) where {T <: Union{fmpz, Int, BigInt}}
    _check_dim(r, c, arr)
    z = fmpq_mat(r, c, map(fmpq, arr))
    z.base_ring = FlintQQ

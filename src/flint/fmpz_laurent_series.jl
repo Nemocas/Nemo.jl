@@ -1427,7 +1427,7 @@ function (R::FmpzLaurentSeriesRing)(b::fmpz_laurent_series)
    return b
 end
 
-function (R::FmpzLaurentSeriesRing)(b::Array{fmpz, 1}, len::Int, prec::Int, val::Int, scale::Int, rescale::Bool = true)
+function (R::FmpzLaurentSeriesRing)(b::Vector{fmpz}, len::Int, prec::Int, val::Int, scale::Int, rescale::Bool = true)
    z = fmpz_laurent_series(b, len, prec, val, scale)
    z.parent = R
    if rescale

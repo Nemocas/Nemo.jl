@@ -649,7 +649,7 @@ function (a::FmpzAbsSeriesRing)(b::fmpz_abs_series)
    return b
 end
 
-function (a::FmpzAbsSeriesRing)(b::Array{fmpz, 1}, len::Int, prec::Int)
+function (a::FmpzAbsSeriesRing)(b::Vector{fmpz}, len::Int, prec::Int)
    z = fmpz_abs_series(b, len, prec)
    z.parent = a
    return z

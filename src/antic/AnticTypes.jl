@@ -29,7 +29,7 @@ mutable struct AnticNumberField <: SimpleNumField{fmpq}
    flag::UInt
    pol::fmpq_poly
    S::Symbol
-   auxilliary_data::Array{Any, 1}
+   auxilliary_data::Vector{Any}
 
    function AnticNumberField(pol::fmpq_poly, s::Symbol, cached::Bool = false, check::Bool = true)
      check && !isirreducible(pol) && error("Polynomial must be irreducible")

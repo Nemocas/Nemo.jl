@@ -1745,7 +1745,7 @@ function agm(x::acb, y::acb)
 end
 
 @doc Markdown.doc"""
-    lindep(A::Array{acb, 1}, bits::Int)
+    lindep(A::Vector{acb}, bits::Int)
 
 Find a small linear combination of the entries of the array $A$ that is small
 (using LLL). The entries are first scaled by the given number of bits before
@@ -1754,7 +1754,7 @@ be used to find linear dependence between a list of complex numbers. The algorit
 heuristic only and returns an array of Nemo integers representing the linear
 combination.
 """
-function lindep(A::Array{acb, 1}, bits::Int)
+function lindep(A::Vector{acb}, bits::Int)
   bits < 0 && throw(DomainError(bits, "Number of bits must be non-negative"))
   n = length(A)
   V = [ldexp(s, bits) for s in A]
@@ -1771,7 +1771,7 @@ function lindep(A::Array{acb, 1}, bits::Int)
 end
 
 @doc Markdown.doc"""
-    lindep(A::Array{acb, 2}, bits::Int)
+    lindep(A::Matrix{acb}, bits::Int)
 
 Find a (common) small linear combination of the entries in each row of the array $A$,
 that is small (using LLL). It is assumed that the complex numbers in each row of the
@@ -1781,7 +1781,7 @@ LLL. This function can be used to find a common linear dependence shared across 
 number of lists of complex numbers. The algorithm is heuristic only and returns an
 array of Nemo integers representing the common linear combination.
 """
-function lindep(A::Array{acb, 2}, bits::Int)
+function lindep(A::Matrix{acb}, bits::Int)
   bits < 0 && throw(DomainError(bits, "Number of bits must be non-negative"))
   m, n = size(A)
   V = [ldexp(s, bits) for s in A]

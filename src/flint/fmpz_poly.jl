@@ -644,8 +644,8 @@ end
 #
 ################################################################################
 
-function interpolate(R::FmpzPolyRing, x::Array{fmpz, 1},
-                                      y::Array{fmpz, 1})
+function interpolate(R::FmpzPolyRing, x::Vector{fmpz},
+                                      y::Vector{fmpz})
   z = R()
 
   ax = Vector{Int}(undef, length(x))
@@ -915,13 +915,13 @@ function (a::FmpzPolyRing)(b::fmpz)
    return z
 end
 
-function (a::FmpzPolyRing)(b::Array{fmpz, 1})
+function (a::FmpzPolyRing)(b::Vector{fmpz})
    z = fmpz_poly(b)
    z.parent = a
    return z
 end
 
-(a::FmpzPolyRing)(b::Array{T, 1}) where {T <: Integer} = a(map(fmpz, b))
+(a::FmpzPolyRing)(b::Vector{T}) where {T <: Integer} = a(map(fmpz, b))
 
 (a::FmpzPolyRing)(b::fmpz_poly) = b
 

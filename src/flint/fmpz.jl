@@ -957,13 +957,13 @@ function gcd(x::fmpz, y::fmpz, z::fmpz...)
 end
 
 @doc Markdown.doc"""
-    gcd(x::Array{fmpz, 1})
+    gcd(x::Vector{fmpz})
 
 Return the greatest common divisor of the elements of $x$. The returned
 result will always be nonnegative and will be zero iff all elements of $x$
 are zero.
 """
-function gcd(x::Array{fmpz, 1})
+function gcd(x::Vector{fmpz})
    if length(x) == 0
       error("Array must not be empty")
    elseif length(x) == 1
@@ -1005,12 +1005,12 @@ function lcm(x::fmpz, y::fmpz, z::fmpz...)
 end
 
 @doc Markdown.doc"""
-    lcm(x::Array{fmpz, 1})
+    lcm(x::Vector{fmpz})
 
 Return the least common multiple of the elements of $x$. The returned result
 will always be nonnegative and will be zero iff the elements of $x$ are zero.
 """
-function lcm(x::Array{fmpz, 1})
+function lcm(x::Vector{fmpz})
    if length(x) == 0
       error("Array must not be empty")
    elseif length(x) == 1

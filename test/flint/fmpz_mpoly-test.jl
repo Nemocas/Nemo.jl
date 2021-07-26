@@ -24,7 +24,7 @@
 
       @test typeof(S) <: FmpzMPolyRing
 
-      isa(symbols(S), Array{Symbol, 1})
+      isa(symbols(S), Vector{Symbol})
 
       for j = 1:num_vars
          @test isa(varlist[j], fmpz_mpoly)

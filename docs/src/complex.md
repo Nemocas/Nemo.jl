@@ -285,7 +285,7 @@ We illustrate finding square roots that are well-approximated by integers:
 
 ```julia
 julia> sort([sqrt(C(n)) for n=0:10], by=x -> abs(x - floor(x + C(1)//2)))
-11-element Array{ca,1}:
+11-element Vector{ca}:
  0
  1
  2
