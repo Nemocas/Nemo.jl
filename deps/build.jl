@@ -21,14 +21,16 @@
     push!(dependencies, "build_FLINT.v200.700.0.jl")
   elseif flint_ver == v"200.700.100+0"
     push!(dependencies, "build_FLINT.v200.700.100.0.jl")
+  elseif flint_ver == v"200.800.0+0"
+    push!(dependencies, "build_FLINT.v200.800.0.jl")
   else
     throw(error("Flint version $flint_ver not supported for julia version <= 1.3"))
   end
 
   append!(dependencies, [
-  "build_Arb.v200.1900.0.jl",
-  "build_Antic.v0.200.400.jl",
-  "build_Calcium.v0.400.0.jl",
+  "build_Arb.v200.2000.0.jl",
+  "build_Antic.v0.200.500.jl",
+  "build_Calcium.v0.400.100.jl",
   ])
 
   for file in dependencies
