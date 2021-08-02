@@ -10,12 +10,15 @@
 import Base: real, imag, abs, conj, angle, log, log1p, sin, cos,
              tan, cot, sinpi, cospi, sinh, cosh, tanh, coth, atan, expm1
 
+if VERSION >= v"1.6"
+  import Base: cispi
+end
 
 export one, onei, real, imag, conj, abs, inv, angle, isreal, polygamma, erf,
        erfi, erfc, bessel_j, bessel_k, bessel_i, bessel_y, airy_ai, airy_bi,
        airy_ai_prime, airy_bi_prime
 
-export rsqrt, log, log1p, exppii, sin, cos, tan, cot, sinpi, cospi, tanpi,
+export rsqrt, log, log1p, cispi, sin, cos, tan, cot, sinpi, cospi, tanpi,
        cotpi, sincos, sincospi, sinh, cosh, tanh, coth, sinhcosh, atan,
        log_sinpi, gamma, rgamma, lgamma, gamma_regularized, gamma_lower,
        gamma_lower_regularized, rising_factorial, rising_factorial2, polylog,
@@ -750,11 +753,11 @@ function Base.expm1(x::acb)
 end
 
 @doc Markdown.doc"""
-    exppii(x::acb)
+    cispi(x::acb)
 
 Return the exponential of $\pi i x$.
 """
-function exppii(x::acb)
+function cispi(x::acb)
    z = parent(x)()
    ccall((:acb_exp_pi_i, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z

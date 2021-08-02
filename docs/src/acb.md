@@ -389,7 +389,7 @@ rsqrt(::acb)
 ```
 
 ```@docs
-exppii(::acb)
+cispi(::acb)
 ```
 
 ```@docs
