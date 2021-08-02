@@ -422,6 +422,8 @@ end
 
    @test overlaps(weierstrass_p(z,a), CC("-1.35871985483098753373 +/- 1.89e-21",
                               "-51.93347883199212591376 +/- 6.19e-21"))
+   @test overlaps(weierstrass_p_prime(z,a), CC("-462.546106875184 +/- 4.32e-13",
+                              "-494.8014585693025 +/- 9.39e-14"))
 
    t = CC(rand(), abs(rand()) + eps())
    prod_sqr = (modular_weber_f(t)*modular_weber_f1(t)*modular_weber_f2(t))^2

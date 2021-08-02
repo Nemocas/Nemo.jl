@@ -25,8 +25,8 @@ export rsqrt, log, log1p, exppii, sin, cos, tan, cot, sinpi, cospi, tanpi,
        hypergeometric_1f1_regularized, hypergeometric_u, hypergeometric_2f1,
        jacobi_theta, modular_delta, dedekind_eta, eisenstein_g, j_invariant,
        modular_lambda, modular_weber_f, modular_weber_f1, modular_weber_f2,
-       weierstrass_p, elliptic_k, elliptic_e, canonical_unit, root_of_unity,
-       hilbert_class_polynomial
+       weierstrass_p, weierstrass_p_prime, elliptic_k, elliptic_e,
+       canonical_unit, root_of_unity, hilbert_class_polynomial
 
 ###############################################################################
 #
@@ -1724,7 +1724,19 @@ Return the Weierstrass elliptic function $\wp(z,\tau)$.
 """
 function weierstrass_p(z::acb, tau::acb)
   r = parent(z)()
-  ccall((:acb_modular_elliptic_p, libarb), Nothing,
+  ccall((:acb_elliptic_p, libarb), Nothing,
+              (Ref{acb}, Ref{acb}, Ref{acb}, Int), r, z, tau, parent(z).prec)
+  return r
+end
+
+@doc Markdown.doc"""
+    weierstrass_p_prime(z::acb, tau::acb)
+
+Return the derivative of the Weierstrass elliptic function $\wp(z,\tau)$.
+"""
+function weierstrass_p_prime(z::acb, tau::acb)
+  r = parent(z)()
+  ccall((:acb_elliptic_p_prime, libarb), Nothing,
               (Ref{acb}, Ref{acb}, Ref{acb}, Int), r, z, tau, parent(z).prec)
   return r
 end
