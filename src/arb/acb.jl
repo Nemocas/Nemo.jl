@@ -1732,7 +1732,7 @@ end
 @doc Markdown.doc"""
     weierstrass_p_prime(z::acb, tau::acb)
 
-Return the derivative of the Weierstrass elliptic function $\wp(z,\tau)$.
+Return the derivative of the Weierstrass elliptic function $\frac{\partial}{\partial z}\wp(z,\tau)$.
 """
 function weierstrass_p_prime(z::acb, tau::acb)
   r = parent(z)()
