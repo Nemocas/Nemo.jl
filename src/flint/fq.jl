@@ -52,8 +52,11 @@ end
 
 function Base.hash(a::fq, h::UInt)
    b = 0xb310fb6ea97e1f1a%UInt
+   z = fmpz()
    for i in 0:degree(parent(a)) - 1
-      b = xor(b, xor(hash(coeff(a, i), h), h))
+      ccall((:fmpz_poly_get_coeff_fmpz, libflint), Nothing,
+               (Ref{fmpz}, Ref{fq}, Int), z, a, i)
+      b = xor(b, xor(hash(z, h), h))
       b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
    return b
