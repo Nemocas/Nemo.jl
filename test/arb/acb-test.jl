@@ -483,4 +483,8 @@ end
    @test overlaps(res, CC(2))
    @test imag(res) == CC(0)
    @test radius(real(res)) < 4e-18
+
+   res = Nemo.integrate(CC, exp, 0, 1, rel_tol = 1.0e-6, abs_tol = 1.0e-6)
+   @test overlaps(res, CC(const_e(parent(real(zero(CC))))) - 1)
+   @test radius(real(res)) < 1.0e-6
 end

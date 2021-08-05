@@ -1,3 +1,5 @@
+export integrate
+
 function acb_calc_func_wrap(res::Ptr{acb}, x::Ptr{acb}, param::Ptr{Nothing}, order::Int, prec::Int)
     xx = unsafe_load(x)
     xx.parent = AcbField(prec)
@@ -33,10 +35,8 @@ function integrate(C::AcbField, F, a, b;
    if rel_tol === -1.0
       cgoal = precision(C)
    else
-      t = BigFloat(rel_tol, RoundDown)
-      cgoal_clong = Ref{Clong}()
-      ccall((:mpfr_get_d_2exp, :libmpfr), Float64, (Ref{Clong}, Ref{BigFloat}, Cint), cgoal_clong, t, Base.MPFR.to_mpfr(RoundDown))
-      cgoal = -Int(cgoal_clong[]) + 1
+      cgoal = -Int(exponent(rel_tol))
+      @assert big(2.0)^(-cgoal) <= rel_tol
    end
 
    ctol = mag_struct(0, 0)
@@ -47,9 +47,14 @@ function integrate(C::AcbField, F, a, b;
    else
       t = BigFloat(abs_tol, RoundDown)
       expo = Ref{Clong}()
-      d = ccall((:mpfr_get_d_2exp, :libmpfr), Float64, (Ref{Clong}, Ref{BigFloat}, Cint), expo, t, Base.MPFR.to_mpfr(RoundDown))
+      d = ccall((:mpfr_get_d_2exp, :libmpfr), Float64,
+                (Ref{Clong}, Ref{BigFloat}, Cint),
+                expo, t,
+                VERSION < v"1.1" ? Base.MPFR.to_mpfr(RoundDown) :
+                                   Base.convert(Base.MPFR.MPFRRoundingMode, RoundDown))
       ccall((:mag_set_d, libarb), Nothing, (Ref{mag_struct}, Float64), ctol, d)
-      ccall((:mag_mul_2exp_si, libarb), Nothing, (Ref{mag_struct}, Ref{mag_struct}, Int), ctol, ctol, Int(expo[]))
+      ccall((:mag_mul_2exp_si, libarb), Nothing,
+            (Ref{mag_struct}, Ref{mag_struct}, Int), ctol, ctol, Int(expo[]))
    end
 
    res = C()
