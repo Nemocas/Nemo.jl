@@ -14,18 +14,8 @@ export FlintPuiseuxSeriesRing, FlintPuiseuxSeriesField,
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    laurent_ring(R::FlintPuiseuxSeriesRing{T}) where T <: RingElem
-
-Return the `LaurentSeriesRing` underlying the given `PuiseuxSeriesRing`.
-"""
 laurent_ring(R::FlintPuiseuxSeriesRing{T}) where T <: RingElem = R.laurent_ring::parent_type(T)
 
-@doc Markdown.doc"""
-    laurent_ring(R::FlintPuiseuxSeriesField{T}) where T <: FieldElem
-
-Return the `LaurentSeriesField` underlying the given `PuiseuxSeriesField`.
-"""
 laurent_ring(R::FlintPuiseuxSeriesField{T}) where T <: FieldElem = R.laurent_ring::parent_type(T)
 
 @doc Markdown.doc"""
@@ -48,51 +38,20 @@ parent_type(::Type{T}) where {S <: RingElem, T <: FlintPuiseuxSeriesRingElem{S}}
 
 parent_type(::Type{T}) where {S <: FieldElem, T <: FlintPuiseuxSeriesFieldElem{S}} = FlintPuiseuxSeriesField{S}
 
-@doc Markdown.doc"""
-    parent(a::FlintPuiseuxSeriesElem)
-
-Return the parent of the given Puiseux series.
-"""
 parent(a::FlintPuiseuxSeriesElem) = a.parent
 
 elem_type(::Type{T}) where {S <: RingElem, T <: FlintPuiseuxSeriesRing{S}} = FlintPuiseuxSeriesRingElem{S}
 
 elem_type(::Type{T}) where {S <: FieldElem, T <: FlintPuiseuxSeriesField{S}} = FlintPuiseuxSeriesFieldElem{S}
 
-@doc Markdown.doc"""
-    base_ring(R::FlintPuiseuxSeriesRing{T}) where T <: RingElem
-
-Return the base (coefficient) ring of the given Puiseux series ring.
-"""
 base_ring(R::FlintPuiseuxSeriesRing{T}) where T <: RingElem = base_ring(laurent_ring(R))
 
-@doc Markdown.doc"""
-    base_ring(R::FlintPuiseuxSeriesField{T}) where T <: FieldElem
-
-Return the base (coefficient) ring of the given Puiseux series field.
-"""
 base_ring(R::FlintPuiseuxSeriesField{T}) where T <: FieldElem = base_ring(laurent_ring(R))
 
-@doc Markdown.doc"""
-    base_ring(a::FlintPuiseuxSeriesElem)
-
-Return the base (coefficient) ring of the Puiseux series ring of the given Puiseux
-series.
-"""
 base_ring(a::FlintPuiseuxSeriesElem) = base_ring(parent(a))
 
-@doc Markdown.doc"""
-    max_precision(R::FlintPuiseuxSeriesRing{T}) where T <: RingElem
-
-Return the maximum precision of the underlying Laurent series ring.
-"""
 max_precision(R::FlintPuiseuxSeriesRing{T}) where T <: RingElem = max_precision(laurent_ring(R))
 
-@doc Markdown.doc"""
-    max_precision(R::FlintPuiseuxSeriesField{T}) where T <: FieldElem
-
-Return the maximum precision of the underlying Laurent series field.
-"""
 max_precision(R::FlintPuiseuxSeriesField{T}) where T <: FieldElem = max_precision(laurent_ring(R))
 
 function isdomain_type(::Type{T}) where {S <: RingElem, T <: FlintPuiseuxSeriesElem{S}}
@@ -127,38 +86,17 @@ function Base.hash(a::FlintPuiseuxSeriesElem, h::UInt)
    return b
 end
 
-@doc Markdown.doc"""
-    precision(a::FlintPuiseuxSeriesElem)
-
-Return the precision of the given Puiseux series in absolute terms.
-"""
 precision(a::FlintPuiseuxSeriesElem) = precision(a.data)//a.scale
 
-@doc Markdown.doc"""
-    valuation(a::FlintPuiseuxSeriesElem)
-
-Return the valuation of the given Puiseux series, i.e. the exponent of the first
-nonzero term (or the precision if it is arithmetically zero).
-"""
 valuation(a::FlintPuiseuxSeriesElem) = valuation(a.data)//a.scale
 
 scale(a::FlintPuiseuxSeriesElem) = a.scale
 
-@doc Markdown.doc"""
-    coeff(a::FlintPuiseuxSeriesElem, n::Int)
-
-Return the coefficient of the term of exponent $n$ of the given Puiseux series.
-"""
 function coeff(a::FlintPuiseuxSeriesElem, n::Int)
    s = scale(a)
    return coeff(a.data, n*s)
 end
 
-@doc Markdown.doc"""
-    coeff(a::FlintPuiseuxSeriesElem, r::Rational{Int})
-
-Return the coefficient of the term of exponent $r$ of the given Puiseux series.
-"""
 function coeff(a::FlintPuiseuxSeriesElem, r::Rational{Int})
    s = scale(a)
    n = numerator(r)
@@ -169,55 +107,19 @@ function coeff(a::FlintPuiseuxSeriesElem, r::Rational{Int})
    return coeff(a.data, n*div(s, d))
 end
 
-@doc Markdown.doc"""
-    zero(R::FlintPuiseuxSeriesRing)
-
-Return $0 + O(x^n)$ where $n$ is the maximum precision of the Puiseux series
-ring $R$.
-"""
 zero(R::FlintPuiseuxSeriesRing) = R(0)
 
-@doc Markdown.doc"""
-    zero(R::FlintPuiseuxSeriesField)
-
-Return $0 + O(x^n)$ where $n$ is the maximum precision of the Puiseux series
-ring $R$.
-"""
 zero(R::FlintPuiseuxSeriesField) = R(0)
 
-@doc Markdown.doc"""
-    one(R::FlintPuiseuxSeriesField)
-
-Return $1 + O(x^n)$ where $n$ is the maximum precision of the Puiseux series
-ring $R$.
-"""
 one(R::FlintPuiseuxSeriesField) = R(1)
 
-@doc Markdown.doc"""
-    one(R::FlintPuiseuxSeriesRing)
-
-Return $1 + O(x^n)$ where $n$ is the maximum precision of the Puiseux series
-ring $R$.
-"""
 one(R::FlintPuiseuxSeriesRing) = R(1)
 
-@doc Markdown.doc"""
-    gen(R::FlintPuiseuxSeriesRing)
-
-Return the generator of the Puiseux series ring, i.e. $x + O(x^{n + 1})$ where
-$n$ is the maximum precision of the Puiseux series ring $R$.
-"""
 function gen(R::FlintPuiseuxSeriesRing)
    S = laurent_ring(R)
    return R(gen(S), 1)
 end
 
-@doc Markdown.doc"""
-    gen(R::FlintPuiseuxSeriesField)
-
-Return the generator of the Puiseux series ring, i.e. $x + O(x^{n + 1})$ where
-$n$ is the maximum precision of the Puiseux series ring $R$.
-"""
 function gen(R::FlintPuiseuxSeriesField)
    S = laurent_ring(R)
    return R(gen(S), 1)
@@ -505,11 +407,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    sqrt(a::FlintPuiseuxSeriesElem{T}; check::Bool=true) where T <: RingElem
-
-Return the square root of the given Puiseux series.
-"""
 function sqrt(a::FlintPuiseuxSeriesElem{T}; check::Bool=true) where T <: RingElem
    val = valuation(a.data)
    S = parent(a)
@@ -526,11 +423,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    exp(a::FlintPuiseuxSeriesElem{T}) where T <: RingElem
-
-Return the exponential of the given Puiseux series.
-"""
 function exp(a::FlintPuiseuxSeriesElem{T}) where T <: RingElem
    z = parent(a)(exp(a.data), a.scale)
    z = rescale!(z)

@@ -53,16 +53,6 @@ Below we describe the functionality that is provided in addition to these.
 
 ## Basic manipulation
 
-```@docs
-characteristic(::GaloisField)
-characteristic(::GaloisFmpzField)
-```
-
-```@docs
-order(::GaloisField)
-order(::GaloisFmpzField)
-```
-
 **Examples**
 
 ```julia

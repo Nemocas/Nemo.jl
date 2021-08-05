@@ -403,14 +403,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    remove(z::fq_poly, p::fq_poly)
-
-Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
-$p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
-
-See also `valuation`, which only returns the valuation.
-"""
 function remove(z::fq_poly, p::fq_poly)
    check_parent(z,p)
    iszero(z) && error("Not yet implemented")

@@ -611,11 +611,6 @@ function powermod(x::T, e::Int, y::T) where {T <: Zmodn_fmpz_poly}
   return z
 end
 
-@doc Markdown.doc"""
-    powermod(x::T, e::fmpz, y::T) where {T <: Zmodn_fmpz_poly}
-
-Return $x^e \pmod{y}$.
-"""
 function powermod(x::T, e::fmpz, y::T) where {T <: Zmodn_fmpz_poly}
   z = parent(x)()
 

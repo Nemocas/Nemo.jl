@@ -155,18 +155,8 @@ end
 
 characteristic(R::FlintIntegerRing) = 0
 
-@doc Markdown.doc"""
-    one(R::FlintIntegerRing)
-
-Return the integer $1$.
-"""
 one(R::FlintIntegerRing) = fmpz(1)
 
-@doc Markdown.doc"""
-    zero(R::FlintIntegerRing)
-
-Return the integer $0$.
-"""
 zero(R::FlintIntegerRing) = fmpz(0)
 
 # Exists only to support Julia functionality (no guarantees)
@@ -202,25 +192,10 @@ Return the number of limbs required to store the absolute value of $a$.
 """
 size(a::fmpz) = Int(ccall((:fmpz_size, libflint), Cint, (Ref{fmpz},), a))
 
-@doc Markdown.doc"""
-    isunit(a::fmpz)
-
-Return `true` if $a$ is a unit, i.e. $\pm 1$, otherwise return `false`.
-"""
 isunit(a::fmpz) = ccall((:fmpz_is_pm1, libflint), Bool, (Ref{fmpz},), a)
 
-@doc Markdown.doc"""
-    iszero(a::fmpz)
-
-Return `true` if $a$ is zero, otherwise return `false`.
-"""
 iszero(a::fmpz) = ccall((:fmpz_is_zero, libflint), Bool, (Ref{fmpz},), a)
 
-@doc Markdown.doc"""
-    isone(a::fmpz)
-
-Return `true` if $a$ is one, otherwise return `false`.
-"""
 isone(a::fmpz) = ccall((:fmpz_is_one, libflint), Bool, (Ref{fmpz},), a)
 
 @doc Markdown.doc"""
@@ -804,12 +779,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    mod(x::fmpz, y::fmpz)
-
-Return the remainder after division of $x$ by $y$. The remainder will be
-closer to zero than $y$ and have the same sign, or it will be zero.
-"""
 function mod(x::fmpz, y::fmpz)
    iszero(y) && throw(DivideError())
    r = fmpz()
@@ -818,12 +787,6 @@ function mod(x::fmpz, y::fmpz)
    return r
 end
 
-@doc Markdown.doc"""
-    mod(x::fmpz, y::UInt)
-
-Return the remainder after division of $x$ by $y$. The remainder will be the
-least nonnegative remainder.
-"""
 function mod(x::fmpz, c::UInt)
     c == 0 && throw(DivideError())
     ccall((:fmpz_fdiv_ui, libflint), Base.GMP.Limb, (Ref{fmpz}, Base.GMP.Limb), x, c)
@@ -1178,12 +1141,6 @@ function isqrtrem(x::fmpz)
     return s, r
 end
 
-@doc Markdown.doc"""
-    sqrt(x::fmpz)
-
-Return the square root $s$ of $x$. By default the function will raise an
-exception if the input is not square. If `check=false` this check is omitted.
-"""
 function Base.sqrt(x::fmpz; check=true)
     x < 0 && throw(DomainError(x, "Argument must be non-negative"))
     if check
@@ -1203,20 +1160,9 @@ function Base.sqrt(x::fmpz; check=true)
     return s
 end
 
-@doc Markdown.doc"""
-    issquare(x::fmpz)
-
-Return `true` if $x$ is a square, otherwise return `false`.
-"""
 issquare(x::fmpz) = Bool(ccall((:fmpz_is_square, libflint), Cint,
                                (Ref{fmpz},), x))
 
-@doc Markdown.doc"""
-    issquare_with_sqrt(x::fmpz)
-
-Return `(flag, s)` where `flag = true` and `s` is the square root of `x`
-if `x` is a perfect square and where `flag = false` and `s = 0` otherwise.
-"""
 function issquare_with_sqrt(x::fmpz)
     x < 0 && throw(DomainError(x, "Argument must be non-negative"))
     for i = 1:length(sqrt_moduli)
@@ -1520,11 +1466,6 @@ function next_prime(x::Int, proved::Bool = true)
    return x < 2 ? 2 : Int(next_prime(x % UInt, proved))
 end
 
-@doc Markdown.doc"""
-    remove(x::fmpz, y::fmpz)
-
-Return the tuple $n, z$ such that $x = y^nz$ where $y$ and $z$ are coprime.
-"""
 function remove(x::fmpz, y::fmpz)
    iszero(y) && throw(DivideError())
    z = fmpz()

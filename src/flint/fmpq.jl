@@ -96,11 +96,6 @@ Return the sign of $a$ ($-1$, $0$ or $1$) as a fraction.
 """
 sign(a::fmpq) = fmpq(sign(numerator(a)))
 
-@doc Markdown.doc"""
-    abs(a::fmpq)
-
-Return the absolute value of $a$.
-"""
 function abs(a::fmpq)
    z = fmpq()
    ccall((:fmpq_abs, libflint), Nothing, (Ref{fmpq}, Ref{fmpq}), z, a)
@@ -322,11 +317,6 @@ function ==(a::fmpq, b::fmpq)
                 (Ref{fmpq}, Ref{fmpq}), a, b)
 end
 
-@doc Markdown.doc"""
-    isless(a::fmpq, b::fmpq)
-
-Return `true` if $a < b$, otherwise return `false`.
-"""
 function isless(a::fmpq, b::fmpq)
    return ccall((:fmpq_cmp, libflint), Cint,
                 (Ref{fmpq}, Ref{fmpq}), a, b) < 0
@@ -355,44 +345,24 @@ end
 
 ==(a::Rational{T}, b::fmpq) where {T <: Integer} = b == a
 
-@doc Markdown.doc"""
-    isless(a::fmpq, b::Integer)
-
-Return `true` if $a < b$, otherwise return `false`.
-"""
 function isless(a::fmpq, b::Integer)
    z = fmpq(b)
    return ccall((:fmpq_cmp, libflint), Cint,
                 (Ref{fmpq}, Ref{fmpq}), a, z) < 0
 end
 
-@doc Markdown.doc"""
-    isless(a::Integer, b::fmpq)
-
-Return `true` if $a < b$, otherwise return `false`.
-"""
 function isless(a::Integer, b::fmpq)
    z = fmpq(a)
    return ccall((:fmpq_cmp, libflint), Cint,
                 (Ref{fmpq}, Ref{fmpq}), z, b) < 0
 end
 
-@doc Markdown.doc"""
-    isless(a::fmpq, b::fmpz)
-
-Return `true` if $a < b$, otherwise return `false`.
-"""
 function isless(a::fmpq, b::fmpz)
    z = fmpq(b)
    return ccall((:fmpq_cmp, libflint), Cint,
                 (Ref{fmpq}, Ref{fmpq}), a, z) < 0
 end
 
-@doc Markdown.doc"""
-    isless(a::fmpz, b::fmpq)
-
-Return `true` if $a < b$, otherwise return `false`.
-"""
 function isless(a::fmpz, b::fmpq)
    z = fmpq(a)
    return ccall((:fmpq_cmp, libflint), Cint,
@@ -765,6 +735,8 @@ end
 
 @doc Markdown.doc"""
     dedekind_sum(h::fmpz, k::fmpz)
+
+Return the Dedekind sum $s(h,k)$ for arbitrary $h$ and $k$.
 """
 function dedekind_sum(h::fmpz, k::fmpz)
    c = fmpq()
@@ -773,25 +745,10 @@ function dedekind_sum(h::fmpz, k::fmpz)
    return c
 end
 
-@doc Markdown.doc"""
-    dedekind_sum(h::fmpz, k::Integer)
-
-Return the Dedekind sum $s(h,k)$ for arbitrary $h$ and $k$.
-"""
 dedekind_sum(h::fmpz, k::Integer) = dedekind_sum(h, fmpz(k))
 
-@doc Markdown.doc"""
-    dedekind_sum(h::Integer, k::fmpz)
-
-Return the Dedekind sum $s(h,k)$ for arbitrary $h$ and $k$.
-"""
 dedekind_sum(h::Integer, k::fmpz) = dedekind_sum(fmpz(h), k)
 
-@doc Markdown.doc"""
-    dedekind_sum(h::Integer, k::Integer)
-
-Return the Dedekind sum $s(h,k)$ for arbitrary $h$ and $k$.
-"""
 dedekind_sum(h::Integer, k::Integer) = dedekind_sum(fmpz(h), fmpz(k))
 
 ###############################################################################

@@ -64,18 +64,8 @@ function deepcopy_internal(a::gfp_elem, dict::IdDict)
    return gfp_elem(deepcopy(a.data), R)
 end
 
-@doc Markdown.doc"""
-    order(R::GaloisField) -> fmpz
-
-Return the order, i.e. the number of elements in, the given Galois field.
-"""
 order(R::GaloisField) = fmpz(R.n)
 
-@doc Markdown.doc"""
-    characteristic(R::GaloisField) -> fmpz
-
-Return the characteristic of the given Galois field.
-"""
 characteristic(R::GaloisField) = fmpz(R.n)
 
 degree(::GaloisField) = 1

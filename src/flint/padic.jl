@@ -175,11 +175,6 @@ function lift(R::FlintIntegerRing, a::padic)
     return r
 end
 
-@doc Markdown.doc"""
-    zero(R::FlintPadicField)
-
-Return zero in the given $p$-adic field, to the default precision.
-"""
 function zero(R::FlintPadicField)
    z = padic(R.prec_max)
    ccall((:padic_zero, libflint), Nothing, (Ref{padic},), z)
@@ -187,11 +182,6 @@ function zero(R::FlintPadicField)
    return z
 end
 
-@doc Markdown.doc"""
-    one(R::FlintPadicField)
-
-Return zero in the given $p$-adic field, to the default precision.
-"""
 function one(R::FlintPadicField)
    z = padic(R.prec_max)
    ccall((:padic_one, libflint), Nothing, (Ref{padic},), z)
@@ -199,30 +189,12 @@ function one(R::FlintPadicField)
    return z
 end
 
-@doc Markdown.doc"""
-    iszero(a::padic)
-
-Return `true` if the given p-adic field element is zero, otherwise return
-`false`.
-"""
 iszero(a::padic) = Bool(ccall((:padic_is_zero, libflint), Cint,
                               (Ref{padic},), a))
 
-@doc Markdown.doc"""
-    isone(a::padic)
-
-Return `true` if the given p-adic field element is one, otherwise return
-`false`.
-"""
 isone(a::padic) = Bool(ccall((:padic_is_one, libflint), Cint,
                              (Ref{padic},), a))
 
-@doc Markdown.doc"""
-    isunit(a::padic)
-
-Return `true` if the given p-adic field element is invertible, i.e. nonzero,
-otherwise return `false`.
-"""
 isunit(a::padic) = !Bool(ccall((:padic_is_zero, libflint), Cint,
                               (Ref{padic},), a))
 
@@ -509,11 +481,6 @@ divexact(a::fmpq, b::padic; check::Bool=true) = inv(inv(a)*b)
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    inv(a::padic)
-
-Returns $a^{-1}$. If $a = 0$ a `DivideError()` is thrown.
-"""
 function inv(a::padic)
    iszero(a) && throw(DivideError())
    ctx = parent(a)
@@ -530,13 +497,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    divides(a::padic, b::padic)
-
-Returns a pair consisting of a flag which is set to `true` if $b$ divides
-$a$ and `false` otherwise, and a value $h$ such that $a = bh$ if
-such a value exists. If not, the value of $h$ is undetermined.
-"""
 function divides(a::padic, b::padic)
    if iszero(a)
       return true, zero(parent(a))
@@ -553,12 +513,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    gcd(x::padic, y::padic)
-
-Returns the greatest common divisor of $x$ and $y$, i.e. the function returns
-$1$ unless both $a$ and $b$ are $0$, in which case it returns $0$.
-"""
 function gcd(x::padic, y::padic)
    check_parent(x, y)
    if iszero(x) && iszero(y)

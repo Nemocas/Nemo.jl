@@ -96,14 +96,6 @@ degree(::FqFiniteField)
 ```
 
 ```@docs
-characteristic(::FqFiniteField)
-```
-
-```@docs
-order(::FqFiniteField)
-```
-
-```@docs
 modulus(::FqFiniteField)
 ```
 

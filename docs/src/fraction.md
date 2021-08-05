@@ -64,10 +64,6 @@ along with generic fractions fields as described here:
 ### Basic manipulation
 
 ```@docs
-abs(::fmpq)
-```
-
-```@docs
 sign(::fmpq)
 ```
 
@@ -85,18 +81,6 @@ height_bits(::fmpq)
 
 ```@docs
 >>(::fmpq, ::Int)
-```
-
-Rational fractions can be compared with each other and with integers. Julia
-provides the full range of operators $<, >, \leq, \geq$ which depend on the
-following functions.
-
-```@docs
-isless(::fmpq, ::fmpq)
-isless(::Integer, ::fmpq)
-isless(::fmpq, ::Integer)
-isless(::fmpq, ::fmpz)
-isless(::fmpz, ::fmpq)
 ```
 
 ```@docs
@@ -205,9 +189,6 @@ bernoulli_cache(::Int)
 
 ```@docs
 dedekind_sum(::fmpz, ::fmpz)
-dedekind_sum(::fmpz, ::Integer)
-dedekind_sum(::Integer, ::fmpz)
-dedekind_sum(::Integer, ::Integer)
 ```
 
 **Examples**

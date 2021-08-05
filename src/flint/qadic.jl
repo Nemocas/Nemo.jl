@@ -83,11 +83,6 @@ Returns `Union{}` as this field is not dependent on another field.
 """
 base_ring(a::qadic) = Union{}
 
-@doc Markdown.doc"""
-    parent(a::qadic)
-
-Returns the parent of the given p-adic field element.
-"""
 parent(a::qadic) = a.parent
 
 isdomain_type(::Type{qadic}) = true
@@ -182,11 +177,6 @@ function lift(R::FmpzPolyRing, a::qadic)
    return r
 end
 
-@doc Markdown.doc"""
-    zero(R::FlintQadicField)
-
-Return zero in the given $q$-adic field, to the default precision.
-"""
 function zero(R::FlintQadicField)
    z = qadic(R.prec_max)
    ccall((:qadic_zero, libflint), Nothing, (Ref{qadic},), z)
@@ -194,11 +184,6 @@ function zero(R::FlintQadicField)
    return z
 end
 
-@doc Markdown.doc"""
-    one(R::FlintQadicField)
-
-Return zero in the given $q$-adic field, to the default precision.
-"""
 function one(R::FlintQadicField)
    z = qadic(R.prec_max)
    ccall((:qadic_one, libflint), Nothing, (Ref{qadic},), z)
@@ -206,30 +191,12 @@ function one(R::FlintQadicField)
    return z
 end
 
-@doc Markdown.doc"""
-    iszero(a::qadic)
-
-Return `true` if the given p-adic field element is zero, otherwise return
-`false`.
-"""
 iszero(a::qadic) = Bool(ccall((:qadic_is_zero, libflint), Cint,
                               (Ref{qadic},), a))
 
-@doc Markdown.doc"""
-    isone(a::qadic)
-
-Return `true` if the given p-adic field element is one, otherwise return
-`false`.
-"""
 isone(a::qadic) = Bool(ccall((:qadic_is_one, libflint), Cint,
                              (Ref{qadic},), a))
 
-@doc Markdown.doc"""
-    isunit(a::qadic)
-
-Return `true` if the given p-adic field element is invertible, i.e. nonzero,
-otherwise return `false`.
-"""
 isunit(a::qadic) = !Bool(ccall((:qadic_is_zero, libflint), Cint,
                               (Ref{qadic},), a))
 
@@ -486,11 +453,6 @@ divexact(a::fmpq, b::qadic; check::Bool=true) = inv(inv(a)*b)
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    inv(a::qadic)
-
-Returns $a^{-1}$. If $a = 0$ a `DivideError()` is thrown.
-"""
 function inv(a::qadic)
    iszero(a) && throw(DivideError())
    ctx = parent(a)
@@ -507,13 +469,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    divides(f::qadic, g::qadic)
-
-Returns a pair consisting of a flag which is set to `true` if $g$ divides
-$f$ and `false` otherwise, and a value $h$ such that $f = gh$ if
-such a value exists. If not, the value of $h$ is undetermined.
-"""
 function divides(a::qadic, b::qadic)
    if iszero(a)
      return true, zero(parent(a))
@@ -530,12 +485,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    gcd(x::qadic, y::qadic)
-
-Returns the greatest common divisor of $x$ and $y$, i.e. the function returns
-$1$ unless both $a$ and $b$ are $0$, in which case it returns $0$.
-"""
 function gcd(x::qadic, y::qadic)
    check_parent(x, y)
    if iszero(x) && iszero(y)

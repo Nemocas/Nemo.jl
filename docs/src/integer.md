@@ -65,10 +65,6 @@ can be exactly represented as an integer.
 ### Basic manipulation
 
 ```@docs
-isunit(::fmpz)
-```
-
-```@docs
 sign(::fmpz)
 ```
 

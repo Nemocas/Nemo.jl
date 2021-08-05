@@ -31,11 +31,6 @@ Returns `Union{}` as this field is not dependent on another field.
 """
 base_ring(a::fq) = Union{}
 
-@doc Markdown.doc"""
-    parent(a::fq)
-
-Returns the parent of the given finite field element.
-"""
 parent(a::fq) = a.parent
 
 isdomain_type(::Type{fq}) = true
@@ -73,22 +68,12 @@ function coeff(x::fq, n::Int)
    return z
 end
 
-@doc Markdown.doc"""
-    zero(a::FqFiniteField)
-
-Return the additive identity, zero, in the given finite field.
-"""
 function zero(a::FqFiniteField)
    d = a()
    ccall((:fq_zero, libflint), Nothing, (Ref{fq}, Ref{FqFiniteField}), d, a)
    return d
 end
 
-@doc Markdown.doc"""
-    one(a::FqFiniteField)
-
-Return the multiplicative identity, one, in the given finite field.
-"""
 function one(a::FqFiniteField)
    d = a()
    ccall((:fq_one, libflint), Nothing, (Ref{fq}, Ref{FqFiniteField}), d, a)
@@ -108,21 +93,9 @@ function gen(a::FqFiniteField)
    return d
 end
 
-@doc Markdown.doc"""
-    iszero(a::fq)
-
-Return `true` if the given finite field element is zero, otherwise return
-`false`.
-"""
 iszero(a::fq) = ccall((:fq_is_zero, libflint), Bool,
                      (Ref{fq}, Ref{FqFiniteField}), a, a.parent)
 
-@doc Markdown.doc"""
-    isone(a::fq)
-
-Return `true` if the given finite field element is one, otherwise return
-`false`.
-"""
 isone(a::fq) = ccall((:fq_is_one, libflint), Bool,
                     (Ref{fq}, Ref{FqFiniteField}), a, a.parent)
 
@@ -134,20 +107,9 @@ finite field, otherwise return `false`.
 """
 isgen(a::fq) = a == gen(parent(a))
 
-@doc Markdown.doc"""
-    isunit(a::fq)
-
-Return `true` if the given finite field element is invertible, i.e. nonzero,
-otherwise return `false`.
-"""
 isunit(a::fq) = ccall((:fq_is_invertible, libflint), Bool,
                      (Ref{fq}, Ref{FqFiniteField}), a, a.parent)
 
-@doc Markdown.doc"""
-    characteristic(a::FqFiniteField)
-
-Return the characteristic of the given finite field.
-"""
 function characteristic(a::FqFiniteField)
    d = fmpz()
    ccall((:__fq_ctx_prime, libflint), Nothing,
@@ -155,11 +117,6 @@ function characteristic(a::FqFiniteField)
    return d
 end
 
-@doc Markdown.doc"""
-    order(a::FqFiniteField)
-
-Return the order, i.e. the number of elements in, the given finite field.
-"""
 function order(a::FqFiniteField)
    d = fmpz()
    ccall((:fq_ctx_order, libflint), Nothing,
@@ -407,11 +364,6 @@ divexact(x::fmpz, y::fq; check::Bool=true) = divexact(parent(y)(x), y; check=che
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    inv(x::fq)
-
-Return $x^{-1}$.
-"""
 function inv(x::fq)
    iszero(x) && throw(DivideError())
    z = parent(x)()
@@ -426,12 +378,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    sqrt(x::fq)
-
-Return a square root of $x$ in the finite field. If $x$ is not a square
-an exception is raised.
-"""
 function sqrt(x::fq; check::Bool=true)
    z = parent(x)()
    res = Bool(ccall((:fq_sqrt, libflint), Cint,
@@ -441,24 +387,12 @@ function sqrt(x::fq; check::Bool=true)
    return z
 end
 
-@doc Markdown.doc"""
-    issquare(x::fq)
-
-Return `true` if $x$ is a square in the finite field (includes zero).
-"""
 function issquare(x::fq)
    return Bool(ccall((:fq_is_square, libflint), Cint,
                      (Ref{fq}, Ref{FqFiniteField}),
                      x, x.parent))
 end
 
-@doc Markdown.doc"""
-    issquare_with_sqrt(x::fq)
-
-If $x$ is a square, return the tuple of `true` and a square root of $x$.
-Otherwise, return the tuple of `false` and an unspecified element of the
-finite field.
-"""
 function issquare_with_sqrt(x::fq)
    z = parent(x)()
    flag = ccall((:fq_sqrt, libflint), Cint,

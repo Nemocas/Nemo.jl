@@ -4,11 +4,6 @@
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    *(a::fmpz, b::AbsSeriesElem)
-
-Return $a\times b$.
-"""
 function *(a::fmpz, b::AbsSeriesElem)
    len = length(b)
    z = parent(b)()
@@ -21,11 +16,6 @@ function *(a::fmpz, b::AbsSeriesElem)
    return z
 end
 
-@doc Markdown.doc"""
-    *(a::AbsSeriesElem, b::fmpz)
-
-Return $a\times b$.
-"""
 *(a::AbsSeriesElem, b::fmpz) = b*a
 
 @doc Markdown.doc"""
@@ -43,11 +33,6 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::fmpz, y::AbsSeriesElem) = y == x
 
-@doc Markdown.doc"""
-    divexact(x::AbsSeriesElem, y::fmpz; check::Bool=true)
-
-Return $x/y$.
-"""
 function divexact(x::AbsSeriesElem, y::fmpz; check::Bool=true)
    iszero(y) && throw(DivideError())
    lenx = length(x)
@@ -76,11 +61,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    *(a::fmpz, b::RelSeriesElem)
-
-Return $a\times b$.
-"""
 function *(a::fmpz, b::RelSeriesElem)
    len = pol_length(b)
    z = parent(b)()
@@ -95,11 +75,6 @@ function *(a::fmpz, b::RelSeriesElem)
    return z
 end
 
-@doc Markdown.doc"""
-    *(a::RelSeriesElem, b::fmpz)
-
-Return $a\times b$.
-"""
 *(a::RelSeriesElem, b::fmpz) = b*a
 
 @doc Markdown.doc"""
@@ -118,11 +93,6 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::fmpz, y::RelSeriesElem) = y == x
 
-@doc Markdown.doc"""
-    divexact(x::RelSeriesElem, y::fmpz; check::Bool=true)
-
-Return $x/y$.
-"""
 function divexact(x::RelSeriesElem, y::fmpz; check::Bool=true)
    iszero(y) && throw(DivideError())
    lenx = pol_length(x)
@@ -152,11 +122,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    *(a::fmpz, b::PolyElem)
-
-Return $a\times b$.
-"""
 function *(a::fmpz, b::PolyElem)
    len = length(b)
    z = parent(b)()
@@ -168,11 +133,6 @@ function *(a::fmpz, b::PolyElem)
    return z
 end
 
-@doc Markdown.doc"""
-    *(a::PolyElem, b::fmpz)
-
-Return $a\times b$.
-"""
 *(a::PolyElem, b::fmpz) = b*a
 
 @doc Markdown.doc"""
@@ -190,11 +150,6 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::fmpz, y::PolyElem) = y == x
 
-@doc Markdown.doc"""
-    divexact(a::PolyElem, b::fmpz; check::Bool=true)
-
-Return $a/b$.
-"""
 function divexact(a::PolyElem, b::fmpz; check::Bool=true)
    iszero(b) && throw(DivideError())
    z = parent(a)()
@@ -243,46 +198,16 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    *(a::ResElem, b::fmpz)
-
-Return $a\times b$.
-"""
 *(a::ResElem, b::fmpz) = parent(a)(data(a) * b)
 
-@doc Markdown.doc"""
-    *(a::fmpz, b::ResElem)
-
-Return $a\times b$.
-"""
 *(a::fmpz, b::ResElem) = parent(b)(a * data(b))
 
-@doc Markdown.doc"""
-    +(a::ResElem, b::fmpz)
-
-Return $a + b$.
-"""
 +(a::ResElem, b::fmpz) = parent(a)(data(a) + b)
 
-@doc Markdown.doc"""
-    +(a::fmpz, b::ResElem)
-
-Return $a + b$.
-"""
 +(a::fmpz, b::ResElem) = parent(b)(a + data(b))
 
-@doc Markdown.doc"""
-    -(a::ResElem, b::fmpz)
-
-Return $a - b$.
-"""
 -(a::ResElem, b::fmpz) = parent(a)(data(a) - b)
 
-@doc Markdown.doc"""
-    -(a::fmpz, b::ResElem)
-
-Return $a - b$.
-"""
 -(a::fmpz, b::ResElem) = parent(b)(a - data(b))
 
 @doc Markdown.doc"""
@@ -437,11 +362,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    *(x::fmpz, y::MatElem)
-
-Return $x\times y$.
-"""
 function *(x::fmpz, y::MatElem)
    z = similar(y)
    for i = 1:nrows(y)
@@ -452,18 +372,8 @@ function *(x::fmpz, y::MatElem)
    return z
 end
 
-@doc Markdown.doc"""
-    *(x::MatElem, y::fmpz)
-
-Return $x\times y$.
-"""
 *(x::MatElem, y::fmpz) = y*x
 
-@doc Markdown.doc"""
-    +(x::fmpz, y::MatElem)
-
-Return $S(x) + y$ where $S$ is the parent of $y$.
-"""
 function +(x::fmpz, y::MatElem)
    z = similar(y)
    R = base_ring(y)
@@ -479,18 +389,8 @@ function +(x::fmpz, y::MatElem)
    return z
 end
 
-@doc Markdown.doc"""
-    +(x::MatElem, y::fmpz)
-
-Return $x + S(y)$ where $S$ is the parent of $x$.
-"""
 +(x::MatElem, y::fmpz) = y + x
 
-@doc Markdown.doc"""
-    -(x::fmpz, y::MatElem)
-
-Return $S(x) - y$ where $S$ is the parent of $y$.
-"""
 function -(x::fmpz, y::MatElem)
    z = similar(y)
    R = base_ring(y)
@@ -506,11 +406,6 @@ function -(x::fmpz, y::MatElem)
    return z
 end
 
-@doc Markdown.doc"""
-    -(x::MatElem, y::fmpz)
-
-Return $x - S(y)$, where $S$ is the parent of $x$
-"""
 function -(x::MatElem, y::fmpz)
    z = similar(x)
    R = base_ring(x)
@@ -602,11 +497,6 @@ end
 
 //(x::fmpz, y::T) where {T <: RingElem} = parent(y)(x)//y
 
-@doc Markdown.doc"""
-    *(a::FracElem, b::fmpz)
-
-Return $a\times b$.
-"""
 function *(a::FracElem, b::fmpz)
    c = base_ring(a)(b)
    g = gcd(denominator(a), c)
@@ -615,11 +505,6 @@ function *(a::FracElem, b::fmpz)
    return parent(a)(n, d)
 end
 
-@doc Markdown.doc"""
-    *(a::fmpz, b::FracElem)
-
-Return $a\times b$.
-"""
 function *(a::fmpz, b::FracElem)
    c = base_ring(b)(a)
    g = gcd(denominator(b), c)
@@ -628,11 +513,6 @@ function *(a::fmpz, b::FracElem)
    return parent(b)(n, d)
 end
 
-@doc Markdown.doc"""
-    +(a::FracElem, b::fmpz)
-
-Return $a + b$.
-"""
 function +(a::FracElem, b::fmpz)
    n = numerator(a) + denominator(a)*b
    d = denominator(a)
@@ -640,11 +520,6 @@ function +(a::FracElem, b::fmpz)
    return parent(a)(divexact(n, g), divexact(d, g))
 end
 
-@doc Markdown.doc"""
-    -(a::FracElem, b::fmpz)
-
-Return $a - b$.
-"""
 function -(a::FracElem, b::fmpz)
    n = numerator(a) - denominator(a)*b
    d = denominator(a)
@@ -652,18 +527,8 @@ function -(a::FracElem, b::fmpz)
    return parent(a)(divexact(n, g), divexact(d, g))
 end
 
-@doc Markdown.doc"""
-    +(a::fmpz, b::FracElem)
-
-Return $a + b$.
-"""
 +(a::fmpz, b::FracElem) = b + a
 
-@doc Markdown.doc"""
-    -(a::fmpz, b::FracElem)
-
-Return $a - b$.
-"""
 function -(a::fmpz, b::FracElem)
    n = a*denominator(b) - numerator(b)
    d = denominator(b)
@@ -687,11 +552,6 @@ Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::fmpz, y::FracElem) = y == x
 
-@doc Markdown.doc"""
-    divexact(a::FracElem, b::fmpz; check::Bool=true)
-
-Return $a/b$.
-"""
 function divexact(a::FracElem, b::fmpz; check::Bool=true)
    iszero(b) && throw(DivideError())
    c = base_ring(a)(b)
@@ -701,11 +561,6 @@ function divexact(a::FracElem, b::fmpz; check::Bool=true)
    return parent(a)(n, d)
 end
 
-@doc Markdown.doc"""
-    divexact(a::fmpz, b::FracElem; check::Bool=true)
-
-Return $a/b$.
-"""
 function divexact(a::fmpz, b::FracElem; check::Bool=true)
    iszero(b) && throw(DivideError())
    c = base_ring(b)(a)

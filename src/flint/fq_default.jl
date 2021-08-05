@@ -30,11 +30,6 @@ Returns `Union{}` as this field is not dependent on another field.
 """
 base_ring(a::fq_default) = Union{}
 
-@doc Markdown.doc"""
-    parent(a::fq_default)
-
-Returns the parent of the given finite field element.
-"""
 parent(a::fq_default) = a.parent
 
 isdomain_type(::Type{fq_default}) = true
@@ -73,22 +68,12 @@ function coeff(x::fq_default, n::Int)
    return z
 end
 
-@doc Markdown.doc"""
-    zero(a::FqDefaultFiniteField)
-
-Return the additive identity, zero, in the given finite field.
-"""
 function zero(a::FqDefaultFiniteField)
    d = a()
    ccall((:fq_default_zero, libflint), Nothing, (Ref{fq_default}, Ref{FqDefaultFiniteField}), d, a)
    return d
 end
 
-@doc Markdown.doc"""
-    one(a::FqDefaultFiniteField)
-
-Return the multiplicative identity, one, in the given finite field.
-"""
 function one(a::FqDefaultFiniteField)
    d = a()
    ccall((:fq_default_one, libflint), Nothing, (Ref{fq_default}, Ref{FqDefaultFiniteField}), d, a)
@@ -108,21 +93,9 @@ function gen(a::FqDefaultFiniteField)
    return d
 end
 
-@doc Markdown.doc"""
-    iszero(a::fq_default)
-
-Return `true` if the given finite field element is zero, otherwise return
-`false`.
-"""
 iszero(a::fq_default) = ccall((:fq_default_is_zero, libflint), Bool,
                      (Ref{fq_default}, Ref{FqDefaultFiniteField}), a, a.parent)
 
-@doc Markdown.doc"""
-    isone(a::fq_default)
-
-Return `true` if the given finite field element is one, otherwise return
-`false`.
-"""
 isone(a::fq_default) = ccall((:fq_default_is_one, libflint), Bool,
                     (Ref{fq_default}, Ref{FqDefaultFiniteField}), a, a.parent)
 
@@ -134,20 +107,9 @@ finite field, otherwise return `false`.
 """
 isgen(a::fq_default) = a == gen(parent(a))
 
-@doc Markdown.doc"""
-    isunit(a::fq_default)
-
-Return `true` if the given finite field element is invertible, i.e. nonzero,
-otherwise return `false`.
-"""
 isunit(a::fq_default) = ccall((:fq_default_is_invertible, libflint), Bool,
                      (Ref{fq_default}, Ref{FqDefaultFiniteField}), a, a.parent)
 
-@doc Markdown.doc"""
-    characteristic(a::FqDefaultFiniteField)
-
-Return the characteristic of the given finite field.
-"""
 function characteristic(a::FqDefaultFiniteField)
    d = fmpz()
    ccall((:fq_default_ctx_prime, libflint), Nothing,
@@ -155,11 +117,6 @@ function characteristic(a::FqDefaultFiniteField)
    return d
 end
 
-@doc Markdown.doc"""
-    order(a::FqDefaultFiniteField)
-
-Return the order, i.e. the number of elements in, the given finite field.
-"""
 function order(a::FqDefaultFiniteField)
    d = fmpz()
    ccall((:fq_default_ctx_order, libflint), Nothing,
@@ -453,11 +410,6 @@ divexact(x::fmpz, y::fq_default; check::Bool=true) = divexact(parent(y)(x), y; c
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    inv(x::fq_default)
-
-Return $x^{-1}$.
-"""
 function inv(x::fq_default)
    iszero(x) && throw(DivideError())
    z = parent(x)()
@@ -472,12 +424,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    sqrt(x::fq_default)
-
-Return a square root of $x$ in the finite field. If $x$ is not a square
-an exception is raised.
-"""
 function sqrt(x::fq_default)
    z = parent(x)()
    res = Bool(ccall((:fq_default_sqrt, libflint), Cint,
@@ -487,24 +433,12 @@ function sqrt(x::fq_default)
    return z
 end
 
-@doc Markdown.doc"""
-    issquare(x::fq_default)
-
-Return `true` if $x$ is a square in the finite field (includes zero).
-"""
 function issquare(x::fq_default)
    return Bool(ccall((:fq_default_is_square, libflint), Cint,
                      (Ref{fq_default}, Ref{FqDefaultFiniteField}),
                      x, x.parent))
 end
 
-@doc Markdown.doc"""
-    issquare_with_sqrt(x::fq_default)
-
-If $x$ is a square, return the tuple of `true` and a square root of $x$.
-Otherwise, return the tuple of `false` and an unspecified element of the
-finite field.
-"""
 function issquare_with_sqrt(x::fq_default)
    z = parent(x)()
    flag = ccall((:fq_default_sqrt, libflint), Cint,
