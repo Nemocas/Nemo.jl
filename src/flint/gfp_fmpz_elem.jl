@@ -221,15 +221,17 @@ end
 
 function ^(x::gfp_fmpz_elem, y::fmpz)
    R = parent(x)
-   if y < 0
-      x = inv(x)
-      y = -y
+   z = R()
+   if 0 == ccall((:fmpz_mod_pow_fmpz, libflint), Cint,
+                 (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz_mod_ctx_struct}),
+                 z.data, x.data, y, R.ninv)
+      if iszero(x)
+         throw(DivideError())
+      else
+         error("Impossible inverse")
+      end
    end
-   d = fmpz()
-   ccall((:fmpz_mod_pow_fmpz, libflint), Nothing,
-	 (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz_mod_ctx_struct}),
-						 d, x.data, y, R.ninv)
-   return gfp_fmpz_elem(d, R)
+   return z
 end
 
 function ^(x::gfp_fmpz_elem, y::Integer)
