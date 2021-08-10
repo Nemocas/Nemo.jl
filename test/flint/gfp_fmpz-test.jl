@@ -302,6 +302,7 @@ end
 
    @test a^ZZ(3) == 20
    @test a^BigInt(3) == 20
+   @test_throws DivideError zero(R)^ZZ(-1)
 end
 
 @testset "gfp_fmpz.comparison" begin
