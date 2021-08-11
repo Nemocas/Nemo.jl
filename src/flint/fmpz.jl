@@ -44,8 +44,8 @@ export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash,
        number_of_partitions, canonical_unit, isunit, isequal, addeq!, mul!,
        issquare, sqrt, issquare_with_sqrt, next_prime, ndivrem,
        iszero, rand, rand_bits, binomial, factorial, rand_bits_prime, iroot,
-       tdivrem, fdivrem, cdivrem, ntdivrem, nfdivrem, ncdivrem
-
+       tdivrem, fdivrem, cdivrem, ntdivrem, nfdivrem, ncdivrem,
+       tstbit
 
 ###############################################################################
 #
@@ -2087,6 +2087,18 @@ Note that this function modifies its input in-place.
 function combit!(x::fmpz, c::Int)
     c < 0 && throw(DomainError(c, "Second argument must be non-negative"))
     ccall((:fmpz_combit, libflint), Nothing, (Ref{fmpz}, Int), x, c)
+end
+
+@doc Markdown.doc"""
+    tstbit(x::fmpz, c::Int)
+
+Test bit $i$ of x (numbered from 0) and return 1 or 0 depending if it is set.
+"""
+function tstbit(x::fmpz, c::Int)
+   if c < 0
+      return 0
+   end
+   return Int(ccall((:fmpz_tstbit, libflint), Cint, (Ref{fmpz}, Int), x, c))
 end
 
 ###############################################################################
