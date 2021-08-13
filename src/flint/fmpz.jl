@@ -2098,7 +2098,7 @@ function tstbit(x::fmpz, c::Int)
    if c < 0
       return 0
    end
-   return Int(ccall((:fmpz_tstbit, libflint), Cint, (Ref{fmpz}, Int), x, c))
+   return Bool(ccall((:fmpz_tstbit, libflint), Cint, (Ref{fmpz}, Int), x, c))
 end
 
 ###############################################################################
