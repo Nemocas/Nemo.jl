@@ -445,7 +445,7 @@ function inv(a::fmpq)
     return z
  end
 
- ###############################################################################
+###############################################################################
 #
 #   Exact division
 #
@@ -802,17 +802,53 @@ function mul!(c::fmpq, a::fmpq, b::fmpq)
    return c
 end
 
-function addeq!(c::fmpq, a::fmpq)
-   ccall((:fmpq_add, libflint), Nothing,
-         (Ref{fmpq}, Ref{fmpq}, Ref{fmpq}), c, c, a)
+function mul!(c::fmpq, a::fmpq, b::fmpz)
+   ccall((:fmpq_mul_fmpz, libflint), Nothing,
+         (Ref{fmpq}, Ref{fmpq}, Ref{fmpz}), c, a, b)
    return c
 end
+
+mul!(c::fmpq, a::fmpz, b::fmpq) = mul!(c, b, a)
+
+function mul!(c::fmpq, a::fmpq, b::Int)
+   ccall((:fmpq_mul_si, libflint), Nothing,
+         (Ref{fmpq}, Ref{fmpq}, Int), c, a, b)
+   return c
+end
+
+mul!(c::fmpq, a::Int, b::fmpq) = mul!(c, b, a)
+
+
+function addmul!(c::fmpq, a::fmpq, b::fmpq)
+   ccall((:fmpq_addmul, libflint), Nothing,
+         (Ref{fmpq}, Ref{fmpq}, Ref{fmpq}), c, a, b)
+   return c
+end
+
+
+addeq!(c::fmpq, a::fmpq) = add!(c, c, a)
 
 function add!(c::fmpq, a::fmpq, b::fmpq)
    ccall((:fmpq_add, libflint), Nothing,
          (Ref{fmpq}, Ref{fmpq}, Ref{fmpq}), c, a, b)
    return c
 end
+
+function add!(c::fmpq, a::fmpq, b::fmpz)
+   ccall((:fmpq_add_fmpz, libflint), Nothing,
+         (Ref{fmpq}, Ref{fmpq}, Ref{fmpz}), c, a, b)
+   return c
+end
+
+add!(c::fmpq, a::fmpz, b::fmpq) = add!(c, b, a)
+
+function add!(c::fmpq, a::fmpq, b::Int)
+   ccall((:fmpq_add_si, libflint), Nothing,
+         (Ref{fmpq}, Ref{fmpq}, Int), c, a, b)
+   return c
+end
+
+add!(c::fmpq, a::Int, b::fmpq) = add!(c, b, a)
 
 ###############################################################################
 #

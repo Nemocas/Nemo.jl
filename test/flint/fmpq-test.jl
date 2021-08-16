@@ -414,3 +414,40 @@ end
    @test simplest_between(fmpq(1//10), fmpq(3//10)) == 1//4
    @test simplest_between(fmpq(11//10), fmpq(21//10)) == 2
 end
+
+
+@testset "fmpq.unsafe" begin
+  a = fmpq(32//17)
+  b = fmpq(23//11)
+  c = one(FlintQQ)
+  b_copy = deepcopy(b)
+  c_copy = deepcopy(c)
+
+  zero!(a)
+  @test iszero(a)
+  mul!(a, a, b)
+  @test iszero(a)
+
+  add!(a, a, b)
+  @test a == b
+  add!(a, a, 1)
+  @test a == b + 1
+  add!(a, a, fmpz(0))
+  @test a == b + 1
+
+  addeq!(a, b^2)
+  @test a == 1 + b + b^2
+
+  mul!(a, a, b)
+  @test a == (1 + b + b^2) * b
+  mul!(a, a, 3)
+  @test a == (1 + b + b^2) * b * 3
+  mul!(a, a, fmpz(3))
+  @test a == (1 + b + b^2) * b * 9
+
+  addmul!(a, a, c)
+  @test a == 2 * (1 + b + b^2) * b * 9
+
+  @test b_copy == b
+  @test c_copy == c
+end

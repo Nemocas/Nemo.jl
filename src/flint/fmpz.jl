@@ -2000,6 +2000,14 @@ function mul!(z::fmpz, x::fmpz, y::fmpz)
    return z
 end
 
+function mul!(z::fmpz, x::fmpz, y::Int)
+   ccall((:fmpz_mul_si, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, Int), z, x, y)
+   return z
+end
+
+mul!(z::fmpz, x::Int, y::fmpz) = mul!(z, y, x)
+
 function addmul!(z::fmpz, x::fmpz, y::fmpz)
    ccall((:fmpz_addmul, libflint), Nothing,
          (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z, x, y)
@@ -2007,6 +2015,14 @@ function addmul!(z::fmpz, x::fmpz, y::fmpz)
 end
 
 addmul!(z::fmpz, x::fmpz, y::fmpz, ::fmpz) = addmul!(z, x, y)
+
+function addmul!(z::fmpz, x::fmpz, y::Int)
+   ccall((:fmpz_addmul_si, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, Int), z, x, y)
+   return z
+end
+
+addmul!(z::fmpz, x::fmpz, y::Int, ::fmpz) = addmul!(z, x, y)
 
 function addeq!(z::fmpz, x::fmpz)
    ccall((:fmpz_add, libflint), Nothing,
@@ -2019,6 +2035,14 @@ function add!(z::fmpz, x::fmpz, y::fmpz)
          (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z, x, y)
    return z
 end
+
+function add!(z::fmpz, x::fmpz, y::Int)
+   ccall((:fmpz_add_si, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, Int), z, x, y)
+   return z
+end
+
+add!(z::fmpz, x::Int, y::fmpz) = add!(z, y, x)
 
 function zero!(z::fmpz)
    ccall((:fmpz_zero, libflint), Nothing,

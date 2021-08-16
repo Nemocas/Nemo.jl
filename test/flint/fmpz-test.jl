@@ -638,14 +638,22 @@ end
   @test iszero(a)
   mul!(a, a, b)
   @test iszero(a)
+
   add!(a, a, b)
   @test a == b
+  add!(a, a, 1)
+  @test a == b + 1
+
   addeq!(a, b^2)
-  @test a == b + b^2
+  @test a == 1 + b + b^2
+
   mul!(a, a, b)
-  @test a == (b + b^2) * b
+  @test a == (1 + b + b^2) * b
+  mul!(a, a, 3)
+  @test a == (1 + b + b^2) * b * 3
+
   addmul!(a, a, c)
-  @test a == 2 * (b + b^2) * b
+  @test a == 2 * (1 + b + b^2) * b * 3
 
   @test b_copy == b
   @test c_copy == c
