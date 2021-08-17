@@ -803,7 +803,7 @@ function (R::FqPolyRing)(x::Integer)
 end
 
 function (R::FqPolyRing)(x::Vector{fq})
-   length(x) == 0 && error("Array must be non-empty")
+   length(x) == 0 && return zero(R)
    base_ring(R) != parent(x[1]) && error("Coefficient rings must coincide")
    z = fq_poly(x)
    z.parent = R
@@ -811,14 +811,14 @@ function (R::FqPolyRing)(x::Vector{fq})
 end
 
 function (R::FqPolyRing)(x::Vector{fmpz})
-   length(x) == 0 && error("Array must be non-empty")
+   length(x) == 0 && return zero(R)
    z = fq_poly(x, base_ring(R))
    z.parent = R
    return z
 end
 
 function (R::FqPolyRing)(x::Vector{T}) where {T <: Integer}
-   length(x) == 0 && error("Array must be non-empty")
+   length(x) == 0 && return zero(R)
    return R(map(fmpz, x))
 end
 
