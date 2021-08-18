@@ -568,28 +568,28 @@ end
    @test_throws ErrorException can_solve_with_solution(A, B)
 
    # Transpose
-   A = matrix(QQ, 2, 2, [1, 2, 2, 5])'
-   B = matrix(QQ, 2, 1, [1, 2])'
+   A = transpose(matrix(QQ, 2, 2, [1, 2, 2, 5]))
+   B = transpose(matrix(QQ, 2, 1, [1, 2]))
    fl, X = can_solve_with_solution(A, B, side = :left)
    @test fl
    @test X * A == B
    @test can_solve(A, B, side = :left)
 
-   A = matrix(QQ, 2, 2, [1, 2, 2, 4])'
-   B = matrix(QQ, 2, 1, [1, 2])'
+   A = transpose(matrix(QQ, 2, 2, [1, 2, 2, 4]))
+   B = transpose(matrix(QQ, 2, 1, [1, 2]))
    fl, X = can_solve_with_solution(A, B, side = :left)
    @test fl
    @test X * A == B
    @test can_solve(A, B, side = :left)
 
-   A = matrix(QQ, 2, 2, [1, 2, 2, 4])'
-   B = matrix(QQ, 2, 1, [1, 3])'
+   A = transpose(matrix(QQ, 2, 2, [1, 2, 2, 4]))
+   B = transpose(matrix(QQ, 2, 1, [1, 3]))
    fl, X = can_solve_with_solution(A, B, side = :left)
    @test !fl
    @test !can_solve(A, B, side = :left)
 
-   A = zero_matrix(QQ, 2, 3)'
-   B = identity_matrix(QQ, 3)'
+   A = transpose(zero_matrix(QQ, 2, 3))
+   B = transpose(identity_matrix(QQ, 3))
    @test_throws ErrorException can_solve_with_solution(A, B, side = :left)
 
    @test_throws ErrorException can_solve_with_solution(A, B, side = :garbage)

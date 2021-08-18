@@ -639,8 +639,8 @@ end
 function can_solve_with_solution(a::fmpq_mat, b::fmpq_mat; side::Symbol = :right)
    if side == :left
       (ncols(a) != ncols(b)) && error("Matrices must have same number of columns")
-      (f, x) = can_solve_with_solution(a', b'; side=:right)
-      return (f, x')
+      (f, x) = can_solve_with_solution(transpose(a), transpose(b); side=:right)
+      return (f, transpose(x))
    elseif side == :right
       (nrows(a) != nrows(b)) && error("Matrices must have same number of rows")
       x = similar(a, ncols(a), ncols(b))
