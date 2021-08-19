@@ -481,18 +481,18 @@ end
 
 Random.gentype(::Type{FqNmodFiniteField}) = elem_type(FqNmodFiniteField)
 
-# define rand(make(::FqNmodFiniteField, n:m))
+# define rand(make(::FqNmodFiniteField, arr)), where arr is any abstract array with integer or fmpz entries
 
 RandomExtensions.maketype(R::FqNmodFiniteField, _) = elem_type(R)
 
-rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{fq_nmod,FqNmodFiniteField,UnitRange{Int}}}) =
+rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{fq_nmod,FqNmodFiniteField,<:AbstractArray{<:Union{fmpz,Integer}}}}) =
    sp[][1](rand(rng, sp[][2]))
 
-# define rand(::FqNmodFiniteField, n:m)
+# define rand(::FqNmodFiniteField, arr), where arr is any abstract array with integer or fmpz entries
 
-rand(r::Random.AbstractRNG, R::FqNmodFiniteField, b::UnitRange{Int}) = rand(r, make(R, b))
+rand(r::Random.AbstractRNG, R::FqNmodFiniteField, b::AbstractArray) = rand(r, make(R, b))
 
-rand(R::FqNmodFiniteField, b::UnitRange{Int}) = rand(Random.GLOBAL_RNG, R, b)
+rand(R::FqNmodFiniteField, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
 
 ###############################################################################
 #

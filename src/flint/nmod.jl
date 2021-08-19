@@ -378,18 +378,18 @@ rand(rng::AbstractRNG, R::Random.SamplerSimple{NmodRing}) = nmod(rand(rng, R.dat
 
 Random.gentype(::Type{NmodRing}) = elem_type(NmodRing)
 
-# define rand(make(R::NmodRing, n:m))
+# define rand(make(R::NmodRing, arr)), where arr is any abstract array with integer or fmpz entries
 
 RandomExtensions.maketype(R::NmodRing, _) = elem_type(R)
 
-rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{nmod,NmodRing,UnitRange{Int}}}) =
+rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{nmod,NmodRing,<:AbstractArray{<:Union{fmpz,Integer}}}}) =
    sp[][1](rand(rng, sp[][2]))
 
-# define rand(R::NmodRing, n:m)
+# define rand(R::NmodRing, arr), where arr is any abstract array with integer or fmpz entries
 
-rand(r::Random.AbstractRNG, R::NmodRing, b::UnitRange{Int}) = rand(r, make(R, b))
+rand(r::Random.AbstractRNG, R::NmodRing, b::AbstractArray) = rand(r, make(R, b))
 
-rand(R::NmodRing, b::UnitRange{Int}) = rand(Random.GLOBAL_RNG, R, b)
+rand(R::NmodRing, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
 
 ###############################################################################
 #

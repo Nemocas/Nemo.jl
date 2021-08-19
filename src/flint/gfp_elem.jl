@@ -331,18 +331,18 @@ Random.Sampler(::Type{RNG}, R::GaloisField, n::Random.Repetition) where {RNG<:Ab
 rand(rng::AbstractRNG, R::Random.SamplerSimple{GaloisField}) =
    gfp_elem(rand(rng, R.data), R[])
 
-# define rand(make(::GaloisField, n:m))
+# define rand(make(::GaloisField, arr)), where arr is any abstract array with integer or fmpz entries
 
 RandomExtensions.maketype(R::GaloisField, _) = elem_type(R)
 
-rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{gfp_elem,GaloisField,UnitRange{Int}}}) =
+rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{gfp_elem,GaloisField,<:AbstractArray{<:Union{fmpz,Integer}}}}) =
    sp[][1](rand(rng, sp[][2]))
 
-# define rand(::GaloisField, n:m)
+# define rand(::GaloisField, arr), where arr is any abstract array with integer or fmpz entries
 
-rand(rng::AbstractRNG, R::GaloisField, b::UnitRange{Int}) = rand(rng, make(R, b))
+rand(rng::AbstractRNG, R::GaloisField, b::AbstractArray) = rand(rng, make(R, b))
 
-rand(R::GaloisField, b::UnitRange{Int}) = rand(Random.GLOBAL_RNG, R, b)
+rand(R::GaloisField, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
 
 ###############################################################################
 #

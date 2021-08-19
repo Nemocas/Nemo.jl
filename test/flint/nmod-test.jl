@@ -44,6 +44,13 @@ end
 
    test_rand(R)
    test_rand(R, 1:9)
+   test_rand(R, Int16(1):Int16(9))
+   test_rand(R, big(1):big(9))
+   test_rand(R, fmpz(1):fmpz(9))
+   test_rand(R, [3,9,2])
+   test_rand(R, Int16[3,9,2])
+   test_rand(R, BigInt[3,9,2])
+   test_rand(R, fmpz[3,9,2])
 end
 
 @testset "nmod.printing" begin

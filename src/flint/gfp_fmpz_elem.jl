@@ -326,19 +326,19 @@ function rand(rng::AbstractRNG, R::Random.SamplerSimple{GaloisFmpzField})
    gfp_fmpz_elem(fmpz(n), R[])
 end
 
-# define rand(make(::GaloisFmpzField, n:m))
+# define rand(make(::GaloisFmpzField, arr)), where arr is any abstract array with integer or fmpz entries
 
 RandomExtensions.maketype(R::GaloisFmpzField, _) = elem_type(R)
 
 rand(rng::AbstractRNG,
-     sp::SamplerTrivial{<:Make2{gfp_fmpz_elem,GaloisFmpzField,UnitRange{Int}}}) =
+     sp::SamplerTrivial{<:Make2{gfp_fmpz_elem,GaloisFmpzField,<:AbstractArray{<:Union{fmpz,Integer}}}}) =
         sp[][1](rand(rng, sp[][2]))
 
-# define rand(::GaloisFmpzField, n:m)
+# define rand(::GaloisFmpzField, arr), where arr is any abstract array with integer or fmpz entries
 
-rand(r::Random.AbstractRNG, R::GaloisFmpzField, b::UnitRange{Int}) = rand(r, make(R, b))
+rand(r::Random.AbstractRNG, R::GaloisFmpzField, b::AbstractArray) = rand(r, make(R, b))
 
-rand(R::GaloisFmpzField, b::UnitRange{Int}) = rand(Random.GLOBAL_RNG, R, b)
+rand(R::GaloisFmpzField, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
 
 ###############################################################################
 #

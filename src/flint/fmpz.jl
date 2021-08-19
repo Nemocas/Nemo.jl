@@ -2078,9 +2078,9 @@ RandomExtensions.maketype(R::FlintIntegerRing, _) = fmpz
 rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{fmpz,FlintIntegerRing}}) =
         sp[][1](rand(rng, sp[][2]))
 
-rand(rng::AbstractRNG, R::FlintIntegerRing, n::UnitRange{Int}) = R(rand(rng, n))
+rand(rng::AbstractRNG, R::FlintIntegerRing, n::AbstractArray) = R(rand(rng, n))
 
-rand(R::FlintIntegerRing, n::UnitRange{Int}) = rand(Random.GLOBAL_RNG, R, n)
+rand(R::FlintIntegerRing, n::AbstractArray) = rand(Random.GLOBAL_RNG, R, n)
 
 @doc Markdown.doc"""
     rand_bits(::FlintIntegerRing, b::Int)

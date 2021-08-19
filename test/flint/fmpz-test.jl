@@ -33,7 +33,13 @@ end
 
 @testset "fmpz.rand" begin
    test_rand(FlintZZ, 1:9)
-   test_rand(FlintZZ(1):FlintZZ(9))
+   test_rand(FlintZZ, Int16(1):Int16(9))
+   test_rand(FlintZZ, big(1):big(9))
+   test_rand(FlintZZ, fmpz(1):fmpz(9))
+   test_rand(FlintZZ, [3,9,2])
+   test_rand(FlintZZ, Int16[3,9,2])
+   test_rand(FlintZZ, BigInt[3,9,2])
+   test_rand(FlintZZ, fmpz[3,9,2])
 
    for bits in 0:100
       t = rand_bits(FlintZZ, bits)

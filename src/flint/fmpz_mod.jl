@@ -375,18 +375,18 @@ end
 
 Random.gentype(::Type{FmpzModRing}) = elem_type(FmpzModRing)
 
-# define rand(make(::FmpzModRing, n:m))
+# define rand(make(::FmpzModRing, arr)), where arr is any abstract array with integer or fmpz entries
 
 RandomExtensions.maketype(R::FmpzModRing, _) = elem_type(R)
 
-rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{fmpz_mod,FmpzModRing,UnitRange{Int}}}) =
+rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{fmpz_mod,FmpzModRing,<:AbstractArray{<:Union{fmpz,Integer}}}}) =
    sp[][1](rand(rng, sp[][2]))
 
-# define rand(::FmpzModRing, n:m)
+# define rand(::FmpzModRing, arr), where arr is any abstract array with integer or fmpz entries
 
-rand(r::Random.AbstractRNG, R::FmpzModRing, b::UnitRange{Int}) = rand(r, make(R, b))
+rand(r::Random.AbstractRNG, R::FmpzModRing, b::AbstractArray) = rand(r, make(R, b))
 
-rand(R::FmpzModRing, b::UnitRange{Int}) = rand(Random.GLOBAL_RNG, R, b)
+rand(R::FmpzModRing, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
 
 ###############################################################################
 #
