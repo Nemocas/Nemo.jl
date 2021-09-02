@@ -1,3 +1,12 @@
+function test_elem(R::FlintRationalField)
+   return rand_bits(ZZ, rand(0:100))//rand_bits(ZZ, rand(1:100))
+end
+
+@testset "fmpq.conformance_tests" begin
+   # TODO: make this work with test_Field_interface_recursive
+   test_Field_interface_recursive(FlintQQ)
+end
+
 @testset "fmpq.constructors" begin
    R = FractionField(ZZ)
 

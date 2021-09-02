@@ -1,3 +1,15 @@
+function test_elem(R::Nemo.NmodRing)
+   return R(rand(Int))
+end
+
+@testset "nmod.conformance_tests" begin
+   # TODO: using test_Ring_interface_recursive below fails because nmod_poly does
+   # not support initialization from arbitrary Integer subtypes such as BigInt
+   for i in [1, 6, 13, 2^8, 2^16, 2^32, next_prime(2^8), next_prime(2^16), next_prime(2^32)]
+      test_Ring_interface(ResidueRing(ZZ, i))
+   end
+end
+
 @testset "nmod.constructors" begin
    R = ResidueRing(ZZ, 13)
 

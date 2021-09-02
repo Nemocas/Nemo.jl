@@ -1,3 +1,19 @@
+function test_elem(R::FqFiniteField)
+   return rand(R)
+end
+
+@testset "fq.conformance_tests" begin
+   test_Field_interface_recursive(FiniteField(fmpz(7), 5, "z")[1])
+
+   Sy, y = PolynomialRing(ResidueRing(FlintZZ, 36893488147419103363), "y")
+   T, z = FiniteField(y^2 + 1, "z")
+   test_Field_interface_recursive(T)
+
+   Syy, yy = PolynomialRing(GF(fmpz(36893488147419103363)), "y")
+   T2, z2 = FiniteField(yy^2 + 1, "z")
+   test_Field_interface_recursive(T2)
+end
+
 @testset "fq.constructors" begin
    R, x = FiniteField(fmpz(7), 5, "x")
 

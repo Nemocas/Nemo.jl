@@ -1,3 +1,11 @@
+function test_elem(R::FlintIntegerRing)
+   return rand_bits(ZZ, rand(0:100))
+end
+
+@testset "fmpq.conformance_tests" begin
+   test_Ring_interface_recursive(FlintZZ)
+end
+
 @testset "fmpz.abstract_types" begin
    @test fmpz <: RingElem
 
