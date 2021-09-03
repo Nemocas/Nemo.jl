@@ -3,7 +3,7 @@
 mutable struct FlintZZiRing <: Nemo.Ring
 end
 
-ZZi = FlintZZiRing()
+const ZZi = FlintZZiRing()
 
 struct fmpzi <: RingElem
   x::fmpz
@@ -13,7 +13,7 @@ end
 mutable struct FlintQQiField <: Nemo.Field
 end
 
-QQi = FlintQQiField()
+const QQi = FlintQQiField()
 
 struct fmpqi <: FieldElem
   num::fmpzi

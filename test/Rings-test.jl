@@ -59,3 +59,6 @@ include("flint/fmpq_mpoly-test.jl")
 include("flint/nmod_mpoly-test.jl")
 include("flint/gfp_mpoly-test.jl")
 include("flint/fq_nmod_mpoly-test.jl")
+
+include("gaussiannumbers/fmpzi-test.jl")
+
