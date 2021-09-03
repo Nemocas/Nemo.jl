@@ -397,6 +397,8 @@ include("arb/ArbTypes.jl")
 
 include("calcium/CalciumTypes.jl")
 
+include("gaussiannumbers/GaussianNumberTypes.jl")
+
 #include("ambiguities.jl") # remove ambiguity warnings
 
 include("flint/adhoc.jl")

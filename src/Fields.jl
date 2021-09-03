@@ -26,3 +26,5 @@ include("calcium/qqbar.jl")
 
 include("calcium/ca.jl")
 
+include("gaussiannumbers/QQi.jl")
+
