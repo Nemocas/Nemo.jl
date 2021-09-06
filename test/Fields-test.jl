@@ -16,3 +16,5 @@ include("arb/acb-test.jl")
 include("calcium/ca-test.jl")
 include("calcium/qqbar-test.jl")
 
+include("gaussiannumbers/fmpqi-test.jl")
+

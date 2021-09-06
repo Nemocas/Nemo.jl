@@ -116,6 +116,14 @@ end
 
 # stuff that should be in fmpq
 
+function convert(::Type{Rational{T}}, a::fmpq) where T <: Integer
+  return Rational{T}(convert(T, numerator(a)), convert(T, denominator(a)))
+end
+
+function convert(::Type{fmpq}, a::Rational{T}) where T <: Integer
+  return convert(fmpz, numerator(a))//convert(fmpz, denominator(a))
+end
+
 function numerator!(z::fmpz, x::fmpq)
   ccall((:fmpq_numerator, libflint), Nothing,
         (Ref{fmpz}, Ref{fmpq}),

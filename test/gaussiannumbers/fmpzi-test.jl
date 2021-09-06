@@ -1,30 +1,30 @@
-@testset "fmpz.abstract_types" begin
+@testset "fmpzi.abstract_types" begin
    @test fmpzi <: RingElem
    @test FlintZZiRing <: Nemo.Ring
    @test elem_type(ZZi) == fmpzi
    @test parent_type(fmpzi) == FlintZZiRing
 end
 
-@testset "ZZi.printing" begin
+@testset "fmpzi.printing" begin
   @test string(zero(ZZi)) == "0"
   @test string(one(ZZi)) == "1"
   @test string(ZZi(2,-3)) == "2 - 3*im"
   @test string(ZZi) == "ZZ[im]"
 end
 
-@testset "ZZi.constructors" begin
+@testset "fmpzi.constructors" begin
   for a in Any[true, false, 1, big(1), fmpz(1)]
     @test ZZi(a) == a
-    @test fmpz(a) + im == fmpzi(a, 1)
-    @test fmpz(a) - im == fmpzi(a, -1)
-    @test im + fmpz(a) == fmpzi(a, 1)
-    @test im - fmpz(a) == fmpzi(-a, 1)
-    @test fmpz(a)*im == fmpzi(0, a)
-    @test im*fmpz(a) == fmpzi(0, a)
+    @test ZZ(a) + im == ZZi(a, 1)
+    @test ZZ(a) - im == ZZi(a, -1)
+    @test im + ZZ(a) == ZZi(a, 1)
+    @test im - ZZ(a) == ZZi(-a, 1)
+    @test ZZ(a)*im == ZZi(0, a)
+    @test im*ZZ(a) == ZZi(0, a)
   end
 end
 
-@testset "ZZi.conversions" begin
+@testset "fmpzi.conversions" begin
   @test ZZ(ZZi(9)) == 9
   @test_throws Exception ZZ(ZZi(0,9))
   @test convert(Complex{BigInt}, ZZi(8,9)) == 8 + 9*im
@@ -32,7 +32,7 @@ end
   @test convert(fmpzi, 8) == 8
 end
 
-@testset "ZZi.gcd" begin
+@testset "fmpzi.gcd" begin
   for a in (ZZi(0,0), ZZi(1,0), ZZi(2,1), ZZi(1,1), ZZi(1,2),
                       ZZi(0,1), ZZi(-1,2), ZZi(-1,1), ZZi(-2,1),
                       ZZi(1,-0), ZZi(2,-1), ZZi(1,-1), ZZi(1,-2),
@@ -47,12 +47,12 @@ end
     for k in 1:200
       a = one(ZZi)
       b = zero(ZZi)
-      for i in 1:rand(0:100)
-        q = rand_bits(ZZ, rand(0:l)) + rand_bits(ZZ, rand(0:l))*im
+      for i in 1:rand(0:200)
+        q = rand_bits(ZZi, rand(0:l))
         (a, b) = (a*q + b, a)
         nbits(a) < 10000 || break
       end
-      g = rand_bits(ZZ, rand(0:l)) + rand_bits(ZZ, rand(0:l))*im
+      g = rand_bits(ZZi, rand(0:l))
       (A, B) = (g*a, g*b)
 
       G = gcd(A, B)
@@ -75,12 +75,12 @@ end
   end
 end
 
-@testset "ZZi.factor" begin
-  let l = 13
+@testset "fmpzi.factor" begin
+  let l = 26
     for k in 1:500
       a = one(ZZi)
       for i in 1:rand(0:20)
-        a *= (rand_bits(ZZ, rand(0:l)) + rand_bits(ZZ, rand(0:l))*im)^rand(1:16)
+        a *= rand_bits(ZZi, rand(0:l))^rand(1:16)
         nbits(a) < 250 || break
       end
       if iszero(a)
@@ -97,7 +97,7 @@ end
   end
 end
 
-@testset "ZZi.unsafe" begin
+@testset "fmpzi.unsafe" begin
   a = rand_bits(ZZi, 600); A = deepcopy(a)
   b = rand_bits(ZZi, 600); B = deepcopy(b)
   t = rand_bits(ZZi, 600)
@@ -114,8 +114,8 @@ end
   @test Nemo.submul!(t, a, b, fmpzi()) == 1
   @test addmul!(t, t, b) == 1 + b
   @test Nemo.submul!(t, t, a) == (1 + b)*(1 - a)
-  @test set!(t, a) == a
-  swap!(a, b)
+  @test Nemo.set!(t, a) == a
+  Nemo.swap!(a, b)
   @test b == A && a == B
 end
 

@@ -1,4 +1,9 @@
-export fmpqi, QQi
+export fmpqi, QQi, FlintQQiField
+
+const fmpqi_all_sub_types = Union{Integer, fmpz, Complex{<:Integer}, fmpzi,
+                              Rational, fmpq, Complex{<:Rational}}
+
+const fmpqi_imag_sub_types = Union{Complex{<:Integer}, fmpzi, Complex{<:Rational}}
 
 ###############################################################################
 #
@@ -31,7 +36,9 @@ isdomain_type(::Type{fmpqi}) = true
 ###############################################################################
 
 function expressify(a::fmpqi; context = nothing)
-  return Expr(:call, :+, real(a), Expr(:call, :*, imag(a)))
+  x = expressify(real(a), context=context)
+  y = expressify(imag(a), context=context)
+  return Expr(:call, :+, x, Expr(:call, :*, y, :im))
 end
 
 function Base.show(io::IO, a::fmpqi)
@@ -39,7 +46,7 @@ function Base.show(io::IO, a::fmpqi)
 end
 
 function Base.show(io::IO, a::FlintQQiField)
-  print(io, "QQ[i]")
+  print(io, "QQ[im]")
 end
 
 ###############################################################################
@@ -56,21 +63,38 @@ function fmpqi(a::fmpzi)
   return fmpqi(a, fmpz(1))
 end
 
+function fmpqi(a::fmpq)
+  return fmpqi(fmpzi(numerator(a)), fmpzi(denominator(a)))
+end
+
+function fmpqi(a::fmpq, b::fmpq)
+  da = denominator(a)
+  db = denominator(b)
+  return reduce!(fmpqi(fmpzi(numerator(a)*db, numerator(b)*da), da*db))
+end
+
 function (a::FlintQQiField)(b::Union{Integer, fmpz, fmpzi})
   return fmpqi(ZZi(b))
 end
 
 function (a::FlintQQiField)(b::Union{Rational, fmpq})
-  return fmpqi(ZZi(b), fmpz(denominator(b)))
+  return fmpqi(ZZi(numerator(b)), fmpz(denominator(b)))
 end
 
-function //(a::Union{Integer, fmpz, Rational, fmpq, fmpzi, fmpqi},
-            b::Union{fmpzi, fmpqi})
+function (a::FlintQQiField)(b::Union{Integer, fmpz, Rational, fmpq},
+                            c::Union{Integer, fmpz, Rational, fmpq})
+  return fmpqi(fmpq(b), fmpq(c))
+end
+
+function (a::FlintQQiField)(b::Union{fmpqi_imag_sub_types})
+  return fmpqi(fmpq(real(b)), fmpq(imag(b)))
+end
+
+function //(a::fmpqi_all_sub_types, b::Union{fmpzi, fmpqi})
   return divexact(QQi(a), QQi(b))
 end
 
-function //(a::Union{fmpzi, fmpqi},
-            b::Union{Integer, fmpz, Rational, fmpq, fmpzi, fmpqi})
+function //(a::Union{fmpzi, fmpqi}, b::fmpqi_all_sub_types)
   return divexact(QQi(a), QQi(b))
 end
 
@@ -82,17 +106,17 @@ end
 
 function (a::FlintZZiRing)(b::fmpqi)
   isone(b.den) || error("cannot coerce")
-  return deepcopy(b.num)
+  return deepcopy(b.num) # ???
 end
 
-function (a::FlintRationalField)
+function (a::FlintRationalField)(b::fmpqi)
   iszero(b.num.y) || error("cannot coerce")
-  return a.num.x//a.den
+  return b.num.x//b.den
 end
 
 function (a::FlintIntegerRing)(b::fmpqi)
   iszero(b.num.y) && isone(b.den) || error("cannot coerce")
-  return deepcopy(b.num.x)
+  return deepcopy(b.num.x) # ???
 end
 
 ###############################################################################
@@ -110,9 +134,17 @@ promote_rule(a::Type{fmpzi}, b::Type{fmpqi}) = fmpqi
 promote_rule(a::Type{fmpqi}, b::Type{fmpq}) = fmpqi
 promote_rule(a::Type{fmpq}, b::Type{fmpqi}) = fmpqi
 
-function Base.convert(::Type{Complex{Rational{T}}}, a::fmpqi) where T
+function Base.convert(::Type{Complex{Rational{T}}}, a::fmpqi) where T <: Integer
   return Complex{Rational{T}}(Base.convert(Rational{T}, real(a)),
-                              Base.convert(Rational{T}, real(b)))
+                              Base.convert(Rational{T}, imag(a)))
+end
+
+function Base.convert(::Type{fmpqi}, a::Complex{T}) where T <: Union{Integer, Rational}
+  return fmpqi(convert(fmpq, real(a)), convert(fmpq, imag(a)))
+end
+
+function Base.convert(::Type{fmpqi}, a::T) where T <: Union{Integer, Rational}
+  return fmpqi(convert(fmpq, a), fmpq(0))
 end
 
 ###############################################################################
@@ -125,11 +157,24 @@ function Base.hash(a::fmpqi, h::UInt)
   return hash(a.num, xor(hash(a.den, h), 0x6edeadc6d0447c19%UInt))
 end
 
+function Base.hash(a::FlintQQiField)
+  return 0x4c00da8e36fcc4a8%UInt
+end
+
 ###############################################################################
 #
 #   Basic manipulation
 #
 ###############################################################################
+
+# ???
+function deepcopy_internal(a::fmpqi, d::IdDict)
+  return fmpqi(deepcopy_internal(a.num, d), deepcopy_internal(a.den, d))
+end
+
+function deepcopy_internal(a::FlintQQiField)
+  return a
+end
 
 function real(a::fmpqi)
   return a.num.x//a.den
@@ -143,8 +188,24 @@ function abs2(a::fmpqi)
   return abs2(a.num)//a.den^2
 end
 
-function ==(a::fmpqi, b::fmpqi)
-  return a.den == b.den && a.num == b.num
+function zero(a::FlintQQiField)
+  return fmpqi(zero(ZZi), fmpz(1))
+end
+
+function one(a::FlintQQiField)
+  return fmpqi(one(ZZi), fmpz(1))
+end
+
+function iszero(a::fmpqi)
+  return iszero(a.num)
+end
+
+function isone(a::fmpqi)
+  return a.num == a.den
+end
+
+function nbits(a::fmpqi)
+  return nbits(a.num) + nbits(a.den)
 end
 
 ###############################################################################
@@ -153,11 +214,162 @@ end
 #
 ###############################################################################
 
+function reduce!(z::fmpqi)
+  g = fmpz()
+  ccall((:fmpz_gcd3, libflint), Nothing,
+        (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}),
+        g, z.num.x, z.den, z.num.y)
+  if ccall((:fmpz_sgn, libflint), Cint, (Ref{fmpz},), z.den) < 0
+    neg!(g, g)
+  end
+  divexact!(z.num, z.num, g)
+  divexact!(z.den, z.den, g)
+  return z
+end
+
 canonical_unit(a::fmpqi) = a
 
 ###############################################################################
 #
+#   equality
+#
+###############################################################################
+
+function ==(a::fmpqi, b::fmpqi)
+  return a.den == b.den && a.num == b.num
+end
+
+function ==(a::fmpqi, b::fmpqi_imag_sub_types)
+  return real(a) == real(b) && imag(a) == imag(b)
+end
+
+function ==(b::fmpqi_imag_sub_types, a::fmpqi)
+  return a == b
+end
+
+###############################################################################
+#
 #   addition, subtraction, multiplication
+#
+###############################################################################
+
+function addeq!(z::fmpqi, a::fmpqi)
+  if z != a
+    t = mul!(fmpzi(), a.num, z.den)
+    addmul!(t, z.num, a.den)
+    swap!(z.num, t)
+    mul!(z.den, a.den, z.den)
+    reduce!(z)
+  else
+    mul!(z, z, 2)
+  end
+  return z
+end
+
+function add!(z::fmpqi, a::fmpqi, b::fmpqi)
+  if z != b
+    mul!(z.num, a.num, b.den)
+    addmul!(z.num, b.num, a.den)
+    mul!(z.den, a.den, b.den)
+    reduce!(z)
+  else
+    addeq!(z, a)
+  end
+  return z
+end
+
+function +(a::fmpqi, b::fmpqi)
+  return add!(fmpqi(), a, b)
+end
+
+function subeq!(z::fmpqi, a::fmpqi)
+  if z !== a
+    t = mul!(fmpzi(), z.num, a.den)
+    submul!(t, a.num, z.den)
+    swap!(z.num, t)
+    mul!(z.den, z.den, a.den)
+    reduce!(z)
+  else
+    zero!(z)
+  end
+  return z
+end
+
+function sub!(z::fmpqi, a::fmpqi, b::fmpqi)
+  if z !== b
+    mul!(z.num, a.num, b.den)
+    submul!(z.num, b.num, a.den)
+    mul!(z.den, a.den, b.den)
+    reduce!(z)
+  else
+    subeq!(z, a)
+    neg!(z, z)
+  end
+  return z
+end
+
+function -(a::fmpqi, b::fmpqi)
+  return sub!(fmpqi(), a, b)
+end
+
+function neg!(z::fmpqi, a::fmpqi)
+  neg!(z.num, a.num)
+  set!(z.den, a.den)
+  return z
+end
+
+function -(a::fmpqi)
+  return neg!(fmpqi(), a)
+end
+
+function mul!(z::fmpqi, a::fmpqi, b::fmpqi)
+  mul!(z.num, a.num, b.num)
+  mul!(z.den, a.den, b.den)
+  reduce!(z)
+  return z
+end
+
+function mul!(z::fmpqi, a::fmpqi, b::Union{Integer, fmpz, fmpzi})
+  mul!(z.num, a.num, b)
+  set!(z.den, a.den)
+  reduce!(z)
+  return z
+end
+
+function *(a::fmpqi, b::fmpqi)
+  return mul!(fmpqi(), a, b)
+end
+
++(a::fmpqi, b::fmpqi_all_sub_types) = a + QQi(b)
++(a::fmpqi_all_sub_types, b::fmpqi) = QQi(a) + b
+-(a::fmpqi, b::fmpqi_all_sub_types) = a - QQi(b)
+-(a::fmpqi_all_sub_types, b::fmpqi) = QQi(a) - b
+*(a::fmpqi, b::fmpqi_all_sub_types) = a * QQi(b)
+*(a::fmpqi_all_sub_types, b::fmpqi) = QQi(a) * b
+
++(a::fmpq, b::fmpqi_imag_sub_types) = QQi(a) + QQi(b)
++(a::fmpqi_imag_sub_types, b::fmpq) = QQi(a) + QQi(b)
+-(a::fmpq, b::fmpqi_imag_sub_types) = QQi(a) - QQi(b)
+-(a::fmpqi_imag_sub_types, b::fmpq) = QQi(a) - QQi(b)
+*(a::fmpq, b::fmpqi_imag_sub_types) = QQi(a) * QQi(b)
+*(a::fmpqi_imag_sub_types, b::fmpq) = QQi(a) * QQi(b)
+
++(a::fmpz, b::Complex{<:Rational}) = QQi(a) + QQi(b)
++(a::Complex{<:Rational}, b::fmpz) = QQi(a) + QQi(b)
+-(a::fmpz, b::Complex{<:Rational}) = QQi(a) - QQi(b)
+-(a::Complex{<:Rational}, b::fmpz) = QQi(a) - QQi(b)
+*(a::fmpz, b::Complex{<:Rational}) = QQi(a) * QQi(b)
+*(a::Complex{<:Rational}, b::fmpz) = QQi(a) * QQi(b)
+
+###############################################################################
+#
+#   division
+#
+###############################################################################
+
+###############################################################################
+#
+#   powering
 #
 ###############################################################################
 
