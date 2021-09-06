@@ -1,4 +1,4 @@
-export fmpzi, ZZi
+export fmpzi, ZZi, FlintZZiRing
 
 include("fmpz_extras.jl")
 
@@ -35,7 +35,7 @@ function Base.show(io::IO, a::fmpzi)
 end
 
 function Base.show(io::IO, a::FlintZZiRing)
-  print(io, "ZZ[i]")
+  print(io, "ZZ[im]")
 end
 
 ###############################################################################
@@ -113,6 +113,14 @@ function Base.convert(::Type{Complex{T}}, a::fmpzi) where T <: Integer
   return Complex{T}(Base.convert(T, real(a)), Base.convert(T, imag(a)))
 end
 
+function Base.convert(::Type{fmpzi}, a::Complex{T}) where T <: Integer
+  return fmpzi(convert(fmpz, real(a)), convert(fmpz, imag(a)))
+end
+
+function Base.convert(::Type{fmpzi}, a::T) where T <: Integer
+  return fmpzi(convert(fmpz, real(a)), fmpz(0))
+end
+
 ###############################################################################
 #
 #   Hashing
@@ -123,11 +131,35 @@ function Base.hash(a::fmpzi, h::UInt)
   return hash(a.x, xor(hash(a.y, h), 0x94405bdfac6c8acd%UInt))
 end
 
+function Base.hash(a::FlintZZiRing)
+  return 0xc76722b5285975da%UInt
+end
+
+###############################################################################
+#
+#   Random generation
+#
+###############################################################################
+
+function rand_bits(::FlintZZiRing, b::Int)
+  t = rand(0:b)
+  return fmpzi(rand_bits(ZZ, t), rand_bits(ZZ, b - t))
+end
+
 ###############################################################################
 #
 #   Basic manipulation
 #
 ###############################################################################
+
+# ???
+function deepcopy_internal(a::fmpzi, d::IdDict)
+  return fmpzi(deepcopy_internal(a.x, d), deepcopy_internal(a.y, d))
+end
+
+function deepcopy_internal(a::FlintZZiRing)
+  return a
+end
 
 function real(a::fmpzi)
   return deepcopy(a.x)
@@ -163,10 +195,6 @@ end
 
 function nbits(a::fmpzi)
   return nbits(a.x) + nbits(a.y)
-end
-
-function ==(a::fmpzi, b::fmpzi)
-  return a.x == b.x && a.y == b.y
 end
 
 function zero!(z::fmpzi)
@@ -247,6 +275,32 @@ function unit_canonicalize!(z::fmpzi)
   return mul_i_pow!(z, canonical_unit_i_pow(z))
 end
 
+
+###############################################################################
+#
+# equality
+#
+###############################################################################
+
+function ==(a::fmpzi, b::fmpzi)
+  return a.x == b.x && a.y == b.y
+end
+
+function ==(a::fmpzi, b::Complex{T}) where T <: Integer
+  return a.x == real(b) && a.y == imag(b)
+end
+
+function ==(b::Complex{T}, a::fmpzi) where T <: Integer
+  return a == b
+end
+
+function ==(a::fmpzi, b::Union{Integer, fmpz})
+  return iszero(a.y) && a.x == b
+end
+
+function ==(b::Union{Integer, fmpz}, a::fmpzi)
+  return a == b
+end
 
 ###############################################################################
 #

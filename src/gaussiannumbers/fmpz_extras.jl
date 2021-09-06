@@ -1,4 +1,4 @@
-# stuff that should be in fmpz/fmpq
+# stuff that should be in fmpz
 
 function swap!(a::fmpz, b::fmpz)
   ccall((:fmpz_swap, libflint), Nothing,
@@ -27,12 +27,94 @@ function neg!(z::fmpz, a::fmpz)
   return z
 end
 
-function pow!(z::fmpz, a::fmpz, b::Int)
+function add!(z::fmpz, a::fmpz, b::Int)
+  ccall((:fmpz_add_si, libflint), Nothing,
+        (Ref{fmpz}, Ref{fmpz}, UInt),
+        z, a, b)
+  return z
+end
+
+function add!(z::fmpz, a::fmpz, b::UInt)
+  ccall((:fmpz_add_ui, libflint), Nothing,
+        (Ref{fmpz}, Ref{fmpz}, UInt),
+        z, a, b)
+  return z
+end
+
+function add!(z::fmpz, a::fmpz, b::Integer)
+  return add!(z, a, fmpz(b))
+end
+
+function sub!(z::fmpz, a::fmpz, b::fmpz)
+  ccall((:fmpz_sub, libflint), Nothing,
+        (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}),
+        z, a, b)
+  return z
+end
+
+function sub!(z::fmpz, a::fmpz, b::Int)
+  ccall((:fmpz_sub_si, libflint), Nothing,
+        (Ref{fmpz}, Ref{fmpz}, UInt),
+        z, a, b)
+  return z
+end
+
+function sub!(z::fmpz, a::fmpz, b::UInt)
+  ccall((:fmpz_sub_ui, libflint), Nothing,
+        (Ref{fmpz}, Ref{fmpz}, UInt),
+        z, a, b)
+  return z
+end
+
+function sub!(z::fmpz, a::fmpz, b::Integer)
+  return sub!(z, a, fmpz(b))
+end
+
+function sub!(z::fmpz, b::Integer, a::fmpz)
+  sub!(z, a, b)
+  return neg!(z, z)
+end
+
+function mul!(z::fmpz, a::fmpz, b::Int)
+  ccall((:fmpz_mul_si, libflint), Nothing,
+        (Ref{fmpz}, Ref{fmpz}, UInt),
+        z, a, b)
+  return z
+end
+
+function mul!(z::fmpz, a::fmpz, b::UInt)
+  ccall((:fmpz_mul_ui, libflint), Nothing,
+        (Ref{fmpz}, Ref{fmpz}, UInt),
+        z, a, b)
+  return z
+end
+
+function mul!(z::fmpz, a::fmpz, b::Integer)
+  return mul!(z, a, fmpz(b))
+end
+
+function submul!(z::fmpz, a::fmpz, b::fmpz)
+   ccall((:fmpz_submul, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}),
+         z, a, b)
+   return z
+end
+
+function divexact!(z::fmpz, a::fmpz, b::fmpz)
+  ccall((:fmpz_divexact, libflint), Nothing,
+        (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}),
+        z, a, b)
+  return z
+end
+
+function pow!(z::fmpz, a::fmpz, b::Union{Int, UInt})
   ccall((:fmpz_pow_ui, libflint), Nothing,
         (Ref{fmpz}, Ref{fmpz}, UInt),
         z, a, UInt(b))
   return z
 end
+
+# stuff that should be in fmpq
 
 function numerator!(z::fmpz, x::fmpq)
   ccall((:fmpq_numerator, libflint), Nothing,
@@ -61,17 +143,9 @@ function add!(z::fmpq, a::fmpq, b::Int)
         z, a, b)
 end
 
-function divexact!(z::fmpz, a::fmpz, b::fmpz)
-  @assert divides(a, b)[1]
-  ccall((:fmpz_divexact, libflint), Nothing,
-        (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}),
-        z, a, b)
-  return z
-end
-
-function sub!(z::fmpz, a::fmpz, b::fmpz)
-  ccall((:fmpz_sub, libflint), Nothing,
-        (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}),
+function mul!(z::fmpq, a::fmpq, b::Int)
+  ccall((:fmpq_mul_si, libflint), Nothing,
+        (Ref{fmpq}, Ref{fmpq}, Int),
         z, a, b)
   return z
 end
@@ -83,13 +157,6 @@ function addmul!(z::fmpq, a::fmpq, b::fmpq)
    return z
 end
 
-function submul!(z::fmpz, a::fmpz, b::fmpz)
-   ccall((:fmpz_submul, libflint), Nothing,
-         (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}),
-         z, a, b)
-   return z
-end
-
 function submul!(z::fmpq, a::fmpq, b::fmpq)
    ccall((:fmpq_submul, libflint), Nothing,
          (Ref{fmpq}, Ref{fmpq}, Ref{fmpq}),
@@ -97,16 +164,3 @@ function submul!(z::fmpq, a::fmpq, b::fmpq)
    return z
 end
 
-function mul!(z::fmpz, a::fmpz, b::Int)
-  ccall((:fmpz_mul_si, libflint), Nothing,
-        (Ref{fmpz}, Ref{fmpz}, Int),
-        z, a, b)
-  return z
-end
-
-function mul!(z::fmpq, a::fmpq, b::Int)
-  ccall((:fmpq_mul_si, libflint), Nothing,
-        (Ref{fmpq}, Ref{fmpq}, Int),
-        z, a, b)
-  return z
-end
