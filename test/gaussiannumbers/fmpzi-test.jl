@@ -53,7 +53,11 @@ end
         @test_throws Exception factor(a)
       else
         f = factor(a)
-        @test a == unit(f)*prod(p^e for (p, e) in f; init=one(ZZi))
+        b = unit(f)
+        for (p, e) in f
+          b *= p^e
+        end
+        @test a == b
       end
     end
   end
