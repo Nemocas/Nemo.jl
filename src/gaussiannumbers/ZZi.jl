@@ -58,6 +58,10 @@ function fmpzi(a::Union{Integer, fmpz})
   return fmpzi(fmpz(a), fmpz(0))
 end
 
+function (a::FlintZZiRing)()
+  return fmpzi()
+end
+
 function (a::FlintZZiRing)(b::Union{Integer, fmpz})
   return fmpzi(fmpz(b), fmpz(0))
 end
@@ -314,6 +318,12 @@ end
 #
 ###############################################################################
 
+function addeq!(z::fmpzi, a::fmpzi)
+  add!(z.x, z.x, a.x)
+  add!(z.y, z.y, a.y)
+  return z
+end
+
 function add!(z::fmpzi, a::fmpzi, b::fmpzi)
   add!(z.x, a.x, b.x)
   add!(z.y, a.y, b.y)
@@ -517,7 +527,7 @@ function divrem(a::fmpzi, b::fmpzi)
   return q, a - q*b
 end
 
-function div(a::fmpzi, b::fmpzi)
+function Base.div(a::fmpzi, b::fmpzi)
   return divrem(a, b)[1]
 end
 
@@ -634,6 +644,62 @@ end
 
 function ^(a::fmpzi, n::Union{Int, UInt})
   return pow!(fmpzi(), a, n)
+end
+
+###############################################################################
+#
+# generic functionality for Euclidean interface: why doesn't AA do this?
+#
+###############################################################################
+
+function mulmod(a::fmpzi, b::fmpzi, c::fmpzi)
+  return mod(a*b, c)
+end
+
+function powermod(a::fmpzi, b::Int, c::fmpzi)
+  if b < 0
+    return mod(invmod(a,c)^(-b%UInt), c)
+  else
+    return mod(a^b, c)
+  end
+end
+
+function invmod(a::fmpzi, b::fmpzi)
+  g, x, y = gcdx(a, b)
+  if !isone(g)
+    error("impossible inverse")
+  end
+  return mod(x, b)  # TODO: make sure gcdx returns the correct x and remove this
+end
+
+function gcdinv(a::fmpzi, b::fmpzi)
+  g, x, y = gcdx(a, b)
+  return (g, x)
+end
+
+function remove(a::fmpzi, b::fmpzi)
+  if (iszero(b) || isunit(b))
+    throw(ArgumentError("Second argument must be a non-zero non-unit"))
+  end
+  if iszero(a)
+    return (0, zero(parent(a))) # questionable case
+  end
+  v = 0
+  while begin; ok, q = divides(a, b); ok; end
+    a = q
+    v += 1
+  end
+  return v, a
+end
+
+function valuation(a::fmpzi, b::fmpzi)
+  return remove(a, b)[1]
+end
+
+function lcm(a::fmpzi, b::fmpzi)
+  g = gcd(a, b)
+  iszero(g) && return g
+  return a*divexact(b, g)
 end
 
 ###############################################################################

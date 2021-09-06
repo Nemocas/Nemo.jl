@@ -42,3 +42,10 @@ end
   @test im//2 * ZZ(5) == QQi(0, 5//2)
 end
 
+function test_elem(R::FlintQQiField)
+  return rand_bits(R, rand(0:200))
+end
+
+@testset "fmpqi.conformance_tests" begin
+#  test_Field_interface_recursive(QQi)
+end

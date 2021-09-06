@@ -1,8 +1,10 @@
 @testset "fmpzi.abstract_types" begin
-   @test fmpzi <: RingElem
-   @test FlintZZiRing <: Nemo.Ring
-   @test elem_type(ZZi) == fmpzi
-   @test parent_type(fmpzi) == FlintZZiRing
+  @test fmpzi <: RingElem
+  @test FlintZZiRing <: Nemo.Ring
+  @test elem_type(ZZi) == fmpzi
+  @test parent_type(fmpzi) == FlintZZiRing
+  @test base_ring(ZZi) == ZZ
+  @test base_ring(ZZi()) == ZZ
 end
 
 @testset "fmpzi.printing" begin
@@ -117,5 +119,14 @@ end
   @test Nemo.set!(t, a) == a
   Nemo.swap!(a, b)
   @test b == A && a == B
+end
+
+function test_elem(R::FlintZZiRing)
+  return rand_bits(R, rand(0:200))
+end
+
+@testset "fmpzi.conformance_tests" begin
+  test_Ring_interface(ZZi)
+  test_EuclideanRing_interface(ZZi)
 end
 
