@@ -41,6 +41,7 @@ end
   @test ZZi(QQi(8,9)) == 8 + 9*im
   @test_throws Exception ZZi(QQi(8//3,9))
   @test convert(Complex{Rational{BigInt}}, QQi(8,9)) == 8 + 9*im
+  @test convert(Complex{Rational{Int}}, QQi(8,9)) == 8 + 9*im
   @test convert(fmpqi, 8//5 + 9*im) == 8//5 + 9*im
   @test convert(fmpqi, 8 + 9*im) == 8 + 9*im
   @test convert(fmpqi, 8) == 8
@@ -78,10 +79,19 @@ end
     for b in bs
       @test Nemo.AbstractAlgebra.promote_rule(typeof(a), typeof(b)) == fmpqi
       @test QQi == parent(a*b)
+      @test QQi == parent(b*a)
       @test QQi == parent(a + b)
+      @test QQi == parent(b + a)
       @test QQi == parent(a - b)
       @test QQi == parent(b - a)
       @test QQi == parent(a//b)
+      @test QQi == parent(b//a)
+      @test QQi(a)*QQi(b) == a*b
+      @test QQi(b)*QQi(a) == b*a
+      @test QQi(a) + QQi(b) == a + b
+      @test QQi(b) + QQi(a) == b + a
+      @test QQi(a) - QQi(b) == a - b
+      @test QQi(b) - QQi(a) == b - a
     end
   end
 end

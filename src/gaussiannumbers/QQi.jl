@@ -128,7 +128,7 @@ function Base.convert(::Type{fmpqi}, a::Complex{T}) where T <: Union{Integer, Ra
   return fmpqi(convert(fmpq, real(a)), convert(fmpq, imag(a)))
 end
 
-function Base.convert(::Type{fmpqi}, a::T) where T <: Union{Integer, Rational}
+function Base.convert(::Type{fmpqi}, a::Union{Integer, fmpz, Rational, fmpq})
   return fmpqi(convert(fmpq, a), fmpq(0))
 end
 

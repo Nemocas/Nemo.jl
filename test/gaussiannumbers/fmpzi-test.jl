@@ -7,6 +7,12 @@
   @test base_ring(ZZi()) == ZZ
 end
 
+@testset "fmpzi.hash" begin
+  @test hash(ZZi(2, 3)) == hash(ZZi(2 + 3*im))
+  @test hash(ZZi) == hash(deepcopy(ZZi))
+  @test ZZi === Base.deepcopy_internal(ZZi, IdDict())
+end
+
 @testset "fmpzi.printing" begin
   @test string(zero(ZZi)) == "0"
   @test string(one(ZZi)) == "1"
@@ -30,8 +36,24 @@ end
   @test ZZ(ZZi(9)) == 9
   @test_throws Exception ZZ(ZZi(0,9))
   @test convert(Complex{BigInt}, ZZi(8,9)) == 8 + 9*im
-  @test convert(fmpzi, 8 + 9*im) == 8 + 9*im
-  @test convert(fmpzi, 8) == 8
+  @test 8 + 9*im == convert(fmpzi, 8 + 9*im)
+  @test 8 == convert(fmpzi, 8)
+  @test convert(fmpzi, fmpz(8)) == 8
+end
+
+@testset "fmpzi.pow" begin
+  @test_throws Exception ZZi(1,1)^-1
+  @test ZZi(0,1)^-1 == -im
+  @test ZZi(0,1)^2 == -1
+end
+
+@testset "fmpzi.Euclidean" begin
+  @test_throws Exception invmod(ZZi(1,1), ZZi(2))
+  m = ZZi(3)
+  @test isdivisible_by(invmod(ZZi(1,1), m) - powermod(ZZi(1,1), -1, m), m)
+  @test_throws Exception remove(ZZi(1), ZZi(0))
+  @test remove(ZZi(0), ZZi(2)) == (0, ZZi(0))
+  @test remove(ZZi(-10,-2), ZZi(1,1)) == (3, ZZi(2,3))
 end
 
 @testset "fmpzi.gcd" begin
@@ -44,6 +66,9 @@ end
     @assert real(b) >= 0
     @assert abs(real(b)) > abs(imag(b)) || real(b) == imag(b)
   end
+
+  @test gcd(ZZ(2), ZZi(1,1)) == ZZi(1,1)
+  @test gcd(ZZi(1,1), ZZ(2)) == ZZi(1,1)
 
   let l = 1000
     for k in 1:200
@@ -111,10 +136,19 @@ end
                   [ZZ(2),    [2*im]]]
     for b in bs
       @test Nemo.AbstractAlgebra.promote_rule(typeof(a), typeof(b)) == fmpzi
+      @test Nemo.AbstractAlgebra.promote_rule(typeof(b), typeof(a)) == fmpzi
       @test ZZi == parent(a*b)
+      @test ZZi == parent(b*a)
       @test ZZi == parent(a + b)
+      @test ZZi == parent(b + a)
       @test ZZi == parent(a - b)
       @test ZZi == parent(b - a)
+      @test ZZi(a)*ZZi(b) == a*b
+      @test ZZi(b)*ZZi(a) == b*a
+      @test ZZi(a) + ZZi(b) == a + b
+      @test ZZi(b) + ZZi(a) == b + a
+      @test ZZi(a) - ZZi(b) == a - b
+      @test ZZi(b) - ZZi(a) == b - a
     end
   end
 end
@@ -129,7 +163,7 @@ end
   @test mul!(t, t, b) == a*b^2
   @test mul!(t, a, t) == a^2*b^2
   @test mul!(t, t, t) == a^4*b^4
-  one!(t)
+  @test 1 + 0*im == one!(t)
   @test addmul!(t, a, b) == 1 + a*b
   @test addmul!(t, a, b, fmpzi()) == 1 + 2*a*b
   @test Nemo.submul!(t, a, b) == 1 + a*b
@@ -137,6 +171,12 @@ end
   @test addmul!(t, t, b) == 1 + b
   @test Nemo.submul!(t, t, a) == (1 + b)*(1 - a)
   @test Nemo.set!(t, a) == a
+  @test Nemo.add!(t, t, UInt(1)) == 1 + a
+  @test Nemo.sub!(t, t, UInt(1)) == a
+  @test Nemo.add!(t, t, BigInt(1)) == a + 1
+  @test Nemo.sub!(t, t, BigInt(1)) == a
+  @test Nemo.mul!(t, t, BigInt(2)) == a*2
+  @test Nemo.mul!(t, t, UInt(3)) == a*6
   Nemo.swap!(a, b)
   @test b == A && a == B
 end

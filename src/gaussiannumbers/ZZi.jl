@@ -70,30 +70,6 @@ function (R::FlintZZiRing)(a::Complex{T}) where T <: Integer
   return ZZi(fmpz(real(a)), fmpz(imag(a)))
 end
 
-function *(a::fmpz, b::Complex{T}) where T <: Integer
-  return fmpzi(a*real(b), a*imag(b))
-end
-
-function *(b::Complex{T}, a::fmpz) where T <: Integer
-  return fmpzi(a*real(b), a*imag(b))
-end
-
-function +(a::fmpz, b::Complex{T}) where T <: Integer
-  return fmpzi(a + real(b), imag(b))
-end
-
-function +(b::Complex{T}, a::fmpz) where T <: Integer
-  return fmpzi(a + real(b), imag(b))
-end
-
-function -(a::fmpz, b::Complex{T}) where T <: Integer
-  return fmpzi(a - real(b), -imag(b))
-end
-
-function -(b::Complex{T}, a::fmpz) where T <: Integer
-  return fmpzi(real(b) - a, imag(b))
-end
-
 ###############################################################################
 #
 #   Parent object call overloads
@@ -125,7 +101,7 @@ function Base.convert(::Type{fmpzi}, a::Complex{T}) where T <: Integer
   return fmpzi(convert(fmpz, real(a)), convert(fmpz, imag(a)))
 end
 
-function Base.convert(::Type{fmpzi}, a::T) where T <: Integer
+function Base.convert(::Type{fmpzi}, a::Union{Integer, fmpz})
   return fmpzi(convert(fmpz, a), fmpz(0))
 end
 
@@ -165,7 +141,11 @@ function deepcopy_internal(a::fmpzi, d::IdDict)
   return fmpzi(deepcopy_internal(a.x, d), deepcopy_internal(a.y, d))
 end
 
-function deepcopy_internal(a::FlintZZiRing)
+function deepcopy_internal(a::FlintZZiRing, d::IdDict)
+  return a
+end
+
+function deepcopy(a::FlintZZiRing)
   return a
 end
 
@@ -278,11 +258,6 @@ function canonical_unit(a::fmpzi)
     return fmpzi(0,1)
   end
 end
-
-function unit_canonicalize!(z::fmpzi)
-  return mul_i_pow!(z, canonical_unit_i_pow(z))
-end
-
 
 ###############################################################################
 #
@@ -509,14 +484,6 @@ function divrem(a::fmpzi, b::fmpz)
   return fmpzi(qx, qy), fmpzi(rx, ry)
 end
 
-function divrem(a::fmpz, b::fmpzi)
-  d = abs2(b)
-  qx, r = ndivrem(a*b.x, d)
-  qy, r = ndivrem(-a*b.y, d)
-  q = fmpzi(qx, qy)
-  return q, a - q*b
-end
-
 function divrem(a::fmpzi, b::fmpzi)
   d = abs2(b)
   qx, r = ndivrem(a.x*b.x + a.y*b.y, d)
@@ -632,7 +599,7 @@ end
 
 function pow!(z::fmpzi, a::fmpzi, n::Union{Int, UInt})
   if n < 0
-    return _pow!(z, inv!(z, a), (-n)%UInt)
+    return _pow!(z, inv(a), (-n)%UInt)
   elseif n > 0
     return _pow!(z, a, (+n)%UInt)
   else
@@ -656,7 +623,7 @@ end
 
 function powermod(a::fmpzi, b::Int, c::fmpzi)
   if b < 0
-    return mod(invmod(a,c)^(-b%UInt), c)
+    return mod(invmod(a,c)^((-b)%UInt), c)
   else
     return mod(a^b, c)
   end
@@ -680,7 +647,7 @@ function remove(a::fmpzi, b::fmpzi)
     throw(ArgumentError("Second argument must be a non-zero non-unit"))
   end
   if iszero(a)
-    return (0, zero(parent(a))) # questionable case
+    return (0, zero(parent(a))) # questionable case, consistent with fmpz
   end
   v = 0
   while begin; (ok, q) = divides(a, b); ok; end
@@ -780,7 +747,7 @@ function factor(a::fmpzi)
     end
   end
   if mod(f.unit.x, UInt(2)) == mod(f.unit.y, UInt(2))
-    f.unit = divexact(f.unit, c)
+    f.unit = divexact(f.unit, c, check=false)
     addeqindex!(f, 1, c)
   end
   for (p, e) in factor(abs2(f.unit))
@@ -807,39 +774,21 @@ promote_rule(a::Type{fmpz}, b::Type{fmpzi}) = fmpzi
 promote_rule(a::Type{fmpzi}, b::Type{<:Integer}) = fmpzi
 promote_rule(a::Type{<:Integer}, b::Type{fmpzi}) = fmpzi
 
-for (A, Bs) in [
-    [fmpzi, [Complex{<:Integer}]],
-    [fmpz,  [Complex{<:Integer}]]]
-  for B in Bs
-    # need Type{<:Complex{<:Integer}]} not Type{Complex{<:Integer}]}
-    TA = @eval Type{<:($(A))}
-    TB = @eval Type{<:($(B))}
-    @eval begin
-      function Nemo.AbstractAlgebra.promote_rule(::($TA), ::($TB))
-        return fmpzi
-      end
-      function Nemo.AbstractAlgebra.promote_rule(::($TB), ::($TA))
-        return fmpzi
-      end
-      function +(a::($A), b::($B))
-        return ZZi(a) + ZZi(b)
-      end
-      function +(a::($B), b::($A))
-        return ZZi(a) + ZZi(b)
-      end
-      function -(a::($A), b::($B))
-        return ZZi(a) - ZZi(b)
-      end
-      function -(a::($B), b::($A))
-        return ZZi(a) - ZZi(b)
-      end
-      function *(a::($A), b::($B))
-        return ZZi(a) * ZZi(b)
-      end
-      function *(a::($B), b::($A))
-        return ZZi(a) * ZZi(b)
-      end
-    end
-  end
-end
+promote_rule(a::Type{fmpz}, b::Type{<:Complex{<:Integer}}) = fmpzi
+promote_rule(a::Type{<:Complex{<:Integer}}, b::Type{fmpz}) = fmpzi
+*(a::fmpz, b::Complex{<:Integer}) = fmpzi(a*real(b), a*imag(b))
+*(b::Complex{<:Integer}, a::fmpz) = fmpzi(a*real(b), a*imag(b))
++(a::fmpz, b::Complex{<:Integer}) = fmpzi(a + real(b), imag(b))
++(b::Complex{<:Integer}, a::fmpz) = fmpzi(a + real(b), imag(b))
+-(a::fmpz, b::Complex{<:Integer}) = fmpzi(a - real(b), -imag(b))
+-(b::Complex{<:Integer}, a::fmpz) = fmpzi(real(b) - a, imag(b))
+
+promote_rule(a::Type{fmpzi}, b::Type{<:Complex{<:Integer}}) = fmpzi
+promote_rule(a::Type{<:Complex{<:Integer}}, b::Type{fmpzi}) = fmpzi
+*(a::fmpzi, b::Complex{<:Integer}) = a*ZZi(b)
+*(b::Complex{<:Integer}, a::fmpzi) = a*ZZi(b)
++(a::fmpzi, b::Complex{<:Integer}) = fmpzi(a.x + real(b), a.y + imag(b))
++(b::Complex{<:Integer}, a::fmpzi) = fmpzi(a.x + real(b), a.y + imag(b))
+-(a::fmpzi, b::Complex{<:Integer}) = fmpzi(a.x - real(b), a.y - imag(b))
+-(b::Complex{<:Integer}, a::fmpzi) = fmpzi(real(b) - a.x, imag(b) - a.y)
 

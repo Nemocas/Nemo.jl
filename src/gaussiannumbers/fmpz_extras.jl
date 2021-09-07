@@ -116,59 +116,12 @@ end
 
 # stuff that should be in fmpq
 
-function convert(::Type{Rational{T}}, a::fmpq) where T <: Integer
+function Base.convert(::Type{Rational{T}}, a::fmpq) where T <: Integer
   return Rational{T}(convert(T, numerator(a)), convert(T, denominator(a)))
 end
 
-function convert(::Type{fmpq}, a::Rational{T}) where T <: Integer
+function Base.convert(::Type{fmpq}, a::Rational{T}) where T <: Integer
   return convert(fmpz, numerator(a))//convert(fmpz, denominator(a))
 end
 
-function numerator!(z::fmpz, x::fmpq)
-  ccall((:fmpq_numerator, libflint), Nothing,
-        (Ref{fmpz}, Ref{fmpq}),
-        z, x)
-  return z
-end
-
-function denominator!(z::fmpz, x::fmpq)
-  ccall((:fmpq_denominator, libflint), Nothing,
-        (Ref{fmpz}, Ref{fmpq}),
-        z, x)
-  return z
-end
-
-function one!(z::fmpq)
-  ccall((:fmpq_set_si, libflint), Nothing,
-        (Ref{fmpq}, Int, UInt),
-        z, Int(1), UInt(1))
-  return z
-end
-
-function add!(z::fmpq, a::fmpq, b::Int)
-  ccall((:fmpq_add_si, libflint), Nothing,
-        (Ref{fmpq}, Ref{fmpq}, Int),
-        z, a, b)
-end
-
-function mul!(z::fmpq, a::fmpq, b::Int)
-  ccall((:fmpq_mul_si, libflint), Nothing,
-        (Ref{fmpq}, Ref{fmpq}, Int),
-        z, a, b)
-  return z
-end
-
-function addmul!(z::fmpq, a::fmpq, b::fmpq)
-   ccall((:fmpq_addmul, libflint), Nothing,
-         (Ref{fmpq}, Ref{fmpq}, Ref{fmpq}),
-         z, a, b)
-   return z
-end
-
-function submul!(z::fmpq, a::fmpq, b::fmpq)
-   ccall((:fmpq_submul, libflint), Nothing,
-         (Ref{fmpq}, Ref{fmpq}, Ref{fmpq}),
-         z, a, b)
-   return z
-end
 
