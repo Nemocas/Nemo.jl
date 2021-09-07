@@ -1,10 +1,5 @@
 export fmpqi, QQi, FlintQQiField
 
-const fmpqi_all_sub_types = Union{Integer, fmpz, Complex{<:Integer}, fmpzi,
-                              Rational, fmpq, Complex{<:Rational}}
-
-const fmpqi_imag_sub_types = Union{Complex{<:Integer}, fmpzi, Complex{<:Rational}}
-
 ###############################################################################
 #
 #   Data type and parent methods
@@ -60,21 +55,13 @@ function fmpqi(a::fmpzi)
 end
 
 function fmpqi(a::fmpq)
-  return fmpqi(fmpzi(numerator(a)), fmpzi(denominator(a)))
+  return fmpqi(fmpzi(numerator(a)), denominator(a))
 end
 
 function fmpqi(a::fmpq, b::fmpq)
   da = denominator(a)
   db = denominator(b)
   return reduce!(fmpqi(fmpzi(numerator(a)*db, numerator(b)*da), da*db))
-end
-
-function //(a::fmpqi_all_sub_types, b::Union{fmpzi, fmpqi})
-  return divexact(QQi(a), QQi(b))
-end
-
-function //(a::Union{fmpzi, fmpqi}, b::fmpqi_all_sub_types)
-  return divexact(QQi(a), QQi(b))
 end
 
 ###############################################################################
@@ -88,12 +75,12 @@ function (a::FlintQQiField)()
 end
 
 
-function (a::FlintQQiField)(b::Union{Integer, fmpz, fmpzi})
+function (a::FlintQQiField)(b::Union{Integer, fmpz})
   return fmpqi(ZZi(b))
 end
 
 function (a::FlintQQiField)(b::Union{Rational, fmpq})
-  return fmpqi(ZZi(numerator(b)), fmpz(denominator(b)))
+  return fmpqi(fmpq(b))
 end
 
 function (a::FlintQQiField)(b::Union{Integer, fmpz, Rational, fmpq},
@@ -101,7 +88,7 @@ function (a::FlintQQiField)(b::Union{Integer, fmpz, Rational, fmpq},
   return fmpqi(fmpq(b), fmpq(c))
 end
 
-function (a::FlintQQiField)(b::Union{fmpqi_imag_sub_types})
+function (a::FlintQQiField)(b::Union{Complex{<:Integer}, fmpzi, Complex{<:Rational}})
   return fmpqi(fmpq(real(b)), fmpq(imag(b)))
 end
 
@@ -126,18 +113,11 @@ end
 
 ###############################################################################
 #
-#   Conversions and promotions
+#   Conversions
 #
 ###############################################################################
 
-promote_rule(a::Type{fmpzi}, b::Type{fmpz}) = fmpzi
-promote_rule(a::Type{fmpz}, b::Type{fmpzi}) = fmpzi
-promote_rule(a::Type{fmpqi}, b::Type{fmpz}) = fmpqi
-promote_rule(a::Type{fmpz}, b::Type{fmpqi}) = fmpqi
-promote_rule(a::Type{fmpqi}, b::Type{fmpzi}) = fmpqi
-promote_rule(a::Type{fmpzi}, b::Type{fmpqi}) = fmpqi
-promote_rule(a::Type{fmpqi}, b::Type{fmpq}) = fmpqi
-promote_rule(a::Type{fmpq}, b::Type{fmpqi}) = fmpqi
+# see adhoc section for promotions
 
 function Base.convert(::Type{Complex{Rational{T}}}, a::fmpqi) where T <: Integer
   return Complex{Rational{T}}(Base.convert(Rational{T}, real(a)),
@@ -189,7 +169,11 @@ function deepcopy_internal(a::fmpqi, d::IdDict)
   return fmpqi(deepcopy_internal(a.num, d), deepcopy_internal(a.den, d))
 end
 
-function deepcopy_internal(a::FlintQQiField)
+function deepcopy_internal(a::FlintQQiField, d::IdDict)
+  return a
+end
+
+function deepcopy(a::FlintQQiField)
   return a
 end
 
@@ -267,7 +251,9 @@ function reduce!(z::fmpqi)
   return z
 end
 
-canonical_unit(a::fmpqi) = a
+function canonical_unit(a::fmpqi)
+  return a
+end
 
 ###############################################################################
 #
@@ -279,11 +265,11 @@ function ==(a::fmpqi, b::fmpqi)
   return a.den == b.den && a.num == b.num
 end
 
-function ==(a::fmpqi, b::fmpqi_imag_sub_types)
+function ==(a::fmpqi, b::Union{Complex{<:Integer}, fmpzi, Complex{<:Rational}})
   return real(a) == real(b) && imag(a) == imag(b)
 end
 
-function ==(b::fmpqi_imag_sub_types, a::fmpqi)
+function ==(b::Union{Complex{<:Integer}, fmpzi, Complex{<:Rational}}, a::fmpqi)
   return a == b
 end
 
@@ -295,9 +281,8 @@ end
 
 function addeq!(z::fmpqi, a::fmpqi)
   if z !== a
-    t = mul!(fmpzi(), a.num, z.den)
-    addmul!(t, z.num, a.den)
-    swap!(z.num, t)
+    mul!(z.num, z.num, a.den)
+    addmul!(z.num, a.num, z.den)
     mul!(z.den, a.den, z.den)
     reduce!(z)
   else
@@ -324,9 +309,8 @@ end
 
 function subeq!(z::fmpqi, a::fmpqi)
   if z !== a
-    t = mul!(fmpzi(), z.num, a.den)
-    submul!(t, a.num, z.den)
-    swap!(z.num, t)
+    mul!(z.num, z.num, a.den)
+    submul!(z.num, a.num, z.den)
     mul!(z.den, z.den, a.den)
     reduce!(z)
   else
@@ -380,26 +364,25 @@ function *(a::fmpqi, b::fmpqi)
   return mul!(fmpqi(), a, b)
 end
 
-+(a::fmpqi, b::fmpqi_all_sub_types) = a + QQi(b)
-+(a::fmpqi_all_sub_types, b::fmpqi) = QQi(a) + b
--(a::fmpqi, b::fmpqi_all_sub_types) = a - QQi(b)
--(a::fmpqi_all_sub_types, b::fmpqi) = QQi(a) - b
-*(a::fmpqi, b::fmpqi_all_sub_types) = a * QQi(b)
-*(a::fmpqi_all_sub_types, b::fmpqi) = QQi(a) * b
+function addmul!(z::fmpqi, a::fmpqi, b::fmpqi, t::fmpqi)
+  mul!(t, a, b)
+  add!(z, z, t)
+  return z
+end
 
-+(a::fmpq, b::fmpqi_imag_sub_types) = QQi(a) + QQi(b)
-+(a::fmpqi_imag_sub_types, b::fmpq) = QQi(a) + QQi(b)
--(a::fmpq, b::fmpqi_imag_sub_types) = QQi(a) - QQi(b)
--(a::fmpqi_imag_sub_types, b::fmpq) = QQi(a) - QQi(b)
-*(a::fmpq, b::fmpqi_imag_sub_types) = QQi(a) * QQi(b)
-*(a::fmpqi_imag_sub_types, b::fmpq) = QQi(a) * QQi(b)
+function addmul!(z::fmpqi, a::fmpqi, b::fmpqi)
+  return addmul!(z, a, b, fmpqi())
+end
 
-+(a::fmpz, b::Complex{<:Rational}) = QQi(a) + QQi(b)
-+(a::Complex{<:Rational}, b::fmpz) = QQi(a) + QQi(b)
--(a::fmpz, b::Complex{<:Rational}) = QQi(a) - QQi(b)
--(a::Complex{<:Rational}, b::fmpz) = QQi(a) - QQi(b)
-*(a::fmpz, b::Complex{<:Rational}) = QQi(a) * QQi(b)
-*(a::Complex{<:Rational}, b::fmpz) = QQi(a) * QQi(b)
+function submul!(z::fmpqi, a::fmpqi, b::fmpqi, t::fmpqi)
+  mul!(t, a, b)
+  sub!(z, z, t)
+  return z
+end
+
+function submul!(z::fmpqi, a::fmpqi, b::fmpqi)
+  return submul!(z, a, b, fmpqi())
+end
 
 ###############################################################################
 #
@@ -458,5 +441,65 @@ end
 
 function ^(a::fmpqi, b::Int)
   return pow!(fmpqi(), a, b)
+end
+
+###############################################################################
+#
+# adhoc
+#
+###############################################################################
+
+for (A, Bs) in [
+    [fmpqi, [Integer, fmpz, Complex{<:Integer}, fmpzi, Rational, fmpq, Complex{<:Rational}]],
+    [fmpzi, [Rational, fmpq, Complex{<:Rational}]],
+    [fmpq, [Complex{<:Integer}, Complex{<:Rational}]],
+    [fmpz, [Complex{<:Rational}]]]
+  for B in Bs
+    # need Type{<:Integer} not Type{Integer} and we can't type <:Integer above
+    TA = @eval Type{<:($(A))}
+    TB = @eval Type{<:($(B))}
+    @eval begin
+      function Nemo.AbstractAlgebra.promote_rule(::($TA), ::($TB))
+        return fmpqi
+      end
+      function Nemo.AbstractAlgebra.promote_rule(::($TB), ::($TA))
+        return fmpqi
+      end
+      function +(a::($A), b::($B))
+        return QQi(a) + QQi(b)
+      end
+      function +(a::($B), b::($A))
+        return QQi(a) + QQi(b)
+      end
+      function -(a::($A), b::($B))
+        return QQi(a) - QQi(b)
+      end
+      function -(a::($B), b::($A))
+        return QQi(a) - QQi(b)
+      end
+      function *(a::($A), b::($B))
+        return QQi(a) * QQi(b)
+      end
+      function *(a::($B), b::($A))
+        return QQi(a) * QQi(b)
+      end
+    end
+  end
+end
+
+# // overloads in AA easily lead to ambiguities
+for (As, Bs) in [
+      [(Integer, Rational), (fmpzi, fmpqi)],
+      [(Complex{<:Integer}, Complex{<:Rational}), (fmpz, fmpq, fmpzi, fmpqi)], 
+      [(fmpz, fmpq), (Complex{<:Integer}, Complex{<:Rational}, fmpzi, fmpqi)],
+      [(fmpzi, fmpqi), (Integer, Rational, fmpz, fmpq, Complex{<:Integer},
+                                           Complex{<:Rational}, fmpzi, fmpqi)]]
+  for A in As, B in Bs
+    @eval begin
+      function //(a::($A), b::($B))
+        return divexact(QQi(a), QQi(b))
+      end
+    end
+  end
 end
 

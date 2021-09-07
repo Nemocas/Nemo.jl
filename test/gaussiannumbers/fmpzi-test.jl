@@ -99,6 +99,26 @@ end
   end
 end
 
+@testset "fmpzi.adhoc" begin
+  @test ZZ(5) + im == ZZi(5, 1)
+  @test im + ZZ(5) == ZZi(5, 1)
+  @test ZZ(5) - im == ZZi(5, -1)
+  @test im - ZZ(5) == ZZi(-5, 1)
+  @test ZZ(5) * im == ZZi(0, 5)
+  @test im * ZZ(5) == ZZi(0, 5)
+
+  for (a, bs) in [[ZZi(1,1), [2, ZZ(2), 2*im, ZZi(2)]],
+                  [ZZ(2),    [2*im]]]
+    for b in bs
+      @test Nemo.AbstractAlgebra.promote_rule(typeof(a), typeof(b)) == fmpzi
+      @test ZZi == parent(a*b)
+      @test ZZi == parent(a + b)
+      @test ZZi == parent(a - b)
+      @test ZZi == parent(b - a)
+    end
+  end
+end
+
 @testset "fmpzi.unsafe" begin
   a = rand_bits(ZZi, 600); A = deepcopy(a)
   b = rand_bits(ZZi, 600); B = deepcopy(b)

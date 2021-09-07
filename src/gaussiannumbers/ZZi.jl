@@ -111,9 +111,11 @@ end
 
 ###############################################################################
 #
-#   Conversions and promotions
+#   Conversions
 #
 ###############################################################################
+
+# see adhoc section for promotions
 
 function Base.convert(::Type{Complex{T}}, a::fmpzi) where T <: Integer
   return Complex{T}(Base.convert(T, real(a)), Base.convert(T, imag(a)))
@@ -681,7 +683,7 @@ function remove(a::fmpzi, b::fmpzi)
     return (0, zero(parent(a))) # questionable case
   end
   v = 0
-  while begin; ok, q = divides(a, b); ok; end
+  while begin; (ok, q) = divides(a, b); ok; end
     a = q
     v += 1
   end
@@ -791,5 +793,53 @@ function factor(a::fmpzi)
   end
   @assert isunit(f.unit)
   return f
+end
+
+###############################################################################
+#
+# adhoc
+#
+###############################################################################
+
+# +,-,* operations defined above
+promote_rule(a::Type{fmpzi}, b::Type{fmpz}) = fmpzi
+promote_rule(a::Type{fmpz}, b::Type{fmpzi}) = fmpzi
+promote_rule(a::Type{fmpzi}, b::Type{<:Integer}) = fmpzi
+promote_rule(a::Type{<:Integer}, b::Type{fmpzi}) = fmpzi
+
+for (A, Bs) in [
+    [fmpzi, [Complex{<:Integer}]],
+    [fmpz,  [Complex{<:Integer}]]]
+  for B in Bs
+    # need Type{<:Complex{<:Integer}]} not Type{Complex{<:Integer}]}
+    TA = @eval Type{<:($(A))}
+    TB = @eval Type{<:($(B))}
+    @eval begin
+      function Nemo.AbstractAlgebra.promote_rule(::($TA), ::($TB))
+        return fmpzi
+      end
+      function Nemo.AbstractAlgebra.promote_rule(::($TB), ::($TA))
+        return fmpzi
+      end
+      function +(a::($A), b::($B))
+        return ZZi(a) + ZZi(b)
+      end
+      function +(a::($B), b::($A))
+        return ZZi(a) + ZZi(b)
+      end
+      function -(a::($A), b::($B))
+        return ZZi(a) - ZZi(b)
+      end
+      function -(a::($B), b::($A))
+        return ZZi(a) - ZZi(b)
+      end
+      function *(a::($A), b::($B))
+        return ZZi(a) * ZZi(b)
+      end
+      function *(a::($B), b::($A))
+        return ZZi(a) * ZZi(b)
+      end
+    end
+  end
 end
 
