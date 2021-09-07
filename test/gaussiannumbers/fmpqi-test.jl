@@ -47,5 +47,5 @@ function test_elem(R::FlintQQiField)
 end
 
 @testset "fmpqi.conformance_tests" begin
-#  test_Field_interface_recursive(QQi)
+  test_Field_interface(QQi)
 end

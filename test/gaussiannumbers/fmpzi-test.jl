@@ -79,7 +79,7 @@ end
 
 @testset "fmpzi.factor" begin
   let l = 26
-    for k in 1:500
+    for k in 1:100
       a = one(ZZi)
       for i in 1:rand(0:20)
         a *= rand_bits(ZZi, rand(0:l))^rand(1:16)

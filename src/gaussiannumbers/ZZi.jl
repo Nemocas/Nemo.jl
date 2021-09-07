@@ -8,23 +8,19 @@ include("fmpz_extras.jl")
 #
 ###############################################################################
 
-function elem_type(::Type{FlintZZiRing})
-  return fmpzi
-end
+elem_type(::Type{FlintZZiRing}) = fmpzi
 
-function parent_type(::Type{fmpzi})
-  return FlintZZiRing
-end
+parent_type(::Type{fmpzi}) = FlintZZiRing
 
-function parent(::fmpzi)
-  return ZZi
-end
+parent(a::fmpzi) = ZZi
 
 base_ring(a::FlintZZiRing) = ZZ
 
 base_ring(a::fmpzi) = ZZ
 
 isdomain_type(::Type{fmpzi}) = true
+
+characteristic(a::FlintZZiRing) = 0
 
 ###############################################################################
 #

@@ -29,7 +29,7 @@ end
 
 function add!(z::fmpz, a::fmpz, b::Int)
   ccall((:fmpz_add_si, libflint), Nothing,
-        (Ref{fmpz}, Ref{fmpz}, UInt),
+        (Ref{fmpz}, Ref{fmpz}, Int),
         z, a, b)
   return z
 end
@@ -54,7 +54,7 @@ end
 
 function sub!(z::fmpz, a::fmpz, b::Int)
   ccall((:fmpz_sub_si, libflint), Nothing,
-        (Ref{fmpz}, Ref{fmpz}, UInt),
+        (Ref{fmpz}, Ref{fmpz}, Int),
         z, a, b)
   return z
 end
@@ -77,7 +77,7 @@ end
 
 function mul!(z::fmpz, a::fmpz, b::Int)
   ccall((:fmpz_mul_si, libflint), Nothing,
-        (Ref{fmpz}, Ref{fmpz}, UInt),
+        (Ref{fmpz}, Ref{fmpz}, Int),
         z, a, b)
   return z
 end

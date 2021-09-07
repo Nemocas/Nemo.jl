@@ -11,23 +11,19 @@ const fmpqi_imag_sub_types = Union{Complex{<:Integer}, fmpzi, Complex{<:Rational
 #
 ###############################################################################
 
-function elem_type(::Type{FlintQQiField})
-  return fmpqi
-end
+elem_type(::Type{FlintQQiField}) = fmpqi
 
-function parent_type(::Type{fmpqi})
-  return FlintQQiField
-end
+parent_type(::Type{fmpqi}) = FlintQQiField
 
-function parent(::fmpqi)
-  return QQi
-end
+parent(a::fmpqi) = QQi
 
 base_ring(a::FlintQQiField) = ZZi
 
 base_ring(a::fmpqi) = ZZi
 
 isdomain_type(::Type{fmpqi}) = true
+
+characteristic(a::FlintQQiField) = 0
 
 ###############################################################################
 #
@@ -56,7 +52,7 @@ end
 ###############################################################################
 
 function fmpqi()
-  return fmpqi(fmpzi())
+  return fmpqi(fmpzi(), fmpz(1))
 end
 
 function fmpqi(a::fmpzi)
@@ -72,6 +68,25 @@ function fmpqi(a::fmpq, b::fmpq)
   db = denominator(b)
   return reduce!(fmpqi(fmpzi(numerator(a)*db, numerator(b)*da), da*db))
 end
+
+function //(a::fmpqi_all_sub_types, b::Union{fmpzi, fmpqi})
+  return divexact(QQi(a), QQi(b))
+end
+
+function //(a::Union{fmpzi, fmpqi}, b::fmpqi_all_sub_types)
+  return divexact(QQi(a), QQi(b))
+end
+
+###############################################################################
+#
+#   Parent object call overloads
+#
+###############################################################################
+
+function (a::FlintQQiField)()
+  return fmpqi()
+end
+
 
 function (a::FlintQQiField)(b::Union{Integer, fmpz, fmpzi})
   return fmpqi(ZZi(b))
@@ -90,23 +105,13 @@ function (a::FlintQQiField)(b::Union{fmpqi_imag_sub_types})
   return fmpqi(fmpq(real(b)), fmpq(imag(b)))
 end
 
-function //(a::fmpqi_all_sub_types, b::Union{fmpzi, fmpqi})
-  return divexact(QQi(a), QQi(b))
+function (a::FlintQQiField)(b::fmpqi)
+  return b
 end
 
-function //(a::Union{fmpzi, fmpqi}, b::fmpqi_all_sub_types)
-  return divexact(QQi(a), QQi(b))
-end
-
-###############################################################################
-#
-#   Parent object call overloads
-#
-###############################################################################
-
-function (a::FlintZZiRing)(b::fmpqi)
-  isone(b.den) || error("cannot coerce")
-  return deepcopy(b.num) # ???
+function (a::FlintIntegerRing)(b::fmpqi)
+  iszero(b.num.y) && isone(b.den) || error("cannot coerce")
+  return deepcopy(b.num.x) # ???
 end
 
 function (a::FlintRationalField)(b::fmpqi)
@@ -114,9 +119,9 @@ function (a::FlintRationalField)(b::fmpqi)
   return b.num.x//b.den
 end
 
-function (a::FlintIntegerRing)(b::fmpqi)
-  iszero(b.num.y) && isone(b.den) || error("cannot coerce")
-  return deepcopy(b.num.x) # ???
+function (a::FlintZZiRing)(b::fmpqi)
+  isone(b.den) || error("cannot coerce")
+  return deepcopy(b.num) # ???
 end
 
 ###############################################################################
@@ -159,6 +164,18 @@ end
 
 function Base.hash(a::FlintQQiField)
   return 0x4c00da8e36fcc4a8%UInt
+end
+
+###############################################################################
+#
+#   Random generation
+#
+###############################################################################
+
+function rand_bits(a::FlintQQiField, b::Int)
+  b = max(1, b)
+  t = clamp(cld(rand(0:b)^2, b), 1, b)  # average b/3 for the denominator
+  return reduce!(fmpqi(rand_bits(ZZi, clamp(b - t, 0, b)), rand_bits(ZZ, t)))
 end
 
 ###############################################################################
@@ -208,6 +225,29 @@ function nbits(a::fmpqi)
   return nbits(a.num) + nbits(a.den)
 end
 
+function zero!(z::fmpqi)
+  zero!(z.num)
+  one!(z.den)
+  return z
+end
+
+function one!(z::fmpqi)
+  one!(z.num)
+  one!(z.den)
+  return z
+end
+
+function set!(z::fmpqi, a::fmpqi)
+  set!(z.num, a.num)
+  set!(z.den, a.den)
+  return z
+end
+
+function swap!(a::fmpqi, b::fmpqi)
+  swap!(a.num, b.num)
+  swap!(a.den, b.den)
+end
+
 ###############################################################################
 #
 #   Canonicalisation
@@ -254,7 +294,7 @@ end
 ###############################################################################
 
 function addeq!(z::fmpqi, a::fmpqi)
-  if z != a
+  if z !== a
     t = mul!(fmpzi(), a.num, z.den)
     addmul!(t, z.num, a.den)
     swap!(z.num, t)
@@ -267,7 +307,7 @@ function addeq!(z::fmpqi, a::fmpqi)
 end
 
 function add!(z::fmpqi, a::fmpqi, b::fmpqi)
-  if z != b
+  if z !== b
     mul!(z.num, a.num, b.den)
     addmul!(z.num, b.num, a.den)
     mul!(z.den, a.den, b.den)
@@ -367,10 +407,56 @@ end
 #
 ###############################################################################
 
+function isunit(a::fmpqi)
+  return !iszero(a)
+end
+
+function inv!(z::fmpqi, a::fmpqi)
+  d = abs2(a.num)
+  mul!(z.num.x, a.num.x, a.den)
+  mul!(z.num.y, a.num.y, a.den)
+  neg!(z.num.y, z.num.y)
+  swap!(z.den, d)
+  reduce!(z)
+  return z
+end
+
+function inv(a::fmpqi)
+  return inv!(fmpqi(), a)
+end
+
+function divexact!(z::fmpqi, a::fmpqi, b::fmpqi)
+  return mul!(z, a, inv(b))
+end
+
+function divexact(a::fmpqi, b::fmpqi; check::Bool = true)
+  return divexact!(fmpqi(), a, b)
+end
+
 ###############################################################################
 #
 #   powering
 #
 ###############################################################################
 
+function pow!(z::fmpqi, a::fmpqi, b::UInt)
+  pow!(z.num, a.num, b)
+  pow!(z.den, a.den, b)
+  reduce!(z)  # bummer: a.num and a.den are not comprime over ZZ[i]
+  return z
+end
+
+function pow!(z::fmpqi, a::fmpqi, b::Int)
+  if b < 0
+    n = (-b)%UInt
+    a = inv(a)
+  else
+    n = (+b)%UInt
+  end
+  return pow!(z, a, n)
+end
+
+function ^(a::fmpqi, b::Int)
+  return pow!(fmpqi(), a, b)
+end
 
