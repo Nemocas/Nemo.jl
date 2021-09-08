@@ -1994,35 +1994,31 @@ end
 #
 ###############################################################################
 
-function mul!(z::fmpz, x::fmpz, y::fmpz)
-   ccall((:fmpz_mul, libflint), Nothing,
-         (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z, x, y)
+function zero!(z::fmpz)
+   ccall((:fmpz_zero, libflint), Nothing,
+         (Ref{fmpz},), z)
    return z
 end
 
-function mul!(z::fmpz, x::fmpz, y::Int)
-   ccall((:fmpz_mul_si, libflint), Nothing,
-         (Ref{fmpz}, Ref{fmpz}, Int), z, x, y)
+function one!(z::fmpz)
+   ccall((:fmpz_set_ui, libflint), Nothing,
+         (Ref{fmpz}, UInt),
+         z, 1)
    return z
 end
 
-mul!(z::fmpz, x::Int, y::fmpz) = mul!(z, y, x)
-
-function addmul!(z::fmpz, x::fmpz, y::fmpz)
-   ccall((:fmpz_addmul, libflint), Nothing,
-         (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z, x, y)
+function set!(z::fmpz, a::fmpz)
+   ccall((:fmpz_set, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}),
+         z, a)
    return z
 end
 
-addmul!(z::fmpz, x::fmpz, y::fmpz, ::fmpz) = addmul!(z, x, y)
-
-function addmul!(z::fmpz, x::fmpz, y::Int)
-   ccall((:fmpz_addmul_si, libflint), Nothing,
-         (Ref{fmpz}, Ref{fmpz}, Int), z, x, y)
-   return z
+function swap!(a::fmpz, b::fmpz)
+   ccall((:fmpz_swap, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}),
+         a, b)
 end
-
-addmul!(z::fmpz, x::fmpz, y::Int, ::fmpz) = addmul!(z, x, y)
 
 function addeq!(z::fmpz, x::fmpz)
    ccall((:fmpz_add, libflint), Nothing,
@@ -2042,11 +2038,111 @@ function add!(z::fmpz, x::fmpz, y::Int)
    return z
 end
 
+function add!(z::fmpz, a::fmpz, b::UInt)
+   ccall((:fmpz_add_ui, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, UInt),
+         z, a, b)
+   return z
+end
+
+add!(z::fmpz, a::fmpz, b::Integer) = add!(z, a, fmpz(b))
 add!(z::fmpz, x::Int, y::fmpz) = add!(z, y, x)
 
-function zero!(z::fmpz)
-   ccall((:fmpz_zero, libflint), Nothing,
-         (Ref{fmpz},), z)
+function neg!(z::fmpz, a::fmpz)
+   ccall((:fmpz_neg, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}),
+         z, a)
+   return z
+end
+
+function sub!(z::fmpz, a::fmpz, b::fmpz)
+   ccall((:fmpz_sub, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}),
+         z, a, b)
+   return z
+end
+
+function sub!(z::fmpz, a::fmpz, b::Int)
+   ccall((:fmpz_sub_si, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, Int),
+         z, a, b)
+   return z
+end
+
+function sub!(z::fmpz, a::fmpz, b::UInt)
+   ccall((:fmpz_sub_ui, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, UInt),
+         z, a, b)
+   return z
+end
+
+function sub!(z::fmpz, a::fmpz, b::Integer)
+   return sub!(z, a, fmpz(b))
+end
+
+function sub!(z::fmpz, b::Integer, a::fmpz)
+   sub!(z, a, b)
+   return neg!(z, z)
+end
+
+
+function mul!(z::fmpz, x::fmpz, y::fmpz)
+   ccall((:fmpz_mul, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z, x, y)
+   return z
+end
+
+function mul!(z::fmpz, x::fmpz, y::Int)
+   ccall((:fmpz_mul_si, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, Int), z, x, y)
+   return z
+end
+
+function mul!(z::fmpz, a::fmpz, b::UInt)
+   ccall((:fmpz_mul_ui, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, UInt),
+         z, a, b)
+   return z
+end
+
+mul!(z::fmpz, a::fmpz, b::Integer) = mul!(z, a, fmpz(b))
+
+mul!(z::fmpz, x::Int, y::fmpz) = mul!(z, y, x)
+
+function addmul!(z::fmpz, x::fmpz, y::fmpz)
+   ccall((:fmpz_addmul, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z, x, y)
+   return z
+end
+
+addmul!(z::fmpz, x::fmpz, y::fmpz, ::fmpz) = addmul!(z, x, y)
+
+function addmul!(z::fmpz, x::fmpz, y::Int)
+   ccall((:fmpz_addmul_si, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, Int), z, x, y)
+   return z
+end
+
+addmul!(z::fmpz, x::fmpz, y::Int, ::fmpz) = addmul!(z, x, y)
+
+function submul!(z::fmpz, a::fmpz, b::fmpz)
+   ccall((:fmpz_submul, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}),
+         z, a, b)
+   return z
+end
+
+function divexact!(z::fmpz, a::fmpz, b::fmpz)
+   ccall((:fmpz_divexact, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}),
+         z, a, b)
+   return z
+end
+
+function pow!(z::fmpz, a::fmpz, b::Union{Int, UInt})
+   ccall((:fmpz_pow_ui, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, UInt),
+         z, a, UInt(b))
    return z
 end
 

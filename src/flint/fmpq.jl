@@ -852,23 +852,6 @@ add!(c::fmpq, a::Int, b::fmpq) = add!(c, b, a)
 
 ###############################################################################
 #
-#   Conversions to/from flint Julia rationals
-#
-###############################################################################
-
-function Rational(z::fmpq)
-   r = Rational{BigInt}(0)
-   ccall((:fmpq_get_mpz_frac, libflint), Nothing,
-         (Ref{BigInt}, Ref{BigInt}, Ref{fmpq}), r.num, r.den, z)
-   return r
-end
-
-function Rational(z::fmpz)
-   return Rational{BigInt}(BigInt(z))
-end
-
-###############################################################################
-#
 #   Parent object call overloads
 #
 ###############################################################################
@@ -939,7 +922,26 @@ promote_rule(::Type{fmpq}, ::Type{fmpz}) = fmpq
 
 Base.promote_rule(::Type{fmpq}, ::Type{Rational{T}}) where {T <: Integer} = fmpq
 
+function Base.convert(::Type{Rational{T}}, a::fmpq) where T <: Integer
+   return Rational{T}(convert(T, numerator(a)), convert(T, denominator(a)))
+end
+
+function Base.convert(::Type{fmpq}, a::Rational{T}) where T <: Integer
+   return convert(fmpz, numerator(a))//convert(fmpz, denominator(a))
+end
+
 convert(::Type{Rational{BigInt}}, a::fmpq) = Rational(a)
+
+function Rational(z::fmpq)
+   r = Rational{BigInt}(0)
+   ccall((:fmpq_get_mpz_frac, libflint), Nothing,
+         (Ref{BigInt}, Ref{BigInt}, Ref{fmpq}), r.num, r.den, z)
+   return r
+end
+
+function Rational(z::fmpz)
+   return Rational{BigInt}(BigInt(z))
+end
 
 ###############################################################################
 #
