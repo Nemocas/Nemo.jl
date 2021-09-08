@@ -97,7 +97,7 @@ end
 
 function (a::FlintIntegerRing)(b::fmpqi)
    iszero(b.num.y) && isone(b.den) || error("cannot coerce")
-   return deepcopy(b.num.x) # ???
+   return b.num.x
 end
 
 function (a::FlintRationalField)(b::fmpqi)
@@ -107,7 +107,7 @@ end
 
 function (a::FlintZZiRing)(b::fmpqi)
    isone(b.den) || error("cannot coerce")
-   return deepcopy(b.num) # ???
+   return b.num
 end
 
 ###############################################################################
@@ -169,10 +169,6 @@ function deepcopy_internal(a::fmpqi, d::IdDict)
 end
 
 function deepcopy_internal(a::FlintQQiField, d::IdDict)
-   return a
-end
-
-function deepcopy(a::FlintQQiField)
    return a
 end
 

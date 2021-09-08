@@ -76,7 +76,7 @@ end
 
 function (a::FlintIntegerRing)(b::fmpzi)
    iszero(b.y) || error("cannot coerce")
-   return deepcopy(b.x)
+   return b.x
 end
 
 function (a::FlintZZiRing)(b::fmpzi)
@@ -143,20 +143,16 @@ function deepcopy_internal(a::FlintZZiRing, d::IdDict)
    return a
 end
 
-function deepcopy(a::FlintZZiRing)
-   return a
-end
-
 function real(a::fmpzi)
-   return deepcopy(a.x)
+   return a.x
 end
 
 function imag(a::fmpzi)
-   return deepcopy(a.y)
+   return a.y
 end
 
 function conj(a::fmpzi)
-   return fmpzi(deepcopy(a.x), -a.y)
+   return fmpzi(a.x, -a.y)
 end
 
 function abs2(a::fmpzi)
@@ -357,7 +353,6 @@ function -(a::fmpzi)
    return neg!(fmpzi(), a)
 end
 
-
 # output does not alias input
 function _muleq!(z::fmpzi, b::fmpzi)
    zx = submul!(mul!(fmpz(), z.x, b.x), z.y, b.y)
@@ -538,9 +533,8 @@ end
 
 function inv(a::fmpzi)
    isunit(a) || error("not invertible")
-   return fmpzi(deepcopy(a.x), -a.y)
+   return fmpzi(a.x, -a.y)
 end
-
 
 ###############################################################################
 #
@@ -705,7 +699,6 @@ function gcdx(a::fmpzi, b::fmpzi)
    return divexact(a, d), divexact(u1, d), divexact(v1, d)
 end
 
-
 ###############################################################################
 #
 #   factor
@@ -751,7 +744,7 @@ function factor(a::fmpzi)
    for (p, e) in factor(abs2(f.unit))
       c1 = _sum_of_squares(p)
       if !isdivisible_by(f.unit, c1)
-         neg!(c1.y, c1.y)
+         c1 = conj(c1)
       end
       f.unit = divexact(f.unit, c1^e)
       addeqindex!(f, e, c1)
