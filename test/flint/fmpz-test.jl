@@ -649,8 +649,9 @@ end
 
   add!(a, a, b)
   @test a == b
-  add!(a, a, 1)
-  @test a == b + 1
+  add!(a, a, 2)
+  @test a == b + 2
+  @test add!(a, -1, a) == b + 1
 
   addeq!(a, b^2)
   @test a == 1 + b + b^2
