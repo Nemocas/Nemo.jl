@@ -501,14 +501,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    sqrt(a::qadic; check::Bool=true)
-
-Return the $q$-adic square root of $a$. We define this only when the
-valuation of $a$ is even. The precision of the output will be
-precision$(a) -$ valuation$(a)/2$. If the square root does not exist, an
-exception is thrown.
-"""
 function Base.sqrt(a::qadic; check::Bool=true)
    av = valuation(a)
    check && (av % 2) != 0 && error("Unable to take qadic square root")
@@ -527,14 +519,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    exp(a::qadic)
-
-Return the $q$-adic exponential of $a$. We define this only when the
-valuation of $a$ is positive (unless $a = 0$). The precision of the output
-will be the same as the precision of the input. If the input is not valid an
-exception is thrown.
-"""
 function Base.exp(a::qadic)
    !iszero(a) && valuation(a) <= 0 && throw(DomainError(a, "Valuation must be positive"))
    ctx = parent(a)
@@ -546,14 +530,6 @@ function Base.exp(a::qadic)
    return z
 end
 
-@doc Markdown.doc"""
-    log(a::qadic)
-
-Return the $q$-adic logarithm of $a$. We define this only when the valuation
-of $a$ is zero (but not for $a = 0$). The precision of the output will be
-the same as the precision of the input. If the input is not valid an
-exception is thrown.
-"""
 function log(a::qadic)
    av = valuation(a)
    (av > 0 || av < 0 || iszero(a)) && throw(DomainError(a, "Valuation must be zero"))

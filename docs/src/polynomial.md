@@ -222,46 +222,10 @@ isreal(n)
 ```
 ### Factorisation
 
-Polynomials can be factorised over certain rings. In general we use the
-same format for the output as the Julia factorisation function, namely an
-associative array with polynomial factors as keys and exponents as values.
-
-```@docs
-isirreducible(::nmod_poly)
-isirreducible(::gfp_poly)
-isirreducible(::fmpz_mod_poly)
-isirreducible(::gfp_fmpz_poly)
-isirreducible(::fq_poly)
-isirreducible(::fq_nmod_poly)
-```
-
-```@docs
-issquarefree(::nmod_poly)
-issquarefree(::gfp_poly)
-issquarefree(::fmpz_mod_poly)
-issquarefree(::gfp_fmpz_poly)
-issquarefree(::fq_poly)
-issquarefree(::fq_nmod_poly)
-```
-
-```@docs
-factor(::fmpz_poly)
-factor(::nmod_poly)
-factor(::gfp_poly)
-factor(::fmpz_mod_poly)
-factor(::gfp_fmpz_poly)
-factor(::fq_poly)
-factor(::fq_nmod_poly)
-```
-
-```@docs
-factor_squarefree(::nmod_poly)
-factor_squarefree(::gfp_poly)
-factor_squarefree(::fmpz_mod_poly)
-factor_squarefree(::gfp_fmpz_poly)
-factor_squarefree(::fq_poly)
-factor_squarefree(::fq_nmod_poly)
-```
+Certain polynomials can be factored (`fmpz_poly', `nmod_poly`, `gfp_poly`,
+`fmpz_mod_poly`, `gfp_fmpz_poly`, `fq_poly`, `fq_nmod_poly`) and the interface
+follows the specification in AbstractAlgebra.jl. The following addition
+functions are available.
 
 ```@docs
 factor_distinct_deg(::nmod_poly)

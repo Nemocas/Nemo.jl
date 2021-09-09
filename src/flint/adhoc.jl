@@ -18,19 +18,9 @@ end
 
 *(a::AbsSeriesElem, b::fmpz) = b*a
 
-@doc Markdown.doc"""
-    ==(x::AbsSeriesElem, y::fmpz)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::AbsSeriesElem, y::fmpz) = precision(x) == 0 || ((length(x) == 0 && iszero(y))
                                        || (length(x) == 1 && coeff(x, 0) == y))
 
-@doc Markdown.doc"""
-    ==(x::fmpz, y::AbsSeriesElem)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::fmpz, y::AbsSeriesElem) = y == x
 
 function divexact(x::AbsSeriesElem, y::fmpz; check::Bool=true)
@@ -77,20 +67,10 @@ end
 
 *(a::RelSeriesElem, b::fmpz) = b*a
 
-@doc Markdown.doc"""
-    ==(x::RelSeriesElem, y::fmpz)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::RelSeriesElem, y::fmpz) = precision(x) == 0 ||
                   ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
                     valuation(x) == 0 && polcoeff(x, 0) == y))
 
-@doc Markdown.doc"""
-    ==(x::fmpz, y::RelSeriesElem)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::fmpz, y::RelSeriesElem) = y == x
 
 function divexact(x::RelSeriesElem, y::fmpz; check::Bool=true)
@@ -135,19 +115,9 @@ end
 
 *(a::PolyElem, b::fmpz) = b*a
 
-@doc Markdown.doc"""
-    ==(x::PolyElem, y::fmpz)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::PolyElem, y::fmpz) = ((length(x) == 0 && iszero(y))
                         || (length(x) == 1 && coeff(x, 0) == y))
 
-@doc Markdown.doc"""
-    ==(x::fmpz, y::PolyElem)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::fmpz, y::PolyElem) = y == x
 
 function divexact(a::PolyElem, b::fmpz; check::Bool=true)
@@ -210,21 +180,11 @@ end
 
 -(a::fmpz, b::ResElem) = parent(b)(a - data(b))
 
-@doc Markdown.doc"""
-    ==(a::ResElem, b::fmpz)
-
-Return `true` if $a == b$ arithmetically, otherwise return `false`.
-"""
 function ==(a::ResElem, b::fmpz)
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
-@doc Markdown.doc"""
-    ==(a::fmpz, b::ResElem)
-
-Return `true` if $a == b$ arithmetically, otherwise return `false`.
-"""
 function ==(a::fmpz, b::ResElem)
    z = base_ring(b)(a)
    return data(b) == mod(z, modulus(b))
@@ -421,12 +381,6 @@ function -(x::MatElem, y::fmpz)
    return z
 end
 
-@doc Markdown.doc"""
-    ==(x::MatElem, y::fmpz)
-
-Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
-otherwise return `false`.
-"""
 function ==(x::MatElem, y::fmpz)
    for i = 1:min(nrows(x), ncols(x))
       if x[i, i] != y
@@ -443,20 +397,8 @@ function ==(x::MatElem, y::fmpz)
    return true
 end
 
-@doc Markdown.doc"""
-    ==(x::fmpz, y::MatElem)
-
-Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
-otherwise return `false`.
-"""
 ==(x::fmpz, y::MatElem) = y == x
 
-@doc Markdown.doc"""
-    divexact(x::MatElem, y::fmpz; check::Bool=true)
-
-Return $x/y$, i.e. the matrix where each of the entries has been divided by
-$y$.
-"""
 function divexact(x::MatElem, y::fmpz; check::Bool=true)
    z = similar(x)
    for i = 1:nrows(x)
@@ -536,20 +478,10 @@ function -(a::fmpz, b::FracElem)
    return parent(b)(divexact(n, g), divexact(d, g))
 end
 
-@doc Markdown.doc"""
-    ==(x::FracElem, y::fmpz)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 function ==(x::FracElem, y::fmpz)
    return (isone(denominator(x)) && numerator(x) == y) || (numerator(x) == denominator(x)*y)
 end
 
-@doc Markdown.doc"""
-    ==(x::fmpz, y::FracElem)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::fmpz, y::FracElem) = y == x
 
 function divexact(a::FracElem, b::fmpz; check::Bool=true)

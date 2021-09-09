@@ -35,18 +35,8 @@ elem_type(::Type{ArbField}) = arb
 
 parent_type(::Type{arb}) = ArbField
 
-@doc Markdown.doc"""
-    base_ring(R::ArbField)
-
-Returns `Union{}` since an Arb field does not depend on any other ring.
-"""
 base_ring(R::ArbField) = Union{}
 
-@doc Markdown.doc"""
-    base_ring(x::arb)
-
-Returns `Union{}` since an Arb field does not depend on any other ring.
-"""
 base_ring(x::arb) = Union{}
 
 parent(x::arb) = x.parent

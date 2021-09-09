@@ -344,11 +344,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    isirreducible(x::gfp_poly)
-
-Return `true` if $x$ is irreducible, otherwise return `false`.
-"""
 function isirreducible(x::gfp_poly)
   return Bool(ccall((:nmod_poly_is_irreducible, libflint), Int32,
           (Ref{gfp_poly}, ), x))
@@ -360,11 +355,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    issquarefree(x::gfp_poly)
-
-Return `true` if $x$ is squarefree, otherwise return `false`.
-"""
 function issquarefree(x::gfp_poly)
    return Bool(ccall((:nmod_poly_is_squarefree, libflint), Int32,
        (Ref{gfp_poly}, ), x))
@@ -376,11 +366,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    factor(x::gfp_poly)
-
-Return the factorisation of $x$.
-"""
 function factor(x::gfp_poly)
   fac, z = _factor(x)
   return Fac(parent(x)(z), fac)
@@ -401,11 +386,6 @@ function _factor(x::gfp_poly)
   return res, base_ring(x)(z)
 end
 
-@doc Markdown.doc"""
-    factor_squarefree(x::gfp_poly)
-
-Return the squarefree factorisation of $x$.
-"""
 function factor_squarefree(x::gfp_poly)
   return Fac(parent(x)(leading_coefficient(x)), _factor_squarefree(x))
 end

@@ -157,30 +157,6 @@ rings.
 
 ### Special functions
 
-```@docs
-log(a::fmpq_rel_series)
-```
-
-```@docs
-Base.sqrt(a::fmpq_rel_series)
-```
-
-```@docs
-tan(a::fmpq_rel_series)
-tanh(a::fmpq_rel_series)
-sin(a::fmpq_rel_series)
-sinh(a::fmpq_rel_series)
-cos(a::fmpq_rel_series)
-cosh(a::fmpq_rel_series)
-```
-
-```@docs
-asin(a::fmpq_rel_series)
-asinh(a::fmpq_rel_series)
-atan(a::fmpq_rel_series)
-atanh(a::fmpq_rel_series)
-```
-
 **Examples**
 
 ```julia

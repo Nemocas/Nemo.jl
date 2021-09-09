@@ -733,11 +733,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    isirreducible(x::fmpz_mod_poly)
-
-Return `true` if $x$ is irreducible, otherwise return `false`.
-"""
 function isirreducible(x::fmpz_mod_poly)
   !isprobable_prime(modulus(x)) && error("Modulus not prime in isirreducible")
   return Bool(ccall((:fmpz_mod_poly_is_irreducible, libflint), Cint,
@@ -751,11 +746,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    issquarefree(x::fmpz_mod_poly)
-
-Return `true` if $x$ is squarefree, otherwise return `false`.
-"""
 function issquarefree(x::fmpz_mod_poly)
    !isprobable_prime(modulus(x)) && error("Modulus not prime in issquarefree")
    return Bool(ccall((:fmpz_mod_poly_is_squarefree, libflint), Cint,
@@ -769,11 +759,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    factor(x::fmpz_mod_poly)
-
-Return the factorisation of $x$.
-"""
 function factor(x::fmpz_mod_poly)
   !isprobable_prime(modulus(x)) && error("Modulus not prime in factor")
   fac = _factor(x)
@@ -799,11 +784,6 @@ function _factor(x::fmpz_mod_poly)
   return res
 end
 
-@doc Markdown.doc"""
-    factor_squarefree(x::fmpz_mod_poly)
-
-Return the squarefree factorisation of $x$.
-"""
 function factor_squarefree(x::fmpz_mod_poly)
   !isprobable_prime(modulus(x)) && error("Modulus not prime in factor_squarefree")
   fac = _factor_squarefree(x)

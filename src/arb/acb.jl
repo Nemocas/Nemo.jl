@@ -38,20 +38,8 @@ elem_type(::Type{AcbField}) = acb
 
 parent_type(::Type{acb}) = AcbField
 
-@doc Markdown.doc"""
-    base_ring(R::AcbField)
-
-Returns `Union{}` since an Arb complex field does not depend on any other
-ring.
-"""
 base_ring(R::AcbField) = Union{}
 
-@doc Markdown.doc"""
-    base_ring(a::acb)
-
-Returns `Union{}` since an Arb complex field does not depend on any other
-ring.
-"""
 base_ring(a::acb) = Union{}
 
 parent(x::acb) = x.parent

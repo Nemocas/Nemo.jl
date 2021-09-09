@@ -17,18 +17,8 @@ parent_type(::Type{fq}) = FqFiniteField
 
 elem_type(::Type{FqFiniteField}) = fq
 
-@doc Markdown.doc"""
-    base_ring(a::FqFiniteField)
-
-Returns `Union{}` as this field is not dependent on another field.
-"""
 base_ring(a::FqFiniteField) = Union{}
 
-@doc Markdown.doc"""
-    base_ring(a::fq)
-
-Returns `Union{}` as this field is not dependent on another field.
-"""
 base_ring(a::fq) = Union{}
 
 parent(a::fq) = a.parent

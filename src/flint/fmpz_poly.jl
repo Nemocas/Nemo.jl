@@ -678,11 +678,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    factor(x::fmpz_poly)
-
-Returns the factorization of $x$.
-"""
 function factor(x::fmpz_poly)
   fac, z = _factor(x)
   ffac = factor(z)
@@ -712,11 +707,6 @@ function _factor(x::fmpz_poly)
   return res, z
 end
 
-@doc Markdown.doc"""
-    isirreducible(x::fmpz_poly)
-
-Checks if $x$ is irreducible.
-"""
 function isirreducible(x::fmpz_poly)
    if degree(x) == 0
      return isprime(coeff(x, 0))

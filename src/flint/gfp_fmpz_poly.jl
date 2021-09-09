@@ -251,11 +251,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    isirreducible(x::gfp_fmpz_poly)
-
-Return `true` if $x$ is irreducible, otherwise return `false`.
-"""
 function isirreducible(x::gfp_fmpz_poly)
   return Bool(ccall((:fmpz_mod_poly_is_irreducible, libflint), Cint,
                     (Ref{gfp_fmpz_poly}, Ref{fmpz_mod_ctx_struct}),
@@ -268,11 +263,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    issquarefree(x::gfp_fmpz_poly)
-
-Return `true` if $x$ is squarefree, otherwise return `false`.
-"""
 function issquarefree(x::gfp_fmpz_poly)
    return Bool(ccall((:fmpz_mod_poly_is_squarefree, libflint), Cint,
                      (Ref{gfp_fmpz_poly}, Ref{fmpz_mod_ctx_struct}),
@@ -285,11 +275,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    factor(x::gfp_fmpz_poly)
-
-Return the factorisation of $x$.
-"""
 function factor(x::gfp_fmpz_poly)
   fac = _factor(x)
   return Fac(parent(x)(leading_coefficient(x)), fac)
@@ -315,11 +300,6 @@ function _factor(x::gfp_fmpz_poly)
   return res 
 end  
 
-@doc Markdown.doc"""
-    factor_squarefree(x::gfp_fmpz_poly)
-
-Return the squarefree factorisation of $x$.
-"""
 function factor_squarefree(x::gfp_fmpz_poly)
   fac = _factor_squarefree(x)
   return Fac(parent(x)(leading_coefficient(x)), fac)

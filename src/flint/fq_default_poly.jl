@@ -553,11 +553,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    isirreducible(x::fq_default_poly)
-
-Return `true` if $x$ is irreducible, otherwise return `false`.
-"""
 function isirreducible(x::fq_default_poly)
   return Bool(ccall((:fq_default_poly_is_irreducible, libflint), Int32,
                     (Ref{fq_default_poly}, Ref{FqDefaultFiniteField} ),
@@ -570,11 +565,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    issquarefree(x::fq_default_poly)
-
-Return `true` if $x$ is squarefree, otherwise return `false`.
-"""
 function issquarefree(x::fq_default_poly)
    return Bool(ccall((:fq_default_poly_is_squarefree, libflint), Int32,
        (Ref{fq_default_poly}, Ref{FqDefaultFiniteField}), x, base_ring(parent(x))))
@@ -598,11 +588,6 @@ function length(x::fq_default_poly_factor)
           x, x.base_field)
 end   
 
-@doc Markdown.doc"""
-    factor(x::fq_default_poly)
-
-Return the factorisation of $x$.
-"""
 function factor(x::fq_default_poly)
    fac, z = _factor(x)
    return Fac(parent(x)(z), fac)
@@ -628,11 +613,6 @@ function _factor(x::fq_default_poly)
    return res, a
 end
 
-@doc Markdown.doc"""
-    factor_squarefree(x::fq_default_poly)
-
-Return the squarefree factorisation of $x$.
-"""
 function factor_squarefree(x::fq_default_poly)
   # _factor_squareefree does weird things if the polynomial is not monic
   return Fac(parent(x)(leading_coefficient(x)),

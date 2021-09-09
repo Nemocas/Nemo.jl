@@ -70,25 +70,10 @@ O(R::FlintPadicField, m::Integer) = O(R, fmpz(m))
 
 elem_type(::Type{FlintPadicField}) = padic
 
-@doc Markdown.doc"""
-    base_ring(a::FlintPadicField)
-
-Returns `Union{}` as this field is not dependent on another field.
-"""
 base_ring(a::FlintPadicField) = Union{}
 
-@doc Markdown.doc"""
-    base_ring(a::padic)
-
-Returns `Union{}` as this field is not dependent on another field.
-"""
 base_ring(a::padic) = Union{}
 
-@doc Markdown.doc"""
-    parent(a::padic)
-
-Returns the parent of the given p-adic field element.
-"""
 parent(a::padic) = a.parent
 
 isdomain_type(::Type{padic}) = true
@@ -529,14 +514,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    sqrt(a::padic; check::Bool=true)
-
-Return the $p$-adic square root of $a$. We define this only when the
-valuation of $a$ is even. The precision of the output will be
-precision$(a) -$ valuation$(a)/2$. By default if the square root does not
-exist, an exception is thrown. If `check=false` this test is not performed.
-"""
 function Base.sqrt(a::padic; check::Bool=true)
    check && (a.v % 2) != 0 && error("Unable to take padic square root")
    ctx = parent(a)
@@ -554,14 +531,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    exp(a::padic)
-
-Return the $p$-adic exponential of $a$. We define this only when the
-valuation of $a$ is positive (unless $a = 0$). The precision of the output
-will be the same as the precision of the input. If the input is not valid an
-exception is thrown.
-"""
 function Base.exp(a::padic)
    !iszero(a) && a.v <= 0 && throw(DomainError(a, "Valuation must be positive"))
    ctx = parent(a)
@@ -573,14 +542,6 @@ function Base.exp(a::padic)
    return z
 end
 
-@doc Markdown.doc"""
-    log(a::padic)
-
-Return the $p$-adic logarithm of $a$. We define this only when `ord_p(a)` is
-at least 2 when `p = 2` or art least 1 otherwise. The precision of the output
-will be the same as the precision of the input. If the input is not valid an
-exception is thrown.
-"""
 function log(a::padic)
    ctx = parent(a)
    z = padic(a.N)

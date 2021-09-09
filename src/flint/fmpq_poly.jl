@@ -641,11 +641,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    factor(x::fmpq_poly)
-
-Returns the factorization of $x$.
-"""
 function factor(x::fmpq_poly)
    res, z = _factor(x)
    return Fac(parent(x)(z), res)
@@ -672,11 +667,6 @@ function _factor(x::fmpq_poly)
    return res, fmpq(z, denominator(x))
 end
 
-@doc Markdown.doc"""
-    isirreducible(x::fmpq_poly)
-
-Checks if $x$ is irreducible.
-"""
 function isirreducible(x::fmpq_poly)
    res, _ = _factor(x)
    return length(res) == 1 && first(values(res)) == 1

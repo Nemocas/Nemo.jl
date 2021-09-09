@@ -732,11 +732,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    isirreducible(x::nmod_poly)
-
-Return `true` if $x$ is irreducible, otherwise return `false`.
-"""
 function isirreducible(x::nmod_poly)
   !isprime(modulus(x)) && error("Modulus not prime in isirreducible")
   return Bool(ccall((:nmod_poly_is_irreducible, libflint), Int32,
@@ -749,11 +744,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    issquarefree(x::nmod_poly)
-
-Return `true` if $x$ is squarefree, otherwise return `false`.
-"""
 function issquarefree(x::nmod_poly)
    !isprime(modulus(x)) && error("Modulus not prime in issquarefree")
    return Bool(ccall((:nmod_poly_is_squarefree, libflint), Int32,
@@ -766,11 +756,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    factor(x::nmod_poly)
-
-Return the factorisation of $x$.
-"""
 function factor(x::nmod_poly)
   fac, z = _factor(x)
   return Fac(parent(x)(z), fac)
@@ -792,11 +777,6 @@ function _factor(x::nmod_poly)
   return res, base_ring(x)(z)
 end
 
-@doc Markdown.doc"""
-    factor_squarefree(x::nmod_poly)
-
-Return the squarefree factorisation of $x$.
-"""
 function factor_squarefree(x::nmod_poly)
   !isprime(modulus(x)) && error("Modulus not prime in factor_squarefree")
   return Fac(parent(x)(leading_coefficient(x)), _factor_squarefree(x))

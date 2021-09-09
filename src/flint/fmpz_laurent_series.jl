@@ -824,36 +824,16 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    ==(x::fmpz_laurent_series, y::T) where {T <: RingElem}
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::fmpz_laurent_series, y::T) where {T <: RingElem} = precision(x) == 0 ||
            ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
              valuation(x) == 0 && polcoeff(x, 0) == y))
 
-@doc Markdown.doc"""
-    ==(x::T, y::fmpz_laurent_series) where {T <: RingElem}
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::T, y::fmpz_laurent_series) where {T <: RingElem} = y == x
 
-@doc Markdown.doc"""
-    ==(x::fmpz_laurent_series, y::Union{Integer, Rational, AbstractFloat})
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::fmpz_laurent_series, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 ||
                   ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
                     valuation(x) == 0 && polcoeff(x, 0) == y))
 
-@doc Markdown.doc"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::fmpz_laurent_series)
-
-Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
 ==(x::Union{Integer, Rational, AbstractFloat}, y::fmpz_laurent_series) = y == x
 
 ###############################################################################
@@ -999,11 +979,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    exp(a::fmpz_laurent_series)
-
-Return the exponential of the power series $a$.
-"""
 function exp(a::fmpz_laurent_series)
    if iszero(a)
       z = one(parent(a))

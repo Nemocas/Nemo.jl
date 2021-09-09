@@ -16,18 +16,8 @@ parent_type(::Type{fq_default}) = FqDefaultFiniteField
 
 elem_type(::Type{FqDefaultFiniteField}) = fq_default
 
-@doc Markdown.doc"""
-    base_ring(a::FqDefaultFiniteField)
-
-Returns `Union{}` as this field is not dependent on another field.
-"""
 base_ring(a::FqDefaultFiniteField) = Union{}
 
-@doc Markdown.doc"""
-    base_ring(a::fq_default)
-
-Returns `Union{}` as this field is not dependent on another field.
-"""
 base_ring(a::fq_default) = Union{}
 
 parent(a::fq_default) = a.parent
