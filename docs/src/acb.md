@@ -222,18 +222,6 @@ isint(::acb)
 ```
 
 ```@docs
-isreal(::acb)
-```
-
-```@docs
-real(::acb)
-```
-
-```@docs
-imag(::acb)
-```
-
-```@docs
 accuracy_bits(::acb)
 ```
 
@@ -336,10 +324,6 @@ x != 1.23
 
 ### Absolute value
 
-```@docs
-abs(::acb)
-```
-
 **Examples**
 
 ```julia
@@ -350,11 +334,6 @@ a = abs(x)
 ```
 
 ### Shifting
-
-```@docs
-ldexp(x::acb, y::Int)
-ldexp(x::acb, y::fmpz)
-```
 
 **Examples**
 
@@ -374,14 +353,6 @@ trim(::acb)
 
 ```@docs
 unique_integer(::acb)
-```
-
-```@docs
-conj(::acb)
-```
-
-```@docs
-angle(::acb)
 ```
 
 **Examples**
@@ -414,27 +385,7 @@ a = const_pi(CC)
 ### Mathematical and special functions
 
 ```@docs
-Base.sqrt(::acb)
-```
-
-```@docs
 rsqrt(::acb)
-```
-
-```@docs
-log(::acb)
-```
-
-```@docs
-log1p(::acb)
-```
-
-```@docs
-Base.exp(::acb)
-```
-
-```@docs
-expm1(::acb)
 ```
 
 ```@docs
@@ -443,58 +394,6 @@ exppii(::acb)
 
 ```@docs
 root_of_unity(::AcbField, k::Int)
-```
-
-```@docs
-sin(::acb)
-```
-
-```@docs
-cos(::acb)
-```
-
-```@docs
-sinpi(::acb)
-```
-
-```@docs
-cospi(::acb)
-```
-
-```@docs
-tan(::acb)
-```
-
-```@docs
-cot(::acb)
-```
-
-```@docs
-tanpi(::acb)
-```
-
-```@docs
-cotpi(::acb)
-```
-
-```@docs
-sinh(::acb)
-```
-
-```@docs
-cosh(::acb)
-```
-
-```@docs
-tanh(::acb)
-```
-
-```@docs
-coth(::acb)
-```
-
-```@docs
-atan(::acb)
 ```
 
 ```@docs
@@ -599,18 +498,6 @@ elliptic_k(::acb)
 
 ```@docs
 elliptic_e(::acb)
-```
-
-```@docs
-sincos(::acb)
-```
-
-```@docs
-sincospi(::acb)
-```
-
-```@docs
-sinhcosh(::acb)
 ```
 
 ```@docs

@@ -206,12 +206,6 @@ function unique_integer(x::acb_poly)
   return (unique != 0, z)
 end
 
-@doc Markdown.doc"""
-    isreal(x::acb_poly)
-
-Return `true` if all the coefficients of $x$ are real, i.e. have exact zero
-imaginary parts.
-"""
 function isreal(x::acb_poly)
   return ccall((:acb_poly_is_real, libarb), Cint, (Ref{acb_poly}, ), x) != 0
 end

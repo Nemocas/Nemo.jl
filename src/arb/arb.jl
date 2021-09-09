@@ -49,29 +49,14 @@ Returns `Union{}` since an Arb field does not depend on any other ring.
 """
 base_ring(x::arb) = Union{}
 
-@doc Markdown.doc"""
-    parent(x::arb)
-
-Return the parent of the given Arb field element.
-"""
 parent(x::arb) = x.parent
 
 isdomain_type(::Type{arb}) = true
 
 isexact_type(::Type{arb}) = false
 
-@doc Markdown.doc"""
-    zero(R::ArbField)
-
-Return exact zero in the given Arb field.
-"""
 zero(R::ArbField) = R(0)
 
-@doc Markdown.doc"""
-    one(R::ArbField)
-
-Return exact one in the given Arb field.
-"""
 one(R::ArbField) = R(1)
 
 # TODO: Add hash (and document under arb basic functionality)
@@ -110,11 +95,6 @@ characteristic(::ArbField) = 0
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    Float64(x::arb)
-
-Return the midpoint of $x$ rounded down to a machine double.
-"""
 function Float64(x::arb)
    GC.@preserve x begin
       t = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ref{arb}, ), x)
@@ -124,11 +104,6 @@ function Float64(x::arb)
    return d
 end
 
-@doc Markdown.doc"""
-    convert(::Type{Float64}, x::arb)
-
-Return the midpoint of $x$ rounded down to a machine double.
-"""
 function convert(::Type{Float64}, x::arb)
     return Float64(x)
 end
@@ -908,11 +883,6 @@ divexact(x::arb, y::Rational{T}; check::Bool=true) where {T <: Integer} = x // y
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    abs(x::arb)
-
-Return the absolute value of $x$.
-"""
 function abs(x::arb)
   z = parent(x)()
   ccall((:arb_abs, libarb), Nothing, (Ref{arb}, Ref{arb}), z, x)
@@ -925,11 +895,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    inv(x::arb)
-
-Return the multiplicative inverse of $x$, i.e. $1/x$.
-"""
 function inv(x::arb)
   z = parent(x)()
   ccall((:arb_inv, libarb), Nothing,
@@ -943,11 +908,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    ldexp(x::arb, y::Int)
-
-Return $2^yx$. Note that $y$ can be positive, zero or negative.
-"""
 function ldexp(x::arb, y::Int)
   z = parent(x)()
   ccall((:arb_mul_2exp_si, libarb), Nothing,
@@ -955,11 +915,6 @@ function ldexp(x::arb, y::Int)
   return z
 end
 
-@doc Markdown.doc"""
-    ldexp(x::arb, y::fmpz)
-
-Return $2^yx$. Note that $y$ can be positive, zero or negative.
-"""
 function ldexp(x::arb, y::fmpz)
   z = parent(x)()
   ccall((:arb_mul_2exp_fmpz, libarb), Nothing,
@@ -1140,51 +1095,26 @@ end
 
 # real - real functions
 
-@doc Markdown.doc"""
-    floor(x::arb)
-
-Return floor of $x$, i.e. the greatest integer not exceeding $x$, as an Arb.
-"""
 function floor(x::arb)
    z = parent(x)()
    ccall((:arb_floor, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    floor(::Type{T}, x::arb) where {T <: Union{arb, fmpz, Integer}
-
-Return floor of $x$ as an element of type `T`.
-"""
 floor(::Type{arb}, x::arb) = floor(x)
 floor(::Type{fmpz}, x::arb) = fmpz(floor(x))
 floor(::Type{T}, x::arb) where {T <: Integer} = T(floor(x))
 
-@doc Markdown.doc"""
-    ceil(x::arb)
-
-Return ceiling of $x$, i.e. the least integer not less than $x$, as an Arb.
-"""
 function ceil(x::arb)
    z = parent(x)()
    ccall((:arb_ceil, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    ceil(::Type{T}, x::arb) where {T <: Union{arb, fmpz, Integer}
-
-Return ceiling of $x$ as an element of type `T`.
-"""
 ceil(::Type{arb}, x::arb) = ceil(x)
 ceil(::Type{fmpz}, x::arb) = fmpz(ceil(x))
 ceil(::Type{T}, x::arb) where {T <: Integer} = T(ceil(x))
 
-@doc Markdown.doc"""
-    sqrt(x::arb; check::Bool=true)
-
-Return the square root of $x$.
-"""
 function Base.sqrt(x::arb; check::Bool=true)
    z = parent(x)()
    ccall((:arb_sqrt, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
@@ -1225,243 +1155,132 @@ function sqrtpos(x::arb)
    return z
 end
 
-
-@doc Markdown.doc"""
-    log(x::arb)
-
-Return the principal branch of the logarithm of $x$.
-"""
 function log(x::arb)
    z = parent(x)()
    ccall((:arb_log, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    log1p(x::arb)
-
-Return $\log(1+x)$, evaluated accurately for small $x$.
-"""
 function log1p(x::arb)
    z = parent(x)()
    ccall((:arb_log1p, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    exp(x::arb)
-
-Return the exponential of $x$.
-"""
 function Base.exp(x::arb)
    z = parent(x)()
    ccall((:arb_exp, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    expm1(x::arb)
-
-Return $\exp(x)-1$, using a more accurate method when $x \approx 0$.
-"""
 function expm1(x::arb)
    z = parent(x)()
    ccall((:arb_expm1, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    sin(x::arb)
-
-Return the sine of $x$.
-"""
 function sin(x::arb)
    z = parent(x)()
    ccall((:arb_sin, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    cos(x::arb)
-
-Return the cosine of $x$.
-"""
 function cos(x::arb)
    z = parent(x)()
    ccall((:arb_cos, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    sinpi(x::arb)
-
-Return the sine of $\pi x$.
-"""
 function sinpi(x::arb)
    z = parent(x)()
    ccall((:arb_sin_pi, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    cospi(x::arb)
-
-Return the cosine of $\pi x$.
-"""
 function cospi(x::arb)
    z = parent(x)()
    ccall((:arb_cos_pi, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    tan(x::arb)
-
-Return the tangent of $x$.
-"""
 function tan(x::arb)
    z = parent(x)()
    ccall((:arb_tan, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    cot(x::arb)
-
-Return the cotangent of $x$.
-"""
 function cot(x::arb)
    z = parent(x)()
    ccall((:arb_cot, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    tanpi(x::arb)
-
-Return the tangent of $\pi x$.
-"""
 function tanpi(x::arb)
    z = parent(x)()
    ccall((:arb_tan_pi, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    cotpi(x::arb)
-
-Return the cotangent of $\pi x$.
-"""
 function cotpi(x::arb)
    z = parent(x)()
    ccall((:arb_cot_pi, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    sinh(x::arb)
-
-Return the hyperbolic sine of $x$.
-"""
 function sinh(x::arb)
    z = parent(x)()
    ccall((:arb_sinh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    cosh(x::arb)
-
-Return the hyperbolic cosine of $x$.
-"""
 function cosh(x::arb)
    z = parent(x)()
    ccall((:arb_cosh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    tanh(x::arb)
-
-Return the hyperbolic tangent of $x$.
-"""
 function tanh(x::arb)
    z = parent(x)()
    ccall((:arb_tanh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    coth(x::arb)
-
-Return the hyperbolic cotangent of $x$.
-"""
 function coth(x::arb)
    z = parent(x)()
    ccall((:arb_coth, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    atan(x::arb)
-
-Return the arctangent of $x$.
-"""
 function atan(x::arb)
    z = parent(x)()
    ccall((:arb_atan, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    asin(x::arb)
-
-Return the arcsine of $x$.
-"""
 function asin(x::arb)
    z = parent(x)()
    ccall((:arb_asin, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    acos(x::arb)
-
-Return the arccosine of $x$.
-"""
 function acos(x::arb)
    z = parent(x)()
    ccall((:arb_acos, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    atanh(x::arb)
-
-Return the hyperbolic arctangent of $x$.
-"""
 function atanh(x::arb)
    z = parent(x)()
    ccall((:arb_atanh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    asinh(x::arb)
-
-Return the hyperbolic arcsine of $x$.
-"""
 function asinh(x::arb)
    z = parent(x)()
    ccall((:arb_asinh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    acosh(x::arb)
-
-Return the hyperbolic arccosine of $x$.
-"""
 function acosh(x::arb)
    z = parent(x)()
    ccall((:arb_acosh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
@@ -1575,11 +1394,6 @@ function zeta(x::arb)
    return z
 end
 
-@doc Markdown.doc"""
-    sincos(x::arb)
-
-Return a tuple $s, c$ consisting of the sine $s$ and cosine $c$ of $x$.
-"""
 function sincos(x::arb)
   s = parent(x)()
   c = parent(x)()
@@ -1588,11 +1402,6 @@ function sincos(x::arb)
   return (s, c)
 end
 
-@doc Markdown.doc"""
-    sincospi(x::arb)
-
-Return a tuple $s, c$ consisting of the sine $s$ and cosine $c$ of $\pi x$.
-"""
 function sincospi(x::arb)
   s = parent(x)()
   c = parent(x)()
@@ -1601,11 +1410,6 @@ function sincospi(x::arb)
   return (s, c)
 end
 
-@doc Markdown.doc"""
-    sinpi(x::fmpq, r::ArbField)
-
-Return the sine of $\pi x$ in the given Arb field.
-"""
 function sinpi(x::fmpq, r::ArbField)
   z = r()
   ccall((:arb_sin_pi_fmpq, libarb), Nothing,
@@ -1613,11 +1417,6 @@ function sinpi(x::fmpq, r::ArbField)
   return z
 end
 
-@doc Markdown.doc"""
-    cospi(x::fmpq, r::ArbField)
-
- Return the cosine of $\pi x$ in the given Arb field.
-"""
 function cospi(x::fmpq, r::ArbField)
   z = r()
   ccall((:arb_cos_pi_fmpq, libarb), Nothing,
@@ -1625,12 +1424,6 @@ function cospi(x::fmpq, r::ArbField)
   return z
 end
 
-@doc Markdown.doc"""
-    sincospi(x::fmpq, r::ArbField)
-
-Return a tuple $s, c$ consisting of the sine and cosine of $\pi x$ in the
-given Arb field.
-"""
 function sincospi(x::fmpq, r::ArbField)
   s = r()
   c = r()
@@ -1639,11 +1432,6 @@ function sincospi(x::fmpq, r::ArbField)
   return (s, c)
 end
 
-@doc Markdown.doc"""
-    sinhcosh(x::arb)
-
-Return a tuple $s, c$ consisting of the hyperbolic sine and cosine of $x$.
-"""
 function sinhcosh(x::arb)
   s = parent(x)()
   c = parent(x)()
@@ -1688,11 +1476,6 @@ function zeta(s::arb, a::arb)
   return z
 end
 
-@doc Markdown.doc"""
-    hypot(x::arb, y::arb)
-
-Return $\sqrt{x^2 + y^2}$.
-"""
 function hypot(x::arb, y::arb)
   z = parent(x)()
   ccall((:arb_hypot, libarb), Nothing,

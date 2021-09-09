@@ -54,33 +54,18 @@ ring.
 """
 base_ring(a::acb) = Union{}
 
-@doc Markdown.doc"""
-    parent(x::acb)
-
-Return the parent of the given Arb complex field element.
-"""
 parent(x::acb) = x.parent
 
 isdomain_type(::Type{acb}) = true
 
 isexact_type(::Type{acb}) = false
 
-@doc Markdown.doc"""
-    zero(r::AcbField)
-
-Return exact zero in the given Arb complex field.
-"""
 function zero(r::AcbField)
   z = acb()
   z.parent = r
   return z
 end
 
-@doc Markdown.doc"""
-    one(r::AcbField)
-
-Return exact one in the given Arb complex field.
-"""
 function one(r::AcbField)
   z = acb()
   ccall((:acb_one, libarb), Nothing, (Ref{acb}, ), z)
@@ -155,11 +140,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    real(x::acb)
-
-Return the real part of $x$ as an `arb`.
-"""
 function real(x::acb)
   z = arb()
   ccall((:acb_get_real, libarb), Nothing, (Ref{arb}, Ref{acb}), z, x)
@@ -167,11 +147,6 @@ function real(x::acb)
   return z
 end
 
-@doc Markdown.doc"""
-    imag(x::acb)
-
-Return the imaginary part of $x$ as an `arb`.
-"""
 function imag(x::acb)
   z = arb()
   ccall((:acb_get_imag, libarb), Nothing, (Ref{arb}, Ref{acb}), z, x)
@@ -621,12 +596,6 @@ function isint(x::acb)
    return Bool(ccall((:acb_is_int, libarb), Cint, (Ref{acb},), x))
 end
 
-@doc Markdown.doc"""
-    isreal(x::acb)
-
-Return `true` if $x$ is purely real, i.e. having zero imaginary part,
-otherwise return `false`.
-"""
 function isreal(x::acb)
    return Bool(ccall((:acb_is_real, libarb), Cint, (Ref{acb},), x))
 end
@@ -639,11 +608,6 @@ isnegative(x::acb) = isreal(x) && isnegative(real(x))
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    abs(x::acb)
-
-Return the complex absolute value of $x$.
-"""
 function abs(x::acb)
   z = arb()
   ccall((:acb_abs, libarb), Nothing,
@@ -658,11 +622,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    inv(x::acb)
-
-Return the multiplicative inverse of $x$, i.e. $1/x$.
-"""
 function inv(x::acb)
   z = parent(x)()
   ccall((:acb_inv, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
@@ -675,11 +634,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    ldexp(x::acb, y::Int)
-
-Return $2^yx$. Note that $y$ can be positive, zero or negative.
-"""
 function ldexp(x::acb, y::Int)
   z = parent(x)()
   ccall((:acb_mul_2exp_si, libarb), Nothing,
@@ -687,11 +641,6 @@ function ldexp(x::acb, y::Int)
   return z
 end
 
-@doc Markdown.doc"""
-    ldexp(x::acb, y::fmpz)
-
-Return $2^yx$. Note that $y$ can be positive, zero or negative.
-"""
 function ldexp(x::acb, y::fmpz)
   z = parent(x)()
   ccall((:acb_mul_2exp_fmpz, libarb), Nothing,
@@ -732,25 +681,12 @@ function unique_integer(x::acb)
   return (unique != 0, z)
 end
 
-@doc Markdown.doc"""
-    conj(x::acb)
-
-Return the complex conjugate of $x$.
-"""
 function conj(x::acb)
   z = parent(x)()
   ccall((:acb_conj, libarb), Nothing, (Ref{acb}, Ref{acb}), z, x)
   return z
 end
 
-@doc Markdown.doc"""
-    angle(x::acb)
-
-Return complex argument of $x$, the angle in radians that the complex vector $x$
-makes with the positive real axis in a counterclockwise direction. It has a
-discontinuity on the non-positive real axis, with the special values
-$\arg(0) = 0$ and $\arg(a + 0 i) = \pi$ for $a < 0$.
-"""
 function angle(x::acb)
   z = arb()
   ccall((:acb_arg, libarb), Nothing,
@@ -784,11 +720,6 @@ end
 
 # complex - complex functions
 
-@doc Markdown.doc"""
-    Base.sqrt(x::acb; check::Bool=true)
-
-Return the square root of $x$.
-"""
 function Base.sqrt(x::acb; check::Bool=true)
    z = parent(x)()
    ccall((:acb_sqrt, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
@@ -806,45 +737,24 @@ function rsqrt(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
-    log(x::acb)
-
-Return the principal branch of the logarithm of $x$.
-
-"""
 function log(x::acb)
    z = parent(x)()
    ccall((:acb_log, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    log1p(x::acb)
-
-Return $\log(1+x)$, evaluated accurately for small $x$.
-"""
 function log1p(x::acb)
    z = parent(x)()
    ccall((:acb_log1p, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    exp(x::acb)
-
-Return the exponential of $x$.
-"""
 function Base.exp(x::acb)
    z = parent(x)()
    ccall((:acb_exp, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    expm1(x::acb)
-
-Return $\exp(x)-1$, using a more accurate method when $x \approx 0$.
-"""
 function Base.expm1(x::acb)
    z = parent(x)()
    ccall((:acb_expm1, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
@@ -874,143 +784,78 @@ function root_of_unity(C::AcbField, k::Int)
    return z
 end
 
-@doc Markdown.doc"""
-    sin(x::acb)
-
-Return the sine of $x$.
-"""
 function sin(x::acb)
    z = parent(x)()
    ccall((:acb_sin, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    cos(x::acb)
-
-Return the cosine of $x$.
-"""
 function cos(x::acb)
    z = parent(x)()
    ccall((:acb_cos, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    tan(x::acb)
-
-Return the tangent of $x$.
-"""
 function tan(x::acb)
    z = parent(x)()
    ccall((:acb_tan, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    cot(x::acb)
-
-Return the cotangent of $x$.
-"""
 function cot(x::acb)
    z = parent(x)()
    ccall((:acb_cot, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    sinpi(x::acb)
-
-Return the sine of $\pi x$.
-"""
 function sinpi(x::acb)
    z = parent(x)()
    ccall((:acb_sin_pi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    cospi(x::acb)
-
-Return the cosine of $\pi x$.
-"""
 function cospi(x::acb)
    z = parent(x)()
    ccall((:acb_cos_pi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    tanpi(x::acb)
-
-Return the tangent of $\pi x$.
-"""
 function tanpi(x::acb)
    z = parent(x)()
    ccall((:acb_tan_pi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    cotpi(x::acb)
-
-Return the cotangent of $\pi x$.
-"""
 function cotpi(x::acb)
    z = parent(x)()
    ccall((:acb_cot_pi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    sinh(x::acb)
-
-Return the hyperbolic sine of $x$.
-"""
 function sinh(x::acb)
    z = parent(x)()
    ccall((:acb_sinh, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    cosh(x::acb)
-
-Return the hyperbolic cosine of $x$.
-"""
 function cosh(x::acb)
    z = parent(x)()
    ccall((:acb_cosh, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    tanh(x::acb)
-
-Return the hyperbolic tangent of $x$.
-"""
 function tanh(x::acb)
    z = parent(x)()
    ccall((:acb_tanh, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    coth(x::acb)
-
-Return the hyperbolic cotangent of $x$.
-"""
 function coth(x::acb)
    z = parent(x)()
    ccall((:acb_coth, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z
 end
 
-@doc Markdown.doc"""
-    atan(x::acb)
-
-Return the arctangent of $x$.
-"""
 function atan(x::acb)
    z = parent(x)()
    ccall((:acb_atan, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
@@ -1346,11 +1191,6 @@ function elliptic_e(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
-    sincos(x::acb)
-
-Return a tuple $s, c$ consisting of the sine $s$ and cosine $c$ of $x$.
-"""
 function sincos(x::acb)
   s = parent(x)()
   c = parent(x)()
@@ -1359,11 +1199,6 @@ function sincos(x::acb)
   return (s, c)
 end
 
-@doc Markdown.doc"""
-    sincospi(x::acb)
-
-Return a tuple $s, c$ consisting of the sine $s$ and cosine $c$ of $\pi x$.
-"""
 function sincospi(x::acb)
   s = parent(x)()
   c = parent(x)()

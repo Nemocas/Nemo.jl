@@ -285,11 +285,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    ldexp(x::arb_mat, y::Int)
-
-Return $2^yx$. Note that $y$ can be positive, zero or negative.
-"""
 function ldexp(x::arb_mat, y::Int)
   z = similar(x)
   ccall((:arb_mat_scalar_mul_2exp_si, libarb), Nothing,
@@ -491,11 +486,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    exp(x::arb_mat)
-
-Returns the exponential of the matrix $x$.
-"""
 function Base.exp(x::arb_mat)
   ncols(x) != nrows(x) && error("Matrix must be square")
   z = similar(x)

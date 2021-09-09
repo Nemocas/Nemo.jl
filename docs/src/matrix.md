@@ -410,14 +410,6 @@ B = gso(A)
 
 ### Exponential
 
-```@docs
-Base.exp(::arb_mat)
-```
-
-```@docs
-Base.exp(::acb_mat)
-```
-
 **Examples**
 
 ```julia
@@ -446,14 +438,6 @@ d = bound_inf_norm(A)
 
 ### Shifting
 
-```@docs
-ldexp(::arb_mat, ::Int)
-```
-
-```@docs
-ldexp(::acb_mat, ::Int)
-```
-
 **Examples**
 
 ```julia
@@ -465,10 +449,6 @@ overlaps(16*A, B)
 ```
 
 ### Predicates
-
-```@docs
-isreal(::acb_mat)
-```
 
 **Examples**
 

@@ -323,11 +323,6 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    ldexp(x::acb_mat, y::Int)
-
-Return $2^yx$. Note that $y$ can be positive, zero or negative.
-"""
 function ldexp(x::acb_mat, y::Int)
   z = similar(x)
   ccall((:acb_mat_scalar_mul_2exp_si, libarb), Nothing,
@@ -433,11 +428,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    isreal(x::acb_mat)
-
-Returns whether every entry of $x$ has vanishing imaginary part.
-"""
 isreal(x::acb_mat) =
             Bool(ccall((:acb_mat_is_real, libarb), Cint, (Ref{acb_mat}, ), x))
 
@@ -554,11 +544,6 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
-    exp(x::acb_mat)
-
-Returns the exponential of the matrix $x$.
-"""
 function Base.exp(x::acb_mat)
   ncols(x) != nrows(x) && error("Matrix must be square")
   z = similar(x)

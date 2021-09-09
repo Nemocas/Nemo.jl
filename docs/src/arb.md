@@ -103,8 +103,10 @@ c = ball(RR(3), RR("0.0001"))
 
 ### Conversions
 
-```@docs
-convert(::Type{Float64}, ::arb)
+```julia
+RR = RealField(64)
+
+convert(Float64, RR(1//3))
 ```
 
 ### Basic manipulation
@@ -200,14 +202,13 @@ which generates
 [2.0000000037252902985 +/- 3.81e-20]
 ```
 
-The first reason that `c` does not get printed as `[1 +/- 2]` is because the
+The first reason that `c` is not printed as `[1 +/- 2]` is that the
 midpoint does not have a greater exponent than the radius in its scientific
-notation. By similair reasons we also have that `y` does not get printed as
-`[12 +/- 2]`.
+notation. For similar reasons `y` is not printed as `[12 +/- 2]`.
 
 The second reason is that we get an additional error term after our addition. As we
-see, `radius(c)` is not equal to $2$, which when printing rounds it up to a
-reasonable decimal place for printing. This is because real balls keep track of
+see, `radius(c)` is not equal to $2$, which when printed rounds it up to a
+reasonable decimal place. This is because real balls keep track of
 rounding errors of basic arithmetic.
 
 ### Containment
@@ -322,10 +323,6 @@ x != 1.23
 
 ### Absolute value
 
-```@docs
-abs(::arb)
-```
-
 **Examples**
 
 ```julia
@@ -336,11 +333,6 @@ a = abs(x)
 ```
 
 ### Shifting
-
-```@docs
-ldexp(x::arb, y::Int)
-ldexp(x::arb, y::fmpz)
-```
 
 **Examples**
 
@@ -426,18 +418,6 @@ d = const_glaisher(RR)
 ### Mathematical and special functions
 
 ```@docs
-floor(::arb)
-```
-
-```@docs
-ceil(::arb)
-```
-
-```@docs
-Base.sqrt(::arb)
-```
-
-```@docs
 rsqrt(::arb)
 ```
 
@@ -447,94 +427,6 @@ sqrt1pm1(::arb)
 
 ```@docs
 sqrtpos(::arb)
-```
-
-```@docs
-log(::arb)
-```
-
-```@docs
-log1p(::arb)
-```
-
-```@docs
-Base.exp(::arb)
-```
-
-```@docs
-expm1(::arb)
-```
-
-```@docs
-sin(::arb)
-```
-
-```@docs
-cos(::arb)
-```
-
-```@docs
-sinpi(::arb)
-```
-
-```@docs
-cospi(::arb)
-```
-
-```@docs
-tan(::arb)
-```
-
-```@docs
-cot(::arb)
-```
-
-```@docs
-tanpi(::arb)
-```
-
-```@docs
-cotpi(::arb)
-```
-
-```@docs
-sinh(::arb)
-```
-
-```@docs
-cosh(::arb)
-```
-
-```@docs
-tanh(::arb)
-```
-
-```@docs
-coth(::arb)
-```
-
-```@docs
-atan(::arb)
-```
-
-```@docs
-asin(::arb)
-```
-
-```@docs
-acos(::arb)
-```
-
-```@docs
-atanh(::arb)
-```
-
-```@docs
-asinh(::arb)
-```
-
-```@docs
-acosh(::arb)
 ```
 
 ```@docs
@@ -574,30 +466,6 @@ zeta(::arb)
 ```
 
 ```@docs
-sincos(::arb)
-```
-
-```@docs
-sincospi(::arb)
-```
-
-```@docs
-sinpi(::fmpq, ::ArbField)
-```
-
-```@docs
-cospi(::fmpq, ::ArbField)
-```
-
-```@docs
-sincospi(::fmpq, ::ArbField)
-```
-
-```@docs
-sinhcosh(::arb)
-```
-
-```@docs
 atan2(::arb, ::arb)
 ```
 
@@ -607,10 +475,6 @@ agm(::arb, ::arb)
 
 ```@docs
 zeta(::arb, ::arb)
-```
-
-```@docs
-hypot(::arb, ::arb)
 ```
 
 ```@docs

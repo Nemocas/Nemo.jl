@@ -198,12 +198,6 @@ unique_integer(::arb_poly)
 unique_integer(::acb_poly)
 ```
 
-We also have the following functions.
-
-```@docs
-isreal(::acb_poly)
-```
-
 **Examples**
 
 ```julia
