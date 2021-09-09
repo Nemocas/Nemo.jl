@@ -224,7 +224,7 @@ isreal(n)
 
 Certain polynomials can be factored (`fmpz_poly', `nmod_poly`, `gfp_poly`,
 `fmpz_mod_poly`, `gfp_fmpz_poly`, `fq_poly`, `fq_nmod_poly`) and the interface
-follows the specification in AbstractAlgebra.jl. The following addition
+follows the specification in AbstractAlgebra.jl. The following additional
 functions are available.
 
 ```@docs
