@@ -47,6 +47,29 @@ end
    @test ZZi(0,1)^2 == -1
 end
 
+@testset "fmpzi.canonical_mod" begin
+   function test_nudivrem(a, b)
+      @test Nemo.nudivrem(fmpz(a), fmpz(b)) == divrem(a, b, RoundNearestTiesUp)
+   end
+   for i in -7:7, j in 1:5
+      test_nudivrem(i, -j)
+      test_nudivrem(i, +j)
+   end
+   for i in 1:30
+      m = rand_bits(ZZi, rand(2:6))
+      if iszero(m)
+         m = ZZi(1, 1)
+      end
+      n = abs2(m)
+      s = Set{fmpzi}([zero(ZZi)])
+      for j in 1:10*Int(n)
+         a = rand_bits(ZZi, rand(1:15))
+         push!(s, mod(a, m))
+         @test length(s) <= n
+      end
+   end
+end
+
 @testset "fmpzi.Euclidean" begin
    @test_throws Exception invmod(ZZi(1,1), ZZi(2))
    m = ZZi(3)

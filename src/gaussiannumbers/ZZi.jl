@@ -471,16 +471,42 @@ end
 #
 ###############################################################################
 
+# for z = mod(a, b) choose the unique representative z so that
+# the complex number z/b = x + i*y is in the following box
+#     -1/2 <= x < 1/2
+#     -1/2 <= y < 1/2
+# note
+#  - the top and right edges are missing
+#  - all corners except the bottom left are missing
+#
+# this corresponends to Base.Rounding.RoundNearestTiesUp
+# unfortunately fmpz_ndiv_qr doesn't fit the bill here
+function nudivrem(a::fmpz, b::fmpz)
+   q, r = tdivrem(a, b)
+   c = ccall((:fmpz_cmp2abs, libflint), Cint, (Ref{fmpz}, Ref{fmpz}), b, r)
+   if c <= 0
+      if ccall((:fmpz_sgn, libflint), Cint, (Ref{fmpz},), r) ==
+         ccall((:fmpz_sgn, libflint), Cint, (Ref{fmpz},), b)
+         add!(q, q, UInt(1))
+         sub!(r, r, b)
+      elseif c < 0
+         sub!(q, q, UInt(1))
+         add!(r, r, b)
+      end
+   end
+   return (q, r)
+end
+
 function divrem(a::fmpzi, b::fmpz)
-   qx, rx = ndivrem(a.x, b)
-   qy, ry = ndivrem(a.y, b)
+   qx, rx = nudivrem(a.x, b)
+   qy, ry = nudivrem(a.y, b)
    return fmpzi(qx, qy), fmpzi(rx, ry)
 end
 
 function divrem(a::fmpzi, b::fmpzi)
    d = abs2(b)
-   qx, r = ndivrem(a.x*b.x + a.y*b.y, d)
-   qy, r = ndivrem(a.y*b.x - a.x*b.y, d)
+   qx, r = nudivrem(a.x*b.x + a.y*b.y, d)
+   qy, r = nudivrem(a.y*b.x - a.x*b.y, d)
    q = fmpzi(qx, qy)
    return q, a - q*b
 end
@@ -623,10 +649,8 @@ end
 
 function invmod(a::fmpzi, b::fmpzi)
    g, x, y = gcdx(a, b)
-   if !isone(g)
-      error("impossible inverse")
-   end
-   return mod(x, b)  # TODO: make sure gcdx returns the correct x and remove this
+   isone(g) || error("impossible inverse")
+   return x
 end
 
 function gcdinv(a::fmpzi, b::fmpzi)
@@ -665,38 +689,115 @@ end
 #
 ###############################################################################
 
-gcd(a::fmpzi, b::fmpz) = gcd(a, fmpzi(b))
-gcd(a::fmpz, b::fmpzi) = gcd(fmpzi(a), b)
+function _divexact(a, b)
+   return isone(b) ? a : divexact(a, b; check = false)
+end
+
+function smod(a::fmpz, b::fmpz)
+   z = fmpz()
+   ccall((:fmpz_smod, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z, a, b)
+   return z
+end
 
 function gcd(a::fmpzi, b::fmpzi)
-  while !iszero(b)
-    (a, b) = (b, mod(a, b))
-  end
-  return divexact(a, canonical_unit(a))
+   if iszero(b.y)
+      return gcd(a, b.x)
+   elseif iszero(b.x)
+      return gcd(a, b.y)
+   elseif iszero(a.y)
+      return gcd(b, a.x)
+   elseif iszero(a.x)
+      return gcd(b, a.y)
+   end
+   #  ax ay           g*1 g*B
+   # -ay ax  row ops   0  g*A
+   #  bx by  ------>   0   0
+   # -by bx            0   0
+   ga, ua, va = gcdx(a.x, a.y)
+   gb, ub, vb = gcdx(b.x, b.y)
+   g, u, v = gcdx(ga, gb)
+   axog = _divexact(a.x, g)
+   ayog = _divexact(a.y, g)
+   bxog = _divexact(b.x, g)
+   byog = _divexact(b.y, g)
+   m1 = ayog*ua - axog*va
+   m2 = _divexact(a.x,ga)*axog + _divexact(a.y,ga)*ayog
+   m3 = byog*ub - bxog*vb
+   m4 = _divexact(b.x,gb)*bxog + _divexact(b.y,gb)*byog
+   (m1, m3) = (m1*u + m3*v, _divexact(ga,g)*m3 - _divexact(gb,g)*m1)
+   A = gcd(m2, m3, m4)
+   v, _ = _shortest_l_infinity(fmpz(1), mod(m1, A), A)
+   z = isone(g) ? fmpzi(v[1], v[2]) : fmpzi(v[1]*g, v[2]*g)
+   return mul_i_pow!(z, canonical_unit_i_pow(z))
+end
+
+function gcd(a::fmpzi, b::fmpz)
+   if iszero(b)
+      return mul_i_pow!(deepcopy(a), canonical_unit_i_pow(a))
+   end
+   #  ax ay           g*1 g*B
+   # -ay ax  row ops   0  g*A
+   #  b  0   ------>   0   0
+   #  0  b             0   0
+   ax = cmpabs(a.x, b) < 0 ? a.x : smod(a.x, b)
+   ay = cmpabs(a.y, b) < 0 ? a.y : smod(a.y, b)
+   if iszero(ax)
+      return fmpzi(gcd(ay, b), zero(fmpz))
+   elseif iszero(ay)
+      return fmpzi(gcd(ax, b), zero(fmpz))
+   end
+   ga, ua, va = gcdx(ax, ay)
+   g, u, _ = gcdx(ga, b)
+   axog = _divexact(ax, g)
+   ayog = _divexact(ay, g)
+   m1 = ayog*ua - axog*va
+   m2 = _divexact(ax,ga)*axog + _divexact(ay,ga)*ayog
+   A = gcd(m2, _divexact(b, g))
+   v, _ = _shortest_l_infinity(fmpz(1), mod(m1*u, A), A)
+   z = isone(g) ? fmpzi(v[1], v[2]) : fmpzi(v[1]*g, v[2]*g)
+   return mul_i_pow!(z, canonical_unit_i_pow(z))
+end
+
+function gcd(a::fmpzi, b::Integer)
+  return gcd(a, fmpz(b))
+end
+
+function gcd(b::Union{fmpz, Integer}, a::fmpzi)
+  return gcd(a, fmpz(b))
 end
 
 function gcdx(a::fmpzi, b::fmpzi)
-   R = parent(a)
    if iszero(a)
       if iszero(b)
-         return zero(R), zero(R), zero(R)
+         return (zero(ZZi), zero(ZZi), zero(ZZi))
       else
-         d = canonical_unit(b)
-         return divexact(b, d), zero(R), inv(d)
+         u = canonical_unit(b)
+         return (divexact(b, u), zero(ZZi), inv(u))
       end
    elseif iszero(b)
-      d = canonical_unit(a)
-      return divexact(a, d), inv(d), zero(R)
+      u = canonical_unit(a)
+      return (divexact(a, u), inv(u), zero(ZZi))
    end
-   u1, u2 = one(R), zero(R)
-   v1, v2 = zero(R), one(R)
-   while !iszero(b)
-      (q, b), a = divrem(a, b), b
-      u2, u1 = u1 - q*u2, u2
-      v2, v1 = v1 - q*v2, v2
-   end
-   d = canonical_unit(a)
-   return divexact(a, d), divexact(u1, d), divexact(v1, d)
+   m = zero_matrix(ZZ, 4, 2)
+   m[1,1] =  a.x; m[1,2] = a.y
+   m[2,1] = -a.y; m[2,2] = a.x
+   m[3,1] =  b.x; m[3,2] = b.y
+   m[4,1] = -b.y; m[4,2] = b.x
+   v, t = shortest_l_infinity_with_transform(m)
+   z = fmpzi(v[1], v[2])
+   w1 = fmpzi(t[1], t[2])
+   w2 = fmpzi(t[3], t[4])
+   k = canonical_unit_i_pow(z)
+   g = mul_i_pow!(z,k)
+   x = mul_i_pow!(w1,k)
+   y = mul_i_pow!(w2,k)
+   # at this point g = x*a + y*b and neither a nor b is zero
+   # make sure x = mod(x, b/g) for our "canonical" gcdx
+   # unexpected problem: q is quite large!
+   q, x = divrem(x, divexact(b, g))
+   y += q*divexact(a, g)
+   return (g, x, y)
 end
 
 ###############################################################################
