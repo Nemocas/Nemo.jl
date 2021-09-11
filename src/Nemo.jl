@@ -82,7 +82,7 @@ export error_dim_negative, ErrorConstrDimMismatch
 
 export iswindows64
 
-export ComplexField, PadicField, QadicField, NGFiniteField
+export ZZi, QQi, ComplexField, PadicField, QadicField, NGFiniteField
 
 export QQBar
 
@@ -503,6 +503,8 @@ const _ecm_nCs = Vector{Int}[_ecm_nC]
 
 const ZZ = FlintZZ
 const QQ = FlintQQ
+const ZZi = FlintZZi
+const QQi = FlintQQi
 const PadicField = FlintPadicField
 const QadicField = FlintQadicField
 const FiniteField = FlintFiniteField

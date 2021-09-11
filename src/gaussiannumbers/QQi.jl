@@ -1,4 +1,4 @@
-export fmpqi, QQi, FlintQQiField
+export fmpqi, FlintQQi, FlintQQiField
 
 ###############################################################################
 #
@@ -10,11 +10,11 @@ elem_type(::Type{FlintQQiField}) = fmpqi
 
 parent_type(::Type{fmpqi}) = FlintQQiField
 
-parent(a::fmpqi) = QQi
+parent(a::fmpqi) = FlintQQi
 
-base_ring(a::FlintQQiField) = ZZi
+base_ring(a::FlintQQiField) = FlintZZi
 
-base_ring(a::fmpqi) = ZZi
+base_ring(a::fmpqi) = FlintZZi
 
 isdomain_type(::Type{fmpqi}) = true
 
@@ -154,7 +154,7 @@ end
 function rand_bits(a::FlintQQiField, b::Int)
    b = max(1, b)
    t = clamp(cld(rand(0:b)^2, b), 1, b)  # average b/3 for the denominator
-   return reduce!(fmpqi(rand_bits(ZZi, clamp(b - t, 0, b)), rand_bits(ZZ, t)))
+   return reduce!(fmpqi(rand_bits(FlintZZi, clamp(b - t, 0, b)), rand_bits(ZZ, t)))
 end
 
 ###############################################################################
@@ -185,11 +185,11 @@ function abs2(a::fmpqi)
 end
 
 function zero(a::FlintQQiField)
-   return fmpqi(zero(ZZi), fmpz(1))
+   return fmpqi(zero(FlintZZi), fmpz(1))
 end
 
 function one(a::FlintQQiField)
-   return fmpqi(one(ZZi), fmpz(1))
+   return fmpqi(one(FlintZZi), fmpz(1))
 end
 
 function iszero(a::fmpqi)
@@ -461,22 +461,22 @@ for (A, Bs) in [
             return fmpqi
          end
          function +(a::($A), b::($B))
-            return QQi(a) + QQi(b)
+            return FlintQQi(a) + FlintQQi(b)
          end
          function +(a::($B), b::($A))
-            return QQi(a) + QQi(b)
+            return FlintQQi(a) + FlintQQi(b)
          end
          function -(a::($A), b::($B))
-            return QQi(a) - QQi(b)
+            return FlintQQi(a) - FlintQQi(b)
          end
          function -(a::($B), b::($A))
-            return QQi(a) - QQi(b)
+            return FlintQQi(a) - FlintQQi(b)
          end
          function *(a::($A), b::($B))
-            return QQi(a) * QQi(b)
+            return FlintQQi(a) * FlintQQi(b)
          end
          function *(a::($B), b::($A))
-            return QQi(a) * QQi(b)
+            return FlintQQi(a) * FlintQQi(b)
          end
       end
    end
@@ -492,7 +492,7 @@ for (As, Bs) in [
    for A in As, B in Bs
       @eval begin
          function //(a::($A), b::($B))
-            return divexact(QQi(a), QQi(b))
+            return divexact(FlintQQi(a), FlintQQi(b))
          end
       end
    end

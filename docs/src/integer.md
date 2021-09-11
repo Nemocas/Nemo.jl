@@ -496,3 +496,22 @@ rand_bits_prime(::FlintIntegerRing, ::Int, ::Bool)
 a = rand_bits(ZZ, 23)
 b = rand_bits_prime(ZZ, 7)
 ```
+
+# Complex Integers
+
+The Gaussian integer type in Nemo is provided by a pair of Flint integers.
+The associated ring of integers is represented by the constant parent object
+called `FlintZZi` or `ZZi`, and the fraction field is called `FlintQQi` or
+`QQi`.
+
+**Examples**
+
+```julia
+a = ZZ(5)*im
+b = ZZi(3, 4)
+
+isunit(a)
+factor(a)
+a//b
+abs2(a//b)
+```

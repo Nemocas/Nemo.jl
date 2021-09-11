@@ -1,4 +1,4 @@
-export fmpzi, ZZi, FlintZZiRing
+export fmpzi, FlintZZi, FlintZZiRing
 
 ###############################################################################
 #
@@ -10,11 +10,11 @@ elem_type(::Type{FlintZZiRing}) = fmpzi
 
 parent_type(::Type{fmpzi}) = FlintZZiRing
 
-parent(a::fmpzi) = ZZi
+parent(a::fmpzi) = FlintZZi
 
-base_ring(a::FlintZZiRing) = ZZ
+base_ring(a::FlintZZiRing) = FlintZZ
 
-base_ring(a::fmpzi) = ZZ
+base_ring(a::fmpzi) = FlintZZ
 
 isdomain_type(::Type{fmpzi}) = true
 
@@ -65,7 +65,7 @@ function (a::FlintZZiRing)(b::IntegerUnion, c::IntegerUnion)
 end
 
 function (R::FlintZZiRing)(a::Complex{T}) where T <: Integer
-   return ZZi(fmpz(real(a)), fmpz(imag(a)))
+   return FlintZZi(fmpz(real(a)), fmpz(imag(a)))
 end
 
 ###############################################################################
@@ -125,7 +125,7 @@ end
 
 function rand_bits(::FlintZZiRing, b::Int)
    t = rand(0:b)
-   return fmpzi(rand_bits(ZZ, t), rand_bits(ZZ, b - t))
+   return fmpzi(rand_bits(FlintZZ, t), rand_bits(FlintZZ, b - t))
 end
 
 ###############################################################################
@@ -770,16 +770,16 @@ end
 function gcdx(a::fmpzi, b::fmpzi)
    if iszero(a)
       if iszero(b)
-         return (zero(ZZi), zero(ZZi), zero(ZZi))
+         return (zero(FlintZZi), zero(FlintZZi), zero(FlintZZi))
       else
          u = canonical_unit(b)
-         return (divexact(b, u), zero(ZZi), inv(u))
+         return (divexact(b, u), zero(FlintZZi), inv(u))
       end
    elseif iszero(b)
       u = canonical_unit(a)
-      return (divexact(a, u), inv(u), zero(ZZi))
+      return (divexact(a, u), inv(u), zero(FlintZZi))
    end
-   m = zero_matrix(ZZ, 4, 2)
+   m = zero_matrix(FlintZZ, 4, 2)
    m[1,1] =  a.x; m[1,2] = a.y
    m[2,1] = -a.y; m[2,2] = a.x
    m[3,1] =  b.x; m[3,2] = b.y
@@ -877,8 +877,8 @@ promote_rule(a::Type{<:Complex{<:Integer}}, b::Type{fmpz}) = fmpzi
 
 promote_rule(a::Type{fmpzi}, b::Type{<:Complex{<:Integer}}) = fmpzi
 promote_rule(a::Type{<:Complex{<:Integer}}, b::Type{fmpzi}) = fmpzi
-*(a::fmpzi, b::Complex{<:Integer}) = a*ZZi(b)
-*(b::Complex{<:Integer}, a::fmpzi) = a*ZZi(b)
+*(a::fmpzi, b::Complex{<:Integer}) = a*FlintZZi(b)
+*(b::Complex{<:Integer}, a::fmpzi) = a*FlintZZi(b)
 +(a::fmpzi, b::Complex{<:Integer}) = fmpzi(a.x + real(b), a.y + imag(b))
 +(b::Complex{<:Integer}, a::fmpzi) = fmpzi(a.x + real(b), a.y + imag(b))
 -(a::fmpzi, b::Complex{<:Integer}) = fmpzi(a.x - real(b), a.y - imag(b))
