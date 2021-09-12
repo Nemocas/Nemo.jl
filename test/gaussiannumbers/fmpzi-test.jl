@@ -90,6 +90,10 @@ end
       @assert abs(real(b)) > abs(imag(b)) || real(b) == imag(b)
    end
 
+   @test gcd(2, ZZi(0,3)) == 1
+   @test gcd(2, ZZi(0,4)) == 2
+   @test gcd(ZZi(3,0), 2) == 1
+   @test gcd(ZZi(4,0), 2) == 2
    @test gcd(ZZ(2), ZZi(1,1)) == ZZi(1,1)
    @test gcd(ZZi(1,1), ZZ(2)) == ZZi(1,1)
    @test gcdx(ZZi(0), ZZi(0)) == (0, 0, 0)

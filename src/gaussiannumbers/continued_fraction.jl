@@ -123,9 +123,7 @@ end
 
 # return shortest vector in the ZZ rowspace along with the ZZ's in that linear combo
 function shortest_l_infinity_with_transform(m::fmpz_mat)
-   if ncols(m) != 2
-      error("not implemented in $(ncols(m)) dimensions")
-   end
+   ncols(m) == 2 || error("not implemented in $(ncols(m)) dimensions")
    r = nrows(m)
    if r < 1
       return fmpz[fmpz(0), fmpz(0)], fmpz[]
@@ -138,12 +136,9 @@ function shortest_l_infinity_with_transform(m::fmpz_mat)
    a = M[2,2]
    if iszero(a)
       return fmpz[c, b], fmpz[U[1,i] for i in 1:r]
-   elseif iszero(c)
-      v1 = fmpz(0)
-      v2, t1, t2 = gcdx(b, a)
    else
       (v1, v2), (t1, t2) = _shortest_l_infinity(c, b, a)
+      return fmpz[v1, v2], fmpz[t1*U[1,i] + t2*U[2,i] for i in 1:r]
    end
-   return fmpz[v1, v2], fmpz[t1*U[1,i] + t2*U[2,i] for i in 1:r]
 end
 
