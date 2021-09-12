@@ -48,12 +48,14 @@ end
 end
 
 @testset "fmpzi.canonical_mod" begin
-   function test_nudivrem(a, b)
-      @test Nemo.nudivrem(fmpz(a), fmpz(b)) == divrem(a, b, RoundNearestTiesUp)
-   end
-   for i in -7:7, j in 1:5
-      test_nudivrem(i, -j)
-      test_nudivrem(i, +j)
+   if VERSION >= v"1.4" # RoundNearestTiesUp
+      function test_ncdivrem(a, b)
+         @test Nemo.ncdivrem(fmpz(a), fmpz(b)) == divrem(a, b, RoundNearestTiesUp)
+      end
+      for i in -7:7, j in 1:5
+         test_ncdivrem(i, -j)
+         test_ncdivrem(i, +j)
+      end
    end
    for i in 1:30
       m = rand_bits(ZZi, rand(2:6))

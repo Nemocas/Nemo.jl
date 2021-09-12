@@ -481,7 +481,7 @@ end
 #
 # this corresponends to Base.Rounding.RoundNearestTiesUp
 # unfortunately fmpz_ndiv_qr doesn't fit the bill here
-function nudivrem(a::fmpz, b::fmpz)
+function ncdivrem(a::fmpz, b::fmpz)
    q, r = tdivrem(a, b)
    c = ccall((:fmpz_cmp2abs, libflint), Cint, (Ref{fmpz}, Ref{fmpz}), b, r)
    if c <= 0
@@ -498,15 +498,15 @@ function nudivrem(a::fmpz, b::fmpz)
 end
 
 function divrem(a::fmpzi, b::fmpz)
-   qx, rx = nudivrem(a.x, b)
-   qy, ry = nudivrem(a.y, b)
+   qx, rx = ncdivrem(a.x, b)
+   qy, ry = ncdivrem(a.y, b)
    return fmpzi(qx, qy), fmpzi(rx, ry)
 end
 
 function divrem(a::fmpzi, b::fmpzi)
    d = abs2(b)
-   qx, r = nudivrem(a.x*b.x + a.y*b.y, d)
-   qy, r = nudivrem(a.y*b.x - a.x*b.y, d)
+   qx, r = ncdivrem(a.x*b.x + a.y*b.y, d)
+   qy, r = ncdivrem(a.y*b.x - a.x*b.y, d)
    q = fmpzi(qx, qy)
    return q, a - q*b
 end
