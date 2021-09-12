@@ -14,7 +14,7 @@
    end
 end
 
-@testset "continuedFraction.shortest_l_infinity_with_transform" begin
+@testset "continued_fraction.shortest_l_infinity_with_transform" begin
    # TODO implement matrix-vector product and use it
 
    m = matrix(ZZ, 0, 2, [])
@@ -55,3 +55,34 @@ end
    m = matrix(ZZ, 2, 3, [0, 1, 3, 4, 5, 6])
    @test_throws Exception Nemo.shortest_l_infinity_with_transform(m)
 end
+
+@testset "continued_fraction.continued_fractions" begin
+   for k in 1:100
+      x = zero(QQ)
+      for i in 1:rand(0:15)
+         x = inv(abs(rand_bits(ZZ, rand(1:80))) + x)
+      end
+      x = rand_bits(ZZ, rand(0:10)) + x
+
+      cf1, m1 = continued_fraction_with_matrix(x)
+      @test x == m1[1,1]//m1[2,1]
+      @test x == last(convergents(cf1))
+      @test isunit(det(m1))
+
+      @test cf1 == continued_fraction(x)
+
+      cnvgts = collect(convergents(cf1))
+      m = matrix(ZZ, 2, 2, [1, 0, 0, 1])
+      cf = fmpz[]
+      while !iszero(m[1,1] - m[2,1]*x)
+         y = divexact(m[2,2]*x - m[1,2], m[1,1] - m[2,1]*x)
+         cf2, m2 = continued_fraction_with_matrix(y, limit = rand(1:4))
+         cf = vcat(cf, cf2)
+         m = m*m2
+         @test cnvgts[length(cf)] == m[1,1]//m[2,1]
+      end
+      @test cf == cf1
+      @test m == m1
+   end
+end
+

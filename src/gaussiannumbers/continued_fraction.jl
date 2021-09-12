@@ -1,3 +1,5 @@
+export continued_fraction, continued_fraction_with_matrix, convergents
+
 macro new_struct(T, args...)
    return esc(Expr(:new, T, args...))
 end
@@ -167,5 +169,108 @@ function shortest_l_infinity_with_transform(m::fmpz_mat)
       (v1, v2), (t1, t2) = _shortest_l_infinity(c, b, a)
       return fmpz[v1, v2], fmpz[t1*U[1,i] + t2*U[2,i] for i in 1:r]
    end
+end
+
+###############################################################################
+#
+# continued_fraction
+#
+###############################################################################
+
+function _doit_exact(xn::fmpz, xd::fmpz, s, wantM::Bool)
+   xdiszero = iszero(xd)
+   x = _fmpq_ball(steal_data!(xn), steal_data!(xd), 0, 0, 1)
+   m = _fmpz_mat22(1,0,0,1,1)
+   if !xdiszero
+      ccall((:_fmpq_ball_get_cfrac, libflint), Nothing,
+            (Ref{_fmpq_cfrac_list}, Ref{_fmpz_mat22}, Cint, Ref{_fmpq_ball}),
+            s, m, wantM, x)
+   end
+   xn.d = x.left_num; x.left_num = 0
+   xd.d = x.left_den; x.left_den = 0
+   return (steal_fmpz_data(m._11), steal_fmpz_data(m._12),
+           steal_fmpz_data(m._21), steal_fmpz_data(m._22))
+end
+
+# xn and xd should be mutatable
+function _continued_fraction_exact(xn::fmpz, xd::fmpz, limit::Int, wantM::Bool)
+   limit = limit < 1 ? typemax(Int) : limit
+   cflist = fmpz[]
+   c = cmp(xn, xd)
+   s = _fmpq_cfrac_list(C_NULL, 0, 0, limit, 0, 0)
+   if c > 0
+      (m11, m12, m21, m22) = _doit_exact(xn, xd, s, wantM)
+   else
+      s.limit = limit - 1
+      q, xn = fdivrem(xn, xd)
+      swap!(xn, xd)
+      push!(cflist, q)
+      (m11, m12, m21, m22) = _doit_exact(xn, xd, s, wantM)
+      addmul!(m21, m11, q); swap!(m21, m11)
+      addmul!(m22, m12, q); swap!(m22, m12)
+   end
+   for i in 1:s.length
+      push!(cflist, steal_fmpz_data(unsafe_load(s.array, i)))
+   end
+   ccall((:flint_free, libflint), Nothing, (Ptr{Int},), s.array)
+   while length(cflist) < limit && !iszero(xd)
+      q, xn = fdivrem(xn, xd)
+      swap!(xn, xd)
+      push!(cflist, q)
+      addmul!(m12, m11, q); swap!(m12, m11)
+      addmul!(m22, m21, q); swap!(m22, m21)
+   end
+   return (cflist, (m11, m12, m21, m22))
+end
+
+function continued_fraction(a::fmpq; limit::Int = 0)
+   return _continued_fraction_exact(numerator(a), denominator(a), limit, false)[1]
+end
+
+function continued_fraction_with_matrix(a::fmpq; limit::Int = 0)
+   cf, m = _continued_fraction_exact(numerator(a), denominator(a), limit, true)
+   return cf, matrix(ZZ, 2, 2, [m...])
+end
+
+###############################################################################
+#
+# convergents
+#
+###############################################################################
+
+struct ConvergentsIterator{T, R}
+   v::Vector{T}
+end
+
+Base.lastindex(it::ConvergentsIterator) = length(it.v)
+Base.length(it::ConvergentsIterator)    = length(it.v)
+Base.eltype(::Type{ConvergentsIterator{T, R}}) where {T, R} = R
+Base.eltype(it::ConvergentsIterator{T, R})     where {T, R} = R
+Base.collect(it::ConvergentsIterator{T, R})    where {T, R} = collect(R, it)
+
+function Base.getindex(it::ConvergentsIterator{T, R}, n) where {T, R}
+   m = mapreduce(q -> (q, T(1), T(1), T(0)),
+                 (x, y) -> (x[1]*y[1] + x[2]*y[3], x[1]*y[2] + x[2]*y[4],
+                            x[3]*y[1] + x[4]*y[3], x[3]*y[2] + x[4]*y[4]),
+                 it.v[1:n])
+   return m[1]//m[3]
+end
+
+function Base.iterate(it::ConvergentsIterator{T, R}) where {T, R}
+   isempty(it.v) && return nothing
+   return (it.v[1]//T(1), ((deepcopy(it.v[1]), T(1), T(1), T(0)), 2))
+end
+
+function Base.iterate(it::ConvergentsIterator{T, R}, state) where {T, R}
+   n = state[2]
+   n > length(it.v) && return nothing
+   m = state[1]
+   addmul!(m[2], m[1], it.v[n]); swap!(m[2], m[1])
+   addmul!(m[4], m[3], it.v[n]); swap!(m[4], m[3])
+   return (m[1]//m[3], (m, n + 1))
+end
+
+function convergents(cf::Vector{fmpz})
+   return ConvergentsIterator{fmpz, fmpq}(cf)
 end
 
