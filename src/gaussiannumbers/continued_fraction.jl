@@ -47,14 +47,20 @@ function copy_data(a::fmpz)
    return z[]
 end
 
+function shift_right!(z::fmpz, a::fmpz, b::Union{Int, UInt})
+   ccall((:fmpz_fdiv_q_2exp, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, UInt),
+         z, a, UInt(b))
+   return z
+end
+
 # l_infinity shortest vector in the ZZ-rowspace of [c b; 0 a]
 # is u = y*(c,b) - x*(0,a) for some t = (y,-x) in ZZ^2
 # (x/y) is either the last convergent of b/a that lies outside [(b-c)/a, (b+c)/a]
 #              or the first convergent that lies inside
 #
-# Simple fact: If I is a finite closed interval with
-#                 1 < I < infty and I contains an integer,
-# then for any z in I, either the first or second convergent of z in is I.
+# Simple fact: If I is a finite interval containing an integer with I > 1,
+#     then for any z in I, either the first or second convergent of z is in I.
 function _shortest_l_infinity(c::fmpz, b::fmpz, a::fmpz)
    @assert c > 0 && a > b && b >= 0
    t1 = fmpz(0)
@@ -71,26 +77,43 @@ function _shortest_l_infinity(c::fmpz, b::fmpz, a::fmpz)
    end
    # s is fake and shallow
    s = _fmpq_cfrac_list(C_NULL, -1, 0, typemax(Int), 0, 0)
-   # will kill m while stealing its entries later
+   # will cleanup m while stealing its entries later
    m = _fmpz_mat22(1,0,0,1,1)
-   # don't destroy a
+   # will cleanup x while stealing its enties later
    x = _fmpq_ball(copy_data(a), steal_data!(b_plus_c),
                   copy_data(a), steal_data!(b_minus_c), 0)
    ccall((:_fmpq_ball_get_cfrac, libflint), Nothing,
          (Ref{_fmpq_cfrac_list}, Ref{_fmpz_mat22}, Cint, Ref{_fmpq_ball}),
          s, m, 1, x)
-   ccall((:_fmpq_ball_clear, libflint), Nothing, (Ref{_fmpq_ball},), x)
 
    m11 = steal_fmpz_data(m._11)
    m12 = steal_fmpz_data(m._12)
    m21 = steal_fmpz_data(m._21)
    m22 = steal_fmpz_data(m._22)
+   xld = steal_fmpz_data(x.left_den)
+   xrd = steal_fmpz_data(x.right_den)
+   xln = steal_fmpz_data(x.left_num)
+   xrn = steal_fmpz_data(x.right_num)
 
-   # v = m applied to [c b; 0 a]
-   v11 = m11*c; v12 = m11*b - mul!(t3, m21, a)
-   v21 = m12*c; v22 = m12*b - mul!(t3, m22, a)
+   # all arithmetic is inplace now
+   v12 = add!(xld, xld, xrd); shift_right!(v12, v12, 1)
+   v22 = add!(xln, xln, xrn); shift_right!(v22, v22, 1)
+   if m.det < 0
+      neg!(v12, v12)
+   else
+      neg!(v22, v22)
+   end
+   v11 = mul!(xrd, m11, c)
+   v21 = mul!(xrn, m12, c)
+
+   # v is supposed to be m 'applied' to [c b; 0 a]
+   @assert v11 == m11*c
+   @assert v12 == m11*b - m21*a
+   @assert v21 == m12*c
+   @assert v22 == m12*b - m22*a
+
    vcmp = cmpabs(v11, v12)
-   # get_cfrac ensures I = M^-1([a/(b-c) a/(b+c)]) satisfies the simple fact.
+   # get_cfrac ensures I = M^-1([a/(b+c) a/(b-c)]) satisfies the simple fact.
    # We have |m11*c| >= |m11*b - m21*a| iff a/(b-c) <= m11/21 <= a/(b+c).
    @assert vcmp < 0  # since infty = M^-1(m11/m21) is outside of I.
    # u is best, t is transformation to best
@@ -100,7 +123,7 @@ function _shortest_l_infinity(c::fmpz, b::fmpz, a::fmpz)
 
    # The simple fact is satisfied with z = M^-1(a/b): generate at most two more
    # convergents q1 and q2. |v12| is decreasing and |v11| is increasing. As soon
-   # as |v11| >= |v12|, we are done since then a/(b-c) <= m11/21 <= a/(b+c),
+   # as |v11| >= |v12|, we are done since then a/(b+c) <= m11/21 <= a/(b-c),
    # which is the same thing as q1 or q1+1/q2 in I.
    triesleft = 2
    while (triesleft -= 1) >= 0 && vcmp < 0
