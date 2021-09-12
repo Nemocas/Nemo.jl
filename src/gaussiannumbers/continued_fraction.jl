@@ -51,6 +51,10 @@ end
 # is u = y*(c,b) - x*(0,a) for some t = (y,-x) in ZZ^2
 # (x/y) is either the last convergent of b/a that lies outside [(b-c)/a, (b+c)/a]
 #              or the first convergent that lies inside
+#
+# Simple fact: If I is a finite closed interval with
+#                 1 < I < infty and I contains an integer,
+# then for any z in I, either the first or second convergent of z in is I.
 function _shortest_l_infinity(c::fmpz, b::fmpz, a::fmpz)
    @assert c > 0 && a > b && b >= 0
    t1 = fmpz(0)
@@ -63,7 +67,7 @@ function _shortest_l_infinity(c::fmpz, b::fmpz, a::fmpz)
    elseif b_minus_c <= 0
       return (c, b), (t2, t1)
    elseif a <= b_plus_c
-      return (c, b-a), (t2, t3)
+      return (c, b - a), (t2, t3)
    end
    # s is fake and shallow
    s = _fmpq_cfrac_list(C_NULL, -1, 0, typemax(Int), 0, 0)
@@ -86,18 +90,18 @@ function _shortest_l_infinity(c::fmpz, b::fmpz, a::fmpz)
    v11 = m11*c; v12 = m11*b - mul!(t3, m21, a)
    v21 = m12*c; v22 = m12*b - mul!(t3, m22, a)
    vcmp = cmpabs(v11, v12)
+   # get_cfrac ensures I = M^-1([a/(b-c) a/(b+c)]) satisfies the simple fact.
+   # We have |m11*c| >= |m11*b - m21*a| iff a/(b-c) <= m11/21 <= a/(b+c).
+   @assert vcmp < 0  # since infty = M^-1(m11/m21) is outside of I.
    # u is best, t is transformation to best
-   if vcmp < 0
-      u1 = fmpz(); u2 = fmpz()
-      set!(u1, v11); set!(u2, v12)
-      set!(t1, m11); neg!(t2, m21)
-   else
-      u1 = v11; u2 = v12
-      t1 = m11; t2 = neg!(m21, m21)
-   end
+   u1 = b_plus_c; u2 = b_minus_c # reuse temp objs
+   set!(u1, v11); set!(u2, v12)
+   set!(t1, m11); neg!(t2, m21)
 
-   # at most two extra rounds: |v12| is decreasing and |v11| is increasing
-   # if |v11| >= |v12|, we are done
+   # The simple fact is satisfied with z = M^-1(a/b): generate at most two more
+   # convergents q1 and q2. |v12| is decreasing and |v11| is increasing. As soon
+   # as |v11| >= |v12|, we are done since then a/(b-c) <= m11/21 <= a/(b+c),
+   # which is the same thing as q1 or q1+1/q2 in I.
    triesleft = 2
    while (triesleft -= 1) >= 0 && vcmp < 0
       Q = tdiv(v22, v12)
