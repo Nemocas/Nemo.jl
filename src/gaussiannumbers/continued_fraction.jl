@@ -177,14 +177,26 @@ end
 #
 ###############################################################################
 
-function _doit_exact(xn::fmpz, xd::fmpz, s, wantM::Bool)
-   xdiszero = iszero(xd)
+function _push_and_clear!(v::Vector{fmpz}, s::_fmpq_cfrac_list)
+   for i in 1:s.length
+      push!(v, steal_fmpz_data(unsafe_load(s.array, i)))
+   end
+   for i in s.length:s.alloc-1
+      ccall((:fmpz_clear, libflint), Nothing, (Ptr{Int},), s.array + sizeof(Int)*i)
+   end
+   ccall((:flint_free, libflint), Nothing, (Ptr{Int},), s.array)
+end
+
+function _doit_exact!(xn::fmpz, xd::fmpz, v::Vector{fmpz}, lim::Int, wantM::Bool)
+   ok = xd > 0 && xn > xd
    x = _fmpq_ball(steal_data!(xn), steal_data!(xd), 0, 0, 1)
    m = _fmpz_mat22(1,0,0,1,1)
-   if !xdiszero
+   if ok
+      s = _fmpq_cfrac_list(C_NULL, 0, 0, lim, 0, 0)
       ccall((:_fmpq_ball_get_cfrac, libflint), Nothing,
             (Ref{_fmpq_cfrac_list}, Ref{_fmpz_mat22}, Cint, Ref{_fmpq_ball}),
             s, m, wantM, x)
+      _push_and_clear!(v, s)
    end
    xn.d = x.left_num; x.left_num = 0
    xd.d = x.left_den; x.left_den = 0
@@ -193,43 +205,128 @@ function _doit_exact(xn::fmpz, xd::fmpz, s, wantM::Bool)
 end
 
 # xn and xd should be mutatable
-function _continued_fraction_exact(xn::fmpz, xd::fmpz, limit::Int, wantM::Bool)
-   limit = limit < 1 ? typemax(Int) : limit
-   cflist = fmpz[]
-   c = cmp(xn, xd)
-   s = _fmpq_cfrac_list(C_NULL, 0, 0, limit, 0, 0)
-   if c > 0
-      (m11, m12, m21, m22) = _doit_exact(xn, xd, s, wantM)
+function _continued_fraction_exact(xn::fmpz, xd::fmpz, lim::Int, wantM::Bool)
+   lim = lim < 1 ? typemax(Int) : lim
+   v = fmpz[]
+   if xn > xd
+      (m11, m12, m21, m22) = _doit_exact!(xn, xd, v, lim, wantM)
    else
-      s.limit = limit - 1
       q, xn = fdivrem(xn, xd)
       swap!(xn, xd)
-      push!(cflist, q)
-      (m11, m12, m21, m22) = _doit_exact(xn, xd, s, wantM)
+      push!(v, q)
+      (m11, m12, m21, m22) = _doit_exact!(xn, xd, v, lim - 1, wantM)
       addmul!(m21, m11, q); swap!(m21, m11)
       addmul!(m22, m12, q); swap!(m22, m12)
    end
-   for i in 1:s.length
-      push!(cflist, steal_fmpz_data(unsafe_load(s.array, i)))
-   end
-   ccall((:flint_free, libflint), Nothing, (Ptr{Int},), s.array)
-   while length(cflist) < limit && !iszero(xd)
+   while length(v) < lim && !iszero(xd)
       q, xn = fdivrem(xn, xd)
       swap!(xn, xd)
-      push!(cflist, q)
+      push!(v, q)
       addmul!(m12, m11, q); swap!(m12, m11)
       addmul!(m22, m21, q); swap!(m22, m21)
    end
-   return (cflist, (m11, m12, m21, m22))
+   return (v, (m11, m12, m21, m22))
 end
 
-function continued_fraction(a::fmpq; limit::Int = 0)
-   return _continued_fraction_exact(numerator(a), denominator(a), limit, false)[1]
+function continued_fraction(x::fmpq; limit::Int = 0)
+   return _continued_fraction_exact(numerator(x), denominator(x), limit, false)[1]
 end
 
-function continued_fraction_with_matrix(a::fmpq; limit::Int = 0)
-   cf, m = _continued_fraction_exact(numerator(a), denominator(a), limit, true)
-   return cf, matrix(ZZ, 2, 2, [m...])
+function continued_fraction_with_matrix(x::fmpq; limit::Int = 0)
+   cf, m = _continued_fraction_exact(numerator(x), denominator(x), limit, true)
+   return cf, matrix(FlintZZ, 2, 2, [m...])
+end
+
+function _doit_ball!(
+   xln::fmpz, xld::fmpz,
+   xrn::fmpz, xrd::fmpz,
+   v::Vector{fmpz},
+   lim::Int,
+   wantM::Bool)
+
+   x = _fmpq_ball(steal_data!(xln), steal_data!(xld),
+                  steal_data!(xrn), steal_data!(xrd), 0)
+   m = _fmpz_mat22(1,0,0,1,1)
+   s = _fmpq_cfrac_list(C_NULL, 0, 0, lim, 0, 0)
+   ccall((:_fmpq_ball_get_cfrac, libflint), Nothing,
+         (Ref{_fmpq_cfrac_list}, Ref{_fmpz_mat22}, Cint, Ref{_fmpq_ball}),
+         s, m, wantM, x)
+   _push_and_clear!(v, s)
+   xln.d = x.left_num; x.left_num = 0
+   xld.d = x.left_den; x.left_den = 0
+   xrn.d = x.right_num; x.right_num = 0
+   xrd.d = x.right_den; x.right_den = 0
+   return (steal_fmpz_data(m._11), steal_fmpz_data(m._12),
+           steal_fmpz_data(m._21), steal_fmpz_data(m._22))
+end
+
+# xln, xld, xrd, xrd should all be mutatable
+function _continued_fraction_ball(
+   xln::fmpz, xld::fmpz,
+   xrn::fmpz, xrd::fmpz,
+   lim::Int,
+   wantM::Bool)
+
+   lim = lim < 1 ? typemax(Int) : lim
+   v = fmpz[]
+   if xln > xld
+      (m11, m12, m21, m22) = _doit_ball!(xln, xld, xrn, xrd, v, lim, wantM)
+      ok = true
+   else
+      (q, xln) = fdivrem(xln, xld)
+      submul!(xrn, xrd, q)
+      swap!(xln, xrd)
+      swap!(xld, xrn)
+      ok = xrd > 0 && xld > 0 && xln > xld
+      if ok
+         push!(v, q)
+         (m11, m12, m21, m22) = _doit_ball!(xln, xld, xrn, xrd, v, lim - 1, wantM)
+         addmul!(m21, m11, q); swap!(m21, m11)
+         addmul!(m22, m12, q); swap!(m22, m12)
+      else
+         (m11, m12, m21, m22) = (fmpz(1), fmpz(0), fmpz(0), fmpz(1))
+      end
+   end
+   while ok && length(v) < lim
+      (q, xln) = fdivrem(xln, xld)
+      submul!(xrn, xrd, q)
+      swap!(xln, xrd)
+      swap!(xld, xrn)
+      ok = xrd > 0 && xld > 0 && xln > xld
+      xln > xld || break
+      push!(v, q)
+      addmul!(m12, m11, q); swap!(m12, m11)
+      addmul!(m22, m21, q); swap!(m22, m21)
+   end
+   return (v, (m11, m12, m21, m22))
+end
+
+# return four mutatable fmpz's
+function _left_and_right(x::arb)
+   a = fmpz()
+   b = fmpz()
+   f = fmpz()
+   ccall((:arb_get_interval_fmpz_2exp, libarb), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{arb}),
+         a, b, f, x)
+   !fits(Int, f) && error("Result does not fit into an fmpq")
+   e = Int(f)
+   if f >= 0
+      return (a << e, fmpz(1), b << e, fmpz(1))
+   else
+      return (a, fmpz(1) << -e, b, fmpz(1) << -e)
+   end
+end
+
+function continued_fraction(x::arb; limit::Int = 0)
+   xln, xld, xrn, xrd = _left_and_right(x)
+   return _continued_fraction_ball(xln, xld, xrn, xrd, limit, false)[1]
+end
+
+function continued_fraction_with_matrix(x::arb; limit::Int = 0)
+   xln, xld, xrn, xrd = _left_and_right(x)
+   cf, m = _continued_fraction_ball(xln, xld, xrn, xrd, limit, true)
+   return cf, matrix(FlintZZ, 2, 2, [m...])
 end
 
 ###############################################################################
