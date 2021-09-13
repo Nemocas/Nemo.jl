@@ -38,13 +38,14 @@ export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash,
        bin, oct, hex, base, one, zero, divexact, fits, sign, nbits, deepcopy,
        tdivpow2, fdivpow2, cdivpow2, flog, clog, cmpabs, clrbit!, setbit!,
        combit!, crt, divisible, divisors, prime_divisors, divisor_lenstra,
-       fdivrem, tdivrem, fmodpow2, gcdinv, isprobable_prime, jacobi_symbol,
+       fmodpow2, gcdinv, isprobable_prime, jacobi_symbol, kronecker_symbol,
        remove, root, size, isqrtrem, sqrtmod, trailing_zeros, divisor_sigma,
        euler_phi, fibonacci, moebius_mu, primorial, rising_factorial,
        number_of_partitions, canonical_unit, isunit, isequal, addeq!, mul!,
        issquare, sqrt, issquare_with_sqrt, next_prime, ndivrem,
        iszero, rand, rand_bits, binomial, factorial, rand_bits_prime, iroot,
-       kronecker_symbol
+       tdivrem, fdivrem, cdivrem, ntdivrem, nfdivrem, ncdivrem
+
 
 ###############################################################################
 #
@@ -604,6 +605,56 @@ function fdivrem(x::fmpz, y::fmpz)
     ccall((:fmpz_fdiv_qr, libflint), Nothing,
           (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z1, z2, x, y)
     z1, z2
+end
+
+function cdivrem(x::fmpz, y::fmpz)
+    iszero(y) && throw(DivideError())
+    z1 = fmpz()
+    z2 = fmpz()
+    ccall((:fmpz_cdiv_qr, libflint), Nothing,
+          (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z1, z2, x, y)
+    z1, z2
+end
+
+function ntdivrem(x::fmpz, y::fmpz)
+    iszero(y) && throw(DivideError())
+    z1 = fmpz()
+    z2 = fmpz()
+    ccall((:fmpz_ndiv_qr, libflint), Nothing,
+          (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z1, z2, x, y)
+    return z1, z2
+end
+
+function nfdivrem(a::fmpz, b::fmpz)
+   q, r = tdivrem(a, b)
+   c = ccall((:fmpz_cmp2abs, libflint), Cint, (Ref{fmpz}, Ref{fmpz}), b, r)
+   if c <= 0
+      if ccall((:fmpz_sgn, libflint), Cint, (Ref{fmpz},), b) !=
+         ccall((:fmpz_sgn, libflint), Cint, (Ref{fmpz},), r)
+         sub!(q, q, UInt(1))
+         add!(r, r, b)
+      elseif c < 0
+         add!(q, q, UInt(1))
+         sub!(r, r, b)
+      end
+   end
+   return (q, r)
+end
+
+function ncdivrem(a::fmpz, b::fmpz)
+   q, r = tdivrem(a, b)
+   c = ccall((:fmpz_cmp2abs, libflint), Cint, (Ref{fmpz}, Ref{fmpz}), b, r)
+   if c <= 0
+      if ccall((:fmpz_sgn, libflint), Cint, (Ref{fmpz},), r) ==
+         ccall((:fmpz_sgn, libflint), Cint, (Ref{fmpz},), b)
+         add!(q, q, UInt(1))
+         sub!(r, r, b)
+      elseif c < 0
+         sub!(q, q, UInt(1))
+         add!(r, r, b)
+      end
+   end
+   return (q, r)
 end
 
 function ndivrem(x::fmpz, y::fmpz)

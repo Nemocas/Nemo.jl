@@ -475,27 +475,6 @@ end
 # the complex number z/b = x + i*y is in the following box
 #     -1/2 <= x < 1/2
 #     -1/2 <= y < 1/2
-# note
-#  - the top and right edges are missing
-#  - all corners except the bottom left are missing
-#
-# this corresponends to Base.Rounding.RoundNearestTiesUp
-# unfortunately fmpz_ndiv_qr doesn't fit the bill here
-function ncdivrem(a::fmpz, b::fmpz)
-   q, r = tdivrem(a, b)
-   c = ccall((:fmpz_cmp2abs, libflint), Cint, (Ref{fmpz}, Ref{fmpz}), b, r)
-   if c <= 0
-      if ccall((:fmpz_sgn, libflint), Cint, (Ref{fmpz},), r) ==
-         ccall((:fmpz_sgn, libflint), Cint, (Ref{fmpz},), b)
-         add!(q, q, UInt(1))
-         sub!(r, r, b)
-      elseif c < 0
-         sub!(q, q, UInt(1))
-         add!(r, r, b)
-      end
-   end
-   return (q, r)
-end
 
 function divrem(a::fmpzi, b::fmpz)
    qx, rx = ncdivrem(a.x, b)
