@@ -303,13 +303,14 @@ end
 
 # return four mutatable fmpz's
 function _left_and_right(x::arb)
+   isfinite(x) || error("Ball must be finite")
    a = fmpz()
    b = fmpz()
    f = fmpz()
    ccall((:arb_get_interval_fmpz_2exp, libarb), Nothing,
          (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{arb}),
          a, b, f, x)
-   !fits(Int, f) && error("Result does not fit into an fmpq")
+   fits(Int, f) || error("Ball endpoints do not fit into fmpq")
    e = Int(f)
    if f >= 0
       return (a << e, fmpz(1), b << e, fmpz(1))
@@ -318,11 +319,25 @@ function _left_and_right(x::arb)
    end
 end
 
+@doc Markdown.doc"""
+    continued_fraction(x; limit::Int = 0)
+
+Return the vector of the first `limit` partial quotient of the continued
+fraction of $x$. `limit = 0` corresponds to no limit, that is, all partial
+quotients are generated or as many as can be justified by the precision of the
+input.
+"""
 function continued_fraction(x::arb; limit::Int = 0)
    xln, xld, xrn, xrd = _left_and_right(x)
    return _continued_fraction_ball(xln, xld, xrn, xrd, limit, false)[1]
 end
 
+@doc Markdown.doc"""
+    continued_fraction_with_matrix(x; limit::Int = 0)
+
+Return the vector of the first `limit` partial quotient of the continued
+fraction of $x$ along with the matrix giving the last two convergents.
+"""
 function continued_fraction_with_matrix(x::arb; limit::Int = 0)
    xln, xld, xrn, xrd = _left_and_right(x)
    cf, m = _continued_fraction_ball(xln, xld, xrn, xrd, limit, true)
@@ -367,6 +382,12 @@ function Base.iterate(it::ConvergentsIterator{T, R}, state) where {T, R}
    return (m[1]//m[3], (m, n + 1))
 end
 
+@doc Markdown.doc"""
+    convergents(a::Vector)
+
+Gives the iterable sequence of convergents of a finite continued fraction from
+its vector $a$ of partial quotients.
+"""
 function convergents(cf::Vector{fmpz})
    return ConvergentsIterator{fmpz, fmpq}(cf)
 end

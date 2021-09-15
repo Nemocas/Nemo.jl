@@ -103,9 +103,10 @@ end
    @test continued_fraction_with_matrix(-1/const_pi(CC), limit = 4) ==
                                  (fmpz[-1, 1, 2, 7], matrix(ZZ, [-7 -1; 22 3]))
 
-   # need exact intervals [-1, 1], [543//512, 17/16], [542//512, 17//16] here
    z = CC()
    ccall((:arb_zero_pm_one, Nemo.libarb), Nothing, (Ref{arb},), z)
+   @test_throws Exception continued_fraction(inv(z))
+   # need exact intervals [-1, 1], [543//512, 17/16], [542//512, 17//16] here
    @test continued_fraction(z) == fmpz[]
    @test continued_fraction(ldexp(1087+z, -10)) == fmpz[1, 16]
    @test continued_fraction(ldexp(543+z, -9)) == fmpz[1]
