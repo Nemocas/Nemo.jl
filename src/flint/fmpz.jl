@@ -1480,7 +1480,37 @@ remove(x::fmpz, y::Integer) = remove(x, fmpz(y))
 
 remove(x::Integer, y::fmpz) = remove(fmpz(x), y)
 
-remove(x::Integer, y::Integer) = remove(fmpz(x), fmpz(y))
+function remove(a::UInt, b::UInt)
+   b <= 1 && error("Factor <= 1")
+   a == 0 && error("Not yet implemented")
+   q = Ref(a)
+   binv = ccall((:n_precompute_inverse, libflint), Float64, (UInt,), b)
+   v = ccall((:n_remove2_precomp, libflint), Cint,
+             (Ptr{UInt}, UInt, Float64),
+             q, b, binv)
+   return (Int(v), q[])
+end
+
+function remove(a::Int, b::Int)
+   b <= 1 && error("Factor <= 1")
+   v, q = remove(abs(a)%UInt, b%UInt)
+   return (v, a < 0 ? -q%Int : q%Int)
+end
+
+function remove(a::BigInt, b::BigInt)
+   b <= 1 && error("Factor <= 1")
+   a == 0 && error("Not yet implemented")
+   q = BigInt()
+   v =  ccall((:__gmpz_remove, :libgmp), Culong,
+              (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}),
+              q, a, b)
+   return (Int(v), q)
+end
+
+function remove(x::Integer, y::Integer)
+   v, q = remove(fmpz(x), fmpz(y))
+   return (v, convert(promote_type(typeof(x), typeof(y)), q))
+end
 
 @doc Markdown.doc"""
     valuation(x::fmpz, y::fmpz)

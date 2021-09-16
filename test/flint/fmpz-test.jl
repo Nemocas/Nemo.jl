@@ -876,6 +876,26 @@ end
    @test_throws DomainError  euler_phi(-fmpz(12480))
 
    @test remove(fmpz(12), fmpz(2)) == (2, 3)
+   @test remove(-3*6^3, 6) === (3, -3)
+   @test remove(-4*6^0, 6) === (0, -4)
+   @test remove(typemin(Int), 2) === (trailing_zeros(typemin(Int)), -1)
+   @test remove(typemin(Int), 3) === (0, typemin(Int))
+   @test remove(UInt(24), 6) === (1, UInt(4))
+
+   for a in (UInt(1), UInt(8), UInt(12), typemax(UInt))
+      n = trailing_zeros(a)
+      @test remove(a, UInt(2)) === (n, a >> n)
+      @test remove(a, 2) === (n, a >> n)
+   end
+
+   @test remove(-3*6^3, BigInt(6)) == (3, -3)
+   @test remove(-3*6^3, BigInt(6)) isa Tuple{Int, BigInt}
+
+   @test remove(BigInt(-3*6^3), BigInt(6)) == (3, -3)
+   @test remove(BigInt(-3*6^3), BigInt(6)) isa Tuple{Int, BigInt}
+
+   @test remove(BigInt(-3*6^3), 6) == (3, -3)
+   @test remove(BigInt(-3*6^3), 6) isa Tuple{Int, BigInt}
 
    @test valuation(fmpz(12), fmpz(2)) == 2
 
