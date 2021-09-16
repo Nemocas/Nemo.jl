@@ -509,7 +509,7 @@ Random.gentype(::Type{FqNmodFiniteField}) = elem_type(FqNmodFiniteField)
 
 RandomExtensions.maketype(R::FqNmodFiniteField, _) = elem_type(R)
 
-rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{fq_nmod,FqNmodFiniteField,<:AbstractArray{<:Union{fmpz,Integer}}}}) =
+rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{fq_nmod,FqNmodFiniteField,<:AbstractArray{<:IntegerUnion}}}) =
    sp[][1](rand(rng, sp[][2]))
 
 # define rand(::FqNmodFiniteField, arr), where arr is any abstract array with integer or fmpz entries

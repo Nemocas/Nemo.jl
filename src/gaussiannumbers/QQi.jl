@@ -74,7 +74,7 @@ function (a::FlintQQiField)()
    return fmpqi()
 end
 
-function (a::FlintQQiField)(b::Union{Integer, fmpz})
+function (a::FlintQQiField)(b::IntegerUnion)
    return fmpqi(ZZi(b))
 end
 

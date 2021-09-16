@@ -382,7 +382,7 @@ Random.gentype(::Type{NmodRing}) = elem_type(NmodRing)
 
 RandomExtensions.maketype(R::NmodRing, _) = elem_type(R)
 
-rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{nmod,NmodRing,<:AbstractArray{<:Union{fmpz,Integer}}}}) =
+rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{nmod,NmodRing,<:AbstractArray{<:IntegerUnion}}}) =
    sp[][1](rand(rng, sp[][2]))
 
 # define rand(R::NmodRing, arr), where arr is any abstract array with integer or fmpz entries

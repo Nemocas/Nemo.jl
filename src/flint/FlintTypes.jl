@@ -67,6 +67,8 @@ mutable struct fmpz <: RingElem
     fmpz(x::fmpz) = x
 end
 
+const IntegerUnion = Union{Integer,fmpz}
+
 function _fmpz_clear_fn(a::fmpz)
    ccall((:fmpz_clear, libflint), Nothing, (Ref{fmpz},), a)
 end

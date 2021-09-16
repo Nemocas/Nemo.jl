@@ -1115,7 +1115,7 @@ function divexact(f::gfp_mpoly, a::gfp_elem; check::Bool=true)
   return ainv * f
 end
 
-function divexact(f::gfp_mpoly, a::Union{fmpz, Integer}; check::Bool=true)
+function divexact(f::gfp_mpoly, a::IntegerUnion; check::Bool=true)
   return divexact(f, base_ring(f)(a))
 end
 
@@ -1123,7 +1123,7 @@ function divexact(f::nmod_mpoly, a::nmod; check::Bool=true)
   return divexact(f, parent(f)(a))
 end
 
-function divexact(f::nmod_mpoly, a::Union{fmpz, Integer}; check::Bool=true)
+function divexact(f::nmod_mpoly, a::IntegerUnion; check::Bool=true)
   return divexact(f, base_ring(f)(a))
 end
 

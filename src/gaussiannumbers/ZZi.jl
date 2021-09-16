@@ -48,7 +48,7 @@ function fmpzi()
    return fmpzi(fmpz(), fmpz())
 end
 
-function fmpzi(a::Union{Integer, fmpz})
+function fmpzi(a::IntegerUnion)
    return fmpzi(fmpz(a), fmpz(0))
 end
 
@@ -56,11 +56,11 @@ function (a::FlintZZiRing)()
    return fmpzi()
 end
 
-function (a::FlintZZiRing)(b::Union{Integer, fmpz})
+function (a::FlintZZiRing)(b::IntegerUnion)
    return fmpzi(fmpz(b), fmpz(0))
 end
 
-function (a::FlintZZiRing)(b::Union{Integer, fmpz}, c::Union{Integer, fmpz})
+function (a::FlintZZiRing)(b::IntegerUnion, c::IntegerUnion)
    return fmpzi(fmpz(b), fmpz(c))
 end
 
@@ -99,7 +99,7 @@ function Base.convert(::Type{fmpzi}, a::Complex{T}) where T <: Integer
    return fmpzi(convert(fmpz, real(a)), convert(fmpz, imag(a)))
 end
 
-function Base.convert(::Type{fmpzi}, a::Union{Integer, fmpz})
+function Base.convert(::Type{fmpzi}, a::IntegerUnion)
    return fmpzi(convert(fmpz, a), fmpz(0))
 end
 
@@ -271,11 +271,11 @@ function ==(b::Complex{T}, a::fmpzi) where T <: Integer
    return a == b
 end
 
-function ==(a::fmpzi, b::Union{Integer, fmpz})
+function ==(a::fmpzi, b::IntegerUnion)
    return iszero(a.y) && a.x == b
 end
 
-function ==(b::Union{Integer, fmpz}, a::fmpzi)
+function ==(b::IntegerUnion, a::fmpzi)
    return a == b
 end
 
@@ -297,13 +297,13 @@ function add!(z::fmpzi, a::fmpzi, b::fmpzi)
    return z
 end
 
-function add!(z::fmpzi, a::fmpzi, b::Union{Integer, fmpz})
+function add!(z::fmpzi, a::fmpzi, b::IntegerUnion)
    add!(z.x, a.x, b)
    set!(z.y, a.y)
    return z
 end
 
-function add!(z::fmpzi, b::Union{Integer, fmpz}, a::fmpzi)
+function add!(z::fmpzi, b::IntegerUnion, a::fmpzi)
    return add!(z, a, b)
 end
 
@@ -311,7 +311,7 @@ function +(a::fmpzi, b::Union{Integer, fmpz, fmpzi})
    return add!(fmpzi(), a, b)
 end
 
-function +(a::Union{Integer, fmpz}, b::fmpzi)
+function +(a::IntegerUnion, b::fmpzi)
    return add!(fmpzi(), a, b)
 end
 
@@ -322,13 +322,13 @@ function sub!(z::fmpzi, a::fmpzi, b::fmpzi)
    return z
 end
 
-function sub!(z::fmpzi, a::fmpzi, b::Union{Integer, fmpz})
+function sub!(z::fmpzi, a::fmpzi, b::IntegerUnion)
    sub!(z.x, a.x, b)
    set!(z.y, a.y)
    return z
 end
 
-function sub!(z::fmpzi, a::Union{Integer, fmpz}, b::fmpzi)
+function sub!(z::fmpzi, a::IntegerUnion, b::fmpzi)
    sub!(z.x, a, b.x)
    neg!(z.y, b.y)
    return z
@@ -338,7 +338,7 @@ function -(a::fmpzi, b::Union{Integer, fmpz, fmpzi})
    return sub!(fmpzi(), a, b)
 end
 
-function -(a::Union{Integer, fmpz}, b::fmpzi)
+function -(a::IntegerUnion, b::fmpzi)
    return sub!(fmpzi(), a, b)
 end
 
@@ -395,13 +395,13 @@ function mul!(z::fmpzi, a::fmpzi, b::fmpzi)
    end
 end
 
-function mul!(z::fmpzi, a::fmpzi, b::Union{Integer, fmpz})
+function mul!(z::fmpzi, a::fmpzi, b::IntegerUnion)
    mul!(z.x, a.x, b)
    mul!(z.y, a.y, b)
    return z
 end
 
-function mul!(z::fmpzi, a::Union{Integer, fmpz}, b::fmpzi)
+function mul!(z::fmpzi, a::IntegerUnion, b::fmpzi)
    return mul!(z, b, a)
 end
 
@@ -409,11 +409,11 @@ function *(a::fmpzi, b::fmpzi)
    return _mul!(fmpzi(), a, b)
 end
 
-function *(a::fmpzi, b::Union{Integer, fmpz})
+function *(a::fmpzi, b::IntegerUnion)
    return mul!(fmpzi(), a, b)
 end
 
-function *(a::Union{Integer, fmpz}, b::fmpzi)
+function *(a::IntegerUnion, b::fmpzi)
    return mul!(fmpzi(), a, b)
 end
 
@@ -502,7 +502,7 @@ function divides(a::fmpzi, b::Union{fmpz, fmpzi})
    return iszero(r), q
 end
 
-function divexact!(z::fmpzi, a::fmpzi, b::Union{Integer, fmpz})
+function divexact!(z::fmpzi, a::fmpzi, b::IntegerUnion)
    divexact!(z.x, a.x, b)
    divexact!(z.y, a.y, b)
    return z

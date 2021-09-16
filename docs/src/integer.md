@@ -27,6 +27,13 @@ Flint           | `fmpz`        | `FlintIntegerRing`
 All integer element types belong directly to the abstract type `RingElem` and
 all the integer ring parent object types belong to the abstract type `Ring`.
 
+A lot of code will want to accept both `fmpz` integers and Julia integers,
+that is, subtypes of `Base.Integer`. Thus for convenience we define
+
+```
+IntegerUnion = Union{Integer,fmpz}
+```
+
 ## Integer functionality
 
 Nemo integers provide all of the ring and Euclidean ring functionality of

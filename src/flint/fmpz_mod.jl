@@ -379,7 +379,7 @@ Random.gentype(::Type{FmpzModRing}) = elem_type(FmpzModRing)
 
 RandomExtensions.maketype(R::FmpzModRing, _) = elem_type(R)
 
-rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{fmpz_mod,FmpzModRing,<:AbstractArray{<:Union{fmpz,Integer}}}}) =
+rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{fmpz_mod,FmpzModRing,<:AbstractArray{<:IntegerUnion}}}) =
    sp[][1](rand(rng, sp[][2]))
 
 # define rand(::FmpzModRing, arr), where arr is any abstract array with integer or fmpz entries

@@ -350,7 +350,7 @@ end
 RandomExtensions.maketype(R::GaloisFmpzField, _) = elem_type(R)
 
 rand(rng::AbstractRNG,
-     sp::SamplerTrivial{<:Make2{gfp_fmpz_elem,GaloisFmpzField,<:AbstractArray{<:Union{fmpz,Integer}}}}) =
+     sp::SamplerTrivial{<:Make2{gfp_fmpz_elem,GaloisFmpzField,<:AbstractArray{<:IntegerUnion}}}) =
         sp[][1](rand(rng, sp[][2]))
 
 # define rand(::GaloisFmpzField, arr), where arr is any abstract array with integer or fmpz entries
