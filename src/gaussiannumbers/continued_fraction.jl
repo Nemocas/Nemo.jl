@@ -322,7 +322,7 @@ end
 @doc Markdown.doc"""
     continued_fraction(x; limit::Int = 0)
 
-Return the vector of the first `limit` partial quotient of the continued
+Return the vector of the first `limit` partial quotients of the continued
 fraction of $x$. `limit = 0` corresponds to no limit, that is, all partial
 quotients are generated or as many as can be justified by the precision of the
 input.
@@ -335,7 +335,7 @@ end
 @doc Markdown.doc"""
     continued_fraction_with_matrix(x; limit::Int = 0)
 
-Return the vector of the first `limit` partial quotient of the continued
+Return the vector of the first `limit` partial quotients of the continued
 fraction of $x$ along with the matrix giving the last two convergents.
 """
 function continued_fraction_with_matrix(x::arb; limit::Int = 0)
