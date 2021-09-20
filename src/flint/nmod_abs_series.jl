@@ -684,7 +684,6 @@ end # for
 Return the power series square root of $a$.
 """
 function Base.sqrt(a::gfp_abs_series; check::Bool=true)
-println("a = ", a)
    v = valuation(a)
    z = parent(a)()
    z.prec = a.prec - div(v, 2)
