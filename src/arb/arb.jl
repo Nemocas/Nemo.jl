@@ -1428,16 +1428,20 @@ function sinhcosh(x::arb)
   return (s, c)
 end
 
+function atan(y::arb, x::arb)
+  z = parent(y)()
+  ccall((:arb_atan2, libarb), Nothing,
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, y, x, parent(y).prec)
+  return z
+end
+
 @doc Markdown.doc"""
     atan2(y::arb, x::arb)
 
 Return $\operatorname{atan2}(y,x) = \arg(x+yi)$.
 """
 function atan2(y::arb, x::arb)
-  z = parent(y)()
-  ccall((:arb_atan2, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, y, x, parent(y).prec)
-  return z
+  return atan(y, x)
 end
 
 @doc Markdown.doc"""
