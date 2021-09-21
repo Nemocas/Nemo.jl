@@ -124,7 +124,7 @@ isexact(::arb)
 ```
 
 ```@docs
-isint(::arb)
+isinteger(::arb)
 ```
 
 ```@docs
@@ -165,7 +165,7 @@ b = RR(3)
 
 ispositive(a)
 isfinite(b)
-isint(b)
+isinteger(b)
 isnegative(a)
 c = radius(a)
 d = midpoint(b)

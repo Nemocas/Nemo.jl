@@ -218,7 +218,7 @@ isexact(::acb)
 ```
 
 ```@docs
-isint(::acb)
+isinteger(::acb)
 ```
 
 ```@docs
@@ -235,7 +235,7 @@ b = CC(3)
 
 isreal(a)
 isfinite(b)
-isint(b)
+isinteger(b)
 c = real(a)
 d = imag(b)
 f = accuracy_bits(a)

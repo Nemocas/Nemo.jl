@@ -159,8 +159,8 @@ end
    @test isexact(RR(QQ(1,4)))
    @test !isexact(RR(QQ(1,3)))
 
-   @test isint(RR(3))
-   @test !isint(RR("3 +/- 0.01"))
+   @test isinteger(RR(3))
+   @test !isinteger(RR("3 +/- 0.01"))
 
    @test ispositive(RR(3))
    @test isnonnegative(RR(3))

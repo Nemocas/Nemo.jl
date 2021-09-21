@@ -117,8 +117,8 @@ end
    @test isexact(CC(QQ(1,4)))
    @test !isexact(CC(QQ(1,3)))
 
-   @test isint(CC(3))
-   @test !isint(CC("3 +/- 0.01"))
+   @test isinteger(CC(3))
+   @test !isinteger(CC("3 +/- 0.01"))
 end
 
 @testset "acb.unary_ops" begin

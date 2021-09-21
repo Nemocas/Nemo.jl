@@ -7,11 +7,11 @@
 #
 ###############################################################################
 
-import Base: ceil
+import Base: ceil, isinteger
 
 export ball, radius, midpoint, contains, contains_zero, contains_negative,
        contains_positive, contains_nonnegative, contains_nonpositive, convert,
-       iszero, isnonzero, isexact, isint, ispositive, isfinite, isnonnegative,
+       iszero, isnonzero, isexact, ispositive, isfinite, isnonnegative,
        isnegative, isnonpositive, add!, mul!, sub!, div!, overlaps,
        unique_integer, accuracy_bits, trim, ldexp, setunion, setintersection,
        const_pi, const_e, const_log2, const_log10, const_euler, const_catalan,
@@ -499,11 +499,11 @@ function isexact(x::arb)
 end
 
 @doc Markdown.doc"""
-    isint(x::arb)
+    isinteger(x::arb)
 
 Return `true` if $x$ is an exact integer, otherwise return `false`.
 """
-function isint(x::arb)
+function isinteger(x::arb)
    return Bool(ccall((:arb_is_int, libarb), Cint, (Ref{arb},), x))
 end
 
@@ -946,15 +946,13 @@ function unique_integer(x::arb)
 end
 
 function (::FlintIntegerRing)(a::arb)
-   if !Nemo.isint(a)
-      error("Argument must be an integer.")
+   if !Nemo.isinteger(a)
+      ui = unique_integer(a)
+      if ui[1]
+         return ui[2]
+      end
    end
-   ui = unique_integer(a)
-   if ui[1] == false
-      error("Argument must be an integer.")
-   else
-      return ui[2]
-   end
+   error("Argument must be an integer.")
 end
 
 @doc Markdown.doc"""

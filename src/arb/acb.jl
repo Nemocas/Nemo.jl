@@ -579,11 +579,11 @@ function isexact(x::acb)
 end
 
 @doc Markdown.doc"""
-    isint(x::acb)
+    isinteger(x::acb)
 
 Return `true` if $x$ is an exact integer, otherwise return `false`.
 """
-function isint(x::acb)
+function isinteger(x::acb)
    return Bool(ccall((:acb_is_int, libarb), Cint, (Ref{acb},), x))
 end
 
