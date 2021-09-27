@@ -47,6 +47,8 @@ end
    c = 0.12
    @test fmpz(RR(a)) == a
    @test_throws ErrorException fmpz(RR(c))
+   @test ZZ(RR(a)) == a
+   @test_throws ErrorException ZZ(RR(c))
    @test BigInt(RR(a)) == a
    @test_throws ErrorException BigInt(RR(c))
    @test Int(RR(a)) == a

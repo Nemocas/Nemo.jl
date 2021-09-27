@@ -105,9 +105,11 @@ Return $x$ as an `fmpz` if it represents an unique integer, else throws an
 error.
 """
 function fmpz(x::arb)
-  !isexact(x) && error("Argument must represent a unique integer")
-  (b, n) = unique_integer(x)
-  !b ? error("Argument must represent a unique integer") : return n
+   if isexact(x)
+      ok, z = unique_integer(x)
+      ok && return z
+   end
+   error("Argument must represent a unique integer")
 end
 
 BigInt(x::arb) = BigInt(fmpz(x))
@@ -946,13 +948,7 @@ function unique_integer(x::arb)
 end
 
 function (::FlintIntegerRing)(a::arb)
-   if !Nemo.isinteger(a)
-      ui = unique_integer(a)
-      if ui[1]
-         return ui[2]
-      end
-   end
-   error("Argument must be an integer.")
+   return fmpz(a)
 end
 
 @doc Markdown.doc"""
