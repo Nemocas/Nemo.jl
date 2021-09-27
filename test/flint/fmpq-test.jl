@@ -86,6 +86,9 @@ end
    @test Rational(fmpz(12)) == 12
 
    @test Rational(fmpq(3, 7)) == 3//7
+
+   @test ZZ(fmpq(3)) isa fmpz
+   @test_throws Exception ZZ(fmpq(3, 2))
 end
 
 @testset "fmpq.manipulation" begin
