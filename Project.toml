@@ -1,6 +1,6 @@
 name = "Nemo"
 uuid = "2edaba10-b0f1-5616-af89-8c11ac63239a"
-version = "0.26.1"
+version = "0.27.0"
 
 [deps]
 AbstractAlgebra = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
@@ -21,7 +21,7 @@ SHA = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
-AbstractAlgebra = "^0.21.0"
+AbstractAlgebra = "^0.22.0"
 Antic_jll = "~0.200.500"
 Arb_jll = "~200.2000.0"
 BinaryProvider = "0.4, 0.5"
