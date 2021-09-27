@@ -886,7 +886,7 @@ end
 function (a::FlintIntegerRing)(b::fmpq)
    z = fmpz()
    ccall((:fmpq_denominator, libflint), Nothing, (Ref{fmpz}, Ref{fmpq}), z, b)
-   isone(denominator(b)) || error("Denominator must be 1")
+   isone(z) || error("Denominator must be 1")
    ccall((:fmpq_numerator, libflint), Nothing, (Ref{fmpz}, Ref{fmpq}), z, b)
    return z
 end
