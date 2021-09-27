@@ -435,8 +435,8 @@ end
 ################################################################################
 
 function remove(z::gfp_poly, p::gfp_poly)
-   check_parent(z,p)
-   iszero(z) && error("Not yet implemented")
+   ok, v = _remove_check_simple_cases(z, p)
+   ok && return v, zero(parent(z))
    z = deepcopy(z)
    v = ccall((:nmod_poly_remove, libflint), Int,
                (Ref{gfp_poly}, Ref{gfp_poly}), z,  p)

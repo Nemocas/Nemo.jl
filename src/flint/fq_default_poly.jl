@@ -377,12 +377,12 @@ end
 ################################################################################
 
 function remove(z::fq_default_poly, p::fq_default_poly)
-   check_parent(z,p)
-   iszero(z) && error("Not yet implemented")
+   ok, v = _remove_check_simple_cases(z, p)
+   ok && return v, zero(parent(z))
    z = deepcopy(z)
    v = ccall((:fq_default_poly_remove, libflint), Int,
             (Ref{fq_default_poly}, Ref{fq_default_poly}, Ref{FqDefaultFiniteField}),
-             z,  p, base_ring(parent(z)))
+             z, p, base_ring(parent(z)))
    return v, z
 end
 

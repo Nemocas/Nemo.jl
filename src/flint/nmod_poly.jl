@@ -844,9 +844,23 @@ end
 #
 ################################################################################
 
+# currently returns Tuple{::Bool, ::Int}, but the Int is supposed to be replaced
+# by a type that include infinity
+function _remove_check_simple_cases(a, b)
+   parent(a) == parent(b) || error("Incompatible parents")
+   if (iszero(b) || isunit(b))
+      throw(ArgumentError("Second argument must be a non-zero non-unit"))
+   end
+   if iszero(a)
+      error("Not yet implemented")
+      return (true, 0) # TODO return infinity instead of 0
+   end
+   return (false, 0)
+end
+
 function remove(z::nmod_poly, p::nmod_poly)
-   check_parent(z,p)
-   iszero(z) && error("Not yet implemented")
+   ok, v = _remove_check_simple_cases(z, p)
+   ok && return v, zero(parent(z))
    z = deepcopy(z)
    v = ccall((:nmod_poly_remove, libflint), Int,
                (Ref{nmod_poly}, Ref{nmod_poly}), z,  p)

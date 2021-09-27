@@ -620,6 +620,10 @@ end
   f = (x + 1)^10 * (x + 2) * (x + 3)
   g = x + 1
 
+  @test_throws Exception remove(f, zero(Rx))
+  @test_throws Exception remove(f, one(Rx))
+  @test_throws Exception remove(zero(Rx), g)
+
   n, p = remove(f, g)
 
   @test n == valuation(f, g)

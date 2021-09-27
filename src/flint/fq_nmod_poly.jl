@@ -404,8 +404,8 @@ end
 ################################################################################
 
 function remove(z::fq_nmod_poly, p::fq_nmod_poly)
-   check_parent(z,p)
-   iszero(z) && error("Not yet implemented")
+   ok, v = _remove_check_simple_cases(z, p)
+   ok && return v, zero(parent(z))
    z = deepcopy(z)
    v = ccall((:fq_nmod_poly_remove, libflint), Int,
             (Ref{fq_nmod_poly}, Ref{fq_nmod_poly}, Ref{FqNmodFiniteField}),

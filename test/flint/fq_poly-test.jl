@@ -522,6 +522,10 @@ end
    f = 7y^2 + 3y + 2
    g = f^5*(11y^3 - 2y^2 + 5)
 
+   @test_throws Exception remove(f, zero(S))
+   @test_throws Exception remove(f, one(S))
+   @test_throws Exception remove(zero(S), f)
+
    v, h = remove(g, f)
 
    @test valuation(g, f) == 5
