@@ -1434,7 +1434,7 @@ end
 @doc Markdown.doc"""
     atan2(y::arb, x::arb)
 
-Return $\operatorname{atan2}(y,x) = \arg(x+yi)$.
+Return $\operatorname{atan2}(y,x) = \arg(x+yi)$. Same as `atan(y, x)`.
 """
 function atan2(y::arb, x::arb)
   return atan(y, x)

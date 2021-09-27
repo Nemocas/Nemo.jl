@@ -119,3 +119,8 @@
 # Deprecated in 0.27.*
 
 @deprecate exppii(x::acb) cispi(x)
+
+@deprecate isint(x::arb) isinteger(x)
+
+@deprecate isint(x::acb) isinteger(x)
+
