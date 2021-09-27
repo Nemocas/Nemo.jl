@@ -620,7 +620,9 @@ end
 
    @test a == 8
 
-   @test tstbit(a, 3) == 1
+   @test tstbit(a, 3)
+   @test !tstbit(a, 9)
+   @test !tstbit(a, -1)
 
    @test_throws DomainError combit!(a, -1)
 

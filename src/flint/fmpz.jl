@@ -2064,7 +2064,7 @@ that this function modifies its input in-place.
 """
 function clrbit!(x::fmpz, c::Int)
     c < 0 && throw(DomainError(c, "Second argument must be non-negative"))
-    ccall((:fmpz_clrbit, libflint), Nothing, (Ref{fmpz}, Int), x, c)
+    ccall((:fmpz_clrbit, libflint), Nothing, (Ref{fmpz}, UInt), x, c)
 end
 
 @doc Markdown.doc"""
@@ -2075,7 +2075,7 @@ that this function modifies its input in-place.
 """
 function setbit!(x::fmpz, c::Int)
     c < 0 && throw(DomainError(c, "Second argument must be non-negative"))
-    ccall((:fmpz_setbit, libflint), Nothing, (Ref{fmpz}, Int), x, c)
+    ccall((:fmpz_setbit, libflint), Nothing, (Ref{fmpz}, UInt), x, c)
 end
 
 @doc Markdown.doc"""
@@ -2086,19 +2086,18 @@ Note that this function modifies its input in-place.
 """
 function combit!(x::fmpz, c::Int)
     c < 0 && throw(DomainError(c, "Second argument must be non-negative"))
-    ccall((:fmpz_combit, libflint), Nothing, (Ref{fmpz}, Int), x, c)
+    ccall((:fmpz_combit, libflint), Nothing, (Ref{fmpz}, UInt), x, c)
 end
 
 @doc Markdown.doc"""
     tstbit(x::fmpz, c::Int)
 
-Test bit $i$ of x (numbered from 0) and return 1 or 0 depending if it is set.
+Return bit $i$ of x (numbered from 0) as `true` for 1 or `false` for 0.
 """
 function tstbit(x::fmpz, c::Int)
-   if c < 0
-      return 0
-   end
-   return Bool(ccall((:fmpz_tstbit, libflint), Cint, (Ref{fmpz}, Int), x, c))
+   return c >= 0 && Bool(ccall((:fmpz_tstbit, libflint), Cint,
+                               (Ref{fmpz}, UInt),
+                               x, c))
 end
 
 ###############################################################################
