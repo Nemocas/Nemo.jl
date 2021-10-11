@@ -415,10 +415,6 @@ function (R::GaloisField)(a::fmpq)
    return R(n)*R(V[1])
 end
 
-function (R::GaloisField)(a::gfp_elem)
-   return a
-end
-
 ###############################################################################
 #
 #   GF constructor

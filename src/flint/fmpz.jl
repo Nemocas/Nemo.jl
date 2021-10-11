@@ -388,6 +388,10 @@ function isdivisible_by(x::fmpz, y::Integer)
    end
 end
 
+function isdivisible_by(x::Integer, y::fmpz)
+   return isdivisible_by(fmpz(x), y)
+end
+
 function rem(x::fmpz, c::fmpz)
     iszero(c) && throw(DivideError())
     q = fmpz()

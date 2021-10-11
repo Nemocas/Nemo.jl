@@ -89,6 +89,19 @@ end
    @test data(R(3)) == 3
    @test lift(R(3)) == 3
    @test isa(lift(R(3)), fmpz)
+
+   R2 = ResidueRing(ZZ, ZZ(2))
+   R22 = ResidueRing(ZZ, 2)
+   R3 = ResidueRing(ZZ, ZZ(3))
+   R6 = ResidueRing(ZZ, ZZ(6))
+   @test R2(R6(2)) == 2  && parent(R2(R6(2))) == R2
+   @test R22(R6(2)) == 2 && parent(R22(R6(2))) == R22
+   @test R3(R6(2)) == 2  && parent(R3(R6(2))) == R3
+   @test_throws Exception R6(R3(1))
+   @test_throws Exception R6(R2(1))
+   @test_throws Exception R6(R22(1))
+   @test_throws Exception R2(R3(1))
+   @test_throws Exception R3(R2(1))
 end
 
 @testset "fmpz_mod.unary_ops" begin

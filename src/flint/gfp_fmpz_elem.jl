@@ -395,10 +395,6 @@ function (R::GaloisFmpzField)(a::fmpz)
    return gfp_fmpz_elem(d, R)
 end
 
-function (R::GaloisFmpzField)(a::gfp_fmpz_elem)
-   return a
-end
-
 ###############################################################################
 #
 #   GF constructor
