@@ -422,7 +422,7 @@ function (R::FmpzModRing)(a::fmpz)
    return fmpz_mod(d, R)
 end
 
-function (R::Union{GaloisFmpzField, FmpzModRing})(a::Union{gfp_elem, nmod, gfp_fmpz_elem, fmpz_mod})
+function (R::FmpzModRing)(a::Union{gfp_elem, nmod, gfp_fmpz_elem, fmpz_mod})
    S = parent(a)
    if S === R
       return a

@@ -449,7 +449,7 @@ function (R::NmodRing)(a::fmpz)
    return nmod(d, R)
 end
 
-function (R::Union{GaloisField, NmodRing})(a::Union{gfp_elem, nmod, gfp_fmpz_elem, fmpz_mod})
+function (R::NmodRing)(a::Union{gfp_elem, nmod, gfp_fmpz_elem, fmpz_mod})
    S = parent(a)
    if S === R
       return a

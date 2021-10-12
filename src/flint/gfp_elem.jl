@@ -415,6 +415,16 @@ function (R::GaloisField)(a::fmpq)
    return R(n)*R(V[1])
 end
 
+function (R::GaloisField)(a::Union{gfp_elem, nmod, gfp_fmpz_elem, fmpz_mod})
+   S = parent(a)
+   if S === R
+      return a
+   else
+      isdivisible_by(modulus(S), modulus(R)) || error("incompatible parents")
+      return R(data(a))
+   end
+end
+
 ###############################################################################
 #
 #   GF constructor
