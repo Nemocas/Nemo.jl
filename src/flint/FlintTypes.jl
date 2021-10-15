@@ -1440,6 +1440,8 @@ mutable struct FmpqMPolyRing <: MPolyRing{fmpq}
             error("$S is not a valid ordering")
          end
 
+         isempty(s) && error("need at least one indeterminate")
+
          z = new()
          ccall((:fmpq_mpoly_ctx_init, libflint), Nothing,
                (Ref{FmpqMPolyRing}, Int, Int),
