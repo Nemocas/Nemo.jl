@@ -1240,6 +1240,8 @@ mutable struct FmpzMPolyRing <: MPolyRing{fmpz}
             error("$S is not a valid ordering")
          end
 
+         isempty(s) && error("need at least one indeterminate")
+
          z = new()
          ccall((:fmpz_mpoly_ctx_init, libflint), Nothing,
                (Ref{FmpzMPolyRing}, Int, Int),
@@ -1659,6 +1661,8 @@ mutable struct NmodMPolyRing <: MPolyRing{nmod}
             error("$S is not a valid ordering")
          end
 
+         isempty(s) && error("need at least one indeterminate")
+
          z = new()
          ccall((:nmod_mpoly_ctx_init, libflint), Nothing,
                (Ref{NmodMPolyRing}, Int, Cint, UInt),
@@ -1852,6 +1856,8 @@ mutable struct GFPMPolyRing <: MPolyRing{gfp_elem}
          else
             error("$S is not a valid ordering")
          end
+
+         isempty(s) && error("need at least one indeterminate")
 
          z = new()
          ccall((:nmod_mpoly_ctx_init, libflint), Nothing,
