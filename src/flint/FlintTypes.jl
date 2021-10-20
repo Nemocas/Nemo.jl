@@ -2619,7 +2619,6 @@ mutable struct FqNmodMPolyRing <: MPolyRing{fq_nmod}
    S::Vector{Symbol}
 
    function FqNmodMPolyRing(R::FqNmodFiniteField, s::Vector{Symbol}, S::Symbol, cached::Bool = true)
-      isempty(s) && error("variable list is empty")
       if cached && haskey(FqNmodMPolyID, (R, s, S))
          return FqNmodMPolyID[R, s, S]
       else
@@ -2632,6 +2631,8 @@ mutable struct FqNmodMPolyRing <: MPolyRing{fq_nmod}
          else
             error("$S is not a valid ordering")
          end
+
+         isempty(s) && error("need at least one indeterminate")
 
          z = new()
          ccall((:fq_nmod_mpoly_ctx_init, libflint), Nothing,
