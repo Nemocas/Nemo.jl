@@ -6643,3 +6643,46 @@ function _rand_ctx_clear_fn(a::rand_ctx)
    ccall((:flint_rand_free, libflint), Cvoid, (Ptr{Cvoid}, ), a.ptr)
    nothing
 end
+
+################################################################################
+#
+# Unsafe iterators
+#
+################################################################################
+
+struct MPolyCoeffs_Unsafe{T, S}
+   poly::T
+   coeff::S
+end
+
+struct MPolyExponentVectors_Unsafe{T, S}
+   poly::T
+   vec::Vector{S}
+end
+
+struct MPolyTerms_Unsafe{T}
+   poly::T
+   term::T
+end
+
+function Base.iterate(x::MPolyCoeffs_Unsafe{T, S}, state = 0) where {T, S}
+   state += 1
+   state > length(x.poly) && return nothing
+   coeff!(x.coeff, x.poly, state)
+   return x.coeff, state
+end
+
+function Base.iterate(x::MPolyExponentVectors_Unsafe{T, S}, state = 0) where {T, S}
+   state += 1
+   state > length(x.poly) && return nothing
+   exponent_vector!(x.vec, x.poly, state)
+   return x.vec, state
+end
+
+function Base.iterate(x::MPolyTerms_Unsafe{T}, state = 0) where T
+   state += 1
+   state > length(x.poly) && return nothing
+   term!(x.term, x.poly, state)
+   return x.term, state
+end
+

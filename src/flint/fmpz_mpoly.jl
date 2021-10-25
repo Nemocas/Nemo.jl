@@ -139,14 +139,18 @@ end
 #
 ################################################################################
 
-function coeff(a::fmpz_mpoly, i::Int)
-   z = fmpz()
-   n = length(a)
-   (i < 1 || i > n) && error("Index must be between 1 and $(length(a))")
+function coeff!(z::fmpz, a::fmpz_mpoly, i::Int)
    ccall((:fmpz_mpoly_get_term_coeff_fmpz, libflint), Nothing,
          (Ref{fmpz}, Ref{fmpz_mpoly}, Int, Ref{FmpzMPolyRing}),
          z, a, i - 1, a.parent)
    return z
+end
+
+function coeff(a::fmpz_mpoly, i::Int)
+   n = length(a)
+   # this check is not needed as fmpz_mpoly_get_term_coeff_fmpz throws
+   (i < 1 || i > n) && error("Index must be between 1 and $(length(a))")
+   return coeff!(fmpz(), a, i)
 end
 
 function coeff(a::fmpz_mpoly, b::fmpz_mpoly)
@@ -809,36 +813,49 @@ function exponent_vector_fits_int(a::fmpz_mpoly, i::Int)
 end
 
 # Return Julia array of UInt's corresponding to exponent vector of i-th term
+function exponent_vector!(z::Vector{UInt}, a::fmpz_mpoly, i::Int)
+   ccall((:fmpz_mpoly_get_term_exp_ui, libflint), Nothing,
+         (Ptr{Int}, Ref{fmpz_mpoly}, Int, Ref{FmpzMPolyRing}),
+         z, a, i - 1, parent(a))
+   return z
+end
+
 function exponent_vector_ui(a::fmpz_mpoly, i::Int)
    z = Vector{UInt}(undef, nvars(parent(a)))
-   ccall((:fmpz_mpoly_get_term_exp_ui, libflint), Nothing,
-         (Ptr{UInt}, Ref{fmpz_mpoly}, Int, Ref{FmpzMPolyRing}),
-      z, a, i - 1, parent(a))
-   return z
+   return exponent_vector!(z, a, i)
 end
 
 # Return Julia array of Int's corresponding to exponent vector of i-th term
-function exponent_vector(a::fmpz_mpoly, i::Int)
-   exponent_vector_fits_int(a, i) ||
-      throw(DomainError(term(a, i), "exponents don't fit in `Int` (try exponent_vector_fmpz)"))
-   z = Vector{Int}(undef, nvars(parent(a)))
+function exponent_vector!(z::Vector{Int}, a::fmpz_mpoly, i::Int)
    ccall((:fmpz_mpoly_get_term_exp_si, libflint), Nothing,
-         (Ptr{Int}, Ref{fmpz_mpoly}, Int, Ref{FmpzMPolyRing}),
-      z, a, i - 1, parent(a))
+         (Ref{Int}, Ref{fmpz_mpoly}, Int, Ref{FmpzMPolyRing}),
+         z, a, i - 1, parent(a))
    return z
 end
 
+function exponent_vector(a::fmpz_mpoly, i::Int)
+   # this check is not needed as fmpz_mpoly_get_term_exp_si throws
+   exponent_vector_fits_int(a, i) ||
+      throw(DomainError(term(a, i), "exponents don't fit in `Int` (try exponent_vector_fmpz)"))
+   z = Vector{Int}(undef, nvars(parent(a)))
+   return exponent_vector!(z, a, i)
+end
+
 # Return Julia array of fmpz's corresponding to exponent vector of i-th term
+function exponent_vector!(z::Vector{fmpz}, a::fmpz_mpoly, i::Int)
+   ccall((:fmpz_mpoly_get_term_exp_fmpz, libflint), Nothing,
+         (Ptr{Ref{fmpz}}, Ref{fmpz_mpoly}, Int, Ref{FmpzMPolyRing}),
+         z, a, i - 1, parent(a))
+   return z
+end
+
 function exponent_vector_fmpz(a::fmpz_mpoly, i::Int)
    n = nvars(parent(a))
    z = Vector{fmpz}(undef, n)
    for j in 1:n
       z[j] = fmpz()
    end
-   ccall((:fmpz_mpoly_get_term_exp_fmpz, libflint), Nothing,
-         (Ptr{Ref{fmpz}}, Ref{fmpz_mpoly}, Int, Ref{FmpzMPolyRing}),
-         z, a, i - 1, parent(a))
-   return z
+   return exponent_vector!(z, a, i)
 end
 
 # Return a generator for exponent vectors of $a$
@@ -949,12 +966,15 @@ function sort_terms!(a::fmpz_mpoly)
 end
 
 # Return the i-th term of the polynomial, as a polynomial
-function term(a::fmpz_mpoly, i::Int)
-   z = parent(a)()
+function term!(z::fmpz_mpoly, a::fmpz_mpoly, i::Int)
    ccall((:fmpz_mpoly_get_term, libflint), Nothing,
          (Ref{fmpz_mpoly}, Ref{fmpz_mpoly}, Int, Ref{FmpzMPolyRing}),
           z, a, i - 1, a.parent)
    return z
+end
+
+function term(a::fmpz_mpoly, i::Int)
+   return term!(parent(a)(), a, i)
 end
 
 # Return the i-th monomial of the polynomial, as a polynomial
@@ -972,6 +992,132 @@ function monomial!(m::fmpz_mpoly, a::fmpz_mpoly, i::Int)
          (Ref{fmpz_mpoly}, Ref{fmpz_mpoly}, Int, Ref{FmpzMPolyRing}),
           m, a, i - 1, a.parent)
    return m
+end
+
+###############################################################################
+#
+# Iterators
+#
+###############################################################################
+
+function coefficients!(a::fmpz_mpoly)
+   return MPolyCoeffs_Unsafe{fmpz_mpoly, fmpz}(a, fmpz())
+end
+
+function exponent_vectors!(::Type{S}, a::fmpz_mpoly) where S <: Union{Int, UInt}
+   v = zeros(S, nvars(parent(a)))
+   return MPolyExponentVectors_Unsafe{fmpz_mpoly, S}(a, v)
+end
+
+function exponent_vectors!(::Type{fmpz}, a::fmpz_mpoly)
+   v = fmpz[fmpz() for i in 1:nvars(parent(a))]
+   return MPolyExponentVectors_Unsafe{fmpz_mpoly, fmpz}(a, v)
+end
+
+function exponent_vectors!(a::fmpz_mpoly)
+   return exponent_vetors!(Int, a)
+end
+
+function terms!(a::fmpz_mpoly)
+   return MPolyTerms_Unsafe{fmpz_mpoly}(a, parent(a)())
+end
+
+# type into which the exponent vectors necessarily fit
+function _exponent_vector_type(a::fmpz_mpoly)
+   return a.bits <= 8*sizeof(Int) ? Int : fmpz
+end
+
+###############################################################################
+#
+# Hashing
+#
+###############################################################################
+
+function _hash0_mpoly_via(::Type{S}, a::fmpz_mpoly, h::UInt) where S
+   b = 0x53dd43cd511044d1%UInt
+   n = length(a)
+   m = nvars(parent(a))
+   c = base_ring(a)()
+   e = S[zero(S) for i in 1:m]
+   for i in 1:n
+      coeff!(c, a, i)
+      b = xor(b, hash(c, h))
+      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+      exponent_vector!(e, a, i)
+      for j in 1:m
+         b = xor(b, hash(e[j], h))
+         b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+      end
+   end
+   return b
+end
+
+function _hash1_mpoly_via(::Type{S}, a::fmpz_mpoly, h::UInt) where S
+   b = 0x53dd43cd511044d1%UInt
+   n = length(a)
+   c = fmpz()
+   e = S[zero(S) for i in 1:nvars(parent(a))]
+   for i in 1:n
+      coeff!(c, a, i)
+      b = xor(b, hash(c, h), h)
+      exponent_vector!(e, a, i)
+      b = xor(b, hash(e, h), h)
+      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+   end
+   return b
+end
+
+function _hash2_mpoly_via(::Type{S}, a::fmpz_mpoly, h::UInt) where S
+   b = 0x53dd43cd511044d1%UInt
+   for (c, e) in zip(coefficients!(a), exponent_vectors!(S, a))
+      b = xor(b, hash(c, h), h)
+      b = xor(b, hash(e, h), h)
+      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+   end
+   return b
+end
+
+function myhash0(a::fmpz_mpoly, h::UInt)
+   return _hash0_mpoly_via(_exponent_vector_type(a), a, h)
+end
+
+function myhash1(a::fmpz_mpoly, h::UInt)
+   return _hash1_mpoly_via(_exponent_vector_type(a), a, h)
+end
+
+function myhash2(a::fmpz_mpoly, h::UInt)
+   return _hash2_mpoly_via(_exponent_vector_type(a), a, h)
+end
+
+###############################################################################
+#
+# String/IO
+#
+###############################################################################
+
+function _expressify_monomial!(prod::Expr, x, v, n::Int)
+   for i in 1:n
+      if v[i] > 1
+         push!(prod.args, Expr(:call, :^, x[i], deepcopy(v[i])))
+      elseif v[i] == 1
+         push!(prod.args, x[i])
+      end
+   end
+end
+
+function _expressify_mpoly_via(::Type{S}, a::fmpz_mpoly, x, context) where S
+   sum = Expr(:call, :+)
+   for (c, v) in zip(coefficients(a), exponent_vectors!(S, a))
+      prod = Expr(:call, :*)
+      isone(c) || push!(prod.args, AbstractAlgebra.expressify(c, context = context))
+      _expressify_monomial!(prod, x, v, length(v))
+      push!(sum.args, prod)
+   end
+   return sum
+end
+
+function AbstractAlgebra.expressify(a::fmpz_mpoly, x = symbols(parent(a)); context = nothing)
+   return _expressify_mpoly_via(_exponent_vector_type(a), a, x, context)
 end
 
 ###############################################################################
