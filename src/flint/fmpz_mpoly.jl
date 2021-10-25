@@ -478,7 +478,17 @@ function (::Type{Fac{fmpz_mpoly}})(fac::fmpz_mpoly_factor, preserve_input::Bool 
    ccall((:fmpz_mpoly_factor_get_constant_fmpz, libflint), Nothing,
          (Ref{fmpz}, Ref{fmpz_mpoly_factor}),
          c, fac)
-   F.unit = R(c)
+   sgnc = ccall((:fmpz_sgn, libflint), Cint, (Ref{fmpz},), c)
+   if sgnc != 0
+      G = fmpz_factor()
+      ccall((:fmpz_factor, libflint), Nothing, (Ref{fmpz_factor}, Ref{fmpz}), G, c)
+      for i in 1:G.num
+        ccall((:fmpz_factor_get_fmpz, libflint), Nothing,
+              (Ref{fmpz}, Ref{fmpz_factor}, Int), c, G, i - 1)
+        F.fac[R(c)] = unsafe_load(G.exp, i)
+      end
+   end
+   F.unit = R(sgnc)
    return F
 end
 

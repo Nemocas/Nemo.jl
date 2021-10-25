@@ -464,10 +464,12 @@ end
 
    function check_factor(a, esum)
       f = factor(a)
+      @test isunit(unit(f))
       @test a == unit(f) * prod([p^e for (p, e) in f])
       @test esum == sum(e for (p, e) in f)
 
       f = factor_squarefree(a)
+      @test isunit(unit(f))
       @test a == unit(f) * prod([p^e for (p, e) in f])
    end
 
@@ -475,6 +477,8 @@ end
    fac = factor((x^2-y^2*z^3)*(x+y+z)*(x+2*y+z)^2*(2*x+y-z)^3)
    @test occursin("x", sprint(show, "text/plain", fac))
    check_factor(x^99-y^99*z^33, 4)
+   check_factor(12*x, 4)
+   check_factor(-32*x + 32*y, 6)
 end
 
 @testset "fmpz_mpoly.sqrt" begin
