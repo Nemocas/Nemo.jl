@@ -67,8 +67,6 @@ mutable struct fmpz <: RingElem
     fmpz(x::fmpz) = x
 end
 
-const IntegerUnion = Union{Integer,fmpz}
-
 function _fmpz_clear_fn(a::fmpz)
    ccall((:fmpz_clear, libflint), Nothing, (Ref{fmpz},), a)
 end
@@ -828,8 +826,6 @@ function _gfp_poly_factor_clear_fn(a::gfp_poly_factor)
           (Ref{gfp_poly_factor}, ), a)
 end
 
-const Zmodn_poly = Union{nmod_poly, gfp_poly}
-
 ###############################################################################
 #
 #   FmpzModPolyRing / fmpz_mod_poly
@@ -1043,8 +1039,6 @@ end
 
 const GFPFmpzPolyRingID = Dict{Tuple{GaloisFmpzField, Symbol}, GFPFmpzPolyRing}()
 
-const ZmodNFmpzPolyRing = Union{FmpzModPolyRing, GFPFmpzPolyRing}
-
 mutable struct gfp_fmpz_poly <: PolyElem{gfp_fmpz_elem}
    coeffs::Ptr{Nothing}
    alloc::Int
@@ -1203,8 +1197,6 @@ function _gfp_fmpz_poly_factor_clear_fn(a::gfp_fmpz_poly_factor)
          (Ref{gfp_fmpz_poly_factor}, Ref{fmpz_mod_ctx_struct}),
          a, a.n)
 end
-
-const Zmodn_fmpz_poly = Union{fmpz_mod_poly, gfp_fmpz_poly}
 
 ###############################################################################
 #
@@ -2003,8 +1995,6 @@ function _gfp_mpoly_clear_fn(a::gfp_mpoly)
          (Ref{gfp_mpoly}, Ref{GFPMPolyRing}),
          a, a.parent)
 end
-
-const Zmodn_mpoly = Union{nmod_mpoly, gfp_mpoly}
 
 mutable struct gfp_mpoly_factor
    constant::UInt
@@ -3167,8 +3157,6 @@ RingElem
       new{T}(d, scale)
    end
 end
-
-const FlintPuiseuxSeriesElem{T} = Union{FlintPuiseuxSeriesRingElem{T}, FlintPuiseuxSeriesFieldElem{T}} where T <: RingElem
 
 ###############################################################################
 #
@@ -5549,8 +5537,6 @@ function _gfp_mat_clear_fn(mat::gfp_mat)
   ccall((:nmod_mat_clear, libflint), Nothing, (Ref{gfp_mat}, ), mat)
 end
 
-const Zmodn_mat = Union{nmod_mat, gfp_mat}
-
 ###############################################################################
 #
 #   FqDefaultPolyRing / fq_default_poly
@@ -6643,3 +6629,28 @@ function _rand_ctx_clear_fn(a::rand_ctx)
    ccall((:flint_rand_free, libflint), Cvoid, (Ptr{Cvoid}, ), a.ptr)
    nothing
 end
+
+################################################################################
+#
+# Type unions
+#
+################################################################################
+
+const IntegerUnion = Union{Integer, fmpz}
+
+const ZmodNFmpzPolyRing = Union{FmpzModPolyRing, GFPFmpzPolyRing}
+
+const Zmodn_poly = Union{nmod_poly, gfp_poly}
+
+const Zmodn_fmpz_poly = Union{fmpz_mod_poly, gfp_fmpz_poly}
+
+const Zmodn_mpoly = Union{nmod_mpoly, gfp_mpoly}
+
+const FlintPuiseuxSeriesElem{T} = Union{FlintPuiseuxSeriesRingElem{T},
+                            FlintPuiseuxSeriesFieldElem{T}} where T <: RingElem
+
+const Zmodn_mat = Union{nmod_mat, gfp_mat}
+
+const FlintMPolyUnion = Union{fmpz_mpoly, fmpq_mpoly, nmod_mpoly, gfp_mpoly,
+                              fq_nmod_mpoly}
+

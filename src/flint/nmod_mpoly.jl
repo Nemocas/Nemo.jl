@@ -837,47 +837,35 @@ end
 #
 ###############################################################################
 
-# Return true if the exponents of the i-th exp. vector fit into UInts
-function exponent_vector_fits_ui(a::($etype), i::Int)
-   return Bool(ccall((:nmod_mpoly_term_exp_fits_ui, libflint), Cint,
-                     (Ref{($etype)}, Int, Ref{($rtype)}),
-                     a, i - 1, a.parent))
+function exponent_vector_fits(::Type{Int}, a::($etype), i::Int)
+   b = ccall((:nmod_mpoly_term_exp_fits_si, libflint), Cint,
+             (Ref{($etype)}, Int, Ref{($rtype)}),
+             a, i - 1, parent(a))
+   return Bool(b)
 end
 
-# Return true if the exponents of the i-th exp. vector fit into UInts
-function exponent_vector_fits_int(a::($etype), i::Int)
-   return Bool(ccall((:nmod_mpoly_term_exp_fits_si, libflint), Cint,
-                     (Ref{($etype)}, Int, Ref{($rtype)}),
-                     a, i - 1, a.parent))
+function exponent_vector_fits(::Type{UInt}, a::($etype), i::Int)
+   b = ccall((:nmod_mpoly_term_exp_fits_ui, libflint), Cint,
+             (Ref{($etype)}, Int, Ref{($rtype)}),
+             a, i - 1, parent(a))
+   return Bool(b)
 end
 
-# Return Julia array of UInt's corresponding to exponent vector of i-th term
-function exponent_vector_ui(a::($etype), i::Int)
-   z = Vector{UInt}(undef, nvars(parent(a)))
-   ccall((:nmod_mpoly_get_term_exp_ui, libflint), Nothing,
-         (Ptr{UInt}, Ref{($etype)}, Int, Ref{($rtype)}),
-         z, a, i - 1, parent(a))
-   return z
-end
-
-# Return Julia array of Int's corresponding to exponent vector of i-th term
-function exponent_vector(a::($etype), i::Int)
-   exponent_vector_fits_int(a, i) ||
-      throw(DomainError(term(a, i), "exponents don't fit in `Int` (try exponent_vector_fmpz)"))
-   z = Vector{Int}(undef, nvars(parent(a)))
+function exponent_vector!(z::Vector{Int}, a::($etype), i::Int)
    ccall((:nmod_mpoly_get_term_exp_si, libflint), Nothing,
          (Ptr{Int}, Ref{($etype)}, Int, Ref{($rtype)}),
          z, a, i - 1, parent(a))
    return z
 end
 
-# Return Julia array of fmpz's corresponding to exponent vector of i-th term
-function exponent_vector_fmpz(a::($etype), i::Int)
-   n = nvars(parent(a))
-   z = Vector{fmpz}(undef, n)
-   for j in 1:n
-      z[j] = fmpz()
-   end
+function exponent_vector!(z::Vector{UInt}, a::($etype), i::Int)
+   ccall((:nmod_mpoly_get_term_exp_ui, libflint), Nothing,
+         (Ptr{UInt}, Ref{($etype)}, Int, Ref{($rtype)}),
+         z, a, i - 1, parent(a))
+   return z
+end
+
+function exponent_vector!(z::Vector{fmpz}, a::($etype), i::Int)
    ccall((:nmod_mpoly_get_term_exp_fmpz, libflint), Nothing,
          (Ptr{Ref{fmpz}}, Ref{($etype)}, Int, Ref{($rtype)}),
          z, a, i - 1, parent(a))

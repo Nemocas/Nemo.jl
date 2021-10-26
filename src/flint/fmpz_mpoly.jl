@@ -139,14 +139,18 @@ end
 #
 ################################################################################
 
-function coeff(a::fmpz_mpoly, i::Int)
-   z = fmpz()
-   n = length(a)
-   (i < 1 || i > n) && error("Index must be between 1 and $(length(a))")
+function coeff!(z::fmpz, a::fmpz_mpoly, i::Int)
    ccall((:fmpz_mpoly_get_term_coeff_fmpz, libflint), Nothing,
          (Ref{fmpz}, Ref{fmpz_mpoly}, Int, Ref{FmpzMPolyRing}),
          z, a, i - 1, a.parent)
    return z
+end
+
+function coeff(a::fmpz_mpoly, i::Int)
+   n = length(a)
+   # this check is not needed as fmpz_mpoly_get_term_coeff_fmpz throws
+   (i < 1 || i > n) && error("Index must be between 1 and $(length(a))")
+   return coeff!(fmpz(), a, i)
 end
 
 function coeff(a::fmpz_mpoly, b::fmpz_mpoly)
@@ -794,47 +798,35 @@ end
 #
 ###############################################################################
 
-# Return true if the exponents of the i-th exp. vector fit into UInts
-function exponent_vector_fits_ui(a::fmpz_mpoly, i::Int)
+function exponent_vector_fits(::Type{Int}, a::fmpz_mpoly, i::Int)
    b = ccall((:fmpz_mpoly_term_exp_fits_ui, libflint), Cint,
-             (Ref{fmpz_mpoly}, Int, Ref{FmpzMPolyRing}), a, i - 1, a.parent)
-      return Bool(b)
-end
-
-# Return true if the exponents of the i-th exp. vector fit into UInts
-function exponent_vector_fits_int(a::fmpz_mpoly, i::Int)
-   b = ccall((:fmpz_mpoly_term_exp_fits_si, libflint), Cint,
-             (Ref{fmpz_mpoly}, Int, Ref{FmpzMPolyRing}), a, i - 1, a.parent)
+             (Ref{fmpz_mpoly}, Int, Ref{FmpzMPolyRing}),
+             a, i - 1, a.parent)
    return Bool(b)
 end
 
-# Return Julia array of UInt's corresponding to exponent vector of i-th term
-function exponent_vector_ui(a::fmpz_mpoly, i::Int)
-   z = Vector{UInt}(undef, nvars(parent(a)))
-   ccall((:fmpz_mpoly_get_term_exp_ui, libflint), Nothing,
-         (Ptr{UInt}, Ref{fmpz_mpoly}, Int, Ref{FmpzMPolyRing}),
-      z, a, i - 1, parent(a))
-   return z
+function exponent_vector_fits(::Type{UInt}, a::fmpz_mpoly, i::Int)
+   b = ccall((:fmpz_mpoly_term_exp_fits_si, libflint), Cint,
+             (Ref{fmpz_mpoly}, Int, Ref{FmpzMPolyRing}),
+             a, i - 1, a.parent)
+   return Bool(b)
 end
 
-# Return Julia array of Int's corresponding to exponent vector of i-th term
-function exponent_vector(a::fmpz_mpoly, i::Int)
-   exponent_vector_fits_int(a, i) ||
-      throw(DomainError(term(a, i), "exponents don't fit in `Int` (try exponent_vector_fmpz)"))
-   z = Vector{Int}(undef, nvars(parent(a)))
+function exponent_vector!(z::Vector{Int}, a::fmpz_mpoly, i::Int)
    ccall((:fmpz_mpoly_get_term_exp_si, libflint), Nothing,
          (Ptr{Int}, Ref{fmpz_mpoly}, Int, Ref{FmpzMPolyRing}),
-      z, a, i - 1, parent(a))
+         z, a, i - 1, parent(a))
    return z
 end
 
-# Return Julia array of fmpz's corresponding to exponent vector of i-th term
-function exponent_vector_fmpz(a::fmpz_mpoly, i::Int)
-   n = nvars(parent(a))
-   z = Vector{fmpz}(undef, n)
-   for j in 1:n
-      z[j] = fmpz()
-   end
+function exponent_vector!(z::Vector{UInt}, a::fmpz_mpoly, i::Int)
+   ccall((:fmpz_mpoly_get_term_exp_ui, libflint), Nothing,
+         (Ptr{UInt}, Ref{fmpz_mpoly}, Int, Ref{FmpzMPolyRing}),
+         z, a, i - 1, parent(a))
+   return z
+end
+
+function exponent_vector!(z::Vector{fmpz}, a::fmpz_mpoly, i::Int)
    ccall((:fmpz_mpoly_get_term_exp_fmpz, libflint), Nothing,
          (Ptr{Ref{fmpz}}, Ref{fmpz_mpoly}, Int, Ref{FmpzMPolyRing}),
          z, a, i - 1, parent(a))
