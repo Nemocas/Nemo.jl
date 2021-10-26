@@ -136,3 +136,38 @@ function Base.hash(a::FlintMPolyUnion, h::UInt)
    return xor(h, 0x53dd43cd511044d1%UInt)
 end
 
+###############################################################################
+#
+# Expressify
+#
+###############################################################################
+
+function _expressify_monomial!(prod::Expr, x, e)
+   for i in 1:length(e)
+      if e[i] > 1
+         push!(prod.args, Expr(:call, :^, x[i], deepcopy(e[i])))
+      elseif e[i] == 1
+         push!(prod.args, x[i])
+      end
+   end
+end
+
+function _expressify_mpoly_via(::Type{S}, a::FlintMPolyUnion, x, context) where S
+   sum = Expr(:call, :+)
+   n = nvars(parent(a))
+   e = S[zero(S) for i in 1:n]
+   for i in 1:length(a)
+      prod = Expr(:call, :*)
+      c = coeff(a, i)
+      isone(c) || push!(prod.args, expressify(c, context = context))
+      exponent_vector!(e, a, i)
+      _expressify_monomial!(prod, x, e)
+      push!(sum.args, prod)
+   end
+   return sum
+end
+
+function expressify(a::FlintMPolyUnion, x = symbols(parent(a)); context = nothing)
+   return _expressify_mpoly_via(_exponent_vector_type(a), a, x, context)
+end
+

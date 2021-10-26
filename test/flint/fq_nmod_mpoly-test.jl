@@ -68,6 +68,10 @@ end
    @test string(S(a)) == "a"
    @test string(x) == "x"
    @test string(y) == "y"
+
+   a = fmpz(3)^100
+   b = fmpz(2)^100
+   @test string(x^a + y^b) == "x^$a + y^$b"
 end
 
 @testset "fq_nmod_mpoly.hash" begin
