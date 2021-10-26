@@ -1459,8 +1459,8 @@ end
 const FmpqMPolyID = Dict{Tuple{Vector{Symbol}, Symbol}, FmpqMPolyRing}()
 
 mutable struct fmpq_mpoly <: MPolyElem{fmpq}
-   content_num::Ptr{Nothing}
-   content_den::Ptr{Nothing}
+   content_num::Int
+   content_den::Int
    coeffs::Ptr{Nothing}
    exps::Ptr{Nothing}
    alloc::Int

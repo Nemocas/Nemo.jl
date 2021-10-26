@@ -70,6 +70,16 @@ end
    @test string(y) == "y"
 end
 
+@testset "fq_nmod_mpoly.hash" begin
+   R, a = FiniteField(23, 5, "a")
+   S, (x, y) = PolynomialRing(R, ["x", "y"])
+
+   p = y^fmpz(2)^100
+
+   @test hash(x) == hash((x + y) - y)
+   @test hash(x) == hash((x + p) - p)
+end
+
 @testset "fq_nmod_mpoly.manipulation" begin
    R, a = FiniteField(23, 5, "a")
 

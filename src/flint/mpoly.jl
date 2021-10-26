@@ -17,7 +17,7 @@ end
 # Return Julia array of Int's or UInt's corresponding to exponent vector of i-th term
 function exponent_vector(::Type{T}, a::FlintMPolyUnion, i::Int) where T <: Union{Int, UInt}
    if !exponent_vector_fits(T, a, i)
-      throw(DomainError(term(a, i), "exponents do not fit in $S"))
+      throw(DomainError(term(a, i), "exponents do not fit in $T"))
    end
    z = Vector{T}(undef, nvars(parent(a)))
    return exponent_vector!(z, a, i)
@@ -43,5 +43,96 @@ end
 
 function exponent_vector_fmpz(a::FlintMPolyUnion, i::Int)
    return exponent_vector(fmpz, a, i)
+end
+
+# type into which the exponent vectors necessarily fit
+function _exponent_vector_type(a::FlintMPolyUnion)
+   return a.bits <= Sys.WORD_SIZE ? Int : fmpz
+end
+
+###############################################################################
+#
+# Hash
+#
+###############################################################################
+
+function _hash_ui_array(a::Ptr{UInt}, n::Int, h::UInt)
+   for i in 1:n
+      h = hash(unsafe_load(a, i), h)
+   end
+   return h
+end
+
+# an array of fmpz's
+function _hash_integer_array(a::Ptr{Int}, n::Int, h::UInt)
+   for i in 1:n
+      h = _hash_integer(unsafe_load(a, i), h)
+   end
+   return h
+end
+
+function _hash_mpoly_coeffs(a::fmpz_mpoly, h::UInt)
+   GC.@preserve a begin
+      h = _hash_integer_array(convert(Ptr{Int}, a.coeffs), a.length, h)
+      return h
+   end
+end
+
+function _hash_mpoly_coeffs(a::fmpq_mpoly, h::UInt)
+   GC.@preserve a begin
+      h = _hash_integer_array(convert(Ptr{Int}, a.coeffs), a.length, h)
+      h = _hash_integer(a.content_num, h)
+      h = _hash_integer(a.content_den, h)
+      return h
+   end
+end
+
+function _hash_mpoly_coeffs(a::Zmodn_mpoly, h::UInt)
+   GC.@preserve a begin
+      h = _hash_ui_array(convert(Ptr{UInt}, a.coeffs), a.length, h)
+      return h
+   end
+end
+
+function _hash_mpoly_coeffs(a::fq_nmod_mpoly, h::UInt)
+   GC.@preserve a begin
+      d = degree(base_ring(a))
+      h = hash(d, h)
+      h = _hash_ui_array(convert(Ptr{UInt}, a.coeffs), d*a.length, h)
+      return h
+   end
+end
+
+# fallback
+function _hash_mpoly_coeffs(a::FlintMPolyUnion, h::UInt) where S
+   c = base_ring(a)()
+   for i in 1:length(a)
+      h = hash(coeff(a, i), h)
+   end
+   return h
+end
+
+function _hash_mpoly_exps_via(::Type{S}, a::FlintMPolyUnion, h::UInt) where S
+   n = nvars(parent(a))
+   e = S[zero(S) for i in 1:n]
+   h = hash(length(a), h)
+   for i in 1:length(a)
+      exponent_vector!(e, a, i)
+      for j in 1:n
+         # crutially, fmpz's hash_integer agrees with Int and UInt
+         if S == fmpz
+            h = hash_integer((@inbounds e[j]), h)
+         else
+            h = Base.hash_integer((@inbounds e[j]), h)
+         end
+      end
+   end
+   return h
+end
+
+function Base.hash(a::FlintMPolyUnion, h::UInt)
+   h = _hash_mpoly_coeffs(a, h)
+   h = _hash_mpoly_exps_via(_exponent_vector_type(a), a, h)
+   return xor(h, 0x53dd43cd511044d1%UInt)
 end
 

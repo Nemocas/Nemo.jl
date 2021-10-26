@@ -68,6 +68,15 @@ end
    @test string(y) == "y"
 end
 
+@testset "fmpz_mpoly.hash" begin
+   S, (x, y) = PolynomialRing(FlintZZ, ["x", "y"])
+
+   p = y^fmpz(2)^100
+
+   @test hash(x) == hash((x + y) - y)
+   @test hash(x) == hash((x + p) - p)
+end
+
 @testset "fmpz_mpoly.manipulation" begin
    R = FlintZZ
 

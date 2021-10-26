@@ -139,18 +139,15 @@ end
 #
 ################################################################################
 
-function coeff!(z::fmpz, a::fmpz_mpoly, i::Int)
+function coeff(a::fmpz_mpoly, i::Int)
+   z = fmpz()
+   n = length(a)
+   # this check is not needed as fmpz_mpoly_get_term_coeff_fmpz throws
+   (i < 1 || i > n) && error("Index must be between 1 and $(length(a))")
    ccall((:fmpz_mpoly_get_term_coeff_fmpz, libflint), Nothing,
          (Ref{fmpz}, Ref{fmpz_mpoly}, Int, Ref{FmpzMPolyRing}),
          z, a, i - 1, a.parent)
    return z
-end
-
-function coeff(a::fmpz_mpoly, i::Int)
-   n = length(a)
-   # this check is not needed as fmpz_mpoly_get_term_coeff_fmpz throws
-   (i < 1 || i > n) && error("Index must be between 1 and $(length(a))")
-   return coeff!(fmpz(), a, i)
 end
 
 function coeff(a::fmpz_mpoly, b::fmpz_mpoly)
