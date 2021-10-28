@@ -113,6 +113,7 @@ end
       f = rand(S, 1:5, 0:100, -100:100)
 
       if length(f) > 0
+        @test f == sum((coeff(f, i) * S(fmpz[1], [Nemo.exponent_vector_ui(f, i)])  for i in 1:length(f)))
         @test f == sum((coeff(f, i) * S(fmpz[1], [Nemo.exponent_vector_fmpz(f, i)])  for i in 1:length(f)))
       end
 

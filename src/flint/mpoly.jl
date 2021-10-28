@@ -87,7 +87,7 @@ function _hash_mpoly_coeffs(a::fmpq_mpoly, h::UInt)
    end
 end
 
-function _hash_mpoly_coeffs(a::Zmodn_mpoly, h::UInt)
+function _hash_mpoly_coeffs(a::gfp_mpoly, h::UInt)
    GC.@preserve a begin
       h = _hash_ui_array(convert(Ptr{UInt}, a.coeffs), a.length, h)
       return h
@@ -105,7 +105,6 @@ end
 
 # fallback
 function _hash_mpoly_coeffs(a::FlintMPolyUnion, h::UInt) where S
-   c = base_ring(a)()
    for i in 1:length(a)
       h = hash(coeff(a, i), h)
    end
