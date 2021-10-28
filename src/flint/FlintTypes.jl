@@ -2693,7 +2693,7 @@ mutable struct fq_nmod_mpoly <: MPolyElem{fq_nmod}
       finalizer(_fq_nmod_mpoly_clear_fn, z)
 
       for i in 1:length(a)
-         ccall((:fq_nmod_mpoly_push_term_ui_ui, libflint), Nothing,
+         ccall((:fq_nmod_mpoly_push_term_fq_nmod_ui, libflint), Nothing,
                (Ref{fq_nmod_mpoly}, Ref{fq_nmod}, Ptr{Int}, Ref{FqNmodMPolyRing}),
                z, a[i], b[i], ctx)
        end
