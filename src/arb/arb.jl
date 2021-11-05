@@ -85,17 +85,82 @@ characteristic(::ArbField) = 0
 #
 ################################################################################
 
-function Float64(x::arb)
-   GC.@preserve x begin
-      t = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ref{arb}, ), x)
-      # 4 == round to nearest
-      d = ccall((:arf_get_d, libarb), Float64, (Ptr{arf_struct}, Int), t, 4)
-   end
-   return d
+@doc Markdown.doc"""
+    Float64(x::arb, round::RoundingMode=RoundNearest)
+
+Converts $x$ to a `Float64`, rounded in the direction specified by $round$.
+For `RoundNearest` the return value approximates the midpoint of $x$. For
+`RoundDown` or `RoundUp` the return value is a lower bound or upper bound for
+all values in $x$.
+"""
+function Float64(x::arb, round::RoundingMode=RoundNearest)
+  t = _arb_get_arf(x, round)
+  return _arf_get_d(t, round)
+end
+
+@doc Markdown.doc"""
+    BigFloat(x::arb, round::RoundingMode=RoundNearest)
+
+Converts $x$ to a `BigFloat` of the currently used precision, rounded in the
+direction specified by $round$. For `RoundNearest` the return value
+approximates the midpoint of $x$. For `RoundDown` or `RoundUp` the return
+value is a lower bound or upper bound for all values in $x$.
+"""
+function BigFloat(x::arb, round::RoundingMode=RoundNearest)
+  t = _arb_get_arf(x, round)
+  return _arf_get_mpfr(t, round)
+end
+
+function _arb_get_arf(x::arb, ::RoundingMode{:Nearest})
+  GC.@preserve x begin
+    t = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ref{arb}, ), x)
+  end
+  return t
+end
+
+for (b, f) in ((RoundingMode{:Down}, :arb_get_lbound_arf),
+               (RoundingMode{:Up}, :arb_get_ubound_arf))
+  @eval begin
+    function _arb_get_arf(x::arb, ::$b)
+      GC.@preserve x begin
+        t = arf_struct()
+        ccall(($(string(f)), libarb), Nothing,
+              (Ref{arf_struct}, Ref{arb}, Int), t, x, parent(x).prec)
+      end
+      return Ref(t)
+    end
+  end
+end
+
+for (b, i) in ((RoundingMode{:Down}, 2),
+               (RoundingMode{:Up}, 3),
+               (RoundingMode{:Nearest}, 4))
+  @eval begin
+    function _arf_get_d(t::Ref{arf_struct}, ::$b)
+      GC.@preserve t begin
+        d = ccall((:arf_get_d, libarb), Float64,
+                  (Ref{arf_struct}, Int), t, $i)
+      end
+      return d
+    end
+    function _arf_get_mpfr(t::Ref{arf_struct}, ::$b)
+      GC.@preserve t begin
+        d = BigFloat()
+        ccall((:arf_get_mpfr, libarb), Int32,
+              (Ref{BigFloat}, Ref{arf_struct}, Base.MPFR.MPFRRoundingMode),
+              d, t, $b())
+      end
+      return d
+    end
+  end
 end
 
 function convert(::Type{Float64}, x::arb)
     return Float64(x)
+end
+
+function convert(::Type{BigFloat}, x::arb)
+    return BigFloat(x)
 end
 
 @doc Markdown.doc"""
