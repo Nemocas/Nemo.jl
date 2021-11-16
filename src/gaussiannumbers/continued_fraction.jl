@@ -350,14 +350,13 @@ end
 #
 ###############################################################################
 
-struct ConvergentsIterator{T, R}
+struct ConvergentsIterator{T, R} <: AbstractVector{R}
    v::Vector{T}
 end
 
 Base.lastindex(it::ConvergentsIterator) = length(it.v)
 Base.length(it::ConvergentsIterator)    = length(it.v)
-Base.eltype(::Type{ConvergentsIterator{T, R}}) where {T, R} = R
-Base.eltype(it::ConvergentsIterator{T, R})     where {T, R} = R
+Base.size(it::ConvergentsIterator)      = size(it.v)
 Base.collect(it::ConvergentsIterator{T, R})    where {T, R} = collect(R, it)
 
 function Base.getindex(it::ConvergentsIterator{T, R}, n) where {T, R}
