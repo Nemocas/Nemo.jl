@@ -753,12 +753,20 @@ end
 #
 ###############################################################################
 
+# We introduce _hnf, __hnf to make it possible for Oscar to overload the
+# hnf(x::fmpz_mat) call to something more performant, while at the same time
+# being able to call the Nemo/flint implementation.
+
 @doc Markdown.doc"""
     hnf(x::fmpz_mat)
 
 Return the Hermite Normal Form of $x$.
 """
-function hnf(x::fmpz_mat)
+@inline hnf(x::fmpz_mat) = _hnf(x)
+
+@inline _hnf(x) = __hnf(x)
+
+function __hnf(x)
    z = similar(x)
    ccall((:fmpz_mat_hnf, libflint), Nothing,
                 (Ref{fmpz_mat}, Ref{fmpz_mat}), z, x)
@@ -771,7 +779,11 @@ end
 Compute a tuple $(H, T)$ where $H$ is the Hermite normal form of $x$ and $T$
 is a transformation matrix so that $H = Tx$.
 """
-function hnf_with_transform(x::fmpz_mat)
+@inline hnf_with_transform(x::fmpz_mat) = _hnf_with_transform(x)
+
+@inline _hnf_with_transform(x) = __hnf_with_transform(x)
+
+function __hnf_with_transform(x::fmpz_mat)
    z = similar(x)
    u = similar(x, nrows(x), nrows(x))
    ccall((:fmpz_mat_hnf_transform, libflint), Nothing,
