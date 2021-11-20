@@ -27,6 +27,8 @@
     push!(dependencies, "build_FLINT.v200.800.100.jl")
   elseif flint_ver == v"200.800.300+0"
     push!(dependencies, "build_FLINT.v200.800.300.jl")
+  elseif flint_ver == v"200.800.400+0"
+    push!(dependencies, "build_FLINT.v200.800.400.jl")
   else
     throw(error("Flint version $flint_ver not supported for julia version <= 1.3"))
   end
