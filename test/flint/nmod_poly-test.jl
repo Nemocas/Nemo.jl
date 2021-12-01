@@ -454,14 +454,11 @@ end
 
   @test t == R(14)
 
-if VERSION >= v"0.5.0-dev+3171"
-
   @test f(R(20)) == R(14)
 
   @test f(20) == R(14)
 
   @test f(fmpz(20)) == R(14)
-end
 end
 
 @testset "nmod_poly.derivative" begin

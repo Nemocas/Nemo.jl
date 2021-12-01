@@ -10,9 +10,7 @@
 import Base: real, imag, abs, conj, angle, log, log1p, sin, cos,
              tan, cot, sinpi, cospi, sinh, cosh, tanh, coth, atan, expm1
 
-if VERSION >= v"1.6"
-  import Base: cispi
-end
+import Base: cispi
 
 export one, onei, real, imag, conj, abs, inv, angle, isreal, polygamma, erf,
        erfi, erfc, bessel_j, bessel_k, bessel_i, bessel_y, airy_ai, airy_bi,

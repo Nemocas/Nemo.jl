@@ -29,18 +29,10 @@ function test_rand(@nospecialize(test::Union{Nothing,Function}),
    _test(x) = test !== nothing && test(x)
 
    M = make(R, args...)
-   if VERSION >= v"1.3"
-      x = @inferred rand(R, args...)
-   else
-      x = rand(R, args...)
-   end
+   x = @inferred rand(R, args...)
    @test x isa type
    _test(x)
-   if VERSION >= v"1.3"
-      x = @inferred rand(make(R, args...))
-   else
-      x = rand(make(R, args...))
-   end
+   x = @inferred rand(make(R, args...))
    @test x isa type
    _test(x)
 

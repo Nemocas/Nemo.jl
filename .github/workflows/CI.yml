@@ -15,13 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         julia-version:
-          - '1.0'  # current LTS
-          #- '1.1'
-          #- '1.2'
-          - '1.3'
-          - '1.4'
-          - '1.5'
-          - '1.6'
+          - '1.6'  # current LTS
           - '~1.7.0-0'
           - 'nightly'
         os:
@@ -29,11 +23,7 @@ jobs:
         include:
           # Add a few windows and macOS jobs (not too many, the number we can run in parallel is limited)
           - os: macOS-latest
-            julia-version: '1.0'
-          - os: macOS-latest
             julia-version: '1.6'
-          - os: windows-latest
-            julia-version: '1.0'
           - os: windows-latest
             julia-version: '1.6'
 
