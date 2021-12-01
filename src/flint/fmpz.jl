@@ -1739,19 +1739,39 @@ function bell(x::fmpz)
     return z
 end
 
-@doc Markdown.doc"""
-    binomial(n::fmpz, k::fmpz)
-
-Return the binomial coefficient $\frac{n!}{(n - k)!k!}$. If $n, k < 0$ or
-$k > n$ we return $0$.
-"""
-function binomial(n::fmpz, k::fmpz)
-    n < 0 && return fmpz(0)
-    k < 0 && return fmpz(0)
-    z = fmpz()
+function _binomial!(z::fmpz, n::UInt, k::UInt)
     ccall((:fmpz_bin_uiui, libflint), Nothing,
           (Ref{fmpz}, UInt, UInt), z, UInt(n), UInt(k))
     return z
+end
+
+@doc Markdown.doc"""
+    binomial(n::fmpz, k::fmpz)
+
+Return the binomial coefficient $\frac{n (n-1) \cdots (n-k+1)}{k!}$.
+If $k < 0$ we return $0$, and the identity
+`binomial(n, k) == binomial(n - 1, k - 1) + binomial(n - 1, k)` always holds
+for integers `n` and `k`.
+"""
+function binomial(n::fmpz, k::fmpz)
+    c = cmp(k, 0)
+    c > 0 || return fmpz(c == 0)
+    # k > 0 now
+    if fits(UInt, k)
+        K = UInt(k)
+        if fits(UInt, n)
+            return _binomial!(fmpz(), UInt(n), K)
+        elseif fits(Int, n)
+            # binomial(-a, k) = (-1)^k*binomial(a+k-1, k)
+            z = -n
+            add!(z, z, K-1)
+            if fits(UInt, z)
+                _binomial!(z, UInt(z), K)
+                return iseven(K) ? z : neg!(z, z)
+            end
+        end
+    end
+    return fmpz(binomial(BigInt(n), BigInt(k)))
 end
 
 @doc Markdown.doc"""

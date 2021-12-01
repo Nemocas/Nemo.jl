@@ -936,6 +936,13 @@ end
    @test_throws DomainError primorial(-7)
 
    @test binomial(ZZ(12), ZZ(5)) == 792
+   for a in -9:9, b in -2:9
+      @test binomial(ZZ(a), ZZ(b)) == binomial(big(a), big(b))
+   end
+   n = typemax(Int)
+   for a in [0, 1, 2, n-2, n-1, n], b in [n-2, n-1, n]
+      @test binomial(ZZ(a), ZZ(b)) == binomial(big(a), big(b))
+   end
 
    @test bell(12) == 4213597
 
