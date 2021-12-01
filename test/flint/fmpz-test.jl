@@ -935,7 +935,8 @@ end
 
    @test_throws DomainError primorial(-7)
 
-   @test binomial(ZZ(12), ZZ(5)) == 792
+   m = ZZ(3)^100
+   @test binomial(m, ZZ(2)) == divexact(m*(m - 1), 2)
    for a in -9:9, b in -2:9
       @test binomial(ZZ(a), ZZ(b)) == binomial(big(a), big(b))
    end
