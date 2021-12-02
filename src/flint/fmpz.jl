@@ -186,6 +186,12 @@ Return `true` if $a$ fits into a `UInt`, otherwise return `false`.
 fits(::Type{UInt}, a::fmpz) = a < 0 ? false :
               ccall((:fmpz_abs_fits_ui, libflint), Bool, (Ref{fmpz},), a)
 
+if Culong !== UInt
+    function fits(::Type{Culong}, a::fmpz)
+        return 0 <= a && a <= UInt(typemax(Culong))
+    end
+end
+
 @doc Markdown.doc"""
     size(a::fmpz)
 
@@ -1739,7 +1745,10 @@ function bell(x::fmpz)
     return z
 end
 
-function _binomial!(z::fmpz, n::UInt, k::UInt)
+# fmpz_bin_uiui doesn't always work on UInt input as it just wraps mpz_bin_uiui,
+# which has silly gnu problems on windows
+# TODO: fib_ui, pow_ui, fac_ui ditto
+function _binomial!(z::fmpz, n::Culong, k::Culong)
     ccall((:fmpz_bin_uiui, libflint), Nothing,
           (Ref{fmpz}, UInt, UInt), z, UInt(n), UInt(k))
     return z
@@ -1757,16 +1766,16 @@ function binomial(n::fmpz, k::fmpz)
     c = cmp(k, 0)
     c > 0 || return fmpz(c == 0)
     # k > 0 now
-    if fits(UInt, k)
-        K = UInt(k)
-        if fits(UInt, n)
-            return _binomial!(fmpz(), UInt(n), K)
+    if fits(Culong, k)
+        K = Culong(k)
+        if fits(Culong, n)
+            return _binomial!(fmpz(), Culong(n), K)
         elseif fits(Int, n)
             # binomial(-a, k) = (-1)^k*binomial(a+k-1, k)
             z = -n
             add!(z, z, K-1)
-            if fits(UInt, z)
-                _binomial!(z, UInt(z), K)
+            if fits(Culong, z)
+                _binomial!(z, Culong(z), K)
                 return iseven(K) ? z : neg!(z, z)
             end
         end
@@ -2513,6 +2522,15 @@ function (::Type{UInt})(a::fmpz)
 end
 
 convert(::Type{UInt}, a::fmpz) = UInt(a)
+
+if Culong !== UInt
+    function (::Type{Culong})(a::fmpz)
+       fits(Culong, a) || throw(InexactError(:convert, Culong, a))
+       return ccall((:fmpz_get_ui, libflint), UInt, (Ref{fmpz}, ), a)%Culong
+    end
+
+    convert(::Type{Culong}, a::fmpz) = Culong(a)
+end
 
 function (::Type{Float64})(n::fmpz)
     # rounds to zero
