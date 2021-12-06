@@ -438,6 +438,11 @@ end
    @test inv(C)*C == one(S)
 
    @test C*inv(C) == one(S)
+
+   a = QQ[1 1;]
+   @test_throws ErrorException inv(a)
+   a = QQ[1 1; 1 1]
+   @test_throws ErrorException inv(a)
 end
 
 @testset "fmpq_mat.exact_division" begin

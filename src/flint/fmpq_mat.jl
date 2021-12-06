@@ -441,6 +441,7 @@ end
 ###############################################################################
 
 function inv(x::fmpq_mat)
+   !issquare(x) && error("Matrix not invertible")
    z = similar(x)
    success = ccall((:fmpq_mat_inv, libflint), Cint,
          (Ref{fmpq_mat}, Ref{fmpq_mat}), z, x)

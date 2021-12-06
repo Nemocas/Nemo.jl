@@ -392,6 +392,13 @@ end
    @test inv(A) == B
 
    @test inv(A)*A == one(S)
+
+   a = ZZ[1 1;]
+   @test_throws ErrorException inv(a)
+   b = ZZ[1 0; 0 2]
+   @test_throws ErrorException inv(b)
+   c = ZZ[1 1; 1 1]
+   @test_throws ErrorException inv(c)
 end
 
 @testset "fmpz_mat.pseudo_inversion" begin
