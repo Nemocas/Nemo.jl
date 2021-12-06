@@ -956,6 +956,7 @@ end
       @test binomial(ZZ(-1), n) == (-1)^isodd(n)
       @test binomial(ZZ(-2), n) == (-1)^isodd(n)*(n + 1)
    end
+   @test_throws ErrorException binomial(ZZ(2)^101, ZZ(2)^100)
 
    @test bell(12) == 4213597
 
