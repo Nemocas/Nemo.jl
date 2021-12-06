@@ -935,14 +935,26 @@ end
 
    @test_throws DomainError primorial(-7)
 
-   m = ZZ(3)^100
-   @test binomial(m, ZZ(2)) == divexact(m*(m - 1), 2)
+   for a in [-ZZ(3)^100, ZZ(3)^100]
+       @test binomial(a, ZZ(2)) == divexact(a*(a - 1), 2)
+       @test binomial(a, ZZ(3)) == divexact(a*(a - 1)*(a - 2), 6)
+   end
    for a in -9:9, b in -2:9
       @test binomial(ZZ(a), ZZ(b)) == binomial(big(a), big(b))
    end
+   # ok for julia on windows
    n = typemax(Clong)
    for a in [0, 1, 2, n-2, n-1, n], b in [n-2, n-1, n]
       @test binomial(ZZ(a), ZZ(b)) == binomial(big(a), big(b))
+   end
+   # avoid julia on windows
+   for n in [ZZ(typemax(Int)), ZZ(typemax(UInt)), ZZ(typemax(UInt)) + 10]
+      @test binomial(n, ZZ(1)) == n
+      @test binomial(n, n) == 1
+      @test binomial(n, n - 1) == n
+      @test binomial(n - 1, n) == 0
+      @test binomial(ZZ(-1), n) == (-1)^isodd(n)
+      @test binomial(ZZ(-2), n) == (-1)^isodd(n)*(n + 1)
    end
 
    @test bell(12) == 4213597

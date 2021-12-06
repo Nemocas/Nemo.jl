@@ -1754,6 +1754,24 @@ function _binomial!(z::fmpz, n::Culong, k::Culong)
     return z
 end
 
+function _binomial(n::fmpz, k::fmpz)
+    @assert k >= 0
+    z = fmpz(1)
+    if fits(Culong, n) && fits(Culong, k)
+        _binomial!(z, Culong(n), Culong(k))
+    elseif fits(UInt, k)
+        for K in UInt(1):UInt(k)
+            mul!(z, z, n - (K - 1))
+            divexact!(z, z, K)
+        end
+    else
+        # if called with n >= k
+        error("result of binomial($n, $k) probably is too large")
+    end
+    return z
+end
+
+
 @doc Markdown.doc"""
     binomial(n::fmpz, k::fmpz)
 
@@ -1763,24 +1781,22 @@ If $k < 0$ we return $0$, and the identity
 for integers `n` and `k`.
 """
 function binomial(n::fmpz, k::fmpz)
-    c = cmp(k, 0)
-    c > 0 || return fmpz(c == 0)
+    ksgn = cmp(k, 0)
+    ksgn > 0 || return fmpz(ksgn == 0)
     # k > 0 now
-    if fits(Culong, k)
-        K = Culong(k)
-        if fits(Culong, n)
-            return _binomial!(fmpz(), Culong(n), K)
-        elseif fits(Int, n)
-            # binomial(-a, k) = (-1)^k*binomial(a+k-1, k)
-            z = -n
-            add!(z, z, K-1)
-            if fits(Culong, z)
-                _binomial!(z, Culong(z), K)
-                return iseven(K) ? z : neg!(z, z)
-            end
-        end
+    negz = false
+    if n < 0
+        n = k - n - 1
+        negz = isodd(k)
     end
-    return fmpz(binomial(BigInt(n), BigInt(k)))
+    if n < k
+        z = fmpz(0)
+    elseif 2*k <= n
+        z = _binomial(n, k)
+    else
+        z = _binomial(n, n - k)
+    end
+    return negz ? neg!(z, z) : z
 end
 
 @doc Markdown.doc"""
@@ -2296,6 +2312,14 @@ function fmms!(r::fmpz, a::fmpz, b::fmpz, c::fmpz, d::fmpz)
    ccall((:fmpz_fmms, libflint), Nothing,
          (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), r, a, b, c, d)
    return r
+end
+
+
+function divexact!(z::fmpz, a::fmpz, b::UInt)
+   ccall((:fmpz_divexact_ui, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, UInt),
+         z, a, b)
+   return z
 end
 
 function divexact!(z::fmpz, a::fmpz, b::fmpz)
