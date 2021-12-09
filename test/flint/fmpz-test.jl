@@ -6,6 +6,10 @@ end
    test_Ring_interface_recursive(FlintZZ)
 end
 
+@testset "fmpz.issingletontype" begin
+   @test Base.issingletontype(FlintIntegerRing)
+end
+
 @testset "fmpz.abstract_types" begin
    @test fmpz <: RingElem
 

@@ -7,6 +7,10 @@ end
    test_Field_interface_recursive(FlintQQ)
 end
 
+@testset "fmpq.issingletontype" begin
+   @test Base.issingletontype(FlintRationalField)
+end
+
 @testset "fmpq.constructors" begin
    R = FractionField(ZZ)
 
