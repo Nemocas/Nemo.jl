@@ -428,10 +428,9 @@ end
 #
 ###############################################################################
 
-mutable struct GaloisField <: FinField
+@attributes mutable struct GaloisField <: FinField
    n::UInt
    ninv::UInt
-   @declare_other
 
    function GaloisField(n::UInt, cached::Bool=true)
       if cached && haskey(GaloisFieldID, n)
@@ -508,10 +507,9 @@ end
 #
 ###############################################################################
 
-mutable struct GaloisFmpzField <: FinField
+@attributes mutable struct GaloisFmpzField <: FinField
    n::fmpz
    ninv::fmpz_mod_ctx_struct
-   @declare_other
 
    function GaloisFmpzField(n::fmpz, cached::Bool=true)
       if cached && haskey(GaloisFmpzFieldID, n)
@@ -2029,7 +2027,7 @@ end
 #
 ###############################################################################
 
-mutable struct FqNmodFiniteField <: FinField
+@attributes mutable struct FqNmodFiniteField <: FinField
    p :: Int
    n :: Int
    ninv :: Int
@@ -2056,7 +2054,6 @@ mutable struct FqNmodFiniteField <: FinField
 
    overfields :: Dict{Int, Vector{FinFieldMorphism}}
    subfields :: Dict{Int, Vector{FinFieldMorphism}}
-   @declare_other
 
    function FqNmodFiniteField(c::fmpz, deg::Int, s::Symbol, cached::Bool = true)
       if cached && haskey(FqNmodFiniteFieldID, (c, deg, s))
@@ -2189,7 +2186,7 @@ end
 #
 ###############################################################################
 
-mutable struct FqDefaultFiniteField <: FinField
+@attributes mutable struct FqDefaultFiniteField <: FinField
    # fq_default_ctx_struct is 200 bytes on 64 bit machine
    opaque::NTuple{200, Int8} 
    # end of flint struct
@@ -2198,7 +2195,6 @@ mutable struct FqDefaultFiniteField <: FinField
    
    overfields :: Dict{Int, Vector{FinFieldMorphism}}
    subfields :: Dict{Int, Vector{FinFieldMorphism}}
-   @declare_other
 
    function FqDefaultFiniteField(char::fmpz, deg::Int, s::Symbol, cached::Bool = true)
       if cached && haskey(FqDefaultFiniteFieldID, (char, deg, s))
@@ -2419,7 +2415,7 @@ end
 #
 ###############################################################################
 
-mutable struct FqFiniteField <: FinField
+@attributes mutable struct FqFiniteField <: FinField
    p::Int # fmpz_t
    add_fxn::Ptr{Nothing}
    sub_fxn::Ptr{Nothing}
@@ -2446,7 +2442,6 @@ mutable struct FqFiniteField <: FinField
 
    overfields :: Dict{Int, Vector{FinFieldMorphism}}
    subfields :: Dict{Int, Vector{FinFieldMorphism}}
-   @declare_other
 
    function FqFiniteField(char::fmpz, deg::Int, s::Symbol, cached::Bool = true)
       if cached && haskey(FqFiniteFieldID, (char, deg, s))

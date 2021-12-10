@@ -264,35 +264,23 @@ end
 #
 ###############################################################################
 
-function set_special(K::AnticNumberField, P::Pair{Symbol, <: Any}...)
+AbstractAlgebra._is_attribute_storing_type(::Type{AnticNumberField}) = true
+AbstractAlgebra._get_attributes(K::AnticNumberField) = _get_Special_of_nf(K, false)
+function AbstractAlgebra._get_attributes!(K::AnticNumberField)
   d = _get_Special_of_nf(K, false)
   if d === nothing
     d = Dict{Symbol, Any}()
     _set_Special_of_nf(K, d)
   end
-  for (S, V) in P
-    d[S] = V
-  end
-end
-
-function get_special(K::AnticNumberField, S::Symbol)
-  d = _get_Special_of_nf(K, false)
-  if d === nothing
-    return nothing
-  end
-  if haskey(d, S)
-    return d[S]
-  else
-    return nothing
-  end
+  return d
 end
 
 function iscyclo_type(K::AnticNumberField)
-  return !(get_special(K, :cyclo) === nothing) ::Bool
+  return !(get_attribute(K, :cyclo) === nothing) ::Bool
 end
 
 function ismaxreal_type(K::AnticNumberField)
-  return get_special(K, :maxreal)::Bool
+  return get_attribute(K, :maxreal)::Bool
 end
 
 ###############################################################################
@@ -1253,13 +1241,13 @@ function CyclotomicField(n::Int, s::Union{AbstractString, Char, Symbol} = "z_$n"
    Qx, = PolynomialRing(FlintQQ, t; cached = cached)
    f = cyclotomic(n, x)
    C, g = NumberField(Qx(f), Symbol(s); cached = cached, check = false)
-   set_special(C, :show => show_cyclo, :cyclo => n)
+   set_attribute!(C, :show => show_cyclo, :cyclo => n)
    return C, g
 end
 
 function show_cyclo(io::IO, a::AnticNumberField)
   @assert iscyclo_type(a)
-  print(io, "Cyclotomic field of order $(get_special(a, :cyclo))")
+  print(io, "Cyclotomic field of order $(get_attribute(a, :cyclo))")
 end
 
 
@@ -1279,10 +1267,10 @@ function CyclotomicRealSubfield(n::Int, s::Union{AbstractString, Char, Symbol} =
    Qx, = PolynomialRing(FlintQQ, t; cached = cached)
    f = cos_minpoly(n, x)
    R, a =  NumberField(Qx(f), Symbol(s); cached = cached, check = false)
-   set_special(R, :show => show_maxreal, :maxreal => n)
+   set_attribute!(R, :show => show_maxreal, :maxreal => n)
    return R, a
 end
 
 function show_maxreal(io::IO, a::AnticNumberField)
-  print(io, "Maximal real subfield of cyclotomic field of order $(get_special(a, :maxreal))")
+  print(io, "Maximal real subfield of cyclotomic field of order $(get_attribute(a, :maxreal))")
 end
