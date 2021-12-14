@@ -985,7 +985,7 @@ end
       @test kronecker_symbol(T(1), T(0)) == 1
    end
 
-   if !Nemo.iswindows64()
+   if !(Sys.iswindows() && (Int == Int64))
 
       @test number_of_partitions(10) == 42
 

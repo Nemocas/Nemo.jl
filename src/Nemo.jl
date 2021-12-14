@@ -70,8 +70,6 @@ export flint_cleanup, flint_set_num_threads
 
 export error_dim_negative, ErrorConstrDimMismatch
 
-export iswindows64
-
 export ZZi, QQi, ComplexField, PadicField, QadicField, NGFiniteField
 
 export QQBar
@@ -89,8 +87,6 @@ using Arb_jll
 using Antic_jll
 using Calcium_jll
 using FLINT_jll
-
-iswindows64() = (Sys.iswindows() ? true : false) && (Int == Int64)
 
 const pkgdir = realpath(joinpath(dirname(@__DIR__)))
 
