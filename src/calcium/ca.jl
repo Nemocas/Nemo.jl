@@ -1377,6 +1377,17 @@ function (R::ArbField)(a::ca; check::Bool=true)
    end
 end
 
+function (::Type{ComplexF64})(x::ca)
+   z = AcbField(53, cached = false)(x)
+   x = arb()
+   ccall((:acb_get_real, libarb), Nothing, (Ref{arb}, Ref{acb}), x, z)
+   xx = Float64(x)
+   y = arb()
+   ccall((:acb_get_imag, libarb), Nothing, (Ref{arb}, Ref{acb}), y, z)
+   yy = Float64(y)
+   return ComplexF64(xx, yy)
+end
+
 ###############################################################################
 #
 #   Unsafe functions
