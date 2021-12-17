@@ -24,13 +24,15 @@ include("flint/fmpz_mod_poly.jl")
 
 include("flint/gfp_fmpz_poly.jl")
 
+include("flint/mpoly.jl")
+
 include("flint/fmpz_mpoly.jl")
 
 include("flint/nmod_mpoly.jl")
 
 include("flint/fq_nmod_mpoly.jl")
 
-include("flint/mpoly.jl")
+include("flint/fq_default_mpoly.jl")
 
 include("flint/fmpz_rel_series.jl")
 
