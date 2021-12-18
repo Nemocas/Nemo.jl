@@ -20,8 +20,6 @@ using Random: SamplerTrivial
 
 using RandomExtensions: RandomExtensions, make, Make2, Make3
 
-using LoadFlint
-
 using Pkg
 
 import SHA
@@ -30,7 +28,7 @@ import AbstractAlgebra: div, divrem
 
 # N.B: do not import div, divrem from Base
 import Base: Array, abs, abs2, acos, acosh, asin, asinh, atan, atanh, bin, binomial,
-             ceil, checkbounds, conj, convert, cmp, cos, cosh, cospi, cot,
+             ceil, checkbounds, conj, convert, cmp, contains, cos, cosh, cospi, cot,
              coth, dec, deepcopy, deepcopy_internal, denominator,
              expm1, exp, factorial, floor, gcd, gcdx, getindex, hash, hcat,
              hex, hypot, intersect, inv, invmod, isequal, iseven, isinf, isfinite,
@@ -38,24 +36,16 @@ import Base: Array, abs, abs2, acos, acosh, asin, asinh, atan, atanh, bin, binom
              ldexp, length, log, log1p, mod, ndigits, numerator, oct, one,
              parent, parse, powermod,
              precision, rand, Rational, rem, reverse, setindex!,
-             show, similar, sign, sin, sincos, sinh, sinpi, size, sqrt, string,
+             show, similar, sign, sin, sincos, sincospi, sinh, sinpi, size, sqrt, string,
              tan, tanh, trailing_zeros, transpose, truncate, typed_hvcat,
              typed_hcat, vcat, xor, zero, zeros, +, -, *, ==, ^, &, |, <<, >>,
              ~, <=, >=, <, >, //, /, !=
-
-if VERSION >= v"1.5.0-DEV.639"
-  import Base: contains
-end
-
-if VERSION >= v"1.6.0-DEV.292"
-  import Base: sincospi
-end
 
 import LinearAlgebra: det, norm, nullspace, rank, transpose!, hessenberg, tr,
                       lu, lu!, eigvals
 
 import AbstractAlgebra: nullspace, @show_name, @show_special, find_name,
-                        get_special, set_special, @declare_other,
+                        get_attribute, set_attribute!, @attributes,
                         @show_special_elem, force_coerce, force_op, expressify
 
 # We don't want the QQ, ZZ, FiniteField, NumberField from AbstractAlgebra
@@ -80,8 +70,6 @@ export flint_cleanup, flint_set_num_threads
 
 export error_dim_negative, ErrorConstrDimMismatch
 
-export iswindows64
-
 export ZZi, QQi, ComplexField, PadicField, QadicField, NGFiniteField
 
 export QQBar
@@ -95,27 +83,14 @@ export ZZ, QQ, RealField, FiniteField, NumberField
 #
 ###############################################################################
 
-if VERSION > v"1.3.0-rc4"
-  # this should do the dlopen for 1.3 and later
-  # and imports the libxxx variables
-  using Arb_jll
-  using Antic_jll
-  using Calcium_jll
-else
-  deps_dir = joinpath(@__DIR__, "..", "deps")
-  include(joinpath(deps_dir,"deps.jl"))
-end
-
-iswindows64() = (Sys.iswindows() ? true : false) && (Int == Int64)
+using Arb_jll
+using Antic_jll
+using Calcium_jll
+using FLINT_jll
 
 const pkgdir = realpath(joinpath(dirname(@__DIR__)))
 
-#const libdir = joinpath(pkgdir, "deps", "usr", "lib")
-#const bindir = joinpath(pkgdir, "deps", "usr", "bin")
-
-const libflint = LoadFlint.libflint
-const libgmp = LoadFlint.libgmp
-const libmpfr = LoadFlint.libmpfr
+const libflint = FLINT_jll.libflint
 
 function flint_abort()
   error("Problem in the Flint-Subsystem")
@@ -198,7 +173,7 @@ function trace_memory(b::Bool)
     return
   end
   if b
-    ccall((:__gmp_set_memory_functions, libgmp), Nothing,
+    ccall((:__gmp_set_memory_functions, :libgmp), Nothing,
        (Ptr{Nothing},Ptr{Nothing},Ptr{Nothing}),
        @cfunction(trace_counted_malloc, UInt, (UInt, )),
        @cfunction(trace_counted_realloc, UInt, (UInt, UInt, UInt)),
@@ -211,7 +186,7 @@ function trace_memory(b::Bool)
        @cfunction(trace_realloc, UInt, (UInt, UInt)),
        @cfunction(trace_free, Nothing, (UInt, )))
   else
-    ccall((:__gmp_set_memory_functions, libgmp), Nothing,
+    ccall((:__gmp_set_memory_functions, :libgmp), Nothing,
        (Ptr{Nothing},Ptr{Nothing},Ptr{Nothing}),
        cglobal(:jl_gc_counted_malloc),
        cglobal(:jl_gc_counted_realloc_with_old_size),
@@ -236,11 +211,6 @@ const __isthreaded = Ref(false)
 
 
 function __init__()
-  if VERSION < v"1.3.0-rc4"
-    # this does the dlopen for 1.0-1.2
-    check_deps()
-  end
-
    # In case libgmp picks up the wrong libgmp later on, we "unset" the jl_*
    # functions from the julia :libgmp.
 
@@ -306,25 +276,15 @@ end
 #
 ################################################################################
 
-if VERSION >= v"1.4"
-   deps = Pkg.dependencies()
-   if !haskey(deps, Base.UUID("2edaba10-b0f1-5616-af89-8c11ac63239a"))
-      version() = "building"
-   else
-      ver = deps[Base.UUID("2edaba10-b0f1-5616-af89-8c11ac63239a")]
-      if occursin("/dev/", ver.source)
-         version() = VersionNumber("$(ver.version)-dev")
-      else
-         version() = VersionNumber("$(ver.version)")
-      end
-   end
+deps = Pkg.dependencies()
+if !haskey(deps, Base.UUID("2edaba10-b0f1-5616-af89-8c11ac63239a"))
+   version() = "building"
 else
-   ver = Pkg.API.__installed(PKGMODE_MANIFEST)["Nemo"]
-   dir = dirname(@__DIR__)
-   if occursin("/dev/", dir)
-      version() = VersionNumber("$(ver)-dev")
+   ver = deps[Base.UUID("2edaba10-b0f1-5616-af89-8c11ac63239a")]
+   if occursin("/dev/", ver.source)
+      version() = VersionNumber("$(ver.version)-dev")
    else
-      version() = VersionNumber("$(ver)")
+      version() = VersionNumber("$(ver.version)")
    end
 end
 
@@ -455,11 +415,7 @@ function Random.seed!(a::rand_ctx, s::Integer)
    seedbits = 512 - 2*sizeof(UInt)*8
    n = Int(seedbits / (sizeof(UInt)*8))
    @assert n == 6 && UInt === UInt64 || n == 14 && UInt === UInt32
-   if VERSION >= v"1.3"
-      b = BigInt(nbits = seedbits)
-   else
-      b = Base.GMP.MPZ.realloc2(seedbits)
-   end
+   b = BigInt(nbits = seedbits)
 
    @assert b.alloc >= n
    GC.@preserve digest b unsafe_copyto!(b.d, pointer(digest), n)

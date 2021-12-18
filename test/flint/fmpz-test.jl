@@ -555,7 +555,9 @@ end
    @test issquare_with_sqrt(fmpz(5)) == (false, 0)
    @test issquare_with_sqrt(fmpz(4)) == (true, 2)
 
-   @test_throws DomainError issquare_with_sqrt(-fmpz(1))
+   f1, s1 = issquare_with_sqrt(-fmpz(1))
+
+   @test !f1
    
    @test isqrt(fmpz(12)) == 3
 
@@ -958,6 +960,9 @@ end
    end
    @test_throws ErrorException binomial(ZZ(2)^101, ZZ(2)^100)
 
+   @test binomial(ZZ(12), ZZ(5)) == 792
+   @test binomial(UInt(12), UInt(5), ZZ) == 792
+
    @test bell(12) == 4213597
 
    @test_throws DomainError bell(-1)
@@ -1006,7 +1011,7 @@ end
       @test kronecker_symbol(T(1), T(0)) == 1
    end
 
-   if !Nemo.iswindows64()
+   if !(Sys.iswindows() && (Int == Int64))
 
       @test number_of_partitions(10) == 42
 

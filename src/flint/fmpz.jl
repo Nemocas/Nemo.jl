@@ -1225,7 +1225,9 @@ issquare(x::fmpz) = Bool(ccall((:fmpz_is_square, libflint), Cint,
                                (Ref{fmpz},), x))
 
 function issquare_with_sqrt(x::fmpz)
-    x < 0 && throw(DomainError(x, "Argument must be non-negative"))
+    if x < 0
+       return false, zero(fmpz)
+    end
     for i = 1:length(sqrt_moduli)
        res = mod(x, sqrt_moduli[i])
        if !(res in sqrt_residues[i])
@@ -1797,6 +1799,18 @@ function binomial(n::fmpz, k::fmpz)
         z = _binomial(n, n - k)
     end
     return negz ? neg!(z, z) : z
+end
+
+@doc Markdown.doc"""
+    binomial(n::UInt, k::UInt, ::FlintIntegerRing)
+
+Return the binomial coefficient $\frac{n!}{(n - k)!k!}$ as an `fmpz`.
+"""
+function binomial(n::UInt, k::UInt, ::FlintIntegerRing)
+    z = fmpz()
+    ccall((:fmpz_bin_uiui, libflint), Nothing,
+          (Ref{fmpz}, UInt, UInt), z, n, k)
+    return z
 end
 
 @doc Markdown.doc"""

@@ -295,6 +295,50 @@ end
 
 ###############################################################################
 #
+#   Square root
+#
+###############################################################################
+
+function Base.sqrt(a::gfp_fmpz_elem; check::Bool=true)
+   R = parent(a)
+   if iszero(a)
+      return zero(R)
+   end
+   z = fmpz()
+   flag = ccall((:fmpz_sqrtmod, libflint), Bool,
+                (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}),
+                 z, a.data, R.n)
+   check && !flag && error("Not a square in sqrt")
+   return gfp_fmpz_elem(z, R)
+end
+
+function issquare(a::gfp_fmpz_elem)
+   R = parent(a)
+   if iszero(a) || R.n == 2
+      return true
+   end
+   r = ccall((:fmpz_jacobi, libflint), Cint, (Ref{fmpz}, Ref{fmpz}),
+                                              a.data, R.n)
+   return isone(r)
+end
+
+function issquare_with_sqrt(a::gfp_fmpz_elem)
+   R = parent(a)
+   if iszero(a) || R.n == 2
+      return true, a
+   end
+   z = fmpz()
+   r = ccall((:fmpz_sqrtmod, libflint), Cint,
+             (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}),
+              z, a.data, R.n)
+   if iszero(r)
+      return false, zero(R)
+   end
+   return true, gfp_fmpz_elem(z, R)
+end
+
+###############################################################################
+#
 #   Unsafe functions
 #
 ###############################################################################

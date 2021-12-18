@@ -8,7 +8,7 @@
 Nemo is a computer algebra package for the Julia programming language. It aims
 to cover commutative algebra, number theory and group theory.
 
-It is currently developed by William Hart, Tommy Hofmann, Fredrik Johansson and
+It is currently developed by Dan Schultz, William Hart, Tommy Hofmann, Fredrik Johansson and
 Claus Fieker with contributions from others.
 
 - <https://nemocas.org> (Website)

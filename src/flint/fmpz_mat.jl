@@ -467,6 +467,7 @@ end
 ###############################################################################
 
 function inv(x::fmpz_mat)
+   !issquare(x) && error("Matrix not invertible")
    z = similar(x)
    d = fmpz()
    ccall((:fmpz_mat_inv, libflint), Nothing,

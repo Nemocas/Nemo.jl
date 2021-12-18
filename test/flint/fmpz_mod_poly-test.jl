@@ -398,15 +398,12 @@ end
 
    @test evaluate(f, R(10)) == 121
 
-if VERSION >= v"0.5.0-dev+3171"
-
    @test f(3) == 16
 
    @test f(fmpz(10)) == 121
 
    @test f(R(10)) == 121
 
-end
 end
 
 @testset "fmpz_mod_poly.composition" begin

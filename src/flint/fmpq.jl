@@ -427,7 +427,26 @@ function Base.sqrt(a::fmpq; check::Bool=true)
     snum = sqrt(numerator(a); check=check)
     sden = sqrt(denominator(a); check=check)
     return fmpq(snum, sden)
- end
+end
+
+function issquare(a::fmpq)
+    if !issquare(numerator(a)) || !issquare(denominator(a))
+       return false
+    end
+    return true
+end
+
+function issquare_with_sqrt(a::fmpq)
+    f1, s1 = issquare_with_sqrt(numerator(a))
+    if !f1
+        return false, zero(fmpq)
+    end
+    f2, s2 = issquare_with_sqrt(denominator(a))
+    if !f2
+        return false, zero(fmpq)
+    end
+    return true, fmpq(s1, s2)
+end
 
 ###############################################################################
 #

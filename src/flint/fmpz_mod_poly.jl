@@ -712,7 +712,7 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
-    function lift(R::FmpzPolyRing, y::fmpz_mod_poly)
+    lift(R::FmpzPolyRing, y::fmpz_mod_poly)
 
 Lift from a polynomial over $\mathbb{Z}/n\mathbb{Z}$ to a polynomial over
 $\mathbb{Z}$ with minimal reduced nonnegative coefficients. The ring `R`

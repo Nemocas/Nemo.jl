@@ -33,7 +33,7 @@ Nemo depends on AbstractAlgebra.jl which provides Nemo with generic routines for
 
 ## Installation
 
-To use Nemo we require Julia 1.0 or higher. Please see
+To use Nemo we require Julia 1.6 or higher. Please see
 <https://julialang.org/downloads/> for instructions on
 how to obtain julia for your system.
 

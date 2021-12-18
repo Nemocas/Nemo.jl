@@ -482,3 +482,41 @@ end
       end
    end
 end
+
+@testset "gfp.square_root" begin
+  for i = 1:100
+      p = rand(1:65537)
+      if Nemo.isprime(ZZ(p))
+         R = GF(p)
+
+         z = rand(R)
+         if p != 2
+            while issquare(z)
+               z = rand(R)
+            end
+         end
+   
+         for iter = 1:100
+            a = rand(R)
+
+            @test issquare(a^2)
+
+            s = sqrt(a^2)
+
+            @test s^2 == a^2
+
+            f1, s1 = issquare_with_sqrt(a^2)
+
+            @test f1 && s1^2 == a^2
+
+            if p != 2 && !iszero(a)
+               @test !issquare(z*a^2)
+
+               f2, s2 = issquare_with_sqrt(z*a^2)
+
+               @test !f2
+            end
+         end
+      end
+   end
+end

@@ -8,6 +8,13 @@ on:
     tags: '*'
   pull_request:
 
+concurrency:
+  # group by workflow and ref; the last slightly strange component ensures that for pull
+  # requests, we limit to 1 concurrent job, but for the master branch we don't
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/master' || github.run_number }}
+  # Cancel intermediate builds, but only if it is a pull request build.
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+
 jobs:
   test:
     runs-on: ${{ matrix.os }}
@@ -15,13 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         julia-version:
-          - '1.0'  # current LTS
-          #- '1.1'
-          #- '1.2'
-          - '1.3'
-          - '1.4'
-          - '1.5'
-          - '1.6'
+          - '1.6'  # current LTS
           - '~1.7.0-0'
           - 'nightly'
         os:
@@ -29,11 +30,7 @@ jobs:
         include:
           # Add a few windows and macOS jobs (not too many, the number we can run in parallel is limited)
           - os: macOS-latest
-            julia-version: '1.0'
-          - os: macOS-latest
             julia-version: '1.6'
-          - os: windows-latest
-            julia-version: '1.0'
           - os: windows-latest
             julia-version: '1.6'
 

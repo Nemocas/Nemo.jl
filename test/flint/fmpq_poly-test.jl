@@ -417,8 +417,6 @@ end
 
    @test evaluate(g, f) == fmpz(1503)//49
 
-if VERSION >= v"0.5.0-dev+3171"
-
    @test g(3) == 63
 
    @test g(fmpz(3)) == 63
@@ -430,7 +428,6 @@ if VERSION >= v"0.5.0-dev+3171"
    @test g(BigInt(3)//BigInt(1)) == 63
 
    @test g(f) == fmpz(1503)//49
-end
 end
 
 @testset "fmpq_poly.composition" begin

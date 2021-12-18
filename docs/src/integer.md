@@ -362,6 +362,7 @@ bell(::Int)
 
 ```@docs
 binomial(::fmpz, ::fmpz)
+binomial(::UInt, ::UInt, ::FlintIntegerRing)
 ```
 
 ```@docs

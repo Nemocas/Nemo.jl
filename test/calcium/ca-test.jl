@@ -275,6 +275,8 @@ end
 
    @test contains(RR(C(1im)*s, check=false), 0)
 
+   s = 1 * one(C) + 2 * onei(C)
+   @test ComplexF64(s) == 1 + 2 * im
 end
 
 @testset "ca.inplace" begin

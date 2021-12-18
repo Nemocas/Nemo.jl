@@ -50,8 +50,7 @@ function integrate(C::AcbField, F, a, b;
       d = ccall((:mpfr_get_d_2exp, :libmpfr), Float64,
                 (Ref{Clong}, Ref{BigFloat}, Cint),
                 expo, t,
-                VERSION < v"1.1" ? Base.MPFR.to_mpfr(RoundDown) :
-                                   Base.convert(Base.MPFR.MPFRRoundingMode, RoundDown))
+                Base.convert(Base.MPFR.MPFRRoundingMode, RoundDown))
       ccall((:mag_set_d, libarb), Nothing, (Ref{mag_struct}, Float64), ctol, d)
       ccall((:mag_mul_2exp_si, libarb), Nothing,
             (Ref{mag_struct}, Ref{mag_struct}, Int), ctol, ctol, Int(expo[]))

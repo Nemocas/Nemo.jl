@@ -296,6 +296,43 @@ end
 
 ###############################################################################
 #
+#   Square root
+#
+###############################################################################
+
+function Base.sqrt(a::gfp_elem; check::Bool=true)
+   R = parent(a)
+   if iszero(a)
+      return zero(R)
+   end
+   r = ccall((:n_sqrtmod, libflint), UInt, (UInt, UInt), a.data, R.n)
+   check && iszero(r) && error("Not a square in sqrt")
+   return gfp_elem(r, R)
+end
+
+function issquare(a::gfp_elem)
+   R = parent(a)
+   if iszero(a) || R.n == 2
+      return true
+   end
+   r = ccall((:n_jacobi, libflint), Cint, (UInt, UInt), a.data, R.n)
+   return isone(r)
+end
+
+function issquare_with_sqrt(a::gfp_elem)
+   R = parent(a)
+   if iszero(a) || R.n == 2
+      return true, a
+   end
+   r = ccall((:n_sqrtmod, libflint), UInt, (UInt, UInt), a.data, R.n)
+   if iszero(r)
+      return false, zero(R)
+   end
+   return true, gfp_elem(r, R)
+end
+
+###############################################################################
+#
 #   Unsafe functions
 #
 ###############################################################################
