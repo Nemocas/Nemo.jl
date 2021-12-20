@@ -985,12 +985,13 @@ end
 
    for T in [Int, fmpz]
       for iters = 1:1000
-         m1 = T(rand(0:100))
-         n1 = T(rand(0:100))
-         m2 = T(rand(0:100))
-         n2 = T(rand(0:100))
+         m1 = T(rand(-100:100))
+         n1 = T(rand(-100:100))
+         m2 = T(rand(-100:100))
+         n2 = T(rand(-100:100))
 
-         @test kronecker_symbol(m1*m2, n1*n2) ==
+         @test m1 == -1 || n1 == -1 || m2 == -1 || n2 == -1 ||
+               kronecker_symbol(m1*m2, n1*n2) ==
                   kronecker_symbol(m1, n1)*kronecker_symbol(m1, n2)*
                   kronecker_symbol(m2, n1)*kronecker_symbol(m2, n2)
       end
