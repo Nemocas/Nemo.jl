@@ -148,7 +148,7 @@ very much like the quotient $R[x]/(x^p)$ of the polynomial ring over $R$.
 Power series rings in Nemo provide all the functionality described for power
 series in AbstractAlgebra:
 
-<https://nemocas.github.io/AbstractAlgebra.jl/latest/series>
+<https://nemocas.github.io/AbstractAlgebra.jl/stable/series>
 
 In addition, generic power series and Laurent series are provided by AbstractAlgebra.
 

@@ -35,7 +35,7 @@ abstract type.
 
 Real balls in Nemo provide all the field functionality described in AbstractAlgebra:
 
-<https://nemocas.github.io/AbstractAlgebra.jl/latest/field>
+<https://nemocas.github.io/AbstractAlgebra.jl/stable/field>
 
 Below, we document the additional functionality provided for real balls.
 

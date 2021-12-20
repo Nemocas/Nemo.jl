@@ -33,7 +33,7 @@ $p$-adic field element types belong to the `FieldElem` abstract type.
 
 P-adic fields in Nemo implement all the AbstractAlgebra field functionality:.
 
-<https://nemocas.github.io/AbstractAlgebra.jl/latest/field>
+<https://nemocas.github.io/AbstractAlgebra.jl/stable/field>
 
 Below, we document all the additional function that is provide by Nemo for p-adic
 fields.

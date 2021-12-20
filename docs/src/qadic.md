@@ -35,7 +35,7 @@ $q$-adic field element types belong to the `FieldElem` abstract type.
 Q-adic fields in Nemo provide all the functionality described in AbstractAlgebra
 for fields:.
 
-<https://nemocas.github.io/AbstractAlgebra.jl/latest/field>
+<https://nemocas.github.io/AbstractAlgebra.jl/stable/field>
 
 Below, we document all the additional function that is provide by Nemo for q-adic
 fields.

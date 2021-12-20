@@ -52,7 +52,7 @@ Puiseux series rings in Nemo implement all the same functionality that is availa
 AbstractAlgebra series rings, with the exception of the `pol_length` and `polcoeff`
 functions:
 
-<https://nemocas.github.io/AbstractAlgebra.jl/latest/series>
+<https://nemocas.github.io/AbstractAlgebra.jl/stable/series>
 
 In addition, generic Puiseux series are provided by AbstractAlgebra.jl
 

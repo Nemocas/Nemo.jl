@@ -42,7 +42,7 @@ one to write generic functions that can accept any Nemo univariate polynomial ty
 All univariate polynomial types in Nemo provide the AbstractAlgebra univariate
 polynomial functionality:
 
-<https://nemocas.github.io/AbstractAlgebra.jl/latest/polynomial>
+<https://nemocas.github.io/AbstractAlgebra.jl/stable/polynomial>
 
 Generic polynomials are also available.
 

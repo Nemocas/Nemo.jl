@@ -5,7 +5,7 @@ Tommy Hofmann, Claus Fieker, Fredrik Johansson with additional code by Oleksandr
 
 - <https://nemocas.org> (Website)
 - <https://github.com/Nemocas/Nemo.jl> (Source code)
-- <https://nemocas.github.io/Nemo.jl/latest/> (Online documentation)
+- <https://nemocas.github.io/Nemo.jl/stable/> (Online documentation)
 
 The features of Nemo so far include:
 

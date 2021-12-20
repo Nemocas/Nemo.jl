@@ -39,9 +39,9 @@ IntegerUnion = Union{Integer,fmpz}
 Nemo integers provide all of the ring and Euclidean ring functionality of
 AbstractAlgebra.jl.
 
-<https://nemocas.github.io/AbstractAlgebra.jl/latest/ring>
+<https://nemocas.github.io/AbstractAlgebra.jl/stable/ring>
 
-<https://nemocas.github.io/AbstractAlgebra.jl/latest/euclidean_interface>
+<https://nemocas.github.io/AbstractAlgebra.jl/stable/euclidean_interface>
 
 Below, we describe the functionality that is specific to the Nemo/Flint integer ring.
 

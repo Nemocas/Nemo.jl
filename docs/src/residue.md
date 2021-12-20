@@ -36,7 +36,7 @@ This enables one to write generic functions that accept any Nemo residue type.
 All the residue rings in Nemo provide the functionality described in AbstractAlgebra
 for residue rings:
 
-<https://nemocas.github.io/AbstractAlgebra.jl/latest/residue>
+<https://nemocas.github.io/AbstractAlgebra.jl/stable/residue>
 
 In addition, generic residue rings are available.
 

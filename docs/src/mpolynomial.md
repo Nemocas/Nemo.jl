@@ -42,7 +42,7 @@ one to write generic functions that can accept any Nemo multivariate polynomial 
 All multivariate polynomial types in Nemo provide the multivariate polynomial
 functionality described by AbstractAlgebra:
 
-<https://nemocas.github.io/AbstractAlgebra.jl/latest/mpolynomial>
+<https://nemocas.github.io/AbstractAlgebra.jl/stable/mpolynomial>
 
 Generic multivariate polynomials are also available.
 
