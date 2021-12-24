@@ -413,9 +413,9 @@ function det(a::nmod_mat)
      return base_ring(a)(r)
   else
      try
-        return det_fflu(a)
+        return AbstractAlgebra.det_fflu(a)
      catch
-        return det_df(a)
+        return AbstractAlgebra.det_df(a)
      end
   end
 end

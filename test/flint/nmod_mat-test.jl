@@ -532,6 +532,10 @@ end
   @test c == Z17(13)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
+
+  R = ResidueRing(ZZ, 3^5)
+  a = R[1;]
+  @test @inferred isone(det(a))
 end
 
 @testset "nmod_mat.rank" begin
