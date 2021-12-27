@@ -523,6 +523,22 @@ end
 
 ###############################################################################
 #
+#   Modulus
+#
+###############################################################################
+
+function modulus(k::FqDefaultFiniteField, var::String="T")
+    p = characteristic(k)
+    Q = polynomial(GF(p), [], var)
+    ccall((:fq_default_ctx_modulus, libflint), Nothing,
+          (Ref{gfp_fmpz_poly}, Ref{FqDefaultFiniteField}),
+          Q, k)
+    return Q
+end
+
+
+###############################################################################
+#
 #   Promotions
 #
 ###############################################################################

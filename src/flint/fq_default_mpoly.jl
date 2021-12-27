@@ -12,12 +12,12 @@ mutable struct FqDefaultMPolyRing <: MPolyRing{fq_default}
     base_ring::FqDefaultFiniteField
 end
 
-mutable struct fq_default_mpoly
+mutable struct fq_default_mpoly <: MPolyElem{fq_default}
     parent::FqDefaultMPolyRing
     data::_fq_default_mpoly_union
 
     function fq_default_mpoly(a::FqDefaultMPolyRing, b::_fq_default_mpoly_union)
-        a.data == parent(b.data) || error("bad parents")
+        a.data == parent(b) || error("bad parents")
         return new(a, b)
     end
 end
@@ -108,6 +108,41 @@ end
 
 function isconstant(a::fq_default_mpoly)
     return isconstant(a.data)
+end
+
+###############################################################################
+#
+#   AbstractString I/O
+#
+###############################################################################
+
+function expressify(a::fq_default_mpoly, x = symbols(parent(a)); context = nothing)
+    return expressify(a.data, x, context = context)
+end
+
+@enable_all_show_via_expressify fq_default_mpoly
+
+
+function show(io::IO, p::FqDefaultMPolyRing)
+    local max_vars = 5 # largest number of variables to print
+    S = symbols(p)
+    n = length(S)
+    print(io, "Multivariate Polynomial Ring in ")
+    if n == 0 || n > max_vars
+        print(io, n)
+        print(io, " variables ")
+    end
+    for i in 1:min(n - 1, max_vars - 1)
+        print(io, string(S[i]), ", ")
+    end
+    if n > max_vars
+        print(io, "..., ")
+    end
+    if n > 0
+        print(io, string(S[n]))
+    end
+    print(io, " over ")
+    print(IOContext(io, :compact => true), base_ring(p))
 end
 
 ################################################################################
@@ -519,11 +554,11 @@ function (R::FqDefaultMPolyRing)(a::Vector{fq_default}, b::Vector{Vector{T}}) wh
     return fq_default_mpoly(R, R.data(A, b))
 end
 
-################################################################################
+###############################################################################
 #
 #  Ad hoc exact division
 #
-################################################################################
+###############################################################################
 
 function divexact(a::fq_default_mpoly, b::fq_default; check::Bool=true)
     return a*inv(b)
@@ -541,8 +576,9 @@ end
 
 function PolynomialRing(R::FqDefaultFiniteField, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
     # try just fq for now
-    Fq = FqFiniteField(modulus(R), Symbol(R.var), cached = cached, check = false)
-    Fqx = AbstractAlgebra.Generic.PolynomialRing(F, R, cached = cached, ordering = ordering)[1]
+    m = modulus(R)
+    Fq = FqFiniteField(m, Symbol(R.var), cached, check = false)
+    Fqx = AbstractAlgebra.Generic.PolynomialRing(Fq, s, cached = cached, ordering = ordering)[1]
     parent_obj = FqDefaultMPolyRing(Fqx, R)
     return parent_obj, gens(parent_obj)
 end
