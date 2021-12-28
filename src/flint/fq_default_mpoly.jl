@@ -1,8 +1,9 @@
 
-const _fq_default_mpoly_union = Union{gfp_mpoly,
-                                      #gfp_fmpz_mpoly,
+const _fq_default_mpoly_union = Union{AbstractAlgebra.Generic.MPoly{fq},
                                       fq_nmod_mpoly,
-                                      AbstractAlgebra.Generic.MPoly{fq}}
+                                      gfp_mpoly,
+                                      #gfp_fmpz_mpoly
+                                      }
 
 mutable struct FqDefaultMPolyRing <: MPolyRing{fq_default}
     data::Union{GFPMPolyRing,
@@ -10,6 +11,7 @@ mutable struct FqDefaultMPolyRing <: MPolyRing{fq_default}
                 FqNmodMPolyRing,
                 AbstractAlgebra.Generic.MPolyRing{fq}}
     base_ring::FqDefaultFiniteField
+    typ::Int
 end
 
 mutable struct fq_default_mpoly <: MPolyElem{fq_default}
@@ -21,6 +23,34 @@ mutable struct fq_default_mpoly <: MPolyElem{fq_default}
         return new(a, b)
     end
 end
+
+macro fq_default_mpoly_do_op(f, R, a)
+    return :(
+        if ($(esc(R))).typ == 1
+            T = AbstractAlgebra.Generic.MPoly{fq}
+            return fq_default_mpoly($(esc(R)), ($(esc(f)))(($(esc(a))).data::T))
+        elseif ($(esc(R))).typ == 2
+            return fq_default_mpoly(($(esc(R))), ($(esc(f)))(($(esc(a))).data::fq_nmod_mpoly))
+        else
+            return fq_default_mpoly(($(esc(R))), ($(esc(f)))(($(esc(a))).data::gfp_mpoly))
+        end
+    )
+end
+
+macro fq_default_mpoly_do_op(f, R, a, b)
+    return :(
+        if ($(esc(R))).typ == 1
+            T = AbstractAlgebra.Generic.MPoly{fq}
+            return fq_default_mpoly($(esc(R)), ($(esc(f)))(($(esc(a))).data::T, ($(esc(b))).data::T))
+        elseif ($(esc(R))).typ == 2
+            return fq_default_mpoly(($(esc(R))), ($(esc(f)))(($(esc(a))).data::fq_nmod_mpoly, ($(esc(b))).data::fq_nmod_mpoly))
+        else
+            return fq_default_mpoly(($(esc(R))), ($(esc(f)))(($(esc(a))).data::gfp_mpoly, ($(esc(b))).data::gfp_mpoly))
+        end
+    )
+end
+
+
 
 ###############################################################################
 #
@@ -218,22 +248,26 @@ end
 ###############################################################################
 
 function -(a::fq_default_mpoly)
-    return fq_default_mpoly(parent(a), -a.data)
+    R = parent(a)
+    @fq_default_mpoly_do_op(-, R, a)
 end
 
 function +(a::fq_default_mpoly, b::fq_default_mpoly)
     check_parent(a, b)
-    return fq_default_mpoly(parent(a), a.data + b.data)
+    R = parent(a)
+    @fq_default_mpoly_do_op(+, R, a, b)
 end
 
 function -(a::fq_default_mpoly, b::fq_default_mpoly)
     check_parent(a, b)
-    return fq_default_mpoly(parent(a), a.data - b.data)
+    R = parent(a)
+    @fq_default_mpoly_do_op(-, R, a, b)
 end
 
 function *(a::fq_default_mpoly, b::fq_default_mpoly)
     check_parent(a, b)
-    return fq_default_mpoly(parent(a), a.data * b.data)
+    R = parent(a)
+    @fq_default_mpoly_do_op(*, R, a, b)
 end
 
 ###############################################################################
@@ -579,7 +613,7 @@ function PolynomialRing(R::FqDefaultFiniteField, s::Vector{Symbol}; cached::Bool
     m = modulus(R)
     Fq = FqFiniteField(m, Symbol(R.var), cached, check = false)
     Fqx = AbstractAlgebra.Generic.PolynomialRing(Fq, s, cached = cached, ordering = ordering)[1]
-    parent_obj = FqDefaultMPolyRing(Fqx, R)
+    parent_obj = FqDefaultMPolyRing(Fqx, R, 1)
     return parent_obj, gens(parent_obj)
 end
 
