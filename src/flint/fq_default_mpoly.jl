@@ -11,7 +11,7 @@ mutable struct FqDefaultMPolyRing <: MPolyRing{fq_default}
                 FqNmodMPolyRing,
                 AbstractAlgebra.Generic.MPolyRing{fq}}
     base_ring::FqDefaultFiniteField
-    typ::Int
+    typ::Int    # keep these in sync with fq_default_mpoly_do_op
 end
 
 mutable struct fq_default_mpoly <: MPolyElem{fq_default}
@@ -24,33 +24,27 @@ mutable struct fq_default_mpoly <: MPolyElem{fq_default}
     end
 end
 
-macro fq_default_mpoly_do_op(f, R, a)
-    return :(
-        if ($(esc(R))).typ == 1
-            T = AbstractAlgebra.Generic.MPoly{fq}
-            return fq_default_mpoly($(esc(R)), ($(esc(f)))(($(esc(a))).data::T))
-        elseif ($(esc(R))).typ == 2
-            return fq_default_mpoly(($(esc(R))), ($(esc(f)))(($(esc(a))).data::fq_nmod_mpoly))
+# julia fails to generate decent code unless it is all pasted in
+macro fq_default_mpoly_do_op(f, R, a...)
+    f = Expr(:escape, f)
+    R = Expr(:escape, R)
+    a = (Expr(:escape, ai) for ai in a)
+    res = nothing
+    for (tnum, T) in ((1, :(AbstractAlgebra.Generic.MPoly{fq})),
+                      (2, :(fq_nmod_mpoly)),
+                      (3, :(gfp_mpoly)),
+                     )
+        ret = (Expr(:(::), Expr(:(.), ai, QuoteNode(:data)), T) for ai in a)
+        ret = Expr(:return, Expr(:call, f, ret...))
+        if res == nothing
+            res = ret
         else
-            return fq_default_mpoly(($(esc(R))), ($(esc(f)))(($(esc(a))).data::gfp_mpoly))
+            cond = Expr(:call, :(==), Expr(:(.), R, QuoteNode(:typ)), tnum)
+            res = Expr(:if, cond, ret, res)
         end
-    )
+    end
+    return res
 end
-
-macro fq_default_mpoly_do_op(f, R, a, b)
-    return :(
-        if ($(esc(R))).typ == 1
-            T = AbstractAlgebra.Generic.MPoly{fq}
-            return fq_default_mpoly($(esc(R)), ($(esc(f)))(($(esc(a))).data::T, ($(esc(b))).data::T))
-        elseif ($(esc(R))).typ == 2
-            return fq_default_mpoly(($(esc(R))), ($(esc(f)))(($(esc(a))).data::fq_nmod_mpoly, ($(esc(b))).data::fq_nmod_mpoly))
-        else
-            return fq_default_mpoly(($(esc(R))), ($(esc(f)))(($(esc(a))).data::gfp_mpoly, ($(esc(b))).data::gfp_mpoly))
-        end
-    )
-end
-
-
 
 ###############################################################################
 #
