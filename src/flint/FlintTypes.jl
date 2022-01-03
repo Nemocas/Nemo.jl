@@ -2553,6 +2553,17 @@ mutable struct fq <: FinFieldElem
       d.parent = ctx
       return d
    end
+
+   function fq(ctx::FqFiniteField, x::fmpz_poly)
+      d = new()
+      ccall((:fq_init2, libflint), Nothing,
+            (Ref{fq}, Ref{FqFiniteField}), d, ctx)
+      finalizer(_fq_clear_fn, d)
+      ccall((:fq_set_fmpz_poly, libflint), Nothing,
+            (Ref{fq}, Ref{fmpz_poly}, Ref{FqFiniteField}), d, x, ctx)
+      d.parent = ctx
+      return d
+   end
 end
 
 function _fq_clear_fn(a::fq)

@@ -174,6 +174,23 @@ function (R::GFPFmpzPolyRing)(x::fq_default)
    return p
 end
 
+function _unchecked_coerce(a::FqFiniteField, b::fq_default)
+    x = fmpz_poly()
+    ccall((:fq_default_get_fmpz_poly, libflint), Nothing,
+         (Ref{fmpz_poly}, Ref{fq_default}, Ref{FqDefaultFiniteField}),
+          x, b, parent(b))
+    return fq(a, x)
+end
+
+function _unchecked_coerce(a::FqDefaultFiniteField, b::fq)
+    x = fmpz_poly()
+    ccall((:fq_get_fmpz_poly, libflint), Nothing,
+         (Ref{fmpz_poly}, Ref{fq}, Ref{FqFiniteField}),
+          x, b, parent(b))
+    return fq_default(a, x)
+end
+
+
 ###############################################################################
 #
 #   Canonicalisation
@@ -520,6 +537,47 @@ function add!(z::fq_default, x::fq_default, y::fq_default)
         (Ref{fq_default}, Ref{fq_default}, Ref{fq_default}, Ref{FqDefaultFiniteField}), z, x, y, x.parent)
    return z
 end
+
+###############################################################################
+#
+#   Random functions
+#
+###############################################################################
+
+# define rand(::FqDefaultFiniteField)
+
+Random.Sampler(::Type{RNG}, R::FqDefaultFiniteField, n::Random.Repetition) where {RNG<:AbstractRNG} =
+   Random.SamplerSimple(R, Random.Sampler(RNG, BigInt(0):BigInt(order(R))-1, n))
+
+function rand(rng::AbstractRNG, R::Random.SamplerSimple{FqDefaultFiniteField})
+   F = R[]
+   x = gen(F)
+   z = zero(F)
+   p = characteristic(F)
+   n = fmpz(rand(rng, R.data))
+   xi = one(F)
+   while !iszero(n)
+      n, r = divrem(n, p)
+      z += r*xi
+      xi *= x
+   end
+   return z
+end
+
+Random.gentype(::Type{FqDefaultFiniteField}) = elem_type(FqDefaultFiniteField)
+
+# define rand(make(::FqDefaultFiniteField, arr)), where arr is any abstract array with integer or fmpz entries
+
+RandomExtensions.maketype(R::FqDefaultFiniteField, _) = elem_type(R)
+
+rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{fq_default,FqDefaultFiniteField,<:AbstractArray{<:IntegerUnion}}}) =
+   sp[][1](rand(rng, sp[][2]))
+
+# define rand(::FqDefaultFiniteField, arr), where arr is any abstract array with integer or fmpz entries
+
+rand(r::Random.AbstractRNG, R::FqDefaultFiniteField, b::AbstractArray) = rand(r, make(R, b))
+
+rand(R::FqDefaultFiniteField, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
 
 ###############################################################################
 #

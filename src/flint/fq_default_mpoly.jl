@@ -12,7 +12,17 @@ mutable struct FqDefaultMPolyRing <: MPolyRing{fq_default}
                 AbstractAlgebra.Generic.MPolyRing{fq}}
     base_ring::FqDefaultFiniteField
     typ::Int    # keep these in sync with fq_default_mpoly_do_op
+
+    function FqDefaultMPolyRing(a, b::FqDefaultFiniteField, c::Int, cached = true)
+        return AbstractAlgebra.get_cached!(FqDefaultMPolyID, (a, b, c), cached) do
+            return new(a, b, c)
+        end::FqDefaultMPolyRing
+    end
 end
+
+const FqDefaultMPolyID = AbstractAlgebra.CacheDictType{
+                              Tuple{Any, FqDefaultFiniteField, Int},
+                              FqDefaultMPolyRing}()
 
 mutable struct fq_default_mpoly <: MPolyElem{fq_default}
     parent::FqDefaultMPolyRing
@@ -23,6 +33,8 @@ mutable struct fq_default_mpoly <: MPolyElem{fq_default}
         return new(a, b)
     end
 end
+
+export FqDefaultMPolyRing, fq_default_mpoly
 
 # julia fails to generate decent code unless it is all pasted in
 macro fq_default_mpoly_do_op(f, R, a...)
@@ -35,7 +47,7 @@ macro fq_default_mpoly_do_op(f, R, a...)
                       (3, :(gfp_mpoly)),
                      )
         ret = (Expr(:(::), Expr(:(.), ai, QuoteNode(:data)), T) for ai in a)
-        ret = Expr(:return, Expr(:call, f, ret...))
+        ret = Expr(:return, Expr(:call, :fq_default_mpoly, R, Expr(:call, f, ret...)))
         if res == nothing
             res = ret
         else
@@ -103,11 +115,11 @@ function length(a::fq_default_mpoly)
 end
 
 function one(R::FqDefaultMPolyRing)
-    return one(R.data)
+    return fq_default_mpoly(R, one(R.data))
 end
 
 function zero(R::FqDefaultMPolyRing)
-    return zero(R.data)
+    return fq_default_mpoly(R, zero(R.data))
 end
 
 function isone(a::fq_default_mpoly)
@@ -176,15 +188,15 @@ end
 ################################################################################
 
 function coeff(a::fq_default_mpoly, i::Int)
-    return fq_default(base_ring(a), coeff(a.data, i))
+    return _unchecked_coerce(base_ring(a), coeff(a.data, i))
 end
 
 function coeff(a::fq_default_mpoly, b::fq_default_mpoly)
-    return fq_default(base_ring(a), coeff(a.data, b.data))
+    return _unchecked_coerce(base_ring(a), coeff(a.data, b.data))
 end
 
-function trailing_coefficient(p::fq_default_mpoly)
-    return fq_default(base_ring(a), trailing_coefficient(p.data))
+function trailing_coefficient(a::fq_default_mpoly)
+    return _unchecked_coerce(base_ring(a), trailing_coefficient(a.data))
 end
 
 ###############################################################################
@@ -232,7 +244,7 @@ end
 ###############################################################################
 
 function coeff(a::fq_default_mpoly, vars::Vector{Int}, exps::Vector{Int})
-    return fq_default_mpoly(parent(a), coeff(a, vars, exps))
+    return fq_default_mpoly(parent(a), coeff(a.data, vars, exps))
 end
 
 ###############################################################################
@@ -270,28 +282,52 @@ end
 #
 ###############################################################################
 
-function +(a::fq_default_mpoly, b::Union{fq_default, Integer})
+function +(a::fq_default_mpoly, b::IntegerUnion)
     return fq_default_mpoly(parent(a), a.data + base_ring(a.data)(b))
 end
 
-function +(b::Union{fq_default, Integer}, a::fq_default_mpoly)
-    return fq_default_mpoly(parent(a), base_ring(a.data)(b) + a.data)
+function +(a::fq_default_mpoly, b::fq_default)
+    parent(b) == base_ring(a) || error("Unable to coerce element")
+    b1 = _unchecked_coerce(base_ring(a.data), b)
+    return fq_default_mpoly(parent(a), a.data + b1)
 end
 
-function -(a::fq_default_mpoly, b::Union{fq_default, Integer})
+function +(b::Union{fq_default, Integer}, a::fq_default_mpoly)
+    return a + b
+end
+
+function -(a::fq_default_mpoly, b::IntegerUnion)
     return fq_default_mpoly(parent(a), a.data - base_ring(a.data)(b))
 end
 
-function -(b::Union{fq_default, Integer}, a::fq_default_mpoly)
+function -(a::fq_default_mpoly, b::fq_default)
+    parent(b) == base_ring(a) || error("Unable to coerce element")
+    b1 = _unchecked_coerce(base_ring(a.data), b)
+    return fq_default_mpoly(parent(a), a.data - b1)
+end
+
+function -(b::IntegerUnion, a::fq_default_mpoly)
     return fq_default_mpoly(parent(a), base_ring(a.data)(b) - a.data)
 end
 
-function *(a::fq_default_mpoly, b::Union{fq_default, Integer})
+function -(b::fq_default, a::fq_default_mpoly)
+    parent(b) == base_ring(a) || error("Unable to coerce element")
+    b1 = _unchecked_coerce(base_ring(a.data), b)
+    return fq_default_mpoly(parent(a), b1 - a.data)
+end
+
+function *(a::fq_default_mpoly, b::IntegerUnion)
     return fq_default_mpoly(parent(a), a.data * base_ring(a.data)(b))
 end
 
+function *(a::fq_default_mpoly, b::fq_default)
+    parent(b) == base_ring(a) || error("Unable to coerce element")
+    b1 = _unchecked_coerce(base_ring(a.data), b)
+    return fq_default_mpoly(parent(a), a.data * b1)
+end
+
 function *(b::Union{fq_default, Integer}, a::fq_default_mpoly)
-    return fq_default_mpoly(parent(a), base_ring(a.data)(b) * a.data)
+    return a*b
 end
 
 ###############################################################################
@@ -300,7 +336,7 @@ end
 #
 ###############################################################################
 
-function ^(a::fq_default_mpoly, b::Union{Int, fmpz})
+function ^(a::fq_default_mpoly, b::Integer)
     return fq_default_mpoly(parent(a), a.data^b)
 end
 
@@ -340,7 +376,7 @@ end
 
 function issquare_with_sqrt(a::fq_default_mpoly)
     x, y = issquare_with_sqrt(a.data)
-    return x, fq_default_mpoly(parent(a), x)
+    return x, fq_default_mpoly(parent(a), y)
 end
 
 ###############################################################################
@@ -416,9 +452,9 @@ function Base.divrem(a::fq_default_mpoly, b::Vector{fq_default_mpoly})
     end
     ad = a.data
     bd = typeof(ad)[bi.data for bi in b]
-    x, y = divrem(ad, bd)
-    return fq_default_mpoly(parent(a), x),
-           [fq_default_mpoly(parent(a), yi) for yi in y]
+    q, r = Base.divrem(ad, bd)
+    return [fq_default_mpoly(parent(a), qi) for qi in q],
+           fq_default_mpoly(parent(a), r)
 end
 
 ###############################################################################
@@ -448,13 +484,39 @@ end
 #
 ###############################################################################
 
-# this is probably not going to work
-function evaluate(a::fq_default_mpoly, b::Vector)
-    return evaluate(a.data, b)
-end
-
-function (a::(fq_default_mpoly))(vals::Integer...)
-   return evaluate(a.data, [vals...])
+# TODO have AA define evaluate(a, vals) for general vals
+# so we can get rid of this copy pasta
+function (a::fq_default_mpoly)(vals::Union{NCRingElem, RingElement}...)
+   length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
+   R = base_ring(a)
+   powers = [Dict{Int, Any}() for i in 1:length(vals)]
+   r = R()
+   c = zero(R)
+   U = Vector{Any}(undef, length(vals))
+   for j = 1:length(vals)
+      W = typeof(vals[j])
+      if ((W <: Integer && W != BigInt) ||
+          (W <: Rational && W != Rational{BigInt}))
+         c = c*zero(W)
+         U[j] = parent(c)
+      else
+         U[j] = parent(vals[j])
+         c = c*zero(parent(vals[j]))
+      end
+   end
+   cvzip = zip(coefficients(a), exponent_vectors(a))
+   for (c, v) in cvzip
+      t = c
+      for j = 1:length(vals)
+         exp = v[j]
+         if !haskey(powers[j], exp)
+            powers[j][exp] = (U[j](vals[j]))^exp
+         end
+         t = t*powers[j][exp]
+      end
+      r += t
+   end
+   return r
 end
 
 ###############################################################################
@@ -483,8 +545,9 @@ function mul!(a::fq_default_mpoly, b::fq_default_mpoly, c::fq_default_mpoly)
     return a
 end
 
-function setcoeff!(a::fq_default_mpoly, n::Int, c)
-    a.data = setcoeff!(a.data, n, base_ring(a)(c))
+function setcoeff!(a::fq_default_mpoly, n::Int, c::fq_default)
+    Rd = parent(a).data
+    a.data = setcoeff!(a.data, n, _unchecked_coerce(base_ring(Rd), c))
     return a
 end
 
@@ -512,8 +575,12 @@ function exponent_vectors_fmpz(a::fq_default_mpoly)
 end
 
 function set_exponent_vector!(a::fq_default_mpoly, n::Int, exps::Vector{T}) where T
-    a.data = set_exponent_vector(a.data, n, exps)
+    a.data = set_exponent_vector!(a.data, n, exps)
     return a
+end
+
+function exponent_vector(a::fq_default_mpoly, i::Int)
+    return exponent_vector(a.data, i)
 end
 
 function exponent(a::fq_default_mpoly, i::Int, j::Int)
@@ -521,11 +588,12 @@ function exponent(a::fq_default_mpoly, i::Int, j::Int)
 end
 
 function coeff(a::fq_default_mpoly, exps::Vector{T}) where T
-    return fq_default(base_ring(a), coeff(a.data, exps))
+    return _unchecked_coerce(base_ring(a), coeff(a.data, exps))
 end
 
-function setcoeff!(a::fq_default_mpoly, exps::Vector{T}, b) where T
-    setcoeff!(a.data, exps, base_ring(a.data)(b))
+function setcoeff!(a::fq_default_mpoly, e, b::fq_default)
+    base_ring(a) == parent(b) || error("unable to coerce element")
+    setcoeff!(a.data, e, _unchecked_coerce(base_ring(a.data), b))
     return a
 end
 
@@ -567,19 +635,25 @@ function (R::FqDefaultMPolyRing)()
     return fq_default_mpoly(R, R.data())
 end
 
-function (R::FqDefaultMPolyRing)(b::Union{fq_default, Integer, fmpz})
-    return fq_default_mpoly(R, R.data(base_ring(R)(b)))
+function (R::FqDefaultMPolyRing)(b::IntegerUnion)
+    return fq_default_mpoly(R, R.data(b))
 end
+
+function (R::FqDefaultMPolyRing)(b::fq_default)
+    parent(b) == base_ring(R) || error("Unable to coerce element")
+    return fq_default_mpoly(R, R.data(_unchecked_coerce(base_ring(R.data), b)))
+end
+
 
 function (R::FqDefaultMPolyRing)(a::fq_default_mpoly)
    parent(a) == R || error("Unable to coerce polynomial")
    return a
 end
 
-function (R::FqDefaultMPolyRing)(a::Vector{fq_default}, b::Vector{Vector{T}}) where {T <: Union{fmpz, UInt}}
-    F = base_ring(R)
-    A = elem_type(F)[F(ai) for ai in a]
-    return fq_default_mpoly(R, R.data(A, b))
+function (R::FqDefaultMPolyRing)(a::Vector{fq_default}, b::Vector{Vector{Int}})
+    F = base_ring(R.data)
+    ad = elem_type(F)[_unchecked_coerce(F, ai) for ai in a]
+    return fq_default_mpoly(R, R.data(ad, b))
 end
 
 ###############################################################################
@@ -607,7 +681,7 @@ function PolynomialRing(R::FqDefaultFiniteField, s::Vector{Symbol}; cached::Bool
     m = modulus(R)
     Fq = FqFiniteField(m, Symbol(R.var), cached, check = false)
     Fqx = AbstractAlgebra.Generic.PolynomialRing(Fq, s, cached = cached, ordering = ordering)[1]
-    parent_obj = FqDefaultMPolyRing(Fqx, R, 1)
+    parent_obj = FqDefaultMPolyRing(Fqx, R, 1, cached)
     return parent_obj, gens(parent_obj)
 end
 
