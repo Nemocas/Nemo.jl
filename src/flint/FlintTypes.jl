@@ -6674,7 +6674,8 @@ mutable struct FqDefaultMPolyRing <: MPolyRing{fq_default}
                 FqNmodMPolyRing,
                 AbstractAlgebra.Generic.MPolyRing{fq}}
     base_ring::FqDefaultFiniteField
-    typ::Int    # keep these in sync with fq_default_mpoly_do_op
+    typ::Int    # keep these in sync with fq_default_mpoly_do_op and
+                # the PolynomialRing constructor
 
     function FqDefaultMPolyRing(a, b::FqDefaultFiniteField, c::Int, cached = true)
         return AbstractAlgebra.get_cached!(FqDefaultMPolyID, (a, b, c), cached) do

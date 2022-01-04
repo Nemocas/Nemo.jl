@@ -623,9 +623,23 @@ end
 function PolynomialRing(R::FqDefaultFiniteField, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
     # try just fq for now
     m = modulus(R)
-    Fq = FqFiniteField(m, Symbol(R.var), cached, check = false)
-    Fqx = AbstractAlgebra.Generic.PolynomialRing(Fq, s, cached = cached, ordering = ordering)[1]
-    parent_obj = FqDefaultMPolyRing(Fqx, R, 1, cached)
+    p = characteristic(R)
+    if fits(UInt, p)
+        Fq = GF(UInt(p))
+        if isone(degree(m))
+            Fqx = PolynomialRing(Fq, s, cached = cached, ordering = ordering)[1]
+            parent_obj = FqDefaultMPolyRing(Fqx, R, 3, cached)
+        else
+            mm = PolynomialRing(Fq, "x")[1](lift(PolynomialRing(ZZ, "x")[1], m))
+            Fq = FlintFiniteField(mm, R.var, cached = cached, check = false)[1]
+            Fqx = PolynomialRing(Fq, s, cached = cached, ordering = ordering)[1]
+            parent_obj = FqDefaultMPolyRing(Fqx, R, 2, cached)
+        end
+    else
+        Fq = FqFiniteField(m, Symbol(R.var), cached, check = false)
+        Fqx = AbstractAlgebra.Generic.PolynomialRing(Fq, s, cached = cached, ordering = ordering)[1]
+        parent_obj = FqDefaultMPolyRing(Fqx, R, 1, cached)
+    end
     return parent_obj, gens(parent_obj)
 end
 

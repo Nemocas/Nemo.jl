@@ -174,6 +174,7 @@ function (R::GFPFmpzPolyRing)(x::fq_default)
    return p
 end
 
+# with fq
 function _unchecked_coerce(a::FqFiniteField, b::fq_default)
     x = fmpz_poly()
     ccall((:fq_default_get_fmpz_poly, libflint), Nothing,
@@ -186,6 +187,41 @@ function _unchecked_coerce(a::FqDefaultFiniteField, b::fq)
     x = fmpz_poly()
     ccall((:fq_get_fmpz_poly, libflint), Nothing,
          (Ref{fmpz_poly}, Ref{fq}, Ref{FqFiniteField}),
+          x, b, parent(b))
+    return fq_default(a, x)
+end
+
+# with nmod
+function _unchecked_coerce(a::GaloisField, b::fq_default)
+    iszero(b) && return zero(a)
+    x = fmpz_poly()
+    ccall((:fq_default_get_fmpz_poly, libflint), Nothing,
+         (Ref{fmpz_poly}, Ref{fq_default}, Ref{FqDefaultFiniteField}),
+          x, b, parent(b))
+    return a(coeff(x, 0))
+end
+
+function _unchecked_coerce(a::FqDefaultFiniteField, b::gfp_elem)
+    return fq_default(a, lift(b))
+end
+
+# with fq_nmod
+function _unchecked_coerce(a::FqNmodFiniteField, b::fq_default)
+    x = nmod_poly(UInt(characteristic(a)))
+    ccall((:fq_default_get_nmod_poly, libflint), Nothing,
+         (Ref{nmod_poly}, Ref{fq_default}, Ref{FqDefaultFiniteField}),
+          x, b, parent(b))
+    y = a()
+    ccall((:fq_nmod_set_nmod_poly, libflint), Nothing,
+         (Ref{fq_nmod}, Ref{nmod_poly}, Ref{FqNmodFiniteField}),
+          y, x, a)
+    return y
+end
+
+function _unchecked_coerce(a::FqDefaultFiniteField, b::fq_nmod)
+    x = nmod_poly(UInt(characteristic(parent(b))))
+    ccall((:fq_nmod_get_nmod_poly, libflint), Nothing,
+         (Ref{nmod_poly}, Ref{fq_nmod}, Ref{FqNmodFiniteField}),
           x, b, parent(b))
     return fq_default(a, x)
 end
