@@ -650,7 +650,7 @@ end
            @test length(f) == lenf - 1
 
            while length(f) < 2
-              f = rand(R, 5:10, 1:10)
+              f = rand(S, 5:10, 1:10)
            end
 
            lenf = length(f)
