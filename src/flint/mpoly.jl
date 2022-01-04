@@ -19,6 +19,7 @@ function exponent_vector(::Type{T}, a::FlintMPolyUnion, i::Int) where T <: Union
    if !exponent_vector_fits(T, a, i)
       throw(DomainError(term(a, i), "exponents do not fit in $T"))
    end
+   1 <= i <= length(a) || error("Index must be between 1 and $(length(a))")
    z = Vector{T}(undef, nvars(parent(a)))
    return exponent_vector!(z, a, i)
 end
@@ -30,6 +31,7 @@ function exponent_vector(::Type{fmpz}, a::FlintMPolyUnion, i::Int)
    for i in 1:n
       z[i] = fmpz()
    end
+   1 <= i <= length(a) || error("Index must be between 1 and $(length(a))")
    return exponent_vector!(z, a, i)
 end
 

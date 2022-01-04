@@ -1017,6 +1017,8 @@ end
 # Return the i-th term of the polynomial, as a polynomial
 function term(a::fmpq_mpoly, i::Int)
    z = parent(a)()
+   n = length(a)
+   (i < 1 || i > n) && error("Index must be between 1 and $(length(a))")
    ccall((:fmpq_mpoly_get_term, libflint), Nothing,
          (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}),
           z, a, i - 1, a.parent)
@@ -1026,6 +1028,8 @@ end
 # Return the i-th monomial of the polynomial, as a polynomial
 function monomial(a::fmpq_mpoly, i::Int)
    z = parent(a)()
+   n = length(a)
+   (i < 1 || i > n) && error("Index must be between 1 and $(length(a))")
    ccall((:fmpq_mpoly_get_term_monomial, libflint), Nothing,
          (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}),
           z, a, i - 1, a.parent)
