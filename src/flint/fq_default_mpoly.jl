@@ -1,62 +1,6 @@
 
-const _fq_default_mpoly_union = Union{AbstractAlgebra.Generic.MPoly{fq},
-                                      fq_nmod_mpoly,
-                                      gfp_mpoly,
-                                      #gfp_fmpz_mpoly
-                                      }
-
-mutable struct FqDefaultMPolyRing <: MPolyRing{fq_default}
-    data::Union{GFPMPolyRing,
-                #GFPFmpzMPolyRing,
-                FqNmodMPolyRing,
-                AbstractAlgebra.Generic.MPolyRing{fq}}
-    base_ring::FqDefaultFiniteField
-    typ::Int    # keep these in sync with fq_default_mpoly_do_op
-
-    function FqDefaultMPolyRing(a, b::FqDefaultFiniteField, c::Int, cached = true)
-        return AbstractAlgebra.get_cached!(FqDefaultMPolyID, (a, b, c), cached) do
-            return new(a, b, c)
-        end::FqDefaultMPolyRing
-    end
-end
-
-const FqDefaultMPolyID = AbstractAlgebra.CacheDictType{
-                              Tuple{Any, FqDefaultFiniteField, Int},
-                              FqDefaultMPolyRing}()
-
-mutable struct fq_default_mpoly <: MPolyElem{fq_default}
-    parent::FqDefaultMPolyRing
-    data::_fq_default_mpoly_union
-
-    function fq_default_mpoly(a::FqDefaultMPolyRing, b::_fq_default_mpoly_union)
-        a.data == parent(b) || error("bad parents")
-        return new(a, b)
-    end
-end
 
 export FqDefaultMPolyRing, fq_default_mpoly
-
-# julia fails to generate decent code unless it is all pasted in
-macro fq_default_mpoly_do_op(f, R, a...)
-    f = Expr(:escape, f)
-    R = Expr(:escape, R)
-    a = (Expr(:escape, ai) for ai in a)
-    res = nothing
-    for (tnum, T) in ((1, :(AbstractAlgebra.Generic.MPoly{fq})),
-                      (2, :(fq_nmod_mpoly)),
-                      (3, :(gfp_mpoly)),
-                     )
-        ret = (Expr(:(::), Expr(:(.), ai, QuoteNode(:data)), T) for ai in a)
-        ret = Expr(:return, Expr(:call, :fq_default_mpoly, R, Expr(:call, f, ret...)))
-        if res == nothing
-            res = ret
-        else
-            cond = Expr(:call, :(==), Expr(:(.), R, QuoteNode(:typ)), tnum)
-            res = Expr(:if, cond, ret, res)
-        end
-    end
-    return res
-end
 
 ###############################################################################
 #
