@@ -51,8 +51,6 @@ end
 
    @test string(C(pi)) == "3.14159 {a where a = 3.14159 [Pi]}"
 
-   @test needs_parentheses(C(pi))
-
 end
 
 @testset "ca.manipulation" begin

@@ -245,8 +245,6 @@ function show(io::IO, R::FlintQadicField)
    print(io, "Unramified extension of $(prime(R))-adic numbers of degree $(degree(R))")
 end
 
-needs_parentheses(x::qadic) = true
-
 ###############################################################################
 #
 #   Canonicalisation

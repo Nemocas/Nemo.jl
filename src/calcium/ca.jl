@@ -112,8 +112,6 @@ function show(io::IO, x::ca)
    print(io, native_string(x))
 end
 
-needs_parentheses(x::ca) = true
-
 ###############################################################################
 #
 #   Basic manipulation

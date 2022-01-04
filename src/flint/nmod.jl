@@ -110,8 +110,6 @@ function show(io::IO, a::nmod)
    print(io, signed(widen(a.data)))
 end
 
-needs_parentheses(x::nmod) = false
-
 ###############################################################################
 #
 #   Unary operations

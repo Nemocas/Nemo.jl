@@ -179,8 +179,6 @@ function show(io::IO, x::AcbField)
   print(io, " bits of precision and error bounds")
 end
 
-needs_parentheses(x::acb) = true
-
 ################################################################################
 #
 #  Unary operations

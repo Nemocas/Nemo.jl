@@ -163,8 +163,6 @@ function show(io::IO, x::qqbar)
    print(io, native_string(x))
 end
 
-needs_parentheses(x::qqbar) = true
-
 ###############################################################################
 #
 #   Basic manipulation

@@ -98,8 +98,6 @@ function show(io::IO, a::gfp_elem)
    print(io, signed(widen(a.data)))
 end
 
-needs_parentheses(x::gfp_elem) = false
-
 ###############################################################################
 #
 #   Unary operations

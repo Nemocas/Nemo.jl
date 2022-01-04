@@ -354,8 +354,6 @@ function show(io::IO, a::FmpzLaurentSeriesRing)
    show(io, base_ring(a))
 end
 
-needs_parentheses(x::fmpz_laurent_series) = pol_length(x) > 1
-
 ###############################################################################
 #
 #   Unary operators
