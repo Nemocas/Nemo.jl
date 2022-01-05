@@ -330,11 +330,11 @@ end
 ###############################################################################
 
 function ==(a::fq_default_mpoly, b::fq_default)
-    return a.data == base_ring(a.data)(b)
+    return a.data == _unchecked_coerce(base_ring(a.data), b)
 end
 
 function ==(b::fq_default, a::fq_default_mpoly)
-    return a.data == base_ring(a.data)(b)
+    return a.data == _unchecked_coerce(base_ring(a.data), b)
 end
 
 function ==(a::fq_default_mpoly, b::IntegerUnion)

@@ -102,6 +102,11 @@ end
 
          @test !isgen(S(1))
 
+         @test S(1) == R(1)
+         @test R(0) != S(1)
+         @test S(1) == 1
+         @test 0 != S(1)
+
          for i = 1:num_vars
             @test isgen(varlist[i])
             @test isgen(g[i])
