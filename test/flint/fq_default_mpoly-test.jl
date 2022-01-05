@@ -89,6 +89,17 @@ end
    end
 end
 
+@testset "fq_default_mpoly.inside_other_stuff" begin
+   for (R, a) in test_fields
+      S, (x, y, z, w) = PolynomialRing(R, ["x", "y", "z", "w"])
+      @test det(matrix(S, [x y; z w])) == x*w - y*z
+
+      SX, X = PolynomialRing(S, "X")
+      @test add!(SX(), X + x, X + y) == x + y + 2*X
+      @test iszero(zero!(X))
+   end
+end
+
 @testset "fq_default_mpoly.manipulation" begin
    for (R, a) in test_fields
       for num_vars = 1:10
