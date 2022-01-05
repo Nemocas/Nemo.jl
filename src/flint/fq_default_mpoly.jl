@@ -490,18 +490,6 @@ end
 #
 ###############################################################################
 
-function exponent_vector_fits(::Type{T}, a::fq_default_mpoly, i::Int) where T
-    return exponent_vector_fits(T, a.data, i)
-end
-
-function exponent_vector!(z::Vector{T}, a::(fq_default_mpoly), i::Int) where T
-    return exponent_vector!(z, a.data, i)
-end
-
-function exponent_vectors_fmpz(a::fq_default_mpoly)
-    return exponent_vectors_fmpz(a.data)
-end
-
 function set_exponent_vector!(a::fq_default_mpoly, n::Int, exps::Vector{T}) where T
     a.data = set_exponent_vector!(a.data, n, exps)
     return a
@@ -517,12 +505,6 @@ end
 
 function coeff(a::fq_default_mpoly, exps::Vector{T}) where T
     return _unchecked_coerce(base_ring(a), coeff(a.data, exps))
-end
-
-function setcoeff!(a::fq_default_mpoly, e, b::fq_default)
-    base_ring(a) == parent(b) || error("unable to coerce element")
-    setcoeff!(a.data, e, _unchecked_coerce(base_ring(a.data), b))
-    return a
 end
 
 function sort_terms!(a::fq_default_mpoly)

@@ -124,6 +124,8 @@ end
             @test !isgen(g[i] + 1)
          end
 
+         @test setcoeff!(gen(S, 1), 1, R(2)) == 2*gen(S, 1)
+
          f = rand(S, 0:5, 0:100)
 
          @test f == deepcopy(f)
@@ -373,6 +375,9 @@ end
          ord = rand_ordering()
 
          S, varlist = PolynomialRing(R, var_names, ordering = ord)
+
+         @test divexact(2*gen(S, 1), 2) == gen(S, 1)
+         @test divexact(2*gen(S, 1), R(2)) == gen(S, 1)
 
          for iter = 1:10
             f = rand(S, 0:5, 0:100)
