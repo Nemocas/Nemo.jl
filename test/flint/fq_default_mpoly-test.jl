@@ -39,12 +39,11 @@ local test_fields = (NGFiniteField(23, 1, "a"),
          f =  rand(S, 0:5, 0:100)
 
          @test isa(f, fq_default_mpoly)
-
          @test isa(S(2), fq_default_mpoly)
-
          @test isa(S(R(2)), fq_default_mpoly)
-
          @test isa(S(f), fq_default_mpoly)
+         @test degree(modulus(S)) == degree(modulus(R))
+         @test degree(modulus(f)) == degree(modulus(R))
 
          V = [R(rand(-100:100)) for i in 1:5]
 
