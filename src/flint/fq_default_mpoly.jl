@@ -149,32 +149,12 @@ function degree(a::fq_default_mpoly, i::Int)
     return degree(a.data, i)
 end
 
-function degree_fmpz(a::fq_default_mpoly, i::Int)
-    return degree_fmpz(a.data, i)
-end
-
-function degrees_fit_int(a::fq_default_mpoly)
-    return degrees_fit_int(a.data)
-end
-
 function degrees(a::fq_default_mpoly)
     return degrees(a.data)
 end
 
-function degrees_fmpz(a::fq_default_mpoly)
-    return degrees_fmpz(a.data)
-end
-
-function total_degree_fits_int(a::fq_default_mpoly)
-    return total_degree_fits_int(a.data)
-end
-
 function total_degree(a::fq_default_mpoly)
     return total_degree(a.data)
-end
-
-function total_degree_fmpz(a::fq_default_mpoly)
-    return total_degree_fmpz(a.data)
 end
 
 ###############################################################################
