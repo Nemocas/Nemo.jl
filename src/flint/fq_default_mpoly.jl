@@ -42,10 +42,6 @@ function gen(R::FqDefaultMPolyRing, i::Int)
     return fq_default_mpoly(R, gen(R.data, i))
 end
 
-function isgen(a::fq_default_mpoly, i::Int)
-    return isgen(a.data, i)
-end
-
 function isgen(a::fq_default_mpoly)
     return isgen(a.data)
 end
