@@ -562,7 +562,11 @@ end
 
 function (R::FqDefaultMPolyRing)(a::Vector{fq_default}, b::Vector{Vector{Int}})
     F = base_ring(R.data)
-    ad = elem_type(F)[_unchecked_coerce(F, ai) for ai in a]
+    ad = elem_type(F)[if parent(ai) != base_ring(R)
+                        error("coefficient is in the wrong field")
+                      else
+                        _unchecked_coerce(F, ai)
+                      end for ai in a]
     return fq_default_mpoly(R, R.data(ad, b))
 end
 

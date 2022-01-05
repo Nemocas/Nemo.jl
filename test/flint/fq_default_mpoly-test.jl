@@ -100,6 +100,13 @@ end
    end
 end
 
+@testset "fq_default_mpoly.dont_mix_the_parents" begin
+   S = FqDefaultMPolyRing[PolynomialRing(Ri[1], ["x"])[1] for Ri in test_fields]
+   cs = [one(base_ring(Si)) for Si in S]
+   exps = Vector{Int}[Int[i] for i in 1:length(S)]
+   @test_throws ErrorException S[1](cs, exps)
+end
+
 @testset "fq_default_mpoly.manipulation" begin
    for (R, a) in test_fields
       for num_vars = 1:10
