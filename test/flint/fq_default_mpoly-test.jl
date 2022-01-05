@@ -490,6 +490,25 @@ end
    end
 end
 
+@testset "fq_nmod_mpoly.factor" begin
+   function check_factor(a, esum)
+      f = factor(a)
+      @test a == unit(f) * prod([p^e for (p, e) in f])
+      @test esum == sum(e for (p, e) in f)
+
+      f = factor_squarefree(a)
+      @test a == unit(f) * prod([p^e for (p, e) in f])
+   end
+
+   for (R, a) in test_fields
+      characteristic(R) == 23 || continue
+      S, (x, y, z) = PolynomialRing(R, ["x", "y", "z"])
+      a = iszero(a) ? one(R) : a
+      check_factor(3*a^3*x^23+2*a^2*y^23+a*z^23, 23)
+      check_factor(x^99-a^33*y^99*z^33, 22)
+   end
+end
+
 @testset "fq_default_mpoly.sqrt" begin
    for (R, a) in test_fields
       for num_vars = 1:4
@@ -505,6 +524,9 @@ end
 
             @test g^2 == f^2
             @test issquare(f^2)
+
+            b, sf = issquare_with_sqrt(f^2)
+            @test b && (sf == f || sf == -f)
 
             if f != 0
                x = varlist[rand(1:num_vars)]

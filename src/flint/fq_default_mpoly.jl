@@ -277,6 +277,15 @@ end
 #
 ################################################################################
 
+function _convert_fac(a::FqDefaultMPolyRing, b::Fac)
+    f = Fac{fq_default_mpoly}()
+    f.unit = fq_default_mpoly(a, b.unit)
+    for (p, e) in b
+        f[fq_default_mpoly(a, p)] = e
+    end
+    return f
+end
+
 function factor(a::fq_default_mpoly)
     return _convert_fac(parent(a), factor(a.data))
 end
@@ -284,7 +293,6 @@ end
 function factor_squarefree(a::fq_default_mpoly)
     return _convert_fac(parent(a), factor_squarefree(a.data))
 end
-
 
 function sqrt(a::fq_default_mpoly; check::Bool=true)
     return fq_default_mpoly(parent(a), sqrt(a.data, check = check))
