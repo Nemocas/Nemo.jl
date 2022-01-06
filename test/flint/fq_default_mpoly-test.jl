@@ -29,6 +29,9 @@ local test_fields = (NGFiniteField(23, 1, "a"),
 
          @test typeof(S) <: FqDefaultMPolyRing
 
+         @test Nemo.promote_rule(elem_type(S), elem_type(R)) == elem_type(S)
+         @test Nemo.promote_rule(elem_type(S), Int) == elem_type(S)
+
          isa(symbols(S), Vector{Symbol})
 
          for j = 1:num_vars
