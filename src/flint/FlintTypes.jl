@@ -11,6 +11,10 @@
 ###############################################################################
 
 mutable struct FlintIntegerRing <: Ring
+    function FlintIntegerRing()
+        isdefined(Nemo, :FlintZZ) && return FlintZZ
+        return new()
+    end
 end
 
 const FlintZZ = FlintIntegerRing()
@@ -117,6 +121,10 @@ end
 ###############################################################################
 
 mutable struct FlintRationalField <: FracField{fmpz}
+    function FlintRationalField()
+        isdefined(Nemo, :FlintQQ) && return FlintQQ
+        return new()
+    end
 end
 
 const FlintQQ = FlintRationalField()

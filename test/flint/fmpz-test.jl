@@ -16,6 +16,10 @@ end
    @test parent_type(fmpz) == FlintIntegerRing
 end
 
+@testset "fmpz.singleton" begin
+   @test ZZ === FlintIntegerRing()
+end
+
 @testset "fmpz.constructors" begin
    a = fmpz(-123)
    @test isa(a, RingElem)

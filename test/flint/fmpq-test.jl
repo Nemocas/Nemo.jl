@@ -7,6 +7,11 @@ end
    test_Field_interface_recursive(FlintQQ)
 end
 
+@testset "fmpq.singleton" begin
+   @test QQ === FlintRationalField()
+   @test QQ === FractionField(ZZ)
+end
+
 @testset "fmpq.constructors" begin
    R = FractionField(ZZ)
 
