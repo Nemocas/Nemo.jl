@@ -96,8 +96,7 @@ function expressify(a::fq_default_mpoly, x = symbols(parent(a)); context = nothi
     return expressify(a.data, x, context = context)
 end
 
-@enable_all_show_via_expressify fq_default_mpoly
-
+# AA has enable all show via expressify for all MPolys
 
 function show(io::IO, p::FqDefaultMPolyRing)
     local max_vars = 5 # largest number of variables to print

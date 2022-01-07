@@ -21,6 +21,8 @@ local test_fields = (NGFiniteField(23, 1, "a"),
 
          @test !(SSS === SSSS)
 
+         @test !occursin("{", string(S))
+
          @test nvars(S) == num_vars
 
          @test elem_type(S) == fq_default_mpoly
