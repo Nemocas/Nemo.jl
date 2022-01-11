@@ -35,6 +35,17 @@ mutable struct arf_struct
   size::UInt # mp_size_t
   d1::UInt # mantissa_struct
   d2::UInt
+
+  function arf_struct()
+    z = new()
+    ccall((:arf_init, libarb), Nothing, (Ref{arf_struct}, ), z)
+    finalizer(_arf_clear_fn, z)
+    return z
+  end
+end
+
+function _arf_clear_fn(x::arf_struct)
+  ccall((:arf_clear, libarb), Nothing, (Ref{arf_struct}, ), x)
 end
 
 mutable struct mag_struct

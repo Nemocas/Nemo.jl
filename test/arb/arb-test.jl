@@ -41,6 +41,8 @@ end
 
    @test Float64(RR(0.5)) == 0.5
    @test convert(Float64, RR(0.5)) == 0.5
+   @test BigFloat(RR(0.5)) == 0.5
+   @test convert(BigFloat, RR(0.5)) == 0.5
 
    a = 123
    b = -8162
@@ -55,6 +57,19 @@ end
    @test_throws ErrorException Int(RR(c))
 
    @test abs(Float64(RR("2.3")) - 2.3) < 1e-10
+   @test setprecision(BigFloat, 1000) do
+      abs(BigFloat(ArbField(1000)("2.3")) - BigFloat("2.3")) < 1e-299
+   end
+
+   for T in [Float64, BigFloat]
+      x = RR(-1)/3
+      y = T(-1)/3
+      @test abs(T(x, RoundDown) - T(x, RoundUp)) < 1e-10
+      for z in [T(x, RoundNearest), y]
+         @test T(x, RoundDown) <= z <= T(x, RoundUp)
+      end
+   end
+
    @test characteristic(RR) == 0
 end
 
