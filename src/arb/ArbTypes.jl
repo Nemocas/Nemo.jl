@@ -36,6 +36,10 @@ mutable struct arf_struct
   d1::UInt # mantissa_struct
   d2::UInt
 
+  function arf_struct(exp, size, d1, d2)
+    new(exp, size, d1, d2)
+  end
+
   function arf_struct()
     z = new()
     ccall((:arf_init, libarb), Nothing, (Ref{arf_struct}, ), z)

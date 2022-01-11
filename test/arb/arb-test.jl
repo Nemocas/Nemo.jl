@@ -13,6 +13,17 @@ RR = ArbField(64)
    @test ArbField(11, cached = false) !== ArbField(11, cached = false)
 end
 
+@testset "arf.hecke_semantics" begin
+    x = Nemo.arf_struct(0, 0, 0, 0)
+    y = fmpz(3)^100
+    ccall((:arf_set_fmpz, Nemo.libarb), Nothing,
+          (Ref{Nemo.arf_struct}, Ref{fmpz}),
+          x, y)
+    ccall((:arf_clear, Nemo.libarb), Nothing,
+          (Ref{Nemo.arf_struct},),
+          x)
+end
+
 @testset "arb.printing" begin
    a = RR(2)
 
