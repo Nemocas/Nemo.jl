@@ -11,6 +11,12 @@
    T, z = FiniteField(y^2 + 1, "z")
    T2, z2 = FiniteField(yy^2 + 1, "z")
 
+   # check that one can leave out the name for the generator, or specify it as a symbol
+   @test FiniteField(7, 5)[1] isa FqNmodFiniteField
+   @test FiniteField(7, 5, :x)[1] isa FqNmodFiniteField
+   @test FiniteField(y^2 + 1)[1] isa FqNmodFiniteField
+   @test FiniteField(y^2 + 1, :x)[1] isa FqNmodFiniteField
+
    @test isa(R, FqNmodFiniteField)
    @test isa(T, FqNmodFiniteField)
    @test isa(T2, FqNmodFiniteField)

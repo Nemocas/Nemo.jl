@@ -661,14 +661,14 @@ end
 #
 ###############################################################################
 
-function FlintFiniteField(char::Int, deg::Int, s::AbstractString; cached = true)
+function FlintFiniteField(char::Int, deg::Int, s::Union{AbstractString,Symbol} = :o; cached = true)
    S = Symbol(s)
    parent_obj = FqNmodFiniteField(fmpz(char), deg, S, cached)
 
    return parent_obj, gen(parent_obj)
 end
 
-function FlintFiniteField(pol::Zmodn_poly, s::AbstractString; cached = true, check::Bool=true)
+function FlintFiniteField(pol::Zmodn_poly, s::Union{AbstractString,Symbol} = :o; cached = true, check::Bool=true)
    S = Symbol(s)
    parent_obj = FqNmodFiniteField(pol, S, cached, check=check)
 
