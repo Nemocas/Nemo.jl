@@ -242,11 +242,6 @@ function __init__()
       println("")
    end
 
-  t = create_accessors(AnticNumberField, Dict, get_handle())
-
-  global _get_Special_of_nf = t[1]
-  global _set_Special_of_nf = t[2]
-
   # Initialize the thread local random state
   resize!(_flint_rand_states, Threads.nthreads())
   for i in 1:Threads.nthreads()

@@ -12,7 +12,7 @@
 
 const AnticNumberFieldID = Dict{Tuple{FmpqPolyRing, fmpq_poly, Symbol}, Field}()
 
-mutable struct AnticNumberField <: SimpleNumField{fmpq}
+@attributes mutable struct AnticNumberField <: SimpleNumField{fmpq}
    pol_coeffs::Ptr{Nothing}
    pol_den::Int
    pol_alloc::Int

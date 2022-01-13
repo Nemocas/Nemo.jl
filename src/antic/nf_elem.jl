@@ -258,23 +258,6 @@ function deepcopy_internal(d::nf_elem, dict::IdDict)
    return z
 end
 
-###############################################################################
-#
-#   Deal with "Special"
-#
-###############################################################################
-
-AbstractAlgebra._is_attribute_storing_type(::Type{AnticNumberField}) = true
-AbstractAlgebra._get_attributes(K::AnticNumberField) = _get_Special_of_nf(K, false)
-function AbstractAlgebra._get_attributes!(K::AnticNumberField)
-  d = _get_Special_of_nf(K, false)
-  if d === nothing
-    d = Dict{Symbol, Any}()
-    _set_Special_of_nf(K, d)
-  end
-  return d
-end
-
 function iscyclo_type(K::AnticNumberField)
   return !(get_attribute(K, :cyclo) === nothing) ::Bool
 end
