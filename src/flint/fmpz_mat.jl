@@ -177,6 +177,22 @@ function deepcopy_internal(d::fmpz_mat, dict::IdDict)
    return z
 end
 
+# This function is dirty because it relies on the internals of fmpz_mat.
+# This function needs to be changed if the internals ever change.
+function Base.hash(a::fmpz_mat, h::UInt)
+   GC.@preserve a begin
+      r = nrows(a)
+      c = ncols(a)
+      h = hash(r, h)
+      h = hash(c, h)
+      rowptr = convert(Ptr{Ptr{Int}}, a.rows)
+      for i in 1:r
+         h = _hash_integer_array(unsafe_load(rowptr, i), c, h)
+      end
+      return xor(h, 0x5c22af6d5986f453%UInt)
+   end
+end
+
 ###############################################################################
 #
 #   Canonicalisation

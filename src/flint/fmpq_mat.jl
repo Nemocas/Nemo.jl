@@ -183,6 +183,26 @@ function deepcopy_internal(d::fmpq_mat, dict::IdDict)
    return z
 end
 
+# This function is filthy because it
+#     relies on the internals of fmpq_mat, and
+#     converts a C array of fmpqs to an array of Ints of twice the length, and
+#     assumes the fmpqs in the mat are each canonical.
+# This function needs to be changed if the internals ever change or if any
+# architectures with strange struct packings are supported.
+function Base.hash(a::fmpq_mat, h::UInt)
+   GC.@preserve a begin
+      r = nrows(a)
+      c = ncols(a)
+      h = hash(r, h)
+      h = hash(c, h)
+      rowptr = convert(Ptr{Ptr{Int}}, a.rows)
+      for i in 1:r
+         h = _hash_integer_array(unsafe_load(rowptr, i), 2*c, h)
+      end
+      return xor(h, 0xb591d5c795885682%UInt)
+   end
+end
+
 ###############################################################################
 #
 #   Canonicalisation

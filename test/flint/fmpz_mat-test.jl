@@ -149,6 +149,10 @@ end
    @test ncols(B) == 3
 
    @test deepcopy(A) == A
+
+   a = matrix(FlintZZ, 4, 4, [-1 fmpz(2)^100 3 -4; 5 -1 fmpz(2)^100 6; 7 5 -1 8; 9 10 11 12])
+   @test hash(a, UInt(5)) == hash(deepcopy(a), UInt(5))
+   @test hash(view(a, 1,1, 2,2)) == hash(view(a, 1,1, 2,2))
 end
 
 @testset "fmpz_mat.view" begin
