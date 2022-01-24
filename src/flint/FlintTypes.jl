@@ -2063,8 +2063,6 @@ end
          ccall((:fq_nmod_ctx_init, libflint), Nothing,
                (Ref{FqNmodFiniteField}, Ref{fmpz}, Int, Ptr{UInt8}),
 			    d, c, deg, string(s))
-         d.overfields = Dict{Int, Vector{FinFieldMorphism}}()
-         d.subfields = Dict{Int, Vector{FinFieldMorphism}}()
          if cached
             FqNmodFiniteFieldID[c, deg, s] = d
          end
@@ -2083,8 +2081,6 @@ end
          ccall((:fq_nmod_ctx_init_modulus, libflint), Nothing,
             (Ref{FqNmodFiniteField}, Ref{nmod_poly}, Ptr{UInt8}),
 	      z, f, string(s))
-         z.overfields = Dict{Int, Vector{FinFieldMorphism}}()
-         z.subfields = Dict{Int, Vector{FinFieldMorphism}}()
          if cached
             FqNmodFiniteFieldIDNmodPol[parent(f), f, s] = z
          end
@@ -2102,8 +2098,6 @@ end
          ccall((:fq_nmod_ctx_init_modulus, libflint), Nothing,
             (Ref{FqNmodFiniteField}, Ref{gfp_poly}, Ptr{UInt8}),
 	      z, f, string(s))
-         z.overfields = Dict{Int, Vector{FinFieldMorphism}}()
-         z.subfields = Dict{Int, Vector{FinFieldMorphism}}()
          if cached
             FqNmodFiniteFieldIDGFPPol[parent(f), f, s] = z
          end
