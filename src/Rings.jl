@@ -58,6 +58,8 @@ include("flint/nmod_mat.jl")
 
 include("flint/fmpz_mod_mat.jl")
 
+include("flint/gfp_fmpz_mat.jl")
+
 include("flint/gfp_mat.jl")
 
 include("flint/fq_mat.jl")

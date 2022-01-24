@@ -5215,7 +5215,7 @@ function _nmod_mat_clear_fn(mat::nmod_mat)
   ccall((:nmod_mat_clear, libflint), Nothing, (Ref{nmod_mat}, ), mat)
 end
 
-###############################################################################          
+###############################################################################
 #
 #   FmpzModMatSpace / fmpz_mod_mat
 #
@@ -5250,6 +5250,8 @@ mutable struct fmpz_mod_mat <: MatElem{fmpz_mod}
    c::Int
    rows::Ptr{Nothing}
    mod::Int              # fmpz
+   # end flint struct
+
    base_ring::FmpzModRing
    view_parent
 
@@ -5358,7 +5360,150 @@ function _fmpz_mod_mat_clear_fn(mat::fmpz_mod_mat)
   ccall((:fmpz_mod_mat_clear, libflint), Nothing, (Ref{fmpz_mod_mat}, ), mat)
 end
 
-const Zmod_fmpz_mat = fmpz_mod_mat # eventually a union with future gfp_fmpz_mat
+###############################################################################
+#
+#   GaloisFmpzMatSpace / gfp_fmpz_mat
+#
+###############################################################################
+
+mutable struct GaloisFmpzMatSpace <: MatSpace{gfp_fmpz_elem}
+  base_ring::GaloisFmpzField
+  n::fmpz
+  nrows::Int
+  ncols::Int
+
+  function GaloisFmpzMatSpace(R::GaloisFmpzField, r::Int, c::Int, cached::Bool = true)
+    (r < 0 || c < 0) && throw(error_dim_negative)
+    if cached && haskey(GaloisFmpzMatID, (R, r, c))
+      return GaloisFmpzMatID[R, r, c]
+    else
+      z = new(R, R.n, r, c)
+      if cached
+        GaloisFmpzMatID[R, r, c] = z
+      end
+      return z
+    end
+  end
+end
+
+const GaloisFmpzMatID = Dict{Tuple{GaloisFmpzField, Int, Int}, GaloisFmpzMatSpace}()
+
+mutable struct gfp_fmpz_mat <: MatElem{gfp_fmpz_elem}
+   entries::Ptr{Nothing}
+   r::Int
+   c::Int
+   rows::Ptr{Nothing}
+   mod::Int              # fmpz
+   # end flint struct
+
+   base_ring::GaloisFmpzField
+   view_parent
+
+  # Used by view, not finalised!!
+  function gfp_fmpz_mat()
+    z = new()
+    return z
+  end
+
+  function gfp_fmpz_mat(r::Int, c::Int, n::fmpz)
+    z = new()
+    ccall((:fmpz_mod_mat_init, libflint), Nothing,
+            (Ref{gfp_fmpz_mat}, Int, Int, Ref{fmpz}), z, r, c, n)
+    finalizer(_gfp_fmpz_mat_clear_fn, z)
+    return z
+  end
+
+  function gfp_fmpz_mat(r::Int, c::Int, n::fmpz, arr::AbstractMatrix{fmpz}, transpose::Bool = false)
+    z = new()
+    ccall((:fmpz_mod_mat_init, libflint), Nothing,
+          (Ref{gfp_fmpz_mat}, Int, Int, Ref{fmpz}), z, r, c, n)
+    finalizer(_gfp_fmpz_mat_clear_fn, z)
+    if transpose
+       arr = Base.transpose(arr)
+    end
+    for i = 1:r
+      for j = 1:c
+         setindex_raw!(z, mod(arr[i, j], n), i, j)
+      end
+    end
+    return z
+  end
+
+  function gfp_fmpz_mat(r::Int, c::Int, n::fmpz, arr::AbstractMatrix{T}, transpose::Bool = false) where T <: Integer
+    z = new()
+    ccall((:fmpz_mod_mat_init, libflint), Nothing,
+          (Ref{gfp_fmpz_mat}, Int, Int, Ref{fmpz}), z, r, c, n)
+    finalizer(_gfp_fmpz_mat_clear_fn, z)
+    if transpose
+       arr = Base.transpose(arr)
+    end
+    for i = 1:r
+      for j = 1:c
+         setindex_raw!(z, mod(fmpz(arr[i, j]), n), i, j)
+      end
+    end
+    return z
+  end
+
+  function gfp_fmpz_mat(r::Int, c::Int, n::fmpz, arr::AbstractMatrix{gfp_fmpz_elem}, transpose::Bool = false)
+    z = new()
+    ccall((:fmpz_mod_mat_init, libflint), Nothing,
+          (Ref{gfp_fmpz_mat}, Int, Int, Ref{fmpz}), z, r, c, n)
+    finalizer(_gfp_fmpz_mat_clear_fn, z)
+    if transpose
+       arr = Base.transpose(arr)
+    end
+    for i = 1:r
+      for j = 1:c
+         setindex_raw!(z, arr[i, j].data, i, j)
+      end
+    end
+    return z
+  end
+
+  function gfp_fmpz_mat(r::Int, c::Int, n::fmpz, arr::AbstractVector{fmpz})
+    z = new()
+    ccall((:fmpz_mod_mat_init, libflint), Nothing,
+          (Ref{gfp_fmpz_mat}, Int, Int, Ref{fmpz}), z, r, c, n)
+    finalizer(_gfp_fmpz_mat_clear_fn, z)
+    for i = 1:r
+      for j = 1:c
+        setindex_raw!(z, mod(arr[(i - 1)*c + j], n), i, j)
+      end
+    end
+    return z
+  end
+
+  function gfp_fmpz_mat(r::Int, c::Int, n::fmpz, arr::AbstractVector{T}) where T <: Integer
+    z = new()
+    ccall((:fmpz_mod_mat_init, libflint), Nothing,
+          (Ref{gfp_fmpz_mat}, Int, Int, Ref{fmpz}), z, r, c, n)
+    finalizer(_gfp_fmpz_mat_clear_fn, z)
+    for i = 1:r
+       for j = 1:c
+          setindex_raw!(z, mod(fmpz(arr[(i - 1)*c + j]), n), i, j)
+       end
+    end
+    return z
+  end
+
+  function gfp_fmpz_mat(r::Int, c::Int, n::fmpz, arr::AbstractVector{fmpz_mod})
+    z = new()
+    ccall((:fmpz_mod_mat_init, libflint), Nothing,
+          (Ref{gfp_fmpz_mat}, Int, Int, Ref{fmpz}), z, r, c, n)
+    finalizer(_gfp_fmpz_mat_clear_fn, z)
+    for i = 1:r
+       for j = 1:c
+          setindex_raw!(z, arr[(i - 1)*c + j].data, i, j)
+       end
+    end
+    return z
+  end
+end
+
+function _gfp_fmpz_mat_clear_fn(mat::gfp_fmpz_mat)
+  ccall((:fmpz_mod_mat_clear, libflint), Nothing, (Ref{gfp_fmpz_mat}, ), mat)
+end
 
 ################################################################################
 #
@@ -6657,6 +6802,8 @@ const FlintPuiseuxSeriesElem{T} = Union{FlintPuiseuxSeriesRingElem{T},
                             FlintPuiseuxSeriesFieldElem{T}} where T <: RingElem
 
 const Zmodn_mat = Union{nmod_mat, gfp_mat}
+
+const Zmod_fmpz_mat = Union{fmpz_mod_mat, gfp_fmpz_mat}
 
 const FlintMPolyUnion = Union{fmpz_mpoly, fmpq_mpoly, nmod_mpoly, gfp_mpoly,
                               fq_nmod_mpoly}
