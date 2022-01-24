@@ -84,7 +84,7 @@ function embed_matrices_pre(a::fq, b::fq, P::gfp_fmpz_poly)
 end
 
 # dirty: internally in flint an fq_struct is just an fmpz_poly_struct
-function coeff!(x::fq, j::Int, c::fmpz)
+function setcoeff!(x::fq, j::Int, c::fmpz)
     ccall((:fmpz_poly_set_coeff_fmpz, libflint), Nothing,
           (Ref{fq}, Int, Ref{fmpz}), x, j, c)
 end
@@ -103,7 +103,7 @@ function embed_pre_mat(x::fq, K::FqFiniteField, M::gfp_fmpz_mat)
     res = K()
 
     for j in degree(K):-1:1
-        coeff!(res, j - 1, data(product[j, 1]))
+        setcoeff!(res, j - 1, data(product[j, 1]))
     end
 
     return res

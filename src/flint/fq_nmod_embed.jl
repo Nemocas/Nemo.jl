@@ -79,7 +79,7 @@ function embed_matrices_pre(a::fq_nmod, b::fq_nmod, P::gfp_poly)
     return s1, s2
 end
 
-function coeff!(x::fq_nmod, j::Int, c::Int)
+function setcoeff!(x::fq_nmod, j::Int, c::Int)
     ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
           (Ref{fq_nmod}, Int, UInt), x, j, c)
 end
@@ -98,7 +98,7 @@ function embed_pre_mat(x::fq_nmod, K::FqNmodFiniteField, M::gfp_mat)
     res = K()
 
     for j in degree(K):-1:1
-        coeff!(res, j - 1, Int(data(product[j, 1])))
+        setcoeff!(res, j - 1, Int(data(product[j, 1])))
     end
 
     return res
