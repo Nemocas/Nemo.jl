@@ -170,8 +170,8 @@ function Base.view(x::gfp_fmpz_mat, r1::Int, c1::Int, r2::Int, c2::Int)
   z.base_ring = x.base_ring
   z.view_parent = x
   ccall((:fmpz_mod_mat_window_init, libflint), Nothing,
-          (Ref{fmpz_mod_mat}, Ref{fmpz_mod_mat}, Int, Int, Int, Int),
-          z, x, r1 - 1, c1 - 1, r2, c2)
+        (Ref{gfp_fmpz_mat}, Ref{gfp_fmpz_mat}, Int, Int, Int, Int),
+        z, x, r1 - 1, c1 - 1, r2, c2)
   finalizer(_gfp_fmpz_mat_window_clear_fn, z)
   return z
 end

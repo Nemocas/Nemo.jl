@@ -568,17 +568,31 @@ end
 
 function (a::FqFiniteField)(b::Int)
    z = fq(a, b)
+   z.parent = a
    return z
 end
 
 function (a::FqFiniteField)(b::fmpz)
    z = fq(a, b)
+   z.parent = a
    return z
 end
 
 function (a::FqFiniteField)(b::fq)
-   parent(b) != a && error("Coercion between finite fields not implemented")
-   return b
+    k = parent(b)
+    da = degree(a)
+    dk = degree(k)
+    if k == a
+        return b
+    elseif dk < da
+        da % dk != 0 && error("Coercion impossible")
+        f = embed(k, a)
+        return f(b)
+    else
+        dk % da != 0 && error("Coercion impossible")
+        f = preimage_map(a, k)
+        return f(b)
+    end
 end
 
 ###############################################################################
@@ -589,7 +603,6 @@ end
 
 @doc Markdown.doc"""
     FlintFiniteField(char::fmpz, deg::Int, s::AbstractString; cached = true)
-
 Returns a tuple $S, x$ consisting of a finite field parent object $S$ and
 generator $x$ for the finite field of the given characteristic and degree.
 The string $s$ is used to designate how the finite field generator will be
@@ -607,7 +620,6 @@ end
 
 @doc Markdown.doc"""
     FlintFiniteField(pol::Union{fmpz_mod_poly, gfp_fmpz_poly}, s::Union{AbstractString,Symbol}; cached = true, check = true)
-
 Returns a tuple $S, x$ consisting of a finite field parent object $S$ and
 generator $x$ for the finite field over $F_p$ defined by the given
 polynomial, i.e. $\mathbb{F}_p[t]/(pol)$. The characteristic is specified by
@@ -624,4 +636,15 @@ function FlintFiniteField(pol::Union{fmpz_mod_poly, gfp_fmpz_poly},
    parent_obj = FqFiniteField(pol, S, cached, check=check)
 
    return parent_obj, gen(parent_obj)
+end
+
+@doc Markdown.doc"""
+    FlintFiniteField(F::FqFiniteField, deg::Int, s::AbstractString; cached = true)
+
+Return a finite field with the same type as `F` but with a possibly different
+degree `deg` over the prime subfield.
+"""
+function FlintFiniteField(F::FqFiniteField, deg::Int,
+                          s::Union{AbstractString,Symbol} = :o; cached = true)
+    return FqFiniteField(characteristic(F), deg, Symbol(s), cached)
 end

@@ -12,8 +12,20 @@ export embed, preimage, preimage_map
 #
 ################################################################################
 
-overfields(k::FinField) = k.overfields
-subfields(k::FinField) = k.subfields
+function overfields(k::FinField)
+    if !isdefined(k, :overfields)
+        k.overfields = Dict{Int, Vector{FinFieldMorphism}}()
+    end
+    return k.overfields
+end
+
+function subfields(k::FinField)
+    if !isdefined(k, :subfields)
+        k.subfields = Dict{Int, Vector{FinFieldMorphism}}()
+    end
+    return k.subfields
+end
+
 
 @doc Markdown.doc"""
     AddOverfield!(F::T, f::FinFieldMorphism{T, T}) where T <: FinField
@@ -252,7 +264,7 @@ function transitive_closure(f::FinFieldMorphism)
                 AddOverfield!(domain(g), phi)
             end
         else
-            val = FqNmodFiniteField[domain(v) for v in subK[d]]
+            val = [domain(v) for v in subK[d]]
             
             for g in subk[d]
                 if !(domain(g) in val)
@@ -333,8 +345,8 @@ function intersections(k::T, K::T) where T <: FinField
         # Otherwise it means that there is no field I around so we create one
         # and we embed it in k and S
         else
-            p::Int = characteristic(k)
-            kc, xc = FiniteField(p, c, string("x", c))
+            # kc of same type as k but degree c
+            kc = FiniteField(k, c, string("x", c))
             embed(kc, k)
             for g in subK[l]
                 embed(kc, domain(g))

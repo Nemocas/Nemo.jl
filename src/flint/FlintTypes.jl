@@ -5487,7 +5487,7 @@ mutable struct gfp_fmpz_mat <: MatElem{gfp_fmpz_elem}
     return z
   end
 
-  function gfp_fmpz_mat(r::Int, c::Int, n::fmpz, arr::AbstractVector{fmpz_mod})
+  function gfp_fmpz_mat(r::Int, c::Int, n::fmpz, arr::AbstractVector{gfp_fmpz_elem})
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
           (Ref{gfp_fmpz_mat}, Int, Int, Ref{fmpz}), z, r, c, n)

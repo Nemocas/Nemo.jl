@@ -8,6 +8,8 @@ include("flint/fmpq.jl")
 
 include("flint/fq.jl")
 
+include("flint/fq_embed.jl")
+
 include("flint/fq_nmod.jl")
 
 include("flint/fq_nmod_embed.jl")

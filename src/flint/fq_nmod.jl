@@ -675,3 +675,7 @@ function FlintFiniteField(pol::Zmodn_poly, s::Union{AbstractString,Symbol} = :o;
    return parent_obj, gen(parent_obj)
 end
 
+function FlintFiniteField(F::FqNmodFiniteField, deg::Int,
+                          s::Union{AbstractString,Symbol} = :o; cached = true)
+    return FqNmodFiniteField(characteristic(F), deg, Symbol(s), cached)
+end
