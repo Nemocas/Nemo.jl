@@ -27,7 +27,6 @@
    flag::UInt
    pol::fmpq_poly
    S::Symbol
-   auxilliary_data::Vector{Any}
 
    function AnticNumberField(pol::fmpq_poly, s::Symbol, cached::Bool = false, check::Bool = true)
      check && !isirreducible(pol) && error("Polynomial must be irreducible")
@@ -38,7 +37,6 @@
            (Ref{AnticNumberField}, Ref{fmpq_poly}), nf, pol)
         finalizer(_AnticNumberField_clear_fn, nf)
         nf.S = s
-        nf.auxilliary_data = Vector{Any}(undef, 5)
         return nf
       end
    end

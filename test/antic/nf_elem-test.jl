@@ -1,15 +1,3 @@
-@testset "nf_elem.accessors" begin
-   t = create_accessors(AnticNumberField, fmpz, get_handle())
-   get_test = t[1]
-   set_test = t[2]
-
-   R, x = PolynomialRing(QQ, "x")
-   K, a = NumberField(x^3 + 3x + 1, "a")
-
-   set_test(K, fmpz(2))
-   @test 2 == get_test(K)
-end
-
 @testset "nf_elem.constructors" begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
