@@ -7,6 +7,7 @@
   @test elem_type(R) == gfp_fmpz_mat
   @test elem_type(GaloisFmpzMatSpace) == gfp_fmpz_mat
   @test parent_type(gfp_fmpz_mat) == GaloisFmpzMatSpace
+  @test dense_matrix_type(elem_type(Z2)) == elem_type(R)
   @test nrows(R) == 2
   @test ncols(R) == 2
 
@@ -242,6 +243,16 @@ end
           MatrixSpace(Z11,2,1)(reshape([ 1 ; 2],2,1))
 
   @test_throws ErrorConstrDimMismatch transpose!(R([ 1 2 ;]))
+
+  R = MatrixSpace(Z11, 4, 4)
+  m = [1 2 3 4; 2 4 6 2; 6 4 2 4; 2 6 4 0]
+  @test R(m, true) == R(transpose(m))
+  m1 = Matrix{BigInt}(m)
+  @test R(m1, true) == R(transpose(m1))
+  m2 = Matrix{fmpz}(m)
+  @test R(m2, true) == R(transpose(m2))
+  m3 = map(Z11, m)
+  @test R(m3, true) == R(transpose(m3))
 end
 
 @testset "gfp_fmpz_mat.unary_ops" begin
@@ -540,6 +551,8 @@ end
   @test view(a, 1, 1, 3, 3) == view(a, 1:3, 1:3)
   @test view(a, 1, 1, 3, 3) == sub(a, 1, 1, 3, 3)
   @test view(a, 1, 1, 3, 3) == sub(a, 1:3, 1:3)
+
+  @test isempty(view(a, 2, 2, 1, 1))
 
   t = view(a, 1, 1, 2, 2)
 

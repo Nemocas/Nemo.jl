@@ -90,6 +90,7 @@ end
         for j in 1:20
             x = rand(ka)
             @test f(g(x)) == x
+            @test ka(kab(x)) == x
         end
     end
 end

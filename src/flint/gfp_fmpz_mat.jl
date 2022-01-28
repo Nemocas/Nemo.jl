@@ -36,20 +36,17 @@ end
 #
 ################################################################################
 
-@inline function getindex(a::gfp_fmpz_mat, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+# return plain fmpz, no bounds checking
+@inline function getindex_raw(a::gfp_fmpz_mat, i::Int, j::Int)
   u = fmpz()
   ccall((:fmpz_mod_mat_get_entry, libflint), Nothing,
-              (Ref{fmpz}, Ref{gfp_fmpz_mat}, Int, Int), u, a, i - 1 , j - 1)
-  return gfp_fmpz_elem(u, base_ring(a)) # no reduction needed
-end
-
-# as above, but as a plain fmpz, no bounds checking
-function getindex_raw(a::gfp_fmpz_mat, i::Int, j::Int)
-  u = fmpz()
-  ccall((:gfp_fmpz_mat_get_entry, libflint), Nothing,
                  (Ref{fmpz}, Ref{gfp_fmpz_mat}, Int, Int), u, a, i - 1, j - 1)
   return u
+end
+
+@inline function getindex(a::gfp_fmpz_mat, i::Int, j::Int)
+  @boundscheck Generic._checkbounds(a, i, j)
+  return gfp_fmpz_elem(getindex_raw(a, i, j), base_ring(a)) # no reduction needed
 end
 
 @inline function setindex!(a::gfp_fmpz_mat, u::fmpz, i::Int, j::Int)
