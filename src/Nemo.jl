@@ -46,6 +46,7 @@ import LinearAlgebra: det, norm, nullspace, rank, transpose!, hessenberg, tr,
 
 import AbstractAlgebra: nullspace, @show_name, @show_special, find_name,
                         get_attribute, set_attribute!, @attributes,
+                        get_cached!,
                         @show_special_elem, force_coerce, force_op, expressify
 
 # We don't want the QQ, ZZ, FiniteField, NumberField from AbstractAlgebra

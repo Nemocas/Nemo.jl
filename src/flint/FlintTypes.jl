@@ -199,14 +199,8 @@ mutable struct FmpzPolyRing <: PolyRing{fmpz}
    S::Symbol
 
    function FmpzPolyRing(R::FlintIntegerRing, s::Symbol, cached::Bool = true)
-      if cached && haskey(FmpzPolyID, (R, s))
-         return FmpzPolyID[R, s]
-      else
-         z = new(R, s)
-         if cached
-            FmpzPolyID[R, s] = z
-         end
-         return z
+      return get_cached!(FmpzPolyID, (R, s), cached) do
+         return new(R, s)
       end
    end
 end
@@ -302,14 +296,8 @@ mutable struct FmpqPolyRing <: PolyRing{fmpq}
    S::Symbol
 
    function FmpqPolyRing(R::FlintRationalField, s::Symbol, cached::Bool = true)
-      if cached && haskey(FmpqPolyID, (R, s))
-         return FmpqPolyID[R, s]
-      else
-         z = new(R, s)
-         if cached
-            FmpqPolyID[R, s] = z
-         end
-         return z
+      return get_cached!(FmpqPolyID, (R, s), cached) do
+         return new(R, s)
       end
    end
 end
@@ -402,15 +390,9 @@ mutable struct NmodRing <: Ring
    ninv::UInt
 
    function NmodRing(n::UInt, cached::Bool=true)
-      if cached && haskey(NmodRingID, n)
-         return NmodRingID[n]
-      else
+      return get_cached!(NmodRingID, n, cached) do
          ninv = ccall((:n_preinvert_limb, libflint), UInt, (UInt,), n)
-         z = new(n, ninv)
-         if cached
-            NmodRingID[n] = z
-         end
-         return z
+         return new(n, ninv)
       end
    end
 end
@@ -433,15 +415,9 @@ end
    ninv::UInt
 
    function GaloisField(n::UInt, cached::Bool=true)
-      if cached && haskey(GaloisFieldID, n)
-         return GaloisFieldID[n]
-      else
+      return get_cached!(GaloisFieldID, n, cached) do
          ninv = ccall((:n_preinvert_limb, libflint), UInt, (UInt,), n)
-         z = new(n, ninv)
-         if cached
-            GaloisFieldID[n] = z
-         end
-         return z
+         return new(n, ninv)
       end
    end
 end
@@ -480,16 +456,10 @@ mutable struct FmpzModRing <: Ring
    ninv::fmpz_mod_ctx_struct
 
    function FmpzModRing(n::fmpz, cached::Bool=true)
-      if cached && haskey(FmpzModRingID, n)
-         return FmpzModRingID[n]
-      else
+      return get_cached!(FmpzModRingID, n, cached) do
          ninv = fmpz_mod_ctx_struct()
          ccall((:fmpz_mod_ctx_init, libflint), Nothing, (Ref{fmpz_mod_ctx_struct}, Ref{fmpz}), ninv, n)
-         z = new(n, ninv)
-         if cached
-            FmpzModRingID[n] = z
-         end
-         return z
+         return new(n, ninv)
       end
    end
 end
@@ -512,17 +482,11 @@ end
    ninv::fmpz_mod_ctx_struct
 
    function GaloisFmpzField(n::fmpz, cached::Bool=true)
-      if cached && haskey(GaloisFmpzFieldID, n)
-         return GaloisFmpzFieldID[n]
-      else
+      return get_cached!(GaloisFmpzFieldID, n, cached) do
          ninv = fmpz_mod_ctx_struct()
          ccall((:fmpz_mod_ctx_init, libflint), Nothing,
                (Ref{fmpz_mod_ctx_struct}, Ref{fmpz}), ninv, n)
-         z = new(n, ninv)
-         if cached
-            GaloisFmpzFieldID[n] = z
-         end
-         return z
+         return new(n, ninv)
       end
    end
 end
@@ -546,15 +510,9 @@ mutable struct NmodPolyRing <: PolyRing{nmod}
   n::UInt
 
   function NmodPolyRing(R::NmodRing, s::Symbol, cached::Bool = true)
-    m = UInt(modulus(R))
-    if cached && haskey(NmodPolyRingID, (R, s))
-       return NmodPolyRingID[R, s]
-    else
-       z = new(R, s, m)
-       if cached
-          NmodPolyRingID[R, s] = z
-       end
-       return z
+    return get_cached!(NmodPolyRingID, (R, s), cached) do
+       m = UInt(modulus(R))
+       return new(R, s, m)
     end
   end
 end
@@ -691,15 +649,9 @@ mutable struct GFPPolyRing <: PolyRing{gfp_elem}
   n::UInt
 
   function GFPPolyRing(R::GaloisField, s::Symbol, cached::Bool = true)
-    m = UInt(modulus(R))
-    if cached && haskey(GFPPolyRingID, (R, s))
-       return GFPPolyRingID[R, s]
-    else
-       z = new(R, s, m)
-       if cached
-          GFPPolyRingID[R, s] = z
-       end
-       return z
+    return get_cached!(GFPPolyRingID, (R, s), cached) do
+       m = UInt(modulus(R))
+       return new(R, s, m)
     end
   end
 end
@@ -836,14 +788,8 @@ mutable struct FmpzModPolyRing <: PolyRing{fmpz_mod}
   n::fmpz
 
   function FmpzModPolyRing(R::FmpzModRing, s::Symbol, cached::Bool = true)
-    if cached && haskey(FmpzModPolyRingID, (R, s))
-       return FmpzModPolyRingID[R, s]
-    else
-       z = new(R, s, modulus(R))
-       if cached
-          FmpzModPolyRingID[R ,s] = z
-       end
-       return z
+    return get_cached!(FmpzModPolyRingID, (R, s), cached) do
+       return new(R, s, modulus(R))
     end
   end
 end
@@ -1023,14 +969,8 @@ mutable struct GFPFmpzPolyRing <: PolyRing{gfp_fmpz_elem}
 
   function GFPFmpzPolyRing(R::GaloisFmpzField, s::Symbol, cached::Bool = true)
     m = modulus(R)
-    if cached && haskey(GFPFmpzPolyRingID, (R, s))
-       return GFPFmpzPolyRingID[R, s]
-    else
-       z = new(R, s, m)
-       if cached
-          GFPFmpzPolyRingID[R, s] = z
-       end
-       return z
+    return get_cached!(GFPFmpzPolyRingID, (R, s), cached) do
+       return new(R, s, m)
     end
   end
 end
@@ -1217,9 +1157,7 @@ mutable struct FmpzMPolyRing <: MPolyRing{fmpz}
    S::Vector{Symbol}
 
    function FmpzMPolyRing(s::Vector{Symbol}, S::Symbol, cached::Bool = true)
-      if cached && haskey(FmpzMPolyID, (s, S))
-         return FmpzMPolyID[s, S]
-      else
+      return get_cached!(FmpzMPolyID, (s, S), cached) do
          if S == :lex
             ord = 0
          elseif S == :deglex
@@ -1239,9 +1177,6 @@ mutable struct FmpzMPolyRing <: MPolyRing{fmpz}
          z.base_ring = FlintZZ
          z.S = s
          finalizer(_fmpz_mpoly_ctx_clear_fn, z)
-         if cached
-            FmpzMPolyID[s, S] = z
-         end
          return z
       end
    end
@@ -1419,9 +1354,7 @@ mutable struct FmpqMPolyRing <: MPolyRing{fmpq}
    S::Vector{Symbol}
 
    function FmpqMPolyRing(s::Vector{Symbol}, S::Symbol, cached::Bool = true)
-      if cached && haskey(FmpqMPolyID, (s, S))
-         return FmpqMPolyID[s, S]
-      else
+      return get_cached!(FmpqMPolyID, (s, S), cached) do
          if S == :lex
             ord = 0
          elseif S == :deglex
@@ -1441,9 +1374,6 @@ mutable struct FmpqMPolyRing <: MPolyRing{fmpq}
          z.base_ring = FlintQQ
          z.S = s
          finalizer(_fmpq_mpoly_ctx_clear_fn, z)
-         if cached
-            FmpqMPolyID[s, S] = z
-         end
          return z
       end
    end
@@ -1638,9 +1568,7 @@ mutable struct NmodMPolyRing <: MPolyRing{nmod}
    S::Vector{Symbol}
 
    function NmodMPolyRing(R::NmodRing, s::Vector{Symbol}, S::Symbol, cached::Bool = true)
-      if cached && haskey(NmodMPolyID, (R, s, S))
-         return NmodMPolyID[R, s, S]
-      else
+      return get_cached!(NmodMPolyID, (R, s, S), cached) do
          if S == :lex
             ord = 0
          elseif S == :deglex
@@ -1660,9 +1588,6 @@ mutable struct NmodMPolyRing <: MPolyRing{nmod}
          z.base_ring = R
          z.S = s
          finalizer(_nmod_mpoly_ctx_clear_fn, z)
-         if cached
-            NmodMPolyID[R, s, S] = z
-         end
          return z
       end
    end
@@ -1834,9 +1759,7 @@ mutable struct GFPMPolyRing <: MPolyRing{gfp_elem}
    S::Vector{Symbol}
 
    function GFPMPolyRing(R::GaloisField, s::Vector{Symbol}, S::Symbol, cached::Bool = true)
-      if cached && haskey(GFPMPolyID, (R, s, S))
-         return GFPMPolyID[R, s, S]
-      else
+      return get_cached!(GFPMPolyID, (R, s, S), cached) do
          if S == :lex
             ord = 0
          elseif S == :deglex
@@ -1856,9 +1779,6 @@ mutable struct GFPMPolyRing <: MPolyRing{gfp_elem}
          z.base_ring = R
          z.S = s
          finalizer(_gfp_mpoly_ctx_clear_fn, z)
-         if cached
-            GFPMPolyID[R, s, S] = z
-         end
          return z
       end
    end
@@ -2056,16 +1976,11 @@ end
    subfields :: Dict{Int, Vector{FinFieldMorphism}}
 
    function FqNmodFiniteField(c::fmpz, deg::Int, s::Symbol, cached::Bool = true)
-      if cached && haskey(FqNmodFiniteFieldID, (c, deg, s))
-         return FqNmodFiniteFieldID[c, deg, s]
-      else
+      return get_cached!(FqNmodFiniteFieldID, (c, deg, s), cached) do
          d = new()
          ccall((:fq_nmod_ctx_init, libflint), Nothing,
                (Ref{FqNmodFiniteField}, Ref{fmpz}, Int, Ptr{UInt8}),
 			    d, c, deg, string(s))
-         if cached
-            FqNmodFiniteFieldID[c, deg, s] = d
-         end
          finalizer(_FqNmodFiniteField_clear_fn, d)
          return d
       end
@@ -2074,16 +1989,11 @@ end
    function FqNmodFiniteField(f::nmod_poly, s::Symbol, cached::Bool = true; check::Bool = true)
       check && !isprime(modulus(f)) &&
          throw(DomainError(base_ring(f), "the base ring of the polynomial must be a field"))
-      if cached && haskey(FqNmodFiniteFieldIDNmodPol, (parent(f), f, s))
-         return FqNmodFiniteFieldIDNmodPol[parent(f), f, s]
-      else
+      return get_cached!(FqNmodFiniteFieldIDNmodPol, (parent(f), f, s), cached) do
          z = new()
          ccall((:fq_nmod_ctx_init_modulus, libflint), Nothing,
             (Ref{FqNmodFiniteField}, Ref{nmod_poly}, Ptr{UInt8}),
 	      z, f, string(s))
-         if cached
-            FqNmodFiniteFieldIDNmodPol[parent(f), f, s] = z
-         end
          finalizer(_FqNmodFiniteField_clear_fn, z)
          return z
       end
@@ -2091,16 +2001,11 @@ end
 
    function FqNmodFiniteField(f::gfp_poly, s::Symbol, cached::Bool = true; check::Bool=true)
       # check ignored
-      if cached && haskey(FqNmodFiniteFieldIDGFPPol, (parent(f), f, s))
-         return FqNmodFiniteFieldIDGFPPol[parent(f), f, s]
-      else
+      return get_cached!(FqNmodFiniteFieldIDGFPPol, (parent(f), f, s), cached) do
          z = new()
          ccall((:fq_nmod_ctx_init_modulus, libflint), Nothing,
             (Ref{FqNmodFiniteField}, Ref{gfp_poly}, Ptr{UInt8}),
 	      z, f, string(s))
-         if cached
-            FqNmodFiniteFieldIDGFPPol[parent(f), f, s] = z
-         end
          finalizer(_FqNmodFiniteField_clear_fn, z)
          return z
       end
@@ -2191,18 +2096,13 @@ end
    subfields :: Dict{Int, Vector{FinFieldMorphism}}
 
    function FqDefaultFiniteField(char::fmpz, deg::Int, s::Symbol, cached::Bool = true)
-      if cached && haskey(FqDefaultFiniteFieldID, (char, deg, s))
-         return FqDefaultFiniteFieldID[char, deg, s]
-      else
+      return get_cached!(FqDefaultFiniteFieldID, (char, deg, s), cached) do
          d = new()
          d.var = string(s)
          finalizer(_FqDefaultFiniteField_clear_fn, d)
          ccall((:fq_default_ctx_init, libflint), Nothing,
                (Ref{FqDefaultFiniteField}, Ref{fmpz}, Int, Ptr{UInt8}),
                   d, char, deg, d.var)
-         if cached
-            FqDefaultFiniteFieldID[char, deg, s] = d
-         end
          return d
       end
    end
@@ -2210,17 +2110,12 @@ end
    function FqDefaultFiniteField(f::fmpz_mod_poly, s::Symbol, cached::Bool = true; check::Bool = true)
       check && !isprobable_prime(modulus(f)) &&
          throw(DomainError(base_ring(f), "the base ring of the polynomial must be a field"))
-      if cached && haskey(FqDefaultFiniteFieldIDFmpzPol, (f, s))
-         return FqDefaultFiniteFieldIDFmpzPol[f, s]
-      else
+      return get_cached!(FqDefaultFiniteFieldIDFmpzPol, (f, s), cached) do
          z = new()
          z.var = string(s)
          ccall((:fq_default_ctx_init_modulus, libflint), Nothing,
                (Ref{FqDefaultFiniteField}, Ref{fmpz_mod_poly}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
                   z, f, f.parent.base_ring.ninv, string(s))
-         if cached
-            FqDefaultFiniteFieldIDFmpzPol[f, s] = z
-         end
          finalizer(_FqDefaultFiniteField_clear_fn, z)
          return z
       end
@@ -2228,17 +2123,12 @@ end
 
    function FqDefaultFiniteField(f::gfp_fmpz_poly, s::Symbol, cached::Bool = true; check::Bool = true)
       # check ignored
-      if cached && haskey(FqDefaultFiniteFieldIDGFPPol, (f, s))
-         return FqDefaultFiniteFieldIDGFPPol[f, s]
-      else
+      return get_cached!(FqDefaultFiniteFieldIDGFPPol, (f, s), cached) do
          z = new()
          z.var = string(s)
          ccall((:fq_default_ctx_init_modulus, libflint), Nothing,
                (Ref{FqDefaultFiniteField}, Ref{gfp_fmpz_poly}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
                   z, f, f.parent.base_ring.ninv, string(s))
-         if cached
-            FqDefaultFiniteFieldIDGFPPol[f, s] = z
-         end
          finalizer(_FqDefaultFiniteField_clear_fn, z)
          return z
       end
@@ -2247,17 +2137,12 @@ end
    function FqDefaultFiniteField(f::nmod_poly, s::Symbol, cached::Bool = true; check::Bool = true)
       check && !isprime(modulus(f)) &&
          throw(DomainError(base_ring(f), "the base ring of the polynomial must be a field"))
-      if cached && haskey(FqDefaultFiniteFieldIDNmodPol, (f, s))
-         return FqDefaultFiniteFieldIDNmodPol[f, s]
-      else
+      return get_cached!(FqDefaultFiniteFieldIDNmodPol, (f, s), cached) do
          z = new()
          z.var = string(s)
          ccall((:fq_default_ctx_init_modulus_nmod, libflint), Nothing,
                (Ref{FqDefaultFiniteField}, Ref{nmod_poly}, Ptr{UInt8}),
                   z, f, string(s))
-         if cached
-            FqDefaultFiniteFieldIDNmodPol[f, s] = z
-         end
          finalizer(_FqDefaultFiniteField_clear_fn, z)
          return z
       end
@@ -2265,17 +2150,12 @@ end
 
    function FqDefaultFiniteField(f::gfp_poly, s::Symbol, cached::Bool = true; check::Bool = true)
       # check ignored
-      if cached && haskey(FqDefaultFiniteFieldIDGFPNmodPol, (f, s))
-         return FqDefaultFiniteFieldIDGFPNmodPol[f, s]
-      else
+      return get_cached!(FqDefaultFiniteFieldIDGFPNmodPol, (f, s), cached) do
          z = new()
          z.var = string(s)
          ccall((:fq_default_ctx_init_modulus_nmod, libflint), Nothing,
                (Ref{FqDefaultFiniteField}, Ref{gfp_poly}, Ptr{UInt8}),
                   z, f, string(s))
-         if cached
-            FqDefaultFiniteFieldIDGFPNmodPol[f, s] = z
-         end
          finalizer(_FqDefaultFiniteField_clear_fn, z)
          return z
       end
@@ -2438,17 +2318,12 @@ end
    subfields :: Dict{Int, Vector{FinFieldMorphism}}
 
    function FqFiniteField(char::fmpz, deg::Int, s::Symbol, cached::Bool = true)
-      if cached && haskey(FqFiniteFieldID, (char, deg, s))
-         return FqFiniteFieldID[char, deg, s]
-      else
+      return get_cached!(FqFiniteFieldID, (char, deg, s), cached) do
          d = new()
          finalizer(_FqFiniteField_clear_fn, d)
          ccall((:fq_ctx_init, libflint), Nothing,
                (Ref{FqFiniteField}, Ref{fmpz}, Int, Ptr{UInt8}),
                   d, char, deg, string(s))
-         if cached
-            FqFiniteFieldID[char, deg, s] = d
-         end
          return d
       end
    end
@@ -2456,16 +2331,11 @@ end
    function FqFiniteField(f::fmpz_mod_poly, s::Symbol, cached::Bool = true; check::Bool = true)
       check && !isprobable_prime(modulus(f)) &&
          throw(DomainError(base_ring(f), "the base ring of the polynomial must be a field"))
-      if cached && haskey(FqFiniteFieldIDFmpzPol, (f, s))
-         return FqFiniteFieldIDFmpzPol[f, s]
-      else
+      return get_cached!(FqFiniteFieldIDFmpzPol, (f, s), cached) do
          z = new()
          ccall((:fq_ctx_init_modulus, libflint), Nothing,
                (Ref{FqFiniteField}, Ref{fmpz_mod_poly}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
                   z, f, f.parent.base_ring.ninv, string(s))
-         if cached
-            FqFiniteFieldIDFmpzPol[f, s] = z
-         end
          finalizer(_FqFiniteField_clear_fn, z)
          return z
       end
@@ -2473,16 +2343,11 @@ end
 
    function FqFiniteField(f::gfp_fmpz_poly, s::Symbol, cached::Bool = true; check::Bool = true)
       # check ignored
-      if cached && haskey(FqFiniteFieldIDGFPPol, (f, s))
-         return FqFiniteFieldIDGFPPol[f, s]
-      else
+      return get_cached!(FqFiniteFieldIDGFPPol, (f, s), cached) do
          z = new()
          ccall((:fq_ctx_init_modulus, libflint), Nothing,
                (Ref{FqFiniteField}, Ref{gfp_fmpz_poly}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
                   z, f, f.parent.base_ring.ninv, string(s))
-         if cached
-            FqFiniteFieldIDGFPPol[f, s] = z
-         end
          finalizer(_FqFiniteField_clear_fn, z)
          return z
       end
@@ -2609,9 +2474,7 @@ mutable struct FqNmodMPolyRing <: MPolyRing{fq_nmod}
    S::Vector{Symbol}
 
    function FqNmodMPolyRing(R::FqNmodFiniteField, s::Vector{Symbol}, S::Symbol, cached::Bool = true)
-      if cached && haskey(FqNmodMPolyID, (R, s, S))
-         return FqNmodMPolyID[R, s, S]
-      else
+      return get_cached!(FqNmodMPolyID, (R, s, S), cached) do
          if S == :lex
             ord = 0
          elseif S == :deglex
@@ -2631,9 +2494,6 @@ mutable struct FqNmodMPolyRing <: MPolyRing{fq_nmod}
          z.base_ring = R
          z.S = s
          finalizer(_fq_nmod_mpoly_ctx_clear_fn, z)
-         if cached
-            FqNmodMPolyID[R, s, S] = z
-         end
          return z
       end
    end
@@ -2830,27 +2690,15 @@ mutable struct FlintPadicField <: FlintLocalField
    function FlintPadicField(p::fmpz, prec::Int; cached::Bool = true, check::Bool = true)
       check && !isprobable_prime(p) && throw(DomainError(p, "Characteristic must be prime"))
 
-      if cached
-         a = (p, prec)
-         if haskey(PadicBase, a)
-            return PadicBase[a]
-         end
+      return get_cached!(PadicBase, (p, prec), cached) do
+         d = new()
+         ccall((:padic_ctx_init, libflint), Nothing,
+               (Ref{FlintPadicField}, Ref{fmpz}, Int, Int, Cint),
+               d, p, 0, 0, 0)
+         finalizer(_padic_ctx_clear_fn, d)
+         d.prec_max = prec
+         return d
       end
-
-      d = new()
-
-      ccall((:padic_ctx_init, libflint), Nothing,
-            (Ref{FlintPadicField}, Ref{fmpz}, Int, Int, Cint),
-            d, p, 0, 0, 0)
-      finalizer(_padic_ctx_clear_fn, d)
-      d.prec_max = prec
-
-      if cached
-         @assert !haskey(PadicBase, (p, prec))
-         PadicBase[(p, prec)] = d
-      end
-
-      return d
    end
 end
 
@@ -2901,24 +2749,14 @@ mutable struct FlintQadicField <: FlintLocalField
 
       check && !isprobable_prime(p) && throw(DomainError(p, "Characteristic must be prime"))
 
-      if cached
-         a = (p, d, prec)
-         if haskey(QadicBase, a)
-            Q = QadicBase[a]
-            return Q, gen(Q)
-         end
-      end
-
-      z = new()
-      ccall((:qadic_ctx_init, libflint), Nothing,
-           (Ref{FlintQadicField}, Ref{fmpz}, Int, Int, Int, Cstring, Cint),
-                                     z, p, d, 0, 0, var, 0)
-      finalizer(_qadic_ctx_clear_fn, z)
-      z.prec_max = prec
-
-      if cached
-         @assert !haskey(QadicBase, (p, d, prec))
-         QadicBase[(p, d, prec)] = z
+      z = get_cached!(QadicBase, (p, d, prec), cached) do
+         z = new()
+         ccall((:qadic_ctx_init, libflint), Nothing,
+              (Ref{FlintQadicField}, Ref{fmpz}, Int, Int, Int, Cstring, Cint),
+                                        z, p, d, 0, 0, var, 0)
+         finalizer(_qadic_ctx_clear_fn, z)
+         z.prec_max = prec
+         return z
       end
 
       return z, gen(z)
@@ -2963,14 +2801,8 @@ mutable struct FmpzRelSeriesRing <: SeriesRing{fmpz}
    S::Symbol
 
    function FmpzRelSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
-      if cached && haskey(FmpzRelSeriesID, (prec, s))
-         FmpzRelSeriesID[prec, s]
-      else
-         z = new(FlintZZ, prec, s)
-         if cached
-            FmpzRelSeriesID[prec, s] = z
-         end
-         return z
+      return get_cached!(FmpzRelSeriesID, (prec, s), cached) do
+         return new(FlintZZ, prec, s)
       end
    end
 end
@@ -3035,14 +2867,8 @@ mutable struct FmpzAbsSeriesRing <: SeriesRing{fmpz}
    S::Symbol
 
    function FmpzAbsSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
-      if cached && haskey(FmpzAbsSeriesID, (prec, s))
-         FmpzAbsSeriesID[prec, s]
-      else
-         z = new(FlintZZ, prec, s)
-         if cached
-            FmpzAbsSeriesID[prec, s] = z
-         end
-         return z
+      return get_cached!(FmpzAbsSeriesID, (prec, s), cached) do
+         return new(FlintZZ, prec, s)
       end
    end
 end
@@ -3101,15 +2927,9 @@ mutable struct FlintPuiseuxSeriesRing{T <: RingElem} <: Ring where T
    laurent_ring::Ring
 
    function FlintPuiseuxSeriesRing{T}(R::Ring, cached::Bool = true) where T
-      if cached && haskey(FlintPuiseuxSeriesID, R)
-         return FlintPuiseuxSeriesID[R]::FlintPuiseuxSeriesRing{T}
-      else
-         z = new{T}(R)
-         if cached
-            FlintPuiseuxSeriesID[R] = z
-         end
-         return z
-      end
+      return get_cached!(FlintPuiseuxSeriesID, R, cached) do
+         return new{T}(R)
+      end::FlintPuiseuxSeriesRing{T}
    end
 end
 
@@ -3136,15 +2956,9 @@ mutable struct FlintPuiseuxSeriesField{T <: RingElem} <: Field
    laurent_ring::Ring
 
    function FlintPuiseuxSeriesField{T}(R::Field, cached::Bool = true) where T
-      if cached && haskey(FlintPuiseuxSeriesID, R)
-         return FlintPuiseuxSeriesID[R]::FlintPuiseuxSeriesField{T}
-      else
-         z = new{T}(R)
-         if cached
-            FlintPuiseuxSeriesID[R] = z
-         end
-         return z
-      end
+      return get_cached!(FlintPuiseuxSeriesID, R, cached) do
+         return new{T}(R)
+      end::FlintPuiseuxSeriesField{T}
    end
 end
 
@@ -3171,14 +2985,8 @@ mutable struct FmpzLaurentSeriesRing <: Ring
    S::Symbol
 
    function FmpzLaurentSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
-      if cached && haskey(FmpzLaurentSeriesID, (prec, s))
-         FmpzLaurentSeriesID[prec, s]
-      else
-         z = new(FlintZZ, prec, s)
-         if cached
-            FmpzLaurentSeriesID[prec, s] = z
-         end
-         return z
+      return get_cached!(FmpzLaurentSeriesID, (prec, s), cached) do
+         return new(FlintZZ, prec, s)
       end
    end
 end
@@ -3243,14 +3051,8 @@ mutable struct FmpqRelSeriesRing <: SeriesRing{fmpq}
    S::Symbol
 
    function FmpqRelSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
-      if cached && haskey(FmpqRelSeriesID, (prec, s))
-         return FmpqRelSeriesID[prec, s]
-      else
-         z = new(FlintQQ, prec, s)
-         if cached
-            FmpqRelSeriesID[prec, s] = z
-         end
-         return z
+      return get_cached!(FmpqRelSeriesID, (prec, s), cached) do
+         return new(FlintQQ, prec, s)
       end
    end
 end
@@ -3314,14 +3116,8 @@ mutable struct FmpqAbsSeriesRing <: SeriesRing{fmpq}
    S::Symbol
 
    function FmpqAbsSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
-      if cached && haskey(FmpqAbsSeriesID, (prec, s))
-         return FmpqAbsSeriesID[prec, s]
-      else
-         z = new(FlintQQ, prec, s)
-         if cached
-            FmpqAbsSeriesID[prec, s] = z
-         end
-         return z
+      return get_cached!(FmpqAbsSeriesID, (prec, s), cached) do
+         return new(FlintQQ, prec, s)
       end
    end
 end
@@ -3384,14 +3180,8 @@ mutable struct GFPRelSeriesRing <: SeriesRing{nmod}
 
    function GFPRelSeriesRing(R::GaloisField, prec::Int, s::Symbol,
                                  cached::Bool = true)
-      if cached && haskey(GFPRelSeriesID, (R, prec, s))
-         return GFPRelSeriesID[R, prec, s]
-      else
-         z = new(R, prec, s)
-         if cached
-            GFPRelSeriesID[R, prec, s] = z
-         end
-         return z
+      return get_cached!(GFPRelSeriesID, (R, prec, s), cached) do
+         return new(R, prec, s)
       end
    end
 end
@@ -3491,14 +3281,8 @@ mutable struct NmodRelSeriesRing <: SeriesRing{nmod}
 
    function NmodRelSeriesRing(R::NmodRing, prec::Int, s::Symbol,
                                  cached::Bool = true)
-      if cached && haskey(NmodRelSeriesID, (R, prec, s))
-         return NmodRelSeriesID[R, prec, s]
-      else
-         z = new(R, prec, s)
-         if cached
-            NmodRelSeriesID[R, prec, s] = z
-         end
-         return z
+      return get_cached!(NmodRelSeriesID, (R, prec, s), cached) do
+         return new(R, prec, s)
       end
    end
 end
@@ -3597,14 +3381,8 @@ mutable struct GFPFmpzRelSeriesRing <: SeriesRing{gfp_fmpz_elem}
 
    function GFPFmpzRelSeriesRing(R::Ring, prec::Int, s::Symbol,
                                  cached::Bool = true)
-      if cached && haskey(GFPFmpzRelSeriesID, (R, prec, s))
-         return GFPFmpzRelSeriesID[R, prec, s]
-      else
-         z = new(R, prec, s)
-         if cached
-            GFPFmpzRelSeriesID[R, prec, s] = z
-         end
-         return z
+      return get_cached!(GFPFmpzRelSeriesID, (R, prec, s), cached) do
+         return new(R, prec, s)
       end
    end
 end
@@ -3715,14 +3493,8 @@ mutable struct FmpzModRelSeriesRing <: SeriesRing{fmpz_mod}
 
    function FmpzModRelSeriesRing(R::Ring, prec::Int, s::Symbol,
                                  cached::Bool = true)
-      if cached && haskey(FmpzModRelSeriesID, (R, prec, s))
-         return FmpzModRelSeriesID[R, prec, s]
-      else
-         z = new(R, prec, s)
-         if cached
-            FmpzModRelSeriesID[R, prec, s] = z
-         end
-         return z
+      return get_cached!(FmpzModRelSeriesID, (R, prec, s), cached) do
+         return new(R, prec, s)
       end
    end
 end
@@ -3833,14 +3605,8 @@ mutable struct GFPFmpzAbsSeriesRing <: SeriesRing{gfp_fmpz_elem}
 
    function GFPFmpzAbsSeriesRing(R::Ring, prec::Int, s::Symbol,
                                  cached::Bool = true)
-      if cached && haskey(GFPFmpzAbsSeriesID, (R, prec, s))
-         return GFPFmpzAbsSeriesID[R, prec, s]
-      else
-         z = new(R, prec, s)
-         if cached
-            GFPFmpzAbsSeriesID[R, prec, s]  = z
-         end
-         return z
+      return get_cached!(GFPFmpzAbsSeriesID, (R, prec, s), cached) do
+         return new(R, prec, s)
       end
    end
 end
@@ -3948,14 +3714,8 @@ mutable struct NmodAbsSeriesRing <: SeriesRing{nmod}
    function NmodAbsSeriesRing(R::Ring, prec::Int, s::Symbol,
                                   cached::Bool = true)
       m = modulus(R)
-      if cached && haskey(NmodAbsSeriesID, (R, prec, s))
-         return NmodAbsSeriesID[R, prec, s]
-      else
-         z = new(R, prec, m, s)
-         if cached
-            NmodAbsSeriesID[R, prec, s]  = z
-         end
-         return z
+      return get_cached!(NmodAbsSeriesID, (R, prec, s), cached) do
+         return new(R, prec, m, s)
       end
    end
 end
@@ -4055,14 +3815,8 @@ mutable struct GFPAbsSeriesRing <: SeriesRing{gfp_elem}
    function GFPAbsSeriesRing(R::Ring, prec::Int, s::Symbol,
                                   cached::Bool = true)
       m = modulus(R)
-      if cached && haskey(GFPAbsSeriesID, (R, prec, s))
-         return GFPAbsSeriesID[R, prec, s]
-      else
-         z = new(R, prec, m, s)
-         if cached
-            GFPAbsSeriesID[R, prec, s]  = z
-         end
-         return z
+      return get_cached!(GFPAbsSeriesID, (R, prec, s), cached) do
+         return new(R, prec, m, s)
       end
    end
 end
@@ -4160,14 +3914,8 @@ mutable struct FmpzModAbsSeriesRing <: SeriesRing{fmpz_mod}
 
    function FmpzModAbsSeriesRing(R::Ring, prec::Int, s::Symbol,
                                  cached::Bool = true)
-      if cached && haskey(FmpzModAbsSeriesID, (R, prec, s))
-         return FmpzModAbsSeriesID[R, prec, s]
-      else
-         z = new(R, prec, s)
-         if cached
-            FmpzModAbsSeriesID[R, prec, s]  = z
-         end
-         return z
+      return get_cached!(FmpzModAbsSeriesID, (R, prec, s), cached) do
+         return new(R, prec, s)
       end
    end
 end
@@ -4275,14 +4023,8 @@ mutable struct FqDefaultRelSeriesRing <: SeriesRing{fq_default}
  
    function FqDefaultRelSeriesRing(R::FqDefaultFiniteField, prec::Int, s::Symbol,
                              cached::Bool = true)
-      if cached && haskey(FqDefaultRelSeriesID, (R, prec, s))
-         return FqDefaultRelSeriesID[R, prec, s]
-      else
-         z = new(R, prec, s)
-         if cached
-            FqDefaultRelSeriesID[R, prec, s] = z
-         end
-         return z
+      return get_cached!(FqDefaultRelSeriesID, (R, prec, s), cached) do
+         return new(R, prec, s)
       end
    end
 end
@@ -4352,14 +4094,8 @@ mutable struct FqRelSeriesRing <: SeriesRing{fq}
 
    function FqRelSeriesRing(R::FqFiniteField, prec::Int, s::Symbol,
                             cached::Bool = true)
-      if cached && haskey(FqRelSeriesID, (R, prec, s))
-         return FqRelSeriesID[R, prec, s]
-      else
-         z = new(R, prec, s)
-         if cached
-            FqRelSeriesID[R, prec, s] = z
-         end
-         return z
+      return get_cached!(FqRelSeriesID, (R, prec, s), cached) do
+         return new(R, prec, s)
       end
    end
 end
@@ -4427,14 +4163,8 @@ mutable struct FqDefaultAbsSeriesRing <: SeriesRing{fq_default}
  
    function FqDefaultAbsSeriesRing(R::FqDefaultFiniteField, prec::Int, s::Symbol,
                              cached::Bool = true)
-      if cached && haskey(FqDefaultAbsSeriesID, (R, prec, s))
-         return FqDefaultAbsSeriesID[R, prec, s]
-      else
-         z = new(R, prec, s)
-         if cached
-            FqDefaultAbsSeriesID[R, prec, s] = z
-         end
-         return z
+      return get_cached!(FqDefaultAbsSeriesID, (R, prec, s), cached) do
+         return new(R, prec, s)
       end
    end
 end
@@ -4501,14 +4231,8 @@ mutable struct FqAbsSeriesRing <: SeriesRing{fq}
 
    function FqAbsSeriesRing(R::FqFiniteField, prec::Int, s::Symbol,
                             cached::Bool = true)
-      if cached && haskey(FqAbsSeriesID, (R, prec, s))
-         return FqAbsSeriesID[R, prec, s]
-      else
-         z = new(R, prec, s)
-         if cached
-            FqAbsSeriesID[R, prec, s] = z
-         end
-         return z
+      return get_cached!(FqAbsSeriesID, (R, prec, s), cached) do
+         return new(R, prec, s)
       end
    end
 end
@@ -4574,14 +4298,8 @@ mutable struct FqNmodRelSeriesRing <: SeriesRing{fq_nmod}
 
    function FqNmodRelSeriesRing(R::FqNmodFiniteField, prec::Int, s::Symbol,
                                 cached::Bool = true)
-      if cached && haskey(FqNmodRelSeriesID, (R, prec, s))
-         return FqNmodRelSeriesID[R, prec, s]
-      else
-         z = new(R, prec, s)
-         if cached
-            FqNmodRelSeriesID[R, prec, s] = z
-         end
-         return z
+      return get_cached!(FqNmodRelSeriesID, (R, prec, s), cached) do
+         return new(R, prec, s)
       end
    end
 end
@@ -4650,14 +4368,8 @@ mutable struct FqNmodAbsSeriesRing <: SeriesRing{fq_nmod}
 
    function FqNmodAbsSeriesRing(R::FqNmodFiniteField, prec::Int, s::Symbol,
                                 cached::Bool = true)
-      if cached && haskey(FqNmodAbsSeriesID, (R, prec, s))
-         return FqNmodAbsSeriesID[R, prec, s]
-      else
-         z = new(R, prec, s)
-         if cached
-            FqNmodAbsSeriesID[R, prec, s] = z
-         end
-         return z
+      return get_cached!(FqNmodAbsSeriesID, (R, prec, s), cached) do
+         return new(R, prec, s)
       end
    end
 end
@@ -4724,14 +4436,8 @@ mutable struct FmpqMatSpace <: MatSpace{fmpq}
    base_ring::FlintRationalField
 
    function FmpqMatSpace(r::Int, c::Int, cached::Bool = true)
-      if cached && haskey(FmpqMatID, (r, c))
-         return FmpqMatID[r, c]
-      else
-         z = new(r, c, FlintQQ)
-         if cached
-            FmpqMatID[r, c] = z
-         end
-         return z
+      return get_cached!(FmpqMatID, (r, c), cached) do
+         return new(r, c, FlintQQ)
       end
    end
 end
@@ -4899,14 +4605,8 @@ mutable struct FmpzMatSpace <: MatSpace{fmpz}
    base_ring::FlintIntegerRing
 
    function FmpzMatSpace(r::Int, c::Int, cached::Bool = true)
-      if cached && haskey(FmpzMatID, (r, c))
-         return FmpzMatID[r, c]
-      else
-         z = new(r, c, FlintZZ)
-         if cached
-            FmpzMatID[r, c] = z
-         end
-         return z
+      return get_cached!(FmpzMatID, (r, c), cached) do
+         return new(r, c, FlintZZ)
       end
    end
 end
@@ -5040,14 +4740,8 @@ mutable struct NmodMatSpace <: MatSpace{nmod}
   function NmodMatSpace(R::NmodRing, r::Int, c::Int,
                         cached::Bool = true)
     (r < 0 || c < 0) && throw(error_dim_negative)
-    if cached && haskey(NmodMatID, (R, r, c))
-      return NmodMatID[R, r, c]
-    else
-      z = new(R, R.n, r, c)
-      if cached
-        NmodMatID[R, r, c] = z
-      end
-      return z
+    return get_cached!(NmodMatID, (R, r, c), cached) do
+       return new(R, R.n, r, c)
     end
   end
 end
@@ -5224,14 +4918,8 @@ mutable struct FmpzModMatSpace <: MatSpace{fmpz_mod}
   function FmpzModMatSpace(R::FmpzModRing, r::Int, c::Int,
                         cached::Bool = true)
     (r < 0 || c < 0) && throw(error_dim_negative)
-    if cached && haskey(FmpzModMatID, (R, r, c))
-      return FmpzModMatID[R, r, c]
-    else
-      z = new(R, R.n, r, c)
-      if cached
-        FmpzModMatID[R, r, c] = z
-      end
-      return z
+    return get_cached!(FmpzModMatID, (R, r, c), cached) do
+       return new(R, R.n, r, c)
     end
   end
 end
@@ -5368,14 +5056,8 @@ mutable struct GaloisFmpzMatSpace <: MatSpace{gfp_fmpz_elem}
 
   function GaloisFmpzMatSpace(R::GaloisFmpzField, r::Int, c::Int, cached::Bool = true)
     (r < 0 || c < 0) && throw(error_dim_negative)
-    if cached && haskey(GaloisFmpzMatID, (R, r, c))
-      return GaloisFmpzMatID[R, r, c]
-    else
-      z = new(R, R.n, r, c)
-      if cached
-        GaloisFmpzMatID[R, r, c] = z
-      end
-      return z
+    return get_cached!(GaloisFmpzMatID, (R, r, c), cached) do
+       return new(R, R.n, r, c)
     end
   end
 end
@@ -5514,14 +5196,8 @@ mutable struct GFPMatSpace <: MatSpace{gfp_elem}
   function GFPMatSpace(R::GaloisField, r::Int, c::Int,
                         cached::Bool = true)
     (r < 0 || c < 0) && throw(error_dim_negative)
-    if cached && haskey(GFPMatID, (R, r, c))
-      return GFPMatID[R, r, c]
-    else
-      z = new(R, R.n, r, c)
-      if cached
-        GFPMatID[R, r, c] = z
-      end
-      return z
+    return get_cached!(GFPMatID, (R, r, c), cached) do
+       return new(R, R.n, r, c)
     end
   end
 end
@@ -5694,14 +5370,8 @@ mutable struct FqDefaultPolyRing <: PolyRing{fq_default}
    S::Symbol
  
    function FqDefaultPolyRing(R::FqDefaultFiniteField, s::Symbol, cached::Bool = true)
-      if cached && haskey(FqDefaultPolyID, (R, s))
-         return FqDefaultPolyID[(R, s)]
-      else
-         z = new(R,s)
-         if cached
-            FqDefaultPolyID[(R, s)] = z
-         end
-         return z
+      return get_cached!(FqDefaultPolyID, (R, s), cached) do
+         return new(R,s)
       end
    end
 end
@@ -5875,14 +5545,8 @@ mutable struct FqPolyRing <: PolyRing{fq}
    S::Symbol
 
    function FqPolyRing(R::FqFiniteField, s::Symbol, cached::Bool = true)
-      if cached && haskey(FqPolyID, (R, s))
-         return FqPolyID[(R, s)]
-      else
-         z = new(R,s)
-         if cached
-            FqPolyID[(R, s)] = z
-         end
-         return z
+      return get_cached!(FqPolyID, (R, s), cached) do
+         return new(R,s)
       end
    end
 end
@@ -6011,14 +5675,8 @@ mutable struct FqNmodPolyRing <: PolyRing{fq_nmod}
    S::Symbol
 
    function FqNmodPolyRing(R::FqNmodFiniteField, s::Symbol, cached::Bool = true)
-      if cached && haskey(FqNmodPolyID, (R, s))
-         return FqNmodPolyID[(R, s)]
-      else
-         z = new(R,s)
-         if cached
-            FqNmodPolyID[(R, s)] = z
-         end
-         return z
+      return get_cached!(FqNmodPolyID, (R, s), cached) do
+         return new(R,s)
       end
    end
 end
@@ -6149,14 +5807,8 @@ mutable struct FqDefaultMatSpace <: MatSpace{fq_default}
  
    function FqDefaultMatSpace(R::FqDefaultFiniteField, r::Int, c::Int, cached::Bool = true)
      (r < 0 || c < 0) && throw(error_dim_negative)
-     if cached && haskey(FqDefaultMatID, (R, r, c))
-       return FqDefaultMatID[R, r, c]
-     else
-       z = new(R, r, c)
-       if cached
-         FqDefaultMatID[R, r, c] = z
-       end
-       return z
+     return get_cached!(FqDefaultMatID, (R, r, c), cached) do
+        return new(R, r, c)
      end
    end
  end
@@ -6389,14 +6041,8 @@ mutable struct FqMatSpace <: MatSpace{fq}
 
   function FqMatSpace(R::FqFiniteField, r::Int, c::Int, cached::Bool = true)
     (r < 0 || c < 0) && throw(error_dim_negative)
-    if cached && haskey(FqMatID, (R, r, c))
-      return FqMatID[R, r, c]
-    else
-      z = new(R, r, c)
-      if cached
-        FqMatID[R, r, c] = z
-      end
-      return z
+    return get_cached!(FqMatID, (R, r, c), cached) do
+       return new(R, r, c)
     end
   end
 end
@@ -6577,14 +6223,8 @@ mutable struct FqNmodMatSpace <: MatSpace{fq_nmod}
 
   function FqNmodMatSpace(R::FqNmodFiniteField, r::Int, c::Int, cached::Bool = true)
     (r < 0 || c < 0) && throw(error_dim_negative)
-    if cached && haskey(FqNmodMatID, (R, r, c))
-      return FqNmodMatID[R, r, c]
-    else
-      z = new(R, r, c)
-      if cached
-        FqNmodMatID[R, r, c] = z
-      end
-      return z
+    return get_cached!(FqNmodMatID, (R, r, c), cached) do
+       return new(R, r, c)
     end
   end
 end
@@ -6819,7 +6459,7 @@ mutable struct FqDefaultMPolyRing <: MPolyRing{fq_default}
                 # the PolynomialRing constructor
 
     function FqDefaultMPolyRing(a, b::FqDefaultFiniteField, c::Int, cached = true)
-        return AbstractAlgebra.get_cached!(FqDefaultMPolyID, (a, b, c), cached) do
+        return get_cached!(FqDefaultMPolyID, (a, b, c), cached) do
             return new(a, b, c)
         end::FqDefaultMPolyRing
     end

@@ -92,14 +92,8 @@ mutable struct ArbField <: Field
 
   function ArbField(p::Int = 256; cached::Bool = true)
     arb_check_precision(p)
-    if cached && haskey(ArbFieldID, p)
-      return ArbFieldID[p]
-    else
-      z = new(p)
-      if cached
-        ArbFieldID[p] = z
-      end
-      return z
+    return get_cached!(ArbFieldID, p, cached) do
+      return new(p)
     end
   end
 end
@@ -174,14 +168,8 @@ mutable struct AcbField <: Field
 
   function AcbField(p::Int = 256; cached::Bool = true)
     arb_check_precision(p)
-    if cached && haskey(AcbFieldID, p)
-      return AcbFieldID[p]
-    else
-      z = new(p)
-      if cached
-        AcbFieldID[p] = z
-      end
-      return z
+    return get_cached!(AcbFieldID, p, cached) do
+      return new(p)
     end
   end
 end
@@ -281,14 +269,8 @@ mutable struct ArbPolyRing <: PolyRing{arb}
   S::Symbol
 
   function ArbPolyRing(R::ArbField, S::Symbol, cached::Bool = true)
-    if cached && haskey(ArbPolyRingID, (R, S))
-      return ArbPolyRingID[R, S]
-    else
-      z = new(R, S)
-      if cached
-        ArbPolyRingID[R, S] = z
-      end
-      return z
+    return get_cached!(ArbPolyRingID, (R, S), cached) do
+      return new(R, S)
     end
   end
 end
@@ -387,14 +369,8 @@ mutable struct AcbPolyRing <: PolyRing{acb}
   S::Symbol
 
   function AcbPolyRing(R::AcbField, S::Symbol, cached::Bool = true)
-    if cached && haskey(AcbPolyRingID, (R, S))
-      return AcbPolyRingID[R, S]
-    else
-      z = new(R, S)
-      if cached
-        AcbPolyRingID[R, S] = z
-      end
-      return z
+    return get_cached!(AcbPolyRingID, (R, S), cached) do
+      return new(R, S)
     end
   end
 end
@@ -505,14 +481,8 @@ mutable struct ArbMatSpace <: MatSpace{arb}
   base_ring::ArbField
 
   function ArbMatSpace(R::ArbField, r::Int, c::Int, cached::Bool = true)
-    if cached && haskey(ArbMatSpaceID, (R, r, c))
-      return ArbMatSpaceID[(R, r, c)]
-    else
-      z = new(r, c, R)
-      if cached
-        ArbMatSpaceID[(R, r, c)] = z
-      end
-      return z::ArbMatSpace
+    return get_cached!(ArbMatSpaceID, (R, r, c), cached) do
+      return new(r, c, R)
     end
   end
 end
@@ -640,14 +610,8 @@ mutable struct AcbMatSpace <: MatSpace{acb}
   base_ring::AcbField
 
   function AcbMatSpace(R::AcbField, r::Int, c::Int, cached::Bool = true)
-    if cached && haskey(AcbMatSpaceID, (R, r, c))
-      return AcbMatSpaceID[(R, r, c)]
-    else
-      z = new(r, c, R)
-      if cached
-        AcbMatSpaceID[(R, r, c)] = z
-      end
-      return z::AcbMatSpace
+    return get_cached!(AcbMatSpaceID, (R, r, c), cached) do
+      return new(r, c, R)
     end
   end
 end
