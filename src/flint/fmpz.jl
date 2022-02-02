@@ -2543,30 +2543,28 @@ function (::Type{BigInt})(a::fmpz)
    return r
 end
 
-convert(::Type{BigInt}, a::fmpz) = BigInt(a)
-
 function (::Type{Int})(a::fmpz)
    (a > typemax(Int) || a < typemin(Int)) && throw(InexactError(:convert, Int, a))
    return ccall((:fmpz_get_si, libflint), Int, (Ref{fmpz},), a)
 end
-
-convert(::Type{Int}, a::fmpz) = Int(a)
 
 function (::Type{UInt})(a::fmpz)
    (a > typemax(UInt) || a < 0) && throw(InexactError(:convert, UInt, a))
    return ccall((:fmpz_get_ui, libflint), UInt, (Ref{fmpz}, ), a)
 end
 
-convert(::Type{UInt}, a::fmpz) = UInt(a)
-
 if Culong !== UInt
     function (::Type{Culong})(a::fmpz)
        fits(Culong, a) || throw(InexactError(:convert, Culong, a))
        return ccall((:fmpz_get_ui, libflint), UInt, (Ref{fmpz}, ), a)%Culong
     end
-
-    convert(::Type{Culong}, a::fmpz) = Culong(a)
 end
+
+(::Type{T})(a::fmpz) where T <: Union{Int8, Int16, Int32} = T(Int(a))
+
+(::Type{T})(a::fmpz) where T <: Union{UInt8, UInt16, UInt32} = T(UInt(a))
+
+convert(::Type{T}, a::fmpz) where T <: Integer = T(a)
 
 function (::Type{Float64})(n::fmpz)
     # rounds to zero

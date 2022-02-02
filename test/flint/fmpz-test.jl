@@ -103,13 +103,17 @@ end
    a = fmpz(-123)
    b = fmpz(12)
 
-   @test Int(a) == -123
-   @test UInt(b) == UInt(12)
-   @test BigInt(a) == BigInt(-123)
-   @test Float64(a) == Float64(-123)
-   @test Float32(a) == Float32(-123)
-   @test Float16(a) == Float16(-123)
-   @test BigFloat(a) == BigFloat(-123)
+   @testset "fmpz.convert for $T" for T in [Int8, Int16, Int32, Int, BigInt, Float16, Float32, Float64, BigFloat]
+      x = @inferred T(a)
+      @test x isa T
+      @test x == -123
+   end
+
+   @testset "fmpz.convert for $T" for T in [UInt8, UInt16, UInt32, UInt]
+      x = @inferred T(b)
+      @test x isa T
+      @test x == 12
+   end
 
    @test_throws InexactError Int(fmpz(1234484735687346876324432764872))
    @test_throws InexactError UInt(fmpz(typemin(Int)))
