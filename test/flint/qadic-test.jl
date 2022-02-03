@@ -1,6 +1,6 @@
 @testset "qadic.constructors" begin
-   R, _     = QadicField(7, 1, 30)
-   K, _     = QadicField(7, 3, 30) 
+   R, _     = @inferred QadicField(7, 1, 30)
+   K, _     = @inferred QadicField(7, 3, 30) 
    QX, x = PolynomialRing(FlintQQ, "x") 
 
    @test elem_type(R) == qadic
@@ -9,7 +9,7 @@
 
    @test isa(R, FlintQadicField)
 
-   S, _ = QadicField(fmpz(1009), 1, 30)
+   S, _ = @inferred QadicField(fmpz(1009), 1, 30)
 
    @test isa(S, FlintQadicField)
 

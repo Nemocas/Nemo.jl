@@ -2750,13 +2750,13 @@ mutable struct FlintQadicField <: FlintLocalField
       check && !isprobable_prime(p) && throw(DomainError(p, "Characteristic must be prime"))
 
       z = get_cached!(QadicBase, (p, d, prec), cached) do
-         z = new()
+         zz = new()
          ccall((:qadic_ctx_init, libflint), Nothing,
               (Ref{FlintQadicField}, Ref{fmpz}, Int, Int, Int, Cstring, Cint),
-                                        z, p, d, 0, 0, var, 0)
-         finalizer(_qadic_ctx_clear_fn, z)
-         z.prec_max = prec
-         return z
+                                        zz, p, d, 0, 0, var, 0)
+         finalizer(_qadic_ctx_clear_fn, zz)
+         zz.prec_max = prec
+         return zz
       end
 
       return z, gen(z)
