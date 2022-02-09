@@ -194,7 +194,7 @@ _fmpq_clear_fn(a::fmpq) = ccall((:fmpq_clear, libflint), Nothing, (Ref{fmpq},), 
 #
 ###############################################################################
 
-mutable struct FmpzPolyRing <: PolyRing{fmpz}
+@attributes mutable struct FmpzPolyRing <: PolyRing{fmpz}
    base_ring::FlintIntegerRing
    S::Symbol
 
@@ -291,7 +291,7 @@ end
 #
 ###############################################################################
 
-mutable struct FmpqPolyRing <: PolyRing{fmpq}
+@attributes mutable struct FmpqPolyRing <: PolyRing{fmpq}
    base_ring::FlintRationalField
    S::Symbol
 
@@ -504,7 +504,7 @@ end
 #
 ###############################################################################
 
-mutable struct NmodPolyRing <: PolyRing{nmod}
+@attributes mutable struct NmodPolyRing <: PolyRing{nmod}
   base_ring::NmodRing
   S::Symbol
   n::UInt
@@ -643,7 +643,7 @@ end
 #
 ###############################################################################
 
-mutable struct GFPPolyRing <: PolyRing{gfp_elem}
+@attributes mutable struct GFPPolyRing <: PolyRing{gfp_elem}
   base_ring::GaloisField
   S::Symbol
   n::UInt
@@ -782,7 +782,7 @@ end
 #
 ###############################################################################
 
-mutable struct FmpzModPolyRing <: PolyRing{fmpz_mod}
+@attributes mutable struct FmpzModPolyRing <: PolyRing{fmpz_mod}
   base_ring::FmpzModRing
   S::Symbol
   n::fmpz
@@ -962,7 +962,7 @@ end
 #
 ###############################################################################
 
-mutable struct GFPFmpzPolyRing <: PolyRing{gfp_fmpz_elem}
+@attributes mutable struct GFPFmpzPolyRing <: PolyRing{gfp_fmpz_elem}
   base_ring::GaloisFmpzField
   S::Symbol
   n::fmpz
@@ -1144,7 +1144,7 @@ end
 
 const flint_orderings = [:lex, :deglex, :degrevlex]
 
-mutable struct FmpzMPolyRing <: MPolyRing{fmpz}
+@attributes mutable struct FmpzMPolyRing <: MPolyRing{fmpz}
    nvars::Int
    nfields::Cint
    ord::Int
@@ -1341,7 +1341,7 @@ end
 #
 ###############################################################################
 
-mutable struct FmpqMPolyRing <: MPolyRing{fmpq}
+@attributes mutable struct FmpqMPolyRing <: MPolyRing{fmpq}
    nvars::Int
    nfields::Cint
    ord::Int
@@ -1550,7 +1550,7 @@ end
 #
 ###############################################################################
 
-mutable struct NmodMPolyRing <: MPolyRing{nmod}
+@attributes mutable struct NmodMPolyRing <: MPolyRing{nmod}
    nvars::Int
    nfields::Int
    ord::Cint
@@ -1741,7 +1741,7 @@ end
 #
 ###############################################################################
 
-mutable struct GFPMPolyRing <: MPolyRing{gfp_elem}
+@attributes mutable struct GFPMPolyRing <: MPolyRing{gfp_elem}
    nvars::Int
    nfields::Int
    ord::Cint
@@ -2437,7 +2437,7 @@ end
 #
 ###############################################################################
 
-mutable struct FqNmodMPolyRing <: MPolyRing{fq_nmod}
+@attributes mutable struct FqNmodMPolyRing <: MPolyRing{fq_nmod}
    nvars::Int
    nfields::Int
    ord::Cint
@@ -5365,7 +5365,7 @@ end
 #
 ###############################################################################
 
-mutable struct FqDefaultPolyRing <: PolyRing{fq_default}
+@attributes mutable struct FqDefaultPolyRing <: PolyRing{fq_default}
    base_ring::FqDefaultFiniteField
    S::Symbol
  
@@ -5540,7 +5540,7 @@ end
 #
 ###############################################################################
 
-mutable struct FqPolyRing <: PolyRing{fq}
+@attributes mutable struct FqPolyRing <: PolyRing{fq}
    base_ring::FqFiniteField
    S::Symbol
 
@@ -5670,7 +5670,7 @@ end
 #
 ###############################################################################
 
-mutable struct FqNmodPolyRing <: PolyRing{fq_nmod}
+@attributes mutable struct FqNmodPolyRing <: PolyRing{fq_nmod}
    base_ring::FqNmodFiniteField
    S::Symbol
 
@@ -6449,7 +6449,7 @@ const _fq_default_mpoly_union = Union{AbstractAlgebra.Generic.MPoly{fq},
                                       #gfp_fmpz_mpoly
                                       }
 
-mutable struct FqDefaultMPolyRing <: MPolyRing{fq_default}
+@attributes mutable struct FqDefaultMPolyRing <: MPolyRing{fq_default}
     data::Union{GFPMPolyRing,
                 #GFPFmpzMPolyRing,
                 FqNmodMPolyRing,
