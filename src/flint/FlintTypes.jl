@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-struct FlintIntegerRing <: Ring
+@attributes struct FlintIntegerRing <: Ring
 end
 
 const FlintZZ = FlintIntegerRing()
@@ -116,7 +116,7 @@ end
 #
 ###############################################################################
 
-struct FlintRationalField <: FracField{fmpz}
+@attributes struct FlintRationalField <: FracField{fmpz}
 end
 
 const FlintQQ = FlintRationalField()
