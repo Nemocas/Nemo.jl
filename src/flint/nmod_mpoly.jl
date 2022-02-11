@@ -1014,7 +1014,7 @@ end
 
 promote_rule(::Type{($etype)}, ::Type{V}) where {V <: Integer} = ($etype)
 
-promote_rule(::Type{($etype)}, ::Type{nmod}) = ($etype)
+promote_rule(::Type{($etype)}, ::Type{$ctype}) = ($etype)
 
 ###############################################################################
 #

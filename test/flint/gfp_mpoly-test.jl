@@ -784,3 +784,10 @@ end
    m = [[BigInt(0),BigInt(0)], [BigInt(1),BigInt(0)], [BigInt(0),BigInt(1)]]
    @test S([BigInt(0), BigInt(1), BigInt(2)], m) == 1*x+2*y
 end
+
+@testset "gfp_mpoly.promote_rule" begin
+  R = GF(2)
+  Rx, (x, ) = PolynomialRing(R, ["x"])
+  Sy, (y, ) = PolynomialRing(Rx, ["y"])
+  @test y == @inferred (R(1) * y)
+end
