@@ -90,7 +90,7 @@ nrows(a::GaloisFmpzMatSpace) = a.nrows
 ncols(a::GaloisFmpzMatSpace) = a.ncols
 
 function parent(a::gfp_fmpz_mat, cached::Bool = true)
-   MatrixSpace(base_ring(a), nrows(a), ncols(a), cached)
+   MatrixSpace(base_ring(a), nrows(a), ncols(a); cached)
 end
 
 base_ring(a::GaloisFmpzMatSpace) = a.base_ring
@@ -348,7 +348,7 @@ end
 #
 ################################################################################
 
-function MatrixSpace(R::GaloisFmpzField, r::Int, c::Int, cached::Bool = true)
+function MatrixSpace(R::GaloisFmpzField, r::Int, c::Int; cached::Bool = true)
   GaloisFmpzMatSpace(R, r, c, cached)
 end
 

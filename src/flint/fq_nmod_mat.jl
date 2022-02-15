@@ -779,6 +779,6 @@ end
 #
 ################################################################################
 
-function MatrixSpace(R::FqNmodFiniteField, r::Int, c::Int, cached::Bool = true)
+function MatrixSpace(R::FqNmodFiniteField, r::Int, c::Int; cached::Bool = true)
   FqNmodMatSpace(R, r, c, cached)
 end

@@ -118,7 +118,7 @@ nrows(a::NmodMatSpace) = a.nrows
 ncols(a::NmodMatSpace) = a.ncols
 
 function parent(a::T, cached::Bool = true) where T <: Zmodn_mat
-   MatrixSpace(base_ring(a), nrows(a), ncols(a), cached)
+   MatrixSpace(base_ring(a), nrows(a), ncols(a); cached)
 end
 
 base_ring(a::NmodMatSpace) = a.base_ring
@@ -854,7 +854,7 @@ end
 #
 ################################################################################
 
-function MatrixSpace(R::NmodRing, r::Int, c::Int, cached::Bool = true)
+function MatrixSpace(R::NmodRing, r::Int, c::Int; cached::Bool = true)
   NmodMatSpace(R, r, c, cached)
 end
 

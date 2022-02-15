@@ -779,6 +779,6 @@ end
 #
 ################################################################################
 
-function MatrixSpace(R::FqFiniteField, r::Int, c::Int, cached::Bool = true)
+function MatrixSpace(R::FqFiniteField, r::Int, c::Int; cached::Bool = true)
   FqMatSpace(R, r, c, cached)
 end

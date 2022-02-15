@@ -1512,6 +1512,6 @@ end
 #
 ###############################################################################
 
-function MatrixSpace(R::FlintIntegerRing, r::Int, c::Int, cached::Bool = true)
+function MatrixSpace(R::FlintIntegerRing, r::Int, c::Int; cached::Bool = true)
    return FmpzMatSpace(r, c, cached)
 end

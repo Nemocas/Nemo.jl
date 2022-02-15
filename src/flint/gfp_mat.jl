@@ -490,6 +490,6 @@ end
 #
 ################################################################################
 
-function MatrixSpace(R::GaloisField, r::Int, c::Int, cached::Bool = true)
+function MatrixSpace(R::GaloisField, r::Int, c::Int; cached::Bool = true)
   GFPMatSpace(R, r, c, cached)
 end
