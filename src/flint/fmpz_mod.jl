@@ -394,6 +394,8 @@ rand(R::FmpzModRing, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
 
 promote_rule(::Type{fmpz_mod}, ::Type{T}) where T <: Integer = fmpz_mod
 
+promote_rule(::Type{fmpz_mod}, ::Type{fmpz}) = fmpz_mod
+
 ###############################################################################
 #
 #   Parent object call overload

@@ -397,6 +397,8 @@ rand(R::NmodRing, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
 
 promote_rule(::Type{nmod}, ::Type{T}) where T <: Integer = nmod
 
+promote_rule(::Type{nmod}, ::Type{fmpz}) = nmod
+
 ###############################################################################
 #
 #   Parent object call overload

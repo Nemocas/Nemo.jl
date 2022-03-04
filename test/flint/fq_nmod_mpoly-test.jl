@@ -22,6 +22,8 @@
       @test elem_type(FqNmodMPolyRing) == fq_nmod_mpoly
       @test parent_type(fq_nmod_mpoly) == FqNmodMPolyRing
 
+      @test Nemo.promote_rule(elem_type(S), fmpz) == elem_type(S)
+
       @test typeof(S) <: FqNmodMPolyRing
 
       isa(symbols(S), Vector{Symbol})

@@ -368,6 +368,8 @@ setcoeff!(x::gfp_fmpz_poly, n::Int, y::gfp_fmpz_elem) = setcoeff!(x, n, y.data)
 
 promote_rule(::Type{gfp_fmpz_poly}, ::Type{gfp_fmpz_elem}) = gfp_fmpz_poly
 
+promote_rule(::Type{gfp_fmpz_poly}, ::Type{fmpz}) = gfp_fmpz_poly
+
 ###############################################################################
 #
 #   Polynomial substitution

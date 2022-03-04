@@ -7,6 +7,8 @@
    @test elem_type(Nemo.GaloisFmpzField) == Nemo.gfp_fmpz_elem
    @test parent_type(Nemo.gfp_fmpz_elem) == Nemo.GaloisFmpzField
 
+   @test Nemo.promote_rule(elem_type(R), fmpz) == elem_type(R)
+
    @test isa(R, Nemo.GaloisFmpzField)
 
    @test isa(R(), Nemo.gfp_fmpz_elem)

@@ -18,6 +18,8 @@ end
    @test elem_type(Nemo.GaloisField) == Nemo.gfp_elem
    @test parent_type(Nemo.gfp_elem) == Nemo.GaloisField
 
+   @test Nemo.promote_rule(elem_type(R), fmpz) == elem_type(R)
+
    @test isa(R, Nemo.GaloisField)
 
    @test isa(R(), Nemo.gfp_elem)

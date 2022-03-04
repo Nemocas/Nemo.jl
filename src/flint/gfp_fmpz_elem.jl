@@ -411,6 +411,8 @@ function promote_rule(::Type{gfp_fmpz_elem}, ::Type{T}) where T <: Integer
    return gfp_fmpz_elem
 end
 
+promote_rule(::Type{gfp_fmpz_elem}, ::Type{fmpz}) = gfp_fmpz_elem
+
 ###############################################################################
 #
 #   Parent object call overload

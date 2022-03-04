@@ -14,6 +14,8 @@
    @test parent_type(gfp_fmpz_poly) == GFPFmpzPolyRing
    @test dense_poly_type(Generic.ResF{fmpz}) == gfp_fmpz_poly
 
+   @test Nemo.promote_rule(elem_type(S), fmpz) == elem_type(S)
+
    @test typeof(S) <: GFPFmpzPolyRing
 
    @test isa(x, PolyElem{Nemo.gfp_fmpz_elem})

@@ -387,6 +387,8 @@ rand(R::GaloisField, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
 
 promote_rule(::Type{gfp_elem}, ::Type{T}) where T <: Integer = gfp_elem
 
+promote_rule(::Type{gfp_elem}, ::Type{fmpz}) = gfp_elem
+
 ###############################################################################
 #
 #   Parent object call overload

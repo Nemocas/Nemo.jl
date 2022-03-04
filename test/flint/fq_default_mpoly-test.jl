@@ -29,10 +29,11 @@ local test_fields = (NGFiniteField(23, 1, "a"),
          @test elem_type(FqDefaultMPolyRing) == fq_default_mpoly
          @test parent_type(fq_default_mpoly) == FqDefaultMPolyRing
 
-         @test typeof(S) <: FqDefaultMPolyRing
-
          @test Nemo.promote_rule(elem_type(S), elem_type(R)) == elem_type(S)
          @test Nemo.promote_rule(elem_type(S), Int) == elem_type(S)
+         @test Nemo.promote_rule(elem_type(S), fmpz) == elem_type(S)
+
+         @test typeof(S) <: FqDefaultMPolyRing
 
          isa(symbols(S), Vector{Symbol})
 

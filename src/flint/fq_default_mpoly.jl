@@ -532,6 +532,8 @@ end
 
 promote_rule(::Type{(fq_default_mpoly)}, ::Type{V}) where {V <: Integer} = (fq_default_mpoly)
 
+promote_rule(::Type{(fq_default_mpoly)}, ::Type{fmpz}) = (fq_default_mpoly)
+
 promote_rule(::Type{(fq_default_mpoly)}, ::Type{fq_default}) = (fq_default_mpoly)
 
 ###############################################################################

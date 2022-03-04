@@ -960,6 +960,8 @@ end
 
 promote_rule(::Type{fq_nmod_mpoly}, ::Type{V}) where {V <: Integer} = fq_nmod_mpoly
 
+promote_rule(::Type{fq_nmod_mpoly}, ::Type{fmpz}) = fq_nmod_mpoly
+
 promote_rule(::Type{fq_nmod_mpoly}, ::Type{fq_nmod}) = fq_nmod_mpoly
 
 ###############################################################################
