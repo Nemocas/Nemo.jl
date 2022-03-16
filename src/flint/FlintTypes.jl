@@ -385,7 +385,7 @@ end
 #
 ###############################################################################
 
-mutable struct NmodRing <: Ring
+@attributes mutable struct NmodRing <: Ring
    n::UInt
    ninv::UInt
 
@@ -457,7 +457,7 @@ function _fmpz_mod_ctx_clear_fn(a::fmpz_mod_ctx_struct)
    ccall((:fmpz_mod_ctx_clear, libflint), Nothing, (Ref{fmpz_mod_ctx_struct},), a)
 end
 
-mutable struct FmpzModRing <: Ring
+@attributes mutable struct FmpzModRing <: Ring
    n::fmpz
    ninv::fmpz_mod_ctx_struct
 
@@ -2801,7 +2801,7 @@ end
 #
 ###############################################################################
 
-mutable struct FmpzRelSeriesRing <: SeriesRing{fmpz}
+@attributes mutable struct FmpzRelSeriesRing <: SeriesRing{fmpz}
    base_ring::FlintIntegerRing
    prec_max::Int
    S::Symbol
@@ -2867,7 +2867,7 @@ end
 #
 ###############################################################################
 
-mutable struct FmpzAbsSeriesRing <: SeriesRing{fmpz}
+@attributes mutable struct FmpzAbsSeriesRing <: SeriesRing{fmpz}
    base_ring::FlintIntegerRing
    prec_max::Int
    S::Symbol
@@ -2929,7 +2929,7 @@ end
 #
 ###############################################################################
 
-mutable struct FlintPuiseuxSeriesRing{T <: RingElem} <: Ring where T
+@attributes mutable struct FlintPuiseuxSeriesRing{T <: RingElem} <: Ring where T
    laurent_ring::Ring
 
    function FlintPuiseuxSeriesRing{T}(R::Ring, cached::Bool = true) where T
@@ -2958,7 +2958,7 @@ end
 #
 ###############################################################################
 
-mutable struct FlintPuiseuxSeriesField{T <: RingElem} <: Field
+@attributes mutable struct FlintPuiseuxSeriesField{T <: RingElem} <: Field
    laurent_ring::Ring
 
    function FlintPuiseuxSeriesField{T}(R::Field, cached::Bool = true) where T
@@ -2985,7 +2985,7 @@ end
 #
 ###############################################################################
 
-mutable struct FmpzLaurentSeriesRing <: Ring
+@attributes mutable struct FmpzLaurentSeriesRing <: Ring
    base_ring::FlintIntegerRing
    prec_max::Int
    S::Symbol
@@ -3051,7 +3051,7 @@ end
 #
 ###############################################################################
 
-mutable struct FmpqRelSeriesRing <: SeriesRing{fmpq}
+@attributes mutable struct FmpqRelSeriesRing <: SeriesRing{fmpq}
    base_ring::FlintRationalField
    prec_max::Int
    S::Symbol
@@ -3116,7 +3116,7 @@ end
 #
 ###############################################################################
 
-mutable struct FmpqAbsSeriesRing <: SeriesRing{fmpq}
+@attributes mutable struct FmpqAbsSeriesRing <: SeriesRing{fmpq}
    base_ring::FlintRationalField
    prec_max::Int
    S::Symbol
@@ -3179,7 +3179,7 @@ end
 #
 ###############################################################################
 
-mutable struct GFPRelSeriesRing <: SeriesRing{nmod}
+@attributes mutable struct GFPRelSeriesRing <: SeriesRing{nmod}
    base_ring::GaloisField
    prec_max::Int
    S::Symbol
@@ -3280,7 +3280,7 @@ end
 #
 ###############################################################################
 
-mutable struct NmodRelSeriesRing <: SeriesRing{nmod}
+@attributes mutable struct NmodRelSeriesRing <: SeriesRing{nmod}
    base_ring::NmodRing
    prec_max::Int
    S::Symbol
@@ -3380,7 +3380,7 @@ end
 #
 ###############################################################################
 
-mutable struct GFPFmpzRelSeriesRing <: SeriesRing{gfp_fmpz_elem}
+@attributes mutable struct GFPFmpzRelSeriesRing <: SeriesRing{gfp_fmpz_elem}
    base_ring::GaloisFmpzField
    prec_max::Int
    S::Symbol
@@ -3492,7 +3492,7 @@ end
 #
 ###############################################################################
 
-mutable struct FmpzModRelSeriesRing <: SeriesRing{fmpz_mod}
+@attributes mutable struct FmpzModRelSeriesRing <: SeriesRing{fmpz_mod}
    base_ring::FmpzModRing
    prec_max::Int
    S::Symbol
@@ -3604,7 +3604,7 @@ end
 #
 ###############################################################################
 
-mutable struct GFPFmpzAbsSeriesRing <: SeriesRing{gfp_fmpz_elem}
+@attributes mutable struct GFPFmpzAbsSeriesRing <: SeriesRing{gfp_fmpz_elem}
    base_ring::GaloisFmpzField
    prec_max::Int
    S::Symbol
@@ -3711,7 +3711,7 @@ end
 #
 ###############################################################################
 
-mutable struct NmodAbsSeriesRing <: SeriesRing{nmod}
+@attributes mutable struct NmodAbsSeriesRing <: SeriesRing{nmod}
    base_ring::NmodRing
    prec_max::Int
    n::UInt
@@ -3812,7 +3812,7 @@ end
 #
 ###############################################################################
 
-mutable struct GFPAbsSeriesRing <: SeriesRing{gfp_elem}
+@attributes mutable struct GFPAbsSeriesRing <: SeriesRing{gfp_elem}
    base_ring::GaloisField
    prec_max::Int
    n::UInt
@@ -3913,7 +3913,7 @@ end
 #
 ###############################################################################
 
-mutable struct FmpzModAbsSeriesRing <: SeriesRing{fmpz_mod}
+@attributes mutable struct FmpzModAbsSeriesRing <: SeriesRing{fmpz_mod}
    base_ring::FmpzModRing
    prec_max::Int
    S::Symbol
@@ -4022,7 +4022,7 @@ end
 #
 ###############################################################################
 
-mutable struct FqDefaultRelSeriesRing <: SeriesRing{fq_default}
+@attributes mutable struct FqDefaultRelSeriesRing <: SeriesRing{fq_default}
    base_ring::FqDefaultFiniteField
    prec_max::Int
    S::Symbol
@@ -4093,7 +4093,7 @@ end
 #
 ###############################################################################
 
-mutable struct FqRelSeriesRing <: SeriesRing{fq}
+@attributes mutable struct FqRelSeriesRing <: SeriesRing{fq}
    base_ring::FqFiniteField
    prec_max::Int
    S::Symbol
@@ -4162,7 +4162,7 @@ end
 #
 ###############################################################################
 
-mutable struct FqDefaultAbsSeriesRing <: SeriesRing{fq_default}
+@attributes mutable struct FqDefaultAbsSeriesRing <: SeriesRing{fq_default}
    base_ring::FqDefaultFiniteField
    prec_max::Int
    S::Symbol
@@ -4230,7 +4230,7 @@ end
 #
 ###############################################################################
 
-mutable struct FqAbsSeriesRing <: SeriesRing{fq}
+@attributes mutable struct FqAbsSeriesRing <: SeriesRing{fq}
    base_ring::FqFiniteField
    prec_max::Int
    S::Symbol
@@ -4297,7 +4297,7 @@ end
 #
 ###############################################################################
 
-mutable struct FqNmodRelSeriesRing <: SeriesRing{fq_nmod}
+@attributes mutable struct FqNmodRelSeriesRing <: SeriesRing{fq_nmod}
    base_ring::FqNmodFiniteField
    prec_max::Int
    S::Symbol
@@ -4367,7 +4367,7 @@ end
 #
 ###############################################################################
 
-mutable struct FqNmodAbsSeriesRing <: SeriesRing{fq_nmod}
+@attributes mutable struct FqNmodAbsSeriesRing <: SeriesRing{fq_nmod}
    base_ring::FqNmodFiniteField
    prec_max::Int
    S::Symbol
