@@ -229,10 +229,10 @@ function __init__()
    bt = Base.process_backtrace(Base.backtrace())
    isinteractive_manual = all(sf -> sf[1].func != :_tryrequire_from_serialized, bt)
 
-   # Respect the -q flag
-   isquiet = Bool(Base.JLOptions().quiet)
+   # Respect the -q and --banner flag
+   allowbanner = Base.JLOptions().banner != 0
 
-   if !isquiet && isinteractive_manual && isinteractive() &&
+   if allowbanner && isinteractive_manual && isinteractive() &&
          !any(x -> x.name in ("Hecke", "Oscar", "Singular"), keys(Base.package_locks)) &&
          get(ENV, "NEMO_PRINT_BANNER", "true") != "false"
 
