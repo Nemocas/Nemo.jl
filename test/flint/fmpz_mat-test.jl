@@ -133,6 +133,12 @@ end
    @test_throws ErrorException Matrix{Int}(B)
 end
 
+@testset "fmpz_mat.arithmetic" begin
+    a = matrix(ZZ, [1 2; 3 4])
+    @test a * fmpz[1, 2 == fmpz[5, 11]
+    @test fmpz[1, 2] * a == fmpz[7, 10]
+end
+
 @testset "fmpz_mat.manipulation" begin
    S = MatrixSpace(FlintZZ, 3, 3)
    A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])

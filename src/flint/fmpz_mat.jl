@@ -1360,6 +1360,21 @@ function zero!(z::fmpz_mat)
    return z
 end
 
+function mul!(z::Vector{fmpz}, a::fmpz_mat, b::Vector{fmpz})
+   ccall((:fmpz_mat_mul_fmpz_vec_ptr, libflint), Nothing,
+         (Ptr{Ref{fmpz}}, Ref{fmpz_mat}, Ptr{Ref{fmpz}}, Int),
+         z, a, b, length(b))
+   return z
+end
+
+function mul!(z::Vector{fmpz}, a::Vector{fmpz}, b::fmpz_mat)
+   ccall((:fmpz_mat_fmpz_vec_mul_ptr, libflint), Nothing,
+         (Ptr{Ref{fmpz}}, Ptr{Ref{fmpz}}, Int, Ref{fmpz_mat}),
+         z, a, length(a), b)
+   return z
+end
+
+
 ###############################################################################
 #
 #   Parent object call overloads
