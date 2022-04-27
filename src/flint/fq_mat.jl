@@ -280,6 +280,20 @@ function zero!(a::fq_mat)
    return a
 end
 
+function mul!(z::Vector{fq}, a::fq_mat, b::Vector{fq})
+   ccall((:fq_mat_mul_vec_ptr, libflint), Nothing,
+         (Ptr{Ref{fq}}, Ref{fq_mat}, Ptr{Ref{fq}}, Int, Ref{FqFiniteField}),
+         z, a, b, length(b), base_ring(a))
+   return z
+end
+
+function mul!(z::Vector{fq}, a::Vector{fq}, b::fq_mat)
+   ccall((:fq_mat_vec_mul_ptr, libflint), Nothing,
+         (Ptr{Ref{fq}}, Ptr{Ref{fq}}, Int, Ref{fq_mat}, Ref{FqFiniteField}),
+         z, a, length(a), b, base_ring(b))
+   return z
+end
+
 ################################################################################
 #
 #  Ad hoc binary operators

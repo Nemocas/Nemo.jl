@@ -280,6 +280,22 @@ function zero!(a::fq_nmod_mat)
    return a
 end
 
+function mul!(z::Vector{fq_nmod}, a::fq_nmod_mat, b::Vector{fq_nmod})
+   ccall((:fq_nmod_mat_mul_vec_ptr, libflint), Nothing,
+         (Ptr{Ref{fq_nmod}}, Ref{fq_nmod_mat}, Ptr{Ref{fq_nmod}}, Int,
+          Ref{FqNmodFiniteField}),
+         z, a, b, length(b), base_ring(a))
+   return z
+end
+
+function mul!(z::Vector{fq_nmod}, a::Vector{fq_nmod}, b::fq_nmod_mat)
+   ccall((:fq_nmod_mat_vec_mul_ptr, libflint), Nothing,
+         (Ptr{Ref{fq_nmod}}, Ptr{Ref{fq_nmod}}, Int, Ref{fq_nmod_mat},
+          Ref{FqNmodFiniteField}),
+         z, a, length(a), b, base_ring(b))
+   return z
+end
+
 ################################################################################
 #
 #  Ad hoc binary operators
