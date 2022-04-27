@@ -133,12 +133,6 @@ end
    @test_throws ErrorException Matrix{Int}(B)
 end
 
-@testset "fmpz_mat.arithmetic" begin
-    a = matrix(ZZ, [1 2; 3 4])
-    @test a * fmpz[1, 2 == fmpz[5, 11]
-    @test fmpz[1, 2] * a == fmpz[7, 10]
-end
-
 @testset "fmpz_mat.manipulation" begin
    S = MatrixSpace(FlintZZ, 3, 3)
    A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
@@ -228,10 +222,11 @@ end
    B = S([fmpz(1) 4 7; 9 6 7; 4 3 3])
 
    @test A + B == S([3 7 12; 10 10 14; 13 9 6])
-
    @test A - B == S([1 (-1) (-2); (-8) (-2) 0; 5 3 0])
-
    @test A*B == S([49 41 50; 65 49 56; 75 81 114])
+
+   @test A*fmpz[1, 2, 3] == fmpz[23, 30, 30]
+   @test fmpz[1, 2, 3]*A == fmpz[31, 29, 28]
 end
 
 @testset "fmpz_mat.adhoc_binary" begin
