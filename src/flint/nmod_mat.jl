@@ -282,6 +282,23 @@ function zero!(a::T) where T <: Zmodn_mat
   return a
 end
 
+# entries of b required to be in [0,n)
+function mul!(z::Vector{UInt}, a::T, b::Vector{UInt}) where T <: Zmodn_mat
+   ccall((:nmod_mat_mul_nmod_vec, libflint), Nothing,
+         (Ptr{UInt}, Ref{T}, Ptr{UInt}, Int),
+         z, a, b, length(b))
+   return z
+end
+
+# entries of a required to be in [0,n)
+function mul!(z::Vector{UInt}, a::Vector{UInt}, b::T) where T <: Zmodn_mat
+   ccall((:nmod_mat_nmod_vec_mul, libflint), Nothing,
+         (Ptr{UInt}, Ptr{UInt}, Int, Ref{T}),
+         z, a, length(a), b)
+   return z
+end
+
+
 ################################################################################
 #
 #  Ad hoc binary operators

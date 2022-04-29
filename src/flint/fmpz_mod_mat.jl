@@ -270,6 +270,20 @@ function zero!(a::T) where T <: Zmod_fmpz_mat
   return a
 end
 
+function mul!(z::Vector{fmpz}, a::T, b::Vector{fmpz}) where T <: Zmod_fmpz_mat
+   ccall((:fmpz_mod_mat_mul_fmpz_vec_ptr, libflint), Nothing,
+         (Ptr{Ref{fmpz}}, Ref{T}, Ptr{Ref{fmpz}}, Int),
+         z, a, b, length(b))
+   return z
+end
+
+function mul!(z::Vector{fmpz}, a::Vector{fmpz}, b::T) where T <: Zmod_fmpz_mat
+   ccall((:fmpz_mod_mat_fmpz_vec_mul_ptr, libflint), Nothing,
+         (Ptr{Ref{fmpz}}, Ptr{Ref{fmpz}}, Int, Ref{T}),
+         z, a, length(a), b)
+   return z
+end
+
 ################################################################################
 #
 #  Ad hoc binary operators
