@@ -318,9 +318,9 @@ end
   d = transpose(a)*a
   @test d == MatrixSpace(Z17, 4, 4)([11 11 8 7; 11 0 14 6; 8 14 14 5; 7 6 5 5])
 
-  a = matrix(GF(5), [1 2; 3 4])
-  @test mul!(Array{UInt}(undef, 2), a, UInt[1, 2]) == [5, 11]
-  @test mul!(Array{UInt}(undef, 2), UInt[1, 2], a) == [7, 10]
+  a = matrix(Z17, [1 2; 3 4])
+  @test mul!(Array{UInt}(undef, 2), a, UInt[1, 2]) == [Z17(5), Z17(11)]
+  @test mul!(Array{UInt}(undef, 2), UInt[1, 2], a) == [Z17(7), Z17(10)]
 end
 
 @testset "gfp_mat.row_col_swapping" begin
