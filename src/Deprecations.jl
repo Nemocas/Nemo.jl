@@ -1,21 +1,3 @@
-# Deprecated in 0.16.*
-
-@deprecate ArbField(x::Int, y::Bool) ArbField(x, cached = y)
-
-@deprecate AcbField(x::Int, y::Bool) AcbField(x, cached = y)
-
-@deprecate prec(x::AcbMatSpace) precision(x)
-
-@deprecate prec(x::ArbMatSpace) precision(x)
-
-@deprecate prec(x::AcbPolyRing) precision(x)
-
-@deprecate prec(x::ArbPolyRing) precision(x)
-
-@deprecate prec(x::AcbField) precision(x)
-
-@deprecate prec(x::ArbField) precision(x)
-
 # Deprecated in 0.22.*
 
 @deprecate binom(x::arb, n::UInt) binomial(x, n)
@@ -115,12 +97,3 @@
 @deprecate fib(n::UInt, r::ArbField) fibonacci(n, r)
 
 @deprecate fib(n::Int, r::ArbField) fibonacci(n, r)
-
-# Deprecated in 0.27.*
-
-@deprecate exppii(x::acb) cispi(x)
-
-@deprecate isint(x::arb) isinteger(x)
-
-@deprecate isint(x::acb) isinteger(x)
-
