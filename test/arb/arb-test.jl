@@ -171,9 +171,9 @@ end
    @test !iszero(RR(1))
    @test !iszero(RR("0 +/- 0.01"))
 
-   @test !isnonzero(RR(0))
-   @test isnonzero(RR(1))
-   @test !isnonzero(RR("0 +/- 0.01"))
+   @test !is_nonzero(RR(0))
+   @test is_nonzero(RR(1))
+   @test !is_nonzero(RR("0 +/- 0.01"))
 
    @test isone(RR(1))
    @test !isone(RR(0))
@@ -182,23 +182,23 @@ end
    @test !isfinite(RR("0 +/- inf"))
    @test !isfinite(RR("nan"))
 
-   @test isexact(RR(3))
-   @test !isexact(RR("3 +/- 0.01"))
-   @test isexact(RR(QQ(1,4)))
-   @test !isexact(RR(QQ(1,3)))
+   @test is_exact(RR(3))
+   @test !is_exact(RR("3 +/- 0.01"))
+   @test is_exact(RR(QQ(1,4)))
+   @test !is_exact(RR(QQ(1,3)))
 
    @test isinteger(RR(3))
    @test !isinteger(RR("3 +/- 0.01"))
 
-   @test ispositive(RR(3))
-   @test isnonnegative(RR(3))
+   @test is_positive(RR(3))
+   @test is_nonnegative(RR(3))
    @test is_negative(RR(-3))
-   @test isnonpositive(RR(-3))
+   @test is_nonpositive(RR(-3))
 
-   @test !ispositive(RR(0))
-   @test isnonnegative(RR(0))
+   @test !is_positive(RR(0))
+   @test is_nonnegative(RR(0))
    @test !is_negative(RR(0))
-   @test isnonpositive(RR(0))
+   @test is_nonpositive(RR(0))
 end
 
 @testset "arb.parts" begin
@@ -534,7 +534,7 @@ end
 
       @test contains(R(".5 +/- .5"), r_urandom)
       @test isfinite(r_randtest)
-      @test isfinite(r_exact) && isexact(r_exact)
+      @test isfinite(r_exact) && is_exact(r_exact)
       @test isfinite(r_precise)
       # Does not work for small precisions (< 20) because of radius
       if midpoint(r_precise) != 0 != radius(r_precise)

@@ -37,7 +37,7 @@ end
    for i = 1:1000
       p = rand(UInt(1):typemax(UInt))
 
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(p)
 
          a = R(rand(Int))
@@ -49,7 +49,7 @@ end
 
    for i = 1:1000
       p = rand(1:24)
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(p)
 
          a = R(rand(Int))
@@ -141,7 +141,7 @@ end
 @testset "gfp.unary_ops" begin
    for i = 1:100
       p = rand(UInt(1):typemax(UInt))
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(p)
 
          for iter = 1:100
@@ -154,7 +154,7 @@ end
 
    for i = 1:100
       p = rand(1:24)
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(p)
 
          for iter = 1:100
@@ -169,7 +169,7 @@ end
 @testset "gfp.binary_ops" begin
    for i = 1:100
       p = rand(1:24)
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(p)
 
          for iter = 1:100
@@ -191,7 +191,7 @@ end
 
    for i = 1:100
       p = rand(UInt(1):typemax(UInt))
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(p)
 
          for iter = 1:100
@@ -215,7 +215,7 @@ end
 @testset "gfp.adhoc_binary" begin
    for i = 1:100
       p = rand(1:24)
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(p)
 
          for iter = 1:100
@@ -240,7 +240,7 @@ end
 
    for i = 1:100
       p = rand(UInt(1):typemax(UInt))
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(p)
 
          for iter = 1:100
@@ -267,7 +267,7 @@ end
 @testset "gfp.powering" begin
   for i = 1:100
       p = rand(1:24)
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(p)
 
          for iter = 1:100
@@ -303,7 +303,7 @@ end
 
    for i = 1:100
       p = rand(UInt(1):typemax(UInt))
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(p)
 
          for iter = 1:100
@@ -341,7 +341,7 @@ end
 @testset "gfp.comparison" begin
   for i = 1:100
       p = rand(1:24)
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(p)
 
          for iter = 1:100
@@ -360,7 +360,7 @@ end
 
    for i = 1:100
       p = rand(UInt(1):typemax(UInt))
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(p)
 
          for iter = 1:100
@@ -381,7 +381,7 @@ end
 @testset "gfp.adhoc_comparison" begin
   for i = 1:100
       p = rand(1:24)
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(p)
 
          for iter = 1:100
@@ -398,7 +398,7 @@ end
 
    for i = 1:100
       p = rand(UInt(1):typemax(UInt))
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(p)
 
          for iter = 1:100
@@ -417,7 +417,7 @@ end
 @testset "gfp.inversion" begin
   for i = 1:100
       p = rand(1:24)
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(p)
 
          for iter = 1:100
@@ -432,7 +432,7 @@ end
 
    for i = 1:100
       p = rand(UInt(1):typemax(UInt))
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(p)
 
          for iter = 1:100
@@ -449,7 +449,7 @@ end
 @testset "gfp.exact_division" begin
   for i = 1:100
       p = rand(1:24)
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(p)
 
          for iter = 1:100
@@ -468,7 +468,7 @@ end
 
    for i = 1:100
       p = rand(UInt(1):typemax(UInt))
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(p)
 
          for iter = 1:100
@@ -488,7 +488,7 @@ end
 @testset "gfp.square_root" begin
   for i = 1:100
       p = rand(1:65537)
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(p)
 
          z = rand(R)

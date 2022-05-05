@@ -125,11 +125,11 @@ end
    @test degree(K) == 3
 
    @test !isinteger(d)
-   @test !isrational(d)
+   @test !is_rational(d)
    @test isinteger(K(2))
-   @test isrational(K(2))
+   @test is_rational(K(2))
    @test !isinteger(K(1//2))
-   @test isrational(K(1//2))
+   @test is_rational(K(1//2))
 
    @test characteristic(K) == 0
 end

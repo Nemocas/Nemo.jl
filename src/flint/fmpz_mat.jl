@@ -6,7 +6,7 @@
 
 export fmpz_mat, FmpzMatSpace, getindex, getindex!, setindex!,
        charpoly, det, det_divisor, det_given_divisor, gram, hadamard,
-       ishadamard, hnf, is_hnf, hnf_with_transform, hnf_modular, lll, lll!,
+       is_hadamard, hnf, is_hnf, hnf_with_transform, hnf_modular, lll, lll!,
        lll_ctx, lll_gram, lll_gram!, lll_with_transform,
        lll_gram_with_transform, lll_with_removal, lll_with_removal_transform,
        nullspace, rank, rref, reduce_mod, similar, snf, snf_diagonal, is_snf,
@@ -755,11 +755,11 @@ function hadamard(R::FmpzMatSpace)
 end
 
 @doc Markdown.doc"""
-    ishadamard(x::fmpz_mat)
+    is_hadamard(x::fmpz_mat)
 
 Return `true` if the given matrix is Hadamard, otherwise return `false`.
 """
-function ishadamard(x::fmpz_mat)
+function is_hadamard(x::fmpz_mat)
    return ccall((:fmpz_mat_is_hadamard, libflint), Bool,
                    (Ref{fmpz_mat},), x)
 end

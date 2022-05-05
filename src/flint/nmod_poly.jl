@@ -513,7 +513,7 @@ mod(x::T, y::T) where T <: Zmodn_poly = rem(x, y)
 
 function gcd(x::nmod_poly, y::nmod_poly)
   check_parent(x,y)
-  !isprime(modulus(x)) && error("Modulus not prime in gcd")
+  !is_prime(modulus(x)) && error("Modulus not prime in gcd")
   z = parent(x)()
   ccall((:nmod_poly_gcd, libflint), Nothing,
           (Ref{nmod_poly}, Ref{nmod_poly}, Ref{nmod_poly}), z, x, y)
@@ -522,7 +522,7 @@ end
 
 function gcdx(x::nmod_poly, y::nmod_poly)
   check_parent(x,y)
-  !isprime(modulus(x)) && error("Modulus not prime in gcdx")
+  !is_prime(modulus(x)) && error("Modulus not prime in gcdx")
   g = parent(x)()
   s = parent(x)()
   t = parent(x)()
@@ -534,7 +534,7 @@ end
 
 function gcdinv(x::nmod_poly, y::nmod_poly)
   check_parent(x,y)
-  !isprime(modulus(x)) && error("Modulus not prime in gcdinv")
+  !is_prime(modulus(x)) && error("Modulus not prime in gcdinv")
   length(y) <= 1 && error("Length of second argument must be >= 2")
   g = parent(x)()
   s = parent(x)()
@@ -599,7 +599,7 @@ end
 function resultant(x::nmod_poly, y::nmod_poly,  check::Bool = true)
   if check
     check_parent(x,y)
-    !isprime(modulus(x)) && error("Modulus not prime in resultant")
+    !is_prime(modulus(x)) && error("Modulus not prime in resultant")
   end
   r = ccall((:nmod_poly_resultant, libflint), UInt,
           (Ref{nmod_poly}, Ref{nmod_poly}), x, y)
@@ -733,7 +733,7 @@ end
 ################################################################################
 
 function is_irreducible(x::nmod_poly)
-  !isprime(modulus(x)) && error("Modulus not prime in is_irreducible")
+  !is_prime(modulus(x)) && error("Modulus not prime in is_irreducible")
   return Bool(ccall((:nmod_poly_is_irreducible, libflint), Int32,
           (Ref{nmod_poly}, ), x))
 end
@@ -745,7 +745,7 @@ end
 ################################################################################
 
 function is_squarefree(x::nmod_poly)
-   !isprime(modulus(x)) && error("Modulus not prime in is_squarefree")
+   !is_prime(modulus(x)) && error("Modulus not prime in is_squarefree")
    return Bool(ccall((:nmod_poly_is_squarefree, libflint), Int32,
        (Ref{nmod_poly}, ), x))
 end
@@ -762,7 +762,7 @@ function factor(x::nmod_poly)
 end
 
 function _factor(x::nmod_poly)
-  !isprime(modulus(x)) && error("Modulus not prime in factor")
+  !is_prime(modulus(x)) && error("Modulus not prime in factor")
   fac = nmod_poly_factor(x.mod_n)
   z = ccall((:nmod_poly_factor, libflint), UInt,
           (Ref{nmod_poly_factor}, Ref{nmod_poly}), fac, x)
@@ -778,7 +778,7 @@ function _factor(x::nmod_poly)
 end
 
 function factor_squarefree(x::nmod_poly)
-  !isprime(modulus(x)) && error("Modulus not prime in factor_squarefree")
+  !is_prime(modulus(x)) && error("Modulus not prime in factor_squarefree")
   return Fac(parent(x)(leading_coefficient(x)), _factor_squarefree(x))
 end
 
@@ -804,7 +804,7 @@ Return the distinct degree factorisation of a squarefree polynomial $x$.
 """
 function factor_distinct_deg(x::nmod_poly)
   !is_squarefree(x) && error("Polynomial must be squarefree")
-  !isprime(modulus(x)) && error("Modulus not prime in factor_distinct_deg")
+  !is_prime(modulus(x)) && error("Modulus not prime in factor_distinct_deg")
   degs = Vector{Int}(undef, degree(x))
   degss = [ pointer(degs) ]
   fac = nmod_poly_factor(x.mod_n)
@@ -887,7 +887,7 @@ end
 function det(M::Generic.Mat{nmod_poly})
    nrows(M) != ncols(M) && error("Not a square matrix in det")
 
-   if isprime(modulus(base_ring(M)))
+   if is_prime(modulus(base_ring(M)))
      return det_popov(M)
    end
 

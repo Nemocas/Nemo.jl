@@ -101,9 +101,9 @@ end
    @test !iszero(CC(1))
    @test !iszero(CC("0 +/- 0.01"))
 
-   # @test !isnonzero(RR(0))
-   # @test isnonzero(RR(1))
-   # @test !isnonzero(RR("0 +/- 0.01"))
+   # @test !is_nonzero(RR(0))
+   # @test is_nonzero(RR(1))
+   # @test !is_nonzero(RR("0 +/- 0.01"))
 
    @test isone(CC(1))
    @test !isone(CC(0))
@@ -112,10 +112,10 @@ end
    @test !isfinite(CC("0 +/- inf"))
    @test !isfinite(CC("nan"))
 
-   @test isexact(CC(3))
-   @test !isexact(CC("3 +/- 0.01"))
-   @test isexact(CC(QQ(1,4)))
-   @test !isexact(CC(QQ(1,3)))
+   @test is_exact(CC(3))
+   @test !is_exact(CC("3 +/- 0.01"))
+   @test is_exact(CC(QQ(1,4)))
+   @test !is_exact(CC(QQ(1,3)))
 
    @test isinteger(CC(3))
    @test !isinteger(CC("3 +/- 0.01"))

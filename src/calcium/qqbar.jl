@@ -4,14 +4,14 @@
 #
 ###############################################################################
 
-export qqbar, CalciumQQBar, CalciumQQBarField, isalgebraic_integer, rand, abs2,
+export qqbar, CalciumQQBar, CalciumQQBarField, is_algebraic_integer, rand, abs2,
        csgn, sign_real, sign_imag, fmpq, fmpz, exp_pi_i, atanpi, asinpi, acospi,
-       conjugates, eigenvalues, guess, root_of_unity_as_args, isroot_of_unity,
+       conjugates, eigenvalues, guess, root_of_unity_as_args, is_root_of_unity,
        log_pi_i, rand
 
-export isequal_real, isequal_imag, isequal_abs, isequal_abs_real,
-       isequal_abs_imag, isless_real, isless_imag, isless_abs, isless_abs_real,
-       isless_abs_imag, isless_root_order
+export is_equal_real, is_equal_imag, is_equal_abs, is_equal_abs_real,
+       is_equal_abs_imag, is_less_real, is_less_imag, is_less_abs, is_less_abs_real,
+       is_less_abs_imag, is_less_root_order
 
 ###############################################################################
 #
@@ -210,11 +210,11 @@ function isinteger(x::qqbar)
 end
 
 @doc Markdown.doc"""
-    isrational(x::qqbar)
+    is_rational(x::qqbar)
 
 Return whether `x` is a rational number.
 """
-function isrational(x::qqbar)
+function is_rational(x::qqbar)
    return Bool(ccall((:qqbar_is_rational, libcalcium), Cint, (Ref{qqbar},), x))
 end
 
@@ -228,11 +228,11 @@ function isreal(x::qqbar)
 end
 
 @doc Markdown.doc"""
-    isalgebraic_integer(x::qqbar)
+    is_algebraic_integer(x::qqbar)
 
 Return whether `x` is an algebraic integer.
 """
-function isalgebraic_integer(x::qqbar)
+function is_algebraic_integer(x::qqbar)
    return Bool(ccall((:qqbar_is_algebraic_integer, libcalcium),
         Cint, (Ref{qqbar},), x))
 end
@@ -647,83 +647,83 @@ cmp_root_order(a::qqbar, b::qqbar) = ccall((:qqbar_cmp_root_order, libcalcium),
     Cint, (Ref{qqbar}, Ref{qqbar}), a, b)
 
 @doc Markdown.doc"""
-    isequal_real(a::qqbar, b::qqbar)
+    is_equal_real(a::qqbar, b::qqbar)
 
 Compares the real parts of `a` and `b`.
 """
-isequal_real(a::qqbar, b::qqbar) = cmp_real(a, b) == 0
+is_equal_real(a::qqbar, b::qqbar) = cmp_real(a, b) == 0
 
 @doc Markdown.doc"""
-    isequal_imag(a::qqbar, b::qqbar)
+    is_equal_imag(a::qqbar, b::qqbar)
 
 Compares the imaginary parts of `a` and `b`.
 """
-isequal_imag(a::qqbar, b::qqbar) = cmp_imag(a, b) == 0
+is_equal_imag(a::qqbar, b::qqbar) = cmp_imag(a, b) == 0
 
 @doc Markdown.doc"""
-    isequal_abs(a::qqbar, b::qqbar)
+    is_equal_abs(a::qqbar, b::qqbar)
 
 Compares the absolute values of `a` and `b`.
 """
-isequal_abs(a::qqbar, b::qqbar) = cmpabs(a, b) == 0
+is_equal_abs(a::qqbar, b::qqbar) = cmpabs(a, b) == 0
 
 @doc Markdown.doc"""
-    isequal_abs_real(a::qqbar, b::qqbar)
+    is_equal_abs_real(a::qqbar, b::qqbar)
 
 Compares the absolute values of the real parts of `a` and `b`.
 """
-isequal_abs_real(a::qqbar, b::qqbar) = cmpabs_real(a, b) == 0
+is_equal_abs_real(a::qqbar, b::qqbar) = cmpabs_real(a, b) == 0
 
 @doc Markdown.doc"""
-    isequal_abs_imag(a::qqbar, b::qqbar)
+    is_equal_abs_imag(a::qqbar, b::qqbar)
 
 Compares the absolute values of the imaginary parts of `a` and `b`.
 """
-isequal_abs_imag(a::qqbar, b::qqbar) = cmpabs_imag(a, b) == 0
+is_equal_abs_imag(a::qqbar, b::qqbar) = cmpabs_imag(a, b) == 0
 
 
 @doc Markdown.doc"""
-    isless_real(a::qqbar, b::qqbar)
+    is_less_real(a::qqbar, b::qqbar)
 
 Compares the real parts of `a` and `b`.
 """
-isless_real(a::qqbar, b::qqbar) = cmp_real(a, b) < 0
+is_less_real(a::qqbar, b::qqbar) = cmp_real(a, b) < 0
 
 @doc Markdown.doc"""
-    isless_imag(a::qqbar, b::qqbar)
+    is_less_imag(a::qqbar, b::qqbar)
 
 Compares the imaginary parts of `a` and `b`.
 """
-isless_imag(a::qqbar, b::qqbar) = cmp_imag(a, b) < 0
+is_less_imag(a::qqbar, b::qqbar) = cmp_imag(a, b) < 0
 
 @doc Markdown.doc"""
-    isless_abs(a::qqbar, b::qqbar)
+    is_less_abs(a::qqbar, b::qqbar)
 
 Compares the absolute values of `a` and `b`.
 """
-isless_abs(a::qqbar, b::qqbar) = cmpabs(a, b) < 0
+is_less_abs(a::qqbar, b::qqbar) = cmpabs(a, b) < 0
 
 
 @doc Markdown.doc"""
-    isless_abs_real(a::qqbar, b::qqbar)
+    is_less_abs_real(a::qqbar, b::qqbar)
 
 Compares the absolute values of the real parts of `a` and `b`.
 """
-isless_abs_real(a::qqbar, b::qqbar) = cmpabs_real(a, b) < 0
+is_less_abs_real(a::qqbar, b::qqbar) = cmpabs_real(a, b) < 0
 
 @doc Markdown.doc"""
-    isless_abs_imag(a::qqbar, b::qqbar)
+    is_less_abs_imag(a::qqbar, b::qqbar)
 
 Compares the absolute values of the imaginary parts of `a` and `b`.
 """
-isless_abs_imag(a::qqbar, b::qqbar) = cmpabs_imag(a, b) < 0
+is_less_abs_imag(a::qqbar, b::qqbar) = cmpabs_imag(a, b) < 0
 
 @doc Markdown.doc"""
-    isless_root_order(a::qqbar, b::qqbar)
+    is_less_root_order(a::qqbar, b::qqbar)
 
 Compares the `a` and `b` in root sort order.
 """
-isless_root_order(a::qqbar, b::qqbar) = cmp_root_order(a, b) < 0
+is_less_root_order(a::qqbar, b::qqbar) = cmp_root_order(a, b) < 0
 
 # todo: wrap qqbar_equal_fmpq_poly_val
 
@@ -1049,11 +1049,11 @@ function root_of_unity(C::CalciumQQBarField, n::Int, k::Int)
 end
 
 @doc Markdown.doc"""
-    isroot_of_unity(a::qqbar)
+    is_root_of_unity(a::qqbar)
 
 Return whether the given algebraic number is a root of unity.
 """
-function isroot_of_unity(a::qqbar)
+function is_root_of_unity(a::qqbar)
    return Bool(ccall((:qqbar_is_root_of_unity, libcalcium),
         Cint, (Ptr{Int}, Ptr{Int}, Ref{qqbar}), C_NULL, C_NULL, a))
 end
@@ -1314,7 +1314,7 @@ Convert `a` to a rational number of type `fmpq`.
 Throws if `a` is not a rational number.
 """
 function fmpq(a::qqbar)
-   !isrational(a) && throw(DomainError(a, "nonrational algebraic number"))
+   !is_rational(a) && throw(DomainError(a, "nonrational algebraic number"))
    p = fmpz()
    q = fmpz()
    ccall((:fmpz_poly_get_coeff_fmpz, libflint),

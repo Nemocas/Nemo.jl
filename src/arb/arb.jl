@@ -11,8 +11,8 @@ import Base: ceil, isinteger
 
 export add_error!, ball, radius, midpoint, contains, contains_zero, contains_negative,
        contains_positive, contains_nonnegative, contains_nonpositive, convert,
-       iszero, isnonzero, isexact, ispositive, isfinite, isnonnegative,
-       is_negative, isnonpositive, add!, mul!, sub!, div!, overlaps,
+       iszero, is_nonzero, is_exact, is_positive, isfinite, is_nonnegative,
+       is_negative, is_nonpositive, add!, mul!, sub!, div!, overlaps,
        unique_integer, accuracy_bits, trim, ldexp, setunion, setintersection,
        const_pi, const_e, const_log2, const_log10, const_euler, const_catalan,
        const_khinchin, const_glaisher, floor, ceil, hypot, rsqrt, sqrt1pm1,
@@ -172,7 +172,7 @@ Return $x$ as an `fmpz` if it represents an unique integer, else throws an
 error.
 """
 function fmpz(x::arb)
-   if isexact(x)
+   if is_exact(x)
       ok, z = unique_integer(x)
       ok && return z
    end
@@ -206,8 +206,8 @@ function native_string(x::arb)
 end
 
 function expressify(x::arb; context = nothing)
-   if isexact(x) && is_negative(x)
-      # TODO isexact does not imply it is printed without radius
+   if is_exact(x) && is_negative(x)
+      # TODO is_exact does not imply it is printed without radius
       return Expr(:call, :-, native_string(-x))
    else
       return native_string(x)
@@ -526,12 +526,12 @@ function iszero(x::arb)
 end
 
 @doc Markdown.doc"""
-    isnonzero(x::arb)
+    is_nonzero(x::arb)
 
 Return `true` if $x$ is certainly not equal to zero, otherwise return
 `false`.
 """
-function isnonzero(x::arb)
+function is_nonzero(x::arb)
    return Bool(ccall((:arb_is_nonzero, libarb), Cint, (Ref{arb},), x))
 end
 
@@ -556,12 +556,12 @@ function isfinite(x::arb)
 end
 
 @doc Markdown.doc"""
-    isexact(x::arb)
+    is_exact(x::arb)
 
 Return `true` if $x$ is exact, i.e. has zero radius, otherwise return
 `false`.
 """
-function isexact(x::arb)
+function is_exact(x::arb)
    return Bool(ccall((:arb_is_exact, libarb), Cint, (Ref{arb},), x))
 end
 
@@ -575,20 +575,20 @@ function isinteger(x::arb)
 end
 
 @doc Markdown.doc"""
-    ispositive(x::arb)
+    is_positive(x::arb)
 
 Return `true` if $x$ is certainly positive, otherwise return `false`.
 """
-function ispositive(x::arb)
+function is_positive(x::arb)
    return Bool(ccall((:arb_is_positive, libarb), Cint, (Ref{arb},), x))
 end
 
 @doc Markdown.doc"""
-    isnonnegative(x::arb)
+    is_nonnegative(x::arb)
 
 Return `true` if $x$ is certainly nonnegative, otherwise return `false`.
 """
-function isnonnegative(x::arb)
+function is_nonnegative(x::arb)
    return Bool(ccall((:arb_is_nonnegative, libarb), Cint, (Ref{arb},), x))
 end
 
@@ -602,11 +602,11 @@ function is_negative(x::arb)
 end
 
 @doc Markdown.doc"""
-    isnonpositive(x::arb)
+    is_nonpositive(x::arb)
 
 Return `true` if $x$ is certainly nonpositive, otherwise return `false`.
 """
-function isnonpositive(x::arb)
+function is_nonpositive(x::arb)
    return Bool(ccall((:arb_is_nonpositive, libarb), Cint, (Ref{arb},), x))
 end
 

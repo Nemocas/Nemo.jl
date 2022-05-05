@@ -1993,7 +1993,7 @@ end
    end
 
    function FqNmodFiniteField(f::nmod_poly, s::Symbol, cached::Bool = true; check::Bool = true)
-      check && !isprime(modulus(f)) &&
+      check && !is_prime(modulus(f)) &&
          throw(DomainError(base_ring(f), "the base ring of the polynomial must be a field"))
       return get_cached!(FqNmodFiniteFieldIDNmodPol, (parent(f), f, s), cached) do
          z = new()
@@ -2141,7 +2141,7 @@ end
    end
 
    function FqDefaultFiniteField(f::nmod_poly, s::Symbol, cached::Bool = true; check::Bool = true)
-      check && !isprime(modulus(f)) &&
+      check && !is_prime(modulus(f)) &&
          throw(DomainError(base_ring(f), "the base ring of the polynomial must be a field"))
       return get_cached!(FqDefaultFiniteFieldIDNmodPol, (f, s), cached) do
          z = new()

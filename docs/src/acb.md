@@ -76,7 +76,7 @@ one can supply them to Arb using a string. In this case, Arb will store them to
 the precision specified when creating the Arb complex field.
 
 If the values can be stored precisely as a binary floating point number, Arb
-will store the values exactly. See the function `isexact` below for more
+will store the values exactly. See the function `is_exact` below for more
 information.
 
 ### Constructors
@@ -214,7 +214,7 @@ isfinite(::acb)
 ```
 
 ```@docs
-isexact(::acb)
+is_exact(::acb)
 ```
 
 ```@docs

@@ -319,11 +319,11 @@ may become configurable in the future.
 ```@docs
 iszero(a::ca)
 isone(a::ca)
-isalgebraic(a::ca)
-isrational(a::ca)
+is_algebraic(a::ca)
+is_rational(a::ca)
 isinteger(a::ca)
 isreal(a::ca)
-isimaginary(a::ca)
+is_imaginary(a::ca)
 ```
 
 ## Infinities and special values
@@ -361,12 +361,12 @@ infinity(C::CalciumField)
 infinity(a::ca)
 undefined(C::CalciumField)
 unknown(C::CalciumField)
-isnumber(a::ca)
-isundefined(a::ca)
+is_number(a::ca)
+is_undefined(a::ca)
 isinf(a::ca)
-isuinf(a::ca)
-issigned_inf(a::ca)
-isunknown(a::ca)
+is_uinf(a::ca)
+is_signed_inf(a::ca)
+is_unknown(a::ca)
 ```
 
 ## Complex parts

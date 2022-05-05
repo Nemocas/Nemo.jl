@@ -63,7 +63,7 @@ end
       nbits = rand(2:100)
       n = rand_bits_prime(FlintZZ, nbits)
       @test ndigits(n, 2) == nbits
-      @test isprime(n)
+      @test is_prime(n)
    end
    @test_throws DomainError rand_bits_prime(FlintZZ, -1)
    @test_throws DomainError rand_bits_prime(FlintZZ, 0)
@@ -849,9 +849,9 @@ end
 end
 
 @testset "fmpz.number_theoretic" begin
-   @test isprime(fmpz(13))
+   @test is_prime(fmpz(13))
 
-   @test isprime(13)
+   @test is_prime(13)
 
    @test is_probable_prime(fmpz(13))
 

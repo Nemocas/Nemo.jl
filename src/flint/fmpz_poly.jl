@@ -727,7 +727,7 @@ end
 
 function is_irreducible(x::fmpz_poly)
    if degree(x) == 0
-     return isprime(coeff(x, 0))
+     return is_prime(coeff(x, 0))
    end
    res, z = _factor(x)
    if abs(z) == 1

@@ -3,7 +3,7 @@
     for i in 1:10
 
         p = rand(2:997)
-        while !isprime(p)
+        while !is_prime(p)
             p = rand(2:997)
         end
 
@@ -84,7 +84,7 @@ end
     for i in 1:10
 
         p = rand(2:997)
-        while !isprime(p)
+        while !is_prime(p)
             p = rand(2:997)
         end
 
@@ -108,7 +108,7 @@ end
     for i in 1:40
 
         p = rand(S)
-        while !isprime(p)
+        while !is_prime(p)
             p = rand(S)
         end
         pop!(S, p)

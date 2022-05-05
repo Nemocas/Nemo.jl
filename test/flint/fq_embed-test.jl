@@ -101,7 +101,7 @@ end
     for i in 1:40
 
         p = rand(S)
-        while !isprime(p)
+        while !is_prime(p)
             p = rand(S)
         end
         pop!(S, p)

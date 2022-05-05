@@ -143,10 +143,10 @@ julia> conjugates(QQBar(1+2im))
 iszero(x::qqbar)
 isone(x::qqbar)
 isinteger(x::qqbar)
-isrational(x::qqbar)
+is_rational(x::qqbar)
 isreal(x::qqbar)
 degree(x::qqbar)
-isalgebraic_integer(x::qqbar)
+is_algebraic_integer(x::qqbar)
 minpoly(R::FmpzPolyRing, x::qqbar)
 minpoly(R::FmpqPolyRing, x::qqbar)
 conjugates(a::qqbar)
@@ -227,30 +227,30 @@ true
 julia> x = QQBar(3+4im)
 Root 3.00000 + 4.00000*im of x^2 - 6x + 25
 
-julia> isequal_abs(x, -x)
+julia> is_equal_abs(x, -x)
 true
 
-julia> isequal_abs_imag(x, 2-x)
+julia> is_equal_abs_imag(x, 2-x)
 true
 
-julia> isless_real(x, x // 2)
+julia> is_less_real(x, x // 2)
 false
 ```
 
 **Interface**
 
 ```@docs
-isequal_real(a::qqbar, b::qqbar)
-isequal_imag(a::qqbar, b::qqbar)
-isequal_abs(a::qqbar, b::qqbar)
-isequal_abs_real(a::qqbar, b::qqbar)
-isequal_abs_imag(a::qqbar, b::qqbar)
-isless_real(a::qqbar, b::qqbar)
-isless_imag(a::qqbar, b::qqbar)
-isless_abs(a::qqbar, b::qqbar)
-isless_abs_real(a::qqbar, b::qqbar)
-isless_abs_imag(a::qqbar, b::qqbar)
-isless_root_order(a::qqbar, b::qqbar)
+is_equal_real(a::qqbar, b::qqbar)
+is_equal_imag(a::qqbar, b::qqbar)
+is_equal_abs(a::qqbar, b::qqbar)
+is_equal_abs_real(a::qqbar, b::qqbar)
+is_equal_abs_imag(a::qqbar, b::qqbar)
+is_less_real(a::qqbar, b::qqbar)
+is_less_imag(a::qqbar, b::qqbar)
+is_less_abs(a::qqbar, b::qqbar)
+is_less_abs_real(a::qqbar, b::qqbar)
+is_less_abs_imag(a::qqbar, b::qqbar)
+is_less_root_order(a::qqbar, b::qqbar)
 ```
 
 ### Roots and trigonometric functions
@@ -276,10 +276,10 @@ Root 0.309017 - 0.951057*im of x^4 + x^3 + x^2 + x + 1
 julia> w = (1 - sqrt(QQBar(-3)))//2
 Root 0.500000 - 0.866025*im of x^2 - x + 1
 
-julia> isroot_of_unity(w)
+julia> is_root_of_unity(w)
 true
 
-julia> isroot_of_unity(w + 1)
+julia> is_root_of_unity(w + 1)
 false
 
 julia> root_of_unity_as_args(w)
@@ -293,7 +293,7 @@ sqrt(a::qqbar)
 root(a::qqbar, n::Int)
 root_of_unity(C::CalciumQQBarField, n::Int)
 root_of_unity(C::CalciumQQBarField, n::Int, k::Int)
-isroot_of_unity(a::qqbar)
+is_root_of_unity(a::qqbar)
 root_of_unity_as_args(a::qqbar)
 exp_pi_i(a::qqbar)
 log_pi_i(a::qqbar)

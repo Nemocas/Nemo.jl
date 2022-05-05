@@ -33,7 +33,7 @@
 
    for i = 1:1000
       p = rand(1:24)
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(ZZ(p))
 
          a = R(rand(Int))
@@ -135,7 +135,7 @@ end
 
    for i = 1:100
       p = rand(1:24)
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(ZZ(p))
 
          for iter = 1:100
@@ -150,7 +150,7 @@ end
 @testset "gfp_fmpz.binary_ops" begin
    for i = 1:100
       p = rand(1:24)
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(ZZ(p))
 
          for iter = 1:100
@@ -196,7 +196,7 @@ end
 @testset "gfp_fmpz.adhoc_binary" begin
    for i = 1:100
       p = rand(1:24)
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(ZZ(p))
 
          for iter = 1:100
@@ -248,7 +248,7 @@ end
 @testset "gfp_fmpz.powering" begin
   for i = 1:100
       p = rand(1:24)
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(ZZ(p))
 
          for iter = 1:100
@@ -330,7 +330,7 @@ end
 @testset "gfp_fmpz.comparison" begin
   for i = 1:100
       p = rand(1:24)
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(ZZ(p))
 
          for iter = 1:100
@@ -370,7 +370,7 @@ end
 @testset "gfp_fmpz.adhoc_comparison" begin
   for i = 1:100
       p = rand(1:24)
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(ZZ(p))
 
          for iter = 1:100
@@ -406,7 +406,7 @@ end
 @testset "gfp_fmpz.inversion" begin
   for i = 1:100
       p = rand(1:24)
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(ZZ(p))
 
          for iter = 1:100
@@ -438,7 +438,7 @@ end
 @testset "gfp_fmpz.exact_division" begin
   for i = 1:100
       p = rand(1:24)
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(ZZ(p))
 
          for iter = 1:100
@@ -480,7 +480,7 @@ end
 @testset "gfp_fmpz.square_root" begin
    for i = 1:100
       p = rand(1:65537)
-      if Nemo.isprime(ZZ(p))
+      if Nemo.is_prime(ZZ(p))
          R = GF(ZZ(p))
 
          z = rand(R)

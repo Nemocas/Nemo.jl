@@ -565,12 +565,12 @@ function isfinite(x::acb)
 end
 
 @doc Markdown.doc"""
-    isexact(x::acb)
+    is_exact(x::acb)
 
 Return `true` if $x$ is exact, i.e. has its real and imaginary parts have
 zero radius, otherwise return `false`.
 """
-function isexact(x::acb)
+function is_exact(x::acb)
    return Bool(ccall((:acb_is_exact, libarb), Cint, (Ref{acb},), x))
 end
 

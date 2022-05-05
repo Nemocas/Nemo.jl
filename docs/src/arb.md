@@ -84,7 +84,7 @@ one can supply them to Arb using a string. In this case, Arb will store them to
 the precision specified when creating the Arb field.
 
 If the values can be stored precisely as a binary floating point number, Arb
-will store the values exactly. See the function `isexact` below for more
+will store the values exactly. See the function `is_exact` below for more
 information.
 
 ### Real ball constructors
@@ -112,7 +112,7 @@ convert(Float64, RR(1//3))
 ### Basic manipulation
 
 ```@docs
-isnonzero(::arb)
+is_nonzero(::arb)
 ```
 
 ```@docs
@@ -120,7 +120,7 @@ isfinite(::arb)
 ```
 
 ```@docs
-isexact(::arb)
+is_exact(::arb)
 ```
 
 ```@docs
@@ -128,11 +128,11 @@ isinteger(::arb)
 ```
 
 ```@docs
-ispositive(::arb)
+is_positive(::arb)
 ```
 
 ```@docs
-isnonnegative(::arb)
+is_nonnegative(::arb)
 ```
 
 ```@docs
@@ -140,7 +140,7 @@ is_negative(::arb)
 ```
 
 ```@docs
-isnonpositive(::arb)
+is_nonpositive(::arb)
 ```
 
 ```@docs
@@ -163,7 +163,7 @@ RR = RealField(64)
 a = RR("1.2 +/- 0.001")
 b = RR(3)
 
-ispositive(a)
+is_positive(a)
 isfinite(b)
 isinteger(b)
 is_negative(a)

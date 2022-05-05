@@ -52,7 +52,7 @@ end
 
    @test iszero(R(0))
    @test isone(R(1))
-   @test isrational(R(1))
+   @test is_rational(R(1))
    @test isreal(R(1))
    @test degree(R(1)) == 1
 
@@ -66,11 +66,11 @@ end
    @test hash(u) != hash(i)
 
    @test degree(u) == 2
-   @test !isrational(u)
+   @test !is_rational(u)
    @test isreal(u)
-   @test !isrational(i)
+   @test !is_rational(i)
    @test !isreal(i)
-   @test isalgebraic_integer(u)
+   @test is_algebraic_integer(u)
 
    @test denominator(qqbar(3+4im) // 5) == 5
    @test numerator(qqbar(3+4im) // 5) == qqbar(3+4im)
@@ -132,8 +132,8 @@ end
    @test_throws DomainError (root_of_unity(R, 0))
    @test_throws DomainError (root_of_unity(R, 0, 1))
 
-   @test isroot_of_unity(i)
-   @test !isroot_of_unity(qqbar(2))
+   @test is_root_of_unity(i)
+   @test !is_root_of_unity(qqbar(2))
    @test root_of_unity_as_args(-i) == (4, 3)
    @test_throws DomainError root_of_unity_as_args(qqbar(2))
 
@@ -241,41 +241,41 @@ end
    @test u > 1
    @test_throws DomainError (i > 1)
 
-   @test isequal_abs(u, -u)
-   @test !isequal_abs(u, 1+u)
+   @test is_equal_abs(u, -u)
+   @test !is_equal_abs(u, 1+u)
 
-   @test isequal_real(u, u+i)
-   @test !isequal_real(u, -u+i)
+   @test is_equal_real(u, u+i)
+   @test !is_equal_real(u, -u+i)
 
-   @test isequal_imag(i, 1+i)
-   @test !isequal_imag(i, 1-i)
+   @test is_equal_imag(i, 1+i)
+   @test !is_equal_imag(i, 1-i)
 
-   @test isequal_abs_real(u, -u+i)
-   @test !isequal_abs_real(u, 1+u+i)
+   @test is_equal_abs_real(u, -u+i)
+   @test !is_equal_abs_real(u, 1+u+i)
 
-   @test isequal_abs_imag(i, 1-i)
-   @test !isequal_abs_imag(i, 1-2*i)
+   @test is_equal_abs_imag(i, 1-i)
+   @test !is_equal_abs_imag(i, 1-2*i)
 
-   @test isless_real(u, 1+u+i)
-   @test !isless_real(u, u+i)
+   @test is_less_real(u, 1+u+i)
+   @test !is_less_real(u, u+i)
 
-   @test isless_imag(i, 2*i)
-   @test !isless_imag(i, i)
+   @test is_less_imag(i, 2*i)
+   @test !is_less_imag(i, i)
 
-   @test isless_abs(u, -2*u)
-   @test isless_abs(u, 2*u)
-   @test !isless_abs(u, -u)
+   @test is_less_abs(u, -2*u)
+   @test is_less_abs(u, 2*u)
+   @test !is_less_abs(u, -u)
 
-   @test isless_abs_real(-u, -2*u)
-   @test isless_abs_real(-u, 2*u)
-   @test !isless_abs_real(-u, u)
+   @test is_less_abs_real(-u, -2*u)
+   @test is_less_abs_real(-u, 2*u)
+   @test !is_less_abs_real(-u, u)
 
-   @test isless_abs_imag(-u, -2*i)
-   @test isless_abs_imag(-u, 2*i)
-   @test !isless_abs_imag(-u, u)
+   @test is_less_abs_imag(-u, -2*i)
+   @test is_less_abs_imag(-u, 2*i)
+   @test !is_less_abs_imag(-u, u)
 
-   @test isless_root_order(u, i)
-   @test isless_root_order(i, -i)
+   @test is_less_root_order(u, i)
+   @test is_less_root_order(i, -i)
 
 end
 

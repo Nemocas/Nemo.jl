@@ -5,8 +5,8 @@
 ###############################################################################
 
 export ca, CalciumField, complex_normal_form, const_euler, const_pi, csgn, erf,
-       erfc, erfi, gamma, infinity, isalgebraic, isimaginary, isinf, isnumber,
-       issigned_inf, isuinf, isundefined, isunknown, onei, pow, undefined,
+       erfc, erfi, gamma, infinity, is_algebraic, is_imaginary, isinf, is_number,
+       is_signed_inf, is_uinf, is_undefined, is_unknown, onei, pow, undefined,
        unknown, unsigned_infinity
 
 ###############################################################################
@@ -192,15 +192,15 @@ isless(a::fmpz, b::ca) = isless(parent(b)(a), b)
 isless(a::Int, b::ca) = isless(parent(b)(a), b)
 
 @doc Markdown.doc"""
-    isnumber(a::ca)
+    is_number(a::ca)
 
 Return whether `a` is a number, i.e. not an infinity or undefined.
 """
-function isnumber(a::ca)
+function is_number(a::ca)
    C = a.parent
    t = ccall((:ca_check_is_number, libcalcium), Cint,
         (Ref{ca}, Ref{CalciumField}), a, C)
-   return truth_as_bool(t, :isnumber)
+   return truth_as_bool(t, :is_number)
 end
 
 @doc Markdown.doc"""
@@ -228,27 +228,27 @@ function isone(a::ca)
 end
 
 @doc Markdown.doc"""
-    isalgebraic(a::ca)
+    is_algebraic(a::ca)
 
 Return whether `a` is an algebraic number.
 """
-function isalgebraic(a::ca)
+function is_algebraic(a::ca)
    C = a.parent
    t = ccall((:ca_check_is_algebraic, libcalcium), Cint,
         (Ref{ca}, Ref{CalciumField}), a, C)
-   return truth_as_bool(t, :isalgebraic)
+   return truth_as_bool(t, :is_algebraic)
 end
 
 @doc Markdown.doc"""
-    isrational(a::ca)
+    is_rational(a::ca)
 
 Return whether `a` is a rational number.
 """
-function isrational(a::ca)
+function is_rational(a::ca)
    C = a.parent
    t = ccall((:ca_check_is_rational, libcalcium), Cint,
         (Ref{ca}, Ref{CalciumField}), a, C)
-   return truth_as_bool(t, :isrational)
+   return truth_as_bool(t, :is_rational)
 end
 
 @doc Markdown.doc"""
@@ -277,28 +277,28 @@ function isreal(a::ca)
 end
 
 @doc Markdown.doc"""
-    isimaginary(a::ca)
+    is_imaginary(a::ca)
 
 Return whether `a` is an imaginary number. This returns `false`
 if `a` is a pure imaginary infinity.
 """
-function isimaginary(a::ca)
+function is_imaginary(a::ca)
    C = a.parent
    t = ccall((:ca_check_is_imaginary, libcalcium), Cint,
         (Ref{ca}, Ref{CalciumField}), a, C)
-   return truth_as_bool(t, :isimaginary)
+   return truth_as_bool(t, :is_imaginary)
 end
 
 @doc Markdown.doc"""
-    isundefined(a::ca)
+    is_undefined(a::ca)
 
 Return whether `a` is the special value *Undefined*.
 """
-function isundefined(a::ca)
+function is_undefined(a::ca)
    C = a.parent
    t = ccall((:ca_check_is_undefined, libcalcium), Cint,
         (Ref{ca}, Ref{CalciumField}), a, C)
-   return truth_as_bool(t, :isundefined)
+   return truth_as_bool(t, :is_undefined)
 end
 
 @doc Markdown.doc"""
@@ -314,23 +314,23 @@ function isinf(a::ca)
 end
 
 @doc Markdown.doc"""
-    isuinf(a::ca)
+    is_uinf(a::ca)
 
 Return whether `a` is unsigned infinity.
 """
-function isuinf(a::ca)
+function is_uinf(a::ca)
    C = a.parent
    t = ccall((:ca_check_is_uinf, libcalcium), Cint,
         (Ref{ca}, Ref{CalciumField}), a, C)
-   return truth_as_bool(t, :isuinf)
+   return truth_as_bool(t, :is_uinf)
 end
 
 @doc Markdown.doc"""
-    issigned_inf(a::ca)
+    is_signed_inf(a::ca)
 
 Return whether `a` is any signed infinity.
 """
-function issigned_inf(a::ca)
+function is_signed_inf(a::ca)
    C = a.parent
    t = ccall((:ca_check_is_signed_inf, libcalcium), Cint,
         (Ref{ca}, Ref{CalciumField}), a, C)
@@ -338,12 +338,12 @@ function issigned_inf(a::ca)
 end
 
 @doc Markdown.doc"""
-    isunknown(a::ca)
+    is_unknown(a::ca)
 
 Return whether `a` is the special value *Unknown*. This is a representation
 property and not a mathematical predicate.
 """
-function isunknown(a::ca)
+function is_unknown(a::ca)
    C = a.parent
    t = Bool(ccall((:ca_is_unknown, libcalcium), Cint,
         (Ref{ca}, Ref{CalciumField}), a, C))

@@ -33,7 +33,7 @@
 
 # do not export div and divrem
 export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash, bell,
-       isprime, fdiv, cdiv, tdiv, rem, mod, gcd, lcm, invmod, powermod, abs,
+       is_prime, fdiv, cdiv, tdiv, rem, mod, gcd, lcm, invmod, powermod, abs,
        isqrt, popcount, prevpow2, nextpow2, ndigits, dec, bin, oct, hex, base,
        one, zero, divexact, fits, sign, nbits, deepcopy, tdivpow2, fdivpow2,
        cdivpow2, flog, clog, cmpabs, clrbit!, setbit!, combit!, crt, divisible,
@@ -1465,28 +1465,28 @@ Return the prime divisors of $a$ in an array. We require $a \neq 0$.
 """
 prime_divisors(a::Int) = Int.(prime_divisors(FlintZZ(a)))
 
-isprime(x::UInt) = Bool(ccall((:n_is_prime, libflint), Cint, (UInt,), x))
+is_prime(x::UInt) = Bool(ccall((:n_is_prime, libflint), Cint, (UInt,), x))
 
 @doc Markdown.doc"""
-    isprime(x::fmpz)
+    is_prime(x::fmpz)
 
 Return `true` if $x$ is a prime number, otherwise return `false`.
 """
-function isprime(x::fmpz)
+function is_prime(x::fmpz)
   !is_probable_prime(x) && return false
   return Bool(ccall((:fmpz_is_prime, libflint), Cint, (Ref{fmpz},), x))
 end
 
 @doc Markdown.doc"""
-    isprime(x::Int)
+    is_prime(x::Int)
 
 Return `true` if $x$ is a prime number, otherwise return `false`.
 """
-function isprime(n::Int)
+function is_prime(n::Int)
   if n < 0
     return false
   end
-  return isprime(n % UInt)
+  return is_prime(n % UInt)
 end
 
 @doc Markdown.doc"""

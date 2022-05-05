@@ -454,7 +454,7 @@ end
 @testset "fmpz_mat.hadamard" begin
    S = MatrixSpace(FlintZZ, 4, 4)
 
-   @test ishadamard(hadamard(S))
+   @test is_hadamard(hadamard(S))
 end
 
 @testset "fmpz_mat.fflu" begin

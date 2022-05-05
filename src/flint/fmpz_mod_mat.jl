@@ -402,7 +402,7 @@ end
 
 function det(a::fmpz_mod_mat)
   !is_square(a) && error("Matrix must be a square matrix")
-  if isprime(a.n)
+  if is_prime(a.n)
      r = ccall((:fmpz_mod_mat_det, libflint), UInt, (Ref{fmpz_mod_mat}, ), a)
      return base_ring(a)(r)
   else

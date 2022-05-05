@@ -320,7 +320,7 @@ is_square(::fmpz)
 ```
 
 ```@docs
-isprime(::fmpz)
+is_prime(::fmpz)
 ```
 
 ```@docs
@@ -395,7 +395,7 @@ number_of_partitions(::fmpz)
 **Examples**
 
 ```julia
-isprime(ZZ(13))
+is_prime(ZZ(13))
 n = factorial(ZZ(100))
 s = divisor_sigma(ZZ(128), 10)
 a = euler_phi(ZZ(12480))

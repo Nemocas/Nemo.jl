@@ -65,14 +65,14 @@ end
    @test iszero(C(0))
    @test isone(C(1))
    @test isinteger(C(1))
-   @test isrational(C(1))
+   @test is_rational(C(1))
    @test isreal(C(1))
-   @test isnumber(C(1))
+   @test is_number(C(1))
 
    u = sqrt(C(2))
    i = sqrt(C(-1))
 
-   @test isalgebraic(u)
+   @test is_algebraic(u)
 
    @test i == C(0+1im)
    @test 3+4*i == C(3+4im)
@@ -87,12 +87,12 @@ end
    @test isa(hash(u), UInt)
 
    @test !isinteger(u)
-   @test !isrational(u)
+   @test !is_rational(u)
    @test isreal(u)
-   @test !isrational(i)
+   @test !is_rational(i)
    @test !isreal(i)
-   @test isimaginary(i)
-   @test !isimaginary(u)
+   @test is_imaginary(i)
+   @test !is_imaginary(u)
 
    @test inv(u) == u // 2
 
@@ -131,26 +131,26 @@ end
 
    @test -2*Cext(i)*inf == infinity(Cext(-i))
 
-   @test issigned_inf(inf)
-   @test !issigned_inf(uinf)
+   @test is_signed_inf(inf)
+   @test !is_signed_inf(uinf)
    @test isinf(inf)
    @test isinf(uinf)
-   @test !isuinf(inf)
-   @test isuinf(uinf)
+   @test !is_uinf(inf)
+   @test is_uinf(uinf)
 
-   @test isundefined(und)
-   @test !isunknown(und)
+   @test is_undefined(und)
+   @test !is_unknown(und)
 
-   @test isunknown(unk)
+   @test is_unknown(unk)
    @test_throws ErrorException isreal(unk)
-   @test_throws ErrorException isnumber(unk)
-   @test_throws ErrorException isundefined(unk)
+   @test_throws ErrorException is_number(unk)
+   @test_throws ErrorException is_undefined(unk)
 
    @test !isinf(C(1))
-   @test !isuinf(C(1))
-   @test !issigned_inf(C(1))
-   @test !isundefined(C(1))
-   @test !isunknown(C(1))
+   @test !is_uinf(C(1))
+   @test !is_signed_inf(C(1))
+   @test !is_undefined(C(1))
+   @test !is_unknown(C(1))
 
    @test und == und
    @test_throws ErrorException (unk == unk)
@@ -392,12 +392,12 @@ end
 
    for i=1:10
       x = rand(C, depth=5, bits=5)
-      @test isnumber(x)
+      @test is_number(x)
    end
 
    for i=1:10
       x = rand(C, depth=5, bits=5, randtype=:rational)
-      @test isrational(x)
+      @test is_rational(x)
    end
 
    @test_throws DomainError [rand(C, depth=1, bits=1, randtype=:special) for i=1:100]

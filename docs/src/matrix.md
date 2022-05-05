@@ -211,7 +211,7 @@ hadamard(::FmpzMatSpace)
 ```
 
 ```@docs
-ishadamard(::fmpz_mat)
+is_hadamard(::fmpz_mat)
 ```
 
 ```@docs
@@ -225,7 +225,7 @@ R = MatrixSpace(ZZ, 3, 3)
 S = MatrixSpace(QQ, 3, 3)
 
 A = hadamard(R)
-ishadamard(A)
+is_hadamard(A)
 B = hilbert(R)
 ```
 
