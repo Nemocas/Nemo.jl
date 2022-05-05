@@ -1,0 +1,40 @@
+# make some Julia names compatible with our naming conventions
+@alias is_equal isequal
+@alias is_finite isfinite
+@alias is_inf isinf
+@alias is_integer isinteger
+@alias is_less isless
+@alias is_real isreal
+
+# for backwards compatibility
+@alias isalgebraic is_algebraic
+@alias isalgebraic_integer is_algebraic_integer
+@alias iscyclo_type is_cyclo_type
+@alias isembedded is_embedded
+@alias isequal_abs is_equal_abs
+@alias isequal_abs_imag is_equal_abs_imag
+@alias isequal_abs_real is_equal_abs_real
+@alias isequal_imag is_equal_imag
+@alias isequal_real is_equal_real
+@alias isexact is_exact
+@alias ishadamard is_hadamard
+@alias isimaginary is_imaginary
+@alias isless_abs is_less_abs
+@alias isless_abs_imag is_less_abs_imag
+@alias isless_abs_real is_less_abs_real
+@alias isless_imag is_less_imag
+@alias isless_real is_less_real
+@alias isless_root_order is_less_root_order
+@alias ismaxreal_type is_maxreal_type
+@alias isnonnegative is_nonnegative
+@alias isnonpositive is_nonpositive
+@alias isnonzero is_nonzero
+@alias isnumber is_number
+@alias ispositive is_positive
+@alias isprime is_prime
+@alias isrational is_rational
+@alias isroot_of_unity is_root_of_unity
+@alias issigned_inf is_signed_inf
+@alias isuinf is_uinf
+@alias isundefined is_undefined
+@alias isunknown is_unknown

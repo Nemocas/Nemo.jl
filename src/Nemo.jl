@@ -524,4 +524,6 @@ end
 
 include("Deprecations.jl")
 
+include("Aliases.jl")
+
 end # module
