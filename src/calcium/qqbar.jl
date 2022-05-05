@@ -29,7 +29,7 @@ base_ring(a::CalciumQQBarField) = CalciumQQBar
 
 base_ring(a::qqbar) = CalciumQQBar
 
-isdomain_type(::Type{qqbar}) = true
+is_domain_type(::Type{qqbar}) = true
 
 check_parent(a::qqbar, b::qqbar, throw::Bool = true) = true
 
@@ -980,7 +980,7 @@ according to their multiplicity.
 """
 function eigenvalues(A::fmpz_mat, R::CalciumQQBarField)
    n = nrows(A)
-   !issquare(A) && throw(DomainError(A, "a square matrix is required"))
+   !is_square(A) && throw(DomainError(A, "a square matrix is required"))
    if n == 0
       return Array{qqbar}(undef, 0)
    end
@@ -1002,7 +1002,7 @@ according to their multiplicity.
 """
 function eigenvalues(A::fmpq_mat, R::CalciumQQBarField)
    n = nrows(A)
-   !issquare(A) && throw(DomainError(A, "a square matrix is required"))
+   !is_square(A) && throw(DomainError(A, "a square matrix is required"))
    if n == 0
       return Array{qqbar}(undef, 0)
    end

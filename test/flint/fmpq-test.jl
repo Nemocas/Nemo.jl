@@ -123,9 +123,9 @@ end
 
    @test iszero(zero(R))
 
-   @test isunit(one(R))
+   @test is_unit(one(R))
 
-   @test isunit(fmpq(1, 3))
+   @test is_unit(fmpq(1, 3))
 
    @test deepcopy(fmpq(2, 3)) == fmpq(2, 3)
 
@@ -385,20 +385,20 @@ end
    @test sqrt(a) == fmpz(2)//3
    @test sqrt(b) == 0
 
-   @test !issquare(fmpz(2)//9)
-   @test !issquare(fmpz(9)//2)
+   @test !is_square(fmpz(2)//9)
+   @test !is_square(fmpz(9)//2)
 
-   @test issquare(fmpz(4)//9)
+   @test is_square(fmpz(4)//9)
 
-   f1, s1 = issquare_with_sqrt(fmpz(2)//9)
+   f1, s1 = is_square_with_sqrt(fmpz(2)//9)
 
    @test !f1
 
-   f2, s2 = issquare_with_sqrt(fmpz(9)//2)
+   f2, s2 = is_square_with_sqrt(fmpz(9)//2)
 
    @test !f2
 
-   f2, s3 = issquare_with_sqrt(fmpz(4)//9)
+   f2, s3 = is_square_with_sqrt(fmpz(4)//9)
 
    @test f2 && s3 == fmpz(2)//3
 end

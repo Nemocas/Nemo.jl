@@ -505,7 +505,7 @@ end
       M = rand(S, -100:100)
       r, N = rref(M)
 
-      @test isrref(N)
+      @test is_rref(N)
    end
  
    S = MatrixSpace(QQ, 3, 3)

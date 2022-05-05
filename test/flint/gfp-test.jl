@@ -107,8 +107,8 @@ end
 
    @test modulus(R) == UInt(13)
 
-   @test !isunit(R())
-   @test isunit(R(3))
+   @test !is_unit(R())
+   @test is_unit(R(3))
 
    @test deepcopy(R(3)) == R(3)
 
@@ -286,7 +286,7 @@ end
             a = R(1)
 
             r = rand(R)
-            while !isunit(r)
+            while !is_unit(r)
                r = rand(R)
             end
 
@@ -322,7 +322,7 @@ end
             a = R(1)
 
             r = rand(R)
-            while !isunit(r)
+            while !is_unit(r)
                r = rand(R)
             end
 
@@ -423,9 +423,9 @@ end
          for iter = 1:100
             a = rand(R)
 
-            @test !isunit(a) || inv(inv(a)) == a
+            @test !is_unit(a) || inv(inv(a)) == a
 
-            @test !isunit(a) || a*inv(a) == one(R)
+            @test !is_unit(a) || a*inv(a) == one(R)
          end
       end
    end
@@ -438,9 +438,9 @@ end
          for iter = 1:100
             a = rand(R)
 
-            @test !isunit(a) || inv(inv(a)) == a
+            @test !is_unit(a) || inv(inv(a)) == a
 
-            @test !isunit(a) || a*inv(a) == one(R)
+            @test !is_unit(a) || a*inv(a) == one(R)
          end
       end
    end
@@ -493,7 +493,7 @@ end
 
          z = rand(R)
          if p != 2
-            while issquare(z)
+            while is_square(z)
                z = rand(R)
             end
          end
@@ -501,20 +501,20 @@ end
          for iter = 1:100
             a = rand(R)
 
-            @test issquare(a^2)
+            @test is_square(a^2)
 
             s = sqrt(a^2)
 
             @test s^2 == a^2
 
-            f1, s1 = issquare_with_sqrt(a^2)
+            f1, s1 = is_square_with_sqrt(a^2)
 
             @test f1 && s1^2 == a^2
 
             if p != 2 && !iszero(a)
-               @test !issquare(z*a^2)
+               @test !is_square(z*a^2)
 
-               f2, s2 = issquare_with_sqrt(z*a^2)
+               f2, s2 = is_square_with_sqrt(z*a^2)
 
                @test !f2
             end

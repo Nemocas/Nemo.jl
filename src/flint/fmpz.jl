@@ -38,11 +38,11 @@ export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash, bell,
        one, zero, divexact, fits, sign, nbits, deepcopy, tdivpow2, fdivpow2,
        cdivpow2, flog, clog, cmpabs, clrbit!, setbit!, combit!, crt, divisible,
        divisors, prime_divisors, divisor_lenstra, fmodpow2, gcdinv,
-       isprobable_prime, jacobi_symbol, kronecker_symbol, remove, root, size,
+       is_probable_prime, jacobi_symbol, kronecker_symbol, remove, root, size,
        isqrtrem, sqrtmod, trailing_zeros, divisor_sigma, euler_phi, fibonacci,
        moebius_mu, primorial, rising_factorial, number_of_partitions,
-       canonical_unit, isunit, isequal, addeq!, mul!, fmma!, fmms!, issquare,
-       sqrt, issquare_with_sqrt, next_prime, ndivrem, iszero, rand, rand_bits,
+       canonical_unit, is_unit, isequal, addeq!, mul!, fmma!, fmms!, is_square,
+       sqrt, is_square_with_sqrt, next_prime, ndivrem, iszero, rand, rand_bits,
        binomial, factorial, rand_bits_prime, iroot, tdivrem, fdivrem, cdivrem,
        ntdivrem, nfdivrem, ncdivrem, tstbit
 
@@ -77,7 +77,7 @@ Returns `Union{}` as the parent ring is not dependent on another ring.
 """
 base_ring(a::fmpz) = Union{}
 
-isdomain_type(::Type{fmpz}) = true
+is_domain_type(::Type{fmpz}) = true
 
 ###############################################################################
 #
@@ -199,7 +199,7 @@ Return the number of limbs required to store the absolute value of $a$.
 """
 size(a::fmpz) = Int(ccall((:fmpz_size, libflint), Cint, (Ref{fmpz},), a))
 
-isunit(a::fmpz) = ccall((:fmpz_is_pm1, libflint), Bool, (Ref{fmpz},), a)
+is_unit(a::fmpz) = ccall((:fmpz_is_pm1, libflint), Bool, (Ref{fmpz},), a)
 
 iszero(a::fmpz) = ccall((:fmpz_is_zero, libflint), Bool, (Ref{fmpz},), a)
 
@@ -361,7 +361,7 @@ end
 
 divides(x::fmpz, y::Integer) = divides(x, fmpz(y))
 
-function isdivisible_by(x::fmpz, y::fmpz)
+function is_divisible_by(x::fmpz, y::fmpz)
    if iszero(x)
       return true
    elseif iszero(y)
@@ -376,7 +376,7 @@ function isdivisible_by(x::fmpz, y::fmpz)
    end
 end
 
-function isdivisible_by(x::fmpz, y::Integer)
+function is_divisible_by(x::fmpz, y::Integer)
    if iszero(x)
       return true
    elseif iszero(y)
@@ -391,8 +391,8 @@ function isdivisible_by(x::fmpz, y::Integer)
    end
 end
 
-function isdivisible_by(x::Integer, y::fmpz)
-   return isdivisible_by(fmpz(x), y)
+function is_divisible_by(x::Integer, y::fmpz)
+   return is_divisible_by(fmpz(x), y)
 end
 
 function rem(x::fmpz, c::fmpz)
@@ -1219,10 +1219,10 @@ function Base.sqrt(x::fmpz; check=true)
     return s
 end
 
-issquare(x::fmpz) = Bool(ccall((:fmpz_is_square, libflint), Cint,
+is_square(x::fmpz) = Bool(ccall((:fmpz_is_square, libflint), Cint,
                                (Ref{fmpz},), x))
 
-function issquare_with_sqrt(x::fmpz)
+function is_square_with_sqrt(x::fmpz)
     if x < 0
        return false, zero(fmpz)
     end
@@ -1473,7 +1473,7 @@ isprime(x::UInt) = Bool(ccall((:n_is_prime, libflint), Cint, (UInt,), x))
 Return `true` if $x$ is a prime number, otherwise return `false`.
 """
 function isprime(x::fmpz)
-  !isprobable_prime(x) && return false
+  !is_probable_prime(x) && return false
   return Bool(ccall((:fmpz_is_prime, libflint), Cint, (Ref{fmpz},), x))
 end
 
@@ -1490,13 +1490,13 @@ function isprime(n::Int)
 end
 
 @doc Markdown.doc"""
-    isprobable_prime(x::fmpz)
+    is_probable_prime(x::fmpz)
 
 Return `true` if $x$ is very probably a prime number, otherwise return
 `false`. No counterexamples are known to this test, but it is conjectured
 that infinitely many exist.
 """
-isprobable_prime(x::fmpz) = Bool(ccall((:fmpz_is_probabprime, libflint), Cint,
+is_probable_prime(x::fmpz) = Bool(ccall((:fmpz_is_probabprime, libflint), Cint,
                                       (Ref{fmpz},), x))
 
 @doc Markdown.doc"""

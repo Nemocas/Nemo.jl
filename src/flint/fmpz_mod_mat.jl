@@ -149,7 +149,7 @@ function transpose(a::T) where T <: Zmod_fmpz_mat
 end
 
 function transpose!(a::T) where T <: Zmod_fmpz_mat
-  !issquare(a) && error("Matrix must be a square matrix")
+  !is_square(a) && error("Matrix must be a square matrix")
   ccall((:fmpz_mod_mat_transpose, libflint), Nothing,
           (Ref{T}, Ref{T}), a, a)
 end
@@ -385,7 +385,7 @@ end
 ################################################################################
 
 function tr(a::T) where T <: Zmod_fmpz_mat
-  !issquare(a) && error("Matrix must be a square matrix")
+  !is_square(a) && error("Matrix must be a square matrix")
   R = base_ring(a)
   r = fmpz()
   ccall((:fmpz_mod_mat_trace, libflint), Nothing, (Ref{fmpz}, Ref{T}), r, a)
@@ -401,7 +401,7 @@ end
 #= Not implemented in Flint yet
 
 function det(a::fmpz_mod_mat)
-  !issquare(a) && error("Matrix must be a square matrix")
+  !is_square(a) && error("Matrix must be a square matrix")
   if isprime(a.n)
      r = ccall((:fmpz_mod_mat_det, libflint), UInt, (Ref{fmpz_mod_mat}, ), a)
      return base_ring(a)(r)
@@ -438,10 +438,10 @@ end
 ################################################################################
 
 function inv(a::fmpz_mod_mat)
-  !issquare(a) && error("Matrix must be a square matrix")
-  if isprobable_prime(modulus(base_ring(a)))
+  !is_square(a) && error("Matrix must be a square matrix")
+  if is_probable_prime(modulus(base_ring(a)))
      X, d = pseudo_inv(a)
-     if !isunit(d)
+     if !is_unit(d)
         error("Matrix is not invertible")
      end
      return divexact(X, d)
@@ -459,7 +459,7 @@ end
 #= Not implemented in Flint yet
 
 function inv(a::T) where T <: Zmod_fmpz_mat
-  !issquare(a) && error("Matrix must be a square matrix")
+  !is_square(a) && error("Matrix must be a square matrix")
   z = similar(a)
   r = ccall((:fmpz_mod_mat_inv, libflint), Int,
           (Ref{T}, Ref{T}), z, a)
@@ -479,7 +479,7 @@ end
 
 function solve(x::T, y::T) where T <: Zmod_fmpz_mat
   (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
-  !issquare(x)&& error("First argument not a square matrix in solve")
+  !is_square(x)&& error("First argument not a square matrix in solve")
   (y.r != x.r) || y.c != 1 && ("Not a column vector in solve")
   z = similar(y)
   r = ccall((:fmpz_mod_mat_solve, libflint), Int,

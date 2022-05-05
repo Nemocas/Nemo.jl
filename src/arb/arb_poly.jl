@@ -53,7 +53,7 @@ function gen(a::ArbPolyRing)
 end
 
 # todo: write a C function for this
-function isgen(a::arb_poly)
+function is_gen(a::arb_poly)
    return isequal(a, gen(parent(a)))
 end
 

@@ -13,7 +13,7 @@ end
    @test gens(R) == [x, y]
    @test isone(one(R))
    @test iszero(zero(R))
-   @test isgen(gen(R, 1))
+   @test is_gen(gen(R, 1))
 
    f = 2x^2*y^3 + 3x^2*y + y + 1
 
@@ -32,7 +32,7 @@ end
 
    @test coeff(f, 3) == 3
 
-   @test isunit(f)
+   @test is_unit(f)
 
    @test parent(f) == R
 

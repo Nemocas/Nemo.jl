@@ -56,9 +56,9 @@ end
 
    @test isone(one(R))
 
-   @test isgen(gen(R))
+   @test is_gen(gen(R))
 
-   @test isunit(one(R))
+   @test is_unit(one(R))
 
    f = x^2 + 2x + 1
 
@@ -390,12 +390,12 @@ end
   @test f in fac
   @test !(x in fac)
 
-  @test isirreducible(Rx(2))
-  @test isirreducible(x^4 + 1)
-  @test isirreducible(x + 1)
-  @test !isirreducible(Rx(4))
-  @test !isirreducible(2x + 2)
-  @test !isirreducible(x^2)
+  @test is_irreducible(Rx(2))
+  @test is_irreducible(x^4 + 1)
+  @test is_irreducible(x + 1)
+  @test !is_irreducible(Rx(4))
+  @test !is_irreducible(2x + 2)
+  @test !is_irreducible(x^2)
 
   g = x^30 + 73*x^28 + 2504*x^27 - 1359*x^26 - 4680*x^25 - 148311*x^24 - 159120*x^23 - 2615547*x^22 - 9732528*x^21 - 2087859*x^20 - 28418280*x^19 - 19101979*x^18 - 80724312*x^17 - 252445155*x^16 - 549998688*x^15 - 1003657917*x^14 - 2740409376*x^13 - 3199593893*x^12 - 2678402184*x^11 - 5168185293*x^10 - 2855108728*x^9 - 984488613*x^8 - 364079376*x^7 + 2870497527*x^6 + 5561735376*x^5 + 6329635407*x^4 + 3459410600*x^3 + 601207031*x^2 + 822759704*x + 294114975
   @test length(factor(g)) == 6
@@ -412,31 +412,31 @@ end
 
   f = 2*x^4 + x^3 + 2*x^2 - 6*x - 9
 
-  @test issquare(f^2)
+  @test is_square(f^2)
 
   for i = 1:5000
     f = rand(R, -1:5, -10:10)
-    while issquare(f)
+    while is_square(f)
       f = rand(R, -1:5, -10:10)
     end
 
     g0 = rand(R, -1:5, -10:10)
     g = g0^2
 
-    @test issquare(g)
+    @test is_square(g)
 
-    f0, s0 = issquare_with_sqrt(g)
+    f0, s0 = is_square_with_sqrt(g)
 
     @test f0 && s0^2 == g
 
-    @test iszero(g) || !issquare(-g)
-    @test iszero(g) || !issquare(f*g)
+    @test iszero(g) || !is_square(-g)
+    @test iszero(g) || !is_square(f*g)
 
-    f1, s1 = issquare_with_sqrt(-g)
+    f1, s1 = is_square_with_sqrt(-g)
 
     @test iszero(g) || !f1
 
-    f2, s2 = issquare_with_sqrt(f*g)
+    f2, s2 = is_square_with_sqrt(f*g)
 
     @test iszero(g) || !f2
   end

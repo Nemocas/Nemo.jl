@@ -6,10 +6,10 @@
 
 export fmpz_mat, FmpzMatSpace, getindex, getindex!, setindex!,
        charpoly, det, det_divisor, det_given_divisor, gram, hadamard,
-       ishadamard, hnf, ishnf, hnf_with_transform, hnf_modular, lll, lll!,
+       ishadamard, hnf, is_hnf, hnf_with_transform, hnf_modular, lll, lll!,
        lll_ctx, lll_gram, lll_gram!, lll_with_transform,
        lll_gram_with_transform, lll_with_removal, lll_with_removal_transform,
-       nullspace, rank, rref, reduce_mod, similar, snf, snf_diagonal, issnf,
+       nullspace, rank, rref, reduce_mod, similar, snf, snf_diagonal, is_snf,
        solve, solve_rational, cansolve, cansolve_with_nullspace, solve_dixon,
        tr, transpose, content, hcat, vcat, addmul!, zero!, pseudo_inv,
        hnf_modular_eldiv, nullspace_right_rational
@@ -483,7 +483,7 @@ end
 ###############################################################################
 
 function inv(x::fmpz_mat)
-   !issquare(x) && error("Matrix not invertible")
+   !is_square(x) && error("Matrix not invertible")
    z = similar(x)
    d = fmpz()
    ccall((:fmpz_mat_inv, libflint), Nothing,
@@ -837,12 +837,12 @@ function hnf_modular_eldiv(x::fmpz_mat, d::fmpz)
 end
 
 @doc Markdown.doc"""
-    ishnf(x::fmpz_mat)
+    is_hnf(x::fmpz_mat)
 
 Return `true` if the given matrix is in Hermite Normal Form, otherwise return
 `false`.
 """
-function ishnf(x::fmpz_mat)
+function is_hnf(x::fmpz_mat)
    return ccall((:fmpz_mat_is_in_hnf, libflint), Bool,
                    (Ref{fmpz_mat},), x)
 end
@@ -1095,11 +1095,11 @@ function snf_diagonal(x::fmpz_mat)
 end
 
 @doc Markdown.doc"""
-    issnf(x::fmpz_mat)
+    is_snf(x::fmpz_mat)
 
 Return `true` if $x$ is in Smith normal form, otherwise return `false`.
 """
-function issnf(x::fmpz_mat)
+function is_snf(x::fmpz_mat)
    return ccall((:fmpz_mat_is_in_snf, libflint), Bool,
                    (Ref{fmpz_mat},), x)
 end

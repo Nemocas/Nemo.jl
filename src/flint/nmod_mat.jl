@@ -165,7 +165,7 @@ function transpose(a::T) where T <: Zmodn_mat
 end
 
 function transpose!(a::T) where T <: Zmodn_mat
-  !issquare(a) && error("Matrix must be a square matrix")
+  !is_square(a) && error("Matrix must be a square matrix")
   ccall((:nmod_mat_transpose, libflint), Nothing,
           (Ref{T}, Ref{T}), a, a)
 end
@@ -395,7 +395,7 @@ end
 ################################################################################
 
 function tr(a::T) where T <: Zmodn_mat
-  !issquare(a) && error("Matrix must be a square matrix")
+  !is_square(a) && error("Matrix must be a square matrix")
   r = ccall((:nmod_mat_trace, libflint), UInt, (Ref{T}, ), a)
   return base_ring(a)(r)
 end
@@ -407,7 +407,7 @@ end
 ################################################################################
 
 function det(a::nmod_mat)
-  !issquare(a) && error("Matrix must be a square matrix")
+  !is_square(a) && error("Matrix must be a square matrix")
   if isprime(a.n)
      r = ccall((:nmod_mat_det, libflint), UInt, (Ref{nmod_mat}, ), a)
      return base_ring(a)(r)
@@ -438,7 +438,7 @@ end
 ################################################################################
 
 function inv(a::nmod_mat)
-  !issquare(a) && error("Matrix must be a square matrix")
+  !is_square(a) && error("Matrix must be a square matrix")
   if isprime(a.n)
      z = similar(a)
      r = ccall((:nmod_mat_inv, libflint), Int,
@@ -465,7 +465,7 @@ end
 
 function solve(x::T, y::T) where T <: Zmodn_mat
   (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
-  !issquare(x)&& error("First argument not a square matrix in solve")
+  !is_square(x)&& error("First argument not a square matrix in solve")
   (y.r != x.r) || y.c != 1 && ("Not a column vector in solve")
   z = similar(y)
   r = ccall((:nmod_mat_solve, libflint), Int,

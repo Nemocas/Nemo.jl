@@ -55,7 +55,7 @@ iszero(a::fmpz_mod) = iszero(a.data)
 
 isone(a::fmpz_mod) = a.parent.n == 1 ? iszero(a.data) : isone(a.data)
 
-isunit(a::fmpz_mod) = a.parent.n == 1 ? iszero(a.data) : isone(gcd(a.data, a.parent.n))
+is_unit(a::fmpz_mod) = a.parent.n == 1 ? iszero(a.data) : isone(gcd(a.data, a.parent.n))
 
 modulus(R::FmpzModRing) = R.n
 
@@ -427,7 +427,7 @@ function (R::FmpzModRing)(a::Union{gfp_elem, nmod, gfp_fmpz_elem, fmpz_mod})
    if S === R
       return a
    else
-      isdivisible_by(modulus(S), modulus(R)) || error("incompatible parents")
+      is_divisible_by(modulus(S), modulus(R)) || error("incompatible parents")
       return R(data(a))
    end
 end

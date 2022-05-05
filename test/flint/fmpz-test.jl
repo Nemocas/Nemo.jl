@@ -152,7 +152,7 @@ end
 
    @test canonical_unit(fmpz(-12)) == -1
 
-   @test isunit(fmpz(-1))
+   @test is_unit(fmpz(-1))
 
    @test iszero(b)
 
@@ -259,7 +259,7 @@ end
       flag, q = divides(a*b, b)
       
       @test flag && b == 0 || q == a
-      @test isdivisible_by(a*b, b)
+      @test is_divisible_by(a*b, b)
    end
 
    for iters = 1:1000
@@ -275,7 +275,7 @@ end
        flag, q = divides(a*b + r, b)
 
        @test !flag && q == 0
-       @test !isdivisible_by(a*b + r, b)
+       @test !is_divisible_by(a*b + r, b)
    end
 end
 
@@ -566,10 +566,10 @@ end
    @test_throws DomainError sqrt(-fmpz(1))
    @test_throws ErrorException sqrt(fmpz(12))
 
-   @test issquare_with_sqrt(fmpz(5)) == (false, 0)
-   @test issquare_with_sqrt(fmpz(4)) == (true, 2)
+   @test is_square_with_sqrt(fmpz(5)) == (false, 0)
+   @test is_square_with_sqrt(fmpz(4)) == (true, 2)
 
-   f1, s1 = issquare_with_sqrt(-fmpz(1))
+   f1, s1 = is_square_with_sqrt(-fmpz(1))
 
    @test !f1
    
@@ -853,7 +853,7 @@ end
 
    @test isprime(13)
 
-   @test isprobable_prime(fmpz(13))
+   @test is_probable_prime(fmpz(13))
 
    @test divisible(fmpz(12), fmpz(6))
 

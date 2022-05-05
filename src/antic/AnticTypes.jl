@@ -29,7 +29,7 @@
    S::Symbol
 
    function AnticNumberField(pol::fmpq_poly, s::Symbol, cached::Bool = false, check::Bool = true)
-     check && !isirreducible(pol) && error("Polynomial must be irreducible")
+     check && !is_irreducible(pol) && error("Polynomial must be irreducible")
      return get_cached!(AnticNumberFieldID, (parent(pol), pol, s), cached) do
         nf = new()
         nf.pol = pol

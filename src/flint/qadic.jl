@@ -85,9 +85,9 @@ base_ring(a::qadic) = Union{}
 
 parent(a::qadic) = a.parent
 
-isdomain_type(::Type{qadic}) = true
+is_domain_type(::Type{qadic}) = true
 
-isexact_type(R::Type{qadic}) = false
+is_exact_type(R::Type{qadic}) = false
 
 function check_parent(a::qadic, b::qadic)
    parent(a) != parent(b) &&
@@ -197,7 +197,7 @@ iszero(a::qadic) = Bool(ccall((:qadic_is_zero, libflint), Cint,
 isone(a::qadic) = Bool(ccall((:qadic_is_one, libflint), Cint,
                              (Ref{qadic},), a))
 
-isunit(a::qadic) = !Bool(ccall((:qadic_is_zero, libflint), Cint,
+is_unit(a::qadic) = !Bool(ccall((:qadic_is_zero, libflint), Cint,
                               (Ref{qadic},), a))
 
 characteristic(R::FlintQadicField) = 0

@@ -399,7 +399,7 @@ end
 
 function ^(a::fmpz_rel_series, b::Int)
    b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
-   if isgen(a)
+   if is_gen(a)
       z = parent(a)()
       z = setcoeff!(z, 0, fmpz(1))
       z.prec = a.prec + b - 1
@@ -562,7 +562,7 @@ divexact(x::fmpz_rel_series, y::Integer; check::Bool=true) = divexact(x, fmpz(y)
 
 function inv(a::fmpz_rel_series)
    iszero(a) && throw(DivideError())
-   !isunit(a) && error("Unable to invert power series")
+   !is_unit(a) && error("Unable to invert power series")
    ainv = parent(a)()
    ainv.prec = a.prec
    ainv.val = 0

@@ -426,7 +426,7 @@ end
 
 function ^(a::($etype), b::Int)
    b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
-   if isgen(a)
+   if is_gen(a)
       z = parent(a)()
       z = setcoeff!(z, 0, UInt(1))
       z.prec = a.prec + b - 1
@@ -581,7 +581,7 @@ function divexact(x::($etype), y::($etype); check::Bool=true)
          y = shift_right(y, yval)
       end
    end
-   check && !isunit(y) && error("Unable to invert power series")
+   check && !is_unit(y) && error("Unable to invert power series")
    prec = min(x.prec - x.val, y.prec - y.val)
    z = parent(x)()
    z.val = xval - yval
@@ -650,7 +650,7 @@ divexact(x::($etype), y::Integer; check::Bool=true) = divexact(x, fmpz(y); check
 
 function inv(a::($etype))
    iszero(a) && throw(DivideError())
-   !isunit(a) && error("Unable to invert power series")
+   !is_unit(a) && error("Unable to invert power series")
    ainv = parent(a)()
    ainv.prec = a.prec
    ainv.val = 0
@@ -688,7 +688,7 @@ function Base.exp(a::($etype))
          c = j >= vala ? polcoeff(a, j - vala) : z0
          s += j * c * d[k - j + 1]
       end
-      !isunit(base_ring(a)(k)) && error("Unable to divide in exp")
+      !is_unit(base_ring(a)(k)) && error("Unable to divide in exp")
       d[k + 1] = divexact(base_ring(a)(s), k)
    end
    z = parent(a)(d, preca, preca, 0)

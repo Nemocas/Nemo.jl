@@ -47,13 +47,13 @@ end
    a = 2x + x^3
    b = O(x^4)
 
-   @test isgen(gen(R))
+   @test is_gen(gen(R))
 
    @test iszero(zero(R))
 
    @test isone(one(R))
 
-   @test isunit(-1 + x + 2x^2)
+   @test is_unit(-1 + x + 2x^2)
 
    @test valuation(a) == 1
 

@@ -45,9 +45,9 @@ base_ring(a::acb) = Union{}
 
 parent(x::acb) = x.parent
 
-isdomain_type(::Type{acb}) = true
+is_domain_type(::Type{acb}) = true
 
-isexact_type(::Type{acb}) = false
+is_exact_type(::Type{acb}) = false
 
 function zero(r::AcbField)
   z = acb()
@@ -532,7 +532,7 @@ end
 #
 ################################################################################
 
-function isunit(x::acb)
+function is_unit(x::acb)
    !iszero(x)
 end
 
@@ -587,7 +587,7 @@ function isreal(x::acb)
    return Bool(ccall((:acb_is_real, libarb), Cint, (Ref{acb},), x))
 end
 
-isnegative(x::acb) = isreal(x) && isnegative(real(x))
+is_negative(x::acb) = isreal(x) && is_negative(real(x))
 
 ################################################################################
 #

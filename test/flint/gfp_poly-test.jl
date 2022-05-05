@@ -143,10 +143,10 @@ end
 
   @test isone(one(Rx))
   @test iszero(zero(Rx))
-  @test isgen(gen(Rx))
-  @test isunit(one(Rx))
+  @test is_gen(gen(Rx))
+  @test is_unit(one(Rx))
 
-  @test !isunit(gen(Rx))
+  @test !is_unit(gen(Rx))
 
   @test degree(x) == 1
   @test degree(x^10) == 10
@@ -552,28 +552,28 @@ end
   @test Rx(Zf) == f
 end
 
-@testset "gfp_poly.isirreducible" begin
+@testset "gfp_poly.is_irreducible" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 
   f = x^6 + x^4 + 2 *x^2
 
-  @test !isirreducible(f)
+  @test !is_irreducible(f)
 
-  @test isirreducible(x)
+  @test is_irreducible(x)
 
-  @test isirreducible(x^16+2*x^9+x^8+x^2+x+1)
+  @test is_irreducible(x^16+2*x^9+x^8+x^2+x+1)
 end
 
-@testset "gfp_poly.issquarefree" begin
+@testset "gfp_poly.is_squarefree" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 
   f = x^6 + x^4 + 2 *x^2
 
-  @test !issquarefree(f)
+  @test !is_squarefree(f)
 
-  @test issquarefree((x+1)*(x+2)*(x+3))
+  @test is_squarefree((x+1)*(x+2)*(x+3))
 end
 
 @testset "gfp_poly.square_root" begin
@@ -582,27 +582,27 @@ end
 
       for iter in 1:1000
          f = rand(S, -1:10)
-         while issquare(f)
+         while is_square(f)
             f = rand(S, -1:10)
          end
 
          g0 = rand(S, -1:10)
          g = g0^2
 
-         @test issquare(g)
+         @test is_square(g)
          @test sqrt(g)^2 == g
 
          if !iszero(g)
-            @test !issquare(f*g)
+            @test !is_square(f*g)
             @test_throws ErrorException sqrt(f*g)
          end
 
-         f1, s1 = issquare_with_sqrt(g)
+         f1, s1 = is_square_with_sqrt(g)
 
          @test f1 && s1^2 == g
 
          if !iszero(g)
-            f2, s2 = issquare_with_sqrt(f*g)
+            f2, s2 = is_square_with_sqrt(f*g)
 
             @test !f2
          end

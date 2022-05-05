@@ -6,7 +6,7 @@
    @test elem_type(R) == qqbar
    @test elem_type(CalciumQQBarField) == qqbar
    @test parent_type(qqbar) == CalciumQQBarField
-   @test isdomain_type(qqbar) == true
+   @test is_domain_type(qqbar) == true
    @test base_ring(CalciumQQBar) == CalciumQQBar
    @test base_ring(qqbar(3)) == CalciumQQBar
 

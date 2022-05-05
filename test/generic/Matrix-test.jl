@@ -172,8 +172,8 @@ end
 
       H, U = hnf_cohen_with_transform(A)
 
-      @test istriu(H)
-      @test isunit(det(U))
+      @test is_upper_triangular(H)
+      @test is_unit(det(U))
       @test U*A == H
    end
 
@@ -182,8 +182,8 @@ end
 
       H, U = hnf_minors_with_transform(A)
 
-      @test istriu(H)
-      @test isunit(det(U))
+      @test is_upper_triangular(H)
+      @test is_unit(det(U))
       @test U*A == H
    end
 
@@ -192,8 +192,8 @@ end
 
       H, U = hnf_kb_with_transform(A)
 
-      @test istriu(H)
-      @test isunit(det(U))
+      @test is_upper_triangular(H)
+      @test is_unit(det(U))
       @test U*A == H
    end
 end
@@ -209,8 +209,8 @@ end
       T, U, K = Generic.snf_kb_with_transform(A)
 
       @test is_snf(T)
-      @test isunit(det(U))
-      @test isunit(det(K))
+      @test is_unit(det(U))
+      @test is_unit(det(K))
       @test U*A*K == T
    end
 end

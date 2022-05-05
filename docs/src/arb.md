@@ -136,7 +136,7 @@ isnonnegative(::arb)
 ```
 
 ```@docs
-isnegative(::arb)
+is_negative(::arb)
 ```
 
 ```@docs
@@ -166,7 +166,7 @@ b = RR(3)
 ispositive(a)
 isfinite(b)
 isinteger(b)
-isnegative(a)
+is_negative(a)
 c = radius(a)
 d = midpoint(b)
 f = accuracy_bits(a)

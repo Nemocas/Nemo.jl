@@ -71,7 +71,7 @@ end
 
    @test isone(one(R))
 
-   @test isgen(gen(R))
+   @test is_gen(gen(R))
 
    @test characteristic(R) == 7
 
@@ -79,7 +79,7 @@ end
 
    @test degree(R) == 5
 
-   @test isunit(x + 1)
+   @test is_unit(x + 1)
 
    @test deepcopy(x + 1) == x + 1
 
@@ -213,19 +213,19 @@ end
 
    @test pth_root(a) == 4*x^4+3*x^3+4*x^2+5*x+2
 
-   @test issquare(a^2)
+   @test is_square(a^2)
 
    @test sqrt(a^2)^2 == a^2
 
-   @test issquare_with_sqrt(a^2)[1]
+   @test is_square_with_sqrt(a^2)[1]
 
-   @test issquare_with_sqrt(a^2)[2]^2 == a^2
+   @test is_square_with_sqrt(a^2)[2]^2 == a^2
 
-   @test !issquare(x*a^2)
+   @test !is_square(x*a^2)
 
    @test_throws ErrorException sqrt(x*a^2)
 
-   @test !issquare_with_sqrt(x*a^2)[1]
+   @test !is_square_with_sqrt(x*a^2)[1]
 end
 
 @testset "fq_default.rand" begin

@@ -59,8 +59,8 @@ local test_fields = (NGFiniteField(23, 1, "a"),
 
          for i in 1:num_vars
            f = gen(S, i)
-           @test isgen(f)
-           @test !isgen(f + 1)
+           @test is_gen(f)
+           @test !is_gen(f + 1)
          end
       end
    end
@@ -124,7 +124,7 @@ end
 
          @test characteristic(S) == characteristic(R)
 
-         @test !isgen(S(1))
+         @test !is_gen(S(1))
 
          @test S(1) == R(1)
          @test R(0) != S(1)
@@ -132,9 +132,9 @@ end
          @test 0 != S(1)
 
          for i = 1:num_vars
-            @test isgen(varlist[i])
-            @test isgen(g[i])
-            @test !isgen(g[i] + 1)
+            @test is_gen(varlist[i])
+            @test is_gen(g[i])
+            @test !is_gen(g[i] + 1)
          end
 
          @test setcoeff!(gen(S, 1), 1, R(2)) == 2*gen(S, 1)
@@ -172,8 +172,8 @@ end
            @test f == sum((coeff(f, i) * S([R(1)], [Nemo.exponent_vector(f, i)])  for i in 1:length(f)))
          end
 
-         deg = isdegree(ordering(S))
-         rev = isreverse(ordering(S))
+         deg = is_degree(ordering(S))
+         rev = is_reverse(ordering(S))
 
          @test ord == ordering(S)
 
@@ -181,8 +181,8 @@ end
 
          @test iszero(zero(S))
 
-         @test isconstant(S(rand(-100:100)))
-         @test isconstant(S(zero(S)))
+         @test is_constant(S(rand(-100:100)))
+         @test is_constant(S(zero(S)))
 
          g = S()
          while g == 0
@@ -198,14 +198,14 @@ end
             h2 = rand(S, 2:2, 1:100)
          end
 
-         @test isterm(h)
-         @test !isterm(h2 + 1 + gen(S, 1))
+         @test is_term(h)
+         @test !is_term(h2 + 1 + gen(S, 1))
 
-         @test isunit(S(1))
-         @test !isunit(gen(S, 1))
+         @test is_unit(S(1))
+         @test !is_unit(gen(S, 1))
 
-         @test ismonomial(gen(S, 1)*gen(S, num_vars))
-         @test !ismonomial(2*gen(S, 1)*gen(S, num_vars))
+         @test is_monomial(gen(S, 1)*gen(S, num_vars))
+         @test !is_monomial(2*gen(S, 1)*gen(S, num_vars))
 
          monomialexp = unique([Int[rand(0:10) for j in 1:num_vars] for k in 1:10])
          coeffs = [rand(R) for k in 1:length(monomialexp)]
@@ -517,7 +517,7 @@ end
             if !iszero(h) && !iszero(g1)
                b, q = divides(g2, g1 * h)
                @test b
-               @test isconstant(q)
+               @test is_constant(q)
             end
          end
       end
@@ -557,15 +557,15 @@ end
             g = sqrt(f^2)
 
             @test g^2 == f^2
-            @test issquare(f^2)
+            @test is_square(f^2)
 
-            b, sf = issquare_with_sqrt(f^2)
+            b, sf = is_square_with_sqrt(f^2)
             @test b && (sf == f || sf == -f)
 
             if f != 0
                x = varlist[rand(1:num_vars)]
                @test_throws ErrorException sqrt(f^2*(x^2 - x))
-               @test !issquare(f^2*(x^2 - x))
+               @test !is_square(f^2*(x^2 - x))
             end
          end
       end
@@ -637,7 +637,7 @@ end
          for iter = 1:100
             f = S()
             g = S()
-            while f == 0 || g == 0 || isconstant(g)
+            while f == 0 || g == 0 || is_constant(g)
                f = rand(S, 0:5, 0:100)
                g = rand(S, 0:5, 0:100)
             end

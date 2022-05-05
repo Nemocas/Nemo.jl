@@ -227,7 +227,7 @@ end
 
   @test_throws ErrorException one(MatrixSpace(GF(ZZ(2)), 1, 2))
 
-  @test issquare(a)
+  @test is_square(a)
 
   @test a == a
   @test a == deepcopy(a)

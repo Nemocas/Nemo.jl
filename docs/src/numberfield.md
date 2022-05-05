@@ -141,7 +141,7 @@ var(::AnticNumberField)
 ```
 
 ```@docs
-isgen(::nf_elem)
+is_gen(::nf_elem)
 ```
 
 ```@docs
@@ -166,7 +166,7 @@ d = a^2 + 2a - 7
 m = gen(K)
 
 c = coeff(d, 1)
-isgen(m)
+is_gen(m)
 q = degree(K)
 r, s = signature(K)
 v = var(R)

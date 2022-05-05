@@ -262,7 +262,7 @@ end
 
   @test_throws ErrorException one(MatrixSpace(GF(2), 1, 2))
 
-  @test issquare(a)
+  @test is_square(a)
 
   @test a == a
   @test a == deepcopy(a)
@@ -461,7 +461,7 @@ end
     M = rand(S)
     r, N = rref(M)
 
-    @test isrref(N)
+    @test is_rref(N)
   end
 
   Z17 = GF(17)

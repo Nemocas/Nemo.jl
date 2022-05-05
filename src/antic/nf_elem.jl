@@ -40,7 +40,7 @@ Returns `Union{}` since a number field doesn't depend on any ring.
 """
 base_ring(a::nf_elem) = Union{}
 
-isdomain_type(::Type{nf_elem}) = true
+is_domain_type(::Type{nf_elem}) = true
 
 @doc Markdown.doc"""
     var(a::AnticNumberField)
@@ -150,12 +150,12 @@ function zero(a::AnticNumberField)
 end
 
 @doc Markdown.doc"""
-    isgen(a::nf_elem)
+    is_gen(a::nf_elem)
 
 Return `true` if the given number field element is the generator of the
 number field, otherwise return `false`.
 """
-function isgen(a::nf_elem)
+function is_gen(a::nf_elem)
    return ccall((:nf_elem_is_gen, libantic), Bool,
                 (Ref{nf_elem}, Ref{AnticNumberField}), a, a.parent)
 end
@@ -183,12 +183,12 @@ function iszero(a::nf_elem)
 end
 
 @doc Markdown.doc"""
-    isunit(a::nf_elem)
+    is_unit(a::nf_elem)
 
 Return `true` if the given number field element is invertible, i.e. nonzero,
 otherwise return `false`.
 """
-isunit(a::nf_elem) = !iszero(a)
+is_unit(a::nf_elem) = !iszero(a)
 
 @doc Markdown.doc"""
     isinteger(a::nf_elem)

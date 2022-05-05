@@ -192,12 +192,12 @@ end
 
    @test ispositive(RR(3))
    @test isnonnegative(RR(3))
-   @test isnegative(RR(-3))
+   @test is_negative(RR(-3))
    @test isnonpositive(RR(-3))
 
    @test !ispositive(RR(0))
    @test isnonnegative(RR(0))
-   @test !isnegative(RR(0))
+   @test !is_negative(RR(0))
    @test isnonpositive(RR(0))
 end
 

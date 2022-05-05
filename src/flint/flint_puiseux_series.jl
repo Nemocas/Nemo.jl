@@ -54,11 +54,11 @@ max_precision(R::FlintPuiseuxSeriesRing{T}) where T <: RingElem = max_precision(
 
 max_precision(R::FlintPuiseuxSeriesField{T}) where T <: FieldElem = max_precision(laurent_ring(R))
 
-function isdomain_type(::Type{T}) where {S <: RingElem, T <: FlintPuiseuxSeriesElem{S}}
-   return isdomain_type(S)
+function is_domain_type(::Type{T}) where {S <: RingElem, T <: FlintPuiseuxSeriesElem{S}}
+   return is_domain_type(S)
 end
 
-isexact_type(a::Type{T}) where T <: FlintPuiseuxSeriesElem = false
+is_exact_type(a::Type{T}) where T <: FlintPuiseuxSeriesElem = false
 
 function check_parent(a::FlintPuiseuxSeriesElem, b::FlintPuiseuxSeriesElem)
    parent(a) != parent(b) &&
@@ -144,23 +144,23 @@ function isone(a::FlintPuiseuxSeriesElem)
 end
 
 @doc Markdown.doc"""
-    isgen(a::FlintPuiseuxSeriesElem)
+    is_gen(a::FlintPuiseuxSeriesElem)
 
 Return `true` if the given Puiseux series is arithmetically equal to the
 generator of its Puiseux series ring to its current precision, otherwise return
 `false`.
 """
-function isgen(a::FlintPuiseuxSeriesElem)
+function is_gen(a::FlintPuiseuxSeriesElem)
    return valuation(a) == 1 && pol_length(a.data) == 1 && isone(polcoeff(a.data, 0))
 end
 
 @doc Markdown.doc"""
-    isunit(a::FlintPuiseuxSeriesElem)
+    is_unit(a::FlintPuiseuxSeriesElem)
 
 Return `true` if the given Puiseux series is arithmetically equal to a unit,
 i.e. is invertible, otherwise return `false`.
 """
-isunit(a::FlintPuiseuxSeriesElem) = valuation(a) == 0 && isunit(polcoeff(a.data, 0))
+is_unit(a::FlintPuiseuxSeriesElem) = valuation(a) == 0 && is_unit(polcoeff(a.data, 0))
 
 @doc Markdown.doc"""
     modulus(a::FlintPuiseuxSeriesElem)

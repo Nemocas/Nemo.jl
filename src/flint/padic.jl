@@ -76,9 +76,9 @@ base_ring(a::padic) = Union{}
 
 parent(a::padic) = a.parent
 
-isdomain_type(::Type{padic}) = true
+is_domain_type(::Type{padic}) = true
 
-isexact_type(R::Type{padic}) = false
+is_exact_type(R::Type{padic}) = false
 
 function check_parent(a::padic, b::padic)
    parent(a) != parent(b) &&
@@ -180,7 +180,7 @@ iszero(a::padic) = Bool(ccall((:padic_is_zero, libflint), Cint,
 isone(a::padic) = Bool(ccall((:padic_is_one, libflint), Cint,
                              (Ref{padic},), a))
 
-isunit(a::padic) = !Bool(ccall((:padic_is_zero, libflint), Cint,
+is_unit(a::padic) = !Bool(ccall((:padic_is_zero, libflint), Cint,
                               (Ref{padic},), a))
 
 characteristic(R::FlintPadicField) = 0

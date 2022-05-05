@@ -16,7 +16,7 @@ base_ring(a::FlintZZiRing) = FlintZZ
 
 base_ring(a::fmpzi) = FlintZZ
 
-isdomain_type(::Type{fmpzi}) = true
+is_domain_type(::Type{fmpzi}) = true
 
 characteristic(a::FlintZZiRing) = 0
 
@@ -532,12 +532,12 @@ function divexact(a::fmpzi, b::Union{Integer, fmpz, fmpzi}; check=true)
    end
 end
 
-function isunit(a::fmpzi)
-   return iszero(a.y) && isunit(a.x) || iszero(a.x) && isunit(a.y)
+function is_unit(a::fmpzi)
+   return iszero(a.y) && is_unit(a.x) || iszero(a.x) && is_unit(a.y)
 end
 
 function inv(a::fmpzi)
-   isunit(a) || error("not invertible")
+   is_unit(a) || error("not invertible")
    return fmpzi(a.x, -a.y)
 end
 
@@ -638,7 +638,7 @@ function gcdinv(a::fmpzi, b::fmpzi)
 end
 
 function remove(a::fmpzi, b::fmpzi)
-   if (iszero(b) || isunit(b))
+   if (iszero(b) || is_unit(b))
       throw(ArgumentError("Second argument must be a non-zero non-unit"))
    end
    if iszero(a)
@@ -794,7 +794,7 @@ end
 function _sum_of_squares(p::fmpz)
    @assert isone(mod(p, UInt(4)))
    x = fmpz(2542238945270620497)
-   while !isdivisible_by(x^2+1, p)
+   while !is_divisible_by(x^2+1, p)
       x = powermod(rand(fmpz(2):(p-2)), div(p-1,4), p)
    end
    return gcd(fmpzi(x, 1), p)
@@ -823,13 +823,13 @@ function factor(a::fmpzi)
    end
    for (p, e) in factor(abs2(f.unit))
       c1 = _sum_of_squares(p)
-      if !isdivisible_by(f.unit, c1)
+      if !is_divisible_by(f.unit, c1)
          c1 = conj(c1)
       end
       f.unit = divexact(f.unit, c1^e)
       addeqindex!(f, e, c1)
    end
-   @assert isunit(f.unit)
+   @assert is_unit(f.unit)
    return f
 end
 

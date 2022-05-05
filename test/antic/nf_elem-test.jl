@@ -114,7 +114,7 @@ end
 
    @test iszero(zero(K))
    @test isone(one(K))
-   @test isgen(gen(K))
+   @test is_gen(gen(K))
 
    @test deepcopy(d) == d
 

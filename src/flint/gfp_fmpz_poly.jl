@@ -251,7 +251,7 @@ end
 #
 ################################################################################
 
-function isirreducible(x::gfp_fmpz_poly)
+function is_irreducible(x::gfp_fmpz_poly)
   return Bool(ccall((:fmpz_mod_poly_is_irreducible, libflint), Cint,
                     (Ref{gfp_fmpz_poly}, Ref{fmpz_mod_ctx_struct}),
                     x, x.parent.base_ring.ninv))
@@ -263,7 +263,7 @@ end
 #
 ################################################################################
 
-function issquarefree(x::gfp_fmpz_poly)
+function is_squarefree(x::gfp_fmpz_poly)
    return Bool(ccall((:fmpz_mod_poly_is_squarefree, libflint), Cint,
                      (Ref{gfp_fmpz_poly}, Ref{fmpz_mod_ctx_struct}),
                      x, x.parent.base_ring.ninv))
@@ -331,7 +331,7 @@ end
 Return the distinct degree factorisation of a squarefree polynomial $x$.
 """
 function factor_distinct_deg(x::gfp_fmpz_poly)
-  !issquarefree(x) && error("Polynomial must be squarefree")
+  !is_squarefree(x) && error("Polynomial must be squarefree")
   degs = Vector{Int}(undef, degree(x))
   degss = [ pointer(degs) ]
   n = x.parent.base_ring.ninv

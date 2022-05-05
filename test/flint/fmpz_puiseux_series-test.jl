@@ -62,13 +62,13 @@ end
    @test coeff(a, 1//3) == 2
    @test coeff(a, 1//4) == 0
 
-   @test isgen(gen(S))
+   @test is_gen(gen(S))
 
    @test iszero(zero(S))
 
    @test isone(one(S))
 
-   @test isunit(-1 + x + 2x^2)
+   @test is_unit(-1 + x + 2x^2)
 
    @test isequal(deepcopy(a), a)
    @test isequal(deepcopy(b), b)
@@ -196,7 +196,7 @@ end
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       f = R()
-      while iszero(f) || !isunit(coeff(f, valuation(f)))
+      while iszero(f) || !is_unit(coeff(f, valuation(f)))
          f = rand(R, -12:12, 1:6, -10:10)
       end
 
@@ -221,7 +221,7 @@ end
    for iter = 1:300
       f = rand(R, -12:12, 1:6, -10:10)
       g = rand(R, -12:12, 1:6, -10:10)
-      while iszero(g) || !isunit(coeff(g, valuation(g)))
+      while iszero(g) || !is_unit(coeff(g, valuation(g)))
          g = rand(R, -12:12, 1:6, -10:10)
       end
 

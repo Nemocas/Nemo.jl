@@ -248,7 +248,7 @@ hnf_modular_eldiv(::fmpz_mat, ::fmpz)
 ```
 
 ```@docs
-ishnf(::fmpz_mat)
+is_hnf(::fmpz_mat)
 ```
 
 **Examples**
@@ -262,7 +262,7 @@ B = hnf(A)
 H, T = hnf_with_transform(A)
 M = hnf_modular(A, fmpz(27))
 N = hnf_modular_eldiv(A, fmpz(27))
-ishnf(M)
+is_hnf(M)
 ```
 
 ### Lattice basis reduction
@@ -338,7 +338,7 @@ snf_diagonal(::fmpz_mat)
 ```
 
 ```@docs
-issnf(::fmpz_mat)
+is_snf(::fmpz_mat)
 ```
 
 **Examples**
@@ -349,7 +349,7 @@ S = MatrixSpace(ZZ, 3, 3)
 A = S([fmpz(2) 3 5; 1 4 7; 19 3 7])
 
 B = snf(A)
-issnf(B) == true
+is_snf(B) == true
 
 B = S([fmpz(2) 0 0; 0 4 0; 0 0 7])
 

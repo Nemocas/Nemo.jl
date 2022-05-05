@@ -84,9 +84,9 @@ end
 
    @test isone(one(S))
 
-   @test isgen(gen(S))
+   @test is_gen(gen(S))
 
-   @test isunit(one(S))
+   @test is_unit(one(S))
 
    f = 2x*y + x^2 + 1
 
@@ -455,28 +455,28 @@ end
    @test deflate(inflate(f, 3), 3) == f
 end
 
-@testset "fq_nmod_poly.isirreducible" begin
+@testset "fq_nmod_poly.is_irreducible" begin
   R, a = FiniteField(23, 1, "a")
   Rx, x = PolynomialRing(R, "x")
 
   f = x^6 + x^4 + 2 *x^2
 
-  @test !isirreducible(f)
+  @test !is_irreducible(f)
 
-  @test isirreducible(x)
+  @test is_irreducible(x)
 
-  @test isirreducible(x^16+2*x^9+x^8+x^2+x+1)
+  @test is_irreducible(x^16+2*x^9+x^8+x^2+x+1)
 end
 
-@testset "fq_nmod_poly.issquarefree" begin
+@testset "fq_nmod_poly.is_squarefree" begin
   R, x = FiniteField(23, 5, "x")
   S, y = PolynomialRing(R, "y")
 
   f = y^6 + y^4 + 2 *y^2
 
-  @test !issquarefree(f)
+  @test !is_squarefree(f)
 
-  @test issquarefree((y+1)*(y+2)*(y+3))
+  @test is_squarefree((y+1)*(y+2)*(y+3))
 end
 
 @testset "fq_nmod_poly.factor" begin

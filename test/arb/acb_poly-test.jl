@@ -61,9 +61,9 @@ end
 
    @test isone(one(R))
 
-   @test isgen(gen(R))
+   @test is_gen(gen(R))
 
-   # @test isunit(one(R))
+   # @test is_unit(one(R))
 
    f = x^2 + 2x + 1
 

@@ -68,7 +68,7 @@ isone(x::fq_nmod_poly) = ccall((:fq_nmod_poly_is_one, libflint), Bool,
                               (Ref{fq_nmod_poly}, Ref{FqNmodFiniteField}),
                               x, base_ring(x.parent))
 
-isgen(x::fq_nmod_poly) = ccall((:fq_nmod_poly_is_gen, libflint), Bool,
+is_gen(x::fq_nmod_poly) = ccall((:fq_nmod_poly_is_gen, libflint), Bool,
                               (Ref{fq_nmod_poly}, Ref{FqNmodFiniteField}),
                               x, base_ring(x.parent))
 
@@ -582,7 +582,7 @@ end
 #
 ################################################################################
 
-function isirreducible(x::fq_nmod_poly)
+function is_irreducible(x::fq_nmod_poly)
   return Bool(ccall((:fq_nmod_poly_is_irreducible, libflint), Int32,
                     (Ref{fq_nmod_poly}, Ref{FqNmodFiniteField} ),
                     x, base_ring(parent(x))))
@@ -594,7 +594,7 @@ end
 #
 ################################################################################
 
-function issquarefree(x::fq_nmod_poly)
+function is_squarefree(x::fq_nmod_poly)
    return Bool(ccall((:fq_nmod_poly_is_squarefree, libflint), Int32,
        (Ref{fq_nmod_poly}, Ref{FqNmodFiniteField}), x, base_ring(parent(x))))
 end

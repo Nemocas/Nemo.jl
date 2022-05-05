@@ -26,7 +26,7 @@ function check_parent(a::gfp_fmpz_elem, b::gfp_fmpz_elem)
    a.parent != b.parent && error("Operations on distinct residue rings not supported")
 end
 
-isdomain_type(::Type{gfp_fmpz_elem}) = true
+is_domain_type(::Type{gfp_fmpz_elem}) = true
 
 ###############################################################################
 #
@@ -59,7 +59,7 @@ function one(R::GaloisFmpzField)
    end
 end
 
-isunit(a::gfp_fmpz_elem) = a.data != 0
+is_unit(a::gfp_fmpz_elem) = a.data != 0
 
 modulus(R::GaloisFmpzField) = R.n
 
@@ -310,7 +310,7 @@ function Base.sqrt(a::gfp_fmpz_elem; check::Bool=true)
    return gfp_fmpz_elem(z, R)
 end
 
-function issquare(a::gfp_fmpz_elem)
+function is_square(a::gfp_fmpz_elem)
    R = parent(a)
    if iszero(a) || R.n == 2
       return true
@@ -320,7 +320,7 @@ function issquare(a::gfp_fmpz_elem)
    return isone(r)
 end
 
-function issquare_with_sqrt(a::gfp_fmpz_elem)
+function is_square_with_sqrt(a::gfp_fmpz_elem)
    R = parent(a)
    if iszero(a) || R.n == 2
       return true, a
@@ -444,7 +444,7 @@ function (R::GaloisFmpzField)(a::Union{gfp_elem, nmod, gfp_fmpz_elem, fmpz_mod})
    if S === R
       return a
    else
-      isdivisible_by(modulus(S), modulus(R)) || error("incompatible parents")
+      is_divisible_by(modulus(S), modulus(R)) || error("incompatible parents")
       return R(data(a))
    end
 end
@@ -457,6 +457,6 @@ end
 
 function GF(n::fmpz; cached::Bool=true)
    (n <= 0) && throw(DomainError(n, "Characteristic must be positive"))
-   !isprobable_prime(n) && throw(DomainError(n, "Characteristic must be prime"))
+   !is_probable_prime(n) && throw(DomainError(n, "Characteristic must be prime"))
    return GaloisFmpzField(n, cached)
 end

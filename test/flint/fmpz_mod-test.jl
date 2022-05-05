@@ -69,8 +69,8 @@ end
 
    @test modulus(R) == UInt(13)
 
-   @test !isunit(R())
-   @test isunit(R(3))
+   @test !is_unit(R())
+   @test is_unit(R(3))
 
    @test deepcopy(R(3)) == R(3)
 
@@ -84,7 +84,7 @@ end
 
    @test modulus(S) == UInt(1)
 
-   @test isunit(S())
+   @test is_unit(S())
 
    @test characteristic(R) == 13
 
@@ -234,7 +234,7 @@ end
          a = R(1)
 
          r = rand(R)
-         while !isunit(r)
+         while !is_unit(r)
             r = rand(R)
          end
 
@@ -267,7 +267,7 @@ end
          a = R(1)
 
          r = rand(R)
-         while !isunit(r)
+         while !is_unit(r)
             r = rand(R)
          end
 
@@ -353,9 +353,9 @@ end
       for iter = 1:100
          a = rand(R)
 
-         @test !isunit(a) || inv(inv(a)) == a
+         @test !is_unit(a) || inv(inv(a)) == a
 
-         @test !isunit(a) || a*inv(a) == one(R)
+         @test !is_unit(a) || a*inv(a) == one(R)
       end
    end
 
@@ -365,9 +365,9 @@ end
       for iter = 1:100
          a = rand(R)
 
-         @test !isunit(a) || inv(inv(a)) == a
+         @test !is_unit(a) || inv(inv(a)) == a
 
-         @test !isunit(a) || a*inv(a) == one(R)
+         @test !is_unit(a) || a*inv(a) == one(R)
       end
    end
 end

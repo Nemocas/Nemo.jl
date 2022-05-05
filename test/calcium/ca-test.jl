@@ -4,7 +4,7 @@
    @test elem_type(C) == ca
    @test elem_type(CalciumField) == ca
    @test parent_type(ca) == CalciumField
-   @test isdomain_type(ca) == true
+   @test is_domain_type(ca) == true
    @test base_ring(C) == Union{}      # ?
    @test base_ring(C(3)) == Union{}      # ?
 

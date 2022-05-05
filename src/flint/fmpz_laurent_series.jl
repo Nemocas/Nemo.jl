@@ -34,9 +34,9 @@ base_ring(R::FmpzLaurentSeriesRing) = R.base_ring
 
 base_ring(a::fmpz_laurent_series) = base_ring(parent(a))
 
-isdomain_type(::Type{fmpz_laurent_series}) = true
+is_domain_type(::Type{fmpz_laurent_series}) = true
 
-isexact_type(a::Type{fmpz_laurent_series}) = false
+is_exact_type(a::Type{fmpz_laurent_series}) = false
 
 var(a::FmpzLaurentSeriesRing) = a.S
 
@@ -264,23 +264,23 @@ function isone(a::fmpz_laurent_series)
 end
 
 @doc Markdown.doc"""
-    isgen(a::fmpz_laurent_series)
+    is_gen(a::fmpz_laurent_series)
 
 Return `true` if the given power series is arithmetically equal to the
 generator of its power series ring to its current precision, otherwise return
 `false`.
 """
-function isgen(a::fmpz_laurent_series)
+function is_gen(a::fmpz_laurent_series)
    return valuation(a) == 1 && pol_length(a) == 1 && isone(polcoeff(a, 0))
 end
 
 @doc Markdown.doc"""
-    isunit(a::fmpz_laurent_series)
+    is_unit(a::fmpz_laurent_series)
 
 Return `true` if the given power series is arithmetically equal to a unit,
 i.e. is invertible, otherwise return `false`.
 """
-isunit(a::fmpz_laurent_series) = valuation(a) == 0 && isunit(polcoeff(a, 0))
+is_unit(a::fmpz_laurent_series) = valuation(a) == 0 && is_unit(polcoeff(a, 0))
 
 function deepcopy_internal(a::fmpz_laurent_series, dict::IdDict)
    d = fmpz_laurent_series(a)
@@ -681,7 +681,7 @@ function ^(a::fmpz_laurent_series, b::Int)
       # in fact, the result would be exact 1 if we had exact series
       z = one(parent(a))
       return z
-   elseif isgen(a)
+   elseif is_gen(a)
       z = parent(a)()
       z = set_precision!(z, b + precision(a) - 1)
       z = set_valuation!(z, b)
@@ -928,7 +928,7 @@ function inv(a::fmpz_laurent_series)
    ainv = set_precision!(ainv, precision(a) - 2*valuation(a))
    ainv = set_valuation!(ainv, -valuation(a))
    ainv = set_scale!(ainv, sa)
-   !isunit(a1) && error("Unable to invert power series")
+   !is_unit(a1) && error("Unable to invert power series")
    z = parent(a)()
    ccall((:fmpz_poly_inv_series, libflint), Nothing,
                 (Ref{fmpz_laurent_series}, Ref{fmpz_laurent_series}, Int),
@@ -947,7 +947,7 @@ function sqrt(a::fmpz_laurent_series; check::Bool=true)
    aval = valuation(a)
    check && !iseven(aval) && error("Not a square in sqrt")
    R = base_ring(a)
-   !isdomain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
+   !is_domain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
    aval2 = div(aval, 2)
    prec = precision(a) - aval
    if prec == 0

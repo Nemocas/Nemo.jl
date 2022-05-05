@@ -101,9 +101,9 @@ end
 
    @test isone(one(S))
 
-   @test isgen(gen(S))
+   @test is_gen(gen(S))
 
-   @test isunit(one(S))
+   @test is_unit(one(S))
 
    f = 2y + fmpz(11)//7 + 1
 
@@ -505,7 +505,7 @@ end
 
    for i = 1:1000
       f = rand(R, -1:4, -5:5)
-      while issquare(f)
+      while is_square(f)
          f = rand(R, -1:4, -5:5)
       end
 
@@ -519,20 +519,20 @@ end
          @test_throws ErrorException sqrt(f*g)
       end
 
-      @test issquare(g)
+      @test is_square(g)
 
-      f0, s0 = issquare_with_sqrt(g)
+      f0, s0 = is_square_with_sqrt(g)
 
       @test f0 && s0^2 == g
 
-      @test iszero(g) || !issquare(-g)
-      @test iszero(g) || !issquare(f*g)
+      @test iszero(g) || !is_square(-g)
+      @test iszero(g) || !is_square(f*g)
 
-      f1, s1 = issquare_with_sqrt(-g)
+      f1, s1 = is_square_with_sqrt(-g)
 
       @test iszero(g) || !f1
 
-      f2, s2 = issquare_with_sqrt(f*g)
+      f2, s2 = is_square_with_sqrt(f*g)
 
       @test iszero(g) || !f2
    end

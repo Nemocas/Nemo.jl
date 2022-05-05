@@ -73,7 +73,7 @@ end
 @testset "fmpzi.Euclidean" begin
    @test_throws Exception invmod(ZZi(1,1), ZZi(2))
    m = ZZi(3)
-   @test isdivisible_by(invmod(ZZi(1,1), m) - powermod(ZZi(1,1), -1, m), m)
+   @test is_divisible_by(invmod(ZZi(1,1), m) - powermod(ZZi(1,1), -1, m), m)
    @test_throws Exception remove(ZZi(1), ZZi(0))
    @test remove(ZZi(0), ZZi(2)) == (0, ZZi(0))
    @test remove(ZZi(-10,-2), ZZi(1,1)) == (3, ZZi(2,3))

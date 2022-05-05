@@ -84,7 +84,7 @@ gen(::FqFiniteField)
 ```
 
 ```@docs
-isgen(::fq)
+is_gen(::fq)
 ```
 
 ```@docs
@@ -108,7 +108,7 @@ c = gen(R)
 d = characteristic(R)
 f = order(R)
 g = degree(R)
-n = isgen(x)
+n = is_gen(x)
 ```
 
 ### Special functions

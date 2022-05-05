@@ -12,7 +12,7 @@ import Base: ceil, isinteger
 export add_error!, ball, radius, midpoint, contains, contains_zero, contains_negative,
        contains_positive, contains_nonnegative, contains_nonpositive, convert,
        iszero, isnonzero, isexact, ispositive, isfinite, isnonnegative,
-       isnegative, isnonpositive, add!, mul!, sub!, div!, overlaps,
+       is_negative, isnonpositive, add!, mul!, sub!, div!, overlaps,
        unique_integer, accuracy_bits, trim, ldexp, setunion, setintersection,
        const_pi, const_e, const_log2, const_log10, const_euler, const_catalan,
        const_khinchin, const_glaisher, floor, ceil, hypot, rsqrt, sqrt1pm1,
@@ -41,9 +41,9 @@ base_ring(x::arb) = Union{}
 
 parent(x::arb) = x.parent
 
-isdomain_type(::Type{arb}) = true
+is_domain_type(::Type{arb}) = true
 
-isexact_type(::Type{arb}) = false
+is_exact_type(::Type{arb}) = false
 
 zero(R::ArbField) = R(0)
 
@@ -206,7 +206,7 @@ function native_string(x::arb)
 end
 
 function expressify(x::arb; context = nothing)
-   if isexact(x) && isnegative(x)
+   if isexact(x) && is_negative(x)
       # TODO isexact does not imply it is printed without radius
       return Expr(:call, :-, native_string(-x))
    else
@@ -512,7 +512,7 @@ end
 #
 ################################################################################
 
-function isunit(x::arb)
+function is_unit(x::arb)
    !iszero(x)
 end
 
@@ -593,11 +593,11 @@ function isnonnegative(x::arb)
 end
 
 @doc Markdown.doc"""
-    isnegative(x::arb)
+    is_negative(x::arb)
 
 Return `true` if $x$ is certainly negative, otherwise return `false`.
 """
-function isnegative(x::arb)
+function is_negative(x::arb)
    return Bool(ccall((:arb_is_negative, libarb), Cint, (Ref{arb},), x))
 end
 

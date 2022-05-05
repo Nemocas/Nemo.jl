@@ -64,7 +64,7 @@ function gen(R::FmpqMPolyRing, i::Int)
    return z
 end
 
-function isgen(a::fmpq_mpoly, i::Int)
+function is_gen(a::fmpq_mpoly, i::Int)
    n = nvars(parent(a))
    (i <= 0 || i > n) && error("Index must be between 1 and $n")
    R = parent(a)
@@ -73,10 +73,10 @@ function isgen(a::fmpq_mpoly, i::Int)
                      a, i - 1, a.parent))
 end
 
-function isgen(a::fmpq_mpoly)
+function is_gen(a::fmpq_mpoly)
    n = nvars(parent(a))
    for i in 1:n
-      isgen(a, i) && return true
+      is_gen(a, i) && return true
    end
    return false
 end
@@ -120,19 +120,19 @@ function iszero(a::fmpq_mpoly)
    return Bool(b)
 end
 
-function ismonomial(a::fmpq_mpoly)
+function is_monomial(a::fmpq_mpoly)
    return length(a) == 1 && coeff(a, 1) == 1
 end
 
-function isterm(a::fmpq_mpoly)
+function is_term(a::fmpq_mpoly)
    return length(a) == 1
 end
 
-function isunit(a::fmpq_mpoly)
-   return length(a) == 1 && total_degree(a) == 0 && isunit(coeff(a, 1))
+function is_unit(a::fmpq_mpoly)
+   return length(a) == 1 && total_degree(a) == 0 && is_unit(coeff(a, 1))
 end
 
-function isconstant(a::fmpq_mpoly)
+function is_constant(a::fmpq_mpoly)
    b = ccall((:fmpq_mpoly_is_fmpq, libflint), Cint,
              (Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}), a, parent(a))
    return Bool(b)
@@ -536,18 +536,18 @@ end
 
 
 function sqrt(a::fmpq_mpoly; check::Bool=true)
-   (flag, q) = issquare_with_sqrt(a)
+   (flag, q) = is_square_with_sqrt(a)
    check && !flag && error("Not a square")
    return q
 end
 
-function issquare(a::fmpq_mpoly)
+function is_square(a::fmpq_mpoly)
    return Bool(ccall((:fmpq_mpoly_is_square, libflint), Cint,
                      (Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
                      a, a.parent))
 end
 
-function issquare_with_sqrt(a::fmpq_mpoly)
+function is_square_with_sqrt(a::fmpq_mpoly)
    q = parent(a)()
    flag = ccall((:fmpq_mpoly_sqrt, libflint), Cint,
                 (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
@@ -569,7 +569,7 @@ function ==(a::fmpq_mpoly, b::fmpq_mpoly)
 end
 
 function Base.isless(a::fmpq_mpoly, b::fmpq_mpoly)
-   (!ismonomial(a) || !ismonomial(b)) && error("Not monomials in comparison")
+   (!is_monomial(a) || !is_monomial(b)) && error("Not monomials in comparison")
    return ccall((:fmpq_mpoly_cmp, libflint), Cint,
                (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
                a, b, a.parent) < 0

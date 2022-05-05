@@ -97,7 +97,7 @@ numerator(::fmpz)
 ```
 a = ZZ(12)
 
-isunit(a)
+is_unit(a)
 sign(a)
 s = size(a)
 fits(Int, a)
@@ -316,7 +316,7 @@ divisible(::fmpz, ::fmpz)
 ```
 
 ```@docs
-issquare(::fmpz)
+is_square(::fmpz)
 ```
 
 ```@docs
@@ -324,7 +324,7 @@ isprime(::fmpz)
 ```
 
 ```@docs
-isprobable_prime(::fmpz)
+is_probable_prime(::fmpz)
 ```
 
 ```@docs
@@ -509,7 +509,7 @@ called `FlintZZi` or `ZZi`, and the fraction field is called `FlintQQi` or
 a = ZZ(5)*im
 b = ZZi(3, 4)
 
-isunit(a)
+is_unit(a)
 factor(a)
 a//b
 abs2(a//b)

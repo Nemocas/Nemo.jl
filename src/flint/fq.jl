@@ -23,7 +23,7 @@ base_ring(a::fq) = Union{}
 
 parent(a::fq) = a.parent
 
-isdomain_type(::Type{fq}) = true
+is_domain_type(::Type{fq}) = true
 
 function check_parent(a::fq, b::fq)
    a.parent != b.parent && error("Operations on distinct finite fields not supported")
@@ -93,14 +93,14 @@ isone(a::fq) = ccall((:fq_is_one, libflint), Bool,
                     (Ref{fq}, Ref{FqFiniteField}), a, a.parent)
 
 @doc Markdown.doc"""
-    isgen(a::fq)
+    is_gen(a::fq)
 
 Return `true` if the given finite field element is the generator of the
 finite field, otherwise return `false`.
 """
-isgen(a::fq) = a == gen(parent(a))
+is_gen(a::fq) = a == gen(parent(a))
 
-isunit(a::fq) = ccall((:fq_is_invertible, libflint), Bool,
+is_unit(a::fq) = ccall((:fq_is_invertible, libflint), Bool,
                      (Ref{fq}, Ref{FqFiniteField}), a, a.parent)
 
 function characteristic(a::FqFiniteField)
@@ -380,13 +380,13 @@ function sqrt(x::fq; check::Bool=true)
    return z
 end
 
-function issquare(x::fq)
+function is_square(x::fq)
    return Bool(ccall((:fq_is_square, libflint), Cint,
                      (Ref{fq}, Ref{FqFiniteField}),
                      x, x.parent))
 end
 
-function issquare_with_sqrt(x::fq)
+function is_square_with_sqrt(x::fq)
    z = parent(x)()
    flag = ccall((:fq_sqrt, libflint), Cint,
                 (Ref{fq}, Ref{fq}, Ref{FqFiniteField}),

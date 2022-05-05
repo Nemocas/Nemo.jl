@@ -504,11 +504,11 @@ end
 
    M = hnf_modular(A, fmpz(27))
 
-   @test ishnf(M)
+   @test is_hnf(M)
 
    MM = hnf_modular_eldiv(B, fmpz(4))
 
-   @test ishnf(MM)
+   @test is_hnf(MM)
    @test S([1 0 0; 0 2 0; 0 0 4]) == MM
 end
 
@@ -579,12 +579,12 @@ end
       M = rand(S, -100:100)
       r, N, d = rref_rational(M)
 
-      @test isrref(N)
+      @test is_rref(N)
 
       N2 = change_base_ring(QQ, N)
       N2 = divexact(N2, d)
 
-      @test isrref(N2)
+      @test is_rref(N2)
    end 
 
    S = MatrixSpace(FlintZZ, 3, 3)
@@ -604,11 +604,11 @@ end
 
    @test snf(A) == S([1 0 0; 0 1 0; 0 0 27])
 
-   @test issnf(snf(A))
+   @test is_snf(snf(A))
 
    B = S([fmpz(2) 0 0; 0 4 0; 0 0 7])
 
-   @test issnf(snf_diagonal(B))
+   @test is_snf(snf_diagonal(B))
 end
 
 @testset "fmpz_mat.solve_rational" begin

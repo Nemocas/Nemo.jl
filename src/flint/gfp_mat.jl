@@ -155,7 +155,7 @@ end
 ################################################################################
 
 function det(a::gfp_mat)
-  !issquare(a) && error("Matrix must be a square matrix")
+  !is_square(a) && error("Matrix must be a square matrix")
   r = ccall((:nmod_mat_det, libflint), UInt, (Ref{gfp_mat}, ), a)
   return base_ring(a)(r)
 end
@@ -279,7 +279,7 @@ promote_rule(::Type{gfp_mat}, ::Type{fmpz}) = gfp_mat
 ################################################################################
 
 function inv(a::gfp_mat)
-  !issquare(a) && error("Matrix must be a square matrix")
+  !is_square(a) && error("Matrix must be a square matrix")
   z = similar(a)
   r = ccall((:nmod_mat_inv, libflint), Int,
           (Ref{gfp_mat}, Ref{gfp_mat}), z, a)

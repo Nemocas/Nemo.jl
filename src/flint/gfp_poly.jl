@@ -344,7 +344,7 @@ end
 #
 ################################################################################
 
-function isirreducible(x::gfp_poly)
+function is_irreducible(x::gfp_poly)
   return Bool(ccall((:nmod_poly_is_irreducible, libflint), Int32,
           (Ref{gfp_poly}, ), x))
 end
@@ -355,7 +355,7 @@ end
 #
 ################################################################################
 
-function issquarefree(x::gfp_poly)
+function is_squarefree(x::gfp_poly)
    return Bool(ccall((:nmod_poly_is_squarefree, libflint), Int32,
        (Ref{gfp_poly}, ), x))
 end
@@ -375,7 +375,7 @@ function sqrt(x::gfp_poly; check::Bool=true)
    return s
 end
 
-function issquare(x::gfp_poly)
+function is_square(x::gfp_poly)
    if iszero(x)
       return true
    end
@@ -389,7 +389,7 @@ function issquare(x::gfp_poly)
    return flag
 end
 
-function issquare_with_sqrt(x::gfp_poly)
+function is_square_with_sqrt(x::gfp_poly)
    R = parent(x)
    if iszero(x)
       return true, zero(R)
@@ -454,7 +454,7 @@ end
 Return the distinct degree factorisation of a squarefree polynomial $x$.
 """
 function factor_distinct_deg(x::gfp_poly)
-  !issquarefree(x) && error("Polynomial must be squarefree")
+  !is_squarefree(x) && error("Polynomial must be squarefree")
   degs = Vector{Int}(undef, degree(x))
   degss = [ pointer(degs) ]
   fac = gfp_poly_factor(x.mod_n)

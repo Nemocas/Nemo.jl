@@ -258,7 +258,7 @@ end
 
   @test_throws ErrorException one(MatrixSpace(F9, 1, 2))
 
-  @test issquare(a)
+  @test is_square(a)
 
   @test a == a
   @test a == deepcopy(a)

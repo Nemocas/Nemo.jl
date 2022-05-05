@@ -67,7 +67,7 @@ end
       cf1, m1 = continued_fraction_with_matrix(x)
       @test x == m1[1,1]//m1[2,1]
       @test x == last(convergents(cf1))
-      @test isunit(det(m1))
+      @test is_unit(det(m1))
 
       @test cf1 == continued_fraction(x)
 

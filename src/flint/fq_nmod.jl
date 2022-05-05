@@ -22,7 +22,7 @@ base_ring(a::fq_nmod) = Union{}
 
 parent(a::fq_nmod) = a.parent
 
-isdomain_type(::Type{fq_nmod}) = true
+is_domain_type(::Type{fq_nmod}) = true
 
 function check_parent(a::fq_nmod, b::fq_nmod)
    a.parent != b.parent && error("Operations on distinct finite fields not supported")
@@ -100,9 +100,9 @@ iszero(a::fq_nmod) = ccall((:fq_nmod_is_zero, libflint), Bool,
 isone(a::fq_nmod) = ccall((:fq_nmod_is_one, libflint), Bool,
                     (Ref{fq_nmod}, Ref{FqNmodFiniteField}), a, a.parent)
 
-isgen(a::fq_nmod) = a == gen(parent(a)) # there is no isgen in flint
+is_gen(a::fq_nmod) = a == gen(parent(a)) # there is no is_gen in flint
 
-isunit(a::fq_nmod) = ccall((:fq_nmod_is_invertible, libflint), Bool,
+is_unit(a::fq_nmod) = ccall((:fq_nmod_is_invertible, libflint), Bool,
                      (Ref{fq_nmod}, Ref{FqNmodFiniteField}), a, a.parent)
 
 function characteristic(a::FqNmodFiniteField)
@@ -387,13 +387,13 @@ function sqrt(x::fq_nmod; check::Bool=true)
    return z
 end
 
-function issquare(x::fq_nmod)
+function is_square(x::fq_nmod)
    return Bool(ccall((:fq_nmod_is_square, libflint), Cint,
                      (Ref{fq_nmod}, Ref{FqNmodFiniteField}),
                      x, x.parent))
 end
 
-function issquare_with_sqrt(x::fq_nmod)
+function is_square_with_sqrt(x::fq_nmod)
    z = parent(x)()
    flag = ccall((:fq_nmod_sqrt, libflint), Cint,
                 (Ref{fq_nmod}, Ref{fq_nmod}, Ref{FqNmodFiniteField}),

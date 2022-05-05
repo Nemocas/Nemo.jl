@@ -26,7 +26,7 @@ function check_parent(a::gfp_elem, b::gfp_elem)
    a.parent != b.parent && error("Operations on distinct Galois fields not supported")
 end
 
-isdomain_type(::Type{gfp_elem}) = true
+is_domain_type(::Type{gfp_elem}) = true
 
 ###############################################################################
 #
@@ -55,7 +55,7 @@ iszero(a::gfp_elem) = a.data == 0
 
 isone(a::gfp_elem) = a.data == 1
 
-isunit(a::gfp_elem) = a.data != 0
+is_unit(a::gfp_elem) = a.data != 0
 
 modulus(R::GaloisField) = R.n
 
@@ -308,7 +308,7 @@ function Base.sqrt(a::gfp_elem; check::Bool=true)
    return gfp_elem(r, R)
 end
 
-function issquare(a::gfp_elem)
+function is_square(a::gfp_elem)
    R = parent(a)
    if iszero(a) || R.n == 2
       return true
@@ -317,7 +317,7 @@ function issquare(a::gfp_elem)
    return isone(r)
 end
 
-function issquare_with_sqrt(a::gfp_elem)
+function is_square_with_sqrt(a::gfp_elem)
    R = parent(a)
    if iszero(a) || R.n == 2
       return true, a
@@ -457,7 +457,7 @@ function (R::GaloisField)(a::Union{gfp_elem, nmod, gfp_fmpz_elem, fmpz_mod})
    if S === R
       return a
    else
-      isdivisible_by(modulus(S), modulus(R)) || error("incompatible parents")
+      is_divisible_by(modulus(S), modulus(R)) || error("incompatible parents")
       return R(data(a))
    end
 end

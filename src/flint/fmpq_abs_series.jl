@@ -93,14 +93,14 @@ function deepcopy_internal(a::fmpq_abs_series, dict::IdDict)
    return z
 end
 
-function isgen(a::fmpq_abs_series)
+function is_gen(a::fmpq_abs_series)
    return precision(a) == 0 || ccall((:fmpq_poly_is_gen, libflint), Bool,
                             (Ref{fmpq_abs_series},), a)
 end
 
 iszero(a::fmpq_abs_series) = length(a) == 0
 
-isunit(a::fmpq_abs_series) = valuation(a) == 0 && isunit(coeff(a, 0))
+is_unit(a::fmpq_abs_series) = valuation(a) == 0 && is_unit(coeff(a, 0))
 
 function isone(a::fmpq_abs_series)
    return precision(a) == 0 || ccall((:fmpq_poly_is_one, libflint), Bool,
@@ -376,7 +376,7 @@ end
 function ^(a::fmpq_abs_series, b::Int)
    b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
    # special case powers of x for constructing power series efficiently
-   if precision(a) > 0 && isgen(a) && b > 0
+   if precision(a) > 0 && is_gen(a) && b > 0
       return shift_left(a, b - 1)
    elseif length(a) == 1
       z = parent(a)(coeff(a, 0)^b)
@@ -465,7 +465,7 @@ function divexact(x::fmpq_abs_series, y::fmpq_abs_series; check::Bool=true)
          y = shift_right(y, v2)
       end
    end
-   check && !isunit(y) && error("Unable to invert power series")
+   check && !is_unit(y) && error("Unable to invert power series")
    prec = min(x.prec, y.prec - v2 + v1)
    z = parent(x)()
    z.prec = prec
@@ -523,7 +523,7 @@ divexact(x::fmpq_abs_series, y::Rational{T}; check::Bool=true) where T <: Union{
 
 function inv(a::fmpq_abs_series)
   iszero(a) && throw(DivideError())
-   !isunit(a) && error("Unable to invert power series")
+   !is_unit(a) && error("Unable to invert power series")
    ainv = parent(a)()
    ainv.prec = a.prec
    ccall((:fmpq_poly_inv_series, libflint), Nothing,

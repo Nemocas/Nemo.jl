@@ -74,7 +74,7 @@ function gen(R::($rtype), i::Int)
    return z
 end
 
-function isgen(a::($etype), i::Int)
+function is_gen(a::($etype), i::Int)
    n = nvars(parent(a))
    (i <= 0 || i > n) && error("Index must be between 1 and $n")
    return Bool(ccall((:nmod_mpoly_is_gen, libflint), Cint,
@@ -82,7 +82,7 @@ function isgen(a::($etype), i::Int)
                      a, i - 1, parent(a)))
 end
 
-function isgen(a::($etype))
+function is_gen(a::($etype))
    return Bool(ccall((:nmod_mpoly_is_gen, libflint), Cint,
                      (Ref{($etype)}, Int, Ref{($rtype)}),
                      a, -1, parent(a)))
@@ -131,19 +131,19 @@ function iszero(a::($etype))
                      a, parent(a)))
 end
 
-function ismonomial(a::($etype))
+function is_monomial(a::($etype))
    return length(a) == 1 && coeff(a, 1) == 1
 end
 
-function isterm(a::($etype))
+function is_term(a::($etype))
    return length(a) == 1
 end
 
-function isunit(a::($etype))
-   return length(a) == 1 && total_degree(a) == 0 && isunit(coeff(a, 1))
+function is_unit(a::($etype))
+   return length(a) == 1 && total_degree(a) == 0 && is_unit(coeff(a, 1))
 end
 
-function isconstant(a::($etype))
+function is_constant(a::($etype))
    return Bool(ccall((:nmod_mpoly_is_ui, libflint), Cint,
                      (Ref{($etype)}, Ref{($rtype)}),
                      a, parent(a)))
@@ -514,18 +514,18 @@ end
 
 
 function sqrt(a::($etype); check::Bool=true)
-   (flag, q) = issquare_with_sqrt(a)
+   (flag, q) = is_square_with_sqrt(a)
    check && !flag && error("Not a square")
    return q
 end
 
-function issquare(a::($etype))
+function is_square(a::($etype))
    return Bool(ccall((:nmod_mpoly_is_square, libflint), Cint,
                      (Ref{($etype)}, Ref{($rtype)}),
                      a, a.parent))
 end
 
-function issquare_with_sqrt(a::($etype))
+function is_square_with_sqrt(a::($etype))
    q = parent(a)()
    flag = ccall((:nmod_mpoly_sqrt, libflint), Cint,
                 (Ref{($etype)}, Ref{($etype)}, Ref{($rtype)}),
@@ -547,7 +547,7 @@ function ==(a::($etype), b::($etype))
 end
 
 function Base.isless(a::($etype), b::($etype))
-   (!ismonomial(a) || !ismonomial(b)) && error("Not monomials in comparison")
+   (!is_monomial(a) || !is_monomial(b)) && error("Not monomials in comparison")
    return ccall((:nmod_mpoly_cmp, libflint), Cint,
                 (Ref{($etype)}, Ref{($etype)}, Ref{($rtype)}),
                 a, b, a.parent) < 0

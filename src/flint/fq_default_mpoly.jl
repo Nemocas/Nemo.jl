@@ -42,8 +42,8 @@ function gen(R::FqDefaultMPolyRing, i::Int)
     return fq_default_mpoly(R, gen(R.data, i))
 end
 
-function isgen(a::fq_default_mpoly)
-    return isgen(a.data)
+function is_gen(a::fq_default_mpoly)
+    return is_gen(a.data)
 end
 
 function deepcopy_internal(a::fq_default_mpoly, dict::IdDict)
@@ -70,20 +70,20 @@ function iszero(a::fq_default_mpoly)
     return iszero(a.data)
 end
 
-function ismonomial(a::fq_default_mpoly)
-    return ismonomial(a.data)
+function is_monomial(a::fq_default_mpoly)
+    return is_monomial(a.data)
 end
 
-function isterm(a::fq_default_mpoly)
-    return isterm(a.data)
+function is_term(a::fq_default_mpoly)
+    return is_term(a.data)
 end
 
-function isunit(a::fq_default_mpoly)
-    return isunit(a.data)
+function is_unit(a::fq_default_mpoly)
+    return is_unit(a.data)
 end
 
-function isconstant(a::fq_default_mpoly)
-    return isconstant(a.data)
+function is_constant(a::fq_default_mpoly)
+    return is_constant(a.data)
 end
 
 ###############################################################################
@@ -297,12 +297,12 @@ function sqrt(a::fq_default_mpoly; check::Bool=true)
     return fq_default_mpoly(parent(a), sqrt(a.data, check = check))
 end
 
-function issquare(a::fq_default_mpoly)
-    return issquare(a.data)
+function is_square(a::fq_default_mpoly)
+    return is_square(a.data)
 end
 
-function issquare_with_sqrt(a::fq_default_mpoly)
-    x, y = issquare_with_sqrt(a.data)
+function is_square_with_sqrt(a::fq_default_mpoly)
+    x, y = is_square_with_sqrt(a.data)
     return x, fq_default_mpoly(parent(a), y)
 end
 

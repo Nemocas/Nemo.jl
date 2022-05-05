@@ -48,7 +48,7 @@ one(a::FmpzPolyRing) = a(1)
 
 gen(a::FmpzPolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
 
-isgen(x::fmpz_poly) = ccall((:fmpz_poly_is_gen, libflint), Bool,
+is_gen(x::fmpz_poly) = ccall((:fmpz_poly_is_gen, libflint), Bool,
                             (Ref{fmpz_poly},), x)
 
 function deepcopy_internal(a::fmpz_poly, dict::IdDict)
@@ -516,14 +516,14 @@ function Base.sqrt(x::fmpz_poly; check::Bool=true)
     return z
 end
 
-function issquare(x::fmpz_poly)
+function is_square(x::fmpz_poly)
     z = parent(x)()
     flag = Bool(ccall((:fmpz_poly_sqrt, libflint), Cint,
           (Ref{fmpz_poly}, Ref{fmpz_poly}), z, x))
     return flag
 end
 
-function issquare_with_sqrt(x::fmpz_poly)
+function is_square_with_sqrt(x::fmpz_poly)
     R = parent(x)
     z = R()
     flag = Bool(ccall((:fmpz_poly_sqrt, libflint), Cint,
@@ -725,7 +725,7 @@ function _factor(x::fmpz_poly)
   return res, z
 end
 
-function isirreducible(x::fmpz_poly)
+function is_irreducible(x::fmpz_poly)
    if degree(x) == 0
      return isprime(coeff(x, 0))
    end
@@ -747,14 +747,14 @@ function chebyshev_t(n::Int, x::fmpz_poly)
    z = parent(x)()
    ccall((:fmpz_poly_chebyshev_t, libflint), Nothing,
                                                   (Ref{fmpz_poly}, Int), z, n)
-   return isgen(x) ? z : compose(z, x)
+   return is_gen(x) ? z : compose(z, x)
 end
 
 function chebyshev_u(n::Int, x::fmpz_poly)
    z = parent(x)()
    ccall((:fmpz_poly_chebyshev_u, libflint), Nothing,
                                                   (Ref{fmpz_poly}, Int), z, n)
-   return isgen(x) ? z : compose(z, x)
+   return is_gen(x) ? z : compose(z, x)
 end
 
 @doc Markdown.doc"""
@@ -768,7 +768,7 @@ function cyclotomic(n::Int, x::fmpz_poly)
    z = parent(x)()
    ccall((:fmpz_poly_cyclotomic, libflint), Nothing,
                                                   (Ref{fmpz_poly}, Int), z, n)
-   return isgen(x) ? z : compose(z, x)
+   return is_gen(x) ? z : compose(z, x)
 end
 
 @doc Markdown.doc"""
@@ -785,7 +785,7 @@ function swinnerton_dyer(n::Int, x::fmpz_poly)
    z = parent(x)()
    ccall((:fmpz_poly_swinnerton_dyer, libflint), Nothing,
                                                   (Ref{fmpz_poly}, Int), z, n)
-   return isgen(x) ? z : compose(z, x)
+   return is_gen(x) ? z : compose(z, x)
 end
 
 @doc Markdown.doc"""
@@ -799,7 +799,7 @@ function cos_minpoly(n::Int, x::fmpz_poly)
    z = parent(x)()
    ccall((:fmpz_poly_cos_minpoly, libflint), Nothing,
                                                   (Ref{fmpz_poly}, Int), z, n)
-   return isgen(x) ? z : compose(z, x)
+   return is_gen(x) ? z : compose(z, x)
 end
 
 @doc Markdown.doc"""
@@ -813,7 +813,7 @@ function theta_qexp(e::Int, n::Int, x::fmpz_poly)
    z = parent(x)()
    ccall((:fmpz_poly_theta_qexp, libflint), Nothing,
                                           (Ref{fmpz_poly}, Int, Int), z, e, n)
-   return isgen(x) ? z : compose(z, x)
+   return is_gen(x) ? z : compose(z, x)
 end
 
 @doc Markdown.doc"""
@@ -831,7 +831,7 @@ function eta_qexp(e::Int, n::Int, x::fmpz_poly)
    z = parent(x)()
    ccall((:fmpz_poly_eta_qexp, libflint), Nothing,
                                           (Ref{fmpz_poly}, Int, Int), z, e, n)
-   return isgen(x) ? z : compose(z, x)
+   return is_gen(x) ? z : compose(z, x)
 end
 
 ###############################################################################

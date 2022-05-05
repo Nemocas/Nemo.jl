@@ -76,9 +76,9 @@ end
 
    @test isone(one(S))
 
-   @test isgen(gen(S))
+   @test is_gen(gen(S))
 
-   @test isunit(one(S))
+   @test is_unit(one(S))
 
    f = x^2 + 2x + 1
 
@@ -456,22 +456,22 @@ end
    @test lift(T, f) == y^2 + 2y + 1
 end
 
-@testset "gfp_fmpz_poly.isirreducible" begin
+@testset "gfp_fmpz_poly.is_irreducible" begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
 
-   @test isirreducible(f) == false
+   @test is_irreducible(f) == false
 end
 
-@testset "gfp_fmpz_poly.issquarefree" begin
+@testset "gfp_fmpz_poly.is_squarefree" begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
 
-   @test issquarefree(f) == false
+   @test is_squarefree(f) == false
 end
 
 @testset "gfp_fmpz_poly.factor" begin

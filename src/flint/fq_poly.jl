@@ -60,7 +60,7 @@ one(a::FqPolyRing) = a(one(base_ring(a)))
 
 gen(a::FqPolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
 
-isgen(x::fq_poly) = ccall((:fq_poly_is_gen, libflint), Bool,
+is_gen(x::fq_poly) = ccall((:fq_poly_is_gen, libflint), Bool,
                               (Ref{fq_poly}, Ref{FqFiniteField}),
                               x, base_ring(x.parent))
 
@@ -580,7 +580,7 @@ end
 #
 ################################################################################
 
-function isirreducible(x::fq_poly)
+function is_irreducible(x::fq_poly)
   return Bool(ccall((:fq_poly_is_irreducible, libflint), Int32,
                     (Ref{fq_poly}, Ref{FqFiniteField} ),
                     x, base_ring(parent(x))))
@@ -592,7 +592,7 @@ end
 #
 ################################################################################
 
-function issquarefree(x::fq_poly)
+function is_squarefree(x::fq_poly)
    return Bool(ccall((:fq_poly_is_squarefree, libflint), Int32,
        (Ref{fq_poly}, Ref{FqFiniteField}), x, base_ring(parent(x))))
 end

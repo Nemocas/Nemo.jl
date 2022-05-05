@@ -153,7 +153,7 @@ end
 #end
 #
 #function transpose!(a::fq_nmod_mat)
-#  !issquare(a) && error("Matrix must be a square matrix")
+#  !is_square(a) && error("Matrix must be a square matrix")
 #  ccall((:fq_nmod_mat_transpose, libflint), Nothing,
 #        (Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}), a, a, base_ring(a))
 #end
@@ -344,7 +344,7 @@ end
 #################################################################################
 
 function tr(a::fq_nmod_mat)
-   !issquare(a) && error("Non-square matrix")
+   !is_square(a) && error("Non-square matrix")
    n = nrows(a)
    t = zero(base_ring(a))
    for i in 1:nrows(a)
@@ -360,7 +360,7 @@ end
 ################################################################################
 
 function det(a::fq_nmod_mat)
-   !issquare(a) && error("Non-square matrix")
+   !is_square(a) && error("Non-square matrix")
    n = nrows(a)
    R = base_ring(a)
    if n == 0
@@ -400,7 +400,7 @@ end
 ################################################################################
 
 function inv(a::fq_nmod_mat)
-   !issquare(a) && error("Matrix must be a square matrix")
+   !is_square(a) && error("Matrix must be a square matrix")
    z = similar(a)
    r = ccall((:fq_nmod_mat_inv, libflint), Int,
              (Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}), z, a, base_ring(a))
@@ -416,7 +416,7 @@ end
 
 function solve(x::fq_nmod_mat, y::fq_nmod_mat)
    (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
-   !issquare(x)&& error("First argument not a square matrix in solve")
+   !is_square(x)&& error("First argument not a square matrix in solve")
    (nrows(y) != nrows(x)) || ncols(y) != 1 && ("Not a column vector in solve")
    z = similar(y)
    r = ccall((:fq_nmod_mat_solve, libflint), Int,
@@ -598,7 +598,7 @@ end
 ################################################################################
 
 function charpoly(R::FqNmodPolyRing, a::fq_nmod_mat)
-  !issquare(a) && error("Matrix must be square")
+  !is_square(a) && error("Matrix must be square")
   base_ring(R) != base_ring(a) && error("Must have common base ring")
   p = R()
   ccall((:fq_nmod_mat_charpoly, libflint), Nothing,
@@ -607,7 +607,7 @@ function charpoly(R::FqNmodPolyRing, a::fq_nmod_mat)
 end
 
 function charpoly_danivlesky!(R::FqNmodPolyRing, a::fq_nmod_mat)
-  !issquare(a) && error("Matrix must be square")
+  !is_square(a) && error("Matrix must be square")
   base_ring(R) != base_ring(a) && error("Must have common base ring")
   p = R()
   ccall((:fq_nmod_mat_charpoly_danilevsky, libflint), Nothing,
@@ -623,7 +623,7 @@ end
 ################################################################################
 
 function minpoly(R::FqNmodPolyRing, a::fq_nmod_mat)
-  !issquare(a) && error("Matrix must be square")
+  !is_square(a) && error("Matrix must be square")
   base_ring(R) != base_ring(a) && error("Must have common base ring")
   m = deepcopy(a)
   p = R()

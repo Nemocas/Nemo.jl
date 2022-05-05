@@ -5,10 +5,10 @@
 ################################################################################
 
 export NmodPolyRing, nmod_poly, parent, base_ring, elem_type, length, zero,
-       one, gen, isgen, iszero, var, deepcopy, show, truncate, mullow, reverse,
+       one, gen, is_gen, iszero, var, deepcopy, show, truncate, mullow, reverse,
        shift_left, shift_right, divexact, rem, gcd, resultant,
        evaluate, derivative, compose, interpolate, inflate, deflate, lift,
-       isirreducible, issquarefree, factor, factor_squarefree,
+       is_irreducible, is_squarefree, factor, factor_squarefree,
        factor_distinct_deg, factor_shape, setcoeff!, canonical_unit,
        add!, sub!, mul!, PolynomialRing, check_parent, gcdx, mod,
        invmod, gcdinv, mulmod, powermod, zero!, one!
@@ -90,7 +90,7 @@ one(R::NmodPolyRing) = R(UInt(1))
 
 gen(R::NmodPolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
 
-isgen(a::T) where T <: Zmodn_poly = (degree(a) == 1 &&
+is_gen(a::T) where T <: Zmodn_poly = (degree(a) == 1 &&
                               iszero(coeff(a,0)) && isone(coeff(a,1)))
 
 iszero(a::T) where T <: Zmodn_poly = Bool(ccall((:nmod_poly_is_zero, libflint), Int32,
@@ -732,8 +732,8 @@ end
 #
 ################################################################################
 
-function isirreducible(x::nmod_poly)
-  !isprime(modulus(x)) && error("Modulus not prime in isirreducible")
+function is_irreducible(x::nmod_poly)
+  !isprime(modulus(x)) && error("Modulus not prime in is_irreducible")
   return Bool(ccall((:nmod_poly_is_irreducible, libflint), Int32,
           (Ref{nmod_poly}, ), x))
 end
@@ -744,8 +744,8 @@ end
 #
 ################################################################################
 
-function issquarefree(x::nmod_poly)
-   !isprime(modulus(x)) && error("Modulus not prime in issquarefree")
+function is_squarefree(x::nmod_poly)
+   !isprime(modulus(x)) && error("Modulus not prime in is_squarefree")
    return Bool(ccall((:nmod_poly_is_squarefree, libflint), Int32,
        (Ref{nmod_poly}, ), x))
 end
@@ -803,7 +803,7 @@ end
 Return the distinct degree factorisation of a squarefree polynomial $x$.
 """
 function factor_distinct_deg(x::nmod_poly)
-  !issquarefree(x) && error("Polynomial must be squarefree")
+  !is_squarefree(x) && error("Polynomial must be squarefree")
   !isprime(modulus(x)) && error("Modulus not prime in factor_distinct_deg")
   degs = Vector{Int}(undef, degree(x))
   degss = [ pointer(degs) ]
@@ -848,7 +848,7 @@ end
 # by a type that include infinity
 function _remove_check_simple_cases(a, b)
    parent(a) == parent(b) || error("Incompatible parents")
-   if (iszero(b) || isunit(b))
+   if (iszero(b) || is_unit(b))
       throw(ArgumentError("Second argument must be a non-zero non-unit"))
    end
    if iszero(a)

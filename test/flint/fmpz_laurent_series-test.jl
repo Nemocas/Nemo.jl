@@ -60,13 +60,13 @@ end
    @test precision(a) == 31
    @test precision(b) == 4
 
-   @test isgen(gen(S))
+   @test is_gen(gen(S))
 
    @test iszero(zero(S))
 
    @test isone(one(S))
 
-   @test isunit(-1 + x + 2x^2)
+   @test is_unit(-1 + x + 2x^2)
 
    @test isequal(deepcopy(a), a)
    @test isequal(deepcopy(b), b)
@@ -210,7 +210,7 @@ end
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       f = R()
-      while iszero(f) || !isunit(polcoeff(f, 0))
+      while iszero(f) || !is_unit(polcoeff(f, 0))
          f = rand(R, -12:12, -10:10)
       end
 
@@ -233,7 +233,7 @@ end
    for iter = 1:300
       f = rand(R, -12:12, -10:10)
       g = rand(R, -12:12, -10:10)
-      while iszero(g) || !isunit(polcoeff(g, 0))
+      while iszero(g) || !is_unit(polcoeff(g, 0))
          g = rand(R, -12:12, -10:10)
       end
 

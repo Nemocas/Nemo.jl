@@ -16,7 +16,7 @@ base_ring(a::FlintQQiField) = FlintZZi
 
 base_ring(a::fmpqi) = FlintZZi
 
-isdomain_type(::Type{fmpqi}) = true
+is_domain_type(::Type{fmpqi}) = true
 
 characteristic(a::FlintQQiField) = 0
 
@@ -385,7 +385,7 @@ end
 #
 ###############################################################################
 
-function isunit(a::fmpqi)
+function is_unit(a::fmpqi)
    return !iszero(a)
 end
 

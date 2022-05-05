@@ -62,7 +62,7 @@ one(R::ZmodNFmpzPolyRing) = R(1)
 
 gen(R::ZmodNFmpzPolyRing) = R([fmpz(0), fmpz(1)])
 
-isgen(a::Zmodn_fmpz_poly) = (degree(a) == 1 &&
+is_gen(a::Zmodn_fmpz_poly) = (degree(a) == 1 &&
                               iszero(coeff(a,0)) && isone(coeff(a,1)))
 
 function iszero(a::T) where {T <: Zmodn_fmpz_poly}
@@ -637,7 +637,7 @@ end
 function resultant(x::T, y::T) where {T <: Zmodn_fmpz_poly}
   check_parent(x,y)
   z = parent(x)()
-  !isprobable_prime(modulus(x)) && error("Modulus not prime in resultant")
+  !is_probable_prime(modulus(x)) && error("Modulus not prime in resultant")
   r = fmpz()
   ccall((:fmpz_mod_poly_resultant, libflint), Nothing,
         (Ref{fmpz}, Ref{T}, Ref{T}, Ref{fmpz_mod_ctx_struct}),
@@ -733,8 +733,8 @@ end
 #
 ################################################################################
 
-function isirreducible(x::fmpz_mod_poly)
-  !isprobable_prime(modulus(x)) && error("Modulus not prime in isirreducible")
+function is_irreducible(x::fmpz_mod_poly)
+  !is_probable_prime(modulus(x)) && error("Modulus not prime in is_irreducible")
   return Bool(ccall((:fmpz_mod_poly_is_irreducible, libflint), Cint,
                     (Ref{fmpz_mod_poly}, Ref{fmpz_mod_ctx_struct}),
                     x, x.parent.base_ring.ninv))
@@ -746,8 +746,8 @@ end
 #
 ################################################################################
 
-function issquarefree(x::fmpz_mod_poly)
-   !isprobable_prime(modulus(x)) && error("Modulus not prime in issquarefree")
+function is_squarefree(x::fmpz_mod_poly)
+   !is_probable_prime(modulus(x)) && error("Modulus not prime in is_squarefree")
    return Bool(ccall((:fmpz_mod_poly_is_squarefree, libflint), Cint,
                      (Ref{fmpz_mod_poly}, Ref{fmpz_mod_ctx_struct}),
                      x, x.parent.base_ring.ninv))
@@ -760,7 +760,7 @@ end
 ################################################################################
 
 function factor(x::fmpz_mod_poly)
-  !isprobable_prime(modulus(x)) && error("Modulus not prime in factor")
+  !is_probable_prime(modulus(x)) && error("Modulus not prime in factor")
   fac = _factor(x)
   return Fac(parent(x)(leading_coefficient(x)), fac)
 end
@@ -785,7 +785,7 @@ function _factor(x::fmpz_mod_poly)
 end
 
 function factor_squarefree(x::fmpz_mod_poly)
-  !isprobable_prime(modulus(x)) && error("Modulus not prime in factor_squarefree")
+  !is_probable_prime(modulus(x)) && error("Modulus not prime in factor_squarefree")
   fac = _factor_squarefree(x)
   return Fac(parent(x)(leading_coefficient(x)), fac)
 end
@@ -815,8 +815,8 @@ end
 Return the distinct degree factorisation of a squarefree polynomial $x$.
 """
 function factor_distinct_deg(x::fmpz_mod_poly)
-  !issquarefree(x) && error("Polynomial must be squarefree")
-  !isprobable_prime(modulus(x)) && error("Modulus not prime in factor_distinct_deg")
+  !is_squarefree(x) && error("Polynomial must be squarefree")
+  !is_probable_prime(modulus(x)) && error("Modulus not prime in factor_distinct_deg")
   degs = Vector{Int}(undef, degree(x))
   degss = [ pointer(degs) ]
   n = x.parent.base_ring.ninv

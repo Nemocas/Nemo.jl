@@ -64,7 +64,7 @@ one(a::FmpqPolyRing) = a(1)
 
 gen(a::FmpqPolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
 
-isgen(x::fmpq_poly) = ccall((:fmpq_poly_is_gen, libflint), Bool,
+is_gen(x::fmpq_poly) = ccall((:fmpq_poly_is_gen, libflint), Bool,
                             (Ref{fmpq_poly},), x)
 
 function deepcopy_internal(a::fmpq_poly, dict::IdDict)
@@ -653,31 +653,31 @@ function sqrt(x::fmpq_poly; check::Bool=true)
    return divexact(s, sd)
 end
 
-function issquare(x::fmpq_poly)
+function is_square(x::fmpq_poly)
    d = denominator(x)
-   if !issquare(d)
+   if !is_square(d)
       return false
    end
    n = polynomial(ZZ, [])
    ccall((:fmpq_poly_get_numerator, libflint), Nothing,
          (Ref{fmpz_poly}, Ref{fmpq_poly}), n, x)
-   if !issquare(n)
+   if !is_square(n)
       return false
    end
    return true
 end
 
-function issquare_with_sqrt(x::fmpq_poly)
+function is_square_with_sqrt(x::fmpq_poly)
    R = parent(x)
    d = denominator(x)
-   f1, s1 = issquare_with_sqrt(d)
+   f1, s1 = is_square_with_sqrt(d)
    if !f1
       return false, zero(R)
    end
    n = polynomial(ZZ, [])
    ccall((:fmpq_poly_get_numerator, libflint), Nothing,
          (Ref{fmpz_poly}, Ref{fmpq_poly}), n, x)
-   f2, s2 = issquare_with_sqrt(n)
+   f2, s2 = is_square_with_sqrt(n)
    if !f2
       return false, zero(R)
    end
@@ -717,7 +717,7 @@ function _factor(x::fmpq_poly)
    return res, fmpq(z, denominator(x))
 end
 
-function isirreducible(x::fmpq_poly)
+function is_irreducible(x::fmpq_poly)
    res, _ = _factor(x)
    return length(res) == 1 && first(values(res)) == 1
 end

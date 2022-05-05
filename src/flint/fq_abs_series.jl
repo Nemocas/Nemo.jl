@@ -106,14 +106,14 @@ function deepcopy_internal(a::($etype), dict::IdDict)
    return z
 end
 
-function isgen(a::($etype))
+function is_gen(a::($etype))
    return precision(a) == 0 || ccall(($(flint_fn*"_is_gen"), libflint), Bool,
                    (Ref{($etype)}, Ref{($ctype)}), a, base_ring(a))
 end
 
 iszero(a::($etype)) = length(a) == 0
 
-isunit(a::($etype)) = valuation(a) == 0 && isunit(coeff(a, 0))
+is_unit(a::($etype)) = valuation(a) == 0 && is_unit(coeff(a, 0))
 
 function isone(a::($etype))
    return precision(a) == 0 || ccall(($(flint_fn*"_is_one"), libflint), Bool,
@@ -341,7 +341,7 @@ end
 
 function ^(a::($etype), b::Int)
    b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
-   if precision(a) > 0 && isgen(a) && b > 0
+   if precision(a) > 0 && is_gen(a) && b > 0
       return shift_left(a, b - 1)
    elseif length(a) == 1
       return parent(a)([coeff(a, 0)^b], 1, a.prec)
@@ -453,7 +453,7 @@ function divexact(x::($etype), y::($etype); check::Bool=true)
          y = shift_right(y, v2)
       end
    end
-   check && !isunit(y) && error("Unable to invert power series")
+   check && !is_unit(y) && error("Unable to invert power series")
    prec = min(x.prec, y.prec - v2 + v1)
    z = parent(x)()
    z.prec = prec
@@ -488,7 +488,7 @@ end
 
 function inv(a::($etype))
    iszero(a) && throw(DivideError())
-   !isunit(a) && error("Unable to invert power series")
+   !is_unit(a) && error("Unable to invert power series")
    ainv = parent(a)()
    ainv.prec = a.prec
    ccall(($(flint_fn*"_inv_series"), libflint), Nothing,

@@ -51,13 +51,13 @@ end
    a = 2x + x^3
    b = O(x^4)
 
-   @test isgen(gen(R))
+   @test is_gen(gen(R))
 
    @test iszero(zero(R))
 
    @test isone(one(R))
 
-   @test isunit(-1 + x + 2x^2)
+   @test is_unit(-1 + x + 2x^2)
 
    @test valuation(a) == 1
 
@@ -387,7 +387,7 @@ end
 
          s = f^2
 
-         @test issquare(s)
+         @test is_square(s)
 
          q = sqrt(s)
 
@@ -397,7 +397,7 @@ end
 
          @test q^2 == s
 
-         f1, s1 = issquare_with_sqrt(s)
+         f1, s1 = is_square_with_sqrt(s)
 
          @test f1 && s1^2 == s
 
@@ -406,7 +406,7 @@ end
          end
 
          if mod(p, 4) == 3
-            @test !issquare(-one(S))
+            @test !is_square(-one(S))
          end
       end
    end

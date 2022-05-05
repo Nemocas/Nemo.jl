@@ -43,7 +43,7 @@ base_ring(a::FlintRationalField) = FlintZZ
 
 base_ring(a::fmpq) = FlintZZ
 
-isdomain_type(::Type{fmpq}) = true
+is_domain_type(::Type{fmpq}) = true
 
 ###############################################################################
 #
@@ -117,7 +117,7 @@ function iszero(a::fmpq)
    return Bool(ccall((:fmpq_is_zero, libflint), Cint, (Ref{fmpq}, ), a))
 end
 
-isunit(a::fmpq) = !iszero(a)
+is_unit(a::fmpq) = !iszero(a)
 
 @doc Markdown.doc"""
     height(a::fmpq)
@@ -427,19 +427,19 @@ function Base.sqrt(a::fmpq; check::Bool=true)
     return fmpq(snum, sden)
 end
 
-function issquare(a::fmpq)
-    if !issquare(numerator(a)) || !issquare(denominator(a))
+function is_square(a::fmpq)
+    if !is_square(numerator(a)) || !is_square(denominator(a))
        return false
     end
     return true
 end
 
-function issquare_with_sqrt(a::fmpq)
-    f1, s1 = issquare_with_sqrt(numerator(a))
+function is_square_with_sqrt(a::fmpq)
+    f1, s1 = is_square_with_sqrt(numerator(a))
     if !f1
         return false, zero(fmpq)
     end
-    f2, s2 = issquare_with_sqrt(denominator(a))
+    f2, s2 = is_square_with_sqrt(denominator(a))
     if !f2
         return false, zero(fmpq)
     end

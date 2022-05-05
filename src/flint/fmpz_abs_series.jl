@@ -91,14 +91,14 @@ function deepcopy_internal(a::fmpz_abs_series, dict::IdDict)
    return z
 end
 
-function isgen(a::fmpz_abs_series)
+function is_gen(a::fmpz_abs_series)
    return precision(a) == 0 || ccall((:fmpz_poly_is_gen, libflint), Bool,
                             (Ref{fmpz_abs_series},), a)
 end
 
 iszero(a::fmpz_abs_series) = length(a) == 0
 
-isunit(a::fmpz_abs_series) = valuation(a) == 0 && isunit(coeff(a, 0))
+is_unit(a::fmpz_abs_series) = valuation(a) == 0 && is_unit(coeff(a, 0))
 
 function isone(a::fmpz_abs_series)
    return precision(a) == 0 || ccall((:fmpz_poly_is_one, libflint), Bool,
@@ -349,7 +349,7 @@ end
 
 function ^(a::fmpz_abs_series, b::Int)
    b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
-   if precision(a) > 0 && isgen(a) && b > 0
+   if precision(a) > 0 && is_gen(a) && b > 0
       return shift_left(a, b - 1)
    elseif length(a) == 1
       return parent(a)([coeff(a, 0)^b], 1, a.prec)
@@ -487,7 +487,7 @@ divexact(x::fmpz_abs_series, y::Integer; check::Bool=true) = divexact(x, fmpz(y)
 
 function inv(a::fmpz_abs_series)
     iszero(a) && throw(DivideError())
-    !isunit(a) && error("Unable to invert power series")
+    !is_unit(a) && error("Unable to invert power series")
     ainv = parent(a)()
     ainv.prec = a.prec
     ccall((:fmpz_poly_inv_series, libflint), Nothing,

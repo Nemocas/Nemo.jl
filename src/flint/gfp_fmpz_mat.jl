@@ -131,7 +131,7 @@ end
 ################################################################################
 
 function tr(a::gfp_fmpz_mat)
-  !issquare(a) && error("Matrix must be a square matrix")
+  !is_square(a) && error("Matrix must be a square matrix")
   R = base_ring(a)
   r = fmpz()
   ccall((:fmpz_mod_mat_trace, libflint), Nothing,

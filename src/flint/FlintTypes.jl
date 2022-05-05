@@ -2114,7 +2114,7 @@ end
    end
 
    function FqDefaultFiniteField(f::fmpz_mod_poly, s::Symbol, cached::Bool = true; check::Bool = true)
-      check && !isprobable_prime(modulus(f)) &&
+      check && !is_probable_prime(modulus(f)) &&
          throw(DomainError(base_ring(f), "the base ring of the polynomial must be a field"))
       return get_cached!(FqDefaultFiniteFieldIDFmpzPol, (f, s), cached) do
          z = new()
@@ -2335,7 +2335,7 @@ end
    end
 
    function FqFiniteField(f::fmpz_mod_poly, s::Symbol, cached::Bool = true; check::Bool = true)
-      check && !isprobable_prime(modulus(f)) &&
+      check && !is_probable_prime(modulus(f)) &&
          throw(DomainError(base_ring(f), "the base ring of the polynomial must be a field"))
       return get_cached!(FqFiniteFieldIDFmpzPol, (f, s), cached) do
          z = new()
@@ -2694,7 +2694,7 @@ mutable struct FlintPadicField <: FlintLocalField
    prec_max::Int
 
    function FlintPadicField(p::fmpz, prec::Int; cached::Bool = true, check::Bool = true)
-      check && !isprobable_prime(p) && throw(DomainError(p, "Characteristic must be prime"))
+      check && !is_probable_prime(p) && throw(DomainError(p, "Characteristic must be prime"))
 
       return get_cached!(PadicBase, (p, prec), cached) do
          d = new()
@@ -2753,7 +2753,7 @@ mutable struct FlintQadicField <: FlintLocalField
 
    function FlintQadicField(p::fmpz, d::Int, prec::Int, var::String = "a"; cached::Bool = true, check::Bool = true)
 
-      check && !isprobable_prime(p) && throw(DomainError(p, "Characteristic must be prime"))
+      check && !is_probable_prime(p) && throw(DomainError(p, "Characteristic must be prime"))
 
       z = get_cached!(QadicBase, (p, d, prec), cached) do
          zz = new()
