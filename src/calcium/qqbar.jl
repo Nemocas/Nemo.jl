@@ -169,6 +169,8 @@ end
 #
 ###############################################################################
 
+is_unit(x::qqbar) = !is_zero(x)
+
 zero(a::CalciumQQBarField) = a(0)
 
 one(a::CalciumQQBarField) = a(1)
@@ -1382,6 +1384,8 @@ end
 (a::CalciumQQBarField)(b::Complex{Int}) = qqbar(b)
 
 (a::CalciumQQBarField)(b::fmpz) = qqbar(b)
+
+(a::CalciumQQBarField)(b::Integer) = qqbar(fmpz(b))
 
 (a::CalciumQQBarField)(b::fmpq) = qqbar(b)
 

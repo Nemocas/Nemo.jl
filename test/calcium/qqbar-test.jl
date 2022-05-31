@@ -327,4 +327,11 @@ end
 
 end
 
+function test_elem(R::CalciumQQBarField)
+   return rand(R, degree=5, bits=5)
+end
+
+@testset "qqbar.conformance_tests" begin
+   test_Field_interface(CalciumQQBar)
+end
 
