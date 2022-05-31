@@ -211,7 +211,7 @@ end
    @test b == A && a == B
 end
 
-function test_elem(R::CalciumQQBarField)
+function test_elem(R::FlintZZiRing)
    return rand_bits(R, rand(0:200))
 end
 
