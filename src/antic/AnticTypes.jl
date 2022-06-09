@@ -12,9 +12,9 @@
 
 @attributes mutable struct AnticNumberField <: SimpleNumField{fmpq}
    pol_coeffs::Ptr{Nothing}
-   pol_den::Int
    pol_alloc::Int
    pol_length::Int
+   pol_den::Int
    pinv_dinv::Ptr{Nothing}
    pinv_n::Int
    pinv_norm::Int
@@ -50,10 +50,10 @@ function _AnticNumberField_clear_fn(a::AnticNumberField)
 end
 
 mutable struct nf_elem <: SimpleNumFieldElem{fmpq}
-   elem_coeffs::Ptr{Nothing}
-   elem_den::Int
-   elem_alloc::Int
-   elem_length::Int
+   xelem_coeffs::Ptr{Nothing}
+   xelem_alloc::Int
+   xelem_length::Int
+   xelem_den::Int
    parent::AnticNumberField
 
    function nf_elem(p::AnticNumberField)

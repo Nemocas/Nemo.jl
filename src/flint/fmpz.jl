@@ -1869,7 +1869,7 @@ function divisor_sigma(x::fmpz, y::Int)
    y < 0 && throw(DomainError(y, "Power must be non-negative"))
    z = fmpz()
    ccall((:fmpz_divisor_sigma, libflint), Nothing,
-         (Ref{fmpz}, Ref{fmpz}, Int), z, x, y)
+         (Ref{fmpz}, UInt, Ref{fmpz}), z, UInt(y), x)
    return z
 end
 
