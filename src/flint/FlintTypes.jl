@@ -305,10 +305,12 @@ end
 const FmpqPolyID = Dict{Tuple{FlintRationalField, Symbol}, FmpqPolyRing}()
 
 mutable struct fmpq_poly <: PolyElem{fmpq}
-   xcoeffs::Ptr{Int}
-   xalloc::Int
-   xlength::Int
-   xden::Int
+   coeffs::Ptr{Int}
+   alloc::Int
+   length::Int
+   den::Int
+   # end flint struct
+
    parent::FmpqPolyRing
 
    function fmpq_poly()
