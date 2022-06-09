@@ -50,10 +50,12 @@ function _AnticNumberField_clear_fn(a::AnticNumberField)
 end
 
 mutable struct nf_elem <: SimpleNumFieldElem{fmpq}
-   xelem_coeffs::Ptr{Nothing}
-   xelem_alloc::Int
-   xelem_length::Int
-   xelem_den::Int
+   elem_coeffs::Ptr{Nothing}
+   elem_alloc::Int
+   elem_length::Int
+   elem_den::Int
+   # end antic struct
+
    parent::AnticNumberField
 
    function nf_elem(p::AnticNumberField)
