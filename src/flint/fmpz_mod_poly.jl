@@ -31,6 +31,13 @@ function check_parent(x::T, y::T) where {T <: Zmodn_fmpz_poly}
   nothing
 end
 
+function _is_one_or_throw(f, y)
+  R = base_ring(y)
+  if !isone(f)
+    throw(NotInvertibleError(R(f), R))
+  end
+end
+
 ################################################################################
 #
 #  Basic manipulation
@@ -429,7 +436,7 @@ function divexact(x::T, y::T; check::Bool=true) where {T <: Zmodn_fmpz_poly}
   ccall((:fmpz_mod_poly_divrem_f, libflint), Nothing,
         (Ref{fmpz}, Ref{T}, Ref{T}, Ref{T}, Ref{T}, Ref{fmpz_mod_ctx_struct}),
         d, q, r, x, y, x.parent.base_ring.ninv)
-  !isone(d) && error("Impossible inverse in divexact")
+  _is_one_or_throw(d, y)
   return q
 end
 
@@ -485,7 +492,7 @@ function Base.divrem(x::T, y::T) where {T <: Zmodn_fmpz_poly}
   ccall((:fmpz_mod_poly_divrem_f, libflint), Nothing,
         (Ref{fmpz}, Ref{T}, Ref{T}, Ref{T}, Ref{T}, Ref{fmpz_mod_ctx_struct}),
         d, q, r, x, y, x.parent.base_ring.ninv)
-  !isone(d) && error("Impossible inverse in divrem")
+  _is_one_or_throw(d, y)
   return q, r
 end
 
@@ -525,43 +532,56 @@ end
 #
 ################################################################################
 
-function gcd(x::T, y::T) where {T <: Zmodn_fmpz_poly}
-  check_parent(x, y)
-  z = parent(x)()
-  f = fmpz()
-  ccall((:fmpz_mod_poly_gcd_f, libflint), Nothing,
-        (Ref{fmpz}, Ref{T}, Ref{T}, Ref{T}, Ref{fmpz_mod_ctx_struct}),
-        f, z, x, y, x.parent.base_ring.ninv)
-  f > 1 && error("Impossible inverse: $(f) divides modulus")
-  return z
+function AbstractAlgebra.hgcd_prefers_basecase(a::fmpz_mod_poly, b::fmpz_mod_poly)
+   return length(b) < 150
 end
 
-function gcdx(x::T, y::T) where {T <: Zmodn_fmpz_poly}
-  check_parent(x, y)
-  g = parent(x)()
-  s = parent(x)()
-  t = parent(x)()
-  f = fmpz()
-  ccall((:fmpz_mod_poly_xgcd_f, libflint), Nothing,
-        (Ref{fmpz}, Ref{T}, Ref{T}, Ref{T},
-         Ref{T}, Ref{T}, Ref{fmpz_mod_ctx_struct}),
-        f, g, s, t, x, y, x.parent.base_ring.ninv)
-  f > 1 && error("Impossible inverse: $(f) divides modulus")
-  return g, s, t
+function AbstractAlgebra.mat22_mul_prefers_classical(
+   a11::fmpz_mod_poly, a12::fmpz_mod_poly, a21::fmpz_mod_poly, a22::fmpz_mod_poly,
+   b11::fmpz_mod_poly, b12::fmpz_mod_poly, b21::fmpz_mod_poly, b22::fmpz_mod_poly)
+   return length(a11) + length(a22) < 30 || length(b11) + length(b22) < 30
 end
 
-function gcdinv(x::T, y::T) where {T <: Zmodn_fmpz_poly}
-  check_parent(x,y)
-  length(y) <= 1 && error("Length of second argument must be >= 2")
-  g = parent(x)()
-  s = parent(x)()
-  f = fmpz()
-  ccall((:fmpz_mod_poly_gcdinv_f, libflint), Nothing,
-        (Ref{fmpz}, Ref{T}, Ref{T}, Ref{T}, Ref{T}, Ref{fmpz_mod_ctx_struct}),
-        f, g, s, x, y, x.parent.base_ring.ninv)
-  f > 1 && error("Impossible inverse: $(f) divides modulus")
-  return g, s
+function AbstractAlgebra.gcd_basecase(x::fmpz_mod_poly, y::fmpz_mod_poly)
+   z = parent(x)()
+   f = fmpz()
+   ccall((:fmpz_mod_poly_gcd_euclidean_f, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz_mod_poly},
+          Ref{fmpz_mod_poly}, Ref{fmpz_mod_poly}, Ref{fmpz_mod_ctx_struct}),
+         f, z, x, y, x.parent.base_ring.ninv)
+   _is_one_or_throw(f, y)
+   return z
 end
+
+function AbstractAlgebra.gcdx_basecase(x::fmpz_mod_poly, y::fmpz_mod_poly)
+   check_parent(x, y)
+   g = parent(x)()
+   s = parent(x)()
+   t = parent(x)()
+   f = fmpz()
+   ccall((:fmpz_mod_poly_xgcd_euclidean_f, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz_mod_poly}, Ref{fmpz_mod_poly}, Ref{fmpz_mod_poly},
+          Ref{fmpz_mod_poly}, Ref{fmpz_mod_poly}, Ref{fmpz_mod_ctx_struct}),
+         f, g, s, t, x, y, x.parent.base_ring.ninv)
+   _is_one_or_throw(f, y)
+   return g, s, t
+end
+
+function AbstractAlgebra.gcdinv_basecase(x::fmpz_mod_poly, y::fmpz_mod_poly)
+   check_parent(x, y)
+   length(y) <= 1 && error("Length of second argument must be >= 2")
+   g = parent(x)()
+   s = parent(x)()
+   f = fmpz()
+   ccall((:fmpz_mod_poly_gcdinv_euclidean_f, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz_mod_poly}, Ref{fmpz_mod_poly},
+          Ref{fmpz_mod_poly}, Ref{fmpz_mod_poly}, Ref{fmpz_mod_ctx_struct}),
+         f, g, s, x, y, x.parent.base_ring.ninv)
+   _is_one_or_throw(f, y)
+   return g, s
+end
+
+# AA does gcd, gcdx, and gcdinv in general
 
 ################################################################################
 #

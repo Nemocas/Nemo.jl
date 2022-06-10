@@ -247,6 +247,47 @@ end
 
 ################################################################################
 #
+#   GCD
+#
+################################################################################
+
+function gcd(x::gfp_fmpz_poly, y::gfp_fmpz_poly)
+   check_parent(x, y)
+   z = parent(x)()
+   f = fmpz()
+   ccall((:fmpz_mod_poly_gcd, libflint), Nothing,
+         (Ref{gfp_fmpz_poly},
+          Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly}, Ref{fmpz_mod_ctx_struct}),
+         z, x, y, x.parent.base_ring.ninv)
+   return z
+end
+
+function gcdx(x::gfp_fmpz_poly, y::gfp_fmpz_poly)
+  check_parent(x, y)
+  g = parent(x)()
+  s = parent(x)()
+  t = parent(x)()
+  ccall((:fmpz_mod_poly_xgcd, libflint), Nothing,
+        (Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly},
+         Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly}, Ref{fmpz_mod_ctx_struct}),
+        g, s, t, x, y, x.parent.base_ring.ninv)
+  return g, s, t
+end
+
+function gcdinv(x::gfp_fmpz_poly, y::gfp_fmpz_poly)
+   check_parent(x,y)
+   length(y) >= 2 || error("Length of second argument must be >= 2")
+   g = parent(x)()
+   s = parent(x)()
+   ccall((:fmpz_mod_poly_gcdinv, libflint), Nothing,
+         (Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly},
+          Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly}, Ref{fmpz_mod_ctx_struct}),
+         g, s, x, y, x.parent.base_ring.ninv)
+   return g, s
+end
+
+################################################################################
+#
 #  Irreducibility
 #
 ################################################################################

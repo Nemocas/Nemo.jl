@@ -44,11 +44,14 @@ end
 #
 ################################################################################
 
-function lead_isunit(a::nmod_poly)
-  d = degree(a)
-  u = ccall((:nmod_poly_get_coeff_ui, libflint), UInt, (Ref{nmod_poly}, Int), a, d)
-  n = ccall((:n_gcd, libflint), UInt, (UInt, UInt), u, modulus(a))
-  return n==1
+function lead_is_unit_or_throw(a::nmod_poly)
+   d = degree(a)
+   u = ccall((:nmod_poly_get_coeff_ui, libflint), UInt, (Ref{nmod_poly}, Int), a, d)
+   n = ccall((:n_gcd, libflint), UInt, (UInt, UInt), u, modulus(a))
+   if n != 1
+      R = base_ring(a)
+      throw(NotInvertibleError(R(n), R))
+   end
 end
 
 function Base.hash(a::nmod_poly, h::UInt)
@@ -429,7 +432,7 @@ end
 function divexact(x::nmod_poly, y::nmod_poly; check::Bool=true)
   check_parent(x, y)
   iszero(y) && throw(DivideError())
-  check && !lead_isunit(y) && error("Impossible inverse in divexact")
+  lead_is_unit_or_throw(y)
   z = parent(x)()
   ccall((:nmod_poly_div, libflint), Nothing,
           (Ref{nmod_poly}, Ref{nmod_poly}, Ref{nmod_poly}), z, x, y)
@@ -467,7 +470,7 @@ end
 function Base.divrem(x::nmod_poly, y::nmod_poly)
   check_parent(x,y)
   iszero(y) && throw(DivideError())
-  !lead_isunit(y) && error("Impossible inverse in divrem")
+  lead_is_unit_or_throw(y)
   q = parent(x)()
   r = parent(x)()
   ccall((:nmod_poly_divrem, libflint), Nothing,
@@ -479,7 +482,7 @@ end
 function Base.div(x::nmod_poly, y::nmod_poly)
   check_parent(x,y)
   iszero(y) && throw(DivideError())
-  !lead_isunit(y) && error("Impossible inverse in div")
+  lead_is_unit_or_throw(y)
   q = parent(x)()
   ccall((:nmod_poly_div, libflint), Nothing,
           (Ref{nmod_poly}, Ref{nmod_poly}, Ref{nmod_poly}),
@@ -496,7 +499,7 @@ end
 function rem(x::nmod_poly, y::nmod_poly)
   check_parent(x,y)
   iszero(y) && throw(DivideError())
-  !lead_isunit(y) && error("Impossible inverse in rem")
+  lead_is_unit_or_throw(y)
   z = parent(x)()
   ccall((:nmod_poly_rem, libflint), Nothing,
           (Ref{nmod_poly}, Ref{nmod_poly}, Ref{nmod_poly}), z, x, y)
@@ -511,38 +514,17 @@ mod(x::T, y::T) where T <: Zmodn_poly = rem(x, y)
 #
 ################################################################################
 
-function gcd(x::nmod_poly, y::nmod_poly)
-  check_parent(x,y)
-  !is_prime(modulus(x)) && error("Modulus not prime in gcd")
-  z = parent(x)()
-  ccall((:nmod_poly_gcd, libflint), Nothing,
-          (Ref{nmod_poly}, Ref{nmod_poly}, Ref{nmod_poly}), z, x, y)
-  return z
+function AbstractAlgebra.hgcd_prefers_basecase(a::nmod_poly, b::nmod_poly)
+   return length(b) < 100
 end
 
-function gcdx(x::nmod_poly, y::nmod_poly)
-  check_parent(x,y)
-  !is_prime(modulus(x)) && error("Modulus not prime in gcdx")
-  g = parent(x)()
-  s = parent(x)()
-  t = parent(x)()
-  ccall((:nmod_poly_xgcd, libflint), Nothing,
-          (Ref{nmod_poly}, Ref{nmod_poly}, Ref{nmod_poly}, Ref{nmod_poly},
-           Ref{nmod_poly}), g, s, t, x, y)
-  return g,s,t
+function AbstractAlgebra.mat22_mul_prefers_classical(
+   a11::nmod_poly, a12::nmod_poly, a21::nmod_poly, a22::nmod_poly,
+   b11::nmod_poly, b12::nmod_poly, b21::nmod_poly, b22::nmod_poly)
+   return length(a11) + length(a22) < 30 || length(b11) + length(b22) < 30
 end
 
-function gcdinv(x::nmod_poly, y::nmod_poly)
-  check_parent(x,y)
-  !is_prime(modulus(x)) && error("Modulus not prime in gcdinv")
-  length(y) <= 1 && error("Length of second argument must be >= 2")
-  g = parent(x)()
-  s = parent(x)()
-  ccall((:nmod_poly_gcdinv, libflint), Nothing,
-          (Ref{nmod_poly}, Ref{nmod_poly}, Ref{nmod_poly}, Ref{nmod_poly}),
-          g, s, x, y)
-  return g,s
-end
+# Let AA do the gcd, gcdx, and gcdinv
 
 ################################################################################
 #
