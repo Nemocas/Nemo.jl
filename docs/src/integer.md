@@ -499,13 +499,13 @@ b = rand_bits_prime(ZZ, 7)
 # Complex Integers
 
 The Gaussian integer type in Nemo is provided by a pair of Flint integers.
-The associated ring of integers is represented by the constant parent object
-called `FlintZZi` or `ZZi`, and the fraction field is called `FlintQQi` or
-`QQi`.
+The associated ring of integers and the fraction field can be retrieved by
+`Nemo.GaussianIntegers()` and `Nemo.GaussianRationals()`.
 
 **Examples**
 
 ```julia
+ZZi = Nemo.GaussianIntegers()
 a = ZZ(5)*im
 b = ZZi(3, 4)
 

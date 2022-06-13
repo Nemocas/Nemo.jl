@@ -1,3 +1,6 @@
+ZZi = Nemo.GaussianIntegers()
+QQi = Nemo.GaussianRationals()
+
 @testset "fmpzi.abstract_types" begin
    @test fmpzi <: RingElem
    @test FlintZZiRing <: Nemo.Ring

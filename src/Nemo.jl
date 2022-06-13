@@ -71,7 +71,7 @@ export flint_cleanup, flint_set_num_threads
 
 export error_dim_negative, ErrorConstrDimMismatch
 
-export ZZi, QQi, ComplexField, PadicField, QadicField, NGFiniteField
+export ComplexField, PadicField, QadicField, NGFiniteField
 
 export QQBar
 
@@ -455,8 +455,6 @@ const _ecm_nCs = Vector{Int}[_ecm_nC]
 
 const ZZ = FlintZZ
 const QQ = FlintQQ
-const ZZi = FlintZZi
-const QQi = FlintQQi
 const PadicField = FlintPadicField
 const QadicField = FlintQadicField
 const FiniteField = FlintFiniteField
@@ -469,6 +467,8 @@ const FiniteField = FlintFiniteField
 
 const RealField = ArbField
 const ComplexField = AcbField
+GaussianIntegers() = FlintZZi
+GaussianRationals() = FlintQQi
 
 ###############################################################################
 #

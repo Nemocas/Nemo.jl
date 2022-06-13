@@ -1,3 +1,6 @@
+ZZi = Nemo.GaussianIntegers()
+QQi = Nemo.GaussianRationals()
+
 @testset "fmpqi.abstract_types" begin
    @test fmpqi <: FieldElem
    @test FlintQQiField <: Nemo.Field

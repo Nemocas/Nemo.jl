@@ -75,7 +75,7 @@ function (a::FlintQQiField)()
 end
 
 function (a::FlintQQiField)(b::IntegerUnion)
-   return fmpqi(ZZi(b))
+   return fmpqi(fmpzi(b))
 end
 
 function (a::FlintQQiField)(b::Union{Rational, fmpq})
