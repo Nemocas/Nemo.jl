@@ -108,8 +108,6 @@ include("arb/arb_mat.jl")
 
 include("arb/acb_mat.jl")
 
-include("gaussiannumbers/ZZi.jl")
-
 include("Factor.jl")
 
 include("polysubst.jl")
