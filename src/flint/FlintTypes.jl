@@ -15,6 +15,12 @@ end
 
 const FlintZZ = FlintIntegerRing()
 
+# Without this macro, there is no way to construct an fmpz without a finalizer
+# attached. Use like @new_struct(fmpz, 2) and use with caution.
+macro new_struct(T, args...)
+   return esc(Expr(:new, T, args...))
+end
+
 mutable struct fmpz <: RingElem
     d::Int
 
