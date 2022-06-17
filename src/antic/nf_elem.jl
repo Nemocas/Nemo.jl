@@ -69,7 +69,7 @@ const hash_seed = UInt==UInt64 ? 0xc2a44fbe466a1827 : 0xc2a44fb
 function hash(a::nf_elem, h::UInt)
    global hash_seed
    b = hash_seed
-   b = _hash_integer(a.elem_den, b)
+   b = hash(denominator(a), b)
    d = degree(parent(a))
    if d < 3
        x = fmpz()
