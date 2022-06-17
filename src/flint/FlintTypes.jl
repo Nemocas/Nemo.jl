@@ -3069,9 +3069,11 @@ const FmpqRelSeriesID = Dict{Tuple{Int, Symbol}, FmpqRelSeriesRing}()
 
 mutable struct fmpq_rel_series <: RelSeriesElem{fmpq}
    coeffs::Ptr{Nothing}
-   den::Int
    alloc::Int
    length::Int
+   den::Int
+   # end flint struct
+
    prec::Int
    val::Int
    parent::FmpqRelSeriesRing
@@ -3134,9 +3136,11 @@ const FmpqAbsSeriesID = Dict{Tuple{Int, Symbol}, FmpqAbsSeriesRing}()
 
 mutable struct fmpq_abs_series <: AbsSeriesElem{fmpq}
    coeffs::Ptr{Nothing}
-   den::Int
    alloc::Int
    length::Int
+   den::Int
+   # end flint struct
+
    prec :: Int
    parent::FmpqAbsSeriesRing
 
