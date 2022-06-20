@@ -64,30 +64,34 @@ defining_polynomial(K::AnticNumberField) = K.pol
 #
 ###############################################################################
 
-const hash_seed = UInt==UInt64 ? 0xc2a44fbe466a1827 : 0xc2a44fb
-
 function hash(a::nf_elem, h::UInt)
-   global hash_seed
-   b = hash_seed
-   b = hash(denominator(a), b)
+   b = 0xc2a44fbe466a1827%UInt64
    d = degree(parent(a))
-   if d < 3
-       x = fmpz()
-       for i in 1:d
-             b = xor(b, xor(hash(num_coeff!(x, a, i-1), h), h))
-             b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
-       end
-   else
-       GC.@preserve a for i in 1:a.elem_length
-             b = xor(b, xor(_hash_integer(unsafe_load(Ptr{Int}(a.elem_coeffs), i), h), h))
-             b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
-       end
-       for i in a.elem_length+1:d
-             b = xor(b, xor(_hash_integer(0, h), h))
-             b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
-       end
+   GC.@preserve a begin
+      aptr = reinterpret(Ptr{Int}, pointer_from_objref(a))
+      if d < 2
+         den = unsafe_load(aptr, 2)
+         b = _hash_integer(den, b)
+         num = unsafe_load(aptr, 1)
+         b = bitrotate(xor(b, xor(_hash_integer(num, h), h)), -1)
+      elseif d == 2
+         den = unsafe_load(aptr, 4)
+         b = _hash_integer(den, b)
+         num0 = unsafe_load(aptr, 1)
+         b = bitrotate(xor(b, xor(_hash_integer(num0, h), h)), -1)
+         num1 = unsafe_load(aptr, 2)
+         b = bitrotate(xor(b, xor(_hash_integer(num1, h), h)), -1)
+      else
+         b = _hash_integer(a.elem_den, b)
+         for i in 1:a.elem_length
+            num = unsafe_load(Ptr{Int}(a.elem_coeffs), i)
+            b = bitrotate(xor(b, xor(_hash_integer(num, h), h)), -1)
+         end
+         for i in a.elem_length+1:d
+            b = bitrotate(xor(b, xor(_hash_integer(0, h), h)), -1)
+         end
+      end
    end
-
    return b
 end
 
