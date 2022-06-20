@@ -65,7 +65,7 @@ defining_polynomial(K::AnticNumberField) = K.pol
 ###############################################################################
 
 function hash(a::nf_elem, h::UInt)
-   b = 0xc2a44fbe466a1827%UInt64
+   b = 0xc2a44fbe466a1827%UInt
    d = degree(parent(a))
    GC.@preserve a begin
       aptr = reinterpret(Ptr{Int}, pointer_from_objref(a))
