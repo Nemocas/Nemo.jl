@@ -141,10 +141,6 @@ function Base.hash(a::fmpqi, h::UInt)
    return hash(a.num, xor(hash(a.den, h), 0x6edeadc6d0447c19%UInt))
 end
 
-function Base.hash(a::FlintQQiField)
-   return 0x4c00da8e36fcc4a8%UInt
-end
-
 ###############################################################################
 #
 #   Random generation

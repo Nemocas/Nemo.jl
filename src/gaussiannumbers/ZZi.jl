@@ -113,10 +113,6 @@ function Base.hash(a::fmpzi, h::UInt)
    return hash(a.x, xor(hash(a.y, h), 0x94405bdfac6c8acd%UInt))
 end
 
-function Base.hash(a::FlintZZiRing)
-   return 0xc76722b5285975da%UInt
-end
-
 ###############################################################################
 #
 #   Random generation

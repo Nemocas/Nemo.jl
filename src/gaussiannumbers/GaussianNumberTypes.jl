@@ -1,6 +1,6 @@
 #### QQ(i) and ZZ(i) ####
 
-mutable struct FlintZZiRing <: Nemo.Ring
+struct FlintZZiRing <: Nemo.Ring
 end
 
 const FlintZZi = FlintZZiRing()
@@ -10,7 +10,7 @@ struct fmpzi <: RingElem
   y::fmpz
 end
 
-mutable struct FlintQQiField <: Nemo.Field
+struct FlintQQiField <: Nemo.Field
 end
 
 const FlintQQi = FlintQQiField()
