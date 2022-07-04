@@ -391,14 +391,6 @@ function !=(x::arb, y::arb)
     return Bool(ccall((:arb_ne, libarb), Cint, (Ref{arb}, Ref{arb}), x, y))
 end
 
-function >(x::arb, y::arb)
-    return Bool(ccall((:arb_gt, libarb), Cint, (Ref{arb}, Ref{arb}), x, y))
-end
-
-function >=(x::arb, y::arb)
-    return Bool(ccall((:arb_ge, libarb), Cint, (Ref{arb}, Ref{arb}), x, y))
-end
-
 function isless(x::arb, y::arb)
     return Bool(ccall((:arb_lt, libarb), Cint, (Ref{arb}, Ref{arb}), x, y))
 end
@@ -410,101 +402,73 @@ end
 ==(x::arb, y::Int) = x == arb(y)
 !=(x::arb, y::Int) = x != arb(y)
 <=(x::arb, y::Int) = x <= arb(y)
->=(x::arb, y::Int) = x >= arb(y)
 <(x::arb, y::Int) = x < arb(y)
->(x::arb, y::Int) = x > arb(y)
 
 ==(x::Int, y::arb) = arb(x) == y
 !=(x::Int, y::arb) = arb(x) != y
 <=(x::Int, y::arb) = arb(x) <= y
->=(x::Int, y::arb) = arb(x) >= y
 <(x::Int, y::arb) = arb(x) < y
->(x::Int, y::arb) = arb(x) > y
 
 ==(x::arb, y::fmpz) = x == arb(y)
 !=(x::arb, y::fmpz) = x != arb(y)
 <=(x::arb, y::fmpz) = x <= arb(y)
->=(x::arb, y::fmpz) = x >= arb(y)
 <(x::arb, y::fmpz) = x < arb(y)
->(x::arb, y::fmpz) = x > arb(y)
 
 ==(x::fmpz, y::arb) = arb(x) == y
 !=(x::fmpz, y::arb) = arb(x) != y
 <=(x::fmpz, y::arb) = arb(x) <= y
->=(x::fmpz, y::arb) = arb(x) >= y
 <(x::fmpz, y::arb) = arb(x) < y
->(x::fmpz, y::arb) = arb(x) > y
 
 ==(x::arb, y::Integer) = x == fmpz(y)
 !=(x::arb, y::Integer) = x != fmpz(y)
 <=(x::arb, y::Integer) = x <= fmpz(y)
->=(x::arb, y::Integer) = x >= fmpz(y)
 <(x::arb, y::Integer) = x < fmpz(y)
->(x::arb, y::Integer) = x > fmpz(y)
 
 
 ==(x::Integer, y::arb) = fmpz(x) == y
 !=(x::Integer, y::arb) = fmpz(x) != y
 <=(x::Integer, y::arb) = fmpz(x) <= y
->=(x::Integer, y::arb) = fmpz(x) >= y
 <(x::Integer, y::arb) = fmpz(x) < y
->(x::Integer, y::arb) = fmpz(x) > y
 
 ==(x::arb, y::Float64) = x == arb(y)
 !=(x::arb, y::Float64) = x != arb(y)
 <=(x::arb, y::Float64) = x <= arb(y)
->=(x::arb, y::Float64) = x >= arb(y)
 <(x::arb, y::Float64) = x < arb(y)
->(x::arb, y::Float64) = x > arb(y)
 
 ==(x::Float64, y::arb) = arb(x) == y
 !=(x::Float64, y::arb) = arb(x) != y
 <=(x::Float64, y::arb) = arb(x) <= y
->=(x::Float64, y::arb) = arb(x) >= y
 <(x::Float64, y::arb) = arb(x) < y
->(x::Float64, y::arb) = arb(x) > y
 
 ==(x::arb, y::BigFloat) = x == arb(y)
 !=(x::arb, y::BigFloat) = x != arb(y)
 <=(x::arb, y::BigFloat) = x <= arb(y)
->=(x::arb, y::BigFloat) = x >= arb(y)
 <(x::arb, y::BigFloat) = x < arb(y)
->(x::arb, y::BigFloat) = x > arb(y)
 
 ==(x::BigFloat, y::arb) = arb(x) == y
 !=(x::BigFloat, y::arb) = arb(x) != y
 <=(x::BigFloat, y::arb) = arb(x) <= y
->=(x::BigFloat, y::arb) = arb(x) >= y
 <(x::BigFloat, y::arb) = arb(x) < y
->(x::BigFloat, y::arb) = arb(x) > y
 
 ==(x::arb, y::fmpq) = x == arb(y, precision(parent(x)))
 !=(x::arb, y::fmpq) = x != arb(y, precision(parent(x)))
 <=(x::arb, y::fmpq) = x <= arb(y, precision(parent(x)))
->=(x::arb, y::fmpq) = x >= arb(y, precision(parent(x)))
 <(x::arb, y::fmpq) = x < arb(y, precision(parent(x)))
->(x::arb, y::fmpq) = x > arb(y, precision(parent(x)))
 
 ==(x::fmpq, y::arb) = arb(x, precision(parent(y))) == y
 !=(x::fmpq, y::arb) = arb(x, precision(parent(y))) != y
 <=(x::fmpq, y::arb) = arb(x, precision(parent(y))) <= y
->=(x::fmpq, y::arb) = arb(x, precision(parent(y))) >= y
 <(x::fmpq, y::arb) = arb(x, precision(parent(y))) < y
->(x::fmpq, y::arb) = arb(x, precision(parent(y))) > y
 
 ==(x::arb, y::Rational{T}) where {T <: Integer} = x == fmpq(y)
 !=(x::arb, y::Rational{T}) where {T <: Integer} = x != fmpq(y)
 <=(x::arb, y::Rational{T}) where {T <: Integer} = x <= fmpq(y)
->=(x::arb, y::Rational{T}) where {T <: Integer} = x >= fmpq(y)
 <(x::arb, y::Rational{T}) where {T <: Integer} = x < fmpq(y)
->(x::arb, y::Rational{T}) where {T <: Integer} = x > fmpq(y)
 
 ==(x::Rational{T}, y::arb) where {T <: Integer} = fmpq(x) == y
 !=(x::Rational{T}, y::arb) where {T <: Integer} = fmpq(x) != y
 <=(x::Rational{T}, y::arb) where {T <: Integer} = fmpq(x) <= y
->=(x::Rational{T}, y::arb) where {T <: Integer} = fmpq(x) >= y
 <(x::Rational{T}, y::arb) where {T <: Integer} = fmpq(x) < y
->(x::Rational{T}, y::arb) where {T <: Integer} = fmpq(x) > y
 
 ################################################################################
 #

@@ -727,11 +727,7 @@ end
 
 <=(x::fmpz, y::fmpz) = cmp(x,y) <= 0
 
->=(x::fmpz, y::fmpz) = cmp(x,y) >= 0
-
 <(x::fmpz, y::fmpz) = cmp(x,y) < 0
-
->(x::fmpz, y::fmpz) = cmp(x,y) > 0
 
 function cmpabs(x::fmpz, y::fmpz)
     Int(ccall((:fmpz_cmpabs, libflint), Cint,
@@ -758,21 +754,13 @@ end
 
 <=(x::fmpz, y::Int) = cmp(x,y) <= 0
 
->=(x::fmpz, y::Int) = cmp(x,y) >= 0
-
 <(x::fmpz, y::Int) = cmp(x,y) < 0
-
->(x::fmpz, y::Int) = cmp(x,y) > 0
 
 ==(x::Int, y::fmpz) = cmp(y,x) == 0
 
 <=(x::Int, y::fmpz) = cmp(y,x) >= 0
 
->=(x::Int, y::fmpz) = cmp(y,x) <= 0
-
 <(x::Int, y::fmpz) = cmp(y,x) > 0
-
->(x::Int, y::fmpz) = cmp(y,x) < 0
 
 function cmp(x::fmpz, y::UInt)
     Int(ccall((:fmpz_cmp_ui, libflint), Cint, (Ref{fmpz}, UInt), x, y))
@@ -782,21 +770,13 @@ end
 
 <=(x::fmpz, y::UInt) = cmp(x,y) <= 0
 
->=(x::fmpz, y::UInt) = cmp(x,y) >= 0
-
 <(x::fmpz, y::UInt) = cmp(x,y) < 0
-
->(x::fmpz, y::UInt) = cmp(x,y) > 0
 
 ==(x::UInt, y::fmpz) = cmp(y,x) == 0
 
 <=(x::UInt, y::fmpz) = cmp(y,x) >= 0
 
->=(x::UInt, y::fmpz) = cmp(y,x) <= 0
-
 <(x::UInt, y::fmpz) = cmp(y,x) > 0
-
->(x::UInt, y::fmpz) = cmp(y,x) < 0
 
 ###############################################################################
 #
