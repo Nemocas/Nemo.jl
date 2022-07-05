@@ -263,7 +263,7 @@ function deepcopy_internal(d::nf_elem, dict::IdDict)
 end
 
 function is_cyclo_type(K::AnticNumberField)
-  return !(get_attribute(K, :cyclo) === nothing) ::Bool
+  return has_attribute(K, :cyclo)
 end
 
 function is_maxreal_type(K::AnticNumberField)
