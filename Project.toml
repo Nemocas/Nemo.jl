@@ -20,9 +20,9 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 AbstractAlgebra = "^0.26.0"
-Antic_jll = "~0.200.500"
-Arb_jll = "~200.2200.000"
-Calcium_jll = "~0.400.102"
-FLINT_jll = "^200.800.401"
+Antic_jll = "~0.201.500"
+Arb_jll = "~200.2300.000"
+Calcium_jll = "~0.401.100"
+FLINT_jll = "^200.900.000"
 RandomExtensions = "0.4.2"
 julia = "1.6"
