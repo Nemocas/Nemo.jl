@@ -364,14 +364,38 @@ end
 
   @test (q,r) == (x^4 + 22*x^3 + 2*x^2 + 21*x + 5, Rx(13))
   @test f == q*(x+2) + r
-
   @test_throws DivideError divrem(f,zero(Rx))
 
   r = rem(f,x+3)
-
   @test parent(r) == parent(f)
-
   @test r == Rx(14)
+
+   R = ResidueRing(ZZ, 24)
+   Rx, x = PolynomialRing(R, "x")
+   a = 2*x+1
+   try
+      q = div(a^2, a)
+      @test q*a = a^2
+   catch e
+      @test e isa NotInvertibleError
+   end
+end
+
+@testset "nmod_poly.hgcd" begin
+   R = ResidueRing(ZZ, next_prime(2^30))
+   Rx, x = PolynomialRing(R, "x")
+   a = rand(Rx, 501:501)
+   b = rand(Rx, 500:500)
+   try
+      (A, B, m11, m12, m21, m22, s) = hgcd(a, b)
+      @test degree(A) >= cld(degree(a), 2) > degree(B)
+      @test m11*A + m12*B == a
+      @test m21*A + m22*B == b
+      @test m11*m22 - m21*m12 == s
+      @test s^2 == 1
+   catch e
+      @test e isa NotInvertibleError
+   end
 end
 
 @testset "nmod_poly.adhoc_exact_division" begin

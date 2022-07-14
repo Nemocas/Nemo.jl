@@ -361,6 +361,33 @@ end
    @test mod(g, f) == 6*x+3
 
    @test divrem(g, f) == (x+123456789012345678947, 6*x+3)
+
+   R = ResidueRing(ZZ, fmpz(24))
+   Rx, x = PolynomialRing(R, "x")
+   a = 2*x+1
+   try
+      q = divexact(a^2, a)
+      @test q*a = a^2
+   catch e
+      @test e isa NotInvertibleError
+   end
+end
+
+@testset "fmpz_mod_poly.hgcd" begin
+   R = ResidueRing(ZZ, next_prime(fmpz(2)^100))
+   Rx, x = PolynomialRing(R, "x")
+   a = rand(Rx, 501:501)
+   b = rand(Rx, 500:500)
+   try
+      (A, B, m11, m12, m21, m22, s) = hgcd(a, b)
+      @test degree(A) >= cld(degree(a), 2) > degree(B)
+      @test m11*A + m12*B == a
+      @test m21*A + m22*B == b
+      @test m11*m22 - m21*m12 == s
+      @test s^2 == 1
+   catch e
+      @test e isa NotInvertibleError
+   end
 end
 
 @testset "fmpz_mod_poly.gcd" begin
