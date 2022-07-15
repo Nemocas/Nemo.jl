@@ -734,6 +734,34 @@ function mul!(z::fmpq_mat, x::fmpq_mat, y::fmpq_mat)
    return z
 end
 
+function mul!(z::Vector{fmpq}, a::Vector{fmpq}, b::fmpq_mat)
+   ccall((:fmpq_mat_fmpq_vec_mul_ptr, libflint), Nothing,
+         (Ptr{Ref{fmpq}}, Ptr{Ref{fmpq}}, Int, Ref{fmpq_mat}),
+         z, a, length(a), b)
+   return z
+end
+
+function mul!(z::Vector{fmpq}, a::fmpq_mat, b::Vector{fmpq})
+   ccall((:fmpq_mat_mul_fmpq_vec_ptr, libflint), Nothing,
+         (Ptr{Ref{fmpq}}, Ref{fmpq_mat}, Ptr{Ref{fmpq}}, Int),
+         z, a, b, length(b))
+   return z
+end
+
+function mul!(z::Vector{fmpq}, a::Vector{fmpz}, b::fmpq_mat)
+   ccall((:fmpq_mat_fmpz_vec_mul_ptr, libflint), Nothing,
+         (Ptr{Ref{fmpq}}, Ptr{Ref{fmpz}}, Int, Ref{fmpq_mat}),
+         z, a, length(a), b)
+   return z
+end
+
+function mul!(z::Vector{fmpq}, a::fmpq_mat, b::Vector{fmpz})
+   ccall((:fmpq_mat_mul_fmpz_vec_ptr, libflint), Nothing,
+         (Ptr{Ref{fmpq}}, Ref{fmpq_mat}, Ptr{Ref{fmpz}}, Int),
+         z, a, b, length(b))
+   return z
+end
+
 function add!(z::fmpq_mat, x::fmpq_mat, y::fmpq_mat)
    ccall((:fmpq_mat_add, libflint), Nothing,
                 (Ref{fmpq_mat}, Ref{fmpq_mat}, Ref{fmpq_mat}), z, x, y)

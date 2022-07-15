@@ -666,3 +666,11 @@ end
       @test denominator(x) in 1:9
    end
 end
+
+@testset "fmpq_mat.unsafe" begin
+   A = matrix(QQ, 2, 3, [1//2 3//4 5//6; 7//8 9//10 11//12])
+   @test mul!([QQ(), QQ()], A, [QQ(1), QQ(2), QQ(3)]) == [9//2, 217//40]
+   @test mul!([QQ(), QQ()], A, [ZZ(1), ZZ(2), ZZ(3)]) == [9//2, 217//40]
+   @test mul!([QQ(), QQ(), QQ()], [QQ(1), QQ(2)], A) == [9//4, 51//20, 8//3]
+   @test mul!([QQ(), QQ(), QQ()], [ZZ(1), ZZ(2)], A) == [9//4, 51//20, 8//3]
+end
