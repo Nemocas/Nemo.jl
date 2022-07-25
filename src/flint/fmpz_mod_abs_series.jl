@@ -732,6 +732,15 @@ function (a::($rtype))(b::Vector{fmpz}, len::Int, prec::Int)
    return z
 end
 
+function (a::($rtype))(b::Vector{($mtype)}, len::Int, prec::Int)
+   if length(b) > 0
+      (base_ring(a) != parent(b[1])) && error("Wrong parents")
+   end
+   z = ($etype)(base_ring(a), b, len, prec)
+   z.parent = a
+   return z
+end
+
 end # eval
 end # for
 
