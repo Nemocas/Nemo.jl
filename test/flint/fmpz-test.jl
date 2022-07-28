@@ -764,14 +764,14 @@ end
       n = length(r)
       s = rand(Bool)
       a = @inferred crt(r, m, s; check=check)
-      b, l = @inferred crt_with_lcm(r, m, s; check=check)
+      b, l = @inferred crt_with_lcm(r, m, !s; check=check)
       if !iszero(l)
          if s
             @test -l < 2*a <= l
-            @test -l < 2*b <= l
+            @test 0 <= b < l
          else
             @test 0 <= a < l
-            @test 0 <= b < l
+            @test -l < 2*b <= l
          end
       end
       for i in 1:length(r)
@@ -795,7 +795,7 @@ end
    @test parent(crt([ZZ(1), ZZ(2)], [ZZ(4), ZZ(6)]; check=false)) == ZZ # junk but no throw
 
    testit([ZZ(1), ZZ(2), ZZ(3)], [ZZ(4), ZZ(5), ZZ(7)])
-   testit([ZZ(1), ZZ(2), ZZ(3)], [ZZ(4), ZZ(5), ZZ(6)])
+   testit([ZZ(1), ZZ(2), ZZ(3)], [ZZ(4), ZZ(5), ZZ(-6)])
    testit([ZZ(-1), ZZ(2), ZZ(-1)], [ZZ(0), ZZ(3), ZZ(0)])
    @test_throws Exception crt([ZZ(1), ZZ(2), ZZ(2)], [ZZ(4), ZZ(5), ZZ(6)])
    @test_throws Exception crt([ZZ(-1), ZZ(2), ZZ(2)], [ZZ(0), ZZ(3), ZZ(0)])
