@@ -245,8 +245,7 @@ sqrtmod(::fmpz, ::fmpz)
 ```
 
 ```@docs
-crt(::fmpz, ::fmpz, ::fmpz, m::fmpz, ::Bool)
-crt(::fmpz, ::fmpz, ::Int, ::Int, ::Bool)
+crt(r1::fmpz, m1::fmpz, r2::fmpz, m2::fmpz, signed=false; check::Bool=true)
 ```
 
 **Examples**
@@ -254,6 +253,7 @@ crt(::fmpz, ::fmpz, ::Int, ::Int, ::Bool)
 ```julia
 c = sqrtmod(ZZ(12), ZZ(13))
 d = crt(ZZ(5), ZZ(13), ZZ(7), ZZ(37), true)
+d = crt(ZZ(5), ZZ(13), 7, 37, true)
 ```
 
 ### Integer logarithm

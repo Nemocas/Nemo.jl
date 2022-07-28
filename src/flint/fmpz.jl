@@ -926,13 +926,15 @@ end
 
 @doc Markdown.doc"""
     crt(r1::fmpz, m1::fmpz, r2::fmpz, m2::fmpz, signed=false; check::Bool=true)
+    crt(r1::fmpz, m1::fmpz, r2::Union{Int, UInt}, m2::Union{Int, UInt}, signed=false; check::Bool=true)
     crt(r::Vector{fmpz}, m::Vector{fmpz}, signed=false; check::Bool=true)
     crt_with_lcm(r1::fmpz, m1::fmpz, r2::fmpz, m2::fmpz, signed=false; check::Bool=true)
+    crt_with_lcm(r1::fmpz, m1::fmpz, r2::Union{Int, UInt}, m2::Union{Int, UInt}, signed=false; check::Bool=true)
     crt_with_lcm(r::Vector{fmpz}, m::Vector{fmpz}, signed=false; check::Bool=true)
 
 As per the AbstractAlgebra `crt` interface, with the following option.
-If `signed = true`, the solution is the range (-m/2, m/2], otherwise it is in
-the range `[0,m)`, where `m` is the least common multiple of the moduli.
+If `signed = true`, the solution is the range $(-m/2, m/2]$, otherwise it is in
+the range $[0,m)$, where $m$ is the least common multiple of the moduli.
 """
 function crt(r1::fmpz, m1::fmpz, r2::fmpz, m2::fmpz, signed=false; check::Bool=true)
    r, m = AbstractAlgebra._crt_with_lcm_stub(r1, m1, r2, m2; check=check)
