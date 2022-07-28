@@ -810,10 +810,43 @@ end
    @test crt(fmpz(11), fmpz(30), fmpz(40), fmpz(85); check=false) isa fmpz
    @test_throws Exception crt(fmpz(11), fmpz(30), fmpz(40), fmpz(85)) isa fmpz
 
-   @test crt(fmpz(5), fmpz(13), 7, 37, false) == 44
-   @test_throws DomainError crt(fmpz(5), fmpz(13), -7, 37, true)
-   @test_throws DomainError crt(fmpz(5), fmpz(13), 7, -37, true)
-   @test_throws DomainError crt(fmpz(5), fmpz(13), -7, -37, true)
+   for s in (true, false)
+      rr = ZZ(99)^150
+      mm = ZZ(101)^100  # something prime to the typemax/mins
+      for (r1, m1, r2, m2) in ((5, 13, 7, 37),
+                               (5, 13, -7, 37),
+                               (5, 13, 7, -37),
+                               (5, 13, -7, -37),
+                               (0, 0, 0, 0),
+                               (2, 4, 0, 2),
+                               (0, 2, 2, 4),
+                               (1, 0, 1, 3),
+                               (1, 3, 1, 0),
+                               (1, 3, UInt(1), UInt(0)),
+                               (rr, mm, 100, typemax(UInt)),
+                               (rr, mm, -200, typemax(UInt)),
+                               (rr, mm, typemin(Int), typemax(UInt)),
+                               (rr, mm, typemin(Int), typemax(UInt)),
+                               (rr, mm, typemax(Int), typemax(UInt)),
+                               (rr, mm, typemin(Int), typemax(Int)),
+                               (rr, mm, typemax(Int), typemax(Int)),
+                               (rr, mm, typemin(Int), typemin(Int)),
+                               (rr, mm, typemax(Int), typemin(Int)),
+                               (rr, mm, typemax(UInt), typemin(Int)),
+                               (rr, mm, typemax(UInt), typemin(Int)))
+
+         @test crt(ZZ(r1), ZZ(m1), r2, m2, s) ==
+               crt(ZZ(r1), ZZ(m1), ZZ(r2), ZZ(m2), s)
+
+         @test crt_with_lcm(ZZ(r1), ZZ(m1), r2, m2, s) ==
+               crt_with_lcm(ZZ(r1), ZZ(m1), ZZ(r2), ZZ(m2), s)
+      end
+   end
+
+   @test_throws Exception crt(fmpz(1), fmpz(3), UInt(2), UInt(0))
+   @test_throws Exception crt(fmpz(1), fmpz(3), 2, 0)
+   @test_throws Exception crt(fmpz(11), fmpz(30), UInt(40), UInt(85))
+   @test_throws Exception crt(fmpz(11), fmpz(30), 40, 85)
 end
 
 @testset "fmpz.factor" begin

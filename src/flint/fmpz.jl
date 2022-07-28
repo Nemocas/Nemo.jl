@@ -954,23 +954,72 @@ function crt_with_lcm(r::Vector{fmpz}, m::Vector{fmpz}, signed=false; check::Boo
    return _normalize_crt_with_lcm(r, m, signed)
 end
 
+# requires a < b
+function _gcdinv(a::UInt, b::UInt)
+   s = Ref{UInt}()
+   g = ccall((:n_gcdinv, libflint), UInt,
+             (Ptr{UInt}, UInt, UInt),
+             s, a, b)
+   return g, s[]
+end
 
-@doc Markdown.doc"""
-    crt(r1::fmpz, m1::fmpz, r2::Int, m2::Int, signed=false)
+function submod(a::UInt, b::UInt, n::UInt)
+   return a >= b ? a - b : a - b + n
+end
 
-Return $r$ such that $r \equiv r_1 (\mod m_1)$ and $r \equiv r_2 (\mod m_2)$.
-If `signed = true`, $r$ will be in the range $-m_1m_2/2 < r \leq m_1m_2/2$.
-If `signed = false` the value will be in the range $0 \leq r < m_1m_2$.
-This function expects $m_1$ and $m_2$ to be coprime.
-"""
-function crt(r1::fmpz, m1::fmpz, r2::Int, m2::Int, signed = false)
-   z = fmpz()
-   r2 < 0 && throw(DomainError(r2, "Second residue must be non-negative"))
-   m2 < 0 && throw(DomainError(m2, "Second modulus must be non-negative"))
-   ccall((:fmpz_CRT_ui, libflint), Nothing,
-          (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Int, Int, Cint),
-          z, r1, m1, r2, m2, signed)
-   return z
+function mulmod(a::UInt, b::UInt, n::UInt)
+   return UInt(mod(widen(a)*b, n))
+end
+
+function divexact(a::UInt, b::UInt; check::Bool=true)
+   check && !iszero(mod(a, b)) && throw(ArgumentError("Not an exact division"))
+   return div(a, b)
+end
+
+function _crt_with_lcm(r1::fmpz, m1::fmpz, r2::UInt, m2::UInt; check::Bool=true)
+   if iszero(m2)
+      check && !is_divisible_by(r2 - r1, m1) && error("no crt solution")
+      return (fmpz(r2), fmpz(m2))
+   end
+   if r2 >= m2
+      r2 = mod(r2, m2)
+   end
+   if iszero(m1)
+      check && mod(r1, m2) != r2 && error("no crt solution")
+      return (r1, m1)
+   end
+   g, s = _gcdinv(mod(m1, m2), m2)
+   diff = submod(r2, mod(r1, m2), m2)
+   if isone(g)
+      return (r1 + mulmod(diff, s, m2)*m1, m1*m2)
+   else
+      m2og = divexact(m2, g; check=false)
+      diff = divexact(diff, g; check=check)
+      return (r1 + mulmod(diff, s, m2og)*m1, m1*m2og)
+   end
+end
+
+function _crt_with_lcm(r1::fmpz, m1::fmpz, r2::Union{Int, UInt},
+                                        m2::Union{Int, UInt}; check::Bool=true)
+   if iszero(m2)
+      check && !is_divisible_by(r2 - r1, m1) && error("no crt solution")
+      return (fmpz(r2), fmpz(m2))
+   end
+   m2 = abs(m2)%UInt
+   r2 = r2 < 0 ? mod(r2, m2) : UInt(r2)
+   return _crt_with_lcm(r1, m1, r2::UInt, m2; check=check)
+end
+
+function crt(r1::fmpz, m1::fmpz, r2::Union{Int, UInt},
+                        m2::Union{Int, UInt}, signed = false; check::Bool=true)
+   r, m = _crt_with_lcm(r1, m1, r2, m2; check=check)
+   return _normalize_crt(r, m, signed)
+end
+
+function crt_with_lcm(r1::fmpz, m1::fmpz, r2::Union{Int, UInt},
+                        m2::Union{Int, UInt}, signed = false; check::Bool=true)
+   r, m = _crt_with_lcm(r1, m1, r2, m2; check=check)
+   return _normalize_crt_with_lcm(r, m, signed)
 end
 
 ###############################################################################
