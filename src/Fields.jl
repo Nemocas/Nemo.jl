@@ -16,6 +16,8 @@ include("flint/fq_nmod_embed.jl")
 
 include("flint/fq_default.jl")
 
+include("flint/fq_default_extended.jl")
+
 include("antic/nf_elem.jl")
 
 include("arb/arb.jl")
