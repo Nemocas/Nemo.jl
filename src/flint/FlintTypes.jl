@@ -2100,13 +2100,22 @@ end
 
    var::String
    
-   overfields :: Dict{Int, Vector{FinFieldMorphism}}
-   subfields :: Dict{Int, Vector{FinFieldMorphism}}
+   overfields::Dict{Int, Vector{FinFieldMorphism}}
+   subfields::Dict{Int, Vector{FinFieldMorphism}}
+
+   isabsolute::Bool
+   base_field
+   defining_poly
+   forwardmap
+   backwardmap
+   preimage_basefield
+   image_basefield
 
    function FqDefaultFiniteField(char::fmpz, deg::Int, s::Symbol, cached::Bool = true)
       return get_cached!(FqDefaultFiniteFieldID, (char, deg, s), cached) do
          d = new()
          d.var = string(s)
+         d.isabsolute = true
          finalizer(_FqDefaultFiniteField_clear_fn, d)
          ccall((:fq_default_ctx_init, libflint), Nothing,
                (Ref{FqDefaultFiniteField}, Ref{fmpz}, Int, Ptr{UInt8}),
@@ -2120,6 +2129,7 @@ end
          throw(DomainError(base_ring(f), "the base ring of the polynomial must be a field"))
       return get_cached!(FqDefaultFiniteFieldIDFmpzPol, (f, s), cached) do
          z = new()
+         z.isabsolute = true
          z.var = string(s)
          ccall((:fq_default_ctx_init_modulus, libflint), Nothing,
                (Ref{FqDefaultFiniteField}, Ref{fmpz_mod_poly}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
@@ -2133,6 +2143,7 @@ end
       # check ignored
       return get_cached!(FqDefaultFiniteFieldIDGFPPol, (f, s), cached) do
          z = new()
+         z.isabsolute = true
          z.var = string(s)
          ccall((:fq_default_ctx_init_modulus, libflint), Nothing,
                (Ref{FqDefaultFiniteField}, Ref{gfp_fmpz_poly}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
@@ -2147,6 +2158,7 @@ end
          throw(DomainError(base_ring(f), "the base ring of the polynomial must be a field"))
       return get_cached!(FqDefaultFiniteFieldIDNmodPol, (f, s), cached) do
          z = new()
+         z.isabsolute = true
          z.var = string(s)
          ccall((:fq_default_ctx_init_modulus_nmod, libflint), Nothing,
                (Ref{FqDefaultFiniteField}, Ref{nmod_poly}, Ptr{UInt8}),
@@ -2160,6 +2172,7 @@ end
       # check ignored
       return get_cached!(FqDefaultFiniteFieldIDGFPNmodPol, (f, s), cached) do
          z = new()
+         z.isabsolute = true
          z.var = string(s)
          ccall((:fq_default_ctx_init_modulus_nmod, libflint), Nothing,
                (Ref{FqDefaultFiniteField}, Ref{gfp_poly}, Ptr{UInt8}),

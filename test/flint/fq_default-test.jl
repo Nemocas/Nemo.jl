@@ -85,7 +85,7 @@ end
 
    @test coeff(2x + 1, 1) == 2
 
-   @test_throws DomainError  coeff(2x + 1, -1)
+   @test_throws DomainError coeff(2x + 1, -1)
 end
 
 @testset "fq_default.conversions" begin
