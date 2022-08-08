@@ -63,7 +63,8 @@ end
 function defining_polynomial(L::FqDefaultFiniteField)
   if !isdefined(L, :defining_poly)
     @assert is_absolute(L)
-    L.defining_poly = minpoly(gen(L))
+    F = PolynomialRing(prime_field(L), "x", cached = false)[1]
+    L.defining_poly = F(map(lift, collect(coefficients(modulus(L)))))
   end
   return L.defining_poly::fq_default_poly
 end
