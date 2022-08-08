@@ -60,15 +60,12 @@ function _coerce_to_prime_field(a::fq_default)
   return K(coeff(lift(ZZ["x"][1], a), 0))
 end
 
-# should be cached
 function defining_polynomial(L::FqDefaultFiniteField)
-  if is_absolute(L)
-    # Would be good if we don't go through minpoly but directly get it from
-    # flint
-    return minpoly(gen(L))
-  else
-    return L.defining_poly::fq_default_poly
+  if !isdefined(L, :defining_poly)
+    @assert is_absolute(L)
+    L.defining_poly = minpoly(gen(L))
   end
+  return L.defining_poly::fq_default_poly
 end
 
 ################################################################################
