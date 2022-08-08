@@ -43,12 +43,11 @@ end
 ################################################################################
 
 # Need this for the trace and norm
-# should be made faster
 function _coerce_to_base_field(a::fq_default)
   L = parent(a)
   K = base_field(L)
   if is_absolute(L)
-    return K(coeff(lift(ZZ["x"][1], a), 0))
+    return K(lift(ZZ, a))
   else
     return L.preimage_basefield(a)
   end
@@ -57,7 +56,7 @@ end
 function _coerce_to_prime_field(a::fq_default)
   L = parent(a)
   K = prime_field(L)
-  return K(coeff(lift(ZZ["x"][1], a), 0))
+  return K(lift(ZZ, a))
 end
 
 function defining_polynomial(L::FqDefaultFiniteField)
@@ -351,14 +350,10 @@ function expressify(a::_fq_default_dummy; context = nothing)
    sum = Expr(:call, :+)
    for k in (d - 1):-1:0
         c = _coeff(a.a, k)
-        if !iszero(c)
-            xk = k < 1 ? 1 : k == 1 ? x : Expr(:call, :^, x, k)
-            if isone(c)
-                push!(sum.args, Expr(:call, :*, xk))
-            else
-                push!(sum.args, Expr(:call, :*, expressify(c, context = context), xk))
-            end
-        end
+        iszero(c) && continue
+        xk = k < 1 ? 1 : k == 1 ? x : Expr(:call, :^, x, k)
+        push!(sum.args, isone(c) ? Expr(:call, :*, xk) :
+                         Expr(:call, :*, expressify(c, context = context), xk))
     end
     return sum
 end
