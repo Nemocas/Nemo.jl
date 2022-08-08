@@ -134,6 +134,15 @@ end
 #
 ###############################################################################
 
+function lift(R::FlintIntegerRing, x::fq_default)
+  z = R()
+  ok = ccall((:fq_default_get_fmpz, libflint), Cint,
+             (Ref{fmpz}, Ref{fq_default}, Ref{FqDefaultFiniteField}),
+             z, x, parent(x))
+  ok == 0 && error("cannot lift")
+  return z
+end
+
 function lift(R::FmpzPolyRing, x::fq_default)
    p = R()
    ccall((:fq_default_get_fmpz_poly, libflint), Nothing,
