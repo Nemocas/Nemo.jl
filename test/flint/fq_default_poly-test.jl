@@ -26,6 +26,9 @@
 
    h = S(x^2 + 2x + 1)
 
+   RR, xx = NGFiniteField(fmpz(23), 1, "xx")
+   @test_throws ErrorException S(xx)
+
    @test isa(h, PolyElem)
 
    j = T(x + 2)

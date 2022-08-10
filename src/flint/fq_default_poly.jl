@@ -817,6 +817,7 @@ function (R::FqDefaultPolyRing)()
 end
 
 function (R::FqDefaultPolyRing)(x::fq_default)
+  parent(x) !== base_ring(R) && error("Element not contained in coefficient ring")
   z = fq_default_poly(x, base_ring(R))
   z.parent = R
   return z
