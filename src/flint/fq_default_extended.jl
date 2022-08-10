@@ -1,4 +1,5 @@
-export absolute_degree, absolute_norm, absolute_tr, absolute_frobenius
+export absolute_degree, absolute_norm, absolute_tr, absolute_frobenius,
+       absolute_charpoly
 
 ################################################################################
 #
