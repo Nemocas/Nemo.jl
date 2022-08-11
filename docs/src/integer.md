@@ -392,6 +392,12 @@ number_of_partitions(::Int)
 number_of_partitions(::fmpz) 
 ```
 
+```@docs
+is_perfect_power(::fmpz)
+is_prime_power(::fmpz)
+is_prime_power_with_data(::fmpz)
+```
+
 **Examples**
 
 ```julia

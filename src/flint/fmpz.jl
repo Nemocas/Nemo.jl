@@ -33,7 +33,7 @@
 
 # do not export div and divrem
 export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash, bell,
-       is_prime, fdiv, cdiv, tdiv, rem, mod, gcd, lcm, invmod, powermod, abs,
+       is_perfect_power, is_prime, is_prime_power, is_prime_power_with_data, fdiv, cdiv, tdiv, rem, mod, gcd, lcm, invmod, powermod, abs,
        isqrt, popcount, prevpow2, nextpow2, ndigits, dec, bin, oct, hex, base,
        one, zero, divexact, fits, sign, nbits, deepcopy, tdivpow2, fdivpow2,
        cdivpow2, flog, clog, cmpabs, clrbit!, setbit!, combit!, crt,
@@ -2659,6 +2659,94 @@ Base.promote_rule(::Type{fmpz}, ::Type{T}) where {T <: Integer} = fmpz
 
 promote_rule(::Type{fmpz}, ::Type{T}) where {T <: Integer} = fmpz
 
+###############################################################################
+#
+#  Perfect power detection
+#
+###############################################################################
+
+# 1, 0, -1 are perfect powers
+# ex is not guarenteed to be maximal
+function _is_perfect_power(a::fmpz)
+  rt = fmpz()
+  ex = ccall((:fmpz_is_perfect_power, libflint), Int, (Ref{fmpz}, Ref{fmpz}), rt, a)
+  return rt, ex
+end
+
+@doc Markdown.doc"""
+    is_perfect_power(a::IntegerUnion)
+
+Returns whether $a$ is a perfect power, that is, whether $a = m^r$ for some
+integer $m$ and $r > 1$.
+"""
+function is_perfect_power(a::fmpz)
+  _, ex = _is_perfect_power(a)
+  return ex > 0
+end
+
+is_perfect_power(a::Integer) = is_perfect_power(fmpz(a))
+
+# Returns $e$, $r$ such that $a = r^e$ with $e$ maximal. Note: $1 = 1^0$.
+function _maximal_integer_root(a::fmpz)
+  if iszero(a)
+    error("must not be zero")
+  end
+  if isone(a)
+    return 0, a
+  end
+  if a < 0
+    e, r = _maximal_integer_root(-a)
+    if isone(e)
+      return 1, a
+    end
+    v, s = iszero(e) ? (0, 0) : remove(e, 2)
+    return s, -r^(2^v)
+  end
+  rt = fmpz()
+  e = 1
+  while true
+    rt, ex = _is_perfect_power(a)
+    if ex == 1 || ex == 0
+      return e, a
+    end
+    e *= ex
+    a = rt
+  end
+end
+
+@doc Markdown.doc"""
+    is_prime_power(q::IntegerUnion) -> Bool
+
+Returns whether $q$ is a prime power.
+"""
+is_prime_power(::IntegerUnion)
+
+function is_prime_power(q::fmpz)
+  iszero(q) && return false
+  e, a = _maximal_integer_root(q)
+  return isprime(a)
+end
+
+is_prime_power(q::Integer) = is_prime_power(fmpz(q))
+
+@doc Markdown.doc"""
+    is_prime_power_with_data(q::IntegerUnion) -> Bool, fmpz, Int
+
+Returns a flag indicating whether $q$ is a prime power and integers $p, e$ such
+that $q = p^e$. If $q$ is a prime power, than $p$ is a prime.
+"""
+is_prime_power_with_data(::IntegerUnion)
+
+function is_prime_power_with_data(q::fmpz)
+  iszero(q) && return false, q, 1
+  e, a = _maximal_integer_root(q)
+  return isprime(a), a, e
+end
+
+function is_prime_power_with_data(q::Integer)
+  e, a = _maximal_integer_root(fmpz(q))
+  return isprime(a), typeof(q)(a), e
+end
 
 ###############################################################################
 #

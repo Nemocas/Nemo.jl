@@ -1120,6 +1120,35 @@ end
 
       @test number_of_partitions(fmpz(-2)) == 0
    end
+
+   # Perfect power
+   for T in [Int, BigInt, fmpz]
+     @test @inferred is_perfect_power(T(4))
+     @test is_perfect_power(T(36))
+     @test is_perfect_power(T(-27))
+     @test is_perfect_power(T(1))
+     @test is_perfect_power(T(-1))
+     @test is_perfect_power(T(0))
+     @test !is_perfect_power(T(2))
+     @test !is_perfect_power(T(-4))
+     @test !is_perfect_power(T(6))
+   end
+   @test is_perfect_power(fmpz(10940293781057873954324736))
+
+   # Prime power
+   for T in [Int, BigInt, fmpz]
+     @test @inferred is_prime_power(T(2))
+     @test (@inferred is_prime_power_with_data(T(2))) == (true, T(2), 1)
+     @test is_prime_power(T(4))
+     @test (@inferred is_prime_power_with_data(T(4))) == (true, T(2), 2)
+     @test is_prime_power(T(27))
+     @test (@inferred is_prime_power_with_data(T(27))) == (true, T(3), 3)
+     @test !is_prime_power(T(1))
+     @test !is_prime_power(T(6))
+     @test !is_prime_power(T(-3))
+     @test !is_prime_power(-T(7)^4)
+   end
+   @test !is_prime_power(fmpz(10940293781057873954324736))
 end
 
 @testset "fmpz.tdivrem" begin
