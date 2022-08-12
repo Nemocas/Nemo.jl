@@ -17,6 +17,10 @@
    @test FF isa FqDefaultFiniteField
    @test base_field(FF) === F
 
+   @test sprint(show, "text/plain", R) isa String
+   @test sprint(show, "text/plain", F) isa String
+   @test sprint(show, "text/plain", FF) isa String
+
    a = F()
 
    @test isa(a, fq_default)
@@ -31,16 +35,19 @@
 
    @test isa(d, fq_default)
 
+   @test FF(one(R)) == one(FF)
+
    # check for irreducibility
    @test_throws ErrorException NGFiniteField(x^2-1, "z")
 
-    F, = NGFiniteField(9)
-    @test order(F) == 9
-    @test NGFiniteField(9)[1] === NGFiniteField(9)[1]
-    @test NGFiniteField(9)[1] !== NGFiniteField(9, cached = false)[1]
-    @test_throws ErrorException NGFiniteField(6)
-    @test Nemo._GF(2, 1) === Nemo._GF(2)
-    @test Nemo._GF(6, 1, check = false) isa FqDefaultFiniteField
+   F, = NGFiniteField(9)
+   @test order(F) == 9
+   @test NGFiniteField(9)[1] === NGFiniteField(9)[1]
+   @test NGFiniteField(9)[1] !== NGFiniteField(9, cached = false)[1]
+   @test_throws ErrorException NGFiniteField(6)
+   @test Nemo._GF(2, 1) === Nemo._GF(2)
+   @test Nemo._GF(6, 1, check = false) isa FqDefaultFiniteField
+   @test Nemo._FiniteField(2, 1)[1] isa FqDefaultFiniteField
 end
 
 @testset "fq_default.printing" begin
