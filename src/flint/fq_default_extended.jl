@@ -511,25 +511,27 @@ end
 #
 ################################################################################
 
-function NGFiniteField(a::IntegerUnion, s::AbstractString = "o"; cached::Bool = false, check::Bool = true)
+function NGFiniteField(a::IntegerUnion, s::AbstractString = "o"; cached::Bool = true, check::Bool = true)
   fl, p, e = is_prime_power_with_data(a)
   !fl && error("Order must be a prime power")
   return NGFiniteField(p, e, s; cached = cached, check = false)
 end
 
-function NGFiniteField(f::fq_default_poly, s::AbstractString = "o"; cached::Bool = false, check::Bool = true)
+function NGFiniteField(f::fq_default_poly, s::AbstractString = "o"; cached::Bool = true, check::Bool = true)
   (check && isirreducible(f)) || error("Defining polynomial must be irreducible")
   # Should probably have its own cache
   F = FqDefaultFiniteField(f, Symbol(s), cached)
   return F, gen(F)
 end
 
+_FiniteField(a...; kw...) = NGFiniteField(a...; kw...)
+
 function _GF(a::IntegerUnion, s = AbstractString = "o"; cached::Bool = true, check::Bool = true)
-  return NGFiniteField(a, s; cached = cached, check = check)
+  return NGFiniteField(a, s; cached = cached, check = check)[1]
 end
 
 function _GF(a::IntegerUnion, b::Int, s = AbstractString = "o"; cached::Bool = true, check::Bool = true)
-  return NGFiniteField(a, b, s; cached = cached, check = check)
+  return NGFiniteField(a, b, s; cached = cached, check = check)[1]
 end
 
 ################################################################################

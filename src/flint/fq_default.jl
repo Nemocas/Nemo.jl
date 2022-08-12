@@ -250,6 +250,9 @@ show(io::IO, a::fq_default) = print(io, AbstractAlgebra.obj_to_string(a, context
 function show(io::IO, a::FqDefaultFiniteField)
    print(io, "Finite field of degree ", _degree(a))
    print(io, " over F_", characteristic(a))
+   if !is_absolute(a)
+     print(io, " (over ", base_field(a), ")")
+   end
 end
 
 ###############################################################################
@@ -479,7 +482,7 @@ end
     pth_root(x::fq_default)
 
 Return the $p$-th root of $x$ in the finite field of characteristic $p$. This
-is the inverse operation to the Frobenius map $\sigma_p$.
+is the inverse operation to the absolute Frobenius map.
 """
 function pth_root(x::fq_default)
    z = parent(x)()
@@ -502,14 +505,6 @@ function _norm(x::fq_default)
    return z
 end
 
-@doc Markdown.doc"""
-    frobenius(x::fq_default, n = 1)
-
-Return the iterated Frobenius $\sigma_p^n(x)$ where $\sigma_p$ is the
-Frobenius map sending the element $a$ to $a^p$ in the finite field of
-characteristic $p$. By default the Frobenius map is applied $n = 1$ times if
-$n$ is not specified.
-"""
 function _frobenius(x::fq_default, n = 1)
    z = parent(x)()
    ccall((:fq_default_frobenius, libflint), Nothing,
