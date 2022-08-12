@@ -33,7 +33,7 @@
 
 # do not export div and divrem
 export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash, bell,
-       is_perfect_power, is_prime, is_prime_power, is_prime_power_with_data, fdiv, cdiv, tdiv, rem, mod, gcd, lcm, invmod, powermod, abs,
+       is_perfect_power, is_prime, is_prime_power_with_data, fdiv, cdiv, tdiv, rem, mod, gcd, lcm, invmod, powermod, abs,
        isqrt, popcount, prevpow2, nextpow2, ndigits, dec, bin, oct, hex, base,
        one, zero, divexact, fits, sign, nbits, deepcopy, tdivpow2, fdivpow2,
        cdivpow2, flog, clog, cmpabs, clrbit!, setbit!, combit!, crt,
