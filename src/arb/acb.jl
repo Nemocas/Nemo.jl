@@ -1806,6 +1806,20 @@ for (typeofx, passtoc) in ((acb, Ref{acb}), (Ptr{acb}, Ptr{acb}))
   end
 end
 
+###############################################################################
+#
+#   Promote rules
+#
+###############################################################################
+
+promote_rule(::Type{acb}, ::Type{T}) where {T <: Number} = acb
+
+promote_rule(::Type{acb}, ::Type{fmpz}) = acb
+
+promote_rule(::Type{acb}, ::Type{fmpq}) = acb
+
+promote_rule(::Type{acb}, ::Type{arb}) = acb
+
 ################################################################################
 #
 #  Parent object overload

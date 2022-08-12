@@ -826,29 +826,15 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{acb_poly}, ::Type{Float64}) = acb_poly
-
-promote_rule(::Type{acb_poly}, ::Type{Complex{Float64}}) = acb_poly
-
-promote_rule(::Type{acb_poly}, ::Type{T}) where {T <: Integer} = acb_poly
-
-promote_rule(::Type{acb_poly}, ::Type{Rational{T}}) where T <: Union{Int, BigInt} = acb_poly
-
-promote_rule(::Type{acb_poly}, ::Type{Complex{Int}}) = acb_poly
-
-promote_rule(::Type{acb_poly}, ::Type{fmpz}) = acb_poly
-
-promote_rule(::Type{acb_poly}, ::Type{fmpq}) = acb_poly
-
-promote_rule(::Type{acb_poly}, ::Type{arb}) = acb_poly
-
-promote_rule(::Type{acb_poly}, ::Type{acb}) = acb_poly
-
 promote_rule(::Type{acb_poly}, ::Type{fmpz_poly}) = acb_poly
 
 promote_rule(::Type{acb_poly}, ::Type{fmpq_poly}) = acb_poly
 
 promote_rule(::Type{acb_poly}, ::Type{arb_poly}) = acb_poly
+
+function promote_rule(::Type{acb_poly}, ::Type{T}) where {T}
+   return promote_rule(acb, T) === acb ? acb_poly : Union{}
+end
 
 ################################################################################
 #

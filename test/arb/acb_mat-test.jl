@@ -200,17 +200,26 @@ end
    @test contains(12 + A, B + 12)
    @test contains(A + 12, B + 12)
 
+   @test contains(RR(12) + A, B + 12)
+   @test contains(A + RR(12), B + 12)
+
    @test contains(fmpz(11) + A, B + fmpz(11))
    @test contains(A + fmpz(11), B + fmpz(11))
 
    @test contains(A - 3, -(3 - B))
    @test contains(3 - A, 3 - B)
 
+   @test contains(A - RR(3), -(3 - B))
+   @test contains(RR(3) - A, 3 - B)
+
    @test contains(A - fmpz(7), -(fmpz(7) - B))
    @test contains(fmpz(7) - A, fmpz(7) - B)
 
    @test contains(3*A, B*3)
    @test contains(A*3, B*3)
+
+   @test contains(RR(3)*A, B*3)
+   @test contains(A*RR(3), B*3)
 
    @test contains(fmpz(3)*A, B*fmpz(3))
    @test contains(A*fmpz(3), B*fmpz(3))
@@ -232,6 +241,10 @@ end
 
    @test contains(qq*A, C*qq)
    @test contains(A*qq, C*qq)
+
+   for T in [Int, fmpz, BigInt, Rational{Int}, Rational{Integer}, RR]
+     @test contains(divexact(CC[2 0; 0 2], T(2)), identity_matrix(CC, 2))
+   end
 end
 
 @testset "acb_mat.shifting" begin
