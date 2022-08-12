@@ -42,6 +42,8 @@ end
    F, b = NGFiniteField(f, "b")
    c = 2 * b + F(a)
    @test sprint(show, "text/plain", c) == "2*b + a"
+
+   @test sprint(Nemo.show_raw, c) isa String
 end
 
 @testset "fq_default.manipulation" begin
@@ -61,6 +63,28 @@ end
    @test deepcopy(b + 1) == b + 1
    @test coeff(2b + 1, 1) == 2
    @test_throws DomainError coeff(2b + 1, -1)
+
+   u = a
+   v = a^2
+   w = R()
+   @test coeff(w, 3) == 0
+   @test coeff(w, 3) == 0
+   mul!(w, u, v)
+   @test coeff(w, 3) == 1
+   add!(w, u, v)
+   @test coeff(w, 1) == 1
+   zero!(w)
+   @test coeff(w, 1) == 0
+   addeq!(w, u)
+   @test coeff(w, 1) == 1
+
+   @test basis(R) == [a^i for i in 0:4]
+   @test basis(F) == [b^0, b^1]
+
+   RR, aa = NGFiniteField(fmpz(7), 2, "a")
+   @test iszero(tr(zero(R)) + tr(zero(R)))
+   @test isone(norm(one(R)) * norm(one(R)))
+   @test prime_field(R) === prime_field(RR)
 end
 
 @testset "fq_default.special_functions" begin
@@ -92,13 +116,11 @@ end
    @test is_square_with_sqrt(b^2)[2]^2 == b^2
 end
 
-# TODO: Iteration is broken because AA uses degree instead of absolute_degree
-#@testset "fq_default.iteration" begin
-#   for n = [2, 3, 5, 13, 31]
-#      R, _ = NGFiniteField(fmpz(n), 1, "x")
-#      elts = Nemo.AbstractAlgebra.test_iterate(R)
-#      @test elts == R.(0:n-1)
-#      R, _ = NGFiniteField(fmpz(n), rand(2:9), "x")
-#      Nemo.AbstractAlgebra.test_iterate(R)
-#   end
-#end
+@testset "fq_default.iteration" begin
+   R, a = NGFiniteField(fmpz(2), 2, "a")
+   Rx, x = R["x"]
+   f = x^3 + x + 1
+   F, _ = NGFiniteField(f, "b")
+   AbstractAlgebra.test_iterate(F)
+   @test length(collect(F)) == order(F)
+end
