@@ -699,3 +699,10 @@ function NGFiniteField(pol::Union{fmpz_mod_poly, gfp_fmpz_poly, nmod_poly, gfp_p
 
    return parent_obj, _gen(parent_obj)
 end
+
+
+function FlintFiniteField(F::FqDefaultFiniteField, deg::Int,
+                          s::Union{AbstractString,Symbol} = :o; cached = true)
+    return FqDefaultFiniteField(characteristic(F), deg, Symbol(s), cached)
+end
+

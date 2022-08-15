@@ -545,9 +545,22 @@ function (a::FqDefaultFiniteField)(b::fq_default)
      return b
    end
 
-   if is_absolute(a)
-      parent(b) != a && error("Coercion between finite fields not implemented")
-   end
+  if is_absolute(a)
+    k = parent(b)
+    da = degree(a)
+    dk = degree(k)
+    if k == a
+        return b
+    elseif dk < da
+        da % dk != 0 && error("Coercion impossible")
+        f = embed(k, a)
+        return f(b)
+    else
+        dk % da != 0 && error("Coercion impossible")
+        f = preimage_map(a, k)
+        return f(b)
+    end
+  end
 
    if parent(b) === base_field(a)
      return (a.image_basefield)(b)
