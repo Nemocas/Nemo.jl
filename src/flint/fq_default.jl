@@ -179,14 +179,20 @@ end
 # with nmod
 function _unchecked_coerce(a::GaloisField, b::fq_default)
     iszero(b) && return zero(a)
-    x = fmpz_poly()
-    ccall((:fq_default_get_fmpz_poly, libflint), Nothing,
-         (Ref{fmpz_poly}, Ref{fq_default}, Ref{FqDefaultFiniteField}),
-          x, b, parent(b))
-    return a(coeff(x, 0))
+    return a(lift(ZZ, b))
 end
 
 function _unchecked_coerce(a::FqDefaultFiniteField, b::gfp_elem)
+    return fq_default(a, lift(b))
+end
+
+# with fmpz_mod
+function _unchecked_coerce(a::GaloisFmpzField, b::fq_default)
+    iszero(b) && return zero(a)
+    return a(lift(ZZ, b))
+end
+
+function _unchecked_coerce(a::FqDefaultFiniteField, b::gfp_fmpz_elem)
     return fq_default(a, lift(b))
 end
 
@@ -211,6 +217,102 @@ function _unchecked_coerce(a::FqDefaultFiniteField, b::fq_nmod)
     return fq_default(a, x)
 end
 
+################################################################################
+#
+#  Convenience conversion maps
+#
+################################################################################
+
+_FQ_DEFAULT_FQ_ZECH   = 1
+_FQ_DEFAULT_FQ_NMOD   = 2
+_FQ_DEFAULT_FQ        = 3
+_FQ_DEFAULT_NMOD      = 4
+_FQ_DEFAULT_FMPZ_NMOD = 5
+
+mutable struct CanonicalFqDefaultMap{T} <: Map{FqDefaultFiniteField, T, SetMap, CanonicalFqDefaultMap}
+  D::FqDefaultFiniteField
+  C::T
+end
+
+domain(f::CanonicalFqDefaultMap) = f.D
+
+codomain(f::CanonicalFqDefaultMap) = f.C
+
+mutable struct CanonicalFqDefaultMapInverse{T} <: Map{T, FqDefaultFiniteField, SetMap, CanonicalFqDefaultMapInverse}
+  D::T
+  C::FqDefaultFiniteField
+end
+
+domain(f::CanonicalFqDefaultMapInverse) = f.D
+
+codomain(f::CanonicalFqDefaultMapInverse) = f.C
+
+function _fq_default_ctx_type(F::FqDefaultFiniteField)
+  return ccall((:fq_default_ctx_type, libflint), Cint, (Ref{FqDefaultFiniteField},),  F)
+end
+
+function _get_raw_type(::Type{FqNmodFiniteField}, F::FqDefaultFiniteField)
+  @assert _fq_default_ctx_type(F) == 2
+  Rx, _ = PolynomialRing(GF(UInt(characteristic(F))), "x", cached = false)
+  m = map_coefficients(x -> _coeff(x, 0), defining_polynomial(F), parent = Rx)
+  return FqNmodFiniteField(m, :$, false)
+end
+
+function _get_raw_type(::Type{FqFiniteField}, F::FqDefaultFiniteField)
+  @assert _fq_default_ctx_type(F) == 3
+  Rx, _ = PolynomialRing(GF(characteristic(F)), "x", cached = false)
+  m = map_coefficients(x -> _coeff(x, 0), defining_polynomial(F), parent = Rx)
+  return FqFiniteField(m, :$, false)
+end
+
+function canonical_raw_type(::Type{T}, F::FqDefaultFiniteField) where {T}
+  C = _get_raw_type(T, F)
+  return CanonicalFqDefaultMap{T}(F, C)
+end
+
+function _get_raw_type(::Type{GaloisField}, F::FqDefaultFiniteField)
+  @assert _fq_default_ctx_type(F) == 4
+  return GF(UInt(order(F)))
+end
+
+function _get_raw_type(::Type{GaloisFmpzField}, F::FqDefaultFiniteField)
+  @assert _fq_default_ctx_type(F) == 5
+  return GF(order(F))
+end
+
+# image/preimage
+
+function image(f::CanonicalFqDefaultMap, x::fq_default)
+  @assert parent(x) === f.D
+  return _unchecked_coerce(f.C, x)
+end
+
+function preimage(f::CanonicalFqDefaultMap, x)
+  @assert parent(x) === f.C
+  return _unchecked_coerce(f.D, x)
+end
+
+(f::CanonicalFqDefaultMap)(x::fq_default) = image(f, x)
+
+# inv
+
+function inv(f::CanonicalFqDefaultMap{T}) where {T}
+  return CanonicalFqDefaultMapInverse{T}(f.C, f.D)
+end
+
+# image/preimage for inv
+
+function image(f::CanonicalFqDefaultMapInverse, x)
+  @assert parent(x) === f.D
+  _unchecked_coerce(f.C, x)
+end
+
+function preimage(f::CanonicalFqDefaultMapInverse, x::fq_default)
+  @assert parent(x) === f.C
+  _unchecked_coerce(f.D, x)
+end
+
+(f::CanonicalFqDefaultMapInverse)(x) = image(f, x)
 
 ###############################################################################
 #

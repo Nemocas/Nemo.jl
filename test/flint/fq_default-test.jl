@@ -243,3 +243,46 @@ end
       Nemo.AbstractAlgebra.test_iterate(R)
    end
 end
+
+@testset "conversions" begin
+  F1, = NGFiniteField(7, 1)
+  F2, = NGFiniteField(ZZ(18446744073709551629), 1)
+  F3, = NGFiniteField(7, 10) # avoid zech
+  F4, = NGFiniteField(ZZ(18446744073709551629), 4)
+  fields = [F1, F2, F3, F4]
+  types = [Nemo.GaloisField, Nemo.GaloisFmpzField, FqNmodFiniteField, FqFiniteField]
+  for (F, T) in zip(fields, types)
+    f = Nemo.canonical_raw_type(T, F)
+    @test codomain(f) isa T
+    @test domain(f) === F
+    for i in 1:10
+      a = rand(F)
+      @test preimage(f, image(f, a)) == a
+      @test preimage(f, f(a)) == a
+      b = rand(F)
+      @test image(f, a * b) == image(f, a) * image(f, b)
+    end
+
+    g = inv(f)
+    FF = domain(g)
+    @test codomain(g) === F
+    @test FF isa T
+    for i in 1:10
+      a = rand(FF)
+      @test preimage(g, image(g, a)) == a
+      @test preimage(g, g(a)) == a
+      b = rand(FF)
+      @test image(g, a * b) == image(g, a) * image(g, b)
+    end
+  end
+
+  @test_throws AssertionError Nemo.canonical_raw_type(Nemo.GaloisFmpzField, F1)
+
+  F1, = NGFiniteField(7, 1)
+  F1w, = NGFiniteField(2, 1)
+  f = Nemo.canonical_raw_type(Nemo.GaloisField, F1)
+  @test_throws AssertionError f(rand(F1w))
+  @test_throws AssertionError f(rand(F2))
+  @test_throws AssertionError f(rand(F3))
+  @test_throws AssertionError f(rand(F4))
+end
