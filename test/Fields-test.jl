@@ -7,6 +7,7 @@ include("flint/fq_default-test.jl")
 include("flint/fq_default_extended-test.jl")
 include("flint/fq_embed-test.jl")
 include("flint/fq_nmod_embed-test.jl")
+include("flint/fq_default_embed-test.jl")
 include("flint/padic-test.jl")
 include("flint/qadic-test.jl")
 
