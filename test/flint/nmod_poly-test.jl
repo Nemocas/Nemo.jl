@@ -568,10 +568,11 @@ end
   Rx, x = PolynomialRing(R, "x")
   Zy,y = PolynomialRing(ZZ, "y")
 
-  f = x^6 + x^4 + 2 *x^2
+  f = x^6 + x^4 + 2*x^2
 
   Zf = lift(Zy, f)
 
+  @test Zf == y^6 + y^4 + 2*y^2
   @test Rx(Zf) == f
 end
 

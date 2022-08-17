@@ -702,7 +702,7 @@ specifies the ring to lift into.
 """
 function lift(R::FmpzPolyRing, y::nmod_poly)
   z = fmpz_poly()
-  ccall((:fmpz_poly_set_nmod_poly, libflint), Nothing,
+  ccall((:fmpz_poly_set_nmod_poly_unsigned, libflint), Nothing,
           (Ref{fmpz_poly}, Ref{nmod_poly}), z, y)
   z.parent = R
   return z
