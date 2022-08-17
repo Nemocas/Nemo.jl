@@ -52,10 +52,8 @@ function embed_matrices(k::FqNmodFiniteField, K::FqNmodFiniteField)
 
     a, b, P = embed_gens(k, K)
     R = base_ring(P)
-    S1 = MatrixSpace(R, n, m)
-    S2 = MatrixSpace(R, m, n)
-    s1 = S1()
-    s2 = S2()
+    s1 = zero_matrix(R, n, m)
+    s2 = zero_matrix(R, m, n)
 
     ccall((:fq_nmod_embed_matrices, libflint), Nothing, (Ref{gfp_mat},
     Ref{gfp_mat}, Ref{fq_nmod}, Ref{FqNmodFiniteField}, Ref{fq_nmod},
@@ -68,10 +66,8 @@ function embed_matrices_pre(a::fq_nmod, b::fq_nmod, P::gfp_poly)
     K = parent(b)
     m, n = degree(k), degree(K)
     R = base_ring(P)
-    S1 = MatrixSpace(R, n, m)
-    S2 = MatrixSpace(R, m, n)
-    s1 = S1()
-    s2 = S2()
+    s1 = zero_matrix(R, n, m)
+    s2 = zero_matrix(R, m, n)
 
     ccall((:fq_nmod_embed_matrices, libflint), Nothing, (Ref{gfp_mat},
     Ref{gfp_mat}, Ref{fq_nmod}, Ref{FqNmodFiniteField}, Ref{fq_nmod},
@@ -87,8 +83,7 @@ end
 function embed_pre_mat(x::fq_nmod, K::FqNmodFiniteField, M::gfp_mat)
 
     d = degree(parent(x))
-    S = MatrixSpace(base_ring(M), d, 1)
-    col = S()
+    col = zero_matrix(base_ring(M), d, 1)
 
     for j in 0:(d - 1)
         col[j + 1, 1] = coeff(x, j)

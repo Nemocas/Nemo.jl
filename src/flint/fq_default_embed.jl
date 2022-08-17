@@ -105,14 +105,10 @@ function embed_matrices(k::FqDefaultFiniteField, K::FqDefaultFiniteField)
             return s1, s2
         end
     end
-
     a, b, P = embed_gens(k, K)
     R = base_ring(P)
-    S1 = MatrixSpace(R, n, m)
-    S2 = MatrixSpace(R, m, n)
-    s1 = S1()
-    s2 = S2()
-
+    s1 = zero_matrix(R, n, m)
+    s2 = zero_matrix(R, m, n)
     _fq_default_embed_matrices(s1, s2, a, k, b, K, P)
     return s1, s2
 end
@@ -122,11 +118,8 @@ function embed_matrices_pre(a::fq_default, b::fq_default, P::gfp_fmpz_poly)
     K = parent(b)
     m, n = degree(k), degree(K)
     R = base_ring(P)
-    S1 = MatrixSpace(R, n, m)
-    S2 = MatrixSpace(R, m, n)
-    s1 = S1()
-    s2 = S2()
-
+    s1 = zero_matrix(R, n, m)
+    s2 = zero_matrix(R, m, n)
     _fq_default_embed_matrices(s1, s2, a, k, b, K, P)
     return s1, s2
 end
@@ -134,8 +127,7 @@ end
 function embed_pre_mat(x::fq_default, K::FqDefaultFiniteField, M::gfp_fmpz_mat)
 
     d = degree(parent(x))
-    S = MatrixSpace(base_ring(M), d, 1)
-    col = S()
+    col = zero_matrix(base_ring(M), d, 1)
 
     for j in 0:(d - 1)
         col[j + 1, 1] = coeff(x, j)
