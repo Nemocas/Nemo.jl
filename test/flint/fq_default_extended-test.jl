@@ -11,7 +11,7 @@
    Fy, y = F["y"]
    g = y^3 + 2*y + 1
 
-   FF, bb = NGFiniteField(g, "bb")
+   FF, c = NGFiniteField(g, "c")
    @test defining_polynomial(FF) == g
 
    @test FF isa FqDefaultFiniteField

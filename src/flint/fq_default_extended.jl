@@ -236,8 +236,8 @@ function _absolute_basis(F::FqDefaultFiniteField)
     res = elem_type(F)[]
     kabs = _absolute_basis(base_field(F))
     for b in basis(F)
-      for bb in kabs
-        push!(res, F(bb) * b)
+      for c in kabs
+        push!(res, F(c) * b)
       end
     end
     return res
