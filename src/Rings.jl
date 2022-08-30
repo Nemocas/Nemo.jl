@@ -30,6 +30,8 @@ include("flint/fmpz_mpoly.jl")
 
 include("flint/nmod_mpoly.jl")
 
+include("flint/fmpz_mod_mpoly.jl")
+
 include("flint/fq_nmod_mpoly.jl")
 
 include("flint/fq_default_mpoly.jl")

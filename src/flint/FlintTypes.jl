@@ -1949,6 +1949,163 @@ function _gfp_mpoly_factor_clear_fn(f::gfp_mpoly_factor)
          f, f.parent)
 end
 
+################################################################################
+#
+#   GFPFmpzMPolyRing / gfp_fmpz_mpoly
+#
+###############################################################################
+
+@attributes mutable struct GFPFmpzMPolyRing <: MPolyRing{gfp_fmpz_elem}
+   nvars::Int
+   nfields::Int
+   ord::Cint
+   deg::Cint
+   rev::Cint
+   lut::NTuple{Base.GMP.BITS_PER_LIMB, Int}
+   lut1::NTuple{Base.GMP.BITS_PER_LIMB, UInt8}
+
+   n::Int # fmpz_t
+   add_fxn::Ptr{Nothing}
+   sub_fxn::Ptr{Nothing}
+   mul_fxn::Ptr{Nothing}
+   n2::UInt
+   ninv::UInt
+   norm::UInt
+   n_limbs::Tuple{UInt, UInt, UInt}
+   ninv_limbs::Tuple{UInt, UInt, UInt}
+   # end of flint struct
+
+   base_ring::GaloisFmpzField
+   S::Vector{Symbol}
+
+   function GFPFmpzMPolyRing(R::GaloisFmpzField, s::Vector{Symbol}, S::Symbol, cached::Bool = true)
+      return get_cached!(GFPFmpzMPolyID, (R, s, S), cached) do
+         if S == :lex
+            ord = 0
+         elseif S == :deglex
+            ord = 1
+         elseif S == :degrevlex
+            ord = 2
+         else
+            error("$S is not a valid ordering")
+         end
+
+         z = new()
+         ccall((:fmpz_mod_mpoly_ctx_init, libflint), Nothing,
+               (Ref{GFPFmpzMPolyRing}, Int, Cint, Ref{fmpz}),
+               z, length(s), ord, modulus(R))
+         z.base_ring = R
+         z.S = s
+         finalizer(_gfp_fmpz_mpoly_ctx_clear_fn, z)
+         return z
+      end
+   end
+end
+
+function _gfp_fmpz_mpoly_ctx_clear_fn(a::GFPFmpzMPolyRing)
+   ccall((:fmpz_mod_mpoly_ctx_clear, libflint), Nothing,
+         (Ref{GFPFmpzMPolyRing},), a)
+end
+
+const GFPFmpzMPolyID = Dict{Tuple{GaloisFmpzField, Vector{Symbol}, Symbol}, GFPFmpzMPolyRing}()
+
+mutable struct gfp_fmpz_mpoly <: MPolyElem{gfp_fmpz_elem}
+   coeffs::Ptr{Nothing}
+   exps::Ptr{Nothing}
+   length::Int
+   bits::Int
+   coeffs_alloc::Int
+   exps_alloc::Int
+   # end of flint struct
+
+   parent::GFPFmpzMPolyRing
+
+   function gfp_fmpz_mpoly(ctx::GFPFmpzMPolyRing)
+      z = new()
+      ccall((:fmpz_mod_mpoly_init, libflint), Nothing,
+            (Ref{gfp_fmpz_mpoly}, Ref{GFPFmpzMPolyRing}),
+            z, ctx)
+      z.parent = ctx
+      finalizer(_gfp_fmpz_mpoly_clear_fn, z)
+      return z
+   end
+
+   function gfp_fmpz_mpoly(ctx::GFPFmpzMPolyRing, a::Vector{gfp_fmpz_elem}, b::Vector{Vector{T}}) where T <: Union{UInt, Int, fmpz}
+      z = new()
+      ccall((:fmpz_mod_mpoly_init2, libflint), Nothing,
+            (Ref{gfp_fmpz_mpoly}, Int, Ref{GFPMPolyRing}),
+            z, length(a), ctx)
+      z.parent = ctx
+      finalizer(_gfp_fmpz_mpoly_clear_fn, z)
+
+      for i in 1:length(a)
+         if T == fmpz
+            ccall((:fmpz_mpoly_push_term_fmpz_fmpz, libflint), Nothing,
+                  (Ref{gfp_mpoly}, Ref{fmpz}, Ptr{Ref{fmpz}}, Ref{GFPMPolyRing}),
+                  z, a[i].data, b[i], ctx)
+         else
+            ccall((:fmpz_mod_mpoly_push_term_fmpz_ui, libflint), Nothing,
+                  (Ref{gfp_fmpz_mpoly}, Ref{fmpz}, Ptr{UInt}, Ref{GFPFmpzMPolyRing}),
+                  z, a[i].data, b[i], ctx)
+         end
+      end
+
+      ccall((:fmpz_mod_mpoly_sort_terms, libflint), Nothing,
+            (Ref{gfp_fmpz_mpoly}, Ref{GFPFmpzMPolyRing}),
+            z, ctx)
+      ccall((:fmpz_mod_mpoly_combine_like_terms, libflint), Nothing,
+            (Ref{gfp_fmpz_mpoly}, Ref{GFPFmpzMPolyRing}),
+            z, ctx)
+      return z
+   end
+
+   function gfp_fmpz_mpoly(ctx::GFPMPolyRing, a::Union{fmpz, gfp_fmpz_elem})
+      z = new()
+      ccall((:fmpz_mod_mpoly_init, libflint), Nothing,
+            (Ref{gfp_fmpz_mpoly}, Ref{GFPFmpzMPolyRing}),
+            z, ctx)
+      ccall((:fmpz_mod_mpoly_set_fmpz, libflint), Nothing,
+            (Ref{gfp_fmpz_mpoly}, Ref{fmpz}, Ref{GFPFmpzMPolyRing}),
+            z, a isa fmpz ? a : data(a), ctx)
+      z.parent = ctx
+      finalizer(_gfp_fmpz_mpoly_clear_fn, z)
+      return z
+   end
+end
+
+function _gfp_fmpz_mpoly_clear_fn(a::gfp_fmpz_mpoly)
+   ccall((:fmpz_mod_mpoly_clear, libflint), Nothing,
+         (Ref{gfp_fmpz_mpoly}, Ref{GFPFmpzMPolyRing}),
+         a, a.parent)
+end
+
+mutable struct gfp_fmpz_mpoly_factor
+   constant::Int
+   poly::Ptr{Nothing}
+   exp::Ptr{Nothing}
+   num::Int
+   alloc::Int
+   # end flint struct
+
+   parent::GFPMPolyRing
+
+   function gfp_fmpz_mpoly_factor(ctx::GFPMPolyRing)
+      z = new()
+      ccall((:gfp_fmpz_mpoly_factor_init, libflint), Nothing,
+            (Ref{gfp_fmpz_mpoly_factor}, Ref{GFPFmpzMPolyRing}),
+            z, ctx)
+      z.parent = ctx
+      finalizer(_gfp_fmpz_mpoly_factor_clear_fn, z)
+      return z
+   end
+end
+
+function _gfp_fmpz_mpoly_factor_clear_fn(f::gfp_fmpz_mpoly_factor)
+   ccall((:fmpz_mod_mpoly_factor_clear, libflint), Nothing,
+         (Ref{gfp_fmpz_mpoly_factor}, Ref{GFPFmpzMPolyRing}),
+         f, f.parent)
+end
+
 ###############################################################################
 #
 #   FqNmodFiniteField / fq_nmod
@@ -6475,7 +6632,7 @@ const Zmodn_mat = Union{nmod_mat, gfp_mat}
 const Zmod_fmpz_mat = Union{fmpz_mod_mat, gfp_fmpz_mat}
 
 const FlintMPolyUnion = Union{fmpz_mpoly, fmpq_mpoly, nmod_mpoly, gfp_mpoly,
-                              fq_nmod_mpoly}
+                              fq_nmod_mpoly, gfp_fmpz_mpoly}
 
 
 const _fq_default_mpoly_union = Union{AbstractAlgebra.Generic.MPoly{fq},

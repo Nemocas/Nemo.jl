@@ -73,7 +73,7 @@ function _hash_integer_array(a::Ptr{Int}, n::Int, h::UInt)
    return h
 end
 
-function _hash_mpoly_coeffs(a::fmpz_mpoly, h::UInt)
+function _hash_mpoly_coeffs(a::Union{fmpz_mpoly, gfp_fmpz_mpoly}, h::UInt)
    GC.@preserve a begin
       h = _hash_integer_array(convert(Ptr{Int}, a.coeffs), a.length, h)
       return h
