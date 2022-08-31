@@ -789,6 +789,37 @@ f values")
    return r
 end
 
+function evaluate(a::fmpq_mpoly, bs::Vector{fmpq_mpoly})
+   R = parent(a)
+   S = parent(bs[1])
+
+   length(bs) != nvars(R) &&
+      error("Number of variables does not match number of values")
+
+   c = S()
+   fl = ccall((:fmpq_mpoly_compose_fmpq_mpoly, libflint), Cint,
+              (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ptr{Ref{fmpq_mpoly}},
+               Ref{FmpqMPolyRing}, Ref{FmpqMPolyRing}),
+              c, a, bs, R, S)
+   fl == 0 && error("Something wrong in evaluation.")
+   return c
+end
+
+function evaluate(a::fmpq_mpoly, bs::Vector{fmpq_poly})
+   R = parent(a)
+   S = parent(bs[1])
+
+   length(bs) != nvars(R) &&
+      error("Number of variables does not match number of values")
+
+   c = S()
+   fl = ccall((:fmpq_mpoly_compose_fmpq_poly, libflint), Cint,
+              (Ref{fmpq_poly}, Ref{fmpq_mpoly}, Ptr{Ref{fmpq_poly}},
+               Ref{FmpqMPolyRing}), c, a, bs, R)
+   fl == 0 && error("Something wrong in evaluation.")
+   return c
+end
+
 ###############################################################################
 #
 #   Unsafe functions
@@ -1057,6 +1088,66 @@ promote_rule(::Type{fmpq_mpoly}, ::Type{Rational{V}}) where {V <: Integer} = fmp
 promote_rule(::Type{fmpq_mpoly}, ::Type{fmpz}) = fmpq_mpoly
 
 promote_rule(::Type{fmpq_mpoly}, ::Type{fmpq}) = fmpq_mpoly
+
+###############################################################################
+#
+#   Build context
+#
+###############################################################################
+
+function _push_term!(z::fmpq_mpoly, c::fmpq, exp::Vector{Int})
+  ccall((:fmpq_mpoly_push_term_fmpq_ui, libflint), Nothing,
+        (Ref{fmpq_mpoly}, Ref{fmpq}, Ptr{UInt}, Ref{FmpqMPolyRing}),
+        z, c, exp, parent(z))
+  return z
+end
+
+function _push_term!(z::fmpq_mpoly, c::fmpz, exp::Vector{Int})
+  ccall((:fmpq_mpoly_push_term_fmpz_ui, libflint), Nothing,
+        (Ref{fmpq_mpoly}, Ref{fmpz}, Ptr{UInt}, Ref{FmpqMPolyRing}),
+        z, c, exp, parent(z))
+  return z
+end
+
+function _push_term!(z::fmpq_mpoly, c::Int, exp::Vector{Int})
+  ccall((:fmpq_mpoly_push_term_si_ui, libflint), Nothing,
+        (Ref{fmpq_mpoly}, Int, Ptr{UInt}, Ref{FmpqMPolyRing}),
+        z, c, exp, parent(z))
+  return z
+end
+
+function _push_term!(z::fmpq_mpoly, c::UInt, exp::Vector{Int})
+  ccall((:fmpq_mpoly_push_term_ui_ui, libflint), Nothing,
+        (Ref{fmpq_mpoly}, UInt, Ptr{UInt}, Ref{FmpqMPolyRing}),
+        z, c, exp, parent(z))
+  return z
+end
+
+function push_term!(M::MPolyBuildCtx{fmpq_mpoly},
+                    c::Union{fmpz, fmpq, Int, UInt}, expv::Vector{Int})
+   if length(expv) != nvars(parent(M.poly))
+      error("length of exponent vector should match the number of variables")
+   end
+  _push_term!(M.poly, c, expv)
+  return M
+end
+
+function push_term!(M::MPolyBuildCtx{fmpq_mpoly},
+                    c::RingElement, expv::Vector{Int})
+  push_term!(M, QQ(c), expv)
+  return M
+end
+
+function finish(M::MPolyBuildCtx{fmpq_mpoly})
+  res = M.poly
+  R = parent(res)
+  M.poly = zero(R)
+  ccall((:fmpq_mpoly_sort_terms, libflint), Nothing,
+        (Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}), res, R)
+  ccall((:fmpq_mpoly_combine_like_terms, libflint), Nothing,
+        (Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}), res, R)
+  return res
+end
 
 ###############################################################################
 #

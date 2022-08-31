@@ -721,6 +721,39 @@ function (a::fq_nmod_mpoly)(vals::Union{NCRingElem, RingElement}...)
    return r
 end
 
+function evaluate(a::fq_nmod_mpoly, bs::Vector{fq_nmod_mpoly})
+   R = parent(a)
+   S = parent(bs[1])
+   @assert base_ring(R) === base_ring(S)
+
+   length(bs) != nvars(R) &&
+      error("Number of variables does not match number of values")
+
+   c = S()
+   fl = ccall((:fq_nmod_mpoly_compose_fq_nmod_mpoly, libflint), Cint,
+              (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly}, Ptr{Ref{fq_nmod_mpoly}},
+               Ref{FqNmodMPolyRing}, Ref{FqNmodMPolyRing}),
+              c, a, bs, R, S)
+   fl == 0 && error("Something wrong in evaluation.")
+   return c
+end
+
+function evaluate(a::fq_nmod_mpoly, bs::Vector{fq_nmod_poly})
+   R = parent(a)
+   S = parent(bs[1])
+   @assert base_ring(R) === base_ring(S)
+
+   length(bs) != nvars(R) &&
+      error("Number of variables does not match number of values")
+
+   c = S()
+   fl = ccall((:fq_nmod_mpoly_compose_fq_nmod_poly, libflint), Cint,
+              (Ref{fq_nmod_poly}, Ref{fq_nmod_mpoly}, Ptr{Ref{fq_nmod_poly}},
+               Ref{FqNmodMPolyRing}), c, a, bs, R)
+   fl == 0 && error("Something wrong in evaluation.")
+   return c
+end
+
 ###############################################################################
 #
 #   Unsafe functions
@@ -963,6 +996,45 @@ promote_rule(::Type{fq_nmod_mpoly}, ::Type{V}) where {V <: Integer} = fq_nmod_mp
 promote_rule(::Type{fq_nmod_mpoly}, ::Type{fmpz}) = fq_nmod_mpoly
 
 promote_rule(::Type{fq_nmod_mpoly}, ::Type{fq_nmod}) = fq_nmod_mpoly
+
+###############################################################################
+#
+#   Build context
+#
+###############################################################################
+
+function _push_term!(z::fq_nmod_mpoly, c::fq_nmod, exp::Vector{Int})
+  ccall((:fq_nmod_mpoly_push_term_fq_nmod_ui, libflint), Nothing,
+        (Ref{fq_nmod_mpoly}, Ref{fq_nmod}, Ptr{UInt}, Ref{FqNmodMPolyRing}),
+        z, c, exp, parent(z))
+  return z
+end
+
+function push_term!(M::MPolyBuildCtx{fq_nmod_mpoly}, c::fq_nmod, expv::Vector{Int})
+   if length(expv) != nvars(parent(M.poly))
+      error("length of exponent vector should match the number of variables")
+   end
+   parent(c) !== base_ring(M.poly) &&error("parent mismatch")
+  _push_term!(M.poly, c, expv)
+  return M
+end
+
+function push_term!(M::MPolyBuildCtx{fq_nmod_mpoly},
+                    c::RingElement, expv::Vector{Int})
+  push_term!(M, base_ring(M.poly)(c), expv)
+  return M
+end
+
+function finish(M::MPolyBuildCtx{fq_nmod_mpoly})
+  res = M.poly
+  R = parent(res)
+  M.poly = zero(R)
+  ccall((:fq_nmod_mpoly_sort_terms, libflint), Nothing,
+        (Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}), res, R)
+  ccall((:fq_nmod_mpoly_combine_like_terms, libflint), Nothing,
+        (Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}), res, R)
+  return res
+end
 
 ###############################################################################
 #

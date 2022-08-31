@@ -46,11 +46,31 @@
 
       @test isa(S(f), nmod_mpoly)
 
-      V = [R(rand(-100:100)) for i in 1:5]
+      V = [(rand(-100:100)) for i in 1:5]
 
       W0 = [ UInt[rand(0:100) for i in 1:num_vars] for j in 1:5]
 
-      @test isa(S(V, W0), nmod_mpoly)
+      f = S(map(v -> R.(v), V), W0)
+
+      @test isa(f, nmod_mpoly)
+
+      # Test the BuildCtx
+      
+      for RR in [Int, ZZ, R]
+        bctx = MPolyBuildCtx(S)
+        @test (@which push_term!(bctx, RR(1), zeros(Int, num_vars))).module === Nemo
+        for (v, w0) in zip(V, W0)
+          push_term!(bctx, RR(v), Int.(w0))
+        end
+        ff = finish(bctx)
+        @test isa(ff, nmod_mpoly)
+        @test f == ff
+      end
+
+      bctx = MPolyBuildCtx(S)
+      @test_throws ErrorException push_term!(bctx, one(R), zeros(Int, num_vars + 1))
+      @test_throws ErrorException push_term!(bctx, one(R), zeros(Int, num_vars - 1))
+      @test (@which finish(bctx)).module === Nemo
 
       for i in 1:num_vars
         f = gen(S, i)
@@ -60,6 +80,11 @@
         @test !is_gen(f + 1)
       end
    end
+
+   RR = ResidueRing(FlintZZ, 29)
+   S, (x, y) = PolynomialRing(R, ["x", "y"])
+   M = MPolyBuildCtx(S)
+   @test_throws ErrorException push_term!(M, one(RR), zeros(Int, 2))
 end
 
 @testset "nmod_mpoly.printing" begin
@@ -594,6 +619,36 @@ end
    # Individual tests
 
    S, (x, y) = PolynomialRing(R, ["x", "y"])
+   @test_throws ErrorException evaluate(x, [x])
+   @test_throws ErrorException evaluate(x, [x, x, x])
+
+   @test (@which evaluate(f, [R(1), R(1)])).module === Nemo
+
+   f = x + y
+   g = x - y
+   r1 = @inferred evaluate(f, [x + y, x^2 + y^2])
+   r2 = evaluate(g, [x + y, x^2 + y^2])
+   r3 = evaluate(f + g, [x + y, x^2 + y^2])
+   @test r3 == r1 + r2
+
+   @test (@which evaluate(f, [x])).module === Nemo
+
+   SS, (xx, yy, zz) = PolynomialRing(R, ["xx", "yy", "zz"])
+   r1 = @inferred evaluate(f, [xx + yy, yy + zz])
+   r2 = evaluate(g, [xx + yy, yy + zz])
+   r3 = evaluate(f + g, [xx + yy, yy + zz])
+   @test r3 == r1 + r2
+
+   SS, z = PolynomialRing(R, "z")
+   @test_throws ErrorException evaluate(x, [z])
+   @test_throws ErrorException evaluate(x, [z, z, z])
+   w = [z, (z + 1)^2]
+   r1 = @inferred evaluate(f, w)
+   r2 = evaluate(g, w)
+   r3 = evaluate(f + g, w)
+   @test r3 == r1 + r2
+   @test (@which evaluate(f, w)).module === Nemo
+
    T = MatrixAlgebra(R, 2)
 
    f = x^2*y^2+2*x+1

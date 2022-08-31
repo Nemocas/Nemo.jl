@@ -7,9 +7,9 @@
 export NmodMPolyRing, nmod_mpoly
 export GFPMPolyRing, gfp_mpoly
 
-for (etype, rtype, ftype, ctype) in (
-                        (nmod_mpoly, NmodMPolyRing, nmod_mpoly_factor, nmod),
-                        (gfp_mpoly, GFPMPolyRing, gfp_mpoly_factor, gfp_elem))
+for (etype, rtype, ftype, ctype, utype) in (
+                        (nmod_mpoly, NmodMPolyRing, nmod_mpoly_factor, nmod, nmod_poly),
+                        (gfp_mpoly, GFPMPolyRing, gfp_mpoly_factor, gfp_elem, gfp_poly))
 @eval begin
 
 ###############################################################################
@@ -676,7 +676,7 @@ end
 #
 ###############################################################################
 
-function evaluate(a::($etype), b::Vector{nmod})
+function evaluate(a::($etype), b::Vector{$ctype})
    length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
    b2 = [d.data for d in b]
    z = ccall((:nmod_mpoly_evaluate_all_ui, libflint), UInt,
@@ -764,6 +764,40 @@ f values")
       r += t
    end
    return r
+end
+
+function evaluate(a::$(etype), bs::Vector{$etype})
+   R = parent(a)
+   S = parent(bs[1])
+   @assert base_ring(R) === base_ring(S)
+
+   length(bs) != nvars(R) &&
+      error("Number of variables does not match number of values")
+
+   c = S()
+   fl = ccall((:nmod_mpoly_compose_nmod_mpoly, libflint), Cint,
+              (Ref{$etype}, Ref{$etype}, Ptr{Ref{$etype}},
+               Ref{$rtype}, Ref{$rtype}),
+              c, a, bs, R, S)
+   fl == 0 && error("Something wrong in evaluation.")
+   return c
+end
+
+
+function evaluate(a::($etype), bs::Vector{$utype})
+   R = parent(a)
+   S = parent(bs[1])
+   @assert base_ring(R) === base_ring(S)
+
+   length(bs) != nvars(R) &&
+      error("Number of variables does not match number of values")
+
+   c = S()
+   fl = ccall((:nmod_mpoly_compose_nmod_poly, libflint), Cint,
+              (Ref{$utype}, Ref{$etype}, Ptr{Ref{$utype}},
+               Ref{$rtype}), c, a, bs, R)
+   fl == 0 && error("Something wrong in evaluation.")
+   return c
 end
 
 ###############################################################################
@@ -1017,6 +1051,45 @@ promote_rule(::Type{($etype)}, ::Type{V}) where {V <: Integer} = ($etype)
 promote_rule(::Type{($etype)}, ::Type{fmpz}) = ($etype)
 
 promote_rule(::Type{($etype)}, ::Type{$ctype}) = ($etype)
+
+###############################################################################
+#
+#   Build context
+#
+###############################################################################
+
+function _push_term!(z::($etype), c::($ctype), exp::Vector{Int})
+   ccall((:nmod_mpoly_push_term_ui_ui, libflint), Nothing,
+         (Ref{$etype}, UInt, Ptr{UInt}, Ref{$rtype}),
+         z, c.data, exp, parent(z))
+   return z
+end
+
+function push_term!(M::MPolyBuildCtx{$etype}, c::($ctype), expv::Vector{Int})
+   if length(expv) != nvars(parent(M.poly))
+      error("length of exponent vector should match the number of variables")
+   end
+   parent(c) !== base_ring(M.poly) &&error("parent mismatch")
+   _push_term!(M.poly, c, expv)
+   return M
+end
+
+function push_term!(M::MPolyBuildCtx{$etype},
+      c::RingElement, expv::Vector{Int})
+   push_term!(M, base_ring(M.poly)(c), expv)
+   return M
+end
+
+function finish(M::MPolyBuildCtx{$etype})
+   res = M.poly
+   R = parent(res)
+   M.poly = zero(R)
+   ccall((:nmod_mpoly_sort_terms, libflint), Nothing,
+         (Ref{$etype}, Ref{$rtype}), res, R)
+   ccall((:nmod_mpoly_combine_like_terms, libflint), Nothing,
+         (Ref{$etype}, Ref{$rtype}), res, R)
+   return res
+end
 
 ###############################################################################
 #
