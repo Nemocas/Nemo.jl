@@ -556,7 +556,7 @@ end
          r3 = evaluate(f + g, V1)
 
          @test r3 == r1 + r2
-         @test (f + g)(V1...) == f(V1...) + g(V1...)
+         @test evaluate(f + g, V1) == evaluate(f, V1) + evaluate(g, V1)
 
          V2 = [BigInt(rand(-10:10)) for i in 1:num_vars]
 
@@ -565,7 +565,7 @@ end
          r3 = evaluate(f + g, V2)
 
          @test r3 == r1 + r2
-         @test (f + g)(V2...) == f(V2...) + g(V2...)
+         @test evaluate(f + g, V2) == evaluate(f, V2) + evaluate(g, V2)
 
          V3 = [R(rand(-10:10)) for i in 1:num_vars]
 
@@ -574,7 +574,7 @@ end
          r3 = evaluate(f + g, V3)
 
          @test r3 == r1 + r2
-         @test (f + g)(V3...) == f(V3...) + g(V3...)
+         @test evaluate(f + g, V3) == evaluate(f, V3) + evaluate(g, V3)
       end
    end
 
@@ -588,7 +588,7 @@ end
    M1 = T([1 2; 3 4])
    M2 = T([1 1; 2 4])
 
-   @test f(M1, M2) == T([9 12; 18 20])
+   @test_broken evaluate(f, [M1, M2]) == T([9 12; 18 20])
 
    @test evaluate(f, [fmpz(20), fmpz(30)]) == R(20^2*30^2+2*20+1)
    @test evaluate(f, [UInt(20), UInt(30)]) == R(20^2*30^2+2*20+1)

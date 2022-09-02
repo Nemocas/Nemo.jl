@@ -38,6 +38,10 @@ base_ring(a::($rtype)) = a.base_ring
 
 base_ring(f::($etype)) = base_ring(parent(f))
 
+coefficient_ring(a::($rtype)) = a.base_ring
+
+coefficient_ring(f::($etype)) = coefficient_ring(parent(f))
+
 characteristic(R::($rtype)) = characteristic(base_ring(R))
 
 modulus(R::($rtype)) = modulus(base_ring(R))
@@ -97,7 +101,7 @@ end
 
 function length(a::($etype))
    return a.length
-#   return ccall((:nmod_mpoly_length, libflint), Int,
+#   return ccall((:fmpz_mod_mpoly_length, libflint), Int,
 #                (Ref{T}, Ref{parent_type(T)}),
 #                a, a.parent)
 end
@@ -148,6 +152,16 @@ function is_constant(a::($etype))
                      a, parent(a)))
 end
 
+# TODO move this
+function expressify(a::($rtype); context = nothing)
+    return Expr(:sequence, Expr(:text, "Multivariate Polynomial Ring in "),
+                           Expr(:series, symbols(a)...),
+                           Expr(:text, " over "),
+                           expressify(coefficient_ring(a); context = context))
+end
+
+@enable_all_show_via_expressify ($rtype)
+
 ################################################################################
 #
 #  Getting coefficients
@@ -168,7 +182,7 @@ function coeff(a::($etype), b::($etype))
    check_parent(a, b)
    !isone(length(b)) && error("Second argument must be a monomial")
    z = fmpz()
-   ccall((:fmpz_mod_mpoly_get_coeff_ui_monomial, libflint), UInt,
+   ccall((:fmpz_mod_mpoly_get_coeff_fmpz_monomial, libflint), UInt,
          (Ref{fmpz}, Ref{($etype)}, Ref{($etype)}, Ref{($rtype)}),
          z, a, b, parent(a))
    return base_ring(parent(a))(z)
@@ -341,7 +355,7 @@ end
 function +(a::($etype), b::Int)
    z = parent(a)()
    ccall((:fmpz_mod_mpoly_add_si, libflint), Nothing,
-         (Ref{($etype)}, Ref{($etype)}, UInt, Ref{($rtype)}),
+         (Ref{($etype)}, Ref{($etype)}, Int, Ref{($rtype)}),
          z, a, b, parent(a))
    return z
 end
@@ -576,7 +590,7 @@ end
 
 function ==(a::($etype), b::($ctype))
    return Bool(ccall((:fmpz_mod_mpoly_equal_fmpz, libflint), Cint,
-                     (Ref{($etype)}, UInt, Ref{($rtype)}),
+                     (Ref{($etype)}, Ref{fmpz}, Ref{($rtype)}),
                      a, data(b), a.parent))
 end
 
@@ -736,7 +750,7 @@ function setcoeff!(a::($etype), n::Int, c::($ctype))
             a, n, a.parent)
    end
    ccall((:fmpz_mod_mpoly_set_term_coeff_fmpz, libflint), Nothing,
-         (Ref{($etype)}, Int, UInt, Ref{($rtype)}),
+         (Ref{($etype)}, Int, Ref{fmpz}, Ref{($rtype)}),
          a, n - 1, data(c), a.parent)
    return a
 end
@@ -868,7 +882,7 @@ end
 # Return zero if there is no such term
 function coeff(a::($etype), exps::Vector{Int})
    z = fmpz()
-   ccall((:nmod_mpoly_get_coeff_ui_ui, libflint), UInt,
+   ccall((:fmpz_mod_mpoly_get_coeff_fmpz_ui, libflint), UInt,
          (Ref{fmpz}, Ref{($etype)}, Ptr{Int}, Ref{($rtype)}),
          z, a, exps, parent(a))
    return base_ring(parent(a))(z)
@@ -877,7 +891,7 @@ end
 # Set the coefficient of the term with the given exponent vector to the
 # given fmpz. Removal of a zero term is performed.
 function setcoeff!(a::($etype), exps::Vector{UInt}, b::($ctype))
-   ccall((:nmod_mpoly_set_coeff_ui_ui, libflint), Nothing,
+   ccall((:fmpz_mod_mpoly_set_coeff_fmpz_ui, libflint), Nothing,
          (Ref{($etype)}, Ref{fmpz}, Ptr{UInt}, Ref{($rtype)}),
          a, data(b), exps, parent(a))
    return a
@@ -886,7 +900,7 @@ end
 # Set the coefficient of the term with the given exponent vector to the
 # given fmpz. Removal of a zero term is performed.
 function setcoeff!(a::($etype), exps::Vector{Int}, b::($ctype))
-   ccall((:nmod_mpoly_set_coeff_ui_ui, libflint), Nothing,
+   ccall((:fmpz_mod_mpoly_set_coeff_fmpz_ui, libflint), Nothing,
          (Ref{($etype)}, Ref{fmpz}, Ptr{Int}, Ref{($rtype)}),
          a, data(b), exps, parent(a))
    return a

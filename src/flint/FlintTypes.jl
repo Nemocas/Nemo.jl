@@ -2033,15 +2033,15 @@ mutable struct gfp_fmpz_mpoly <: MPolyElem{gfp_fmpz_elem}
    function gfp_fmpz_mpoly(ctx::GFPFmpzMPolyRing, a::Vector{gfp_fmpz_elem}, b::Vector{Vector{T}}) where T <: Union{UInt, Int, fmpz}
       z = new()
       ccall((:fmpz_mod_mpoly_init2, libflint), Nothing,
-            (Ref{gfp_fmpz_mpoly}, Int, Ref{GFPMPolyRing}),
+            (Ref{gfp_fmpz_mpoly}, Int, Ref{GFPFmpzMPolyRing}),
             z, length(a), ctx)
       z.parent = ctx
       finalizer(_gfp_fmpz_mpoly_clear_fn, z)
 
       for i in 1:length(a)
          if T == fmpz
-            ccall((:fmpz_mpoly_push_term_fmpz_fmpz, libflint), Nothing,
-                  (Ref{gfp_mpoly}, Ref{fmpz}, Ptr{Ref{fmpz}}, Ref{GFPMPolyRing}),
+            ccall((:fmpz_mod_mpoly_push_term_fmpz_fmpz, libflint), Nothing,
+                  (Ref{gfp_fmpz_mpoly}, Ref{fmpz}, Ptr{Ref{fmpz}}, Ref{GFPFmpzMPolyRing}),
                   z, a[i].data, b[i], ctx)
          else
             ccall((:fmpz_mod_mpoly_push_term_fmpz_ui, libflint), Nothing,
@@ -2059,7 +2059,7 @@ mutable struct gfp_fmpz_mpoly <: MPolyElem{gfp_fmpz_elem}
       return z
    end
 
-   function gfp_fmpz_mpoly(ctx::GFPMPolyRing, a::Union{fmpz, gfp_fmpz_elem})
+   function gfp_fmpz_mpoly(ctx::GFPFmpzMPolyRing, a::Union{fmpz, gfp_fmpz_elem})
       z = new()
       ccall((:fmpz_mod_mpoly_init, libflint), Nothing,
             (Ref{gfp_fmpz_mpoly}, Ref{GFPFmpzMPolyRing}),
@@ -2087,11 +2087,11 @@ mutable struct gfp_fmpz_mpoly_factor
    alloc::Int
    # end flint struct
 
-   parent::GFPMPolyRing
+   parent::GFPFmpzMPolyRing
 
-   function gfp_fmpz_mpoly_factor(ctx::GFPMPolyRing)
+   function gfp_fmpz_mpoly_factor(ctx::GFPFmpzMPolyRing)
       z = new()
-      ccall((:gfp_fmpz_mpoly_factor_init, libflint), Nothing,
+      ccall((:fmpz_mod_mpoly_factor_init, libflint), Nothing,
             (Ref{gfp_fmpz_mpoly_factor}, Ref{GFPFmpzMPolyRing}),
             z, ctx)
       z.parent = ctx
