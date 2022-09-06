@@ -1017,7 +1017,7 @@ function divexact(f::gfp_fmpz_mpoly, a::gfp_elem; check::Bool=true)
   return f*inv(a)
 end
 
-function divexact(f::gfp_mpoly, a::IntegerUnion; check::Bool=true)
+function divexact(f::gfp_fmpz_mpoly, a::IntegerUnion; check::Bool=true)
   return divexact(f, base_ring(f)(a))
 end
 
