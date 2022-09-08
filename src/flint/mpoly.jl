@@ -106,7 +106,7 @@ function _hash_mpoly_coeffs(a::fq_nmod_mpoly, h::UInt)
 end
 
 # fallback
-function _hash_mpoly_coeffs(a::FlintMPolyUnion, h::UInt) where S
+function _hash_mpoly_coeffs(a::FlintMPolyUnion, h::UInt)
    for i in 1:length(a)
       h = hash(coeff(a, i), h)
    end
