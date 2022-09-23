@@ -2138,9 +2138,8 @@ end
 
 Return the number of binary bits of $x$. We return zero if $x = 0$.
 """
-nbits(x::fmpz) = iszero(x) ? 0 : Int(ccall((:fmpz_sizeinbase, libflint), UInt,
-                  (Ref{fmpz}, Int32), x, 2))  # docu states: always correct
-                                #if base is power of 2
+nbits(x::fmpz) = iszero(x) ? 0 : Int(ccall((:fmpz_bits, libflint), Clong,
+                  (Ref{fmpz},), x))  
 
 ###############################################################################
 #
