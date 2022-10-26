@@ -95,9 +95,9 @@ parent_type(::Type{padic}) = FlintPadicField
 
 function Base.deepcopy_internal(a::padic, dict::IdDict)
    z = parent(a)()
+   z.N = a.N      # set does not transfer N - neither should it.
    ccall((:padic_set, libflint), Nothing,
          (Ref{padic}, Ref{padic}, Ref{FlintPadicField}), z, a, parent(a))
-   z.N = a.N      # set does not transfer N - neither should it.
    return z
 end
 
@@ -233,7 +233,15 @@ function expressify(x::padic; context = nothing)
       pp = prime(parent(x))
       p = BigInt(pp)
       v = valuation(x)
-      u = BigInt(lift(FlintZZ, x*parent(x)(pp)^-v))
+      if v >= 0
+        u = BigInt(lift(FlintZZ, x))
+        if v > 0
+          u = div(u, p^v)
+        end
+      else
+        u = lift(x*p^-v)
+      end
+
       if pmode == 1  # series
          d = digits(u, base=p)
       else  # val_unit
@@ -582,9 +590,18 @@ function log(a::padic)
    ctx = parent(a)
    z = padic(a.N)
    z.parent = ctx
+   v = valuation(a)
+   v == 0 || error("Unable to compute logarithm")
+   v = valuation(a-1)
+   if v == 0
+     a = a^(prime(ctx)-1)
+   end
    res = Bool(ccall((:padic_log, libflint), Cint,
                     (Ref{padic}, Ref{padic}, Ref{FlintPadicField}), z, a, ctx))
    !res && error("Unable to compute logarithm")
+   if v == 0
+     z = z//(prime(ctx)-1)
+   end
    return z
 end
 
