@@ -819,13 +819,18 @@ end
 #
 ###############################################################################
 
-function mod(x::fmpz, y::fmpz)
-   iszero(y) && throw(DivideError())
-   r = fmpz()
+function mod!(r::fmpz, x::fmpz, y::fmpz)
    ccall((:fmpz_fdiv_r, libflint), Nothing,
          (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), r, x, y)
    return r
 end
+
+function mod(x::fmpz, y::fmpz)
+   iszero(y) && throw(DivideError())
+   r = fmpz()
+   return mod!(r, x, y)
+end
+
 
 function mod(x::fmpz, c::UInt)
     c == 0 && throw(DivideError())
