@@ -408,7 +408,11 @@ function ^(a::qadic, n::fmpz)
    if n < 0
       return inv(a)^(-n)
    end
-   z = qadic(a.N + (Int(n) - 1)*valuation(a))
+   if valuation(a) == 0
+     z = qadic(a.N) #if expo is fmpz, Int(n) would throw an error
+   else             #for units (v==0) this is fine hower.
+     z = qadic(a.N + (Int(n) - 1)*valuation(a))
+   end
    z.parent = ctx
    ccall((:qadic_pow, libflint), Nothing,
                  (Ref{qadic}, Ref{qadic}, Ref{fmpz}, Ref{FlintQadicField}),
