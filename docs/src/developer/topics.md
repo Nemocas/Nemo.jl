@@ -465,7 +465,7 @@ By default the `check_parent` functions throw an exception if parents do not
 match. However sometimes one would like to know if they match without throwing.
 
 For this purpose one can pass an additional `false` argument to `check_parent`.
-This supresses the exception that would be thrown if the parent objects didn't
+This suppresses the exception that would be thrown if the parent objects didn't
 match. Instead the function simply returns `true` or `false` to indicate
 whether they matched or not.
 

@@ -1005,7 +1005,7 @@ end
     eigvals(A::acb_mat)
 
 Returns the eigenvalues of `A` as a vector of tuples `(acb, Int)`.
-Each tuple `(z, k)` corresponds to a cluser of `k` eigenvalues
+Each tuple `(z, k)` corresponds to a cluster of `k` eigenvalues
 of $A$.
 
 This function is experimental.

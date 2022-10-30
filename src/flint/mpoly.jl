@@ -120,7 +120,7 @@ function _hash_mpoly_exps_via(::Type{S}, a::FlintMPolyUnion, h::UInt) where S
    for i in 1:length(a)
       exponent_vector!(e, a, i)
       for j in 1:n
-         # crutially, fmpz's hash_integer agrees with Int and UInt
+         # crucially, fmpz's hash_integer agrees with Int and UInt
          if S == fmpz
             h = hash_integer((@inbounds e[j]), h)
          else

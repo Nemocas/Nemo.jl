@@ -63,7 +63,7 @@ julia> T, z = PolynomialRing(S, "z")
 julia> f = x + y + z + 1
 z+(y+(x+1))
 
-julia> p = f^30; # semicolon supresses output
+julia> p = f^30; # semicolon suppresses output
 
 julia> @time q = p*(p+1);
   0.325521 seconds (140.64 k allocations: 3.313 MB)
@@ -152,6 +152,6 @@ Antic = "/prefix/for/libantic"
 
 ## Experimental threading support for flint
 
-Enabling a threaded version of flint can be done by setting the evironment
+Enabling a threaded version of flint can be done by setting the environment
 variable `NEMO_THREADED=1`. To set the actual number of threads, use
 `Nemo.flint_set_num_threads($numberofthreads)`.

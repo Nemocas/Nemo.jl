@@ -51,7 +51,7 @@ one to write generic functions that can accept any Nemo fraction type.
 
 ## Fraction functionality
 
-All fraction types in Nemo provide funtionality for fields described in
+All fraction types in Nemo provide functionality for fields described in
 AbstractAlgebra.jl:
 
 <https://nemocas.github.io/AbstractAlgebra.jl/stable/field>

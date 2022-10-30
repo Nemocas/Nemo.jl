@@ -18,7 +18,7 @@ this is the name of a specific parent object, not the name of its type.
 
 The types of the integer ring parent objects and elements of the associated
 rings of integers are given in the following table according to the library
-provding them.
+providing them.
 
  Library        | Element type  | Parent type
 ----------------|---------------|--------------------

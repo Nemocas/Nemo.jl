@@ -1225,7 +1225,7 @@ Guessing typically requires high precision to succeed, and it does not make
 much sense to call this function with input precision smaller than
 $O(maxdeg \cdot maxbits)$.
 If this function succeeds, then the output is guaranteed to be contained in
-the enclosure `x`, but failure does not prove that such an algebric
+the enclosure `x`, but failure does not prove that such an algebraic
 number with the specified parameters does not exist.
 
 This function does a single iteration with the target parameters. For best
@@ -1260,7 +1260,7 @@ Guessing typically requires high precision to succeed, and it does not make
 much sense to call this function with input precision smaller than
 $O(maxdeg \cdot maxbits)$.
 If this function succeeds, then the output is guaranteed to be contained in
-the enclosure `x`, but failure does not prove that such an algebric
+the enclosure `x`, but failure does not prove that such an algebraic
 number with the specified parameters does not exist.
 
 This function does a single iteration with the target parameters. For best

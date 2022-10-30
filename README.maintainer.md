@@ -21,7 +21,7 @@ julia> Nemo.libflint
 Troubleshooting guide:
 
 - If setting up the override for the first time, Nemo should be re-precompiled. This can be triggered by touching a source file.
-- Serveral of the other libraries depending on flint might want a specific so version. This can be tweaked by hacking the flint makefile.
+- Several of the other libraries depending on flint might want a specific so version. This can be tweaked by hacking the flint makefile.
 
 ## arb
 

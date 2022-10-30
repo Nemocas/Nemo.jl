@@ -45,7 +45,7 @@ function _isspecial(a::ca)
    return (a.field & 3) != 0
 end
 
-# todo: distiguish unknown
+# todo: distinguish unknown
 function check_special(a::ca)
    if !a.parent.extended && _isspecial(a)
       throw(DomainError(a, "Non-number result"))

@@ -149,7 +149,7 @@ end
 @doc Markdown.doc"""
     is_embedded(k::T, K::T) where T <: FinField
 
-If $k$ is embbeded in $K$, return the corresponding embedding.
+If $k$ is embedded in $K$, return the corresponding embedding.
 """
 function is_embedded(k::T, K::T) where T <: FinField
 
@@ -403,7 +403,7 @@ function embed(k::T, K::T) where T <: FinField
     # Prior to embed k in K, we compute the needed embeddings
     # The embedding might be computed during the process !
 
-    needmore = intersections(k, K) # reccursive calls to embed
+    needmore = intersections(k, K) # recursive calls to embed
 
     # And, if the wanted embeddings has not been computed during the process, we
     # finally compute a compatible embedding

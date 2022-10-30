@@ -2665,7 +2665,7 @@ promote_rule(::Type{fmpz}, ::Type{T}) where {T <: Integer} = fmpz
 ###############################################################################
 
 # 1, 0, -1 are perfect powers
-# ex is not guarenteed to be maximal
+# ex is not guaranteed to be maximal
 function _is_perfect_power(a::fmpz)
   rt = fmpz()
   ex = ccall((:fmpz_is_perfect_power, libflint), Int, (Ref{fmpz}, Ref{fmpz}), rt, a)
