@@ -870,7 +870,7 @@ function roots(a::fmpz_mod_poly)
     nfac = fmpz_factor()
     ccall((:fmpz_factor, libflint), Nothing,
           (Ref{fmpz_factor}, Ref{fmpz}),
-          nfac, n.n)
+          nfac, R.base_ring.n)
     ccall((:fmpz_mod_poly_roots_factored, libflint), UInt,
             (Ref{fmpz_mod_poly_factor}, Ref{fmpz_mod_poly}, Cint, Ref{fmpz_factor}, Ref{fmpz_mod_ctx_struct}),
             fac, a, 0, nfac, n)

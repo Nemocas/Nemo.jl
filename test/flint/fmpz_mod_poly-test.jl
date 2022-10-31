@@ -542,6 +542,11 @@ end
 
   _, x = PolynomialRing(ResidueRing(ZZ, ZZ(1031)), "x")
   @test length(roots(x^2+7)) == 2
+
+  for n in (17, 18, 19, 20)
+    _, x = PolynomialRing(ResidueRing(ZZ, ZZ(10)^n), "x")
+    @test length(roots(10*x)) == 10
+  end
 end
 
 @testset "fmpz_mod_poly.remove_valuation" begin
