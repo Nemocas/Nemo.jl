@@ -820,6 +820,35 @@ function factor_shape(x::PolyElem{T}) where {T <: RingElem}
   return res
 end
 
+function roots(a::nmod_poly)
+  R = parent(a)
+  n = R.n
+  fac = nmod_poly_factor(n)
+  if is_prime(n)
+    ccall((:nmod_poly_roots, libflint), UInt,
+            (Ref{nmod_poly_factor}, Ref{nmod_poly}, Cint),
+            fac, a, 0)
+  else
+    nfac = n_factor()
+    ccall((:n_factor, libflint), Nothing,
+          (Ref{n_factor}, UInt),
+          nfac, n)
+    ccall((:nmod_poly_roots_factored, libflint), UInt,
+            (Ref{nmod_poly_factor}, Ref{nmod_poly}, Cint, Ref{n_factor}),
+            fac, a, 0, nfac)
+  end
+  f = R()
+  res = nmod[]
+  for i in 1:fac.num
+    ccall((:nmod_poly_factor_get_nmod_poly, libflint), Nothing,
+          (Ref{nmod_poly}, Ref{nmod_poly_factor}, Int),
+          f, fac, i - 1)
+    @assert isone(coeff(f, 1))
+    push!(res, -coeff(f, 0))
+  end
+  return res
+end
+
 ################################################################################
 #
 #   Remove and valuation

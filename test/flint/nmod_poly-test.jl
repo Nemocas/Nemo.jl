@@ -628,6 +628,14 @@ end
   @test fac == Dict(2=>x^4+3*x^2+2,1=>x^2 + x)
 end
 
+@testset "nmod_poly.roots" begin
+  _, x = PolynomialRing(ResidueRing(ZZ, 1024), "x")
+  @test length(roots(x^2+7)) == 4
+
+  _, x = PolynomialRing(ResidueRing(ZZ, 1031), "x")
+  @test length(roots(x^2+7)) == 2
+end
+
 @testset "nmod_poly.canonicalization" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")

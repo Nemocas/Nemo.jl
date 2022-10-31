@@ -536,6 +536,14 @@ end
    @test R == Dict(3=>1, 1=>2)
 end
 
+@testset "fmpz_mod_poly.roots" begin
+  _, x = PolynomialRing(ResidueRing(ZZ, ZZ(1024)), "x")
+  @test length(roots(x^2+7)) == 4
+
+  _, x = PolynomialRing(ResidueRing(ZZ, ZZ(1031)), "x")
+  @test length(roots(x^2+7)) == 2
+end
+
 @testset "fmpz_mod_poly.remove_valuation" begin
    R = ResidueRing(ZZ, 123456789012345678949)
    S, y = PolynomialRing(R, "y")
