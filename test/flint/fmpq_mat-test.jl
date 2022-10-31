@@ -506,6 +506,9 @@ end
       r, N = rref(M)
 
       @test is_rref(N)
+      MM = deepcopy(M)
+      rr = rref!(MM)
+      @test (r, N) == (rr, MM)
    end
  
    S = MatrixSpace(QQ, 3, 3)

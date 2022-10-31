@@ -625,6 +625,12 @@ function rref(x::fmpq_mat)
    return r, z
 end
 
+function rref!(x::fmpq_mat)
+   r = ccall((:fmpq_mat_rref, libflint), Int,
+         (Ref{fmpq_mat}, Ref{fmpq_mat}), x, x)
+   return r
+end
+
 ###############################################################################
 #
 #   Linear solving
