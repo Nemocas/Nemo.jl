@@ -865,7 +865,7 @@ function roots(a::fmpz_mod_poly)
   if is_probable_prime(n.n)
     ccall((:fmpz_mod_poly_roots, libflint), UInt,
             (Ref{fmpz_mod_poly_factor}, Ref{fmpz_mod_poly}, Cint, Ref{fmpz_mod_ctx_struct}),
-            fac, x, 0, n)
+            fac, a, 0, n)
   else
     nfac = fmpz_factor()
     ccall((:fmpz_factor, libflint), Nothing,
