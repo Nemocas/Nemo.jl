@@ -770,3 +770,17 @@ end
      @test_throws DomainError exponent_vector(f, 1)
   end
 end
+
+@testset "fmpz_mpoly.FactoredFractionField" begin
+   R, (x, y, z) = PolynomialRing(ZZ, [:x, :y, :z])
+   F = FactoredFractionField(R)
+   (x, y, z) = map(F, (x, y, z))
+   a = divexact(x, (x+2y+3z+1))
+   b = divexact(y, (x+2y+3z+2))
+   c = divexact(z, (x+2y+3z+1)^2)
+   ab = a + b
+   abc = a + b + c
+   @test is_unit(denominator((x+2y+3z+1)^2*(x+2y+3z+2)*abc))
+   @test abc - a - b == c
+   @test abc - ab == c
+end

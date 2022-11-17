@@ -414,8 +414,21 @@ function gcd(a::fq_nmod_mpoly, b::fq_nmod_mpoly)
              (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly},
               Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
              z, a, b, a.parent)
-   iszero(r) && error("Unable to compute gcd")
+   r == 0 && error("Unable to compute gcd")
    return z
+end
+
+function gcd_with_cofactors(a::fq_nmod_mpoly, b::fq_nmod_mpoly)
+   check_parent(a, b)
+   z = parent(a)()
+   abar = parent(a)()
+   bbar = parent(a)()
+   r = ccall((:fq_nmod_mpoly_gcd_cofactors, Nemo.libflint), Cint,
+             (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly},
+              Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+             z, abar, bbar, a, b, a.parent)
+   r == 0 && error("Unable to compute gcd")
+   return z, abar, bbar
 end
 
 ################################################################################

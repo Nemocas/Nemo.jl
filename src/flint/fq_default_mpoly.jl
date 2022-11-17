@@ -270,6 +270,13 @@ function gcd(a::fq_default_mpoly, b::fq_default_mpoly)
     return fq_default_mpoly(parent(a), gcd(a.data, b.data))
 end
 
+function gcd_with_cofactors(a::fq_default_mpoly, b::fq_default_mpoly)
+    check_parent(a, b)
+    (g, abar, bbar) = gcd(a.data, b.data)
+    R = parent(a)
+    return (fq_default_mpoly(R, g), fq_default_mpoly(R, abar), fq_default_mpoly(R, bar))
+end
+
 ################################################################################
 #
 #   Factorization and Square Root

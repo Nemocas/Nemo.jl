@@ -475,11 +475,23 @@ end
 function gcd(a::fmpq_mpoly, b::fmpq_mpoly)
    check_parent(a, b)
    z = parent(a)()
-   r = Bool(ccall((:fmpq_mpoly_gcd, libflint), Cint,
+   r = ccall((:fmpq_mpoly_gcd, libflint), Cint,
          (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
-         z, a, b, a.parent))
-   r == false && error("Unable to compute gcd")
+         z, a, b, a.parent)
+   r == 0 && error("Unable to compute gcd")
    return z
+end
+
+function gcd_with_cofactors(a::fmpq_mpoly, b::fmpq_mpoly)
+   z = parent(a)()
+   abar = parent(a)()
+   bbar = parent(a)()
+   r = ccall((:fmpq_mpoly_gcd_cofactors, Nemo.libflint), Cint,
+             (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{fmpq_mpoly},
+              Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
+             z, abar, bbar, a, b, a.parent)
+   r == 0 && error("Unable to compute gcd")
+   return z, abar, bbar
 end
 
 ################################################################################

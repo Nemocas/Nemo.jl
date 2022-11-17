@@ -443,11 +443,23 @@ end
 function gcd(a::fmpz_mpoly, b::fmpz_mpoly)
    check_parent(a, b)
    z = parent(a)()
-   r = Bool(ccall((:fmpz_mpoly_gcd, libflint), Cint,
-         (Ref{fmpz_mpoly}, Ref{fmpz_mpoly}, Ref{fmpz_mpoly}, Ref{FmpzMPolyRing}),
-         z, a, b, a.parent))
-   r == false && error("Unable to compute gcd")
+   r = ccall((:fmpz_mpoly_gcd, libflint), Cint,
+             (Ref{fmpz_mpoly}, Ref{fmpz_mpoly}, Ref{fmpz_mpoly}, Ref{FmpzMPolyRing}),
+             z, a, b, a.parent)
+   r == 0 && error("Unable to compute gcd")
    return z
+end
+
+function gcd_with_cofactors(a::fmpz_mpoly, b::fmpz_mpoly)
+   z = parent(a)()
+   abar = parent(a)()
+   bbar = parent(a)()
+   r = ccall((:fmpz_mpoly_gcd_cofactors, Nemo.libflint), Cint,
+             (Ref{fmpz_mpoly}, Ref{fmpz_mpoly}, Ref{fmpz_mpoly},
+              Ref{fmpz_mpoly}, Ref{fmpz_mpoly}, Ref{FmpzMPolyRing}),
+             z, abar, bbar, a, b, a.parent)
+   r == 0 && error("Unable to compute gcd")
+   return z, abar, bbar
 end
 
 ################################################################################

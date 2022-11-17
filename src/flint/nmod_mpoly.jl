@@ -454,11 +454,24 @@ end
 function gcd(a::($etype), b::($etype))
    check_parent(a, b)
    z = parent(a)()
-   ok = ccall((:nmod_mpoly_gcd, libflint), Cint,
+   r = ccall((:nmod_mpoly_gcd, libflint), Cint,
               (Ref{($etype)}, Ref{($etype)}, Ref{($etype)}, Ref{($rtype)}),
               z, a, b, a.parent)
-   !isone(ok) && error("Unable to compute gcd")
+   r == 0 && error("Unable to compute gcd")
    return z
+end
+
+function gcd_with_cofactors(a::($etype), b::($etype))
+   check_parent(a, b)
+   z = parent(a)()
+   abar = parent(a)()
+   bbar = parent(a)()
+   r = ccall((:nmod_mpoly_gcd_cofactors, libflint), Cint,
+              (Ref{($etype)}, Ref{($etype)}, Ref{($etype)},
+               Ref{($etype)}, Ref{($etype)}, Ref{($rtype)}),
+              z, abar, bbar, a, b, a.parent)
+   r == 0 && error("Unable to compute gcd")
+   return z, abar, bbar
 end
 
 ################################################################################
