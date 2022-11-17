@@ -272,9 +272,9 @@ end
 
 function gcd_with_cofactors(a::fq_default_mpoly, b::fq_default_mpoly)
     check_parent(a, b)
-    (g, abar, bbar) = gcd(a.data, b.data)
+    (g, abar, bbar) = gcd_with_cofactors(a.data, b.data)
     R = parent(a)
-    return (fq_default_mpoly(R, g), fq_default_mpoly(R, abar), fq_default_mpoly(R, bar))
+    return (fq_default_mpoly(R, g), fq_default_mpoly(R, abar), fq_default_mpoly(R, bbar))
 end
 
 ################################################################################

@@ -796,9 +796,12 @@ end
   end
 end
 
-@testset "fq_nmod_mpoly.FactoredFractionField" begin
+@testset "fq_nmod_mpoly.gcd_with_cofactors" begin
    R23, t = FiniteField(23, 5, "t")
    R, (x, y, z) = PolynomialRing(R23, [:x, :y, :z])
+
+   @test gcd_with_cofactors(x, y) == (1, x, y)
+
    F = FactoredFractionField(R)
    (x, y, z, t) = map(F, (x, y, z, R(t)))
    a = divexact(x, (x+2y+3z+1t))

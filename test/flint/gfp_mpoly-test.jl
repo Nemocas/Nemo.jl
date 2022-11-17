@@ -847,8 +847,11 @@ end
   @test y == @inferred (R(1) * y)
 end
 
-@testset "fmpz_mpoly.FactoredFractionField" begin
+@testset "gfp_mpoly.gcd_with_cofactors" begin
    R, (x, y, z) = PolynomialRing(GF(23), [:x, :y, :z])
+
+   @test gcd_with_cofactors(x, y) == (1, x, y)
+
    F = FactoredFractionField(R)
    (x, y, z) = map(F, (x, y, z))
    a = divexact(x, (x+2y+3z+1))

@@ -770,9 +770,13 @@ end
    end
 end
 
-@testset "fq_default_mpoly.FactoredFractionField" begin
-   for R in test_fields
-      R, (x, y, z) = PolynomialRing(QQ, [:x, :y, :z])
+@testset "fq_default_mpoly.gcd_with_cofactors" begin
+   # TODO replace by "for (F, t) in test_fields" once gcd_with_cofactors is in AA
+   for (F, t) in (test_fields[1], test_fields[2])
+      R, (x, y, z) = PolynomialRing(F, [:x, :y, :z])
+
+      @test gcd_with_cofactors(x, y) == (1, x, y)
+
       F = FactoredFractionField(R)
       (x, y, z) = map(F, (x, y, z))
       a = divexact(x, (x+2y+3z+1))
