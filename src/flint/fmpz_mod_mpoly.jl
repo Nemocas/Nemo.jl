@@ -709,6 +709,48 @@ end
 
 ###############################################################################
 #
+#   Evaluation
+#
+###############################################################################
+
+# TODO have AA define evaluate(a, vals) for general vals
+# so we can get rid of this copy pasta
+function (a::($etype))(vals::Union{NCRingElem, RingElement}...)
+   length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
+   R = base_ring(a)
+   powers = [Dict{Int, Any}() for i in 1:length(vals)]
+   r = R()
+   c = zero(R)
+   U = Vector{Any}(undef, length(vals))
+   for j = 1:length(vals)
+      W = typeof(vals[j])
+      if ((W <: Integer && W != BigInt) ||
+          (W <: Rational && W != Rational{BigInt}))
+         c = c*zero(W)
+         U[j] = parent(c)
+      else
+         U[j] = parent(vals[j])
+         c = c*zero(parent(vals[j]))
+      end
+   end
+   cvzip = zip(coefficients(a), exponent_vectors(a))
+   for (c, v) in cvzip
+      t = c
+      for j = 1:length(vals)
+         exp = v[j]
+         if !haskey(powers[j], exp)
+            powers[j][exp] = (U[j](vals[j]))^exp
+         end
+         t = t*powers[j][exp]
+      end
+      r += t
+   end
+   return r
+end
+
+
+###############################################################################
+#
 #   Unsafe functions
 #
 ###############################################################################
