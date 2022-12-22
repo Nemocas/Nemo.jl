@@ -118,6 +118,9 @@ end
    @test sign(fmpq(-2, 3)) == -1
    @test sign(fmpq()) == 0
    @test sign(fmpq(1, 7)) == 1
+   @test sign(Int, fmpq(-2, 3)) == -1
+   @test sign(Int, fmpq()) == 0
+   @test sign(Int, fmpq(1, 7)) == 1
 
    @test isone(one(R))
 

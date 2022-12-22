@@ -96,6 +96,8 @@ Return the sign of $a$ ($-1$, $0$ or $1$) as a fraction.
 """
 sign(a::fmpq) = fmpq(sign(numerator(a)))
 
+sign(::Type{Int}, a::fmpq) = sign(Int, numerator(a))
+
 function abs(a::fmpq)
    z = fmpq()
    ccall((:fmpq_abs, libflint), Nothing, (Ref{fmpq}, Ref{fmpq}), z, a)
