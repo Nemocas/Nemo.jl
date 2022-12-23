@@ -87,6 +87,36 @@ end
 #
 ################################################################################
 
+struct RealField <: Field
+  n::Int
+
+  RealField() = new(-1)
+
+  RealField(n::Int) = new(n)
+end
+
+__prec(R::RealField) = R.n
+
+_prec(R::RealField) = __prec(R) == -1 ? get_precision(RealField) : __prec(R)
+
+const ARB_DEFAULT_PRECISION = Ref{Int}(64)
+
+function set_precision!(::Type{RealField}, n)
+  ARB_DEFAULT_PRECISION[] = n
+end
+
+function get_precision(::Type{RealField})
+  return ARB_DEFAULT_PRECISION[]
+end
+
+function set_precision(f, ::Type{RealField}, prec::Int)
+  old = get_precision(RealField)
+  set_precision!(RealField, prec)
+  x = f()
+  set_precision!(RealField, old)
+  return x
+end
+
 mutable struct ArbField <: Field
   prec::Int
 
@@ -101,6 +131,43 @@ end
 const ArbFieldID = Dict{Int, ArbField}()
 
 precision(x::ArbField) = x.prec
+
+mutable struct arb_t <: FieldElem
+  mid_exp::Int # fmpz
+  mid_size::UInt # mp_size_t
+  mid_d1::UInt # mantissa_struct
+  mid_d2::UInt
+  rad_exp::Int # fmpz
+  rad_man::UInt
+
+  function arb_t()
+    z = new()
+    ccall((:arb_init, libarb), Nothing, (Ref{arb_t}, ), z)
+    finalizer(_arb_clear_fn, z)
+    return z
+  end
+
+  function arb_t(x::Union{Int, UInt, Float64, fmpz, fmpq,
+                        BigFloat, AbstractString, arb_t}, p::Int)
+    z = new()
+    ccall((:arb_init, libarb), Nothing, (Ref{arb_t}, ), z)
+    _arb_set(z, x, p)
+    finalizer(_arb_clear_fn, z)
+    return z
+  end
+
+  function arb_t(x::Union{Int, UInt, Float64, fmpz, BigFloat})
+    z = new()
+    ccall((:arb_init, libarb), Nothing, (Ref{arb_t}, ), z)
+    _arb_set(z, x)
+    finalizer(_arb_clear_fn, z)
+    return z
+  end
+end
+
+function _arb_clear_fn(x::arb_t)
+  ccall((:arb_clear, libarb), Nothing, (Ref{arb_t}, ), x)
+end
 
 mutable struct arb <: FieldElem
   mid_exp::Int # fmpz

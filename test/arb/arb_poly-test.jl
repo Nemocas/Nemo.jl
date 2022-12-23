@@ -79,7 +79,7 @@ end
 end
 
 @testset "arb_poly.polynomial" begin
-   R = RealField(53)
+   R = ArbField(53)
 
    f = polynomial(R, [])
    g = polynomial(R, [1, 2, 3])
@@ -99,7 +99,7 @@ end
 end
 
 @testset "arb_poly.similar" begin
-   R = RealField(53)
+   R = ArbField(53)
 
    f = polynomial(R, [1, 2, 3])
    g = similar(f)
