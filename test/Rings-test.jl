@@ -4,8 +4,8 @@ const ring_to_mat = Dict(FlintZZ                         => fmpz_mat,
                          GF(5)                           => gfp_mat,
                          FiniteField(3, 2, "b")[1]       => fq_nmod_mat,
                          FiniteField(fmpz(3), 2, "b")[1] => fq_mat,
-                         ArbField(64)                    => arb_mat,
-                         AcbField(64)                    => acb_mat,
+                         ArbField()                      => arb_mat,
+                         AcbField()                      => acb_mat,
                          )
 
 include("flint/fmpz-test.jl")
@@ -64,4 +64,3 @@ include("flint/fq_nmod_mpoly-test.jl")
 include("flint/fq_default_mpoly-test.jl")
 
 include("gaussiannumbers/fmpzi-test.jl")
-

@@ -24,8 +24,6 @@ include("antic/nf_elem.jl")
 
 include("arb/arb.jl")
 
-include("arb/arb_dr.jl")
-
 include("arb/acb.jl")
 
 include("arb/acb_calc.jl")

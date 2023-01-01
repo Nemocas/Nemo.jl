@@ -474,7 +474,7 @@ const FiniteField = FlintFiniteField
 #
 ###############################################################################
 
-#const RealField = ArbField
+const RealField = ArbField
 const ComplexField = AcbField
 GaussianIntegers() = FlintZZi
 GaussianRationals() = FlintQQi

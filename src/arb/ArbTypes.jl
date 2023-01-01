@@ -7,6 +7,7 @@
 #
 ###############################################################################
 
+export Balls
 export ArbField, arb
 export AcbField, acb
 export ArbPolyRing, arb_poly
@@ -31,9 +32,9 @@ const ARB_RND_NEAR = Cint(4)   # to nearest
 ################################################################################
 
 mutable struct arf_struct
-  exp::Int # fmpz
-  size::UInt # mp_size_t
-  d1::UInt # mantissa_struct
+  exp::Int    # fmpz
+  size::UInt  # mp_size_t
+  d1::UInt    # mantissa_struct
   d2::UInt
 
   function arf_struct(exp, size, d1, d2)
@@ -53,7 +54,7 @@ function _arf_clear_fn(x::arf_struct)
 end
 
 mutable struct mag_struct
-  exp::Int # fmpz
+  exp::Int  # fmpz
   man::UInt # mp_limb_t
 end
 
@@ -87,96 +88,18 @@ end
 #
 ################################################################################
 
-struct RealField <: Field
-  n::Int
-
-  RealField() = new(-1)
-
-  RealField(n::Int) = new(n)
+struct ArbField <: Field
 end
 
-__prec(R::RealField) = R.n
-
-_prec(R::RealField) = __prec(R) == -1 ? get_precision(RealField) : __prec(R)
-
-const ARB_DEFAULT_PRECISION = Ref{Int}(64)
-
-function set_precision!(::Type{RealField}, n)
-  ARB_DEFAULT_PRECISION[] = n
-end
-
-function get_precision(::Type{RealField})
-  return ARB_DEFAULT_PRECISION[]
-end
-
-function set_precision(f, ::Type{RealField}, prec::Int)
-  old = get_precision(RealField)
-  set_precision!(RealField, prec)
-  x = f()
-  set_precision!(RealField, old)
-  return x
-end
-
-mutable struct ArbField <: Field
-  prec::Int
-
-  function ArbField(p::Int = 256; cached::Bool = true)
-    arb_check_precision(p)
-    return get_cached!(ArbFieldID, p, cached) do
-      return new(p)
-    end
-  end
-end
-
-const ArbFieldID = Dict{Int, ArbField}()
-
-precision(x::ArbField) = x.prec
-
-mutable struct arb_t <: FieldElem
-  mid_exp::Int # fmpz
-  mid_size::UInt # mp_size_t
-  mid_d1::UInt # mantissa_struct
-  mid_d2::UInt
-  rad_exp::Int # fmpz
-  rad_man::UInt
-
-  function arb_t()
-    z = new()
-    ccall((:arb_init, libarb), Nothing, (Ref{arb_t}, ), z)
-    finalizer(_arb_clear_fn, z)
-    return z
-  end
-
-  function arb_t(x::Union{Int, UInt, Float64, fmpz, fmpq,
-                        BigFloat, AbstractString, arb_t}, p::Int)
-    z = new()
-    ccall((:arb_init, libarb), Nothing, (Ref{arb_t}, ), z)
-    _arb_set(z, x, p)
-    finalizer(_arb_clear_fn, z)
-    return z
-  end
-
-  function arb_t(x::Union{Int, UInt, Float64, fmpz, BigFloat})
-    z = new()
-    ccall((:arb_init, libarb), Nothing, (Ref{arb_t}, ), z)
-    _arb_set(z, x)
-    finalizer(_arb_clear_fn, z)
-    return z
-  end
-end
-
-function _arb_clear_fn(x::arb_t)
-  ccall((:arb_clear, libarb), Nothing, (Ref{arb_t}, ), x)
-end
+_prec(R::ArbField) = precision(Balls)
 
 mutable struct arb <: FieldElem
-  mid_exp::Int # fmpz
-  mid_size::UInt # mp_size_t
-  mid_d1::UInt # mantissa_struct
+  mid_exp::Int    # fmpz
+  mid_size::UInt  # mp_size_t
+  mid_d1::UInt    # mantissa_struct
   mid_d2::UInt
-  rad_exp::Int # fmpz
+  rad_exp::Int    # fmpz
   rad_man::UInt
-  parent::ArbField
 
   function arb()
     z = new()
@@ -194,7 +117,7 @@ mutable struct arb <: FieldElem
     return z
   end
 
-  function arb(x::Union{Int, UInt, Float64, fmpz, BigFloat, arb})
+  function arb(x::Union{Int, UInt, Float64, fmpz, BigFloat})
     z = new()
     ccall((:arb_init, libarb), Nothing, (Ref{arb}, ), z)
     _arb_set(z, x)
@@ -211,13 +134,6 @@ mutable struct arb <: FieldElem
     return z
   end
 
-  #function arb(x::arf)
-  #  z = new()
-  #  ccall((:arb_init, libarb), Nothing, (Ref{arb}, ), z)
-  #  ccall((:arb_set_arf, libarb), Nothing, (Ref{arb}, Ptr{arf}), z, x)
-  #  finalizer(_arb_clear_fn, z)
-  #  return z
-  #end
 end
 
 function _arb_clear_fn(x::arb)
@@ -230,35 +146,22 @@ end
 #
 ################################################################################
 
-mutable struct AcbField <: Field
-  prec::Int
-
-  function AcbField(p::Int = 256; cached::Bool = true)
-    arb_check_precision(p)
-    return get_cached!(AcbFieldID, p, cached) do
-      return new(p)
-    end
-  end
+struct AcbField <: Field
 end
-
-const AcbFieldID = Dict{Int, AcbField}()
-
-precision(x::AcbField) = x.prec
 
 mutable struct acb <: FieldElem
   real_mid_exp::Int     # fmpz
-  real_mid_size::UInt # mp_size_t
-  real_mid_d1::UInt    # mantissa_struct
+  real_mid_size::UInt   # mp_size_t
+  real_mid_d1::UInt     # mantissa_struct
   real_mid_d2::UInt
   real_rad_exp::Int     # fmpz
   real_rad_man::UInt
   imag_mid_exp::Int     # fmpz
-  imag_mid_size::UInt # mp_size_t
-  imag_mid_d1::UInt    # mantissa_struct
+  imag_mid_size::UInt   # mp_size_t
+  imag_mid_d1::UInt     # mantissa_struct
   imag_mid_d2::UInt
   imag_rad_exp::Int     # fmpz
   imag_rad_man::UInt
-  parent::AcbField
 
   function acb()
     z = new()
@@ -284,14 +187,6 @@ mutable struct acb <: FieldElem
     return z
   end
 
-  #function acb{T <: Union{Int, UInt, Float64, fmpz, BigFloat, arb}}(x::T, y::T)
-  #  z = new()
-  #  ccall((:acb_init, libarb), Nothing, (Ref{acb}, ), z)
-  #  _acb_set(z, x, y)
-  #  finalizer(_acb_clear_fn, z)
-  #  return z
-  #end
-
   function acb(x::T, y::T, p::Int) where {T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, AbstractString, arb}}
     z = new()
     ccall((:acb_init, libarb), Nothing, (Ref{acb}, ), z)
@@ -304,6 +199,55 @@ end
 function _acb_clear_fn(x::acb)
   ccall((:acb_clear, libarb), Nothing, (Ref{acb}, ), x)
 end
+
+################################################################################
+#
+#  Precision management
+#
+################################################################################
+
+struct Balls
+end
+
+# arb as in arblib
+const ARB_DEFAULT_PRECISION = Ref{Int}(64)
+
+function set_precision!(::Type{Balls}, n::Int)
+  arb_check_precision(n)
+  ARB_DEFAULT_PRECISION[] = n
+end
+
+function Base.precision(::Type{Balls})
+  return ARB_DEFAULT_PRECISION[]
+end
+
+function set_precision!(f, ::Type{Balls}, prec::Int)
+  arb_check_precision(prec)
+  old = precision(Balls)
+  set_precision!(Balls, prec)
+  x = f()
+  set_precision!(Balls, old)
+  return x
+end
+
+for T in [ArbField, AcbField]
+  @eval begin
+    precision(::$T) = precision(Balls)
+    precision(::Type{$T}) = precision(Balls)
+
+    set_precision!(::$T, n) = set_precision!(Balls, n)
+    set_precision!(::Type{$T}, n) = set_precision!(Balls, n)
+
+    set_precision!(f, ::$T, n) = set_precision!(f, Balls, n)
+    set_precision!(f, ::Type{$T}, n) = set_precision!(f, Balls, n)
+  end
+end
+
+################################################################################
+#
+#  Integration things
+#
+################################################################################
 
 mutable struct acb_calc_integrate_opts
   deg_limit::Int   # <= 0: default of 0.5*min(prec, rel_goal) + 10
@@ -332,17 +276,17 @@ end
 ################################################################################
 
 mutable struct ArbPolyRing <: PolyRing{arb}
-  base_ring::ArbField
+  #base_ring::ArbField
   S::Symbol
 
   function ArbPolyRing(R::ArbField, S::Symbol, cached::Bool = true)
-    return get_cached!(ArbPolyRingID, (R, S), cached) do
-      return new(R, S)
+    return get_cached!(ArbPolyRingID, (S, ), cached) do
+      return new(S)
     end
   end
 end
 
-const ArbPolyRingID = Dict{Tuple{ArbField, Symbol}, ArbPolyRing}()
+const ArbPolyRingID = Dict{Tuple{Symbol}, ArbPolyRing}()
 
 mutable struct arb_poly <: PolyElem{arb}
   coeffs::Ptr{Nothing}
@@ -421,9 +365,9 @@ parent(x::arb_poly) = x.parent
 
 var(x::ArbPolyRing) = x.S
 
-precision(x::ArbPolyRing) = precision(x.base_ring)
+#precision(x::ArbPolyRing) = precision(x.base_ring)
 
-base_ring(a::ArbPolyRing) = a.base_ring
+base_ring(a::ArbPolyRing) = ArbField()
 
 ################################################################################
 #
@@ -432,17 +376,17 @@ base_ring(a::ArbPolyRing) = a.base_ring
 ################################################################################
 
 mutable struct AcbPolyRing <: PolyRing{acb}
-  base_ring::AcbField
+  #base_ring::AcbField
   S::Symbol
 
   function AcbPolyRing(R::AcbField, S::Symbol, cached::Bool = true)
-    return get_cached!(AcbPolyRingID, (R, S), cached) do
-      return new(R, S)
+    return get_cached!(AcbPolyRingID, (S, ), cached) do
+      return new(S)
     end
   end
 end
 
-const AcbPolyRingID = Dict{Tuple{AcbField, Symbol}, AcbPolyRing}()
+const AcbPolyRingID = Dict{Tuple{Symbol}, AcbPolyRing}()
 
 mutable struct acb_poly <: PolyElem{acb}
   coeffs::Ptr{Nothing}
@@ -534,7 +478,7 @@ var(x::AcbPolyRing) = x.S
 
 precision(x::AcbPolyRing) = precision(x.base_ring)
 
-base_ring(a::AcbPolyRing) = a.base_ring
+base_ring(a::AcbPolyRing) = AcbField()
 
 ################################################################################
 #
@@ -545,23 +489,23 @@ base_ring(a::AcbPolyRing) = a.base_ring
 mutable struct ArbMatSpace <: MatSpace{arb}
   nrows::Int
   ncols::Int
-  base_ring::ArbField
+  #base_ring::ArbField
 
   function ArbMatSpace(R::ArbField, r::Int, c::Int, cached::Bool = true)
-    return get_cached!(ArbMatSpaceID, (R, r, c), cached) do
-      return new(r, c, R)
+    return get_cached!(ArbMatSpaceID, (r, c), cached) do
+      return new(r, c)
     end
   end
 end
 
-const ArbMatSpaceID = Dict{Tuple{ArbField, Int, Int}, ArbMatSpace}()
+const ArbMatSpaceID = Dict{Tuple{Int, Int}, ArbMatSpace}()
 
 mutable struct arb_mat <: MatElem{arb}
   entries::Ptr{Nothing}
   r::Int
   c::Int
   rows::Ptr{Nothing}
-  base_ring::ArbField
+  #base_ring::ArbField
 
   function arb_mat(r::Int, c::Int)
     z = new()
@@ -674,23 +618,23 @@ end
 mutable struct AcbMatSpace <: MatSpace{acb}
   nrows::Int
   ncols::Int
-  base_ring::AcbField
+  #base_ring::AcbField
 
   function AcbMatSpace(R::AcbField, r::Int, c::Int, cached::Bool = true)
-    return get_cached!(AcbMatSpaceID, (R, r, c), cached) do
-      return new(r, c, R)
+    return get_cached!(AcbMatSpaceID, (r, c), cached) do
+      return new(r, c)
     end
   end
 end
 
-const AcbMatSpaceID = Dict{Tuple{AcbField, Int, Int}, AcbMatSpace}()
+const AcbMatSpaceID = Dict{Tuple{Int, Int}, AcbMatSpace}()
 
 mutable struct acb_mat <: MatElem{acb}
   entries::Ptr{Nothing}
   r::Int
   c::Int
   rows::Ptr{Nothing}
-  base_ring::AcbField
+  #base_ring::AcbField
 
   function acb_mat(r::Int, c::Int)
     z = new()
@@ -937,4 +881,3 @@ end
 function _acb_mat_clear_fn(x::acb_mat)
   ccall((:acb_mat_clear, libarb), Nothing, (Ref{acb_mat}, ), x)
 end
-

@@ -252,8 +252,8 @@ end
    @test CalciumQQBar(c) == qqbar(1+2im)
    @test_throws ErrorException CalciumQQBar(t)
 
-   RR = ArbField(64)
-   CC = AcbField(64)
+   RR = ArbField()
+   CC = AcbField()
 
    @test RR(h) == 0.5
    @test CC(h) == 0.5

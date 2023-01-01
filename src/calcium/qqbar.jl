@@ -1234,7 +1234,7 @@ larger parameters when the size of the intended solution is unknown or
 may be much smaller than a worst-case bound.
 """
 function guess(R::CalciumQQBarField, x::acb, maxdeg::Int, maxbits::Int=0)
-   prec = precision(parent(x))
+   prec = precision(Balls)
    if maxbits <= 0
       maxbits = prec
    end
@@ -1269,7 +1269,7 @@ larger parameters when the size of the intended solution is unknown or
 may be much smaller than a worst-case bound.
 """
 function guess(R::CalciumQQBarField, x::arb, maxdeg::Int, maxbits::Int=0)
-   CC = AcbField(precision(parent(x)))
+   CC = AcbField()
    return guess(R, CC(x), maxdeg, maxbits)
 end
 
@@ -1286,7 +1286,7 @@ Convert `a` to a real ball with the precision of the parent field `R`.
 Throws if `a` is not a real number.
 """
 function (R::ArbField)(a::qqbar)
-   prec = precision(R)
+   prec = precision(Balls)
    z = R()
    ccall((:qqbar_get_arb, libcalcium),
         Nothing, (Ref{arb}, Ref{qqbar}, Int), z, a, prec)
@@ -1301,7 +1301,7 @@ Convert `a` to a complex ball with the precision of the parent field `R`.
 Throws if `a` is not a real number.
 """
 function (R::AcbField)(a::qqbar)
-   prec = precision(R)
+   prec = precision(Balls)
    z = R()
    ccall((:qqbar_get_acb, libcalcium),
         Nothing, (Ref{acb}, Ref{qqbar}, Int), z, a, prec)

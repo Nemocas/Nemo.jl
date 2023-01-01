@@ -43,7 +43,7 @@ base_ring(R::AcbField) = Union{}
 
 base_ring(a::acb) = Union{}
 
-parent(x::acb) = x.parent
+parent(x::acb) = AcbField()
 
 is_domain_type(::Type{acb}) = true
 
@@ -51,14 +51,12 @@ is_exact_type(::Type{acb}) = false
 
 function zero(r::AcbField)
   z = acb()
-  z.parent = r
   return z
 end
 
 function one(r::AcbField)
   z = acb()
   ccall((:acb_one, libarb), Nothing, (Ref{acb}, ), z)
-  z.parent = r
   return z
 end
 
@@ -70,7 +68,6 @@ Return exact one times $i$ in the given Arb complex field.
 function onei(r::AcbField)
   z = acb()
   ccall((:acb_onei, libarb), Nothing, (Ref{acb}, ), z)
-  z.parent = r
   return z
 end
 
@@ -86,7 +83,7 @@ function accuracy_bits(x::acb)
 end
 
 function deepcopy_internal(a::acb, dict::IdDict)
-  b = parent(a)()
+  b = acb()
   ccall((:acb_set, libarb), Nothing, (Ref{acb}, Ref{acb}), b, a)
   return b
 end
@@ -132,14 +129,12 @@ end
 function real(x::acb)
   z = arb()
   ccall((:acb_get_real, libarb), Nothing, (Ref{arb}, Ref{acb}), z, x)
-  z.parent = ArbField(parent(x).prec)
   return z
 end
 
 function imag(x::acb)
   z = arb()
   ccall((:acb_get_imag, libarb), Nothing, (Ref{arb}, Ref{acb}), z, x)
-  z.parent = ArbField(parent(x).prec)
   return z
 end
 
@@ -174,9 +169,9 @@ function Base.show(io::IO, z::acb)
 end
 
 function show(io::IO, x::AcbField)
-  print(io, "Complex Field with ")
-  print(io, precision(x))
-  print(io, " bits of precision and error bounds")
+  print(io, "Complex Field")# with ")
+  #print(io, precision(x))
+  #print(io, " bits of precision and error bounds")
 end
 
 ################################################################################
@@ -186,7 +181,7 @@ end
 ################################################################################
 
 function -(x::acb)
-  z = parent(x)()
+  z = acb()
   ccall((:acb_neg, libarb), Nothing, (Ref{acb}, Ref{acb}), z, x)
   return z
 end
@@ -202,9 +197,9 @@ end
 for (s,f) in ((:+,"acb_add"), (:*,"acb_mul"), (://, "acb_div"), (:-,"acb_sub"), (:^,"acb_pow"))
   @eval begin
     function ($s)(x::acb, y::acb)
-      z = parent(x)()
+      z = acb()
       ccall(($f, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{acb}, Int),
-                           z, x, y, parent(x).prec)
+                           z, x, y, precision(Balls))
       return z
     end
   end
@@ -214,33 +209,33 @@ for (f,s) in ((:+, "add"), (:-, "sub"), (:*, "mul"), (://, "div"), (:^, "pow"))
   @eval begin
 
     function ($f)(x::acb, y::UInt)
-      z = parent(x)()
+      z = acb()
       ccall(($("acb_"*s*"_ui"), libarb), Nothing,
                   (Ref{acb}, Ref{acb}, UInt, Int),
-                  z, x, y, parent(x).prec)
+                  z, x, y, precision(Balls))
       return z
     end
 
     function ($f)(x::acb, y::Int)
-      z = parent(x)()
+      z = acb()
       ccall(($("acb_"*s*"_si"), libarb), Nothing,
-      (Ref{acb}, Ref{acb}, Int, Int), z, x, y, parent(x).prec)
+      (Ref{acb}, Ref{acb}, Int, Int), z, x, y, precision(Balls))
       return z
     end
 
     function ($f)(x::acb, y::fmpz)
-      z = parent(x)()
+      z = acb()
       ccall(($("acb_"*s*"_fmpz"), libarb), Nothing,
                   (Ref{acb}, Ref{acb}, Ref{fmpz}, Int),
-                  z, x, y, parent(x).prec)
+                  z, x, y, precision(Balls))
       return z
     end
 
     function ($f)(x::acb, y::arb)
-      z = parent(x)()
+      z = acb()
       ccall(($("acb_"*s*"_arb"), libarb), Nothing,
                   (Ref{acb}, Ref{acb}, Ref{arb}, Int),
-                  z, x, y, parent(x).prec)
+                  z, x, y, precision(Balls))
       return z
     end
   end
@@ -269,29 +264,29 @@ end
 ^(x::Integer, y::acb) = fmpz(x)^y
 
 function -(x::UInt, y::acb)
-  z = parent(y)()
-  ccall((:acb_sub_ui, libarb), Nothing, (Ref{acb}, Ref{acb}, UInt, Int), z, y, x, parent(y).prec)
+  z = acb()
+  ccall((:acb_sub_ui, libarb), Nothing, (Ref{acb}, Ref{acb}, UInt, Int), z, y, x, precision(Balls))
   ccall((:acb_neg, libarb), Nothing, (Ref{acb}, Ref{acb}), z, z)
   return z
 end
 
 function -(x::Int, y::acb)
-  z = parent(y)()
-  ccall((:acb_sub_si, libarb), Nothing, (Ref{acb}, Ref{acb}, Int, Int), z, y, x, parent(y).prec)
+  z = acb()
+  ccall((:acb_sub_si, libarb), Nothing, (Ref{acb}, Ref{acb}, Int, Int), z, y, x, precision(Balls))
   ccall((:acb_neg, libarb), Nothing, (Ref{acb}, Ref{acb}), z, z)
   return z
 end
 
 function -(x::fmpz, y::acb)
-  z = parent(y)()
-  ccall((:acb_sub_fmpz, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{fmpz}, Int), z, y, x, parent(y).prec)
+  z = acb()
+  ccall((:acb_sub_fmpz, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{fmpz}, Int), z, y, x, precision(Balls))
   ccall((:acb_neg, libarb), Nothing, (Ref{acb}, Ref{acb}), z, z)
   return z
 end
 
 function -(x::arb, y::acb)
-  z = parent(y)()
-  ccall((:acb_sub_arb, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{arb}, Int), z, y, x, parent(y).prec)
+  z = acb()
+  ccall((:acb_sub_arb, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{arb}, Int), z, y, x, precision(Balls))
   ccall((:acb_neg, libarb), Nothing, (Ref{acb}, Ref{acb}), z, z)
   return z
 end
@@ -598,8 +593,7 @@ is_negative(x::acb) = isreal(x) && is_negative(real(x))
 function abs(x::acb)
   z = arb()
   ccall((:acb_abs, libarb), Nothing,
-                (Ref{arb}, Ref{acb}, Int), z, x, parent(x).prec)
-  z.parent = ArbField(parent(x).prec)
+                (Ref{arb}, Ref{acb}, Int), z, x, precision(Balls))
   return z
 end
 
@@ -610,8 +604,8 @@ end
 ################################################################################
 
 function inv(x::acb)
-  z = parent(x)()
-  ccall((:acb_inv, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+  z = acb()
+  ccall((:acb_inv, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
   return z
 end
 
@@ -622,14 +616,14 @@ end
 ################################################################################
 
 function ldexp(x::acb, y::Int)
-  z = parent(x)()
+  z = acb()
   ccall((:acb_mul_2exp_si, libarb), Nothing,
               (Ref{acb}, Ref{acb}, Int), z, x, y)
   return z
 end
 
 function ldexp(x::acb, y::fmpz)
-  z = parent(x)()
+  z = acb()
   ccall((:acb_mul_2exp_fmpz, libarb), Nothing,
               (Ref{acb}, Ref{acb}, Ref{fmpz}), z, x, y)
   return z
@@ -648,7 +642,7 @@ Return an `acb` box containing $x$ but which may be more economical,
 by rounding off insignificant bits from midpoints.
 """
 function trim(x::acb)
-  z = parent(x)()
+  z = acb()
   ccall((:acb_trim, libarb), Nothing, (Ref{acb}, Ref{acb}), z, x)
   return z
 end
@@ -669,7 +663,7 @@ function unique_integer(x::acb)
 end
 
 function conj(x::acb)
-  z = parent(x)()
+  z = acb()
   ccall((:acb_conj, libarb), Nothing, (Ref{acb}, Ref{acb}), z, x)
   return z
 end
@@ -677,8 +671,8 @@ end
 function angle(x::acb)
   z = arb()
   ccall((:acb_arg, libarb), Nothing,
-                (Ref{arb}, Ref{acb}, Int), z, x, parent(x).prec)
-  z.parent = ArbField(parent(x).prec)
+                (Ref{arb}, Ref{acb}, Int), z, x, precision(Balls))
+  z.parent = ArbField(precision(Balls))
   return z
 end
 
@@ -695,7 +689,7 @@ Return $\pi = 3.14159\ldots$ as an element of $r$.
 """
 function const_pi(r::AcbField)
   z = r()
-  ccall((:acb_const_pi, libarb), Nothing, (Ref{acb}, Int), z, precision(r))
+  ccall((:acb_const_pi, libarb), Nothing, (Ref{acb}, Int), z, precision(Balls))
   return z
 end
 
@@ -708,8 +702,8 @@ end
 # complex - complex functions
 
 function Base.sqrt(x::acb; check::Bool=true)
-   z = parent(x)()
-   ccall((:acb_sqrt, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_sqrt, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -719,32 +713,32 @@ end
 Return the reciprocal of the square root of $x$, i.e. $1/\sqrt{x}$.
 """
 function rsqrt(x::acb)
-   z = parent(x)()
-   ccall((:acb_rsqrt, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_rsqrt, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
 function log(x::acb)
-   z = parent(x)()
-   ccall((:acb_log, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_log, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
 function log1p(x::acb)
-   z = parent(x)()
-   ccall((:acb_log1p, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_log1p, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
 function Base.exp(x::acb)
-   z = parent(x)()
-   ccall((:acb_exp, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_exp, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
 function Base.expm1(x::acb)
-   z = parent(x)()
-   ccall((:acb_expm1, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_expm1, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -754,8 +748,8 @@ end
 Return the exponential of $\pi i x$.
 """
 function cispi(x::acb)
-   z = parent(x)()
-   ccall((:acb_exp_pi_i, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_exp_pi_i, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -767,85 +761,85 @@ Return $\exp(2\pi i/k)$.
 function root_of_unity(C::AcbField, k::Int)
    k <= 0 && throw(ArgumentError("Order must be positive ($k)"))
    z = C()
-   ccall((:acb_unit_root, libarb), Nothing, (Ref{acb}, UInt, Int), z, k, C.prec)
+   ccall((:acb_unit_root, libarb), Nothing, (Ref{acb}, UInt, Int), z, k, precision(Balls))
    return z
 end
 
 function sin(x::acb)
-   z = parent(x)()
-   ccall((:acb_sin, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_sin, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
 function cos(x::acb)
-   z = parent(x)()
-   ccall((:acb_cos, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_cos, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
 function tan(x::acb)
-   z = parent(x)()
-   ccall((:acb_tan, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_tan, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
 function cot(x::acb)
-   z = parent(x)()
-   ccall((:acb_cot, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_cot, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
 function sinpi(x::acb)
-   z = parent(x)()
-   ccall((:acb_sin_pi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_sin_pi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
 function cospi(x::acb)
-   z = parent(x)()
-   ccall((:acb_cos_pi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_cos_pi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
 function tanpi(x::acb)
-   z = parent(x)()
-   ccall((:acb_tan_pi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_tan_pi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
 function cotpi(x::acb)
-   z = parent(x)()
-   ccall((:acb_cot_pi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_cot_pi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
 function sinh(x::acb)
-   z = parent(x)()
-   ccall((:acb_sinh, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_sinh, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
 function cosh(x::acb)
-   z = parent(x)()
-   ccall((:acb_cosh, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_cosh, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
 function tanh(x::acb)
-   z = parent(x)()
-   ccall((:acb_tanh, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_tanh, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
 function coth(x::acb)
-   z = parent(x)()
-   ccall((:acb_coth, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_coth, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
 function atan(x::acb)
-   z = parent(x)()
-   ccall((:acb_atan, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_atan, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -855,8 +849,8 @@ end
 Return $\log\sin(\pi x)$, constructed without branch cuts off the real line.
 """
 function log_sinpi(x::acb)
-   z = parent(x)()
-   ccall((:acb_log_sin_pi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_log_sin_pi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -866,8 +860,8 @@ end
 Return the Gamma function evaluated at $x$.
 """
 function gamma(x::acb)
-   z = parent(x)()
-   ccall((:acb_gamma, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_gamma, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -877,8 +871,8 @@ end
 Return the reciprocal of the Gamma function evaluated at $x$.
 """
 function rgamma(x::acb)
-   z = parent(x)()
-   ccall((:acb_rgamma, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_rgamma, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -888,8 +882,8 @@ end
 Return the logarithm of the Gamma function evaluated at $x$.
 """
 function lgamma(x::acb)
-   z = parent(x)()
-   ccall((:acb_lgamma, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_lgamma, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -900,8 +894,8 @@ Return the  logarithmic derivative of the gamma function evaluated at $x$,
 i.e. $\psi(x)$.
 """
 function digamma(x::acb)
-   z = parent(x)()
-   ccall((:acb_digamma, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_digamma, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -911,8 +905,8 @@ end
 Return the Riemann zeta function evaluated at $x$.
 """
 function zeta(x::acb)
-   z = parent(x)()
-   ccall((:acb_zeta, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_zeta, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -922,8 +916,8 @@ end
 Return the Barnes $G$-function, evaluated at $x$.
 """
 function barnes_g(x::acb)
-   z = parent(x)()
-   ccall((:acb_barnes_g, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_barnes_g, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -933,8 +927,8 @@ end
 Return the logarithm of the Barnes $G$-function, evaluated at $x$.
 """
 function log_barnes_g(x::acb)
-   z = parent(x)()
-   ccall((:acb_log_barnes_g, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_log_barnes_g, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -944,8 +938,8 @@ end
 Return the arithmetic-geometric mean of $1$ and $x$.
 """
 function agm(x::acb)
-   z = parent(x)()
-   ccall((:acb_agm1, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_agm1, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -955,8 +949,8 @@ end
 Return the error function evaluated at $x$.
 """
 function erf(x::acb)
-   z = parent(x)()
-   ccall((:acb_hypgeom_erf, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_hypgeom_erf, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -966,8 +960,8 @@ end
 Return the imaginary error function evaluated at $x$.
 """
 function erfi(x::acb)
-   z = parent(x)()
-   ccall((:acb_hypgeom_erfi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_hypgeom_erfi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -977,8 +971,8 @@ end
 Return the complementary error function evaluated at $x$.
 """
 function erfc(x::acb)
-   z = parent(x)()
-   ccall((:acb_hypgeom_erfc, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_hypgeom_erfc, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -988,8 +982,8 @@ end
 Return the exponential integral evaluated at $x$.
 """
 function exp_integral_ei(x::acb)
-   z = parent(x)()
-   ccall((:acb_hypgeom_ei, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_hypgeom_ei, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -999,8 +993,8 @@ end
 Return the sine integral evaluated at $x$.
 """
 function sin_integral(x::acb)
-   z = parent(x)()
-   ccall((:acb_hypgeom_si, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_hypgeom_si, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -1010,8 +1004,8 @@ end
 Return the exponential cosine integral evaluated at $x$.
 """
 function cos_integral(x::acb)
-   z = parent(x)()
-   ccall((:acb_hypgeom_ci, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_hypgeom_ci, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -1021,8 +1015,8 @@ end
 Return the hyperbolic sine integral evaluated at $x$.
 """
 function sinh_integral(x::acb)
-   z = parent(x)()
-   ccall((:acb_hypgeom_shi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_hypgeom_shi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -1032,8 +1026,8 @@ end
 Return the hyperbolic cosine integral evaluated at $x$.
 """
 function cosh_integral(x::acb)
-   z = parent(x)()
-   ccall((:acb_hypgeom_chi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_hypgeom_chi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -1043,8 +1037,8 @@ end
 Return the Dedekind eta function $\eta(\tau)$ at $\tau = x$.
 """
 function dedekind_eta(x::acb)
-   z = parent(x)()
-   ccall((:acb_modular_eta, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_modular_eta, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -1091,8 +1085,8 @@ end
 Return the $j$-invariant $j(\tau)$ at $\tau = x$.
 """
 function j_invariant(x::acb)
-   z = parent(x)()
-   ccall((:acb_modular_j, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_modular_j, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -1102,8 +1096,8 @@ end
 Return the modular lambda function $\lambda(\tau)$ at $\tau = x$.
 """
 function modular_lambda(x::acb)
-   z = parent(x)()
-   ccall((:acb_modular_lambda, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_modular_lambda, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -1113,8 +1107,8 @@ end
 Return the modular delta function $\Delta(\tau)$ at $\tau = x$.
 """
 function modular_delta(x::acb)
-   z = parent(x)()
-   ccall((:acb_modular_delta, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_modular_delta, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -1135,7 +1129,7 @@ function eisenstein_g(k::Int, x::acb)
   len = div(k, 2) - 1
   vec = acb_vec(len)
   ccall((:acb_modular_eisenstein, libarb), Nothing,
-        (Ptr{acb_struct}, Ref{acb}, Int, Int), vec, x, len, CC.prec)
+        (Ptr{acb_struct}, Ref{acb}, Int, Int), vec, x, len, precision(Balls))
   z = array(CC, vec, len)
   acb_vec_clear(vec, len)
   return z[end]
@@ -1162,8 +1156,8 @@ end
 Return the complete elliptic integral $K(x)$.
 """
 function elliptic_k(x::acb)
-   z = parent(x)()
-   ccall((:acb_modular_elliptic_k, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_modular_elliptic_k, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -1173,24 +1167,24 @@ end
 Return the complete elliptic integral $E(x)$.
 """
 function elliptic_e(x::acb)
-   z = parent(x)()
-   ccall((:acb_modular_elliptic_e, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   z = acb()
+   ccall((:acb_modular_elliptic_e, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, precision(Balls))
    return z
 end
 
 function sincos(x::acb)
-  s = parent(x)()
-  c = parent(x)()
+  s = acb()
+  c = acb()
   ccall((:acb_sin_cos, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), s, c, x, parent(x).prec)
+              (Ref{acb}, Ref{acb}, Ref{acb}, Int), s, c, x, precision(Balls))
   return (s, c)
 end
 
 function sincospi(x::acb)
-  s = parent(x)()
-  c = parent(x)()
+  s = acb()
+  c = acb()
   ccall((:acb_sin_cos_pi, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), s, c, x, parent(x).prec)
+              (Ref{acb}, Ref{acb}, Ref{acb}, Int), s, c, x, precision(Balls))
   return (s, c)
 end
 
@@ -1200,10 +1194,10 @@ end
 Return a tuple $s, c$ consisting of the hyperbolic sine and cosine of $x$.
 """
 function sinhcosh(x::acb)
-  s = parent(x)()
-  c = parent(x)()
+  s = acb()
+  c = acb()
   ccall((:acb_sinh_cosh, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), s, c, x, parent(x).prec)
+              (Ref{acb}, Ref{acb}, Ref{acb}, Int), s, c, x, precision(Balls))
   return (s, c)
 end
 
@@ -1215,7 +1209,7 @@ Return the Hurwitz zeta function $\zeta(s,a)$.
 function zeta(s::acb, a::acb)
   z = parent(s)()
   ccall((:acb_hurwitz_zeta, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, s, a, parent(s).prec)
+              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, s, a, precision(Balls))
   return z
 end
 
@@ -1227,14 +1221,14 @@ Return the generalised polygamma function $\psi(s,z)$.
 function polygamma(s::acb, a::acb)
   z = parent(s)()
   ccall((:acb_polygamma, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, s, a, parent(s).prec)
+              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, s, a, precision(Balls))
   return z
 end
 
 function rising_factorial(x::acb, n::UInt)
-  z = parent(x)()
+  z = acb()
   ccall((:acb_rising_ui, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, UInt, Int), z, x, n, parent(x).prec)
+              (Ref{acb}, Ref{acb}, UInt, Int), z, x, n, precision(Balls))
   return z
 end
 
@@ -1249,10 +1243,10 @@ function rising_factorial(x::acb, n::Int)
 end
 
 function rising_factorial2(x::acb, n::UInt)
-  z = parent(x)()
-  w = parent(x)()
+  z = acb()
+  w = acb()
   ccall((:acb_rising2_ui, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, UInt, Int), z, w, x, n, parent(x).prec)
+              (Ref{acb}, Ref{acb}, Ref{acb}, UInt, Int), z, w, x, n, precision(Balls))
   return (z, w)
 end
 
@@ -1270,14 +1264,14 @@ end
 function polylog(s::acb, a::acb)
   z = parent(s)()
   ccall((:acb_polylog, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, s, a, parent(s).prec)
+              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, s, a, precision(Balls))
   return z
 end
 
 function polylog(s::Int, a::acb)
   z = parent(a)()
   ccall((:acb_polylog_si, libarb), Nothing,
-              (Ref{acb}, Int, Ref{acb}, Int), z, s, a, parent(a).prec)
+              (Ref{acb}, Int, Ref{acb}, Int), z, s, a, precision(Balls))
   return z
 end
 
@@ -1293,9 +1287,9 @@ Return the polylogarithm Li$_s(a)$.
 Return the logarithmic integral, evaluated at $x$.
 """
 function log_integral(x::acb)
-  z = parent(x)()
+  z = acb()
   ccall((:acb_hypgeom_li, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Int, Int), z, x, 0, parent(x).prec)
+              (Ref{acb}, Ref{acb}, Int, Int), z, x, 0, precision(Balls))
   return z
 end
 
@@ -1305,9 +1299,9 @@ end
 Return the offset logarithmic integral, evaluated at $x$.
 """
 function log_integral_offset(x::acb)
-  z = parent(x)()
+  z = acb()
   ccall((:acb_hypgeom_li, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Int, Int), z, x, 1, parent(x).prec)
+              (Ref{acb}, Ref{acb}, Int, Int), z, x, 1, precision(Balls))
   return z
 end
 
@@ -1319,7 +1313,7 @@ Return the generalised exponential integral $E_s(x)$.
 function exp_integral_e(s::acb, x::acb)
   z = parent(s)()
   ccall((:acb_hypgeom_expint, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, s, x, parent(s).prec)
+              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, s, x, precision(Balls))
   return z
 end
 
@@ -1331,7 +1325,7 @@ Return the upper incomplete gamma function $\Gamma(s,x)$.
 function gamma(s::acb, x::acb)
   z = parent(s)()
   ccall((:acb_hypgeom_gamma_upper, libarb), Nothing,
-        (Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, s, x, 0, parent(s).prec)
+        (Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, s, x, 0, precision(Balls))
   return z
 end
 
@@ -1344,7 +1338,7 @@ $\Gamma(s,x) / \Gamma(s)$.
 function gamma_regularized(s::acb, x::acb)
   z = parent(s)()
   ccall((:acb_hypgeom_gamma_upper, libarb), Nothing,
-        (Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, s, x, 1, parent(s).prec)
+        (Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, s, x, 1, precision(Balls))
   return z
 end
 
@@ -1356,7 +1350,7 @@ Return the lower incomplete gamma function $\gamma(s,x) / \Gamma(s)$.
 function gamma_lower(s::acb, x::acb)
   z = parent(s)()
   ccall((:acb_hypgeom_gamma_lower, libarb), Nothing,
-        (Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, s, x, 0, parent(s).prec)
+        (Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, s, x, 0, precision(Balls))
   return z
 end
 
@@ -1369,7 +1363,7 @@ $\gamma(s,x) / \Gamma(s)$.
 function gamma_lower_regularized(s::acb, x::acb)
   z = parent(s)()
   ccall((:acb_hypgeom_gamma_lower, libarb), Nothing,
-        (Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, s, x, 1, parent(s).prec)
+        (Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, s, x, 1, precision(Balls))
   return z
 end
 
@@ -1379,9 +1373,9 @@ end
 Return the Bessel function $J_{\nu}(x)$.
 """
 function bessel_j(nu::acb, x::acb)
-  z = parent(x)()
+  z = acb()
   ccall((:acb_hypgeom_bessel_j, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, nu, x, parent(x).prec)
+              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, nu, x, precision(Balls))
   return z
 end
 
@@ -1391,9 +1385,9 @@ end
 Return the Bessel function $Y_{\nu}(x)$.
 """
 function bessel_y(nu::acb, x::acb)
-  z = parent(x)()
+  z = acb()
   ccall((:acb_hypgeom_bessel_y, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, nu, x, parent(x).prec)
+              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, nu, x, precision(Balls))
   return z
 end
 
@@ -1403,9 +1397,9 @@ end
 Return the Bessel function $I_{\nu}(x)$.
 """
 function bessel_i(nu::acb, x::acb)
-  z = parent(x)()
+  z = acb()
   ccall((:acb_hypgeom_bessel_i, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, nu, x, parent(x).prec)
+              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, nu, x, precision(Balls))
   return z
 end
 
@@ -1415,9 +1409,9 @@ end
 Return the Bessel function $K_{\nu}(x)$.
 """
 function bessel_k(nu::acb, x::acb)
-  z = parent(x)()
+  z = acb()
   ccall((:acb_hypgeom_bessel_k, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, nu, x, parent(x).prec)
+              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, nu, x, precision(Balls))
   return z
 end
 
@@ -1427,10 +1421,10 @@ end
 Return the Airy function $\operatorname{Ai}(x)$.
 """
 function airy_ai(x::acb)
-  ai = parent(x)()
+  ai = acb()
   ccall((:acb_hypgeom_airy, libarb), Nothing,
               (Ref{acb}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{acb}, Int),
-              ai, C_NULL, C_NULL, C_NULL, x, parent(x).prec)
+              ai, C_NULL, C_NULL, C_NULL, x, precision(Balls))
   return ai
 end
 
@@ -1440,10 +1434,10 @@ end
 Return the Airy function $\operatorname{Bi}(x)$.
 """
 function airy_bi(x::acb)
-  bi = parent(x)()
+  bi = acb()
   ccall((:acb_hypgeom_airy, libarb), Nothing,
               (Ptr{Cvoid}, Ptr{Cvoid}, Ref{acb}, Ptr{Cvoid}, Ref{acb}, Int),
-              C_NULL, C_NULL, bi, C_NULL, x, parent(x).prec)
+              C_NULL, C_NULL, bi, C_NULL, x, precision(Balls))
   return bi
 end
 
@@ -1453,10 +1447,10 @@ end
 Return the derivative of the Airy function $\operatorname{Ai}^\prime(x)$.
 """
 function airy_ai_prime(x::acb)
-  ai_prime = parent(x)()
+  ai_prime = acb()
   ccall((:acb_hypgeom_airy, libarb), Nothing,
               (Ptr{Cvoid}, Ref{acb}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{acb}, Int),
-              C_NULL, ai_prime, C_NULL, C_NULL, x, parent(x).prec)
+              C_NULL, ai_prime, C_NULL, C_NULL, x, precision(Balls))
   return ai_prime
 end
 
@@ -1466,10 +1460,10 @@ end
 Return the derivative of the Airy function $\operatorname{Bi}^\prime(x)$.
 """
 function airy_bi_prime(x::acb)
-  bi_prime = parent(x)()
+  bi_prime = acb()
   ccall((:acb_hypgeom_airy, libarb), Nothing,
               (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{acb}, Ref{acb}, Int),
-              C_NULL, C_NULL, C_NULL, bi_prime, x, parent(x).prec)
+              C_NULL, C_NULL, C_NULL, bi_prime, x, precision(Balls))
   return bi_prime
 end
 
@@ -1479,9 +1473,9 @@ end
 Return the confluent hypergeometric function ${}_1F_1(a,b,x)$.
 """
 function hypergeometric_1f1(a::acb, b::acb, x::acb)
-  z = parent(x)()
+  z = acb()
   ccall((:acb_hypgeom_m, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, a, b, x, 0, parent(x).prec)
+              (Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, a, b, x, 0, precision(Balls))
   return z
 end
 
@@ -1492,9 +1486,9 @@ Return the regularized confluent hypergeometric function
 ${}_1F_1(a,b,x) / \Gamma(b)$.
 """
 function hypergeometric_1f1_regularized(a::acb, b::acb, x::acb)
-  z = parent(x)()
+  z = acb()
   ccall((:acb_hypgeom_m, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, a, b, x, 1, parent(x).prec)
+              (Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, a, b, x, 1, precision(Balls))
   return z
 end
 
@@ -1504,9 +1498,9 @@ end
 Return the confluent hypergeometric function $U(a,b,x)$.
 """
 function hypergeometric_u(a::acb, b::acb, x::acb)
-  z = parent(x)()
+  z = acb()
   ccall((:acb_hypgeom_u, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Int), z, a, b, x, parent(x).prec)
+              (Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Int), z, a, b, x, precision(Balls))
   return z
 end
 
@@ -1516,9 +1510,9 @@ end
 Return the Gauss hypergeometric function ${}_2F_1(a,b,c,x)$.
 """
 function hypergeometric_2f1(a::acb, b::acb, c::acb, x::acb; flags=0)
-  z = parent(x)()
+  z = acb()
   ccall((:acb_hypgeom_2f1, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, a, b, c, x, flags, parent(x).prec)
+              (Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, a, b, c, x, flags, precision(Balls))
   return z
 end
 
@@ -1529,13 +1523,13 @@ Return a tuple of four elements containing the Jacobi theta function values
 $\theta_1, \theta_2, \theta_3, \theta_4$ evaluated at $z, \tau$.
 """
 function jacobi_theta(z::acb, tau::acb)
-  t1 = parent(z)()
-  t2 = parent(z)()
-  t3 = parent(z)()
-  t4 = parent(z)()
+  t1 = acb()
+  t2 = acb()
+  t3 = acb()
+  t4 = acb()
   ccall((:acb_modular_theta, libarb), Nothing,
               (Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Int),
-                t1, t2, t3, t4, z, tau, parent(z).prec)
+                t1, t2, t3, t4, z, tau, precision(Balls))
   return (t1, t2, t3, t4)
 end
 
@@ -1547,7 +1541,7 @@ Return the Weierstrass elliptic function $\wp(z,\tau)$.
 function weierstrass_p(z::acb, tau::acb)
   r = parent(z)()
   ccall((:acb_elliptic_p, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), r, z, tau, parent(z).prec)
+              (Ref{acb}, Ref{acb}, Ref{acb}, Int), r, z, tau, precision(Balls))
   return r
 end
 
@@ -1559,7 +1553,7 @@ Return the derivative of the Weierstrass elliptic function $\frac{\partial}{\par
 function weierstrass_p_prime(z::acb, tau::acb)
   r = parent(z)()
   ccall((:acb_elliptic_p_prime, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), r, z, tau, parent(z).prec)
+              (Ref{acb}, Ref{acb}, Ref{acb}, Int), r, z, tau, precision(Balls))
   return r
 end
 
@@ -1648,31 +1642,31 @@ end
 
 function add!(z::acb, x::acb, y::acb)
   ccall((:acb_add, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{acb}, Int),
-         z, x, y, parent(z).prec)
+         z, x, y, precision(Balls))
   return z
 end
 
 function addeq!(z::acb, y::acb)
   ccall((:acb_add, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{acb}, Int),
-         z, z, y, parent(z).prec)
+         z, z, y, precision(Balls))
   return z
 end
 
 function sub!(z::acb, x::acb, y::acb)
   ccall((:acb_sub, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{acb}, Int),
-        z, x, y, parent(z).prec)
+        z, x, y, precision(Balls))
   return z
 end
 
 function mul!(z::acb, x::acb, y::acb)
   ccall((:acb_mul, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{acb}, Int),
-        z, x, y, parent(z).prec)
+        z, x, y, precision(Balls))
   return z
 end
 
 function div!(z::acb, x::acb, y::acb)
   ccall((:acb_div, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{acb}, Int),
-        z, x, y, parent(z).prec)
+        z, x, y, precision(Balls))
   return z
 end
 
@@ -1828,14 +1822,12 @@ promote_rule(::Type{acb}, ::Type{arb}) = acb
 
 function (r::AcbField)()
   z = acb()
-  z.parent = r
   return z
 end
 
 function (r::AcbField)(x::Union{Int, UInt, fmpz, fmpq, arb, acb, Float64,
                                 BigFloat, AbstractString})
-  z = acb(x, r.prec)
-  z.parent = r
+  z = acb(x, precision(Balls))
   return z
 end
 
@@ -1844,8 +1836,7 @@ end
 (r::AcbField)(x::Rational{T}) where {T <: Integer} = r(fmpq(x))
 
 function (r::AcbField)(x::T, y::T) where {T <: Union{Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString}}
-  z = acb(x, y, r.prec)
-  z.parent = r
+  z = acb(x, y, precision(Balls))
   return z
 end
 
@@ -1854,9 +1845,7 @@ for S in (Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString, BigInt)
     if S != T
       @eval begin
         function (r::AcbField)(x::$(S), y::$(T))
-          RR = ArbField(r.prec, cached = false)
-          z = acb(RR(x), RR(y), r.prec)
-          z.parent = r
+          z = acb(ArbField()(x), ArbField()(y), precision(Balls))
           return z
         end
       end
@@ -1867,15 +1856,11 @@ end
 for T in (Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString, BigInt)
   @eval begin
     function (r::AcbField)(x::Rational{S}, y::$(T)) where {S <: Integer}
-      RR = ArbField(r.prec, cached = false)
-      z = acb(RR(x), RR(y), r.prec)
-      z.parent = r
+      z = acb(ArbField()(x), ArbField()(y), precision(Balls))
       return z
     end
     function (r::AcbField)(x::$(T), y::Rational{S}) where {S <: Integer}
-      RR = ArbField(r.prec, cached = false)
-      z = acb(RR(x), RR(y), r.prec)
-      z.parent = r
+      z = acb(ArbField()(x), ArbField()(y), precision(Balls))
       return z
     end
   end

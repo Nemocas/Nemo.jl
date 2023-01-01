@@ -2,7 +2,6 @@ export integrate
 
 function acb_calc_func_wrap(res::Ptr{acb}, x::Ptr{acb}, param::Ptr{Nothing}, order::Int, prec::Int)
     xx = unsafe_load(x)
-    xx.parent = AcbField(prec)
     F = unsafe_pointer_to_objref(param)
     w = F(xx)
     ccall((:acb_set, libarb), Ptr{Nothing}, (Ptr{acb}, Ref{acb}), res, w)
@@ -33,7 +32,7 @@ function integrate(C::AcbField, F, a, b;
    cgoal = 0
 
    if rel_tol === -1.0
-      cgoal = precision(C)
+      cgoal = precision(Balls)
    else
       cgoal = -Int(exponent(rel_tol))
       @assert big(2.0)^(-cgoal) <= rel_tol
@@ -43,7 +42,7 @@ function integrate(C::AcbField, F, a, b;
    ccall((:mag_init, libarb), Nothing, (Ref{mag_struct},), ctol)
 
    if abs_tol === -1.0
-      ccall((:mag_set_ui_2exp_si, libarb), Nothing, (Ref{mag_struct}, UInt, Int), ctol, 1, -precision(C))
+      ccall((:mag_set_ui_2exp_si, libarb), Nothing, (Ref{mag_struct}, UInt, Int), ctol, 1, -precision(Balls))
    else
       t = BigFloat(abs_tol, RoundDown)
       expo = Ref{Clong}()
@@ -68,7 +67,7 @@ function integrate(C::AcbField, F, a, b;
                    Ref{mag_struct},                #abs_tol
                    Ref{acb_calc_integrate_opts},   #opts
                    Int),
-      res, acb_calc_func_wrap_c(), F, lower, upper, cgoal, ctol, opts, precision(C))
+      res, acb_calc_func_wrap_c(), F, lower, upper, cgoal, ctol, opts, precision(Balls))
 
    ccall((:mag_clear, libarb), Nothing, (Ref{mag_struct},), ctol)
 

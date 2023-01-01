@@ -159,23 +159,24 @@ end
    @test fmpz(qqbar(3)) == 3
    @test fmpq(qqbar(3) // 2) == fmpq(3,2)
 
-   RR = ArbField(128)
-   CC = AcbField(128)
+   set_precision!(Balls, 128) do
+     RR = ArbField()
+     CC = AcbField()
 
-   @test RR(qqbar(3)) == 3
-   @test CC(qqbar(3)) == 3
-   @test_throws DomainError (RR(i))
+     @test RR(qqbar(3)) == 3
+     @test CC(qqbar(3)) == 3
+     @test_throws DomainError (RR(i))
 
-   v = sqrt(RR(2)) + sqrt(RR(3))
-   @test guess(CalciumQQBar, v, 4) == sqrt(qqbar(2)) + sqrt(qqbar(3))
-   @test guess(CalciumQQBar, v, 4, 10) == sqrt(qqbar(2)) + sqrt(qqbar(3))
-   @test_throws ErrorException guess(CalciumQQBar, v, 2)
+     v = sqrt(RR(2)) + sqrt(RR(3))
+     @test guess(CalciumQQBar, v, 4) == sqrt(qqbar(2)) + sqrt(qqbar(3))
+     @test guess(CalciumQQBar, v, 4, 10) == sqrt(qqbar(2)) + sqrt(qqbar(3))
+     @test_throws ErrorException guess(CalciumQQBar, v, 2)
 
-   @test guess(CalciumQQBar, CC(2+i), 2, 10) == 2+i
+     @test guess(CalciumQQBar, CC(2+i), 2, 10) == 2+i
 
-   Rx, x = PolynomialRing(QQBar, "x")
-   @test gcd(x^4 - 4*x^2 + 4, x^2 + sqrt(QQBar(18))*x + 4) == x + sqrt(QQBar(2))
-
+     Rx, x = PolynomialRing(QQBar, "x")
+     @test gcd(x^4 - 4*x^2 + 4, x^2 + sqrt(QQBar(18))*x + 4) == x + sqrt(QQBar(2))
+   end
 end
 
 @testset "qqbar.adhoc_operations" begin

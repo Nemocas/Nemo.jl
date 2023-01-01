@@ -39,7 +39,7 @@ base_ring(R::ArbField) = Union{}
 
 base_ring(x::arb) = Union{}
 
-parent(x::arb) = x.parent
+parent(x::arb) = ArbField()
 
 is_domain_type(::Type{arb}) = true
 
@@ -131,7 +131,7 @@ for (b, f) in ((RoundingMode{:Down}, :arb_get_lbound_arf),
       t = arf_struct()
       ccall(($(string(f)), libarb), Nothing,
             (Ref{arf_struct}, Ref{arb}, Int),
-            t, x, parent(x).prec)
+            t, x, precision(Balls))
       return t
     end
   end
@@ -194,7 +194,7 @@ end
 ################################################################################
 
 function native_string(x::arb)
-   d = ceil(parent(x).prec * 0.30102999566398119521)
+   d = ceil(precision(Balls) * 0.30102999566398119521)
    cstr = ccall((:arb_get_str, libarb), Ptr{UInt8},
                 (Ref{arb}, Int, UInt),
                 x, Int(d), UInt(0))
@@ -450,15 +450,15 @@ end
 <=(x::BigFloat, y::arb) = arb(x) <= y
 <(x::BigFloat, y::arb) = arb(x) < y
 
-==(x::arb, y::fmpq) = x == arb(y, precision(parent(x)))
-!=(x::arb, y::fmpq) = x != arb(y, precision(parent(x)))
-<=(x::arb, y::fmpq) = x <= arb(y, precision(parent(x)))
-<(x::arb, y::fmpq) = x < arb(y, precision(parent(x)))
+==(x::arb, y::fmpq) = x == arb(y, precision(Balls))
+!=(x::arb, y::fmpq) = x != arb(y, precision(Balls))
+<=(x::arb, y::fmpq) = x <= arb(y, precision(Balls))
+<(x::arb, y::fmpq) = x < arb(y, precision(Balls))
 
-==(x::fmpq, y::arb) = arb(x, precision(parent(y))) == y
-!=(x::fmpq, y::arb) = arb(x, precision(parent(y))) != y
-<=(x::fmpq, y::arb) = arb(x, precision(parent(y))) <= y
-<(x::fmpq, y::arb) = arb(x, precision(parent(y))) < y
+==(x::fmpq, y::arb) = arb(x, precision(Balls)) == y
+!=(x::fmpq, y::arb) = arb(x, precision(Balls)) != y
+<=(x::fmpq, y::arb) = arb(x, precision(Balls)) <= y
+<(x::fmpq, y::arb) = arb(x, precision(Balls)) < y
 
 ==(x::arb, y::Rational{T}) where {T <: Integer} = x == fmpq(y)
 !=(x::arb, y::Rational{T}) where {T <: Integer} = x != fmpq(y)
@@ -477,7 +477,7 @@ end
 ################################################################################
 
 function is_unit(x::arb)
-   !iszero(x)
+   !contains_zero(x)
 end
 
 @doc Markdown.doc"""
@@ -588,7 +588,6 @@ pair $(x, y) = (x_m \pm x_r, y_m \pm y_r)$.
 """
 function ball(mid::arb, rad::arb)
   z = arb(mid, rad)
-  z.parent = parent(mid)
   return z
 end
 
@@ -598,7 +597,7 @@ end
 Return the radius of the ball $x$ as an Arb ball.
 """
 function radius(x::arb)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_get_rad_arb, libarb), Nothing, (Ref{arb}, Ref{arb}), z, x)
   return z
 end
@@ -609,7 +608,7 @@ end
 Return the midpoint of the ball $x$ as an Arb ball.
 """
 function midpoint(x::arb)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_get_mid_arb, libarb), Nothing, (Ref{arb}, Ref{arb}), z, x)
   return z
 end
@@ -630,7 +629,7 @@ end
 ################################################################################
 
 function -(x::arb)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_neg, libarb), Nothing, (Ref{arb}, Ref{arb}), z, x)
   return z
 end
@@ -644,9 +643,9 @@ end
 for (s,f) in ((:+,"arb_add"), (:*,"arb_mul"), (://, "arb_div"), (:-,"arb_sub"))
   @eval begin
     function ($s)(x::arb, y::arb)
-      z = parent(x)()
+      z = arb()
       ccall(($f, libarb), Nothing, (Ref{arb}, Ref{arb}, Ref{arb}, Int),
-                           z, x, y, parent(x).prec)
+                           z, x, y, precision(Balls))
       return z
     end
   end
@@ -655,39 +654,39 @@ end
 for (f,s) in ((:+, "add"), (:*, "mul"))
   @eval begin
     #function ($f)(x::arb, y::arf)
-    #  z = parent(x)()
+    #  z = arb()
     #  ccall(($("arb_"*s*"_arf"), libarb), Nothing,
     #              (Ref{arb}, Ref{arb}, Ref{arf}, Int),
-    #              z, x, y, parent(x).prec)
+    #              z, x, y, precision(Balls))
     #  return z
     #end
 
     #($f)(x::arf, y::arb) = ($f)(y, x)
 
     function ($f)(x::arb, y::UInt)
-      z = parent(x)()
+      z = arb()
       ccall(($("arb_"*s*"_ui"), libarb), Nothing,
                   (Ref{arb}, Ref{arb}, UInt, Int),
-                  z, x, y, parent(x).prec)
+                  z, x, y, precision(Balls))
       return z
     end
 
     ($f)(x::UInt, y::arb) = ($f)(y, x)
 
     function ($f)(x::arb, y::Int)
-      z = parent(x)()
+      z = arb()
       ccall(($("arb_"*s*"_si"), libarb), Nothing,
-      (Ref{arb}, Ref{arb}, Int, Int), z, x, y, parent(x).prec)
+      (Ref{arb}, Ref{arb}, Int, Int), z, x, y, precision(Balls))
       return z
     end
 
     ($f)(x::Int, y::arb) = ($f)(y,x)
 
     function ($f)(x::arb, y::fmpz)
-      z = parent(x)()
+      z = arb()
       ccall(($("arb_"*s*"_fmpz"), libarb), Nothing,
                   (Ref{arb}, Ref{arb}, Ref{fmpz}, Int),
-                  z, x, y, parent(x).prec)
+                  z, x, y, precision(Balls))
       return z
     end
 
@@ -696,37 +695,37 @@ for (f,s) in ((:+, "add"), (:*, "mul"))
 end
 
 #function -(x::arb, y::arf)
-#  z = parent(x)()
+#  z = arb()
 #  ccall((:arb_sub_arf, libarb), Nothing,
-#              (Ref{arb}, Ref{arb}, Ref{arf}, Int), z, x, y, parent(x).prec)
+#              (Ref{arb}, Ref{arb}, Ref{arf}, Int), z, x, y, precision(Balls))
 #  return z
 #end
 
 #-(x::arf, y::arb) = -(y - x)
 
 function -(x::arb, y::UInt)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_sub_ui, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, UInt, Int), z, x, y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, UInt, Int), z, x, y, precision(Balls))
   return z
 end
 
 -(x::UInt, y::arb) = -(y - x)
 
 function -(x::arb, y::Int)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_sub_si, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Int, Int), z, x, y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Int, Int), z, x, y, precision(Balls))
   return z
 end
 
 -(x::Int, y::arb) = -(y - x)
 
 function -(x::arb, y::fmpz)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_sub_fmpz, libarb), Nothing,
               (Ref{arb}, Ref{arb}, Ref{fmpz}, Int),
-              z, x, y, parent(x).prec)
+              z, x, y, precision(Balls))
   return z
 end
 
@@ -749,38 +748,38 @@ end
 //(x::Integer, y::arb) = fmpz(x)//y
 
 #function //(x::arb, y::arf)
-#  z = parent(x)()
+#  z = arb()
 #  ccall((:arb_div_arf, libarb), Nothing,
-#              (Ref{arb}, Ref{arb}, Ref{arf}, Int), z, x, y, parent(x).prec)
+#              (Ref{arb}, Ref{arb}, Ref{arf}, Int), z, x, y, precision(Balls))
 #  return z
 #end
 
 function //(x::arb, y::UInt)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_div_ui, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, UInt, Int), z, x, y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, UInt, Int), z, x, y, precision(Balls))
   return z
 end
 
 function //(x::arb, y::Int)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_div_si, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Int, Int), z, x, y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Int, Int), z, x, y, precision(Balls))
   return z
 end
 
 function //(x::arb, y::fmpz)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_div_fmpz, libarb), Nothing,
               (Ref{arb}, Ref{arb}, Ref{fmpz}, Int),
-              z, x, y, parent(x).prec)
+              z, x, y, precision(Balls))
   return z
 end
 
 function //(x::UInt, y::arb)
   z = parent(y)()
   ccall((:arb_ui_div, libarb), Nothing,
-              (Ref{arb}, UInt, Ref{arb}, Int), z, x, y, parent(y).prec)
+              (Ref{arb}, UInt, Ref{arb}, Int), z, x, y, precision(Balls))
   return z
 end
 
@@ -788,7 +787,7 @@ function //(x::Int, y::arb)
   z = parent(y)()
   t = arb(x)
   ccall((:arb_div, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, t, y, parent(y).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, t, y, precision(Balls))
   return z
 end
 
@@ -796,39 +795,39 @@ function //(x::fmpz, y::arb)
   z = parent(y)()
   t = arb(x)
   ccall((:arb_div, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, t, y, parent(y).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, t, y, precision(Balls))
   return z
 end
 
 function ^(x::arb, y::arb)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_pow, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, precision(Balls))
   return z
 end
 
 function ^(x::arb, y::fmpz)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_pow_fmpz, libarb), Nothing,
               (Ref{arb}, Ref{arb}, Ref{fmpz}, Int),
-              z, x, y, parent(x).prec)
+              z, x, y, precision(Balls))
   return z
 end
 
 ^(x::arb, y::Integer) = x^fmpz(y)
 
 function ^(x::arb, y::UInt)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_pow_ui, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, UInt, Int), z, x, y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, UInt, Int), z, x, y, precision(Balls))
   return z
 end
 
 function ^(x::arb, y::fmpq)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_pow_fmpq, libarb), Nothing,
               (Ref{arb}, Ref{arb}, Ref{fmpq}, Int),
-              z, x, y, parent(x).prec)
+              z, x, y, precision(Balls))
   return z
 end
 
@@ -914,7 +913,7 @@ divexact(x::arb, y::Rational{T}; check::Bool=true) where {T <: Integer} = x // y
 ################################################################################
 
 function abs(x::arb)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_abs, libarb), Nothing, (Ref{arb}, Ref{arb}), z, x)
   return z
 end
@@ -926,9 +925,9 @@ end
 ################################################################################
 
 function inv(x::arb)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_inv, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
   return parent(x)(z)
 end
 
@@ -939,14 +938,14 @@ end
 ################################################################################
 
 function ldexp(x::arb, y::Int)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_mul_2exp_si, libarb), Nothing,
               (Ref{arb}, Ref{arb}, Int), z, x, y)
   return z
 end
 
 function ldexp(x::arb, y::fmpz)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_mul_2exp_fmpz, libarb), Nothing,
               (Ref{arb}, Ref{arb}, Ref{fmpz}), z, x, y)
   return z
@@ -965,7 +964,7 @@ Return an `arb` interval containing $x$ but which may be more economical,
 by rounding off insignificant bits from the midpoint.
 """
 function trim(x::arb)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_trim, libarb), Nothing, (Ref{arb}, Ref{arb}), z, x)
   return z
 end
@@ -996,9 +995,9 @@ Return an `arb` containing the union of the intervals represented by $x$ and
 $y$.
 """
 function setunion(x::arb, y::arb)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_union, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, precision(Balls))
   return z
 end
 
@@ -1009,9 +1008,9 @@ Return an `arb` containing the intersection of the intervals represented by
 $x$ and $y$.
 """
 function setintersection(x::arb, y::arb)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_intersection, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, precision(Balls))
   return z
 end
 
@@ -1028,7 +1027,7 @@ Return $\pi = 3.14159\ldots$ as an element of $r$.
 """
 function const_pi(r::ArbField)
   z = r()
-  ccall((:arb_const_pi, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
+  ccall((:arb_const_pi, libarb), Nothing, (Ref{arb}, Int), z, precision(Balls))
   return z
 end
 
@@ -1039,7 +1038,7 @@ Return $e = 2.71828\ldots$ as an element of $r$.
 """
 function const_e(r::ArbField)
   z = r()
-  ccall((:arb_const_e, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
+  ccall((:arb_const_e, libarb), Nothing, (Ref{arb}, Int), z, precision(Balls))
   return z
 end
 
@@ -1050,7 +1049,7 @@ Return $\log(2) = 0.69314\ldots$ as an element of $r$.
 """
 function const_log2(r::ArbField)
   z = r()
-  ccall((:arb_const_log2, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
+  ccall((:arb_const_log2, libarb), Nothing, (Ref{arb}, Int), z, precision(Balls))
   return z
 end
 
@@ -1061,7 +1060,7 @@ Return $\log(10) = 2.302585\ldots$ as an element of $r$.
 """
 function const_log10(r::ArbField)
   z = r()
-  ccall((:arb_const_log10, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
+  ccall((:arb_const_log10, libarb), Nothing, (Ref{arb}, Int), z, precision(Balls))
   return z
 end
 
@@ -1072,7 +1071,7 @@ Return Euler's constant $\gamma = 0.577215\ldots$ as an element of $r$.
 """
 function const_euler(r::ArbField)
   z = r()
-  ccall((:arb_const_euler, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
+  ccall((:arb_const_euler, libarb), Nothing, (Ref{arb}, Int), z, precision(Balls))
   return z
 end
 
@@ -1083,7 +1082,7 @@ Return Catalan's constant $C = 0.915965\ldots$ as an element of $r$.
 """
 function const_catalan(r::ArbField)
   z = r()
-  ccall((:arb_const_catalan, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
+  ccall((:arb_const_catalan, libarb), Nothing, (Ref{arb}, Int), z, precision(Balls))
   return z
 end
 
@@ -1094,7 +1093,7 @@ Return Khinchin's constant $K = 2.685452\ldots$ as an element of $r$.
 """
 function const_khinchin(r::ArbField)
   z = r()
-  ccall((:arb_const_khinchin, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
+  ccall((:arb_const_khinchin, libarb), Nothing, (Ref{arb}, Int), z, precision(Balls))
   return z
 end
 
@@ -1105,7 +1104,7 @@ Return Glaisher's constant $A = 1.282427\ldots$ as an element of $r$.
 """
 function const_glaisher(r::ArbField)
   z = r()
-  ccall((:arb_const_glaisher, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
+  ccall((:arb_const_glaisher, libarb), Nothing, (Ref{arb}, Int), z, precision(Balls))
   return z
 end
 
@@ -1118,8 +1117,8 @@ end
 # real - real functions
 
 function floor(x::arb)
-   z = parent(x)()
-   ccall((:arb_floor, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_floor, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -1128,8 +1127,8 @@ floor(::Type{fmpz}, x::arb) = fmpz(floor(x))
 floor(::Type{T}, x::arb) where {T <: Integer} = T(floor(x))
 
 function ceil(x::arb)
-   z = parent(x)()
-   ccall((:arb_ceil, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_ceil, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -1138,8 +1137,8 @@ ceil(::Type{fmpz}, x::arb) = fmpz(ceil(x))
 ceil(::Type{T}, x::arb) where {T <: Integer} = T(ceil(x))
 
 function Base.sqrt(x::arb; check::Bool=true)
-   z = parent(x)()
-   ccall((:arb_sqrt, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_sqrt, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -1149,8 +1148,8 @@ end
 Return the reciprocal of the square root of $x$, i.e. $1/\sqrt{x}$.
 """
 function rsqrt(x::arb)
-   z = parent(x)()
-   ccall((:arb_rsqrt, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_rsqrt, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -1160,8 +1159,8 @@ end
 Return $\sqrt{1+x}-1$, evaluated accurately for small $x$.
 """
 function sqrt1pm1(x::arb)
-   z = parent(x)()
-   ccall((:arb_sqrt1pm1, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_sqrt1pm1, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -1172,140 +1171,140 @@ Return the sqrt root of $x$, assuming that $x$ represents a nonnegative
 number. Thus any negative number in the input interval is discarded.
 """
 function sqrtpos(x::arb)
-   z = parent(x)()
-   ccall((:arb_sqrtpos, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_sqrtpos, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function log(x::arb)
-   z = parent(x)()
-   ccall((:arb_log, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_log, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function log1p(x::arb)
-   z = parent(x)()
-   ccall((:arb_log1p, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_log1p, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function Base.exp(x::arb)
-   z = parent(x)()
-   ccall((:arb_exp, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_exp, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function expm1(x::arb)
-   z = parent(x)()
-   ccall((:arb_expm1, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_expm1, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function sin(x::arb)
-   z = parent(x)()
-   ccall((:arb_sin, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_sin, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function cos(x::arb)
-   z = parent(x)()
-   ccall((:arb_cos, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_cos, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function sinpi(x::arb)
-   z = parent(x)()
-   ccall((:arb_sin_pi, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_sin_pi, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function cospi(x::arb)
-   z = parent(x)()
-   ccall((:arb_cos_pi, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_cos_pi, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function tan(x::arb)
-   z = parent(x)()
-   ccall((:arb_tan, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_tan, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function cot(x::arb)
-   z = parent(x)()
-   ccall((:arb_cot, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_cot, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function tanpi(x::arb)
-   z = parent(x)()
-   ccall((:arb_tan_pi, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_tan_pi, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function cotpi(x::arb)
-   z = parent(x)()
-   ccall((:arb_cot_pi, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_cot_pi, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function sinh(x::arb)
-   z = parent(x)()
-   ccall((:arb_sinh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_sinh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function cosh(x::arb)
-   z = parent(x)()
-   ccall((:arb_cosh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_cosh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function tanh(x::arb)
-   z = parent(x)()
-   ccall((:arb_tanh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_tanh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function coth(x::arb)
-   z = parent(x)()
-   ccall((:arb_coth, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_coth, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function atan(x::arb)
-   z = parent(x)()
-   ccall((:arb_atan, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_atan, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function asin(x::arb)
-   z = parent(x)()
-   ccall((:arb_asin, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_asin, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function acos(x::arb)
-   z = parent(x)()
-   ccall((:arb_acos, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_acos, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function atanh(x::arb)
-   z = parent(x)()
-   ccall((:arb_atanh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_atanh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function asinh(x::arb)
-   z = parent(x)()
-   ccall((:arb_asinh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_asinh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function acosh(x::arb)
-   z = parent(x)()
-   ccall((:arb_acosh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_acosh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -1315,8 +1314,8 @@ end
 Return the Gamma function evaluated at $x$.
 """
 function gamma(x::arb)
-   z = parent(x)()
-   ccall((:arb_gamma, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_gamma, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -1326,8 +1325,8 @@ end
 Return the logarithm of the Gamma function evaluated at $x$.
 """
 function lgamma(x::arb)
-   z = parent(x)()
-   ccall((:arb_lgamma, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_lgamma, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -1337,8 +1336,8 @@ end
 Return the reciprocal of the Gamma function evaluated at $x$.
 """
 function rgamma(x::arb)
-   z = parent(x)()
-   ccall((:arb_rgamma, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_rgamma, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -1349,8 +1348,8 @@ Return the  logarithmic derivative of the gamma function evaluated at $x$,
 i.e. $\psi(x)$.
 """
 function digamma(x::arb)
-   z = parent(x)()
-   ccall((:arb_digamma, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_digamma, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -1362,7 +1361,7 @@ Return the upper incomplete gamma function $\Gamma(s,x)$.
 function gamma(s::arb, x::arb)
   z = parent(s)()
   ccall((:arb_hypgeom_gamma_upper, libarb), Nothing,
-        (Ref{arb}, Ref{arb}, Ref{arb}, Int, Int), z, s, x, 0, parent(s).prec)
+        (Ref{arb}, Ref{arb}, Ref{arb}, Int, Int), z, s, x, 0, precision(Balls))
   return z
 end
 
@@ -1375,7 +1374,7 @@ $\Gamma(s,x) / \Gamma(s)$.
 function gamma_regularized(s::arb, x::arb)
   z = parent(s)()
   ccall((:arb_hypgeom_gamma_upper, libarb), Nothing,
-        (Ref{arb}, Ref{arb}, Ref{arb}, Int, Int), z, s, x, 1, parent(s).prec)
+        (Ref{arb}, Ref{arb}, Ref{arb}, Int, Int), z, s, x, 1, precision(Balls))
   return z
 end
 
@@ -1387,7 +1386,7 @@ Return the lower incomplete gamma function $\gamma(s,x) / \Gamma(s)$.
 function gamma_lower(s::arb, x::arb)
   z = parent(s)()
   ccall((:arb_hypgeom_gamma_lower, libarb), Nothing,
-        (Ref{arb}, Ref{arb}, Ref{arb}, Int, Int), z, s, x, 0, parent(s).prec)
+        (Ref{arb}, Ref{arb}, Ref{arb}, Int, Int), z, s, x, 0, precision(Balls))
   return z
 end
 
@@ -1400,7 +1399,7 @@ $\gamma(s,x) / \Gamma(s)$.
 function gamma_lower_regularized(s::arb, x::arb)
   z = parent(s)()
   ccall((:arb_hypgeom_gamma_lower, libarb), Nothing,
-        (Ref{arb}, Ref{arb}, Ref{arb}, Int, Int), z, s, x, 1, parent(s).prec)
+        (Ref{arb}, Ref{arb}, Ref{arb}, Int, Int), z, s, x, 1, precision(Balls))
   return z
 end
 
@@ -1411,38 +1410,38 @@ end
 Return the Riemann zeta function evaluated at $x$.
 """
 function zeta(x::arb)
-   z = parent(x)()
-   ccall((:arb_zeta, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   z = arb()
+   ccall((:arb_zeta, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, precision(Balls))
    return z
 end
 
 function sincos(x::arb)
-  s = parent(x)()
-  c = parent(x)()
+  s = arb()
+  c = arb()
   ccall((:arb_sin_cos, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), s, c, x, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), s, c, x, precision(Balls))
   return (s, c)
 end
 
 function sincospi(x::arb)
-  s = parent(x)()
-  c = parent(x)()
+  s = arb()
+  c = arb()
   ccall((:arb_sin_cos_pi, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), s, c, x, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), s, c, x, precision(Balls))
   return (s, c)
 end
 
 function sinpi(x::fmpq, r::ArbField)
   z = r()
   ccall((:arb_sin_pi_fmpq, libarb), Nothing,
-        (Ref{arb}, Ref{fmpq}, Int), z, x, precision(r))
+        (Ref{arb}, Ref{fmpq}, Int), z, x, precision(Balls))
   return z
 end
 
 function cospi(x::fmpq, r::ArbField)
   z = r()
   ccall((:arb_cos_pi_fmpq, libarb), Nothing,
-        (Ref{arb}, Ref{fmpq}, Int), z, x, precision(r))
+        (Ref{arb}, Ref{fmpq}, Int), z, x, precision(Balls))
   return z
 end
 
@@ -1450,22 +1449,22 @@ function sincospi(x::fmpq, r::ArbField)
   s = r()
   c = r()
   ccall((:arb_sin_cos_pi_fmpq, libarb), Nothing,
-        (Ref{arb}, Ref{arb}, Ref{fmpq}, Int), s, c, x, precision(r))
+        (Ref{arb}, Ref{arb}, Ref{fmpq}, Int), s, c, x, precision(Balls))
   return (s, c)
 end
 
 function sinhcosh(x::arb)
-  s = parent(x)()
-  c = parent(x)()
+  s = arb()
+  c = arb()
   ccall((:arb_sinh_cosh, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), s, c, x, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), s, c, x, precision(Balls))
   return (s, c)
 end
 
 function atan(y::arb, x::arb)
   z = parent(y)()
   ccall((:arb_atan2, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, y, x, parent(y).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, y, x, precision(Balls))
   return z
 end
 
@@ -1484,9 +1483,9 @@ end
 Return the arithmetic-geometric mean of $x$ and $y$
 """
 function agm(x::arb, y::arb)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_agm, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, precision(Balls))
   return z
 end
 
@@ -1498,21 +1497,21 @@ Return the Hurwitz zeta function $\zeta(s,a)$.
 function zeta(s::arb, a::arb)
   z = parent(s)()
   ccall((:arb_hurwitz_zeta, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, s, a, parent(s).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, s, a, precision(Balls))
   return z
 end
 
 function hypot(x::arb, y::arb)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_hypot, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, precision(Balls))
   return z
 end
 
 function root(x::arb, n::UInt)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_root, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, UInt, Int), z, x, n, parent(x).prec)
+              (Ref{arb}, Ref{arb}, UInt, Int), z, x, n, precision(Balls))
   return z
 end
 
@@ -1535,7 +1534,7 @@ factorial(x::arb) = gamma(x+1)
 
 function factorial(n::UInt, r::ArbField)
   z = r()
-  ccall((:arb_fac_ui, libarb), Nothing, (Ref{arb}, UInt, Int), z, n, r.prec)
+  ccall((:arb_fac_ui, libarb), Nothing, (Ref{arb}, UInt, Int), z, n, precision(Balls))
   return z
 end
 
@@ -1552,9 +1551,9 @@ factorial(n::Int, r::ArbField) = n < 0 ? factorial(r(n)) : factorial(UInt(n), r)
 Return the binomial coefficient ${x \choose n}$.
 """
 function binomial(x::arb, n::UInt)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_bin_ui, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, UInt, Int), z, x, n, parent(x).prec)
+              (Ref{arb}, Ref{arb}, UInt, Int), z, x, n, precision(Balls))
   return z
 end
 
@@ -1566,7 +1565,7 @@ Return the binomial coefficient ${n \choose k}$ in the given Arb field.
 function binomial(n::UInt, k::UInt, r::ArbField)
   z = r()
   ccall((:arb_bin_uiui, libarb), Nothing,
-              (Ref{arb}, UInt, UInt, Int), z, n, k, r.prec)
+              (Ref{arb}, UInt, UInt, Int), z, n, k, precision(Balls))
   return z
 end
 
@@ -1578,14 +1577,14 @@ Return the $n$-th Fibonacci number in the given Arb field.
 function fibonacci(n::fmpz, r::ArbField)
   z = r()
   ccall((:arb_fib_fmpz, libarb), Nothing,
-              (Ref{arb}, Ref{fmpz}, Int), z, n, r.prec)
+              (Ref{arb}, Ref{fmpz}, Int), z, n, precision(Balls))
   return z
 end
 
 function fibonacci(n::UInt, r::ArbField)
   z = r()
   ccall((:arb_fib_ui, libarb), Nothing,
-              (Ref{arb}, UInt, Int), z, n, r.prec)
+              (Ref{arb}, UInt, Int), z, n, precision(Balls))
   return z
 end
 
@@ -1604,7 +1603,7 @@ Return the Gamma function evaluated at $x$ in the given Arb field.
 function gamma(x::fmpz, r::ArbField)
   z = r()
   ccall((:arb_gamma_fmpz, libarb), Nothing,
-              (Ref{arb}, Ref{fmpz}, Int), z, x, r.prec)
+              (Ref{arb}, Ref{fmpz}, Int), z, x, precision(Balls))
   return z
 end
 
@@ -1616,7 +1615,7 @@ Return the Gamma function evaluated at $x$ in the given Arb field.
 function gamma(x::fmpq, r::ArbField)
   z = r()
   ccall((:arb_gamma_fmpq, libarb), Nothing,
-              (Ref{arb}, Ref{fmpq}, Int), z, x, r.prec)
+              (Ref{arb}, Ref{fmpq}, Int), z, x, precision(Balls))
   return z
 end
 
@@ -1624,7 +1623,7 @@ end
 function zeta(n::UInt, r::ArbField)
   z = r()
   ccall((:arb_zeta_ui, libarb), Nothing,
-              (Ref{arb}, UInt, Int), z, n, r.prec)
+              (Ref{arb}, UInt, Int), z, n, precision(Balls))
   return z
 end
 
@@ -1639,7 +1638,7 @@ zeta(n::Int, r::ArbField) = n >= 0 ? zeta(UInt(n), r) : zeta(r(n))
 function bernoulli(n::UInt, r::ArbField)
   z = r()
   ccall((:arb_bernoulli_ui, libarb), Nothing,
-              (Ref{arb}, UInt, Int), z, n, r.prec)
+              (Ref{arb}, UInt, Int), z, n, precision(Balls))
   return z
 end
 
@@ -1651,9 +1650,9 @@ Return the $n$-th Bernoulli number as an element of the given Arb field.
 bernoulli(n::Int, r::ArbField) = n >= 0 ? bernoulli(UInt(n), r) : throw(DomainError(n, "Index must be non-negative"))
 
 function rising_factorial(x::arb, n::UInt)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_rising_ui, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, UInt, Int), z, x, n, parent(x).prec)
+              (Ref{arb}, Ref{arb}, UInt, Int), z, x, n, precision(Balls))
   return z
 end
 
@@ -1667,7 +1666,7 @@ rising_factorial(x::arb, n::Int) = n < 0 ? throw(DomainError(n, "Index must be n
 function rising_factorial(x::fmpq, n::UInt, r::ArbField)
   z = r()
   ccall((:arb_rising_fmpq_ui, libarb), Nothing,
-              (Ref{arb}, Ref{fmpq}, UInt, Int), z, x, n, r.prec)
+              (Ref{arb}, Ref{fmpq}, UInt, Int), z, x, n, precision(Balls))
   return z
 end
 
@@ -1680,10 +1679,10 @@ given Arb field.
 rising_factorial(x::fmpq, n::Int, r::ArbField) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : rising_factorial(x, UInt(n), r)
 
 function rising_factorial2(x::arb, n::UInt)
-  z = parent(x)()
-  w = parent(x)()
+  z = arb()
+  w = arb()
   ccall((:arb_rising2_ui, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, UInt, Int), z, w, x, n, parent(x).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, UInt, Int), z, w, x, n, precision(Balls))
   return (z, w)
 end
 
@@ -1698,14 +1697,14 @@ rising_factorial2(x::arb, n::Int) = n < 0 ? throw(DomainError(n, "Index must be 
 function polylog(s::arb, a::arb)
   z = parent(s)()
   ccall((:arb_polylog, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, s, a, parent(s).prec)
+              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, s, a, precision(Balls))
   return z
 end
 
 function polylog(s::Int, a::arb)
   z = parent(a)()
   ccall((:arb_polylog_si, libarb), Nothing,
-              (Ref{arb}, Int, Ref{arb}, Int), z, s, a, parent(a).prec)
+              (Ref{arb}, Int, Ref{arb}, Int), z, s, a, precision(Balls))
   return z
 end
 
@@ -1716,32 +1715,32 @@ Return the polylogarithm Li$_s(a)$.
 """ polylog(s::Union{arb,Int}, a::arb)
 
 function chebyshev_t(n::UInt, x::arb)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_chebyshev_t_ui, libarb), Nothing,
-              (Ref{arb}, UInt, Ref{arb}, Int), z, n, x, parent(x).prec)
+              (Ref{arb}, UInt, Ref{arb}, Int), z, n, x, precision(Balls))
   return z
 end
 
 function chebyshev_u(n::UInt, x::arb)
-  z = parent(x)()
+  z = arb()
   ccall((:arb_chebyshev_u_ui, libarb), Nothing,
-              (Ref{arb}, UInt, Ref{arb}, Int), z, n, x, parent(x).prec)
+              (Ref{arb}, UInt, Ref{arb}, Int), z, n, x, precision(Balls))
   return z
 end
 
 function chebyshev_t2(n::UInt, x::arb)
-  z = parent(x)()
-  w = parent(x)()
+  z = arb()
+  w = arb()
   ccall((:arb_chebyshev_t2_ui, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, UInt, Ref{arb}, Int), z, w, n, x, parent(x).prec)
+              (Ref{arb}, Ref{arb}, UInt, Ref{arb}, Int), z, w, n, x, precision(Balls))
   return z, w
 end
 
 function chebyshev_u2(n::UInt, x::arb)
-  z = parent(x)()
-  w = parent(x)()
+  z = arb()
+  w = arb()
   ccall((:arb_chebyshev_u2_ui, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, UInt, Ref{arb}, Int), z, w, n, x, parent(x).prec)
+              (Ref{arb}, Ref{arb}, UInt, Ref{arb}, Int), z, w, n, x, precision(Balls))
   return z, w
 end
 
@@ -1781,7 +1780,7 @@ Return the Bell number $B_n$ as an element of $r$.
 function bell(n::fmpz, r::ArbField)
   z = r()
   ccall((:arb_bell_fmpz, libarb), Nothing,
-              (Ref{arb}, Ref{fmpz}, Int), z, n, r.prec)
+              (Ref{arb}, Ref{fmpz}, Int), z, n, precision(Balls))
   return z
 end
 
@@ -1800,7 +1799,7 @@ Return the number of partitions $p(n)$ as an element of $r$.
 function numpart(n::fmpz, r::ArbField)
   z = r()
   ccall((:arb_partitions_fmpz, libarb), Nothing,
-              (Ref{arb}, Ref{fmpz}, Int), z, n, r.prec)
+              (Ref{arb}, Ref{fmpz}, Int), z, n, precision(Balls))
   return z
 end
 
@@ -1823,10 +1822,10 @@ numpart(n::Int, r::ArbField) = numpart(fmpz(n), r)
 Return the Airy function $\operatorname{Ai}(x)$.
 """
 function airy_ai(x::arb)
-  ai = parent(x)()
+  ai = arb()
   ccall((:arb_hypgeom_airy, libarb), Nothing,
               (Ref{arb}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{arb}, Int),
-              ai, C_NULL, C_NULL, C_NULL, x, parent(x).prec)
+              ai, C_NULL, C_NULL, C_NULL, x, precision(Balls))
   return ai
 end
 
@@ -1836,10 +1835,10 @@ end
 Return the Airy function $\operatorname{Bi}(x)$.
 """
 function airy_bi(x::arb)
-  bi = parent(x)()
+  bi = arb()
   ccall((:arb_hypgeom_airy, libarb), Nothing,
               (Ptr{Cvoid}, Ptr{Cvoid}, Ref{arb}, Ptr{Cvoid}, Ref{arb}, Int),
-              C_NULL, C_NULL, bi, C_NULL, x, parent(x).prec)
+              C_NULL, C_NULL, bi, C_NULL, x, precision(Balls))
   return bi
 end
 
@@ -1849,10 +1848,10 @@ end
 Return the derivative of the Airy function $\operatorname{Ai}^\prime(x)$.
 """
 function airy_ai_prime(x::arb)
-  ai_prime = parent(x)()
+  ai_prime = arb()
   ccall((:arb_hypgeom_airy, libarb), Nothing,
               (Ptr{Cvoid}, Ref{arb}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{arb}, Int),
-              C_NULL, ai_prime, C_NULL, C_NULL, x, parent(x).prec)
+              C_NULL, ai_prime, C_NULL, C_NULL, x, precision(Balls))
   return ai_prime
 end
 
@@ -1862,10 +1861,10 @@ end
 Return the derivative of the Airy function $\operatorname{Bi}^\prime(x)$.
 """
 function airy_bi_prime(x::arb)
-  bi_prime = parent(x)()
+  bi_prime = arb()
   ccall((:arb_hypgeom_airy, libarb), Nothing,
               (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{arb}, Ref{arb}, Int),
-              C_NULL, C_NULL, C_NULL, bi_prime, x, parent(x).prec)
+              C_NULL, C_NULL, C_NULL, bi_prime, x, precision(Balls))
   return bi_prime
 end
 
@@ -1944,7 +1943,7 @@ for (s,f) in (("add!","arb_add"), ("mul!","arb_mul"), ("div!", "arb_div"),
   @eval begin
     function ($(Symbol(s)))(z::arb, x::arb, y::arb)
       ccall(($f, libarb), Nothing, (Ref{arb}, Ref{arb}, Ref{arb}, Int),
-                           z, x, y, parent(x).prec)
+                           z, x, y, precision(Balls))
       return z
     end
   end
@@ -1952,7 +1951,7 @@ end
 
 function addeq!(z::arb, x::arb)
     ccall((:arb_add, libarb), Nothing, (Ref{arb}, Ref{arb}, Ref{arb}, Int),
-                           z, z, x, parent(x).prec)
+                           z, z, x, precision(Balls))
     return z
 end
 
@@ -2039,59 +2038,45 @@ end
 
 function (r::ArbField)()
   z = arb()
-  z.parent = r
   return z
 end
 
 function (r::ArbField)(x::Int)
-  z = arb(fmpz(x), r.prec)
-  z.parent = r
+  z = arb(fmpz(x), precision(Balls))
   return z
 end
 
 function (r::ArbField)(x::UInt)
-  z = arb(fmpz(x), r.prec)
-  z.parent = r
+  z = arb(fmpz(x), precision(Balls))
   return z
 end
 
 function (r::ArbField)(x::fmpz)
-  z = arb(x, r.prec)
-  z.parent = r
+  z = arb(x, precision(Balls))
   return z
 end
 
 (r::ArbField)(x::Integer) = r(fmpz(x))
 
 function (r::ArbField)(x::fmpq)
-  z = arb(x, r.prec)
-  z.parent = r
+  z = arb(x, precision(Balls))
   return z
 end
 
 (r::ArbField)(x::Rational{T}) where {T <: Integer} = r(fmpq(x))
 
-#function call(r::ArbField, x::arf)
-#  z = arb(arb(x), r.prec)
-#  z.parent = r
-#  return z
-#end
-
 function (r::ArbField)(x::Float64)
-  z = arb(x, r.prec)
-  z.parent = r
+  z = arb(x, precision(Balls))
   return z
 end
 
 function (r::ArbField)(x::arb)
-  z = arb(x, r.prec)
-  z.parent = r
+  z = arb(x, precision(Balls))
   return z
 end
 
 function (r::ArbField)(x::AbstractString)
-  z = arb(x, r.prec)
-  z.parent = r
+  z = arb(x, precision(Balls))
   return z
 end
 
@@ -2099,15 +2084,14 @@ function (r::ArbField)(x::Irrational)
   if x == pi
     return const_pi(r)
   elseif x == e
-    return const_e(r.prec)
+    return const_e(precision(Balls))
   else
     error("constant not supported")
   end
 end
 
 function (r::ArbField)(x::BigFloat)
-  z = arb(x, r.prec)
-  z.parent = r
+  z = arb(x, precision(Balls))
   return z
 end
 
@@ -2147,22 +2131,22 @@ function rand(r::ArbField; randtype::Symbol=:urandom)
 
   if randtype == :urandom
     ccall((:arb_urandom, libarb), Nothing,
-          (Ref{arb}, Ptr{Cvoid}, Int), x, state.ptr, r.prec)
+          (Ref{arb}, Ptr{Cvoid}, Int), x, state.ptr, precision(Balls))
   elseif randtype == :randtest
     ccall((:arb_randtest, libarb), Nothing,
-          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
+          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, precision(Balls), 30)
   elseif randtype == :randtest_exact
     ccall((:arb_randtest_exact, libarb), Nothing,
-          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
+          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, precision(Balls), 30)
   elseif randtype == :randtest_precise
     ccall((:arb_randtest_precise, libarb), Nothing,
-          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
+          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, precision(Balls), 30)
   elseif randtype == :randtest_wide
     ccall((:arb_randtest_wide, libarb), Nothing,
-          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
+          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, precision(Balls), 30)
   elseif randtype == :randtest_special
     ccall((:arb_randtest_special, libarb), Nothing,
-          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
+          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, precision(Balls), 30)
   else
     error("Arb random generation `" * String(randtype) * "` is not defined")
   end

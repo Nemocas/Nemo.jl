@@ -34,7 +34,7 @@ degree(x::arb_poly) = length(x) - 1
 
 function coeff(a::arb_poly, n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
-  t = parent(a).base_ring()
+  t = base_ring(parent(a))()
   ccall((:arb_poly_get_coeff_arb, libarb), Nothing,
               (Ref{arb}, Ref{arb_poly}, Int), t, a, n)
   return t
@@ -83,7 +83,7 @@ function show(io::IO, x::ArbPolyRing)
   print(io, "Univariate Polynomial Ring in ")
   print(io, string(var(x)))
   print(io, " over ")
-  show(io, x.base_ring)
+  show(io, base_ring(x))
 end
 
 ###############################################################################
@@ -107,7 +107,7 @@ end
 function polynomial(R::ArbField, arr::Vector{T}, var::String="x"; cached::Bool=true) where T
    coeffs = map(R, arr)
    coeffs = length(coeffs) == 0 ? arb[] : coeffs
-   z = arb_poly(coeffs, R.prec)
+   z = arb_poly(coeffs, precision(Balls))
    z.parent = ArbPolyRing(R, Symbol(var), cached)
    return z
 end
@@ -246,7 +246,7 @@ function +(x::arb_poly, y::arb_poly)
   z = parent(x)()
   ccall((:arb_poly_add, libarb), Nothing,
               (Ref{arb_poly}, Ref{arb_poly}, Ref{arb_poly}, Int),
-              z, x, y, precision(parent(x)))
+              z, x, y, precision(Balls))
   return z
 end
 
@@ -254,7 +254,7 @@ function *(x::arb_poly, y::arb_poly)
   z = parent(x)()
   ccall((:arb_poly_mul, libarb), Nothing,
               (Ref{arb_poly}, Ref{arb_poly}, Ref{arb_poly}, Int),
-              z, x, y, precision(parent(x)))
+              z, x, y, precision(Balls))
   return z
 end
 
@@ -262,7 +262,7 @@ function -(x::arb_poly, y::arb_poly)
   z = parent(x)()
   ccall((:arb_poly_sub, libarb), Nothing,
               (Ref{arb_poly}, Ref{arb_poly}, Ref{arb_poly}, Int),
-              z, x, y, precision(parent(x)))
+              z, x, y, precision(Balls))
   return z
 end
 
@@ -271,7 +271,7 @@ function ^(x::arb_poly, y::Int)
   z = parent(x)()
   ccall((:arb_poly_pow_ui, libarb), Nothing,
               (Ref{arb_poly}, Ref{arb_poly}, UInt, Int),
-              z, x, y, precision(parent(x)))
+              z, x, y, precision(Balls))
   return z
 end
 
@@ -343,7 +343,7 @@ function Base.divrem(x::arb_poly, y::arb_poly)
    r = parent(x)()
    if (ccall((:arb_poly_divrem, libarb), Int,
          (Ref{arb_poly}, Ref{arb_poly}, Ref{arb_poly}, Ref{arb_poly}, Int),
-               q, r, x, y, precision(parent(x))) == 1)
+               q, r, x, y, precision(Balls)) == 1)
       return (q, r)
    else
       throw(DivideError())
@@ -381,7 +381,7 @@ function mullow(x::arb_poly, y::arb_poly, n::Int)
    z = parent(x)()
    ccall((:arb_poly_mullow, libarb), Nothing,
          (Ref{arb_poly}, Ref{arb_poly}, Ref{arb_poly}, Int, Int),
-            z, x, y, n, precision(parent(x)))
+            z, x, y, n, precision(Balls))
    return z
 end
 
@@ -409,7 +409,7 @@ function evaluate(x::arb_poly, y::arb)
    z = parent(y)()
    ccall((:arb_poly_evaluate, libarb), Nothing,
                 (Ref{arb}, Ref{arb_poly}, Ref{arb}, Int),
-                z, x, y, precision(parent(y)))
+                z, x, y, precision(Balls))
    return z
 end
 
@@ -424,7 +424,7 @@ function evaluate2(x::arb_poly, y::arb)
    w = parent(y)()
    ccall((:arb_poly_evaluate2, libarb), Nothing,
                 (Ref{arb}, Ref{arb}, Ref{arb_poly}, Ref{arb}, Int),
-                z, w, x, y, precision(parent(y)))
+                z, w, x, y, precision(Balls))
    return z, w
 end
 
@@ -432,7 +432,7 @@ function evaluate(x::arb_poly, y::acb)
    z = parent(y)()
    ccall((:arb_poly_evaluate_acb, libarb), Nothing,
                 (Ref{acb}, Ref{arb_poly}, Ref{acb}, Int),
-                z, x, y, precision(parent(y)))
+                z, x, y, precision(Balls))
    return z
 end
 
@@ -447,7 +447,7 @@ function evaluate2(x::arb_poly, y::acb)
    w = parent(y)()
    ccall((:arb_poly_evaluate2_acb, libarb), Nothing,
                 (Ref{acb}, Ref{acb}, Ref{arb_poly}, Ref{acb}, Int),
-                z, w, x, y, precision(parent(y)))
+                z, w, x, y, precision(Balls))
    return z, w
 end
 
@@ -509,7 +509,7 @@ function compose(x::arb_poly, y::arb_poly)
    z = parent(x)()
    ccall((:arb_poly_compose, libarb), Nothing,
                 (Ref{arb_poly}, Ref{arb_poly}, Ref{arb_poly}, Int),
-                z, x, y, precision(parent(x)))
+                z, x, y, precision(Balls))
    return z
 end
 
@@ -522,14 +522,14 @@ end
 function derivative(x::arb_poly)
    z = parent(x)()
    ccall((:arb_poly_derivative, libarb), Nothing,
-                (Ref{arb_poly}, Ref{arb_poly}, Int), z, x, precision(parent(x)))
+                (Ref{arb_poly}, Ref{arb_poly}, Int), z, x, precision(Balls))
    return z
 end
 
 function integral(x::arb_poly)
    z = parent(x)()
    ccall((:arb_poly_integral, libarb), Nothing,
-                (Ref{arb_poly}, Ref{arb_poly}, Int), z, x, precision(parent(x)))
+                (Ref{arb_poly}, Ref{arb_poly}, Int), z, x, precision(Balls))
    return z
 end
 
@@ -575,7 +575,7 @@ function from_roots(R::ArbPolyRing, b::Vector{arb})
    z = R()
    tmp = arb_vec(b)
    ccall((:arb_poly_product_roots, libarb), Nothing,
-                (Ref{arb_poly}, Ptr{arb_struct}, Int, Int), z, tmp, length(b), precision(R))
+                (Ref{arb_poly}, Ptr{arb_struct}, Int, Int), z, tmp, length(b), precision(Balls))
    arb_vec_clear(tmp, length(b))
    return z
 end
@@ -588,7 +588,7 @@ function evaluate_fast(x::arb_poly, b::Vector{arb})
    tmp = arb_vec(b)
    ccall((:arb_poly_evaluate_vec_fast, libarb), Nothing,
                 (Ptr{arb_struct}, Ref{arb_poly}, Ptr{arb_struct}, Int, Int),
-            tmp, x, tmp, length(b), precision(parent(x)))
+            tmp, x, tmp, length(b), precision(Balls))
    res = array(base_ring(parent(x)), tmp, length(b))
    arb_vec_clear(tmp, length(b))
    return res
@@ -601,7 +601,7 @@ function interpolate_newton(R::ArbPolyRing, xs::Vector{arb}, ys::Vector{arb})
    ysv = arb_vec(ys)
    ccall((:arb_poly_interpolate_newton, libarb), Nothing,
                 (Ref{arb_poly}, Ptr{arb_struct}, Ptr{arb_struct}, Int, Int),
-            z, xsv, ysv, length(xs), precision(R))
+            z, xsv, ysv, length(xs), precision(Balls))
    arb_vec_clear(xsv, length(xs))
    arb_vec_clear(ysv, length(ys))
    return z
@@ -614,7 +614,7 @@ function interpolate_barycentric(R::ArbPolyRing, xs::Vector{arb}, ys::Vector{arb
    ysv = arb_vec(ys)
    ccall((:arb_poly_interpolate_barycentric, libarb), Nothing,
                 (Ref{arb_poly}, Ptr{arb_struct}, Ptr{arb_struct}, Int, Int),
-            z, xsv, ysv, length(xs), precision(R))
+            z, xsv, ysv, length(xs), precision(Balls))
    arb_vec_clear(xsv, length(xs))
    arb_vec_clear(ysv, length(ys))
    return z
@@ -627,7 +627,7 @@ function interpolate_fast(R::ArbPolyRing, xs::Vector{arb}, ys::Vector{arb})
    ysv = arb_vec(ys)
    ccall((:arb_poly_interpolate_fast, libarb), Nothing,
                 (Ref{arb_poly}, Ptr{arb_struct}, Ptr{arb_struct}, Int, Int),
-            z, xsv, ysv, length(xs), precision(R))
+            z, xsv, ysv, length(xs), precision(Balls))
    arb_vec_clear(xsv, length(xs))
    arb_vec_clear(ysv, length(ys))
    return z
@@ -656,7 +656,7 @@ Returns an upper bound for the absolute value of all complex roots of $x$.
 """
 function roots_upper_bound(x::arb_poly)
    z = base_ring(x)()
-   p = precision(base_ring(x))
+   p = precision(Balls)
    GC.@preserve x z begin
       t = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ref{arb}, ), z)
       ccall((:arb_poly_root_bound_fujiwara, libarb), Nothing,
@@ -760,7 +760,7 @@ end
 for T in [Integer, fmpz, fmpq, Float64, arb, BigFloat]
    @eval begin
       function (a::ArbPolyRing)(b::$T)
-         z = arb_poly(base_ring(a)(b), a.base_ring.prec)
+         z = arb_poly(base_ring(a)(b), precision(Balls))
          z.parent = a
          return z
       end
@@ -768,13 +768,13 @@ for T in [Integer, fmpz, fmpq, Float64, arb, BigFloat]
 end
 
 function (a::ArbPolyRing)(b::Rational{T}) where {T <: Integer}
-   z = arb_poly(base_ring(a)(b), a.base_ring.prec)
+   z = arb_poly(base_ring(a)(b), precision(Balls))
    z.parent = a
    return z
 end
 
 function (a::ArbPolyRing)(b::Vector{arb})
-   z = arb_poly(b, a.base_ring.prec)
+   z = arb_poly(b, precision(Balls))
    z.parent = a
    return z
 end
@@ -790,19 +790,19 @@ end
 (a::ArbPolyRing)(b::Vector{Rational{T}}) where {T <: Integer} = a(map(base_ring(a), b))
 
 function (a::ArbPolyRing)(b::fmpz_poly)
-   z = arb_poly(b, a.base_ring.prec)
+   z = arb_poly(b, precision(Balls))
    z.parent = a
    return z
 end
 
 function (a::ArbPolyRing)(b::fmpq_poly)
-   z = arb_poly(b, a.base_ring.prec)
+   z = arb_poly(b, precision(Balls))
    z.parent = a
    return z
 end
 
 function (a::ArbPolyRing)(b::arb_poly)
-   z = arb_poly(b, a.base_ring.prec)
+   z = arb_poly(b, precision(Balls))
    z.parent = a
    return z
 end
