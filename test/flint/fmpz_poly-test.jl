@@ -253,6 +253,17 @@ end
    @test divexact(3*f, 3) == f
 end
 
+@testset "fmpz_poly.divrem" begin
+   R, x = PolynomialRing(ZZ, "x")
+
+   f = x^2 + 2x + 1
+   g = x + 1
+
+   @test divrem(f, g) == (x+1, 0)
+
+   @test mod(x + 1, x - 1) == 2
+end
+
 @testset "fmpz_poly.pseudodivision" begin
    R, x = PolynomialRing(ZZ, "x")
 

@@ -402,6 +402,8 @@ function Base.divrem(x::fmpz_poly, y::fmpz_poly)
    return z, r
 end
 
+mod(x::fmpz_poly, y::fmpz_poly) = divrem(x, y)[2]
+
 function divides(x::fmpz_poly, y::fmpz_poly)
    check_parent(x, y)
    iszero(y) && throw(DivideError())
