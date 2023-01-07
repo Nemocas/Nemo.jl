@@ -2,23 +2,20 @@
 CurrentModule = Nemo
 ```
 
-# Fixed precision real balls
+# Arbitrary precision real balls
 
-Fixed precision real ball arithmetic is supplied by Arb which provides a
+Arbitrary precision real ball arithmetic is supplied by Arb which provides a
 ball representation which tracks error bounds rigorously. Real numbers are 
 represented in mid-rad interval form $[m \pm r] = [m-r, m+r]$.
-
-The Arb real field is constructed using the `ArbField` constructor. This
-constructs the parent object for the Arb real field.
 
 The types of real balls in Nemo are given in the following table, along with
 the libraries that provide them and the associated types of the parent objects.
 
  Library | Field                | Element type  | Parent type
 ---------|----------------------|---------------|--------------
-Arb      | $\mathbb{R}$ (balls) | `arb`         | `ArbField`
+Arb      | $\mathbb{R}$ (balls) | `RealElem`    | `RealField`
 
-All the real field types belong to the `Field` abstract type and the types of
+The real field types belong to the `Field` abstract type and the types of
 elements in this field, i.e. balls in this case, belong to the `FieldElem`
 abstract type.
 
@@ -30,26 +27,36 @@ Real balls in Nemo provide all the field functionality described in AbstractAlge
 
 Below, we document the additional functionality provided for real balls.
 
+### [Precision management](@id precision_management)
+
+Precision for ball arithmetic and creation of elements can be controlled
+using the functions:
+
+```@docs
+precision(::Type{Balls})
+set_precision!(::Type{Balls}, n::Int)
+set_precision!(f::Any, ::Type{Balls}, n::Int)
+```
+
+!!! info
+    This functions are not thread-safe.
+
 ### Constructors
 
 In order to construct real balls in Nemo, one must first construct the Arb
 real field itself. This is accomplished with the following constructor.
 
 ```
-ArbField(prec::Int)
+RealField()
 ```
 
-Return the Arb field with precision in bits `prec` used for operations on
-interval midpoints. The precision used for interval radii is a fixed
-implementation-defined constant (30 bits).
-
-Here is an example of creating an Arb real field and using the resulting
+Here is an example of creating the real field and using the resulting
 parent object to coerce values into the resulting field.
 
 **Examples**
 
 ```julia
-RR = ArbField(64)
+RR = RealField()
 
 a = RR("0.25")
 b = RR("0.1 +/- 0.001")
@@ -72,22 +79,30 @@ information.
 
 ### Real ball constructors
 
-```@docs
-ball(::arb, ::arb)
-```
+Using coercion into the real field, new elements can be created.
 
 **Examples**
 
 ```julia
-RR = ArbField(64)
+RR = RealField()
 
-c = ball(RR(3), RR("0.0001"))
+c = RR(1)
+d = RR(1//2)
+```
+
+Note that for the construction, also the precision can be supplied:
+
+```julia
+RR = RealField()
+
+c = RR(1, precision = 100)
+d = RR(1//2, precision = 4)
 ```
 
 ### Conversions
 
 ```julia
-RR = ArbField(64)
+RR = RealField()
 
 convert(Float64, RR(1//3))
 ```
@@ -95,53 +110,53 @@ convert(Float64, RR(1//3))
 ### Basic manipulation
 
 ```@docs
-is_nonzero(::arb)
+is_nonzero(::RealElem)
 ```
 
 ```@docs
-isfinite(::arb)
+isfinite(::RealElem)
 ```
 
 ```@docs
-is_exact(::arb)
+is_exact(::RealElem)
 ```
 
 ```@docs
-isinteger(::arb)
+isinteger(::RealElem)
 ```
 
 ```@docs
-is_positive(::arb)
+is_positive(::RealElem)
 ```
 
 ```@docs
-is_nonnegative(::arb)
+is_nonnegative(::RealElem)
 ```
 
 ```@docs
-is_negative(::arb)
+is_negative(::RealElem)
 ```
 
 ```@docs
-is_nonpositive(::arb)
+is_nonpositive(::RealElem)
 ```
 
 ```@docs
-midpoint(::arb)
+midpoint(::RealElem)
 ```
 
 ```@docs
-radius(::arb)
+radius(::RealElem)
 ```
 
 ```@docs
-accuracy_bits(::arb)
+accuracy_bits(::RealElem)
 ```
 
 **Examples**
 
 ```julia
-RR = ArbField(64)
+RR = RealField()
 
 a = RR("1.2 +/- 0.001")
 b = RR(3)
@@ -161,7 +176,7 @@ Printing real balls can at first sight be confusing. Lets look at the following
 example:
 
 ```julia
-RR = ArbField(64)
+RR = RealField()
 
 a = RR(1)
 b = RR(2)
@@ -201,48 +216,48 @@ contained in a given real ball or whether two balls overlap. The following
 functions are provided for this purpose.
 
 ```@docs
-overlaps(::arb, ::arb)
+overlaps(::RealElem, ::RealElem)
 ```
 
 ```@docs
-contains(::arb, ::arb)
+contains(::RealElem, ::RealElem)
 ```
 
 ```@docs
-contains(::arb, ::Integer)
-contains(::arb, ::fmpz)
-contains(::arb, ::fmpq)
-contains{T <: Integer}(::arb, ::Rational{T})
-contains(::arb, ::BigFloat)
+contains(::RealElem, ::Integer)
+contains(::RealElem, ::fmpz)
+contains(::RealElem, ::fmpq)
+contains{T <: Integer}(::RealElem, ::Rational{T})
+contains(::RealElem, ::BigFloat)
 ```
 
 The following functions are also provided for determining if a ball intersects
 a certain part of the real number line.
 
 ```@docs
-contains_zero(::arb)
+contains_zero(::RealElem)
 ```
 
 ```@docs
-contains_negative(::arb)
+contains_negative(::RealElem)
 ```
 
 ```@docs
-contains_positive(::arb)
+contains_positive(::RealElem)
 ```
 
 ```@docs
-contains_nonnegative(::arb)
+contains_nonnegative(::RealElem)
 ```
 
 ```@docs
-contains_nonpositive(::arb)
+contains_nonpositive(::RealElem)
 ```
 
 **Examples**
 
 ```julia
-RR = ArbField(64)
+RR = RealField()
 x = RR("1 +/- 0.001")
 y = RR("3")
 
@@ -265,7 +280,7 @@ is distinct from arithmetic equality implemented by `==`, which merely compares 
 the minimum of the precisions of its operands.
 
 ```@docs
-isequal(::arb, ::arb)
+isequal(::RealElem, ::RealElem)
 ```
 
 We also provide a full range of ad hoc comparison operators. These are implemented
@@ -273,27 +288,27 @@ directly in Julia, but we document them as though `isless` and `==` were provide
 
 Function                      |
 ------------------------------|
-`==(x::arb, y::Integer)`      |
-`==(x::Integer, y::arb)`      |
-`==(x::arb, y::fmpz)`         |
-`==(x::fmpz, y::arb)`         |
-`==(x::arb, y::Float64)`      |
-`==(x::Float64, y::arb)`      |
-`isless(x::arb, y::Integer)`  |
-`isless(x::Integer, y::arb)`  |
-`isless(x::arb, y::fmpz)`     |
-`isless(x::fmpz, y::arb)`     |
-`isless(x::arb, y::Float64)`  |
-`isless(x::Float64, y::arb)`  |
-`isless(x::arb, y::BigFloat)` |
-`isless(x::BigFloat, y::arb)` |
-`isless(x::arb, y::fmpq)`     |
-`isless(x::fmpq, y::arb)`     |
+`==(x::RealElem, y::Integer)`      |
+`==(x::Integer, y::RealElem)`      |
+`==(x::RealElem, y::fmpz)`         |
+`==(x::fmpz, y::RealElem)`         |
+`==(x::RealElem, y::Float64)`      |
+`==(x::Float64, y::RealElem)`      |
+`isless(x::RealElem, y::Integer)`  |
+`isless(x::Integer, y::RealElem)`  |
+`isless(x::RealElem, y::fmpz)`     |
+`isless(x::fmpz, y::RealElem)`     |
+`isless(x::RealElem, y::Float64)`  |
+`isless(x::Float64, y::RealElem)`  |
+`isless(x::RealElem, y::BigFloat)` |
+`isless(x::BigFloat, y::RealElem)` |
+`isless(x::RealElem, y::fmpq)`     |
+`isless(x::fmpq, y::RealElem)`     |
 
 **Examples**
 
 ```julia
-RR = ArbField(64)
+RR = RealField()
 x = RR("1 +/- 0.001")
 y = RR("3")
 z = RR("4")
@@ -309,7 +324,7 @@ x != 1.23
 **Examples**
 
 ```julia
-RR = ArbField(64)
+RR = RealField()
 x = RR("-1 +/- 0.001")
 
 a = abs(x)
@@ -320,7 +335,7 @@ a = abs(x)
 **Examples**
 
 ```julia
-RR = ArbField(64)
+RR = RealField()
 x = RR("-3 +/- 0.001")
 
 a = ldexp(x, 23)
@@ -330,25 +345,25 @@ b = ldexp(x, -ZZ(15))
 ### Miscellaneous operations
 
 ```@docs
-add_error!(::arb, ::arb)
+add_error!(::RealElem, ::RealElem)
 ```
 
 ```@docs
-trim(::arb)
+trim(::RealElem)
 ```
 
 ```@docs
-unique_integer(::arb)
+unique_integer(::RealElem)
 ```
 
 ```@docs
-setunion(::arb, ::arb)
+setunion(::RealElem, ::RealElem)
 ```
 
 **Examples**
 
 ```julia
-RR = ArbField(64)
+RR = RealField()
 x = RR("-3 +/- 0.001")
 y = RR("2 +/- 0.5")
 
@@ -360,41 +375,41 @@ d = setunion(x, y)
 ### Constants
 
 ```@docs
-const_pi(::ArbField)
+const_pi(::RealField)
 ```
 
 ```@docs
-const_e(::ArbField)
+const_e(::RealField)
 ```
 
 ```@docs
-const_log2(::ArbField)
+const_log2(::RealField)
 ```
 
 ```@docs
-const_log10(::ArbField)
+const_log10(::RealField)
 ```
 
 ```@docs
-const_euler(::ArbField)
+const_euler(::RealField)
 ```
 
 ```@docs
-const_catalan(::ArbField)
+const_catalan(::RealField)
 ```
 
 ```@docs
-const_khinchin(::ArbField)
+const_khinchin(::RealField)
 ```
 
 ```@docs
-const_glaisher(::ArbField)
+const_glaisher(::RealField)
 ```
 
 **Examples**
 
 ```julia
-RR = ArbField(200)
+RR = RealField()
 
 a = const_pi(RR)
 b = const_e(RR)
@@ -405,195 +420,195 @@ d = const_glaisher(RR)
 ### Mathematical and special functions
 
 ```@docs
-rsqrt(::arb)
+rsqrt(::RealElem)
 ```
 
 ```@docs
-sqrt1pm1(::arb)
+sqrt1pm1(::RealElem)
 ```
 
 ```@docs
-sqrtpos(::arb)
+sqrtpos(::RealElem)
 ```
 
 ```@docs
-gamma(::arb)
+gamma(::RealElem)
 ```
 
 ```@docs
-lgamma(::arb)
+lgamma(::RealElem)
 ```
 
 ```@docs
-rgamma(::arb)
+rgamma(::RealElem)
 ```
 
 ```@docs
-digamma(::arb)
+digamma(::RealElem)
 ```
 
 ```@docs
-gamma(::arb, ::arb)
+gamma(::RealElem, ::RealElem)
 ```
 
 ```@docs
-gamma_regularized(::arb, ::arb)
+gamma_regularized(::RealElem, ::RealElem)
 ```
 
 ```@docs
-gamma_lower(::arb, ::arb)
+gamma_lower(::RealElem, ::RealElem)
 ```
 
 ```@docs
-gamma_lower_regularized(::arb, ::arb)
+gamma_lower_regularized(::RealElem, ::RealElem)
 ```
 
 ```@docs
-zeta(::arb)
+zeta(::RealElem)
 ```
 
 ```@docs
-atan2(::arb, ::arb)
+atan2(::RealElem, ::RealElem)
 ```
 
 ```@docs
-agm(::arb, ::arb)
+agm(::RealElem, ::RealElem)
 ```
 
 ```@docs
-zeta(::arb, ::arb)
+zeta(::RealElem, ::RealElem)
 ```
 
 ```@docs
-root(::arb, ::Int)
+root(::RealElem, ::Int)
 ```
 
 ```@docs
-factorial(::arb)
+factorial(::RealElem)
 ```
 
 ```@docs
-factorial(::Int, ::ArbField)
+factorial(::Int, ::RealField)
 ```
 
 ```@docs
-binomial(::arb, ::UInt)
+binomial(::RealElem, ::UInt)
 ```
 
 ```@docs
-binomial(::UInt, ::UInt, ::ArbField)
+binomial(::UInt, ::UInt, ::RealField)
 ```
 
 ```@docs
-fibonacci(::fmpz, ::ArbField)
+fibonacci(::fmpz, ::RealField)
 ```
 
 ```@docs
-fibonacci(::Int, ::ArbField)
+fibonacci(::Int, ::RealField)
 ```
 
 ```@docs
-gamma(::fmpz, ::ArbField)
+gamma(::fmpz, ::RealField)
 ```
 
 ```@docs
-gamma(::fmpq, ::ArbField)
+gamma(::fmpq, ::RealField)
 ```
 
 ```@docs
-zeta(::Int, ::ArbField)
+zeta(::Int, ::RealField)
 ```
 
 ```@docs
-bernoulli(::Int, ::ArbField)
+bernoulli(::Int, ::RealField)
 ```
 
 ```@docs
-rising_factorial(::arb, ::Int)
+rising_factorial(::RealElem, ::Int)
 ```
 
 ```@docs
-rising_factorial(::fmpq, ::Int, ::ArbField)
+rising_factorial(::fmpq, ::Int, ::RealField)
 ```
 
 ```@docs
-rising_factorial2(::arb, ::Int)
+rising_factorial2(::RealElem, ::Int)
 ```
 
 ```@docs
-polylog(::Union{arb,Int}, ::arb)
+polylog(::Union{RealElem,Int}, ::RealElem)
 ```
 
 ```@docs
-chebyshev_t(::Int, ::arb)
+chebyshev_t(::Int, ::RealElem)
 ```
 
 ```@docs
-chebyshev_u(::Int, ::arb)
+chebyshev_u(::Int, ::RealElem)
 ```
 
 ```@docs
-chebyshev_t2(::Int, ::arb)
+chebyshev_t2(::Int, ::RealElem)
 ```
 
 ```@docs
-chebyshev_u2(::Int, ::arb)
+chebyshev_u2(::Int, ::RealElem)
 ```
 
 ```@docs
-bell(::fmpz, ::ArbField)
+bell(::fmpz, ::RealField)
 ```
 
 ```@docs
-bell(::Int, ::ArbField)
+bell(::Int, ::RealField)
 ```
 
 ```@docs
-numpart(::fmpz, ::ArbField)
+numpart(::fmpz, ::RealField)
 ```
 
 ```@docs
-numpart(::Int, ::ArbField)
+numpart(::Int, ::RealField)
 ```
 
 ```@docs
-airy_ai(::arb)
+airy_ai(::RealElem)
 ```
 
 ```@docs
-airy_ai_prime(::arb)
+airy_ai_prime(::RealElem)
 ```
 
 ```@docs
-airy_bi(::arb)
+airy_bi(::RealElem)
 ```
 
 ```@docs
-airy_bi_prime(::arb)
+airy_bi_prime(::RealElem)
 ```
 
 **Examples**
 
 ```julia
-RR = ArbField(64)
+RR = RealField()
 
 a = floor(exp(RR(1)))
 b = sinpi(QQ(5,6), RR)
-c = gamma(QQ(1,3), ArbField(256))
-d = bernoulli(1000, ArbField(53))
+c = gamma(QQ(1,3), RealField()
+d = bernoulli(1000, RealField()
 f = polylog(3, RR(-10))
 ```
 
 ### Linear dependence
 
 ```@docs
-lindep(::Vector{arb}, n::Int)
+lindep(::Vector{RealElem}, n::Int)
 ```
 
 **Examples**
 
 ```julia
-RR = ArbField(128)
+RR = RealField()
 
 a = RR(-0.33198902958450931620250069492231652319)
 
@@ -602,26 +617,26 @@ W = lindep(V, 20)
 ```
 
 ```@docs
-simplest_rational_inside(::arb)
+simplest_rational_inside(::RealElem)
 ```
 
 **Examples**
 
 ```julia
-RR = ArbField(64)
+RR = RealField()
 simplest_rational_inside(const_pi(RR))
 ```
 
 ### Random generation
 
 ```@docs
-rand(::ArbField)
+rand(::RealField)
 ```
 
 **Examples**
 
 ```julia
-RR = ArbField(100)
+RR = RealField()
 
 a = rand(RR)
 b = rand(RR; randtype = :null_exact)

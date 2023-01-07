@@ -25,6 +25,7 @@ makedocs(
                            "rational.md",
                            "algebraic.md",
                            "complex.md",
+                           "Real.md",
                            "arb.md",
                            "acb.md",
                            "gfp.md",

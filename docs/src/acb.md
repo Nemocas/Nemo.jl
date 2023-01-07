@@ -2,7 +2,7 @@
 CurrentModule = Nemo
 ```
 
-# Complex balls
+# Fixed precisioncomplex balls
 
 Arbitrary precision complex ball arithmetic is supplied by Arb which provides a
 ball representation which tracks error bounds rigorously. Complex numbers are 
@@ -10,15 +10,6 @@ represented in rectangular form $a+bi$ where $a,b$ are `arb` balls.
 
 The Arb complex field is constructed using the `AcbField` constructor. This
 constructs the parent object for the Arb complex field.
-
-We define
-
-```
-ComplexField = AcbField
-```
-
-so that one can construct the Arb complex field parent using `ComplexField`
-instead of `AcbField`.
 
 The types of complex boxes in Nemo are given in the following table, along with
 the libraries that provide them and the associated types of the parent objects.
@@ -58,7 +49,7 @@ parent object to coerce values into the resulting field.
 **Examples**
 
 ```julia
-CC = ComplexField(64)
+CC = AcbField(64)
 
 a = CC("0.25")
 b = CC("0.1")
@@ -88,7 +79,7 @@ onei(::AcbField)
 **Examples**
 
 ```julia
-CC = ComplexField(64)
+CC = AcbField(64)
 
 c = onei(CC)
 ```
@@ -189,7 +180,7 @@ Here are some examples of coercing elements into the Arb complex field.
 
 ```
 RR = RealField(64)
-CC = ComplexField(64)
+CC = AcbField(64)
 
 a = CC(3)
 b = CC(QQ(2,3))
@@ -228,7 +219,7 @@ accuracy_bits(::acb)
 **Examples**
 
 ```julia
-CC = ComplexField(64)
+CC = AcbField(64)
 
 a = CC("1.2 +/- 0.001")
 b = CC(3)
@@ -271,7 +262,7 @@ contains_zero(::acb)
 **Examples**
 
 ```julia
-CC = ComplexField(64)
+CC = AcbField(64)
 x = CC("1 +/- 0.001")
 y = CC("3")
 
@@ -311,7 +302,7 @@ Function                     |
 **Examples**
 
 ```julia
-CC = ComplexField(64)
+CC = AcbField(64)
 x = CC("1 +/- 0.001")
 y = CC("3")
 z = CC("4")
@@ -327,7 +318,7 @@ x != 1.23
 **Examples**
 
 ```julia
-CC = ComplexField(64)
+CC = AcbField(64)
 x = CC("-1 +/- 0.001")
 
 a = abs(x)
@@ -338,7 +329,7 @@ a = abs(x)
 **Examples**
 
 ```julia
-CC = ComplexField(64)
+CC = AcbField(64)
 x = CC("-3 +/- 0.001")
 
 a = ldexp(x, 23)
@@ -358,7 +349,7 @@ unique_integer(::acb)
 **Examples**
 
 ```julia
-CC = ComplexField(64)
+CC = AcbField(64)
 x = CC("-3 +/- 0.001", "0.1")
 
 a = trim(x)
@@ -377,7 +368,7 @@ const_pi(::AcbField)
 **Examples**
 
 ```julia
-CC = ComplexField(200)
+CC = AcbField(200)
 
 a = const_pi(CC)
 ```
@@ -486,10 +477,6 @@ modular_delta(::acb)
 
 ```@docs
 eisenstein_g(::Int, ::acb)
-```
-
-```@docs
-hilbert_class_polynomial(::Int, ::FmpzPolyRing)
 ```
 
 ```@docs
@@ -612,7 +599,7 @@ weierstrass_p(::acb, ::acb)
 **Examples**
 
 ```julia
-CC = ComplexField(64)
+CC = AcbField(64)
 
 s = CC(1, 2)
 z = CC("1.23", "3.45")
@@ -636,7 +623,7 @@ lindep(A::Matrix{acb}, bits::Int)
 **Examples**
 
 ```julia
-CC = ComplexField(128)
+CC = AcbField(128)
 
 # These are two of the roots of x^5 + 3x + 1
 a = CC(1.0050669478588622428791051888364775253, - 0.93725915669289182697903585868761513585)

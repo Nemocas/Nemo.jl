@@ -27,8 +27,10 @@ $\mathbb{Z}/p\mathbb{Z}$ (small prime $p$)  | Flint               | `gfp_poly`  
 $\mathbb{Z}/p\mathbb{Z}$ (large prime $p$)  | Flint               | `gfp_fmpz_poly`     | `GFPFmpzPolyRing`
 $\mathbb{F}_{p^n}$ (small $p$)              | Flint               | `fq_nmod_poly`      | `FqNmodPolyRing`
 $\mathbb{F}_{p^n}$ (large $p$)              | Flint               | `fq_poly`           | `FqPolyRing`
-$\mathbb{R}$                                | Arb                 | `arb_poly`          | `ArbPolyRing`
-$\mathbb{C}$                                | Arb                 | `acb_poly`          | `AcbPolyRing`
+$\mathbb{R}$ (arbitrary precision)          | Arb                 | `RealPoly`          | `RealPolyRing`
+$\mathbb{C}$ (arbitrary precision)          | Arb                 | `ComplexPoly`       | `ComplexPolyRing`
+$\mathbb{R}$ (fixed precision)              | Arb                 | `arb_poly`          | `ArbPolyRing`
+$\mathbb{C}$ (fixed precision)              | Arb                 | `acb_poly`          | `AcbPolyRing`
 
 The string representation of the variable and the base ring $R$ of a generic
 polynomial is stored in its parent object. 
@@ -52,21 +54,11 @@ AbstractAlgebra.jl, for specific coefficient rings.
 ### Remove and valuation
 
 ```@docs
-evaluate2(::arb_poly, ::Integer)
-evaluate2(::arb_poly, ::Float64)
-evaluate2(::arb_poly, ::fmpz)
-evaluate2(::arb_poly, ::fmpq)
-evaluate2(::arb_poly, ::arb)
-evaluate2(::arb_poly, ::acb)
+evaluate2(::RealPoly, ::RealElem)
 ```
 
 ```@docs
-evaluate2(::acb_poly, ::Integer)
-evaluate2(::acb_poly, ::Float64)
-evaluate2(::acb_poly, ::fmpz)
-evaluate2(::acb_poly, ::fmpq)
-evaluate2(::acb_poly, ::arb)
-evaluate2(::acb_poly, ::acb)
+evaluate2(::ComplexPoly, ::ComplexElem)
 ```
 
 **Examples**
@@ -100,7 +92,7 @@ f = x^3 + 3x + 1
 ### Root finding
 
 ```@docs
-roots(::acb_poly)
+roots(::ComplexPoly)
 ```
 
 **Examples**
@@ -139,8 +131,8 @@ f = from_roots(R, xs)
 ### Bounding absolute values of roots
 
 ```@docs
-roots_upper_bound(::arb_poly)
-roots_upper_bound(::acb_poly)
+roots_upper_bound(::RealPoly)
+roots_upper_bound(::ComplexPoly)
 ```
 
 ### Lifting
@@ -174,28 +166,28 @@ or contain other exact or inexact polynomials. The following functions are
 provided for this purpose.
 
 ```@docs
-overlaps(::arb_poly, ::arb_poly)
-overlaps(::acb_poly, ::acb_poly)
+overlaps(::RealPoly, ::RealPoly)
+overlaps(::ComplexPoly, ::ComplexPoly)
 ```
 
 ```@docs
-contains(::arb_poly, ::arb_poly)
-contains(::acb_poly, ::acb_poly)
+contains(::RealPoly, ::RealPoly)
+contains(::ComplexPoly, ::ComplexPoly)
 ```
 
 ```@docs
-contains(::arb_poly, ::fmpz_poly)
-contains(::arb_poly, ::fmpq_poly)
-contains(::acb_poly, ::fmpz_poly)
-contains(::acb_poly, ::fmpq_poly)
+contains(::RealPoly, ::fmpz_poly)
+contains(::RealPoly, ::fmpq_poly)
+contains(::ComplexPoly, ::fmpz_poly)
+contains(::ComplexPoly, ::fmpq_poly)
 ```
 
 It is sometimes also useful to be able to determine if there is a unique
 integer contained in the coefficient of an inexact constant polynomial.
 
 ```@docs
-unique_integer(::arb_poly)
-unique_integer(::acb_poly)
+unique_integer(::RealPoly)
+unique_integer(::ComplexPoly)
 ```
 
 **Examples**

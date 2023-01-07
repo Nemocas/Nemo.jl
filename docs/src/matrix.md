@@ -24,8 +24,10 @@ $\mathbb{Q}$                          | Flint               | `fmpq_mat`        
 $\mathbb{Z}/p\mathbb{Z}$ (small $p$)  | Flint               | `gfp_mat`           | `GFPMatSpace`
 $\mathbb{F}_{p^n}$ (small $p$)        | Flint               | `fq_nmod_mat`       | `FqNmodMatSpace`
 $\mathbb{F}_{p^n}$ (large $p$)        | Flint               | `fq_mat`            | `FqMatSpace
-$\mathbb{R}$                          | Arb                 | `arb_mat`           | `ArbMatSpace`
-$\mathbb{C}$                          | Arb                 | `acb_mat`           | `AcbMatSpace`
+$\mathbb{R}$ (arbitrary precision)    | Arb                 | `RealMat`           | `RealMatSpace`
+$\mathbb{C}$ (arbitrary precision)    | Arb                 | `ComplexMat`        | `ComplexMatSpace`
+$\mathbb{R}$ (fixed precision)        | Arb                 | `arb_mat`           | `ArbMatSpace`
+$\mathbb{C}$ (fixed precision)        | Arb                 | `acb_mat`           | `AcbMatSpace`
 
 The dimensions and base ring $R$ of a generic matrix are stored in its parent
 object.
@@ -54,19 +56,19 @@ matrix functionality, for specific rings in Nemo.
 ### Comparison operators
 
 ```@docs
-overlaps(::arb_mat, ::arb_mat)
+overlaps(::RealMat, ::RealMat)
 ```
 
 ```@docs
-overlaps(::acb_mat, ::acb_mat)
+overlaps(::ComplexMat, ::ComplexMat)
 ```
 
 ```@docs
-contains(::arb_mat, ::arb_mat)
+contains(::RealMat, ::RealMat)
 ```
 
 ```@docs
-contains(::acb_mat, ::acb_mat)
+contains(::ComplexMat, ::ComplexMat)
 ```
 
 In addition we have the following ad hoc comparison operators.
@@ -421,11 +423,11 @@ B = exp(A)
 ### Norm
 
 ```@docs
-bound_inf_norm(::arb_mat)
+bound_inf_norm(::RealMat)
 ```
 
 ```@docs
-bound_inf_norm(::acb_mat)
+bound_inf_norm(::ComplexMat)
 ```
 
 **Examples**
@@ -476,8 +478,8 @@ In case the matrix cannot be converted without loss, an `InexactError` is thrown
 ### Eigenvalues and Eigenvectors (experimental)
 
 ```@docs
-eigvals(::acb_mat)
-eigvals_simple(a::acb_mat)
+eigvals(::ComplexMat)
+eigvals_simple(a::ComplexMat)
 ```
 
 ```julia

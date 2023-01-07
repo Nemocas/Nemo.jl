@@ -97,8 +97,6 @@ end
 struct RealField <: Field
 end
 
-_prec(R::RealField) = precision(Balls)
-
 mutable struct RealElem <: FieldElem
   mid_exp::Int    # fmpz
   mid_size::UInt  # mp_size_t
@@ -291,15 +289,61 @@ end
 # arb as in arblib
 const ARB_DEFAULT_PRECISION = Ref{Int}(64)
 
+@doc Markdown.doc"""
+    set_precision!(::Type{Balls}, n::Int)
+
+Set the precision for all ball arithemtic to be `n`.
+
+# Examples
+
+```julia
+julia> const_pi(RealField())
+[3.141592653589793239 +/- 5.96e-19]
+
+julia> set_precision!(Balls, 200); const_pi(RealField())
+[3.14159265358979323846264338327950288419716939937510582097494 +/- 5.73e-60]
+```
+"""
 function set_precision!(::Type{Balls}, n::Int)
   arb_check_precision(n)
   ARB_DEFAULT_PRECISION[] = n
 end
 
+@doc Markdown.doc"""
+    precision(::Type{Balls})
+
+Return the precision for ball arithemtic.
+
+# Examples
+
+```julia
+julia> set_precision!(Balls, 200); precision(Balls)
+200
+```
+"""
 function Base.precision(::Type{Balls})
   return ARB_DEFAULT_PRECISION[]
 end
 
+@doc Markdown.doc"""
+    set_precision!(f, ::Type{Balls}, n::Int)
+
+Change ball arithmetic precision to `n` for the duration of `f`..
+
+# Examples
+
+```julia
+julia> set_precision!(Balls, 4) do
+         const_pi(RealField())
+       end
+[3e+0 +/- 0.376]
+
+julia> set_precision!(Balls, 200) do
+         const_pi(RealField())
+       end
+[3.14159265358979323846264338327950288419716939937510582097494 +/- 5.73e-60]
+```
+"""
 function set_precision!(f, ::Type{Balls}, prec::Int)
   arb_check_precision(prec)
   old = precision(Balls)
