@@ -1,4 +1,4 @@
-RR = ArbField()
+RR = ArbField(64)
 
 @testset "arb_poly.constructors" begin
    S1 = PolyRing(RR)
@@ -79,7 +79,7 @@ end
 end
 
 @testset "arb_poly.polynomial" begin
-   R = ArbField()
+   R = ArbField(53)
 
    f = polynomial(R, [])
    g = polynomial(R, [1, 2, 3])
@@ -99,7 +99,7 @@ end
 end
 
 @testset "arb_poly.similar" begin
-   R = ArbField()
+   R = ArbField(53)
 
    f = polynomial(R, [1, 2, 3])
    g = similar(f)

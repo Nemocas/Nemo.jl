@@ -1,5 +1,5 @@
-RR = AcbField()
-CC = AcbField()
+RR = AcbField(64)
+CC = AcbField(64)
 
 @testset "acb_poly.constructors" begin
    S1 = PolyRing(CC)

@@ -1,28 +1,4 @@
-RR = ArbField()
-
-@testset "arb.precision" begin
-   old_prec = precision(ArbField)
-
-   set_precision!(ArbField, 100) do
-      RR = ArbField()
-      @test precision(RR) == 100
-   end
-
-   set_precision!(ArbField(), 100) do
-      RR = ArbField()
-      @test precision(RR) == 100
-   end
-
-   @test precision(ArbField) == old_prec
-
-   set_precision!(ArbField, 200)
-   @test precision(ArbField) == 200
-
-   set_precision!(ArbField(), 300)
-   @test precision(ArbField) == 300
-
-   set_precision!(ArbField, old_prec)
-end
+RR = ArbField(64)
 
 @testset "arb.constructors" begin
    @test isa(RR, ArbField)
@@ -33,7 +9,8 @@ end
    @test parent_type(arb) == ArbField
    @test base_ring(RR) == Union{}
 
-   @test ArbField() == ArbField()
+   @test ArbField(10, cached = true) === ArbField(10, cached = true)
+   @test ArbField(11, cached = false) !== ArbField(11, cached = false)
 end
 
 @testset "arf.hecke_semantics" begin
@@ -92,9 +69,7 @@ end
 
    @test abs(Float64(RR("2.3")) - 2.3) < 1e-10
    @test setprecision(BigFloat, 1000) do
-      set_precision!(Balls, 1000) do
-         abs(BigFloat(RR("2.3")) - BigFloat("2.3")) < 1e-299
-      end
+      abs(BigFloat(ArbField(1000)("2.3")) - BigFloat("2.3")) < 1e-299
    end
 
    for T in [Float64, BigFloat]
@@ -288,7 +263,7 @@ end
 
    @test accuracy_bits(RR(0)) == typemax(Int)
    @test accuracy_bits(RR("+/- inf")) == -typemax(Int)
-   @test accuracy_bits(RR("0.1")) > precision(Balls) - 4
+   @test accuracy_bits(RR("0.1")) > precision(RR) - 4
 
    uniq, n = unique_integer(RR("3 +/- 0.001"))
    @test uniq
@@ -301,12 +276,11 @@ end
    @test contains(setunion(RR(3), RR(4)), 4)
 
    # Issue #499
-   set_precision!(Balls, 1000) do
-     b, i = unique_integer(RR(2)^1000)
-     b, i = unique_integer(RR(2)^1000)
-     b, i = unique_integer(RR(2)^1000)
-     b, i = unique_integer(RR(2)^1000)
-   end
+   RRR = ArbField(1000)
+   b, i = unique_integer(RRR(2)^1000);
+   b, i = unique_integer(RRR(2)^1000);
+   b, i = unique_integer(RRR(2)^1000);
+   b, i = unique_integer(RRR(2)^1000);
 end
 
 @testset "arb.unsafe_ops" begin
@@ -529,7 +503,7 @@ end
 end
 
 @testset "arb.lindep" begin
-   CC = AcbField()
+   CC = AcbField(64)
 
    tau = (1 + sqrt(CC(-23)))/2
    a = abs(modular_weber_f2(tau))^2
@@ -539,7 +513,7 @@ end
 end
 
 @testset "arb.simplest_rational_inside" begin
-   R = ArbField()
+   R = ArbField(64)
    @test @inferred simplest_rational_inside(R(1)) == 1
    @test simplest_rational_inside(R(1//2)) == 1//2
    @test simplest_rational_inside(R("0.1 +/- 0.01")) == 1//10
@@ -547,7 +521,7 @@ end
 end
 
 @testset "arb.rand" begin
-   R = ArbField()
+   R = ArbField(64)
 
    n = 100
    for _ in 1:n
@@ -564,9 +538,9 @@ end
       @test isfinite(r_precise)
       # Does not work for small precisions (< 20) because of radius
       if midpoint(r_precise) != 0 != radius(r_precise)
-         @test R(0.99) * R(2)^(-6 - precision(Balls)) <
+         @test R(0.99) * R(2)^(-6 - precision(R)) <
                abs(radius(r_precise) / midpoint(r_precise)) <
-               R(1.01) * R(2)^(3 - precision(Balls))
+               R(1.01) * R(2)^(3 - precision(R))
       end
       @test isfinite(r_wide)
       @test r_special isa arb

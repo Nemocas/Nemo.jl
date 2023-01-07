@@ -69,12 +69,12 @@ export flint_cleanup, flint_set_num_threads
 
 export error_dim_negative, ErrorConstrDimMismatch
 
-export ComplexField, PadicField, QadicField, NGFiniteField
+export PadicField, QadicField, NGFiniteField
 
 export QQBar
 
 # Things/constants which are also defined in AbstractAlgebra:
-export ZZ, QQ, RealField, FiniteField, NumberField
+export ZZ, QQ, FiniteField, NumberField
 
 ###############################################################################
 #
@@ -474,8 +474,6 @@ const FiniteField = FlintFiniteField
 #
 ###############################################################################
 
-const RealField = ArbField
-const ComplexField = AcbField
 GaussianIntegers() = FlintZZi
 GaussianRationals() = FlintQQi
 

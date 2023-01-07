@@ -1,5 +1,5 @@
-CC = AcbField()
-RR = ArbField()
+CC = AcbField(64)
+RR = ArbField(64)
 
 @testset "acb_mat.constructors" begin
    S = MatrixSpace(CC, 3, 3)
@@ -64,13 +64,13 @@ RR = ArbField()
    for T in [fmpz, fmpq, Int, BigInt, Float64, BigFloat, RR, CC, string, Rational{Int}, Rational{BigInt}]
       M = matrix(CC, map(T, arr))
       @test isa(M, acb_mat)
-      @test base_ring(M) == CC
+      @test M.base_ring == CC
       @test nrows(M) == 2
       @test ncols(M) == 2
 
       M2 = matrix(CC, 2, 3, map(T, arr2))
       @test isa(M2, acb_mat)
-      @test base_ring(M2) == CC
+      @test M2.base_ring == CC
       @test nrows(M2) == 2
       @test ncols(M2) == 3
       @test_throws ErrorConstrDimMismatch matrix(CC, 2, 2, map(T, arr2))
@@ -80,12 +80,12 @@ RR = ArbField()
    M3 = zero_matrix(CC, 2, 3)
 
    @test isa(M3, acb_mat)
-   @test base_ring(M3) == CC
+   @test M3.base_ring == CC
 
    M4 = identity_matrix(CC, 3)
 
    @test isa(M4, acb_mat)
-   @test base_ring(M4) == CC
+   @test M4.base_ring == CC
 
    a = zero_matrix(CC, 2, 2)
    b = zero_matrix(CC, 2, 3)

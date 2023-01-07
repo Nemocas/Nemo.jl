@@ -1,5 +1,5 @@
-RR = ArbField()
-CC = AcbField()
+RR = ArbField(64)
+CC = AcbField(64)
 
 @testset "acb.constructors" begin
    @test isa(CC, AcbField)
@@ -11,8 +11,8 @@ CC = AcbField()
    @test elem_type(AcbField) == acb
    @test parent_type(acb) == AcbField
 
-#   @test AcbField(10, cached = true) === AcbField(10, cached = true)
-#   @test AcbField(11, cached = false) !== AcbField(11, cached = false)
+   @test AcbField(10, cached = true) === AcbField(10, cached = true)
+   @test AcbField(11, cached = false) !== AcbField(11, cached = false)
 
    for T in [Int32, Int, BigInt, Complex{Int}, Complex{Float64}, Rational{Int}, Rational{BigInt}, Float64, BigFloat, fmpz, fmpq, arb]
      @test acb === Nemo.promote_rule(acb, T)
@@ -174,7 +174,7 @@ end
 
    @test accuracy_bits(CC(0)) == typemax(Int)
    @test accuracy_bits(CC("+/- inf")) == -typemax(Int)
-   @test accuracy_bits(CC("0.1")) > precision(Balls) - 4
+   @test accuracy_bits(CC("0.1")) > precision(CC) - 4
 
    uniq, n = unique_integer(CC("3 +/- 0.001"))
    @test uniq
@@ -442,52 +442,32 @@ end
 end
 
 @testset "acb.lindep" begin
-   set_precision!(Balls, 512) do
-     tau1 = CC(1//3, 8//7)
-     tau2 = CC(1//5, 9//8)
-     A1 = modular_weber_f1(tau1)^8; B1 = modular_weber_f1(2*tau1)^8
+   CC = AcbField(512)
+   tau1 = CC(1//3, 8//7)
+   tau2 = CC(1//5, 9//8)
+   A1 = modular_weber_f1(tau1)^8; B1 = modular_weber_f1(2*tau1)^8
 
-     vals1 = [A1^i*B1^j for i in 0:2 for j in 0:2];
-     C = lindep(vals1, 150)
+   vals1 = [A1^i*B1^j for i in 0:2 for j in 0:2];
+   C = lindep(vals1, 150)
 
-     @test_throws DomainError lindep(vals1, -1)
+   @test_throws DomainError lindep(vals1, -1)
 
-     R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
-     Phi = sum([C[3*i+j+1]*x^i*y^j for i in 0:2 for j in 0:2])
+   R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+   Phi = sum([C[3*i+j+1]*x^i*y^j for i in 0:2 for j in 0:2])
 
-     @test Phi == x^2*y+16*x-y^2
+   @test Phi == x^2*y+16*x-y^2
 
-     A2 = modular_weber_f1(tau2)^8; B2 = modular_weber_f1(2*tau2)^8
-     vals2 = [A2^i*B2^j for i in 0:2 for j in 0:2]
+   A2 = modular_weber_f1(tau2)^8; B2 = modular_weber_f1(2*tau2)^8
+   vals2 = [A2^i*B2^j for i in 0:2 for j in 0:2]
 
-     vals = permutedims([vals1 vals2])
-     C = lindep(vals, 150)
+   vals = permutedims([vals1 vals2])
+   C = lindep(vals, 150)
 
-     @test_throws DomainError lindep(vals, -1)
+   @test_throws DomainError lindep(vals, -1)
 
-     Phi = sum([C[3*i+j+1]*x^i*y^j for i in 0:2 for j in 0:2])
+   Phi = sum([C[3*i+j+1]*x^i*y^j for i in 0:2 for j in 0:2])
 
-     @test Phi == x^2*y+16*x-y^2
-  end
-end
+   @test Phi == x^2*y+16*x-y^2
 
-@testset "acb.integration" begin
-   res = Nemo.integrate(CC, x->x,  -1, 1)
-   @test contains(res, CC(0))
-   @test imag(res) == CC(0)
-   @test radius(real(res)) < 3e-19
-
-   res = Nemo.integrate(CC, x->x^2, -1, 1)
-   @test contains(res, CC(2//3))
-   @test imag(res) == CC(0)
-   @test radius(real(res)) < 7e-19
-
-   res = Nemo.integrate(CC, sin, 0, const_pi(CC))
-   @test overlaps(res, CC(2))
-   @test imag(res) == CC(0)
-   @test radius(real(res)) < 4e-18
-
-   res = Nemo.integrate(CC, exp, 0, 1, rel_tol = 1.0e-6, abs_tol = 1.0e-6)
-   @test overlaps(res, CC(const_e(parent(real(zero(CC))))) - 1)
-   @test radius(real(res)) < 1.0e-6
+   CC = AcbField(64)
 end

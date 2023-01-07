@@ -104,12 +104,19 @@ include("flint/fq_default_poly.jl")
 
 include("arb/arb_poly.jl")
 
+include("arb/RealPoly.jl")
+
 include("arb/acb_poly.jl")
+
+include("arb/ComplexPoly.jl")
 
 include("arb/arb_mat.jl")
 
+include("arb/RealMat.jl")
+
 include("arb/acb_mat.jl")
 
+include("arb/ComplexMat.jl")
 include("gaussiannumbers/ZZi.jl")
 
 include("Factor.jl")

@@ -6,6 +6,8 @@ const ring_to_mat = Dict(FlintZZ                         => fmpz_mat,
                          FiniteField(fmpz(3), 2, "b")[1] => fq_mat,
                          ArbField()                      => arb_mat,
                          AcbField()                      => acb_mat,
+                         RealField()                     => RealMat,
+                         ComplexField()                  => ComplexMat,
                          )
 
 include("flint/fmpz-test.jl")
@@ -51,9 +53,13 @@ include("flint/fmpz_mat-test.jl")
 include("flint/fmpq_mat-test.jl")
 
 include("arb/arb_poly-test.jl")
+include("arb/RealPoly-test.jl")
 include("arb/acb_poly-test.jl")
+include("arb/Complexpoly-test.jl")
 include("arb/arb_mat-test.jl")
+include("arb/RealMat-test.jl")
 include("arb/acb_mat-test.jl")
+include("arb/ComplexMat-test.jl")
 
 include("flint/fmpz_mpoly-test.jl")
 include("flint/fmpq_mpoly-test.jl")
