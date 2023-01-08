@@ -857,7 +857,6 @@ function factor_distinct_deg(x::fmpz_mod_poly)
   return res
 end
 
-
 function roots(a::fmpz_mod_poly)
   R = parent(a)
   n = R.base_ring.ninv

@@ -471,6 +471,25 @@ function factor_distinct_deg(x::gfp_poly)
   return res
 end
 
+function roots(a::gfp_poly)
+  R = parent(a)
+  n = R.n
+  fac = nmod_poly_factor(n)
+  ccall((:nmod_poly_roots, libflint), UInt,
+          (Ref{nmod_poly_factor}, Ref{gfp_poly}, Cint),
+          fac, a, 0)
+  f = R()
+  res = gfp_elem[]
+  for i in 1:fac.num
+    ccall((:nmod_poly_factor_get_nmod_poly, libflint), Nothing,
+          (Ref{gfp_poly}, Ref{nmod_poly_factor}, Int),
+          f, fac, i - 1)
+    @assert isone(coeff(f, 1))
+    push!(res, -coeff(f, 0))
+  end
+  return res
+end
+
 ################################################################################
 #
 #   Remove and valuation

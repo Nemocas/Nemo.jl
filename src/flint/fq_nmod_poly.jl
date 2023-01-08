@@ -723,6 +723,25 @@ function factor_distinct_deg(x::fq_nmod_poly)
    return res
 end
 
+function roots(x::fq_nmod_poly)
+   R = parent(x)
+   F = base_ring(R)
+   fac = fq_nmod_poly_factor(F)
+   ccall((:fq_nmod_poly_roots, libflint), Nothing,
+         (Ref{fq_nmod_poly_factor}, Ref{fq_nmod_poly}, Cint,
+         Ref{FqNmodFiniteField}), fac, x, 0, F)
+   res = fq_nmod[]
+   for i in 1:fac.num
+      f = R()
+      ccall((:fq_nmod_poly_factor_get_poly, libflint), Nothing,
+            (Ref{fq_nmod_poly}, Ref{fq_nmod_poly_factor}, Int,
+            Ref{FqNmodFiniteField}), f, fac, i-1, F)
+      @assert isone(coeff(f, 1))
+      push!(res, -coeff(f, 0))
+   end
+   return res
+end
+
 ################################################################################
 #
 #   Unsafe functions

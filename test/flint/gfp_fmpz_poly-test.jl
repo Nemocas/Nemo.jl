@@ -511,6 +511,7 @@ end
 @testset "gfp_fmpz_poly.factor" begin
    R = GF(fmpz(123456789012345678949))
    S, x = PolynomialRing(R, "x")
+   F = R
 
    f = 3*(x^2 + 2x + 1)
    g = x^3 + 3x + 1
@@ -535,6 +536,8 @@ end
 
    @test length(R) == 2
    @test R == Dict(3=>1, 1=>2)
+
+   @test issetequal(roots(5 * x * (x^2 + 1)*(x^2 + 2)*(x+1)^2), F.([0, 123456789012345678948, 32539196700765078531, 90917592311580600418]))
 end
 
 @testset "gfp_fmpz_poly.remove_valuation" begin

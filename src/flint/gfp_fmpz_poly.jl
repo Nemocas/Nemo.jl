@@ -424,6 +424,25 @@ function factor_distinct_deg(x::gfp_fmpz_poly)
   return res 
 end  
 
+function roots(a::gfp_fmpz_poly)
+  R = parent(a)
+  n = R.base_ring.ninv
+  fac = fmpz_mod_poly_factor(n)
+  ccall((:fmpz_mod_poly_roots, libflint), UInt,
+          (Ref{fmpz_mod_poly_factor}, Ref{gfp_fmpz_poly}, Cint, Ref{fmpz_mod_ctx_struct}),
+          fac, a, 0, n)
+  f = R()
+  res = gfp_fmpz_elem[]
+  for i in 1:fac.num
+    ccall((:fmpz_mod_poly_factor_get_fmpz_mod_poly, libflint), Nothing,
+          (Ref{gfp_fmpz_poly}, Ref{fmpz_mod_poly_factor}, Int, Ref{fmpz_mod_ctx_struct}),
+          f, fac, i - 1, n)
+    @assert isone(coeff(f, 1))
+    push!(res, -coeff(f, 0))
+  end
+  return res
+end
+
 ################################################################################
 #
 #  Unsafe functions

@@ -542,6 +542,8 @@ end
 
    @test length(B) == 3
    @test 11*prod([e for (h,e)=B]) == ((y + 1)*g*(y^5+y^3+y+1))
+
+   @test issetequal(roots(5 * y * (y^2 + 1)*(y^2 + 2)*(y+1) * (y - x)), R.([0, -1, x]))
 end
 
 @testset "fq_nmod_poly.remove_valuation" begin

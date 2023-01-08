@@ -637,6 +637,8 @@ end
   fac = factor_distinct_deg(x* (x^2 + 1)*(x^2 + 2)*(x+1))
 
   @test fac == Dict(2=>x^4+3*x^2+2,1=>x^2 + x)
+
+  @test issetequal(roots(5 * x * (x^2 + 1)*(x^2 + 2)*(x+1)^10), R.([0, -1]))
 end
 
 @testset "gfp_poly.canonicalization" begin
