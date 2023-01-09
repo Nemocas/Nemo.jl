@@ -144,7 +144,7 @@ end
 @doc Markdown.doc"""
     zero(a::AnticNumberField)
 
-Return the multiplicative identity, i.e. one, in the given number field.
+Return the additive identity, i.e. zero, in the given number field.
 """
 function zero(a::AnticNumberField)
    r = nf_elem(a)
