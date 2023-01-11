@@ -49,7 +49,7 @@ end
 
    g = fmpz()
    @test isa(f, RingElem)
-   @test g == 1
+   @test g == 0
 end
 
 @testset "fmpz.rand" begin
