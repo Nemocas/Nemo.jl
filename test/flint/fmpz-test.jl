@@ -30,17 +30,26 @@ end
    c = fmpz("-1234567876545678376545678900000000000000000000000000")
    @test isa(c, RingElem)
 
+   @test a == fmpz("-123")
+   @test b == fmpz("12")
+
+   @test fmpz(234) == fmpz(SubString("12345",2,4))
+
    d = fmpz(c)
    @test isa(d, RingElem)
+   @test c == d
 
    e = deepcopy(c)
    @test isa(e, RingElem)
+   @test c == e
 
    f = fmpz(BigFloat(10)^100)
    @test isa(f, RingElem)
+   @test f == fmpz(10)^100
 
    g = fmpz()
    @test isa(f, RingElem)
+   @test g == 1
 end
 
 @testset "fmpz.rand" begin

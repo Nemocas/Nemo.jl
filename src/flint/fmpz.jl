@@ -2451,14 +2451,18 @@ end
 #
 ###############################################################################
 
-function parse(::Type{fmpz}, s::String, base::Int = 10)
-    s = string(s)
-    sgn = s[1] == '-' ? -1 : 1
-    i = 1 + (sgn == -1)
+function parse(::Type{fmpz}, s::AbstractString, base::Int = 10)
+    if s[1] == '-'
+        sgn = -1
+        s2 = string(SubString(s, 2))
+    else
+        sgn = 1
+        s2 = string(s)
+    end
     z = fmpz()
     err = ccall((:fmpz_set_str, libflint),
                Int32, (Ref{fmpz}, Ptr{UInt8}, Int32),
-               z, string(SubString(s, i)), base)
+               z, s2, base)
     err == 0 || error("Invalid big integer: $(repr(s))")
     return sgn < 0 ? -z : z
 end
