@@ -417,7 +417,7 @@ end
 
 function (R::ZZModRing)(a::ZZRingElem)
    d = ZZRingElem()
-   ccall((:ZZModRingElem, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}),
+   ccall((:fmpz_mod, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}),
              d, a, R.n)
    return ZZModRingElem(d, R)
 end

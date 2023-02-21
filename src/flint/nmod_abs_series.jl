@@ -10,8 +10,8 @@ export nmod_abs_series, NmodAbsSeriesRing,
        gfp_abs_series, GFPAbsSeriesRing
 
 for (etype, rtype, mtype, brtype, flint_fn) in (
-   (nmod_abs_series, NmodAbsSeriesRing, zzModRingElem, zzModRing, "zzModPolyRingElem"),
-   (gfp_abs_series, GFPAbsSeriesRing, fpFieldElem, fpField, "zzModPolyRingElem"))
+   (nmod_abs_series, NmodAbsSeriesRing, zzModRingElem, zzModRing, "nmod_poly"),
+   (gfp_abs_series, GFPAbsSeriesRing, fpFieldElem, fpField, "nmod_poly"))
 @eval begin
 
 ###############################################################################

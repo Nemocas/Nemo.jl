@@ -10,8 +10,8 @@ export fmpz_mod_abs_series, FmpzModAbsSeriesRing,
        gfp_fmpz_abs_series, GFPFmpzAbsSeriesRing
 
 for (etype, rtype, ctype, mtype, brtype, flint_fn) in (
-   (fmpz_mod_abs_series, FmpzModAbsSeriesRing, fmpz_mod_ctx_struct, ZZModRingElem, ZZModRing, "ZZModPolyRingElem"),
-   (gfp_fmpz_abs_series, GFPFmpzAbsSeriesRing, fmpz_mod_ctx_struct, FpFieldElem, FpField, "ZZModPolyRingElem"))
+   (fmpz_mod_abs_series, FmpzModAbsSeriesRing, fmpz_mod_ctx_struct, ZZModRingElem, ZZModRing, "fmpz_mod_poly"),
+   (gfp_fmpz_abs_series, GFPFmpzAbsSeriesRing, fmpz_mod_ctx_struct, FpFieldElem, FpField, "fmpz_mod_poly"))
 @eval begin
 
 ###############################################################################

@@ -365,7 +365,7 @@ end
 #
 ###############################################################################
 
-for (jT, cN, cT) in ((QQFieldElem, :QQFieldElem, Ref{QQFieldElem}), (ZZRingElem, :ZZRingElem, Ref{ZZRingElem}),
+for (jT, cN, cT) in ((QQFieldElem, :fmpq, Ref{QQFieldElem}), (ZZRingElem, :fmpz, Ref{ZZRingElem}),
                      (Int, :si, Int))
    @eval begin
       function +(a::QQMPolyRingElem, b::($jT))

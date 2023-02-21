@@ -10,8 +10,8 @@ export fq_rel_series, FqRelSeriesRing,
        fq_nmod_rel_series, FqNmodRelSeriesRing
 
 for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
-   (fq_rel_series, FqRelSeriesRing, FqPolyRepField, FqPolyRepFieldElem, "FqPolyRepPolyRingElem", "FqPolyRepFieldElem"),
-   (fq_nmod_rel_series, FqNmodRelSeriesRing, fqPolyRepField, fqPolyRepFieldElem, "fqPolyRepPolyRingElem", "fqPolyRepFieldElem"))
+   (fq_rel_series, FqRelSeriesRing, FqPolyRepField, FqPolyRepFieldElem, "fq_poly", "fq"),
+   (fq_nmod_rel_series, FqNmodRelSeriesRing, fqPolyRepField, fqPolyRepFieldElem, "fq_nmod_poly", "fq_nmod"))
 @eval begin
 
 ###############################################################################
