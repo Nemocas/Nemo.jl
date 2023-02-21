@@ -25,7 +25,7 @@ compute the preimage of is not in the image of the embedding.
 ### Computing an embedding
 
 ```@docs
-embed(::FqNmodFiniteField, ::FqNmodFiniteField)
+embed(::fqPolyRepField, ::fqPolyRepField)
 ```
 
 **Examples**
@@ -51,7 +51,7 @@ julia> z = k4(x2)
 ### Computing the preimage of an embedding
 
 ```@docs
-preimage_map(::FqNmodFiniteField, ::FqNmodFiniteField)
+preimage_map(::fqPolyRepField, ::fqPolyRepField)
 preimage_map(::FinFieldMorphism)
 ```
 

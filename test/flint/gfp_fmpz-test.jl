@@ -3,21 +3,21 @@
 
    @test_throws DomainError GF(-ZZ(13))
 
-   @test elem_type(R) == Nemo.gfp_fmpz_elem
-   @test elem_type(Nemo.GaloisFmpzField) == Nemo.gfp_fmpz_elem
-   @test parent_type(Nemo.gfp_fmpz_elem) == Nemo.GaloisFmpzField
+   @test elem_type(R) == Nemo.FpFieldElem
+   @test elem_type(Nemo.FpField) == Nemo.FpFieldElem
+   @test parent_type(Nemo.FpFieldElem) == Nemo.FpField
 
-   @test Nemo.promote_rule(elem_type(R), fmpz) == elem_type(R)
+   @test Nemo.promote_rule(elem_type(R), ZZRingElem) == elem_type(R)
 
-   @test isa(R, Nemo.GaloisFmpzField)
+   @test isa(R, Nemo.FpField)
 
-   @test isa(R(), Nemo.gfp_fmpz_elem)
+   @test isa(R(), Nemo.FpFieldElem)
 
-   @test isa(R(11), Nemo.gfp_fmpz_elem)
+   @test isa(R(11), Nemo.FpFieldElem)
 
    a = R(11)
 
-   @test isa(R(a), Nemo.gfp_fmpz_elem)
+   @test isa(R(a), Nemo.FpFieldElem)
 
    for i = 1:1000
       p = rand(BigInt(1):BigInt(4273673264873254848326487))*6 + 1
@@ -51,12 +51,12 @@
    T = GF(ZZ(19), cached = false)
    @test !(S === T)
 
-   S = GF(fmpz(17))
-   T = GF(fmpz(17))
+   S = GF(ZZRingElem(17))
+   T = GF(ZZRingElem(17))
    @test T === S
 
-   S = GF(fmpz(19), cached = false)
-   T = GF(fmpz(19), cached = false)
+   S = GF(ZZRingElem(19), cached = false)
+   T = GF(ZZRingElem(19), cached = false)
    @test !(S === T)
 end
 
@@ -67,11 +67,11 @@ end
    test_rand(R, 1:9)
    test_rand(R, Int16(1):Int16(9))
    test_rand(R, big(1):big(9))
-   test_rand(R, fmpz(1):fmpz(9))
+   test_rand(R, ZZRingElem(1):ZZRingElem(9))
    test_rand(R, [3,9,2])
    test_rand(R, Int16[3,9,2])
    test_rand(R, BigInt[3,9,2])
-   test_rand(R, fmpz[3,9,2])
+   test_rand(R, ZZRingElem[3,9,2])
 end
 
 @testset "gfp_fmpz.printing" begin
@@ -103,7 +103,7 @@ end
 
    @test data(R(3)) == 3
    @test lift(R(3)) == 3
-   @test isa(lift(R(3)), fmpz)
+   @test isa(lift(R(3)), ZZRingElem)
 
    R2 = GF(ZZ(2))
    R22 = GF(2)

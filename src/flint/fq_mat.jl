@@ -1,10 +1,10 @@
 ################################################################################
 #
-#  fq_mat.jl: flint fq_mat types in julia
+#  FqPolyRepMatrix.jl: flint FqPolyRepMatrix types in julia
 #
 ################################################################################
 
-export fq_mat, FqMatSpace, getindex, setindex!, deepcopy,
+export FqPolyRepMatrix, FqPolyRepMatrixSpace, getindex, setindex!, deepcopy,
        parent, base_ring, zero, one, transpose,
        transpose!, rref, rref!, tr, det, rank, inv, solve, lu,
        sub, hcat, vcat, Array, lift, lift!, MatrixSpace, check_parent,
@@ -16,13 +16,13 @@ export fq_mat, FqMatSpace, getindex, setindex!, deepcopy,
 #
 ################################################################################
 
-parent_type(::Type{fq_mat}) = FqMatSpace
+parent_type(::Type{FqPolyRepMatrix}) = FqPolyRepMatrixSpace
 
-elem_type(::Type{FqMatSpace}) = fq_mat
+elem_type(::Type{FqPolyRepMatrixSpace}) = FqPolyRepMatrix
 
-dense_matrix_type(::Type{fq}) = fq_mat
+dense_matrix_type(::Type{FqPolyRepFieldElem}) = FqPolyRepMatrix
 
-function check_parent(x::fq_mat, y::fq_mat, throw::Bool = true)
+function check_parent(x::FqPolyRepMatrix, y::FqPolyRepMatrix, throw::Bool = true)
    fl = base_ring(x) != base_ring(y)
    fl && throw && error("Residue rings must be equal")
    fl && return false
@@ -37,8 +37,8 @@ end
 #
 ###############################################################################
 
-similar(::fq_mat, R::FqFiniteField, r::Int, c::Int) = fq_mat(r, c, R)
-zero(m::fq_mat, R::FqFiniteField, r::Int, c::Int) = fq_mat(r, c, R)
+similar(::FqPolyRepMatrix, R::FqPolyRepField, r::Int, c::Int) = FqPolyRepMatrix(r, c, R)
+zero(m::FqPolyRepMatrix, R::FqPolyRepField, r::Int, c::Int) = FqPolyRepMatrix(r, c, R)
 
 ################################################################################
 #
@@ -46,68 +46,68 @@ zero(m::fq_mat, R::FqFiniteField, r::Int, c::Int) = fq_mat(r, c, R)
 #
 ################################################################################
 
-@inline function getindex(a::fq_mat, i::Int, j::Int)
+@inline function getindex(a::FqPolyRepMatrix, i::Int, j::Int)
    @boundscheck Generic._checkbounds(a, i, j)
    GC.@preserve a begin
-      el = ccall((:fq_mat_entry, libflint), Ptr{fq},
-                 (Ref{fq_mat}, Int, Int), a, i - 1 , j - 1)
+      el = ccall((:fq_mat_entry, libflint), Ptr{FqPolyRepFieldElem},
+                 (Ref{FqPolyRepMatrix}, Int, Int), a, i - 1 , j - 1)
       z = base_ring(a)()
-      ccall((:fq_set, libflint), Nothing, (Ref{fq}, Ptr{fq}), z, el)
+      ccall((:fq_set, libflint), Nothing, (Ref{FqPolyRepFieldElem}, Ptr{FqPolyRepFieldElem}), z, el)
    end
    return z
 end
 
-@inline function setindex!(a::fq_mat, u::fq, i::Int, j::Int)
+@inline function setindex!(a::FqPolyRepMatrix, u::FqPolyRepFieldElem, i::Int, j::Int)
    @boundscheck Generic._checkbounds(a, i, j)
    ccall((:fq_mat_entry_set, libflint), Nothing,
-         (Ref{fq_mat}, Int, Int, Ref{fq}, Ref{FqFiniteField}),
+         (Ref{FqPolyRepMatrix}, Int, Int, Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}),
          a, i - 1, j - 1, u, base_ring(a))
 end
 
-@inline function setindex!(a::fq_mat, u::fmpz, i::Int, j::Int)
+@inline function setindex!(a::FqPolyRepMatrix, u::ZZRingElem, i::Int, j::Int)
    @boundscheck Generic._checkbounds(a, i, j)
    GC.@preserve a begin
-      el = ccall((:fq_mat_entry, libflint), Ptr{fq},
-                 (Ref{fq_mat}, Int, Int), a, i - 1, j - 1)
+      el = ccall((:fq_mat_entry, libflint), Ptr{FqPolyRepFieldElem},
+                 (Ref{FqPolyRepMatrix}, Int, Int), a, i - 1, j - 1)
       ccall((:fq_set_fmpz, libflint), Nothing,
-            (Ptr{fq}, Ref{fmpz}, Ref{FqFiniteField}), el, u, base_ring(a))
+            (Ptr{FqPolyRepFieldElem}, Ref{ZZRingElem}, Ref{FqPolyRepField}), el, u, base_ring(a))
    end
 end
 
-setindex!(a::fq_mat, u::Integer, i::Int, j::Int) =
+setindex!(a::FqPolyRepMatrix, u::Integer, i::Int, j::Int) =
         setindex!(a, base_ring(a)(u), i, j)
 
-function deepcopy_internal(a::fq_mat, dict::IdDict)
-  z = fq_mat(nrows(a), ncols(a), base_ring(a))
+function deepcopy_internal(a::FqPolyRepMatrix, dict::IdDict)
+  z = FqPolyRepMatrix(nrows(a), ncols(a), base_ring(a))
   ccall((:fq_mat_set, libflint), Nothing,
-        (Ref{fq_mat}, Ref{fq_mat}, Ref{FqFiniteField}), z, a, base_ring(a))
+        (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}), z, a, base_ring(a))
   return z
 end
 
-nrows(a::fq_mat) = a.r
+nrows(a::FqPolyRepMatrix) = a.r
 
-ncols(a::fq_mat) = a.c
+ncols(a::FqPolyRepMatrix) = a.c
 
-nrows(a::FqMatSpace) = a.nrows
+nrows(a::FqPolyRepMatrixSpace) = a.nrows
 
-ncols(a::FqMatSpace) = a.ncols
+ncols(a::FqPolyRepMatrixSpace) = a.ncols
 
-parent(a::fq_mat, cached::Bool = true) = FqMatSpace(base_ring(a), nrows(a), ncols(a), cached)
+parent(a::FqPolyRepMatrix, cached::Bool = true) = FqPolyRepMatrixSpace(base_ring(a), nrows(a), ncols(a), cached)
 
-base_ring(a::FqMatSpace) = a.base_ring
+base_ring(a::FqPolyRepMatrixSpace) = a.base_ring
 
-base_ring(a::fq_mat) = a.base_ring
+base_ring(a::FqPolyRepMatrix) = a.base_ring
 
-zero(a::FqMatSpace) = a()
+zero(a::FqPolyRepMatrixSpace) = a()
 
-function one(a::FqMatSpace)
+function one(a::FqPolyRepMatrixSpace)
   (nrows(a) != ncols(a)) && error("Matrices must be square")
   return a(one(base_ring(a)))
 end
 
-function iszero(a::fq_mat)
+function iszero(a::FqPolyRepMatrix)
    r = ccall((:fq_mat_is_zero, libflint), Cint,
-             (Ref{fq_mat}, Ref{FqFiniteField}), a, base_ring(a))
+             (Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}), a, base_ring(a))
   return Bool(r)
 end
 
@@ -117,16 +117,16 @@ end
 #
 ################################################################################
 
-function ==(a::fq_mat, b::fq_mat)
+function ==(a::FqPolyRepMatrix, b::FqPolyRepMatrix)
    if !(a.base_ring == b.base_ring)
       return false
    end
    r = ccall((:fq_mat_equal, libflint), Cint,
-             (Ref{fq_mat}, Ref{fq_mat}, Ref{FqFiniteField}), a, b, base_ring(a))
+             (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}), a, b, base_ring(a))
    return Bool(r)
 end
 
-isequal(a::fq_mat, b::fq_mat) = ==(a, b)
+isequal(a::FqPolyRepMatrix, b::FqPolyRepMatrix) = ==(a, b)
 
 ################################################################################
 #
@@ -134,8 +134,8 @@ isequal(a::fq_mat, b::fq_mat) = ==(a, b)
 #
 ################################################################################
 
-function transpose(a::fq_mat)
-   z = fq_mat(ncols(a), nrows(a), base_ring(a))
+function transpose(a::FqPolyRepMatrix)
+   z = FqPolyRepMatrix(ncols(a), nrows(a), base_ring(a))
    for i in 1:nrows(a)
       for j in 1:ncols(a)
          z[j, i] = a[i, j]
@@ -144,18 +144,18 @@ function transpose(a::fq_mat)
    return z
 end
 
-# There is no transpose for fq_mat
-#function transpose(a::fq_mat)
-#  z = FqMatSpace(base_ring(a), ncols(a), nrows(a))()
+# There is no transpose for FqPolyRepMatrix
+#function transpose(a::FqPolyRepMatrix)
+#  z = FqPolyRepMatrixSpace(base_ring(a), ncols(a), nrows(a))()
 #  ccall((:fq_mat_transpose, libflint), Nothing,
-#        (Ref{fq_mat}, Ref{fq_mat}, Ref{FqFiniteField}), z, a, base_ring(a))
+#        (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}), z, a, base_ring(a))
 #  return z
 #end
 #
-#function transpose!(a::fq_mat)
+#function transpose!(a::FqPolyRepMatrix)
 #  !is_square(a) && error("Matrix must be a square matrix")
 #  ccall((:fq_mat_transpose, libflint), Nothing,
-#        (Ref{fq_mat}, Ref{fq_mat}, Ref{FqFiniteField}), a, a, base_ring(a))
+#        (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}), a, a, base_ring(a))
 #end
 
 ###############################################################################
@@ -164,47 +164,47 @@ end
 #
 ###############################################################################
 
-function swap_rows!(x::fq_mat, i::Int, j::Int)
+function swap_rows!(x::FqPolyRepMatrix, i::Int, j::Int)
   ccall((:fq_mat_swap_rows, libflint), Nothing,
-        (Ref{fq_mat}, Ptr{Nothing}, Int, Int, Ref{FqFiniteField}),
+        (Ref{FqPolyRepMatrix}, Ptr{Nothing}, Int, Int, Ref{FqPolyRepField}),
         x, C_NULL, i - 1, j - 1, base_ring(x))
   return x
 end
 
-function swap_rows(x::fq_mat, i::Int, j::Int)
+function swap_rows(x::FqPolyRepMatrix, i::Int, j::Int)
    (1 <= i <= nrows(x) && 1 <= j <= nrows(x)) || throw(BoundsError())
    y = deepcopy(x)
    return swap_rows!(y, i, j)
 end
 
-function swap_cols!(x::fq_mat, i::Int, j::Int)
+function swap_cols!(x::FqPolyRepMatrix, i::Int, j::Int)
   ccall((:fq_mat_swap_cols, libflint), Nothing,
-        (Ref{fq_mat}, Ptr{Nothing}, Int, Int, Ref{FqFiniteField}),
+        (Ref{FqPolyRepMatrix}, Ptr{Nothing}, Int, Int, Ref{FqPolyRepField}),
         x, C_NULL, i - 1, j - 1, base_ring(x))
   return x
 end
 
-function swap_cols(x::fq_mat, i::Int, j::Int)
+function swap_cols(x::FqPolyRepMatrix, i::Int, j::Int)
    (1 <= i <= ncols(x) && 1 <= j <= ncols(x)) || throw(BoundsError())
    y = deepcopy(x)
    return swap_cols!(y, i, j)
 end
 
-function reverse_rows!(x::fq_mat)
+function reverse_rows!(x::FqPolyRepMatrix)
    ccall((:fq_mat_invert_rows, libflint), Nothing,
-         (Ref{fq_mat}, Ptr{Nothing}, Ref{FqFiniteField}), x, C_NULL, base_ring(x))
+         (Ref{FqPolyRepMatrix}, Ptr{Nothing}, Ref{FqPolyRepField}), x, C_NULL, base_ring(x))
    return x
 end
 
-reverse_rows(x::fq_mat) = reverse_rows!(deepcopy(x))
+reverse_rows(x::FqPolyRepMatrix) = reverse_rows!(deepcopy(x))
 
-function reverse_cols!(x::fq_mat)
+function reverse_cols!(x::FqPolyRepMatrix)
    ccall((:fq_mat_invert_cols, libflint), Nothing,
-         (Ref{fq_mat}, Ptr{Nothing}, Ref{FqFiniteField}), x, C_NULL, base_ring(x))
+         (Ref{FqPolyRepMatrix}, Ptr{Nothing}, Ref{FqPolyRepField}), x, C_NULL, base_ring(x))
    return x
 end
 
-reverse_cols(x::fq_mat) = reverse_cols!(deepcopy(x))
+reverse_cols(x::FqPolyRepMatrix) = reverse_cols!(deepcopy(x))
 
 ################################################################################
 #
@@ -212,10 +212,10 @@ reverse_cols(x::fq_mat) = reverse_cols!(deepcopy(x))
 #
 ################################################################################
 
-function -(x::fq_mat)
+function -(x::FqPolyRepMatrix)
    z = similar(x)
    ccall((:fq_mat_neg, libflint), Nothing,
-         (Ref{fq_mat}, Ref{fq_mat}, Ref{FqFiniteField}), z, x, base_ring(x))
+         (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}), z, x, base_ring(x))
    return z
 end
 
@@ -225,31 +225,31 @@ end
 #
 ################################################################################
 
-function +(x::fq_mat, y::fq_mat)
+function +(x::FqPolyRepMatrix, y::FqPolyRepMatrix)
    check_parent(x,y)
    z = similar(x)
    ccall((:fq_mat_add, libflint), Nothing,
-         (Ref{fq_mat}, Ref{fq_mat}, Ref{fq_mat}, Ref{FqFiniteField}),
+         (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}),
          z, x, y, base_ring(x))
    return z
 end
 
-function -(x::fq_mat, y::fq_mat)
+function -(x::FqPolyRepMatrix, y::FqPolyRepMatrix)
    check_parent(x,y)
    z = similar(x)
    ccall((:fq_mat_sub, libflint), Nothing,
-         (Ref{fq_mat}, Ref{fq_mat}, Ref{fq_mat}, Ref{FqFiniteField}),
+         (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}),
          z, x, y, base_ring(x))
 
    return z
 end
 
-function *(x::fq_mat, y::fq_mat)
+function *(x::FqPolyRepMatrix, y::FqPolyRepMatrix)
    (base_ring(x) != base_ring(y)) && error("Base ring must be equal")
    (ncols(x) != nrows(y)) && error("Dimensions are wrong")
    z = similar(x, nrows(x), ncols(y))
    ccall((:fq_mat_mul, libflint), Nothing,
-         (Ref{fq_mat}, Ref{fq_mat}, Ref{fq_mat}, Ref{FqFiniteField}), z, x, y, base_ring(x))
+         (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}), z, x, y, base_ring(x))
    return z
 end
 
@@ -260,36 +260,36 @@ end
 #
 ################################################################################
 
-function mul!(a::fq_mat, b::fq_mat, c::fq_mat)
+function mul!(a::FqPolyRepMatrix, b::FqPolyRepMatrix, c::FqPolyRepMatrix)
    ccall((:fq_mat_mul, libflint), Nothing,
-         (Ref{fq_mat}, Ref{fq_mat}, Ref{fq_mat}, Ref{FqFiniteField}),
+         (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}),
          a, b, c, base_ring(a))
   return a
 end
 
-function add!(a::fq_mat, b::fq_mat, c::fq_mat)
+function add!(a::FqPolyRepMatrix, b::FqPolyRepMatrix, c::FqPolyRepMatrix)
    ccall((:fq_mat_add, libflint), Nothing,
-         (Ref{fq_mat}, Ref{fq_mat}, Ref{fq_mat}, Ref{FqFiniteField}),
+         (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}),
          a, b, c, base_ring(a))
   return a
 end
 
-function zero!(a::fq_mat)
+function zero!(a::FqPolyRepMatrix)
    ccall((:fq_mat_zero, libflint), Nothing,
-         (Ref{fq_mat}, Ref{FqFiniteField}), a, base_ring(a))
+         (Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}), a, base_ring(a))
    return a
 end
 
-function mul!(z::Vector{fq}, a::fq_mat, b::Vector{fq})
+function mul!(z::Vector{FqPolyRepFieldElem}, a::FqPolyRepMatrix, b::Vector{FqPolyRepFieldElem})
    ccall((:fq_mat_mul_vec_ptr, libflint), Nothing,
-         (Ptr{Ref{fq}}, Ref{fq_mat}, Ptr{Ref{fq}}, Int, Ref{FqFiniteField}),
+         (Ptr{Ref{FqPolyRepFieldElem}}, Ref{FqPolyRepMatrix}, Ptr{Ref{FqPolyRepFieldElem}}, Int, Ref{FqPolyRepField}),
          z, a, b, length(b), base_ring(a))
    return z
 end
 
-function mul!(z::Vector{fq}, a::Vector{fq}, b::fq_mat)
+function mul!(z::Vector{FqPolyRepFieldElem}, a::Vector{FqPolyRepFieldElem}, b::FqPolyRepMatrix)
    ccall((:fq_mat_vec_mul_ptr, libflint), Nothing,
-         (Ptr{Ref{fq}}, Ptr{Ref{fq}}, Int, Ref{fq_mat}, Ref{FqFiniteField}),
+         (Ptr{Ref{FqPolyRepFieldElem}}, Ptr{Ref{FqPolyRepFieldElem}}, Int, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}),
          z, a, length(a), b, base_ring(b))
    return z
 end
@@ -300,7 +300,7 @@ end
 #
 ################################################################################
 
-function *(x::fq_mat, y::fq)
+function *(x::FqPolyRepMatrix, y::FqPolyRepFieldElem)
    z = similar(x)
    for i in 1:nrows(x)
       for j in 1:ncols(x)
@@ -310,19 +310,19 @@ function *(x::fq_mat, y::fq)
    return z
 end
 
-*(x::fq, y::fq_mat) = y * x
+*(x::FqPolyRepFieldElem, y::FqPolyRepMatrix) = y * x
 
-function *(x::fq_mat, y::fmpz)
+function *(x::FqPolyRepMatrix, y::ZZRingElem)
    return base_ring(x)(y) * x
 end
 
-*(x::fmpz, y::fq_mat) = y * x
+*(x::ZZRingElem, y::FqPolyRepMatrix) = y * x
 
-function *(x::fq_mat, y::Integer)
+function *(x::FqPolyRepMatrix, y::Integer)
    return x * base_ring(x)(y)
 end
 
-*(x::Integer, y::fq_mat) = y * x
+*(x::Integer, y::FqPolyRepMatrix) = y * x
 
 ################################################################################
 #
@@ -338,16 +338,16 @@ end
 #
 ################################################################################
 
-function rref(a::fq_mat)
+function rref(a::FqPolyRepMatrix)
    z = deepcopy(a)
    r = ccall((:fq_mat_rref, libflint), Int,
-             (Ref{fq_mat}, Ref{FqFiniteField}), z, base_ring(a))
+             (Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}), z, base_ring(a))
    return r, z
 end
 
-function rref!(a::fq_mat)
+function rref!(a::FqPolyRepMatrix)
    r = ccall((:fq_mat_rref, libflint), Int,
-         (Ref{fq_mat}, Ref{FqFiniteField}), a, base_ring(a))
+         (Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}), a, base_ring(a))
    return r
 end
 
@@ -357,7 +357,7 @@ end
 #
 #################################################################################
 
-function tr(a::fq_mat)
+function tr(a::FqPolyRepMatrix)
    !is_square(a) && error("Non-square matrix")
    n = nrows(a)
    t = zero(base_ring(a))
@@ -373,7 +373,7 @@ end
 #
 ################################################################################
 
-function det(a::fq_mat)
+function det(a::FqPolyRepMatrix)
    !is_square(a) && error("Non-square matrix")
    n = nrows(a)
    R = base_ring(a)
@@ -398,7 +398,7 @@ end
 #
 ################################################################################
 
-function rank(a::fq_mat)
+function rank(a::FqPolyRepMatrix)
    n = nrows(a)
    if n == 0
       return 0
@@ -413,11 +413,11 @@ end
 #
 ################################################################################
 
-function inv(a::fq_mat)
+function inv(a::FqPolyRepMatrix)
    !is_square(a) && error("Matrix must be a square matrix")
    z = similar(a)
    r = ccall((:fq_mat_inv, libflint), Int,
-             (Ref{fq_mat}, Ref{fq_mat}, Ref{FqFiniteField}), z, a, base_ring(a))
+             (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}), z, a, base_ring(a))
    !Bool(r) && error("Matrix not invertible")
    return z
 end
@@ -428,19 +428,19 @@ end
 #
 ################################################################################
 
-function solve(x::fq_mat, y::fq_mat)
+function solve(x::FqPolyRepMatrix, y::FqPolyRepMatrix)
    (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
    !is_square(x)&& error("First argument not a square matrix in solve")
    (nrows(y) != nrows(x)) || ncols(y) != 1 && ("Not a column vector in solve")
    z = similar(y)
    r = ccall((:fq_mat_solve, libflint), Int,
-             (Ref{fq_mat}, Ref{fq_mat}, Ref{fq_mat}, Ref{FqFiniteField}),
+             (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}),
              z, x, y, base_ring(x))
    !Bool(r) && error("Singular matrix in solve")
    return z
 end
 
-function can_solve_with_solution(a::fq_mat, b::fq_mat; side::Symbol = :right)
+function can_solve_with_solution(a::FqPolyRepMatrix, b::FqPolyRepMatrix; side::Symbol = :right)
    (base_ring(a) != base_ring(b)) && error("Matrices must have same base ring")
    if side == :left
       (ncols(a) != ncols(b)) && error("Matrices must have same number of columns")
@@ -450,15 +450,15 @@ function can_solve_with_solution(a::fq_mat, b::fq_mat; side::Symbol = :right)
       (nrows(a) != nrows(b)) && error("Matrices must have same number of rows")
       x = similar(a, ncols(a), ncols(b))
       r = ccall((:fq_mat_can_solve, libflint), Cint,
-                (Ref{fq_mat}, Ref{fq_mat}, Ref{fq_mat},
-                 Ref{FqFiniteField}), x, a, b, base_ring(a))
+                (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix},
+                 Ref{FqPolyRepField}), x, a, b, base_ring(a))
       return Bool(r), x
    else
       error("Unsupported argument :$side for side: Must be :left or :right.")
    end
 end
 
-function can_solve(a::fq_mat, b::fq_mat; side::Symbol = :right)
+function can_solve(a::FqPolyRepMatrix, b::FqPolyRepMatrix; side::Symbol = :right)
    fl, _ = can_solve_with_solution(a, b, side = side)
    return fl
 end
@@ -469,11 +469,11 @@ end
 #
 ################################################################################
 
-function lu!(P::Generic.Perm, x::fq_mat)
+function lu!(P::Generic.Perm, x::FqPolyRepMatrix)
    P.d .-= 1
 
    rank = Int(ccall((:fq_mat_lu, libflint), Cint,
-                (Ptr{Int}, Ref{fq_mat}, Cint, Ref{FqFiniteField}),
+                (Ptr{Int}, Ref{FqPolyRepMatrix}, Cint, Ref{FqPolyRepField}),
                 P.d, x, 0, base_ring(x)))
 
   P.d .+= 1
@@ -484,7 +484,7 @@ function lu!(P::Generic.Perm, x::fq_mat)
   return rank
 end
 
-function lu(x::fq_mat, P = SymmetricGroup(nrows(x)))
+function lu(x::FqPolyRepMatrix, P = SymmetricGroup(nrows(x)))
    m = nrows(x)
    n = ncols(x)
    P.n != m && error("Permutation does not match matrix")
@@ -517,7 +517,7 @@ end
 #
 ################################################################################
 
-function Base.view(x::fq_mat, r1::Int, c1::Int, r2::Int, c2::Int)
+function Base.view(x::FqPolyRepMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
 
    _checkrange_or_empty(nrows(x), r1, r2) ||
       Base.throw_boundserror(x, (r1:r2, c1:c2))
@@ -534,34 +534,34 @@ function Base.view(x::fq_mat, r1::Int, c1::Int, r2::Int, c2::Int)
      c2 = 0
    end
 
-   z = fq_mat()
+   z = FqPolyRepMatrix()
    z.base_ring = x.base_ring
    z.view_parent = x
    ccall((:fq_mat_window_init, libflint), Nothing,
-         (Ref{fq_mat}, Ref{fq_mat}, Int, Int, Int, Int, Ref{FqFiniteField}),
+         (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Int, Int, Int, Int, Ref{FqPolyRepField}),
          z, x, r1 - 1, c1 - 1, r2, c2, base_ring(x))
    finalizer(_fq_mat_window_clear_fn, z)
    return z
 end
 
-function Base.view(x::fq_mat, r::UnitRange{Int}, c::UnitRange{Int})
+function Base.view(x::FqPolyRepMatrix, r::UnitRange{Int}, c::UnitRange{Int})
    return Base.view(x, r.start, c.start, r.stop, c.stop)
 end
 
-function _fq_mat_window_clear_fn(a::fq_mat)
+function _fq_mat_window_clear_fn(a::FqPolyRepMatrix)
    ccall((:fq_mat_window_clear, libflint), Nothing,
-         (Ref{fq_mat}, Ref{FqFiniteField}), a, base_ring(a))
+         (Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}), a, base_ring(a))
 end
 
-function sub(x::fq_mat, r1::Int, c1::Int, r2::Int, c2::Int)
+function sub(x::FqPolyRepMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
   return deepcopy(Base.view(x, r1, c1, r2, c2))
 end
 
-function sub(x::fq_mat, r::UnitRange{Int}, c::UnitRange{Int})
+function sub(x::FqPolyRepMatrix, r::UnitRange{Int}, c::UnitRange{Int})
   return deepcopy(Base.view(x, r, c))
 end
 
-getindex(x::fq_mat, r::UnitRange{Int}, c::UnitRange{Int}) = sub(x, r, c)
+getindex(x::FqPolyRepMatrix, r::UnitRange{Int}, c::UnitRange{Int}) = sub(x, r, c)
 
 ################################################################################
 #
@@ -569,22 +569,22 @@ getindex(x::fq_mat, r::UnitRange{Int}, c::UnitRange{Int}) = sub(x, r, c)
 #
 ################################################################################
 
-function hcat(x::fq_mat, y::fq_mat)
+function hcat(x::FqPolyRepMatrix, y::FqPolyRepMatrix)
    (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
    (x.r != y.r) && error("Matrices must have same number of rows")
    z = similar(x, nrows(x), ncols(x) + ncols(y))
    ccall((:fq_mat_concat_horizontal, libflint), Nothing,
-         (Ref{fq_mat}, Ref{fq_mat}, Ref{fq_mat}, Ref{FqFiniteField}),
+         (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}),
          z, x, y, base_ring(x))
    return z
 end
 
-function vcat(x::fq_mat, y::fq_mat)
+function vcat(x::FqPolyRepMatrix, y::FqPolyRepMatrix)
    (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
    (x.c != y.c) && error("Matrices must have same number of columns")
    z = similar(x, nrows(x) + nrows(y), ncols(x))
    ccall((:fq_mat_concat_vertical, libflint), Nothing,
-         (Ref{fq_mat}, Ref{fq_mat}, Ref{fq_mat}, Ref{FqFiniteField}),
+         (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}),
          z, x, y, base_ring(x))
    return z
 end
@@ -595,8 +595,8 @@ end
 #
 ################################################################################
 
-function Array(b::fq_mat)
-  a = Array{fq}(undef, b.r, b.c)
+function Array(b::FqPolyRepMatrix)
+  a = Array{FqPolyRepFieldElem}(undef, b.r, b.c)
   for i = 1:nrows(b)
     for j = 1:ncols(b)
       a[i, j] = b[i, j]
@@ -611,21 +611,21 @@ end
 #
 ################################################################################
 
-function charpoly(R::FqPolyRing, a::fq_mat)
+function charpoly(R::FqPolyRepPolyRing, a::FqPolyRepMatrix)
   !is_square(a) && error("Matrix must be square")
   base_ring(R) != base_ring(a) && error("Must have common base ring")
   p = R()
   ccall((:fq_mat_charpoly, libflint), Nothing,
-          (Ref{fq_poly}, Ref{fq_mat}, Ref{FqFiniteField}), p, a, base_ring(a))
+          (Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}), p, a, base_ring(a))
   return p
 end
 
-function charpoly_danivlesky!(R::FqPolyRing, a::fq_mat)
+function charpoly_danivlesky!(R::FqPolyRepPolyRing, a::FqPolyRepMatrix)
   !is_square(a) && error("Matrix must be square")
   base_ring(R) != base_ring(a) && error("Must have common base ring")
   p = R()
   ccall((:fq_mat_charpoly_danilevsky, libflint), Nothing,
-          (Ref{fq_poly}, Ref{fq_mat}, Ref{FqFiniteField}), p, a, base_ring(a))
+          (Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}), p, a, base_ring(a))
   return p
 end
 
@@ -636,13 +636,13 @@ end
 #
 ################################################################################
 
-function minpoly(R::FqPolyRing, a::fq_mat)
+function minpoly(R::FqPolyRepPolyRing, a::FqPolyRepMatrix)
   !is_square(a) && error("Matrix must be square")
   base_ring(R) != base_ring(a) && error("Must have common base ring")
   m = deepcopy(a)
   p = R()
   ccall((:fq_mat_minpoly, libflint), Nothing,
-          (Ref{fq_poly}, Ref{fq_mat}, Ref{FqFiniteField}), p, m, base_ring(a))
+          (Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}), p, m, base_ring(a))
   return p
 end
 
@@ -652,11 +652,11 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{fq_mat}, ::Type{V}) where {V <: Integer} = fq_mat
+promote_rule(::Type{FqPolyRepMatrix}, ::Type{V}) where {V <: Integer} = FqPolyRepMatrix
 
-promote_rule(::Type{fq_mat}, ::Type{fq}) = fq_mat
+promote_rule(::Type{FqPolyRepMatrix}, ::Type{FqPolyRepFieldElem}) = FqPolyRepMatrix
 
-promote_rule(::Type{fq_mat}, ::Type{fmpz}) = fq_mat
+promote_rule(::Type{FqPolyRepMatrix}, ::Type{ZZRingElem}) = FqPolyRepMatrix
 
 ################################################################################
 #
@@ -664,12 +664,12 @@ promote_rule(::Type{fq_mat}, ::Type{fmpz}) = fq_mat
 #
 ################################################################################
 
-function (a::FqMatSpace)()
-  z = fq_mat(nrows(a), ncols(a), base_ring(a))
+function (a::FqPolyRepMatrixSpace)()
+  z = FqPolyRepMatrix(nrows(a), ncols(a), base_ring(a))
   return z
 end
 
-function (a::FqMatSpace)(b::Integer)
+function (a::FqPolyRepMatrixSpace)(b::Integer)
    M = a()
    for i = 1:nrows(a)
       for j = 1:ncols(a)
@@ -683,7 +683,7 @@ function (a::FqMatSpace)(b::Integer)
    return M
 end
 
-function (a::FqMatSpace)(b::fmpz)
+function (a::FqPolyRepMatrixSpace)(b::ZZRingElem)
    M = a()
    for i = 1:nrows(a)
       for j = 1:ncols(a)
@@ -697,49 +697,49 @@ function (a::FqMatSpace)(b::fmpz)
    return M
 end
 
-function (a::FqMatSpace)(b::fq)
+function (a::FqPolyRepMatrixSpace)(b::FqPolyRepFieldElem)
    parent(b) != base_ring(a) && error("Unable to coerce to matrix")
-   return fq_mat(nrows(a), ncols(a), b)
+   return FqPolyRepMatrix(nrows(a), ncols(a), b)
 end
 
-function (a::FqMatSpace)(arr::AbstractMatrix{T}) where {T <: Integer}
+function (a::FqPolyRepMatrixSpace)(arr::AbstractMatrix{T}) where {T <: Integer}
   _check_dim(nrows(a), ncols(a), arr)
-  return fq_mat(nrows(a), ncols(a), arr, base_ring(a))
+  return FqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
 end
 
-function (a::FqMatSpace)(arr::AbstractVector{T}) where {T <: Integer}
+function (a::FqPolyRepMatrixSpace)(arr::AbstractVector{T}) where {T <: Integer}
   _check_dim(nrows(a), ncols(a), arr)
-  return fq_mat(nrows(a), ncols(a), arr, base_ring(a))
+  return FqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
   return z
 end
 
-function (a::FqMatSpace)(arr::AbstractMatrix{fmpz})
+function (a::FqPolyRepMatrixSpace)(arr::AbstractMatrix{ZZRingElem})
   _check_dim(nrows(a), ncols(a), arr)
-  return fq_mat(nrows(a), ncols(a), arr, base_ring(a))
+  return FqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
   return z
 end
 
-function (a::FqMatSpace)(arr::AbstractVector{fmpz})
+function (a::FqPolyRepMatrixSpace)(arr::AbstractVector{ZZRingElem})
   _check_dim(nrows(a), ncols(a), arr)
-  return fq_mat(nrows(a), ncols(a), arr, base_ring(a))
+  return FqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
   return z
 end
 
-function (a::FqMatSpace)(arr::AbstractMatrix{fq})
+function (a::FqPolyRepMatrixSpace)(arr::AbstractMatrix{FqPolyRepFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
-  return fq_mat(nrows(a), ncols(a), arr, base_ring(a))
+  return FqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
 end
 
-function (a::FqMatSpace)(arr::AbstractVector{fq})
+function (a::FqPolyRepMatrixSpace)(arr::AbstractVector{FqPolyRepFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
-  return fq_mat(nrows(a), ncols(a), arr, base_ring(a))
+  return FqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
 end
 
-function (a::FqMatSpace)(b::fmpz_mat)
+function (a::FqPolyRepMatrixSpace)(b::ZZMatrix)
   (ncols(a) != b.c || nrows(a) != b.r) && error("Dimensions do not fit")
-  return fq_mat(b, base_ring(a))
+  return FqPolyRepMatrix(b, base_ring(a))
 end
 
 ###############################################################################
@@ -748,14 +748,14 @@ end
 #
 ###############################################################################
 
-function matrix(R::FqFiniteField, arr::AbstractMatrix{<: Union{fq, fmpz, Integer}})
-   z = fq_mat(size(arr, 1), size(arr, 2), arr, R)
+function matrix(R::FqPolyRepField, arr::AbstractMatrix{<: Union{FqPolyRepFieldElem, ZZRingElem, Integer}})
+   z = FqPolyRepMatrix(size(arr, 1), size(arr, 2), arr, R)
    return z
 end
 
-function matrix(R::FqFiniteField, r::Int, c::Int, arr::AbstractVector{<: Union{fq, fmpz, Integer}})
+function matrix(R::FqPolyRepField, r::Int, c::Int, arr::AbstractVector{<: Union{FqPolyRepFieldElem, ZZRingElem, Integer}})
    _check_dim(r, c, arr)
-   z = fq_mat(r, c, arr, R)
+   z = FqPolyRepMatrix(r, c, arr, R)
    return z
 end
 
@@ -765,11 +765,11 @@ end
 #
 ###############################################################################
 
-function zero_matrix(R::FqFiniteField, r::Int, c::Int)
+function zero_matrix(R::FqPolyRepField, r::Int, c::Int)
    if r < 0 || c < 0
      error("dimensions must not be negative")
    end
-   z = fq_mat(r, c, R)
+   z = FqPolyRepMatrix(r, c, R)
    return z
 end
 
@@ -779,7 +779,7 @@ end
 #
 ###############################################################################
 
-function identity_matrix(R::FqFiniteField, n::Int)
+function identity_matrix(R::FqPolyRepField, n::Int)
    z = zero_matrix(R, n, n)
    for i in 1:n
       z[i, i] = one(R)
@@ -793,6 +793,6 @@ end
 #
 ################################################################################
 
-function MatrixSpace(R::FqFiniteField, r::Int, c::Int; cached::Bool = true)
-  FqMatSpace(R, r, c, cached)
+function MatrixSpace(R::FqPolyRepField, r::Int, c::Int; cached::Bool = true)
+  FqPolyRepMatrixSpace(R, r, c, cached)
 end

@@ -1,5 +1,5 @@
 @testset "gfp_fmpz_rel_series.types" begin
-   @test rel_series_type(gfp_fmpz_elem) == gfp_fmpz_rel_series
+   @test rel_series_type(FpFieldElem) == gfp_fmpz_rel_series
 end
 
 @testset "gfp_fmpz_rel_series.constructors" begin
@@ -17,7 +17,7 @@ end
    @test elem_type(GFPFmpzRelSeriesRing) == gfp_fmpz_rel_series
    @test parent_type(gfp_fmpz_rel_series) == GFPFmpzRelSeriesRing
 
-   @test characteristic(S) == fmpz(123456789012345678949)
+   @test characteristic(S) == ZZRingElem(123456789012345678949)
 
    @test isa(S, GFPFmpzRelSeriesRing)
 
@@ -28,7 +28,7 @@ end
    @test isa(b, SeriesElem)
 
    c = S(a)
-   d = S([fmpz(0), fmpz(3), fmpz(1)], 3, 5, 0)
+   d = S([ZZRingElem(0), ZZRingElem(3), ZZRingElem(1)], 3, 5, 0)
 
    f = S([R(0), R(3), R(1)], 3, 5, 0)
 
@@ -37,7 +37,7 @@ end
    @test isa(f, SeriesElem)
 
    g = S(1)
-   h = S(fmpz(2))
+   h = S(ZZRingElem(2))
    k = S()
 
    @test isa(g, SeriesElem)
@@ -50,7 +50,7 @@ end
 
    @test isa(S(0), SeriesElem)
    @test isa(S(R(0)), SeriesElem)
-   @test isa(S(fmpz(0)), SeriesElem)
+   @test isa(S(ZZRingElem(0)), SeriesElem)
 end
 
 @testset "gfp_fmpz_rel_series.printing" begin
@@ -172,7 +172,7 @@ end
    @test parent(h) === parent(g)
    @test parent(k) !== parent(m)
 
-   p = rel_series(R, gfp_fmpz_elem[], 0, 3, 1)
+   p = rel_series(R, FpFieldElem[], 0, 3, 1)
    q = rel_series(R, [], 0, 3, 2)
 
    @test isa(p, gfp_fmpz_rel_series)
@@ -181,7 +181,7 @@ end
    @test pol_length(p) == 0
    @test pol_length(q) == 0
 
-   r = rel_series(R, fmpz[1, 2, 3], 3, 11, 8)
+   r = rel_series(R, ZZRingElem[1, 2, 3], 3, 11, 8)
 
    @test isa(r, gfp_fmpz_rel_series)
 
@@ -353,11 +353,11 @@ end
 
    @test isequal(2a, 4x + 2x^3 + O(x^31))
 
-   @test isequal(fmpz(3)*b, O(x^4))
+   @test isequal(ZZRingElem(3)*b, O(x^4))
 
    @test isequal(c*2, 2 + 2*x + 6*x^2 + O(x^5))
 
-   @test isequal(d*fmpz(3), 3x^2 + 9x^3 - 3x^4 + O(x^32))
+   @test isequal(d*ZZRingElem(3), 3x^2 + 9x^3 - 3x^4 + O(x^32))
 end
 
 @testset "gfp_fmpz_rel_series.comparison" begin
@@ -396,18 +396,18 @@ end
    @test d == 3
    @test d == R(3)
 
-   @test c == fmpz(1)
+   @test c == ZZRingElem(1)
    @test c == R(1)
 
-   @test fmpz() != a
+   @test ZZRingElem() != a
 
    @test 2 == b
    @test R(2) == b
 
-   @test fmpz(1) == c
+   @test ZZRingElem(1) == c
    @test R(1) == c
 
-   @test fmpz(2) != e
+   @test ZZRingElem(2) != e
    @test R(2) != e
 
    @test 0 == f
@@ -526,9 +526,9 @@ end
 
    @test isequal(divexact(a, 7), 35273368289241622557*x^3+35273368289241622557*x+O(x^31))
 
-   @test isequal(divexact(b, fmpz(11)), 0+O(x^4))
+   @test isequal(divexact(b, ZZRingElem(11)), 0+O(x^4))
 
-   @test isequal(divexact(c, fmpz(2)), x^2+61728394506172839475*x+61728394506172839475+O(x^5))
+   @test isequal(divexact(c, ZZRingElem(2)), x^2+61728394506172839475*x+61728394506172839475+O(x^5))
 
    @test isequal(divexact(d, 9), 27434842002743484211*x^3+27434842002743484211*x+O(x^6))
 
@@ -538,7 +538,7 @@ end
 end
 
 @testset "gfp_fmpz_rel_series.square_root" begin
-   S = GF(fmpz(31))
+   S = GF(ZZRingElem(31))
    R, x = PowerSeriesRing(S, 30, "x")
 
    for iter = 1:300
@@ -548,7 +548,7 @@ end
    end
 
    for p in [2, 7, 19, 65537]
-      R = GF(fmpz(p))
+      R = GF(ZZRingElem(p))
 
       S, x = PowerSeriesRing(R, 10, "x")
 

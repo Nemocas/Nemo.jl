@@ -2,9 +2,9 @@
 begin
 local test_fields = (NGFiniteField(23, 1, "a"),
                      NGFiniteField(23, 5, "a"),
-                     NGFiniteField(next_prime(fmpz(2)^100), 2, "a"))
+                     NGFiniteField(next_prime(ZZRingElem(2)^100), 2, "a"))
 
-@testset "fq_default_mpoly.constructors" begin
+@testset "FqMPolyRingElem.constructors" begin
    for (R, a) in test_fields
       for num_vars = 1:10
          var_names = ["x$j" for j in 1:num_vars]
@@ -25,29 +25,29 @@ local test_fields = (NGFiniteField(23, 1, "a"),
 
          @test nvars(S) == num_vars
 
-         @test elem_type(S) == fq_default_mpoly
-         @test elem_type(FqDefaultMPolyRing) == fq_default_mpoly
-         @test parent_type(fq_default_mpoly) == FqDefaultMPolyRing
+         @test elem_type(S) == FqMPolyRingElem
+         @test elem_type(FqMPolyRing) == FqMPolyRingElem
+         @test parent_type(FqMPolyRingElem) == FqMPolyRing
 
          @test Nemo.promote_rule(elem_type(S), elem_type(R)) == elem_type(S)
          @test Nemo.promote_rule(elem_type(S), Int) == elem_type(S)
-         @test Nemo.promote_rule(elem_type(S), fmpz) == elem_type(S)
+         @test Nemo.promote_rule(elem_type(S), ZZRingElem) == elem_type(S)
 
-         @test typeof(S) <: FqDefaultMPolyRing
+         @test typeof(S) <: FqMPolyRing
 
          isa(symbols(S), Vector{Symbol})
 
          for j = 1:num_vars
-            @test isa(varlist[j], fq_default_mpoly)
-            @test isa(gens(S)[j], fq_default_mpoly)
+            @test isa(varlist[j], FqMPolyRingElem)
+            @test isa(gens(S)[j], FqMPolyRingElem)
          end
 
          f =  rand(S, 0:5, 0:100)
 
-         @test isa(f, fq_default_mpoly)
-         @test isa(S(2), fq_default_mpoly)
-         @test isa(S(R(2)), fq_default_mpoly)
-         @test isa(S(f), fq_default_mpoly)
+         @test isa(f, FqMPolyRingElem)
+         @test isa(S(2), FqMPolyRingElem)
+         @test isa(S(R(2)), FqMPolyRingElem)
+         @test isa(S(f), FqMPolyRingElem)
          @test degree(modulus(S)) == degree(modulus(R))
          @test degree(modulus(f)) == degree(modulus(R))
 
@@ -55,7 +55,7 @@ local test_fields = (NGFiniteField(23, 1, "a"),
 
          W0 = [Int[rand(0:100) for i in 1:num_vars] for j in 1:5]
 
-         @test isa(S(V, W0), fq_default_mpoly)
+         @test isa(S(V, W0), FqMPolyRingElem)
 
          for i in 1:num_vars
            f = gen(S, i)
@@ -66,7 +66,7 @@ local test_fields = (NGFiniteField(23, 1, "a"),
    end
 end
 
-@testset "fq_default_mpoly.printing" begin
+@testset "FqMPolyRingElem.printing" begin
    for (R, a) in test_fields
       S, (x, y) = PolynomialRing(R, ["x", "y"])
 
@@ -84,7 +84,7 @@ end
    end
 end
 
-@testset "fq_default_mpoly.hash" begin
+@testset "FqMPolyRingElem.hash" begin
    for (R, a) in test_fields
       S, (x, y) = PolynomialRing(R, ["x", "y"])
 
@@ -95,7 +95,7 @@ end
    end
 end
 
-@testset "fq_default_mpoly.inside_other_stuff" begin
+@testset "FqMPolyRingElem.inside_other_stuff" begin
    for (R, a) in test_fields
       S, (x, y, z, w) = PolynomialRing(R, ["x", "y", "z", "w"])
       @test det(matrix(S, [x y; z w])) == x*w - y*z
@@ -106,14 +106,14 @@ end
    end
 end
 
-@testset "fq_default_mpoly.dont_mix_the_parents" begin
-   S = FqDefaultMPolyRing[PolynomialRing(Ri[1], ["x"])[1] for Ri in test_fields]
+@testset "FqMPolyRingElem.dont_mix_the_parents" begin
+   S = FqMPolyRing[PolynomialRing(Ri[1], ["x"])[1] for Ri in test_fields]
    cs = [one(base_ring(Si)) for Si in S]
    exps = Vector{Int}[Int[i] for i in 1:length(S)]
    @test_throws ErrorException S[1](cs, exps)
 end
 
-@testset "fq_default_mpoly.manipulation" begin
+@testset "FqMPolyRingElem.manipulation" begin
    for (R, a) in test_fields
       for num_vars = 1:10
          var_names = ["x$j" for j in 1:num_vars]
@@ -239,7 +239,7 @@ end
    end
 end
 
-@testset "fq_default_mpoly.multivariate_coeff" begin
+@testset "FqMPolyRingElem.multivariate_coeff" begin
    for (R, a) in test_fields
       for ord in Nemo.flint_orderings
          S, (x, y, z) = PolynomialRing(R, ["x", "y", "z"]; ordering=ord)
@@ -257,7 +257,7 @@ end
    end
 end
 
-@testset "fq_default_mpoly.unary_ops" begin
+@testset "FqMPolyRingElem.unary_ops" begin
    for (R, a) in test_fields
       for num_vars = 1:10
          var_names = ["x$j" for j in 1:num_vars]
@@ -274,7 +274,7 @@ end
    end
 end
 
-@testset "fq_default_mpoly.binary_ops" begin
+@testset "FqMPolyRingElem.binary_ops" begin
    for (R, a) in test_fields
       for num_vars = 1:10
          var_names = ["x$j" for j in 1:num_vars]
@@ -297,7 +297,7 @@ end
    end
 end
 
-@testset "fq_default_mpoly.adhoc_binary" begin
+@testset "FqMPolyRingElem.adhoc_binary" begin
    for (R, a) in test_fields
       for num_vars = 1:10
          var_names = ["x$j" for j in 1:num_vars]
@@ -333,7 +333,7 @@ end
    end
 end
 
-@testset "fq_default_mpoly.adhoc_comparison" begin
+@testset "FqMPolyRingElem.adhoc_comparison" begin
    for (R, a) in test_fields
       for num_vars = 1:10
          var_names = ["x$j" for j in 1:num_vars]
@@ -346,8 +346,8 @@ end
 
             @test S(d) == d
             @test d == S(d)
-            @test S(fmpz(d)) == fmpz(d)
-            @test fmpz(d) == S(fmpz(d))
+            @test S(ZZRingElem(d)) == ZZRingElem(d)
+            @test ZZRingElem(d) == S(ZZRingElem(d))
             @test S(d) == BigInt(d)
             @test BigInt(d) == S(d)
          end
@@ -355,7 +355,7 @@ end
    end
 end
 
-@testset "fq_default_mpoly.powering" begin
+@testset "FqMPolyRingElem.powering" begin
    for (R, a) in test_fields
       for num_vars = 1:10
          var_names = ["x$j" for j in 1:num_vars]
@@ -381,7 +381,7 @@ end
    end
 end
 
-@testset "fq_default_mpoly.divides" begin
+@testset "FqMPolyRingElem.divides" begin
    for (R, a) in test_fields
       for num_vars = 1:10
          var_names = ["x$j" for j in 1:num_vars]
@@ -413,7 +413,7 @@ end
    end
 end
 
-@testset "fq_default_mpoly.euclidean_division" begin
+@testset "FqMPolyRingElem.euclidean_division" begin
    for (R, a) in test_fields
       for num_vars = 1:10
          var_names = ["x$j" for j in 1:num_vars]
@@ -449,7 +449,7 @@ end
    end
 end
 
-@testset "fq_default_mpoly.ideal_reduction" begin
+@testset "FqMPolyRingElem.ideal_reduction" begin
    for (R, a) in test_fields
       for num_vars = 1:10
          var_names = ["x$j" for j in 1:num_vars]
@@ -498,7 +498,7 @@ end
    end
 end
 
-@testset "fq_default_mpoly.gcd" begin
+@testset "FqMPolyRingElem.gcd" begin
    for (R, a) in test_fields
       for num_vars = 1:4
          var_names = ["x$j" for j in 1:num_vars]
@@ -524,7 +524,7 @@ end
    end
 end
 
-@testset "fq_nmod_mpoly.factor" begin
+@testset "fqPolyRepMPolyRingElem.factor" begin
    function check_factor(a, esum)
       f = factor(a)
       @test a == unit(f) * prod([p^e for (p, e) in f])
@@ -543,7 +543,7 @@ end
    end
 end
 
-@testset "fq_default_mpoly.sqrt" begin
+@testset "FqMPolyRingElem.sqrt" begin
    for (R, a) in test_fields
       for num_vars = 1:4
          var_names = ["x$j" for j in 1:num_vars]
@@ -572,7 +572,7 @@ end
    end
 end
 
-@testset "fq_default_mpoly.evaluation" begin
+@testset "FqMPolyRingElem.evaluation" begin
    for (R, a) in test_fields
       for num_vars = 1:10
          var_names = ["x$j" for j in 1:num_vars]
@@ -626,7 +626,7 @@ end
    end
 end
 
-@testset "fq_default_mpoly.valuation" begin
+@testset "FqMPolyRingElem.valuation" begin
    for (R, a) in test_fields
       for num_vars = 1:10
          var_names = ["x$j" for j in 1:num_vars]
@@ -664,7 +664,7 @@ end
    end
 end
 
-@testset "fq_default_mpoly.derivative" begin
+@testset "FqMPolyRingElem.derivative" begin
    for (R, a) in test_fields
       for num_vars = 1:10
          var_names = ["x$j" for j in 1:num_vars]
@@ -684,7 +684,7 @@ end
    end
 end
 
-@testset "fq_default_mpoly.combine_like_terms" begin
+@testset "FqMPolyRingElem.combine_like_terms" begin
    for (R, a) in test_fields
      for num_vars in 1:10
         var_names = ["x$j" for j in 1:num_vars]
@@ -720,7 +720,7 @@ end
    end
 end
 
-@testset "fq_default_mpoly.exponents" begin
+@testset "FqMPolyRingElem.exponents" begin
    for (R, a) in test_fields
      for num_vars = 1:10
         var_names = ["x$j" for j in 1:num_vars]
@@ -770,7 +770,7 @@ end
    end
 end
 
-@testset "fq_default_mpoly.gcd_with_cofactors" begin
+@testset "FqMPolyRingElem.gcd_with_cofactors" begin
    # TODO replace by "for (F, t) in test_fields" once gcd_with_cofactors is in AA
    for (F, t) in (test_fields[1], test_fields[2])
       R, (x, y, z) = PolynomialRing(F, [:x, :y, :z])

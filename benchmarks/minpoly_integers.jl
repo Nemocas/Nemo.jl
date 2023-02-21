@@ -11,7 +11,7 @@ function benchmark_minpoly_integers()
    end
 
    for i in 1:10
-      similarity!(M, rand(1:80), fmpz(rand(-3:3)))
+      similarity!(M, rand(1:80), ZZRingElem(rand(-3:3)))
    end
 
    tt = @elapsed minpoly(PolynomialRing(FlintZZ, "x")[1], M)

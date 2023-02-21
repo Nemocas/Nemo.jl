@@ -52,7 +52,7 @@ It is also possible to call the inner constructor directly. It has the following
 form.
 
 ```
-FlintPadicField(p::fmpz, prec::Int)
+FlintPadicField(p::ZZRingElem, prec::Int)
 ```
 
 Returns the parent object for the $p$-adic field for given prime $p$, where
@@ -80,8 +80,8 @@ purpose we define the following functions.
 
 ```@docs
 O(::FlintPadicField, ::Integer)
-O(::FlintPadicField, ::fmpz)
-O(::FlintPadicField, ::fmpq)
+O(::FlintPadicField, ::ZZRingElem)
+O(::FlintPadicField, ::QQFieldElem)
 ```
 
 The $O(p^n)$ construction can be used to construct $p$-adic values of precision
@@ -119,8 +119,8 @@ valuation(::padic)
 ```
 
 ```@docs
-lift(::FlintIntegerRing, ::padic)
-lift(::FlintRationalField, ::padic)
+lift(::ZZRing, ::padic)
+lift(::QQField, ::padic)
 ```
 
 **Examples**

@@ -26,10 +26,10 @@ parent objects.
 
  Library | Field                          | Element type  | Parent type
 ---------|--------------------------------|---------------|---------------------
-Flint    | $\mathbb{F}_{p^n}$ (small $p$) | `fq_nmod`     | `FqNmodFiniteField`
-Flint    | $\mathbb{F}_{p^n}$ (large $p$) | `fq`          | `FqFiniteField`
+Flint    | $\mathbb{F}_{p^n}$ (small $p$) | `fqPolyRepFieldElem`     | `fqPolyRepField`
+Flint    | $\mathbb{F}_{p^n}$ (large $p$) | `FqPolyRepFieldElem`          | `FqPolyRepField`
 
-The only difference between the `fq` and `fq_nmod` types is the representation.
+The only difference between the `FqPolyRepFieldElem` and `fqPolyRepFieldElem` types is the representation.
 The former is for finite fields with multiprecision characteristic and the
 latter is for characteristics that fit into a single unsigned machine word. The
 `FlintFiniteField` constructor automatically picks the correct representation
@@ -39,8 +39,8 @@ types.
 All the finite field types belong to the `FinField` abstract type and the
 finite field element types belong to the `FinFieldElem` abstract type.
 
-Since all the functionality for the `fq` finite field type is identical to that
-provided for the `fq_nmod` finite field type, we simply document the former.
+Since all the functionality for the `FqPolyRepFieldElem` finite field type is identical to that
+provided for the `fqPolyRepFieldElem` finite field type, we simply document the former.
 
 ## Finite field functionality
 
@@ -80,23 +80,23 @@ d = U(7)
 ### Basic manipulation
 
 ```@docs
-gen(::FqFiniteField)
+gen(::FqPolyRepField)
 ```
 
 ```@docs
-is_gen(::fq)
+is_gen(::FqPolyRepFieldElem)
 ```
 
 ```@docs
-coeff(::fq, ::Int)
+coeff(::FqPolyRepFieldElem, ::Int)
 ```
 
 ```@docs
-degree(::FqFiniteField)
+degree(::FqPolyRepField)
 ```
 
 ```@docs
-modulus(::FqFiniteField)
+modulus(::FqPolyRepField)
 ```
 
 **Examples**
@@ -116,19 +116,19 @@ n = is_gen(x)
 Various special functions with finite field specific behaviour are defined.
 
 ```@docs
-tr(::fq)
+tr(::FqPolyRepFieldElem)
 ```
 
 ```@docs
-norm(::fq)
+norm(::FqPolyRepFieldElem)
 ```
 
 ```@docs
-frobenius(::fq, ::Int)
+frobenius(::FqPolyRepFieldElem, ::Int)
 ```
 
 ```@docs
-pth_root(::fq)
+pth_root(::FqPolyRepFieldElem)
 ```
 
 **Examples**
@@ -148,7 +148,7 @@ g = pth_root(a)
 ### Lift
 
 ```@docs
-lift(::GFPFmpzPolyRing, ::fq)
+lift(::FpPolyRing, ::FqPolyRepFieldElem)
 ```
 
 **Examples**

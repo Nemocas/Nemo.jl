@@ -68,7 +68,7 @@ end
   return z
 end
 
-for T in [Int, UInt, fmpz, fmpq, Float64, BigFloat, RealElem, AbstractString]
+for T in [Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealElem, AbstractString]
    @eval begin
       @inline function setindex!(x::RealMat, y::$T, r::Int, c::Int)
          @boundscheck Generic._checkbounds(x, r, c)
@@ -84,11 +84,11 @@ end
 
 Base.@propagate_inbounds setindex!(x::RealMat, y::Integer,
                                  r::Int, c::Int) =
-         setindex!(x, fmpz(y), r, c)
+         setindex!(x, ZZRingElem(y), r, c)
 
 Base.@propagate_inbounds setindex!(x::RealMat, y::Rational{T},
                                  r::Int, c::Int) where {T <: Integer} =
-         setindex!(x, fmpz(y), r, c)
+         setindex!(x, ZZRingElem(y), r, c)
 
 zero(a::RealMatSpace) = a()
 
@@ -195,19 +195,19 @@ end
 
 *(x::Int, y::RealMat) = y*x
 
-*(x::RealMat, y::fmpq) = x*base_ring(x)(y)
+*(x::RealMat, y::QQFieldElem) = x*base_ring(x)(y)
 
-*(x::fmpq, y::RealMat) = y*x
+*(x::QQFieldElem, y::RealMat) = y*x
 
-function *(x::RealMat, y::fmpz)
+function *(x::RealMat, y::ZZRingElem)
   z = similar(x)
   ccall((:arb_mat_scalar_mul_fmpz, libarb), Nothing,
-              (Ref{RealMat}, Ref{RealMat}, Ref{fmpz}, Int),
+              (Ref{RealMat}, Ref{RealMat}, Ref{ZZRingElem}, Int),
               z, x, y, precision(Balls))
   return z
 end
 
-*(x::fmpz, y::RealMat) = y*x
+*(x::ZZRingElem, y::RealMat) = y*x
 
 function *(x::RealMat, y::arb)
   z = similar(x)
@@ -219,7 +219,7 @@ end
 
 *(x::arb, y::RealMat) = y*x
 
-for T in [Integer, fmpz, fmpq, RealElem]
+for T in [Integer, ZZRingElem, QQFieldElem, RealElem]
    @eval begin
       function +(x::RealMat, y::$T)
          z = deepcopy(x)
@@ -349,27 +349,27 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    contains(x::RealMat, y::fmpz_mat)
+    contains(x::RealMat, y::ZZMatrix)
 
 Returns `true` if all entries of $x$ contain the corresponding entry of
 $y$, otherwise return `false`.
 """
-function contains(x::RealMat, y::fmpz_mat)
+function contains(x::RealMat, y::ZZMatrix)
   r = ccall((:arb_mat_contains_fmpz_mat, libarb), Cint,
-              (Ref{RealMat}, Ref{fmpz_mat}), x, y)
+              (Ref{RealMat}, Ref{ZZMatrix}), x, y)
   return Bool(r)
 end
 
 
 @doc Markdown.doc"""
-    contains(x::RealMat, y::fmpq_mat)
+    contains(x::RealMat, y::QQMatrix)
 
 Returns `true` if all entries of $x$ contain the corresponding entry of
 $y$, otherwise return `false`.
 """
-function contains(x::RealMat, y::fmpq_mat)
+function contains(x::RealMat, y::QQMatrix)
   r = ccall((:arb_mat_contains_fmpq_mat, libarb), Cint,
-              (Ref{RealMat}, Ref{fmpq_mat}), x, y)
+              (Ref{RealMat}, Ref{QQMatrix}), x, y)
   return Bool(r)
 end
 
@@ -377,13 +377,13 @@ end
 
 ==(x::Integer, y::RealMat) = y == x
 
-==(x::RealMat, y::fmpz) = x == parent(x)(y)
+==(x::RealMat, y::ZZRingElem) = x == parent(x)(y)
 
-==(x::fmpz, y::RealMat) = y == x
+==(x::ZZRingElem, y::RealMat) = y == x
 
-==(x::RealMat, y::fmpz_mat) = x == parent(x)(y)
+==(x::RealMat, y::ZZMatrix) = x == parent(x)(y)
 
-==(x::fmpz_mat, y::RealMat) = y == x
+==(x::ZZMatrix, y::RealMat) = y == x
 
 ###############################################################################
 #
@@ -432,10 +432,10 @@ function divexact(x::RealMat, y::Int; check::Bool=true)
   return z
 end
 
-function divexact(x::RealMat, y::fmpz; check::Bool=true)
+function divexact(x::RealMat, y::ZZRingElem; check::Bool=true)
   z = similar(x)
   ccall((:arb_mat_scalar_div_fmpz, libarb), Nothing,
-              (Ref{RealMat}, Ref{RealMat}, Ref{fmpz}, Int),
+              (Ref{RealMat}, Ref{RealMat}, Ref{ZZRingElem}, Int),
               z, x, y, precision(Balls))
   return z
 end
@@ -638,26 +638,26 @@ function (x::RealMatSpace)()
   return z
 end
 
-function (x::RealMatSpace)(y::fmpz_mat)
+function (x::RealMatSpace)(y::ZZMatrix)
   (ncols(x) != ncols(y) || nrows(x) != nrows(y)) &&
       error("Dimensions are wrong")
   z = RealMat(y, precision(Balls))
   return z
 end
 
-function (x::RealMatSpace)(y::AbstractMatrix{T}) where {T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, RealElem, AbstractString}}
+function (x::RealMatSpace)(y::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealElem, AbstractString}}
   _check_dim(nrows(x), ncols(x), y)
   z = RealMat(nrows(x), ncols(x), y, precision(Balls))
   return z
 end
 
-function (x::RealMatSpace)(y::AbstractVector{T}) where {T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, RealElem, AbstractString}}
+function (x::RealMatSpace)(y::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealElem, AbstractString}}
   _check_dim(nrows(x), ncols(x), y)
   z = RealMat(nrows(x), ncols(x), y, precision(Balls))
   return z
 end
 
-function (x::RealMatSpace)(y::Union{Int, UInt, fmpz, fmpq, Float64,
+function (x::RealMatSpace)(y::Union{Int, UInt, ZZRingElem, QQFieldElem, Float64,
                           BigFloat, RealElem, AbstractString})
   z = x()
   for i in 1:nrows(z)
@@ -680,34 +680,34 @@ end
 #
 ###############################################################################
 
-function matrix(R::RealField, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, RealElem, AbstractString}}
+function matrix(R::RealField, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealElem, AbstractString}}
    z = RealMat(size(arr, 1), size(arr, 2), arr, precision(Balls))
    return z
 end
 
-function matrix(R::RealField, r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, RealElem, AbstractString}}
+function matrix(R::RealField, r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealElem, AbstractString}}
    _check_dim(r, c, arr)
    z = RealMat(r, c, arr, precision(Balls))
    return z
 end
 
 function matrix(R::RealField, arr::AbstractMatrix{<: Integer})
-   arr_fmpz = map(fmpz, arr)
+   arr_fmpz = map(ZZRingElem, arr)
    return matrix(R, arr_fmpz)
 end
 
 function matrix(R::RealField, r::Int, c::Int, arr::AbstractVector{<: Integer})
-   arr_fmpz = map(fmpz, arr)
+   arr_fmpz = map(ZZRingElem, arr)
    return matrix(R, r, c, arr_fmpz)
 end
 
 function matrix(R::RealField, arr::AbstractMatrix{Rational{T}}) where {T <: Integer}
-   arr_fmpz = map(fmpq, arr)
+   arr_fmpz = map(QQFieldElem, arr)
    return matrix(R, arr_fmpz)
 end
 
 function matrix(R::RealField, r::Int, c::Int, arr::AbstractVector{Rational{T}}) where {T <: Integer}
-   arr_fmpz = map(fmpq, arr)
+   arr_fmpz = map(QQFieldElem, arr)
    return matrix(R, r, c, arr_fmpz)
 end
 
@@ -750,9 +750,9 @@ promote_rule(::Type{RealMat}, ::Type{T}) where {T <: Integer} = RealMat
 
 promote_rule(::Type{RealMat}, ::Type{Rational{T}}) where T <: Union{Int, BigInt} = RealMat
 
-promote_rule(::Type{RealMat}, ::Type{fmpz}) = RealMat
+promote_rule(::Type{RealMat}, ::Type{ZZRingElem}) = RealMat
 
-promote_rule(::Type{RealMat}, ::Type{fmpq}) = RealMat
+promote_rule(::Type{RealMat}, ::Type{QQFieldElem}) = RealMat
 
 promote_rule(::Type{RealMat}, ::Type{RealElem}) = RealMat
 
@@ -760,9 +760,9 @@ promote_rule(::Type{RealMat}, ::Type{Float64}) = RealMat
 
 promote_rule(::Type{RealMat}, ::Type{BigFloat}) = RealMat
 
-promote_rule(::Type{RealMat}, ::Type{fmpz_mat}) = RealMat
+promote_rule(::Type{RealMat}, ::Type{ZZMatrix}) = RealMat
 
-promote_rule(::Type{RealMat}, ::Type{fmpq_mat}) = RealMat
+promote_rule(::Type{RealMat}, ::Type{QQMatrix}) = RealMat
 
 ###############################################################################
 #

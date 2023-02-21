@@ -1,5 +1,5 @@
 @testset "fq_nmod_rel_series.types" begin
-   @test rel_series_type(fq_nmod) == fq_nmod_rel_series
+   @test rel_series_type(fqPolyRepFieldElem) == fq_nmod_rel_series
 end
 
 @testset "fq_nmod_rel_series.constructors" begin
@@ -32,7 +32,7 @@ end
    @test isa(d, SeriesElem)
 
    g = S(1)
-   h = S(fmpz(2))
+   h = S(ZZRingElem(2))
    k = S()
 
    @test isa(g, SeriesElem)
@@ -162,7 +162,7 @@ end
    @test parent(h) === parent(g)
    @test parent(k) !== parent(m)
 
-   p = rel_series(R, fq_nmod[], 0, 3, 1)
+   p = rel_series(R, fqPolyRepFieldElem[], 0, 3, 1)
    q = rel_series(R, [], 0, 3, 2)
 
    @test isa(p, fq_nmod_rel_series)
@@ -171,7 +171,7 @@ end
    @test pol_length(p) == 0
    @test pol_length(q) == 0
 
-   r = rel_series(R, fmpz[1, 2, 3], 3, 11, 8)
+   r = rel_series(R, ZZRingElem[1, 2, 3], 3, 11, 8)
 
    @test isa(r, fq_nmod_rel_series)
 
@@ -341,11 +341,11 @@ end
 
    @test isequal(2a, 4x + 2x^3 + O(x^31))
 
-   @test isequal(fmpz(3)*b, O(x^4))
+   @test isequal(ZZRingElem(3)*b, O(x^4))
 
    @test isequal(c*2, 2 + 2*x + 6*x^2 + O(x^5))
 
-   @test isequal(d*fmpz(3), 3x^2 + 9x^3 - 3x^4 + O(x^32))
+   @test isequal(d*ZZRingElem(3), 3x^2 + 9x^3 - 3x^4 + O(x^32))
 end
 
 @testset "fq_nmod_rel_series.comparison" begin
@@ -379,13 +379,13 @@ end
 
    @test d == 3
 
-   @test c == fmpz(1)
+   @test c == ZZRingElem(1)
 
-   @test fmpz() != a
+   @test ZZRingElem() != a
 
    @test 2 == b
 
-   @test fmpz(1) == c
+   @test ZZRingElem(1) == c
 end
 
 @testset "fq_nmod_rel_series.powering" begin
@@ -491,9 +491,9 @@ end
 
    @test isequal(divexact(a, 7), 10*x+10*x^3+O(x^31))
 
-   @test isequal(divexact(b, fmpz(11)), 0+O(x^4))
+   @test isequal(divexact(b, ZZRingElem(11)), 0+O(x^4))
 
-   @test isequal(divexact(c, fmpz(2)), 12 + 12*x+x^2+O(x^5))
+   @test isequal(divexact(c, ZZRingElem(2)), 12 + 12*x+x^2+O(x^5))
 
    @test isequal(divexact(d, 9), 18*x+18*x^3+O(x^6))
 

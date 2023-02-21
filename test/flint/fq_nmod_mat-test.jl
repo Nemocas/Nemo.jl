@@ -1,43 +1,43 @@
-@testset "fq_nmod_mat.constructors" begin
+@testset "fqPolyRepMatrix.constructors" begin
   F4, a = FlintFiniteField(2, 2, "a")
   F9, b = FlintFiniteField(3, 2, "b")
 
-  R = FqNmodMatSpace(F4, 2, 2)
+  R = fqPolyRepMatrixSpace(F4, 2, 2)
 
-  @test elem_type(R) == fq_nmod_mat
-  @test elem_type(FqNmodMatSpace) == fq_nmod_mat
-  @test parent_type(fq_nmod_mat) == FqNmodMatSpace
+  @test elem_type(R) == fqPolyRepMatrix
+  @test elem_type(fqPolyRepMatrixSpace) == fqPolyRepMatrix
+  @test parent_type(fqPolyRepMatrix) == fqPolyRepMatrixSpace
   @test nrows(R) == 2
   @test ncols(R) == 2
 
-  @test isa(R, FqNmodMatSpace)
+  @test isa(R, fqPolyRepMatrixSpace)
 
   @test base_ring(R) == F4
 
-  S = FqNmodMatSpace(F9, 2, 2)
+  S = fqPolyRepMatrixSpace(F9, 2, 2)
 
-  @test isa(S, FqNmodMatSpace)
+  @test isa(S, fqPolyRepMatrixSpace)
 
-  RR = FqNmodMatSpace(F4, 2, 2)
+  RR = fqPolyRepMatrixSpace(F4, 2, 2)
 
-  @test isa(RR, FqNmodMatSpace)
+  @test isa(RR, fqPolyRepMatrixSpace)
 
   @test R == RR
 
-  @test_throws ErrorException FqNmodMatSpace(F4, 2, -1)
-  @test_throws ErrorException FqNmodMatSpace(F4, -1, 2)
-  @test_throws ErrorException FqNmodMatSpace(F4, -1, -1)
+  @test_throws ErrorException fqPolyRepMatrixSpace(F4, 2, -1)
+  @test_throws ErrorException fqPolyRepMatrixSpace(F4, -1, 2)
+  @test_throws ErrorException fqPolyRepMatrixSpace(F4, -1, -1)
 
   a = R()
 
-  @test isa(a, fq_nmod_mat)
+  @test isa(a, fqPolyRepMatrix)
   @test parent(a) == R
 
   ar = [ BigInt(1) BigInt(1); BigInt(1) BigInt(1) ]
 
   b = R(ar)
 
-  @test isa(b, fq_nmod_mat)
+  @test isa(b, fqPolyRepMatrix)
   @test parent(b) == R
   @test nrows(b) == 2 && ncols(b) == 2
   @test_throws ErrorConstrDimMismatch R(reshape(ar,1,4))
@@ -52,7 +52,7 @@
   ar = [ ZZ(1) ZZ(1); ZZ(1) ZZ(1) ]
 
   c = R(ar)
-  @test isa(c, fq_nmod_mat)
+  @test isa(c, fqPolyRepMatrix)
   @test parent(c) == R
   @test nrows(c) == 2 && ncols(c) == 2
   @test_throws ErrorConstrDimMismatch R(reshape(ar,4,1))
@@ -66,7 +66,7 @@
 
   d = R(ar)
 
-  @test isa(d, fq_nmod_mat)
+  @test isa(d, fqPolyRepMatrix)
   @test parent(d) == R
   @test nrows(d) == 2 && ncols(d) == 2
   @test_throws ErrorConstrDimMismatch R(reshape(ar,1,4))
@@ -80,13 +80,13 @@
 
   d = R(ar)
 
-  @test isa(d, fq_nmod_mat)
+  @test isa(d, fqPolyRepMatrix)
 
   ar = MatrixSpace(ZZ, 2, 2)([ 1 1; 1 1])
 
   e = R(ar)
 
-  @test isa(e, fq_nmod_mat)
+  @test isa(e, fqPolyRepMatrix)
   @test parent(e) == R
   @test nrows(e) == 2 && ncols(e) == 2
 
@@ -98,7 +98,7 @@
 
   f = R(ar)
 
-  @test isa(f, fq_nmod_mat)
+  @test isa(f, fqPolyRepMatrix)
   @test parent(f) == R
   @test nrows(f) == 2 && ncols(f) == 2
   @test_throws ErrorConstrDimMismatch R(reshape(ar,4,1))
@@ -108,11 +108,11 @@
   @test_throws ErrorConstrDimMismatch R([F4(1), F4(1), F4(1)])
   @test_throws ErrorConstrDimMismatch R([F4(1), F4(1), F4(1), F4(1), F4(1)])
 
-  @test isa(S(1), fq_nmod_mat)
+  @test isa(S(1), fqPolyRepMatrix)
 
-  @test isa(S(fmpz(1)), fq_nmod_mat)
+  @test isa(S(ZZRingElem(1)), fqPolyRepMatrix)
 
-  @test isa(S(F9(1)), fq_nmod_mat)
+  @test isa(S(F9(1)), fqPolyRepMatrix)
 
   g = deepcopy(e)
 
@@ -125,13 +125,13 @@
    arr = [1 2; 3 4]
    arr2 = [1, 2, 3, 4, 5, 6]
 
-   for T in [F9, fmpz, Int, BigInt]
+   for T in [F9, ZZRingElem, Int, BigInt]
       M = matrix(F9, map(T, arr))
-      @test isa(M, fq_nmod_mat)
+      @test isa(M, fqPolyRepMatrix)
       @test M.base_ring == F9
 
       M2 = matrix(F9, 2, 3, map(T, arr2))
-      @test isa(M2, fq_nmod_mat)
+      @test isa(M2, fqPolyRepMatrix)
       @test M2.base_ring == F9
       @test nrows(M2) == 2
       @test ncols(M2) == 3
@@ -141,12 +141,12 @@
 
    M3 = zero_matrix(F9, 2, 3)
 
-   @test isa(M3, fq_nmod_mat)
+   @test isa(M3, fqPolyRepMatrix)
    @test M3.base_ring == F9
 
    M4 = identity_matrix(F9, 3)
 
-   @test isa(M4, fq_nmod_mat)
+   @test isa(M4, fqPolyRepMatrix)
    @test M4.base_ring == F9
 
    a = zero_matrix(F9, 2, 2)
@@ -166,17 +166,17 @@
    @test !(a in keys(Dict(b => 1)))
 end
 
-@testset "fq_nmod_mat.similar" begin
+@testset "fqPolyRepMatrix.similar" begin
    F9, b = FiniteField(3, 2, "b")
-   S = FqNmodMatSpace(F9, 2, 2)
-   s = S(fmpz(3))
+   S = fqPolyRepMatrixSpace(F9, 2, 2)
+   s = S(ZZRingElem(3))
 
    t = similar(s)
-   @test t isa fq_nmod_mat
+   @test t isa fqPolyRepMatrix
    @test size(t) == size(s)
 
    t = similar(s, 2, 3)
-   @test t isa fq_nmod_mat
+   @test t isa fqPolyRepMatrix
    @test size(t) == (2, 3)
 
    for (R, M) in ring_to_mat
@@ -188,15 +188,15 @@ end
    end
 
    # issue #651
-   m = one(Generic.MatSpace{fq_nmod}(F9, 2, 2, false))
+   m = one(Generic.MatSpace{fqPolyRepFieldElem}(F9, 2, 2, false))
    for n = (m, -m, m*m, m+m, 2m)
-      @test n isa Generic.MatSpaceElem{fq_nmod}
+      @test n isa Generic.MatSpaceElem{fqPolyRepFieldElem}
    end
 end
 
-@testset "fq_nmod_mat.printing" begin
+@testset "fqPolyRepMatrix.printing" begin
   F4, _  = FlintFiniteField(2, 2, "a")
-  R = FqNmodMatSpace(F4, 2, 2)
+  R = fqPolyRepMatrixSpace(F4, 2, 2)
 
   a = R(1)
 
@@ -204,11 +204,11 @@ end
   @test !occursin(string(typeof(a)), string(a))
 end
 
-@testset "fq_nmod_mat.manipulation" begin
+@testset "fqPolyRepMatrix.manipulation" begin
   F4, _ = FlintFiniteField(2, 2, "a")
-  R = FqNmodMatSpace(F4, 2, 2)
+  R = fqPolyRepMatrixSpace(F4, 2, 2)
   F9, _ = FlintFiniteField(3, 2, "b")
-  S = FqNmodMatSpace(F9, 2, 2)
+  S = fqPolyRepMatrixSpace(F9, 2, 2)
 
   ar = [ 1 2; 3 4]
 
@@ -248,11 +248,11 @@ end
 
   d = one(R)
 
-  @test isa(d, fq_nmod_mat)
+  @test isa(d, fqPolyRepMatrix)
 
   e = zero(R)
 
-  @test isa(e, fq_nmod_mat)
+  @test isa(e, fqPolyRepMatrix)
 
   @test iszero(e)
 
@@ -272,7 +272,7 @@ end
   @test_throws ErrorConstrDimMismatch transpose!(R([ 1 2 ;]))
 end
 
-@testset "fq_nmod_mat.unary_ops" begin
+@testset "fqPolyRepMatrix.unary_ops" begin
   F17, _ = FlintFiniteField(17, 1, "a")
 
   R = MatrixSpace(F17, 3, 4)
@@ -289,7 +289,7 @@ end
   @test d == R([ 15 16 0 16; 0 0 0 0; 0 16 15 0])
 end
 
-@testset "fq_nmod_mat.row_col_swapping" begin
+@testset "fqPolyRepMatrix.row_col_swapping" begin
    R, _ = FlintFiniteField(17, 1, "a")
 
    a = matrix(R, [1 2; 3 4; 5 6])
@@ -328,7 +328,7 @@ end
    @test a == matrix(R, [3 2 1; 5 4 3; 7 6 5])
 end
 
-@testset "fq_nmod_mat.binary_ops" begin
+@testset "fqPolyRepMatrix.binary_ops" begin
   F17, _ = FlintFiniteField(17, 1, "a")
 
   R = MatrixSpace(F17, 3, 4)
@@ -355,7 +355,7 @@ end
   @test v*A == [31, 29, 28]
 end
 
-@testset "fq_nmod_mat.adhoc_binary" begin
+@testset "fqPolyRepMatrix.adhoc_binary" begin
   F17, _ = FlintFiniteField(17, 1, "a")
 
   R = MatrixSpace(F17, 3, 4)
@@ -394,7 +394,7 @@ end
   @test_throws ErrorException F2(1)*a
 end
 
-@testset "fq_nmod_mat.comparison" begin
+@testset "fqPolyRepMatrix.comparison" begin
   F17, _ = FlintFiniteField(17, 1, "a")
 
   R = MatrixSpace(F17, 3, 4)
@@ -408,21 +408,21 @@ end
   @test a != R([0 1 3 1; 2 1 4 2; 1 1 1 1])
 end
 
-@testset "fq_nmod_mat.comparison" begin
+@testset "fqPolyRepMatrix.comparison" begin
   F17, _ = FlintFiniteField(17, 1, "a")
 
   R = MatrixSpace(F17, 3, 4)
 
   @test R(5) == 5
-  @test R(5) == fmpz(5)
+  @test R(5) == ZZRingElem(5)
   @test R(5) == F17(5)
 
   @test 5 == R(5)
-  @test fmpz(5) == R(5)
+  @test ZZRingElem(5) == R(5)
   @test F17(5) == R(5)
 end
 
-@testset "fq_nmod_mat.powering" begin
+@testset "fqPolyRepMatrix.powering" begin
   F17, _ = FlintFiniteField(17, 1, "a")
 
   R = MatrixSpace(F17, 3, 4)
@@ -436,7 +436,7 @@ end
   @test g == MatrixSpace(F17, 3, 3)([1 2 2; 2 13 12; 2 12 15])
 end
 
-@testset "fq_nmod_mat.row_echelon_form" begin
+@testset "fqPolyRepMatrix.row_echelon_form" begin
   F17, _ = FlintFiniteField(17, 1, "a")
   R = MatrixSpace(F17, 3, 4)
   RR = MatrixSpace(F17, 4, 3)
@@ -465,7 +465,7 @@ end
   @test r == 2
 end
 
-@testset "fq_nmod_mat.trace_det" begin
+@testset "fqPolyRepMatrix.trace_det" begin
   F17, _ = FlintFiniteField(17, 1, "a")
   R = MatrixSpace(F17, 3, 4)
   RR = MatrixSpace(F17, 4, 3)
@@ -497,7 +497,7 @@ end
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 end
 
-@testset "fq_nmod_mat.rank" begin
+@testset "fqPolyRepMatrix.rank" begin
   F17, _ = FlintFiniteField(17, 1, "a")
   R = MatrixSpace(F17, 3, 4)
   RR = MatrixSpace(F17, 4, 3)
@@ -521,7 +521,7 @@ end
   @test c == 2
 end
 
-@testset "fq_nmod_mat.inv" begin
+@testset "fqPolyRepMatrix.inv" begin
   F17, _ = FlintFiniteField(17, 1, "a")
   R = MatrixSpace(F17, 3, 4)
   RR = MatrixSpace(F17, 4, 3)
@@ -541,7 +541,7 @@ end
   @test_throws ErrorException inv(transpose(a)*a)
 end
 
-@testset "fq_nmod_mat.solve" begin
+@testset "fqPolyRepMatrix.solve" begin
   F17, _ = FlintFiniteField(17, 1, "a")
   R = MatrixSpace(F17, 3, 3)
   S = MatrixSpace(F17, 3, 4)
@@ -630,7 +630,7 @@ end
    @test_throws ErrorException can_solve(A, B, side = :garbage)
 end
 
-@testset "fq_nmod_mat.lu" begin
+@testset "fqPolyRepMatrix.lu" begin
 
   F17, _ = FlintFiniteField(17, 1, "a")
   R = MatrixSpace(F17, 3, 3)
@@ -658,7 +658,7 @@ end
   @test l*u == P*c
 end
 
-@testset "fq_nmod_mat.view" begin
+@testset "fqPolyRepMatrix.view" begin
   F17, _ = FlintFiniteField(17, 1, "a")
   R = MatrixSpace(F17, 3, 3)
   S = MatrixSpace(F17, 3, 4)
@@ -694,7 +694,7 @@ end
   @test t[1, 1] == 2
 end
 
-@testset "fq_nmod_mat.sub" begin
+@testset "fqPolyRepMatrix.sub" begin
    F17, _ = FlintFiniteField(17, 1, "a")
    S = MatrixSpace(F17, 3, 3)
 
@@ -702,7 +702,7 @@ end
 
    B = @inferred sub(A, 1, 1, 2, 2)
 
-   @test typeof(B) == fq_nmod_mat
+   @test typeof(B) == fqPolyRepMatrix
    @test B == MatrixSpace(F17, 2, 2)([1 2; 4 5])
 
    B[1, 1] = 10
@@ -710,7 +710,7 @@ end
 
    C = @inferred sub(B, 1:2, 1:2)
 
-   @test typeof(C) == fq_nmod_mat
+   @test typeof(C) == fqPolyRepMatrix
    @test C == MatrixSpace(F17, 2, 2)([10 2; 4 5])
 
    C[1, 1] = 20
@@ -718,7 +718,7 @@ end
    @test A == S([1 2 3; 4 5 6; 7 8 9])
 end
 
-@testset "fq_nmod_mat.concatenation" begin
+@testset "fqPolyRepMatrix.concatenation" begin
   F17, _ = FlintFiniteField(17, 1, "a")
   R = MatrixSpace(F17, 3, 3)
   S = MatrixSpace(F17, 3, 4)
@@ -754,7 +754,7 @@ end
   @test_throws ErrorException vcat(a,b)
 end
 
-@testset "fq_nmod_mat.conversion" begin
+@testset "fqPolyRepMatrix.conversion" begin
   F17, _ = FlintFiniteField(17, 1, "a")
   R = MatrixSpace(F17, 3, 3)
 
@@ -765,7 +765,7 @@ end
                      F17(0) F17(0) F17(2) ]
 end
 
-@testset "fq_nmod_mat.charpoly" begin
+@testset "fqPolyRepMatrix.charpoly" begin
    F17, _ = FlintFiniteField(17, 1, "a")
 
    for dim = 0:5
@@ -785,7 +785,7 @@ end
    end
 end
 
-@testset "fq_nmod_mat.rand" begin
+@testset "fqPolyRepMatrix.rand" begin
    F17, _ = FlintFiniteField(17, 1, "a")
    S = MatrixSpace(F17, 3, 4)
    M = rand(S)

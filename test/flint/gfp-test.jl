@@ -1,4 +1,4 @@
-function test_elem(R::Nemo.GaloisField)
+function test_elem(R::Nemo.fpField)
    return rand(R)
 end
 
@@ -14,25 +14,25 @@ end
 
    @test_throws DomainError GF(-13)
 
-   @test elem_type(R) == Nemo.gfp_elem
-   @test elem_type(Nemo.GaloisField) == Nemo.gfp_elem
-   @test parent_type(Nemo.gfp_elem) == Nemo.GaloisField
+   @test elem_type(R) == Nemo.fpFieldElem
+   @test elem_type(Nemo.fpField) == Nemo.fpFieldElem
+   @test parent_type(Nemo.fpFieldElem) == Nemo.fpField
 
-   @test Nemo.promote_rule(elem_type(R), fmpz) == elem_type(R)
+   @test Nemo.promote_rule(elem_type(R), ZZRingElem) == elem_type(R)
 
-   @test isa(R, Nemo.GaloisField)
+   @test isa(R, Nemo.fpField)
 
-   @test isa(R(), Nemo.gfp_elem)
+   @test isa(R(), Nemo.fpFieldElem)
 
-   @test isa(R(11), Nemo.gfp_elem)
+   @test isa(R(11), Nemo.fpFieldElem)
 
    a = R(11)
 
-   @test isa(R(a), Nemo.gfp_elem)
+   @test isa(R(a), Nemo.fpFieldElem)
 
-   @test isa(R(fmpq(7, 11)), Nemo.gfp_elem)
-   @test R(fmpq(7, 11))*11 == 7
-   @test_throws ErrorException R(fmpq(7, 13))
+   @test isa(R(QQFieldElem(7, 11)), Nemo.fpFieldElem)
+   @test R(QQFieldElem(7, 11))*11 == 7
+   @test_throws ErrorException R(QQFieldElem(7, 13))
 
    for i = 1:1000
       p = rand(UInt(1):typemax(UInt))
@@ -67,12 +67,12 @@ end
    T = GF(19, cached = false)
    @test !(S === T)
 
-   S = GF(fmpz(17))
-   T = GF(fmpz(17))
+   S = GF(ZZRingElem(17))
+   T = GF(ZZRingElem(17))
    @test T === S
 
-   S = GF(fmpz(19), cached = false)
-   T = GF(fmpz(19), cached = false)
+   S = GF(ZZRingElem(19), cached = false)
+   T = GF(ZZRingElem(19), cached = false)
    @test !(S === T)
 
    @test_throws MethodError GF(big(3))
@@ -86,11 +86,11 @@ end
    test_rand(R, 1:9)
    test_rand(R, Int16(1):Int16(9))
    test_rand(R, big(1):big(9))
-   test_rand(R, fmpz(1):fmpz(9))
+   test_rand(R, ZZRingElem(1):ZZRingElem(9))
    test_rand(R, [3,9,2])
    test_rand(R, Int16[3,9,2])
    test_rand(R, BigInt[3,9,2])
-   test_rand(R, fmpz[3,9,2])
+   test_rand(R, ZZRingElem[3,9,2])
 end
 
 @testset "gfp.printing" begin
@@ -121,7 +121,7 @@ end
 
    @test data(R(3)) == 3
    @test lift(R(3)) == 3
-   @test isa(lift(R(3)), fmpz)
+   @test isa(lift(R(3)), ZZRingElem)
 
    R2 = GF(2)
    R3 = GF(3)

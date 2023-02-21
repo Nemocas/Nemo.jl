@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   nmod_abs_series.jl: Absolute series using nmod_poly
+#   nmod_abs_series.jl: Absolute series using zzModPolyRingElem
 #
 #   nmod_abs_series, gfp_abs_series
 #
@@ -10,8 +10,8 @@ export nmod_abs_series, NmodAbsSeriesRing,
        gfp_abs_series, GFPAbsSeriesRing
 
 for (etype, rtype, mtype, brtype, flint_fn) in (
-   (nmod_abs_series, NmodAbsSeriesRing, nmod, NmodRing, "nmod_poly"),
-   (gfp_abs_series, GFPAbsSeriesRing, gfp_elem, GaloisField, "nmod_poly"))
+   (nmod_abs_series, NmodAbsSeriesRing, zzModRingElem, zzModRing, "zzModPolyRingElem"),
+   (gfp_abs_series, GFPAbsSeriesRing, fpFieldElem, fpField, "zzModPolyRingElem"))
 @eval begin
 
 ###############################################################################
@@ -87,7 +87,7 @@ zero(R::($rtype)) = R(0)
 one(R::($rtype)) = R(1)
 
 function gen(R::($rtype))
-   z = ($etype)(R.n, [fmpz(0), fmpz(1)], 2, max_precision(R))
+   z = ($etype)(R.n, [ZZRingElem(0), ZZRingElem(1)], 2, max_precision(R))
    z.parent = R
    return z
 end
@@ -279,17 +279,17 @@ end
 
 *(x::($etype), y::$(mtype)) = y*x
 
-function *(x::fmpz, y::($etype))
+function *(x::ZZRingElem, y::($etype))
    R = base_ring(y)
    xmod = ccall((:fmpz_fdiv_ui, libflint), UInt,
-                (Ref{fmpz}, UInt),
+                (Ref{ZZRingElem}, UInt),
                 x, R.n)
    return R(xmod)*y
 end
 
-*(x::($etype), y::fmpz) = y*x
+*(x::($etype), y::ZZRingElem) = y*x
 
-*(x::Integer, y::($etype)) = fmpz(x)*y
+*(x::Integer, y::($etype)) = ZZRingElem(x)*y
 
 *(x::($etype), y::Integer) = y*x
 
@@ -426,17 +426,17 @@ end
 
 ==(x::$(mtype), y::($etype)) = y == x
 
-function ==(x::($etype), y::fmpz)
+function ==(x::($etype), y::ZZRingElem)
    R = base_ring(x)
    ymod = ccall((:fmpz_fdiv_ui, libflint), UInt,
-                (Ref{fmpz}, UInt),
+                (Ref{ZZRingElem}, UInt),
                 y, modulus(x))
    return x == R(ymod)
 end
 
-==(x::fmpz, y::($etype)) = y == x
+==(x::ZZRingElem, y::($etype)) = y == x
 
-==(x::($etype), y::Integer) = x == fmpz(y)
+==(x::($etype), y::Integer) = x == ZZRingElem(y)
 
 ==(x::Integer, y::($etype)) = y == x
 
@@ -484,12 +484,12 @@ function divexact(x::($etype), y::$(mtype); check::Bool=true)
    return z
 end
 
-function divexact(x::($etype), y::fmpz; check::Bool=true)
+function divexact(x::($etype), y::ZZRingElem; check::Bool=true)
    R = base_ring(x)
    return divexact(x, R(y))
 end
 
-divexact(x::($etype), y::Integer; check::Bool=true) = divexact(x, fmpz(y); check=check)
+divexact(x::($etype), y::Integer; check::Bool=true) = divexact(x, ZZRingElem(y); check=check)
 
 ###############################################################################
 #
@@ -533,7 +533,7 @@ function setcoeff!(z::($etype), n::Int, x::($mtype))
    return z
 end
 
-function setcoeff!(z::($etype), n::Int, x::fmpz)
+function setcoeff!(z::($etype), n::Int, x::ZZRingElem)
    R = base_ring(z)
    return setcoeff!(z, n, R(x))
 end
@@ -605,7 +605,7 @@ end
 
 promote_rule(::Type{($etype)}, ::Type{T}) where {T <: Integer} = ($etype)
 
-promote_rule(::Type{($etype)}, ::Type{fmpz}) = ($etype)
+promote_rule(::Type{($etype)}, ::Type{ZZRingElem}) = ($etype)
 
 promote_rule(::Type{($etype)}, ::Type{$(mtype)}) = ($etype)
 
@@ -633,13 +633,13 @@ function (a::($rtype))(b::$(mtype))
    return z
 end
 
-function (a::($rtype))(b::fmpz)
+function (a::($rtype))(b::ZZRingElem)
    R = base_ring(a)
    return a(R(b))
 end
 
 function (a::($rtype))(b::Integer)
-   return a(fmpz(b))
+   return a(ZZRingElem(b))
 end
 
 function (a::($rtype))(b::($etype))
@@ -647,7 +647,7 @@ function (a::($rtype))(b::($etype))
    return b
 end
 
-function (a::($rtype))(b::Vector{fmpz}, len::Int, prec::Int)
+function (a::($rtype))(b::Vector{ZZRingElem}, len::Int, prec::Int)
    z = ($etype)(a.n, b, len, prec)
    z.parent = a
    return z
@@ -761,7 +761,7 @@ end
 #
 ###############################################################################
 
-function PowerSeriesRing(R::NmodRing, prec::Int, s::Symbol; model=:capped_relative, cached = true)
+function PowerSeriesRing(R::zzModRing, prec::Int, s::Symbol; model=:capped_relative, cached = true)
    if model == :capped_relative
       parent_obj = NmodRelSeriesRing(R, prec, s, cached)
    elseif model == :capped_absolute
@@ -772,19 +772,19 @@ function PowerSeriesRing(R::NmodRing, prec::Int, s::Symbol; model=:capped_relati
    return parent_obj, gen(parent_obj)
 end
 
-function PowerSeriesRing(R::NmodRing, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
+function PowerSeriesRing(R::zzModRing, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
    return PowerSeriesRing(R, prec, Symbol(s); model=model, cached=cached)
 end
 
-function AbsSeriesRing(R::NmodRing, prec::Int)
+function AbsSeriesRing(R::zzModRing, prec::Int)
    return NmodAbsSeriesRing(R, prec, :x, false)
 end
 
-function RelSeriesRing(R::NmodRing, prec::Int)
+function RelSeriesRing(R::zzModRing, prec::Int)
    return NmodRelSeriesRing(R, prec, :x, false)
 end
 
-function PowerSeriesRing(R::GaloisField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
+function PowerSeriesRing(R::fpField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
    if model == :capped_relative
       parent_obj = GFPRelSeriesRing(R, prec, s, cached)
    elseif model == :capped_absolute
@@ -795,14 +795,14 @@ function PowerSeriesRing(R::GaloisField, prec::Int, s::Symbol; model=:capped_rel
    return parent_obj, gen(parent_obj)
 end
 
-function PowerSeriesRing(R::GaloisField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
+function PowerSeriesRing(R::fpField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
    return PowerSeriesRing(R, prec, Symbol(s); model=model, cached=cached)
 end
 
-function AbsSeriesRing(R::GaloisField, prec::Int)
+function AbsSeriesRing(R::fpField, prec::Int)
    return GFPAbsSeriesRing(R, prec, :x, false)
 end
 
-function RelSeriesRing(R::GaloisField, prec::Int)
+function RelSeriesRing(R::fpField, prec::Int)
    return GFPRelSeriesRing(R, prec, :x, false)
 end

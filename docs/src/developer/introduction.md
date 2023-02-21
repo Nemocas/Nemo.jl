@@ -55,14 +55,14 @@ In the `src` directory of Nemo are four directories `flint`, `arb`, `antic` and
 `test` directory is similarly organised.
 
 Within each of these directories is a set of files, one per module within
-the C libraries, e.g. the `fmpz.jl` file wraps the Flint `fmpz` module for
-multiple precision integers. The `fmpz_poly.jl` file wraps the Flint
-univariate polynomials over `fmpz` integers, and so on.
+the C libraries, e.g. the `ZZRingElem.jl` file wraps the Flint `ZZRingElem` module for
+multiple precision integers. The `ZZPolyRingElem.jl` file wraps the Flint
+univariate polynomials over `ZZRingElem` integers, and so on.
 
-The `fmpq` prefix is for Flint rationals, `fq` for Flint finite fields with
-multiprecision characteristic, `fq_nmod` is the same but for single word
+The `QQFieldElem` prefix is for Flint rationals, `FqPolyRepFieldElem` for Flint finite fields with
+multiprecision characteristic, `fqPolyRepFieldElem` is the same but for single word
 characteristic. The `padic` prefix is for the field of p-adic numbers for a
-given `p`. The `nmod` prefix is for `Z/nZ` for a given `n`. The `gfp` prefix is
+given `p`. The `zzModRingElem` prefix is for `Z/nZ` for a given `n`. The `gfp` prefix is
 the same as `Z/nZ` but where `n` is prime, so that we are dealing with a field.
 
 The `FlintTypes.jl` file contains the implementation of all the Flint types.

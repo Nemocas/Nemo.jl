@@ -13,12 +13,12 @@ export FlintQadicField, qadic, prime, teichmuller, log
 ###############################################################################
 
 @doc Markdown.doc"""
-    O(R::FlintQadicField, m::fmpz)
+    O(R::FlintQadicField, m::ZZRingElem)
 
 Construct the value $0 + O(p^n)$ given $m = p^n$. An exception results if $m$
 is not found to be a power of `p = prime(R)`.
 """
-function O(R::FlintQadicField, m::fmpz)
+function O(R::FlintQadicField, m::ZZRingElem)
    if isone(m)
       N = 0
    else
@@ -36,12 +36,12 @@ function O(R::FlintQadicField, m::fmpz)
 end
 
 @doc Markdown.doc"""
-    O(R::FlintQadicField, m::fmpq)
+    O(R::FlintQadicField, m::QQFieldElem)
 
 Construct the value $0 + O(p^n)$ given $m = p^n$. An exception results if $m$
 is not found to be a power of `p = prime(R)`.
 """
-function O(R::FlintQadicField, m::fmpq)
+function O(R::FlintQadicField, m::QQFieldElem)
    d = denominator(m)
    if isone(d)
       return O(R, numerator(m))
@@ -65,7 +65,7 @@ end
 Construct the value $0 + O(p^n)$ given $m = p^n$. An exception results if $m$
 is not found to be a power of `p = prime(R)`.
 """
-O(R::FlintQadicField, m::Integer) = O(R, fmpz(m))
+O(R::FlintQadicField, m::Integer) = O(R, ZZRingElem(m))
 
 elem_type(::Type{FlintQadicField}) = qadic
 
@@ -97,9 +97,9 @@ end
 parent_type(::Type{qadic}) = FlintQadicField
 
 function _prime(R::FlintQadicField, n::Int = 1)
-   z = fmpz()
+   z = ZZRingElem()
    ccall((:padic_ctx_pow_ui, libflint), Nothing,
-         (Ref{fmpz}, UInt, Ref{FlintQadicField}), z, n, R)
+         (Ref{ZZRingElem}, UInt, Ref{FlintQadicField}), z, n, R)
    return z
 end
 
@@ -118,7 +118,7 @@ function Base.deepcopy_internal(a::qadic, dict::IdDict{Any, Any})
 end
 
 function Base.hash(a::qadic, h::UInt)
-   return xor(hash(lift(FmpqPolyRing(FlintQQ, :x), a), h),
+   return xor(hash(lift(QQPolyRing(FlintQQ, :x), a), h),
               xor(hash([prime(parent(a)),degree(parent(a))], h), h))
 end
 
@@ -132,9 +132,9 @@ end
 Return the prime $p$ for the given $q$-adic field.
 """
 function prime(R::FlintQadicField)
-   z = fmpz()
+   z = ZZRingElem()
    ccall((:padic_ctx_pow_ui, libflint), Nothing,
-         (Ref{fmpz}, UInt, Ref{FlintQadicField}), z, 1, R)
+         (Ref{ZZRingElem}, UInt, Ref{FlintQadicField}), z, 1, R)
    return z
 end
 
@@ -158,28 +158,28 @@ function valuation(a::qadic)
 end
 
 @doc Markdown.doc"""
-    lift(R::FmpqPolyRing, a::qadic)
+    lift(R::QQPolyRing, a::qadic)
 
 Return a lift of the given $q$-adic field element to $\mathbb{Q}[x]$.
 """
-function lift(R::FmpqPolyRing, a::qadic)
+function lift(R::QQPolyRing, a::qadic)
    ctx = parent(a)
    r = R()
    ccall((:padic_poly_get_fmpq_poly, libflint), Nothing,
-         (Ref{fmpq_poly}, Ref{qadic}, Ref{FlintQadicField}), r, a, ctx)
+         (Ref{QQPolyRingElem}, Ref{qadic}, Ref{FlintQadicField}), r, a, ctx)
    return r
 end
 
 @doc Markdown.doc"""
-    lift(R::FmpzPolyRing, a::qadic)
+    lift(R::ZZPolyRing, a::qadic)
 
 Return a lift of the given $q$-adic field element to $\mathbb{Z}[x]$ if possible.
 """
-function lift(R::FmpzPolyRing, a::qadic)
+function lift(R::ZZPolyRing, a::qadic)
    ctx = parent(a)
    r = R()
    res = Bool(ccall((:padic_poly_get_fmpz_poly, libflint), Cint,
-                    (Ref{fmpz_poly}, Ref{qadic}, Ref{FlintQadicField}), r, a, ctx))
+                    (Ref{ZZPolyRingElem}, Ref{qadic}, Ref{FlintQadicField}), r, a, ctx))
    !res && error("Unable to lift")
    return r
 end
@@ -326,39 +326,39 @@ end
 
 +(a::qadic, b::Integer) = a + parent(a)(b)
 
-+(a::qadic, b::fmpz) = a + parent(a)(b)
++(a::qadic, b::ZZRingElem) = a + parent(a)(b)
 
-+(a::qadic, b::fmpq) = a + parent(a)(b)
++(a::qadic, b::QQFieldElem) = a + parent(a)(b)
 
 +(a::Integer, b::qadic) = b + a
 
-+(a::fmpz, b::qadic) = b + a
++(a::ZZRingElem, b::qadic) = b + a
 
-+(a::fmpq, b::qadic) = b + a
++(a::QQFieldElem, b::qadic) = b + a
 
 -(a::qadic, b::Integer) = a - parent(a)(b)
 
--(a::qadic, b::fmpz) = a - parent(a)(b)
+-(a::qadic, b::ZZRingElem) = a - parent(a)(b)
 
--(a::qadic, b::fmpq) = a - parent(a)(b)
+-(a::qadic, b::QQFieldElem) = a - parent(a)(b)
 
 -(a::Integer, b::qadic) = parent(b)(a) - b
 
--(a::fmpz, b::qadic) = parent(b)(a) - b
+-(a::ZZRingElem, b::qadic) = parent(b)(a) - b
 
--(a::fmpq, b::qadic) = parent(b)(a) - b
+-(a::QQFieldElem, b::qadic) = parent(b)(a) - b
 
 *(a::qadic, b::Integer) = a*parent(a)(b)
 
-*(a::qadic, b::fmpz) = a*parent(a)(b)
+*(a::qadic, b::ZZRingElem) = a*parent(a)(b)
 
-*(a::qadic, b::fmpq) = a*parent(a)(b)
+*(a::qadic, b::QQFieldElem) = a*parent(a)(b)
 
 *(a::Integer, b::qadic) = b*a
 
-*(a::fmpz, b::qadic) = b*a
+*(a::ZZRingElem, b::qadic) = b*a
 
-*(a::fmpq, b::qadic) = b*a
+*(a::QQFieldElem, b::qadic) = b*a
 
 ###############################################################################
 #
@@ -392,15 +392,15 @@ end
 
 ==(a::qadic, b::Integer) = a == parent(a)(b)
 
-==(a::qadic, b::fmpz) = a == parent(a)(b)
+==(a::qadic, b::ZZRingElem) = a == parent(a)(b)
 
-==(a::qadic, b::fmpq) = a == parent(a)(b)
+==(a::qadic, b::QQFieldElem) = a == parent(a)(b)
 
 ==(a::Integer, b::qadic) = parent(b)(a) == b
 
-==(a::fmpz, b::qadic) = parent(b)(a) == b
+==(a::ZZRingElem, b::qadic) = parent(b)(a) == b
 
-==(a::fmpq, b::qadic) = parent(b)(a) == b
+==(a::QQFieldElem, b::qadic) = parent(b)(a) == b
 
 ###############################################################################
 #
@@ -408,21 +408,21 @@ end
 #
 ###############################################################################
 
-^(q::qadic, n::Int) = q^fmpz(n)
+^(q::qadic, n::Int) = q^ZZRingElem(n)
 
-function ^(a::qadic, n::fmpz)
+function ^(a::qadic, n::ZZRingElem)
    ctx = parent(a)
    if n < 0
       return inv(a)^(-n)
    end
    if valuation(a) == 0
-     z = qadic(a.N) #if expo is fmpz, Int(n) would throw an error
+     z = qadic(a.N) #if expo is ZZRingElem, Int(n) would throw an error
    else             #for units (v==0) this is fine hower.
      z = qadic(a.N + (Int(n) - 1)*valuation(a))
    end
    z.parent = ctx
    ccall((:qadic_pow, libflint), Nothing,
-                 (Ref{qadic}, Ref{qadic}, Ref{fmpz}, Ref{FlintQadicField}),
+                 (Ref{qadic}, Ref{qadic}, Ref{ZZRingElem}, Ref{FlintQadicField}),
                z, a, n, ctx)
    return z
 end
@@ -444,17 +444,17 @@ end
 #
 ###############################################################################
 
-divexact(a::qadic, b::Integer; check::Bool=true) = a*(fmpz(1)//fmpz(b))
+divexact(a::qadic, b::Integer; check::Bool=true) = a*(ZZRingElem(1)//ZZRingElem(b))
 
-divexact(a::qadic, b::fmpz; check::Bool=true) = a*(1//b)
+divexact(a::qadic, b::ZZRingElem; check::Bool=true) = a*(1//b)
 
-divexact(a::qadic, b::fmpq; check::Bool=true) = a*inv(b)
+divexact(a::qadic, b::QQFieldElem; check::Bool=true) = a*inv(b)
 
-divexact(a::Integer, b::qadic; check::Bool=true) = fmpz(a)*inv(b)
+divexact(a::Integer, b::qadic; check::Bool=true) = ZZRingElem(a)*inv(b)
 
-divexact(a::fmpz, b::qadic; check::Bool=true) = inv((fmpz(1)//a)*b)
+divexact(a::ZZRingElem, b::qadic; check::Bool=true) = inv((ZZRingElem(1)//a)*b)
 
-divexact(a::fmpq, b::qadic; check::Bool=true) = inv(inv(a)*b)
+divexact(a::QQFieldElem, b::qadic; check::Bool=true) = inv(inv(a)*b)
 
 ###############################################################################
 #
@@ -646,9 +646,9 @@ promote_rule(::Type{qadic}, ::Type{T}) where {T <: Integer} = qadic
 
 promote_rule(::Type{qadic}, ::Type{Rational{V}}) where {V <: Integer} = qadic
 
-promote_rule(::Type{qadic}, ::Type{fmpz}) = qadic
+promote_rule(::Type{qadic}, ::Type{ZZRingElem}) = qadic
 
-promote_rule(::Type{qadic}, ::Type{fmpq}) = qadic
+promote_rule(::Type{qadic}, ::Type{QQFieldElem}) = qadic
 
 promote_rule(::Type{qadic}, ::Type{padic}) = qadic
 
@@ -668,10 +668,10 @@ function gen(R::FlintQadicField)
    if degree(R) == 1
       # Work around flint limitation
       # https://github.com/wbhart/flint2/issues/898
-      a = fmpz()
+      a = ZZRingElem()
       GC.@preserve R begin
-         ccall((:fmpz_set, libflint), Nothing, (Ref{fmpz}, Ptr{fmpz}),
-                                               a, reinterpret(Ptr{fmpz}, R.a))
+         ccall((:fmpz_set, libflint), Nothing, (Ref{ZZRingElem}, Ptr{ZZRingElem}),
+                                               a, reinterpret(Ptr{ZZRingElem}, R.a))
       end
       return R(-a)
    end
@@ -711,7 +711,7 @@ function (R::FlintQadicField)(a::Int)
    return z
 end
 
-function (R::FlintQadicField)(n::fmpz)
+function (R::FlintQadicField)(n::ZZRingElem)
    if iszero(n) || isone(n)
       N = 0
    else
@@ -720,12 +720,12 @@ function (R::FlintQadicField)(n::fmpz)
    end
    z = qadic(N + R.prec_max)
    ccall((:padic_poly_set_fmpz, libflint), Nothing,
-         (Ref{qadic}, Ref{fmpz}, Ref{FlintQadicField}), z, n, R)
+         (Ref{qadic}, Ref{ZZRingElem}, Ref{FlintQadicField}), z, n, R)
    z.parent = R
    return z
 end
 
-function (R::FlintQadicField)(n::fmpq)
+function (R::FlintQadicField)(n::QQFieldElem)
    m = denominator(n)
    if isone(m)
       return R(numerator(n))
@@ -738,20 +738,20 @@ function (R::FlintQadicField)(n::fmpq)
    end
    z = qadic(N + R.prec_max)
    ccall((:padic_poly_set_fmpq, libflint), Nothing,
-         (Ref{qadic}, Ref{fmpq}, Ref{FlintQadicField}), z, n, R)
+         (Ref{qadic}, Ref{QQFieldElem}, Ref{FlintQadicField}), z, n, R)
    z.parent = R
    return z
 end
 
-function (R::FlintQadicField)(n::fmpz_poly, pr::Int = R.prec_max)
+function (R::FlintQadicField)(n::ZZPolyRingElem, pr::Int = R.prec_max)
    z = qadic(pr)
    ccall((:qadic_set_fmpz_poly, libflint), Nothing,
-         (Ref{qadic}, Ref{fmpz_poly}, Ref{FlintQadicField}), z, n, R)
+         (Ref{qadic}, Ref{ZZPolyRingElem}, Ref{FlintQadicField}), z, n, R)
    z.parent = R
    return z
 end
 
-function (R::FlintQadicField)(n::fmpq_poly)
+function (R::FlintQadicField)(n::QQPolyRingElem)
 
    if degree(n) > degree(R) + 1
        error("Polynomial degree larger than degree of qadic field.")
@@ -765,16 +765,16 @@ function (R::FlintQadicField)(n::fmpq_poly)
    end
    z = qadic(N + R.prec_max)
    ccall((:padic_poly_set_fmpq_poly, libflint), Nothing,
-         (Ref{qadic}, Ref{fmpq_poly}, Ref{FlintQadicField}), z, n, R)
+         (Ref{qadic}, Ref{QQPolyRingElem}, Ref{FlintQadicField}), z, n, R)
    z.parent = R
    return z
 end
 
 function (R::FlintQadicField)(b::Rational{<:Integer})
-   return R(fmpq(b))
+   return R(QQFieldElem(b))
 end
 
-(R::FlintQadicField)(n::Integer) = R(fmpz(n))
+(R::FlintQadicField)(n::Integer) = R(ZZRingElem(n))
 
 function (R::FlintQadicField)(n::qadic)
    parent(n) != R && error("Unable to coerce into q-adic field")
@@ -797,5 +797,5 @@ degree $d$, where the default absolute precision of elements of the field
 is given by `prec` and the generator is printed as `var`.
 """
 function FlintQadicField(p::Integer, d::Int, prec::Int, var::String = "a"; cached::Bool = true)
-   return FlintQadicField(fmpz(p), d, prec, var, cached = cached)
+   return FlintQadicField(ZZRingElem(p), d, prec, var, cached = cached)
 end

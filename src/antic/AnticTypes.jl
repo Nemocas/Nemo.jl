@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-@attributes mutable struct AnticNumberField <: SimpleNumField{fmpq}
+@attributes mutable struct AnticNumberField <: SimpleNumField{QQFieldElem}
    pol_coeffs::Ptr{Nothing}
    pol_alloc::Int
    pol_length::Int
@@ -25,16 +25,16 @@
    traces_alloc::Int
    traces_length::Int
    flag::UInt
-   pol::fmpq_poly
+   pol::QQPolyRingElem
    S::Symbol
 
-   function AnticNumberField(pol::fmpq_poly, s::Symbol, cached::Bool = false, check::Bool = true)
+   function AnticNumberField(pol::QQPolyRingElem, s::Symbol, cached::Bool = false, check::Bool = true)
      check && !is_irreducible(pol) && error("Polynomial must be irreducible")
      return get_cached!(AnticNumberFieldID, (parent(pol), pol, s), cached) do
         nf = new()
         nf.pol = pol
         ccall((:nf_init, libantic), Nothing, 
-           (Ref{AnticNumberField}, Ref{fmpq_poly}), nf, pol)
+           (Ref{AnticNumberField}, Ref{QQPolyRingElem}), nf, pol)
         finalizer(_AnticNumberField_clear_fn, nf)
         nf.S = s
         return nf
@@ -42,14 +42,14 @@
    end
 end
 
-const AnticNumberFieldID = Dict{Tuple{FmpqPolyRing, fmpq_poly, Symbol}, AnticNumberField}()
+const AnticNumberFieldID = Dict{Tuple{QQPolyRing, QQPolyRingElem, Symbol}, AnticNumberField}()
 
 
 function _AnticNumberField_clear_fn(a::AnticNumberField)
    ccall((:nf_clear, libantic), Nothing, (Ref{AnticNumberField},), a)
 end
 
-mutable struct nf_elem <: SimpleNumFieldElem{fmpq}
+mutable struct nf_elem <: SimpleNumFieldElem{QQFieldElem}
    elem_coeffs::Ptr{Nothing}
    elem_alloc::Int
    elem_length::Int

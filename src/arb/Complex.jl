@@ -222,10 +222,10 @@ for (f,s) in ((:+, "add"), (:-, "sub"), (:*, "mul"), (://, "div"), (:^, "pow"))
       return z
     end
 
-    function ($f)(x::ComplexElem, y::fmpz, prec::Int = precision(Balls))
+    function ($f)(x::ComplexElem, y::ZZRingElem, prec::Int = precision(Balls))
       z = ComplexElem()
       ccall(($("acb_"*s*"_fmpz"), libarb), Nothing,
-                  (Ref{ComplexElem}, Ref{ComplexElem}, Ref{fmpz}, Int),
+                  (Ref{ComplexElem}, Ref{ComplexElem}, Ref{ZZRingElem}, Int),
                   z, x, y, prec)
       return z
     end
@@ -243,24 +243,24 @@ end
 
 +(x::UInt,y::ComplexElem) = +(y,x)
 +(x::Int,y::ComplexElem) = +(y,x)
-+(x::fmpz,y::ComplexElem) = +(y,x)
++(x::ZZRingElem,y::ComplexElem) = +(y,x)
 +(x::RealElem,y::ComplexElem) = +(y,x)
 
 *(x::UInt,y::ComplexElem) = *(y,x)
 *(x::Int,y::ComplexElem) = *(y,x)
-*(x::fmpz,y::ComplexElem) = *(y,x)
+*(x::ZZRingElem,y::ComplexElem) = *(y,x)
 *(x::RealElem,y::ComplexElem) = *(y,x)
 
 //(x::UInt,y::ComplexElem) = (x == 1) ? inv(y) : parent(y)(x) // y
 //(x::Int,y::ComplexElem) = (x == 1) ? inv(y) : parent(y)(x) // y
-//(x::fmpz,y::ComplexElem) = isone(x) ? inv(y) : parent(y)(x) // y
+//(x::ZZRingElem,y::ComplexElem) = isone(x) ? inv(y) : parent(y)(x) // y
 //(x::RealElem,y::ComplexElem) = isone(x) ? inv(y) : parent(y)(x) // y
 
 ^(x::UInt,y::ComplexElem) = parent(y)(x) ^ y
 ^(x::Int,y::ComplexElem) = parent(y)(x) ^ y
-^(x::fmpz,y::ComplexElem) = parent(y)(x) ^ y
+^(x::ZZRingElem,y::ComplexElem) = parent(y)(x) ^ y
 ^(x::RealElem,y::ComplexElem) = parent(y)(x) ^ y
-^(x::Integer, y::ComplexElem) = fmpz(x)^y
+^(x::Integer, y::ComplexElem) = ZZRingElem(x)^y
 
 function -(x::UInt, y::ComplexElem)
   z = ComplexElem()
@@ -276,9 +276,9 @@ function -(x::Int, y::ComplexElem)
   return z
 end
 
-function -(x::fmpz, y::ComplexElem)
+function -(x::ZZRingElem, y::ComplexElem)
   z = ComplexElem()
-  ccall((:acb_sub_fmpz, libarb), Nothing, (Ref{ComplexElem}, Ref{ComplexElem}, Ref{fmpz}, Int), z, y, x, precision(Balls))
+  ccall((:acb_sub_fmpz, libarb), Nothing, (Ref{ComplexElem}, Ref{ComplexElem}, Ref{ZZRingElem}, Int), z, y, x, precision(Balls))
   ccall((:acb_neg, libarb), Nothing, (Ref{ComplexElem}, Ref{ComplexElem}), z, z)
   return z
 end
@@ -290,45 +290,45 @@ function -(x::RealElem, y::ComplexElem)
   return z
 end
 
-+(x::ComplexElem, y::Integer) = x + fmpz(y)
++(x::ComplexElem, y::Integer) = x + ZZRingElem(y)
 
--(x::ComplexElem, y::Integer) = x - fmpz(y)
+-(x::ComplexElem, y::Integer) = x - ZZRingElem(y)
 
-*(x::ComplexElem, y::Integer) = x*fmpz(y)
+*(x::ComplexElem, y::Integer) = x*ZZRingElem(y)
 
-//(x::ComplexElem, y::Integer) = x//fmpz(y)
+//(x::ComplexElem, y::Integer) = x//ZZRingElem(y)
 
-+(x::Integer, y::ComplexElem) = fmpz(x) + y
++(x::Integer, y::ComplexElem) = ZZRingElem(x) + y
 
--(x::Integer, y::ComplexElem) = fmpz(x) - y
+-(x::Integer, y::ComplexElem) = ZZRingElem(x) - y
 
-*(x::Integer, y::ComplexElem) = fmpz(x)*y
+*(x::Integer, y::ComplexElem) = ZZRingElem(x)*y
 
-//(x::Integer, y::ComplexElem) = fmpz(x)//y
+//(x::Integer, y::ComplexElem) = ZZRingElem(x)//y
 
 ^(x::ComplexElem, y::Integer) = x ^ parent(x)(y)
 
-+(x::ComplexElem, y::fmpq) = x + parent(x)(y)
--(x::ComplexElem, y::fmpq) = x - parent(x)(y)
-*(x::ComplexElem, y::fmpq) = x * parent(x)(y)
-//(x::ComplexElem, y::fmpq) = x // parent(x)(y)
-^(x::ComplexElem, y::fmpq) = x ^ parent(x)(y)
++(x::ComplexElem, y::QQFieldElem) = x + parent(x)(y)
+-(x::ComplexElem, y::QQFieldElem) = x - parent(x)(y)
+*(x::ComplexElem, y::QQFieldElem) = x * parent(x)(y)
+//(x::ComplexElem, y::QQFieldElem) = x // parent(x)(y)
+^(x::ComplexElem, y::QQFieldElem) = x ^ parent(x)(y)
 
-+(x::fmpq, y::ComplexElem) = parent(y)(x) + y
--(x::fmpq, y::ComplexElem) = parent(y)(x) - y
-*(x::fmpq, y::ComplexElem) = parent(y)(x) * y
-//(x::fmpq, y::ComplexElem) = parent(y)(x) // y
-^(x::fmpq, y::ComplexElem) = parent(y)(x) ^ y
++(x::QQFieldElem, y::ComplexElem) = parent(y)(x) + y
+-(x::QQFieldElem, y::ComplexElem) = parent(y)(x) - y
+*(x::QQFieldElem, y::ComplexElem) = parent(y)(x) * y
+//(x::QQFieldElem, y::ComplexElem) = parent(y)(x) // y
+^(x::QQFieldElem, y::ComplexElem) = parent(y)(x) ^ y
 
 divexact(x::ComplexElem, y::ComplexElem; check::Bool=true) = x // y
-divexact(x::fmpz, y::ComplexElem; check::Bool=true) = x // y
-divexact(x::ComplexElem, y::fmpz; check::Bool=true) = x // y
+divexact(x::ZZRingElem, y::ComplexElem; check::Bool=true) = x // y
+divexact(x::ComplexElem, y::ZZRingElem; check::Bool=true) = x // y
 divexact(x::Int, y::ComplexElem; check::Bool=true) = x // y
 divexact(x::ComplexElem, y::Int; check::Bool=true) = x // y
 divexact(x::UInt, y::ComplexElem; check::Bool=true) = x // y
 divexact(x::ComplexElem, y::UInt; check::Bool=true) = x // y
-divexact(x::fmpq, y::ComplexElem; check::Bool=true) = x // y
-divexact(x::ComplexElem, y::fmpq; check::Bool=true) = x // y
+divexact(x::QQFieldElem, y::ComplexElem; check::Bool=true) = x // y
+divexact(x::ComplexElem, y::QQFieldElem; check::Bool=true) = x // y
 divexact(x::RealElem, y::ComplexElem; check::Bool=true) = x // y
 divexact(x::ComplexElem, y::RealElem; check::Bool=true) = x // y
 divexact(x::Float64, y::ComplexElem; check::Bool=true) = x // y
@@ -341,27 +341,27 @@ divexact(x::Rational{T}, y::ComplexElem; check::Bool=true) where {T <: Integer} 
 divexact(x::ComplexElem, y::Rational{T}; check::Bool=true) where {T <: Integer} = x // y
 
 /(x::ComplexElem, y::ComplexElem) = x // y
-/(x::fmpz, y::ComplexElem) = x // y
-/(x::ComplexElem, y::fmpz) = x // y
+/(x::ZZRingElem, y::ComplexElem) = x // y
+/(x::ComplexElem, y::ZZRingElem) = x // y
 /(x::Int, y::ComplexElem) = x // y
 /(x::ComplexElem, y::Int) = x // y
 /(x::UInt, y::ComplexElem) = x // y
 /(x::ComplexElem, y::UInt) = x // y
-/(x::fmpq, y::ComplexElem) = x // y
-/(x::ComplexElem, y::fmpq) = x // y
+/(x::QQFieldElem, y::ComplexElem) = x // y
+/(x::ComplexElem, y::QQFieldElem) = x // y
 /(x::RealElem, y::ComplexElem) = x // y
 /(x::ComplexElem, y::RealElem) = x // y
 
-+(x::Rational{T}, y::ComplexElem) where {T <: Integer} = fmpq(x) + y
-+(x::ComplexElem, y::Rational{T}) where {T <: Integer} = x + fmpq(y)
--(x::Rational{T}, y::ComplexElem) where {T <: Integer} = fmpq(x) - y
--(x::ComplexElem, y::Rational{T}) where {T <: Integer} = x - fmpq(y)
-*(x::Rational{T}, y::ComplexElem) where {T <: Integer} = fmpq(x) * y
-*(x::ComplexElem, y::Rational{T}) where {T <: Integer} = x * fmpq(y)
-//(x::Rational{T}, y::ComplexElem) where {T <: Integer} = fmpq(x) // y
-//(x::ComplexElem, y::Rational{T}) where {T <: Integer} = x // fmpq(y)
-^(x::Rational{T}, y::ComplexElem) where {T <: Integer} = fmpq(x)^y
-^(x::ComplexElem, y::Rational{T}) where {T <: Integer} = x ^ fmpq(y)
++(x::Rational{T}, y::ComplexElem) where {T <: Integer} = QQFieldElem(x) + y
++(x::ComplexElem, y::Rational{T}) where {T <: Integer} = x + QQFieldElem(y)
+-(x::Rational{T}, y::ComplexElem) where {T <: Integer} = QQFieldElem(x) - y
+-(x::ComplexElem, y::Rational{T}) where {T <: Integer} = x - QQFieldElem(y)
+*(x::Rational{T}, y::ComplexElem) where {T <: Integer} = QQFieldElem(x) * y
+*(x::ComplexElem, y::Rational{T}) where {T <: Integer} = x * QQFieldElem(y)
+//(x::Rational{T}, y::ComplexElem) where {T <: Integer} = QQFieldElem(x) // y
+//(x::ComplexElem, y::Rational{T}) where {T <: Integer} = x // QQFieldElem(y)
+^(x::Rational{T}, y::ComplexElem) where {T <: Integer} = QQFieldElem(x)^y
+^(x::ComplexElem, y::Rational{T}) where {T <: Integer} = x ^ QQFieldElem(y)
 
 +(x::Float64, y::ComplexElem) = parent(y)(x) + y
 +(x::ComplexElem, y::Float64) = x + parent(x)(y)
@@ -418,11 +418,11 @@ end
 ==(x::ComplexElem,y::RealElem) = (x == parent(x)(y))
 ==(x::RealElem,y::ComplexElem) = (y == parent(y)(x))
 
-==(x::ComplexElem,y::fmpz) = (x == parent(x)(y))
-==(x::fmpz,y::ComplexElem) = (y == parent(y)(x))
+==(x::ComplexElem,y::ZZRingElem) = (x == parent(x)(y))
+==(x::ZZRingElem,y::ComplexElem) = (y == parent(y)(x))
 
-==(x::ComplexElem,y::Integer) = x == fmpz(y)
-==(x::Integer,y::ComplexElem) = fmpz(x) == y
+==(x::ComplexElem,y::Integer) = x == ZZRingElem(y)
+==(x::Integer,y::ComplexElem) = ZZRingElem(x) == y
 
 ==(x::ComplexElem,y::Float64) = (x == parent(x)(y))
 ==(x::Float64,y::ComplexElem) = (y == parent(y)(x))
@@ -433,8 +433,8 @@ end
 !=(x::ComplexElem,y::RealElem) = (x != parent(x)(y))
 !=(x::RealElem,y::ComplexElem) = (y != parent(y)(x))
 
-!=(x::ComplexElem,y::fmpz) = (x != parent(x)(y))
-!=(x::fmpz,y::ComplexElem) = (y != parent(y)(x))
+!=(x::ComplexElem,y::ZZRingElem) = (x != parent(x)(y))
+!=(x::ZZRingElem,y::ComplexElem) = (y != parent(y)(x))
 
 !=(x::ComplexElem,y::Float64) = (x != parent(x)(y))
 !=(x::Float64,y::ComplexElem) = (y != parent(y)(x))
@@ -468,30 +468,30 @@ function contains(x::ComplexElem, y::ComplexElem)
 end
 
 @doc Markdown.doc"""
-    contains(x::ComplexElem, y::fmpq)
+    contains(x::ComplexElem, y::QQFieldElem)
 
 Returns `true` if the box $x$ contains the given rational value, otherwise
 return `false`.
 """
-function contains(x::ComplexElem, y::fmpq)
-  r = ccall((:acb_contains_fmpq, libarb), Cint, (Ref{ComplexElem}, Ref{fmpq}), x, y)
+function contains(x::ComplexElem, y::QQFieldElem)
+  r = ccall((:acb_contains_fmpq, libarb), Cint, (Ref{ComplexElem}, Ref{QQFieldElem}), x, y)
   return Bool(r)
 end
 
 @doc Markdown.doc"""
-    contains(x::ComplexElem, y::fmpz)
+    contains(x::ComplexElem, y::ZZRingElem)
 
 Returns `true` if the box $x$ contains the given integer value, otherwise
 return `false`.
 """
-function contains(x::ComplexElem, y::fmpz)
-  r = ccall((:acb_contains_fmpz, libarb), Cint, (Ref{ComplexElem}, Ref{fmpz}), x, y)
+function contains(x::ComplexElem, y::ZZRingElem)
+  r = ccall((:acb_contains_fmpz, libarb), Cint, (Ref{ComplexElem}, Ref{ZZRingElem}), x, y)
   return Bool(r)
 end
 
 function contains(x::ComplexElem, y::Int)
-  v = fmpz(y)
-  r = ccall((:acb_contains_fmpz, libarb), Cint, (Ref{ComplexElem}, Ref{fmpz}), x, v)
+  v = ZZRingElem(y)
+  r = ccall((:acb_contains_fmpz, libarb), Cint, (Ref{ComplexElem}, Ref{ZZRingElem}), x, v)
   return Bool(r)
 end
 
@@ -501,7 +501,7 @@ end
 Returns `true` if the box $x$ contains the given integer value, otherwise
 return `false`.
 """
-contains(x::ComplexElem, y::Integer) = contains(x, fmpz(y))
+contains(x::ComplexElem, y::Integer) = contains(x, ZZRingElem(y))
 
 @doc Markdown.doc"""
     contains(x::ComplexElem, y::Rational{T}) where {T <: Integer}
@@ -509,7 +509,7 @@ contains(x::ComplexElem, y::Integer) = contains(x, fmpz(y))
 Returns `true` if the box $x$ contains the given rational value, otherwise
 return `false`.
 """
-contains(x::ComplexElem, y::Rational{T}) where {T <: Integer} = contains(x, fmpz(y))
+contains(x::ComplexElem, y::Rational{T}) where {T <: Integer} = contains(x, ZZRingElem(y))
 
 @doc Markdown.doc"""
     contains_zero(x::ComplexElem)
@@ -621,10 +621,10 @@ function ldexp(x::ComplexElem, y::Int)
   return z
 end
 
-function ldexp(x::ComplexElem, y::fmpz)
+function ldexp(x::ComplexElem, y::ZZRingElem)
   z = ComplexElem()
   ccall((:acb_mul_2exp_fmpz, libarb), Nothing,
-              (Ref{ComplexElem}, Ref{ComplexElem}, Ref{fmpz}), z, x, y)
+              (Ref{ComplexElem}, Ref{ComplexElem}, Ref{ZZRingElem}), z, x, y)
   return z
 end
 
@@ -649,15 +649,15 @@ end
 @doc Markdown.doc"""
     unique_integer(x::ComplexElem)
 
-Return a pair where the first value is a boolean and the second is an `fmpz`
+Return a pair where the first value is a boolean and the second is an `ZZRingElem`
 integer. The boolean indicates whether the box $x$ contains a unique
 integer. If this is the case, the second return value is set to this unique
 integer.
 """
 function unique_integer(x::ComplexElem)
-  z = fmpz()
+  z = ZZRingElem()
   unique = ccall((:acb_get_unique_fmpz, libarb), Int,
-    (Ref{fmpz}, Ref{ComplexElem}), z, x)
+    (Ref{ZZRingElem}, Ref{ComplexElem}), z, x)
   return (unique != 0, z)
 end
 
@@ -1135,16 +1135,16 @@ function eisenstein_g(k::Int, x::ComplexElem, prec::Int = precision(Balls))
 end
 
 @doc Markdown.doc"""
-    hilbert_class_polynomial(D::Int, R::FmpzPolyRing)
+    hilbert_class_polynomial(D::Int, R::ZZPolyRing)
 
 Return in the ring $R$ the Hilbert class polynomial of discriminant $D$,
 which is only defined for $D < 0$ and $D \equiv 0, 1 \pmod 4$.
 """
-function hilbert_class_polynomial(D::Int, R::FmpzPolyRing)
+function hilbert_class_polynomial(D::Int, R::ZZPolyRing)
    D < 0 && mod(D, 4) < 2 || throw(ArgumentError("$D is not a negative discriminant"))
    z = R()
    ccall((:acb_modular_hilbert_class_poly, Nemo.libarb), Nothing,
-         (Ref{fmpz_poly}, Int),
+         (Ref{ZZPolyRingElem}, Int),
          z, D)
    return z
 end
@@ -1692,18 +1692,18 @@ for (typeofx, passtoc) in ((ComplexElem, Ref{ComplexElem}), (Ptr{ComplexElem}, P
   end
 
   @eval begin
-    function _acb_set(x::($typeofx), y::fmpz)
-      ccall((:acb_set_fmpz, libarb), Nothing, (($passtoc), Ref{fmpz}), x, y)
+    function _acb_set(x::($typeofx), y::ZZRingElem)
+      ccall((:acb_set_fmpz, libarb), Nothing, (($passtoc), Ref{ZZRingElem}), x, y)
     end
 
-    function _acb_set(x::($typeofx), y::fmpz, p::Int)
+    function _acb_set(x::($typeofx), y::ZZRingElem, p::Int)
       ccall((:acb_set_round_fmpz, libarb), Nothing,
-                  (($passtoc), Ref{fmpz}, Int), x, y, p)
+                  (($passtoc), Ref{ZZRingElem}, Int), x, y, p)
     end
 
-    function _acb_set(x::($typeofx), y::fmpq, p::Int)
+    function _acb_set(x::($typeofx), y::QQFieldElem, p::Int)
       ccall((:acb_set_fmpq, libarb), Nothing,
-                  (($passtoc), Ref{fmpq}, Int), x, y, p)
+                  (($passtoc), Ref{QQFieldElem}, Int), x, y, p)
     end
 
     function _acb_set(x::($typeofx), y::RealElem)
@@ -1764,7 +1764,7 @@ for (typeofx, passtoc) in ((ComplexElem, Ref{ComplexElem}), (Ptr{ComplexElem}, P
                   (($passtoc), ($passtoc), Int), x, x, p)
     end
 
-    function _acb_set(x::($typeofx), y::fmpq, z::fmpq, p::Int)
+    function _acb_set(x::($typeofx), y::QQFieldElem, z::QQFieldElem, p::Int)
       r = ccall((:acb_real_ptr, libarb), Ptr{RealElem}, (($passtoc), ), x)
       _arb_set(r, y, p)
       i = ccall((:acb_imag_ptr, libarb), Ptr{RealElem}, (($passtoc), ), x)
@@ -1780,7 +1780,7 @@ for (typeofx, passtoc) in ((ComplexElem, Ref{ComplexElem}), (Ptr{ComplexElem}, P
 
   end
 
-  for T in (Float64, BigFloat, UInt, fmpz)
+  for T in (Float64, BigFloat, UInt, ZZRingElem)
     @eval begin
       function _acb_set(x::($typeofx), y::($T), z::($T))
         r = ccall((:acb_real_ptr, libarb), Ptr{RealElem}, (($passtoc), ), x)
@@ -1807,9 +1807,9 @@ end
 
 promote_rule(::Type{ComplexElem}, ::Type{T}) where {T <: Number} = ComplexElem
 
-promote_rule(::Type{ComplexElem}, ::Type{fmpz}) = ComplexElem
+promote_rule(::Type{ComplexElem}, ::Type{ZZRingElem}) = ComplexElem
 
-promote_rule(::Type{ComplexElem}, ::Type{fmpq}) = ComplexElem
+promote_rule(::Type{ComplexElem}, ::Type{QQFieldElem}) = ComplexElem
 
 promote_rule(::Type{ComplexElem}, ::Type{RealElem}) = ComplexElem
 
@@ -1824,23 +1824,23 @@ function (r::ComplexField)()
   return z
 end
 
-function (r::ComplexField)(x::Union{Int, UInt, fmpz, fmpq, RealElem, ComplexElem, Float64,
+function (r::ComplexField)(x::Union{Int, UInt, ZZRingElem, QQFieldElem, RealElem, ComplexElem, Float64,
                                     BigFloat, AbstractString}; precision::Int = precision(Balls))
   z = ComplexElem(x, precision)
   return z
 end
 
-(r::ComplexField)(x::Integer; precision::Int = precision(Balls)) = r(fmpz(x); precision = precision)
+(r::ComplexField)(x::Integer; precision::Int = precision(Balls)) = r(ZZRingElem(x); precision = precision)
 
-(r::ComplexField)(x::Rational{T}; precision::Int = precision(Balls)) where {T <: Integer} = r(fmpq(x), precision = precision)
+(r::ComplexField)(x::Rational{T}; precision::Int = precision(Balls)) where {T <: Integer} = r(QQFieldElem(x), precision = precision)
 
-function (r::ComplexField)(x::T, y::T; precision::Int = precision(Balls)) where {T <: Union{Int, UInt, fmpz, fmpq, RealElem, Float64, BigFloat, AbstractString}}
+function (r::ComplexField)(x::T, y::T; precision::Int = precision(Balls)) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, RealElem, Float64, BigFloat, AbstractString}}
   z = ComplexElem(x, y, precision)
   return z
 end
 
-for S in (Int, UInt, fmpz, fmpq, RealElem, Float64, BigFloat, AbstractString, BigInt)
-  for T in (Int, UInt, fmpz, fmpq, RealElem, Float64, BigFloat, AbstractString, BigInt)
+for S in (Int, UInt, ZZRingElem, QQFieldElem, RealElem, Float64, BigFloat, AbstractString, BigInt)
+  for T in (Int, UInt, ZZRingElem, QQFieldElem, RealElem, Float64, BigFloat, AbstractString, BigInt)
     if S != T
       @eval begin
         function (r::ComplexField)(x::$(S), y::$(T); precision::Int = precision(Balls))
@@ -1852,7 +1852,7 @@ for S in (Int, UInt, fmpz, fmpq, RealElem, Float64, BigFloat, AbstractString, Bi
   end
 end
 
-for T in (Int, UInt, fmpz, fmpq, RealElem, Float64, BigFloat, AbstractString, BigInt)
+for T in (Int, UInt, ZZRingElem, QQFieldElem, RealElem, Float64, BigFloat, AbstractString, BigInt)
   @eval begin
     function (r::ComplexField)(x::Rational{S}, y::$(T); precision::Int = precision(Balls)) where {S <: Integer}
       z = ComplexElem(RealField()(x), RealField()(y), precision)
@@ -1865,10 +1865,10 @@ for T in (Int, UInt, fmpz, fmpq, RealElem, Float64, BigFloat, AbstractString, Bi
   end
 end
 
-(r::ComplexField)(x::BigInt, y::BigInt; precision::Int = precision(Balls)) = r(fmpz(x), fmpz(y), precision = precision)
+(r::ComplexField)(x::BigInt, y::BigInt; precision::Int = precision(Balls)) = r(ZZRingElem(x), ZZRingElem(y), precision = precision)
 
 (r::ComplexField)(x::Rational{S}, y::Rational{T}; precision::Int = precision(Balls)) where {S <: Integer, T <: Integer} =
-      r(fmpq(x), fmpq(y); precision = precision)
+      r(QQFieldElem(x), QQFieldElem(y); precision = precision)
 
 ################################################################################
 #

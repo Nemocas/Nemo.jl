@@ -2,10 +2,10 @@ export Fac, unit
 
 ################################################################################
 #
-#   Special functions for Fac{fmpz}
+#   Special functions for Fac{ZZRingElem}
 #
 ################################################################################
 
-Base.in(b::Integer, a::Fac{fmpz}) = Base.in(fmpz(b), a)
+Base.in(b::Integer, a::Fac{ZZRingElem}) = Base.in(ZZRingElem(b), a)
 
-Base.getindex(a::Fac{fmpz}, b::Integer) = getindex(a, fmpz(b))
+Base.getindex(a::Fac{ZZRingElem}, b::Integer) = getindex(a, ZZRingElem(b))

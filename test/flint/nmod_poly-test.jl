@@ -1,18 +1,18 @@
-@testset "nmod_poly.constructors" begin
+@testset "zzModPolyRingElem.constructors" begin
   R = ResidueRing(ZZ, 17)
   
   S1 = PolyRing(R)
   S2 = PolyRing(R)
 
-  @test isa(S1, NmodPolyRing)
+  @test isa(S1, zzModPolyRing)
   @test S1 !== S2
 
   Rx, x = PolynomialRing(R, "x")
 
-  @test elem_type(Rx) == nmod_poly
-  @test elem_type(NmodPolyRing) == nmod_poly
-  @test parent_type(nmod_poly) == NmodPolyRing
-  @test dense_poly_type(nmod) == nmod_poly
+  @test elem_type(Rx) == zzModPolyRingElem
+  @test elem_type(zzModPolyRing) == zzModPolyRingElem
+  @test parent_type(zzModPolyRingElem) == zzModPolyRing
+  @test dense_poly_type(zzModRingElem) == zzModPolyRingElem
 
   S = ResidueRing(ZZ, 19)
   Sy, y = PolynomialRing(R, "y")
@@ -28,7 +28,7 @@
 
   @test S != R
 
-  @test isa(Rx, NmodPolyRing)
+  @test isa(Rx, zzModPolyRing)
   @test isa(x, PolyElem)
 
   a = Rx()
@@ -46,7 +46,7 @@
   @test isa(c, PolyElem)
   @test parent(c) == Rx
 
-  d = Rx(fmpz(3))
+  d = Rx(ZZRingElem(3))
 
   @test isa(d, PolyElem)
   @test parent(d) == Rx
@@ -61,7 +61,7 @@
   @test isa(f, PolyElem)
   @test parent(f) == Rx
 
-  g = Rx([fmpz(1), fmpz(2), fmpz(3)])
+  g = Rx([ZZRingElem(1), ZZRingElem(2), ZZRingElem(3)])
 
   @test isa(g, PolyElem)
   @test parent(g) == Rx
@@ -71,7 +71,7 @@
   @test isa(h, PolyElem)
   @test parent(h) == Rx
 
-  _a = PolynomialRing(ZZ, "y")[1]([fmpz(1),fmpz(2),fmpz(3)])
+  _a = PolynomialRing(ZZ, "y")[1]([ZZRingElem(1),ZZRingElem(2),ZZRingElem(3)])
 
   k = Rx(_a)
 
@@ -93,7 +93,7 @@
   @test isa(m, PolyElem)
 end
 
-@testset "nmod_poly.printing" begin
+@testset "zzModPolyRingElem.printing" begin
   R = ResidueRing(ZZ, 17)
   Rx, x = PolynomialRing(R, "x")
 
@@ -102,7 +102,7 @@ end
   @test sprint(show, "text/plain", a) == "x^3 + x + 1"
 end
 
-@testset "nmod_poly.manipulation" begin
+@testset "zzModPolyRingElem.manipulation" begin
   R = ResidueRing(ZZ, 17)
   Rx, x = PolynomialRing(R, "x")
 
@@ -135,42 +135,42 @@ end
   @test characteristic(Rx) == 17
 end
 
-@testset "nmod_poly.polynomial" begin
+@testset "zzModPolyRingElem.polynomial" begin
    R = ResidueRing(ZZ, 23)
 
    f = polynomial(R, [])
    g = polynomial(R, [1, 2, 3])
-   h = polynomial(R, fmpz[1, 2, 3])
+   h = polynomial(R, ZZRingElem[1, 2, 3])
    k = polynomial(R, [R(1), R(2), R(3)])
    p = polynomial(R, [1, 2, 3], "y")
 
-   @test isa(f, nmod_poly)
-   @test isa(g, nmod_poly)
-   @test isa(h, nmod_poly)
-   @test isa(k, nmod_poly)
-   @test isa(p, nmod_poly)
+   @test isa(f, zzModPolyRingElem)
+   @test isa(g, zzModPolyRingElem)
+   @test isa(h, zzModPolyRingElem)
+   @test isa(k, zzModPolyRingElem)
+   @test isa(p, zzModPolyRingElem)
 
    q = polynomial(R, [1, 2, 3], cached=false)
 
    @test parent(g) !== parent(q)
 end
 
-@testset "nmod_poly.similar" begin
+@testset "zzModPolyRingElem.similar" begin
    R = ResidueRing(ZZ, 23)
 
    f = polynomial(R, [1, 2, 3])
    g = similar(f)
    h = similar(f, "y")
 
-   @test isa(g, nmod_poly)
-   @test isa(h, nmod_poly)
+   @test isa(g, zzModPolyRingElem)
+   @test isa(h, zzModPolyRingElem)
 
    q = similar(g, cached=false)
 
    @test parent(g) === parent(q)
 end
 
-@testset "nmod_poly.unary_ops" begin
+@testset "zzModPolyRingElem.unary_ops" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -179,7 +179,7 @@ end
   @test -f ==  R(22)*x^2 + R(10)*x + R(18)
 end
 
-@testset "nmod_poly.binary_ops" begin
+@testset "zzModPolyRingElem.binary_ops" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -196,7 +196,7 @@ end
   @test h*(f+g) == x^4 + R(22)*x^3 + R(5)*x^2
 end
 
-@testset "nmod_poly.adhoc_binary" begin
+@testset "zzModPolyRingElem.adhoc_binary" begin
   R = ResidueRing(ZZ, 113)
   Rx, x = PolynomialRing(R, "x")
 
@@ -205,11 +205,11 @@ end
   f = x^2 + R(2)x + R(1)
   g = x^3 + R(3)x^2 + x
 
-  @test fmpz(2)*f == R(2)x^2 + R(4)x + R(2)
-  @test fmpz(2)*f == f*fmpz(2)
-  @test 2*f == fmpz(2)*f
+  @test ZZRingElem(2)*f == R(2)x^2 + R(4)x + R(2)
+  @test ZZRingElem(2)*f == f*ZZRingElem(2)
+  @test 2*f == ZZRingElem(2)*f
   @test f*2 == 2*f
-  @test R(2)*f == fmpz(2)*f
+  @test R(2)*f == ZZRingElem(2)*f
   @test f*R(2) == R(2)*f
 
   @test_throws ErrorException S(1)*f
@@ -218,21 +218,21 @@ end
   @test 112 + f == f + 112
   @test R(112) + f == f + 112
   @test 112 + f == f + R(112)
-  @test f + fmpz(112) == f + 112
-  @test fmpz(112) + f == f + fmpz(112)
+  @test f + ZZRingElem(112) == f + 112
+  @test ZZRingElem(112) + f == f + ZZRingElem(112)
 
   @test_throws ErrorException S(1)+f
 
   @test f - 1 == x^2 + R(2)x
-  @test fmpz(1) - f == -(f - fmpz(1))
-  @test fmpz(1) - f == R(112)*x^2 + R(111)*x
+  @test ZZRingElem(1) - f == -(f - ZZRingElem(1))
+  @test ZZRingElem(1) - f == R(112)*x^2 + R(111)*x
   @test f - R(1) == f - 1
   @test R(1) - f == -(f - R(1))
 
   @test_throws ErrorException f - S(1)
 end
 
-@testset "nmod_poly.powering" begin
+@testset "zzModPolyRingElem.powering" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -245,7 +245,7 @@ end
   @test_throws DomainError f^(-1)
 end
 
-@testset "nmod_poly.comparison" begin
+@testset "zzModPolyRingElem.comparison" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
   Ry, y = PolynomialRing(R, "y")
@@ -254,7 +254,7 @@ end
   @test_throws ErrorException x^2 + x != y^2 + y
 end
 
-@testset "nmod_poly.adhoc_comparison" begin
+@testset "zzModPolyRingElem.adhoc_comparison" begin
    R = ResidueRing(ZZ, 7)
    S, x = PolynomialRing(R, "x")
 
@@ -264,16 +264,16 @@ end
 
    @test 1 != f
 
-   @test S(5) == fmpz(5)
+   @test S(5) == ZZRingElem(5)
 
-   @test fmpz(5) != f
+   @test ZZRingElem(5) != f
 
    @test S(5) == R(5)
 
    @test R(5) != x + 1
 end
 
-@testset "nmod_poly.truncation" begin
+@testset "zzModPolyRingElem.truncation" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -288,7 +288,7 @@ end
   @test truncate(f,10) == f
 end
 
-@testset "nmod_poly.mullow" begin
+@testset "zzModPolyRingElem.mullow" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -299,7 +299,7 @@ end
   @test mullow(f,g,7) == truncate(f*g,7)
 end
 
-@testset "nmod_poly.reverse" begin
+@testset "zzModPolyRingElem.reverse" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -312,7 +312,7 @@ end
   @test isone(reverse(x))
 end
 
-@testset "nmod_poly.shift" begin
+@testset "zzModPolyRingElem.shift" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -334,7 +334,7 @@ end
   @test_throws DomainError shift_right(f,-1)
 end
 
-@testset "nmod_poly.division" begin
+@testset "zzModPolyRingElem.division" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -381,7 +381,7 @@ end
    end
 end
 
-@testset "nmod_poly.hgcd" begin
+@testset "zzModPolyRingElem.hgcd" begin
    R = ResidueRing(ZZ, next_prime(2^30))
    Rx, x = PolynomialRing(R, "x")
    a = rand(Rx, 501:501)
@@ -398,20 +398,20 @@ end
    end
 end
 
-@testset "nmod_poly.adhoc_exact_division" begin
+@testset "zzModPolyRingElem.adhoc_exact_division" begin
    R = ResidueRing(ZZ, 23)
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
 
-   @test divexact(3*f, fmpz(3)) == f
+   @test divexact(3*f, ZZRingElem(3)) == f
 
    @test divexact(3*f, 3) == f
 
    @test divexact(R(7)*f, R(7)) == f
 end
 
-@testset "nmod_poly.gcd" begin
+@testset "zzModPolyRingElem.gcd" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -428,7 +428,7 @@ end
   @test k == s*f + t*g
 end
 
-@testset "nmod_poly.modular_arithmetic" begin
+@testset "zzModPolyRingElem.modular_arithmetic" begin
   R = ResidueRing(ZZ, 487326487)
   S, x = PolynomialRing(R, "x")
 
@@ -447,7 +447,7 @@ end
   @test powermod(f, -10, g) == 484381224*x+14566177
 end
 
-@testset "nmod_poly.resultant" begin
+@testset "zzModPolyRingElem.resultant" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -462,7 +462,7 @@ end
   @test g == 4
 end
 
-@testset "nmod_poly.evaluate" begin
+@testset "zzModPolyRingElem.evaluate" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -470,7 +470,7 @@ end
 
   r = evaluate(f, R(20))
   s = evaluate(f, 20)
-  t = evaluate(f, fmpz(20))
+  t = evaluate(f, ZZRingElem(20))
 
   @test r == R(14)
 
@@ -482,10 +482,10 @@ end
 
   @test f(20) == R(14)
 
-  @test f(fmpz(20)) == R(14)
+  @test f(ZZRingElem(20)) == R(14)
 end
 
-@testset "nmod_poly.derivative" begin
+@testset "zzModPolyRingElem.derivative" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -498,7 +498,7 @@ end
   @test ff == 5*x^4 + 4*x^3 + 4*x + 1
 end
 
-@testset "nmod_poly.integral" begin
+@testset "zzModPolyRingElem.integral" begin
   R = ResidueRing(ZZ, 7)
   S, x = PolynomialRing(R, "x")
 
@@ -507,7 +507,7 @@ end
   @test integral(f) == 5x^3 + x^2 + x
 end
 
-@testset "nmod_poly.compose" begin
+@testset "zzModPolyRingElem.compose" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -521,7 +521,7 @@ end
   @test ff == x^5 + 6*x^4 + 14*x^3 + 18*x^2 + 14*x + 5
 end
 
-@testset "nmod_poly.interpolate" begin
+@testset "zzModPolyRingElem.interpolate" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -535,7 +535,7 @@ end
   @test f == x^2
 end
 
-@testset "nmod_poly.inflate" begin
+@testset "zzModPolyRingElem.inflate" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -549,7 +549,7 @@ end
   @test_throws DomainError inflate(f,-1)
 end
 
-@testset "nmod_poly.deflate" begin
+@testset "zzModPolyRingElem.deflate" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -563,7 +563,7 @@ end
   @test_throws DomainError deflate(f,-1)
 end
 
-@testset "nmod_poly.lifting" begin
+@testset "zzModPolyRingElem.lifting" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
   Zy,y = PolynomialRing(ZZ, "y")
@@ -576,7 +576,7 @@ end
   @test Rx(Zf) == f
 end
 
-@testset "nmod_poly.is_irreducible" begin
+@testset "zzModPolyRingElem.is_irreducible" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -589,7 +589,7 @@ end
   @test is_irreducible(x^16+2*x^9+x^8+x^2+x+1)
 end
 
-@testset "nmod_poly.is_squarefree" begin
+@testset "zzModPolyRingElem.is_squarefree" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -600,7 +600,7 @@ end
   @test is_squarefree((x+1)*(x+2)*(x+3))
 end
 
-@testset "nmod_poly.factor" begin
+@testset "zzModPolyRingElem.factor" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -628,7 +628,7 @@ end
   @test fac == Dict(2=>x^4+3*x^2+2,1=>x^2 + x)
 end
 
-@testset "nmod_poly.roots" begin
+@testset "zzModPolyRingElem.roots" begin
   _, x = PolynomialRing(ResidueRing(ZZ, 1024), "x")
   @test length(roots(x^2+7)) == 4
 
@@ -636,14 +636,14 @@ end
   @test length(roots(x^2+7)) == 2
 end
 
-@testset "nmod_poly.canonicalization" begin
+@testset "zzModPolyRingElem.canonicalization" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
   @test canonical_unit(5*x) == R(5)
 end
 
-@testset "nmod_poly.remove_valuation" begin
+@testset "zzModPolyRingElem.remove_valuation" begin
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 

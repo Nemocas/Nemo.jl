@@ -56,7 +56,7 @@ end
    @test_throws Exception Nemo.shortest_l_infinity_with_transform(m)
 end
 
-@testset "continued_fraction.fmpq" begin
+@testset "continued_fraction.QQFieldElem" begin
    for k in 1:100
       x = zero(QQ)
       for i in 1:rand(0:15)
@@ -74,11 +74,11 @@ end
       cnvgts1 = convergents(cf1)
       cnvgts2 = collect(cnvgts1)
 
-      @test eltype(cnvgts1) == fmpq
-      @test eltype(typeof(cnvgts1)) == fmpq
+      @test eltype(cnvgts1) == QQFieldElem
+      @test eltype(typeof(cnvgts1)) == QQFieldElem
 
       m = identity_matrix(ZZ, 2)
-      cf = fmpz[]
+      cf = ZZRingElem[]
       while !iszero(m[1,1] - m[2,1]*x)
          y = divexact(m[2,2]*x - m[1,2], m[1,1] - m[2,1]*x)
          cf2, m2 = continued_fraction_with_matrix(y, limit = rand(1:4))
@@ -95,21 +95,21 @@ end
 @testset "continued_fraction.arb" begin
    set_precision!(Balls, 100) do 
      CC = ArbField()
-     @test continued_fraction(CC(11//8)) == fmpz[1, 2, 1, 2]
-     @test continued_fraction(CC("1.375")) == fmpz[1, 2, 1, 2]
-     @test continued_fraction(CC("1.375 +/- 0.0000001")) == fmpz[1, 2, 1]
-     @test continued_fraction(CC("543.5 +/- 0.4")) == fmpz[543]
-     @test continued_fraction(CC("543.5 +/- 0.5")) == fmpz[]
-     @test continued_fraction(-1/const_pi(CC), limit = 4) == fmpz[-1, 1, 2, 7]
+     @test continued_fraction(CC(11//8)) == ZZRingElem[1, 2, 1, 2]
+     @test continued_fraction(CC("1.375")) == ZZRingElem[1, 2, 1, 2]
+     @test continued_fraction(CC("1.375 +/- 0.0000001")) == ZZRingElem[1, 2, 1]
+     @test continued_fraction(CC("543.5 +/- 0.4")) == ZZRingElem[543]
+     @test continued_fraction(CC("543.5 +/- 0.5")) == ZZRingElem[]
+     @test continued_fraction(-1/const_pi(CC), limit = 4) == ZZRingElem[-1, 1, 2, 7]
      @test continued_fraction_with_matrix(-1/const_pi(CC), limit = 4) ==
-                                   (fmpz[-1, 1, 2, 7], matrix(ZZ, [-7 -1; 22 3]))
+                                   (ZZRingElem[-1, 1, 2, 7], matrix(ZZ, [-7 -1; 22 3]))
 
      z = CC()
      ccall((:arb_zero_pm_one, Nemo.libarb), Nothing, (Ref{arb},), z)
      @test_throws Exception continued_fraction(inv(z))
      # need exact intervals [-1, 1], [543//512, 17/16], [542//512, 17//16] here
-     @test continued_fraction(z) == fmpz[]
-     @test continued_fraction(ldexp(1087+z, -10)) == fmpz[1, 16]
-     @test continued_fraction(ldexp(543+z, -9)) == fmpz[1]
+     @test continued_fraction(z) == ZZRingElem[]
+     @test continued_fraction(ldexp(1087+z, -10)) == ZZRingElem[1, 16]
+     @test continued_fraction(ldexp(543+z, -9)) == ZZRingElem[1]
   end
 end

@@ -56,10 +56,10 @@ Methods to construct algebraic numbers include:
 Arithmetic:
 
 ```julia
-julia> fmpz(QQBar(3))
+julia> ZZRingElem(QQBar(3))
 3
 
-julia> fmpq(QQBar(3) // 2)
+julia> QQFieldElem(QQBar(3) // 2)
 3//2
 
 julia> QQBar(-1) ^ (QQBar(1) // 3)
@@ -97,10 +97,10 @@ julia> eigenvalues(ZZ[1 1 0; 0 1 1; 1 0 1], QQBar)
 **Interface**
 
 ```@docs
-roots(f::fmpz_poly, R::CalciumQQBarField)
-roots(f::fmpq_poly, R::CalciumQQBarField)
-eigenvalues(A::fmpz_mat, R::CalciumQQBarField)
-eigenvalues(A::fmpq_mat, R::CalciumQQBarField)
+roots(f::ZZPolyRingElem, R::CalciumQQBarField)
+roots(f::QQPolyRingElem, R::CalciumQQBarField)
+eigenvalues(A::ZZMatrix, R::CalciumQQBarField)
+eigenvalues(A::QQMatrix, R::CalciumQQBarField)
 rand(R::CalciumQQBarField; degree::Int, bits::Int, randtype::Symbol=:null)
 ```
 
@@ -147,8 +147,8 @@ is_rational(x::qqbar)
 isreal(x::qqbar)
 degree(x::qqbar)
 is_algebraic_integer(x::qqbar)
-minpoly(R::FmpzPolyRing, x::qqbar)
-minpoly(R::FmpqPolyRing, x::qqbar)
+minpoly(R::ZZPolyRing, x::qqbar)
+minpoly(R::QQPolyRing, x::qqbar)
 conjugates(a::qqbar)
 denominator(x::qqbar)
 numerator(x::qqbar)

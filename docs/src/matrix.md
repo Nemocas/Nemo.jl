@@ -17,13 +17,13 @@ information is mainly of concern to developers).
 Base ring                             | Library             | Element type        | Parent type
 --------------------------------------|---------------------|---------------------|----------------------
 Generic ring $R$                      | AbstractAlgebra.jl  | `Generic.Mat{T}`    | `Generic.MatSpace{T}`
-$\mathbb{Z}$                          | Flint               | `fmpz_mat`          | `FmpzMatSpace`
-$\mathbb{Z}/n\mathbb{Z}$ (small $n$)  | Flint               | `nmod_mat`          | `NmodMatSpace`
-$\mathbb{Z}/n\mathbb{Z}$ (large $n$)  | Flint               | `fmpz_mod_mat`      | `FmpzModMatSpace`
-$\mathbb{Q}$                          | Flint               | `fmpq_mat`          | `FmpqMatSpace`
-$\mathbb{Z}/p\mathbb{Z}$ (small $p$)  | Flint               | `gfp_mat`           | `GFPMatSpace`
-$\mathbb{F}_{p^n}$ (small $p$)        | Flint               | `fq_nmod_mat`       | `FqNmodMatSpace`
-$\mathbb{F}_{p^n}$ (large $p$)        | Flint               | `fq_mat`            | `FqMatSpace
+$\mathbb{Z}$                          | Flint               | `ZZMatrix`          | `ZZMatrixSpace`
+$\mathbb{Z}/n\mathbb{Z}$ (small $n$)  | Flint               | `zzModMatrix`          | `zzModMatrixSpace`
+$\mathbb{Z}/n\mathbb{Z}$ (large $n$)  | Flint               | `ZZModMatrix`      | `ZZModMatrixSpace`
+$\mathbb{Q}$                          | Flint               | `QQMatrix`          | `QQMatrixSpace`
+$\mathbb{Z}/p\mathbb{Z}$ (small $p$)  | Flint               | `fpMatrix`           | `fpMatrixSpace`
+$\mathbb{F}_{p^n}$ (small $p$)        | Flint               | `fqPolyRepMatrix`       | `fqPolyRepMatrixSpace`
+$\mathbb{F}_{p^n}$ (large $p$)        | Flint               | `FqPolyRepMatrix`            | `FqPolyRepMatrixSpace
 $\mathbb{R}$ (arbitrary precision)    | Arb                 | `RealMat`           | `RealMatSpace`
 $\mathbb{C}$ (arbitrary precision)    | Arb                 | `ComplexMat`        | `ComplexMatSpace`
 $\mathbb{R}$ (fixed precision)        | Arb                 | `arb_mat`           | `ArbMatSpace`
@@ -85,11 +85,11 @@ contains(D, C)
 ### Scaling
 
 ```@docs
-<<(::fmpz_mat, ::Int)
+<<(::ZZMatrix, ::Int)
 ```
 
 ```@docs
->>(::fmpz_mat, ::Int)
+>>(::ZZMatrix, ::Int)
 ```
 
 **Examples**
@@ -97,7 +97,7 @@ contains(D, C)
 ```julia
 S = MatrixSpace(ZZ, 3, 3)
 
-A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
+A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
 B = A<<5
 C = B>>2
@@ -106,12 +106,12 @@ C = B>>2
 ### Determinant
 
 ```@docs
-det_divisor(::fmpz_mat)
+det_divisor(::ZZMatrix)
 ```
 
 ```@docs
-det_given_divisor(::fmpz_mat, ::Integer, ::Bool)
-det_given_divisor(::fmpz_mat, ::fmpz, ::Bool)
+det_given_divisor(::ZZMatrix, ::Integer, ::Bool)
+det_given_divisor(::ZZMatrix, ::ZZRingElem, ::Bool)
 ```
 
 **Examples**
@@ -119,7 +119,7 @@ det_given_divisor(::fmpz_mat, ::fmpz, ::Bool)
 ```julia
 S = MatrixSpace(ZZ, 3, 3)
 
-A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
+A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
 c = det_divisor(A)
 d = det_given_divisor(A, c)
@@ -128,12 +128,12 @@ d = det_given_divisor(A, c)
 ### Linear solving
 
 ```@docs
-cansolve(::fmpz_mat, ::fmpz_mat)
+cansolve(::ZZMatrix, ::ZZMatrix)
 ```
 
 ```@docs
-solve_dixon(::fmpz_mat, ::fmpz_mat)
-solve_dixon(::fmpq_mat, ::fmpq_mat)
+solve_dixon(::ZZMatrix, ::ZZMatrix)
+solve_dixon(::QQMatrix, ::QQMatrix)
 ```
 
 **Examples**
@@ -142,8 +142,8 @@ solve_dixon(::fmpq_mat, ::fmpq_mat)
 S = MatrixSpace(ZZ, 3, 3)
 T = MatrixSpace(ZZ, 3, 1)
 
-A = S([fmpz(2) 3 5; 1 4 7; 9 2 2])
-B = T([fmpz(4), 5, 7])
+A = S([ZZRingElem(2) 3 5; 1 4 7; 9 2 2])
+B = T([ZZRingElem(4), 5, 7])
 
 X, m = solve_dixon(A, B)
 ```
@@ -151,7 +151,7 @@ X, m = solve_dixon(A, B)
 ### Pseudo inverse
 
 ```@docs
-pseudo_inv(::fmpz_mat)
+pseudo_inv(::ZZMatrix)
 ```
 
 **Examples**
@@ -167,14 +167,14 @@ B, d = pseudo_inv(A)
 ### Nullspace
 
 ```@docs
-nullspace_right_rational(x::fmpz_mat)
+nullspace_right_rational(x::ZZMatrix)
 ```
 
 ### Modular reduction
 
 ```@docs
-reduce_mod(::fmpz_mat, ::Integer)
-reduce_mod(::fmpz_mat, ::fmpz)
+reduce_mod(::ZZMatrix, ::Integer)
+reduce_mod(::ZZMatrix, ::ZZRingElem)
 ```
 
 **Examples**
@@ -182,7 +182,7 @@ reduce_mod(::fmpz_mat, ::fmpz)
 ```julia
 S = MatrixSpace(ZZ, 3, 3)
 
-A = S([fmpz(2) 3 5; 1 4 7; 9 2 2])
+A = S([ZZRingElem(2) 3 5; 1 4 7; 9 2 2])
 
 reduce_mod(A, ZZ(5))
 reduce_mod(A, 2)
@@ -191,8 +191,8 @@ reduce_mod(A, 2)
 ### Lifting
 
 ```@docs
-lift(::nmod_mat)
-lift(::gfp_mat)
+lift(::zzModMatrix)
+lift(::fpMatrix)
 ```
 
 **Examples**
@@ -209,15 +209,15 @@ a = S([4 5 6; 7 3 2; 1 4 5])
 ### Special matrices
 
 ```@docs
-hadamard(::FmpzMatSpace)
+hadamard(::ZZMatrixSpace)
 ```
 
 ```@docs
-is_hadamard(::fmpz_mat)
+is_hadamard(::ZZMatrix)
 ```
 
 ```@docs
-hilbert(::FmpqMatSpace)
+hilbert(::QQMatrixSpace)
 ```
 
 **Examples**
@@ -234,23 +234,23 @@ B = hilbert(R)
 ### Hermite Normal Form
 
 ```@docs
-hnf(::fmpz_mat)
+hnf(::ZZMatrix)
 ```
 
 ```@docs
-hnf_with_transform(::fmpz_mat)
+hnf_with_transform(::ZZMatrix)
 ```
 
 ```@docs
-hnf_modular(::fmpz_mat, ::fmpz)
+hnf_modular(::ZZMatrix, ::ZZRingElem)
 ```
 
 ```@docs
-hnf_modular_eldiv(::fmpz_mat, ::fmpz)
+hnf_modular_eldiv(::ZZMatrix, ::ZZRingElem)
 ```
 
 ```@docs
-is_hnf(::fmpz_mat)
+is_hnf(::ZZMatrix)
 ```
 
 **Examples**
@@ -258,12 +258,12 @@ is_hnf(::fmpz_mat)
 ```julia
 S = MatrixSpace(ZZ, 3, 3)
 
-A = S([fmpz(2) 3 5; 1 4 7; 19 3 7])
+A = S([ZZRingElem(2) 3 5; 1 4 7; 19 3 7])
 
 B = hnf(A)
 H, T = hnf_with_transform(A)
-M = hnf_modular(A, fmpz(27))
-N = hnf_modular_eldiv(A, fmpz(27))
+M = hnf_modular(A, ZZRingElem(27))
+N = hnf_modular_eldiv(A, ZZRingElem(27))
 is_hnf(M)
 ```
 
@@ -281,35 +281,35 @@ specifying the representation as either `:zbasis` or `:gram` and the Gram type
 as either `:approx` or `:exact`.
 
 ```@docs
-lll(::fmpz_mat, ::lll_ctx)
+lll(::ZZMatrix, ::lll_ctx)
 ```
 
 ```@docs
-lll_with_transform(::fmpz_mat, ::lll_ctx)
+lll_with_transform(::ZZMatrix, ::lll_ctx)
 ```
 
 ```@docs
-lll_gram(::fmpz_mat, ::lll_ctx)
+lll_gram(::ZZMatrix, ::lll_ctx)
 ```
 
 ```@docs
-lll_gram_with_transform(::fmpz_mat, ::lll_ctx)
+lll_gram_with_transform(::ZZMatrix, ::lll_ctx)
 ```
 
 ```@docs
-lll_with_removal(::fmpz_mat, ::fmpz, ::lll_ctx)
+lll_with_removal(::ZZMatrix, ::ZZRingElem, ::lll_ctx)
 ```
 
 ```@docs
-lll_with_removal_transform(::fmpz_mat, ::fmpz, ::lll_ctx)
+lll_with_removal_transform(::ZZMatrix, ::ZZRingElem, ::lll_ctx)
 ```
 
 ```@docs
-lll!(::fmpz_mat, ::lll_ctx)
+lll!(::ZZMatrix, ::lll_ctx)
 ```
 
 ```@docs
-lll_gram!(::fmpz_mat, ::lll_ctx)
+lll_gram!(::ZZMatrix, ::lll_ctx)
 ```
 
 **Examples**
@@ -317,7 +317,7 @@ lll_gram!(::fmpz_mat, ::lll_ctx)
 ```julia
 S = MatrixSpace(ZZ, 3, 3)
 
-A = S([fmpz(2) 3 5; 1 4 7; 19 3 7])
+A = S([ZZRingElem(2) 3 5; 1 4 7; 19 3 7])
 
 L = lll(A, lll_ctx(0.95, 0.55, :zbasis, :approx)
 L, T = lll_with_transform(A)
@@ -325,22 +325,22 @@ L, T = lll_with_transform(A)
 G == lll_gram(gram(A))
 G, T = lll_gram_with_transform(gram(A))
 
-r, L = lll_with_removal(A, fmpz(100))
-r, L, T = lll_with_removal_transform(A, fmpz(100))
+r, L = lll_with_removal(A, ZZRingElem(100))
+r, L, T = lll_with_removal_transform(A, ZZRingElem(100))
 ```
 
 ### Smith Normal Form
 
 ```@docs
-snf(::fmpz_mat)
+snf(::ZZMatrix)
 ```
 
 ```@docs
-snf_diagonal(::fmpz_mat)
+snf_diagonal(::ZZMatrix)
 ```
 
 ```@docs
-is_snf(::fmpz_mat)
+is_snf(::ZZMatrix)
 ```
 
 **Examples**
@@ -348,12 +348,12 @@ is_snf(::fmpz_mat)
 ```julia
 S = MatrixSpace(ZZ, 3, 3)
 
-A = S([fmpz(2) 3 5; 1 4 7; 19 3 7])
+A = S([ZZRingElem(2) 3 5; 1 4 7; 19 3 7])
 
 B = snf(A)
 is_snf(B) == true
 
-B = S([fmpz(2) 0 0; 0 4 0; 0 0 7])
+B = S([ZZRingElem(2) 0 0; 0 4 0; 0 0 7])
 
 C = snf_diagonal(B)
 ```
@@ -361,8 +361,8 @@ C = snf_diagonal(B)
 ### Strong Echelon Form
 
 ```@docs
-strong_echelon_form(::nmod_mat)
-strong_echelon_form(::gfp_mat)
+strong_echelon_form(::zzModMatrix)
+strong_echelon_form(::fpMatrix)
 ```
 
 **Examples**
@@ -379,8 +379,8 @@ B = strong_echelon_form(A)
 ### Howell Form
 
 ```@docs
-howell_form(::nmod_mat)
-howell_form(::gfp_mat)
+howell_form(::zzModMatrix)
+howell_form(::fpMatrix)
 ```
 
 **Examples**
@@ -397,7 +397,7 @@ B = howell_form(A)
 ### Gram-Schmidt Orthogonalisation
 
 ```@docs
-gso(::fmpq_mat)
+gso(::QQMatrix)
 ```
 
 **Examples**
@@ -466,7 +466,7 @@ isreal(onei(CC)*A)
 
 Julia matrices use a different data structure than Nemo matrices. Conversion to Julia matrices is usually only required for interfacing with other packages. It isn't necessary to convert Nemo matrices to Julia matrices in order to manipulate them.
 
-This conversion can be performed with standard Julia syntax, such as the following, where `A` is an `fmpz_mat`:
+This conversion can be performed with standard Julia syntax, such as the following, where `A` is an `ZZMatrix`:
 
 ```julia
 Matrix{Int}(A)

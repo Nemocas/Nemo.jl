@@ -1,4 +1,4 @@
-@testset "fq_nmod_mpoly.constructors" begin
+@testset "fqPolyRepMPolyRingElem.constructors" begin
    R, a = FiniteField(23, 5, "a")
 
    for num_vars = 1:10
@@ -18,30 +18,30 @@
 
       @test nvars(S) == num_vars
 
-      @test elem_type(S) == fq_nmod_mpoly
-      @test elem_type(FqNmodMPolyRing) == fq_nmod_mpoly
-      @test parent_type(fq_nmod_mpoly) == FqNmodMPolyRing
+      @test elem_type(S) == fqPolyRepMPolyRingElem
+      @test elem_type(fqPolyRepMPolyRing) == fqPolyRepMPolyRingElem
+      @test parent_type(fqPolyRepMPolyRingElem) == fqPolyRepMPolyRing
 
-      @test Nemo.promote_rule(elem_type(S), fmpz) == elem_type(S)
+      @test Nemo.promote_rule(elem_type(S), ZZRingElem) == elem_type(S)
 
-      @test typeof(S) <: FqNmodMPolyRing
+      @test typeof(S) <: fqPolyRepMPolyRing
 
       isa(symbols(S), Vector{Symbol})
 
       for j = 1:num_vars
-         @test isa(varlist[j], fq_nmod_mpoly)
-         @test isa(gens(S)[j], fq_nmod_mpoly)
+         @test isa(varlist[j], fqPolyRepMPolyRingElem)
+         @test isa(gens(S)[j], fqPolyRepMPolyRingElem)
       end
 
       f =  rand(S, 0:5, 0:100)
 
-      @test isa(f, fq_nmod_mpoly)
+      @test isa(f, fqPolyRepMPolyRingElem)
 
-      @test isa(S(2), fq_nmod_mpoly)
+      @test isa(S(2), fqPolyRepMPolyRingElem)
 
-      @test isa(S(R(2)), fq_nmod_mpoly)
+      @test isa(S(R(2)), fqPolyRepMPolyRingElem)
 
-      @test isa(S(f), fq_nmod_mpoly)
+      @test isa(S(f), fqPolyRepMPolyRingElem)
 
       V = [(rand(-100:100)) for i in 1:5]
 
@@ -49,7 +49,7 @@
 
       f = S(map(v -> R.(v), V), W0)
 
-      @test isa(f, fq_nmod_mpoly)
+      @test isa(f, fqPolyRepMPolyRingElem)
 
       # Test the BuildCtx
       
@@ -60,7 +60,7 @@
           push_term!(bctx, RR(v), Int.(w0))
         end
         ff = finish(bctx)
-        @test isa(ff, fq_nmod_mpoly)
+        @test isa(ff, fqPolyRepMPolyRingElem)
         @test f == ff
       end
 
@@ -89,7 +89,7 @@
    @test R([1], [[BigInt(1)]]) == x
 end
 
-@testset "fq_nmod_mpoly.printing" begin
+@testset "fqPolyRepMPolyRingElem.printing" begin
    R, a = FiniteField(23, 5, "a")
    S, (x, y) = PolynomialRing(R, ["x", "y"])
 
@@ -101,22 +101,22 @@ end
    @test string(x) == "x"
    @test string(y) == "y"
 
-   a = fmpz(3)^100
-   b = fmpz(2)^100
+   a = ZZRingElem(3)^100
+   b = ZZRingElem(2)^100
    @test string(x^a + y^b) == "x^$a + y^$b"
 end
 
-@testset "fq_nmod_mpoly.hash" begin
+@testset "fqPolyRepMPolyRingElem.hash" begin
    R, a = FiniteField(23, 5, "a")
    S, (x, y) = PolynomialRing(R, ["x", "y"])
 
-   p = y^fmpz(2)^100
+   p = y^ZZRingElem(2)^100
 
    @test hash(x) == hash((x + y) - y)
    @test hash(x) == hash((x + p) - p)
 end
 
-@testset "fq_nmod_mpoly.manipulation" begin
+@testset "fqPolyRepMPolyRingElem.manipulation" begin
    R, a = FiniteField(23, 5, "a")
 
    for num_vars = 1:10
@@ -243,7 +243,7 @@ end
    @test trailing_coefficient(S()) == 0
 end
 
-@testset "fq_nmod_mpoly.multivariate_coeff" begin
+@testset "fqPolyRepMPolyRingElem.multivariate_coeff" begin
    R, a = FiniteField(23, 5, "a")
 
    for ord in Nemo.flint_orderings
@@ -261,7 +261,7 @@ end
    end
 end
 
-@testset "fq_nmod_mpoly.unary_ops" begin
+@testset "fqPolyRepMPolyRingElem.unary_ops" begin
    R, a = FiniteField(23, 5, "a")
 
    for num_vars = 1:10
@@ -278,7 +278,7 @@ end
    end
 end
 
-@testset "fq_nmod_mpoly.binary_ops" begin
+@testset "fqPolyRepMPolyRingElem.binary_ops" begin
    R, a = FiniteField(23, 5, "a")
 
    for num_vars = 1:10
@@ -301,7 +301,7 @@ end
    end
 end
 
-@testset "fq_nmod_mpoly.adhoc_binary" begin
+@testset "fqPolyRepMPolyRingElem.adhoc_binary" begin
    R, a = FiniteField(23, 5, "a")
 
    for num_vars = 1:10
@@ -337,7 +337,7 @@ end
    end
 end
 
-@testset "fq_nmod_mpoly.adhoc_comparison" begin
+@testset "fqPolyRepMPolyRingElem.adhoc_comparison" begin
    R, a = FiniteField(23, 5, "a")
 
    for num_vars = 1:10
@@ -351,15 +351,15 @@ end
 
          @test S(d) == d
          @test d == S(d)
-         @test S(fmpz(d)) == fmpz(d)
-         @test fmpz(d) == S(fmpz(d))
+         @test S(ZZRingElem(d)) == ZZRingElem(d)
+         @test ZZRingElem(d) == S(ZZRingElem(d))
          @test S(d) == BigInt(d)
          @test BigInt(d) == S(d)
       end
    end
 end
 
-@testset "fq_nmod_mpoly.powering" begin
+@testset "fqPolyRepMPolyRingElem.powering" begin
    R, a = FiniteField(23, 5, "a")
 
    for num_vars = 1:10
@@ -381,12 +381,12 @@ end
          @test (f == 0 && expn == 0 && f^expn == 0) || f^expn == r
 
          @test_throws DomainError f^-1
-         @test_throws DomainError f^fmpz(-1)
+         @test_throws DomainError f^ZZRingElem(-1)
       end
    end
 end
 
-@testset "fq_nmod_mpoly.divides" begin
+@testset "fqPolyRepMPolyRingElem.divides" begin
    R, a = FiniteField(23, 5, "a")
 
    for num_vars = 1:10
@@ -415,7 +415,7 @@ end
    end
 end
 
-@testset "fq_nmod_mpoly.euclidean_division" begin
+@testset "fqPolyRepMPolyRingElem.euclidean_division" begin
    R, a = FiniteField(23, 5, "a")
 
    for num_vars = 1:10
@@ -451,7 +451,7 @@ end
    end
 end
 
-@testset "fq_nmod_mpoly.ideal_reduction" begin
+@testset "fqPolyRepMPolyRingElem.ideal_reduction" begin
    R, a = FiniteField(23, 5, "a")
 
    for num_vars = 1:10
@@ -500,7 +500,7 @@ end
    end
 end
 
-@testset "fq_nmod_mpoly.gcd" begin
+@testset "fqPolyRepMPolyRingElem.gcd" begin
    R, a = FiniteField(23, 5, "a")
 
    for num_vars = 1:4
@@ -526,7 +526,7 @@ end
    end
 end
 
-@testset "fq_nmod_mpoly.factor" begin
+@testset "fqPolyRepMPolyRingElem.factor" begin
    R, a = FiniteField(23, 5, "a")
    R, (x, y, z) = PolynomialRing(R, ["x", "y", "z"])
 
@@ -543,7 +543,7 @@ end
    check_factor(x^99-a^33*y^99*z^33, 22)
 end
 
-@testset "fq_nmod_mpoly.sqrt" begin
+@testset "fqPolyRepMPolyRingElem.sqrt" begin
    R, a = FiniteField(23, 5, "a")
 
    for num_vars = 1:4
@@ -569,7 +569,7 @@ end
    end
 end
 
-@testset "fq_nmod_mpoly.evaluation" begin
+@testset "fqPolyRepMPolyRingElem.evaluation" begin
    R, a = FiniteField(23, 5, "a")
 
    for num_vars = 1:10
@@ -652,7 +652,7 @@ end
    @test f(M1, M2) == T([9 12; 18 20])
 end
 
-@testset "fq_nmod_mpoly.valuation" begin
+@testset "fqPolyRepMPolyRingElem.valuation" begin
    R, a = FiniteField(23, 5, "a")
 
    for num_vars = 1:10
@@ -690,7 +690,7 @@ end
    end
 end
 
-@testset "fq_nmod_mpoly.derivative" begin
+@testset "fqPolyRepMPolyRingElem.derivative" begin
    R, a = FiniteField(23, 5, "a")
 
    for num_vars = 1:10
@@ -710,7 +710,7 @@ end
    end
 end
 
-@testset "fq_nmod_mpoly.combine_like_terms" begin
+@testset "fqPolyRepMPolyRingElem.combine_like_terms" begin
   R23, a = FiniteField(23, 5, "a")
 
   for num_vars = 1:10
@@ -746,7 +746,7 @@ end
   end
 end
 
-@testset "fq_nmod_mpoly.exponents" begin
+@testset "fqPolyRepMPolyRingElem.exponents" begin
   R23, a = FiniteField(23, 5, "a")
 
   for num_vars = 1:10
@@ -794,14 +794,14 @@ end
         end
      end
 
-     f = rand(vars_R)^(fmpz(typemax(UInt)) + 1)
+     f = rand(vars_R)^(ZZRingElem(typemax(UInt)) + 1)
      @test !exponent_vector_fits_int(f, 1)
      @test !exponent_vector_fits_ui(f, 1)
      @test_throws DomainError exponent_vector(f, 1)
   end
 end
 
-@testset "fq_nmod_mpoly.gcd_with_cofactors" begin
+@testset "fqPolyRepMPolyRingElem.gcd_with_cofactors" begin
    R23, t = FiniteField(23, 5, "t")
    R, (x, y, z) = PolynomialRing(R23, [:x, :y, :z])
 

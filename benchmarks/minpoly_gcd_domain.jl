@@ -6,7 +6,7 @@ function benchmark_minpoly_gcd_domain()
 
    for i in 1:10
       for j in 1:10
-         r = ZZx(map(fmpz, rand(-20:20, 3)))
+         r = ZZx(map(ZZRingElem, rand(-20:20, 3)))
          M[i, j] = r
          M[10 + i, 10 + j] = deepcopy(r)
       end

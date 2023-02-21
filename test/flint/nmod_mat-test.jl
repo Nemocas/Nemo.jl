@@ -1,43 +1,43 @@
-@testset "nmod_mat.constructors" begin
+@testset "zzModMatrix.constructors" begin
   Z2 = ResidueRing(ZZ, 2)
   Z3 = ResidueRing(ZZ, 3)
 
-  R = NmodMatSpace(Z2, 2, 2)
+  R = zzModMatrixSpace(Z2, 2, 2)
 
-  @test elem_type(R) == nmod_mat
-  @test elem_type(NmodMatSpace) == nmod_mat
-  @test parent_type(nmod_mat) == NmodMatSpace
+  @test elem_type(R) == zzModMatrix
+  @test elem_type(zzModMatrixSpace) == zzModMatrix
+  @test parent_type(zzModMatrix) == zzModMatrixSpace
   @test nrows(R) == 2
   @test ncols(R) == 2
 
-  @test isa(R, NmodMatSpace)
+  @test isa(R, zzModMatrixSpace)
 
   @test base_ring(R) == Z2
 
-  S = NmodMatSpace(Z3, 2, 2)
+  S = zzModMatrixSpace(Z3, 2, 2)
 
-  @test isa(S, NmodMatSpace)
+  @test isa(S, zzModMatrixSpace)
 
-  RR = NmodMatSpace(Z2, 2, 2)
+  RR = zzModMatrixSpace(Z2, 2, 2)
 
-  @test isa(RR, NmodMatSpace)
+  @test isa(RR, zzModMatrixSpace)
 
   @test R == RR
 
-  @test_throws ErrorException NmodMatSpace(Z2, 2, -1)
-  @test_throws ErrorException NmodMatSpace(Z2, -1, 2)
-  @test_throws ErrorException NmodMatSpace(Z2, -1, -1)
+  @test_throws ErrorException zzModMatrixSpace(Z2, 2, -1)
+  @test_throws ErrorException zzModMatrixSpace(Z2, -1, 2)
+  @test_throws ErrorException zzModMatrixSpace(Z2, -1, -1)
 
   a = R()
 
-  @test isa(a, nmod_mat)
+  @test isa(a, zzModMatrix)
   @test parent(a) == R
 
   ar = [ BigInt(1) BigInt(1); BigInt(1) BigInt(1) ]
 
   b = R(ar)
 
-  @test isa(b, nmod_mat)
+  @test isa(b, zzModMatrix)
   @test parent(b) == R
   @test nrows(b) == 2 && ncols(b) == 2
   @test_throws ErrorConstrDimMismatch R(reshape(ar,1,4))
@@ -52,7 +52,7 @@
   ar = [ ZZ(1) ZZ(1); ZZ(1) ZZ(1) ]
 
   c = R(ar)
-  @test isa(c, nmod_mat)
+  @test isa(c, zzModMatrix)
   @test parent(c) == R
   @test nrows(c) == 2 && ncols(c) == 2
   @test_throws ErrorConstrDimMismatch R(reshape(ar,4,1))
@@ -66,7 +66,7 @@
 
   d = R(ar)
 
-  @test isa(d, nmod_mat)
+  @test isa(d, zzModMatrix)
   @test parent(d) == R
   @test nrows(d) == 2 && ncols(d) == 2
   @test_throws ErrorConstrDimMismatch R(reshape(ar,1,4))
@@ -80,13 +80,13 @@
 
   d = R(ar)
 
-  @test isa(d, nmod_mat)
+  @test isa(d, zzModMatrix)
 
   ar = MatrixSpace(ZZ, 2, 2)([ 1 1; 1 1])
 
   e = R(ar)
 
-  @test isa(e, nmod_mat)
+  @test isa(e, zzModMatrix)
   @test parent(e) == R
   @test nrows(e) == 2 && ncols(e) == 2
 
@@ -98,7 +98,7 @@
 
   f = R(ar)
 
-  @test isa(f, nmod_mat)
+  @test isa(f, zzModMatrix)
   @test parent(f) == R
   @test nrows(f) == 2 && ncols(f) == 2
   @test_throws ErrorConstrDimMismatch R(reshape(ar,4,1))
@@ -108,11 +108,11 @@
   @test_throws ErrorConstrDimMismatch R([Z2(1), Z2(1), Z2(1)])
   @test_throws ErrorConstrDimMismatch R([Z2(1), Z2(1), Z2(1), Z2(1), Z2(1)])
 
-  @test isa(S(1), nmod_mat)
+  @test isa(S(1), zzModMatrix)
 
-  @test isa(S(fmpz(1)), nmod_mat)
+  @test isa(S(ZZRingElem(1)), zzModMatrix)
 
-  @test isa(S(Z3(1)), nmod_mat)
+  @test isa(S(Z3(1)), zzModMatrix)
 
   g = deepcopy(e)
 
@@ -125,13 +125,13 @@
    arr = [1 2; 3 4]
    arr2 = [1, 2, 3, 4, 5, 6]
 
-   for T in [Z3, fmpz, Int, BigInt]
+   for T in [Z3, ZZRingElem, Int, BigInt]
       M = matrix(Z3, map(T, arr))
-      @test isa(M, nmod_mat)
+      @test isa(M, zzModMatrix)
       @test M.base_ring == Z3
 
       M2 = matrix(Z3, 2, 3, map(T, arr2))
-      @test isa(M2, nmod_mat)
+      @test isa(M2, zzModMatrix)
       @test M2.base_ring == Z3
       @test nrows(M2) == 2
       @test ncols(M2) == 3
@@ -141,12 +141,12 @@
 
    M3 = zero_matrix(Z3, 2, 3)
 
-   @test isa(M3, nmod_mat)
+   @test isa(M3, zzModMatrix)
    @test M3.base_ring == Z3
 
    M4 = identity_matrix(Z3, 3)
 
-   @test isa(M4, nmod_mat)
+   @test isa(M4, zzModMatrix)
    @test M4.base_ring == Z3
 
    a = zero_matrix(Z2, 2, 2)
@@ -166,17 +166,17 @@
    @test !(a in keys(Dict(b => 1)))
 end
 
-@testset "nmod_mat.similar" begin
+@testset "zzModMatrix.similar" begin
    Z13 = ResidueRing(ZZ, 13)
-   S = NmodMatSpace(Z13, 2, 2)
-   s = S(fmpz(3))
+   S = zzModMatrixSpace(Z13, 2, 2)
+   s = S(ZZRingElem(3))
 
    t = similar(s)
-   @test t isa nmod_mat
+   @test t isa zzModMatrix
    @test size(t) == size(s)
 
    t = similar(s, 2, 3)
-   @test t isa nmod_mat
+   @test t isa zzModMatrix
    @test size(t) == (2, 3)
 
    for (R, M) in ring_to_mat
@@ -188,15 +188,15 @@ end
    end
 
    # issue #651
-   m = one(Generic.MatSpace{Nemo.nmod}(Z13, 2, 2, false))
+   m = one(Generic.MatSpace{Nemo.zzModRingElem}(Z13, 2, 2, false))
    for n = (m, -m, m*m, m+m, 2m)
-      @test n isa Generic.MatSpaceElem{Nemo.nmod}
+      @test n isa Generic.MatSpaceElem{Nemo.zzModRingElem}
    end
 end
 
-@testset "nmod_mat.printing" begin
+@testset "zzModMatrix.printing" begin
   Z2 = ResidueRing(ZZ, 2)
-  R = NmodMatSpace(Z2, 2, 2)
+  R = zzModMatrixSpace(Z2, 2, 2)
 
   a = R(1)
 
@@ -204,11 +204,11 @@ end
   @test !occursin(string(typeof(a)), string(a))
 end
 
-@testset "nmod_mat.manipulation" begin
+@testset "zzModMatrix.manipulation" begin
   Z10 = ResidueRing(ZZ, 10)
-  R = NmodMatSpace(Z10, 2, 2)
+  R = zzModMatrixSpace(Z10, 2, 2)
   Z20 = ResidueRing(ZZ, 20)
-  S = NmodMatSpace(Z20, 2, 2)
+  S = zzModMatrixSpace(Z20, 2, 2)
 
   ar = [ 1 2; 3 4]
 
@@ -248,11 +248,11 @@ end
 
   d = one(R)
 
-  @test isa(d, nmod_mat)
+  @test isa(d, zzModMatrix)
 
   e = zero(R)
 
-  @test isa(e, nmod_mat)
+  @test isa(e, zzModMatrix)
 
   @test iszero(e)
 
@@ -276,7 +276,7 @@ end
   @test_throws ErrorConstrDimMismatch transpose!(R([ 1 2 ;]))
 end
 
-@testset "nmod_mat.unary_ops" begin
+@testset "zzModMatrix.unary_ops" begin
   Z17 = ResidueRing(ZZ,17)
 
   R = MatrixSpace(Z17, 3, 4)
@@ -295,7 +295,7 @@ end
   @test d == R([ 15 16 0 16; 0 0 0 0; 0 16 15 0])
 end
 
-@testset "nmod_mat.binary_ops" begin
+@testset "zzModMatrix.binary_ops" begin
   Z17 = ResidueRing(ZZ, 17)
 
   R = MatrixSpace(Z17, 3, 4)
@@ -323,7 +323,7 @@ end
   @test d == MatrixSpace(Z17, 4, 4)([11 11 8 7; 11 0 14 6; 8 14 14 5; 7 6 5 5])
 end
 
-@testset "nmod_mat.row_col_swapping" begin
+@testset "zzModMatrix.row_col_swapping" begin
    R = ResidueRing(FlintZZ, 17)
 
    a = matrix(R, [1 2; 3 4; 5 6])
@@ -362,7 +362,7 @@ end
    @test a == matrix(R, [3 2 1; 5 4 3; 7 6 5])
 end
 
-@testset "nmod_mat.adhoc_binary" begin
+@testset "zzModMatrix.adhoc_binary" begin
   Z17 = ResidueRing(ZZ,17)
 
   R = MatrixSpace(Z17, 3, 4)
@@ -401,7 +401,7 @@ end
   @test_throws ErrorException Z2(1)*a
 end
 
-@testset "nmod_mat.comparison" begin
+@testset "zzModMatrix.comparison" begin
   Z17 = ResidueRing(ZZ,17)
 
   R = MatrixSpace(Z17, 3, 4)
@@ -415,21 +415,21 @@ end
   @test a != R([0 1 3 1; 2 1 4 2; 1 1 1 1])
 end
 
-@testset "nmod_mat.adhoc_comparison" begin
+@testset "zzModMatrix.adhoc_comparison" begin
   Z17 = ResidueRing(ZZ,17)
 
   R = MatrixSpace(Z17, 3, 4)
 
   @test R(5) == 5
-  @test R(5) == fmpz(5)
+  @test R(5) == ZZRingElem(5)
   @test R(5) == Z17(5)
 
   @test 5 == R(5)
-  @test fmpz(5) == R(5)
+  @test ZZRingElem(5) == R(5)
   @test Z17(5) == R(5)
 end
 
-@testset "nmod_mat.powering" begin
+@testset "zzModMatrix.powering" begin
   Z17 = ResidueRing(ZZ,17)
 
   R = MatrixSpace(Z17, 3, 4)
@@ -449,7 +449,7 @@ end
   @test_throws ErrorException f^(ZZ(2)^1000)
 end
 
-@testset "nmod_mat.row_echelon_form" begin
+@testset "zzModMatrix.row_echelon_form" begin
   Z17 = ResidueRing(ZZ,17)
   R = MatrixSpace(Z17, 3, 4)
   RR = MatrixSpace(Z17, 4, 3)
@@ -483,7 +483,7 @@ end
   @test den == Z17(2)
 end
 
-@testset "nmod_mat.howell_form" begin
+@testset "zzModMatrix.howell_form" begin
   Z17 = ResidueRing(ZZ, 12)
   R = MatrixSpace(Z17, 3, 3)
 
@@ -500,7 +500,7 @@ end
   @test strong_echelon_form(d) == R([4 0 0; 0 0 0; 0 0 1])
 end
 
-@testset "nmod_mat.trace_det" begin
+@testset "zzModMatrix.trace_det" begin
   Z17 = ResidueRing(ZZ,17)
   R = MatrixSpace(Z17, 3, 4)
   RR = MatrixSpace(Z17, 4, 3)
@@ -538,7 +538,7 @@ end
   @test @inferred isone(det(a))
 end
 
-@testset "nmod_mat.rank" begin
+@testset "zzModMatrix.rank" begin
   Z17 = ResidueRing(ZZ,17)
   R = MatrixSpace(Z17, 3, 4)
   RR = MatrixSpace(Z17, 4, 3)
@@ -564,7 +564,7 @@ end
   @test c == 2
 end
 
-@testset "nmod_mat.inv" begin
+@testset "zzModMatrix.inv" begin
   Z17 = ResidueRing(ZZ,17)
   R = MatrixSpace(Z17, 3, 4)
   RR = MatrixSpace(Z17, 4, 3)
@@ -595,7 +595,7 @@ end
   @test_throws ErrorException inv(matrix(R, 2, 1, [1, 1]))
 end
 
-@testset "nmod_mat.solve" begin
+@testset "zzModMatrix.solve" begin
   Z17 = ResidueRing(ZZ,17)
   R = MatrixSpace(Z17, 3, 3)
   S = MatrixSpace(Z17, 3, 4)
@@ -615,7 +615,7 @@ end
   @test_throws ErrorException  solve(a,c)
 end
 
-@testset "nmod_mat.lu" begin
+@testset "zzModMatrix.lu" begin
 
   Z17 = ResidueRing(ZZ,17)
   R = MatrixSpace(Z17, 3, 3)
@@ -643,7 +643,7 @@ end
   @test l*u == P*c
 end
 
-@testset "nmod_mat.swap_rows" begin
+@testset "zzModMatrix.swap_rows" begin
   Z17 = ResidueRing(ZZ, 17)
 
   A = matrix(Z17, 5, 1, [1, 2, 3, 4, 5])
@@ -658,7 +658,7 @@ end
   @test_throws BoundsError swap_rows(A, 4, 6)
 end
 
-@testset "nmod_mat.view" begin
+@testset "zzModMatrix.view" begin
   Z17 = ResidueRing(ZZ, 17)
   R = MatrixSpace(Z17, 3, 3)
   S = MatrixSpace(Z17, 3, 4)
@@ -695,7 +695,7 @@ end
 
   B = @inferred view(A, 1, 1, 2, 2)
 
-  @test typeof(B) == nmod_mat
+  @test typeof(B) == zzModMatrix
   @test B == MatrixSpace(Z17, 2, 2)([1 2; 4 5])
 
   B[1, 1] = 10
@@ -703,7 +703,7 @@ end
 
   C = @inferred view(B, 1:2, 1:2)
 
-  @test typeof(C) == nmod_mat
+  @test typeof(C) == zzModMatrix
   @test C == MatrixSpace(Z17, 2, 2)([10 2; 4 5])
 
   C[1, 1] = 20
@@ -715,7 +715,7 @@ end
   @test B[1, 1] == 20
 end
 
-@testset "nmod_mat.sub" begin
+@testset "zzModMatrix.sub" begin
    Z17 = ResidueRing(ZZ, 17)
    S = MatrixSpace(Z17, 3, 3)
 
@@ -723,7 +723,7 @@ end
 
    B = @inferred sub(A, 1, 1, 2, 2)
 
-   @test typeof(B) == nmod_mat
+   @test typeof(B) == zzModMatrix
    @test B == MatrixSpace(Z17, 2, 2)([1 2; 4 5])
 
    B[1, 1] = 10
@@ -731,7 +731,7 @@ end
 
    C = @inferred sub(B, 1:2, 1:2)
 
-   @test typeof(C) == nmod_mat
+   @test typeof(C) == zzModMatrix
    @test C == MatrixSpace(Z17, 2, 2)([10 2; 4 5])
 
    C[1, 1] = 20
@@ -739,7 +739,7 @@ end
    @test A == S([1 2 3; 4 5 6; 7 8 9])
 end
 
-@testset "nmod_mat.concatenation" begin
+@testset "zzModMatrix.concatenation" begin
   Z17 = ResidueRing(ZZ,17)
   R = MatrixSpace(Z17, 3, 3)
   S = MatrixSpace(Z17, 3, 4)
@@ -775,7 +775,7 @@ end
   @test_throws ErrorException vcat(a,b)
 end
 
-@testset "nmod_mat.conversion" begin
+@testset "zzModMatrix.conversion" begin
   Z17 = ResidueRing(ZZ, 17)
   R = MatrixSpace(Z17, 3, 3)
   S = MatrixSpace(ZZ, 3, 3)
@@ -798,7 +798,7 @@ end
   @test c == S([ 1 2 3; 3 2 1; 0 0 2])
 end
 
-@testset "nmod_mat.charpoly" begin
+@testset "zzModMatrix.charpoly" begin
    R = ResidueRing(ZZ, 17)
 
    for dim = 0:5
@@ -816,7 +816,7 @@ end
    end
 end
 
-@testset "nmod_mat.rand" begin
+@testset "zzModMatrix.rand" begin
    R = ResidueRing(ZZ, 17)
    S = MatrixSpace(R, 3, 3)
 

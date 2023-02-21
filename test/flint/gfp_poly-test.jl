@@ -1,18 +1,18 @@
-@testset "gfp_poly.constructors" begin
+@testset "fpPolyRingElem.constructors" begin
   R = GF(17)
   
   S1 = PolyRing(R)
   S2 = PolyRing(R)
 
-  @test isa(S1, GFPPolyRing)
+  @test isa(S1, fpPolyRing)
   @test S1 !== S2
 
   Rx, x = PolynomialRing(R, "x")
 
-  @test elem_type(Rx) == gfp_poly
-  @test elem_type(GFPPolyRing) == gfp_poly
-  @test parent_type(gfp_poly) == GFPPolyRing
-  @test dense_poly_type(gfp_elem) == gfp_poly
+  @test elem_type(Rx) == fpPolyRingElem
+  @test elem_type(fpPolyRing) == fpPolyRingElem
+  @test parent_type(fpPolyRingElem) == fpPolyRing
+  @test dense_poly_type(fpFieldElem) == fpPolyRingElem
 
   S = GF(19)
   Sy, y = PolynomialRing(R, "y")
@@ -28,7 +28,7 @@
 
   @test S != R
 
-  @test isa(Rx, GFPPolyRing)
+  @test isa(Rx, fpPolyRing)
   @test isa(x, PolyElem)
 
   a = Rx()
@@ -46,7 +46,7 @@
   @test isa(c, PolyElem)
   @test parent(c) == Rx
 
-  d = Rx(fmpz(3))
+  d = Rx(ZZRingElem(3))
 
   @test isa(d, PolyElem)
   @test parent(d) == Rx
@@ -61,7 +61,7 @@
   @test isa(f, PolyElem)
   @test parent(f) == Rx
 
-  g = Rx([fmpz(1), fmpz(2), fmpz(3)])
+  g = Rx([ZZRingElem(1), ZZRingElem(2), ZZRingElem(3)])
 
   @test isa(g, PolyElem)
   @test parent(g) == Rx
@@ -71,7 +71,7 @@
   @test isa(h, PolyElem)
   @test parent(h) == Rx
 
-  _a = PolynomialRing(ZZ, "y")[1]([fmpz(1),fmpz(2),fmpz(3)])
+  _a = PolynomialRing(ZZ, "y")[1]([ZZRingElem(1),ZZRingElem(2),ZZRingElem(3)])
 
   k = Rx(_a)
 
@@ -93,42 +93,42 @@
   @test isa(m, PolyElem)
 end
 
-@testset "gfp_poly.polynomial" begin
+@testset "fpPolyRingElem.polynomial" begin
    R = GF(23)
 
    f = polynomial(R, [])
    g = polynomial(R, [1, 2, 3])
-   h = polynomial(R, fmpz[1, 2, 3])
+   h = polynomial(R, ZZRingElem[1, 2, 3])
    k = polynomial(R, [R(1), R(2), R(3)])
    p = polynomial(R, [1, 2, 3], "y")
 
-   @test isa(f, gfp_poly)
-   @test isa(g, gfp_poly)
-   @test isa(h, gfp_poly)
-   @test isa(k, gfp_poly)
-   @test isa(p, gfp_poly)
+   @test isa(f, fpPolyRingElem)
+   @test isa(g, fpPolyRingElem)
+   @test isa(h, fpPolyRingElem)
+   @test isa(k, fpPolyRingElem)
+   @test isa(p, fpPolyRingElem)
 
    q = polynomial(R, [1, 2, 3], cached=false)
 
    @test parent(g) !== parent(q)
 end
 
-@testset "nmod_poly.similar" begin
+@testset "zzModPolyRingElem.similar" begin
    R = GF(23)
 
    f = polynomial(R, [1, 2, 3])
    g = similar(f)
    h = similar(f, "y")
 
-   @test isa(g, gfp_poly)
-   @test isa(h, gfp_poly)
+   @test isa(g, fpPolyRingElem)
+   @test isa(h, fpPolyRingElem)
 
    q = similar(g, cached=false)
 
    @test parent(g) === parent(q)
 end
 
-@testset "gfp_poly.printing" begin
+@testset "fpPolyRingElem.printing" begin
   R = GF(17)
   Rx, x = PolynomialRing(R, "x")
 
@@ -137,7 +137,7 @@ end
   @test sprint(show, "text/plain", a) == "x^3 + x + 1"
 end
 
-@testset "gfp_poly.manipulation" begin
+@testset "fpPolyRingElem.manipulation" begin
   R = GF(17)
   Rx, x = PolynomialRing(R, "x")
 
@@ -170,7 +170,7 @@ end
   @test characteristic(Rx) == 17
 end
 
-@testset "gfp_poly.unary_ops" begin
+@testset "fpPolyRingElem.unary_ops" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -179,7 +179,7 @@ end
   @test -f ==  R(22)*x^2 + R(10)*x + R(18)
 end
 
-@testset "gfp_poly.binary_ops" begin
+@testset "fpPolyRingElem.binary_ops" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -196,7 +196,7 @@ end
   @test h*(f+g) == x^4 + R(22)*x^3 + R(5)*x^2
 end
 
-@testset "gfp_poly.adhoc_binary" begin
+@testset "fpPolyRingElem.adhoc_binary" begin
   R = GF(113)
   Rx, x = PolynomialRing(R, "x")
 
@@ -205,11 +205,11 @@ end
   f = x^2 + R(2)x + R(1)
   g = x^3 + R(3)x^2 + x
 
-  @test fmpz(2)*f == R(2)x^2 + R(4)x + R(2)
-  @test fmpz(2)*f == f*fmpz(2)
-  @test 2*f == fmpz(2)*f
+  @test ZZRingElem(2)*f == R(2)x^2 + R(4)x + R(2)
+  @test ZZRingElem(2)*f == f*ZZRingElem(2)
+  @test 2*f == ZZRingElem(2)*f
   @test f*2 == 2*f
-  @test R(2)*f == fmpz(2)*f
+  @test R(2)*f == ZZRingElem(2)*f
   @test f*R(2) == R(2)*f
 
   @test_throws ErrorException S(1)*f
@@ -218,21 +218,21 @@ end
   @test 112 + f == f + 112
   @test R(112) + f == f + 112
   @test 112 + f == f + R(112)
-  @test f + fmpz(112) == f + 112
-  @test fmpz(112) + f == f + fmpz(112)
+  @test f + ZZRingElem(112) == f + 112
+  @test ZZRingElem(112) + f == f + ZZRingElem(112)
 
   @test_throws ErrorException S(1)+f
 
   @test f - 1 == x^2 + R(2)x
-  @test fmpz(1) - f == -(f - fmpz(1))
-  @test fmpz(1) - f == R(112)*x^2 + R(111)*x
+  @test ZZRingElem(1) - f == -(f - ZZRingElem(1))
+  @test ZZRingElem(1) - f == R(112)*x^2 + R(111)*x
   @test f - R(1) == f - 1
   @test R(1) - f == -(f - R(1))
 
   @test_throws ErrorException f - S(1)
 end
 
-@testset "gfp_poly.powering" begin
+@testset "fpPolyRingElem.powering" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -245,7 +245,7 @@ end
   @test_throws DomainError f^(-1)
 end
 
-@testset "gfp_poly.comparison" begin
+@testset "fpPolyRingElem.comparison" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
   Ry, y = PolynomialRing(R, "y")
@@ -254,7 +254,7 @@ end
   @test_throws ErrorException x^2 + x != y^2 + y
 end
 
-@testset "gfp_poly.adhoc_comparison" begin
+@testset "fpPolyRingElem.adhoc_comparison" begin
    R = GF(7)
    S, x = PolynomialRing(R, "x")
 
@@ -264,16 +264,16 @@ end
 
    @test 1 != f
 
-   @test S(5) == fmpz(5)
+   @test S(5) == ZZRingElem(5)
 
-   @test fmpz(5) != f
+   @test ZZRingElem(5) != f
 
    @test S(5) == R(5)
 
    @test R(5) != x + 1
 end
 
-@testset "gfp_poly.truncation" begin
+@testset "fpPolyRingElem.truncation" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -288,7 +288,7 @@ end
   @test truncate(f,10) == f
 end
 
-@testset "gfp_poly.mullow" begin
+@testset "fpPolyRingElem.mullow" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -299,7 +299,7 @@ end
   @test mullow(f,g,7) == truncate(f*g,7)
 end
 
-@testset "gfp_poly.reverse" begin
+@testset "fpPolyRingElem.reverse" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -312,7 +312,7 @@ end
   @test isone(reverse(x))
 end
 
-@testset "gfp_poly.shift" begin
+@testset "fpPolyRingElem.shift" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -334,7 +334,7 @@ end
   @test_throws DomainError shift_right(f,-1)
 end
 
-@testset "gfp_poly.division" begin
+@testset "fpPolyRingElem.division" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -374,20 +374,20 @@ end
   @test r == Rx(14)
 end
 
-@testset "gfp_poly.adhoc_exact_division" begin
+@testset "fpPolyRingElem.adhoc_exact_division" begin
    R = GF(23)
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
 
-   @test divexact(3*f, fmpz(3)) == f
+   @test divexact(3*f, ZZRingElem(3)) == f
 
    @test divexact(3*f, 3) == f
 
    @test divexact(R(7)*f, R(7)) == f
 end
 
-@testset "gfp_poly.gcd" begin
+@testset "fpPolyRingElem.gcd" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -404,7 +404,7 @@ end
   @test k == s*f + t*g
 end
 
-@testset "gfp_poly.modular_arithmetic" begin
+@testset "fpPolyRingElem.modular_arithmetic" begin
   R = GF(487326487)
   S, x = PolynomialRing(R, "x")
 
@@ -423,7 +423,7 @@ end
   @test powermod(f, -10, g) == 484381224*x+14566177
 end
 
-@testset "gfp_poly.resultant" begin
+@testset "fpPolyRingElem.resultant" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -438,7 +438,7 @@ end
   @test g == 4
 end
 
-@testset "gfp_poly.evaluate" begin
+@testset "fpPolyRingElem.evaluate" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -446,7 +446,7 @@ end
 
   r = evaluate(f, R(20))
   s = evaluate(f, 20)
-  t = evaluate(f, fmpz(20))
+  t = evaluate(f, ZZRingElem(20))
 
   @test r == R(14)
 
@@ -458,11 +458,11 @@ end
 
   @test f(20) == R(14)
 
-  @test f(fmpz(20)) == R(14)
+  @test f(ZZRingElem(20)) == R(14)
 
 end
 
-@testset "gfp_poly.derivative" begin
+@testset "fpPolyRingElem.derivative" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -475,7 +475,7 @@ end
   @test ff == 5*x^4 + 4*x^3 + 4*x + 1
 end
 
-@testset "gfp_poly.integral" begin
+@testset "fpPolyRingElem.integral" begin
   R = GF(7)
   S, x = PolynomialRing(R, "x")
 
@@ -484,7 +484,7 @@ end
   @test integral(f) == 5x^3 + x^2 + x
 end
 
-@testset "gfp_poly.compose" begin
+@testset "fpPolyRingElem.compose" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -498,7 +498,7 @@ end
   @test ff == x^5 + 6*x^4 + 14*x^3 + 18*x^2 + 14*x + 5
 end
 
-@testset "gfp_poly.interpolate" begin
+@testset "fpPolyRingElem.interpolate" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -512,7 +512,7 @@ end
   @test f == x^2
 end
 
-@testset "gfp_poly.inflate" begin
+@testset "fpPolyRingElem.inflate" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -526,7 +526,7 @@ end
   @test_throws DomainError inflate(f,-1)
 end
 
-@testset "gfp_poly.deflate" begin
+@testset "fpPolyRingElem.deflate" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -540,7 +540,7 @@ end
   @test_throws DomainError deflate(f,-1)
 end
 
-@testset "gfp_poly.lifting" begin
+@testset "fpPolyRingElem.lifting" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
   Zy,y = PolynomialRing(ZZ, "y")
@@ -553,7 +553,7 @@ end
   @test Rx(Zf) == f
 end
 
-@testset "gfp_poly.is_irreducible" begin
+@testset "fpPolyRingElem.is_irreducible" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -566,7 +566,7 @@ end
   @test is_irreducible(x^16+2*x^9+x^8+x^2+x+1)
 end
 
-@testset "gfp_poly.is_squarefree" begin
+@testset "fpPolyRingElem.is_squarefree" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -577,7 +577,7 @@ end
   @test is_squarefree((x+1)*(x+2)*(x+3))
 end
 
-@testset "gfp_poly.square_root" begin
+@testset "fpPolyRingElem.square_root" begin
    for R in [GF(2), GF(23)]
       S, x = PolynomialRing(R, "x")
 
@@ -611,7 +611,7 @@ end
    end
 end
 
-@testset "gfp_poly.factor" begin
+@testset "fpPolyRingElem.factor" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -641,14 +641,14 @@ end
   @test issetequal(roots(5 * x * (x^2 + 1)*(x^2 + 2)*(x+1)^10), R.([0, -1]))
 end
 
-@testset "gfp_poly.canonicalization" begin
+@testset "fpPolyRingElem.canonicalization" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 
   @test canonical_unit(5*x) == R(5)
 end
 
-@testset "gfp_poly.remove_valuation" begin
+@testset "fpPolyRingElem.remove_valuation" begin
   R = GF(23)
   Rx, x = PolynomialRing(R, "x")
 

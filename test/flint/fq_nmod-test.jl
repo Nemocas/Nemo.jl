@@ -1,9 +1,9 @@
-@testset "fq_nmod.constructors" begin
+@testset "fqPolyRepFieldElem.constructors" begin
    R, x = FiniteField(7, 5, "x")
 
-   @test elem_type(R) == fq_nmod
-   @test elem_type(FqNmodFiniteField) == fq_nmod
-   @test parent_type(fq_nmod) == FqNmodFiniteField
+   @test elem_type(R) == fqPolyRepFieldElem
+   @test elem_type(fqPolyRepField) == fqPolyRepFieldElem
+   @test parent_type(fqPolyRepFieldElem) == fqPolyRepField
 
    Sy, y = PolynomialRing(ResidueRing(FlintZZ, 3), "y")
    Syy, yy = GF(3)["y"]
@@ -12,57 +12,57 @@
    T2, z2 = FiniteField(yy^2 + 1, "z")
 
    # check that one can leave out the name for the generator, or specify it as a symbol
-   @test FiniteField(7, 5)[1] isa FqNmodFiniteField
-   @test FiniteField(7, 5, :x)[1] isa FqNmodFiniteField
-   @test FiniteField(y^2 + 1)[1] isa FqNmodFiniteField
-   @test FiniteField(y^2 + 1, :x)[1] isa FqNmodFiniteField
+   @test FiniteField(7, 5)[1] isa fqPolyRepField
+   @test FiniteField(7, 5, :x)[1] isa fqPolyRepField
+   @test FiniteField(y^2 + 1)[1] isa fqPolyRepField
+   @test FiniteField(y^2 + 1, :x)[1] isa fqPolyRepField
 
-   @test isa(R, FqNmodFiniteField)
-   @test isa(T, FqNmodFiniteField)
-   @test isa(T2, FqNmodFiniteField)
+   @test isa(R, fqPolyRepField)
+   @test isa(T, fqPolyRepField)
+   @test isa(T2, fqPolyRepField)
 
-   @test isa(3x^4 + 2x^3 + 4x^2 + x + 1, fq_nmod)
-   @test isa(z^2 + z + 1, fq_nmod)
-   @test isa(z2^2 + z2 + 1, fq_nmod)
+   @test isa(3x^4 + 2x^3 + 4x^2 + x + 1, fqPolyRepFieldElem)
+   @test isa(z^2 + z + 1, fqPolyRepFieldElem)
+   @test isa(z2^2 + z2 + 1, fqPolyRepFieldElem)
 
    a = R()
 
-   @test isa(a, fq_nmod)
+   @test isa(a, fqPolyRepFieldElem)
 
    b = R(4)
-   c = R(fmpz(7))
+   c = R(ZZRingElem(7))
 
-   @test isa(b, fq_nmod)
+   @test isa(b, fqPolyRepFieldElem)
 
-   @test isa(c, fq_nmod)
+   @test isa(c, fqPolyRepFieldElem)
 
    d = R(c)
 
-   @test isa(d, fq_nmod)
+   @test isa(d, fqPolyRepFieldElem)
 
    # check for primality
    T3, z3 = FiniteField(yy^2 + 1, "z", check=false)
-   @test isa(T2, FqNmodFiniteField)
+   @test isa(T2, fqPolyRepField)
    Syyy, yyy = PolynomialRing(ResidueRing(FlintZZ, 4), "y")
-   @test yyy isa nmod_poly
+   @test yyy isa zzModPolyRingElem
    @test_throws DomainError FiniteField(yyy^2+1, "z")
 end
 
-@testset "fq_nmod.rand" begin
+@testset "fqPolyRepFieldElem.rand" begin
    R, x = FiniteField(7, 5, "x")
 
    test_rand(R)
    test_rand(R, 1:9)
    test_rand(R, Int16(1):Int16(9))
    test_rand(R, big(1):big(9))
-   test_rand(R, fmpz(1):fmpz(9))
+   test_rand(R, ZZRingElem(1):ZZRingElem(9))
    test_rand(R, [3,9,2])
    test_rand(R, Int16[3,9,2])
    test_rand(R, BigInt[3,9,2])
-   test_rand(R, fmpz[3,9,2])
+   test_rand(R, ZZRingElem[3,9,2])
 end
 
-@testset "fq_nmod.unsafe_coeffs" begin
+@testset "fqPolyRepFieldElem.unsafe_coeffs" begin
    R, a = FiniteField(23, 2, "a")
 
    b = R()
@@ -78,16 +78,16 @@ end
    @test Nemo.setindex_raw!(b, UInt(4), 0) == 4
    @test Nemo.setindex_raw!(b, UInt(0), 0) == 0
 
-   @test fq_nmod(R, UInt[0, 0]) == 0
-   @test fq_nmod(R, UInt[2, 0]) == 2
-   @test fq_nmod(R, UInt[2, 3]) == 3a + 2
+   @test fqPolyRepFieldElem(R, UInt[0, 0]) == 0
+   @test fqPolyRepFieldElem(R, UInt[2, 0]) == 2
+   @test fqPolyRepFieldElem(R, UInt[2, 3]) == 3a + 2
 
    @test coeffs_raw(2a + 3) == UInt[3, 2]
    @test coeffs_raw(R(3)) == UInt[3, 0]
    @test coeffs_raw(R()) == UInt[0, 0]
 end
 
-@testset "fq_nmod.printing" begin
+@testset "fqPolyRepFieldElem.printing" begin
    R, x = FiniteField(7, 5, "x")
 
    a = 3x^4 + 2x^3 + 4x^2 + x + 1
@@ -95,7 +95,7 @@ end
    @test sprint(show, "text/plain", a) == "3*x^4 + 2*x^3 + 4*x^2 + x + 1"
 end
 
-@testset "fq_nmod.manipulation" begin
+@testset "fqPolyRepFieldElem.manipulation" begin
    R, x = FiniteField(7, 5, "x")
 
    @test iszero(zero(R))
@@ -118,10 +118,10 @@ end
 
    @test_throws DomainError coeff(2x + 1, -1)
 
-   @test isa(modulus(R), gfp_poly)
+   @test isa(modulus(R), fpPolyRingElem)
 end
 
-@testset "fq_nmod.unary_ops" begin
+@testset "fqPolyRepFieldElem.unary_ops" begin
    R, x = FiniteField(7, 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
@@ -129,7 +129,7 @@ end
    @test -a == 6*x^4+4*x^2+x+6
 end
 
-@testset "fq_nmod.binary_ops" begin
+@testset "fqPolyRepFieldElem.binary_ops" begin
    R, x = FiniteField(7, 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
@@ -142,7 +142,7 @@ end
    @test a*b == 3*x^3+2
 end
 
-@testset "fq_nmod.adhoc_binary" begin
+@testset "fqPolyRepFieldElem.adhoc_binary" begin
    R, x = FiniteField(7, 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
@@ -151,26 +151,26 @@ end
 
    @test a*3 == 3*x^4+2*x^2+4*x+3
 
-   @test a*fmpz(5) == 5*x^4+x^2+2*x+5
+   @test a*ZZRingElem(5) == 5*x^4+x^2+2*x+5
 
-   @test fmpz(5)*a == 5*x^4+x^2+2*x+5
+   @test ZZRingElem(5)*a == 5*x^4+x^2+2*x+5
 
    @test 12345678901234567890123*a == 3*x^4+2*x^2+4*x+3
 
    @test a*12345678901234567890123 == 3*x^4+2*x^2+4*x+3
 end
 
-@testset "fq_nmod.powering" begin
+@testset "fqPolyRepFieldElem.powering" begin
    R, x = FiniteField(7, 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
 
    @test a^3 == x^4+6*x^3+5*x^2+5*x+6
 
-   @test a^fmpz(-5) == x^4+4*x^3+6*x^2+6*x+2
+   @test a^ZZRingElem(-5) == x^4+4*x^3+6*x^2+6*x+2
 end
 
-@testset "fq_nmod.comparison" begin
+@testset "fqPolyRepFieldElem.comparison" begin
    R, x = FiniteField(7, 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
@@ -181,7 +181,7 @@ end
    @test isequal(R(3), R(3))
 end
 
-@testset "fq_nmod.inversion" begin
+@testset "fqPolyRepFieldElem.inversion" begin
    R, x = FiniteField(7, 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
@@ -193,7 +193,7 @@ end
    @test b == a^-1
 end
 
-@testset "fq_nmod.exact_division" begin
+@testset "fqPolyRepFieldElem.exact_division" begin
    R, x = FiniteField(7, 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
@@ -204,7 +204,7 @@ end
    @test b//a == 4*x^2+6*x+5
 end
 
-@testset "fq_nmod.gcd" begin
+@testset "fqPolyRepFieldElem.gcd" begin
    R, x = FiniteField(7, 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
@@ -215,7 +215,7 @@ end
    @test gcd(R(0), R(0)) == 0
 end
 
-@testset "fq_nmod.special_functions" begin
+@testset "fqPolyRepFieldElem.special_functions" begin
    R, x = FiniteField(7, 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
@@ -245,7 +245,7 @@ end
    @test !is_square_with_sqrt(x*a^2)[1]
 end
 
-@testset "fq_nmod.iteration" begin
+@testset "fqPolyRepFieldElem.iteration" begin
    for n = [2, 3, 5, 13, 31]
       R, _ = FiniteField(n, 1, "x")
       elts = Nemo.AbstractAlgebra.test_iterate(R)
@@ -255,7 +255,7 @@ end
    end
 end
 
-@testset "fq_nmod.lift" begin
+@testset "fqPolyRepFieldElem.lift" begin
    R, x = FiniteField(23, 2, "x")
    f = 8x + 9
    S, y = PolynomialRing(GF(23), "y")

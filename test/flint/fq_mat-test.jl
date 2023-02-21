@@ -1,43 +1,43 @@
-@testset "fq_mat.constructors" begin
-  F4, a = FiniteField(fmpz(2), 2, "a")
-  F9, b = FiniteField(fmpz(3), 2, "b")
+@testset "FqPolyRepMatrix.constructors" begin
+  F4, a = FiniteField(ZZRingElem(2), 2, "a")
+  F9, b = FiniteField(ZZRingElem(3), 2, "b")
 
-  R = FqMatSpace(F4, 2, 2)
+  R = FqPolyRepMatrixSpace(F4, 2, 2)
 
-  @test elem_type(R) == fq_mat
-  @test elem_type(FqMatSpace) == fq_mat
-  @test parent_type(fq_mat) == FqMatSpace
+  @test elem_type(R) == FqPolyRepMatrix
+  @test elem_type(FqPolyRepMatrixSpace) == FqPolyRepMatrix
+  @test parent_type(FqPolyRepMatrix) == FqPolyRepMatrixSpace
   @test nrows(R) == 2
   @test ncols(R) == 2
 
-  @test isa(R, FqMatSpace)
+  @test isa(R, FqPolyRepMatrixSpace)
 
   @test base_ring(R) == F4
 
-  S = FqMatSpace(F9, 2, 2)
+  S = FqPolyRepMatrixSpace(F9, 2, 2)
 
-  @test isa(S, FqMatSpace)
+  @test isa(S, FqPolyRepMatrixSpace)
 
-  RR = FqMatSpace(F4, 2, 2)
+  RR = FqPolyRepMatrixSpace(F4, 2, 2)
 
-  @test isa(RR, FqMatSpace)
+  @test isa(RR, FqPolyRepMatrixSpace)
 
   @test R == RR
 
-  @test_throws ErrorException FqMatSpace(F4, 2, -1)
-  @test_throws ErrorException FqMatSpace(F4, -1, 2)
-  @test_throws ErrorException FqMatSpace(F4, -1, -1)
+  @test_throws ErrorException FqPolyRepMatrixSpace(F4, 2, -1)
+  @test_throws ErrorException FqPolyRepMatrixSpace(F4, -1, 2)
+  @test_throws ErrorException FqPolyRepMatrixSpace(F4, -1, -1)
 
   a = R()
 
-  @test isa(a, fq_mat)
+  @test isa(a, FqPolyRepMatrix)
   @test parent(a) == R
 
   ar = [ BigInt(1) BigInt(1); BigInt(1) BigInt(1) ]
 
   b = R(ar)
 
-  @test isa(b, fq_mat)
+  @test isa(b, FqPolyRepMatrix)
   @test parent(b) == R
   @test nrows(b) == 2 && ncols(b) == 2
   @test_throws ErrorConstrDimMismatch R(reshape(ar,1,4))
@@ -52,7 +52,7 @@
   ar = [ ZZ(1) ZZ(1); ZZ(1) ZZ(1) ]
 
   c = R(ar)
-  @test isa(c, fq_mat)
+  @test isa(c, FqPolyRepMatrix)
   @test parent(c) == R
   @test nrows(c) == 2 && ncols(c) == 2
   @test_throws ErrorConstrDimMismatch R(reshape(ar,4,1))
@@ -66,7 +66,7 @@
 
   d = R(ar)
 
-  @test isa(d, fq_mat)
+  @test isa(d, FqPolyRepMatrix)
   @test parent(d) == R
   @test nrows(d) == 2 && ncols(d) == 2
   @test_throws ErrorConstrDimMismatch R(reshape(ar,1,4))
@@ -80,13 +80,13 @@
 
   d = R(ar)
 
-  @test isa(d, fq_mat)
+  @test isa(d, FqPolyRepMatrix)
 
   ar = MatrixSpace(ZZ, 2, 2)([ 1 1; 1 1])
 
   e = R(ar)
 
-  @test isa(e, fq_mat)
+  @test isa(e, FqPolyRepMatrix)
   @test parent(e) == R
   @test nrows(e) == 2 && ncols(e) == 2
 
@@ -98,7 +98,7 @@
 
   f = R(ar)
 
-  @test isa(f, fq_mat)
+  @test isa(f, FqPolyRepMatrix)
   @test parent(f) == R
   @test nrows(f) == 2 && ncols(f) == 2
   @test_throws ErrorConstrDimMismatch R(reshape(ar,4,1))
@@ -108,11 +108,11 @@
   @test_throws ErrorConstrDimMismatch R([F4(1), F4(1), F4(1)])
   @test_throws ErrorConstrDimMismatch R([F4(1), F4(1), F4(1), F4(1), F4(1)])
 
-  @test isa(S(1), fq_mat)
+  @test isa(S(1), FqPolyRepMatrix)
 
-  @test isa(S(fmpz(1)), fq_mat)
+  @test isa(S(ZZRingElem(1)), FqPolyRepMatrix)
 
-  @test isa(S(F9(1)), fq_mat)
+  @test isa(S(F9(1)), FqPolyRepMatrix)
 
   g = deepcopy(e)
 
@@ -125,13 +125,13 @@
    arr = [1 2; 3 4]
    arr2 = [1, 2, 3, 4, 5, 6]
 
-   for T in [F9, fmpz, Int, BigInt]
+   for T in [F9, ZZRingElem, Int, BigInt]
       M = matrix(F9, map(T, arr))
-      @test isa(M, fq_mat)
+      @test isa(M, FqPolyRepMatrix)
       @test M.base_ring == F9
 
       M2 = matrix(F9, 2, 3, map(T, arr2))
-      @test isa(M2, fq_mat)
+      @test isa(M2, FqPolyRepMatrix)
       @test M2.base_ring == F9
       @test nrows(M2) == 2
       @test ncols(M2) == 3
@@ -141,12 +141,12 @@
 
    M3 = zero_matrix(F9, 2, 3)
 
-   @test isa(M3, fq_mat)
+   @test isa(M3, FqPolyRepMatrix)
    @test M3.base_ring == F9
 
    M4 = identity_matrix(F9, 3)
 
-   @test isa(M4, fq_mat)
+   @test isa(M4, FqPolyRepMatrix)
    @test M4.base_ring == F9
 
    a = zero_matrix(F9, 2, 2)
@@ -166,17 +166,17 @@
    @test !(a in keys(Dict(b => 1)))
 end
 
-@testset "fq_mat.similar" begin
-   F9, b = FiniteField(fmpz(3), 2, "b")
+@testset "FqPolyRepMatrix.similar" begin
+   F9, b = FiniteField(ZZRingElem(3), 2, "b")
    S = MatrixSpace(F9, 3, 3)
-   s = S(fmpz(3))
+   s = S(ZZRingElem(3))
 
    t = similar(s)
-   @test t isa fq_mat
+   @test t isa FqPolyRepMatrix
    @test size(t) == size(s)
 
    t = similar(s, 2, 3)
-   @test t isa fq_mat
+   @test t isa FqPolyRepMatrix
    @test size(t) == (2, 3)
 
    for (R, M) in ring_to_mat
@@ -188,15 +188,15 @@ end
    end
 
    # issue #651
-   m = one(Generic.MatSpace{fq}(F9, 2, 2, false))
+   m = one(Generic.MatSpace{FqPolyRepFieldElem}(F9, 2, 2, false))
    for n = (m, -m, m*m, m+m, 2m)
-      @test n isa Generic.MatSpaceElem{fq}
+      @test n isa Generic.MatSpaceElem{FqPolyRepFieldElem}
    end
 end
 
-@testset "fq_mat.printing" begin
-  F4, _  = FiniteField(fmpz(2), 2, "a")
-  R = FqMatSpace(F4, 2, 2)
+@testset "FqPolyRepMatrix.printing" begin
+  F4, _  = FiniteField(ZZRingElem(2), 2, "a")
+  R = FqPolyRepMatrixSpace(F4, 2, 2)
 
   a = R(1)
 
@@ -204,11 +204,11 @@ end
   @test !occursin(string(typeof(a)), string(a))
 end
 
-@testset "fq_mat.manipulation" begin
-  F4, _ = FiniteField(fmpz(2), 2, "a")
-  R = FqMatSpace(F4, 2, 2)
-  F9, _ = FiniteField(fmpz(3), 2, "b")
-  S = FqMatSpace(F9, 2, 2)
+@testset "FqPolyRepMatrix.manipulation" begin
+  F4, _ = FiniteField(ZZRingElem(2), 2, "a")
+  R = FqPolyRepMatrixSpace(F4, 2, 2)
+  F9, _ = FiniteField(ZZRingElem(3), 2, "b")
+  S = FqPolyRepMatrixSpace(F9, 2, 2)
 
   ar = [ 1 2; 3 4]
 
@@ -248,11 +248,11 @@ end
 
   d = one(R)
 
-  @test isa(d, fq_mat)
+  @test isa(d, FqPolyRepMatrix)
 
   e = zero(R)
 
-  @test isa(e, fq_mat)
+  @test isa(e, FqPolyRepMatrix)
 
   @test iszero(e)
 
@@ -272,8 +272,8 @@ end
   @test_throws ErrorConstrDimMismatch transpose!(R([ 1 2 ;]))
 end
 
-@testset "fq_mat.unary_ops" begin
-  F17, _ = FiniteField(fmpz(17), 1, "a")
+@testset "FqPolyRepMatrix.unary_ops" begin
+  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
 
   R = MatrixSpace(F17, 3, 4)
   RR = MatrixSpace(F17, 4, 3)
@@ -289,8 +289,8 @@ end
   @test d == R([ 15 16 0 16; 0 0 0 0; 0 16 15 0])
 end
 
-@testset "fq_mat.binary_ops" begin
-  F17, _ = FiniteField(fmpz(17), 1, "a")
+@testset "FqPolyRepMatrix.binary_ops" begin
+  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
   R = MatrixSpace(F17, 3, 4)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
@@ -316,8 +316,8 @@ end
   @test v*A == [31, 29, 28]
 end
 
-@testset "fq_mat.row_col_swapping" begin
-   R, _ = FlintFiniteField(fmpz(17), 1, "a")
+@testset "FqPolyRepMatrix.row_col_swapping" begin
+   R, _ = FlintFiniteField(ZZRingElem(17), 1, "a")
 
    a = matrix(R, [1 2; 3 4; 5 6])
 
@@ -355,11 +355,11 @@ end
    @test a == matrix(R, [3 2 1; 5 4 3; 7 6 5])
 end
 
-@testset "fq_mat.adhoc_binary" begin
-  F17, _ = FiniteField(fmpz(17), 1, "a")
+@testset "FqPolyRepMatrix.adhoc_binary" begin
+  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
 
   R = MatrixSpace(F17, 3, 4)
-  F2, _ = FiniteField(fmpz(2), 1, "a")
+  F2, _ = FiniteField(ZZRingElem(2), 1, "a")
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 
@@ -394,8 +394,8 @@ end
   @test_throws ErrorException F2(1)*a
 end
 
-@testset "fq_mat.comparison" begin
-  F17, _ = FiniteField(fmpz(17), 1, "a")
+@testset "FqPolyRepMatrix.comparison" begin
+  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
 
   R = MatrixSpace(F17, 3, 4)
 
@@ -408,22 +408,22 @@ end
   @test a != R([0 1 3 1; 2 1 4 2; 1 1 1 1])
 end
 
-@testset "fq_mat.adhoc_comparison" begin
-  F17, _ = FiniteField(fmpz(17), 1, "a")
+@testset "FqPolyRepMatrix.adhoc_comparison" begin
+  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
 
   R = MatrixSpace(F17, 3, 4)
 
   @test R(5) == 5
-  @test R(5) == fmpz(5)
+  @test R(5) == ZZRingElem(5)
   @test R(5) == F17(5)
 
   @test 5 == R(5)
-  @test fmpz(5) == R(5)
+  @test ZZRingElem(5) == R(5)
   @test F17(5) == R(5)
 end
 
-@testset "fq_mat.powering" begin
-  F17, _ = FiniteField(fmpz(17), 1, "a")
+@testset "FqPolyRepMatrix.powering" begin
+  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
 
   R = MatrixSpace(F17, 3, 4)
 
@@ -436,8 +436,8 @@ end
   @test g == MatrixSpace(F17, 3, 3)([1 2 2; 2 13 12; 2 12 15])
 end
 
-@testset "fq_mat.row_echelon_form" begin
-  F17, _ = FlintFiniteField(fmpz(17), 1, "a")
+@testset "FqPolyRepMatrix.row_echelon_form" begin
+  F17, _ = FlintFiniteField(ZZRingElem(17), 1, "a")
   R = MatrixSpace(F17, 3, 4)
   RR = MatrixSpace(F17, 4, 3)
 
@@ -465,8 +465,8 @@ end
   @test r == 2
 end
 
-@testset "fq_mat.trace_det" begin
-  F17, _ = FiniteField(fmpz(17), 1, "a")
+@testset "FqPolyRepMatrix.trace_det" begin
+  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
   R = MatrixSpace(F17, 3, 4)
   RR = MatrixSpace(F17, 4, 3)
 
@@ -497,8 +497,8 @@ end
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 end
 
-@testset "fq_mat.rank" begin
-  F17, _ = FiniteField(fmpz(17), 1, "a")
+@testset "FqPolyRepMatrix.rank" begin
+  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
   R = MatrixSpace(F17, 3, 4)
   RR = MatrixSpace(F17, 4, 3)
 
@@ -521,8 +521,8 @@ end
   @test c == 2
 end
 
-@testset "fq_mat.inv" begin
-  F17, _ = FiniteField(fmpz(17), 1, "a")
+@testset "FqPolyRepMatrix.inv" begin
+  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
   R = MatrixSpace(F17, 3, 4)
   RR = MatrixSpace(F17, 4, 3)
 
@@ -541,8 +541,8 @@ end
   @test_throws ErrorException inv(transpose(a)*a)
 end
 
-@testset "fq_mat.solve" begin
-  F17, _ = FiniteField(fmpz(17), 1, "a")
+@testset "FqPolyRepMatrix.solve" begin
+  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
   R = MatrixSpace(F17, 3, 3)
   S = MatrixSpace(F17, 3, 4)
 
@@ -630,9 +630,9 @@ end
    @test_throws ErrorException can_solve(A, B, side = :garbage)
 end
 
-@testset "fq_mat.lu" begin
+@testset "FqPolyRepMatrix.lu" begin
 
-  F17, _ = FiniteField(fmpz(17), 1, "a")
+  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
   R = MatrixSpace(F17, 3, 3)
   S = MatrixSpace(F17, 3, 4)
 
@@ -658,8 +658,8 @@ end
   @test l*u == P*c
 end
 
-@testset "fq_mat.view" begin
-  F17, _ = FiniteField(fmpz(17), 1, "a")
+@testset "FqPolyRepMatrix.view" begin
+  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
   R = MatrixSpace(F17, 3, 3)
   S = MatrixSpace(F17, 3, 4)
 
@@ -694,15 +694,15 @@ end
   @test t[1, 1] == 2
 end
 
-@testset "fq_mat.sub" begin
-   F17, _ = FiniteField(fmpz(17), 1, "a")
+@testset "FqPolyRepMatrix.sub" begin
+   F17, _ = FiniteField(ZZRingElem(17), 1, "a")
    S = MatrixSpace(F17, 3, 3)
 
    A = S([1 2 3; 4 5 6; 7 8 9])
 
    B = @inferred sub(A, 1, 1, 2, 2)
 
-   @test typeof(B) == fq_mat
+   @test typeof(B) == FqPolyRepMatrix
    @test B == MatrixSpace(F17, 2, 2)([1 2; 4 5])
 
    B[1, 1] = 10
@@ -710,7 +710,7 @@ end
 
    C = @inferred sub(B, 1:2, 1:2)
 
-   @test typeof(C) == fq_mat
+   @test typeof(C) == FqPolyRepMatrix
    @test C == MatrixSpace(F17, 2, 2)([10 2; 4 5])
 
    C[1, 1] = 20
@@ -718,8 +718,8 @@ end
    @test A == S([1 2 3; 4 5 6; 7 8 9])
 end
 
-@testset "fq_mat.concatenation" begin
-  F17, _ = FiniteField(fmpz(17), 1, "a")
+@testset "FqPolyRepMatrix.concatenation" begin
+  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
   R = MatrixSpace(F17, 3, 3)
   S = MatrixSpace(F17, 3, 4)
 
@@ -754,8 +754,8 @@ end
   @test_throws ErrorException vcat(a,b)
 end
 
-@testset "fq_mat.conversion" begin
-  F17, _ = FiniteField(fmpz(17), 1, "a")
+@testset "FqPolyRepMatrix.conversion" begin
+  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
   R = MatrixSpace(F17, 3, 3)
 
   a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
@@ -765,8 +765,8 @@ end
                      F17(0) F17(0) F17(2) ]
 end
 
-@testset "fq_mat.charpoly" begin
-   F17, _ = FiniteField(fmpz(17), 1, "a")
+@testset "FqPolyRepMatrix.charpoly" begin
+   F17, _ = FiniteField(ZZRingElem(17), 1, "a")
 
    for dim = 0:5
       S = MatrixSpace(F17, dim, dim)
@@ -785,8 +785,8 @@ end
    end
 end
 
-@testset "fq_mat.rand" begin
-   F17, _ = FiniteField(fmpz(17), 1, "a")
+@testset "FqPolyRepMatrix.rand" begin
+   F17, _ = FiniteField(ZZRingElem(17), 1, "a")
    S = MatrixSpace(F17, 3, 3)
    M = rand(S)
    @test parent(M) == S

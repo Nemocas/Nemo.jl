@@ -1,4 +1,4 @@
-@testset "fmpq_mpoly.constructors" begin
+@testset "QQMPolyRingElem.constructors" begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -18,28 +18,28 @@
 
       @test nvars(S) == num_vars
 
-      @test elem_type(S) == fmpq_mpoly
-      @test elem_type(FmpqMPolyRing) == fmpq_mpoly
-      @test parent_type(fmpq_mpoly) == FmpqMPolyRing
+      @test elem_type(S) == QQMPolyRingElem
+      @test elem_type(QQMPolyRing) == QQMPolyRingElem
+      @test parent_type(QQMPolyRingElem) == QQMPolyRing
 
-      @test typeof(S) <: FmpqMPolyRing
+      @test typeof(S) <: QQMPolyRing
 
       isa(symbols(S), Vector{Symbol})
 
       for j = 1:num_vars
-         @test isa(varlist[j], fmpq_mpoly)
-         @test isa(gens(S)[j], fmpq_mpoly)
+         @test isa(varlist[j], QQMPolyRingElem)
+         @test isa(gens(S)[j], QQMPolyRingElem)
       end
 
       f =  rand(S, 0:5, 0:100, -100:100)
 
-      @test isa(f, fmpq_mpoly)
+      @test isa(f, QQMPolyRingElem)
 
-      @test isa(S(2), fmpq_mpoly)
+      @test isa(S(2), QQMPolyRingElem)
 
-      @test isa(S(R(2)), fmpq_mpoly)
+      @test isa(S(R(2)), QQMPolyRingElem)
 
-      @test isa(S(f), fmpq_mpoly)
+      @test isa(S(f), QQMPolyRingElem)
 
       V = [(rand(-100:100)) for i in 1:5]
 
@@ -47,7 +47,7 @@
 
       f = S(map(v -> R.(v), V), W0)
 
-      @test isa(f, fmpq_mpoly)
+      @test isa(f, QQMPolyRingElem)
 
       # Test the BuildCtx
       
@@ -58,7 +58,7 @@
           push_term!(bctx, RR(v), Int.(w0))
         end
         ff = finish(bctx)
-        @test isa(ff, fmpq_mpoly)
+        @test isa(ff, QQMPolyRingElem)
         @test f == ff
       end
 
@@ -79,7 +79,7 @@
    end
 end
 
-@testset "fmpq_mpoly.printing" begin
+@testset "QQMPolyRingElem.printing" begin
    S, (x, y) = PolynomialRing(FlintQQ, ["x", "y"])
 
    @test !occursin(r"{", string(S))
@@ -89,21 +89,21 @@ end
    @test string(x) == "x"
    @test string(y) == "y"
 
-   a = fmpz(3)^100
-   b = fmpz(2)^100
+   a = ZZRingElem(3)^100
+   b = ZZRingElem(2)^100
    @test string(x^a + y^b) == "x^$a + y^$b"
 end
 
-@testset "fmpq_mpoly.hash" begin
+@testset "QQMPolyRingElem.hash" begin
    S, (x, y) = PolynomialRing(FlintQQ, ["x", "y"])
 
-   p = y^fmpz(2)^100
+   p = y^ZZRingElem(2)^100
 
    @test hash(x) == hash((x + y) - y)
    @test hash(x) == hash((x + p) - p)
 end
 
-@testset "fmpq_mpoly.manipulation" begin
+@testset "QQMPolyRingElem.manipulation" begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -135,9 +135,9 @@ end
       f = rand(S, 1:5, 0:100, -100:100)
 
       if length(f) > 0
-        @test f == sum((coeff(f, i) * S(fmpq[1], [Nemo.exponent_vector(f, i)])  for i in 1:length(f)))
-        @test f == sum((coeff(f, i) * S(fmpq[1], [Nemo.exponent_vector_ui(f, i)])  for i in 1:length(f)))
-        @test f == sum((coeff(f, i) * S(fmpq[1], [Nemo.exponent_vector_fmpz(f, i)])  for i in 1:length(f)))
+        @test f == sum((coeff(f, i) * S(QQFieldElem[1], [Nemo.exponent_vector(f, i)])  for i in 1:length(f)))
+        @test f == sum((coeff(f, i) * S(QQFieldElem[1], [Nemo.exponent_vector_ui(f, i)])  for i in 1:length(f)))
+        @test f == sum((coeff(f, i) * S(QQFieldElem[1], [Nemo.exponent_vector_fmpz(f, i)])  for i in 1:length(f)))
       end
 
       c = @inferred content(f)
@@ -199,7 +199,7 @@ end
       h = S(coeffs, monomialexp)
       @test length(h) == length(monomialexp)
       for k in 1:length(h)
-        @test coeff(h, S(fmpq[1], [monomialexp[k]])) == coeffs[k]
+        @test coeff(h, S(QQFieldElem[1], [monomialexp[k]])) == coeffs[k]
       end
 
       max_degs = max.(monomialexp...)
@@ -226,7 +226,7 @@ end
    @test trailing_coefficient(S()) == 0
 end
 
-@testset "fmpq_mpoly.multivariate_coeff" begin
+@testset "QQMPolyRingElem.multivariate_coeff" begin
    R = FlintQQ
 
    for ord in Nemo.flint_orderings
@@ -245,7 +245,7 @@ z^4-4*x*y-10*x*z^2+8*y^2*z^5-9*y^2*z^3
    end
 end
 
-@testset "fmpq_mpoly.unary_ops" begin
+@testset "QQMPolyRingElem.unary_ops" begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -262,7 +262,7 @@ end
    end
 end
 
-@testset "fmpq_mpoly.binary_ops" begin
+@testset "QQMPolyRingElem.binary_ops" begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -285,7 +285,7 @@ end
    end
 end
 
-@testset "fmpq_mpoly.adhoc_binary" begin
+@testset "QQMPolyRingElem.adhoc_binary" begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -325,7 +325,7 @@ end
    end
 end
 
-@testset "fmpq_mpoly.adhoc_comparison" begin
+@testset "QQMPolyRingElem.adhoc_comparison" begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -339,10 +339,10 @@ end
 
          @test S(d) == d
          @test d == S(d)
-         @test S(fmpz(d)) == fmpz(d)
-         @test fmpz(d) == S(fmpz(d))
-         @test S(fmpq(d)) == fmpq(d)
-         @test fmpq(d) == S(fmpq(d))
+         @test S(ZZRingElem(d)) == ZZRingElem(d)
+         @test ZZRingElem(d) == S(ZZRingElem(d))
+         @test S(QQFieldElem(d)) == QQFieldElem(d)
+         @test QQFieldElem(d) == S(QQFieldElem(d))
          @test S(d) == BigInt(d)
          @test BigInt(d) == S(d)
          @test S(d) == Rational{Int}(d)
@@ -351,7 +351,7 @@ end
    end
 end
 
-@testset "fmpq_mpoly.powering" begin
+@testset "QQMPolyRingElem.powering" begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -373,12 +373,12 @@ end
          @test (f == 0 && expn == 0 && f^expn == 0) || f^expn == r
 
          @test_throws DomainError f^-1
-         @test_throws DomainError f^fmpz(-1)
+         @test_throws DomainError f^ZZRingElem(-1)
       end
    end
 end
 
-@testset "fmpq_mpoly.divides" begin
+@testset "QQMPolyRingElem.divides" begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -407,7 +407,7 @@ end
    end
 end
 
-@testset "fmpq_mpoly.euclidean_division" begin
+@testset "QQMPolyRingElem.euclidean_division" begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -443,7 +443,7 @@ end
    end
 end
 
-@testset "fmpq_mpoly.ideal_reduction" begin
+@testset "QQMPolyRingElem.ideal_reduction" begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -492,7 +492,7 @@ end
    end
 end
 
-@testset "fmpq_mpoly.gcd" begin
+@testset "QQMPolyRingElem.gcd" begin
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -516,7 +516,7 @@ end
    end
 end
 
-@testset "fmpq_mpoly.factor" begin
+@testset "QQMPolyRingElem.factor" begin
    R, (x, y, z) = PolynomialRing(FlintQQ, ["x", "y", "z"])
 
    function check_factor(a, esum)
@@ -534,7 +534,7 @@ end
    check_factor(x^99-1//8*y^99*z^33, 2)
 end
 
-@testset "fmpq_mpoly.sqrt" begin
+@testset "QQMPolyRingElem.sqrt" begin
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -558,7 +558,7 @@ end
    end
 end
 
-@testset "fmpq_mpoly.evaluation" begin
+@testset "QQMPolyRingElem.evaluation" begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -641,7 +641,7 @@ end
    @test f(M1, M2) == T([124 219; 271 480])
 end
 
-@testset "fmpq_mpoly.valuation" begin
+@testset "QQMPolyRingElem.valuation" begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -679,7 +679,7 @@ end
    end
 end
 
-@testset "fmpq_mpoly.derivative_integral" begin
+@testset "QQMPolyRingElem.derivative_integral" begin
    R = FlintQQ
 
    for num_vars = 1:10
@@ -699,7 +699,7 @@ end
    end
 end
 
-@testset "fmpq_mpoly.combine_like_terms" begin
+@testset "QQMPolyRingElem.combine_like_terms" begin
   for num_vars = 1:10
      var_names = ["x$j" for j in 1:num_vars]
      ord = rand_ordering()
@@ -733,7 +733,7 @@ end
   end
 end
 
-@testset "fmpq_mpoly.exponents" begin
+@testset "QQMPolyRingElem.exponents" begin
   for num_vars = 1:10
      var_names = ["x$j" for j in 1:num_vars]
      ord = rand_ordering()
@@ -779,14 +779,14 @@ end
         end
      end
 
-     f = rand(vars_R)^(fmpz(typemax(UInt)) + 1)
+     f = rand(vars_R)^(ZZRingElem(typemax(UInt)) + 1)
      @test !exponent_vector_fits_int(f, 1)
      @test !exponent_vector_fits_ui(f, 1)
      @test_throws DomainError exponent_vector(f, 1)
   end
 end
 
-@testset "fmpq_mpoly.gcd_with_cofactors" begin
+@testset "QQMPolyRingElem.gcd_with_cofactors" begin
    R, (x, y, z) = PolynomialRing(QQ, [:x, :y, :z])
 
    @test gcd_with_cofactors(x, y) == (1, x, y)

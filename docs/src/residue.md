@@ -22,8 +22,8 @@ Nemo are given in the following table.
 Base ring                   | Library            | Element type    | Parent type
 ----------------------------|--------------------|-----------------|--------------------
 Generic ring $R$            | AbstractAlgebra.jl | `Generic.Res{T}`| `Generic.ResRing{T}`
-$\mathbb{Z}$ (Int modulus)  | Flint              | `nmod`          | `NmodRing`
-$\mathbb{Z}$ (ZZ modulus)   | Flint              | `fmpz_mod`      | `FmpzModRing`
+$\mathbb{Z}$ (Int modulus)  | Flint              | `zzModRingElem`          | `zzModRing`
+$\mathbb{Z}$ (ZZ modulus)   | Flint              | `ZZModRingElem`      | `ZZModRing`
 
 The modulus $a$ of a residue ring is stored in its parent object.
 
@@ -45,8 +45,8 @@ We describe Nemo specific residue ring functionality below.
 ### GCD
 
 ```@docs
-gcdx(::nmod, ::nmod)
-gcdx(::fmpz_mod, ::fmpz_mod)
+gcdx(::zzModRingElem, ::zzModRingElem)
+gcdx(::ZZModRingElem, ::ZZModRingElem)
 ```
 
 **Examples**

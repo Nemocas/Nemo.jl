@@ -146,25 +146,25 @@ function contains(x::RealPoly, y::RealPoly)
 end
 
 @doc Markdown.doc"""
-    contains(x::RealPoly, y::fmpz_poly)
+    contains(x::RealPoly, y::ZZPolyRingElem)
 
 Return `true` if the coefficient balls of $x$ contain the corresponding
 exact coefficients of $y$, otherwise return `false`.
 """
-function contains(x::RealPoly, y::fmpz_poly)
+function contains(x::RealPoly, y::ZZPolyRingElem)
    return ccall((:arb_poly_contains_fmpz_poly, libarb), Bool,
-                                      (Ref{RealPoly}, Ref{fmpz_poly}), x, y)
+                                      (Ref{RealPoly}, Ref{ZZPolyRingElem}), x, y)
 end
 
 @doc Markdown.doc"""
-    contains(x::RealPoly, y::fmpq_poly)
+    contains(x::RealPoly, y::QQPolyRingElem)
 
 Return `true` if the coefficient balls of $x$ contain the corresponding
 exact coefficients of $y$, otherwise return `false`.
 """
-function contains(x::RealPoly, y::fmpq_poly)
+function contains(x::RealPoly, y::QQPolyRingElem)
    return ccall((:arb_poly_contains_fmpq_poly, libarb), Bool,
-                                      (Ref{RealPoly}, Ref{fmpq_poly}), x, y)
+                                      (Ref{RealPoly}, Ref{QQPolyRingElem}), x, y)
 end
 
 function ==(x::RealPoly, y::RealPoly)
@@ -196,9 +196,9 @@ contained in each of the coefficients of $x$, otherwise sets $t$ to `false`.
 In the former case, $z$ is set to the integer polynomial.
 """
 function unique_integer(x::RealPoly)
-  z = FmpzPolyRing(FlintZZ, var(parent(x)))()
+  z = ZZPolyRing(FlintZZ, var(parent(x)))()
   unique = ccall((:arb_poly_get_unique_fmpz_poly, libarb), Int,
-    (Ref{fmpz_poly}, Ref{RealPoly}), z, x)
+    (Ref{ZZPolyRingElem}, Ref{RealPoly}), z, x)
   return (unique != 0, z)
 end
 
@@ -281,7 +281,7 @@ end
 #
 ###############################################################################
 
-for T in [Integer, fmpz, fmpq, Float64, BigFloat, RealElem, fmpz_poly, fmpq_poly]
+for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, RealElem, ZZPolyRingElem, QQPolyRingElem]
    @eval begin
       +(x::RealPoly, y::$T) = x + parent(x)(y)
 
@@ -315,7 +315,7 @@ end
 #
 ###############################################################################
 
-for T in [Integer, fmpz, fmpq, Float64, BigFloat, RealElem]
+for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, RealElem]
    @eval begin
       divexact(x::RealPoly, y::$T; check::Bool=true) = x * inv(base_ring(parent(x))(y))
 
@@ -451,7 +451,7 @@ function evaluate2(x::RealPoly, y::ComplexElem, prec = precision(Balls))
    return z, w
 end
 
-for T in [Integer, Float64, fmpz, fmpq, Rational]
+for T in [Integer, Float64, ZZRingElem, QQFieldElem, Rational]
   @eval begin
     function evaluate(x::RealPoly, y::$T)
         return evaluate(x, base_ring(parent(x))(y))
@@ -465,7 +465,7 @@ end
 Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
 its derivative evaluated at $y$.
 """
-function evaluate2(x::RealPoly, y::Union{Integer, Float64, fmpz, fmpq, Rational})
+function evaluate2(x::RealPoly, y::Union{Integer, Float64, ZZRingElem, QQFieldElem, Rational})
     return evaluate2(x, base_ring(parent(x))(y))
 end
 
@@ -658,9 +658,9 @@ function fit!(z::RealPoly, n::Int)
    return nothing
 end
 
-function setcoeff!(z::RealPoly, n::Int, x::fmpz)
+function setcoeff!(z::RealPoly, n::Int, x::ZZRingElem)
    ccall((:arb_poly_set_coeff_fmpz, libarb), Nothing,
-                    (Ref{RealPoly}, Int, Ref{fmpz}), z, n, x)
+                    (Ref{RealPoly}, Int, Ref{ZZRingElem}), z, n, x)
    return z
 end
 
@@ -701,15 +701,15 @@ promote_rule(::Type{RealPoly}, ::Type{Float64}) = RealPoly
 
 promote_rule(::Type{RealPoly}, ::Type{BigFloat}) = RealPoly
 
-promote_rule(::Type{RealPoly}, ::Type{fmpz}) = RealPoly
+promote_rule(::Type{RealPoly}, ::Type{ZZRingElem}) = RealPoly
 
-promote_rule(::Type{RealPoly}, ::Type{fmpq}) = RealPoly
+promote_rule(::Type{RealPoly}, ::Type{QQFieldElem}) = RealPoly
 
 promote_rule(::Type{RealPoly}, ::Type{RealElem}) = RealPoly
 
-promote_rule(::Type{RealPoly}, ::Type{fmpz_poly}) = RealPoly
+promote_rule(::Type{RealPoly}, ::Type{ZZPolyRingElem}) = RealPoly
 
-promote_rule(::Type{RealPoly}, ::Type{fmpq_poly}) = RealPoly
+promote_rule(::Type{RealPoly}, ::Type{QQPolyRingElem}) = RealPoly
 
 promote_rule(::Type{RealPoly}, ::Type{T}) where {T <: Integer} = RealPoly
 
@@ -727,7 +727,7 @@ function (a::RealPolyRing)()
    return z
 end
 
-for T in [Integer, fmpz, fmpq, Float64, RealElem, BigFloat]
+for T in [Integer, ZZRingElem, QQFieldElem, Float64, RealElem, BigFloat]
    @eval begin
       function (a::RealPolyRing)(b::$T)
          z = RealPoly(base_ring(a)(b), precision(Balls))
@@ -749,7 +749,7 @@ function (a::RealPolyRing)(b::Vector{RealElem})
    return z
 end
 
-for T in [fmpz, fmpq, Float64, BigFloat]
+for T in [ZZRingElem, QQFieldElem, Float64, BigFloat]
    @eval begin
       (a::RealPolyRing)(b::Vector{$T}) = a(map(base_ring(a), b))
    end
@@ -759,13 +759,13 @@ end
 
 (a::RealPolyRing)(b::Vector{Rational{T}}) where {T <: Integer} = a(map(base_ring(a), b))
 
-function (a::RealPolyRing)(b::fmpz_poly)
+function (a::RealPolyRing)(b::ZZPolyRingElem)
    z = RealPoly(b, precision(Balls))
    z.parent = a
    return z
 end
 
-function (a::RealPolyRing)(b::fmpq_poly)
+function (a::RealPolyRing)(b::QQPolyRingElem)
    z = RealPoly(b, precision(Balls))
    z.parent = a
    return z
@@ -789,7 +789,7 @@ end
 
 function PolynomialRing(R::RealField, s::Symbol; cached = true)
   parent_obj = RealPolyRing(R, s, cached)
-  return parent_obj, parent_obj(fmpz_poly([fmpz(0), fmpz(1)]))
+  return parent_obj, parent_obj(ZZPolyRingElem([ZZRingElem(0), ZZRingElem(1)]))
 end
 
 function PolynomialRing(R::RealField, s::AbstractString; cached = true)

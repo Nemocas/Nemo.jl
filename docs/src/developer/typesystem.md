@@ -63,12 +63,12 @@ concrete instantiation of the types `Poly{T}` and `Mat{T}`, which are defined
 in AbstractAlgebra in `src/generic/GenericTypes.jl`.
 
 The totality of all univariate polynomial types, including those of generic
-`Poly{T}` types and those coming from C libraries (such as `fmpz_poly`), is
+`Poly{T}` types and those coming from C libraries (such as `ZZPolyRingElem`), is
 represented by the abstract type `PolyElem{T}` which in turn belongs to
 `RingElem`, both defined in AbstractAlgebra in `src/AbstractTypes.jl`.
 
 Similarly, the totality of all matrix types, including explicit C types
-like `fmpz_mat` and the generic `Mat{T}` types is given by the abstract type
+like `ZZMatrix` and the generic `Mat{T}` types is given by the abstract type
 `MatElem{T}`, again defined in AbstractAlgebra in `src/AbstractTypes.jl`.
 
 This hierarchy of types allows one to write functions at any level, e.g. for

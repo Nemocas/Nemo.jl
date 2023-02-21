@@ -142,8 +142,8 @@ Coerce zero into the Arb complex field.
 
 ```
 R(n::Integer)
-R(f::fmpz)
-R(q::fmpq)
+R(f::ZZRingElem)
+R(q::QQFieldElem)
 ```
 
 Coerce an integer or rational value into the Arb complex field.
@@ -248,8 +248,8 @@ contains(::acb, ::acb)
 
 ```@docs
 contains(::acb, ::Integer)
-contains(::acb, ::fmpz)
-contains(::acb, ::fmpq)
+contains(::acb, ::ZZRingElem)
+contains(::acb, ::QQFieldElem)
 ```
 
 The following functions are also provided for determining if a box intersects
@@ -292,10 +292,10 @@ Function                     |
 -----------------------------|
 `==(x::acb, y::Integer)`     |
 `==(x::Integer, y::acb)`     |
-`==(x::acb, y::fmpz)`        |
-`==(x::fmpz, y::acb)`        |
-`==(x::arb, y::fmpz)`        |
-`==(x::fmpz, y::arb)`        |
+`==(x::acb, y::ZZRingElem)`        |
+`==(x::ZZRingElem, y::acb)`        |
+`==(x::arb, y::ZZRingElem)`        |
+`==(x::ZZRingElem, y::arb)`        |
 `==(x::acb, y::Float64)`     |
 `==(x::Float64, y::acb)`     |
 

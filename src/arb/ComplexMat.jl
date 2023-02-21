@@ -68,7 +68,7 @@ end
   return z
 end
 
-for T in [Integer, Float64, fmpz, fmpq, RealElem, BigFloat, ComplexElem, AbstractString]
+for T in [Integer, Float64, ZZRingElem, QQFieldElem, RealElem, BigFloat, ComplexElem, AbstractString]
    @eval begin
       @inline function setindex!(x::ComplexMat, y::$T, r::Int, c::Int)
          @boundscheck Generic._checkbounds(x, r, c)
@@ -84,9 +84,9 @@ end
 
 Base.@propagate_inbounds setindex!(x::ComplexMat, y::Rational{T},
                                    r::Int, c::Int) where {T <: Integer} =
-         setindex!(x, fmpq(y), r, c)
+         setindex!(x, QQFieldElem(y), r, c)
 
-for T in [Integer, Float64, fmpz, fmpq, RealElem, BigFloat, AbstractString]
+for T in [Integer, Float64, ZZRingElem, QQFieldElem, RealElem, BigFloat, AbstractString]
    @eval begin
       @inline function setindex!(x::ComplexMat, y::Tuple{$T, $T}, r::Int, c::Int)
          @boundscheck Generic._checkbounds(x, r, c)
@@ -101,7 +101,7 @@ for T in [Integer, Float64, fmpz, fmpq, RealElem, BigFloat, AbstractString]
 end
 
 setindex!(x::ComplexMat, y::Tuple{Rational{T}, Rational{T}}, r::Int, c::Int) where {T <: Integer} =
-         setindex!(x, map(fmpq, y), r, c)
+         setindex!(x, map(QQFieldElem, y), r, c)
 
 zero(x::ComplexMatSpace) = x()
 
@@ -208,15 +208,15 @@ end
 
 *(x::Int, y::ComplexMat) = y*x
 
-function *(x::ComplexMat, y::fmpz)
+function *(x::ComplexMat, y::ZZRingElem)
   z = similar(x)
   ccall((:acb_mat_scalar_mul_fmpz, libarb), Nothing,
-              (Ref{ComplexMat}, Ref{ComplexMat}, Ref{fmpz}, Int),
+              (Ref{ComplexMat}, Ref{ComplexMat}, Ref{ZZRingElem}, Int),
               z, x, y, precision(Balls))
   return z
 end
 
-*(x::fmpz, y::ComplexMat) = y*x
+*(x::ZZRingElem, y::ComplexMat) = y*x
 
 function *(x::ComplexMat, y::RealElem)
   z = similar(x)
@@ -238,13 +238,13 @@ end
 
 *(x::ComplexElem, y::ComplexMat) = y*x
 
-*(x::Integer, y::ComplexMat) = fmpz(x) * y
+*(x::Integer, y::ComplexMat) = ZZRingElem(x) * y
 
 *(x::ComplexMat, y::Integer) = y * x
 
-*(x::fmpq, y::ComplexMat) = base_ring(y)(x) * y
+*(x::QQFieldElem, y::ComplexMat) = base_ring(y)(x) * y
 
-*(x::ComplexMat, y::fmpq) = y * x
+*(x::ComplexMat, y::QQFieldElem) = y * x
 
 *(x::Float64, y::ComplexMat) = base_ring(y)(x) * y
 
@@ -254,11 +254,11 @@ end
 
 *(x::ComplexMat, y::BigFloat) = y * x
 
-*(x::Rational{T}, y::ComplexMat) where T <: Union{Int, BigInt} = fmpq(x) * y
+*(x::Rational{T}, y::ComplexMat) where T <: Union{Int, BigInt} = QQFieldElem(x) * y
 
 *(x::ComplexMat, y::Rational{T}) where T <: Union{Int, BigInt} = y * x
 
-for T in [Integer, fmpz, fmpq, RealElem, ComplexElem]
+for T in [Integer, ZZRingElem, QQFieldElem, RealElem, ComplexElem]
    @eval begin
       function +(x::ComplexMat, y::$T)
          z = deepcopy(x)
@@ -388,32 +388,32 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
-    contains(x::ComplexMat, y::fmpz_mat)
+    contains(x::ComplexMat, y::ZZMatrix)
 
 Returns `true` if all entries of $x$ contain the corresponding entry of
 $y$, otherwise return `false`.
 """
-function contains(x::ComplexMat, y::fmpz_mat)
+function contains(x::ComplexMat, y::ZZMatrix)
   r = ccall((:acb_mat_contains_fmpz_mat, libarb), Cint,
-              (Ref{ComplexMat}, Ref{fmpz_mat}), x, y)
+              (Ref{ComplexMat}, Ref{ZZMatrix}), x, y)
   return Bool(r)
 end
 
 @doc Markdown.doc"""
-    contains(x::ComplexMat, y::fmpq_mat)
+    contains(x::ComplexMat, y::QQMatrix)
 
 Returns `true` if all entries of $x$ contain the corresponding entry of
 $y$, otherwise return `false`.
 """
-function contains(x::ComplexMat, y::fmpq_mat)
+function contains(x::ComplexMat, y::QQMatrix)
   r = ccall((:acb_mat_contains_fmpq_mat, libarb), Cint,
-              (Ref{ComplexMat}, Ref{fmpq_mat}), x, y)
+              (Ref{ComplexMat}, Ref{QQMatrix}), x, y)
   return Bool(r)
 end
 
-==(x::ComplexMat, y::fmpz_mat) = x == parent(x)(y)
+==(x::ComplexMat, y::ZZMatrix) = x == parent(x)(y)
 
-==(x::fmpz_mat, y::ComplexMat) = y == x
+==(x::ZZMatrix, y::ComplexMat) = y == x
 
 ==(x::ComplexMat, y::RealMat) = x == parent(x)(y)
 
@@ -475,10 +475,10 @@ function divexact(x::ComplexMat, y::Int; check::Bool=true)
   return z
 end
 
-function divexact(x::ComplexMat, y::fmpz; check::Bool=true)
+function divexact(x::ComplexMat, y::ZZRingElem; check::Bool=true)
   z = similar(x)
   ccall((:acb_mat_scalar_div_fmpz, libarb), Nothing,
-              (Ref{ComplexMat}, Ref{ComplexMat}, Ref{fmpz}, Int),
+              (Ref{ComplexMat}, Ref{ComplexMat}, Ref{ZZRingElem}, Int),
               z, x, y, precision(Balls))
   return z
 end
@@ -503,9 +503,9 @@ divexact(x::ComplexMat, y::Float64; check::Bool=true) = divexact(x, base_ring(x)
 
 divexact(x::ComplexMat, y::BigFloat; check::Bool=true) = divexact(x, base_ring(x)(y); check=check)
 
-divexact(x::ComplexMat, y::Integer; check::Bool=true) = divexact(x, fmpz(y); check=check)
+divexact(x::ComplexMat, y::Integer; check::Bool=true) = divexact(x, ZZRingElem(y); check=check)
 
-divexact(x::ComplexMat, y::Rational{T}; check::Bool=true) where T <: Union{Int, BigInt} = divexact(x, fmpq(y); check=check)
+divexact(x::ComplexMat, y::Rational{T}; check::Bool=true) where T <: Union{Int, BigInt} = divexact(x, QQFieldElem(y); check=check)
 
 ################################################################################
 #
@@ -696,7 +696,7 @@ function (x::ComplexMatSpace)()
   return z
 end
 
-function (x::ComplexMatSpace)(y::fmpz_mat)
+function (x::ComplexMatSpace)(y::ZZMatrix)
   (ncols(x) != ncols(y) || nrows(x) != nrows(y)) &&
       error("Dimensions are wrong")
   z = ComplexMat(y, precision(Balls))
@@ -710,7 +710,7 @@ function (x::ComplexMatSpace)(y::RealMat)
   return z
 end
 
-for T in [Float64, fmpz, fmpq, BigFloat, RealElem, ComplexElem, String]
+for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, RealElem, ComplexElem, String]
    @eval begin
       function (x::ComplexMatSpace)(y::AbstractMatrix{$T})
          _check_dim(nrows(x), ncols(x), y)
@@ -726,15 +726,15 @@ for T in [Float64, fmpz, fmpq, BigFloat, RealElem, ComplexElem, String]
    end
 end
 
-(x::ComplexMatSpace)(y::AbstractMatrix{T}) where {T <: Integer} = x(map(fmpz, y))
+(x::ComplexMatSpace)(y::AbstractMatrix{T}) where {T <: Integer} = x(map(ZZRingElem, y))
 
-(x::ComplexMatSpace)(y::AbstractVector{T}) where {T <: Integer} = x(map(fmpz, y))
+(x::ComplexMatSpace)(y::AbstractVector{T}) where {T <: Integer} = x(map(ZZRingElem, y))
 
-(x::ComplexMatSpace)(y::AbstractMatrix{Rational{T}}) where {T <: Integer} = x(map(fmpq, y))
+(x::ComplexMatSpace)(y::AbstractMatrix{Rational{T}}) where {T <: Integer} = x(map(QQFieldElem, y))
 
-(x::ComplexMatSpace)(y::AbstractVector{Rational{T}}) where {T <: Integer} = x(map(fmpq, y))
+(x::ComplexMatSpace)(y::AbstractVector{Rational{T}}) where {T <: Integer} = x(map(QQFieldElem, y))
 
-for T in [Float64, fmpz, fmpq, BigFloat, RealElem, String]
+for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, RealElem, String]
    @eval begin
       function (x::ComplexMatSpace)(y::AbstractMatrix{Tuple{$T, $T}})
          _check_dim(nrows(x), ncols(x), y)
@@ -751,18 +751,18 @@ for T in [Float64, fmpz, fmpq, BigFloat, RealElem, String]
 end
 
 (x::ComplexMatSpace)(y::AbstractMatrix{Tuple{T, T}}) where {T <: Integer} =
-         x(map(z -> (fmpz(z[1]), fmpz(z[2])), y))
+         x(map(z -> (ZZRingElem(z[1]), ZZRingElem(z[2])), y))
 
 (x::ComplexMatSpace)(y::AbstractVector{Tuple{T, T}}) where {T <: Integer} =
-         x(map(z -> (fmpz(z[1]), fmpz(z[2])), y))
+         x(map(z -> (ZZRingElem(z[1]), ZZRingElem(z[2])), y))
 
 (x::ComplexMatSpace)(y::AbstractMatrix{Tuple{Rational{T}, Rational{T}}}) where {T <: Integer} =
-         x(map(z -> (fmpq(z[1]), fmpq(z[2])), y))
+         x(map(z -> (QQFieldElem(z[1]), QQFieldElem(z[2])), y))
 
 (x::ComplexMatSpace)(y::AbstractVector{Tuple{Rational{T}, Rational{T}}}) where {T <: Integer} =
-         x(map(z -> (fmpq(z[1]), fmpq(z[2])), y))
+         x(map(z -> (QQFieldElem(z[1]), QQFieldElem(z[2])), y))
 
-for T in [Integer, fmpz, fmpq, Float64, BigFloat, RealElem, ComplexElem, String]
+for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, RealElem, ComplexElem, String]
    @eval begin
       function (x::ComplexMatSpace)(y::$T)
          z = x()
@@ -780,7 +780,7 @@ for T in [Integer, fmpz, fmpq, Float64, BigFloat, RealElem, ComplexElem, String]
    end
 end
 
-(x::ComplexMatSpace)(y::Rational{T}) where {T <: Integer} = x(fmpq(y))
+(x::ComplexMatSpace)(y::Rational{T}) where {T <: Integer} = x(QQFieldElem(y))
 
 (x::ComplexMatSpace)(y::ComplexMat) = y
 
@@ -790,34 +790,34 @@ end
 #
 ###############################################################################
 
-function matrix(R::ComplexField, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, RealElem, ComplexElem, AbstractString}}
+function matrix(R::ComplexField, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealElem, ComplexElem, AbstractString}}
    z = ComplexMat(size(arr, 1), size(arr, 2), arr, precision(Balls))
    return z
 end
 
-function matrix(R::ComplexField, r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, RealElem, ComplexElem, AbstractString}}
+function matrix(R::ComplexField, r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealElem, ComplexElem, AbstractString}}
    _check_dim(r, c, arr)
    z = ComplexMat(r, c, arr, precision(Balls))
    return z
 end
 
 function matrix(R::ComplexField, arr::AbstractMatrix{<: Integer})
-   arr_fmpz = map(fmpz, arr)
+   arr_fmpz = map(ZZRingElem, arr)
    return matrix(R, arr_fmpz)
 end
 
 function matrix(R::ComplexField, r::Int, c::Int, arr::AbstractVector{<: Integer})
-   arr_fmpz = map(fmpz, arr)
+   arr_fmpz = map(ZZRingElem, arr)
    return matrix(R, r, c, arr_fmpz)
 end
 
 function matrix(R::ComplexField, arr::AbstractMatrix{Rational{T}}) where {T <: Integer}
-   arr_fmpz = map(fmpq, arr)
+   arr_fmpz = map(QQFieldElem, arr)
    return matrix(R, arr_fmpz)
 end
 
 function matrix(R::ComplexField, r::Int, c::Int, arr::AbstractVector{Rational{T}}) where {T <: Integer}
-   arr_fmpz = map(fmpq, arr)
+   arr_fmpz = map(QQFieldElem, arr)
    return matrix(R, r, c, arr_fmpz)
 end
 
@@ -860,17 +860,17 @@ promote_rule(::Type{ComplexMat}, ::Type{T}) where {T <: Integer} = ComplexMat
 
 promote_rule(::Type{ComplexMat}, ::Type{Rational{T}}) where T <: Union{Int, BigInt} = ComplexMat
 
-promote_rule(::Type{ComplexMat}, ::Type{fmpz}) = ComplexMat
+promote_rule(::Type{ComplexMat}, ::Type{ZZRingElem}) = ComplexMat
 
-promote_rule(::Type{ComplexMat}, ::Type{fmpq}) = ComplexMat
+promote_rule(::Type{ComplexMat}, ::Type{QQFieldElem}) = ComplexMat
 
 promote_rule(::Type{ComplexMat}, ::Type{arb}) = ComplexMat
 
 promote_rule(::Type{ComplexMat}, ::Type{ComplexElem}) = ComplexMat
 
-promote_rule(::Type{ComplexMat}, ::Type{fmpz_mat}) = ComplexMat
+promote_rule(::Type{ComplexMat}, ::Type{ZZMatrix}) = ComplexMat
 
-promote_rule(::Type{ComplexMat}, ::Type{fmpq_mat}) = ComplexMat
+promote_rule(::Type{ComplexMat}, ::Type{QQMatrix}) = ComplexMat
 
 promote_rule(::Type{ComplexMat}, ::Type{arb_mat}) = ComplexMat
 

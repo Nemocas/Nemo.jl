@@ -1,5 +1,5 @@
 @testset "fmpz_rel_series.types" begin
-   @test rel_series_type(fmpz) == fmpz_rel_series
+   @test rel_series_type(ZZRingElem) == fmpz_rel_series
 end
 
 @testset "fmpz_rel_series.constructors" begin
@@ -130,7 +130,7 @@ end
    @test parent(h) === parent(g)
    @test parent(k) !== parent(m)
 
-   p = rel_series(ZZ, fmpz[], 0, 3, 1)
+   p = rel_series(ZZ, ZZRingElem[], 0, 3, 1)
    q = rel_series(ZZ, [], 0, 3, 2)
 
    @test isa(p, fmpz_rel_series)
@@ -431,9 +431,9 @@ end
 
    @test isequal(divexact(7a, 7), a)
 
-   @test isequal(divexact(11b, fmpz(11)), b)
+   @test isequal(divexact(11b, ZZRingElem(11)), b)
 
-   @test isequal(divexact(2c, fmpz(2)), c)
+   @test isequal(divexact(2c, ZZRingElem(2)), c)
 
    @test isequal(divexact(9d, 9), d)
 

@@ -14,7 +14,7 @@ CC = AcbField(64)
    @test AcbField(10, cached = true) === AcbField(10, cached = true)
    @test AcbField(11, cached = false) !== AcbField(11, cached = false)
 
-   for T in [Int32, Int, BigInt, Complex{Int}, Complex{Float64}, Rational{Int}, Rational{BigInt}, Float64, BigFloat, fmpz, fmpq, arb]
+   for T in [Int32, Int, BigInt, Complex{Int}, Complex{Float64}, Rational{Int}, Rational{BigInt}, Float64, BigFloat, ZZRingElem, QQFieldElem, arb]
      @test acb === Nemo.promote_rule(acb, T)
    end
 end
@@ -141,7 +141,7 @@ end
    @test x * y == 8
    @test x // y == 0.5
 
-   for T in [fmpz, fmpq, Int, BigInt, Rational{Int}, Rational{BigInt}]
+   for T in [ZZRingElem, QQFieldElem, Int, BigInt, Rational{Int}, Rational{BigInt}]
 
       @test x + T(4) == 6
       @test x - T(4) == -2
@@ -158,11 +158,11 @@ end
       @test contains(x + T(4), 6)
       @test contains(x - T(4), -2)
       @test contains(x * T(4), 8)
-      @test contains(x // T(4), fmpq(1, 2))
+      @test contains(x // T(4), QQFieldElem(1, 2))
       @test contains(T(2) + y, 6)
       @test contains(T(2) - y, -2)
       @test contains(T(2) * y, 8)
-      @test contains(T(2) // y, fmpq(1, 2))
+      @test contains(T(2) // y, QQFieldElem(1, 2))
       @test contains(x ^ T(4), 16)
    end
 end
@@ -434,7 +434,7 @@ end
    @test overlaps(prod_sqr, CC(2))
 end
 
-@testset "acb.fmpz_poly" begin
+@testset "acb.ZZPolyRingElem" begin
    R, x = PolynomialRing(ZZ, "x")
    @test hilbert_class_polynomial(-3, R) == x
    @test_throws ArgumentError hilbert_class_polynomial(2, R)

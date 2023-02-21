@@ -150,25 +150,25 @@ function contains(x::ComplexPoly, y::ComplexPoly)
 end
 
 @doc Markdown.doc"""
-    contains(x::ComplexPoly, y::fmpz_poly)
+    contains(x::ComplexPoly, y::ZZPolyRingElem)
 
 Return `true` if the coefficient boxes of $x$ contain the corresponding
 exact coefficients of $y$, otherwise return `false`.
 """
-function contains(x::ComplexPoly, y::fmpz_poly)
+function contains(x::ComplexPoly, y::ZZPolyRingElem)
    return ccall((:acb_poly_contains_fmpz_poly, libarb), Bool,
-                                      (Ref{ComplexPoly}, Ref{fmpz_poly}), x, y)
+                                      (Ref{ComplexPoly}, Ref{ZZPolyRingElem}), x, y)
 end
 
 @doc Markdown.doc"""
-    contains(x::ComplexPoly, y::fmpq_poly)
+    contains(x::ComplexPoly, y::QQPolyRingElem)
 
 Return `true` if the coefficient boxes of $x$ contain the corresponding
 exact coefficients of $y$, otherwise return `false`.
 """
-function contains(x::ComplexPoly, y::fmpq_poly)
+function contains(x::ComplexPoly, y::QQPolyRingElem)
    return ccall((:acb_poly_contains_fmpq_poly, libarb), Bool,
-                                      (Ref{ComplexPoly}, Ref{fmpq_poly}), x, y)
+                                      (Ref{ComplexPoly}, Ref{QQPolyRingElem}), x, y)
 end
 
 function ==(x::ComplexPoly, y::ComplexPoly)
@@ -200,9 +200,9 @@ contained in the (constant) polynomial $x$, along with that integer $z$
 in case it is, otherwise sets $t$ to `false`.
 """
 function unique_integer(x::ComplexPoly)
-  z = FmpzPolyRing(FlintZZ, var(parent(x)))()
+  z = ZZPolyRing(FlintZZ, var(parent(x)))()
   unique = ccall((:acb_poly_get_unique_fmpz_poly, libarb), Int,
-    (Ref{fmpz_poly}, Ref{ComplexPoly}), z, x)
+    (Ref{ZZPolyRingElem}, Ref{ComplexPoly}), z, x)
   return (unique != 0, z)
 end
 
@@ -289,7 +289,7 @@ end
 #
 ###############################################################################
 
-for T in [Integer, fmpz, fmpq, Float64, BigFloat, RealElem, ComplexElem, fmpz_poly, fmpq_poly]
+for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, RealElem, ComplexElem, ZZPolyRingElem, QQPolyRingElem]
    @eval begin
       +(x::ComplexPoly, y::$T) = x + parent(x)(y)
 
@@ -323,7 +323,7 @@ end
 #
 ###############################################################################
 
-for T in [Integer, fmpz, fmpq, Float64, BigFloat, RealElem, ComplexElem]
+for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, RealElem, ComplexElem]
    @eval begin
       divexact(x::ComplexPoly, y::$T; check::Bool=true) = x * inv(base_ring(parent(x))(y))
 
@@ -436,11 +436,11 @@ function evaluate2(x::ComplexPoly, y::ComplexElem, prec = precision(Balls))
    return z, w
 end
 
-function evaluate(x::ComplexPoly, y::Union{Int, Float64, fmpz, fmpq, RealElem}, prec = precision(Balls))
+function evaluate(x::ComplexPoly, y::Union{Int, Float64, ZZRingElem, QQFieldElem, RealElem}, prec = precision(Balls))
     return evaluate(x, base_ring(parent(x))(y), prec)
 end
 
-function evaluate2(x::ComplexPoly, y::Union{Integer, Float64, fmpz, fmpq, RealElem}, prec = precision(Balls))
+function evaluate2(x::ComplexPoly, y::Union{Integer, Float64, ZZRingElem, QQFieldElem, RealElem}, prec = precision(Balls))
     return evaluate2(x, base_ring(parent(x))(y), prec)
 end
 
@@ -737,9 +737,9 @@ function fit!(z::ComplexPoly, n::Int)
    return nothing
 end
 
-function setcoeff!(z::ComplexPoly, n::Int, x::fmpz)
+function setcoeff!(z::ComplexPoly, n::Int, x::ZZRingElem)
    ccall((:acb_poly_set_coeff_fmpz, libarb), Nothing,
-                    (Ref{ComplexPoly}, Int, Ref{fmpz}), z, n, x)
+                    (Ref{ComplexPoly}, Int, Ref{ZZRingElem}), z, n, x)
    return z
 end
 
@@ -776,9 +776,9 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{ComplexPoly}, ::Type{fmpz_poly}) = ComplexPoly
+promote_rule(::Type{ComplexPoly}, ::Type{ZZPolyRingElem}) = ComplexPoly
 
-promote_rule(::Type{ComplexPoly}, ::Type{fmpq_poly}) = ComplexPoly
+promote_rule(::Type{ComplexPoly}, ::Type{QQPolyRingElem}) = ComplexPoly
 
 promote_rule(::Type{ComplexPoly}, ::Type{arb_poly}) = ComplexPoly
 
@@ -798,7 +798,7 @@ function (a::ComplexPolyRing)()
    return z
 end
 
-for T in [Integer, fmpz, fmpq, Float64, Complex{Float64},
+for T in [Integer, ZZRingElem, QQFieldElem, Float64, Complex{Float64},
           Complex{Int}, RealElem, ComplexElem]
   @eval begin
     function (a::ComplexPolyRing)(b::$T)
@@ -809,7 +809,7 @@ for T in [Integer, fmpz, fmpq, Float64, Complex{Float64},
   end
 end
 
-(a::ComplexPolyRing)(b::Rational{T}) where {T <: Integer} = a(fmpq(b))
+(a::ComplexPolyRing)(b::Rational{T}) where {T <: Integer} = a(QQFieldElem(b))
 
 function (a::ComplexPolyRing)(b::Vector{ComplexElem})
    z = ComplexPoly(b, precision(Balls))
@@ -817,7 +817,7 @@ function (a::ComplexPolyRing)(b::Vector{ComplexElem})
    return z
 end
 
-for T in [fmpz, fmpq, Float64, Complex{Float64}, Complex{Int}, RealElem]
+for T in [ZZRingElem, QQFieldElem, Float64, Complex{Float64}, Complex{Int}, RealElem]
   @eval begin
     (a::ComplexPolyRing)(b::Vector{$T}) = a(map(base_ring(a), b))
   end
@@ -827,13 +827,13 @@ end
 
 (a::ComplexPolyRing)(b::Vector{Rational{T}}) where {T <: Integer} = a(map(base_ring(a), b))
 
-function (a::ComplexPolyRing)(b::fmpz_poly)
+function (a::ComplexPolyRing)(b::ZZPolyRingElem)
    z = ComplexPoly(b, precision(Balls))
    z.parent = a
    return z
 end
 
-function (a::ComplexPolyRing)(b::fmpq_poly)
+function (a::ComplexPolyRing)(b::QQPolyRingElem)
    z = ComplexPoly(b, precision(Balls))
    z.parent = a
    return z
@@ -859,7 +859,7 @@ end
 
 function PolynomialRing(R::ComplexField, s::Symbol; cached = true)
   parent_obj = ComplexPolyRing(R, s, cached)
-  return parent_obj, parent_obj(fmpz_poly([fmpz(0), fmpz(1)]))
+  return parent_obj, parent_obj(ZZPolyRingElem([ZZRingElem(0), ZZRingElem(1)]))
 end
 
 function PolynomialRing(R::ComplexField, s::AbstractString; cached = true)

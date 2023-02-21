@@ -129,7 +129,7 @@ We do however partially implement some Julia interfaces.
   the specific documentation for the module of interest to see details.
 
 * `zero` and `one` : these are implemented for parent types, which is not what
-  Julia typically expects. Exceptions include the Flint `fmpz` and `fmpq` types,
+  Julia typically expects. Exceptions include the Flint `ZZRingElem` and `QQFieldElem` types,
   as their parents are not parameterised, which makes it possible to implement
   these functions for the types as well as the parents.
 
@@ -152,7 +152,7 @@ We do however partially implement some Julia interfaces.
   types cannot be expected to be well-behaved when they overflow. We recommend
   using Nemo integer types if one wants good performance for small machine
   word sized integers, but no overflow when the integer becomes large (Nemo
-  integers are based on Flint's multiprecision `fmpz` type).
+  integers are based on Flint's multiprecision `ZZRingElem` type).
 
 * `hash` : we implement hash functions for all major element types in Nemo.
 
@@ -162,7 +162,7 @@ We do however partially implement some Julia interfaces.
   This is done by overloading `typed_hvcat` for the parent object `R` instead of
   a type as Julia would normally expect. This produces a Nemo matrix rather than
   a Julia one. Note that when passed a type, Julia's `typed_hvcat` can only
-  construct Julia matrices for Nemo types such as `fmpz` and `fmpq` where
+  construct Julia matrices for Nemo types such as `ZZRingElem` and `QQFieldElem` where
   elements can be constructed from types alone.
 
 Many other Julia interfaces are either not yet implemented or only very

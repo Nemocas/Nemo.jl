@@ -1,11 +1,11 @@
-@testset "fq_default.constructors" begin
-   R, a = NGFiniteField(fmpz(7), 5, "a")
+@testset "FqFieldElem.constructors" begin
+   R, a = NGFiniteField(ZZRingElem(7), 5, "a")
    Rx, x = R["x"]
    f = x^2 + (2*a^4 + 5*a^3 + 5*a^2 + 3*a + 6)*x + a^4 + a^2 + 5*a + 5
    F, b = NGFiniteField(f, "b")
    @test defining_polynomial(F) == f
 
-   @test F isa FqDefaultFiniteField
+   @test F isa FqField
    @test base_field(F) === R
 
    Fy, y = F["y"]
@@ -14,7 +14,7 @@
    FF, c = NGFiniteField(g, "c")
    @test defining_polynomial(FF) == g
 
-   @test FF isa FqDefaultFiniteField
+   @test FF isa FqField
    @test base_field(FF) === F
 
    @test sprint(show, "text/plain", R) isa String
@@ -23,17 +23,17 @@
 
    a = F()
 
-   @test isa(a, fq_default)
+   @test isa(a, FqFieldElem)
 
    b = F(4)
-   c = F(fmpz(7))
+   c = F(ZZRingElem(7))
 
-   @test isa(b, fq_default)
-   @test isa(c, fq_default)
+   @test isa(b, FqFieldElem)
+   @test isa(c, FqFieldElem)
 
    d = F(c)
 
-   @test isa(d, fq_default)
+   @test isa(d, FqFieldElem)
 
    @test FF(one(R)) == one(FF)
 
@@ -46,12 +46,12 @@
    @test NGFiniteField(9)[1] !== NGFiniteField(9, cached = false)[1]
    @test_throws ErrorException NGFiniteField(6)
    @test Nemo._GF(2, 1) === Nemo._GF(2)
-   @test Nemo._GF(6, 1, check = false) isa FqDefaultFiniteField
-   @test Nemo._FiniteField(2, 1)[1] isa FqDefaultFiniteField
+   @test Nemo._GF(6, 1, check = false) isa FqField
+   @test Nemo._FiniteField(2, 1)[1] isa FqField
 end
 
-@testset "fq_default.printing" begin
-   R, a = NGFiniteField(fmpz(7), 5, "a")
+@testset "FqFieldElem.printing" begin
+   R, a = NGFiniteField(ZZRingElem(7), 5, "a")
    Rx, x = R["x"]
    f = x^2 + (2*a^4 + 5*a^3 + 5*a^2 + 3*a + 6)*x + a^4 + a^2 + 5*a + 5
    F, b = NGFiniteField(f, "b")
@@ -61,8 +61,8 @@ end
    @test sprint(Nemo.show_raw, c) isa String
 end
 
-@testset "fq_default.manipulation" begin
-   R, a = NGFiniteField(fmpz(7), 5, "a")
+@testset "FqFieldElem.manipulation" begin
+   R, a = NGFiniteField(ZZRingElem(7), 5, "a")
    Rx, x = R["x"]
    f = x^2 + (2*a^4 + 5*a^3 + 5*a^2 + 3*a + 6)*x + a^4 + a^2 + 5*a + 5
    F, b = NGFiniteField(f, "b")
@@ -71,7 +71,7 @@ end
    @test isone(one(F))
    @test is_gen(gen(F))
    @test characteristic(F) == 7
-   @test order(F) == fmpz(7)^10
+   @test order(F) == ZZRingElem(7)^10
    @test degree(F) == 2
    @test absolute_degree(F) == 10
    @test is_unit(b + 1)
@@ -96,20 +96,20 @@ end
    @test basis(R) == [a^i for i in 0:4]
    @test basis(F) == [b^0, b^1]
 
-   RR, aa = NGFiniteField(fmpz(7), 2, "a")
+   RR, aa = NGFiniteField(ZZRingElem(7), 2, "a")
    @test iszero(tr(zero(R)) + tr(zero(R)))
    @test isone(norm(one(R)) * norm(one(R)))
    @test prime_field(R) === prime_field(RR)
 end
 
-@testset "fq_default.special_functions" begin
-   R, a = NGFiniteField(fmpz(7), 5, "a")
+@testset "FqFieldElem.special_functions" begin
+   R, a = NGFiniteField(ZZRingElem(7), 5, "a")
 
    @test degree(minpoly(a)) == degree(R)
    @test degree(defining_polynomial(R)) == degree(R)
    @test degree(absolute_charpoly(a)) == degree(R)
    @test !iszero(absolute_norm(a))
-   @test_throws ErrorException NGFiniteField(fmpz(11), 2, "a")[1](a)
+   @test_throws ErrorException NGFiniteField(ZZRingElem(11), 2, "a")[1](a)
 
    Rx, x = R["x"]
    f = x^2 + (2*a^4 + 5*a^3 + 5*a^2 + 3*a + 6)*x + a^4 + a^2 + 5*a + 5
@@ -131,8 +131,8 @@ end
    @test is_square_with_sqrt(b^2)[2]^2 == b^2
 end
 
-@testset "fq_default.iteration" begin
-   R, a = NGFiniteField(fmpz(2), 2, "a")
+@testset "FqFieldElem.iteration" begin
+   R, a = NGFiniteField(ZZRingElem(2), 2, "a")
    Rx, x = R["x"]
    f = x^3 + x + 1
    F, _ = NGFiniteField(f, "b")

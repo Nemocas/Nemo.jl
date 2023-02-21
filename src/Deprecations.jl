@@ -78,9 +78,9 @@
 
 @deprecate risingfac(x::arb, n::Int) rising_factorial(x, n)
 
-@deprecate risingfac(x::fmpq, n::UInt, r::ArbField) rising_factorial(x, n, r)
+@deprecate risingfac(x::QQFieldElem, n::UInt, r::ArbField) rising_factorial(x, n, r)
 
-@deprecate risingfac(x::fmpq, n::Int, r::ArbField) rising_factorial(x, n, r)
+@deprecate risingfac(x::QQFieldElem, n::Int, r::ArbField) rising_factorial(x, n, r)
 
 @deprecate risingfac2(x::arb, n::UInt) rising_factorial2(x, n)
 
@@ -92,7 +92,7 @@
 
 @deprecate fac(n::Int, r::ArbField) factorial(n, r)
 
-@deprecate fib(n::fmpz, r::ArbField) fibonacci(n, r)
+@deprecate fib(n::ZZRingElem, r::ArbField) fibonacci(n, r)
 
 @deprecate fib(n::UInt, r::ArbField) fibonacci(n, r)
 

@@ -15,7 +15,7 @@ export fq_default_rel_series, FqDefaultRelSeriesRing
 function O(a::fq_default_rel_series)
    val = pol_length(a) + valuation(a) - 1
    val < 0 && throw(DomainError(val, "Valuation must be non-negative"))
-   z = fq_default_rel_series(base_ring(a), Vector{fq_default}(undef, 0), 0, val, val)
+   z = fq_default_rel_series(base_ring(a), Vector{FqFieldElem}(undef, 0), 0, val, val)
    z.parent = parent(a)
    return z
 end
@@ -26,7 +26,7 @@ parent_type(::Type{fq_default_rel_series}) = FqDefaultRelSeriesRing
 
 base_ring(R::FqDefaultRelSeriesRing) = R.base_ring
 
-rel_series_type(::Type{fq_default}) = fq_default_rel_series
+rel_series_type(::Type{FqFieldElem}) = fq_default_rel_series
 
 var(a::FqDefaultRelSeriesRing) = a.S
 
@@ -43,14 +43,14 @@ function normalise(a::fq_default_rel_series, len::Int)
    if len > 0
       c = base_ring(a)()
       ccall((:fq_default_poly_get_coeff, libflint), Nothing,
-         (Ref{fq_default}, Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+         (Ref{FqFieldElem}, Ref{fq_default_rel_series}, Int, Ref{FqField}),
                                                          c, a, len - 1, ctx)
    end
    while len > 0 && iszero(c)
       len -= 1
       if len > 0
          ccall((:fq_default_poly_get_coeff, libflint), Nothing,
-            (Ref{fq_default}, Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+            (Ref{FqFieldElem}, Ref{fq_default_rel_series}, Int, Ref{FqField}),
                                                          c, a, len - 1, ctx)
       end
    end
@@ -59,7 +59,7 @@ end
 
 function pol_length(x::fq_default_rel_series)
    return ccall((:fq_default_poly_length, libflint), Int,
-                (Ref{fq_default_rel_series}, Ref{FqDefaultFiniteField}), x, base_ring(x))
+                (Ref{fq_default_rel_series}, Ref{FqField}), x, base_ring(x))
 end
 
 precision(x::fq_default_rel_series) = x.prec
@@ -70,7 +70,7 @@ function polcoeff(x::fq_default_rel_series, n::Int)
       return z
    end
    ccall((:fq_default_poly_get_coeff, libflint), Nothing,
-         (Ref{fq_default}, Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+         (Ref{FqFieldElem}, Ref{fq_default_rel_series}, Int, Ref{FqField}),
                                                       z, x, n, base_ring(x))
    return z
 end
@@ -107,7 +107,7 @@ function renormalize!(z::fq_default_rel_series)
    else
       z.val = zval + i
       ccall((:fq_default_poly_shift_right, libflint), Nothing,
-            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqField}),
                                                       z, z, i, base_ring(z))
    end
    return nothing
@@ -121,7 +121,7 @@ characteristic(R::FqDefaultRelSeriesRing) = characteristic(base_ring(R))
 #
 ###############################################################################
 
-function similar(f::RelSeriesElem, R::FqDefaultFiniteField, max_prec::Int,
+function similar(f::RelSeriesElem, R::FqField, max_prec::Int,
                                  var::Symbol=var(parent(f)); cached::Bool=true)
    z = fq_default_rel_series(R)
    z.parent = FqDefaultRelSeriesRing(R, max_prec, var, cached)
@@ -136,12 +136,12 @@ end
 #
 ###############################################################################
 
-function rel_series(R::FqDefaultFiniteField, arr::Vector{T},
+function rel_series(R::FqField, arr::Vector{T},
                    len::Int, prec::Int, val::Int, var::String="x";
                             max_precision::Int=prec, cached::Bool=true) where T
    prec < len + val && error("Precision too small for given data")
-   coeffs = T == fq_default ? arr : map(R, arr)
-   coeffs = length(coeffs) == 0 ? fq_default[] : coeffs
+   coeffs = T == FqFieldElem ? arr : map(R, arr)
+   coeffs = length(coeffs) == 0 ? FqFieldElem[] : coeffs
    z = fq_default_rel_series(R, coeffs, len, prec, val)
    z.parent = FqDefaultRelSeriesRing(R, max_precision, Symbol(var), cached)
    return z
@@ -167,7 +167,7 @@ end
 function -(x::fq_default_rel_series)
    z = parent(x)()
    ccall((:fq_default_poly_neg, libflint), Nothing,
-                (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Ref{FqDefaultFiniteField}),
+                (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Ref{FqField}),
                z, x, base_ring(x))
    z.prec = x.prec
    z.val = x.val
@@ -193,32 +193,32 @@ function +(a::fq_default_rel_series, b::fq_default_rel_series)
    if a.val < b.val
       lenz = max(lena, lenb + b.val - a.val)
       ccall((:fq_default_poly_set_trunc, libflint), Nothing,
-            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqField}),
             z, b, max(0, lenz - b.val + a.val), ctx)
       ccall((:fq_default_poly_shift_left, libflint), Nothing,
-            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqField}),
             z, z, b.val - a.val, ctx)
       ccall((:fq_default_poly_add_series, libflint), Nothing,
                 (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
-                 Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+                 Ref{fq_default_rel_series}, Int, Ref{FqField}),
                z, z, a, lenz, ctx)
    elseif b.val < a.val
       lenz = max(lena + a.val - b.val, lenb)
       ccall((:fq_default_poly_set_trunc, libflint), Nothing,
-            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqField}),
             z, a, max(0, lenz - a.val + b.val), ctx)
       ccall((:fq_default_poly_shift_left, libflint), Nothing,
-            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqField}),
             z, z, a.val - b.val, ctx)
       ccall((:fq_default_poly_add_series, libflint), Nothing,
                 (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
-                 Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+                 Ref{fq_default_rel_series}, Int, Ref{FqField}),
                z, z, b, lenz, ctx)
    else
       lenz = max(lena, lenb)
       ccall((:fq_default_poly_add_series, libflint), Nothing,
                 (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
-                 Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+                 Ref{fq_default_rel_series}, Int, Ref{FqField}),
                z, a, b, lenz, ctx)
    end
    z.prec = prec
@@ -241,35 +241,35 @@ function -(a::fq_default_rel_series, b::fq_default_rel_series)
    if a.val < b.val
       lenz = max(lena, lenb + b.val - a.val)
       ccall((:fq_default_poly_set_trunc, libflint), Nothing,
-            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqField}),
             z, b, max(0, lenz - b.val + a.val), ctx)
       ccall((:fq_default_poly_shift_left, libflint), Nothing,
-            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqField}),
             z, z, b.val - a.val, ctx)
       ccall((:fq_default_poly_neg, libflint), Nothing,
-            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Ref{FqDefaultFiniteField}),
+            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Ref{FqField}),
             z, z, ctx)
       ccall((:fq_default_poly_add_series, libflint), Nothing,
                 (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
-                 Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+                 Ref{fq_default_rel_series}, Int, Ref{FqField}),
                z, z, a, lenz, ctx)
    elseif b.val < a.val
       lenz = max(lena + a.val - b.val, lenb)
       ccall((:fq_default_poly_set_trunc, libflint), Nothing,
-            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqField}),
             z, a, max(0, lenz - a.val + b.val), ctx)
       ccall((:fq_default_poly_shift_left, libflint), Nothing,
-            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqField}),
             z, z, a.val - b.val, ctx)
       ccall((:fq_default_poly_sub_series, libflint), Nothing,
                 (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
-                 Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+                 Ref{fq_default_rel_series}, Int, Ref{FqField}),
                z, z, b, lenz, ctx)
    else
       lenz = max(lena, lenb)
       ccall((:fq_default_poly_sub_series, libflint), Nothing,
                 (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
-                 Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+                 Ref{fq_default_rel_series}, Int, Ref{FqField}),
                z, a, b, lenz, ctx)
    end
    z.prec = prec
@@ -296,7 +296,7 @@ function *(a::fq_default_rel_series, b::fq_default_rel_series)
    lenz = min(lena + lenb - 1, prec)
    ccall((:fq_default_poly_mullow, libflint), Nothing,
                 (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
-                 Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+                 Ref{fq_default_rel_series}, Int, Ref{FqField}),
                z, a, b, lenz, base_ring(a))
    return z
 end
@@ -307,18 +307,18 @@ end
 #
 ###############################################################################
 
-function *(x::fq_default, y::fq_default_rel_series)
+function *(x::FqFieldElem, y::fq_default_rel_series)
    z = parent(y)()
    z.prec = y.prec
    z.val = y.val
    ccall((:fq_default_poly_scalar_mul_fq_default, libflint), Nothing,
                 (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
-                 Ref{fq_default}, Ref{FqDefaultFiniteField}),
+                 Ref{FqFieldElem}, Ref{FqField}),
                z, y, x, base_ring(y))
    return z
 end
 
-*(x::fq_default_rel_series, y::fq_default) = y * x
+*(x::fq_default_rel_series, y::FqFieldElem) = y * x
 
 ###############################################################################
 #
@@ -350,7 +350,7 @@ function shift_right(x::fq_default_rel_series, len::Int)
       zlen = min(xlen + xval - len, xlen)
       ccall((:fq_default_poly_shift_right, libflint), Nothing,
                 (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
-                 Int, Ref{FqDefaultFiniteField}),
+                 Int, Ref{FqField}),
                z, x, xlen - zlen, base_ring(x))
       renormalize!(z)
    end
@@ -381,7 +381,7 @@ function truncate(x::fq_default_rel_series, prec::Int)
       z.val = xval
       ccall((:fq_default_poly_set_trunc, libflint), Nothing,
                 (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
-                 Int, Ref{FqDefaultFiniteField}),
+                 Int, Ref{FqField}),
                z, x, min(prec - xval, xlen), base_ring(x))
    end
    return z
@@ -449,7 +449,7 @@ function ==(x::fq_default_rel_series, y::fq_default_rel_series)
    end
    return Bool(ccall((:fq_default_poly_equal_trunc, libflint), Cint,
                 (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
-                 Int, Ref{FqDefaultFiniteField}),
+                 Int, Ref{FqField}),
                x, y, xlen, base_ring(x)))
 end
 
@@ -462,7 +462,7 @@ function isequal(x::fq_default_rel_series, y::fq_default_rel_series)
    end
    return Bool(ccall((:fq_default_poly_equal, libflint), Cint,
                 (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
-                 Ref{FqDefaultFiniteField}),
+                 Ref{FqField}),
                  x, y, base_ring(x)))
 end
 
@@ -491,7 +491,7 @@ function divexact(x::fq_default_rel_series, y::fq_default_rel_series; check::Boo
    if prec != 0
       ccall((:fq_default_poly_div_series, libflint), Nothing,
                 (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
-                 Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+                 Ref{fq_default_rel_series}, Int, Ref{FqField}),
                z, x, y, prec, base_ring(x))
    end
    return z
@@ -503,7 +503,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::fq_default_rel_series, y::fq_default)
+function divexact(x::fq_default_rel_series, y::FqFieldElem)
    iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
@@ -511,7 +511,7 @@ function divexact(x::fq_default_rel_series, y::fq_default)
    z.val = x.val
    ccall((:fq_default_poly_scalar_div_fq_default, libflint), Nothing,
                 (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
-                 Ref{fq_default}, Ref{FqDefaultFiniteField}),
+                 Ref{FqFieldElem}, Ref{FqField}),
                z, x, y, base_ring(x))
    return z
 end
@@ -529,7 +529,7 @@ function inv(a::fq_default_rel_series)
    ainv.prec = a.prec
    ainv.val = 0
    ccall((:fq_default_poly_inv_series, libflint), Nothing,
-         (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+         (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqField}),
                ainv, a, a.prec, base_ring(a))
    return ainv
 end
@@ -606,7 +606,7 @@ function sqrt_classical(a::fq_default_rel_series; check::Bool=true)
    a = divexact(a, c)
    ccall((:fq_default_poly_sqrt_series, libflint), Nothing,
                 (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
-                 Int, Ref{FqDefaultFiniteField}),
+                 Int, Ref{FqField}),
                z, a, a.prec, base_ring(a))
    if !isone(s)
       z *= s
@@ -639,7 +639,7 @@ end
 
 function zero!(x::fq_default_rel_series)
   ccall((:fq_default_poly_zero, libflint), Nothing,
-                   (Ref{fq_default_rel_series}, Ref{FqDefaultFiniteField}), x, base_ring(x))
+                   (Ref{fq_default_rel_series}, Ref{FqField}), x, base_ring(x))
   x.prec = parent(x).prec_max
   x.val = parent(x).prec_max
   return x
@@ -647,21 +647,21 @@ end
 
 function fit!(z::fq_default_rel_series, n::Int)
    ccall((:fq_default_poly_fit_length, libflint), Nothing,
-         (Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+         (Ref{fq_default_rel_series}, Int, Ref{FqField}),
          z, n, base_ring(z))
    return nothing
 end
 
-function setcoeff!(z::fq_default_rel_series, n::Int, x::fmpz)
+function setcoeff!(z::fq_default_rel_series, n::Int, x::ZZRingElem)
    ccall((:fq_default_poly_set_coeff_fmpz, libflint), Nothing,
-                (Ref{fq_default_rel_series}, Int, Ref{fmpz}, Ref{FqDefaultFiniteField}),
+                (Ref{fq_default_rel_series}, Int, Ref{ZZRingElem}, Ref{FqField}),
                z, n, x, base_ring(z))
    return z
 end
 
-function setcoeff!(z::fq_default_rel_series, n::Int, x::fq_default)
+function setcoeff!(z::fq_default_rel_series, n::Int, x::FqFieldElem)
    ccall((:fq_default_poly_set_coeff, libflint), Nothing,
-                (Ref{fq_default_rel_series}, Int, Ref{fq_default}, Ref{FqDefaultFiniteField}),
+                (Ref{fq_default_rel_series}, Int, Ref{FqFieldElem}, Ref{FqField}),
                z, n, x, base_ring(z))
    return z
 end
@@ -682,7 +682,7 @@ function mul!(z::fq_default_rel_series, a::fq_default_rel_series, b::fq_default_
    end
    ccall((:fq_default_poly_mullow, libflint), Nothing,
          (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
-          Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+          Ref{fq_default_rel_series}, Int, Ref{FqField}),
                z, a, b, lenz, base_ring(z))
    return z
 end
@@ -700,32 +700,32 @@ function addeq!(a::fq_default_rel_series, b::fq_default_rel_series)
       z.parent = parent(a)
       lenz = max(lena, lenb + b.val - a.val)
       ccall((:fq_default_poly_set_trunc, libflint), Nothing,
-            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqField}),
             z, b, max(0, lenz - b.val + a.val), ctx)
       ccall((:fq_default_poly_shift_left, libflint), Nothing,
-            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqField}),
             z, z, b.val - a.val, ctx)
       ccall((:fq_default_poly_add_series, libflint), Nothing,
                 (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
-                 Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+                 Ref{fq_default_rel_series}, Int, Ref{FqField}),
                a, a, z, lenz, ctx)
    elseif b.val < a.val
       lenz = max(lena + a.val - b.val, lenb)
       ccall((:fq_default_poly_truncate, libflint), Nothing,
-            (Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+            (Ref{fq_default_rel_series}, Int, Ref{FqField}),
             a, max(0, lenz - a.val + b.val), ctx)
       ccall((:fq_default_poly_shift_left, libflint), Nothing,
-            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqField}),
             a, a, a.val - b.val, ctx)
       ccall((:fq_default_poly_add_series, libflint), Nothing,
                 (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
-                 Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+                 Ref{fq_default_rel_series}, Int, Ref{FqField}),
                a, a, b, lenz, ctx)
    else
       lenz = max(lena, lenb)
       ccall((:fq_default_poly_add_series, libflint), Nothing,
                 (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
-                 Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+                 Ref{fq_default_rel_series}, Int, Ref{FqField}),
                a, a, b, lenz, ctx)
    end
    a.prec = prec
@@ -750,32 +750,32 @@ function add!(c::fq_default_rel_series, a::fq_default_rel_series, b::fq_default_
    if a.val < b.val
       lenc = max(lena, lenb + b.val - a.val)
       ccall((:fq_default_poly_set_trunc, libflint), Nothing,
-            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqField}),
             c, b, max(0, lenc - b.val + a.val), ctx)
       ccall((:fq_default_poly_shift_left, libflint), Nothing,
-            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqField}),
             c, c, b.val - a.val, ctx)
       ccall((:fq_default_poly_add_series, libflint), Nothing,
                 (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
-                 Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+                 Ref{fq_default_rel_series}, Int, Ref{FqField}),
                c, c, a, lenc, ctx)
    elseif b.val < a.val
       lenc = max(lena + a.val - b.val, lenb)
       ccall((:fq_default_poly_set_trunc, libflint), Nothing,
-            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqField}),
             c, a, max(0, lenc - a.val + b.val), ctx)
       ccall((:fq_default_poly_shift_left, libflint), Nothing,
-            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series}, Int, Ref{FqField}),
             c, c, a.val - b.val, ctx)
       ccall((:fq_default_poly_add_series, libflint), Nothing,
                 (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
-                 Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+                 Ref{fq_default_rel_series}, Int, Ref{FqField}),
                c, c, b, lenc, ctx)
    else
       lenc = max(lena, lenb)
       ccall((:fq_default_poly_add_series, libflint), Nothing,
                 (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
-                 Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+                 Ref{fq_default_rel_series}, Int, Ref{FqField}),
                c, a, b, lenc, ctx)
    end
    c.prec = prec
@@ -786,7 +786,7 @@ end
 
 function set_length!(a::fq_default_rel_series, n::Int64)
    ccall((:_fq_default_poly_set_length, libflint), Nothing,
-         (Ref{fq_default_rel_series}, Int, Ref{FqDefaultFiniteField}),
+         (Ref{fq_default_rel_series}, Int, Ref{FqField}),
           a, n, base_ring(a))
    return a
 end
@@ -799,9 +799,9 @@ end
 
 promote_rule(::Type{fq_default_rel_series}, ::Type{T}) where {T <: Integer} = fq_default_rel_series
 
-promote_rule(::Type{fq_default_rel_series}, ::Type{fmpz}) = fq_default_rel_series
+promote_rule(::Type{fq_default_rel_series}, ::Type{ZZRingElem}) = fq_default_rel_series
 
-promote_rule(::Type{fq_default_rel_series}, ::Type{fq_default}) = fq_default_rel_series
+promote_rule(::Type{fq_default_rel_series}, ::Type{FqFieldElem}) = fq_default_rel_series
 
 ###############################################################################
 #
@@ -831,7 +831,7 @@ function (a::FqDefaultRelSeriesRing)(b::Integer)
    return z
 end
 
-function (a::FqDefaultRelSeriesRing)(b::fmpz)
+function (a::FqDefaultRelSeriesRing)(b::ZZRingElem)
    ctx = base_ring(a)
    if iszero(b)
       z = fq_default_rel_series(ctx)
@@ -844,7 +844,7 @@ function (a::FqDefaultRelSeriesRing)(b::fmpz)
    return z
 end
 
-function (a::FqDefaultRelSeriesRing)(b::fq_default)
+function (a::FqDefaultRelSeriesRing)(b::FqFieldElem)
    ctx = base_ring(a)
    if iszero(b)
       z = fq_default_rel_series(ctx)
@@ -862,7 +862,7 @@ function (a::FqDefaultRelSeriesRing)(b::fq_default_rel_series)
    return b
 end
 
-function (a::FqDefaultRelSeriesRing)(b::Vector{fq_default}, len::Int, prec::Int, val::Int)
+function (a::FqDefaultRelSeriesRing)(b::Vector{FqFieldElem}, len::Int, prec::Int, val::Int)
    ctx = base_ring(a)
    z = fq_default_rel_series(ctx, b, len, prec, val)
    z.parent = a

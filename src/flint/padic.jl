@@ -14,12 +14,12 @@ export FlintPadicField, padic, prime, teichmuller, log, get_printing_mode,
 ###############################################################################
 
 @doc Markdown.doc"""
-    O(R::FlintPadicField, m::fmpz)
+    O(R::FlintPadicField, m::ZZRingElem)
 
 Construct the value $0 + O(p^n)$ given $m = p^n$. An exception results if $m$
 is not found to be a power of `p = prime(R)`.
 """
-function O(R::FlintPadicField, m::fmpz)
+function O(R::FlintPadicField, m::ZZRingElem)
    if isone(m)
       N = 0
    else
@@ -37,12 +37,12 @@ function O(R::FlintPadicField, m::fmpz)
 end
 
 @doc Markdown.doc"""
-    O(R::FlintPadicField, m::fmpq)
+    O(R::FlintPadicField, m::QQFieldElem)
 
 Construct the value $0 + O(p^n)$ given $m = p^n$. An exception results if $m$
 is not found to be a power of `p = prime(R)`.
 """
-function O(R::FlintPadicField, m::fmpq)
+function O(R::FlintPadicField, m::QQFieldElem)
    d = denominator(m)
    if isone(d)
       return O(R, numerator(m))
@@ -66,7 +66,7 @@ end
 Construct the value $0 + O(p^n)$ given $m = p^n$. An exception results if $m$
 is not found to be a power of `p = prime(R)`.
 """
-O(R::FlintPadicField, m::Integer) = O(R, fmpz(m))
+O(R::FlintPadicField, m::Integer) = O(R, ZZRingElem(m))
 
 elem_type(::Type{FlintPadicField}) = padic
 
@@ -111,9 +111,9 @@ end
 Return the prime $p$ for the given $p$-adic field.
 """
 function prime(R::FlintPadicField)
-   z = fmpz()
+   z = ZZRingElem()
    ccall((:padic_ctx_pow_ui, libflint), Nothing,
-         (Ref{fmpz}, Int, Ref{FlintPadicField}), z, 1, R)
+         (Ref{ZZRingElem}, Int, Ref{FlintPadicField}), z, 1, R)
    return z
 end
 
@@ -135,28 +135,28 @@ will return $n$.
 valuation(a::padic) = iszero(a) ? a.N : a.v
 
 @doc Markdown.doc"""
-    lift(R::FlintRationalField, a::padic)
+    lift(R::QQField, a::padic)
 
 Return a lift of the given $p$-adic field element to $\mathbb{Q}$.
 """
-function lift(R::FlintRationalField, a::padic)
+function lift(R::QQField, a::padic)
     ctx = parent(a)
-    r = fmpq()
+    r = QQFieldElem()
     ccall((:padic_get_fmpq, libflint), Nothing,
-          (Ref{fmpq}, Ref{padic}, Ref{FlintPadicField}), r, a, ctx)
+          (Ref{QQFieldElem}, Ref{padic}, Ref{FlintPadicField}), r, a, ctx)
     return r
 end
 
 @doc Markdown.doc"""
-    lift(R::FlintIntegerRing, a::padic)
+    lift(R::ZZRing, a::padic)
 
 Return a lift of the given $p$-adic field element to $\mathbb{Z}$.
 """
-function lift(R::FlintIntegerRing, a::padic)
+function lift(R::ZZRing, a::padic)
     ctx = parent(a)
-    r = fmpz()
+    r = ZZRingElem()
     ccall((:padic_get_fmpz, libflint), Nothing,
-          (Ref{fmpz}, Ref{padic}, Ref{FlintPadicField}), r, a, ctx)
+          (Ref{ZZRingElem}, Ref{padic}, Ref{FlintPadicField}), r, a, ctx)
     return r
 end
 
@@ -338,39 +338,39 @@ end
 
 +(a::padic, b::Integer) = a + parent(a)(b)
 
-+(a::padic, b::fmpz) = a + parent(a)(b)
++(a::padic, b::ZZRingElem) = a + parent(a)(b)
 
-+(a::padic, b::fmpq) = a + parent(a)(b)
++(a::padic, b::QQFieldElem) = a + parent(a)(b)
 
 +(a::Integer, b::padic) = b + a
 
-+(a::fmpz, b::padic) = b + a
++(a::ZZRingElem, b::padic) = b + a
 
-+(a::fmpq, b::padic) = b + a
++(a::QQFieldElem, b::padic) = b + a
 
 -(a::padic, b::Integer) = a - parent(a)(b)
 
--(a::padic, b::fmpz) = a - parent(a)(b)
+-(a::padic, b::ZZRingElem) = a - parent(a)(b)
 
--(a::padic, b::fmpq) = a - parent(a)(b)
+-(a::padic, b::QQFieldElem) = a - parent(a)(b)
 
 -(a::Integer, b::padic) = parent(b)(a) - b
 
--(a::fmpz, b::padic) = parent(b)(a) - b
+-(a::ZZRingElem, b::padic) = parent(b)(a) - b
 
--(a::fmpq, b::padic) = parent(b)(a) - b
+-(a::QQFieldElem, b::padic) = parent(b)(a) - b
 
 *(a::padic, b::Integer) = a*parent(a)(b)
 
-*(a::padic, b::fmpz) = a*parent(a)(b)
+*(a::padic, b::ZZRingElem) = a*parent(a)(b)
 
-*(a::padic, b::fmpq) = a*parent(a)(b)
+*(a::padic, b::QQFieldElem) = a*parent(a)(b)
 
 *(a::Integer, b::padic) = b*a
 
-*(a::fmpz, b::padic) = b*a
+*(a::ZZRingElem, b::padic) = b*a
 
-*(a::fmpq, b::padic) = b*a
+*(a::QQFieldElem, b::padic) = b*a
 
 ###############################################################################
 #
@@ -404,15 +404,15 @@ end
 
 ==(a::padic, b::Integer) = a == parent(a)(b)
 
-==(a::padic, b::fmpz) = a == parent(a)(b)
+==(a::padic, b::ZZRingElem) = a == parent(a)(b)
 
-==(a::padic, b::fmpq) = a == parent(a)(b)
+==(a::padic, b::QQFieldElem) = a == parent(a)(b)
 
 ==(a::Integer, b::padic) = parent(b)(a) == b
 
-==(a::fmpz, b::padic) = parent(b)(a) == b
+==(a::ZZRingElem, b::padic) = parent(b)(a) == b
 
-==(a::fmpq, b::padic) = parent(b)(a) == b
+==(a::QQFieldElem, b::padic) = parent(b)(a) == b
 
 ###############################################################################
 #
@@ -454,17 +454,17 @@ end
 #
 ###############################################################################
 
-divexact(a::padic, b::Integer; check::Bool=true) = a*(fmpz(1)//fmpz(b))
+divexact(a::padic, b::Integer; check::Bool=true) = a*(ZZRingElem(1)//ZZRingElem(b))
 
-divexact(a::padic, b::fmpz; check::Bool=true) = a*(1//b)
+divexact(a::padic, b::ZZRingElem; check::Bool=true) = a*(1//b)
 
-divexact(a::padic, b::fmpq; check::Bool=true) = a*inv(b)
+divexact(a::padic, b::QQFieldElem; check::Bool=true) = a*inv(b)
 
-divexact(a::Integer, b::padic; check::Bool=true) = fmpz(a)*inv(b)
+divexact(a::Integer, b::padic; check::Bool=true) = ZZRingElem(a)*inv(b)
 
-divexact(a::fmpz, b::padic; check::Bool=true) = inv((fmpz(1)//a)*b)
+divexact(a::ZZRingElem, b::padic; check::Bool=true) = inv((ZZRingElem(1)//a)*b)
 
-divexact(a::fmpq, b::padic; check::Bool=true) = inv(inv(a)*b)
+divexact(a::QQFieldElem, b::padic; check::Bool=true) = inv(inv(a)*b)
 
 ###############################################################################
 #
@@ -539,9 +539,9 @@ function issquare(a::padic)
       return false
    end
    R = parent(a)
-   u = fmpz()
+   u = ZZRingElem()
    ccall((:padic_get_unit, libflint), Nothing,
-          (Ref{fmpz}, Ref{padic}), u, a)
+          (Ref{ZZRingElem}, Ref{padic}), u, a)
    p = prime(R)
    if p == 2
       umod = mod(u, 8)
@@ -673,9 +673,9 @@ end
 
 promote_rule(::Type{padic}, ::Type{T}) where {T <: Integer} = padic
 
-promote_rule(::Type{padic}, ::Type{fmpz}) = padic
+promote_rule(::Type{padic}, ::Type{ZZRingElem}) = padic
 
-promote_rule(::Type{padic}, ::Type{fmpq}) = padic
+promote_rule(::Type{padic}, ::Type{QQFieldElem}) = padic
 
 ###############################################################################
 #
@@ -689,7 +689,7 @@ function (R::FlintPadicField)()
    return z
 end
 
-function (R::FlintPadicField)(n::fmpz)
+function (R::FlintPadicField)(n::ZZRingElem)
    if isone(n)
       N = 0
    else
@@ -698,12 +698,12 @@ function (R::FlintPadicField)(n::fmpz)
    end
    z = padic(N + R.prec_max)
    ccall((:padic_set_fmpz, libflint), Nothing,
-         (Ref{padic}, Ref{fmpz}, Ref{FlintPadicField}), z, n, R)
+         (Ref{padic}, Ref{ZZRingElem}, Ref{FlintPadicField}), z, n, R)
    z.parent = R
    return z
 end
 
-function (R::FlintPadicField)(n::fmpq)
+function (R::FlintPadicField)(n::QQFieldElem)
    m = denominator(n)
    if isone(m)
       return R(numerator(n))
@@ -716,12 +716,12 @@ function (R::FlintPadicField)(n::fmpq)
    end
    z = padic(N + R.prec_max)
    ccall((:padic_set_fmpq, libflint), Nothing,
-         (Ref{padic}, Ref{fmpq}, Ref{FlintPadicField}), z, n, R)
+         (Ref{padic}, Ref{QQFieldElem}, Ref{FlintPadicField}), z, n, R)
    z.parent = R
    return z
 end
 
-(R::FlintPadicField)(n::Integer) = R(fmpz(n))
+(R::FlintPadicField)(n::Integer) = R(ZZRingElem(n))
 
 function (R::FlintPadicField)(n::padic)
    parent(n) != R && error("Unable to coerce into p-adic field")
@@ -743,5 +743,5 @@ Returns the parent object for the $p$-adic field for given prime $p$, where
 the default absolute precision of elements of the field is given by `prec`.
 """
 function FlintPadicField(p::Integer, prec::Int; kw...)
-   return FlintPadicField(fmpz(p), prec; kw...)
+   return FlintPadicField(ZZRingElem(p), prec; kw...)
 end

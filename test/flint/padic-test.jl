@@ -1,7 +1,7 @@
 function test_elem(R::FlintPadicField)
    p = prime(R)
    prec = rand(1:R.prec_max)
-   r = fmpz(0):p-1
+   r = ZZRingElem(0):p-1
    return R(sum(rand(r)*p^i for i in 0:prec))
 end
 
@@ -9,7 +9,7 @@ end
 # TODO: make the following work; for now they fail because the conformance
 # tests want to use isapprox on padic elements, but no such method exists
 #   test_Field_interface_recursive(PadicField(7, 30))
-#   test_Field_interface_recursive(PadicField(fmpz(65537), 30))
+#   test_Field_interface_recursive(PadicField(ZZRingElem(65537), 30))
 end
 
 @testset "padic.constructors" begin
@@ -21,7 +21,7 @@ end
 
    @test isa(R, FlintPadicField)
 
-   S = PadicField(fmpz(65537), 30)
+   S = PadicField(ZZRingElem(65537), 30)
 
    @test isa(S, FlintPadicField)
 
@@ -35,11 +35,11 @@ end
 
    @test isa(1 + 2*7 + 4*7^2 + O(R, 7^3), padic)
 
-   @test isa(13 + 357*fmpz(65537) + O(S, fmpz(65537)^12), padic)
+   @test isa(13 + 357*ZZRingElem(65537) + O(S, ZZRingElem(65537)^12), padic)
 
-   @test isa(fmpz(1)//7^2 + fmpz(2)//7 + 3 + 4*7 + O(R, 7^2), padic)
+   @test isa(ZZRingElem(1)//7^2 + ZZRingElem(2)//7 + 3 + 4*7 + O(R, 7^2), padic)
 
-   @test precision(R(fmpq(2//3)^100)) == precision(R(fmpq(2//3))^100)
+   @test precision(R(QQFieldElem(2//3)^100)) == precision(R(QQFieldElem(2//3))^100)
     
    s = R()
 
@@ -95,7 +95,7 @@ end
 
    @test lift(FlintZZ, a) == 211
 
-   @test lift(FlintQQ, divexact(a, b)) == fmpq(337, 49)
+   @test lift(FlintQQ, divexact(a, b)) == QQFieldElem(337, 49)
 
    @test characteristic(R) == 0
 end
@@ -142,21 +142,21 @@ end
 
    @test 3 - b == 3 + 6*7^2 + 3*7^3 + 6*7^4 + O(R, 7^5)
 
-   @test a*fmpz(5) == 5 + 3*7^1 + O(R, 7^3)
+   @test a*ZZRingElem(5) == 5 + 3*7^1 + O(R, 7^3)
 
-   @test fmpz(3)*c == O(R, 7^3)
+   @test ZZRingElem(3)*c == O(R, 7^3)
 
    @test 2*d == 4
 
    @test 2 + d == 4
 
-   @test iszero(d - fmpz(2))
+   @test iszero(d - ZZRingElem(2))
 
-   @test a + fmpz(1)//7^2 == fmpz(1)//7^2 + 1 + 2*7^1 + 4*7^2 + O(R, 7^3)
+   @test a + ZZRingElem(1)//7^2 == ZZRingElem(1)//7^2 + 1 + 2*7^1 + 4*7^2 + O(R, 7^3)
 
-   @test (fmpz(12)//11)*b == 3*7^2 + 3*7^3 + O(R, 7^5)
+   @test (ZZRingElem(12)//11)*b == 3*7^2 + 3*7^3 + O(R, 7^5)
 
-   @test c*(fmpz(1)//7) == O(R, 7^2)
+   @test c*(ZZRingElem(1)//7) == O(R, 7^2)
 end
 
 @testset "padic.comparison" begin
@@ -189,9 +189,9 @@ end
 
    @test c == 2
 
-   @test fmpz(2) == c
+   @test ZZRingElem(2) == c
 
-   @test a == fmpz(344)//1
+   @test a == ZZRingElem(344)//1
 end
 
 @testset "padic.powering" begin
@@ -220,9 +220,9 @@ end
 
    @test inv(b) == 4 + 4*7^1 + 3*7^2 + 1*7^3 + 1*7^4 + O(R, 7^5)
 
-   @test inv(c) == fmpz(1)//7^2 + fmpz(5)//7 + O(R, 7^0)
+   @test inv(c) == ZZRingElem(1)//7^2 + ZZRingElem(5)//7 + O(R, 7^0)
 
-   @test inv(d) == fmpz(1)//7 + 5 + 3*7^1 + 6*7^2 + O(R, 7^3)
+   @test inv(d) == ZZRingElem(1)//7 + 5 + 3*7^1 + 6*7^2 + O(R, 7^3)
 
    @test inv(R(1)) == 1
 end
@@ -239,7 +239,7 @@ end
 
    @test divexact(c, d) == 1*7^1 + O(R, 7^3)
 
-   @test divexact(d, R(7^3)) == fmpz(1)//7^2 + fmpz(2)//7 + O(R, 7^2)
+   @test divexact(d, R(7^3)) == ZZRingElem(1)//7^2 + ZZRingElem(2)//7 + O(R, 7^2)
 
    @test divexact(R(34), R(17)) == 2
 end
@@ -254,15 +254,15 @@ end
 
    @test divexact(a, 2) == 4 + 1*7^2 + O(R, 7^3)
 
-   @test divexact(b, fmpz(7)) == fmpz(2)//7 + 3 + O(R, 7^4)
+   @test divexact(b, ZZRingElem(7)) == ZZRingElem(2)//7 + 3 + O(R, 7^4)
 
-   @test divexact(c, fmpz(12)//7^2) == 3*7^4 + 5*7^5 + O(R, 7^6)
+   @test divexact(c, ZZRingElem(12)//7^2) == 3*7^4 + 5*7^5 + O(R, 7^6)
 
-   @test divexact(2, d) == fmpz(2)//7 + 3 + 6*7^2 + O(R, 7^3)
+   @test divexact(2, d) == ZZRingElem(2)//7 + 3 + 6*7^2 + O(R, 7^3)
 
    @test divexact(R(3), 3) == 1
 
-   @test divexact(fmpz(5)//7, R(5)) == fmpz(1)//7
+   @test divexact(ZZRingElem(5)//7, R(5)) == ZZRingElem(1)//7
 end
 
 @testset "padic.divides" begin

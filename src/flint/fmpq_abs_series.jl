@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   fmpq_abs_series.jl : Power series over flint fmpq rationals (using fmpq_poly)
+#   fmpq_abs_series.jl : Power series over flint QQFieldElem rationals (using QQPolyRingElem)
 #
 ###############################################################################
 
@@ -31,7 +31,7 @@ parent_type(::Type{fmpq_abs_series}) = FmpqAbsSeriesRing
 
 base_ring(R::FmpqAbsSeriesRing) = R.base_ring
 
-abs_series_type(::Type{fmpq}) = fmpq_abs_series
+abs_series_type(::Type{QQFieldElem}) = fmpq_abs_series
 
 var(a::FmpqAbsSeriesRing) = a.S
 
@@ -45,15 +45,15 @@ max_precision(R::FmpqAbsSeriesRing) = R.prec_max
 
 function normalise(a::fmpq_abs_series, len::Int)
    if len > 0
-      c = fmpq()
+      c = QQFieldElem()
       ccall((:fmpq_poly_get_coeff_fmpq, libflint), Nothing,
-         (Ref{fmpq}, Ref{fmpq_abs_series}, Int), c, a, len - 1)
+         (Ref{QQFieldElem}, Ref{fmpq_abs_series}, Int), c, a, len - 1)
    end
    while len > 0 && iszero(c)
       len -= 1
       if len > 0
          ccall((:fmpq_poly_get_coeff_fmpq, libflint), Nothing,
-            (Ref{fmpq}, Ref{fmpq_abs_series}, Int), c, a, len - 1)
+            (Ref{QQFieldElem}, Ref{fmpq_abs_series}, Int), c, a, len - 1)
       end
    end
 
@@ -62,11 +62,11 @@ end
 
 function coeff(x::fmpq_abs_series, n::Int)
    if n < 0
-      return fmpq(0)
+      return QQFieldElem(0)
    end
-   z = fmpq()
+   z = QQFieldElem()
    ccall((:fmpq_poly_get_coeff_fmpq, libflint), Nothing,
-         (Ref{fmpq}, Ref{fmpq_abs_series}, Int), z, x, n)
+         (Ref{QQFieldElem}, Ref{fmpq_abs_series}, Int), z, x, n)
    return z
 end
 
@@ -81,7 +81,7 @@ zero(R::FmpqAbsSeriesRing) = R(0)
 one(R::FmpqAbsSeriesRing) = R(1)
 
 function gen(R::FmpqAbsSeriesRing)
-   z = fmpq_abs_series([fmpq(0), fmpq(1)], 2, max_precision(R))
+   z = fmpq_abs_series([QQFieldElem(0), QQFieldElem(1)], 2, max_precision(R))
    z.parent = R
    return z
 end
@@ -125,7 +125,7 @@ characteristic(::FmpqAbsSeriesRing) = 0
 #
 ###############################################################################
 
-function similar(f::AbsSeriesElem, R::FlintRationalField, max_prec::Int,
+function similar(f::AbsSeriesElem, R::QQField, max_prec::Int,
                                    s::Symbol=var(parent(f)); cached::Bool=true)
    z = fmpq_abs_series()
    if base_ring(f) === R && s == var(parent(f)) &&
@@ -145,12 +145,12 @@ end
 #
 ###############################################################################
 
-function abs_series(R::FlintRationalField, arr::Vector{T},
+function abs_series(R::QQField, arr::Vector{T},
                            len::Int, prec::Int, var::String="x";
                             max_precision::Int=prec, cached::Bool=true) where T
    prec < len && error("Precision too small for given data")
-   coeffs = T == fmpq ? arr : map(R, arr)
-   coeffs = length(coeffs) == 0 ? fmpq[] : coeffs
+   coeffs = T == QQFieldElem ? arr : map(R, arr)
+   coeffs = length(coeffs) == 0 ? QQFieldElem[] : coeffs
    z = fmpq_abs_series(coeffs, len, prec)
    z.parent = FmpqAbsSeriesRing(max_precision, Symbol(var), cached)
    return z
@@ -271,45 +271,45 @@ function *(x::Int, y::fmpq_abs_series)
    return z
 end
 
-function *(x::fmpz, y::fmpq_abs_series)
+function *(x::ZZRingElem, y::fmpq_abs_series)
    z = parent(y)()
    z.prec = y.prec
    ccall((:fmpq_poly_scalar_mul_fmpz, libflint), Nothing,
-                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Ref{fmpz}),
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Ref{ZZRingElem}),
                z, y, x)
    return z
 end
 
-function *(x::fmpq, y::fmpq_abs_series)
+function *(x::QQFieldElem, y::fmpq_abs_series)
    z = parent(y)()
    z.prec = y.prec
    ccall((:fmpq_poly_scalar_mul_fmpq, libflint), Nothing,
-                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Ref{fmpq}),
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Ref{QQFieldElem}),
                z, y, x)
    return z
 end
 
 *(x::fmpq_abs_series, y::Int) = y*x
 
-*(x::fmpq_abs_series, y::fmpz) = y*x
+*(x::fmpq_abs_series, y::ZZRingElem) = y*x
 
-*(x::fmpq_abs_series, y::fmpq) = y*x
+*(x::fmpq_abs_series, y::QQFieldElem) = y*x
 
-*(x::fmpq_abs_series, y::Integer) = x*fmpz(y)
+*(x::fmpq_abs_series, y::Integer) = x*ZZRingElem(y)
 
-*(x::Integer, y::fmpq_abs_series) = fmpz(x)*y
+*(x::Integer, y::fmpq_abs_series) = ZZRingElem(x)*y
 
-*(x::fmpq_abs_series, y::Rational) = x*fmpq(y)
+*(x::fmpq_abs_series, y::Rational) = x*QQFieldElem(y)
 
-*(x::Rational, y::fmpq_abs_series) = fmpq(x)*y
+*(x::Rational, y::fmpq_abs_series) = QQFieldElem(x)*y
 
-+(x::fmpq_abs_series, y::Rational) = x + fmpq(y)
++(x::fmpq_abs_series, y::Rational) = x + QQFieldElem(y)
 
-+(x::Rational, y::fmpq_abs_series) = fmpq(x) + y
++(x::Rational, y::fmpq_abs_series) = QQFieldElem(x) + y
 
--(x::fmpq_abs_series, y::Rational) = x - fmpq(y)
+-(x::fmpq_abs_series, y::Rational) = x - QQFieldElem(y)
 
--(x::Rational, y::fmpq_abs_series) = fmpq(x) - y
+-(x::Rational, y::fmpq_abs_series) = QQFieldElem(x) - y
 
 ###############################################################################
 #
@@ -440,9 +440,9 @@ end
 #
 ###############################################################################
 
-==(x::fmpq_abs_series, y::Rational{T}) where T <: Union{Int, BigInt} = x == fmpq(y)
+==(x::fmpq_abs_series, y::Rational{T}) where T <: Union{Int, BigInt} = x == QQFieldElem(y)
 
-==(x::fmpq_abs_series, y::Integer) = x == fmpz(y)
+==(x::fmpq_abs_series, y::Integer) = x == ZZRingElem(y)
 
 ==(x::Rational{T}, y::fmpq_abs_series) where T <: Union{Int, BigInt} = y == x
 
@@ -491,29 +491,29 @@ function divexact(x::fmpq_abs_series, y::Int; check::Bool=true)
    return z
 end
 
-function divexact(x::fmpq_abs_series, y::fmpz; check::Bool=true)
+function divexact(x::fmpq_abs_series, y::ZZRingElem; check::Bool=true)
    iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
    ccall((:fmpq_poly_scalar_div_fmpz, libflint), Nothing,
-                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Ref{fmpz}),
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Ref{ZZRingElem}),
                z, x, y)
    return z
 end
 
-function divexact(x::fmpq_abs_series, y::fmpq; check::Bool=true)
+function divexact(x::fmpq_abs_series, y::QQFieldElem; check::Bool=true)
    iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
    ccall((:fmpq_poly_scalar_div_fmpq, libflint), Nothing,
-                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Ref{fmpq}),
+                (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}, Ref{QQFieldElem}),
                z, x, y)
    return z
 end
 
-divexact(x::fmpq_abs_series, y::Integer; check::Bool=true) = divexact(x, fmpz(y); check=check)
+divexact(x::fmpq_abs_series, y::Integer; check::Bool=true) = divexact(x, ZZRingElem(y); check=check)
 
-divexact(x::fmpq_abs_series, y::Rational{T}; check::Bool=true) where T <: Union{Int, BigInt} = divexact(x, fmpq(y); check=check)
+divexact(x::fmpq_abs_series, y::Rational{T}; check::Bool=true) where T <: Union{Int, BigInt} = divexact(x, QQFieldElem(y); check=check)
 
 ###############################################################################
 #
@@ -541,7 +541,7 @@ end
 function Base.exp(a::fmpq_abs_series)
    !iszero(coeff(a, 0)) && error("Constant term not zero in exp")
    if length(a) == 0 || a.prec == 1
-      return parent(a)([fmpq(1)], 1, a.prec)
+      return parent(a)([QQFieldElem(1)], 1, a.prec)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -738,9 +738,9 @@ function fit!(z::fmpq_abs_series, n::Int)
    return nothing
 end
 
-function setcoeff!(z::fmpq_abs_series, n::Int, x::fmpq)
+function setcoeff!(z::fmpq_abs_series, n::Int, x::QQFieldElem)
    ccall((:fmpq_poly_set_coeff_fmpq, libflint), Nothing,
-                (Ref{fmpq_abs_series}, Int, Ref{fmpq}),
+                (Ref{fmpq_abs_series}, Int, Ref{QQFieldElem}),
                z, n, x)
    return z
 end
@@ -822,9 +822,9 @@ promote_rule(::Type{fmpq_abs_series}, ::Type{T}) where {T <: Integer} = fmpq_abs
 
 promote_rule(::Type{fmpq_abs_series}, ::Type{Rational{T}}) where T <: Union{Int, BigInt} = fmpq_abs_series
 
-promote_rule(::Type{fmpq_abs_series}, ::Type{fmpz}) = fmpq_abs_series
+promote_rule(::Type{fmpq_abs_series}, ::Type{ZZRingElem}) = fmpq_abs_series
 
-promote_rule(::Type{fmpq_abs_series}, ::Type{fmpq}) = fmpq_abs_series
+promote_rule(::Type{fmpq_abs_series}, ::Type{QQFieldElem}) = fmpq_abs_series
 
 ###############################################################################
 #
@@ -844,24 +844,24 @@ function (a::FmpqAbsSeriesRing)(b::Integer)
       z = fmpq_abs_series()
       z.prec = a.prec_max
    else
-      z = fmpq_abs_series([fmpq(b)], 1, a.prec_max)
+      z = fmpq_abs_series([QQFieldElem(b)], 1, a.prec_max)
    end
    z.parent = a
    return z
 end
 
-function (a::FmpqAbsSeriesRing)(b::fmpz)
+function (a::FmpqAbsSeriesRing)(b::ZZRingElem)
    if iszero(b)
       z = fmpq_abs_series()
       z.prec = a.prec_max
    else
-      z = fmpq_abs_series([fmpq(b)], 1, a.prec_max)
+      z = fmpq_abs_series([QQFieldElem(b)], 1, a.prec_max)
    end
    z.parent = a
    return z
 end
 
-function (a::FmpqAbsSeriesRing)(b::fmpq)
+function (a::FmpqAbsSeriesRing)(b::QQFieldElem)
    if iszero(b)
       z = fmpq_abs_series()
       z.prec = a.prec_max
@@ -872,14 +872,14 @@ function (a::FmpqAbsSeriesRing)(b::fmpq)
    return z
 end
 
-(a::FmpqAbsSeriesRing)(b::Rational{T}) where T <: Union{Int, BigInt} = a(fmpq(b))
+(a::FmpqAbsSeriesRing)(b::Rational{T}) where T <: Union{Int, BigInt} = a(QQFieldElem(b))
 
 function (a::FmpqAbsSeriesRing)(b::fmpq_abs_series)
    parent(b) != a && error("Unable to coerce power series")
    return b
 end
 
-function (a::FmpqAbsSeriesRing)(b::Vector{fmpq}, len::Int, prec::Int)
+function (a::FmpqAbsSeriesRing)(b::Vector{QQFieldElem}, len::Int, prec::Int)
    z = fmpq_abs_series(b, len, prec)
    z.parent = a
    return z
@@ -891,7 +891,7 @@ end
 #
 ###############################################################################
 
-function PowerSeriesRing(R::FlintRationalField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
+function PowerSeriesRing(R::QQField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
    if model == :capped_relative
       parent_obj = FmpqRelSeriesRing(prec, s, cached)
    elseif model == :capped_absolute
@@ -903,14 +903,14 @@ function PowerSeriesRing(R::FlintRationalField, prec::Int, s::Symbol; model=:cap
    return parent_obj, gen(parent_obj)
 end
 
-function PowerSeriesRing(R::FlintRationalField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
+function PowerSeriesRing(R::QQField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
    return PowerSeriesRing(R, prec, Symbol(s); model=model, cached=cached)
 end
 
-function AbsSeriesRing(R::FlintRationalField, prec::Int)
+function AbsSeriesRing(R::QQField, prec::Int)
    return FmpqAbsSeriesRing(prec, :x, false)
 end
 
-function RelSeriesRing(R::FlintRationalField, prec::Int)
+function RelSeriesRing(R::QQField, prec::Int)
    return FmpqRelSeriesRing(prec, :x, false)
 end

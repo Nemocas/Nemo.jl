@@ -1,41 +1,41 @@
-function test_elem(R::FlintIntegerRing)
+function test_elem(R::ZZRing)
    return rand_bits(ZZ, rand(0:100))
 end
 
-@testset "fmpq.conformance_tests" begin
+@testset "QQFieldElem.conformance_tests" begin
    test_Ring_interface_recursive(FlintZZ)
 end
 
-@testset "fmpz.issingletontype" begin
-   @test Base.issingletontype(FlintIntegerRing)
+@testset "ZZRingElem.issingletontype" begin
+   @test Base.issingletontype(ZZRing)
 end
 
-@testset "fmpz.abstract_types" begin
-   @test fmpz <: RingElem
+@testset "ZZRingElem.abstract_types" begin
+   @test ZZRingElem <: RingElem
 
-   @test FlintIntegerRing <: Nemo.Ring
+   @test ZZRing <: Nemo.Ring
 
-   @test elem_type(FlintIntegerRing()) == fmpz
-   @test elem_type(FlintIntegerRing) == fmpz
-   @test parent_type(fmpz) == FlintIntegerRing
+   @test elem_type(ZZRing()) == ZZRingElem
+   @test elem_type(ZZRing) == ZZRingElem
+   @test parent_type(ZZRingElem) == ZZRing
 end
 
-@testset "fmpz.constructors" begin
-   a = fmpz(-123)
+@testset "ZZRingElem.constructors" begin
+   a = ZZRingElem(-123)
    @test isa(a, RingElem)
 
-   b = fmpz(12.0)
+   b = ZZRingElem(12.0)
    @test isa(b, RingElem)
 
-   c = fmpz("-1234567876545678376545678900000000000000000000000000")
+   c = ZZRingElem("-1234567876545678376545678900000000000000000000000000")
    @test isa(c, RingElem)
 
-   @test a == fmpz("-123")
-   @test b == fmpz("12")
+   @test a == ZZRingElem("-123")
+   @test b == ZZRingElem("12")
 
-   @test fmpz(234) == fmpz(SubString("12345",2,4))
+   @test ZZRingElem(234) == ZZRingElem(SubString("12345",2,4))
 
-   d = fmpz(c)
+   d = ZZRingElem(c)
    @test isa(d, RingElem)
    @test c == d
 
@@ -43,29 +43,29 @@ end
    @test isa(e, RingElem)
    @test c == e
 
-   f = fmpz(BigFloat(10)^100)
+   f = ZZRingElem(BigFloat(10)^100)
    @test isa(f, RingElem)
-   @test f == fmpz(10)^100
+   @test f == ZZRingElem(10)^100
 
-   g = fmpz()
+   g = ZZRingElem()
    @test isa(f, RingElem)
    @test g == 0
 end
 
-@testset "fmpz.rand" begin
+@testset "ZZRingElem.rand" begin
    test_rand(FlintZZ, 1:9)
    test_rand(FlintZZ, Int16(1):Int16(9))
    test_rand(FlintZZ, big(1):big(9))
-   test_rand(FlintZZ, fmpz(1):fmpz(9))
+   test_rand(FlintZZ, ZZRingElem(1):ZZRingElem(9))
    test_rand(FlintZZ, [3,9,2])
    test_rand(FlintZZ, Int16[3,9,2])
    test_rand(FlintZZ, BigInt[3,9,2])
-   test_rand(FlintZZ, fmpz[3,9,2])
+   test_rand(FlintZZ, ZZRingElem[3,9,2])
 
    for bits in 0:100
       t = rand_bits(FlintZZ, bits)
-      @test abs(t) < fmpz(2)^bits
-      @test bits < 1 || abs(t) >= fmpz(2)^(bits - 1)
+      @test abs(t) < ZZRingElem(2)^bits
+      @test bits < 1 || abs(t) >= ZZRingElem(2)^(bits - 1)
    end
 
    for i = 1:100
@@ -80,12 +80,12 @@ end
 
    # in a range
    for e in [0, 1, 2, 3, 32, 64, 65, 100, 129, 500]
-      for b in [fmpz(2) .^ e ; fmpz(2) .^ e .+ e;]
-         for r in [fmpz(1):fmpz(1):b, fmpz(3):fmpz(1):b, fmpz(1):fmpz(3):b]
+      for b in [ZZRingElem(2) .^ e ; ZZRingElem(2) .^ e .+ e;]
+         for r in [ZZRingElem(1):ZZRingElem(1):b, ZZRingElem(3):ZZRingElem(1):b, ZZRingElem(1):ZZRingElem(3):b]
             if isempty(r)
                @test_throws ArgumentError rand(r)
             else
-               rb = map(BigInt, r) # in(::fmpz, StepRange{fmpz}) no working
+               rb = map(BigInt, r) # in(::ZZRingElem, StepRange{ZZRingElem}) no working
                test_rand(r) do x
                   @test BigInt(x) in rb
                end
@@ -106,42 +106,42 @@ end
    end
 end
 
-@testset "fmpz.printing" begin
-   a = fmpz(-123)
+@testset "ZZRingElem.printing" begin
+   a = ZZRingElem(-123)
 
    @test string(a) == "-123"
 end
 
-@testset "fmpz.convert" begin
-   a = fmpz(-123)
-   b = fmpz(12)
+@testset "ZZRingElem.convert" begin
+   a = ZZRingElem(-123)
+   b = ZZRingElem(12)
 
-   @testset "fmpz.convert for $T" for T in [Int8, Int16, Int32, Int, BigInt, Float16, Float32, Float64, BigFloat]
+   @testset "ZZRingElem.convert for $T" for T in [Int8, Int16, Int32, Int, BigInt, Float16, Float32, Float64, BigFloat]
       x = @inferred T(a)
       @test x isa T
       @test x == -123
    end
 
-   @testset "fmpz.convert for $T" for T in [UInt8, UInt16, UInt32, UInt]
+   @testset "ZZRingElem.convert for $T" for T in [UInt8, UInt16, UInt32, UInt]
       x = @inferred T(b)
       @test x isa T
       @test x == 12
    end
 
-   @test_throws InexactError Int(fmpz(1234484735687346876324432764872))
-   @test_throws InexactError UInt(fmpz(typemin(Int)))
+   @test_throws InexactError Int(ZZRingElem(1234484735687346876324432764872))
+   @test_throws InexactError UInt(ZZRingElem(typemin(Int)))
 end
 
-@testset "fmpz.vector_arithmetics" begin
-   @test fmpz[1, 2, 3] // fmpz(2) == fmpq[1//2, 1, 3//2]
-   @test fmpz(2) * fmpz[1, 2, 3] == fmpz[2, 4, 6]
-   @test fmpz[1, 2, 3] * fmpz(2) == fmpz[2, 4, 6]
+@testset "ZZRingElem.vector_arithmetics" begin
+   @test ZZRingElem[1, 2, 3] // ZZRingElem(2) == QQFieldElem[1//2, 1, 3//2]
+   @test ZZRingElem(2) * ZZRingElem[1, 2, 3] == ZZRingElem[2, 4, 6]
+   @test ZZRingElem[1, 2, 3] * ZZRingElem(2) == ZZRingElem[2, 4, 6]
 end
 
-@testset "fmpz.manipulation" begin
-   a = one(FlintIntegerRing())
-   b = zero(FlintIntegerRing())
-   c = zero(fmpz)
+@testset "ZZRingElem.manipulation" begin
+   a = one(ZZRing())
+   b = zero(ZZRing())
+   c = zero(ZZRingElem)
 
    @test isa(a, RingElem)
 
@@ -151,7 +151,7 @@ end
 
    @test sign(a) == 1
 
-   @test sign(a) isa fmpz
+   @test sign(a) isa ZZRingElem
 
    @test fits(Int, a)
 
@@ -159,36 +159,36 @@ end
 
    @test size(a) == 1
 
-   @test canonical_unit(fmpz(-12)) == -1
+   @test canonical_unit(ZZRingElem(-12)) == -1
 
-   @test is_unit(fmpz(-1))
+   @test is_unit(ZZRingElem(-1))
 
    @test iszero(b)
 
    @test isone(a)
 
-   @test numerator(fmpz(12)) == fmpz(12)
+   @test numerator(ZZRingElem(12)) == ZZRingElem(12)
 
-   @test denominator(fmpz(12)) == fmpz(1)
+   @test denominator(ZZRingElem(12)) == ZZRingElem(1)
 
-   @test floor(fmpz(12)) == fmpz(12)
+   @test floor(ZZRingElem(12)) == ZZRingElem(12)
 
-   @test ceil(fmpz(12)) == fmpz(12)
+   @test ceil(ZZRingElem(12)) == ZZRingElem(12)
 
-   @test iseven(fmpz(12))
-   @test isodd(fmpz(13))
+   @test iseven(ZZRingElem(12))
+   @test isodd(ZZRingElem(13))
    b = big(2)
    x = rand(-b^rand(1:1000):b^rand(1:1000))
-   y = fmpz(x)
+   y = ZZRingElem(x)
    @test iseven(x) == iseven(y)
    @test isodd(x) == isodd(y)
 
    @test characteristic(ZZ) == 0
 end
 
-@testset "fmpz.binary_ops" begin
-   a = fmpz(12)
-   b = fmpz(26)
+@testset "ZZRingElem.binary_ops" begin
+   a = ZZRingElem(12)
+   b = ZZRingElem(26)
 
    @test a + b == 38
 
@@ -205,9 +205,9 @@ end
    @test xor(b, a) == 22
 end
 
-@testset "fmpz.division" begin
-   a = fmpz(12)
-   b = fmpz(26)
+@testset "ZZRingElem.division" begin
+   a = ZZRingElem(12)
+   b = ZZRingElem(26)
 
    @test fdiv(b, a) == 2
 
@@ -217,23 +217,23 @@ end
 
    @test div(b, a) == 2
 
-   @test div(-fmpz(2), fmpz(3)) == 0
-   @test Nemo.div(-fmpz(2), fmpz(3)) == -1
+   @test div(-ZZRingElem(2), ZZRingElem(3)) == 0
+   @test Nemo.div(-ZZRingElem(2), ZZRingElem(3)) == -1
 
-   @test div(-2, fmpz(3)) == 0
-   @test Nemo.div(-2, fmpz(3)) == -1
+   @test div(-2, ZZRingElem(3)) == 0
+   @test Nemo.div(-2, ZZRingElem(3)) == -1
 
-   @test div(-fmpz(2), 3) == 0
-   @test Nemo.div(-fmpz(2), 3) == -1
+   @test div(-ZZRingElem(2), 3) == 0
+   @test Nemo.div(-ZZRingElem(2), 3) == -1
 end
 
-@testset "fmpz.remainder" begin
-   a = fmpz(12)
-   b = fmpz(26)
+@testset "ZZRingElem.remainder" begin
+   a = ZZRingElem(12)
+   b = ZZRingElem(26)
 
    @test mod(b, a) == 2
 
-   @test mod(fmpz(3), fmpz(-2)) == fmpz(-1)
+   @test mod(ZZRingElem(3), ZZRingElem(-2)) == ZZRingElem(-1)
 
    @test rem(b, a) == 2
 
@@ -242,24 +242,24 @@ end
    @test rem(b, 12) == 2
 end
 
-@testset "fmpz.exact_division" begin
-   @test divexact(fmpz(24), fmpz(12)) == 2
-   @test divexact(fmpz(24), fmpz(12); check=false) == 2
-   @test_throws ArgumentError divexact(fmpz(24), fmpz(11))
+@testset "ZZRingElem.exact_division" begin
+   @test divexact(ZZRingElem(24), ZZRingElem(12)) == 2
+   @test divexact(ZZRingElem(24), ZZRingElem(12); check=false) == 2
+   @test_throws ArgumentError divexact(ZZRingElem(24), ZZRingElem(11))
 end
 
-@testset "fmpz.inverse" begin
-   @test inv(fmpz(1)) == 1
-   @test inv(-fmpz(1)) == -1
-   @test_throws DivideError inv(fmpz(0))
-   @test_throws ArgumentError inv(fmpz(2))
+@testset "ZZRingElem.inverse" begin
+   @test inv(ZZRingElem(1)) == 1
+   @test inv(-ZZRingElem(1)) == -1
+   @test_throws DivideError inv(ZZRingElem(0))
+   @test_throws ArgumentError inv(ZZRingElem(2))
 end
 
-@testset "fmpz.divides" begin
-   flag, q = divides(fmpz(12), fmpz(0))
+@testset "ZZRingElem.divides" begin
+   flag, q = divides(ZZRingElem(12), ZZRingElem(0))
    @test flag == false
-   @test divides(fmpz(12), fmpz(6)) == (true, fmpz(2))
-   @test divides(fmpz(0), fmpz(0)) == (true, fmpz(0))
+   @test divides(ZZRingElem(12), ZZRingElem(6)) == (true, ZZRingElem(2))
+   @test divides(ZZRingElem(0), ZZRingElem(0)) == (true, ZZRingElem(0))
 
    for iters = 1:1000
       a = rand(ZZ, -1000:1000)
@@ -288,58 +288,58 @@ end
    end
 end
 
-@testset "fmpz.gcd_lcm" begin
-   a = fmpz(12)
-   b = fmpz(26)
+@testset "ZZRingElem.gcd_lcm" begin
+   a = ZZRingElem(12)
+   b = ZZRingElem(26)
 
    @test gcd(a, b) == 2
    @test gcd(a, 26) == 2
    @test gcd(12, b) == 2
 
-   c = fmpz(2^2 * 3 * 5^2 * 7)
-   zero = fmpz(0)
-   one = fmpz(1)
+   c = ZZRingElem(2^2 * 3 * 5^2 * 7)
+   zero = ZZRingElem(0)
+   one = ZZRingElem(1)
 
    @test gcd(130 * c, 618 * c, 817 * c, 177 * c) == c
    @test gcd(one, one, one, one, one) == 1
    @test gcd(zero, zero, zero, zero) == 0
 
-   @test_throws ErrorException gcd(fmpz[])
+   @test_throws ErrorException gcd(ZZRingElem[])
 
-   @test gcd(fmpz[8]) == 8
+   @test gcd(ZZRingElem[8]) == 8
 
-   @test gcd([fmpz(10), fmpz(2)]) == 2
+   @test gcd([ZZRingElem(10), ZZRingElem(2)]) == 2
 
-   @test gcd([fmpz(1), fmpz(2), fmpz(3)]) == 1
+   @test gcd([ZZRingElem(1), ZZRingElem(2), ZZRingElem(3)]) == 1
 
-   @test gcd([fmpz(9), fmpz(27), fmpz(3)]) == 3
+   @test gcd([ZZRingElem(9), ZZRingElem(27), ZZRingElem(3)]) == 3
 
    @test lcm(a, b) == 156
    @test lcm(12, b) == 156
    @test lcm(a, 26) == 156
 
-   c = fmpz(2^2 * 3 * 5^2 * 7)
-   zero = fmpz(0)
-   one = fmpz(1)
+   c = ZZRingElem(2^2 * 3 * 5^2 * 7)
+   zero = ZZRingElem(0)
+   one = ZZRingElem(1)
 
    @test lcm(2 * c, 2 * c, 3 * c, 19 * c) == 114 * c
    @test lcm(one, one, one, one, one) == 1
    @test lcm(zero, one, one, one, one, one) == 0
 
-   @test_throws ErrorException lcm(fmpz[])
+   @test_throws ErrorException lcm(ZZRingElem[])
 
-   @test lcm(fmpz[2]) == 2
+   @test lcm(ZZRingElem[2]) == 2
 
-   @test lcm(fmpz[2, 3]) == 6
+   @test lcm(ZZRingElem[2, 3]) == 6
 
-   @test lcm(fmpz[2, 2, 2]) == 2
+   @test lcm(ZZRingElem[2, 2, 2]) == 2
 
-   @test lcm(fmpz[2, 3, 2]) == 6
+   @test lcm(ZZRingElem[2, 3, 2]) == 6
 end
 
-@testset "fmpz.logarithm" begin
-   a = fmpz(12)
-   b = fmpz(26)
+@testset "ZZRingElem.logarithm" begin
+   a = ZZRingElem(12)
+   b = ZZRingElem(26)
 
    @test flog(b, a) == 1
 
@@ -358,8 +358,8 @@ end
    @test_throws DomainError clog(b, -12)
 end
 
-@testset "fmpz.adhoc_binary" begin
-   a = fmpz(-12)
+@testset "ZZRingElem.adhoc_binary" begin
+   a = ZZRingElem(-12)
 
    @test 3 + a == -9
 
@@ -376,8 +376,8 @@ end
    @test a%5 == -2
 end
 
-@testset "fmpz.adhoc_division" begin
-   a = fmpz(-12)
+@testset "ZZRingElem.adhoc_division" begin
+   a = ZZRingElem(-12)
 
    @test fdiv(a, 5) == -3
 
@@ -387,21 +387,21 @@ end
 
    @test div(a, 3) == -4
 
-   @test div(-12, fmpz(3)) == -4
+   @test div(-12, ZZRingElem(3)) == -4
 
-   @test mod(-12, fmpz(3)) == 0
+   @test mod(-12, ZZRingElem(3)) == 0
 
-   @test isa(mod(fmpz(2), -3), fmpz)
+   @test isa(mod(ZZRingElem(2), -3), ZZRingElem)
 
-   @test mod(fmpz(2), -3) == -1
+   @test mod(ZZRingElem(2), -3) == -1
 
-   @test rem(-12, fmpz(3)) == 0
+   @test rem(-12, ZZRingElem(3)) == 0
 
    @test_throws ArgumentError divexact(ZZ(2), 3)
 end
 
-@testset "fmpz.shift.." begin
-   a = fmpz(-12)
+@testset "ZZRingElem.shift.." begin
+   a = ZZRingElem(-12)
 
    @test a >> 3 == -2
 
@@ -420,46 +420,46 @@ end
    @test a << 4 == -192
 end
 
-@testset "fmpz.powering" begin
-   a = fmpz(-12)
+@testset "ZZRingElem.powering" begin
+   a = ZZRingElem(-12)
 
-   @test a^5 == a^fmpz(5) == -248832
+   @test a^5 == a^ZZRingElem(5) == -248832
 
-   @test isone(a^0) && isone(a^fmpz(0))
+   @test isone(a^0) && isone(a^ZZRingElem(0))
 
-   a = fmpz(2)
+   a = ZZRingElem(2)
    @test_throws InexactError a^(a^200)
 
-   for a in fmpz.(-5:5)
+   for a in ZZRingElem.(-5:5)
       for e = -5:-1
          if a != 1 && a != -1
             @test_throws DomainError a^e
-            @test_throws DomainError a^fmpz(e)
+            @test_throws DomainError a^ZZRingElem(e)
          end
       end
-      @test a^1 == a^fmpz(1) == a
-      @test a^1 !== a^fmpz(1) !== a
+      @test a^1 == a^ZZRingElem(1) == a
+      @test a^1 !== a^ZZRingElem(1) !== a
    end
 
-   a = fmpz(1)
+   a = ZZRingElem(1)
    for e = -2:2
-      @test isone(a^e) && isone(a^fmpz(e))
-      @test a^e !== a^fmpz(e) !== a
+      @test isone(a^e) && isone(a^ZZRingElem(e))
+      @test a^e !== a^ZZRingElem(e) !== a
    end
 
-   a = fmpz(-1)
+   a = ZZRingElem(-1)
    for e = [-3, -1, 1, 3, 5]
-      @test a^e == a^fmpz(e) == a
-      @test a^e !== a^fmpz(e) !== a
+      @test a^e == a^ZZRingElem(e) == a
+      @test a^e !== a^ZZRingElem(e) !== a
    end
    for e = [-2, 0, 2, 4]
-      @test isone(a^e) && isone(a^fmpz(e))
+      @test isone(a^e) && isone(a^ZZRingElem(e))
    end
 end
 
-@testset "fmpz.comparison" begin
-   a = fmpz(-12)
-   b = fmpz(5)
+@testset "ZZRingElem.comparison" begin
+   a = ZZRingElem(-12)
+   b = ZZRingElem(5)
 
    @test a < b
 
@@ -469,23 +469,23 @@ end
 
    @test a <= b
 
-   @test a == fmpz(-12)
+   @test a == ZZRingElem(-12)
 
    @test a != b
 
-   @test isequal(a, fmpz(-12))
+   @test isequal(a, ZZRingElem(-12))
 
    @test cmpabs(a, b) == 1
 
    @test cmp(a, b) == -1
 
-   @test fmpz(2) < 47632748687326487326487326487326
+   @test ZZRingElem(2) < 47632748687326487326487326487326
 
-   @test fmpz(2) < 476327486873264873264873264873264837624982
+   @test ZZRingElem(2) < 476327486873264873264873264873264837624982
 end
 
-@testset "fmpz.adhoc_comparison" begin
-   a = fmpz(-12)
+@testset "ZZRingElem.adhoc_comparison" begin
+   a = ZZRingElem(-12)
 
    @test a < 7
 
@@ -511,7 +511,7 @@ end
 
    @test 4 != a
 
-   a = fmpz(2)
+   a = ZZRingElem(2)
 
    @test a < UInt(7)
 
@@ -538,100 +538,100 @@ end
    @test UInt(4) != a
 end
 
-@testset "fmpz.unary_ops" begin
-   @test -fmpz(12) == -12
+@testset "ZZRingElem.unary_ops" begin
+   @test -ZZRingElem(12) == -12
 
-   @test ~fmpz(-5) == 4
+   @test ~ZZRingElem(-5) == 4
 end
 
-@testset "fmpz.abs" begin
-   @test abs(fmpz(-12)) == 12
+@testset "ZZRingElem.abs" begin
+   @test abs(ZZRingElem(-12)) == 12
 end
 
-@testset "fmpz.divrem" begin
-   @test fdivrem(fmpz(12), fmpz(5)) == (fmpz(2), fmpz(2))
+@testset "ZZRingElem.divrem" begin
+   @test fdivrem(ZZRingElem(12), ZZRingElem(5)) == (ZZRingElem(2), ZZRingElem(2))
 
-   @test tdivrem(fmpz(12), fmpz(5)) == (fmpz(2), fmpz(2))
+   @test tdivrem(ZZRingElem(12), ZZRingElem(5)) == (ZZRingElem(2), ZZRingElem(2))
 
-   @test ndivrem(fmpz(12), fmpz(5)) == (fmpz(2), fmpz(2))
-   @test ndivrem(fmpz(13), fmpz(5)) == (fmpz(3), fmpz(-2))
-   @test ndivrem(fmpz(6), fmpz(-4)) == (fmpz(-1), fmpz(2))
+   @test ndivrem(ZZRingElem(12), ZZRingElem(5)) == (ZZRingElem(2), ZZRingElem(2))
+   @test ndivrem(ZZRingElem(13), ZZRingElem(5)) == (ZZRingElem(3), ZZRingElem(-2))
+   @test ndivrem(ZZRingElem(6), ZZRingElem(-4)) == (ZZRingElem(-1), ZZRingElem(2))
 
-   @test divrem(fmpz(12), fmpz(5)) == (fmpz(2), fmpz(2))
+   @test divrem(ZZRingElem(12), ZZRingElem(5)) == (ZZRingElem(2), ZZRingElem(2))
 
-   @test divrem(-fmpz(2), fmpz(3)) == (fmpz(0), -fmpz(2))
-   @test divrem(-2, fmpz(3)) == (fmpz(0), -fmpz(2))
-   @test divrem(-fmpz(2), 3) == (fmpz(0), -fmpz(2))
+   @test divrem(-ZZRingElem(2), ZZRingElem(3)) == (ZZRingElem(0), -ZZRingElem(2))
+   @test divrem(-2, ZZRingElem(3)) == (ZZRingElem(0), -ZZRingElem(2))
+   @test divrem(-ZZRingElem(2), 3) == (ZZRingElem(0), -ZZRingElem(2))
 
-   @test Nemo.divrem(-fmpz(2), fmpz(3)) == (-fmpz(1), fmpz(1))
-   @test Nemo.divrem(-2, fmpz(3)) == (-fmpz(1), fmpz(1))
-   @test Nemo.divrem(-fmpz(2), 3) == (-fmpz(1), fmpz(1))
+   @test Nemo.divrem(-ZZRingElem(2), ZZRingElem(3)) == (-ZZRingElem(1), ZZRingElem(1))
+   @test Nemo.divrem(-2, ZZRingElem(3)) == (-ZZRingElem(1), ZZRingElem(1))
+   @test Nemo.divrem(-ZZRingElem(2), 3) == (-ZZRingElem(1), ZZRingElem(1))
 end
 
-@testset "fmpz.roots" begin
-   @test sqrt(fmpz(16)) == 4
-   @test sqrt(fmpz()) == 0
+@testset "ZZRingElem.roots" begin
+   @test sqrt(ZZRingElem(16)) == 4
+   @test sqrt(ZZRingElem()) == 0
 
-   @test_throws DomainError sqrt(-fmpz(1))
-   @test_throws ErrorException sqrt(fmpz(12))
+   @test_throws DomainError sqrt(-ZZRingElem(1))
+   @test_throws ErrorException sqrt(ZZRingElem(12))
 
-   @test is_square_with_sqrt(fmpz(5)) == (false, 0)
-   @test is_square_with_sqrt(fmpz(4)) == (true, 2)
+   @test is_square_with_sqrt(ZZRingElem(5)) == (false, 0)
+   @test is_square_with_sqrt(ZZRingElem(4)) == (true, 2)
 
-   f1, s1 = is_square_with_sqrt(-fmpz(1))
+   f1, s1 = is_square_with_sqrt(-ZZRingElem(1))
 
    @test !f1
    
-   @test isqrt(fmpz(12)) == 3
+   @test isqrt(ZZRingElem(12)) == 3
 
-   @test_throws DomainError isqrt(-fmpz(12))
+   @test_throws DomainError isqrt(-ZZRingElem(12))
 
-   @test isqrtrem(fmpz(12)) == (3, 3)
+   @test isqrtrem(ZZRingElem(12)) == (3, 3)
 
-   @test_throws DomainError isqrtrem(-fmpz(12))
+   @test_throws DomainError isqrtrem(-ZZRingElem(12))
 
-   @test root(fmpz(1000), 3) == 10
-   @test root(-fmpz(27), 3) == -3
-   @test root(fmpz(27), 3; check=true) == 3
+   @test root(ZZRingElem(1000), 3) == 10
+   @test root(-ZZRingElem(27), 3) == -3
+   @test root(ZZRingElem(27), 3; check=true) == 3
 
-   @test_throws DomainError root(-fmpz(1000), 4)
-   @test_throws DomainError root(fmpz(1000), -3)
+   @test_throws DomainError root(-ZZRingElem(1000), 4)
+   @test_throws DomainError root(ZZRingElem(1000), -3)
 
 #= Disabled until Flint-2.9 comes out
-   @test_throws ErrorException root(fmpz(1100), 3; check=true)
-   @test_throws ErrorException root(-fmpz(40), 3; check=true)
+   @test_throws ErrorException root(ZZRingElem(1100), 3; check=true)
+   @test_throws ErrorException root(-ZZRingElem(40), 3; check=true)
 =#
 
-   @test iroot(fmpz(1000), 3) == 10
-   @test iroot(fmpz(1100), 3) == 10
-   @test iroot(-fmpz(40), 3) == -3
+   @test iroot(ZZRingElem(1000), 3) == 10
+   @test iroot(ZZRingElem(1100), 3) == 10
+   @test iroot(-ZZRingElem(40), 3) == -3
 
-   @test_throws DomainError iroot(-fmpz(1000), 4)
-   @test_throws DomainError iroot(fmpz(1000), -3)
+   @test_throws DomainError iroot(-ZZRingElem(1000), 4)
+   @test_throws DomainError iroot(ZZRingElem(1000), -3)
 end
 
-@testset "fmpz.extended_gcd" begin
-   @test gcdx(fmpz(12), fmpz(5)) == (1, -2, 5)
-   @test gcdx(fmpz(12), 5) == (1, -2, 5)
-   @test gcdx(12, fmpz(5)) == (1, -2, 5)
+@testset "ZZRingElem.extended_gcd" begin
+   @test gcdx(ZZRingElem(12), ZZRingElem(5)) == (1, -2, 5)
+   @test gcdx(ZZRingElem(12), 5) == (1, -2, 5)
+   @test gcdx(12, ZZRingElem(5)) == (1, -2, 5)
 
-   @test gcdinv(fmpz(5), fmpz(12)) == (1, 5)
-   @test gcdinv(fmpz(5), 12) == (1, 5)
-   @test gcdinv(5, fmpz(12)) == (1, 5)
+   @test gcdinv(ZZRingElem(5), ZZRingElem(12)) == (1, 5)
+   @test gcdinv(ZZRingElem(5), 12) == (1, 5)
+   @test gcdinv(5, ZZRingElem(12)) == (1, 5)
 
-   @test_throws DomainError gcdinv(-fmpz(5), fmpz(12))
+   @test_throws DomainError gcdinv(-ZZRingElem(5), ZZRingElem(12))
 
-   @test_throws DomainError gcdinv(fmpz(13), fmpz(12))
+   @test_throws DomainError gcdinv(ZZRingElem(13), ZZRingElem(12))
 
    for i = -10:10
       for j = -10:10
-         @test gcdx(fmpz(i), fmpz(j)) == gcdx(i, j)
+         @test gcdx(ZZRingElem(i), ZZRingElem(j)) == gcdx(i, j)
       end
    end
 end
 
-@testset "fmpz.bit_twiddling" begin
-   a = fmpz(12)
+@testset "ZZRingElem.bit_twiddling" begin
+   a = ZZRingElem(12)
 
    @test popcount(a) == 2
 
@@ -664,12 +664,12 @@ end
    @test_throws DomainError clrbit!(a, -1)
 end
 
-@testset "fmpz.unsafe" begin
-  a = fmpz(32)
-  b = fmpz(23)
+@testset "ZZRingElem.unsafe" begin
+  a = ZZRingElem(32)
+  b = ZZRingElem(23)
   c = one(FlintZZ)
-  d = fmpz(-3)
-  r = fmpz()
+  d = ZZRingElem(-3)
+  r = ZZRingElem()
   b_copy = deepcopy(b)
   c_copy = deepcopy(c)
 
@@ -705,8 +705,8 @@ end
   @test c_copy == c
 end
 
-@testset "fmpz.bases" begin
-   a = fmpz(12)
+@testset "ZZRingElem.bases" begin
+   a = ZZRingElem(12)
 
    @test bin(a) == "1100"
 
@@ -722,7 +722,7 @@ end
 
    @test ndigits(a, 3) == 3
 
-   a = fmpz(4611686837384281896) # must not be an "immediate" integer (but a GMP int)
+   a = ZZRingElem(4611686837384281896) # must not be an "immediate" integer (but a GMP int)
 
    @test ndigits(a, 257) == 8
    @test ndigits(a, base = 257) == 8
@@ -742,33 +742,33 @@ end
 
 end
 
-@testset "fmpz.string_io" begin
-   a = fmpz(12)
+@testset "ZZRingElem.string_io" begin
+   a = ZZRingElem(12)
 
    @test string(a) == "12"
 end
 
-@testset "fmpz.modular_arithmetic" begin
-   @test powermod(fmpz(12), fmpz(110), fmpz(13)) == 1
+@testset "ZZRingElem.modular_arithmetic" begin
+   @test powermod(ZZRingElem(12), ZZRingElem(110), ZZRingElem(13)) == 1
 
-   @test_throws DomainError powermod(fmpz(12), fmpz(110), fmpz(-1))
+   @test_throws DomainError powermod(ZZRingElem(12), ZZRingElem(110), ZZRingElem(-1))
 
-   @test powermod(fmpz(12), 110, fmpz(13)) == 1
+   @test powermod(ZZRingElem(12), 110, ZZRingElem(13)) == 1
 
-   @test_throws DomainError powermod(fmpz(12), 110, fmpz(-1))
+   @test_throws DomainError powermod(ZZRingElem(12), 110, ZZRingElem(-1))
 
-   @test invmod(fmpz(12), fmpz(13)) == 12
+   @test invmod(ZZRingElem(12), ZZRingElem(13)) == 12
 
-   @test_throws DomainError invmod(fmpz(12), fmpz(-13))
+   @test_throws DomainError invmod(ZZRingElem(12), ZZRingElem(-13))
 
-   @test sqrtmod(fmpz(12), fmpz(13)) == 5
+   @test sqrtmod(ZZRingElem(12), ZZRingElem(13)) == 5
 
-   @test_throws DomainError sqrtmod(fmpz(12), fmpz(-13))
+   @test_throws DomainError sqrtmod(ZZRingElem(12), ZZRingElem(-13))
 
-   @test_throws ErrorException sqrtmod(fmpz(-7), fmpz(1024))
+   @test_throws ErrorException sqrtmod(ZZRingElem(-7), ZZRingElem(1024))
 end
 
-@testset "fmpz.crt" begin
+@testset "ZZRingElem.crt" begin
    function testit(r, m, check=true)
       n = length(r)
       s = rand(Bool)
@@ -810,14 +810,14 @@ end
    @test_throws Exception crt([ZZ(-1), ZZ(2), ZZ(2)], [ZZ(0), ZZ(3), ZZ(0)])
    @test_throws Exception crt([ZZ(-1), ZZ(-1), ZZ(2)], [ZZ(0), ZZ(0), ZZ(4)])
 
-   @test crt(fmpz(5), fmpz(13), fmpz(7), fmpz(37), true) == 44
-   @test crt(fmpz(1), fmpz(2), fmpz(2), fmpz(-3), true) == -1
-   @test crt(fmpz(1), fmpz(2), fmpz(0), fmpz(3), true) == 3
-   @test crt(fmpz(1), fmpz(-2), fmpz(2), fmpz(3), false) == 5
-   @test crt(fmpz(1), fmpz(2), fmpz(0), fmpz(3), false) == 3
-   @test crt(fmpz(11),fmpz(30),fmpz(41),fmpz(85)) == 41
-   @test crt(fmpz(11), fmpz(30), fmpz(40), fmpz(85); check=false) isa fmpz
-   @test_throws Exception crt(fmpz(11), fmpz(30), fmpz(40), fmpz(85)) isa fmpz
+   @test crt(ZZRingElem(5), ZZRingElem(13), ZZRingElem(7), ZZRingElem(37), true) == 44
+   @test crt(ZZRingElem(1), ZZRingElem(2), ZZRingElem(2), ZZRingElem(-3), true) == -1
+   @test crt(ZZRingElem(1), ZZRingElem(2), ZZRingElem(0), ZZRingElem(3), true) == 3
+   @test crt(ZZRingElem(1), ZZRingElem(-2), ZZRingElem(2), ZZRingElem(3), false) == 5
+   @test crt(ZZRingElem(1), ZZRingElem(2), ZZRingElem(0), ZZRingElem(3), false) == 3
+   @test crt(ZZRingElem(11),ZZRingElem(30),ZZRingElem(41),ZZRingElem(85)) == 41
+   @test crt(ZZRingElem(11), ZZRingElem(30), ZZRingElem(40), ZZRingElem(85); check=false) isa ZZRingElem
+   @test_throws Exception crt(ZZRingElem(11), ZZRingElem(30), ZZRingElem(40), ZZRingElem(85)) isa ZZRingElem
 
    for s in (true, false)
       rr = ZZ(99)^150
@@ -852,14 +852,14 @@ end
       end
    end
 
-   @test_throws Exception crt(fmpz(1), fmpz(3), UInt(2), UInt(0))
-   @test_throws Exception crt(fmpz(1), fmpz(3), 2, 0)
-   @test_throws Exception crt(fmpz(11), fmpz(30), UInt(40), UInt(85))
-   @test_throws Exception crt(fmpz(11), fmpz(30), 40, 85)
+   @test_throws Exception crt(ZZRingElem(1), ZZRingElem(3), UInt(2), UInt(0))
+   @test_throws Exception crt(ZZRingElem(1), ZZRingElem(3), 2, 0)
+   @test_throws Exception crt(ZZRingElem(11), ZZRingElem(30), UInt(40), UInt(85))
+   @test_throws Exception crt(ZZRingElem(11), ZZRingElem(30), 40, 85)
 end
 
-@testset "fmpz.factor" begin
-   a = fmpz(-3*5*7*11*13^10)
+@testset "ZZRingElem.factor" begin
+   a = ZZRingElem(-3*5*7*11*13^10)
 
    fact = factor(a)
 
@@ -871,26 +871,26 @@ end
 
    @test b == a
 
-   @test fact[fmpz(3)] == 1
-   @test fact[fmpz(5)] == 1
-   @test fact[fmpz(7)] == 1
-   @test fact[fmpz(11)] == 1
-   @test fact[fmpz(13)] == 10
+   @test fact[ZZRingElem(3)] == 1
+   @test fact[ZZRingElem(5)] == 1
+   @test fact[ZZRingElem(7)] == 1
+   @test fact[ZZRingElem(11)] == 1
+   @test fact[ZZRingElem(13)] == 10
    @test 3 in fact
    @test !(2 in fact)
 
-   fact = factor(fmpz(-1))
+   fact = factor(ZZRingElem(-1))
 
-   @test fact.fac == Dict{fmpz, Int}()
+   @test fact.fac == Dict{ZZRingElem, Int}()
 
-   fact = factor(fmpz(-2))
+   fact = factor(ZZRingElem(-2))
 
    @test occursin("2", sprint(show, "text/plain", fact))
 
-   @test fact.fac == Dict(fmpz(2) => 1)
+   @test fact.fac == Dict(ZZRingElem(2) => 1)
    @test unit(fact) == -1
 
-   @test_throws ArgumentError factor(fmpz(0))
+   @test_throws ArgumentError factor(ZZRingElem(0))
 
    for (T, a) in [(Int, -3*5*7*11*13^5), (UInt, UInt(3*5*7*11*13^5))]
       fact = factor(a)
@@ -929,7 +929,7 @@ end
    fact = factor(next_prime(3*UInt(2)^62))
    @test length(fact.fac) == 1
 
-   n = fmpz(2 * 1125899906842679)
+   n = ZZRingElem(2 * 1125899906842679)
    b, f = Nemo.ecm(n)
    @test mod(n, f) == 0
 
@@ -939,18 +939,18 @@ end
    @test prod(p^e for (p, e) in d) == n
 end
 
-@testset "fmpz.number_theoretic" begin
-   @test is_prime(fmpz(13))
+@testset "ZZRingElem.number_theoretic" begin
+   @test is_prime(ZZRingElem(13))
 
    @test is_prime(13)
 
-   @test is_probable_prime(fmpz(13))
+   @test is_probable_prime(ZZRingElem(13))
 
-   @test divisible(fmpz(12), fmpz(6))
+   @test divisible(ZZRingElem(12), ZZRingElem(6))
 
-   n = fmpz(2^2 * 3 * 13^2)
-   d = fmpz.([1, 2, 3, 4, 6, 12, 13, 26, 39, 52, 78, 156, 169, 338, 507, 676, 1014, 2028])
-   p = fmpz.([2, 3, 13])
+   n = ZZRingElem(2^2 * 3 * 13^2)
+   d = ZZRingElem.([1, 2, 3, 4, 6, 12, 13, 26, 39, 52, 78, 156, 169, 338, 507, 676, 1014, 2028])
+   p = ZZRingElem.([2, 3, 13])
    divsr = divisors(n)
    pdivsr = prime_divisors(n)
    @test all([k in divsr for k in d])
@@ -974,13 +974,13 @@ end
    @test next_prime(UInt(11), false) == 13
    @test_throws Exception next_prime(typemax(UInt))
 
-   @test factorial(ZZ(100)) == fmpz("93326215443944152681699238856266700490715968264381621468592963895217599993229915608941463976156518286253697920827223758251185210916864000000000000000000000000")
+   @test factorial(ZZ(100)) == ZZRingElem("93326215443944152681699238856266700490715968264381621468592963895217599993229915608941463976156518286253697920827223758251185210916864000000000000000000000000")
 
-   @test divisor_sigma(fmpz(128), 10) == fmpz("1181745669222511412225")
+   @test divisor_sigma(ZZRingElem(128), 10) == ZZRingElem("1181745669222511412225")
 
-   @test_throws DomainError divisor_sigma(fmpz(1), -1)
+   @test_throws DomainError divisor_sigma(ZZRingElem(1), -1)
 
-   @test euler_phi(fmpz(12480)) == 3072
+   @test euler_phi(ZZRingElem(12480)) == 3072
 
    @test fibonacci(2) == 1
 
@@ -988,13 +988,13 @@ end
 
    @test fibonacci(-2) == -1
 
-   @test fibonacci(fmpz(2)) == 1
+   @test fibonacci(ZZRingElem(2)) == 1
 
-   @test fibonacci(fmpz(-2)) == -1
+   @test fibonacci(ZZRingElem(-2)) == -1
 
-   @test_throws DomainError  euler_phi(-fmpz(12480))
+   @test_throws DomainError  euler_phi(-ZZRingElem(12480))
 
-   @test remove(fmpz(12), fmpz(2)) == (2, 3)
+   @test remove(ZZRingElem(12), ZZRingElem(2)) == (2, 3)
    @test remove(-3*6^3, 6) === (3, -3)
    @test remove(-4*6^0, 6) === (0, -4)
    @test remove(typemin(Int), 2) === (trailing_zeros(typemin(Int)), -1)
@@ -1016,23 +1016,23 @@ end
    @test remove(BigInt(-3*6^3), 6) == (3, -3)
    @test remove(BigInt(-3*6^3), 6) isa Tuple{Int, BigInt}
 
-   @test valuation(fmpz(12), fmpz(2)) == 2
+   @test valuation(ZZRingElem(12), ZZRingElem(2)) == 2
 
-   @test valuation(fmpz(12), 2) == 2
+   @test valuation(ZZRingElem(12), 2) == 2
 
    @test valuation(12, 2) == 2
 
    @test_throws ErrorException valuation(0, 2)
 
-   @test divisor_lenstra(fmpz(12), fmpz(4), fmpz(5)) == 4
+   @test divisor_lenstra(ZZRingElem(12), ZZRingElem(4), ZZRingElem(5)) == 4
 
-   @test_throws DomainError divisor_lenstra(fmpz(12), -fmpz(4), fmpz(5))
-   @test_throws DomainError divisor_lenstra(fmpz(1), fmpz(4), fmpz(5))
-   @test_throws DomainError divisor_lenstra(fmpz(10), fmpz(4), fmpz(3))
+   @test_throws DomainError divisor_lenstra(ZZRingElem(12), -ZZRingElem(4), ZZRingElem(5))
+   @test_throws DomainError divisor_lenstra(ZZRingElem(1), ZZRingElem(4), ZZRingElem(5))
+   @test_throws DomainError divisor_lenstra(ZZRingElem(10), ZZRingElem(4), ZZRingElem(3))
 
-   @test rising_factorial(fmpz(12), 5) == 524160
+   @test rising_factorial(ZZRingElem(12), 5) == 524160
 
-   @test_throws DomainError rising_factorial(fmpz(12), -1)
+   @test_throws DomainError rising_factorial(ZZRingElem(12), -1)
 
    @test rising_factorial(12, 5) == 524160
 
@@ -1072,15 +1072,15 @@ end
 
    @test_throws DomainError bell(-1)
 
-   @test moebius_mu(fmpz(13)) == -1
+   @test moebius_mu(ZZRingElem(13)) == -1
 
-   @test_throws DomainError moebius_mu(-fmpz(1))
+   @test_throws DomainError moebius_mu(-ZZRingElem(1))
 
-   @test jacobi_symbol(fmpz(2), fmpz(5)) == -1
+   @test jacobi_symbol(ZZRingElem(2), ZZRingElem(5)) == -1
 
-   @test_throws DomainError jacobi_symbol(fmpz(5), fmpz(-2))
+   @test_throws DomainError jacobi_symbol(ZZRingElem(5), ZZRingElem(-2))
 
-   @test_throws DomainError jacobi_symbol(fmpz(5), fmpz(2))
+   @test_throws DomainError jacobi_symbol(ZZRingElem(5), ZZRingElem(2))
 
    @test jacobi_symbol(2, 3) == -1
 
@@ -1088,7 +1088,7 @@ end
 
    @test_throws DomainError jacobi_symbol(-5, 4)
 
-   for T in [Int, fmpz]
+   for T in [Int, ZZRingElem]
       for iters = 1:1000
          m1 = T(rand(-100:100))
          n1 = T(rand(-100:100))
@@ -1121,17 +1121,17 @@ end
 
       @test number_of_partitions(10) == 42
 
-      @test number_of_partitions(fmpz(1000)) == fmpz("24061467864032622473692149727991")
+      @test number_of_partitions(ZZRingElem(1000)) == ZZRingElem("24061467864032622473692149727991")
 
       @test number_of_partitions(0) == 1
 
       @test number_of_partitions(-1) == 0
 
-      @test number_of_partitions(fmpz(-2)) == 0
+      @test number_of_partitions(ZZRingElem(-2)) == 0
    end
 
    # Perfect power
-   for T in [Int, BigInt, fmpz]
+   for T in [Int, BigInt, ZZRingElem]
      @test @inferred is_perfect_power(T(4))
      @test is_perfect_power(T(36))
      @test is_perfect_power(T(-27))
@@ -1142,10 +1142,10 @@ end
      @test !is_perfect_power(T(-4))
      @test !is_perfect_power(T(6))
    end
-   @test is_perfect_power(fmpz(10940293781057873954324736))
+   @test is_perfect_power(ZZRingElem(10940293781057873954324736))
 
    # Prime power
-   for T in [Int, BigInt, fmpz]
+   for T in [Int, BigInt, ZZRingElem]
      @test @inferred Nemo.is_prime_power(T(2))
      @test (@inferred Nemo.is_prime_power_with_data(T(2))) == (true, T(2), 1)
      @test Nemo.is_prime_power(T(4))
@@ -1157,10 +1157,10 @@ end
      @test !Nemo.is_prime_power(T(-3))
      @test !Nemo.is_prime_power(-T(7)^4)
    end
-   @test !Nemo.is_prime_power(fmpz(10940293781057873954324736))
+   @test !Nemo.is_prime_power(ZZRingElem(10940293781057873954324736))
 end
 
-@testset "fmpz.tdivrem" begin
+@testset "ZZRingElem.tdivrem" begin
    @test tdivrem(ZZ(-6), ZZ(+4)) == (-1, -2)
    @test tdivrem(ZZ(-5), ZZ(+4)) == (-1, -1)
    @test tdivrem(ZZ(-4), ZZ(+4)) == (-1,  0)
@@ -1190,7 +1190,7 @@ end
    @test tdivrem(ZZ(-6), ZZ(-4)) == (+1, -2)
 end
 
-@testset "fmpz.fdivrem" begin
+@testset "ZZRingElem.fdivrem" begin
    @test fdivrem(ZZ(-6), ZZ(+4)) == (-2, +2)
    @test fdivrem(ZZ(-5), ZZ(+4)) == (-2, +3)
    @test fdivrem(ZZ(-4), ZZ(+4)) == (-1,  0)
@@ -1220,7 +1220,7 @@ end
    @test fdivrem(ZZ(-6), ZZ(-4)) == (+1, -2)
 end
 
-@testset "fmpz.cdivrem" begin
+@testset "ZZRingElem.cdivrem" begin
    @test cdivrem(ZZ(-6), ZZ(+4)) == (-1, -2)
    @test cdivrem(ZZ(-5), ZZ(+4)) == (-1, -1)
    @test cdivrem(ZZ(-4), ZZ(+4)) == (-1,  0)
@@ -1250,7 +1250,7 @@ end
    @test cdivrem(ZZ(-6), ZZ(-4)) == (+2, +2)
 end
 
-@testset "fmpz.ntdivrem" begin
+@testset "ZZRingElem.ntdivrem" begin
    @test ntdivrem(ZZ(-6), ZZ(+4)) == (-1, -2)
    @test ntdivrem(ZZ(-5), ZZ(+4)) == (-1, -1)
    @test ntdivrem(ZZ(-4), ZZ(+4)) == (-1,  0)
@@ -1280,7 +1280,7 @@ end
    @test ntdivrem(ZZ(-6), ZZ(-4)) == (+1, -2)
 end
 
-@testset "fmpz.nfdivrem" begin
+@testset "ZZRingElem.nfdivrem" begin
    @test nfdivrem(ZZ(-6), ZZ(+4)) == (-2, +2)
    @test nfdivrem(ZZ(-5), ZZ(+4)) == (-1, -1)
    @test nfdivrem(ZZ(-4), ZZ(+4)) == (-1,  0)
@@ -1310,7 +1310,7 @@ end
    @test nfdivrem(ZZ(-6), ZZ(-4)) == (+1, -2)
 end
 
-@testset "fmpz.ncdivrem" begin
+@testset "ZZRingElem.ncdivrem" begin
    @test ncdivrem(ZZ(-6), ZZ(+4)) == (-1, -2)
    @test ncdivrem(ZZ(-5), ZZ(+4)) == (-1, -1)
    @test ncdivrem(ZZ(-4), ZZ(+4)) == (-1,  0)

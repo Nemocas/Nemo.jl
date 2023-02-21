@@ -1,10 +1,10 @@
 ###############################################################################
 #
-#   fq_nmod.jl : Flint finite fields
+#   fqPolyRepFieldElem.jl : Flint finite fields
 #
 ###############################################################################
 
-export fq_nmod, FqNmodFiniteField, coeffs_raw
+export fqPolyRepFieldElem, fqPolyRepField, coeffs_raw
 
 ###############################################################################
 #
@@ -12,19 +12,19 @@ export fq_nmod, FqNmodFiniteField, coeffs_raw
 #
 ###############################################################################
 
-parent_type(::Type{fq_nmod}) = FqNmodFiniteField
+parent_type(::Type{fqPolyRepFieldElem}) = fqPolyRepField
 
-elem_type(::Type{FqNmodFiniteField}) = fq_nmod
+elem_type(::Type{fqPolyRepField}) = fqPolyRepFieldElem
 
-base_ring(a::FqNmodFiniteField) = Union{}
+base_ring(a::fqPolyRepField) = Union{}
 
-base_ring(a::fq_nmod) = Union{}
+base_ring(a::fqPolyRepFieldElem) = Union{}
 
-parent(a::fq_nmod) = a.parent
+parent(a::fqPolyRepFieldElem) = a.parent
 
-is_domain_type(::Type{fq_nmod}) = true
+is_domain_type(::Type{fqPolyRepFieldElem}) = true
 
-function check_parent(a::fq_nmod, b::fq_nmod)
+function check_parent(a::fqPolyRepFieldElem, b::fqPolyRepFieldElem)
    a.parent != b.parent && error("Operations on distinct finite fields not supported")
 end
 
@@ -34,7 +34,7 @@ end
 #
 ###############################################################################
 
-function Base.hash(a::fq_nmod, h::UInt)
+function Base.hash(a::fqPolyRepFieldElem, h::UInt)
    b = 0x78e5f766c8ace18d%UInt
    for i in 0:degree(parent(a)) - 1
       b = xor(b, xor(hash(coeff(a, i), h), h))
@@ -43,13 +43,13 @@ function Base.hash(a::fq_nmod, h::UInt)
    return b
 end
 
-function coeff(x::fq_nmod, n::Int)
+function coeff(x::fqPolyRepFieldElem, n::Int)
    n < 0 && throw(DomainError(n, "Index must be non-negative"))
    return ccall((:nmod_poly_get_coeff_ui, libflint), UInt,
-                (Ref{fq_nmod}, Int), x, n)
+                (Ref{fqPolyRepFieldElem}, Int), x, n)
 end
 
-function coeffs_raw(x::fq_nmod)
+function coeffs_raw(x::fqPolyRepFieldElem)
    @GC.preserve x begin
       len = degree(parent(x))
       V = unsafe_wrap(Vector{UInt}, reinterpret(Ptr{UInt}, x.coeffs), x.length)
@@ -65,67 +65,67 @@ function coeffs_raw(x::fq_nmod)
 end
 
 # set the i-th coeff of x to c, internal use only
-function setindex_raw!(x::fq_nmod, c::UInt, i::Int)
+function setindex_raw!(x::fqPolyRepFieldElem, c::UInt, i::Int)
    len = degree(parent(x))
    i > len - 1 && error("Index out of range")
    ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-         (Ref{fq_nmod}, Int, UInt), x, i, c)
+         (Ref{fqPolyRepFieldElem}, Int, UInt), x, i, c)
    return x
 end
 
-function zero(a::FqNmodFiniteField)
+function zero(a::fqPolyRepField)
    d = a()
    ccall((:fq_nmod_zero, libflint), Nothing,
-         (Ref{fq_nmod}, Ref{FqNmodFiniteField}), d, a)
+         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), d, a)
    return d
 end
 
-function one(a::FqNmodFiniteField)
+function one(a::fqPolyRepField)
    d = a()
    ccall((:fq_nmod_one, libflint), Nothing,
-         (Ref{fq_nmod}, Ref{FqNmodFiniteField}), d, a)
+         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), d, a)
    return d
 end
 
-function gen(a::FqNmodFiniteField)
+function gen(a::fqPolyRepField)
    d = a()
    ccall((:fq_nmod_gen, libflint), Nothing,
-         (Ref{fq_nmod}, Ref{FqNmodFiniteField}), d, a)
+         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), d, a)
    return d
 end
 
-iszero(a::fq_nmod) = ccall((:fq_nmod_is_zero, libflint), Bool,
-                     (Ref{fq_nmod}, Ref{FqNmodFiniteField}), a, a.parent)
+iszero(a::fqPolyRepFieldElem) = ccall((:fq_nmod_is_zero, libflint), Bool,
+                     (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), a, a.parent)
 
-isone(a::fq_nmod) = ccall((:fq_nmod_is_one, libflint), Bool,
-                    (Ref{fq_nmod}, Ref{FqNmodFiniteField}), a, a.parent)
+isone(a::fqPolyRepFieldElem) = ccall((:fq_nmod_is_one, libflint), Bool,
+                    (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), a, a.parent)
 
-is_gen(a::fq_nmod) = a == gen(parent(a)) # there is no is_gen in flint
+is_gen(a::fqPolyRepFieldElem) = a == gen(parent(a)) # there is no is_gen in flint
 
-is_unit(a::fq_nmod) = ccall((:fq_nmod_is_invertible, libflint), Bool,
-                     (Ref{fq_nmod}, Ref{FqNmodFiniteField}), a, a.parent)
+is_unit(a::fqPolyRepFieldElem) = ccall((:fq_nmod_is_invertible, libflint), Bool,
+                     (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), a, a.parent)
 
-function characteristic(a::FqNmodFiniteField)
-   d = fmpz()
+function characteristic(a::fqPolyRepField)
+   d = ZZRingElem()
    ccall((:__fq_nmod_ctx_prime, libflint), Nothing,
-         (Ref{fmpz}, Ref{FqNmodFiniteField}), d, a)
+         (Ref{ZZRingElem}, Ref{fqPolyRepField}), d, a)
    return d
 end
 
-function order(a::FqNmodFiniteField)
-   d = fmpz()
+function order(a::fqPolyRepField)
+   d = ZZRingElem()
    ccall((:fq_nmod_ctx_order, libflint), Nothing,
-         (Ref{fmpz}, Ref{FqNmodFiniteField}), d, a)
+         (Ref{ZZRingElem}, Ref{fqPolyRepField}), d, a)
    return d
 end
 
-function degree(a::FqNmodFiniteField)
+function degree(a::fqPolyRepField)
    return ccall((:fq_nmod_ctx_degree, libflint), Int,
-                (Ref{FqNmodFiniteField},), a)
+                (Ref{fqPolyRepField},), a)
 end
 
-function deepcopy_internal(d::fq_nmod, dict::IdDict)
-   z = fq_nmod(parent(d), d)
+function deepcopy_internal(d::fqPolyRepFieldElem, dict::IdDict)
+   z = fqPolyRepFieldElem(parent(d), d)
    z.parent = parent(d)
    return z
 end
@@ -136,7 +136,7 @@ end
 #
 ###############################################################################
 
-canonical_unit(x::fq_nmod) = x
+canonical_unit(x::fqPolyRepFieldElem) = x
 
 ###############################################################################
 #
@@ -144,7 +144,7 @@ canonical_unit(x::fq_nmod) = x
 #
 ###############################################################################
 
-function expressify(a::fq_nmod; context = nothing)
+function expressify(a::fqPolyRepFieldElem; context = nothing)
    x = unsafe_string(reinterpret(Cstring, a.parent.var))
    d = degree(a.parent)
 
@@ -163,9 +163,9 @@ function expressify(a::fq_nmod; context = nothing)
     return sum
 end
 
-show(io::IO, a::fq_nmod) = print(io, AbstractAlgebra.obj_to_string(a, context = io))
+show(io::IO, a::fqPolyRepFieldElem) = print(io, AbstractAlgebra.obj_to_string(a, context = io))
 
-function show(io::IO, a::FqNmodFiniteField)
+function show(io::IO, a::fqPolyRepField)
    print(io, "Finite field of degree ", degree(a))
    print(io, " over F_", characteristic(a))
 end
@@ -176,10 +176,10 @@ end
 #
 ###############################################################################
 
-function -(x::fq_nmod)
+function -(x::fqPolyRepFieldElem)
    z = parent(x)()
    ccall((:fq_nmod_neg, libflint), Nothing,
-       (Ref{fq_nmod}, Ref{fq_nmod}, Ref{FqNmodFiniteField}), z, x, x.parent)
+       (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, x.parent)
    return z
 end
 
@@ -189,29 +189,29 @@ end
 #
 ###############################################################################
 
-function +(x::fq_nmod, y::fq_nmod)
+function +(x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
    check_parent(x, y)
    z = parent(y)()
    ccall((:fq_nmod_add, libflint), Nothing,
-         (Ref{fq_nmod}, Ref{fq_nmod}, Ref{fq_nmod}, Ref{FqNmodFiniteField}),
+         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
                                                        z, x, y, y.parent)
    return z
 end
 
-function -(x::fq_nmod, y::fq_nmod)
+function -(x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
    check_parent(x, y)
    z = parent(y)()
    ccall((:fq_nmod_sub, libflint), Nothing,
-         (Ref{fq_nmod}, Ref{fq_nmod}, Ref{fq_nmod}, Ref{FqNmodFiniteField}),
+         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
                                                        z, x, y, y.parent)
    return z
 end
 
-function *(x::fq_nmod, y::fq_nmod)
+function *(x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
    check_parent(x, y)
    z = parent(y)()
    ccall((:fq_nmod_mul, libflint), Nothing,
-         (Ref{fq_nmod}, Ref{fq_nmod}, Ref{fq_nmod}, Ref{FqNmodFiniteField}),
+         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
                                                        z, x, y, y.parent)
    return z
 end
@@ -222,45 +222,45 @@ end
 #
 ###############################################################################
 
-function *(x::Int, y::fq_nmod)
+function *(x::Int, y::fqPolyRepFieldElem)
    z = parent(y)()
    ccall((:fq_nmod_mul_si, libflint), Nothing,
-         (Ref{fq_nmod}, Ref{fq_nmod}, Int, Ref{FqNmodFiniteField}),
+         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Int, Ref{fqPolyRepField}),
                                                z, y, x, y.parent)
    return z
 end
 
-*(x::fq_nmod, y::Int) = y*x
+*(x::fqPolyRepFieldElem, y::Int) = y*x
 
-*(x::Integer, y::fq_nmod) = fmpz(x)*y
+*(x::Integer, y::fqPolyRepFieldElem) = ZZRingElem(x)*y
 
-*(x::fq_nmod, y::Integer) = y*x
+*(x::fqPolyRepFieldElem, y::Integer) = y*x
 
-function *(x::fmpz, y::fq_nmod)
+function *(x::ZZRingElem, y::fqPolyRepFieldElem)
    z = parent(y)()
    ccall((:fq_nmod_mul_fmpz, libflint), Nothing,
-         (Ref{fq_nmod}, Ref{fq_nmod}, Ref{fmpz}, Ref{FqNmodFiniteField}),
+         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{ZZRingElem}, Ref{fqPolyRepField}),
                                                     z, y, x, y.parent)
    return z
 end
 
-*(x::fq_nmod, y::fmpz) = y*x
+*(x::fqPolyRepFieldElem, y::ZZRingElem) = y*x
 
-+(x::fq_nmod, y::Integer) = x + parent(x)(y)
++(x::fqPolyRepFieldElem, y::Integer) = x + parent(x)(y)
 
-+(x::Integer, y::fq_nmod) = y + x
++(x::Integer, y::fqPolyRepFieldElem) = y + x
 
-+(x::fq_nmod, y::fmpz) = x + parent(x)(y)
++(x::fqPolyRepFieldElem, y::ZZRingElem) = x + parent(x)(y)
 
-+(x::fmpz, y::fq_nmod) = y + x
++(x::ZZRingElem, y::fqPolyRepFieldElem) = y + x
 
--(x::fq_nmod, y::Integer) = x - parent(x)(y)
+-(x::fqPolyRepFieldElem, y::Integer) = x - parent(x)(y)
 
--(x::Integer, y::fq_nmod) = parent(y)(x) - y
+-(x::Integer, y::fqPolyRepFieldElem) = parent(y)(x) - y
 
--(x::fq_nmod, y::fmpz) = x - parent(x)(y)
+-(x::fqPolyRepFieldElem, y::ZZRingElem) = x - parent(x)(y)
 
--(x::fmpz, y::fq_nmod) = parent(y)(x) - y
+-(x::ZZRingElem, y::fqPolyRepFieldElem) = parent(y)(x) - y
 
 ###############################################################################
 #
@@ -268,26 +268,26 @@ end
 #
 ###############################################################################
 
-function ^(x::fq_nmod, y::Int)
+function ^(x::fqPolyRepFieldElem, y::Int)
    if y < 0
       x = inv(x)
       y = -y
    end
    z = parent(x)()
    ccall((:fq_nmod_pow_ui, libflint), Nothing,
-         (Ref{fq_nmod}, Ref{fq_nmod}, Int, Ref{FqNmodFiniteField}),
+         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Int, Ref{fqPolyRepField}),
                                                z, x, y, x.parent)
    return z
 end
 
-function ^(x::fq_nmod, y::fmpz)
+function ^(x::fqPolyRepFieldElem, y::ZZRingElem)
    if y < 0
       x = inv(x)
       y = -y
    end
    z = parent(x)()
    ccall((:fq_nmod_pow, libflint), Nothing,
-         (Ref{fq_nmod}, Ref{fq_nmod}, Ref{fmpz}, Ref{FqNmodFiniteField}),
+         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{ZZRingElem}, Ref{fqPolyRepField}),
                                                     z, x, y, x.parent)
    return z
 end
@@ -298,10 +298,10 @@ end
 #
 ###############################################################################
 
-function ==(x::fq_nmod, y::fq_nmod)
+function ==(x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
    check_parent(x, y)
    ccall((:fq_nmod_equal, libflint), Bool,
-       (Ref{fq_nmod}, Ref{fq_nmod}, Ref{FqNmodFiniteField}), x, y, y.parent)
+       (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), x, y, y.parent)
 end
 
 ###############################################################################
@@ -310,13 +310,13 @@ end
 #
 ###############################################################################
 
-==(x::fq_nmod, y::Integer) = x == parent(x)(y)
+==(x::fqPolyRepFieldElem, y::Integer) = x == parent(x)(y)
 
-==(x::fq_nmod, y::fmpz) = x == parent(x)(y)
+==(x::fqPolyRepFieldElem, y::ZZRingElem) = x == parent(x)(y)
 
-==(x::Integer, y::fq_nmod) = parent(y)(x) == y
+==(x::Integer, y::fqPolyRepFieldElem) = parent(y)(x) == y
 
-==(x::fmpz, y::fq_nmod) = parent(y)(x) == y
+==(x::ZZRingElem, y::fqPolyRepFieldElem) = parent(y)(x) == y
 
 ###############################################################################
 #
@@ -324,11 +324,11 @@ end
 #
 ###############################################################################
 
-function inv(x::fq_nmod)
+function inv(x::fqPolyRepFieldElem)
    iszero(x) && throw(DivideError())
    z = parent(x)()
    ccall((:fq_nmod_inv, libflint), Nothing,
-       (Ref{fq_nmod}, Ref{fq_nmod}, Ref{FqNmodFiniteField}), z, x, x.parent)
+       (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, x.parent)
    return z
 end
 
@@ -338,17 +338,17 @@ end
 #
 ###############################################################################
 
-function divexact(x::fq_nmod, y::fq_nmod; check::Bool=true)
+function divexact(x::fqPolyRepFieldElem, y::fqPolyRepFieldElem; check::Bool=true)
    check_parent(x, y)
    iszero(y) && throw(DivideError())
    z = parent(y)()
    ccall((:fq_nmod_div, libflint), Nothing,
-         (Ref{fq_nmod}, Ref{fq_nmod}, Ref{fq_nmod}, Ref{FqNmodFiniteField}),
+         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
                                                        z, x, y, y.parent)
    return z
 end
 
-function divides(a::fq_nmod, b::fq_nmod)
+function divides(a::fqPolyRepFieldElem, b::fqPolyRepFieldElem)
    if iszero(a)
       return true, zero(parent(a))
    end
@@ -364,13 +364,13 @@ end
 #
 ###############################################################################
 
-divexact(x::fq_nmod, y::Integer; check::Bool=true) = divexact(x, parent(x)(y); check=check)
+divexact(x::fqPolyRepFieldElem, y::Integer; check::Bool=true) = divexact(x, parent(x)(y); check=check)
 
-divexact(x::fq_nmod, y::fmpz; check::Bool=true) = divexact(x, parent(x)(y); check=check)
+divexact(x::fqPolyRepFieldElem, y::ZZRingElem; check::Bool=true) = divexact(x, parent(x)(y); check=check)
 
-divexact(x::Integer, y::fq_nmod; check::Bool=true) = divexact(parent(y)(x), y; check=check)
+divexact(x::Integer, y::fqPolyRepFieldElem; check::Bool=true) = divexact(parent(y)(x), y; check=check)
 
-divexact(x::fmpz, y::fq_nmod; check::Bool=true) = divexact(parent(y)(x), y; check=check)
+divexact(x::ZZRingElem, y::fqPolyRepFieldElem; check::Bool=true) = divexact(parent(y)(x), y; check=check)
 
 ###############################################################################
 #
@@ -378,54 +378,54 @@ divexact(x::fmpz, y::fq_nmod; check::Bool=true) = divexact(parent(y)(x), y; chec
 #
 ###############################################################################
 
-function sqrt(x::fq_nmod; check::Bool=true)
+function sqrt(x::fqPolyRepFieldElem; check::Bool=true)
    z = parent(x)()
    res = Bool(ccall((:fq_nmod_sqrt, libflint), Cint,
-                    (Ref{fq_nmod}, Ref{fq_nmod}, Ref{FqNmodFiniteField}),
+                    (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
                     z, x, x.parent))
    check && !res && error("Not a square")
    return z
 end
 
-function is_square(x::fq_nmod)
+function is_square(x::fqPolyRepFieldElem)
    return Bool(ccall((:fq_nmod_is_square, libflint), Cint,
-                     (Ref{fq_nmod}, Ref{FqNmodFiniteField}),
+                     (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
                      x, x.parent))
 end
 
-function is_square_with_sqrt(x::fq_nmod)
+function is_square_with_sqrt(x::fqPolyRepFieldElem)
    z = parent(x)()
    flag = ccall((:fq_nmod_sqrt, libflint), Cint,
-                (Ref{fq_nmod}, Ref{fq_nmod}, Ref{FqNmodFiniteField}),
+                (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
                 z, x, x.parent)
    return (Bool(flag), z)
 end
 
-function pth_root(x::fq_nmod)
+function pth_root(x::fqPolyRepFieldElem)
    z = parent(x)()
    ccall((:fq_nmod_pth_root, libflint), Nothing,
-       (Ref{fq_nmod}, Ref{fq_nmod}, Ref{FqNmodFiniteField}), z, x, x.parent)
+       (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, x.parent)
    return z
 end
 
-function tr(x::fq_nmod)
-   z = fmpz()
+function tr(x::fqPolyRepFieldElem)
+   z = ZZRingElem()
    ccall((:fq_nmod_trace, libflint), Nothing,
-         (Ref{fmpz}, Ref{fq_nmod}, Ref{FqNmodFiniteField}), z, x, x.parent)
+         (Ref{ZZRingElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, x.parent)
    return parent(x)(z)
 end
 
-function norm(x::fq_nmod)
-   z = fmpz()
+function norm(x::fqPolyRepFieldElem)
+   z = ZZRingElem()
    ccall((:fq_nmod_norm, libflint), Nothing,
-         (Ref{fmpz}, Ref{fq_nmod}, Ref{FqNmodFiniteField}), z, x, x.parent)
+         (Ref{ZZRingElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, x.parent)
    return parent(x)(z)
 end
 
-function frobenius(x::fq_nmod, n = 1)
+function frobenius(x::fqPolyRepFieldElem, n = 1)
    z = parent(x)()
    ccall((:fq_nmod_frobenius, libflint), Nothing,
-         (Ref{fq_nmod}, Ref{fq_nmod}, Int, Ref{FqNmodFiniteField}),
+         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Int, Ref{fqPolyRepField}),
                                                z, x, n, x.parent)
    return z
 end
@@ -436,10 +436,10 @@ end
 #
 ###############################################################################
 
-function lift(R::GFPPolyRing, x::fq_nmod)
+function lift(R::fpPolyRing, x::fqPolyRepFieldElem)
    c = R()
    ccall((:fq_nmod_get_nmod_poly, libflint), Nothing,
-         (Ref{gfp_poly}, Ref{fq_nmod}, Ref{FqNmodFiniteField}),
+         (Ref{fpPolyRingElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
                                                       c, x, parent(x))
    return c
 end
@@ -450,29 +450,29 @@ end
 #
 ###############################################################################
 
-function zero!(z::fq_nmod)
+function zero!(z::fqPolyRepFieldElem)
    ccall((:fq_nmod_zero, libflint), Nothing,
-        (Ref{fq_nmod}, Ref{FqNmodFiniteField}), z, z.parent)
+        (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, z.parent)
    return z
 end
 
-function mul!(z::fq_nmod, x::fq_nmod, y::fq_nmod)
+function mul!(z::fqPolyRepFieldElem, x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
    ccall((:fq_nmod_mul, libflint), Nothing,
-         (Ref{fq_nmod}, Ref{fq_nmod}, Ref{fq_nmod}, Ref{FqNmodFiniteField}),
+         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
                                                        z, x, y, y.parent)
    return z
 end
 
-function addeq!(z::fq_nmod, x::fq_nmod)
+function addeq!(z::fqPolyRepFieldElem, x::fqPolyRepFieldElem)
    ccall((:fq_nmod_add, libflint), Nothing,
-         (Ref{fq_nmod}, Ref{fq_nmod}, Ref{fq_nmod}, Ref{FqNmodFiniteField}),
+         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
                                                        z, z, x, x.parent)
    return z
 end
 
-function add!(z::fq_nmod, x::fq_nmod, y::fq_nmod)
+function add!(z::fqPolyRepFieldElem, x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
    ccall((:fq_nmod_add, libflint), Nothing,
-         (Ref{fq_nmod}, Ref{fq_nmod}, Ref{fq_nmod}, Ref{FqNmodFiniteField}),
+         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
                                                        z, x, y, x.parent)
    return z
 end
@@ -483,17 +483,17 @@ end
 #
 ###############################################################################
 
-# define rand(::FqNmodFiniteField)
+# define rand(::fqPolyRepField)
 
-Random.Sampler(::Type{RNG}, R::FqNmodFiniteField, n::Random.Repetition) where {RNG<:AbstractRNG} =
+Random.Sampler(::Type{RNG}, R::fqPolyRepField, n::Random.Repetition) where {RNG<:AbstractRNG} =
    Random.SamplerSimple(R, Random.Sampler(RNG, BigInt(0):BigInt(order(R))-1, n))
 
-function rand(rng::AbstractRNG, R::Random.SamplerSimple{FqNmodFiniteField})
+function rand(rng::AbstractRNG, R::Random.SamplerSimple{fqPolyRepField})
    F = R[]
    x = gen(F)
    z = zero(F)
    p = characteristic(F)
-   n = fmpz(rand(rng, R.data))
+   n = ZZRingElem(rand(rng, R.data))
    xi = one(F)
    while !iszero(n)
       n, r = divrem(n, p)
@@ -503,20 +503,20 @@ function rand(rng::AbstractRNG, R::Random.SamplerSimple{FqNmodFiniteField})
    return z
 end
 
-Random.gentype(::Type{FqNmodFiniteField}) = elem_type(FqNmodFiniteField)
+Random.gentype(::Type{fqPolyRepField}) = elem_type(fqPolyRepField)
 
-# define rand(make(::FqNmodFiniteField, arr)), where arr is any abstract array with integer or fmpz entries
+# define rand(make(::fqPolyRepField, arr)), where arr is any abstract array with integer or ZZRingElem entries
 
-RandomExtensions.maketype(R::FqNmodFiniteField, _) = elem_type(R)
+RandomExtensions.maketype(R::fqPolyRepField, _) = elem_type(R)
 
-rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{fq_nmod,FqNmodFiniteField,<:AbstractArray{<:IntegerUnion}}}) =
+rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{fqPolyRepFieldElem,fqPolyRepField,<:AbstractArray{<:IntegerUnion}}}) =
    sp[][1](rand(rng, sp[][2]))
 
-# define rand(::FqNmodFiniteField, arr), where arr is any abstract array with integer or fmpz entries
+# define rand(::fqPolyRepField, arr), where arr is any abstract array with integer or ZZRingElem entries
 
-rand(r::Random.AbstractRNG, R::FqNmodFiniteField, b::AbstractArray) = rand(r, make(R, b))
+rand(r::Random.AbstractRNG, R::fqPolyRepField, b::AbstractArray) = rand(r, make(R, b))
 
-rand(R::FqNmodFiniteField, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
+rand(R::fqPolyRepField, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
 
 ###############################################################################
 #
@@ -526,12 +526,12 @@ rand(R::FqNmodFiniteField, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
 
 # the two definitions are merged (with `Union`) so that this doesn't produce a compilation
 # warning due to similar definitions in Hecke
-Base.iterate(F::Union{FqNmodFiniteField,FqFiniteField}) =
-   zero(F), zeros(F isa FqNmodFiniteField ? UInt : fmpz, degree(F))
+Base.iterate(F::Union{fqPolyRepField,FqPolyRepField}) =
+   zero(F), zeros(F isa fqPolyRepField ? UInt : ZZRingElem, degree(F))
 
-function Base.iterate(F::Union{FqNmodFiniteField,FqFiniteField}, coeffs::Vector)
+function Base.iterate(F::Union{fqPolyRepField,FqPolyRepField}, coeffs::Vector)
    deg = length(coeffs)
-   char = F isa FqNmodFiniteField ? F.p : # cheaper than calling characteristic(F)::fmpz
+   char = F isa fqPolyRepField ? F.p : # cheaper than calling characteristic(F)::ZZRingElem
                                     characteristic(F)
    allzero = true
    for d = 1:deg
@@ -550,12 +550,12 @@ function Base.iterate(F::Union{FqNmodFiniteField,FqFiniteField}, coeffs::Vector)
 
    elt = F()
    for d = 1:deg
-      if F isa FqNmodFiniteField
+      if F isa fqPolyRepField
          ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-               (Ref{fq_nmod}, Int, UInt), elt, d - 1, coeffs[d])
+               (Ref{fqPolyRepFieldElem}, Int, UInt), elt, d - 1, coeffs[d])
       else
          ccall((:fmpz_poly_set_coeff_fmpz, libflint), Nothing,
-               (Ref{fq}, Int, Ref{fmpz}), elt, d - 1, coeffs[d])
+               (Ref{FqPolyRepFieldElem}, Int, Ref{ZZRingElem}), elt, d - 1, coeffs[d])
       end
    end
    elt, coeffs
@@ -565,22 +565,22 @@ end
 
 ################################################################################
 #
-#   FqNmodFiniteField Modulus
+#   fqPolyRepField Modulus
 #
 ################################################################################
 
 @doc Markdown.doc"""
-    modulus(k::FqNmodFiniteField, var::String="T")
+    modulus(k::fqPolyRepField, var::String="T")
 
 Return the modulus defining the finite field $k$.
 """
-function modulus(k::FqNmodFiniteField, var::String="T")
+function modulus(k::fqPolyRepField, var::String="T")
     p::Int = characteristic(k)
     Q = polynomial(GF(p), [], var)
-    P = ccall((:fq_nmod_ctx_modulus, libflint), Ref{gfp_poly},
-                 (Ref{FqNmodFiniteField},), k)
+    P = ccall((:fq_nmod_ctx_modulus, libflint), Ref{fpPolyRingElem},
+                 (Ref{fqPolyRepField},), k)
     ccall((:nmod_poly_set, libflint), Nothing,
-          (Ref{gfp_poly}, Ref{gfp_poly}),
+          (Ref{fpPolyRingElem}, Ref{fpPolyRingElem}),
           Q, P)
 
     return Q
@@ -592,9 +592,9 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{fq_nmod}, ::Type{T}) where {T <: Integer} = fq_nmod
+promote_rule(::Type{fqPolyRepFieldElem}, ::Type{T}) where {T <: Integer} = fqPolyRepFieldElem
 
-promote_rule(::Type{fq_nmod}, ::Type{fmpz}) = fq_nmod
+promote_rule(::Type{fqPolyRepFieldElem}, ::Type{ZZRingElem}) = fqPolyRepFieldElem
 
 ###############################################################################
 #
@@ -602,27 +602,27 @@ promote_rule(::Type{fq_nmod}, ::Type{fmpz}) = fq_nmod
 #
 ###############################################################################
 
-function (a::FqNmodFiniteField)()
-   z = fq_nmod(a)
+function (a::fqPolyRepField)()
+   z = fqPolyRepFieldElem(a)
    z.parent = a
    return z
 end
 
-(a::FqNmodFiniteField)(b::Integer) = a(fmpz(b))
+(a::fqPolyRepField)(b::Integer) = a(ZZRingElem(b))
 
-function (a::FqNmodFiniteField)(b::Int)
-   z = fq_nmod(a, b)
+function (a::fqPolyRepField)(b::Int)
+   z = fqPolyRepFieldElem(a, b)
    z.parent = a
    return z
 end
 
-function (a::FqNmodFiniteField)(b::fmpz)
-   z = fq_nmod(a, b)
+function (a::fqPolyRepField)(b::ZZRingElem)
+   z = fqPolyRepFieldElem(a, b)
    z.parent = a
    return z
 end
 
-function (a::FqNmodFiniteField)(b::fq_nmod)
+function (a::fqPolyRepField)(b::fqPolyRepFieldElem)
     k = parent(b)
     da = degree(a)
     dk = degree(k)
@@ -639,7 +639,7 @@ function (a::FqNmodFiniteField)(b::fq_nmod)
     end
 end
 
-function fq_nmod(a::FqNmodFiniteField, b::Vector{UInt})
+function fqPolyRepFieldElem(a::fqPolyRepField, b::Vector{UInt})
    r = a()
    len = degree(a)
    length(b) != len && error("Vector does not have correct length")
@@ -663,19 +663,19 @@ end
 
 function FlintFiniteField(char::Int, deg::Int, s::Union{AbstractString,Symbol} = :o; cached = true)
    S = Symbol(s)
-   parent_obj = FqNmodFiniteField(fmpz(char), deg, S, cached)
+   parent_obj = fqPolyRepField(ZZRingElem(char), deg, S, cached)
 
    return parent_obj, gen(parent_obj)
 end
 
 function FlintFiniteField(pol::Zmodn_poly, s::Union{AbstractString,Symbol} = :o; cached = true, check::Bool=true)
    S = Symbol(s)
-   parent_obj = FqNmodFiniteField(pol, S, cached, check=check)
+   parent_obj = fqPolyRepField(pol, S, cached, check=check)
 
    return parent_obj, gen(parent_obj)
 end
 
-function FlintFiniteField(F::FqNmodFiniteField, deg::Int,
+function FlintFiniteField(F::fqPolyRepField, deg::Int,
                           s::Union{AbstractString,Symbol} = :o; cached = true)
-    return FqNmodFiniteField(characteristic(F), deg, Symbol(s), cached)
+    return fqPolyRepField(characteristic(F), deg, Symbol(s), cached)
 end

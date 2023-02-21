@@ -24,7 +24,7 @@ end
 end
 
 @testset "fmpqi.constructors" begin
-   for a in Any[true, false, 1, big(1), fmpz(1), fmpq(2,3)]
+   for a in Any[true, false, 1, big(1), ZZRingElem(1), QQFieldElem(2,3)]
       @test QQi(a) == a
       @test QQi(a) + im == QQi(a, 1)
       @test QQi(a) - im == QQi(a, -1)

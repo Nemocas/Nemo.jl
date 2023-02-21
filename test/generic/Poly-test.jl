@@ -31,7 +31,7 @@ end
 @testset "@PolynomialRing" begin
    # cf. AbstractAlgebra issue #274
    R, x = @PolynomialRing(ZZ, x)
-   @test typeof(R) == FmpzMPolyRing
+   @test typeof(R) == ZZMPolyRing
    R, x = @PolynomialRing(QQ, x)
-   @test typeof(R) == FmpqMPolyRing
+   @test typeof(R) == QQMPolyRing
 end

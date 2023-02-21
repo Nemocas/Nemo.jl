@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-function *(a::fmpz, b::AbsSeriesElem)
+function *(a::ZZRingElem, b::AbsSeriesElem)
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -16,14 +16,14 @@ function *(a::fmpz, b::AbsSeriesElem)
    return z
 end
 
-*(a::AbsSeriesElem, b::fmpz) = b*a
+*(a::AbsSeriesElem, b::ZZRingElem) = b*a
 
-==(x::AbsSeriesElem, y::fmpz) = precision(x) == 0 || ((length(x) == 0 && iszero(y))
+==(x::AbsSeriesElem, y::ZZRingElem) = precision(x) == 0 || ((length(x) == 0 && iszero(y))
                                        || (length(x) == 1 && coeff(x, 0) == y))
 
-==(x::fmpz, y::AbsSeriesElem) = y == x
+==(x::ZZRingElem, y::AbsSeriesElem) = y == x
 
-function divexact(x::AbsSeriesElem, y::fmpz; check::Bool=true)
+function divexact(x::AbsSeriesElem, y::ZZRingElem; check::Bool=true)
    iszero(y) && throw(DivideError())
    lenx = length(x)
    z = parent(x)()
@@ -35,7 +35,7 @@ function divexact(x::AbsSeriesElem, y::fmpz; check::Bool=true)
    return z
 end
 
-function (a::Generic.AbsSeriesRing{T})(b::fmpz) where {T <: RingElement}
+function (a::Generic.AbsSeriesRing{T})(b::ZZRingElem) where {T <: RingElement}
    if iszero(b)
       z = Generic.AbsSeries{T}(Array{T}(undef, 0), 0, a.prec_max)
    else
@@ -51,7 +51,7 @@ end
 #
 ###############################################################################
 
-function *(a::fmpz, b::RelSeriesElem)
+function *(a::ZZRingElem, b::RelSeriesElem)
    len = pol_length(b)
    z = parent(b)()
    fit!(z, len)
@@ -65,15 +65,15 @@ function *(a::fmpz, b::RelSeriesElem)
    return z
 end
 
-*(a::RelSeriesElem, b::fmpz) = b*a
+*(a::RelSeriesElem, b::ZZRingElem) = b*a
 
-==(x::RelSeriesElem, y::fmpz) = precision(x) == 0 ||
+==(x::RelSeriesElem, y::ZZRingElem) = precision(x) == 0 ||
                   ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
                     valuation(x) == 0 && polcoeff(x, 0) == y))
 
-==(x::fmpz, y::RelSeriesElem) = y == x
+==(x::ZZRingElem, y::RelSeriesElem) = y == x
 
-function divexact(x::RelSeriesElem, y::fmpz; check::Bool=true)
+function divexact(x::RelSeriesElem, y::ZZRingElem; check::Bool=true)
    iszero(y) && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
@@ -86,7 +86,7 @@ function divexact(x::RelSeriesElem, y::fmpz; check::Bool=true)
    return z
 end
 
-function (a::Generic.RelSeriesRing{T})(b::fmpz) where {T <: RingElement}
+function (a::Generic.RelSeriesRing{T})(b::ZZRingElem) where {T <: RingElement}
    if iszero(b)
       z = Generic.RelSeries{T}(Array{T}(undef, 0), 0, a.prec_max, a.prec_max)
    else
@@ -102,7 +102,7 @@ end
 #
 ###############################################################################
 
-function *(a::fmpz, b::PolyElem)
+function *(a::ZZRingElem, b::PolyElem)
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -113,14 +113,14 @@ function *(a::fmpz, b::PolyElem)
    return z
 end
 
-*(a::PolyElem, b::fmpz) = b*a
+*(a::PolyElem, b::ZZRingElem) = b*a
 
-==(x::PolyElem, y::fmpz) = ((length(x) == 0 && iszero(y))
+==(x::PolyElem, y::ZZRingElem) = ((length(x) == 0 && iszero(y))
                         || (length(x) == 1 && coeff(x, 0) == y))
 
-==(x::fmpz, y::PolyElem) = y == x
+==(x::ZZRingElem, y::PolyElem) = y == x
 
-function divexact(a::PolyElem, b::fmpz; check::Bool=true)
+function divexact(a::PolyElem, b::ZZRingElem; check::Bool=true)
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
@@ -133,7 +133,7 @@ end
 
 # ambiguities
 
-function *(a::fmpz, b::PolyElem{fmpz})
+function *(a::ZZRingElem, b::PolyElem{ZZRingElem})
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -144,14 +144,14 @@ function *(a::fmpz, b::PolyElem{fmpz})
    return z
 end
 
-*(a::PolyElem{fmpz}, b::fmpz) = b*a
+*(a::PolyElem{ZZRingElem}, b::ZZRingElem) = b*a
 
-==(x::PolyElem{fmpz}, y::fmpz) = ((length(x) == 0 && iszero(y))
+==(x::PolyElem{ZZRingElem}, y::ZZRingElem) = ((length(x) == 0 && iszero(y))
                         || (length(x) == 1 && coeff(x, 0) == y))
 
-==(x::fmpz, y::PolyElem{fmpz}) = y == x
+==(x::ZZRingElem, y::PolyElem{ZZRingElem}) = y == x
 
-function divexact(a::PolyElem{fmpz}, b::fmpz; check::Bool=true)
+function divexact(a::PolyElem{ZZRingElem}, b::ZZRingElem; check::Bool=true)
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
@@ -168,48 +168,48 @@ end
 #
 ###############################################################################
 
-*(a::ResElem, b::fmpz) = parent(a)(data(a) * b)
+*(a::ResElem, b::ZZRingElem) = parent(a)(data(a) * b)
 
-*(a::fmpz, b::ResElem) = parent(b)(a * data(b))
+*(a::ZZRingElem, b::ResElem) = parent(b)(a * data(b))
 
-+(a::ResElem, b::fmpz) = parent(a)(data(a) + b)
++(a::ResElem, b::ZZRingElem) = parent(a)(data(a) + b)
 
-+(a::fmpz, b::ResElem) = parent(b)(a + data(b))
++(a::ZZRingElem, b::ResElem) = parent(b)(a + data(b))
 
--(a::ResElem, b::fmpz) = parent(a)(data(a) - b)
+-(a::ResElem, b::ZZRingElem) = parent(a)(data(a) - b)
 
--(a::fmpz, b::ResElem) = parent(b)(a - data(b))
+-(a::ZZRingElem, b::ResElem) = parent(b)(a - data(b))
 
-function ==(a::ResElem, b::fmpz)
+function ==(a::ResElem, b::ZZRingElem)
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
-function ==(a::fmpz, b::ResElem)
+function ==(a::ZZRingElem, b::ResElem)
    z = base_ring(b)(a)
    return data(b) == mod(z, modulus(b))
 end
 
 # ambiguities
 
-*(a::ResElem{fmpz}, b::fmpz) = parent(a)(data(a) * b)
+*(a::ResElem{ZZRingElem}, b::ZZRingElem) = parent(a)(data(a) * b)
 
-*(a::fmpz, b::ResElem{fmpz}) = b*a
+*(a::ZZRingElem, b::ResElem{ZZRingElem}) = b*a
 
-+(a::ResElem{fmpz}, b::fmpz) = parent(a)(data(a) + b)
++(a::ResElem{ZZRingElem}, b::ZZRingElem) = parent(a)(data(a) + b)
 
-+(a::fmpz, b::ResElem{fmpz}) = b + a
++(a::ZZRingElem, b::ResElem{ZZRingElem}) = b + a
 
--(a::ResElem{fmpz}, b::fmpz) = parent(a)(data(a) - b)
+-(a::ResElem{ZZRingElem}, b::ZZRingElem) = parent(a)(data(a) - b)
 
--(a::fmpz, b::ResElem{fmpz}) = parent(b)(a - data(b))
+-(a::ZZRingElem, b::ResElem{ZZRingElem}) = parent(b)(a - data(b))
 
-function ==(a::ResElem{fmpz}, b::fmpz)
+function ==(a::ResElem{ZZRingElem}, b::ZZRingElem)
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
-==(a::fmpz, b::ResElem{fmpz}) = b == a
+==(a::ZZRingElem, b::ResElem{ZZRingElem}) = b == a
 
 ###############################################################################
 #
@@ -217,7 +217,7 @@ end
 #
 ###############################################################################
 
-function *(a::Generic.MPoly{T}, n::fmpz) where T <: RingElem
+function *(a::Generic.MPoly{T}, n::ZZRingElem) where T <: RingElem
    N = size(a.exps, 1)
    r = parent(a)()
    fit!(r, length(a))
@@ -235,9 +235,9 @@ function *(a::Generic.MPoly{T}, n::fmpz) where T <: RingElem
    return r
 end
 
-*(n::fmpz, a::Generic.MPoly{T}) where T <: RingElem = a*n
+*(n::ZZRingElem, a::Generic.MPoly{T}) where T <: RingElem = a*n
 
-function ==(a::Generic.MPoly{T}, n::fmpz) where T <: RingElem
+function ==(a::Generic.MPoly{T}, n::ZZRingElem) where T <: RingElem
    N = size(a.exps, 1)
    if iszero(n)
       return a.length == 0
@@ -247,7 +247,7 @@ function ==(a::Generic.MPoly{T}, n::fmpz) where T <: RingElem
    return false
 end
 
-function evaluate(a::Generic.MPoly{T}, A::Vector{fmpz}) where {T <: RingElement}
+function evaluate(a::Generic.MPoly{T}, A::Vector{ZZRingElem}) where {T <: RingElement}
    if iszero(a)
       return base_ring(a)()
    end
@@ -284,7 +284,7 @@ end
 #
 ###############################################################################
 
-function *(a::Generic.SparsePoly{T}, n::fmpz) where T <: RingElem
+function *(a::Generic.SparsePoly{T}, n::ZZRingElem) where T <: RingElem
    r = parent(a)()
    fit!(r, length(a))
    j = 1
@@ -300,16 +300,16 @@ function *(a::Generic.SparsePoly{T}, n::fmpz) where T <: RingElem
    return r
 end
 
-*(n::fmpz, a::Generic.SparsePoly{T}) where T <: RingElem = a*n
+*(n::ZZRingElem, a::Generic.SparsePoly{T}) where T <: RingElem = a*n
 
-function ==(a::Generic.SparsePoly{T}, b::fmpz) where T <: RingElem
+function ==(a::Generic.SparsePoly{T}, b::ZZRingElem) where T <: RingElem
    return length(a) == 0 ? iszero(b) : a.length == 1 &
           a.exps[1] == 0 && a.coeffs[1] == b
 end
 
-==(a::fmpz, b::Generic.SparsePoly{T}) where T <: RingElem = b == a
+==(a::ZZRingElem, b::Generic.SparsePoly{T}) where T <: RingElem = b == a
 
-function divexact(a::Generic.SparsePoly{T}, b::fmpz; check::Bool=true) where T <: RingElem
+function divexact(a::Generic.SparsePoly{T}, b::ZZRingElem; check::Bool=true) where T <: RingElem
    len = length(a)
    exps = deepcopy(a.exps)
    coeffs = [divexact(a.coeffs[i], b; check=check) for i in 1:len]
@@ -322,7 +322,7 @@ end
 #
 ###############################################################################
 
-function *(x::fmpz, y::MatElem)
+function *(x::ZZRingElem, y::MatElem)
    z = similar(y)
    for i = 1:nrows(y)
       for j = 1:ncols(y)
@@ -332,9 +332,9 @@ function *(x::fmpz, y::MatElem)
    return z
 end
 
-*(x::MatElem, y::fmpz) = y*x
+*(x::MatElem, y::ZZRingElem) = y*x
 
-function +(x::fmpz, y::MatElem)
+function +(x::ZZRingElem, y::MatElem)
    z = similar(y)
    R = base_ring(y)
    for i = 1:nrows(y)
@@ -349,9 +349,9 @@ function +(x::fmpz, y::MatElem)
    return z
 end
 
-+(x::MatElem, y::fmpz) = y + x
++(x::MatElem, y::ZZRingElem) = y + x
 
-function -(x::fmpz, y::MatElem)
+function -(x::ZZRingElem, y::MatElem)
    z = similar(y)
    R = base_ring(y)
    for i = 1:nrows(y)
@@ -366,7 +366,7 @@ function -(x::fmpz, y::MatElem)
    return z
 end
 
-function -(x::MatElem, y::fmpz)
+function -(x::MatElem, y::ZZRingElem)
    z = similar(x)
    R = base_ring(x)
    for i = 1:nrows(x)
@@ -381,7 +381,7 @@ function -(x::MatElem, y::fmpz)
    return z
 end
 
-function ==(x::MatElem, y::fmpz)
+function ==(x::MatElem, y::ZZRingElem)
    for i = 1:min(nrows(x), ncols(x))
       if x[i, i] != y
          return false
@@ -397,9 +397,9 @@ function ==(x::MatElem, y::fmpz)
    return true
 end
 
-==(x::fmpz, y::MatElem) = y == x
+==(x::ZZRingElem, y::MatElem) = y == x
 
-function divexact(x::MatElem, y::fmpz; check::Bool=true)
+function divexact(x::MatElem, y::ZZRingElem; check::Bool=true)
    z = similar(x)
    for i = 1:nrows(x)
       for j = 1:ncols(x)
@@ -409,7 +409,7 @@ function divexact(x::MatElem, y::fmpz; check::Bool=true)
    return z
 end
 
-function (a::Generic.MatSpace{T})(b::fmpz_mat) where {T <: RingElement}
+function (a::Generic.MatSpace{T})(b::ZZMatrix) where {T <: RingElement}
   if a.nrows != nrows(b) || a.ncols != ncols(b)
     error("incompatible matrix dimensions")
   end
@@ -435,11 +435,11 @@ end
 #
 ###############################################################################
 
-//(x::T, y::fmpz) where {T <: RingElem} = x//parent(x)(y)
+//(x::T, y::ZZRingElem) where {T <: RingElem} = x//parent(x)(y)
 
-//(x::fmpz, y::T) where {T <: RingElem} = parent(y)(x)//y
+//(x::ZZRingElem, y::T) where {T <: RingElem} = parent(y)(x)//y
 
-function *(a::FracElem, b::fmpz)
+function *(a::FracElem, b::ZZRingElem)
    c = base_ring(a)(b)
    g = gcd(denominator(a), c)
    n = numerator(a)*divexact(c, g)
@@ -447,7 +447,7 @@ function *(a::FracElem, b::fmpz)
    return parent(a)(n, d)
 end
 
-function *(a::fmpz, b::FracElem)
+function *(a::ZZRingElem, b::FracElem)
    c = base_ring(b)(a)
    g = gcd(denominator(b), c)
    n = numerator(b)*divexact(c, g)
@@ -455,36 +455,36 @@ function *(a::fmpz, b::FracElem)
    return parent(b)(n, d)
 end
 
-function +(a::FracElem, b::fmpz)
+function +(a::FracElem, b::ZZRingElem)
    n = numerator(a) + denominator(a)*b
    d = denominator(a)
    g = gcd(n, d)
    return parent(a)(divexact(n, g), divexact(d, g))
 end
 
-function -(a::FracElem, b::fmpz)
+function -(a::FracElem, b::ZZRingElem)
    n = numerator(a) - denominator(a)*b
    d = denominator(a)
    g = gcd(n, d)
    return parent(a)(divexact(n, g), divexact(d, g))
 end
 
-+(a::fmpz, b::FracElem) = b + a
++(a::ZZRingElem, b::FracElem) = b + a
 
-function -(a::fmpz, b::FracElem)
+function -(a::ZZRingElem, b::FracElem)
    n = a*denominator(b) - numerator(b)
    d = denominator(b)
    g = gcd(n, d)
    return parent(b)(divexact(n, g), divexact(d, g))
 end
 
-function ==(x::FracElem, y::fmpz)
+function ==(x::FracElem, y::ZZRingElem)
    return (isone(denominator(x)) && numerator(x) == y) || (numerator(x) == denominator(x)*y)
 end
 
-==(x::fmpz, y::FracElem) = y == x
+==(x::ZZRingElem, y::FracElem) = y == x
 
-function divexact(a::FracElem, b::fmpz; check::Bool=true)
+function divexact(a::FracElem, b::ZZRingElem; check::Bool=true)
    iszero(b) && throw(DivideError())
    c = base_ring(a)(b)
    g = gcd(numerator(a), c)
@@ -493,7 +493,7 @@ function divexact(a::FracElem, b::fmpz; check::Bool=true)
    return parent(a)(n, d)
 end
 
-function divexact(a::fmpz, b::FracElem; check::Bool=true)
+function divexact(a::ZZRingElem, b::FracElem; check::Bool=true)
    iszero(b) && throw(DivideError())
    c = base_ring(b)(a)
    g = gcd(numerator(b), c)
@@ -502,7 +502,7 @@ function divexact(a::fmpz, b::FracElem; check::Bool=true)
    return parent(b)(n, d)
 end
 
-function (a::Generic.FracField{T})(b::fmpz) where {T <: RingElement}
+function (a::Generic.FracField{T})(b::ZZRingElem) where {T <: RingElement}
    z = Generic.Frac{T}(base_ring(a)(b), one(base_ring(a)))
    z.parent = a
    return z

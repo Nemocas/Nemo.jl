@@ -15,9 +15,9 @@ end
 
 @testset "arf.hecke_semantics" begin
     x = Nemo.arf_struct(0, 0, 0, 0)
-    y = fmpz(3)^100
+    y = ZZRingElem(3)^100
     ccall((:arf_set_fmpz, Nemo.libarb), Nothing,
-          (Ref{Nemo.arf_struct}, Ref{fmpz}),
+          (Ref{Nemo.arf_struct}, Ref{ZZRingElem}),
           x, y)
     ccall((:arf_clear, Nemo.libarb), Nothing,
           (Ref{Nemo.arf_struct},),
@@ -58,8 +58,8 @@ end
    a = 123
    b = -8162
    c = 0.12
-   @test fmpz(RR(a)) == a
-   @test_throws ErrorException fmpz(RR(c))
+   @test ZZRingElem(RR(a)) == a
+   @test_throws ErrorException ZZRingElem(RR(c))
    @test ZZ(RR(a)) == a
    @test_throws ErrorException ZZ(RR(c))
    @test BigInt(RR(a)) == a
@@ -148,7 +148,7 @@ end
 @testset "arb.adhoc_comparison" begin
    a = RR(3)
 
-   for T in [fmpz, fmpq, Int, BigInt, Float64, BigFloat, Rational{Int}, Rational{BigInt}]
+   for T in [ZZRingElem, QQFieldElem, Int, BigInt, Float64, BigFloat, Rational{Int}, Rational{BigInt}]
       @test a == T(3)
       @test !(a == T(4))
       @test a != T(4)
@@ -230,7 +230,7 @@ end
    @test x // y == 0.5
    @test x ^ y == 16
 
-   for T in [fmpz, fmpq, Int, BigInt, Rational{Int}, Rational{BigInt}]
+   for T in [ZZRingElem, QQFieldElem, Int, BigInt, Rational{Int}, Rational{BigInt}]
 
       @test x + T(4) == 6
       @test x - T(4) == -2
@@ -247,11 +247,11 @@ end
       @test contains(x + T(4), 6)
       @test contains(x - T(4), -2)
       @test contains(x * T(4), 8)
-      @test contains(x // T(4), fmpq(1, 2))
+      @test contains(x // T(4), QQFieldElem(1, 2))
       @test contains(T(2) + y, 6)
       @test contains(T(2) - y, -2)
       @test contains(T(2) * y, 8)
-      @test contains(T(2) // y, fmpq(1, 2))
+      @test contains(T(2) // y, QQFieldElem(1, 2))
       @test contains(x ^ T(4), 16)
    end
 end
@@ -319,12 +319,12 @@ end
    a = 2.3
    b = 2
    c = 3
-   @test floor(fmpz, RR(a)) == b
-   @test ceil(fmpz, RR(a)) == c
-   @test floor(fmpz, RR(-a)) == -c
-   @test ceil(fmpz, RR(-a)) == -b
-   @test typeof(floor(fmpz, RR(a))) == fmpz
-   @test typeof(ceil(fmpz, RR(a))) == fmpz
+   @test floor(ZZRingElem, RR(a)) == b
+   @test ceil(ZZRingElem, RR(a)) == c
+   @test floor(ZZRingElem, RR(-a)) == -c
+   @test ceil(ZZRingElem, RR(-a)) == -b
+   @test typeof(floor(ZZRingElem, RR(a))) == ZZRingElem
+   @test typeof(ceil(ZZRingElem, RR(a))) == ZZRingElem
 
    @test sqrt(RR(4)) == 2
    @test rsqrt(RR(4)) == 0.5
@@ -488,8 +488,8 @@ end
    @test overlaps(airy_bi_prime(x), RR("[0.9324359333927756329 +/- 7.75e-20]"))
 end
 
-@testset "fmpq.arb_special_functions" begin
-   @test bernoulli(10) == fmpz(5)//66
+@testset "QQFieldElem.arb_special_functions" begin
+   @test bernoulli(10) == ZZRingElem(5)//66
 
    b = bernoulli(100)
 
@@ -509,7 +509,7 @@ end
    a = abs(modular_weber_f2(tau))^2
    C = lindep([RR(1), a, a^2, a^3, a^4, a^5], 20)
 
-   @test C == fmpz[-1, 1, 1, 0, 1, 0]
+   @test C == ZZRingElem[-1, 1, 1, 0, 1, 0]
 end
 
 @testset "arb.simplest_rational_inside" begin

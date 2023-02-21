@@ -10,8 +10,8 @@ export fq_rel_series, FqRelSeriesRing,
        fq_nmod_rel_series, FqNmodRelSeriesRing
 
 for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
-   (fq_rel_series, FqRelSeriesRing, FqFiniteField, fq, "fq_poly", "fq"),
-   (fq_nmod_rel_series, FqNmodRelSeriesRing, FqNmodFiniteField, fq_nmod, "fq_nmod_poly", "fq_nmod"))
+   (fq_rel_series, FqRelSeriesRing, FqPolyRepField, FqPolyRepFieldElem, "FqPolyRepPolyRingElem", "FqPolyRepFieldElem"),
+   (fq_nmod_rel_series, FqNmodRelSeriesRing, fqPolyRepField, fqPolyRepFieldElem, "fqPolyRepPolyRingElem", "fqPolyRepFieldElem"))
 @eval begin
 
 ###############################################################################
@@ -518,7 +518,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::($etype), y::fq; check::Bool=true)
+function divexact(x::($etype), y::FqPolyRepFieldElem; check::Bool=true)
    iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
@@ -667,9 +667,9 @@ function fit!(z::($etype), n::Int)
    return nothing
 end
 
-function setcoeff!(z::($etype), n::Int, x::fmpz)
+function setcoeff!(z::($etype), n::Int, x::ZZRingElem)
    ccall(($(flint_fn*"_set_coeff_fmpz"), libflint), Nothing,
-                (Ref{($etype)}, Int, Ref{fmpz}, Ref{($ctype)}),
+                (Ref{($etype)}, Int, Ref{ZZRingElem}, Ref{($ctype)}),
                z, n, x, base_ring(z))
    return z
 end
@@ -814,7 +814,7 @@ end
 
 promote_rule(::Type{($etype)}, ::Type{T}) where {T <: Integer} = ($etype)
 
-promote_rule(::Type{($etype)}, ::Type{fmpz}) = ($etype)
+promote_rule(::Type{($etype)}, ::Type{ZZRingElem}) = ($etype)
 
 promote_rule(::Type{($etype)}, ::Type{($btype)}) = ($etype)
 
@@ -846,7 +846,7 @@ function (a::($rtype))(b::Integer)
    return z
 end
 
-function (a::($rtype))(b::fmpz)
+function (a::($rtype))(b::ZZRingElem)
    ctx = base_ring(a)
    if iszero(b)
       z = ($etype)(ctx)

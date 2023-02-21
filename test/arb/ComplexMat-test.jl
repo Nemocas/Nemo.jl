@@ -13,7 +13,7 @@ RR = RealField()
 
    @test isa(S, ComplexMatSpace)
 
-   f = S(fmpz(3))
+   f = S(ZZRingElem(3))
 
    @test isa(f, MatElem)
 
@@ -21,7 +21,7 @@ RR = RealField()
 
    @test isa(g, MatElem)
 
-   for T in [fmpz, fmpq, Int, UInt, BigInt, Rational{Int}, Rational{BigInt}, Float64, BigFloat]
+   for T in [ZZRingElem, QQFieldElem, Int, UInt, BigInt, Rational{Int}, Rational{BigInt}, Float64, BigFloat]
       k = S(map(T, [2 3 5; 1 4 7; 9 6 3]))
 
       @test isa(k, MatElem)
@@ -43,7 +43,7 @@ RR = RealField()
 
    @test isa(q, MatElem)
 
-   r = S(R([fmpz(2) 3 5; 1 4 7; 9 6 3]))
+   r = S(R([ZZRingElem(2) 3 5; 1 4 7; 9 6 3]))
 
    @test isa(r, MatElem)
 
@@ -61,7 +61,7 @@ RR = RealField()
    arr = [1 2; 3 4]
    arr2 = [1, 2, 3, 4, 5, 6]
 
-   for T in [fmpz, fmpq, Int, BigInt, Float64, BigFloat, RR, CC, string, Rational{Int}, Rational{BigInt}]
+   for T in [ZZRingElem, QQFieldElem, Int, BigInt, Float64, BigFloat, RR, CC, string, Rational{Int}, Rational{BigInt}]
       M = matrix(CC, map(T, arr))
       @test isa(M, ComplexMat)
       @test base_ring(M) == CC
@@ -96,7 +96,7 @@ end
 
 @testset "ComplexMat.similar" begin
    S = MatrixSpace(CC, 3, 3)
-   s = S(fmpz(3))
+   s = S(ZZRingElem(3))
 
    t = similar(s)
    @test t isa ComplexMat
@@ -123,7 +123,7 @@ end
 
 @testset "ComplexMat.printing" begin
    S = MatrixSpace(CC, 3, 3)
-   f = S(fmpz(3))
+   f = S(ZZRingElem(3))
 
    # test that default Julia printing is not used
    @test !occursin(string(typeof(f)), string(f))
@@ -131,13 +131,13 @@ end
 
 @testset "ComplexMat.manipulation" begin
    S = MatrixSpace(CC, 3, 3)
-   A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
-   B = S([fmpz(1) 4 7; 9 6 7; 4 3 3])
+   A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
+   B = S([ZZRingElem(1) 4 7; 9 6 7; 4 3 3])
 
    @test iszero(zero(S))
    @test isone(one(S))
 
-   B[1, 1] = fmpz(3)
+   B[1, 1] = ZZRingElem(3)
 
    @test B[1, 1] == CC(3)
 
@@ -191,8 +191,8 @@ end
    R = MatrixSpace(ZZ, 3, 3)
    T = MatrixSpace(QQ, 3, 3)
 
-   A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
-   B = R([fmpz(2) 3 5; 1 4 7; 9 6 3])
+   A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
+   B = R([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
    C = T([QQ(2) 3 5; 1 4 7; 9 6 3])
    q = QQ(1)//QQ(3)
    qq = 1//3
@@ -203,8 +203,8 @@ end
    @test contains(RR(12) + A, B + 12)
    @test contains(A + RR(12), B + 12)
 
-   @test contains(fmpz(11) + A, B + fmpz(11))
-   @test contains(A + fmpz(11), B + fmpz(11))
+   @test contains(ZZRingElem(11) + A, B + ZZRingElem(11))
+   @test contains(A + ZZRingElem(11), B + ZZRingElem(11))
 
    @test contains(A - 3, -(3 - B))
    @test contains(3 - A, 3 - B)
@@ -212,8 +212,8 @@ end
    @test contains(A - RR(3), -(3 - B))
    @test contains(RR(3) - A, 3 - B)
 
-   @test contains(A - fmpz(7), -(fmpz(7) - B))
-   @test contains(fmpz(7) - A, fmpz(7) - B)
+   @test contains(A - ZZRingElem(7), -(ZZRingElem(7) - B))
+   @test contains(ZZRingElem(7) - A, ZZRingElem(7) - B)
 
    @test contains(3*A, B*3)
    @test contains(A*3, B*3)
@@ -221,8 +221,8 @@ end
    @test contains(RR(3)*A, B*3)
    @test contains(A*RR(3), B*3)
 
-   @test contains(fmpz(3)*A, B*fmpz(3))
-   @test contains(A*fmpz(3), B*fmpz(3))
+   @test contains(ZZRingElem(3)*A, B*ZZRingElem(3))
+   @test contains(A*ZZRingElem(3), B*ZZRingElem(3))
 
    @test contains(q + A, C + q)
    @test contains(A + q, C + q)
@@ -242,7 +242,7 @@ end
    @test contains(qq*A, C*qq)
    @test contains(A*qq, C*qq)
 
-   for T in [Int, fmpz, BigInt, Rational{Int}, Rational{Integer}, RR]
+   for T in [Int, ZZRingElem, BigInt, Rational{Int}, Rational{Integer}, RR]
      @test contains(divexact(CC[2 0; 0 2], T(2)), identity_matrix(CC, 2))
    end
 end
@@ -289,15 +289,15 @@ end
 
    A = S([2 3 5; 1 4 7; 9 6 3])
    B = R([2 3 5; 1 4 7; 9 6 3])
-   C = T(fmpq[2 3 5; 1 4 7; 9 6 3])
+   C = T(QQFieldElem[2 3 5; 1 4 7; 9 6 3])
 
    @test contains(A, B)
    @test contains(A, C)
 
    @test S(12) == 12
    @test 12 == S(12)
-   @test S(5) == fmpz(5)
-   @test fmpz(5) == S(5)
+   @test S(5) == ZZRingElem(5)
+   @test ZZRingElem(5) == S(5)
 
    @test A == B
    @test B == A
@@ -346,7 +346,7 @@ end
    B = one(R)
 
    @test contains(divexact(A, 3), B)
-   @test contains(divexact(A, fmpz(3)), B)
+   @test contains(divexact(A, ZZRingElem(3)), B)
    @test contains(divexact(A, BigInt(3)), B)
    @test contains(divexact(A, Float64(3)), B)
    @test contains(divexact(A, BigFloat(3)), B)

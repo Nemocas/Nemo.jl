@@ -146,25 +146,25 @@ function contains(x::arb_poly, y::arb_poly)
 end
 
 @doc Markdown.doc"""
-    contains(x::arb_poly, y::fmpz_poly)
+    contains(x::arb_poly, y::ZZPolyRingElem)
 
 Return `true` if the coefficient balls of $x$ contain the corresponding
 exact coefficients of $y$, otherwise return `false`.
 """
-function contains(x::arb_poly, y::fmpz_poly)
+function contains(x::arb_poly, y::ZZPolyRingElem)
    return ccall((:arb_poly_contains_fmpz_poly, libarb), Bool,
-                                      (Ref{arb_poly}, Ref{fmpz_poly}), x, y)
+                                      (Ref{arb_poly}, Ref{ZZPolyRingElem}), x, y)
 end
 
 @doc Markdown.doc"""
-    contains(x::arb_poly, y::fmpq_poly)
+    contains(x::arb_poly, y::QQPolyRingElem)
 
 Return `true` if the coefficient balls of $x$ contain the corresponding
 exact coefficients of $y$, otherwise return `false`.
 """
-function contains(x::arb_poly, y::fmpq_poly)
+function contains(x::arb_poly, y::QQPolyRingElem)
    return ccall((:arb_poly_contains_fmpq_poly, libarb), Bool,
-                                      (Ref{arb_poly}, Ref{fmpq_poly}), x, y)
+                                      (Ref{arb_poly}, Ref{QQPolyRingElem}), x, y)
 end
 
 function ==(x::arb_poly, y::arb_poly)
@@ -196,9 +196,9 @@ contained in each of the coefficients of $x$, otherwise sets $t$ to `false`.
 In the former case, $z$ is set to the integer polynomial.
 """
 function unique_integer(x::arb_poly)
-  z = FmpzPolyRing(FlintZZ, var(parent(x)))()
+  z = ZZPolyRing(FlintZZ, var(parent(x)))()
   unique = ccall((:arb_poly_get_unique_fmpz_poly, libarb), Int,
-    (Ref{fmpz_poly}, Ref{arb_poly}), z, x)
+    (Ref{ZZPolyRingElem}, Ref{arb_poly}), z, x)
   return (unique != 0, z)
 end
 
@@ -281,7 +281,7 @@ end
 #
 ###############################################################################
 
-for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb, fmpz_poly, fmpq_poly]
+for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, arb, ZZPolyRingElem, QQPolyRingElem]
    @eval begin
       +(x::arb_poly, y::$T) = x + parent(x)(y)
 
@@ -315,7 +315,7 @@ end
 #
 ###############################################################################
 
-for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb]
+for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, arb]
    @eval begin
       divexact(x::arb_poly, y::$T; check::Bool=true) = x * inv(base_ring(parent(x))(y))
 
@@ -451,11 +451,11 @@ function evaluate2(x::arb_poly, y::acb)
    return z, w
 end
 
-function evaluate(x::arb_poly, y::Union{Int,Float64,fmpq})
+function evaluate(x::arb_poly, y::Union{Int,Float64,QQFieldElem})
     return evaluate(x, base_ring(parent(x))(y))
 end
 
-function evaluate(x::arb_poly, y::fmpz)
+function evaluate(x::arb_poly, y::ZZRingElem)
     return evaluate(x, base_ring(parent(x))(y))
 end
 
@@ -480,22 +480,22 @@ function evaluate2(x::arb_poly, y::Float64)
 end
 
 @doc Markdown.doc"""
-    evaluate2(x::arb_poly, y::fmpz)
+    evaluate2(x::arb_poly, y::ZZRingElem)
 
 Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
 its derivative evaluated at $y$.
 """
-function evaluate2(x::arb_poly, y::fmpz)
+function evaluate2(x::arb_poly, y::ZZRingElem)
     return evaluate2(x, base_ring(parent(x))(y))
 end
 
 @doc Markdown.doc"""
-    evaluate2(x::arb_poly, y::fmpq)
+    evaluate2(x::arb_poly, y::QQFieldElem)
 
 Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
 its derivative evaluated at $y$.
 """
-function evaluate2(x::arb_poly, y::fmpq)
+function evaluate2(x::arb_poly, y::QQFieldElem)
     return evaluate2(x, base_ring(parent(x))(y))
 end
 
@@ -680,9 +680,9 @@ function fit!(z::arb_poly, n::Int)
    return nothing
 end
 
-function setcoeff!(z::arb_poly, n::Int, x::fmpz)
+function setcoeff!(z::arb_poly, n::Int, x::ZZRingElem)
    ccall((:arb_poly_set_coeff_fmpz, libarb), Nothing,
-                    (Ref{arb_poly}, Int, Ref{fmpz}), z, n, x)
+                    (Ref{arb_poly}, Int, Ref{ZZRingElem}), z, n, x)
    return z
 end
 
@@ -723,15 +723,15 @@ promote_rule(::Type{arb_poly}, ::Type{Float64}) = arb_poly
 
 promote_rule(::Type{arb_poly}, ::Type{BigFloat}) = arb_poly
 
-promote_rule(::Type{arb_poly}, ::Type{fmpz}) = arb_poly
+promote_rule(::Type{arb_poly}, ::Type{ZZRingElem}) = arb_poly
 
-promote_rule(::Type{arb_poly}, ::Type{fmpq}) = arb_poly
+promote_rule(::Type{arb_poly}, ::Type{QQFieldElem}) = arb_poly
 
 promote_rule(::Type{arb_poly}, ::Type{arb}) = arb_poly
 
-promote_rule(::Type{arb_poly}, ::Type{fmpz_poly}) = arb_poly
+promote_rule(::Type{arb_poly}, ::Type{ZZPolyRingElem}) = arb_poly
 
-promote_rule(::Type{arb_poly}, ::Type{fmpq_poly}) = arb_poly
+promote_rule(::Type{arb_poly}, ::Type{QQPolyRingElem}) = arb_poly
 
 promote_rule(::Type{arb_poly}, ::Type{T}) where {T <: Integer} = arb_poly
 
@@ -749,7 +749,7 @@ function (a::ArbPolyRing)()
    return z
 end
 
-for T in [Integer, fmpz, fmpq, Float64, arb, BigFloat]
+for T in [Integer, ZZRingElem, QQFieldElem, Float64, arb, BigFloat]
    @eval begin
       function (a::ArbPolyRing)(b::$T)
          z = arb_poly(base_ring(a)(b), a.base_ring.prec)
@@ -771,7 +771,7 @@ function (a::ArbPolyRing)(b::Vector{arb})
    return z
 end
 
-for T in [fmpz, fmpq, Float64, BigFloat]
+for T in [ZZRingElem, QQFieldElem, Float64, BigFloat]
    @eval begin
       (a::ArbPolyRing)(b::Vector{$T}) = a(map(base_ring(a), b))
    end
@@ -781,13 +781,13 @@ end
 
 (a::ArbPolyRing)(b::Vector{Rational{T}}) where {T <: Integer} = a(map(base_ring(a), b))
 
-function (a::ArbPolyRing)(b::fmpz_poly)
+function (a::ArbPolyRing)(b::ZZPolyRingElem)
    z = arb_poly(b, a.base_ring.prec)
    z.parent = a
    return z
 end
 
-function (a::ArbPolyRing)(b::fmpq_poly)
+function (a::ArbPolyRing)(b::QQPolyRingElem)
    z = arb_poly(b, a.base_ring.prec)
    z.parent = a
    return z
@@ -811,7 +811,7 @@ end
 
 function PolynomialRing(R::ArbField, s::Symbol; cached = true)
   parent_obj = ArbPolyRing(R, s, cached)
-  return parent_obj, parent_obj(fmpz_poly([fmpz(0), fmpz(1)]))
+  return parent_obj, parent_obj(ZZPolyRingElem([ZZRingElem(0), ZZRingElem(1)]))
 end
 
 function PolynomialRing(R::ArbField, s::AbstractString; cached = true)

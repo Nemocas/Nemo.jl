@@ -5,7 +5,7 @@
 ###############################################################################
 
 export qqbar, CalciumQQBar, CalciumQQBarField, is_algebraic_integer, rand, abs2,
-       csgn, sign_real, sign_imag, fmpq, fmpz, exp_pi_i, atanpi, asinpi, acospi,
+       csgn, sign_real, sign_imag, QQFieldElem, ZZRingElem, exp_pi_i, atanpi, asinpi, acospi,
        conjugates, eigenvalues, guess, root_of_unity_as_args, is_root_of_unity,
        log_pi_i, rand
 
@@ -66,17 +66,17 @@ function qqbar(a::Complex{Int})
   return z
 end
 
-function qqbar(a::fmpz)
+function qqbar(a::ZZRingElem)
    z = qqbar()
    ccall((:qqbar_set_fmpz, libcalcium),
-        Nothing, (Ref{qqbar}, Ref{fmpz}, ), z, a)
+        Nothing, (Ref{qqbar}, Ref{ZZRingElem}, ), z, a)
    return z
 end
 
-function qqbar(a::fmpq)
+function qqbar(a::QQFieldElem)
    z = qqbar()
    ccall((:qqbar_set_fmpq, libcalcium),
-        Nothing, (Ref{qqbar}, Ref{fmpq}, ), z, a)
+        Nothing, (Ref{qqbar}, Ref{QQFieldElem}, ), z, a)
    return z
 end
 
@@ -124,14 +124,14 @@ function qqbar_vec_clear(v::Ptr{qqbar_struct}, n::Int)
         Nothing, (Ptr{qqbar_struct}, Int), v, n)
 end
 
-function roots(f::fmpz_poly, R::CalciumQQBarField)
+function roots(f::ZZPolyRingElem, R::CalciumQQBarField)
    deg = degree(f)
    if deg <= 0
       return Array{qqbar}(undef, 0)
    end
    roots = qqbar_vec(deg)
    ccall((:qqbar_roots_fmpz_poly, libcalcium),
-        Nothing, (Ptr{qqbar_struct}, Ref{fmpz_poly}, Int), roots, f, 0)
+        Nothing, (Ptr{qqbar_struct}, Ref{ZZPolyRingElem}, Int), roots, f, 0)
    res = array(R, roots, deg)
    qqbar_vec_clear(roots, deg)
    return res
@@ -240,26 +240,26 @@ function is_algebraic_integer(x::qqbar)
 end
 
 @doc Markdown.doc"""
-    minpoly(R::FmpzPolyRing, x::qqbar)
+    minpoly(R::ZZPolyRing, x::qqbar)
 
 Return the minimal polynomial of `x` as an element of the polynomial ring `R`.
 """
-function minpoly(R::FmpzPolyRing, x::qqbar)
+function minpoly(R::ZZPolyRing, x::qqbar)
    z = R()
    ccall((:fmpz_poly_set, libflint),
-        Nothing, (Ref{fmpz_poly}, Ref{qqbar}, ), z, x)
+        Nothing, (Ref{ZZPolyRingElem}, Ref{qqbar}, ), z, x)
    return z
 end
 
 @doc Markdown.doc"""
-    minpoly(R::FmpzPolyRing, x::qqbar)
+    minpoly(R::ZZPolyRing, x::qqbar)
 
 Return the minimal polynomial of `x` as an element of the polynomial ring `R`.
 """
-function minpoly(R::FmpqPolyRing, x::qqbar)
+function minpoly(R::QQPolyRing, x::qqbar)
    z = R()
    ccall((:fmpq_poly_set_fmpz_poly, libflint),
-        Nothing, (Ref{fmpq_poly}, Ref{qqbar}, ), z, x)
+        Nothing, (Ref{QQPolyRingElem}, Ref{qqbar}, ), z, x)
    return z
 end
 
@@ -267,13 +267,13 @@ end
     denominator(x::qqbar)
 
 Return the denominator of `x`, defined as the leading coefficient of the
-minimal polynomial of `x`. The result is returned as an `fmpz`.
+minimal polynomial of `x`. The result is returned as an `ZZRingElem`.
 """
 function denominator(x::qqbar)
    d = degree(x)
-   q = fmpz()
+   q = ZZRingElem()
    ccall((:fmpz_poly_get_coeff_fmpz, libflint),
-        Nothing, (Ref{fmpz}, Ref{qqbar}, Int), q, x, d)
+        Nothing, (Ref{ZZRingElem}, Ref{qqbar}, Int), q, x, d)
    return q
 end
 
@@ -290,11 +290,11 @@ end
 @doc Markdown.doc"""
     height(x::qqbar)
 
-Return the height of the algebraic number `x`. The result is an `fmpz` integer.
+Return the height of the algebraic number `x`. The result is an `ZZRingElem` integer.
 """
 function height(x::qqbar)
-   z = fmpz()
-   ccall((:qqbar_height, libcalcium), Nothing, (Ref{fmpz}, Ref{qqbar}, ), z, x)
+   z = ZZRingElem()
+   ccall((:qqbar_height, libcalcium), Nothing, (Ref{ZZRingElem}, Ref{qqbar}, ), z, x)
    return z
 end
 
@@ -374,17 +374,17 @@ function +(a::qqbar, b::qqbar)
    return z
 end
 
-function +(a::qqbar, b::fmpq)
+function +(a::qqbar, b::QQFieldElem)
    z = qqbar()
    ccall((:qqbar_add_fmpq, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Ref{fmpq}), z, a, b)
+         (Ref{qqbar}, Ref{qqbar}, Ref{QQFieldElem}), z, a, b)
    return z
 end
 
-function +(a::qqbar, b::fmpz)
+function +(a::qqbar, b::ZZRingElem)
    z = qqbar()
    ccall((:qqbar_add_fmpz, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Ref{fmpz}), z, a, b)
+         (Ref{qqbar}, Ref{qqbar}, Ref{ZZRingElem}), z, a, b)
    return z
 end
 
@@ -395,8 +395,8 @@ function +(a::qqbar, b::Int)
    return z
 end
 
-+(a::fmpq, b::qqbar) = b + a
-+(a::fmpz, b::qqbar) = b + a
++(a::QQFieldElem, b::qqbar) = b + a
++(a::ZZRingElem, b::qqbar) = b + a
 +(a::Int, b::qqbar) = b + a
 
 function -(a::qqbar, b::qqbar)
@@ -406,17 +406,17 @@ function -(a::qqbar, b::qqbar)
    return z
 end
 
-function -(a::qqbar, b::fmpq)
+function -(a::qqbar, b::QQFieldElem)
    z = qqbar()
    ccall((:qqbar_sub_fmpq, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Ref{fmpq}), z, a, b)
+         (Ref{qqbar}, Ref{qqbar}, Ref{QQFieldElem}), z, a, b)
    return z
 end
 
-function -(a::qqbar, b::fmpz)
+function -(a::qqbar, b::ZZRingElem)
    z = qqbar()
    ccall((:qqbar_sub_fmpz, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Ref{fmpz}), z, a, b)
+         (Ref{qqbar}, Ref{qqbar}, Ref{ZZRingElem}), z, a, b)
    return z
 end
 
@@ -427,17 +427,17 @@ function -(a::qqbar, b::Int)
    return z
 end
 
-function -(a::fmpq, b::qqbar)
+function -(a::QQFieldElem, b::qqbar)
    z = qqbar()
    ccall((:qqbar_fmpq_sub, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{fmpq}, Ref{qqbar}), z, a, b)
+         (Ref{qqbar}, Ref{QQFieldElem}, Ref{qqbar}), z, a, b)
    return z
 end
 
-function -(a::fmpz, b::qqbar)
+function -(a::ZZRingElem, b::qqbar)
    z = qqbar()
    ccall((:qqbar_fmpz_sub, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{fmpz}, Ref{qqbar}), z, a, b)
+         (Ref{qqbar}, Ref{ZZRingElem}, Ref{qqbar}), z, a, b)
    return z
 end
 
@@ -455,17 +455,17 @@ function *(a::qqbar, b::qqbar)
    return z
 end
 
-function *(a::qqbar, b::fmpq)
+function *(a::qqbar, b::QQFieldElem)
    z = qqbar()
    ccall((:qqbar_mul_fmpq, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Ref{fmpq}), z, a, b)
+         (Ref{qqbar}, Ref{qqbar}, Ref{QQFieldElem}), z, a, b)
    return z
 end
 
-function *(a::qqbar, b::fmpz)
+function *(a::qqbar, b::ZZRingElem)
    z = qqbar()
    ccall((:qqbar_mul_fmpz, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Ref{fmpz}), z, a, b)
+         (Ref{qqbar}, Ref{qqbar}, Ref{ZZRingElem}), z, a, b)
    return z
 end
 
@@ -476,8 +476,8 @@ function *(a::qqbar, b::Int)
    return z
 end
 
-*(a::fmpq, b::qqbar) = b * a
-*(a::fmpz, b::qqbar) = b * a
+*(a::QQFieldElem, b::qqbar) = b * a
+*(a::ZZRingElem, b::qqbar) = b * a
 *(a::Int, b::qqbar) = b * a
 
 function ^(a::qqbar, b::qqbar)
@@ -489,11 +489,11 @@ function ^(a::qqbar, b::qqbar)
 end
 
 # todo: want qqbar_pow_fmpz, qqbar_pow_fmpq, qqbar_pow_si
-^(a::qqbar, b::fmpz) = a ^ qqbar(b)
-^(a::qqbar, b::fmpq) = a ^ qqbar(b)
+^(a::qqbar, b::ZZRingElem) = a ^ qqbar(b)
+^(a::qqbar, b::QQFieldElem) = a ^ qqbar(b)
 ^(a::qqbar, b::Int) = a ^ qqbar(b)
-^(a::fmpz, b::qqbar) = qqbar(a) ^ b
-^(a::fmpq, b::qqbar) = qqbar(a) ^ b
+^(a::ZZRingElem, b::qqbar) = qqbar(a) ^ b
+^(a::QQFieldElem, b::qqbar) = qqbar(a) ^ b
 ^(a::Int, b::qqbar) = qqbar(a) ^ b
 
 ###############################################################################
@@ -517,19 +517,19 @@ function divexact(a::qqbar, b::qqbar; check::Bool=true)
    return z
 end
 
-function divexact(a::qqbar, b::fmpq; check::Bool=true)
+function divexact(a::qqbar, b::QQFieldElem; check::Bool=true)
    iszero(b) && throw(DivideError())
    z = qqbar()
    ccall((:qqbar_div_fmpq, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Ref{fmpq}), z, a, b)
+         (Ref{qqbar}, Ref{qqbar}, Ref{QQFieldElem}), z, a, b)
    return z
 end
 
-function divexact(a::qqbar, b::fmpz; check::Bool=true)
+function divexact(a::qqbar, b::ZZRingElem; check::Bool=true)
    iszero(b) && throw(DivideError())
    z = qqbar()
    ccall((:qqbar_div_fmpz, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Ref{fmpz}), z, a, b)
+         (Ref{qqbar}, Ref{qqbar}, Ref{ZZRingElem}), z, a, b)
    return z
 end
 
@@ -541,19 +541,19 @@ function divexact(a::qqbar, b::Int; check::Bool=true)
    return z
 end
 
-function divexact(a::fmpq, b::qqbar; check::Bool=true)
+function divexact(a::QQFieldElem, b::qqbar; check::Bool=true)
    iszero(b) && throw(DivideError())
    z = qqbar()
    ccall((:qqbar_fmpq_div, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{fmpq}, Ref{qqbar}), z, a, b)
+         (Ref{qqbar}, Ref{QQFieldElem}, Ref{qqbar}), z, a, b)
    return z
 end
 
-function divexact(a::fmpz, b::qqbar; check::Bool=true)
+function divexact(a::ZZRingElem, b::qqbar; check::Bool=true)
    iszero(b) && throw(DivideError())
    z = qqbar()
    ccall((:qqbar_fmpz_div, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{fmpz}, Ref{qqbar}), z, a, b)
+         (Ref{qqbar}, Ref{ZZRingElem}, Ref{qqbar}), z, a, b)
    return z
 end
 
@@ -566,11 +566,11 @@ function divexact(a::Int, b::qqbar; check::Bool=true)
 end
 
 //(a::qqbar, b::qqbar) = divexact(a, b)
-//(a::qqbar, b::fmpq) = divexact(a, b)
-//(a::qqbar, b::fmpz) = divexact(a, b)
+//(a::qqbar, b::QQFieldElem) = divexact(a, b)
+//(a::qqbar, b::ZZRingElem) = divexact(a, b)
 //(a::qqbar, b::Int) = divexact(a, b)
-//(a::fmpq, b::qqbar) = divexact(a, b)
-//(a::fmpz, b::qqbar) = divexact(a, b)
+//(a::QQFieldElem, b::qqbar) = divexact(a, b)
+//(a::ZZRingElem, b::qqbar) = divexact(a, b)
 //(a::Int, b::qqbar) = divexact(a, b)
 
 
@@ -594,17 +594,17 @@ end
 #
 ###############################################################################
 
-function evaluate(x::fmpq_poly, y::qqbar)
+function evaluate(x::QQPolyRingElem, y::qqbar)
    z = qqbar()
    ccall((:qqbar_evaluate_fmpq_poly, libcalcium), Nothing,
-                (Ref{qqbar}, Ref{fmpq_poly}, Ref{qqbar}), z, x, y)
+                (Ref{qqbar}, Ref{QQPolyRingElem}, Ref{qqbar}), z, x, y)
    return z
 end
 
-function evaluate(x::fmpz_poly, y::qqbar)
+function evaluate(x::ZZPolyRingElem, y::qqbar)
    z = qqbar()
    ccall((:qqbar_evaluate_fmpz_poly, libcalcium), Nothing,
-                (Ref{qqbar}, Ref{fmpz_poly}, Ref{qqbar}), z, x, y)
+                (Ref{qqbar}, Ref{ZZPolyRingElem}, Ref{qqbar}), z, x, y)
    return z
 end
 
@@ -627,11 +627,11 @@ function cmp(a::qqbar, b::qqbar)
 end
 
 isless(a::qqbar, b::qqbar) = cmp(a, b) < 0
-isless(a::qqbar, b::fmpz) = isless(a, qqbar(b))
-isless(a::qqbar, b::fmpq) = isless(a, qqbar(b))
+isless(a::qqbar, b::ZZRingElem) = isless(a, qqbar(b))
+isless(a::qqbar, b::QQFieldElem) = isless(a, qqbar(b))
 isless(a::qqbar, b::Int) = isless(a, qqbar(b))
-isless(a::fmpq, b::qqbar) = isless(qqbar(a), b)
-isless(a::fmpz, b::qqbar) = isless(qqbar(a), b)
+isless(a::QQFieldElem, b::qqbar) = isless(qqbar(a), b)
+isless(a::ZZRingElem, b::qqbar) = isless(qqbar(a), b)
 isless(a::Int, b::qqbar) = isless(qqbar(a), b)
 
 # todo: export the cmp functions?
@@ -838,24 +838,24 @@ end
 @doc Markdown.doc"""
     floor(a::qqbar)
 
-Return the floor function of `a` as an algebraic number. Use `fmpz(floor(a))`
+Return the floor function of `a` as an algebraic number. Use `ZZRingElem(floor(a))`
 to construct a Nemo integer instead.
 """
 function floor(a::qqbar)
-   z = fmpz()
-   ccall((:qqbar_floor, libcalcium), Nothing, (Ref{fmpz}, Ref{qqbar}, ), z, a)
+   z = ZZRingElem()
+   ccall((:qqbar_floor, libcalcium), Nothing, (Ref{ZZRingElem}, Ref{qqbar}, ), z, a)
    return qqbar(z)
 end
 
 @doc Markdown.doc"""
     ceil(a::qqbar)
 
-Return the ceiling function of `b` as an algebraic number. Use `fmpz(ceil(a))`
+Return the ceiling function of `b` as an algebraic number. Use `ZZRingElem(ceil(a))`
 to construct a Nemo integer instead.
 """
 function ceil(a::qqbar)
-   z = fmpz()
-   ccall((:qqbar_ceil, libcalcium), Nothing, (Ref{fmpz}, Ref{qqbar}, ), z, a)
+   z = ZZRingElem()
+   ccall((:qqbar_ceil, libcalcium), Nothing, (Ref{ZZRingElem}, Ref{qqbar}, ), z, a)
    return qqbar(z)
 end
 
@@ -911,42 +911,42 @@ function qqbar_vec_clear(v::Ptr{qqbar_struct}, n::Int)
 end
 
 @doc Markdown.doc"""
-    roots(f::fmpz_poly, R::CalciumQQBarField)
+    roots(f::ZZPolyRingElem, R::CalciumQQBarField)
 
 Return all the roots of the polynomial `f` in the field of algebraic
 numbers `R`. The output array is sorted in the default sort order for
 algebraic numbers. Roots of multiplicity higher than one are repeated
 according to their multiplicity.
 """
-function roots(f::fmpz_poly, R::CalciumQQBarField)
+function roots(f::ZZPolyRingElem, R::CalciumQQBarField)
    deg = degree(f)
    if deg <= 0
       return Array{qqbar}(undef, 0)
    end
    roots = qqbar_vec(deg)
    ccall((:qqbar_roots_fmpz_poly, libcalcium),
-        Nothing, (Ptr{qqbar_struct}, Ref{fmpz_poly}, Int), roots, f, 0)
+        Nothing, (Ptr{qqbar_struct}, Ref{ZZPolyRingElem}, Int), roots, f, 0)
    res = array(R, roots, deg)
    qqbar_vec_clear(roots, deg)
    return res
 end
 
 @doc Markdown.doc"""
-    roots(f::fmpq_poly, R::CalciumQQBarField)
+    roots(f::QQPolyRingElem, R::CalciumQQBarField)
 
 Return all the roots of the polynomial `f` in the field of algebraic
 numbers `R`. The output array is sorted in the default sort order for
 algebraic numbers. Roots of multiplicity higher than one are repeated
 according to their multiplicity.
 """
-function roots(f::fmpq_poly, R::CalciumQQBarField)
+function roots(f::QQPolyRingElem, R::CalciumQQBarField)
    deg = degree(f)
    if deg <= 0
       return Array{qqbar}(undef, 0)
    end
    roots = qqbar_vec(deg)
    ccall((:qqbar_roots_fmpq_poly, libcalcium),
-        Nothing, (Ptr{qqbar_struct}, Ref{fmpq_poly}, Int), roots, f, 0)
+        Nothing, (Ptr{qqbar_struct}, Ref{QQPolyRingElem}, Int), roots, f, 0)
    res = array(R, roots, deg)
    qqbar_vec_clear(roots, deg)
    return res
@@ -973,14 +973,14 @@ function conjugates(a::qqbar)
 end
 
 @doc Markdown.doc"""
-    eigenvalues(A::fmpz_mat, R::CalciumQQBarField)
+    eigenvalues(A::ZZMatrix, R::CalciumQQBarField)
 
 Return all the eigenvalues of the matrix `A` in the field of algebraic
 numbers `R`. The output array is sorted in the default sort order for
 algebraic numbers. Eigenvalues of multiplicity higher than one are repeated
 according to their multiplicity.
 """
-function eigenvalues(A::fmpz_mat, R::CalciumQQBarField)
+function eigenvalues(A::ZZMatrix, R::CalciumQQBarField)
    n = nrows(A)
    !is_square(A) && throw(DomainError(A, "a square matrix is required"))
    if n == 0
@@ -988,21 +988,21 @@ function eigenvalues(A::fmpz_mat, R::CalciumQQBarField)
    end
    roots = qqbar_vec(n)
    ccall((:qqbar_eigenvalues_fmpz_mat, libcalcium),
-        Nothing, (Ptr{qqbar_struct}, Ref{fmpz_mat}, Int), roots, A, 0)
+        Nothing, (Ptr{qqbar_struct}, Ref{ZZMatrix}, Int), roots, A, 0)
    res = array(R, roots, n)
    qqbar_vec_clear(roots, n)
    return res
 end
 
 @doc Markdown.doc"""
-    eigenvalues(A::fmpq_mat, R::CalciumQQBarField)
+    eigenvalues(A::QQMatrix, R::CalciumQQBarField)
 
 Return all the eigenvalues of the matrix `A` in the field of algebraic
 numbers `R`. The output array is sorted in the default sort order for
 algebraic numbers. Eigenvalues of multiplicity higher than one are repeated
 according to their multiplicity.
 """
-function eigenvalues(A::fmpq_mat, R::CalciumQQBarField)
+function eigenvalues(A::QQMatrix, R::CalciumQQBarField)
    n = nrows(A)
    !is_square(A) && throw(DomainError(A, "a square matrix is required"))
    if n == 0
@@ -1010,7 +1010,7 @@ function eigenvalues(A::fmpq_mat, R::CalciumQQBarField)
    end
    roots = qqbar_vec(n)
    ccall((:qqbar_eigenvalues_fmpq_mat, libcalcium),
-        Nothing, (Ptr{qqbar_struct}, Ref{fmpq_mat}, Int), roots, A, 0)
+        Nothing, (Ptr{qqbar_struct}, Ref{QQMatrix}, Int), roots, A, 0)
    res = array(R, roots, n)
    qqbar_vec_clear(roots, n)
    return res
@@ -1084,7 +1084,7 @@ Return $e^{\pi i a}$ as an algebraic number.
 Throws if this value is transcendental.
 """
 function exp_pi_i(a::qqbar)
-   r = fmpq(a)
+   r = QQFieldElem(a)
    p = Int(numerator(r))
    q = Int(denominator(r))
    z = qqbar()
@@ -1100,7 +1100,7 @@ Return $\sin(\pi a)$ as an algebraic number.
 Throws if this value is transcendental.
 """
 function sinpi(a::qqbar)
-   r = fmpq(a)
+   r = QQFieldElem(a)
    p = Int(numerator(r))
    q = Int(denominator(r))
    z = qqbar()
@@ -1115,7 +1115,7 @@ Return $\cos(\pi a)$ as an algebraic number.
 Throws if this value is transcendental.
 """
 function cospi(a::qqbar)
-   r = fmpq(a)
+   r = QQFieldElem(a)
    p = Int(numerator(r))
    q = Int(denominator(r))
    z = qqbar()
@@ -1130,7 +1130,7 @@ Return $\tan(\pi a)$ as an algebraic number.
 Throws if this value is transcendental or undefined.
 """
 function tanpi(a::qqbar)
-   r = fmpq(a)
+   r = QQFieldElem(a)
    p = Int(numerator(r))
    q = Int(denominator(r))
    z = qqbar()
@@ -1310,35 +1310,35 @@ end
 
 # todo: provide qqbar_get_fmpq, qqbar_get_fmpz in C
 @doc Markdown.doc"""
-    fmpq(a::qqbar)
+    QQFieldElem(a::qqbar)
 
-Convert `a` to a rational number of type `fmpq`.
+Convert `a` to a rational number of type `QQFieldElem`.
 Throws if `a` is not a rational number.
 """
-function fmpq(a::qqbar)
+function QQFieldElem(a::qqbar)
    !is_rational(a) && throw(DomainError(a, "nonrational algebraic number"))
-   p = fmpz()
-   q = fmpz()
+   p = ZZRingElem()
+   q = ZZRingElem()
    ccall((:fmpz_poly_get_coeff_fmpz, libflint),
-        Nothing, (Ref{fmpz}, Ref{qqbar}, Int), p, a, 0)
+        Nothing, (Ref{ZZRingElem}, Ref{qqbar}, Int), p, a, 0)
    ccall((:fmpz_poly_get_coeff_fmpz, libflint),
-        Nothing, (Ref{fmpz}, Ref{qqbar}, Int), q, a, 1)
-   ccall((:fmpz_neg, libflint), Nothing, (Ref{fmpz}, Ref{fmpz}), p, p)
+        Nothing, (Ref{ZZRingElem}, Ref{qqbar}, Int), q, a, 1)
+   ccall((:fmpz_neg, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}), p, p)
    return p // q
 end
 
 @doc Markdown.doc"""
-    fmpz(a::qqbar)
+    ZZRingElem(a::qqbar)
 
-Convert `a` to an integer of type `fmpz`.
+Convert `a` to an integer of type `ZZRingElem`.
 Throws if `a` is not an integer.
 """
-function fmpz(a::qqbar)
+function ZZRingElem(a::qqbar)
    !isinteger(a) && throw(DomainError(a, "noninteger algebraic number"))
-   z = fmpz()
+   z = ZZRingElem()
    ccall((:fmpz_poly_get_coeff_fmpz, libflint),
-        Nothing, (Ref{fmpz}, Ref{qqbar}, Int), z, a, 0)
-   ccall((:fmpz_neg, libflint), Nothing, (Ref{fmpz}, Ref{fmpz}), z, z)
+        Nothing, (Ref{ZZRingElem}, Ref{qqbar}, Int), z, a, 0)
+   ccall((:fmpz_neg, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}), z, z)
    return z
 end
 
@@ -1383,11 +1383,11 @@ end
 
 (a::CalciumQQBarField)(b::Complex{Int}) = qqbar(b)
 
-(a::CalciumQQBarField)(b::fmpz) = qqbar(b)
+(a::CalciumQQBarField)(b::ZZRingElem) = qqbar(b)
 
-(a::CalciumQQBarField)(b::Integer) = qqbar(fmpz(b))
+(a::CalciumQQBarField)(b::Integer) = qqbar(ZZRingElem(b))
 
-(a::CalciumQQBarField)(b::fmpq) = qqbar(b)
+(a::CalciumQQBarField)(b::QQFieldElem) = qqbar(b)
 
 (a::CalciumQQBarField)(b::qqbar) = b
 

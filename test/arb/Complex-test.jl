@@ -14,7 +14,7 @@ CC = ComplexField()
 #   @test ComplexField(10, cached = true) === ComplexField(10, cached = true)
 #   @test ComplexField(11, cached = false) !== ComplexField(11, cached = false)
 
-   for T in [Int32, Int, BigInt, Complex{Int}, Complex{Float64}, Rational{Int}, Rational{BigInt}, Float64, BigFloat, fmpz, fmpq, RealElem]
+   for T in [Int32, Int, BigInt, Complex{Int}, Complex{Float64}, Rational{Int}, Rational{BigInt}, Float64, BigFloat, ZZRingElem, QQFieldElem, RealElem]
      @test ComplexElem === Nemo.promote_rule(ComplexElem, T)
    end
 end
@@ -141,7 +141,7 @@ end
    @test x * y == 8
    @test x // y == 0.5
 
-   for T in [fmpz, fmpq, Int, BigInt, Rational{Int}, Rational{BigInt}]
+   for T in [ZZRingElem, QQFieldElem, Int, BigInt, Rational{Int}, Rational{BigInt}]
 
       @test x + T(4) == 6
       @test x - T(4) == -2
@@ -158,11 +158,11 @@ end
       @test contains(x + T(4), 6)
       @test contains(x - T(4), -2)
       @test contains(x * T(4), 8)
-      @test contains(x // T(4), fmpq(1, 2))
+      @test contains(x // T(4), QQFieldElem(1, 2))
       @test contains(T(2) + y, 6)
       @test contains(T(2) - y, -2)
       @test contains(T(2) * y, 8)
-      @test contains(T(2) // y, fmpq(1, 2))
+      @test contains(T(2) // y, QQFieldElem(1, 2))
       @test contains(x ^ T(4), 16)
    end
 end
@@ -434,7 +434,7 @@ end
    @test overlaps(prod_sqr, CC(2))
 end
 
-@testset "ComplexElem.fmpz_poly" begin
+@testset "ComplexElem.ZZPolyRingElem" begin
    R, x = PolynomialRing(ZZ, "x")
    @test hilbert_class_polynomial(-3, R) == x
    @test_throws ArgumentError hilbert_class_polynomial(2, R)

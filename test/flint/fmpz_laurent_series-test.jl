@@ -15,7 +15,7 @@
 
    @test isa(b1, fmpz_laurent_series)
 
-   c1 = R(fmpz[1, 3, 5], 3, 5, 0, 1)
+   c1 = R(ZZRingElem[1, 3, 5], 3, 5, 0, 1)
 
    @test isa(c1, fmpz_laurent_series)
 

@@ -30,28 +30,28 @@ mutable struct _fmpz_mat22
 end
 
 function steal_fmpz_data(data::Int)
-   z = @new_struct(fmpz, data)
+   z = @new_struct(ZZRingElem, data)
    finalizer(Nemo._fmpz_clear_fn, z)
    return z
 end
 
-function steal_data!(z::fmpz)
+function steal_data!(z::ZZRingElem)
    r = z.d
    z.d = 0
    return r
 end
 
-function copy_data(a::fmpz)
+function copy_data(a::ZZRingElem)
    z = Ref(0)
    ccall((:fmpz_init_set, libflint), Nothing,
-         (Ref{Int}, Ref{fmpz}),
+         (Ref{Int}, Ref{ZZRingElem}),
          z, a)
    return z[]
 end
 
-function shift_right!(z::fmpz, a::fmpz, b::Union{Int, UInt})
+function shift_right!(z::ZZRingElem, a::ZZRingElem, b::Union{Int, UInt})
    ccall((:fmpz_fdiv_q_2exp, libflint), Nothing,
-         (Ref{fmpz}, Ref{fmpz}, UInt),
+         (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt),
          z, a, UInt(b))
    return z
 end
@@ -63,15 +63,15 @@ end
 #
 # Simple fact: If I is a finite interval containing an integer with I > 1,
 #     then for any z in I, either the first or second convergent of z is in I.
-function _shortest_l_infinity(c::fmpz, b::fmpz, a::fmpz)
+function _shortest_l_infinity(c::ZZRingElem, b::ZZRingElem, a::ZZRingElem)
    @assert c > 0 && a > b && b >= 0
-   t1 = fmpz(0)
-   t2 = fmpz(1)
-   t3 = fmpz(-1)
+   t1 = ZZRingElem(0)
+   t2 = ZZRingElem(1)
+   t3 = ZZRingElem(-1)
    b_plus_c = b + c
    b_minus_c = b - c
    if a <= c
-      return (fmpz(0), a), (t1, t2)
+      return (ZZRingElem(0), a), (t1, t2)
    elseif b_minus_c <= 0
       return (c, b), (t2, t1)
    elseif a <= b_plus_c
@@ -151,23 +151,23 @@ function _shortest_l_infinity(c::fmpz, b::fmpz, a::fmpz)
 end
 
 # return shortest vector in the ZZ rowspace along with the ZZ's in that linear combo
-function shortest_l_infinity_with_transform(m::fmpz_mat)
+function shortest_l_infinity_with_transform(m::ZZMatrix)
    ncols(m) == 2 || error("not implemented in $(ncols(m)) dimensions")
    r = nrows(m)
    if r < 1
-      return fmpz[fmpz(0), fmpz(0)], fmpz[]
+      return ZZRingElem[ZZRingElem(0), ZZRingElem(0)], ZZRingElem[]
    elseif r == 1
-      return fmpz[m[1,1], m[1,2]], fmpz[fmpz(1)]
+      return ZZRingElem[m[1,1], m[1,2]], ZZRingElem[ZZRingElem(1)]
    end
    M, U = hnf_with_transform(m)
    c = M[1,1]
    b = M[1,2]
    a = M[2,2]
    if iszero(a)
-      return fmpz[c, b], fmpz[U[1,i] for i in 1:r]
+      return ZZRingElem[c, b], ZZRingElem[U[1,i] for i in 1:r]
    else
       (v1, v2), (t1, t2) = _shortest_l_infinity(c, b, a)
-      return fmpz[v1, v2], fmpz[t1*U[1,i] + t2*U[2,i] for i in 1:r]
+      return ZZRingElem[v1, v2], ZZRingElem[t1*U[1,i] + t2*U[2,i] for i in 1:r]
    end
 end
 
@@ -177,7 +177,7 @@ end
 #
 ###############################################################################
 
-function _push_and_clear!(v::Vector{fmpz}, s::_fmpq_cfrac_list)
+function _push_and_clear!(v::Vector{ZZRingElem}, s::_fmpq_cfrac_list)
    for i in 1:s.length
       push!(v, steal_fmpz_data(unsafe_load(s.array, i)))
    end
@@ -187,7 +187,7 @@ function _push_and_clear!(v::Vector{fmpz}, s::_fmpq_cfrac_list)
    ccall((:flint_free, libflint), Nothing, (Ptr{Int},), s.array)
 end
 
-function _doit_exact!(xn::fmpz, xd::fmpz, v::Vector{fmpz}, lim::Int, wantM::Bool)
+function _doit_exact!(xn::ZZRingElem, xd::ZZRingElem, v::Vector{ZZRingElem}, lim::Int, wantM::Bool)
    ok = xd > 0 && xn > xd
    x = _fmpq_ball(steal_data!(xn), steal_data!(xd), 0, 0, 1)
    m = _fmpz_mat22(1,0,0,1,1)
@@ -205,9 +205,9 @@ function _doit_exact!(xn::fmpz, xd::fmpz, v::Vector{fmpz}, lim::Int, wantM::Bool
 end
 
 # xn and xd should be mutatable
-function _continued_fraction_exact(xn::fmpz, xd::fmpz, lim::Int, wantM::Bool)
+function _continued_fraction_exact(xn::ZZRingElem, xd::ZZRingElem, lim::Int, wantM::Bool)
    lim = lim < 1 ? typemax(Int) : lim
-   v = fmpz[]
+   v = ZZRingElem[]
    if xn > xd
       (m11, m12, m21, m22) = _doit_exact!(xn, xd, v, lim, wantM)
    else
@@ -228,19 +228,19 @@ function _continued_fraction_exact(xn::fmpz, xd::fmpz, lim::Int, wantM::Bool)
    return (v, (m11, m12, m21, m22))
 end
 
-function continued_fraction(x::fmpq; limit::Int = 0)
+function continued_fraction(x::QQFieldElem; limit::Int = 0)
    return _continued_fraction_exact(numerator(x), denominator(x), limit, false)[1]
 end
 
-function continued_fraction_with_matrix(x::fmpq; limit::Int = 0)
+function continued_fraction_with_matrix(x::QQFieldElem; limit::Int = 0)
    cf, m = _continued_fraction_exact(numerator(x), denominator(x), limit, true)
    return cf, matrix(FlintZZ, 2, 2, [m...])
 end
 
 function _doit_ball!(
-   xln::fmpz, xld::fmpz,
-   xrn::fmpz, xrd::fmpz,
-   v::Vector{fmpz},
+   xln::ZZRingElem, xld::ZZRingElem,
+   xrn::ZZRingElem, xrd::ZZRingElem,
+   v::Vector{ZZRingElem},
    lim::Int,
    wantM::Bool)
 
@@ -262,13 +262,13 @@ end
 
 # xln, xld, xrd, xrd should all be mutatable
 function _continued_fraction_ball(
-   xln::fmpz, xld::fmpz,
-   xrn::fmpz, xrd::fmpz,
+   xln::ZZRingElem, xld::ZZRingElem,
+   xrn::ZZRingElem, xrd::ZZRingElem,
    lim::Int,
    wantM::Bool)
 
    lim = lim < 1 ? typemax(Int) : lim
-   v = fmpz[]
+   v = ZZRingElem[]
    if xln > xld
       (m11, m12, m21, m22) = _doit_ball!(xln, xld, xrn, xrd, v, lim, wantM)
       ok = true
@@ -284,7 +284,7 @@ function _continued_fraction_ball(
          addmul!(m21, m11, q); swap!(m21, m11)
          addmul!(m22, m12, q); swap!(m22, m12)
       else
-         (m11, m12, m21, m22) = (fmpz(1), fmpz(0), fmpz(0), fmpz(1))
+         (m11, m12, m21, m22) = (ZZRingElem(1), ZZRingElem(0), ZZRingElem(0), ZZRingElem(1))
       end
    end
    while ok && length(v) < lim
@@ -301,21 +301,21 @@ function _continued_fraction_ball(
    return (v, (m11, m12, m21, m22))
 end
 
-# return four mutatable fmpz's
+# return four mutatable ZZRingElem's
 function _left_and_right(x::arb)
    isfinite(x) || error("Ball must be finite")
-   a = fmpz()
-   b = fmpz()
-   f = fmpz()
+   a = ZZRingElem()
+   b = ZZRingElem()
+   f = ZZRingElem()
    ccall((:arb_get_interval_fmpz_2exp, libarb), Nothing,
-         (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{arb}),
+         (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{arb}),
          a, b, f, x)
-   fits(Int, f) || error("Ball endpoints do not fit into fmpq")
+   fits(Int, f) || error("Ball endpoints do not fit into QQFieldElem")
    e = Int(f)
    if f >= 0
-      return (a << e, fmpz(1), b << e, fmpz(1))
+      return (a << e, ZZRingElem(1), b << e, ZZRingElem(1))
    else
-      return (a, fmpz(1) << -e, b, fmpz(1) << -e)
+      return (a, ZZRingElem(1) << -e, b, ZZRingElem(1) << -e)
    end
 end
 
@@ -388,7 +388,7 @@ end
 Gives the iterable sequence of convergents of a finite continued fraction from
 its vector $a$ of partial quotients.
 """
-function convergents(cf::Vector{fmpz})
-   return ConvergentsIterator{fmpz, fmpq}(cf)
+function convergents(cf::Vector{ZZRingElem})
+   return ConvergentsIterator{ZZRingElem, QQFieldElem}(cf)
 end
 

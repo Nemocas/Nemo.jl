@@ -20,17 +20,17 @@ the words, e.g. `zip` and `jacobi_symbol`.
 We follow these conventions in Nemo with some exceptions:
 
 * When interfacing C libraries the types use the same spelling and
-  capitalisation in Nemo as they do in C, e.g. the Flint library's `fmpz_poly`
+  capitalisation in Nemo as they do in C, e.g. the Flint library's `ZZPolyRingElem`
   remains uncapitalised in Nemo.
 
-* Types such as `gfp_poly` which don't exist under that name on the C side
+* Types such as `fpPolyRingElem` which don't exist under that name on the C side
   also use the lowercase convention as they wrap an actual C type which must be
-  split into more than one type on the Julia side. For example `nmod_poly` and
-  `gfp_poly` on the Julia side both represent Flint `nmod_poly`'s on the C side.
+  split into more than one type on the Julia side. For example `zzModPolyRingElem` and
+  `fpPolyRingElem` on the Julia side both represent Flint `zzModPolyRingElem`'s on the C side.
 
 * Types of rings and fields, modules, maps, etc. are capitalised whether they
-  correspond to a C type or not, e.g. `FqNmodFiniteField` for the type of an
-  object representing the field that `fq_nmod`'s belong to.
+  correspond to a C type or not, e.g. `fqPolyRepField` for the type of an
+  object representing the field that `fqPolyRepFieldElem`'s belong to.
 .
 * We omit an underscore if the first word of a method is "is" or "has", e.g.
   `iseven`.
@@ -39,7 +39,7 @@ We follow these conventions in Nemo with some exceptions:
   without an underscore in Julia itself, e.g. `setindex`.
 
 * Constructors with the same name as a type use the same spelling and
-  capitalisation as that type, e.g. `fmpz(1)`.
+  capitalisation as that type, e.g. `ZZRingElem(1)`.
 
 * Functions for creating rings, fields, modules, maps, etc. (rather than the
   elements thereof) use CamelCase, e.g. `PolynomialRing`. We refer to these 

@@ -24,7 +24,7 @@ end
 end
 
 @testset "fmpzi.constructors" begin
-   for a in Any[true, false, 1, big(1), fmpz(1)]
+   for a in Any[true, false, 1, big(1), ZZRingElem(1)]
       @test ZZi(a) == a
       @test ZZ(a) + im == ZZi(a, 1)
       @test ZZ(a) - im == ZZi(a, -1)
@@ -41,7 +41,7 @@ end
    @test convert(Complex{BigInt}, ZZi(8,9)) == 8 + 9*im
    @test 8 + 9*im == convert(fmpzi, 8 + 9*im)
    @test 8 == convert(fmpzi, 8)
-   @test convert(fmpzi, fmpz(8)) == 8
+   @test convert(fmpzi, ZZRingElem(8)) == 8
 end
 
 @testset "fmpzi.pow" begin
@@ -52,7 +52,7 @@ end
 
 @testset "fmpzi.canonical_mod" begin
    function test_ncdivrem(a, b)
-      @test Nemo.ncdivrem(fmpz(a), fmpz(b)) == divrem(a, b, RoundNearestTiesUp)
+      @test Nemo.ncdivrem(ZZRingElem(a), ZZRingElem(b)) == divrem(a, b, RoundNearestTiesUp)
    end
    for i in -7:7, j in 1:5
       test_ncdivrem(i, -j)

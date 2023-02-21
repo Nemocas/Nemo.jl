@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   fmpz_abs_series.jl : Power series over flint fmpz integers
+#   fmpz_abs_series.jl : Power series over flint ZZRingElem integers
 #
 ###############################################################################
 
@@ -18,7 +18,7 @@ function O(a::fmpz_abs_series)
    end
    prec = length(a) - 1
    prec < 0 && throw(DomainError(prec, "Precision must be non-negative"))
-   z = fmpz_abs_series(Vector{fmpz}(undef, 0), 0, prec)
+   z = fmpz_abs_series(Vector{ZZRingElem}(undef, 0), 0, prec)
    z.parent = parent(a)
    return z
 end
@@ -29,7 +29,7 @@ parent_type(::Type{fmpz_abs_series}) = FmpzAbsSeriesRing
 
 base_ring(R::FmpzAbsSeriesRing) = R.base_ring
 
-abs_series_type(::Type{fmpz}) = fmpz_abs_series
+abs_series_type(::Type{ZZRingElem}) = fmpz_abs_series
 
 var(a::FmpzAbsSeriesRing) = a.S
 
@@ -43,15 +43,15 @@ max_precision(R::FmpzAbsSeriesRing) = R.prec_max
 
 function normalise(a::fmpz_abs_series, len::Int)
    if len > 0
-      c = fmpz()
+      c = ZZRingElem()
       ccall((:fmpz_poly_get_coeff_fmpz, libflint), Nothing,
-         (Ref{fmpz}, Ref{fmpz_abs_series}, Int), c, a, len - 1)
+         (Ref{ZZRingElem}, Ref{fmpz_abs_series}, Int), c, a, len - 1)
    end
    while len > 0 && iszero(c)
       len -= 1
       if len > 0
          ccall((:fmpz_poly_get_coeff_fmpz, libflint), Nothing,
-            (Ref{fmpz}, Ref{fmpz_abs_series}, Int), c, a, len - 1)
+            (Ref{ZZRingElem}, Ref{fmpz_abs_series}, Int), c, a, len - 1)
       end
    end
 
@@ -66,11 +66,11 @@ precision(x::fmpz_abs_series) = x.prec
 
 function coeff(x::fmpz_abs_series, n::Int)
    if n < 0
-      return fmpz(0)
+      return ZZRingElem(0)
    end
-   z = fmpz()
+   z = ZZRingElem()
    ccall((:fmpz_poly_get_coeff_fmpz, libflint), Nothing,
-         (Ref{fmpz}, Ref{fmpz_abs_series}, Int), z, x, n)
+         (Ref{ZZRingElem}, Ref{fmpz_abs_series}, Int), z, x, n)
    return z
 end
 
@@ -79,7 +79,7 @@ zero(R::FmpzAbsSeriesRing) = R(0)
 one(R::FmpzAbsSeriesRing) = R(1)
 
 function gen(R::FmpzAbsSeriesRing)
-   z = fmpz_abs_series([fmpz(0), fmpz(1)], 2, max_precision(R))
+   z = fmpz_abs_series([ZZRingElem(0), ZZRingElem(1)], 2, max_precision(R))
    z.parent = R
    return z
 end
@@ -123,7 +123,7 @@ characteristic(::FmpzAbsSeriesRing) = 0
 #
 ###############################################################################
 
-function similar(f::AbsSeriesElem, R::FlintIntegerRing, max_prec::Int,
+function similar(f::AbsSeriesElem, R::ZZRing, max_prec::Int,
                                    s::Symbol=var(parent(f)); cached::Bool=true)
    z = fmpz_abs_series()
    if base_ring(f) === R && s == var(parent(f)) &&
@@ -143,12 +143,12 @@ end
 #
 ###############################################################################
 
-function abs_series(R::FlintIntegerRing, arr::Vector{T},
+function abs_series(R::ZZRing, arr::Vector{T},
                            len::Int, prec::Int, var::String="x";
                             max_precision::Int=prec, cached::Bool=true) where T
    prec < len && error("Precision too small for given data")
-   coeffs = T == fmpz ? arr : map(R, arr)
-   coeffs = length(coeffs) == 0 ? fmpz[] : coeffs
+   coeffs = T == ZZRingElem ? arr : map(R, arr)
+   coeffs = length(coeffs) == 0 ? ZZRingElem[] : coeffs
    z = fmpz_abs_series(coeffs, len, prec)
    z.parent = FmpzAbsSeriesRing(max_precision, Symbol(var), cached)
    return z
@@ -270,18 +270,18 @@ end
 
 *(x::fmpz_abs_series, y::Int) = y * x
 
-function *(x::fmpz, y::fmpz_abs_series)
+function *(x::ZZRingElem, y::fmpz_abs_series)
    z = parent(y)()
    z.prec = y.prec
    ccall((:fmpz_poly_scalar_mul_fmpz, libflint), Nothing,
-                (Ref{fmpz_abs_series}, Ref{fmpz_abs_series}, Ref{fmpz}),
+                (Ref{fmpz_abs_series}, Ref{fmpz_abs_series}, Ref{ZZRingElem}),
                z, y, x)
    return z
 end
 
-*(x::fmpz_abs_series, y::fmpz) = y * x
+*(x::fmpz_abs_series, y::ZZRingElem) = y * x
 
-*(x::Integer, y::fmpz_abs_series) = fmpz(x)*y
+*(x::Integer, y::fmpz_abs_series) = ZZRingElem(x)*y
 
 *(x::fmpz_abs_series, y::Integer) = y*x
 
@@ -404,23 +404,23 @@ end
 #
 ###############################################################################
 
-function ==(x::fmpz_abs_series, y::fmpz)
+function ==(x::fmpz_abs_series, y::ZZRingElem)
    if length(x) > 1
       return false
    elseif length(x) == 1
-      z = fmpz()
+      z = ZZRingElem()
       ccall((:fmpz_poly_get_coeff_fmpz, libflint), Nothing,
-                       (Ref{fmpz}, Ref{fmpz_abs_series}, Int), z, x, 0)
+                       (Ref{ZZRingElem}, Ref{fmpz_abs_series}, Int), z, x, 0)
       return ccall((:fmpz_equal, libflint), Bool,
-               (Ref{fmpz}, Ref{fmpz}, Int), z, y, 0)
+               (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), z, y, 0)
    else
       return precision(x) == 0 || iszero(y)
    end
 end
 
-==(x::fmpz, y::fmpz_abs_series) = y == x
+==(x::ZZRingElem, y::fmpz_abs_series) = y == x
 
-==(x::fmpz_abs_series, y::Integer) = x == fmpz(y)
+==(x::fmpz_abs_series, y::Integer) = x == ZZRingElem(y)
 
 ==(x::Integer, y::fmpz_abs_series) = y == x
 
@@ -467,17 +467,17 @@ function divexact(x::fmpz_abs_series, y::Int; check::Bool=true)
    return z
 end
 
-function divexact(x::fmpz_abs_series, y::fmpz; check::Bool=true)
+function divexact(x::fmpz_abs_series, y::ZZRingElem; check::Bool=true)
    iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
    ccall((:fmpz_poly_scalar_divexact_fmpz, libflint), Nothing,
-                (Ref{fmpz_abs_series}, Ref{fmpz_abs_series}, Ref{fmpz}),
+                (Ref{fmpz_abs_series}, Ref{fmpz_abs_series}, Ref{ZZRingElem}),
                z, x, y)
    return z
 end
 
-divexact(x::fmpz_abs_series, y::Integer; check::Bool=true) = divexact(x, fmpz(y); check=check)
+divexact(x::fmpz_abs_series, y::Integer; check::Bool=true) = divexact(x, ZZRingElem(y); check=check)
 
 ###############################################################################
 #
@@ -532,9 +532,9 @@ function fit!(z::fmpz_abs_series, n::Int)
    return nothing
 end
 
-function setcoeff!(z::fmpz_abs_series, n::Int, x::fmpz)
+function setcoeff!(z::fmpz_abs_series, n::Int, x::ZZRingElem)
    ccall((:fmpz_poly_set_coeff_fmpz, libflint), Nothing,
-                (Ref{fmpz_abs_series}, Int, Ref{fmpz}),
+                (Ref{fmpz_abs_series}, Int, Ref{ZZRingElem}),
                z, n, x)
    return z
 end
@@ -612,7 +612,7 @@ end
 
 promote_rule(::Type{fmpz_abs_series}, ::Type{T}) where {T <: Integer} = fmpz_abs_series
 
-promote_rule(::Type{fmpz_abs_series}, ::Type{fmpz}) = fmpz_abs_series
+promote_rule(::Type{fmpz_abs_series}, ::Type{ZZRingElem}) = fmpz_abs_series
 
 ###############################################################################
 #
@@ -632,13 +632,13 @@ function (a::FmpzAbsSeriesRing)(b::Integer)
       z = fmpz_abs_series()
       z.prec = a.prec_max
    else
-      z = fmpz_abs_series([fmpz(b)], 1, a.prec_max)
+      z = fmpz_abs_series([ZZRingElem(b)], 1, a.prec_max)
    end
    z.parent = a
    return z
 end
 
-function (a::FmpzAbsSeriesRing)(b::fmpz)
+function (a::FmpzAbsSeriesRing)(b::ZZRingElem)
    if iszero(b)
       z = fmpz_abs_series()
       z.prec = a.prec_max
@@ -654,7 +654,7 @@ function (a::FmpzAbsSeriesRing)(b::fmpz_abs_series)
    return b
 end
 
-function (a::FmpzAbsSeriesRing)(b::Vector{fmpz}, len::Int, prec::Int)
+function (a::FmpzAbsSeriesRing)(b::Vector{ZZRingElem}, len::Int, prec::Int)
    z = fmpz_abs_series(b, len, prec)
    z.parent = a
    return z
@@ -666,7 +666,7 @@ end
 #
 ###############################################################################
 
-function PowerSeriesRing(R::FlintIntegerRing, prec::Int, s::Symbol;  model=:capped_relative, cached = true)
+function PowerSeriesRing(R::ZZRing, prec::Int, s::Symbol;  model=:capped_relative, cached = true)
    if model == :capped_relative
       parent_obj = FmpzRelSeriesRing(prec, s, cached)
    elseif model == :capped_absolute
@@ -678,14 +678,14 @@ function PowerSeriesRing(R::FlintIntegerRing, prec::Int, s::Symbol;  model=:capp
    return parent_obj, gen(parent_obj)
 end
 
-function PowerSeriesRing(R::FlintIntegerRing, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
+function PowerSeriesRing(R::ZZRing, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
    return PowerSeriesRing(R, prec, Symbol(s); model=model, cached=cached)
 end
 
-function AbsSeriesRing(R::FlintIntegerRing, prec::Int)
+function AbsSeriesRing(R::ZZRing, prec::Int)
    return FmpzAbsSeriesRing(prec, :x, false)
 end
 
-function RelSeriesRing(R::FlintIntegerRing, prec::Int)
+function RelSeriesRing(R::ZZRing, prec::Int)
    return FmpzRelSeriesRing(prec, :x, false)
 end

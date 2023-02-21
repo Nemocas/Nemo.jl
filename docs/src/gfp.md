@@ -13,7 +13,7 @@ For convenience, the following constructors are provided.
 ```julia
 GF(n::UInt)
 GF(n::Int)
-GF(n::fmpz)
+GF(n::ZZRingElem)
 ```
 
 For example, one can create the Galois field of characteristic $7$ as follows.
@@ -28,15 +28,15 @@ Elements of the field are then created in the usual way.
 a = R(3)
 ```
 
-Elements of Galois fields have type `gfp_elem` when $p$ is given to the
-constructor as an `Int` or `UInt`, and of type `gfp_fmpz_elem` if $p$ is
-given as an `fmpz`, and the type of the parent objects is
-`GaloisField` or `GaloisFmpzField` respectively.
+Elements of Galois fields have type `fpFieldElem` when $p$ is given to the
+constructor as an `Int` or `UInt`, and of type `FpFieldElem` if $p$ is
+given as an `ZZRingElem`, and the type of the parent objects is
+`fpField` or `FpField` respectively.
 
 The modulus $p$ of an element of a Galois field is stored in its parent object.
 
-The `gfp_elem` and `gfp_fmpz_elem` types belong to the abstract type
-`FinFieldElem` and the `GaloisField` and `GaloisFmpzField` parent object types
+The `fpFieldElem` and `FpFieldElem` types belong to the abstract type
+`FinFieldElem` and the `fpField` and `FpField` parent object types
 belong to the abstract type `FinField`.
 
 ## Galois field functionality

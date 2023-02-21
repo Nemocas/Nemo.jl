@@ -17,7 +17,7 @@
 
    @test isa(b, nf_elem)
 
-   c = K(fmpz(12))
+   c = K(ZZRingElem(12))
 
    @test isa(c, nf_elem)
 
@@ -25,7 +25,7 @@
 
    @test isa(d, nf_elem)
 
-   f = K(fmpq(2, 3))
+   f = K(QQFieldElem(2, 3))
 
    @test isa(f, nf_elem)
 
@@ -62,10 +62,10 @@ end
    M[1, 2] = 2
    M[1, 3] = 3
 
-   @test Nemo.elem_from_mat_row(K, M, 1, fmpz(5)) == (1 + 2*a + 3*a^2)//5
+   @test Nemo.elem_from_mat_row(K, M, 1, ZZRingElem(5)) == (1 + 2*a + 3*a^2)//5
 
    b = (1 + a + 5*a^2)//3
-   d = fmpz()
+   d = ZZRingElem()
 
    Nemo.elem_to_mat_row!(M, 1, d, b)
 
@@ -164,14 +164,14 @@ end
    d = 3a^2 - a + 1
 
    @test d + 3 == 3 + d
-   @test d + fmpz(3) == fmpz(3) + d
-   @test d + fmpq(2, 3) == fmpq(2, 3) + d
+   @test d + ZZRingElem(3) == ZZRingElem(3) + d
+   @test d + QQFieldElem(2, 3) == QQFieldElem(2, 3) + d
    @test d - 3 == -(3 - d)
-   @test d - fmpz(3) == -(fmpz(3) - d)
-   @test d - fmpq(2, 3) == -(fmpq(2, 3) - d)
+   @test d - ZZRingElem(3) == -(ZZRingElem(3) - d)
+   @test d - QQFieldElem(2, 3) == -(QQFieldElem(2, 3) - d)
    @test d*3 == 3d
-   @test d*fmpz(3) == fmpz(3)*d
-   @test d*fmpq(2, 3) == fmpq(2, 3)*d
+   @test d*ZZRingElem(3) == ZZRingElem(3)*d
+   @test d*QQFieldElem(2, 3) == QQFieldElem(2, 3)*d
 
    d = [-97, -95, -94, -93, -91, -89, -87, -86, -85, -83, -82, -79, -78, -77,
         -74, -73, -71, -70, -69, -67, -66, -65, -62, -61, -59, -58, -57, -55,
@@ -192,10 +192,10 @@ end
                @assert z + i == z + K(i)
                @assert i + z == K(i) + z
                @assert i - z == K(i) - z
-               @assert z - fmpq(i, j) == z - K(fmpq(i, j))
-               @assert z + fmpq(i, j) == z + K(fmpq(i, j))
-               @assert fmpq(i, j) - z == K(fmpq(i, j)) - z
-               @assert fmpq(i, j) + z == K(fmpq(i, j)) + z
+               @assert z - QQFieldElem(i, j) == z - K(QQFieldElem(i, j))
+               @assert z + QQFieldElem(i, j) == z + K(QQFieldElem(i, j))
+               @assert QQFieldElem(i, j) - z == K(QQFieldElem(i, j)) - z
+               @assert QQFieldElem(i, j) + z == K(QQFieldElem(i, j)) + z
             end
          end
       end
@@ -209,7 +209,7 @@ end
    d = a^2 + 2a - 7
 
    @test d^5 == -13195*a^2 + 72460*a + 336
-   @test d^(-2) == fmpz(2773)//703921*a^2 + fmpz(1676)//703921*a + fmpz(12632)//703921
+   @test d^(-2) == ZZRingElem(2773)//703921*a^2 + ZZRingElem(1676)//703921*a + ZZRingElem(12632)//703921
    @test d^0 == 1
 end
 
@@ -231,7 +231,7 @@ end
    c = 3a^2 - a + 1
    b = K(5)
 
-   for T in [Int, UInt, BigInt, fmpz, fmpq,
+   for T in [Int, UInt, BigInt, ZZRingElem, QQFieldElem,
              Rational{Int}, Rational{BigInt}]
       @test c != T(5)
       @test T(5) != c
@@ -239,10 +239,10 @@ end
       @test T(5) == b
    end
 
-   @test K(fmpq(2, 3)) == fmpq(2, 3)
+   @test K(QQFieldElem(2, 3)) == QQFieldElem(2, 3)
    @test 5 == K(5)
-   @test fmpz(5) == K(5)
-   @test fmpq(2, 3) == K(fmpq(2, 3))
+   @test ZZRingElem(5) == K(5)
+   @test QQFieldElem(2, 3) == K(QQFieldElem(2, 3))
 end
 
 @testset "nf_elem.inversion" begin
@@ -271,8 +271,8 @@ end
    c = 3a^2 - a + 1
 
    @test divexact(7c, 7) == c
-   @test divexact(7c, fmpz(7)) == c
-   @test divexact(fmpq(2, 3)*c, fmpq(2, 3)) == c
+   @test divexact(7c, ZZRingElem(7)) == c
+   @test divexact(QQFieldElem(2, 3)*c, QQFieldElem(2, 3)) == c
 end
 
 @testset "nf_elem.divides" begin

@@ -22,16 +22,16 @@ providing them.
 
  Library        | Element type  | Parent type
 ----------------|---------------|--------------------
-Flint           | `fmpz`        | `FlintIntegerRing`
+Flint           | `ZZRingElem`        | `ZZRing`
 
 All integer element types belong directly to the abstract type `RingElem` and
 all the integer ring parent object types belong to the abstract type `Ring`.
 
-A lot of code will want to accept both `fmpz` integers and Julia integers,
+A lot of code will want to accept both `ZZRingElem` integers and Julia integers,
 that is, subtypes of `Base.Integer`. Thus for convenience we define
 
 ```
-IntegerUnion = Union{Integer,fmpz}
+IntegerUnion = Union{Integer,ZZRingElem}
 ```
 
 ## Integer functionality
@@ -72,24 +72,24 @@ can be exactly represented as an integer.
 ### Basic manipulation
 
 ```@docs
-sign(::fmpz)
+sign(::ZZRingElem)
 ```
 
 ```@docs
-size(::fmpz)
+size(::ZZRingElem)
 ```
 
 ```@docs
-fits(::Type{UInt}, ::fmpz)
-fits(::Type{Int}, ::fmpz)
+fits(::Type{UInt}, ::ZZRingElem)
+fits(::Type{Int}, ::ZZRingElem)
 ```
 
 ```@docs
-denominator(::fmpz)
+denominator(::ZZRingElem)
 ```
 
 ```@docs
-numerator(::fmpz)
+numerator(::ZZRingElem)
 ```
 
 **Examples**
@@ -125,13 +125,13 @@ Function                     | Return | Rounding of the quotient
 `mod`                        | r      | towards minus infinity
 `rem`                        | r      | towards zero
 `div`                        | q      | towards minus infinity
-`divrem(a::fmpz, b::fmpz)`   | q, r   | towards minus infinity
-`tdivrem(a::fmpz, b::fmpz)`  | q, r   | towards zero
-`fdivrem(a::fmpz, b::fmpz)`  | q, r   | towards minus infinity
-`cdivrem(a::fmpz, b::fmpz)`  | q, r   | towards plus infinity
-`ntdivrem(a::fmpz, b::fmpz)` | q, r   | nearest integer, ties toward zero
-`nfdivrem(a::fmpz, b::fmpz)` | q, r   | nearest integer, ties toward minus infinity
-`ncdivrem(a::fmpz, b::fmpz)` | q, r   | nearest integer, ties toward plus infinity
+`divrem(a::ZZRingElem, b::ZZRingElem)`   | q, r   | towards minus infinity
+`tdivrem(a::ZZRingElem, b::ZZRingElem)`  | q, r   | towards zero
+`fdivrem(a::ZZRingElem, b::ZZRingElem)`  | q, r   | towards minus infinity
+`cdivrem(a::ZZRingElem, b::ZZRingElem)`  | q, r   | towards plus infinity
+`ntdivrem(a::ZZRingElem, b::ZZRingElem)` | q, r   | nearest integer, ties toward zero
+`nfdivrem(a::ZZRingElem, b::ZZRingElem)` | q, r   | nearest integer, ties toward minus infinity
+`ncdivrem(a::ZZRingElem, b::ZZRingElem)` | q, r   | nearest integer, ties toward plus infinity
 
 N.B: the internal definition of `Nemo.div` and `Nemo.divrem` are the same as
 `fdiv` and `fdivrem`. The definitions in the table are of `Base.div` and
@@ -142,12 +142,12 @@ description is as for the other Euclidean division functions.
 
 Function                    | Return | Rounding
 ----------------------------|--------|------------------------
-`mod(a::fmpz, b::Int)`      | r      | towards minus infinity
-`rem(a::fmpz, b::Int)`      | r      | towards zero
-`div(a::fmpz, b::Int)`      | q      | towards zero
-`tdiv(a::fmpz, b::Int)`     | q      | towards zero
-`fdiv(a::fmpz, b::Int)`     | q      | towards minus infinity
-`cdiv(a::fmpz, b::Int)`     | q      | towards plus infinity
+`mod(a::ZZRingElem, b::Int)`      | r      | towards minus infinity
+`rem(a::ZZRingElem, b::Int)`      | r      | towards zero
+`div(a::ZZRingElem, b::Int)`      | q      | towards zero
+`tdiv(a::ZZRingElem, b::Int)`     | q      | towards zero
+`fdiv(a::ZZRingElem, b::Int)`     | q      | towards minus infinity
+`cdiv(a::ZZRingElem, b::Int)`     | q      | towards plus infinity
 
 N.B: the internal definition of `Nemo.div` is the same as `fdiv`. The
 definition in the table is `Base.div` which agrees with Julia's
@@ -159,16 +159,16 @@ $a = b2^{d} + r$. These are useful for bit twiddling.
 
 Function                    | Return | Rounding
 ----------------------------|--------|------------------------
-`tdivpow2(a::fmpz, d::Int)` | q      | towards zero
-`fdivpow2(a::fmpz, d::Int)` | q      | towards minus infinity
-`fmodpow2(a::fmpz, d::Int)` | r      | towards minus infinity
-`cdivpow2(a::fmpz, d::Int)` | q      | towards plus infinity
+`tdivpow2(a::ZZRingElem, d::Int)` | q      | towards zero
+`fdivpow2(a::ZZRingElem, d::Int)` | q      | towards minus infinity
+`fmodpow2(a::ZZRingElem, d::Int)` | r      | towards minus infinity
+`cdivpow2(a::ZZRingElem, d::Int)` | q      | towards plus infinity
 
 **Examples**
 
 ```julia
-a = fmpz(12)
-b = fmpz(5)
+a = ZZRingElem(12)
+b = ZZRingElem(5)
 
 q, r = divrem(a, b)
 c = cdiv(a, b)
@@ -193,18 +193,18 @@ that `cmp` provides all of the comparison operators listed above.
 
 Function                   |
 ---------------------------|
-`cmp(a::fmpz, b::fmpz)`    |
-`cmpabs(a::fmpz, b::fmpz)` |
+`cmp(a::ZZRingElem, b::ZZRingElem)`    |
+`cmpabs(a::ZZRingElem, b::ZZRingElem)` |
 
 We also provide the following ad hoc comparisons which again provide all of the
 comparison operators mentioned above.
 
 Function                   |
 ---------------------------|
-`cmp(a::fmpz, b::Int)`     |
-`cmp(a::Int, b::fmpz)`     |
-`cmp(a::fmpz, b::UInt)`    |
-`cmp(a::UInt, b::fmpz)`    |
+`cmp(a::ZZRingElem, b::Int)`     |
+`cmp(a::Int, b::ZZRingElem)`     |
+`cmp(a::ZZRingElem, b::UInt)`    |
+`cmp(a::UInt, b::ZZRingElem)`    |
 
 **Examples**
 
@@ -222,17 +222,17 @@ cmpabs(a, b)
 ### Shifting
 
 ```@docs
-<<(::fmpz, ::Int)
+<<(::ZZRingElem, ::Int)
 ```
 
 ```@docs
->>(::fmpz, ::Int)
+>>(::ZZRingElem, ::Int)
 ```
 
 **Examples**
 
 ```julia
-a = fmpz(12)
+a = ZZRingElem(12)
 
 a << 3
 a >> 5
@@ -241,11 +241,11 @@ a >> 5
 ### Modular arithmetic
 
 ```@docs
-sqrtmod(::fmpz, ::fmpz)
+sqrtmod(::ZZRingElem, ::ZZRingElem)
 ```
 
 ```@docs
-crt(r1::fmpz, m1::fmpz, r2::fmpz, m2::fmpz, signed=false; check::Bool=true)
+crt(r1::ZZRingElem, m1::ZZRingElem, r2::ZZRingElem, m2::ZZRingElem, signed=false; check::Bool=true)
 ```
 
 **Examples**
@@ -259,20 +259,20 @@ d = crt(ZZ(5), ZZ(13), 7, 37, true)
 ### Integer logarithm
 
 ```@docs
-flog(::fmpz, ::fmpz)
-flog(::fmpz, ::Int)
+flog(::ZZRingElem, ::ZZRingElem)
+flog(::ZZRingElem, ::Int)
 ```
 
 ```@docs
-clog(::fmpz, ::fmpz)
-clog(::fmpz, ::Int)
+clog(::ZZRingElem, ::ZZRingElem)
+clog(::ZZRingElem, ::Int)
 ```
 
 **Examples**
 
 ```julia
-a = fmpz(12)
-b = fmpz(2)
+a = ZZRingElem(12)
+b = ZZRingElem(2)
 
 c = flog(a, b)
 d = clog(a, 3)
@@ -281,19 +281,19 @@ d = clog(a, 3)
 ### Integer roots
 
 ```@docs
-isqrt(::fmpz)
+isqrt(::ZZRingElem)
 ```
 
 ```@docs
-isqrtrem(::fmpz)
+isqrtrem(::ZZRingElem)
 ```
 
 ```@docs
-root(::fmpz, ::Int)
+root(::ZZRingElem, ::Int)
 ```
 
 ```@docs
-iroot(::fmpz, ::Int)
+iroot(::ZZRingElem, ::Int)
 ```
 
 **Examples**
@@ -311,91 +311,91 @@ k = root(b, 3; check=true)
 ### Number theoretic functionality
 
 ```@docs
-divisible(::fmpz, ::Int)
-divisible(::fmpz, ::fmpz)
+divisible(::ZZRingElem, ::Int)
+divisible(::ZZRingElem, ::ZZRingElem)
 ```
 
 ```@docs
-is_square(::fmpz)
+is_square(::ZZRingElem)
 ```
 
 ```@docs
-is_prime(::fmpz)
+is_prime(::ZZRingElem)
 ```
 
 ```@docs
-is_probable_prime(::fmpz)
+is_probable_prime(::ZZRingElem)
 ```
 
 ```@docs
-factor(::fmpz)
+factor(::ZZRingElem)
 ```
 
 ```@docs
-divisor_lenstra(::fmpz, ::fmpz, ::fmpz)
+divisor_lenstra(::ZZRingElem, ::ZZRingElem, ::ZZRingElem)
 ```
 
 ```@docs
-factorial(::fmpz)
+factorial(::ZZRingElem)
 ```
 
 ```@docs
-rising_factorial(::fmpz, ::fmpz)
-rising_factorial(::fmpz, ::Int)
+rising_factorial(::ZZRingElem, ::ZZRingElem)
+rising_factorial(::ZZRingElem, ::Int)
 rising_factorial(::Int, ::Int)
 ```
 
 ```@docs
-primorial(::fmpz)
+primorial(::ZZRingElem)
 primorial(::Int)
 ```
 
 ```@docs
 fibonacci(::Int)
-fibonacci(::fmpz)
+fibonacci(::ZZRingElem)
 ```
 
 ```@docs
-bell(::fmpz)
+bell(::ZZRingElem)
 bell(::Int)
 ```
 
 ```@docs
-binomial(::fmpz, ::fmpz)
-binomial(::UInt, ::UInt, ::FlintIntegerRing)
+binomial(::ZZRingElem, ::ZZRingElem)
+binomial(::UInt, ::UInt, ::ZZRing)
 ```
 
 ```@docs
 moebius_mu(::Int)
-moebius_mu(::fmpz)
+moebius_mu(::ZZRingElem)
 ```
 
 ```@docs
 jacobi_symbol(::Int, ::Int)
-jacobi_symbol(::fmpz, ::fmpz)
+jacobi_symbol(::ZZRingElem, ::ZZRingElem)
 kronecker_symbol(::Int, ::Int)
 ```
 
 ```@docs
 divisor_sigma(::Int, ::Int)
-divisor_sigma(::fmpz, ::Int)
-divisor_sigma(::fmpz, ::fmpz)
+divisor_sigma(::ZZRingElem, ::Int)
+divisor_sigma(::ZZRingElem, ::ZZRingElem)
 ```
 
 ```@docs
 euler_phi(::Int)
-euler_phi(::fmpz)
+euler_phi(::ZZRingElem)
 ```
 
 ```@docs
 number_of_partitions(::Int)
-number_of_partitions(::fmpz) 
+number_of_partitions(::ZZRingElem) 
 ```
 
 ```@docs
-is_perfect_power(::fmpz)
-Nemo.is_prime_power(::fmpz)
-is_prime_power_with_data(::fmpz)
+is_perfect_power(::ZZRingElem)
+Nemo.is_prime_power(::ZZRingElem)
+is_prime_power_with_data(::ZZRingElem)
 ```
 
 **Examples**
@@ -412,37 +412,37 @@ f = factor(ZZ(12))
 ### Digits and bases
 
 ```@docs
-bin(::fmpz)
+bin(::ZZRingElem)
 ```
 
 ```@docs
-oct(::fmpz)
+oct(::ZZRingElem)
 ```
 
 ```@docs
-dec(::fmpz)
+dec(::ZZRingElem)
 ```
 
 ```@docs
-hex(::fmpz)
+hex(::ZZRingElem)
 ```
 
 ```@docs
-base(::fmpz, ::Integer)
+base(::ZZRingElem, ::Integer)
 ```
 
 ```@docs
-ndigits(::fmpz, ::Integer)
+ndigits(::ZZRingElem, ::Integer)
 ```
 
 ```@docs
-nbits(::fmpz)
+nbits(::ZZRingElem)
 ```
 
 **Examples**
 
 ```julia
-a = fmpz(12)
+a = ZZRingElem(12)
 
 s1 = bin(a)
 s2 = base(a, 13)
@@ -453,32 +453,32 @@ n2 = ndigits(a, 3)
 ### Bit twiddling
 
 ```@docs
-popcount(::fmpz)
+popcount(::ZZRingElem)
 ```
 
 ```@docs
-prevpow2(::fmpz)
+prevpow2(::ZZRingElem)
 ```
 
 ```@docs
-nextpow2(::fmpz)
+nextpow2(::ZZRingElem)
 ```
 
 ```@docs
-trailing_zeros(::fmpz)
+trailing_zeros(::ZZRingElem)
 ```
 
 ```@docs
-clrbit!(::fmpz, ::Int)
-setbit!(::fmpz, ::Int)
-combit!(::fmpz, ::Int)
-tstbit(::fmpz, ::Int)
+clrbit!(::ZZRingElem, ::Int)
+setbit!(::ZZRingElem, ::Int)
+combit!(::ZZRingElem, ::Int)
+tstbit(::ZZRingElem, ::Int)
 ```
 
 **Examples**
 
 ```julia
-a = fmpz(12)
+a = ZZRingElem(12)
 
 p = popcount(a)
 b = nextpow2(a)
@@ -488,11 +488,11 @@ combit!(a, 2)
 ### Random generation
 
 ```@docs
-rand_bits(::FlintIntegerRing, ::Int)
+rand_bits(::ZZRing, ::Int)
 ```
 
 ```@docs
-rand_bits_prime(::FlintIntegerRing, ::Int, ::Bool)
+rand_bits_prime(::ZZRing, ::Int, ::Bool)
 ```
 
 **Examples**

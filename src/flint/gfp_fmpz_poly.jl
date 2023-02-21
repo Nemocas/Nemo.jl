@@ -1,10 +1,10 @@
 ################################################################################
 #
-#  fmpz_mod_poly.jl : Flint fmpz_mod_poly (polynomials over Z/nZ, large modulus)
+#  ZZModPolyRingElem.jl : Flint ZZModPolyRingElem (polynomials over Z/nZ, large modulus)
 #
 ################################################################################
 
-export GFPFmpzPolyRing, gfp_fmpz_poly
+export FpPolyRing, FpPolyRingElem
 
 ################################################################################
 #
@@ -12,21 +12,21 @@ export GFPFmpzPolyRing, gfp_fmpz_poly
 #
 ################################################################################
 
-parent(a::gfp_fmpz_poly) = a.parent
+parent(a::FpPolyRingElem) = a.parent
 
-base_ring(R::GFPFmpzPolyRing) = R.base_ring
+base_ring(R::FpPolyRing) = R.base_ring
 
-base_ring(a::gfp_fmpz_poly) = base_ring(parent(a))
+base_ring(a::FpPolyRingElem) = base_ring(parent(a))
 
-elem_type(::Type{gfp_fmpz_poly}) = gfp_fmpz_poly
+elem_type(::Type{FpPolyRingElem}) = FpPolyRingElem
 
-elem_type(::Type{GFPFmpzPolyRing}) = gfp_fmpz_poly
+elem_type(::Type{FpPolyRing}) = FpPolyRingElem
 
-parent_type(::Type{gfp_fmpz_poly}) = GFPFmpzPolyRing
+parent_type(::Type{FpPolyRingElem}) = FpPolyRing
 
-dense_poly_type(::Type{Generic.ResF{fmpz}}) = gfp_fmpz_poly
+dense_poly_type(::Type{Generic.ResF{ZZRingElem}}) = FpPolyRingElem
 
-characteristic(R::GFPFmpzPolyRing) = characteristic(base_ring(R))
+characteristic(R::FpPolyRing) = characteristic(base_ring(R))
 
 ###############################################################################
 #
@@ -34,13 +34,13 @@ characteristic(R::GFPFmpzPolyRing) = characteristic(base_ring(R))
 #
 ###############################################################################
 
-function similar(f::PolyElem, R::GaloisFmpzField, s::Symbol=var(parent(f)); cached::Bool=true)
-   z = gfp_fmpz_poly(R)
-   if base_ring(f) === R && s == var(parent(f)) && typeof(f) == gfp_fmpz_poly
+function similar(f::PolyElem, R::FpField, s::Symbol=var(parent(f)); cached::Bool=true)
+   z = FpPolyRingElem(R)
+   if base_ring(f) === R && s == var(parent(f)) && typeof(f) == FpPolyRingElem
       # steal parent in case it is not cached
       z.parent = parent(f)
    else
-      z.parent = GFPFmpzPolyRing(R, s, cached)
+      z.parent = FpPolyRing(R, s, cached)
    end
    return z
 end
@@ -51,11 +51,11 @@ end
 #
 ###############################################################################
 
-function polynomial(R::GaloisFmpzField, arr::Vector{T}, var::String="x"; cached::Bool=true) where T
+function polynomial(R::FpField, arr::Vector{T}, var::String="x"; cached::Bool=true) where T
    coeffs = map(R, arr)
-   coeffs = length(coeffs) == 0 ? gfp_fmpz_elem[] : coeffs
-   z = gfp_fmpz_poly(R, coeffs)
-   z.parent = GFPFmpzPolyRing(R, Symbol(var), cached)
+   coeffs = length(coeffs) == 0 ? FpFieldElem[] : coeffs
+   z = FpPolyRingElem(R, coeffs)
+   z.parent = FpPolyRing(R, Symbol(var), cached)
    return z
 end
 
@@ -65,104 +65,104 @@ end
 #
 ###############################################################################
 
-function *(x::gfp_fmpz_poly, y::fmpz)
+function *(x::FpPolyRingElem, y::ZZRingElem)
   z = parent(x)()
   ccall((:fmpz_mod_poly_scalar_mul_fmpz, libflint), Nothing,
-        (Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly}, Ref{fmpz},
+        (Ref{FpPolyRingElem}, Ref{FpPolyRingElem}, Ref{ZZRingElem},
          Ref{fmpz_mod_ctx_struct}),
         z, x, y, x.parent.base_ring.ninv)
   return z
 end
 
-*(x::fmpz, y::gfp_fmpz_poly) = y*x
+*(x::ZZRingElem, y::FpPolyRingElem) = y*x
 
-*(x::gfp_fmpz_poly, y::Integer) = x*fmpz(y)
+*(x::FpPolyRingElem, y::Integer) = x*ZZRingElem(y)
 
-*(x::Integer, y::gfp_fmpz_poly) = y*x
+*(x::Integer, y::FpPolyRingElem) = y*x
 
-function *(x::gfp_fmpz_poly, y::gfp_fmpz_elem)
+function *(x::FpPolyRingElem, y::FpFieldElem)
   (base_ring(x) != parent(y)) && error("Must have same parent")
   return x*y.data
 end
 
-*(x::gfp_fmpz_elem, y::gfp_fmpz_poly) = y*x
+*(x::FpFieldElem, y::FpPolyRingElem) = y*x
 
-function +(x::gfp_fmpz_poly, y::Int)
+function +(x::FpPolyRingElem, y::Int)
   z = parent(x)()
   ccall((:fmpz_mod_poly_add_si, libflint), Nothing,
-        (Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly}, Int, Ref{fmpz_mod_ctx_struct}),
+        (Ref{FpPolyRingElem}, Ref{FpPolyRingElem}, Int, Ref{fmpz_mod_ctx_struct}),
         z, x, y, x.parent.base_ring.ninv)
   return z
 end
 
-+(x::Int, y::gfp_fmpz_poly) = +(y, x)
++(x::Int, y::FpPolyRingElem) = +(y, x)
 
-function +(x::gfp_fmpz_poly, y::fmpz)
+function +(x::FpPolyRingElem, y::ZZRingElem)
   z = parent(x)()
   ccall((:fmpz_mod_poly_add_fmpz, libflint), Nothing,
-        (Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly}, Ref{fmpz},
+        (Ref{FpPolyRingElem}, Ref{FpPolyRingElem}, Ref{ZZRingElem},
          Ref{fmpz_mod_ctx_struct}),
         z, x, y, x.parent.base_ring.ninv)
   return z
 end
 
-+(x::fmpz, y::gfp_fmpz_poly) = y + x
++(x::ZZRingElem, y::FpPolyRingElem) = y + x
 
-+(x::gfp_fmpz_poly, y::Integer) = x + fmpz(y)
++(x::FpPolyRingElem, y::Integer) = x + ZZRingElem(y)
 
-+(x::Integer, y::gfp_fmpz_poly) = fmpz(y) + x 
++(x::Integer, y::FpPolyRingElem) = ZZRingElem(y) + x 
 
-function +(x::gfp_fmpz_poly, y::gfp_fmpz_elem)
+function +(x::FpPolyRingElem, y::FpFieldElem)
   (base_ring(x) != parent(y)) && error("Elements must have same parent")
   return x + y.data
 end
 
-+(x::gfp_fmpz_elem, y::gfp_fmpz_poly) = y + x
++(x::FpFieldElem, y::FpPolyRingElem) = y + x
 
-function -(x::gfp_fmpz_poly, y::Int)
+function -(x::FpPolyRingElem, y::Int)
   z = parent(x)()
   ccall((:fmpz_mod_poly_sub_si, libflint), Nothing,
-        (Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly}, Int, Ref{fmpz_mod_ctx_struct}),
+        (Ref{FpPolyRingElem}, Ref{FpPolyRingElem}, Int, Ref{fmpz_mod_ctx_struct}),
         z, x, y, x.parent.base_ring.ninv)
   return z
 end
 
-function -(x::Int, y::gfp_fmpz_poly)
+function -(x::Int, y::FpPolyRingElem)
   z = parent(y)()
   ccall((:fmpz_mod_poly_si_sub, libflint), Nothing,
-        (Ref{gfp_fmpz_poly}, Int, Ref{gfp_fmpz_poly}, Ref{fmpz_mod_ctx_struct}),
+        (Ref{FpPolyRingElem}, Int, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}),
         z, x, y, y.parent.base_ring.ninv)
   return z
 end
 
-function -(x::gfp_fmpz_poly, y::fmpz)
+function -(x::FpPolyRingElem, y::ZZRingElem)
   z = parent(x)()
   ccall((:fmpz_mod_poly_sub_fmpz, libflint), Nothing,
-        (Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly}, Ref{fmpz},
+        (Ref{FpPolyRingElem}, Ref{FpPolyRingElem}, Ref{ZZRingElem},
          Ref{fmpz_mod_ctx_struct}),
         z, x, y, x.parent.base_ring.ninv)
   return z
 end
 
-function -(x::fmpz, y::gfp_fmpz_poly)
+function -(x::ZZRingElem, y::FpPolyRingElem)
   z = parent(y)()
   ccall((:fmpz_mod_poly_fmpz_sub, libflint), Nothing,
-        (Ref{gfp_fmpz_poly}, Ref{fmpz}, Ref{gfp_fmpz_poly},
+        (Ref{FpPolyRingElem}, Ref{ZZRingElem}, Ref{FpPolyRingElem},
          Ref{fmpz_mod_ctx_struct}),
         z, x, y, y.parent.base_ring.ninv)
   return z
 end
 
--(x::gfp_fmpz_poly, y::Integer) = x - fmpz(y)
+-(x::FpPolyRingElem, y::Integer) = x - ZZRingElem(y)
 
--(x::Integer, y::gfp_fmpz_poly) = fmpz(x) - y
+-(x::Integer, y::FpPolyRingElem) = ZZRingElem(x) - y
 
-function -(x::gfp_fmpz_poly, y::gfp_fmpz_elem)
+function -(x::FpPolyRingElem, y::FpFieldElem)
   (base_ring(x) != parent(y)) && error("Elements must have same parent")
   return x - y.data
 end
 
-function -(x::gfp_fmpz_elem, y::gfp_fmpz_poly)
+function -(x::FpFieldElem, y::FpPolyRingElem)
    (parent(x) != base_ring(y)) && error("Elements must have same parent")
    return x.data - y
 end
@@ -173,14 +173,14 @@ end
 #
 ################################################################################
 
-function ==(x::gfp_fmpz_poly, y::gfp_fmpz_elem)
+function ==(x::FpPolyRingElem, y::FpFieldElem)
   base_ring(x) != parent(y) && error("Incompatible base rings in comparison")
   if length(x) > 1
      return false
   elseif length(x) == 1 
-     u = fmpz()
+     u = ZZRingElem()
      ccall((:fmpz_mod_poly_get_coeff_fmpz, libflint), Nothing, 
-           (Ref{fmpz}, Ref{gfp_fmpz_poly}, Int, Ref{fmpz_mod_ctx_struct}),
+           (Ref{ZZRingElem}, Ref{FpPolyRingElem}, Int, Ref{fmpz_mod_ctx_struct}),
            u, x, 0, x.parent.base_ring.ninv)
      return u == y
   else
@@ -188,7 +188,7 @@ function ==(x::gfp_fmpz_poly, y::gfp_fmpz_elem)
   end 
 end
 
-==(x::gfp_fmpz_elem, y::gfp_fmpz_poly) = y == x
+==(x::FpFieldElem, y::FpPolyRingElem) = y == x
 
 ################################################################################
 #
@@ -196,12 +196,12 @@ end
 #
 ################################################################################
 
-function divexact(x::gfp_fmpz_poly, y::gfp_fmpz_elem; check::Bool=true)
+function divexact(x::FpPolyRingElem, y::FpFieldElem; check::Bool=true)
   base_ring(x) != parent(y) && error("Elements must have same parent")
   iszero(y) && throw(DivideError())
   q = parent(x)()
   ccall((:fmpz_mod_poly_scalar_div_fmpz, libflint), Nothing, 
-        (Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly}, Ref{fmpz},
+        (Ref{FpPolyRingElem}, Ref{FpPolyRingElem}, Ref{ZZRingElem},
          Ref{fmpz_mod_ctx_struct}), 
         q, x, y.data, x.parent.base_ring.ninv)
   return q
@@ -213,9 +213,9 @@ end
 #
 ###############################################################################
 
-function integral(x::gfp_fmpz_poly)
+function integral(x::FpPolyRingElem)
    len = length(x)
-   v = Vector{gfp_fmpz_elem}(undef, len + 1)
+   v = Vector{FpFieldElem}(undef, len + 1)
    v[1] = zero(base_ring(x))
    for i = 1:len
       v[i + 1] = divexact(coeff(x, i - 1), base_ring(x)(i))
@@ -230,16 +230,16 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
-    lift(R::FmpzPolyRing, y::gfp_fmpz_poly)
+    lift(R::ZZPolyRing, y::FpPolyRingElem)
 
 Lift from a polynomial over $\mathbb{Z}/n\mathbb{Z}$ to a polynomial over
 $\mathbb{Z}$ with minimal reduced nonnegative coefficients. The ring `R`
 specifies the ring to lift into.
 """
-function lift(R::FmpzPolyRing, y::gfp_fmpz_poly)
-   z = fmpz_poly()
+function lift(R::ZZPolyRing, y::FpPolyRingElem)
+   z = ZZPolyRingElem()
    ccall((:fmpz_mod_poly_get_fmpz_poly, libflint), Nothing,
-         (Ref{fmpz_poly}, Ref{gfp_fmpz_poly}, Ref{fmpz_mod_ctx_struct}),
+         (Ref{ZZPolyRingElem}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}),
          z, y, y.parent.base_ring.ninv)
    z.parent = R
    return z
@@ -251,37 +251,37 @@ end
 #
 ################################################################################
 
-function gcd(x::gfp_fmpz_poly, y::gfp_fmpz_poly)
+function gcd(x::FpPolyRingElem, y::FpPolyRingElem)
    check_parent(x, y)
    z = parent(x)()
-   f = fmpz()
+   f = ZZRingElem()
    ccall((:fmpz_mod_poly_gcd, libflint), Nothing,
-         (Ref{gfp_fmpz_poly},
-          Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly}, Ref{fmpz_mod_ctx_struct}),
+         (Ref{FpPolyRingElem},
+          Ref{FpPolyRingElem}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}),
          z, x, y, x.parent.base_ring.ninv)
    return z
 end
 
-function gcdx(x::gfp_fmpz_poly, y::gfp_fmpz_poly)
+function gcdx(x::FpPolyRingElem, y::FpPolyRingElem)
   check_parent(x, y)
   g = parent(x)()
   s = parent(x)()
   t = parent(x)()
   ccall((:fmpz_mod_poly_xgcd, libflint), Nothing,
-        (Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly},
-         Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly}, Ref{fmpz_mod_ctx_struct}),
+        (Ref{FpPolyRingElem}, Ref{FpPolyRingElem}, Ref{FpPolyRingElem},
+         Ref{FpPolyRingElem}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}),
         g, s, t, x, y, x.parent.base_ring.ninv)
   return g, s, t
 end
 
-function gcdinv(x::gfp_fmpz_poly, y::gfp_fmpz_poly)
+function gcdinv(x::FpPolyRingElem, y::FpPolyRingElem)
    check_parent(x,y)
    length(y) >= 2 || error("Length of second argument must be >= 2")
    g = parent(x)()
    s = parent(x)()
    ccall((:fmpz_mod_poly_gcdinv, libflint), Nothing,
-         (Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly},
-          Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly}, Ref{fmpz_mod_ctx_struct}),
+         (Ref{FpPolyRingElem}, Ref{FpPolyRingElem},
+          Ref{FpPolyRingElem}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}),
          g, s, x, y, x.parent.base_ring.ninv)
    return g, s
 end
@@ -292,9 +292,9 @@ end
 #
 ################################################################################
 
-function is_irreducible(x::gfp_fmpz_poly)
+function is_irreducible(x::FpPolyRingElem)
   return Bool(ccall((:fmpz_mod_poly_is_irreducible, libflint), Cint,
-                    (Ref{gfp_fmpz_poly}, Ref{fmpz_mod_ctx_struct}),
+                    (Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}),
                     x, x.parent.base_ring.ninv))
 end
 
@@ -304,9 +304,9 @@ end
 #
 ################################################################################
 
-function is_squarefree(x::gfp_fmpz_poly)
+function is_squarefree(x::FpPolyRingElem)
    return Bool(ccall((:fmpz_mod_poly_is_squarefree, libflint), Cint,
-                     (Ref{gfp_fmpz_poly}, Ref{fmpz_mod_ctx_struct}),
+                     (Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}),
                      x, x.parent.base_ring.ninv))
 end
 
@@ -316,27 +316,27 @@ end
 #
 ################################################################################
 
-function Base.sqrt(x::gfp_fmpz_poly; check::Bool=true)
+function Base.sqrt(x::FpPolyRingElem; check::Bool=true)
    s = parent(x)()
    flag = Bool(ccall((:fmpz_mod_poly_sqrt, libflint), Cint,
-                     (Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly}, Ref{fmpz_mod_ctx_struct}),
+                     (Ref{FpPolyRingElem}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}),
                       s, x, x.parent.base_ring.ninv))
    check && !flag && error("Not a square in sqrt")
    return s
 end
 
-function issquare(x::gfp_fmpz_poly)
+function issquare(x::FpPolyRingElem)
    s = parent(x)()
    flag = Bool(ccall((:fmpz_mod_poly_sqrt, libflint), Cint,
-                     (Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly}, Ref{fmpz_mod_ctx_struct}),
+                     (Ref{FpPolyRingElem}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}),
                       s, x, x.parent.base_ring.ninv))
    return flag
 end
 
-function issquare_with_sqrt(x::gfp_fmpz_poly)
+function issquare_with_sqrt(x::FpPolyRingElem)
    s = parent(x)()
    flag = Bool(ccall((:fmpz_mod_poly_sqrt, libflint), Cint,
-                     (Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly}, Ref{fmpz_mod_ctx_struct}),
+                     (Ref{FpPolyRingElem}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}),
                       s, x, x.parent.base_ring.ninv))
    return flag, s
 end
@@ -347,23 +347,23 @@ end
 #
 ################################################################################
 
-function factor(x::gfp_fmpz_poly)
+function factor(x::FpPolyRingElem)
   fac = _factor(x)
   return Fac(parent(x)(leading_coefficient(x)), fac)
 end
 
-function _factor(x::gfp_fmpz_poly)
+function _factor(x::FpPolyRingElem)
   n = x.parent.base_ring.ninv
   fac = gfp_fmpz_poly_factor(n)
   ccall((:fmpz_mod_poly_factor, libflint), Nothing,
-        (Ref{gfp_fmpz_poly_factor}, Ref{gfp_fmpz_poly},
+        (Ref{gfp_fmpz_poly_factor}, Ref{FpPolyRingElem},
          Ref{fmpz_mod_ctx_struct}),
         fac, x, n)
-  res = Dict{gfp_fmpz_poly, Int}()
+  res = Dict{FpPolyRingElem, Int}()
   for i in 1:fac.num
     f = parent(x)()
     ccall((:fmpz_mod_poly_factor_get_fmpz_mod_poly, libflint), Nothing,
-          (Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly_factor}, Int,
+          (Ref{FpPolyRingElem}, Ref{gfp_fmpz_poly_factor}, Int,
            Ref{fmpz_mod_ctx_struct}),
           f, fac, i - 1, n)
     e = unsafe_load(fac.exp, i)
@@ -372,23 +372,23 @@ function _factor(x::gfp_fmpz_poly)
   return res 
 end  
 
-function factor_squarefree(x::gfp_fmpz_poly)
+function factor_squarefree(x::FpPolyRingElem)
   fac = _factor_squarefree(x)
   return Fac(parent(x)(leading_coefficient(x)), fac)
 end
 
-function _factor_squarefree(x::gfp_fmpz_poly)
+function _factor_squarefree(x::FpPolyRingElem)
   n = x.parent.base_ring.ninv
   fac = gfp_fmpz_poly_factor(n)
   ccall((:fmpz_mod_poly_factor_squarefree, libflint), UInt,
-        (Ref{gfp_fmpz_poly_factor}, Ref{gfp_fmpz_poly},
+        (Ref{gfp_fmpz_poly_factor}, Ref{FpPolyRingElem},
          Ref{fmpz_mod_ctx_struct}),
         fac, x, n)
-  res = Dict{gfp_fmpz_poly, Int}()
+  res = Dict{FpPolyRingElem, Int}()
   for i in 1:fac.num
     f = parent(x)()
     ccall((:fmpz_mod_poly_factor_get_fmpz_mod_poly, libflint), Nothing,
-          (Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly_factor}, Int,
+          (Ref{FpPolyRingElem}, Ref{gfp_fmpz_poly_factor}, Int,
            Ref{fmpz_mod_ctx_struct}),
           f, fac, i - 1, n)
     e = unsafe_load(fac.exp, i)
@@ -398,25 +398,25 @@ function _factor_squarefree(x::gfp_fmpz_poly)
 end  
 
 @doc Markdown.doc"""
-    factor_distinct_deg(x::fmpz_mod_poly)
+    factor_distinct_deg(x::ZZModPolyRingElem)
 
 Return the distinct degree factorisation of a squarefree polynomial $x$.
 """
-function factor_distinct_deg(x::gfp_fmpz_poly)
+function factor_distinct_deg(x::FpPolyRingElem)
   !is_squarefree(x) && error("Polynomial must be squarefree")
   degs = Vector{Int}(undef, degree(x))
   degss = [ pointer(degs) ]
   n = x.parent.base_ring.ninv
   fac = gfp_fmpz_poly_factor(n)
   ccall((:fmpz_mod_poly_factor_distinct_deg, libflint), UInt,
-        (Ref{gfp_fmpz_poly_factor}, Ref{gfp_fmpz_poly}, Ptr{Ptr{Int}},
+        (Ref{gfp_fmpz_poly_factor}, Ref{FpPolyRingElem}, Ptr{Ptr{Int}},
          Ref{fmpz_mod_ctx_struct}),
         fac, x, degss, n)
-  res = Dict{Int, gfp_fmpz_poly}()
+  res = Dict{Int, FpPolyRingElem}()
   for i in 1:fac.num
     f = parent(x)()
     ccall((:fmpz_mod_poly_factor_get_fmpz_mod_poly, libflint), Nothing,
-          (Ref{gfp_fmpz_poly}, Ref{gfp_fmpz_poly_factor}, Int,
+          (Ref{FpPolyRingElem}, Ref{gfp_fmpz_poly_factor}, Int,
            Ref{fmpz_mod_ctx_struct}),
           f, fac, i - 1, n)
     res[degs[i]] = f
@@ -424,18 +424,18 @@ function factor_distinct_deg(x::gfp_fmpz_poly)
   return res 
 end  
 
-function roots(a::gfp_fmpz_poly)
+function roots(a::FpPolyRingElem)
   R = parent(a)
   n = R.base_ring.ninv
   fac = fmpz_mod_poly_factor(n)
   ccall((:fmpz_mod_poly_roots, libflint), UInt,
-          (Ref{fmpz_mod_poly_factor}, Ref{gfp_fmpz_poly}, Cint, Ref{fmpz_mod_ctx_struct}),
+          (Ref{fmpz_mod_poly_factor}, Ref{FpPolyRingElem}, Cint, Ref{fmpz_mod_ctx_struct}),
           fac, a, 0, n)
   f = R()
-  res = gfp_fmpz_elem[]
+  res = FpFieldElem[]
   for i in 1:fac.num
     ccall((:fmpz_mod_poly_factor_get_fmpz_mod_poly, libflint), Nothing,
-          (Ref{gfp_fmpz_poly}, Ref{fmpz_mod_poly_factor}, Int, Ref{fmpz_mod_ctx_struct}),
+          (Ref{FpPolyRingElem}, Ref{fmpz_mod_poly_factor}, Int, Ref{fmpz_mod_ctx_struct}),
           f, fac, i - 1, n)
     @assert isone(coeff(f, 1))
     push!(res, -coeff(f, 0))
@@ -449,7 +449,7 @@ end
 #
 ################################################################################
 
-setcoeff!(x::gfp_fmpz_poly, n::Int, y::gfp_fmpz_elem) = setcoeff!(x, n, y.data)
+setcoeff!(x::FpPolyRingElem, n::Int, y::FpFieldElem) = setcoeff!(x, n, y.data)
 
 ################################################################################
 #
@@ -457,9 +457,9 @@ setcoeff!(x::gfp_fmpz_poly, n::Int, y::gfp_fmpz_elem) = setcoeff!(x, n, y.data)
 #
 ################################################################################
 
-promote_rule(::Type{gfp_fmpz_poly}, ::Type{gfp_fmpz_elem}) = gfp_fmpz_poly
+promote_rule(::Type{FpPolyRingElem}, ::Type{FpFieldElem}) = FpPolyRingElem
 
-promote_rule(::Type{gfp_fmpz_poly}, ::Type{fmpz}) = gfp_fmpz_poly
+promote_rule(::Type{FpPolyRingElem}, ::Type{ZZRingElem}) = FpPolyRingElem
 
 ###############################################################################
 #
@@ -467,7 +467,7 @@ promote_rule(::Type{gfp_fmpz_poly}, ::Type{fmpz}) = gfp_fmpz_poly
 #
 ###############################################################################
 
-function (f::gfp_fmpz_poly)(a::gfp_fmpz_elem)
+function (f::FpPolyRingElem)(a::FpFieldElem)
    if parent(a) != base_ring(f)
       return subst(f, a)
    end
@@ -480,55 +480,55 @@ end
 #
 ################################################################################
 
-function (R::GFPFmpzPolyRing)()
-  z = gfp_fmpz_poly(base_ring(R))
+function (R::FpPolyRing)()
+  z = FpPolyRingElem(base_ring(R))
   z.parent = R
   return z
 end
 
-function (R::GFPFmpzPolyRing)(x::fmpz)
-  z = gfp_fmpz_poly(base_ring(R), x)
+function (R::FpPolyRing)(x::ZZRingElem)
+  z = FpPolyRingElem(base_ring(R), x)
   z.parent = R
   return z
 end
 
-function (R::GFPFmpzPolyRing)(x::Integer)
-  z = gfp_fmpz_poly(base_ring(R), fmpz(x))
+function (R::FpPolyRing)(x::Integer)
+  z = FpPolyRingElem(base_ring(R), ZZRingElem(x))
   z.parent = R
   return z
 end
 
-function (R::GFPFmpzPolyRing)(x::gfp_fmpz_elem)
+function (R::FpPolyRing)(x::FpFieldElem)
   base_ring(R) != parent(x) && error("Wrong parents")
-  z = gfp_fmpz_poly(base_ring(R), x.data)
+  z = FpPolyRingElem(base_ring(R), x.data)
   z.parent = R
   return z
 end
 
-function (R::GFPFmpzPolyRing)(arr::Vector{fmpz})
-  z = gfp_fmpz_poly(base_ring(R), arr)
+function (R::FpPolyRing)(arr::Vector{ZZRingElem})
+  z = FpPolyRingElem(base_ring(R), arr)
   z.parent = R
   return z
 end
 
-function (R::GFPFmpzPolyRing)(arr::Vector{gfp_fmpz_elem})
+function (R::FpPolyRing)(arr::Vector{FpFieldElem})
   if length(arr) > 0
      (base_ring(R) != parent(arr[1])) && error("Wrong parents")
   end
-  z = gfp_fmpz_poly(base_ring(R), arr)
+  z = FpPolyRingElem(base_ring(R), arr)
   z.parent = R
   return z
 end
 
-(R::GFPFmpzPolyRing)(arr::Vector{T}) where {T <: Integer} = R(map(base_ring(R), arr))
+(R::FpPolyRing)(arr::Vector{T}) where {T <: Integer} = R(map(base_ring(R), arr))
 
-function (R::GFPFmpzPolyRing)(x::fmpz_poly)
-  z = gfp_fmpz_poly(base_ring(R), x)
+function (R::FpPolyRing)(x::ZZPolyRingElem)
+  z = FpPolyRingElem(base_ring(R), x)
   z.parent = R
   return z
 end
 
-function (R::GFPFmpzPolyRing)(f::gfp_fmpz_poly)
+function (R::FpPolyRing)(f::FpPolyRingElem)
    parent(f) != R && error("Unable to coerce polynomial")
    return f
 end
@@ -539,16 +539,16 @@ end
 #
 ################################################################################
 
-function PolynomialRing(R::GaloisFmpzField, s::Symbol; cached=true)
-   parent_obj = GFPFmpzPolyRing(R, s, cached)
+function PolynomialRing(R::FpField, s::Symbol; cached=true)
+   parent_obj = FpPolyRing(R, s, cached)
 
    return parent_obj, parent_obj([R(0), R(1)])
 end
 
-function PolynomialRing(R::GaloisFmpzField, s::AbstractString; cached = true)
+function PolynomialRing(R::FpField, s::AbstractString; cached = true)
    return PolynomialRing(R, Symbol(s); cached=cached)
 end
 
-function PolyRing(R::GaloisFmpzField)
-   return GFPFmpzPolyRing(R, :x, false)
+function PolyRing(R::FpField)
+   return FpPolyRing(R, :x, false)
 end

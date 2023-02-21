@@ -1,5 +1,5 @@
 @testset "fmpq_abs_series.types" begin
-   @test abs_series_type(fmpq) == fmpq_abs_series
+   @test abs_series_type(QQFieldElem) == fmpq_abs_series
 end
 
 @testset "fmpq_abs_series.constructors" begin
@@ -22,15 +22,15 @@ end
 
    @test isa(R(a), SeriesElem)
 
-   @test isa(R([fmpz(1), fmpz(2), fmpq(3)], 3, 5), SeriesElem)
+   @test isa(R([ZZRingElem(1), ZZRingElem(2), QQFieldElem(3)], 3, 5), SeriesElem)
 
-   @test isa(R([fmpq(1), fmpq(2), fmpq(3)], 3, 3), SeriesElem)
+   @test isa(R([QQFieldElem(1), QQFieldElem(2), QQFieldElem(3)], 3, 3), SeriesElem)
 
    @test isa(R(1), SeriesElem)
 
-   @test isa(R(fmpz(2)), SeriesElem)
+   @test isa(R(ZZRingElem(2)), SeriesElem)
 
-   @test isa(R(fmpq(2)), SeriesElem)
+   @test isa(R(QQFieldElem(2)), SeriesElem)
 
    @test isa(R(BigInt(2)), SeriesElem)
 
@@ -141,7 +141,7 @@ end
    @test parent(h) === parent(g)
    @test parent(k) !== parent(m)
 
-   p = abs_series(QQ, fmpq[], 0, 4)
+   p = abs_series(QQ, QQFieldElem[], 0, 4)
    q = abs_series(QQ, [], 0, 6)
 
    @test isa(p, fmpq_abs_series)
@@ -150,7 +150,7 @@ end
    @test length(p) == 0
    @test length(q) == 0
 
-   r = abs_series(QQ, fmpz[1, 2, 3], 3, 5)
+   r = abs_series(QQ, ZZRingElem[1, 2, 3], 3, 5)
 
    @test isa(r, fmpq_abs_series)
 
@@ -205,13 +205,13 @@ end
 
    @test BigInt(2) + a == 2x + x^3 + 2
 
-   @test a + fmpq(2) == 2x + x^3 + 2
+   @test a + QQFieldElem(2) == 2x + x^3 + 2
 
-   @test fmpq(2) + a == 2x + x^3 + 2
+   @test QQFieldElem(2) + a == 2x + x^3 + 2
 
-   @test a + fmpz(2) == 2x + x^3 + 2
+   @test a + ZZRingElem(2) == 2x + x^3 + 2
 
-   @test fmpz(2) + a == 2x + x^3 + 2
+   @test ZZRingElem(2) + a == 2x + x^3 + 2
 
    @test a + 2//1 == 2x + x^3 + 2
 
@@ -237,17 +237,17 @@ end
 
    @test d*ZZ(3) == 3x^2 + 9x^3 - 3x^4
 
-   @test c*fmpq(2, 3) == 2*x^2 + fmpz(2)//3*x + fmpz(2)//3+O(x^5)
+   @test c*QQFieldElem(2, 3) == 2*x^2 + ZZRingElem(2)//3*x + ZZRingElem(2)//3+O(x^5)
 
-   @test fmpq(2, 3)*c == 2*x^2 + fmpz(2)//3*x + fmpz(2)//3+O(x^5)
+   @test QQFieldElem(2, 3)*c == 2*x^2 + ZZRingElem(2)//3*x + ZZRingElem(2)//3+O(x^5)
 
-   @test c*(2//3) == 2*x^2 + fmpz(2)//3*x + fmpz(2)//3+O(x^5)
+   @test c*(2//3) == 2*x^2 + ZZRingElem(2)//3*x + ZZRingElem(2)//3+O(x^5)
 
-   @test (2//3)*c == 2*x^2 + fmpz(2)//3*x + fmpz(2)//3+O(x^5)
+   @test (2//3)*c == 2*x^2 + ZZRingElem(2)//3*x + ZZRingElem(2)//3+O(x^5)
 
-   @test c*(BigInt(2)//3) == 2*x^2 + fmpz(2)//3*x + fmpz(2)//3+O(x^5)
+   @test c*(BigInt(2)//3) == 2*x^2 + ZZRingElem(2)//3*x + ZZRingElem(2)//3+O(x^5)
 
-   @test (BigInt(2)//3)*c == 2*x^2 + fmpz(2)//3*x + fmpz(2)//3+O(x^5)
+   @test (BigInt(2)//3)*c == 2*x^2 + ZZRingElem(2)//3*x + ZZRingElem(2)//3+O(x^5)
 end
 
 @testset "fmpq_abs_series.comparison" begin
@@ -279,11 +279,11 @@ end
    @test d == BigInt(3)
    @test BigInt(3) == d
 
-   @test d == fmpz(3)
-   @test fmpz(3) == d
+   @test d == ZZRingElem(3)
+   @test ZZRingElem(3) == d
 
-   @test d == fmpq(3)
-   @test fmpq(3) == d
+   @test d == QQFieldElem(3)
+   @test QQFieldElem(3) == d
 
    @test d == 3//1
    @test 3//1 == d
@@ -388,9 +388,9 @@ end
 
    @test isequal(divexact(7a, BigInt(7)), a)
 
-   @test isequal(divexact(11b, fmpz(11)), b)
+   @test isequal(divexact(11b, ZZRingElem(11)), b)
 
-   @test isequal(divexact(2c, fmpz(2)), c)
+   @test isequal(divexact(2c, ZZRingElem(2)), c)
 
    @test isequal(divexact(9d, 9), d)
 

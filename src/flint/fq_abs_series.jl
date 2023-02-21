@@ -11,8 +11,8 @@ export fq_abs_series, FqAbsSeriesRing,
        PowerSeriesRing
 
 for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
-   (fq_abs_series, FqAbsSeriesRing, FqFiniteField, fq, "fq_poly", "fq"),
-   (fq_nmod_abs_series, FqNmodAbsSeriesRing, FqNmodFiniteField, fq_nmod, "fq_nmod_poly", "fq_nmod"))
+   (fq_abs_series, FqAbsSeriesRing, FqPolyRepField, FqPolyRepFieldElem, "FqPolyRepPolyRingElem", "FqPolyRepFieldElem"),
+   (fq_nmod_abs_series, FqNmodAbsSeriesRing, fqPolyRepField, fqPolyRepFieldElem, "fqPolyRepPolyRingElem", "fqPolyRepFieldElem"))
 @eval begin
 
 ###############################################################################
@@ -416,7 +416,7 @@ end
 
 ==(x::($btype), y::($etype)) = y == x
 
-function ==(x::($etype), y::fmpz)
+function ==(x::($etype), y::ZZRingElem)
    if length(x) > 1
       return false
    elseif length(x) == 1
@@ -430,9 +430,9 @@ function ==(x::($etype), y::fmpz)
    end
 end
 
-==(x::fmpz, y::($etype)) = y == x
+==(x::ZZRingElem, y::($etype)) = y == x
 
-==(x::($etype), y::Integer) = x == fmpz(y)
+==(x::($etype), y::Integer) = x == ZZRingElem(y)
 
 ==(x::Integer, y::($etype)) = y == x
 
@@ -677,7 +677,7 @@ promote_rule(::Type{($etype)}, ::Type{T}) where {T <: Integer} = ($etype)
 
 promote_rule(::Type{($etype)}, ::Type{$(btype)}) = ($etype)
 
-promote_rule(::Type{($etype)}, ::Type{fmpz}) = ($etype)
+promote_rule(::Type{($etype)}, ::Type{ZZRingElem}) = ($etype)
 
 ###############################################################################
 #
@@ -705,7 +705,7 @@ function (a::($rtype))(b::Integer)
    return z
 end
 
-function (a::($rtype))(b::fmpz)
+function (a::($rtype))(b::ZZRingElem)
    ctx = base_ring(a)
    if iszero(b)
       z = ($etype)(ctx)
@@ -750,7 +750,7 @@ end # for
 #
 ###############################################################################
 
-function PowerSeriesRing(R::FqFiniteField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
+function PowerSeriesRing(R::FqPolyRepField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
    if model == :capped_relative
       parent_obj = FqRelSeriesRing(R, prec, s, cached)
    elseif model == :capped_absolute
@@ -762,19 +762,19 @@ function PowerSeriesRing(R::FqFiniteField, prec::Int, s::Symbol; model=:capped_r
    return parent_obj, gen(parent_obj)
 end
 
-function PowerSeriesRing(R::FqFiniteField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
+function PowerSeriesRing(R::FqPolyRepField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
    return PowerSeriesRing(R, prec, Symbol(s); model=model, cached=cached)
 end
 
-function AbsSeriesRing(R::FqFiniteField, prec::Int)
+function AbsSeriesRing(R::FqPolyRepField, prec::Int)
    return FqAbsSeriesRing(R, prec, :x, false)
 end
 
-function RelSeriesRing(R::FqFiniteField, prec::Int)
+function RelSeriesRing(R::FqPolyRepField, prec::Int)
    return FqRelSeriesRing(R, prec, :x, false)
 end
 
-function PowerSeriesRing(R::FqNmodFiniteField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
+function PowerSeriesRing(R::fqPolyRepField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
    if model == :capped_relative
       parent_obj = FqNmodRelSeriesRing(R, prec, s, cached)
    elseif model == :capped_absolute
@@ -786,14 +786,14 @@ function PowerSeriesRing(R::FqNmodFiniteField, prec::Int, s::Symbol; model=:capp
    return parent_obj, gen(parent_obj)
 end
 
-function PowerSeriesRing(R::FqNmodFiniteField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
+function PowerSeriesRing(R::fqPolyRepField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
    return PowerSeriesRing(R, prec, Symbol(s); model=model, cached=cached)
 end
 
-function AbsSeriesRing(R::FqNmodFiniteField, prec::Int)
+function AbsSeriesRing(R::fqPolyRepField, prec::Int)
    return FqNmodAbsSeriesRing(R, prec, :x, false)
 end
 
-function RelSeriesRing(R::FqNmodFiniteField, prec::Int)
+function RelSeriesRing(R::fqPolyRepField, prec::Int)
    return FqNmodRelSeriesRing(R, prec, :x, false)
 end

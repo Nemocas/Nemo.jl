@@ -1,10 +1,10 @@
 ################################################################################
 #
-#  nmod_poly.jl : Flint nmod_poly (polynomials over Z/nZ, small modulus)
+#  zzModPolyRingElem.jl : Flint zzModPolyRingElem (polynomials over Z/nZ, small modulus)
 #
 ################################################################################
 
-export NmodPolyRing, nmod_poly, parent, base_ring, elem_type, length, zero,
+export zzModPolyRing, zzModPolyRingElem, parent, base_ring, elem_type, length, zero,
        one, gen, is_gen, iszero, var, deepcopy, show, truncate, mullow, reverse,
        shift_left, shift_right, divexact, rem, gcd, resultant,
        evaluate, derivative, compose, interpolate, inflate, deflate, lift,
@@ -19,19 +19,19 @@ export NmodPolyRing, nmod_poly, parent, base_ring, elem_type, length, zero,
 #
 ################################################################################
 
-parent(a::nmod_poly) = a.parent
+parent(a::zzModPolyRingElem) = a.parent
 
-base_ring(R::NmodPolyRing) = R.base_ring
+base_ring(R::zzModPolyRing) = R.base_ring
 
-base_ring(a::nmod_poly) = base_ring(parent(a))
+base_ring(a::zzModPolyRingElem) = base_ring(parent(a))
 
-parent_type(::Type{nmod_poly}) = NmodPolyRing
+parent_type(::Type{zzModPolyRingElem}) = zzModPolyRing
 
-elem_type(::Type{nmod_poly}) = nmod_poly
+elem_type(::Type{zzModPolyRingElem}) = zzModPolyRingElem
 
-elem_type(::Type{NmodPolyRing}) = nmod_poly
+elem_type(::Type{zzModPolyRing}) = zzModPolyRingElem
 
-dense_poly_type(::Type{nmod}) = nmod_poly
+dense_poly_type(::Type{zzModRingElem}) = zzModPolyRingElem
 
 function check_parent(x::T, y::T) where T <: Zmodn_poly
   parent(x) != parent(y) && error("Parents must coincide")
@@ -44,9 +44,9 @@ end
 #
 ################################################################################
 
-function lead_is_unit_or_throw(a::nmod_poly)
+function lead_is_unit_or_throw(a::zzModPolyRingElem)
    d = degree(a)
-   u = ccall((:nmod_poly_get_coeff_ui, libflint), UInt, (Ref{nmod_poly}, Int), a, d)
+   u = ccall((:nmod_poly_get_coeff_ui, libflint), UInt, (Ref{zzModPolyRingElem}, Int), a, d)
    n = ccall((:n_gcd, libflint), UInt, (UInt, UInt), u, modulus(a))
    if n != 1
       R = base_ring(a)
@@ -54,10 +54,10 @@ function lead_is_unit_or_throw(a::nmod_poly)
    end
 end
 
-function Base.hash(a::nmod_poly, h::UInt)
+function Base.hash(a::zzModPolyRingElem, h::UInt)
    b = 0x53dd43cd511044d1%UInt
    for i in 0:length(a) - 1
-      u = ccall((:nmod_poly_get_coeff_ui, libflint), UInt, (Ref{nmod_poly}, Int), a, i)
+      u = ccall((:nmod_poly_get_coeff_ui, libflint), UInt, (Ref{zzModPolyRingElem}, Int), a, i)
       b = xor(b, xor(hash(u, h), h))
       b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
@@ -87,11 +87,11 @@ function coeff_raw(x::T, n::Int) where T <: Zmodn_poly
                 (Ref{T}, Int), x, n)
 end
 
-zero(R::NmodPolyRing) = R(UInt(0))
+zero(R::zzModPolyRing) = R(UInt(0))
 
-one(R::NmodPolyRing) = R(UInt(1))
+one(R::zzModPolyRing) = R(UInt(1))
 
-gen(R::NmodPolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
+gen(R::zzModPolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
 
 is_gen(a::T) where T <: Zmodn_poly = (degree(a) == 1 &&
                               iszero(coeff(a,0)) && isone(coeff(a,1)))
@@ -101,17 +101,17 @@ iszero(a::T) where T <: Zmodn_poly = Bool(ccall((:nmod_poly_is_zero, libflint), 
 
 modulus(a::T) where T <: Zmodn_poly = a.parent.n
 
-modulus(R::NmodPolyRing) = R.n
+modulus(R::zzModPolyRing) = R.n
 
-var(R::NmodPolyRing) = R.S
+var(R::zzModPolyRing) = R.S
 
-function deepcopy_internal(a::nmod_poly, dict::IdDict)
-  z = nmod_poly(modulus(a), a)
+function deepcopy_internal(a::zzModPolyRingElem, dict::IdDict)
+  z = zzModPolyRingElem(modulus(a), a)
   z.parent = a.parent
   return z
 end
 
-characteristic(R::NmodPolyRing) = modulus(R)
+characteristic(R::zzModPolyRing) = modulus(R)
 
 ###############################################################################
 #
@@ -119,13 +119,13 @@ characteristic(R::NmodPolyRing) = modulus(R)
 #
 ###############################################################################
 
-function similar(f::PolyElem, R::NmodRing, s::Symbol=var(parent(f)); cached::Bool=true)
-   z = nmod_poly(R.n)
-   if base_ring(f) === R && s == var(parent(f)) && typeof(f) == nmod_poly
+function similar(f::PolyElem, R::zzModRing, s::Symbol=var(parent(f)); cached::Bool=true)
+   z = zzModPolyRingElem(R.n)
+   if base_ring(f) === R && s == var(parent(f)) && typeof(f) == zzModPolyRingElem
       # steal parent in case it is not cached
       z.parent = parent(f)
    else
-      z.parent = NmodPolyRing(R, s, cached)
+      z.parent = zzModPolyRing(R, s, cached)
    end
    return z
 end
@@ -136,11 +136,11 @@ end
 #
 ###############################################################################
 
-function polynomial(R::NmodRing, arr::Vector{T}, var::String="x"; cached::Bool=true) where T
+function polynomial(R::zzModRing, arr::Vector{T}, var::String="x"; cached::Bool=true) where T
    coeffs = map(R, arr)
-   coeffs = length(coeffs) == 0 ? nmod[] : coeffs
-   z = nmod_poly(R.n, coeffs)
-   z.parent = NmodPolyRing(R, Symbol(var), cached)
+   coeffs = length(coeffs) == 0 ? zzModRingElem[] : coeffs
+   z = zzModPolyRingElem(R.n, coeffs)
+   z.parent = zzModPolyRing(R, Symbol(var), cached)
    return z
 end
 
@@ -150,7 +150,7 @@ end
 #
 ################################################################################
 
-function show(io::IO, R::NmodPolyRing)
+function show(io::IO, R::zzModPolyRing)
   print(io, "Univariate Polynomial Ring in ")
   print(io, string(var(R)))
   print(io, " over ")
@@ -225,28 +225,28 @@ end
 
 *(x::UInt, y::T) where T <: Zmodn_poly = y*x
 
-function *(x::T, y::fmpz) where T <: Zmodn_poly
+function *(x::T, y::ZZRingElem) where T <: Zmodn_poly
   z = parent(x)()
-  t = fmpz()
+  t = ZZRingElem()
   tt = UInt(0)
   ccall((:fmpz_mod_ui, libflint), UInt,
-                (Ref{fmpz}, Ref{fmpz}, UInt), t, y, parent(x).n)
-  tt = ccall((:fmpz_get_ui, libflint), UInt, (Ref{fmpz}, ), t)
+                (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt), t, y, parent(x).n)
+  tt = ccall((:fmpz_get_ui, libflint), UInt, (Ref{ZZRingElem}, ), t)
   return x*tt
 end
 
-*(x::fmpz, y::T) where T <: Zmodn_poly = y*x
+*(x::ZZRingElem, y::T) where T <: Zmodn_poly = y*x
 
-*(x::T, y::Integer) where T <: Zmodn_poly = x*fmpz(y)
+*(x::T, y::Integer) where T <: Zmodn_poly = x*ZZRingElem(y)
 
 *(x::Integer, y::T) where T <: Zmodn_poly = y*x
 
-function *(x::nmod_poly, y::nmod)
+function *(x::zzModPolyRingElem, y::zzModRingElem)
   (base_ring(x) != parent(y)) && error("Must have same parent")
   return x*y.data
 end
 
-*(x::nmod, y::nmod_poly) = y*x
+*(x::zzModRingElem, y::zzModPolyRingElem) = y*x
 
 function +(x::T, y::UInt) where T <: Zmodn_poly
   z = parent(x)()
@@ -257,28 +257,28 @@ end
 
 +(x::UInt, y::T) where T <: Zmodn_poly = y + x
 
-function +(x::T, y::fmpz) where T <: Zmodn_poly
+function +(x::T, y::ZZRingElem) where T <: Zmodn_poly
   z = parent(x)()
-  t = fmpz()
+  t = ZZRingElem()
   tt = UInt(0)
   ccall((:fmpz_mod_ui, libflint), UInt,
-                (Ref{fmpz}, Ref{fmpz}, UInt), t, y, parent(x).n)
-  tt = ccall((:fmpz_get_ui, libflint), UInt, (Ref{fmpz}, ), t)
+                (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt), t, y, parent(x).n)
+  tt = ccall((:fmpz_get_ui, libflint), UInt, (Ref{ZZRingElem}, ), t)
   return +(x,tt)
 end
 
-+(x::fmpz, y::T) where T <: Zmodn_poly = y + x
++(x::ZZRingElem, y::T) where T <: Zmodn_poly = y + x
 
-+(x::T, y::Integer) where T <: Zmodn_poly = x + fmpz(y)
++(x::T, y::Integer) where T <: Zmodn_poly = x + ZZRingElem(y)
 
 +(x::Integer, y::T) where T <: Zmodn_poly = y + x
 
-function +(x::nmod_poly, y::nmod)
+function +(x::zzModPolyRingElem, y::zzModRingElem)
   (base_ring(x) != parent(y)) && error("Elements must have same parent")
   return +(x, y.data)
 end
 
-+(x::nmod, y::nmod_poly) = y + x
++(x::zzModRingElem, y::zzModPolyRingElem) = y + x
 
 function -(x::T, y::UInt) where T <: Zmodn_poly
   z = parent(x)()
@@ -289,28 +289,28 @@ end
 
 -(x::UInt, y::T) where T <: Zmodn_poly = -(y - x)
 
-function -(x::T, y::fmpz) where T <: Zmodn_poly
+function -(x::T, y::ZZRingElem) where T <: Zmodn_poly
   z = parent(x)()
-  t = fmpz()
+  t = ZZRingElem()
   tt = UInt(0)
   ccall((:fmpz_mod_ui, libflint), UInt,
-                (Ref{fmpz}, Ref{fmpz}, UInt), t, y, parent(x).n)
-  tt = ccall((:fmpz_get_ui, libflint), UInt, (Ref{fmpz}, ), t)
+                (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt), t, y, parent(x).n)
+  tt = ccall((:fmpz_get_ui, libflint), UInt, (Ref{ZZRingElem}, ), t)
   return -(x,tt)
 end
 
--(x::fmpz, y::T) where T <: Zmodn_poly = -(y - x)
+-(x::ZZRingElem, y::T) where T <: Zmodn_poly = -(y - x)
 
--(x::T, y::Integer) where T <: Zmodn_poly = x - fmpz(y)
+-(x::T, y::Integer) where T <: Zmodn_poly = x - ZZRingElem(y)
 
 -(x::Integer, y::T) where T <: Zmodn_poly = -(y - x)
 
-function -(x::nmod_poly, y::nmod)
+function -(x::zzModPolyRingElem, y::zzModRingElem)
   (base_ring(x) != parent(y)) && error("Elements must have same parent")
   return -(x,y.data)
 end
 
--(x::nmod, y::nmod_poly) = -(y - x)
+-(x::zzModRingElem, y::zzModPolyRingElem) = -(y - x)
 
 ################################################################################
 #
@@ -346,20 +346,20 @@ isequal(x::T, y::T) where T <: Zmodn_poly = x == y
 #
 ################################################################################
 
-function ==(x::nmod_poly, y::nmod)
+function ==(x::zzModPolyRingElem, y::zzModRingElem)
   base_ring(x) != parent(y) && error("Incompatible base rings in comparison")
   if length(x) > 1
     return false
   elseif length(x) == 1
     u = ccall((:nmod_poly_get_coeff_ui, libflint), UInt,
-            (Ref{nmod_poly}, Int), x, 0)
+            (Ref{zzModPolyRingElem}, Int), x, 0)
     return u == y
   else
     return iszero(y)
   end
 end
 
-==(x::nmod, y::nmod_poly) = y == x
+==(x::zzModRingElem, y::zzModPolyRingElem) = y == x
 
 ################################################################################
 #
@@ -429,13 +429,13 @@ end
 #
 ###############################################################################
 
-function divexact(x::nmod_poly, y::nmod_poly; check::Bool=true)
+function divexact(x::zzModPolyRingElem, y::zzModPolyRingElem; check::Bool=true)
   check_parent(x, y)
   iszero(y) && throw(DivideError())
   lead_is_unit_or_throw(y)
   z = parent(x)()
   ccall((:nmod_poly_div, libflint), Nothing,
-          (Ref{nmod_poly}, Ref{nmod_poly}, Ref{nmod_poly}), z, x, y)
+          (Ref{zzModPolyRingElem}, Ref{zzModPolyRingElem}, Ref{zzModPolyRingElem}), z, x, y)
   return z
 end
 
@@ -445,13 +445,13 @@ end
 #
 ################################################################################
 
-function divexact(x::nmod_poly, y::nmod; check::Bool=true)
+function divexact(x::zzModPolyRingElem, y::zzModRingElem; check::Bool=true)
   base_ring(x) != parent(y) && error("Elements must have same parent")
   iszero(y) && throw(DivideError())
   return divexact(x, parent(x)(y); check=check)
 end
 
-function divexact(x::T, y::fmpz; check::Bool=true) where T <: Zmodn_poly
+function divexact(x::T, y::ZZRingElem; check::Bool=true) where T <: Zmodn_poly
   iszero(y) && throw(DivideError())
   return divexact(x, parent(x)(y); check=check)
 end
@@ -467,25 +467,25 @@ end
 #
 ################################################################################
 
-function Base.divrem(x::nmod_poly, y::nmod_poly)
+function Base.divrem(x::zzModPolyRingElem, y::zzModPolyRingElem)
   check_parent(x,y)
   iszero(y) && throw(DivideError())
   lead_is_unit_or_throw(y)
   q = parent(x)()
   r = parent(x)()
   ccall((:nmod_poly_divrem, libflint), Nothing,
-          (Ref{nmod_poly}, Ref{nmod_poly}, Ref{nmod_poly}, Ref{nmod_poly}),
+          (Ref{zzModPolyRingElem}, Ref{zzModPolyRingElem}, Ref{zzModPolyRingElem}, Ref{zzModPolyRingElem}),
           q, r, x, y)
   return q, r
 end
 
-function Base.div(x::nmod_poly, y::nmod_poly)
+function Base.div(x::zzModPolyRingElem, y::zzModPolyRingElem)
   check_parent(x,y)
   iszero(y) && throw(DivideError())
   lead_is_unit_or_throw(y)
   q = parent(x)()
   ccall((:nmod_poly_div, libflint), Nothing,
-          (Ref{nmod_poly}, Ref{nmod_poly}, Ref{nmod_poly}),
+          (Ref{zzModPolyRingElem}, Ref{zzModPolyRingElem}, Ref{zzModPolyRingElem}),
           q, x, y)
   return q
 end
@@ -496,13 +496,13 @@ end
 #
 ################################################################################
 
-function rem(x::nmod_poly, y::nmod_poly)
+function rem(x::zzModPolyRingElem, y::zzModPolyRingElem)
   check_parent(x,y)
   iszero(y) && throw(DivideError())
   lead_is_unit_or_throw(y)
   z = parent(x)()
   ccall((:nmod_poly_rem, libflint), Nothing,
-          (Ref{nmod_poly}, Ref{nmod_poly}, Ref{nmod_poly}), z, x, y)
+          (Ref{zzModPolyRingElem}, Ref{zzModPolyRingElem}, Ref{zzModPolyRingElem}), z, x, y)
   return z
 end
 
@@ -514,13 +514,13 @@ mod(x::T, y::T) where T <: Zmodn_poly = rem(x, y)
 #
 ################################################################################
 
-function AbstractAlgebra.hgcd_prefers_basecase(a::nmod_poly, b::nmod_poly)
+function AbstractAlgebra.hgcd_prefers_basecase(a::zzModPolyRingElem, b::zzModPolyRingElem)
    return length(b) < 100
 end
 
 function AbstractAlgebra.mat22_mul_prefers_classical(
-   a11::nmod_poly, a12::nmod_poly, a21::nmod_poly, a22::nmod_poly,
-   b11::nmod_poly, b12::nmod_poly, b21::nmod_poly, b22::nmod_poly)
+   a11::zzModPolyRingElem, a12::zzModPolyRingElem, a21::zzModPolyRingElem, a22::zzModPolyRingElem,
+   b11::zzModPolyRingElem, b12::zzModPolyRingElem, b21::zzModPolyRingElem, b22::zzModPolyRingElem)
    return length(a11) + length(a22) < 30 || length(b11) + length(b22) < 30
 end
 
@@ -578,13 +578,13 @@ end
 #
 ################################################################################
 
-function resultant(x::nmod_poly, y::nmod_poly,  check::Bool = true)
+function resultant(x::zzModPolyRingElem, y::zzModPolyRingElem,  check::Bool = true)
   if check
     check_parent(x,y)
     !is_prime(modulus(x)) && error("Modulus not prime in resultant")
   end
   r = ccall((:nmod_poly_resultant, libflint), UInt,
-          (Ref{nmod_poly}, Ref{nmod_poly}), x, y)
+          (Ref{zzModPolyRingElem}, Ref{zzModPolyRingElem}), x, y)
   return base_ring(x)(r)
 end
 
@@ -594,10 +594,10 @@ end
 #
 ################################################################################
 
-function evaluate(x::nmod_poly, y::nmod)
+function evaluate(x::zzModPolyRingElem, y::zzModRingElem)
   base_ring(x) != parent(y) && error("Elements must have same parent")
   z = ccall((:nmod_poly_evaluate_nmod, libflint), UInt,
-              (Ref{nmod_poly}, UInt), x, y.data)
+              (Ref{zzModPolyRingElem}, UInt), x, y.data)
   return parent(y)(z)
 end
 
@@ -647,8 +647,8 @@ end
 #
 ################################################################################
 
-function interpolate(R::NmodPolyRing, x::Vector{nmod},
-                                      y::Vector{nmod})
+function interpolate(R::zzModPolyRing, x::Vector{zzModRingElem},
+                                      y::Vector{zzModRingElem})
   z = R()
 
   ax = Vector{UInt}(undef, length(x))
@@ -660,7 +660,7 @@ function interpolate(R::NmodPolyRing, x::Vector{nmod},
     ay[i] = y[i].data
   end
   ccall((:nmod_poly_interpolate_nmod_vec, libflint), Nothing,
-          (Ref{nmod_poly}, Ptr{UInt}, Ptr{UInt}, Int),
+          (Ref{zzModPolyRingElem}, Ptr{UInt}, Ptr{UInt}, Int),
           z, ax, ay, length(x))
   return z
 end
@@ -694,16 +694,16 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
-    lift(R::FmpzPolyRing, y::nmod_poly)
+    lift(R::ZZPolyRing, y::zzModPolyRingElem)
 
 Lift from a polynomial over $\mathbb{Z}/n\mathbb{Z}$ to a polynomial over
 $\mathbb{Z}$ with minimal reduced nonnegative coefficients. The ring `R`
 specifies the ring to lift into.
 """
-function lift(R::FmpzPolyRing, y::nmod_poly)
-  z = fmpz_poly()
+function lift(R::ZZPolyRing, y::zzModPolyRingElem)
+  z = ZZPolyRingElem()
   ccall((:fmpz_poly_set_nmod_poly_unsigned, libflint), Nothing,
-          (Ref{fmpz_poly}, Ref{nmod_poly}), z, y)
+          (Ref{ZZPolyRingElem}, Ref{zzModPolyRingElem}), z, y)
   z.parent = R
   return z
 end
@@ -714,10 +714,10 @@ end
 #
 ################################################################################
 
-function is_irreducible(x::nmod_poly)
+function is_irreducible(x::zzModPolyRingElem)
   !is_prime(modulus(x)) && error("Modulus not prime in is_irreducible")
   return Bool(ccall((:nmod_poly_is_irreducible, libflint), Int32,
-          (Ref{nmod_poly}, ), x))
+          (Ref{zzModPolyRingElem}, ), x))
 end
 
 ################################################################################
@@ -726,10 +726,10 @@ end
 #
 ################################################################################
 
-function is_squarefree(x::nmod_poly)
+function is_squarefree(x::zzModPolyRingElem)
    !is_prime(modulus(x)) && error("Modulus not prime in is_squarefree")
    return Bool(ccall((:nmod_poly_is_squarefree, libflint), Int32,
-       (Ref{nmod_poly}, ), x))
+       (Ref{zzModPolyRingElem}, ), x))
 end
 
 ################################################################################
@@ -738,41 +738,41 @@ end
 #
 ################################################################################
 
-function factor(x::nmod_poly)
+function factor(x::zzModPolyRingElem)
   fac, z = _factor(x)
   return Fac(parent(x)(z), fac)
 end
 
-function _factor(x::nmod_poly)
+function _factor(x::zzModPolyRingElem)
   !is_prime(modulus(x)) && error("Modulus not prime in factor")
   fac = nmod_poly_factor(x.mod_n)
   z = ccall((:nmod_poly_factor, libflint), UInt,
-          (Ref{nmod_poly_factor}, Ref{nmod_poly}), fac, x)
-  res = Dict{nmod_poly,Int}()
+          (Ref{nmod_poly_factor}, Ref{zzModPolyRingElem}), fac, x)
+  res = Dict{zzModPolyRingElem,Int}()
   for i in 1:fac.num
     f = parent(x)()
     ccall((:nmod_poly_factor_get_nmod_poly, libflint), Nothing,
-            (Ref{nmod_poly}, Ref{nmod_poly_factor}, Int), f, fac, i-1)
+            (Ref{zzModPolyRingElem}, Ref{nmod_poly_factor}, Int), f, fac, i-1)
     e = unsafe_load(fac.exp,i)
     res[f] = e
   end
   return res, base_ring(x)(z)
 end
 
-function factor_squarefree(x::nmod_poly)
+function factor_squarefree(x::zzModPolyRingElem)
   !is_prime(modulus(x)) && error("Modulus not prime in factor_squarefree")
   return Fac(parent(x)(leading_coefficient(x)), _factor_squarefree(x))
 end
 
-function _factor_squarefree(x::nmod_poly)
+function _factor_squarefree(x::zzModPolyRingElem)
   fac = nmod_poly_factor(x.mod_n)
   ccall((:nmod_poly_factor_squarefree, libflint), UInt,
-          (Ref{nmod_poly_factor}, Ref{nmod_poly}), fac, x)
-  res = Dict{nmod_poly,Int}()
+          (Ref{nmod_poly_factor}, Ref{zzModPolyRingElem}), fac, x)
+  res = Dict{zzModPolyRingElem,Int}()
   for i in 1:fac.num
     f = parent(x)()
     ccall((:nmod_poly_factor_get_nmod_poly, libflint), Nothing,
-            (Ref{nmod_poly}, Ref{nmod_poly_factor}, Int), f, fac, i-1)
+            (Ref{zzModPolyRingElem}, Ref{nmod_poly_factor}, Int), f, fac, i-1)
     e = unsafe_load(fac.exp,i)
     res[f] = e
   end
@@ -780,24 +780,24 @@ function _factor_squarefree(x::nmod_poly)
 end
 
 @doc Markdown.doc"""
-    factor_distinct_deg(x::nmod_poly)
+    factor_distinct_deg(x::zzModPolyRingElem)
 
 Return the distinct degree factorisation of a squarefree polynomial $x$.
 """
-function factor_distinct_deg(x::nmod_poly)
+function factor_distinct_deg(x::zzModPolyRingElem)
   !is_squarefree(x) && error("Polynomial must be squarefree")
   !is_prime(modulus(x)) && error("Modulus not prime in factor_distinct_deg")
   degs = Vector{Int}(undef, degree(x))
   degss = [ pointer(degs) ]
   fac = nmod_poly_factor(x.mod_n)
   ccall((:nmod_poly_factor_distinct_deg, libflint), UInt,
-          (Ref{nmod_poly_factor}, Ref{nmod_poly}, Ptr{Ptr{Int}}),
+          (Ref{nmod_poly_factor}, Ref{zzModPolyRingElem}, Ptr{Ptr{Int}}),
           fac, x, degss)
-  res = Dict{Int,nmod_poly}()
+  res = Dict{Int,zzModPolyRingElem}()
   for i in 1:fac.num
     f = parent(x)()
     ccall((:nmod_poly_factor_get_nmod_poly, libflint), Nothing,
-            (Ref{nmod_poly}, Ref{nmod_poly_factor}, Int), f, fac, i-1)
+            (Ref{zzModPolyRingElem}, Ref{nmod_poly_factor}, Int), f, fac, i-1)
     res[degs[i]] = f
   end
   return res
@@ -820,13 +820,13 @@ function factor_shape(x::PolyElem{T}) where {T <: RingElem}
   return res
 end
 
-function roots(a::nmod_poly)
+function roots(a::zzModPolyRingElem)
   R = parent(a)
   n = R.n
   fac = nmod_poly_factor(n)
   if is_prime(n)
     ccall((:nmod_poly_roots, libflint), UInt,
-            (Ref{nmod_poly_factor}, Ref{nmod_poly}, Cint),
+            (Ref{nmod_poly_factor}, Ref{zzModPolyRingElem}, Cint),
             fac, a, 0)
   else
     nfac = n_factor()
@@ -834,14 +834,14 @@ function roots(a::nmod_poly)
           (Ref{n_factor}, UInt),
           nfac, n)
     ccall((:nmod_poly_roots_factored, libflint), UInt,
-            (Ref{nmod_poly_factor}, Ref{nmod_poly}, Cint, Ref{n_factor}),
+            (Ref{nmod_poly_factor}, Ref{zzModPolyRingElem}, Cint, Ref{n_factor}),
             fac, a, 0, nfac)
   end
   f = R()
-  res = nmod[]
+  res = zzModRingElem[]
   for i in 1:fac.num
     ccall((:nmod_poly_factor_get_nmod_poly, libflint), Nothing,
-          (Ref{nmod_poly}, Ref{nmod_poly_factor}, Int),
+          (Ref{zzModPolyRingElem}, Ref{nmod_poly_factor}, Int),
           f, fac, i - 1)
     @assert isone(coeff(f, 1))
     push!(res, -coeff(f, 0))
@@ -869,12 +869,12 @@ function _remove_check_simple_cases(a, b)
    return (false, 0)
 end
 
-function remove(z::nmod_poly, p::nmod_poly)
+function remove(z::zzModPolyRingElem, p::zzModPolyRingElem)
    ok, v = _remove_check_simple_cases(z, p)
    ok && return v, zero(parent(z))
    z = deepcopy(z)
    v = ccall((:nmod_poly_remove, libflint), Int,
-               (Ref{nmod_poly}, Ref{nmod_poly}), z,  p)
+               (Ref{zzModPolyRingElem}, Ref{zzModPolyRingElem}), z,  p)
    return v, z
 end
 
@@ -891,11 +891,11 @@ end
 
 ################################################################################
 #
-#  Speedups for rings over nmod_poly
+#  Speedups for rings over zzModPolyRingElem
 #
 ################################################################################
 
-function det(M::Generic.Mat{nmod_poly})
+function det(M::Generic.Mat{zzModPolyRingElem})
    nrows(M) != ncols(M) && error("Not a square matrix in det")
 
    if is_prime(modulus(base_ring(M)))
@@ -944,16 +944,16 @@ function setcoeff!(x::T, n::Int, y::Int) where T <: Zmodn_poly
   return x
 end
 
-function setcoeff!(x::T, n::Int, y::fmpz) where T <: Zmodn_poly
-  r = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{fmpz}, UInt), y, x.mod_n)
+function setcoeff!(x::T, n::Int, y::ZZRingElem) where T <: Zmodn_poly
+  r = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), y, x.mod_n)
   ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
                    (Ref{T}, Int, UInt), x, n, r)
   return x
 end
 
-setcoeff!(x::T, n::Int, y::Integer) where T <: Zmodn_poly = setcoeff!(x, n, fmpz(y))
+setcoeff!(x::T, n::Int, y::Integer) where T <: Zmodn_poly = setcoeff!(x, n, ZZRingElem(y))
 
-setcoeff!(x::nmod_poly, n::Int, y::nmod) = setcoeff!(x, n, y.data)
+setcoeff!(x::zzModPolyRingElem, n::Int, y::zzModRingElem) = setcoeff!(x, n, y.data)
 
 function add!(z::T, x::T, y::T) where T <: Zmodn_poly
   ccall((:nmod_poly_add, libflint), Nothing,
@@ -991,11 +991,11 @@ end
 #
 ################################################################################
 
-promote_rule(::Type{nmod_poly}, ::Type{V}) where {V <: Integer} = nmod_poly
+promote_rule(::Type{zzModPolyRingElem}, ::Type{V}) where {V <: Integer} = zzModPolyRingElem
 
-promote_rule(::Type{nmod_poly}, ::Type{fmpz}) = nmod_poly
+promote_rule(::Type{zzModPolyRingElem}, ::Type{ZZRingElem}) = zzModPolyRingElem
 
-promote_rule(::Type{nmod_poly}, ::Type{nmod}) = nmod_poly
+promote_rule(::Type{zzModPolyRingElem}, ::Type{zzModRingElem}) = zzModPolyRingElem
 
 ###############################################################################
 #
@@ -1003,7 +1003,7 @@ promote_rule(::Type{nmod_poly}, ::Type{nmod}) = nmod_poly
 #
 ###############################################################################
 
-function (f::nmod_poly)(a::nmod)
+function (f::zzModPolyRingElem)(a::zzModRingElem)
    if parent(a) != base_ring(f)
       return subst(f, a)
    end
@@ -1016,68 +1016,68 @@ end
 #
 ################################################################################
 
-function (R::NmodPolyRing)()
-  z = nmod_poly(R.n)
+function (R::zzModPolyRing)()
+  z = zzModPolyRingElem(R.n)
   z.parent = R
   return z
 end
 
-function (R::NmodPolyRing)(x::fmpz)
-  r = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{fmpz}, UInt), x, R.n)
-  z = nmod_poly(R.n, r)
+function (R::zzModPolyRing)(x::ZZRingElem)
+  r = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), x, R.n)
+  z = zzModPolyRingElem(R.n, r)
   z.parent = R
   return z
 end
 
-function (R::NmodPolyRing)(x::UInt)
-  z = nmod_poly(R.n, x)
+function (R::zzModPolyRing)(x::UInt)
+  z = zzModPolyRingElem(R.n, x)
   z.parent = R
   return z
 end
 
-function (R::NmodPolyRing)(x::Integer)
-  z = nmod_poly(R.n, x)
+function (R::zzModPolyRing)(x::Integer)
+  z = zzModPolyRingElem(R.n, x)
   z.parent = R
   return z
 end
 
-function (R::NmodPolyRing)(x::nmod_poly)
+function (R::zzModPolyRing)(x::zzModPolyRingElem)
    R != parent(x) && error("Wrong parents")
    return x
 end
 
-function (R::NmodPolyRing)(x::nmod)
+function (R::zzModPolyRing)(x::zzModRingElem)
   base_ring(R) != parent(x) && error("Wrong parents")
-  z = nmod_poly(R.n, x.data)
+  z = zzModPolyRingElem(R.n, x.data)
   z.parent = R
   return z
 end
 
-function (R::NmodPolyRing)(arr::Vector{fmpz})
-  z = nmod_poly(R.n, arr)
+function (R::zzModPolyRing)(arr::Vector{ZZRingElem})
+  z = zzModPolyRingElem(R.n, arr)
   z.parent = R
   return z
 end
 
-function (R::NmodPolyRing)(arr::Vector{UInt})
-  z = nmod_poly(R.n, arr)
+function (R::zzModPolyRing)(arr::Vector{UInt})
+  z = zzModPolyRingElem(R.n, arr)
   z.parent = R
   return z
 end
 
-(R::NmodPolyRing)(arr::Vector{T}) where {T <: Integer} = R(map(base_ring(R), arr))
+(R::zzModPolyRing)(arr::Vector{T}) where {T <: Integer} = R(map(base_ring(R), arr))
 
-function (R::NmodPolyRing)(arr::Vector{nmod})
+function (R::zzModPolyRing)(arr::Vector{zzModRingElem})
   if length(arr) > 0
      (base_ring(R) != parent(arr[1])) && error("Wrong parents")
   end
-  z = nmod_poly(R.n, arr)
+  z = zzModPolyRingElem(R.n, arr)
   z.parent = R
   return z
 end
 
-function (R::NmodPolyRing)(x::fmpz_poly)
-  z = nmod_poly(R.n, x)
+function (R::zzModPolyRing)(x::ZZPolyRingElem)
+  z = zzModPolyRingElem(R.n, x)
   z.parent = R
   return z
 end
@@ -1088,16 +1088,16 @@ end
 #
 ################################################################################
 
-function PolynomialRing(R::NmodRing, s::Symbol; cached=true)
-   parent_obj = NmodPolyRing(R, s, cached)
+function PolynomialRing(R::zzModRing, s::Symbol; cached=true)
+   parent_obj = zzModPolyRing(R, s, cached)
 
    return parent_obj, parent_obj([R(0), R(1)])
 end
 
-function PolynomialRing(R::NmodRing, s::AbstractString; cached = true)
+function PolynomialRing(R::zzModRing, s::AbstractString; cached = true)
    return PolynomialRing(R, Symbol(s); cached=cached)
 end
 
-function PolyRing(R::NmodRing)
-   return NmodPolyRing(R, :x, false)
+function PolyRing(R::zzModRing)
+   return zzModPolyRing(R, :x, false)
 end

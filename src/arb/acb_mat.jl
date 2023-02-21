@@ -71,7 +71,7 @@ end
   return z
 end
 
-for T in [Integer, Float64, fmpz, fmpq, arb, BigFloat, acb, AbstractString]
+for T in [Integer, Float64, ZZRingElem, QQFieldElem, arb, BigFloat, acb, AbstractString]
    @eval begin
       @inline function setindex!(x::acb_mat, y::$T, r::Int, c::Int)
          @boundscheck Generic._checkbounds(x, r, c)
@@ -87,9 +87,9 @@ end
 
 Base.@propagate_inbounds setindex!(x::acb_mat, y::Rational{T},
                                    r::Int, c::Int) where {T <: Integer} =
-         setindex!(x, fmpq(y), r, c)
+         setindex!(x, QQFieldElem(y), r, c)
 
-for T in [Integer, Float64, fmpz, fmpq, arb, BigFloat, AbstractString]
+for T in [Integer, Float64, ZZRingElem, QQFieldElem, arb, BigFloat, AbstractString]
    @eval begin
       @inline function setindex!(x::acb_mat, y::Tuple{$T, $T}, r::Int, c::Int)
          @boundscheck Generic._checkbounds(x, r, c)
@@ -104,7 +104,7 @@ for T in [Integer, Float64, fmpz, fmpq, arb, BigFloat, AbstractString]
 end
 
 setindex!(x::acb_mat, y::Tuple{Rational{T}, Rational{T}}, r::Int, c::Int) where {T <: Integer} =
-         setindex!(x, map(fmpq, y), r, c)
+         setindex!(x, map(QQFieldElem, y), r, c)
 
 zero(x::AcbMatSpace) = x()
 
@@ -211,15 +211,15 @@ end
 
 *(x::Int, y::acb_mat) = y*x
 
-function *(x::acb_mat, y::fmpz)
+function *(x::acb_mat, y::ZZRingElem)
   z = similar(x)
   ccall((:acb_mat_scalar_mul_fmpz, libarb), Nothing,
-              (Ref{acb_mat}, Ref{acb_mat}, Ref{fmpz}, Int),
+              (Ref{acb_mat}, Ref{acb_mat}, Ref{ZZRingElem}, Int),
               z, x, y, precision(base_ring(x)))
   return z
 end
 
-*(x::fmpz, y::acb_mat) = y*x
+*(x::ZZRingElem, y::acb_mat) = y*x
 
 function *(x::acb_mat, y::arb)
   z = similar(x)
@@ -241,13 +241,13 @@ end
 
 *(x::acb, y::acb_mat) = y*x
 
-*(x::Integer, y::acb_mat) = fmpz(x) * y
+*(x::Integer, y::acb_mat) = ZZRingElem(x) * y
 
 *(x::acb_mat, y::Integer) = y * x
 
-*(x::fmpq, y::acb_mat) = base_ring(y)(x) * y
+*(x::QQFieldElem, y::acb_mat) = base_ring(y)(x) * y
 
-*(x::acb_mat, y::fmpq) = y * x
+*(x::acb_mat, y::QQFieldElem) = y * x
 
 *(x::Float64, y::acb_mat) = base_ring(y)(x) * y
 
@@ -257,11 +257,11 @@ end
 
 *(x::acb_mat, y::BigFloat) = y * x
 
-*(x::Rational{T}, y::acb_mat) where T <: Union{Int, BigInt} = fmpq(x) * y
+*(x::Rational{T}, y::acb_mat) where T <: Union{Int, BigInt} = QQFieldElem(x) * y
 
 *(x::acb_mat, y::Rational{T}) where T <: Union{Int, BigInt} = y * x
 
-for T in [Integer, fmpz, fmpq, arb, acb]
+for T in [Integer, ZZRingElem, QQFieldElem, arb, acb]
    @eval begin
       function +(x::acb_mat, y::$T)
          z = deepcopy(x)
@@ -391,32 +391,32 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
-    contains(x::acb_mat, y::fmpz_mat)
+    contains(x::acb_mat, y::ZZMatrix)
 
 Returns `true` if all entries of $x$ contain the corresponding entry of
 $y$, otherwise return `false`.
 """
-function contains(x::acb_mat, y::fmpz_mat)
+function contains(x::acb_mat, y::ZZMatrix)
   r = ccall((:acb_mat_contains_fmpz_mat, libarb), Cint,
-              (Ref{acb_mat}, Ref{fmpz_mat}), x, y)
+              (Ref{acb_mat}, Ref{ZZMatrix}), x, y)
   return Bool(r)
 end
 
 @doc Markdown.doc"""
-    contains(x::acb_mat, y::fmpq_mat)
+    contains(x::acb_mat, y::QQMatrix)
 
 Returns `true` if all entries of $x$ contain the corresponding entry of
 $y$, otherwise return `false`.
 """
-function contains(x::acb_mat, y::fmpq_mat)
+function contains(x::acb_mat, y::QQMatrix)
   r = ccall((:acb_mat_contains_fmpq_mat, libarb), Cint,
-              (Ref{acb_mat}, Ref{fmpq_mat}), x, y)
+              (Ref{acb_mat}, Ref{QQMatrix}), x, y)
   return Bool(r)
 end
 
-==(x::acb_mat, y::fmpz_mat) = x == parent(x)(y)
+==(x::acb_mat, y::ZZMatrix) = x == parent(x)(y)
 
-==(x::fmpz_mat, y::acb_mat) = y == x
+==(x::ZZMatrix, y::acb_mat) = y == x
 
 ==(x::acb_mat, y::arb_mat) = x == parent(x)(y)
 
@@ -478,10 +478,10 @@ function divexact(x::acb_mat, y::Int; check::Bool=true)
   return z
 end
 
-function divexact(x::acb_mat, y::fmpz; check::Bool=true)
+function divexact(x::acb_mat, y::ZZRingElem; check::Bool=true)
   z = similar(x)
   ccall((:acb_mat_scalar_div_fmpz, libarb), Nothing,
-              (Ref{acb_mat}, Ref{acb_mat}, Ref{fmpz}, Int),
+              (Ref{acb_mat}, Ref{acb_mat}, Ref{ZZRingElem}, Int),
               z, x, y, precision(base_ring(x)))
   return z
 end
@@ -506,9 +506,9 @@ divexact(x::acb_mat, y::Float64; check::Bool=true) = divexact(x, base_ring(x)(y)
 
 divexact(x::acb_mat, y::BigFloat; check::Bool=true) = divexact(x, base_ring(x)(y); check=check)
 
-divexact(x::acb_mat, y::Integer; check::Bool=true) = divexact(x, fmpz(y); check=check)
+divexact(x::acb_mat, y::Integer; check::Bool=true) = divexact(x, ZZRingElem(y); check=check)
 
-divexact(x::acb_mat, y::Rational{T}; check::Bool=true) where T <: Union{Int, BigInt} = divexact(x, fmpq(y); check=check)
+divexact(x::acb_mat, y::Rational{T}; check::Bool=true) where T <: Union{Int, BigInt} = divexact(x, QQFieldElem(y); check=check)
 
 ################################################################################
 #
@@ -700,7 +700,7 @@ function (x::AcbMatSpace)()
   return z
 end
 
-function (x::AcbMatSpace)(y::fmpz_mat)
+function (x::AcbMatSpace)(y::ZZMatrix)
   (ncols(x) != ncols(y) || nrows(x) != nrows(y)) &&
       error("Dimensions are wrong")
   z = acb_mat(y, precision(x))
@@ -716,7 +716,7 @@ function (x::AcbMatSpace)(y::arb_mat)
   return z
 end
 
-for T in [Float64, fmpz, fmpq, BigFloat, arb, acb, String]
+for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, arb, acb, String]
    @eval begin
       function (x::AcbMatSpace)(y::AbstractMatrix{$T})
          _check_dim(nrows(x), ncols(x), y)
@@ -734,15 +734,15 @@ for T in [Float64, fmpz, fmpq, BigFloat, arb, acb, String]
    end
 end
 
-(x::AcbMatSpace)(y::AbstractMatrix{T}) where {T <: Integer} = x(map(fmpz, y))
+(x::AcbMatSpace)(y::AbstractMatrix{T}) where {T <: Integer} = x(map(ZZRingElem, y))
 
-(x::AcbMatSpace)(y::AbstractVector{T}) where {T <: Integer} = x(map(fmpz, y))
+(x::AcbMatSpace)(y::AbstractVector{T}) where {T <: Integer} = x(map(ZZRingElem, y))
 
-(x::AcbMatSpace)(y::AbstractMatrix{Rational{T}}) where {T <: Integer} = x(map(fmpq, y))
+(x::AcbMatSpace)(y::AbstractMatrix{Rational{T}}) where {T <: Integer} = x(map(QQFieldElem, y))
 
-(x::AcbMatSpace)(y::AbstractVector{Rational{T}}) where {T <: Integer} = x(map(fmpq, y))
+(x::AcbMatSpace)(y::AbstractVector{Rational{T}}) where {T <: Integer} = x(map(QQFieldElem, y))
 
-for T in [Float64, fmpz, fmpq, BigFloat, arb, String]
+for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, arb, String]
    @eval begin
       function (x::AcbMatSpace)(y::AbstractMatrix{Tuple{$T, $T}})
          _check_dim(nrows(x), ncols(x), y)
@@ -761,18 +761,18 @@ for T in [Float64, fmpz, fmpq, BigFloat, arb, String]
 end
 
 (x::AcbMatSpace)(y::AbstractMatrix{Tuple{T, T}}) where {T <: Integer} =
-         x(map(z -> (fmpz(z[1]), fmpz(z[2])), y))
+         x(map(z -> (ZZRingElem(z[1]), ZZRingElem(z[2])), y))
 
 (x::AcbMatSpace)(y::AbstractVector{Tuple{T, T}}) where {T <: Integer} =
-         x(map(z -> (fmpz(z[1]), fmpz(z[2])), y))
+         x(map(z -> (ZZRingElem(z[1]), ZZRingElem(z[2])), y))
 
 (x::AcbMatSpace)(y::AbstractMatrix{Tuple{Rational{T}, Rational{T}}}) where {T <: Integer} =
-         x(map(z -> (fmpq(z[1]), fmpq(z[2])), y))
+         x(map(z -> (QQFieldElem(z[1]), QQFieldElem(z[2])), y))
 
 (x::AcbMatSpace)(y::AbstractVector{Tuple{Rational{T}, Rational{T}}}) where {T <: Integer} =
-         x(map(z -> (fmpq(z[1]), fmpq(z[2])), y))
+         x(map(z -> (QQFieldElem(z[1]), QQFieldElem(z[2])), y))
 
-for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb, acb, String]
+for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, arb, acb, String]
    @eval begin
       function (x::AcbMatSpace)(y::$T)
          z = x()
@@ -790,7 +790,7 @@ for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb, acb, String]
    end
 end
 
-(x::AcbMatSpace)(y::Rational{T}) where {T <: Integer} = x(fmpq(y))
+(x::AcbMatSpace)(y::Rational{T}) where {T <: Integer} = x(QQFieldElem(y))
 
 (x::AcbMatSpace)(y::acb_mat) = y
 
@@ -800,13 +800,13 @@ end
 #
 ###############################################################################
 
-function matrix(R::AcbField, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, acb, AbstractString}}
+function matrix(R::AcbField, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, arb, acb, AbstractString}}
    z = acb_mat(size(arr, 1), size(arr, 2), arr, precision(R))
    z.base_ring = R
    return z
 end
 
-function matrix(R::AcbField, r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, acb, AbstractString}}
+function matrix(R::AcbField, r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, arb, acb, AbstractString}}
    _check_dim(r, c, arr)
    z = acb_mat(r, c, arr, precision(R))
    z.base_ring = R
@@ -814,22 +814,22 @@ function matrix(R::AcbField, r::Int, c::Int, arr::AbstractVector{T}) where {T <:
 end
 
 function matrix(R::AcbField, arr::AbstractMatrix{<: Integer})
-   arr_fmpz = map(fmpz, arr)
+   arr_fmpz = map(ZZRingElem, arr)
    return matrix(R, arr_fmpz)
 end
 
 function matrix(R::AcbField, r::Int, c::Int, arr::AbstractVector{<: Integer})
-   arr_fmpz = map(fmpz, arr)
+   arr_fmpz = map(ZZRingElem, arr)
    return matrix(R, r, c, arr_fmpz)
 end
 
 function matrix(R::AcbField, arr::AbstractMatrix{Rational{T}}) where {T <: Integer}
-   arr_fmpz = map(fmpq, arr)
+   arr_fmpz = map(QQFieldElem, arr)
    return matrix(R, arr_fmpz)
 end
 
 function matrix(R::AcbField, r::Int, c::Int, arr::AbstractVector{Rational{T}}) where {T <: Integer}
-   arr_fmpz = map(fmpq, arr)
+   arr_fmpz = map(QQFieldElem, arr)
    return matrix(R, r, c, arr_fmpz)
 end
 
@@ -874,17 +874,17 @@ promote_rule(::Type{acb_mat}, ::Type{T}) where {T <: Integer} = acb_mat
 
 promote_rule(::Type{acb_mat}, ::Type{Rational{T}}) where T <: Union{Int, BigInt} = acb_mat
 
-promote_rule(::Type{acb_mat}, ::Type{fmpz}) = acb_mat
+promote_rule(::Type{acb_mat}, ::Type{ZZRingElem}) = acb_mat
 
-promote_rule(::Type{acb_mat}, ::Type{fmpq}) = acb_mat
+promote_rule(::Type{acb_mat}, ::Type{QQFieldElem}) = acb_mat
 
 promote_rule(::Type{acb_mat}, ::Type{arb}) = acb_mat
 
 promote_rule(::Type{acb_mat}, ::Type{acb}) = acb_mat
 
-promote_rule(::Type{acb_mat}, ::Type{fmpz_mat}) = acb_mat
+promote_rule(::Type{acb_mat}, ::Type{ZZMatrix}) = acb_mat
 
-promote_rule(::Type{acb_mat}, ::Type{fmpq_mat}) = acb_mat
+promote_rule(::Type{acb_mat}, ::Type{QQMatrix}) = acb_mat
 
 promote_rule(::Type{acb_mat}, ::Type{arb_mat}) = acb_mat
 

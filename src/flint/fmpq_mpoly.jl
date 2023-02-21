@@ -1,10 +1,10 @@
 ###############################################################################
 #
-#   fmpq_mpoly.jl : Flint multivariate polynomials over fmpq
+#   QQMPolyRingElem.jl : Flint multivariate polynomials over QQFieldElem
 #
 ###############################################################################
 
-export FmpqMPolyRing, fmpq_mpoly, degrees, symbols, degree_fmpz,
+export QQMPolyRing, QQMPolyRingElem, degrees, symbols, degree_fmpz,
        degrees_fit_int, degrees_fmpz, total_degree_fits_int, total_degree_fmpz,
        exponent_vector_fits_int, exponent_vector_fits_ui,
        exponent_vector, exponent_vector_ui, exponent_vector_fmpz,
@@ -17,63 +17,63 @@ export FmpqMPolyRing, fmpq_mpoly, degrees, symbols, degree_fmpz,
 #
 ###############################################################################
 
-parent_type(::Type{fmpq_mpoly}) = FmpqMPolyRing
+parent_type(::Type{QQMPolyRingElem}) = QQMPolyRing
 
-elem_type(::Type{FmpqMPolyRing}) = fmpq_mpoly
+elem_type(::Type{QQMPolyRing}) = QQMPolyRingElem
 
-elem_type(::FmpqMPolyRing) = fmpq_mpoly
+elem_type(::QQMPolyRing) = QQMPolyRingElem
 
-symbols(a::FmpqMPolyRing) = a.S
+symbols(a::QQMPolyRing) = a.S
 
-parent(a::fmpq_mpoly) = a.parent
+parent(a::QQMPolyRingElem) = a.parent
 
-function check_parent(a::fmpq_mpoly, b::fmpq_mpoly)
+function check_parent(a::QQMPolyRingElem, b::QQMPolyRingElem)
    parent(a) != parent(b) &&
       error("Incompatible polynomial rings in polynomial operation")
 end
 
-nvars(a::FmpqMPolyRing) = ccall((:fmpq_mpoly_ctx_nvars, libflint), Int,
-                                (Ref{FmpqMPolyRing}, ), a)
+nvars(a::QQMPolyRing) = ccall((:fmpq_mpoly_ctx_nvars, libflint), Int,
+                                (Ref{QQMPolyRing}, ), a)
 
-base_ring(a::FmpqMPolyRing) = a.base_ring
+base_ring(a::QQMPolyRing) = a.base_ring
 
-base_ring(f::fmpq_mpoly) = f.parent.base_ring
+base_ring(f::QQMPolyRingElem) = f.parent.base_ring
 
-function ordering(a::FmpqMPolyRing)
-   b = ccall((:fmpq_mpoly_ctx_ord, libflint), Cint, (Ref{FmpqMPolyRing}, ), a)
+function ordering(a::QQMPolyRing)
+   b = ccall((:fmpq_mpoly_ctx_ord, libflint), Cint, (Ref{QQMPolyRing}, ), a)
    return flint_orderings[b + 1]
 end
 
-function gens(R::FmpqMPolyRing)
-   A = Vector{fmpq_mpoly}(undef, R.nvars)
+function gens(R::QQMPolyRing)
+   A = Vector{QQMPolyRingElem}(undef, R.nvars)
    for i = 1:R.nvars
       z = R()
       ccall((:fmpq_mpoly_gen, libflint), Nothing,
-            (Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}), z, i - 1, R)
+            (Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}), z, i - 1, R)
       A[i] = z
    end
    return A
 end
 
-function gen(R::FmpqMPolyRing, i::Int)
+function gen(R::QQMPolyRing, i::Int)
    n = nvars(R)
    (i <= 0 || i > n) && error("Index must be between 1 and $n")
    z = R()
    ccall((:fmpq_mpoly_gen, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}), z, i - 1, R)
+         (Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}), z, i - 1, R)
    return z
 end
 
-function is_gen(a::fmpq_mpoly, i::Int)
+function is_gen(a::QQMPolyRingElem, i::Int)
    n = nvars(parent(a))
    (i <= 0 || i > n) && error("Index must be between 1 and $n")
    R = parent(a)
    return Bool(ccall((:fmpq_mpoly_is_gen, libflint), Cint,
-                     (Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}),
+                     (Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}),
                      a, i - 1, a.parent))
 end
 
-function is_gen(a::fmpq_mpoly)
+function is_gen(a::QQMPolyRingElem)
    n = nvars(parent(a))
    for i in 1:n
       is_gen(a, i) && return true
@@ -81,78 +81,78 @@ function is_gen(a::fmpq_mpoly)
    return false
 end
 
-function deepcopy_internal(a::fmpq_mpoly, dict::IdDict)
+function deepcopy_internal(a::QQMPolyRingElem, dict::IdDict)
    z = parent(a)()
    ccall((:fmpq_mpoly_set, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
+         (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
          z, a, a.parent)
    return z
 end
 
-function length(a::fmpq_mpoly)
-   n = ccall((:fmpq_mpoly_length, libflint), Int, (Ref{fmpq_mpoly}, ), a)
+function length(a::QQMPolyRingElem)
+   n = ccall((:fmpq_mpoly_length, libflint), Int, (Ref{QQMPolyRingElem}, ), a)
    return n
 end
 
-function one(R::FmpqMPolyRing)
+function one(R::QQMPolyRing)
    z = R()
    ccall((:fmpq_mpoly_one, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}), z, R)
+         (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), z, R)
    return z
 end
 
-function zero(R::FmpqMPolyRing)
+function zero(R::QQMPolyRing)
    z = R()
    ccall((:fmpq_mpoly_zero, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}), z, R)
+         (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), z, R)
    return z
 end
 
-function isone(a::fmpq_mpoly)
+function isone(a::QQMPolyRingElem)
    b = ccall((:fmpq_mpoly_is_one, libflint), Cint,
-             (Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}), a, a.parent)
+             (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), a, a.parent)
    return Bool(b)
 end
 
-function iszero(a::fmpq_mpoly)
+function iszero(a::QQMPolyRingElem)
    b = ccall((:fmpq_mpoly_is_zero, libflint), Cint,
-             (Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}), a, a.parent)
+             (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), a, a.parent)
    return Bool(b)
 end
 
-function is_monomial(a::fmpq_mpoly)
+function is_monomial(a::QQMPolyRingElem)
    return length(a) == 1 && coeff(a, 1) == 1
 end
 
-function is_term(a::fmpq_mpoly)
+function is_term(a::QQMPolyRingElem)
    return length(a) == 1
 end
 
-function is_unit(a::fmpq_mpoly)
+function is_unit(a::QQMPolyRingElem)
    return length(a) == 1 && total_degree(a) == 0 && is_unit(coeff(a, 1))
 end
 
-function is_constant(a::fmpq_mpoly)
+function is_constant(a::QQMPolyRingElem)
    b = ccall((:fmpq_mpoly_is_fmpq, libflint), Cint,
-             (Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}), a, parent(a))
+             (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), a, parent(a))
    return Bool(b)
 end
 
-function content(a::fmpq_mpoly)
-  c = fmpq()
+function content(a::QQMPolyRingElem)
+  c = QQFieldElem()
   ccall((:fmpq_mpoly_content, libflint), Nothing,
-        (Ref{fmpq}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}), c, a, parent(a))
+        (Ref{QQFieldElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), c, a, parent(a))
   return c
 end
 
-function denominator(a::fmpq_mpoly)
-  c = fmpz()
+function denominator(a::QQMPolyRingElem)
+  c = ZZRingElem()
   ccall((:fmpq_mpoly_get_denominator, libflint), Nothing,
-        (Ref{fmpz}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}), c, a, parent(a))
+        (Ref{ZZRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), c, a, parent(a))
   return c
 end
 
-characteristic(::FmpqMPolyRing) = 0
+characteristic(::QQMPolyRing) = 0
 
 ################################################################################
 #
@@ -160,27 +160,27 @@ characteristic(::FmpqMPolyRing) = 0
 #
 ################################################################################
 
-function coeff(a::fmpq_mpoly, i::Int)
-   z = fmpq()
+function coeff(a::QQMPolyRingElem, i::Int)
+   z = QQFieldElem()
    n = length(a)
    (i < 1 || i > n) && error("Index must be between 1 and $(length(a))")
    ccall((:fmpq_mpoly_get_term_coeff_fmpq, libflint), Nothing,
-         (Ref{fmpq}, Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}),
+         (Ref{QQFieldElem}, Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}),
          z, a, i - 1, a.parent)
    return z
 end
 
-function coeff(a::fmpq_mpoly, b::fmpq_mpoly)
+function coeff(a::QQMPolyRingElem, b::QQMPolyRingElem)
    check_parent(a, b)
    !isone(length(b)) && error("Second argument must be a monomial")
-   z = fmpq()
+   z = QQFieldElem()
    ccall((:fmpq_mpoly_get_coeff_fmpq_monomial, libflint), Nothing,
-         (Ref{fmpq}, Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
+         (Ref{QQFieldElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
          z, a, b, parent(a))
    return z
 end
 
-function trailing_coefficient(p::fmpq_mpoly)
+function trailing_coefficient(p::QQMPolyRingElem)
    if iszero(p)
       return zero(base_ring(p))
    else
@@ -195,73 +195,73 @@ end
 ###############################################################################
 
 # Degree in the i-th variable as an Int
-function degree(a::fmpq_mpoly, i::Int)
+function degree(a::QQMPolyRingElem, i::Int)
    n = nvars(parent(a))
    (i <= 0 || i > n) && error("Index must be between 1 and $n")
    d = ccall((:fmpq_mpoly_degree_si, libflint), Int,
-             (Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}), a, i - 1, a.parent)
+             (Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}), a, i - 1, a.parent)
    return d
 end
 
-# Degree in the i-th variable as an fmpz
-function degree_fmpz(a::fmpq_mpoly, i::Int)
+# Degree in the i-th variable as an ZZRingElem
+function degree_fmpz(a::QQMPolyRingElem, i::Int)
    n = nvars(parent(a))
    (i <= 0 || i > n) && error("Index must be between 1 and $n")
-   d = fmpz()
+   d = ZZRingElem()
    ccall((:fmpq_mpoly_degree_fmpz, libflint), Nothing,
-         (Ref{fmpz}, Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}),
+         (Ref{ZZRingElem}, Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}),
          d, a, i - 1, a.parent)
    return d
 end
 
 # Return true if degrees fit into an Int
-function degrees_fit_int(a::fmpq_mpoly)
+function degrees_fit_int(a::QQMPolyRingElem)
    b = ccall((:fmpq_mpoly_degrees_fit_si, libflint), Cint,
-             (Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}), a, a.parent)
+             (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), a, a.parent)
    return Bool(b)
 end
 
 # Return an array of the max degrees in each variable
-function degrees(a::fmpq_mpoly)
+function degrees(a::QQMPolyRingElem)
    degs = Vector{Int}(undef, nvars(parent(a)))
    ccall((:fmpq_mpoly_degrees_si, libflint), Nothing,
-         (Ptr{Int}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
+         (Ptr{Int}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
          degs, a, a.parent)
    return degs
 end
 
 # Return an array of the max degrees as fmpzs in each variable
-function degrees_fmpz(a::fmpq_mpoly)
+function degrees_fmpz(a::QQMPolyRingElem)
    n = nvars(parent(a))
-   degs = Vector{fmpz}(undef, n)
+   degs = Vector{ZZRingElem}(undef, n)
    for i in 1:n
-      degs[i] = fmpz()
+      degs[i] = ZZRingElem()
    end
    ccall((:fmpq_mpoly_degrees_fmpz, libflint), Nothing,
-         (Ptr{Ref{fmpz}}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
+         (Ptr{Ref{ZZRingElem}}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
          degs, a, a.parent)
    return degs
 end
 
 # Return true if degree fits into an Int
-function total_degree_fits_int(a::fmpq_mpoly)
+function total_degree_fits_int(a::QQMPolyRingElem)
       b = ccall((:fmpq_mpoly_total_degree_fits_si, libflint), Cint,
-                (Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}), a, a.parent)
+                (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), a, a.parent)
       return Bool(b)
    end
 
 # Total degree as an Int
-function total_degree(a::fmpq_mpoly)
+function total_degree(a::QQMPolyRingElem)
    d = ccall((:fmpq_mpoly_total_degree_si, libflint), Int,
-             (Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}), a, a.parent)
+             (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), a, a.parent)
    return d
 end
 
-# Total degree as an fmpz
-function total_degree_fmpz(a::fmpq_mpoly)
-   d = fmpz()
+# Total degree as an ZZRingElem
+function total_degree_fmpz(a::QQMPolyRingElem)
+   d = ZZRingElem()
    ccall((:fmpq_mpoly_total_degree_fmpz, libflint), Nothing,
-         (Ref{fmpz}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
+         (Ref{ZZRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
             d, a, a.parent)
    return d
 end
@@ -272,7 +272,7 @@ end
 #
 ###############################################################################
 
-function coeff(a::fmpq_mpoly, vars::Vector{Int}, exps::Vector{Int})
+function coeff(a::QQMPolyRingElem, vars::Vector{Int}, exps::Vector{Int})
    unique(vars) != vars && error("Variables not unique")
    length(vars) != length(exps) &&
        error("Number of variables does not match number of exponents")
@@ -287,8 +287,8 @@ function coeff(a::fmpq_mpoly, vars::Vector{Int}, exps::Vector{Int})
       end
    end
    ccall((:fmpq_mpoly_get_coeff_vars_ui, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ptr{Int},
-          Ptr{Int}, Int, Ref{FmpqMPolyRing}),
+         (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ptr{Int},
+          Ptr{Int}, Int, Ref{QQMPolyRing}),
           z, a, vars, exps, length(vars), a.parent)
    return z
 end
@@ -299,7 +299,7 @@ end
 #
 ###############################################################################
 
-function show(io::IO, p::FmpqMPolyRing)
+function show(io::IO, p::QQMPolyRing)
    local max_vars = 5 # largest number of variables to print
    n = nvars(p)
    print(io, "Multivariate Polynomial Ring in ")
@@ -324,37 +324,37 @@ end
 #
 ###############################################################################
 
-function -(a::fmpq_mpoly)
+function -(a::QQMPolyRingElem)
    z = parent(a)()
    ccall((:fmpq_mpoly_neg, libflint), Nothing,
-       (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
+       (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
        z, a, a.parent)
    return z
 end
 
-function +(a::fmpq_mpoly, b::fmpq_mpoly)
+function +(a::QQMPolyRingElem, b::QQMPolyRingElem)
    check_parent(a, b)
    z = parent(a)()
    ccall((:fmpq_mpoly_add, libflint), Nothing,
-       (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
+       (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
        z, a, b, a.parent)
    return z
 end
 
-function -(a::fmpq_mpoly, b::fmpq_mpoly)
+function -(a::QQMPolyRingElem, b::QQMPolyRingElem)
    check_parent(a, b)
    z = parent(a)()
    ccall((:fmpq_mpoly_sub, libflint), Nothing,
-       (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
+       (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
        z, a, b, a.parent)
    return z
 end
 
-function *(a::fmpq_mpoly, b::fmpq_mpoly)
+function *(a::QQMPolyRingElem, b::QQMPolyRingElem)
    check_parent(a, b)
    z = parent(a)()
    ccall((:fmpq_mpoly_mul, libflint), Nothing,
-       (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
+       (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
        z, a, b, a.parent)
    return z
 end
@@ -365,82 +365,82 @@ end
 #
 ###############################################################################
 
-for (jT, cN, cT) in ((fmpq, :fmpq, Ref{fmpq}), (fmpz, :fmpz, Ref{fmpz}),
+for (jT, cN, cT) in ((QQFieldElem, :QQFieldElem, Ref{QQFieldElem}), (ZZRingElem, :ZZRingElem, Ref{ZZRingElem}),
                      (Int, :si, Int))
    @eval begin
-      function +(a::fmpq_mpoly, b::($jT))
+      function +(a::QQMPolyRingElem, b::($jT))
          z = parent(a)()
          ccall(($(string(:fmpq_mpoly_add_, cN)), libflint), Nothing,
-               (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, ($cT), Ref{FmpqMPolyRing}),
+               (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, ($cT), Ref{QQMPolyRing}),
                z, a, b, parent(a))
          return z
       end
 
-      +(a::($jT), b::fmpq_mpoly) = b + a
+      +(a::($jT), b::QQMPolyRingElem) = b + a
 
-      function -(a::fmpq_mpoly, b::($jT))
+      function -(a::QQMPolyRingElem, b::($jT))
          z = parent(a)()
          ccall(($(string(:fmpq_mpoly_sub_, cN)), libflint), Nothing,
-               (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, ($cT), Ref{FmpqMPolyRing}),
+               (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, ($cT), Ref{QQMPolyRing}),
                z, a, b, parent(a))
          return z
       end
 
-      -(a::($jT), b::fmpq_mpoly) = - (b - a)
+      -(a::($jT), b::QQMPolyRingElem) = - (b - a)
 
-      function *(a::fmpq_mpoly, b::($jT))
+      function *(a::QQMPolyRingElem, b::($jT))
          z = parent(a)()
          ccall(($(string(:fmpq_mpoly_scalar_mul_, cN)), libflint), Nothing,
-               (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, ($cT), Ref{FmpqMPolyRing}),
+               (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, ($cT), Ref{QQMPolyRing}),
                z, a, b, parent(a))
          return z
       end
 
-      *(a::($jT), b::fmpq_mpoly) = b * a
+      *(a::($jT), b::QQMPolyRingElem) = b * a
 
-      function divexact(a::fmpq_mpoly, b::($jT); check::Bool=true)
+      function divexact(a::QQMPolyRingElem, b::($jT); check::Bool=true)
          z = parent(a)()
          ccall(($(string(:fmpq_mpoly_scalar_div_, cN)), libflint), Nothing,
-               (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, ($cT), Ref{FmpqMPolyRing}),
+               (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, ($cT), Ref{QQMPolyRing}),
                z, a, b, parent(a))
          return z
       end
 
-      //(a::fmpq_mpoly, b::($jT)) = a//parent(a)(b)
+      //(a::QQMPolyRingElem, b::($jT)) = a//parent(a)(b)
    end
 end
 
-+(a::fmpq_mpoly, b::Integer) = a + fmpz(b)
++(a::QQMPolyRingElem, b::Integer) = a + ZZRingElem(b)
 
-+(a::Integer, b::fmpq_mpoly) = b + a
++(a::Integer, b::QQMPolyRingElem) = b + a
 
--(a::fmpq_mpoly, b::Integer) = a - fmpz(b)
+-(a::QQMPolyRingElem, b::Integer) = a - ZZRingElem(b)
 
--(a::Integer, b::fmpq_mpoly) = -(b - a)
+-(a::Integer, b::QQMPolyRingElem) = -(b - a)
 
-+(a::fmpq_mpoly, b::Rational{<:Integer}) = a + fmpq(b)
++(a::QQMPolyRingElem, b::Rational{<:Integer}) = a + QQFieldElem(b)
 
-+(a::Rational{<:Integer}, b::fmpq_mpoly) = b + a
++(a::Rational{<:Integer}, b::QQMPolyRingElem) = b + a
 
--(a::fmpq_mpoly, b::Rational{<:Integer}) = a - fmpq(b)
+-(a::QQMPolyRingElem, b::Rational{<:Integer}) = a - QQFieldElem(b)
 
--(a::Rational{<:Integer}, b::fmpq_mpoly) = -(b - a)
+-(a::Rational{<:Integer}, b::QQMPolyRingElem) = -(b - a)
 
-*(a::fmpq_mpoly, b::Integer) = a * fmpz(b)
+*(a::QQMPolyRingElem, b::Integer) = a * ZZRingElem(b)
 
-*(a::Integer, b::fmpq_mpoly) = b * a
+*(a::Integer, b::QQMPolyRingElem) = b * a
 
-*(a::fmpq_mpoly, b::Rational{<:Integer}) = a * fmpq(b)
+*(a::QQMPolyRingElem, b::Rational{<:Integer}) = a * QQFieldElem(b)
 
-*(a::Rational{<:Integer}, b::fmpq_mpoly) = b * a
+*(a::Rational{<:Integer}, b::QQMPolyRingElem) = b * a
 
-divexact(a::fmpq_mpoly, b::Integer; check::Bool=true) = divexact(a, fmpz(b); check=check)
+divexact(a::QQMPolyRingElem, b::Integer; check::Bool=true) = divexact(a, ZZRingElem(b); check=check)
 
-divexact(a::fmpq_mpoly, b::Rational{<:Integer}; check::Bool=true) = divexact(a, fmpq(b); check=check)
+divexact(a::QQMPolyRingElem, b::Rational{<:Integer}; check::Bool=true) = divexact(a, QQFieldElem(b); check=check)
 
-//(a::fmpq_mpoly, b::Integer) = //(a, fmpz(b))
+//(a::QQMPolyRingElem, b::Integer) = //(a, ZZRingElem(b))
 
-//(a::fmpq_mpoly, b::Rational{<:Integer}) = //(a, fmpq(b))
+//(a::QQMPolyRingElem, b::Rational{<:Integer}) = //(a, QQFieldElem(b))
 
 ###############################################################################
 #
@@ -448,20 +448,20 @@ divexact(a::fmpq_mpoly, b::Rational{<:Integer}; check::Bool=true) = divexact(a, 
 #
 ###############################################################################
 
-function ^(a::fmpq_mpoly, b::Int)
+function ^(a::QQMPolyRingElem, b::Int)
    b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
    z = parent(a)()
    ccall((:fmpq_mpoly_pow_ui, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}),
+         (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}),
          z, a, b, parent(a))
    return z
 end
 
-function ^(a::fmpq_mpoly, b::fmpz)
+function ^(a::QQMPolyRingElem, b::ZZRingElem)
    b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
    z = parent(a)()
    ccall((:fmpq_mpoly_pow_fmpz, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{fmpz}, Ref{FmpqMPolyRing}),
+         (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{ZZRingElem}, Ref{QQMPolyRing}),
          z, a, b, parent(a))
    return z
 end
@@ -472,23 +472,23 @@ end
 #
 ################################################################################
 
-function gcd(a::fmpq_mpoly, b::fmpq_mpoly)
+function gcd(a::QQMPolyRingElem, b::QQMPolyRingElem)
    check_parent(a, b)
    z = parent(a)()
    r = ccall((:fmpq_mpoly_gcd, libflint), Cint,
-         (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
+         (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
          z, a, b, a.parent)
    r == 0 && error("Unable to compute gcd")
    return z
 end
 
-function gcd_with_cofactors(a::fmpq_mpoly, b::fmpq_mpoly)
+function gcd_with_cofactors(a::QQMPolyRingElem, b::QQMPolyRingElem)
    z = parent(a)()
    abar = parent(a)()
    bbar = parent(a)()
    r = ccall((:fmpq_mpoly_gcd_cofactors, Nemo.libflint), Cint,
-             (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{fmpq_mpoly},
-              Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
+             (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem},
+              Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
              z, abar, bbar, a, b, a.parent)
    r == 0 && error("Unable to compute gcd")
    return z, abar, bbar
@@ -500,69 +500,69 @@ end
 #
 ################################################################################
 
-function (::Type{Fac{fmpq_mpoly}})(fac::fmpq_mpoly_factor, preserve_input::Bool = true)
-   F = Fac{fmpq_mpoly}()
+function (::Type{Fac{QQMPolyRingElem}})(fac::fmpq_mpoly_factor, preserve_input::Bool = true)
+   F = Fac{QQMPolyRingElem}()
    R = fac.parent
    for i in 0:fac.num-1
       f = R()
       if preserve_input
          ccall((:fmpq_mpoly_factor_get_base, libflint), Nothing,
-               (Ref{fmpq_mpoly}, Ref{fmpq_mpoly_factor}, Int, Ref{FmpqMPolyRing}),
+               (Ref{QQMPolyRingElem}, Ref{fmpq_mpoly_factor}, Int, Ref{QQMPolyRing}),
                f, fac, i, R)
       else
          ccall((:fmpq_mpoly_factor_swap_base, libflint), Nothing,
-               (Ref{fmpq_mpoly}, Ref{fmpq_mpoly_factor}, Int, Ref{FmpqMPolyRing}),
+               (Ref{QQMPolyRingElem}, Ref{fmpq_mpoly_factor}, Int, Ref{QQMPolyRing}),
                f, fac, i, R)
       end
       F.fac[f] = ccall((:fmpq_mpoly_factor_get_exp_si, libflint), Int,
-                       (Ref{fmpq_mpoly_factor}, Int, Ref{FmpqMPolyRing}),
+                       (Ref{fmpq_mpoly_factor}, Int, Ref{QQMPolyRing}),
                        fac, i, R)
    end
-   c = fmpq()
+   c = QQFieldElem()
    ccall((:fmpq_mpoly_factor_get_constant_fmpq, libflint), Nothing,
-         (Ref{fmpq}, Ref{fmpq_mpoly_factor}),
+         (Ref{QQFieldElem}, Ref{fmpq_mpoly_factor}),
          c, fac)
    F.unit = R(c)
    return F
 end
 
-function factor(a::fmpq_mpoly)
+function factor(a::QQMPolyRingElem)
    R = parent(a)
    fac = fmpq_mpoly_factor(R)
    ok = ccall((:fmpq_mpoly_factor, libflint), Cint,
-              (Ref{fmpq_mpoly_factor}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
+              (Ref{fmpq_mpoly_factor}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
               fac, a, R)
    ok == 0 && error("unable to compute factorization")
-   return Fac{fmpq_mpoly}(fac, false)
+   return Fac{QQMPolyRingElem}(fac, false)
 end
 
-function factor_squarefree(a::fmpq_mpoly)
+function factor_squarefree(a::QQMPolyRingElem)
    R = parent(a)
    fac = fmpq_mpoly_factor(R)
    ok = ccall((:fmpq_mpoly_factor_squarefree, libflint), Cint,
-              (Ref{fmpq_mpoly_factor}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
+              (Ref{fmpq_mpoly_factor}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
               fac, a, R)
    ok == 0 && error("unable to compute factorization")
-   return Fac{fmpq_mpoly}(fac, false)
+   return Fac{QQMPolyRingElem}(fac, false)
 end
 
 
-function sqrt(a::fmpq_mpoly; check::Bool=true)
+function sqrt(a::QQMPolyRingElem; check::Bool=true)
    (flag, q) = is_square_with_sqrt(a)
    check && !flag && error("Not a square")
    return q
 end
 
-function is_square(a::fmpq_mpoly)
+function is_square(a::QQMPolyRingElem)
    return Bool(ccall((:fmpq_mpoly_is_square, libflint), Cint,
-                     (Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
+                     (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
                      a, a.parent))
 end
 
-function is_square_with_sqrt(a::fmpq_mpoly)
+function is_square_with_sqrt(a::QQMPolyRingElem)
    q = parent(a)()
    flag = ccall((:fmpq_mpoly_sqrt, libflint), Cint,
-                (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
+                (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
                 q, a, a.parent)
    return (Bool(flag), q)
 end
@@ -573,17 +573,17 @@ end
 #
 ###############################################################################
 
-function ==(a::fmpq_mpoly, b::fmpq_mpoly)
+function ==(a::QQMPolyRingElem, b::QQMPolyRingElem)
    check_parent(a, b)
    return Bool(ccall((:fmpq_mpoly_equal, libflint), Cint,
-               (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
+               (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
                a, b, a.parent))
 end
 
-function Base.isless(a::fmpq_mpoly, b::fmpq_mpoly)
+function Base.isless(a::QQMPolyRingElem, b::QQMPolyRingElem)
    (!is_monomial(a) || !is_monomial(b)) && error("Not monomials in comparison")
    return ccall((:fmpq_mpoly_cmp, libflint), Cint,
-               (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
+               (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
                a, b, a.parent) < 0
 end
 
@@ -593,37 +593,37 @@ end
 #
 ###############################################################################
 
-function ==(a::fmpq_mpoly, b::fmpq)
+function ==(a::QQMPolyRingElem, b::QQFieldElem)
    return Bool(ccall((:fmpq_mpoly_equal_fmpq, libflint), Cint,
-                     (Ref{fmpq_mpoly}, Ref{fmpq}, Ref{FmpqMPolyRing}),
+                     (Ref{QQMPolyRingElem}, Ref{QQFieldElem}, Ref{QQMPolyRing}),
                      a, b, a.parent))
 end
 
-==(a::fmpq, b::fmpq_mpoly) = b == a
+==(a::QQFieldElem, b::QQMPolyRingElem) = b == a
 
-function ==(a::fmpq_mpoly, b::fmpz)
+function ==(a::QQMPolyRingElem, b::ZZRingElem)
    return Bool(ccall((:fmpq_mpoly_equal_fmpz, libflint), Cint,
-                     (Ref{fmpq_mpoly}, Ref{fmpz}, Ref{FmpqMPolyRing}),
+                     (Ref{QQMPolyRingElem}, Ref{ZZRingElem}, Ref{QQMPolyRing}),
                      a, b, a.parent))
 end
 
-==(a::fmpz, b::fmpq_mpoly) = b == a
+==(a::ZZRingElem, b::QQMPolyRingElem) = b == a
 
-function ==(a::fmpq_mpoly, b::Int)
+function ==(a::QQMPolyRingElem, b::Int)
    return Bool(ccall((:fmpq_mpoly_equal_si, libflint), Cint,
-               (Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}),
+               (Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}),
                a, b, a.parent))
 end
 
-==(a::Int, b::fmpq_mpoly) = b == a
+==(a::Int, b::QQMPolyRingElem) = b == a
 
-==(a::fmpq_mpoly, b::Integer) = a == fmpz(b)
+==(a::QQMPolyRingElem, b::Integer) = a == ZZRingElem(b)
 
-==(a::Integer, b::fmpq_mpoly) = b == a
+==(a::Integer, b::QQMPolyRingElem) = b == a
 
-==(a::fmpq_mpoly, b::Rational{<:Integer}) = a == fmpq(b)
+==(a::QQMPolyRingElem, b::Rational{<:Integer}) = a == QQFieldElem(b)
 
-==(a::Rational{<:Integer}, b::fmpq_mpoly) = b == a
+==(a::Rational{<:Integer}, b::QQMPolyRingElem) = b == a
 
 ###############################################################################
 #
@@ -631,7 +631,7 @@ end
 #
 ###############################################################################
 
-function divides(a::fmpq_mpoly, b::fmpq_mpoly)
+function divides(a::QQMPolyRingElem, b::QQMPolyRingElem)
    check_parent(a, b)
    if iszero(a)
       return true, zero(parent(a))
@@ -641,7 +641,7 @@ function divides(a::fmpq_mpoly, b::fmpq_mpoly)
    end
    z = parent(a)()
    d = ccall((:fmpq_mpoly_divides, libflint), Cint,
-       (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
+       (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
        z, a, b, a.parent)
    return isone(d), z
 end
@@ -652,34 +652,34 @@ end
 #
 ###############################################################################
 
-function Base.div(a::fmpq_mpoly, b::fmpq_mpoly)
+function Base.div(a::QQMPolyRingElem, b::QQMPolyRingElem)
    check_parent(a, b)
    q = parent(a)()
    ccall((:fmpq_mpoly_div, libflint), Nothing,
-       (Ref{fmpq_mpoly}, Ref{fmpq_mpoly},
-        Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
+       (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem},
+        Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
        q, a, b, a.parent)
    return q
 end
 
-function Base.divrem(a::fmpq_mpoly, b::fmpq_mpoly)
+function Base.divrem(a::QQMPolyRingElem, b::QQMPolyRingElem)
    check_parent(a, b)
    q = parent(a)()
    r = parent(a)()
    ccall((:fmpq_mpoly_divrem, libflint), Nothing,
-       (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ref{fmpq_mpoly},
-        Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}),
+       (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem},
+        Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
        q, r, a, b, a.parent)
    return q, r
 end
 
-function Base.divrem(a::fmpq_mpoly, b::Vector{fmpq_mpoly})
+function Base.divrem(a::QQMPolyRingElem, b::Vector{QQMPolyRingElem})
    len = length(b)
    q = [parent(a)() for i in 1:len]
    r = parent(a)()
    ccall((:fmpq_mpoly_divrem_ideal, libflint), Nothing,
-         (Ptr{Ref{fmpq_mpoly}}, Ref{fmpq_mpoly}, Ref{fmpq_mpoly},
-          Ptr{Ref{fmpq_mpoly}}, Int, Ref{FmpqMPolyRing}),
+         (Ptr{Ref{QQMPolyRingElem}}, Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem},
+          Ptr{Ref{QQMPolyRingElem}}, Int, Ref{QQMPolyRing}),
        q, r, a, b, len, a.parent)
    return q, r
 end
@@ -690,7 +690,7 @@ end
 #
 ###############################################################################
 
-function divexact(a::fmpq_mpoly, b::fmpq_mpoly; check::Bool=true)
+function divexact(a::QQMPolyRingElem, b::QQMPolyRingElem; check::Bool=true)
    check_parent(a, b)
    b, q = divides(a, b)
    !b && error("Division is not exact in divexact")
@@ -703,22 +703,22 @@ end
 #
 ###############################################################################
 
-function derivative(a::fmpq_mpoly, i::Int)
+function derivative(a::QQMPolyRingElem, i::Int)
    n = nvars(parent(a))
    (i <= 0 || i > n) && error("Index must be between 1 and $n")
    z = parent(a)()
    ccall((:fmpq_mpoly_derivative, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}),
+         (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}),
          z, a, i - 1, parent(a))
    return z
 end
 
-function integral(a::fmpq_mpoly, i::Int)
+function integral(a::QQMPolyRingElem, i::Int)
    n = nvars(parent(a))
    (i <= 0 || i > n) && error("Index must be between 1 and $n")
    z = parent(a)()
    ccall((:fmpq_mpoly_integral, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}),
+         (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}),
          z, a, i - 1, parent(a))
    return z
 end
@@ -729,38 +729,38 @@ end
 #
 ###############################################################################
 
-function evaluate(a::fmpq_mpoly, b::Vector{fmpq})
+function evaluate(a::QQMPolyRingElem, b::Vector{QQFieldElem})
    length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
-   z = fmpq()
+   z = QQFieldElem()
    GC.@preserve b ccall((:fmpq_mpoly_evaluate_all_fmpq, libflint), Nothing,
-         (Ref{fmpq}, Ref{fmpq_mpoly}, Ptr{fmpq}, Ref{FmpqMPolyRing}),
+         (Ref{QQFieldElem}, Ref{QQMPolyRingElem}, Ptr{QQFieldElem}, Ref{QQMPolyRing}),
             z, a, b, parent(a))
    return z
 end
 
-function evaluate(a::fmpq_mpoly, b::Vector{fmpz})
-   fmpq_vec = [fmpq(s) for s in b]
+function evaluate(a::QQMPolyRingElem, b::Vector{ZZRingElem})
+   fmpq_vec = [QQFieldElem(s) for s in b]
    return evaluate(a, fmpq_vec)
 end
 
-function evaluate(a::fmpq_mpoly, b::Vector{<:Integer})
-   fmpq_vec = [fmpq(s) for s in b]
+function evaluate(a::QQMPolyRingElem, b::Vector{<:Integer})
+   fmpq_vec = [QQFieldElem(s) for s in b]
    return evaluate(a, fmpq_vec)
 end
 
-function (a::fmpq_mpoly)(vals::fmpq...)
+function (a::QQMPolyRingElem)(vals::QQFieldElem...)
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number o
 f values")
    return evaluate(a, [vals...])
 end
 
-function (a::fmpq_mpoly)(vals::Integer...)
+function (a::QQMPolyRingElem)(vals::Integer...)
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number o
 f values")
    return evaluate(a, [vals...])
 end
 
-function (a::fmpq_mpoly)(vals::Union{NCRingElem, RingElement}...)
+function (a::QQMPolyRingElem)(vals::Union{NCRingElem, RingElement}...)
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number o
 f values")
    R = base_ring(a)
@@ -801,7 +801,7 @@ f values")
    return r
 end
 
-function evaluate(a::fmpq_mpoly, bs::Vector{fmpq_mpoly})
+function evaluate(a::QQMPolyRingElem, bs::Vector{QQMPolyRingElem})
    R = parent(a)
    S = parent(bs[1])
 
@@ -810,14 +810,14 @@ function evaluate(a::fmpq_mpoly, bs::Vector{fmpq_mpoly})
 
    c = S()
    fl = ccall((:fmpq_mpoly_compose_fmpq_mpoly, libflint), Cint,
-              (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Ptr{Ref{fmpq_mpoly}},
-               Ref{FmpqMPolyRing}, Ref{FmpqMPolyRing}),
+              (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ptr{Ref{QQMPolyRingElem}},
+               Ref{QQMPolyRing}, Ref{QQMPolyRing}),
               c, a, bs, R, S)
    fl == 0 && error("Something wrong in evaluation.")
    return c
 end
 
-function evaluate(a::fmpq_mpoly, bs::Vector{fmpq_poly})
+function evaluate(a::QQMPolyRingElem, bs::Vector{QQPolyRingElem})
    R = parent(a)
    S = parent(bs[1])
 
@@ -826,8 +826,8 @@ function evaluate(a::fmpq_mpoly, bs::Vector{fmpq_poly})
 
    c = S()
    fl = ccall((:fmpq_mpoly_compose_fmpq_poly, libflint), Cint,
-              (Ref{fmpq_poly}, Ref{fmpq_mpoly}, Ptr{Ref{fmpq_poly}},
-               Ref{FmpqMPolyRing}), c, a, bs, R)
+              (Ref{QQPolyRingElem}, Ref{QQMPolyRingElem}, Ptr{Ref{QQPolyRingElem}},
+               Ref{QQMPolyRing}), c, a, bs, R)
    fl == 0 && error("Something wrong in evaluation.")
    return c
 end
@@ -838,64 +838,64 @@ end
 #
 ###############################################################################
 
-function zero!(a::fmpq_mpoly)
+function zero!(a::QQMPolyRingElem)
     ccall((:fmpq_mpoly_zero, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}), a, a.parent)
+         (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), a, a.parent)
     return a
 end
 
-function add!(a::fmpq_mpoly, b::fmpq_mpoly, c::fmpq_mpoly)
+function add!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::QQMPolyRingElem)
    ccall((:fmpq_mpoly_add, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Ref{fmpq_mpoly},
-          Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}), a, b, c, a.parent)
+         (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem},
+          Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), a, b, c, a.parent)
    return a
 end
 
-function addeq!(a::fmpq_mpoly, b::fmpq_mpoly)
+function addeq!(a::QQMPolyRingElem, b::QQMPolyRingElem)
    ccall((:fmpq_mpoly_add, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Ref{fmpq_mpoly},
-          Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}), a, a, b, a.parent)
+         (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem},
+          Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), a, a, b, a.parent)
    return a
 end
 
-function mul!(a::fmpq_mpoly, b::fmpq_mpoly, c::fmpq_mpoly)
+function mul!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::QQMPolyRingElem)
    ccall((:fmpq_mpoly_mul, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Ref{fmpq_mpoly},
-          Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}), a, b, c, a.parent)
+         (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem},
+          Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), a, b, c, a.parent)
    return a
 end
 
 # Set the n-th coefficient of a to c. If zero coefficients are inserted, they
 # must be removed with combine_like_terms!
-function setcoeff!(a::fmpq_mpoly, n::Int, c::fmpq)
+function setcoeff!(a::QQMPolyRingElem, n::Int, c::QQFieldElem)
    if n > length(a)
       ccall((:fmpq_mpoly_resize, libflint), Nothing,
-            (Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}), a, n, a.parent)
+            (Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}), a, n, a.parent)
    end
    ccall((:fmpq_mpoly_set_term_coeff_fmpq, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Int, Ref{fmpq}, Ref{FmpqMPolyRing}),
+         (Ref{QQMPolyRingElem}, Int, Ref{QQFieldElem}, Ref{QQMPolyRing}),
          a, n - 1, c, a.parent)
    return a
 end
 
 # Set the i-th coefficient of a to c. If zero coefficients are inserted, they
 # must be removed with combine_like_terms!
-setcoeff!(a::fmpq_mpoly, i::Int, c::fmpz) = setcoeff!(a, i, fmpq(c))
+setcoeff!(a::QQMPolyRingElem, i::Int, c::ZZRingElem) = setcoeff!(a, i, QQFieldElem(c))
 
 # Set the i-th coefficient of a to c. If zero coefficients are inserted, they
 # must be removed with combine_like_terms!
-setcoeff!(a::fmpq_mpoly, i::Int, c::Integer) = setcoeff!(a, i, fmpq(c))
+setcoeff!(a::QQMPolyRingElem, i::Int, c::Integer) = setcoeff!(a, i, QQFieldElem(c))
 
 # Set the i-th coefficient of a to c. If zero coefficients are inserted, they
 # must be removed with combine_like_terms!
-setcoeff!(a::fmpq_mpoly, i::Int, c::Rational{<:Integer}) =
-   setcoeff!(a, i, fmpq(c))
+setcoeff!(a::QQMPolyRingElem, i::Int, c::Rational{<:Integer}) =
+   setcoeff!(a, i, QQFieldElem(c))
 
 # Remove zero terms and combine adjacent terms if they have the same monomial
 # no sorting is performed
-function combine_like_terms!(a::fmpq_mpoly)
+function combine_like_terms!(a::QQMPolyRingElem)
    ccall((:fmpq_mpoly_combine_like_terms, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}), a, a.parent)
+         (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), a, a.parent)
    return a
 end
 
@@ -905,56 +905,56 @@ end
 #
 ###############################################################################
 
-function exponent_vector_fits(::Type{Int}, a::fmpq_mpoly, i::Int)
+function exponent_vector_fits(::Type{Int}, a::QQMPolyRingElem, i::Int)
    b = ccall((:fmpq_mpoly_term_exp_fits_si, libflint), Cint,
-             (Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}),
+             (Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}),
              a, i - 1, a.parent)
    return Bool(b)
 end
 
-function exponent_vector_fits(::Type{UInt}, a::fmpq_mpoly, i::Int)
+function exponent_vector_fits(::Type{UInt}, a::QQMPolyRingElem, i::Int)
    b = ccall((:fmpq_mpoly_term_exp_fits_ui, libflint), Cint,
-             (Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}),
+             (Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}),
              a, i - 1, a.parent)
    return Bool(b)
 end
 
-function exponent_vector!(z::Vector{Int}, a::fmpq_mpoly, i::Int)
+function exponent_vector!(z::Vector{Int}, a::QQMPolyRingElem, i::Int)
    ccall((:fmpq_mpoly_get_term_exp_si, libflint), Nothing,
-         (Ptr{Int}, Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}),
+         (Ptr{Int}, Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}),
          z, a, i - 1, parent(a))
    return z
 end
 
-function exponent_vector!(z::Vector{UInt}, a::fmpq_mpoly, i::Int)
+function exponent_vector!(z::Vector{UInt}, a::QQMPolyRingElem, i::Int)
    ccall((:fmpq_mpoly_get_term_exp_ui, libflint), Nothing,
-         (Ptr{UInt}, Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}),
+         (Ptr{UInt}, Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}),
          z, a, i - 1, parent(a))
    return z
 end
 
-function exponent_vector!(z::Vector{fmpz}, a::fmpq_mpoly, i::Int)
+function exponent_vector!(z::Vector{ZZRingElem}, a::QQMPolyRingElem, i::Int)
    ccall((:fmpq_mpoly_get_term_exp_fmpz, libflint), Nothing,
-         (Ptr{Ref{fmpz}}, Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}),
+         (Ptr{Ref{ZZRingElem}}, Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}),
          z, a, i - 1, parent(a))
    return z
 end
 
 # Return a generator for exponent vectors of $a$
-function exponent_vectors_fmpz(a::fmpq_mpoly)
+function exponent_vectors_fmpz(a::QQMPolyRingElem)
    return (exponent_vector_fmpz(a, i) for i in 1:length(a))
 end
 
 # Set exponent of n-th term to given vector of UInt's
-# No sort is performed, so this is unsafe. These are promoted to fmpz's if
+# No sort is performed, so this is unsafe. These are promoted to ZZRingElem's if
 # they don't fit into 31/63 bits
-function set_exponent_vector!(a::fmpq_mpoly, n::Int, exps::Vector{UInt})
+function set_exponent_vector!(a::QQMPolyRingElem, n::Int, exps::Vector{UInt})
    if n > length(a)
       ccall((:fmpq_mpoly_resize, libflint), Nothing,
-            (Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}), a, n, a.parent)
+            (Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}), a, n, a.parent)
    end
    ccall((:fmpq_mpoly_set_term_exp_ui, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Int, Ptr{UInt}, Ref{FmpqMPolyRing}),
+         (Ref{QQMPolyRingElem}, Int, Ptr{UInt}, Ref{QQMPolyRing}),
       a, n - 1, exps, parent(a))
    return a
 end
@@ -962,127 +962,127 @@ end
 # Set exponent of n-th term to given vector of Int's
 # No sort is performed, so this is unsafe. The Int's must be positive, but
 # no check is performed
-function set_exponent_vector!(a::fmpq_mpoly, n::Int, exps::Vector{Int})
+function set_exponent_vector!(a::QQMPolyRingElem, n::Int, exps::Vector{Int})
    if n > length(a)
       ccall((:fmpq_mpoly_resize, libflint), Nothing,
-            (Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}), a, n, a.parent)
+            (Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}), a, n, a.parent)
    end
    ccall((:fmpq_mpoly_set_term_exp_ui, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Int, Ptr{Int}, Ref{FmpqMPolyRing}),
+         (Ref{QQMPolyRingElem}, Int, Ptr{Int}, Ref{QQMPolyRing}),
       a, n - 1, exps, parent(a))
    return a
 end
 
-# Set exponent of n-th term to given vector of fmpz's
+# Set exponent of n-th term to given vector of ZZRingElem's
 # No sort is performed, so this is unsafe
-function set_exponent_vector!(a::fmpq_mpoly, n::Int, exps::Vector{fmpz})
+function set_exponent_vector!(a::QQMPolyRingElem, n::Int, exps::Vector{ZZRingElem})
    if n > length(a)
       ccall((:fmpq_mpoly_resize, libflint), Nothing,
-            (Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}), a, n, a.parent)
+            (Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}), a, n, a.parent)
    end
    @GC.preserve exps ccall((:fmpq_mpoly_set_term_exp_fmpz, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Int, Ptr{fmpz}, Ref{FmpqMPolyRing}),
+         (Ref{QQMPolyRingElem}, Int, Ptr{ZZRingElem}, Ref{QQMPolyRing}),
       a, n - 1, exps, parent(a))
    return a
 end
 
 # Return j-th coordinate of i-th exponent vector
-function exponent(a::fmpq_mpoly, i::Int, j::Int)
+function exponent(a::QQMPolyRingElem, i::Int, j::Int)
    (j < 1 || j > nvars(parent(a))) && error("Invalid variable index")
    return ccall((:fmpq_mpoly_get_term_var_exp_ui, libflint), Int,
-                (Ref{fmpq_mpoly}, Int, Int, Ref{FmpqMPolyRing}),
+                (Ref{QQMPolyRingElem}, Int, Int, Ref{QQMPolyRing}),
                  a, i - 1, j - 1, a.parent)
 end
 
 # Return the coefficient of the term with the given exponent vector
 # Return zero if there is no such term
-function coeff(a::fmpq_mpoly, exps::Vector{UInt})
-   z = fmpq()
+function coeff(a::QQMPolyRingElem, exps::Vector{UInt})
+   z = QQFieldElem()
    ccall((:fmpq_mpoly_get_coeff_fmpq_ui, libflint), Nothing,
-         (Ref{fmpq}, Ref{fmpq_mpoly}, Ptr{UInt}, Ref{FmpqMPolyRing}),
+         (Ref{QQFieldElem}, Ref{QQMPolyRingElem}, Ptr{UInt}, Ref{QQMPolyRing}),
       z, a, exps, parent(a))
    return z
 end
 
 # Return the coefficient of the term with the given exponent vector
 # Return zero if there is no such term
-function coeff(a::fmpq_mpoly, exps::Vector{Int})
-   z = fmpq()
+function coeff(a::QQMPolyRingElem, exps::Vector{Int})
+   z = QQFieldElem()
    ccall((:fmpq_mpoly_get_coeff_fmpq_ui, libflint), Nothing,
-         (Ref{fmpq}, Ref{fmpq_mpoly}, Ptr{Int}, Ref{FmpqMPolyRing}),
+         (Ref{QQFieldElem}, Ref{QQMPolyRingElem}, Ptr{Int}, Ref{QQMPolyRing}),
       z, a, exps, parent(a))
    return z
 end
 
 # Set the coefficient of the term with the given exponent vector to the
-# given fmpq. Removal of a zero term is performed.
-function setcoeff!(a::fmpq_mpoly, exps::Vector{UInt}, b::fmpq)
+# given QQFieldElem. Removal of a zero term is performed.
+function setcoeff!(a::QQMPolyRingElem, exps::Vector{UInt}, b::QQFieldElem)
    ccall((:fmpq_mpoly_set_coeff_fmpq_ui, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Ref{fmpq}, Ptr{UInt}, Ref{FmpqMPolyRing}),
+         (Ref{QQMPolyRingElem}, Ref{QQFieldElem}, Ptr{UInt}, Ref{QQMPolyRing}),
       a, b, exps, parent(a))
    return a
 end
 
 # Set the coefficient of the term with the given exponent vector to the
-# given fmpq. Removal of a zero term is performed.
-function setcoeff!(a::fmpq_mpoly, exps::Vector{Int}, b::fmpq)
+# given QQFieldElem. Removal of a zero term is performed.
+function setcoeff!(a::QQMPolyRingElem, exps::Vector{Int}, b::QQFieldElem)
    ccall((:fmpq_mpoly_set_coeff_fmpq_ui, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Ref{fmpq}, Ptr{Int}, Ref{FmpqMPolyRing}),
+         (Ref{QQMPolyRingElem}, Ref{QQFieldElem}, Ptr{Int}, Ref{QQMPolyRing}),
       a, b, exps, parent(a))
    return a
 end
 
 # Set the coefficient of the term with the given exponent vector to the
 # given integer. Removal of a zero term is performed.
-setcoeff!(a::fmpq_mpoly, exps::Vector{Int}, b::Rational{<:Integer}) =
-   setcoeff!(a, exps, fmpq(b))
+setcoeff!(a::QQMPolyRingElem, exps::Vector{Int}, b::Rational{<:Integer}) =
+   setcoeff!(a, exps, QQFieldElem(b))
 
 # Set the coefficient of the term with the given exponent vector to the
-# given fmpz. Removal of a zero term is performed.
-setcoeff!(a::fmpq_mpoly, exps::Vector{Int}, b::fmpz) =
-   setcoeff!(a, exps, fmpq(b))
+# given ZZRingElem. Removal of a zero term is performed.
+setcoeff!(a::QQMPolyRingElem, exps::Vector{Int}, b::ZZRingElem) =
+   setcoeff!(a, exps, QQFieldElem(b))
 
 # Set the coefficient of the term with the given exponent vector to the
 # given integer. Removal of a zero term is performed.
-setcoeff!(a::fmpq_mpoly, exps::Vector{Int}, b::Integer) =
-   setcoeff!(a, exps, fmpq(b))
+setcoeff!(a::QQMPolyRingElem, exps::Vector{Int}, b::Integer) =
+   setcoeff!(a, exps, QQFieldElem(b))
 
 # Sort the terms according to the ordering. This is only needed if unsafe
 # functions such as those above have been called and terms have been inserted
 # out of order. Note that like terms are not combined and zeros are not
 # removed. For that, call combine_like_terms!
-function sort_terms!(a::fmpq_mpoly)
+function sort_terms!(a::QQMPolyRingElem)
    ccall((:fmpq_mpoly_sort_terms, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}), a, a.parent)
+         (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), a, a.parent)
    return a
 end
 
 # Return the i-th term of the polynomial, as a polynomial
-function term(a::fmpq_mpoly, i::Int)
+function term(a::QQMPolyRingElem, i::Int)
    z = parent(a)()
    n = length(a)
    (i < 1 || i > n) && error("Index must be between 1 and $(length(a))")
    ccall((:fmpq_mpoly_get_term, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}),
+         (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}),
           z, a, i - 1, a.parent)
    return z
 end
 
 # Return the i-th monomial of the polynomial, as a polynomial
-function monomial(a::fmpq_mpoly, i::Int)
+function monomial(a::QQMPolyRingElem, i::Int)
    z = parent(a)()
    n = length(a)
    (i < 1 || i > n) && error("Index must be between 1 and $(length(a))")
    ccall((:fmpq_mpoly_get_term_monomial, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}),
+         (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}),
           z, a, i - 1, a.parent)
    return z
 end
 
 # Sets the given polynomial m to the i-th monomial of the polynomial
-function monomial!(m::fmpq_mpoly, a::fmpq_mpoly, i::Int)
+function monomial!(m::QQMPolyRingElem, a::QQMPolyRingElem, i::Int)
    ccall((:fmpq_mpoly_get_term_monomial, libflint), Nothing,
-         (Ref{fmpq_mpoly}, Ref{fmpq_mpoly}, Int, Ref{FmpqMPolyRing}),
+         (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}),
           m, a, i - 1, a.parent)
    return m
 end
@@ -1093,13 +1093,13 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{fmpq_mpoly}, ::Type{V}) where {V <: Integer} = fmpq_mpoly
+promote_rule(::Type{QQMPolyRingElem}, ::Type{V}) where {V <: Integer} = QQMPolyRingElem
 
-promote_rule(::Type{fmpq_mpoly}, ::Type{Rational{V}}) where {V <: Integer} = fmpq_mpoly
+promote_rule(::Type{QQMPolyRingElem}, ::Type{Rational{V}}) where {V <: Integer} = QQMPolyRingElem
 
-promote_rule(::Type{fmpq_mpoly}, ::Type{fmpz}) = fmpq_mpoly
+promote_rule(::Type{QQMPolyRingElem}, ::Type{ZZRingElem}) = QQMPolyRingElem
 
-promote_rule(::Type{fmpq_mpoly}, ::Type{fmpq}) = fmpq_mpoly
+promote_rule(::Type{QQMPolyRingElem}, ::Type{QQFieldElem}) = QQMPolyRingElem
 
 ###############################################################################
 #
@@ -1107,36 +1107,36 @@ promote_rule(::Type{fmpq_mpoly}, ::Type{fmpq}) = fmpq_mpoly
 #
 ###############################################################################
 
-function _push_term!(z::fmpq_mpoly, c::fmpq, exp::Vector{Int})
+function _push_term!(z::QQMPolyRingElem, c::QQFieldElem, exp::Vector{Int})
   ccall((:fmpq_mpoly_push_term_fmpq_ui, libflint), Nothing,
-        (Ref{fmpq_mpoly}, Ref{fmpq}, Ptr{UInt}, Ref{FmpqMPolyRing}),
+        (Ref{QQMPolyRingElem}, Ref{QQFieldElem}, Ptr{UInt}, Ref{QQMPolyRing}),
         z, c, exp, parent(z))
   return z
 end
 
-function _push_term!(z::fmpq_mpoly, c::fmpz, exp::Vector{Int})
+function _push_term!(z::QQMPolyRingElem, c::ZZRingElem, exp::Vector{Int})
   ccall((:fmpq_mpoly_push_term_fmpz_ui, libflint), Nothing,
-        (Ref{fmpq_mpoly}, Ref{fmpz}, Ptr{UInt}, Ref{FmpqMPolyRing}),
+        (Ref{QQMPolyRingElem}, Ref{ZZRingElem}, Ptr{UInt}, Ref{QQMPolyRing}),
         z, c, exp, parent(z))
   return z
 end
 
-function _push_term!(z::fmpq_mpoly, c::Int, exp::Vector{Int})
+function _push_term!(z::QQMPolyRingElem, c::Int, exp::Vector{Int})
   ccall((:fmpq_mpoly_push_term_si_ui, libflint), Nothing,
-        (Ref{fmpq_mpoly}, Int, Ptr{UInt}, Ref{FmpqMPolyRing}),
+        (Ref{QQMPolyRingElem}, Int, Ptr{UInt}, Ref{QQMPolyRing}),
         z, c, exp, parent(z))
   return z
 end
 
-function _push_term!(z::fmpq_mpoly, c::UInt, exp::Vector{Int})
+function _push_term!(z::QQMPolyRingElem, c::UInt, exp::Vector{Int})
   ccall((:fmpq_mpoly_push_term_ui_ui, libflint), Nothing,
-        (Ref{fmpq_mpoly}, UInt, Ptr{UInt}, Ref{FmpqMPolyRing}),
+        (Ref{QQMPolyRingElem}, UInt, Ptr{UInt}, Ref{QQMPolyRing}),
         z, c, exp, parent(z))
   return z
 end
 
-function push_term!(M::MPolyBuildCtx{fmpq_mpoly},
-                    c::Union{fmpz, fmpq, Int, UInt}, expv::Vector{Int})
+function push_term!(M::MPolyBuildCtx{QQMPolyRingElem},
+                    c::Union{ZZRingElem, QQFieldElem, Int, UInt}, expv::Vector{Int})
    if length(expv) != nvars(parent(M.poly))
       error("length of exponent vector should match the number of variables")
    end
@@ -1144,20 +1144,20 @@ function push_term!(M::MPolyBuildCtx{fmpq_mpoly},
   return M
 end
 
-function push_term!(M::MPolyBuildCtx{fmpq_mpoly},
+function push_term!(M::MPolyBuildCtx{QQMPolyRingElem},
                     c::RingElement, expv::Vector{Int})
   push_term!(M, QQ(c), expv)
   return M
 end
 
-function finish(M::MPolyBuildCtx{fmpq_mpoly})
+function finish(M::MPolyBuildCtx{QQMPolyRingElem})
   res = M.poly
   R = parent(res)
   M.poly = zero(R)
   ccall((:fmpq_mpoly_sort_terms, libflint), Nothing,
-        (Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}), res, R)
+        (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), res, R)
   ccall((:fmpq_mpoly_combine_like_terms, libflint), Nothing,
-        (Ref{fmpq_mpoly}, Ref{FmpqMPolyRing}), res, R)
+        (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), res, R)
   return res
 end
 
@@ -1167,76 +1167,76 @@ end
 #
 ###############################################################################
 
-function (R::FmpqMPolyRing)()
-   z = fmpq_mpoly(R)
+function (R::QQMPolyRing)()
+   z = QQMPolyRingElem(R)
    return z
 end
 
-function (R::FmpqMPolyRing)(b::fmpq)
-   z = fmpq_mpoly(R, b)
+function (R::QQMPolyRing)(b::QQFieldElem)
+   z = QQMPolyRingElem(R, b)
    return z
 end
 
-function (R::FmpqMPolyRing)(b::fmpz)
-   z = fmpq_mpoly(R, b)
+function (R::QQMPolyRing)(b::ZZRingElem)
+   z = QQMPolyRingElem(R, b)
    return z
 end
 
-function (R::FmpqMPolyRing)(b::Int)
-   z = fmpq_mpoly(R, b)
+function (R::QQMPolyRing)(b::Int)
+   z = QQMPolyRingElem(R, b)
    return z
 end
 
-function (R::FmpqMPolyRing)(b::UInt)
-   z = fmpq_mpoly(R, b)
+function (R::QQMPolyRing)(b::UInt)
+   z = QQMPolyRingElem(R, b)
    return z
 end
 
-function (R::FmpqMPolyRing)(b::Integer)
-   return R(fmpz(b))
+function (R::QQMPolyRing)(b::Integer)
+   return R(ZZRingElem(b))
 end
 
-function (R::FmpqMPolyRing)(b::Rational{<:Integer})
-   return R(fmpq(b))
+function (R::QQMPolyRing)(b::Rational{<:Integer})
+   return R(QQFieldElem(b))
 end
 
-function (R::FmpqMPolyRing)(a::fmpq_mpoly)
+function (R::QQMPolyRing)(a::QQMPolyRingElem)
    parent(a) != R && error("Unable to coerce polynomial")
    return a
 end
 
 # Create poly with given array of coefficients and array of exponent vectors (sorting is performed)
-function (R::FmpqMPolyRing)(a::Vector{fmpq}, b::Vector{Vector{T}}) where {T <: Union{fmpz, UInt}}
+function (R::QQMPolyRing)(a::Vector{QQFieldElem}, b::Vector{Vector{T}}) where {T <: Union{ZZRingElem, UInt}}
    length(a) != length(b) && error("Coefficient and exponent vector must have the same length")
 
    for i in 1:length(b)
      length(b[i]) != nvars(R) && error("Exponent vector $i has length $(length(b[i])) (expected $(nvars(R))")
    end
 
-   z = fmpq_mpoly(R, a, b)
+   z = QQMPolyRingElem(R, a, b)
    return z
 end
 
 # Create poly with given array of coefficients and array of exponent vectors (sorting is performed)
-function (R::FmpqMPolyRing)(a::Vector{fmpq}, b::Vector{Vector{Int}})
+function (R::QQMPolyRing)(a::Vector{QQFieldElem}, b::Vector{Vector{Int}})
    length(a) != length(b) && error("Coefficient and exponent vector must have the same length")
 
    for i in 1:length(b)
       length(b[i]) != nvars(R) && error("Exponent vector $i has length $(length(b[i])) (expected $(nvars(R)))")
    end
 
-   z = fmpq_mpoly(R, a, b)
+   z = QQMPolyRingElem(R, a, b)
    return z
 end
 
 # Create poly with given array of coefficients and array of exponent vectors (sorting is performed)
-function (R::FmpqMPolyRing)(a::Vector{Any}, b::Vector{Vector{T}}) where T
+function (R::QQMPolyRing)(a::Vector{Any}, b::Vector{Vector{T}}) where T
    n = nvars(R)
    length(a) != length(b) && error("Coefficient and exponent vector must have the same length")
    newa = map(FlintQQ, a)
    newb = map(x -> map(FlintZZ, x), b)
-   newaa = convert(Vector{fmpq}, newa)
-   newbb = convert(Vector{Vector{fmpz}}, newb)
+   newaa = convert(Vector{QQFieldElem}, newa)
+   newbb = convert(Vector{Vector{ZZRingElem}}, newb)
 
    for i in 1:length(newbb)
       length(newbb[i]) != n && error("Exponent vector $i has length $(length(newbb[i])) (expected $(nvars(R)))")
@@ -1251,12 +1251,12 @@ end
 #
 ###############################################################################
 
-function PolynomialRing(R::FlintRationalField, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
-   parent_obj = FmpqMPolyRing(s, ordering, cached)
+function PolynomialRing(R::QQField, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
+   parent_obj = QQMPolyRing(s, ordering, cached)
    return tuple(parent_obj, gens(parent_obj))
 end
 
-function PolynomialRing(R::FlintRationalField, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
+function PolynomialRing(R::QQField, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
    return PolynomialRing(R, [Symbol(x) for x in s]; cached=cached, ordering=ordering)
 end
 

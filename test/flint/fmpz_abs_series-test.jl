@@ -1,5 +1,5 @@
 @testset "fmpz_abs_series.types" begin
-   @test abs_series_type(fmpz) == fmpz_abs_series
+   @test abs_series_type(ZZRingElem) == fmpz_abs_series
 end
 
 @testset "fmpz_abs_series.constructors" begin
@@ -131,7 +131,7 @@ end
    @test parent(h) === parent(g)
    @test parent(k) !== parent(m)
 
-   p = abs_series(ZZ, fmpz[], 0, 4)
+   p = abs_series(ZZ, ZZRingElem[], 0, 4)
    q = abs_series(ZZ, [], 0, 6)
 
    @test isa(p, fmpz_abs_series)
@@ -314,9 +314,9 @@ end
 
    @test isequal(divexact(7a, 7), a)
 
-   @test isequal(divexact(11b, fmpz(11)), b)
+   @test isequal(divexact(11b, ZZRingElem(11)), b)
 
-   @test isequal(divexact(2c, fmpz(2)), c)
+   @test isequal(divexact(2c, ZZRingElem(2)), c)
 
    @test isequal(divexact(9d, 9), d)
 

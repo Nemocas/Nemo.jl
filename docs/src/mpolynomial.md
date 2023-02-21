@@ -19,16 +19,16 @@ information is mainly of concern to developers).
 Base ring                                   | Library             | Element type        | Parent type
 --------------------------------------------|---------------------|---------------------|----------------------
 Generic ring $R$                            | AbstractAlgebra.jl  | `Generic.MPoly{T}`  | `Generic.MPolyRing{T}`
-$\mathbb{Z}$                                | Flint               | `fmpz_mpoly`        | `FmpzMPolyRing`
-$\mathbb{Z}/n\mathbb{Z}$ (small $n$)        | Flint               | `nmod_mpoly`        | `NmodMPolyRing`
-$\mathbb{Q}$                                | Flint               | `fmpq_mpoly`        | `FmpqMPolyRing`
+$\mathbb{Z}$                                | Flint               | `ZZMPolyRingElem`        | `ZZMPolyRing`
+$\mathbb{Z}/n\mathbb{Z}$ (small $n$)        | Flint               | `zzModMPolyRingElem`        | `zzModMPolyRing`
+$\mathbb{Q}$                                | Flint               | `QQMPolyRingElem`        | `QQMPolyRing`
 
 The following are not implemented yet, but will be available soon:
 
 Base ring                                   | Library             | Element type        | Parent type
 --------------------------------------------|---------------------|---------------------|----------------------
-$\mathbb{Z}/p\mathbb{Z}$ (small prime $p$)  | Flint               | `gfp_mpoly`         | `GFPMPolyRing`
-$\mathbb{F}_{p^n}$ (small $p$)              | Flint               | `fq_nmod_mpoly`     | `FqNmodMPolyRing`
+$\mathbb{Z}/p\mathbb{Z}$ (small prime $p$)  | Flint               | `fpMPolyRingElem`         | `fpMPolyRing`
+$\mathbb{F}_{p^n}$ (small $p$)              | Flint               | `fqPolyRepMPolyRingElem`     | `fqPolyRepMPolyRing`
 
 The string representation of the variables and the base ring $R$ of a generic
 polynomial is stored in its parent object. 

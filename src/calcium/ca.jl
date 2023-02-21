@@ -183,12 +183,12 @@ function isless(a::ca, b::ca)
 end
 
 isless(a::ca, b::qqbar) = isless(a, parent(a)(b))
-isless(a::ca, b::fmpz) = isless(a, parent(a)(b))
-isless(a::ca, b::fmpq) = isless(a, parent(a)(b))
+isless(a::ca, b::ZZRingElem) = isless(a, parent(a)(b))
+isless(a::ca, b::QQFieldElem) = isless(a, parent(a)(b))
 isless(a::ca, b::Int) = isless(a, parent(a)(b))
 isless(a::qqbar, b::ca) = isless(parent(b)(a), b)
-isless(a::fmpq, b::ca) = isless(parent(b)(a), b)
-isless(a::fmpz, b::ca) = isless(parent(b)(a), b)
+isless(a::QQFieldElem, b::ca) = isless(parent(b)(a), b)
+isless(a::ZZRingElem, b::ca) = isless(parent(b)(a), b)
 isless(a::Int, b::ca) = isless(parent(b)(a), b)
 
 @doc Markdown.doc"""
@@ -415,20 +415,20 @@ function +(a::ca, b::Int)
    return r
 end
 
-function +(a::ca, b::fmpz)
+function +(a::ca, b::ZZRingElem)
    C = a.parent
    r = C()
    ccall((:ca_add_fmpz, libcalcium), Nothing,
-         (Ref{ca}, Ref{ca}, Ref{fmpz}, Ref{CalciumField}), r, a, b, C)
+         (Ref{ca}, Ref{ca}, Ref{ZZRingElem}, Ref{CalciumField}), r, a, b, C)
    check_special(r)
    return r
 end
 
-function +(a::ca, b::fmpq)
+function +(a::ca, b::QQFieldElem)
    C = a.parent
    r = C()
    ccall((:ca_add_fmpq, libcalcium), Nothing,
-         (Ref{ca}, Ref{ca}, Ref{fmpq}, Ref{CalciumField}), r, a, b, C)
+         (Ref{ca}, Ref{ca}, Ref{QQFieldElem}, Ref{CalciumField}), r, a, b, C)
    check_special(r)
    return r
 end
@@ -436,8 +436,8 @@ end
 +(a::ca, b::qqbar) = a + parent(a)(b)
 
 +(a::Int, b::ca) = b + a
-+(a::fmpz, b::ca) = b + a
-+(a::fmpq, b::ca) = b + a
++(a::ZZRingElem, b::ca) = b + a
++(a::QQFieldElem, b::ca) = b + a
 +(a::qqbar, b::ca) = b + a
 
 function -(a::ca, b::ca)
@@ -459,40 +459,40 @@ function -(a::ca, b::Int)
    return r
 end
 
-function -(a::ca, b::fmpz)
+function -(a::ca, b::ZZRingElem)
    C = a.parent
    r = C()
    ccall((:ca_sub_fmpz, libcalcium), Nothing,
-         (Ref{ca}, Ref{ca}, Ref{fmpz}, Ref{CalciumField}), r, a, b, C)
+         (Ref{ca}, Ref{ca}, Ref{ZZRingElem}, Ref{CalciumField}), r, a, b, C)
    check_special(r)
    return r
 end
 
-function -(a::ca, b::fmpq)
+function -(a::ca, b::QQFieldElem)
    C = a.parent
    r = C()
    ccall((:ca_sub_fmpq, libcalcium), Nothing,
-         (Ref{ca}, Ref{ca}, Ref{fmpq}, Ref{CalciumField}), r, a, b, C)
+         (Ref{ca}, Ref{ca}, Ref{QQFieldElem}, Ref{CalciumField}), r, a, b, C)
    check_special(r)
    return r
 end
 
 -(a::ca, b::qqbar) = a - parent(a)(b)
 
-function -(a::fmpz, b::ca)
+function -(a::ZZRingElem, b::ca)
    C = b.parent
    r = C()
    ccall((:ca_fmpz_sub, libcalcium), Nothing,
-         (Ref{ca}, Ref{fmpz}, Ref{ca}, Ref{CalciumField}), r, a, b, C)
+         (Ref{ca}, Ref{ZZRingElem}, Ref{ca}, Ref{CalciumField}), r, a, b, C)
    check_special(r)
    return r
 end
 
-function -(a::fmpq, b::ca)
+function -(a::QQFieldElem, b::ca)
    C = b.parent
    r = C()
    ccall((:ca_fmpq_sub, libcalcium), Nothing,
-         (Ref{ca}, Ref{fmpq}, Ref{ca}, Ref{CalciumField}), r, a, b, C)
+         (Ref{ca}, Ref{QQFieldElem}, Ref{ca}, Ref{CalciumField}), r, a, b, C)
    check_special(r)
    return r
 end
@@ -509,20 +509,20 @@ function *(a::ca, b::Int)
    return r
 end
 
-function *(a::ca, b::fmpz)
+function *(a::ca, b::ZZRingElem)
    C = a.parent
    r = C()
    ccall((:ca_mul_fmpz, libcalcium), Nothing,
-         (Ref{ca}, Ref{ca}, Ref{fmpz}, Ref{CalciumField}), r, a, b, C)
+         (Ref{ca}, Ref{ca}, Ref{ZZRingElem}, Ref{CalciumField}), r, a, b, C)
    check_special(r)
    return r
 end
 
-function *(a::ca, b::fmpq)
+function *(a::ca, b::QQFieldElem)
    C = a.parent
    r = C()
    ccall((:ca_mul_fmpq, libcalcium), Nothing,
-         (Ref{ca}, Ref{ca}, Ref{fmpq}, Ref{CalciumField}), r, a, b, C)
+         (Ref{ca}, Ref{ca}, Ref{QQFieldElem}, Ref{CalciumField}), r, a, b, C)
    check_special(r)
    return r
 end
@@ -530,8 +530,8 @@ end
 *(a::ca, b::qqbar) = a * parent(a)(b)
 
 *(a::Int, b::ca) = b * a
-*(a::fmpz, b::ca) = b * a
-*(a::fmpq, b::ca) = b * a
+*(a::ZZRingElem, b::ca) = b * a
+*(a::QQFieldElem, b::ca) = b * a
 *(a::qqbar, b::ca) = b * a
 
 ###############################################################################
@@ -576,20 +576,20 @@ function //(a::ca, b::Int)
    return r
 end
 
-function //(a::ca, b::fmpz)
+function //(a::ca, b::ZZRingElem)
    C = a.parent
    r = C()
    ccall((:ca_div_fmpz, libcalcium), Nothing,
-         (Ref{ca}, Ref{ca}, Ref{fmpz}, Ref{CalciumField}), r, a, b, C)
+         (Ref{ca}, Ref{ca}, Ref{ZZRingElem}, Ref{CalciumField}), r, a, b, C)
    check_special(r)
    return r
 end
 
-function //(a::ca, b::fmpq)
+function //(a::ca, b::QQFieldElem)
    C = a.parent
    r = C()
    ccall((:ca_div_fmpq, libcalcium), Nothing,
-         (Ref{ca}, Ref{ca}, Ref{fmpq}, Ref{CalciumField}), r, a, b, C)
+         (Ref{ca}, Ref{ca}, Ref{QQFieldElem}, Ref{CalciumField}), r, a, b, C)
    check_special(r)
    return r
 end
@@ -605,20 +605,20 @@ function //(a::Int, b::ca)
    return r
 end
 
-function //(a::fmpz, b::ca)
+function //(a::ZZRingElem, b::ca)
    C = b.parent
    r = C()
    ccall((:ca_fmpz_div, libcalcium), Nothing,
-         (Ref{ca}, Ref{fmpz}, Ref{ca}, Ref{CalciumField}), r, a, b, C)
+         (Ref{ca}, Ref{ZZRingElem}, Ref{ca}, Ref{CalciumField}), r, a, b, C)
    check_special(r)
    return r
 end
 
-function //(a::fmpq, b::ca)
+function //(a::QQFieldElem, b::ca)
    C = b.parent
    r = C()
    ccall((:ca_fmpq_div, libcalcium), Nothing,
-         (Ref{ca}, Ref{fmpq}, Ref{ca}, Ref{CalciumField}), r, a, b, C)
+         (Ref{ca}, Ref{QQFieldElem}, Ref{ca}, Ref{CalciumField}), r, a, b, C)
    check_special(r)
    return r
 end
@@ -626,12 +626,12 @@ end
 //(a::qqbar, b::ca) = parent(b)(a) // b
 
 divexact(a::ca, b::Int; check::Bool=true) = a // b
-divexact(a::ca, b::fmpz; check::Bool=true) = a // b
-divexact(a::ca, b::fmpq; check::Bool=true) = a // b
+divexact(a::ca, b::ZZRingElem; check::Bool=true) = a // b
+divexact(a::ca, b::QQFieldElem; check::Bool=true) = a // b
 divexact(a::ca, b::qqbar; check::Bool=true) = a // b
 divexact(a::Int, b::ca; check::Bool=true) = a // b
-divexact(a::fmpz, b::ca; check::Bool=true) = a // b
-divexact(a::fmpq, b::ca; check::Bool=true) = a // b
+divexact(a::ZZRingElem, b::ca; check::Bool=true) = a // b
+divexact(a::QQFieldElem, b::ca; check::Bool=true) = a // b
 divexact(a::qqbar, b::ca; check::Bool=true) = a // b
 
 ###############################################################################
@@ -659,20 +659,20 @@ function ^(a::ca, b::Int)
    return r
 end
 
-function ^(a::ca, b::fmpz)
+function ^(a::ca, b::ZZRingElem)
    C = a.parent
    r = C()
    ccall((:ca_pow_fmpz, libcalcium), Nothing,
-         (Ref{ca}, Ref{ca}, Ref{fmpz}, Ref{CalciumField}), r, a, b, C)
+         (Ref{ca}, Ref{ca}, Ref{ZZRingElem}, Ref{CalciumField}), r, a, b, C)
    check_special(r)
    return r
 end
 
-function ^(a::ca, b::fmpq)
+function ^(a::ca, b::QQFieldElem)
    C = a.parent
    r = C()
    ccall((:ca_pow_fmpq, libcalcium), Nothing,
-         (Ref{ca}, Ref{ca}, Ref{fmpq}, Ref{CalciumField}), r, a, b, C)
+         (Ref{ca}, Ref{ca}, Ref{QQFieldElem}, Ref{CalciumField}), r, a, b, C)
    check_special(r)
    return r
 end
@@ -680,8 +680,8 @@ end
 ^(a::ca, b::qqbar) = a ^ parent(a)(b)
 
 ^(a::Int, b::ca) = parent(b)(a) ^ b
-^(a::fmpz, b::ca) = parent(b)(a) ^ b
-^(a::fmpq, b::ca) = parent(b)(a) ^ b
+^(a::ZZRingElem, b::ca) = parent(b)(a) ^ b
+^(a::QQFieldElem, b::ca) = parent(b)(a) ^ b
 ^(a::qqbar, b::ca) = parent(b)(a) ^ b
 
 
@@ -1311,20 +1311,20 @@ end
 #
 ###############################################################################
 
-function fmpq(a::ca)
+function QQFieldElem(a::ca)
    C = a.parent
-   res = fmpq()
+   res = QQFieldElem()
    ok = Bool(ccall((:ca_get_fmpq, libcalcium), Cint,
-        (Ref{fmpq}, Ref{ca}, Ref{CalciumField}), res, a, C))
+        (Ref{QQFieldElem}, Ref{ca}, Ref{CalciumField}), res, a, C))
    !ok && error("unable to convert to a rational number")
    return res
 end
 
-function fmpz(a::ca)
+function ZZRingElem(a::ca)
    C = a.parent
-   res = fmpz()
+   res = ZZRingElem()
    ok = Bool(ccall((:ca_get_fmpz, libcalcium), Cint,
-        (Ref{fmpz}, Ref{ca}, Ref{CalciumField}), res, a, C))
+        (Ref{ZZRingElem}, Ref{ca}, Ref{CalciumField}), res, a, C))
    !ok && error("unable to convert to an integer")
    return res
 end
@@ -1338,8 +1338,8 @@ function qqbar(a::ca)
    return res
 end
 
-(R::FlintRationalField)(a::ca) = fmpq(a)
-(R::FlintIntegerRing)(a::ca) = fmpz(a)
+(R::QQField)(a::ca) = QQFieldElem(a)
+(R::ZZRing)(a::ca) = ZZRingElem(a)
 (R::CalciumQQBarField)(a::ca) = qqbar(a)
 
 function (R::AcbField)(a::ca; parts::Bool=false)
@@ -1464,17 +1464,17 @@ function (C::CalciumField)(v::Int)
    return z
 end
 
-function (C::CalciumField)(v::fmpz)
+function (C::CalciumField)(v::ZZRingElem)
    z = ca(C)
    ccall((:ca_set_fmpz, libcalcium), Nothing,
-         (Ref{ca}, Ref{fmpz}, Ref{CalciumField}), z, v, C)
+         (Ref{ca}, Ref{ZZRingElem}, Ref{CalciumField}), z, v, C)
    return z
 end
 
-function (C::CalciumField)(v::fmpq)
+function (C::CalciumField)(v::QQFieldElem)
    z = ca(C)
    ccall((:ca_set_fmpq, libcalcium), Nothing,
-         (Ref{ca}, Ref{fmpq}, Ref{CalciumField}), z, v, C)
+         (Ref{ca}, Ref{QQFieldElem}, Ref{CalciumField}), z, v, C)
    return z
 end
 

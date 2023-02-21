@@ -47,18 +47,18 @@ end
 ###############################################################################
 
 function fmpqi()
-   return fmpqi(fmpzi(), fmpz(1))
+   return fmpqi(fmpzi(), ZZRingElem(1))
 end
 
 function fmpqi(a::fmpzi)
-   return fmpqi(a, fmpz(1))
+   return fmpqi(a, ZZRingElem(1))
 end
 
-function fmpqi(a::fmpq)
+function fmpqi(a::QQFieldElem)
    return fmpqi(fmpzi(numerator(a)), denominator(a))
 end
 
-function fmpqi(a::fmpq, b::fmpq)
+function fmpqi(a::QQFieldElem, b::QQFieldElem)
    da = denominator(a)
    db = denominator(b)
    return reduce!(fmpqi(fmpzi(numerator(a)*db, numerator(b)*da), da*db))
@@ -78,29 +78,29 @@ function (a::FlintQQiField)(b::IntegerUnion)
    return fmpqi(fmpzi(b))
 end
 
-function (a::FlintQQiField)(b::Union{Rational, fmpq})
-   return fmpqi(fmpq(b))
+function (a::FlintQQiField)(b::Union{Rational, QQFieldElem})
+   return fmpqi(QQFieldElem(b))
 end
 
-function (a::FlintQQiField)(b::Union{Integer, fmpz, Rational, fmpq},
-                            c::Union{Integer, fmpz, Rational, fmpq})
-   return fmpqi(fmpq(b), fmpq(c))
+function (a::FlintQQiField)(b::Union{Integer, ZZRingElem, Rational, QQFieldElem},
+                            c::Union{Integer, ZZRingElem, Rational, QQFieldElem})
+   return fmpqi(QQFieldElem(b), QQFieldElem(c))
 end
 
 function (a::FlintQQiField)(b::Union{Complex{<:Integer}, fmpzi, Complex{<:Rational}})
-   return fmpqi(fmpq(real(b)), fmpq(imag(b)))
+   return fmpqi(QQFieldElem(real(b)), QQFieldElem(imag(b)))
 end
 
 function (a::FlintQQiField)(b::fmpqi)
    return b
 end
 
-function (a::FlintIntegerRing)(b::fmpqi)
+function (a::ZZRing)(b::fmpqi)
    iszero(b.num.y) && isone(b.den) || error("cannot coerce")
    return b.num.x
 end
 
-function (a::FlintRationalField)(b::fmpqi)
+function (a::QQField)(b::fmpqi)
    iszero(b.num.y) || error("cannot coerce")
    return b.num.x//b.den
 end
@@ -124,11 +124,11 @@ function Base.convert(::Type{Complex{Rational{T}}}, a::fmpqi) where T <: Integer
 end
 
 function Base.convert(::Type{fmpqi}, a::Complex{T}) where T <: Union{Integer, Rational}
-   return fmpqi(convert(fmpq, real(a)), convert(fmpq, imag(a)))
+   return fmpqi(convert(QQFieldElem, real(a)), convert(QQFieldElem, imag(a)))
 end
 
-function Base.convert(::Type{fmpqi}, a::Union{Integer, fmpz, Rational, fmpq})
-   return fmpqi(convert(fmpq, a), fmpq(0))
+function Base.convert(::Type{fmpqi}, a::Union{Integer, ZZRingElem, Rational, QQFieldElem})
+   return fmpqi(convert(QQFieldElem, a), QQFieldElem(0))
 end
 
 ###############################################################################
@@ -181,11 +181,11 @@ function abs2(a::fmpqi)
 end
 
 function zero(a::FlintQQiField)
-   return fmpqi(zero(FlintZZi), fmpz(1))
+   return fmpqi(zero(FlintZZi), ZZRingElem(1))
 end
 
 function one(a::FlintQQiField)
-   return fmpqi(one(FlintZZi), fmpz(1))
+   return fmpqi(one(FlintZZi), ZZRingElem(1))
 end
 
 function iszero(a::fmpqi)
@@ -230,11 +230,11 @@ end
 ###############################################################################
 
 function reduce!(z::fmpqi)
-   g = fmpz()
+   g = ZZRingElem()
    ccall((:fmpz_gcd3, libflint), Nothing,
-         (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}),
+         (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}),
          g, z.num.x, z.den, z.num.y)
-   if ccall((:fmpz_sgn, libflint), Cint, (Ref{fmpz},), z.den) < 0
+   if ccall((:fmpz_sgn, libflint), Cint, (Ref{ZZRingElem},), z.den) < 0
       neg!(g, g)
    end
    divexact!(z.num, z.num, g)
@@ -344,7 +344,7 @@ function mul!(z::fmpqi, a::fmpqi, b::fmpqi)
    return z
 end
 
-function mul!(z::fmpqi, a::fmpqi, b::Union{Integer, fmpz, fmpzi})
+function mul!(z::fmpqi, a::fmpqi, b::Union{Integer, ZZRingElem, fmpzi})
    mul!(z.num, a.num, b)
    set!(z.den, a.den)
    reduce!(z)
@@ -441,10 +441,10 @@ end
 ###############################################################################
 
 for (A, Bs) in [
-    [fmpqi, [Integer, fmpz, Complex{<:Integer}, fmpzi, Rational, fmpq, Complex{<:Rational}]],
-    [fmpzi, [Rational, fmpq, Complex{<:Rational}]],
-    [fmpq, [Complex{<:Integer}, Complex{<:Rational}]],
-    [fmpz, [Complex{<:Rational}]]]
+    [fmpqi, [Integer, ZZRingElem, Complex{<:Integer}, fmpzi, Rational, QQFieldElem, Complex{<:Rational}]],
+    [fmpzi, [Rational, QQFieldElem, Complex{<:Rational}]],
+    [QQFieldElem, [Complex{<:Integer}, Complex{<:Rational}]],
+    [ZZRingElem, [Complex{<:Rational}]]]
    for B in Bs
       # need Type{<:Integer} not Type{Integer} and we can't type <:Integer above
       TA = @eval Type{<:($(A))}
@@ -481,9 +481,9 @@ end
 # // overloads in AA easily lead to ambiguities
 for (As, Bs) in [
       [(Integer, Rational), (fmpzi, fmpqi)],
-      [(Complex{<:Integer}, Complex{<:Rational}), (fmpz, fmpq, fmpzi, fmpqi)], 
-      [(fmpz, fmpq), (Complex{<:Integer}, Complex{<:Rational}, fmpzi, fmpqi)],
-      [(fmpzi, fmpqi), (Integer, Rational, fmpz, fmpq, Complex{<:Integer},
+      [(Complex{<:Integer}, Complex{<:Rational}), (ZZRingElem, QQFieldElem, fmpzi, fmpqi)], 
+      [(ZZRingElem, QQFieldElem), (Complex{<:Integer}, Complex{<:Rational}, fmpzi, fmpqi)],
+      [(fmpzi, fmpqi), (Integer, Rational, ZZRingElem, QQFieldElem, Complex{<:Integer},
                                            Complex{<:Rational}, fmpzi, fmpqi)]]
    for A in As, B in Bs
       @eval begin

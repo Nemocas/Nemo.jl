@@ -1,9 +1,9 @@
 @testset "fq_default_rel_series.types" begin
-   @test rel_series_type(fq_default) == fq_default_rel_series
+   @test rel_series_type(FqFieldElem) == fq_default_rel_series
 end
 
 @testset "fq_default_rel_series.constructors" begin
-   R, t = NGFiniteField(fmpz(23), 5, "t")
+   R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    @test elem_type(S) == fq_default_rel_series
@@ -25,7 +25,7 @@ end
    @test isa(d, SeriesElem)
 
    g = S(1)
-   h = S(fmpz(2))
+   h = S(ZZRingElem(2))
    k = S()
 
    @test isa(g, SeriesElem)
@@ -38,7 +38,7 @@ end
 end
 
 @testset "fq_default_rel_series.printing" begin
-   R, t = NGFiniteField(fmpz(23), 5, "t")
+   R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    b = (t^2 + 1)*x^2 + (t + 3)x + O(x^4)
@@ -47,7 +47,7 @@ end
 end
 
 @testset "fq_default_rel_series.manipulation" begin
-   R, t = NGFiniteField(fmpz(23), 5, "t")
+   R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    @test max_precision(S) == 30
@@ -155,7 +155,7 @@ end
    @test parent(h) == parent(g)
    @test parent(k) != parent(m)
 
-   p = rel_series(R, fq_default[], 0, 3, 1)
+   p = rel_series(R, FqFieldElem[], 0, 3, 1)
    q = rel_series(R, [], 0, 3, 2)
 
    @test isa(p, fq_default_rel_series)
@@ -164,7 +164,7 @@ end
    @test pol_length(p) == 0
    @test pol_length(q) == 0
 
-   r = rel_series(R, fmpz[1, 2, 3], 3, 11, 8)
+   r = rel_series(R, ZZRingElem[1, 2, 3], 3, 11, 8)
 
    @test isa(r, fq_default_rel_series)
 
@@ -174,7 +174,7 @@ end
 end
 
 @testset "fq_default_rel_series.unary_ops" begin
-   R, t = NGFiniteField(fmpz(23), 5, "t")
+   R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -186,7 +186,7 @@ end
 end
 
 @testset "fq_default_rel_series.binary_ops" begin
-   R, t = NGFiniteField(fmpz(23), 5, "t")
+   R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -324,7 +324,7 @@ end
 end
 
 @testset "fq_default_rel_series.adhoc_binary_ops" begin
-   R, t = NGFiniteField(fmpz(23), 5, "t")
+   R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -334,15 +334,15 @@ end
 
    @test isequal(2a, 4x + 2x^3 + O(x^31))
 
-   @test isequal(fmpz(3)*b, O(x^4))
+   @test isequal(ZZRingElem(3)*b, O(x^4))
 
    @test isequal(c*2, 2 + 2*x + 6*x^2 + O(x^5))
 
-   @test isequal(d*fmpz(3), 3x^2 + 9x^3 - 3x^4 + O(x^32))
+   @test isequal(d*ZZRingElem(3), 3x^2 + 9x^3 - 3x^4 + O(x^32))
 end
 
 @testset "fq_default_rel_series.comparison" begin
-   R, t = NGFiniteField(fmpz(23), 5, "t")
+   R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -362,7 +362,7 @@ end
 end
 
 @testset "fq_default_rel_series.adhoc_comparison" begin
-   R, t = NGFiniteField(fmpz(23), 5, "t")
+   R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -372,17 +372,17 @@ end
 
    @test d == 3
 
-   @test c == fmpz(1)
+   @test c == ZZRingElem(1)
 
-   @test fmpz() != a
+   @test ZZRingElem() != a
 
    @test 2 == b
 
-   @test fmpz(1) == c
+   @test ZZRingElem(1) == c
 end
 
 @testset "fq_default_rel_series.powering" begin
-   R, t = NGFiniteField(fmpz(23), 5, "t")
+   R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -402,7 +402,7 @@ end
 end
 
 @testset "fq_default_rel_series.shift" begin
-   R, t = NGFiniteField(fmpz(23), 5, "t")
+   R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -424,7 +424,7 @@ end
 end
 
 @testset "fq_default_rel_series.truncation" begin
-   R, t = NGFiniteField(fmpz(23), 5, "t")
+   R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 2x + x^3
@@ -444,7 +444,7 @@ end
 end
 
 @testset "fq_default_rel_series.inversion" begin
-   R, t = NGFiniteField(fmpz(23), 5, "t")
+   R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = 1 + x + 2x^2 + O(x^5)
@@ -456,7 +456,7 @@ end
 end
 
 @testset "fq_default_rel_series.exact_division" begin
-   R, t = NGFiniteField(fmpz(23), 5, "t")
+   R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = x + x^3
@@ -474,7 +474,7 @@ end
 end
 
 @testset "fq_default_rel_series.adhoc_exact_division" begin
-   R, t = NGFiniteField(fmpz(23), 5, "t")
+   R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    a = x + x^3
@@ -484,9 +484,9 @@ end
 
    @test isequal(divexact(a, 7), 10*x+10*x^3+O(x^31))
 
-   @test isequal(divexact(b, fmpz(11)), 0+O(x^4))
+   @test isequal(divexact(b, ZZRingElem(11)), 0+O(x^4))
 
-   @test isequal(divexact(c, fmpz(2)), 12 + 12*x+x^2+O(x^5))
+   @test isequal(divexact(c, ZZRingElem(2)), 12 + 12*x+x^2+O(x^5))
 
    @test isequal(divexact(d, 9), 18*x+18*x^3+O(x^6))
 
@@ -496,7 +496,7 @@ end
 end
 
 @testset "fq_default_rel_series.square_root" begin
-   S, t = NGFiniteField(fmpz(31), 5, "t")
+   S, t = NGFiniteField(ZZRingElem(31), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x")
 
    for iter = 1:300
@@ -506,7 +506,7 @@ end
    end
 
    for p in [2, 7, 19, 65537]
-      R, t = NGFiniteField(fmpz(p), 2, "t")
+      R, t = NGFiniteField(ZZRingElem(p), 2, "t")
 
       S, x = PowerSeriesRing(R, 10, "x")
 
@@ -537,7 +537,7 @@ end
 end
 
 @testset "fq_default_rel_series.special_functions" begin
-   R, t = NGFiniteField(fmpz(23), 5, "t")
+   R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    @test isequal(exp(x + O(x^10)), 18*x^9+x^8+8*x^7+10*x^6+14*x^5+x^4+4*x^3+12*x^2+x+1+O(x^10))
@@ -547,7 +547,7 @@ end
 
 
 @testset "fq_default_rel_series.unsafe_operators" begin
-   S, t = NGFiniteField(fmpz(23), 5, "t")
+   S, t = NGFiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x")
 
    for iter = 1:300

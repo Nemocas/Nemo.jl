@@ -150,25 +150,25 @@ function contains(x::acb_poly, y::acb_poly)
 end
 
 @doc Markdown.doc"""
-    contains(x::acb_poly, y::fmpz_poly)
+    contains(x::acb_poly, y::ZZPolyRingElem)
 
 Return `true` if the coefficient boxes of $x$ contain the corresponding
 exact coefficients of $y$, otherwise return `false`.
 """
-function contains(x::acb_poly, y::fmpz_poly)
+function contains(x::acb_poly, y::ZZPolyRingElem)
    return ccall((:acb_poly_contains_fmpz_poly, libarb), Bool,
-                                      (Ref{acb_poly}, Ref{fmpz_poly}), x, y)
+                                      (Ref{acb_poly}, Ref{ZZPolyRingElem}), x, y)
 end
 
 @doc Markdown.doc"""
-    contains(x::acb_poly, y::fmpq_poly)
+    contains(x::acb_poly, y::QQPolyRingElem)
 
 Return `true` if the coefficient boxes of $x$ contain the corresponding
 exact coefficients of $y$, otherwise return `false`.
 """
-function contains(x::acb_poly, y::fmpq_poly)
+function contains(x::acb_poly, y::QQPolyRingElem)
    return ccall((:acb_poly_contains_fmpq_poly, libarb), Bool,
-                                      (Ref{acb_poly}, Ref{fmpq_poly}), x, y)
+                                      (Ref{acb_poly}, Ref{QQPolyRingElem}), x, y)
 end
 
 function ==(x::acb_poly, y::acb_poly)
@@ -200,9 +200,9 @@ contained in the (constant) polynomial $x$, along with that integer $z$
 in case it is, otherwise sets $t$ to `false`.
 """
 function unique_integer(x::acb_poly)
-  z = FmpzPolyRing(FlintZZ, var(parent(x)))()
+  z = ZZPolyRing(FlintZZ, var(parent(x)))()
   unique = ccall((:acb_poly_get_unique_fmpz_poly, libarb), Int,
-    (Ref{fmpz_poly}, Ref{acb_poly}), z, x)
+    (Ref{ZZPolyRingElem}, Ref{acb_poly}), z, x)
   return (unique != 0, z)
 end
 
@@ -289,7 +289,7 @@ end
 #
 ###############################################################################
 
-for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb, acb, fmpz_poly, fmpq_poly]
+for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, arb, acb, ZZPolyRingElem, QQPolyRingElem]
    @eval begin
       +(x::acb_poly, y::$T) = x + parent(x)(y)
 
@@ -323,7 +323,7 @@ end
 #
 ###############################################################################
 
-for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb, acb]
+for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, arb, acb]
    @eval begin
       divexact(x::acb_poly, y::$T; check::Bool=true) = x * inv(base_ring(parent(x))(y))
 
@@ -436,11 +436,11 @@ function evaluate2(x::acb_poly, y::acb)
    return z, w
 end
 
-function evaluate(x::acb_poly, y::Union{Int,Float64,fmpq,arb})
+function evaluate(x::acb_poly, y::Union{Int,Float64,QQFieldElem,arb})
     return evaluate(x, base_ring(parent(x))(y))
 end
 
-function evaluate(x::acb_poly, y::fmpz)
+function evaluate(x::acb_poly, y::ZZRingElem)
     return evaluate(x, base_ring(parent(x))(y))
 end
 
@@ -465,22 +465,22 @@ function evaluate2(x::acb_poly, y::Float64)
 end
 
 @doc Markdown.doc"""
-    evaluate2(x::acb_poly, y::fmpz)
+    evaluate2(x::acb_poly, y::ZZRingElem)
 
 Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
 its derivative evaluated at $y$.
 """
-function evaluate2(x::acb_poly, y::fmpz)
+function evaluate2(x::acb_poly, y::ZZRingElem)
     return evaluate2(x, base_ring(parent(x))(y))
 end
 
 @doc Markdown.doc"""
-    evaluate2(x::acb_poly, y::fmpq)
+    evaluate2(x::acb_poly, y::QQFieldElem)
 
 Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
 its derivative evaluated at $y$.
 """
-function evaluate2(x::acb_poly, y::fmpq)
+function evaluate2(x::acb_poly, y::QQFieldElem)
     return evaluate2(x, base_ring(parent(x))(y))
 end
 
@@ -779,9 +779,9 @@ function fit!(z::acb_poly, n::Int)
    return nothing
 end
 
-function setcoeff!(z::acb_poly, n::Int, x::fmpz)
+function setcoeff!(z::acb_poly, n::Int, x::ZZRingElem)
    ccall((:acb_poly_set_coeff_fmpz, libarb), Nothing,
-                    (Ref{acb_poly}, Int, Ref{fmpz}), z, n, x)
+                    (Ref{acb_poly}, Int, Ref{ZZRingElem}), z, n, x)
    return z
 end
 
@@ -818,9 +818,9 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{acb_poly}, ::Type{fmpz_poly}) = acb_poly
+promote_rule(::Type{acb_poly}, ::Type{ZZPolyRingElem}) = acb_poly
 
-promote_rule(::Type{acb_poly}, ::Type{fmpq_poly}) = acb_poly
+promote_rule(::Type{acb_poly}, ::Type{QQPolyRingElem}) = acb_poly
 
 promote_rule(::Type{acb_poly}, ::Type{arb_poly}) = acb_poly
 
@@ -840,7 +840,7 @@ function (a::AcbPolyRing)()
    return z
 end
 
-for T in [Integer, fmpz, fmpq, Float64, Complex{Float64},
+for T in [Integer, ZZRingElem, QQFieldElem, Float64, Complex{Float64},
           Complex{Int}, arb, acb]
   @eval begin
     function (a::AcbPolyRing)(b::$T)
@@ -851,7 +851,7 @@ for T in [Integer, fmpz, fmpq, Float64, Complex{Float64},
   end
 end
 
-(a::AcbPolyRing)(b::Rational{T}) where {T <: Integer} = a(fmpq(b))
+(a::AcbPolyRing)(b::Rational{T}) where {T <: Integer} = a(QQFieldElem(b))
 
 function (a::AcbPolyRing)(b::Vector{acb})
    z = acb_poly(b, a.base_ring.prec)
@@ -859,7 +859,7 @@ function (a::AcbPolyRing)(b::Vector{acb})
    return z
 end
 
-for T in [fmpz, fmpq, Float64, Complex{Float64}, Complex{Int}, arb]
+for T in [ZZRingElem, QQFieldElem, Float64, Complex{Float64}, Complex{Int}, arb]
   @eval begin
     (a::AcbPolyRing)(b::Vector{$T}) = a(map(base_ring(a), b))
   end
@@ -869,13 +869,13 @@ end
 
 (a::AcbPolyRing)(b::Vector{Rational{T}}) where {T <: Integer} = a(map(base_ring(a), b))
 
-function (a::AcbPolyRing)(b::fmpz_poly)
+function (a::AcbPolyRing)(b::ZZPolyRingElem)
    z = acb_poly(b, a.base_ring.prec)
    z.parent = a
    return z
 end
 
-function (a::AcbPolyRing)(b::fmpq_poly)
+function (a::AcbPolyRing)(b::QQPolyRingElem)
    z = acb_poly(b, a.base_ring.prec)
    z.parent = a
    return z
@@ -901,7 +901,7 @@ end
 
 function PolynomialRing(R::AcbField, s::Symbol; cached = true)
   parent_obj = AcbPolyRing(R, s, cached)
-  return parent_obj, parent_obj(fmpz_poly([fmpz(0), fmpz(1)]))
+  return parent_obj, parent_obj(ZZPolyRingElem([ZZRingElem(0), ZZRingElem(1)]))
 end
 
 function PolynomialRing(R::AcbField, s::AbstractString; cached = true)

@@ -1,10 +1,10 @@
 ################################################################################
 #
-#  fq_nmod_mat.jl: flint fq_nmod_mat types in julia
+#  fqPolyRepMatrix.jl: flint fqPolyRepMatrix types in julia
 #
 ################################################################################
 
-export fq_nmod_mat, FqNmodMatSpace, getindex, setindex!, deepcopy,
+export fqPolyRepMatrix, fqPolyRepMatrixSpace, getindex, setindex!, deepcopy,
        parent, base_ring, zero, one, show, transpose,
        transpose!, rref, rref!, tr, det, rank, inv, solve,
        sub, hcat, vcat, Array, lift, lift!, MatrixSpace, check_parent,
@@ -16,13 +16,13 @@ export fq_nmod_mat, FqNmodMatSpace, getindex, setindex!, deepcopy,
 #
 ################################################################################
 
-parent_type(::Type{fq_nmod_mat}) = FqNmodMatSpace
+parent_type(::Type{fqPolyRepMatrix}) = fqPolyRepMatrixSpace
 
-elem_type(::Type{FqNmodMatSpace}) = fq_nmod_mat
+elem_type(::Type{fqPolyRepMatrixSpace}) = fqPolyRepMatrix
 
-dense_matrix_type(::Type{fq_nmod}) = fq_nmod_mat
+dense_matrix_type(::Type{fqPolyRepFieldElem}) = fqPolyRepMatrix
 
-function check_parent(x::fq_nmod_mat, y::fq_nmod_mat)
+function check_parent(x::fqPolyRepMatrix, y::fqPolyRepMatrix)
    fl = base_ring(x) != base_ring(y)
    fl && throw && error("Residue rings must be equal")
    fl && return false
@@ -37,8 +37,8 @@ end
 #
 ###############################################################################
 
-similar(::fq_nmod_mat, R::FqNmodFiniteField, r::Int, c::Int) = fq_nmod_mat(r, c, R)
-zero(::fq_nmod_mat, R::FqNmodFiniteField, r::Int, c::Int) = fq_nmod_mat(r, c, R)
+similar(::fqPolyRepMatrix, R::fqPolyRepField, r::Int, c::Int) = fqPolyRepMatrix(r, c, R)
+zero(::fqPolyRepMatrix, R::fqPolyRepField, r::Int, c::Int) = fqPolyRepMatrix(r, c, R)
 
 ################################################################################
 #
@@ -46,68 +46,68 @@ zero(::fq_nmod_mat, R::FqNmodFiniteField, r::Int, c::Int) = fq_nmod_mat(r, c, R)
 #
 ################################################################################
 
-@inline function getindex(a::fq_nmod_mat, i::Int, j::Int)
+@inline function getindex(a::fqPolyRepMatrix, i::Int, j::Int)
    @boundscheck Generic._checkbounds(a, i, j)
    GC.@preserve a begin
-      el = ccall((:fq_nmod_mat_entry, libflint), Ptr{fq_nmod},
-                 (Ref{fq_nmod_mat}, Int, Int), a, i - 1 , j - 1)
+      el = ccall((:fq_nmod_mat_entry, libflint), Ptr{fqPolyRepFieldElem},
+                 (Ref{fqPolyRepMatrix}, Int, Int), a, i - 1 , j - 1)
       z = base_ring(a)()
-      ccall((:fq_nmod_set, libflint), Nothing, (Ref{fq_nmod}, Ptr{fq_nmod}), z, el)
+      ccall((:fq_nmod_set, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Ptr{fqPolyRepFieldElem}), z, el)
    end
    return z
 end
 
-@inline function setindex!(a::fq_nmod_mat, u::fq_nmod, i::Int, j::Int)
+@inline function setindex!(a::fqPolyRepMatrix, u::fqPolyRepFieldElem, i::Int, j::Int)
    @boundscheck Generic._checkbounds(a, i, j)
    ccall((:fq_nmod_mat_entry_set, libflint), Nothing,
-         (Ref{fq_nmod_mat}, Int, Int, Ref{fq_nmod}, Ref{FqNmodFiniteField}),
+         (Ref{fqPolyRepMatrix}, Int, Int, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
          a, i - 1, j - 1, u, base_ring(a))
 end
 
-@inline function setindex!(a::fq_nmod_mat, u::fmpz, i::Int, j::Int)
+@inline function setindex!(a::fqPolyRepMatrix, u::ZZRingElem, i::Int, j::Int)
    @boundscheck Generic._checkbounds(a, i, j)
    GC.@preserve a begin
-      el = ccall((:fq_nmod_mat_entry, libflint), Ptr{fq_nmod},
-                 (Ref{fq_nmod_mat}, Int, Int), a, i - 1, j - 1)
+      el = ccall((:fq_nmod_mat_entry, libflint), Ptr{fqPolyRepFieldElem},
+                 (Ref{fqPolyRepMatrix}, Int, Int), a, i - 1, j - 1)
       ccall((:fq_nmod_set_fmpz, libflint), Nothing,
-            (Ptr{fq_nmod}, Ref{fmpz}, Ref{FqNmodFiniteField}), el, u, base_ring(a))
+            (Ptr{fqPolyRepFieldElem}, Ref{ZZRingElem}, Ref{fqPolyRepField}), el, u, base_ring(a))
    end
 end
 
-setindex!(a::fq_nmod_mat, u::Integer, i::Int, j::Int) =
+setindex!(a::fqPolyRepMatrix, u::Integer, i::Int, j::Int) =
         setindex!(a, base_ring(a)(u), i, j)
 
-function deepcopy_internal(a::fq_nmod_mat, dict::IdDict)
-  z = fq_nmod_mat(nrows(a), ncols(a), base_ring(a))
+function deepcopy_internal(a::fqPolyRepMatrix, dict::IdDict)
+  z = fqPolyRepMatrix(nrows(a), ncols(a), base_ring(a))
   ccall((:fq_nmod_mat_set, libflint), Nothing,
-        (Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}), z, a, base_ring(a))
+        (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), z, a, base_ring(a))
   return z
 end
 
-nrows(a::fq_nmod_mat) = a.r
+nrows(a::fqPolyRepMatrix) = a.r
 
-ncols(a::fq_nmod_mat) = a.c
+ncols(a::fqPolyRepMatrix) = a.c
 
-nrows(a::FqNmodMatSpace) = a.nrows
+nrows(a::fqPolyRepMatrixSpace) = a.nrows
 
-ncols(a::FqNmodMatSpace) = a.ncols
+ncols(a::fqPolyRepMatrixSpace) = a.ncols
 
-parent(a::fq_nmod_mat, cached::Bool = true) = FqNmodMatSpace(base_ring(a), nrows(a), ncols(a), cached)
+parent(a::fqPolyRepMatrix, cached::Bool = true) = fqPolyRepMatrixSpace(base_ring(a), nrows(a), ncols(a), cached)
 
-base_ring(a::FqNmodMatSpace) = a.base_ring
+base_ring(a::fqPolyRepMatrixSpace) = a.base_ring
 
-base_ring(a::fq_nmod_mat) = a.base_ring
+base_ring(a::fqPolyRepMatrix) = a.base_ring
 
-zero(a::FqNmodMatSpace) = a()
+zero(a::fqPolyRepMatrixSpace) = a()
 
-function one(a::FqNmodMatSpace)
+function one(a::fqPolyRepMatrixSpace)
   (nrows(a) != ncols(a)) && error("Matrices must be square")
   return a(one(base_ring(a)))
 end
 
-function iszero(a::fq_nmod_mat)
+function iszero(a::fqPolyRepMatrix)
    r = ccall((:fq_nmod_mat_is_zero, libflint), Cint,
-             (Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}), a, base_ring(a))
+             (Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), a, base_ring(a))
   return Bool(r)
 end
 
@@ -117,16 +117,16 @@ end
 #
 ################################################################################
 
-function ==(a::fq_nmod_mat, b::fq_nmod_mat)
+function ==(a::fqPolyRepMatrix, b::fqPolyRepMatrix)
    if !(a.base_ring == b.base_ring)
       return false
    end
    r = ccall((:fq_nmod_mat_equal, libflint), Cint,
-             (Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}), a, b, base_ring(a))
+             (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), a, b, base_ring(a))
    return Bool(r)
 end
 
-isequal(a::fq_nmod_mat, b::fq_nmod_mat) = ==(a, b)
+isequal(a::fqPolyRepMatrix, b::fqPolyRepMatrix) = ==(a, b)
 
 ################################################################################
 #
@@ -134,8 +134,8 @@ isequal(a::fq_nmod_mat, b::fq_nmod_mat) = ==(a, b)
 #
 ################################################################################
 
-function transpose(a::fq_nmod_mat)
-   z = fq_nmod_mat(ncols(a), nrows(a), base_ring(a))
+function transpose(a::fqPolyRepMatrix)
+   z = fqPolyRepMatrix(ncols(a), nrows(a), base_ring(a))
    for i in 1:nrows(a)
       for j in 1:ncols(a)
          z[j, i] = a[i, j]
@@ -144,18 +144,18 @@ function transpose(a::fq_nmod_mat)
    return z
 end
 
-# There is no transpose for fq_nmod_mat
-#function transpose(a::fq_nmod_mat)
-#  z = FqNmodMatSpace(base_ring(a), ncols(a), nrows(a))()
+# There is no transpose for fqPolyRepMatrix
+#function transpose(a::fqPolyRepMatrix)
+#  z = fqPolyRepMatrixSpace(base_ring(a), ncols(a), nrows(a))()
 #  ccall((:fq_nmod_mat_transpose, libflint), Nothing,
-#        (Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}), z, a, base_ring(a))
+#        (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), z, a, base_ring(a))
 #  return z
 #end
 #
-#function transpose!(a::fq_nmod_mat)
+#function transpose!(a::fqPolyRepMatrix)
 #  !is_square(a) && error("Matrix must be a square matrix")
 #  ccall((:fq_nmod_mat_transpose, libflint), Nothing,
-#        (Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}), a, a, base_ring(a))
+#        (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), a, a, base_ring(a))
 #end
 
 ###############################################################################
@@ -164,47 +164,47 @@ end
 #
 ###############################################################################
 
-function swap_rows!(x::fq_nmod_mat, i::Int, j::Int)
+function swap_rows!(x::fqPolyRepMatrix, i::Int, j::Int)
   ccall((:fq_nmod_mat_swap_rows, libflint), Nothing,
-        (Ref{fq_nmod_mat}, Ptr{Nothing}, Int, Int, Ref{FqNmodFiniteField}),
+        (Ref{fqPolyRepMatrix}, Ptr{Nothing}, Int, Int, Ref{fqPolyRepField}),
         x, C_NULL, i - 1, j - 1, base_ring(x))
   return x
 end
 
-function swap_rows(x::fq_nmod_mat, i::Int, j::Int)
+function swap_rows(x::fqPolyRepMatrix, i::Int, j::Int)
    (1 <= i <= nrows(x) && 1 <= j <= nrows(x)) || throw(BoundsError())
    y = deepcopy(x)
    return swap_rows!(y, i, j)
 end
 
-function swap_cols!(x::fq_nmod_mat, i::Int, j::Int)
+function swap_cols!(x::fqPolyRepMatrix, i::Int, j::Int)
   ccall((:fq_nmod_mat_swap_cols, libflint), Nothing,
-        (Ref{fq_nmod_mat}, Ptr{Nothing}, Int, Int, Ref{FqNmodFiniteField}),
+        (Ref{fqPolyRepMatrix}, Ptr{Nothing}, Int, Int, Ref{fqPolyRepField}),
         x, C_NULL, i - 1, j - 1, base_ring(x))
   return x
 end
 
-function swap_cols(x::fq_nmod_mat, i::Int, j::Int)
+function swap_cols(x::fqPolyRepMatrix, i::Int, j::Int)
    (1 <= i <= ncols(x) && 1 <= j <= ncols(x)) || throw(BoundsError())
    y = deepcopy(x)
    return swap_cols!(y, i, j)
 end
 
-function reverse_rows!(x::fq_nmod_mat)
+function reverse_rows!(x::fqPolyRepMatrix)
    ccall((:fq_nmod_mat_invert_rows, libflint), Nothing,
-         (Ref{fq_nmod_mat}, Ptr{Nothing}, Ref{FqNmodFiniteField}), x, C_NULL, base_ring(x))
+         (Ref{fqPolyRepMatrix}, Ptr{Nothing}, Ref{fqPolyRepField}), x, C_NULL, base_ring(x))
    return x
 end
 
-reverse_rows(x::fq_nmod_mat) = reverse_rows!(deepcopy(x))
+reverse_rows(x::fqPolyRepMatrix) = reverse_rows!(deepcopy(x))
 
-function reverse_cols!(x::fq_nmod_mat)
+function reverse_cols!(x::fqPolyRepMatrix)
    ccall((:fq_nmod_mat_invert_cols, libflint), Nothing,
-         (Ref{fq_nmod_mat}, Ptr{Nothing}, Ref{FqNmodFiniteField}), x, C_NULL, base_ring(x))
+         (Ref{fqPolyRepMatrix}, Ptr{Nothing}, Ref{fqPolyRepField}), x, C_NULL, base_ring(x))
    return x
 end
 
-reverse_cols(x::fq_nmod_mat) = reverse_cols!(deepcopy(x))
+reverse_cols(x::fqPolyRepMatrix) = reverse_cols!(deepcopy(x))
 
 ################################################################################
 #
@@ -212,10 +212,10 @@ reverse_cols(x::fq_nmod_mat) = reverse_cols!(deepcopy(x))
 #
 ################################################################################
 
-function -(x::fq_nmod_mat)
+function -(x::fqPolyRepMatrix)
    z = similar(x)
    ccall((:fq_nmod_mat_neg, libflint), Nothing,
-         (Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}), z, x, base_ring(x))
+         (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), z, x, base_ring(x))
    return z
 end
 
@@ -225,31 +225,31 @@ end
 #
 ################################################################################
 
-function +(x::fq_nmod_mat, y::fq_nmod_mat)
+function +(x::fqPolyRepMatrix, y::fqPolyRepMatrix)
    check_parent(x,y)
    z = similar(x)
    ccall((:fq_nmod_mat_add, libflint), Nothing,
-         (Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}),
+         (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}),
          z, x, y, base_ring(x))
    return z
 end
 
-function -(x::fq_nmod_mat, y::fq_nmod_mat)
+function -(x::fqPolyRepMatrix, y::fqPolyRepMatrix)
    check_parent(x,y)
    z = similar(x)
    ccall((:fq_nmod_mat_sub, libflint), Nothing,
-         (Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}),
+         (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}),
          z, x, y, base_ring(x))
 
    return z
 end
 
-function *(x::fq_nmod_mat, y::fq_nmod_mat)
+function *(x::fqPolyRepMatrix, y::fqPolyRepMatrix)
    (base_ring(x) != base_ring(y)) && error("Base ring must be equal")
    (ncols(x) != nrows(y)) && error("Dimensions are wrong")
    z = similar(x, nrows(x), ncols(y))
    ccall((:fq_nmod_mat_mul, libflint), Nothing,
-         (Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}), z, x, y, base_ring(x))
+         (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), z, x, y, base_ring(x))
    return z
 end
 
@@ -260,38 +260,38 @@ end
 #
 ################################################################################
 
-function mul!(a::fq_nmod_mat, b::fq_nmod_mat, c::fq_nmod_mat)
+function mul!(a::fqPolyRepMatrix, b::fqPolyRepMatrix, c::fqPolyRepMatrix)
    ccall((:fq_nmod_mat_mul, libflint), Nothing,
-         (Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}),
+         (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}),
          a, b, c, base_ring(a))
   return a
 end
 
-function add!(a::fq_nmod_mat, b::fq_nmod_mat, c::fq_nmod_mat)
+function add!(a::fqPolyRepMatrix, b::fqPolyRepMatrix, c::fqPolyRepMatrix)
    ccall((:fq_nmod_mat_add, libflint), Nothing,
-         (Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}),
+         (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}),
          a, b, c, base_ring(a))
   return a
 end
 
-function zero!(a::fq_nmod_mat)
+function zero!(a::fqPolyRepMatrix)
    ccall((:fq_nmod_mat_zero, libflint), Nothing,
-         (Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}), a, base_ring(a))
+         (Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), a, base_ring(a))
    return a
 end
 
-function mul!(z::Vector{fq_nmod}, a::fq_nmod_mat, b::Vector{fq_nmod})
+function mul!(z::Vector{fqPolyRepFieldElem}, a::fqPolyRepMatrix, b::Vector{fqPolyRepFieldElem})
    ccall((:fq_nmod_mat_mul_vec_ptr, libflint), Nothing,
-         (Ptr{Ref{fq_nmod}}, Ref{fq_nmod_mat}, Ptr{Ref{fq_nmod}}, Int,
-          Ref{FqNmodFiniteField}),
+         (Ptr{Ref{fqPolyRepFieldElem}}, Ref{fqPolyRepMatrix}, Ptr{Ref{fqPolyRepFieldElem}}, Int,
+          Ref{fqPolyRepField}),
          z, a, b, length(b), base_ring(a))
    return z
 end
 
-function mul!(z::Vector{fq_nmod}, a::Vector{fq_nmod}, b::fq_nmod_mat)
+function mul!(z::Vector{fqPolyRepFieldElem}, a::Vector{fqPolyRepFieldElem}, b::fqPolyRepMatrix)
    ccall((:fq_nmod_mat_vec_mul_ptr, libflint), Nothing,
-         (Ptr{Ref{fq_nmod}}, Ptr{Ref{fq_nmod}}, Int, Ref{fq_nmod_mat},
-          Ref{FqNmodFiniteField}),
+         (Ptr{Ref{fqPolyRepFieldElem}}, Ptr{Ref{fqPolyRepFieldElem}}, Int, Ref{fqPolyRepMatrix},
+          Ref{fqPolyRepField}),
          z, a, length(a), b, base_ring(b))
    return z
 end
@@ -302,7 +302,7 @@ end
 #
 ################################################################################
 
-function *(x::fq_nmod_mat, y::fq_nmod)
+function *(x::fqPolyRepMatrix, y::fqPolyRepFieldElem)
    z = similar(x)
    for i in 1:nrows(x)
       for j in 1:ncols(x)
@@ -312,19 +312,19 @@ function *(x::fq_nmod_mat, y::fq_nmod)
    return z
 end
 
-*(x::fq_nmod, y::fq_nmod_mat) = y * x
+*(x::fqPolyRepFieldElem, y::fqPolyRepMatrix) = y * x
 
-function *(x::fq_nmod_mat, y::fmpz)
+function *(x::fqPolyRepMatrix, y::ZZRingElem)
    return base_ring(x)(y) * x
 end
 
-*(x::fmpz, y::fq_nmod_mat) = y * x
+*(x::ZZRingElem, y::fqPolyRepMatrix) = y * x
 
-function *(x::fq_nmod_mat, y::Integer)
+function *(x::fqPolyRepMatrix, y::Integer)
    return x * base_ring(x)(y)
 end
 
-*(x::Integer, y::fq_nmod_mat) = y * x
+*(x::Integer, y::fqPolyRepMatrix) = y * x
 
 ################################################################################
 #
@@ -340,16 +340,16 @@ end
 #
 ################################################################################
 
-function rref(a::fq_nmod_mat)
+function rref(a::fqPolyRepMatrix)
    z = deepcopy(a)
    r = ccall((:fq_nmod_mat_rref, libflint), Int,
-             (Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}), z, base_ring(a))
+             (Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), z, base_ring(a))
    return r, z
 end
 
-function rref!(a::fq_nmod_mat)
+function rref!(a::fqPolyRepMatrix)
    r = ccall((:fq_nmod_mat_rref, libflint), Int,
-         (Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}), a, base_ring(a))
+         (Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), a, base_ring(a))
    return r
 end
 
@@ -359,7 +359,7 @@ end
 #
 #################################################################################
 
-function tr(a::fq_nmod_mat)
+function tr(a::fqPolyRepMatrix)
    !is_square(a) && error("Non-square matrix")
    n = nrows(a)
    t = zero(base_ring(a))
@@ -375,7 +375,7 @@ end
 #
 ################################################################################
 
-function det(a::fq_nmod_mat)
+function det(a::fqPolyRepMatrix)
    !is_square(a) && error("Non-square matrix")
    n = nrows(a)
    R = base_ring(a)
@@ -400,7 +400,7 @@ end
 #
 ################################################################################
 
-function rank(a::fq_nmod_mat)
+function rank(a::fqPolyRepMatrix)
    n = nrows(a)
    if n == 0
       return 0
@@ -415,11 +415,11 @@ end
 #
 ################################################################################
 
-function inv(a::fq_nmod_mat)
+function inv(a::fqPolyRepMatrix)
    !is_square(a) && error("Matrix must be a square matrix")
    z = similar(a)
    r = ccall((:fq_nmod_mat_inv, libflint), Int,
-             (Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}), z, a, base_ring(a))
+             (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), z, a, base_ring(a))
    !Bool(r) && error("Matrix not invertible")
    return z
 end
@@ -430,19 +430,19 @@ end
 #
 ################################################################################
 
-function solve(x::fq_nmod_mat, y::fq_nmod_mat)
+function solve(x::fqPolyRepMatrix, y::fqPolyRepMatrix)
    (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
    !is_square(x)&& error("First argument not a square matrix in solve")
    (nrows(y) != nrows(x)) || ncols(y) != 1 && ("Not a column vector in solve")
    z = similar(y)
    r = ccall((:fq_nmod_mat_solve, libflint), Int,
-             (Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}),
+             (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}),
              z, x, y, base_ring(x))
    !Bool(r) && error("Singular matrix in solve")
    return z
 end
 
-function can_solve_with_solution(a::fq_nmod_mat, b::fq_nmod_mat; side::Symbol = :right)
+function can_solve_with_solution(a::fqPolyRepMatrix, b::fqPolyRepMatrix; side::Symbol = :right)
    (base_ring(a) != base_ring(b)) && error("Matrices must have same base ring")
    if side == :left
       (ncols(a) != ncols(b)) && error("Matrices must have same number of columns")
@@ -452,15 +452,15 @@ function can_solve_with_solution(a::fq_nmod_mat, b::fq_nmod_mat; side::Symbol = 
       (nrows(a) != nrows(b)) && error("Matrices must have same number of rows")
       x = similar(a, ncols(a), ncols(b))
       r = ccall((:fq_nmod_mat_can_solve, libflint), Cint,
-                (Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{fq_nmod_mat},
-                 Ref{FqNmodFiniteField}), x, a, b, base_ring(a))
+                (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix},
+                 Ref{fqPolyRepField}), x, a, b, base_ring(a))
       return Bool(r), x
    else
       error("Only side = :right or :left is supported (:$side)")
    end
 end
 
-function can_solve(a::fq_nmod_mat, b::fq_nmod_mat; side::Symbol = :right)
+function can_solve(a::fqPolyRepMatrix, b::fqPolyRepMatrix; side::Symbol = :right)
    fl, _ = can_solve_with_solution(a, b, side = side)
    return fl
 end
@@ -471,11 +471,11 @@ end
 #
 ################################################################################
 
-function lu!(P::Generic.Perm, x::fq_nmod_mat)
+function lu!(P::Generic.Perm, x::fqPolyRepMatrix)
    P.d .-= 1
 
    rank = Int(ccall((:fq_nmod_mat_lu, libflint), Cint,
-                (Ptr{Int}, Ref{fq_nmod_mat}, Cint, Ref{FqNmodFiniteField}),
+                (Ptr{Int}, Ref{fqPolyRepMatrix}, Cint, Ref{fqPolyRepField}),
                 P.d, x, 0, base_ring(x)))
 
   P.d .+= 1
@@ -486,7 +486,7 @@ function lu!(P::Generic.Perm, x::fq_nmod_mat)
   return rank
 end
 
-function lu(x::fq_nmod_mat, P = SymmetricGroup(nrows(x)))
+function lu(x::fqPolyRepMatrix, P = SymmetricGroup(nrows(x)))
    m = nrows(x)
    n = ncols(x)
    P.n != m && error("Permutation does not match matrix")
@@ -519,7 +519,7 @@ end
 #
 ################################################################################
 
-function Base.view(x::fq_nmod_mat, r1::Int, c1::Int, r2::Int, c2::Int)
+function Base.view(x::fqPolyRepMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
 
    _checkrange_or_empty(nrows(x), r1, r2) ||
       Base.throw_boundserror(x, (r1:r2, c1:c2))
@@ -536,34 +536,34 @@ function Base.view(x::fq_nmod_mat, r1::Int, c1::Int, r2::Int, c2::Int)
      c2 = 0
    end
 
-   z = fq_nmod_mat()
+   z = fqPolyRepMatrix()
    z.base_ring = x.base_ring
    z.view_parent = x
    ccall((:fq_nmod_mat_window_init, libflint), Nothing,
-         (Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Int, Int, Int, Int, Ref{FqNmodFiniteField}),
+         (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Int, Int, Int, Int, Ref{fqPolyRepField}),
          z, x, r1 - 1, c1 - 1, r2, c2, base_ring(x))
    finalizer(_fq_nmod_mat_window_clear_fn, z)
    return z
 end
 
-function Base.view(x::fq_nmod_mat, r::UnitRange{Int}, c::UnitRange{Int})
+function Base.view(x::fqPolyRepMatrix, r::UnitRange{Int}, c::UnitRange{Int})
    return Base.view(x, r.start, c.start, r.stop, c.stop)
 end
 
-function _fq_nmod_mat_window_clear_fn(a::fq_nmod_mat)
+function _fq_nmod_mat_window_clear_fn(a::fqPolyRepMatrix)
    ccall((:fq_nmod_mat_window_clear, libflint), Nothing,
-         (Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}), a, base_ring(a))
+         (Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), a, base_ring(a))
 end
 
-function sub(x::fq_nmod_mat, r1::Int, c1::Int, r2::Int, c2::Int)
+function sub(x::fqPolyRepMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
   return deepcopy(Base.view(x, r1, c1, r2, c2))
 end
 
-function sub(x::fq_nmod_mat, r::UnitRange{Int}, c::UnitRange{Int})
+function sub(x::fqPolyRepMatrix, r::UnitRange{Int}, c::UnitRange{Int})
   return deepcopy(Base.view(x, r, c))
 end
 
-getindex(x::fq_nmod_mat, r::UnitRange{Int}, c::UnitRange{Int}) = sub(x, r, c)
+getindex(x::fqPolyRepMatrix, r::UnitRange{Int}, c::UnitRange{Int}) = sub(x, r, c)
 
 ################################################################################
 #
@@ -571,22 +571,22 @@ getindex(x::fq_nmod_mat, r::UnitRange{Int}, c::UnitRange{Int}) = sub(x, r, c)
 #
 ################################################################################
 
-function hcat(x::fq_nmod_mat, y::fq_nmod_mat)
+function hcat(x::fqPolyRepMatrix, y::fqPolyRepMatrix)
    (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
    (x.r != y.r) && error("Matrices must have same number of rows")
    z = similar(x, nrows(x), ncols(x) + ncols(y))
    ccall((:fq_nmod_mat_concat_horizontal, libflint), Nothing,
-         (Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}),
+         (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}),
          z, x, y, base_ring(x))
    return z
 end
 
-function vcat(x::fq_nmod_mat, y::fq_nmod_mat)
+function vcat(x::fqPolyRepMatrix, y::fqPolyRepMatrix)
    (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
    (x.c != y.c) && error("Matrices must have same number of columns")
    z = similar(x, nrows(x) + nrows(y), ncols(x))
    ccall((:fq_nmod_mat_concat_vertical, libflint), Nothing,
-         (Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}),
+         (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}),
          z, x, y, base_ring(x))
    return z
 end
@@ -597,8 +597,8 @@ end
 #
 ################################################################################
 
-function Array(b::fq_nmod_mat)
-  a = Array{fq_nmod}(undef, b.r, b.c)
+function Array(b::fqPolyRepMatrix)
+  a = Array{fqPolyRepFieldElem}(undef, b.r, b.c)
   for i = 1:nrows(b)
     for j = 1:ncols(b)
       a[i, j] = b[i, j]
@@ -613,21 +613,21 @@ end
 #
 ################################################################################
 
-function charpoly(R::FqNmodPolyRing, a::fq_nmod_mat)
+function charpoly(R::fqPolyRepPolyRing, a::fqPolyRepMatrix)
   !is_square(a) && error("Matrix must be square")
   base_ring(R) != base_ring(a) && error("Must have common base ring")
   p = R()
   ccall((:fq_nmod_mat_charpoly, libflint), Nothing,
-          (Ref{fq_nmod_poly}, Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}), p, a, base_ring(a))
+          (Ref{fqPolyRepPolyRingElem}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), p, a, base_ring(a))
   return p
 end
 
-function charpoly_danivlesky!(R::FqNmodPolyRing, a::fq_nmod_mat)
+function charpoly_danivlesky!(R::fqPolyRepPolyRing, a::fqPolyRepMatrix)
   !is_square(a) && error("Matrix must be square")
   base_ring(R) != base_ring(a) && error("Must have common base ring")
   p = R()
   ccall((:fq_nmod_mat_charpoly_danilevsky, libflint), Nothing,
-          (Ref{fq_nmod_poly}, Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}), p, a, base_ring(a))
+          (Ref{fqPolyRepPolyRingElem}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), p, a, base_ring(a))
   return p
 end
 
@@ -638,13 +638,13 @@ end
 #
 ################################################################################
 
-function minpoly(R::FqNmodPolyRing, a::fq_nmod_mat)
+function minpoly(R::fqPolyRepPolyRing, a::fqPolyRepMatrix)
   !is_square(a) && error("Matrix must be square")
   base_ring(R) != base_ring(a) && error("Must have common base ring")
   m = deepcopy(a)
   p = R()
   ccall((:fq_nmod_mat_minpoly, libflint), Nothing,
-          (Ref{fq_nmod_poly}, Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}), p, m, base_ring(a))
+          (Ref{fqPolyRepPolyRingElem}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), p, m, base_ring(a))
   return p
 end
 
@@ -654,11 +654,11 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{fq_nmod_mat}, ::Type{V}) where {V <: Integer} = fq_nmod_mat
+promote_rule(::Type{fqPolyRepMatrix}, ::Type{V}) where {V <: Integer} = fqPolyRepMatrix
 
-promote_rule(::Type{fq_nmod_mat}, ::Type{fq_nmod}) = fq_nmod_mat
+promote_rule(::Type{fqPolyRepMatrix}, ::Type{fqPolyRepFieldElem}) = fqPolyRepMatrix
 
-promote_rule(::Type{fq_nmod_mat}, ::Type{fmpz}) = fq_nmod_mat
+promote_rule(::Type{fqPolyRepMatrix}, ::Type{ZZRingElem}) = fqPolyRepMatrix
 
 ################################################################################
 #
@@ -666,12 +666,12 @@ promote_rule(::Type{fq_nmod_mat}, ::Type{fmpz}) = fq_nmod_mat
 #
 ################################################################################
 
-function (a::FqNmodMatSpace)()
-  z = fq_nmod_mat(nrows(a), ncols(a), base_ring(a))
+function (a::fqPolyRepMatrixSpace)()
+  z = fqPolyRepMatrix(nrows(a), ncols(a), base_ring(a))
   return z
 end
 
-function (a::FqNmodMatSpace)(b::Integer)
+function (a::fqPolyRepMatrixSpace)(b::Integer)
    M = a()
    for i = 1:nrows(a)
       for j = 1:ncols(a)
@@ -685,7 +685,7 @@ function (a::FqNmodMatSpace)(b::Integer)
    return M
 end
 
-function (a::FqNmodMatSpace)(b::fmpz)
+function (a::fqPolyRepMatrixSpace)(b::ZZRingElem)
    M = a()
    for i = 1:nrows(a)
       for j = 1:ncols(a)
@@ -699,49 +699,49 @@ function (a::FqNmodMatSpace)(b::fmpz)
    return M
 end
 
-function (a::FqNmodMatSpace)(b::fq_nmod)
+function (a::fqPolyRepMatrixSpace)(b::fqPolyRepFieldElem)
    parent(b) != base_ring(a) && error("Unable to coerce to matrix")
-   return fq_nmod_mat(nrows(a), ncols(a), b)
+   return fqPolyRepMatrix(nrows(a), ncols(a), b)
 end
 
-function (a::FqNmodMatSpace)(arr::AbstractMatrix{T}) where {T <: Integer}
+function (a::fqPolyRepMatrixSpace)(arr::AbstractMatrix{T}) where {T <: Integer}
   _check_dim(nrows(a), ncols(a), arr)
-  return fq_nmod_mat(nrows(a), ncols(a), arr, base_ring(a))
+  return fqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
 end
 
-function (a::FqNmodMatSpace)(arr::AbstractVector{T}) where {T <: Integer}
+function (a::fqPolyRepMatrixSpace)(arr::AbstractVector{T}) where {T <: Integer}
   _check_dim(nrows(a), ncols(a), arr)
-  return fq_nmod_mat(nrows(a), ncols(a), arr, base_ring(a))
+  return fqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
   return z
 end
 
-function (a::FqNmodMatSpace)(arr::AbstractMatrix{fmpz})
+function (a::fqPolyRepMatrixSpace)(arr::AbstractMatrix{ZZRingElem})
   _check_dim(nrows(a), ncols(a), arr)
-  return fq_nmod_mat(nrows(a), ncols(a), arr, base_ring(a))
+  return fqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
   return z
 end
 
-function (a::FqNmodMatSpace)(arr::AbstractVector{fmpz})
+function (a::fqPolyRepMatrixSpace)(arr::AbstractVector{ZZRingElem})
   _check_dim(nrows(a), ncols(a), arr)
-  return fq_nmod_mat(nrows(a), ncols(a), arr, base_ring(a))
+  return fqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
   return z
 end
 
-function (a::FqNmodMatSpace)(arr::AbstractMatrix{fq_nmod})
+function (a::fqPolyRepMatrixSpace)(arr::AbstractMatrix{fqPolyRepFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
-  return fq_nmod_mat(nrows(a), ncols(a), arr, base_ring(a))
+  return fqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
 end
 
-function (a::FqNmodMatSpace)(arr::AbstractVector{fq_nmod})
+function (a::fqPolyRepMatrixSpace)(arr::AbstractVector{fqPolyRepFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
-  return fq_nmod_mat(nrows(a), ncols(a), arr, base_ring(a))
+  return fqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
 end
 
-function (a::FqNmodMatSpace)(b::fmpz_mat)
+function (a::fqPolyRepMatrixSpace)(b::ZZMatrix)
   (ncols(a) != b.c || nrows(a) != b.r) && error("Dimensions do not fit")
-  return fq_nmod_mat(b, base_ring(a))
+  return fqPolyRepMatrix(b, base_ring(a))
 end
 
 ###############################################################################
@@ -750,14 +750,14 @@ end
 #
 ###############################################################################
 
-function matrix(R::FqNmodFiniteField, arr::AbstractMatrix{<: Union{fq_nmod, fmpz, Integer}})
-   z = fq_nmod_mat(size(arr, 1), size(arr, 2), arr, R)
+function matrix(R::fqPolyRepField, arr::AbstractMatrix{<: Union{fqPolyRepFieldElem, ZZRingElem, Integer}})
+   z = fqPolyRepMatrix(size(arr, 1), size(arr, 2), arr, R)
    return z
 end
 
-function matrix(R::FqNmodFiniteField, r::Int, c::Int, arr::AbstractVector{<: Union{fq_nmod, fmpz, Integer}})
+function matrix(R::fqPolyRepField, r::Int, c::Int, arr::AbstractVector{<: Union{fqPolyRepFieldElem, ZZRingElem, Integer}})
    _check_dim(r, c, arr)
-   z = fq_nmod_mat(r, c, arr, R)
+   z = fqPolyRepMatrix(r, c, arr, R)
    return z
 end
 
@@ -767,11 +767,11 @@ end
 #
 ###############################################################################
 
-function zero_matrix(R::FqNmodFiniteField, r::Int, c::Int)
+function zero_matrix(R::fqPolyRepField, r::Int, c::Int)
    if c < 0 || r < 0
      error("dimensions must not be negative")
    end
-   z = fq_nmod_mat(r, c, R)
+   z = fqPolyRepMatrix(r, c, R)
    return z
 end
 
@@ -781,7 +781,7 @@ end
 #
 ###############################################################################
 
-function identity_matrix(R::FqNmodFiniteField, n::Int)
+function identity_matrix(R::fqPolyRepField, n::Int)
    z = zero_matrix(R, n, n)
    for i in 1:n
       z[i, i] = one(R)
@@ -795,6 +795,6 @@ end
 #
 ################################################################################
 
-function MatrixSpace(R::FqNmodFiniteField, r::Int, c::Int; cached::Bool = true)
-  FqNmodMatSpace(R, r, c, cached)
+function MatrixSpace(R::fqPolyRepField, r::Int, c::Int; cached::Bool = true)
+  fqPolyRepMatrixSpace(R, r, c, cached)
 end

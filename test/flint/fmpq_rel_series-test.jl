@@ -1,5 +1,5 @@
 @testset "fmpq_rel_series.types" begin
-   @test rel_series_type(fmpq) == fmpq_rel_series
+   @test rel_series_type(QQFieldElem) == fmpq_rel_series
 end
 
 @testset "fmpq_rel_series.constructors" begin
@@ -22,9 +22,9 @@ end
 
    @test isa(R(a), SeriesElem)
 
-   @test isa(R([fmpz(1), fmpz(2), fmpq(3)], 3, 5, 0), SeriesElem)
+   @test isa(R([ZZRingElem(1), ZZRingElem(2), QQFieldElem(3)], 3, 5, 0), SeriesElem)
 
-   @test isa(R([fmpz(1), 2, 3], 3, 3, 0), SeriesElem)
+   @test isa(R([ZZRingElem(1), 2, 3], 3, 3, 0), SeriesElem)
 
    @test isa(R([BigInt(1), 2, 3], 3, 3, 0), SeriesElem)
 
@@ -34,11 +34,11 @@ end
 
    @test isa(R(1), SeriesElem)
 
-   @test isa(R(fmpz(2)), SeriesElem)
+   @test isa(R(ZZRingElem(2)), SeriesElem)
 
    @test isa(R(BigInt(2)), SeriesElem)
 
-   @test isa(R(fmpq(2)), SeriesElem)
+   @test isa(R(QQFieldElem(2)), SeriesElem)
 
    @test isa(R(2//1), SeriesElem)
 
@@ -147,7 +147,7 @@ end
    @test parent(h) === parent(g)
    @test parent(k) !== parent(m)
 
-   p = rel_series(QQ, fmpq[], 0, 3, 1)
+   p = rel_series(QQ, QQFieldElem[], 0, 3, 1)
    q = rel_series(QQ, [], 0, 3, 2)
 
    @test isa(p, fmpq_rel_series)
@@ -156,7 +156,7 @@ end
    @test pol_length(p) == 0
    @test pol_length(q) == 0
 
-   r = rel_series(QQ, fmpz[1, 2, 3], 3, 11, 8)
+   r = rel_series(QQ, ZZRingElem[1, 2, 3], 3, 11, 8)
 
    @test isa(r, fmpq_rel_series)
 
@@ -321,12 +321,12 @@ end
    c = 1 + x + 3x^2 + O(x^5)
    d = x^2 + 3x^3 - x^4
 
-   for T in [Int, BigInt, Rational{Int}, Rational{BigInt}, fmpz, fmpq]
+   for T in [Int, BigInt, Rational{Int}, Rational{BigInt}, ZZRingElem, QQFieldElem]
       @test T(2) + a == 2x + x^3 + 2
       @test a + T(2) == 2x + x^3 + 2
    end
 
-   for T in [Int, BigInt, Rational{Int}, Rational{BigInt}, fmpz, fmpq]
+   for T in [Int, BigInt, Rational{Int}, Rational{BigInt}, ZZRingElem, QQFieldElem]
      @test T(2) * a == 4x + 2x^3
      @test a * T(2) == 4x + 2x^3
    end
@@ -335,14 +335,14 @@ end
 
    @test c*2 == 2 + 2*x + 6*x^2 + O(x^5)
 
-   for T in [Int, BigInt, Rational{Int}, Rational{BigInt}, fmpz, fmpq]
+   for T in [Int, BigInt, Rational{Int}, Rational{BigInt}, ZZRingElem, QQFieldElem]
      @test d * T(3) == 3x^2 + 9x^3 - 3x^4
      @test T(3) * d== 3x^2 + 9x^3 - 3x^4
    end
 
-   @test c*fmpq(2, 3) == 2*x^2 + fmpz(2)//3*x + fmpz(2)//3+O(x^5)
+   @test c*QQFieldElem(2, 3) == 2*x^2 + ZZRingElem(2)//3*x + ZZRingElem(2)//3+O(x^5)
 
-   @test fmpq(2, 3)*c == 2*x^2 + fmpz(2)//3*x + fmpz(2)//3+O(x^5)
+   @test QQFieldElem(2, 3)*c == 2*x^2 + ZZRingElem(2)//3*x + ZZRingElem(2)//3+O(x^5)
 end
 
 @testset "fmpq_rel_series.comparison" begin
@@ -369,7 +369,7 @@ end
    d = R(3)
 
 
-   for T in [Int, BigInt, Rational{Int}, Rational{BigInt}, fmpz, fmpq]
+   for T in [Int, BigInt, Rational{Int}, Rational{BigInt}, ZZRingElem, QQFieldElem]
       @test d == T(3)
 
       @test c == T(1)
@@ -466,7 +466,7 @@ end
    c = 1 + x + 2x^2 + O(x^5)
    d = x + x^3 + O(x^6)
 
-   for T in [Int, BigInt, Rational{Int}, Rational{BigInt}, fmpz, fmpq]
+   for T in [Int, BigInt, Rational{Int}, Rational{BigInt}, ZZRingElem, QQFieldElem]
       @test isequal(divexact(7a, T(7)), a)
 
       @test isequal(divexact(11b, T(11)), b)

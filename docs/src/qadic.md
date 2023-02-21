@@ -54,7 +54,7 @@ It is also possible to call the inner constructor directly. It has the following
 form.
 
 ```
-FlintQadicField(p::fmpz, d::Int, prec::Int)
+FlintQadicField(p::ZZRingElem, d::Int, prec::Int)
 ```
 
 Returns the parent object for the $q$-adic field for given prime $p$ and degree
@@ -83,8 +83,8 @@ purpose we define the following functions.
 
 ```@docs
 O(::FlintQadicField, ::Integer)
-O(::FlintQadicField, ::fmpz)
-O(::FlintQadicField, ::fmpq)
+O(::FlintQadicField, ::ZZRingElem)
+O(::FlintQadicField, ::QQFieldElem)
 ```
 
 The $O(p^n)$ construction can be used to construct $q$-adic values of precision
@@ -122,8 +122,8 @@ valuation(::qadic)
 ```
 
 ```@docs
-lift(::FmpqPolyRing, ::qadic)
-lift(::FmpzPolyRing, ::qadic)
+lift(::QQPolyRing, ::qadic)
+lift(::ZZPolyRing, ::qadic)
 ```
 
 **Examples**

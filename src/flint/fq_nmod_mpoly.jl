@@ -1,10 +1,10 @@
 ###############################################################################
 #
-#   fq_nmod_mpoly.jl : Flint multivariate polynomials over fq_nmod
+#   fqPolyRepMPolyRingElem.jl : Flint multivariate polynomials over fqPolyRepFieldElem
 #
 ###############################################################################
 
-export FqNmodMPolyRing, fq_nmod_mpoly
+export fqPolyRepMPolyRing, fqPolyRepMPolyRingElem
 
 ###############################################################################
 #
@@ -12,134 +12,134 @@ export FqNmodMPolyRing, fq_nmod_mpoly
 #
 ###############################################################################
 
-parent_type(::Type{fq_nmod_mpoly}) = FqNmodMPolyRing
+parent_type(::Type{fqPolyRepMPolyRingElem}) = fqPolyRepMPolyRing
 
-elem_type(::Type{FqNmodMPolyRing}) = fq_nmod_mpoly
+elem_type(::Type{fqPolyRepMPolyRing}) = fqPolyRepMPolyRingElem
 
-elem_type(::FqNmodMPolyRing) = fq_nmod_mpoly
+elem_type(::fqPolyRepMPolyRing) = fqPolyRepMPolyRingElem
 
-symbols(a::FqNmodMPolyRing) = a.S
+symbols(a::fqPolyRepMPolyRing) = a.S
 
-parent(a::fq_nmod_mpoly) = a.parent
+parent(a::fqPolyRepMPolyRingElem) = a.parent
 
-function check_parent(a::fq_nmod_mpoly, b::fq_nmod_mpoly)
+function check_parent(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
    parent(a) != parent(b) &&
       error("Incompatible polynomial rings in polynomial operation")
 end
 
-nvars(a::FqNmodMPolyRing) = a.nvars
+nvars(a::fqPolyRepMPolyRing) = a.nvars
 
-base_ring(a::FqNmodMPolyRing) = a.base_ring
+base_ring(a::fqPolyRepMPolyRing) = a.base_ring
 
-base_ring(f::fq_nmod_mpoly) = f.parent.base_ring
+base_ring(f::fqPolyRepMPolyRingElem) = f.parent.base_ring
 
-function ordering(a::FqNmodMPolyRing)
+function ordering(a::fqPolyRepMPolyRing)
    b = a.ord
-#   b = ccall((:fq_nmod_mpoly_ctx_ord, libflint), Cint, (Ref{FqNmodMPolyRing}, ), a)
+#   b = ccall((:fq_nmod_mpoly_ctx_ord, libflint), Cint, (Ref{fqPolyRepMPolyRing}, ), a)
    return flint_orderings[b + 1]
 end
 
-function gens(R::FqNmodMPolyRing)
-   A = Vector{fq_nmod_mpoly}(undef, R.nvars)
+function gens(R::fqPolyRepMPolyRing)
+   A = Vector{fqPolyRepMPolyRingElem}(undef, R.nvars)
    for i = 1:R.nvars
       z = R()
       ccall((:fq_nmod_mpoly_gen, libflint), Nothing,
-            (Ref{fq_nmod_mpoly}, Int, Ref{FqNmodMPolyRing}),
+            (Ref{fqPolyRepMPolyRingElem}, Int, Ref{fqPolyRepMPolyRing}),
             z, i - 1, R)
       A[i] = z
    end
    return A
 end
 
-function gen(R::FqNmodMPolyRing, i::Int)
+function gen(R::fqPolyRepMPolyRing, i::Int)
    n = nvars(R)
    !(1 <= i <= n) && error("Index must be between 1 and $n")
    z = R()
    ccall((:fq_nmod_mpoly_gen, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Int, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Int, Ref{fqPolyRepMPolyRing}),
          z, i - 1, R)
    return z
 end
 
-function is_gen(a::fq_nmod_mpoly, i::Int)
+function is_gen(a::fqPolyRepMPolyRingElem, i::Int)
    n = nvars(parent(a))
    !(1 <= i <= n) && error("Index must be between 1 and $n")
    return Bool(ccall((:fq_nmod_mpoly_is_gen, libflint), Cint,
-                     (Ref{fq_nmod_mpoly}, Int, Ref{FqNmodMPolyRing}),
+                     (Ref{fqPolyRepMPolyRingElem}, Int, Ref{fqPolyRepMPolyRing}),
                      a, i - 1, a.parent))
 end
 
-function is_gen(a::fq_nmod_mpoly)
+function is_gen(a::fqPolyRepMPolyRingElem)
    return Bool(ccall((:fq_nmod_mpoly_is_gen, libflint), Cint,
-                     (Ref{fq_nmod_mpoly}, Int, Ref{FqNmodMPolyRing}),
+                     (Ref{fqPolyRepMPolyRingElem}, Int, Ref{fqPolyRepMPolyRing}),
                      a, -1, a.parent))
 end
 
-function deepcopy_internal(a::fq_nmod_mpoly, dict::IdDict)
+function deepcopy_internal(a::fqPolyRepMPolyRingElem, dict::IdDict)
    z = parent(a)()
    ccall((:fq_nmod_mpoly_set, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
          z, a, a.parent)
    return z
 end
 
-function length(a::fq_nmod_mpoly)
+function length(a::fqPolyRepMPolyRingElem)
    n = ccall((:fq_nmod_mpoly_length, libflint), Int,
-             (Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+             (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
              a, a.parent)
    return n
 end
 
-function one(R::FqNmodMPolyRing)
+function one(R::fqPolyRepMPolyRing)
    z = R()
    ccall((:fq_nmod_mpoly_one, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
          z, R)
    return z
 end
 
-function zero(R::FqNmodMPolyRing)
+function zero(R::fqPolyRepMPolyRing)
    z = R()
    ccall((:fq_nmod_mpoly_zero, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
          z, R)
    return z
 end
 
-function isone(a::fq_nmod_mpoly)
+function isone(a::fqPolyRepMPolyRingElem)
    b = ccall((:fq_nmod_mpoly_is_one, libflint), Cint,
-             (Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+             (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
              a, a.parent)
    return Bool(b)
 end
 
-function iszero(a::fq_nmod_mpoly)
+function iszero(a::fqPolyRepMPolyRingElem)
    b = ccall((:fq_nmod_mpoly_is_zero, libflint), Cint,
-             (Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+             (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
              a, a.parent)
    return Bool(b)
 end
 
-function is_monomial(a::fq_nmod_mpoly)
+function is_monomial(a::fqPolyRepMPolyRingElem)
    return length(a) == 1 && isone(coeff(a, 1))
 end
 
-function is_term(a::fq_nmod_mpoly)
+function is_term(a::fqPolyRepMPolyRingElem)
    return length(a) == 1
 end
 
-function is_unit(a::fq_nmod_mpoly)
+function is_unit(a::fqPolyRepMPolyRingElem)
    return is_constant(a)
 end
 
-function is_constant(a::fq_nmod_mpoly)
+function is_constant(a::fqPolyRepMPolyRingElem)
    b = ccall((:fq_nmod_mpoly_is_fq_nmod, libflint), Cint,
-             (Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+             (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
              a, parent(a))
    return Bool(b)
 end
 
-characteristic(R::FqNmodMPolyRing) = characteristic(base_ring(R))
+characteristic(R::fqPolyRepMPolyRing) = characteristic(base_ring(R))
 
 ################################################################################
 #
@@ -147,28 +147,28 @@ characteristic(R::FqNmodMPolyRing) = characteristic(base_ring(R))
 #
 ################################################################################
 
-function coeff(a::fq_nmod_mpoly, i::Int)
+function coeff(a::fqPolyRepMPolyRingElem, i::Int)
    n = length(a)
    !(1 <= i <= n) && error("Index must be between 1 and $(length(a))")
    z = base_ring(parent(a))()
    ccall((:fq_nmod_mpoly_get_term_coeff_fq_nmod, libflint), Nothing,
-         (Ref{fq_nmod}, Ref{fq_nmod_mpoly}, Int, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepMPolyRingElem}, Int, Ref{fqPolyRepMPolyRing}),
          z, a, i - 1, a.parent)
    return z
 end
 
-function coeff(a::fq_nmod_mpoly, b::fq_nmod_mpoly)
+function coeff(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
    check_parent(a, b)
    !isone(length(b)) && error("Second argument must be a monomial")
    z = base_ring(parent(a))()
    ccall((:fq_nmod_mpoly_get_coeff_fq_nmod_monomial, libflint), UInt,
-         (Ref{fq_nmod}, Ref{fq_nmod_mpoly},
-          Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepMPolyRingElem},
+          Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
          z, a, b, parent(a))
    return z
 end
 
-function trailing_coefficient(p::fq_nmod_mpoly)
+function trailing_coefficient(p::fqPolyRepMPolyRingElem)
    if iszero(p)
       return zero(base_ring(p))
    else
@@ -183,77 +183,77 @@ end
 ###############################################################################
 
 # Degree in the i-th variable as an Int
-function degree(a::fq_nmod_mpoly, i::Int)
+function degree(a::fqPolyRepMPolyRingElem, i::Int)
    n = nvars(parent(a))
    !(1 <= i <= n) && error("Index must be between 1 and $n")
    d = ccall((:fq_nmod_mpoly_degree_si, libflint), Int,
-             (Ref{fq_nmod_mpoly}, Int, Ref{FqNmodMPolyRing}),
+             (Ref{fqPolyRepMPolyRingElem}, Int, Ref{fqPolyRepMPolyRing}),
              a, i - 1, a.parent)
    return d
 end
 
-# Degree in the i-th variable as an fmpz
-function degree_fmpz(a::fq_nmod_mpoly, i::Int)
+# Degree in the i-th variable as an ZZRingElem
+function degree_fmpz(a::fqPolyRepMPolyRingElem, i::Int)
    n = nvars(parent(a))
    !(1 <= i <= n) && error("Index must be between 1 and $n")
-   d = fmpz()
+   d = ZZRingElem()
    ccall((:fq_nmod_mpoly_degree_fmpz, libflint), Nothing,
-         (Ref{fmpz}, Ref{fq_nmod_mpoly}, Int, Ref{FqNmodMPolyRing}),
+         (Ref{ZZRingElem}, Ref{fqPolyRepMPolyRingElem}, Int, Ref{fqPolyRepMPolyRing}),
          d, a, i - 1, a.parent)
    return d
 end
 
 # Return true if degrees fit into an Int
-function degrees_fit_int(a::fq_nmod_mpoly)
+function degrees_fit_int(a::fqPolyRepMPolyRingElem)
    b = ccall((:fq_nmod_mpoly_degrees_fit_si, libflint), Cint,
-             (Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+             (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
              a, a.parent)
    return Bool(b)
 end
 
 # Return an array of the max degrees in each variable
-function degrees(a::fq_nmod_mpoly)
+function degrees(a::fqPolyRepMPolyRingElem)
    degs = Vector{Int}(undef, nvars(parent(a)))
    ccall((:fq_nmod_mpoly_degrees_si, libflint), Nothing,
-         (Ptr{Int}, Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+         (Ptr{Int}, Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
          degs, a, a.parent)
    return degs
 end
 
 # Return an array of the max degrees as fmpzs in each variable
-function degrees_fmpz(a::fq_nmod_mpoly)
+function degrees_fmpz(a::fqPolyRepMPolyRingElem)
    n = nvars(parent(a))
-   degs = Vector{fmpz}(undef, n)
+   degs = Vector{ZZRingElem}(undef, n)
    for i in 1:n
-      degs[i] = fmpz()
+      degs[i] = ZZRingElem()
    end
    ccall((:fq_nmod_mpoly_degrees_fmpz, libflint), Nothing,
-         (Ptr{Ref{fmpz}}, Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+         (Ptr{Ref{ZZRingElem}}, Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
          degs, a, a.parent)
    return degs
 end
 
 # Return true if degree fits into an Int
-function total_degree_fits_int(a::fq_nmod_mpoly)
+function total_degree_fits_int(a::fqPolyRepMPolyRingElem)
    b = ccall((:fq_nmod_mpoly_total_degree_fits_si, libflint), Cint,
-             (Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+             (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
              a, a.parent)
    return Bool(b)
 end
 
 # Total degree as an Int
-function total_degree(a::fq_nmod_mpoly)
+function total_degree(a::fqPolyRepMPolyRingElem)
    d = ccall((:fq_nmod_mpoly_total_degree_si, libflint), Int,
-             (Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+             (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
              a, a.parent)
    return d
 end
 
-# Total degree as an fmpz
-function total_degree_fmpz(a::fq_nmod_mpoly)
-   d = fmpz()
+# Total degree as an ZZRingElem
+function total_degree_fmpz(a::fqPolyRepMPolyRingElem)
+   d = ZZRingElem()
    ccall((:fq_nmod_mpoly_total_degree_fmpz, libflint), Nothing,
-         (Ref{fmpz}, Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+         (Ref{ZZRingElem}, Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
          d, a, a.parent)
    return d
 end
@@ -264,7 +264,7 @@ end
 #
 ###############################################################################
 
-function coeff(a::fq_nmod_mpoly, vars::Vector{Int}, exps::Vector{Int})
+function coeff(a::fqPolyRepMPolyRingElem, vars::Vector{Int}, exps::Vector{Int})
    unique(vars) != vars && error("Variables not unique")
    length(vars) != length(exps) &&
        error("Number of variables does not match number of exponents")
@@ -279,8 +279,8 @@ function coeff(a::fq_nmod_mpoly, vars::Vector{Int}, exps::Vector{Int})
    end
    z = parent(a)()
    ccall((:fq_nmod_mpoly_get_coeff_vars_ui, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly}, Ptr{Int},
-          Ptr{Int}, Int, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem}, Ptr{Int},
+          Ptr{Int}, Int, Ref{fqPolyRepMPolyRing}),
          z, a, vars, exps, length(vars), a.parent)
    return z
 end
@@ -291,7 +291,7 @@ end
 #
 ###############################################################################
 
-function show(io::IO, p::FqNmodMPolyRing)
+function show(io::IO, p::fqPolyRepMPolyRing)
    local max_vars = 5 # largest number of variables to print
    n = nvars(p)
    print(io, "Multivariate Polynomial Ring in ")
@@ -316,40 +316,40 @@ end
 #
 ###############################################################################
 
-function -(a::fq_nmod_mpoly)
+function -(a::fqPolyRepMPolyRingElem)
    z = parent(a)()
    ccall((:fq_nmod_mpoly_neg, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
          z, a, a.parent)
    return z
 end
 
-function +(a::fq_nmod_mpoly, b::fq_nmod_mpoly)
+function +(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
    check_parent(a, b)
    z = parent(a)()
    ccall((:fq_nmod_mpoly_add, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly},
-          Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem},
+          Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
          z, a, b, a.parent)
    return z
 end
 
-function -(a::fq_nmod_mpoly, b::fq_nmod_mpoly)
+function -(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
    check_parent(a, b)
    z = parent(a)()
    ccall((:fq_nmod_mpoly_sub, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly},
-          Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem},
+          Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
          z, a, b, a.parent)
    return z
 end
 
-function *(a::fq_nmod_mpoly, b::fq_nmod_mpoly)
+function *(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
    check_parent(a, b)
    z = parent(a)()
    ccall((:fq_nmod_mpoly_mul, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly},
-          Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem},
+          Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
          z, a, b, a.parent)
    return z
 end
@@ -360,19 +360,19 @@ end
 #
 ###############################################################################
 
-+(a::fq_nmod_mpoly, b::Integer) = a + base_ring(parent(a))(b)
++(a::fqPolyRepMPolyRingElem, b::Integer) = a + base_ring(parent(a))(b)
 
-+(a::Integer, b::fq_nmod_mpoly) = b + a
++(a::Integer, b::fqPolyRepMPolyRingElem) = b + a
 
--(a::fq_nmod_mpoly, b::Integer) = a - base_ring(parent(a))(b)
+-(a::fqPolyRepMPolyRingElem, b::Integer) = a - base_ring(parent(a))(b)
 
--(a::Integer, b::fq_nmod_mpoly) = base_ring(parent(b))(a) - b
+-(a::Integer, b::fqPolyRepMPolyRingElem) = base_ring(parent(b))(a) - b
 
-*(a::fq_nmod_mpoly, b::Integer) = a*base_ring(parent(a))(b)
+*(a::fqPolyRepMPolyRingElem, b::Integer) = a*base_ring(parent(a))(b)
 
-*(a::Integer, b::fq_nmod_mpoly) = b*a
+*(a::Integer, b::fqPolyRepMPolyRingElem) = b*a
 
-divexact(a::fq_nmod_mpoly, b::Integer; check::Bool=true) = divexact(a, base_ring(parent(a))(b); check=check)
+divexact(a::fqPolyRepMPolyRingElem, b::Integer; check::Bool=true) = divexact(a, base_ring(parent(a))(b); check=check)
 
 ###############################################################################
 #
@@ -380,22 +380,22 @@ divexact(a::fq_nmod_mpoly, b::Integer; check::Bool=true) = divexact(a, base_ring
 #
 ###############################################################################
 
-function ^(a::fq_nmod_mpoly, b::Int)
+function ^(a::fqPolyRepMPolyRingElem, b::Int)
    b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
    z = parent(a)()
    r = ccall((:fq_nmod_mpoly_pow_ui, libflint), Cint,
-             (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly}, UInt, Ref{FqNmodMPolyRing}),
+             (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem}, UInt, Ref{fqPolyRepMPolyRing}),
              z, a, UInt(b), parent(a))
    iszero(r) && error("Unable to compute power")
    return z
 end
 
-function ^(a::fq_nmod_mpoly, b::fmpz)
+function ^(a::fqPolyRepMPolyRingElem, b::ZZRingElem)
    b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
    z = parent(a)()
    r = ccall((:fq_nmod_mpoly_pow_fmpz, libflint), Cint,
-             (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly},
-              Ref{fmpz}, Ref{FqNmodMPolyRing}),
+             (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem},
+              Ref{ZZRingElem}, Ref{fqPolyRepMPolyRing}),
              z, a, b, parent(a))
    iszero(r) && error("Unable to compute power")
    return z
@@ -407,25 +407,25 @@ end
 #
 ################################################################################
 
-function gcd(a::fq_nmod_mpoly, b::fq_nmod_mpoly)
+function gcd(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
    check_parent(a, b)
    z = parent(a)()
    r = ccall((:fq_nmod_mpoly_gcd, libflint), Cint,
-             (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly},
-              Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+             (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem},
+              Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
              z, a, b, a.parent)
    r == 0 && error("Unable to compute gcd")
    return z
 end
 
-function gcd_with_cofactors(a::fq_nmod_mpoly, b::fq_nmod_mpoly)
+function gcd_with_cofactors(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
    check_parent(a, b)
    z = parent(a)()
    abar = parent(a)()
    bbar = parent(a)()
    r = ccall((:fq_nmod_mpoly_gcd_cofactors, Nemo.libflint), Cint,
-             (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly},
-              Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+             (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem},
+              Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
              z, abar, bbar, a, b, a.parent)
    r == 0 && error("Unable to compute gcd")
    return z, abar, bbar
@@ -437,69 +437,69 @@ end
 #
 ################################################################################
 
-function (::Type{Fac{fq_nmod_mpoly}})(fac::fq_nmod_mpoly_factor, preserve_input::Bool = false)
+function (::Type{Fac{fqPolyRepMPolyRingElem}})(fac::fq_nmod_mpoly_factor, preserve_input::Bool = false)
    R = fac.parent
-   F = Fac{fq_nmod_mpoly}()
+   F = Fac{fqPolyRepMPolyRingElem}()
    for i in 0:fac.num-1
       f = R()
       if preserve_input
          ccall((:fq_nmod_mpoly_factor_get_base, libflint), Nothing,
-               (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly_factor}, Int, Ref{FqNmodMPolyRing}),
+               (Ref{fqPolyRepMPolyRingElem}, Ref{fq_nmod_mpoly_factor}, Int, Ref{fqPolyRepMPolyRing}),
                f, fac, i, R)
       else
          ccall((:fq_nmod_mpoly_factor_swap_base, libflint), Nothing,
-               (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly_factor}, Int, Ref{FqNmodMPolyRing}),
+               (Ref{fqPolyRepMPolyRingElem}, Ref{fq_nmod_mpoly_factor}, Int, Ref{fqPolyRepMPolyRing}),
                f, fac, i, R)
       end
       F.fac[f] = ccall((:fq_nmod_mpoly_factor_get_exp_si, libflint), Int,
-                       (Ref{fq_nmod_mpoly_factor}, Int, Ref{FqNmodMPolyRing}),
+                       (Ref{fq_nmod_mpoly_factor}, Int, Ref{fqPolyRepMPolyRing}),
                        fac, i, R)
    end
    c = base_ring(R)()
    ccall((:fq_nmod_mpoly_factor_get_constant_fq_nmod, libflint), Nothing,
-         (Ref{fq_nmod}, Ref{fq_nmod_mpoly_factor}),
+         (Ref{fqPolyRepFieldElem}, Ref{fq_nmod_mpoly_factor}),
          c, fac)
    F.unit = R(c)
    return F
 end
 
-function factor(a::fq_nmod_mpoly)
+function factor(a::fqPolyRepMPolyRingElem)
    R = parent(a)
    fac = fq_nmod_mpoly_factor(R)
    ok = ccall((:fq_nmod_mpoly_factor, libflint), Cint,
-              (Ref{fq_nmod_mpoly_factor}, Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+              (Ref{fq_nmod_mpoly_factor}, Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
               fac, a, R)
    ok == 0 && error("unable to compute factorization")
-   return Fac{fq_nmod_mpoly}(fac, false)
+   return Fac{fqPolyRepMPolyRingElem}(fac, false)
 end
 
-function factor_squarefree(a::fq_nmod_mpoly)
+function factor_squarefree(a::fqPolyRepMPolyRingElem)
    R = parent(a)
    fac = fq_nmod_mpoly_factor(R)
    ok = ccall((:fq_nmod_mpoly_factor_squarefree, libflint), Cint,
-              (Ref{fq_nmod_mpoly_factor}, Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+              (Ref{fq_nmod_mpoly_factor}, Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
               fac, a, R)
    ok == 0 && error("unable to compute factorization")
-   return Fac{fq_nmod_mpoly}(fac, false)
+   return Fac{fqPolyRepMPolyRingElem}(fac, false)
 end
 
 
-function sqrt(a::fq_nmod_mpoly; check::Bool=true)
+function sqrt(a::fqPolyRepMPolyRingElem; check::Bool=true)
    (flag, q) = is_square_with_sqrt(a)
    check && !flag && error("Not a square")
    return q
 end
 
-function is_square(a::fq_nmod_mpoly)
+function is_square(a::fqPolyRepMPolyRingElem)
    return Bool(ccall((:fq_nmod_mpoly_is_square, libflint), Cint,
-                     (Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+                     (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
                      a, a.parent))
 end
 
-function is_square_with_sqrt(a::fq_nmod_mpoly)
+function is_square_with_sqrt(a::fqPolyRepMPolyRingElem)
    q = parent(a)()
    flag = ccall((:fq_nmod_mpoly_sqrt, libflint), Cint,
-                (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+                (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
                 q, a, a.parent)
    return (Bool(flag), q)
 end
@@ -510,17 +510,17 @@ end
 #
 ###############################################################################
 
-function ==(a::fq_nmod_mpoly, b::fq_nmod_mpoly)
+function ==(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
    check_parent(a, b)
    return ccall((:fq_nmod_mpoly_equal, libflint), Cint,
-                (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+                (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
                 a, b, a.parent) != 0
 end
 
-function Base.isless(a::fq_nmod_mpoly, b::fq_nmod_mpoly)
+function Base.isless(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
    (!is_monomial(a) || !is_monomial(b)) && error("Not monomials in comparison")
    return ccall((:fq_nmod_mpoly_cmp, libflint), Cint,
-                (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+                (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
                 a, b, a.parent) < 0
 end
 
@@ -530,21 +530,21 @@ end
 #
 ###############################################################################
 
-function ==(a::fq_nmod_mpoly, b::fq_nmod)
+function ==(a::fqPolyRepMPolyRingElem, b::fqPolyRepFieldElem)
    return Bool(ccall((:fq_nmod_mpoly_equal_fq_nmod, libflint), Cint,
-                     (Ref{fq_nmod_mpoly}, Ref{fq_nmod}, Ref{FqNmodMPolyRing}),
+                     (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepMPolyRing}),
                      a, b, a.parent))
 end
 
-==(a::fq_nmod, b::fq_nmod_mpoly) = b == a
+==(a::fqPolyRepFieldElem, b::fqPolyRepMPolyRingElem) = b == a
 
-==(a::fq_nmod_mpoly, b::Integer) = a == base_ring(parent(a))(b)
+==(a::fqPolyRepMPolyRingElem, b::Integer) = a == base_ring(parent(a))(b)
 
-==(a::fq_nmod_mpoly, b::fmpz) = a == base_ring(parent(a))(b)
+==(a::fqPolyRepMPolyRingElem, b::ZZRingElem) = a == base_ring(parent(a))(b)
 
-==(a::Integer, b::fq_nmod_mpoly) = b == a
+==(a::Integer, b::fqPolyRepMPolyRingElem) = b == a
 
-==(a::fmpz, b::fq_nmod_mpoly) = b == a
+==(a::ZZRingElem, b::fqPolyRepMPolyRingElem) = b == a
 
 ###############################################################################
 #
@@ -552,7 +552,7 @@ end
 #
 ###############################################################################
 
-function divides(a::fq_nmod_mpoly, b::fq_nmod_mpoly)
+function divides(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
    check_parent(a, b)
    if iszero(a)
       return true, zero(parent(a))
@@ -562,8 +562,8 @@ function divides(a::fq_nmod_mpoly, b::fq_nmod_mpoly)
    end
    z = parent(a)()
    d = ccall((:fq_nmod_mpoly_divides, libflint), Cint,
-             (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly},
-              Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+             (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem},
+              Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
              z, a, b, a.parent)
    return isone(d), z
 end
@@ -574,28 +574,28 @@ end
 #
 ###############################################################################
 
-function Base.div(a::fq_nmod_mpoly, b::fq_nmod_mpoly)
+function Base.div(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
    check_parent(a, b)
    q = parent(a)()
    ccall((:fq_nmod_mpoly_div, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly},
-          Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem},
+          Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
          q, a, b, a.parent)
    return q
 end
 
-function Base.divrem(a::fq_nmod_mpoly, b::fq_nmod_mpoly)
+function Base.divrem(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
    check_parent(a, b)
    q = parent(a)()
    r = parent(a)()
    ccall((:fq_nmod_mpoly_divrem, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly},
-          Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem},
+          Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
          q, r, a, b, a.parent)
    return q, r
 end
 
-function Base.divrem(a::fq_nmod_mpoly, b::Vector{fq_nmod_mpoly})
+function Base.divrem(a::fqPolyRepMPolyRingElem, b::Vector{fqPolyRepMPolyRingElem})
    len = length(b)
    if len < 1
       error("need at least one divisor in divrem")
@@ -606,8 +606,8 @@ function Base.divrem(a::fq_nmod_mpoly, b::Vector{fq_nmod_mpoly})
    q = [parent(a)() for i in 1:len]
    r = parent(a)()
    ccall((:fq_nmod_mpoly_divrem_ideal, libflint), Nothing,
-         (Ptr{Ref{fq_nmod_mpoly}}, Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly},
-          Ptr{Ref{fq_nmod_mpoly}}, Int, Ref{FqNmodMPolyRing}),
+         (Ptr{Ref{fqPolyRepMPolyRingElem}}, Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem},
+          Ptr{Ref{fqPolyRepMPolyRingElem}}, Int, Ref{fqPolyRepMPolyRing}),
          q, r, a, b, len, a.parent)
    return q, r
 end
@@ -618,7 +618,7 @@ end
 #
 ###############################################################################
 
-function divexact(a::fq_nmod_mpoly, b::fq_nmod_mpoly; check::Bool=true)
+function divexact(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem; check::Bool=true)
    check_parent(a, b)
    b, q = divides(a, b)
    check && !b && error("Division is not exact in divexact")
@@ -631,12 +631,12 @@ end
 #
 ###############################################################################
 
-function derivative(a::fq_nmod_mpoly, i::Int)
+function derivative(a::fqPolyRepMPolyRingElem, i::Int)
    n = nvars(parent(a))
    !(1 <= i <= n) && error("Index must be between 1 and $n")
    z = parent(a)()
    ccall((:fq_nmod_mpoly_derivative, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly}, Int, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem}, Int, Ref{fqPolyRepMPolyRing}),
          z, a, i - 1, parent(a))
    return z
 end
@@ -647,54 +647,54 @@ end
 #
 ###############################################################################
 
-function evaluate(a::fq_nmod_mpoly, b::Vector{fq_nmod})
+function evaluate(a::fqPolyRepMPolyRingElem, b::Vector{fqPolyRepFieldElem})
    length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
    z = base_ring(parent(a))()
    ccall((:fq_nmod_mpoly_evaluate_all_fq_nmod, libflint), Nothing,
-         (Ref{fq_nmod}, Ref{fq_nmod_mpoly}, Ptr{Ref{fq_nmod}}, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepMPolyRingElem}, Ptr{Ref{fqPolyRepFieldElem}}, Ref{fqPolyRepMPolyRing}),
          z, a, b, parent(a))
    return z
 end
 
-function evaluate(a::fq_nmod_mpoly, b::Vector{Int})
+function evaluate(a::fqPolyRepMPolyRingElem, b::Vector{Int})
    length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
    R = base_ring(parent(a))
    b2 = [R(d) for d in b]
    return evaluate(a, b2)
 end
 
-function evaluate(a::fq_nmod_mpoly, b::Vector{T}) where T <: Integer
+function evaluate(a::fqPolyRepMPolyRingElem, b::Vector{T}) where T <: Integer
    length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
    R = base_ring(parent(a))
    b2 = [R(d) for d in b]
    return evaluate(a, b2)
 end
 
-function evaluate(a::fq_nmod_mpoly, b::Vector{fmpz})
+function evaluate(a::fqPolyRepMPolyRingElem, b::Vector{ZZRingElem})
    length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
    R = base_ring(parent(a))
    b2 = [R(d) for d in b]
    return evaluate(a, b2)
 end
 
-function evaluate(a::fq_nmod_mpoly, b::Vector{UInt})
+function evaluate(a::fqPolyRepMPolyRingElem, b::Vector{UInt})
    length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
    R = base_ring(parent(a))
    b2 = [R(d) for d in b]
    return evaluate(a, b2)
 end
 
-function (a::fq_nmod_mpoly)(vals::fq_nmod...)
+function (a::fqPolyRepMPolyRingElem)(vals::fqPolyRepFieldElem...)
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
    return evaluate(a, [vals...])
 end
 
-function (a::fq_nmod_mpoly)(vals::Integer...)
+function (a::fqPolyRepMPolyRingElem)(vals::Integer...)
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
    return evaluate(a, [vals...])
 end
 
-function (a::fq_nmod_mpoly)(vals::Union{NCRingElem, RingElement}...)
+function (a::fqPolyRepMPolyRingElem)(vals::Union{NCRingElem, RingElement}...)
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
    R = base_ring(a)
    # The best we can do here is to cache previously used powers of the values
@@ -734,7 +734,7 @@ function (a::fq_nmod_mpoly)(vals::Union{NCRingElem, RingElement}...)
    return r
 end
 
-function evaluate(a::fq_nmod_mpoly, bs::Vector{fq_nmod_mpoly})
+function evaluate(a::fqPolyRepMPolyRingElem, bs::Vector{fqPolyRepMPolyRingElem})
    R = parent(a)
    S = parent(bs[1])
    @assert base_ring(R) === base_ring(S)
@@ -744,14 +744,14 @@ function evaluate(a::fq_nmod_mpoly, bs::Vector{fq_nmod_mpoly})
 
    c = S()
    fl = ccall((:fq_nmod_mpoly_compose_fq_nmod_mpoly, libflint), Cint,
-              (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly}, Ptr{Ref{fq_nmod_mpoly}},
-               Ref{FqNmodMPolyRing}, Ref{FqNmodMPolyRing}),
+              (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem}, Ptr{Ref{fqPolyRepMPolyRingElem}},
+               Ref{fqPolyRepMPolyRing}, Ref{fqPolyRepMPolyRing}),
               c, a, bs, R, S)
    fl == 0 && error("Something wrong in evaluation.")
    return c
 end
 
-function evaluate(a::fq_nmod_mpoly, bs::Vector{fq_nmod_poly})
+function evaluate(a::fqPolyRepMPolyRingElem, bs::Vector{fqPolyRepPolyRingElem})
    R = parent(a)
    S = parent(bs[1])
    @assert base_ring(R) === base_ring(S)
@@ -761,8 +761,8 @@ function evaluate(a::fq_nmod_mpoly, bs::Vector{fq_nmod_poly})
 
    c = S()
    fl = ccall((:fq_nmod_mpoly_compose_fq_nmod_poly, libflint), Cint,
-              (Ref{fq_nmod_poly}, Ref{fq_nmod_mpoly}, Ptr{Ref{fq_nmod_poly}},
-               Ref{FqNmodMPolyRing}), c, a, bs, R)
+              (Ref{fqPolyRepPolyRingElem}, Ref{fqPolyRepMPolyRingElem}, Ptr{Ref{fqPolyRepPolyRingElem}},
+               Ref{fqPolyRepMPolyRing}), c, a, bs, R)
    fl == 0 && error("Something wrong in evaluation.")
    return c
 end
@@ -773,63 +773,63 @@ end
 #
 ###############################################################################
 
-function zero!(a::fq_nmod_mpoly)
+function zero!(a::fqPolyRepMPolyRingElem)
     ccall((:fq_nmod_mpoly_zero, libflint), Nothing,
-          (Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+          (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
           a, a.parent)
     return a
 end
 
-function add!(a::fq_nmod_mpoly, b::fq_nmod_mpoly, c::fq_nmod_mpoly)
+function add!(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem, c::fqPolyRepMPolyRingElem)
    ccall((:fq_nmod_mpoly_add, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly},
-          Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem},
+          Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
          a, b, c, a.parent)
    return a
 end
 
-function addeq!(a::fq_nmod_mpoly, b::fq_nmod_mpoly)
+function addeq!(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
    ccall((:fq_nmod_mpoly_add, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly},
-          Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem},
+          Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
          a, a, b, a.parent)
    return a
 end
 
-function mul!(a::fq_nmod_mpoly, b::fq_nmod_mpoly, c::fq_nmod_mpoly)
+function mul!(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem, c::fqPolyRepMPolyRingElem)
    ccall((:fq_nmod_mpoly_mul, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly},
-          Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem},
+          Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
          a, b, c, a.parent)
    return a
 end
 
 # Set the n-th coefficient of a to c. If zero coefficients are inserted, they
 # must be removed with combine_like_terms!
-function setcoeff!(a::fq_nmod_mpoly, n::Int, c::fq_nmod)
+function setcoeff!(a::fqPolyRepMPolyRingElem, n::Int, c::fqPolyRepFieldElem)
    if n > length(a)
       ccall((:fq_nmod_mpoly_resize, libflint), Nothing,
-            (Ref{fq_nmod_mpoly}, Int, Ref{FqNmodMPolyRing}), a, n, a.parent)
+            (Ref{fqPolyRepMPolyRingElem}, Int, Ref{fqPolyRepMPolyRing}), a, n, a.parent)
    end
    ccall((:fq_nmod_mpoly_set_term_coeff_fq_nmod, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Int, Ref{fq_nmod}, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Int, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepMPolyRing}),
          a, n - 1, c, a.parent)
    return a
 end
 
 # Set the i-th coefficient of a to c. If zero coefficients are inserted, they
 # must be removed with combine_like_terms!
-setcoeff!(a::fq_nmod_mpoly, i::Int, c::Integer) = setcoeff!(a, i, base_ring(parent(a))(c))
+setcoeff!(a::fqPolyRepMPolyRingElem, i::Int, c::Integer) = setcoeff!(a, i, base_ring(parent(a))(c))
 
 # Set the i-th coefficient of a to c. If zero coefficients are inserted, they
 # must be removed with combine_like_terms!
-setcoeff!(a::fq_nmod_mpoly, i::Int, c::fmpz) = setcoeff!(a, i, base_ring(parent(a))(c))
+setcoeff!(a::fqPolyRepMPolyRingElem, i::Int, c::ZZRingElem) = setcoeff!(a, i, base_ring(parent(a))(c))
 
 # Remove zero terms and combine adjacent terms if they have the same monomial
 # no sorting is performed
-function combine_like_terms!(a::fq_nmod_mpoly)
+function combine_like_terms!(a::fqPolyRepMPolyRingElem)
    ccall((:fq_nmod_mpoly_combine_like_terms, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
          a, a.parent)
    return a
 end
@@ -840,55 +840,55 @@ end
 #
 ###############################################################################
 
-function exponent_vector_fits(::Type{Int}, a::fq_nmod_mpoly, i::Int)
+function exponent_vector_fits(::Type{Int}, a::fqPolyRepMPolyRingElem, i::Int)
    b = ccall((:fq_nmod_mpoly_term_exp_fits_si, libflint), Cint,
-             (Ref{fq_nmod_mpoly}, Int, Ref{FqNmodMPolyRing}),
+             (Ref{fqPolyRepMPolyRingElem}, Int, Ref{fqPolyRepMPolyRing}),
              a, i - 1, a.parent)
    return Bool(b)
 end
 
-function exponent_vector_fits(::Type{UInt}, a::fq_nmod_mpoly, i::Int)
+function exponent_vector_fits(::Type{UInt}, a::fqPolyRepMPolyRingElem, i::Int)
    b = ccall((:fq_nmod_mpoly_term_exp_fits_ui, libflint), Cint,
-             (Ref{fq_nmod_mpoly}, Int, Ref{FqNmodMPolyRing}),
+             (Ref{fqPolyRepMPolyRingElem}, Int, Ref{fqPolyRepMPolyRing}),
              a, i - 1, a.parent)
    return Bool(b)
 end
 
-function exponent_vector!(z::Vector{Int}, a::fq_nmod_mpoly, i::Int)
+function exponent_vector!(z::Vector{Int}, a::fqPolyRepMPolyRingElem, i::Int)
    ccall((:fq_nmod_mpoly_get_term_exp_si, libflint), Nothing,
-         (Ptr{Int}, Ref{fq_nmod_mpoly}, Int, Ref{FqNmodMPolyRing}),
+         (Ptr{Int}, Ref{fqPolyRepMPolyRingElem}, Int, Ref{fqPolyRepMPolyRing}),
          z, a, i - 1, parent(a))
    return z
 end
 
-function exponent_vector!(z::Vector{UInt}, a::fq_nmod_mpoly, i::Int)
+function exponent_vector!(z::Vector{UInt}, a::fqPolyRepMPolyRingElem, i::Int)
    ccall((:fq_nmod_mpoly_get_term_exp_ui, libflint), Nothing,
-         (Ptr{UInt}, Ref{fq_nmod_mpoly}, Int, Ref{FqNmodMPolyRing}),
+         (Ptr{UInt}, Ref{fqPolyRepMPolyRingElem}, Int, Ref{fqPolyRepMPolyRing}),
          z, a, i - 1, parent(a))
    return z
 end
 
-function exponent_vector!(z::Vector{fmpz}, a::fq_nmod_mpoly, i::Int)
+function exponent_vector!(z::Vector{ZZRingElem}, a::fqPolyRepMPolyRingElem, i::Int)
    ccall((:fq_nmod_mpoly_get_term_exp_fmpz, libflint), Nothing,
-         (Ptr{Ref{fmpz}}, Ref{fq_nmod_mpoly}, Int, Ref{FqNmodMPolyRing}),
+         (Ptr{Ref{ZZRingElem}}, Ref{fqPolyRepMPolyRingElem}, Int, Ref{fqPolyRepMPolyRing}),
          z, a, i - 1, parent(a))
    return z
 end
 
 # Return a generator for exponent vectors of $a$
-function exponent_vectors_fmpz(a::fq_nmod_mpoly)
+function exponent_vectors_fmpz(a::fqPolyRepMPolyRingElem)
    return (exponent_vector_fmpz(a, i) for i in 1:length(a))
 end
 
 # Set exponent of n-th term to given vector of UInt's
 # No sort is performed, so this is unsafe.
-function set_exponent_vector!(a::fq_nmod_mpoly, n::Int, exps::Vector{UInt})
+function set_exponent_vector!(a::fqPolyRepMPolyRingElem, n::Int, exps::Vector{UInt})
    if n > length(a)
       ccall((:fq_nmod_mpoly_resize, libflint), Nothing,
-            (Ref{fq_nmod_mpoly}, Int, Ref{FqNmodMPolyRing}), a, n, a.parent)
+            (Ref{fqPolyRepMPolyRingElem}, Int, Ref{fqPolyRepMPolyRing}), a, n, a.parent)
    end
    ccall((:fq_nmod_mpoly_set_term_exp_ui, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Int, Ptr{UInt}, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Int, Ptr{UInt}, Ref{fqPolyRepMPolyRing}),
          a, n - 1, exps, parent(a))
    return a
 end
@@ -896,104 +896,104 @@ end
 # Set exponent of n-th term to given vector of Int's
 # No sort is performed, so this is unsafe. The Int's must be positive, but
 # no check is performed
-function set_exponent_vector!(a::fq_nmod_mpoly, n::Int, exps::Vector{Int})
+function set_exponent_vector!(a::fqPolyRepMPolyRingElem, n::Int, exps::Vector{Int})
    if n > length(a)
       ccall((:fq_nmod_mpoly_resize, libflint), Nothing,
-            (Ref{fq_nmod_mpoly}, Int, Ref{FqNmodMPolyRing}), a, n, a.parent)
+            (Ref{fqPolyRepMPolyRingElem}, Int, Ref{fqPolyRepMPolyRing}), a, n, a.parent)
    end
    ccall((:fq_nmod_mpoly_set_term_exp_ui, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Int, Ptr{Int}, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Int, Ptr{Int}, Ref{fqPolyRepMPolyRing}),
          a, n - 1, exps, parent(a))
    return a
 end
 
-# Set exponent of n-th term to given vector of fmpz's
+# Set exponent of n-th term to given vector of ZZRingElem's
 # No sort is performed, so this is unsafe
-function set_exponent_vector!(a::fq_nmod_mpoly, n::Int, exps::Vector{fmpz})
+function set_exponent_vector!(a::fqPolyRepMPolyRingElem, n::Int, exps::Vector{ZZRingElem})
    if n > length(a)
       ccall((:fq_nmod_mpoly_resize, libflint), Nothing,
-            (Ref{fq_nmod_mpoly}, Int, Ref{FqNmodMPolyRing}), a, n, a.parent)
+            (Ref{fqPolyRepMPolyRingElem}, Int, Ref{fqPolyRepMPolyRing}), a, n, a.parent)
    end
    ccall((:fq_nmod_mpoly_set_term_exp_fmpz, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Int, Ptr{fmpz}, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Int, Ptr{ZZRingElem}, Ref{fqPolyRepMPolyRing}),
          a, n - 1, exps, parent(a))
    return a
 end
 
 # Return j-th coordinate of i-th exponent vector
-function exponent(a::fq_nmod_mpoly, i::Int, j::Int)
+function exponent(a::fqPolyRepMPolyRingElem, i::Int, j::Int)
    (j < 1 || j > nvars(parent(a))) && error("Invalid variable index")
    return ccall((:fq_nmod_mpoly_get_term_var_exp_ui, libflint), Int,
-                (Ref{fq_nmod_mpoly}, Int, Int, Ref{FqNmodMPolyRing}),
+                (Ref{fqPolyRepMPolyRingElem}, Int, Int, Ref{fqPolyRepMPolyRing}),
                  a, i - 1, j - 1, a.parent)
 end
 
 # Return the coefficient of the term with the given exponent vector
 # Return zero if there is no such term
-function coeff(a::fq_nmod_mpoly, exps::Vector{UInt})
+function coeff(a::fqPolyRepMPolyRingElem, exps::Vector{UInt})
    z = base_ring(parent(a))()
    ccall((:fq_nmod_mpoly_get_coeff_fq_nmod_ui, libflint), UInt,
-         (Ref{fq_nmod}, Ref{fq_nmod_mpoly}, Ptr{UInt}, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepMPolyRingElem}, Ptr{UInt}, Ref{fqPolyRepMPolyRing}),
          z, a, exps, parent(a))
    return z
 end
 
 # Return the coefficient of the term with the given exponent vector
 # Return zero if there is no such term
-function coeff(a::fq_nmod_mpoly, exps::Vector{Int})
+function coeff(a::fqPolyRepMPolyRingElem, exps::Vector{Int})
    z = base_ring(parent(a))()
    ccall((:fq_nmod_mpoly_get_coeff_fq_nmod_ui, libflint), UInt,
-         (Ref{fq_nmod}, Ref{fq_nmod_mpoly}, Ptr{Int}, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepMPolyRingElem}, Ptr{Int}, Ref{fqPolyRepMPolyRing}),
          z, a, exps, parent(a))
    return z
 end
 
 # Set the coefficient of the term with the given exponent vector to the
-# given fmpz. Removal of a zero term is performed.
-function setcoeff!(a::fq_nmod_mpoly, exps::Vector{Int}, b::fq_nmod)
+# given ZZRingElem. Removal of a zero term is performed.
+function setcoeff!(a::fqPolyRepMPolyRingElem, exps::Vector{Int}, b::fqPolyRepFieldElem)
    ccall((:fq_nmod_mpoly_set_coeff_fq_nmod_ui, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, UInt, Ptr{Int}, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, UInt, Ptr{Int}, Ref{fqPolyRepMPolyRing}),
          a, b, exps, parent(a))
    return a
 end
 
 # Set the coefficient of the term with the given exponent vector to the
 # given integer. Removal of a zero term is performed.
-setcoeff!(a::fq_nmod_mpoly, exps::Vector{Int}, b::Union{Integer, nmod}) =
+setcoeff!(a::fqPolyRepMPolyRingElem, exps::Vector{Int}, b::Union{Integer, zzModRingElem}) =
    setcoeff!(a, exps, base_ring(parent(a))(b))
 
 # Sort the terms according to the ordering. This is only needed if unsafe
 # functions such as those above have been called and terms have been inserted
 # out of order. Note that like terms are not combined and zeros are not
 # removed. For that, call combine_like_terms!
-function sort_terms!(a::fq_nmod_mpoly)
+function sort_terms!(a::fqPolyRepMPolyRingElem)
    ccall((:fq_nmod_mpoly_sort_terms, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}), a, a.parent)
+         (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}), a, a.parent)
    return a
 end
 
 # Return the i-th term of the polynomial, as a polynomial
-function term(a::fq_nmod_mpoly, i::Int)
+function term(a::fqPolyRepMPolyRingElem, i::Int)
    z = parent(a)()
    ccall((:fq_nmod_mpoly_get_term, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly}, Int, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem}, Int, Ref{fqPolyRepMPolyRing}),
           z, a, i - 1, a.parent)
    return z
 end
 
 # Return the i-th monomial of the polynomial, as a polynomial
-function monomial(a::fq_nmod_mpoly, i::Int)
+function monomial(a::fqPolyRepMPolyRingElem, i::Int)
    z = parent(a)()
    ccall((:fq_nmod_mpoly_get_term_monomial, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly}, Int, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem}, Int, Ref{fqPolyRepMPolyRing}),
           z, a, i - 1, a.parent)
    return z
 end
 
 # Sets the given polynomial m to the i-th monomial of the polynomial
-function monomial!(m::fq_nmod_mpoly, a::fq_nmod_mpoly, i::Int)
+function monomial!(m::fqPolyRepMPolyRingElem, a::fqPolyRepMPolyRingElem, i::Int)
    ccall((:fq_nmod_mpoly_get_term_monomial, libflint), Nothing,
-         (Ref{fq_nmod_mpoly}, Ref{fq_nmod_mpoly}, Int, Ref{FqNmodMPolyRing}),
+         (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem}, Int, Ref{fqPolyRepMPolyRing}),
           m, a, i - 1, a.parent)
    return m
 end
@@ -1004,11 +1004,11 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{fq_nmod_mpoly}, ::Type{V}) where {V <: Integer} = fq_nmod_mpoly
+promote_rule(::Type{fqPolyRepMPolyRingElem}, ::Type{V}) where {V <: Integer} = fqPolyRepMPolyRingElem
 
-promote_rule(::Type{fq_nmod_mpoly}, ::Type{fmpz}) = fq_nmod_mpoly
+promote_rule(::Type{fqPolyRepMPolyRingElem}, ::Type{ZZRingElem}) = fqPolyRepMPolyRingElem
 
-promote_rule(::Type{fq_nmod_mpoly}, ::Type{fq_nmod}) = fq_nmod_mpoly
+promote_rule(::Type{fqPolyRepMPolyRingElem}, ::Type{fqPolyRepFieldElem}) = fqPolyRepMPolyRingElem
 
 ###############################################################################
 #
@@ -1016,14 +1016,14 @@ promote_rule(::Type{fq_nmod_mpoly}, ::Type{fq_nmod}) = fq_nmod_mpoly
 #
 ###############################################################################
 
-function _push_term!(z::fq_nmod_mpoly, c::fq_nmod, exp::Vector{Int})
+function _push_term!(z::fqPolyRepMPolyRingElem, c::fqPolyRepFieldElem, exp::Vector{Int})
   ccall((:fq_nmod_mpoly_push_term_fq_nmod_ui, libflint), Nothing,
-        (Ref{fq_nmod_mpoly}, Ref{fq_nmod}, Ptr{UInt}, Ref{FqNmodMPolyRing}),
+        (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepFieldElem}, Ptr{UInt}, Ref{fqPolyRepMPolyRing}),
         z, c, exp, parent(z))
   return z
 end
 
-function push_term!(M::MPolyBuildCtx{fq_nmod_mpoly}, c::fq_nmod, expv::Vector{Int})
+function push_term!(M::MPolyBuildCtx{fqPolyRepMPolyRingElem}, c::fqPolyRepFieldElem, expv::Vector{Int})
    if length(expv) != nvars(parent(M.poly))
       error("length of exponent vector should match the number of variables")
    end
@@ -1032,20 +1032,20 @@ function push_term!(M::MPolyBuildCtx{fq_nmod_mpoly}, c::fq_nmod, expv::Vector{In
   return M
 end
 
-function push_term!(M::MPolyBuildCtx{fq_nmod_mpoly},
+function push_term!(M::MPolyBuildCtx{fqPolyRepMPolyRingElem},
                     c::RingElement, expv::Vector{Int})
   push_term!(M, base_ring(M.poly)(c), expv)
   return M
 end
 
-function finish(M::MPolyBuildCtx{fq_nmod_mpoly})
+function finish(M::MPolyBuildCtx{fqPolyRepMPolyRingElem})
   res = M.poly
   R = parent(res)
   M.poly = zero(R)
   ccall((:fq_nmod_mpoly_sort_terms, libflint), Nothing,
-        (Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}), res, R)
+        (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}), res, R)
   ccall((:fq_nmod_mpoly_combine_like_terms, libflint), Nothing,
-        (Ref{fq_nmod_mpoly}, Ref{FqNmodMPolyRing}), res, R)
+        (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}), res, R)
   return res
 end
 
@@ -1055,60 +1055,60 @@ end
 #
 ###############################################################################
 
-function (R::FqNmodMPolyRing)()
-   z = fq_nmod_mpoly(R)
+function (R::fqPolyRepMPolyRing)()
+   z = fqPolyRepMPolyRingElem(R)
    return z
 end
 
-function (R::FqNmodMPolyRing)(b::nmod)
-   z = fq_nmod_mpoly(R, b.data)
+function (R::fqPolyRepMPolyRing)(b::zzModRingElem)
+   z = fqPolyRepMPolyRingElem(R, b.data)
    return z
 end
 
-function (R::FqNmodMPolyRing)(b::UInt)
-   z = fq_nmod_mpoly(R, b)
+function (R::fqPolyRepMPolyRing)(b::UInt)
+   z = fqPolyRepMPolyRingElem(R, b)
    return z
 end
 
-function (R::FqNmodMPolyRing)(b::fq_nmod)
+function (R::fqPolyRepMPolyRing)(b::fqPolyRepFieldElem)
    parent(b) != base_ring(R) && error("Unable to coerce element")   
-   z = fq_nmod_mpoly(R, b)
+   z = fqPolyRepMPolyRingElem(R, b)
    return z
 end
 
-function (R::FqNmodMPolyRing)(b::Integer)
+function (R::fqPolyRepMPolyRing)(b::Integer)
    return R(base_ring(R)(b))
 end
 
-function (R::FqNmodMPolyRing)(b::fmpz)
+function (R::fqPolyRepMPolyRing)(b::ZZRingElem)
    return R(base_ring(R)(b))
 end
 
-function (R::FqNmodMPolyRing)(a::fq_nmod_mpoly)
+function (R::fqPolyRepMPolyRing)(a::fqPolyRepMPolyRingElem)
    parent(a) != R && error("Unable to coerce polynomial")
    return a
 end
 
 # Create poly with given array of coefficients and array of exponent vectors (sorting is performed)
-function (R::FqNmodMPolyRing)(a::Vector{fq_nmod}, b::Vector{Vector{T}}) where {T <: Union{fmpz, UInt, Int}}
+function (R::fqPolyRepMPolyRing)(a::Vector{fqPolyRepFieldElem}, b::Vector{Vector{T}}) where {T <: Union{ZZRingElem, UInt, Int}}
    length(a) != length(b) && error("Coefficient and exponent vector must have the same length")
 
    for i in 1:length(b)
      length(b[i]) != nvars(R) && error("Exponent vector $i has length $(length(b[i])) (expected $(nvars(R))")
    end
 
-   z = fq_nmod_mpoly(R, a, b)
+   z = fqPolyRepMPolyRingElem(R, a, b)
    return z
 end
 
 # Create poly with given array of coefficients and array of exponent vectors (sorting is performed)
-function (R::FqNmodMPolyRing)(a::Vector{<:Any}, b::Vector{Vector{T}}) where T
+function (R::fqPolyRepMPolyRing)(a::Vector{<:Any}, b::Vector{Vector{T}}) where T
    n = nvars(R)
    length(a) != length(b) && error("Coefficient and exponent vector must have the same length")
    newa = map(base_ring(R), a)
    newb = map(x -> map(FlintZZ, x), b)
-   newaa = convert(Vector{fq_nmod}, newa)
-   newbb = convert(Vector{Vector{fmpz}}, newb)
+   newaa = convert(Vector{fqPolyRepFieldElem}, newa)
+   newbb = convert(Vector{Vector{ZZRingElem}}, newb)
 
    for i in 1:length(newbb)
       length(newbb[i]) != n && error("Exponent vector $i has length $(length(newbb[i])) (expected $(nvars(R)))")
@@ -1123,12 +1123,12 @@ end
 #
 ###############################################################################
 
-function PolynomialRing(R::FqNmodFiniteField, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
-   parent_obj = FqNmodMPolyRing(R, s, ordering, cached)
+function PolynomialRing(R::fqPolyRepField, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
+   parent_obj = fqPolyRepMPolyRing(R, s, ordering, cached)
    return tuple(parent_obj, gens(parent_obj))
 end
 
-function PolynomialRing(R::FqNmodFiniteField, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
+function PolynomialRing(R::fqPolyRepField, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
    return PolynomialRing(R, [Symbol(x) for x in s]; cached=cached, ordering=ordering)
 end
 

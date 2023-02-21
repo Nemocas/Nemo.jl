@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   fmpq_rel_series.jl : Power series over flint fmpq rationals
+#   fmpq_rel_series.jl : Power series over flint QQFieldElem rationals
 #
 ###############################################################################
 
@@ -15,7 +15,7 @@ export fmpq_rel_series, FmpqRelSeriesRing
 function O(a::fmpq_rel_series)
    val = pol_length(a) + valuation(a) - 1
    val < 0 && throw(DomainError(val, "Valuation must be non-negative"))
-   z = fmpq_rel_series(Vector{fmpq}(undef, 0), 0, val, val)
+   z = fmpq_rel_series(Vector{QQFieldElem}(undef, 0), 0, val, val)
    z.parent = parent(a)
    return z
 end
@@ -26,7 +26,7 @@ parent_type(::Type{fmpq_rel_series}) = FmpqRelSeriesRing
 
 base_ring(R::FmpqRelSeriesRing) = R.base_ring
 
-rel_series_type(::Type{fmpq}) = fmpq_rel_series
+rel_series_type(::Type{QQFieldElem}) = fmpq_rel_series
 
 var(a::FmpqRelSeriesRing) = a.S
 
@@ -40,15 +40,15 @@ max_precision(R::FmpqRelSeriesRing) = R.prec_max
 
 function normalise(a::fmpq_rel_series, len::Int)
    if len > 0
-      c = fmpq()
+      c = QQFieldElem()
       ccall((:fmpq_poly_get_coeff_fmpq, libflint), Nothing,
-         (Ref{fmpq}, Ref{fmpq_rel_series}, Int), c, a, len - 1)
+         (Ref{QQFieldElem}, Ref{fmpq_rel_series}, Int), c, a, len - 1)
    end
    while len > 0 && iszero(c)
       len -= 1
       if len > 0
          ccall((:fmpq_poly_get_coeff_fmpq, libflint), Nothing,
-            (Ref{fmpq}, Ref{fmpq_rel_series}, Int), c, a, len - 1)
+            (Ref{QQFieldElem}, Ref{fmpq_rel_series}, Int), c, a, len - 1)
       end
    end
    return len
@@ -62,11 +62,11 @@ precision(x::fmpq_rel_series) = x.prec
 
 function polcoeff(x::fmpq_rel_series, n::Int)
    if n < 0
-      return fmpq(0)
+      return QQFieldElem(0)
    end
-   z = fmpq()
+   z = QQFieldElem()
    ccall((:fmpq_poly_get_coeff_fmpq, libflint), Nothing,
-         (Ref{fmpq}, Ref{fmpq_rel_series}, Int), z, x, n)
+         (Ref{QQFieldElem}, Ref{fmpq_rel_series}, Int), z, x, n)
    return z
 end
 
@@ -75,7 +75,7 @@ zero(R::FmpqRelSeriesRing) = R(0)
 one(R::FmpqRelSeriesRing) = R(1)
 
 function gen(R::FmpqRelSeriesRing)
-   z = fmpq_rel_series([fmpq(1)], 1, max_precision(R) + 1, 1)
+   z = fmpq_rel_series([QQFieldElem(1)], 1, max_precision(R) + 1, 1)
    z.parent = R
    return z
 end
@@ -115,7 +115,7 @@ characteristic(::FmpqRelSeriesRing) = 0
 #
 ###############################################################################
 
-function similar(f::RelSeriesElem, R::FlintRationalField, max_prec::Int,
+function similar(f::RelSeriesElem, R::QQField, max_prec::Int,
                                    s::Symbol=var(parent(f)); cached::Bool=true)
    z = fmpq_rel_series()
    if base_ring(f) === R && s == var(parent(f)) &&
@@ -136,12 +136,12 @@ end
 #
 ###############################################################################
 
-function rel_series(R::FlintRationalField, arr::Vector{T},
+function rel_series(R::QQField, arr::Vector{T},
                    len::Int, prec::Int, val::Int, var::String="x";
                             max_precision::Int=prec, cached::Bool=true) where T
    prec < len + val && error("Precision too small for given data")
-   coeffs = T == fmpq ? arr : map(R, arr)
-   coeffs = length(coeffs) == 0 ? fmpq[] : coeffs
+   coeffs = T == QQFieldElem ? arr : map(R, arr)
+   coeffs = length(coeffs) == 0 ? QQFieldElem[] : coeffs
    z = fmpq_rel_series(coeffs, len, prec, val)
    z.parent = FmpqRelSeriesRing(max_precision, Symbol(var), cached)
    return z
@@ -309,53 +309,53 @@ end
 
 *(x::fmpq_rel_series, y::Int) = y * x
 
-function *(x::fmpz, y::fmpq_rel_series)
+function *(x::ZZRingElem, y::fmpq_rel_series)
    z = parent(y)()
    z.prec = y.prec
    z.val = y.val
    ccall((:fmpq_poly_scalar_mul_fmpz, libflint), Nothing,
-                (Ref{fmpq_rel_series}, Ref{fmpq_rel_series}, Ref{fmpz}),
+                (Ref{fmpq_rel_series}, Ref{fmpq_rel_series}, Ref{ZZRingElem}),
                z, y, x)
    return z
 end
 
-function *(x::fmpq, y::fmpq_rel_series)
+function *(x::QQFieldElem, y::fmpq_rel_series)
    z = parent(y)()
    z.prec = y.prec
    z.val = y.val
    ccall((:fmpq_poly_scalar_mul_fmpq, libflint), Nothing,
-                (Ref{fmpq_rel_series}, Ref{fmpq_rel_series}, Ref{fmpq}),
+                (Ref{fmpq_rel_series}, Ref{fmpq_rel_series}, Ref{QQFieldElem}),
                z, y, x)
    return z
 end
 
-*(x::fmpq_rel_series, y::fmpz) = y * x
+*(x::fmpq_rel_series, y::ZZRingElem) = y * x
 
-*(x::fmpq_rel_series, y::fmpq) = y * x
+*(x::fmpq_rel_series, y::QQFieldElem) = y * x
 
-*(x::fmpq_rel_series, y::Integer) = x * fmpz(y)
+*(x::fmpq_rel_series, y::Integer) = x * ZZRingElem(y)
 
-*(x::Integer, y::fmpq_rel_series) = fmpz(x) * y
+*(x::Integer, y::fmpq_rel_series) = ZZRingElem(x) * y
 
-*(x::fmpq_rel_series, y::Rational) = x * fmpq(y)
+*(x::fmpq_rel_series, y::Rational) = x * QQFieldElem(y)
 
-*(x::Rational, y::fmpq_rel_series) = fmpq(x) * y
+*(x::Rational, y::fmpq_rel_series) = QQFieldElem(x) * y
 
-+(x::fmpq_rel_series, y::Integer) = x + fmpz(y)
++(x::fmpq_rel_series, y::Integer) = x + ZZRingElem(y)
 
-+(x::Integer, y::fmpq_rel_series) = fmpz(x) + y
++(x::Integer, y::fmpq_rel_series) = ZZRingElem(x) + y
 
-+(x::fmpq_rel_series, y::Rational) = x + fmpq(y)
++(x::fmpq_rel_series, y::Rational) = x + QQFieldElem(y)
 
-+(x::Rational, y::fmpq_rel_series) = fmpq(x) + y
++(x::Rational, y::fmpq_rel_series) = QQFieldElem(x) + y
 
--(x::fmpq_rel_series, y::Integer) = x - fmpz(y)
+-(x::fmpq_rel_series, y::Integer) = x - ZZRingElem(y)
 
--(x::Integer, y::fmpq_rel_series) = fmpz(x) - y
+-(x::Integer, y::fmpq_rel_series) = ZZRingElem(x) - y
 
--(x::fmpq_rel_series, y::Rational) = x - fmpq(y)
+-(x::fmpq_rel_series, y::Rational) = x - QQFieldElem(y)
 
--(x::Rational, y::fmpq_rel_series) = fmpq(x) - y
+-(x::Rational, y::fmpq_rel_series) = QQFieldElem(x) - y
 
 ###############################################################################
 #
@@ -432,7 +432,7 @@ function ^(a::fmpq_rel_series, b::Int)
    b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
    if is_gen(a)
       z = parent(a)()
-      z = setcoeff!(z, 0, fmpq(1))
+      z = setcoeff!(z, 0, QQFieldElem(1))
       z.prec = a.prec + b - 1
       z.val = b
    elseif pol_length(a) == 0
@@ -505,18 +505,18 @@ end
 #
 ###############################################################################
 
-function ==(x::fmpq_rel_series, y::fmpq)
+function ==(x::fmpq_rel_series, y::QQFieldElem)
    if precision(x) == 0
       return true
    elseif pol_length(x) > 1
       return false
    elseif pol_length(x) == 1
       if x.val == 0
-         z = fmpq()
+         z = QQFieldElem()
          ccall((:fmpq_poly_get_coeff_fmpq, libflint), Nothing,
-                       (Ref{fmpq}, Ref{fmpq_rel_series}, Int), z, x, 0)
+                       (Ref{QQFieldElem}, Ref{fmpq_rel_series}, Int), z, x, 0)
          return ccall((:fmpq_equal, libflint), Bool,
-               (Ref{fmpq}, Ref{fmpq}, Int), z, y, 0)
+               (Ref{QQFieldElem}, Ref{QQFieldElem}, Int), z, y, 0)
       else
          return false
       end
@@ -525,18 +525,18 @@ function ==(x::fmpq_rel_series, y::fmpq)
    end
 end
 
-function ==(x::fmpq_rel_series, y::fmpz)
+function ==(x::fmpq_rel_series, y::ZZRingElem)
    if precision(x) == 0
       return true
    elseif pol_length(x) > 1
       return false
    elseif pol_length(x) == 1
       if x.val == 0
-         z = fmpq()
+         z = QQFieldElem()
          ccall((:fmpq_poly_get_coeff_fmpq, libflint), Nothing,
-                       (Ref{fmpq}, Ref{fmpq_rel_series}, Int), z, x, 0)
+                       (Ref{QQFieldElem}, Ref{fmpq_rel_series}, Int), z, x, 0)
          return isone(denominator(z)) && ccall((:fmpz_equal, libflint), Bool,
-               (Ref{fmpz}, Ref{fmpz}, Int), numerator(z), y, 0)
+               (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), numerator(z), y, 0)
       else
          return false
       end
@@ -545,15 +545,15 @@ function ==(x::fmpq_rel_series, y::fmpz)
    end
 end
 
-==(x::fmpz, y::fmpq_rel_series) = y == x
+==(x::ZZRingElem, y::fmpq_rel_series) = y == x
 
-==(x::fmpq, y::fmpq_rel_series) = y == x
+==(x::QQFieldElem, y::fmpq_rel_series) = y == x
 
-==(x::fmpq_rel_series, y::Integer) = x == fmpz(y)
+==(x::fmpq_rel_series, y::Integer) = x == ZZRingElem(y)
 
 ==(x::Integer, y::fmpq_rel_series) = y == x
 
-==(x::fmpq_rel_series, y::Rational{T}) where T <: Union{Int, BigInt} = x == fmpq(y)
+==(x::fmpq_rel_series, y::Rational{T}) where T <: Union{Int, BigInt} = x == QQFieldElem(y)
 
 ==(x::Rational{T}, y::fmpq_rel_series) where T <: Union{Int, BigInt} = y == x
 
@@ -604,33 +604,33 @@ function divexact(x::fmpq_rel_series, y::Int; check::Bool=true)
    return z
 end
 
-function divexact(x::fmpq_rel_series, y::fmpz; check::Bool=true)
+function divexact(x::fmpq_rel_series, y::ZZRingElem; check::Bool=true)
    iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
    z.prec = x.prec
    z.val = x.val
    ccall((:fmpq_poly_scalar_div_fmpz, libflint), Nothing,
-                (Ref{fmpq_rel_series}, Ref{fmpq_rel_series}, Ref{fmpz}),
+                (Ref{fmpq_rel_series}, Ref{fmpq_rel_series}, Ref{ZZRingElem}),
                z, x, y)
    return z
 end
 
-function divexact(x::fmpq_rel_series, y::fmpq; check::Bool=true)
+function divexact(x::fmpq_rel_series, y::QQFieldElem; check::Bool=true)
    iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
    z.prec = x.prec
    z.val = x.val
    ccall((:fmpq_poly_scalar_div_fmpq, libflint), Nothing,
-                (Ref{fmpq_rel_series}, Ref{fmpq_rel_series}, Ref{fmpq}),
+                (Ref{fmpq_rel_series}, Ref{fmpq_rel_series}, Ref{QQFieldElem}),
                z, x, y)
    return z
 end
 
-divexact(x::fmpq_rel_series, y::Integer; check::Bool=true) = divexact(x, fmpz(y); check=check)
+divexact(x::fmpq_rel_series, y::Integer; check::Bool=true) = divexact(x, ZZRingElem(y); check=check)
 
-divexact(x::fmpq_rel_series, y::Rational{T}; check::Bool=true) where T <: Union{Int, BigInt} = divexact(x, fmpq(y); check=check)
+divexact(x::fmpq_rel_series, y::Rational{T}; check::Bool=true) where T <: Union{Int, BigInt} = divexact(x, QQFieldElem(y); check=check)
 
 ###############################################################################
 #
@@ -659,7 +659,7 @@ end
 function Base.exp(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in exp")
    if pol_length(a) + valuation(a) == 0 || a.prec == 1
-      return parent(a)([fmpq(1)], 1, a.prec, 0)
+      return parent(a)([QQFieldElem(1)], 1, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -677,7 +677,7 @@ end
 function log(a::fmpq_rel_series)
    (a.val != 0 || coeff(a, 0) != 1) && error("Constant term not one in log")
    if pol_length(a) + valuation(a) == 1 || a.prec < 2
-      return parent(a)(fmpq[], 0, a.prec, 0)
+      return parent(a)(QQFieldElem[], 0, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -692,7 +692,7 @@ end
 function tan(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in tan")
    if iszero(a) || a.prec < 2
-      return parent(a)(fmpq[], 0, a.prec, 0)
+      return parent(a)(QQFieldElem[], 0, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -710,7 +710,7 @@ end
 function tanh(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in tanh")
    if iszero(a) || a.prec < 2
-      return parent(a)(fmpq[], 0, a.prec, 0)
+      return parent(a)(QQFieldElem[], 0, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -728,7 +728,7 @@ end
 function sin(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in sin")
    if iszero(a) || a.prec < 2
-      return parent(a)(fmpq[], 0, a.prec, 0)
+      return parent(a)(QQFieldElem[], 0, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -749,7 +749,7 @@ end
 function sinh(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in sinh")
    if iszero(a) || a.prec < 2
-      return parent(a)(fmpq[], 0, a.prec, 0)
+      return parent(a)(QQFieldElem[], 0, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -767,7 +767,7 @@ end
 function cos(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in cos")
    if pol_length(a) + valuation(a) == 0 || a.prec == 1
-      return parent(a)(fmpq[1], 1, a.prec, 0)
+      return parent(a)(QQFieldElem[1], 1, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -788,7 +788,7 @@ end
 function cosh(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in cosh")
    if pol_length(a) + valuation(a) == 0 || a.prec == 1
-      return parent(a)(fmpq[1], 1, a.prec, 0)
+      return parent(a)(QQFieldElem[1], 1, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -806,7 +806,7 @@ end
 function asin(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in asin")
    if iszero(a) || a.prec < 2
-      return parent(a)(fmpq[], 0, a.prec, 0)
+      return parent(a)(QQFieldElem[], 0, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -824,7 +824,7 @@ end
 function asinh(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in asinh")
    if iszero(a) || a.prec < 2
-      return parent(a)(fmpq[], 0, a.prec, 0)
+      return parent(a)(QQFieldElem[], 0, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -842,7 +842,7 @@ end
 function atan(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in atan")
    if iszero(a) || a.prec < 2
-      return parent(a)(fmpq[], 0, a.prec, 0)
+      return parent(a)(QQFieldElem[], 0, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -860,7 +860,7 @@ end
 function atanh(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in atanh")
    if iszero(a) || a.prec < 2
-      return parent(a)(fmpq[], 0, a.prec, 0)
+      return parent(a)(QQFieldElem[], 0, a.prec, 0)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -919,9 +919,9 @@ function fit!(z::fmpq_rel_series, n::Int)
    return nothing
 end
 
-function setcoeff!(z::fmpq_rel_series, n::Int, x::fmpq)
+function setcoeff!(z::fmpq_rel_series, n::Int, x::QQFieldElem)
    ccall((:fmpq_poly_set_coeff_fmpq, libflint), Nothing,
-                (Ref{fmpq_rel_series}, Int, Ref{fmpq}),
+                (Ref{fmpq_rel_series}, Int, Ref{QQFieldElem}),
                z, n, x)
    return z
 end
@@ -1051,9 +1051,9 @@ promote_rule(::Type{fmpq_rel_series}, ::Type{T}) where {T <: Integer} = fmpq_rel
 
 promote_rule(::Type{fmpq_rel_series}, ::Type{Rational{T}}) where T <: Union{Int, BigInt} = fmpq_rel_series
 
-promote_rule(::Type{fmpq_rel_series}, ::Type{fmpz}) = fmpq_rel_series
+promote_rule(::Type{fmpq_rel_series}, ::Type{ZZRingElem}) = fmpq_rel_series
 
-promote_rule(::Type{fmpq_rel_series}, ::Type{fmpq}) = fmpq_rel_series
+promote_rule(::Type{fmpq_rel_series}, ::Type{QQFieldElem}) = fmpq_rel_series
 
 ###############################################################################
 #
@@ -1075,25 +1075,25 @@ function (a::FmpqRelSeriesRing)(b::Integer)
       z.prec = a.prec_max
       z.val = a.prec_max
    else
-      z = fmpq_rel_series([fmpq(b)], 1, a.prec_max, 0)
+      z = fmpq_rel_series([QQFieldElem(b)], 1, a.prec_max, 0)
    end
    z.parent = a
    return z
 end
 
-function (a::FmpqRelSeriesRing)(b::fmpz)
+function (a::FmpqRelSeriesRing)(b::ZZRingElem)
    if iszero(b)
       z = fmpq_rel_series()
       z.prec = a.prec_max
       z.val = a.prec_max
    else
-      z = fmpq_rel_series([fmpq(b)], 1, a.prec_max, 0)
+      z = fmpq_rel_series([QQFieldElem(b)], 1, a.prec_max, 0)
    end
    z.parent = a
    return z
 end
 
-function (a::FmpqRelSeriesRing)(b::fmpq)
+function (a::FmpqRelSeriesRing)(b::QQFieldElem)
    if iszero(b)
       z = fmpq_rel_series()
       z.prec = a.prec_max
@@ -1105,24 +1105,24 @@ function (a::FmpqRelSeriesRing)(b::fmpq)
    return z
 end
 
-(a::FmpqRelSeriesRing)(b::Rational{T}) where T <: Union{Int, BigInt} = a(fmpq(b))
+(a::FmpqRelSeriesRing)(b::Rational{T}) where T <: Union{Int, BigInt} = a(QQFieldElem(b))
 
 function (a::FmpqRelSeriesRing)(b::fmpq_rel_series)
    parent(b) != a && error("Unable to coerce power series")
    return b
 end
 
-function (a::FmpqRelSeriesRing)(b::Vector{fmpq}, len::Int, prec::Int, val::Int)
+function (a::FmpqRelSeriesRing)(b::Vector{QQFieldElem}, len::Int, prec::Int, val::Int)
    z = fmpq_rel_series(b, len, prec, val)
    z.parent = a
    return z
 end
 
-(a::FmpqRelSeriesRing)(b::Vector{fmpz}, len::Int, prec::Int, val::Int) =
-    a(map(fmpq, b), len, prec, val)
+(a::FmpqRelSeriesRing)(b::Vector{ZZRingElem}, len::Int, prec::Int, val::Int) =
+    a(map(QQFieldElem, b), len, prec, val)
 
 (a::FmpqRelSeriesRing)(b::Vector{T}, len::Int, prec::Int, val::Int) where {T <: Integer} =
-    a(map(fmpq, b), len, prec, val)
+    a(map(QQFieldElem, b), len, prec, val)
 
 (a::FmpqRelSeriesRing)(b::Vector{Rational{T}}, len::Int, prec::Int, val::Int) where {T <: Integer} =
-    a(map(fmpq, b), len, prec, val)
+    a(map(QQFieldElem, b), len, prec, val)

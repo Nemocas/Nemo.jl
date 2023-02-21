@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   fmpz_laurent_series.jl : Laurent series over Flint fmpz
+#   fmpz_laurent_series.jl : Laurent series over Flint ZZRingElem
 #
 ###############################################################################
 
@@ -21,7 +21,7 @@ can be used to set the precision of a power series when constructing it.
 """
 function O(a::fmpz_laurent_series)
    val = valuation(a)
-   return parent(a)(Vector{fmpz}(undef, 0), 0, val, val, 1)
+   return parent(a)(Vector{ZZRingElem}(undef, 0), 0, val, val, 1)
 end
 
 parent_type(::Type{fmpz_laurent_series}) = FmpzLaurentSeriesRing
@@ -130,11 +130,11 @@ end
 
 function polcoeff(a::fmpz_laurent_series, n::Int)
    if n < 0
-      return fmpz(0)
+      return ZZRingElem(0)
    end
-   z = fmpz()
+   z = ZZRingElem()
    ccall((:fmpz_poly_get_coeff_fmpz, libflint), Nothing,
-         (Ref{fmpz}, Ref{fmpz_laurent_series}, Int), z, a, n)
+         (Ref{ZZRingElem}, Ref{fmpz_laurent_series}, Int), z, a, n)
    return z
 end
 
@@ -504,7 +504,7 @@ function *(a::fmpz_laurent_series, b::fmpz_laurent_series)
    lena = min(lena*sa, prec)
    lenb = min(lenb*sb, prec)
    if lena == 0 || lenb == 0
-      return parent(a)(Vector{fmpz}(undef, 0), 0, prec + zval, zval, 1)
+      return parent(a)(Vector{ZZRingElem}(undef, 0), 0, prec + zval, zval, 1)
    end
    t = base_ring(a)()
    da = div(sa, sz)
@@ -531,7 +531,7 @@ end
 #
 ###############################################################################
 
-function *(a::fmpz, b::fmpz_laurent_series)
+function *(a::ZZRingElem, b::fmpz_laurent_series)
    len = pol_length(b)
    z = parent(b)()
    z = set_precision!(z, precision(b))
@@ -557,7 +557,7 @@ function *(a::Integer, b::fmpz_laurent_series)
    return z
 end
 
-*(a::fmpz_laurent_series, b::fmpz) = b*a
+*(a::fmpz_laurent_series, b::ZZRingElem) = b*a
 
 *(a::fmpz_laurent_series, b::Integer) = b*a
 
@@ -860,7 +860,7 @@ function divexact(a::fmpz_laurent_series, b::fmpz_laurent_series; check::Bool=tr
    lenb = min(lenb*sb, prec)
    lenb == 0 && throw(DivideError())
    if lena == 0
-      return parent(a)(Vector{fmpz}(undef, 0), 0, prec + zval, zval, 1)
+      return parent(a)(Vector{ZZRingElem}(undef, 0), 0, prec + zval, zval, 1)
    end
    t = base_ring(a)()
    da = div(sa, sz)
@@ -1015,7 +1015,7 @@ function exp(a::fmpz_laurent_series)
          c = j >= vala ? polcoeff(a, j - vala) : R()
          s += j * c * polcoeff(z, k - j)
       end
-      flag, q = divides(s, fmpz(k))
+      flag, q = divides(s, ZZRingElem(k))
       !flag && error("Unable to divide in exp")
       z = setcoeff!(z, k, q)
    end
@@ -1039,9 +1039,9 @@ function zero!(a::fmpz_laurent_series)
    return a
 end
 
-function setcoeff!(c::fmpz_laurent_series, n::Int, a::fmpz)
+function setcoeff!(c::fmpz_laurent_series, n::Int, a::ZZRingElem)
    ccall((:fmpz_poly_set_coeff_fmpz, libflint), Nothing,
-                (Ref{fmpz_laurent_series}, Int, Ref{fmpz}),
+                (Ref{fmpz_laurent_series}, Int, Ref{ZZRingElem}),
                c, n, a)
    return c
 end
@@ -1230,7 +1230,7 @@ rand(S::FmpzLaurentSeriesRing, val_range, v...) = rand(Random.GLOBAL_RNG, S, val
 
 promote_rule(::Type{fmpz_laurent_series}, ::Type{T}) where {T <: Integer} = fmpz_laurent_series
 
-promote_rule(::Type{fmpz_laurent_series}, ::Type{fmpz}) = fmpz_laurent_series
+promote_rule(::Type{fmpz_laurent_series}, ::Type{ZZRingElem}) = fmpz_laurent_series
 
 ###############################################################################
 #
@@ -1239,24 +1239,24 @@ promote_rule(::Type{fmpz_laurent_series}, ::Type{fmpz}) = fmpz_laurent_series
 ###############################################################################
 
 function (R::FmpzLaurentSeriesRing)()
-   z = fmpz_laurent_series(Vector{fmpz}(undef, 0), 0, R.prec_max, R.prec_max, 1)
+   z = fmpz_laurent_series(Vector{ZZRingElem}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    z.parent = R
    return z
 end
 
 function (R::FmpzLaurentSeriesRing)(b::Integer)
    if b == 0
-      z = fmpz_laurent_series(Vector{fmpz}(undef, 0), 0, R.prec_max, R.prec_max, 1)
+      z = fmpz_laurent_series(Vector{ZZRingElem}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    else
-      z = fmpz_laurent_series([fmpz(b)], 1, R.prec_max, 0, 1)
+      z = fmpz_laurent_series([ZZRingElem(b)], 1, R.prec_max, 0, 1)
    end
    z.parent = R
    return z
 end
 
-function (R::FmpzLaurentSeriesRing)(b::fmpz)
+function (R::FmpzLaurentSeriesRing)(b::ZZRingElem)
    if iszero(b)
-      z = fmpz_laurent_series(Vector{fmpz}(undef, 0), 0, R.prec_max, R.prec_max, 1)
+      z = fmpz_laurent_series(Vector{ZZRingElem}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    else
       z = fmpz_laurent_series([b], 1, R.prec_max, 0, 1)
    end
@@ -1268,7 +1268,7 @@ function (R::FmpzLaurentSeriesRing)(b::fmpz_laurent_series)
    return b
 end
 
-function (R::FmpzLaurentSeriesRing)(b::Vector{fmpz}, len::Int, prec::Int, val::Int, scale::Int, rescale::Bool = true)
+function (R::FmpzLaurentSeriesRing)(b::Vector{ZZRingElem}, len::Int, prec::Int, val::Int, scale::Int, rescale::Bool = true)
    z = fmpz_laurent_series(b, len, prec, val, scale)
    z.parent = R
    if rescale
@@ -1284,7 +1284,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    LaurentSeriesRing(R::FlintIntegerRing, prec::Int, s::AbstractString; cached=true)
+    LaurentSeriesRing(R::ZZRing, prec::Int, s::AbstractString; cached=true)
 
 Return a tuple $(S, x)$ consisting of the parent object `S` of a Laurent series
 ring over ZZ and a generator `x` for the Laurent series ring.
@@ -1295,13 +1295,13 @@ object `S` will be cached so that supplying the same base ring, string and
 precision in future will return the same parent object and generator. If
 caching of the parent object is not required, `cached` can be set to `false`.
 """
-function LaurentSeriesRing(R::FlintIntegerRing, prec::Int, s::Symbol; cached=true)
+function LaurentSeriesRing(R::ZZRing, prec::Int, s::Symbol; cached=true)
    parent_obj = FmpzLaurentSeriesRing(prec, s, cached)
 
    return parent_obj, gen(parent_obj)
 end
 
-function LaurentSeriesRing(R::FlintIntegerRing, prec::Int, s::AbstractString; cached=true)
+function LaurentSeriesRing(R::ZZRing, prec::Int, s::AbstractString; cached=true)
    return LaurentSeriesRing(R, prec, Symbol(s); cached=cached)
 end
 

@@ -41,8 +41,8 @@ language not built around this model. We discuss some of these issues below.
 As all elements and parents in Nemo are objects, those objects have types
 which we refer to as the element type and parent type respectively.
 
-For example, Flint integers have type `fmpz` and the parent object they all
-belong to, `FlintZZ` has type `FlintIntegerRing`.
+For example, Flint integers have type `ZZRingElem` and the parent object they all
+belong to, `FlintZZ` has type `ZZRing`.
 
 More complex parents and elements are parameterised. For example, generic
 univariate polynomials over a base ring `R` are parameterised by `R`. The
@@ -51,19 +51,19 @@ base ring of a ring `S` can be obtained by the call `base_ring(S)`.
 We have found it extremely useful to parameterise the type of both the parent
 and element objects of such a ring by the type of the elements of the base
 ring. Thus for example, a generic polynomial with Flint integer coefficients
-would have type `Poly{fmpz}`.
+would have type `Poly{ZZRingElem}`.
 
 In practice Flint already implements univariate polynomials over Flint
-integers, and these have type `fmpz_poly`. But both `fmpz_poly` and the
-generic polynomials `Poly{fmpz}` belong to the abstract type `PolyElem{fmpz}`
+integers, and these have type `ZZPolyRingElem`. But both `ZZPolyRingElem` and the
+generic polynomials `Poly{ZZRingElem}` belong to the abstract type `PolyElem{ZZRingElem}`
 making it possible to write functions for all univariate polynomials over
 Flint integers.
 
 Given a specific element type or parent type it is possible to compute one
 from the other with the functions `elem_type` and `parent_type`. For example
-`parent_type(fmpz_poly)` returns `FmpzPolyRing` and `elem_type(FmpzPolyRing)`
-returns `fmpz_poly`. Similarly `parent_type(Generic.Poly{fmpz})` returns
-`Generic.PolyRing{fmpz}` and so on.
+`parent_type(ZZPolyRingElem)` returns `ZZPolyRing` and `elem_type(ZZPolyRing)`
+returns `ZZPolyRingElem`. Similarly `parent_type(Generic.Poly{ZZRingElem})` returns
+`Generic.PolyRing{ZZRingElem}` and so on.
 
 These functions are especially useful when writing type assertions or
 constructing arrays of elements insides function where only the parent object
@@ -84,7 +84,7 @@ The function for returning the correct type for a dense matrix is
 `dense_matrix_type` to which one can pass either a base ring or an element
 type. For example, if AbstractAlgebra is being used, `dense_matrix_type(ZZ)`
 will return `Mat{BigInt}` whereas if Nemo is being used it will return
-`fmpz_mat`.
+`ZZMatrix`.
 
 We also have `dense_poly_type` for univariate polynomials, `abs_series_type`
 for absolute series and `rel_series_type` for relative series.

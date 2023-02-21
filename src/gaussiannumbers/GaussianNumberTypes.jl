@@ -6,8 +6,8 @@ end
 const FlintZZi = FlintZZiRing()
 
 struct fmpzi <: RingElem
-  x::fmpz
-  y::fmpz
+  x::ZZRingElem
+  y::ZZRingElem
 end
 
 struct FlintQQiField <: Nemo.Field
@@ -17,6 +17,6 @@ const FlintQQi = FlintQQiField()
 
 struct fmpqi <: FieldElem
   num::fmpzi
-  den::fmpz
+  den::ZZRingElem
 end
 

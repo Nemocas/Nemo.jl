@@ -10,10 +10,10 @@
 #
 ###############################################################################
 
-function linear_factor(x::fq_poly)
+function linear_factor(x::FqPolyRepPolyRingElem)
     y = parent(x)()
     ccall((:fq_poly_factor_split_single, libflint), Nothing,
-          (Ref{fq_poly}, Ref{fq_poly}, Ref{FqFiniteField}),
+          (Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepField}),
            y, x, base_ring(x))
     return y
 end
@@ -24,23 +24,23 @@ end
 #
 ###############################################################################
 
-function embed_gens(k::FqFiniteField, K::FqFiniteField)
+function embed_gens(k::FqPolyRepField, K::FqPolyRepField)
     a = k()
     b = K()
-    p = fmpz(characteristic(k))::fmpz
+    p = ZZRingElem(characteristic(k))::ZZRingElem
     R = GF(p)
     PR = PolynomialRing(R, "T")[1]
     P = PR()
 
     ccall((:fq_embed_gens, libflint), Nothing,
-          (Ref{fq}, Ref{fq}, Ref{gfp_fmpz_poly}, Ref{FqFiniteField},
-                                                         Ref{FqFiniteField}),
+          (Ref{FqPolyRepFieldElem}, Ref{FqPolyRepFieldElem}, Ref{FpPolyRingElem}, Ref{FqPolyRepField},
+                                                         Ref{FqPolyRepField}),
           a, b, P, k, K)
 
     return a, b, P
 end
 
-function embed_matrices(k::FqFiniteField, K::FqFiniteField)
+function embed_matrices(k::FqPolyRepField, K::FqPolyRepField)
 
     m, n = degree(k), degree(K)
     if m == n
@@ -58,13 +58,13 @@ function embed_matrices(k::FqFiniteField, K::FqFiniteField)
     s2 = zero_matrix(R, m, n)
 
     ccall((:fq_embed_matrices, libflint), Nothing,
-          (Ref{gfp_fmpz_mat}, Ref{gfp_fmpz_mat}, Ref{fq}, Ref{FqFiniteField},
-                             Ref{fq}, Ref{FqFiniteField}, Ref{gfp_fmpz_poly}),
+          (Ref{FpMatrix}, Ref{FpMatrix}, Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField},
+                             Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}, Ref{FpPolyRingElem}),
           s1, s2, a, k, b, K, P)
     return s1, s2
 end
 
-function embed_matrices_pre(a::fq, b::fq, P::gfp_fmpz_poly)
+function embed_matrices_pre(a::FqPolyRepFieldElem, b::FqPolyRepFieldElem, P::FpPolyRingElem)
     k = parent(a)
     K = parent(b)
     m, n = degree(k), degree(K)
@@ -73,19 +73,19 @@ function embed_matrices_pre(a::fq, b::fq, P::gfp_fmpz_poly)
     s2 = zero_matrix(R, m, n)
 
     ccall((:fq_embed_matrices, libflint), Nothing,
-          (Ref{gfp_fmpz_mat}, Ref{gfp_fmpz_mat}, Ref{fq}, Ref{FqFiniteField},
-                              Ref{fq}, Ref{FqFiniteField}, Ref{gfp_fmpz_poly}),
+          (Ref{FpMatrix}, Ref{FpMatrix}, Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField},
+                              Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}, Ref{FpPolyRingElem}),
            s1, s2, a, k, b, K, P)
     return s1, s2
 end
 
 # dirty: internally in flint an fq_struct is just an fmpz_poly_struct
-function setcoeff!(x::fq, j::Int, c::fmpz)
+function setcoeff!(x::FqPolyRepFieldElem, j::Int, c::ZZRingElem)
     ccall((:fmpz_poly_set_coeff_fmpz, libflint), Nothing,
-          (Ref{fq}, Int, Ref{fmpz}), x, j, c)
+          (Ref{FqPolyRepFieldElem}, Int, Ref{ZZRingElem}), x, j, c)
 end
 
-function embed_pre_mat(x::fq, K::FqFiniteField, M::gfp_fmpz_mat)
+function embed_pre_mat(x::FqPolyRepFieldElem, K::FqPolyRepField, M::FpMatrix)
 
     d = degree(parent(x))
     col = zero_matrix(base_ring(M), d, 1)
@@ -110,7 +110,7 @@ end
 #
 ################################################################################
 
-function embed_polynomial(P::fq_poly, f::FinFieldMorphism)
+function embed_polynomial(P::FqPolyRepPolyRingElem, f::FinFieldMorphism)
     S = PolynomialRing(codomain(f), "T")[1]
     return S([f(coeff(P, j)) for j in 0:degree(P)])
 end

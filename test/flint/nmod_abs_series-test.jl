@@ -1,5 +1,5 @@
 @testset "nmod_abs_series.types" begin
-   @test abs_series_type(nmod) == nmod_abs_series
+   @test abs_series_type(zzModRingElem) == nmod_abs_series
 end
 
 @testset "nmod_abs_series.constructors" begin
@@ -139,7 +139,7 @@ end
    @test parent(h) === parent(g)
    @test parent(k) !== parent(m)
 
-   p = abs_series(R, nmod[], 0, 4)
+   p = abs_series(R, zzModRingElem[], 0, 4)
    q = abs_series(R, [], 0, 6)
 
    @test isa(p, nmod_abs_series)
@@ -148,7 +148,7 @@ end
    @test length(p) == 0
    @test length(q) == 0
 
-   r = abs_series(R, fmpz[1, 2, 3], 3, 5)
+   r = abs_series(R, ZZRingElem[1, 2, 3], 3, 5)
 
    @test isa(r, nmod_abs_series)
 
@@ -335,9 +335,9 @@ end
 
    @test isequal(divexact(7a, 7), a)
 
-   @test isequal(divexact(11b, fmpz(11)), b)
+   @test isequal(divexact(11b, ZZRingElem(11)), b)
 
-   @test isequal(divexact(2c, fmpz(2)), c)
+   @test isequal(divexact(2c, ZZRingElem(2)), c)
 
    @test isequal(divexact(9d, 9), d)
 

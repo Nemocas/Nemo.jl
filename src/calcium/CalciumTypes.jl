@@ -36,17 +36,17 @@ mutable struct qqbar_struct
   coeffs::Ptr{Nothing}
   alloc::Int
   length::Int
-  real_mid_exp::Int     # fmpz
+  real_mid_exp::Int     # ZZRingElem
   real_mid_size::UInt # mp_size_t
   real_mid_d1::UInt    # mantissa_struct
   real_mid_d2::UInt
-  real_rad_exp::Int     # fmpz
+  real_rad_exp::Int     # ZZRingElem
   real_rad_man::UInt
-  imag_mid_exp::Int     # fmpz
+  imag_mid_exp::Int     # ZZRingElem
   imag_mid_size::UInt # mp_size_t
   imag_mid_d1::UInt    # mantissa_struct
   imag_mid_d2::UInt
-  imag_rad_exp::Int     # fmpz
+  imag_rad_exp::Int     # ZZRingElem
   imag_rad_man::UInt
 end
 
@@ -70,17 +70,17 @@ mutable struct qqbar <: FieldElem
   coeffs::Ptr{Nothing}
   alloc::Int
   length::Int
-  real_mid_exp::Int     # fmpz
+  real_mid_exp::Int     # ZZRingElem
   real_mid_size::UInt # mp_size_t
   real_mid_d1::UInt    # mantissa_struct
   real_mid_d2::UInt
-  real_rad_exp::Int     # fmpz
+  real_rad_exp::Int     # ZZRingElem
   real_rad_man::UInt
-  imag_mid_exp::Int     # fmpz
+  imag_mid_exp::Int     # ZZRingElem
   imag_mid_size::UInt # mp_size_t
   imag_mid_d1::UInt    # mantissa_struct
   imag_mid_d2::UInt
-  imag_rad_exp::Int     # fmpz
+  imag_rad_exp::Int     # ZZRingElem
   imag_rad_man::UInt
 
   function qqbar()

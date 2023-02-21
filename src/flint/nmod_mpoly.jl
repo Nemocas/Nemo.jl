@@ -1,15 +1,15 @@
 ###############################################################################
 #
-#   nmod_mpoly.jl : Flint multivariate polynomials over nmod and GaloisField
+#   zzModMPolyRingElem.jl : Flint multivariate polynomials over zzModRingElem and fpField
 #
 ###############################################################################
 
-export NmodMPolyRing, nmod_mpoly
-export GFPMPolyRing, gfp_mpoly
+export zzModMPolyRing, zzModMPolyRingElem
+export fpMPolyRing, fpMPolyRingElem
 
 for (etype, rtype, ftype, ctype, utype) in (
-                        (nmod_mpoly, NmodMPolyRing, nmod_mpoly_factor, nmod, nmod_poly),
-                        (gfp_mpoly, GFPMPolyRing, gfp_mpoly_factor, gfp_elem, gfp_poly))
+                        (zzModMPolyRingElem, zzModMPolyRing, nmod_mpoly_factor, zzModRingElem, zzModPolyRingElem),
+                        (fpMPolyRingElem, fpMPolyRing, gfp_mpoly_factor, fpFieldElem, fpPolyRingElem))
 @eval begin
 
 ###############################################################################
@@ -48,7 +48,7 @@ modulus(f::($etype)) = modulus(base_ring(parent(f)))
 
 function ordering(a::($rtype))
    b = a.ord
-#   b = ccall((:nmod_mpoly_ctx_ord, libflint), Cint, (Ref{NmodMPolyRing}, ), a)
+#   b = ccall((:nmod_mpoly_ctx_ord, libflint), Cint, (Ref{zzModMPolyRing}, ), a)
    return flint_orderings[b + 1]
 end
 
@@ -197,13 +197,13 @@ function degree(a::($etype), i::Int)
    return d
 end
 
-# Degree in the i-th variable as an fmpz
+# Degree in the i-th variable as an ZZRingElem
 function degree_fmpz(a::($etype), i::Int)
    n = nvars(parent(a))
    (i <= 0 || i > n) && error("Index must be between 1 and $n")
-   d = fmpz()
+   d = ZZRingElem()
    ccall((:nmod_mpoly_degree_fmpz, libflint), Nothing,
-         (Ref{fmpz}, Ref{($etype)}, Int, Ref{($rtype)}),
+         (Ref{ZZRingElem}, Ref{($etype)}, Int, Ref{($rtype)}),
          d, a, i - 1, parent(a))
    return d
 end
@@ -227,12 +227,12 @@ end
 # Return an array of the max degrees as fmpzs in each variable
 function degrees_fmpz(a::($etype))
    n = nvars(parent(a))
-   degs = Vector{fmpz}(undef, n)
+   degs = Vector{ZZRingElem}(undef, n)
    for i in 1:n
-      degs[i] = fmpz()
+      degs[i] = ZZRingElem()
    end
    ccall((:nmod_mpoly_degrees_fmpz, libflint), Nothing,
-         (Ptr{Ref{fmpz}}, Ref{($etype)}, Ref{($rtype)}),
+         (Ptr{Ref{ZZRingElem}}, Ref{($etype)}, Ref{($rtype)}),
          degs, a, parent(a))
    return degs
 end
@@ -252,11 +252,11 @@ function total_degree(a::($etype))
    return d
 end
 
-# Total degree as an fmpz
+# Total degree as an ZZRingElem
 function total_degree_fmpz(a::($etype))
-   d = fmpz()
+   d = ZZRingElem()
    ccall((:nmod_mpoly_total_degree_fmpz, libflint), Nothing,
-         (Ref{fmpz}, Ref{($etype)}, Ref{($rtype)}),
+         (Ref{ZZRingElem}, Ref{($etype)}, Ref{($rtype)}),
          d, a, parent(a))
    return d
 end
@@ -435,11 +435,11 @@ function ^(a::($etype), b::Int)
    return z
 end
 
-function ^(a::($etype), b::fmpz)
+function ^(a::($etype), b::ZZRingElem)
    b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
    z = parent(a)()
    ok = ccall((:nmod_mpoly_pow_fmpz, libflint), Cint,
-         (Ref{($etype)}, Ref{($etype)}, Ref{fmpz}, Ref{($rtype)}),
+         (Ref{($etype)}, Ref{($etype)}, Ref{ZZRingElem}, Ref{($rtype)}),
          z, a, b, parent(a))
    !isone(ok) && error("Unable to compute power")
    return z
@@ -590,11 +590,11 @@ end
 
 ==(a::($etype), b::Integer) = a == base_ring(parent(a))(b)
 
-==(a::($etype), b::fmpz) = a == base_ring(parent(a))(b)
+==(a::($etype), b::ZZRingElem) = a == base_ring(parent(a))(b)
 
 ==(a::Integer, b::($etype)) = b == a
 
-==(a::fmpz, b::($etype)) = b == a
+==(a::ZZRingElem, b::($etype)) = b == a
 
 ###############################################################################
 #
@@ -712,7 +712,7 @@ function evaluate(a::($etype), b::Vector{T}) where T <: Integer
    return evaluate(a, b2)
 end
 
-function evaluate(a::($etype), b::Vector{fmpz})
+function evaluate(a::($etype), b::Vector{ZZRingElem})
    length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
    R = base_ring(parent(a))
    b2 = [R(d) for d in b]
@@ -726,7 +726,7 @@ function evaluate(a::($etype), b::Vector{UInt})
    return evaluate(a, b2)
 end
 
-function (a::($etype))(vals::nmod...)
+function (a::($etype))(vals::zzModRingElem...)
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number o
 f values")
    return evaluate(a, [vals...])
@@ -867,7 +867,7 @@ setcoeff!(a::($etype), i::Int, c::Integer) = setcoeff!(a, i, base_ring(parent(a)
 
 # Set the i-th coefficient of a to c. If zero coefficients are inserted, they
 # must be removed with combine_like_terms!
-setcoeff!(a::($etype), i::Int, c::fmpz) = setcoeff!(a, i, base_ring(parent(a))(c))
+setcoeff!(a::($etype), i::Int, c::ZZRingElem) = setcoeff!(a, i, base_ring(parent(a))(c))
 
 # Remove zero terms and combine adjacent terms if they have the same monomial
 # no sorting is performed
@@ -912,9 +912,9 @@ function exponent_vector!(z::Vector{UInt}, a::($etype), i::Int)
    return z
 end
 
-function exponent_vector!(z::Vector{fmpz}, a::($etype), i::Int)
+function exponent_vector!(z::Vector{ZZRingElem}, a::($etype), i::Int)
    ccall((:nmod_mpoly_get_term_exp_fmpz, libflint), Nothing,
-         (Ptr{Ref{fmpz}}, Ref{($etype)}, Int, Ref{($rtype)}),
+         (Ptr{Ref{ZZRingElem}}, Ref{($etype)}, Int, Ref{($rtype)}),
          z, a, i - 1, parent(a))
    return z
 end
@@ -925,7 +925,7 @@ function exponent_vectors_fmpz(a::($etype))
 end
 
 # Set exponent of n-th term to given vector of UInt's
-# No sort is performed, so this is unsafe. These are promoted to fmpz's if
+# No sort is performed, so this is unsafe. These are promoted to ZZRingElem's if
 # they don't fit into 31/63 bits
 function set_exponent_vector!(a::($etype), n::Int, exps::Vector{UInt})
    if n > length(a)
@@ -953,16 +953,16 @@ function set_exponent_vector!(a::($etype), n::Int, exps::Vector{Int})
    return a
 end
 
-# Set exponent of n-th term to given vector of fmpz's
+# Set exponent of n-th term to given vector of ZZRingElem's
 # No sort is performed, so this is unsafe
-function set_exponent_vector!(a::($etype), n::Int, exps::Vector{fmpz})
+function set_exponent_vector!(a::($etype), n::Int, exps::Vector{ZZRingElem})
    if n > length(a)
       ccall((:nmod_mpoly_resize, libflint), Nothing,
             (Ref{($etype)}, Int, Ref{($rtype)}),
             a, n, parent(a))
    end
    ccall((:nmod_mpoly_set_term_exp_fmpz, libflint), Nothing,
-         (Ref{($etype)}, Int, Ptr{fmpz}, Ref{($rtype)}),
+         (Ref{($etype)}, Int, Ptr{ZZRingElem}, Ref{($rtype)}),
          a, n - 1, exps, parent(a))
    return a
 end
@@ -994,7 +994,7 @@ function coeff(a::($etype), exps::Vector{Int})
 end
 
 # Set the coefficient of the term with the given exponent vector to the
-# given fmpz. Removal of a zero term is performed.
+# given ZZRingElem. Removal of a zero term is performed.
 function setcoeff!(a::($etype), exps::Vector{UInt}, b::($ctype))
    ccall((:nmod_mpoly_set_coeff_ui_ui, libflint), Nothing,
          (Ref{($etype)}, UInt, Ptr{UInt}, Ref{($rtype)}),
@@ -1003,7 +1003,7 @@ function setcoeff!(a::($etype), exps::Vector{UInt}, b::($ctype))
 end
 
 # Set the coefficient of the term with the given exponent vector to the
-# given fmpz. Removal of a zero term is performed.
+# given ZZRingElem. Removal of a zero term is performed.
 function setcoeff!(a::($etype), exps::Vector{Int}, b::($ctype))
    ccall((:nmod_mpoly_set_coeff_ui_ui, libflint), Nothing,
          (Ref{($etype)}, UInt, Ptr{Int}, Ref{($rtype)}),
@@ -1061,7 +1061,7 @@ end
 
 promote_rule(::Type{($etype)}, ::Type{V}) where {V <: Integer} = ($etype)
 
-promote_rule(::Type{($etype)}, ::Type{fmpz}) = ($etype)
+promote_rule(::Type{($etype)}, ::Type{ZZRingElem}) = ($etype)
 
 promote_rule(::Type{($etype)}, ::Type{$ctype}) = ($etype)
 
@@ -1134,7 +1134,7 @@ function (R::($rtype))(b::Integer)
    return R(base_ring(R)(b))
 end
 
-function (R::($rtype))(b::fmpz)
+function (R::($rtype))(b::ZZRingElem)
    return R(base_ring(R)(b))
 end
 
@@ -1144,7 +1144,7 @@ function (R::($rtype))(a::($etype))
 end
 
 # Create poly with given array of coefficients and array of exponent vectors (sorting is performed)
-function (R::($rtype))(a::Vector{($ctype)}, b::Vector{Vector{T}}) where {T <: Union{fmpz, UInt}}
+function (R::($rtype))(a::Vector{($ctype)}, b::Vector{Vector{T}}) where {T <: Union{ZZRingElem, UInt}}
    length(a) != length(b) && error("Coefficient and exponent vector must have the same length")
    for i in 1:length(b)
      length(b[i]) != nvars(R) && error("Exponent vector $i has length $(length(b[i])) (expected $(nvars(R))")
@@ -1170,7 +1170,7 @@ function (R::($rtype))(a::Vector, b::Vector{Vector{T}}) where T
    newa = map(base_ring(R), a)
    newb = map(x -> map(FlintZZ, x), b)
    newaa = convert(Vector{($ctype)}, newa)
-   newbb = convert(Vector{Vector{fmpz}}, newb)
+   newbb = convert(Vector{Vector{ZZRingElem}}, newb)
    for i in 1:length(newbb)
       length(newbb[i]) != n && error("Exponent vector $i has length $(length(newbb[i])) (expected $(nvars(R)))")
    end
@@ -1186,20 +1186,20 @@ end #for
 #
 ################################################################################
 
-function divexact(f::gfp_mpoly, a::gfp_elem; check::Bool=true)
+function divexact(f::fpMPolyRingElem, a::fpFieldElem; check::Bool=true)
   ainv = inv(a)
   return ainv * f
 end
 
-function divexact(f::gfp_mpoly, a::IntegerUnion; check::Bool=true)
+function divexact(f::fpMPolyRingElem, a::IntegerUnion; check::Bool=true)
   return divexact(f, base_ring(f)(a))
 end
 
-function divexact(f::nmod_mpoly, a::nmod; check::Bool=true)
+function divexact(f::zzModMPolyRingElem, a::zzModRingElem; check::Bool=true)
   return divexact(f, parent(f)(a))
 end
 
-function divexact(f::nmod_mpoly, a::IntegerUnion; check::Bool=true)
+function divexact(f::zzModMPolyRingElem, a::IntegerUnion; check::Bool=true)
   return divexact(f, base_ring(f)(a))
 end
 
@@ -1209,20 +1209,20 @@ end
 #
 ###############################################################################
 
-function PolynomialRing(R::NmodRing, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
-   parent_obj = NmodMPolyRing(R, s, ordering, cached)
+function PolynomialRing(R::zzModRing, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
+   parent_obj = zzModMPolyRing(R, s, ordering, cached)
    return tuple(parent_obj, gens(parent_obj))
 end
 
-function PolynomialRing(R::NmodRing, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
+function PolynomialRing(R::zzModRing, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
    return PolynomialRing(R, [Symbol(x) for x in s]; cached=cached, ordering=ordering)
 end
 
-function PolynomialRing(R::GaloisField, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
-   parent_obj = GFPMPolyRing(R, s, ordering, cached)
+function PolynomialRing(R::fpField, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
+   parent_obj = fpMPolyRing(R, s, ordering, cached)
    return tuple(parent_obj, gens(parent_obj))   
 end
 
-function PolynomialRing(R::GaloisField, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
+function PolynomialRing(R::fpField, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
    return PolynomialRing(R, [Symbol(x) for x in s]; cached=cached, ordering=ordering)
 end

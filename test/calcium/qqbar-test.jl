@@ -15,15 +15,15 @@
    @test isa(R(), qqbar)
    @test isa(R(2), qqbar)
    @test isa(R(2+3im), qqbar)
-   @test isa(R(fmpz(2)), qqbar)
-   @test isa(R(fmpq(2)), qqbar)
+   @test isa(R(ZZRingElem(2)), qqbar)
+   @test isa(R(QQFieldElem(2)), qqbar)
    @test isa(R(qqbar(2)), qqbar)
 
    @test isa(qqbar(), qqbar)
    @test isa(qqbar(2), qqbar)
    @test isa(qqbar(2+3im), qqbar)
-   @test isa(qqbar(fmpz(2)), qqbar)
-   @test isa(qqbar(fmpq(2)), qqbar)
+   @test isa(qqbar(ZZRingElem(2)), qqbar)
+   @test isa(qqbar(QQFieldElem(2)), qqbar)
 
    x = R(1)
    @test deepcopy(x) !== x
@@ -156,8 +156,8 @@ end
    @test conjugates(qqbar(3)) == [qqbar(3)]
    @test conjugates(u) == [u, -u]
 
-   @test fmpz(qqbar(3)) == 3
-   @test fmpq(qqbar(3) // 2) == fmpq(3,2)
+   @test ZZRingElem(qqbar(3)) == 3
+   @test QQFieldElem(qqbar(3) // 2) == QQFieldElem(3,2)
 
    set_precision!(Balls, 128) do
      RR = ArbField()
@@ -184,51 +184,51 @@ end
 
    @test qqbar(2) + qqbar(3) == 5
    @test qqbar(2) + 3 == 5
-   @test qqbar(2) + fmpz(3) == 5
-   @test qqbar(2) + fmpq(3) == 5
+   @test qqbar(2) + ZZRingElem(3) == 5
+   @test qqbar(2) + QQFieldElem(3) == 5
    @test 3 + qqbar(2) == 5
-   @test fmpz(3) + qqbar(2) == 5
-   @test fmpq(3) + qqbar(2) == 5
+   @test ZZRingElem(3) + qqbar(2) == 5
+   @test QQFieldElem(3) + qqbar(2) == 5
 
    @test qqbar(2) - qqbar(3) == -1
    @test qqbar(2) - 3 == -1
-   @test qqbar(2) - fmpz(3) == -1
-   @test qqbar(2) - fmpq(3) == -1
+   @test qqbar(2) - ZZRingElem(3) == -1
+   @test qqbar(2) - QQFieldElem(3) == -1
    @test 3 - qqbar(2) == 1
-   @test fmpz(3) - qqbar(2) == 1
-   @test fmpq(3) - qqbar(2) == 1
+   @test ZZRingElem(3) - qqbar(2) == 1
+   @test QQFieldElem(3) - qqbar(2) == 1
 
    @test qqbar(2) * qqbar(3) == 6
    @test qqbar(2) * 3 == 6
-   @test qqbar(2) * fmpz(3) == 6
-   @test qqbar(2) * fmpq(3) == 6
+   @test qqbar(2) * ZZRingElem(3) == 6
+   @test qqbar(2) * QQFieldElem(3) == 6
    @test 3 * qqbar(2) == 6
-   @test fmpz(3) * qqbar(2) == 6
-   @test fmpq(3) * qqbar(2) == 6
+   @test ZZRingElem(3) * qqbar(2) == 6
+   @test QQFieldElem(3) * qqbar(2) == 6
 
    @test qqbar(6) // qqbar(2) == 3
    @test qqbar(6) // 2 == 3
-   @test qqbar(6) // fmpz(2) == 3
-   @test qqbar(6) // fmpq(2) == 3
+   @test qqbar(6) // ZZRingElem(2) == 3
+   @test qqbar(6) // QQFieldElem(2) == 3
    @test 6 // qqbar(2) == 3
-   @test fmpz(6) // qqbar(2) == 3
-   @test fmpq(6) // qqbar(2) == 3
+   @test ZZRingElem(6) // qqbar(2) == 3
+   @test QQFieldElem(6) // qqbar(2) == 3
 
    @test qqbar(2) ^ qqbar(3) == 8
    @test qqbar(2) ^ 3 == 8
-   @test qqbar(2) ^ fmpz(3) == 8
-   @test qqbar(2) ^ fmpq(3) == 8
+   @test qqbar(2) ^ ZZRingElem(3) == 8
+   @test qqbar(2) ^ QQFieldElem(3) == 8
    @test 2 ^ qqbar(3) == 8
-   @test fmpz(2) ^ qqbar(3) == 8
-   @test fmpq(2) ^ qqbar(3) == 8
+   @test ZZRingElem(2) ^ qqbar(3) == 8
+   @test QQFieldElem(2) ^ qqbar(3) == 8
 
    @test qqbar(2) < qqbar(3)
    @test qqbar(2) < 3
-   @test qqbar(2) < fmpz(3)
-   @test qqbar(2) < fmpq(3)
+   @test qqbar(2) < ZZRingElem(3)
+   @test qqbar(2) < QQFieldElem(3)
    @test 2 < qqbar(3)
-   @test fmpz(2) < qqbar(3)
-   @test fmpq(2) < qqbar(3)
+   @test ZZRingElem(2) < qqbar(3)
+   @test QQFieldElem(2) < qqbar(3)
 
 end
 

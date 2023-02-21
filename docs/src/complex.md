@@ -142,8 +142,8 @@ Coerce zero into the Arb complex field.
 
 ```
 R(n::Integer)
-R(f::fmpz)
-R(q::fmpq)
+R(f::ZZRingElem)
+R(q::QQFieldElem)
 ```
 
 Coerce an integer or rational value into the Arb complex field.
@@ -248,8 +248,8 @@ contains(::ComplexElem, ::ComplexElem)
 
 ```@docs
 contains(::ComplexElem, ::Integer)
-contains(::ComplexElem, ::fmpz)
-contains(::ComplexElem, ::fmpq)
+contains(::ComplexElem, ::ZZRingElem)
+contains(::ComplexElem, ::QQFieldElem)
 ```
 
 The following functions are also provided for determining if a box intersects
@@ -292,10 +292,10 @@ Function                     |
 -----------------------------|
 `==(x::ComplexElem, y::Integer)`     |
 `==(x::Integer, y::ComplexElem)`     |
-`==(x::ComplexElem, y::fmpz)`        |
-`==(x::fmpz, y::ComplexElem)`        |
-`==(x::arb, y::fmpz)`        |
-`==(x::fmpz, y::arb)`        |
+`==(x::ComplexElem, y::ZZRingElem)`        |
+`==(x::ZZRingElem, y::ComplexElem)`        |
+`==(x::arb, y::ZZRingElem)`        |
+`==(x::ZZRingElem, y::arb)`        |
 `==(x::ComplexElem, y::Float64)`     |
 `==(x::Float64, y::ComplexElem)`     |
 
@@ -480,7 +480,7 @@ eisenstein_g(::Int, ::ComplexElem)
 ```
 
 ```@docs
-hilbert_class_polynomial(::Int, ::FmpzPolyRing)
+hilbert_class_polynomial(::Int, ::ZZPolyRing)
 ```
 
 ```@docs

@@ -1,4 +1,4 @@
-@testset "fmpz_mpoly.constructors" begin
+@testset "ZZMPolyRingElem.constructors" begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -18,28 +18,28 @@
 
       @test nvars(S) == num_vars
 
-      @test elem_type(S) == fmpz_mpoly
-      @test elem_type(FmpzMPolyRing) == fmpz_mpoly
-      @test parent_type(fmpz_mpoly) == FmpzMPolyRing
+      @test elem_type(S) == ZZMPolyRingElem
+      @test elem_type(ZZMPolyRing) == ZZMPolyRingElem
+      @test parent_type(ZZMPolyRingElem) == ZZMPolyRing
 
-      @test typeof(S) <: FmpzMPolyRing
+      @test typeof(S) <: ZZMPolyRing
 
       isa(symbols(S), Vector{Symbol})
 
       for j = 1:num_vars
-         @test isa(varlist[j], fmpz_mpoly)
-         @test isa(gens(S)[j], fmpz_mpoly)
+         @test isa(varlist[j], ZZMPolyRingElem)
+         @test isa(gens(S)[j], ZZMPolyRingElem)
       end
 
       f =  rand(S, 0:5, 0:100, -100:100)
 
-      @test isa(f, fmpz_mpoly)
+      @test isa(f, ZZMPolyRingElem)
 
-      @test isa(S(2), fmpz_mpoly)
+      @test isa(S(2), ZZMPolyRingElem)
 
-      @test isa(S(R(2)), fmpz_mpoly)
+      @test isa(S(R(2)), ZZMPolyRingElem)
 
-      @test isa(S(f), fmpz_mpoly)
+      @test isa(S(f), ZZMPolyRingElem)
 
       V = [(rand(-100:100)) for i in 1:5]
 
@@ -47,7 +47,7 @@
 
       f = S(map(v -> R.(v), V), W0)
 
-      @test isa(f, fmpz_mpoly)
+      @test isa(f, ZZMPolyRingElem)
 
       # Test the BuildCtx
       
@@ -58,7 +58,7 @@
           push_term!(bctx, RR(v), Int.(w0))
         end
         ff = finish(bctx)
-        @test isa(ff, fmpz_mpoly)
+        @test isa(ff, ZZMPolyRingElem)
         @test f == ff
       end
 
@@ -79,7 +79,7 @@
    end
 end
 
-@testset "fmpz_mpoly.printing" begin
+@testset "ZZMPolyRingElem.printing" begin
    S, (x, y) = PolynomialRing(FlintZZ, ["x", "y"])
 
    @test !occursin(r"{", string(S))
@@ -89,21 +89,21 @@ end
    @test string(x) == "x"
    @test string(y) == "y"
 
-   a = fmpz(3)^100
-   b = fmpz(2)^100
+   a = ZZRingElem(3)^100
+   b = ZZRingElem(2)^100
    @test string(x^a + y^b) == "x^$a + y^$b"
 end
 
-@testset "fmpz_mpoly.hash" begin
+@testset "ZZMPolyRingElem.hash" begin
    S, (x, y) = PolynomialRing(FlintZZ, ["x", "y"])
 
-   p = y^fmpz(2)^100
+   p = y^ZZRingElem(2)^100
 
    @test hash(x) == hash((x + y) - y)
    @test hash(x) == hash((x + p) - p)
 end
 
-@testset "fmpz_mpoly.manipulation" begin
+@testset "ZZMPolyRingElem.manipulation" begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -135,9 +135,9 @@ end
       f = rand(S, 1:5, 0:100, -100:100)
 
       if length(f) > 0
-        @test f == sum((coeff(f, i) * S(fmpz[1], [Nemo.exponent_vector(f, i)])  for i in 1:length(f)))
-        @test f == sum((coeff(f, i) * S(fmpz[1], [Nemo.exponent_vector_ui(f, i)])  for i in 1:length(f)))
-        @test f == sum((coeff(f, i) * S(fmpz[1], [Nemo.exponent_vector_fmpz(f, i)])  for i in 1:length(f)))
+        @test f == sum((coeff(f, i) * S(ZZRingElem[1], [Nemo.exponent_vector(f, i)])  for i in 1:length(f)))
+        @test f == sum((coeff(f, i) * S(ZZRingElem[1], [Nemo.exponent_vector_ui(f, i)])  for i in 1:length(f)))
+        @test f == sum((coeff(f, i) * S(ZZRingElem[1], [Nemo.exponent_vector_fmpz(f, i)])  for i in 1:length(f)))
       end
 
       r = S()
@@ -188,7 +188,7 @@ end
       h = S(coeffs, monomialexp)
       @test length(h) == length(monomialexp)
       for k in 1:length(h)
-        @test coeff(h, S(fmpz[1], [monomialexp[k]])) == coeffs[k]
+        @test coeff(h, S(ZZRingElem[1], [monomialexp[k]])) == coeffs[k]
       end
 
       max_degs = max.(monomialexp...)
@@ -215,7 +215,7 @@ end
    @test trailing_coefficient(S()) == 0
 end
 
-@testset "fmpz_mpoly.multivariate_coeff" begin
+@testset "ZZMPolyRingElem.multivariate_coeff" begin
    R = FlintZZ
 
    for ord in Nemo.flint_orderings
@@ -233,7 +233,7 @@ end
    end
 end
 
-@testset "fmpz_mpoly.unary_ops" begin
+@testset "ZZMPolyRingElem.unary_ops" begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -250,7 +250,7 @@ end
    end
 end
 
-@testset "fmpz_mpoly.binary_ops" begin
+@testset "ZZMPolyRingElem.binary_ops" begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -273,7 +273,7 @@ end
    end
 end
 
-@testset "fmpz_mpoly.adhoc_binary" begin
+@testset "ZZMPolyRingElem.adhoc_binary" begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -309,7 +309,7 @@ end
    end
 end
 
-@testset "fmpz_mpoly.adhoc_comparison" begin
+@testset "ZZMPolyRingElem.adhoc_comparison" begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -323,15 +323,15 @@ end
 
          @test S(d) == d
          @test d == S(d)
-         @test S(fmpz(d)) == fmpz(d)
-         @test fmpz(d) == S(fmpz(d))
+         @test S(ZZRingElem(d)) == ZZRingElem(d)
+         @test ZZRingElem(d) == S(ZZRingElem(d))
          @test S(d) == BigInt(d)
          @test BigInt(d) == S(d)
       end
    end
 end
 
-@testset "fmpz_mpoly.powering" begin
+@testset "ZZMPolyRingElem.powering" begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -353,12 +353,12 @@ end
          @test (f == 0 && expn == 0 && f^expn == 0) || f^expn == r
 
          @test_throws DomainError f^-1
-         @test_throws DomainError f^fmpz(-1)
+         @test_throws DomainError f^ZZRingElem(-1)
       end
    end
 end
 
-@testset "fmpz_mpoly.divides" begin
+@testset "ZZMPolyRingElem.divides" begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -387,7 +387,7 @@ end
    end
 end
 
-@testset "fmpz_mpoly.euclidean_division" begin
+@testset "ZZMPolyRingElem.euclidean_division" begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -423,7 +423,7 @@ end
    end
 end
 
-@testset "fmpz_mpoly.ideal_reduction" begin
+@testset "ZZMPolyRingElem.ideal_reduction" begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -472,7 +472,7 @@ end
    end
 end
 
-@testset "fmpz_mpoly.gcd" begin
+@testset "ZZMPolyRingElem.gcd" begin
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -496,7 +496,7 @@ end
    end
 end
 
-@testset "fmpz_mpoly.factor" begin
+@testset "ZZMPolyRingElem.factor" begin
    R, (x, y, z) = PolynomialRing(FlintZZ, ["x", "y", "z"])
 
    function check_factor(a, esum)
@@ -518,7 +518,7 @@ end
    check_factor(-32*x + 32*y, 6)
 end
 
-@testset "fmpz_mpoly.sqrt" begin
+@testset "ZZMPolyRingElem.sqrt" begin
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -542,7 +542,7 @@ end
    end
 end
 
-@testset "fmpz_mpoly.evaluation" begin
+@testset "ZZMPolyRingElem.evaluation" begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -626,7 +626,7 @@ end
    @test f(M1, M2) == T([124 219; 271 480])
 end
 
-@testset "fmpz_mpoly.valuation" begin
+@testset "ZZMPolyRingElem.valuation" begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -664,7 +664,7 @@ end
    end
 end
 
-@testset "fmpz_mpoly.derivative" begin
+@testset "ZZMPolyRingElem.derivative" begin
    R = FlintZZ
 
    for num_vars = 1:10
@@ -684,7 +684,7 @@ end
    end
 end
 
-@testset "fmpz_mpoly.combine_like_terms" begin
+@testset "ZZMPolyRingElem.combine_like_terms" begin
   for num_vars = 1:10
      var_names = ["x$j" for j in 1:num_vars]
      ord = rand_ordering()
@@ -718,7 +718,7 @@ end
   end
 end
 
-@testset "fmpz_mpoly.exponents" begin
+@testset "ZZMPolyRingElem.exponents" begin
   for num_vars = 1:10
      var_names = ["x$j" for j in 1:num_vars]
      ord = rand_ordering()
@@ -764,14 +764,14 @@ end
         end
      end
 
-     f = rand(vars_R)^(fmpz(typemax(UInt)) + 1)
+     f = rand(vars_R)^(ZZRingElem(typemax(UInt)) + 1)
      @test !exponent_vector_fits_int(f, 1)
      @test !exponent_vector_fits_ui(f, 1)
      @test_throws DomainError exponent_vector(f, 1)
   end
 end
 
-@testset "fmpz_mpoly.gcd_with_cofactors" begin
+@testset "ZZMPolyRingElem.gcd_with_cofactors" begin
    R, (x, y, z) = PolynomialRing(ZZ, [:x, :y, :z])
 
    @test gcd_with_cofactors(x, y) == (1, x, y)

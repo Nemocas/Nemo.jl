@@ -41,8 +41,8 @@ then `for (p, e) in a` will iterate through all pairs `(p, e)`, where `p` is a
 factor and `e` the corresponding exponent.
 
 ```@docs
-in(::fmpz, ::Fac{fmpz})
-getindex(::Fac{fmpz}, ::fmpz)
-length(::Fac{fmpz})
-unit(::Fac{fmpz})
+in(::ZZRingElem, ::Fac{ZZRingElem})
+getindex(::Fac{ZZRingElem}, ::ZZRingElem)
+length(::Fac{ZZRingElem})
+unit(::Fac{ZZRingElem})
 ```

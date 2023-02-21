@@ -1,16 +1,16 @@
-@testset "fmpq_mat.constructors" begin
+@testset "QQMatrix.constructors" begin
    S = MatrixSpace(QQ, 3, 3)
 
-   @test elem_type(S) == fmpq_mat
-   @test elem_type(FmpqMatSpace) == fmpq_mat
-   @test parent_type(fmpq_mat) == FmpqMatSpace
+   @test elem_type(S) == QQMatrix
+   @test elem_type(QQMatrixSpace) == QQMatrix
+   @test parent_type(QQMatrix) == QQMatrixSpace
    @test base_ring(S) == FlintQQ
    @test nrows(S) == 3
    @test ncols(S) == 3
 
-   @test isa(S, FmpqMatSpace)
+   @test isa(S, QQMatrixSpace)
 
-   f = S(fmpq(3))
+   f = S(QQFieldElem(3))
 
    @test isa(f, MatElem)
 
@@ -18,11 +18,11 @@
 
    @test isa(g, MatElem)
 
-   h = S(fmpz(5))
+   h = S(ZZRingElem(5))
 
    @test isa(h, MatElem)
 
-   k = S([fmpq(2) 3 5; 1 4 7; 9 6 3])
+   k = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
 
    @test isa(k, MatElem)
 
@@ -30,7 +30,7 @@
 
    @test isa(k, MatElem)
 
-   k = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
+   k = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
    @test isa(k, MatElem)
 
@@ -58,7 +58,7 @@
 
    @test isa(o, MatElem)
 
-   o = S([fmpz(1), 2, 3, 4, 5, 6, 7, 8, 9])
+   o = S([ZZRingElem(1), 2, 3, 4, 5, 6, 7, 8, 9])
 
    @test isa(o, MatElem)
 
@@ -66,7 +66,7 @@
 
    @test isa(o, MatElem)
 
-   o = S([fmpq(1), 2, 3, 4, 5, 6, 7, 8, 9])
+   o = S([QQFieldElem(1), 2, 3, 4, 5, 6, 7, 8, 9])
 
    @test isa(o, MatElem)
 
@@ -78,21 +78,21 @@
 
    @test isa(o, MatElem)
 
-   @test_throws ErrorConstrDimMismatch (S([fmpq(1) 2; 3 4]))
-   @test_throws ErrorConstrDimMismatch (S([fmpq(1), 2, 3, 4]))
-   @test_throws ErrorConstrDimMismatch (S([fmpq(1) 2 3 4; 5 6 7 8; 1 2 3 4]))
-   @test_throws ErrorConstrDimMismatch (S([fmpq(1), 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4]))
+   @test_throws ErrorConstrDimMismatch (S([QQFieldElem(1) 2; 3 4]))
+   @test_throws ErrorConstrDimMismatch (S([QQFieldElem(1), 2, 3, 4]))
+   @test_throws ErrorConstrDimMismatch (S([QQFieldElem(1) 2 3 4; 5 6 7 8; 1 2 3 4]))
+   @test_throws ErrorConstrDimMismatch (S([QQFieldElem(1), 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4]))
 
    arr = [1 2; 3 4]
    arr2 = [1, 2, 3, 4, 5, 6]
 
-   for T in [fmpz, Int, BigInt, Rational{Int}, Rational{BigInt}]
+   for T in [ZZRingElem, Int, BigInt, Rational{Int}, Rational{BigInt}]
       M = matrix(FlintQQ, map(T, arr))
-      @test isa(M, fmpq_mat)
+      @test isa(M, QQMatrix)
       @test M.base_ring == FlintQQ
 
       M2 = matrix(FlintQQ, 2, 3, map(T, arr2))
-      @test isa(M2, fmpq_mat)
+      @test isa(M2, QQMatrix)
       @test M2.base_ring == FlintQQ
       @test nrows(M2) == 2
       @test ncols(M2) == 3
@@ -102,12 +102,12 @@
 
    M3 = zero_matrix(FlintQQ, 2, 3)
 
-   @test isa(M3, fmpq_mat)
+   @test isa(M3, QQMatrix)
    @test M3.base_ring == FlintQQ
 
    M4 = identity_matrix(FlintQQ, 3)
 
-   @test isa(M4, fmpq_mat)
+   @test isa(M4, QQMatrix)
    @test M4.base_ring == FlintQQ
 
    a = zero_matrix(FlintQQ, 2, 2)
@@ -119,16 +119,16 @@
    @test !(a in keys(Dict(b => 1)))
 end
 
-@testset "fmpq_mat.similar" begin
+@testset "QQMatrix.similar" begin
    S = MatrixSpace(QQ, 3, 3)
-   s = S(fmpz(3))
+   s = S(ZZRingElem(3))
 
    t = similar(s)
-   @test t isa fmpq_mat
+   @test t isa QQMatrix
    @test size(t) == size(s)
 
    t = similar(s, 2, 3)
-   @test t isa fmpq_mat
+   @test t isa QQMatrix
    @test size(t) == (2, 3)
 
    for (R, M) in ring_to_mat
@@ -140,34 +140,34 @@ end
    end
 
    # issue #651
-   m = one(Generic.MatSpace{fmpq}(QQ, 2, 2, false))
+   m = one(Generic.MatSpace{QQFieldElem}(QQ, 2, 2, false))
    for n = (m, -m, m*m, m+m, 2m)
-      @test n isa Generic.MatSpaceElem{fmpq}
+      @test n isa Generic.MatSpaceElem{QQFieldElem}
    end
 end
 
-@testset "fmpq_mat.printing" begin
+@testset "QQMatrix.printing" begin
    a = MatrixSpace(QQ, 2, 2)(1)
 
   # test that default Julia printing is not used
   @test !occursin(string(typeof(a)), string(a))
 end
 
-@testset "fmpq_mat.manipulation" begin
+@testset "QQMatrix.manipulation" begin
    S = MatrixSpace(QQ, 3, 3)
-   A = S([fmpq(2) 3 5; 1 4 7; 9 6 3])
-   B = S([fmpq(1) 4 7; 9 6 7; 4 3 3])
+   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
+   B = S([QQFieldElem(1) 4 7; 9 6 7; 4 3 3])
 
    @test iszero(zero(S))
    @test isone(one(S))
 
-   B[1, 1] = fmpz(3)
+   B[1, 1] = ZZRingElem(3)
 
-   @test B[1, 1] == fmpz(3)
+   @test B[1, 1] == ZZRingElem(3)
 
-   B[1, 1] = fmpq(4)
+   B[1, 1] = QQFieldElem(4)
 
-   @test B[1, 1] == fmpq(4)
+   @test B[1, 1] == QQFieldElem(4)
 
    B[1, 1] = BigInt(5)
 
@@ -186,19 +186,19 @@ end
 
    @test deepcopy(A) == A
 
-   a = matrix(FlintQQ, 4, 4, [-1//2 fmpz(2)^100 3 -4; 5 -1//2 fmpz(2)^100 6; 7 5 -1//2 8; 9 10 11 12])
+   a = matrix(FlintQQ, 4, 4, [-1//2 ZZRingElem(2)^100 3 -4; 5 -1//2 ZZRingElem(2)^100 6; 7 5 -1//2 8; 9 10 11 12])
    @test hash(a, UInt(5)) == hash(deepcopy(a), UInt(5))
    @test hash(view(a, 1,1, 2,2)) == hash(view(a, 1,1, 2,2))
 end
 
-@testset "fmpq_mat.view" begin
+@testset "QQMatrix.view" begin
    S = MatrixSpace(QQ, 3, 3)
 
    A = S([1 2 3; 4 5 6; 7 8 9])
 
    B = @inferred view(A, 1, 1, 2, 2)
 
-   @test typeof(B) == fmpq_mat
+   @test typeof(B) == QQMatrix
    @test B == MatrixSpace(QQ, 2, 2)([1 2; 4 5])
 
    B[1, 1] = 10
@@ -206,7 +206,7 @@ end
 
    C = @inferred view(B, 1:2, 1:2)
 
-   @test typeof(C) == fmpq_mat
+   @test typeof(C) == QQMatrix
    @test C == MatrixSpace(QQ, 2, 2)([10 2; 4 5])
 
    C[1, 1] = 20
@@ -219,14 +219,14 @@ end
    @test B[1, 1] == 20
 end
 
-@testset "fmpq_mat.sub" begin
+@testset "QQMatrix.sub" begin
    S = MatrixSpace(FlintQQ, 3, 3)
 
    A = S([1 2 3; 4 5 6; 7 8 9])
 
    B = @inferred sub(A, 1, 1, 2, 2)
 
-   @test typeof(B) == fmpq_mat
+   @test typeof(B) == QQMatrix
    @test B == MatrixSpace(FlintQQ, 2, 2)([1 2; 4 5])
 
    B[1, 1] = 10
@@ -234,7 +234,7 @@ end
 
    C = @inferred sub(B, 1:2, 1:2)
 
-   @test typeof(C) == fmpq_mat
+   @test typeof(C) == QQMatrix
    @test C == MatrixSpace(FlintQQ, 2, 2)([10 2; 4 5])
 
    C[1, 1] = 20
@@ -242,20 +242,20 @@ end
    @test A == S([1 2 3; 4 5 6; 7 8 9])
 end
 
-@testset "fmpq_mat.unary_ops" begin
+@testset "QQMatrix.unary_ops" begin
    S = MatrixSpace(QQ, 3, 3)
 
-   A = S([fmpq(2) 3 5; 1 4 7; 9 6 3])
-   B = S([fmpq(-2) (-3) (-5); (-1) (-4) (-7); (-9) (-6) (-3)])
+   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
+   B = S([QQFieldElem(-2) (-3) (-5); (-1) (-4) (-7); (-9) (-6) (-3)])
 
    @test -A == B
 end
 
-@testset "fmpq_mat.binary_ops" begin
+@testset "QQMatrix.binary_ops" begin
    S = MatrixSpace(QQ, 3, 3)
 
-   A = S([fmpq(2) 3 5; 1 4 7; 9 6 3])
-   B = S([fmpq(1) 4 7; 9 6 7; 4 3 3])
+   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
+   B = S([QQFieldElem(1) 4 7; 9 6 7; 4 3 3])
 
    @test A + B == S([3 7 12; 10 10 14; 13 9 6])
 
@@ -264,121 +264,121 @@ end
    @test A*B == S([49 41 50; 65 49 56; 75 81 114])
 end
 
-@testset "fmpq_mat.adhoc_binary" begin
+@testset "QQMatrix.adhoc_binary" begin
    S = MatrixSpace(QQ, 3, 3)
 
-   A = S([fmpq(2) 3 5; 1 4 7; 9 6 3])
+   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
 
    @test 12 + A == A + 12
    @test BigInt(12) + A == A + 12
-   @test fmpz(11) + A == A + fmpz(11)
-   @test fmpq(11) + A == A + fmpq(11)
-   @test 11//1 + A == A + fmpq(11)
-   @test BigInt(11)//1 + A == A + fmpq(11)
+   @test ZZRingElem(11) + A == A + ZZRingElem(11)
+   @test QQFieldElem(11) + A == A + QQFieldElem(11)
+   @test 11//1 + A == A + QQFieldElem(11)
+   @test BigInt(11)//1 + A == A + QQFieldElem(11)
    @test A - 3 == -(3 - A)
    @test A - BigInt(3) == -(3 - A)
-   @test A - fmpz(7) == -(fmpz(7) - A)
-   @test A - fmpq(7) == -(fmpq(7) - A)
-   @test A - 7//1 == -(fmpq(7) - A)
-   @test A - BigInt(7)//1 == -(fmpq(7) - A)
+   @test A - ZZRingElem(7) == -(ZZRingElem(7) - A)
+   @test A - QQFieldElem(7) == -(QQFieldElem(7) - A)
+   @test A - 7//1 == -(QQFieldElem(7) - A)
+   @test A - BigInt(7)//1 == -(QQFieldElem(7) - A)
    @test 3*A == A*3
    @test BigInt(3)*A == A*3
-   @test fmpz(3)*A == A*fmpz(3)
-   @test fmpq(3)*A == A*fmpq(3)
-   @test (3//1)*A == A*fmpq(3)
-   @test (BigInt(3)//1)*A == A*fmpq(3)
+   @test ZZRingElem(3)*A == A*ZZRingElem(3)
+   @test QQFieldElem(3)*A == A*QQFieldElem(3)
+   @test (3//1)*A == A*QQFieldElem(3)
+   @test (BigInt(3)//1)*A == A*QQFieldElem(3)
 end
 
-@testset "fmpq_mat.kronecker_product" begin
+@testset "QQMatrix.kronecker_product" begin
    S = MatrixSpace(QQ, 2, 3)
    S2 = MatrixSpace(QQ, 2, 2)
    S3 = MatrixSpace(QQ, 3, 3)
 
-   A = S(fmpq[2 3 5; 9 6 3])
-   B = S2(fmpq[2 3; 1 4])
-   C = S3(fmpq[2 3 5; 1 4 7; 9 6 3])
+   A = S(QQFieldElem[2 3 5; 9 6 3])
+   B = S2(QQFieldElem[2 3; 1 4])
+   C = S3(QQFieldElem[2 3 5; 1 4 7; 9 6 3])
 
    @test size(kronecker_product(A, A)) == (4,9)
    @test kronecker_product(B*A,A*C) == kronecker_product(B,A) * kronecker_product(A,C)
 end
 
-@testset "fmpq_mat.comparison" begin
+@testset "QQMatrix.comparison" begin
    S = MatrixSpace(QQ, 3, 3)
 
-   A = S([fmpq(2) 3 5; 1 4 7; 9 6 3])
-   B = S([fmpq(2) 3 5; 1 4 7; 9 6 3])
+   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
+   B = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
 
    @test A == B
 
    @test A != one(S)
 end
 
-@testset "fmpq_mat.adhoc_comparison" begin
+@testset "QQMatrix.adhoc_comparison" begin
    S = MatrixSpace(QQ, 3, 3)
 
-   A = S([fmpq(2) 3 5; 1 4 7; 9 6 3])
+   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
 
    @test S(12) == 12
    @test S(12) == BigInt(12)
-   @test S(5) == fmpz(5)
-   @test S(5) == fmpq(5)
+   @test S(5) == ZZRingElem(5)
+   @test S(5) == QQFieldElem(5)
    @test S(5) == 5//1
    @test S(5) == BigInt(5)//1
    @test 12 == S(12)
    @test BigInt(12) == S(12)
-   @test fmpz(5) == S(5)
-   @test fmpq(5) == S(5)
+   @test ZZRingElem(5) == S(5)
+   @test QQFieldElem(5) == S(5)
    @test 5//1 == S(5)
    @test BigInt(5)//1 == S(5)
    @test A != one(S)
    @test one(S) == one(S)
 end
 
-@testset "fmpq_mat.powering" begin
+@testset "QQMatrix.powering" begin
    S = MatrixSpace(QQ, 3, 3)
 
-   A = S([fmpq(2) 3 5; 1 4 7; 9 6 3])
+   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
 
    @test A^5 == A^2*A^3
 
    @test A^0 == one(S)
 end
 
-@testset "fmpq_mat.adhoc_exact_division" begin
+@testset "QQMatrix.adhoc_exact_division" begin
    S = MatrixSpace(QQ, 3, 3)
 
-   A = S([fmpq(2) 3 5; 1 4 7; 9 6 3])
+   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
 
    @test divexact(5*A, 5) == A
-   @test divexact(12*A, fmpz(12)) == A
-   @test divexact(3*A, fmpq(3)) == A
+   @test divexact(12*A, ZZRingElem(12)) == A
+   @test divexact(3*A, QQFieldElem(3)) == A
    @test divexact(3*A, BigInt(3)) == A
    @test divexact(3*A, 3//1) == A
    @test divexact(3*A, BigInt(3)//1) == A
 end
 
-@testset "fmpq_mat.gso" begin
+@testset "QQMatrix.gso" begin
    S = MatrixSpace(QQ, 3, 3)
 
-   A = S([fmpq(2) 3 5; 1 4 7; 9 6 3])
+   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
 
-   @test gso(A) == S([fmpq(2) fmpq(65, 43) fmpq(18, 23);
-                      fmpq(1) fmpq(140, 43) fmpq(-9, 23);
-                      fmpq(9) fmpq(-30, 43) fmpq(-3, 23)])
+   @test gso(A) == S([QQFieldElem(2) QQFieldElem(65, 43) QQFieldElem(18, 23);
+                      QQFieldElem(1) QQFieldElem(140, 43) QQFieldElem(-9, 23);
+                      QQFieldElem(9) QQFieldElem(-30, 43) QQFieldElem(-3, 23)])
 end
 
-@testset "fmpq_mat.trace" begin
+@testset "QQMatrix.trace" begin
    S = MatrixSpace(QQ, 3, 3)
 
-   A = S([fmpq(2) 3 5; 1 4 7; 9 6 3])
+   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
 
    @test tr(A) == 9
 end
 
-@testset "fmpq_mat.transpose" begin
+@testset "QQMatrix.transpose" begin
    S = MatrixSpace(QQ, 3, 3)
 
-   A = S([fmpq(2) 3 5; 1 4 7; 9 6 3])
+   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
 
    B = transpose(A) + A
 
@@ -389,7 +389,7 @@ end
    @test transpose(C) == C
 end
 
-@testset "fmpq_mat.row_col_swapping" begin
+@testset "QQMatrix.row_col_swapping" begin
    a = matrix(FlintQQ, [1 2; 3 4; 5 6])
 
    @test swap_rows(a, 1, 3) == matrix(FlintQQ, [5 6; 3 4; 1 2])
@@ -426,12 +426,12 @@ end
    @test a == matrix(FlintQQ, [3 2 1; 5 4 3; 7 6 5])
 end
 
-@testset "fmpq_mat.inversion" begin
+@testset "QQMatrix.inversion" begin
    S = MatrixSpace(QQ, 3, 3)
 
-   A = S([fmpq(2) 3 5; 1 4 7; 9 2 2])
+   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 2 2])
    B = S([-6 4 1; 61 (-41) (-9); -34 23 5])
-   C = S([fmpq(3) 1 2; 1 5 1; 4 8 0])
+   C = S([QQFieldElem(3) 1 2; 1 5 1; 4 8 0])
 
    @test inv(inv(A)) == A
 
@@ -449,55 +449,55 @@ end
    @test_throws ErrorException inv(a)
 end
 
-@testset "fmpq_mat.exact_division" begin
+@testset "QQMatrix.exact_division" begin
    S = MatrixSpace(QQ, 3, 3)
 
-   A = S([fmpq(2) 3 5; 1 4 7; 9 2 2])
+   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 2 2])
    B = S([2 3 4; 7 9 1; 5 4 5])
 
    @test divexact(B*A, A) == B
 end
 
-@testset "fmpq_mat.det" begin
+@testset "QQMatrix.det" begin
    S = MatrixSpace(QQ, 3, 3)
 
-   A = S([fmpq(2) 3 5; 1 4 7; 19 3 7])
+   A = S([QQFieldElem(2) 3 5; 1 4 7; 19 3 7])
 
    @test det(A) == 27
 end
 
-@testset "fmpq_mat.hilbert" begin
+@testset "QQMatrix.hilbert" begin
    S = MatrixSpace(QQ, 4, 4)
 
-   c4 = fmpz(2)^2*fmpz(3)
+   c4 = ZZRingElem(2)^2*ZZRingElem(3)
 
-   c8 = fmpz(2)^6*fmpz(3)^5*fmpz(4)^4*fmpz(5)^3*fmpz(6)^2*fmpz(7)
+   c8 = ZZRingElem(2)^6*ZZRingElem(3)^5*ZZRingElem(4)^4*ZZRingElem(5)^3*ZZRingElem(6)^2*ZZRingElem(7)
 
    @test det(hilbert(S)) == c4^4//c8
 end
 
-@testset "fmpq_mat.nullspace" begin
+@testset "QQMatrix.nullspace" begin
    S = MatrixSpace(QQ, 3, 3)
    T = MatrixSpace(QQ, 3, 1)
 
-   A = S([fmpq(2) 3 5; 1 4 7; 4 1 1])
+   A = S([QQFieldElem(2) 3 5; 1 4 7; 4 1 1])
 
-   @test nullspace(A) == (1, T([fmpq(1, 5); fmpq(-9, 5); fmpq(1)]))
+   @test nullspace(A) == (1, T([QQFieldElem(1, 5); QQFieldElem(-9, 5); QQFieldElem(1)]))
 
    r, N = nullspace(A)
 
    @test iszero(A*N)
 end
 
-@testset "fmpq_mat.rank" begin
+@testset "QQMatrix.rank" begin
    S = MatrixSpace(QQ, 3, 3)
 
-   A = S([fmpq(2) 3 5; 1 4 7; 4 1 1])
+   A = S([QQFieldElem(2) 3 5; 1 4 7; 4 1 1])
 
    @test rank(A) == 2
 end
 
-@testset "fmpq_mat.rref" begin
+@testset "QQMatrix.rref" begin
    for iters = 1:50
       m = rand(0:50)
       n = rand(0:50)
@@ -513,19 +513,19 @@ end
  
    S = MatrixSpace(QQ, 3, 3)
 
-   A = S([fmpq(2) 3 5; 1 4 7; 4 1 1])
+   A = S([QQFieldElem(2) 3 5; 1 4 7; 4 1 1])
 
-   @test rref(A) == (2, S([1 0 fmpq(-1, 5); 0 1 fmpq(9, 5); 0 0 0]))
+   @test rref(A) == (2, S([1 0 QQFieldElem(-1, 5); 0 1 QQFieldElem(9, 5); 0 0 0]))
 end
 
-@testset "fmpq_mat.solve" begin
+@testset "QQMatrix.solve" begin
    S = MatrixSpace(QQ, 3, 3)
 
-   A = S([fmpq(2) 3 5; 1 4 7; 9 2 2])
+   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 2 2])
 
    T = MatrixSpace(QQ, 3, 1)
 
-   B = T([fmpq(4), 5, 7])
+   B = T([QQFieldElem(4), 5, 7])
 
    X = solve(A, B)
 
@@ -617,29 +617,29 @@ end
    @test_throws ErrorException can_solve(A, B, side = :garbage)
 end
 
-@testset "fmpq_mat.concat" begin
+@testset "QQMatrix.concat" begin
    S = MatrixSpace(QQ, 3, 3)
    T = MatrixSpace(QQ, 3, 6)
    U = MatrixSpace(QQ, 6, 3)
 
-   A = S([fmpq(2) 3 5; 1 4 7; 9 6 3])
-   B = S([fmpq(1) 4 7; 9 6 7; 4 3 3])
+   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
+   B = S([QQFieldElem(1) 4 7; 9 6 7; 4 3 3])
 
-   @test hcat(A, B) == T([fmpq(2) 3 5 1 4 7; 1 4 7 9 6 7; 9 6 3 4 3 3])
+   @test hcat(A, B) == T([QQFieldElem(2) 3 5 1 4 7; 1 4 7 9 6 7; 9 6 3 4 3 3])
 
-   @test vcat(A, B) == U([fmpq(2) 3 5; 1 4 7; 9 6 3; 1 4 7; 9 6 7; 4 3 3])
+   @test vcat(A, B) == U([QQFieldElem(2) 3 5; 1 4 7; 9 6 3; 1 4 7; 9 6 7; 4 3 3])
 end
 
-@testset "fmpq_mat.charpoly" begin
+@testset "QQMatrix.charpoly" begin
    S = MatrixSpace(QQ, 3, 3)
    R, x = PolynomialRing(QQ, "x")
 
-   A = S([fmpq(2) 3 5; 1 4 7; 9 6 3])
+   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
 
    @test charpoly(R, A) == x^3 - 9*x^2 - 64*x + 30
 end
 
-@testset "fmpq_mat.minpoly" begin
+@testset "QQMatrix.minpoly" begin
    S = MatrixSpace(QQ, 10, 10)
    R, x = PolynomialRing(QQ, "x")
    M = S()
@@ -653,13 +653,13 @@ end
    end
 
    for i in 1:5
-      similarity!(M, rand(1:10), fmpq(rand(-3:3)))
+      similarity!(M, rand(1:10), QQFieldElem(rand(-3:3)))
    end
 
    @test degree(minpoly(R, M)) == 5
 end
 
-@testset "fmpq_mat.rand" begin
+@testset "QQMatrix.rand" begin
    S = MatrixSpace(QQ, 10, 10)
    M = rand(S, 1:9)
    @test parent(M) == S
@@ -670,7 +670,7 @@ end
    end
 end
 
-@testset "fmpq_mat.unsafe" begin
+@testset "QQMatrix.unsafe" begin
    A = matrix(QQ, 2, 3, [1//2 3//4 5//6; 7//8 9//10 11//12])
    @test mul!([QQ(), QQ()], A, [QQ(1), QQ(2), QQ(3)]) == [9//2, 217//40]
    @test mul!([QQ(), QQ()], A, [ZZ(1), ZZ(2), ZZ(3)]) == [9//2, 217//40]

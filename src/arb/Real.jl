@@ -144,12 +144,12 @@ function convert(::Type{BigFloat}, x::RealElem)
 end
 
 @doc Markdown.doc"""
-    fmpz(x::RealElem)
+    ZZRingElem(x::RealElem)
 
-Return $x$ as an `fmpz` if it represents an unique integer, else throws an
+Return $x$ as an `ZZRingElem` if it represents an unique integer, else throws an
 error.
 """
-function fmpz(x::RealElem)
+function ZZRingElem(x::RealElem)
    if is_exact(x)
       ok, z = unique_integer(x)
       ok && return z
@@ -157,12 +157,12 @@ function fmpz(x::RealElem)
    error("Argument must represent a unique integer")
 end
 
-BigInt(x::RealElem) = BigInt(fmpz(x))
+BigInt(x::RealElem) = BigInt(ZZRingElem(x))
 
 function (::Type{T})(x::RealElem) where {T <: Integer}
   typemin(T) <= x <= typemax(T) ||
       error("Argument does not fit inside datatype.")
-  return T(fmpz(x))
+  return T(ZZRingElem(x))
 end
 
 ################################################################################
@@ -225,24 +225,24 @@ end
 #end
 
 @doc Markdown.doc"""
-    contains(x::RealElem, y::fmpq)
+    contains(x::RealElem, y::QQFieldElem)
 
 Returns `true` if the ball $x$ contains the given rational value, otherwise
 return `false`.
 """
-function contains(x::RealElem, y::fmpq)
-  r = ccall((:arb_contains_fmpq, libarb), Cint, (Ref{RealElem}, Ref{fmpq}), x, y)
+function contains(x::RealElem, y::QQFieldElem)
+  r = ccall((:arb_contains_fmpq, libarb), Cint, (Ref{RealElem}, Ref{QQFieldElem}), x, y)
   return Bool(r)
 end
 
 @doc Markdown.doc"""
-    contains(x::RealElem, y::fmpz)
+    contains(x::RealElem, y::ZZRingElem)
 
 Returns `true` if the ball $x$ contains the given integer value, otherwise
 return `false`.
 """
-function contains(x::RealElem, y::fmpz)
-  r = ccall((:arb_contains_fmpz, libarb), Cint, (Ref{RealElem}, Ref{fmpz}), x, y)
+function contains(x::RealElem, y::ZZRingElem)
+  r = ccall((:arb_contains_fmpz, libarb), Cint, (Ref{RealElem}, Ref{ZZRingElem}), x, y)
   return Bool(r)
 end
 
@@ -257,7 +257,7 @@ end
 Returns `true` if the ball $x$ contains the given integer value, otherwise
 return `false`.
 """
-contains(x::RealElem, y::Integer) = contains(x, fmpz(y))
+contains(x::RealElem, y::Integer) = contains(x, ZZRingElem(y))
 
 @doc Markdown.doc"""
     contains(x::RealElem, y::Rational{T}) where {T <: Integer}
@@ -265,7 +265,7 @@ contains(x::RealElem, y::Integer) = contains(x, fmpz(y))
 Returns `true` if the ball $x$ contains the given rational value, otherwise
 return `false`.
 """
-contains(x::RealElem, y::Rational{T}) where {T <: Integer} = contains(x, fmpq(y))
+contains(x::RealElem, y::Rational{T}) where {T <: Integer} = contains(x, QQFieldElem(y))
 
 @doc Markdown.doc"""
     contains(x::RealElem, y::BigFloat)
@@ -387,26 +387,26 @@ end
 <=(x::Int, y::RealElem) = RealElem(x) <= y
 <(x::Int, y::RealElem) = RealElem(x) < y
 
-==(x::RealElem, y::fmpz) = x == RealElem(y)
-!=(x::RealElem, y::fmpz) = x != RealElem(y)
-<=(x::RealElem, y::fmpz) = x <= RealElem(y)
-<(x::RealElem, y::fmpz) = x < RealElem(y)
+==(x::RealElem, y::ZZRingElem) = x == RealElem(y)
+!=(x::RealElem, y::ZZRingElem) = x != RealElem(y)
+<=(x::RealElem, y::ZZRingElem) = x <= RealElem(y)
+<(x::RealElem, y::ZZRingElem) = x < RealElem(y)
 
-==(x::fmpz, y::RealElem) = RealElem(x) == y
-!=(x::fmpz, y::RealElem) = RealElem(x) != y
-<=(x::fmpz, y::RealElem) = RealElem(x) <= y
-<(x::fmpz, y::RealElem) = RealElem(x) < y
+==(x::ZZRingElem, y::RealElem) = RealElem(x) == y
+!=(x::ZZRingElem, y::RealElem) = RealElem(x) != y
+<=(x::ZZRingElem, y::RealElem) = RealElem(x) <= y
+<(x::ZZRingElem, y::RealElem) = RealElem(x) < y
 
-==(x::RealElem, y::Integer) = x == fmpz(y)
-!=(x::RealElem, y::Integer) = x != fmpz(y)
-<=(x::RealElem, y::Integer) = x <= fmpz(y)
-<(x::RealElem, y::Integer) = x < fmpz(y)
+==(x::RealElem, y::Integer) = x == ZZRingElem(y)
+!=(x::RealElem, y::Integer) = x != ZZRingElem(y)
+<=(x::RealElem, y::Integer) = x <= ZZRingElem(y)
+<(x::RealElem, y::Integer) = x < ZZRingElem(y)
 
 
-==(x::Integer, y::RealElem) = fmpz(x) == y
-!=(x::Integer, y::RealElem) = fmpz(x) != y
-<=(x::Integer, y::RealElem) = fmpz(x) <= y
-<(x::Integer, y::RealElem) = fmpz(x) < y
+==(x::Integer, y::RealElem) = ZZRingElem(x) == y
+!=(x::Integer, y::RealElem) = ZZRingElem(x) != y
+<=(x::Integer, y::RealElem) = ZZRingElem(x) <= y
+<(x::Integer, y::RealElem) = ZZRingElem(x) < y
 
 ==(x::RealElem, y::Float64) = x == RealElem(y)
 !=(x::RealElem, y::Float64) = x != RealElem(y)
@@ -428,25 +428,25 @@ end
 <=(x::BigFloat, y::RealElem) = RealElem(x) <= y
 <(x::BigFloat, y::RealElem) = RealElem(x) < y
 
-==(x::RealElem, y::fmpq) = x == RealElem(y, precision(Balls))
-!=(x::RealElem, y::fmpq) = x != RealElem(y, precision(Balls))
-<=(x::RealElem, y::fmpq) = x <= RealElem(y, precision(Balls))
-<(x::RealElem, y::fmpq) = x < RealElem(y, precision(Balls))
+==(x::RealElem, y::QQFieldElem) = x == RealElem(y, precision(Balls))
+!=(x::RealElem, y::QQFieldElem) = x != RealElem(y, precision(Balls))
+<=(x::RealElem, y::QQFieldElem) = x <= RealElem(y, precision(Balls))
+<(x::RealElem, y::QQFieldElem) = x < RealElem(y, precision(Balls))
 
-==(x::fmpq, y::RealElem) = RealElem(x, precision(Balls)) == y
-!=(x::fmpq, y::RealElem) = RealElem(x, precision(Balls)) != y
-<=(x::fmpq, y::RealElem) = RealElem(x, precision(Balls)) <= y
-<(x::fmpq, y::RealElem) = RealElem(x, precision(Balls)) < y
+==(x::QQFieldElem, y::RealElem) = RealElem(x, precision(Balls)) == y
+!=(x::QQFieldElem, y::RealElem) = RealElem(x, precision(Balls)) != y
+<=(x::QQFieldElem, y::RealElem) = RealElem(x, precision(Balls)) <= y
+<(x::QQFieldElem, y::RealElem) = RealElem(x, precision(Balls)) < y
 
-==(x::RealElem, y::Rational{T}) where {T <: Integer} = x == fmpq(y)
-!=(x::RealElem, y::Rational{T}) where {T <: Integer} = x != fmpq(y)
-<=(x::RealElem, y::Rational{T}) where {T <: Integer} = x <= fmpq(y)
-<(x::RealElem, y::Rational{T}) where {T <: Integer} = x < fmpq(y)
+==(x::RealElem, y::Rational{T}) where {T <: Integer} = x == QQFieldElem(y)
+!=(x::RealElem, y::Rational{T}) where {T <: Integer} = x != QQFieldElem(y)
+<=(x::RealElem, y::Rational{T}) where {T <: Integer} = x <= QQFieldElem(y)
+<(x::RealElem, y::Rational{T}) where {T <: Integer} = x < QQFieldElem(y)
 
-==(x::Rational{T}, y::RealElem) where {T <: Integer} = fmpq(x) == y
-!=(x::Rational{T}, y::RealElem) where {T <: Integer} = fmpq(x) != y
-<=(x::Rational{T}, y::RealElem) where {T <: Integer} = fmpq(x) <= y
-<(x::Rational{T}, y::RealElem) where {T <: Integer} = fmpq(x) < y
+==(x::Rational{T}, y::RealElem) where {T <: Integer} = QQFieldElem(x) == y
+!=(x::Rational{T}, y::RealElem) where {T <: Integer} = QQFieldElem(x) != y
+<=(x::Rational{T}, y::RealElem) where {T <: Integer} = QQFieldElem(x) <= y
+<(x::Rational{T}, y::RealElem) where {T <: Integer} = QQFieldElem(x) < y
 
 ################################################################################
 #
@@ -660,15 +660,15 @@ for (f,s) in ((:+, "add"), (:*, "mul"))
 
     ($f)(x::Int, y::RealElem, prec = precision(Balls)) = ($f)(y, x, prec)
 
-    function ($f)(x::RealElem, y::fmpz, prec = precision(Balls))
+    function ($f)(x::RealElem, y::ZZRingElem, prec = precision(Balls))
       z = RealElem()
       ccall(($("arb_"*s*"_fmpz"), libarb), Nothing,
-                  (Ref{RealElem}, Ref{RealElem}, Ref{fmpz}, Int),
+                  (Ref{RealElem}, Ref{RealElem}, Ref{ZZRingElem}, Int),
                   z, x, y, prec)
       return z
     end
 
-    ($f)(x::fmpz, y::RealElem, prec = precision(Balls)) = ($f)(y, x, prec)
+    ($f)(x::ZZRingElem, y::RealElem, prec = precision(Balls)) = ($f)(y, x, prec)
   end
 end
 
@@ -699,31 +699,31 @@ end
 
 -(x::Int, y::RealElem) = -(y - x)
 
-function -(x::RealElem, y::fmpz, prec = precision(Balls))
+function -(x::RealElem, y::ZZRingElem, prec = precision(Balls))
   z = RealElem()
   ccall((:arb_sub_fmpz, libarb), Nothing,
-              (Ref{RealElem}, Ref{RealElem}, Ref{fmpz}, Int),
+              (Ref{RealElem}, Ref{RealElem}, Ref{ZZRingElem}, Int),
               z, x, y, prec)
   return z
 end
 
--(x::fmpz, y::RealElem) = -(y-x)
+-(x::ZZRingElem, y::RealElem) = -(y-x)
 
-+(x::RealElem, y::Integer) = x + fmpz(y)
++(x::RealElem, y::Integer) = x + ZZRingElem(y)
 
--(x::RealElem, y::Integer) = x - fmpz(y)
+-(x::RealElem, y::Integer) = x - ZZRingElem(y)
 
-*(x::RealElem, y::Integer) = x*fmpz(y)
+*(x::RealElem, y::Integer) = x*ZZRingElem(y)
 
-//(x::RealElem, y::Integer) = x//fmpz(y)
+//(x::RealElem, y::Integer) = x//ZZRingElem(y)
 
-+(x::Integer, y::RealElem) = fmpz(x) + y
++(x::Integer, y::RealElem) = ZZRingElem(x) + y
 
--(x::Integer, y::RealElem) = fmpz(x) - y
+-(x::Integer, y::RealElem) = ZZRingElem(x) - y
 
-*(x::Integer, y::RealElem) = fmpz(x)*y
+*(x::Integer, y::RealElem) = ZZRingElem(x)*y
 
-//(x::Integer, y::RealElem) = fmpz(x)//y
+//(x::Integer, y::RealElem) = ZZRingElem(x)//y
 
 #function //(x::RealElem, y::arf)
 #  z = RealElem()
@@ -746,10 +746,10 @@ function //(x::RealElem, y::Int, prec = precision(Balls))
   return z
 end
 
-function //(x::RealElem, y::fmpz, prec = precision(Balls))
+function //(x::RealElem, y::ZZRingElem, prec = precision(Balls))
   z = RealElem()
   ccall((:arb_div_fmpz, libarb), Nothing,
-              (Ref{RealElem}, Ref{RealElem}, Ref{fmpz}, Int),
+              (Ref{RealElem}, Ref{RealElem}, Ref{ZZRingElem}, Int),
               z, x, y, prec)
   return z
 end
@@ -769,7 +769,7 @@ function //(x::Int, y::RealElem, prec = precision(Balls))
   return z
 end
 
-function //(x::fmpz, y::RealElem, prec = precision(Balls))
+function //(x::ZZRingElem, y::RealElem, prec = precision(Balls))
   z = parent(y)()
   t = RealElem(x)
   ccall((:arb_div, libarb), Nothing,
@@ -784,15 +784,15 @@ function ^(x::RealElem, y::RealElem, prec = precision(Balls))
   return z
 end
 
-function ^(x::RealElem, y::fmpz, prec = precision(Balls))
+function ^(x::RealElem, y::ZZRingElem, prec = precision(Balls))
   z = RealElem()
   ccall((:arb_pow_fmpz, libarb), Nothing,
-              (Ref{RealElem}, Ref{RealElem}, Ref{fmpz}, Int),
+              (Ref{RealElem}, Ref{RealElem}, Ref{ZZRingElem}, Int),
               z, x, y, prec)
   return z
 end
 
-^(x::RealElem, y::Integer, prec = precision(Balls)) = ^(x, fmpz(y), prec)
+^(x::RealElem, y::Integer, prec = precision(Balls)) = ^(x, ZZRingElem(y), prec)
 
 function ^(x::RealElem, y::UInt, prec = precision(Balls))
   z = RealElem()
@@ -801,23 +801,23 @@ function ^(x::RealElem, y::UInt, prec = precision(Balls))
   return z
 end
 
-function ^(x::RealElem, y::fmpq, prec = precision(Balls))
+function ^(x::RealElem, y::QQFieldElem, prec = precision(Balls))
   z = RealElem()
   ccall((:arb_pow_fmpq, libarb), Nothing,
-              (Ref{RealElem}, Ref{RealElem}, Ref{fmpq}, Int),
+              (Ref{RealElem}, Ref{RealElem}, Ref{QQFieldElem}, Int),
               z, x, y, prec)
   return z
 end
 
-+(x::fmpq, y::RealElem) = parent(y)(x) + y
-+(x::RealElem, y::fmpq) = x + parent(x)(y)
--(x::fmpq, y::RealElem) = parent(y)(x) - y
-//(x::RealElem, y::fmpq) = x//parent(x)(y)
-//(x::fmpq, y::RealElem) = parent(y)(x)//y
--(x::RealElem, y::fmpq) = x - parent(x)(y)
-*(x::fmpq, y::RealElem) = parent(y)(x) * y
-*(x::RealElem, y::fmpq) = x * parent(x)(y)
-^(x::fmpq, y::RealElem) = parent(y)(x) ^ y
++(x::QQFieldElem, y::RealElem) = parent(y)(x) + y
++(x::RealElem, y::QQFieldElem) = x + parent(x)(y)
+-(x::QQFieldElem, y::RealElem) = parent(y)(x) - y
+//(x::RealElem, y::QQFieldElem) = x//parent(x)(y)
+//(x::QQFieldElem, y::RealElem) = parent(y)(x)//y
+-(x::RealElem, y::QQFieldElem) = x - parent(x)(y)
+*(x::QQFieldElem, y::RealElem) = parent(y)(x) * y
+*(x::RealElem, y::QQFieldElem) = x * parent(x)(y)
+^(x::QQFieldElem, y::RealElem) = parent(y)(x) ^ y
 
 +(x::Float64, y::RealElem) = parent(y)(x) + y
 +(x::RealElem, y::Float64) = x + parent(x)(y)
@@ -841,26 +841,26 @@ end
 ^(x::BigFloat, y::RealElem) = parent(y)(x) ^ y
 ^(x::RealElem, y::BigFloat) = x ^ parent(x)(y)
 
-+(x::Rational{T}, y::RealElem) where {T <: Integer} = fmpq(x) + y
-+(x::RealElem, y::Rational{T}) where {T <: Integer} = x + fmpq(y)
--(x::Rational{T}, y::RealElem) where {T <: Integer} = fmpq(x) - y
--(x::RealElem, y::Rational{T}) where {T <: Integer} = x - fmpq(y)
-//(x::Rational{T}, y::RealElem) where {T <: Integer} = fmpq(x)//y
-//(x::RealElem, y::Rational{T}) where {T <: Integer} = x//fmpq(y)
-*(x::Rational{T}, y::RealElem) where {T <: Integer} = fmpq(x) * y
-*(x::RealElem, y::Rational{T}) where {T <: Integer} = x * fmpq(y)
-^(x::Rational{T}, y::RealElem) where {T <: Integer} = fmpq(x) ^ y
-^(x::RealElem, y::Rational{T}) where {T <: Integer} = x ^ fmpq(y)
++(x::Rational{T}, y::RealElem) where {T <: Integer} = QQFieldElem(x) + y
++(x::RealElem, y::Rational{T}) where {T <: Integer} = x + QQFieldElem(y)
+-(x::Rational{T}, y::RealElem) where {T <: Integer} = QQFieldElem(x) - y
+-(x::RealElem, y::Rational{T}) where {T <: Integer} = x - QQFieldElem(y)
+//(x::Rational{T}, y::RealElem) where {T <: Integer} = QQFieldElem(x)//y
+//(x::RealElem, y::Rational{T}) where {T <: Integer} = x//QQFieldElem(y)
+*(x::Rational{T}, y::RealElem) where {T <: Integer} = QQFieldElem(x) * y
+*(x::RealElem, y::Rational{T}) where {T <: Integer} = x * QQFieldElem(y)
+^(x::Rational{T}, y::RealElem) where {T <: Integer} = QQFieldElem(x) ^ y
+^(x::RealElem, y::Rational{T}) where {T <: Integer} = x ^ QQFieldElem(y)
 
 /(x::RealElem, y::RealElem) = x // y
-/(x::fmpz, y::RealElem) = x // y
-/(x::RealElem, y::fmpz) = x // y
+/(x::ZZRingElem, y::RealElem) = x // y
+/(x::RealElem, y::ZZRingElem) = x // y
 /(x::Int, y::RealElem) = x // y
 /(x::RealElem, y::Int) = x // y
 /(x::UInt, y::RealElem) = x // y
 /(x::RealElem, y::UInt) = x // y
-/(x::fmpq, y::RealElem) = x // y
-/(x::RealElem, y::fmpq) = x // y
+/(x::QQFieldElem, y::RealElem) = x // y
+/(x::RealElem, y::QQFieldElem) = x // y
 /(x::Float64, y::RealElem) = x // y
 /(x::RealElem, y::Float64) = x // y
 /(x::BigFloat, y::RealElem) = x // y
@@ -869,14 +869,14 @@ end
 /(x::RealElem, y::Rational{T}) where {T <: Integer} = x // y
 
 divexact(x::RealElem, y::RealElem; check::Bool=true) = x // y
-divexact(x::fmpz, y::RealElem; check::Bool=true) = x // y
-divexact(x::RealElem, y::fmpz; check::Bool=true) = x // y
+divexact(x::ZZRingElem, y::RealElem; check::Bool=true) = x // y
+divexact(x::RealElem, y::ZZRingElem; check::Bool=true) = x // y
 divexact(x::Int, y::RealElem; check::Bool=true) = x // y
 divexact(x::RealElem, y::Int; check::Bool=true) = x // y
 divexact(x::UInt, y::RealElem; check::Bool=true) = x // y
 divexact(x::RealElem, y::UInt; check::Bool=true) = x // y
-divexact(x::fmpq, y::RealElem; check::Bool=true) = x // y
-divexact(x::RealElem, y::fmpq; check::Bool=true) = x // y
+divexact(x::QQFieldElem, y::RealElem; check::Bool=true) = x // y
+divexact(x::RealElem, y::QQFieldElem; check::Bool=true) = x // y
 divexact(x::Float64, y::RealElem; check::Bool=true) = x // y
 divexact(x::RealElem, y::Float64; check::Bool=true) = x // y
 divexact(x::BigFloat, y::RealElem; check::Bool=true) = x // y
@@ -922,10 +922,10 @@ function ldexp(x::RealElem, y::Int)
   return z
 end
 
-function ldexp(x::RealElem, y::fmpz)
+function ldexp(x::RealElem, y::ZZRingElem)
   z = RealElem()
   ccall((:arb_mul_2exp_fmpz, libarb), Nothing,
-              (Ref{RealElem}, Ref{RealElem}, Ref{fmpz}), z, x, y)
+              (Ref{RealElem}, Ref{RealElem}, Ref{ZZRingElem}), z, x, y)
   return z
 end
 
@@ -950,20 +950,20 @@ end
 @doc Markdown.doc"""
     unique_integer(x::RealElem)
 
-Return a pair where the first value is a boolean and the second is an `fmpz`
+Return a pair where the first value is a boolean and the second is an `ZZRingElem`
 integer. The boolean indicates whether the interval $x$ contains a unique
 integer. If this is the case, the second return value is set to this unique
 integer.
 """
 function unique_integer(x::RealElem)
-  z = fmpz()
+  z = ZZRingElem()
   unique = ccall((:arb_get_unique_fmpz, libarb), Int,
-    (Ref{fmpz}, Ref{RealElem}), z, x)
+    (Ref{ZZRingElem}, Ref{RealElem}), z, x)
   return (unique != 0, z)
 end
 
-function (::FlintIntegerRing)(a::RealElem)
-   return fmpz(a)
+function (::ZZRing)(a::RealElem)
+   return ZZRingElem(a)
 end
 
 @doc Markdown.doc"""
@@ -1101,7 +1101,7 @@ function floor(x::RealElem, prec = precision(Balls))
 end
 
 floor(::Type{RealElem}, x::RealElem) = floor(x)
-floor(::Type{fmpz}, x::RealElem) = fmpz(floor(x))
+floor(::Type{ZZRingElem}, x::RealElem) = ZZRingElem(floor(x))
 floor(::Type{T}, x::RealElem) where {T <: Integer} = T(floor(x))
 
 function ceil(x::RealElem, prec = precision(Balls))
@@ -1111,7 +1111,7 @@ function ceil(x::RealElem, prec = precision(Balls))
 end
 
 ceil(::Type{RealElem}, x::RealElem) = ceil(x)
-ceil(::Type{fmpz}, x::RealElem) = fmpz(ceil(x))
+ceil(::Type{ZZRingElem}, x::RealElem) = ZZRingElem(ceil(x))
 ceil(::Type{T}, x::RealElem) where {T <: Integer} = T(ceil(x))
 
 function Base.sqrt(x::RealElem, prec = precision(Balls); check::Bool=true)
@@ -1409,25 +1409,25 @@ function sincospi(x::RealElem, prec = precision(Balls))
   return (s, c)
 end
 
-function sinpi(x::fmpq, r::RealField, prec = precision(Balls))
+function sinpi(x::QQFieldElem, r::RealField, prec = precision(Balls))
   z = r()
   ccall((:arb_sin_pi_fmpq, libarb), Nothing,
-        (Ref{RealElem}, Ref{fmpq}, Int), z, x, prec)
+        (Ref{RealElem}, Ref{QQFieldElem}, Int), z, x, prec)
   return z
 end
 
-function cospi(x::fmpq, r::RealField, prec = precision(Balls))
+function cospi(x::QQFieldElem, r::RealField, prec = precision(Balls))
   z = r()
   ccall((:arb_cos_pi_fmpq, libarb), Nothing,
-        (Ref{RealElem}, Ref{fmpq}, Int), z, x, prec)
+        (Ref{RealElem}, Ref{QQFieldElem}, Int), z, x, prec)
   return z
 end
 
-function sincospi(x::fmpq, r::RealField, prec = precision(Balls))
+function sincospi(x::QQFieldElem, r::RealField, prec = precision(Balls))
   s = r()
   c = r()
   ccall((:arb_sin_cos_pi_fmpq, libarb), Nothing,
-        (Ref{RealElem}, Ref{RealElem}, Ref{fmpq}, Int), s, c, x, prec)
+        (Ref{RealElem}, Ref{RealElem}, Ref{QQFieldElem}, Int), s, c, x, prec)
   return (s, c)
 end
 
@@ -1548,14 +1548,14 @@ function binomial(n::UInt, k::UInt, r::RealField, prec = precision(Balls))
 end
 
 @doc Markdown.doc"""
-    fibonacci(n::fmpz, r::RealField)
+    fibonacci(n::ZZRingElem, r::RealField)
 
 Return the $n$-th Fibonacci number in the given Arb field.
 """
-function fibonacci(n::fmpz, r::RealField, prec = precision(Balls))
+function fibonacci(n::ZZRingElem, r::RealField, prec = precision(Balls))
   z = r()
   ccall((:arb_fib_fmpz, libarb), Nothing,
-              (Ref{RealElem}, Ref{fmpz}, Int), z, n, prec)
+              (Ref{RealElem}, Ref{ZZRingElem}, Int), z, n, prec)
   return z
 end
 
@@ -1571,29 +1571,29 @@ end
 
 Return the $n$-th Fibonacci number in the given Arb field.
 """
-fibonacci(n::Int, r::RealField, prec = precision(Balls)) = n >= 0 ? fibonacci(UInt(n), r, prec) : fibonacci(fmpz(n), r, prec)
+fibonacci(n::Int, r::RealField, prec = precision(Balls)) = n >= 0 ? fibonacci(UInt(n), r, prec) : fibonacci(ZZRingElem(n), r, prec)
 
 @doc Markdown.doc"""
-    gamma(x::fmpz, r::RealField)
+    gamma(x::ZZRingElem, r::RealField)
 
 Return the Gamma function evaluated at $x$ in the given Arb field.
 """
-function gamma(x::fmpz, r::RealField, prec = precision(Balls))
+function gamma(x::ZZRingElem, r::RealField, prec = precision(Balls))
   z = r()
   ccall((:arb_gamma_fmpz, libarb), Nothing,
-              (Ref{RealElem}, Ref{fmpz}, Int), z, x, prec)
+              (Ref{RealElem}, Ref{ZZRingElem}, Int), z, x, prec)
   return z
 end
 
 @doc Markdown.doc"""
-    gamma(x::fmpq, r::RealField)
+    gamma(x::QQFieldElem, r::RealField)
 
 Return the Gamma function evaluated at $x$ in the given Arb field.
 """
-function gamma(x::fmpq, r::RealField, prec = precision(Balls))
+function gamma(x::QQFieldElem, r::RealField, prec = precision(Balls))
   z = r()
   ccall((:arb_gamma_fmpq, libarb), Nothing,
-              (Ref{RealElem}, Ref{fmpq}, Int), z, x, prec)
+              (Ref{RealElem}, Ref{QQFieldElem}, Int), z, x, prec)
   return z
 end
 
@@ -1641,20 +1641,20 @@ Return the rising factorial $x(x + 1)\ldots (x + n - 1)$ as an Arb.
 """
 rising_factorial(x::RealElem, n::Int, prec = precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : rising_factorial(x, UInt(n), prec)
 
-function rising_factorial(x::fmpq, n::UInt, r::RealField, prec = precision(Balls))
+function rising_factorial(x::QQFieldElem, n::UInt, r::RealField, prec = precision(Balls))
   z = r()
   ccall((:arb_rising_fmpq_ui, libarb), Nothing,
-              (Ref{RealElem}, Ref{fmpq}, UInt, Int), z, x, n, prec)
+              (Ref{RealElem}, Ref{QQFieldElem}, UInt, Int), z, x, n, prec)
   return z
 end
 
 @doc Markdown.doc"""
-    rising_factorial(x::fmpq, n::Int, r::RealField)
+    rising_factorial(x::QQFieldElem, n::Int, r::RealField)
 
 Return the rising factorial $x(x + 1)\ldots (x + n - 1)$ as an element of the
 given Arb field.
 """
-rising_factorial(x::fmpq, n::Int, r::RealField, prec = precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : rising_factorial(x, UInt(n), r, prec)
+rising_factorial(x::QQFieldElem, n::Int, r::RealField, prec = precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : rising_factorial(x, UInt(n), r, prec)
 
 function rising_factorial2(x::RealElem, n::UInt, prec = precision(Balls))
   z = RealElem()
@@ -1751,14 +1751,14 @@ Return the tuple $(U_{n}(x), U_{n-1}(x))$
 chebyshev_u2(n::Int, x::RealElem, prec = precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : chebyshev_u2(UInt(n), x, prec)
 
 @doc Markdown.doc"""
-    bell(n::fmpz, r::RealField)
+    bell(n::ZZRingElem, r::RealField)
 
 Return the Bell number $B_n$ as an element of $r$.
 """
-function bell(n::fmpz, r::RealField, prec = precision(Balls))
+function bell(n::ZZRingElem, r::RealField, prec = precision(Balls))
   z = r()
   ccall((:arb_bell_fmpz, libarb), Nothing,
-              (Ref{RealElem}, Ref{fmpz}, Int), z, n, prec)
+              (Ref{RealElem}, Ref{ZZRingElem}, Int), z, n, prec)
   return z
 end
 
@@ -1767,17 +1767,17 @@ end
 
 Return the Bell number $B_n$ as an element of $r$.
 """
-bell(n::Int, r::RealField, prec = precision(Balls)) = bell(fmpz(n), r, prec)
+bell(n::Int, r::RealField, prec = precision(Balls)) = bell(ZZRingElem(n), r, prec)
 
 @doc Markdown.doc"""
-    numpart(n::fmpz, r::RealField)
+    numpart(n::ZZRingElem, r::RealField)
 
 Return the number of partitions $p(n)$ as an element of $r$.
 """
-function numpart(n::fmpz, r::RealField, prec = precision(Balls))
+function numpart(n::ZZRingElem, r::RealField, prec = precision(Balls))
   z = r()
   ccall((:arb_partitions_fmpz, libarb), Nothing,
-              (Ref{RealElem}, Ref{fmpz}, Int), z, n, prec)
+              (Ref{RealElem}, Ref{ZZRingElem}, Int), z, n, prec)
   return z
 end
 
@@ -1786,7 +1786,7 @@ end
 
 Return the number of partitions $p(n)$ as an element of $r$.
 """
-numpart(n::Int, r::RealField, prec = precision(Balls)) = numpart(fmpz(n), r, prec)
+numpart(n::Int, r::RealField, prec = precision(Balls)) = numpart(ZZRingElem(n), r, prec)
 
 ################################################################################
 #
@@ -1889,19 +1889,19 @@ $a_1/b_1$ is defined to be simpler than $a_2/b_2$ iff $b_1 < b_2$ or $b_1 =
 b_2$ and $a_1 < a_2$.
 """
 function simplest_rational_inside(x::RealElem)
-   a = fmpz()
-   b = fmpz()
-   e = fmpz()
+   a = ZZRingElem()
+   b = ZZRingElem()
+   e = ZZRingElem()
 
    ccall((:arb_get_interval_fmpz_2exp, libarb), Nothing,
-         (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{RealElem}), a, b, e, x)
-   !fits(Int, e) && error("Result does not fit into an fmpq")
+         (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{RealElem}), a, b, e, x)
+   !fits(Int, e) && error("Result does not fit into an QQFieldElem")
    _e = Int(e)
    if e >= 0
       return a << _e
    end
    _e = -_e
-   d = fmpz(1) << _e
+   d = ZZRingElem(1) << _e
    return _fmpq_simplest_between(a, d, b, d)
 end
 
@@ -1956,18 +1956,18 @@ for (typeofx, passtoc) in ((RealElem, Ref{RealElem}), (Ptr{RealElem}, Ptr{RealEl
   end
 
   @eval begin
-    function _arb_set(x::($typeofx), y::fmpz)
-      ccall((:arb_set_fmpz, libarb), Nothing, (($passtoc), Ref{fmpz}), x, y)
+    function _arb_set(x::($typeofx), y::ZZRingElem)
+      ccall((:arb_set_fmpz, libarb), Nothing, (($passtoc), Ref{ZZRingElem}), x, y)
     end
 
-    function _arb_set(x::($typeofx), y::fmpz, p::Int)
+    function _arb_set(x::($typeofx), y::ZZRingElem, p::Int)
       ccall((:arb_set_round_fmpz, libarb), Nothing,
-                  (($passtoc), Ref{fmpz}, Int), x, y, p)
+                  (($passtoc), Ref{ZZRingElem}, Int), x, y, p)
     end
 
-    function _arb_set(x::($typeofx), y::fmpq, p::Int)
+    function _arb_set(x::($typeofx), y::QQFieldElem, p::Int)
       ccall((:arb_set_fmpq, libarb), Nothing,
-                  (($passtoc), Ref{fmpq}, Int), x, y, p)
+                  (($passtoc), Ref{QQFieldElem}, Int), x, y, p)
     end
 
     function _arb_set(x::($typeofx), y::RealElem)
@@ -2020,28 +2020,28 @@ function (r::RealField)()
 end
 
 function (r::RealField)(x::Int, prec = precision(Balls))
-  z = RealElem(fmpz(x), prec)
+  z = RealElem(ZZRingElem(x), prec)
   return z
 end
 
 function (r::RealField)(x::UInt, prec = precision(Balls))
-  z = RealElem(fmpz(x), prec)
+  z = RealElem(ZZRingElem(x), prec)
   return z
 end
 
-function (r::RealField)(x::fmpz, prec = precision(Balls))
+function (r::RealField)(x::ZZRingElem, prec = precision(Balls))
   z = RealElem(x, prec)
   return z
 end
 
-(r::RealField)(x::Integer, prec = precision(Balls)) = r(fmpz(x), prec)
+(r::RealField)(x::Integer, prec = precision(Balls)) = r(ZZRingElem(x), prec)
 
-function (r::RealField)(x::fmpq, prec = precision(Balls))
+function (r::RealField)(x::QQFieldElem, prec = precision(Balls))
   z = RealElem(x, prec)
   return z
 end
 
-(r::RealField)(x::Rational{T}, prec = precision(Balls)) where {T <: Integer} = r(fmpq(x), prec)
+(r::RealField)(x::Rational{T}, prec = precision(Balls)) where {T <: Integer} = r(QQFieldElem(x), prec)
 
 function (r::RealField)(x::Float64, prec = precision(Balls))
   z = RealElem(x, prec)

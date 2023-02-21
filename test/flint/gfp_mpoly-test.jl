@@ -1,4 +1,4 @@
-@testset "gfp_mpoly.constructors" begin
+@testset "fpMPolyRingElem.constructors" begin
    R = GF(23)
 
    for num_vars = 1:10
@@ -21,28 +21,28 @@
       @test modulus(S) == modulus(R)
       @test modulus(varlist[1]) == modulus(R)
 
-      @test elem_type(S) == gfp_mpoly
-      @test elem_type(GFPMPolyRing) == gfp_mpoly
-      @test parent_type(gfp_mpoly) == GFPMPolyRing
+      @test elem_type(S) == fpMPolyRingElem
+      @test elem_type(fpMPolyRing) == fpMPolyRingElem
+      @test parent_type(fpMPolyRingElem) == fpMPolyRing
 
-      @test typeof(S) <: GFPMPolyRing
+      @test typeof(S) <: fpMPolyRing
 
       isa(symbols(S), Vector{Symbol})
 
       for j = 1:num_vars
-         @test isa(varlist[j], gfp_mpoly)
-         @test isa(gens(S)[j], gfp_mpoly)
+         @test isa(varlist[j], fpMPolyRingElem)
+         @test isa(gens(S)[j], fpMPolyRingElem)
       end
 
       f =  rand(S, 0:5, 0:100)
 
-      @test isa(f, gfp_mpoly)
+      @test isa(f, fpMPolyRingElem)
 
-      @test isa(S(2), gfp_mpoly)
+      @test isa(S(2), fpMPolyRingElem)
 
-      @test isa(S(R(2)), gfp_mpoly)
+      @test isa(S(R(2)), fpMPolyRingElem)
 
-      @test isa(S(f), gfp_mpoly)
+      @test isa(S(f), fpMPolyRingElem)
 
       V = [(rand(-100:100)) for i in 1:5]
 
@@ -50,7 +50,7 @@
 
       f = S(map(v -> R.(v), V), W0)
 
-      @test isa(f, gfp_mpoly)
+      @test isa(f, fpMPolyRingElem)
 
       # Test the BuildCtx
       
@@ -61,7 +61,7 @@
           push_term!(bctx, RR(v), Int.(w0))
         end
         ff = finish(bctx)
-        @test isa(ff, gfp_mpoly)
+        @test isa(ff, fpMPolyRingElem)
         @test f == ff
       end
 
@@ -85,7 +85,7 @@
    @test_throws ErrorException push_term!(M, one(RR), zeros(Int, 2))
 end
 
-@testset "gfp_mpoly.printing" begin
+@testset "fpMPolyRingElem.printing" begin
    S, (x, y) = PolynomialRing(GF(23), ["x", "y"])
 
    @test !occursin(r"{", string(S))
@@ -96,7 +96,7 @@ end
    @test string(y) == "y"
 end
 
-@testset "gfp_mpoly.manipulation" begin
+@testset "fpMPolyRingElem.manipulation" begin
    R = GF(23)
 
    for num_vars = 1:10
@@ -228,7 +228,7 @@ end
    @test trailing_coefficient(S()) == 0
 end
 
-@testset "gfp_mpoly.multivariate_coeff" begin
+@testset "fpMPolyRingElem.multivariate_coeff" begin
    R = GF(23)
 
    for ord in Nemo.flint_orderings
@@ -246,7 +246,7 @@ end
    end
 end
 
-@testset "gfp_mpoly.unary_ops" begin
+@testset "fpMPolyRingElem.unary_ops" begin
    R = GF(23)
 
    for num_vars = 1:10
@@ -263,7 +263,7 @@ end
    end
 end
 
-@testset "gfp_mpoly.binary_ops" begin
+@testset "fpMPolyRingElem.binary_ops" begin
    R = GF(23)
 
    for num_vars = 1:10
@@ -286,7 +286,7 @@ end
    end
 end
 
-@testset "gfp_mpoly.adhoc_binary" begin
+@testset "fpMPolyRingElem.adhoc_binary" begin
    R = GF(23)
 
    for num_vars = 1:10
@@ -322,7 +322,7 @@ end
    end
 end
 
-@testset "gfp_mpoly.adhoc_comparison" begin
+@testset "fpMPolyRingElem.adhoc_comparison" begin
    R = GF(23)
 
    for num_vars = 1:10
@@ -336,15 +336,15 @@ end
 
          @test S(d) == d
          @test d == S(d)
-         @test S(fmpz(d)) == fmpz(d)
-         @test fmpz(d) == S(fmpz(d))
+         @test S(ZZRingElem(d)) == ZZRingElem(d)
+         @test ZZRingElem(d) == S(ZZRingElem(d))
          @test S(d) == BigInt(d)
          @test BigInt(d) == S(d)
       end
    end
 end
 
-@testset "gfp_mpoly.powering" begin
+@testset "fpMPolyRingElem.powering" begin
    R = GF(23)
 
    for num_vars = 1:10
@@ -366,12 +366,12 @@ end
          @test (f == 0 && expn == 0 && f^expn == 0) || f^expn == r
 
          @test_throws DomainError f^-1
-         @test_throws DomainError f^fmpz(-1)
+         @test_throws DomainError f^ZZRingElem(-1)
       end
    end
 end
 
-@testset "gfp_mpoly.divides" begin
+@testset "fpMPolyRingElem.divides" begin
    R = GF(23)
 
    for num_vars = 1:10
@@ -386,7 +386,7 @@ end
 
          @test iszero(f) || !divides(f, S(0))[1]
          @test divexact(2*f, 2) == f
-         @test divexact(2*f, fmpz(2)) == f
+         @test divexact(2*f, ZZRingElem(2)) == f
          @test divexact(R(2)*f, R(2)) == f
 
          p = f*g
@@ -405,7 +405,7 @@ end
    end
 end
 
-@testset "gfp_mpoly.euclidean_division" begin
+@testset "fpMPolyRingElem.euclidean_division" begin
    R = GF(23)
 
    for num_vars = 1:10
@@ -441,7 +441,7 @@ end
    end
 end
 
-@testset "gfp_mpoly.ideal_reduction" begin
+@testset "fpMPolyRingElem.ideal_reduction" begin
    R = GF(23)
 
    for num_vars = 1:10
@@ -490,7 +490,7 @@ end
    end
 end
 
-@testset "gfp_mpoly.gcd" begin
+@testset "fpMPolyRingElem.gcd" begin
    R = GF(23)
 
    for num_vars = 1:4
@@ -516,7 +516,7 @@ end
    end
 end
 
-@testset "gfp_mpoly.factor" begin
+@testset "fpMPolyRingElem.factor" begin
    R = GF(23)
    R, (x, y, z) = PolynomialRing(R, ["x", "y", "z"])
 
@@ -535,7 +535,7 @@ end
    check_factor(x^99-y^99*z^33, 22)
 end
 
-@testset "gfp_mpoly.sqrt" begin
+@testset "fpMPolyRingElem.sqrt" begin
    R = GF(23)
 
    for num_vars = 1:4
@@ -561,7 +561,7 @@ end
    end
 end
 
-@testset "gfp_mpoly.evaluation" begin
+@testset "fpMPolyRingElem.evaluation" begin
    R = GF(23)
 
    for num_vars = 1:10
@@ -645,11 +645,11 @@ end
 
    @test f(M1, M2) == T([9 12; 18 20])
 
-   @test evaluate(f, [fmpz(20), fmpz(30)]) == R(20^2*30^2+2*20+1)
+   @test evaluate(f, [ZZRingElem(20), ZZRingElem(30)]) == R(20^2*30^2+2*20+1)
    @test evaluate(f, [UInt(20), UInt(30)]) == R(20^2*30^2+2*20+1)
 end
 
-@testset "gfp_mpoly.valuation" begin
+@testset "fpMPolyRingElem.valuation" begin
    R = GF(23)
 
    for num_vars = 1:10
@@ -687,7 +687,7 @@ end
    end
 end
 
-@testset "gfp_mpoly.derivative" begin
+@testset "fpMPolyRingElem.derivative" begin
    R = GF(23)
 
    for num_vars = 1:10
@@ -707,7 +707,7 @@ end
    end
 end
 
-@testset "gfp_mpoly.unsafe" begin
+@testset "fpMPolyRingElem.unsafe" begin
   R23 = GF(23)
 
   for num_vars = 1:10
@@ -747,12 +747,12 @@ end
    f = one(S)
    zero!(f)
    setcoeff!(f, 1, 1)
-   set_exponent_vector!(f, 1, [fmpz(1), fmpz(0)])
+   set_exponent_vector!(f, 1, [ZZRingElem(1), ZZRingElem(0)])
    set_exponent_vector!(f, 2, [UInt(0), UInt(1)])
    setcoeff!(f, 2, 2)
    setcoeff!(f, 3, 3)
    set_exponent_vector!(f, 3, [UInt(2), UInt(0)])
-   set_exponent_vector!(f, 4, [fmpz(0), fmpz(2)])
+   set_exponent_vector!(f, 4, [ZZRingElem(0), ZZRingElem(2)])
    setcoeff!(f, 4, 4)
    sort_terms!(f)
    @test f == 1*x+2*y+3*x^2+4*y^2
@@ -765,7 +765,7 @@ end
    @test f == (y^2 + x*y + x^2)*x
 end
 
-@testset "gfp_mpoly.exponents" begin
+@testset "fpMPolyRingElem.exponents" begin
   R23 = GF(23)
 
   for num_vars = 1:10
@@ -812,7 +812,7 @@ end
         end
      end
 
-     f = rand(vars_R)^(fmpz(typemax(UInt)) + 1)
+     f = rand(vars_R)^(ZZRingElem(typemax(UInt)) + 1)
      @test !exponent_vector_fits_int(f, 1)
      @test !exponent_vector_fits_ui(f, 1)
      @test_throws DomainError exponent_vector(f, 1)
@@ -833,21 +833,21 @@ end
    m = [[0,0], [1,0], [0,1]]
    @test S([R23(0), R23(1), R23(2)], m) == 1*x+2*y
 
-   m = [[fmpz(0),fmpz(0)], [fmpz(1),fmpz(0)], [fmpz(0),fmpz(1)]]
+   m = [[ZZRingElem(0),ZZRingElem(0)], [ZZRingElem(1),ZZRingElem(0)], [ZZRingElem(0),ZZRingElem(1)]]
    @test S([R23(0), R23(1), R23(2)], m) == 1*x+2*y
 
    m = [[BigInt(0),BigInt(0)], [BigInt(1),BigInt(0)], [BigInt(0),BigInt(1)]]
    @test S([BigInt(0), BigInt(1), BigInt(2)], m) == 1*x+2*y
 end
 
-@testset "gfp_mpoly.promote_rule" begin
+@testset "fpMPolyRingElem.promote_rule" begin
   R = GF(2)
   Rx, (x, ) = PolynomialRing(R, ["x"])
   Sy, (y, ) = PolynomialRing(Rx, ["y"])
   @test y == @inferred (R(1) * y)
 end
 
-@testset "gfp_mpoly.gcd_with_cofactors" begin
+@testset "fpMPolyRingElem.gcd_with_cofactors" begin
    R, (x, y, z) = PolynomialRing(GF(23), [:x, :y, :z])
 
    @test gcd_with_cofactors(x, y) == (1, x, y)

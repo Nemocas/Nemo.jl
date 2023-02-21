@@ -1,7 +1,7 @@
 @testset "fq_default_embed.embed" begin
 
     for i in 1:10
-        p = fmpz(next_prime(rand(1:999)))
+        p = ZZRingElem(next_prime(rand(1:999)))
 
         k1, x1 = NGFiniteField(p, 1, "x1")
         k2, x2 = NGFiniteField(p, 2, "x2")
@@ -78,7 +78,7 @@ end
 @testset "fq_default_embed.preimage_map" begin
 
     for i in 1:10
-        p = fmpz(next_prime(rand(1:999)))
+        p = ZZRingElem(next_prime(rand(1:999)))
 
         a, b = rand(1:5), rand(1:5)
         ka, xa = NGFiniteField(p, a, "xa")
@@ -105,7 +105,7 @@ end
             p = rand(S)
         end
         pop!(S, p)
-        p = fmpz(p)
+        p = ZZRingElem(p)
 
         F = NGFiniteField(p, 4, "s")[1]
         Z = GF(p)

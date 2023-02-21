@@ -1,38 +1,38 @@
-function test_elem(R::Nemo.NmodRing)
+function test_elem(R::Nemo.zzModRing)
    return R(rand(Int))
 end
 
-@testset "nmod.conformance_tests" begin
-   # TODO: using test_Ring_interface_recursive below fails because nmod_poly does
+@testset "zzModRingElem.conformance_tests" begin
+   # TODO: using test_Ring_interface_recursive below fails because zzModPolyRingElem does
    # not support initialization from arbitrary Integer subtypes such as BigInt
    for i in [1, 6, 13, 2^8, 2^16, 2^32, next_prime(2^8), next_prime(2^16), next_prime(2^32)]
       test_Ring_interface(ResidueRing(ZZ, i))
    end
 end
 
-@testset "nmod.constructors" begin
+@testset "zzModRingElem.constructors" begin
    R = ResidueRing(ZZ, 13)
 
    @test_throws DomainError ResidueRing(ZZ, -13)
    @test_throws DomainError ResidueRing(ZZ, 0)
 
-   @test elem_type(R) == Nemo.nmod
-   @test elem_type(Nemo.NmodRing) == Nemo.nmod
-   @test parent_type(Nemo.nmod) == Nemo.NmodRing
+   @test elem_type(R) == Nemo.zzModRingElem
+   @test elem_type(Nemo.zzModRing) == Nemo.zzModRingElem
+   @test parent_type(Nemo.zzModRingElem) == Nemo.zzModRing
 
-   @test Nemo.promote_rule(elem_type(R), fmpz) == elem_type(R)
+   @test Nemo.promote_rule(elem_type(R), ZZRingElem) == elem_type(R)
 
    @test base_ring(R) == FlintZZ
 
-   @test isa(R, Nemo.NmodRing)
+   @test isa(R, Nemo.zzModRing)
 
-   @test isa(R(), Nemo.nmod)
+   @test isa(R(), Nemo.zzModRingElem)
 
-   @test isa(R(11), Nemo.nmod)
+   @test isa(R(11), Nemo.zzModRingElem)
 
    a = R(11)
 
-   @test isa(R(a), Nemo.nmod)
+   @test isa(R(a), Nemo.zzModRingElem)
 
    for i = 1:1000
       R = ResidueRing(ZZ, rand(UInt(1):typemax(UInt)))
@@ -53,28 +53,28 @@ end
    end
 end
 
-@testset "nmod.rand" begin
+@testset "zzModRingElem.rand" begin
    R = ResidueRing(ZZ, 13)
 
    test_rand(R)
    test_rand(R, 1:9)
    test_rand(R, Int16(1):Int16(9))
    test_rand(R, big(1):big(9))
-   test_rand(R, fmpz(1):fmpz(9))
+   test_rand(R, ZZRingElem(1):ZZRingElem(9))
    test_rand(R, [3,9,2])
    test_rand(R, Int16[3,9,2])
    test_rand(R, BigInt[3,9,2])
-   test_rand(R, fmpz[3,9,2])
+   test_rand(R, ZZRingElem[3,9,2])
 end
 
-@testset "nmod.printing" begin
+@testset "zzModRingElem.printing" begin
    R = ResidueRing(ZZ, 13)
 
    @test string(R(3)) == "3"
    @test string(R()) == "0"
 end
 
-@testset "nmod.manipulation" begin
+@testset "zzModRingElem.manipulation" begin
    R = ResidueRing(ZZ, 13)
 
    @test iszero(zero(R))
@@ -102,7 +102,7 @@ end
 
    @test data(R(3)) == 3
    @test lift(R(3)) == 3
-   @test isa(lift(R(3)), fmpz)
+   @test isa(lift(R(3)), ZZRingElem)
 
    R2 = ResidueRing(ZZ, 2)
    R3 = ResidueRing(ZZ, 3)
@@ -119,7 +119,7 @@ end
    @test_throws Exception R3(R2(1))
 end
 
-@testset "nmod.unary_ops" begin
+@testset "zzModRingElem.unary_ops" begin
    for i = 1:100
       R = ResidueRing(ZZ, rand(UInt(1):typemax(UInt)))
 
@@ -141,7 +141,7 @@ end
    end
 end
 
-@testset "nmod.binary_ops" begin
+@testset "zzModRingElem.binary_ops" begin
    for i = 1:100
       R = ResidueRing(ZZ, rand(1:24))
 
@@ -181,7 +181,7 @@ end
    end
 end
 
-@testset "nmod.adhoc_binary" begin
+@testset "zzModRingElem.adhoc_binary" begin
    for i = 1:100
       R = ResidueRing(ZZ, rand(1:24))
 
@@ -227,7 +227,7 @@ end
    end
 end
 
-@testset "nmod.powering" begin
+@testset "zzModRingElem.powering" begin
    for i = 1:100
       R = ResidueRing(ZZ, rand(1:24))
 
@@ -295,7 +295,7 @@ end
    end
 end
 
-@testset "nmod.comparison" begin
+@testset "zzModRingElem.comparison" begin
    for i = 1:100
       R = ResidueRing(ZZ, rand(1:24))
 
@@ -329,7 +329,7 @@ end
    end
 end
 
-@testset "nmod.adhoc_comparison" begin
+@testset "zzModRingElem.adhoc_comparison" begin
    for i = 1:100
       R = ResidueRing(ZZ, rand(1:24))
 
@@ -359,7 +359,7 @@ end
    end
 end
 
-@testset "nmod.inversion" begin
+@testset "zzModRingElem.inversion" begin
    for i = 1:100
       R = ResidueRing(ZZ, rand(1:24))
 
@@ -385,7 +385,7 @@ end
    end
 end
 
-@testset "nmod.exact_division" begin
+@testset "zzModRingElem.exact_division" begin
    for i = 1:100
       R = ResidueRing(ZZ, rand(1:24))
 
@@ -417,7 +417,7 @@ end
    end
 end
 
-@testset "nmod.gcd" begin
+@testset "zzModRingElem.gcd" begin
    for i = 1:100
       R = ResidueRing(ZZ, rand(1:24))
 
@@ -431,7 +431,7 @@ end
    end
 end
 
-@testset "nmod.gcdx" begin
+@testset "zzModRingElem.gcdx" begin
    for i = 1:100
       R = ResidueRing(ZZ, rand(1:24))
 

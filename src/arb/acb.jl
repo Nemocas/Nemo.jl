@@ -228,10 +228,10 @@ for (f,s) in ((:+, "add"), (:-, "sub"), (:*, "mul"), (://, "div"), (:^, "pow"))
       return z
     end
 
-    function ($f)(x::acb, y::fmpz)
+    function ($f)(x::acb, y::ZZRingElem)
       z = parent(x)()
       ccall(($("acb_"*s*"_fmpz"), libarb), Nothing,
-                  (Ref{acb}, Ref{acb}, Ref{fmpz}, Int),
+                  (Ref{acb}, Ref{acb}, Ref{ZZRingElem}, Int),
                   z, x, y, parent(x).prec)
       return z
     end
@@ -249,24 +249,24 @@ end
 
 +(x::UInt,y::acb) = +(y,x)
 +(x::Int,y::acb) = +(y,x)
-+(x::fmpz,y::acb) = +(y,x)
++(x::ZZRingElem,y::acb) = +(y,x)
 +(x::arb,y::acb) = +(y,x)
 
 *(x::UInt,y::acb) = *(y,x)
 *(x::Int,y::acb) = *(y,x)
-*(x::fmpz,y::acb) = *(y,x)
+*(x::ZZRingElem,y::acb) = *(y,x)
 *(x::arb,y::acb) = *(y,x)
 
 //(x::UInt,y::acb) = (x == 1) ? inv(y) : parent(y)(x) // y
 //(x::Int,y::acb) = (x == 1) ? inv(y) : parent(y)(x) // y
-//(x::fmpz,y::acb) = isone(x) ? inv(y) : parent(y)(x) // y
+//(x::ZZRingElem,y::acb) = isone(x) ? inv(y) : parent(y)(x) // y
 //(x::arb,y::acb) = isone(x) ? inv(y) : parent(y)(x) // y
 
 ^(x::UInt,y::acb) = parent(y)(x) ^ y
 ^(x::Int,y::acb) = parent(y)(x) ^ y
-^(x::fmpz,y::acb) = parent(y)(x) ^ y
+^(x::ZZRingElem,y::acb) = parent(y)(x) ^ y
 ^(x::arb,y::acb) = parent(y)(x) ^ y
-^(x::Integer, y::acb) = fmpz(x)^y
+^(x::Integer, y::acb) = ZZRingElem(x)^y
 
 function -(x::UInt, y::acb)
   z = parent(y)()
@@ -282,9 +282,9 @@ function -(x::Int, y::acb)
   return z
 end
 
-function -(x::fmpz, y::acb)
+function -(x::ZZRingElem, y::acb)
   z = parent(y)()
-  ccall((:acb_sub_fmpz, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{fmpz}, Int), z, y, x, parent(y).prec)
+  ccall((:acb_sub_fmpz, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{ZZRingElem}, Int), z, y, x, parent(y).prec)
   ccall((:acb_neg, libarb), Nothing, (Ref{acb}, Ref{acb}), z, z)
   return z
 end
@@ -296,45 +296,45 @@ function -(x::arb, y::acb)
   return z
 end
 
-+(x::acb, y::Integer) = x + fmpz(y)
++(x::acb, y::Integer) = x + ZZRingElem(y)
 
--(x::acb, y::Integer) = x - fmpz(y)
+-(x::acb, y::Integer) = x - ZZRingElem(y)
 
-*(x::acb, y::Integer) = x*fmpz(y)
+*(x::acb, y::Integer) = x*ZZRingElem(y)
 
-//(x::acb, y::Integer) = x//fmpz(y)
+//(x::acb, y::Integer) = x//ZZRingElem(y)
 
-+(x::Integer, y::acb) = fmpz(x) + y
++(x::Integer, y::acb) = ZZRingElem(x) + y
 
--(x::Integer, y::acb) = fmpz(x) - y
+-(x::Integer, y::acb) = ZZRingElem(x) - y
 
-*(x::Integer, y::acb) = fmpz(x)*y
+*(x::Integer, y::acb) = ZZRingElem(x)*y
 
-//(x::Integer, y::acb) = fmpz(x)//y
+//(x::Integer, y::acb) = ZZRingElem(x)//y
 
 ^(x::acb, y::Integer) = x ^ parent(x)(y)
 
-+(x::acb, y::fmpq) = x + parent(x)(y)
--(x::acb, y::fmpq) = x - parent(x)(y)
-*(x::acb, y::fmpq) = x * parent(x)(y)
-//(x::acb, y::fmpq) = x // parent(x)(y)
-^(x::acb, y::fmpq) = x ^ parent(x)(y)
++(x::acb, y::QQFieldElem) = x + parent(x)(y)
+-(x::acb, y::QQFieldElem) = x - parent(x)(y)
+*(x::acb, y::QQFieldElem) = x * parent(x)(y)
+//(x::acb, y::QQFieldElem) = x // parent(x)(y)
+^(x::acb, y::QQFieldElem) = x ^ parent(x)(y)
 
-+(x::fmpq, y::acb) = parent(y)(x) + y
--(x::fmpq, y::acb) = parent(y)(x) - y
-*(x::fmpq, y::acb) = parent(y)(x) * y
-//(x::fmpq, y::acb) = parent(y)(x) // y
-^(x::fmpq, y::acb) = parent(y)(x) ^ y
++(x::QQFieldElem, y::acb) = parent(y)(x) + y
+-(x::QQFieldElem, y::acb) = parent(y)(x) - y
+*(x::QQFieldElem, y::acb) = parent(y)(x) * y
+//(x::QQFieldElem, y::acb) = parent(y)(x) // y
+^(x::QQFieldElem, y::acb) = parent(y)(x) ^ y
 
 divexact(x::acb, y::acb; check::Bool=true) = x // y
-divexact(x::fmpz, y::acb; check::Bool=true) = x // y
-divexact(x::acb, y::fmpz; check::Bool=true) = x // y
+divexact(x::ZZRingElem, y::acb; check::Bool=true) = x // y
+divexact(x::acb, y::ZZRingElem; check::Bool=true) = x // y
 divexact(x::Int, y::acb; check::Bool=true) = x // y
 divexact(x::acb, y::Int; check::Bool=true) = x // y
 divexact(x::UInt, y::acb; check::Bool=true) = x // y
 divexact(x::acb, y::UInt; check::Bool=true) = x // y
-divexact(x::fmpq, y::acb; check::Bool=true) = x // y
-divexact(x::acb, y::fmpq; check::Bool=true) = x // y
+divexact(x::QQFieldElem, y::acb; check::Bool=true) = x // y
+divexact(x::acb, y::QQFieldElem; check::Bool=true) = x // y
 divexact(x::arb, y::acb; check::Bool=true) = x // y
 divexact(x::acb, y::arb; check::Bool=true) = x // y
 divexact(x::Float64, y::acb; check::Bool=true) = x // y
@@ -347,27 +347,27 @@ divexact(x::Rational{T}, y::acb; check::Bool=true) where {T <: Integer} = x // y
 divexact(x::acb, y::Rational{T}; check::Bool=true) where {T <: Integer} = x // y
 
 /(x::acb, y::acb) = x // y
-/(x::fmpz, y::acb) = x // y
-/(x::acb, y::fmpz) = x // y
+/(x::ZZRingElem, y::acb) = x // y
+/(x::acb, y::ZZRingElem) = x // y
 /(x::Int, y::acb) = x // y
 /(x::acb, y::Int) = x // y
 /(x::UInt, y::acb) = x // y
 /(x::acb, y::UInt) = x // y
-/(x::fmpq, y::acb) = x // y
-/(x::acb, y::fmpq) = x // y
+/(x::QQFieldElem, y::acb) = x // y
+/(x::acb, y::QQFieldElem) = x // y
 /(x::arb, y::acb) = x // y
 /(x::acb, y::arb) = x // y
 
-+(x::Rational{T}, y::acb) where {T <: Integer} = fmpq(x) + y
-+(x::acb, y::Rational{T}) where {T <: Integer} = x + fmpq(y)
--(x::Rational{T}, y::acb) where {T <: Integer} = fmpq(x) - y
--(x::acb, y::Rational{T}) where {T <: Integer} = x - fmpq(y)
-*(x::Rational{T}, y::acb) where {T <: Integer} = fmpq(x) * y
-*(x::acb, y::Rational{T}) where {T <: Integer} = x * fmpq(y)
-//(x::Rational{T}, y::acb) where {T <: Integer} = fmpq(x) // y
-//(x::acb, y::Rational{T}) where {T <: Integer} = x // fmpq(y)
-^(x::Rational{T}, y::acb) where {T <: Integer} = fmpq(x)^y
-^(x::acb, y::Rational{T}) where {T <: Integer} = x ^ fmpq(y)
++(x::Rational{T}, y::acb) where {T <: Integer} = QQFieldElem(x) + y
++(x::acb, y::Rational{T}) where {T <: Integer} = x + QQFieldElem(y)
+-(x::Rational{T}, y::acb) where {T <: Integer} = QQFieldElem(x) - y
+-(x::acb, y::Rational{T}) where {T <: Integer} = x - QQFieldElem(y)
+*(x::Rational{T}, y::acb) where {T <: Integer} = QQFieldElem(x) * y
+*(x::acb, y::Rational{T}) where {T <: Integer} = x * QQFieldElem(y)
+//(x::Rational{T}, y::acb) where {T <: Integer} = QQFieldElem(x) // y
+//(x::acb, y::Rational{T}) where {T <: Integer} = x // QQFieldElem(y)
+^(x::Rational{T}, y::acb) where {T <: Integer} = QQFieldElem(x)^y
+^(x::acb, y::Rational{T}) where {T <: Integer} = x ^ QQFieldElem(y)
 
 +(x::Float64, y::acb) = parent(y)(x) + y
 +(x::acb, y::Float64) = x + parent(x)(y)
@@ -424,11 +424,11 @@ end
 ==(x::acb,y::arb) = (x == parent(x)(y))
 ==(x::arb,y::acb) = (y == parent(y)(x))
 
-==(x::acb,y::fmpz) = (x == parent(x)(y))
-==(x::fmpz,y::acb) = (y == parent(y)(x))
+==(x::acb,y::ZZRingElem) = (x == parent(x)(y))
+==(x::ZZRingElem,y::acb) = (y == parent(y)(x))
 
-==(x::acb,y::Integer) = x == fmpz(y)
-==(x::Integer,y::acb) = fmpz(x) == y
+==(x::acb,y::Integer) = x == ZZRingElem(y)
+==(x::Integer,y::acb) = ZZRingElem(x) == y
 
 ==(x::acb,y::Float64) = (x == parent(x)(y))
 ==(x::Float64,y::acb) = (y == parent(y)(x))
@@ -439,8 +439,8 @@ end
 !=(x::acb,y::arb) = (x != parent(x)(y))
 !=(x::arb,y::acb) = (y != parent(y)(x))
 
-!=(x::acb,y::fmpz) = (x != parent(x)(y))
-!=(x::fmpz,y::acb) = (y != parent(y)(x))
+!=(x::acb,y::ZZRingElem) = (x != parent(x)(y))
+!=(x::ZZRingElem,y::acb) = (y != parent(y)(x))
 
 !=(x::acb,y::Float64) = (x != parent(x)(y))
 !=(x::Float64,y::acb) = (y != parent(y)(x))
@@ -474,30 +474,30 @@ function contains(x::acb, y::acb)
 end
 
 @doc Markdown.doc"""
-    contains(x::acb, y::fmpq)
+    contains(x::acb, y::QQFieldElem)
 
 Returns `true` if the box $x$ contains the given rational value, otherwise
 return `false`.
 """
-function contains(x::acb, y::fmpq)
-  r = ccall((:acb_contains_fmpq, libarb), Cint, (Ref{acb}, Ref{fmpq}), x, y)
+function contains(x::acb, y::QQFieldElem)
+  r = ccall((:acb_contains_fmpq, libarb), Cint, (Ref{acb}, Ref{QQFieldElem}), x, y)
   return Bool(r)
 end
 
 @doc Markdown.doc"""
-    contains(x::acb, y::fmpz)
+    contains(x::acb, y::ZZRingElem)
 
 Returns `true` if the box $x$ contains the given integer value, otherwise
 return `false`.
 """
-function contains(x::acb, y::fmpz)
-  r = ccall((:acb_contains_fmpz, libarb), Cint, (Ref{acb}, Ref{fmpz}), x, y)
+function contains(x::acb, y::ZZRingElem)
+  r = ccall((:acb_contains_fmpz, libarb), Cint, (Ref{acb}, Ref{ZZRingElem}), x, y)
   return Bool(r)
 end
 
 function contains(x::acb, y::Int)
-  v = fmpz(y)
-  r = ccall((:acb_contains_fmpz, libarb), Cint, (Ref{acb}, Ref{fmpz}), x, v)
+  v = ZZRingElem(y)
+  r = ccall((:acb_contains_fmpz, libarb), Cint, (Ref{acb}, Ref{ZZRingElem}), x, v)
   return Bool(r)
 end
 
@@ -507,7 +507,7 @@ end
 Returns `true` if the box $x$ contains the given integer value, otherwise
 return `false`.
 """
-contains(x::acb, y::Integer) = contains(x, fmpz(y))
+contains(x::acb, y::Integer) = contains(x, ZZRingElem(y))
 
 @doc Markdown.doc"""
     contains(x::acb, y::Rational{T}) where {T <: Integer}
@@ -515,7 +515,7 @@ contains(x::acb, y::Integer) = contains(x, fmpz(y))
 Returns `true` if the box $x$ contains the given rational value, otherwise
 return `false`.
 """
-contains(x::acb, y::Rational{T}) where {T <: Integer} = contains(x, fmpz(y))
+contains(x::acb, y::Rational{T}) where {T <: Integer} = contains(x, ZZRingElem(y))
 
 @doc Markdown.doc"""
     contains_zero(x::acb)
@@ -628,10 +628,10 @@ function ldexp(x::acb, y::Int)
   return z
 end
 
-function ldexp(x::acb, y::fmpz)
+function ldexp(x::acb, y::ZZRingElem)
   z = parent(x)()
   ccall((:acb_mul_2exp_fmpz, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{fmpz}), z, x, y)
+              (Ref{acb}, Ref{acb}, Ref{ZZRingElem}), z, x, y)
   return z
 end
 
@@ -656,15 +656,15 @@ end
 @doc Markdown.doc"""
     unique_integer(x::acb)
 
-Return a pair where the first value is a boolean and the second is an `fmpz`
+Return a pair where the first value is a boolean and the second is an `ZZRingElem`
 integer. The boolean indicates whether the box $x$ contains a unique
 integer. If this is the case, the second return value is set to this unique
 integer.
 """
 function unique_integer(x::acb)
-  z = fmpz()
+  z = ZZRingElem()
   unique = ccall((:acb_get_unique_fmpz, libarb), Int,
-    (Ref{fmpz}, Ref{acb}), z, x)
+    (Ref{ZZRingElem}, Ref{acb}), z, x)
   return (unique != 0, z)
 end
 
@@ -1684,18 +1684,18 @@ for (typeofx, passtoc) in ((acb, Ref{acb}), (Ptr{acb}, Ptr{acb}))
   end
 
   @eval begin
-    function _acb_set(x::($typeofx), y::fmpz)
-      ccall((:acb_set_fmpz, libarb), Nothing, (($passtoc), Ref{fmpz}), x, y)
+    function _acb_set(x::($typeofx), y::ZZRingElem)
+      ccall((:acb_set_fmpz, libarb), Nothing, (($passtoc), Ref{ZZRingElem}), x, y)
     end
 
-    function _acb_set(x::($typeofx), y::fmpz, p::Int)
+    function _acb_set(x::($typeofx), y::ZZRingElem, p::Int)
       ccall((:acb_set_round_fmpz, libarb), Nothing,
-                  (($passtoc), Ref{fmpz}, Int), x, y, p)
+                  (($passtoc), Ref{ZZRingElem}, Int), x, y, p)
     end
 
-    function _acb_set(x::($typeofx), y::fmpq, p::Int)
+    function _acb_set(x::($typeofx), y::QQFieldElem, p::Int)
       ccall((:acb_set_fmpq, libarb), Nothing,
-                  (($passtoc), Ref{fmpq}, Int), x, y, p)
+                  (($passtoc), Ref{QQFieldElem}, Int), x, y, p)
     end
 
     function _acb_set(x::($typeofx), y::arb)
@@ -1756,7 +1756,7 @@ for (typeofx, passtoc) in ((acb, Ref{acb}), (Ptr{acb}, Ptr{acb}))
                   (($passtoc), ($passtoc), Int), x, x, p)
     end
 
-    function _acb_set(x::($typeofx), y::fmpq, z::fmpq, p::Int)
+    function _acb_set(x::($typeofx), y::QQFieldElem, z::QQFieldElem, p::Int)
       r = ccall((:acb_real_ptr, libarb), Ptr{arb}, (($passtoc), ), x)
       _arb_set(r, y, p)
       i = ccall((:acb_imag_ptr, libarb), Ptr{arb}, (($passtoc), ), x)
@@ -1772,7 +1772,7 @@ for (typeofx, passtoc) in ((acb, Ref{acb}), (Ptr{acb}, Ptr{acb}))
 
   end
 
-  for T in (Float64, BigFloat, UInt, fmpz)
+  for T in (Float64, BigFloat, UInt, ZZRingElem)
     @eval begin
       function _acb_set(x::($typeofx), y::($T), z::($T))
         r = ccall((:acb_real_ptr, libarb), Ptr{arb}, (($passtoc), ), x)
@@ -1799,9 +1799,9 @@ end
 
 promote_rule(::Type{acb}, ::Type{T}) where {T <: Number} = acb
 
-promote_rule(::Type{acb}, ::Type{fmpz}) = acb
+promote_rule(::Type{acb}, ::Type{ZZRingElem}) = acb
 
-promote_rule(::Type{acb}, ::Type{fmpq}) = acb
+promote_rule(::Type{acb}, ::Type{QQFieldElem}) = acb
 
 promote_rule(::Type{acb}, ::Type{arb}) = acb
 
@@ -1817,25 +1817,25 @@ function (r::AcbField)()
   return z
 end
 
-function (r::AcbField)(x::Union{Int, UInt, fmpz, fmpq, arb, acb, Float64,
+function (r::AcbField)(x::Union{Int, UInt, ZZRingElem, QQFieldElem, arb, acb, Float64,
                                 BigFloat, AbstractString})
   z = acb(x, r.prec)
   z.parent = r
   return z
 end
 
-(r::AcbField)(x::Integer) = r(fmpz(x))
+(r::AcbField)(x::Integer) = r(ZZRingElem(x))
 
-(r::AcbField)(x::Rational{T}) where {T <: Integer} = r(fmpq(x))
+(r::AcbField)(x::Rational{T}) where {T <: Integer} = r(QQFieldElem(x))
 
-function (r::AcbField)(x::T, y::T) where {T <: Union{Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString}}
+function (r::AcbField)(x::T, y::T) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, arb, Float64, BigFloat, AbstractString}}
   z = acb(x, y, r.prec)
   z.parent = r
   return z
 end
 
-for S in (Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString, BigInt)
-  for T in (Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString, BigInt)
+for S in (Int, UInt, ZZRingElem, QQFieldElem, arb, Float64, BigFloat, AbstractString, BigInt)
+  for T in (Int, UInt, ZZRingElem, QQFieldElem, arb, Float64, BigFloat, AbstractString, BigInt)
     if S != T
       @eval begin
         function (r::AcbField)(x::$(S), y::$(T))
@@ -1849,7 +1849,7 @@ for S in (Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString, BigInt)
   end
 end
 
-for T in (Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString, BigInt)
+for T in (Int, UInt, ZZRingElem, QQFieldElem, arb, Float64, BigFloat, AbstractString, BigInt)
   @eval begin
     function (r::AcbField)(x::Rational{S}, y::$(T)) where {S <: Integer}
       RR = ArbField(r.prec, cached = false)
@@ -1866,10 +1866,10 @@ for T in (Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString, BigInt)
   end
 end
 
-(r::AcbField)(x::BigInt, y::BigInt) = r(fmpz(x), fmpz(y))
+(r::AcbField)(x::BigInt, y::BigInt) = r(ZZRingElem(x), ZZRingElem(y))
 
 (r::AcbField)(x::Rational{S}, y::Rational{T}) where {S <: Integer, T <: Integer} =
-      r(fmpq(x), fmpq(y))
+      r(QQFieldElem(x), QQFieldElem(y))
 
 ################################################################################
 #

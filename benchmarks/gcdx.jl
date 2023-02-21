@@ -1,24 +1,24 @@
-function gcdx_bigint(a::fmpz, b::fmpz)
+function gcdx_bigint(a::ZZRingElem, b::ZZRingElem)
   g, s, t = gcdx(BigInt(a), BigInt(b))
-  return fmpz(g), fmpz(s), fmpz(t)
+  return ZZRingElem(g), ZZRingElem(s), ZZRingElem(t)
 end
 
-function gcdx_fmpz(a::fmpz, b::fmpz)
+function gcdx_fmpz(a::ZZRingElem, b::ZZRingElem)
   d = ZZ()
   x = ZZ()
   y = ZZ()
   ccall((:fmpz_xgcd_canonical_bezout, libflint), Nothing,
-        (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), d, x, y, a, b)
+        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), d, x, y, a, b)
   return d, x, y
 end
 
-function run_gcdx_bigint(x::Vector{fmpz}, y::Vector{fmpz})
+function run_gcdx_bigint(x::Vector{ZZRingElem}, y::Vector{ZZRingElem})
   for ix in x, iy in y
     gcdx_bigint(ix, iy)
   end
 end
     
-function run_gcdx_fmpz(x::Vector{fmpz}, y::Vector{fmpz})
+function run_gcdx_fmpz(x::Vector{ZZRingElem}, y::Vector{ZZRingElem})
   for ix in x, iy in y
     gcdx_fmpz(ix, iy)
   end
@@ -35,7 +35,7 @@ function benchmark_gcdx()
   tt = @elapsed run_gcdx_bigint(x, y)
   println("Small sized integers for BigInt-solution: $tt")
   tt = @elapsed run_gcdx_fmpz(x, y)
-  println("Small sized integers for fmpz-solution:   $tt")
+  println("Small sized integers for ZZRingElem-solution:   $tt")
 
   # mixed integers
   range = ZZ(0):ZZ(2)^Sys.WORD_SIZE
@@ -45,7 +45,7 @@ function benchmark_gcdx()
   tt = @elapsed run_gcdx_bigint(x, y)
   println("Mixed sized integers for BigInt-solution: $tt")
   tt = @elapsed run_gcdx_fmpz(x, y)
-  println("Mixed sized integers for fmpz-solution:   $tt")
+  println("Mixed sized integers for ZZRingElem-solution:   $tt")
 
   # big integers
   range = ZZ(0):ZZ(2)^512
@@ -55,5 +55,5 @@ function benchmark_gcdx()
   tt = @elapsed run_gcdx_bigint(x, y)
   println("Large sized integers for BigInt-solution: $tt")
   tt = @elapsed run_gcdx_fmpz(x, y)
-  println("Large sized integers for fmpz-solution:   $tt")
+  println("Large sized integers for ZZRingElem-solution:   $tt")
 end

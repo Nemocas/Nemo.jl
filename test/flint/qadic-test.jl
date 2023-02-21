@@ -9,7 +9,7 @@
 
    @test isa(R, FlintQadicField)
 
-   S, _ = @inferred QadicField(fmpz(1009), 1, 30)
+   S, _ = @inferred QadicField(ZZRingElem(1009), 1, 30)
 
    @test isa(S, FlintQadicField)
 
@@ -23,13 +23,13 @@
 
    @test isa(1 + 2*7 + 4*7^2 + O(R, 7^3), qadic)
 
-   @test isa(13 + 357*fmpz(1009) + O(S, fmpz(1009)^12), qadic)
+   @test isa(13 + 357*ZZRingElem(1009) + O(S, ZZRingElem(1009)^12), qadic)
 
-   @test isa(fmpz(1)//7^2 + fmpz(2)//7 + 3 + 4*7 + O(R, 7^2), qadic)
+   @test isa(ZZRingElem(1)//7^2 + ZZRingElem(2)//7 + 3 + 4*7 + O(R, 7^2), qadic)
 
-   @test precision( R(fmpq(2//3)^100) ) == precision( R(fmpq(2//3))^100 )
+   @test precision( R(QQFieldElem(2//3)^100) ) == precision( R(QQFieldElem(2//3))^100 )
 
-   @test precision( K(fmpq(2//3)^100*(x+1)) ) == precision( K( QX(fmpq(2//3))^100 )*K(x+1) )
+   @test precision( K(QQFieldElem(2//3)^100*(x+1)) ) == precision( K( QX(QQFieldElem(2//3))^100 )*K(x+1) )
     
    s = R()
 
@@ -125,21 +125,21 @@ end
 
    @test 3 - b == 3 + 6*7^2 + 3*7^3 + 6*7^4 + O(R, 7^5)
 
-   @test a*fmpz(5) == 5 + 3*7^1 + O(R, 7^3)
+   @test a*ZZRingElem(5) == 5 + 3*7^1 + O(R, 7^3)
 
-   @test fmpz(3)*c == O(R, 7^3)
+   @test ZZRingElem(3)*c == O(R, 7^3)
 
    @test 2*d == 4
 
    @test 2 + d == 4
 
-   @test iszero(d - fmpz(2))
+   @test iszero(d - ZZRingElem(2))
 
-   @test a + fmpz(1)//7^2 == fmpz(1)//7^2 + 1 + 2*7^1 + 4*7^2 + O(R, 7^3)
+   @test a + ZZRingElem(1)//7^2 == ZZRingElem(1)//7^2 + 1 + 2*7^1 + 4*7^2 + O(R, 7^3)
 
-   @test (fmpz(12)//11)*b == 3*7^2 + 3*7^3 + O(R, 7^5)
+   @test (ZZRingElem(12)//11)*b == 3*7^2 + 3*7^3 + O(R, 7^5)
 
-   @test c*(fmpz(1)//7) == O(R, 7^2)
+   @test c*(ZZRingElem(1)//7) == O(R, 7^2)
 end
 
 @testset "qadic.comparison" begin
@@ -172,9 +172,9 @@ end
 
    @test c == 2
 
-   @test fmpz(2) == c
+   @test ZZRingElem(2) == c
 
-   @test a == fmpz(344)//1
+   @test a == ZZRingElem(344)//1
 end
 
 @testset "qadic.powering" begin
@@ -203,9 +203,9 @@ end
 
    @test inv(b) == 4 + 4*7^1 + 3*7^2 + 1*7^3 + 1*7^4 + O(R, 7^5)
 
-   @test inv(c) == fmpz(1)//7^2 + fmpz(5)//7 + O(R, 7^0)
+   @test inv(c) == ZZRingElem(1)//7^2 + ZZRingElem(5)//7 + O(R, 7^0)
 
-   @test inv(d) == fmpz(1)//7 + 5 + 3*7^1 + 6*7^2 + O(R, 7^3)
+   @test inv(d) == ZZRingElem(1)//7 + 5 + 3*7^1 + 6*7^2 + O(R, 7^3)
 
    @test inv(R(1)) == 1
 end
@@ -222,7 +222,7 @@ end
 
    @test divexact(c, d) == 1*7^1 + O(R, 7^3)
 
-   @test divexact(d, R(7^3)) == fmpz(1)//7^2 + fmpz(2)//7 + O(R, 7^2)
+   @test divexact(d, R(7^3)) == ZZRingElem(1)//7^2 + ZZRingElem(2)//7 + O(R, 7^2)
 
    @test divexact(R(34), R(17)) == 2
 end
@@ -237,15 +237,15 @@ end
 
    @test divexact(a, 2) == 4 + 1*7^2 + O(R, 7^3)
 
-   @test divexact(b, fmpz(7)) == fmpz(2)//7 + 3 + O(R, 7^4)
+   @test divexact(b, ZZRingElem(7)) == ZZRingElem(2)//7 + 3 + O(R, 7^4)
 
-   @test divexact(c, fmpz(12)//7^2) == 3*7^4 + 5*7^5 + O(R, 7^6)
+   @test divexact(c, ZZRingElem(12)//7^2) == 3*7^4 + 5*7^5 + O(R, 7^6)
 
-   @test divexact(2, d) == fmpz(2)//7 + 3 + 6*7^2 + O(R, 7^3)
+   @test divexact(2, d) == ZZRingElem(2)//7 + 3 + 6*7^2 + O(R, 7^3)
 
    @test divexact(R(3), 3) == 1
 
-   @test divexact(fmpz(5)//7, R(5)) == fmpz(1)//7
+   @test divexact(ZZRingElem(5)//7, R(5)) == ZZRingElem(1)//7
 end
 
 @testset "qadic.divides" begin

@@ -51,7 +51,7 @@ the number field itself. This is accomplished with one of the following
 constructors.
 
 ```@docs
-NumberField(::fmpq_poly, ::String)
+NumberField(::QQPolyRingElem, ::String)
 CyclotomicField(::Int, ::String)
 CyclotomicRealSubfield(::Int, ::String)
 ```
@@ -107,7 +107,7 @@ reduce!(::nf_elem)
 The following coercion function is provided for a number field $R$.
 
 ```julia
-R(f::fmpq_poly)
+R(f::QQPolyRingElem)
 ```
 
 Coerce the given rational polynomial into the number field $R$, i.e. consider the

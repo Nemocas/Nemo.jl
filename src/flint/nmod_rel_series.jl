@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   nmod_rel_series.jl: Relative series using nmod_poly
+#   nmod_rel_series.jl: Relative series using zzModPolyRingElem
 #
 #   nmod_rel_series, gfp_rel_series
 #
@@ -10,8 +10,8 @@ export nmod_rel_series, NmodRelSeriesRing,
        gfp_rel_series, GFPRelSeriesRing
 
 for (etype, rtype, mtype, brtype, flint_fn) in (
-   (nmod_rel_series, NmodRelSeriesRing, nmod, NmodRing, "nmod_poly"),
-   (gfp_rel_series, GFPRelSeriesRing, gfp_elem, GaloisField, "nmod_poly"))
+   (nmod_rel_series, NmodRelSeriesRing, zzModRingElem, zzModRing, "zzModPolyRingElem"),
+   (gfp_rel_series, GFPRelSeriesRing, fpFieldElem, fpField, "zzModPolyRingElem"))
 @eval begin
 
 ###############################################################################
@@ -322,11 +322,11 @@ end
 
 *(x::($etype), y::($mtype)) = y * x
 
-function *(x::fmpz, y::($etype))
+function *(x::ZZRingElem, y::($etype))
    z = parent(y)()
    z.prec = y.prec
    z.val = y.val
-   r = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{fmpz}, UInt), x, modulus(y))
+   r = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), x, modulus(y))
    ccall(($(flint_fn*"_scalar_mul_nmod"), libflint), Nothing,
                 (Ref{($etype)}, Ref{($etype)}, UInt),
                z, y, r)
@@ -345,11 +345,11 @@ function *(x::UInt, y::($etype))
    return z
 end
 
-*(x::($etype), y::fmpz) = y * x
+*(x::($etype), y::ZZRingElem) = y * x
 
 *(x::($etype), y::UInt) = y * x
 
-*(x::Integer, y::($etype)) = fmpz(x)*y
+*(x::Integer, y::($etype)) = ZZRingElem(x)*y
 
 *(x::($etype), y::Integer) = y * x
 
@@ -516,14 +516,14 @@ end
 
 ==(x::($mtype), y::($etype)) = y == x
 
-function ==(x::($etype), y::fmpz)
+function ==(x::($etype), y::ZZRingElem)
    if precision(x) == 0
       return true
    elseif pol_length(x) > 1
       return false
    elseif pol_length(x) == 1
       if x.val == 0
-         r = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{fmpz}, UInt), y, modulus(x))
+         r = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), y, modulus(x))
          z = ccall(($(flint_fn*"_get_coeff_ui"), libflint), UInt,
                        (Ref{($etype)}, Int), x, 0)
          return r == z
@@ -531,12 +531,12 @@ function ==(x::($etype), y::fmpz)
          return false
       end
    else
-      r = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{fmpz}, UInt), y, modulus(x))
+      r = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), y, modulus(x))
       return r == UInt(0)
    end
 end
 
-==(x::fmpz, y::($etype)) = y == x
+==(x::ZZRingElem, y::($etype)) = y == x
 
 function ==(x::($etype), y::UInt)
    if precision(x) == 0
@@ -560,7 +560,7 @@ end
 
 ==(x::UInt, y::($etype)) = y == x
 
-==(x::($etype), y::Integer) = x == fmpz(y)
+==(x::($etype), y::Integer) = x == ZZRingElem(y)
 
 ==(x::Integer, y::($etype)) = y == x
 
@@ -612,13 +612,13 @@ function divexact(x::($etype), y::($mtype); check::Bool=true)
    return z
 end
 
-function divexact(x::($etype), y::fmpz; check::Bool=true)
+function divexact(x::($etype), y::ZZRingElem; check::Bool=true)
    iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
    z.prec = x.prec
    z.val = x.val
-   r = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{fmpz}, UInt), y, modulus(x))
+   r = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), y, modulus(x))
    rinv = inv(base_ring(x)(r))
    ccall(($(flint_fn*"_scalar_mul_nmod"), libflint), Nothing,
                 (Ref{($etype)}, Ref{($etype)}, UInt),
@@ -640,7 +640,7 @@ function divexact(x::($etype), y::UInt; check::Bool=true)
    return z
 end
 
-divexact(x::($etype), y::Integer; check::Bool=true) = divexact(x, fmpz(y); check=check)
+divexact(x::($etype), y::Integer; check::Bool=true) = divexact(x, ZZRingElem(y); check=check)
 
 ###############################################################################
 #
@@ -717,8 +717,8 @@ function fit!(x::($etype), n::Int)
   return nothing
 end
 
-function setcoeff!(z::($etype), n::Int, x::fmpz)
-   r = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{fmpz}, UInt), x, modulus(z))
+function setcoeff!(z::($etype), n::Int, x::ZZRingElem)
+   r = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), x, modulus(z))
    ccall(($(flint_fn*"_set_coeff_ui"), libflint), Nothing,
                 (Ref{($etype)}, Int, UInt),
                z, n, r)
@@ -865,7 +865,7 @@ end
 
 promote_rule(::Type{($etype)}, ::Type{T}) where {T <: Integer} = ($etype)
 
-promote_rule(::Type{($etype)}, ::Type{fmpz}) = ($etype)
+promote_rule(::Type{($etype)}, ::Type{ZZRingElem}) = ($etype)
 
 promote_rule(::Type{($etype)}, ::Type{($mtype)}) = ($etype)
 
@@ -889,13 +889,13 @@ function (a::($rtype))(b::Integer)
       z.prec = a.prec_max
       z.val = a.prec_max
    else
-      z = ($etype)(modulus(a), [fmpz(b)], 1, a.prec_max, 0)
+      z = ($etype)(modulus(a), [ZZRingElem(b)], 1, a.prec_max, 0)
    end
    z.parent = a
    return z
 end
 
-function (a::($rtype))(b::fmpz)
+function (a::($rtype))(b::ZZRingElem)
    if iszero(b)
       z = ($etype)(modulus(a))
       z.prec = a.prec_max
@@ -924,7 +924,7 @@ function (a::($rtype))(b::($etype))
    return b
 end
 
-function (a::($rtype))(b::Vector{fmpz}, len::Int, prec::Int, val::Int)
+function (a::($rtype))(b::Vector{ZZRingElem}, len::Int, prec::Int, val::Int)
    z = ($etype)(modulus(a), b, len, prec, val)
    z.parent = a
    return z

@@ -1,133 +1,133 @@
 # Fix ambiguities on julia 0.4
 
-*(a::ResElem{fmpz}, b::fmpz) = parent(a)(data(a) * b)
+*(a::ResElem{ZZRingElem}, b::ZZRingElem) = parent(a)(data(a) * b)
 
-*(a::fmpz, b::ResElem{fmpz}) = b*a
+*(a::ZZRingElem, b::ResElem{ZZRingElem}) = b*a
 
-+(a::ResElem{fmpz}, b::fmpz) = parent(a)(data(a) + b)
++(a::ResElem{ZZRingElem}, b::ZZRingElem) = parent(a)(data(a) + b)
 
-+(a::fmpz, b::ResElem{fmpz}) = b + a
++(a::ZZRingElem, b::ResElem{ZZRingElem}) = b + a
 
--(a::ResElem{fmpz}, b::fmpz) = parent(a)(data(a) - b)
+-(a::ResElem{ZZRingElem}, b::ZZRingElem) = parent(a)(data(a) - b)
 
--(a::fmpz, b::ResElem{fmpz}) = parent(b)(a - data(b))
+-(a::ZZRingElem, b::ResElem{ZZRingElem}) = parent(b)(a - data(b))
 
-function ==(a::ResElem{fmpz}, b::fmpz)
+function ==(a::ResElem{ZZRingElem}, b::ZZRingElem)
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
-==(a::fmpz, b::ResElem{fmpz}) = b == a
+==(a::ZZRingElem, b::ResElem{ZZRingElem}) = b == a
 
 #
 
-*(::fmpz, ::PolyElem{fmpz}) = nothing
+*(::ZZRingElem, ::PolyElem{ZZRingElem}) = nothing
 
-*(::PolyElem{fmpz}, ::fmpz) = nothing
+*(::PolyElem{ZZRingElem}, ::ZZRingElem) = nothing
 
-+(::fmpz, ::PolyElem{fmpz}) = nothing
++(::ZZRingElem, ::PolyElem{ZZRingElem}) = nothing
 
-+(::PolyElem{fmpz}, ::fmpz) = nothing
++(::PolyElem{ZZRingElem}, ::ZZRingElem) = nothing
 
--(::fmpz, ::PolyElem{fmpz}) = nothing
+-(::ZZRingElem, ::PolyElem{ZZRingElem}) = nothing
 
--(::PolyElem{fmpz}, ::fmpz) = nothing
+-(::PolyElem{ZZRingElem}, ::ZZRingElem) = nothing
 
-==(::fmpz, ::PolyElem{fmpz}) = nothing
+==(::ZZRingElem, ::PolyElem{ZZRingElem}) = nothing
 
-==(::PolyElem{fmpz}, ::fmpz) = nothing
+==(::PolyElem{ZZRingElem}, ::ZZRingElem) = nothing
 
-divexact(::PolyElem{fmpz}, ::fmpz) = nothing
+divexact(::PolyElem{ZZRingElem}, ::ZZRingElem) = nothing
 
-evaluate(::PolyElem{fmpz}, ::fmpz) = nothing
-
-#
-
-*(::fmpz, ::SeriesElem{fmpz}) = nothing
-
-*(::SeriesElem{fmpz}, ::fmpz) = nothing
-
-+(::fmpz, ::SeriesElem{fmpz}) = nothing
-
-+(::SeriesElem{fmpz}, ::fmpz) = nothing
-
--(::fmpz, ::SeriesElem{fmpz}) = nothing
-
--(::SeriesElem{fmpz}, ::fmpz) = nothing
-
-==(::fmpz, ::SeriesElem{fmpz}) = nothing
-
-==(::SeriesElem{fmpz}, ::fmpz) = nothing
-
-*(::fmpz, ::RelSeriesElem{fmpz}) = nothing
-
-*(::RelSeriesElem{fmpz}, ::fmpz) = nothing
-
-+(::fmpz, ::RelSeriesElem{fmpz}) = nothing
-
-+(::RelSeriesElem{fmpz}, ::fmpz) = nothing
-
--(::fmpz, ::RelSeriesElem{fmpz}) = nothing
-
--(::RelSeriesElem{fmpz}, ::fmpz) = nothing
-
-==(::fmpz, ::RelSeriesElem{fmpz}) = nothing
-
-==(::RelSeriesElem{fmpz}, ::fmpz) = nothing
-
-*(::fmpz, ::AbsSeriesElem{fmpz}) = nothing
-
-*(::AbsSeriesElem{fmpz}, ::fmpz) = nothing
-
-+(::fmpz, ::AbsSeriesElem{fmpz}) = nothing
-
-+(::AbsSeriesElem{fmpz}, ::fmpz) = nothing
-
--(::fmpz, ::AbsSeriesElem{fmpz}) = nothing
-
--(::AbsSeriesElem{fmpz}, ::fmpz) = nothing
-
-==(::fmpz, ::AbsSeriesElem{fmpz}) = nothing
-
-==(::AbsSeriesElem{fmpz}, ::fmpz) = nothing
-
-*(::fmpz, ::MatElem{fmpz}) = nothing
-
-*(::MatElem{fmpz}, ::fmpz) = nothing
-
-+(::fmpz, ::MatElem{fmpz}) = nothing
-
-+(::MatElem{fmpz}, ::fmpz) = nothing
-
--(::fmpz, ::MatElem{fmpz}) = nothing
-
--(::MatElem{fmpz}, ::fmpz) = nothing
-
-==(::MatElem{fmpz}, ::fmpz) = nothing
-
-divexact(::MatElem{fmpz}, ::fmpz) = nothing
+evaluate(::PolyElem{ZZRingElem}, ::ZZRingElem) = nothing
 
 #
 
-setindex_t!(a::nmod_mat, b::GenRes{fmpz}, i::Int, j::Int) = setindex_!(a, data(b), i, j)
+*(::ZZRingElem, ::SeriesElem{ZZRingElem}) = nothing
 
-*(::FracElem{fmpz}, ::fmpz) = nothing
+*(::SeriesElem{ZZRingElem}, ::ZZRingElem) = nothing
 
-*(::fmpz, ::FracElem{fmpz}) = nothing
++(::ZZRingElem, ::SeriesElem{ZZRingElem}) = nothing
 
-+(::FracElem{fmpz}, ::fmpz) = nothing
++(::SeriesElem{ZZRingElem}, ::ZZRingElem) = nothing
 
-+(::fmpz, ::FracElem{fmpz}) = nothing
+-(::ZZRingElem, ::SeriesElem{ZZRingElem}) = nothing
 
--(::FracElem{fmpz}, ::fmpz) = nothing
+-(::SeriesElem{ZZRingElem}, ::ZZRingElem) = nothing
 
--(::fmpz, ::FracElem{fmpz}) = nothing
+==(::ZZRingElem, ::SeriesElem{ZZRingElem}) = nothing
 
-==(::FracElem{fmpz}, ::fmpz) = nothing
+==(::SeriesElem{ZZRingElem}, ::ZZRingElem) = nothing
 
-==(::fmpz, ::FracElem{fmpz}) = nothing
+*(::ZZRingElem, ::RelSeriesElem{ZZRingElem}) = nothing
 
-divexact(::FracElem{fmpz}, ::fmpz) = nothing
+*(::RelSeriesElem{ZZRingElem}, ::ZZRingElem) = nothing
 
-divexact(::fmpz, ::FracElem{fmpz}) = nothing
++(::ZZRingElem, ::RelSeriesElem{ZZRingElem}) = nothing
+
++(::RelSeriesElem{ZZRingElem}, ::ZZRingElem) = nothing
+
+-(::ZZRingElem, ::RelSeriesElem{ZZRingElem}) = nothing
+
+-(::RelSeriesElem{ZZRingElem}, ::ZZRingElem) = nothing
+
+==(::ZZRingElem, ::RelSeriesElem{ZZRingElem}) = nothing
+
+==(::RelSeriesElem{ZZRingElem}, ::ZZRingElem) = nothing
+
+*(::ZZRingElem, ::AbsSeriesElem{ZZRingElem}) = nothing
+
+*(::AbsSeriesElem{ZZRingElem}, ::ZZRingElem) = nothing
+
++(::ZZRingElem, ::AbsSeriesElem{ZZRingElem}) = nothing
+
++(::AbsSeriesElem{ZZRingElem}, ::ZZRingElem) = nothing
+
+-(::ZZRingElem, ::AbsSeriesElem{ZZRingElem}) = nothing
+
+-(::AbsSeriesElem{ZZRingElem}, ::ZZRingElem) = nothing
+
+==(::ZZRingElem, ::AbsSeriesElem{ZZRingElem}) = nothing
+
+==(::AbsSeriesElem{ZZRingElem}, ::ZZRingElem) = nothing
+
+*(::ZZRingElem, ::MatElem{ZZRingElem}) = nothing
+
+*(::MatElem{ZZRingElem}, ::ZZRingElem) = nothing
+
++(::ZZRingElem, ::MatElem{ZZRingElem}) = nothing
+
++(::MatElem{ZZRingElem}, ::ZZRingElem) = nothing
+
+-(::ZZRingElem, ::MatElem{ZZRingElem}) = nothing
+
+-(::MatElem{ZZRingElem}, ::ZZRingElem) = nothing
+
+==(::MatElem{ZZRingElem}, ::ZZRingElem) = nothing
+
+divexact(::MatElem{ZZRingElem}, ::ZZRingElem) = nothing
+
+#
+
+setindex_t!(a::zzModMatrix, b::GenRes{ZZRingElem}, i::Int, j::Int) = setindex_!(a, data(b), i, j)
+
+*(::FracElem{ZZRingElem}, ::ZZRingElem) = nothing
+
+*(::ZZRingElem, ::FracElem{ZZRingElem}) = nothing
+
++(::FracElem{ZZRingElem}, ::ZZRingElem) = nothing
+
++(::ZZRingElem, ::FracElem{ZZRingElem}) = nothing
+
+-(::FracElem{ZZRingElem}, ::ZZRingElem) = nothing
+
+-(::ZZRingElem, ::FracElem{ZZRingElem}) = nothing
+
+==(::FracElem{ZZRingElem}, ::ZZRingElem) = nothing
+
+==(::ZZRingElem, ::FracElem{ZZRingElem}) = nothing
+
+divexact(::FracElem{ZZRingElem}, ::ZZRingElem) = nothing
+
+divexact(::ZZRingElem, ::FracElem{ZZRingElem}) = nothing
 

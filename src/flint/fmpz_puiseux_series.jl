@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   fmpz_puiseux_series.jl : Puiseux series over Flint fmpz integers
+#   fmpz_puiseux_series.jl : Puiseux series over Flint ZZRingElem integers
 #
 ###############################################################################
 
@@ -10,13 +10,13 @@
 #
 ###############################################################################
 
-function *(x::FlintPuiseuxSeriesElem{fmpz_laurent_series}, y::fmpz)
+function *(x::FlintPuiseuxSeriesElem{fmpz_laurent_series}, y::ZZRingElem)
    z = parent(x)(x.data*y, x.scale)
    z = rescale!(z)
    return z
 end
 
-*(x::fmpz, y::FlintPuiseuxSeriesElem{fmpz_laurent_series}) = y*x
+*(x::ZZRingElem, y::FlintPuiseuxSeriesElem{fmpz_laurent_series}) = y*x
 
 ###############################################################################
 #
@@ -24,7 +24,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::FlintPuiseuxSeriesElem{fmpz_laurent_series}, y::fmpz; check::Bool=true)
+function divexact(x::FlintPuiseuxSeriesElem{fmpz_laurent_series}, y::ZZRingElem; check::Bool=true)
    return parent(x)(divexact(x.data, y; check=check), x.scale)
 end
 
@@ -34,9 +34,9 @@ end
 #
 ###############################################################################
 
-==(x::FlintPuiseuxSeriesElem{fmpz_laurent_series}, y::fmpz) = x.data == y
+==(x::FlintPuiseuxSeriesElem{fmpz_laurent_series}, y::ZZRingElem) = x.data == y
 
-==(x::fmpz, y::FlintPuiseuxSeriesElem{fmpz_laurent_series}) = y == x
+==(x::ZZRingElem, y::FlintPuiseuxSeriesElem{fmpz_laurent_series}) = y == x
 
 ###############################################################################
 #
@@ -63,7 +63,7 @@ end
 #
 ###############################################################################
 
-function (R::FlintPuiseuxSeriesRing{fmpz_laurent_series})(b::fmpz)
+function (R::FlintPuiseuxSeriesRing{fmpz_laurent_series})(b::ZZRingElem)
    z = FlintPuiseuxSeriesRingElem{fmpz_laurent_series}(laurent_ring(R)(b), 1)
    z.parent = R
    return z
@@ -76,7 +76,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    PuiseuxSeriesRing(R::FlintIntegerRing, prec::Int, s::AbstractString; cached=true)
+    PuiseuxSeriesRing(R::ZZRing, prec::Int, s::AbstractString; cached=true)
 
 Return a tuple $(S, x)$ consisting of the parent object `S` of a Puiseux series
 ring over the given base ring and a generator `x` for the Puiseux series ring.
@@ -88,7 +88,7 @@ object `S` will be cached so that supplying the same base ring, string and
 precision in future will return the same parent object and generator. If
 caching of the parent object is not required, `cached` can be set to `false`.
 """
-function PuiseuxSeriesRing(R::FlintIntegerRing, prec::Int, s::Symbol; cached=true)
+function PuiseuxSeriesRing(R::ZZRing, prec::Int, s::Symbol; cached=true)
    S, x = LaurentSeriesRing(R, prec, s; cached=cached)
 
    parent_obj = FlintPuiseuxSeriesRing{fmpz_laurent_series}(S, cached)
@@ -96,7 +96,7 @@ function PuiseuxSeriesRing(R::FlintIntegerRing, prec::Int, s::Symbol; cached=tru
    return parent_obj, gen(parent_obj)
 end
 
-function PuiseuxSeriesRing(R::FlintIntegerRing, prec::Int, s::AbstractString; cached=true)
+function PuiseuxSeriesRing(R::ZZRing, prec::Int, s::AbstractString; cached=true)
    return PuiseuxSeriesRing(R, prec, Symbol(s); cached=cached)
 end
 

@@ -34,7 +34,7 @@ RR = ArbField(64)
 
    @test isa(k, PolyElem)
 
-   for T in [Int, UInt, BigInt, Float64, BigFloat, fmpz, fmpq, Rational{Int}, Rational{BigInt}]
+   for T in [Int, UInt, BigInt, Float64, BigFloat, ZZRingElem, QQFieldElem, Rational{Int}, Rational{BigInt}]
       l = R(T[1, 2, 3])
 
       @test isa(l, arb_poly)
@@ -83,7 +83,7 @@ end
 
    f = polynomial(R, [])
    g = polynomial(R, [1, 2, 3])
-   h = polynomial(R, fmpz[1, 2, 3])
+   h = polynomial(R, ZZRingElem[1, 2, 3])
    k = polynomial(R, [R(1), R(2), R(3)])
    p = polynomial(R, [1, 2, 3], "y")
 
@@ -132,7 +132,7 @@ end
    f = x^2 + 2x + 1
    g = x^3 + 3x + 2
 
-   for T in [Int, BigInt, RR, fmpz, fmpq, Rational{Int}, Rational{BigInt}]
+   for T in [Int, BigInt, RR, ZZRingElem, QQFieldElem, Rational{Int}, Rational{BigInt}]
       @test f * T(12) == 12*x^2+24*x+12
 
       @test T(7) * g == 7*x^3+21*x+14
@@ -208,9 +208,9 @@ end
 
    @test 1 != f
 
-   @test R(7) == fmpz(7)
+   @test R(7) == ZZRingElem(7)
 
-   @test fmpz(7) != f
+   @test ZZRingElem(7) != f
 
    @test R(7) == RR(7)
 

@@ -59,7 +59,7 @@ A number of things must be taken into account when making such moves:
 * Some of the code calls back into convenience functions found only in Hecke.
   These have to be rewritten in terms of AbstractAlgebra/Nemo functions.
 
-* Some of the code relies on `fmpz` being available, but would otherwise be
+* Some of the code relies on `ZZRingElem` being available, but would otherwise be
   suitable for AbstractAlgebra. This code can hopefully be rewritten to be
   agnostic about the integer type.
 

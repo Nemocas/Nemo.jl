@@ -1,10 +1,10 @@
 ###############################################################################
 #
-#   nmod.jl : Nemo nmod (integers modulo small n)
+#   zzModRingElem.jl : Nemo zzModRingElem (integers modulo small n)
 #
 ###############################################################################
 
-export nmod
+export zzModRingElem
 
 ###############################################################################
 #
@@ -12,17 +12,17 @@ export nmod
 #
 ###############################################################################
 
-parent_type(::Type{nmod}) = NmodRing
+parent_type(::Type{zzModRingElem}) = zzModRing
 
-elem_type(::Type{NmodRing}) = nmod
+elem_type(::Type{zzModRing}) = zzModRingElem
 
-base_ring(a::NmodRing) = FlintZZ
+base_ring(a::zzModRing) = FlintZZ
 
-base_ring(a::nmod) = FlintZZ
+base_ring(a::zzModRingElem) = FlintZZ
 
-parent(a::nmod) = a.parent
+parent(a::zzModRingElem) = a.parent
 
-function check_parent(a::nmod, b::nmod)
+function check_parent(a::zzModRingElem, b::zzModRingElem)
    a.parent != b.parent && error("Operations on distinct residue rings not supported")
 end
 
@@ -32,39 +32,39 @@ end
 #
 ###############################################################################
 
-function Base.hash(a::nmod, h::UInt)
+function Base.hash(a::zzModRingElem, h::UInt)
    b = 0x1812aa3492cbf4d9%UInt
    return xor(xor(hash(a.data), h), b)
 end
 
-lift(a::nmod) = fmpz(data(a))
+lift(a::zzModRingElem) = ZZRingElem(data(a))
 
-function zero(R::NmodRing)
-   return nmod(UInt(0), R)
+function zero(R::zzModRing)
+   return zzModRingElem(UInt(0), R)
 end
 
-function one(R::NmodRing)
+function one(R::zzModRing)
    if R.n == 1
-      return nmod(UInt(0), R)
+      return zzModRingElem(UInt(0), R)
    else
-      return nmod(UInt(1), R)
+      return zzModRingElem(UInt(1), R)
    end
 end
 
-iszero(a::nmod) = a.data == 0
+iszero(a::zzModRingElem) = a.data == 0
 
-isone(a::nmod) = a.parent.n == 1 ? a.data == 0 : a.data == 1
+isone(a::zzModRingElem) = a.parent.n == 1 ? a.data == 0 : a.data == 1
 
-is_unit(a::nmod) = a.parent.n == 1 ? a.data == 0 : gcd(a.data, a.parent.n) == 1
+is_unit(a::zzModRingElem) = a.parent.n == 1 ? a.data == 0 : gcd(a.data, a.parent.n) == 1
 
-modulus(R::NmodRing) = R.n
+modulus(R::zzModRing) = R.n
 
-function deepcopy_internal(a::nmod, dict::IdDict)
+function deepcopy_internal(a::zzModRingElem, dict::IdDict)
    R = parent(a)
-   return nmod(deepcopy(a.data), R)
+   return zzModRingElem(deepcopy(a.data), R)
 end
 
-characteristic(R::NmodRing) = fmpz(modulus(R))
+characteristic(R::zzModRing) = ZZRingElem(modulus(R))
 
 ###############################################################################
 #
@@ -72,7 +72,7 @@ characteristic(R::NmodRing) = fmpz(modulus(R))
 #
 ###############################################################################
 
-function canonical_unit(x::nmod)
+function canonical_unit(x::zzModRingElem)
   #the simple return x does not work
   # - if x == 0, this is not a unit
   # - if R is not a field....
@@ -87,7 +87,7 @@ function canonical_unit(x::nmod)
   elseif isone(b)
     r = b
   else
-    r = crt(fmpz(1), fmpz(a), fmpz(u), fmpz(b))
+    r = crt(ZZRingElem(1), ZZRingElem(a), ZZRingElem(u), ZZRingElem(b))
   end
   return parent(x)(r)
 end
@@ -98,15 +98,15 @@ end
 #
 ###############################################################################
 
-function show(io::IO, R::NmodRing)
+function show(io::IO, R::zzModRing)
    print(io, "Integers modulo ", signed(widen(R.n)))
 end
 
-function expressify(a::Nemo.nmod; context = nothing)
+function expressify(a::Nemo.zzModRingElem; context = nothing)
     return a.data
 end
 
-function show(io::IO, a::nmod)
+function show(io::IO, a::zzModRingElem)
    print(io, signed(widen(a.data)))
 end
 
@@ -116,12 +116,12 @@ end
 #
 ###############################################################################
 
-function -(x::nmod)
+function -(x::zzModRingElem)
    if x.data == 0
       return deepcopy(x)
    else
       R = parent(x)
-      return nmod(R.n - x.data, R)
+      return zzModRingElem(R.n - x.data, R)
    end
 end
 
@@ -131,36 +131,36 @@ end
 #
 ###############################################################################
 
-function +(x::nmod, y::nmod)
+function +(x::zzModRingElem, y::zzModRingElem)
    check_parent(x, y)
    R = parent(x)
    n = modulus(R)
    d = x.data + y.data - n
    if d > x.data
-      return nmod(d + n, R)
+      return zzModRingElem(d + n, R)
    else
-      return nmod(d, R)
+      return zzModRingElem(d, R)
    end
 end
 
-function -(x::nmod, y::nmod)
+function -(x::zzModRingElem, y::zzModRingElem)
    check_parent(x, y)
    R = parent(x)
    n = modulus(R)
    d = x.data - y.data
    if d > x.data
-      return nmod(d + n, R)
+      return zzModRingElem(d + n, R)
    else
-      return nmod(d, R)
+      return zzModRingElem(d, R)
    end
 end
 
-function *(x::nmod, y::nmod)
+function *(x::zzModRingElem, y::zzModRingElem)
    check_parent(x, y)
    R = parent(x)
    d = ccall((:n_mulmod2_preinv, libflint), UInt, (UInt, UInt, UInt, UInt),
              x.data, y.data, R.n, R.ninv)
-   return nmod(d, R)
+   return zzModRingElem(d, R)
 end
 
 ###############################################################################
@@ -169,44 +169,44 @@ end
 #
 ###############################################################################
 
-function *(x::Integer, y::nmod)
+function *(x::Integer, y::zzModRingElem)
    R = parent(y)
    return R(widen(x)*signed(widen(y.data)))
 end
 
-*(x::nmod, y::Integer) = y*x
+*(x::zzModRingElem, y::Integer) = y*x
 
-function *(x::Int, y::nmod)
+function *(x::Int, y::zzModRingElem)
    R = parent(y)
    if x < 0
       d = ccall((:n_mulmod2_preinv, libflint), UInt, (UInt, UInt, UInt, UInt),
              UInt(-x), y.data, R.n, R.ninv)
-      return -nmod(d, R)
+      return -zzModRingElem(d, R)
    else
       d = ccall((:n_mulmod2_preinv, libflint), UInt, (UInt, UInt, UInt, UInt),
              UInt(x), y.data, R.n, R.ninv)
-      return nmod(d, R)
+      return zzModRingElem(d, R)
    end
 end
 
-*(x::nmod, y::Int) = y*x
+*(x::zzModRingElem, y::Int) = y*x
 
-function *(x::UInt, y::nmod)
+function *(x::UInt, y::zzModRingElem)
    R = parent(y)
    d = ccall((:n_mulmod2_preinv, libflint), UInt, (UInt, UInt, UInt, UInt),
              UInt(x), y.data, R.n, R.ninv)
-   return nmod(d, R)
+   return zzModRingElem(d, R)
 end
 
-*(x::nmod, y::UInt) = y*x
+*(x::zzModRingElem, y::UInt) = y*x
 
-+(x::nmod, y::Integer) = x + parent(x)(y)
++(x::zzModRingElem, y::Integer) = x + parent(x)(y)
 
-+(x::Integer, y::nmod) = y + x
++(x::Integer, y::zzModRingElem) = y + x
 
--(x::nmod, y::Integer) = x - parent(x)(y)
+-(x::zzModRingElem, y::Integer) = x - parent(x)(y)
 
--(x::Integer, y::nmod) = parent(y)(x) - y
+-(x::Integer, y::zzModRingElem) = parent(y)(x) - y
 
 ###############################################################################
 #
@@ -214,7 +214,7 @@ end
 #
 ###############################################################################
 
-function ^(x::nmod, y::Int)
+function ^(x::zzModRingElem, y::Int)
    R = parent(x)
    if y < 0
       x = inv(x)
@@ -222,7 +222,7 @@ function ^(x::nmod, y::Int)
    end
    d = ccall((:n_powmod2_preinv, libflint), UInt, (UInt, Int, UInt, UInt),
              UInt(x.data), y, R.n, R.ninv)
-   return nmod(d, R)
+   return zzModRingElem(d, R)
 end
 
 ###############################################################################
@@ -231,7 +231,7 @@ end
 #
 ###############################################################################
 
-function ==(x::nmod, y::nmod)
+function ==(x::zzModRingElem, y::zzModRingElem)
    check_parent(x, y)
    return x.data == y.data
 end
@@ -242,13 +242,13 @@ end
 #
 ###############################################################################
 
-==(x::nmod, y::Integer) = x == parent(x)(y)
+==(x::zzModRingElem, y::Integer) = x == parent(x)(y)
 
-==(x::Integer, y::nmod) = parent(y)(x) == y
+==(x::Integer, y::zzModRingElem) = parent(y)(x) == y
 
-==(x::nmod, y::fmpz) = x == parent(x)(y)
+==(x::zzModRingElem, y::ZZRingElem) = x == parent(x)(y)
 
-==(x::fmpz, y::nmod) = parent(y)(x) == y
+==(x::ZZRingElem, y::zzModRingElem) = parent(y)(x) == y
 
 ###############################################################################
 #
@@ -256,7 +256,7 @@ end
 #
 ###############################################################################
 
-function inv(x::nmod)
+function inv(x::zzModRingElem)
    R = parent(x)
    (iszero(x) && R.n != 1) && throw(DivideError())
    if R.n == 1
@@ -267,7 +267,7 @@ function inv(x::nmod)
    g = ccall((:n_gcdinv, libflint), UInt, (Ptr{UInt}, UInt, UInt),
          s, x.data, R.n)
    g != 1 && error("Impossible inverse in ", R)
-   return nmod(s[], R)
+   return zzModRingElem(s[], R)
 end
 
 ###############################################################################
@@ -276,7 +276,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::nmod, y::nmod; check::Bool=true)
+function divexact(x::zzModRingElem, y::zzModRingElem; check::Bool=true)
    check_parent(x, y)
    fl, q = divides(x, y)
    if !fl
@@ -285,7 +285,7 @@ function divexact(x::nmod, y::nmod; check::Bool=true)
    return q
 end
 
-function divides(a::nmod, b::nmod)
+function divides(a::zzModRingElem, b::zzModRingElem)
    check_parent(a, b)
    if iszero(a)
       return true, a
@@ -313,28 +313,28 @@ end
 #
 ###############################################################################
 
-function gcd(x::nmod, y::nmod)
+function gcd(x::zzModRingElem, y::zzModRingElem)
    check_parent(x, y)
    R = parent(x)
    d = gcd(gcd(x.data, R.n), y.data)
    if d == R.n
-      return nmod(0, R)
+      return zzModRingElem(0, R)
    else
-      return nmod(d, R)
+      return zzModRingElem(d, R)
    end
 end
 
 @doc Markdown.doc"""
-    gcdx(a::nmod, b::nmod)
+    gcdx(a::zzModRingElem, b::zzModRingElem)
 
 Compute the extended gcd with the Euclidean structure inherited from
 $\mathbb{Z}$.
 """
-function gcdx(a::nmod, b::nmod)
+function gcdx(a::zzModRingElem, b::zzModRingElem)
    m = modulus(a)
    R = parent(a)
-   g, u, v = gcdx(fmpz(a.data), fmpz(b.data))
-   G, U, V = gcdx(g, fmpz(m))
+   g, u, v = gcdx(ZZRingElem(a.data), ZZRingElem(b.data))
+   G, U, V = gcdx(g, ZZRingElem(m))
    return R(G), R(U)*R(u), R(U)*R(v)
 end
 
@@ -344,20 +344,20 @@ end
 #
 ###############################################################################
 
-function zero!(z::nmod)
+function zero!(z::zzModRingElem)
    R = parent(z)
-   return nmod(UInt(0), R)
+   return zzModRingElem(UInt(0), R)
 end
 
-function mul!(z::nmod, x::nmod, y::nmod)
+function mul!(z::zzModRingElem, x::zzModRingElem, y::zzModRingElem)
    return x*y
 end
 
-function addeq!(z::nmod, x::nmod)
+function addeq!(z::zzModRingElem, x::zzModRingElem)
    return z + x
 end
 
-function add!(z::nmod, x::nmod, y::nmod)
+function add!(z::zzModRingElem, x::zzModRingElem, y::zzModRingElem)
    return x + y
 end
 
@@ -367,27 +367,27 @@ end
 #
 ###############################################################################
 
-# define rand(::NmodRing)
+# define rand(::zzModRing)
 
-Random.Sampler(::Type{RNG}, R::NmodRing, n::Random.Repetition) where {RNG<:AbstractRNG} =
+Random.Sampler(::Type{RNG}, R::zzModRing, n::Random.Repetition) where {RNG<:AbstractRNG} =
    Random.SamplerSimple(R, Random.Sampler(RNG, UInt(0):R.n - 1, n))
 
-rand(rng::AbstractRNG, R::Random.SamplerSimple{NmodRing}) = nmod(rand(rng, R.data), R[])
+rand(rng::AbstractRNG, R::Random.SamplerSimple{zzModRing}) = zzModRingElem(rand(rng, R.data), R[])
 
-Random.gentype(::Type{NmodRing}) = elem_type(NmodRing)
+Random.gentype(::Type{zzModRing}) = elem_type(zzModRing)
 
-# define rand(make(R::NmodRing, arr)), where arr is any abstract array with integer or fmpz entries
+# define rand(make(R::zzModRing, arr)), where arr is any abstract array with integer or ZZRingElem entries
 
-RandomExtensions.maketype(R::NmodRing, _) = elem_type(R)
+RandomExtensions.maketype(R::zzModRing, _) = elem_type(R)
 
-rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{nmod,NmodRing,<:AbstractArray{<:IntegerUnion}}}) =
+rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{zzModRingElem,zzModRing,<:AbstractArray{<:IntegerUnion}}}) =
    sp[][1](rand(rng, sp[][2]))
 
-# define rand(R::NmodRing, arr), where arr is any abstract array with integer or fmpz entries
+# define rand(R::zzModRing, arr), where arr is any abstract array with integer or ZZRingElem entries
 
-rand(r::Random.AbstractRNG, R::NmodRing, b::AbstractArray) = rand(r, make(R, b))
+rand(r::Random.AbstractRNG, R::zzModRing, b::AbstractArray) = rand(r, make(R, b))
 
-rand(R::NmodRing, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
+rand(R::zzModRing, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
 
 ###############################################################################
 #
@@ -395,9 +395,9 @@ rand(R::NmodRing, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
 #
 ###############################################################################
 
-promote_rule(::Type{nmod}, ::Type{T}) where T <: Integer = nmod
+promote_rule(::Type{zzModRingElem}, ::Type{T}) where T <: Integer = zzModRingElem
 
-promote_rule(::Type{nmod}, ::Type{fmpz}) = nmod
+promote_rule(::Type{zzModRingElem}, ::Type{ZZRingElem}) = zzModRingElem
 
 ###############################################################################
 #
@@ -405,20 +405,20 @@ promote_rule(::Type{nmod}, ::Type{fmpz}) = nmod
 #
 ###############################################################################
 
-function (R::NmodRing)()
-   return nmod(UInt(0), R)
+function (R::zzModRing)()
+   return zzModRingElem(UInt(0), R)
 end
 
-function (R::NmodRing)(a::Integer)
+function (R::zzModRing)(a::Integer)
    n = R.n
    d = a%signed(widen(n))
    if d < 0
       d += n
    end
-   return nmod(UInt(d), R)
+   return zzModRingElem(UInt(d), R)
 end
 
-function (R::NmodRing)(a::Int)
+function (R::zzModRing)(a::Int)
    n = R.n
    ninv = R.ninv
    if reinterpret(Int, n) > 0 && a < 0
@@ -432,24 +432,24 @@ function (R::NmodRing)(a::Int)
       d = ccall((:n_mod2_preinv, libflint), UInt, (UInt, UInt, UInt),
              d, n, ninv)
    end
-   return nmod(d, R)
+   return zzModRingElem(d, R)
 end
 
-function (R::NmodRing)(a::UInt)
+function (R::zzModRing)(a::UInt)
    n = R.n
    ninv = R.ninv
    a = ccall((:n_mod2_preinv, libflint), UInt, (UInt, UInt, UInt),
              a, n, ninv)
-   return nmod(a, R)
+   return zzModRingElem(a, R)
 end
 
-function (R::NmodRing)(a::fmpz)
-   d = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{fmpz}, UInt),
+function (R::zzModRing)(a::ZZRingElem)
+   d = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt),
              a, R.n)
-   return nmod(d, R)
+   return zzModRingElem(d, R)
 end
 
-function (R::NmodRing)(a::Union{gfp_elem, nmod, gfp_fmpz_elem, fmpz_mod})
+function (R::zzModRing)(a::Union{fpFieldElem, zzModRingElem, FpFieldElem, ZZModRingElem})
    S = parent(a)
    if S === R
       return a
@@ -461,17 +461,17 @@ end
 
 ###############################################################################
 #
-#   nmod constructor
+#   zzModRingElem constructor
 #
 ###############################################################################
 
-function ResidueRing(R::FlintIntegerRing, n::Int; cached::Bool=true)
+function ResidueRing(R::ZZRing, n::Int; cached::Bool=true)
    # Modulus of zero cannot be supported. E.g. Flint library could not be expected to
    # do matrices over Z/0 using a Z/nZ type. The former is multiprecision, the latter not.
    n <= 0 && throw(DomainError(n, "Modulus must be positive"))
-   return NmodRing(UInt(n), cached)
+   return zzModRing(UInt(n), cached)
 end
 
-function ResidueRing(R::FlintIntegerRing, n::UInt; cached::Bool=true)
-   return NmodRing(n, cached)
+function ResidueRing(R::ZZRing, n::UInt; cached::Bool=true)
+   return zzModRing(n, cached)
 end

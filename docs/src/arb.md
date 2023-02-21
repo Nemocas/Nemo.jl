@@ -210,8 +210,8 @@ contains(::arb, ::arb)
 
 ```@docs
 contains(::arb, ::Integer)
-contains(::arb, ::fmpz)
-contains(::arb, ::fmpq)
+contains(::arb, ::ZZRingElem)
+contains(::arb, ::QQFieldElem)
 contains{T <: Integer}(::arb, ::Rational{T})
 contains(::arb, ::BigFloat)
 ```
@@ -275,20 +275,20 @@ Function                      |
 ------------------------------|
 `==(x::arb, y::Integer)`      |
 `==(x::Integer, y::arb)`      |
-`==(x::arb, y::fmpz)`         |
-`==(x::fmpz, y::arb)`         |
+`==(x::arb, y::ZZRingElem)`         |
+`==(x::ZZRingElem, y::arb)`         |
 `==(x::arb, y::Float64)`      |
 `==(x::Float64, y::arb)`      |
 `isless(x::arb, y::Integer)`  |
 `isless(x::Integer, y::arb)`  |
-`isless(x::arb, y::fmpz)`     |
-`isless(x::fmpz, y::arb)`     |
+`isless(x::arb, y::ZZRingElem)`     |
+`isless(x::ZZRingElem, y::arb)`     |
 `isless(x::arb, y::Float64)`  |
 `isless(x::Float64, y::arb)`  |
 `isless(x::arb, y::BigFloat)` |
 `isless(x::BigFloat, y::arb)` |
-`isless(x::arb, y::fmpq)`     |
-`isless(x::fmpq, y::arb)`     |
+`isless(x::arb, y::QQFieldElem)`     |
+`isless(x::QQFieldElem, y::arb)`     |
 
 **Examples**
 
@@ -485,7 +485,7 @@ binomial(::UInt, ::UInt, ::ArbField)
 ```
 
 ```@docs
-fibonacci(::fmpz, ::ArbField)
+fibonacci(::ZZRingElem, ::ArbField)
 ```
 
 ```@docs
@@ -493,11 +493,11 @@ fibonacci(::Int, ::ArbField)
 ```
 
 ```@docs
-gamma(::fmpz, ::ArbField)
+gamma(::ZZRingElem, ::ArbField)
 ```
 
 ```@docs
-gamma(::fmpq, ::ArbField)
+gamma(::QQFieldElem, ::ArbField)
 ```
 
 ```@docs
@@ -513,7 +513,7 @@ rising_factorial(::arb, ::Int)
 ```
 
 ```@docs
-rising_factorial(::fmpq, ::Int, ::ArbField)
+rising_factorial(::QQFieldElem, ::Int, ::ArbField)
 ```
 
 ```@docs
@@ -541,7 +541,7 @@ chebyshev_u2(::Int, ::arb)
 ```
 
 ```@docs
-bell(::fmpz, ::ArbField)
+bell(::ZZRingElem, ::ArbField)
 ```
 
 ```@docs
@@ -549,7 +549,7 @@ bell(::Int, ::ArbField)
 ```
 
 ```@docs
-numpart(::fmpz, ::ArbField)
+numpart(::ZZRingElem, ::ArbField)
 ```
 
 ```@docs

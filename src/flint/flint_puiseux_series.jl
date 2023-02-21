@@ -531,7 +531,7 @@ end
 ###############################################################################
 
 function (R::FlintPuiseuxSeriesRing{T})(b::RingElement) where T <: RingElem
-   # TODO this method applies to b::fmpz_poly but is broken
+   # TODO this method applies to b::ZZPolyRingElem but is broken
    return R(base_ring(R)(b))
 end
 

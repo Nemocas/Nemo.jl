@@ -1,10 +1,10 @@
 ################################################################################
 #
-#  gfp_mat.jl: flint gfp_mat types in julia for small prime modulus
+#  fpMatrix.jl: flint fpMatrix types in julia for small prime modulus
 #
 ################################################################################
 
-export gfp_mat, GFPMatSpace
+export fpMatrix, fpMatrixSpace
 
 ################################################################################
 #
@@ -12,11 +12,11 @@ export gfp_mat, GFPMatSpace
 #
 ################################################################################
 
-parent_type(::Type{gfp_mat}) = GFPMatSpace
+parent_type(::Type{fpMatrix}) = fpMatrixSpace
 
-elem_type(::Type{GFPMatSpace}) = gfp_mat
+elem_type(::Type{fpMatrixSpace}) = fpMatrix
 
-dense_matrix_type(::Type{gfp_elem}) = gfp_mat
+dense_matrix_type(::Type{fpFieldElem}) = fpMatrix
 
 ###############################################################################
 #
@@ -24,13 +24,13 @@ dense_matrix_type(::Type{gfp_elem}) = gfp_mat
 #
 ###############################################################################
 
-function similar(::gfp_mat, R::GaloisField, r::Int, c::Int)
-   z = gfp_mat(r, c, R.n)
+function similar(::fpMatrix, R::fpField, r::Int, c::Int)
+   z = fpMatrix(r, c, R.n)
    z.base_ring = R
    return z
 end
 
-zero(m::gfp_mat, R::GaloisField, r::Int, c::Int) = similar(m, R, r, c)
+zero(m::fpMatrix, R::fpField, r::Int, c::Int) = similar(m, R, r, c)
 
 ################################################################################
 #
@@ -38,41 +38,41 @@ zero(m::gfp_mat, R::GaloisField, r::Int, c::Int) = similar(m, R, r, c)
 #
 ################################################################################
 
-@inline function getindex(a::gfp_mat, i::Int, j::Int)
+@inline function getindex(a::fpMatrix, i::Int, j::Int)
   @boundscheck Generic._checkbounds(a, i, j)
   u = ccall((:nmod_mat_get_entry, libflint), UInt,
-            (Ref{gfp_mat}, Int, Int), a, i - 1 , j - 1)
-  return gfp_elem(u, base_ring(a)) # no reduction needed
+            (Ref{fpMatrix}, Int, Int), a, i - 1 , j - 1)
+  return fpFieldElem(u, base_ring(a)) # no reduction needed
 end
 
-@inline function setindex!(a::gfp_mat, u::gfp_elem, i::Int, j::Int)
+@inline function setindex!(a::fpMatrix, u::fpFieldElem, i::Int, j::Int)
   @boundscheck Generic._checkbounds(a, i, j)
   (base_ring(a) != parent(u)) && error("Parent objects must coincide")
   setindex_raw!(a, u.data, i, j) # no reduction necessary
 end
 
-function deepcopy_internal(a::gfp_mat, dict::IdDict)
-  z = gfp_mat(nrows(a), ncols(a), a.n)
+function deepcopy_internal(a::fpMatrix, dict::IdDict)
+  z = fpMatrix(nrows(a), ncols(a), a.n)
   if isdefined(a, :base_ring)
     z.base_ring = a.base_ring
   end
   ccall((:nmod_mat_set, libflint), Nothing,
-          (Ref{gfp_mat}, Ref{gfp_mat}), z, a)
+          (Ref{fpMatrix}, Ref{fpMatrix}), z, a)
   return z
 end
 
-nrows(a::GFPMatSpace) = a.nrows
+nrows(a::fpMatrixSpace) = a.nrows
 
-ncols(a::GFPMatSpace) = a.ncols
+ncols(a::fpMatrixSpace) = a.ncols
 
-base_ring(a::GFPMatSpace) = a.base_ring
+base_ring(a::fpMatrixSpace) = a.base_ring
 
-zero(a::GFPMatSpace) = a()
+zero(a::fpMatrixSpace) = a()
 
-function one(a::GFPMatSpace)
+function one(a::fpMatrixSpace)
   (nrows(a) != ncols(a)) && error("Matrices must be square")
   z = a()
-  ccall((:nmod_mat_one, libflint), Nothing, (Ref{gfp_mat}, ), z)
+  ccall((:nmod_mat_one, libflint), Nothing, (Ref{fpMatrix}, ), z)
   return z
 end
 
@@ -82,12 +82,12 @@ end
 #
 ################################################################################
 
-function *(x::gfp_mat, y::gfp_elem)
+function *(x::fpMatrix, y::fpFieldElem)
   (base_ring(x) != parent(y)) && error("Parent objects must coincide")
   return x*y.data
 end
 
-*(x::gfp_elem, y::gfp_mat) = y*x
+*(x::fpFieldElem, y::fpMatrix) = y*x
 
 ################################################################################
 #
@@ -95,14 +95,14 @@ end
 #
 ################################################################################
 
-function rref(a::gfp_mat)
+function rref(a::fpMatrix)
   z = deepcopy(a)
-  r = ccall((:nmod_mat_rref, libflint), Int, (Ref{gfp_mat}, ), z)
+  r = ccall((:nmod_mat_rref, libflint), Int, (Ref{fpMatrix}, ), z)
   return r, z
 end
 
-function rref!(a::gfp_mat)
-  r = ccall((:nmod_mat_rref, libflint), Int, (Ref{gfp_mat}, ), a)
+function rref!(a::fpMatrix)
+  r = ccall((:nmod_mat_rref, libflint), Int, (Ref{fpMatrix}, ), a)
   return r
 end
 
@@ -113,12 +113,12 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
-    strong_echelon_form(a::gfp_mat)
+    strong_echelon_form(a::fpMatrix)
 
 Return the strong echeleon form of $a$. The matrix $a$ must have at least as
 many rows as columns.
 """
-function strong_echelon_form(a::gfp_mat)
+function strong_echelon_form(a::fpMatrix)
   (nrows(a) < ncols(a)) &&
               error("Matrix must have at least as many rows as columns")
   r, z = rref(a)
@@ -137,12 +137,12 @@ function strong_echelon_form(a::gfp_mat)
 end
 
 @doc Markdown.doc"""
-    howell_form(a::gfp_mat)
+    howell_form(a::fpMatrix)
 
 Return the Howell normal form of $a$. The matrix $a$ must have at least as
 many rows as columns.
 """
-function howell_form(a::gfp_mat)
+function howell_form(a::fpMatrix)
   (nrows(a) < ncols(a)) &&
               error("Matrix must have at least as many rows as columns")
   return rref(a)[2]
@@ -154,9 +154,9 @@ end
 #
 ################################################################################
 
-function det(a::gfp_mat)
+function det(a::fpMatrix)
   !is_square(a) && error("Matrix must be a square matrix")
-  r = ccall((:nmod_mat_det, libflint), UInt, (Ref{gfp_mat}, ), a)
+  r = ccall((:nmod_mat_det, libflint), UInt, (Ref{fpMatrix}, ), a)
   return base_ring(a)(r)
 end
 
@@ -166,7 +166,7 @@ end
 #
 ################################################################################
 
-function Base.view(x::gfp_mat, r1::Int, c1::Int, r2::Int, c2::Int)
+function Base.view(x::fpMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
 
    _checkrange_or_empty(nrows(x), r1, r2) ||
       Base.throw_boundserror(x, (r1:r2, c1:c2))
@@ -183,18 +183,18 @@ function Base.view(x::gfp_mat, r1::Int, c1::Int, r2::Int, c2::Int)
      c2 = 0
    end
 
-  z = gfp_mat()
+  z = fpMatrix()
   z.base_ring = x.base_ring
   z.view_parent = x
   ccall((:nmod_mat_window_init, libflint), Nothing,
-          (Ref{gfp_mat}, Ref{gfp_mat}, Int, Int, Int, Int),
+          (Ref{fpMatrix}, Ref{fpMatrix}, Int, Int, Int, Int),
           z, x, r1 - 1, c1 - 1, r2, c2)
   finalizer(_gfp_mat_window_clear_fn, z)
   return z
 end
 
-function _gfp_mat_window_clear_fn(a::gfp_mat)
-  ccall((:nmod_mat_window_clear, libflint), Nothing, (Ref{gfp_mat}, ), a)
+function _gfp_mat_window_clear_fn(a::fpMatrix)
+  ccall((:nmod_mat_window_clear, libflint), Nothing, (Ref{fpMatrix}, ), a)
 end
 
 ################################################################################
@@ -203,8 +203,8 @@ end
 #
 ################################################################################
 
-function Array(b::gfp_mat)
-  a = Array{gfp_elem}(undef, b.r, b.c)
+function Array(b::fpMatrix)
+  a = Array{fpFieldElem}(undef, b.r, b.c)
   for i = 1:b.r
     for j = 1:b.c
       a[i, j] = b[i, j]
@@ -220,16 +220,16 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
-    lift(a::gfp_mat)
+    lift(a::fpMatrix)
 
 Return a lift of the matrix $a$ to a matrix over $\mathbb{Z}$, i.e. where the
 entries of the returned matrix are those of $a$ lifted to $\mathbb{Z}$.
 """
-function lift(a::gfp_mat)
-  z = fmpz_mat(nrows(a), ncols(a))
+function lift(a::fpMatrix)
+  z = ZZMatrix(nrows(a), ncols(a))
   z.base_ring = FlintZZ
   ccall((:fmpz_mat_set_nmod_mat, libflint), Nothing,
-          (Ref{fmpz_mat}, Ref{gfp_mat}), z, a)
+          (Ref{ZZMatrix}, Ref{fpMatrix}), z, a)
   return z
 end
 
@@ -239,11 +239,11 @@ end
 #
 ################################################################################
 
-function charpoly(R::GFPPolyRing, a::gfp_mat)
+function charpoly(R::fpPolyRing, a::fpMatrix)
   m = deepcopy(a)
   p = R()
   ccall((:nmod_mat_charpoly, libflint), Nothing,
-          (Ref{gfp_poly}, Ref{gfp_mat}), p, m)
+          (Ref{fpPolyRingElem}, Ref{fpMatrix}), p, m)
   return p
 end
 
@@ -253,10 +253,10 @@ end
 #
 ################################################################################
 
-function minpoly(R::GFPPolyRing, a::gfp_mat)
+function minpoly(R::fpPolyRing, a::fpMatrix)
   p = R()
   ccall((:nmod_mat_minpoly, libflint), Nothing,
-          (Ref{gfp_poly}, Ref{gfp_mat}), p, a)
+          (Ref{fpPolyRingElem}, Ref{fpMatrix}), p, a)
   return p
 end
 
@@ -266,11 +266,11 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{gfp_mat}, ::Type{V}) where {V <: Integer} = gfp_mat
+promote_rule(::Type{fpMatrix}, ::Type{V}) where {V <: Integer} = fpMatrix
 
-promote_rule(::Type{gfp_mat}, ::Type{gfp_elem}) = gfp_mat
+promote_rule(::Type{fpMatrix}, ::Type{fpFieldElem}) = fpMatrix
 
-promote_rule(::Type{gfp_mat}, ::Type{fmpz}) = gfp_mat
+promote_rule(::Type{fpMatrix}, ::Type{ZZRingElem}) = fpMatrix
 
 ################################################################################
 #
@@ -278,11 +278,11 @@ promote_rule(::Type{gfp_mat}, ::Type{fmpz}) = gfp_mat
 #
 ################################################################################
 
-function inv(a::gfp_mat)
+function inv(a::fpMatrix)
   !is_square(a) && error("Matrix must be a square matrix")
   z = similar(a)
   r = ccall((:nmod_mat_inv, libflint), Int,
-          (Ref{gfp_mat}, Ref{gfp_mat}), z, a)
+          (Ref{fpMatrix}, Ref{fpMatrix}), z, a)
   !Bool(r) && error("Matrix not invertible")
   return z
 end
@@ -293,7 +293,7 @@ end
 #
 ################################################################################
 
-function can_solve_with_solution(a::gfp_mat, b::gfp_mat; side::Symbol = :right)
+function can_solve_with_solution(a::fpMatrix, b::fpMatrix; side::Symbol = :right)
    (base_ring(a) != base_ring(b)) && error("Matrices must have same base ring")
    if side == :left
       (ncols(a) != ncols(b)) && error("Matrices must have same number of columns")
@@ -303,14 +303,14 @@ function can_solve_with_solution(a::gfp_mat, b::gfp_mat; side::Symbol = :right)
       (nrows(a) != nrows(b)) && error("Matrices must have same number of rows")
       x = similar(a, ncols(a), ncols(b))
       r = ccall((:nmod_mat_can_solve, libflint), Cint,
-                (Ref{gfp_mat}, Ref{gfp_mat}, Ref{gfp_mat}), x, a, b)
+                (Ref{fpMatrix}, Ref{fpMatrix}, Ref{fpMatrix}), x, a, b)
       return Bool(r), x
    else
       error("Unsupported argument :$side for side: Must be :left or :right.")
    end
 end
 
-function can_solve(a::gfp_mat, b::gfp_mat; side::Symbol = :right)
+function can_solve(a::fpMatrix, b::fpMatrix; side::Symbol = :right)
    fl, _ = can_solve_with_solution(a, b, side = side)
    return fl
 end
@@ -321,13 +321,13 @@ end
 #
 ################################################################################
 
-function (a::GFPMatSpace)()
-  z = gfp_mat(nrows(a), ncols(a), a.n)
+function (a::fpMatrixSpace)()
+  z = fpMatrix(nrows(a), ncols(a), a.n)
   z.base_ring = a.base_ring
   return z
 end
 
-function (a::GFPMatSpace)(b::Integer)
+function (a::fpMatrixSpace)(b::Integer)
    M = a()
    for i = 1:nrows(a)
       for j = 1:ncols(a)
@@ -341,7 +341,7 @@ function (a::GFPMatSpace)(b::Integer)
    return M
 end
 
-function (a::GFPMatSpace)(b::fmpz)
+function (a::fpMatrixSpace)(b::ZZRingElem)
    M = a()
    for i = 1:nrows(a)
       for j = 1:ncols(a)
@@ -355,7 +355,7 @@ function (a::GFPMatSpace)(b::fmpz)
    return M
 end
 
-function (a::GFPMatSpace)(b::gfp_elem)
+function (a::fpMatrixSpace)(b::fpFieldElem)
    parent(b) != base_ring(a) && error("Unable to coerce to matrix")
    M = a()
    for i = 1:nrows(a)
@@ -370,67 +370,67 @@ function (a::GFPMatSpace)(b::gfp_elem)
    return M
 end
 
-function (a::GFPMatSpace)(arr::AbstractMatrix{BigInt}, transpose::Bool = false)
+function (a::fpMatrixSpace)(arr::AbstractMatrix{BigInt}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
-  z = gfp_mat(nrows(a), ncols(a), a.n, arr, transpose)
+  z = fpMatrix(nrows(a), ncols(a), a.n, arr, transpose)
   z.base_ring = a.base_ring
   return z
 end
 
-function (a::GFPMatSpace)(arr::AbstractVector{BigInt})
+function (a::fpMatrixSpace)(arr::AbstractVector{BigInt})
   _check_dim(nrows(a), ncols(a), arr)
-  z = gfp_mat(nrows(a), ncols(a), a.n, arr)
+  z = fpMatrix(nrows(a), ncols(a), a.n, arr)
   z.base_ring = a.base_ring
   return z
 end
 
-function (a::GFPMatSpace)(arr::AbstractMatrix{fmpz}, transpose::Bool = false)
+function (a::fpMatrixSpace)(arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
-  z = gfp_mat(nrows(a), ncols(a), a.n, arr, transpose)
+  z = fpMatrix(nrows(a), ncols(a), a.n, arr, transpose)
   z.base_ring = a.base_ring
   return z
 end
 
-function (a::GFPMatSpace)(arr::AbstractVector{fmpz})
+function (a::fpMatrixSpace)(arr::AbstractVector{ZZRingElem})
   _check_dim(nrows(a), ncols(a), arr)
-  z = gfp_mat(nrows(a), ncols(a), a.n, arr)
+  z = fpMatrix(nrows(a), ncols(a), a.n, arr)
   z.base_ring = a.base_ring
   return z
 end
 
-function (a::GFPMatSpace)(arr::AbstractMatrix{Int}, transpose::Bool = false)
+function (a::fpMatrixSpace)(arr::AbstractMatrix{Int}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
-  z = gfp_mat(nrows(a), ncols(a), a.n, arr, transpose)
+  z = fpMatrix(nrows(a), ncols(a), a.n, arr, transpose)
   z.base_ring = a.base_ring
   return z
 end
 
-function (a::GFPMatSpace)(arr::AbstractVector{Int})
+function (a::fpMatrixSpace)(arr::AbstractVector{Int})
   _check_dim(nrows(a), ncols(a), arr)
-  z = gfp_mat(nrows(a), ncols(a), a.n, arr)
+  z = fpMatrix(nrows(a), ncols(a), a.n, arr)
   z.base_ring = a.base_ring
   return z
 end
 
-function (a::GFPMatSpace)(arr::AbstractMatrix{gfp_elem}, transpose::Bool = false)
+function (a::fpMatrixSpace)(arr::AbstractMatrix{fpFieldElem}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
-  z = gfp_mat(nrows(a), ncols(a), a.n, arr, transpose)
+  z = fpMatrix(nrows(a), ncols(a), a.n, arr, transpose)
   z.base_ring = a.base_ring
   return z
 end
 
-function (a::GFPMatSpace)(arr::AbstractVector{gfp_elem})
+function (a::fpMatrixSpace)(arr::AbstractVector{fpFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
-  z = gfp_mat(nrows(a), ncols(a), a.n, arr)
+  z = fpMatrix(nrows(a), ncols(a), a.n, arr)
   z.base_ring = a.base_ring
   return z
 end
 
-function (a::GFPMatSpace)(b::fmpz_mat)
+function (a::fpMatrixSpace)(b::ZZMatrix)
   (ncols(a) != b.c || nrows(a) != b.r) && error("Dimensions do not fit")
-  z = gfp_mat(a.n, b)
+  z = fpMatrix(a.n, b)
   z.base_ring = a.base_ring
   return z
 end
@@ -441,15 +441,15 @@ end
 #
 ###############################################################################
 
-function matrix(R::GaloisField, arr::AbstractMatrix{<: Union{gfp_elem, fmpz, Integer}})
-   z = gfp_mat(size(arr, 1), size(arr, 2), R.n, arr)
+function matrix(R::fpField, arr::AbstractMatrix{<: Union{fpFieldElem, ZZRingElem, Integer}})
+   z = fpMatrix(size(arr, 1), size(arr, 2), R.n, arr)
    z.base_ring = R
    return z
 end
 
-function matrix(R::GaloisField, r::Int, c::Int, arr::AbstractVector{<: Union{gfp_elem, fmpz, Integer}})
+function matrix(R::fpField, r::Int, c::Int, arr::AbstractVector{<: Union{fpFieldElem, ZZRingElem, Integer}})
    _check_dim(r, c, arr)
-   z = gfp_mat(r, c, R.n, arr)
+   z = fpMatrix(r, c, R.n, arr)
    z.base_ring = R
    return z
 end
@@ -460,11 +460,11 @@ end
 #
 ###############################################################################
 
-function zero_matrix(R::GaloisField, r::Int, c::Int)
+function zero_matrix(R::fpField, r::Int, c::Int)
    if r < 0 || c < 0
      error("dimensions must not be negative")
    end
-   z = gfp_mat(r, c, R.n)
+   z = fpMatrix(r, c, R.n)
    z.base_ring = R
    return z
 end
@@ -475,7 +475,7 @@ end
 #
 ###############################################################################
 
-function identity_matrix(R::GaloisField, n::Int)
+function identity_matrix(R::fpField, n::Int)
    z = zero_matrix(R, n, n)
    for i in 1:n
       z[i, i] = one(R)
@@ -490,6 +490,6 @@ end
 #
 ################################################################################
 
-function MatrixSpace(R::GaloisField, r::Int, c::Int; cached::Bool = true)
-  GFPMatSpace(R, r, c, cached)
+function MatrixSpace(R::fpField, r::Int, c::Int; cached::Bool = true)
+  fpMatrixSpace(R, r, c, cached)
 end

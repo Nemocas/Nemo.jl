@@ -163,7 +163,7 @@ definition inside the module than what it exports is as follows. Firstly, we
 do not import the functions from Base or export the functions at all.
 Internally we make our definitions as we want them, but then we overload the
 Base version explicitly to do what the console version of the function should
-do. This is done by explicitly defining `Base.sqrt(::fmpz)` for example without
+do. This is done by explicitly defining `Base.sqrt(::ZZRingElem)` for example without
 explicitly importing `sqrt` from Base, etc.
 
 In the Generic module discussed below, we import the definitions from
@@ -191,8 +191,8 @@ in Nemo, `R, x = Generic.PolynomialRing(ZZ, "x")` will construct a generic
 polynomial ring over Nemo integers instead of constructing a Flint polynomial
 ring.
 
-In other words `x` will have the type `Generic.Poly{fmpz}` instead of the
-usual `fmpz_poly`.
+In other words `x` will have the type `Generic.Poly{ZZRingElem}` instead of the
+usual `ZZPolyRingElem`.
 
 The ability to construct generic polynomials and matrices and the like is
 useful for test code and for tracking down bugs in basic arithmetic. It is

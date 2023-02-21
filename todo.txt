@@ -30,26 +30,26 @@ General
 
 * extend documentation for absolute power series
 
-fq_poly.jl / fq_nmod_poly.jl
+FqPolyRepPolyRingElem.jl / fqPolyRepPolyRingElem.jl
 ----------------------------
 
 * divexact is missing along with numerous other things provided by generic Poly
 
 * division is currently using basecase instead of divide and conquer
 
-nmod_poly.jl
+zzModPolyRingElem.jl
 ------------
 
 * Add constructor for array of ints
 
 * Use Int throughout instead of UInt and allow modulus only up to typemax(Int)
 
-fmpz_mod_poly.jl
+ZZModPolyRingElem.jl
 ----------------
 
 * Add constructor for array of ints 
 
-Poly.jl/fmpz_poly.jl
+Poly.jl/ZZPolyRingElem.jl
 --------------------
 
 * Fix efficient powering of x in flint specialised polynomials cases
@@ -93,7 +93,7 @@ FLINT
 
 * document and test fq_poly_scalar_div_fq
 
-* add fq_poly_scalar_div_ui/si/fmpz
+* add fq_poly_scalar_div_ui/si/ZZRingElem
 
 * implement print_pretty_series (reverse order of coeffs)
 
@@ -104,15 +104,15 @@ FLINT
 * handle monomials and binomials optimally in powering, composition, division
   etc. in polynomial/power series functions (over Z, Z/nZ, Q, Fq)
 
-* Print pretty for fmpz_mod_poly
+* Print pretty for ZZModPolyRingElem
 
-* Inflate/deflate for fmpz_mod_poly
+* Inflate/deflate for ZZModPolyRingElem
 
-* Interpolate for fmpz_mod_poly
+* Interpolate for ZZModPolyRingElem
 
-* factor_get_fmpz_mod_poly for fmpz_mod_poly (inlines.c)
+* factor_get_fmpz_mod_poly for ZZModPolyRingElem (inlines.c)
 
-* gcdinv doesn't exist for fq_poly and fq_nmod_poly
+* gcdinv doesn't exist for FqPolyRepPolyRingElem and fqPolyRepPolyRingElem
 
 PowerSeries.jl
 --------------
@@ -139,14 +139,14 @@ nf.jl
   over Q, and yet allow all the coercions from that ring into number fields
   maximal orders, ideals, etc., without making it inefficient
 
-nmod_mat
+zzModMatrix
 --------
 
 * fix _checkbounds and related functions
 
 * implement missing functions from generic matrices
 
-fmpz_mat
+ZZMatrix
 --------
 
 * fix _checkbounds

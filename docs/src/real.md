@@ -225,8 +225,8 @@ contains(::RealElem, ::RealElem)
 
 ```@docs
 contains(::RealElem, ::Integer)
-contains(::RealElem, ::fmpz)
-contains(::RealElem, ::fmpq)
+contains(::RealElem, ::ZZRingElem)
+contains(::RealElem, ::QQFieldElem)
 contains{T <: Integer}(::RealElem, ::Rational{T})
 contains(::RealElem, ::BigFloat)
 ```
@@ -290,20 +290,20 @@ Function                      |
 ------------------------------|
 `==(x::RealElem, y::Integer)`      |
 `==(x::Integer, y::RealElem)`      |
-`==(x::RealElem, y::fmpz)`         |
-`==(x::fmpz, y::RealElem)`         |
+`==(x::RealElem, y::ZZRingElem)`         |
+`==(x::ZZRingElem, y::RealElem)`         |
 `==(x::RealElem, y::Float64)`      |
 `==(x::Float64, y::RealElem)`      |
 `isless(x::RealElem, y::Integer)`  |
 `isless(x::Integer, y::RealElem)`  |
-`isless(x::RealElem, y::fmpz)`     |
-`isless(x::fmpz, y::RealElem)`     |
+`isless(x::RealElem, y::ZZRingElem)`     |
+`isless(x::ZZRingElem, y::RealElem)`     |
 `isless(x::RealElem, y::Float64)`  |
 `isless(x::Float64, y::RealElem)`  |
 `isless(x::RealElem, y::BigFloat)` |
 `isless(x::BigFloat, y::RealElem)` |
-`isless(x::RealElem, y::fmpq)`     |
-`isless(x::fmpq, y::RealElem)`     |
+`isless(x::RealElem, y::QQFieldElem)`     |
+`isless(x::QQFieldElem, y::RealElem)`     |
 
 **Examples**
 
@@ -500,7 +500,7 @@ binomial(::UInt, ::UInt, ::RealField)
 ```
 
 ```@docs
-fibonacci(::fmpz, ::RealField)
+fibonacci(::ZZRingElem, ::RealField)
 ```
 
 ```@docs
@@ -508,11 +508,11 @@ fibonacci(::Int, ::RealField)
 ```
 
 ```@docs
-gamma(::fmpz, ::RealField)
+gamma(::ZZRingElem, ::RealField)
 ```
 
 ```@docs
-gamma(::fmpq, ::RealField)
+gamma(::QQFieldElem, ::RealField)
 ```
 
 ```@docs
@@ -528,7 +528,7 @@ rising_factorial(::RealElem, ::Int)
 ```
 
 ```@docs
-rising_factorial(::fmpq, ::Int, ::RealField)
+rising_factorial(::QQFieldElem, ::Int, ::RealField)
 ```
 
 ```@docs
@@ -556,7 +556,7 @@ chebyshev_u2(::Int, ::RealElem)
 ```
 
 ```@docs
-bell(::fmpz, ::RealField)
+bell(::ZZRingElem, ::RealField)
 ```
 
 ```@docs
@@ -564,7 +564,7 @@ bell(::Int, ::RealField)
 ```
 
 ```@docs
-numpart(::fmpz, ::RealField)
+numpart(::ZZRingElem, ::RealField)
 ```
 
 ```@docs

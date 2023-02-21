@@ -1,4 +1,4 @@
-@testset "nmod_mpoly.constructors" begin
+@testset "zzModMPolyRingElem.constructors" begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -21,30 +21,30 @@
       @test modulus(S) == modulus(R)
       @test modulus(varlist[1]) == modulus(R)
 
-      @test elem_type(S) == nmod_mpoly
-      @test elem_type(NmodMPolyRing) == nmod_mpoly
-      @test parent_type(nmod_mpoly) == NmodMPolyRing
+      @test elem_type(S) == zzModMPolyRingElem
+      @test elem_type(zzModMPolyRing) == zzModMPolyRingElem
+      @test parent_type(zzModMPolyRingElem) == zzModMPolyRing
 
-      @test Nemo.promote_rule(elem_type(S), fmpz) == elem_type(S)
+      @test Nemo.promote_rule(elem_type(S), ZZRingElem) == elem_type(S)
 
-      @test typeof(S) <: NmodMPolyRing
+      @test typeof(S) <: zzModMPolyRing
 
       isa(symbols(S), Vector{Symbol})
 
       for j = 1:num_vars
-         @test isa(varlist[j], nmod_mpoly)
-         @test isa(gens(S)[j], nmod_mpoly)
+         @test isa(varlist[j], zzModMPolyRingElem)
+         @test isa(gens(S)[j], zzModMPolyRingElem)
       end
 
       f =  rand(S, 0:5, 0:100)
 
-      @test isa(f, nmod_mpoly)
+      @test isa(f, zzModMPolyRingElem)
 
-      @test isa(S(2), nmod_mpoly)
+      @test isa(S(2), zzModMPolyRingElem)
 
-      @test isa(S(R(2)), nmod_mpoly)
+      @test isa(S(R(2)), zzModMPolyRingElem)
 
-      @test isa(S(f), nmod_mpoly)
+      @test isa(S(f), zzModMPolyRingElem)
 
       V = [(rand(-100:100)) for i in 1:5]
 
@@ -52,7 +52,7 @@
 
       f = S(map(v -> R.(v), V), W0)
 
-      @test isa(f, nmod_mpoly)
+      @test isa(f, zzModMPolyRingElem)
 
       # Test the BuildCtx
       
@@ -63,7 +63,7 @@
           push_term!(bctx, RR(v), Int.(w0))
         end
         ff = finish(bctx)
-        @test isa(ff, nmod_mpoly)
+        @test isa(ff, zzModMPolyRingElem)
         @test f == ff
       end
 
@@ -87,7 +87,7 @@
    @test_throws ErrorException push_term!(M, one(RR), zeros(Int, 2))
 end
 
-@testset "nmod_mpoly.printing" begin
+@testset "zzModMPolyRingElem.printing" begin
    S, (x, y) = PolynomialRing(ResidueRing(FlintZZ, 23), ["x", "y"])
 
    @test !occursin(r"{", string(S))
@@ -97,21 +97,21 @@ end
    @test string(x) == "x"
    @test string(y) == "y"
 
-   a = fmpz(3)^100
-   b = fmpz(2)^100
+   a = ZZRingElem(3)^100
+   b = ZZRingElem(2)^100
    @test string(x^a + y^b) == "x^$a + y^$b"
 end
 
-@testset "nmod_mpoly.hash" begin
+@testset "zzModMPolyRingElem.hash" begin
    S, (x, y) = PolynomialRing(ResidueRing(FlintZZ, 23), ["x", "y"])
 
-   p = y^fmpz(2)^100
+   p = y^ZZRingElem(2)^100
 
    @test hash(x) == hash((x + y) - y)
    @test hash(x) == hash((x + p) - p)
 end
 
-@testset "nmod_mpoly.manipulation" begin
+@testset "zzModMPolyRingElem.manipulation" begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -243,7 +243,7 @@ end
    @test trailing_coefficient(S()) == 0
 end
 
-@testset "nmod_mpoly.multivariate_coeff" begin
+@testset "zzModMPolyRingElem.multivariate_coeff" begin
    R = ResidueRing(FlintZZ, 23)
 
    for ord in Nemo.flint_orderings
@@ -261,7 +261,7 @@ end
    end
 end
 
-@testset "nmod_mpoly.unary_ops" begin
+@testset "zzModMPolyRingElem.unary_ops" begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -278,7 +278,7 @@ end
    end
 end
 
-@testset "nmod_mpoly.binary_ops" begin
+@testset "zzModMPolyRingElem.binary_ops" begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -301,7 +301,7 @@ end
    end
 end
 
-@testset "nmod_mpoly.adhoc_binary" begin
+@testset "zzModMPolyRingElem.adhoc_binary" begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -337,7 +337,7 @@ end
    end
 end
 
-@testset "nmod_mpoly.adhoc_comparison" begin
+@testset "zzModMPolyRingElem.adhoc_comparison" begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -351,15 +351,15 @@ end
 
          @test S(d) == d
          @test d == S(d)
-         @test S(fmpz(d)) == fmpz(d)
-         @test fmpz(d) == S(fmpz(d))
+         @test S(ZZRingElem(d)) == ZZRingElem(d)
+         @test ZZRingElem(d) == S(ZZRingElem(d))
          @test S(d) == BigInt(d)
          @test BigInt(d) == S(d)
       end
    end
 end
 
-@testset "nmod_mpoly.powering" begin
+@testset "zzModMPolyRingElem.powering" begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -381,12 +381,12 @@ end
          @test (f == 0 && expn == 0 && f^expn == 0) || f^expn == r
 
          @test_throws DomainError f^-1
-         @test_throws DomainError f^fmpz(-1)
+         @test_throws DomainError f^ZZRingElem(-1)
       end
    end
 end
 
-@testset "nmod_mpoly.divides" begin
+@testset "zzModMPolyRingElem.divides" begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -402,7 +402,7 @@ end
          @test iszero(f) || !divides(f, S(0))[1]
          @test divexact(2*f, 2) == f
          @test divexact(2*f, R(2)) == f
-         @test divexact(2*f, fmpz(2)) == f
+         @test divexact(2*f, ZZRingElem(2)) == f
 
          p = f*g
 
@@ -420,7 +420,7 @@ end
    end
 end
 
-@testset "nmod_mpoly.euclidean_division" begin
+@testset "zzModMPolyRingElem.euclidean_division" begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -456,7 +456,7 @@ end
    end
 end
 
-@testset "nmod_mpoly.ideal_reduction" begin
+@testset "zzModMPolyRingElem.ideal_reduction" begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -505,7 +505,7 @@ end
    end
 end
 
-@testset "nmod_mpoly.gcd" begin
+@testset "zzModMPolyRingElem.gcd" begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:4
@@ -531,7 +531,7 @@ end
    end
 end
 
-@testset "nmod_mpoly.factor" begin
+@testset "zzModMPolyRingElem.factor" begin
    R = ResidueRing(FlintZZ, 23)
    R, (x, y, z) = PolynomialRing(R, ["x", "y", "z"])
 
@@ -548,7 +548,7 @@ end
    check_factor(x^99-y^99*z^33, 22)
 end
 
-@testset "nmod_mpoly.sqrt" begin
+@testset "zzModMPolyRingElem.sqrt" begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:4
@@ -574,7 +574,7 @@ end
    end
 end
 
-@testset "nmod_mpoly.evaluation" begin
+@testset "zzModMPolyRingElem.evaluation" begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -658,11 +658,11 @@ end
 
    @test f(M1, M2) == T([9 12; 18 20])
 
-   @test evaluate(f, [fmpz(20), fmpz(30)]) == R(20^2*30^2+2*20+1)
+   @test evaluate(f, [ZZRingElem(20), ZZRingElem(30)]) == R(20^2*30^2+2*20+1)
    @test evaluate(f, [UInt(20), UInt(30)]) == R(20^2*30^2+2*20+1)
 end
 
-@testset "nmod_mpoly.valuation" begin
+@testset "zzModMPolyRingElem.valuation" begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -700,7 +700,7 @@ end
    end
 end
 
-@testset "nmod_mpoly.derivative" begin
+@testset "zzModMPolyRingElem.derivative" begin
    R = ResidueRing(FlintZZ, 23)
 
    for num_vars = 1:10
@@ -720,7 +720,7 @@ end
    end
 end
 
-@testset "nmod_mpoly.unsafe" begin
+@testset "zzModMPolyRingElem.unsafe" begin
   R23 = ResidueRing(FlintZZ, 23)
 
   for num_vars = 1:10
@@ -760,12 +760,12 @@ end
    f = one(S)
    zero!(f)
    setcoeff!(f, 1, 1)
-   set_exponent_vector!(f, 1, [fmpz(1), fmpz(0)])
+   set_exponent_vector!(f, 1, [ZZRingElem(1), ZZRingElem(0)])
    set_exponent_vector!(f, 2, [UInt(0), UInt(1)])
    setcoeff!(f, 2, 2)
    setcoeff!(f, 3, 3)
    set_exponent_vector!(f, 3, [UInt(2), UInt(0)])
-   set_exponent_vector!(f, 4, [fmpz(0), fmpz(2)])
+   set_exponent_vector!(f, 4, [ZZRingElem(0), ZZRingElem(2)])
    setcoeff!(f, 4, 4)
    sort_terms!(f)
    @test f == 1*x+2*y+3*x^2+4*y^2
@@ -778,7 +778,7 @@ end
    @test f == (y^2 + x*y + x^2)*x
 end
 
-@testset "nmod_mpoly.exponents" begin
+@testset "zzModMPolyRingElem.exponents" begin
   R23 = ResidueRing(FlintZZ, 23)
 
   for num_vars = 1:10
@@ -825,7 +825,7 @@ end
         end
      end
 
-     f = rand(vars_R)^(fmpz(typemax(UInt)) + 1)
+     f = rand(vars_R)^(ZZRingElem(typemax(UInt)) + 1)
      @test !exponent_vector_fits_int(f, 1)
      @test !exponent_vector_fits_ui(f, 1)
      @test_throws DomainError exponent_vector(f, 1)
@@ -846,7 +846,7 @@ end
    m = [[0,0], [1,0], [0,1]]
    @test S([R23(0), R23(1), R23(2)], m) == 1*x+2*y
 
-   m = [[fmpz(0),fmpz(0)], [fmpz(1),fmpz(0)], [fmpz(0),fmpz(1)]]
+   m = [[ZZRingElem(0),ZZRingElem(0)], [ZZRingElem(1),ZZRingElem(0)], [ZZRingElem(0),ZZRingElem(1)]]
    @test S([R23(0), R23(1), R23(2)], m) == 1*x+2*y
 
    m = [[BigInt(0),BigInt(0)], [BigInt(1),BigInt(0)], [BigInt(0),BigInt(1)]]

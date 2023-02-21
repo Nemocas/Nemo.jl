@@ -1,9 +1,9 @@
 @testset "fq_default_abs_series.types" begin
-   @test abs_series_type(fq_default) == fq_default_abs_series
+   @test abs_series_type(FqFieldElem) == fq_default_abs_series
 end
 
 @testset "fq_default_abs_series.constructors" begin
-   S, t = NGFiniteField(fmpz(23), 5, "t")
+   S, t = NGFiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
    @test elem_type(R) == fq_default_abs_series
@@ -29,7 +29,7 @@ end
 end
 
 @testset "fq_default_abs_series.printing" begin
-   S, t = NGFiniteField(fmpz(23), 5, "t")
+   S, t = NGFiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
    b = x^2 + 3x + O(x^4)
@@ -38,7 +38,7 @@ end
 end
 
 @testset "fq_default_abs_series.manipulation" begin
-   S, t = NGFiniteField(fmpz(23), 5, "t")
+   S, t = NGFiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -132,7 +132,7 @@ end
    @test parent(h) == parent(g)
    @test parent(k) != parent(m)
 
-   p = abs_series(R, fq_default[], 0, 4)
+   p = abs_series(R, FqFieldElem[], 0, 4)
    q = abs_series(R, [], 0, 6)
 
    @test isa(p, fq_default_abs_series)
@@ -141,7 +141,7 @@ end
    @test length(p) == 0
    @test length(q) == 0
 
-   r = abs_series(R, fmpz[1, 2, 3], 3, 5)
+   r = abs_series(R, ZZRingElem[1, 2, 3], 3, 5)
 
    @test isa(r, fq_default_abs_series)
 
@@ -151,7 +151,7 @@ end
 end
 
 @testset "fq_default_abs_series.unary_ops" begin
-   S, t = NGFiniteField(fmpz(23), 5, "t")
+   S, t = NGFiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -163,7 +163,7 @@ end
 end
 
 @testset "fq_default_abs_series.binary_ops" begin
-   S, t = NGFiniteField(fmpz(23), 5, "t")
+   S, t = NGFiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -183,7 +183,7 @@ end
 end
 
 @testset "fq_default_abs_series.adhoc_binary_ops" begin
-   S, t = NGFiniteField(fmpz(23), 5, "t")
+   S, t = NGFiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -201,7 +201,7 @@ end
 end
 
 @testset "fq_default_abs_series.comparison" begin
-   S, t = NGFiniteField(fmpz(23), 5, "t")
+   S, t = NGFiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -217,7 +217,7 @@ end
 end
 
 @testset "fq_default_abs_series.adhoc_comparison" begin
-   S, t = NGFiniteField(fmpz(23), 5, "t")
+   S, t = NGFiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -237,7 +237,7 @@ end
 end
 
 @testset "fq_default_abs_series.powering" begin
-   S, t = NGFiniteField(fmpz(23), 5, "t")
+   S, t = NGFiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -257,7 +257,7 @@ end
 end
 
 @testset "fq_default_abs_series.shift" begin
-   S, t = NGFiniteField(fmpz(23), 5, "t")
+   S, t = NGFiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -279,7 +279,7 @@ end
 end
 
 @testset "fq_default_abs_series.truncation" begin
-   S, t = NGFiniteField(fmpz(23), 5, "t")
+   S, t = NGFiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -299,7 +299,7 @@ end
 end
 
 @testset "fq_default_abs_series.exact_division" begin
-   S, t = NGFiniteField(fmpz(23), 5, "t")
+   S, t = NGFiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
    a = x + x^3
@@ -317,7 +317,7 @@ end
 end
 
 @testset "fq_default_abs_series.adhoc_exact_division" begin
-   S, t = NGFiniteField(fmpz(23), 5, "t")
+   S, t = NGFiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
    a = x + x^3
@@ -327,9 +327,9 @@ end
 
    @test isequal(divexact(7a, 7), a)
 
-   @test isequal(divexact(11b, fmpz(11)), b)
+   @test isequal(divexact(11b, ZZRingElem(11)), b)
 
-   @test isequal(divexact(2c, fmpz(2)), c)
+   @test isequal(divexact(2c, ZZRingElem(2)), c)
 
    @test isequal(divexact(9d, 9), d)
 
@@ -337,7 +337,7 @@ end
 end
 
 @testset "fq_default_abs_series.inversion" begin
-   S, t = NGFiniteField(fmpz(23), 5, "t")
+   S, t = NGFiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
    a = 1 + x + 2x^2 + O(x^5)
@@ -349,7 +349,7 @@ end
 end
 
 @testset "fq_default_abs_series.square_root" begin
-   S, t = NGFiniteField(fmpz(31), 5, "t")
+   S, t = NGFiniteField(ZZRingElem(31), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
    for iter = 1:300
@@ -359,7 +359,7 @@ end
    end
 
    for p in [2, 7, 19, 65537]
-      R, t = NGFiniteField(fmpz(p), 2, "t")
+      R, t = NGFiniteField(ZZRingElem(p), 2, "t")
       S, x = PowerSeriesRing(R, 10, "x", model=:capped_absolute)
 
       for iter = 1:10
@@ -389,7 +389,7 @@ end
 end
 
 @testset "fq_default_abs_series.unsafe_operators" begin
-   S, t = NGFiniteField(fmpz(23), 5, "t")
+   S, t = NGFiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
    for iter = 1:300

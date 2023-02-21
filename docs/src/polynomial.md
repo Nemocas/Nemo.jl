@@ -19,14 +19,14 @@ information is mainly of concern to developers).
 Base ring                                   | Library             | Element type        | Parent type
 --------------------------------------------|---------------------|---------------------|----------------------
 Generic ring $R$                            | AbstractAlgebra.jl  | `Generic.Poly{T}`   | `Generic.PolyRing{T}`
-$\mathbb{Z}$                                | Flint               | `fmpz_poly`         | `FmpzPolyRing`
-$\mathbb{Z}/n\mathbb{Z}$ (small $n$)        | Flint               | `nmod_poly`         | `NmodPolyRing`
-$\mathbb{Z}/n\mathbb{Z}$ (large $n$)        | Flint               | `fmpz_mod_poly`     | `FmpzModPolyRing`
-$\mathbb{Q}$                                | Flint               | `fmpq_poly`         | `FmpqPolyRing`
-$\mathbb{Z}/p\mathbb{Z}$ (small prime $p$)  | Flint               | `gfp_poly`          | `GFPPolyRing`
-$\mathbb{Z}/p\mathbb{Z}$ (large prime $p$)  | Flint               | `gfp_fmpz_poly`     | `GFPFmpzPolyRing`
-$\mathbb{F}_{p^n}$ (small $p$)              | Flint               | `fq_nmod_poly`      | `FqNmodPolyRing`
-$\mathbb{F}_{p^n}$ (large $p$)              | Flint               | `fq_poly`           | `FqPolyRing`
+$\mathbb{Z}$                                | Flint               | `ZZPolyRingElem`         | `ZZPolyRing`
+$\mathbb{Z}/n\mathbb{Z}$ (small $n$)        | Flint               | `zzModPolyRingElem`         | `zzModPolyRing`
+$\mathbb{Z}/n\mathbb{Z}$ (large $n$)        | Flint               | `ZZModPolyRingElem`     | `ZZModPolyRing`
+$\mathbb{Q}$                                | Flint               | `QQPolyRingElem`         | `QQPolyRing`
+$\mathbb{Z}/p\mathbb{Z}$ (small prime $p$)  | Flint               | `fpPolyRingElem`          | `fpPolyRing`
+$\mathbb{Z}/p\mathbb{Z}$ (large prime $p$)  | Flint               | `FpPolyRingElem`     | `FpPolyRing`
+$\mathbb{F}_{p^n}$ (small $p$)              | Flint               | `fqPolyRepPolyRingElem`      | `fqPolyRepPolyRing`
+$\mathbb{F}_{p^n}$ (large $p$)              | Flint               | `FqPolyRepPolyRingElem`           | `FqPolyRepPolyRing`
 $\mathbb{R}$ (arbitrary precision)          | Arb                 | `RealPoly`          | `RealPolyRing`
 $\mathbb{C}$ (arbitrary precision)          | Arb                 | `ComplexPoly`       | `ComplexPolyRing`
 $\mathbb{R}$ (fixed precision)              | Arb                 | `arb_poly`          | `ArbPolyRing`
@@ -75,8 +75,8 @@ s, t = evaluate2(h, RR("2.0 +/- 0.1"))
 ### Signature
 
 ```@docs
-signature(::fmpz_poly)
-signature(::fmpq_poly)
+signature(::ZZPolyRingElem)
+signature(::QQPolyRingElem)
 ```
 
 **Examples**
@@ -141,10 +141,10 @@ When working over a residue ring it is useful to be able to lift to the base
 ring of the residue ring, e.g. from $\mathbb{Z}/n\mathbb{Z}$ to $\mathbb{Z}$.
 
 ```@docs
-lift(::FmpzPolyRing, ::nmod_poly)
-lift(::FmpzPolyRing, ::gfp_poly)
-lift(::FmpzPolyRing, ::fmpz_mod_poly)
-lift(::FmpzPolyRing, ::gfp_fmpz_poly)
+lift(::ZZPolyRing, ::zzModPolyRingElem)
+lift(::ZZPolyRing, ::fpPolyRingElem)
+lift(::ZZPolyRing, ::ZZModPolyRingElem)
+lift(::ZZPolyRing, ::FpPolyRingElem)
 ```
 
 **Examples**
@@ -176,10 +176,10 @@ contains(::ComplexPoly, ::ComplexPoly)
 ```
 
 ```@docs
-contains(::RealPoly, ::fmpz_poly)
-contains(::RealPoly, ::fmpq_poly)
-contains(::ComplexPoly, ::fmpz_poly)
-contains(::ComplexPoly, ::fmpq_poly)
+contains(::RealPoly, ::ZZPolyRingElem)
+contains(::RealPoly, ::QQPolyRingElem)
+contains(::ComplexPoly, ::ZZPolyRingElem)
+contains(::ComplexPoly, ::QQPolyRingElem)
 ```
 
 It is sometimes also useful to be able to determine if there is a unique
@@ -214,18 +214,18 @@ isreal(n)
 ```
 ### Factorisation
 
-Certain polynomials can be factored (`fmpz_poly', `nmod_poly`, `gfp_poly`,
-`fmpz_mod_poly`, `gfp_fmpz_poly`, `fq_poly`, `fq_nmod_poly`) and the interface
+Certain polynomials can be factored (`ZZPolyRingElem', `zzModPolyRingElem`, `fpPolyRingElem`,
+`ZZModPolyRingElem`, `FpPolyRingElem`, `FqPolyRepPolyRingElem`, `fqPolyRepPolyRingElem`) and the interface
 follows the specification in AbstractAlgebra.jl. The following additional
 functions are available.
 
 ```@docs
-factor_distinct_deg(::nmod_poly)
-factor_distinct_deg(::gfp_poly)
-factor_distinct_deg(::fmpz_mod_poly)
-factor_distinct_deg(::gfp_fmpz_poly)
-factor_distinct_deg(::fq_poly)
-factor_distinct_deg(::fq_nmod_poly)
+factor_distinct_deg(::zzModPolyRingElem)
+factor_distinct_deg(::fpPolyRingElem)
+factor_distinct_deg(::ZZModPolyRingElem)
+factor_distinct_deg(::FpPolyRingElem)
+factor_distinct_deg(::FqPolyRepPolyRingElem)
+factor_distinct_deg(::fqPolyRepPolyRingElem)
 ```
 
 **Examples**
@@ -245,23 +245,23 @@ T = factor_distinct_deg((x + 1)*g*(x^5+x^3+x+1))
 ### Special functions
 
 ```@docs
-cyclotomic(::Int, ::fmpz_poly)
+cyclotomic(::Int, ::ZZPolyRingElem)
 ```
 
 ```@docs
-swinnerton_dyer(::Int, ::fmpz_poly)
+swinnerton_dyer(::Int, ::ZZPolyRingElem)
 ```
 
 ```@docs
-cos_minpoly(::Int, ::fmpz_poly)
+cos_minpoly(::Int, ::ZZPolyRingElem)
 ```
 
 ```@docs
-theta_qexp(::Int, ::Int, ::fmpz_poly)
+theta_qexp(::Int, ::Int, ::ZZPolyRingElem)
 ```
 
 ```@docs
-eta_qexp(::Int, ::Int, ::fmpz_poly)
+eta_qexp(::Int, ::Int, ::ZZPolyRingElem)
 ```
 
 **Examples**

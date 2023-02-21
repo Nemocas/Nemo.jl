@@ -43,7 +43,7 @@ information is mainly of concern to developers).
 Base ring                             | Library             | Element type        | Parent type
 --------------------------------------|---------------------|---------------------|----------------------
 Generic ring $R$                      | AbstractAlgebra.jl  | `Generic.Frac{T}`   | `Generic.FracField{T}`
-$\mathbb{Z}$                          | Flint               | `fmpq`              | `FlintRationalField`
+$\mathbb{Z}$                          | Flint               | `QQFieldElem`              | `QQField`
 
 All fraction element types belong to the abstract type `FracElem` and all of
 the fraction field types belong to the abstract type `FracField`. This enables
@@ -64,28 +64,28 @@ along with generic fractions fields as described here:
 ### Basic manipulation
 
 ```@docs
-sign(::fmpq)
+sign(::QQFieldElem)
 ```
 
 ```@docs
-height(::fmpq)
+height(::QQFieldElem)
 ```
 
 ```@docs
-height_bits(::fmpq)
+height_bits(::QQFieldElem)
 ```
 
 ```@docs
-<<(::fmpq, ::Int)
+<<(::QQFieldElem, ::Int)
 ```
 
 ```@docs
->>(::fmpq, ::Int)
+>>(::QQFieldElem, ::Int)
 ```
 
 ```@docs
-floor(::fmpq)
-ceil(::fmpq)
+floor(::QQFieldElem)
+ceil(::QQFieldElem)
 ```
 
 **Examples**
@@ -100,21 +100,21 @@ d = abs(ZZ(11)//3)
 The following functions are available for rationals.
 
 ```@docs
-mod(a::fmpq, b::fmpz)
+mod(a::QQFieldElem, b::ZZRingElem)
 ```
 
 ```@docs
-mod(a::fmpq, b::Integer)
+mod(a::QQFieldElem, b::Integer)
 ```
 
 **Examples**
 
 ```julia
-a = -fmpz(2)//3
-b = fmpz(1)//2
+a = -ZZRingElem(2)//3
+b = ZZRingElem(1)//2
 
 c = mod(a, 7)
-d = mod(b, fmpz(5))
+d = mod(b, ZZRingElem(5))
 ```
 
 ### Rational Reconstruction
@@ -122,9 +122,9 @@ d = mod(b, fmpz(5))
 Rational reconstruction is available for rational numbers.
 
 ```@docs
-reconstruct(::fmpz, ::fmpz)
-reconstruct(::fmpz, ::Integer)
-reconstruct(::Integer, ::fmpz)
+reconstruct(::ZZRingElem, ::ZZRingElem)
+reconstruct(::ZZRingElem, ::Integer)
+reconstruct(::Integer, ::ZZRingElem)
 reconstruct(::Integer, ::Integer)
 ```
 
@@ -132,8 +132,8 @@ reconstruct(::Integer, ::Integer)
 
 ```julia
 a = reconstruct(7, 13)
-b = reconstruct(fmpz(15), 31)
-c = reconstruct(fmpz(123), fmpz(237))
+b = reconstruct(ZZRingElem(15), 31)
+c = reconstruct(ZZRingElem(123), ZZRingElem(237))
 ```
 
 ## Rational enumeration
@@ -141,34 +141,34 @@ c = reconstruct(fmpz(123), fmpz(237))
 Various methods exist to enumerate rationals.
 
 ```@docs
-next_minimal(::fmpq)
+next_minimal(::QQFieldElem)
 ```
 
 ```@docs
-next_signed_minimal(::fmpq)
+next_signed_minimal(::QQFieldElem)
 ```
 
 ```@docs
-next_calkin_wilf(::fmpq)
+next_calkin_wilf(::QQFieldElem)
 ```
 
 ```@docs
-next_signed_calkin_wilf(::fmpq)
+next_signed_calkin_wilf(::QQFieldElem)
 ```
 
 **Examples**
 
 ```julia
-next_minimal(fmpz(2)//3)
-next_signed_minimal(-fmpz(21)//31)
-next_calkin_wilf(fmpz(321)//113)
-next_signed_calkin_wilf(-fmpz(51)//(17))
+next_minimal(ZZRingElem(2)//3)
+next_signed_minimal(-ZZRingElem(21)//31)
+next_calkin_wilf(ZZRingElem(321)//113)
+next_signed_calkin_wilf(-ZZRingElem(51)//(17))
 ```
 
 ### Random generation
 
 ```@docs
-rand_bits(::FlintRationalField, b::Int)
+rand_bits(::QQField, b::Int)
 ```
 
 ### Special functions
@@ -188,7 +188,7 @@ bernoulli_cache(::Int)
 ```
 
 ```@docs
-dedekind_sum(::fmpz, ::fmpz)
+dedekind_sum(::ZZRingElem, ::ZZRingElem)
 ```
 
 **Examples**
@@ -197,7 +197,7 @@ dedekind_sum(::fmpz, ::fmpz)
 a = harmonic(12)
 
 b = dedekind_sum(12, 13)
-c = dedekind_sum(-120, fmpz(1305))
+c = dedekind_sum(-120, ZZRingElem(1305))
 
 d = bernoulli(12)
 
@@ -206,12 +206,12 @@ e = bernoulli(100)
 ```
 
 ```@docs
-simplest_between(::fmpq, ::fmpq)
+simplest_between(::QQFieldElem, ::QQFieldElem)
 ```
 
 **Examples**
 
 ```julia
-simplest_between(fmpq(1//10), fmpq(3//10))
+simplest_between(QQFieldElem(1//10), QQFieldElem(3//10))
 ```
 
