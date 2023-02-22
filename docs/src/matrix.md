@@ -18,12 +18,12 @@ Base ring                             | Library             | Element type      
 --------------------------------------|---------------------|---------------------|----------------------
 Generic ring $R$                      | AbstractAlgebra.jl  | `Generic.Mat{T}`    | `Generic.MatSpace{T}`
 $\mathbb{Z}$                          | Flint               | `ZZMatrix`          | `ZZMatrixSpace`
-$\mathbb{Z}/n\mathbb{Z}$ (small $n$)  | Flint               | `zzModMatrix`          | `zzModMatrixSpace`
-$\mathbb{Z}/n\mathbb{Z}$ (large $n$)  | Flint               | `ZZModMatrix`      | `ZZModMatrixSpace`
+$\mathbb{Z}/n\mathbb{Z}$ (small $n$)  | Flint               | `zzModMatrix`       | `zzModMatrixSpace`
+$\mathbb{Z}/n\mathbb{Z}$ (large $n$)  | Flint               | `ZZModMatrix`       | `ZZModMatrixSpace`
 $\mathbb{Q}$                          | Flint               | `QQMatrix`          | `QQMatrixSpace`
-$\mathbb{Z}/p\mathbb{Z}$ (small $p$)  | Flint               | `fpMatrix`           | `fpMatrixSpace`
-$\mathbb{F}_{p^n}$ (small $p$)        | Flint               | `fqPolyRepMatrix`       | `fqPolyRepMatrixSpace`
-$\mathbb{F}_{p^n}$ (large $p$)        | Flint               | `FqPolyRepMatrix`            | `FqPolyRepMatrixSpace
+$\mathbb{Z}/p\mathbb{Z}$ (small $p$)  | Flint               | `fpMatrix`          | `fpMatrixSpace`
+$\mathbb{F}_{p^n}$ (small $p$)        | Flint               | `fqPolyRepMatrix`   | `fqPolyRepMatrixSpace`
+$\mathbb{F}_{p^n}$ (large $p$)        | Flint               | `FqPolyRepMatrix`   | `FqPolyRepMatrixSpace
 $\mathbb{R}$ (arbitrary precision)    | Arb                 | `RealMat`           | `RealMatSpace`
 $\mathbb{C}$ (arbitrary precision)    | Arb                 | `ComplexMat`        | `ComplexMatSpace`
 $\mathbb{R}$ (fixed precision)        | Arb                 | `arb_mat`           | `ArbMatSpace`

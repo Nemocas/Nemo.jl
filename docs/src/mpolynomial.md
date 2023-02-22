@@ -16,19 +16,19 @@ The following table shows each of the polynomial types available in Nemo, the
 base ring $R$, and the Julia/Nemo types for that kind of polynomial (the type
 information is mainly of concern to developers).
 
-Base ring                                   | Library             | Element type        | Parent type
---------------------------------------------|---------------------|---------------------|----------------------
-Generic ring $R$                            | AbstractAlgebra.jl  | `Generic.MPoly{T}`  | `Generic.MPolyRing{T}`
+Base ring                                   | Library             | Element type             | Parent type
+--------------------------------------------|---------------------|--------------------------|----------------------
+Generic ring $R$                            | AbstractAlgebra.jl  | `Generic.MPoly{T}`       | `Generic.MPolyRing{T}`
 $\mathbb{Z}$                                | Flint               | `ZZMPolyRingElem`        | `ZZMPolyRing`
-$\mathbb{Z}/n\mathbb{Z}$ (small $n$)        | Flint               | `zzModMPolyRingElem`        | `zzModMPolyRing`
+$\mathbb{Z}/n\mathbb{Z}$ (small $n$)        | Flint               | `zzModMPolyRingElem`     | `zzModMPolyRing`
 $\mathbb{Q}$                                | Flint               | `QQMPolyRingElem`        | `QQMPolyRing`
 
 The following are not implemented yet, but will be available soon:
 
 Base ring                                   | Library             | Element type        | Parent type
---------------------------------------------|---------------------|---------------------|----------------------
-$\mathbb{Z}/p\mathbb{Z}$ (small prime $p$)  | Flint               | `fpMPolyRingElem`         | `fpMPolyRing`
-$\mathbb{F}_{p^n}$ (small $p$)              | Flint               | `fqPolyRepMPolyRingElem`     | `fqPolyRepMPolyRing`
+--------------------------------------------|---------------------|--------------------------|----------------------
+$\mathbb{Z}/p\mathbb{Z}$ (small prime $p$)  | Flint               | `fpMPolyRingElem`        | `fpMPolyRing`
+$\mathbb{F}_{p^n}$ (small $p$)              | Flint               | `fqPolyRepMPolyRingElem` | `fqPolyRepMPolyRing`
 
 The string representation of the variables and the base ring $R$ of a generic
 polynomial is stored in its parent object. 

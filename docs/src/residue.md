@@ -19,11 +19,11 @@ which accepts any ring $R$ as base ring.
 The associated types of parent object and elements for each kind of residue rings in
 Nemo are given in the following table.
 
-Base ring                   | Library            | Element type    | Parent type
-----------------------------|--------------------|-----------------|--------------------
-Generic ring $R$            | AbstractAlgebra.jl | `Generic.Res{T}`| `Generic.ResRing{T}`
-$\mathbb{Z}$ (Int modulus)  | Flint              | `zzModRingElem`          | `zzModRing`
-$\mathbb{Z}$ (ZZ modulus)   | Flint              | `ZZModRingElem`      | `ZZModRing`
+Base ring                   | Library            | Element type     | Parent type
+----------------------------|--------------------|------------------|--------------------
+Generic ring $R$            | AbstractAlgebra.jl | `Generic.Res{T}` | `Generic.ResRing{T}`
+$\mathbb{Z}$ (Int modulus)  | Flint              | `zzModRingElem`  | `zzModRing`
+$\mathbb{Z}$ (ZZ modulus)   | Flint              | `ZZModRingElem`  | `ZZModRing`
 
 The modulus $a$ of a residue ring is stored in its parent object.
 

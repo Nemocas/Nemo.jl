@@ -16,21 +16,21 @@ The following table shows each of the polynomial types available in Nemo, the
 base ring $R$, and the Julia/Nemo types for that kind of polynomial (the type
 information is mainly of concern to developers).
 
-Base ring                                   | Library             | Element type        | Parent type
---------------------------------------------|---------------------|---------------------|----------------------
-Generic ring $R$                            | AbstractAlgebra.jl  | `Generic.Poly{T}`   | `Generic.PolyRing{T}`
-$\mathbb{Z}$                                | Flint               | `ZZPolyRingElem`         | `ZZPolyRing`
-$\mathbb{Z}/n\mathbb{Z}$ (small $n$)        | Flint               | `zzModPolyRingElem`         | `zzModPolyRing`
+Base ring                                   | Library             | Element type            | Parent type
+--------------------------------------------|---------------------|-------------------------|----------------------
+Generic ring $R$                            | AbstractAlgebra.jl  | `Generic.Poly{T}`       | `Generic.PolyRing{T}`
+$\mathbb{Z}$                                | Flint               | `ZZPolyRingElem`        | `ZZPolyRing`
+$\mathbb{Z}/n\mathbb{Z}$ (small $n$)        | Flint               | `zzModPolyRingElem`     | `zzModPolyRing`
 $\mathbb{Z}/n\mathbb{Z}$ (large $n$)        | Flint               | `ZZModPolyRingElem`     | `ZZModPolyRing`
-$\mathbb{Q}$                                | Flint               | `QQPolyRingElem`         | `QQPolyRing`
-$\mathbb{Z}/p\mathbb{Z}$ (small prime $p$)  | Flint               | `fpPolyRingElem`          | `fpPolyRing`
-$\mathbb{Z}/p\mathbb{Z}$ (large prime $p$)  | Flint               | `FpPolyRingElem`     | `FpPolyRing`
-$\mathbb{F}_{p^n}$ (small $p$)              | Flint               | `fqPolyRepPolyRingElem`      | `fqPolyRepPolyRing`
-$\mathbb{F}_{p^n}$ (large $p$)              | Flint               | `FqPolyRepPolyRingElem`           | `FqPolyRepPolyRing`
-$\mathbb{R}$ (arbitrary precision)          | Arb                 | `RealPoly`          | `RealPolyRing`
-$\mathbb{C}$ (arbitrary precision)          | Arb                 | `ComplexPoly`       | `ComplexPolyRing`
-$\mathbb{R}$ (fixed precision)              | Arb                 | `arb_poly`          | `ArbPolyRing`
-$\mathbb{C}$ (fixed precision)              | Arb                 | `acb_poly`          | `AcbPolyRing`
+$\mathbb{Q}$                                | Flint               | `QQPolyRingElem`        | `QQPolyRing`
+$\mathbb{Z}/p\mathbb{Z}$ (small prime $p$)  | Flint               | `fpPolyRingElem`        | `fpPolyRing`
+$\mathbb{Z}/p\mathbb{Z}$ (large prime $p$)  | Flint               | `FpPolyRingElem`        | `FpPolyRing`
+$\mathbb{F}_{p^n}$ (small $p$)              | Flint               | `fqPolyRepPolyRingElem` | `fqPolyRepPolyRing`
+$\mathbb{F}_{p^n}$ (large $p$)              | Flint               | `FqPolyRepPolyRingElem` | `FqPolyRepPolyRing`
+$\mathbb{R}$ (arbitrary precision)          | Arb                 | `RealPoly`              | `RealPolyRing`
+$\mathbb{C}$ (arbitrary precision)          | Arb                 | `ComplexPoly`           | `ComplexPolyRing`
+$\mathbb{R}$ (fixed precision)              | Arb                 | `arb_poly`              | `ArbPolyRing`
+$\mathbb{C}$ (fixed precision)              | Arb                 | `acb_poly`              | `AcbPolyRing`
 
 The string representation of the variable and the base ring $R$ of a generic
 polynomial is stored in its parent object. 

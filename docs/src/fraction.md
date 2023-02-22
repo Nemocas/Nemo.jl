@@ -40,10 +40,10 @@ The following table shows each of the fraction types available in Nemo, the
 base ring $R$, and the Julia/Nemo types for that kind of fraction (the type
 information is mainly of concern to developers).
 
-Base ring                             | Library             | Element type        | Parent type
---------------------------------------|---------------------|---------------------|----------------------
-Generic ring $R$                      | AbstractAlgebra.jl  | `Generic.Frac{T}`   | `Generic.FracField{T}`
-$\mathbb{Z}$                          | Flint               | `QQFieldElem`              | `QQField`
+Base ring         | Library             | Element type        | Parent type
+------------------|---------------------|---------------------|----------------------
+Generic ring $R$  | AbstractAlgebra.jl  | `Generic.Frac{T}`   | `Generic.FracField{T}`
+$\mathbb{Z}$      | Flint               | `QQFieldElem`       | `QQField`
 
 All fraction element types belong to the abstract type `FracElem` and all of
 the fraction field types belong to the abstract type `FracField`. This enables
