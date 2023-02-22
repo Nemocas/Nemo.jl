@@ -39,6 +39,10 @@ import Base: Array, abs, abs2, acos, acosh, asin, asinh, atan, atanh, bin, binom
              typed_hcat, vcat, xor, zero, zeros, +, -, *, ==, ^, &, |, <<, >>,
              ~, <=, >=, <, >, //, /, !=
 
+if isdefined(Base, :tanpi) # added in julia >= 1.10-DEV
+  import Base: tanpi
+end
+
 import LinearAlgebra: det, norm, nullspace, rank, transpose!, hessenberg, tr,
                       lu, lu!, eigvals
 
