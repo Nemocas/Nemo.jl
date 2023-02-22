@@ -1,23 +1,23 @@
-@testset "gfp_rel_series.types" begin
-   @test rel_series_type(fpFieldElem) == gfp_rel_series
+@testset "fpRelPowerSeriesRingElem.types" begin
+   @test rel_series_type(fpFieldElem) == fpRelPowerSeriesRingElem
 end
 
-@testset "gfp_rel_series.constructors" begin
+@testset "fpRelPowerSeriesRingElem.constructors" begin
    R = GF(17)
    
    S1 = RelSeriesRing(R, 30)
    S2 = RelSeriesRing(R, 30)
 
-   @test isa(S1, GFPRelSeriesRing)
+   @test isa(S1, fpRelPowerSeriesRing)
    @test S1 !== S2
 
    S, x = PowerSeriesRing(R, 30, "x")
 
-   @test elem_type(S) == gfp_rel_series
-   @test elem_type(GFPRelSeriesRing) == gfp_rel_series
-   @test parent_type(gfp_rel_series) == GFPRelSeriesRing
+   @test elem_type(S) == fpRelPowerSeriesRingElem
+   @test elem_type(fpRelPowerSeriesRing) == fpRelPowerSeriesRingElem
+   @test parent_type(fpRelPowerSeriesRingElem) == fpRelPowerSeriesRing
 
-   @test isa(S, GFPRelSeriesRing)
+   @test isa(S, fpRelPowerSeriesRing)
 
    a = x^3 + 2x + 1
    b = x^2 + x + O(x^4)
@@ -51,7 +51,7 @@ end
    @test isa(l, SeriesElem)
 end
 
-@testset "gfp_rel_series.printing" begin
+@testset "fpRelPowerSeriesRingElem.printing" begin
    R = GF(17)
    S, x = PowerSeriesRing(R, 30, "x")
    b = x^2 + x + O(x^4)
@@ -59,7 +59,7 @@ end
    @test sprint(show, "text/plain", b) == "x + x^2 + O(x^4)"
 end
 
-@testset "gfp_rel_series.manipulation" begin
+@testset "fpRelPowerSeriesRingElem.manipulation" begin
    R = GF(17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -95,7 +95,7 @@ end
    @test characteristic(S) == 17
 end
 
-@testset "gfp_rel_series.similar" begin
+@testset "fpRelPowerSeriesRingElem.similar" begin
    R0 = GF(23)
    R, x = PowerSeriesRing(R0, 10, "x")
    S, y = PowerSeriesRing(ZZ, 10, "y")
@@ -110,11 +110,11 @@ end
       m = similar(fz, R0, 5)
       n = similar(f, 5)
 
-      @test isa(g, gfp_rel_series)
-      @test isa(h, gfp_rel_series)
-      @test isa(k, gfp_rel_series)
-      @test isa(m, gfp_rel_series)
-      @test isa(n, gfp_rel_series)
+      @test isa(g, fpRelPowerSeriesRingElem)
+      @test isa(h, fpRelPowerSeriesRingElem)
+      @test isa(k, fpRelPowerSeriesRingElem)
+      @test isa(m, fpRelPowerSeriesRingElem)
+      @test isa(n, fpRelPowerSeriesRingElem)
 
       @test parent(g).S == :y
       @test parent(h).S == :y
@@ -143,11 +143,11 @@ end
    end
 end
 
-@testset "gfp_rel_series.rel_series" begin
+@testset "fpRelPowerSeriesRingElem.rel_series" begin
    R = GF(23)
    f = rel_series(R, [1, 2, 3], 3, 5, 2, "y")
 
-   @test isa(f, gfp_rel_series)
+   @test isa(f, fpRelPowerSeriesRingElem)
    @test base_ring(f) === R
    @test coeff(f, 2) == 1
    @test coeff(f, 4) == 3
@@ -155,7 +155,7 @@ end
 
    g = rel_series(R, [1, 2, 3], 3, 7, 4)
 
-   @test isa(g, gfp_rel_series)
+   @test isa(g, fpRelPowerSeriesRingElem)
    @test base_ring(g) === R
    @test coeff(g, 4) == 1
    @test coeff(g, 6) == 3
@@ -171,22 +171,22 @@ end
    p = rel_series(R, fpFieldElem[], 0, 3, 1)
    q = rel_series(R, [], 0, 3, 2)
 
-   @test isa(p, gfp_rel_series)
-   @test isa(q, gfp_rel_series)
+   @test isa(p, fpRelPowerSeriesRingElem)
+   @test isa(q, fpRelPowerSeriesRingElem)
 
    @test pol_length(p) == 0
    @test pol_length(q) == 0
 
    r = rel_series(R, ZZRingElem[1, 2, 3], 3, 11, 8)
 
-   @test isa(r, gfp_rel_series)
+   @test isa(r, fpRelPowerSeriesRingElem)
 
    s = rel_series(R, [1, 2, 3], 3, 5, 0; max_precision=10)
    
    @test max_precision(parent(s)) == 10
 end
 
-@testset "gfp_rel_series.unary_ops" begin
+@testset "fpRelPowerSeriesRingElem.unary_ops" begin
    R = GF(17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -198,7 +198,7 @@ end
    @test isequal(-b, -1 - 2x - x^2 + O(x^3))
 end
 
-@testset "gfp_rel_series.binary_ops" begin
+@testset "fpRelPowerSeriesRingElem.binary_ops" begin
    R = GF(17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -336,7 +336,7 @@ end
    @test isequal(m1 - m4, 1+x+O(x^4))
 end
 
-@testset "gfp_rel_series.adhoc_binary_ops" begin
+@testset "fpRelPowerSeriesRingElem.adhoc_binary_ops" begin
    R = GF(17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -354,7 +354,7 @@ end
    @test isequal(d*ZZRingElem(3), 3x^2 + 9x^3 - 3x^4 + O(x^32))
 end
 
-@testset "gfp_rel_series.comparison" begin
+@testset "fpRelPowerSeriesRingElem.comparison" begin
    R = GF(17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -374,7 +374,7 @@ end
    @test !isequal(b, d)
 end
 
-@testset "gfp_rel_series.adhoc_comparison" begin
+@testset "fpRelPowerSeriesRingElem.adhoc_comparison" begin
    R = GF(17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -394,7 +394,7 @@ end
    @test ZZRingElem(1) == c
 end
 
-@testset "gfp_rel_series.powering" begin
+@testset "fpRelPowerSeriesRingElem.powering" begin
    R = GF(17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -414,7 +414,7 @@ end
    @test_throws DomainError a^-1
 end
 
-@testset "gfp_rel_series.shift" begin
+@testset "fpRelPowerSeriesRingElem.shift" begin
    R = GF(17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -436,7 +436,7 @@ end
    @test_throws DomainError shift_right(a, -1)
 end
 
-@testset "gfp_rel_series.truncation" begin
+@testset "fpRelPowerSeriesRingElem.truncation" begin
    R = GF(17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -456,7 +456,7 @@ end
    @test_throws DomainError truncate(a, -1)
 end
 
-@testset "gfp_rel_series.inversion" begin
+@testset "fpRelPowerSeriesRingElem.inversion" begin
    R = GF(17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -468,7 +468,7 @@ end
    @test isequal(inv(b), -1+O(x^30))
 end
 
-@testset "gfp_rel_series.exact_division" begin
+@testset "fpRelPowerSeriesRingElem.exact_division" begin
    R = GF(17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -486,7 +486,7 @@ end
    @test isequal(divexact(d, c), -2*x^5+2*x^4-x^2+x+O(x^6))
 end
 
-@testset "gfp_rel_series.adhoc_exact_division" begin
+@testset "fpRelPowerSeriesRingElem.adhoc_exact_division" begin
    R = GF(17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -508,7 +508,7 @@ end
    @test isequal(divexact(R(5)*a, R(5)), a)
 end
 
-@testset "gfp_rel_series.square_root" begin
+@testset "fpRelPowerSeriesRingElem.square_root" begin
    S = GF(31)
    R, x = PowerSeriesRing(S, 30, "x")
 
@@ -549,7 +549,7 @@ end
    end
 end
 
-@testset "gfp_rel_series.special_functions" begin
+@testset "fpRelPowerSeriesRingElem.special_functions" begin
    R = GF(17)
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -560,7 +560,7 @@ end
    @test isequal(divexact(x, exp(x + O(x^5)) - 1), 1+8*x+10*x^2+O(x^4))
 end
 
-@testset "gfp_rel_series.unsafe_operators" begin
+@testset "fpRelPowerSeriesRingElem.unsafe_operators" begin
    S = GF(17)
    R, x = PowerSeriesRing(S, 30, "x")
 

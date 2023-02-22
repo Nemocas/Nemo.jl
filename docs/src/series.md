@@ -25,14 +25,14 @@ type information is mainly of concern to developers).
 Base ring                             | Library            | Element type          | Parent type
 --------------------------------------|--------------------|-----------------------|----------------------
 Generic ring $R$                      | AbstractAlgebra.jl | `Generic.RelSeries{T} | `Generic.RelSeriesRing{T}`
-$\mathbb{Z}$                          | Flint              | `fmpz_rel_series`     | `FmpzRelSeriesRing`
-$\mathbb{Z}/n\mathbb{Z}$ (small $n$)  | Flint              | `nmod_rel_series`     |  NmodRelSeriesRing
-$\mathbb{Z}/n\mathbb{Z}$ (large $n$)  | Flint              | `fmpz_mod_rel_series` | `FmpzModRelSeriesRing`
-$\mathbb{Q}$                          | Flint              | `fmpq_rel_series`     | `FmpqRelSeriesRing`
-$\mathbb{F}_p$ (small $n$)            | Flint              | `gfp_rel_series`      | `GFPRelSeriesRing`
-$\mathbb{F}_p$ (large $n$)            | Flint              | `gfp_fmpz_rel_series` | `GFPFmpzRelSeriesRing`
-$\mathbb{F}_{p^n}$ (small $p$)        | Flint              | `fq_nmod_rel_series`  | `FqNmodRelSeriesRing`
-$\mathbb{F}_{p^n}$ (large $p$)        | Flint              | `fq_rel_series`       | `FqRelSeriesRing`
+$\mathbb{Z}$                          | Flint              | `ZZRelPowerSeriesRingElem`     | `ZZRelPowerSeriesRing`
+$\mathbb{Z}/n\mathbb{Z}$ (small $n$)  | Flint              | `zzModRelPowerSeriesRingElem`     |  zzModRelPowerSeriesRing
+$\mathbb{Z}/n\mathbb{Z}$ (large $n$)  | Flint              | `ZZModRelPowerSeriesRingElem` | `ZZModRelPowerSeriesRing`
+$\mathbb{Q}$                          | Flint              | `QQRelPowerSeriesRingElem`     | `QQRelPowerSeriesRing`
+$\mathbb{F}_p$ (small $n$)            | Flint              | `fpRelPowerSeriesRingElem`      | `fpRelPowerSeriesRing`
+$\mathbb{F}_p$ (large $n$)            | Flint              | `FpRelPowerSeriesRingElem` | `FpRelPowerSeriesRing`
+$\mathbb{F}_{p^n}$ (small $p$)        | Flint              | `fqPolyRepRelPowerSeriesRingElem`  | `fqPolyRepRelPowerSeriesRing`
+$\mathbb{F}_{p^n}$ (large $p$)        | Flint              | `FqPolyRepRelPowerSeriesRingElem`       | `FqPolyRepRelPowerSeriesRing`
 
 All relative power series elements belong to the abstract type `RelSeriesElem` and all
 of the relative power series ring types belong to the abstract type `RelSeriesRing`.
@@ -45,14 +45,14 @@ Here is the corresponding table for the absolute power series types.
 Base ring                             | Library            | Element type          | Parent type
 --------------------------------------|--------------------|-----------------------|----------------------
 Generic ring $R$                      | AbstractAlgebra.jl | `Generic.AbsSeries{T}`| `Generic.AbsSeriesRing{T}`
-$\mathbb{Z}$                          | Flint              | `fmpz_abs_series`     | `FmpzAbsSeriesRing`
-$\mathbb{Z}/n\mathbb{Z}$ (small $n$)  | Flint              | `nmod_abs_series`     | `NmodAbsSeriesRing`
-$\mathbb{Z}/n\mathbb{Z}$ (large $n$)  | Flint              | `fmpz_mod_abs_series` | `FmpzModAbsSeriesRing`
-$\mathbb{Q}$                          | Flint              | `fmpq_abs_series`     | `FmpqAbsSeriesRing`
-$\mathbb{F}_p$ (small $n$)            | Flint              | `gfp_abs_series`      | `GFPAbsSeriesRing`
-$\mathbb{F}_p$ (large $n$)            | Flint              | `gfp_fmpz_abs_series` | `GFPFmpzAbsSeriesRing`
-$\mathbb{F}_{p^n}$ (small $n$)        | Flint              | `fq_nmod_abs_series`  | `FqNmodAbsSeriesRing`
-$\mathbb{F}_{p^n}$ (large $n$)        | Flint              | `fq_abs_series`       | `FqAbsSeriesRing`
+$\mathbb{Z}$                          | Flint              | `ZZAbsPowerSeriesRingElem`     | `ZZAbsPowerSeriesRing`
+$\mathbb{Z}/n\mathbb{Z}$ (small $n$)  | Flint              | `zzModAbsPowerSeriesRingElem`     | `zzModAbsPowerSeriesRing`
+$\mathbb{Z}/n\mathbb{Z}$ (large $n$)  | Flint              | `ZZModAbsPowerSeriesRingElem` | `ZZModAbsPowerSeriesRing`
+$\mathbb{Q}$                          | Flint              | `QQAbsPowerSeriesRingElem`     | `QQAbsPowerSeriesRing`
+$\mathbb{F}_p$ (small $n$)            | Flint              | `fpAbsPowerSeriesRingElem`      | `fpAbsPowerSeriesRing`
+$\mathbb{F}_p$ (large $n$)            | Flint              | `FpAbsPowerSeriesRingElem` | `FpAbsPowerSeriesRing`
+$\mathbb{F}_{p^n}$ (small $n$)        | Flint              | `fqPolyRepAbsPowerSeriesRingElem`  | `fqPolyRepAbsPowerSeriesRing`
+$\mathbb{F}_{p^n}$ (large $n$)        | Flint              | `FqPolyRepAbsPowerSeriesRingElem`       | `FqPolyRepAbsPowerSeriesRing`
 
 All absolute power series elements belong to the abstract type `AbsSeriesElem` and all
 of the absolute power series ring types belong to the abstract type `AbsSeriesRing`.

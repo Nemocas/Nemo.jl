@@ -1,23 +1,23 @@
-@testset "fq_rel_series.types" begin
-   @test rel_series_type(FqPolyRepFieldElem) == fq_rel_series
+@testset "FqPolyRepRelPowerSeriesRingElem.types" begin
+   @test rel_series_type(FqPolyRepFieldElem) == FqPolyRepRelPowerSeriesRingElem
 end
 
-@testset "fq_rel_series.constructors" begin
+@testset "FqPolyRepRelPowerSeriesRingElem.constructors" begin
    R, t = FiniteField(ZZRingElem(23), 5, "t")
    
    S1 = RelSeriesRing(R, 30)
    S2 = RelSeriesRing(R, 30)
 
-   @test isa(S1, FqRelSeriesRing)
+   @test isa(S1, FqPolyRepRelPowerSeriesRing)
    @test S1 !== S2
 
    S, x = PowerSeriesRing(R, 30, "x")
 
-   @test elem_type(S) == fq_rel_series
-   @test elem_type(FqRelSeriesRing) == fq_rel_series
-   @test parent_type(fq_rel_series) == FqRelSeriesRing
+   @test elem_type(S) == FqPolyRepRelPowerSeriesRingElem
+   @test elem_type(FqPolyRepRelPowerSeriesRing) == FqPolyRepRelPowerSeriesRingElem
+   @test parent_type(FqPolyRepRelPowerSeriesRingElem) == FqPolyRepRelPowerSeriesRing
 
-   @test isa(S, FqRelSeriesRing)
+   @test isa(S, FqPolyRepRelPowerSeriesRing)
 
    a = x^3 + 2x + 1
    b = (t^2 + 1)*x^2 + (t + 3)x + O(x^4)
@@ -44,7 +44,7 @@ end
    @test isa(l, SeriesElem)
 end
 
-@testset "fq_rel_series.printing" begin
+@testset "FqPolyRepRelPowerSeriesRingElem.printing" begin
    R, t = FiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -53,7 +53,7 @@ end
    @test sprint(show, "text/plain", b) == "(t + 3)*x + (t^2 + 1)*x^2 + O(x^4)"
 end
 
-@testset "fq_rel_series.manipulation" begin
+@testset "FqPolyRepRelPowerSeriesRingElem.manipulation" begin
    R, t = FiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -89,7 +89,7 @@ end
    @test characteristic(S) == 23
 end
 
-@testset "fq_rel_series.similar" begin
+@testset "FqPolyRepRelPowerSeriesRingElem.similar" begin
    R0, a = FiniteField(ZZ(23), 2, "a")
    R, x = PowerSeriesRing(R0, 10, "x")
    S, y = PowerSeriesRing(ZZ, 10, "y")
@@ -104,11 +104,11 @@ end
       m = similar(fz, R0, 5)
       n = similar(f, 5)
 
-      @test isa(g, fq_rel_series)
-      @test isa(h, fq_rel_series)
-      @test isa(k, fq_rel_series)
-      @test isa(m, fq_rel_series)
-      @test isa(n, fq_rel_series)
+      @test isa(g, FqPolyRepRelPowerSeriesRingElem)
+      @test isa(h, FqPolyRepRelPowerSeriesRingElem)
+      @test isa(k, FqPolyRepRelPowerSeriesRingElem)
+      @test isa(m, FqPolyRepRelPowerSeriesRingElem)
+      @test isa(n, FqPolyRepRelPowerSeriesRingElem)
 
       @test parent(g).S == :y
       @test parent(h).S == :y
@@ -137,11 +137,11 @@ end
    end
 end
 
-@testset "fq_rel_series.rel_series" begin
+@testset "FqPolyRepRelPowerSeriesRingElem.rel_series" begin
    R, a = FiniteField(ZZ(23), 2, "a")
    f = rel_series(R, [1, 2, 3], 3, 5, 2, "y")
 
-   @test isa(f, fq_rel_series)
+   @test isa(f, FqPolyRepRelPowerSeriesRingElem)
    @test base_ring(f) === R
    @test coeff(f, 2) == 1
    @test coeff(f, 4) == 3
@@ -149,7 +149,7 @@ end
 
    g = rel_series(R, [1, 2, 3], 3, 7, 4)
 
-   @test isa(g, fq_rel_series)
+   @test isa(g, FqPolyRepRelPowerSeriesRingElem)
    @test base_ring(g) === R
    @test coeff(g, 4) == 1
    @test coeff(g, 6) == 3
@@ -165,22 +165,22 @@ end
    p = rel_series(R, FqPolyRepFieldElem[], 0, 3, 1)
    q = rel_series(R, [], 0, 3, 2)
 
-   @test isa(p, fq_rel_series)
-   @test isa(q, fq_rel_series)
+   @test isa(p, FqPolyRepRelPowerSeriesRingElem)
+   @test isa(q, FqPolyRepRelPowerSeriesRingElem)
 
    @test pol_length(p) == 0
    @test pol_length(q) == 0
 
    r = rel_series(R, ZZRingElem[1, 2, 3], 3, 11, 8)
 
-   @test isa(r, fq_rel_series)
+   @test isa(r, FqPolyRepRelPowerSeriesRingElem)
 
    s = rel_series(R, [1, 2, 3], 3, 5, 0; max_precision=10)
    
    @test max_precision(parent(s)) == 10
 end
 
-@testset "fq_rel_series.unary_ops" begin
+@testset "FqPolyRepRelPowerSeriesRingElem.unary_ops" begin
    R, t = FiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -192,7 +192,7 @@ end
    @test isequal(-b, -1 - 2x - x^2 + O(x^3))
 end
 
-@testset "fq_rel_series.binary_ops" begin
+@testset "FqPolyRepRelPowerSeriesRingElem.binary_ops" begin
    R, t = FiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -330,7 +330,7 @@ end
    @test isequal(m1 - m4, 1+x+O(x^4))
 end
 
-@testset "fq_rel_series.adhoc_binary_ops" begin
+@testset "FqPolyRepRelPowerSeriesRingElem.adhoc_binary_ops" begin
    R, t = FiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -348,7 +348,7 @@ end
    @test isequal(d*ZZRingElem(3), 3x^2 + 9x^3 - 3x^4 + O(x^32))
 end
 
-@testset "fq_rel_series.comparison" begin
+@testset "FqPolyRepRelPowerSeriesRingElem.comparison" begin
    R, t = FiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -368,7 +368,7 @@ end
    @test !isequal(b, d)
 end
 
-@testset "fq_rel_series.adhoc_comparison" begin
+@testset "FqPolyRepRelPowerSeriesRingElem.adhoc_comparison" begin
    R, t = FiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -388,7 +388,7 @@ end
    @test ZZRingElem(1) == c
 end
 
-@testset "fq_rel_series.powering" begin
+@testset "FqPolyRepRelPowerSeriesRingElem.powering" begin
    R, t = FiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -408,7 +408,7 @@ end
    @test_throws DomainError a^-1
 end
 
-@testset "fq_rel_series.shift" begin
+@testset "FqPolyRepRelPowerSeriesRingElem.shift" begin
    R, t = FiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -430,7 +430,7 @@ end
    @test_throws DomainError shift_right(a, -1)
 end
 
-@testset "fq_rel_series.truncation" begin
+@testset "FqPolyRepRelPowerSeriesRingElem.truncation" begin
    R, t = FiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -450,7 +450,7 @@ end
    @test_throws DomainError truncate(a, -1)
 end
 
-@testset "fq_rel_series.inversion" begin
+@testset "FqPolyRepRelPowerSeriesRingElem.inversion" begin
    R, t = FiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -462,7 +462,7 @@ end
    @test isequal(inv(b), -1+O(x^30))
 end
 
-@testset "fq_rel_series.exact_division" begin
+@testset "FqPolyRepRelPowerSeriesRingElem.exact_division" begin
    R, t = FiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -480,7 +480,7 @@ end
    @test isequal(divexact(d, c), -2*x^5+2*x^4-x^2+x+O(x^6))
 end
 
-@testset "fq_rel_series.adhoc_exact_division" begin
+@testset "FqPolyRepRelPowerSeriesRingElem.adhoc_exact_division" begin
    R, t = FiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -502,7 +502,7 @@ end
    @test isequal(divexact((t + 1)*a, t + 1), a)
 end
 
-@testset "fq_rel_series.square_root" begin
+@testset "FqPolyRepRelPowerSeriesRingElem.square_root" begin
    S, t = FiniteField(ZZRingElem(31), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x")
 
@@ -543,7 +543,7 @@ end
    end
 end
 
-@testset "fq_rel_series.special_functions" begin
+@testset "FqPolyRepRelPowerSeriesRingElem.special_functions" begin
    R, t = FiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -552,7 +552,7 @@ end
    @test isequal(divexact(x, exp(x + O(x^10)) - 1), 13*x^8+9*x^6+13*x^4+2*x^2+11*x+1+O(x^9))
 end
 
-@testset "fq_rel_series.unsafe_operators" begin
+@testset "FqPolyRepRelPowerSeriesRingElem.unsafe_operators" begin
    S, t = FiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x")
 

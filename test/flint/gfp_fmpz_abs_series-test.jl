@@ -1,23 +1,23 @@
-@testset "gfp_fmpz_abs_series.types" begin
-   @test abs_series_type(FpFieldElem) == gfp_fmpz_abs_series
+@testset "FpAbsPowerSeriesRingElem.types" begin
+   @test abs_series_type(FpFieldElem) == FpAbsPowerSeriesRingElem
 end
 
-@testset "gfp_fmpz_abs_series.constructors" begin
+@testset "FpAbsPowerSeriesRingElem.constructors" begin
    S = GF(ZZ(123456789012345678949))
    
    R1 = AbsSeriesRing(S, 30)
    R2 = AbsSeriesRing(S, 30)
 
-   @test isa(R1, GFPFmpzAbsSeriesRing)
+   @test isa(R1, FpAbsPowerSeriesRing)
    @test R1 !== R2
 
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
-   @test elem_type(R) == gfp_fmpz_abs_series
-   @test elem_type(GFPFmpzAbsSeriesRing) == gfp_fmpz_abs_series
-   @test parent_type(gfp_fmpz_abs_series) == GFPFmpzAbsSeriesRing
+   @test elem_type(R) == FpAbsPowerSeriesRingElem
+   @test elem_type(FpAbsPowerSeriesRing) == FpAbsPowerSeriesRingElem
+   @test parent_type(FpAbsPowerSeriesRingElem) == FpAbsPowerSeriesRing
 
-   @test isa(R, GFPFmpzAbsSeriesRing)
+   @test isa(R, FpAbsPowerSeriesRing)
 
    a = x^3 + 2x + 1
    b = x^2 + 3x + O(x^4)
@@ -35,7 +35,7 @@ end
    @test isa(R(), SeriesElem)
 end
 
-@testset "gfp_fmpz_abs_series.printing" begin
+@testset "FpAbsPowerSeriesRingElem.printing" begin
    S = GF(ZZ(123456789012345678949))
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -44,7 +44,7 @@ end
    @test sprint(show, "text/plain", b) == "3*x + x^2 + O(x^4)"
 end
 
-@testset "gfp_fmpz_abs_series.manipulation" begin
+@testset "FpAbsPowerSeriesRingElem.manipulation" begin
    S = GF(ZZ(123456789012345678949))
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -66,7 +66,7 @@ end
    @test characteristic(R) == 123456789012345678949
 end
 
-@testset "gfp_fmpz_abs_series.similar" begin
+@testset "FpAbsPowerSeriesRingElem.similar" begin
    R0 = GF(ZZ(23))
    R, x = PowerSeriesRing(R0, 10, "x"; model=:capped_absolute)
    S, y = PowerSeriesRing(ZZ, 10, "y"; model=:capped_absolute)
@@ -81,11 +81,11 @@ end
       m = similar(fz, R0, 5)
       n = similar(f, 5)
 
-      @test isa(g, gfp_fmpz_abs_series)
-      @test isa(h, gfp_fmpz_abs_series)
-      @test isa(k, gfp_fmpz_abs_series)
-      @test isa(m, gfp_fmpz_abs_series)
-      @test isa(n, gfp_fmpz_abs_series)
+      @test isa(g, FpAbsPowerSeriesRingElem)
+      @test isa(h, FpAbsPowerSeriesRingElem)
+      @test isa(k, FpAbsPowerSeriesRingElem)
+      @test isa(m, FpAbsPowerSeriesRingElem)
+      @test isa(n, FpAbsPowerSeriesRingElem)
 
       @test parent(g).S == :y
       @test parent(h).S == :y
@@ -114,11 +114,11 @@ end
    end
 end
 
-@testset "gfp_fmpz_abs_series.abs_series" begin
+@testset "FpAbsPowerSeriesRingElem.abs_series" begin
    R = GF(ZZ(23))
    f = abs_series(R, [1, 2, 3], 3, 5, "y")
 
-   @test isa(f, gfp_fmpz_abs_series)
+   @test isa(f, FpAbsPowerSeriesRingElem)
    @test base_ring(f) === R
    @test coeff(f, 0) == 1
    @test coeff(f, 2) == 3
@@ -126,7 +126,7 @@ end
 
    g = abs_series(R, [1, 2, 3], 3, 5)
 
-   @test isa(g, gfp_fmpz_abs_series)
+   @test isa(g, FpAbsPowerSeriesRingElem)
    @test base_ring(g) === R
    @test coeff(g, 0) == 1
    @test coeff(g, 2) == 3
@@ -142,22 +142,22 @@ end
    p = abs_series(R, FpFieldElem[], 0, 4)
    q = abs_series(R, [], 0, 6)
 
-   @test isa(p, gfp_fmpz_abs_series)
-   @test isa(q, gfp_fmpz_abs_series)
+   @test isa(p, FpAbsPowerSeriesRingElem)
+   @test isa(q, FpAbsPowerSeriesRingElem)
 
    @test length(p) == 0
    @test length(q) == 0
 
    r = abs_series(R, ZZRingElem[1, 2, 3], 3, 5)
 
-   @test isa(r, gfp_fmpz_abs_series)
+   @test isa(r, FpAbsPowerSeriesRingElem)
 
    s = abs_series(R, [1, 2, 3], 3, 5; max_precision=10)
    
    @test max_precision(parent(s)) == 10
 end
 
-@testset "gfp_fmpz_abs_series.unary_ops" begin
+@testset "FpAbsPowerSeriesRingElem.unary_ops" begin
    S = GF(ZZ(123456789012345678949))
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -169,7 +169,7 @@ end
    @test -b == -1 - 2x - x^2 + O(x^3)
 end
 
-@testset "gfp_fmpz_abs_series.binary_ops" begin
+@testset "FpAbsPowerSeriesRingElem.binary_ops" begin
    S = GF(ZZ(123456789012345678949))
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -189,7 +189,7 @@ end
    @test a*d == -x^7+3*x^6-x^5+6*x^4+2*x^3
 end
 
-@testset "gfp_fmpz_abs_series.adhoc_binary_ops" begin
+@testset "FpAbsPowerSeriesRingElem.adhoc_binary_ops" begin
    S = GF(ZZ(123456789012345678949))
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -207,7 +207,7 @@ end
    @test d*ZZ(3) == 3x^2 + 9x^3 - 3x^4
 end
 
-@testset "gfp_fmpz_abs_series.comparison" begin
+@testset "FpAbsPowerSeriesRingElem.comparison" begin
    S = GF(ZZ(123456789012345678949))
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -223,7 +223,7 @@ end
    @test c != d
 end
 
-@testset "gfp_fmpz_abs_series.adhoc_comparison" begin
+@testset "FpAbsPowerSeriesRingElem.adhoc_comparison" begin
    S = GF(ZZ(123456789012345678949))
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -243,7 +243,7 @@ end
    @test ZZ(1) == c
 end
 
-@testset "gfp_fmpz_abs_series.powering" begin
+@testset "FpAbsPowerSeriesRingElem.powering" begin
    S = GF(ZZ(123456789012345678949))
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -260,7 +260,7 @@ end
    @test_throws DomainError a^-1
 end
 
-@testset "gfp_fmpz_abs_series.shift" begin
+@testset "FpAbsPowerSeriesRingElem.shift" begin
    S = GF(ZZ(123456789012345678949))
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -282,7 +282,7 @@ end
    @test_throws DomainError shift_right(a, -1)
 end
 
-@testset "gfp_fmpz_abs_series.truncation" begin
+@testset "FpAbsPowerSeriesRingElem.truncation" begin
    S = GF(ZZ(123456789012345678949))
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -303,7 +303,7 @@ end
 
 end
 
-@testset "gfp_fmpz_abs_series.exact_division" begin
+@testset "FpAbsPowerSeriesRingElem.exact_division" begin
    S = GF(ZZ(123456789012345678949))
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -321,7 +321,7 @@ end
    @test divexact(d, c) == -2*x^5+2*x^4-x^2+x+O(x^6)
 end
 
-@testset "gfp_fmpz_abs_series.adhoc_exact_division" begin
+@testset "FpAbsPowerSeriesRingElem.adhoc_exact_division" begin
    S = GF(ZZ(123456789012345678949))
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
@@ -341,7 +341,7 @@ end
    @test isequal(divexact(94872394861923874346987123694871329847a, 94872394861923874346987123694871329847), a)
 end
 
-@testset "gfp_fmpz_abs_series.inversion" begin
+@testset "FpAbsPowerSeriesRingElem.inversion" begin
    S = GF(ZZ(123456789012345678949))
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -353,7 +353,7 @@ end
    @test inv(b) == -1
 end
 
-@testset "gfp_fmpz_abs_series.integral_derivative" begin
+@testset "FpAbsPowerSeriesRingElem.integral_derivative" begin
    S = GF(ZZ(31))
    R, x = PowerSeriesRing(S, 10, "x"; model=:capped_absolute)
 
@@ -364,7 +364,7 @@ end
    end
 end
 
-@testset "gfp_fmpz_abs_series.square_root" begin
+@testset "FpAbsPowerSeriesRingElem.square_root" begin
    S = GF(ZZ(31))
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -405,7 +405,7 @@ end
    end
 end
 
-@testset "gfp_fmpz_abs_series.unsafe_operators" begin
+@testset "FpAbsPowerSeriesRingElem.unsafe_operators" begin
    S = GF(ZZ(31))
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 

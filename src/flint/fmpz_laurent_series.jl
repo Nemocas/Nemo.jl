@@ -1,10 +1,10 @@
 ###############################################################################
 #
-#   fmpz_laurent_series.jl : Laurent series over Flint ZZRingElem
+#   ZZLaurentSeriesRingElem.jl : Laurent series over Flint ZZRingElem
 #
 ###############################################################################
 
-export fmpz_laurent_series, FmpzLaurentSeriesRing
+export ZZLaurentSeriesRingElem, ZZLaurentSeriesRing
 
 ###############################################################################
 #
@@ -13,34 +13,34 @@ export fmpz_laurent_series, FmpzLaurentSeriesRing
 ###############################################################################
 
 @doc Markdown.doc"""
-    O(a::fmpz_laurent_series)
+    O(a::ZZLaurentSeriesRingElem)
 
 Returns $0 + O(x^\mathrm{val}(a))$. Usually this function is called with $x^n$
 as parameter. Then the function returns the power series $0 + O(x^n)$, which
 can be used to set the precision of a power series when constructing it.
 """
-function O(a::fmpz_laurent_series)
+function O(a::ZZLaurentSeriesRingElem)
    val = valuation(a)
    return parent(a)(Vector{ZZRingElem}(undef, 0), 0, val, val, 1)
 end
 
-parent_type(::Type{fmpz_laurent_series}) = FmpzLaurentSeriesRing
+parent_type(::Type{ZZLaurentSeriesRingElem}) = ZZLaurentSeriesRing
 
-parent(a::fmpz_laurent_series) = a.parent
+parent(a::ZZLaurentSeriesRingElem) = a.parent
 
-elem_type(::Type{FmpzLaurentSeriesRing}) = fmpz_laurent_series
+elem_type(::Type{ZZLaurentSeriesRing}) = ZZLaurentSeriesRingElem
 
-base_ring(R::FmpzLaurentSeriesRing) = R.base_ring
+base_ring(R::ZZLaurentSeriesRing) = R.base_ring
 
-base_ring(a::fmpz_laurent_series) = base_ring(parent(a))
+base_ring(a::ZZLaurentSeriesRingElem) = base_ring(parent(a))
 
-is_domain_type(::Type{fmpz_laurent_series}) = true
+is_domain_type(::Type{ZZLaurentSeriesRingElem}) = true
 
-is_exact_type(a::Type{fmpz_laurent_series}) = false
+is_exact_type(a::Type{ZZLaurentSeriesRingElem}) = false
 
-var(a::FmpzLaurentSeriesRing) = a.S
+var(a::ZZLaurentSeriesRing) = a.S
 
-function check_parent(a::fmpz_laurent_series, b::fmpz_laurent_series)
+function check_parent(a::ZZLaurentSeriesRingElem, b::ZZLaurentSeriesRingElem)
    parent(a) != parent(b) &&
              error("Incompatible power series rings in Laurent series operation")
 end
@@ -51,7 +51,7 @@ end
 #
 ###############################################################################
 
-function Base.hash(a::fmpz_laurent_series, h::UInt)
+function Base.hash(a::ZZLaurentSeriesRingElem, h::UInt)
    b = 0xb163af5694734274%UInt
    for i in 0:pol_length(a) - 1
       b = xor(b, hash(polcoeff(a, i), h))
@@ -62,44 +62,44 @@ function Base.hash(a::fmpz_laurent_series, h::UInt)
 end
 
 @doc Markdown.doc"""
-    pol_length(a::fmpz_laurent_series)
+    pol_length(a::ZZLaurentSeriesRingElem)
 
 Return the length of the polynomial underlying the given power series. This
 will be zero if the power series has no nonzero terms.
 """
-pol_length(a::fmpz_laurent_series) = a.length
+pol_length(a::ZZLaurentSeriesRingElem) = a.length
 
 @doc Markdown.doc"""
-    precision(a::fmpz_laurent_series)
+    precision(a::ZZLaurentSeriesRingElem)
 
 Return the precision of the given power series in absolute terms. This will
 be the sum of the valuation and the length of the underlying polynomial.
 """
-precision(a::fmpz_laurent_series) = a.prec
+precision(a::ZZLaurentSeriesRingElem) = a.prec
 
 @doc Markdown.doc"""
-    valuation(a::fmpz_laurent_series)
+    valuation(a::ZZLaurentSeriesRingElem)
 
 Return the valuation of the given power series, i.e. the degree of the first
 nonzero term (or the precision if it is arithmetically zero).
 """
-valuation(a::fmpz_laurent_series) = a.val
+valuation(a::ZZLaurentSeriesRingElem) = a.val
 
 @doc Markdown.doc"""
-    scale(a::fmpz_laurent_series)
+    scale(a::ZZLaurentSeriesRingElem)
 
 Return the scale factor of the polynomial underlying the given power series.
 """
-scale(a::fmpz_laurent_series) = a.scale
+scale(a::ZZLaurentSeriesRingElem) = a.scale
 
-max_precision(R::FmpzLaurentSeriesRing) = R.prec_max
+max_precision(R::ZZLaurentSeriesRing) = R.prec_max
 
 @doc Markdown.doc"""
-    exp_gcd(a::fmpz_laurent_series)
+    exp_gcd(a::ZZLaurentSeriesRingElem)
 
 Return the GCD of the exponents of the polynomial underlying the given Laurent series.
 """
-function exp_gcd(a::fmpz_laurent_series)
+function exp_gcd(a::ZZLaurentSeriesRingElem)
    n = 0
    s = scale(a)
    for i = 1:pol_length(a) - 1
@@ -113,32 +113,32 @@ function exp_gcd(a::fmpz_laurent_series)
    return n
 end
 
-function set_precision!(a::fmpz_laurent_series, prec::Int)
+function set_precision!(a::ZZLaurentSeriesRingElem, prec::Int)
    a.prec = prec
    return a
 end
 
-function set_valuation!(a::fmpz_laurent_series, val::Int)
+function set_valuation!(a::ZZLaurentSeriesRingElem, val::Int)
    a.val = val
    return a
 end
 
-function set_scale!(a::fmpz_laurent_series, scale::Int)
+function set_scale!(a::ZZLaurentSeriesRingElem, scale::Int)
    a.scale = scale
    return a
 end
 
-function polcoeff(a::fmpz_laurent_series, n::Int)
+function polcoeff(a::ZZLaurentSeriesRingElem, n::Int)
    if n < 0
       return ZZRingElem(0)
    end
    z = ZZRingElem()
    ccall((:fmpz_poly_get_coeff_fmpz, libflint), Nothing,
-         (Ref{ZZRingElem}, Ref{fmpz_laurent_series}, Int), z, a, n)
+         (Ref{ZZRingElem}, Ref{ZZLaurentSeriesRingElem}, Int), z, a, n)
    return z
 end
 
-function coeff(a::fmpz_laurent_series, n::Int)
+function coeff(a::ZZLaurentSeriesRingElem, n::Int)
    if n < valuation(a)
       return base_ring(a)()
    else
@@ -152,13 +152,13 @@ function coeff(a::fmpz_laurent_series, n::Int)
 end
 
 @doc Markdown.doc"""
-    rescale!(a::fmpz_laurent_series)
+    rescale!(a::ZZLaurentSeriesRingElem)
 
 Rescale the polynomial underlying the series so that the GCD of its exponents is 1.
 This is only used internally, since the result of every user facing function is a
 rescaled series.
 """
-function rescale!(a::fmpz_laurent_series)
+function rescale!(a::ZZLaurentSeriesRingElem)
    s = exp_gcd(a)
    if s > 1
       zlen = div(pol_length(a) - 1, s) + 1
@@ -176,12 +176,12 @@ function rescale!(a::fmpz_laurent_series)
 end
 
 @doc Markdown.doc"""
-    downscale(a::fmpz_laurent_series, n::Int)
+    downscale(a::ZZLaurentSeriesRingElem, n::Int)
 
 Inflate the underlying polynomial by a factor of $n$. This inserts zero coefficients
 for padding. It is assumed that the scale factor of $a$ is divisible by $n$.
 """
-function downscale(a::fmpz_laurent_series, n::Int)
+function downscale(a::ZZLaurentSeriesRingElem, n::Int)
    n <= 0 && throw(DomainError(n, "Scale must be positive"))
    lena = pol_length(a)
    if n == 1 || lena == 0
@@ -189,7 +189,7 @@ function downscale(a::fmpz_laurent_series, n::Int)
    end
    R = base_ring(a)
    lenz = (lena - 1)*n + 1
-   d = fmpz_laurent_series()
+   d = ZZLaurentSeriesRingElem()
    j = 0
    pn = 0
    for i = 0:lenz - 1
@@ -208,13 +208,13 @@ function downscale(a::fmpz_laurent_series, n::Int)
 end
 
 @doc Markdown.doc"""
-    upscale(a::fmpz_laurent_series, n::Int)
+    upscale(a::ZZLaurentSeriesRingElem, n::Int)
 
 Deflate the underlying polynomial by a factor of $n$. This removes zero coefficients
 that were inserted for padding. It is assumed that the spacing between nonzero coefficients
 of $a$ is divisible by $n$.
 """
-function upscale(a::fmpz_laurent_series, n::Int)
+function upscale(a::ZZLaurentSeriesRingElem, n::Int)
    n <= 0 && throw(DomainError(n, "Scale must be positive"))
    lena = pol_length(a)
    if n == 1 || lena == 0
@@ -222,7 +222,7 @@ function upscale(a::fmpz_laurent_series, n::Int)
    end
    R = base_ring(a)
    lenz = div(lena - 1, n) + 1
-   d = fmpz_laurent_series()
+   d = ZZLaurentSeriesRingElem()
    j = 0
    for i = 0:lenz - 1
       setcoeff!(d, i, polcoeff(a, j))
@@ -236,54 +236,54 @@ function upscale(a::fmpz_laurent_series, n::Int)
    return d
 end
 
-zero(R::FmpzLaurentSeriesRing) = R(0)
+zero(R::ZZLaurentSeriesRing) = R(0)
 
-one(R::FmpzLaurentSeriesRing) = R(1)
+one(R::ZZLaurentSeriesRing) = R(1)
 
-function gen(R::FmpzLaurentSeriesRing)
+function gen(R::ZZLaurentSeriesRing)
    S = base_ring(R)
    return R([S(1)], 1, max_precision(R) + 1, 1, 1)
 end
 
 @doc Markdown.doc"""
-    iszero(a::fmpz_laurent_series)
+    iszero(a::ZZLaurentSeriesRingElem)
 
 Return `true` if the given power series is arithmetically equal to zero to
 its current precision, otherwise return `false`.
 """
-iszero(a::fmpz_laurent_series) = pol_length(a) == 0
+iszero(a::ZZLaurentSeriesRingElem) = pol_length(a) == 0
 
 @doc Markdown.doc"""
-    isone(a::fmpz_laurent_series)
+    isone(a::ZZLaurentSeriesRingElem)
 
 Return `true` if the given power series is arithmetically equal to one to
 its current precision, otherwise return `false`.
 """
-function isone(a::fmpz_laurent_series)
+function isone(a::ZZLaurentSeriesRingElem)
    return valuation(a) == 0 && pol_length(a) == 1 && isone(polcoeff(a, 0))
 end
 
 @doc Markdown.doc"""
-    is_gen(a::fmpz_laurent_series)
+    is_gen(a::ZZLaurentSeriesRingElem)
 
 Return `true` if the given power series is arithmetically equal to the
 generator of its power series ring to its current precision, otherwise return
 `false`.
 """
-function is_gen(a::fmpz_laurent_series)
+function is_gen(a::ZZLaurentSeriesRingElem)
    return valuation(a) == 1 && pol_length(a) == 1 && isone(polcoeff(a, 0))
 end
 
 @doc Markdown.doc"""
-    is_unit(a::fmpz_laurent_series)
+    is_unit(a::ZZLaurentSeriesRingElem)
 
 Return `true` if the given power series is arithmetically equal to a unit,
 i.e. is invertible, otherwise return `false`.
 """
-is_unit(a::fmpz_laurent_series) = valuation(a) == 0 && is_unit(polcoeff(a, 0))
+is_unit(a::ZZLaurentSeriesRingElem) = valuation(a) == 0 && is_unit(polcoeff(a, 0))
 
-function deepcopy_internal(a::fmpz_laurent_series, dict::IdDict)
-   d = fmpz_laurent_series(a)
+function deepcopy_internal(a::ZZLaurentSeriesRingElem, dict::IdDict)
+   d = ZZLaurentSeriesRingElem(a)
    d = set_precision!(d, precision(a))
    d = set_valuation!(d, valuation(a))
    d = set_scale!(d, scale(a))
@@ -291,7 +291,7 @@ function deepcopy_internal(a::fmpz_laurent_series, dict::IdDict)
    return d
 end
 
-function renormalize!(z::fmpz_laurent_series)
+function renormalize!(z::ZZLaurentSeriesRingElem)
    i = 0
    zlen = pol_length(z)
    zval = valuation(z)
@@ -318,7 +318,7 @@ function renormalize!(z::fmpz_laurent_series)
    return nothing
 end
 
-characteristic(::FmpzLaurentSeriesRing) = 0
+characteristic(::ZZLaurentSeriesRing) = 0
 
 ###############################################################################
 #
@@ -326,7 +326,7 @@ characteristic(::FmpzLaurentSeriesRing) = 0
 #
 ###############################################################################
 
-function expressify(a::fmpz_laurent_series, x = var(parent(a)); context = nothing)
+function expressify(a::ZZLaurentSeriesRingElem, x = var(parent(a)); context = nothing)
    sum = Expr(:call, :+)
    for i in 0:pol_length(a) - 1
       c = polcoeff(a, i)
@@ -345,11 +345,11 @@ function expressify(a::fmpz_laurent_series, x = var(parent(a)); context = nothin
    return sum
 end
 
-function show(io::IO, a::fmpz_laurent_series)
+function show(io::IO, a::ZZLaurentSeriesRingElem)
    print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
-function show(io::IO, a::FmpzLaurentSeriesRing)
+function show(io::IO, a::ZZLaurentSeriesRing)
    print(io, "Laurent series ring in ", var(a), " over ")
    show(io, base_ring(a))
 end
@@ -360,7 +360,7 @@ end
 #
 ###############################################################################
 
-function -(a::fmpz_laurent_series)
+function -(a::ZZLaurentSeriesRingElem)
    len = pol_length(a)
    z = parent(a)()
    z = set_precision!(z, precision(a))
@@ -378,7 +378,7 @@ end
 #
 ###############################################################################
 
-function +(a::fmpz_laurent_series, b::fmpz_laurent_series)
+function +(a::ZZLaurentSeriesRingElem, b::ZZLaurentSeriesRingElem)
    check_parent(a, b)
    lena = pol_length(a)
    lenb = pol_length(b)
@@ -430,7 +430,7 @@ function +(a::fmpz_laurent_series, b::fmpz_laurent_series)
    return z
 end
 
-function -(a::fmpz_laurent_series, b::fmpz_laurent_series)
+function -(a::ZZLaurentSeriesRingElem, b::ZZLaurentSeriesRingElem)
    check_parent(a, b)
    lena = pol_length(a)
    lenb = pol_length(b)
@@ -482,7 +482,7 @@ function -(a::fmpz_laurent_series, b::fmpz_laurent_series)
    return z
 end
 
-function *(a::fmpz_laurent_series, b::fmpz_laurent_series)
+function *(a::ZZLaurentSeriesRingElem, b::ZZLaurentSeriesRingElem)
    check_parent(a, b)
    lena = pol_length(a)
    lenb = pol_length(b)
@@ -516,7 +516,7 @@ function *(a::fmpz_laurent_series, b::fmpz_laurent_series)
    lenz = div(prec + sz - 1, sz)
    z = parent(a)()
    ccall((:fmpz_poly_mullow, libflint), Nothing,
-                (Ref{fmpz_laurent_series}, Ref{fmpz_laurent_series}, Ref{fmpz_laurent_series}, Int),
+                (Ref{ZZLaurentSeriesRingElem}, Ref{ZZLaurentSeriesRingElem}, Ref{ZZLaurentSeriesRingElem}, Int),
                z, a, b, lenz)
    z = set_precision!(z, prec + zval)
    z = set_valuation!(z, zval)
@@ -531,7 +531,7 @@ end
 #
 ###############################################################################
 
-function *(a::ZZRingElem, b::fmpz_laurent_series)
+function *(a::ZZRingElem, b::ZZLaurentSeriesRingElem)
    len = pol_length(b)
    z = parent(b)()
    z = set_precision!(z, precision(b))
@@ -544,7 +544,7 @@ function *(a::ZZRingElem, b::fmpz_laurent_series)
    return z
 end
 
-function *(a::Integer, b::fmpz_laurent_series)
+function *(a::Integer, b::ZZLaurentSeriesRingElem)
    len = pol_length(b)
    z = parent(b)()
    z = set_precision!(z, precision(b))
@@ -557,9 +557,9 @@ function *(a::Integer, b::fmpz_laurent_series)
    return z
 end
 
-*(a::fmpz_laurent_series, b::ZZRingElem) = b*a
+*(a::ZZLaurentSeriesRingElem, b::ZZRingElem) = b*a
 
-*(a::fmpz_laurent_series, b::Integer) = b*a
+*(a::ZZLaurentSeriesRingElem, b::Integer) = b*a
 
 ###############################################################################
 #
@@ -567,14 +567,14 @@ end
 #
 ###############################################################################
 
-function shift_left(x::fmpz_laurent_series, n::Int)
+function shift_left(x::ZZLaurentSeriesRingElem, n::Int)
    z = deepcopy(x)
    z = set_precision!(z, precision(x) + n)
    z = set_valuation!(z, valuation(x) + n)
    return z
 end
 
-function shift_right(x::fmpz_laurent_series, n::Int)
+function shift_right(x::ZZLaurentSeriesRingElem, n::Int)
    z = deepcopy(x)
    z = set_precision!(z, precision(x) - n)
    z = set_valuation!(z, valuation(x) - n)
@@ -587,7 +587,7 @@ end
 #
 ###############################################################################
 
-function truncate(a::fmpz_laurent_series, n::Int)
+function truncate(a::ZZLaurentSeriesRingElem, n::Int)
    alen = pol_length(a)
    aprec = precision(a)
    aval = valuation(a)
@@ -615,7 +615,7 @@ end
 
 # Intended only for internal use, does not renormalize or rescale, assumes n >= 0
 # Requires valuation(a) == valuation(b) == 0 and scale(a) == scale(b)
-function mullow(a::fmpz_laurent_series, b::fmpz_laurent_series, n::Int)
+function mullow(a::ZZLaurentSeriesRingElem, b::ZZLaurentSeriesRingElem, n::Int)
    lena = pol_length(a)
    lenb = pol_length(b)
    if lena == 0 || lenb == 0
@@ -631,7 +631,7 @@ function mullow(a::fmpz_laurent_series, b::fmpz_laurent_series, n::Int)
    z = parent(a)()
    lenz = min(lena + lenb - 1, div(n + s - 1, s))
    ccall((:fmpz_poly_mullow, libflint), Nothing,
-                (Ref{fmpz_laurent_series}, Ref{fmpz_laurent_series}, Ref{fmpz_laurent_series}, Int),
+                (Ref{ZZLaurentSeriesRingElem}, Ref{ZZLaurentSeriesRingElem}, Ref{ZZLaurentSeriesRingElem}, Int),
                z, a, b, lenz)
    z = set_precision!(z, prec)
    z = set_valuation!(z, valuation(a) + valuation(b))
@@ -645,8 +645,8 @@ end
 #
 ###############################################################################
 
-function inflate(a::fmpz_laurent_series, b::Int)
-    d = fmpz_laurent_series(a)
+function inflate(a::ZZLaurentSeriesRingElem, b::Int)
+    d = ZZLaurentSeriesRingElem(a)
     d = set_precision!(d, b*precision(a))
     d = set_valuation!(d, b*valuation(a))
     d = set_scale!(d, b*scale(a))
@@ -654,8 +654,8 @@ function inflate(a::fmpz_laurent_series, b::Int)
     return d
 end
 
-function deflate(a::fmpz_laurent_series, b::Int)
-    d = fmpz_laurent_series(a)
+function deflate(a::ZZLaurentSeriesRingElem, b::Int)
+    d = ZZLaurentSeriesRingElem(a)
     d = set_precision!(d, div(precision(a), b))
     d = set_valuation!(d, div(valuation(a), b))
     d = set_scale!(d, div(scale(a), b))
@@ -669,7 +669,7 @@ end
 #
 ###############################################################################
 
-function ^(a::fmpz_laurent_series, b::Int)
+function ^(a::ZZLaurentSeriesRingElem, b::Int)
    # special case powers of x for constructing power series efficiently
    if pol_length(a) == 0
       z = parent(a)()
@@ -738,13 +738,13 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    ==(x::fmpz_laurent_series, y::fmpz_laurent_series)
+    ==(x::ZZLaurentSeriesRingElem, y::ZZLaurentSeriesRingElem)
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 that power series to different precisions may still be arithmetically
 equal to the minimum of the two precisions.
 """
-function ==(x::fmpz_laurent_series, y::fmpz_laurent_series)
+function ==(x::ZZLaurentSeriesRingElem, y::ZZLaurentSeriesRingElem)
    check_parent(x, y)
    xval = valuation(x)
    xprec = precision(x)
@@ -794,13 +794,13 @@ function ==(x::fmpz_laurent_series, y::fmpz_laurent_series)
 end
 
 @doc Markdown.doc"""
-    isequal(x::fmpz_laurent_series, y::fmpz_laurent_series)
+    isequal(x::ZZLaurentSeriesRingElem, y::ZZLaurentSeriesRingElem)
 
 Return `true` if $x == y$ exactly, otherwise return `false`. Only if the
 power series are precisely the same, to the same precision, are they declared
 equal by this function.
 """
-function isequal(x::fmpz_laurent_series, y::fmpz_laurent_series)
+function isequal(x::ZZLaurentSeriesRingElem, y::ZZLaurentSeriesRingElem)
    if parent(x) != parent(y)
       return false
    end
@@ -822,17 +822,17 @@ end
 #
 ###############################################################################
 
-==(x::fmpz_laurent_series, y::T) where {T <: RingElem} = precision(x) == 0 ||
+==(x::ZZLaurentSeriesRingElem, y::T) where {T <: RingElem} = precision(x) == 0 ||
            ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
              valuation(x) == 0 && polcoeff(x, 0) == y))
 
-==(x::T, y::fmpz_laurent_series) where {T <: RingElem} = y == x
+==(x::T, y::ZZLaurentSeriesRingElem) where {T <: RingElem} = y == x
 
-==(x::fmpz_laurent_series, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 ||
+==(x::ZZLaurentSeriesRingElem, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 ||
                   ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
                     valuation(x) == 0 && polcoeff(x, 0) == y))
 
-==(x::Union{Integer, Rational, AbstractFloat}, y::fmpz_laurent_series) = y == x
+==(x::Union{Integer, Rational, AbstractFloat}, y::ZZLaurentSeriesRingElem) = y == x
 
 ###############################################################################
 #
@@ -840,7 +840,7 @@ end
 #
 ###############################################################################
 
-function divexact(a::fmpz_laurent_series, b::fmpz_laurent_series; check::Bool=true)
+function divexact(a::ZZLaurentSeriesRingElem, b::ZZLaurentSeriesRingElem; check::Bool=true)
    check_parent(a, b)
    lena = pol_length(a)
    lenb = pol_length(b)
@@ -872,7 +872,7 @@ function divexact(a::fmpz_laurent_series, b::fmpz_laurent_series; check::Bool=tr
    lenz = div(prec + sz - 1, sz)
    z = parent(a)()
    ccall((:fmpz_poly_div_series, libflint), Nothing,
-                (Ref{fmpz_laurent_series}, Ref{fmpz_laurent_series}, Ref{fmpz_laurent_series}, Int),
+                (Ref{ZZLaurentSeriesRingElem}, Ref{ZZLaurentSeriesRingElem}, Ref{ZZLaurentSeriesRingElem}, Int),
                z, a, b, lenz)
    z = set_precision!(z, prec + zval)
    z = set_valuation!(z, zval)
@@ -887,7 +887,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::fmpz_laurent_series, y::Union{Integer, Rational, AbstractFloat})
+function divexact(x::ZZLaurentSeriesRingElem, y::Union{Integer, Rational, AbstractFloat})
    y == 0 && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
@@ -900,7 +900,7 @@ function divexact(x::fmpz_laurent_series, y::Union{Integer, Rational, AbstractFl
    return z
 end
 
-function divexact(x::fmpz_laurent_series, y::T; check::Bool=true) where {T <: RingElem}
+function divexact(x::ZZLaurentSeriesRingElem, y::T; check::Bool=true) where {T <: RingElem}
    iszero(y) && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
@@ -919,7 +919,7 @@ end
 #
 ###############################################################################
 
-function inv(a::fmpz_laurent_series)
+function inv(a::ZZLaurentSeriesRingElem)
    iszero(a) && throw(DivideError())
    a1 = polcoeff(a, 0)
    ainv = parent(a)()
@@ -931,7 +931,7 @@ function inv(a::fmpz_laurent_series)
    !is_unit(a1) && error("Unable to invert power series")
    z = parent(a)()
    ccall((:fmpz_poly_inv_series, libflint), Nothing,
-                (Ref{fmpz_laurent_series}, Ref{fmpz_laurent_series}, Int),
+                (Ref{ZZLaurentSeriesRingElem}, Ref{ZZLaurentSeriesRingElem}, Int),
                ainv, a, lenz)
    ainv = rescale!(ainv)
    return ainv
@@ -943,7 +943,7 @@ end
 #
 ###############################################################################
 
-function sqrt(a::fmpz_laurent_series; check::Bool=true)
+function sqrt(a::ZZLaurentSeriesRingElem; check::Bool=true)
    aval = valuation(a)
    check && !iseven(aval) && error("Not a square in sqrt")
    R = base_ring(a)
@@ -963,7 +963,7 @@ function sqrt(a::fmpz_laurent_series; check::Bool=true)
    asqrt = set_precision!(asqrt, prec + aval2)
    asqrt = set_valuation!(asqrt, aval2)
    flag = Bool(ccall((:fmpz_poly_sqrt_series, libflint), Cint,
-          (Ref{fmpz_laurent_series}, Ref{fmpz_laurent_series}, Int),
+          (Ref{ZZLaurentSeriesRingElem}, Ref{ZZLaurentSeriesRingElem}, Int),
                 asqrt, a, zlen))
    check && flag == false && error("Not a square in sqrt")
    asqrt = set_scale!(asqrt, s)
@@ -977,7 +977,7 @@ end
 #
 ###############################################################################
 
-function exp(a::fmpz_laurent_series)
+function exp(a::ZZLaurentSeriesRingElem)
    if iszero(a)
       z = one(parent(a))
       z = set_precision!(z, precision(a))
@@ -996,7 +996,7 @@ function exp(a::fmpz_laurent_series)
    if sc != 1
       vala = div(vala, sc)
       preca = div(preca, sc)
-      a = fmpz_laurent_series(a)
+      a = ZZLaurentSeriesRingElem(a)
       a = set_valuation!(a, vala)
       a = set_precision!(a, preca)
       a = set_scale!(a, 1)
@@ -1030,23 +1030,23 @@ end
 #
 ###############################################################################
 
-function zero!(a::fmpz_laurent_series)
+function zero!(a::ZZLaurentSeriesRingElem)
   ccall((:fmpz_poly_zero, libflint), Nothing,
-                   (Ref{fmpz_laurent_series},), a)
+                   (Ref{ZZLaurentSeriesRingElem},), a)
    a = set_precision!(a, parent(a).prec_max)
    a = set_valuation!(a, parent(a).prec_max)
    a = set_scale!(a, 1)
    return a
 end
 
-function setcoeff!(c::fmpz_laurent_series, n::Int, a::ZZRingElem)
+function setcoeff!(c::ZZLaurentSeriesRingElem, n::Int, a::ZZRingElem)
    ccall((:fmpz_poly_set_coeff_fmpz, libflint), Nothing,
-                (Ref{fmpz_laurent_series}, Int, Ref{ZZRingElem}),
+                (Ref{ZZLaurentSeriesRingElem}, Int, Ref{ZZRingElem}),
                c, n, a)
    return c
 end
 
-function mul!(c::fmpz_laurent_series, a::fmpz_laurent_series, b::fmpz_laurent_series)
+function mul!(c::ZZLaurentSeriesRingElem, a::ZZLaurentSeriesRingElem, b::ZZLaurentSeriesRingElem)
    lena = pol_length(a)
    lenb = pol_length(b)
    if lena > lenb
@@ -1067,7 +1067,7 @@ function mul!(c::fmpz_laurent_series, a::fmpz_laurent_series, b::fmpz_laurent_se
    lenb = min(lenb*sb, prec)
    if lena == 0 || lenb == 0
       ccall((:fmpz_poly_zero, libflint), Nothing,
-                (Ref{fmpz_laurent_series},), c)
+                (Ref{ZZLaurentSeriesRingElem},), c)
       c = set_precision!(c, prec + aval + bval)
       c = set_valuation!(c, aval + bval)
       c = set_scale!(c, 1)
@@ -1082,7 +1082,7 @@ function mul!(c::fmpz_laurent_series, a::fmpz_laurent_series, b::fmpz_laurent_se
       lenb = pol_length(b)
       lenc = min(lena + lenb - 1, div(prec + sz - 1, sz))
       ccall((:fmpz_poly_mullow, libflint), Nothing,
-         (Ref{fmpz_laurent_series}, Ref{fmpz_laurent_series}, Ref{fmpz_laurent_series}, Int), c, a, b, lenc)
+         (Ref{ZZLaurentSeriesRingElem}, Ref{ZZLaurentSeriesRingElem}, Ref{ZZLaurentSeriesRingElem}, Int), c, a, b, lenc)
    end
    c = set_valuation!(c, aval + bval)
    c = set_precision!(c, prec + c.val)
@@ -1092,12 +1092,12 @@ function mul!(c::fmpz_laurent_series, a::fmpz_laurent_series, b::fmpz_laurent_se
    return c
 end
 
-function addeq!(c::fmpz_laurent_series, a::fmpz_laurent_series)
+function addeq!(c::ZZLaurentSeriesRingElem, a::ZZLaurentSeriesRingElem)
    b = deepcopy(c)
    return add!(c, b, a)
 end
 
-function add!(c::fmpz_laurent_series, a::fmpz_laurent_series, b::fmpz_laurent_series)
+function add!(c::ZZLaurentSeriesRingElem, a::ZZLaurentSeriesRingElem, b::ZZLaurentSeriesRingElem)
    if c === a
       return addeq!(c, b)
    elseif c === b
@@ -1165,18 +1165,18 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    eta_qexp(x::fmpz_laurent_series)
+    eta_qexp(x::ZZLaurentSeriesRingElem)
 
 Return the $q$-series for the eta function, without the leading $q^{1/24}$. It is
 currently assumed that $x$ is a power of the generator of the Laurent series ring.
 """
-function eta_qexp(x::fmpz_laurent_series)
+function eta_qexp(x::ZZLaurentSeriesRingElem)
    pol_length(x) != 1 || polcoeff(x, 0) != 1 && error("Series composition not implemented")
    z = parent(x)()
    zscale = valuation(x)
    prec = max_precision(parent(x))
    ccall((:fmpz_poly_eta_qexp, libflint), Nothing,
-                                          (Ref{fmpz_laurent_series}, Int, Int), z, 1, div(prec + zscale - 1, zscale))
+                                          (Ref{ZZLaurentSeriesRingElem}, Int, Int), z, 1, div(prec + zscale - 1, zscale))
    z = set_scale!(z, zscale)
    z = set_valuation!(z, 0)
    z = set_precision!(z, prec)
@@ -1189,11 +1189,11 @@ end
 #
 ###############################################################################
 
-# define rand(make(::FmpzLaurentSeriesRing, n:m, ...))
+# define rand(make(::ZZLaurentSeriesRing, n:m, ...))
 
-RandomExtensions.maketype(S::FmpzLaurentSeriesRing, _, _) = elem_type(S)
+RandomExtensions.maketype(S::ZZLaurentSeriesRing, _, _) = elem_type(S)
 
-function RandomExtensions.make(S::FmpzLaurentSeriesRing, val_range::UnitRange{Int}, vs...)
+function RandomExtensions.make(S::ZZLaurentSeriesRing, val_range::UnitRange{Int}, vs...)
    R = base_ring(S)
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       RandomExtensions.Make(S, val_range, vs[1]) # forward to default Make constructor
@@ -1202,8 +1202,8 @@ function RandomExtensions.make(S::FmpzLaurentSeriesRing, val_range::UnitRange{In
    end
 end
 
-function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make3{fmpz_laurent_series,
-                                                           FmpzLaurentSeriesRing,
+function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make3{ZZLaurentSeriesRingElem,
+                                                           ZZLaurentSeriesRing,
                                                            UnitRange{Int}}})
    S, val_range, v = sp[][1:end]
    R = base_ring(S)
@@ -1215,12 +1215,12 @@ function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make3{fmpz_laurent_series,
    return shift_left(f, rand(rng, val_range))
 end
 
-# define rand(::FmpzLaurentSeriesRing, n:m, ...)
+# define rand(::ZZLaurentSeriesRing, n:m, ...)
 
-rand(rng::AbstractRNG, S::FmpzLaurentSeriesRing, val_range::UnitRange{Int}, v...) =
+rand(rng::AbstractRNG, S::ZZLaurentSeriesRing, val_range::UnitRange{Int}, v...) =
    rand(rng, make(S, val_range, v...))
 
-rand(S::FmpzLaurentSeriesRing, val_range, v...) = rand(Random.GLOBAL_RNG, S, val_range, v...)
+rand(S::ZZLaurentSeriesRing, val_range, v...) = rand(Random.GLOBAL_RNG, S, val_range, v...)
 
 ###############################################################################
 #
@@ -1228,9 +1228,9 @@ rand(S::FmpzLaurentSeriesRing, val_range, v...) = rand(Random.GLOBAL_RNG, S, val
 #
 ###############################################################################
 
-promote_rule(::Type{fmpz_laurent_series}, ::Type{T}) where {T <: Integer} = fmpz_laurent_series
+promote_rule(::Type{ZZLaurentSeriesRingElem}, ::Type{T}) where {T <: Integer} = ZZLaurentSeriesRingElem
 
-promote_rule(::Type{fmpz_laurent_series}, ::Type{ZZRingElem}) = fmpz_laurent_series
+promote_rule(::Type{ZZLaurentSeriesRingElem}, ::Type{ZZRingElem}) = ZZLaurentSeriesRingElem
 
 ###############################################################################
 #
@@ -1238,38 +1238,38 @@ promote_rule(::Type{fmpz_laurent_series}, ::Type{ZZRingElem}) = fmpz_laurent_ser
 #
 ###############################################################################
 
-function (R::FmpzLaurentSeriesRing)()
-   z = fmpz_laurent_series(Vector{ZZRingElem}(undef, 0), 0, R.prec_max, R.prec_max, 1)
+function (R::ZZLaurentSeriesRing)()
+   z = ZZLaurentSeriesRingElem(Vector{ZZRingElem}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    z.parent = R
    return z
 end
 
-function (R::FmpzLaurentSeriesRing)(b::Integer)
+function (R::ZZLaurentSeriesRing)(b::Integer)
    if b == 0
-      z = fmpz_laurent_series(Vector{ZZRingElem}(undef, 0), 0, R.prec_max, R.prec_max, 1)
+      z = ZZLaurentSeriesRingElem(Vector{ZZRingElem}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    else
-      z = fmpz_laurent_series([ZZRingElem(b)], 1, R.prec_max, 0, 1)
+      z = ZZLaurentSeriesRingElem([ZZRingElem(b)], 1, R.prec_max, 0, 1)
    end
    z.parent = R
    return z
 end
 
-function (R::FmpzLaurentSeriesRing)(b::ZZRingElem)
+function (R::ZZLaurentSeriesRing)(b::ZZRingElem)
    if iszero(b)
-      z = fmpz_laurent_series(Vector{ZZRingElem}(undef, 0), 0, R.prec_max, R.prec_max, 1)
+      z = ZZLaurentSeriesRingElem(Vector{ZZRingElem}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    else
-      z = fmpz_laurent_series([b], 1, R.prec_max, 0, 1)
+      z = ZZLaurentSeriesRingElem([b], 1, R.prec_max, 0, 1)
    end
    z.parent = R
    return z
 end
 
-function (R::FmpzLaurentSeriesRing)(b::fmpz_laurent_series)
+function (R::ZZLaurentSeriesRing)(b::ZZLaurentSeriesRingElem)
    return b
 end
 
-function (R::FmpzLaurentSeriesRing)(b::Vector{ZZRingElem}, len::Int, prec::Int, val::Int, scale::Int, rescale::Bool = true)
-   z = fmpz_laurent_series(b, len, prec, val, scale)
+function (R::ZZLaurentSeriesRing)(b::Vector{ZZRingElem}, len::Int, prec::Int, val::Int, scale::Int, rescale::Bool = true)
+   z = ZZLaurentSeriesRingElem(b, len, prec, val, scale)
    z.parent = R
    if rescale
       z = rescale!(z)
@@ -1296,7 +1296,7 @@ precision in future will return the same parent object and generator. If
 caching of the parent object is not required, `cached` can be set to `false`.
 """
 function LaurentSeriesRing(R::ZZRing, prec::Int, s::Symbol; cached=true)
-   parent_obj = FmpzLaurentSeriesRing(prec, s, cached)
+   parent_obj = ZZLaurentSeriesRing(prec, s, cached)
 
    return parent_obj, gen(parent_obj)
 end

@@ -1,21 +1,21 @@
-@testset "fmpq_rel_series.types" begin
-   @test rel_series_type(QQFieldElem) == fmpq_rel_series
+@testset "QQRelPowerSeriesRingElem.types" begin
+   @test rel_series_type(QQFieldElem) == QQRelPowerSeriesRingElem
 end
 
-@testset "fmpq_rel_series.constructors" begin
+@testset "QQRelPowerSeriesRingElem.constructors" begin
    S1 = RelSeriesRing(QQ, 30)
    S2 = RelSeriesRing(QQ, 30)
 
-   @test isa(S1, FmpqRelSeriesRing)
+   @test isa(S1, QQRelPowerSeriesRing)
    @test S1 !== S2
 
    R, x = PowerSeriesRing(QQ, 30, "x")
 
-   @test elem_type(R) == fmpq_rel_series
-   @test elem_type(FmpqRelSeriesRing) == fmpq_rel_series
-   @test parent_type(fmpq_rel_series) == FmpqRelSeriesRing
+   @test elem_type(R) == QQRelPowerSeriesRingElem
+   @test elem_type(QQRelPowerSeriesRing) == QQRelPowerSeriesRingElem
+   @test parent_type(QQRelPowerSeriesRingElem) == QQRelPowerSeriesRing
 
-   @test isa(R, FmpqRelSeriesRing)
+   @test isa(R, QQRelPowerSeriesRing)
 
    a = x^3 + 2x + 1
    b = x^2 + 3x + O(x^4)
@@ -47,7 +47,7 @@ end
    @test isa(R(), SeriesElem)
 end
 
-@testset "fmpq_rel_series.printing" begin
+@testset "QQRelPowerSeriesRingElem.printing" begin
    R, x = PowerSeriesRing(QQ, 30, "x")
 
    a = x^3 + 2x + 1
@@ -55,7 +55,7 @@ end
    @test sprint(show, "text/plain", a) == "1 + 2*x + x^3 + O(x^30)"
 end
 
-@testset "fmpq_rel_series.manipulation" begin
+@testset "QQRelPowerSeriesRingElem.manipulation" begin
    R, x = PowerSeriesRing(QQ, 30, "x")
 
    a = 2x + x^3
@@ -76,7 +76,7 @@ end
    @test characteristic(R) == 0
 end
 
-@testset "fmpq_rel_series.similar" begin
+@testset "QQRelPowerSeriesRingElem.similar" begin
    R, x = PowerSeriesRing(QQ, 10, "x")
    S, y = PowerSeriesRing(ZZ, 10, "y")
 
@@ -90,11 +90,11 @@ end
       m = similar(fz, QQ, 5)
       n = similar(f, 5)
 
-      @test isa(g, fmpq_rel_series)
-      @test isa(h, fmpq_rel_series)
-      @test isa(k, fmpq_rel_series)
-      @test isa(m, fmpq_rel_series)
-      @test isa(n, fmpq_rel_series)
+      @test isa(g, QQRelPowerSeriesRingElem)
+      @test isa(h, QQRelPowerSeriesRingElem)
+      @test isa(k, QQRelPowerSeriesRingElem)
+      @test isa(m, QQRelPowerSeriesRingElem)
+      @test isa(n, QQRelPowerSeriesRingElem)
 
       @test parent(g).S == :y
       @test parent(h).S == :y
@@ -123,10 +123,10 @@ end
    end
 end
 
-@testset "fmpq_rel_series.rel_series" begin
+@testset "QQRelPowerSeriesRingElem.rel_series" begin
    f = rel_series(QQ, [1, 2, 3], 3, 5, 2, "y")
 
-   @test isa(f, fmpq_rel_series)
+   @test isa(f, QQRelPowerSeriesRingElem)
    @test base_ring(f) === QQ
    @test coeff(f, 2) == 1
    @test coeff(f, 4) == 3
@@ -134,7 +134,7 @@ end
 
    g = rel_series(QQ, [1, 2, 3], 3, 7, 4)
 
-   @test isa(g, fmpq_rel_series)
+   @test isa(g, QQRelPowerSeriesRingElem)
    @test base_ring(g) === QQ
    @test coeff(g, 4) == 1
    @test coeff(g, 6) == 3
@@ -150,22 +150,22 @@ end
    p = rel_series(QQ, QQFieldElem[], 0, 3, 1)
    q = rel_series(QQ, [], 0, 3, 2)
 
-   @test isa(p, fmpq_rel_series)
-   @test isa(q, fmpq_rel_series)
+   @test isa(p, QQRelPowerSeriesRingElem)
+   @test isa(q, QQRelPowerSeriesRingElem)
 
    @test pol_length(p) == 0
    @test pol_length(q) == 0
 
    r = rel_series(QQ, ZZRingElem[1, 2, 3], 3, 11, 8)
 
-   @test isa(r, fmpq_rel_series)
+   @test isa(r, QQRelPowerSeriesRingElem)
 
    s = rel_series(QQ, [1, 2, 3], 3, 5, 0; max_precision=10)
    
    @test max_precision(parent(s)) == 10
 end
 
-@testset "fmpq_rel_series.unary_ops" begin
+@testset "QQRelPowerSeriesRingElem.unary_ops" begin
    R, x = PowerSeriesRing(QQ, 30, "x")
 
    a = 2x + x^3
@@ -176,7 +176,7 @@ end
    @test -b == -1 - 2x - x^2 + O(x^3)
 end
 
-@testset "fmpq_rel_series.binary_ops" begin
+@testset "QQRelPowerSeriesRingElem.binary_ops" begin
    R, x = PowerSeriesRing(QQ, 30, "x")
 
    a = 2x + x^3
@@ -313,7 +313,7 @@ end
    @test isequal(m1 - m4, 1+x+O(x^4))
 end
 
-@testset "fmpq_rel_series.adhoc_binary_ops" begin
+@testset "QQRelPowerSeriesRingElem.adhoc_binary_ops" begin
    R, x = PowerSeriesRing(QQ, 30, "x")
 
    a = 2x + x^3
@@ -345,7 +345,7 @@ end
    @test QQFieldElem(2, 3)*c == 2*x^2 + ZZRingElem(2)//3*x + ZZRingElem(2)//3+O(x^5)
 end
 
-@testset "fmpq_rel_series.comparison" begin
+@testset "QQRelPowerSeriesRingElem.comparison" begin
    R, x = PowerSeriesRing(QQ, 30, "x")
 
    a = 2x + x^3
@@ -360,7 +360,7 @@ end
    @test c != d
 end
 
-@testset "fmpq_rel_series.adhoc_comparison" begin
+@testset "QQRelPowerSeriesRingElem.adhoc_comparison" begin
    R, x = PowerSeriesRing(QQ, 30, "x")
 
    a = 2x + x^3
@@ -382,7 +382,7 @@ end
    end
 end
 
-@testset "fmpq_rel_series.powering" begin
+@testset "QQRelPowerSeriesRingElem.powering" begin
    R, x = PowerSeriesRing(QQ, 30, "x")
 
    a = 2x + x^3
@@ -401,7 +401,7 @@ end
    @test_throws DomainError d^-1
 end
 
-@testset "fmpq_rel_series.shift" begin
+@testset "QQRelPowerSeriesRingElem.shift" begin
    R, x = PowerSeriesRing(QQ, 30, "x")
 
    a = 2x + x^3
@@ -422,7 +422,7 @@ end
    @test shift_right(d, 3) == 1+O(x^1)
 end
 
-@testset "fmpq_rel_series.truncation" begin
+@testset "QQRelPowerSeriesRingElem.truncation" begin
    R, x = PowerSeriesRing(QQ, 30, "x")
 
    a = 2x + x^3
@@ -441,7 +441,7 @@ end
    @test truncate(d, 5) == x^3+2*x+O(x^4)
 end
 
-@testset "fmpq_rel_series.exact_division" begin
+@testset "QQRelPowerSeriesRingElem.exact_division" begin
    R, x = PowerSeriesRing(QQ, 30, "x")
 
    a = x + x^3
@@ -458,7 +458,7 @@ end
    @test divexact(d, c) == -2*x^5+2*x^4-x^2+x+O(x^6)
 end
 
-@testset "fmpq_rel_series.adhoc_exact_division" begin
+@testset "QQRelPowerSeriesRingElem.adhoc_exact_division" begin
    R, x = PowerSeriesRing(QQ, 30, "x")
 
    a = x + x^3
@@ -479,7 +479,7 @@ end
    @test isequal(divexact(94872394861923874346987123694871329847a, 94872394861923874346987123694871329847), a)
 end
 
-@testset "fmpq_rel_series.inversion" begin
+@testset "QQRelPowerSeriesRingElem.inversion" begin
    R, x = PowerSeriesRing(QQ, 30, "x")
 
    a = 1 + x + 2x^2 + O(x^5)
@@ -490,7 +490,7 @@ end
    @test inv(b) == -1
 end
 
-@testset "fmpq_rel_series.integral_derivative" begin
+@testset "QQRelPowerSeriesRingElem.integral_derivative" begin
    R, x = PowerSeriesRing(QQ, 10, "x")
 
    for iter = 1:100
@@ -500,7 +500,7 @@ end
    end
 end
 
-@testset "fmpq_rel_series.special" begin
+@testset "QQRelPowerSeriesRingElem.special" begin
    R, x = PowerSeriesRing(QQ, 30, "x")
 
    a = 1 + x + 3x^2 + O(x^5)
@@ -522,7 +522,7 @@ end
    end
 end
 
-@testset "fmpq_rel_series.unsafe_operators" begin
+@testset "QQRelPowerSeriesRingElem.unsafe_operators" begin
    R, x = PowerSeriesRing(QQ, 30, "x")
 
    for iter = 1:300

@@ -23,7 +23,7 @@ Base ring                             | Library            | Element type       
 --------------------------------------|--------------------|--------------------------------------------------|----------------------------------------------
 Generic ring $R$                      | AbstractAlgebra.jl | `Generic.PuiseuxSeriesRingElem{T}                | `Generic.PuiseuxSeriesRing{T}`
 Generic field $K$                     | AbstractAlgebra.jl | `Generic.PuiseuxSeriesFieldElem{T}               | `Generic.PuiseuxSeriesField{T}`
-$\mathbb{Z}$                          | Flint              | `FlintPuiseuxSeriesRingElem{fmpz_laurent_series}`| `FlintPuiseuxSeriesRing{fmpz_laurent_series}`
+$\mathbb{Z}$                          | Flint              | `FlintPuiseuxSeriesRingElem{ZZLaurentSeriesRingElem}`| `FlintPuiseuxSeriesRing{ZZLaurentSeriesRingElem}`
 
 For convenience, `FlintPuiseuxSeriesRingElem` and `FlintPuiseuxSeriesFieldElem` both
 belong to a union type called `FlintPuiseuxSeriesElem`.
@@ -62,15 +62,15 @@ for specific rings provided by Nemo.
 ### Special functions
 
 ```@docs
-Base.sqrt(a::FlintPuiseuxSeriesElem{fmpz_laurent_series})
+Base.sqrt(a::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem})
 ```
 
 ```@docs
-Base.exp(a::FlintPuiseuxSeriesElem{fmpz_laurent_series})
+Base.exp(a::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem})
 ```
 
 ```@docs
-eta_qexp(x::FlintPuiseuxSeriesElem{fmpz_laurent_series})
+eta_qexp(x::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem})
 ```
 
 **Examples**

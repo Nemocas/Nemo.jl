@@ -10,13 +10,13 @@
 #
 ###############################################################################
 
-function *(x::FlintPuiseuxSeriesElem{fmpz_laurent_series}, y::ZZRingElem)
+function *(x::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem}, y::ZZRingElem)
    z = parent(x)(x.data*y, x.scale)
    z = rescale!(z)
    return z
 end
 
-*(x::ZZRingElem, y::FlintPuiseuxSeriesElem{fmpz_laurent_series}) = y*x
+*(x::ZZRingElem, y::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem}) = y*x
 
 ###############################################################################
 #
@@ -24,7 +24,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::FlintPuiseuxSeriesElem{fmpz_laurent_series}, y::ZZRingElem; check::Bool=true)
+function divexact(x::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem}, y::ZZRingElem; check::Bool=true)
    return parent(x)(divexact(x.data, y; check=check), x.scale)
 end
 
@@ -34,9 +34,9 @@ end
 #
 ###############################################################################
 
-==(x::FlintPuiseuxSeriesElem{fmpz_laurent_series}, y::ZZRingElem) = x.data == y
+==(x::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem}, y::ZZRingElem) = x.data == y
 
-==(x::ZZRingElem, y::FlintPuiseuxSeriesElem{fmpz_laurent_series}) = y == x
+==(x::ZZRingElem, y::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem}) = y == x
 
 ###############################################################################
 #
@@ -45,12 +45,12 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    eta_qexp(x::FlintPuiseuxSeriesElem{fmpz_laurent_series})
+    eta_qexp(x::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem})
 
 Return the $q$-series for eta evaluated at $x$, which must currently be a rational
 power of the generator of the Puiseux series ring.
 """
-function eta_qexp(x::FlintPuiseuxSeriesElem{fmpz_laurent_series})
+function eta_qexp(x::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem})
    v = valuation(x)
    d = eta_qexp(x.data)
    z = parent(x)(d, x.scale)
@@ -63,8 +63,8 @@ end
 #
 ###############################################################################
 
-function (R::FlintPuiseuxSeriesRing{fmpz_laurent_series})(b::ZZRingElem)
-   z = FlintPuiseuxSeriesRingElem{fmpz_laurent_series}(laurent_ring(R)(b), 1)
+function (R::FlintPuiseuxSeriesRing{ZZLaurentSeriesRingElem})(b::ZZRingElem)
+   z = FlintPuiseuxSeriesRingElem{ZZLaurentSeriesRingElem}(laurent_ring(R)(b), 1)
    z.parent = R
    return z
 end
@@ -91,7 +91,7 @@ caching of the parent object is not required, `cached` can be set to `false`.
 function PuiseuxSeriesRing(R::ZZRing, prec::Int, s::Symbol; cached=true)
    S, x = LaurentSeriesRing(R, prec, s; cached=cached)
 
-   parent_obj = FlintPuiseuxSeriesRing{fmpz_laurent_series}(S, cached)
+   parent_obj = FlintPuiseuxSeriesRing{ZZLaurentSeriesRingElem}(S, cached)
 
    return parent_obj, gen(parent_obj)
 end

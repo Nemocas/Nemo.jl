@@ -1,17 +1,17 @@
 ###############################################################################
 #
-#   fmpz_mod_rel_series.jl: Relative series using ZZModPolyRingElem
+#   ZZModRelPowerSeriesRingElem.jl: Relative series using ZZModPolyRingElem
 #
-#   fmpz_mod_rel_series, gfp_fmpz_rel_series
+#   ZZModRelPowerSeriesRingElem, FpRelPowerSeriesRingElem
 #
 ###############################################################################
 
-export fmpz_mod_rel_series, FmpzModRelSeriesRing,
-       gfp_fmpz_rel_series, GFPFmpzRelSeriesRing
+export ZZModRelPowerSeriesRingElem, ZZModRelPowerSeriesRing,
+       FpRelPowerSeriesRingElem, FpRelPowerSeriesRing
 
 for (etype, rtype, ctype, mtype, brtype, flint_fn) in (
-   (fmpz_mod_rel_series, FmpzModRelSeriesRing, fmpz_mod_ctx_struct, ZZModRingElem, ZZModRing, "fmpz_mod_poly"),
-   (gfp_fmpz_rel_series, GFPFmpzRelSeriesRing, fmpz_mod_ctx_struct, FpFieldElem, FpField, "fmpz_mod_poly"))
+   (ZZModRelPowerSeriesRingElem, ZZModRelPowerSeriesRing, fmpz_mod_ctx_struct, ZZModRingElem, ZZModRing, "fmpz_mod_poly"),
+   (FpRelPowerSeriesRingElem, FpRelPowerSeriesRing, fmpz_mod_ctx_struct, FpFieldElem, FpField, "fmpz_mod_poly"))
 @eval begin
 
 ###############################################################################
@@ -953,7 +953,7 @@ end # for
 #
 ###############################################################################
 
-function sqrt_classical_char2(a::gfp_fmpz_rel_series; check::Bool=true)
+function sqrt_classical_char2(a::FpRelPowerSeriesRingElem; check::Bool=true)
    S = parent(a)
    R = base_ring(a)
    prec = div(precision(a) + 1, 2)
@@ -984,7 +984,7 @@ function sqrt_classical_char2(a::gfp_fmpz_rel_series; check::Bool=true)
    return true, asqrt
 end
 
-function sqrt_classical(a::gfp_fmpz_rel_series; check::Bool=true)
+function sqrt_classical(a::FpRelPowerSeriesRingElem; check::Bool=true)
    S = parent(a)
    R = base_ring(a)
    v = valuation(a)
@@ -1014,7 +1014,7 @@ function sqrt_classical(a::gfp_fmpz_rel_series; check::Bool=true)
    end
    a = divexact(a, c)
    ccall((:fmpz_mod_poly_sqrt_series, libflint), Nothing,
-                (Ref{gfp_fmpz_rel_series}, Ref{gfp_fmpz_rel_series},
+                (Ref{FpRelPowerSeriesRingElem}, Ref{FpRelPowerSeriesRingElem},
                  Int, Ref{fmpz_mod_ctx_struct}),
                z, a, a.prec, a.parent.base_ring.ninv)
    if !isone(s)
@@ -1024,13 +1024,13 @@ function sqrt_classical(a::gfp_fmpz_rel_series; check::Bool=true)
 end
 
 @doc Markdown.doc"""
-    sqrt(a::gfp_fmpz_rel_series)
+    sqrt(a::FpRelPowerSeriesRingElem)
 
 Return the square root of the power series $a$. By default the function raises
 an exception if the input is not a square. If `check=false` this check is
 omitted.
 """
-function Base.sqrt(a::gfp_fmpz_rel_series; check::Bool=true)
+function Base.sqrt(a::FpRelPowerSeriesRingElem; check::Bool=true)
    flag, q = sqrt_classical(a; check=check)
    if check && !flag
       error("Not a square in sqrt")
@@ -1038,11 +1038,11 @@ function Base.sqrt(a::gfp_fmpz_rel_series; check::Bool=true)
    return q
 end
 
-function issquare(a::gfp_fmpz_rel_series)
+function issquare(a::FpRelPowerSeriesRingElem)
    flag, q = sqrt_classical(a; check=true)
    return flag
 end
 
-function issquare_with_sqrt(a::gfp_fmpz_rel_series)
+function issquare_with_sqrt(a::FpRelPowerSeriesRingElem)
    return sqrt_classical(a; check=true)
 end

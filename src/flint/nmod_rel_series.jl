@@ -1,17 +1,17 @@
 ###############################################################################
 #
-#   nmod_rel_series.jl: Relative series using zzModPolyRingElem
+#   zzModRelPowerSeriesRingElem.jl: Relative series using zzModPolyRingElem
 #
-#   nmod_rel_series, gfp_rel_series
+#   zzModRelPowerSeriesRingElem, fpRelPowerSeriesRingElem
 #
 ###############################################################################
 
-export nmod_rel_series, NmodRelSeriesRing,
-       gfp_rel_series, GFPRelSeriesRing
+export zzModRelPowerSeriesRingElem, zzModRelPowerSeriesRing,
+       fpRelPowerSeriesRingElem, fpRelPowerSeriesRing
 
 for (etype, rtype, mtype, brtype, flint_fn) in (
-   (nmod_rel_series, NmodRelSeriesRing, zzModRingElem, zzModRing, "nmod_poly"),
-   (gfp_rel_series, GFPRelSeriesRing, fpFieldElem, fpField, "nmod_poly"))
+   (zzModRelPowerSeriesRingElem, zzModRelPowerSeriesRing, zzModRingElem, zzModRing, "nmod_poly"),
+   (fpRelPowerSeriesRingElem, fpRelPowerSeriesRing, fpFieldElem, fpField, "nmod_poly"))
 @eval begin
 
 ###############################################################################
@@ -951,7 +951,7 @@ end # for
 #
 ###############################################################################
 
-function sqrt_classical_char2(a::gfp_rel_series; check::Bool=true)
+function sqrt_classical_char2(a::fpRelPowerSeriesRingElem; check::Bool=true)
    S = parent(a)
    R = base_ring(a)
    prec = div(precision(a) + 1, 2)
@@ -983,7 +983,7 @@ function sqrt_classical_char2(a::gfp_rel_series; check::Bool=true)
    return true, asqrt
 end
 
-function sqrt_classical(a::gfp_rel_series; check::Bool=true)
+function sqrt_classical(a::fpRelPowerSeriesRingElem; check::Bool=true)
    S = parent(a)
    if characteristic(S) == 2
       return sqrt_classical_char2(a; check=check)
@@ -1012,7 +1012,7 @@ function sqrt_classical(a::gfp_rel_series; check::Bool=true)
    end
    a = divexact(a, c)
    ccall((:nmod_poly_sqrt_series, libflint), Nothing,
-                (Ref{gfp_rel_series}, Ref{gfp_rel_series}, Int),
+                (Ref{fpRelPowerSeriesRingElem}, Ref{fpRelPowerSeriesRingElem}, Int),
                z, a, a.prec)
    if !isone(s)
       z *= s
@@ -1021,13 +1021,13 @@ function sqrt_classical(a::gfp_rel_series; check::Bool=true)
 end
 
 @doc Markdown.doc"""
-    sqrt(a::gfp_rel_series)
+    sqrt(a::fpRelPowerSeriesRingElem)
 
 Return the square root of the power series $a$. By default the function raises
 an exception if the input is not a square. If `check=false` this check is
 omitted.
 """
-function Base.sqrt(a::gfp_rel_series; check::Bool=true)
+function Base.sqrt(a::fpRelPowerSeriesRingElem; check::Bool=true)
    flag, q = sqrt_classical(a; check=check)
    if check && !flag
       error("Not a square in sqrt")
@@ -1035,12 +1035,12 @@ function Base.sqrt(a::gfp_rel_series; check::Bool=true)
    return q
 end
 
-function issquare(a::gfp_rel_series)
+function issquare(a::fpRelPowerSeriesRingElem)
    flag, q = sqrt_classical(a; check=true)
    return flag
 end
 
-function issquare_with_sqrt(a::gfp_rel_series)
+function issquare_with_sqrt(a::fpRelPowerSeriesRingElem)
    return sqrt_classical(a; check=true)
 end
 

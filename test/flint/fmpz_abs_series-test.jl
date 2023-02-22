@@ -1,21 +1,21 @@
-@testset "fmpz_abs_series.types" begin
-   @test abs_series_type(ZZRingElem) == fmpz_abs_series
+@testset "ZZAbsPowerSeriesRingElem.types" begin
+   @test abs_series_type(ZZRingElem) == ZZAbsPowerSeriesRingElem
 end
 
-@testset "fmpz_abs_series.constructors" begin
+@testset "ZZAbsPowerSeriesRingElem.constructors" begin
    S1 = AbsSeriesRing(ZZ, 30)
    S2 = AbsSeriesRing(ZZ, 30)
 
-   @test isa(S1, FmpzAbsSeriesRing)
+   @test isa(S1, ZZAbsPowerSeriesRing)
    @test S1 !== S2
 
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
-   @test elem_type(R) == fmpz_abs_series
-   @test elem_type(FmpzAbsSeriesRing) == fmpz_abs_series
-   @test parent_type(fmpz_abs_series) == FmpzAbsSeriesRing
+   @test elem_type(R) == ZZAbsPowerSeriesRingElem
+   @test elem_type(ZZAbsPowerSeriesRing) == ZZAbsPowerSeriesRingElem
+   @test parent_type(ZZAbsPowerSeriesRingElem) == ZZAbsPowerSeriesRing
 
-   @test isa(R, FmpzAbsSeriesRing)
+   @test isa(R, ZZAbsPowerSeriesRing)
 
    a = x^3 + 2x + 1
    b = x^2 + 3x + O(x^4)
@@ -33,7 +33,7 @@ end
    @test isa(R(), SeriesElem)
 end
 
-@testset "fmpz_abs_series.printing" begin
+@testset "ZZAbsPowerSeriesRingElem.printing" begin
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
    b = x^2 + 3x + O(x^4)
@@ -41,7 +41,7 @@ end
    @test sprint(show, "text/plain", b) == "3*x + x^2 + O(x^4)"
 end
 
-@testset "fmpz_abs_series.manipulation" begin
+@testset "ZZAbsPowerSeriesRingElem.manipulation" begin
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -62,7 +62,7 @@ end
    @test characteristic(R) == 0
 end
 
-@testset "fmpz_abs_series.similar" begin
+@testset "ZZAbsPowerSeriesRingElem.similar" begin
    R, x = PowerSeriesRing(ZZ, 10, "x"; model=:capped_absolute)
 
    for iters = 1:10
@@ -74,11 +74,11 @@ end
       m = similar(f, ZZ, 5)
       n = similar(f, 5)
 
-      @test isa(g, fmpz_abs_series)
-      @test isa(h, fmpz_abs_series)
-      @test isa(k, fmpz_abs_series)
-      @test isa(m, fmpz_abs_series)
-      @test isa(n, fmpz_abs_series)
+      @test isa(g, ZZAbsPowerSeriesRingElem)
+      @test isa(h, ZZAbsPowerSeriesRingElem)
+      @test isa(k, ZZAbsPowerSeriesRingElem)
+      @test isa(m, ZZAbsPowerSeriesRingElem)
+      @test isa(n, ZZAbsPowerSeriesRingElem)
 
       @test parent(g).S == :y
       @test parent(h).S == :y
@@ -107,10 +107,10 @@ end
    end
 end
 
-@testset "fmpz_abs_series.abs_series" begin
+@testset "ZZAbsPowerSeriesRingElem.abs_series" begin
    f = abs_series(ZZ, [1, 2, 3], 3, 5, "y")
 
-   @test isa(f, fmpz_abs_series)
+   @test isa(f, ZZAbsPowerSeriesRingElem)
    @test base_ring(f) === ZZ
    @test coeff(f, 0) == 1
    @test coeff(f, 2) == 3
@@ -118,7 +118,7 @@ end
 
    g = abs_series(ZZ, [1, 2, 3], 3, 5)
 
-   @test isa(g, fmpz_abs_series)
+   @test isa(g, ZZAbsPowerSeriesRingElem)
    @test base_ring(g) === ZZ
    @test coeff(g, 0) == 1
    @test coeff(g, 2) == 3
@@ -134,8 +134,8 @@ end
    p = abs_series(ZZ, ZZRingElem[], 0, 4)
    q = abs_series(ZZ, [], 0, 6)
 
-   @test isa(p, fmpz_abs_series)
-   @test isa(q, fmpz_abs_series)
+   @test isa(p, ZZAbsPowerSeriesRingElem)
+   @test isa(q, ZZAbsPowerSeriesRingElem)
 
    @test length(p) == 0
    @test length(q) == 0
@@ -145,7 +145,7 @@ end
    @test max_precision(parent(s)) == 10
 end
 
-@testset "fmpz_abs_series.unary_ops" begin
+@testset "ZZAbsPowerSeriesRingElem.unary_ops" begin
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -156,7 +156,7 @@ end
    @test -b == -1 - 2x - x^2 + O(x^3)
 end
 
-@testset "fmpz_abs_series.binary_ops" begin
+@testset "ZZAbsPowerSeriesRingElem.binary_ops" begin
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -175,7 +175,7 @@ end
    @test a*d == -x^7+3*x^6-x^5+6*x^4+2*x^3
 end
 
-@testset "fmpz_abs_series.adhoc_binary_ops" begin
+@testset "ZZAbsPowerSeriesRingElem.adhoc_binary_ops" begin
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -194,7 +194,7 @@ end
    @test d*ZZ(3) == 3x^2 + 9x^3 - 3x^4
 end
 
-@testset "fmpz_abs_series.comparison" begin
+@testset "ZZAbsPowerSeriesRingElem.comparison" begin
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -209,7 +209,7 @@ end
    @test c != d
 end
 
-@testset "fmpz_abs_series.adhoc_comparison" begin
+@testset "ZZAbsPowerSeriesRingElem.adhoc_comparison" begin
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -228,7 +228,7 @@ end
    @test ZZ(1) == c
 end
 
-@testset "fmpz_abs_series.powering" begin
+@testset "ZZAbsPowerSeriesRingElem.powering" begin
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -247,7 +247,7 @@ end
    @test_throws DomainError a^-1
 end
 
-@testset "fmpz_abs_series.shift" begin
+@testset "ZZAbsPowerSeriesRingElem.shift" begin
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -268,7 +268,7 @@ end
    @test shift_right(d, 3) == 1+O(x^1)
 end
 
-@testset "fmpz_abs_series.truncation" begin
+@testset "ZZAbsPowerSeriesRingElem.truncation" begin
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -287,7 +287,7 @@ end
    @test truncate(d, 5) == x^3+2*x+O(x^4)
 end
 
-@testset "fmpz_abs_series.exact_division" begin
+@testset "ZZAbsPowerSeriesRingElem.exact_division" begin
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
    a = x + x^3
@@ -304,7 +304,7 @@ end
    @test divexact(d, c) == -2*x^5+2*x^4-x^2+x+O(x^6)
 end
 
-@testset "fmpz_abs_series.adhoc_exact_division" begin
+@testset "ZZAbsPowerSeriesRingElem.adhoc_exact_division" begin
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
    a = x + x^3
@@ -323,7 +323,7 @@ end
    @test isequal(divexact(94872394861923874346987123694871329847a, 94872394861923874346987123694871329847), a)
 end
 
-@testset "fmpz_abs_series.inversion" begin
+@testset "ZZAbsPowerSeriesRingElem.inversion" begin
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
    a = 1 + x + 2x^2 + O(x^5)
@@ -334,7 +334,7 @@ end
    @test inv(b) == -1
 end
 
-@testset "fmpz_abs_series.integral_derivative" begin
+@testset "ZZAbsPowerSeriesRingElem.integral_derivative" begin
    R, x = PowerSeriesRing(ZZ, 10, "x"; model=:capped_absolute)
 
    for iter = 1:100
@@ -344,7 +344,7 @@ end
    end
 end
 
-@testset "fmpz_abs_series.square_root" begin
+@testset "ZZAbsPowerSeriesRingElem.square_root" begin
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
    a = rand(R, 0:10, -10:10)
@@ -353,7 +353,7 @@ end
    @test isequal(sqrt(b)^2, b)
 end
 
-@testset "fmpz_abs_series.unsafe_operators" begin
+@testset "ZZAbsPowerSeriesRingElem.unsafe_operators" begin
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
    for iter = 1:300

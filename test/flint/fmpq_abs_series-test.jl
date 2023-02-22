@@ -1,21 +1,21 @@
-@testset "fmpq_abs_series.types" begin
-   @test abs_series_type(QQFieldElem) == fmpq_abs_series
+@testset "QQAbsPowerSeriesRingElem.types" begin
+   @test abs_series_type(QQFieldElem) == QQAbsPowerSeriesRingElem
 end
 
-@testset "fmpq_abs_series.constructors" begin
+@testset "QQAbsPowerSeriesRingElem.constructors" begin
    S1 = AbsSeriesRing(QQ, 30)
    S2 = AbsSeriesRing(QQ, 30)
 
-   @test isa(S1, FmpqAbsSeriesRing)
+   @test isa(S1, QQAbsPowerSeriesRing)
    @test S1 !== S2
 
    R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
 
-   @test elem_type(R) == fmpq_abs_series
-   @test elem_type(FmpqAbsSeriesRing) == fmpq_abs_series
-   @test parent_type(fmpq_abs_series) == FmpqAbsSeriesRing
+   @test elem_type(R) == QQAbsPowerSeriesRingElem
+   @test elem_type(QQAbsPowerSeriesRing) == QQAbsPowerSeriesRingElem
+   @test parent_type(QQAbsPowerSeriesRingElem) == QQAbsPowerSeriesRing
 
-   @test isa(R, FmpqAbsSeriesRing)
+   @test isa(R, QQAbsPowerSeriesRing)
 
    a = x^3 + 2x + 1
    b = x^2 + 3x + O(x^4)
@@ -41,7 +41,7 @@ end
    @test isa(R(), SeriesElem)
 end
 
-@testset "fmpq_abs_series.printing" begin
+@testset "QQAbsPowerSeriesRingElem.printing" begin
    R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
 
    b = x^2 + 3x + O(x^4)
@@ -49,7 +49,7 @@ end
    @test sprint(show, "text/plain", b) == "3*x + x^2 + O(x^4)"
 end
 
-@testset "fmpq_abs_series.manipulation" begin
+@testset "QQAbsPowerSeriesRingElem.manipulation" begin
    R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -70,7 +70,7 @@ end
    @test characteristic(R) == 0
 end
 
-@testset "fmpq_abs_series.similar" begin
+@testset "QQAbsPowerSeriesRingElem.similar" begin
    R, x = PowerSeriesRing(QQ, 10, "x"; model=:capped_absolute)
    S, y = PowerSeriesRing(ZZ, 10, "y"; model=:capped_absolute)
 
@@ -84,11 +84,11 @@ end
       m = similar(fz, QQ, 5)
       n = similar(f, 5)
 
-      @test isa(g, fmpq_abs_series)
-      @test isa(h, fmpq_abs_series)
-      @test isa(k, fmpq_abs_series)
-      @test isa(m, fmpq_abs_series)
-      @test isa(n, fmpq_abs_series)
+      @test isa(g, QQAbsPowerSeriesRingElem)
+      @test isa(h, QQAbsPowerSeriesRingElem)
+      @test isa(k, QQAbsPowerSeriesRingElem)
+      @test isa(m, QQAbsPowerSeriesRingElem)
+      @test isa(n, QQAbsPowerSeriesRingElem)
 
       @test parent(g).S == :y
       @test parent(h).S == :y
@@ -117,10 +117,10 @@ end
    end
 end
 
-@testset "fmpq_abs_series.abs_series" begin
+@testset "QQAbsPowerSeriesRingElem.abs_series" begin
    f = abs_series(QQ, [1, 2, 3], 3, 5, "y")
 
-   @test isa(f, fmpq_abs_series)
+   @test isa(f, QQAbsPowerSeriesRingElem)
    @test base_ring(f) === QQ
    @test coeff(f, 0) == 1
    @test coeff(f, 2) == 3
@@ -128,7 +128,7 @@ end
 
    g = abs_series(QQ, [1, 2, 3], 3, 5)
 
-   @test isa(g, fmpq_abs_series)
+   @test isa(g, QQAbsPowerSeriesRingElem)
    @test base_ring(g) === QQ
    @test coeff(g, 0) == 1
    @test coeff(g, 2) == 3
@@ -144,22 +144,22 @@ end
    p = abs_series(QQ, QQFieldElem[], 0, 4)
    q = abs_series(QQ, [], 0, 6)
 
-   @test isa(p, fmpq_abs_series)
-   @test isa(q, fmpq_abs_series)
+   @test isa(p, QQAbsPowerSeriesRingElem)
+   @test isa(q, QQAbsPowerSeriesRingElem)
 
    @test length(p) == 0
    @test length(q) == 0
 
    r = abs_series(QQ, ZZRingElem[1, 2, 3], 3, 5)
 
-   @test isa(r, fmpq_abs_series)
+   @test isa(r, QQAbsPowerSeriesRingElem)
 
    s = abs_series(QQ, [1, 2, 3], 3, 5; max_precision=10)
    
    @test max_precision(parent(s)) == 10
 end
 
-@testset "fmpq_abs_series.unary_ops" begin
+@testset "QQAbsPowerSeriesRingElem.unary_ops" begin
    R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -170,7 +170,7 @@ end
    @test -b == -1 - 2x - x^2 + O(x^3)
 end
 
-@testset "fmpq_abs_series.binary_ops" begin
+@testset "QQAbsPowerSeriesRingElem.binary_ops" begin
    R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -189,7 +189,7 @@ end
    @test a*d == -x^7+3*x^6-x^5+6*x^4+2*x^3
 end
 
-@testset "fmpq_abs_series.adhoc_binary_ops" begin
+@testset "QQAbsPowerSeriesRingElem.adhoc_binary_ops" begin
    R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -250,7 +250,7 @@ end
    @test (BigInt(2)//3)*c == 2*x^2 + ZZRingElem(2)//3*x + ZZRingElem(2)//3+O(x^5)
 end
 
-@testset "fmpq_abs_series.comparison" begin
+@testset "QQAbsPowerSeriesRingElem.comparison" begin
    R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -265,7 +265,7 @@ end
    @test c != d
 end
 
-@testset "fmpq_abs_series.adhoc_comparison" begin
+@testset "QQAbsPowerSeriesRingElem.adhoc_comparison" begin
    R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -300,7 +300,7 @@ end
    @test ZZ(1) == c
 end
 
-@testset "fmpq_abs_series.powering" begin
+@testset "QQAbsPowerSeriesRingElem.powering" begin
    R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -319,7 +319,7 @@ end
    @test_throws DomainError a^(-1)
 end
 
-@testset "fmpq_abs_series.shift" begin
+@testset "QQAbsPowerSeriesRingElem.shift" begin
    R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -340,7 +340,7 @@ end
    @test shift_right(d, 3) == 1+O(x^1)
 end
 
-@testset "fmpq_abs_series.truncation" begin
+@testset "QQAbsPowerSeriesRingElem.truncation" begin
    R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -359,7 +359,7 @@ end
    @test truncate(d, 5) == x^3+2*x+O(x^4)
 end
 
-@testset "fmpq_abs_series.exact_division" begin
+@testset "QQAbsPowerSeriesRingElem.exact_division" begin
    R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
 
    a = x + x^3
@@ -376,7 +376,7 @@ end
    @test divexact(d, c) == -2*x^5+2*x^4-x^2+x+O(x^6)
 end
 
-@testset "fmpq_abs_series.adhoc_exact_division" begin
+@testset "QQAbsPowerSeriesRingElem.adhoc_exact_division" begin
    R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
 
    a = x + x^3
@@ -401,7 +401,7 @@ end
    @test isequal(divexact(9d, BigInt(9)//1), d)
 end
 
-@testset "fmpq_abs_series.inversion" begin
+@testset "QQAbsPowerSeriesRingElem.inversion" begin
    R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
 
    a = 1 + x + 2x^2 + O(x^5)
@@ -412,7 +412,7 @@ end
    @test inv(b) == -1
 end
 
-@testset "fmpq_abs_series.integral_derivative" begin
+@testset "QQAbsPowerSeriesRingElem.integral_derivative" begin
    R, x = PowerSeriesRing(QQ, 10, "x"; model=:capped_absolute)
 
    for iter = 1:100
@@ -422,7 +422,7 @@ end
    end
 end
 
-@testset "fmpq_abs_series.special" begin
+@testset "QQAbsPowerSeriesRingElem.special" begin
    R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
 
    a = 1 + x + 3x^2 + O(x^5)
@@ -444,7 +444,7 @@ end
    end
 end
 
-@testset "fmpq_abs_series.unsafe_operators" begin
+@testset "QQAbsPowerSeriesRingElem.unsafe_operators" begin
    R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
 
    for iter = 1:300

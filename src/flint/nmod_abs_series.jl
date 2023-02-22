@@ -1,17 +1,17 @@
 ###############################################################################
 #
-#   nmod_abs_series.jl: Absolute series using zzModPolyRingElem
+#   zzModAbsPowerSeriesRingElem.jl: Absolute series using zzModPolyRingElem
 #
-#   nmod_abs_series, gfp_abs_series
+#   zzModAbsPowerSeriesRingElem, fpAbsPowerSeriesRingElem
 #
 ###############################################################################
 
-export nmod_abs_series, NmodAbsSeriesRing,
-       gfp_abs_series, GFPAbsSeriesRing
+export zzModAbsPowerSeriesRingElem, zzModAbsPowerSeriesRing,
+       fpAbsPowerSeriesRingElem, fpAbsPowerSeriesRing
 
 for (etype, rtype, mtype, brtype, flint_fn) in (
-   (nmod_abs_series, NmodAbsSeriesRing, zzModRingElem, zzModRing, "nmod_poly"),
-   (gfp_abs_series, GFPAbsSeriesRing, fpFieldElem, fpField, "nmod_poly"))
+   (zzModAbsPowerSeriesRingElem, zzModAbsPowerSeriesRing, zzModRingElem, zzModRing, "nmod_poly"),
+   (fpAbsPowerSeriesRingElem, fpAbsPowerSeriesRing, fpFieldElem, fpField, "nmod_poly"))
 @eval begin
 
 ###############################################################################
@@ -678,7 +678,7 @@ end # for
 #
 ###############################################################################
 
-function sqrt_classical_char2(a::gfp_abs_series; check::Bool=true)
+function sqrt_classical_char2(a::fpAbsPowerSeriesRingElem; check::Bool=true)
   S = parent(a)
   asqrt = S()
   prec = div(precision(a) + 1, 2)
@@ -696,7 +696,7 @@ function sqrt_classical_char2(a::gfp_abs_series; check::Bool=true)
   return true, asqrt
 end
 
-function sqrt_classical(a::gfp_abs_series; check::Bool=true)
+function sqrt_classical(a::fpAbsPowerSeriesRingElem; check::Bool=true)
    R = base_ring(a)
    S = parent(a)
    if characteristic(R) == 2
@@ -724,7 +724,7 @@ function sqrt_classical(a::gfp_abs_series; check::Bool=true)
    a = divexact(a, c)
    z.prec = a.prec - div(v, 2)
    ccall((:nmod_poly_sqrt_series, libflint), Nothing,
-                (Ref{gfp_abs_series}, Ref{gfp_abs_series}, Int),
+                (Ref{fpAbsPowerSeriesRingElem}, Ref{fpAbsPowerSeriesRingElem}, Int),
                z, a, a.prec)
    if !isone(s)
       z *= s
@@ -736,22 +736,22 @@ function sqrt_classical(a::gfp_abs_series; check::Bool=true)
 end
 
 @doc Markdown.doc"""
-    sqrt(a::gfp_abs_series; check::Bool=true)
+    sqrt(a::fpAbsPowerSeriesRingElem; check::Bool=true)
 
 Return the power series square root of $a$.
 """
-function Base.sqrt(a::gfp_abs_series; check::Bool=true)
+function Base.sqrt(a::fpAbsPowerSeriesRingElem; check::Bool=true)
   flag, s = sqrt_classical(a; check=check)
   check && !flag && error("Not a square")
   return s
 end
  
-function is_square(a::gfp_abs_series)
+function is_square(a::fpAbsPowerSeriesRingElem)
   flag, s = sqrt_classical(a; check=true)
   return flag
 end
 
-function is_square_with_sqrt(a::gfp_abs_series)
+function is_square_with_sqrt(a::fpAbsPowerSeriesRingElem)
   return sqrt_classical(a; check=true)
 end
 
@@ -763,9 +763,9 @@ end
 
 function PowerSeriesRing(R::zzModRing, prec::Int, s::Symbol; model=:capped_relative, cached = true)
    if model == :capped_relative
-      parent_obj = NmodRelSeriesRing(R, prec, s, cached)
+      parent_obj = zzModRelPowerSeriesRing(R, prec, s, cached)
    elseif model == :capped_absolute
-      parent_obj = NmodAbsSeriesRing(R, prec, s, cached)
+      parent_obj = zzModAbsPowerSeriesRing(R, prec, s, cached)
    else
       error("Unknown model")
    end
@@ -777,18 +777,18 @@ function PowerSeriesRing(R::zzModRing, prec::Int, s::AbstractString; model=:capp
 end
 
 function AbsSeriesRing(R::zzModRing, prec::Int)
-   return NmodAbsSeriesRing(R, prec, :x, false)
+   return zzModAbsPowerSeriesRing(R, prec, :x, false)
 end
 
 function RelSeriesRing(R::zzModRing, prec::Int)
-   return NmodRelSeriesRing(R, prec, :x, false)
+   return zzModRelPowerSeriesRing(R, prec, :x, false)
 end
 
 function PowerSeriesRing(R::fpField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
    if model == :capped_relative
-      parent_obj = GFPRelSeriesRing(R, prec, s, cached)
+      parent_obj = fpRelPowerSeriesRing(R, prec, s, cached)
    elseif model == :capped_absolute
-      parent_obj = GFPAbsSeriesRing(R, prec, s, cached)
+      parent_obj = fpAbsPowerSeriesRing(R, prec, s, cached)
    else
       error("Unknown model")
    end
@@ -800,9 +800,9 @@ function PowerSeriesRing(R::fpField, prec::Int, s::AbstractString; model=:capped
 end
 
 function AbsSeriesRing(R::fpField, prec::Int)
-   return GFPAbsSeriesRing(R, prec, :x, false)
+   return fpAbsPowerSeriesRing(R, prec, :x, false)
 end
 
 function RelSeriesRing(R::fpField, prec::Int)
-   return GFPRelSeriesRing(R, prec, :x, false)
+   return fpRelPowerSeriesRing(R, prec, :x, false)
 end

@@ -1,23 +1,23 @@
-@testset "fmpz_mod_abs_series.types" begin
-   @test abs_series_type(ZZModRingElem) == fmpz_mod_abs_series
+@testset "ZZModAbsPowerSeriesRingElem.types" begin
+   @test abs_series_type(ZZModRingElem) == ZZModAbsPowerSeriesRingElem
 end
 
-@testset "fmpz_mod_abs_series.constructors" begin
+@testset "ZZModAbsPowerSeriesRingElem.constructors" begin
    S = ResidueRing(ZZ, 123456789012345678949)
    
    R1 = AbsSeriesRing(S, 30)
    R2 = AbsSeriesRing(S, 30)
 
-   @test isa(R1, FmpzModAbsSeriesRing)
+   @test isa(R1, ZZModAbsPowerSeriesRing)
    @test R1 !== R2
 
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
-   @test elem_type(R) == fmpz_mod_abs_series
-   @test elem_type(FmpzModAbsSeriesRing) == fmpz_mod_abs_series
-   @test parent_type(fmpz_mod_abs_series) == FmpzModAbsSeriesRing
+   @test elem_type(R) == ZZModAbsPowerSeriesRingElem
+   @test elem_type(ZZModAbsPowerSeriesRing) == ZZModAbsPowerSeriesRingElem
+   @test parent_type(ZZModAbsPowerSeriesRingElem) == ZZModAbsPowerSeriesRing
 
-   @test isa(R, FmpzModAbsSeriesRing)
+   @test isa(R, ZZModAbsPowerSeriesRing)
 
    a = x^3 + 2x + 1
    b = x^2 + 3x + O(x^4)
@@ -35,7 +35,7 @@ end
    @test isa(R(), SeriesElem)
 end
 
-@testset "fmpz_mod_abs_series.printing" begin
+@testset "ZZModAbsPowerSeriesRingElem.printing" begin
    S = ResidueRing(ZZ, 123456789012345678949)
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -44,7 +44,7 @@ end
    @test sprint(show, "text/plain", b) == "3*x + x^2 + O(x^4)"
 end
 
-@testset "fmpz_mod_abs_series.manipulation" begin
+@testset "ZZModAbsPowerSeriesRingElem.manipulation" begin
    S = ResidueRing(ZZ, 123456789012345678949)
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -66,7 +66,7 @@ end
    @test characteristic(R) == 123456789012345678949
 end
 
-@testset "fmpz_mod_abs_series.similar" begin
+@testset "ZZModAbsPowerSeriesRingElem.similar" begin
    R0 = ResidueRing(ZZ, ZZ(23))
    R, x = PowerSeriesRing(R0, 10, "x"; model=:capped_absolute)
    S, y = PowerSeriesRing(ZZ, 10, "y"; model=:capped_absolute)
@@ -81,11 +81,11 @@ end
       m = similar(fz, R0, 5)
       n = similar(f, 5)
 
-      @test isa(g, fmpz_mod_abs_series)
-      @test isa(h, fmpz_mod_abs_series)
-      @test isa(k, fmpz_mod_abs_series)
-      @test isa(m, fmpz_mod_abs_series)
-      @test isa(n, fmpz_mod_abs_series)
+      @test isa(g, ZZModAbsPowerSeriesRingElem)
+      @test isa(h, ZZModAbsPowerSeriesRingElem)
+      @test isa(k, ZZModAbsPowerSeriesRingElem)
+      @test isa(m, ZZModAbsPowerSeriesRingElem)
+      @test isa(n, ZZModAbsPowerSeriesRingElem)
 
       @test parent(g).S == :y
       @test parent(h).S == :y
@@ -114,11 +114,11 @@ end
    end
 end
 
-@testset "fmpz_mod_abs_series.abs_series" begin
+@testset "ZZModAbsPowerSeriesRingElem.abs_series" begin
    R = ResidueRing(ZZ, ZZ(23))
    f = abs_series(R, [1, 2, 3], 3, 5, "y")
 
-   @test isa(f, fmpz_mod_abs_series)
+   @test isa(f, ZZModAbsPowerSeriesRingElem)
    @test base_ring(f) === R
    @test coeff(f, 0) == 1
    @test coeff(f, 2) == 3
@@ -126,7 +126,7 @@ end
 
    g = abs_series(R, [1, 2, 3], 3, 5)
 
-   @test isa(g, fmpz_mod_abs_series)
+   @test isa(g, ZZModAbsPowerSeriesRingElem)
    @test base_ring(g) === R
    @test coeff(g, 0) == 1
    @test coeff(g, 2) == 3
@@ -142,22 +142,22 @@ end
    p = abs_series(R, ZZModRingElem[], 0, 4)
    q = abs_series(R, [], 0, 6)
 
-   @test isa(p, fmpz_mod_abs_series)
-   @test isa(q, fmpz_mod_abs_series)
+   @test isa(p, ZZModAbsPowerSeriesRingElem)
+   @test isa(q, ZZModAbsPowerSeriesRingElem)
 
    @test length(p) == 0
    @test length(q) == 0
 
    r = abs_series(R, ZZRingElem[1, 2, 3], 3, 5)
 
-   @test isa(r, fmpz_mod_abs_series)
+   @test isa(r, ZZModAbsPowerSeriesRingElem)
 
    s = abs_series(R, [1, 2, 3], 3, 5; max_precision=10)
    
    @test max_precision(parent(s)) == 10
 end
 
-@testset "fmpz_mod_abs_series.unary_ops" begin
+@testset "ZZModAbsPowerSeriesRingElem.unary_ops" begin
    S = ResidueRing(ZZ, 123456789012345678949)
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -169,7 +169,7 @@ end
    @test -b == -1 - 2x - x^2 + O(x^3)
 end
 
-@testset "fmpz_mod_abs_series.binary_ops" begin
+@testset "ZZModAbsPowerSeriesRingElem.binary_ops" begin
    S = ResidueRing(ZZ, 123456789012345678949)
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -189,7 +189,7 @@ end
    @test a*d == -x^7+3*x^6-x^5+6*x^4+2*x^3
 end
 
-@testset "fmpz_mod_abs_series.adhoc_binary_ops" begin
+@testset "ZZModAbsPowerSeriesRingElem.adhoc_binary_ops" begin
    S = ResidueRing(ZZ, 123456789012345678949)
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -207,7 +207,7 @@ end
    @test d*ZZ(3) == 3x^2 + 9x^3 - 3x^4
 end
 
-@testset "fmpz_mod_abs_series.comparison" begin
+@testset "ZZModAbsPowerSeriesRingElem.comparison" begin
    S = ResidueRing(ZZ, 123456789012345678949)
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -223,7 +223,7 @@ end
    @test c != d
 end
 
-@testset "fmpz_mod_abs_series.adhoc_comparison" begin
+@testset "ZZModAbsPowerSeriesRingElem.adhoc_comparison" begin
    S = ResidueRing(ZZ, 123456789012345678949)
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -243,7 +243,7 @@ end
    @test ZZ(1) == c
 end
 
-@testset "fmpz_mod_abs_series.powering" begin
+@testset "ZZModAbsPowerSeriesRingElem.powering" begin
    S = ResidueRing(ZZ, 123456789012345678949)
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -260,7 +260,7 @@ end
    @test_throws DomainError a^-1
 end
 
-@testset "fmpz_mod_abs_series.shift" begin
+@testset "ZZModAbsPowerSeriesRingElem.shift" begin
    S = ResidueRing(ZZ, 123456789012345678949)
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -282,7 +282,7 @@ end
    @test_throws DomainError shift_right(a, -1)
 end
 
-@testset "fmpz_mod_abs_series.truncation" begin
+@testset "ZZModAbsPowerSeriesRingElem.truncation" begin
    S = ResidueRing(ZZ, 123456789012345678949)
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -303,7 +303,7 @@ end
 
 end
 
-@testset "fmpz_mod_abs_series.exact_division" begin
+@testset "ZZModAbsPowerSeriesRingElem.exact_division" begin
    S = ResidueRing(ZZ, 123456789012345678949)
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -321,7 +321,7 @@ end
    @test divexact(d, c) == -2*x^5+2*x^4-x^2+x+O(x^6)
 end
 
-@testset "fmpz_mod_abs_series.adhoc_exact_division" begin
+@testset "ZZModAbsPowerSeriesRingElem.adhoc_exact_division" begin
    S = ResidueRing(ZZ, 123456789012345678949)
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
@@ -341,7 +341,7 @@ end
    @test isequal(divexact(94872394861923874346987123694871329847a, 94872394861923874346987123694871329847), a)
 end
 
-@testset "fmpz_mod_abs_series.inversion" begin
+@testset "ZZModAbsPowerSeriesRingElem.inversion" begin
    S = ResidueRing(ZZ, 123456789012345678949)
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -353,7 +353,7 @@ end
    @test inv(b) == -1
 end
 
-@testset "fmpz_mod_abs_series.integral_derivative" begin
+@testset "ZZModAbsPowerSeriesRingElem.integral_derivative" begin
    S = ResidueRing(ZZ, ZZ(31))
    R, x = PowerSeriesRing(S, 10, "x"; model=:capped_absolute)
 
@@ -364,7 +364,7 @@ end
    end
 end
 
-@testset "fmpz_mod_abs_series.unsafe_operators" begin
+@testset "ZZModAbsPowerSeriesRingElem.unsafe_operators" begin
    S = ResidueRing(ZZ, ZZ(31))
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 

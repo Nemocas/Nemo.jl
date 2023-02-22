@@ -1,34 +1,34 @@
-@testset "fmpz_laurent_series.constructors" begin
+@testset "ZZLaurentSeriesRingElem.constructors" begin
    R, x = LaurentSeriesRing(ZZ, 30, "x")
 
-   @test elem_type(R) == fmpz_laurent_series
-   @test elem_type(FmpzLaurentSeriesRing) == fmpz_laurent_series
-   @test parent_type(fmpz_laurent_series) == FmpzLaurentSeriesRing
+   @test elem_type(R) == ZZLaurentSeriesRingElem
+   @test elem_type(ZZLaurentSeriesRing) == ZZLaurentSeriesRingElem
+   @test parent_type(ZZLaurentSeriesRingElem) == ZZLaurentSeriesRing
 
-   @test isa(R, FmpzLaurentSeriesRing)
+   @test isa(R, ZZLaurentSeriesRing)
 
    a1 = x^3 + 2x + 1
 
-   @test isa(a1, fmpz_laurent_series)
+   @test isa(a1, ZZLaurentSeriesRingElem)
 
    b1 = R(a1)
 
-   @test isa(b1, fmpz_laurent_series)
+   @test isa(b1, ZZLaurentSeriesRingElem)
 
    c1 = R(ZZRingElem[1, 3, 5], 3, 5, 0, 1)
 
-   @test isa(c1, fmpz_laurent_series)
+   @test isa(c1, ZZLaurentSeriesRingElem)
 
    g1 = R(1)
    h1 = R(ZZ(2))
    k1 = R()
 
-   @test isa(g1, fmpz_laurent_series)
-   @test isa(h1, fmpz_laurent_series)
-   @test isa(k1, fmpz_laurent_series)
+   @test isa(g1, ZZLaurentSeriesRingElem)
+   @test isa(h1, ZZLaurentSeriesRingElem)
+   @test isa(k1, ZZLaurentSeriesRingElem)
 end
 
-@testset "fmpz_laurent_series.printing" begin
+@testset "ZZLaurentSeriesRingElem.printing" begin
    R, x = LaurentSeriesRing(ZZ, 30, "x")
 
    @test !occursin(r"{", string(R))
@@ -36,14 +36,14 @@ end
    @test occursin(r"x", string(x^-1 + 1 - x + x^2 + x^5))
 end
 
-@testset "fmpz_laurent_series.rand" begin
+@testset "ZZLaurentSeriesRingElem.rand" begin
    R, x = LaurentSeriesRing(ZZ, 10, "x")
 
    test_rand(R, -12:12, -10:10)
    test_rand(R, -12:12, make(ZZ, -10:10))
 end
 
-@testset "fmpz_laurent_series.manipulation" begin
+@testset "ZZLaurentSeriesRingElem.manipulation" begin
    S, x = LaurentSeriesRing(ZZ, 30, "x")
 
    @test max_precision(S) == 30
@@ -77,7 +77,7 @@ end
    @test characteristic(S) == 0
 end
 
-@testset "fmpz_laurent_series.unary_ops" begin
+@testset "ZZLaurentSeriesRingElem.unary_ops" begin
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -10:10)
@@ -87,7 +87,7 @@ end
    end
 end
 
-@testset "fmpz_laurent_series.binary_ops" begin
+@testset "ZZLaurentSeriesRingElem.binary_ops" begin
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:100
       f = rand(R, -12:12, -10:10)
@@ -104,7 +104,7 @@ end
    end
 end
 
-@testset "fmpz_laurent_series.adhoc_binary_ops" begin
+@testset "ZZLaurentSeriesRingElem.adhoc_binary_ops" begin
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:500
       f = rand(R, -12:12, -10:10)
@@ -125,7 +125,7 @@ end
    end
 end
 
-@testset "fmpz_laurent_series.comparison" begin
+@testset "ZZLaurentSeriesRingElem.comparison" begin
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:500
       f = rand(R, -12:12, -10:10)
@@ -142,7 +142,7 @@ end
    end
 end
 
-@testset "fmpz_laurent_series.adhoc_comparison" begin
+@testset "ZZLaurentSeriesRingElem.adhoc_comparison" begin
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:500
       f = R()
@@ -165,7 +165,7 @@ end
    end
 end
 
-@testset "fmpz_laurent_series.powering" begin
+@testset "ZZLaurentSeriesRingElem.powering" begin
    R, x = LaurentSeriesRing(ZZ, 10, "x")
 
    for iter = 1:100
@@ -182,7 +182,7 @@ end
    end
 end
 
-@testset "fmpz_laurent_series.shift" begin
+@testset "ZZLaurentSeriesRingElem.shift" begin
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -10:10)
@@ -194,7 +194,7 @@ end
    end
 end
 
-@testset "fmpz_laurent_series.truncation" begin
+@testset "ZZLaurentSeriesRingElem.truncation" begin
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -10:10)
@@ -206,7 +206,7 @@ end
    end
 end
 
-@testset "fmpz_laurent_series.inversion" begin
+@testset "ZZLaurentSeriesRingElem.inversion" begin
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       f = R()
@@ -218,7 +218,7 @@ end
    end
 end
 
-@testset "fmpz_laurent_series.square_root" begin
+@testset "ZZLaurentSeriesRingElem.square_root" begin
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -10:10)
@@ -228,7 +228,7 @@ end
    end
 end
 
-@testset "fmpz_laurent_series.exact_division" begin
+@testset "ZZLaurentSeriesRingElem.exact_division" begin
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -10:10)
@@ -241,7 +241,7 @@ end
    end
 end
 
-@testset "fmpz_laurent_series.adhoc_exact_division" begin
+@testset "ZZLaurentSeriesRingElem.adhoc_exact_division" begin
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -10:10)
@@ -254,7 +254,7 @@ end
    end
 end
 
-@testset "fmpz_laurent_series.special_functions" begin
+@testset "ZZLaurentSeriesRingElem.special_functions" begin
    R, x = LaurentSeriesRing(ZZ, 10, "x")
 
    @test isequal(exp(2x + x^2 + O(x^3)), 1 + 2*x + 3*x^2 + O(x^3))

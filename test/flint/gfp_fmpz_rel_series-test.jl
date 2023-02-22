@@ -1,25 +1,25 @@
-@testset "gfp_fmpz_rel_series.types" begin
-   @test rel_series_type(FpFieldElem) == gfp_fmpz_rel_series
+@testset "FpRelPowerSeriesRingElem.types" begin
+   @test rel_series_type(FpFieldElem) == FpRelPowerSeriesRingElem
 end
 
-@testset "gfp_fmpz_rel_series.constructors" begin
+@testset "FpRelPowerSeriesRingElem.constructors" begin
    R = GF(ZZ(123456789012345678949))
    
    S1 = RelSeriesRing(R, 30)
    S2 = RelSeriesRing(R, 30)
 
-   @test isa(S1, GFPFmpzRelSeriesRing)
+   @test isa(S1, FpRelPowerSeriesRing)
    @test S1 !== S2
 
    S, x = PowerSeriesRing(R, 30, "x")
 
-   @test elem_type(S) == gfp_fmpz_rel_series
-   @test elem_type(GFPFmpzRelSeriesRing) == gfp_fmpz_rel_series
-   @test parent_type(gfp_fmpz_rel_series) == GFPFmpzRelSeriesRing
+   @test elem_type(S) == FpRelPowerSeriesRingElem
+   @test elem_type(FpRelPowerSeriesRing) == FpRelPowerSeriesRingElem
+   @test parent_type(FpRelPowerSeriesRingElem) == FpRelPowerSeriesRing
 
    @test characteristic(S) == ZZRingElem(123456789012345678949)
 
-   @test isa(S, GFPFmpzRelSeriesRing)
+   @test isa(S, FpRelPowerSeriesRing)
 
    a = x^3 + 2x + 1
    b = x^2 + x + O(x^4)
@@ -53,7 +53,7 @@ end
    @test isa(S(ZZRingElem(0)), SeriesElem)
 end
 
-@testset "gfp_fmpz_rel_series.printing" begin
+@testset "FpRelPowerSeriesRingElem.printing" begin
    R = GF(ZZ(123456789012345678949))
    S, x = PowerSeriesRing(R, 30, "x")
    b = x^2 + x + O(x^4)
@@ -61,7 +61,7 @@ end
    @test sprint(show, "text/plain", b) == "x + x^2 + O(x^4)"
 end
 
-@testset "gfp_fmpz_rel_series.manipulation" begin
+@testset "FpRelPowerSeriesRingElem.manipulation" begin
    R = GF(ZZ(123456789012345678949))
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -99,7 +99,7 @@ end
    @test characteristic(R) == 123456789012345678949
 end
 
-@testset "gfp_fmpz_rel_series.similar" begin
+@testset "FpRelPowerSeriesRingElem.similar" begin
    R0 = GF(ZZ(23))
    R, x = PowerSeriesRing(R0, 10, "x")
    S, y = PowerSeriesRing(ZZ, 10, "y")
@@ -114,11 +114,11 @@ end
       m = similar(fz, R0, 5)
       n = similar(f, 5)
 
-      @test isa(g, gfp_fmpz_rel_series)
-      @test isa(h, gfp_fmpz_rel_series)
-      @test isa(k, gfp_fmpz_rel_series)
-      @test isa(m, gfp_fmpz_rel_series)
-      @test isa(n, gfp_fmpz_rel_series)
+      @test isa(g, FpRelPowerSeriesRingElem)
+      @test isa(h, FpRelPowerSeriesRingElem)
+      @test isa(k, FpRelPowerSeriesRingElem)
+      @test isa(m, FpRelPowerSeriesRingElem)
+      @test isa(n, FpRelPowerSeriesRingElem)
 
       @test parent(g).S == :y
       @test parent(h).S == :y
@@ -147,11 +147,11 @@ end
    end
 end
 
-@testset "gfp_fmpz_rel_series.rel_series" begin
+@testset "FpRelPowerSeriesRingElem.rel_series" begin
    R = GF(ZZ(23))
    f = rel_series(R, [1, 2, 3], 3, 5, 2, "y")
 
-   @test isa(f, gfp_fmpz_rel_series)
+   @test isa(f, FpRelPowerSeriesRingElem)
    @test base_ring(f) === R
    @test coeff(f, 2) == 1
    @test coeff(f, 4) == 3
@@ -159,7 +159,7 @@ end
 
    g = rel_series(R, [1, 2, 3], 3, 7, 4)
 
-   @test isa(g, gfp_fmpz_rel_series)
+   @test isa(g, FpRelPowerSeriesRingElem)
    @test base_ring(g) === R
    @test coeff(g, 4) == 1
    @test coeff(g, 6) == 3
@@ -175,22 +175,22 @@ end
    p = rel_series(R, FpFieldElem[], 0, 3, 1)
    q = rel_series(R, [], 0, 3, 2)
 
-   @test isa(p, gfp_fmpz_rel_series)
-   @test isa(q, gfp_fmpz_rel_series)
+   @test isa(p, FpRelPowerSeriesRingElem)
+   @test isa(q, FpRelPowerSeriesRingElem)
 
    @test pol_length(p) == 0
    @test pol_length(q) == 0
 
    r = rel_series(R, ZZRingElem[1, 2, 3], 3, 11, 8)
 
-   @test isa(r, gfp_fmpz_rel_series)
+   @test isa(r, FpRelPowerSeriesRingElem)
 
    s = rel_series(R, [1, 2, 3], 3, 5, 0; max_precision=10)
    
    @test max_precision(parent(s)) == 10
 end
 
-@testset "gfp_fmpz_rel_series.unary_ops" begin
+@testset "FpRelPowerSeriesRingElem.unary_ops" begin
    R = GF(ZZ(123456789012345678949))
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -202,7 +202,7 @@ end
    @test isequal(-b, -1 - 2x - x^2 + O(x^3))
 end
 
-@testset "gfp_fmpz_rel_series.binary_ops" begin
+@testset "FpRelPowerSeriesRingElem.binary_ops" begin
    R = GF(ZZ(123456789012345678949))
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -342,7 +342,7 @@ end
    @test isequal(m1 - m4, 1+x+O(x^4))
 end
 
-@testset "gfp_fmpz_rel_series.adhoc_binary_ops" begin
+@testset "FpRelPowerSeriesRingElem.adhoc_binary_ops" begin
    R = GF(ZZ(123456789012345678949))
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -360,7 +360,7 @@ end
    @test isequal(d*ZZRingElem(3), 3x^2 + 9x^3 - 3x^4 + O(x^32))
 end
 
-@testset "gfp_fmpz_rel_series.comparison" begin
+@testset "FpRelPowerSeriesRingElem.comparison" begin
    R = GF(ZZ(123456789012345678949))
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -382,7 +382,7 @@ end
    @test !isequal(b, d)
 end
 
-@testset "gfp_fmpz_rel_series.adhoc_comparison" begin
+@testset "FpRelPowerSeriesRingElem.adhoc_comparison" begin
    R = GF(ZZ(123456789012345678949))
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -417,7 +417,7 @@ end
    @test R(0) != a + O(x^5)
 end
 
-@testset "gfp_fmpz_rel_series.powering" begin
+@testset "FpRelPowerSeriesRingElem.powering" begin
    R = GF(ZZ(123456789012345678949))
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -441,7 +441,7 @@ end
    @test_throws DomainError a^-1
 end
 
-@testset "gfp_fmpz_rel_series.shift" begin
+@testset "FpRelPowerSeriesRingElem.shift" begin
    R = GF(ZZ(123456789012345678949))
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -465,7 +465,7 @@ end
    @test_throws DomainError shift_right(a, -1)
 end
 
-@testset "gfp_fmpz_rel_series.truncation" begin
+@testset "FpRelPowerSeriesRingElem.truncation" begin
    R = GF(ZZ(123456789012345678949))
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -485,7 +485,7 @@ end
    @test_throws DomainError truncate(a, -1)
 end
 
-@testset "gfp_fmpz_rel_series.inversion" begin
+@testset "FpRelPowerSeriesRingElem.inversion" begin
    R = GF(ZZ(123456789012345678949))
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -497,7 +497,7 @@ end
    @test isequal(inv(b), -1+O(x^30))
 end
 
-@testset "gfp_fmpz_rel_series.exact_division" begin
+@testset "FpRelPowerSeriesRingElem.exact_division" begin
    R = GF(ZZ(123456789012345678949))
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -515,7 +515,7 @@ end
    @test isequal(divexact(d, c), -2*x^5+2*x^4-x^2+x+O(x^6))
 end
 
-@testset "gfp_fmpz_rel_series.adhoc_exact_division" begin
+@testset "FpRelPowerSeriesRingElem.adhoc_exact_division" begin
    R = GF(ZZ(123456789012345678949))
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -537,7 +537,7 @@ end
    @test isequal(divexact(R(5)*a, R(5)), a)
 end
 
-@testset "gfp_fmpz_rel_series.square_root" begin
+@testset "FpRelPowerSeriesRingElem.square_root" begin
    S = GF(ZZRingElem(31))
    R, x = PowerSeriesRing(S, 30, "x")
 
@@ -578,7 +578,7 @@ end
    end
 end
 
-@testset "gfp_fmpz_rel_series.special_functions" begin
+@testset "FpRelPowerSeriesRingElem.special_functions" begin
    R = GF(ZZ(123456789012345678949))
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -589,7 +589,7 @@ end
    @test isequal(divexact(x, exp(x + O(x^5)) - 1), 113168723261316872370*x^2+61728394506172839474*x+1+O(x^4))
 end
 
-@testset "gfp_fmpz_rel_series.unsafe_operators" begin
+@testset "FpRelPowerSeriesRingElem.unsafe_operators" begin
    S = GF(ZZ(31))
    R, x = PowerSeriesRing(S, 30, "x")
 

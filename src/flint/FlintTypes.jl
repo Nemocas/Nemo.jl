@@ -2979,25 +2979,25 @@ end
 
 ###############################################################################
 #
-#   FmpzRelSeriesRing / fmpz_rel_series
+#   ZZRelPowerSeriesRing / ZZRelPowerSeriesRingElem
 #
 ###############################################################################
 
-@attributes mutable struct FmpzRelSeriesRing <: SeriesRing{ZZRingElem}
+@attributes mutable struct ZZRelPowerSeriesRing <: SeriesRing{ZZRingElem}
    base_ring::ZZRing
    prec_max::Int
    S::Symbol
 
-   function FmpzRelSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
+   function ZZRelPowerSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
       return get_cached!(FmpzRelSeriesID, (prec, s), cached) do
          return new(FlintZZ, prec, s)
       end
    end
 end
 
-const FmpzRelSeriesID = Dict{Tuple{Int, Symbol}, FmpzRelSeriesRing}()
+const FmpzRelSeriesID = Dict{Tuple{Int, Symbol}, ZZRelPowerSeriesRing}()
 
-mutable struct fmpz_rel_series <: RelSeriesElem{ZZRingElem}
+mutable struct ZZRelPowerSeriesRingElem <: RelSeriesElem{ZZRingElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -3005,23 +3005,23 @@ mutable struct fmpz_rel_series <: RelSeriesElem{ZZRingElem}
 
    prec::Int
    val::Int
-   parent::FmpzRelSeriesRing
+   parent::ZZRelPowerSeriesRing
 
-   function fmpz_rel_series()
+   function ZZRelPowerSeriesRingElem()
       z = new()
       ccall((:fmpz_poly_init, libflint), Nothing,
-            (Ref{fmpz_rel_series},), z)
+            (Ref{ZZRelPowerSeriesRingElem},), z)
       finalizer(_fmpz_rel_series_clear_fn, z)
       return z
    end
 
-   function fmpz_rel_series(a::Vector{ZZRingElem}, len::Int, prec::Int, val::Int)
+   function ZZRelPowerSeriesRingElem(a::Vector{ZZRingElem}, len::Int, prec::Int, val::Int)
       z = new()
       ccall((:fmpz_poly_init2, libflint), Nothing,
-            (Ref{fmpz_rel_series}, Int), z, len)
+            (Ref{ZZRelPowerSeriesRingElem}, Int), z, len)
       for i = 1:len
          ccall((:fmpz_poly_set_coeff_fmpz, libflint), Nothing,
-                     (Ref{fmpz_rel_series}, Int, Ref{ZZRingElem}), z, i - 1, a[i])
+                     (Ref{ZZRelPowerSeriesRingElem}, Int, Ref{ZZRingElem}), z, i - 1, a[i])
       end
       z.prec = prec
       z.val = val
@@ -3029,80 +3029,80 @@ mutable struct fmpz_rel_series <: RelSeriesElem{ZZRingElem}
       return z
    end
 
-   function fmpz_rel_series(a::fmpz_rel_series)
+   function ZZRelPowerSeriesRingElem(a::ZZRelPowerSeriesRingElem)
       z = new()
-      ccall((:fmpz_poly_init, libflint), Nothing, (Ref{fmpz_rel_series},), z)
+      ccall((:fmpz_poly_init, libflint), Nothing, (Ref{ZZRelPowerSeriesRingElem},), z)
       ccall((:fmpz_poly_set, libflint), Nothing,
-            (Ref{fmpz_rel_series}, Ref{fmpz_rel_series}), z, a)
+            (Ref{ZZRelPowerSeriesRingElem}, Ref{ZZRelPowerSeriesRingElem}), z, a)
       finalizer(_fmpz_rel_series_clear_fn, z)
       return z
    end
 end
 
-function _fmpz_rel_series_clear_fn(a::fmpz_rel_series)
-   ccall((:fmpz_poly_clear, libflint), Nothing, (Ref{fmpz_rel_series},), a)
+function _fmpz_rel_series_clear_fn(a::ZZRelPowerSeriesRingElem)
+   ccall((:fmpz_poly_clear, libflint), Nothing, (Ref{ZZRelPowerSeriesRingElem},), a)
 end
 
 ###############################################################################
 #
-#   FmpzAbsSeriesRing / fmpz_abs_series
+#   ZZAbsPowerSeriesRing / ZZAbsPowerSeriesRingElem
 #
 ###############################################################################
 
-@attributes mutable struct FmpzAbsSeriesRing <: SeriesRing{ZZRingElem}
+@attributes mutable struct ZZAbsPowerSeriesRing <: SeriesRing{ZZRingElem}
    base_ring::ZZRing
    prec_max::Int
    S::Symbol
 
-   function FmpzAbsSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
+   function ZZAbsPowerSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
       return get_cached!(FmpzAbsSeriesID, (prec, s), cached) do
          return new(FlintZZ, prec, s)
       end
    end
 end
 
-const FmpzAbsSeriesID = Dict{Tuple{Int, Symbol}, FmpzAbsSeriesRing}()
+const FmpzAbsSeriesID = Dict{Tuple{Int, Symbol}, ZZAbsPowerSeriesRing}()
 
-mutable struct fmpz_abs_series <: AbsSeriesElem{ZZRingElem}
+mutable struct ZZAbsPowerSeriesRingElem <: AbsSeriesElem{ZZRingElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
    prec :: Int
-   parent::FmpzAbsSeriesRing
+   parent::ZZAbsPowerSeriesRing
 
-   function fmpz_abs_series()
+   function ZZAbsPowerSeriesRingElem()
       z = new()
       ccall((:fmpz_poly_init, libflint), Nothing,
-            (Ref{fmpz_abs_series},), z)
+            (Ref{ZZAbsPowerSeriesRingElem},), z)
       finalizer(_fmpz_abs_series_clear_fn, z)
       return z
    end
 
-   function fmpz_abs_series(a::Vector{ZZRingElem}, len::Int, prec::Int)
+   function ZZAbsPowerSeriesRingElem(a::Vector{ZZRingElem}, len::Int, prec::Int)
       z = new()
       ccall((:fmpz_poly_init2, libflint), Nothing,
-            (Ref{fmpz_abs_series}, Int), z, len)
+            (Ref{ZZAbsPowerSeriesRingElem}, Int), z, len)
       for i = 1:len
          ccall((:fmpz_poly_set_coeff_fmpz, libflint), Nothing,
-                     (Ref{fmpz_abs_series}, Int, Ref{ZZRingElem}), z, i - 1, a[i])
+                     (Ref{ZZAbsPowerSeriesRingElem}, Int, Ref{ZZRingElem}), z, i - 1, a[i])
       end
       z.prec = prec
       finalizer(_fmpz_abs_series_clear_fn, z)
       return z
    end
 
-   function fmpz_abs_series(a::fmpz_abs_series)
+   function ZZAbsPowerSeriesRingElem(a::ZZAbsPowerSeriesRingElem)
       z = new()
-      ccall((:fmpz_poly_init, libflint), Nothing, (Ref{fmpz_abs_series},), z)
+      ccall((:fmpz_poly_init, libflint), Nothing, (Ref{ZZAbsPowerSeriesRingElem},), z)
       ccall((:fmpz_poly_set, libflint), Nothing,
-            (Ref{fmpz_abs_series}, Ref{fmpz_abs_series}), z, a)
+            (Ref{ZZAbsPowerSeriesRingElem}, Ref{ZZAbsPowerSeriesRingElem}), z, a)
       finalizer(_fmpz_abs_series_clear_fn, z)
       return z
    end
 end
 
-function _fmpz_abs_series_clear_fn(a::fmpz_abs_series)
-   ccall((:fmpz_poly_clear, libflint), Nothing, (Ref{fmpz_abs_series},), a)
+function _fmpz_abs_series_clear_fn(a::ZZAbsPowerSeriesRingElem)
+   ccall((:fmpz_poly_clear, libflint), Nothing, (Ref{ZZAbsPowerSeriesRingElem},), a)
 end
 
 ###############################################################################
@@ -3163,48 +3163,48 @@ end
 
 ###############################################################################
 #
-#   FmpzLaurentSeriesRing / fmpz_laurent_series
+#   ZZLaurentSeriesRing / ZZLaurentSeriesRingElem
 #
 ###############################################################################
 
-@attributes mutable struct FmpzLaurentSeriesRing <: Ring
+@attributes mutable struct ZZLaurentSeriesRing <: Ring
    base_ring::ZZRing
    prec_max::Int
    S::Symbol
 
-   function FmpzLaurentSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
+   function ZZLaurentSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
       return get_cached!(FmpzLaurentSeriesID, (prec, s), cached) do
          return new(FlintZZ, prec, s)
       end
    end
 end
 
-const FmpzLaurentSeriesID = Dict{Tuple{Int, Symbol}, FmpzLaurentSeriesRing}()
+const FmpzLaurentSeriesID = Dict{Tuple{Int, Symbol}, ZZLaurentSeriesRing}()
 
-mutable struct fmpz_laurent_series <: RingElem
+mutable struct ZZLaurentSeriesRingElem <: RingElem
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
    prec::Int
    val::Int
    scale::Int
-   parent::FmpzLaurentSeriesRing
+   parent::ZZLaurentSeriesRing
 
-   function fmpz_laurent_series()
+   function ZZLaurentSeriesRingElem()
       z = new()
       ccall((:fmpz_poly_init, libflint), Nothing,
-            (Ref{fmpz_laurent_series},), z)
+            (Ref{ZZLaurentSeriesRingElem},), z)
       finalizer(_fmpz_laurent_series_clear_fn, z)
       return z
    end
 
-   function fmpz_laurent_series(a::Vector{ZZRingElem}, len::Int, prec::Int, val::Int, scale::Int)
+   function ZZLaurentSeriesRingElem(a::Vector{ZZRingElem}, len::Int, prec::Int, val::Int, scale::Int)
       z = new()
       ccall((:fmpz_poly_init2, libflint), Nothing,
-            (Ref{fmpz_laurent_series}, Int), z, len)
+            (Ref{ZZLaurentSeriesRingElem}, Int), z, len)
       for i = 1:len
          ccall((:fmpz_poly_set_coeff_fmpz, libflint), Nothing,
-                     (Ref{fmpz_laurent_series}, Int, Ref{ZZRingElem}), z, i - 1, a[i])
+                     (Ref{ZZLaurentSeriesRingElem}, Int, Ref{ZZRingElem}), z, i - 1, a[i])
       end
       z.prec = prec
       z.val = val
@@ -3213,41 +3213,41 @@ mutable struct fmpz_laurent_series <: RingElem
       return z
    end
 
-   function fmpz_laurent_series(a::fmpz_laurent_series)
+   function ZZLaurentSeriesRingElem(a::ZZLaurentSeriesRingElem)
       z = new()
-      ccall((:fmpz_poly_init, libflint), Nothing, (Ref{fmpz_laurent_series},), z)
+      ccall((:fmpz_poly_init, libflint), Nothing, (Ref{ZZLaurentSeriesRingElem},), z)
       ccall((:fmpz_poly_set, libflint), Nothing,
-            (Ref{fmpz_laurent_series}, Ref{fmpz_laurent_series}), z, a)
+            (Ref{ZZLaurentSeriesRingElem}, Ref{ZZLaurentSeriesRingElem}), z, a)
       finalizer(_fmpz_laurent_series_clear_fn, z)
       return z
    end
 end
 
-function _fmpz_laurent_series_clear_fn(a::fmpz_laurent_series)
-   ccall((:fmpz_poly_clear, libflint), Nothing, (Ref{fmpz_laurent_series},), a)
+function _fmpz_laurent_series_clear_fn(a::ZZLaurentSeriesRingElem)
+   ccall((:fmpz_poly_clear, libflint), Nothing, (Ref{ZZLaurentSeriesRingElem},), a)
 end
 
 ###############################################################################
 #
-#   FmpqRelSeriesRing / fmpq_rel_series
+#   QQRelPowerSeriesRing / QQRelPowerSeriesRingElem
 #
 ###############################################################################
 
-@attributes mutable struct FmpqRelSeriesRing <: SeriesRing{QQFieldElem}
+@attributes mutable struct QQRelPowerSeriesRing <: SeriesRing{QQFieldElem}
    base_ring::QQField
    prec_max::Int
    S::Symbol
 
-   function FmpqRelSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
+   function QQRelPowerSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
       return get_cached!(FmpqRelSeriesID, (prec, s), cached) do
          return new(FlintQQ, prec, s)
       end
    end
 end
 
-const FmpqRelSeriesID = Dict{Tuple{Int, Symbol}, FmpqRelSeriesRing}()
+const FmpqRelSeriesID = Dict{Tuple{Int, Symbol}, QQRelPowerSeriesRing}()
 
-mutable struct fmpq_rel_series <: RelSeriesElem{QQFieldElem}
+mutable struct QQRelPowerSeriesRingElem <: RelSeriesElem{QQFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -3256,23 +3256,23 @@ mutable struct fmpq_rel_series <: RelSeriesElem{QQFieldElem}
 
    prec::Int
    val::Int
-   parent::FmpqRelSeriesRing
+   parent::QQRelPowerSeriesRing
 
-   function fmpq_rel_series()
+   function QQRelPowerSeriesRingElem()
       z = new()
       ccall((:fmpq_poly_init, libflint), Nothing,
-            (Ref{fmpq_rel_series},), z)
+            (Ref{QQRelPowerSeriesRingElem},), z)
       finalizer(_fmpq_rel_series_clear_fn, z)
       return z
    end
 
-   function fmpq_rel_series(a::Vector{QQFieldElem}, len::Int, prec::Int, val::Int)
+   function QQRelPowerSeriesRingElem(a::Vector{QQFieldElem}, len::Int, prec::Int, val::Int)
       z = new()
       ccall((:fmpq_poly_init2, libflint), Nothing,
-            (Ref{fmpq_rel_series}, Int), z, len)
+            (Ref{QQRelPowerSeriesRingElem}, Int), z, len)
       for i = 1:len
          ccall((:fmpq_poly_set_coeff_fmpq, libflint), Nothing,
-                     (Ref{fmpq_rel_series}, Int, Ref{QQFieldElem}), z, i - 1, a[i])
+                     (Ref{QQRelPowerSeriesRingElem}, Int, Ref{QQFieldElem}), z, i - 1, a[i])
       end
       z.prec = prec
       z.val = val
@@ -3280,41 +3280,41 @@ mutable struct fmpq_rel_series <: RelSeriesElem{QQFieldElem}
       return z
    end
 
-   function fmpq_rel_series(a::fmpq_rel_series)
+   function QQRelPowerSeriesRingElem(a::QQRelPowerSeriesRingElem)
       z = new()
-      ccall((:fmpq_poly_init, libflint), Nothing, (Ref{fmpq_rel_series},), z)
+      ccall((:fmpq_poly_init, libflint), Nothing, (Ref{QQRelPowerSeriesRingElem},), z)
       ccall((:fmpq_poly_set, libflint), Nothing,
-            (Ref{fmpq_rel_series}, Ref{fmpq_rel_series}), z, a)
+            (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}), z, a)
       finalizer(_fmpq_rel_series_clear_fn, z)
       return z
    end
 end
 
-function _fmpq_rel_series_clear_fn(a::fmpq_rel_series)
-   ccall((:fmpq_poly_clear, libflint), Nothing, (Ref{fmpq_rel_series},), a)
+function _fmpq_rel_series_clear_fn(a::QQRelPowerSeriesRingElem)
+   ccall((:fmpq_poly_clear, libflint), Nothing, (Ref{QQRelPowerSeriesRingElem},), a)
 end
 
 ###############################################################################
 #
-#   FmpqAbsSeriesRing / fmpq_abs_series
+#   QQAbsPowerSeriesRing / QQAbsPowerSeriesRingElem
 #
 ###############################################################################
 
-@attributes mutable struct FmpqAbsSeriesRing <: SeriesRing{QQFieldElem}
+@attributes mutable struct QQAbsPowerSeriesRing <: SeriesRing{QQFieldElem}
    base_ring::QQField
    prec_max::Int
    S::Symbol
 
-   function FmpqAbsSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
+   function QQAbsPowerSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
       return get_cached!(FmpqAbsSeriesID, (prec, s), cached) do
          return new(FlintQQ, prec, s)
       end
    end
 end
 
-const FmpqAbsSeriesID = Dict{Tuple{Int, Symbol}, FmpqAbsSeriesRing}()
+const FmpqAbsSeriesID = Dict{Tuple{Int, Symbol}, QQAbsPowerSeriesRing}()
 
-mutable struct fmpq_abs_series <: AbsSeriesElem{QQFieldElem}
+mutable struct QQAbsPowerSeriesRingElem <: AbsSeriesElem{QQFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -3322,55 +3322,55 @@ mutable struct fmpq_abs_series <: AbsSeriesElem{QQFieldElem}
    # end flint struct
 
    prec :: Int
-   parent::FmpqAbsSeriesRing
+   parent::QQAbsPowerSeriesRing
 
-   function fmpq_abs_series()
+   function QQAbsPowerSeriesRingElem()
       z = new()
       ccall((:fmpq_poly_init, libflint), Nothing,
-            (Ref{fmpq_abs_series},), z)
+            (Ref{QQAbsPowerSeriesRingElem},), z)
       finalizer(_fmpq_abs_series_clear_fn, z)
       return z
    end
 
-   function fmpq_abs_series(a::Vector{QQFieldElem}, len::Int, prec::Int)
+   function QQAbsPowerSeriesRingElem(a::Vector{QQFieldElem}, len::Int, prec::Int)
       z = new()
       ccall((:fmpq_poly_init2, libflint), Nothing,
-            (Ref{fmpq_abs_series}, Int), z, len)
+            (Ref{QQAbsPowerSeriesRingElem}, Int), z, len)
       for i = 1:len
          ccall((:fmpq_poly_set_coeff_fmpq, libflint), Nothing,
-                     (Ref{fmpq_abs_series}, Int, Ref{QQFieldElem}), z, i - 1, a[i])
+                     (Ref{QQAbsPowerSeriesRingElem}, Int, Ref{QQFieldElem}), z, i - 1, a[i])
       end
       z.prec = prec
       finalizer(_fmpq_abs_series_clear_fn, z)
       return z
    end
 
-   function fmpq_abs_series(a::fmpq_abs_series)
+   function QQAbsPowerSeriesRingElem(a::QQAbsPowerSeriesRingElem)
       z = new()
-      ccall((:fmpq_poly_init, libflint), Nothing, (Ref{fmpq_abs_series},), z)
+      ccall((:fmpq_poly_init, libflint), Nothing, (Ref{QQAbsPowerSeriesRingElem},), z)
       ccall((:fmpq_poly_set, libflint), Nothing,
-            (Ref{fmpq_abs_series}, Ref{fmpq_abs_series}), z, a)
+            (Ref{QQAbsPowerSeriesRingElem}, Ref{QQAbsPowerSeriesRingElem}), z, a)
       finalizer(_fmpq_abs_series_clear_fn, z)
       return z
    end
 end
 
-function _fmpq_abs_series_clear_fn(a::fmpq_abs_series)
-   ccall((:fmpq_poly_clear, libflint), Nothing, (Ref{fmpq_abs_series},), a)
+function _fmpq_abs_series_clear_fn(a::QQAbsPowerSeriesRingElem)
+   ccall((:fmpq_poly_clear, libflint), Nothing, (Ref{QQAbsPowerSeriesRingElem},), a)
 end
 
 ###############################################################################
 #
-#   GFPRelSeriesRing / gfp_rel_series
+#   fpRelPowerSeriesRing / fpRelPowerSeriesRingElem
 #
 ###############################################################################
 
-@attributes mutable struct GFPRelSeriesRing <: SeriesRing{zzModRingElem}
+@attributes mutable struct fpRelPowerSeriesRing <: SeriesRing{zzModRingElem}
    base_ring::fpField
    prec_max::Int
    S::Symbol
 
-   function GFPRelSeriesRing(R::fpField, prec::Int, s::Symbol,
+   function fpRelPowerSeriesRing(R::fpField, prec::Int, s::Symbol,
                                  cached::Bool = true)
       return get_cached!(GFPRelSeriesID, (R, prec, s), cached) do
          return new(R, prec, s)
@@ -3379,9 +3379,9 @@ end
 end
 
 const GFPRelSeriesID = Dict{Tuple{fpField, Int, Symbol},
-                                GFPRelSeriesRing}()
+                                fpRelPowerSeriesRing}()
 
-mutable struct gfp_rel_series <: RelSeriesElem{fpFieldElem}
+mutable struct fpRelPowerSeriesRingElem <: RelSeriesElem{fpFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -3390,25 +3390,25 @@ mutable struct gfp_rel_series <: RelSeriesElem{fpFieldElem}
    mod_norm::UInt
    prec::Int
    val::Int
-   parent::GFPRelSeriesRing
+   parent::fpRelPowerSeriesRing
 
-   function gfp_rel_series(p::UInt)
+   function fpRelPowerSeriesRingElem(p::UInt)
       z = new()
       ccall((:nmod_poly_init, libflint), Nothing,
-            (Ref{gfp_rel_series}, UInt), z, p)
+            (Ref{fpRelPowerSeriesRingElem}, UInt), z, p)
       finalizer(_gfp_rel_series_clear_fn, z)
       return z
    end
 
-   function gfp_rel_series(p::UInt, a::Vector{ZZRingElem}, len::Int, prec::Int, val::Int)
+   function fpRelPowerSeriesRingElem(p::UInt, a::Vector{ZZRingElem}, len::Int, prec::Int, val::Int)
       z = new()
       ccall((:nmod_poly_init2, libflint), Nothing,
-            (Ref{gfp_rel_series}, UInt, Int), z, p, len)
+            (Ref{fpRelPowerSeriesRingElem}, UInt, Int), z, p, len)
       for i = 1:len
          tt = ccall((:fmpz_fdiv_ui, libflint), UInt,
                     (Ref{ZZRingElem}, UInt), a[i], p)
          ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-                     (Ref{gfp_rel_series}, Int, UInt), z, i - 1, tt)
+                     (Ref{fpRelPowerSeriesRingElem}, Int, UInt), z, i - 1, tt)
       end
       z.prec = prec
       z.val = val
@@ -3416,13 +3416,13 @@ mutable struct gfp_rel_series <: RelSeriesElem{fpFieldElem}
       return z
    end
 
-   function gfp_rel_series(p::UInt, a::Vector{UInt}, len::Int, prec::Int, val::Int)
+   function fpRelPowerSeriesRingElem(p::UInt, a::Vector{UInt}, len::Int, prec::Int, val::Int)
       z = new()
       ccall((:nmod_poly_init2, libflint), Nothing,
-            (Ref{gfp_rel_series}, UInt, Int), z, p, len)
+            (Ref{fpRelPowerSeriesRingElem}, UInt, Int), z, p, len)
       for i = 1:len
          ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-                     (Ref{gfp_rel_series}, Int, UInt), z, i - 1, a[i])
+                     (Ref{fpRelPowerSeriesRingElem}, Int, UInt), z, i - 1, a[i])
       end
       z.prec = prec
       z.val = val
@@ -3430,13 +3430,13 @@ mutable struct gfp_rel_series <: RelSeriesElem{fpFieldElem}
       return z
    end
 
-   function gfp_rel_series(p::UInt, a::Vector{fpFieldElem}, len::Int, prec::Int, val::Int)
+   function fpRelPowerSeriesRingElem(p::UInt, a::Vector{fpFieldElem}, len::Int, prec::Int, val::Int)
       z = new()
       ccall((:nmod_poly_init2, libflint), Nothing,
-            (Ref{gfp_rel_series}, UInt, Int), z, p, len)
+            (Ref{fpRelPowerSeriesRingElem}, UInt, Int), z, p, len)
       for i = 1:len
          ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-               (Ref{gfp_rel_series}, Int, UInt), z, i - 1, data(a[i]))
+               (Ref{fpRelPowerSeriesRingElem}, Int, UInt), z, i - 1, data(a[i]))
       end
       z.prec = prec
       z.val = val
@@ -3444,34 +3444,34 @@ mutable struct gfp_rel_series <: RelSeriesElem{fpFieldElem}
       return z
    end
 
-   function gfp_rel_series(a::gfp_rel_series)
+   function fpRelPowerSeriesRingElem(a::fpRelPowerSeriesRingElem)
       z = new()
       p = modulus(base_ring(parent(a)))
       ccall((:nmod_poly_init, libflint), Nothing,
-            (Ref{gfp_rel_series}, UInt), z, p)
+            (Ref{fpRelPowerSeriesRingElem}, UInt), z, p)
       ccall((:nmod_poly_set, libflint), Nothing,
-            (Ref{gfp_rel_series}, Ref{gfp_rel_series}), z, a)
+            (Ref{fpRelPowerSeriesRingElem}, Ref{fpRelPowerSeriesRingElem}), z, a)
       finalizer(_gfp_rel_series_clear_fn, z)
       return z
    end
 end
 
-function _gfp_rel_series_clear_fn(a::gfp_rel_series)
-   ccall((:nmod_poly_clear, libflint), Nothing, (Ref{gfp_rel_series},), a)
+function _gfp_rel_series_clear_fn(a::fpRelPowerSeriesRingElem)
+   ccall((:nmod_poly_clear, libflint), Nothing, (Ref{fpRelPowerSeriesRingElem},), a)
 end
 
 ###############################################################################
 #
-#   NmodRelSeriesRing / nmod_rel_series
+#   zzModRelPowerSeriesRing / zzModRelPowerSeriesRingElem
 #
 ###############################################################################
 
-@attributes mutable struct NmodRelSeriesRing <: SeriesRing{zzModRingElem}
+@attributes mutable struct zzModRelPowerSeriesRing <: SeriesRing{zzModRingElem}
    base_ring::zzModRing
    prec_max::Int
    S::Symbol
 
-   function NmodRelSeriesRing(R::zzModRing, prec::Int, s::Symbol,
+   function zzModRelPowerSeriesRing(R::zzModRing, prec::Int, s::Symbol,
                                  cached::Bool = true)
       return get_cached!(NmodRelSeriesID, (R, prec, s), cached) do
          return new(R, prec, s)
@@ -3480,9 +3480,9 @@ end
 end
 
 const NmodRelSeriesID = Dict{Tuple{zzModRing, Int, Symbol},
-                                NmodRelSeriesRing}()
+                                zzModRelPowerSeriesRing}()
 
-mutable struct nmod_rel_series <: RelSeriesElem{zzModRingElem}
+mutable struct zzModRelPowerSeriesRingElem <: RelSeriesElem{zzModRingElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -3491,24 +3491,24 @@ mutable struct nmod_rel_series <: RelSeriesElem{zzModRingElem}
    mod_norm::UInt
    prec::Int
    val::Int
-   parent::NmodRelSeriesRing
+   parent::zzModRelPowerSeriesRing
 
-   function nmod_rel_series(p::UInt)
+   function zzModRelPowerSeriesRingElem(p::UInt)
       z = new()
       ccall((:nmod_poly_init, libflint), Nothing,
-            (Ref{nmod_rel_series}, UInt), z, p)
+            (Ref{zzModRelPowerSeriesRingElem}, UInt), z, p)
       finalizer(_nmod_rel_series_clear_fn, z)
       return z
    end
 
-   function nmod_rel_series(p::UInt, a::Vector{ZZRingElem}, len::Int, prec::Int, val::Int)
+   function zzModRelPowerSeriesRingElem(p::UInt, a::Vector{ZZRingElem}, len::Int, prec::Int, val::Int)
       z = new()
       ccall((:nmod_poly_init2, libflint), Nothing,
-            (Ref{nmod_rel_series}, UInt, Int), z, p, len)
+            (Ref{zzModRelPowerSeriesRingElem}, UInt, Int), z, p, len)
       for i = 1:len
          tt = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), a[i], p)
          ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-                     (Ref{nmod_rel_series}, Int, UInt), z, i - 1, tt)
+                     (Ref{zzModRelPowerSeriesRingElem}, Int, UInt), z, i - 1, tt)
       end
       z.prec = prec
       z.val = val
@@ -3516,13 +3516,13 @@ mutable struct nmod_rel_series <: RelSeriesElem{zzModRingElem}
       return z
    end
 
-   function nmod_rel_series(p::UInt, a::Vector{UInt}, len::Int, prec::Int, val::Int)
+   function zzModRelPowerSeriesRingElem(p::UInt, a::Vector{UInt}, len::Int, prec::Int, val::Int)
       z = new()
       ccall((:nmod_poly_init2, libflint), Nothing,
-            (Ref{nmod_rel_series}, UInt, Int), z, p, len)
+            (Ref{zzModRelPowerSeriesRingElem}, UInt, Int), z, p, len)
       for i = 1:len
          ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-                     (Ref{nmod_rel_series}, Int, UInt), z, i - 1, a[i])
+                     (Ref{zzModRelPowerSeriesRingElem}, Int, UInt), z, i - 1, a[i])
       end
       z.prec = prec
       z.val = val
@@ -3530,13 +3530,13 @@ mutable struct nmod_rel_series <: RelSeriesElem{zzModRingElem}
       return z
    end
 
-   function nmod_rel_series(p::UInt, a::Vector{zzModRingElem}, len::Int, prec::Int, val::Int)
+   function zzModRelPowerSeriesRingElem(p::UInt, a::Vector{zzModRingElem}, len::Int, prec::Int, val::Int)
       z = new()
       ccall((:nmod_poly_init2, libflint), Nothing,
-            (Ref{nmod_rel_series}, UInt, Int), z, p, len)
+            (Ref{zzModRelPowerSeriesRingElem}, UInt, Int), z, p, len)
       for i = 1:len
          ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-                     (Ref{nmod_rel_series}, Int, UInt), z, i - 1, data(a[i]))
+                     (Ref{zzModRelPowerSeriesRingElem}, Int, UInt), z, i - 1, data(a[i]))
       end
       z.prec = prec
       z.val = val
@@ -3544,34 +3544,34 @@ mutable struct nmod_rel_series <: RelSeriesElem{zzModRingElem}
       return z
    end
 
-   function nmod_rel_series(a::nmod_rel_series)
+   function zzModRelPowerSeriesRingElem(a::zzModRelPowerSeriesRingElem)
       z = new()
       p = modulus(base_ring(parent(a)))
       ccall((:nmod_poly_init, libflint), Nothing,
-            (Ref{nmod_rel_series}, UInt), z, p)
+            (Ref{zzModRelPowerSeriesRingElem}, UInt), z, p)
       ccall((:nmod_poly_set, libflint), Nothing,
-            (Ref{nmod_rel_series}, Ref{nmod_rel_series}), z, a)
+            (Ref{zzModRelPowerSeriesRingElem}, Ref{zzModRelPowerSeriesRingElem}), z, a)
       finalizer(_nmod_rel_series_clear_fn, z)
       return z
    end
 end
 
-function _nmod_rel_series_clear_fn(a::nmod_rel_series)
-   ccall((:nmod_poly_clear, libflint), Nothing, (Ref{nmod_rel_series},), a)
+function _nmod_rel_series_clear_fn(a::zzModRelPowerSeriesRingElem)
+   ccall((:nmod_poly_clear, libflint), Nothing, (Ref{zzModRelPowerSeriesRingElem},), a)
 end
 
 ###############################################################################
 #
-#   GFPFmpzRelSeriesRing / gfp_fmpz_rel_series
+#   FpRelPowerSeriesRing / FpRelPowerSeriesRingElem
 #
 ###############################################################################
 
-@attributes mutable struct GFPFmpzRelSeriesRing <: SeriesRing{FpFieldElem}
+@attributes mutable struct FpRelPowerSeriesRing <: SeriesRing{FpFieldElem}
    base_ring::FpField
    prec_max::Int
    S::Symbol
 
-   function GFPFmpzRelSeriesRing(R::Ring, prec::Int, s::Symbol,
+   function FpRelPowerSeriesRing(R::Ring, prec::Int, s::Symbol,
                                  cached::Bool = true)
       return get_cached!(GFPFmpzRelSeriesID, (R, prec, s), cached) do
          return new(R, prec, s)
@@ -3580,9 +3580,9 @@ end
 end
 
 const GFPFmpzRelSeriesID = Dict{Tuple{FpField, Int, Symbol},
-                                GFPFmpzRelSeriesRing}()
+                                FpRelPowerSeriesRing}()
 
-mutable struct gfp_fmpz_rel_series <: RelSeriesElem{FpFieldElem}
+mutable struct FpRelPowerSeriesRingElem <: RelSeriesElem{FpFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -3590,30 +3590,30 @@ mutable struct gfp_fmpz_rel_series <: RelSeriesElem{FpFieldElem}
 
    prec::Int
    val::Int
-   parent::GFPFmpzRelSeriesRing
+   parent::FpRelPowerSeriesRing
 
-   function gfp_fmpz_rel_series(p::fmpz_mod_ctx_struct)
+   function FpRelPowerSeriesRingElem(p::fmpz_mod_ctx_struct)
       z = new()
       ccall((:fmpz_mod_poly_init, libflint), Nothing,
-            (Ref{gfp_fmpz_rel_series}, Ref{fmpz_mod_ctx_struct}),
+            (Ref{FpRelPowerSeriesRingElem}, Ref{fmpz_mod_ctx_struct}),
             z, p)
       finalizer(_gfp_fmpz_rel_series_clear_fn, z)
       return z
    end
 
-   function gfp_fmpz_rel_series(R::FpField)
-      return gfp_fmpz_rel_series(R.ninv)
+   function FpRelPowerSeriesRingElem(R::FpField)
+      return FpRelPowerSeriesRingElem(R.ninv)
    end
 
-   function gfp_fmpz_rel_series(p::fmpz_mod_ctx_struct, a::Vector{ZZRingElem},
+   function FpRelPowerSeriesRingElem(p::fmpz_mod_ctx_struct, a::Vector{ZZRingElem},
                                 len::Int, prec::Int, val::Int)
       z = new()
       ccall((:fmpz_mod_poly_init2, libflint), Nothing,
-            (Ref{gfp_fmpz_rel_series}, Int, Ref{fmpz_mod_ctx_struct}),
+            (Ref{FpRelPowerSeriesRingElem}, Int, Ref{fmpz_mod_ctx_struct}),
             z, len, p)
       for i = 1:len
          ccall((:fmpz_mod_poly_set_coeff_fmpz, libflint), Nothing,
-               (Ref{gfp_fmpz_rel_series}, Int, Ref{ZZRingElem},
+               (Ref{FpRelPowerSeriesRingElem}, Int, Ref{ZZRingElem},
                 Ref{fmpz_mod_ctx_struct}),
                z, i - 1, a[i], p)
       end
@@ -3623,20 +3623,20 @@ mutable struct gfp_fmpz_rel_series <: RelSeriesElem{FpFieldElem}
       return z
    end
 
-   function gfp_fmpz_rel_series(R::FpField, a::Vector{ZZRingElem},
+   function FpRelPowerSeriesRingElem(R::FpField, a::Vector{ZZRingElem},
                                 len::Int, prec::Int, val::Int)
-      return gfp_fmpz_rel_series(R.ninv, a, len, prec, val)
+      return FpRelPowerSeriesRingElem(R.ninv, a, len, prec, val)
    end
 
-   function gfp_fmpz_rel_series(p::fmpz_mod_ctx_struct, a::Vector{FpFieldElem},
+   function FpRelPowerSeriesRingElem(p::fmpz_mod_ctx_struct, a::Vector{FpFieldElem},
                                 len::Int, prec::Int, val::Int)
       z = new()
       ccall((:fmpz_mod_poly_init2, libflint), Nothing,
-            (Ref{gfp_fmpz_rel_series}, Int, Ref{fmpz_mod_ctx_struct}),
+            (Ref{FpRelPowerSeriesRingElem}, Int, Ref{fmpz_mod_ctx_struct}),
             z, len, p)
       for i = 1:len
          ccall((:fmpz_mod_poly_set_coeff_fmpz, libflint), Nothing,
-               (Ref{gfp_fmpz_rel_series}, Int, Ref{ZZRingElem},
+               (Ref{FpRelPowerSeriesRingElem}, Int, Ref{ZZRingElem},
                 Ref{fmpz_mod_ctx_struct}),
                z, i - 1, data(a[i]), p)
       end
@@ -3646,19 +3646,19 @@ mutable struct gfp_fmpz_rel_series <: RelSeriesElem{FpFieldElem}
       return z
    end
 
-   function gfp_fmpz_rel_series(R::FpField, a::Vector{FpFieldElem},
+   function FpRelPowerSeriesRingElem(R::FpField, a::Vector{FpFieldElem},
                                 len::Int, prec::Int, val::Int)
-      return gfp_fmpz_rel_series(R.ninv, a, len, prec, val)
+      return FpRelPowerSeriesRingElem(R.ninv, a, len, prec, val)
    end
 
-   function gfp_fmpz_rel_series(a::gfp_fmpz_rel_series)
+   function FpRelPowerSeriesRingElem(a::FpRelPowerSeriesRingElem)
       z = new()
       p = a.parent.base_ring.ninv
       ccall((:fmpz_mod_poly_init, libflint), Nothing,
-            (Ref{gfp_fmpz_rel_series}, Ref{fmpz_mod_ctx_struct}),
+            (Ref{FpRelPowerSeriesRingElem}, Ref{fmpz_mod_ctx_struct}),
             z, p)
       ccall((:fmpz_mod_poly_set, libflint), Nothing,
-            (Ref{gfp_fmpz_rel_series}, Ref{gfp_fmpz_rel_series},
+            (Ref{FpRelPowerSeriesRingElem}, Ref{FpRelPowerSeriesRingElem},
              Ref{fmpz_mod_ctx_struct}),
             z, a, p)
       finalizer(_gfp_fmpz_rel_series_clear_fn, z)
@@ -3666,24 +3666,24 @@ mutable struct gfp_fmpz_rel_series <: RelSeriesElem{FpFieldElem}
    end
 end
 
-function _gfp_fmpz_rel_series_clear_fn(a::gfp_fmpz_rel_series)
+function _gfp_fmpz_rel_series_clear_fn(a::FpRelPowerSeriesRingElem)
    ccall((:fmpz_mod_poly_clear, libflint), Nothing,
-         (Ref{gfp_fmpz_rel_series}, Ref{fmpz_mod_ctx_struct}),
+         (Ref{FpRelPowerSeriesRingElem}, Ref{fmpz_mod_ctx_struct}),
          a, a.parent.base_ring.ninv)
 end
 
 ###############################################################################
 #
-#   FmpzModRelSeriesRing / fmpz_mod_rel_series
+#   ZZModRelPowerSeriesRing / ZZModRelPowerSeriesRingElem
 #
 ###############################################################################
 
-@attributes mutable struct FmpzModRelSeriesRing <: SeriesRing{ZZModRingElem}
+@attributes mutable struct ZZModRelPowerSeriesRing <: SeriesRing{ZZModRingElem}
    base_ring::ZZModRing
    prec_max::Int
    S::Symbol
 
-   function FmpzModRelSeriesRing(R::Ring, prec::Int, s::Symbol,
+   function ZZModRelPowerSeriesRing(R::Ring, prec::Int, s::Symbol,
                                  cached::Bool = true)
       return get_cached!(FmpzModRelSeriesID, (R, prec, s), cached) do
          return new(R, prec, s)
@@ -3692,9 +3692,9 @@ end
 end
 
 const FmpzModRelSeriesID = Dict{Tuple{ZZModRing, Int, Symbol},
-                                FmpzModRelSeriesRing}()
+                                ZZModRelPowerSeriesRing}()
 
-mutable struct fmpz_mod_rel_series <: RelSeriesElem{ZZModRingElem}
+mutable struct ZZModRelPowerSeriesRingElem <: RelSeriesElem{ZZModRingElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -3702,30 +3702,30 @@ mutable struct fmpz_mod_rel_series <: RelSeriesElem{ZZModRingElem}
 
    prec::Int
    val::Int
-   parent::FmpzModRelSeriesRing
+   parent::ZZModRelPowerSeriesRing
 
-   function fmpz_mod_rel_series(p::fmpz_mod_ctx_struct)
+   function ZZModRelPowerSeriesRingElem(p::fmpz_mod_ctx_struct)
       z = new()
       ccall((:fmpz_mod_poly_init, libflint), Nothing,
-            (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_ctx_struct}),
+            (Ref{ZZModRelPowerSeriesRingElem}, Ref{fmpz_mod_ctx_struct}),
             z, p)
       finalizer(_fmpz_mod_rel_series_clear_fn, z)
       return z
    end
 
-   function fmpz_mod_rel_series(R::ZZModRing)
-      return fmpz_mod_rel_series(R.ninv)
+   function ZZModRelPowerSeriesRingElem(R::ZZModRing)
+      return ZZModRelPowerSeriesRingElem(R.ninv)
    end
 
-   function fmpz_mod_rel_series(p::fmpz_mod_ctx_struct, a::Vector{ZZRingElem},
+   function ZZModRelPowerSeriesRingElem(p::fmpz_mod_ctx_struct, a::Vector{ZZRingElem},
                                 len::Int, prec::Int, val::Int)
       z = new()
       ccall((:fmpz_mod_poly_init2, libflint), Nothing,
-            (Ref{fmpz_mod_rel_series}, Int, Ref{fmpz_mod_ctx_struct}),
+            (Ref{ZZModRelPowerSeriesRingElem}, Int, Ref{fmpz_mod_ctx_struct}),
             z, len, p)
       for i = 1:len
          ccall((:fmpz_mod_poly_set_coeff_fmpz, libflint), Nothing,
-               (Ref{fmpz_mod_rel_series}, Int, Ref{ZZRingElem},
+               (Ref{ZZModRelPowerSeriesRingElem}, Int, Ref{ZZRingElem},
                 Ref{fmpz_mod_ctx_struct}),
                z, i - 1, a[i], p)
       end
@@ -3735,20 +3735,20 @@ mutable struct fmpz_mod_rel_series <: RelSeriesElem{ZZModRingElem}
       return z
    end
 
-   function fmpz_mod_rel_series(R::ZZModRing, a::Vector{ZZRingElem},
+   function ZZModRelPowerSeriesRingElem(R::ZZModRing, a::Vector{ZZRingElem},
                                 len::Int, prec::Int, val::Int)
-      return fmpz_mod_rel_series(R.ninv, a, len, prec, val)
+      return ZZModRelPowerSeriesRingElem(R.ninv, a, len, prec, val)
    end
 
-   function fmpz_mod_rel_series(p::fmpz_mod_ctx_struct, a::Vector{ZZModRingElem},
+   function ZZModRelPowerSeriesRingElem(p::fmpz_mod_ctx_struct, a::Vector{ZZModRingElem},
                                 len::Int, prec::Int, val::Int)
       z = new()
       ccall((:fmpz_mod_poly_init2, libflint), Nothing,
-            (Ref{fmpz_mod_rel_series}, Int, Ref{fmpz_mod_ctx_struct}),
+            (Ref{ZZModRelPowerSeriesRingElem}, Int, Ref{fmpz_mod_ctx_struct}),
             z, len, p)
       for i = 1:len
          ccall((:fmpz_mod_poly_set_coeff_fmpz, libflint), Nothing,
-               (Ref{fmpz_mod_rel_series}, Int, Ref{ZZRingElem},
+               (Ref{ZZModRelPowerSeriesRingElem}, Int, Ref{ZZRingElem},
                 Ref{fmpz_mod_ctx_struct}),
                z, i - 1, data(a[i]), p)
       end
@@ -3758,19 +3758,19 @@ mutable struct fmpz_mod_rel_series <: RelSeriesElem{ZZModRingElem}
       return z
    end
 
-   function fmpz_mod_rel_series(R::ZZModRing, a::Vector{ZZModRingElem},
+   function ZZModRelPowerSeriesRingElem(R::ZZModRing, a::Vector{ZZModRingElem},
                                 len::Int, prec::Int, val::Int)
-      return fmpz_mod_rel_series(R.ninv, a, len, prec, val)
+      return ZZModRelPowerSeriesRingElem(R.ninv, a, len, prec, val)
    end
 
-   function fmpz_mod_rel_series(a::fmpz_mod_rel_series)
+   function ZZModRelPowerSeriesRingElem(a::ZZModRelPowerSeriesRingElem)
       z = new()
       p = a.parent.base_ring.ninv
       ccall((:fmpz_mod_poly_init, libflint), Nothing,
-            (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_ctx_struct}),
+            (Ref{ZZModRelPowerSeriesRingElem}, Ref{fmpz_mod_ctx_struct}),
             z, p)
       ccall((:fmpz_mod_poly_set, libflint), Nothing,
-            (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_rel_series},
+            (Ref{ZZModRelPowerSeriesRingElem}, Ref{ZZModRelPowerSeriesRingElem},
              Ref{fmpz_mod_ctx_struct}),
             z, a, p)
       finalizer(_fmpz_mod_rel_series_clear_fn, z)
@@ -3778,24 +3778,24 @@ mutable struct fmpz_mod_rel_series <: RelSeriesElem{ZZModRingElem}
    end
 end
 
-function _fmpz_mod_rel_series_clear_fn(a::fmpz_mod_rel_series)
+function _fmpz_mod_rel_series_clear_fn(a::ZZModRelPowerSeriesRingElem)
    ccall((:fmpz_mod_poly_clear, libflint), Nothing,
-         (Ref{fmpz_mod_rel_series}, Ref{fmpz_mod_ctx_struct}),
+         (Ref{ZZModRelPowerSeriesRingElem}, Ref{fmpz_mod_ctx_struct}),
          a, a.parent.base_ring.ninv)
 end
 
 ###############################################################################
 #
-#   GFPFmpzAbsSeriesRing / gfp_fmpz_abs_series
+#   FpAbsPowerSeriesRing / FpAbsPowerSeriesRingElem
 #
 ###############################################################################
 
-@attributes mutable struct GFPFmpzAbsSeriesRing <: SeriesRing{FpFieldElem}
+@attributes mutable struct FpAbsPowerSeriesRing <: SeriesRing{FpFieldElem}
    base_ring::FpField
    prec_max::Int
    S::Symbol
 
-   function GFPFmpzAbsSeriesRing(R::Ring, prec::Int, s::Symbol,
+   function FpAbsPowerSeriesRing(R::Ring, prec::Int, s::Symbol,
                                  cached::Bool = true)
       return get_cached!(GFPFmpzAbsSeriesID, (R, prec, s), cached) do
          return new(R, prec, s)
@@ -3804,39 +3804,39 @@ end
 end
 
 const GFPFmpzAbsSeriesID = Dict{Tuple{FpField, Int, Symbol},
-                                GFPFmpzAbsSeriesRing}()
+                                FpAbsPowerSeriesRing}()
 
-mutable struct gfp_fmpz_abs_series <: AbsSeriesElem{FpFieldElem}
+mutable struct FpAbsPowerSeriesRingElem <: AbsSeriesElem{FpFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
    # end flint struct
 
    prec::Int
-   parent::GFPFmpzAbsSeriesRing
+   parent::FpAbsPowerSeriesRing
 
-   function gfp_fmpz_abs_series(p::fmpz_mod_ctx_struct)
+   function FpAbsPowerSeriesRingElem(p::fmpz_mod_ctx_struct)
       z = new()
       ccall((:fmpz_mod_poly_init, libflint), Nothing,
-            (Ref{gfp_fmpz_abs_series}, Ref{fmpz_mod_ctx_struct}),
+            (Ref{FpAbsPowerSeriesRingElem}, Ref{fmpz_mod_ctx_struct}),
             z, p)
       finalizer(_gfp_fmpz_abs_series_clear_fn, z)
       return z
    end
 
-   function gfp_fmpz_abs_series(R::FpField)
-      return gfp_fmpz_abs_series(R.ninv)
+   function FpAbsPowerSeriesRingElem(R::FpField)
+      return FpAbsPowerSeriesRingElem(R.ninv)
    end
 
-   function gfp_fmpz_abs_series(p::fmpz_mod_ctx_struct, a::Vector{ZZRingElem},
+   function FpAbsPowerSeriesRingElem(p::fmpz_mod_ctx_struct, a::Vector{ZZRingElem},
                                 len::Int, prec::Int)
       z = new()
       ccall((:fmpz_mod_poly_init2, libflint), Nothing,
-            (Ref{gfp_fmpz_abs_series}, Int, Ref{fmpz_mod_ctx_struct}),
+            (Ref{FpAbsPowerSeriesRingElem}, Int, Ref{fmpz_mod_ctx_struct}),
             z, len, p)
       for i = 1:len
          ccall((:fmpz_mod_poly_set_coeff_fmpz, libflint), Nothing,
-               (Ref{gfp_fmpz_abs_series}, Int, Ref{ZZRingElem},
+               (Ref{FpAbsPowerSeriesRingElem}, Int, Ref{ZZRingElem},
                 Ref{fmpz_mod_ctx_struct}),
                z, i - 1, a[i], p)
       end
@@ -3845,19 +3845,19 @@ mutable struct gfp_fmpz_abs_series <: AbsSeriesElem{FpFieldElem}
       return z
    end
 
-   function gfp_fmpz_abs_series(R::FpField, a::Vector{ZZRingElem}, len::Int, prec::Int)
-      return gfp_fmpz_abs_series(R.ninv, a, len, prec)
+   function FpAbsPowerSeriesRingElem(R::FpField, a::Vector{ZZRingElem}, len::Int, prec::Int)
+      return FpAbsPowerSeriesRingElem(R.ninv, a, len, prec)
    end
 
-   function gfp_fmpz_abs_series(p::fmpz_mod_ctx_struct, a::Vector{FpFieldElem},
+   function FpAbsPowerSeriesRingElem(p::fmpz_mod_ctx_struct, a::Vector{FpFieldElem},
                                 len::Int, prec::Int)
       z = new()
       ccall((:fmpz_mod_poly_init2, libflint), Nothing,
-            (Ref{gfp_fmpz_abs_series}, Int, Ref{fmpz_mod_ctx_struct}),
+            (Ref{FpAbsPowerSeriesRingElem}, Int, Ref{fmpz_mod_ctx_struct}),
             z, len, p)
       for i = 1:len
          ccall((:fmpz_mod_poly_set_coeff_fmpz, libflint), Nothing,
-            (Ref{gfp_fmpz_abs_series}, Int, Ref{ZZRingElem}, Ref{fmpz_mod_ctx_struct}),
+            (Ref{FpAbsPowerSeriesRingElem}, Int, Ref{ZZRingElem}, Ref{fmpz_mod_ctx_struct}),
              z, i - 1, data(a[i]), p)
       end
       z.prec = prec
@@ -3865,19 +3865,19 @@ mutable struct gfp_fmpz_abs_series <: AbsSeriesElem{FpFieldElem}
       return z
    end
 
-   function gfp_fmpz_abs_series(R::FpField, a::Vector{FpFieldElem},
+   function FpAbsPowerSeriesRingElem(R::FpField, a::Vector{FpFieldElem},
                                 len::Int, prec::Int)
-      return gfp_fmpz_abs_series(R.ninv, a, len, prec)
+      return FpAbsPowerSeriesRingElem(R.ninv, a, len, prec)
    end
 
-   function gfp_fmpz_abs_series(a::gfp_fmpz_abs_series)
+   function FpAbsPowerSeriesRingElem(a::FpAbsPowerSeriesRingElem)
       z = new()
       p = a.parent.base_ring.ninv
       ccall((:fmpz_mod_poly_init, libflint), Nothing,
-            (Ref{gfp_fmpz_abs_series}, Ref{fmpz_mod_ctx_struct}),
+            (Ref{FpAbsPowerSeriesRingElem}, Ref{fmpz_mod_ctx_struct}),
             z, p)
       ccall((:fmpz_mod_poly_set, libflint), Nothing,
-            (Ref{gfp_fmpz_abs_series}, Ref{gfp_fmpz_abs_series},
+            (Ref{FpAbsPowerSeriesRingElem}, Ref{FpAbsPowerSeriesRingElem},
              Ref{fmpz_mod_ctx_struct}),
             z, a, p)
       finalizer(_gfp_fmpz_abs_series_clear_fn, z)
@@ -3885,25 +3885,25 @@ mutable struct gfp_fmpz_abs_series <: AbsSeriesElem{FpFieldElem}
    end
 end
 
-function _gfp_fmpz_abs_series_clear_fn(a::gfp_fmpz_abs_series)
+function _gfp_fmpz_abs_series_clear_fn(a::FpAbsPowerSeriesRingElem)
    ccall((:fmpz_mod_poly_clear, libflint), Nothing,
-         (Ref{gfp_fmpz_abs_series}, Ref{fmpz_mod_ctx_struct}),
+         (Ref{FpAbsPowerSeriesRingElem}, Ref{fmpz_mod_ctx_struct}),
          a, a.parent.base_ring.ninv)
 end
 
 ###############################################################################
 #
-#   NmodAbsSeriesRing / nmod_abs_series
+#   zzModAbsPowerSeriesRing / zzModAbsPowerSeriesRingElem
 #
 ###############################################################################
 
-@attributes mutable struct NmodAbsSeriesRing <: SeriesRing{zzModRingElem}
+@attributes mutable struct zzModAbsPowerSeriesRing <: SeriesRing{zzModRingElem}
    base_ring::zzModRing
    prec_max::Int
    n::UInt
    S::Symbol
  
-   function NmodAbsSeriesRing(R::Ring, prec::Int, s::Symbol,
+   function zzModAbsPowerSeriesRing(R::Ring, prec::Int, s::Symbol,
                                   cached::Bool = true)
       m = modulus(R)
       return get_cached!(NmodAbsSeriesID, (R, prec, s), cached) do
@@ -3913,9 +3913,9 @@ end
 end
  
 const NmodAbsSeriesID = Dict{Tuple{zzModRing, Int, Symbol},
-                                 NmodAbsSeriesRing}()
+                                 zzModAbsPowerSeriesRing}()
   
-mutable struct nmod_abs_series <: AbsSeriesElem{zzModRingElem}
+mutable struct zzModAbsPowerSeriesRingElem <: AbsSeriesElem{zzModRingElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -3925,86 +3925,86 @@ mutable struct nmod_abs_series <: AbsSeriesElem{zzModRingElem}
    # end of flint struct
 
    prec::Int
-   parent::NmodAbsSeriesRing
+   parent::zzModAbsPowerSeriesRing
   
-   function nmod_abs_series(n::UInt)
+   function zzModAbsPowerSeriesRingElem(n::UInt)
       z = new()
       ccall((:nmod_poly_init, libflint), Nothing,
-            (Ref{nmod_abs_series}, UInt), z, n)
+            (Ref{zzModAbsPowerSeriesRingElem}, UInt), z, n)
       finalizer(_nmod_abs_series_clear_fn, z)
       return z
    end
   
-   function nmod_abs_series(n::UInt, arr::Vector{ZZRingElem}, len::Int, prec::Int)
+   function zzModAbsPowerSeriesRingElem(n::UInt, arr::Vector{ZZRingElem}, len::Int, prec::Int)
       z = new()
       ccall((:nmod_poly_init2, libflint), Nothing,
-            (Ref{nmod_abs_series}, UInt, Int), z, n, length(arr))
+            (Ref{zzModAbsPowerSeriesRingElem}, UInt, Int), z, n, length(arr))
       for i in 1:len
          tt = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), arr[i], n)
          ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-               (Ref{nmod_abs_series}, Int, UInt), z, i - 1, tt)
+               (Ref{zzModAbsPowerSeriesRingElem}, Int, UInt), z, i - 1, tt)
       end
       z.prec = prec
       finalizer(_nmod_abs_series_clear_fn, z)
       return z
    end
   
-   function nmod_abs_series(n::UInt, arr::Vector{UInt}, len::Int, prec::Int)
+   function zzModAbsPowerSeriesRingElem(n::UInt, arr::Vector{UInt}, len::Int, prec::Int)
       z = new()
       ccall((:nmod_poly_init2, libflint), Nothing,
-            (Ref{nmod_abs_series}, UInt, Int), z, n, length(arr))
+            (Ref{zzModAbsPowerSeriesRingElem}, UInt, Int), z, n, length(arr))
       for i in 1:len
          ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-               (Ref{nmod_abs_series}, Int, UInt), z, i - 1, arr[i])
+               (Ref{zzModAbsPowerSeriesRingElem}, Int, UInt), z, i - 1, arr[i])
       end
       z.prec = prec
       finalizer(_nmod_abs_series_clear_fn, z)
       return z
    end
   
-   function nmod_abs_series(n::UInt, arr::Vector{zzModRingElem}, len::Int, prec::Int)
+   function zzModAbsPowerSeriesRingElem(n::UInt, arr::Vector{zzModRingElem}, len::Int, prec::Int)
       z = new()
       ccall((:nmod_poly_init2, libflint), Nothing,
-            (Ref{nmod_abs_series}, UInt, Int), z, n, length(arr))
+            (Ref{zzModAbsPowerSeriesRingElem}, UInt, Int), z, n, length(arr))
       for i in 1:len
          ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-               (Ref{nmod_abs_series}, Int, UInt), z, i-1, arr[i].data)
+               (Ref{zzModAbsPowerSeriesRingElem}, Int, UInt), z, i-1, arr[i].data)
       end
       z.prec = prec
       finalizer(_nmod_abs_series_clear_fn, z)
       return z
    end
 
-   function nmod_abs_series(a::nmod_abs_series)
+   function zzModAbsPowerSeriesRingElem(a::zzModAbsPowerSeriesRingElem)
       z = new()
       R = base_ring(a)
       ccall((:nmod_poly_init2, libflint), Nothing,
-            (Ref{nmod_abs_series}, UInt, Int), z, R.n, length(a))
+            (Ref{zzModAbsPowerSeriesRingElem}, UInt, Int), z, R.n, length(a))
       ccall((:nmod_poly_set, libflint), Nothing,
-            (Ref{nmod_abs_series}, Ref{nmod_abs_series}), z, a)
+            (Ref{zzModAbsPowerSeriesRingElem}, Ref{zzModAbsPowerSeriesRingElem}), z, a)
       z.prec = a.prec
       finalizer(_nmod_abs_series_clear_fn, z)
       return z
    end      
 end
 
-function _nmod_abs_series_clear_fn(x::nmod_abs_series)
-   ccall((:nmod_poly_clear, libflint), Nothing, (Ref{nmod_abs_series}, ), x)
+function _nmod_abs_series_clear_fn(x::zzModAbsPowerSeriesRingElem)
+   ccall((:nmod_poly_clear, libflint), Nothing, (Ref{zzModAbsPowerSeriesRingElem}, ), x)
 end
 
 ###############################################################################
 #
-#   GFPAbsSeriesRing / gfp_abs_series
+#   fpAbsPowerSeriesRing / fpAbsPowerSeriesRingElem
 #
 ###############################################################################
 
-@attributes mutable struct GFPAbsSeriesRing <: SeriesRing{fpFieldElem}
+@attributes mutable struct fpAbsPowerSeriesRing <: SeriesRing{fpFieldElem}
    base_ring::fpField
    prec_max::Int
    n::UInt
    S::Symbol
  
-   function GFPAbsSeriesRing(R::Ring, prec::Int, s::Symbol,
+   function fpAbsPowerSeriesRing(R::Ring, prec::Int, s::Symbol,
                                   cached::Bool = true)
       m = modulus(R)
       return get_cached!(GFPAbsSeriesID, (R, prec, s), cached) do
@@ -4014,9 +4014,9 @@ end
 end
  
 const GFPAbsSeriesID = Dict{Tuple{fpField, Int, Symbol},
-                                 GFPAbsSeriesRing}()
+                                 fpAbsPowerSeriesRing}()
   
-mutable struct gfp_abs_series <: AbsSeriesElem{fpFieldElem}
+mutable struct fpAbsPowerSeriesRingElem <: AbsSeriesElem{fpFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -4026,85 +4026,85 @@ mutable struct gfp_abs_series <: AbsSeriesElem{fpFieldElem}
    # end of flint struct
 
    prec::Int
-   parent::GFPAbsSeriesRing
+   parent::fpAbsPowerSeriesRing
   
-   function gfp_abs_series(n::UInt)
+   function fpAbsPowerSeriesRingElem(n::UInt)
       z = new()
       ccall((:nmod_poly_init, libflint), Nothing,
-            (Ref{gfp_abs_series}, UInt), z, n)
+            (Ref{fpAbsPowerSeriesRingElem}, UInt), z, n)
       finalizer(_gfp_abs_series_clear_fn, z)
       return z
    end
   
-   function gfp_abs_series(n::UInt, arr::Vector{ZZRingElem}, len::Int, prec::Int)
+   function fpAbsPowerSeriesRingElem(n::UInt, arr::Vector{ZZRingElem}, len::Int, prec::Int)
       z = new()
       ccall((:nmod_poly_init2, libflint), Nothing,
-            (Ref{gfp_abs_series}, UInt, Int), z, n, length(arr))
+            (Ref{fpAbsPowerSeriesRingElem}, UInt, Int), z, n, length(arr))
       for i in 1:len
          tt = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), arr[i], n)
          ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-               (Ref{gfp_abs_series}, Int, UInt), z, i - 1, tt)
+               (Ref{fpAbsPowerSeriesRingElem}, Int, UInt), z, i - 1, tt)
       end
       z.prec = prec
       finalizer(_gfp_abs_series_clear_fn, z)
       return z
    end
   
-   function gfp_abs_series(n::UInt, arr::Vector{UInt}, len::Int, prec::Int)
+   function fpAbsPowerSeriesRingElem(n::UInt, arr::Vector{UInt}, len::Int, prec::Int)
       z = new()
       ccall((:nmod_poly_init2, libflint), Nothing,
-            (Ref{gfp_abs_series}, UInt, Int), z, n, length(arr))
+            (Ref{fpAbsPowerSeriesRingElem}, UInt, Int), z, n, length(arr))
       for i in 1:len
          ccall((:nmod_poly_series_set_coeff_ui, libflint), Nothing,
-               (Ref{gfp_abs_series}, Int, UInt), z, i - 1, arr[i])
+               (Ref{fpAbsPowerSeriesRingElem}, Int, UInt), z, i - 1, arr[i])
       end
       z.prec = prec
       finalizer(_gfp_abs_series_clear_fn, z)
       return z
    end
   
-   function gfp_abs_series(n::UInt, arr::Vector{fpFieldElem}, len::Int, prec::Int)
+   function fpAbsPowerSeriesRingElem(n::UInt, arr::Vector{fpFieldElem}, len::Int, prec::Int)
       z = new()
       ccall((:nmod_poly_init2, libflint), Nothing,
-            (Ref{gfp_abs_series}, UInt, Int), z, n, length(arr))
+            (Ref{fpAbsPowerSeriesRingElem}, UInt, Int), z, n, length(arr))
       for i in 1:len
          ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-               (Ref{gfp_abs_series}, Int, UInt), z, i-1, arr[i].data)
+               (Ref{fpAbsPowerSeriesRingElem}, Int, UInt), z, i-1, arr[i].data)
       end
       z.prec = prec
       finalizer(_gfp_abs_series_clear_fn, z)
       return z
    end
 
-   function gfp_abs_series(a::gfp_abs_series)
+   function fpAbsPowerSeriesRingElem(a::fpAbsPowerSeriesRingElem)
       z = new()
       R = base_ring(a)
       ccall((:nmod_poly_init2, libflint), Nothing,
-            (Ref{gfp_abs_series}, UInt, Int), z, R.n, length(a))
+            (Ref{fpAbsPowerSeriesRingElem}, UInt, Int), z, R.n, length(a))
       ccall((:nmod_poly_set, libflint), Nothing,
-            (Ref{gfp_abs_series}, Ref{gfp_abs_series}), z, a)
+            (Ref{fpAbsPowerSeriesRingElem}, Ref{fpAbsPowerSeriesRingElem}), z, a)
       z.prec = a.prec
       finalizer(_gfp_abs_series_clear_fn, z)
       return z
    end
 end
 
-function _gfp_abs_series_clear_fn(x::gfp_abs_series)
-   ccall((:nmod_poly_clear, libflint), Nothing, (Ref{gfp_abs_series}, ), x)
+function _gfp_abs_series_clear_fn(x::fpAbsPowerSeriesRingElem)
+   ccall((:nmod_poly_clear, libflint), Nothing, (Ref{fpAbsPowerSeriesRingElem}, ), x)
 end
 
 ###############################################################################
 #
-#   FmpzModAbsSeriesRing / fmpz_mod_abs_series
+#   ZZModAbsPowerSeriesRing / ZZModAbsPowerSeriesRingElem
 #
 ###############################################################################
 
-@attributes mutable struct FmpzModAbsSeriesRing <: SeriesRing{ZZModRingElem}
+@attributes mutable struct ZZModAbsPowerSeriesRing <: SeriesRing{ZZModRingElem}
    base_ring::ZZModRing
    prec_max::Int
    S::Symbol
 
-   function FmpzModAbsSeriesRing(R::Ring, prec::Int, s::Symbol,
+   function ZZModAbsPowerSeriesRing(R::Ring, prec::Int, s::Symbol,
                                  cached::Bool = true)
       return get_cached!(FmpzModAbsSeriesID, (R, prec, s), cached) do
          return new(R, prec, s)
@@ -4113,39 +4113,39 @@ end
 end
 
 const FmpzModAbsSeriesID = Dict{Tuple{ZZModRing, Int, Symbol},
-                                FmpzModAbsSeriesRing}()
+                                ZZModAbsPowerSeriesRing}()
 
-mutable struct fmpz_mod_abs_series <: AbsSeriesElem{ZZModRingElem}
+mutable struct ZZModAbsPowerSeriesRingElem <: AbsSeriesElem{ZZModRingElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
    # end flint struct
 
    prec::Int
-   parent::FmpzModAbsSeriesRing
+   parent::ZZModAbsPowerSeriesRing
 
-   function fmpz_mod_abs_series(p::fmpz_mod_ctx_struct)
+   function ZZModAbsPowerSeriesRingElem(p::fmpz_mod_ctx_struct)
       z = new()
       ccall((:fmpz_mod_poly_init, libflint), Nothing,
-            (Ref{fmpz_mod_abs_series}, Ref{fmpz_mod_ctx_struct}),
+            (Ref{ZZModAbsPowerSeriesRingElem}, Ref{fmpz_mod_ctx_struct}),
             z, p)
       finalizer(_fmpz_mod_abs_series_clear_fn, z)
       return z
    end
 
-   function fmpz_mod_abs_series(R::ZZModRing)
-      return fmpz_mod_abs_series(R.ninv)
+   function ZZModAbsPowerSeriesRingElem(R::ZZModRing)
+      return ZZModAbsPowerSeriesRingElem(R.ninv)
    end
 
-   function fmpz_mod_abs_series(p::fmpz_mod_ctx_struct, a::Vector{ZZRingElem},
+   function ZZModAbsPowerSeriesRingElem(p::fmpz_mod_ctx_struct, a::Vector{ZZRingElem},
                                 len::Int, prec::Int)
       z = new()
       ccall((:fmpz_mod_poly_init2, libflint), Nothing,
-            (Ref{fmpz_mod_abs_series}, Int, Ref{fmpz_mod_ctx_struct}),
+            (Ref{ZZModAbsPowerSeriesRingElem}, Int, Ref{fmpz_mod_ctx_struct}),
             z, len, p)
       for i = 1:len
          ccall((:fmpz_mod_poly_set_coeff_fmpz, libflint), Nothing,
-               (Ref{fmpz_mod_abs_series}, Int, Ref{ZZRingElem},
+               (Ref{ZZModAbsPowerSeriesRingElem}, Int, Ref{ZZRingElem},
                 Ref{fmpz_mod_ctx_struct}),
                z, i - 1, a[i], p)
       end
@@ -4154,19 +4154,19 @@ mutable struct fmpz_mod_abs_series <: AbsSeriesElem{ZZModRingElem}
       return z
    end
 
-   function fmpz_mod_abs_series(R::ZZModRing, a::Vector{ZZRingElem}, len::Int, prec::Int)
-      return fmpz_mod_abs_series(R.ninv, a, len, prec)
+   function ZZModAbsPowerSeriesRingElem(R::ZZModRing, a::Vector{ZZRingElem}, len::Int, prec::Int)
+      return ZZModAbsPowerSeriesRingElem(R.ninv, a, len, prec)
    end
 
-   function fmpz_mod_abs_series(p::fmpz_mod_ctx_struct, a::Vector{ZZModRingElem},
+   function ZZModAbsPowerSeriesRingElem(p::fmpz_mod_ctx_struct, a::Vector{ZZModRingElem},
                                 len::Int, prec::Int)
       z = new()
       ccall((:fmpz_mod_poly_init2, libflint), Nothing,
-            (Ref{fmpz_mod_abs_series}, Int, Ref{fmpz_mod_ctx_struct}),
+            (Ref{ZZModAbsPowerSeriesRingElem}, Int, Ref{fmpz_mod_ctx_struct}),
             z, len, p)
       for i = 1:len
          ccall((:fmpz_mod_poly_set_coeff_fmpz, libflint), Nothing,
-            (Ref{fmpz_mod_abs_series}, Int, Ref{ZZRingElem}, Ref{fmpz_mod_ctx_struct}),
+            (Ref{ZZModAbsPowerSeriesRingElem}, Int, Ref{ZZRingElem}, Ref{fmpz_mod_ctx_struct}),
 		     z, i - 1, data(a[i]), p)
       end
       z.prec = prec
@@ -4174,19 +4174,19 @@ mutable struct fmpz_mod_abs_series <: AbsSeriesElem{ZZModRingElem}
       return z
    end
 
-   function fmpz_mod_abs_series(R::ZZModRing, a::Vector{ZZModRingElem},
+   function ZZModAbsPowerSeriesRingElem(R::ZZModRing, a::Vector{ZZModRingElem},
                                 len::Int, prec::Int)
-      return fmpz_mod_abs_series(R.ninv, a, len, prec)
+      return ZZModAbsPowerSeriesRingElem(R.ninv, a, len, prec)
    end
 
-   function fmpz_mod_abs_series(a::fmpz_mod_abs_series)
+   function ZZModAbsPowerSeriesRingElem(a::ZZModAbsPowerSeriesRingElem)
       z = new()
       p = a.parent.base_ring.ninv
       ccall((:fmpz_mod_poly_init, libflint), Nothing,
-            (Ref{fmpz_mod_abs_series}, Ref{fmpz_mod_ctx_struct}),
+            (Ref{ZZModAbsPowerSeriesRingElem}, Ref{fmpz_mod_ctx_struct}),
             z, p)
       ccall((:fmpz_mod_poly_set, libflint), Nothing,
-            (Ref{fmpz_mod_abs_series}, Ref{fmpz_mod_abs_series},
+            (Ref{ZZModAbsPowerSeriesRingElem}, Ref{ZZModAbsPowerSeriesRingElem},
              Ref{fmpz_mod_ctx_struct}),
             z, a, p)
       z.prec = a.prec
@@ -4195,25 +4195,25 @@ mutable struct fmpz_mod_abs_series <: AbsSeriesElem{ZZModRingElem}
    end
 end
 
-function _fmpz_mod_abs_series_clear_fn(a::fmpz_mod_abs_series)
+function _fmpz_mod_abs_series_clear_fn(a::ZZModAbsPowerSeriesRingElem)
    ccall((:fmpz_mod_poly_clear, libflint), Nothing,
-         (Ref{fmpz_mod_abs_series}, Ref{fmpz_mod_ctx_struct}),
+         (Ref{ZZModAbsPowerSeriesRingElem}, Ref{fmpz_mod_ctx_struct}),
          a, a.parent.base_ring.ninv)
 end
 
 
 ###############################################################################
 #
-#   FqDefaultRelSeriesRing / fq_default_rel_series
+#   FqRelPowerSeriesRing / FqRelPowerSeriesRingElem
 #
 ###############################################################################
 
-@attributes mutable struct FqDefaultRelSeriesRing <: SeriesRing{FqFieldElem}
+@attributes mutable struct FqRelPowerSeriesRing <: SeriesRing{FqFieldElem}
    base_ring::FqField
    prec_max::Int
    S::Symbol
  
-   function FqDefaultRelSeriesRing(R::FqField, prec::Int, s::Symbol,
+   function FqRelPowerSeriesRing(R::FqField, prec::Int, s::Symbol,
                              cached::Bool = true)
       return get_cached!(FqDefaultRelSeriesID, (R, prec, s), cached) do
          return new(R, prec, s)
@@ -4221,32 +4221,32 @@ end
    end
 end
  
-const FqDefaultRelSeriesID = Dict{Tuple{FqField, Int, Symbol}, FqDefaultRelSeriesRing}()
+const FqDefaultRelSeriesID = Dict{Tuple{FqField, Int, Symbol}, FqRelPowerSeriesRing}()
  
-mutable struct fq_default_rel_series <: RelSeriesElem{FqFieldElem}
+mutable struct FqRelPowerSeriesRingElem <: RelSeriesElem{FqFieldElem}
    # fq_default_poly_struct is 48 bytes on 64 bit machine
    opaque::NTuple{48, Int8}
    # end of flint struct
 
    prec::Int
    val::Int
-   parent::FqDefaultRelSeriesRing
+   parent::FqRelPowerSeriesRing
  
-   function fq_default_rel_series(ctx::FqField)
+   function FqRelPowerSeriesRingElem(ctx::FqField)
       z = new()
       ccall((:fq_default_poly_init, libflint), Nothing,
-            (Ref{fq_default_rel_series}, Ref{FqField}), z, ctx)
+            (Ref{FqRelPowerSeriesRingElem}, Ref{FqField}), z, ctx)
       finalizer(_fq_default_rel_series_clear_fn, z)
       return z
    end
  
-   function fq_default_rel_series(ctx::FqField, a::Vector{FqFieldElem}, len::Int, prec::Int, val::Int)
+   function FqRelPowerSeriesRingElem(ctx::FqField, a::Vector{FqFieldElem}, len::Int, prec::Int, val::Int)
       z = new()
       ccall((:fq_default_poly_init2, libflint), Nothing,
-            (Ref{fq_default_rel_series}, Int, Ref{FqField}), z, len, ctx)
+            (Ref{FqRelPowerSeriesRingElem}, Int, Ref{FqField}), z, len, ctx)
       for i = 1:len
          ccall((:fq_default_poly_set_coeff, libflint), Nothing,
-               (Ref{fq_default_rel_series}, Int, Ref{FqFieldElem},
+               (Ref{FqRelPowerSeriesRingElem}, Int, Ref{FqFieldElem},
                 Ref{FqField}), z, i - 1, a[i], ctx)
       end
       z.prec = prec
@@ -4255,36 +4255,36 @@ mutable struct fq_default_rel_series <: RelSeriesElem{FqFieldElem}
       return z
    end
  
-   function fq_default_rel_series(ctx::FqField, a::fq_default_rel_series)
+   function FqRelPowerSeriesRingElem(ctx::FqField, a::FqRelPowerSeriesRingElem)
       z = new()
       ccall((:fq_default_poly_init, libflint), Nothing,
-            (Ref{fq_default_rel_series}, Ref{FqField}), z, ctx)
+            (Ref{FqRelPowerSeriesRingElem}, Ref{FqField}), z, ctx)
       ccall((:fq_default_poly_set, libflint), Nothing,
-            (Ref{fq_default_rel_series}, Ref{fq_default_rel_series},
+            (Ref{FqRelPowerSeriesRingElem}, Ref{FqRelPowerSeriesRingElem},
              Ref{FqField}), z, a, ctx)
       finalizer(_fq_default_rel_series_clear_fn, z)
       return z
    end
 end
  
-function _fq_default_rel_series_clear_fn(a::fq_default_rel_series)
+function _fq_default_rel_series_clear_fn(a::FqRelPowerSeriesRingElem)
    ctx = base_ring(a)
    ccall((:fq_default_poly_clear, libflint), Nothing,
-         (Ref{fq_default_rel_series}, Ref{FqField}), a, ctx)
+         (Ref{FqRelPowerSeriesRingElem}, Ref{FqField}), a, ctx)
 end
 
 ###############################################################################
 #
-#   FqRelSeriesRing / fq_rel_series
+#   FqPolyRepRelPowerSeriesRing / FqPolyRepRelPowerSeriesRingElem
 #
 ###############################################################################
 
-@attributes mutable struct FqRelSeriesRing <: SeriesRing{FqPolyRepFieldElem}
+@attributes mutable struct FqPolyRepRelPowerSeriesRing <: SeriesRing{FqPolyRepFieldElem}
    base_ring::FqPolyRepField
    prec_max::Int
    S::Symbol
 
-   function FqRelSeriesRing(R::FqPolyRepField, prec::Int, s::Symbol,
+   function FqPolyRepRelPowerSeriesRing(R::FqPolyRepField, prec::Int, s::Symbol,
                             cached::Bool = true)
       return get_cached!(FqRelSeriesID, (R, prec, s), cached) do
          return new(R, prec, s)
@@ -4292,31 +4292,31 @@ end
    end
 end
 
-const FqRelSeriesID = Dict{Tuple{FqPolyRepField, Int, Symbol}, FqRelSeriesRing}()
+const FqRelSeriesID = Dict{Tuple{FqPolyRepField, Int, Symbol}, FqPolyRepRelPowerSeriesRing}()
 
-mutable struct fq_rel_series <: RelSeriesElem{FqPolyRepFieldElem}
+mutable struct FqPolyRepRelPowerSeriesRingElem <: RelSeriesElem{FqPolyRepFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
    prec::Int
    val::Int
-   parent::FqRelSeriesRing
+   parent::FqPolyRepRelPowerSeriesRing
 
-   function fq_rel_series(ctx::FqPolyRepField)
+   function FqPolyRepRelPowerSeriesRingElem(ctx::FqPolyRepField)
       z = new()
       ccall((:fq_poly_init, libflint), Nothing,
-            (Ref{fq_rel_series}, Ref{FqPolyRepField}), z, ctx)
+            (Ref{FqPolyRepRelPowerSeriesRingElem}, Ref{FqPolyRepField}), z, ctx)
       finalizer(_fq_rel_series_clear_fn, z)
       return z
    end
 
-   function fq_rel_series(ctx::FqPolyRepField, a::Vector{FqPolyRepFieldElem}, len::Int, prec::Int, val::Int)
+   function FqPolyRepRelPowerSeriesRingElem(ctx::FqPolyRepField, a::Vector{FqPolyRepFieldElem}, len::Int, prec::Int, val::Int)
       z = new()
       ccall((:fq_poly_init2, libflint), Nothing,
-            (Ref{fq_rel_series}, Int, Ref{FqPolyRepField}), z, len, ctx)
+            (Ref{FqPolyRepRelPowerSeriesRingElem}, Int, Ref{FqPolyRepField}), z, len, ctx)
       for i = 1:len
          ccall((:fq_poly_set_coeff, libflint), Nothing,
-               (Ref{fq_rel_series}, Int, Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}),
+               (Ref{FqPolyRepRelPowerSeriesRingElem}, Int, Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}),
                                                z, i - 1, a[i], ctx)
       end
       z.prec = prec
@@ -4325,35 +4325,35 @@ mutable struct fq_rel_series <: RelSeriesElem{FqPolyRepFieldElem}
       return z
    end
 
-   function fq_rel_series(ctx::FqPolyRepField, a::fq_rel_series)
+   function FqPolyRepRelPowerSeriesRingElem(ctx::FqPolyRepField, a::FqPolyRepRelPowerSeriesRingElem)
       z = new()
       ccall((:fq_poly_init, libflint), Nothing,
-            (Ref{fq_rel_series}, Ref{FqPolyRepField}), z, ctx)
+            (Ref{FqPolyRepRelPowerSeriesRingElem}, Ref{FqPolyRepField}), z, ctx)
       ccall((:fq_poly_set, libflint), Nothing,
-            (Ref{fq_rel_series}, Ref{fq_rel_series}, Ref{FqPolyRepField}), z, a, ctx)
+            (Ref{FqPolyRepRelPowerSeriesRingElem}, Ref{FqPolyRepRelPowerSeriesRingElem}, Ref{FqPolyRepField}), z, a, ctx)
       finalizer(_fq_rel_series_clear_fn, z)
       return z
    end
 end
 
-function _fq_rel_series_clear_fn(a::fq_rel_series)
+function _fq_rel_series_clear_fn(a::FqPolyRepRelPowerSeriesRingElem)
    ctx = base_ring(a)
    ccall((:fq_poly_clear, libflint), Nothing,
-         (Ref{fq_rel_series}, Ref{FqPolyRepField}), a, ctx)
+         (Ref{FqPolyRepRelPowerSeriesRingElem}, Ref{FqPolyRepField}), a, ctx)
 end
 
 ###############################################################################
 #
-#   FqDefaultAbsSeriesRing / fq_default_abs_series
+#   FqAbsPowerSeriesRing / FqAbsPowerSeriesRingElem
 #
 ###############################################################################
 
-@attributes mutable struct FqDefaultAbsSeriesRing <: SeriesRing{FqFieldElem}
+@attributes mutable struct FqAbsPowerSeriesRing <: SeriesRing{FqFieldElem}
    base_ring::FqField
    prec_max::Int
    S::Symbol
  
-   function FqDefaultAbsSeriesRing(R::FqField, prec::Int, s::Symbol,
+   function FqAbsPowerSeriesRing(R::FqField, prec::Int, s::Symbol,
                              cached::Bool = true)
       return get_cached!(FqDefaultAbsSeriesID, (R, prec, s), cached) do
          return new(R, prec, s)
@@ -4361,31 +4361,31 @@ end
    end
 end
  
-const FqDefaultAbsSeriesID = Dict{Tuple{FqField, Int, Symbol}, FqDefaultAbsSeriesRing}()
+const FqDefaultAbsSeriesID = Dict{Tuple{FqField, Int, Symbol}, FqAbsPowerSeriesRing}()
  
-mutable struct fq_default_abs_series <: AbsSeriesElem{FqFieldElem}
+mutable struct FqAbsPowerSeriesRingElem <: AbsSeriesElem{FqFieldElem}
    # fq_default_poly_struct is 48 bytes on 64 bit machine
    opaque::NTuple{48, Int8}
    # end of flint struct
 
    prec::Int
-   parent::FqDefaultAbsSeriesRing
+   parent::FqAbsPowerSeriesRing
  
-   function fq_default_abs_series(ctx::FqField)
+   function FqAbsPowerSeriesRingElem(ctx::FqField)
       z = new()
       ccall((:fq_default_poly_init, libflint), Nothing,
-            (Ref{fq_default_abs_series}, Ref{FqField}), z, ctx)
+            (Ref{FqAbsPowerSeriesRingElem}, Ref{FqField}), z, ctx)
       finalizer(_fq_default_abs_series_clear_fn, z)
       return z
    end
  
-   function fq_default_abs_series(ctx::FqField, a::Vector{FqFieldElem}, len::Int, prec::Int)
+   function FqAbsPowerSeriesRingElem(ctx::FqField, a::Vector{FqFieldElem}, len::Int, prec::Int)
       z = new()
       ccall((:fq_default_poly_init2, libflint), Nothing,
-            (Ref{fq_default_abs_series}, Int, Ref{FqField}), z, len, ctx)
+            (Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqField}), z, len, ctx)
       for i = 1:len
          ccall((:fq_default_poly_set_coeff, libflint), Nothing,
-               (Ref{fq_default_abs_series}, Int, Ref{FqFieldElem}, Ref{FqField}),
+               (Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqFieldElem}, Ref{FqField}),
                                                 z, i - 1, a[i], ctx)
       end
       z.prec = prec
@@ -4393,35 +4393,35 @@ mutable struct fq_default_abs_series <: AbsSeriesElem{FqFieldElem}
       return z
    end
  
-   function fq_default_abs_series(ctx::FqField, a::fq_default_abs_series)
+   function FqAbsPowerSeriesRingElem(ctx::FqField, a::FqAbsPowerSeriesRingElem)
       z = new()
       ccall((:fq_default_poly_init, libflint), Nothing,
-            (Ref{fq_default_abs_series}, Ref{FqField}), z, ctx)
+            (Ref{FqAbsPowerSeriesRingElem}, Ref{FqField}), z, ctx)
       ccall((:fq_default_poly_set, libflint), Nothing,
-            (Ref{fq_default_abs_series}, Ref{fq_default_abs_series}, Ref{FqField}), z, a, ctx)
+            (Ref{FqAbsPowerSeriesRingElem}, Ref{FqAbsPowerSeriesRingElem}, Ref{FqField}), z, a, ctx)
       finalizer(_fq_default_abs_series_clear_fn, z)
       return z
    end
 end
  
-function _fq_default_abs_series_clear_fn(a::fq_default_abs_series)
+function _fq_default_abs_series_clear_fn(a::FqAbsPowerSeriesRingElem)
    ctx = base_ring(a)
    ccall((:fq_default_poly_clear, libflint), Nothing,
-         (Ref{fq_default_abs_series}, Ref{FqField}), a, ctx)
+         (Ref{FqAbsPowerSeriesRingElem}, Ref{FqField}), a, ctx)
 end
 
 ###############################################################################
 #
-#   FqAbsSeriesRing / fq_abs_series
+#   FqPolyRepAbsPowerSeriesRing / FqPolyRepAbsPowerSeriesRingElem
 #
 ###############################################################################
 
-@attributes mutable struct FqAbsSeriesRing <: SeriesRing{FqPolyRepFieldElem}
+@attributes mutable struct FqPolyRepAbsPowerSeriesRing <: SeriesRing{FqPolyRepFieldElem}
    base_ring::FqPolyRepField
    prec_max::Int
    S::Symbol
 
-   function FqAbsSeriesRing(R::FqPolyRepField, prec::Int, s::Symbol,
+   function FqPolyRepAbsPowerSeriesRing(R::FqPolyRepField, prec::Int, s::Symbol,
                             cached::Bool = true)
       return get_cached!(FqAbsSeriesID, (R, prec, s), cached) do
          return new(R, prec, s)
@@ -4429,30 +4429,30 @@ end
    end
 end
 
-const FqAbsSeriesID = Dict{Tuple{FqPolyRepField, Int, Symbol}, FqAbsSeriesRing}()
+const FqAbsSeriesID = Dict{Tuple{FqPolyRepField, Int, Symbol}, FqPolyRepAbsPowerSeriesRing}()
 
-mutable struct fq_abs_series <: AbsSeriesElem{FqPolyRepFieldElem}
+mutable struct FqPolyRepAbsPowerSeriesRingElem <: AbsSeriesElem{FqPolyRepFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
    prec::Int
-   parent::FqAbsSeriesRing
+   parent::FqPolyRepAbsPowerSeriesRing
 
-   function fq_abs_series(ctx::FqPolyRepField)
+   function FqPolyRepAbsPowerSeriesRingElem(ctx::FqPolyRepField)
       z = new()
       ccall((:fq_poly_init, libflint), Nothing,
-            (Ref{fq_abs_series}, Ref{FqPolyRepField}), z, ctx)
+            (Ref{FqPolyRepAbsPowerSeriesRingElem}, Ref{FqPolyRepField}), z, ctx)
       finalizer(_fq_abs_series_clear_fn, z)
       return z
    end
 
-   function fq_abs_series(ctx::FqPolyRepField, a::Vector{FqPolyRepFieldElem}, len::Int, prec::Int)
+   function FqPolyRepAbsPowerSeriesRingElem(ctx::FqPolyRepField, a::Vector{FqPolyRepFieldElem}, len::Int, prec::Int)
       z = new()
       ccall((:fq_poly_init2, libflint), Nothing,
-            (Ref{fq_abs_series}, Int, Ref{FqPolyRepField}), z, len, ctx)
+            (Ref{FqPolyRepAbsPowerSeriesRingElem}, Int, Ref{FqPolyRepField}), z, len, ctx)
       for i = 1:len
          ccall((:fq_poly_set_coeff, libflint), Nothing,
-               (Ref{fq_abs_series}, Int, Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}),
+               (Ref{FqPolyRepAbsPowerSeriesRingElem}, Int, Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}),
                                                z, i - 1, a[i], ctx)
       end
       z.prec = prec
@@ -4460,35 +4460,35 @@ mutable struct fq_abs_series <: AbsSeriesElem{FqPolyRepFieldElem}
       return z
    end
 
-   function fq_abs_series(ctx::FqPolyRepField, a::fq_abs_series)
+   function FqPolyRepAbsPowerSeriesRingElem(ctx::FqPolyRepField, a::FqPolyRepAbsPowerSeriesRingElem)
       z = new()
       ccall((:fq_poly_init, libflint), Nothing,
-            (Ref{fq_abs_series}, Ref{FqPolyRepField}), z, ctx)
+            (Ref{FqPolyRepAbsPowerSeriesRingElem}, Ref{FqPolyRepField}), z, ctx)
       ccall((:fq_poly_set, libflint), Nothing,
-            (Ref{fq_abs_series}, Ref{fq_abs_series}, Ref{FqPolyRepField}), z, a, ctx)
+            (Ref{FqPolyRepAbsPowerSeriesRingElem}, Ref{FqPolyRepAbsPowerSeriesRingElem}, Ref{FqPolyRepField}), z, a, ctx)
       finalizer(_fq_abs_series_clear_fn, z)
       return z
    end
 end
 
-function _fq_abs_series_clear_fn(a::fq_abs_series)
+function _fq_abs_series_clear_fn(a::FqPolyRepAbsPowerSeriesRingElem)
    ctx = base_ring(a)
    ccall((:fq_poly_clear, libflint), Nothing,
-         (Ref{fq_abs_series}, Ref{FqPolyRepField}), a, ctx)
+         (Ref{FqPolyRepAbsPowerSeriesRingElem}, Ref{FqPolyRepField}), a, ctx)
 end
 
 ###############################################################################
 #
-#   FqNmodRelSeriesRing / fq_nmod_rel_series
+#   fqPolyRepRelPowerSeriesRing / fqPolyRepRelPowerSeriesRingElem
 #
 ###############################################################################
 
-@attributes mutable struct FqNmodRelSeriesRing <: SeriesRing{fqPolyRepFieldElem}
+@attributes mutable struct fqPolyRepRelPowerSeriesRing <: SeriesRing{fqPolyRepFieldElem}
    base_ring::fqPolyRepField
    prec_max::Int
    S::Symbol
 
-   function FqNmodRelSeriesRing(R::fqPolyRepField, prec::Int, s::Symbol,
+   function fqPolyRepRelPowerSeriesRing(R::fqPolyRepField, prec::Int, s::Symbol,
                                 cached::Bool = true)
       return get_cached!(FqNmodRelSeriesID, (R, prec, s), cached) do
          return new(R, prec, s)
@@ -4497,31 +4497,31 @@ end
 end
 
 const FqNmodRelSeriesID = Dict{Tuple{fqPolyRepField, Int, Symbol},
-                               FqNmodRelSeriesRing}()
+                               fqPolyRepRelPowerSeriesRing}()
 
-mutable struct fq_nmod_rel_series <: RelSeriesElem{fqPolyRepFieldElem}
+mutable struct fqPolyRepRelPowerSeriesRingElem <: RelSeriesElem{fqPolyRepFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
    prec::Int
    val::Int
-   parent::FqNmodRelSeriesRing
+   parent::fqPolyRepRelPowerSeriesRing
 
-   function fq_nmod_rel_series(ctx::fqPolyRepField)
+   function fqPolyRepRelPowerSeriesRingElem(ctx::fqPolyRepField)
       z = new()
       ccall((:fq_nmod_poly_init, libflint), Nothing,
-            (Ref{fq_nmod_rel_series}, Ref{fqPolyRepField}), z, ctx)
+            (Ref{fqPolyRepRelPowerSeriesRingElem}, Ref{fqPolyRepField}), z, ctx)
       finalizer(_fq_nmod_rel_series_clear_fn, z)
       return z
    end
 
-   function fq_nmod_rel_series(ctx::fqPolyRepField, a::Vector{fqPolyRepFieldElem}, len::Int, prec::Int, val::Int)
+   function fqPolyRepRelPowerSeriesRingElem(ctx::fqPolyRepField, a::Vector{fqPolyRepFieldElem}, len::Int, prec::Int, val::Int)
       z = new()
       ccall((:fq_nmod_poly_init2, libflint), Nothing,
-            (Ref{fq_nmod_rel_series}, Int, Ref{fqPolyRepField}), z, len, ctx)
+            (Ref{fqPolyRepRelPowerSeriesRingElem}, Int, Ref{fqPolyRepField}), z, len, ctx)
       for i = 1:len
          ccall((:fq_nmod_poly_set_coeff, libflint), Nothing,
-               (Ref{fq_nmod_rel_series}, Int, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
+               (Ref{fqPolyRepRelPowerSeriesRingElem}, Int, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
                                                z, i - 1, a[i], ctx)
       end
       z.prec = prec
@@ -4530,35 +4530,35 @@ mutable struct fq_nmod_rel_series <: RelSeriesElem{fqPolyRepFieldElem}
       return z
    end
 
-   function fq_nmod_rel_series(ctx::fqPolyRepField, a::fq_nmod_rel_series)
+   function fqPolyRepRelPowerSeriesRingElem(ctx::fqPolyRepField, a::fqPolyRepRelPowerSeriesRingElem)
       z = new()
       ccall((:fq_nmod_poly_init, libflint), Nothing,
-            (Ref{fq_nmod_rel_series}, Ref{fqPolyRepField}), z, ctx)
+            (Ref{fqPolyRepRelPowerSeriesRingElem}, Ref{fqPolyRepField}), z, ctx)
       ccall((:fq_nmod_poly_set, libflint), Nothing,
-            (Ref{fq_nmod_rel_series}, Ref{fq_nmod_rel_series}, Ref{fqPolyRepField}), z, a, ctx)
+            (Ref{fqPolyRepRelPowerSeriesRingElem}, Ref{fqPolyRepRelPowerSeriesRingElem}, Ref{fqPolyRepField}), z, a, ctx)
       finalizer(_fq_nmod_rel_series_clear_fn, z)
       return z
    end
 end
 
-function _fq_nmod_rel_series_clear_fn(a::fq_nmod_rel_series)
+function _fq_nmod_rel_series_clear_fn(a::fqPolyRepRelPowerSeriesRingElem)
    ctx = base_ring(a)
    ccall((:fq_nmod_poly_clear, libflint), Nothing,
-         (Ref{fq_nmod_rel_series}, Ref{fqPolyRepField}), a, ctx)
+         (Ref{fqPolyRepRelPowerSeriesRingElem}, Ref{fqPolyRepField}), a, ctx)
 end
 
 ###############################################################################
 #
-#   FqNmodAbsSeriesRing / fq_nmod_abs_series
+#   fqPolyRepAbsPowerSeriesRing / fqPolyRepAbsPowerSeriesRingElem
 #
 ###############################################################################
 
-@attributes mutable struct FqNmodAbsSeriesRing <: SeriesRing{fqPolyRepFieldElem}
+@attributes mutable struct fqPolyRepAbsPowerSeriesRing <: SeriesRing{fqPolyRepFieldElem}
    base_ring::fqPolyRepField
    prec_max::Int
    S::Symbol
 
-   function FqNmodAbsSeriesRing(R::fqPolyRepField, prec::Int, s::Symbol,
+   function fqPolyRepAbsPowerSeriesRing(R::fqPolyRepField, prec::Int, s::Symbol,
                                 cached::Bool = true)
       return get_cached!(FqNmodAbsSeriesID, (R, prec, s), cached) do
          return new(R, prec, s)
@@ -4567,30 +4567,30 @@ end
 end
 
 const FqNmodAbsSeriesID = Dict{Tuple{fqPolyRepField, Int, Symbol},
-                               FqNmodAbsSeriesRing}()
+                               fqPolyRepAbsPowerSeriesRing}()
 
-mutable struct fq_nmod_abs_series <: AbsSeriesElem{fqPolyRepFieldElem}
+mutable struct fqPolyRepAbsPowerSeriesRingElem <: AbsSeriesElem{fqPolyRepFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
    prec::Int
-   parent::FqNmodAbsSeriesRing
+   parent::fqPolyRepAbsPowerSeriesRing
 
-   function fq_nmod_abs_series(ctx::fqPolyRepField)
+   function fqPolyRepAbsPowerSeriesRingElem(ctx::fqPolyRepField)
       z = new()
       ccall((:fq_nmod_poly_init, libflint), Nothing,
-            (Ref{fq_nmod_abs_series}, Ref{fqPolyRepField}), z, ctx)
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepField}), z, ctx)
       finalizer(_fq_nmod_abs_series_clear_fn, z)
       return z
    end
 
-   function fq_nmod_abs_series(ctx::fqPolyRepField, a::Vector{fqPolyRepFieldElem}, len::Int, prec::Int)
+   function fqPolyRepAbsPowerSeriesRingElem(ctx::fqPolyRepField, a::Vector{fqPolyRepFieldElem}, len::Int, prec::Int)
       z = new()
       ccall((:fq_nmod_poly_init2, libflint), Nothing,
-            (Ref{fq_nmod_abs_series}, Int, Ref{fqPolyRepField}), z, len, ctx)
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepField}), z, len, ctx)
       for i = 1:len
          ccall((:fq_nmod_poly_set_coeff, libflint), Nothing,
-               (Ref{fq_nmod_abs_series}, Int, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
+               (Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
                                                z, i - 1, a[i], ctx)
       end
       z.prec = prec
@@ -4598,21 +4598,21 @@ mutable struct fq_nmod_abs_series <: AbsSeriesElem{fqPolyRepFieldElem}
       return z
    end
 
-   function fq_nmod_abs_series(ctx::fqPolyRepField, a::fq_nmod_abs_series)
+   function fqPolyRepAbsPowerSeriesRingElem(ctx::fqPolyRepField, a::fqPolyRepAbsPowerSeriesRingElem)
       z = new()
       ccall((:fq_nmod_poly_init, libflint), Nothing,
-            (Ref{fq_nmod_abs_series}, Ref{fqPolyRepField}), z, ctx)
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepField}), z, ctx)
       ccall((:fq_nmod_poly_set, libflint), Nothing,
-            (Ref{fq_nmod_abs_series}, Ref{fq_nmod_abs_series}, Ref{fqPolyRepField}), z, a, ctx)
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepField}), z, a, ctx)
       finalizer(_fq_nmod_abs_series_clear_fn, z)
       return z
    end
 end
 
-function _fq_nmod_abs_series_clear_fn(a::fq_nmod_abs_series)
+function _fq_nmod_abs_series_clear_fn(a::fqPolyRepAbsPowerSeriesRingElem)
    ctx = base_ring(a)
    ccall((:fq_nmod_poly_clear, libflint), Nothing,
-         (Ref{fq_nmod_abs_series}, Ref{fqPolyRepField}), a, ctx)
+         (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepField}), a, ctx)
 end
 
 ###############################################################################

@@ -1,18 +1,18 @@
 ###############################################################################
 #
-#   fq_abs_series.jl: Absolute series over finite fields
+#   FqPolyRepAbsPowerSeriesRingElem.jl: Absolute series over finite fields
 #
-#   fq_abs_series, fq_nmod_abs_series
+#   FqPolyRepAbsPowerSeriesRingElem, fqPolyRepAbsPowerSeriesRingElem
 #
 ###############################################################################
 
-export fq_abs_series, FqAbsSeriesRing,
-       fq_nmod_abs_series, FqNmodAbsSeriesRing,
+export FqPolyRepAbsPowerSeriesRingElem, FqPolyRepAbsPowerSeriesRing,
+       fqPolyRepAbsPowerSeriesRingElem, fqPolyRepAbsPowerSeriesRing,
        PowerSeriesRing
 
 for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
-   (fq_abs_series, FqAbsSeriesRing, FqPolyRepField, FqPolyRepFieldElem, "fq_poly", "fq"),
-   (fq_nmod_abs_series, FqNmodAbsSeriesRing, fqPolyRepField, fqPolyRepFieldElem, "fq_nmod_poly", "fq_nmod"))
+   (FqPolyRepAbsPowerSeriesRingElem, FqPolyRepAbsPowerSeriesRing, FqPolyRepField, FqPolyRepFieldElem, "fq_poly", "fq"),
+   (fqPolyRepAbsPowerSeriesRingElem, fqPolyRepAbsPowerSeriesRing, fqPolyRepField, fqPolyRepFieldElem, "fq_nmod_poly", "fq_nmod"))
 @eval begin
 
 ###############################################################################
@@ -752,9 +752,9 @@ end # for
 
 function PowerSeriesRing(R::FqPolyRepField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
    if model == :capped_relative
-      parent_obj = FqRelSeriesRing(R, prec, s, cached)
+      parent_obj = FqPolyRepRelPowerSeriesRing(R, prec, s, cached)
    elseif model == :capped_absolute
-      parent_obj = FqAbsSeriesRing(R, prec, s, cached)
+      parent_obj = FqPolyRepAbsPowerSeriesRing(R, prec, s, cached)
    else
       error("Unknown model")
    end
@@ -767,18 +767,18 @@ function PowerSeriesRing(R::FqPolyRepField, prec::Int, s::AbstractString; model=
 end
 
 function AbsSeriesRing(R::FqPolyRepField, prec::Int)
-   return FqAbsSeriesRing(R, prec, :x, false)
+   return FqPolyRepAbsPowerSeriesRing(R, prec, :x, false)
 end
 
 function RelSeriesRing(R::FqPolyRepField, prec::Int)
-   return FqRelSeriesRing(R, prec, :x, false)
+   return FqPolyRepRelPowerSeriesRing(R, prec, :x, false)
 end
 
 function PowerSeriesRing(R::fqPolyRepField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
    if model == :capped_relative
-      parent_obj = FqNmodRelSeriesRing(R, prec, s, cached)
+      parent_obj = fqPolyRepRelPowerSeriesRing(R, prec, s, cached)
    elseif model == :capped_absolute
-      parent_obj = FqNmodAbsSeriesRing(R, prec, s, cached)
+      parent_obj = fqPolyRepAbsPowerSeriesRing(R, prec, s, cached)
    else
       error("Unknown model")
    end
@@ -791,9 +791,9 @@ function PowerSeriesRing(R::fqPolyRepField, prec::Int, s::AbstractString; model=
 end
 
 function AbsSeriesRing(R::fqPolyRepField, prec::Int)
-   return FqNmodAbsSeriesRing(R, prec, :x, false)
+   return fqPolyRepAbsPowerSeriesRing(R, prec, :x, false)
 end
 
 function RelSeriesRing(R::fqPolyRepField, prec::Int)
-   return FqNmodRelSeriesRing(R, prec, :x, false)
+   return fqPolyRepRelPowerSeriesRing(R, prec, :x, false)
 end

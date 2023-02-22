@@ -1,16 +1,16 @@
-@testset "fq_default_rel_series.types" begin
-   @test rel_series_type(FqFieldElem) == fq_default_rel_series
+@testset "FqRelPowerSeriesRingElem.types" begin
+   @test rel_series_type(FqFieldElem) == FqRelPowerSeriesRingElem
 end
 
-@testset "fq_default_rel_series.constructors" begin
+@testset "FqRelPowerSeriesRingElem.constructors" begin
    R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
-   @test elem_type(S) == fq_default_rel_series
-   @test elem_type(FqDefaultRelSeriesRing) == fq_default_rel_series
-   @test parent_type(fq_default_rel_series) == FqDefaultRelSeriesRing
+   @test elem_type(S) == FqRelPowerSeriesRingElem
+   @test elem_type(FqRelPowerSeriesRing) == FqRelPowerSeriesRingElem
+   @test parent_type(FqRelPowerSeriesRingElem) == FqRelPowerSeriesRing
 
-   @test isa(S, FqDefaultRelSeriesRing)
+   @test isa(S, FqRelPowerSeriesRing)
 
    a = x^3 + 2x + 1
    b = (t^2 + 1)*x^2 + (t + 3)x + O(x^4)
@@ -37,7 +37,7 @@ end
    @test isa(l, SeriesElem)
 end
 
-@testset "fq_default_rel_series.printing" begin
+@testset "FqRelPowerSeriesRingElem.printing" begin
    R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -46,7 +46,7 @@ end
    @test sprint(show, "text/plain", b) == "(t + 3)*x + (t^2 + 1)*x^2 + O(x^4)"
 end
 
-@testset "fq_default_rel_series.manipulation" begin
+@testset "FqRelPowerSeriesRingElem.manipulation" begin
    R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -82,7 +82,7 @@ end
    @test characteristic(S) == 23
 end
 
-@testset "fq_default_rel_series.similar" begin
+@testset "FqRelPowerSeriesRingElem.similar" begin
    R0, a = NGFiniteField(23, 2, "a")
    R, x = PowerSeriesRing(R0, 10, "x")
    S, y = PowerSeriesRing(ZZ, 10, "y")
@@ -97,11 +97,11 @@ end
       m = similar(fz, R0, 5)
       n = similar(f, 5)
 
-      @test isa(g, fq_default_rel_series)
-      @test isa(h, fq_default_rel_series)
-      @test isa(k, fq_default_rel_series)
-      @test isa(m, fq_default_rel_series)
-      @test isa(n, fq_default_rel_series)
+      @test isa(g, FqRelPowerSeriesRingElem)
+      @test isa(h, FqRelPowerSeriesRingElem)
+      @test isa(k, FqRelPowerSeriesRingElem)
+      @test isa(m, FqRelPowerSeriesRingElem)
+      @test isa(n, FqRelPowerSeriesRingElem)
 
       @test parent(g).S == :y
       @test parent(h).S == :y
@@ -130,11 +130,11 @@ end
    end
 end
 
-@testset "fq_default_rel_series.rel_series" begin
+@testset "FqRelPowerSeriesRingElem.rel_series" begin
    R, a = NGFiniteField(23, 2, "a")
    f = rel_series(R, [1, 2, 3], 3, 5, 2, "y")
 
-   @test isa(f, fq_default_rel_series)
+   @test isa(f, FqRelPowerSeriesRingElem)
    @test base_ring(f) == R
    @test coeff(f, 2) == 1
    @test coeff(f, 4) == 3
@@ -142,7 +142,7 @@ end
 
    g = rel_series(R, [1, 2, 3], 3, 7, 4)
 
-   @test isa(g, fq_default_rel_series)
+   @test isa(g, FqRelPowerSeriesRingElem)
    @test base_ring(g) == R
    @test coeff(g, 4) == 1
    @test coeff(g, 6) == 3
@@ -158,22 +158,22 @@ end
    p = rel_series(R, FqFieldElem[], 0, 3, 1)
    q = rel_series(R, [], 0, 3, 2)
 
-   @test isa(p, fq_default_rel_series)
-   @test isa(q, fq_default_rel_series)
+   @test isa(p, FqRelPowerSeriesRingElem)
+   @test isa(q, FqRelPowerSeriesRingElem)
 
    @test pol_length(p) == 0
    @test pol_length(q) == 0
 
    r = rel_series(R, ZZRingElem[1, 2, 3], 3, 11, 8)
 
-   @test isa(r, fq_default_rel_series)
+   @test isa(r, FqRelPowerSeriesRingElem)
 
    s = rel_series(R, [1, 2, 3], 3, 5, 0; max_precision=10)
 
    @test max_precision(parent(s)) == 10
 end
 
-@testset "fq_default_rel_series.unary_ops" begin
+@testset "FqRelPowerSeriesRingElem.unary_ops" begin
    R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -185,7 +185,7 @@ end
    @test isequal(-b, -1 - 2x - x^2 + O(x^3))
 end
 
-@testset "fq_default_rel_series.binary_ops" begin
+@testset "FqRelPowerSeriesRingElem.binary_ops" begin
    R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -323,7 +323,7 @@ end
    @test isequal(m1 - m4, 1+x+O(x^4))
 end
 
-@testset "fq_default_rel_series.adhoc_binary_ops" begin
+@testset "FqRelPowerSeriesRingElem.adhoc_binary_ops" begin
    R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -341,7 +341,7 @@ end
    @test isequal(d*ZZRingElem(3), 3x^2 + 9x^3 - 3x^4 + O(x^32))
 end
 
-@testset "fq_default_rel_series.comparison" begin
+@testset "FqRelPowerSeriesRingElem.comparison" begin
    R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -361,7 +361,7 @@ end
    @test !isequal(b, d)
 end
 
-@testset "fq_default_rel_series.adhoc_comparison" begin
+@testset "FqRelPowerSeriesRingElem.adhoc_comparison" begin
    R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -381,7 +381,7 @@ end
    @test ZZRingElem(1) == c
 end
 
-@testset "fq_default_rel_series.powering" begin
+@testset "FqRelPowerSeriesRingElem.powering" begin
    R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -401,7 +401,7 @@ end
    @test_throws DomainError a^-1
 end
 
-@testset "fq_default_rel_series.shift" begin
+@testset "FqRelPowerSeriesRingElem.shift" begin
    R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -423,7 +423,7 @@ end
    @test_throws DomainError shift_right(a, -1)
 end
 
-@testset "fq_default_rel_series.truncation" begin
+@testset "FqRelPowerSeriesRingElem.truncation" begin
    R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -443,7 +443,7 @@ end
    @test_throws DomainError truncate(a, -1)
 end
 
-@testset "fq_default_rel_series.inversion" begin
+@testset "FqRelPowerSeriesRingElem.inversion" begin
    R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -455,7 +455,7 @@ end
    @test isequal(inv(b), -1+O(x^30))
 end
 
-@testset "fq_default_rel_series.exact_division" begin
+@testset "FqRelPowerSeriesRingElem.exact_division" begin
    R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -473,7 +473,7 @@ end
    @test isequal(divexact(d, c), -2*x^5+2*x^4-x^2+x+O(x^6))
 end
 
-@testset "fq_default_rel_series.adhoc_exact_division" begin
+@testset "FqRelPowerSeriesRingElem.adhoc_exact_division" begin
    R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -495,7 +495,7 @@ end
    @test isequal(divexact((t + 1)*a, t + 1), a)
 end
 
-@testset "fq_default_rel_series.square_root" begin
+@testset "FqRelPowerSeriesRingElem.square_root" begin
    S, t = NGFiniteField(ZZRingElem(31), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x")
 
@@ -536,7 +536,7 @@ end
    end
 end
 
-@testset "fq_default_rel_series.special_functions" begin
+@testset "FqRelPowerSeriesRingElem.special_functions" begin
    R, t = NGFiniteField(ZZRingElem(23), 5, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -546,7 +546,7 @@ end
 end
 
 
-@testset "fq_default_rel_series.unsafe_operators" begin
+@testset "FqRelPowerSeriesRingElem.unsafe_operators" begin
    S, t = NGFiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x")
 

@@ -1,21 +1,21 @@
-@testset "fmpz_rel_series.types" begin
-   @test rel_series_type(ZZRingElem) == fmpz_rel_series
+@testset "ZZRelPowerSeriesRingElem.types" begin
+   @test rel_series_type(ZZRingElem) == ZZRelPowerSeriesRingElem
 end
 
-@testset "fmpz_rel_series.constructors" begin
+@testset "ZZRelPowerSeriesRingElem.constructors" begin
    S1 = RelSeriesRing(ZZ, 30)
    S2 = RelSeriesRing(ZZ, 30)
 
-   @test isa(S1, FmpzRelSeriesRing)
+   @test isa(S1, ZZRelPowerSeriesRing)
    @test S1 !== S2
 
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
-   @test elem_type(R) == fmpz_rel_series
-   @test elem_type(FmpzRelSeriesRing) == fmpz_rel_series
-   @test parent_type(fmpz_rel_series) == FmpzRelSeriesRing
+   @test elem_type(R) == ZZRelPowerSeriesRingElem
+   @test elem_type(ZZRelPowerSeriesRing) == ZZRelPowerSeriesRingElem
+   @test parent_type(ZZRelPowerSeriesRingElem) == ZZRelPowerSeriesRing
 
-   @test isa(R, FmpzRelSeriesRing)
+   @test isa(R, ZZRelPowerSeriesRing)
 
    a = x^3 + 2x + 1
    b = x^2 + 3x + O(x^4)
@@ -33,14 +33,14 @@ end
    @test isa(R(), SeriesElem)
 end
 
-@testset "fmpz_rel_series.printing" begin
+@testset "ZZRelPowerSeriesRingElem.printing" begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
    a = x^3 + 2x + 1
 
    @test sprint(show, "text/plain", a) == "1 + 2*x + x^3 + O(x^30)"
 end
 
-@testset "fmpz_rel_series.manipulation" begin
+@testset "ZZRelPowerSeriesRingElem.manipulation" begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
@@ -61,7 +61,7 @@ end
    @test characteristic(R) == 0
 end
 
-@testset "fmpz_rel_series.similar" begin
+@testset "ZZRelPowerSeriesRingElem.similar" begin
    R, x = PowerSeriesRing(ZZ, 10, "x")
 
    for iters = 1:10
@@ -73,11 +73,11 @@ end
       m = similar(f, ZZ, 5)
       n = similar(f, 5)
 
-      @test isa(g, fmpz_rel_series)
-      @test isa(h, fmpz_rel_series)
-      @test isa(k, fmpz_rel_series)
-      @test isa(m, fmpz_rel_series)
-      @test isa(n, fmpz_rel_series)
+      @test isa(g, ZZRelPowerSeriesRingElem)
+      @test isa(h, ZZRelPowerSeriesRingElem)
+      @test isa(k, ZZRelPowerSeriesRingElem)
+      @test isa(m, ZZRelPowerSeriesRingElem)
+      @test isa(n, ZZRelPowerSeriesRingElem)
 
       @test parent(g).S == :y
       @test parent(h).S == :y
@@ -106,10 +106,10 @@ end
    end
 end
 
-@testset "fmpz_rel_series.rel_series" begin
+@testset "ZZRelPowerSeriesRingElem.rel_series" begin
    f = rel_series(ZZ, [1, 2, 3], 3, 5, 2, "y")
 
-   @test isa(f, fmpz_rel_series)
+   @test isa(f, ZZRelPowerSeriesRingElem)
    @test base_ring(f) === ZZ
    @test coeff(f, 2) == 1
    @test coeff(f, 4) == 3
@@ -117,7 +117,7 @@ end
 
    g = rel_series(ZZ, [1, 2, 3], 3, 7, 4)
 
-   @test isa(g, fmpz_rel_series)
+   @test isa(g, ZZRelPowerSeriesRingElem)
    @test base_ring(g) === ZZ
    @test coeff(g, 4) == 1
    @test coeff(g, 6) == 3
@@ -133,8 +133,8 @@ end
    p = rel_series(ZZ, ZZRingElem[], 0, 3, 1)
    q = rel_series(ZZ, [], 0, 3, 2)
 
-   @test isa(p, fmpz_rel_series)
-   @test isa(q, fmpz_rel_series)
+   @test isa(p, ZZRelPowerSeriesRingElem)
+   @test isa(q, ZZRelPowerSeriesRingElem)
 
    @test pol_length(p) == 0
    @test pol_length(q) == 0
@@ -144,7 +144,7 @@ end
    @test max_precision(parent(s)) == 10
 end
 
-@testset "fmpz_rel_series.unary_ops" begin
+@testset "ZZRelPowerSeriesRingElem.unary_ops" begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
@@ -155,7 +155,7 @@ end
    @test -b == -1 - 2x - x^2 + O(x^3)
 end
 
-@testset "fmpz_rel_series.binary_ops" begin
+@testset "ZZRelPowerSeriesRingElem.binary_ops" begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
@@ -292,7 +292,7 @@ end
    @test isequal(m1 - m4, 1+x+O(x^4))
 end
 
-@testset "fmpz_rel_series.adhoc_binary_ops" begin
+@testset "ZZRelPowerSeriesRingElem.adhoc_binary_ops" begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
@@ -311,7 +311,7 @@ end
    @test d*ZZ(3) == 3x^2 + 9x^3 - 3x^4
 end
 
-@testset "fmpz_rel_series.comparison" begin
+@testset "ZZRelPowerSeriesRingElem.comparison" begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
@@ -326,7 +326,7 @@ end
    @test c != d
 end
 
-@testset "fmpz_rel_series.adhoc_comparison" begin
+@testset "ZZRelPowerSeriesRingElem.adhoc_comparison" begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
@@ -345,7 +345,7 @@ end
    @test ZZ(1) == c
 end
 
-@testset "fmpz_rel_series.powering" begin
+@testset "ZZRelPowerSeriesRingElem.powering" begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
@@ -364,7 +364,7 @@ end
    @test_throws DomainError a^-1
 end
 
-@testset "fmpz_rel_series.shift" begin
+@testset "ZZRelPowerSeriesRingElem.shift" begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
@@ -385,7 +385,7 @@ end
    @test_throws DomainError shift_right(a, -1)
 end
 
-@testset "fmpz_rel_series.truncation" begin
+@testset "ZZRelPowerSeriesRingElem.truncation" begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
@@ -404,7 +404,7 @@ end
    @test_throws DomainError truncate(a, -1)
 end
 
-@testset "fmpz_rel_series.exact_division" begin
+@testset "ZZRelPowerSeriesRingElem.exact_division" begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = x + x^3
@@ -421,7 +421,7 @@ end
    @test divexact(d, c) == -2*x^5+2*x^4-x^2+x+O(x^6)
 end
 
-@testset "fmpz_rel_series.adhoc_exact_division" begin
+@testset "ZZRelPowerSeriesRingElem.adhoc_exact_division" begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = x + x^3
@@ -440,7 +440,7 @@ end
    @test isequal(divexact(94872394861923874346987123694871329847a, 94872394861923874346987123694871329847), a)
 end
 
-@testset "fmpz_rel_series.inversion" begin
+@testset "ZZRelPowerSeriesRingElem.inversion" begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 1 + x + 2x^2 + O(x^5)
@@ -451,7 +451,7 @@ end
    @test inv(b) == -1
 end
 
-@testset "fmpz_rel_series.integral_derivative" begin
+@testset "ZZRelPowerSeriesRingElem.integral_derivative" begin
    R, x = PowerSeriesRing(ZZ, 10, "x")
 
    for iter = 1:100
@@ -461,7 +461,7 @@ end
    end
 end
 
-@testset "fmpz_rel_series.square_root" begin
+@testset "ZZRelPowerSeriesRingElem.square_root" begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = rand(R, 0:10, -10:10)
@@ -470,7 +470,7 @@ end
    @test isequal(sqrt(b)^2, b)
 end
 
-@testset "fmpz_rel_series.unsafe_operators" begin
+@testset "ZZRelPowerSeriesRingElem.unsafe_operators" begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    for iter = 1:300

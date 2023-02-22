@@ -1,17 +1,17 @@
 ###############################################################################
 #
-#   fq_rel_series.jl: Relative series over finite fields
+#   FqPolyRepRelPowerSeriesRingElem.jl: Relative series over finite fields
 #
-#   fq_rel_series, fq_nmod_rel_series
+#   FqPolyRepRelPowerSeriesRingElem, fqPolyRepRelPowerSeriesRingElem
 #
 ###############################################################################
 
-export fq_rel_series, FqRelSeriesRing,
-       fq_nmod_rel_series, FqNmodRelSeriesRing
+export FqPolyRepRelPowerSeriesRingElem, FqPolyRepRelPowerSeriesRing,
+       fqPolyRepRelPowerSeriesRingElem, fqPolyRepRelPowerSeriesRing
 
 for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
-   (fq_rel_series, FqRelSeriesRing, FqPolyRepField, FqPolyRepFieldElem, "fq_poly", "fq"),
-   (fq_nmod_rel_series, FqNmodRelSeriesRing, fqPolyRepField, fqPolyRepFieldElem, "fq_nmod_poly", "fq_nmod"))
+   (FqPolyRepRelPowerSeriesRingElem, FqPolyRepRelPowerSeriesRing, FqPolyRepField, FqPolyRepFieldElem, "fq_poly", "fq"),
+   (fqPolyRepRelPowerSeriesRingElem, fqPolyRepRelPowerSeriesRing, fqPolyRepField, fqPolyRepFieldElem, "fq_nmod_poly", "fq_nmod"))
 @eval begin
 
 ###############################################################################

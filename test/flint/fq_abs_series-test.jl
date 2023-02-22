@@ -1,23 +1,23 @@
-@testset "fq_abs_series.types" begin
-   @test abs_series_type(FqPolyRepFieldElem) == fq_abs_series
+@testset "FqPolyRepAbsPowerSeriesRingElem.types" begin
+   @test abs_series_type(FqPolyRepFieldElem) == FqPolyRepAbsPowerSeriesRingElem
 end
 
-@testset "fq_abs_series.constructors" begin
+@testset "FqPolyRepAbsPowerSeriesRingElem.constructors" begin
    S, t = FiniteField(ZZRingElem(23), 5, "t")
    
    R1 = AbsSeriesRing(S, 30)
    R2 = AbsSeriesRing(S, 30)
 
-   @test isa(R1, FqAbsSeriesRing)
+   @test isa(R1, FqPolyRepAbsPowerSeriesRing)
    @test R1 !== R2
 
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
-   @test elem_type(R) == fq_abs_series
-   @test elem_type(FqAbsSeriesRing) == fq_abs_series
-   @test parent_type(fq_abs_series) == FqAbsSeriesRing
+   @test elem_type(R) == FqPolyRepAbsPowerSeriesRingElem
+   @test elem_type(FqPolyRepAbsPowerSeriesRing) == FqPolyRepAbsPowerSeriesRingElem
+   @test parent_type(FqPolyRepAbsPowerSeriesRingElem) == FqPolyRepAbsPowerSeriesRing
 
-   @test isa(R, FqAbsSeriesRing)
+   @test isa(R, FqPolyRepAbsPowerSeriesRing)
 
    a = x^3 + 2x + 1
    b = x^2 + 3x + O(x^4)
@@ -35,7 +35,7 @@ end
    @test isa(R(), SeriesElem)
 end
 
-@testset "fq_abs_series.printing" begin
+@testset "FqPolyRepAbsPowerSeriesRingElem.printing" begin
    S, t = FiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -44,7 +44,7 @@ end
    @test sprint(show, "text/plain", b) == "3*x + x^2 + O(x^4)"
 end
 
-@testset "fq_abs_series.manipulation" begin
+@testset "FqPolyRepAbsPowerSeriesRingElem.manipulation" begin
    S, t = FiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -66,7 +66,7 @@ end
    @test characteristic(R) == 23
 end
 
-@testset "fq_abs_series.similar" begin
+@testset "FqPolyRepAbsPowerSeriesRingElem.similar" begin
    R0, a = FiniteField(ZZ(23), 2, "a")
    R, x = PowerSeriesRing(R0, 10, "x"; model=:capped_absolute)
    S, y = PowerSeriesRing(ZZ, 10, "y"; model=:capped_absolute)
@@ -81,11 +81,11 @@ end
       m = similar(fz, R0, 5)
       n = similar(f, 5)
 
-      @test isa(g, fq_abs_series)
-      @test isa(h, fq_abs_series)
-      @test isa(k, fq_abs_series)
-      @test isa(m, fq_abs_series)
-      @test isa(n, fq_abs_series)
+      @test isa(g, FqPolyRepAbsPowerSeriesRingElem)
+      @test isa(h, FqPolyRepAbsPowerSeriesRingElem)
+      @test isa(k, FqPolyRepAbsPowerSeriesRingElem)
+      @test isa(m, FqPolyRepAbsPowerSeriesRingElem)
+      @test isa(n, FqPolyRepAbsPowerSeriesRingElem)
 
       @test parent(g).S == :y
       @test parent(h).S == :y
@@ -114,11 +114,11 @@ end
    end
 end
 
-@testset "fq_abs_series.abs_series" begin
+@testset "FqPolyRepAbsPowerSeriesRingElem.abs_series" begin
    R, a = FiniteField(ZZ(23), 2, "a")
    f = abs_series(R, [1, 2, 3], 3, 5, "y")
 
-   @test isa(f, fq_abs_series)
+   @test isa(f, FqPolyRepAbsPowerSeriesRingElem)
    @test base_ring(f) === R
    @test coeff(f, 0) == 1
    @test coeff(f, 2) == 3
@@ -126,7 +126,7 @@ end
 
    g = abs_series(R, [1, 2, 3], 3, 5)
 
-   @test isa(g, fq_abs_series)
+   @test isa(g, FqPolyRepAbsPowerSeriesRingElem)
    @test base_ring(g) === R
    @test coeff(g, 0) == 1
    @test coeff(g, 2) == 3
@@ -142,22 +142,22 @@ end
    p = abs_series(R, FqPolyRepFieldElem[], 0, 4)
    q = abs_series(R, [], 0, 6)
 
-   @test isa(p, fq_abs_series)
-   @test isa(q, fq_abs_series)
+   @test isa(p, FqPolyRepAbsPowerSeriesRingElem)
+   @test isa(q, FqPolyRepAbsPowerSeriesRingElem)
 
    @test length(p) == 0
    @test length(q) == 0
 
    r = abs_series(R, ZZRingElem[1, 2, 3], 3, 5)
 
-   @test isa(r, fq_abs_series)
+   @test isa(r, FqPolyRepAbsPowerSeriesRingElem)
 
    s = abs_series(R, [1, 2, 3], 3, 5; max_precision=10)
    
    @test max_precision(parent(s)) == 10
 end
 
-@testset "fq_abs_series.unary_ops" begin
+@testset "FqPolyRepAbsPowerSeriesRingElem.unary_ops" begin
    S, t = FiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -169,7 +169,7 @@ end
    @test -b == -1 - 2x - x^2 + O(x^3)
 end
 
-@testset "fq_abs_series.binary_ops" begin
+@testset "FqPolyRepAbsPowerSeriesRingElem.binary_ops" begin
    S, t = FiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -189,7 +189,7 @@ end
    @test a*d == -x^7+3*x^6-x^5+6*x^4+2*x^3
 end
 
-@testset "fq_abs_series.adhoc_binary_ops" begin
+@testset "FqPolyRepAbsPowerSeriesRingElem.adhoc_binary_ops" begin
    S, t = FiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -207,7 +207,7 @@ end
    @test d*ZZ(3) == 3x^2 + 9x^3 - 3x^4
 end
 
-@testset "fq_abs_series.comparison" begin
+@testset "FqPolyRepAbsPowerSeriesRingElem.comparison" begin
    S, t = FiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -223,7 +223,7 @@ end
    @test c != d
 end
 
-@testset "fq_abs_series.adhoc_comparison" begin
+@testset "FqPolyRepAbsPowerSeriesRingElem.adhoc_comparison" begin
    S, t = FiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -243,7 +243,7 @@ end
    @test ZZ(1) == c
 end
 
-@testset "fq_abs_series.powering" begin
+@testset "FqPolyRepAbsPowerSeriesRingElem.powering" begin
    S, t = FiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -263,7 +263,7 @@ end
    @test_throws DomainError a^-1
 end
 
-@testset "fq_abs_series.shift" begin
+@testset "FqPolyRepAbsPowerSeriesRingElem.shift" begin
    S, t = FiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -285,7 +285,7 @@ end
    @test_throws DomainError shift_right(a, -1)
 end
 
-@testset "fq_abs_series.truncation" begin
+@testset "FqPolyRepAbsPowerSeriesRingElem.truncation" begin
    S, t = FiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -305,7 +305,7 @@ end
    @test_throws DomainError truncate(a, -1)
 end
 
-@testset "fq_abs_series.exact_division" begin
+@testset "FqPolyRepAbsPowerSeriesRingElem.exact_division" begin
    S, t = FiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -323,7 +323,7 @@ end
    @test divexact(d, c) == -2*x^5+2*x^4-x^2+x+O(x^6)
 end
 
-@testset "fq_abs_series.adhoc_exact_division" begin
+@testset "FqPolyRepAbsPowerSeriesRingElem.adhoc_exact_division" begin
    S, t = FiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
@@ -343,7 +343,7 @@ end
    @test isequal(divexact(94872394861923874346987123694871329847a, 94872394861923874346987123694871329847), a)
 end
 
-@testset "fq_abs_series.adhoc_exact_division" begin
+@testset "FqPolyRepAbsPowerSeriesRingElem.adhoc_exact_division" begin
    S, t = FiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
@@ -363,7 +363,7 @@ end
    @test isequal(divexact(94872394861923874346987123694871329847a, 94872394861923874346987123694871329847), a)
 end
 
-@testset "fq_abs_series.inversion" begin
+@testset "FqPolyRepAbsPowerSeriesRingElem.inversion" begin
    S, t = FiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -375,7 +375,7 @@ end
    @test inv(b) == -1
 end
 
-@testset "fq_abs_series.square_root" begin
+@testset "FqPolyRepAbsPowerSeriesRingElem.square_root" begin
    S, t = FiniteField(ZZRingElem(31), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 
@@ -415,7 +415,7 @@ end
    end
 end
 
-@testset "fq_abs_series.unsafe_operators" begin
+@testset "FqPolyRepAbsPowerSeriesRingElem.unsafe_operators" begin
    S, t = FiniteField(ZZRingElem(23), 5, "t")
    R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
 

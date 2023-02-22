@@ -1,9 +1,9 @@
 @testset "fmpz_puiseux_series.constructors" begin
    R, x = PuiseuxSeriesRing(ZZ, 30, "x")
 
-   @test elem_type(R) == FlintPuiseuxSeriesRingElem{fmpz_laurent_series}
-   @test elem_type(FlintPuiseuxSeriesRing{fmpz_laurent_series}) == FlintPuiseuxSeriesRingElem{fmpz_laurent_series}
-   @test parent_type(FlintPuiseuxSeriesRingElem{fmpz_laurent_series}) == FlintPuiseuxSeriesRing{fmpz_laurent_series}
+   @test elem_type(R) == FlintPuiseuxSeriesRingElem{ZZLaurentSeriesRingElem}
+   @test elem_type(FlintPuiseuxSeriesRing{ZZLaurentSeriesRingElem}) == FlintPuiseuxSeriesRingElem{ZZLaurentSeriesRingElem}
+   @test parent_type(FlintPuiseuxSeriesRingElem{ZZLaurentSeriesRingElem}) == FlintPuiseuxSeriesRing{ZZLaurentSeriesRingElem}
 
    @test isa(R, FlintPuiseuxSeriesRing)
 
