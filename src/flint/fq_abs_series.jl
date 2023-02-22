@@ -1,8 +1,8 @@
 ###############################################################################
 #
-#   FqPolyRepAbsPowerSeriesRingElem.jl: Absolute series over finite fields
+#   fq_abs_series.jl: Absolute series over finite fields
 #
-#   FqPolyRepAbsPowerSeriesRingElem, fqPolyRepAbsPowerSeriesRingElem
+#   fq_abs_series, fq_nmod_abs_series
 #
 ###############################################################################
 

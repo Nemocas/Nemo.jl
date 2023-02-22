@@ -1,8 +1,8 @@
 ###############################################################################
 #
-#   FqPolyRepRelPowerSeriesRingElem.jl: Relative series over finite fields
+#   fq_rel_series.jl: Relative series over finite fields
 #
-#   FqPolyRepRelPowerSeriesRingElem, fqPolyRepRelPowerSeriesRingElem
+#   fq_rel_series, fq_nmod_rel_series
 #
 ###############################################################################
 

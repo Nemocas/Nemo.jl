@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   zzModMPolyRingElem.jl : Flint multivariate polynomials over zzModRingElem and fpField
+#   nmod_mpoly.jl : Flint multivariate polynomials over nmod and GaloisField
 #
 ###############################################################################
 

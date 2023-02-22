@@ -1,8 +1,8 @@
 ###############################################################################
 #
-#   ZZModRelPowerSeriesRingElem.jl: Relative series using ZZModPolyRingElem
+#   fmpz_mod_rel_series.jl: Relative series using fmpz_mod_poly
 #
-#   ZZModRelPowerSeriesRingElem, FpRelPowerSeriesRingElem
+#   fmpz_mod_rel_series, gfp_fmpz_rel_series
 #
 ###############################################################################
 

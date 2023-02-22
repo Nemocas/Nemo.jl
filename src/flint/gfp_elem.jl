@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   fpFieldElem.jl : Nemo fpFieldElem (integers modulo small n)
+#   gfp_elem.jl : Nemo gfp_elem (integers modulo small n)
 #
 ###############################################################################
 

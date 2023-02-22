@@ -1,6 +1,6 @@
 ################################################################################
 #
-#  ZZModMatrix.jl: flint ZZModMatrix (matrices over Z/nZ, large n)
+#  fmpz_mod_mat.jl: flint fmpz_mod_mat (matrices over Z/nZ, large n)
 #
 ################################################################################
 

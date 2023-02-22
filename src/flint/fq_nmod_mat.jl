@@ -1,6 +1,6 @@
 ################################################################################
 #
-#  fqPolyRepMatrix.jl: flint fqPolyRepMatrix types in julia
+#  fq_nmod_mat.jl: flint fq_nmod_mat types in julia
 #
 ################################################################################
 

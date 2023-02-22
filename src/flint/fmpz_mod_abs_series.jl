@@ -1,8 +1,8 @@
 ###############################################################################
 #
-#   ZZModAbsPowerSeriesRingElem.jl: Absolute series using ZZModPolyRingElem
+#   fmpz_mod_abs_series.jl: Absolute series using fmpz_mod_poly
 #
-#   ZZModAbsPowerSeriesRingElem, FpAbsPowerSeriesRingElem
+#   fmpz_mod_abs_series, gfp_fmpz_abs_series
 #
 ###############################################################################
 

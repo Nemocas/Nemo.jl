@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   zzModRingElem.jl : Nemo zzModRingElem (integers modulo small n)
+#   nmod.jl : Nemo nmod (integers modulo small n)
 #
 ###############################################################################
 

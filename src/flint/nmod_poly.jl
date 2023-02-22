@@ -1,6 +1,6 @@
 ################################################################################
 #
-#  zzModPolyRingElem.jl : Flint zzModPolyRingElem (polynomials over Z/nZ, small modulus)
+#  nmod_poly.jl : Flint nmod_poly (polynomials over Z/nZ, small modulus)
 #
 ################################################################################
 

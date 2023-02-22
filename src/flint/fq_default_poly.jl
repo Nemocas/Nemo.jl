@@ -1,7 +1,7 @@
 ################################################################################
 #
-#  FqPolyRingElem.jl: Flint FqPolyRingElem
-#                      (Polynomials over FqField)
+#  fq_default_poly.jl: Flint fq_default_poly
+#                      (Polynomials over FqDefaultFiniteField)
 #
 ################################################################################
 

@@ -1,6 +1,6 @@
 ################################################################################
 #
-#  fpMatrix.jl: flint fpMatrix types in julia for small prime modulus
+#  gfp_mat.jl: flint gfp_mat types in julia for small prime modulus
 #
 ################################################################################
 

@@ -1,6 +1,6 @@
 ################################################################################
 #
-#  fqPolyRepPolyRingElem.jl: Flint fq_mod_poly (Polynomials over fqPolyRepField)
+#  fq_nmod_poly.jl: Flint fq_mod_poly (Polynomials over FqNmodFiniteField)
 #
 ################################################################################
 
