@@ -1,25 +1,25 @@
 RR = RealField()
 CC = ComplexField()
 
-@testset "ComplexElem.constructors" begin
+@testset "ComplexFieldElem.constructors" begin
    @test isa(CC, ComplexField)
    @test isa(CC(2), FieldElem)
 
-   @test elem_type(CC) == ComplexElem
+   @test elem_type(CC) == ComplexFieldElem
    @test base_ring(CC) == Union{}
 
-   @test elem_type(ComplexField) == ComplexElem
-   @test parent_type(ComplexElem) == ComplexField
+   @test elem_type(ComplexField) == ComplexFieldElem
+   @test parent_type(ComplexFieldElem) == ComplexField
 
 #   @test ComplexField(10, cached = true) === ComplexField(10, cached = true)
 #   @test ComplexField(11, cached = false) !== ComplexField(11, cached = false)
 
-   for T in [Int32, Int, BigInt, Complex{Int}, Complex{Float64}, Rational{Int}, Rational{BigInt}, Float64, BigFloat, ZZRingElem, QQFieldElem, RealElem]
-     @test ComplexElem === Nemo.promote_rule(ComplexElem, T)
+   for T in [Int32, Int, BigInt, Complex{Int}, Complex{Float64}, Rational{Int}, Rational{BigInt}, Float64, BigFloat, ZZRingElem, QQFieldElem, RealFieldElem]
+     @test ComplexFieldElem === Nemo.promote_rule(ComplexFieldElem, T)
    end
 end
 
-@testset "ComplexElem.printing" begin
+@testset "ComplexFieldElem.printing" begin
    @test occursin(r"\A0\Z", string(CC(0)))
    @test occursin(r"\A1\.[0]+\Z", string(CC(1)))
    @test occursin(r"\A1\.[0]+[ ]*\*[ ]*?im\Z", string(onei(CC)))
@@ -27,7 +27,7 @@ end
                                                       string(CC(1) + onei(CC)))
 end
 
-@testset "ComplexElem.basic_ops" begin
+@testset "ComplexFieldElem.basic_ops" begin
    @test one(CC) == 1
    @test zero(CC) == 0
 
@@ -66,7 +66,7 @@ end
    @test characteristic(CC) == 0
 end
 
-@testset "ComplexElem.comparison" begin
+@testset "ComplexFieldElem.comparison" begin
    exact3 = CC(3)
    exact4 = CC(4)
    approx3 = CC("3 +/- 0.000001")
@@ -100,7 +100,7 @@ end
 end
 
 
-@testset "ComplexElem.predicates" begin
+@testset "ComplexFieldElem.predicates" begin
    @test iszero(CC(0))
    @test !iszero(CC(1))
    @test !iszero(CC("0 +/- 0.01"))
@@ -125,14 +125,14 @@ end
    @test !isinteger(CC("3 +/- 0.01"))
 end
 
-@testset "ComplexElem.unary_ops" begin
+@testset "ComplexFieldElem.unary_ops" begin
    @test -CC(3) == CC(-3)
    @test abs(-CC(3)) == 3
    @test abs(CC(3)) == 3
    @test inv(CC(2)) == CC(QQ(1,2))
 end
 
-@testset "ComplexElem.binary_ops" begin
+@testset "ComplexFieldElem.binary_ops" begin
    x = CC(2)
    y = CC(4)
 
@@ -154,7 +154,7 @@ end
       @test x ^ T(4) == 16
    end
 
-   for T in [Float64, BigFloat, RealElem]
+   for T in [Float64, BigFloat, RealFieldElem]
       @test contains(x + T(4), 6)
       @test contains(x - T(4), -2)
       @test contains(x * T(4), 8)
@@ -167,7 +167,7 @@ end
    end
 end
 
-@testset "ComplexElem.misc_ops" begin
+@testset "ComplexFieldElem.misc_ops" begin
    @test ldexp(CC(3), 2) == 12
    @test ldexp(CC(3), ZZ(2)) == 12
    @test contains(trim(CC("1.1 +/- 0.001")), CC("1.1"))
@@ -187,7 +187,7 @@ end
    @test !uniq
 end
 
-@testset "ComplexElem.unsafe_ops" begin
+@testset "ComplexFieldElem.unsafe_ops" begin
    z = CC(1)
    x = CC(2)
    y = CC(3)
@@ -205,11 +205,11 @@ end
    @test z == 1.5
 end
 
-@testset "ComplexElem.constants" begin
+@testset "ComplexFieldElem.constants" begin
    @test overlaps(const_pi(CC), CC("3.141592653589793238462643 +/- 4.03e-25"))
 end
 
-@testset "ComplexElem.functions" begin
+@testset "ComplexFieldElem.functions" begin
    z = CC("0.2", "0.3")
    a = CC("0.3", "0.4")
    b = CC("0.4", "0.5")
@@ -434,14 +434,14 @@ end
    @test overlaps(prod_sqr, CC(2))
 end
 
-@testset "ComplexElem.ZZPolyRingElem" begin
+@testset "ComplexFieldElem.ZZPolyRingElem" begin
    R, x = PolynomialRing(ZZ, "x")
    @test hilbert_class_polynomial(-3, R) == x
    @test_throws ArgumentError hilbert_class_polynomial(2, R)
    @test_throws ArgumentError hilbert_class_polynomial(-2, R)
 end
 
-@testset "ComplexElem.lindep" begin
+@testset "ComplexFieldElem.lindep" begin
    set_precision!(Balls, 512) do
      tau1 = CC(1//3, 8//7)
      tau2 = CC(1//5, 9//8)
@@ -471,7 +471,7 @@ end
   end
 end
 
-@testset "ComplexElem.integration" begin
+@testset "ComplexFieldElem.integration" begin
    res = Nemo.integrate(CC, x->x,  -1, 1)
    @test contains(res, CC(0))
    @test imag(res) == CC(0)

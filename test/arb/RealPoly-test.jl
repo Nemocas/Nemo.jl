@@ -12,7 +12,7 @@ RR = RealField()
    @test elem_type(R) == RealPoly
    @test elem_type(RealPolyRing) == RealPoly
    @test parent_type(RealPoly) == RealPolyRing
-   @test dense_poly_type(RealElem) == RealPoly
+   @test dense_poly_type(RealFieldElem) == RealPoly
 
    @test typeof(R) <: RealPolyRing
 
@@ -350,8 +350,8 @@ end
    R, x = PolynomialRing(RR, "x")
 
    n = 5
-   xs = RealElem[inv(RR(i)) for i=1:n]
-   ys = RealElem[RR(i) for i=1:n]
+   xs = RealFieldElem[inv(RR(i)) for i=1:n]
+   ys = RealFieldElem[RR(i) for i=1:n]
 
    f = interpolate(R, xs, ys)
    vs = evaluate(f, xs)

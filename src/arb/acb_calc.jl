@@ -1,15 +1,15 @@
 export integrate
 
-function acb_calc_func_wrap(res::Ptr{ComplexElem}, x::Ptr{ComplexElem}, param::Ptr{Nothing}, order::Int, prec::Int)
+function acb_calc_func_wrap(res::Ptr{ComplexFieldElem}, x::Ptr{ComplexFieldElem}, param::Ptr{Nothing}, order::Int, prec::Int)
     xx = unsafe_load(x)
     F = unsafe_pointer_to_objref(param)
     w = F(xx)
-    ccall((:acb_set, libarb), Ptr{Nothing}, (Ptr{ComplexElem}, Ref{ComplexElem}), res, w)
+    ccall((:acb_set, libarb), Ptr{Nothing}, (Ptr{ComplexFieldElem}, Ref{ComplexFieldElem}), res, w)
     return zero(Cint)
 end
 
 acb_calc_func_wrap_c() = @cfunction(acb_calc_func_wrap, Cint,
-        (Ptr{ComplexElem}, Ptr{ComplexElem}, Ptr{Nothing}, Int, Int))
+        (Ptr{ComplexFieldElem}, Ptr{ComplexFieldElem}, Ptr{Nothing}, Int, Int))
 
 const ARB_CALC_SUCCESS = UInt(0)
 const ARB_CALC_NO_CONVERGENCE = UInt(2)
@@ -58,11 +58,11 @@ function integrate(C::ComplexField, F, a, b;
    res = C()
 
    status = ccall((:acb_calc_integrate, libarb), UInt,
-                  (Ref{ComplexElem},                       #res
+                  (Ref{ComplexFieldElem},                       #res
                    Ptr{Nothing},                      #func
                    Any,                            #params
-                   Ref{ComplexElem},                       #a
-                   Ref{ComplexElem},                       #b
+                   Ref{ComplexFieldElem},                       #a
+                   Ref{ComplexFieldElem},                       #b
                    Int,                            #rel_goal
                    Ref{mag_struct},                #abs_tol
                    Ref{acb_calc_integrate_opts},   #opts

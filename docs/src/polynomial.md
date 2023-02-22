@@ -54,11 +54,11 @@ AbstractAlgebra.jl, for specific coefficient rings.
 ### Remove and valuation
 
 ```@docs
-evaluate2(::RealPoly, ::RealElem)
+evaluate2(::RealPoly, ::RealFieldElem)
 ```
 
 ```@docs
-evaluate2(::ComplexPoly, ::ComplexElem)
+evaluate2(::ComplexPoly, ::ComplexFieldElem)
 ```
 
 **Examples**

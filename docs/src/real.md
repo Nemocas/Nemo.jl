@@ -11,9 +11,9 @@ represented in mid-rad interval form $[m \pm r] = [m-r, m+r]$.
 The types of real balls in Nemo are given in the following table, along with
 the libraries that provide them and the associated types of the parent objects.
 
- Library | Field                | Element type  | Parent type
----------|----------------------|---------------|--------------
-Arb      | $\mathbb{R}$ (balls) | `RealElem`    | `RealField`
+ Library | Field                | Element type       | Parent type
+---------|----------------------|--------------------|--------------
+Arb      | $\mathbb{R}$ (balls) | `RealFieldElem`    | `RealField`
 
 The real field types belong to the `Field` abstract type and the types of
 elements in this field, i.e. balls in this case, belong to the `FieldElem`
@@ -110,47 +110,47 @@ convert(Float64, RR(1//3))
 ### Basic manipulation
 
 ```@docs
-is_nonzero(::RealElem)
+is_nonzero(::RealFieldElem)
 ```
 
 ```@docs
-isfinite(::RealElem)
+isfinite(::RealFieldElem)
 ```
 
 ```@docs
-is_exact(::RealElem)
+is_exact(::RealFieldElem)
 ```
 
 ```@docs
-isinteger(::RealElem)
+isinteger(::RealFieldElem)
 ```
 
 ```@docs
-is_positive(::RealElem)
+is_positive(::RealFieldElem)
 ```
 
 ```@docs
-is_nonnegative(::RealElem)
+is_nonnegative(::RealFieldElem)
 ```
 
 ```@docs
-is_negative(::RealElem)
+is_negative(::RealFieldElem)
 ```
 
 ```@docs
-is_nonpositive(::RealElem)
+is_nonpositive(::RealFieldElem)
 ```
 
 ```@docs
-midpoint(::RealElem)
+midpoint(::RealFieldElem)
 ```
 
 ```@docs
-radius(::RealElem)
+radius(::RealFieldElem)
 ```
 
 ```@docs
-accuracy_bits(::RealElem)
+accuracy_bits(::RealFieldElem)
 ```
 
 **Examples**
@@ -216,42 +216,42 @@ contained in a given real ball or whether two balls overlap. The following
 functions are provided for this purpose.
 
 ```@docs
-overlaps(::RealElem, ::RealElem)
+overlaps(::RealFieldElem, ::RealFieldElem)
 ```
 
 ```@docs
-contains(::RealElem, ::RealElem)
+contains(::RealFieldElem, ::RealFieldElem)
 ```
 
 ```@docs
-contains(::RealElem, ::Integer)
-contains(::RealElem, ::ZZRingElem)
-contains(::RealElem, ::QQFieldElem)
-contains{T <: Integer}(::RealElem, ::Rational{T})
-contains(::RealElem, ::BigFloat)
+contains(::RealFieldElem, ::Integer)
+contains(::RealFieldElem, ::ZZRingElem)
+contains(::RealFieldElem, ::QQFieldElem)
+contains{T <: Integer}(::RealFieldElem, ::Rational{T})
+contains(::RealFieldElem, ::BigFloat)
 ```
 
 The following functions are also provided for determining if a ball intersects
 a certain part of the real number line.
 
 ```@docs
-contains_zero(::RealElem)
+contains_zero(::RealFieldElem)
 ```
 
 ```@docs
-contains_negative(::RealElem)
+contains_negative(::RealFieldElem)
 ```
 
 ```@docs
-contains_positive(::RealElem)
+contains_positive(::RealFieldElem)
 ```
 
 ```@docs
-contains_nonnegative(::RealElem)
+contains_nonnegative(::RealFieldElem)
 ```
 
 ```@docs
-contains_nonpositive(::RealElem)
+contains_nonpositive(::RealFieldElem)
 ```
 
 **Examples**
@@ -280,7 +280,7 @@ is distinct from arithmetic equality implemented by `==`, which merely compares 
 the minimum of the precisions of its operands.
 
 ```@docs
-isequal(::RealElem, ::RealElem)
+isequal(::RealFieldElem, ::RealFieldElem)
 ```
 
 We also provide a full range of ad hoc comparison operators. These are implemented
@@ -288,22 +288,22 @@ directly in Julia, but we document them as though `isless` and `==` were provide
 
 Function                      |
 ------------------------------|
-`==(x::RealElem, y::Integer)`      |
-`==(x::Integer, y::RealElem)`      |
-`==(x::RealElem, y::ZZRingElem)`         |
-`==(x::ZZRingElem, y::RealElem)`         |
-`==(x::RealElem, y::Float64)`      |
-`==(x::Float64, y::RealElem)`      |
-`isless(x::RealElem, y::Integer)`  |
-`isless(x::Integer, y::RealElem)`  |
-`isless(x::RealElem, y::ZZRingElem)`     |
-`isless(x::ZZRingElem, y::RealElem)`     |
-`isless(x::RealElem, y::Float64)`  |
-`isless(x::Float64, y::RealElem)`  |
-`isless(x::RealElem, y::BigFloat)` |
-`isless(x::BigFloat, y::RealElem)` |
-`isless(x::RealElem, y::QQFieldElem)`     |
-`isless(x::QQFieldElem, y::RealElem)`     |
+`==(x::RealFieldElem, y::Integer)`      |
+`==(x::Integer, y::RealFieldElem)`      |
+`==(x::RealFieldElem, y::ZZRingElem)`         |
+`==(x::ZZRingElem, y::RealFieldElem)`         |
+`==(x::RealFieldElem, y::Float64)`      |
+`==(x::Float64, y::RealFieldElem)`      |
+`isless(x::RealFieldElem, y::Integer)`  |
+`isless(x::Integer, y::RealFieldElem)`  |
+`isless(x::RealFieldElem, y::ZZRingElem)`     |
+`isless(x::ZZRingElem, y::RealFieldElem)`     |
+`isless(x::RealFieldElem, y::Float64)`  |
+`isless(x::Float64, y::RealFieldElem)`  |
+`isless(x::RealFieldElem, y::BigFloat)` |
+`isless(x::BigFloat, y::RealFieldElem)` |
+`isless(x::RealFieldElem, y::QQFieldElem)`     |
+`isless(x::QQFieldElem, y::RealFieldElem)`     |
 
 **Examples**
 
@@ -345,19 +345,19 @@ b = ldexp(x, -ZZ(15))
 ### Miscellaneous operations
 
 ```@docs
-add_error!(::RealElem, ::RealElem)
+add_error!(::RealFieldElem, ::RealFieldElem)
 ```
 
 ```@docs
-trim(::RealElem)
+trim(::RealFieldElem)
 ```
 
 ```@docs
-unique_integer(::RealElem)
+unique_integer(::RealFieldElem)
 ```
 
 ```@docs
-setunion(::RealElem, ::RealElem)
+setunion(::RealFieldElem, ::RealFieldElem)
 ```
 
 **Examples**
@@ -420,71 +420,71 @@ d = const_glaisher(RR)
 ### Mathematical and special functions
 
 ```@docs
-rsqrt(::RealElem)
+rsqrt(::RealFieldElem)
 ```
 
 ```@docs
-sqrt1pm1(::RealElem)
+sqrt1pm1(::RealFieldElem)
 ```
 
 ```@docs
-sqrtpos(::RealElem)
+sqrtpos(::RealFieldElem)
 ```
 
 ```@docs
-gamma(::RealElem)
+gamma(::RealFieldElem)
 ```
 
 ```@docs
-lgamma(::RealElem)
+lgamma(::RealFieldElem)
 ```
 
 ```@docs
-rgamma(::RealElem)
+rgamma(::RealFieldElem)
 ```
 
 ```@docs
-digamma(::RealElem)
+digamma(::RealFieldElem)
 ```
 
 ```@docs
-gamma(::RealElem, ::RealElem)
+gamma(::RealFieldElem, ::RealFieldElem)
 ```
 
 ```@docs
-gamma_regularized(::RealElem, ::RealElem)
+gamma_regularized(::RealFieldElem, ::RealFieldElem)
 ```
 
 ```@docs
-gamma_lower(::RealElem, ::RealElem)
+gamma_lower(::RealFieldElem, ::RealFieldElem)
 ```
 
 ```@docs
-gamma_lower_regularized(::RealElem, ::RealElem)
+gamma_lower_regularized(::RealFieldElem, ::RealFieldElem)
 ```
 
 ```@docs
-zeta(::RealElem)
+zeta(::RealFieldElem)
 ```
 
 ```@docs
-atan2(::RealElem, ::RealElem)
+atan2(::RealFieldElem, ::RealFieldElem)
 ```
 
 ```@docs
-agm(::RealElem, ::RealElem)
+agm(::RealFieldElem, ::RealFieldElem)
 ```
 
 ```@docs
-zeta(::RealElem, ::RealElem)
+zeta(::RealFieldElem, ::RealFieldElem)
 ```
 
 ```@docs
-root(::RealElem, ::Int)
+root(::RealFieldElem, ::Int)
 ```
 
 ```@docs
-factorial(::RealElem)
+factorial(::RealFieldElem)
 ```
 
 ```@docs
@@ -492,7 +492,7 @@ factorial(::Int, ::RealField)
 ```
 
 ```@docs
-binomial(::RealElem, ::UInt)
+binomial(::RealFieldElem, ::UInt)
 ```
 
 ```@docs
@@ -524,7 +524,7 @@ bernoulli(::Int, ::RealField)
 ```
 
 ```@docs
-rising_factorial(::RealElem, ::Int)
+rising_factorial(::RealFieldElem, ::Int)
 ```
 
 ```@docs
@@ -532,27 +532,27 @@ rising_factorial(::QQFieldElem, ::Int, ::RealField)
 ```
 
 ```@docs
-rising_factorial2(::RealElem, ::Int)
+rising_factorial2(::RealFieldElem, ::Int)
 ```
 
 ```@docs
-polylog(::Union{RealElem,Int}, ::RealElem)
+polylog(::Union{RealFieldElem,Int}, ::RealFieldElem)
 ```
 
 ```@docs
-chebyshev_t(::Int, ::RealElem)
+chebyshev_t(::Int, ::RealFieldElem)
 ```
 
 ```@docs
-chebyshev_u(::Int, ::RealElem)
+chebyshev_u(::Int, ::RealFieldElem)
 ```
 
 ```@docs
-chebyshev_t2(::Int, ::RealElem)
+chebyshev_t2(::Int, ::RealFieldElem)
 ```
 
 ```@docs
-chebyshev_u2(::Int, ::RealElem)
+chebyshev_u2(::Int, ::RealFieldElem)
 ```
 
 ```@docs
@@ -572,19 +572,19 @@ numpart(::Int, ::RealField)
 ```
 
 ```@docs
-airy_ai(::RealElem)
+airy_ai(::RealFieldElem)
 ```
 
 ```@docs
-airy_ai_prime(::RealElem)
+airy_ai_prime(::RealFieldElem)
 ```
 
 ```@docs
-airy_bi(::RealElem)
+airy_bi(::RealFieldElem)
 ```
 
 ```@docs
-airy_bi_prime(::RealElem)
+airy_bi_prime(::RealFieldElem)
 ```
 
 **Examples**
@@ -602,7 +602,7 @@ f = polylog(3, RR(-10))
 ### Linear dependence
 
 ```@docs
-lindep(::Vector{RealElem}, n::Int)
+lindep(::Vector{RealFieldElem}, n::Int)
 ```
 
 **Examples**
@@ -617,7 +617,7 @@ W = lindep(V, 20)
 ```
 
 ```@docs
-simplest_rational_inside(::RealElem)
+simplest_rational_inside(::RealFieldElem)
 ```
 
 **Examples**

@@ -114,9 +114,9 @@ end
    end
 
    # issue #651
-   m = one(Generic.MatSpace{RealElem}(RR, 2, 2, false))
+   m = one(Generic.MatSpace{RealFieldElem}(RR, 2, 2, false))
    for n = (m, -m, m*m, m+m, 2m)
-      @test n isa Generic.MatSpaceElem{RealElem}
+      @test n isa Generic.MatSpaceElem{RealFieldElem}
    end
 end
 

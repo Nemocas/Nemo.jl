@@ -39,7 +39,7 @@ base_ring(a::RealMat) = RealField()
 parent(x::RealMat, cached::Bool = true) =
       MatrixSpace(base_ring(x), nrows(x), ncols(x))
 
-dense_matrix_type(::Type{RealElem}) = RealMat
+dense_matrix_type(::Type{RealFieldElem}) = RealMat
 
 function check_parent(x::RealMat, y::RealMat, throw::Bool = true)
    fl = (nrows(x) != nrows(y) || ncols(x) != ncols(y) || base_ring(x) != base_ring(y))
@@ -49,9 +49,9 @@ end
 
 function getindex!(z::arb, x::RealMat, r::Int, c::Int)
   GC.@preserve x begin
-     v = ccall((:arb_mat_entry_ptr, libarb), Ptr{RealElem},
+     v = ccall((:arb_mat_entry_ptr, libarb), Ptr{RealFieldElem},
                  (Ref{RealMat}, Int, Int), x, r - 1, c - 1)
-     ccall((:arb_set, libarb), Nothing, (Ref{RealElem}, Ptr{RealElem}), z, v)
+     ccall((:arb_set, libarb), Nothing, (Ref{RealFieldElem}, Ptr{RealFieldElem}), z, v)
   end
   return z
 end
@@ -61,20 +61,20 @@ end
 
   z = base_ring(x)()
   GC.@preserve x begin
-     v = ccall((:arb_mat_entry_ptr, libarb), Ptr{RealElem},
+     v = ccall((:arb_mat_entry_ptr, libarb), Ptr{RealFieldElem},
                  (Ref{RealMat}, Int, Int), x, r - 1, c - 1)
-     ccall((:arb_set, libarb), Nothing, (Ref{RealElem}, Ptr{RealElem}), z, v)
+     ccall((:arb_set, libarb), Nothing, (Ref{RealFieldElem}, Ptr{RealFieldElem}), z, v)
   end
   return z
 end
 
-for T in [Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealElem, AbstractString]
+for T in [Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, AbstractString]
    @eval begin
       @inline function setindex!(x::RealMat, y::$T, r::Int, c::Int)
          @boundscheck Generic._checkbounds(x, r, c)
 
          GC.@preserve x begin
-            z = ccall((:arb_mat_entry_ptr, libarb), Ptr{RealElem},
+            z = ccall((:arb_mat_entry_ptr, libarb), Ptr{RealFieldElem},
                       (Ref{RealMat}, Int, Int), x, r - 1, c - 1)
             Nemo._arb_set(z, y, precision(Balls))
          end
@@ -212,14 +212,14 @@ end
 function *(x::RealMat, y::arb)
   z = similar(x)
   ccall((:arb_mat_scalar_mul_arb, libarb), Nothing,
-              (Ref{RealMat}, Ref{RealMat}, Ref{RealElem}, Int),
+              (Ref{RealMat}, Ref{RealMat}, Ref{RealFieldElem}, Int),
               z, x, y, precision(Balls))
   return z
 end
 
 *(x::arb, y::RealMat) = y*x
 
-for T in [Integer, ZZRingElem, QQFieldElem, RealElem]
+for T in [Integer, ZZRingElem, QQFieldElem, RealFieldElem]
    @eval begin
       function +(x::RealMat, y::$T)
          z = deepcopy(x)
@@ -443,7 +443,7 @@ end
 function divexact(x::RealMat, y::arb; check::Bool=true)
   z = similar(x)
   ccall((:arb_mat_scalar_div_arb, libarb), Nothing,
-              (Ref{RealMat}, Ref{RealMat}, Ref{RealElem}, Int),
+              (Ref{RealMat}, Ref{RealMat}, Ref{RealFieldElem}, Int),
               z, x, y, precision(Balls))
   return z
 end
@@ -472,7 +472,7 @@ function det(x::RealMat, prec = precision(Balls))
   ncols(x) != nrows(x) && error("Matrix must be square")
   z = base_ring(x)()
   ccall((:arb_mat_det, libarb), Nothing,
-              (Ref{RealElem}, Ref{RealMat}, Int), z, x, prec)
+              (Ref{RealFieldElem}, Ref{RealMat}, Int), z, x, prec)
   return z
 end
 
@@ -595,12 +595,12 @@ Returns a nonnegative element $z$ of type `arb`, such that $z$ is an upper
 bound for the infinity norm for every matrix in $x$
 """
 function bound_inf_norm(x::RealMat)
-  z = RealElem()
+  z = RealFieldElem()
   GC.@preserve x z begin
-     t = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ref{RealElem}, ), z)
+     t = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ref{RealFieldElem}, ), z)
      ccall((:arb_mat_bound_inf_norm, libarb), Nothing,
                  (Ptr{mag_struct}, Ref{RealMat}), t, x)
-     s = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ref{RealElem}, ), z)
+     s = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ref{RealFieldElem}, ), z)
      ccall((:arf_set_mag, libarb), Nothing,
                  (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
      ccall((:mag_zero, libarb), Nothing,
@@ -645,20 +645,20 @@ function (x::RealMatSpace)(y::ZZMatrix)
   return z
 end
 
-function (x::RealMatSpace)(y::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealElem, AbstractString}}
+function (x::RealMatSpace)(y::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, AbstractString}}
   _check_dim(nrows(x), ncols(x), y)
   z = RealMat(nrows(x), ncols(x), y, precision(Balls))
   return z
 end
 
-function (x::RealMatSpace)(y::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealElem, AbstractString}}
+function (x::RealMatSpace)(y::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, AbstractString}}
   _check_dim(nrows(x), ncols(x), y)
   z = RealMat(nrows(x), ncols(x), y, precision(Balls))
   return z
 end
 
 function (x::RealMatSpace)(y::Union{Int, UInt, ZZRingElem, QQFieldElem, Float64,
-                          BigFloat, RealElem, AbstractString})
+                          BigFloat, RealFieldElem, AbstractString})
   z = x()
   for i in 1:nrows(z)
       for j = 1:ncols(z)
@@ -680,12 +680,12 @@ end
 #
 ###############################################################################
 
-function matrix(R::RealField, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealElem, AbstractString}}
+function matrix(R::RealField, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, AbstractString}}
    z = RealMat(size(arr, 1), size(arr, 2), arr, precision(Balls))
    return z
 end
 
-function matrix(R::RealField, r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealElem, AbstractString}}
+function matrix(R::RealField, r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, AbstractString}}
    _check_dim(r, c, arr)
    z = RealMat(r, c, arr, precision(Balls))
    return z
@@ -754,7 +754,7 @@ promote_rule(::Type{RealMat}, ::Type{ZZRingElem}) = RealMat
 
 promote_rule(::Type{RealMat}, ::Type{QQFieldElem}) = RealMat
 
-promote_rule(::Type{RealMat}, ::Type{RealElem}) = RealMat
+promote_rule(::Type{RealMat}, ::Type{RealFieldElem}) = RealMat
 
 promote_rule(::Type{RealMat}, ::Type{Float64}) = RealMat
 

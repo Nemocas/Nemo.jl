@@ -14,9 +14,9 @@ constructs the parent object for the Arb complex field.
 The types of complex boxes in Nemo are given in the following table, along with
 the libraries that provide them and the associated types of the parent objects.
 
- Library | Field                | Element type  | Parent type
----------|----------------------|---------------|--------------
-Arb      | $\mathbb{C}$ (boxes) | `ComplexElem` | `ComplexField`
+ Library | Field                | Element type       | Parent type
+---------|----------------------|--------------------|--------------
+Arb      | $\mathbb{C}$ (boxes) | `ComplexFieldElem` | `ComplexField`
 
 All the complex field types belong to the `Field` abstract type and the types of
 elements in this field, i.e. complex boxes in this case, belong to the
@@ -92,7 +92,7 @@ fields. Any custom complex field implementation in Nemo should provide analogues
 of these functions along with the usual arithmetic operations.
 
 ```
-parent_type(::Type{ComplexElem})
+parent_type(::Type{ComplexFieldElem})
 ```
 
 Gives the type of the parent object of an Arb complex field element.
@@ -105,7 +105,7 @@ Given the parent object for an Arb complex field, return the type of elements
 of the field.
 
 ```
-mul!(c::ComplexElem, a::ComplexElem, b::ComplexElem)
+mul!(c::ComplexFieldElem, a::ComplexFieldElem, b::ComplexFieldElem)
 ```
 
 Multiply $a$ by $b$ and set the existing Arb complex field element $c$ to the
@@ -114,7 +114,7 @@ allocating a new object for the result and eliminates associated garbage
 collection.
 
 ```
-addeq!(c::ComplexElem, a::ComplexElem)
+addeq!(c::ComplexFieldElem, a::ComplexFieldElem)
 ```
 
 In-place addition adds $a$ to $c$ and sets $c$ to the result. This function
@@ -122,7 +122,7 @@ is provided for performance reasons as it saves allocating a new object for
 the result and eliminates associated garbage collection.
 
 ```
-deepcopy(a::ComplexElem)
+deepcopy(a::ComplexFieldElem)
 ```
 
 Return a copy of the Arb complex field element $a$, recursively copying the
@@ -170,7 +170,7 @@ R(f::arb)
 Coerce the given Arb real ball into the Arb complex field.
 
 ```
-R(f::ComplexElem)
+R(f::ComplexFieldElem)
 ```
 
 Take an Arb complex field element that is already in an Arb field and simply
@@ -195,25 +195,25 @@ that they provide the equivalent of the function `base_ring(R::ComplexField)`
 which should return `Union{}`. In addition to this they should ensure that
 each complex field element contains a field `parent` specifying the parent
 object of the complex field element, or at least supply the equivalent of the
-function `parent(a::ComplexElem)` to return the parent object of a complex field
+function `parent(a::ComplexFieldElem)` to return the parent object of a complex field
 element.
 
 ### Basic manipulation
 
 ```@docs
-isfinite(::ComplexElem)
+isfinite(::ComplexFieldElem)
 ```
 
 ```@docs
-is_exact(::ComplexElem)
+is_exact(::ComplexFieldElem)
 ```
 
 ```@docs
-isinteger(::ComplexElem)
+isinteger(::ComplexFieldElem)
 ```
 
 ```@docs
-accuracy_bits(::ComplexElem)
+accuracy_bits(::ComplexFieldElem)
 ```
 
 **Examples**
@@ -239,24 +239,24 @@ contained in a given complex box or whether two boxes overlap. The following
 functions are provided for this purpose.
 
 ```@docs
-overlaps(::ComplexElem, ::ComplexElem)
+overlaps(::ComplexFieldElem, ::ComplexFieldElem)
 ```
 
 ```@docs
-contains(::ComplexElem, ::ComplexElem)
+contains(::ComplexFieldElem, ::ComplexFieldElem)
 ```
 
 ```@docs
-contains(::ComplexElem, ::Integer)
-contains(::ComplexElem, ::ZZRingElem)
-contains(::ComplexElem, ::QQFieldElem)
+contains(::ComplexFieldElem, ::Integer)
+contains(::ComplexFieldElem, ::ZZRingElem)
+contains(::ComplexFieldElem, ::QQFieldElem)
 ```
 
 The following functions are also provided for determining if a box intersects
 a certain part of the complex number plane.
 
 ```@docs
-contains_zero(::ComplexElem)
+contains_zero(::ComplexFieldElem)
 ```
 
 **Examples**
@@ -282,7 +282,7 @@ distinct from arithmetic equality implemented by `==`, which merely compares up 
 minimum of the precisions of its operands.
 
 ```@docs
-isequal(::ComplexElem, ::ComplexElem)
+isequal(::ComplexFieldElem, ::ComplexFieldElem)
 ```
 
 A full range of ad hoc comparison operators is provided. These are implemented directly
@@ -290,14 +290,14 @@ in Julia, but we document them as though only `==` were provided.
 
 Function                     |
 -----------------------------|
-`==(x::ComplexElem, y::Integer)`     |
-`==(x::Integer, y::ComplexElem)`     |
-`==(x::ComplexElem, y::ZZRingElem)`        |
-`==(x::ZZRingElem, y::ComplexElem)`        |
+`==(x::ComplexFieldElem, y::Integer)`     |
+`==(x::Integer, y::ComplexFieldElem)`     |
+`==(x::ComplexFieldElem, y::ZZRingElem)`        |
+`==(x::ZZRingElem, y::ComplexFieldElem)`        |
 `==(x::arb, y::ZZRingElem)`        |
 `==(x::ZZRingElem, y::arb)`        |
-`==(x::ComplexElem, y::Float64)`     |
-`==(x::Float64, y::ComplexElem)`     |
+`==(x::ComplexFieldElem, y::Float64)`     |
+`==(x::Float64, y::ComplexFieldElem)`     |
 
 **Examples**
 
@@ -339,11 +339,11 @@ b = ldexp(x, -ZZ(15))
 ### Miscellaneous operations
 
 ```@docs
-trim(::ComplexElem)
+trim(::ComplexFieldElem)
 ```
 
 ```@docs
-unique_integer(::ComplexElem)
+unique_integer(::ComplexFieldElem)
 ```
 
 **Examples**
@@ -376,11 +376,11 @@ a = const_pi(CC)
 ### Mathematical and special functions
 
 ```@docs
-rsqrt(::ComplexElem)
+rsqrt(::ComplexFieldElem)
 ```
 
 ```@docs
-cispi(::ComplexElem)
+cispi(::ComplexFieldElem)
 ```
 
 ```@docs
@@ -388,95 +388,95 @@ root_of_unity(::ComplexField, k::Int)
 ```
 
 ```@docs
-log_sinpi(::ComplexElem)
+log_sinpi(::ComplexFieldElem)
 ```
 
 ```@docs
-gamma(::ComplexElem)
+gamma(::ComplexFieldElem)
 ```
 
 ```@docs
-lgamma(::ComplexElem)
+lgamma(::ComplexFieldElem)
 ```
 
 ```@docs
-rgamma(::ComplexElem)
+rgamma(::ComplexFieldElem)
 ```
 
 ```@docs
-digamma(::ComplexElem)
+digamma(::ComplexFieldElem)
 ```
 
 ```@docs
-zeta(::ComplexElem)
+zeta(::ComplexFieldElem)
 ```
 
 ```@docs
-barnes_g(::ComplexElem)
+barnes_g(::ComplexFieldElem)
 ```
 
 ```@docs
-log_barnes_g(::ComplexElem)
+log_barnes_g(::ComplexFieldElem)
 ```
 
 ```@docs
-erf(::ComplexElem)
+erf(::ComplexFieldElem)
 ```
 
 ```@docs
-erfi(::ComplexElem)
+erfi(::ComplexFieldElem)
 ```
 
 ```@docs
-exp_integral_ei(::ComplexElem)
+exp_integral_ei(::ComplexFieldElem)
 ```
 
 ```@docs
-sin_integral(::ComplexElem)
+sin_integral(::ComplexFieldElem)
 ```
 
 ```@docs
-cos_integral(::ComplexElem)
+cos_integral(::ComplexFieldElem)
 ```
 
 ```@docs
-sinh_integral(::ComplexElem)
+sinh_integral(::ComplexFieldElem)
 ```
 
 ```@docs
-cosh_integral(::ComplexElem)
+cosh_integral(::ComplexFieldElem)
 ```
 
 ```@docs
-dedekind_eta(::ComplexElem)
+dedekind_eta(::ComplexFieldElem)
 ```
 
 ```@docs
-modular_weber_f(::ComplexElem)
+modular_weber_f(::ComplexFieldElem)
 ```
 
 ```@docs
-modular_weber_f1(::ComplexElem)
+modular_weber_f1(::ComplexFieldElem)
 ```
 
 ```@docs
-modular_weber_f2(::ComplexElem)
+modular_weber_f2(::ComplexFieldElem)
 ```
 
 ```@docs
-j_invariant(::ComplexElem)
+j_invariant(::ComplexFieldElem)
 ```
 
 ```@docs
-modular_lambda(::ComplexElem)
+modular_lambda(::ComplexFieldElem)
 ```
 
 ```@docs
-modular_delta(::ComplexElem)
+modular_delta(::ComplexFieldElem)
 ```
 
 ```@docs
-eisenstein_g(::Int, ::ComplexElem)
+eisenstein_g(::Int, ::ComplexFieldElem)
 ```
 
 ```@docs
@@ -484,120 +484,120 @@ hilbert_class_polynomial(::Int, ::ZZPolyRing)
 ```
 
 ```@docs
-elliptic_k(::ComplexElem)
+elliptic_k(::ComplexFieldElem)
 ```
 
 ```@docs
-elliptic_e(::ComplexElem)
+elliptic_e(::ComplexFieldElem)
 ```
 
 ```@docs
-agm(::ComplexElem)
-agm(::ComplexElem, ::ComplexElem)
+agm(::ComplexFieldElem)
+agm(::ComplexFieldElem, ::ComplexFieldElem)
 ```
 
 ```@docs
-polygamma(::ComplexElem, ::ComplexElem)
+polygamma(::ComplexFieldElem, ::ComplexFieldElem)
 ```
 
 ```@docs
-zeta(::ComplexElem, ::ComplexElem)
+zeta(::ComplexFieldElem, ::ComplexFieldElem)
 ```
 
 ```@docs
-rising_factorial(::ComplexElem, ::Int)
+rising_factorial(::ComplexFieldElem, ::Int)
 ```
 
 ```@docs
-rising_factorial2(::ComplexElem, ::Int)
+rising_factorial2(::ComplexFieldElem, ::Int)
 ```
 
 ```@docs
-polylog(::Union{ComplexElem,Int}, ::ComplexElem)
+polylog(::Union{ComplexFieldElem,Int}, ::ComplexFieldElem)
 ```
 
 ```@docs
-log_integral(::ComplexElem)
+log_integral(::ComplexFieldElem)
 ```
 
 ```@docs
-log_integral_offset(::ComplexElem)
+log_integral_offset(::ComplexFieldElem)
 ```
 
 ```@docs
-exp_integral_e(::ComplexElem, ::ComplexElem)
+exp_integral_e(::ComplexFieldElem, ::ComplexFieldElem)
 ```
 
 ```@docs
-gamma(::ComplexElem, ::ComplexElem)
+gamma(::ComplexFieldElem, ::ComplexFieldElem)
 ```
 
 ```@docs
-gamma_regularized(::ComplexElem, ::ComplexElem)
+gamma_regularized(::ComplexFieldElem, ::ComplexFieldElem)
 ```
 
 ```@docs
-gamma_lower(::ComplexElem, ::ComplexElem)
+gamma_lower(::ComplexFieldElem, ::ComplexFieldElem)
 ```
 
 ```@docs
-gamma_lower_regularized(::ComplexElem, ::ComplexElem)
+gamma_lower_regularized(::ComplexFieldElem, ::ComplexFieldElem)
 ```
 
 ```@docs
-airy_ai(::ComplexElem)
+airy_ai(::ComplexFieldElem)
 ```
 
 ```@docs
-airy_ai_prime(::ComplexElem)
+airy_ai_prime(::ComplexFieldElem)
 ```
 
 ```@docs
-airy_bi(::ComplexElem)
+airy_bi(::ComplexFieldElem)
 ```
 
 ```@docs
-airy_bi_prime(::ComplexElem)
+airy_bi_prime(::ComplexFieldElem)
 ```
 
 ```@docs
-bessel_j(::ComplexElem, ::ComplexElem)
+bessel_j(::ComplexFieldElem, ::ComplexFieldElem)
 ```
 
 ```@docs
-bessel_y(::ComplexElem, ::ComplexElem)
+bessel_y(::ComplexFieldElem, ::ComplexFieldElem)
 ```
 
 ```@docs
-bessel_i(::ComplexElem, ::ComplexElem)
+bessel_i(::ComplexFieldElem, ::ComplexFieldElem)
 ```
 
 ```@docs
-bessel_k(::ComplexElem, ::ComplexElem)
+bessel_k(::ComplexFieldElem, ::ComplexFieldElem)
 ```
 
 ```@docs
-hypergeometric_1f1(::ComplexElem, ::ComplexElem, ::ComplexElem)
+hypergeometric_1f1(::ComplexFieldElem, ::ComplexFieldElem, ::ComplexFieldElem)
 ```
 
 ```@docs
-hypergeometric_1f1_regularized(::ComplexElem, ::ComplexElem, ::ComplexElem)
+hypergeometric_1f1_regularized(::ComplexFieldElem, ::ComplexFieldElem, ::ComplexFieldElem)
 ```
 
 ```@docs
-hypergeometric_u(::ComplexElem, ::ComplexElem, ::ComplexElem)
+hypergeometric_u(::ComplexFieldElem, ::ComplexFieldElem, ::ComplexFieldElem)
 ```
 
 ```@docs
-hypergeometric_2f1(::ComplexElem, ::ComplexElem, ::ComplexElem, ::ComplexElem)
+hypergeometric_2f1(::ComplexFieldElem, ::ComplexFieldElem, ::ComplexFieldElem, ::ComplexFieldElem)
 ```
 
 ```@docs
-jacobi_theta(::ComplexElem, ::ComplexElem)
+jacobi_theta(::ComplexFieldElem, ::ComplexFieldElem)
 ```
 
 ```@docs
-weierstrass_p(::ComplexElem, ::ComplexElem)
+weierstrass_p(::ComplexFieldElem, ::ComplexFieldElem)
 ```
 
 **Examples**
@@ -617,11 +617,11 @@ d = hypergeometric_1f1(s, s+1, z)
 ### Linear dependence
 
 ```@docs
-lindep(::Vector{ComplexElem}, n::Int)
+lindep(::Vector{ComplexFieldElem}, n::Int)
 ```
 
 ```@docs
-lindep(A::Matrix{ComplexElem}, bits::Int)
+lindep(A::Matrix{ComplexFieldElem}, bits::Int)
 ```
 
 **Examples**

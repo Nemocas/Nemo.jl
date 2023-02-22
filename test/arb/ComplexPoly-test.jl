@@ -13,7 +13,7 @@ CC = ComplexField()
    @test elem_type(R) == ComplexPoly
    @test elem_type(ComplexPolyRing) == ComplexPoly
    @test parent_type(ComplexPoly) == ComplexPolyRing
-   @test dense_poly_type(ComplexElem) == ComplexPoly
+   @test dense_poly_type(ComplexFieldElem) == ComplexPoly
 
    @test typeof(R) <: ComplexPolyRing
 
@@ -335,8 +335,8 @@ end
    R, x = PolynomialRing(CC, "x")
 
    n = 5
-   xs = ComplexElem[inv(CC(i)) for i=1:n]
-   ys = ComplexElem[CC(i) for i=1:n]
+   xs = ComplexFieldElem[inv(CC(i)) for i=1:n]
+   ys = ComplexFieldElem[CC(i) for i=1:n]
 
    f = interpolate(R, xs, ys)
    vs = evaluate(f, xs)

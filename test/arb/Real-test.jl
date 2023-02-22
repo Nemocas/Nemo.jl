@@ -1,6 +1,6 @@
 RR = RealField()
 
-@testset "RealElem.precision" begin
+@testset "RealFieldElem.precision" begin
    old_prec = precision(RealField)
 
    set_precision!(RealField, 100) do
@@ -24,13 +24,13 @@ RR = RealField()
    set_precision!(RealField, old_prec)
 end
 
-@testset "RealElem.constructors" begin
+@testset "RealFieldElem.constructors" begin
    @test isa(RR, RealField)
    @test isa(RR(2), FieldElem)
 
-   @test elem_type(RR) == RealElem
-   @test elem_type(RealField) == RealElem
-   @test parent_type(RealElem) == RealField
+   @test elem_type(RR) == RealFieldElem
+   @test elem_type(RealField) == RealFieldElem
+   @test parent_type(RealFieldElem) == RealField
    @test base_ring(RR) == Union{}
 
    @test RealField() == RealField()
@@ -47,13 +47,13 @@ end
           x)
 end
 
-@testset "RealElem.printing" begin
+@testset "RealFieldElem.printing" begin
    a = RR(2)
 
    @test string(a) == "2.0000000000000000000"
 end
 
-@testset "RealElem.basic_ops" begin
+@testset "RealFieldElem.basic_ops" begin
    @test one(RR) == 1
    @test zero(RR) == 0
 
@@ -109,7 +109,7 @@ end
    @test characteristic(RR) == 0
 end
 
-@testset "RealElem.comparison" begin
+@testset "RealFieldElem.comparison" begin
    exact3 = RR(3)
    exact4 = RR(4)
    approx3 = RR("3 +/- 0.000001")
@@ -170,7 +170,7 @@ end
    @test contains_nonnegative(approx3 - 3)
 end
 
-@testset "RealElem.adhoc_comparison" begin
+@testset "RealFieldElem.adhoc_comparison" begin
    a = RR(3)
 
    for T in [ZZRingElem, QQFieldElem, Int, BigInt, Float64, BigFloat, Rational{Int}, Rational{BigInt}]
@@ -191,7 +191,7 @@ end
    end
 end
 
-@testset "RealElem.predicates" begin
+@testset "RealFieldElem.predicates" begin
    @test iszero(RR(0))
    @test !iszero(RR(1))
    @test !iszero(RR("0 +/- 0.01"))
@@ -226,7 +226,7 @@ end
    @test is_nonpositive(RR(0))
 end
 
-@testset "RealElem.parts" begin
+@testset "RealFieldElem.parts" begin
    @test midpoint(RR(3)) == 3
    @test radius(RR(3)) == 0
    @test midpoint(RR("3 +/- 0.25")) == 3
@@ -238,14 +238,14 @@ end
    @test 3.999 <= radius(x) <= 4.001
 end
 
-@testset "RealElem.unary_ops" begin
+@testset "RealFieldElem.unary_ops" begin
    @test -RR(3) == RR(-3)
    @test abs(-RR(3)) == 3
    @test abs(RR(3)) == 3
    @test inv(RR(2)) == RR(0.5)
 end
 
-@testset "RealElem.binary_ops" begin
+@testset "RealFieldElem.binary_ops" begin
    x = RR(2)
    y = RR(4)
 
@@ -281,7 +281,7 @@ end
    end
 end
 
-@testset "RealElem.misc_ops" begin
+@testset "RealFieldElem.misc_ops" begin
    @test ldexp(RR(3), 2) == 12
    @test ldexp(RR(3), ZZ(2)) == 12
    @test contains(trim(RR("1.1 +/- 0.001")), RR("1.1"))
@@ -309,7 +309,7 @@ end
    end
 end
 
-@testset "RealElem.unsafe_ops" begin
+@testset "RealFieldElem.unsafe_ops" begin
    z = RR(1)
    x = RR(2)
    y = RR(3)
@@ -327,7 +327,7 @@ end
    @test z == 1.5
 end
 
-@testset "RealElem.constants" begin
+@testset "RealFieldElem.constants" begin
    @test overlaps(const_pi(RR), RR("3.141592653589793238462643 +/- 4.03e-25"))
    @test overlaps(const_e(RR), RR("2.718281828459045235360287 +/- 4.96e-25"))
    @test overlaps(const_log2(RR), RR("0.6931471805599453094172321 +/- 2.28e-26"))
@@ -338,7 +338,7 @@ end
    @test overlaps(const_glaisher(RR), RR("1.282427129100622636875343 +/- 4.78e-25"))
 end
 
-@testset "RealElem.functions" begin
+@testset "RealFieldElem.functions" begin
    @test floor(RR(2.5)) == 2
    @test ceil(RR(2.5)) == 3
 
@@ -528,7 +528,7 @@ end
    @test denominator(bernoulli(100)) == 33330
 end
 
-@testset "RealElem.lindep" begin
+@testset "RealFieldElem.lindep" begin
    CC = ComplexField()
 
    tau = (1 + sqrt(CC(-23)))/2
@@ -538,7 +538,7 @@ end
    @test C == ZZRingElem[-1, 1, 1, 0, 1, 0]
 end
 
-@testset "RealElem.simplest_rational_inside" begin
+@testset "RealFieldElem.simplest_rational_inside" begin
    R = RealField()
    @test @inferred simplest_rational_inside(R(1)) == 1
    @test simplest_rational_inside(R(1//2)) == 1//2
@@ -546,7 +546,7 @@ end
    @test simplest_rational_inside(const_pi(R)) == 8717442233//2774848045
 end
 
-@testset "RealElem.rand" begin
+@testset "RealFieldElem.rand" begin
    R = RealField()
 
    n = 100
@@ -569,6 +569,6 @@ end
                R(1.01) * R(2)^(3 - precision(Balls))
       end
       @test isfinite(r_wide)
-      @test r_special isa RealElem
+      @test r_special isa RealFieldElem
    end
 end

@@ -35,7 +35,7 @@ elem_type(::Type{ComplexMatSpace}) = ComplexMat
 parent(x::ComplexMat, cached::Bool = true) =
       MatrixSpace(base_ring(x), nrows(x), ncols(x))
 
-dense_matrix_type(::Type{ComplexElem}) = ComplexMat
+dense_matrix_type(::Type{ComplexFieldElem}) = ComplexMat
 
 base_ring(a::ComplexMatSpace) = ComplexField()
 
@@ -47,11 +47,11 @@ function check_parent(x::ComplexMat, y::ComplexMat, throw::Bool = true)
    return !fl
 end
 
-function getindex!(z::ComplexElem, x::ComplexMat, r::Int, c::Int)
+function getindex!(z::ComplexFieldElem, x::ComplexMat, r::Int, c::Int)
   GC.@preserve x begin
-    v = ccall((:acb_mat_entry_ptr, libarb), Ptr{ComplexElem},
+    v = ccall((:acb_mat_entry_ptr, libarb), Ptr{ComplexFieldElem},
                 (Ref{ComplexMat}, Int, Int), x, r - 1, c - 1)
-    ccall((:acb_set, libarb), Nothing, (Ref{ComplexElem}, Ptr{ComplexElem}), z, v)
+    ccall((:acb_set, libarb), Nothing, (Ref{ComplexFieldElem}, Ptr{ComplexFieldElem}), z, v)
   end
   return z
 end
@@ -61,20 +61,20 @@ end
 
   z = base_ring(x)()
   GC.@preserve x begin
-     v = ccall((:acb_mat_entry_ptr, libarb), Ptr{ComplexElem},
+     v = ccall((:acb_mat_entry_ptr, libarb), Ptr{ComplexFieldElem},
                (Ref{ComplexMat}, Int, Int), x, r - 1, c - 1)
-     ccall((:acb_set, libarb), Nothing, (Ref{ComplexElem}, Ptr{ComplexElem}), z, v)
+     ccall((:acb_set, libarb), Nothing, (Ref{ComplexFieldElem}, Ptr{ComplexFieldElem}), z, v)
   end
   return z
 end
 
-for T in [Integer, Float64, ZZRingElem, QQFieldElem, RealElem, BigFloat, ComplexElem, AbstractString]
+for T in [Integer, Float64, ZZRingElem, QQFieldElem, RealFieldElem, BigFloat, ComplexFieldElem, AbstractString]
    @eval begin
       @inline function setindex!(x::ComplexMat, y::$T, r::Int, c::Int)
          @boundscheck Generic._checkbounds(x, r, c)
 
          GC.@preserve x begin
-            z = ccall((:acb_mat_entry_ptr, libarb), Ptr{ComplexElem},
+            z = ccall((:acb_mat_entry_ptr, libarb), Ptr{ComplexFieldElem},
                       (Ref{ComplexMat}, Int, Int), x, r - 1, c - 1)
             _acb_set(z, y, precision(Balls))
          end
@@ -86,13 +86,13 @@ Base.@propagate_inbounds setindex!(x::ComplexMat, y::Rational{T},
                                    r::Int, c::Int) where {T <: Integer} =
          setindex!(x, QQFieldElem(y), r, c)
 
-for T in [Integer, Float64, ZZRingElem, QQFieldElem, RealElem, BigFloat, AbstractString]
+for T in [Integer, Float64, ZZRingElem, QQFieldElem, RealFieldElem, BigFloat, AbstractString]
    @eval begin
       @inline function setindex!(x::ComplexMat, y::Tuple{$T, $T}, r::Int, c::Int)
          @boundscheck Generic._checkbounds(x, r, c)
 
          GC.@preserve x begin
-            z = ccall((:acb_mat_entry_ptr, libarb), Ptr{ComplexElem},
+            z = ccall((:acb_mat_entry_ptr, libarb), Ptr{ComplexFieldElem},
                       (Ref{ComplexMat}, Int, Int), x, r - 1, c - 1)
             _acb_set(z, y[1], y[2], precision(Balls))
          end
@@ -218,25 +218,25 @@ end
 
 *(x::ZZRingElem, y::ComplexMat) = y*x
 
-function *(x::ComplexMat, y::RealElem)
+function *(x::ComplexMat, y::RealFieldElem)
   z = similar(x)
   ccall((:acb_mat_scalar_mul_arb, libarb), Nothing,
-              (Ref{ComplexMat}, Ref{ComplexMat}, Ref{RealElem}, Int),
+              (Ref{ComplexMat}, Ref{ComplexMat}, Ref{RealFieldElem}, Int),
               z, x, y, precision(Balls))
   return z
 end
 
-*(x::RealElem, y::ComplexMat) = y*x
+*(x::RealFieldElem, y::ComplexMat) = y*x
 
-function *(x::ComplexMat, y::ComplexElem)
+function *(x::ComplexMat, y::ComplexFieldElem)
   z = similar(x)
   ccall((:acb_mat_scalar_mul_acb, libarb), Nothing,
-              (Ref{ComplexMat}, Ref{ComplexMat}, Ref{ComplexElem}, Int),
+              (Ref{ComplexMat}, Ref{ComplexMat}, Ref{ComplexFieldElem}, Int),
               z, x, y, precision(Balls))
   return z
 end
 
-*(x::ComplexElem, y::ComplexMat) = y*x
+*(x::ComplexFieldElem, y::ComplexMat) = y*x
 
 *(x::Integer, y::ComplexMat) = ZZRingElem(x) * y
 
@@ -258,7 +258,7 @@ end
 
 *(x::ComplexMat, y::Rational{T}) where T <: Union{Int, BigInt} = y * x
 
-for T in [Integer, ZZRingElem, QQFieldElem, RealElem, ComplexElem]
+for T in [Integer, ZZRingElem, QQFieldElem, RealFieldElem, ComplexFieldElem]
    @eval begin
       function +(x::ComplexMat, y::$T)
          z = deepcopy(x)
@@ -483,18 +483,18 @@ function divexact(x::ComplexMat, y::ZZRingElem; check::Bool=true)
   return z
 end
 
-function divexact(x::ComplexMat, y::RealElem; check::Bool=true)
+function divexact(x::ComplexMat, y::RealFieldElem; check::Bool=true)
   z = similar(x)
   ccall((:acb_mat_scalar_div_arb, libarb), Nothing,
-              (Ref{ComplexMat}, Ref{ComplexMat}, Ref{RealElem}, Int),
+              (Ref{ComplexMat}, Ref{ComplexMat}, Ref{RealFieldElem}, Int),
               z, x, y, precision(Balls))
   return z
 end
 
-function divexact(x::ComplexMat, y::ComplexElem; check::Bool=true)
+function divexact(x::ComplexMat, y::ComplexFieldElem; check::Bool=true)
   z = similar(x)
   ccall((:acb_mat_scalar_div_acb, libarb), Nothing,
-              (Ref{ComplexMat}, Ref{ComplexMat}, Ref{ComplexElem}, Int),
+              (Ref{ComplexMat}, Ref{ComplexMat}, Ref{ComplexFieldElem}, Int),
               z, x, y, precision(Balls))
   return z
 end
@@ -531,7 +531,7 @@ function det(x::ComplexMat, prec = precision(Balls))
   ncols(x) != nrows(x) && error("Matrix must be square")
   z = base_ring(x)()
   ccall((:acb_mat_det, libarb), Nothing,
-              (Ref{ComplexElem}, Ref{ComplexMat}, Int), z, x, prec)
+              (Ref{ComplexFieldElem}, Ref{ComplexMat}, Int), z, x, prec)
   return z
 end
 
@@ -653,12 +653,12 @@ Returns a nonnegative element $z$ of type `acb`, such that $z$ is an upper
 bound for the infinity norm for every matrix in $x$
 """
 function bound_inf_norm(x::ComplexMat)
-  z = RealElem()
+  z = RealFieldElem()
   GC.@preserve x z begin
-     t = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ref{RealElem}, ), z)
+     t = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ref{RealFieldElem}, ), z)
      ccall((:acb_mat_bound_inf_norm, libarb), Nothing,
                  (Ptr{mag_struct}, Ref{ComplexMat}), t, x)
-     s = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ref{RealElem}, ), z)
+     s = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ref{RealFieldElem}, ), z)
      ccall((:arf_set_mag, libarb), Nothing,
                  (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
      ccall((:mag_zero, libarb), Nothing,
@@ -710,7 +710,7 @@ function (x::ComplexMatSpace)(y::RealMat)
   return z
 end
 
-for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, RealElem, ComplexElem, String]
+for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, RealFieldElem, ComplexFieldElem, String]
    @eval begin
       function (x::ComplexMatSpace)(y::AbstractMatrix{$T})
          _check_dim(nrows(x), ncols(x), y)
@@ -734,7 +734,7 @@ end
 
 (x::ComplexMatSpace)(y::AbstractVector{Rational{T}}) where {T <: Integer} = x(map(QQFieldElem, y))
 
-for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, RealElem, String]
+for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, RealFieldElem, String]
    @eval begin
       function (x::ComplexMatSpace)(y::AbstractMatrix{Tuple{$T, $T}})
          _check_dim(nrows(x), ncols(x), y)
@@ -762,7 +762,7 @@ end
 (x::ComplexMatSpace)(y::AbstractVector{Tuple{Rational{T}, Rational{T}}}) where {T <: Integer} =
          x(map(z -> (QQFieldElem(z[1]), QQFieldElem(z[2])), y))
 
-for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, RealElem, ComplexElem, String]
+for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, ComplexFieldElem, String]
    @eval begin
       function (x::ComplexMatSpace)(y::$T)
          z = x()
@@ -790,12 +790,12 @@ end
 #
 ###############################################################################
 
-function matrix(R::ComplexField, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealElem, ComplexElem, AbstractString}}
+function matrix(R::ComplexField, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, ComplexFieldElem, AbstractString}}
    z = ComplexMat(size(arr, 1), size(arr, 2), arr, precision(Balls))
    return z
 end
 
-function matrix(R::ComplexField, r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealElem, ComplexElem, AbstractString}}
+function matrix(R::ComplexField, r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, ComplexFieldElem, AbstractString}}
    _check_dim(r, c, arr)
    z = ComplexMat(r, c, arr, precision(Balls))
    return z
@@ -866,7 +866,7 @@ promote_rule(::Type{ComplexMat}, ::Type{QQFieldElem}) = ComplexMat
 
 promote_rule(::Type{ComplexMat}, ::Type{arb}) = ComplexMat
 
-promote_rule(::Type{ComplexMat}, ::Type{ComplexElem}) = ComplexMat
+promote_rule(::Type{ComplexMat}, ::Type{ComplexFieldElem}) = ComplexMat
 
 promote_rule(::Type{ComplexMat}, ::Type{ZZMatrix}) = ComplexMat
 
@@ -912,7 +912,7 @@ function _eig_multiple(A::ComplexMat, check::Bool = true)
   z = array(base_ring(A), v, n)
   acb_vec_clear(v, n)
   acb_vec_clear(v_approx, n)
-  res = Vector{Tuple{ComplexElem, Int}}()
+  res = Vector{Tuple{ComplexFieldElem, Int}}()
   k = 1
   for i in 1:n
     if i < n && isequal(z[i], z[i + 1])
@@ -990,7 +990,7 @@ end
 @doc Markdown.doc"""
     eigvals(A::ComplexMat)
 
-Returns the eigenvalues of `A` as a vector of tuples `(ComplexElem, Int)`.
+Returns the eigenvalues of `A` as a vector of tuples `(ComplexFieldElem, Int)`.
 Each tuple `(z, k)` corresponds to a cluster of `k` eigenvalues
 of $A$.
 
