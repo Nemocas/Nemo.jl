@@ -22,11 +22,6 @@ Generic ring $R$                            | AbstractAlgebra.jl  | `Generic.MPo
 $\mathbb{Z}$                                | Flint               | `ZZMPolyRingElem`        | `ZZMPolyRing`
 $\mathbb{Z}/n\mathbb{Z}$ (small $n$)        | Flint               | `zzModMPolyRingElem`     | `zzModMPolyRing`
 $\mathbb{Q}$                                | Flint               | `QQMPolyRingElem`        | `QQMPolyRing`
-
-The following are not implemented yet, but will be available soon:
-
-Base ring                                   | Library             | Element type        | Parent type
---------------------------------------------|---------------------|--------------------------|----------------------
 $\mathbb{Z}/p\mathbb{Z}$ (small prime $p$)  | Flint               | `fpMPolyRingElem`        | `fpMPolyRing`
 $\mathbb{F}_{p^n}$ (small $p$)              | Flint               | `fqPolyRepMPolyRingElem` | `fqPolyRepMPolyRing`
 
