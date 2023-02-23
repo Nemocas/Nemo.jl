@@ -28,7 +28,7 @@ $\mathbb{F}_{p^n}$ (small $p$)              | Flint               | `fqPolyRepMP
 The string representation of the variables and the base ring $R$ of a generic
 polynomial is stored in its parent object. 
 
-All polynomial element types belong to the abstract type `MPolyElem` and all of
+All polynomial element types belong to the abstract type `MPolyRingElem` and all of
 the polynomial ring types belong to the abstract type `MPolyRing`. This enables
 one to write generic functions that can accept any Nemo multivariate polynomial type.
 

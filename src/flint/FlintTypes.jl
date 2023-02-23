@@ -1197,7 +1197,7 @@ end
 
 const FmpzMPolyID = Dict{Tuple{Vector{Symbol}, Symbol}, ZZMPolyRing}()
 
-mutable struct ZZMPolyRingElem <: MPolyElem{ZZRingElem}
+mutable struct ZZMPolyRingElem <: MPolyRingElem{ZZRingElem}
    coeffs::Ptr{Nothing}
    exps::Ptr{Nothing}
    alloc::Int
@@ -1394,7 +1394,7 @@ end
 
 const FmpqMPolyID = Dict{Tuple{Vector{Symbol}, Symbol}, QQMPolyRing}()
 
-mutable struct QQMPolyRingElem <: MPolyElem{QQFieldElem}
+mutable struct QQMPolyRingElem <: MPolyRingElem{QQFieldElem}
    content_num::Int
    content_den::Int
    coeffs::Ptr{Nothing}
@@ -1608,7 +1608,7 @@ end
 
 const NmodMPolyID = Dict{Tuple{zzModRing, Vector{Symbol}, Symbol}, zzModMPolyRing}()
 
-mutable struct zzModMPolyRingElem <: MPolyElem{zzModRingElem}
+mutable struct zzModMPolyRingElem <: MPolyRingElem{zzModRingElem}
    coeffs::Ptr{Nothing}
    exps::Ptr{Nothing}
    length::Int
@@ -1799,7 +1799,7 @@ end
 
 const GFPMPolyID = Dict{Tuple{fpField, Vector{Symbol}, Symbol}, fpMPolyRing}()
 
-mutable struct fpMPolyRingElem <: MPolyElem{fpFieldElem}
+mutable struct fpMPolyRingElem <: MPolyRingElem{fpFieldElem}
    coeffs::Ptr{Nothing}
    exps::Ptr{Nothing}
    length::Int
@@ -2009,7 +2009,7 @@ end
 
 const GFPFmpzMPolyID = Dict{Tuple{FpField, Vector{Symbol}, Symbol}, FpMPolyRing}()
 
-mutable struct FpMPolyRingElem <: MPolyElem{FpFieldElem}
+mutable struct FpMPolyRingElem <: MPolyRingElem{FpFieldElem}
    coeffs::Ptr{Nothing}
    exps::Ptr{Nothing}
    length::Int
@@ -2694,7 +2694,7 @@ end
 
 const FqNmodMPolyID = Dict{Tuple{fqPolyRepField, Vector{Symbol}, Symbol}, fqPolyRepMPolyRing}()
 
-mutable struct fqPolyRepMPolyRingElem <: MPolyElem{fqPolyRepFieldElem}
+mutable struct fqPolyRepMPolyRingElem <: MPolyRingElem{fqPolyRepFieldElem}
    coeffs::Ptr{Nothing}
    exps::Ptr{Nothing}
    length::Int
@@ -6661,7 +6661,7 @@ const FqDefaultMPolyID = AbstractAlgebra.CacheDictType{
                               Tuple{Any, FqField, Int},
                               FqMPolyRing}()
 
-mutable struct FqMPolyRingElem <: MPolyElem{FqFieldElem}
+mutable struct FqMPolyRingElem <: MPolyRingElem{FqFieldElem}
     parent::FqMPolyRing
     data::_fq_default_mpoly_union
 

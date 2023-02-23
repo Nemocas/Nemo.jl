@@ -37,7 +37,7 @@ For convenience we list the most important abstract types and their unions
 for which one should usually prefer to write generic implementations.
 
 * `PolyElem{T}` : all univariate polynomial types
-* `MPolyElem{T}` : all multivariate polynomial types (see note below)
+* `MPolyRingElem{T}` : all multivariate polynomial types (see note below)
 * `MatrixElem{T}` : union of all matrix types including matrix algebras
 * `MatElem{T}` : all matrix types not including matrix algebras
 * `AbsSeriesElem{T}` : all abstract series types
@@ -59,7 +59,7 @@ same name, so this is more than just a convention.
 Note that multivariate polynomials tend to require very specialised
 implementations depending heavily on implementation details of the specific
 multivariate type. Therefore it is rare to write implementations for the
-abstract type `MPolyElem{T}`. Instead, implementations tend to be done for each
+abstract type `MPolyRingElem{T}`. Instead, implementations tend to be done for each
 concrete multivariate type separately.
 
 ## Generic interfaces

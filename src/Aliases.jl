@@ -174,3 +174,5 @@
 @alias nmod_rel_series zzModRelPowerSeriesRingElem
 @alias NmodAbsSeriesRing zzModAbsPowerSeriesRing
 @alias NmodRelSeriesRing zzModRelPowerSeriesRing
+
+@alias MPolyElem MPolyRingElem
