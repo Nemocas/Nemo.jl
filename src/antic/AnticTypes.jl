@@ -59,9 +59,6 @@ function _AnticNumberField_clear_fn(a::AnticNumberField)
    ccall((:nf_clear, libantic), Nothing, (Ref{AnticNumberField},), a)
 end
 
-<<<<<<< HEAD
-mutable struct nf_elem <: SimpleNumFieldElem{QQFieldElem}
-=======
 """
     nf_elem
  
@@ -73,8 +70,7 @@ Essentially never called directly.
 
 See also `number_field`.
 """
-mutable struct nf_elem <: SimpleNumFieldElem{fmpq}
->>>>>>> 7f458af7 (make the snake_case names the default)
+mutable struct nf_elem <: SimpleNumFieldElem{QQFieldElem}
    elem_coeffs::Ptr{Nothing}
    elem_alloc::Int
    elem_length::Int
