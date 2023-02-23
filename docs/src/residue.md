@@ -21,14 +21,14 @@ Nemo are given in the following table.
 
 Base ring                   | Library            | Element type     | Parent type
 ----------------------------|--------------------|------------------|--------------------
-Generic ring $R$            | AbstractAlgebra.jl | `Generic.Res{T}` | `Generic.ResRing{T}`
+Generic ring $R$            | AbstractAlgebra.jl | `Generic.ResidueRingElem{T}` | `Generic.ResidueRing{T}`
 $\mathbb{Z}$ (Int modulus)  | Flint              | `zzModRingElem`  | `zzModRing`
 $\mathbb{Z}$ (ZZ modulus)   | Flint              | `ZZModRingElem`  | `ZZModRing`
 
 The modulus $a$ of a residue ring is stored in its parent object.
 
 All residue element types belong to the abstract type `ResElem` and all the
-residue ring parent object types belong to the abstract type `ResRing`.
+residue ring parent object types belong to the abstract type `ResidueRing`.
 This enables one to write generic functions that accept any Nemo residue type.
 
 ## Residue functionality
