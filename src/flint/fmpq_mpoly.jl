@@ -1247,16 +1247,16 @@ end
 
 ###############################################################################
 #
-#   PolynomialRing constructor
+#   polynomial_ring constructor
 #
 ###############################################################################
 
-function PolynomialRing(R::QQField, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
+function polynomial_ring(R::QQField, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
    parent_obj = QQMPolyRing(s, ordering, cached)
    return tuple(parent_obj, gens(parent_obj))
 end
 
-function PolynomialRing(R::QQField, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
-   return PolynomialRing(R, [Symbol(x) for x in s]; cached=cached, ordering=ordering)
+function polynomial_ring(R::QQField, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
+   return polynomial_ring(R, [Symbol(x) for x in s]; cached=cached, ordering=ordering)
 end
 

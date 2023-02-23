@@ -1,5 +1,5 @@
 @testset "ZZLaurentSeriesRingElem.constructors" begin
-   R, x = LaurentSeriesRing(ZZ, 30, "x")
+   R, x = laurent_series_ring(ZZ, 30, "x")
 
    @test elem_type(R) == ZZLaurentSeriesRingElem
    @test elem_type(ZZLaurentSeriesRing) == ZZLaurentSeriesRingElem
@@ -29,7 +29,7 @@
 end
 
 @testset "ZZLaurentSeriesRingElem.printing" begin
-   R, x = LaurentSeriesRing(ZZ, 30, "x")
+   R, x = laurent_series_ring(ZZ, 30, "x")
 
    @test !occursin(r"{", string(R))
 
@@ -37,14 +37,14 @@ end
 end
 
 @testset "ZZLaurentSeriesRingElem.rand" begin
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
 
    test_rand(R, -12:12, -10:10)
    test_rand(R, -12:12, make(ZZ, -10:10))
 end
 
 @testset "ZZLaurentSeriesRingElem.manipulation" begin
-   S, x = LaurentSeriesRing(ZZ, 30, "x")
+   S, x = laurent_series_ring(ZZ, 30, "x")
 
    @test max_precision(S) == 30
 
@@ -78,7 +78,7 @@ end
 end
 
 @testset "ZZLaurentSeriesRingElem.unary_ops" begin
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -10:10)
 
@@ -88,7 +88,7 @@ end
 end
 
 @testset "ZZLaurentSeriesRingElem.binary_ops" begin
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:100
       f = rand(R, -12:12, -10:10)
       g = rand(R, -12:12, -10:10)
@@ -105,7 +105,7 @@ end
 end
 
 @testset "ZZLaurentSeriesRingElem.adhoc_binary_ops" begin
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:500
       f = rand(R, -12:12, -10:10)
       c1 = rand(ZZ, -10:10)
@@ -126,7 +126,7 @@ end
 end
 
 @testset "ZZLaurentSeriesRingElem.comparison" begin
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:500
       f = rand(R, -12:12, -10:10)
       g = deepcopy(f)
@@ -143,7 +143,7 @@ end
 end
 
 @testset "ZZLaurentSeriesRingElem.adhoc_comparison" begin
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:500
       f = R()
       while f == 0
@@ -166,7 +166,7 @@ end
 end
 
 @testset "ZZLaurentSeriesRingElem.powering" begin
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
 
    for iter = 1:100
       f = rand(R, -12:12, -10:10)
@@ -183,7 +183,7 @@ end
 end
 
 @testset "ZZLaurentSeriesRingElem.shift" begin
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -10:10)
       s = rand(0:12)
@@ -195,7 +195,7 @@ end
 end
 
 @testset "ZZLaurentSeriesRingElem.truncation" begin
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -10:10)
       s = rand(-12:12)
@@ -207,7 +207,7 @@ end
 end
 
 @testset "ZZLaurentSeriesRingElem.inversion" begin
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = R()
       while iszero(f) || !is_unit(polcoeff(f, 0))
@@ -219,7 +219,7 @@ end
 end
 
 @testset "ZZLaurentSeriesRingElem.square_root" begin
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -10:10)
       g = f^2
@@ -229,7 +229,7 @@ end
 end
 
 @testset "ZZLaurentSeriesRingElem.exact_division" begin
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -10:10)
       g = rand(R, -12:12, -10:10)
@@ -242,7 +242,7 @@ end
 end
 
 @testset "ZZLaurentSeriesRingElem.adhoc_exact_division" begin
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -10:10)
       c = ZZ()
@@ -255,7 +255,7 @@ end
 end
 
 @testset "ZZLaurentSeriesRingElem.special_functions" begin
-   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   R, x = laurent_series_ring(ZZ, 10, "x")
 
    @test isequal(exp(2x + x^2 + O(x^3)), 1 + 2*x + 3*x^2 + O(x^3))
 end

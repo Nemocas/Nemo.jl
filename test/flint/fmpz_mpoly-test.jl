@@ -5,14 +5,14 @@
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
-      SS, varlist = PolynomialRing(R, var_names, ordering = ord)
+      SS, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       @test S === SS
 
-      SSS, varlist = PolynomialRing(R, var_names, ordering = ord, cached = false)
-      SSSS, varlist = PolynomialRing(R, var_names, ordering = ord, cached = false)
+      SSS, varlist = polynomial_ring(R, var_names, ordering = ord, cached = false)
+      SSSS, varlist = polynomial_ring(R, var_names, ordering = ord, cached = false)
 
       @test !(SSS === SSSS)
 
@@ -80,7 +80,7 @@
 end
 
 @testset "ZZMPolyRingElem.printing" begin
-   S, (x, y) = PolynomialRing(FlintZZ, ["x", "y"])
+   S, (x, y) = polynomial_ring(FlintZZ, ["x", "y"])
 
    @test !occursin(r"{", string(S))
 
@@ -95,7 +95,7 @@ end
 end
 
 @testset "ZZMPolyRingElem.hash" begin
-   S, (x, y) = PolynomialRing(FlintZZ, ["x", "y"])
+   S, (x, y) = polynomial_ring(FlintZZ, ["x", "y"])
 
    p = y^ZZRingElem(2)^100
 
@@ -110,7 +110,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
       g = gens(S)
 
       @test characteristic(S) == 0
@@ -206,7 +206,7 @@ end
       @test total_degree_fits_int(h)
    end
 
-   S, (x, y) = PolynomialRing(R, ["x", "y"])
+   S, (x, y) = polynomial_ring(R, ["x", "y"])
 
    @test trailing_coefficient(3x^2*y^2 + 2x*y + 5x + y + 7) == 7
    @test trailing_coefficient(3x^2*y^2 + 2x*y + 5x) == 5
@@ -219,7 +219,7 @@ end
    R = FlintZZ
 
    for ord in Nemo.flint_orderings
-      S, (x, y, z) = PolynomialRing(R, ["x", "y", "z"]; ordering=ord)
+      S, (x, y, z) = polynomial_ring(R, ["x", "y", "z"]; ordering=ord)
 
       f = -8*x^5*y^3*z^5+9*x^5*y^2*z^3-8*x^4*y^5*z^4-10*x^4*y^3*z^2+8*x^3*y^2*z-10*x*y^3*z^4-4*x*y-10*x*z^2+8*y^2*z^5-9*y^2*z^3
 
@@ -240,7 +240,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100, -100:100)
@@ -257,7 +257,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100, -100:100)
@@ -280,7 +280,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for iter = 1:100
          f = rand(S, 0:5, 0:100, -100:100)
@@ -316,7 +316,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for iter = 1:100
          d = rand(-100:100)
@@ -338,7 +338,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100, -100:100)
@@ -365,7 +365,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100, -100:100)
@@ -394,7 +394,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for iter = 1:10
          f = S(0)
@@ -430,7 +430,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for iter = 1:10
          f = S(0)
@@ -477,7 +477,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(FlintZZ, var_names, ordering = ord)
+      S, varlist = polynomial_ring(FlintZZ, var_names, ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:4, 0:5, -10:10)
@@ -497,7 +497,7 @@ end
 end
 
 @testset "ZZMPolyRingElem.factor" begin
-   R, (x, y, z) = PolynomialRing(FlintZZ, ["x", "y", "z"])
+   R, (x, y, z) = polynomial_ring(FlintZZ, ["x", "y", "z"])
 
    function check_factor(a, esum)
       f = factor(a)
@@ -523,7 +523,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(FlintZZ, var_names, ordering = ord)
+      S, varlist = polynomial_ring(FlintZZ, var_names, ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:4, 0:5, -10:10)
@@ -549,7 +549,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for iter = 1:100
          f = rand(S, 0:5, 0:100, -100:100)
@@ -586,7 +586,7 @@ end
 
    # Individual tests
 
-   S, (x, y) = PolynomialRing(R, ["x", "y"])
+   S, (x, y) = polynomial_ring(R, ["x", "y"])
    @test_throws ErrorException evaluate(x, [x])
    @test_throws ErrorException evaluate(x, [x, x, x])
 
@@ -599,13 +599,13 @@ end
 
    @test (@which evaluate(f, [x])).module === Nemo
 
-   SS, (xx, yy, zz) = PolynomialRing(R, ["xx", "yy", "zz"])
+   SS, (xx, yy, zz) = polynomial_ring(R, ["xx", "yy", "zz"])
    r1 = @inferred evaluate(f, [xx + yy, yy + zz])
    r2 = evaluate(g, [xx + yy, yy + zz])
    r3 = evaluate(f + g, [xx + yy, yy + zz])
    @test r3 == r1 + r2
 
-   SS, z = PolynomialRing(R, "z")
+   SS, z = polynomial_ring(R, "z")
    @test_throws ErrorException evaluate(x, [z])
    @test_throws ErrorException evaluate(x, [z, z, z])
    w = [z, (z + 1)^2]
@@ -615,7 +615,7 @@ end
    @test r3 == r1 + r2
    @test (@which evaluate(f, w)).module === Nemo
 
-   S, (x, y) = PolynomialRing(R, ["x", "y"])
+   S, (x, y) = polynomial_ring(R, ["x", "y"])
    T = MatrixAlgebra(R, 2)
 
    f = x^2*y^2+2*x+1
@@ -633,7 +633,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for iter = 1:100
          f = S()
@@ -671,7 +671,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for j in 1:100
          f = rand(S, 0:5, 0:100, -100:100)
@@ -689,7 +689,7 @@ end
      var_names = ["x$j" for j in 1:num_vars]
      ord = rand_ordering()
 
-     R, vars_R = PolynomialRing(FlintZZ, var_names; ordering=ord)
+     R, vars_R = polynomial_ring(FlintZZ, var_names; ordering=ord)
 
      for iter in 1:10
         f = R()
@@ -723,7 +723,7 @@ end
      var_names = ["x$j" for j in 1:num_vars]
      ord = rand_ordering()
 
-     R, vars_R = PolynomialRing(FlintZZ, var_names; ordering=ord)
+     R, vars_R = polynomial_ring(FlintZZ, var_names; ordering=ord)
 
      for iter in 1:10
         f = R()
@@ -772,7 +772,7 @@ end
 end
 
 @testset "ZZMPolyRingElem.gcd_with_cofactors" begin
-   R, (x, y, z) = PolynomialRing(ZZ, [:x, :y, :z])
+   R, (x, y, z) = polynomial_ring(ZZ, [:x, :y, :z])
 
    @test gcd_with_cofactors(x, y) == (1, x, y)
 

@@ -7,7 +7,7 @@
 export fqPolyRepMatrix, fqPolyRepMatrixSpace, getindex, setindex!, deepcopy,
        parent, base_ring, zero, one, show, transpose,
        transpose!, rref, rref!, tr, det, rank, inv, solve,
-       sub, hcat, vcat, Array, lift, lift!, MatrixSpace, check_parent,
+       sub, hcat, vcat, Array, lift, lift!, matrix_space, check_parent,
        howell_form, howell_form!, strong_echelon_form, strong_echelon_form!
 
 ################################################################################
@@ -795,6 +795,6 @@ end
 #
 ################################################################################
 
-function MatrixSpace(R::fqPolyRepField, r::Int, c::Int; cached::Bool = true)
+function matrix_space(R::fqPolyRepField, r::Int, c::Int; cached::Bool = true)
   fqPolyRepMatrixSpace(R, r, c, cached)
 end

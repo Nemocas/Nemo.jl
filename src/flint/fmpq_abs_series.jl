@@ -887,11 +887,11 @@ end
 
 ###############################################################################
 #
-#   PowerSeriesRing constructor
+#   power_series_ring constructor
 #
 ###############################################################################
 
-function PowerSeriesRing(R::QQField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
+function power_series_ring(R::QQField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
    if model == :capped_relative
       parent_obj = QQRelPowerSeriesRing(prec, s, cached)
    elseif model == :capped_absolute
@@ -903,8 +903,8 @@ function PowerSeriesRing(R::QQField, prec::Int, s::Symbol; model=:capped_relativ
    return parent_obj, gen(parent_obj)
 end
 
-function PowerSeriesRing(R::QQField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
-   return PowerSeriesRing(R, prec, Symbol(s); model=model, cached=cached)
+function power_series_ring(R::QQField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
+   return power_series_ring(R, prec, Symbol(s); model=model, cached=cached)
 end
 
 function AbsSeriesRing(R::QQField, prec::Int)

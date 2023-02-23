@@ -1,9 +1,9 @@
 function benchmark_fateman()
    print("benchmark_fateman ... ")
-   R, x = PolynomialRing(FlintZZ, "x")
-   S, y = PolynomialRing(R, "y")
-   T, z = PolynomialRing(S, "z")
-   U, t = PolynomialRing(T, "t")
+   R, x = polynomial_ring(FlintZZ, "x")
+   S, y = polynomial_ring(R, "y")
+   T, z = polynomial_ring(S, "z")
+   U, t = polynomial_ring(T, "t")
 
    p = (x + y + z + t + 1)^20
    

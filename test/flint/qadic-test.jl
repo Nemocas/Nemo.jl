@@ -1,7 +1,7 @@
 @testset "qadic.constructors" begin
    R, _     = @inferred QadicField(7, 1, 30)
    K, _     = @inferred QadicField(7, 3, 30) 
-   QX, x = PolynomialRing(FlintQQ, "x") 
+   QX, x = polynomial_ring(FlintQQ, "x") 
 
    @test elem_type(R) == qadic
    @test elem_type(FlintQadicField) == qadic
@@ -40,7 +40,7 @@
    @test parent(t) === R
    
    Q, _ = QadicField(13, 3, 10)
-   _, t = PolynomialRing(FlintZZ, "t")
+   _, t = polynomial_ring(FlintZZ, "t")
    @test Q(t^4) == Q(t)^4
 
    R, _ = QadicField(13, 1, 10)

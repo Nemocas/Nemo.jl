@@ -8,7 +8,7 @@ CC = AcbField(64)
    @test isa(S1, AcbPolyRing)
    @test S1 !== S2
 
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    @test elem_type(R) == acb_poly
    @test elem_type(AcbPolyRing) == acb_poly
@@ -47,7 +47,7 @@ CC = AcbField(64)
 end
 
 @testset "acb_poly.printing" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
    f = x^3 + 2x^2 + x + 1
 
    @test occursin(r"x", string(f))
@@ -55,7 +55,7 @@ end
 end
 
 @testset "acb_poly.manipulation" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    @test iszero(zero(R))
 
@@ -85,7 +85,7 @@ end
 end
 
 @testset "acb_poly.binary_ops" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 2
@@ -98,7 +98,7 @@ end
 end
 
 @testset "acb_poly.adhoc_binary" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 2
@@ -125,9 +125,9 @@ end
 end
 
 @testset "acb_poly.comparison" begin
-   R, x = PolynomialRing(CC, "x")
-   Zx, zx = PolynomialRing(ZZ, "x")
-   Qx, qx = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(CC, "x")
+   Zx, zx = polynomial_ring(ZZ, "x")
+   Qx, qx = polynomial_ring(QQ, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 2
@@ -171,7 +171,7 @@ end
 end
 
 @testset "acb_poly.adhoc_comparison" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
 
@@ -195,7 +195,7 @@ end
 end
 
 @testset "acb_poly.unary_ops" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
 
@@ -203,7 +203,7 @@ end
 end
 
 @testset "acb_poly.truncation" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
@@ -218,7 +218,7 @@ end
 end
 
 @testset "acb_poly.reverse" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 3
 
@@ -226,7 +226,7 @@ end
 end
 
 @testset "acb_poly.shift" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
 
@@ -240,7 +240,7 @@ end
 end
 
 @testset "acb_poly.powering" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
 
@@ -250,7 +250,7 @@ end
 end
 
 @testset "acb_poly.exact_division" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
@@ -259,7 +259,7 @@ end
 end
 
 @testset "acb_poly.scalar_division" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
 
@@ -275,7 +275,7 @@ end
 end
 
 @testset "acb_poly.evaluation" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
 
@@ -301,7 +301,7 @@ end
 end
 
 @testset "acb_poly.roots" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = (x - 1)*(x - 2)*(x - CC("5 +/- 0.001"))
 
@@ -313,7 +313,7 @@ end
 end
 
 @testset "acb_poly.composition" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
@@ -322,7 +322,7 @@ end
 end
 
 @testset "acb_poly.derivative_integral" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
 
@@ -332,7 +332,7 @@ end
 end
 
 @testset "acb_poly.evaluation_interpolation" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    n = 5
    xs = acb[inv(CC(i)) for i=1:n]
@@ -376,7 +376,7 @@ end
 end
 
 @testset "acb_poly.root_bound" begin
-   Rx, x = PolynomialRing(CC, "x")
+   Rx, x = polynomial_ring(CC, "x")
 
    for i in 1:2
       r = rand(1:10)

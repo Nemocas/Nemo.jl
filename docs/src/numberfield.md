@@ -11,10 +11,10 @@ Number fields are constructed using the `AnticNumberField` function. However,
 for convenience we define
 
 ```
-NumberField = AnticNumberField
+number_field = AnticNumberField
 ```
 
-so that number fields can be constructed using `NumberField` rather than
+so that number fields can be constructed using `number_field` rather than
 `AnticNumberField`. 
 
 The types of number field elements in Nemo are given in the following table,
@@ -51,7 +51,7 @@ the number field itself. This is accomplished with one of the following
 constructors.
 
 ```@docs
-NumberField(::QQPolyRingElem, ::String)
+number_field(::QQPolyRingElem, ::String)
 CyclotomicField(::Int, ::String)
 CyclotomicRealSubfield(::Int, ::String)
 ```
@@ -62,8 +62,8 @@ resulting parent objects to coerce various elements into those fields.
 **Examples**
 
 ```julia
-R, x = PolynomialRing(QQ, "x")
-K, a = NumberField(x^3 + 3x + 1, "a")
+R, x = polynomial_ring(QQ, "x")
+K, a = number_field(x^3 + 3x + 1, "a")
 L, b = CyclotomicField(5, "b")
 M, c = CyclotomicRealField(5, "c")
 
@@ -87,8 +87,8 @@ representation as a polynomial. See the following examples for how to do this.
 **Examples**
 
 ```
-R, x = PolynomialRing(QQ, "x")
-K, a = NumberField(x^3 + 3x + 1, "a")
+R, x = polynomial_ring(QQ, "x")
+K, a = number_field(x^3 + 3x + 1, "a")
 
 d = gen(K)
 f = a^2 + 2a - 7
@@ -127,8 +127,8 @@ number field is a quotient.
 **Examples**
 
 ```
-R, x = PolynomialRing(QQ, "x")
-K, a = NumberField(x^3 + 3x + 1, "a")
+R, x = polynomial_ring(QQ, "x")
+K, a = number_field(x^3 + 3x + 1, "a")
 
 f = R(a^2 + 2a + 3)
 g = K(x^2 + 2x + 1)
@@ -159,8 +159,8 @@ degree(::AnticNumberField)
 **Examples**
 
 ```julia
-R, x = PolynomialRing(QQ, "x")
-K, a = NumberField(x^3 + 3x + 1, "a")
+R, x = polynomial_ring(QQ, "x")
+K, a = number_field(x^3 + 3x + 1, "a")
 
 d = a^2 + 2a - 7
 m = gen(K)
@@ -185,8 +185,8 @@ tr(::nf_elem)
 **Examples**
 
 ```julia
-R, x = PolynomialRing(QQ, "x")
-K, a = NumberField(x^3 + 3x + 1, "a")
+R, x = polynomial_ring(QQ, "x")
+K, a = number_field(x^3 + 3x + 1, "a")
 
 c = 3a^2 - a + 1
 

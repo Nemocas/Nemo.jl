@@ -1,5 +1,5 @@
 @testset "AbsMSeries.constructors" begin
-    R, (x, y) = PowerSeriesRing(QQ, [5, 5], ["x", "y"])
+    R, (x, y) = power_series_ring(QQ, [5, 5], ["x", "y"])
 
     @test R() == 0
     @test R(1) == 1
@@ -8,7 +8,7 @@
 end
 
 @testset "AbsMSeries.manipulation" begin
-   R, (x, y) = PowerSeriesRing(QQ, [5, 5], ["x", "y"])
+   R, (x, y) = power_series_ring(QQ, [5, 5], ["x", "y"])
 
    @test gens(R) == [x, y]
    @test isone(one(R))
@@ -44,7 +44,7 @@ end
 end
 
 @testset "AbsMSeries.unary/binary_ops" begin
-   R, (x, y) = PowerSeriesRing(QQ, [5, 5], ["x", "y"])
+   R, (x, y) = power_series_ring(QQ, [5, 5], ["x", "y"])
 
    f = 2x^2*y^3 + 3x^2*y + y + 1
 
@@ -62,7 +62,7 @@ end
 end
 
 @testset "AbsMSeries.inv/divexact" begin
-   R, (x, y) = PowerSeriesRing(QQ, [5, 5], ["x", "y"])
+   R, (x, y) = power_series_ring(QQ, [5, 5], ["x", "y"])
 
    f = 2x^2*y^3 + 3x^2*y + y + 1
 
@@ -72,7 +72,7 @@ end
 end
 
 @testset "AbsMSeries.evaluate" begin
-   R, (x, y) = PowerSeriesRing(QQ, [5, 5], ["x", "y"])
+   R, (x, y) = power_series_ring(QQ, [5, 5], ["x", "y"])
 
    f = 2x^2*y^3 + 3x^2*y + y + 1
 

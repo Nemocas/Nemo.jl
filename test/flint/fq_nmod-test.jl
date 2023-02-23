@@ -5,7 +5,7 @@
    @test elem_type(fqPolyRepField) == fqPolyRepFieldElem
    @test parent_type(fqPolyRepFieldElem) == fqPolyRepField
 
-   Sy, y = PolynomialRing(ResidueRing(FlintZZ, 3), "y")
+   Sy, y = polynomial_ring(residue_ring(FlintZZ, 3), "y")
    Syy, yy = GF(3)["y"]
 
    T, z = FiniteField(y^2 + 1, "z")
@@ -43,7 +43,7 @@
    # check for primality
    T3, z3 = FiniteField(yy^2 + 1, "z", check=false)
    @test isa(T2, fqPolyRepField)
-   Syyy, yyy = PolynomialRing(ResidueRing(FlintZZ, 4), "y")
+   Syyy, yyy = polynomial_ring(residue_ring(FlintZZ, 4), "y")
    @test yyy isa zzModPolyRingElem
    @test_throws DomainError FiniteField(yyy^2+1, "z")
 end
@@ -258,7 +258,7 @@ end
 @testset "fqPolyRepFieldElem.lift" begin
    R, x = FiniteField(23, 2, "x")
    f = 8x + 9
-   S, y = PolynomialRing(GF(23), "y")
+   S, y = polynomial_ring(GF(23), "y")
    @test lift(S, f) == 8y + 9
 end
 

@@ -3,7 +3,7 @@
 end
 
 @testset "zzModAbsPowerSeriesRingElem.constructors" begin
-   S = ResidueRing(ZZ, 23)
+   S = residue_ring(ZZ, 23)
    
    R1 = AbsSeriesRing(S, 30)
    R2 = AbsSeriesRing(S, 30)
@@ -11,7 +11,7 @@ end
    @test isa(R1, zzModAbsPowerSeriesRing)
    @test R1 !== R2
 
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    @test elem_type(R) == zzModAbsPowerSeriesRingElem
    @test elem_type(zzModAbsPowerSeriesRing) == zzModAbsPowerSeriesRingElem
@@ -36,8 +36,8 @@ end
 end
 
 @testset "zzModAbsPowerSeriesRingElem.printing" begin
-   S = ResidueRing(ZZ, 23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   S = residue_ring(ZZ, 23)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    b = x^2 + 3x + O(x^4)
 
@@ -45,8 +45,8 @@ end
 end
 
 @testset "zzModAbsPowerSeriesRingElem.manipulation" begin
-   S = ResidueRing(ZZ, 23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   S = residue_ring(ZZ, 23)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -67,9 +67,9 @@ end
 end
 
 @testset "zzModAbsPowerSeriesRingElem.similar" begin
-   R0 = ResidueRing(ZZ, 23)
-   R, x = PowerSeriesRing(R0, 10, "x"; model=:capped_absolute)
-   S, y = PowerSeriesRing(ZZ, 10, "y"; model=:capped_absolute)
+   R0 = residue_ring(ZZ, 23)
+   R, x = power_series_ring(R0, 10, "x"; model=:capped_absolute)
+   S, y = power_series_ring(ZZ, 10, "y"; model=:capped_absolute)
 
    for iters = 1:10
       f = rand(R, 0:10, -10:10)
@@ -115,7 +115,7 @@ end
 end
 
 @testset "zzModAbsPowerSeriesRingElem.abs_series" begin
-   R = ResidueRing(ZZ, 23)
+   R = residue_ring(ZZ, 23)
    f = abs_series(R, [1, 2, 3], 3, 5, "y")
 
    @test isa(f, zzModAbsPowerSeriesRingElem)
@@ -158,8 +158,8 @@ end
 end
 
 @testset "zzModAbsPowerSeriesRingElem.unary_ops" begin
-   S = ResidueRing(ZZ, 23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   S = residue_ring(ZZ, 23)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = 1 + 2x + x^2 + O(x^3)
@@ -170,8 +170,8 @@ end
 end
 
 @testset "zzModAbsPowerSeriesRingElem.binary_ops" begin
-   S = ResidueRing(ZZ, 23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   S = residue_ring(ZZ, 23)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -190,8 +190,8 @@ end
 end
 
 @testset "zzModAbsPowerSeriesRingElem.adhoc_binary_ops" begin
-   S = ResidueRing(ZZ, 23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   S = residue_ring(ZZ, 23)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -208,8 +208,8 @@ end
 end
 
 @testset "zzModAbsPowerSeriesRingElem.comparison" begin
-   S = ResidueRing(ZZ, 23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   S = residue_ring(ZZ, 23)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^3)
@@ -224,8 +224,8 @@ end
 end
 
 @testset "zzModAbsPowerSeriesRingElem.adhoc_comparison" begin
-   S = ResidueRing(ZZ, 23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   S = residue_ring(ZZ, 23)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^0)
@@ -244,8 +244,8 @@ end
 end
 
 @testset "zzModAbsPowerSeriesRingElem.powering" begin
-   S = ResidueRing(ZZ, 23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   S = residue_ring(ZZ, 23)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -264,8 +264,8 @@ end
 end
 
 @testset "zzModAbsPowerSeriesRingElem.shift" begin
-   S = ResidueRing(ZZ, 23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   S = residue_ring(ZZ, 23)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -286,8 +286,8 @@ end
 end
 
 @testset "zzModAbsPowerSeriesRingElem.truncation" begin
-   S = ResidueRing(ZZ, 23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   S = residue_ring(ZZ, 23)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -307,8 +307,8 @@ end
 end
 
 @testset "zzModAbsPowerSeriesRingElem.exact_division" begin
-   S = ResidueRing(ZZ, 23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   S = residue_ring(ZZ, 23)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = x + x^3
    b = O(x^4)
@@ -325,8 +325,8 @@ end
 end
 
 @testset "zzModAbsPowerSeriesRingElem.adhoc_exact_division" begin
-   S = ResidueRing(ZZ, 23)
-   R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+   S = residue_ring(ZZ, 23)
+   R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
    a = x + x^3
    b = O(x^4)
@@ -345,8 +345,8 @@ end
 end
 
 @testset "zzModAbsPowerSeriesRingElem.inversion" begin
-   S = ResidueRing(ZZ, 23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   S = residue_ring(ZZ, 23)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 1 + x + 2x^2 + O(x^5)
    b = R(-1)
@@ -357,8 +357,8 @@ end
 end
 
 @testset "zzModAbsPowerSeriesRingElem.integral_derivative" begin
-   S = ResidueRing(ZZ, 31)
-   R, x = PowerSeriesRing(S, 10, "x"; model=:capped_absolute)
+   S = residue_ring(ZZ, 31)
+   R, x = power_series_ring(S, 10, "x"; model=:capped_absolute)
 
    for iter = 1:100
       f = rand(R, 0:0)
@@ -368,8 +368,8 @@ end
 end
 
 @testset "zzModAbsPowerSeriesRingElem.unsafe_operators" begin
-   S = ResidueRing(ZZ, 31)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   S = residue_ring(ZZ, 31)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    for iter = 1:300
       f = rand(R, 0:9)

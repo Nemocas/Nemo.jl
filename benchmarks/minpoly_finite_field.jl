@@ -3,7 +3,7 @@ function benchmark_minpoly_finite_field()
 
    F, s = FlintFiniteField(103, 2, "s")
 
-   M = MatrixSpace(F, 80, 80)()
+   M = matrix_space(F, 80, 80)()
 
    for i in 1:40
       for j in 1:40
@@ -17,7 +17,7 @@ function benchmark_minpoly_finite_field()
       similarity!(M, rand(1:80), F(rand(-3:3)))
    end
 
-   tt = @elapsed minpoly(PolynomialRing(F, "x")[1], M)
+   tt = @elapsed minpoly(polynomial_ring(F, "x")[1], M)
    println("$tt")
 end
 

@@ -65,7 +65,7 @@ end
 function defining_polynomial(L::FqField)
   if !isdefined(L, :defining_poly)
     @assert is_absolute(L)
-    F = PolynomialRing(prime_field(L), "x", cached = false)[1]
+    F = polynomial_ring(prime_field(L), "x", cached = false)[1]
     L.defining_poly = F(map(lift, collect(coefficients(modulus(L)))))
   end
   return L.defining_poly::FqPolyRingElem
@@ -251,7 +251,7 @@ end
 ################################################################################
 
 function minpoly(a::FqFieldElem)
-  return minpoly(PolynomialRing(base_field(parent(a)), "x", cached = false)[1], a)
+  return minpoly(polynomial_ring(base_field(parent(a)), "x", cached = false)[1], a)
 end
 
 function minpoly(Rx::FqPolyRing, a::FqFieldElem)
@@ -262,7 +262,7 @@ function minpoly(Rx::FqPolyRing, a::FqFieldElem)
     push!(c, fa)
     fa = frobenius(fa)
   end
-  St = PolynomialRing(parent(a), "x", cached = false)[1]
+  St = polynomial_ring(parent(a), "x", cached = false)[1]
   f = prod([gen(St) - x for x = c], init = one(St))
   g = Rx()
   for i = 0:degree(f)
@@ -272,7 +272,7 @@ function minpoly(Rx::FqPolyRing, a::FqFieldElem)
 end
 
 function absolute_minpoly(a::FqFieldElem)
-  return absolute_minpoly(PolynomialRing(prime_field(parent(a)), "x", cached = false)[1], a)
+  return absolute_minpoly(polynomial_ring(prime_field(parent(a)), "x", cached = false)[1], a)
 end
 
 function absolute_minpoly(Rx::FqPolyRing, a::FqFieldElem)
@@ -283,7 +283,7 @@ function absolute_minpoly(Rx::FqPolyRing, a::FqFieldElem)
     push!(c, fa)
     fa = absolute_frobenius(fa)
   end
-  St = PolynomialRing(parent(a), "x", cached = false)[1]
+  St = polynomial_ring(parent(a), "x", cached = false)[1]
   f = prod([gen(St) - x for x = c], init = one(St))
   g = Rx()
   for i = 0:degree(f)
@@ -299,7 +299,7 @@ end
 ################################################################################
 
 function charpoly(a::FqFieldElem)
-  return charpoly(PolynomialRing(base_field(parent(a)), "x", cached = false)[1], a)
+  return charpoly(polynomial_ring(base_field(parent(a)), "x", cached = false)[1], a)
 end
 
 function charpoly(Rx::FqPolyRing, a::FqFieldElem)
@@ -309,7 +309,7 @@ function charpoly(Rx::FqPolyRing, a::FqFieldElem)
 end
 
 function absolute_charpoly(a::FqFieldElem)
-  return absolute_charpoly(PolynomialRing(prime_field(parent(a)), "x", cached = false)[1], a)
+  return absolute_charpoly(polynomial_ring(prime_field(parent(a)), "x", cached = false)[1], a)
 end
 
 function absolute_charpoly(Rx::FqPolyRing, a::FqFieldElem)

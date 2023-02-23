@@ -898,18 +898,18 @@ end
 
 ###############################################################################
 #
-#   PolynomialRing constructor
+#   polynomial_ring constructor
 #
 ###############################################################################
 
-function PolynomialRing(R::QQField, s::Symbol; cached = true)
+function polynomial_ring(R::QQField, s::Symbol; cached = true)
    parent_obj = QQPolyRing(R, s, cached)
 
    return parent_obj, parent_obj([QQFieldElem(0), QQFieldElem(1)])
 end
 
-function PolynomialRing(R::QQField, s::AbstractString; cached = true)
-   return PolynomialRing(R, Symbol(s); cached=cached)
+function polynomial_ring(R::QQField, s::AbstractString; cached = true)
+   return polynomial_ring(R, Symbol(s); cached=cached)
 end
 
 function PolyRing(R::QQField)

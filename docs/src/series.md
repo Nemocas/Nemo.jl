@@ -68,11 +68,10 @@ type.
 AbstractAlgebra.jl also provides Nemo with a generic implementation of Laurent series
 over a given ring $R$. For completeness, we list it here.
 
-Base ring                             | Library            | Element type              | Parent type
---------------------------------------|--------------------|---------------------------|----------------------
-Generic ring $R$                      | AbstractAlgebra.jl | `Generic.LaurentSeriesRingElem{T}`| `Generic.LaurentSeriesRing{T}`
-Generic field $K$                     | AbstractAlgebra.jl | `Generic.LaurentSeriesFieldElem{T}`|
-`Generic.LaurentSeriesField{T}`
+Base ring          | Library            | Element type                       | Parent type
+-------------------|--------------------|------------------------------------|----------------------
+Generic ring $R$   | AbstractAlgebra.jl | `Generic.LaurentSeriesRingElem{T}` | `Generic.LaurentSeriesRing{T}`
+Generic field $K$  | AbstractAlgebra.jl | `Generic.LaurentSeriesFieldElem{T}`| `Generic.LaurentSeriesField{T}`
 
 ## Capped relative power series
 
@@ -160,8 +159,8 @@ rings.
 **Examples**
 
 ```julia
-S, x = PowerSeriesRing(R, 30, "x")
-T, z = PowerSeriesRing(QQ, 30, "z")
+S, x = power_series_ring(R, 30, "x")
+T, z = power_series_ring(QQ, 30, "z")
 
 a = 1 + z + 3z^2 + O(z^5)
 b = z + 2z^2 + 5z^3 + O(z^5)

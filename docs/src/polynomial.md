@@ -65,7 +65,7 @@ evaluate2(::ComplexPoly, ::ComplexFieldElem)
 
 ```julia
 RR = RealField(64)
-T, z = PolynomialRing(RR, "z")
+T, z = polynomial_ring(RR, "z")
    
 h = z^2 + 2z + 1
 
@@ -82,7 +82,7 @@ signature(::QQPolyRingElem)
 **Examples**
 
 ```julia
-R, x = PolynomialRing(ZZ, "x")
+R, x = polynomial_ring(ZZ, "x")
 
 f = x^3 + 3x + 1
 
@@ -99,7 +99,7 @@ roots(::ComplexPoly)
 
 ```julia
 CC = ComplexField(64)
-C, y = PolynomialRing(CC, "y")
+C, y = polynomial_ring(CC, "y")
 
 m = y^2 + 2y + 3
 n = m + CC("0 +/- 0.0001", "0 +/- 0.0001")
@@ -122,7 +122,7 @@ from_roots(::AcbPolyRing, ::Vector{acb})
 
 ```julia
 RR = RealField(64)
-R, x = PolynomialRing(RR, "x")
+R, x = polynomial_ring(RR, "x")
 
 xs = arb[inv(RR(i)) for i=1:5]
 f = from_roots(R, xs)
@@ -150,9 +150,9 @@ lift(::ZZPolyRing, ::FpPolyRingElem)
 **Examples**
 
 ```julia
-R = ResidueRing(ZZ, 123456789012345678949)
-S, x = PolynomialRing(R, "x")
-T, y = PolynomialRing(ZZ, "y")
+R = residue_ring(ZZ, 123456789012345678949)
+S, x = polynomial_ring(R, "x")
+T, y = polynomial_ring(ZZ, "y")
 
 f = x^2 + 2x + 1
 
@@ -195,10 +195,10 @@ unique_integer(::ComplexPoly)
 ```julia
 RR = RealField(64)
 CC = ComplexField(64)
-R, x = PolynomialRing(RR, "x")
-C, y = PolynomialRing(CC, "y")
-Zx, zx = PolynomialRing(ZZ, "x")
-Qx, qx = PolynomialRing(QQ, "x")
+R, x = polynomial_ring(RR, "x")
+C, y = polynomial_ring(CC, "y")
+Zx, zx = polynomial_ring(ZZ, "x")
+Qx, qx = polynomial_ring(QQ, "x")
 
 f = x^2 + 2x + 1
 h = f + RR("0 +/- 0.0001")
@@ -231,8 +231,8 @@ factor_distinct_deg(::fqPolyRepPolyRingElem)
 **Examples**
 
 ```
-R = ResidueRing(ZZ, 23)
-S, x = PolynomialRing(R, "x")
+R = residue_ring(ZZ, 23)
+S, x = polynomial_ring(R, "x")
 
 f = x^2 + 2x + 1
 g = x^3 + 3x + 1
@@ -267,8 +267,8 @@ eta_qexp(::Int, ::Int, ::ZZPolyRingElem)
 **Examples**
 
 ```julia
-R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
+R, x = polynomial_ring(ZZ, "x")
+S, y = polynomial_ring(R, "y")
 
 h = cyclotomic(120, x)
 j = swinnerton_dyer(5, x)

@@ -7,7 +7,7 @@
 export zzModMatrix, zzModMatrixSpace, getindex, setindex!, deepcopy,
        parent, base_ring, zero, one, transpose,
        transpose!, rref, rref!, tr, det, rank, inv, solve, lu,
-       sub, hcat, vcat, Array, lift, lift!, MatrixSpace, check_parent,
+       sub, hcat, vcat, Array, lift, lift!, matrix_space, check_parent,
        howell_form, howell_form!, strong_echelon_form, strong_echelon_form!
 
 ################################################################################
@@ -118,7 +118,7 @@ nrows(a::zzModMatrixSpace) = a.nrows
 ncols(a::zzModMatrixSpace) = a.ncols
 
 function parent(a::T, cached::Bool = true) where T <: Zmodn_mat
-   MatrixSpace(base_ring(a), nrows(a), ncols(a); cached)
+   matrix_space(base_ring(a), nrows(a), ncols(a); cached)
 end
 
 base_ring(a::zzModMatrixSpace) = a.base_ring
@@ -871,7 +871,7 @@ end
 #
 ################################################################################
 
-function MatrixSpace(R::zzModRing, r::Int, c::Int; cached::Bool = true)
+function matrix_space(R::zzModRing, r::Int, c::Int; cached::Bool = true)
   zzModMatrixSpace(R, r, c, cached)
 end
 

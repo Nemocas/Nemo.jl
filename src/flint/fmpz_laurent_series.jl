@@ -1279,12 +1279,12 @@ end
 
 ###############################################################################
 #
-#   PowerSeriesRing constructor
+#   power_series_ring constructor
 #
 ###############################################################################
 
 @doc Markdown.doc"""
-    LaurentSeriesRing(R::ZZRing, prec::Int, s::AbstractString; cached=true)
+    laurent_series_ring(R::ZZRing, prec::Int, s::AbstractString; cached=true)
 
 Return a tuple $(S, x)$ consisting of the parent object `S` of a Laurent series
 ring over ZZ and a generator `x` for the Laurent series ring.
@@ -1295,13 +1295,13 @@ object `S` will be cached so that supplying the same base ring, string and
 precision in future will return the same parent object and generator. If
 caching of the parent object is not required, `cached` can be set to `false`.
 """
-function LaurentSeriesRing(R::ZZRing, prec::Int, s::Symbol; cached=true)
+function laurent_series_ring(R::ZZRing, prec::Int, s::Symbol; cached=true)
    parent_obj = ZZLaurentSeriesRing(prec, s, cached)
 
    return parent_obj, gen(parent_obj)
 end
 
-function LaurentSeriesRing(R::ZZRing, prec::Int, s::AbstractString; cached=true)
-   return LaurentSeriesRing(R, prec, Symbol(s); cached=cached)
+function laurent_series_ring(R::ZZRing, prec::Int, s::AbstractString; cached=true)
+   return laurent_series_ring(R, prec, Symbol(s); cached=cached)
 end
 

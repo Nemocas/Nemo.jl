@@ -1,7 +1,7 @@
 @testset "Matrix.binary_ops_delayed_reduction" begin
-   R, t = PolynomialRing(QQ, "t")
-   K, a = NumberField(t^3 + 3t + 1, "a")
-   S = MatrixSpace(K, 5, 5)
+   R, t = polynomial_ring(QQ, "t")
+   K, a = number_field(t^3 + 3t + 1, "a")
+   S = matrix_space(K, 5, 5)
 
    for iter = 1:10
       f = rand(S, -10:10)
@@ -14,9 +14,9 @@
 end
 
 @testset "Matrix.lu_delayed_reduction" begin
-   R, t = PolynomialRing(QQ, "t")
-   K, a = NumberField(t^3 + 3t + 1, "a")
-   S = MatrixSpace(K, 5, 5)
+   R, t = polynomial_ring(QQ, "t")
+   K, a = number_field(t^3 + 3t + 1, "a")
+   S = matrix_space(K, 5, 5)
 
    for iter = 1:10
       rk = rand(0:5)
@@ -30,9 +30,9 @@ end
 end
 
 @testset "Matrix.fflu_delayed_reduction" begin
-   R, t = PolynomialRing(QQ, "t")
-   K, a = NumberField(t^3 + 3t + 1, "a")
-   S = MatrixSpace(K, 5, 5)
+   R, t = polynomial_ring(QQ, "t")
+   K, a = number_field(t^3 + 3t + 1, "a")
+   S = matrix_space(K, 5, 5)
 
    for iter = 1:20
       rk = rand(0:5)
@@ -56,10 +56,10 @@ end
 @testset "Matrix.minpoly_delayed_reduction" begin
    # Tests reduce_row!
 
-   R, t = PolynomialRing(QQ, "t")
-   K, a = NumberField(t^3 + 3t + 1, "a")
-   S = MatrixSpace(K, 6, 6)
-   U, z = PolynomialRing(K, "z")
+   R, t = polynomial_ring(QQ, "t")
+   K, a = number_field(t^3 + 3t + 1, "a")
+   S = matrix_space(K, 6, 6)
+   U, z = polynomial_ring(K, "z")
 
    M = S()
    for i = 1:3
@@ -81,12 +81,12 @@ end
 end
 
 @testset "Matrix.solve_fflu_delayed_reduction" begin
-   R, t = PolynomialRing(QQ, "t")
-   K, a = NumberField(t^3 + 3t + 1, "a")
+   R, t = polynomial_ring(QQ, "t")
+   K, a = number_field(t^3 + 3t + 1, "a")
 
    for dim = 0:5
-      S = MatrixSpace(K, dim, dim)
-      T = MatrixSpace(K, dim, rand(1:5))
+      S = matrix_space(K, dim, dim)
+      T = matrix_space(K, dim, rand(1:5))
 
       M = randmat_with_rank(S, dim, -100:100)
       b = rand(T, -100:100)
@@ -103,12 +103,12 @@ end
 end
 
 @testset "Matrix.solve_lu_delayed_reduction" begin
-   R, t = PolynomialRing(QQ, "t")
-   K, a = NumberField(t^3 + 3t + 1, "a")
+   R, t = polynomial_ring(QQ, "t")
+   K, a = number_field(t^3 + 3t + 1, "a")
 
    for dim = 0:5
-      S = MatrixSpace(K, dim, dim)
-      T = MatrixSpace(K, dim, rand(1:5))
+      S = matrix_space(K, dim, dim)
+      T = matrix_space(K, dim, rand(1:5))
 
       M = randmat_with_rank(S, dim, -100:100)
       b = rand(T, -100:100)
@@ -125,12 +125,12 @@ end
 end
 
 @testset "Matrix.solve_triu_delayed_reduction" begin
-   R, x = PolynomialRing(QQ, "x")
-   K, a = NumberField(x^3 + 3x + 1, "a")
+   R, x = polynomial_ring(QQ, "x")
+   K, a = number_field(x^3 + 3x + 1, "a")
 
    for dim = 0:10
-      S = MatrixSpace(K, dim, dim)
-      U = MatrixSpace(K, dim, rand(1:5))
+      S = matrix_space(K, dim, dim)
+      U = matrix_space(K, dim, rand(1:5))
 
       M = randmat_triu(S, -100:100)
       b = rand(U, -100:100)
@@ -142,12 +142,12 @@ end
 end
 
 @testset "Matrix.charpoly_delayed_reduction" begin
-   R, x = PolynomialRing(QQ, "x")
-   K, a = NumberField(x^3 + 3x + 1, "a")
+   R, x = polynomial_ring(QQ, "x")
+   K, a = number_field(x^3 + 3x + 1, "a")
 
    for dim = 0:5
-      S = MatrixSpace(K, dim, dim)
-      U, x = PolynomialRing(K, "x")
+      S = matrix_space(K, dim, dim)
+      U, x = polynomial_ring(K, "x")
 
       for i = 1:10
          M = rand(S, -5:5)
@@ -163,9 +163,9 @@ end
 end
 
 @testset "Matrix.hnf_delayed_reduction" begin
-   R, x = PolynomialRing(QQ, "x")
-   K, a = NumberField(x^3 + 3x + 1, "a")
-   S = MatrixSpace(K, 6, 6)
+   R, x = polynomial_ring(QQ, "x")
+   K, a = number_field(x^3 + 3x + 1, "a")
+   S = matrix_space(K, 6, 6)
 
    for iter = 1:10
       A = rand(S, -10:10)
@@ -199,9 +199,9 @@ end
 end
 
 @testset "Matrix.snf_delayed_reduction" begin
-   R, x = PolynomialRing(QQ, "x")
-   K, a = NumberField(x^3 + 3x + 1, "a")
-   S = MatrixSpace(K, 6, 6)
+   R, x = polynomial_ring(QQ, "x")
+   K, a = number_field(x^3 + 3x + 1, "a")
+   S = matrix_space(K, 6, 6)
 
    for iter = 1:10
       A = rand(S, -10:10)

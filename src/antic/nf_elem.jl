@@ -1178,7 +1178,7 @@ rand(K::AnticNumberField, r) = rand(Random.GLOBAL_RNG, K, r)
 ###############################################################################
 
 @doc Markdown.doc"""
-    NumberField(f::QQPolyRingElem, s::Union{AbstractString, Char, Symbol};
+    number_field(f::QQPolyRingElem, s::Union{AbstractString, Char, Symbol};
                 cached::Bool = true, check::Bool = true)
 
 Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$
@@ -1186,7 +1186,7 @@ of the number field $\mathbb{Q}[x]/(f)$ where $f$ is the supplied polynomial.
 The supplied string `s` specifies how the generator of the number field
 should be printed.
 """
-function NumberField(f::QQPolyRingElem, s::Union{AbstractString, Char, Symbol}; cached::Bool = true, check::Bool = true)
+function number_field(f::QQPolyRingElem, s::Union{AbstractString, Char, Symbol}; cached::Bool = true, check::Bool = true)
    parent_obj = AnticNumberField(f, Symbol(s), cached, check)
 
    return parent_obj, gen(parent_obj)
@@ -1203,10 +1203,10 @@ from which the number field is constructed, should be printed. If it is not
 supplied, a default dollar sign will be used to represent the variable.
 """
 function CyclotomicField(n::Int, s::Union{AbstractString, Char, Symbol} = "z_$n", t = "_\$"; cached = true)
-   Zx, x = PolynomialRing(FlintZZ, gensym(); cached = cached)
-   Qx, = PolynomialRing(FlintQQ, t; cached = cached)
+   Zx, x = polynomial_ring(FlintZZ, gensym(); cached = cached)
+   Qx, = polynomial_ring(FlintQQ, t; cached = cached)
    f = cyclotomic(n, x)
-   C, g = NumberField(Qx(f), Symbol(s); cached = cached, check = false)
+   C, g = number_field(Qx(f), Symbol(s); cached = cached, check = false)
    set_attribute!(C, :show => show_cyclo, :cyclo => n)
    return C, g
 end
@@ -1229,10 +1229,10 @@ constructed, should be printed. If it is not supplied, a default dollar sign
 will be used to represent the variable.
 """
 function CyclotomicRealSubfield(n::Int, s::Union{AbstractString, Char, Symbol} = "(z_$n + 1/z_$n)", t = "\$"; cached = true)
-   Zx, x = PolynomialRing(FlintZZ, gensym(); cached = cached)
-   Qx, = PolynomialRing(FlintQQ, t; cached = cached)
+   Zx, x = polynomial_ring(FlintZZ, gensym(); cached = cached)
+   Qx, = polynomial_ring(FlintQQ, t; cached = cached)
    f = cos_minpoly(n, x)
-   R, a =  NumberField(Qx(f), Symbol(s); cached = cached, check = false)
+   R, a =  number_field(Qx(f), Symbol(s); cached = cached, check = false)
    set_attribute!(R, :show => show_maxreal, :maxreal => n)
    return R, a
 end

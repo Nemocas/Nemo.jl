@@ -1,12 +1,12 @@
 @testset "MPoly.binary_ops_delayed_reduction" begin
-   S, t = PolynomialRing(QQ, "t")
-   K, a = NumberField(t^3 + 3t + 1, "a")
+   S, t = polynomial_ring(QQ, "t")
+   K, a = number_field(t^3 + 3t + 1, "a")
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(K, var_names, ordering = ord)
+      S, varlist = polynomial_ring(K, var_names, ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100, -100:100)
@@ -23,14 +23,14 @@
 end
 
 @testset "MPoly.powering_delayed_reduction" begin
-   S, t = PolynomialRing(QQ, "t")
-   K, a = NumberField(t^3 + 3t + 1, "a")
+   S, t = polynomial_ring(QQ, "t")
+   K, a = number_field(t^3 + 3t + 1, "a")
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(K, var_names, ordering = ord)
+      S, varlist = polynomial_ring(K, var_names, ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100, -100:100)
@@ -48,14 +48,14 @@ end
 end
 
 @testset "MPoly.divides_delayed_reduction" begin
-   S, t = PolynomialRing(QQ, "t")
-   K, a = NumberField(t^3 + 3t + 1, "a")
+   S, t = polynomial_ring(QQ, "t")
+   K, a = number_field(t^3 + 3t + 1, "a")
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(K, var_names, ordering = ord)
+      S, varlist = polynomial_ring(K, var_names, ordering = ord)
 
       for iter = 1:10
          f = S(0)
@@ -83,14 +83,14 @@ end
 end
 
 @testset "MPoly.euclidean_division_delayed_reduction" begin
-   S, t = PolynomialRing(QQ, "t")
-   K, a = NumberField(t^3 + 3t + 1, "a")
+   S, t = polynomial_ring(QQ, "t")
+   K, a = number_field(t^3 + 3t + 1, "a")
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(K, var_names, ordering = ord)
+      S, varlist = polynomial_ring(K, var_names, ordering = ord)
 
       for iter = 1:10
          f = S(0)

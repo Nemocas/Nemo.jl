@@ -7,7 +7,7 @@ RR = RealField()
    @test isa(S1, RealPolyRing)
    @test S1 !== S2
 
-   R, x = PolynomialRing(RR, "x")
+   R, x = polynomial_ring(RR, "x")
 
    @test elem_type(R) == RealPoly
    @test elem_type(RealPolyRing) == RealPoly
@@ -42,14 +42,14 @@ RR = RealField()
 end
 
 @testset "RealPoly.printing" begin
-   R, x = PolynomialRing(RR, "x")
+   R, x = polynomial_ring(RR, "x")
    f = x^3 + 2x^2 + x + 1
 
    @test sprint(show, "text/plain", f) == "x^3 + 2.0000000000000000000*x^2 + x + 1"
 end
 
 @testset "RealPoly.manipulation" begin
-   R, x = PolynomialRing(RR, "x")
+   R, x = polynomial_ring(RR, "x")
 
    @test iszero(zero(R))
 
@@ -114,7 +114,7 @@ end
 end
 
 @testset "RealPoly.binary_ops" begin
-   R, x = PolynomialRing(RR, "x")
+   R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 2
@@ -127,7 +127,7 @@ end
 end
 
 @testset "RealPoly.adhoc_binary" begin
-   R, x = PolynomialRing(RR, "x")
+   R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 2
@@ -154,9 +154,9 @@ end
 end
 
 @testset "RealPoly.comparison" begin
-   R, x = PolynomialRing(RR, "x")
-   Zx, zx = PolynomialRing(ZZ, "x")
-   Qx, qx = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(RR, "x")
+   Zx, zx = polynomial_ring(ZZ, "x")
+   Qx, qx = polynomial_ring(QQ, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 2
@@ -200,7 +200,7 @@ end
 end
 
 @testset "RealPoly.adhoc_comparison" begin
-   R, x = PolynomialRing(RR, "x")
+   R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
 
@@ -222,7 +222,7 @@ end
 end
 
 @testset "RealPoly.unary_ops" begin
-   R, x = PolynomialRing(RR, "x")
+   R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
 
@@ -230,7 +230,7 @@ end
 end
 
 @testset "RealPoly.truncation" begin
-   R, x = PolynomialRing(RR, "x")
+   R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
@@ -245,7 +245,7 @@ end
 end
 
 @testset "RealPoly.reverse" begin
-   R, x = PolynomialRing(RR, "x")
+   R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 3
 
@@ -253,7 +253,7 @@ end
 end
 
 @testset "RealPoly.shift" begin
-   R, x = PolynomialRing(RR, "x")
+   R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
 
@@ -267,7 +267,7 @@ end
 end
 
 @testset "RealPoly.powering" begin
-   R, x = PolynomialRing(RR, "x")
+   R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
 
@@ -277,7 +277,7 @@ end
 end
 
 @testset "RealPoly.exact_division" begin
-   R, x = PolynomialRing(RR, "x")
+   R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
@@ -286,7 +286,7 @@ end
 end
 
 @testset "RealPoly_scalar_division" begin
-   R, x = PolynomialRing(RR, "x")
+   R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
 
@@ -302,7 +302,7 @@ end
 end
 
 @testset "RealPoly.evaluation" begin
-   R, x = PolynomialRing(RR, "x")
+   R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
 
@@ -328,7 +328,7 @@ end
 end
 
 @testset "RealPoly.composition" begin
-   R, x = PolynomialRing(RR, "x")
+   R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
@@ -337,7 +337,7 @@ end
 end
 
 @testset "RealPoly.derivative_integral" begin
-   R, x = PolynomialRing(RR, "x")
+   R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
 
@@ -347,7 +347,7 @@ end
 end
 
 @testset "RealPoly.evaluation_interpolation" begin
-   R, x = PolynomialRing(RR, "x")
+   R, x = polynomial_ring(RR, "x")
 
    n = 5
    xs = RealFieldElem[inv(RR(i)) for i=1:n]
@@ -391,7 +391,7 @@ end
 end
 
 @testset "RealPoly.root_bound" begin
-   Rx, x = PolynomialRing(RR, "x")
+   Rx, x = polynomial_ring(RR, "x")
 
    for i in 1:2
       r = rand(1:10)

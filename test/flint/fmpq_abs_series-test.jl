@@ -9,7 +9,7 @@ end
    @test isa(S1, QQAbsPowerSeriesRing)
    @test S1 !== S2
 
-   R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(QQ, 30, "x", model=:capped_absolute)
 
    @test elem_type(R) == QQAbsPowerSeriesRingElem
    @test elem_type(QQAbsPowerSeriesRing) == QQAbsPowerSeriesRingElem
@@ -42,7 +42,7 @@ end
 end
 
 @testset "QQAbsPowerSeriesRingElem.printing" begin
-   R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(QQ, 30, "x", model=:capped_absolute)
 
    b = x^2 + 3x + O(x^4)
 
@@ -50,7 +50,7 @@ end
 end
 
 @testset "QQAbsPowerSeriesRingElem.manipulation" begin
-   R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(QQ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -71,8 +71,8 @@ end
 end
 
 @testset "QQAbsPowerSeriesRingElem.similar" begin
-   R, x = PowerSeriesRing(QQ, 10, "x"; model=:capped_absolute)
-   S, y = PowerSeriesRing(ZZ, 10, "y"; model=:capped_absolute)
+   R, x = power_series_ring(QQ, 10, "x"; model=:capped_absolute)
+   S, y = power_series_ring(ZZ, 10, "y"; model=:capped_absolute)
 
    for iters = 1:10
       f = rand(R, 0:10, -10:10)
@@ -160,7 +160,7 @@ end
 end
 
 @testset "QQAbsPowerSeriesRingElem.unary_ops" begin
-   R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(QQ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = 1 + 2x + x^2 + O(x^3)
@@ -171,7 +171,7 @@ end
 end
 
 @testset "QQAbsPowerSeriesRingElem.binary_ops" begin
-   R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(QQ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -190,7 +190,7 @@ end
 end
 
 @testset "QQAbsPowerSeriesRingElem.adhoc_binary_ops" begin
-   R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(QQ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -251,7 +251,7 @@ end
 end
 
 @testset "QQAbsPowerSeriesRingElem.comparison" begin
-   R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(QQ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^3)
@@ -266,7 +266,7 @@ end
 end
 
 @testset "QQAbsPowerSeriesRingElem.adhoc_comparison" begin
-   R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(QQ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^0)
@@ -301,7 +301,7 @@ end
 end
 
 @testset "QQAbsPowerSeriesRingElem.powering" begin
-   R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(QQ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -320,7 +320,7 @@ end
 end
 
 @testset "QQAbsPowerSeriesRingElem.shift" begin
-   R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(QQ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -341,7 +341,7 @@ end
 end
 
 @testset "QQAbsPowerSeriesRingElem.truncation" begin
-   R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(QQ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -360,7 +360,7 @@ end
 end
 
 @testset "QQAbsPowerSeriesRingElem.exact_division" begin
-   R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(QQ, 30, "x", model=:capped_absolute)
 
    a = x + x^3
    b = O(x^4)
@@ -377,7 +377,7 @@ end
 end
 
 @testset "QQAbsPowerSeriesRingElem.adhoc_exact_division" begin
-   R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(QQ, 30, "x", model=:capped_absolute)
 
    a = x + x^3
    b = O(x^4)
@@ -402,7 +402,7 @@ end
 end
 
 @testset "QQAbsPowerSeriesRingElem.inversion" begin
-   R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(QQ, 30, "x", model=:capped_absolute)
 
    a = 1 + x + 2x^2 + O(x^5)
    b = R(-1)
@@ -413,7 +413,7 @@ end
 end
 
 @testset "QQAbsPowerSeriesRingElem.integral_derivative" begin
-   R, x = PowerSeriesRing(QQ, 10, "x"; model=:capped_absolute)
+   R, x = power_series_ring(QQ, 10, "x"; model=:capped_absolute)
 
    for iter = 1:100
       f = rand(R, 0:0, -10:10)
@@ -423,7 +423,7 @@ end
 end
 
 @testset "QQAbsPowerSeriesRingElem.special" begin
-   R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(QQ, 30, "x", model=:capped_absolute)
 
    a = 1 + x + 3x^2 + O(x^5)
    b = x + 2x^2 + 5x^3 + O(x^5)
@@ -445,7 +445,7 @@ end
 end
 
 @testset "QQAbsPowerSeriesRingElem.unsafe_operators" begin
-   R, x = PowerSeriesRing(QQ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(QQ, 30, "x", model=:capped_absolute)
 
    for iter = 1:300
       f = rand(R, 0:9, -10:10)

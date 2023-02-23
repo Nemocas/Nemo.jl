@@ -69,7 +69,7 @@ Root 0.500000 + 0.866025*im of x^2 - x + 1
 Solving the quintic equation:
 
 ```julia
-julia> R, x = PolynomialRing(QQ, "x")
+julia> R, x = polynomial_ring(QQ, "x")
 (Univariate Polynomial Ring in x over Rational Field, x)
 
 julia> v = roots(x^5-x-1, QQBar)
@@ -128,7 +128,7 @@ Retrieving the minimal polynomial and algebraic conjugates
 of a given algebraic number:
 
 ```julia
-julia> minpoly(PolynomialRing(ZZ, "x")[1], QQBar(1+2im))
+julia> minpoly(polynomial_ring(ZZ, "x")[1], QQBar(1+2im))
 x^2 - 2*x + 5
 
 julia> conjugates(QQBar(1+2im))

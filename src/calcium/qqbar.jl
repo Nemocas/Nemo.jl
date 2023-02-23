@@ -41,7 +41,7 @@ check_parent(a::qqbar, b::qqbar, throw::Bool = true) = true
 
 # todo: want a C function for this
 function Base.hash(a::qqbar, h::UInt)
-   R, x = PolynomialRing(FlintZZ, "x")
+   R, x = polynomial_ring(FlintZZ, "x")
    return xor(hash(minpoly(R, a)), h)
 end
 
@@ -147,7 +147,7 @@ function native_string(x::qqbar)
    number = number[1:first(findfirst(" (", number))-1]
    number = replace(number, "I" => "im")
 
-   R, Rx = PolynomialRing(ZZ, "x")
+   R, Rx = polynomial_ring(ZZ, "x")
    polynomial = string(minpoly(R, x))
    polynomial = replace(polynomial, "*" => "")
    res = string("Root ", number, " of ", polynomial)

@@ -225,7 +225,7 @@ end
 
   @test iszero(e)
 
-  @test_throws ErrorException one(MatrixSpace(GF(ZZ(2)), 1, 2))
+  @test_throws ErrorException one(matrix_space(GF(ZZ(2)), 1, 2))
 
   @test is_square(a)
 
@@ -239,12 +239,12 @@ end
 
   @test b == c
 
-  @test transpose(MatrixSpace(Z11,1,2)([ 1 2; ])) ==
-          MatrixSpace(Z11,2,1)(reshape([ 1 ; 2],2,1))
+  @test transpose(matrix_space(Z11,1,2)([ 1 2; ])) ==
+          matrix_space(Z11,2,1)(reshape([ 1 ; 2],2,1))
 
   @test_throws ErrorConstrDimMismatch transpose!(R([ 1 2 ;]))
 
-  R = MatrixSpace(Z11, 4, 4)
+  R = matrix_space(Z11, 4, 4)
   m = [1 2 3 4; 2 4 6 2; 6 4 2 4; 2 6 4 0]
   @test R(m, true) == R(transpose(m))
   m1 = Matrix{BigInt}(m)
@@ -258,10 +258,10 @@ end
 @testset "FpMatrix.unary_ops" begin
   Z17 = GF(ZZ(17))
 
-  R = MatrixSpace(Z17, 3, 4)
-  RR = MatrixSpace(Z17, 4, 3)
+  R = matrix_space(Z17, 3, 4)
+  RR = matrix_space(Z17, 4, 3)
   Z2 = GF(ZZ(2))
-  S = MatrixSpace(Z2, 3, 4)
+  S = matrix_space(Z2, 3, 4)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 
@@ -277,7 +277,7 @@ end
 @testset "FpMatrix.binary_ops" begin
   Z17 = GF(ZZ(17))
 
-  R = MatrixSpace(Z17, 3, 4)
+  R = matrix_space(Z17, 3, 4)
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
   b = R([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
   c = R()
@@ -288,10 +288,10 @@ end
   @test d == R([ 16 1 3 0; 3 2 1 2; 1 2 0 0 ])
 
   d = a*transpose(a)
-  @test d == MatrixSpace(Z17, 3, 3)([15 12 13; 12 1 11; 13 11 14])
+  @test d == matrix_space(Z17, 3, 3)([15 12 13; 12 1 11; 13 11 14])
 
   d = transpose(a)*a
-  @test d == MatrixSpace(Z17, 4, 4)([11 11 8 7; 11 0 14 6; 8 14 14 5; 7 6 5 5])
+  @test d == matrix_space(Z17, 4, 4)([11 11 8 7; 11 0 14 6; 8 14 14 5; 7 6 5 5])
 
   a = matrix(Z17, [1 2; 3 4])
   @test mul!([ZZRingElem(), ZZRingElem()], a, ZZRingElem[1, 2]) == [Z17(5), Z17(11)]
@@ -340,7 +340,7 @@ end
 @testset "FpMatrix.adhoc_binary" begin
   Z17 = GF(ZZ(17))
 
-  R = MatrixSpace(Z17, 3, 4)
+  R = matrix_space(Z17, 3, 4)
   Z2 = GF(ZZ(2))
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
@@ -379,7 +379,7 @@ end
 @testset "FpMatrix.comparison" begin
   Z17 = GF(ZZ(17))
 
-  R = MatrixSpace(Z17, 3, 4)
+  R = matrix_space(Z17, 3, 4)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 
@@ -393,7 +393,7 @@ end
 @testset "FpMatrix.adhoc_comparison" begin
   Z17 = GF(ZZ(17))
 
-  R = MatrixSpace(Z17, 3, 4)
+  R = matrix_space(Z17, 3, 4)
 
   @test R(5) == 5
   @test R(5) == ZZRingElem(5)
@@ -407,7 +407,7 @@ end
 @testset "FpMatrix.powering" begin
   Z17 = GF(ZZ(17))
 
-  R = MatrixSpace(Z17, 3, 4)
+  R = matrix_space(Z17, 3, 4)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 
@@ -415,21 +415,21 @@ end
 
   g = f^1000
 
-  @test g == MatrixSpace(Z17, 3, 3)([1 2 2; 2 13 12; 2 12 15])
+  @test g == matrix_space(Z17, 3, 3)([1 2 2; 2 13 12; 2 12 15])
 
   g = f^ZZ(1000)
 
-  @test g == MatrixSpace(Z17, 3, 3)([1 2 2; 2 13 12; 2 12 15])
+  @test g == matrix_space(Z17, 3, 3)([1 2 2; 2 13 12; 2 12 15])
 
   @test_throws ErrorException f^(ZZ(2)^1000)
 end
 
 @testset "FpMatrix.row_echelon_form" begin
   Z17 = GF(ZZ(17))
-  R = MatrixSpace(Z17, 3, 4)
-  RR = MatrixSpace(Z17, 4, 3)
+  R = matrix_space(Z17, 3, 4)
+  RR = matrix_space(Z17, 4, 3)
   Z2 = GF(ZZ(2))
-  S = MatrixSpace(Z2, 3, 4)
+  S = matrix_space(Z2, 3, 4)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 
@@ -460,14 +460,14 @@ end
 
 @testset "FpMatrix.trace_det" begin
   Z17 = GF(ZZ(17))
-  R = MatrixSpace(Z17, 3, 4)
-  RR = MatrixSpace(Z17, 4, 3)
+  R = matrix_space(Z17, 3, 4)
+  RR = matrix_space(Z17, 4, 3)
   Z2 = GF(ZZ(2))
-  S = MatrixSpace(Z2, 3, 4)
+  S = matrix_space(Z2, 3, 4)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 
-  aa = MatrixSpace(Z17,3,3)([ 1 2 3; 3 2 1; 1 1 2])
+  aa = matrix_space(Z17,3,3)([ 1 2 3; 3 2 1; 1 1 2])
 
   b = R([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
 
@@ -492,14 +492,14 @@ end
 
 @testset "FpMatrix.rank" begin
   Z17 = GF(ZZ(17))
-  R = MatrixSpace(Z17, 3, 4)
-  RR = MatrixSpace(Z17, 4, 3)
+  R = matrix_space(Z17, 3, 4)
+  RR = matrix_space(Z17, 4, 3)
   Z2 = GF(ZZ(2))
-  S = MatrixSpace(Z2, 3, 4)
+  S = matrix_space(Z2, 3, 4)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 
-  aa = MatrixSpace(Z17,3,3)([ 1 2 3; 3 2 1; 1 1 2])
+  aa = matrix_space(Z17,3,3)([ 1 2 3; 3 2 1; 1 1 2])
 
   b = R([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
 
@@ -533,8 +533,8 @@ end
 
 @testset "FpMatrix.view" begin
   Z17 = GF(ZZ(17))
-  R = MatrixSpace(Z17, 3, 3)
-  S = MatrixSpace(Z17, 3, 4)
+  R = matrix_space(Z17, 3, 3)
+  S = matrix_space(Z17, 3, 4)
 
   a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
 
@@ -564,14 +564,14 @@ end
 
   @test_throws BoundsError view(a, 3, 3, 5, 5)
 
-  S = MatrixSpace(Z17, 3, 3)
+  S = matrix_space(Z17, 3, 3)
 
   A = S([1 2 3; 4 5 6; 7 8 9])
 
   B = @inferred view(A, 1, 1, 2, 2)
 
   @test typeof(B) == FpMatrix
-  @test B == MatrixSpace(Z17, 2, 2)([1 2; 4 5])
+  @test B == matrix_space(Z17, 2, 2)([1 2; 4 5])
 
   B[1, 1] = 10
   @test A[1, 1] == 10
@@ -579,7 +579,7 @@ end
   C = @inferred view(B, 1:2, 1:2)
 
   @test typeof(C) == FpMatrix
-  @test C == MatrixSpace(Z17, 2, 2)([10 2; 4 5])
+  @test C == matrix_space(Z17, 2, 2)([10 2; 4 5])
 
   C[1, 1] = 23
   @test B[1, 1] == 23
@@ -592,14 +592,14 @@ end
 
 @testset "FpMatrix.sub" begin
    Z17 = GF(ZZ(17))
-   S = MatrixSpace(Z17, 3, 3)
+   S = matrix_space(Z17, 3, 3)
 
    A = S([1 2 3; 4 5 6; 7 8 9])
 
    B = @inferred sub(A, 1, 1, 2, 2)
 
    @test typeof(B) == FpMatrix
-   @test B == MatrixSpace(Z17, 2, 2)([1 2; 4 5])
+   @test B == matrix_space(Z17, 2, 2)([1 2; 4 5])
 
    B[1, 1] = 10
    @test A == S([1 2 3; 4 5 6; 7 8 9])
@@ -607,17 +607,17 @@ end
    C = @inferred sub(B, 1:2, 1:2)
 
    @test typeof(C) == FpMatrix
-   @test C == MatrixSpace(Z17, 2, 2)([10 2; 4 5])
+   @test C == matrix_space(Z17, 2, 2)([10 2; 4 5])
 
    C[1, 1] = 20
-   @test B == MatrixSpace(Z17, 2, 2)([10 2; 4 5])
+   @test B == matrix_space(Z17, 2, 2)([10 2; 4 5])
    @test A == S([1 2 3; 4 5 6; 7 8 9])
 end
 
 @testset "FpMatrix.concatenation" begin
   Z17 = GF(ZZ(17))
-  R = MatrixSpace(Z17, 3, 3)
-  S = MatrixSpace(Z17, 3, 4)
+  R = matrix_space(Z17, 3, 3)
+  S = matrix_space(Z17, 3, 4)
 
   a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
 
@@ -625,13 +625,13 @@ end
 
   c = hcat(a,a)
 
-  @test c == MatrixSpace(Z17, 3, 6)([1, 2, 3, 1, 2, 3,
+  @test c == matrix_space(Z17, 3, 6)([1, 2, 3, 1, 2, 3,
                                      3, 2, 1, 3, 2, 1,
                                      0, 0, 2, 0, 0, 2])
 
   c = hcat(a,b)
 
-  @test c == MatrixSpace(Z17, 3, 7)([1, 2, 3, 2, 1, 0, 1,
+  @test c == matrix_space(Z17, 3, 7)([1, 2, 3, 2, 1, 0, 1,
                                      3, 2, 1, 0, 0, 0, 0,
                                      0, 0, 2, 0, 1, 2, 0])
 
@@ -639,7 +639,7 @@ end
 
   c = vcat(a,transpose(b))
 
-  @test c == MatrixSpace(Z17, 7, 3)([1, 2, 3,
+  @test c == matrix_space(Z17, 7, 3)([1, 2, 3,
                                      3, 2, 1,
                                      0, 0, 2,
                                      2, 0, 0,
@@ -652,8 +652,8 @@ end
 
 @testset "FpMatrix.conversion" begin
   Z17 = GF(ZZ(17))
-  R = MatrixSpace(Z17, 3, 3)
-  S = MatrixSpace(ZZ, 3, 3)
+  R = matrix_space(Z17, 3, 3)
+  S = matrix_space(ZZ, 3, 3)
 
   c = S()
 
@@ -680,8 +680,8 @@ end
    R = GF(ZZ(17))
 
    for dim = 0:5
-      S = MatrixSpace(R, dim, dim)
-      U, x = PolynomialRing(R, "x")
+      S = matrix_space(R, dim, dim)
+      U, x = polynomial_ring(R, "x")
 
       for i = 1:10
          M = rand(S, -5:5)
@@ -696,7 +696,7 @@ end
 
 @testset "FpMatrix.rand" begin
    R = GF(ZZ(17))
-   S = MatrixSpace(R, 3, 3)
+   S = matrix_space(R, 3, 3)
 
    M = rand(S, 1:5)
    @test parent(M) == S

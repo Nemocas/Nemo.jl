@@ -11,7 +11,7 @@ end
    @test isa(S1, fpRelPowerSeriesRing)
    @test S1 !== S2
 
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = power_series_ring(R, 30, "x")
 
    @test elem_type(S) == fpRelPowerSeriesRingElem
    @test elem_type(fpRelPowerSeriesRing) == fpRelPowerSeriesRingElem
@@ -53,7 +53,7 @@ end
 
 @testset "fpRelPowerSeriesRingElem.printing" begin
    R = GF(17)
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = power_series_ring(R, 30, "x")
    b = x^2 + x + O(x^4)
 
    @test sprint(show, "text/plain", b) == "x + x^2 + O(x^4)"
@@ -61,7 +61,7 @@ end
 
 @testset "fpRelPowerSeriesRingElem.manipulation" begin
    R = GF(17)
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = power_series_ring(R, 30, "x")
 
    @test max_precision(S) == 30
 
@@ -97,8 +97,8 @@ end
 
 @testset "fpRelPowerSeriesRingElem.similar" begin
    R0 = GF(23)
-   R, x = PowerSeriesRing(R0, 10, "x")
-   S, y = PowerSeriesRing(ZZ, 10, "y")
+   R, x = power_series_ring(R0, 10, "x")
+   S, y = power_series_ring(ZZ, 10, "y")
 
    for iters = 1:10
       f = rand(R, 0:10)
@@ -188,7 +188,7 @@ end
 
 @testset "fpRelPowerSeriesRingElem.unary_ops" begin
    R = GF(17)
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
    b = 1 + 2x + x^2 + O(x^3)
@@ -200,7 +200,7 @@ end
 
 @testset "fpRelPowerSeriesRingElem.binary_ops" begin
    R = GF(17)
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -338,7 +338,7 @@ end
 
 @testset "fpRelPowerSeriesRingElem.adhoc_binary_ops" begin
    R = GF(17)
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -356,7 +356,7 @@ end
 
 @testset "fpRelPowerSeriesRingElem.comparison" begin
    R = GF(17)
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
    b = O(x^3)
@@ -376,7 +376,7 @@ end
 
 @testset "fpRelPowerSeriesRingElem.adhoc_comparison" begin
    R = GF(17)
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
    b = O(x^0)
@@ -396,7 +396,7 @@ end
 
 @testset "fpRelPowerSeriesRingElem.powering" begin
    R = GF(17)
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -416,7 +416,7 @@ end
 
 @testset "fpRelPowerSeriesRingElem.shift" begin
    R = GF(17)
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -438,7 +438,7 @@ end
 
 @testset "fpRelPowerSeriesRingElem.truncation" begin
    R = GF(17)
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -458,7 +458,7 @@ end
 
 @testset "fpRelPowerSeriesRingElem.inversion" begin
    R = GF(17)
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = power_series_ring(R, 30, "x")
 
    a = 1 + x + 2x^2 + O(x^5)
    b = S(-1)
@@ -470,7 +470,7 @@ end
 
 @testset "fpRelPowerSeriesRingElem.exact_division" begin
    R = GF(17)
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = power_series_ring(R, 30, "x")
 
    a = x + x^3
    b = O(x^4)
@@ -488,7 +488,7 @@ end
 
 @testset "fpRelPowerSeriesRingElem.adhoc_exact_division" begin
    R = GF(17)
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = power_series_ring(R, 30, "x")
 
    a = x + x^3
    b = O(x^4)
@@ -510,7 +510,7 @@ end
 
 @testset "fpRelPowerSeriesRingElem.square_root" begin
    S = GF(31)
-   R, x = PowerSeriesRing(S, 30, "x")
+   R, x = power_series_ring(S, 30, "x")
 
    for iter = 1:300
       f = rand(R, 0:9)
@@ -521,7 +521,7 @@ end
    for p in [2, 7, 19, 65537]
       R = GF(p)
 
-      S, x = PowerSeriesRing(R, 10, "x")
+      S, x = power_series_ring(R, 10, "x")
 
       for iter = 1:10
          f = rand(S, 0:10, 0:Int(p))
@@ -551,7 +551,7 @@ end
 
 @testset "fpRelPowerSeriesRingElem.special_functions" begin
    R = GF(17)
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = power_series_ring(R, 30, "x")
 
    @test isequal(exp(x + O(x^5)), 1+x+9*x^2+3*x^3+5*x^4+O(x^5))
    @test isequal(exp(O(x^5)), 1+O(x^5))
@@ -562,7 +562,7 @@ end
 
 @testset "fpRelPowerSeriesRingElem.unsafe_operators" begin
    S = GF(17)
-   R, x = PowerSeriesRing(S, 30, "x")
+   R, x = power_series_ring(S, 30, "x")
 
    for iter = 1:300
       f = rand(R, 0:9)

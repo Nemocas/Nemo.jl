@@ -89,7 +89,7 @@ precision in future will return the same parent object and generator. If
 caching of the parent object is not required, `cached` can be set to `false`.
 """
 function PuiseuxSeriesRing(R::ZZRing, prec::Int, s::Symbol; cached=true)
-   S, x = LaurentSeriesRing(R, prec, s; cached=cached)
+   S, x = laurent_series_ring(R, prec, s; cached=cached)
 
    parent_obj = FlintPuiseuxSeriesRing{ZZLaurentSeriesRingElem}(S, cached)
 

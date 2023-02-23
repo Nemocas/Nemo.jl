@@ -435,7 +435,7 @@ end
 end
 
 @testset "acb.ZZPolyRingElem" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
    @test hilbert_class_polynomial(-3, R) == x
    @test_throws ArgumentError hilbert_class_polynomial(2, R)
    @test_throws ArgumentError hilbert_class_polynomial(-2, R)
@@ -452,7 +452,7 @@ end
 
    @test_throws DomainError lindep(vals1, -1)
 
-   R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+   R, (x, y) = polynomial_ring(ZZ, ["x", "y"])
    Phi = sum([C[3*i+j+1]*x^i*y^j for i in 0:2 for j in 0:2])
 
    @test Phi == x^2*y+16*x-y^2

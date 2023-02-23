@@ -1,6 +1,6 @@
 const ring_to_mat = Dict(FlintZZ                         => ZZMatrix,
                          FlintQQ                         => QQMatrix,
-                         ResidueRing(ZZ, 9)              => zzModMatrix,
+                         residue_ring(ZZ, 9)             => zzModMatrix,
                          GF(5)                           => fpMatrix,
                          FiniteField(3, 2, "b")[1]       => fqPolyRepMatrix,
                          FiniteField(ZZRingElem(3), 2, "b")[1] => FqPolyRepMatrix,

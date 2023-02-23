@@ -109,7 +109,7 @@ end
 
         F = NGFiniteField(p, 4, "s")[1]
         Z = GF(p)
-        R, x = PolynomialRing(Z, "x")
+        R, x = polynomial_ring(Z, "x")
 
         P1 = R(rand(Z, 4)) + x^4
         F1 = factor(P1)

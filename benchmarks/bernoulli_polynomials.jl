@@ -2,7 +2,7 @@ function benchmark_bernoulli()
    print("benchmark_bernoulli ... ")
 
    R, x = FlintQQ["x"]
-   S, t = PowerSeriesRing(R, 1000, "t")
+   S, t = power_series_ring(R, 1000, "t")
 
    u = t + O(t^1000)
 

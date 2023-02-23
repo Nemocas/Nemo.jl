@@ -757,11 +757,11 @@ end
 
 ###############################################################################
 #
-#   PowerSeriesRing constructor
+#   power_series_ring constructor
 #
 ###############################################################################
 
-function PowerSeriesRing(R::zzModRing, prec::Int, s::Symbol; model=:capped_relative, cached = true)
+function power_series_ring(R::zzModRing, prec::Int, s::Symbol; model=:capped_relative, cached = true)
    if model == :capped_relative
       parent_obj = zzModRelPowerSeriesRing(R, prec, s, cached)
    elseif model == :capped_absolute
@@ -772,8 +772,8 @@ function PowerSeriesRing(R::zzModRing, prec::Int, s::Symbol; model=:capped_relat
    return parent_obj, gen(parent_obj)
 end
 
-function PowerSeriesRing(R::zzModRing, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
-   return PowerSeriesRing(R, prec, Symbol(s); model=model, cached=cached)
+function power_series_ring(R::zzModRing, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
+   return power_series_ring(R, prec, Symbol(s); model=model, cached=cached)
 end
 
 function AbsSeriesRing(R::zzModRing, prec::Int)
@@ -784,7 +784,7 @@ function RelSeriesRing(R::zzModRing, prec::Int)
    return zzModRelPowerSeriesRing(R, prec, :x, false)
 end
 
-function PowerSeriesRing(R::fpField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
+function power_series_ring(R::fpField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
    if model == :capped_relative
       parent_obj = fpRelPowerSeriesRing(R, prec, s, cached)
    elseif model == :capped_absolute
@@ -795,8 +795,8 @@ function PowerSeriesRing(R::fpField, prec::Int, s::Symbol; model=:capped_relativ
    return parent_obj, gen(parent_obj)
 end
 
-function PowerSeriesRing(R::fpField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
-   return PowerSeriesRing(R, prec, Symbol(s); model=model, cached=cached)
+function power_series_ring(R::fpField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
+   return power_series_ring(R, prec, Symbol(s); model=model, cached=cached)
 end
 
 function AbsSeriesRing(R::fpField, prec::Int)

@@ -1,7 +1,7 @@
 @testset "Poly.binary_ops_delayed_reduction" begin
-   S, t = PolynomialRing(QQ, "t")
-   K, a = NumberField(t^3 + 3t + 1, "a")
-   R, x = PolynomialRing(K, "x")
+   S, t = polynomial_ring(QQ, "t")
+   K, a = number_field(t^3 + 3t + 1, "a")
+   R, x = polynomial_ring(K, "x")
 
    for iter = 1:100
       f = rand(R, 0:10, -10:10)
@@ -15,9 +15,9 @@
 end
 
 @testset "Poly.truncation_delayed_reduction" begin
-   S, t = PolynomialRing(QQ, "t")
-   K, a = NumberField(t^3 + 3t + 1, "a")
-   R, x = PolynomialRing(K, "x")
+   S, t = polynomial_ring(QQ, "t")
+   K, a = number_field(t^3 + 3t + 1, "a")
+   R, x = polynomial_ring(K, "x")
 
    for iter = 1:300
       f = rand(R, 0:10, -10:10)
@@ -28,10 +28,10 @@ end
    end
 end
 
-@testset "@PolynomialRing" begin
+@testset "@polynomial_ring" begin
    # cf. AbstractAlgebra issue #274
-   R, x = @PolynomialRing(ZZ, x)
+   R, x = @polynomial_ring(ZZ, x)
    @test typeof(R) == ZZMPolyRing
-   R, x = @PolynomialRing(QQ, x)
+   R, x = @polynomial_ring(QQ, x)
    @test typeof(R) == QQMPolyRing
 end

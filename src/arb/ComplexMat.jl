@@ -33,7 +33,7 @@ parent_type(::Type{ComplexMat}) = ComplexMatSpace
 elem_type(::Type{ComplexMatSpace}) = ComplexMat
 
 parent(x::ComplexMat, cached::Bool = true) =
-      MatrixSpace(base_ring(x), nrows(x), ncols(x))
+      matrix_space(base_ring(x), nrows(x), ncols(x))
 
 dense_matrix_type(::Type{ComplexFieldElem}) = ComplexMat
 
@@ -1003,11 +1003,11 @@ end
 
 ###############################################################################
 #
-#   MatrixSpace constructor
+#   matrix_space constructor
 #
 ###############################################################################
 
-function MatrixSpace(R::ComplexField, r::Int, c::Int; cached = true)
+function matrix_space(R::ComplexField, r::Int, c::Int; cached = true)
   (r <= 0 || c <= 0) && error("Dimensions must be positive")
   return ComplexMatSpace(R, r, c, cached)
 end

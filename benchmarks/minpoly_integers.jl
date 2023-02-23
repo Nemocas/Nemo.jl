@@ -1,6 +1,6 @@
 function benchmark_minpoly_integers()
    print("benchmark_minpoly_integers ... ")
-   M = MatrixSpace(FlintZZ, 80, 80)()
+   M = matrix_space(FlintZZ, 80, 80)()
    
    for i in 1:40
       for j in 1:40
@@ -14,7 +14,7 @@ function benchmark_minpoly_integers()
       similarity!(M, rand(1:80), ZZRingElem(rand(-3:3)))
    end
 
-   tt = @elapsed minpoly(PolynomialRing(FlintZZ, "x")[1], M)
+   tt = @elapsed minpoly(polynomial_ring(FlintZZ, "x")[1], M)
    println("$tt")
 end
 

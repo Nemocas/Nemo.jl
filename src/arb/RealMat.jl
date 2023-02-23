@@ -37,7 +37,7 @@ base_ring(a::RealMatSpace) = RealField()
 base_ring(a::RealMat) = RealField()
 
 parent(x::RealMat, cached::Bool = true) =
-      MatrixSpace(base_ring(x), nrows(x), ncols(x))
+      matrix_space(base_ring(x), nrows(x), ncols(x))
 
 dense_matrix_type(::Type{RealFieldElem}) = RealMat
 
@@ -766,11 +766,11 @@ promote_rule(::Type{RealMat}, ::Type{QQMatrix}) = RealMat
 
 ###############################################################################
 #
-#   MatrixSpace constructor
+#   matrix_space constructor
 #
 ###############################################################################
 
-function MatrixSpace(R::RealField, r::Int, c::Int; cached = true)
+function matrix_space(R::RealField, r::Int, c::Int; cached = true)
   (r <= 0 || c <= 0) && error("Dimensions must be positive")
   return RealMatSpace(R, r, c, cached)
 end

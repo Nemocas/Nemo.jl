@@ -68,7 +68,7 @@ resulting parent objects to coerce various elements into those fields.
 ```julia
 R, x = FiniteField(7, 3, "x")
 S, y = FiniteField(ZZ(12431351431561), 2, "y")
-T, t = PolynomialRing(ResidueRing(ZZ, 12431351431561), "t")
+T, t = polynomial_ring(residue_ring(ZZ, 12431351431561), "t")
 U, z = FiniteField(t^2 + 7, "z")
 
 a = R(5)
@@ -155,7 +155,7 @@ lift(::FpPolyRing, ::FqPolyRepFieldElem)
 
 ```julia
 R, x = FiniteField(23, 2, "x")
-S, y = PolynomialRing(GF(23), "y")
+S, y = polynomial_ring(GF(23), "y")
 
 f = 8x + 9
 

@@ -90,7 +90,7 @@ nrows(a::FpMatrixSpace) = a.nrows
 ncols(a::FpMatrixSpace) = a.ncols
 
 function parent(a::FpMatrix, cached::Bool = true)
-   MatrixSpace(base_ring(a), nrows(a), ncols(a); cached)
+   matrix_space(base_ring(a), nrows(a), ncols(a); cached)
 end
 
 base_ring(a::FpMatrixSpace) = a.base_ring
@@ -348,7 +348,7 @@ end
 #
 ################################################################################
 
-function MatrixSpace(R::FpField, r::Int, c::Int; cached::Bool = true)
+function matrix_space(R::FpField, r::Int, c::Int; cached::Bool = true)
   FpMatrixSpace(R, r, c, cached)
 end
 

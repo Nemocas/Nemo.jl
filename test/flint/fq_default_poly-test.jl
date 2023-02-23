@@ -1,6 +1,6 @@
 @testset "FqPolyRingElem.constructors" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    @test elem_type(S) == FqPolyRingElem
    @test elem_type(FqPolyRing) == FqPolyRingElem
@@ -10,7 +10,7 @@
 
    @test isa(y, PolyElem)
 
-   T, z = PolynomialRing(S, "z")
+   T, z = polynomial_ring(S, "z")
 
    @test typeof(T) <: Generic.PolyRing
 
@@ -51,7 +51,7 @@
 
    @test isa(n, PolyElem)
 
-   T, z = PolynomialRing(ZZ, "z")
+   T, z = polynomial_ring(ZZ, "z")
 
    p = S(3z^2 + 2z + 5)
 
@@ -61,8 +61,8 @@
 
    @test isa(r, PolyElem)
 
-   for R in [FlintZZ, ResidueRing(FlintZZ, 23), ResidueRing(FlintZZ, ZZ(23)), GF(23), GF(ZZ(23))]
-      T, y = PolynomialRing(R, "y")
+   for R in [FlintZZ, residue_ring(FlintZZ, 23), residue_ring(FlintZZ, ZZ(23)), GF(23), GF(ZZ(23))]
+      T, y = polynomial_ring(R, "y")
 
       f = 3y^2 + 2y + 1
 
@@ -72,8 +72,8 @@ end
 
 @testset "FqPolyRingElem.printing" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
-   T, z = PolynomialRing(S, "z")
+   S, y = polynomial_ring(R, "y")
+   T, z = polynomial_ring(S, "z")
 
    f = x^2 + y^3 + z + 1
 
@@ -82,7 +82,7 @@ end
 
 @testset "FqPolyRingElem.manipulation" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    @test iszero(zero(S))
 
@@ -128,7 +128,7 @@ end
 
 @testset "FqPolyRingElem.binary_ops" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
    g = (x + 1)*y + (x^3 + 2x + 2)
@@ -142,7 +142,7 @@ end
 
 @testset "FqPolyRingElem.adhoc_binary" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
    g = (x + 1)*y + (x^3 + 2x + 2)
@@ -178,7 +178,7 @@ end
 
 @testset "FqPolyRingElem.comparison" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
    g = x*y^2 + (x + 1)*y + 3
@@ -190,7 +190,7 @@ end
 
 @testset "FqPolyRingElem.adhoc_comparison" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    @test S(1) == 1
 
@@ -207,7 +207,7 @@ end
 
 @testset "FqPolyRingElem.unary_ops" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
 
@@ -216,7 +216,7 @@ end
 
 @testset "FqPolyRingElem.truncation" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
    g = (x + 1)*y + (x^3 + 2x + 2)
@@ -232,7 +232,7 @@ end
 
 @testset "FqPolyRingElem.reverse" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
 
@@ -243,7 +243,7 @@ end
 
 @testset "FqPolyRingElem.shift" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
 
@@ -258,7 +258,7 @@ end
 
 @testset "FqPolyRingElem.powering" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
 
@@ -269,7 +269,7 @@ end
 
 @testset "FqPolyRingElem.modular_arithmetic" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    f = (3*x^2 + x + 2)*y + x^2 + 1
    g = (5*x^2 + 2*x + 1)*y^2 + 2x*y + x + 1
@@ -290,7 +290,7 @@ end
 
 @testset "FqPolyRingElem.exact_division" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
    g = (x + 1)*y + (x^3 + 2x + 2)
@@ -300,7 +300,7 @@ end
 
 @testset "FqPolyRingElem.adhoc_exact_division" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
 
@@ -311,7 +311,7 @@ end
 
 @testset "FqPolyRingElem.euclidean_division" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    k = y^3 + x*y^2 + (x + 1)*y + 3
    l = (x + 1)*y^2 + (x^3 + 2x + 2)
@@ -323,7 +323,7 @@ end
 
 @testset "FqPolyRingElem.content_primpart_gcd" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    k = x*y^2 + (x + 1)*y + 3
    l = (x + 1)*y + (x^3 + 2x + 2)
@@ -345,7 +345,7 @@ end
 
 @testset "FqPolyRingElem.square_root" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    for iter in 1:1000
       f = rand(S, -1:10)
@@ -378,7 +378,7 @@ end
 
 @testset "FqPolyRingElem.evaluation" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    f = x^2 + 2x + 1
    g = x*y^2 + (x + 1)*y + 3
@@ -399,7 +399,7 @@ end
 
 @testset "FqPolyRingElem.composition" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
    g = (x + 1)*y + (x^3 + 2x + 2)
@@ -409,7 +409,7 @@ end
 
 @testset "FqPolyRingElem.derivative" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    h = x*y^2 + (x + 1)*y + 3
 
@@ -418,7 +418,7 @@ end
 
 @testset "FqPolyRingElem.integral" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    f = (x^2 + 2x + 1)*y^2 + (x + 1)*y - 2x + 4
 
@@ -427,7 +427,7 @@ end
 
 @testset "FqPolyRingElem.resultant" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    f = 3x*y^2 + (x + 1)*y + 3
    g = 6(x + 1)*y + (x^3 + 2x + 2)
@@ -437,7 +437,7 @@ end
 
 @testset "FqPolyRingElem.discriminant" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
 
@@ -446,7 +446,7 @@ end
 
 @testset "FqPolyRingElem.gcdx" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    f = 3x*y^2 + (x + 1)*y + 3
    g = 6(x + 1)*y + (x^3 + 2x + 2)
@@ -456,7 +456,7 @@ end
 
 @testset "FqPolyRingElem.special" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    @test chebyshev_t(20, y) == 524288*y^20-2621440*y^18+5570560*y^16-6553600*y^14+4659200*y^12-2050048*y^10+549120*y^8-84480*y^6+6600*y^4-200*y^2+1
 
@@ -465,7 +465,7 @@ end
 
 @testset "FqPolyRingElem.inflation_deflation" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    f = (x + 1)*y^2 + 2x*y + x + 3
 
@@ -474,7 +474,7 @@ end
 
 @testset "FqPolyRingElem.is_irreducible" begin
   R, a = NGFiniteField(ZZRingElem(23), 1, "a")
-  Rx, x = PolynomialRing(R, "x")
+  Rx, x = polynomial_ring(R, "x")
 
   f = x^6 + x^4 + 2 *x^2
 
@@ -487,7 +487,7 @@ end
 
 @testset "FqPolyRingElem.is_squarefree" begin
   R, a = NGFiniteField(ZZRingElem(23), 1, "a")
-  Rx, x = PolynomialRing(R, "x")
+  Rx, x = polynomial_ring(R, "x")
 
   f = x^6 + x^4 + 2 *x^2
 
@@ -498,7 +498,7 @@ end
 
 @testset "FqPolyRingElem.factor" begin
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    f = 7y^2 + 3y + 2
    g = 11y^3 - 2y^2 + 5
@@ -532,7 +532,7 @@ end
 
 @testset "FqPolyRingElem.remove_valuation" begin
    R, x = NGFiniteField(23, 5, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    f = 7y^2 + 3y + 2
    g = f^5*(11y^3 - 2y^2 + 5)

@@ -135,7 +135,7 @@ julia> log(C(10)^23) // log(C(100))
 julia> 4*atan(C(1)//5) - atan(C(1)//239) == C(pi)//4
 true
 
-julia> Cx, x = PolynomialRing(C, "x")
+julia> Cx, x = polynomial_ring(C, "x")
 (Univariate Polynomial Ring in x over Exact Complex Field, x)
 
 julia> (a, b) = (sqrt(C(2)), sqrt(C(3)))

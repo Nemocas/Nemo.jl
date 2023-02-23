@@ -9,7 +9,7 @@ end
    @test isa(S1, ZZRelPowerSeriesRing)
    @test S1 !== S2
 
-   R, x = PowerSeriesRing(ZZ, 30, "x")
+   R, x = power_series_ring(ZZ, 30, "x")
 
    @test elem_type(R) == ZZRelPowerSeriesRingElem
    @test elem_type(ZZRelPowerSeriesRing) == ZZRelPowerSeriesRingElem
@@ -34,14 +34,14 @@ end
 end
 
 @testset "ZZRelPowerSeriesRingElem.printing" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x")
+   R, x = power_series_ring(ZZ, 30, "x")
    a = x^3 + 2x + 1
 
    @test sprint(show, "text/plain", a) == "1 + 2*x + x^3 + O(x^30)"
 end
 
 @testset "ZZRelPowerSeriesRingElem.manipulation" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x")
+   R, x = power_series_ring(ZZ, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -62,7 +62,7 @@ end
 end
 
 @testset "ZZRelPowerSeriesRingElem.similar" begin
-   R, x = PowerSeriesRing(ZZ, 10, "x")
+   R, x = power_series_ring(ZZ, 10, "x")
 
    for iters = 1:10
       f = rand(R, 0:10, -10:10)
@@ -145,7 +145,7 @@ end
 end
 
 @testset "ZZRelPowerSeriesRingElem.unary_ops" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x")
+   R, x = power_series_ring(ZZ, 30, "x")
 
    a = 2x + x^3
    b = 1 + 2x + x^2 + O(x^3)
@@ -156,7 +156,7 @@ end
 end
 
 @testset "ZZRelPowerSeriesRingElem.binary_ops" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x")
+   R, x = power_series_ring(ZZ, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -293,7 +293,7 @@ end
 end
 
 @testset "ZZRelPowerSeriesRingElem.adhoc_binary_ops" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x")
+   R, x = power_series_ring(ZZ, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -312,7 +312,7 @@ end
 end
 
 @testset "ZZRelPowerSeriesRingElem.comparison" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x")
+   R, x = power_series_ring(ZZ, 30, "x")
 
    a = 2x + x^3
    b = O(x^3)
@@ -327,7 +327,7 @@ end
 end
 
 @testset "ZZRelPowerSeriesRingElem.adhoc_comparison" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x")
+   R, x = power_series_ring(ZZ, 30, "x")
 
    a = 2x + x^3
    b = O(x^0)
@@ -346,7 +346,7 @@ end
 end
 
 @testset "ZZRelPowerSeriesRingElem.powering" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x")
+   R, x = power_series_ring(ZZ, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -365,7 +365,7 @@ end
 end
 
 @testset "ZZRelPowerSeriesRingElem.shift" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x")
+   R, x = power_series_ring(ZZ, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -386,7 +386,7 @@ end
 end
 
 @testset "ZZRelPowerSeriesRingElem.truncation" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x")
+   R, x = power_series_ring(ZZ, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -405,7 +405,7 @@ end
 end
 
 @testset "ZZRelPowerSeriesRingElem.exact_division" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x")
+   R, x = power_series_ring(ZZ, 30, "x")
 
    a = x + x^3
    b = O(x^4)
@@ -422,7 +422,7 @@ end
 end
 
 @testset "ZZRelPowerSeriesRingElem.adhoc_exact_division" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x")
+   R, x = power_series_ring(ZZ, 30, "x")
 
    a = x + x^3
    b = O(x^4)
@@ -441,7 +441,7 @@ end
 end
 
 @testset "ZZRelPowerSeriesRingElem.inversion" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x")
+   R, x = power_series_ring(ZZ, 30, "x")
 
    a = 1 + x + 2x^2 + O(x^5)
    b = R(-1)
@@ -452,7 +452,7 @@ end
 end
 
 @testset "ZZRelPowerSeriesRingElem.integral_derivative" begin
-   R, x = PowerSeriesRing(ZZ, 10, "x")
+   R, x = power_series_ring(ZZ, 10, "x")
 
    for iter = 1:100
       f = rand(R, 0:0, -10:10)
@@ -462,7 +462,7 @@ end
 end
 
 @testset "ZZRelPowerSeriesRingElem.square_root" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x")
+   R, x = power_series_ring(ZZ, 30, "x")
 
    a = rand(R, 0:10, -10:10)
    b = a^2
@@ -471,7 +471,7 @@ end
 end
 
 @testset "ZZRelPowerSeriesRingElem.unsafe_operators" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x")
+   R, x = power_series_ring(ZZ, 30, "x")
 
    for iter = 1:300
       f = rand(R, 0:9, -10:10)

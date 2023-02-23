@@ -798,6 +798,6 @@ end
 #
 ################################################################################
 
-function MatrixSpace(R::FqField, r::Int, c::Int; cached::Bool = true)
+function matrix_space(R::FqField, r::Int, c::Int; cached::Bool = true)
   FqMatrixSpace(R, r, c, cached)
 end

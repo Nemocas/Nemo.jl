@@ -1,8 +1,8 @@
 function benchmark_solve_poly()
    print("benchmark_solve_poly ... ")
-   R, x = PolynomialRing(FlintZZ, "x")
-   S, y = PolynomialRing(R, "y")
-   M = MatrixSpace(S, 20, 20)()
+   R, x = polynomial_ring(FlintZZ, "x")
+   S, y = polynomial_ring(R, "y")
+   M = matrix_space(S, 20, 20)()
 
    for i in 1:20
      for j in 1:20
@@ -12,7 +12,7 @@ function benchmark_solve_poly()
      end
    end
 
-   b = MatrixSpace(S, 20, 1)()
+   b = matrix_space(S, 20, 1)()
 
    for j in 1:20
      for k in 0:2

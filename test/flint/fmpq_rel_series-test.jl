@@ -9,7 +9,7 @@ end
    @test isa(S1, QQRelPowerSeriesRing)
    @test S1 !== S2
 
-   R, x = PowerSeriesRing(QQ, 30, "x")
+   R, x = power_series_ring(QQ, 30, "x")
 
    @test elem_type(R) == QQRelPowerSeriesRingElem
    @test elem_type(QQRelPowerSeriesRing) == QQRelPowerSeriesRingElem
@@ -48,7 +48,7 @@ end
 end
 
 @testset "QQRelPowerSeriesRingElem.printing" begin
-   R, x = PowerSeriesRing(QQ, 30, "x")
+   R, x = power_series_ring(QQ, 30, "x")
 
    a = x^3 + 2x + 1
 
@@ -56,7 +56,7 @@ end
 end
 
 @testset "QQRelPowerSeriesRingElem.manipulation" begin
-   R, x = PowerSeriesRing(QQ, 30, "x")
+   R, x = power_series_ring(QQ, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -77,8 +77,8 @@ end
 end
 
 @testset "QQRelPowerSeriesRingElem.similar" begin
-   R, x = PowerSeriesRing(QQ, 10, "x")
-   S, y = PowerSeriesRing(ZZ, 10, "y")
+   R, x = power_series_ring(QQ, 10, "x")
+   S, y = power_series_ring(ZZ, 10, "y")
 
    for iters = 1:10
       f = rand(R, 0:10, -10:10)
@@ -166,7 +166,7 @@ end
 end
 
 @testset "QQRelPowerSeriesRingElem.unary_ops" begin
-   R, x = PowerSeriesRing(QQ, 30, "x")
+   R, x = power_series_ring(QQ, 30, "x")
 
    a = 2x + x^3
    b = 1 + 2x + x^2 + O(x^3)
@@ -177,7 +177,7 @@ end
 end
 
 @testset "QQRelPowerSeriesRingElem.binary_ops" begin
-   R, x = PowerSeriesRing(QQ, 30, "x")
+   R, x = power_series_ring(QQ, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -314,7 +314,7 @@ end
 end
 
 @testset "QQRelPowerSeriesRingElem.adhoc_binary_ops" begin
-   R, x = PowerSeriesRing(QQ, 30, "x")
+   R, x = power_series_ring(QQ, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -346,7 +346,7 @@ end
 end
 
 @testset "QQRelPowerSeriesRingElem.comparison" begin
-   R, x = PowerSeriesRing(QQ, 30, "x")
+   R, x = power_series_ring(QQ, 30, "x")
 
    a = 2x + x^3
    b = O(x^3)
@@ -361,7 +361,7 @@ end
 end
 
 @testset "QQRelPowerSeriesRingElem.adhoc_comparison" begin
-   R, x = PowerSeriesRing(QQ, 30, "x")
+   R, x = power_series_ring(QQ, 30, "x")
 
    a = 2x + x^3
    b = O(x^0)
@@ -383,7 +383,7 @@ end
 end
 
 @testset "QQRelPowerSeriesRingElem.powering" begin
-   R, x = PowerSeriesRing(QQ, 30, "x")
+   R, x = power_series_ring(QQ, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -402,7 +402,7 @@ end
 end
 
 @testset "QQRelPowerSeriesRingElem.shift" begin
-   R, x = PowerSeriesRing(QQ, 30, "x")
+   R, x = power_series_ring(QQ, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -423,7 +423,7 @@ end
 end
 
 @testset "QQRelPowerSeriesRingElem.truncation" begin
-   R, x = PowerSeriesRing(QQ, 30, "x")
+   R, x = power_series_ring(QQ, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -442,7 +442,7 @@ end
 end
 
 @testset "QQRelPowerSeriesRingElem.exact_division" begin
-   R, x = PowerSeriesRing(QQ, 30, "x")
+   R, x = power_series_ring(QQ, 30, "x")
 
    a = x + x^3
    b = O(x^4)
@@ -459,7 +459,7 @@ end
 end
 
 @testset "QQRelPowerSeriesRingElem.adhoc_exact_division" begin
-   R, x = PowerSeriesRing(QQ, 30, "x")
+   R, x = power_series_ring(QQ, 30, "x")
 
    a = x + x^3
    b = O(x^4)
@@ -480,7 +480,7 @@ end
 end
 
 @testset "QQRelPowerSeriesRingElem.inversion" begin
-   R, x = PowerSeriesRing(QQ, 30, "x")
+   R, x = power_series_ring(QQ, 30, "x")
 
    a = 1 + x + 2x^2 + O(x^5)
    b = R(-1)
@@ -491,7 +491,7 @@ end
 end
 
 @testset "QQRelPowerSeriesRingElem.integral_derivative" begin
-   R, x = PowerSeriesRing(QQ, 10, "x")
+   R, x = power_series_ring(QQ, 10, "x")
 
    for iter = 1:100
       f = rand(R, 0:0, -10:10)
@@ -501,7 +501,7 @@ end
 end
 
 @testset "QQRelPowerSeriesRingElem.special" begin
-   R, x = PowerSeriesRing(QQ, 30, "x")
+   R, x = power_series_ring(QQ, 30, "x")
 
    a = 1 + x + 3x^2 + O(x^5)
    b = x + 2x^2 + 5x^3 + O(x^5)
@@ -523,7 +523,7 @@ end
 end
 
 @testset "QQRelPowerSeriesRingElem.unsafe_operators" begin
-   R, x = PowerSeriesRing(QQ, 30, "x")
+   R, x = power_series_ring(QQ, 30, "x")
 
    for iter = 1:300
       f = rand(R, 0:9, -10:10)

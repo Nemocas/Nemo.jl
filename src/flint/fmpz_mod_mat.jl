@@ -102,7 +102,7 @@ nrows(a::ZZModMatrixSpace) = a.nrows
 ncols(a::ZZModMatrixSpace) = a.ncols
 
 function parent(a::T, cached::Bool = true) where T <: Zmod_fmpz_mat
-   MatrixSpace(base_ring(a), nrows(a), ncols(a); cached)
+   matrix_space(base_ring(a), nrows(a), ncols(a); cached)
 end
 
 base_ring(a::ZZModMatrixSpace) = a.base_ring
@@ -893,7 +893,7 @@ end
 #
 ################################################################################
 
-function MatrixSpace(R::ZZModRing, r::Int, c::Int; cached::Bool = true)
+function matrix_space(R::ZZModRing, r::Int, c::Int; cached::Bool = true)
   ZZModMatrixSpace(R, r, c, cached)
 end
 

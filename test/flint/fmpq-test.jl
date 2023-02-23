@@ -12,7 +12,7 @@ end
 end
 
 @testset "QQFieldElem.constructors" begin
-   R = FractionField(ZZ)
+   R = fraction_field(ZZ)
 
    @test elem_type(R) == QQFieldElem
    @test elem_type(QQField) == QQFieldElem
@@ -102,7 +102,7 @@ end
 end
 
 @testset "QQFieldElem.manipulation" begin
-   R = FractionField(ZZ)
+   R = fraction_field(ZZ)
 
    @test zero(QQFieldElem) == 0
 

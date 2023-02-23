@@ -95,7 +95,7 @@ contains(D, C)
 **Examples**
 
 ```julia
-S = MatrixSpace(ZZ, 3, 3)
+S = matrix_space(ZZ, 3, 3)
 
 A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -117,7 +117,7 @@ det_given_divisor(::ZZMatrix, ::ZZRingElem, ::Bool)
 **Examples**
 
 ```julia
-S = MatrixSpace(ZZ, 3, 3)
+S = matrix_space(ZZ, 3, 3)
 
 A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -139,8 +139,8 @@ solve_dixon(::QQMatrix, ::QQMatrix)
 **Examples**
 
 ```julia
-S = MatrixSpace(ZZ, 3, 3)
-T = MatrixSpace(ZZ, 3, 1)
+S = matrix_space(ZZ, 3, 3)
+T = matrix_space(ZZ, 3, 1)
 
 A = S([ZZRingElem(2) 3 5; 1 4 7; 9 2 2])
 B = T([ZZRingElem(4), 5, 7])
@@ -157,7 +157,7 @@ pseudo_inv(::ZZMatrix)
 **Examples**
 
 ```julia
-S = MatrixSpace(ZZ, 3, 3)
+S = matrix_space(ZZ, 3, 3)
 
 A = S([1 0 1; 2 3 1; 5 6 7])
 
@@ -180,7 +180,7 @@ reduce_mod(::ZZMatrix, ::ZZRingElem)
 **Examples**
 
 ```julia
-S = MatrixSpace(ZZ, 3, 3)
+S = matrix_space(ZZ, 3, 3)
 
 A = S([ZZRingElem(2) 3 5; 1 4 7; 9 2 2])
 
@@ -198,8 +198,8 @@ lift(::fpMatrix)
 **Examples**
 
 ```julia
-R = ResidueRing(ZZ, 7)
-S = MatrixSpace(R, 3, 3)
+R = residue_ring(ZZ, 7)
+S = matrix_space(R, 3, 3)
 
 a = S([4 5 6; 7 3 2; 1 4 5])
 
@@ -223,8 +223,8 @@ hilbert(::QQMatrixSpace)
 **Examples**
 
 ```julia
-R = MatrixSpace(ZZ, 3, 3)
-S = MatrixSpace(QQ, 3, 3)
+R = matrix_space(ZZ, 3, 3)
+S = matrix_space(QQ, 3, 3)
 
 A = hadamard(R)
 is_hadamard(A)
@@ -256,7 +256,7 @@ is_hnf(::ZZMatrix)
 **Examples**
 
 ```julia
-S = MatrixSpace(ZZ, 3, 3)
+S = matrix_space(ZZ, 3, 3)
 
 A = S([ZZRingElem(2) 3 5; 1 4 7; 19 3 7])
 
@@ -315,7 +315,7 @@ lll_gram!(::ZZMatrix, ::lll_ctx)
 **Examples**
 
 ```julia
-S = MatrixSpace(ZZ, 3, 3)
+S = matrix_space(ZZ, 3, 3)
 
 A = S([ZZRingElem(2) 3 5; 1 4 7; 19 3 7])
 
@@ -346,7 +346,7 @@ is_snf(::ZZMatrix)
 **Examples**
 
 ```julia
-S = MatrixSpace(ZZ, 3, 3)
+S = matrix_space(ZZ, 3, 3)
 
 A = S([ZZRingElem(2) 3 5; 1 4 7; 19 3 7])
 
@@ -368,8 +368,8 @@ strong_echelon_form(::fpMatrix)
 **Examples**
 
 ```julia
-R = ResidueRing(ZZ, 12)
-S = MatrixSpace(R, 3, 3)
+R = residue_ring(ZZ, 12)
+S = matrix_space(R, 3, 3)
 
 A = S([4 1 0; 0 0 5; 0 0 0 ])
 
@@ -386,8 +386,8 @@ howell_form(::fpMatrix)
 **Examples**
 
 ```julia
-R = ResidueRing(ZZ, 12)
-S = MatrixSpace(R, 3, 3)
+R = residue_ring(ZZ, 12)
+S = matrix_space(R, 3, 3)
 
 A = S([4 1 0; 0 0 5; 0 0 0 ])
 
@@ -403,7 +403,7 @@ gso(::QQMatrix)
 **Examples**
 
 ```julia
-S = MatrixSpace(QQ, 3, 3)
+S = matrix_space(QQ, 3, 3)
 
 A = S([4 7 3; 2 9 1; 0 5 3])
 

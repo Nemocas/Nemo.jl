@@ -1,8 +1,8 @@
 function benchmark_minpoly_gcd_domain()
    print("benchmark_minpoly_gcd_domain ... ")
-   ZZx, x = PolynomialRing(ZZ, "x")
+   ZZx, x = polynomial_ring(ZZ, "x")
 
-   M = MatrixSpace(ZZx, 20, 20)()
+   M = matrix_space(ZZx, 20, 20)()
 
    for i in 1:10
       for j in 1:10
@@ -16,6 +16,6 @@ function benchmark_minpoly_gcd_domain()
       similarity!(M, rand(1:20), ZZx(rand(-3:3)))
    end
 
-   tt = @elapsed minpoly(PolynomialRing(ZZx, "y")[1], M)
+   tt = @elapsed minpoly(polynomial_ring(ZZx, "y")[1], M)
    println("$tt")
 end

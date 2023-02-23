@@ -253,14 +253,14 @@ end
 
 function _get_raw_type(::Type{fqPolyRepField}, F::FqField)
   @assert _fq_default_ctx_type(F) == 2
-  Rx, _ = PolynomialRing(GF(UInt(characteristic(F))), "x", cached = false)
+  Rx, _ = polynomial_ring(GF(UInt(characteristic(F))), "x", cached = false)
   m = map_coefficients(x -> _coeff(x, 0), defining_polynomial(F), parent = Rx)
   return fqPolyRepField(m, :$, false)
 end
 
 function _get_raw_type(::Type{FqPolyRepField}, F::FqField)
   @assert _fq_default_ctx_type(F) == 3
-  Rx, _ = PolynomialRing(GF(characteristic(F)), "x", cached = false)
+  Rx, _ = polynomial_ring(GF(characteristic(F)), "x", cached = false)
   m = map_coefficients(x -> _coeff(x, 0), defining_polynomial(F), parent = Rx)
   return FqPolyRepField(m, :$, false)
 end

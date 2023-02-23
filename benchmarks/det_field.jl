@@ -1,8 +1,8 @@
 function benchmark_nf_det()
    print("benchmark_nf_det ... ")
-   QQx, x = PolynomialRing(FlintQQ, "x")
+   QQx, x = polynomial_ring(FlintQQ, "x")
    K, a = AnticNumberField(x^3 + 3*x + 1, "a")
-   M = MatrixSpace(K, 80, 80)()
+   M = matrix_space(K, 80, 80)()
 
    for i in 1:80
      for j in 1:80

@@ -68,7 +68,7 @@ function embed_gens(k::FqField, K::FqField)
     b = K()
     p = ZZRingElem(characteristic(k))::ZZRingElem
     R = GF(p)
-    PR = PolynomialRing(R, "T")[1]
+    PR = polynomial_ring(R, "T")[1]
     P = PR()
 
     _fq_default_embed_gens(a, b, P, k, K)
@@ -145,6 +145,6 @@ end
 ################################################################################
 
 function embed_polynomial(P::FqPolyRingElem, f::FinFieldMorphism)
-    S = PolynomialRing(codomain(f), "T")[1]
+    S = polynomial_ring(codomain(f), "T")[1]
     return S([f(coeff(P, j)) for j in 0:degree(P)])
 end

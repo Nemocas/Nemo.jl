@@ -6648,7 +6648,7 @@ const _fq_default_mpoly_union = Union{AbstractAlgebra.Generic.MPoly{FqPolyRepFie
                 AbstractAlgebra.Generic.MPolyRing{FqPolyRepFieldElem}}
     base_ring::FqField
     typ::Int    # keep these in sync with fq_default_mpoly_do_op and
-                # the PolynomialRing constructor
+                # the polynomial_ring constructor
 
     function FqMPolyRing(a, b::FqField, c::Int, cached = true)
         return get_cached!(FqDefaultMPolyID, (a, b, c), cached) do

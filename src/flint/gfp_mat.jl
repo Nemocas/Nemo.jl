@@ -490,6 +490,6 @@ end
 #
 ################################################################################
 
-function MatrixSpace(R::fpField, r::Int, c::Int; cached::Bool = true)
+function matrix_space(R::fpField, r::Int, c::Int; cached::Bool = true)
   fpMatrixSpace(R, r, c, cached)
 end

@@ -1,5 +1,5 @@
 @testset "QQMatrix.constructors" begin
-   S = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(QQ, 3, 3)
 
    @test elem_type(S) == QQMatrix
    @test elem_type(QQMatrixSpace) == QQMatrix
@@ -120,7 +120,7 @@
 end
 
 @testset "QQMatrix.similar" begin
-   S = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(QQ, 3, 3)
    s = S(ZZRingElem(3))
 
    t = similar(s)
@@ -147,14 +147,14 @@ end
 end
 
 @testset "QQMatrix.printing" begin
-   a = MatrixSpace(QQ, 2, 2)(1)
+   a = matrix_space(QQ, 2, 2)(1)
 
   # test that default Julia printing is not used
   @test !occursin(string(typeof(a)), string(a))
 end
 
 @testset "QQMatrix.manipulation" begin
-   S = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(QQ, 3, 3)
    A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
    B = S([QQFieldElem(1) 4 7; 9 6 7; 4 3 3])
 
@@ -192,14 +192,14 @@ end
 end
 
 @testset "QQMatrix.view" begin
-   S = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(QQ, 3, 3)
 
    A = S([1 2 3; 4 5 6; 7 8 9])
 
    B = @inferred view(A, 1, 1, 2, 2)
 
    @test typeof(B) == QQMatrix
-   @test B == MatrixSpace(QQ, 2, 2)([1 2; 4 5])
+   @test B == matrix_space(QQ, 2, 2)([1 2; 4 5])
 
    B[1, 1] = 10
    @test A[1, 1] == 10
@@ -207,7 +207,7 @@ end
    C = @inferred view(B, 1:2, 1:2)
 
    @test typeof(C) == QQMatrix
-   @test C == MatrixSpace(QQ, 2, 2)([10 2; 4 5])
+   @test C == matrix_space(QQ, 2, 2)([10 2; 4 5])
 
    C[1, 1] = 20
    @test B[1, 1] == 20
@@ -220,14 +220,14 @@ end
 end
 
 @testset "QQMatrix.sub" begin
-   S = MatrixSpace(FlintQQ, 3, 3)
+   S = matrix_space(FlintQQ, 3, 3)
 
    A = S([1 2 3; 4 5 6; 7 8 9])
 
    B = @inferred sub(A, 1, 1, 2, 2)
 
    @test typeof(B) == QQMatrix
-   @test B == MatrixSpace(FlintQQ, 2, 2)([1 2; 4 5])
+   @test B == matrix_space(FlintQQ, 2, 2)([1 2; 4 5])
 
    B[1, 1] = 10
    @test A == S([1 2 3; 4 5 6; 7 8 9])
@@ -235,15 +235,15 @@ end
    C = @inferred sub(B, 1:2, 1:2)
 
    @test typeof(C) == QQMatrix
-   @test C == MatrixSpace(FlintQQ, 2, 2)([10 2; 4 5])
+   @test C == matrix_space(FlintQQ, 2, 2)([10 2; 4 5])
 
    C[1, 1] = 20
-   @test B == MatrixSpace(FlintQQ, 2, 2)([10 2; 4 5])
+   @test B == matrix_space(FlintQQ, 2, 2)([10 2; 4 5])
    @test A == S([1 2 3; 4 5 6; 7 8 9])
 end
 
 @testset "QQMatrix.unary_ops" begin
-   S = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(QQ, 3, 3)
 
    A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
    B = S([QQFieldElem(-2) (-3) (-5); (-1) (-4) (-7); (-9) (-6) (-3)])
@@ -252,7 +252,7 @@ end
 end
 
 @testset "QQMatrix.binary_ops" begin
-   S = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(QQ, 3, 3)
 
    A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
    B = S([QQFieldElem(1) 4 7; 9 6 7; 4 3 3])
@@ -265,7 +265,7 @@ end
 end
 
 @testset "QQMatrix.adhoc_binary" begin
-   S = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(QQ, 3, 3)
 
    A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -290,9 +290,9 @@ end
 end
 
 @testset "QQMatrix.kronecker_product" begin
-   S = MatrixSpace(QQ, 2, 3)
-   S2 = MatrixSpace(QQ, 2, 2)
-   S3 = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(QQ, 2, 3)
+   S2 = matrix_space(QQ, 2, 2)
+   S3 = matrix_space(QQ, 3, 3)
 
    A = S(QQFieldElem[2 3 5; 9 6 3])
    B = S2(QQFieldElem[2 3; 1 4])
@@ -303,7 +303,7 @@ end
 end
 
 @testset "QQMatrix.comparison" begin
-   S = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(QQ, 3, 3)
 
    A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
    B = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
@@ -314,7 +314,7 @@ end
 end
 
 @testset "QQMatrix.adhoc_comparison" begin
-   S = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(QQ, 3, 3)
 
    A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -335,7 +335,7 @@ end
 end
 
 @testset "QQMatrix.powering" begin
-   S = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(QQ, 3, 3)
 
    A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -345,7 +345,7 @@ end
 end
 
 @testset "QQMatrix.adhoc_exact_division" begin
-   S = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(QQ, 3, 3)
 
    A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -358,7 +358,7 @@ end
 end
 
 @testset "QQMatrix.gso" begin
-   S = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(QQ, 3, 3)
 
    A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -368,7 +368,7 @@ end
 end
 
 @testset "QQMatrix.trace" begin
-   S = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(QQ, 3, 3)
 
    A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -376,7 +376,7 @@ end
 end
 
 @testset "QQMatrix.transpose" begin
-   S = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(QQ, 3, 3)
 
    A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -427,7 +427,7 @@ end
 end
 
 @testset "QQMatrix.inversion" begin
-   S = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(QQ, 3, 3)
 
    A = S([QQFieldElem(2) 3 5; 1 4 7; 9 2 2])
    B = S([-6 4 1; 61 (-41) (-9); -34 23 5])
@@ -450,7 +450,7 @@ end
 end
 
 @testset "QQMatrix.exact_division" begin
-   S = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(QQ, 3, 3)
 
    A = S([QQFieldElem(2) 3 5; 1 4 7; 9 2 2])
    B = S([2 3 4; 7 9 1; 5 4 5])
@@ -459,7 +459,7 @@ end
 end
 
 @testset "QQMatrix.det" begin
-   S = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(QQ, 3, 3)
 
    A = S([QQFieldElem(2) 3 5; 1 4 7; 19 3 7])
 
@@ -467,7 +467,7 @@ end
 end
 
 @testset "QQMatrix.hilbert" begin
-   S = MatrixSpace(QQ, 4, 4)
+   S = matrix_space(QQ, 4, 4)
 
    c4 = ZZRingElem(2)^2*ZZRingElem(3)
 
@@ -477,8 +477,8 @@ end
 end
 
 @testset "QQMatrix.nullspace" begin
-   S = MatrixSpace(QQ, 3, 3)
-   T = MatrixSpace(QQ, 3, 1)
+   S = matrix_space(QQ, 3, 3)
+   T = matrix_space(QQ, 3, 1)
 
    A = S([QQFieldElem(2) 3 5; 1 4 7; 4 1 1])
 
@@ -490,7 +490,7 @@ end
 end
 
 @testset "QQMatrix.rank" begin
-   S = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(QQ, 3, 3)
 
    A = S([QQFieldElem(2) 3 5; 1 4 7; 4 1 1])
 
@@ -501,7 +501,7 @@ end
    for iters = 1:50
       m = rand(0:50)
       n = rand(0:50)
-      S = MatrixSpace(QQ, m, n)
+      S = matrix_space(QQ, m, n)
       M = rand(S, -100:100)
       r, N = rref(M)
 
@@ -511,7 +511,7 @@ end
       @test (r, N) == (rr, MM)
    end
  
-   S = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(QQ, 3, 3)
 
    A = S([QQFieldElem(2) 3 5; 1 4 7; 4 1 1])
 
@@ -519,11 +519,11 @@ end
 end
 
 @testset "QQMatrix.solve" begin
-   S = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(QQ, 3, 3)
 
    A = S([QQFieldElem(2) 3 5; 1 4 7; 9 2 2])
 
-   T = MatrixSpace(QQ, 3, 1)
+   T = matrix_space(QQ, 3, 1)
 
    B = T([QQFieldElem(4), 5, 7])
 
@@ -551,8 +551,8 @@ end
       n = rand(0:10)
       k = rand(0:10)
 
-      M = MatrixSpace(QQ, n, k)
-      N = MatrixSpace(QQ, n, m)
+      M = matrix_space(QQ, n, k)
+      N = matrix_space(QQ, n, m)
 
       A = rand(M, -10:10)
       B = rand(N, -10:10)
@@ -618,9 +618,9 @@ end
 end
 
 @testset "QQMatrix.concat" begin
-   S = MatrixSpace(QQ, 3, 3)
-   T = MatrixSpace(QQ, 3, 6)
-   U = MatrixSpace(QQ, 6, 3)
+   S = matrix_space(QQ, 3, 3)
+   T = matrix_space(QQ, 3, 6)
+   U = matrix_space(QQ, 6, 3)
 
    A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
    B = S([QQFieldElem(1) 4 7; 9 6 7; 4 3 3])
@@ -631,8 +631,8 @@ end
 end
 
 @testset "QQMatrix.charpoly" begin
-   S = MatrixSpace(QQ, 3, 3)
-   R, x = PolynomialRing(QQ, "x")
+   S = matrix_space(QQ, 3, 3)
+   R, x = polynomial_ring(QQ, "x")
 
    A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -640,8 +640,8 @@ end
 end
 
 @testset "QQMatrix.minpoly" begin
-   S = MatrixSpace(QQ, 10, 10)
-   R, x = PolynomialRing(QQ, "x")
+   S = matrix_space(QQ, 10, 10)
+   R, x = polynomial_ring(QQ, "x")
    M = S()
 
    for i in 1:5
@@ -660,7 +660,7 @@ end
 end
 
 @testset "QQMatrix.rand" begin
-   S = MatrixSpace(QQ, 10, 10)
+   S = matrix_space(QQ, 10, 10)
    M = rand(S, 1:9)
    @test parent(M) == S
    for i=1:10, j=1:10

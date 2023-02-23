@@ -87,7 +87,7 @@ Compute the minimal polynomial of a linear recurring sequence $a$.
 """
 function berlekamp_massey(a::Vector{Y}, n::Int) where Y <: FieldElem
 
-  S, T = PolynomialRing(parent(a[1]), "T")
+  S, T = polynomial_ring(parent(a[1]), "T")
   m = 2*n - 1
   R0 = T^(2*n)
   R1 = S(reverse(a))
@@ -191,7 +191,7 @@ Returns a compatible embedding from $k$ to $K$.
 """
 function find_morphism(k::T, K::T) where T <: FinField
 
-    S = PolynomialRing(K, "T")[1]
+    S = polynomial_ring(K, "T")[1]
     Q = S()
     needy = false
     m, n = degree(k), degree(K)

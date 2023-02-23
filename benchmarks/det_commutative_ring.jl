@@ -1,10 +1,10 @@
 function benchmark_znz_det()
    print("benchmark_znz_det ... ")
    n = 2003 * 1009
-   Zn = ResidueRing(FlintZZ, n)
-   R, x = PolynomialRing(Zn, "x")
+   Zn = residue_ring(FlintZZ, n)
+   R, x = polynomial_ring(Zn, "x")
 
-   M = MatrixSpace(R, 80, 80)()
+   M = matrix_space(R, 80, 80)()
 
    for i in 1:80
      for j in 1:80

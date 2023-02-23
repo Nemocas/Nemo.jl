@@ -10,14 +10,14 @@ local test_fields = (NGFiniteField(23, 1, "a"),
          var_names = ["x$j" for j in 1:num_vars]
          ord = rand_ordering()
 
-         S, varlist = PolynomialRing(R, var_names, ordering = ord)
+         S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
-         SS, varlist = PolynomialRing(R, var_names, ordering = ord)
+         SS, varlist = polynomial_ring(R, var_names, ordering = ord)
 
          @test S === SS
 
-         SSS, varlist = PolynomialRing(R, var_names, ordering = ord, cached = false)
-         SSSS, varlist = PolynomialRing(R, var_names, ordering = ord, cached = false)
+         SSS, varlist = polynomial_ring(R, var_names, ordering = ord, cached = false)
+         SSSS, varlist = polynomial_ring(R, var_names, ordering = ord, cached = false)
 
          @test !(SSS === SSSS)
 
@@ -68,7 +68,7 @@ end
 
 @testset "FqMPolyRingElem.printing" begin
    for (R, a) in test_fields
-      S, (x, y) = PolynomialRing(R, ["x", "y"])
+      S, (x, y) = polynomial_ring(R, ["x", "y"])
 
       @test !occursin(r"{", string(S))
 
@@ -86,7 +86,7 @@ end
 
 @testset "FqMPolyRingElem.hash" begin
    for (R, a) in test_fields
-      S, (x, y) = PolynomialRing(R, ["x", "y"])
+      S, (x, y) = polynomial_ring(R, ["x", "y"])
 
       p = y^2
 
@@ -97,17 +97,17 @@ end
 
 @testset "FqMPolyRingElem.inside_other_stuff" begin
    for (R, a) in test_fields
-      S, (x, y, z, w) = PolynomialRing(R, ["x", "y", "z", "w"])
+      S, (x, y, z, w) = polynomial_ring(R, ["x", "y", "z", "w"])
       @test det(matrix(S, [x y; z w])) == x*w - y*z
 
-      SX, X = PolynomialRing(S, "X")
+      SX, X = polynomial_ring(S, "X")
       @test add!(SX(), X + x, X + y) == x + y + 2*X
       @test iszero(zero!(X))
    end
 end
 
 @testset "FqMPolyRingElem.dont_mix_the_parents" begin
-   S = FqMPolyRing[PolynomialRing(Ri[1], ["x"])[1] for Ri in test_fields]
+   S = FqMPolyRing[polynomial_ring(Ri[1], ["x"])[1] for Ri in test_fields]
    cs = [one(base_ring(Si)) for Si in S]
    exps = Vector{Int}[Int[i] for i in 1:length(S)]
    @test_throws ErrorException S[1](cs, exps)
@@ -119,7 +119,7 @@ end
          var_names = ["x$j" for j in 1:num_vars]
          ord = rand_ordering()
 
-         S, varlist = PolynomialRing(R, var_names, ordering = ord)
+         S, varlist = polynomial_ring(R, var_names, ordering = ord)
          g = gens(S)
 
          @test characteristic(S) == characteristic(R)
@@ -229,7 +229,7 @@ end
          @test (total_degree(h) == max(sum.(monomialexp)...)) || (h == 0 && total_degree(h) == -1)
       end
 
-      S, (x, y) = PolynomialRing(R, ["x", "y"])
+      S, (x, y) = polynomial_ring(R, ["x", "y"])
 
       @test trailing_coefficient(3x^2*y^2 + 2x*y + 5x + y + 7) == 7
       @test trailing_coefficient(3x^2*y^2 + 2x*y + 5x) == 5
@@ -242,7 +242,7 @@ end
 @testset "FqMPolyRingElem.multivariate_coeff" begin
    for (R, a) in test_fields
       for ord in Nemo.flint_orderings
-         S, (x, y, z) = PolynomialRing(R, ["x", "y", "z"]; ordering=ord)
+         S, (x, y, z) = polynomial_ring(R, ["x", "y", "z"]; ordering=ord)
 
          f = 15*x^5*y^3*z^5+9*x^5*y^2*z^3+15*x^4*y^5*z^4+13*x^4*y^3*z^2+8*x^3*y^2*z+13*x*y^3*z^4+19*a*x*y+13*x*z^2+8*y^2*z^5+14*y^2*z^3
 
@@ -263,7 +263,7 @@ end
          var_names = ["x$j" for j in 1:num_vars]
          ord = rand_ordering()
 
-         S, varlist = PolynomialRing(R, var_names, ordering = ord)
+         S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
          for iter = 1:10
             f = rand(S, 0:5, 0:100)
@@ -280,7 +280,7 @@ end
          var_names = ["x$j" for j in 1:num_vars]
          ord = rand_ordering()
 
-         S, varlist = PolynomialRing(R, var_names, ordering = ord)
+         S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
          for iter = 1:10
             f = rand(S, 0:5, 0:100)
@@ -303,7 +303,7 @@ end
          var_names = ["x$j" for j in 1:num_vars]
          ord = rand_ordering()
 
-         S, varlist = PolynomialRing(R, var_names, ordering = ord)
+         S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
          for iter = 1:100
             f = rand(S, 0:5, 0:100)
@@ -339,7 +339,7 @@ end
          var_names = ["x$j" for j in 1:num_vars]
          ord = rand_ordering()
 
-         S, varlist = PolynomialRing(R, var_names, ordering = ord)
+         S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
          for iter = 1:100
             d = rand(-100:100)
@@ -361,7 +361,7 @@ end
          var_names = ["x$j" for j in 1:num_vars]
          ord = rand_ordering()
 
-         S, varlist = PolynomialRing(R, var_names, ordering = ord)
+         S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
          for iter = 1:10
             f = rand(S, 0:5, 0:100)
@@ -387,7 +387,7 @@ end
          var_names = ["x$j" for j in 1:num_vars]
          ord = rand_ordering()
 
-         S, varlist = PolynomialRing(R, var_names, ordering = ord)
+         S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
          @test divexact(2*gen(S, 1), 2) == gen(S, 1)
          @test divexact(2*gen(S, 1), R(2)) == gen(S, 1)
@@ -419,7 +419,7 @@ end
          var_names = ["x$j" for j in 1:num_vars]
          ord = rand_ordering()
 
-         S, varlist = PolynomialRing(R, var_names, ordering = ord)
+         S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
          for iter = 1:10
             f = S(0)
@@ -455,7 +455,7 @@ end
          var_names = ["x$j" for j in 1:num_vars]
          ord = rand_ordering()
 
-         S, varlist = PolynomialRing(R, var_names, ordering = ord)
+         S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
          for iter = 1:10
             f = S(0)
@@ -504,7 +504,7 @@ end
          var_names = ["x$j" for j in 1:num_vars]
          ord = rand_ordering()
 
-         S, varlist = PolynomialRing(R, var_names, ordering = ord)
+         S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
          for iter = 1:10
             f = rand(S, 0:4, 0:5)
@@ -536,7 +536,7 @@ end
 
    for (R, a) in test_fields
       characteristic(R) == 23 || continue
-      S, (x, y, z) = PolynomialRing(R, ["x", "y", "z"])
+      S, (x, y, z) = polynomial_ring(R, ["x", "y", "z"])
       a = iszero(a) ? one(R) : a
       check_factor(3*a^3*x^23+2*a^2*y^23+a*z^23, 23)
       check_factor(x^99-a^33*y^99*z^33, 22)
@@ -549,7 +549,7 @@ end
          var_names = ["x$j" for j in 1:num_vars]
          ord = rand_ordering()
 
-         S, varlist = PolynomialRing(R, var_names, ordering = ord)
+         S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
          for iter = 1:10
             f = rand(S, 0:4, 0:5, -10:10)
@@ -578,7 +578,7 @@ end
          var_names = ["x$j" for j in 1:num_vars]
          ord = rand_ordering()
 
-         S, varlist = PolynomialRing(R, var_names, ordering = ord)
+         S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
          for iter = 1:100
             f = rand(S, 0:5, 0:100)
@@ -614,7 +614,7 @@ end
       end
 
       # Individual tests
-      S, (x, y) = PolynomialRing(R, ["x", "y"])
+      S, (x, y) = polynomial_ring(R, ["x", "y"])
       T = MatrixAlgebra(R, 2)
 
       f = x^2*y^2+2*x+1
@@ -632,7 +632,7 @@ end
          var_names = ["x$j" for j in 1:num_vars]
          ord = rand_ordering()
 
-         S, varlist = PolynomialRing(R, var_names, ordering = ord)
+         S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
          for iter = 1:100
             f = S()
@@ -670,7 +670,7 @@ end
          var_names = ["x$j" for j in 1:num_vars]
          ord = rand_ordering()
 
-         S, varlist = PolynomialRing(R, var_names, ordering = ord)
+         S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
          for j in 1:100
             f = rand(S, 0:5, 0:100)
@@ -690,7 +690,7 @@ end
         var_names = ["x$j" for j in 1:num_vars]
         ord = rand_ordering()
 
-        S, _ = PolynomialRing(R, var_names; ordering=ord)
+        S, _ = polynomial_ring(R, var_names; ordering=ord)
 
         for iter in 1:10
            f = S()
@@ -726,7 +726,7 @@ end
         var_names = ["x$j" for j in 1:num_vars]
         ord = rand_ordering()
 
-        S, _ = PolynomialRing(R, var_names; ordering=ord)
+        S, _ = polynomial_ring(R, var_names; ordering=ord)
 
         for iter in 1:10
            f = S()
@@ -773,7 +773,7 @@ end
 @testset "FqMPolyRingElem.gcd_with_cofactors" begin
    # TODO replace by "for (F, t) in test_fields" once gcd_with_cofactors is in AA
    for (F, t) in (test_fields[1], test_fields[2])
-      R, (x, y, z) = PolynomialRing(F, [:x, :y, :z])
+      R, (x, y, z) = polynomial_ring(F, [:x, :y, :z])
 
       @test gcd_with_cofactors(x, y) == (1, x, y)
 

@@ -2,8 +2,8 @@ CC = ComplexField()
 RR = RealField()
 
 @testset "ComplexMat.constructors" begin
-   S = MatrixSpace(CC, 3, 3)
-   R = MatrixSpace(ZZ, 3, 3)
+   S = matrix_space(CC, 3, 3)
+   R = matrix_space(ZZ, 3, 3)
 
    @test elem_type(S) == ComplexMat
    @test elem_type(ComplexMatSpace) == ComplexMat
@@ -95,7 +95,7 @@ RR = RealField()
 end
 
 @testset "ComplexMat.similar" begin
-   S = MatrixSpace(CC, 3, 3)
+   S = matrix_space(CC, 3, 3)
    s = S(ZZRingElem(3))
 
    t = similar(s)
@@ -122,7 +122,7 @@ end
 end
 
 @testset "ComplexMat.printing" begin
-   S = MatrixSpace(CC, 3, 3)
+   S = matrix_space(CC, 3, 3)
    f = S(ZZRingElem(3))
 
    # test that default Julia printing is not used
@@ -130,7 +130,7 @@ end
 end
 
 @testset "ComplexMat.manipulation" begin
-   S = MatrixSpace(CC, 3, 3)
+   S = matrix_space(CC, 3, 3)
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
    B = S([ZZRingElem(1) 4 7; 9 6 7; 4 3 3])
 
@@ -148,8 +148,8 @@ end
 end
 
 @testset "ComplexMat.unary_ops" begin
-   S = MatrixSpace(CC, 3, 3)
-   R = MatrixSpace(ZZ, 3, 3)
+   S = matrix_space(CC, 3, 3)
+   R = matrix_space(ZZ, 3, 3)
 
    A = S([2 3 5; 1 4 7; 9 6 3])
    B = R([(-2) (-3) (-5); (-1) (-4) (-7); (-9) (-6) (-3)])
@@ -158,8 +158,8 @@ end
 end
 
 @testset "ComplexMat.transpose" begin
-   S = MatrixSpace(CC, 3, 3)
-   T = MatrixSpace(ZZ, 3, 3)
+   S = matrix_space(CC, 3, 3)
+   T = matrix_space(ZZ, 3, 3)
 
    A = S([2 3 5; 1 4 7; 9 6 3])
 
@@ -173,8 +173,8 @@ end
 end
 
 @testset "ComplexMat.binary_ops" begin
-   S = MatrixSpace(CC, 3, 3)
-   R = MatrixSpace(ZZ, 3, 3)
+   S = matrix_space(CC, 3, 3)
+   R = matrix_space(ZZ, 3, 3)
 
    A = S([2 3 5; 1 4 7; 9 6 3])
    B = S([1 4 7; 9 6 7; 4 3 3])
@@ -187,9 +187,9 @@ end
 end
 
 @testset "ComplexMat.adhoc_binary" begin
-   S = MatrixSpace(CC, 3, 3)
-   R = MatrixSpace(ZZ, 3, 3)
-   T = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(CC, 3, 3)
+   R = matrix_space(ZZ, 3, 3)
+   T = matrix_space(QQ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
    B = R([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
@@ -248,8 +248,8 @@ end
 end
 
 @testset "ComplexMat.shifting" begin
-   S = MatrixSpace(CC, 3, 3)
-   R = MatrixSpace(ZZ, 3, 3)
+   S = matrix_space(CC, 3, 3)
+   R = matrix_space(ZZ, 3, 3)
 
    A = S([2 3 5; 1 4 7; 9 6 3])
    B = R([2 3 5; 1 4 7; 9 6 3])
@@ -261,8 +261,8 @@ end
 end
 
 @testset "ComplexMat.comparison" begin
-   S = MatrixSpace(CC, 3, 3)
-   R = MatrixSpace(ZZ, 3, 3)
+   S = matrix_space(CC, 3, 3)
+   R = matrix_space(ZZ, 3, 3)
 
    A = S([2 3 5; 1 4 7; 9 6 3])
    AZZ = R([2 3 5; 1 4 7; 9 6 3])
@@ -283,9 +283,9 @@ end
 end
 
 @testset "ComplexMat.adhoc_comparison" begin
-   S = MatrixSpace(CC, 3, 3)
-   R = MatrixSpace(ZZ, 3, 3)
-   T = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(CC, 3, 3)
+   R = matrix_space(ZZ, 3, 3)
+   T = matrix_space(QQ, 3, 3)
 
    A = S([2 3 5; 1 4 7; 9 6 3])
    B = R([2 3 5; 1 4 7; 9 6 3])
@@ -304,7 +304,7 @@ end
 end
 
 @testset "ComplexMat.predicates" begin
-   S = MatrixSpace(CC, 3, 3)
+   S = matrix_space(CC, 3, 3)
    A = S([1 2 1000; 0 3 1; 0 2 1])
 
    @test isreal(A)
@@ -315,8 +315,8 @@ end
 end
 
 @testset "ComplexMat.inversion" begin
-   S = MatrixSpace(CC, 3, 3)
-   R = MatrixSpace(ZZ, 3, 3)
+   S = matrix_space(CC, 3, 3)
+   R = matrix_space(ZZ, 3, 3)
 
    A = S([1 2 1000; 0 3 1; 0 2 1])
    B = R([1 1998 -2998; 0 1 -1; 0 -2 3])
@@ -328,8 +328,8 @@ end
 end
 
 @testset "ComplexMat.divexact" begin
-   S = MatrixSpace(CC, 3, 3)
-   R = MatrixSpace(ZZ, 3, 3)
+   S = matrix_space(CC, 3, 3)
+   R = matrix_space(ZZ, 3, 3)
 
    A = S([1 2 1001; 0 3 1; 0 2 1])
    B = R([1 2000 -3001; 0 1 -1; 0 -2 3])
@@ -339,8 +339,8 @@ end
 end
 
 @testset "ComplexMat.adhoc_divexact" begin
-   S = MatrixSpace(CC, 3, 3)
-   R = MatrixSpace(ZZ, 3, 3)
+   S = matrix_space(CC, 3, 3)
+   R = matrix_space(ZZ, 3, 3)
 
    A = S([3 0 0; 0 3 0; 0 0 3])
    B = one(R)
@@ -354,9 +354,9 @@ end
 end
 
 @testset "ComplexMat.charpoly" begin
-   S = MatrixSpace(CC, 3, 3)
-   R, x = PolynomialRing(CC, "x")
-   ZZy, y = PolynomialRing(ZZ, "y")
+   S = matrix_space(CC, 3, 3)
+   R, x = polynomial_ring(CC, "x")
+   ZZy, y = polynomial_ring(ZZ, "y")
 
    A = S(["2.0 +/- 0.1" "3.0 +/- 0.1" "5.0 +/- 0.1";
           "0.0 +/- 0.1" "4.0 +/- 0.1" "7.0 +/- 0.1";
@@ -370,7 +370,7 @@ end
 end
 
 @testset "ComplexMat.det" begin
-   S = MatrixSpace(CC, 3, 3)
+   S = matrix_space(CC, 3, 3)
 
    A = S(["2.0 +/- 0.1" "3.0 +/- 0.1" "5.0 +/- 0.1";
           "0.0 +/- 0.1" "4.0 +/- 0.1" "7.0 +/- 0.1";
@@ -382,7 +382,7 @@ end
 end
 
 @testset "ComplexMat.exp" begin
-   S = MatrixSpace(CC, 3, 3)
+   S = matrix_space(CC, 3, 3)
 
    A = S(["2.0 +/- 0.1" "0.0 +/- 0.1" "0.0 +/- 0.1";
           "0.0 +/- 0.1" "4.0 +/- 0.1" "0.0 +/- 0.1";
@@ -396,8 +396,8 @@ end
 end
 
 @testset "ComplexMat.linear_solving" begin
-   S = MatrixSpace(CC, 3, 3)
-   T = MatrixSpace(ZZ, 3, 3)
+   S = matrix_space(CC, 3, 3)
+   T = matrix_space(ZZ, 3, 3)
 
    A = S(["1.0 +/- 0.01" "2.0 +/- 0.01" "3.0 +/- 0.01";
           "4.0 +/- 0.01" "5.0 +/- 0.01" "6.0 +/- 0.01";
@@ -428,7 +428,7 @@ end
 end
 
 @testset "ComplexMat.bound_inf_norm" begin
-   S = MatrixSpace(CC, 3, 3)
+   S = matrix_space(CC, 3, 3)
 
    A = S([2 3 5; 1 4 7; 9 6 3])
 

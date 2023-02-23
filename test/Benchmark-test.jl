@@ -1,8 +1,8 @@
 @testset "Benchmark.fateman" begin
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
-   T, z = PolynomialRing(S, "z")
-   U, t = PolynomialRing(T, "t")
+   R, x = polynomial_ring(ZZ, "x")
+   S, y = polynomial_ring(R, "y")
+   T, z = polynomial_ring(S, "z")
+   U, t = polynomial_ring(T, "t")
 
    p = (x + y + z + t + 1)^20
 
@@ -12,11 +12,11 @@
 end
 
 @testset "Benchmark.pearce" begin
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
-   T, z = PolynomialRing(S, "z")
-   U, t = PolynomialRing(T, "t")
-   V, u = PolynomialRing(U, "u")
+   R, x = polynomial_ring(ZZ, "x")
+   S, y = polynomial_ring(R, "y")
+   T, z = polynomial_ring(S, "z")
+   U, t = polynomial_ring(T, "t")
+   V, u = polynomial_ring(U, "u")
 
    f = (x + y + 2z^2 + 3t^3 + 5u^5 + 1)^10
    g = (u + t + 2z^2 + 3y^3 + 5x^5 + 1)^10
@@ -28,9 +28,9 @@ end
 
 @testset "Benchmark.resultant" begin
    R, x = FlintFiniteField(7, 11, "x")
-   S, y = PolynomialRing(R, "y")
-   T = ResidueRing(S, y^3 + 3x*y + 1)
-   U, z = PolynomialRing(T, "z")
+   S, y = polynomial_ring(R, "y")
+   T = residue_ring(S, y^3 + 3x*y + 1)
+   U, z = polynomial_ring(T, "z")
 
    f = (3y^2 + y + x)*z^2 + ((x + 2)*y^2 + x + 1)*z + 4x*y + 3
    g = (7y^2 - y + 2x + 7)*z^2 + (3y^2 + 4x + 1)*z + (2x + 1)*y + 1
@@ -45,7 +45,7 @@ end
 
 @testset "Benchmark.poly_nf_elem" begin
    R, x = CyclotomicField(20, "x")
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    f = (3x^7 + x^4 - 3x + 1)*y^3 + (2x^6-x^5+4x^4-x^3+x^2-1)*y +(-3x^7+2x^6-x^5+3x^3-2x^2+x)
 

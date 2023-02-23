@@ -82,7 +82,7 @@
 
   @test isa(d, FqMatrix)
 
-  ar = MatrixSpace(ZZ, 2, 2)([ 1 1; 1 1])
+  ar = matrix_space(ZZ, 2, 2)([ 1 1; 1 1])
 
   e = R(ar)
 
@@ -166,9 +166,9 @@
    @test !(a in keys(Dict(b => 1)))
 
    R, x = NGFiniteField(ZZRingElem(23), 5, "x")
-   S = MatrixSpace(R, 2, 2)
+   S = matrix_space(R, 2, 2)
 
-   for R in [FlintZZ, ResidueRing(FlintZZ, 23), ResidueRing(FlintZZ, ZZ(23)), GF(23)]
+   for R in [FlintZZ, residue_ring(FlintZZ, 23), residue_ring(FlintZZ, ZZ(23)), GF(23)]
       M = matrix(R, 2, 2, [1, 2, 3, 4])
 
       @test isa(S(M), MatElem)
@@ -177,7 +177,7 @@ end
 
 @testset "FqMatrix.similar" begin
    F9, b = NGFiniteField(ZZRingElem(3), 2, "b")
-   S = MatrixSpace(F9, 3, 3)
+   S = matrix_space(F9, 3, 3)
    s = S(ZZRingElem(3))
 
    t = similar(s)
@@ -265,7 +265,7 @@ end
 
   @test iszero(e)
 
-  @test_throws ErrorException one(MatrixSpace(F9, 1, 2))
+  @test_throws ErrorException one(matrix_space(F9, 1, 2))
 
   @test is_square(a)
 
@@ -275,8 +275,8 @@ end
 
   @test transpose(b) == c
 
-  @test transpose(MatrixSpace(F4,1,2)([ 1 2; ])) ==
-          MatrixSpace(F4,2,1)(reshape([ 1 ; 2],2,1))
+  @test transpose(matrix_space(F4,1,2)([ 1 2; ])) ==
+          matrix_space(F4,2,1)(reshape([ 1 ; 2],2,1))
 
   @test_throws ErrorConstrDimMismatch transpose!(R([ 1 2 ;]))
 end
@@ -284,8 +284,8 @@ end
 @testset "FqMatrix.unary_ops" begin
   F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
 
-  R = MatrixSpace(F17, 3, 4)
-  RR = MatrixSpace(F17, 4, 3)
+  R = matrix_space(F17, 3, 4)
+  RR = matrix_space(F17, 4, 3)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 
@@ -301,7 +301,7 @@ end
 @testset "FqMatrix.binary_ops" begin
   F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
 
-  R = MatrixSpace(F17, 3, 4)
+  R = matrix_space(F17, 3, 4)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 
@@ -319,11 +319,11 @@ end
 
   d = a*transpose(a)
 
-  @test d == MatrixSpace(F17, 3, 3)([15 12 13; 12 1 11; 13 11 14])
+  @test d == matrix_space(F17, 3, 3)([15 12 13; 12 1 11; 13 11 14])
 
   d = transpose(a)*a
 
-  @test d == MatrixSpace(F17, 4, 4)([11 11 8 7; 11 0 14 6; 8 14 14 5; 7 6 5 5])
+  @test d == matrix_space(F17, 4, 4)([11 11 8 7; 11 0 14 6; 8 14 14 5; 7 6 5 5])
 end
 
 @testset "FqMatrix.row_col_swapping" begin
@@ -368,7 +368,7 @@ end
 @testset "FqMatrix.adhoc_binary" begin
   F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
 
-  R = MatrixSpace(F17, 3, 4)
+  R = matrix_space(F17, 3, 4)
   F2, _ = NGFiniteField(ZZRingElem(2), 1, "a")
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
@@ -407,7 +407,7 @@ end
 @testset "FqMatrix.comparison" begin
   F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
 
-  R = MatrixSpace(F17, 3, 4)
+  R = matrix_space(F17, 3, 4)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 
@@ -421,7 +421,7 @@ end
 @testset "FqMatrix.adhoc_comparison" begin
   F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
 
-  R = MatrixSpace(F17, 3, 4)
+  R = matrix_space(F17, 3, 4)
 
   @test R(5) == 5
   @test R(5) == ZZRingElem(5)
@@ -435,7 +435,7 @@ end
 @testset "FqMatrix.powering" begin
   F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
 
-  R = MatrixSpace(F17, 3, 4)
+  R = matrix_space(F17, 3, 4)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 
@@ -443,13 +443,13 @@ end
 
   g = f^1000
 
-  @test g == MatrixSpace(F17, 3, 3)([1 2 2; 2 13 12; 2 12 15])
+  @test g == matrix_space(F17, 3, 3)([1 2 2; 2 13 12; 2 12 15])
 end
 
 @testset "FqMatrix.row_echelon_form" begin
   F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
-  R = MatrixSpace(F17, 3, 4)
-  RR = MatrixSpace(F17, 4, 3)
+  R = matrix_space(F17, 3, 4)
+  RR = matrix_space(F17, 4, 3)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 
@@ -477,12 +477,12 @@ end
 
 @testset "FqMatrix.trace_det" begin
   F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
-  R = MatrixSpace(F17, 3, 4)
-  RR = MatrixSpace(F17, 4, 3)
+  R = matrix_space(F17, 3, 4)
+  RR = matrix_space(F17, 4, 3)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 
-  aa = MatrixSpace(F17,3,3)([ 1 2 3; 3 2 1; 1 1 2])
+  aa = matrix_space(F17,3,3)([ 1 2 3; 3 2 1; 1 1 2])
 
   b = R([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
 
@@ -509,12 +509,12 @@ end
 
 @testset "FqMatrix.rank" begin
   F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
-  R = MatrixSpace(F17, 3, 4)
-  RR = MatrixSpace(F17, 4, 3)
+  R = matrix_space(F17, 3, 4)
+  RR = matrix_space(F17, 4, 3)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 
-  aa = MatrixSpace(F17,3,3)([ 1 2 3; 3 2 1; 1 1 2])
+  aa = matrix_space(F17,3,3)([ 1 2 3; 3 2 1; 1 1 2])
 
   b = R([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
 
@@ -533,12 +533,12 @@ end
 
 @testset "FqMatrix.inv" begin
   F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
-  R = MatrixSpace(F17, 3, 4)
-  RR = MatrixSpace(F17, 4, 3)
+  R = matrix_space(F17, 3, 4)
+  RR = matrix_space(F17, 4, 3)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 
-  aa = MatrixSpace(F17,3,3)([ 1 2 3; 3 2 1; 1 1 2])
+  aa = matrix_space(F17,3,3)([ 1 2 3; 3 2 1; 1 1 2])
 
   b = R([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
 
@@ -553,8 +553,8 @@ end
 
 @testset "FqMatrix.solve" begin
   F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
-  R = MatrixSpace(F17, 3, 3)
-  S = MatrixSpace(F17, 3, 4)
+  R = matrix_space(F17, 3, 3)
+  S = matrix_space(F17, 3, 4)
 
   a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
 
@@ -575,8 +575,8 @@ end
       n = rand(0:10)
       k = rand(0:10)
 
-      M = MatrixSpace(F17, n, k)
-      N = MatrixSpace(F17, n, m)
+      M = matrix_space(F17, n, k)
+      N = matrix_space(F17, n, m)
 
       A = rand(M)
       B = rand(N)
@@ -643,8 +643,8 @@ end
 @testset "FqMatrix.lu" begin
 
   F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
-  R = MatrixSpace(F17, 3, 3)
-  S = MatrixSpace(F17, 3, 4)
+  R = matrix_space(F17, 3, 3)
+  S = matrix_space(F17, 3, 4)
 
   a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
 
@@ -670,8 +670,8 @@ end
 
 @testset "FqMatrix.view" begin
   F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
-  R = MatrixSpace(F17, 3, 3)
-  S = MatrixSpace(F17, 3, 4)
+  R = matrix_space(F17, 3, 3)
+  S = matrix_space(F17, 3, 4)
 
   a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
 
@@ -706,14 +706,14 @@ end
 
 @testset "FqMatrix.sub" begin
    F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
-   S = MatrixSpace(F17, 3, 3)
+   S = matrix_space(F17, 3, 3)
 
    A = S([1 2 3; 4 5 6; 7 8 9])
 
    B = @inferred sub(A, 1, 1, 2, 2)
 
    @test typeof(B) == FqMatrix
-   @test B == MatrixSpace(F17, 2, 2)([1 2; 4 5])
+   @test B == matrix_space(F17, 2, 2)([1 2; 4 5])
 
    B[1, 1] = 10
    @test A == S([1 2 3; 4 5 6; 7 8 9])
@@ -721,17 +721,17 @@ end
    C = @inferred sub(B, 1:2, 1:2)
 
    @test typeof(C) == FqMatrix
-   @test C == MatrixSpace(F17, 2, 2)([10 2; 4 5])
+   @test C == matrix_space(F17, 2, 2)([10 2; 4 5])
 
    C[1, 1] = 20
-   @test B == MatrixSpace(F17, 2, 2)([10 2; 4 5])
+   @test B == matrix_space(F17, 2, 2)([10 2; 4 5])
    @test A == S([1 2 3; 4 5 6; 7 8 9])
 end
 
 @testset "FqMatrix.concatenation" begin
   F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
-  R = MatrixSpace(F17, 3, 3)
-  S = MatrixSpace(F17, 3, 4)
+  R = matrix_space(F17, 3, 3)
+  S = matrix_space(F17, 3, 4)
 
   a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
 
@@ -739,13 +739,13 @@ end
 
   c = hcat(a,a)
 
-  @test c == MatrixSpace(F17, 3, 6)([1, 2, 3, 1, 2, 3,
+  @test c == matrix_space(F17, 3, 6)([1, 2, 3, 1, 2, 3,
                                      3, 2, 1, 3, 2, 1,
                                      0, 0, 2, 0, 0, 2])
 
   c = hcat(a,b)
 
-  @test c == MatrixSpace(F17, 3, 7)([1, 2, 3, 2, 1, 0, 1,
+  @test c == matrix_space(F17, 3, 7)([1, 2, 3, 2, 1, 0, 1,
                                      3, 2, 1, 0, 0, 0, 0,
                                      0, 0, 2, 0, 1, 2, 0])
 
@@ -753,7 +753,7 @@ end
 
   c = vcat(a,transpose(b))
 
-  @test c == MatrixSpace(F17, 7, 3)([1, 2, 3,
+  @test c == matrix_space(F17, 7, 3)([1, 2, 3,
                                      3, 2, 1,
                                      0, 0, 2,
                                      2, 0, 0,
@@ -766,7 +766,7 @@ end
 
 @testset "FqMatrix.conversion" begin
   F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
-  R = MatrixSpace(F17, 3, 3)
+  R = matrix_space(F17, 3, 3)
 
   a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
 
@@ -779,8 +779,8 @@ end
    F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
 
    for dim = 0:5
-      S = MatrixSpace(F17, dim, dim)
-      U, x = PolynomialRing(F17, "x")
+      S = matrix_space(F17, dim, dim)
+      U, x = polynomial_ring(F17, "x")
 
       for i = 1:10
          M = rand(S)
@@ -797,7 +797,7 @@ end
 
 @testset "FqMatrix.rand" begin
    F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
-   S = MatrixSpace(F17, 3, 3)
+   S = matrix_space(F17, 3, 3)
    M = rand(S)
    @test parent(M) == S
 end

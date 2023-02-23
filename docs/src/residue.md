@@ -52,7 +52,7 @@ gcdx(::ZZModRingElem, ::ZZModRingElem)
 **Examples**
 
 ```julia
-R = ResidueRing(ZZ, 123456789012345678949)
+R = residue_ring(ZZ, 123456789012345678949)
 
 g, s, t = gcdx(R(123), R(456))
 ```

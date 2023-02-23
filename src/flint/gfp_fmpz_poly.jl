@@ -539,14 +539,14 @@ end
 #
 ################################################################################
 
-function PolynomialRing(R::FpField, s::Symbol; cached=true)
+function polynomial_ring(R::FpField, s::Symbol; cached=true)
    parent_obj = FpPolyRing(R, s, cached)
 
    return parent_obj, parent_obj([R(0), R(1)])
 end
 
-function PolynomialRing(R::FpField, s::AbstractString; cached = true)
-   return PolynomialRing(R, Symbol(s); cached=cached)
+function polynomial_ring(R::FpField, s::AbstractString; cached = true)
+   return polynomial_ring(R, Symbol(s); cached=cached)
 end
 
 function PolyRing(R::FpField)

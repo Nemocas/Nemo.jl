@@ -51,7 +51,7 @@ import AbstractAlgebra: nullspace, @show_name, @show_special, find_name,
                         get_cached!,
                         @show_special_elem, force_coerce, force_op, expressify
 
-# We don't want the QQ, ZZ, FiniteField, NumberField from AbstractAlgebra
+# We don't want the QQ, ZZ, FiniteField, number_field from AbstractAlgebra
 # as they are for parents of Julia types or naive implementations
 # We only import AbstractAlgebra, not export
 # We do not want the AbstractAlgebra version of certain functions as the Base version
@@ -78,7 +78,7 @@ export PadicField, QadicField, NGFiniteField
 export QQBar
 
 # Things/constants which are also defined in AbstractAlgebra:
-export ZZ, QQ, FiniteField, NumberField
+export ZZ, QQ, FiniteField, number_field
 
 ###############################################################################
 #
@@ -343,10 +343,10 @@ end
 #
 ###############################################################################
 
-export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
-       FractionField, ResidueRing, Partition, SymmetricGroup, YoungTableau,
-       AllParts, SkewDiagram, AllPerms, Perm, LaurentSeriesRing,
-       LaurentSeriesField, PuiseuxSeriesRing, ResidueField
+export power_series_ring, polynomial_ring, SparsePolynomialRing, matrix_space,
+       fraction_field, residue_ring, Partition, SymmetricGroup, YoungTableau,
+       AllParts, SkewDiagram, AllPerms, Perm, laurent_series_ring,
+       laurent_series_field, PuiseuxSeriesRing, residue_field
 
 export Generic
 

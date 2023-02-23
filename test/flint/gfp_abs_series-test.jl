@@ -11,7 +11,7 @@ end
    @test isa(R1,fpAbsPowerSeriesRing)
    @test R1 !== R2
 
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    @test elem_type(R) == fpAbsPowerSeriesRingElem
    @test elem_type(fpAbsPowerSeriesRing) == fpAbsPowerSeriesRingElem
@@ -37,7 +37,7 @@ end
 
 @testset "fpAbsPowerSeriesRingElem.printing" begin
    S = GF(23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    b = x^2 + 3x + O(x^4)
 
@@ -46,7 +46,7 @@ end
 
 @testset "fpAbsPowerSeriesRingElem.manipulation" begin
    S = GF(23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -68,8 +68,8 @@ end
 
 @testset "fpAbsPowerSeriesRingElem.similar" begin
    R0 = GF(23)
-   R, x = PowerSeriesRing(R0, 10, "x"; model=:capped_absolute)
-   S, y = PowerSeriesRing(ZZ, 10, "y"; model=:capped_absolute)
+   R, x = power_series_ring(R0, 10, "x"; model=:capped_absolute)
+   S, y = power_series_ring(ZZ, 10, "y"; model=:capped_absolute)
 
    for iters = 1:10
       f = rand(R, 0:10)
@@ -159,7 +159,7 @@ end
 
 @testset "fpAbsPowerSeriesRingElem.unary_ops" begin
    S = GF(23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = 1 + 2x + x^2 + O(x^3)
@@ -171,7 +171,7 @@ end
 
 @testset "fpAbsPowerSeriesRingElem.binary_ops" begin
    S = GF(23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -191,7 +191,7 @@ end
 
 @testset "fpAbsPowerSeriesRingElem.adhoc_binary_ops" begin
    S = GF(23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -209,7 +209,7 @@ end
 
 @testset "fpAbsPowerSeriesRingElem.comparison" begin
    S = GF(23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^3)
@@ -225,7 +225,7 @@ end
 
 @testset "fpAbsPowerSeriesRingElem.adhoc_comparison" begin
    S = GF(23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^0)
@@ -245,7 +245,7 @@ end
 
 @testset "fpAbsPowerSeriesRingElem.powering" begin
    S = GF(23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -265,7 +265,7 @@ end
 
 @testset "fpAbsPowerSeriesRingElem.shift" begin
    S = GF(23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -287,7 +287,7 @@ end
 
 @testset "fpAbsPowerSeriesRingElem.truncation" begin
    S = GF(23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -308,7 +308,7 @@ end
 
 @testset "fpAbsPowerSeriesRingElem.exact_division" begin
    S = GF(23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = x + x^3
    b = O(x^4)
@@ -326,7 +326,7 @@ end
 
 @testset "fpAbsPowerSeriesRingElem.adhoc_exact_division" begin
    S = GF(23)
-   R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
    a = x + x^3
    b = O(x^4)
@@ -346,7 +346,7 @@ end
 
 @testset "fpAbsPowerSeriesRingElem.inversion" begin
    S = GF(23)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 1 + x + 2x^2 + O(x^5)
    b = R(-1)
@@ -358,7 +358,7 @@ end
 
 @testset "fpAbsPowerSeriesRingElem.integral_derivative" begin
    S = GF(31)
-   R, x = PowerSeriesRing(S, 10, "x"; model=:capped_absolute)
+   R, x = power_series_ring(S, 10, "x"; model=:capped_absolute)
 
    for iter = 1:100
       f = rand(R, 0:0)
@@ -369,7 +369,7 @@ end
 
 @testset "fpAbsPowerSeriesRingElem.square_root" begin
    S = GF(31)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    for iter = 1:300
       f = rand(R, 0:9)
@@ -380,7 +380,7 @@ end
    for p in [2, 7, 19, 65537]
       R = GF(p)
 
-      S, x = PowerSeriesRing(R, 10, "x", model=:capped_absolute)
+      S, x = power_series_ring(R, 10, "x", model=:capped_absolute)
 
       for iter = 1:10
          f = rand(S, 0:10, 0:Int(p))
@@ -414,7 +414,7 @@ end
 
 @testset "fpAbsPowerSeriesRingElem.unsafe_operators" begin
    S = GF(31)
-   R, x = PowerSeriesRing(S, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    for iter = 1:300
       f = rand(R, 0:9)

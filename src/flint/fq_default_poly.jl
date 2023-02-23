@@ -899,11 +899,11 @@ end
 
 ################################################################################
 #
-#   PolynomialRing constructor
+#   polynomial_ring constructor
 #
 ################################################################################
 
-function PolynomialRing(R::FqField, s::AbstractString; cached = true)
+function polynomial_ring(R::FqField, s::AbstractString; cached = true)
    S = Symbol(s)
    parent_obj = FqPolyRing(R, S, cached)
    return parent_obj, parent_obj([R(0), R(1)])

@@ -733,11 +733,11 @@ end
 
 ###############################################################################
 #
-#   PowerSeriesRing constructor
+#   power_series_ring constructor
 #
 ###############################################################################
 
-function PowerSeriesRing(R::FqField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
+function power_series_ring(R::FqField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
    S = Symbol(s)
 
    if model == :capped_relative

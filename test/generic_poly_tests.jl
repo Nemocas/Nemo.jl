@@ -7,7 +7,7 @@ function test_poly_constructors(R)
     #@test isa(S1, GFPPolyRing)
     @test S1 !== S2
 
-    Rx, x = PolynomialRing(R, "x")
+    Rx, x = polynomial_ring(R, "x")
 
     #@test elem_type(Rx) == gfp_poly
     #@test elem_type(GFPPolyRing) == gfp_poly
@@ -15,10 +15,10 @@ function test_poly_constructors(R)
     #@test dense_poly_type(gfp_elem) == gfp_poly
 
     #S = GF(19)
-    #Sy, y = PolynomialRing(R, "y")
+    #Sy, y = polynomial_ring(R, "y")
 
-    #RRx, xx = PolynomialRing(R, "x")
-    #RRRx, xxx = PolynomialRing(GF(17), "xx")
+    #RRx, xx = polynomial_ring(R, "x")
+    #RRRx, xxx = polynomial_ring(GF(17), "xx")
 
     @test var(Rx) == Symbol("x")
 
@@ -86,7 +86,7 @@ function test_poly_constructors(R)
     @test isa(n, PolyElem)
     @test parent(e) == Rx
 
-    _a = PolynomialRing(ZZ, "y")[1]([fmpz(1),fmpz(2),fmpz(3)])
+    _a = polynomial_ring(ZZ, "y")[1]([fmpz(1),fmpz(2),fmpz(3)])
 
     k = Rx(_a)
 

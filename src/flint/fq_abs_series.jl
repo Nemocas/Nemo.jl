@@ -8,7 +8,7 @@
 
 export FqPolyRepAbsPowerSeriesRingElem, FqPolyRepAbsPowerSeriesRing,
        fqPolyRepAbsPowerSeriesRingElem, fqPolyRepAbsPowerSeriesRing,
-       PowerSeriesRing
+       power_series_ring
 
 for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
    (FqPolyRepAbsPowerSeriesRingElem, FqPolyRepAbsPowerSeriesRing, FqPolyRepField, FqPolyRepFieldElem, "fq_poly", "fq"),
@@ -746,11 +746,11 @@ end # for
 
 ###############################################################################
 #
-#   PowerSeriesRing constructor
+#   power_series_ring constructor
 #
 ###############################################################################
 
-function PowerSeriesRing(R::FqPolyRepField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
+function power_series_ring(R::FqPolyRepField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
    if model == :capped_relative
       parent_obj = FqPolyRepRelPowerSeriesRing(R, prec, s, cached)
    elseif model == :capped_absolute
@@ -762,8 +762,8 @@ function PowerSeriesRing(R::FqPolyRepField, prec::Int, s::Symbol; model=:capped_
    return parent_obj, gen(parent_obj)
 end
 
-function PowerSeriesRing(R::FqPolyRepField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
-   return PowerSeriesRing(R, prec, Symbol(s); model=model, cached=cached)
+function power_series_ring(R::FqPolyRepField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
+   return power_series_ring(R, prec, Symbol(s); model=model, cached=cached)
 end
 
 function AbsSeriesRing(R::FqPolyRepField, prec::Int)
@@ -774,7 +774,7 @@ function RelSeriesRing(R::FqPolyRepField, prec::Int)
    return FqPolyRepRelPowerSeriesRing(R, prec, :x, false)
 end
 
-function PowerSeriesRing(R::fqPolyRepField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
+function power_series_ring(R::fqPolyRepField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
    if model == :capped_relative
       parent_obj = fqPolyRepRelPowerSeriesRing(R, prec, s, cached)
    elseif model == :capped_absolute
@@ -786,8 +786,8 @@ function PowerSeriesRing(R::fqPolyRepField, prec::Int, s::Symbol; model=:capped_
    return parent_obj, gen(parent_obj)
 end
 
-function PowerSeriesRing(R::fqPolyRepField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
-   return PowerSeriesRing(R, prec, Symbol(s); model=model, cached=cached)
+function power_series_ring(R::fqPolyRepField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
+   return power_series_ring(R, prec, Symbol(s); model=model, cached=cached)
 end
 
 function AbsSeriesRing(R::fqPolyRepField, prec::Int)

@@ -1,8 +1,8 @@
 RR = ArbField(64)
 
 @testset "arb_mat.constructors" begin
-   S = MatrixSpace(RR, 3, 3)
-   R = MatrixSpace(ZZ, 3, 3)
+   S = matrix_space(RR, 3, 3)
+   R = matrix_space(ZZ, 3, 3)
 
    @test elem_type(S) == arb_mat
    @test elem_type(ArbMatSpace) == arb_mat
@@ -94,7 +94,7 @@ RR = ArbField(64)
 end
 
 @testset "arb_mat.similar" begin
-   S = MatrixSpace(RR, 3, 3)
+   S = matrix_space(RR, 3, 3)
    s = S(ZZRingElem(3))
 
    t = similar(s)
@@ -121,7 +121,7 @@ end
 end
 
 @testset "arb_mat.printing" begin
-   S = MatrixSpace(RR, 3, 3)
+   S = matrix_space(RR, 3, 3)
    f = S(ZZRingElem(3))
 
    # test that default Julia printing is not used
@@ -129,7 +129,7 @@ end
 end
 
 @testset "arb_mat.manipulation" begin
-   S = MatrixSpace(RR, 3, 3)
+   S = matrix_space(RR, 3, 3)
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
    B = S([ZZRingElem(1) 4 7; 9 6 7; 4 3 3])
 
@@ -151,8 +151,8 @@ end
 end
 
 @testset "arb_mat.unary_ops" begin
-   S = MatrixSpace(RR, 3, 3)
-   R = MatrixSpace(ZZ, 3, 3)
+   S = matrix_space(RR, 3, 3)
+   R = matrix_space(ZZ, 3, 3)
 
    A = S([2 3 5; 1 4 7; 9 6 3])
    B = R([(-2) (-3) (-5); (-1) (-4) (-7); (-9) (-6) (-3)])
@@ -161,8 +161,8 @@ end
 end
 
 @testset "arb_mat.transpose" begin
-   S = MatrixSpace(RR, 3, 3)
-   T = MatrixSpace(ZZ, 3, 3)
+   S = matrix_space(RR, 3, 3)
+   T = matrix_space(ZZ, 3, 3)
 
    A = S([2 3 5; 1 4 7; 9 6 3])
 
@@ -176,8 +176,8 @@ end
 end
 
 @testset "arb_mat.binary_ops" begin
-   S = MatrixSpace(RR, 3, 3)
-   R = MatrixSpace(ZZ, 3, 3)
+   S = matrix_space(RR, 3, 3)
+   R = matrix_space(ZZ, 3, 3)
 
    A = S([2 3 5; 1 4 7; 9 6 3])
    B = S([1 4 7; 9 6 7; 4 3 3])
@@ -190,9 +190,9 @@ end
 end
 
 @testset "arb_mat.adhoc_binary" begin
-   S = MatrixSpace(RR, 3, 3)
-   R = MatrixSpace(ZZ, 3, 3)
-   T = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(RR, 3, 3)
+   R = matrix_space(ZZ, 3, 3)
+   T = matrix_space(QQ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
    B = R([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
@@ -228,8 +228,8 @@ end
 end
 
 @testset "arb_mat.shifting" begin
-   S = MatrixSpace(RR, 3, 3)
-   R = MatrixSpace(ZZ, 3, 3)
+   S = matrix_space(RR, 3, 3)
+   R = matrix_space(ZZ, 3, 3)
 
    A = S([2 3 5; 1 4 7; 9 6 3])
    B = R([2 3 5; 1 4 7; 9 6 3])
@@ -241,8 +241,8 @@ end
 end
 
 @testset "arb_mat.comparison" begin
-   S = MatrixSpace(RR, 3, 3)
-   R = MatrixSpace(ZZ, 3, 3)
+   S = matrix_space(RR, 3, 3)
+   R = matrix_space(ZZ, 3, 3)
 
    A = S([2 3 5; 1 4 7; 9 6 3])
    AZZ = R([2 3 5; 1 4 7; 9 6 3])
@@ -263,9 +263,9 @@ end
 end
 
 @testset "arb_mat.adhoc_comparison" begin
-   S = MatrixSpace(RR, 3, 3)
-   R = MatrixSpace(ZZ, 3, 3)
-   T = MatrixSpace(QQ, 3, 3)
+   S = matrix_space(RR, 3, 3)
+   R = matrix_space(ZZ, 3, 3)
+   T = matrix_space(QQ, 3, 3)
 
    A = S([2 3 5; 1 4 7; 9 6 3])
    B = R([2 3 5; 1 4 7; 9 6 3])
@@ -284,8 +284,8 @@ end
 end
 
 @testset "arb_mat.inversion" begin
-   S = MatrixSpace(RR, 3, 3)
-   R = MatrixSpace(ZZ, 3, 3)
+   S = matrix_space(RR, 3, 3)
+   R = matrix_space(ZZ, 3, 3)
 
    A = S([1 2 1000; 0 3 1; 0 2 1])
    B = R([1 1998 -2998; 0 1 -1; 0 -2 3])
@@ -297,8 +297,8 @@ end
 end
 
 @testset "arb_mat.divexact" begin
-   S = MatrixSpace(RR, 3, 3)
-   R = MatrixSpace(ZZ, 3, 3)
+   S = matrix_space(RR, 3, 3)
+   R = matrix_space(ZZ, 3, 3)
 
    A = S([1 2 1001; 0 3 1; 0 2 1])
    B = R([1 2000 -3001; 0 1 -1; 0 -2 3])
@@ -308,8 +308,8 @@ end
 end
 
 @testset "arb_mat.adhoc_divexact" begin
-   S = MatrixSpace(RR, 3, 3)
-   R = MatrixSpace(ZZ, 3, 3)
+   S = matrix_space(RR, 3, 3)
+   R = matrix_space(ZZ, 3, 3)
 
    A = S([3 0 0; 0 3 0; 0 0 3])
    B = one(R)
@@ -320,9 +320,9 @@ end
 end
 
 @testset "arb_mat.charpoly" begin
-   S = MatrixSpace(RR, 3, 3)
-   R, x = PolynomialRing(RR, "x")
-   ZZy, y = PolynomialRing(ZZ, "y")
+   S = matrix_space(RR, 3, 3)
+   R, x = polynomial_ring(RR, "x")
+   ZZy, y = polynomial_ring(ZZ, "y")
 
    A = S(["2.0 +/- 0.1" "3.0 +/- 0.1" "5.0 +/- 0.1";
           "0.0 +/- 0.1" "4.0 +/- 0.1" "7.0 +/- 0.1";
@@ -336,7 +336,7 @@ end
 end
 
 @testset "arb_mat.det" begin
-   S = MatrixSpace(RR, 3, 3)
+   S = matrix_space(RR, 3, 3)
 
    A = S(["2.0 +/- 0.1" "3.0 +/- 0.1" "5.0 +/- 0.1";
           "0.0 +/- 0.1" "4.0 +/- 0.1" "7.0 +/- 0.1";
@@ -348,7 +348,7 @@ end
 end
 
 @testset "arb_mat.exp" begin
-   S = MatrixSpace(RR, 3, 3)
+   S = matrix_space(RR, 3, 3)
 
    A = S(["2.0 +/- 0.1" "0.0 +/- 0.1" "0.0 +/- 0.1";
           "0.0 +/- 0.1" "4.0 +/- 0.1" "0.0 +/- 0.1";
@@ -362,8 +362,8 @@ end
 end
 
 @testset "arb_mat.linear_solving" begin
-   S = MatrixSpace(RR, 3, 3)
-   T = MatrixSpace(ZZ, 3, 3)
+   S = matrix_space(RR, 3, 3)
+   T = matrix_space(ZZ, 3, 3)
 
    A = S(["1.0 +/- 0.01" "2.0 +/- 0.01" "3.0 +/- 0.01";
           "4.0 +/- 0.01" "5.0 +/- 0.01" "6.0 +/- 0.01";
@@ -394,7 +394,7 @@ end
 end
 
 @testset "arb_mat.bound_inf_norm" begin
-   S = MatrixSpace(RR, 3, 3)
+   S = matrix_space(RR, 3, 3)
 
    A = S([2 3 5; 1 4 7; 9 6 3])
 

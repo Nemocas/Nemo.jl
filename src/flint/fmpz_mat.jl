@@ -1523,10 +1523,10 @@ end
 
 ###############################################################################
 #
-#   MatrixSpace constructor
+#   matrix_space constructor
 #
 ###############################################################################
 
-function MatrixSpace(R::ZZRing, r::Int, c::Int; cached::Bool = true)
+function matrix_space(R::ZZRing, r::Int, c::Int; cached::Bool = true)
    return ZZMatrixSpace(r, c, cached)
 end

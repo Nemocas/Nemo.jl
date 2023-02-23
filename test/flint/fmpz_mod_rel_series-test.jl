@@ -3,7 +3,7 @@
 end
 
 @testset "ZZModRelPowerSeriesRingElem.constructors" begin
-   R = ResidueRing(ZZ, 123456789012345678949)
+   R = residue_ring(ZZ, 123456789012345678949)
    
    S1 = RelSeriesRing(R, 30)
    S2 = RelSeriesRing(R, 30)
@@ -11,7 +11,7 @@ end
    @test isa(S1, ZZModRelPowerSeriesRing)
    @test S1 !== S2
 
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = power_series_ring(R, 30, "x")
 
    @test elem_type(S) == ZZModRelPowerSeriesRingElem
    @test elem_type(ZZModRelPowerSeriesRing) == ZZModRelPowerSeriesRingElem
@@ -54,16 +54,16 @@ end
 end
 
 @testset "ZZModRelPowerSeriesRingElem.printing" begin
-   R = ResidueRing(ZZ, 123456789012345678949)
-   S, x = PowerSeriesRing(R, 30, "x")
+   R = residue_ring(ZZ, 123456789012345678949)
+   S, x = power_series_ring(R, 30, "x")
    b = x^2 + x + O(x^4)
 
    @test sprint(show, "text/plain", b) == "x + x^2 + O(x^4)"
 end
 
 @testset "ZZModRelPowerSeriesRingElem.manipulation" begin
-   R = ResidueRing(ZZ, 123456789012345678949)
-   S, x = PowerSeriesRing(R, 30, "x")
+   R = residue_ring(ZZ, 123456789012345678949)
+   S, x = power_series_ring(R, 30, "x")
 
    @test max_precision(S) == 30
 
@@ -100,9 +100,9 @@ end
 end
 
 @testset "ZZModRelPowerSeriesRingElem.similar" begin
-   R0 = ResidueRing(ZZ, ZZ(23))
-   R, x = PowerSeriesRing(R0, 10, "x")
-   S, y = PowerSeriesRing(ZZ, 10, "y")
+   R0 = residue_ring(ZZ, ZZ(23))
+   R, x = power_series_ring(R0, 10, "x")
+   S, y = power_series_ring(ZZ, 10, "y")
 
    for iters = 1:10
       f = rand(R, 0:10)
@@ -148,7 +148,7 @@ end
 end
 
 @testset "ZZModRelPowerSeriesRingElem.rel_series" begin
-   R = ResidueRing(ZZ, ZZ(23))
+   R = residue_ring(ZZ, ZZ(23))
    f = rel_series(R, [1, 2, 3], 3, 5, 2, "y")
 
    @test isa(f, ZZModRelPowerSeriesRingElem)
@@ -191,8 +191,8 @@ end
 end
 
 @testset "ZZModRelPowerSeriesRingElem.unary_ops" begin
-   R = ResidueRing(ZZ, 123456789012345678949)
-   S, x = PowerSeriesRing(R, 30, "x")
+   R = residue_ring(ZZ, 123456789012345678949)
+   S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
    b = 1 + 2x + x^2 + O(x^3)
@@ -203,8 +203,8 @@ end
 end
 
 @testset "ZZModRelPowerSeriesRingElem.binary_ops" begin
-   R = ResidueRing(ZZ, 123456789012345678949)
-   S, x = PowerSeriesRing(R, 30, "x")
+   R = residue_ring(ZZ, 123456789012345678949)
+   S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -343,8 +343,8 @@ end
 end
 
 @testset "ZZModRelPowerSeriesRingElem.adhoc_binary_ops" begin
-   R = ResidueRing(ZZ, 123456789012345678949)
-   S, x = PowerSeriesRing(R, 30, "x")
+   R = residue_ring(ZZ, 123456789012345678949)
+   S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -361,8 +361,8 @@ end
 end
 
 @testset "ZZModRelPowerSeriesRingElem.comparison" begin
-   R = ResidueRing(ZZ, 123456789012345678949)
-   S, x = PowerSeriesRing(R, 30, "x")
+   R = residue_ring(ZZ, 123456789012345678949)
+   S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
    b = O(x^3)
@@ -383,8 +383,8 @@ end
 end
 
 @testset "ZZModRelPowerSeriesRingElem.adhoc_comparison" begin
-   R = ResidueRing(ZZ, 123456789012345678949)
-   S, x = PowerSeriesRing(R, 30, "x")
+   R = residue_ring(ZZ, 123456789012345678949)
+   S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
    b = O(x^0)
@@ -418,8 +418,8 @@ end
 end
 
 @testset "ZZModRelPowerSeriesRingElem.powering" begin
-   R = ResidueRing(ZZ, 123456789012345678949)
-   S, x = PowerSeriesRing(R, 30, "x")
+   R = residue_ring(ZZ, 123456789012345678949)
+   S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -442,8 +442,8 @@ end
 end
 
 @testset "ZZModRelPowerSeriesRingElem.shift" begin
-   R = ResidueRing(ZZ, 123456789012345678949)
-   S, x = PowerSeriesRing(R, 30, "x")
+   R = residue_ring(ZZ, 123456789012345678949)
+   S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -466,8 +466,8 @@ end
 end
 
 @testset "ZZModRelPowerSeriesRingElem.truncation" begin
-   R = ResidueRing(ZZ, 123456789012345678949)
-   S, x = PowerSeriesRing(R, 30, "x")
+   R = residue_ring(ZZ, 123456789012345678949)
+   S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -486,8 +486,8 @@ end
 end
 
 @testset "ZZModRelPowerSeriesRingElem.inversion" begin
-   R = ResidueRing(ZZ, 123456789012345678949)
-   S, x = PowerSeriesRing(R, 30, "x")
+   R = residue_ring(ZZ, 123456789012345678949)
+   S, x = power_series_ring(R, 30, "x")
 
    a = 1 + x + 2x^2 + O(x^5)
    b = S(-1)
@@ -498,8 +498,8 @@ end
 end
 
 @testset "ZZModRelPowerSeriesRingElem.exact_division" begin
-   R = ResidueRing(ZZ, 123456789012345678949)
-   S, x = PowerSeriesRing(R, 30, "x")
+   R = residue_ring(ZZ, 123456789012345678949)
+   S, x = power_series_ring(R, 30, "x")
 
    a = x + x^3
    b = O(x^4)
@@ -516,8 +516,8 @@ end
 end
 
 @testset "ZZModRelPowerSeriesRingElem.adhoc_exact_division" begin
-   R = ResidueRing(ZZ, 123456789012345678949)
-   S, x = PowerSeriesRing(R, 30, "x")
+   R = residue_ring(ZZ, 123456789012345678949)
+   S, x = power_series_ring(R, 30, "x")
 
    a = x + x^3
    b = O(x^4)
@@ -538,8 +538,8 @@ end
 end
 
 @testset "ZZModRelPowerSeriesRingElem.special_functions" begin
-   R = ResidueRing(ZZ, 123456789012345678949)
-   S, x = PowerSeriesRing(R, 30, "x")
+   R = residue_ring(ZZ, 123456789012345678949)
+   S, x = power_series_ring(R, 30, "x")
 
    @test isequal(exp(x + O(x^5)), 56584361630658436185*x^4+102880657510288065791*x^3+61728394506172839475*x^2+x+1+O(x^5))
    @test isequal(exp(O(x^0)), O(x^0))
@@ -549,8 +549,8 @@ end
 end
 
 @testset "ZZModRelPowerSeriesRingElem.unsafe_operators" begin
-   S = ResidueRing(ZZ, 31)
-   R, x = PowerSeriesRing(S, 30, "x")
+   S = residue_ring(ZZ, 31)
+   R, x = power_series_ring(S, 30, "x")
 
    for iter = 1:300
       f = rand(R, 0:9)

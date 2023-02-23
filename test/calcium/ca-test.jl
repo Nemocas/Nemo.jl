@@ -155,7 +155,7 @@ end
    @test und == und
    @test_throws ErrorException (unk == unk)
 
-   Rx, x = PolynomialRing(C, "x")
+   Rx, x = polynomial_ring(C, "x")
    @test gcd(x^4 - 4*x^2 + 4, x^2 + sqrt(C(18))*x + 4) == x + sqrt(C(2))
 
 end

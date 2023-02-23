@@ -10,7 +10,7 @@ export zzModPolyRing, zzModPolyRingElem, parent, base_ring, elem_type, length, z
        evaluate, derivative, compose, interpolate, inflate, deflate, lift,
        is_irreducible, is_squarefree, factor, factor_squarefree,
        factor_distinct_deg, factor_shape, setcoeff!, canonical_unit,
-       add!, sub!, mul!, PolynomialRing, check_parent, gcdx, mod,
+       add!, sub!, mul!, polynomial_ring, check_parent, gcdx, mod,
        invmod, gcdinv, mulmod, powermod, zero!, one!
 
 ################################################################################
@@ -1088,14 +1088,14 @@ end
 #
 ################################################################################
 
-function PolynomialRing(R::zzModRing, s::Symbol; cached=true)
+function polynomial_ring(R::zzModRing, s::Symbol; cached=true)
    parent_obj = zzModPolyRing(R, s, cached)
 
    return parent_obj, parent_obj([R(0), R(1)])
 end
 
-function PolynomialRing(R::zzModRing, s::AbstractString; cached = true)
-   return PolynomialRing(R, Symbol(s); cached=cached)
+function polynomial_ring(R::zzModRing, s::AbstractString; cached = true)
+   return polynomial_ring(R, Symbol(s); cached=cached)
 end
 
 function PolyRing(R::zzModRing)

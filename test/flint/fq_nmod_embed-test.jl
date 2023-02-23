@@ -114,8 +114,8 @@ end
         pop!(S, p)
 
         F = FiniteField(p, 4, "s")[1]
-        Z = ResidueRing(ZZ, p)
-        R, x = PolynomialRing(Z, "x")
+        Z = residue_ring(ZZ, p)
+        R, x = polynomial_ring(Z, "x")
 
         P1 = R(rand(Z, 4)) + x^4
         F1 = factor(P1)

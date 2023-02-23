@@ -187,7 +187,7 @@ matrices underlying generic Nemo matrices for this reason.
 
 In AbstractAlgebra we define a submodule called Generic. The purpose of this
 module is to allow generic constructions over a given base ring. For example
-in Nemo, `R, x = Generic.PolynomialRing(ZZ, "x")` will construct a generic
+in Nemo, `R, x = Generic.polynomial_ring(ZZ, "x")` will construct a generic
 polynomial ring over Nemo integers instead of constructing a Flint polynomial
 ring.
 
@@ -205,14 +205,14 @@ unless they have such needs, all Nemo developers need to understand how to
 define new generic ring constructions and functions for them. They also need
 to understand some subtleties that arise because of this mechanism.
 
-Firstly, a generic construction like `PolynomialRing` must be defined inside
+Firstly, a generic construction like `polynomial_ring` must be defined inside
 the Generic submodule of AbstractAlgebra. All files inside the `src/generic`
 directory of AbstractAlgebra exist for this purpose. However, exporting from
 that submodule will not export the functionality to the Nemo user.
 
-To do this, one must add a function `PolynomialRing` for example, in
-`src/Poly.jl`, say, which calls `Generic.PolynomialRing`. Then one needs
-to export `PolynomialRing` from AbstractAlgebra (also in that file).
+To do this, one must add a function `polynomial_ring` for example, in
+`src/Poly.jl`, say, which calls `Generic.polynomial_ring`. Then one needs
+to export `polynomial_ring` from AbstractAlgebra (also in that file).
 
 Similarly, all functions provided for generic polynomial rings are not
 automatically available, even when exported from the Generic submodule.

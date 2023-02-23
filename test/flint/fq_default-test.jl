@@ -5,10 +5,10 @@
    @test elem_type(FqField) == FqFieldElem
    @test parent_type(FqFieldElem) == FqField
 
-   Sy, y = PolynomialRing(ResidueRing(FlintZZ, 36893488147419103363), "y")
-   Syy, yy = PolynomialRing(GF(ZZRingElem(36893488147419103363)), "y")
-   St, t = PolynomialRing(ResidueRing(FlintZZ, 23), "t")
-   Stt, tt = PolynomialRing(GF(23), "y")
+   Sy, y = polynomial_ring(residue_ring(FlintZZ, 36893488147419103363), "y")
+   Syy, yy = polynomial_ring(GF(ZZRingElem(36893488147419103363)), "y")
+   St, t = polynomial_ring(residue_ring(FlintZZ, 23), "t")
+   Stt, tt = polynomial_ring(GF(23), "y")
 
    T, z = NGFiniteField(y^2 + 1, "z")
    T2, z2 = NGFiniteField(yy^2 + 1, "z")
@@ -51,7 +51,7 @@
    # check for primality
    T3, z3 = NGFiniteField(yy^2 + 1, "z", check=false)
    @test isa(T2, FqField)
-   Syyy, yyy = PolynomialRing(ResidueRing(FlintZZ, ZZ(4)), "y")
+   Syyy, yyy = polynomial_ring(residue_ring(FlintZZ, ZZ(4)), "y")
    @test yyy isa ZZModPolyRingElem
    @test_throws DomainError NGFiniteField(yyy^2+1, "z")
 end
@@ -93,13 +93,13 @@ end
 
    f = 3a^4 + 2a^3 + a + 5
 
-   for R in [ResidueRing(FlintZZ, 7), ResidueRing(FlintZZ, ZZ(7)), GF(7), GF(ZZ(7))]
-      S, y = PolynomialRing(R, "y")
+   for R in [residue_ring(FlintZZ, 7), residue_ring(FlintZZ, ZZ(7)), GF(7), GF(ZZ(7))]
+      S, y = polynomial_ring(R, "y")
 
       @test f == U(S(f))
    end
 
-   S, y = PolynomialRing(ZZ, "y")
+   S, y = polynomial_ring(ZZ, "y")
 
    @test f == U(lift(S, f))
 end

@@ -1,5 +1,5 @@
 @testset "ZZMatrix.constructors" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    @test elem_type(S) == ZZMatrix
    @test elem_type(ZZMatrixSpace) == ZZMatrix
@@ -76,7 +76,7 @@
 end
 
 @testset "ZZMatrix.$sim_zero" for sim_zero in (similar, zero)
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
    s = S(ZZRingElem(3))
 
    t = sim_zero(s)
@@ -111,7 +111,7 @@ end
 end
 
 @testset "ZZMatrix.printing" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
    f = S(ZZRingElem(3))
 
    # test that default Julia printing is not used
@@ -122,7 +122,7 @@ end
    # Basic tests.
    A = [[1 2 3]; [4 5 6]]
    Abig = BigInt[[1 2 3]; [4 5 6]]
-   S = MatrixSpace(FlintZZ, 2, 3)
+   S = matrix_space(FlintZZ, 2, 3)
    B = S(A)
 
    @test Matrix{Int}(B) == A
@@ -134,7 +134,7 @@ end
 end
 
 @testset "ZZMatrix.manipulation" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
    B = S([ZZRingElem(1) 4 7; 9 6 7; 4 3 3])
 
@@ -156,14 +156,14 @@ end
 end
 
 @testset "ZZMatrix.view" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([1 2 3; 4 5 6; 7 8 9])
 
    B = @inferred view(A, 1, 1, 2, 2)
 
    @test typeof(B) == ZZMatrix
-   @test B == MatrixSpace(FlintZZ, 2, 2)([1 2; 4 5])
+   @test B == matrix_space(FlintZZ, 2, 2)([1 2; 4 5])
 
    B[1, 1] = 10
    @test A[1, 1] == 10
@@ -171,7 +171,7 @@ end
    C = @inferred view(B, 1:2, 1:2)
 
    @test typeof(C) == ZZMatrix
-   @test C == MatrixSpace(FlintZZ, 2, 2)([10 2; 4 5])
+   @test C == matrix_space(FlintZZ, 2, 2)([10 2; 4 5])
 
    C[1, 1] = 20
    @test B[1, 1] == 20
@@ -184,14 +184,14 @@ end
 end
 
 @testset "ZZMatrix.sub" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([1 2 3; 4 5 6; 7 8 9])
 
    B = @inferred sub(A, 1, 1, 2, 2)
 
    @test typeof(B) == ZZMatrix
-   @test B == MatrixSpace(FlintZZ, 2, 2)([1 2; 4 5])
+   @test B == matrix_space(FlintZZ, 2, 2)([1 2; 4 5])
 
    B[1, 1] = 10
    @test A == S([1 2 3; 4 5 6; 7 8 9])
@@ -199,15 +199,15 @@ end
    C = @inferred sub(B, 1:2, 1:2)
 
    @test typeof(C) == ZZMatrix
-   @test C == MatrixSpace(FlintZZ, 2, 2)([10 2; 4 5])
+   @test C == matrix_space(FlintZZ, 2, 2)([10 2; 4 5])
 
    C[1, 1] = 20
-   @test B == MatrixSpace(FlintZZ, 2, 2)([10 2; 4 5])
+   @test B == matrix_space(FlintZZ, 2, 2)([10 2; 4 5])
    @test A == S([1 2 3; 4 5 6; 7 8 9])
 end
 
 @testset "ZZMatrix.unary_ops" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
    B = S([ZZRingElem(-2) (-3) (-5); (-1) (-4) (-7); (-9) (-6) (-3)])
@@ -216,7 +216,7 @@ end
 end
 
 @testset "ZZMatrix.binary_ops" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
    B = S([ZZRingElem(1) 4 7; 9 6 7; 4 3 3])
@@ -230,7 +230,7 @@ end
 end
 
 @testset "ZZMatrix.adhoc_binary" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -243,9 +243,9 @@ end
 end
 
 @testset "ZZMatrix.kronecker_product" begin
-   S = MatrixSpace(ZZ, 2, 3)
-   S2 = MatrixSpace(ZZ, 2, 2)
-   S3 = MatrixSpace(ZZ, 3, 3)
+   S = matrix_space(ZZ, 2, 3)
+   S2 = matrix_space(ZZ, 2, 2)
+   S3 = matrix_space(ZZ, 3, 3)
 
    A = S(ZZRingElem[2 3 5; 9 6 3])
    B = S2(ZZRingElem[2 3; 1 4])
@@ -256,7 +256,7 @@ end
 end
 
 @testset "ZZMatrix.comparison" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
    B = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
@@ -267,7 +267,7 @@ end
 end
 
 @testset "ZZMatrix.adhoc_comparison" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -280,7 +280,7 @@ end
 end
 
 @testset "ZZMatrix.powering" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -292,7 +292,7 @@ end
 end
 
 @testset "ZZMatrix.adhoc_exact_division" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -301,7 +301,7 @@ end
 end
 
 @testset "ZZMatrix.gram" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -309,7 +309,7 @@ end
 end
 
 @testset "ZZMatrix.trace" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -317,7 +317,7 @@ end
 end
 
 @testset "ZZMatrix.content" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -325,7 +325,7 @@ end
 end
 
 @testset "ZZMatrix.transpose" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -376,7 +376,7 @@ end
 end
 
 @testset "ZZMatrix.scaling" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -387,7 +387,7 @@ end
 end
 
 @testset "ZZMatrix.inversion" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 2 2])
    B = S([-6 4 1; 61 (-41) (-9); -34 23 5])
@@ -407,7 +407,7 @@ end
 end
 
 @testset "ZZMatrix.pseudo_inversion" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([1 2 3; 1 2 3; 1 2 3])
    B = S([1 0 1; 2 3 1; 5 6 7])
@@ -419,7 +419,7 @@ end
 end
 
 @testset "ZZMatrix.exact_division" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 2 2])
    B = S([2 3 4; 7 9 1; 5 4 5])
@@ -428,7 +428,7 @@ end
 end
 
 @testset "ZZMatrix.modular_reduction" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 2 2])
    B = S([2 0 2; 1 1 1; 0 2 2])
@@ -439,7 +439,7 @@ end
 end
 
 @testset "ZZMatrix.det" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 19 3 7])
 
@@ -453,7 +453,7 @@ end
 end
 
 @testset "ZZMatrix.hadamard" begin
-   S = MatrixSpace(FlintZZ, 4, 4)
+   S = matrix_space(FlintZZ, 4, 4)
 
    @test is_hadamard(hadamard(S))
 end
@@ -464,7 +464,7 @@ end
       n = rand(0:20)
 
       rank = rand(0:min(m, n))
-      S = MatrixSpace(ZZ, m, n)
+      S = matrix_space(ZZ, m, n)
       A = S()
       for i = 1:m
          for j = 1:n
@@ -474,7 +474,7 @@ end
 
       r, d, P, L, U = fflu(A)
 
-      V = MatrixSpace(QQ, m, m)
+      V = matrix_space(QQ, m, m)
       D = V()
       if m >= 1
           D[1, 1] = 1//L[1, 1]
@@ -491,7 +491,7 @@ end
 end
 
 @testset "ZZMatrix.hnf" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 19 3 7])
 
@@ -514,7 +514,7 @@ end
 end
 
 @testset "ZZMatrix.lll" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 19 3 7])
 
@@ -546,8 +546,8 @@ end
 end
 
 @testset "ZZMatrix.nullspace" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
-   T = MatrixSpace(FlintZZ, 3, 1)
+   S = matrix_space(FlintZZ, 3, 3)
+   T = matrix_space(FlintZZ, 3, 1)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 4 1 1])
 
@@ -565,7 +565,7 @@ end
 end
 
 @testset "ZZMatrix.rank" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 4 1 1])
 
@@ -576,7 +576,7 @@ end
    for iters = 1:100
       m = rand(0:100)
       n = rand(0:100)
-      S = MatrixSpace(FlintZZ, m, n)
+      S = matrix_space(FlintZZ, m, n)
       M = rand(S, -100:100)
       r, N, d = rref_rational(M)
 
@@ -588,7 +588,7 @@ end
       @test is_rref(N2)
    end 
 
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 4 1 1])
 
@@ -599,7 +599,7 @@ end
 end
 
 @testset "ZZMatrix.snf" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 19 3 7])
 
@@ -613,11 +613,11 @@ end
 end
 
 @testset "ZZMatrix.solve_rational" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 2 2])
 
-   T = MatrixSpace(FlintZZ, 3, 1)
+   T = matrix_space(FlintZZ, 3, 1)
 
    B = T([ZZRingElem(4), 5, 7])
 
@@ -635,11 +635,11 @@ end
 end
 
 @testset "ZZMatrix.solve" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 2 2])
 
-   T = MatrixSpace(FlintZZ, 3, 1)
+   T = matrix_space(FlintZZ, 3, 1)
 
    B = T([ZZRingElem(4), 5, 7])
 
@@ -651,9 +651,9 @@ end
 
 
 @testset "ZZMatrix.concat" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
-   T = MatrixSpace(FlintZZ, 3, 6)
-   U = MatrixSpace(FlintZZ, 6, 3)
+   S = matrix_space(FlintZZ, 3, 3)
+   T = matrix_space(FlintZZ, 3, 6)
+   U = matrix_space(FlintZZ, 6, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
    B = S([ZZRingElem(1) 4 7; 9 6 7; 4 3 3])
@@ -664,7 +664,7 @@ end
 end
 
 @testset "ZZMatrix.rand" begin
-   S = MatrixSpace(FlintZZ, 3, 3)
+   S = matrix_space(FlintZZ, 3, 3)
    M = rand(S, 1:9)
    @test parent(M) == S
    for i=1:3, j=1:3

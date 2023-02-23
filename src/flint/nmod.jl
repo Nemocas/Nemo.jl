@@ -465,13 +465,13 @@ end
 #
 ###############################################################################
 
-function ResidueRing(R::ZZRing, n::Int; cached::Bool=true)
+function residue_ring(R::ZZRing, n::Int; cached::Bool=true)
    # Modulus of zero cannot be supported. E.g. Flint library could not be expected to
    # do matrices over Z/0 using a Z/nZ type. The former is multiprecision, the latter not.
    n <= 0 && throw(DomainError(n, "Modulus must be positive"))
    return zzModRing(UInt(n), cached)
 end
 
-function ResidueRing(R::ZZRing, n::UInt; cached::Bool=true)
+function residue_ring(R::ZZRing, n::UInt; cached::Bool=true)
    return zzModRing(n, cached)
 end

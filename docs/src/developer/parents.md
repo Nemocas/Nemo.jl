@@ -147,7 +147,7 @@ parent. If not, an exception is raised by `parent_check`.
 ### Parent object constructors
 
 Various functions are provided for constructing parent objects. For example
-a polynomial ring is constructed by calling a `PolynomialRing` function.
+a polynomial ring is constructed by calling a `polynomial_ring` function.
 Such functions are called parent object constructors.
 
 In general parent object constructors are intended for the user and should not
@@ -159,8 +159,8 @@ a Nemo function calls a function inside Generic and it creates a parent object
 using one of the parent object constructors, it will create a parent object for
 a generic ring rather than a Nemo one.
 
-One can work around this by calling `AbstractAlgebra.PolynomialRing` instead of
-simply `PolynomialRing` inside Generic, but even safer would be to find another
+One can work around this by calling `AbstractAlgebra.polynomial_ring` instead of
+simply `polynomial_ring` inside Generic, but even safer would be to find another
 way to construct the polynomials required.
 
 A second issue is that parent objects are allowed to be as large as one likes

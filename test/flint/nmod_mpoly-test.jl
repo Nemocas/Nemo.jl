@@ -1,18 +1,18 @@
 @testset "zzModMPolyRingElem.constructors" begin
-   R = ResidueRing(FlintZZ, 23)
+   R = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
-      SS, varlist = PolynomialRing(R, var_names, ordering = ord)
+      SS, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       @test S === SS
 
-      SSS, varlist = PolynomialRing(R, var_names, ordering = ord, cached = false)
-      SSSS, varlist = PolynomialRing(R, var_names, ordering = ord, cached = false)
+      SSS, varlist = polynomial_ring(R, var_names, ordering = ord, cached = false)
+      SSSS, varlist = polynomial_ring(R, var_names, ordering = ord, cached = false)
 
       @test !(SSS === SSSS)
 
@@ -81,14 +81,14 @@
       end
    end
 
-   RR = ResidueRing(FlintZZ, 29)
-   S, (x, y) = PolynomialRing(R, ["x", "y"])
+   RR = residue_ring(FlintZZ, 29)
+   S, (x, y) = polynomial_ring(R, ["x", "y"])
    M = MPolyBuildCtx(S)
    @test_throws ErrorException push_term!(M, one(RR), zeros(Int, 2))
 end
 
 @testset "zzModMPolyRingElem.printing" begin
-   S, (x, y) = PolynomialRing(ResidueRing(FlintZZ, 23), ["x", "y"])
+   S, (x, y) = polynomial_ring(residue_ring(FlintZZ, 23), ["x", "y"])
 
    @test !occursin(r"{", string(S))
 
@@ -103,7 +103,7 @@ end
 end
 
 @testset "zzModMPolyRingElem.hash" begin
-   S, (x, y) = PolynomialRing(ResidueRing(FlintZZ, 23), ["x", "y"])
+   S, (x, y) = polynomial_ring(residue_ring(FlintZZ, 23), ["x", "y"])
 
    p = y^ZZRingElem(2)^100
 
@@ -112,13 +112,13 @@ end
 end
 
 @testset "zzModMPolyRingElem.manipulation" begin
-   R = ResidueRing(FlintZZ, 23)
+   R = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
       g = gens(S)
 
       @test characteristic(S) == 23
@@ -234,7 +234,7 @@ end
       @test total_degree_fits_int(h)
    end
 
-   S, (x, y) = PolynomialRing(R, ["x", "y"])
+   S, (x, y) = polynomial_ring(R, ["x", "y"])
 
    @test trailing_coefficient(3x^2*y^2 + 2x*y + 5x + y + 7) == 7
    @test trailing_coefficient(3x^2*y^2 + 2x*y + 5x) == 5
@@ -244,10 +244,10 @@ end
 end
 
 @testset "zzModMPolyRingElem.multivariate_coeff" begin
-   R = ResidueRing(FlintZZ, 23)
+   R = residue_ring(FlintZZ, 23)
 
    for ord in Nemo.flint_orderings
-      S, (x, y, z) = PolynomialRing(R, ["x", "y", "z"]; ordering=ord)
+      S, (x, y, z) = polynomial_ring(R, ["x", "y", "z"]; ordering=ord)
 
       f = 15*x^5*y^3*z^5+9*x^5*y^2*z^3+15*x^4*y^5*z^4+13*x^4*y^3*z^2+8*x^3*y^2*z+13*x*y^3*z^4+19*x*y+13*x*z^2+8*y^2*z^5+14*y^2*z^3
 
@@ -262,13 +262,13 @@ end
 end
 
 @testset "zzModMPolyRingElem.unary_ops" begin
-   R = ResidueRing(FlintZZ, 23)
+   R = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100)
@@ -279,13 +279,13 @@ end
 end
 
 @testset "zzModMPolyRingElem.binary_ops" begin
-   R = ResidueRing(FlintZZ, 23)
+   R = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100)
@@ -302,13 +302,13 @@ end
 end
 
 @testset "zzModMPolyRingElem.adhoc_binary" begin
-   R = ResidueRing(FlintZZ, 23)
+   R = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for iter = 1:100
          f = rand(S, 0:5, 0:100)
@@ -338,13 +338,13 @@ end
 end
 
 @testset "zzModMPolyRingElem.adhoc_comparison" begin
-   R = ResidueRing(FlintZZ, 23)
+   R = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for iter = 1:100
          d = rand(-100:100)
@@ -360,13 +360,13 @@ end
 end
 
 @testset "zzModMPolyRingElem.powering" begin
-   R = ResidueRing(FlintZZ, 23)
+   R = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100)
@@ -387,13 +387,13 @@ end
 end
 
 @testset "zzModMPolyRingElem.divides" begin
-   R = ResidueRing(FlintZZ, 23)
+   R = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100)
@@ -421,13 +421,13 @@ end
 end
 
 @testset "zzModMPolyRingElem.euclidean_division" begin
-   R = ResidueRing(FlintZZ, 23)
+   R = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for iter = 1:10
          f = S(0)
@@ -457,13 +457,13 @@ end
 end
 
 @testset "zzModMPolyRingElem.ideal_reduction" begin
-   R = ResidueRing(FlintZZ, 23)
+   R = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for iter = 1:10
          f = S(0)
@@ -506,13 +506,13 @@ end
 end
 
 @testset "zzModMPolyRingElem.gcd" begin
-   R = ResidueRing(FlintZZ, 23)
+   R = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:4, 0:5)
@@ -532,8 +532,8 @@ end
 end
 
 @testset "zzModMPolyRingElem.factor" begin
-   R = ResidueRing(FlintZZ, 23)
-   R, (x, y, z) = PolynomialRing(R, ["x", "y", "z"])
+   R = residue_ring(FlintZZ, 23)
+   R, (x, y, z) = polynomial_ring(R, ["x", "y", "z"])
 
    function check_factor(a, esum)
       f = factor(a)
@@ -549,13 +549,13 @@ end
 end
 
 @testset "zzModMPolyRingElem.sqrt" begin
-   R = ResidueRing(FlintZZ, 23)
+   R = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:4, 0:5, -10:10)
@@ -575,13 +575,13 @@ end
 end
 
 @testset "zzModMPolyRingElem.evaluation" begin
-   R = ResidueRing(FlintZZ, 23)
+   R = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for iter = 1:100
          f = rand(S, 0:5, 0:100)
@@ -618,7 +618,7 @@ end
 
    # Individual tests
 
-   S, (x, y) = PolynomialRing(R, ["x", "y"])
+   S, (x, y) = polynomial_ring(R, ["x", "y"])
    @test_throws ErrorException evaluate(x, [x])
    @test_throws ErrorException evaluate(x, [x, x, x])
 
@@ -633,13 +633,13 @@ end
 
    @test (@which evaluate(f, [x])).module === Nemo
 
-   SS, (xx, yy, zz) = PolynomialRing(R, ["xx", "yy", "zz"])
+   SS, (xx, yy, zz) = polynomial_ring(R, ["xx", "yy", "zz"])
    r1 = @inferred evaluate(f, [xx + yy, yy + zz])
    r2 = evaluate(g, [xx + yy, yy + zz])
    r3 = evaluate(f + g, [xx + yy, yy + zz])
    @test r3 == r1 + r2
 
-   SS, z = PolynomialRing(R, "z")
+   SS, z = polynomial_ring(R, "z")
    @test_throws ErrorException evaluate(x, [z])
    @test_throws ErrorException evaluate(x, [z, z, z])
    w = [z, (z + 1)^2]
@@ -663,13 +663,13 @@ end
 end
 
 @testset "zzModMPolyRingElem.valuation" begin
-   R = ResidueRing(FlintZZ, 23)
+   R = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for iter = 1:100
          f = S()
@@ -701,13 +701,13 @@ end
 end
 
 @testset "zzModMPolyRingElem.derivative" begin
-   R = ResidueRing(FlintZZ, 23)
+   R = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, ordering = ord)
 
       for j in 1:100
          f = rand(S, 0:5, 0:100)
@@ -721,13 +721,13 @@ end
 end
 
 @testset "zzModMPolyRingElem.unsafe" begin
-  R23 = ResidueRing(FlintZZ, 23)
+  R23 = residue_ring(FlintZZ, 23)
 
   for num_vars = 1:10
      var_names = ["x$j" for j in 1:num_vars]
      ord = rand_ordering()
 
-     R, vars_R = PolynomialRing(R23, var_names; ordering=ord)
+     R, vars_R = polynomial_ring(R23, var_names; ordering=ord)
 
      for iter in 1:10
         f = R()
@@ -755,7 +755,7 @@ end
      end
   end
 
-   S, (x, y) = PolynomialRing(R23, ["x", "y"])
+   S, (x, y) = polynomial_ring(R23, ["x", "y"])
 
    f = one(S)
    zero!(f)
@@ -779,13 +779,13 @@ end
 end
 
 @testset "zzModMPolyRingElem.exponents" begin
-  R23 = ResidueRing(FlintZZ, 23)
+  R23 = residue_ring(FlintZZ, 23)
 
   for num_vars = 1:10
      var_names = ["x$j" for j in 1:num_vars]
      ord = rand_ordering()
 
-     R, vars_R = PolynomialRing(R23, var_names; ordering=ord)
+     R, vars_R = polynomial_ring(R23, var_names; ordering=ord)
 
      for iter in 1:10
         f = R()
@@ -831,7 +831,7 @@ end
      @test_throws DomainError exponent_vector(f, 1)
   end
 
-   S, (x, y) = PolynomialRing(R23, ["x", "y"])
+   S, (x, y) = polynomial_ring(R23, ["x", "y"])
 
    f = 1+2*x+3*y^2
    @test coeff(f, [UInt(1), UInt(0)]) == 2

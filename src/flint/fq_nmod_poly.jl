@@ -882,17 +882,17 @@ end
 
 ################################################################################
 #
-#   PolynomialRing constructor
+#   polynomial_ring constructor
 #
 ################################################################################
 
-function PolynomialRing(R::fqPolyRepField, s::Symbol; cached = true)
+function polynomial_ring(R::fqPolyRepField, s::Symbol; cached = true)
    parent_obj = fqPolyRepPolyRing(R, s, cached)
    return parent_obj, parent_obj([R(0), R(1)])
 end
 
-function PolynomialRing(R::fqPolyRepField, s::AbstractString; cached = true)
-   return PolynomialRing(R, Symbol(s); cached=cached)
+function polynomial_ring(R::fqPolyRepField, s::AbstractString; cached = true)
+   return polynomial_ring(R, Symbol(s); cached=cached)
 end
 
 function PolyRing(R::fqPolyRepField)

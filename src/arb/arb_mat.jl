@@ -38,7 +38,7 @@ base_ring(a::ArbMatSpace) = a.base_ring
 base_ring(a::arb_mat) = a.base_ring
 
 parent(x::arb_mat, cached::Bool = true) =
-      MatrixSpace(base_ring(x), nrows(x), ncols(x))
+      matrix_space(base_ring(x), nrows(x), ncols(x))
 
 dense_matrix_type(::Type{arb}) = arb_mat
 
@@ -778,11 +778,11 @@ promote_rule(::Type{arb_mat}, ::Type{QQMatrix}) = arb_mat
 
 ###############################################################################
 #
-#   MatrixSpace constructor
+#   matrix_space constructor
 #
 ###############################################################################
 
-function MatrixSpace(R::ArbField, r::Int, c::Int; cached = true)
+function matrix_space(R::ArbField, r::Int, c::Int; cached = true)
   (r <= 0 || c <= 0) && error("Dimensions must be positive")
   return ArbMatSpace(R, r, c, cached)
 end

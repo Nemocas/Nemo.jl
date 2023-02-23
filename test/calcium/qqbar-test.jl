@@ -95,8 +95,8 @@ end
    @test (u >> 3) == u // 8
    @test (u << 3) == 8 * u
 
-   ZZx, x = PolynomialRing(FlintZZ, "x")
-   QQy, y = PolynomialRing(FlintQQ, "x")
+   ZZx, x = polynomial_ring(FlintZZ, "x")
+   QQy, y = polynomial_ring(FlintQQ, "x")
 
    @test minpoly(ZZx, u) == x^2 - 2
    @test minpoly(QQy, u) == y^2 - 2
@@ -148,8 +148,8 @@ end
    @test roots(QQy(0), CalciumQQBar) == []
    @test roots(QQy(1), CalciumQQBar) == []
 
-   @test eigenvalues(zero(MatrixSpace(ZZ, 0, 0)), CalciumQQBar) == []
-   @test eigenvalues(zero(MatrixSpace(QQ, 0, 0)), CalciumQQBar) == []
+   @test eigenvalues(zero(matrix_space(ZZ, 0, 0)), CalciumQQBar) == []
+   @test eigenvalues(zero(matrix_space(QQ, 0, 0)), CalciumQQBar) == []
    @test eigenvalues(ZZ[1 1; 1 -1], CalciumQQBar) == [u, -u]
    @test eigenvalues(QQ[1 1; 1 -1], CalciumQQBar) == [u, -u]
 
@@ -174,7 +174,7 @@ end
 
      @test guess(CalciumQQBar, CC(2+i), 2, 10) == 2+i
 
-     Rx, x = PolynomialRing(QQBar, "x")
+     Rx, x = polynomial_ring(QQBar, "x")
      @test gcd(x^4 - 4*x^2 + 4, x^2 + sqrt(QQBar(18))*x + 4) == x + sqrt(QQBar(2))
    end
 end

@@ -9,7 +9,7 @@ end
    @test isa(S1, ZZAbsPowerSeriesRing)
    @test S1 !== S2
 
-   R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
    @test elem_type(R) == ZZAbsPowerSeriesRingElem
    @test elem_type(ZZAbsPowerSeriesRing) == ZZAbsPowerSeriesRingElem
@@ -34,7 +34,7 @@ end
 end
 
 @testset "ZZAbsPowerSeriesRingElem.printing" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
    b = x^2 + 3x + O(x^4)
 
@@ -42,7 +42,7 @@ end
 end
 
 @testset "ZZAbsPowerSeriesRingElem.manipulation" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -63,7 +63,7 @@ end
 end
 
 @testset "ZZAbsPowerSeriesRingElem.similar" begin
-   R, x = PowerSeriesRing(ZZ, 10, "x"; model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 10, "x"; model=:capped_absolute)
 
    for iters = 1:10
       f = rand(R, 0:10, -10:10)
@@ -146,7 +146,7 @@ end
 end
 
 @testset "ZZAbsPowerSeriesRingElem.unary_ops" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = 1 + 2x + x^2 + O(x^3)
@@ -157,7 +157,7 @@ end
 end
 
 @testset "ZZAbsPowerSeriesRingElem.binary_ops" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -176,7 +176,7 @@ end
 end
 
 @testset "ZZAbsPowerSeriesRingElem.adhoc_binary_ops" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -195,7 +195,7 @@ end
 end
 
 @testset "ZZAbsPowerSeriesRingElem.comparison" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^3)
@@ -210,7 +210,7 @@ end
 end
 
 @testset "ZZAbsPowerSeriesRingElem.adhoc_comparison" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^0)
@@ -229,7 +229,7 @@ end
 end
 
 @testset "ZZAbsPowerSeriesRingElem.powering" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -248,7 +248,7 @@ end
 end
 
 @testset "ZZAbsPowerSeriesRingElem.shift" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -269,7 +269,7 @@ end
 end
 
 @testset "ZZAbsPowerSeriesRingElem.truncation" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -288,7 +288,7 @@ end
 end
 
 @testset "ZZAbsPowerSeriesRingElem.exact_division" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
    a = x + x^3
    b = O(x^4)
@@ -305,7 +305,7 @@ end
 end
 
 @testset "ZZAbsPowerSeriesRingElem.adhoc_exact_division" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
    a = x + x^3
    b = O(x^4)
@@ -324,7 +324,7 @@ end
 end
 
 @testset "ZZAbsPowerSeriesRingElem.inversion" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
    a = 1 + x + 2x^2 + O(x^5)
    b = R(-1)
@@ -335,7 +335,7 @@ end
 end
 
 @testset "ZZAbsPowerSeriesRingElem.integral_derivative" begin
-   R, x = PowerSeriesRing(ZZ, 10, "x"; model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 10, "x"; model=:capped_absolute)
 
    for iter = 1:100
       f = rand(R, 0:0, -10:10)
@@ -345,7 +345,7 @@ end
 end
 
 @testset "ZZAbsPowerSeriesRingElem.square_root" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
    a = rand(R, 0:10, -10:10)
    b = a^2
@@ -354,7 +354,7 @@ end
 end
 
 @testset "ZZAbsPowerSeriesRingElem.unsafe_operators" begin
-   R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+   R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
    for iter = 1:300
       f = rand(R, 0:9, -10:10)

@@ -988,10 +988,10 @@ end
 
 ###############################################################################
 #
-#   MatrixSpace constructor
+#   matrix_space constructor
 #
 ###############################################################################
 
-function MatrixSpace(R::QQField, r::Int, c::Int; cached = true)
+function matrix_space(R::QQField, r::Int, c::Int; cached = true)
    return QQMatrixSpace(r, c, cached)
 end

@@ -594,34 +594,34 @@ end
 
 ###############################################################################
 #
-#   PolynomialRing constructor
+#   polynomial_ring constructor
 #
 ###############################################################################
 
-function PolynomialRing(R::FqField, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
+function polynomial_ring(R::FqField, s::Vector{Symbol}; cached::Bool = true, ordering::Symbol = :lex)
     # try just FqPolyRepFieldElem for now
     m = modulus(R)
     p = characteristic(R)
     if fits(UInt, p)
         Fq = GF(UInt(p))
         if isone(degree(m))
-            Fqx = PolynomialRing(Fq, s, cached = cached, ordering = ordering)[1]
+            Fqx = polynomial_ring(Fq, s, cached = cached, ordering = ordering)[1]
             parent_obj = FqMPolyRing(Fqx, R, 3, cached)
         else
-            mm = PolynomialRing(Fq, "x")[1](lift(PolynomialRing(ZZ, "x")[1], m))
+            mm = polynomial_ring(Fq, "x")[1](lift(polynomial_ring(ZZ, "x")[1], m))
             Fq = FlintFiniteField(mm, R.var, cached = cached, check = false)[1]
-            Fqx = PolynomialRing(Fq, s, cached = cached, ordering = ordering)[1]
+            Fqx = polynomial_ring(Fq, s, cached = cached, ordering = ordering)[1]
             parent_obj = FqMPolyRing(Fqx, R, 2, cached)
         end
     else
         Fq = FqPolyRepField(m, Symbol(R.var), cached, check = false)
-        Fqx = AbstractAlgebra.Generic.PolynomialRing(Fq, s, cached = cached, ordering = ordering)[1]
+        Fqx = AbstractAlgebra.Generic.polynomial_ring(Fq, s, cached = cached, ordering = ordering)[1]
         parent_obj = FqMPolyRing(Fqx, R, 1, cached)
     end
     return parent_obj, gens(parent_obj)
 end
 
-function PolynomialRing(R::FqField, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
-   return PolynomialRing(R, [Symbol(x) for x in s]; cached=cached, ordering=ordering)
+function polynomial_ring(R::FqField, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
+   return polynomial_ring(R, [Symbol(x) for x in s]; cached=cached, ordering=ordering)
 end
 

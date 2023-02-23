@@ -5,7 +5,7 @@
    @test isa(S1, QQPolyRing)
    @test S1 !== S2
 
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    @test elem_type(S) == QQPolyRingElem
    @test elem_type(QQPolyRing) == QQPolyRingElem
@@ -16,7 +16,7 @@
 
    @test isa(y, PolyElem)
 
-   T, z = PolynomialRing(S, "z")
+   T, z = polynomial_ring(S, "z")
 
    @test typeof(T) <: Generic.PolyRing
 
@@ -46,7 +46,7 @@
 
    @test isa(l, PolyElem)
 
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    m = S(3x^3 + 2x + 1)
 
@@ -82,20 +82,20 @@
 
    @test isa(p, PolyElem)
    
-   @test PolynomialRing(QQField(), "x")[1] != PolynomialRing(QQField(), "y")[1]
+   @test polynomial_ring(QQField(), "x")[1] != polynomial_ring(QQField(), "y")[1]
 
    R = QQField()
-   @test PolynomialRing(R, "x", cached = true)[1] === PolynomialRing(R, "x", cached = true)[1]
+   @test polynomial_ring(R, "x", cached = true)[1] === polynomial_ring(R, "x", cached = true)[1]
 end
 
 @testset "QQPolyRingElem.printing" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    @test sprint(show, "text/plain", y + y^2) == "y^2 + y"
 end
 
 @testset "QQPolyRingElem.manipulation" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    @test iszero(zero(S))
 
@@ -160,7 +160,7 @@ end
 end
 
 @testset "QQPolyRingElem.binary_ops" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    f = 3*y^2 + 7*y + 3
    g = 2*y + 11
@@ -173,7 +173,7 @@ end
 end
 
 @testset "QQPolyRingElem.adhoc_binary" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    f = 3*y^2 + 7*y + 3
    g = 2*y + 11
@@ -240,7 +240,7 @@ end
 end
 
 @testset "QQPolyRingElem.comparison" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    f = 3*y^2 + 7*y + 3
    g = 3*y^2 + 7*y + 3
@@ -251,7 +251,7 @@ end
 end
 
 @testset "QQPolyRingElem.adhoc_comparison" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    @test S(1) == 1
 
@@ -277,7 +277,7 @@ end
 end
 
 @testset "QQPolyRingElem.unary_ops" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    f = 3*y^2 + 2*y + 3
 
@@ -285,7 +285,7 @@ end
 end
 
 @testset "QQPolyRingElem.truncation" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    f = 3*y^2 + 7*y + 3
    g = 2*y^2 + 11*y + 1
@@ -300,7 +300,7 @@ end
 end
 
 @testset "QQPolyRingElem.reverse" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    f = 3*y^2 + 7*y + 3
 
@@ -310,7 +310,7 @@ end
 end
 
 @testset "QQPolyRingElem.shift" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    f = 3*y^2 + 7*y + 3
 
@@ -324,7 +324,7 @@ end
 end
 
 @testset "QQPolyRingElem.powering" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    f = 3*y^2 + 7*y + 3
 
@@ -334,7 +334,7 @@ end
 end
 
 @testset "QQPolyRingElem.modular_arithmetic" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    f = 7y + 1
    g = 11y^2 + 12y + 21
@@ -348,7 +348,7 @@ end
 end
 
 @testset "QQPolyRingElem.exact_division" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    f = 3*y^2 + 7*y + 3
    g = 11*y^2 + 2*y + 3
@@ -357,7 +357,7 @@ end
 end
 
 @testset "QQPolyRingElem.adhoc_exact_division" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    f = 3*y^2 + 7*y + 3
 
@@ -373,7 +373,7 @@ end
 end
 
 @testset "QQPolyRingElem.euclidean_division" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    f = y^3 + 3*y^2 + 7*y + 3
    g = 11*y^2 + 2*y + 3
@@ -384,7 +384,7 @@ end
 end
 
 @testset "QQPolyRingElem.content_primpart_gcd" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    k = 3y^2 + 7y + 3
    l = 11y + 5
@@ -400,7 +400,7 @@ end
 end
 
 @testset "QQPolyRingElem.evaluation" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    f = ZZRingElem(12)//7
    g = 3y^2 + 11*y + 3
@@ -431,7 +431,7 @@ end
 end
 
 @testset "QQPolyRingElem.composition" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    f = 7y^2 + 12y + 3
    g = 11y + 9
@@ -440,7 +440,7 @@ end
 end
 
 @testset "QQPolyRingElem.derivative" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    h = 17y^2 + 2y + 3
 
@@ -448,7 +448,7 @@ end
 end
 
 @testset "QQPolyRingElem.integral" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    f = 17y^2 + 2y - 11
 
@@ -456,7 +456,7 @@ end
 end
 
 @testset "QQPolyRingElem.resultant" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    f = 13y^2 + 7y + 3
    g = 6y + 11
@@ -465,7 +465,7 @@ end
 end
 
 @testset "QQPolyRingElem.discriminant" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    f = 17y^2 + 11y + 3
 
@@ -473,7 +473,7 @@ end
 end
 
 @testset "QQPolyRingElem.gcdx" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    f = 17y^2 + 11y + 3
    g = 61y - 9
@@ -482,7 +482,7 @@ end
 end
 
 @testset "QQPolyRingElem.factor" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    f = (2y + 1)^10*(5*y^3 + 1)^100*(-QQFieldElem(1,5))
 
@@ -497,7 +497,7 @@ end
 end
 
 @testset "QQPolyRingElem.signature" begin
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    f = (x^3 + 3x + QQ(2)//QQ(3))
 
@@ -505,7 +505,7 @@ end
 end
 
 @testset "QQPolyRingElem.square_root"  begin
-   R, x = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(QQ, "x")
 
    for i = 1:1000
       f = rand(R, -1:4, -5:5)
@@ -543,7 +543,7 @@ end
 end
 
 @testset "QQPolyRingElem.special" begin
-   S, y = PolynomialRing(QQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    @test chebyshev_t(20, y) == 524288*y^20-2621440*y^18+5570560*y^16-6553600*y^14+4659200*y^12-2050048*y^10+549120*y^8-84480*y^6+6600*y^4-200*y^2+1
 
@@ -551,8 +551,8 @@ end
 end
 
 @testset "QQPolyRingElem.Polynomials" begin
-   R, x = PolynomialRing(QQ, "x")
-   S, y = PolynomialRing(R, "y")
+   R, x = polynomial_ring(QQ, "x")
+   S, y = polynomial_ring(R, "y")
 
    f = (3x^2 + 2x + 1)*y^3 + (2x^2 + 4)*y^2 + 4x*y + (2x^2 - x + 1)
 
@@ -560,7 +560,7 @@ end
 end
 
 @testset "QQPolyRingElem.remove_valuation" begin
-   S, y = PolynomialRing(FlintQQ, "y")
+   S, y = polynomial_ring(FlintQQ, "y")
 
    f = 7y^2 + 3y + 2
    g = f^5*(11y^3 - 2y^2 + 5)

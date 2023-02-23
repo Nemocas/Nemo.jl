@@ -7,7 +7,7 @@
    @test isa(S1, FpPolyRing)
    @test S1 !== S2
 
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    @test elem_type(S) == FpPolyRingElem
    @test elem_type(FpPolyRing) == FpPolyRingElem
@@ -48,7 +48,7 @@
 
    @test isa(n, PolyElem)
 
-   T, y = PolynomialRing(ZZ, "y")
+   T, y = polynomial_ring(ZZ, "y")
 
    p = 3y^3 + 2y - 1
    q = S(p)
@@ -62,7 +62,7 @@ end
 
 @testset "FpPolyRingElem.printing" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
    f = x^3 + 2x^2 + x + 1
 
    @test sprint(show, "text/plain", f) == "x^3 + 2*x^2 + x + 1"
@@ -70,7 +70,7 @@ end
 
 @testset "FpPolyRingElem.manipulation" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    @test iszero(zero(S))
 
@@ -152,7 +152,7 @@ end
 
 @testset "FpPolyRingElem.binary_ops" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 2
@@ -166,7 +166,7 @@ end
 
 @testset "FpPolyRingElem.adhoc_binary" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 2
@@ -210,7 +210,7 @@ end
 
 @testset "FpPolyRingElem.comparison" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 2
@@ -222,7 +222,7 @@ end
 
 @testset "FpPolyRingElem.adhoc_comparison" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
 
@@ -241,7 +241,7 @@ end
 
 @testset "FpPolyRingElem.unary_ops" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
 
@@ -250,7 +250,7 @@ end
 
 @testset "FpPolyRingElem.truncation" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
@@ -266,7 +266,7 @@ end
 
 @testset "FpPolyRingElem.reverse" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 3
 
@@ -275,7 +275,7 @@ end
 
 @testset "FpPolyRingElem.shift" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
 
@@ -290,7 +290,7 @@ end
 
 @testset "FpPolyRingElem.powering" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
 
@@ -301,7 +301,7 @@ end
 
 @testset "FpPolyRingElem.exact_division" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
@@ -311,7 +311,7 @@ end
 
 @testset "FpPolyRingElem.adhoc_exact_division" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
 
@@ -324,7 +324,7 @@ end
 
 @testset "FpPolyRingElem.modular_arithmetic" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = 3*x^2 + x + 2
    g = 5*x^2 + 2*x + 1
@@ -345,7 +345,7 @@ end
 
 @testset "FpPolyRingElem.euclidean_division" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
@@ -357,7 +357,7 @@ end
 
 @testset "FpPolyRingElem.gcd" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
@@ -370,7 +370,7 @@ end
 
 @testset "FpPolyRingElem.gcdinv" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
@@ -380,7 +380,7 @@ end
 
 @testset "FpPolyRingElem.square_root" begin
    for R in [GF(ZZ(2)), GF(ZZ(23))]
-      S, x = PolynomialRing(R, "x")
+      S, x = polynomial_ring(R, "x")
 
       for iter in 1:1000
          f = rand(S, -1:10)
@@ -414,7 +414,7 @@ end
 
 @testset "FpPolyRingElem.evaluation" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
 
@@ -434,7 +434,7 @@ end
 
 @testset "FpPolyRingElem.composition" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
@@ -444,7 +444,7 @@ end
 
 @testset "FpPolyRingElem.derivative" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
 
@@ -453,7 +453,7 @@ end
 
 @testset "FpPolyRingElem.integral" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
 
@@ -462,7 +462,7 @@ end
 
 @testset "FpPolyRingElem.resultant" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = 5x^2 + 2x + 1
    g = 2x^3 + 3x + 1
@@ -472,7 +472,7 @@ end
 
 @testset "FpPolyRingElem.discriminant" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
 
@@ -481,9 +481,9 @@ end
 
 @testset "FpPolyRingElem.lift" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
-   T, y = PolynomialRing(ZZ, "y")
+   T, y = polynomial_ring(ZZ, "y")
 
    f = x^2 + 2x + 1
 
@@ -492,7 +492,7 @@ end
 
 @testset "FpPolyRingElem.is_irreducible" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
 
@@ -501,7 +501,7 @@ end
 
 @testset "FpPolyRingElem.is_squarefree" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
 
@@ -510,7 +510,7 @@ end
 
 @testset "FpPolyRingElem.factor" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, x = PolynomialRing(R, "x")
+   S, x = polynomial_ring(R, "x")
    F = R
 
    f = 3*(x^2 + 2x + 1)
@@ -542,7 +542,7 @@ end
 
 @testset "FpPolyRingElem.remove_valuation" begin
    R = GF(ZZRingElem(123456789012345678949))
-   S, y = PolynomialRing(R, "y")
+   S, y = polynomial_ring(R, "y")
 
    f = 7y^2 + 3y + 2
    g = f^5*(11y^3 - 2y^2 + 5)

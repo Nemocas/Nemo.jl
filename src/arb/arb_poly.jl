@@ -805,17 +805,17 @@ end
 
 ################################################################################
 #
-#  PolynomialRing constructor
+#  polynomial_ring constructor
 #
 ################################################################################
 
-function PolynomialRing(R::ArbField, s::Symbol; cached = true)
+function polynomial_ring(R::ArbField, s::Symbol; cached = true)
   parent_obj = ArbPolyRing(R, s, cached)
   return parent_obj, parent_obj(ZZPolyRingElem([ZZRingElem(0), ZZRingElem(1)]))
 end
 
-function PolynomialRing(R::ArbField, s::AbstractString; cached = true)
-   return PolynomialRing(R, Symbol(s); cached=cached)
+function polynomial_ring(R::ArbField, s::AbstractString; cached = true)
+   return polynomial_ring(R, Symbol(s); cached=cached)
 end
 
 function PolyRing(R::ArbField)

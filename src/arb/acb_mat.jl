@@ -34,7 +34,7 @@ parent_type(::Type{acb_mat}) = AcbMatSpace
 elem_type(::Type{AcbMatSpace}) = acb_mat
 
 parent(x::acb_mat, cached::Bool = true) =
-      MatrixSpace(base_ring(x), nrows(x), ncols(x))
+      matrix_space(base_ring(x), nrows(x), ncols(x))
 
 dense_matrix_type(::Type{acb}) = acb_mat
 
@@ -1017,11 +1017,11 @@ end
 
 ###############################################################################
 #
-#   MatrixSpace constructor
+#   matrix_space constructor
 #
 ###############################################################################
 
-function MatrixSpace(R::AcbField, r::Int, c::Int; cached = true)
+function matrix_space(R::AcbField, r::Int, c::Int; cached = true)
   (r <= 0 || c <= 0) && error("Dimensions must be positive")
   return AcbMatSpace(R, r, c, cached)
 end

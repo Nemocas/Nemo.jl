@@ -1,7 +1,7 @@
 function benchmark_det_poly_ring()
    print("benchmark_det_poly_ring ... ")
-   ZZx, x = PolynomialRing(FlintZZ, "x")
-   M = MatrixSpace(ZZx, 40, 40)()
+   ZZx, x = polynomial_ring(FlintZZ, "x")
+   M = matrix_space(ZZx, 40, 40)()
 
    for i in 1:40
       for j in 1:40

@@ -5,7 +5,7 @@
    @test isa(S1, ZZPolyRing)
    @test S1 !== S2
 
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    @test elem_type(R) == ZZPolyRingElem
    @test elem_type(ZZPolyRing) == ZZPolyRingElem
@@ -36,21 +36,21 @@
 
    @test isa(l, PolyElem)
 
-   @test PolynomialRing(ZZRing(), "x")[1] != PolynomialRing(ZZRing(), "y")[1]
+   @test polynomial_ring(ZZRing(), "x")[1] != polynomial_ring(ZZRing(), "y")[1]
 
    R = ZZRing()
-   @test PolynomialRing(R, "x", cached = true)[1] === PolynomialRing(R, "x", cached = true)[1]
+   @test polynomial_ring(R, "x", cached = true)[1] === polynomial_ring(R, "x", cached = true)[1]
 end
 
 @testset "ZZPolyRingElem.printing" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
    f = x^3 + 2x^2 + x + 1
 
    @test sprint(show, "text/plain", f) == "x^3 + 2*x^2 + x + 1"
 end
 
 @testset "ZZPolyRingElem.manipulation" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    @test iszero(zero(R))
 
@@ -111,7 +111,7 @@ end
 end
 
 @testset "ZZPolyRingElem.binary_ops" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 2
@@ -124,7 +124,7 @@ end
 end
 
 @testset "ZZPolyRingElem.adhoc_binary" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 2
@@ -155,7 +155,7 @@ end
 end
 
 @testset "ZZPolyRingElem.comparison" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 2
@@ -166,7 +166,7 @@ end
 end
 
 @testset "ZZPolyRingElem.adhoc_comparison" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = x^2 + 2x + 1
 
@@ -180,7 +180,7 @@ end
 end
 
 @testset "ZZPolyRingElem.unary_ops" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = x^2 + 2x + 1
 
@@ -188,7 +188,7 @@ end
 end
 
 @testset "ZZPolyRingElem.truncation" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
@@ -203,7 +203,7 @@ end
 end
 
 @testset "ZZPolyRingElem.reverse" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = x^2 + 2x + 3
 
@@ -211,7 +211,7 @@ end
 end
 
 @testset "ZZPolyRingElem.shift" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = x^2 + 2x + 1
 
@@ -225,7 +225,7 @@ end
 end
 
 @testset "ZZPolyRingElem.powering" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = x^2 + 2x + 1
 
@@ -233,7 +233,7 @@ end
 end
 
 @testset "ZZPolyRingElem.exact_division" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
@@ -244,7 +244,7 @@ end
 end
 
 @testset "ZZPolyRingElem.adhoc_exact_division" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = x^2 + 2x + 1
 
@@ -254,7 +254,7 @@ end
 end
 
 @testset "ZZPolyRingElem.divrem" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = x^2 + 2x + 1
    g = x + 1
@@ -265,7 +265,7 @@ end
 end
 
 @testset "ZZPolyRingElem.pseudodivision" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
@@ -276,7 +276,7 @@ end
 end
 
 @testset "ZZPolyRingElem.remove_valuation" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
@@ -292,7 +292,7 @@ end
 end
 
 @testset "ZZPolyRingElem.content_primpart_gcd" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
@@ -308,7 +308,7 @@ end
 end
 
 @testset "ZZPolyRingElem.evaluation" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = x^2 + 2x + 1
 
@@ -323,7 +323,7 @@ end
 end
 
 @testset "ZZPolyRingElem.composition" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
@@ -332,7 +332,7 @@ end
 end
 
 @testset "ZZPolyRingElem.derivative" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = x^2 + 2x + 1
 
@@ -340,7 +340,7 @@ end
 end
 
 @testset "ZZPolyRingElem.resultant" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = 5x^2 + 2x + 1
    g = 2x^3 + 3x + 1
@@ -349,7 +349,7 @@ end
 end
 
 @testset "ZZPolyRingElem.discriminant" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = x^2 + 2x + 1
 
@@ -357,7 +357,7 @@ end
 end
 
 @testset "ZZPolyRingElem.resx" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = 5x^2 + 2x + 1
    g = 2x^3 + 3x + 1
@@ -366,7 +366,7 @@ end
 end
 
 @testset "ZZPolyRingElem.signature" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    f = x^3 + 3x + 1
 
@@ -374,7 +374,7 @@ end
 end
 
 @testset "ZZPolyRingElem.interpolate" begin
-  Rx, x = PolynomialRing(ZZ, "x")
+  Rx, x = polynomial_ring(ZZ, "x")
 
   xval = [ ZZ(0), ZZ(1), ZZ(2), ZZ(3) ]
 
@@ -387,7 +387,7 @@ end
 end
 
 @testset "ZZPolyRingElem.factor" begin
-  Rx, x = PolynomialRing(FlintZZ, "x")
+  Rx, x = polynomial_ring(FlintZZ, "x")
 
   f = x^24 - x^23 + x^19 - x^18 + x^17 - x^16 + x^14 - x^13 + x^12 - x^11 + x^10 - x^8 + x^7 - x^6 + x^5 - x + 1
   g = x - 1
@@ -419,7 +419,7 @@ end
 end
 
 @testset "ZZPolyRingElem.square_root" begin
-  R, x = PolynomialRing(ZZ, "x")
+  R, x = polynomial_ring(ZZ, "x")
 
   f = rand(R, 0:10, -10:10)
   g = f^2
@@ -459,7 +459,7 @@ end
 end
 
 @testset "ZZPolyRingElem.special" begin
-   R, x = PolynomialRing(ZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
 
    @test chebyshev_t(20, x) == 524288*x^20-2621440*x^18+5570560*x^16-6553600*x^14+4659200*x^12-2050048*x^10+549120*x^8-84480*x^6+6600*x^4-200*x^2+1
 
@@ -479,8 +479,8 @@ end
 end
 
 @testset "ZZPolyRingElem.Polynomials" begin
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
+   R, x = polynomial_ring(ZZ, "x")
+   S, y = polynomial_ring(R, "y")
 
    f = (3x^2 + 2x + 1)*y^3 + (2x^2 + 4)*y^2 + 4x*y + (2x^2 - x + 1)
 

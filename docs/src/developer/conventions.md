@@ -42,9 +42,9 @@ We follow these conventions in Nemo with some exceptions:
   capitalisation as that type, e.g. `ZZRingElem(1)`.
 
 * Functions for creating rings, fields, modules, maps, etc. (rather than the
-  elements thereof) use CamelCase, e.g. `PolynomialRing`. We refer to these 
+  elements thereof) use CamelCase, e.g. `polynomial_ring`. We refer to these 
   functions as parent constructors. Note that we do not follow the Julia
-  convention here, e.g. `PolynomialRing` is a function and not a type constructor
+  convention here, e.g. `polynomial_ring` is a function and not a type constructor
   (in fact we often return a tuple consisting of a parent object and other
   objects such as generators with this type of function) yet we capitalise it.
 
@@ -170,7 +170,7 @@ follows:
 * Additional constructors, e.g. `matrix`, which might be used instead of a
   parent object to construct elements.
 
-* Parent object constructors, e.g. `PolynomialRing`, etc.
+* Parent object constructors, e.g. `polynomial_ring`, etc.
 
 The exact order within the file is less important than generally following
 something like the above. This aids in finding functions in a file since all

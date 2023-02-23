@@ -8,7 +8,7 @@ CC = ComplexField()
    @test isa(S1, ComplexPolyRing)
    @test S1 !== S2
 
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    @test elem_type(R) == ComplexPoly
    @test elem_type(ComplexPolyRing) == ComplexPoly
@@ -47,7 +47,7 @@ CC = ComplexField()
 end
 
 @testset "ComplexPoly.printing" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
    f = x^3 + 2x^2 + x + 1
 
    @test occursin(r"x", string(f))
@@ -55,7 +55,7 @@ end
 end
 
 @testset "ComplexPoly.manipulation" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    @test iszero(zero(R))
 
@@ -85,7 +85,7 @@ end
 end
 
 @testset "ComplexPoly.binary_ops" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 2
@@ -98,7 +98,7 @@ end
 end
 
 @testset "ComplexPoly.adhoc_binary" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 2
@@ -125,9 +125,9 @@ end
 end
 
 @testset "ComplexPoly.comparison" begin
-   R, x = PolynomialRing(CC, "x")
-   Zx, zx = PolynomialRing(ZZ, "x")
-   Qx, qx = PolynomialRing(QQ, "x")
+   R, x = polynomial_ring(CC, "x")
+   Zx, zx = polynomial_ring(ZZ, "x")
+   Qx, qx = polynomial_ring(QQ, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 2
@@ -171,7 +171,7 @@ end
 end
 
 @testset "ComplexPoly.adhoc_comparison" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
 
@@ -195,7 +195,7 @@ end
 end
 
 @testset "ComplexPoly.unary_ops" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
 
@@ -203,7 +203,7 @@ end
 end
 
 @testset "ComplexPoly.truncation" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
@@ -218,7 +218,7 @@ end
 end
 
 @testset "ComplexPoly.reverse" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 3
 
@@ -226,7 +226,7 @@ end
 end
 
 @testset "ComplexPoly.shift" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
 
@@ -240,7 +240,7 @@ end
 end
 
 @testset "ComplexPoly.powering" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
 
@@ -250,7 +250,7 @@ end
 end
 
 @testset "ComplexPoly.exact_division" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
@@ -259,7 +259,7 @@ end
 end
 
 @testset "ComplexPoly.scalar_division" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
 
@@ -275,7 +275,7 @@ end
 end
 
 @testset "ComplexPoly.evaluation" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
 
@@ -301,7 +301,7 @@ end
 end
 
 @testset "ComplexPoly.roots" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = (x - 1)*(x - 2)*(x - CC("5 +/- 0.001"))
 
@@ -313,7 +313,7 @@ end
 end
 
 @testset "ComplexPoly.composition" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
@@ -322,7 +322,7 @@ end
 end
 
 @testset "ComplexPoly.derivative_integral" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
 
@@ -332,7 +332,7 @@ end
 end
 
 @testset "ComplexPoly.evaluation_interpolation" begin
-   R, x = PolynomialRing(CC, "x")
+   R, x = polynomial_ring(CC, "x")
 
    n = 5
    xs = ComplexFieldElem[inv(CC(i)) for i=1:n]
@@ -376,7 +376,7 @@ end
 end
 
 @testset "ComplexPoly.root_bound" begin
-   Rx, x = PolynomialRing(CC, "x")
+   Rx, x = polynomial_ring(CC, "x")
 
    for i in 1:2
       r = rand(1:10)

@@ -51,13 +51,13 @@ This example computes recursive univariate polynomials.
 ```julia
 julia> using Nemo
 
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integer Ring,x)
 
-julia> S, y = PolynomialRing(R, "y")
+julia> S, y = polynomial_ring(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integer Ring,y)
 
-julia> T, z = PolynomialRing(S, "z")
+julia> T, z = polynomial_ring(S, "z")
 (Univariate Polynomial Ring in z over Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integer Ring,z)
 
 julia> f = x + y + z + 1
@@ -77,13 +77,13 @@ julia> using Nemo
 julia> R, x = FiniteField(7, 11, "x")
 (Finite field of degree 11 over F_7,x)
 
-julia> S, y = PolynomialRing(R, "y")
+julia> S, y = polynomial_ring(R, "y")
 (Univariate Polynomial Ring in y over Finite field of degree 11 over F_7,y)
 
-julia> T = ResidueRing(S, y^3 + 3x*y + 1)
+julia> T = residue_ring(S, y^3 + 3x*y + 1)
 Residue ring of Univariate Polynomial Ring in y over Finite field of degree 11 over F_7 modulo y^3+(3*x)*y+(1)
 
-julia> U, z = PolynomialRing(T, "z")
+julia> U, z = polynomial_ring(T, "z")
 (Univariate Polynomial Ring in z over Residue ring of Univariate Polynomial Ring in y over Finite field of degree 11 over F_7 modulo y^3+(3*x)*y+(1),z)
 
 julia> f = (3y^2 + y + x)*z^2 + ((x + 2)*y^2 + x + 1)*z + 4x*y + 3;
@@ -104,10 +104,10 @@ Here is an example using matrices.
 ```
 julia> using Nemo
 
-julia> R, x = PolynomialRing(ZZ, "x")
+julia> R, x = polynomial_ring(ZZ, "x")
 (Univariate Polynomial Ring in x over Integer Ring,x)
 
-julia> S = MatrixSpace(R, 40, 40)
+julia> S = matrix_space(R, 40, 40)
 Matrix Space of 40 rows and 40 columns over Univariate Polynomial Ring in x over Integer Ring
 
 julia> M = rand(S, 2:2, -20:20)
@@ -124,7 +124,7 @@ julia> using Nemo
 julia> R, x = QQ["x"]
 (Univariate Polynomial Ring in x over Rational Field,x)
 
-julia> S, t = PowerSeriesRing(R, 100, "t")
+julia> S, t = power_series_ring(R, 100, "t")
 (Univariate power series ring in t over Univariate Polynomial Ring in x over Rational Field,t+O(t^101))
 
 julia> u = t + O(t^100)
