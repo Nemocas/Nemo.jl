@@ -96,7 +96,7 @@ end
 #
 ###############################################################################
 
-function similar(f::PolyElem, R::ComplexField, var::Symbol=var(parent(f)); cached::Bool=true)
+function similar(f::PolyRingElem, R::ComplexField, var::Symbol=var(parent(f)); cached::Bool=true)
    z = ComplexPoly()
    z.parent = ComplexPolyRing(R, var, cached)
    return z

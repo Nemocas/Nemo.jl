@@ -92,7 +92,7 @@ end
 #
 ###############################################################################
 
-function similar(f::PolyElem, R::ArbField, var::Symbol=var(parent(f)); cached::Bool=true)
+function similar(f::PolyRingElem, R::ArbField, var::Symbol=var(parent(f)); cached::Bool=true)
    z = arb_poly()
    z.parent = ArbPolyRing(R, var, cached)
    return z

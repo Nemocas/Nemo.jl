@@ -16,55 +16,55 @@
 
    @test typeof(S) <: fqPolyRepPolyRing
 
-   @test isa(y, PolyElem)
+   @test isa(y, PolyRingElem)
 
    T, z = polynomial_ring(S, "z")
 
    @test typeof(T) <: Generic.PolyRing
 
-   @test isa(z, PolyElem)
+   @test isa(z, PolyRingElem)
 
    f = x^2 + y^3 + z + 1
 
-   @test isa(f, PolyElem)
+   @test isa(f, PolyRingElem)
 
    g = S(2)
 
-   @test isa(g, PolyElem)
+   @test isa(g, PolyRingElem)
 
    h = S(x^2 + 2x + 1)
 
-   @test isa(h, PolyElem)
+   @test isa(h, PolyRingElem)
 
    j = T(x + 2)
 
-   @test isa(j, PolyElem)
+   @test isa(j, PolyRingElem)
 
    k = S([x, x + 2, x^2 + 3x + 1])
 
-   @test isa(k, PolyElem)
+   @test isa(k, PolyRingElem)
 
    l = S(k)
 
-   @test isa(l, PolyElem)
+   @test isa(l, PolyRingElem)
 
    m = S([1, 2, 3])
 
-   @test isa(m, PolyElem)
+   @test isa(m, PolyRingElem)
 
    n = S(ZZRingElem(12))
 
-   @test isa(n, PolyElem)
+   @test isa(n, PolyRingElem)
 
    T, z = polynomial_ring(ZZ, "z")
 
    p = S(3z^2 + 2z + 5)
 
-   @test isa(p, PolyElem)
+   @test isa(p, PolyRingElem)
 
    r = S([ZZ(1), ZZ(2), ZZ(3)])
 
-   @test isa(r, PolyElem)
+   @test isa(r, PolyRingElem)
 end
 
 @testset "fqPolyRepPolyRingElem.printing" begin

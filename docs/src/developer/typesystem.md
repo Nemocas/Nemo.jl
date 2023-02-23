@@ -64,7 +64,7 @@ in AbstractAlgebra in `src/generic/GenericTypes.jl`.
 
 The totality of all univariate polynomial types, including those of generic
 `Poly{T}` types and those coming from C libraries (such as `ZZPolyRingElem`), is
-represented by the abstract type `PolyElem{T}` which in turn belongs to
+represented by the abstract type `PolyRingElem{T}` which in turn belongs to
 `RingElem`, both defined in AbstractAlgebra in `src/AbstractTypes.jl`.
 
 Similarly, the totality of all matrix types, including explicit C types

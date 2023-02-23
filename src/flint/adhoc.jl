@@ -102,7 +102,7 @@ end
 #
 ###############################################################################
 
-function *(a::ZZRingElem, b::PolyElem)
+function *(a::ZZRingElem, b::PolyRingElem)
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -113,14 +113,14 @@ function *(a::ZZRingElem, b::PolyElem)
    return z
 end
 
-*(a::PolyElem, b::ZZRingElem) = b*a
+*(a::PolyRingElem, b::ZZRingElem) = b*a
 
-==(x::PolyElem, y::ZZRingElem) = ((length(x) == 0 && iszero(y))
+==(x::PolyRingElem, y::ZZRingElem) = ((length(x) == 0 && iszero(y))
                         || (length(x) == 1 && coeff(x, 0) == y))
 
-==(x::ZZRingElem, y::PolyElem) = y == x
+==(x::ZZRingElem, y::PolyRingElem) = y == x
 
-function divexact(a::PolyElem, b::ZZRingElem; check::Bool=true)
+function divexact(a::PolyRingElem, b::ZZRingElem; check::Bool=true)
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
@@ -133,7 +133,7 @@ end
 
 # ambiguities
 
-function *(a::ZZRingElem, b::PolyElem{ZZRingElem})
+function *(a::ZZRingElem, b::PolyRingElem{ZZRingElem})
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -144,14 +144,14 @@ function *(a::ZZRingElem, b::PolyElem{ZZRingElem})
    return z
 end
 
-*(a::PolyElem{ZZRingElem}, b::ZZRingElem) = b*a
+*(a::PolyRingElem{ZZRingElem}, b::ZZRingElem) = b*a
 
-==(x::PolyElem{ZZRingElem}, y::ZZRingElem) = ((length(x) == 0 && iszero(y))
+==(x::PolyRingElem{ZZRingElem}, y::ZZRingElem) = ((length(x) == 0 && iszero(y))
                         || (length(x) == 1 && coeff(x, 0) == y))
 
-==(x::ZZRingElem, y::PolyElem{ZZRingElem}) = y == x
+==(x::ZZRingElem, y::PolyRingElem{ZZRingElem}) = y == x
 
-function divexact(a::PolyElem{ZZRingElem}, b::ZZRingElem; check::Bool=true)
+function divexact(a::PolyRingElem{ZZRingElem}, b::ZZRingElem; check::Bool=true)
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))

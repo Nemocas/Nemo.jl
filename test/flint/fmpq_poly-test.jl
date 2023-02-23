@@ -14,73 +14,73 @@
 
    @test isa(S, QQPolyRing)
 
-   @test isa(y, PolyElem)
+   @test isa(y, PolyRingElem)
 
    T, z = polynomial_ring(S, "z")
 
    @test typeof(T) <: Generic.PolyRing
 
-   @test isa(z, PolyElem)
+   @test isa(z, PolyRingElem)
 
    f = ZZRingElem(12)//3 + y^3 + z + 1
 
-   @test isa(f, PolyElem)
+   @test isa(f, PolyRingElem)
 
    g = S(2)
 
-   @test isa(g, PolyElem)
+   @test isa(g, PolyRingElem)
 
    h = S(ZZRingElem(12)//7 + 1)
 
-   @test isa(h, PolyElem)
+   @test isa(h, PolyRingElem)
 
    j = T(ZZRingElem(12)//7 + 2)
 
-   @test isa(j, PolyElem)
+   @test isa(j, PolyRingElem)
 
    k = S([ZZRingElem(12)//7, ZZRingElem(12)//7 + 2, ZZRingElem(3)//11 + 1])
 
-   @test isa(k, PolyElem)
+   @test isa(k, PolyRingElem)
 
    l = S(k)
 
-   @test isa(l, PolyElem)
+   @test isa(l, PolyRingElem)
 
    R, x = polynomial_ring(ZZ, "x")
 
    m = S(3x^3 + 2x + 1)
 
-   @test isa(m, PolyElem)
+   @test isa(m, PolyRingElem)
 
    @test m == 3y^3 + 2y + 1
 
    n = S(ZZRingElem(12))
 
-   @test isa(n, PolyElem)
+   @test isa(n, PolyRingElem)
 
    n2 = S(12//1)
 
-   @test isa(n2, PolyElem)
+   @test isa(n2, PolyRingElem)
 
    n2 = S(BigInt(12)//BigInt(1))
 
-   @test isa(n2, PolyElem)
+   @test isa(n2, PolyRingElem)
 
    o = S([1, 2, 3])
 
-   @test isa(o, PolyElem)
+   @test isa(o, PolyRingElem)
 
    o2 = S([1//1, 2//1, 3//1])
 
-   @test isa(o2, PolyElem)
+   @test isa(o2, PolyRingElem)
 
    o3 = S([BigInt(1)//BigInt(1), BigInt(2)//BigInt(1), BigInt(3)//BigInt(1)])
 
-   @test isa(o3, PolyElem)
+   @test isa(o3, PolyRingElem)
 
    p = S([ZZ(1), ZZ(2), ZZ(3)])
 
-   @test isa(p, PolyElem)
+   @test isa(p, PolyRingElem)
    
    @test polynomial_ring(QQField(), "x")[1] != polynomial_ring(QQField(), "y")[1]
 

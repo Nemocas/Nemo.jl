@@ -16,23 +16,23 @@ RR = ArbField(64)
 
    @test typeof(R) <: ArbPolyRing
 
-   @test isa(x, PolyElem)
+   @test isa(x, PolyRingElem)
 
    f = x^3 + 2x^2 + x + 1
 
-   @test isa(f, PolyElem)
+   @test isa(f, PolyRingElem)
 
    g = R(2)
 
-   @test isa(g, PolyElem)
+   @test isa(g, PolyRingElem)
 
    h = R(x^2 + 2x + 1)
 
-   @test isa(h, PolyElem)
+   @test isa(h, PolyRingElem)
 
    k = R([RR(1), RR(0), RR(3)])
 
-   @test isa(k, PolyElem)
+   @test isa(k, PolyRingElem)
 
    for T in [Int, UInt, BigInt, Float64, BigFloat, ZZRingElem, QQFieldElem, Rational{Int}, Rational{BigInt}]
       l = R(T[1, 2, 3])

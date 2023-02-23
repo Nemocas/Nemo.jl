@@ -29,73 +29,73 @@ function test_poly_constructors(R)
     #@test S != R
 
     #@test isa(Rx, GFPPolyRing)
-    @test isa(x, PolyElem)
+    @test isa(x, PolyRingElem)
 
     a = Rx()
 
-    @test isa(a, PolyElem)
+    @test isa(a, PolyRingElem)
     @test parent(a) == Rx
 
     b = Rx(2)
 
-    @test isa(b, PolyElem)
+    @test isa(b, PolyRingElem)
     @test parent(b) == Rx
 
     c = Rx(UInt(3))
 
-    @test isa(c, PolyElem)
+    @test isa(c, PolyRingElem)
     @test parent(c) == Rx
 
     d = Rx(fmpz(3))
 
-    @test isa(d, PolyElem)
+    @test isa(d, PolyRingElem)
     @test parent(d) == Rx
 
     e = Rx(R(16))
 
-    @test isa(e, PolyElem)
+    @test isa(e, PolyRingElem)
     @test parent(e) == Rx
 
     m = Rx([1, 2, 3])
 
-    @test isa(m, PolyElem)
+    @test isa(m, PolyRingElem)
     @test parent(e) == Rx
 
     f = Rx([UInt(1), UInt(2), UInt(3)])
 
-    @test isa(f, PolyElem)
+    @test isa(f, PolyRingElem)
     @test parent(f) == Rx
 
     g = Rx([fmpz(1), fmpz(2), fmpz(3)])
 
-    @test isa(g, PolyElem)
+    @test isa(g, PolyRingElem)
     @test parent(g) == Rx
 
     h = Rx([R(1), R(2), R(3)])
 
-    @test isa(h, PolyElem)
+    @test isa(h, PolyRingElem)
     @test parent(h) == Rx
 
     m = Rx(1:3)
 
-    @test isa(m, PolyElem)
+    @test isa(m, PolyRingElem)
     @test parent(e) == Rx
 
     n = Rx(fmpz(1):fmpz(3))
 
-    @test isa(n, PolyElem)
+    @test isa(n, PolyRingElem)
     @test parent(e) == Rx
 
     _a = polynomial_ring(ZZ, "y")[1]([fmpz(1),fmpz(2),fmpz(3)])
 
     k = Rx(_a)
 
-    @test isa(k, PolyElem)
+    @test isa(k, PolyRingElem)
     @test parent(k) == Rx
 
     l = x^2 + x^2 + x^2 + x^1 + x^1 + R(1)
 
-    @test isa(l, PolyElem)
+    @test isa(l, PolyRingElem)
     @test parent(l) == Rx
 
     @test f == g

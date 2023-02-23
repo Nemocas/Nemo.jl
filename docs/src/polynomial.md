@@ -35,7 +35,7 @@ $\mathbb{C}$ (fixed precision)              | Arb                 | `acb_poly`  
 The string representation of the variable and the base ring $R$ of a generic
 polynomial is stored in its parent object. 
 
-All polynomial element types belong to the abstract type `PolyElem` and all of
+All polynomial element types belong to the abstract type `PolyRingElem` and all of
 the polynomial ring types belong to the abstract type `PolyRing`. This enables
 one to write generic functions that can accept any Nemo univariate polynomial type.
 

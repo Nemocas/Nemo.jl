@@ -207,7 +207,7 @@ end
 
 const FmpzPolyID = Dict{Tuple{ZZRing, Symbol}, ZZPolyRing}()
 
-mutable struct ZZPolyRingElem <: PolyElem{ZZRingElem}
+mutable struct ZZPolyRingElem <: PolyRingElem{ZZRingElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -304,7 +304,7 @@ end
 
 const FmpqPolyID = Dict{Tuple{QQField, Symbol}, QQPolyRing}()
 
-mutable struct QQPolyRingElem <: PolyElem{QQFieldElem}
+mutable struct QQPolyRingElem <: PolyRingElem{QQFieldElem}
    coeffs::Ptr{Int}
    alloc::Int
    length::Int
@@ -527,7 +527,7 @@ end
 
 const NmodPolyRingID = Dict{Tuple{zzModRing, Symbol}, zzModPolyRing}()
 
-mutable struct zzModPolyRingElem <: PolyElem{zzModRingElem}
+mutable struct zzModPolyRingElem <: PolyRingElem{zzModRingElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -666,7 +666,7 @@ end
 
 const GFPPolyRingID = Dict{Tuple{fpField, Symbol}, fpPolyRing}()
 
-mutable struct fpPolyRingElem <: PolyElem{fpFieldElem}
+mutable struct fpPolyRingElem <: PolyRingElem{fpFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -804,7 +804,7 @@ end
 
 const FmpzModPolyRingID = Dict{Tuple{ZZModRing, Symbol}, ZZModPolyRing}()
 
-mutable struct ZZModPolyRingElem <: PolyElem{ZZModRingElem}
+mutable struct ZZModPolyRingElem <: PolyRingElem{ZZModRingElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -985,7 +985,7 @@ end
 
 const GFPFmpzPolyRingID = Dict{Tuple{FpField, Symbol}, FpPolyRing}()
 
-mutable struct FpPolyRingElem <: PolyElem{FpFieldElem}
+mutable struct FpPolyRingElem <: PolyRingElem{FpFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -5570,7 +5570,7 @@ end
  
 const FqDefaultPolyID = Dict{Tuple{FqField, Symbol}, FqPolyRing}()
  
-mutable struct FqPolyRingElem <: PolyElem{FqFieldElem}
+mutable struct FqPolyRingElem <: PolyRingElem{FqFieldElem}
    # fq_default_poly_struct is 48 bytes on 64 bit machine
    opaque::NTuple{48, Int8}
    # end of flint struct
@@ -5745,7 +5745,7 @@ end
 
 const FqPolyID = Dict{Tuple{FqPolyRepField, Symbol}, FqPolyRepPolyRing}()
 
-mutable struct FqPolyRepPolyRingElem <: PolyElem{FqPolyRepFieldElem}
+mutable struct FqPolyRepPolyRingElem <: PolyRingElem{FqPolyRepFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -5875,7 +5875,7 @@ end
 
 const FqNmodPolyID = Dict{Tuple{fqPolyRepField, Symbol}, fqPolyRepPolyRing}()
 
-mutable struct fqPolyRepPolyRingElem <: PolyElem{fqPolyRepFieldElem}
+mutable struct fqPolyRepPolyRingElem <: PolyRingElem{fqPolyRepFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int

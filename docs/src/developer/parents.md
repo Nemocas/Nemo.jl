@@ -55,7 +55,7 @@ would have type `Poly{ZZRingElem}`.
 
 In practice Flint already implements univariate polynomials over Flint
 integers, and these have type `ZZPolyRingElem`. But both `ZZPolyRingElem` and the
-generic polynomials `Poly{ZZRingElem}` belong to the abstract type `PolyElem{ZZRingElem}`
+generic polynomials `Poly{ZZRingElem}` belong to the abstract type `PolyRingElem{ZZRingElem}`
 making it possible to write functions for all univariate polynomials over
 Flint integers.
 

@@ -119,7 +119,7 @@ characteristic(R::zzModPolyRing) = modulus(R)
 #
 ###############################################################################
 
-function similar(f::PolyElem, R::zzModRing, s::Symbol=var(parent(f)); cached::Bool=true)
+function similar(f::PolyRingElem, R::zzModRing, s::Symbol=var(parent(f)); cached::Bool=true)
    z = zzModPolyRingElem(R.n)
    if base_ring(f) === R && s == var(parent(f)) && typeof(f) == zzModPolyRingElem
       # steal parent in case it is not cached
@@ -803,7 +803,7 @@ function factor_distinct_deg(x::zzModPolyRingElem)
   return res
 end
 
-function factor_shape(x::PolyElem{T}) where {T <: RingElem}
+function factor_shape(x::PolyRingElem{T}) where {T <: RingElem}
   res = Dict{Int, Int}()
   square_fac = factor_squarefree(x)
   for (f, i) in square_fac

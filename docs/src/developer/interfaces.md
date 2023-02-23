@@ -9,7 +9,7 @@ CurrentModule = Nemo
 As previously mentioned, Nemo provides various generic types, e.g. `Poly{T}`
 for generic univariate polynomials and `Mat{T}` for generic matrices over a
 base ring. These and other polynomial and matrix types belong in turn to
-abstract types or unions thereof, e.g. `PolyElem{T}` is an abstract type
+abstract types or unions thereof, e.g. `PolyRingElem{T}` is an abstract type
 representing all univariate polynomial types and `MatrixElem{T}` is a union
 of all Nemo matrix types.
 
@@ -36,7 +36,7 @@ or not.
 For convenience we list the most important abstract types and their unions
 for which one should usually prefer to write generic implementations.
 
-* `PolyElem{T}` : all univariate polynomial types
+* `PolyRingElem{T}` : all univariate polynomial types
 * `MPolyRingElem{T}` : all multivariate polynomial types (see note below)
 * `MatrixElem{T}` : union of all matrix types including matrix algebras
 * `MatElem{T}` : all matrix types not including matrix algebras

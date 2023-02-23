@@ -18,46 +18,46 @@
 
    @test typeof(S) <: FpPolyRing
 
-   @test isa(x, PolyElem{Nemo.FpFieldElem})
+   @test isa(x, PolyRingElem{Nemo.FpFieldElem})
 
    f = x^3 + 2x^2 + x + 1
 
-   @test isa(f, PolyElem)
+   @test isa(f, PolyRingElem)
 
    g = S(2)
 
-   @test isa(g, PolyElem)
+   @test isa(g, PolyRingElem)
 
    h = S(x^2 + 2x + 1)
 
-   @test isa(h, PolyElem)
+   @test isa(h, PolyRingElem)
 
    k = S([R(1), R(0), R(3)])
 
-   @test isa(k, PolyElem)
+   @test isa(k, PolyRingElem)
 
    l = S()
 
-   @test isa(l, PolyElem)
+   @test isa(l, PolyRingElem)
 
    m = S(ZZRingElem(123))
 
-   @test isa(m, PolyElem)
+   @test isa(m, PolyRingElem)
 
    n = S([ZZRingElem(1), ZZRingElem(0), ZZRingElem(3)])
 
-   @test isa(n, PolyElem)
+   @test isa(n, PolyRingElem)
 
    T, y = polynomial_ring(ZZ, "y")
 
    p = 3y^3 + 2y - 1
    q = S(p)
 
-   @test isa(q, PolyElem)
+   @test isa(q, PolyRingElem)
 
    r = S([1, 2, 3])
 
-   @test isa(r, PolyElem)
+   @test isa(r, PolyRingElem)
 end
 
 @testset "FpPolyRingElem.printing" begin

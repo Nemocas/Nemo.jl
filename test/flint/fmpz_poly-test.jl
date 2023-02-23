@@ -14,27 +14,27 @@
 
    @test typeof(R) <: ZZPolyRing
 
-   @test isa(x, PolyElem)
+   @test isa(x, PolyRingElem)
 
    f = x^3 + 2x^2 + x + 1
 
-   @test isa(f, PolyElem)
+   @test isa(f, PolyRingElem)
 
    g = R(2)
 
-   @test isa(g, PolyElem)
+   @test isa(g, PolyRingElem)
 
    h = R(x^2 + 2x + 1)
 
-   @test isa(h, PolyElem)
+   @test isa(h, PolyRingElem)
 
    k = R([ZZ(1), ZZ(0), ZZ(3)])
 
-   @test isa(k, PolyElem)
+   @test isa(k, PolyRingElem)
 
    l = R([1, 2, 3])
 
-   @test isa(l, PolyElem)
+   @test isa(l, PolyRingElem)
 
    @test polynomial_ring(ZZRing(), "x")[1] != polynomial_ring(ZZRing(), "y")[1]
 

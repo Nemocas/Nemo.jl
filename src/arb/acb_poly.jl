@@ -96,7 +96,7 @@ end
 #
 ###############################################################################
 
-function similar(f::PolyElem, R::AcbField, var::Symbol=var(parent(f)); cached::Bool=true)
+function similar(f::PolyRingElem, R::AcbField, var::Symbol=var(parent(f)); cached::Bool=true)
    z = acb_poly()
    z.parent = AcbPolyRing(R, var, cached)
    return z

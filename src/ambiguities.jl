@@ -21,25 +21,25 @@ end
 
 #
 
-*(::ZZRingElem, ::PolyElem{ZZRingElem}) = nothing
+*(::ZZRingElem, ::PolyRingElem{ZZRingElem}) = nothing
 
-*(::PolyElem{ZZRingElem}, ::ZZRingElem) = nothing
+*(::PolyRingElem{ZZRingElem}, ::ZZRingElem) = nothing
 
-+(::ZZRingElem, ::PolyElem{ZZRingElem}) = nothing
++(::ZZRingElem, ::PolyRingElem{ZZRingElem}) = nothing
 
-+(::PolyElem{ZZRingElem}, ::ZZRingElem) = nothing
++(::PolyRingElem{ZZRingElem}, ::ZZRingElem) = nothing
 
--(::ZZRingElem, ::PolyElem{ZZRingElem}) = nothing
+-(::ZZRingElem, ::PolyRingElem{ZZRingElem}) = nothing
 
--(::PolyElem{ZZRingElem}, ::ZZRingElem) = nothing
+-(::PolyRingElem{ZZRingElem}, ::ZZRingElem) = nothing
 
-==(::ZZRingElem, ::PolyElem{ZZRingElem}) = nothing
+==(::ZZRingElem, ::PolyRingElem{ZZRingElem}) = nothing
 
-==(::PolyElem{ZZRingElem}, ::ZZRingElem) = nothing
+==(::PolyRingElem{ZZRingElem}, ::ZZRingElem) = nothing
 
-divexact(::PolyElem{ZZRingElem}, ::ZZRingElem) = nothing
+divexact(::PolyRingElem{ZZRingElem}, ::ZZRingElem) = nothing
 
-evaluate(::PolyElem{ZZRingElem}, ::ZZRingElem) = nothing
+evaluate(::PolyRingElem{ZZRingElem}, ::ZZRingElem) = nothing
 
 #
 

@@ -487,7 +487,7 @@ end
 
 const RealPolyRingID = Dict{Tuple{Symbol}, RealPolyRing}()
 
-mutable struct RealPoly <: PolyElem{RealFieldElem}
+mutable struct RealPoly <: PolyRingElem{RealFieldElem}
   coeffs::Ptr{Nothing}
   length::Int
   alloc::Int
@@ -581,7 +581,7 @@ end
 
 const ArbPolyRingID = Dict{Tuple{ArbField, Symbol}, ArbPolyRing}()
 
-mutable struct arb_poly <: PolyElem{arb}
+mutable struct arb_poly <: PolyRingElem{arb}
   coeffs::Ptr{Nothing}
   length::Int
   alloc::Int
@@ -680,7 +680,7 @@ end
 
 const ComplexPolyRingID = Dict{Tuple{Symbol}, ComplexPolyRing}()
 
-mutable struct ComplexPoly <: PolyElem{ComplexFieldElem}
+mutable struct ComplexPoly <: PolyRingElem{ComplexFieldElem}
   coeffs::Ptr{Nothing}
   length::Int
   alloc::Int
@@ -785,7 +785,7 @@ end
 
 const AcbPolyRingID = Dict{Tuple{AcbField, Symbol}, AcbPolyRing}()
 
-mutable struct acb_poly <: PolyElem{acb}
+mutable struct acb_poly <: PolyRingElem{acb}
   coeffs::Ptr{Nothing}
   length::Int
   alloc::Int

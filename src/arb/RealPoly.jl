@@ -92,7 +92,7 @@ end
 #
 ###############################################################################
 
-function similar(f::PolyElem, R::RealField, var::Symbol=var(parent(f)); cached::Bool=true)
+function similar(f::PolyRingElem, R::RealField, var::Symbol=var(parent(f)); cached::Bool=true)
    z = RealPoly()
    z.parent = RealPolyRing(R, var, cached)
    return z
