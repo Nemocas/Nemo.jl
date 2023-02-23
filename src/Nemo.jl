@@ -83,11 +83,7 @@ export ZZ, QQ, FiniteField, number_field
 
 # FIXME/TODO: for compatibility with AbstractAlgebra before 0.28.x; remove in the future
 @alias PolyRingElem PolyElem
-@alias NCPolyRingElem NCPolyElem
 @alias MPolyRingElem MPolyElem
-@alias UnivPolyRingElem UnivPolyElem
-#@alias LaurentPolyRingElem LaurentPolyElem
-#@alias LaurentMPolyRingElem LaurentMPolyElem
 
 
 ###############################################################################
