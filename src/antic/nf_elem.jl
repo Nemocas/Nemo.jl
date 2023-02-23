@@ -120,7 +120,7 @@ end
 @doc Markdown.doc"""
     gen(a::AnticNumberField)
 
-Return the generator of the given number field, ie. a symbolic root of the
+Return the generator of the given number field, i.e., a symbolic root of the
 defining polynomial.
 """
 function gen(a::AnticNumberField)
@@ -176,7 +176,7 @@ is_unit(a::nf_elem) = !iszero(a)
 @doc Markdown.doc"""
     isinteger(a::nf_elem)
 
-Return `true` if the given number field element is an integer, ie. in ZZ, otherwise
+Return `true` if the given number field element is an integer, i.e., in ZZ, otherwise
 return `false`.
 """
 function isinteger(a::nf_elem)
@@ -188,7 +188,7 @@ end
 @doc Markdown.doc"""
     is_rational(a::nf_elem)
 
-Return `true` if the given number field element is a rational number, ie. in QQ,
+Return `true` if the given number field element is a rational number, i.e., in QQ,
 otherwise `false`.
 """
 function is_rational(a::nf_elem)

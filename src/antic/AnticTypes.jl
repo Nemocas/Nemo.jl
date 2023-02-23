@@ -13,12 +13,12 @@
 """
     AnticNumberField
 
-This is the basic type for absolute extensions, ie. an extension of QQ by some
+This is the basic type for absolute extensions, i.e., an extension of QQ by some
 irreducible monic polyomial with coefficients in either ZZ or QQ.
 
-Creation is usually by calling `number_field`, but see also
-`cyclotomic_field` and `cyclotomic_real_subfield` for some more specialized
-fields.
+Creation is usually by calling [`number_field`](@ref), but see also
+[`cyclotomic_field`](@ref) and [`cyclotomic_real_subfield`](@ref)
+for some more specialized fields.
 """
 @attributes mutable struct AnticNumberField <: SimpleNumField{QQFieldElem}
    pol_coeffs::Ptr{Nothing}
@@ -62,13 +62,13 @@ end
 """
     nf_elem
  
-The element type of an (absolute simple) number field, ie, an extension
+The element type of an (absolute simple) number field, i.e., an extension
 of QQ by an irreducible polynomial.
 
 To construct such an element, one starts by constructing the field first.
 Essentially never called directly.
 
-See also `number_field`.
+See also [`number_field`](@ref).
 """
 mutable struct nf_elem <: SimpleNumFieldElem{QQFieldElem}
    elem_coeffs::Ptr{Nothing}
