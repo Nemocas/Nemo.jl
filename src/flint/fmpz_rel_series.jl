@@ -115,7 +115,7 @@ characteristic(::ZZRelPowerSeriesRing) = 0
 #
 ###############################################################################
 
-function similar(f::RelSeriesElem, R::ZZRing, max_prec::Int,
+function similar(f::RelPowerSeriesRingElem, R::ZZRing, max_prec::Int,
                                    s::Symbol=var(parent(f)); cached::Bool=true)
    z = ZZRelPowerSeriesRingElem()
    if base_ring(f) === R && s == var(parent(f)) &&

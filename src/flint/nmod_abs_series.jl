@@ -131,7 +131,7 @@ characteristic(R::($rtype)) = characteristic(base_ring(R))
 #
 ###############################################################################
 
-function similar(f::AbsSeriesElem, R::($brtype), max_prec::Int,
+function similar(f::AbsPowerSeriesRingElem, R::($brtype), max_prec::Int,
                                    s::Symbol=var(parent(f)); cached::Bool=true)
    par = ($rtype)(R, max_prec, s, cached)
    z = ($etype)(par.n)
@@ -776,11 +776,11 @@ function power_series_ring(R::zzModRing, prec::Int, s::AbstractString; model=:ca
    return power_series_ring(R, prec, Symbol(s); model=model, cached=cached)
 end
 
-function AbsSeriesRing(R::zzModRing, prec::Int)
+function AbsPowerSeriesRing(R::zzModRing, prec::Int)
    return zzModAbsPowerSeriesRing(R, prec, :x, false)
 end
 
-function RelSeriesRing(R::zzModRing, prec::Int)
+function RelPowerSeriesRing(R::zzModRing, prec::Int)
    return zzModRelPowerSeriesRing(R, prec, :x, false)
 end
 
@@ -799,10 +799,10 @@ function power_series_ring(R::fpField, prec::Int, s::AbstractString; model=:capp
    return power_series_ring(R, prec, Symbol(s); model=model, cached=cached)
 end
 
-function AbsSeriesRing(R::fpField, prec::Int)
+function AbsPowerSeriesRing(R::fpField, prec::Int)
    return fpAbsPowerSeriesRing(R, prec, :x, false)
 end
 
-function RelSeriesRing(R::fpField, prec::Int)
+function RelPowerSeriesRing(R::fpField, prec::Int)
    return fpRelPowerSeriesRing(R, prec, :x, false)
 end

@@ -5,8 +5,8 @@ end
 @testset "FpRelPowerSeriesRingElem.constructors" begin
    R = GF(ZZ(123456789012345678949))
    
-   S1 = RelSeriesRing(R, 30)
-   S2 = RelSeriesRing(R, 30)
+   S1 = RelPowerSeriesRing(R, 30)
+   S2 = RelPowerSeriesRing(R, 30)
 
    @test isa(S1, FpRelPowerSeriesRing)
    @test S1 !== S2

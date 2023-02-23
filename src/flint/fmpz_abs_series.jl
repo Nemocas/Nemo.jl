@@ -123,7 +123,7 @@ characteristic(::ZZAbsPowerSeriesRing) = 0
 #
 ###############################################################################
 
-function similar(f::AbsSeriesElem, R::ZZRing, max_prec::Int,
+function similar(f::AbsPowerSeriesRingElem, R::ZZRing, max_prec::Int,
                                    s::Symbol=var(parent(f)); cached::Bool=true)
    z = ZZAbsPowerSeriesRingElem()
    if base_ring(f) === R && s == var(parent(f)) &&
@@ -682,10 +682,10 @@ function power_series_ring(R::ZZRing, prec::Int, s::AbstractString; model=:cappe
    return power_series_ring(R, prec, Symbol(s); model=model, cached=cached)
 end
 
-function AbsSeriesRing(R::ZZRing, prec::Int)
+function AbsPowerSeriesRing(R::ZZRing, prec::Int)
    return ZZAbsPowerSeriesRing(prec, :x, false)
 end
 
-function RelSeriesRing(R::ZZRing, prec::Int)
+function RelPowerSeriesRing(R::ZZRing, prec::Int)
    return ZZRelPowerSeriesRing(prec, :x, false)
 end

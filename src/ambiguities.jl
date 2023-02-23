@@ -59,37 +59,37 @@ evaluate(::PolyRingElem{ZZRingElem}, ::ZZRingElem) = nothing
 
 ==(::SeriesElem{ZZRingElem}, ::ZZRingElem) = nothing
 
-*(::ZZRingElem, ::RelSeriesElem{ZZRingElem}) = nothing
+*(::ZZRingElem, ::RelPowerSeriesRingElem{ZZRingElem}) = nothing
 
-*(::RelSeriesElem{ZZRingElem}, ::ZZRingElem) = nothing
+*(::RelPowerSeriesRingElem{ZZRingElem}, ::ZZRingElem) = nothing
 
-+(::ZZRingElem, ::RelSeriesElem{ZZRingElem}) = nothing
++(::ZZRingElem, ::RelPowerSeriesRingElem{ZZRingElem}) = nothing
 
-+(::RelSeriesElem{ZZRingElem}, ::ZZRingElem) = nothing
++(::RelPowerSeriesRingElem{ZZRingElem}, ::ZZRingElem) = nothing
 
--(::ZZRingElem, ::RelSeriesElem{ZZRingElem}) = nothing
+-(::ZZRingElem, ::RelPowerSeriesRingElem{ZZRingElem}) = nothing
 
--(::RelSeriesElem{ZZRingElem}, ::ZZRingElem) = nothing
+-(::RelPowerSeriesRingElem{ZZRingElem}, ::ZZRingElem) = nothing
 
-==(::ZZRingElem, ::RelSeriesElem{ZZRingElem}) = nothing
+==(::ZZRingElem, ::RelPowerSeriesRingElem{ZZRingElem}) = nothing
 
-==(::RelSeriesElem{ZZRingElem}, ::ZZRingElem) = nothing
+==(::RelPowerSeriesRingElem{ZZRingElem}, ::ZZRingElem) = nothing
 
-*(::ZZRingElem, ::AbsSeriesElem{ZZRingElem}) = nothing
+*(::ZZRingElem, ::AbsPowerSeriesRingElem{ZZRingElem}) = nothing
 
-*(::AbsSeriesElem{ZZRingElem}, ::ZZRingElem) = nothing
+*(::AbsPowerSeriesRingElem{ZZRingElem}, ::ZZRingElem) = nothing
 
-+(::ZZRingElem, ::AbsSeriesElem{ZZRingElem}) = nothing
++(::ZZRingElem, ::AbsPowerSeriesRingElem{ZZRingElem}) = nothing
 
-+(::AbsSeriesElem{ZZRingElem}, ::ZZRingElem) = nothing
++(::AbsPowerSeriesRingElem{ZZRingElem}, ::ZZRingElem) = nothing
 
--(::ZZRingElem, ::AbsSeriesElem{ZZRingElem}) = nothing
+-(::ZZRingElem, ::AbsPowerSeriesRingElem{ZZRingElem}) = nothing
 
--(::AbsSeriesElem{ZZRingElem}, ::ZZRingElem) = nothing
+-(::AbsPowerSeriesRingElem{ZZRingElem}, ::ZZRingElem) = nothing
 
-==(::ZZRingElem, ::AbsSeriesElem{ZZRingElem}) = nothing
+==(::ZZRingElem, ::AbsPowerSeriesRingElem{ZZRingElem}) = nothing
 
-==(::AbsSeriesElem{ZZRingElem}, ::ZZRingElem) = nothing
+==(::AbsPowerSeriesRingElem{ZZRingElem}, ::ZZRingElem) = nothing
 
 *(::ZZRingElem, ::MatElem{ZZRingElem}) = nothing
 

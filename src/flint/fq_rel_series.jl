@@ -129,7 +129,7 @@ characteristic(R::($rtype)) = characteristic(base_ring(R))
 #
 ###############################################################################
 
-function similar(f::RelSeriesElem, R::($ctype), max_prec::Int,
+function similar(f::RelPowerSeriesRingElem, R::($ctype), max_prec::Int,
                                    s::Symbol=var(parent(f)); cached::Bool=true)
    par = ($rtype)(R, max_prec, s, cached)
    z = ($etype)(R)

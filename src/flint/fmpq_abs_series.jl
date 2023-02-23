@@ -125,7 +125,7 @@ characteristic(::QQAbsPowerSeriesRing) = 0
 #
 ###############################################################################
 
-function similar(f::AbsSeriesElem, R::QQField, max_prec::Int,
+function similar(f::AbsPowerSeriesRingElem, R::QQField, max_prec::Int,
                                    s::Symbol=var(parent(f)); cached::Bool=true)
    z = QQAbsPowerSeriesRingElem()
    if base_ring(f) === R && s == var(parent(f)) &&
@@ -907,10 +907,10 @@ function power_series_ring(R::QQField, prec::Int, s::AbstractString; model=:capp
    return power_series_ring(R, prec, Symbol(s); model=model, cached=cached)
 end
 
-function AbsSeriesRing(R::QQField, prec::Int)
+function AbsPowerSeriesRing(R::QQField, prec::Int)
    return QQAbsPowerSeriesRing(prec, :x, false)
 end
 
-function RelSeriesRing(R::QQField, prec::Int)
+function RelPowerSeriesRing(R::QQField, prec::Int)
    return QQRelPowerSeriesRing(prec, :x, false)
 end

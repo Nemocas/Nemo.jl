@@ -115,7 +115,7 @@ characteristic(::QQRelPowerSeriesRing) = 0
 #
 ###############################################################################
 
-function similar(f::RelSeriesElem, R::QQField, max_prec::Int,
+function similar(f::RelPowerSeriesRingElem, R::QQField, max_prec::Int,
                                    s::Symbol=var(parent(f)); cached::Bool=true)
    z = QQRelPowerSeriesRingElem()
    if base_ring(f) === R && s == var(parent(f)) &&

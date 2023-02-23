@@ -129,7 +129,7 @@ characteristic(R::FqAbsPowerSeriesRing) = characteristic(base_ring(R))
 #
 ###############################################################################
 
-function similar(f::AbsSeriesElem, R::FqField, max_prec::Int,
+function similar(f::AbsPowerSeriesRingElem, R::FqField, max_prec::Int,
                                  var::Symbol=var(parent(f)); cached::Bool=true)
    z = FqAbsPowerSeriesRingElem(R)
    z.parent = FqAbsPowerSeriesRing(R, max_prec, var, cached)

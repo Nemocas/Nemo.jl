@@ -133,7 +133,7 @@ characteristic(R::($rtype)) = modulus(R)
 #
 ###############################################################################
 
-function similar(f::RelSeriesElem, R::($brtype), max_prec::Int,
+function similar(f::RelPowerSeriesRingElem, R::($brtype), max_prec::Int,
                                    s::Symbol=var(parent(f)); cached::Bool=true)
    par = ($rtype)(R, max_prec, s, cached)
    z = ($etype)(R)

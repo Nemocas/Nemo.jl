@@ -5,8 +5,8 @@ end
 @testset "FqPolyRepRelPowerSeriesRingElem.constructors" begin
    R, t = FiniteField(ZZRingElem(23), 5, "t")
    
-   S1 = RelSeriesRing(R, 30)
-   S2 = RelSeriesRing(R, 30)
+   S1 = RelPowerSeriesRing(R, 30)
+   S2 = RelPowerSeriesRing(R, 30)
 
    @test isa(S1, FqPolyRepRelPowerSeriesRing)
    @test S1 !== S2

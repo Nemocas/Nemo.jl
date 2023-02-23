@@ -2997,7 +2997,7 @@ end
 
 const FmpzRelSeriesID = Dict{Tuple{Int, Symbol}, ZZRelPowerSeriesRing}()
 
-mutable struct ZZRelPowerSeriesRingElem <: RelSeriesElem{ZZRingElem}
+mutable struct ZZRelPowerSeriesRingElem <: RelPowerSeriesRingElem{ZZRingElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -3063,7 +3063,7 @@ end
 
 const FmpzAbsSeriesID = Dict{Tuple{Int, Symbol}, ZZAbsPowerSeriesRing}()
 
-mutable struct ZZAbsPowerSeriesRingElem <: AbsSeriesElem{ZZRingElem}
+mutable struct ZZAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{ZZRingElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -3247,7 +3247,7 @@ end
 
 const FmpqRelSeriesID = Dict{Tuple{Int, Symbol}, QQRelPowerSeriesRing}()
 
-mutable struct QQRelPowerSeriesRingElem <: RelSeriesElem{QQFieldElem}
+mutable struct QQRelPowerSeriesRingElem <: RelPowerSeriesRingElem{QQFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -3314,7 +3314,7 @@ end
 
 const FmpqAbsSeriesID = Dict{Tuple{Int, Symbol}, QQAbsPowerSeriesRing}()
 
-mutable struct QQAbsPowerSeriesRingElem <: AbsSeriesElem{QQFieldElem}
+mutable struct QQAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{QQFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -3381,7 +3381,7 @@ end
 const GFPRelSeriesID = Dict{Tuple{fpField, Int, Symbol},
                                 fpRelPowerSeriesRing}()
 
-mutable struct fpRelPowerSeriesRingElem <: RelSeriesElem{fpFieldElem}
+mutable struct fpRelPowerSeriesRingElem <: RelPowerSeriesRingElem{fpFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -3482,7 +3482,7 @@ end
 const NmodRelSeriesID = Dict{Tuple{zzModRing, Int, Symbol},
                                 zzModRelPowerSeriesRing}()
 
-mutable struct zzModRelPowerSeriesRingElem <: RelSeriesElem{zzModRingElem}
+mutable struct zzModRelPowerSeriesRingElem <: RelPowerSeriesRingElem{zzModRingElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -3582,7 +3582,7 @@ end
 const GFPFmpzRelSeriesID = Dict{Tuple{FpField, Int, Symbol},
                                 FpRelPowerSeriesRing}()
 
-mutable struct FpRelPowerSeriesRingElem <: RelSeriesElem{FpFieldElem}
+mutable struct FpRelPowerSeriesRingElem <: RelPowerSeriesRingElem{FpFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -3694,7 +3694,7 @@ end
 const FmpzModRelSeriesID = Dict{Tuple{ZZModRing, Int, Symbol},
                                 ZZModRelPowerSeriesRing}()
 
-mutable struct ZZModRelPowerSeriesRingElem <: RelSeriesElem{ZZModRingElem}
+mutable struct ZZModRelPowerSeriesRingElem <: RelPowerSeriesRingElem{ZZModRingElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -3806,7 +3806,7 @@ end
 const GFPFmpzAbsSeriesID = Dict{Tuple{FpField, Int, Symbol},
                                 FpAbsPowerSeriesRing}()
 
-mutable struct FpAbsPowerSeriesRingElem <: AbsSeriesElem{FpFieldElem}
+mutable struct FpAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{FpFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -3915,7 +3915,7 @@ end
 const NmodAbsSeriesID = Dict{Tuple{zzModRing, Int, Symbol},
                                  zzModAbsPowerSeriesRing}()
   
-mutable struct zzModAbsPowerSeriesRingElem <: AbsSeriesElem{zzModRingElem}
+mutable struct zzModAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{zzModRingElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -4016,7 +4016,7 @@ end
 const GFPAbsSeriesID = Dict{Tuple{fpField, Int, Symbol},
                                  fpAbsPowerSeriesRing}()
   
-mutable struct fpAbsPowerSeriesRingElem <: AbsSeriesElem{fpFieldElem}
+mutable struct fpAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{fpFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -4115,7 +4115,7 @@ end
 const FmpzModAbsSeriesID = Dict{Tuple{ZZModRing, Int, Symbol},
                                 ZZModAbsPowerSeriesRing}()
 
-mutable struct ZZModAbsPowerSeriesRingElem <: AbsSeriesElem{ZZModRingElem}
+mutable struct ZZModAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{ZZModRingElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -4223,7 +4223,7 @@ end
  
 const FqDefaultRelSeriesID = Dict{Tuple{FqField, Int, Symbol}, FqRelPowerSeriesRing}()
  
-mutable struct FqRelPowerSeriesRingElem <: RelSeriesElem{FqFieldElem}
+mutable struct FqRelPowerSeriesRingElem <: RelPowerSeriesRingElem{FqFieldElem}
    # fq_default_poly_struct is 48 bytes on 64 bit machine
    opaque::NTuple{48, Int8}
    # end of flint struct
@@ -4294,7 +4294,7 @@ end
 
 const FqRelSeriesID = Dict{Tuple{FqPolyRepField, Int, Symbol}, FqPolyRepRelPowerSeriesRing}()
 
-mutable struct FqPolyRepRelPowerSeriesRingElem <: RelSeriesElem{FqPolyRepFieldElem}
+mutable struct FqPolyRepRelPowerSeriesRingElem <: RelPowerSeriesRingElem{FqPolyRepFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -4363,7 +4363,7 @@ end
  
 const FqDefaultAbsSeriesID = Dict{Tuple{FqField, Int, Symbol}, FqAbsPowerSeriesRing}()
  
-mutable struct FqAbsPowerSeriesRingElem <: AbsSeriesElem{FqFieldElem}
+mutable struct FqAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{FqFieldElem}
    # fq_default_poly_struct is 48 bytes on 64 bit machine
    opaque::NTuple{48, Int8}
    # end of flint struct
@@ -4431,7 +4431,7 @@ end
 
 const FqAbsSeriesID = Dict{Tuple{FqPolyRepField, Int, Symbol}, FqPolyRepAbsPowerSeriesRing}()
 
-mutable struct FqPolyRepAbsPowerSeriesRingElem <: AbsSeriesElem{FqPolyRepFieldElem}
+mutable struct FqPolyRepAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{FqPolyRepFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -4499,7 +4499,7 @@ end
 const FqNmodRelSeriesID = Dict{Tuple{fqPolyRepField, Int, Symbol},
                                fqPolyRepRelPowerSeriesRing}()
 
-mutable struct fqPolyRepRelPowerSeriesRingElem <: RelSeriesElem{fqPolyRepFieldElem}
+mutable struct fqPolyRepRelPowerSeriesRingElem <: RelPowerSeriesRingElem{fqPolyRepFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int
@@ -4569,7 +4569,7 @@ end
 const FqNmodAbsSeriesID = Dict{Tuple{fqPolyRepField, Int, Symbol},
                                fqPolyRepAbsPowerSeriesRing}()
 
-mutable struct fqPolyRepAbsPowerSeriesRingElem <: AbsSeriesElem{fqPolyRepFieldElem}
+mutable struct fqPolyRepAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{fqPolyRepFieldElem}
    coeffs::Ptr{Nothing}
    alloc::Int
    length::Int

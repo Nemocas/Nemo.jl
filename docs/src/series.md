@@ -24,7 +24,7 @@ type information is mainly of concern to developers).
 
 Base ring                             | Library            | Element type          | Parent type
 --------------------------------------|--------------------|-----------------------|----------------------
-Generic ring $R$                      | AbstractAlgebra.jl | `Generic.RelSeries{T} | `Generic.RelSeriesRing{T}`
+Generic ring $R$                      | AbstractAlgebra.jl | `Generic.RelSeries{T} | `Generic.RelPowerSeriesRing{T}`
 $\mathbb{Z}$                          | Flint              | `ZZRelPowerSeriesRingElem`     | `ZZRelPowerSeriesRing`
 $\mathbb{Z}/n\mathbb{Z}$ (small $n$)  | Flint              | `zzModRelPowerSeriesRingElem`     |  zzModRelPowerSeriesRing
 $\mathbb{Z}/n\mathbb{Z}$ (large $n$)  | Flint              | `ZZModRelPowerSeriesRingElem` | `ZZModRelPowerSeriesRing`
@@ -34,8 +34,8 @@ $\mathbb{F}_p$ (large $n$)            | Flint              | `FpRelPowerSeriesRi
 $\mathbb{F}_{p^n}$ (small $p$)        | Flint              | `fqPolyRepRelPowerSeriesRingElem`  | `fqPolyRepRelPowerSeriesRing`
 $\mathbb{F}_{p^n}$ (large $p$)        | Flint              | `FqPolyRepRelPowerSeriesRingElem`       | `FqPolyRepRelPowerSeriesRing`
 
-All relative power series elements belong to the abstract type `RelSeriesElem` and all
-of the relative power series ring types belong to the abstract type `RelSeriesRing`.
+All relative power series elements belong to the abstract type `RelPowerSeriesRingElem` and all
+of the relative power series ring types belong to the abstract type `RelPowerSeriesRing`.
 
 The maximum relative precision, the string representation of the variable and
 the base ring $R$ of a generic power series are stored in its parent object. 
@@ -44,7 +44,7 @@ Here is the corresponding table for the absolute power series types.
 
 Base ring                             | Library            | Element type          | Parent type
 --------------------------------------|--------------------|-----------------------|----------------------
-Generic ring $R$                      | AbstractAlgebra.jl | `Generic.AbsSeries{T}`| `Generic.AbsSeriesRing{T}`
+Generic ring $R$                      | AbstractAlgebra.jl | `Generic.AbsSeries{T}`| `Generic.AbsPowerSeriesRing{T}`
 $\mathbb{Z}$                          | Flint              | `ZZAbsPowerSeriesRingElem`     | `ZZAbsPowerSeriesRing`
 $\mathbb{Z}/n\mathbb{Z}$ (small $n$)  | Flint              | `zzModAbsPowerSeriesRingElem`     | `zzModAbsPowerSeriesRing`
 $\mathbb{Z}/n\mathbb{Z}$ (large $n$)  | Flint              | `ZZModAbsPowerSeriesRingElem` | `ZZModAbsPowerSeriesRing`
@@ -54,8 +54,8 @@ $\mathbb{F}_p$ (large $n$)            | Flint              | `FpAbsPowerSeriesRi
 $\mathbb{F}_{p^n}$ (small $n$)        | Flint              | `fqPolyRepAbsPowerSeriesRingElem`  | `fqPolyRepAbsPowerSeriesRing`
 $\mathbb{F}_{p^n}$ (large $n$)        | Flint              | `FqPolyRepAbsPowerSeriesRingElem`       | `FqPolyRepAbsPowerSeriesRing`
 
-All absolute power series elements belong to the abstract type `AbsSeriesElem` and all
-of the absolute power series ring types belong to the abstract type `AbsSeriesRing`.
+All absolute power series elements belong to the abstract type `AbsPowerSeriesRingElem` and all
+of the absolute power series ring types belong to the abstract type `AbsPowerSeriesRing`.
 
 The absolute precision, the string representation of the variable and
 the base ring $R$ of a generic power series are stored in its parent object. 

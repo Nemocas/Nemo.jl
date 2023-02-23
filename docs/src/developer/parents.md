@@ -202,8 +202,8 @@ it is convenient to be able to construct a parent just as a user would. For
 this purpose various light-weight and very safe parent constructors are
 provided for use in library code.
 
-For example there are the constructors `PolyRing`, `AbsSeriesRing` and
-`RelSeriesRing`. These functions return the parent ring $R$ only and no
+For example there are the constructors `PolyRing`, `AbsPowerSeriesRing` and
+`RelPowerSeriesRing`. These functions return the parent ring $R$ only and no
 generator (it can be obtained by calling `gen(R)`). They also set the
 variable for printing to a default (usually `x`). Moreover, these parents
 are not cached, so they are completely safe to use in library code. They

@@ -40,8 +40,8 @@ for which one should usually prefer to write generic implementations.
 * `MPolyRingElem{T}` : all multivariate polynomial types (see note below)
 * `MatrixElem{T}` : union of all matrix types including matrix algebras
 * `MatElem{T}` : all matrix types not including matrix algebras
-* `AbsSeriesElem{T}` : all abstract series types
-* `RelSeriesElem{T}` : all relative series types
+* `AbsPowerSeriesRingElem{T}` : all abstract series types
+* `RelPowerSeriesRingElem{T}` : all relative series types
 * `LaurentSeriesElem{T}` : union of all Laurent series over rings and fields
 * `PuiseuxSeriesElem{T}` : union of all Puiseux series over rings and fields
 * `FPModule{T}` : all finitely presented modules over a Euclidean domain

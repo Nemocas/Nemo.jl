@@ -5,8 +5,8 @@ end
 @testset "zzModAbsPowerSeriesRingElem.constructors" begin
    S = residue_ring(ZZ, 23)
    
-   R1 = AbsSeriesRing(S, 30)
-   R2 = AbsSeriesRing(S, 30)
+   R1 = AbsPowerSeriesRing(S, 30)
+   R2 = AbsPowerSeriesRing(S, 30)
 
    @test isa(R1, zzModAbsPowerSeriesRing)
    @test R1 !== R2

@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-function *(a::ZZRingElem, b::AbsSeriesElem)
+function *(a::ZZRingElem, b::AbsPowerSeriesRingElem)
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -16,14 +16,14 @@ function *(a::ZZRingElem, b::AbsSeriesElem)
    return z
 end
 
-*(a::AbsSeriesElem, b::ZZRingElem) = b*a
+*(a::AbsPowerSeriesRingElem, b::ZZRingElem) = b*a
 
-==(x::AbsSeriesElem, y::ZZRingElem) = precision(x) == 0 || ((length(x) == 0 && iszero(y))
+==(x::AbsPowerSeriesRingElem, y::ZZRingElem) = precision(x) == 0 || ((length(x) == 0 && iszero(y))
                                        || (length(x) == 1 && coeff(x, 0) == y))
 
-==(x::ZZRingElem, y::AbsSeriesElem) = y == x
+==(x::ZZRingElem, y::AbsPowerSeriesRingElem) = y == x
 
-function divexact(x::AbsSeriesElem, y::ZZRingElem; check::Bool=true)
+function divexact(x::AbsPowerSeriesRingElem, y::ZZRingElem; check::Bool=true)
    iszero(y) && throw(DivideError())
    lenx = length(x)
    z = parent(x)()
@@ -35,7 +35,7 @@ function divexact(x::AbsSeriesElem, y::ZZRingElem; check::Bool=true)
    return z
 end
 
-function (a::Generic.AbsSeriesRing{T})(b::ZZRingElem) where {T <: RingElement}
+function (a::Generic.AbsPowerSeriesRing{T})(b::ZZRingElem) where {T <: RingElement}
    if iszero(b)
       z = Generic.AbsSeries{T}(Array{T}(undef, 0), 0, a.prec_max)
    else
@@ -51,7 +51,7 @@ end
 #
 ###############################################################################
 
-function *(a::ZZRingElem, b::RelSeriesElem)
+function *(a::ZZRingElem, b::RelPowerSeriesRingElem)
    len = pol_length(b)
    z = parent(b)()
    fit!(z, len)
@@ -65,15 +65,15 @@ function *(a::ZZRingElem, b::RelSeriesElem)
    return z
 end
 
-*(a::RelSeriesElem, b::ZZRingElem) = b*a
+*(a::RelPowerSeriesRingElem, b::ZZRingElem) = b*a
 
-==(x::RelSeriesElem, y::ZZRingElem) = precision(x) == 0 ||
+==(x::RelPowerSeriesRingElem, y::ZZRingElem) = precision(x) == 0 ||
                   ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
                     valuation(x) == 0 && polcoeff(x, 0) == y))
 
-==(x::ZZRingElem, y::RelSeriesElem) = y == x
+==(x::ZZRingElem, y::RelPowerSeriesRingElem) = y == x
 
-function divexact(x::RelSeriesElem, y::ZZRingElem; check::Bool=true)
+function divexact(x::RelPowerSeriesRingElem, y::ZZRingElem; check::Bool=true)
    iszero(y) && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
@@ -86,7 +86,7 @@ function divexact(x::RelSeriesElem, y::ZZRingElem; check::Bool=true)
    return z
 end
 
-function (a::Generic.RelSeriesRing{T})(b::ZZRingElem) where {T <: RingElement}
+function (a::Generic.RelPowerSeriesRing{T})(b::ZZRingElem) where {T <: RingElement}
    if iszero(b)
       z = Generic.RelSeries{T}(Array{T}(undef, 0), 0, a.prec_max, a.prec_max)
    else

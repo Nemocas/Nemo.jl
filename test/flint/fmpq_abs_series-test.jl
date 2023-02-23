@@ -3,8 +3,8 @@
 end
 
 @testset "QQAbsPowerSeriesRingElem.constructors" begin
-   S1 = AbsSeriesRing(QQ, 30)
-   S2 = AbsSeriesRing(QQ, 30)
+   S1 = AbsPowerSeriesRing(QQ, 30)
+   S2 = AbsPowerSeriesRing(QQ, 30)
 
    @test isa(S1, QQAbsPowerSeriesRing)
    @test S1 !== S2
