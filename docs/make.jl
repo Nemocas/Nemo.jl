@@ -1,6 +1,6 @@
 using Documenter, Nemo, AbstractAlgebra
 
-DocMeta.setdocmeta!(Nemo.AbstractAlgebra, :DocTestSetup, :(using AbstractAlgebra); recursive = true)
+DocMeta.setdocmeta!(Nemo, :DocTestSetup, :(using Nemo); recursive = true)
 
 makedocs(
          format = Documenter.HTML(),
