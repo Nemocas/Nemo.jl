@@ -10,6 +10,16 @@
 #
 ###############################################################################
 
+"""
+    AnticNumberField
+
+This is the basic type for absolute extensions, ie. an extension of QQ by some
+irreducible monic polyomial with coefficients in either ZZ or QQ.
+
+Creation is usually by calling `number_field`, but see also
+`cyclotomic_field` and `cyclotomic_real_subfield` for some more specialized
+fields.
+"""
 @attributes mutable struct AnticNumberField <: SimpleNumField{QQFieldElem}
    pol_coeffs::Ptr{Nothing}
    pol_alloc::Int
@@ -49,7 +59,22 @@ function _AnticNumberField_clear_fn(a::AnticNumberField)
    ccall((:nf_clear, libantic), Nothing, (Ref{AnticNumberField},), a)
 end
 
+<<<<<<< HEAD
 mutable struct nf_elem <: SimpleNumFieldElem{QQFieldElem}
+=======
+"""
+    nf_elem
+ 
+The element type of an (absolute simple) number field, ie, an extension
+of QQ by an irreducible polynomial.
+
+To construct such an element, one starts by constructing the field first.
+Essentially never called directly.
+
+See also `number_field`.
+"""
+mutable struct nf_elem <: SimpleNumFieldElem{fmpq}
+>>>>>>> 7f458af7 (make the snake_case names the default)
    elem_coeffs::Ptr{Nothing}
    elem_alloc::Int
    elem_length::Int

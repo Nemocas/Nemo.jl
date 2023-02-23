@@ -5,7 +5,7 @@
 """
 module Nemo
 
-using AbstractAlgebra
+import AbstractAlgebra
 
 using Markdown
 
@@ -61,6 +61,7 @@ import AbstractAlgebra: nullspace, @show_name, @show_special, find_name,
 for i in names(AbstractAlgebra)
    (i in AbstractAlgebra.import_exclude || !isdefined(AbstractAlgebra, i)) && continue
    i == :GF && continue
+   i == :NumberField && continue
    eval(Meta.parse("import AbstractAlgebra." * string(i)))
    eval(Expr(:export, i))
 end

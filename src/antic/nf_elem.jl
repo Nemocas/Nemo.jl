@@ -120,7 +120,8 @@ end
 @doc Markdown.doc"""
     gen(a::AnticNumberField)
 
-Return the generator of the given number field.
+Return the generator of the given number field, ie. a symbolic root of the
+defining polynomial.
 """
 function gen(a::AnticNumberField)
    r = nf_elem(a)
@@ -129,11 +130,6 @@ function gen(a::AnticNumberField)
    return r
 end
 
-@doc Markdown.doc"""
-    one(a::AnticNumberField)
-
-Return the multiplicative identity, i.e. one, in the given number field.
-"""
 function one(a::AnticNumberField)
    r = nf_elem(a)
    ccall((:nf_elem_one, libantic), Nothing,
@@ -141,11 +137,6 @@ function one(a::AnticNumberField)
    return r
 end
 
-@doc Markdown.doc"""
-    zero(a::AnticNumberField)
-
-Return the additive identity, i.e. zero, in the given number field.
-"""
 function zero(a::AnticNumberField)
    r = nf_elem(a)
    ccall((:nf_elem_zero, libantic), Nothing,
@@ -164,23 +155,11 @@ function is_gen(a::nf_elem)
                 (Ref{nf_elem}, Ref{AnticNumberField}), a, a.parent)
 end
 
-@doc Markdown.doc"""
-    isone(a::nf_elem)
-
-Return `true` if the given number field element is the multiplicative
-identity of the number field, i.e. one, otherwise return `false`.
-"""
 function isone(a::nf_elem)
    return ccall((:nf_elem_is_one, libantic), Bool,
                 (Ref{nf_elem}, Ref{AnticNumberField}), a, a.parent)
 end
 
-@doc Markdown.doc"""
-    iszero(a::nf_elem)
-
-Return `true` if the given number field element is the additive
-identity of the number field, i.e. zero, otherwise return `false`.
-"""
 function iszero(a::nf_elem)
    return ccall((:nf_elem_is_zero, libantic), Bool,
                 (Ref{nf_elem}, Ref{AnticNumberField}), a, a.parent)
@@ -190,14 +169,14 @@ end
     is_unit(a::nf_elem)
 
 Return `true` if the given number field element is invertible, i.e. nonzero,
-otherwise return `false`.
+otherwise return `false`. Note, this does not take the maximal order into account.
 """
 is_unit(a::nf_elem) = !iszero(a)
 
 @doc Markdown.doc"""
     isinteger(a::nf_elem)
 
-Return `true` if the given number field element is an integer, otherwise
+Return `true` if the given number field element is an integer, ie. in ZZ, otherwise
 return `false`.
 """
 function isinteger(a::nf_elem)
@@ -209,7 +188,7 @@ end
 @doc Markdown.doc"""
     is_rational(a::nf_elem)
 
-Return `true` if the given number field element is a rational number,
+Return `true` if the given number field element is a rational number, ie. in QQ,
 otherwise `false`.
 """
 function is_rational(a::nf_elem)
@@ -1184,16 +1163,17 @@ rand(K::AnticNumberField, r) = rand(Random.GLOBAL_RNG, K, r)
 Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$
 of the number field $\mathbb{Q}[x]/(f)$ where $f$ is the supplied polynomial.
 The supplied string `s` specifies how the generator of the number field
-should be printed.
+should be printed. If `s` is not specified, it defaults to `_a`.
 """
-function number_field(f::QQPolyRingElem, s::Union{AbstractString, Char, Symbol}; cached::Bool = true, check::Bool = true)
+function number_field(f::QQPolyRingElem, s::Union{AbstractString, Char, Symbol} = "_a"; cached::Bool = true, check::Bool = true)
    parent_obj = AnticNumberField(f, Symbol(s), cached, check)
 
    return parent_obj, gen(parent_obj)
 end
+@alias NumberField number_field
 
 @doc Markdown.doc"""
-    CyclotomicField(n::Int, s::Union{AbstractString, Char, Symbol} = "z_$n", t = "_\$"; cached = true)
+    cyclotomic_field(n::Int, s::Union{AbstractString, Char, Symbol} = "z_$n", t = "_\$"; cached = true)
 
 Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$
 of the $n$-th cyclotomic field, $\mathbb{Q}(\zeta_n)$. The supplied string
@@ -1202,14 +1182,15 @@ provided, the string `t` specifies how the generator of the polynomial ring
 from which the number field is constructed, should be printed. If it is not
 supplied, a default dollar sign will be used to represent the variable.
 """
-function CyclotomicField(n::Int, s::Union{AbstractString, Char, Symbol} = "z_$n", t = "_\$"; cached = true)
-   Zx, x = polynomial_ring(FlintZZ, gensym(); cached = cached)
-   Qx, = polynomial_ring(FlintQQ, t; cached = cached)
+function cyclotomic_field(n::Int, s::Union{AbstractString, Char, Symbol} = "z_$n", t = "_\$"; cached = true)
+   Zx, x = PolynomialRing(FlintZZ, gensym(); cached = false)
+   Qx, = PolynomialRing(FlintQQ, t; cached = cached)
    f = cyclotomic(n, x)
    C, g = number_field(Qx(f), Symbol(s); cached = cached, check = false)
    set_attribute!(C, :show => show_cyclo, :cyclo => n)
    return C, g
 end
+@alias CyclotomicField cyclotomic_field
 
 function show_cyclo(io::IO, a::AnticNumberField)
   @assert is_cyclo_type(a)
@@ -1218,7 +1199,7 @@ end
 
 
 @doc Markdown.doc"""
-    CyclotomicRealSubfield(n::Int, s::Union{AbstractString, Char, Symbol} = "(z_$n + 1/z_$n)", t = "\$"; cached = true)
+    cyclotomic_real_subfield(n::Int, s::Union{AbstractString, Char, Symbol} = "(z_$n + 1/z_$n)", t = "\$"; cached = true)
 
 Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$
 of the totally real subfield of the $n$-th cyclotomic field,
@@ -1228,14 +1209,15 @@ the generator of the polynomial ring from which the number field is
 constructed, should be printed. If it is not supplied, a default dollar sign
 will be used to represent the variable.
 """
-function CyclotomicRealSubfield(n::Int, s::Union{AbstractString, Char, Symbol} = "(z_$n + 1/z_$n)", t = "\$"; cached = true)
-   Zx, x = polynomial_ring(FlintZZ, gensym(); cached = cached)
-   Qx, = polynomial_ring(FlintQQ, t; cached = cached)
+function cyclotomic_real_subfield(n::Int, s::Union{AbstractString, Char, Symbol} = "(z_$n + 1/z_$n)", t = "\$"; cached = true)
+   Zx, x = PolynomialRing(FlintZZ, gensym(); cached = false)
+   Qx, = PolynomialRing(FlintQQ, t; cached = cached)
    f = cos_minpoly(n, x)
    R, a =  number_field(Qx(f), Symbol(s); cached = cached, check = false)
    set_attribute!(R, :show => show_maxreal, :maxreal => n)
    return R, a
 end
+@alias CyclotomicRealSubfield cyclotomic_real_subfield
 
 function show_maxreal(io::IO, a::AnticNumberField)
   print(io, "Maximal real subfield of cyclotomic field of order $(get_attribute(a, :maxreal))")
