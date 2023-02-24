@@ -1268,6 +1268,7 @@ and two arbitrary matrices are returned.
 function cansolve_with_nullspace(a::ZZMatrix, b::ZZMatrix)
    nrows(b) != nrows(a) && error("Incompatible dimensions in cansolve_with_nullspace")
    H, T = hnf_with_transform(transpose(a))
+   b = deepcopy(b)
    z = similar(a, ncols(b), ncols(a))
    l = min(nrows(a), ncols(a))
    for i=1:ncols(b)
