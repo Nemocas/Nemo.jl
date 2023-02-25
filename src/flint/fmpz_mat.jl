@@ -1220,7 +1220,7 @@ function Base.cat(A::ZZMatrix...;dims)
 end
 
 
-function _vcat(A::ZZMatrix...)
+function AbstractAlgebra._vcat(A::NTuple{<:Any, ZZMatrix})
   if length(A) == 0
     error("Number of matrices to concatenate must be positive")
   end
