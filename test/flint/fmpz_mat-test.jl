@@ -691,7 +691,6 @@ end
    @test cat(A, A, dims = 1) == hcat(A, A)
    @test cat(A, A, dims = 2) == vcat(A, A)
    @test_throws ErrorException cat(A, A, dims = 3)
-   @test_throws ErrorException Nemo._vcat()
 end
 
 @testset "ZZMatrix.rand" begin

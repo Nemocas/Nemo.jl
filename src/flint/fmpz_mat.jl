@@ -1221,15 +1221,11 @@ end
 
 
 function AbstractAlgebra._vcat(A::NTuple{<:Any, ZZMatrix})
-  if length(A) == 0
-    error("Number of matrices to concatenate must be positive")
-  end
-
   if any(x -> ncols(x) != ncols(A[1]), A)
     error("Matrices must have the same number of columns")
   end
 
-  M = zero_matrix(ZZ, sum(nrows, A), ncols(A[1]))
+  M = zero_matrix(ZZ, sum(nrows, A, init = 0), ncols(A[1]))
   s = 0
   for N in A
     GC.@preserve M N begin
