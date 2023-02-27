@@ -2117,7 +2117,7 @@ julia> number_of_partitions(ZZ(1000))
 """
 function number_of_partitions(x::Int)
    if (Sys.iswindows() ? true : false) && Int == Int64
-      error("not yet supported on win64")
+#      error("not yet supported on win64")
    end
    z = ZZRingElem()
    if x < 0
@@ -2130,7 +2130,7 @@ end
 
 function number_of_partitions(x::ZZRingElem)
    if (Sys.iswindows() ? true : false) && Int == Int64
-      error("not yet supported on win64")
+#      error("not yet supported on win64")
    end
    z = ZZRingElem()
    if x < 0
