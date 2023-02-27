@@ -12,11 +12,7 @@ export QQMatrix, QQMatrixSpace, gso, hilbert
 #
 ###############################################################################
 
-elem_type(::Type{QQMatrixSpace}) = QQMatrix
-
 parent_type(::Type{QQMatrix}) = QQMatrixSpace
-
-base_ring(a::QQMatrixSpace) = FlintQQ
 
 base_ring(a::QQMatrix) = FlintQQ
 
@@ -159,14 +155,6 @@ Base.@propagate_inbounds setindex!(a::QQMatrix, d::Rational,
 nrows(a::QQMatrix) = a.r
 
 ncols(a::QQMatrix) = a.c
-
-nrows(a::QQMatrixSpace) = a.nrows
-
-ncols(a::QQMatrixSpace) = a.ncols
-
-zero(a::QQMatrixSpace) = a()
-
-one(a::QQMatrixSpace) = a(1)
 
 iszero(a::QQMatrix) = ccall((:fmpq_mat_is_zero, libflint), Bool,
                             (Ref{QQMatrix},), a)
@@ -957,15 +945,4 @@ function identity_matrix(R::QQField, n::Int)
    z = QQMatrix(n, n)
    ccall((:fmpq_mat_one, libflint), Nothing, (Ref{QQMatrix}, ), z)
    return z
-end
-
-###############################################################################
-#
-#   matrix_space constructor
-#
-###############################################################################
-
-function matrix_space(R::QQField, r::Int, c::Int; cached = true)
-   # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
-   return QQMatrixSpace(r, c)
 end

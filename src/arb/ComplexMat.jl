@@ -30,8 +30,6 @@ zero(m::ComplexMat, R::ComplexField, r::Int, c::Int) = similar(m, R, r, c)
 
 parent_type(::Type{ComplexMat}) = ComplexMatSpace
 
-elem_type(::Type{ComplexMatSpace}) = ComplexMat
-
 parent(x::ComplexMat) = matrix_space(base_ring(x), nrows(x), ncols(x))
 
 dense_matrix_type(::Type{ComplexFieldElem}) = ComplexMat
@@ -102,8 +100,6 @@ end
 setindex!(x::ComplexMat, y::Tuple{Rational{T}, Rational{T}}, r::Int, c::Int) where {T <: Integer} =
          setindex!(x, map(QQFieldElem, y), r, c)
 
-zero(x::ComplexMatSpace) = x()
-
 function one(x::ComplexMatSpace)
   z = x()
   ccall((:acb_mat_one, libarb), Nothing, (Ref{ComplexMat}, ), z)
@@ -113,10 +109,6 @@ end
 nrows(a::ComplexMat) = a.r
 
 ncols(a::ComplexMat) = a.c
-
-nrows(a::ComplexMatSpace) = a.nrows
-
-ncols(a::ComplexMatSpace) = a.ncols
 
 function deepcopy_internal(x::ComplexMat, dict::IdDict)
   z = similar(x)

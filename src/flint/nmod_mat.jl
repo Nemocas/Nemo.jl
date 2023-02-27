@@ -18,8 +18,6 @@ export zzModMatrix, zzModMatrixSpace, getindex, setindex!, deepcopy,
 
 parent_type(::Type{zzModMatrix}) = zzModMatrixSpace
 
-elem_type(::Type{zzModMatrixSpace}) = zzModMatrix
-
 dense_matrix_type(::Type{zzModRingElem}) = zzModMatrix
 
 function check_parent(x::T, y::T, throw::Bool = true) where T <: Zmodn_mat
@@ -113,17 +111,9 @@ nrows(a::T) where T <: Zmodn_mat = a.r
 
 ncols(a::T) where T <: Zmodn_mat = a.c
 
-nrows(a::zzModMatrixSpace) = a.nrows
-
-ncols(a::zzModMatrixSpace) = a.ncols
-
 parent(a::Zmodn_mat) = matrix_space(base_ring(a), nrows(a), ncols(a))
 
-base_ring(a::zzModMatrixSpace) = a.base_ring
-
 base_ring(a::T) where T <: Zmodn_mat = a.base_ring
-
-zero(a::zzModMatrixSpace) = a()
 
 function one(a::zzModMatrixSpace)
   (nrows(a) != ncols(a)) && error("Matrices must be square")
@@ -705,49 +695,6 @@ function (a::zzModMatrixSpace)()
   return z
 end
 
-function (a::zzModMatrixSpace)(b::Integer)
-   M = a()
-   for i = 1:nrows(a)
-      for j = 1:ncols(a)
-         if i != j
-            M[i, j] = zero(base_ring(a))
-         else
-            M[i, j] = base_ring(a)(b)
-         end
-      end
-   end
-   return M
-end
-
-function (a::zzModMatrixSpace)(b::ZZRingElem)
-   M = a()
-   for i = 1:nrows(a)
-      for j = 1:ncols(a)
-         if i != j
-            M[i, j] = zero(base_ring(a))
-         else
-            M[i, j] = base_ring(a)(b)
-         end
-      end
-   end
-   return M
-end
-
-function (a::zzModMatrixSpace)(b::zzModRingElem)
-   parent(b) != base_ring(a) && error("Unable to coerce to matrix")
-   M = a()
-   for i = 1:nrows(a)
-      for j = 1:ncols(a)
-         if i != j
-            M[i, j] = zero(base_ring(a))
-         else
-            M[i, j] = deepcopy(b)
-         end
-      end
-   end
-   return M
-end
-
 function (a::zzModMatrixSpace)(arr::AbstractMatrix{BigInt}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
   z = zzModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr, transpose)
@@ -861,15 +808,3 @@ function identity_matrix(R::zzModRing, n::Int)
    z.base_ring = R
    return z
 end
-
-################################################################################
-#
-#  Matrix space constructor
-#
-################################################################################
-
-function matrix_space(R::zzModRing, r::Int, c::Int; cached::Bool = true)
-  # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
-  zzModMatrixSpace(R, r, c)
-end
-

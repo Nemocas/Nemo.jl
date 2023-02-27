@@ -20,11 +20,7 @@ export ZZMatrix, ZZMatrixSpace, getindex, getindex!, setindex!,
 #
 ###############################################################################
 
-elem_type(::Type{ZZMatrixSpace}) = ZZMatrix
-
 parent_type(::Type{ZZMatrix}) = ZZMatrixSpace
-
-base_ring(a::ZZMatrixSpace) = FlintZZ
 
 base_ring(a::ZZMatrix) = FlintZZ
 
@@ -155,14 +151,6 @@ end
 @inline nrows(a::ZZMatrix) = a.r
 
 @inline ncols(a::ZZMatrix) = a.c
-
-nrows(a::ZZMatrixSpace) = a.nrows
-
-ncols(a::ZZMatrixSpace) = a.ncols
-
-zero(a::ZZMatrixSpace) = a()
-
-one(a::ZZMatrixSpace) = a(1)
 
 iszero(a::ZZMatrix) = ccall((:fmpz_mat_is_zero, libflint), Bool,
                             (Ref{ZZMatrix},), a)
@@ -1596,15 +1584,4 @@ function identity_matrix(R::ZZRing, n::Int)
    z = ZZMatrix(n, n)
    ccall((:fmpz_mat_one, libflint), Nothing, (Ref{ZZMatrix}, ), z)
    return z
-end
-
-###############################################################################
-#
-#   matrix_space constructor
-#
-###############################################################################
-
-function matrix_space(R::ZZRing, r::Int, c::Int; cached::Bool = true)
-   # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
-   return ZZMatrixSpace(r, c)
 end

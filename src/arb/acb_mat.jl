@@ -31,8 +31,6 @@ zero(m::acb_mat, R::AcbField, r::Int, c::Int) = similar(m, R, r, c)
 
 parent_type(::Type{acb_mat}) = AcbMatSpace
 
-elem_type(::Type{AcbMatSpace}) = acb_mat
-
 parent(x::acb_mat) = matrix_space(base_ring(x), nrows(x), ncols(x))
 
 dense_matrix_type(::Type{acb}) = acb_mat
@@ -105,8 +103,6 @@ end
 setindex!(x::acb_mat, y::Tuple{Rational{T}, Rational{T}}, r::Int, c::Int) where {T <: Integer} =
          setindex!(x, map(QQFieldElem, y), r, c)
 
-zero(x::AcbMatSpace) = x()
-
 function one(x::AcbMatSpace)
   z = x()
   ccall((:acb_mat_one, libarb), Nothing, (Ref{acb_mat}, ), z)
@@ -116,10 +112,6 @@ end
 nrows(a::acb_mat) = a.r
 
 ncols(a::acb_mat) = a.c
-
-nrows(a::AcbMatSpace) = a.nrows
-
-ncols(a::AcbMatSpace) = a.ncols
 
 function deepcopy_internal(x::acb_mat, dict::IdDict)
   z = similar(x)

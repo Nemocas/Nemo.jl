@@ -14,8 +14,6 @@ export FqMatrix, FqMatrixSpace
 
 parent_type(::Type{FqMatrix}) = FqMatrixSpace
 
-elem_type(::Type{FqMatrixSpace}) = FqMatrix
-
 dense_matrix_type(::Type{FqFieldElem}) = FqMatrix
 
 function check_parent(x::FqMatrix, y::FqMatrix, throw::Bool = true)
@@ -91,17 +89,9 @@ function ncols(a::FqMatrix)
     a, base_ring(a))
 end
 
-nrows(a::FqMatrixSpace) = a.nrows
-
-ncols(a::FqMatrixSpace) = a.ncols
-
 parent(a::FqMatrix) = matrix_space(base_ring(a), nrows(a), ncols(a))
 
-base_ring(a::FqMatrixSpace) = a.base_ring
-
 base_ring(a::FqMatrix) = a.base_ring
-
-zero(a::FqMatrixSpace) = a()
 
 function one(a::FqMatrixSpace)
   (nrows(a) != ncols(a)) && error("Matrices must be square")
@@ -660,34 +650,6 @@ function (a::FqMatrixSpace)()
   return z
 end
 
-function (a::FqMatrixSpace)(b::Integer)
-   M = a()
-   for i = 1:nrows(a)
-      for j = 1:ncols(a)
-         if i != j
-            M[i, j] = zero(base_ring(a))
-         else
-            M[i, j] = base_ring(a)(b)
-         end
-      end
-   end
-   return M
-end
-
-function (a::FqMatrixSpace)(b::ZZRingElem)
-   M = a()
-   for i = 1:nrows(a)
-      for j = 1:ncols(a)
-         if i != j
-            M[i, j] = zero(base_ring(a))
-         else
-            M[i, j] = base_ring(a)(b)
-         end
-      end
-   end
-   return M
-end
-
 function (a::FqMatrixSpace)(b::FqFieldElem)
    parent(b) != base_ring(a) && error("Unable to coerce to matrix")
    return FqMatrix(nrows(a), ncols(a), b)
@@ -787,17 +749,6 @@ function identity_matrix(R::FqField, n::Int)
       z[i, i] = one(R)
    end
    return z
-end
-
-################################################################################
-#
-#  Matrix space constructor
-#
-################################################################################
-
-function matrix_space(R::FqField, r::Int, c::Int; cached::Bool = true)
-  # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
-  FqMatrixSpace(R, r, c)
 end
 
 ################################################################################

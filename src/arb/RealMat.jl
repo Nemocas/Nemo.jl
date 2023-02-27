@@ -30,8 +30,6 @@ zero(m::RealMat, R::RealField, r::Int, c::Int) = similar(m, R, r, c)
 
 parent_type(::Type{RealMat}) = RealMatSpace
 
-elem_type(::Type{RealMatSpace}) = RealMat
-
 base_ring(a::RealMatSpace) = RealField()
 
 base_ring(a::RealMat) = RealField()
@@ -89,8 +87,6 @@ Base.@propagate_inbounds setindex!(x::RealMat, y::Rational{T},
                                  r::Int, c::Int) where {T <: Integer} =
          setindex!(x, ZZRingElem(y), r, c)
 
-zero(a::RealMatSpace) = a()
-
 function one(x::RealMatSpace)
   z = x()
   ccall((:arb_mat_one, libarb), Nothing, (Ref{RealMat}, ), z)
@@ -100,10 +96,6 @@ end
 nrows(a::RealMat) = a.r
 
 ncols(a::RealMat) = a.c
-
-nrows(a::RealMatSpace) = a.nrows
-
-ncols(a::RealMatSpace) = a.ncols
 
 function deepcopy_internal(x::RealMat, dict::IdDict)
   z = RealMat(nrows(x), ncols(x))

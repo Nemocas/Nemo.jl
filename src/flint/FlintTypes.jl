@@ -4760,15 +4760,7 @@ end
 #
 ###############################################################################
 
-# not really a mathematical ring
-struct QQMatrixSpace <: MatSpace{QQFieldElem}
-   nrows::Int
-   ncols::Int
-
-   function QQMatrixSpace(r::Int, c::Int)
-      return new(r, c)
-   end
-end
+const QQMatrixSpace = AbstractAlgebra.Generic.MatSpace{QQFieldElem, QQField}
 
 mutable struct QQMatrix <: MatElem{QQFieldElem}
    entries::Ptr{Nothing}
@@ -4923,15 +4915,7 @@ end
 #
 ###############################################################################
 
-# not really a mathematical ring
-struct ZZMatrixSpace <: MatSpace{ZZRingElem}
-   nrows::Int
-   ncols::Int
-
-   function ZZMatrixSpace(r::Int, c::Int)
-      return new(r, c)
-   end
-end
+const ZZMatrixSpace = AbstractAlgebra.Generic.MatSpace{ZZRingElem, ZZRing}
 
 mutable struct ZZMatrix <: MatElem{ZZRingElem}
    entries::Ptr{Nothing}
@@ -5050,16 +5034,7 @@ end
 #
 ###############################################################################
 
-struct zzModMatrixSpace <: MatSpace{zzModRingElem}
-  base_ring::zzModRing
-  nrows::Int
-  ncols::Int
-
-  function zzModMatrixSpace(R::zzModRing, r::Int, c::Int)
-    (r < 0 || c < 0) && throw(error_dim_negative)
-    return new(R, r, c)
-  end
-end
+const zzModMatrixSpace = AbstractAlgebra.Generic.MatSpace{zzModRingElem, zzModRing}
 
 mutable struct zzModMatrix <: MatElem{zzModRingElem}
   entries::Ptr{Nothing}
@@ -5222,16 +5197,7 @@ end
 #
 ###############################################################################
 
-struct ZZModMatrixSpace <: MatSpace{ZZModRingElem}
-  base_ring::ZZModRing
-  nrows::Int
-  ncols::Int
-
-  function ZZModMatrixSpace(R::ZZModRing, r::Int, c::Int)
-    (r < 0 || c < 0) && throw(error_dim_negative)
-    return new(R, r, c)
-  end
-end
+const ZZModMatrixSpace = AbstractAlgebra.Generic.MatSpace{ZZModRingElem, ZZModRing}
 
 mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
    entries::Ptr{Nothing}
@@ -5356,18 +5322,7 @@ end
 #
 ###############################################################################
 
-struct FpMatrixSpace <: MatSpace{FpFieldElem}
-  base_ring::FpField
-  nrows::Int
-  ncols::Int
-
-  function FpMatrixSpace(R::FpField, r::Int, c::Int)
-    (r < 0 || c < 0) && throw(error_dim_negative)
-    return new(R, r, c)
-  end
-end
-
-const GaloisFmpzMatID = CacheDictType{Tuple{FpField, Int, Int}, FpMatrixSpace}()
+const FpMatrixSpace = AbstractAlgebra.Generic.MatSpace{FpFieldElem, FpField}
 
 mutable struct FpMatrix <: MatElem{FpFieldElem}
    entries::Ptr{Nothing}
@@ -5492,18 +5447,7 @@ end
 #
 ###############################################################################
 
-struct fpMatrixSpace <: MatSpace{fpFieldElem}
-  base_ring::fpField
-  nrows::Int
-  ncols::Int
-
-  function fpMatrixSpace(R::fpField, r::Int, c::Int)
-    (r < 0 || c < 0) && throw(error_dim_negative)
-    return new(R, r, c)
-  end
-end
-
-const GFPMatID = CacheDictType{Tuple{fpField, Int, Int}, fpMatrixSpace}()
+const fpMatrixSpace = AbstractAlgebra.Generic.MatSpace{fpFieldElem, fpField}
 
 mutable struct fpMatrix <: MatElem{fpFieldElem}
   entries::Ptr{Nothing}
@@ -6102,17 +6046,8 @@ end
 #
 ###############################################################################
 
-struct FqMatrixSpace <: MatSpace{FqFieldElem}
-   base_ring::FqField
-   nrows::Int
-   ncols::Int
- 
-   function FqMatrixSpace(R::FqField, r::Int, c::Int)
-     (r < 0 || c < 0) && throw(error_dim_negative)
-     return new(R, r, c)
-   end
- end
- 
+const FqMatrixSpace = AbstractAlgebra.Generic.MatSpace{FqFieldElem, FqField}
+
  mutable struct FqMatrix <: MatElem{FqFieldElem}
     # fq_default_mat_struct is 56 bytes on 64 bit machine
     opaque::NTuple{56, Int8}
@@ -6332,16 +6267,7 @@ struct FqMatrixSpace <: MatSpace{FqFieldElem}
 #
 ###############################################################################
 
-struct FqPolyRepMatrixSpace <: MatSpace{FqPolyRepFieldElem}
-  base_ring::FqPolyRepField
-  nrows::Int
-  ncols::Int
-
-  function FqPolyRepMatrixSpace(R::FqPolyRepField, r::Int, c::Int)
-    (r < 0 || c < 0) && throw(error_dim_negative)
-    return new(R, r, c)
-  end
-end
+const FqPolyRepMatrixSpace = AbstractAlgebra.Generic.MatSpace{FqPolyRepFieldElem, FqPolyRepField}
 
 mutable struct FqPolyRepMatrix <: MatElem{FqPolyRepFieldElem}
    entries::Ptr{Nothing}
@@ -6510,16 +6436,7 @@ end
 #
 ###############################################################################
 
-struct fqPolyRepMatrixSpace <: MatSpace{fqPolyRepFieldElem}
-  base_ring::fqPolyRepField
-  nrows::Int
-  ncols::Int
-
-  function fqPolyRepMatrixSpace(R::fqPolyRepField, r::Int, c::Int)
-    (r < 0 || c < 0) && throw(error_dim_negative)
-    return new(R, r, c)
-  end
-end
+const fqPolyRepMatrixSpace = AbstractAlgebra.Generic.MatSpace{fqPolyRepFieldElem, fqPolyRepField}
 
 mutable struct fqPolyRepMatrix <: MatElem{fqPolyRepFieldElem}
    entries::Ptr{Nothing}

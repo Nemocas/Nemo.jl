@@ -14,8 +14,6 @@ export FpMatrix, FpMatrixSpace
 
 parent_type(::Type{FpMatrix}) = FpMatrixSpace
 
-elem_type(::Type{FpMatrixSpace}) = FpMatrix
-
 dense_matrix_type(::Type{FpFieldElem}) = FpMatrix
 
 ###############################################################################
@@ -85,17 +83,9 @@ nrows(a::FpMatrix) = a.r
 
 ncols(a::FpMatrix) = a.c
 
-nrows(a::FpMatrixSpace) = a.nrows
-
-ncols(a::FpMatrixSpace) = a.ncols
-
 parent(a::FpMatrix) = matrix_space(base_ring(a), nrows(a), ncols(a))
 
-base_ring(a::FpMatrixSpace) = a.base_ring
-
 base_ring(a::FpMatrix) = a.base_ring
-
-zero(a::FpMatrixSpace) = a()
 
 function one(a::FpMatrixSpace)
   (nrows(a) != ncols(a)) && error("Matrices must be square")
@@ -216,14 +206,6 @@ function (a::FpMatrixSpace)()
   return z
 end
 
-function (a::FpMatrixSpace)(b::IntegerUnion)
-   M = a()  # zero
-   for i in 1:min(nrows(a), ncols(a))
-      M[i, i] = base_ring(a)(b)
-   end
-   return M
-end
-
 function (a::FpMatrixSpace)(b::FpFieldElem)
    parent(b) != base_ring(a) && error("Unable to coerce to matrix")
    M = a()  # zero
@@ -339,15 +321,3 @@ function identity_matrix(R::FpField, n::Int)
    z.base_ring = R
    return z
 end
-
-################################################################################
-#
-#  Matrix space constructor
-#
-################################################################################
-
-function matrix_space(R::FpField, r::Int, c::Int; cached::Bool = true)
-  # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
-  FpMatrixSpace(R, r, c)
-end
-

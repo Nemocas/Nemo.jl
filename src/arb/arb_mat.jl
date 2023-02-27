@@ -31,8 +31,6 @@ zero(m::arb_mat, R::ArbField, r::Int, c::Int) = similar(m, R, r, c)
 
 parent_type(::Type{arb_mat}) = ArbMatSpace
 
-elem_type(::Type{ArbMatSpace}) = arb_mat
-
 base_ring(a::ArbMatSpace) = a.base_ring
 
 base_ring(a::arb_mat) = a.base_ring
@@ -92,8 +90,6 @@ Base.@propagate_inbounds setindex!(x::arb_mat, y::Rational{T},
                                  r::Int, c::Int) where {T <: Integer} =
          setindex!(x, ZZRingElem(y), r, c)
 
-zero(a::ArbMatSpace) = a()
-
 function one(x::ArbMatSpace)
   z = x()
   ccall((:arb_mat_one, libarb), Nothing, (Ref{arb_mat}, ), z)
@@ -103,10 +99,6 @@ end
 nrows(a::arb_mat) = a.r
 
 ncols(a::arb_mat) = a.c
-
-nrows(a::ArbMatSpace) = a.nrows
-
-ncols(a::ArbMatSpace) = a.ncols
 
 function deepcopy_internal(x::arb_mat, dict::IdDict)
   z = arb_mat(nrows(x), ncols(x))
