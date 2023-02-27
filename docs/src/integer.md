@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Nemo
+DocTestSetup = quote
+    using Nemo
+end
 ```
 
 # Integers
@@ -94,15 +97,27 @@ numerator(::ZZRingElem)
 
 **Examples**
 
-```
-a = ZZ(12)
+```jldoctest
+julia> a = ZZ(12)
+12
 
-is_unit(a)
-sign(a)
-s = size(a)
-fits(Int, a)
-n = numerator(a)
-d = denominator(a)
+julia> is_unit(a)
+false
+
+julia> sign(a)
+1
+
+julia> s = size(a)
+1
+
+julia> fits(Int, a)
+true
+
+julia> n = numerator(a)
+12
+
+julia> d = denominator(a)
+1
 ```
 
 ### Euclidean division
@@ -166,15 +181,27 @@ Function                    | Return | Rounding
 
 **Examples**
 
-```julia
-a = ZZRingElem(12)
-b = ZZRingElem(5)
+```jldoctest
+julia> a = ZZ(12)
+12
 
-q, r = divrem(a, b)
-c = cdiv(a, b)
-d = fdiv(a, b)
-f = tdivpow2(a, 2)
-g = fmodpow2(a, 3)
+julia> b = ZZ(5)
+5
+
+julia> q, r = divrem(a, b)
+(2, 2)
+
+julia> c = cdiv(a, b)
+3
+
+julia> d = fdiv(a, b)
+2
+
+julia> f = tdivpow2(a, 2)
+3
+
+julia> g = fmodpow2(a, 3)
+4
 ```
 
 ### Comparison
@@ -208,15 +235,27 @@ Function                   |
 
 **Examples**
 
-```julia
-a = ZZ(12)
-b = ZZ(3)
+```jldoctest
+julia> a = ZZ(12)
+12
 
-a < b
-a != b
-a > 4
-5 <= b
-cmpabs(a, b)
+julia> b = ZZ(3)
+3
+
+julia> a < b
+false
+
+julia> a != b
+true
+
+julia> a > 4
+true
+
+julia> 5 <= b
+false
+
+julia> cmpabs(a, b)
+1
 ```
 
 ### Shifting
@@ -231,11 +270,15 @@ cmpabs(a, b)
 
 **Examples**
 
-```julia
-a = ZZRingElem(12)
+```jldoctest
+julia> a = ZZ(12)
+12
 
-a << 3
-a >> 5
+julia> a << 3
+96
+
+julia> a >> 5
+0
 ```
 
 ### Modular arithmetic
@@ -248,34 +291,14 @@ sqrtmod(::ZZRingElem, ::ZZRingElem)
 crt(r1::ZZRingElem, m1::ZZRingElem, r2::ZZRingElem, m2::ZZRingElem, signed=false; check::Bool=true)
 ```
 
-**Examples**
-
-```julia
-c = sqrtmod(ZZ(12), ZZ(13))
-d = crt(ZZ(5), ZZ(13), ZZ(7), ZZ(37), true)
-d = crt(ZZ(5), ZZ(13), 7, 37, true)
-```
-
 ### Integer logarithm
 
 ```@docs
 flog(::ZZRingElem, ::ZZRingElem)
-flog(::ZZRingElem, ::Int)
 ```
 
 ```@docs
 clog(::ZZRingElem, ::ZZRingElem)
-clog(::ZZRingElem, ::Int)
-```
-
-**Examples**
-
-```julia
-a = ZZRingElem(12)
-b = ZZRingElem(2)
-
-c = flog(a, b)
-d = clog(a, 3)
 ```
 
 ### Integer roots
@@ -294,18 +317,6 @@ root(::ZZRingElem, ::Int)
 
 ```@docs
 iroot(::ZZRingElem, ::Int)
-```
-
-**Examples**
-
-```julia
-a = ZZ(13)
-b = ZZ(27)
-
-c = isqrt(a)
-s, r = isqrtrem(a)
-d = iroot(a, 3)
-k = root(b, 3; check=true)
 ```
 
 ### Number theoretic functionality
@@ -377,36 +388,21 @@ kronecker_symbol(::Int, ::Int)
 ```
 
 ```@docs
-divisor_sigma(::Int, ::Int)
 divisor_sigma(::ZZRingElem, ::Int)
-divisor_sigma(::ZZRingElem, ::ZZRingElem)
 ```
 
 ```@docs
-euler_phi(::Int)
 euler_phi(::ZZRingElem)
 ```
 
 ```@docs
 number_of_partitions(::Int)
-number_of_partitions(::ZZRingElem) 
 ```
 
 ```@docs
 is_perfect_power(::ZZRingElem)
 Nemo.is_prime_power(::ZZRingElem)
 is_prime_power_with_data(::ZZRingElem)
-```
-
-**Examples**
-
-```julia
-is_prime(ZZ(13))
-n = factorial(ZZ(100))
-s = divisor_sigma(ZZ(128), 10)
-a = euler_phi(ZZ(12480))
-p = number_of_partitions(ZZ(1000))
-f = factor(ZZ(12))
 ```
 
 ### Digits and bases
@@ -439,17 +435,6 @@ ndigits(::ZZRingElem, ::Integer)
 nbits(::ZZRingElem)
 ```
 
-**Examples**
-
-```julia
-a = ZZRingElem(12)
-
-s1 = bin(a)
-s2 = base(a, 13)
-n1 = nbits(a)
-n2 = ndigits(a, 3)
-```
-
 ### Bit twiddling
 
 ```@docs
@@ -473,16 +458,6 @@ clrbit!(::ZZRingElem, ::Int)
 setbit!(::ZZRingElem, ::Int)
 combit!(::ZZRingElem, ::Int)
 tstbit(::ZZRingElem, ::Int)
-```
-
-**Examples**
-
-```julia
-a = ZZRingElem(12)
-
-p = popcount(a)
-b = nextpow2(a)
-combit!(a, 2)
 ```
 
 ### Random generation
@@ -510,13 +485,25 @@ The associated ring of integers and the fraction field can be retrieved by
 
 **Examples**
 
-```julia
-ZZi = Nemo.GaussianIntegers()
-a = ZZ(5)*im
-b = ZZi(3, 4)
+```jldoctest
+julia> ZZi = Nemo.GaussianIntegers()
+ZZ[im]
 
-is_unit(a)
-factor(a)
-a//b
-abs2(a//b)
+julia> a = ZZ(5)*im
+5*im
+
+julia> b = ZZi(3, 4)
+3 + 4*im
+
+julia> is_unit(a)
+false
+
+julia> factor(a)
+im * (2 - im) * (2 + im)
+
+julia> a//b
+4//5 + 3//5*im
+
+julia> abs2(a//b)
+1
 ```

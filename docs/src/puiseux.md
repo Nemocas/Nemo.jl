@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Nemo
+DocTestSetup = quote
+    using Nemo
+end
 ```
 
 # Puiseux series
@@ -75,11 +78,16 @@ eta_qexp(x::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem})
 
 **Examples**
 
-```julia
-S, x = PuiseuxSeriesRing(ZZ, 30, "x")
+```jldoctest
+julia> S, z = PuiseuxSeriesRing(ZZ, 30, "z")
+(Puiseux series ring in z over Integer Ring, z + O(z^31))
 
-a = 1 + z + 3z^2 + O(z^5)
+julia> a = 1 + z + 3z^2 + O(z^5)
+1 + z + 3*z^2 + O(z^5)
 
-h = sqrt(a^2)
-k = eta_qexp(S)
+julia> h = sqrt(a^2)
+1 + z + 3*z^2 + O(z^5)
+
+julia> k = eta_qexp(z)
+z^(1//24) - z^(25//24) + O(z^(31//24))
 ```

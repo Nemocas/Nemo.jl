@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Nemo
+DocTestSetup = quote
+    using Nemo
+end
 ```
 
 # Algebraic numbers
@@ -55,7 +58,7 @@ Methods to construct algebraic numbers include:
 
 Arithmetic:
 
-```julia
+```jldoctest
 julia> ZZRingElem(QQBar(3))
 3
 
@@ -68,7 +71,7 @@ Root 0.500000 + 0.866025*im of x^2 - x + 1
 
 Solving the quintic equation:
 
-```julia
+```jldoctest
 julia> R, x = polynomial_ring(QQ, "x")
 (Univariate Polynomial Ring in x over Rational Field, x)
 
@@ -86,7 +89,7 @@ true
 
 Computing exact eigenvalues of a matrix:
 
-```julia
+```jldoctest
 julia> eigenvalues(ZZ[1 1 0; 0 1 1; 1 0 1], QQBar)
 3-element Vector{qqbar}:
  Root 2.00000 of x - 2
@@ -112,12 +115,12 @@ Algebraic numbers can be evaluated
 numerically to arbitrary precision by converting
 to real or complex Arb fields:
 
-```julia
+```jldoctest
 julia> RR = ArbField(64); RR(sqrt(QQBar(2)))
 [1.414213562373095049 +/- 3.45e-19]
 
 julia> CC = AcbField(32); CC(QQBar(-1) ^ (QQBar(1) // 4))
-[0.707106781 +/- 2.74e-10] + [0.707106781 +/- 2.74e-10]*im
+[0.7071067812 +/- 1.35e-11] + [0.7071067812 +/- 1.35e-11]*im
 ```
 
 ### Minimal polynomials, conjugates, and properties
@@ -127,7 +130,7 @@ julia> CC = AcbField(32); CC(QQBar(-1) ^ (QQBar(1) // 4))
 Retrieving the minimal polynomial and algebraic conjugates
 of a given algebraic number:
 
-```julia
+```jldoctest
 julia> minpoly(polynomial_ring(ZZ, "x")[1], QQBar(1+2im))
 x^2 - 2*x + 5
 
@@ -160,7 +163,7 @@ height_bits(x::qqbar)
 
 **Examples**
 
-```julia
+```jldoctest
 julia> real(sqrt(QQBar(1im)))
 Root 0.707107 of 2x^2 - 1
 
@@ -220,7 +223,7 @@ first.
 
 **Examples**
 
-```julia
+```jldoctest
 julia> 1 < sqrt(QQBar(2)) < QQBar(3)//2
 true
 
@@ -257,7 +260,7 @@ is_less_root_order(a::qqbar, b::qqbar)
 
 **Examples**
 
-```julia
+```jldoctest
 julia> root(QQBar(2), 5)
 Root 1.14870 of x^5 - 2
 
@@ -311,7 +314,7 @@ atanpi(a::qqbar)
 
 An algebraic number can be recovered from a numerical value:
 
-```julia
+```jldoctest
 julia> RR = ArbField(53); guess(QQBar, RR("1.41421356 +/- 1e-6"), 2)
 Root 1.41421 of x^2 - 2
 ```

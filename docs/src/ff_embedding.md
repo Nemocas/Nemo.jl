@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Nemo
+DocTestSetup = quote
+    using Nemo
+end
 ```
 
 # Finite field embeddings
@@ -30,7 +33,7 @@ embed(::fqPolyRepField, ::fqPolyRepField)
 
 **Examples**
 
-```julia
+```jldoctest
 julia> k2, x2 = FiniteField(19, 2, "x2")
 (Finite field of degree 2 over F_19, x2)
 
@@ -38,14 +41,13 @@ julia> k4, x4 = FiniteField(19, 4, "x4")
 (Finite field of degree 4 over F_19, x4)
 
 julia> f = embed(k2, k4)
-Morphism from Finite field of degree 2 over F_19
-to Finite field of degree 4 over F_19
+Morphism from Finite field of degree 2 over F_19 to Finite field of degree 4 over F_19
 
 julia> y = f(x2)
-6*x4^3+5*x4^2+9*x4+17
+6*x4^3 + 5*x4^2 + 9*x4 + 17
 
 julia> z = k4(x2)
-6*x4^3+5*x4^2+9*x4+17
+6*x4^3 + 5*x4^2 + 9*x4 + 17
 ```
 
 ### Computing the preimage of an embedding
@@ -57,7 +59,7 @@ preimage_map(::FinFieldMorphism)
 
 **Examples**
 
-```julia
+```jldoctest
 julia> k7, x7 = FiniteField(13, 7, "x7")
 (Finite field of degree 7 over F_13, x7)
 
@@ -65,8 +67,7 @@ julia> k21, x21 = FiniteField(13, 21, "x21")
 (Finite field of degree 21 over F_13, x21)
 
 julia> s = preimage_map(k7, k21)
-Preimage of the morphism from Finite field of degree 7 over F_13
-to Finite field of degree 21 over F_13
+Preimage of the morphism from Finite field of degree 7 over F_13 to Finite field of degree 21 over F_13
 
 julia> y = k21(x7);
 

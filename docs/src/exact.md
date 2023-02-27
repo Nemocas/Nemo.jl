@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Nemo
+DocTestSetup = quote
+    using Nemo
+end
 ```
 
 # Exact real and complex numbers

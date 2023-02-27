@@ -1,3 +1,11 @@
+```@meta
+CurrentModule = Nemo
+DocTestFilters = r"[0-9\.]+ seconds \(.*\)"
+DocTestSetup = quote
+    using Nemo
+end
+```
+
 # Getting Started
 
 Nemo is a computer algebra package for the Julia programming language, maintained by William Hart, 
@@ -48,43 +56,43 @@ Here are some examples of using Nemo.
 
 This example computes recursive univariate polynomials.
 
-```julia
+```jldoctest
 julia> using Nemo
 
 julia> R, x = polynomial_ring(ZZ, "x")
-(Univariate Polynomial Ring in x over Integer Ring,x)
+(Univariate Polynomial Ring in x over Integer Ring, x)
 
 julia> S, y = polynomial_ring(R, "y")
-(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integer Ring,y)
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integer Ring, y)
 
 julia> T, z = polynomial_ring(S, "z")
-(Univariate Polynomial Ring in z over Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integer Ring,z)
+(Univariate Polynomial Ring in z over Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integer Ring, z)
 
 julia> f = x + y + z + 1
-z+(y+(x+1))
+z + y + x + 1
 
 julia> p = f^30; # semicolon suppresses output
 
 julia> @time q = p*(p+1);
-  0.325521 seconds (140.64 k allocations: 3.313 MB)
+  0.161733 seconds (79.42 k allocations: 2.409 MiB)
 ```
 
 Here is an example using generic recursive ring constructions.
 
-```
+```jldoctest
 julia> using Nemo
 
 julia> R, x = FiniteField(7, 11, "x")
-(Finite field of degree 11 over F_7,x)
+(Finite field of degree 11 over F_7, x)
 
 julia> S, y = polynomial_ring(R, "y")
-(Univariate Polynomial Ring in y over Finite field of degree 11 over F_7,y)
+(Univariate Polynomial Ring in y over Finite field of degree 11 over F_7, y)
 
 julia> T = residue_ring(S, y^3 + 3x*y + 1)
-Residue ring of Univariate Polynomial Ring in y over Finite field of degree 11 over F_7 modulo y^3+(3*x)*y+(1)
+Residue ring of Univariate Polynomial Ring in y over Finite field of degree 11 over F_7 modulo y^3 + 3*x*y + 1
 
 julia> U, z = polynomial_ring(T, "z")
-(Univariate Polynomial Ring in z over Residue ring of Univariate Polynomial Ring in y over Finite field of degree 11 over F_7 modulo y^3+(3*x)*y+(1),z)
+(Univariate Polynomial Ring in z over Residue ring of Univariate Polynomial Ring in y over Finite field of degree 11 over F_7 modulo y^3 + 3*x*y + 1, z)
 
 julia> f = (3y^2 + y + x)*z^2 + ((x + 2)*y^2 + x + 1)*z + 4x*y + 3;
 
@@ -95,43 +103,43 @@ julia> s = f^12;
 julia> t = (s + g)^12;
 
 julia> @time resultant(s, t)
-  0.426612 seconds (705.88 k allocations: 52.346 MB, 2.79% gc time)
-(x^10+4*x^8+6*x^7+3*x^6+4*x^5+x^4+6*x^3+5*x^2+x)*y^2+(5*x^10+x^8+4*x^7+3*x^5+5*x^4+3*x^3+x^2+x+6)*y+(2*x^10+6*x^9+5*x^8+5*x^7+x^6+6*x^5+5*x^4+4*x^3+x+3)
+  0.059095 seconds (391.89 k allocations: 54.851 MiB, 5.22% gc time)
+(x^10 + 4*x^8 + 6*x^7 + 3*x^6 + 4*x^5 + x^4 + 6*x^3 + 5*x^2 + x)*y^2 + (5*x^10 + x^8 + 4*x^7 + 3*x^5 + 5*x^4 + 3*x^3 + x^2 + x + 6)*y + 2*x^10 + 6*x^9 + 5*x^8 + 5*x^7 + x^6 + 6*x^5 + 5*x^4 + 4*x^3 + x + 3
 ```
 
 Here is an example using matrices.
 
-```
+```jldoctest
 julia> using Nemo
 
 julia> R, x = polynomial_ring(ZZ, "x")
-(Univariate Polynomial Ring in x over Integer Ring,x)
+(Univariate Polynomial Ring in x over Integer Ring, x)
 
 julia> S = matrix_space(R, 40, 40)
 Matrix Space of 40 rows and 40 columns over Univariate Polynomial Ring in x over Integer Ring
 
-julia> M = rand(S, 2:2, -20:20)
+julia> M = rand(S, 2:2, -20:20);
 
 julia> @time det(M);
-  0.131212 seconds (1.12 M allocations: 39.331 MiB, 4.77% gc time)
+  0.080976 seconds (132.28 k allocations: 23.341 MiB, 4.11% gc time)
 ```
 
 And here is an example with power series.
 
-```
+```jldoctest
 julia> using Nemo
 
 julia> R, x = QQ["x"]
-(Univariate Polynomial Ring in x over Rational Field,x)
+(Univariate Polynomial Ring in x over Rational Field, x)
 
 julia> S, t = power_series_ring(R, 100, "t")
-(Univariate power series ring in t over Univariate Polynomial Ring in x over Rational Field,t+O(t^101))
+(Univariate power series ring in t over Univariate Polynomial Ring in x over Rational Field, t + O(t^101))
 
 julia> u = t + O(t^100)
-t+O(t^100)
+t + O(t^100)
 
 julia> @time divexact((u*exp(x*u)), (exp(u)-1));
-  0.042663 seconds (64.01 k allocations: 1.999 MB, 15.40% gc time)
+  0.412813 seconds (667.49 k allocations: 33.966 MiB, 90.26% compilation time)
 ```
 
 ## Building dependencies from source

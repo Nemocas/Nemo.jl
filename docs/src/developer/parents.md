@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Nemo
+DocTestSetup = quote
+    using Nemo
+end
 ```
 
 # Parent objects
@@ -212,11 +215,18 @@ for users.
 
 Here is an example of their use:
 
-```julia
-R = PolyRing(ZZ)
-p = R([1, 2, 3])
-q = R([2, 3, 4])
-s = p + q
+```jldoctest
+julia> R = PolyRing(ZZ)
+Univariate Polynomial Ring in x over Integer Ring
+
+julia> p = R([1, 2, 3])
+3*x^2 + 2*x + 1
+
+julia> q = R([2, 3, 4])
+4*x^2 + 3*x + 2
+
+julia> s = p + q
+7*x^2 + 5*x + 3
 ```
 
 Naturally functions like `polynomial` and `matrix` and the light-weight parent

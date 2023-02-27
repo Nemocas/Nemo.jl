@@ -68,8 +68,9 @@ jobs:
             using Pkg
             Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()
-            using Documenter: doctest
+            using Documenter
             using Nemo
+            DocMeta.setdocmeta!(Nemo, :DocTestSetup, :(using Nemo); recursive = true)
             doctest(Nemo)'
       - name: "Process code coverage"
         continue-on-error: true

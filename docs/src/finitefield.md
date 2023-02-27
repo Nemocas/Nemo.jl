@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Nemo
+DocTestSetup = quote
+    using Nemo
+end
 ```
 
 # Finite fields
@@ -65,16 +68,30 @@ resulting parent objects to coerce various elements into those fields.
 
 **Examples**
 
-```julia
-R, x = FiniteField(7, 3, "x")
-S, y = FiniteField(ZZ(12431351431561), 2, "y")
-T, t = polynomial_ring(residue_ring(ZZ, 12431351431561), "t")
-U, z = FiniteField(t^2 + 7, "z")
+```jldoctest
+julia> R, x = FiniteField(7, 3, "x")
+(Finite field of degree 3 over F_7, x)
 
-a = R(5)
-b = R(x)
-c = S(ZZ(11))
-d = U(7)
+julia> S, y = FiniteField(ZZ(12431351431561), 2, "y")
+(Finite field of degree 2 over F_12431351431561, y)
+
+julia> T, t = polynomial_ring(residue_ring(ZZ, 12431351431561), "t")
+(Univariate Polynomial Ring in t over Integers modulo 12431351431561, t)
+
+julia> U, z = FiniteField(t^2 + 7, "z")
+(Finite field of degree 2 over F_12431351431561, z)
+
+julia> a = R(5)
+5
+
+julia> b = R(x)
+x
+
+julia> c = S(ZZ(11))
+11
+
+julia> d = U(7)
+7
 ```
 
 ### Basic manipulation
@@ -101,14 +118,24 @@ modulus(::FqPolyRepField)
 
 **Examples**
 
-```julia
-R, x = FiniteField(ZZ(7), 5, "x")
+```jldoctest
+julia> R, x = FiniteField(ZZ(7), 5, "x")
+(Finite field of degree 5 over F_7, x)
 
-c = gen(R)
-d = characteristic(R)
-f = order(R)
-g = degree(R)
-n = is_gen(x)
+julia> c = gen(R)
+x
+
+julia> d = characteristic(R)
+7
+
+julia> f = order(R)
+16807
+
+julia> g = degree(R)
+5
+
+julia> n = is_gen(x)
+true
 ```
 
 ### Special functions
@@ -133,16 +160,27 @@ pth_root(::FqPolyRepFieldElem)
 
 **Examples**
 
-```julia
-R, x = FiniteField(ZZ(7), 5, "x")
+```jldoctest
+julia> R, x = FiniteField(ZZ(7), 5, "x")
+(Finite field of degree 5 over F_7, x)
 
-a = x^4 + 3x^2 + 6x + 1
+julia> a = x^4 + 3x^2 + 6x + 1
+x^4 + 3*x^2 + 6*x + 1
 
-b = tr(a)
-c = norm(a)
-d = frobenius(a)
-f = frobenius(a, 3)
-g = pth_root(a)
+julia> b = tr(a)
+1
+
+julia> c = norm(a)
+4
+
+julia> d = frobenius(a)
+x^4 + 2*x^3 + 3*x^2 + 5*x + 1
+
+julia> f = frobenius(a, 3)
+3*x^4 + 3*x^3 + 3*x^2 + x + 4
+
+julia> g = pth_root(a)
+4*x^4 + 3*x^3 + 4*x^2 + 5*x + 2
 ```
 
 ### Lift
@@ -153,13 +191,16 @@ lift(::FpPolyRing, ::FqPolyRepFieldElem)
 
 **Examples**
 
-```julia
-R, x = FiniteField(23, 2, "x")
-S, y = polynomial_ring(GF(23), "y")
+```jldoctest
+julia> R, x = FiniteField(23, 2, "x")
+(Finite field of degree 2 over F_23, x)
 
-f = 8x + 9
+julia> S, y = polynomial_ring(GF(23), "y")
+(Univariate Polynomial Ring in y over Galois field with characteristic 23, y)
 
-lift(S, f)
-```
+julia> f = 8x + 9
+8*x + 9
 
+julia> lift(S, f)
+8*y + 9
 ```

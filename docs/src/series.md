@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Nemo
+DocTestSetup = quote
+    using Nemo
+end
 ```
 
 # Power series and Laurent series
@@ -158,17 +161,31 @@ rings.
 
 **Examples**
 
-```julia
-S, x = power_series_ring(R, 30, "x")
-T, z = power_series_ring(QQ, 30, "z")
+```jldoctest
+julia> T, z = power_series_ring(QQ, 30, "z")
+(Univariate power series ring in z over Rational Field, z + O(z^31))
 
-a = 1 + z + 3z^2 + O(z^5)
-b = z + 2z^2 + 5z^3 + O(z^5)
+julia> a = 1 + z + 3z^2 + O(z^5)
+1 + z + 3*z^2 + O(z^5)
 
-d = divexact(x, exp(x + O(x^40)) - 1)
-f = exp(b)
-g = log(a)
-h = sqrt(a)
-k = sin(b)
-m = atanh(b)
+julia> b = z + 2z^2 + 5z^3 + O(z^5)
+z + 2*z^2 + 5*z^3 + O(z^5)
+
+julia> d = divexact(z, exp(z + O(z^40)) - 1)
+1 - 1//2*z + 1//12*z^2 - 1//720*z^4 + 1//30240*z^6 - 1//1209600*z^8 + 1//47900160*z^10 - 691//1307674368000*z^12 + 1//74724249600*z^14 - 3617//10670622842880000*z^16 + 43867//5109094217170944000*z^18 - 174611//802857662698291200000*z^20 + 77683//14101100039391805440000*z^22 - 236364091//1693824136731743669452800000*z^24 + 657931//186134520519971831808000000*z^26 - 3392780147//37893265687455865519472640000000*z^28 + O(z^29)
+
+julia> f = exp(b)
+1 + z + 5//2*z^2 + 43//6*z^3 + 193//24*z^4 + O(z^5)
+
+julia> g = log(a)
+z + 5//2*z^2 - 8//3*z^3 - 7//4*z^4 + O(z^5)
+
+julia> h = sqrt(a)
+1 + 1//2*z + 11//8*z^2 - 11//16*z^3 - 77//128*z^4 + O(z^5)
+
+julia> k = sin(b)
+z + 2*z^2 + 29//6*z^3 - z^4 + O(z^5)
+
+julia> m = atanh(b)
+z + 2*z^2 + 16//3*z^3 + 2*z^4 + O(z^5)
 ```

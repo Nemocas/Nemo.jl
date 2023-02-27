@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Nemo
+DocTestSetup = quote
+    using Nemo
+end
 ```
 
 # Fraction fields
@@ -17,7 +20,7 @@ of the elements $a$ and $b$ is first divided by the canonical unit of $b$.
 The `canonical_unit` function is defined for elements of every Nemo ring. It
 must have the properties
 
-```
+```julia
 canonical_unit(u) == u
 canonical_unit(a*b) == canonical_unit(a)*canonical_unit(b)
 ```
@@ -91,8 +94,11 @@ ceil(::QQFieldElem)
 **Examples**
 
 ```julia
-d = abs(ZZ(11)//3)
-4 <= ZZ(7)//ZZ(3)
+julia> d = abs(ZZ(11)//3)
+11//3
+
+julia> 4 <= ZZ(7)//ZZ(3)
+false
 ```
 
 ### Modular arithmetic
@@ -103,37 +109,12 @@ The following functions are available for rationals.
 mod(a::QQFieldElem, b::ZZRingElem)
 ```
 
-```@docs
-mod(a::QQFieldElem, b::Integer)
-```
-
-**Examples**
-
-```julia
-a = -ZZRingElem(2)//3
-b = ZZRingElem(1)//2
-
-c = mod(a, 7)
-d = mod(b, ZZRingElem(5))
-```
-
 ### Rational Reconstruction
 
 Rational reconstruction is available for rational numbers.
 
 ```@docs
 reconstruct(::ZZRingElem, ::ZZRingElem)
-reconstruct(::ZZRingElem, ::Integer)
-reconstruct(::Integer, ::ZZRingElem)
-reconstruct(::Integer, ::Integer)
-```
-
-**Examples**
-
-```julia
-a = reconstruct(7, 13)
-b = reconstruct(ZZRingElem(15), 31)
-c = reconstruct(ZZRingElem(123), ZZRingElem(237))
 ```
 
 ## Rational enumeration
@@ -154,15 +135,6 @@ next_calkin_wilf(::QQFieldElem)
 
 ```@docs
 next_signed_calkin_wilf(::QQFieldElem)
-```
-
-**Examples**
-
-```julia
-next_minimal(ZZRingElem(2)//3)
-next_signed_minimal(-ZZRingElem(21)//31)
-next_calkin_wilf(ZZRingElem(321)//113)
-next_signed_calkin_wilf(-ZZRingElem(51)//(17))
 ```
 
 ### Random generation
@@ -191,27 +163,6 @@ bernoulli_cache(::Int)
 dedekind_sum(::ZZRingElem, ::ZZRingElem)
 ```
 
-**Examples**
-
-```julia
-a = harmonic(12)
-
-b = dedekind_sum(12, 13)
-c = dedekind_sum(-120, ZZRingElem(1305))
-
-d = bernoulli(12)
-
-bernoulli_cache(100)
-e = bernoulli(100)
-```
-
 ```@docs
 simplest_between(::QQFieldElem, ::QQFieldElem)
 ```
-
-**Examples**
-
-```julia
-simplest_between(QQFieldElem(1//10), QQFieldElem(3//10))
-```
-

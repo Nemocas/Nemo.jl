@@ -898,6 +898,13 @@ end
 Return a square root of $x (\mod m)$ if one exists. The remainder will be in
 the range $[0, m)$. We require that $m$ is prime, otherwise the algorithm may
 not terminate.
+
+# Examples
+
+```jldoctest
+julia> sqrtmod(ZZ(12), ZZ(13))
+5
+```
 """
 function sqrtmod(x::ZZRingElem, m::ZZRingElem)
     m <= 0 && throw(DomainError(m, "Modulus must be non-negative"))
@@ -941,6 +948,16 @@ end
 As per the AbstractAlgebra `crt` interface, with the following option.
 If `signed = true`, the solution is the range $(-m/2, m/2]$, otherwise it is in
 the range $[0,m)$, where $m$ is the least common multiple of the moduli.
+
+# Examples
+
+```jldoctest
+julia> crt(ZZ(5), ZZ(13), ZZ(7), ZZ(37), true)
+44
+
+julia> crt(ZZ(5), ZZ(13), 7, 37, true)
+44
+```
 """
 function crt(r1::ZZRingElem, m1::ZZRingElem, r2::ZZRingElem, m2::ZZRingElem, signed=false; check::Bool=true)
    r, m = AbstractAlgebra._crt_with_lcm_stub(r1, m1, r2, m2; check=check)
@@ -1038,8 +1055,20 @@ end
 
 @doc Markdown.doc"""
     flog(x::ZZRingElem, c::ZZRingElem)
+    flog(x::ZZRingElem, c::Int)
 
 Return the floor of the logarithm of $x$ to base $c$.
+
+# Examples
+
+```jldoctest
+julia> flog(ZZ(12), ZZ(2))
+3
+
+julia> flog(ZZ(12), 3)
+2
+
+```
 """
 function flog(x::ZZRingElem, c::ZZRingElem)
     c <= 0 && throw(DomainError(c, "Base must be non-negative"))
@@ -1048,10 +1077,28 @@ function flog(x::ZZRingElem, c::ZZRingElem)
                  (Ref{ZZRingElem}, Ref{ZZRingElem}), x, c)
 end
 
+function flog(x::ZZRingElem, c::Int)
+    c <= 0 && throw(DomainError(c, "Base must be non-negative"))
+    return ccall((:fmpz_flog_ui, libflint), Int,
+                 (Ref{ZZRingElem}, Int), x, c)
+end
+
 @doc Markdown.doc"""
     clog(x::ZZRingElem, c::ZZRingElem)
+    clog(x::ZZRingElem, c::Int)
 
 Return the ceiling of the logarithm of $x$ to base $c$.
+
+# Examples
+
+```jldoctest
+julia> clog(ZZ(12), ZZ(2))
+4
+
+julia> clog(ZZ(12), 3)
+3
+
+```
 """
 function clog(x::ZZRingElem, c::ZZRingElem)
     c <= 0 && throw(DomainError(c, "Base must be non-negative"))
@@ -1060,22 +1107,6 @@ function clog(x::ZZRingElem, c::ZZRingElem)
                  (Ref{ZZRingElem}, Ref{ZZRingElem}), x, c)
 end
 
-@doc Markdown.doc"""
-    flog(x::ZZRingElem, c::Int)
-
-Return the floor of the logarithm of $x$ to base $c$.
-"""
-function flog(x::ZZRingElem, c::Int)
-    c <= 0 && throw(DomainError(c, "Base must be non-negative"))
-    return ccall((:fmpz_flog_ui, libflint), Int,
-                 (Ref{ZZRingElem}, Int), x, c)
-end
-
-@doc Markdown.doc"""
-    clog(x::ZZRingElem, c::Int)
-
-Return the ceiling of the logarithm of $x$ to base $c$.
-"""
 function clog(x::ZZRingElem, c::Int)
     c <= 0 && throw(DomainError(c, "Base must be non-negative"))
     return ccall((:fmpz_clog_ui, libflint), Int,
@@ -1253,6 +1284,14 @@ sqrt_residues = [[0, 1], [0, 1, 4], [0, 1, 2, 4], [0, 1, 4]]
     isqrt(x::ZZRingElem)
 
 Return the floor of the square root of $x$.
+
+# Examples
+
+```jldoctest
+julia> isqrt(ZZ(13))
+3
+
+```
 """
 function isqrt(x::ZZRingElem)
     x < 0 && throw(DomainError(x, "Argument must be non-negative"))
@@ -1266,6 +1305,14 @@ end
 
 Return a tuple $s, r$ consisting of the floor $s$ of the square root of $x$
 and the remainder $r$, i.e. such that $x = s^2 + r$. We require $x \geq 0$.
+
+# Examples
+
+```jldoctest
+julia> isqrtrem(ZZ(13))
+(3, 4)
+
+```
 """
 function isqrtrem(x::ZZRingElem)
     x < 0 && throw(DomainError(x, "Argument must be non-negative"))
@@ -1325,6 +1372,13 @@ Return the $n$-the root of $x$. We require $n > 0$ and that
 $x \geq 0$ if $n$ is even. By default the function tests whether the input was
 a perfect $n$-th power and if not raises an exception. If `check=false` this
 check is omitted.
+
+# Examples
+
+```jldoctest
+julia> root(ZZ(27), 3; check=true)
+3
+```
 """
 function root(x::ZZRingElem, n::Int; check::Bool=true)
    x < 0 && iseven(n) && throw(DomainError((x, n), "Argument `x` must be positive if exponent `n` is even"))
@@ -1341,6 +1395,13 @@ end
 
 Return the integer truncation of the $n$-the root of $x$ (round towards zero).
 We require $n > 0$ and that $x \geq 0$ if $n$ is even.
+
+# Examples
+
+```jldoctest
+julia> iroot(ZZ(13), 3)
+2
+```
 """
 function iroot(x::ZZRingElem, n::Int)
    x < 0 && iseven(n) && throw(DomainError((x, n), "Argument `x` must be positive if exponent `n` is even"))
@@ -1456,6 +1517,20 @@ end
 
 Return a factorisation of $a$ using a `Fac` struct (see the documentation on
 factorisation in Nemo).
+
+# Examples
+
+```jldoctest
+julia> factor(ZZ(12))
+1 * 2^2 * 3
+
+julia> factor(UInt(12))
+1 * 2^2 * 3
+
+julia> factor(12)
+1 * 2^2 * 3
+
+```
 """
 function factor(a::ZZRingElem)
    if iszero(a)
@@ -1543,19 +1618,22 @@ is_prime(x::UInt) = Bool(ccall((:n_is_prime, libflint), Cint, (UInt,), x))
 
 @doc Markdown.doc"""
     is_prime(x::ZZRingElem)
+    is_prime(x::Int)
 
 Return `true` if $x$ is a prime number, otherwise return `false`.
+
+# Examples
+
+```jldoctest
+julia> is_prime(ZZ(13))
+true
+```
 """
 function is_prime(x::ZZRingElem)
   !is_probable_prime(x) && return false
   return Bool(ccall((:fmpz_is_prime, libflint), Cint, (Ref{ZZRingElem},), x))
 end
 
-@doc Markdown.doc"""
-    is_prime(x::Int)
-
-Return `true` if $x$ is a prime number, otherwise return `false`.
-"""
 function is_prime(n::Int)
   if n < 0
     return false
@@ -1688,6 +1766,13 @@ end
 
 Return the factorial of $x$, i.e. $x! = 1.2.3\ldots x$. We require
 $x \geq 0$.
+
+# Examples
+
+```jldoctest
+julia> factorial(ZZ(100))
+93326215443944152681699238856266700490715968264381621468592963895217599993229915608941463976156518286253697920827223758251185210916864000000000000000000000000
+```
 """
 function factorial(x::ZZRingElem)
     x < 0 && throw(DomainError(x, "Argument must be non-negative"))
@@ -1954,9 +2039,24 @@ end
 
 @doc Markdown.doc"""
     divisor_sigma(x::ZZRingElem, y::Int)
+    divisor_sigma(x::ZZRingElem, y::ZZRingElem)
+    divisor_sigma(x::Int, y::Int)
 
 Return the value of the sigma function, i.e. $\sum_{0 < d \;| x} d^y$. If
 $x \leq 0$ or $y < 0$ we throw a `DomainError()`.
+
+# Examples
+
+```jldoctest
+julia> divisor_sigma(ZZ(32), 10)
+1127000493261825
+
+julia> divisor_sigma(ZZ(32), ZZ(10))
+1127000493261825
+
+julia> divisor_sigma(32, 10)
+1127000493261825
+```
 """
 function divisor_sigma(x::ZZRingElem, y::Int)
    x <= 0 && throw(DomainError(x, "Argument must be positive"))
@@ -1967,28 +2067,26 @@ function divisor_sigma(x::ZZRingElem, y::Int)
    return z
 end
 
-@doc Markdown.doc"""
-    divisor_sigma(x::ZZRingElem, y::ZZRingElem)
-
-Return the value of the sigma function, i.e. $\sum_{0 < d \;| x} d^y$. If
-$x \leq 0$ or $y < 0$ we throw a `DomainError()`.
-"""
 divisor_sigma(x::ZZRingElem, y::ZZRingElem) = divisor_sigma(x, Int(y))
-
-@doc Markdown.doc"""
-    divisor_sigma(x::Int, y::Int)
-
-Return the value of the sigma function, i.e. $\sum_{0 < d \;| x} d^y$. If
-$x \leq 0$ or $y < 0$ we throw a `DomainError()`.
-"""
 divisor_sigma(x::Int, y::Int) = Int(divisor_sigma(ZZRingElem(x), y))
 
 @doc Markdown.doc"""
     euler_phi(x::ZZRingElem)
+    euler_phi(x::Int)
 
 Return the value of the Euler phi function at $x$, i.e. the number of
 positive integers up to $x$ (inclusive) that are coprime with $x$. An
 exception is raised if $x \leq 0$.
+
+# Examples
+
+```jldoctest
+julia> euler_phi(ZZ(12480))
+3072
+
+julia> euler_phi(12480)
+3072
+```
 """
 function euler_phi(x::ZZRingElem)
    x <= 0 && throw(DomainError(x, "Argument must be positive"))
@@ -1998,20 +2096,24 @@ function euler_phi(x::ZZRingElem)
    return z
 end
 
-@doc Markdown.doc"""
-    euler_phi(x::Int)
-
-Return the value of the Euler phi function at $x$, i.e. the number of
-positive integers up to $x$ (inclusive) that are coprime with $x$. An
-exception is raised if $x \leq 0$.
-"""
 euler_phi(x::Int) = Int(euler_phi(ZZRingElem(x)))
 
 @doc Markdown.doc"""
     number_of_partitions(x::Int)
+    number_of_partitions(x::ZZRingElem)
 
 Return the number of partitions of $x$. This function is not available on
 Windows 64.
+
+# Examples
+
+```jldoctest
+julia> number_of_partitions(100)
+190569292
+
+julia> number_of_partitions(ZZ(1000))
+24061467864032622473692149727991
+```
 """
 function number_of_partitions(x::Int)
    if (Sys.iswindows() ? true : false) && Int == Int64
@@ -2026,12 +2128,6 @@ function number_of_partitions(x::Int)
    return Int(z)
 end
 
-@doc Markdown.doc"""
-    number_of_partitions(x::ZZRingElem)
-
-Return the number of partitions of $x$. This function is not available on
-Windows 64.
-"""
 function number_of_partitions(x::ZZRingElem)
    if (Sys.iswindows() ? true : false) && Int == Int64
       error("not yet supported on win64")
@@ -2055,6 +2151,13 @@ end
     bin(n::ZZRingElem)
 
 Return $n$ as a binary string.
+
+# Examples
+
+```jldoctest
+julia> bin(ZZ(12))
+"1100"
+```
 """
 bin(n::ZZRingElem) = base(n, 2)
 
@@ -2062,6 +2165,13 @@ bin(n::ZZRingElem) = base(n, 2)
     oct(n::ZZRingElem)
 
 Return $n$ as a octal string.
+
+# Examples
+
+```jldoctest
+julia> oct(ZZ(12))
+"14"
+```
 """
 oct(n::ZZRingElem) = base(n, 8)
 
@@ -2069,6 +2179,13 @@ oct(n::ZZRingElem) = base(n, 8)
     dec(n::ZZRingElem)
 
 Return $n$ as a decimal string.
+
+# Examples
+
+```jldoctest
+julia> dec(ZZ(12))
+"12"
+```
 """
 dec(n::ZZRingElem) = base(n, 10)
 
@@ -2076,6 +2193,13 @@ dec(n::ZZRingElem) = base(n, 10)
     hex(n::ZZRingElem) = base(n, 16)
 
 Return $n$ as a hexadecimal string.
+
+# Examples
+
+```jldoctest
+julia> hex(ZZ(12))
+"c"
+```
 """
 hex(n::ZZRingElem) = base(n, 16)
 
@@ -2083,6 +2207,13 @@ hex(n::ZZRingElem) = base(n, 16)
     base(n::ZZRingElem, b::Integer)
 
 Return $n$ as a string in base $b$. We require $2 \leq b \leq 62$.
+
+# Examples
+
+```jldoctest
+julia> base(ZZ(12), 13)
+"c"
+```
 """
 function base(n::ZZRingElem, b::Integer)
     2 <= b <= 62 || error("invalid base: $b")
@@ -2097,6 +2228,13 @@ end
     ndigits(x::ZZRingElem, b::Integer)
 
 Return the number of digits of $x$ in the base $b$ (default is $b = 10$).
+
+# Examples
+
+```jldoctest
+julia> ndigits(ZZ(12), 3)
+3
+```
 """
 function ndigits(x::ZZRingElem, b::Integer)::Int
    ndigits(x, base=b)
@@ -2141,6 +2279,13 @@ end
     nbits(x::ZZRingElem)
 
 Return the number of binary bits of $x$. We return zero if $x = 0$.
+
+# Examples
+
+```jldoctest
+julia> nbits(ZZ(12))
+4
+```
 """
 nbits(x::ZZRingElem) = iszero(x) ? 0 : Int(ccall((:fmpz_bits, libflint), Clong,
                   (Ref{ZZRingElem},), x))  
@@ -2155,6 +2300,13 @@ nbits(x::ZZRingElem) = iszero(x) ? 0 : Int(ccall((:fmpz_bits, libflint), Clong,
     popcount(x::ZZRingElem)
 
 Return the number of ones in the binary representation of $x$.
+
+# Examples
+
+```jldoctest
+julia> popcount(ZZ(12))
+2
+```
 """
 popcount(x::ZZRingElem) = Int(ccall((:fmpz_popcnt, libflint), UInt,
                               (Ref{ZZRingElem},), x))
@@ -2171,6 +2323,13 @@ prevpow2(x::ZZRingElem) = x < 0 ? -prevpow2(-x) :
     nextpow2(x::ZZRingElem)
 
 Return the next power of $2$ that is at least $x$.
+
+# Examples
+
+```jldoctest
+julia> nextpow2(ZZ(12))
+16
+```
 """
 nextpow2(x::ZZRingElem) = x < 0 ? -nextpow2(-x) :
                             (x <= 2 ? x : one(FlintZZ) << ndigits(x - 1, 2))
@@ -2194,6 +2353,18 @@ trailing_zeros(x::ZZRingElem) = ccall((:fmpz_val2, libflint), Int,
 
 Clear bit $c$ of $x$, where the least significant bit is the $0$-th bit. Note
 that this function modifies its input in-place.
+
+# Examples
+
+```jldoctest
+julia> a = ZZ(12)
+12
+
+julia> clrbit!(a, 3)
+
+julia> a
+4
+```
 """
 function clrbit!(x::ZZRingElem, c::Int)
     c < 0 && throw(DomainError(c, "Second argument must be non-negative"))
@@ -2205,6 +2376,18 @@ end
 
 Set bit $c$ of $x$, where the least significant bit is the $0$-th bit. Note
 that this function modifies its input in-place.
+
+# Examples
+
+```jldoctest
+julia> a = ZZ(12)
+12
+
+julia> setbit!(a, 0)
+
+julia> a
+13
+```
 """
 function setbit!(x::ZZRingElem, c::Int)
     c < 0 && throw(DomainError(c, "Second argument must be non-negative"))
@@ -2216,6 +2399,18 @@ end
 
 Complement bit $c$ of $x$, where the least significant bit is the $0$-th bit.
 Note that this function modifies its input in-place.
+
+# Examples
+
+```jldoctest
+julia> a = ZZ(12)
+12
+
+julia> combit!(a, 2)
+
+julia> a
+8
+```
 """
 function combit!(x::ZZRingElem, c::Int)
     c < 0 && throw(DomainError(c, "Second argument must be non-negative"))
@@ -2226,6 +2421,19 @@ end
     tstbit(x::ZZRingElem, c::Int)
 
 Return bit $i$ of x (numbered from 0) as `true` for 1 or `false` for 0.
+
+# Examples
+
+```jldoctest
+julia> a = ZZ(12)
+12
+
+julia> tstbit(a, 0)
+false
+
+julia> tstbit(a, 2)
+true
+```
 """
 function tstbit(x::ZZRingElem, c::Int)
    return c >= 0 && Bool(ccall((:fmpz_tstbit, libflint), Cint,

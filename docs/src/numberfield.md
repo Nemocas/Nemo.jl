@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Nemo
+DocTestSetup = quote
+    using Nemo
+end
 ```
 
 # Number field arithmetic
@@ -184,12 +187,19 @@ tr(::nf_elem)
 
 **Examples**
 
-```julia
-R, x = polynomial_ring(QQ, "x")
-K, a = number_field(x^3 + 3x + 1, "a")
+```jldoctest
+julia> R, x = polynomial_ring(QQ, "x")
+(Univariate Polynomial Ring in x over Rational Field, x)
 
-c = 3a^2 - a + 1
+julia> K, a = number_field(x^3 + 3x + 1, "a")
+(Number field over Rational Field with defining polynomial x^3 + 3*x + 1, a)
 
-d = norm(c)
-f = tr(c)
+julia> c = 3a^2 - a + 1
+3*a^2 - a + 1
+
+julia> d = norm(c)
+113
+
+julia> f = tr(c)
+-15
 ```

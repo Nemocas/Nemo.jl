@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Nemo
+DocTestSetup = quote
+    using Nemo
+end
 ```
 
 # Qadics
@@ -94,8 +97,8 @@ $p^n$ as in the examples.
 **Examples**
 
 ```julia
-R, _ = QadicField(7, 30)
-S, _ = QadicField(ZZ(65537), 30)
+R, _ = QadicField(7, 1, 30)
+S, _ = QadicField(ZZ(65537), 1, 30)
 
 c = 1 + 2*7 + 4*7^2 + O(R, 7^3)
 d = 13 + 357*ZZ(65537) + O(S, ZZ(65537)^12)

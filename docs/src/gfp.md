@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Nemo
+DocTestSetup = quote
+    using Nemo
+end
 ```
 
 # Galois fields
@@ -55,9 +58,13 @@ Below we describe the functionality that is provided in addition to these.
 
 **Examples**
 
-```julia
-F = GF(3)
+```jldoctest
+julia> F = GF(3)
+Galois field with characteristic 3
 
-a = characteristic(F)
-b = order(F)
+julia> a = characteristic(F)
+3
+
+julia> b = order(F)
+3
 ```

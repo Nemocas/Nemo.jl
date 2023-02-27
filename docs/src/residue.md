@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Nemo
+DocTestSetup = quote
+    using Nemo
+end
 ```
 
 # Residue rings
@@ -51,8 +54,10 @@ gcdx(::ZZModRingElem, ::ZZModRingElem)
 
 **Examples**
 
-```julia
-R = residue_ring(ZZ, 123456789012345678949)
+```jldoctest
+julia> R = residue_ring(ZZ, 123456789012345678949)
+Integers modulo 123456789012345678949
 
-g, s, t = gcdx(R(123), R(456))
+julia> g, s, t = gcdx(R(123), R(456))
+(1, 123456789012345678928, 41152263004115226322)
 ```

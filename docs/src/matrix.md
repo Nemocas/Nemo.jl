@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = Nemo
+DocTestSetup = quote
+    using Nemo
+end
 ```
 
 # Matrices
@@ -97,7 +100,7 @@ contains(D, C)
 ```julia
 S = matrix_space(ZZ, 3, 3)
 
-A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
+A = S([ZZ(2) 3 5; 1 4 7; 9 6 3])
 
 B = A<<5
 C = B>>2
@@ -119,7 +122,7 @@ det_given_divisor(::ZZMatrix, ::ZZRingElem, ::Bool)
 ```julia
 S = matrix_space(ZZ, 3, 3)
 
-A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
+A = S([ZZ(2) 3 5; 1 4 7; 9 6 3])
 
 c = det_divisor(A)
 d = det_given_divisor(A, c)
@@ -142,8 +145,8 @@ solve_dixon(::QQMatrix, ::QQMatrix)
 S = matrix_space(ZZ, 3, 3)
 T = matrix_space(ZZ, 3, 1)
 
-A = S([ZZRingElem(2) 3 5; 1 4 7; 9 2 2])
-B = T([ZZRingElem(4), 5, 7])
+A = S([ZZ(2) 3 5; 1 4 7; 9 2 2])
+B = T([ZZ(4), 5, 7])
 
 X, m = solve_dixon(A, B)
 ```
@@ -182,7 +185,7 @@ reduce_mod(::ZZMatrix, ::ZZRingElem)
 ```julia
 S = matrix_space(ZZ, 3, 3)
 
-A = S([ZZRingElem(2) 3 5; 1 4 7; 9 2 2])
+A = S([ZZ(2) 3 5; 1 4 7; 9 2 2])
 
 reduce_mod(A, ZZ(5))
 reduce_mod(A, 2)
@@ -258,12 +261,12 @@ is_hnf(::ZZMatrix)
 ```julia
 S = matrix_space(ZZ, 3, 3)
 
-A = S([ZZRingElem(2) 3 5; 1 4 7; 19 3 7])
+A = S([ZZ(2) 3 5; 1 4 7; 19 3 7])
 
 B = hnf(A)
 H, T = hnf_with_transform(A)
-M = hnf_modular(A, ZZRingElem(27))
-N = hnf_modular_eldiv(A, ZZRingElem(27))
+M = hnf_modular(A, ZZ(27))
+N = hnf_modular_eldiv(A, ZZ(27))
 is_hnf(M)
 ```
 
@@ -317,7 +320,7 @@ lll_gram!(::ZZMatrix, ::lll_ctx)
 ```julia
 S = matrix_space(ZZ, 3, 3)
 
-A = S([ZZRingElem(2) 3 5; 1 4 7; 19 3 7])
+A = S([ZZ(2) 3 5; 1 4 7; 19 3 7])
 
 L = lll(A, lll_ctx(0.95, 0.55, :zbasis, :approx)
 L, T = lll_with_transform(A)
@@ -325,8 +328,8 @@ L, T = lll_with_transform(A)
 G == lll_gram(gram(A))
 G, T = lll_gram_with_transform(gram(A))
 
-r, L = lll_with_removal(A, ZZRingElem(100))
-r, L, T = lll_with_removal_transform(A, ZZRingElem(100))
+r, L = lll_with_removal(A, ZZ(100))
+r, L, T = lll_with_removal_transform(A, ZZ(100))
 ```
 
 ### Smith Normal Form
@@ -348,12 +351,12 @@ is_snf(::ZZMatrix)
 ```julia
 S = matrix_space(ZZ, 3, 3)
 
-A = S([ZZRingElem(2) 3 5; 1 4 7; 19 3 7])
+A = S([ZZ(2) 3 5; 1 4 7; 19 3 7])
 
 B = snf(A)
 is_snf(B) == true
 
-B = S([ZZRingElem(2) 0 0; 0 4 0; 0 0 7])
+B = S([ZZ(2) 0 0; 0 4 0; 0 0 7])
 
 C = snf_diagonal(B)
 ```
