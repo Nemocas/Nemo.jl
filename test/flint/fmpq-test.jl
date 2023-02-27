@@ -414,12 +414,10 @@ end
    @test_throws DomainError root(-QQFieldElem(1000, 27), 4)
    @test_throws DomainError root(QQFieldElem(1000, 27), -3)
 
-#= Disabled until Flint-2.9 comes out
    @test_throws ErrorException root(QQFieldElem(1100, 27), 3; check=true)
    @test_throws ErrorException root(QQFieldElem(27, 7), 3; check=true)
    @test_throws ErrorException root(-QQFieldElem(40, 27), 3; check=true)
    @test_throws ErrorException root(-QQFieldElem(27, 7), 3; check=true)
-=#
 end
 
 @testset "QQFieldElem.rational_reconstruction" begin

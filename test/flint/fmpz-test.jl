@@ -597,10 +597,8 @@ end
    @test_throws DomainError root(-ZZRingElem(1000), 4)
    @test_throws DomainError root(ZZRingElem(1000), -3)
 
-#= Disabled until Flint-2.9 comes out
    @test_throws ErrorException root(ZZRingElem(1100), 3; check=true)
    @test_throws ErrorException root(-ZZRingElem(40), 3; check=true)
-=#
 
    @test iroot(ZZRingElem(1000), 3) == 10
    @test iroot(ZZRingElem(1100), 3) == 10

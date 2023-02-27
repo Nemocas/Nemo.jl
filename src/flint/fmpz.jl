@@ -1332,9 +1332,7 @@ function root(x::ZZRingElem, n::Int; check::Bool=true)
    z = ZZRingElem()
    res = ccall((:fmpz_root, libflint), Bool,
          (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), z, x, n)
-#= Check disabled until flint-2.9 comes out
    check && !res && error("Not a perfect n-th power (n = $n)")
-=#
    return z
 end
 
