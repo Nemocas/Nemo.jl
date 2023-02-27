@@ -413,8 +413,22 @@ function evaluate(x::RealPoly, y::RealFieldElem, prec::Int = precision(Balls))
    return z
 end
 
+function evaluate(x::RealPoly, y::acb, prec::Int = precision(Balls))
+   z = parent(y)()
+   ccall((:arb_poly_evaluate_acb, libarb), Nothing,
+                (Ref{acb}, Ref{RealPoly}, Ref{acb}, Int),
+                z, x, y, prec)
+   return z
+end
+
+evaluate(x::RealPoly, y::RingElem) = evaluate(x, base_ring(parent(x))(y))
+evaluate(x::RealPoly, y::Integer) = evaluate(x, base_ring(parent(x))(y))
+evaluate(x::RealPoly, y::Rational) = evaluate(x, base_ring(parent(x))(y))
+evaluate(x::RealPoly, y::Float64) = evaluate(x, base_ring(parent(x))(y))
+evaluate(x::RealPoly, y::Any) = evaluate(x, base_ring(parent(x))(y))
+
 @doc Markdown.doc"""
-    evaluate2(x::RealPoly, y::RealFieldElem)
+    evaluate2(x::RealPoly, y::RingElement)
 
 Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
 its derivative evaluated at $y$.
@@ -428,20 +442,6 @@ function evaluate2(x::RealPoly, y::RealFieldElem, prec::Int = precision(Balls))
    return z, w
 end
 
-function evaluate(x::RealPoly, y::acb, prec::Int = precision(Balls))
-   z = parent(y)()
-   ccall((:arb_poly_evaluate_acb, libarb), Nothing,
-                (Ref{acb}, Ref{RealPoly}, Ref{acb}, Int),
-                z, x, y, prec)
-   return z
-end
-
-@doc Markdown.doc"""
-    evaluate2(x::RealPoly, y::acb)
-
-Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
-its derivative evaluated at $y$.
-"""
 function evaluate2(x::RealPoly, y::ComplexFieldElem, prec::Int = precision(Balls))
    z = parent(y)()
    w = parent(y)()
@@ -451,21 +451,7 @@ function evaluate2(x::RealPoly, y::ComplexFieldElem, prec::Int = precision(Balls
    return z, w
 end
 
-for T in [Integer, Float64, ZZRingElem, QQFieldElem, Rational]
-  @eval begin
-    function evaluate(x::RealPoly, y::$T)
-        return evaluate(x, base_ring(parent(x))(y))
-    end
-  end
-end
-
-@doc Markdown.doc"""
-    evaluate2(x::RealPoly, y::Integer)
-
-Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
-its derivative evaluated at $y$.
-"""
-function evaluate2(x::RealPoly, y::Union{Integer, Float64, ZZRingElem, QQFieldElem, Rational})
+function evaluate2(x::RealPoly, y::RingElement)
     return evaluate2(x, base_ring(parent(x))(y))
 end
 

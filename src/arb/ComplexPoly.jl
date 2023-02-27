@@ -421,8 +421,14 @@ function evaluate(x::ComplexPoly, y::ComplexFieldElem, prec::Int = precision(Bal
    return z
 end
 
+evaluate(x::ComplexPoly, y::RingElem, prec::Int = precision(Balls)) = evaluate(x, base_ring(parent(x))(y), prec)
+evaluate(x::ComplexPoly, y::Integer, prec::Int = precision(Balls)) = evaluate(x, base_ring(parent(x))(y), prec)
+evaluate(x::ComplexPoly, y::Rational, prec::Int = precision(Balls)) = evaluate(x, base_ring(parent(x))(y), prec)
+evaluate(x::ComplexPoly, y::Float64, prec::Int = precision(Balls)) = evaluate(x, base_ring(parent(x))(y), prec)
+evaluate(x::ComplexPoly, y::Any, prec::Int = precision(Balls)) = evaluate(x, base_ring(parent(x))(y), prec)
+
 @doc Markdown.doc"""
-    evaluate2(x::ComplexPoly, y::ComplexFieldElem)
+    evaluate2(x::ComplexPoly, y::RingElement; prec::Int = precision(Balls))
 
 Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
 its derivative evaluated at $y$.
@@ -436,11 +442,7 @@ function evaluate2(x::ComplexPoly, y::ComplexFieldElem, prec::Int = precision(Ba
    return z, w
 end
 
-function evaluate(x::ComplexPoly, y::Union{Int, Float64, ZZRingElem, QQFieldElem, RealFieldElem}, prec::Int = precision(Balls))
-    return evaluate(x, base_ring(parent(x))(y), prec)
-end
-
-function evaluate2(x::ComplexPoly, y::Union{Integer, Float64, ZZRingElem, QQFieldElem, RealFieldElem}, prec::Int = precision(Balls))
+function evaluate2(x::ComplexPoly, y::RingElement, prec::Int = precision(Balls))
     return evaluate2(x, base_ring(parent(x))(y), prec)
 end
 

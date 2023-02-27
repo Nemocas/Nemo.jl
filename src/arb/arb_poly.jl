@@ -413,8 +413,22 @@ function evaluate(x::arb_poly, y::arb)
    return z
 end
 
+function evaluate(x::arb_poly, y::acb)
+   z = parent(y)()
+   ccall((:arb_poly_evaluate_acb, libarb), Nothing,
+                (Ref{acb}, Ref{arb_poly}, Ref{acb}, Int),
+                z, x, y, precision(parent(y)))
+   return z
+end
+
+evaluate(x::arb_poly, y::RingElem) = evaluate(x, base_ring(parent(x))(y))
+evaluate(x::arb_poly, y::Integer) = evaluate(x, base_ring(parent(x))(y))
+evaluate(x::arb_poly, y::Rational) = evaluate(x, base_ring(parent(x))(y))
+evaluate(x::arb_poly, y::Float64) = evaluate(x, base_ring(parent(x))(y))
+evaluate(x::arb_poly, y::Any) = evaluate(x, base_ring(parent(x))(y))
+
 @doc Markdown.doc"""
-    evaluate2(x::arb_poly, y::arb)
+    evaluate2(x::arb_poly, y::Any)
 
 Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
 its derivative evaluated at $y$.
@@ -428,20 +442,6 @@ function evaluate2(x::arb_poly, y::arb)
    return z, w
 end
 
-function evaluate(x::arb_poly, y::acb)
-   z = parent(y)()
-   ccall((:arb_poly_evaluate_acb, libarb), Nothing,
-                (Ref{acb}, Ref{arb_poly}, Ref{acb}, Int),
-                z, x, y, precision(parent(y)))
-   return z
-end
-
-@doc Markdown.doc"""
-    evaluate2(x::arb_poly, y::acb)
-
-Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
-its derivative evaluated at $y$.
-"""
 function evaluate2(x::arb_poly, y::acb)
    z = parent(y)()
    w = parent(y)()
@@ -451,53 +451,7 @@ function evaluate2(x::arb_poly, y::acb)
    return z, w
 end
 
-function evaluate(x::arb_poly, y::Union{Int,Float64,QQFieldElem})
-    return evaluate(x, base_ring(parent(x))(y))
-end
-
-function evaluate(x::arb_poly, y::ZZRingElem)
-    return evaluate(x, base_ring(parent(x))(y))
-end
-
-@doc Markdown.doc"""
-    evaluate2(x::arb_poly, y::Integer)
-
-Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
-its derivative evaluated at $y$.
-"""
-function evaluate2(x::arb_poly, y::Integer)
-    return evaluate2(x, base_ring(parent(x))(y))
-end
-
-@doc Markdown.doc"""
-    evaluate2(x::arb_poly, y::Float64)
-
-Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
-its derivative evaluated at $y$.
-"""
-function evaluate2(x::arb_poly, y::Float64)
-    return evaluate2(x, base_ring(parent(x))(y))
-end
-
-@doc Markdown.doc"""
-    evaluate2(x::arb_poly, y::ZZRingElem)
-
-Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
-its derivative evaluated at $y$.
-"""
-function evaluate2(x::arb_poly, y::ZZRingElem)
-    return evaluate2(x, base_ring(parent(x))(y))
-end
-
-@doc Markdown.doc"""
-    evaluate2(x::arb_poly, y::QQFieldElem)
-
-Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
-its derivative evaluated at $y$.
-"""
-function evaluate2(x::arb_poly, y::QQFieldElem)
-    return evaluate2(x, base_ring(parent(x))(y))
-end
+evaluate2(x::arb_poly, y::Any) = evaluate2(x, base_ring(parent(x))(y))
 
 ###############################################################################
 #
