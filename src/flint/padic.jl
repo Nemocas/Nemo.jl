@@ -239,7 +239,7 @@ function expressify(x::padic; context = nothing)
           u = div(u, p^v)
         end
       else
-        u = lift(x*p^-v)
+        u = lift(FlintZZ, x*p^-v)
       end
 
       if pmode == 1  # series
