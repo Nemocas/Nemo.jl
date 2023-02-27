@@ -48,6 +48,13 @@
    @test Nemo._GF(2, 1) === Nemo._GF(2)
    @test Nemo._GF(6, 1, check = false) isa FqField
    @test Nemo._FiniteField(2, 1)[1] isa FqField
+
+   # check that the check is correct
+   R, a = NGFiniteField(3, 1, "a")
+   Rx, x = R["x"]
+   f = x^2 + 1
+   F, b = NGFiniteField(f, "b")
+   @test F isa FqField
 end
 
 @testset "FqFieldElem.printing" begin

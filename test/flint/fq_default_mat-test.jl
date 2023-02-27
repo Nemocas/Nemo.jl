@@ -801,3 +801,24 @@ end
    M = rand(S)
    @test parent(M) == S
 end
+
+@testset "FqMatrix.pointer_fun" begin
+  ps = fmpz[2, 1073741827, 1180591620717411303449]
+  degs = [1, 2]
+  for p in ps
+    for d in degs
+      F, = NGFiniteField(p, d)
+      A = matrix(F, 2, 2, [rand(F) for i in 1:4])
+      GC.@preserve A begin
+        for i in 1:2
+          for j in 1:2
+            z = Nemo.fq_default_mat_entry_ptr(A, i, j)
+            zz = unsafe_load(z)
+            zz.parent = F
+            @test zz == A[i, j]
+          end
+        end
+      end
+    end
+  end
+end

@@ -801,3 +801,31 @@ end
 function matrix_space(R::FqField, r::Int, c::Int; cached::Bool = true)
   FqMatrixSpace(R, r, c, cached)
 end
+
+################################################################################
+#
+#  Entry pointers
+#
+################################################################################
+
+function fq_default_mat_entry_ptr(a::FqMatrix, i, j)
+  t = _fq_default_ctx_type(base_ring(a))
+  ptr = pointer_from_objref(a)
+  if t == _FQ_DEFAULT_FQ_ZECH
+    pptr = ccall((:fq_zech_mat_entry, libflint), Ptr{FqFieldElem},
+                 (Ptr{Cvoid}, Int, Int), ptr, i - 1, j - 1)
+  elseif t == _FQ_DEFAULT_FQ_NMOD
+    pptr = ccall((:fq_nmod_mat_entry, libflint), Ptr{FqFieldElem},
+                 (Ptr{Cvoid}, Int, Int), ptr, i - 1, j - 1)
+  elseif t == _FQ_DEFAULT_FQ
+    pptr = ccall((:fq_mat_entry, libflint), Ptr{FqFieldElem},
+                 (Ptr{Cvoid}, Int, Int), ptr, i - 1, j - 1)
+  elseif t == _FQ_DEFAULT_NMOD
+    pptr = ccall((:nmod_mat_entry_ptr, libflint), Ptr{FqFieldElem},
+                 (Ptr{Cvoid}, Int, Int), ptr, i - 1, j - 1)
+  else#if t == _FQ_DEFAULT_FMPZ_NMOD
+    pptr = ccall((:fmpz_mod_mat_entry, libflint), Ptr{FqFieldElem},
+                 (Ptr{Cvoid}, Int, Int), ptr, i - 1, j - 1)
+  end
+  return pptr
+end
