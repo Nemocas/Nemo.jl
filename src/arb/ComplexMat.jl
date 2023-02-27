@@ -441,7 +441,7 @@ Given a $n\times n$ matrix of type `acb_mat`, return an
 $n\times n$ matrix $X$ such that $AX$ contains the
 identity matrix. If $A$ cannot be inverted numerically an exception is raised.
 """
-function inv(x::ComplexMat, prec = precision(Balls))
+function inv(x::ComplexMat, prec::Int = precision(Balls))
   ncols(x) != nrows(x) && error("Matrix must be square")
   z = similar(x)
   r = ccall((:acb_mat_inv, libarb), Cint,
@@ -513,7 +513,7 @@ divexact(x::ComplexMat, y::Rational{T}; check::Bool=true) where T <: Union{Int, 
 #
 ################################################################################
 
-function charpoly(x::AcbPolyRing, y::ComplexMat, prec = precision(Balls))
+function charpoly(x::AcbPolyRing, y::ComplexMat, prec::Int = precision(Balls))
   base_ring(x) != base_ring(y) && error("Base rings must coincide")
   z = x()
   ccall((:acb_mat_charpoly, libarb), Nothing,
@@ -527,7 +527,7 @@ end
 #
 ################################################################################
 
-function det(x::ComplexMat, prec = precision(Balls))
+function det(x::ComplexMat, prec::Int = precision(Balls))
   ncols(x) != nrows(x) && error("Matrix must be square")
   z = base_ring(x)()
   ccall((:acb_mat_det, libarb), Nothing,
@@ -676,7 +676,7 @@ end
 for (s,f) in (("add!","acb_mat_add"), ("mul!","acb_mat_mul"),
               ("sub!","acb_mat_sub"))
   @eval begin
-    function ($(Symbol(s)))(z::ComplexMat, x::ComplexMat, y::ComplexMat, prec = precision(Balls))
+    function ($(Symbol(s)))(z::ComplexMat, x::ComplexMat, y::ComplexMat, prec::Int = precision(Balls))
       ccall(($f, libarb), Nothing,
                   (Ref{ComplexMat}, Ref{ComplexMat}, Ref{ComplexMat}, Int),
                   z, x, y, prec)

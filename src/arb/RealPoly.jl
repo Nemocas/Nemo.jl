@@ -376,7 +376,7 @@ function truncate(a::RealPoly, n::Int)
    return z
 end
 
-function mullow(x::RealPoly, y::RealPoly, n::Int, prec = precision(Balls))
+function mullow(x::RealPoly, y::RealPoly, n::Int, prec::Int = precision(Balls))
    n < 0 && throw(DomainError(n, "Index must be non-negative"))
    z = parent(x)()
    ccall((:arb_poly_mullow, libarb), Nothing,
@@ -405,7 +405,7 @@ end
 #
 ###############################################################################
 
-function evaluate(x::RealPoly, y::RealFieldElem, prec = precision(Balls))
+function evaluate(x::RealPoly, y::RealFieldElem, prec::Int = precision(Balls))
    z = parent(y)()
    ccall((:arb_poly_evaluate, libarb), Nothing,
                 (Ref{RealFieldElem}, Ref{RealPoly}, Ref{RealFieldElem}, Int),
@@ -419,7 +419,7 @@ end
 Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
 its derivative evaluated at $y$.
 """
-function evaluate2(x::RealPoly, y::RealFieldElem, prec = precision(Balls))
+function evaluate2(x::RealPoly, y::RealFieldElem, prec::Int = precision(Balls))
    z = parent(y)()
    w = parent(y)()
    ccall((:arb_poly_evaluate2, libarb), Nothing,
@@ -428,7 +428,7 @@ function evaluate2(x::RealPoly, y::RealFieldElem, prec = precision(Balls))
    return z, w
 end
 
-function evaluate(x::RealPoly, y::acb, prec = precision(Balls))
+function evaluate(x::RealPoly, y::acb, prec::Int = precision(Balls))
    z = parent(y)()
    ccall((:arb_poly_evaluate_acb, libarb), Nothing,
                 (Ref{acb}, Ref{RealPoly}, Ref{acb}, Int),
@@ -442,7 +442,7 @@ end
 Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
 its derivative evaluated at $y$.
 """
-function evaluate2(x::RealPoly, y::ComplexFieldElem, prec = precision(Balls))
+function evaluate2(x::RealPoly, y::ComplexFieldElem, prec::Int = precision(Balls))
    z = parent(y)()
    w = parent(y)()
    ccall((:arb_poly_evaluate2_acb, libarb), Nothing,
@@ -475,7 +475,7 @@ end
 #
 ###############################################################################
 
-function compose(x::RealPoly, y::RealPoly, prec = precision(Balls))
+function compose(x::RealPoly, y::RealPoly, prec::Int = precision(Balls))
    z = parent(x)()
    ccall((:arb_poly_compose, libarb), Nothing,
                 (Ref{RealPoly}, Ref{RealPoly}, Ref{RealPoly}, Int),
@@ -489,14 +489,14 @@ end
 #
 ###############################################################################
 
-function derivative(x::RealPoly, prec = precision(Balls))
+function derivative(x::RealPoly, prec::Int = precision(Balls))
    z = parent(x)()
    ccall((:arb_poly_derivative, libarb), Nothing,
                 (Ref{RealPoly}, Ref{RealPoly}, Int), z, x, prec)
    return z
 end
 
-function integral(x::RealPoly, prec = precision(Balls))
+function integral(x::RealPoly, prec::Int = precision(Balls))
    z = parent(x)()
    ccall((:arb_poly_integral, libarb), Nothing,
                 (Ref{RealPoly}, Ref{RealPoly}, Int), z, x, prec)
@@ -541,7 +541,7 @@ end
 
 Construct a polynomial in the given polynomial ring from a list of its roots.
 """
-function from_roots(R::RealPolyRing, b::Vector{RealFieldElem}, prec = precision(Balls))
+function from_roots(R::RealPolyRing, b::Vector{RealFieldElem}, prec::Int = precision(Balls))
    z = R()
    tmp = arb_vec(b)
    ccall((:arb_poly_product_roots, libarb), Nothing,
@@ -550,11 +550,11 @@ function from_roots(R::RealPolyRing, b::Vector{RealFieldElem}, prec = precision(
    return z
 end
 
-function evaluate_iter(x::RealPoly, b::Vector{RealFieldElem}, prec = precision(Balls))
+function evaluate_iter(x::RealPoly, b::Vector{RealFieldElem}, prec::Int = precision(Balls))
    return RealFieldElem[evaluate(x, b[i]) for i=1:length(b)]
 end
 
-function evaluate_fast(x::RealPoly, b::Vector{RealFieldElem}, prec = precision(Balls))
+function evaluate_fast(x::RealPoly, b::Vector{RealFieldElem}, prec::Int = precision(Balls))
    tmp = arb_vec(b)
    ccall((:arb_poly_evaluate_vec_fast, libarb), Nothing,
                 (Ptr{arb_struct}, Ref{RealPoly}, Ptr{arb_struct}, Int, Int),
@@ -564,7 +564,7 @@ function evaluate_fast(x::RealPoly, b::Vector{RealFieldElem}, prec = precision(B
    return res
 end
 
-function interpolate_newton(R::RealPolyRing, xs::Vector{RealFieldElem}, ys::Vector{RealFieldElem}, prec = precision(Balls))
+function interpolate_newton(R::RealPolyRing, xs::Vector{RealFieldElem}, ys::Vector{RealFieldElem}, prec::Int = precision(Balls))
    length(xs) != length(ys) && error()
    z = R()
    xsv = arb_vec(xs)
@@ -577,7 +577,7 @@ function interpolate_newton(R::RealPolyRing, xs::Vector{RealFieldElem}, ys::Vect
    return z
 end
 
-function interpolate_barycentric(R::RealPolyRing, xs::Vector{RealFieldElem}, ys::Vector{RealFieldElem}, prec = precision(Balls))
+function interpolate_barycentric(R::RealPolyRing, xs::Vector{RealFieldElem}, ys::Vector{RealFieldElem}, prec::Int = precision(Balls))
    length(xs) != length(ys) && error()
    z = R()
    xsv = arb_vec(xs)
@@ -590,7 +590,7 @@ function interpolate_barycentric(R::RealPolyRing, xs::Vector{RealFieldElem}, ys:
    return z
 end
 
-function interpolate_fast(R::RealPolyRing, xs::Vector{RealFieldElem}, ys::Vector{RealFieldElem}, prec = precision(Balls))
+function interpolate_fast(R::RealPolyRing, xs::Vector{RealFieldElem}, ys::Vector{RealFieldElem}, prec::Int = precision(Balls))
    length(xs) != length(ys) && error()
    z = R()
    xsv = arb_vec(xs)
@@ -604,12 +604,12 @@ function interpolate_fast(R::RealPolyRing, xs::Vector{RealFieldElem}, ys::Vector
 end
 
 # todo: cutoffs for fast algorithm
-function interpolate(R::RealPolyRing, xs::Vector{RealFieldElem}, ys::Vector{RealFieldElem}, prec = precision(Balls))
+function interpolate(R::RealPolyRing, xs::Vector{RealFieldElem}, ys::Vector{RealFieldElem}, prec::Int = precision(Balls))
    return interpolate_newton(R, xs, ys, prec)
 end
 
 # todo: cutoffs for fast algorithm
-function evaluate(x::RealPoly, b::Vector{RealFieldElem}, prec = precision(Balls))
+function evaluate(x::RealPoly, b::Vector{RealFieldElem}, prec::Int = precision(Balls))
    return evaluate_iter(x, b, prec)
 end
 

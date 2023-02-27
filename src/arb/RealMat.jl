@@ -454,7 +454,7 @@ end
 #
 ################################################################################
 
-function charpoly(x::RealPolyRing, y::RealMat, prec = precision(Balls))
+function charpoly(x::RealPolyRing, y::RealMat, prec::Int = precision(Balls))
   base_ring(y) != base_ring(x) && error("Base rings must coincide")
   z = x()
   ccall((:arb_mat_charpoly, libarb), Nothing,
@@ -468,7 +468,7 @@ end
 #
 ###############################################################################
 
-function det(x::RealMat, prec = precision(Balls))
+function det(x::RealMat, prec::Int = precision(Balls))
   ncols(x) != nrows(x) && error("Matrix must be square")
   z = base_ring(x)()
   ccall((:arb_mat_det, libarb), Nothing,
@@ -618,7 +618,7 @@ end
 for (s,f) in (("add!","arb_mat_add"), ("mul!","arb_mat_mul"),
               ("sub!","arb_mat_sub"))
   @eval begin
-    function ($(Symbol(s)))(z::RealMat, x::RealMat, y::RealMat, prec = precision(Balls))
+    function ($(Symbol(s)))(z::RealMat, x::RealMat, y::RealMat, prec::Int = precision(Balls))
       ccall(($f, libarb), Nothing,
                   (Ref{RealMat}, Ref{RealMat}, Ref{RealMat}, Int),
                   z, x, y, prec)
