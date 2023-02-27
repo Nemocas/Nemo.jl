@@ -18,7 +18,7 @@ elem_type(::Type{QQPolyRing}) = QQPolyRingElem
 
 dense_poly_type(::Type{QQFieldElem}) = QQPolyRingElem
 
-base_ring(a::QQPolyRing) = a.base_ring
+base_ring(a::QQPolyRing) = FlintQQ
 
 var(a::QQPolyRing) = a.S
 

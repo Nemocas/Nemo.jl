@@ -664,7 +664,6 @@ entries of the returned matrix are those of $a$ lifted to $\mathbb{Z}$.
 """
 function lift(a::T) where {T <: Zmod_fmpz_mat}
   z = ZZMatrix(nrows(a), ncols(a))
-  z.base_ring = FlintZZ
   ccall((:fmpz_mat_set_fmpz_mod_mat, libflint), Nothing,
           (Ref{ZZMatrix}, Ref{T}), z, a)
   return z

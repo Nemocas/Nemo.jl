@@ -27,7 +27,7 @@ elem_type(::Type{ZZAbsPowerSeriesRing}) = ZZAbsPowerSeriesRingElem
 
 parent_type(::Type{ZZAbsPowerSeriesRingElem}) = ZZAbsPowerSeriesRing
 
-base_ring(R::ZZAbsPowerSeriesRing) = R.base_ring
+base_ring(R::ZZAbsPowerSeriesRing) = FlintZZ
 
 abs_series_type(::Type{ZZRingElem}) = ZZAbsPowerSeriesRingElem
 

@@ -16,9 +16,9 @@ elem_type(::Type{QQMatrixSpace}) = QQMatrix
 
 parent_type(::Type{QQMatrix}) = QQMatrixSpace
 
-base_ring(a::QQMatrixSpace) = a.base_ring
+base_ring(a::QQMatrixSpace) = FlintQQ
 
-base_ring(a::QQMatrix) = a.base_ring
+base_ring(a::QQMatrix) = FlintQQ
 
 dense_matrix_type(::Type{QQFieldElem}) = QQMatrix
 
@@ -39,7 +39,6 @@ end
 
 function similar(::QQMatrix, R::QQField, r::Int, c::Int)
    z = QQMatrix(r, c)
-   z.base_ring = R
    return z
 end
 
@@ -69,7 +68,6 @@ function Base.view(x::QQMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
 
   b = QQMatrix()
   b.view_parent = x
-  b.base_ring = x.base_ring
   ccall((:fmpq_mat_window_init, libflint), Nothing,
         (Ref{QQMatrix}, Ref{QQMatrix}, Int, Int, Int, Int),
             b, x, r1 - 1, c1 - 1, r2, c2)
@@ -179,7 +177,6 @@ isone(a::QQMatrix) = ccall((:fmpq_mat_is_one, libflint), Bool,
 
 function deepcopy_internal(d::QQMatrix, dict::IdDict)
    z = QQMatrix(d)
-   z.base_ring = d.base_ring
    return z
 end
 
@@ -513,7 +510,6 @@ divexact(x::QQMatrix, y::Rational{T}; check::Bool=true) where T <: Union{Int, Bi
 ###############################################################################
 
 function kronecker_product(x::QQMatrix, y::QQMatrix)
-   base_ring(x) == base_ring(y) || error("Incompatible matrices")
    z = similar(x, nrows(x)*nrows(y), ncols(x)*ncols(y))
    ccall((:fmpq_mat_kronecker_product, libflint), Nothing,
                 (Ref{QQMatrix}, Ref{QQMatrix}, Ref{QQMatrix}), z, x, y)
@@ -806,21 +802,18 @@ end
 
 function (a::QQMatrixSpace)()
    z = QQMatrix(nrows(a), ncols(a))
-   z.base_ring = a.base_ring
    return z
 end
 
 function (a::QQMatrixSpace)(arr::AbstractMatrix{QQFieldElem})
    _check_dim(nrows(a), ncols(a), arr)
    z = QQMatrix(nrows(a), ncols(a), arr)
-   z.base_ring = a.base_ring
    return z
 end
 
 function (a::QQMatrixSpace)(arr::AbstractMatrix{ZZRingElem})
    _check_dim(nrows(a), ncols(a), arr)
    z = QQMatrix(nrows(a), ncols(a), arr)
-   z.base_ring = a.base_ring
    return z
 end
 
@@ -828,60 +821,51 @@ end
 function (a::QQMatrixSpace)(arr::AbstractMatrix{T}) where {T <: Integer}
    _check_dim(nrows(a), ncols(a), arr)
    z = QQMatrix(nrows(a), ncols(a), arr)
-   z.base_ring = a.base_ring
    return z
 end
 
 function (a::QQMatrixSpace)(arr::AbstractMatrix{Rational{T}}) where {T <: Integer}
    _check_dim(nrows(a), ncols(a), arr)
    z = QQMatrix(nrows(a), ncols(a), map(QQFieldElem, arr))
-   z.base_ring = a.base_ring
    return z
 end
 
 function (a::QQMatrixSpace)(arr::AbstractVector{QQFieldElem})
    _check_dim(nrows(a), ncols(a), arr)
    z = QQMatrix(nrows(a), ncols(a), arr)
-   z.base_ring = a.base_ring
    return z
 end
 
 function (a::QQMatrixSpace)(arr::AbstractVector{ZZRingElem})
    _check_dim(nrows(a), ncols(a), arr)
    z = QQMatrix(nrows(a), ncols(a), arr)
-   z.base_ring = a.base_ring
    return z
 end
 
 function (a::QQMatrixSpace)(arr::AbstractVector{T}) where {T <: Integer}
    _check_dim(nrows(a), ncols(a), arr)
    z = QQMatrix(nrows(a), ncols(a), arr)
-   z.base_ring = a.base_ring
    return z
 end
 
 function (a::QQMatrixSpace)(arr::AbstractVector{Rational{T}}) where {T <: Integer}
    _check_dim(nrows(a), ncols(a), arr)
    z = QQMatrix(nrows(a), ncols(a), map(QQFieldElem, arr))
-   z.base_ring = a.base_ring
    return z
 end
 
 function (a::QQMatrixSpace)(d::QQFieldElem)
    z = QQMatrix(nrows(a), ncols(a), d)
-   z.base_ring = a.base_ring
    return z
 end
 
 function (a::QQMatrixSpace)(d::ZZRingElem)
    z = QQMatrix(nrows(a), ncols(a), QQFieldElem(d))
-   z.base_ring = a.base_ring
    return z
 end
 
 function (a::QQMatrixSpace)(d::Integer)
    z = QQMatrix(nrows(a), ncols(a), QQFieldElem(d))
-   z.base_ring = a.base_ring
    return z
 end
 
@@ -916,40 +900,34 @@ promote_rule(::Type{QQMatrix}, ::Type{Rational{T}}) where T <: Union{Int, BigInt
 
 function matrix(R::QQField, arr::AbstractMatrix{QQFieldElem})
    z = QQMatrix(size(arr, 1), size(arr, 2), arr)
-   z.base_ring = FlintQQ
    return z
 end
 
 function matrix(R::QQField, arr::AbstractMatrix{<: Union{ZZRingElem, Int, BigInt}})
    z = QQMatrix(size(arr, 1), size(arr, 2), arr)
-   z.base_ring = FlintQQ
    return z
 end
 
 function matrix(R::QQField, arr::AbstractMatrix{Rational{T}}) where {T <: Integer}
    z = QQMatrix(size(arr, 1), size(arr, 2), map(QQFieldElem, arr))
-   z.base_ring = FlintQQ
    return z
 end
 
 function matrix(R::QQField, r::Int, c::Int, arr::AbstractVector{QQFieldElem})
    _check_dim(r, c, arr)
    z = QQMatrix(r, c, arr)
-   z.base_ring = FlintQQ
    return z
 end
 
 function matrix(R::QQField, r::Int, c::Int, arr::AbstractVector{<: Union{ZZRingElem, Int, BigInt}})
    _check_dim(r, c, arr)
    z = QQMatrix(r, c, arr)
-   z.base_ring = FlintQQ
    return z
 end
 
 function matrix(R::QQField, r::Int, c::Int, arr::AbstractVector{Rational{T}}) where {T <: Union{ZZRingElem, Int, BigInt}}
    _check_dim(r, c, arr)
    z = QQMatrix(r, c, map(QQFieldElem, arr))
-   z.base_ring = FlintQQ
    return z
 end
 
@@ -964,7 +942,6 @@ function zero_matrix(R::QQField, r::Int, c::Int)
      error("dimensions must not be negative")
    end
    z = QQMatrix(r, c)
-   z.base_ring = FlintQQ
    return z
 end
 
@@ -980,7 +957,6 @@ function identity_matrix(R::QQField, n::Int)
    end
    z = QQMatrix(n, n)
    ccall((:fmpq_mat_one, libflint), Nothing, (Ref{QQMatrix}, ), z)
-   z.base_ring = FlintQQ
    return z
 end
 

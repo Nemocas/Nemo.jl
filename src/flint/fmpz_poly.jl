@@ -19,7 +19,7 @@ elem_type(::Type{ZZPolyRing}) = ZZPolyRingElem
 
 dense_poly_type(::Type{ZZRingElem}) = ZZPolyRingElem
 
-base_ring(a::ZZPolyRing) = a.base_ring
+base_ring(a::ZZPolyRing) = FlintZZ
 
 parent(a::ZZPolyRingElem) = a.parent
 
@@ -120,7 +120,7 @@ function show(io::IO, p::ZZPolyRing)
    print(io, "Univariate Polynomial Ring in ")
    print(io, string(var(p)))
    print(io, " over ")
-   show(io, p.base_ring)
+   show(io, FlintZZ)
 end
 
 ###############################################################################

@@ -35,9 +35,9 @@ end
 nvars(a::QQMPolyRing) = ccall((:fmpq_mpoly_ctx_nvars, libflint), Int,
                                 (Ref{QQMPolyRing}, ), a)
 
-base_ring(a::QQMPolyRing) = a.base_ring
+base_ring(a::QQMPolyRing) = FlintQQ
 
-base_ring(f::QQMPolyRingElem) = f.parent.base_ring
+base_ring(f::QQMPolyRingElem) = FlintQQ
 
 function ordering(a::QQMPolyRing)
    b = ccall((:fmpq_mpoly_ctx_ord, libflint), Cint, (Ref{QQMPolyRing}, ), a)

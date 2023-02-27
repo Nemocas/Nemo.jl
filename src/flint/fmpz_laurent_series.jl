@@ -30,7 +30,7 @@ parent(a::ZZLaurentSeriesRingElem) = a.parent
 
 elem_type(::Type{ZZLaurentSeriesRing}) = ZZLaurentSeriesRingElem
 
-base_ring(R::ZZLaurentSeriesRing) = R.base_ring
+base_ring(R::ZZLaurentSeriesRing) = FlintZZ
 
 base_ring(a::ZZLaurentSeriesRingElem) = base_ring(parent(a))
 

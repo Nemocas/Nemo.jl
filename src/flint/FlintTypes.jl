@@ -236,17 +236,16 @@ _fmpq_clear_fn(a::QQFieldElem) = ccall((:fmpq_clear, libflint), Nothing, (Ref{QQ
 ###############################################################################
 
 @attributes mutable struct ZZPolyRing <: PolyRing{ZZRingElem}
-   base_ring::ZZRing
    S::Symbol
 
    function ZZPolyRing(R::ZZRing, s::Symbol, cached::Bool = true)
-      return get_cached!(FmpzPolyID, (R, s), cached) do
-         return new(R, s)
+      return get_cached!(FmpzPolyID, s, cached) do
+         return new(s)
       end
    end
 end
 
-const FmpzPolyID = CacheDictType{Tuple{ZZRing, Symbol}, ZZPolyRing}()
+const FmpzPolyID = CacheDictType{Symbol, ZZPolyRing}()
 
 mutable struct ZZPolyRingElem <: PolyRingElem{ZZRingElem}
    coeffs::Ptr{Nothing}
@@ -333,17 +332,16 @@ end
 ###############################################################################
 
 @attributes mutable struct QQPolyRing <: PolyRing{QQFieldElem}
-   base_ring::QQField
    S::Symbol
 
    function QQPolyRing(R::QQField, s::Symbol, cached::Bool = true)
-      return get_cached!(FmpqPolyID, (R, s), cached) do
-         return new(R, s)
+      return get_cached!(FmpqPolyID, s, cached) do
+         return new(s)
       end
    end
 end
 
-const FmpqPolyID = CacheDictType{Tuple{QQField, Symbol}, QQPolyRing}()
+const FmpqPolyID = CacheDictType{Symbol, QQPolyRing}()
 
 mutable struct QQPolyRingElem <: PolyRingElem{QQFieldElem}
    coeffs::Ptr{Int}
@@ -1248,7 +1246,6 @@ const flint_orderings = [:lex, :deglex, :degrevlex]
    lut::NTuple{Base.GMP.BITS_PER_LIMB, Int}
    lut1::NTuple{Base.GMP.BITS_PER_LIMB, UInt8}
 
-   base_ring::ZZRing
    S::Vector{Symbol}
 
    function ZZMPolyRing(s::Vector{Symbol}, S::Symbol, cached::Bool = true)
@@ -1269,7 +1266,6 @@ const flint_orderings = [:lex, :deglex, :degrevlex]
          ccall((:fmpz_mpoly_ctx_init, libflint), Nothing,
                (Ref{ZZMPolyRing}, Int, Int),
                z, length(s), ord)
-         z.base_ring = FlintZZ
          z.S = s
          finalizer(_fmpz_mpoly_ctx_clear_fn, z)
          return z
@@ -1445,7 +1441,6 @@ end
    lut::NTuple{Base.GMP.BITS_PER_LIMB, Int}
    lut1::NTuple{Base.GMP.BITS_PER_LIMB, UInt8}
 
-   base_ring::QQField
    S::Vector{Symbol}
 
    function QQMPolyRing(s::Vector{Symbol}, S::Symbol, cached::Bool = true)
@@ -1466,7 +1461,6 @@ end
          ccall((:fmpq_mpoly_ctx_init, libflint), Nothing,
                (Ref{QQMPolyRing}, Int, Int),
                z, length(s), ord)
-         z.base_ring = FlintQQ
          z.S = s
          finalizer(_fmpq_mpoly_ctx_clear_fn, z)
          return z
@@ -3134,13 +3128,12 @@ end
 ###############################################################################
 
 @attributes mutable struct ZZRelPowerSeriesRing <: SeriesRing{ZZRingElem}
-   base_ring::ZZRing
    prec_max::Int
    S::Symbol
 
    function ZZRelPowerSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
       return get_cached!(FmpzRelSeriesID, (prec, s), cached) do
-         return new(FlintZZ, prec, s)
+         return new(prec, s)
       end
    end
 end
@@ -3200,13 +3193,12 @@ end
 ###############################################################################
 
 @attributes mutable struct ZZAbsPowerSeriesRing <: SeriesRing{ZZRingElem}
-   base_ring::ZZRing
    prec_max::Int
    S::Symbol
 
    function ZZAbsPowerSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
       return get_cached!(FmpzAbsSeriesID, (prec, s), cached) do
-         return new(FlintZZ, prec, s)
+         return new(prec, s)
       end
    end
 end
@@ -3316,13 +3308,12 @@ end
 ###############################################################################
 
 @attributes mutable struct ZZLaurentSeriesRing <: Ring
-   base_ring::ZZRing
    prec_max::Int
    S::Symbol
 
    function ZZLaurentSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
       return get_cached!(FmpzLaurentSeriesID, (prec, s), cached) do
-         return new(FlintZZ, prec, s)
+         return new(prec, s)
       end
    end
 end
@@ -3382,13 +3373,12 @@ end
 ###############################################################################
 
 @attributes mutable struct QQRelPowerSeriesRing <: SeriesRing{QQFieldElem}
-   base_ring::QQField
    prec_max::Int
    S::Symbol
 
    function QQRelPowerSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
       return get_cached!(FmpqRelSeriesID, (prec, s), cached) do
-         return new(FlintQQ, prec, s)
+         return new(prec, s)
       end
    end
 end
@@ -3449,13 +3439,12 @@ end
 ###############################################################################
 
 @attributes mutable struct QQAbsPowerSeriesRing <: SeriesRing{QQFieldElem}
-   base_ring::QQField
    prec_max::Int
    S::Symbol
 
    function QQAbsPowerSeriesRing(prec::Int, s::Symbol, cached::Bool = true)
       return get_cached!(FmpqAbsSeriesID, (prec, s), cached) do
-         return new(FlintQQ, prec, s)
+         return new(prec, s)
       end
    end
 end
@@ -4770,26 +4759,21 @@ end
 ###############################################################################
 
 # not really a mathematical ring
-mutable struct QQMatrixSpace <: MatSpace{QQFieldElem}
+struct QQMatrixSpace <: MatSpace{QQFieldElem}
    nrows::Int
    ncols::Int
-   base_ring::QQField
 
    function QQMatrixSpace(r::Int, c::Int, cached::Bool = true)
-      return get_cached!(FmpqMatID, (r, c), cached) do
-         return new(r, c, FlintQQ)
-      end
+      # TODO/FIXME: ignore cached, for backwards compatibility
+      return new(r, c)
    end
 end
-
-const FmpqMatID = CacheDictType{Tuple{Int, Int}, QQMatrixSpace}()
 
 mutable struct QQMatrix <: MatElem{QQFieldElem}
    entries::Ptr{Nothing}
    r::Int
    c::Int
    rows::Ptr{Nothing}
-   base_ring::QQField
    view_parent
 
    # used by windows, not finalised!!
@@ -4939,26 +4923,21 @@ end
 ###############################################################################
 
 # not really a mathematical ring
-mutable struct ZZMatrixSpace <: MatSpace{ZZRingElem}
+struct ZZMatrixSpace <: MatSpace{ZZRingElem}
    nrows::Int
    ncols::Int
-   base_ring::ZZRing
 
    function ZZMatrixSpace(r::Int, c::Int, cached::Bool = true)
-      return get_cached!(FmpzMatID, (r, c), cached) do
-         return new(r, c, FlintZZ)
-      end
+      # TODO/FIXME: ignore cached, for backwards compatibility
+      return new(r, c)
    end
 end
-
-const FmpzMatID = CacheDictType{Tuple{Int, Int}, ZZMatrixSpace}()
 
 mutable struct ZZMatrix <: MatElem{ZZRingElem}
    entries::Ptr{Nothing}
    r::Int
    c::Int
    rows::Ptr{Nothing}
-   base_ring::ZZRing
    view_parent
 
    # Used by view, not finalised!!

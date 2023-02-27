@@ -24,7 +24,9 @@ elem_type(::Type{ZZMatrixSpace}) = ZZMatrix
 
 parent_type(::Type{ZZMatrix}) = ZZMatrixSpace
 
-base_ring(a::ZZMatrixSpace) = a.base_ring
+base_ring(a::ZZMatrixSpace) = FlintZZ
+
+base_ring(a::ZZMatrix) = FlintZZ
 
 dense_matrix_type(::Type{ZZRingElem}) = ZZMatrix
 
@@ -45,7 +47,6 @@ end
 
 function similar(::ZZMatrix, R::ZZRing, r::Int, c::Int)
    z = ZZMatrix(r, c)
-   z.base_ring = R
    return z
 end
 
@@ -81,7 +82,6 @@ function Base.view(x::ZZMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
    end
 
    b = ZZMatrix()
-   b.base_ring = FlintZZ
    b.view_parent = x
    ccall((:fmpz_mat_window_init, libflint), Nothing,
          (Ref{ZZMatrix}, Ref{ZZMatrix}, Int, Int, Int, Int),
@@ -173,7 +173,6 @@ isone(a::ZZMatrix) = ccall((:fmpz_mat_is_one, libflint), Bool,
 
 function deepcopy_internal(d::ZZMatrix, dict::IdDict)
    z = ZZMatrix(d)
-   z.base_ring = d.base_ring
    return z
 end
 
@@ -560,7 +559,6 @@ divexact(x::ZZMatrix, y::Integer; check::Bool=true) = divexact(x, ZZRingElem(y);
 ###############################################################################
 
 function kronecker_product(x::ZZMatrix, y::ZZMatrix)
-   base_ring(x) == base_ring(y) || error("Incompatible matrices")
    z = similar(x, nrows(x)*nrows(y), ncols(x)*ncols(y))
    ccall((:fmpz_mat_kronecker_product, libflint), Nothing,
                 (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZMatrix}), z, x, y)
@@ -1478,47 +1476,40 @@ end
 
 function (a::ZZMatrixSpace)()
    z = ZZMatrix(nrows(a), ncols(a))
-   z.base_ring = FlintZZ
    return z
 end
 
 function (a::ZZMatrixSpace)(arr::AbstractMatrix{ZZRingElem})
    _check_dim(nrows(a), ncols(a), arr)
    z = ZZMatrix(nrows(a), ncols(a), arr)
-   z.base_ring = FlintZZ
    return z
 end
 
 function (a::ZZMatrixSpace)(arr::AbstractMatrix{T}) where {T <: Integer}
    _check_dim(nrows(a), ncols(a), arr)
    z = ZZMatrix(nrows(a), ncols(a), arr)
-   z.base_ring = FlintZZ
    return z
 end
 
 function (a::ZZMatrixSpace)(arr::AbstractVector{ZZRingElem})
    _check_dim(nrows(a), ncols(a), arr)
    z = ZZMatrix(nrows(a), ncols(a), arr)
-   z.base_ring = FlintZZ
    return z
 end
 
 function (a::ZZMatrixSpace)(arr::AbstractVector{T}) where {T <: Integer}
    _check_dim(nrows(a), ncols(a), arr)
    z = ZZMatrix(nrows(a), ncols(a), arr)
-   z.base_ring = FlintZZ
    return z
 end
 
 function (a::ZZMatrixSpace)(d::ZZRingElem)
    z = ZZMatrix(nrows(a), ncols(a), d)
-   z.base_ring = FlintZZ
    return z
 end
 
 function (a::ZZMatrixSpace)(d::Integer)
    z = ZZMatrix(nrows(a), ncols(a), ZZRingElem(d))
-   z.base_ring = FlintZZ
    return z
 end
 
@@ -1559,27 +1550,23 @@ end
 
 function matrix(R::ZZRing, arr::AbstractMatrix{ZZRingElem})
    z = ZZMatrix(size(arr, 1), size(arr, 2), arr)
-   z.base_ring = FlintZZ
    return z
 end
 
 function matrix(R::ZZRing, arr::AbstractMatrix{<: Integer})
    z = ZZMatrix(size(arr, 1), size(arr, 2), arr)
-   z.base_ring = FlintZZ
    return z
 end
 
 function matrix(R::ZZRing, r::Int, c::Int, arr::AbstractVector{ZZRingElem})
    _check_dim(r, c, arr)
    z = ZZMatrix(r, c, arr)
-   z.base_ring = FlintZZ
    return z
 end
 
 function matrix(R::ZZRing, r::Int, c::Int, arr::AbstractVector{<: Integer})
    _check_dim(r, c, arr)
    z = ZZMatrix(r, c, arr)
-   z.base_ring = FlintZZ
    return z
 end
 
@@ -1594,7 +1581,6 @@ function zero_matrix(R::ZZRing, r::Int, c::Int)
      error("dimensions must not be negative")
    end
    z = ZZMatrix(r, c)
-   z.base_ring = FlintZZ
    return z
 end
 
@@ -1610,7 +1596,6 @@ function identity_matrix(R::ZZRing, n::Int)
    end
    z = ZZMatrix(n, n)
    ccall((:fmpz_mat_one, libflint), Nothing, (Ref{ZZMatrix}, ), z)
-   z.base_ring = FlintZZ
    return z
 end
 

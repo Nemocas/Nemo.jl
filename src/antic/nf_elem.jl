@@ -697,7 +697,6 @@ The matrix is of type QQMatrix.
 function representation_matrix(a::nf_elem)
   K = parent(a)
   z = QQMatrix(degree(K), degree(K))
-  z.base_ring = FlintQQ
   ccall((:nf_elem_rep_mat, libantic), Nothing,
         (Ref{QQMatrix}, Ref{nf_elem}, Ref{AnticNumberField}), z, a, K)
   return z
@@ -714,7 +713,6 @@ a primitive integer matrix and a denominator.
 function representation_matrix_q(a::nf_elem)
   K = parent(a)
   z = ZZMatrix(degree(K), degree(K))
-  z.base_ring = FlintZZ
   d = ZZRingElem()
   ccall((:nf_elem_rep_mat_fmpz_mat_den, libantic), Nothing,
         (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{nf_elem}, Ref{AnticNumberField}),

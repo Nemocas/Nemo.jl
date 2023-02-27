@@ -30,9 +30,9 @@ end
 nvars(a::ZZMPolyRing) = ccall((:fmpz_mpoly_ctx_nvars, libflint), Int,
                                 (Ref{ZZMPolyRing}, ), a)
 
-base_ring(a::ZZMPolyRing) = a.base_ring
+base_ring(a::ZZMPolyRing) = FlintZZ
 
-base_ring(f::ZZMPolyRingElem) = f.parent.base_ring
+base_ring(f::ZZMPolyRingElem) = FlintZZ
 
 function ordering(a::ZZMPolyRing)
    b = ccall((:fmpz_mpoly_ctx_ord, libflint), Cint, (Ref{ZZMPolyRing}, ), a)

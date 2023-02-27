@@ -29,7 +29,7 @@ elem_type(::Type{QQAbsPowerSeriesRing}) = QQAbsPowerSeriesRingElem
 
 parent_type(::Type{QQAbsPowerSeriesRingElem}) = QQAbsPowerSeriesRing
 
-base_ring(R::QQAbsPowerSeriesRing) = R.base_ring
+base_ring(R::QQAbsPowerSeriesRing) = FlintQQ
 
 abs_series_type(::Type{QQFieldElem}) = QQAbsPowerSeriesRingElem
 
