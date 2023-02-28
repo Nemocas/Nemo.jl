@@ -2102,8 +2102,7 @@ euler_phi(x::Int) = Int(euler_phi(ZZRingElem(x)))
     number_of_partitions(x::Int)
     number_of_partitions(x::ZZRingElem)
 
-Return the number of partitions of $x$. This function is not available on
-Windows 64.
+Return the number of partitions of $x$.
 
 # Examples
 
@@ -2116,22 +2115,16 @@ julia> number_of_partitions(ZZ(1000))
 ```
 """
 function number_of_partitions(x::Int)
-   if (Sys.iswindows() ? true : false) && Int == Int64
-#      error("not yet supported on win64")
-   end
-   z = ZZRingElem()
    if x < 0
       return 0
    end
+   z = ZZRingElem()
    ccall((:partitions_fmpz_ui, libarb), Nothing,
          (Ref{ZZRingElem}, UInt), z, x)
    return Int(z)
 end
 
 function number_of_partitions(x::ZZRingElem)
-   if (Sys.iswindows() ? true : false) && Int == Int64
-#      error("not yet supported on win64")
-   end
    z = ZZRingElem()
    if x < 0
       return z
