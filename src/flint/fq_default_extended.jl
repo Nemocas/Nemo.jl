@@ -171,7 +171,7 @@ polynomial representing the given finite field element.
 """
 function coeff(x::FqFieldElem, n::Int)
    if is_absolute(parent(x))
-     return _coeff(x, n)
+     return base_field(parent(x))(_coeff(x, n))
    end
    return coeff(_as_poly(x), n)
 end

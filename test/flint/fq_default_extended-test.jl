@@ -83,7 +83,7 @@ end
    @test absolute_degree(F) == 10
    @test is_unit(b + 1)
    @test deepcopy(b + 1) == b + 1
-   @test coeff(2b + 1, 1) == 2
+   @test (@inferred coeff(2b + 1, 1)) == 2
    @test_throws DomainError coeff(2b + 1, -1)
 
    u = a

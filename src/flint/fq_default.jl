@@ -334,7 +334,7 @@ function expressify(a::FqFieldElem; context = nothing)
 
    sum = Expr(:call, :+)
    for k in (d - 1):-1:0
-        c = coeff(a, k)
+        c = is_absolute(parent(a)) ? _coeff(a, k) : coeff(a, k)
         if !iszero(c)
             xk = k < 1 ? 1 : k == 1 ? x : Expr(:call, :^, x, k)
             if isone(c)

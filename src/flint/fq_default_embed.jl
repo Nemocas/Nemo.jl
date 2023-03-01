@@ -130,7 +130,7 @@ function embed_pre_mat(x::FqFieldElem, K::FqField, M::FpMatrix)
     col = zero_matrix(base_ring(M), d, 1)
 
     for j in 0:(d - 1)
-        col[j + 1, 1] = coeff(x, j)
+        col[j + 1, 1] = _coeff(x, j)
     end
 
     product = M*col

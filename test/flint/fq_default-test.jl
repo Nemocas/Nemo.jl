@@ -83,7 +83,7 @@ end
 
    @test deepcopy(x + 1) == x + 1
 
-   @test coeff(2x + 1, 1) == 2
+   @test (@inferred coeff(2x + 1, 1)) == 2
 
    @test_throws DomainError coeff(2x + 1, -1)
 end

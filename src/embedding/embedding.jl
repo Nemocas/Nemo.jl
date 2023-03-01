@@ -376,8 +376,8 @@ function embed(k::T, K::T) where T <: FinField
         return morph
 
     elseif degree(k) == 1
-        f(x) = K(coeff(x, 0))
-        finv(y) = k(coeff(y, 0))
+        f(x) = K(k isa FqField ? _coeff(x, 0) : coeff(x, 0))
+        finv(y) = k(k isa FqField ? _coeff(y, 0) : coeff(y, 0))
         morph = FinFieldMorphism(k, K, f, finv)
         return morph
     end
