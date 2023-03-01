@@ -502,8 +502,7 @@ end
 @doc Markdown.doc"""
     isone(x::arb)
 
-Return `true` if $x$ is certainly not equal to oneo, otherwise return
-`false`.
+Return `true` if $x$ is certainly one, otherwise return `false`.
 """
 function isone(x::arb)
    return Bool(ccall((:arb_is_one, libarb), Cint, (Ref{arb},), x))

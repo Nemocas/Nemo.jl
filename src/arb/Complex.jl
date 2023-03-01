@@ -542,7 +542,7 @@ end
 @doc Markdown.doc"""
     isone(x::ComplexFieldElem)
 
-Return `true` if $x$ is certainly zero, otherwise return `false`.
+Return `true` if $x$ is certainly one, otherwise return `false`.
 """
 function isone(x::ComplexFieldElem)
    return Bool(ccall((:acb_is_one, libarb), Cint, (Ref{ComplexFieldElem},), x))
