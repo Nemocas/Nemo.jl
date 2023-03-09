@@ -102,11 +102,11 @@ end
 
 # Similar to hash for BigInt found in julia/base
 
-function _fmpz_is_small(a::ZZRingElem)
+@inline function _fmpz_is_small(a::ZZRingElem)
    return __fmpz_is_small(a.d)
 end
 
-function _fmpz_limbs(a::ZZRingElem)
+@inline function _fmpz_limbs(a::ZZRingElem)
    return __fmpz_limbs(a.d)
 end
 
@@ -118,7 +118,7 @@ function hash(a::ZZRingElem, h::UInt)
    return hash_integer(a, h)
 end
 
-function __fmpz_is_small(a::Int)
+@inline function __fmpz_is_small(a::Int)
    return (unsigned(a) >> (Sys.WORD_SIZE - 2) != 1)
 end
 
