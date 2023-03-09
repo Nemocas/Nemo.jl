@@ -82,16 +82,6 @@ signature(::ZZPolyRingElem)
 signature(::QQPolyRingElem)
 ```
 
-**Examples**
-
-```julia
-R, x = polynomial_ring(ZZ, "x")
-
-f = x^3 + 3x + 1
-
-(r, s) = signature(f)
-```
-
 ### Root finding
 
 ```@docs

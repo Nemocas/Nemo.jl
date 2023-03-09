@@ -49,7 +49,7 @@ set_precision!(f::Any, ::Type{Balls}, n::Int)
 In order to construct real balls in Nemo, one must first construct the Arb
 real field itself. This is accomplished with the following constructor.
 
-```
+```julia
 RealField()
 ```
 
@@ -58,13 +58,21 @@ parent object to coerce values into the resulting field.
 
 **Examples**
 
-```julia
-RR = RealField()
+```jldoctest
+julia> RR = RealField()
+Real Field with 64 bits of precision and error bounds
 
-a = RR("0.25")
-b = RR("0.1 +/- 0.001")
-c = RR(0.5)
-d = RR(12)
+julia> a = RR("0.25")
+0.25000000000000000000
+
+julia> b = RR("0.1 +/- 0.001")
+[0.1 +/- 1.01e-3]
+
+julia> c = RR(0.5)
+0.50000000000000000000
+
+julia> d = RR(12)
+12.000000000000000000
 ```
 
 Note that whilst one can coerce double precision floating point values into an
@@ -86,11 +94,15 @@ Using coercion into the real field, new elements can be created.
 
 **Examples**
 
-```julia
-RR = RealField()
+```jldoctest
+julia> RR = RealField()
+Real Field with 64 bits of precision and error bounds
 
-c = RR(1)
-d = RR(1//2)
+julia> c = RR(1)
+1.0000000000000000000
+
+julia> d = RR(1//2)
+0.50000000000000000000
 ```
 
 Note that for the construction, also the precision can be supplied:
@@ -104,10 +116,12 @@ d = RR(1//2, precision = 4)
 
 ### Conversions
 
-```julia
-RR = RealField()
+```jldoctest
+julia> RR = RealField()
+Real Field with 64 bits of precision and error bounds
 
-convert(Float64, RR(1//3))
+julia> convert(Float64, RR(1//3))
+0.3333333333333333
 ```
 
 ### Basic manipulation
@@ -158,19 +172,36 @@ accuracy_bits(::RealFieldElem)
 
 **Examples**
 
-```julia
-RR = RealField()
+```jldoctest
+julia> RR = RealField()
+Real Field with 64 bits of precision and error bounds
 
-a = RR("1.2 +/- 0.001")
-b = RR(3)
+julia> a = RR("1.2 +/- 0.001")
+[1.20 +/- 1.01e-3]
 
-is_positive(a)
-isfinite(b)
-isinteger(b)
-is_negative(a)
-c = radius(a)
-d = midpoint(b)
-f = accuracy_bits(a)
+julia> b = RR(3)
+3.0000000000000000000
+
+julia> is_positive(a)
+true
+
+julia> isfinite(b)
+true
+
+julia> isinteger(b)
+true
+
+julia> is_negative(a)
+false
+
+julia> c = radius(a)
+[0.0010000000038417056203 +/- 1.12e-23]
+
+julia> d = midpoint(b)
+3.0000000000000000000
+
+julia> f = accuracy_bits(a)
+9
 ```
 
 ### Printing
@@ -259,17 +290,33 @@ contains_nonpositive(::RealFieldElem)
 
 **Examples**
 
-```julia
-RR = RealField()
-x = RR("1 +/- 0.001")
-y = RR("3")
+```jldoctest
+julia> RR = RealField()
+Real Field with 64 bits of precision and error bounds
 
-overlaps(x, y)
-contains(x, y)
-contains(y, 3)
-contains(x, ZZ(1)//2)
-contains_zero(x)
-contains_positive(y)
+julia> x = RR("1 +/- 0.001")
+[1.00 +/- 1.01e-3]
+
+julia> y = RR("3")
+3.0000000000000000000
+
+julia> overlaps(x, y)
+false
+
+julia> contains(x, y)
+false
+
+julia> contains(y, 3)
+true
+
+julia> contains(x, ZZ(1)//2)
+false
+
+julia> contains_zero(x)
+false
+
+julia> contains_positive(y)
+true
 ```
 
 ### Comparison
@@ -310,39 +357,63 @@ Function                      |
 
 **Examples**
 
-```julia
-RR = RealField()
-x = RR("1 +/- 0.001")
-y = RR("3")
-z = RR("4")
+```jldoctest
+julia> RR = RealField()
+Real Field with 64 bits of precision and error bounds
 
-isequal(x, deepcopy(x))
-x == 3
-ZZ(3) < z
-x != 1.23
+julia> x = RR("1 +/- 0.001")
+[1.00 +/- 1.01e-3]
+
+julia> y = RR("3")
+3.0000000000000000000
+
+julia> z = RR("4")
+4.0000000000000000000
+
+julia> isequal(x, deepcopy(x))
+true
+
+julia> x == 3
+false
+
+julia> ZZ(3) < z
+true
+
+julia> x != 1.23
+true
 ```
 
 ### Absolute value
 
 **Examples**
 
-```julia
-RR = RealField()
-x = RR("-1 +/- 0.001")
+```jldoctest
+julia> RR = RealField()
+Real Field with 64 bits of precision and error bounds
 
-a = abs(x)
+julia> x = RR("-1 +/- 0.001")
+[-1.00 +/- 1.01e-3]
+
+julia> a = abs(x)
+[1.00 +/- 1.01e-3]
 ```
 
 ### Shifting
 
 **Examples**
 
-```julia
-RR = RealField()
-x = RR("-3 +/- 0.001")
+```jldoctest
+julia> RR = RealField()
+Real Field with 64 bits of precision and error bounds
 
-a = ldexp(x, 23)
-b = ldexp(x, -ZZ(15))
+julia> x = RR("-3 +/- 0.001")
+[-3.00 +/- 1.01e-3]
+
+julia> a = ldexp(x, 23)
+[-2.52e+7 +/- 4.26e+4]
+
+julia> b = ldexp(x, -ZZ(15))
+[-9.16e-5 +/- 7.78e-8]
 ```
 
 ### Miscellaneous operations
@@ -365,14 +436,24 @@ setunion(::RealFieldElem, ::RealFieldElem)
 
 **Examples**
 
-```julia
-RR = RealField()
-x = RR("-3 +/- 0.001")
-y = RR("2 +/- 0.5")
+```jldoctest
+julia> RR = RealField()
+Real Field with 64 bits of precision and error bounds
 
-a = trim(x)
-b, c = unique_integer(x)
-d = setunion(x, y)
+julia> x = RR("-3 +/- 0.001")
+[-3.00 +/- 1.01e-3]
+
+julia> y = RR("2 +/- 0.5")
+[2e+0 +/- 0.501]
+
+julia> a = trim(x)
+[-3.00 +/- 1.01e-3]
+
+julia> b, c = unique_integer(x)
+(true, -3)
+
+julia> d = setunion(x, y)
+[+/- 3.01]
 ```
 
 ### Constants
@@ -411,13 +492,21 @@ const_glaisher(::RealField)
 
 **Examples**
 
-```julia
-RR = RealField()
+```jldoctest
+julia> RR = RealField()
+Real Field with 64 bits of precision and error bounds
 
-a = const_pi(RR)
-b = const_e(RR)
-c = const_euler(RR)
-d = const_glaisher(RR)
+julia> a = const_pi(RR)
+[3.141592653589793239 +/- 5.96e-19]
+
+julia> b = const_e(RR)
+[2.718281828459045235 +/- 4.29e-19]
+
+julia> c = const_euler(RR)
+[0.5772156649015328606 +/- 4.35e-20]
+
+julia> d = const_glaisher(RR)
+[1.282427129100622637 +/- 3.01e-19]
 ```
 
 ### Mathematical and special functions
@@ -592,14 +681,24 @@ airy_bi_prime(::RealFieldElem)
 
 **Examples**
 
-```julia
-RR = RealField()
+```jldoctest
+julia> RR = RealField()
+Real Field with 64 bits of precision and error bounds
 
-a = floor(exp(RR(1)))
-b = sinpi(QQ(5,6), RR)
-c = gamma(QQ(1,3), RealField()
-d = bernoulli(1000, RealField()
-f = polylog(3, RR(-10))
+julia> a = floor(exp(RR(1)))
+2.0000000000000000000
+
+julia> b = sinpi(QQ(5,6), RR)
+0.50000000000000000000
+
+julia> c = gamma(QQ(1,3), RR)
+[2.678938534707747634 +/- 7.13e-19]
+
+julia> d = bernoulli(1000, RR)
+[-5.318704469415522036e+1769 +/- 6.61e+1750]
+
+julia> f = polylog(3, RR(-10))
+[-5.92106480375697 +/- 6.68e-15]
 ```
 
 ### Linear dependence
@@ -608,26 +707,8 @@ f = polylog(3, RR(-10))
 lindep(::Vector{RealFieldElem}, n::Int)
 ```
 
-**Examples**
-
-```julia
-RR = RealField()
-
-a = RR(-0.33198902958450931620250069492231652319)
-
-V = [RR(1), a, a^2, a^3, a^4, a^5]
-W = lindep(V, 20)
-```
-
 ```@docs
 simplest_rational_inside(::RealFieldElem)
-```
-
-**Examples**
-
-```julia
-RR = RealField()
-simplest_rational_inside(const_pi(RR))
 ```
 
 ### Random generation

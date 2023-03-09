@@ -739,12 +739,19 @@ end
 @doc Markdown.doc"""
     signature(f::QQPolyRingElem)
 
-Return the signature of $f$, i.e. a tuple $(r, s)$ where $r$ is the number of
+Return the signature of $f$, i.e. a tuple $(r, s)$ such that $r$ is the number of
 real roots of $f$ and $s$ is half the number of complex roots.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(QQ, "x");
+
+julia> signature(x^3 + 3x + 1)
+(1, 1)
+```
 """
 function signature(f::QQPolyRingElem)
-   r = Vector{Int}(undef, 1)
-   s = Vector{Int}(undef, 1)
    z = ZZPolyRingElem()
    ccall((:fmpq_poly_get_numerator, libflint), Nothing,
          (Ref{ZZPolyRingElem}, Ref{QQPolyRingElem}), z, f)

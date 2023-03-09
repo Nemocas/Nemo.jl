@@ -1859,6 +1859,34 @@ Find a small linear combination of the entries of the array $A$ that is small
 truncating to integers for use in LLL. This function can be used to find linear
 dependence between a list of real numbers. The algorithm is heuristic only and
 returns an array of Nemo integers representing the linear combination.
+
+# Examples
+
+```jldoctest
+julia> RR = RealField()
+Real Field with 64 bits of precision and error bounds
+
+julia> a = RR(-0.33198902958450931620250069492231652319)
+[-0.33198902958450932088 +/- 4.15e-22]
+
+julia> V = [RR(1), a, a^2, a^3, a^4, a^5]
+6-element Vector{RealFieldElem}:
+ 1.0000000000000000000
+ [-0.33198902958450932088 +/- 4.15e-22]
+ [0.11021671576446420510 +/- 7.87e-21]
+ [-0.03659074051063616184 +/- 4.17e-21]
+ [0.012147724433904692427 +/- 4.99e-22]
+ [-0.004032911246472051677 +/- 6.25e-22]
+
+julia> W = lindep(V, 20)
+6-element Vector{ZZRingElem}:
+ 1
+ 3
+ 0
+ 0
+ 0
+ 1
+```
 """
 function lindep(A::Vector{RealFieldElem}, bits::Int)
   bits < 0 && throw(DomainError(bits, "Number of bits must be non-negative"))
@@ -1886,6 +1914,16 @@ end
 Return the simplest fraction inside the ball $x$. A canonical fraction
 $a_1/b_1$ is defined to be simpler than $a_2/b_2$ iff $b_1 < b_2$ or $b_1 =
 b_2$ and $a_1 < a_2$.
+
+# Examples
+
+```jldoctest
+julia> RR = RealField()
+Real Field with 64 bits of precision and error bounds
+
+julia> simplest_rational_inside(const_pi(RR))
+8717442233//2774848045
+```
 """
 function simplest_rational_inside(x::RealFieldElem)
    a = ZZRingElem()

@@ -69,14 +69,22 @@ resulting parent objects to coerce various elements into those fields.
 
 **Examples**
 
-```julia
-R, p = QadicField(7, 1, 30)
-S, _ = QadicField(ZZ(65537), 1, 30)
+```jldoctest
+julia> R, p = QadicField(7, 1, 30);
 
-a = R()
-b = S(1)
-c = S(ZZ(123))
-d = R(ZZ(1)//7^2)
+julia> S, _ = QadicField(ZZ(65537), 1, 30);
+
+julia> a = R()
+0
+
+julia> b = S(1)
+65537^0 + O(65537^30)
+
+julia> c = S(ZZ(123))
+123*65537^0 + O(65537^30)
+
+julia> d = R(ZZ(1)//7^2)
+7^-2 + O(7^28)
 ```
 
 ### Big-oh notation
@@ -96,13 +104,19 @@ $p^n$ as in the examples.
 
 **Examples**
 
-```julia
-R, _ = QadicField(7, 1, 30)
-S, _ = QadicField(ZZ(65537), 1, 30)
+```jldoctest
+julia> R, _ = QadicField(7, 1, 30);
 
-c = 1 + 2*7 + 4*7^2 + O(R, 7^3)
-d = 13 + 357*ZZ(65537) + O(S, ZZ(65537)^12)
-f = ZZ(1)//7^2 + ZZ(2)//7 + 3 + 4*7 + O(R, 7^2)
+julia> S, _ = QadicField(ZZ(65537), 1, 30);
+
+julia> c = 1 + 2*7 + 4*7^2 + O(R, 7^3)
+7^0 + 2*7^1 + 4*7^2 + O(7^3)
+
+julia> d = 13 + 357*ZZ(65537) + O(S, ZZ(65537)^12)
+13*65537^0 + 357*65537^1 + O(65537^12)
+
+julia> f = ZZ(1)//7^2 + ZZ(2)//7 + 3 + 4*7 + O(R, 7^2)
+7^-2 + 2*7^-1 + 3*7^0 + 4*7^1 + O(7^2)
 ```
 
 Beware that the expression `1 + 2*p + 3*p^2 + O(R, p^n)` is actually computed
@@ -132,7 +146,7 @@ lift(::ZZPolyRing, ::qadic)
 **Examples**
 
 ```julia
-R, _ = QadicField(7, 1, 30)
+R, _ = QadicField(7, 1, 30);
 
 a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
 b = 7^2 + 3*7^3 + O(R, 7^5)
@@ -155,17 +169,29 @@ Base.sqrt(::qadic)
 
 **Examples**
 
-```julia
-R, _ = QadicField(7, 1, 30)
+```jldoctest
+julia> R, _ = QadicField(7, 1, 30);
 
-a = 1 + 7 + 2*7^2 + O(R, 7^3)
-b = 2 + 3*7 + O(R, 7^5)
-c = 7^2 + 2*7^3 + O(R, 7^4)
+julia> a = 1 + 7 + 2*7^2 + O(R, 7^3)
+7^0 + 7^1 + 2*7^2 + O(7^3)
 
-d = sqrt(a)
-f = sqrt(b)
-f = sqrt(c)
-g = sqrt(R(121))
+julia> b = 2 + 3*7 + O(R, 7^5)
+2*7^0 + 3*7^1 + O(7^5)
+
+julia> c = 7^2 + 2*7^3 + O(R, 7^4)
+7^2 + 2*7^3 + O(7^4)
+
+julia> d = sqrt(a)
+7^0 + 4*7^1 + 3*7^2 + O(7^3)
+
+julia> f = sqrt(b)
+4*7^0 + 7^1 + 5*7^2 + 5*7^3 + 6*7^4 + O(7^5)
+
+julia> f = sqrt(c)
+7^1 + 7^2 + O(7^3)
+
+julia> g = sqrt(R(121))
+4*7^0 + 7^1 + O(7^30)
 ```
 
 ### Special functions
@@ -188,17 +214,33 @@ frobenius(::qadic, ::Int)
 
 **Examples**
 
-```julia
-R, _ = QadicField(7, 30)
+```jldoctest
+julia> R, _ = QadicField(7, 1, 30);
 
-a = 1 + 7 + 2*7^2 + O(R, 7^3)
-b = 2 + 5*7 + 3*7^2 + O(R, 7^3)
-c = 3*7 + 2*7^2 + O(R, 7^5)
+julia> a = 1 + 7 + 2*7^2 + O(R, 7^3)
+7^0 + 7^1 + 2*7^2 + O(7^3)
 
-c = exp(c)
-d = log(a)
-c = exp(R(0))
-d = log(R(1))
-f = teichmuller(b)
-g = frobenius(a, 2)
+julia> b = 2 + 5*7 + 3*7^2 + O(R, 7^3)
+2*7^0 + 5*7^1 + 3*7^2 + O(7^3)
+
+julia> c = 3*7 + 2*7^2 + O(R, 7^5)
+3*7^1 + 2*7^2 + O(7^5)
+
+julia> c = exp(c)
+7^0 + 3*7^1 + 3*7^2 + 4*7^3 + 4*7^4 + O(7^5)
+
+julia> d = log(a)
+7^1 + 5*7^2 + O(7^3)
+
+julia> c = exp(R(0))
+7^0 + O(7^30)
+
+julia> d = log(R(1))
+0
+
+julia> f = teichmuller(b)
+2*7^0 + 4*7^1 + 6*7^2 + O(7^3)
+
+julia> g = frobenius(a, 2)
+7^0 + 7^1 + 2*7^2 + O(7^3)
 ``` 
