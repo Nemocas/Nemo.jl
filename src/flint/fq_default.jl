@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export FqPolyRepField, FqFieldElem, FqField
+export FqPolyRepField, FqFieldElem, FqField, is_absolute
 
 ###############################################################################
 #
@@ -350,10 +350,15 @@ end
 show(io::IO, a::FqFieldElem) = print(io, AbstractAlgebra.obj_to_string(a, context = io))
 
 function show(io::IO, a::FqField)
-   print(io, "Finite field of degree ", _degree(a))
-   print(io, " over F_", characteristic(a))
-   if !is_absolute(a)
-     print(io, " (over ", base_field(a), ")")
+   if is_absolute(a)
+     print(io, "Finite field ", characteristic(a))
+     if _degree(a) != 1
+       print(io, "^", _degree(a))
+     end
+   else
+     print(io, "Finite field of degree ", degree(a))
+     print(io, " over ",)
+     print(io, "(", base_field(a), ")")
    end
 end
 
@@ -703,7 +708,6 @@ function modulus(k::FqField, var::String="T")
           Q, k)
     return Q
 end
-
 
 ###############################################################################
 #

@@ -1,9 +1,5 @@
 export continued_fraction, continued_fraction_with_matrix, convergents
 
-macro new_struct(T, args...)
-   return esc(Expr(:new, T, args...))
-end
-
 mutable struct _fmpq_ball
    left_num::Int
    left_den::Int

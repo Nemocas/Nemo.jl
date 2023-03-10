@@ -286,6 +286,12 @@ end
    @test powermod(f, ZZRingElem(3), h) == (17*x^4+14*x^3+7*x^2+20*x+5)*y^3+(20*x^4+7*x^3+16*x^2+x+10)*y^2+(x^4+6*x^3+17*x^2+16*x+21)*y+(3*x^4+5*x+1)
 
    @test powermod(f, -ZZRingElem(3), g) == (18*x^4+x^3+7*x^2+15*x+5)*y+(16*x^4+14*x^3+15*x^2+5*x+21)
+
+   R, _ = NGFiniteField(23, 1, "x")
+   Rx, x = R["x"]
+   f = x^2
+   g = x^4
+   @test iszero(powermod(f, ZZ(2), g))
 end
 
 @testset "FqPolyRingElem.exact_division" begin

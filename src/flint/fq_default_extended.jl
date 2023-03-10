@@ -62,10 +62,22 @@ function _coerce_to_prime_field(a::FqFieldElem)
   return K(lift(ZZ, a))
 end
 
+function defining_polynomial(R::FqPolyRing, L::FqField)
+  coefficient_ring(R) !== base_field(L) && error("Coefficient ring must be base field of finite field")
+  f = defining_polynomial(L) # this is cached
+  if parent(f) === R
+     return f
+  else
+     g = deepcopy(f)
+     g.parent = R
+     return g
+  end
+end
+
 function defining_polynomial(L::FqField)
   if !isdefined(L, :defining_poly)
-    @assert is_absolute(L)
-    F = polynomial_ring(prime_field(L), "x", cached = false)[1]
+    @assert L.isstandard
+    F, = polynomial_ring(prime_field(L), "x", cached = false)
     L.defining_poly = F(map(lift, collect(coefficients(modulus(L)))))
   end
   return L.defining_poly::FqPolyRingElem
@@ -430,79 +442,170 @@ show_raw(io::IO, a::FqFieldElem) =
 #
 ################################################################################
 
+# Given an FqField F and a polynomial f in F[x], we want to construct
+# FF = F[x]/(f) together with the map p : F[x] -> FF
+#
+# There are first two special cases, where F is in fact an
+# FpField or an fpfield (in disguise)
+# In this case we call directly the corresponding flint function
+# to construct FF and p.
+
+function _fq_field_from_fmpz_mod_poly_in_disguise(f::FqPolyRingElem, s)
+  K = base_ring(f)
+  @assert _fq_default_ctx_type(K) == _FQ_DEFAULT_FMPZ_NMOD
+  # f is an fmpz_mod_poly in disguise
+  # I cannot use the FqField constructor, since f has the wrong type
+  # on the julia side
+  z = @new_struct(FqField) # this is just new() usable outside the type definition
+  z.var = string(s)
+  # I need to get to the fmpz_mod_ctx
+  # It is in K but the first 4 bytes are the type
+  # Temporary hack
+  #_K = _get_raw_type(FpField, K)
+  ccall((:fq_default_ctx_init_modulus, libflint), Nothing,
+        (Ref{FqField}, Ref{FqPolyRingElem}, Ptr{Nothing}, Ptr{UInt8}),
+        #z, f, _K.ninv, string(s))
+        z, f, pointer_from_objref(K) + 2 * sizeof(Cint), string(s))
+  finalizer(_FqDefaultFiniteField_clear_fn, z)
+  z.isabsolute = true
+  z.isstandard = true
+  z.forwardmap = g -> begin
+    y = FqFieldElem(z)
+    ccall((:fq_default_set_fmpz_mod_poly, libflint), Nothing,
+          (Ref{FqFieldElem}, Ref{FqPolyRingElem}, Ref{FqField}), y, g, z)
+    @assert parent(y) === z
+    return y
+  end
+  z.backwardmap = g -> begin
+    y = parent(f)()
+    ccall((:fq_default_get_fmpz_mod_poly, libflint), Nothing,
+          (Ref{FqPolyRingElem}, Ref{FqFieldElem}, Ref{FqField}), y, g, z)
+    return y
+  end
+  return z
+end
+
+function _fq_field_from_nmod_poly_in_disguise(f::FqPolyRingElem, s)
+  K = base_ring(f)
+  @assert _fq_default_ctx_type(K) == _FQ_DEFAULT_NMOD
+  # f is an fmpz_mod_poly in disguise
+  # I cannot use the FqField constructor, since f has the wrong type
+  # on the julia side
+  z = @new_struct(FqField) # this is just new() usable outside the type definition
+  z.var = string(s)
+  # I need to get to the fmpz_mod_ctx
+  # It is in K but the first 4 bytes are the type
+  #
+  # There is a bug in flint, #1264: fq_default_ctx_init_modulus_nmod
+  # sets the the *wrong* ctx.
+  # I need to create a corresponding fmpz_mod_poly
+  _F = Nemo.FpField(ZZ(characteristic(K)), false)
+  _Fx, = polynomial_ring(_F, cached = false)
+  _f = map_coefficients(c -> _F(lift(ZZ, c)), f)
+  ccall((:fq_default_ctx_init_modulus, libflint), Nothing,
+        (Ref{FqField}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
+              z, _f, _F.ninv, string(s))
+  finalizer(_FqDefaultFiniteField_clear_fn, z)
+  z.isabsolute = true
+  z.isstandard = true
+  z.forwardmap = g -> begin
+    y = FqFieldElem(z)
+    ccall((:fq_default_set_nmod_poly, libflint), Nothing,
+          (Ref{FqFieldElem}, Ref{FqPolyRingElem}, Ref{FqField}), y, g, z)
+    return y
+  end
+  z.backwardmap = g -> begin
+    y = parent(f)()
+    ccall((:fq_default_get_nmod_poly, libflint), Nothing,
+          (Ref{FqPolyRingElem}, Ref{FqFieldElem}, Ref{FqField}), y, g, z)
+    return y
+  end
+  return z
+end
 
 const FqDefaultFiniteFieldIDFqDefaultPoly = Dict{Tuple{FqPolyRingElem, Symbol}, FqField}()
 
-function FqField(f::FqPolyRingElem, s::Symbol, cached::Bool = false)
+function FqField(f::FqPolyRingElem, s::Symbol, cached::Bool = false, absolute::Bool = false)
   return get_cached!(FqDefaultFiniteFieldIDFqDefaultPoly, (f, s), cached) do
     K = base_ring(f)
-    p = characteristic(K)
-    d = absolute_degree(K) * degree(f)
-    L = FqField(p, d, s, cached)
-    L.isabsolute = false
-    L.defining_poly = f
-    L.base_field = K
-    # We also need to determine the map K[x]/(f) -> L
-    # First embed K into L
-    e = _embed(K, L)
-    # Push f to L
-    foverL = map_coefficients(e, f)
-    a = roots(foverL)[1]
-    # Found the map K[x]/(f) -> L
-    forwardmap = y -> evaluate(map_coefficients(e, y), a)
-    Kabs = _absolute_basis(K)
-    Fp = prime_field(K)
-    # We have no natural coercion Fp -> K
-    eabs = _embed(Fp, K)
-    # Determine inverse of forwardmap using linear algebra
-    # First determine the matrix representing forwardmap
-    forwardmat = zero_matrix(Fp, d, d)
-    l = 1
-    x = gen(parent(f))
-    xi = powers(x, degree(f) - 1)
-    for i in 0:(degree(f) - 1)
-      for b in Kabs
-        v = forwardmap(b * xi[i + 1])
-        for j in 1:_degree(L)
-          forwardmat[l, j] = _coeff(v, j - 1)
-        end
-        l += 1
+    if absolute_degree(K) == 1
+      # K is F_p
+      # f is either nmod_poly or fmpz_mod_poly
+      # we can define K[t]/(f) directly on the C side with the right modulus
+      if _fq_default_ctx_type(K) == _FQ_DEFAULT_NMOD
+        z = _fq_field_from_nmod_poly_in_disguise(f, s)
+      else
+        @assert _fq_default_ctx_type(K) == _FQ_DEFAULT_FMPZ_NMOD
+        z = _fq_field_from_fmpz_mod_poly_in_disguise(f, s)
       end
-    end
-    forwardmatinv = inv(forwardmat)
-    backwardmap = y -> begin
-      w = matrix(Fp, 1, d, [_coeff(y, j - 1) for j in 1:d])
-      ww = [Fp(_coeff(y, j - 1)) for j in 1:d]
-      _abs_gen_rel = zero(parent(f))
-      fl, vv = can_solve_with_solution(forwardmat, w, side = :left)
-      vvv = ww * forwardmatinv
-      @assert fl
+    else
+      # This is the generic case
+      p = characteristic(K)
+      d = absolute_degree(K) * degree(f)
+      # Construct a "standard" copy of F_p^d
+      L = FqField(p, d, s, cached)
+      L.isabsolute = absolute
+      L.isstandard = false
+      L.defining_poly = f
+      L.base_field = K
+      # We also need to determine the map K[x]/(f) -> L
+      # First embed K into L
+      e = _embed(K, L)
+      # Push f to L
+      foverL = map_coefficients(e, f)
+      a = roots(foverL)[1]
+      # Found the map K[x]/(f) -> L
+      forwardmap = y -> evaluate(map_coefficients(e, y), a)
+      Kabs = _absolute_basis(K)
+      Fp = prime_field(K)
+      # We have no natural coercion Fp -> K
+      eabs = _embed(Fp, K)
+      # Determine inverse of forwardmap using linear algebra
+      # First determine the matrix representing forwardmap
+      forwardmat = zero_matrix(Fp, d, d)
       l = 1
+      x = gen(parent(f))
+      xi = powers(x, degree(f) - 1)
       for i in 0:(degree(f) - 1)
         for b in Kabs
-          _abs_gen_rel += eabs(vv[1, l]) * b * xi[i + 1]
+          v = forwardmap(b * xi[i + 1])
+          for j in 1:_degree(L)
+            forwardmat[l, j] = _coeff(v, j - 1)
+          end
           l += 1
         end
       end
-      return _abs_gen_rel
-    end
-    backwardmap_basefield = y -> begin
-      w = matrix(Fp, 1, d, [_coeff(y, j - 1) for j in 1:d])
-      fl, vv = can_solve_with_solution(forwardmat, w, side = :left)
-      @assert fl
-      @assert all(iszero, (vv[1, i] for i in (absolute_degree(K) + 1):d))
-      return sum(eabs(vv[1, i]) * Kabs[i] for i in 1:absolute_degree(K))
-    end
+      forwardmatinv = inv(forwardmat)
+      backwardmap = y -> begin
+        w = matrix(Fp, 1, d, [_coeff(y, j - 1) for j in 1:d])
+        ww = [Fp(_coeff(y, j - 1)) for j in 1:d]
+        _abs_gen_rel = zero(parent(f))
+        fl, vv = can_solve_with_solution(forwardmat, w, side = :left)
+        vvv = ww * forwardmatinv
+        @assert fl
+        l = 1
+        for i in 0:(degree(f) - 1)
+          for b in Kabs
+            _abs_gen_rel += eabs(vv[1, l]) * b * xi[i + 1]
+            l += 1
+          end
+        end
+        return _abs_gen_rel
+      end
+      backwardmap_basefield = y -> begin
+        w = matrix(Fp, 1, d, [_coeff(y, j - 1) for j in 1:d])
+        fl, vv = can_solve_with_solution(forwardmat, w, side = :left)
+        @assert fl
+        return sum(eabs(vv[1, i]) * Kabs[i] for i in 1:absolute_degree(K))
+      end
 
-    u = rand(K)
-    @assert backwardmap_basefield(forwardmap(u*x^0)) == u
-
-    L.forwardmap = forwardmap
-    L.backwardmap = backwardmap
-    L.image_basefield = e
-    L.preimage_basefield = backwardmap_basefield
-    return L
-  end::FqField
+      L.forwardmap = forwardmap
+      L.backwardmap = backwardmap
+      L.image_basefield = e
+      L.preimage_basefield = backwardmap_basefield
+      return L
+    end::FqField
+  end
 end
 
 ################################################################################
@@ -517,12 +620,12 @@ function NGFiniteField(a::IntegerUnion, s::AbstractString = "o"; cached::Bool = 
   return NGFiniteField(p, e, s; cached = cached, check = false)
 end
 
-function NGFiniteField(f::FqPolyRingElem, s::AbstractString = "o"; cached::Bool = true, check::Bool = true)
-  (check && !isirreducible(f)) && error("Defining polynomial must be irreducible")
-  # Should probably have its own cache
-  F = FqField(f, Symbol(s), cached)
-  return F, gen(F)
-end
+#function NGFiniteField(f::FqPolyRingElem, s::AbstractString = "o"; cached::Bool = true, check::Bool = true)
+#  (check && !isirreducible(f)) && error("Defining polynomial must be irreducible")
+#  # Should probably have its own cache
+#  F = FqField(f, Symbol(s), cached)
+#  return F, gen(F)
+#end
 
 _FiniteField(a...; kw...) = NGFiniteField(a...; kw...)
 
@@ -567,3 +670,37 @@ function (a::FqField)(b::FqFieldElem)
   # To make it work in towers
   return a(base_field(a)(b))
 end
+
+################################################################################
+#
+#  Proper way to construct extension via polynomials
+#
+################################################################################
+
+# Note: the modulus might be rescaled to be monic
+function _residue_field(f::FqPolyRingElem; absolute::Bool = false)
+  F = FqField(f, :o, false, absolute)
+  return F, FqPolyRingToFqField(parent(f), F)
+end
+
+@attributes mutable struct FqPolyRingToFqField <: Map{FqPolyRing, FqField, SetMap, FqPolyRingToFqField}
+  D::FqPolyRing
+  C::FqField
+  f# the actual map
+  g# the inverse
+
+  function FqPolyRingToFqField(R::FqPolyRing, F::FqField)
+    z = new(R, F, F.forwardmap, F.backwardmap)
+    return z
+  end
+end
+
+domain(f::FqPolyRingToFqField) = f.D
+
+codomain(f::FqPolyRingToFqField) = f.C
+
+image(f::FqPolyRingToFqField, x::FqPolyRingElem) = f.f(x)::FqFieldElem
+
+(f::FqPolyRingToFqField)(x::FqPolyRingElem) = image(f, x)
+
+preimage(f::FqPolyRingToFqField, x::FqFieldElem) = f.g(x)::FqPolyRingElem

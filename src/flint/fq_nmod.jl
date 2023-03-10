@@ -577,13 +577,32 @@ Return the modulus defining the finite field $k$.
 function modulus(k::fqPolyRepField, var::String="T")
     p::Int = characteristic(k)
     Q = polynomial(GF(p), [], var)
-    P = ccall((:fq_nmod_ctx_modulus, libflint), Ref{fpPolyRingElem},
-                 (Ref{fqPolyRepField},), k)
-    ccall((:nmod_poly_set, libflint), Nothing,
-          (Ref{fpPolyRingElem}, Ref{fpPolyRingElem}),
-          Q, P)
-
+    GC.@preserve k begin
+        P = ccall((:fq_nmod_ctx_modulus, libflint), Ptr{fpPolyRingElem},
+                     (Ref{fqPolyRepField},), k)
+        ccall((:nmod_poly_set, libflint), Nothing,
+              (Ref{fpPolyRingElem}, Ptr{fpPolyRingElem}),
+              Q, P)
+    end
     return Q
+end
+
+function defining_polynomial(k::fqPolyRepField)
+   F = fpField(UInt(characteristic(k)))
+   Fx, = polynomial_ring(F, "x", cached = false)
+   return defining_polynomial(Fx, k)
+end
+
+function defining_polynomial(R::fpPolyRing, k::fqPolyRepField)
+   Q = R()
+   GC.@preserve k begin
+      P = ccall((:fq_nmod_ctx_modulus, libflint), Ptr{fpPolyRingElem},
+                (Ref{fqPolyRepField},), k)
+      ccall((:nmod_poly_set, libflint), Nothing,
+            (Ref{fpPolyRingElem}, Ptr{fpPolyRingElem}),
+            Q, P)
+   end
+   return Q
 end
 
 ###############################################################################

@@ -344,6 +344,10 @@ function versioninfo()
   return nothing
 end
 
+macro new_struct(T, args...)
+   return esc(Expr(:new, T, args...))
+end
+
 ###############################################################################
 #
 #   Generic submodule

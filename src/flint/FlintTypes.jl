@@ -2260,6 +2260,10 @@ end
    overfields::Dict{Int, Vector{FinFieldMorphism}}
    subfields::Dict{Int, Vector{FinFieldMorphism}}
 
+   isstandard::Bool
+   # isstandard means, that defining_polynomial(F) === modulus(F)
+   # In particular, we can use the fast fq_default_get/set_*_poly
+   # functions to go from polynomials to field elements
    isabsolute::Bool
    base_field
    defining_poly
@@ -2273,6 +2277,7 @@ end
          d = new()
          d.var = string(s)
          d.isabsolute = true
+         d.isstandard = true
          finalizer(_FqDefaultFiniteField_clear_fn, d)
          ccall((:fq_default_ctx_init, libflint), Nothing,
                (Ref{FqField}, Ref{ZZRingElem}, Int, Ptr{UInt8}),
@@ -2287,6 +2292,7 @@ end
       return get_cached!(FqDefaultFiniteFieldIDFmpzPol, (f, s), cached) do
          z = new()
          z.isabsolute = true
+         z.isstandard = true
          z.var = string(s)
          ccall((:fq_default_ctx_init_modulus, libflint), Nothing,
                (Ref{FqField}, Ref{ZZModPolyRingElem}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
@@ -2296,11 +2302,12 @@ end
       end
    end
 
-   function FqField(f::FpPolyRingElem, s::Symbol, cached::Bool = true; check::Bool = true)
+   function FqField(f::FpPolyRingElem, s::Symbol, cached::Bool = true;  check::Bool = true)
       # check ignored
       return get_cached!(FqDefaultFiniteFieldIDGFPPol, (f, s), cached) do
          z = new()
-         z.isabsolute = true
+         z.isabsolute = absolute
+         z.isstandard = true
          z.var = string(s)
          ccall((:fq_default_ctx_init_modulus, libflint), Nothing,
                (Ref{FqField}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
@@ -2316,6 +2323,7 @@ end
       return get_cached!(FqDefaultFiniteFieldIDNmodPol, (f, s), cached) do
          z = new()
          z.isabsolute = true
+         z.isstandard = true
          z.var = string(s)
          ccall((:fq_default_ctx_init_modulus_nmod, libflint), Nothing,
                (Ref{FqField}, Ref{zzModPolyRingElem}, Ptr{UInt8}),
@@ -2330,6 +2338,7 @@ end
       return get_cached!(FqDefaultFiniteFieldIDGFPNmodPol, (f, s), cached) do
          z = new()
          z.isabsolute = true
+         z.isstandard = true
          z.var = string(s)
          ccall((:fq_default_ctx_init_modulus_nmod, libflint), Nothing,
                (Ref{FqField}, Ref{fpPolyRingElem}, Ptr{UInt8}),

@@ -500,11 +500,16 @@ function powermod(x::FqPolyRingElem, n::ZZRingElem, y::FqPolyRingElem)
       end
       n = -n
    end
-
-   ccall((:fq_default_poly_powmod_fmpz_binexp, libflint), Nothing,
-         (Ref{FqPolyRingElem}, Ref{FqPolyRingElem}, Ref{ZZRingElem}, Ref{FqPolyRingElem},
-         Ref{FqField}), z, x, n, y, base_ring(parent(x)))
-  return z
+   # https://github.com/flintlib/flint2/pull/1261
+   if _fq_default_ctx_type(base_ring(parent(x))) == 4
+      ccall((:nmod_poly_powmod_fmpz_binexp, libflint), Nothing,
+            (Ref{FqPolyRingElem}, Ref{FqPolyRingElem}, Ref{ZZRingElem}, Ref{FqPolyRingElem}), z, x, n, y)
+   else
+     ccall((:fq_default_poly_powmod_fmpz_binexp, libflint), Nothing,
+           (Ref{FqPolyRingElem}, Ref{FqPolyRingElem}, Ref{ZZRingElem}, Ref{FqPolyRingElem},
+           Ref{FqField}), z, x, n, y, base_ring(parent(x)))
+   end
+   return z
 end
 
 ################################################################################
