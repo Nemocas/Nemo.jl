@@ -10,10 +10,14 @@
    St, t = polynomial_ring(residue_ring(FlintZZ, 23), "t")
    Stt, tt = polynomial_ring(GF(23), "y")
 
-   T, z = NGFiniteField(y^2 + 1, "z")
-   T2, z2 = NGFiniteField(yy^2 + 1, "z")
-   T3, z3 = NGFiniteField(t^2 + 1, "z")
-   T4, z4 = NGFiniteField(tt^2 + 1, "z")
+   T = FqField(y^2 + 1, :z)
+   z = gen(T)
+   T2 = FqField(yy^2 + 1, :z)
+   z2 = gen(T2)
+   T3 = FqField(t^2 + 1, :z)
+   z3 = gen(T3)
+   T4 = FqField(tt^2 + 1, :z)
+   z4 = gen(T4)
 
    @test isa(R, FqField)
    @test isa(T, FqField)
@@ -49,11 +53,11 @@
    @test isa(d, FqFieldElem)
 
    # check for primality
-   T3, z3 = NGFiniteField(yy^2 + 1, "z", check=false)
+   T3, z3 = FqField(yy^2 + 1, :z, check=false)
    @test isa(T2, FqField)
    Syyy, yyy = polynomial_ring(residue_ring(FlintZZ, ZZ(4)), "y")
    @test yyy isa ZZModPolyRingElem
-   @test_throws DomainError NGFiniteField(yyy^2+1, "z")
+   @test_throws DomainError FqField(yyy^2+1, :z)
 end
 
 @testset "FqFieldElem.printing" begin

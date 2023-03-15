@@ -2306,7 +2306,7 @@ end
       # check ignored
       return get_cached!(FqDefaultFiniteFieldIDGFPPol, (f, s), cached) do
          z = new()
-         z.isabsolute = absolute
+         z.isabsolute = true
          z.isstandard = true
          z.var = string(s)
          ccall((:fq_default_ctx_init_modulus, libflint), Nothing,

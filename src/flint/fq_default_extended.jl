@@ -98,7 +98,7 @@ function degree(a::FqField)
   if is_absolute(a)
     return _degree(a)
   else
-    return degree(a.defining_poly)
+    return degree(defining_polynomial(a))
   end
 end
 
@@ -469,6 +469,7 @@ function _fq_field_from_fmpz_mod_poly_in_disguise(f::FqPolyRingElem, s)
   finalizer(_FqDefaultFiniteField_clear_fn, z)
   z.isabsolute = true
   z.isstandard = true
+  z.base_field = K
   z.forwardmap = g -> begin
     y = FqFieldElem(z)
     ccall((:fq_default_set_fmpz_mod_poly, libflint), Nothing,
@@ -500,7 +501,7 @@ function _fq_field_from_nmod_poly_in_disguise(f::FqPolyRingElem, s)
   # sets the the *wrong* ctx.
   # I need to create a corresponding fmpz_mod_poly
   _F = Nemo.FpField(ZZ(characteristic(K)), false)
-  _Fx, = polynomial_ring(_F, cached = false)
+  _Fx, = polynomial_ring(_F, "x", cached = false)
   _f = map_coefficients(c -> _F(lift(ZZ, c)), f)
   ccall((:fq_default_ctx_init_modulus, libflint), Nothing,
         (Ref{FqField}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
@@ -508,6 +509,7 @@ function _fq_field_from_nmod_poly_in_disguise(f::FqPolyRingElem, s)
   finalizer(_FqDefaultFiniteField_clear_fn, z)
   z.isabsolute = true
   z.isstandard = true
+  z.base_field = K
   z.forwardmap = g -> begin
     y = FqFieldElem(z)
     ccall((:fq_default_set_nmod_poly, libflint), Nothing,
@@ -523,10 +525,10 @@ function _fq_field_from_nmod_poly_in_disguise(f::FqPolyRingElem, s)
   return z
 end
 
-const FqDefaultFiniteFieldIDFqDefaultPoly = Dict{Tuple{FqPolyRingElem, Symbol}, FqField}()
+const FqDefaultFiniteFieldIDFqDefaultPoly = Dict{Tuple{FqPolyRingElem, Symbol, Bool}, FqField}()
 
 function FqField(f::FqPolyRingElem, s::Symbol, cached::Bool = false, absolute::Bool = false)
-  return get_cached!(FqDefaultFiniteFieldIDFqDefaultPoly, (f, s), cached) do
+  return get_cached!(FqDefaultFiniteFieldIDFqDefaultPoly, (f, s, absolute), cached) do
     K = base_ring(f)
     if absolute_degree(K) == 1
       # K is F_p
@@ -620,12 +622,12 @@ function NGFiniteField(a::IntegerUnion, s::AbstractString = "o"; cached::Bool = 
   return NGFiniteField(p, e, s; cached = cached, check = false)
 end
 
-#function NGFiniteField(f::FqPolyRingElem, s::AbstractString = "o"; cached::Bool = true, check::Bool = true)
-#  (check && !isirreducible(f)) && error("Defining polynomial must be irreducible")
-#  # Should probably have its own cache
-#  F = FqField(f, Symbol(s), cached)
-#  return F, gen(F)
-#end
+function NGFiniteField(f::FqPolyRingElem, s::AbstractString = "o"; cached::Bool = true, check::Bool = true)
+  (check && !isirreducible(f)) && error("Defining polynomial must be irreducible")
+  # Should probably have its own cache
+  F = FqField(f, Symbol(s), cached)
+  return F, gen(F)
+end
 
 _FiniteField(a...; kw...) = NGFiniteField(a...; kw...)
 
@@ -678,8 +680,11 @@ end
 ################################################################################
 
 # Note: the modulus might be rescaled to be monic
-function _residue_field(f::FqPolyRingElem; absolute::Bool = false)
-  F = FqField(f, :o, false, absolute)
+function _residue_field(f::FqPolyRingElem, s = "o"; absolute::Bool = false, check::Bool = true)
+  if check
+    !is_irreducible(f) && throw(ArgumentError("Polynomial must be irreducible"))
+  end
+  F = FqField(f, Symbol(s), false, absolute)
   return F, FqPolyRingToFqField(parent(f), F)
 end
 

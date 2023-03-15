@@ -785,28 +785,30 @@ function NGFiniteField(char::IntegerUnion, deg::Int, s::AbstractString = "o"; ca
    return parent_obj, _gen(parent_obj)
 end
 
-@doc Markdown.doc"""
-    NGFiniteField(pol::Union{ZZModPolyRingElem, FpPolyRingElem}, s::AbstractString; cached = true, check = true)
+# @doc Markdown.doc"""
+#     NGFiniteField(pol::Union{ZZModPolyRingElem, FpPolyRingElem}, s::AbstractString; cached = true, check = true)
+# 
+# Returns a tuple $S, x$ consisting of a finite field parent object $S$ and
+# generator $x$ for the finite field over $F_p$ defined by the given
+# polynomial, i.e. $\mathbb{F}_p[t]/(pol)$. The characteristic is specified by
+# the modulus of `pol`. The polynomial is required to be irreducible, but this
+# is not checked. The base ring of the polynomial is required to be a field, which
+# is checked by default. Use `check = false` to disable the check.
+# The string $s$ is used to designate how the finite field
+# generator will be printed. The generator will not be multiplicative in
+# general.
+# """
+# function NGFiniteField(pol::Union{ZZModPolyRingElem, FpPolyRingElem, zzModPolyRingElem, fpPolyRingElem},
+#                           s::AbstractString; cached = true, check::Bool=true)
+#    S = Symbol(s)
+#    parent_obj = FqField(pol, S, cached, check=check)
+# 
+#    return parent_obj, _gen(parent_obj)
+# end
+# 
+# 
 
-Returns a tuple $S, x$ consisting of a finite field parent object $S$ and
-generator $x$ for the finite field over $F_p$ defined by the given
-polynomial, i.e. $\mathbb{F}_p[t]/(pol)$. The characteristic is specified by
-the modulus of `pol`. The polynomial is required to be irreducible, but this
-is not checked. The base ring of the polynomial is required to be a field, which
-is checked by default. Use `check = false` to disable the check.
-The string $s$ is used to designate how the finite field
-generator will be printed. The generator will not be multiplicative in
-general.
-"""
-function NGFiniteField(pol::Union{ZZModPolyRingElem, FpPolyRingElem, zzModPolyRingElem, fpPolyRingElem},
-                          s::AbstractString; cached = true, check::Bool=true)
-   S = Symbol(s)
-   parent_obj = FqField(pol, S, cached, check=check)
-
-   return parent_obj, _gen(parent_obj)
-end
-
-
+# The following code is used in the intersection code
 function FlintFiniteField(F::FqField, deg::Int,
                           s::Union{AbstractString,Symbol} = :o; cached = true)
     return FqField(characteristic(F), deg, Symbol(s), cached)

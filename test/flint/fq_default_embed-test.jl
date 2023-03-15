@@ -140,10 +140,10 @@ end
             F4 = factor(P4)
         end
 
-        K1 = NGFiniteField(P1, "r1")[1]
-        K2 = NGFiniteField(P2, "r2")[1]
-        K3 = NGFiniteField(P3, "r3")[1]
-        K4 = NGFiniteField(P4, "r4")[1]
+        K1 = FqField(P1, :r1)
+        K2 = FqField(P2, :r2)
+        K3 = FqField(P3, :r3)
+        K4 = FqField(P4, :r4)
 
         K = Set([K1, K2, K3, K4])
         while !isempty(K)

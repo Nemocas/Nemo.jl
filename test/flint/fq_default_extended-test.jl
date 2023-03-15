@@ -196,5 +196,5 @@ end
    Rx, x = R["x"]
    f = x + 2
    F, RxtoF = Nemo._residue_field(f)
-   @test defining_polynomial(F) == 2
+   @test defining_polynomial(Rx, F) == x + 2
 end
