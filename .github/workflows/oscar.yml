@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - master
-   pull_request:
-     branches:
-       - master
+  pull_request:
+    branches:
+      - master
 
 concurrency:
   # group by workflow and ref; the last slightly strange component ensures that for pull
