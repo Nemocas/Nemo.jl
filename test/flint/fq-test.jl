@@ -101,6 +101,10 @@ end
    @test_throws DomainError coeff(2x + 1, -1)
 
    @test isa(modulus(R), FpPolyRingElem)
+
+   @test defining_polynomial(R) isa FpPolyRingElem
+   kt, t = GF(ZZ(7))["t"]
+   @test parent(defining_polynomial(kt, R)) === kt
 end
 
 @testset "FqPolyRepFieldElem.unary_ops" begin

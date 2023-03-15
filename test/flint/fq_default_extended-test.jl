@@ -66,6 +66,17 @@
    f = x^2 + 1
    F, b = NGFiniteField(f, "b")
    @test F isa FqField
+
+   # check caching
+   R, a = NGFiniteField(3, 1, "a")
+   Rx, x = R["x"]
+   f = x^2 + 2x + 2
+   F, b = NGFiniteField(f, "b", cached = false)
+   FF, bb = NGFiniteField(f, "b", cached = false)
+   @test F !== FF
+   F, b = NGFiniteField(f, "b")
+   FF, bb = NGFiniteField(f, "b")
+   @test F === FF
 end
 
 @testset "FqFieldElem.printing" begin
@@ -193,6 +204,18 @@ end
    end
 
    R, a = NGFiniteField(ZZRingElem(7), 1, "a")
+   Rx, x = R["x"]
+   f = x + 2
+   F, RxtoF = Nemo._residue_field(f)
+   @test defining_polynomial(Rx, F) == x + 2
+
+   R, a = NGFiniteField(ZZRingElem(7), 1, "a")
+   Rx, x = R["x"]
+   f = x + 2
+   F, RxtoF = Nemo._residue_field(f)
+   @test defining_polynomial(Rx, F) == x + 2
+
+   R, a = NGFiniteField(ZZRingElem(18446744073709551629), 1, "a")
    Rx, x = R["x"]
    f = x + 2
    F, RxtoF = Nemo._residue_field(f)
