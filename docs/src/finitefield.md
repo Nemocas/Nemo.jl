@@ -204,3 +204,44 @@ julia> f = 8x + 9
 julia> lift(S, f)
 8*y + 9
 ```
+
+# Uniform finite fields
+
+An (experimental) uniform finite field interface is provided by the type `FqField`.
+Such a finite field can be constructed as an extension of a prime field
+$\mathbf{F}_p$ (an absolute extension) or of another finite field (a relative
+extension). The field over which the extension is constructed is referred to as the *base field*
+and field theoretic properties like the degree of an extension or the trace of an element are understood with respect to the base field.
+The corresponding functionality for the implicit absolute extension over the prime field is available
+by methods with the prefix `absolute_`.
+
+Note that all finite fields are simple extension $k[t]/(f)$ of their base field $k$.
+The irreducible polynomial $f \in k[t]$ is the *defining polynomial* and the class of $t$ is referred
+to as the *generator* of the extension.
+
+## Construction of finite fields
+
+```@docs
+Nemo._FiniteField
+Nemo._GF
+```
+
+## Field properties
+
+```@docs
+base_field(::FqField)
+prime_field(::FqField)
+degree(::FqField)
+absolute_degree(::FqField)
+is_absolute(::FqField)
+defining_polynomial(::FqPolyRing, ::FqField)
+```
+
+## Element properties
+
+```@docs
+tr(::FqFieldElem)
+absolute_tr(::FqFieldElem)
+norm(::FqFieldElem)
+absolute_norm(::FqFieldElem)
+```
