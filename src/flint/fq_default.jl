@@ -351,10 +351,11 @@ show(io::IO, a::FqFieldElem) = print(io, AbstractAlgebra.obj_to_string(a, contex
 
 function show(io::IO, a::FqField)
    if is_absolute(a)
-     print(io, "Finite field ", characteristic(a))
-     if _degree(a) != 1
-       print(io, "^", _degree(a))
-     end
+     print(io, "Finite field of degree ", degree(a), " over F_", characteristic(a))
+     #print(io, "Finite field ", characteristic(a))
+     #if _degree(a) != 1
+     #  print(io, "^", _degree(a))
+     #end
    else
      print(io, "Finite field of degree ", degree(a))
      print(io, " over ",)
