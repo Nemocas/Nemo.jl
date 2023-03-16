@@ -1183,6 +1183,7 @@ from which the number field is constructed, should be printed. If it is not
 supplied, a default dollar sign will be used to represent the variable.
 """
 function cyclotomic_field(n::Int, s::Union{AbstractString, Char, Symbol} = "z_$n", t = "_\$"; cached = true)
+   n > 0 || throw(ArgumentError("conductor must be positive, not $n"))
    Zx, x = PolynomialRing(FlintZZ, gensym(); cached = false)
    Qx, = PolynomialRing(FlintQQ, t; cached = cached)
    f = cyclotomic(n, x)
