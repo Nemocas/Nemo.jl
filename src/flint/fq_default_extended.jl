@@ -426,7 +426,7 @@ function _embed(K::FqField, L::FqField)
     # must be absolute minpoly
     g = absolute_minpoly(_gen(K))
     e = _embed(prime_field(K), L)
-    a = roots(map_coefficients(e, g))[1]
+    a = roots(map_coefficients(e, g, cached = false))[1]
     return x -> begin
       return sum(_coeff(x, i)*a^i for i in 0:(absolute_degree(K) - 1))
     end::FqFieldElem
@@ -527,7 +527,7 @@ function _fq_field_from_nmod_poly_in_disguise(f::FqPolyRingElem, s)
   # I need to create a corresponding fmpz_mod_poly
   _F = Nemo.FpField(ZZ(characteristic(K)), false)
   _Fx, = polynomial_ring(_F, "x", cached = false)
-  _f = map_coefficients(c -> _F(lift(ZZ, c)), f)
+  _f = map_coefficients(c -> _F(lift(ZZ, c)), f, parent = _Fx)
   ccall((:fq_default_ctx_init_modulus, libflint), Nothing,
         (Ref{FqField}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
               z, _f, _F.ninv, string(s))
@@ -579,10 +579,11 @@ function FqField(f::FqPolyRingElem, s::Symbol, cached::Bool = false, absolute::B
       # First embed K into L
       e = _embed(K, L)
       # Push f to L
-      foverL = map_coefficients(e, f)
+			Lx, _ = polynomial_ring(L, "\$", cached = false)
+      foverL = map_coefficients(e, f, parent = Lx)
       a = roots(foverL)[1]
       # Found the map K[x]/(f) -> L
-      forwardmap = y -> evaluate(map_coefficients(e, y), a)
+      forwardmap = y -> evaluate(map_coefficients(e, y, parent = Lx), a)
       Kabs = _absolute_basis(K)
       Fp = prime_field(K)
       # We have no natural coercion Fp -> K

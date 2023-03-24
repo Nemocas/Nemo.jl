@@ -72,7 +72,7 @@ end
 end
 
 function deepcopy_internal(a::FpMatrix, dict::IdDict)
-  z = FpMatrix(nrows(a), ncols(a), parent(a).n)
+  z = FpMatrix(nrows(a), ncols(a), a.base_ring.n)
   if isdefined(a, :base_ring)
     z.base_ring = a.base_ring
   end

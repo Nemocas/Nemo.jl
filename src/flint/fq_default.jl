@@ -701,9 +701,17 @@ rand(R::FqField, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
 #
 ###############################################################################
 
+function modulus(R::FpPolyRing, k::FqField)
+    Q = R()
+    ccall((:fq_default_ctx_modulus, libflint), Nothing,
+          (Ref{FpPolyRingElem}, Ref{FqField}),
+          Q, k)
+    return Q
+end
+
 function modulus(k::FqField, var::String="T")
     p = characteristic(k)
-    Q = polynomial(GF(p), [], var)
+    Q = polynomial(GF(p), [], var, cached = false)
     ccall((:fq_default_ctx_modulus, libflint), Nothing,
           (Ref{FpPolyRingElem}, Ref{FqField}),
           Q, k)

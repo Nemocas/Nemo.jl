@@ -6821,15 +6821,15 @@ const _fq_default_mpoly_union = Union{AbstractAlgebra.Generic.MPoly{FqPolyRepFie
     typ::Int    # keep these in sync with fq_default_mpoly_do_op and
                 # the polynomial_ring constructor
 
-    function FqMPolyRing(a, b::FqField, c::Int, cached = true)
-        return get_cached!(FqDefaultMPolyID, (a, b, c), cached) do
+    function FqMPolyRing(a, b::FqField, c::Int, d::Vector{Symbol}, ord::Symbol, cached = true)
+        return get_cached!(FqDefaultMPolyID, (b, c, d, ord), cached) do
             return new(a, b, c)
         end::FqMPolyRing
     end
 end
 
 const FqDefaultMPolyID = CacheDictType{
-                              Tuple{Any, FqField, Int},
+                              Tuple{FqField, Int, Vector{Symbol}, Symbol},
                               FqMPolyRing}()
 
 mutable struct FqMPolyRingElem <: MPolyRingElem{FqFieldElem}

@@ -98,7 +98,8 @@ end
 function embed_matrices(k::FqField, K::FqField)
     m, n = degree(k), degree(K)
     if m == n
-        T1, T2 = modulus(k), modulus(K)
+        T1 = modulus(k)
+				T2 = modulus(parent(T1), K)
         if T1 == T2
             s1 = identity_matrix(base_ring(T1), n)
             s2 = s1

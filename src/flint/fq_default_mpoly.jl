@@ -606,17 +606,17 @@ function polynomial_ring(R::FqField, s::Vector{Symbol}; cached::Bool = true, ord
         Fq = GF(UInt(p))
         if isone(degree(m))
             Fqx = polynomial_ring(Fq, s, cached = cached, ordering = ordering)[1]
-            parent_obj = FqMPolyRing(Fqx, R, 3, cached)
+            parent_obj = FqMPolyRing(Fqx, R, 3, s, ordering, cached)
         else
             mm = polynomial_ring(Fq, "x")[1](lift(polynomial_ring(ZZ, "x")[1], m))
             Fq = FlintFiniteField(mm, R.var, cached = cached, check = false)[1]
             Fqx = polynomial_ring(Fq, s, cached = cached, ordering = ordering)[1]
-            parent_obj = FqMPolyRing(Fqx, R, 2, cached)
+            parent_obj = FqMPolyRing(Fqx, R, 2, s, ordering, cached)
         end
     else
         Fq = FqPolyRepField(m, Symbol(R.var), cached, check = false)
         Fqx = AbstractAlgebra.Generic.polynomial_ring(Fq, s, cached = cached, ordering = ordering)[1]
-        parent_obj = FqMPolyRing(Fqx, R, 1, cached)
+        parent_obj = FqMPolyRing(Fqx, R, 1, s, ordering, cached)
     end
     return parent_obj, gens(parent_obj)
 end
