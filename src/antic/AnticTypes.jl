@@ -52,7 +52,7 @@ for some more specialized fields.
    end
 end
 
-const AnticNumberFieldID = Dict{Tuple{QQPolyRing, QQPolyRingElem, Symbol}, AnticNumberField}()
+const AnticNumberFieldID = CacheDictType{Tuple{QQPolyRing, QQPolyRingElem, Symbol}, AnticNumberField}()
 
 
 function _AnticNumberField_clear_fn(a::AnticNumberField)

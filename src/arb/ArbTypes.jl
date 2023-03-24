@@ -157,7 +157,7 @@ mutable struct ArbField <: Field
   end
 end
 
-const ArbFieldID = Dict{Int, ArbField}()
+const ArbFieldID = CacheDictType{Int, ArbField}()
 
 precision(x::ArbField) = x.prec
 
@@ -379,7 +379,7 @@ mutable struct AcbField <: Field
   end
 end
 
-const AcbFieldID = Dict{Int, AcbField}()
+const AcbFieldID = CacheDictType{Int, AcbField}()
 
 precision(x::AcbField) = x.prec
 
@@ -485,7 +485,7 @@ mutable struct RealPolyRing <: PolyRing{RealFieldElem}
   end
 end
 
-const RealPolyRingID = Dict{Tuple{Symbol}, RealPolyRing}()
+const RealPolyRingID = CacheDictType{Tuple{Symbol}, RealPolyRing}()
 
 mutable struct RealPoly <: PolyRingElem{RealFieldElem}
   coeffs::Ptr{Nothing}
@@ -579,7 +579,7 @@ mutable struct ArbPolyRing <: PolyRing{arb}
   end
 end
 
-const ArbPolyRingID = Dict{Tuple{ArbField, Symbol}, ArbPolyRing}()
+const ArbPolyRingID = CacheDictType{Tuple{ArbField, Symbol}, ArbPolyRing}()
 
 mutable struct arb_poly <: PolyRingElem{arb}
   coeffs::Ptr{Nothing}
@@ -678,7 +678,7 @@ mutable struct ComplexPolyRing <: PolyRing{acb}
   end
 end
 
-const ComplexPolyRingID = Dict{Tuple{Symbol}, ComplexPolyRing}()
+const ComplexPolyRingID = CacheDictType{Tuple{Symbol}, ComplexPolyRing}()
 
 mutable struct ComplexPoly <: PolyRingElem{ComplexFieldElem}
   coeffs::Ptr{Nothing}
@@ -783,7 +783,7 @@ mutable struct AcbPolyRing <: PolyRing{acb}
   end
 end
 
-const AcbPolyRingID = Dict{Tuple{AcbField, Symbol}, AcbPolyRing}()
+const AcbPolyRingID = CacheDictType{Tuple{AcbField, Symbol}, AcbPolyRing}()
 
 mutable struct acb_poly <: PolyRingElem{acb}
   coeffs::Ptr{Nothing}
@@ -896,7 +896,7 @@ mutable struct RealMatSpace <: MatSpace{RealFieldElem}
   end
 end
 
-const RealMatSpaceID = Dict{Tuple{Int, Int}, RealMatSpace}()
+const RealMatSpaceID = CacheDictType{Tuple{Int, Int}, RealMatSpace}()
 
 mutable struct RealMat <: MatElem{RealFieldElem}
   entries::Ptr{Nothing}
@@ -1021,7 +1021,7 @@ mutable struct ArbMatSpace <: MatSpace{arb}
   end
 end
 
-const ArbMatSpaceID = Dict{Tuple{ArbField, Int, Int}, ArbMatSpace}()
+const ArbMatSpaceID = CacheDictType{Tuple{ArbField, Int, Int}, ArbMatSpace}()
 
 mutable struct arb_mat <: MatElem{arb}
   entries::Ptr{Nothing}
@@ -1150,7 +1150,7 @@ mutable struct ComplexMatSpace <: MatSpace{ComplexFieldElem}
   end
 end
 
-const ComplexMatSpaceID = Dict{Tuple{Int, Int}, ComplexMatSpace}()
+const ComplexMatSpaceID = CacheDictType{Tuple{Int, Int}, ComplexMatSpace}()
 
 mutable struct ComplexMat <: MatElem{ComplexFieldElem}
   entries::Ptr{Nothing}
@@ -1419,7 +1419,7 @@ mutable struct AcbMatSpace <: MatSpace{acb}
   end
 end
 
-const AcbMatSpaceID = Dict{Tuple{AcbField, Int, Int}, AcbMatSpace}()
+const AcbMatSpaceID = CacheDictType{Tuple{AcbField, Int, Int}, AcbMatSpace}()
 
 mutable struct acb_mat <: MatElem{acb}
   entries::Ptr{Nothing}

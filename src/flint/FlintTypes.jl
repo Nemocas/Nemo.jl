@@ -246,7 +246,7 @@ _fmpq_clear_fn(a::QQFieldElem) = ccall((:fmpq_clear, libflint), Nothing, (Ref{QQ
    end
 end
 
-const FmpzPolyID = Dict{Tuple{ZZRing, Symbol}, ZZPolyRing}()
+const FmpzPolyID = CacheDictType{Tuple{ZZRing, Symbol}, ZZPolyRing}()
 
 mutable struct ZZPolyRingElem <: PolyRingElem{ZZRingElem}
    coeffs::Ptr{Nothing}
@@ -343,7 +343,7 @@ end
    end
 end
 
-const FmpqPolyID = Dict{Tuple{QQField, Symbol}, QQPolyRing}()
+const FmpqPolyID = CacheDictType{Tuple{QQField, Symbol}, QQPolyRing}()
 
 mutable struct QQPolyRingElem <: PolyRingElem{QQFieldElem}
    coeffs::Ptr{Int}
@@ -447,7 +447,7 @@ For the modulus being a [`ZZRingElem`](@ref) see [`ZZModRing`](@ref).
    end
 end
 
-const NmodRingID = Dict{UInt, zzModRing}()
+const NmodRingID = CacheDictType{UInt, zzModRing}()
 
 @doc md"""
     zzModRingElem <: RingElem
@@ -483,7 +483,7 @@ Implementation for $p$ being a machine integer [`Int`](@ref).
    end
 end
 
-const GaloisFieldID = Dict{UInt, fpField}()
+const GaloisFieldID = CacheDictType{UInt, fpField}()
 
 @doc md"""
     fpFieldElem <: FinFieldElem
@@ -543,7 +543,7 @@ For the modulus being an [`Int`](@ref) see [`zzModRing`](@ref).
    end
 end
 
-const FmpzModRingID = Dict{ZZRingElem, ZZModRing}()
+const FmpzModRingID = CacheDictType{ZZRingElem, ZZModRing}()
 
 @doc md"""
     ZZModRingElem <: RingElem
@@ -581,7 +581,7 @@ Implementation for $p$ being a big integer [`ZZRingElem`](@ref).
    end
 end
 
-const GaloisFmpzFieldID = Dict{ZZRingElem, FpField}()
+const GaloisFmpzFieldID = CacheDictType{ZZRingElem, FpField}()
 
 @doc md"""
     FpFieldElem <: FinFieldElem
@@ -612,7 +612,7 @@ end
   end
 end
 
-const NmodPolyRingID = Dict{Tuple{zzModRing, Symbol}, zzModPolyRing}()
+const NmodPolyRingID = CacheDictType{Tuple{zzModRing, Symbol}, zzModPolyRing}()
 
 mutable struct zzModPolyRingElem <: PolyRingElem{zzModRingElem}
    coeffs::Ptr{Nothing}
@@ -751,7 +751,7 @@ end
   end
 end
 
-const GFPPolyRingID = Dict{Tuple{fpField, Symbol}, fpPolyRing}()
+const GFPPolyRingID = CacheDictType{Tuple{fpField, Symbol}, fpPolyRing}()
 
 mutable struct fpPolyRingElem <: PolyRingElem{fpFieldElem}
    coeffs::Ptr{Nothing}
@@ -889,7 +889,7 @@ end
   end
 end
 
-const FmpzModPolyRingID = Dict{Tuple{ZZModRing, Symbol}, ZZModPolyRing}()
+const FmpzModPolyRingID = CacheDictType{Tuple{ZZModRing, Symbol}, ZZModPolyRing}()
 
 mutable struct ZZModPolyRingElem <: PolyRingElem{ZZModRingElem}
    coeffs::Ptr{Nothing}
@@ -1070,7 +1070,7 @@ end
   end
 end
 
-const GFPFmpzPolyRingID = Dict{Tuple{FpField, Symbol}, FpPolyRing}()
+const GFPFmpzPolyRingID = CacheDictType{Tuple{FpField, Symbol}, FpPolyRing}()
 
 mutable struct FpPolyRingElem <: PolyRingElem{FpFieldElem}
    coeffs::Ptr{Nothing}
@@ -1282,7 +1282,7 @@ function _fmpz_mpoly_ctx_clear_fn(a::ZZMPolyRing)
            (Ref{ZZMPolyRing},), a)
 end
 
-const FmpzMPolyID = Dict{Tuple{Vector{Symbol}, Symbol}, ZZMPolyRing}()
+const FmpzMPolyID = CacheDictType{Tuple{Vector{Symbol}, Symbol}, ZZMPolyRing}()
 
 mutable struct ZZMPolyRingElem <: MPolyRingElem{ZZRingElem}
    coeffs::Ptr{Nothing}
@@ -1479,7 +1479,7 @@ function _fmpq_mpoly_ctx_clear_fn(a::QQMPolyRing)
           (Ref{QQMPolyRing},), a)
 end
 
-const FmpqMPolyID = Dict{Tuple{Vector{Symbol}, Symbol}, QQMPolyRing}()
+const FmpqMPolyID = CacheDictType{Tuple{Vector{Symbol}, Symbol}, QQMPolyRing}()
 
 mutable struct QQMPolyRingElem <: MPolyRingElem{QQFieldElem}
    content_num::Int
@@ -1693,7 +1693,7 @@ function _nmod_mpoly_ctx_clear_fn(a::zzModMPolyRing)
            (Ref{zzModMPolyRing},), a)
 end
 
-const NmodMPolyID = Dict{Tuple{zzModRing, Vector{Symbol}, Symbol}, zzModMPolyRing}()
+const NmodMPolyID = CacheDictType{Tuple{zzModRing, Vector{Symbol}, Symbol}, zzModMPolyRing}()
 
 mutable struct zzModMPolyRingElem <: MPolyRingElem{zzModRingElem}
    coeffs::Ptr{Nothing}
@@ -1884,7 +1884,7 @@ function _gfp_mpoly_ctx_clear_fn(a::fpMPolyRing)
          (Ref{fpMPolyRing},), a)
 end
 
-const GFPMPolyID = Dict{Tuple{fpField, Vector{Symbol}, Symbol}, fpMPolyRing}()
+const GFPMPolyID = CacheDictType{Tuple{fpField, Vector{Symbol}, Symbol}, fpMPolyRing}()
 
 mutable struct fpMPolyRingElem <: MPolyRingElem{fpFieldElem}
    coeffs::Ptr{Nothing}
@@ -2094,7 +2094,7 @@ function _gfp_fmpz_mpoly_ctx_clear_fn(a::FpMPolyRing)
          (Ref{FpMPolyRing},), a)
 end
 
-const GFPFmpzMPolyID = Dict{Tuple{FpField, Vector{Symbol}, Symbol}, FpMPolyRing}()
+const GFPFmpzMPolyID = CacheDictType{Tuple{FpField, Vector{Symbol}, Symbol}, FpMPolyRing}()
 
 mutable struct FpMPolyRingElem <: MPolyRingElem{FpFieldElem}
    coeffs::Ptr{Nothing}
@@ -2271,12 +2271,12 @@ See [`FqPolyRepField`](@ref) for $p$ being a [`ZZRingElem`](@ref). See [`fqPolyR
 
 end
 
-const FqNmodFiniteFieldID = Dict{Tuple{ZZRingElem, Int, Symbol}, fqPolyRepField}()
+const FqNmodFiniteFieldID = CacheDictType{Tuple{ZZRingElem, Int, Symbol}, fqPolyRepField}()
 
-const FqNmodFiniteFieldIDNmodPol = Dict{Tuple{zzModPolyRing, zzModPolyRingElem, Symbol},
+const FqNmodFiniteFieldIDNmodPol = CacheDictType{Tuple{zzModPolyRing, zzModPolyRingElem, Symbol},
                                     fqPolyRepField}()
 
-const FqNmodFiniteFieldIDGFPPol = Dict{Tuple{fpPolyRing, fpPolyRingElem, Symbol},
+const FqNmodFiniteFieldIDGFPPol = CacheDictType{Tuple{fpPolyRing, fpPolyRingElem, Symbol},
                                     fqPolyRepField}()
 
 
@@ -2453,15 +2453,15 @@ A finite field. The constructor automatically determines a fast implementation.
    end
 end
 
-const FqDefaultFiniteFieldID = Dict{Tuple{ZZRingElem, Int, Symbol}, FqField}()
+const FqDefaultFiniteFieldID = CacheDictType{Tuple{ZZRingElem, Int, Symbol}, FqField}()
 
-const FqDefaultFiniteFieldIDFmpzPol = Dict{Tuple{ZZModPolyRingElem, Symbol}, FqField}()
+const FqDefaultFiniteFieldIDFmpzPol = CacheDictType{Tuple{ZZModPolyRingElem, Symbol}, FqField}()
 
-const FqDefaultFiniteFieldIDGFPPol = Dict{Tuple{FpPolyRingElem, Symbol}, FqField}()
+const FqDefaultFiniteFieldIDGFPPol = CacheDictType{Tuple{FpPolyRingElem, Symbol}, FqField}()
 
-const FqDefaultFiniteFieldIDNmodPol = Dict{Tuple{zzModPolyRingElem, Symbol}, FqField}()
+const FqDefaultFiniteFieldIDNmodPol = CacheDictType{Tuple{zzModPolyRingElem, Symbol}, FqField}()
 
-const FqDefaultFiniteFieldIDGFPNmodPol = Dict{Tuple{fpPolyRingElem, Symbol}, FqField}()
+const FqDefaultFiniteFieldIDGFPNmodPol = CacheDictType{Tuple{fpPolyRingElem, Symbol}, FqField}()
 
 function _FqDefaultFiniteField_clear_fn(a :: FqField)
    ccall((:fq_default_ctx_clear, libflint), Nothing, (Ref{FqField},), a)
@@ -2667,11 +2667,11 @@ See [`fqPolyRepField`](@ref) for $p$ being an [`Int`](@ref). See [`FqPolyRepFiel
 
 end
 
-const FqFiniteFieldID = Dict{Tuple{ZZRingElem, Int, Symbol}, FqPolyRepField}()
+const FqFiniteFieldID = CacheDictType{Tuple{ZZRingElem, Int, Symbol}, FqPolyRepField}()
 
-const FqFiniteFieldIDFmpzPol = Dict{Tuple{ZZModPolyRingElem, Symbol}, FqPolyRepField}()
+const FqFiniteFieldIDFmpzPol = CacheDictType{Tuple{ZZModPolyRingElem, Symbol}, FqPolyRepField}()
 
-const FqFiniteFieldIDGFPPol = Dict{Tuple{FpPolyRingElem, Symbol}, FqPolyRepField}()
+const FqFiniteFieldIDGFPPol = CacheDictType{Tuple{FpPolyRingElem, Symbol}, FqPolyRepField}()
 
 function _FqFiniteField_clear_fn(a :: FqPolyRepField)
    ccall((:fq_ctx_clear, libflint), Nothing, (Ref{FqPolyRepField},), a)
@@ -2822,7 +2822,7 @@ function _fq_nmod_mpoly_ctx_clear_fn(a::fqPolyRepMPolyRing)
            (Ref{fqPolyRepMPolyRing},), a)
 end
 
-const FqNmodMPolyID = Dict{Tuple{fqPolyRepField, Vector{Symbol}, Symbol}, fqPolyRepMPolyRing}()
+const FqNmodMPolyID = CacheDictType{Tuple{fqPolyRepField, Vector{Symbol}, Symbol}, fqPolyRepMPolyRing}()
 
 mutable struct fqPolyRepMPolyRingElem <: MPolyRingElem{fqPolyRepFieldElem}
    coeffs::Ptr{Nothing}
@@ -3025,7 +3025,7 @@ mutable struct FlintPadicField <: FlintLocalField
    end
 end
 
-const PadicBase = Dict{Tuple{ZZRingElem, Int}, FlintPadicField}()
+const PadicBase = CacheDictType{Tuple{ZZRingElem, Int}, FlintPadicField}()
 
 function _padic_ctx_clear_fn(a::FlintPadicField)
    ccall((:padic_ctx_clear, libflint), Nothing, (Ref{FlintPadicField},), a)
@@ -3096,7 +3096,7 @@ mutable struct FlintQadicField <: FlintLocalField
    end
 end
 
-const QadicBase = Dict{Tuple{ZZRingElem, Int, Int}, FlintQadicField}()
+const QadicBase = CacheDictType{Tuple{ZZRingElem, Int, Int}, FlintQadicField}()
 
 function _qadic_ctx_clear_fn(a::FlintQadicField)
    ccall((:qadic_ctx_clear, libflint), Nothing, (Ref{FlintQadicField},), a)
@@ -3145,7 +3145,7 @@ end
    end
 end
 
-const FmpzRelSeriesID = Dict{Tuple{Int, Symbol}, ZZRelPowerSeriesRing}()
+const FmpzRelSeriesID = CacheDictType{Tuple{Int, Symbol}, ZZRelPowerSeriesRing}()
 
 mutable struct ZZRelPowerSeriesRingElem <: RelPowerSeriesRingElem{ZZRingElem}
    coeffs::Ptr{Nothing}
@@ -3211,7 +3211,7 @@ end
    end
 end
 
-const FmpzAbsSeriesID = Dict{Tuple{Int, Symbol}, ZZAbsPowerSeriesRing}()
+const FmpzAbsSeriesID = CacheDictType{Tuple{Int, Symbol}, ZZAbsPowerSeriesRing}()
 
 mutable struct ZZAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{ZZRingElem}
    coeffs::Ptr{Nothing}
@@ -3271,7 +3271,7 @@ end
    end
 end
 
-const FlintPuiseuxSeriesID = Dict{Ring, Ring}()
+const FlintPuiseuxSeriesID = CacheDictType{Ring, Ring}()
 
 mutable struct FlintPuiseuxSeriesRingElem{T <: RingElem} <: RingElem
    data::T
@@ -3329,7 +3329,7 @@ end
    end
 end
 
-const FmpzLaurentSeriesID = Dict{Tuple{Int, Symbol}, ZZLaurentSeriesRing}()
+const FmpzLaurentSeriesID = CacheDictType{Tuple{Int, Symbol}, ZZLaurentSeriesRing}()
 
 mutable struct ZZLaurentSeriesRingElem <: RingElem
    coeffs::Ptr{Nothing}
@@ -3395,7 +3395,7 @@ end
    end
 end
 
-const FmpqRelSeriesID = Dict{Tuple{Int, Symbol}, QQRelPowerSeriesRing}()
+const FmpqRelSeriesID = CacheDictType{Tuple{Int, Symbol}, QQRelPowerSeriesRing}()
 
 mutable struct QQRelPowerSeriesRingElem <: RelPowerSeriesRingElem{QQFieldElem}
    coeffs::Ptr{Nothing}
@@ -3462,7 +3462,7 @@ end
    end
 end
 
-const FmpqAbsSeriesID = Dict{Tuple{Int, Symbol}, QQAbsPowerSeriesRing}()
+const FmpqAbsSeriesID = CacheDictType{Tuple{Int, Symbol}, QQAbsPowerSeriesRing}()
 
 mutable struct QQAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{QQFieldElem}
    coeffs::Ptr{Nothing}
@@ -3528,7 +3528,7 @@ end
    end
 end
 
-const GFPRelSeriesID = Dict{Tuple{fpField, Int, Symbol},
+const GFPRelSeriesID = CacheDictType{Tuple{fpField, Int, Symbol},
                                 fpRelPowerSeriesRing}()
 
 mutable struct fpRelPowerSeriesRingElem <: RelPowerSeriesRingElem{fpFieldElem}
@@ -3629,7 +3629,7 @@ end
    end
 end
 
-const NmodRelSeriesID = Dict{Tuple{zzModRing, Int, Symbol},
+const NmodRelSeriesID = CacheDictType{Tuple{zzModRing, Int, Symbol},
                                 zzModRelPowerSeriesRing}()
 
 mutable struct zzModRelPowerSeriesRingElem <: RelPowerSeriesRingElem{zzModRingElem}
@@ -3729,7 +3729,7 @@ end
    end
 end
 
-const GFPFmpzRelSeriesID = Dict{Tuple{FpField, Int, Symbol},
+const GFPFmpzRelSeriesID = CacheDictType{Tuple{FpField, Int, Symbol},
                                 FpRelPowerSeriesRing}()
 
 mutable struct FpRelPowerSeriesRingElem <: RelPowerSeriesRingElem{FpFieldElem}
@@ -3841,7 +3841,7 @@ end
    end
 end
 
-const FmpzModRelSeriesID = Dict{Tuple{ZZModRing, Int, Symbol},
+const FmpzModRelSeriesID = CacheDictType{Tuple{ZZModRing, Int, Symbol},
                                 ZZModRelPowerSeriesRing}()
 
 mutable struct ZZModRelPowerSeriesRingElem <: RelPowerSeriesRingElem{ZZModRingElem}
@@ -3953,7 +3953,7 @@ end
    end
 end
 
-const GFPFmpzAbsSeriesID = Dict{Tuple{FpField, Int, Symbol},
+const GFPFmpzAbsSeriesID = CacheDictType{Tuple{FpField, Int, Symbol},
                                 FpAbsPowerSeriesRing}()
 
 mutable struct FpAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{FpFieldElem}
@@ -4062,7 +4062,7 @@ end
    end
 end
  
-const NmodAbsSeriesID = Dict{Tuple{zzModRing, Int, Symbol},
+const NmodAbsSeriesID = CacheDictType{Tuple{zzModRing, Int, Symbol},
                                  zzModAbsPowerSeriesRing}()
   
 mutable struct zzModAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{zzModRingElem}
@@ -4163,7 +4163,7 @@ end
    end
 end
  
-const GFPAbsSeriesID = Dict{Tuple{fpField, Int, Symbol},
+const GFPAbsSeriesID = CacheDictType{Tuple{fpField, Int, Symbol},
                                  fpAbsPowerSeriesRing}()
   
 mutable struct fpAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{fpFieldElem}
@@ -4262,7 +4262,7 @@ end
    end
 end
 
-const FmpzModAbsSeriesID = Dict{Tuple{ZZModRing, Int, Symbol},
+const FmpzModAbsSeriesID = CacheDictType{Tuple{ZZModRing, Int, Symbol},
                                 ZZModAbsPowerSeriesRing}()
 
 mutable struct ZZModAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{ZZModRingElem}
@@ -4371,7 +4371,7 @@ end
    end
 end
  
-const FqDefaultRelSeriesID = Dict{Tuple{FqField, Int, Symbol}, FqRelPowerSeriesRing}()
+const FqDefaultRelSeriesID = CacheDictType{Tuple{FqField, Int, Symbol}, FqRelPowerSeriesRing}()
  
 mutable struct FqRelPowerSeriesRingElem <: RelPowerSeriesRingElem{FqFieldElem}
    # fq_default_poly_struct is 48 bytes on 64 bit machine
@@ -4442,7 +4442,7 @@ end
    end
 end
 
-const FqRelSeriesID = Dict{Tuple{FqPolyRepField, Int, Symbol}, FqPolyRepRelPowerSeriesRing}()
+const FqRelSeriesID = CacheDictType{Tuple{FqPolyRepField, Int, Symbol}, FqPolyRepRelPowerSeriesRing}()
 
 mutable struct FqPolyRepRelPowerSeriesRingElem <: RelPowerSeriesRingElem{FqPolyRepFieldElem}
    coeffs::Ptr{Nothing}
@@ -4511,7 +4511,7 @@ end
    end
 end
  
-const FqDefaultAbsSeriesID = Dict{Tuple{FqField, Int, Symbol}, FqAbsPowerSeriesRing}()
+const FqDefaultAbsSeriesID = CacheDictType{Tuple{FqField, Int, Symbol}, FqAbsPowerSeriesRing}()
  
 mutable struct FqAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{FqFieldElem}
    # fq_default_poly_struct is 48 bytes on 64 bit machine
@@ -4579,7 +4579,7 @@ end
    end
 end
 
-const FqAbsSeriesID = Dict{Tuple{FqPolyRepField, Int, Symbol}, FqPolyRepAbsPowerSeriesRing}()
+const FqAbsSeriesID = CacheDictType{Tuple{FqPolyRepField, Int, Symbol}, FqPolyRepAbsPowerSeriesRing}()
 
 mutable struct FqPolyRepAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{FqPolyRepFieldElem}
    coeffs::Ptr{Nothing}
@@ -4646,7 +4646,7 @@ end
    end
 end
 
-const FqNmodRelSeriesID = Dict{Tuple{fqPolyRepField, Int, Symbol},
+const FqNmodRelSeriesID = CacheDictType{Tuple{fqPolyRepField, Int, Symbol},
                                fqPolyRepRelPowerSeriesRing}()
 
 mutable struct fqPolyRepRelPowerSeriesRingElem <: RelPowerSeriesRingElem{fqPolyRepFieldElem}
@@ -4716,7 +4716,7 @@ end
    end
 end
 
-const FqNmodAbsSeriesID = Dict{Tuple{fqPolyRepField, Int, Symbol},
+const FqNmodAbsSeriesID = CacheDictType{Tuple{fqPolyRepField, Int, Symbol},
                                fqPolyRepAbsPowerSeriesRing}()
 
 mutable struct fqPolyRepAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{fqPolyRepFieldElem}
@@ -4784,7 +4784,7 @@ mutable struct QQMatrixSpace <: MatSpace{QQFieldElem}
    end
 end
 
-const FmpqMatID = Dict{Tuple{Int, Int}, QQMatrixSpace}()
+const FmpqMatID = CacheDictType{Tuple{Int, Int}, QQMatrixSpace}()
 
 mutable struct QQMatrix <: MatElem{QQFieldElem}
    entries::Ptr{Nothing}
@@ -4953,7 +4953,7 @@ mutable struct ZZMatrixSpace <: MatSpace{ZZRingElem}
    end
 end
 
-const FmpzMatID = Dict{Tuple{Int, Int}, ZZMatrixSpace}()
+const FmpzMatID = CacheDictType{Tuple{Int, Int}, ZZMatrixSpace}()
 
 mutable struct ZZMatrix <: MatElem{ZZRingElem}
    entries::Ptr{Nothing}
@@ -5088,7 +5088,7 @@ mutable struct zzModMatrixSpace <: MatSpace{zzModRingElem}
   end
 end
 
-const NmodMatID = Dict{Tuple{zzModRing, Int, Int}, zzModMatrixSpace}()
+const NmodMatID = CacheDictType{Tuple{zzModRing, Int, Int}, zzModMatrixSpace}()
 
 mutable struct zzModMatrix <: MatElem{zzModRingElem}
   entries::Ptr{Nothing}
@@ -5266,7 +5266,7 @@ mutable struct ZZModMatrixSpace <: MatSpace{ZZModRingElem}
   end
 end
 
-const FmpzModMatID = Dict{Tuple{ZZModRing, Int, Int}, ZZModMatrixSpace}()
+const FmpzModMatID = CacheDictType{Tuple{ZZModRing, Int, Int}, ZZModMatrixSpace}()
 
 mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
    entries::Ptr{Nothing}
@@ -5404,7 +5404,7 @@ mutable struct FpMatrixSpace <: MatSpace{FpFieldElem}
   end
 end
 
-const GaloisFmpzMatID = Dict{Tuple{FpField, Int, Int}, FpMatrixSpace}()
+const GaloisFmpzMatID = CacheDictType{Tuple{FpField, Int, Int}, FpMatrixSpace}()
 
 mutable struct FpMatrix <: MatElem{FpFieldElem}
    entries::Ptr{Nothing}
@@ -5544,7 +5544,7 @@ mutable struct fpMatrixSpace <: MatSpace{fpFieldElem}
   end
 end
 
-const GFPMatID = Dict{Tuple{fpField, Int, Int}, fpMatrixSpace}()
+const GFPMatID = CacheDictType{Tuple{fpField, Int, Int}, fpMatrixSpace}()
 
 mutable struct fpMatrix <: MatElem{fpFieldElem}
   entries::Ptr{Nothing}
@@ -5718,7 +5718,7 @@ end
    end
 end
  
-const FqDefaultPolyID = Dict{Tuple{FqField, Symbol}, FqPolyRing}()
+const FqDefaultPolyID = CacheDictType{Tuple{FqField, Symbol}, FqPolyRing}()
  
 mutable struct FqPolyRingElem <: PolyRingElem{FqFieldElem}
    # fq_default_poly_struct is 48 bytes on 64 bit machine
@@ -5908,7 +5908,7 @@ end
    end
 end
 
-const FqPolyID = Dict{Tuple{FqPolyRepField, Symbol}, FqPolyRepPolyRing}()
+const FqPolyID = CacheDictType{Tuple{FqPolyRepField, Symbol}, FqPolyRepPolyRing}()
 
 mutable struct FqPolyRepPolyRingElem <: PolyRingElem{FqPolyRepFieldElem}
    coeffs::Ptr{Nothing}
@@ -6038,7 +6038,7 @@ end
    end
 end
 
-const FqNmodPolyID = Dict{Tuple{fqPolyRepField, Symbol}, fqPolyRepPolyRing}()
+const FqNmodPolyID = CacheDictType{Tuple{fqPolyRepField, Symbol}, fqPolyRepPolyRing}()
 
 mutable struct fqPolyRepPolyRingElem <: PolyRingElem{fqPolyRepFieldElem}
    coeffs::Ptr{Nothing}
@@ -6170,7 +6170,7 @@ mutable struct FqMatrixSpace <: MatSpace{FqFieldElem}
    end
  end
  
- const FqDefaultMatID = Dict{Tuple{FqField, Int, Int}, FqMatrixSpace}()
+ const FqDefaultMatID = CacheDictType{Tuple{FqField, Int, Int}, FqMatrixSpace}()
  
  mutable struct FqMatrix <: MatElem{FqFieldElem}
     # fq_default_mat_struct is 56 bytes on 64 bit machine
@@ -6404,7 +6404,7 @@ mutable struct FqPolyRepMatrixSpace <: MatSpace{FqPolyRepFieldElem}
   end
 end
 
-const FqMatID = Dict{Tuple{FqPolyRepField, Int, Int}, FqPolyRepMatrixSpace}()
+const FqMatID = CacheDictType{Tuple{FqPolyRepField, Int, Int}, FqPolyRepMatrixSpace}()
 
 mutable struct FqPolyRepMatrix <: MatElem{FqPolyRepFieldElem}
    entries::Ptr{Nothing}
@@ -6586,7 +6586,7 @@ mutable struct fqPolyRepMatrixSpace <: MatSpace{fqPolyRepFieldElem}
   end
 end
 
-const FqNmodMatID = Dict{Tuple{fqPolyRepField, Int, Int}, fqPolyRepMatrixSpace}()
+const FqNmodMatID = CacheDictType{Tuple{fqPolyRepField, Int, Int}, fqPolyRepMatrixSpace}()
 
 mutable struct fqPolyRepMatrix <: MatElem{fqPolyRepFieldElem}
    entries::Ptr{Nothing}
@@ -6828,7 +6828,7 @@ const _fq_default_mpoly_union = Union{AbstractAlgebra.Generic.MPoly{FqPolyRepFie
     end
 end
 
-const FqDefaultMPolyID = AbstractAlgebra.CacheDictType{
+const FqDefaultMPolyID = CacheDictType{
                               Tuple{Any, FqField, Int},
                               FqMPolyRing}()
 
