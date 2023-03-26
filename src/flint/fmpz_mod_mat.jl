@@ -84,7 +84,7 @@ end
 end
 
 function deepcopy_internal(a::ZZModMatrix, dict::IdDict)
-  z = ZZModMatrix(nrows(a), ncols(a), a.base_ring.n)
+  z = ZZModMatrix(nrows(a), ncols(a), modulus(base_ring(a)))
   if isdefined(a, :base_ring)
     z.base_ring = a.base_ring
   end
@@ -732,7 +732,7 @@ promote_rule(::Type{ZZModMatrix}, ::Type{ZZRingElem}) = ZZModMatrix
 ################################################################################
 
 function (a::ZZModMatrixSpace)()
-  z = ZZModMatrix(nrows(a), ncols(a), a.n)
+  z = ZZModMatrix(nrows(a), ncols(a), modulus(base_ring(a)))
   z.base_ring = a.base_ring
   return z
 end
@@ -782,42 +782,42 @@ end
 
 function (a::ZZModMatrixSpace)(arr::AbstractMatrix{BigInt}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
-  z = ZZModMatrix(nrows(a), ncols(a), a.n, arr, transpose)
+  z = ZZModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr, transpose)
   z.base_ring = a.base_ring
   return z
 end
 
 function (a::ZZModMatrixSpace)(arr::AbstractVector{BigInt})
   _check_dim(nrows(a), ncols(a), arr)
-  z = ZZModMatrix(nrows(a), ncols(a), a.n, arr)
+  z = ZZModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
   z.base_ring = a.base_ring
   return z
 end
 
 function (a::ZZModMatrixSpace)(arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
-  z = ZZModMatrix(nrows(a), ncols(a), a.n, arr, transpose)
+  z = ZZModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr, transpose)
   z.base_ring = a.base_ring
   return z
 end
 
 function (a::ZZModMatrixSpace)(arr::AbstractVector{ZZRingElem})
   _check_dim(nrows(a), ncols(a), arr)
-  z = ZZModMatrix(nrows(a), ncols(a), a.n, arr)
+  z = ZZModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
   z.base_ring = a.base_ring
   return z
 end
 
 function (a::ZZModMatrixSpace)(arr::AbstractMatrix{Int}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
-  z = ZZModMatrix(nrows(a), ncols(a), a.n, arr, transpose)
+  z = ZZModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr, transpose)
   z.base_ring = a.base_ring
   return z
 end
 
 function (a::ZZModMatrixSpace)(arr::AbstractVector{Int})
   _check_dim(nrows(a), ncols(a), arr)
-  z = ZZModMatrix(nrows(a), ncols(a), a.n, arr)
+  z = ZZModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
   z.base_ring = a.base_ring
   return z
 end
@@ -825,7 +825,7 @@ end
 function (a::ZZModMatrixSpace)(arr::AbstractMatrix{ZZModRingElem}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
-  z = ZZModMatrix(nrows(a), ncols(a), a.n, arr, transpose)
+  z = ZZModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr, transpose)
   z.base_ring = a.base_ring
   return z
 end
@@ -833,7 +833,7 @@ end
 function (a::ZZModMatrixSpace)(arr::AbstractVector{ZZModRingElem})
   _check_dim(nrows(a), ncols(a), arr)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
-  z = ZZModMatrix(nrows(a), ncols(a), a.n, arr)
+  z = ZZModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
   z.base_ring = a.base_ring
   return z
 end

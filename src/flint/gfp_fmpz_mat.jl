@@ -72,7 +72,7 @@ end
 end
 
 function deepcopy_internal(a::FpMatrix, dict::IdDict)
-  z = FpMatrix(nrows(a), ncols(a), a.base_ring.n)
+  z = FpMatrix(nrows(a), ncols(a), modulus(base_ring(a)))
   if isdefined(a, :base_ring)
     z.base_ring = a.base_ring
   end
@@ -213,7 +213,7 @@ promote_rule(::Type{FpMatrix}, ::Type{ZZRingElem}) = FpMatrix
 ################################################################################
 
 function (a::FpMatrixSpace)()
-  z = FpMatrix(nrows(a), ncols(a), a.n)
+  z = FpMatrix(nrows(a), ncols(a), modulus(base_ring(a)))
   z.base_ring = a.base_ring
   return z
 end
@@ -237,42 +237,42 @@ end
 
 function (a::FpMatrixSpace)(arr::AbstractMatrix{BigInt}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
-  z = FpMatrix(nrows(a), ncols(a), a.n, arr, transpose)
+  z = FpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr, transpose)
   z.base_ring = a.base_ring
   return z
 end
 
 function (a::FpMatrixSpace)(arr::AbstractVector{BigInt})
   _check_dim(nrows(a), ncols(a), arr)
-  z = FpMatrix(nrows(a), ncols(a), a.n, arr)
+  z = FpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
   z.base_ring = a.base_ring
   return z
 end
 
 function (a::FpMatrixSpace)(arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
-  z = FpMatrix(nrows(a), ncols(a), a.n, arr, transpose)
+  z = FpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr, transpose)
   z.base_ring = a.base_ring
   return z
 end
 
 function (a::FpMatrixSpace)(arr::AbstractVector{ZZRingElem})
   _check_dim(nrows(a), ncols(a), arr)
-  z = FpMatrix(nrows(a), ncols(a), a.n, arr)
+  z = FpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
   z.base_ring = a.base_ring
   return z
 end
 
 function (a::FpMatrixSpace)(arr::AbstractMatrix{Int}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
-  z = FpMatrix(nrows(a), ncols(a), a.n, arr, transpose)
+  z = FpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr, transpose)
   z.base_ring = a.base_ring
   return z
 end
 
 function (a::FpMatrixSpace)(arr::AbstractVector{Int})
   _check_dim(nrows(a), ncols(a), arr)
-  z = FpMatrix(nrows(a), ncols(a), a.n, arr)
+  z = FpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
   z.base_ring = a.base_ring
   return z
 end
@@ -280,7 +280,7 @@ end
 function (a::FpMatrixSpace)(arr::AbstractMatrix{FpFieldElem}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
-  z = FpMatrix(nrows(a), ncols(a), a.n, arr, transpose)
+  z = FpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr, transpose)
   z.base_ring = a.base_ring
   return z
 end
@@ -288,7 +288,7 @@ end
 function (a::FpMatrixSpace)(arr::AbstractVector{FpFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
-  z = FpMatrix(nrows(a), ncols(a), a.n, arr)
+  z = FpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
   z.base_ring = a.base_ring
   return z
 end

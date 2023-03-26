@@ -5073,7 +5073,6 @@ end
 
 mutable struct zzModMatrixSpace <: MatSpace{zzModRingElem}
   base_ring::zzModRing
-  n::UInt
   nrows::Int
   ncols::Int
 
@@ -5081,7 +5080,7 @@ mutable struct zzModMatrixSpace <: MatSpace{zzModRingElem}
                         cached::Bool = true)
     (r < 0 || c < 0) && throw(error_dim_negative)
     return get_cached!(NmodMatID, (R, r, c), cached) do
-       return new(R, R.n, r, c)
+       return new(R, r, c)
     end
   end
 end
@@ -5251,7 +5250,6 @@ end
 
 mutable struct ZZModMatrixSpace <: MatSpace{ZZModRingElem}
   base_ring::ZZModRing
-  n::ZZRingElem
   nrows::Int
   ncols::Int
 
@@ -5259,7 +5257,7 @@ mutable struct ZZModMatrixSpace <: MatSpace{ZZModRingElem}
                         cached::Bool = true)
     (r < 0 || c < 0) && throw(error_dim_negative)
     return get_cached!(FmpzModMatID, (R, r, c), cached) do
-       return new(R, R.n, r, c)
+       return new(R, r, c)
     end
   end
 end
@@ -5391,14 +5389,13 @@ end
 
 mutable struct FpMatrixSpace <: MatSpace{FpFieldElem}
   base_ring::FpField
-  n::ZZRingElem
   nrows::Int
   ncols::Int
 
   function FpMatrixSpace(R::FpField, r::Int, c::Int, cached::Bool = true)
     (r < 0 || c < 0) && throw(error_dim_negative)
     return get_cached!(GaloisFmpzMatID, (R, r, c), cached) do
-       return new(R, R.n, r, c)
+       return new(R, r, c)
     end
   end
 end
@@ -5530,7 +5527,6 @@ end
 
 mutable struct fpMatrixSpace <: MatSpace{fpFieldElem}
   base_ring::fpField
-  n::UInt
   nrows::Int
   ncols::Int
 
@@ -5538,7 +5534,7 @@ mutable struct fpMatrixSpace <: MatSpace{fpFieldElem}
                         cached::Bool = true)
     (r < 0 || c < 0) && throw(error_dim_negative)
     return get_cached!(GFPMatID, (R, r, c), cached) do
-       return new(R, R.n, r, c)
+       return new(R, r, c)
     end
   end
 end
