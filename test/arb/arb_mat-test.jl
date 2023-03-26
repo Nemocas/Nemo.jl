@@ -63,13 +63,13 @@ RR = ArbField(64)
    for T in [ZZRingElem, QQFieldElem, Int, BigInt, Float64, BigFloat, RR, string, Rational{Int}, Rational{BigInt}]
       M = matrix(RR, map(T, arr))
       @test isa(M, arb_mat)
-      @test M.base_ring == RR
+      @test base_ring(M) == RR
       @test nrows(M) == 2
       @test ncols(M) == 2
 
       M2 = matrix(RR, 2, 3, map(T, arr2))
       @test isa(M2, arb_mat)
-      @test M2.base_ring == RR
+      @test base_ring(M2) == RR
       @test nrows(M2) == 2
       @test ncols(M2) == 3
       @test_throws ErrorConstrDimMismatch matrix(RR, 2, 2, map(T, arr2))
@@ -79,12 +79,12 @@ RR = ArbField(64)
    M3 = zero_matrix(RR, 2, 3)
 
    @test isa(M3, arb_mat)
-   @test M3.base_ring == RR
+   @test base_ring(M3) == RR
 
    M4 = identity_matrix(RR, 3)
 
    @test isa(M4, arb_mat)
-   @test M4.base_ring == RR
+   @test base_ring(M4) == RR
 
    a = zero_matrix(RR, 2, 2)
    b = zero_matrix(RR, 2, 3)

@@ -103,11 +103,11 @@
    for T in [Z3, ZZRingElem, Int, BigInt]
       M = matrix(Z3, map(T, arr))
       @test isa(M, FpMatrix)
-      @test M.base_ring == Z3
+      @test base_ring(M) == Z3
 
       M2 = matrix(Z3, 2, 3, map(T, arr2))
       @test isa(M2, FpMatrix)
-      @test M2.base_ring == Z3
+      @test base_ring(M2) == Z3
       @test nrows(M2) == 2
       @test ncols(M2) == 3
       @test_throws ErrorConstrDimMismatch matrix(Z3, 2, 2, map(T, arr2))
@@ -117,12 +117,12 @@
    M3 = zero_matrix(Z3, 2, 3)
 
    @test isa(M3, FpMatrix)
-   @test M3.base_ring == Z3
+   @test base_ring(M3) == Z3
 
    M4 = identity_matrix(Z3, 3)
 
    @test isa(M4, FpMatrix)
-   @test M4.base_ring == Z3
+   @test base_ring(M4) == Z3
 
    a = zero_matrix(Z2, 2, 2)
    b = zero_matrix(Z2, 2, 3)

@@ -1018,7 +1018,7 @@ end
 function _fmpz_mod_poly_clear_fn(x::ZZModPolyRingElem)
    ccall((:fmpz_mod_poly_clear, libflint), Nothing,
          (Ref{ZZModPolyRingElem}, Ref{fmpz_mod_ctx_struct}),
-         x, x.parent.base_ring.ninv)
+         x, base_ring(parent(x)).ninv)
 end
 
 mutable struct fmpz_mod_poly_factor
@@ -1198,7 +1198,7 @@ end
 function _fmpz_mod_poly_clear_fn(x::FpPolyRingElem)
    ccall((:fmpz_mod_poly_clear, libflint), Nothing,
          (Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}),
-         x, x.parent.base_ring.ninv)
+         x, base_ring(parent(x)).ninv)
 end
 
 mutable struct gfp_fmpz_poly_factor
@@ -2400,7 +2400,7 @@ A finite field. The constructor automatically determines a fast implementation.
          z.var = string(s)
          ccall((:fq_default_ctx_init_modulus, libflint), Nothing,
                (Ref{FqField}, Ref{ZZModPolyRingElem}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
-                  z, f, f.parent.base_ring.ninv, string(s))
+                  z, f, base_ring(parent(f)).ninv, string(s))
          finalizer(_FqDefaultFiniteField_clear_fn, z)
          return z
       end
@@ -2415,7 +2415,7 @@ A finite field. The constructor automatically determines a fast implementation.
          z.var = string(s)
          ccall((:fq_default_ctx_init_modulus, libflint), Nothing,
                (Ref{FqField}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
-                  z, f, f.parent.base_ring.ninv, string(s))
+                  z, f, base_ring(parent(f)).ninv, string(s))
          finalizer(_FqDefaultFiniteField_clear_fn, z)
          return z
       end
@@ -2647,7 +2647,7 @@ See [`fqPolyRepField`](@ref) for $p$ being an [`Int`](@ref). See [`FqPolyRepFiel
          z = new()
          ccall((:fq_ctx_init_modulus, libflint), Nothing,
                (Ref{FqPolyRepField}, Ref{ZZModPolyRingElem}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
-                  z, f, f.parent.base_ring.ninv, string(s))
+                  z, f, base_ring(parent(f)).ninv, string(s))
          finalizer(_FqFiniteField_clear_fn, z)
          return z
       end
@@ -2659,7 +2659,7 @@ See [`fqPolyRepField`](@ref) for $p$ being an [`Int`](@ref). See [`FqPolyRepFiel
          z = new()
          ccall((:fq_ctx_init_modulus, libflint), Nothing,
                (Ref{FqPolyRepField}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
-                  z, f, f.parent.base_ring.ninv, string(s))
+                  z, f, base_ring(parent(f)).ninv, string(s))
          finalizer(_FqFiniteField_clear_fn, z)
          return z
       end
@@ -3803,7 +3803,7 @@ mutable struct FpRelPowerSeriesRingElem <: RelPowerSeriesRingElem{FpFieldElem}
 
    function FpRelPowerSeriesRingElem(a::FpRelPowerSeriesRingElem)
       z = new()
-      p = a.parent.base_ring.ninv
+      p = base_ring(parent(a)).ninv
       ccall((:fmpz_mod_poly_init, libflint), Nothing,
             (Ref{FpRelPowerSeriesRingElem}, Ref{fmpz_mod_ctx_struct}),
             z, p)
@@ -3819,7 +3819,7 @@ end
 function _gfp_fmpz_rel_series_clear_fn(a::FpRelPowerSeriesRingElem)
    ccall((:fmpz_mod_poly_clear, libflint), Nothing,
          (Ref{FpRelPowerSeriesRingElem}, Ref{fmpz_mod_ctx_struct}),
-         a, a.parent.base_ring.ninv)
+         a, base_ring(parent(a)).ninv)
 end
 
 ###############################################################################
@@ -3915,7 +3915,7 @@ mutable struct ZZModRelPowerSeriesRingElem <: RelPowerSeriesRingElem{ZZModRingEl
 
    function ZZModRelPowerSeriesRingElem(a::ZZModRelPowerSeriesRingElem)
       z = new()
-      p = a.parent.base_ring.ninv
+      p = base_ring(parent(a)).ninv
       ccall((:fmpz_mod_poly_init, libflint), Nothing,
             (Ref{ZZModRelPowerSeriesRingElem}, Ref{fmpz_mod_ctx_struct}),
             z, p)
@@ -3931,7 +3931,7 @@ end
 function _fmpz_mod_rel_series_clear_fn(a::ZZModRelPowerSeriesRingElem)
    ccall((:fmpz_mod_poly_clear, libflint), Nothing,
          (Ref{ZZModRelPowerSeriesRingElem}, Ref{fmpz_mod_ctx_struct}),
-         a, a.parent.base_ring.ninv)
+         a, base_ring(parent(a)).ninv)
 end
 
 ###############################################################################
@@ -4022,7 +4022,7 @@ mutable struct FpAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{FpFieldElem}
 
    function FpAbsPowerSeriesRingElem(a::FpAbsPowerSeriesRingElem)
       z = new()
-      p = a.parent.base_ring.ninv
+      p = base_ring(parent(a)).ninv
       ccall((:fmpz_mod_poly_init, libflint), Nothing,
             (Ref{FpAbsPowerSeriesRingElem}, Ref{fmpz_mod_ctx_struct}),
             z, p)
@@ -4038,7 +4038,7 @@ end
 function _gfp_fmpz_abs_series_clear_fn(a::FpAbsPowerSeriesRingElem)
    ccall((:fmpz_mod_poly_clear, libflint), Nothing,
          (Ref{FpAbsPowerSeriesRingElem}, Ref{fmpz_mod_ctx_struct}),
-         a, a.parent.base_ring.ninv)
+         a, base_ring(parent(a)).ninv)
 end
 
 ###############################################################################
@@ -4331,7 +4331,7 @@ mutable struct ZZModAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{ZZModRingEl
 
    function ZZModAbsPowerSeriesRingElem(a::ZZModAbsPowerSeriesRingElem)
       z = new()
-      p = a.parent.base_ring.ninv
+      p = base_ring(parent(a)).ninv
       ccall((:fmpz_mod_poly_init, libflint), Nothing,
             (Ref{ZZModAbsPowerSeriesRingElem}, Ref{fmpz_mod_ctx_struct}),
             z, p)
@@ -4348,7 +4348,7 @@ end
 function _fmpz_mod_abs_series_clear_fn(a::ZZModAbsPowerSeriesRingElem)
    ccall((:fmpz_mod_poly_clear, libflint), Nothing,
          (Ref{ZZModAbsPowerSeriesRingElem}, Ref{fmpz_mod_ctx_struct}),
-         a, a.parent.base_ring.ninv)
+         a, base_ring(parent(a)).ninv)
 end
 
 

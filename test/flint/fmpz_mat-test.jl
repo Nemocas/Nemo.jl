@@ -45,11 +45,11 @@
    for T in [ZZRingElem, Int, BigInt]
       M = matrix(FlintZZ, map(T, arr))
       @test isa(M, ZZMatrix)
-      @test M.base_ring == FlintZZ
+      @test base_ring(M) == FlintZZ
 
       M2 = matrix(FlintZZ, 2, 3, map(T, arr2))
       @test isa(M2, ZZMatrix)
-      @test M2.base_ring == FlintZZ
+      @test base_ring(M2) == FlintZZ
       @test nrows(M2) == 2
       @test ncols(M2) == 3
       @test_throws ErrorConstrDimMismatch matrix(FlintZZ, 2, 2, map(T, arr2))
@@ -59,12 +59,12 @@
    M3 = zero_matrix(FlintZZ, 2, 3)
 
    @test isa(M3, ZZMatrix)
-   @test M3.base_ring == FlintZZ
+   @test base_ring(M3) == FlintZZ
 
    M4 = identity_matrix(FlintZZ, 3)
 
    @test isa(M4, ZZMatrix)
-   @test M4.base_ring == FlintZZ
+   @test base_ring(M4) == FlintZZ
 
    a = zero_matrix(FlintZZ, 2, 2)
    b = zero_matrix(FlintZZ, 2, 3)

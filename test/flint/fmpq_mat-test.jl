@@ -89,11 +89,11 @@
    for T in [ZZRingElem, Int, BigInt, Rational{Int}, Rational{BigInt}]
       M = matrix(FlintQQ, map(T, arr))
       @test isa(M, QQMatrix)
-      @test M.base_ring == FlintQQ
+      @test base_ring(M) == FlintQQ
 
       M2 = matrix(FlintQQ, 2, 3, map(T, arr2))
       @test isa(M2, QQMatrix)
-      @test M2.base_ring == FlintQQ
+      @test base_ring(M2) == FlintQQ
       @test nrows(M2) == 2
       @test ncols(M2) == 3
       @test_throws ErrorConstrDimMismatch matrix(FlintQQ, 2, 2, map(T, arr2))
@@ -103,12 +103,12 @@
    M3 = zero_matrix(FlintQQ, 2, 3)
 
    @test isa(M3, QQMatrix)
-   @test M3.base_ring == FlintQQ
+   @test base_ring(M3) == FlintQQ
 
    M4 = identity_matrix(FlintQQ, 3)
 
    @test isa(M4, QQMatrix)
-   @test M4.base_ring == FlintQQ
+   @test base_ring(M4) == FlintQQ
 
    a = zero_matrix(FlintQQ, 2, 2)
    b = zero_matrix(FlintQQ, 2, 3)

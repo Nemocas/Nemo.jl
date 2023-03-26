@@ -122,7 +122,7 @@ function show(io::IO, p::QQPolyRing)
    print(io, "Univariate Polynomial Ring in ")
    print(io, string(var(p)))
    print(io, " over ")
-   show(io, p.base_ring)
+   show(io, base_ring(p))
 end
 
 ###############################################################################
