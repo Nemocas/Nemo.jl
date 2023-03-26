@@ -3278,8 +3278,7 @@ mutable struct FlintPuiseuxSeriesRingElem{T <: RingElem} <: RingElem
    scale::Int
    parent::FlintPuiseuxSeriesRing{T}
 
-   function FlintPuiseuxSeriesRingElem{T}(d::T, scale::Int) where T <:
-RingElem
+   function FlintPuiseuxSeriesRingElem{T}(d::T, scale::Int) where T <: RingElem
       new{T}(d, scale)
    end
 end
@@ -3305,8 +3304,7 @@ mutable struct FlintPuiseuxSeriesFieldElem{T <: RingElem} <: FieldElem
    scale::Int
    parent::FlintPuiseuxSeriesField{T}
 
-   function FlintPuiseuxSeriesFieldElem{T}(d::T, scale::Int) where T <:
-RingElem
+   function FlintPuiseuxSeriesFieldElem{T}(d::T, scale::Int) where T <: RingElem
       new{T}(d, scale)
    end
 end
@@ -5367,7 +5365,8 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
     return z
   end
 
-  function ZZModMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractVector{ZZModRingElem})                z = new()
+  function ZZModMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractVector{ZZModRingElem})
+    z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
 	  (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
     finalizer(_fmpz_mod_mat_clear_fn, z)
@@ -6510,7 +6509,7 @@ mutable struct FqPolyRepMatrix <: MatElem{FqPolyRepFieldElem}
       return z
    end
 
-   function FqPolyRepMatrix(r::Int, c::Int, arr::AbstractVector{T }, ctx::FqPolyRepField) where {T <: Integer}
+   function FqPolyRepMatrix(r::Int, c::Int, arr::AbstractVector{T}, ctx::FqPolyRepField) where {T <: Integer}
       z = new()
       ccall((:fq_mat_init, libflint), Nothing,
             (Ref{FqPolyRepMatrix}, Int, Int, Ref{FqPolyRepField}), z, r, c, ctx)
@@ -6692,7 +6691,7 @@ mutable struct fqPolyRepMatrix <: MatElem{fqPolyRepFieldElem}
       return z
    end
 
-   function fqPolyRepMatrix(r::Int, c::Int, arr::AbstractVector{T }, ctx::fqPolyRepField) where {T <: Integer}
+   function fqPolyRepMatrix(r::Int, c::Int, arr::AbstractVector{T}, ctx::fqPolyRepField) where {T <: Integer}
       z = new()
       ccall((:fq_nmod_mat_init, libflint), Nothing,
             (Ref{fqPolyRepMatrix}, Int, Int, Ref{fqPolyRepField}), z, r, c, ctx)
