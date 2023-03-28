@@ -24,8 +24,6 @@ elem_type(::Type{ZZModPolyRing}) = ZZModPolyRingElem
 
 parent_type(::Type{ZZModPolyRingElem}) = ZZModPolyRing
 
-dense_poly_type(::Type{Generic.ResidueRingElem{ZZRingElem}}) = ZZModPolyRingElem
-
 dense_poly_type(::Type{ZZModRingElem}) = ZZModPolyRingElem
 
 function check_parent(x::T, y::T) where {T <: Zmodn_fmpz_poly}

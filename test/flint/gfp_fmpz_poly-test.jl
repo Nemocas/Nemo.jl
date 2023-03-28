@@ -12,7 +12,7 @@
    @test elem_type(S) == FpPolyRingElem
    @test elem_type(FpPolyRing) == FpPolyRingElem
    @test parent_type(FpPolyRingElem) == FpPolyRing
-   @test dense_poly_type(Generic.ResidueFieldElem{ZZRingElem}) == FpPolyRingElem
+   @test dense_poly_type(FpFieldElem) == FpPolyRingElem
 
    @test Nemo.promote_rule(elem_type(S), ZZRingElem) == elem_type(S)
 
