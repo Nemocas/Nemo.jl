@@ -24,6 +24,8 @@ elem_type(::Type{($rtype)}) = ($etype)
 
 elem_type(::($rtype)) = ($etype)
 
+mpoly_type(::Type{$ctype}) = $etype
+
 symbols(a::($rtype)) = a.S
 
 parent(a::($etype)) = a.parent

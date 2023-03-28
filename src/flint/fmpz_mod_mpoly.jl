@@ -23,6 +23,8 @@ elem_type(::Type{($rtype)}) = ($etype)
 
 elem_type(::($rtype)) = ($etype)
 
+mpoly_type(::Type{FpFieldElem}) = FpMPolyRingElem
+
 symbols(a::($rtype)) = a.S
 
 parent(a::($etype)) = a.parent

@@ -23,6 +23,8 @@ elem_type(::Type{QQMPolyRing}) = QQMPolyRingElem
 
 elem_type(::QQMPolyRing) = QQMPolyRingElem
 
+mpoly_type(::Type{QQFieldElem}) = QQMPolyRingElem
+
 symbols(a::QQMPolyRing) = a.S
 
 parent(a::QQMPolyRingElem) = a.parent

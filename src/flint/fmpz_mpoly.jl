@@ -18,6 +18,8 @@ elem_type(::Type{ZZMPolyRing}) = ZZMPolyRingElem
 
 elem_type(::ZZMPolyRing) = ZZMPolyRingElem
 
+mpoly_type(::Type{ZZRingElem}) = ZZMPolyRingElem
+
 symbols(a::ZZMPolyRing) = a.S
 
 parent(a::ZZMPolyRingElem) = a.parent

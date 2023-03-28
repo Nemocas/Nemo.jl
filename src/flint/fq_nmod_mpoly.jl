@@ -18,6 +18,8 @@ elem_type(::Type{fqPolyRepMPolyRing}) = fqPolyRepMPolyRingElem
 
 elem_type(::fqPolyRepMPolyRing) = fqPolyRepMPolyRingElem
 
+mpoly_type(::Type{fqPolyRepFieldElem}) = fqPolyRepMPolyRingElem
+
 symbols(a::fqPolyRepMPolyRing) = a.S
 
 parent(a::fqPolyRepMPolyRingElem) = a.parent

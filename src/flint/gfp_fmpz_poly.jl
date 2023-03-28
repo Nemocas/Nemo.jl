@@ -26,6 +26,8 @@ parent_type(::Type{FpPolyRingElem}) = FpPolyRing
 
 dense_poly_type(::Type{Generic.ResidueFieldElem{ZZRingElem}}) = FpPolyRingElem
 
+dense_poly_type(::Type{FpFieldElem}) = FpPolyRingElem
+
 characteristic(R::FpPolyRing) = characteristic(base_ring(R))
 
 ###############################################################################
