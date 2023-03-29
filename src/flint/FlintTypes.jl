@@ -5848,23 +5848,9 @@ end
  
 function _fq_default_poly_factor_clear_fn(a::fq_default_poly_factor)
    K = a.base_field
-   # backport of https://github.com/flintlib/flint2/pull/1289
-   # TODO: Remove once new flint version hits the street
-   if _fq_default_ctx_type(K) == _FQ_DEFAULT_NMOD
-      GC.@preserve a begin
-         ccall((:nmod_poly_factor_clear, libflint), Nothing,
-               (Ptr{Nothing}, ), pointer_from_objref(a))
-      end
-   elseif _fq_default_ctx_type(K) == _FQ_DEFAULT_FMPZ_NMOD
-      GC.@preserve a K begin
-         ccall((:fmpz_mod_poly_factor_clear, libflint), Nothing,
-               (Ptr{Nothing}, Ptr{Nothing}), pointer_from_objref(a), pointer_from_objref(K) + 2 * sizeof(Cint))
-      end
-   else
-      ccall((:fq_default_poly_factor_clear, libflint), Nothing,
-            (Ref{fq_default_poly_factor}, Ref{FqField}),
-             a, K)
-   end
+   ccall((:fq_default_poly_factor_clear, libflint), Nothing,
+         (Ref{fq_default_poly_factor}, Ref{FqField}),
+          a, K)
 end
 
 ###############################################################################

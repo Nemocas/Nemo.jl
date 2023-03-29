@@ -514,23 +514,14 @@ end
 function _fq_field_from_nmod_poly_in_disguise(f::FqPolyRingElem, s)
   K = base_ring(f)
   @assert _fq_default_ctx_type(K) == _FQ_DEFAULT_NMOD
-  # f is an fmpz_mod_poly in disguise
+  # f is an nmod_poly in disguise
   # I cannot use the FqField constructor, since f has the wrong type
   # on the julia side
   z = @new_struct(FqField) # this is just new() usable outside the type definition
   z.var = string(s)
-  # I need to get to the fmpz_mod_ctx
-  # It is in K but the first 4 bytes are the type
-  #
-  # There is a bug in flint, #1264: fq_default_ctx_init_modulus_nmod
-  # sets the the *wrong* ctx.
-  # I need to create a corresponding fmpz_mod_poly
-  _F = Nemo.FpField(ZZ(characteristic(K)), false)
-  _Fx, = polynomial_ring(_F, "x", cached = false)
-  _f = map_coefficients(c -> _F(lift(ZZ, c)), f, parent = _Fx)
-  ccall((:fq_default_ctx_init_modulus, libflint), Nothing,
-        (Ref{FqField}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
-              z, _f, _F.ninv, string(s))
+  ccall((:fq_default_ctx_init_modulus_nmod, libflint), Nothing,
+        (Ref{FqField}, Ref{FqPolyRingElem}, Ptr{UInt8}),
+              z, f, string(s))
   finalizer(_FqDefaultFiniteField_clear_fn, z)
   z.isabsolute = true
   z.isstandard = true
