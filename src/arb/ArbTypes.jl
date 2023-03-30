@@ -885,14 +885,12 @@ base_ring(a::AcbPolyRing) = a.base_ring
 #
 ################################################################################
 
-mutable struct RealMatSpace <: MatSpace{RealFieldElem}
+struct RealMatSpace <: MatSpace{RealFieldElem}
   nrows::Int
   ncols::Int
 
-  function RealMatSpace(R::RealField, r::Int, c::Int, cached::Bool = true)
-    return get_cached!(RealMatSpaceID, (r, c), cached) do
-      return new(r, c)
-    end
+  function RealMatSpace(R::RealField, r::Int, c::Int)
+    return new(r, c)
   end
 end
 
@@ -1009,15 +1007,13 @@ end
 
 # fixed precision
 
-mutable struct ArbMatSpace <: MatSpace{arb}
+struct ArbMatSpace <: MatSpace{arb}
   nrows::Int
   ncols::Int
   base_ring::ArbField
 
-  function ArbMatSpace(R::ArbField, r::Int, c::Int, cached::Bool = true)
-    return get_cached!(ArbMatSpaceID, (R, r, c), cached) do
-      return new(r, c, R)
-    end
+  function ArbMatSpace(R::ArbField, r::Int, c::Int)
+    return new(r, c, R)
   end
 end
 
@@ -1138,15 +1134,13 @@ end
 #
 ################################################################################
 
-mutable struct ComplexMatSpace <: MatSpace{ComplexFieldElem}
+struct ComplexMatSpace <: MatSpace{ComplexFieldElem}
   nrows::Int
   ncols::Int
   #base_ring::AcbField
 
-  function ComplexMatSpace(R::ComplexField, r::Int, c::Int, cached::Bool = true)
-    return get_cached!(ComplexMatSpaceID, (r, c), cached) do
-      return new(r, c)
-    end
+  function ComplexMatSpace(R::ComplexField, r::Int, c::Int)
+    return new(r, c)
   end
 end
 
@@ -1407,15 +1401,13 @@ end
 
 # fixed precision
 
-mutable struct AcbMatSpace <: MatSpace{acb}
+struct AcbMatSpace <: MatSpace{acb}
   nrows::Int
   ncols::Int
   base_ring::AcbField
 
-  function AcbMatSpace(R::AcbField, r::Int, c::Int, cached::Bool = true)
-    return get_cached!(AcbMatSpaceID, (R, r, c), cached) do
-      return new(r, c, R)
-    end
+  function AcbMatSpace(R::AcbField, r::Int, c::Int)
+    return new(r, c, R)
   end
 end
 

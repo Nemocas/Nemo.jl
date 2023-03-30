@@ -22,8 +22,7 @@ base_ring(a::QQMatrix) = FlintQQ
 
 dense_matrix_type(::Type{QQFieldElem}) = QQMatrix
 
-parent(a::QQMatrix, cached::Bool = true) =
-      QQMatrixSpace(nrows(a), ncols(a), cached)
+parent(a::QQMatrix) = matrix_space(QQ, nrows(a), ncols(a))
 
 function check_parent(a::QQMatrix, b::QQMatrix, throw::Bool = true)
    fl = (nrows(a) != nrows(b) || ncols(a) != ncols(b) || base_ring(a) != base_ring(b))
@@ -967,5 +966,6 @@ end
 ###############################################################################
 
 function matrix_space(R::QQField, r::Int, c::Int; cached = true)
-   return QQMatrixSpace(r, c, cached)
+   # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+   return QQMatrixSpace(r, c)
 end

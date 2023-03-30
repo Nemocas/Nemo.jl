@@ -117,9 +117,7 @@ nrows(a::zzModMatrixSpace) = a.nrows
 
 ncols(a::zzModMatrixSpace) = a.ncols
 
-function parent(a::T, cached::Bool = true) where T <: Zmodn_mat
-   matrix_space(base_ring(a), nrows(a), ncols(a); cached)
-end
+parent(a::Zmodn_mat) = matrix_space(base_ring(a), nrows(a), ncols(a))
 
 base_ring(a::zzModMatrixSpace) = a.base_ring
 
@@ -871,6 +869,7 @@ end
 ################################################################################
 
 function matrix_space(R::zzModRing, r::Int, c::Int; cached::Bool = true)
-  zzModMatrixSpace(R, r, c, cached)
+  # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+  zzModMatrixSpace(R, r, c)
 end
 

@@ -4765,8 +4765,7 @@ struct QQMatrixSpace <: MatSpace{QQFieldElem}
    nrows::Int
    ncols::Int
 
-   function QQMatrixSpace(r::Int, c::Int, cached::Bool = true)
-      # TODO/FIXME: ignore cached, for backwards compatibility
+   function QQMatrixSpace(r::Int, c::Int)
       return new(r, c)
    end
 end
@@ -4929,8 +4928,7 @@ struct ZZMatrixSpace <: MatSpace{ZZRingElem}
    nrows::Int
    ncols::Int
 
-   function ZZMatrixSpace(r::Int, c::Int, cached::Bool = true)
-      # TODO/FIXME: ignore cached, for backwards compatibility
+   function ZZMatrixSpace(r::Int, c::Int)
       return new(r, c)
    end
 end
@@ -5052,21 +5050,16 @@ end
 #
 ###############################################################################
 
-mutable struct zzModMatrixSpace <: MatSpace{zzModRingElem}
+struct zzModMatrixSpace <: MatSpace{zzModRingElem}
   base_ring::zzModRing
   nrows::Int
   ncols::Int
 
-  function zzModMatrixSpace(R::zzModRing, r::Int, c::Int,
-                        cached::Bool = true)
+  function zzModMatrixSpace(R::zzModRing, r::Int, c::Int)
     (r < 0 || c < 0) && throw(error_dim_negative)
-    return get_cached!(NmodMatID, (R, r, c), cached) do
-       return new(R, r, c)
-    end
+    return new(R, r, c)
   end
 end
-
-const NmodMatID = CacheDictType{Tuple{zzModRing, Int, Int}, zzModMatrixSpace}()
 
 mutable struct zzModMatrix <: MatElem{zzModRingElem}
   entries::Ptr{Nothing}
@@ -5229,21 +5222,16 @@ end
 #
 ###############################################################################
 
-mutable struct ZZModMatrixSpace <: MatSpace{ZZModRingElem}
+struct ZZModMatrixSpace <: MatSpace{ZZModRingElem}
   base_ring::ZZModRing
   nrows::Int
   ncols::Int
 
-  function ZZModMatrixSpace(R::ZZModRing, r::Int, c::Int,
-                        cached::Bool = true)
+  function ZZModMatrixSpace(R::ZZModRing, r::Int, c::Int)
     (r < 0 || c < 0) && throw(error_dim_negative)
-    return get_cached!(FmpzModMatID, (R, r, c), cached) do
-       return new(R, r, c)
-    end
+    return new(R, r, c)
   end
 end
-
-const FmpzModMatID = CacheDictType{Tuple{ZZModRing, Int, Int}, ZZModMatrixSpace}()
 
 mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
    entries::Ptr{Nothing}
@@ -5368,16 +5356,14 @@ end
 #
 ###############################################################################
 
-mutable struct FpMatrixSpace <: MatSpace{FpFieldElem}
+struct FpMatrixSpace <: MatSpace{FpFieldElem}
   base_ring::FpField
   nrows::Int
   ncols::Int
 
-  function FpMatrixSpace(R::FpField, r::Int, c::Int, cached::Bool = true)
+  function FpMatrixSpace(R::FpField, r::Int, c::Int)
     (r < 0 || c < 0) && throw(error_dim_negative)
-    return get_cached!(GaloisFmpzMatID, (R, r, c), cached) do
-       return new(R, r, c)
-    end
+    return new(R, r, c)
   end
 end
 
@@ -5506,17 +5492,14 @@ end
 #
 ###############################################################################
 
-mutable struct fpMatrixSpace <: MatSpace{fpFieldElem}
+struct fpMatrixSpace <: MatSpace{fpFieldElem}
   base_ring::fpField
   nrows::Int
   ncols::Int
 
-  function fpMatrixSpace(R::fpField, r::Int, c::Int,
-                        cached::Bool = true)
+  function fpMatrixSpace(R::fpField, r::Int, c::Int)
     (r < 0 || c < 0) && throw(error_dim_negative)
-    return get_cached!(GFPMatID, (R, r, c), cached) do
-       return new(R, r, c)
-    end
+    return new(R, r, c)
   end
 end
 
@@ -6119,20 +6102,16 @@ end
 #
 ###############################################################################
 
-mutable struct FqMatrixSpace <: MatSpace{FqFieldElem}
+struct FqMatrixSpace <: MatSpace{FqFieldElem}
    base_ring::FqField
    nrows::Int
    ncols::Int
  
-   function FqMatrixSpace(R::FqField, r::Int, c::Int, cached::Bool = true)
+   function FqMatrixSpace(R::FqField, r::Int, c::Int)
      (r < 0 || c < 0) && throw(error_dim_negative)
-     return get_cached!(FqDefaultMatID, (R, r, c), cached) do
-        return new(R, r, c)
-     end
+     return new(R, r, c)
    end
  end
- 
- const FqDefaultMatID = CacheDictType{Tuple{FqField, Int, Int}, FqMatrixSpace}()
  
  mutable struct FqMatrix <: MatElem{FqFieldElem}
     # fq_default_mat_struct is 56 bytes on 64 bit machine
@@ -6353,20 +6332,16 @@ mutable struct FqMatrixSpace <: MatSpace{FqFieldElem}
 #
 ###############################################################################
 
-mutable struct FqPolyRepMatrixSpace <: MatSpace{FqPolyRepFieldElem}
+struct FqPolyRepMatrixSpace <: MatSpace{FqPolyRepFieldElem}
   base_ring::FqPolyRepField
   nrows::Int
   ncols::Int
 
-  function FqPolyRepMatrixSpace(R::FqPolyRepField, r::Int, c::Int, cached::Bool = true)
+  function FqPolyRepMatrixSpace(R::FqPolyRepField, r::Int, c::Int)
     (r < 0 || c < 0) && throw(error_dim_negative)
-    return get_cached!(FqMatID, (R, r, c), cached) do
-       return new(R, r, c)
-    end
+    return new(R, r, c)
   end
 end
-
-const FqMatID = CacheDictType{Tuple{FqPolyRepField, Int, Int}, FqPolyRepMatrixSpace}()
 
 mutable struct FqPolyRepMatrix <: MatElem{FqPolyRepFieldElem}
    entries::Ptr{Nothing}
@@ -6535,20 +6510,16 @@ end
 #
 ###############################################################################
 
-mutable struct fqPolyRepMatrixSpace <: MatSpace{fqPolyRepFieldElem}
+struct fqPolyRepMatrixSpace <: MatSpace{fqPolyRepFieldElem}
   base_ring::fqPolyRepField
   nrows::Int
   ncols::Int
 
-  function fqPolyRepMatrixSpace(R::fqPolyRepField, r::Int, c::Int, cached::Bool = true)
+  function fqPolyRepMatrixSpace(R::fqPolyRepField, r::Int, c::Int)
     (r < 0 || c < 0) && throw(error_dim_negative)
-    return get_cached!(FqNmodMatID, (R, r, c), cached) do
-       return new(R, r, c)
-    end
+    return new(R, r, c)
   end
 end
-
-const FqNmodMatID = CacheDictType{Tuple{fqPolyRepField, Int, Int}, fqPolyRepMatrixSpace}()
 
 mutable struct fqPolyRepMatrix <: MatElem{fqPolyRepFieldElem}
    entries::Ptr{Nothing}

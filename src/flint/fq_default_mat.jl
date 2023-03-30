@@ -95,7 +95,7 @@ nrows(a::FqMatrixSpace) = a.nrows
 
 ncols(a::FqMatrixSpace) = a.ncols
 
-parent(a::FqMatrix, cached::Bool = true) = FqMatrixSpace(base_ring(a), nrows(a), ncols(a), cached)
+parent(a::FqMatrix) = matrix_space(base_ring(a), nrows(a), ncols(a))
 
 base_ring(a::FqMatrixSpace) = a.base_ring
 
@@ -796,7 +796,8 @@ end
 ################################################################################
 
 function matrix_space(R::FqField, r::Int, c::Int; cached::Bool = true)
-  FqMatrixSpace(R, r, c, cached)
+  # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+  FqMatrixSpace(R, r, c)
 end
 
 ################################################################################

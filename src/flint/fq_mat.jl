@@ -92,7 +92,7 @@ nrows(a::FqPolyRepMatrixSpace) = a.nrows
 
 ncols(a::FqPolyRepMatrixSpace) = a.ncols
 
-parent(a::FqPolyRepMatrix, cached::Bool = true) = FqPolyRepMatrixSpace(base_ring(a), nrows(a), ncols(a), cached)
+parent(a::FqPolyRepMatrix) = matrix_space(base_ring(a), nrows(a), ncols(a))
 
 base_ring(a::FqPolyRepMatrixSpace) = a.base_ring
 
@@ -791,5 +791,6 @@ end
 ################################################################################
 
 function matrix_space(R::FqPolyRepField, r::Int, c::Int; cached::Bool = true)
-  FqPolyRepMatrixSpace(R, r, c, cached)
+  # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+  FqPolyRepMatrixSpace(R, r, c)
 end

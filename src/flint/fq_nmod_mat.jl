@@ -92,7 +92,7 @@ nrows(a::fqPolyRepMatrixSpace) = a.nrows
 
 ncols(a::fqPolyRepMatrixSpace) = a.ncols
 
-parent(a::fqPolyRepMatrix, cached::Bool = true) = fqPolyRepMatrixSpace(base_ring(a), nrows(a), ncols(a), cached)
+parent(a::fqPolyRepMatrix) = matrix_space(base_ring(a), nrows(a), ncols(a))
 
 base_ring(a::fqPolyRepMatrixSpace) = a.base_ring
 
@@ -143,20 +143,6 @@ function transpose(a::fqPolyRepMatrix)
    end
    return z
 end
-
-# There is no transpose for fqPolyRepMatrix
-#function transpose(a::fqPolyRepMatrix)
-#  z = fqPolyRepMatrixSpace(base_ring(a), ncols(a), nrows(a))()
-#  ccall((:fq_nmod_mat_transpose, libflint), Nothing,
-#        (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), z, a, base_ring(a))
-#  return z
-#end
-#
-#function transpose!(a::fqPolyRepMatrix)
-#  !is_square(a) && error("Matrix must be a square matrix")
-#  ccall((:fq_nmod_mat_transpose, libflint), Nothing,
-#        (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), a, a, base_ring(a))
-#end
 
 ###############################################################################
 #
@@ -793,5 +779,6 @@ end
 ################################################################################
 
 function matrix_space(R::fqPolyRepField, r::Int, c::Int; cached::Bool = true)
-  fqPolyRepMatrixSpace(R, r, c, cached)
+  # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+  fqPolyRepMatrixSpace(R, r, c)
 end

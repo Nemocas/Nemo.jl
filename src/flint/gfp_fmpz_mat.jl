@@ -89,9 +89,7 @@ nrows(a::FpMatrixSpace) = a.nrows
 
 ncols(a::FpMatrixSpace) = a.ncols
 
-function parent(a::FpMatrix, cached::Bool = true)
-   matrix_space(base_ring(a), nrows(a), ncols(a); cached)
-end
+parent(a::FpMatrix) = matrix_space(base_ring(a), nrows(a), ncols(a))
 
 base_ring(a::FpMatrixSpace) = a.base_ring
 
@@ -349,6 +347,7 @@ end
 ################################################################################
 
 function matrix_space(R::FpField, r::Int, c::Int; cached::Bool = true)
-  FpMatrixSpace(R, r, c, cached)
+  # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+  FpMatrixSpace(R, r, c)
 end
 

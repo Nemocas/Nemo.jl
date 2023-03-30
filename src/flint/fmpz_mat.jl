@@ -30,8 +30,7 @@ base_ring(a::ZZMatrix) = FlintZZ
 
 dense_matrix_type(::Type{ZZRingElem}) = ZZMatrix
 
-parent(a::ZZMatrix, cached::Bool = true) =
-    ZZMatrixSpace(nrows(a), ncols(a), cached)
+parent(a::ZZMatrix) = matrix_space(base_ring(a), nrows(a), ncols(a))
 
 function check_parent(a::ZZMatrix, b::ZZMatrix, throw::Bool = true)
    b = (nrows(a) != nrows(b) || ncols(a) != ncols(b))
@@ -1606,5 +1605,6 @@ end
 ###############################################################################
 
 function matrix_space(R::ZZRing, r::Int, c::Int; cached::Bool = true)
-   return ZZMatrixSpace(r, c, cached)
+   # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
+   return ZZMatrixSpace(r, c)
 end
