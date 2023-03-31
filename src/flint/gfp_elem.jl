@@ -86,8 +86,15 @@ end
 #
 ###############################################################################
 
-function show(io::IO, R::fpField)
-   print(io, "Galois field with characteristic ", signed(widen(R.n)))
+function show(io::IO, a::fpField)
+   if get(io, :supercompact, false)
+      # no nested printing
+      io = pretty(io)
+      print(io, LowercaseOff(), "GF($(signed(widen(a.n))))")
+   else
+      # nested printing allowed, preferably supercompact
+      print(io, "Finite field of characteristic ", signed(widen(a.n)))
+   end
 end
 
 function expressify(a::fpFieldElem; context = nothing)

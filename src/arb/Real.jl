@@ -193,9 +193,11 @@ function expressify(x::RealFieldElem; context = nothing)
 end
 
 function show(io::IO, x::RealField)
-  print(io, "Real Field with ")
-  print(io, precision(x))
-  print(io, " bits of precision and error bounds")
+  if get(io, :supercompact, false)
+    print(io, LowercaseOff(), "RR")
+  else
+    print(io, "Real field")
+  end
 end
 
 function show(io::IO, x::RealFieldElem)
@@ -1864,7 +1866,7 @@ returns an array of Nemo integers representing the linear combination.
 
 ```jldoctest
 julia> RR = RealField()
-Real Field with 64 bits of precision and error bounds
+Real field
 
 julia> a = RR(-0.33198902958450931620250069492231652319)
 [-0.33198902958450932088 +/- 4.15e-22]
@@ -1919,7 +1921,7 @@ b_2$ and $a_1 < a_2$.
 
 ```jldoctest
 julia> RR = RealField()
-Real Field with 64 bits of precision and error bounds
+Real field
 
 julia> simplest_rational_inside(const_pi(RR))
 8717442233//2774848045

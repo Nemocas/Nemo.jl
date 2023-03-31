@@ -43,8 +43,8 @@ end
    C = CalciumField()
    Cext = CalciumField(extended=true)
 
-   @test string(C) == "Exact Complex Field"
-   @test string(Cext) == "Exact Complex Field (Extended)"
+   @test string(C) == "Exact complex field"
+   @test string(Cext) == "Exact complex field (extended)"
 
    @test string(C(1)) == "1"
    @test string(Cext(1)) == "1"

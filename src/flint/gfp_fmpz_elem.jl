@@ -88,8 +88,15 @@ canonical_unit(x::FpFieldElem) = x
 #
 ###############################################################################
 
-function show(io::IO, R::FpField)
-   print(io, "Galois field with characteristic ", R.n)
+function show(io::IO, a::FpField)
+   if get(io, :supercompact, false)
+      # no nested printing
+      io = pretty(io)
+      print(io, LowercaseOff(), "GF(", a.n, ")")
+   else
+      # nested printing allowed, preferably supercompact
+      print(io, "Finite field of characteristic ", a.n)
+   end
 end
 
 function expressify(a::FpFieldElem; context = nothing)

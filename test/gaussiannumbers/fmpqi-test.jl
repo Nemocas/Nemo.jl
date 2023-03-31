@@ -20,7 +20,7 @@ end
    @test string(zero(QQi)) == "0"
    @test string(one(QQi)) == "1"
    @test string(QQi(2//5,-3)) == "2//5 - 3*im"
-   @test string(QQi) == "QQ[im]"
+   @test string(QQi) == "Gaussian rational field"
 end
 
 @testset "fmpqi.constructors" begin

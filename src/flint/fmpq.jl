@@ -198,7 +198,14 @@ function show(io::IO, a::QQFieldElem)
 end
 
 function show(io::IO, a::QQField)
-   print(io, "Rational Field")
+  if get(io, :supercompact, false)
+    # no nested printing
+    io = AbstractAlgebra.pretty(io)
+    print(io, AbstractAlgebra.LowercaseOff(), "QQ")
+  else
+    # nested printing allowed, preferably supercompact
+    print(io, "Rational field" )
+  end
 end
 
 ###############################################################################

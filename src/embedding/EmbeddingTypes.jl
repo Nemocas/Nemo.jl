@@ -27,8 +27,21 @@ function (f::FinFieldMorphism)(x)
     return image_fn(f)(x)::elem_type(codomain(f))
 end
 
-function Base.show(io::IO, f::FinFieldMorphism)
-    print(io, "Morphism from $(domain(f)) to $(codomain(f))")
+function show(io::IO, ::MIME"text/plain", f::FinFieldMorphism)
+  println(io, "Morphism of finite fields from")
+  io = pretty(io)
+  print(io, Indent(), "from ", Lowercase(), domain(f))
+  println(io)
+  print(io, "to ", Lowercase(), codomain(f))
+end
+
+function show(io::IO, f::FinFieldMorphism)
+  if get(io, :supercompact, false)
+    print(io, "Morphism of finite fields")
+  else
+    print(io, "Hom: ")
+    print(IOContext(io, :supercompact => true), domain(f), " -> ", codomain(f))
+  end
 end
 
 struct FinFieldPreimage{S, T} <: AbstractAlgebra.Map{S, T, AbstractAlgebra.SetMap,

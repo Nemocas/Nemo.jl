@@ -79,13 +79,6 @@ characteristic(::ComplexPolyRing) = 0
 #
 ###############################################################################
 
-function show(io::IO, x::ComplexPolyRing)
-  print(io, "Univariate Polynomial Ring in ")
-  print(io, var(x))
-  print(io, " over ")
-  show(io, base_ring(x))
-end
-
 function Base.show(io::IO, a::ComplexPoly)
    print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end

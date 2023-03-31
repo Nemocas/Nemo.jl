@@ -37,7 +37,13 @@ function Base.show(io::IO, a::fmpqi)
 end
 
 function Base.show(io::IO, a::FlintQQiField)
-   print(io, "QQ[im]")
+   if get(io, :supercompact, false)
+     io = pretty(io)
+     print(io, LowercaseOff(), "QQ[im]")
+   else
+     io = pretty(io)
+     print(io, LowercaseOff(), "Gaussian rational field")
+   end
 end
 
 ###############################################################################

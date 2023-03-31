@@ -289,31 +289,6 @@ end
 
 ###############################################################################
 #
-#   String I/O
-#
-###############################################################################
-
-function show(io::IO, p::fqPolyRepMPolyRing)
-   local max_vars = 5 # largest number of variables to print
-   n = nvars(p)
-   print(io, "Multivariate Polynomial Ring in ")
-   if n > max_vars
-      print(io, nvars(p))
-      print(io, " variables ")
-   end
-   for i = 1:min(n - 1, max_vars - 1)
-      print(io, string(p.S[i]), ", ")
-   end
-   if n > max_vars
-      print(io, "..., ")
-   end
-   print(io, string(p.S[n]))
-   print(io, " over ")
-   show(io, base_ring(p))
-end
-
-###############################################################################
-#
 #   Basic arithmetic
 #
 ###############################################################################

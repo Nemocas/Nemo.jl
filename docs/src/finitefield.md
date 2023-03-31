@@ -70,16 +70,16 @@ resulting parent objects to coerce various elements into those fields.
 
 ```jldoctest
 julia> R, x = FiniteField(7, 3, "x")
-(Finite field of degree 3 over F_7, x)
+(Finite field of degree 3 over GF(7), x)
 
 julia> S, y = FiniteField(ZZ(12431351431561), 2, "y")
-(Finite field of degree 2 over F_12431351431561, y)
+(Finite field of degree 2 over GF(12431351431561), y)
 
 julia> T, t = polynomial_ring(residue_ring(ZZ, 12431351431561), "t")
-(Univariate Polynomial Ring in t over Integers modulo 12431351431561, t)
+(Univariate polynomial ring in t over ZZ/(12431351431561), t)
 
 julia> U, z = FiniteField(t^2 + 7, "z")
-(Finite field of degree 2 over F_12431351431561, z)
+(Finite field of degree 2 over GF(12431351431561), z)
 
 julia> a = R(5)
 5
@@ -120,7 +120,7 @@ modulus(::FqPolyRepField)
 
 ```jldoctest
 julia> R, x = FiniteField(ZZ(7), 5, "x")
-(Finite field of degree 5 over F_7, x)
+(Finite field of degree 5 over GF(7), x)
 
 julia> c = gen(R)
 x
@@ -162,7 +162,7 @@ pth_root(::FqPolyRepFieldElem)
 
 ```jldoctest
 julia> R, x = FiniteField(ZZ(7), 5, "x")
-(Finite field of degree 5 over F_7, x)
+(Finite field of degree 5 over GF(7), x)
 
 julia> a = x^4 + 3x^2 + 6x + 1
 x^4 + 3*x^2 + 6*x + 1
@@ -193,10 +193,10 @@ lift(::FpPolyRing, ::FqPolyRepFieldElem)
 
 ```jldoctest
 julia> R, x = FiniteField(23, 2, "x")
-(Finite field of degree 2 over F_23, x)
+(Finite field of degree 2 over GF(23), x)
 
 julia> S, y = polynomial_ring(GF(23), "y")
-(Univariate Polynomial Ring in y over Galois field with characteristic 23, y)
+(Univariate polynomial ring in y over GF(23), y)
 
 julia> f = 8x + 9
 8*x + 9

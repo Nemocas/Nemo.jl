@@ -20,7 +20,7 @@ end
    @test string(zero(ZZi)) == "0"
    @test string(one(ZZi)) == "1"
    @test string(ZZi(2,-3)) == "2 - 3*im"
-   @test string(ZZi) == "ZZ[im]"
+   @test string(ZZi) == "Gaussian integer ring"
 end
 
 @testset "fmpzi.constructors" begin

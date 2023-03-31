@@ -60,13 +60,13 @@ This example computes recursive univariate polynomials.
 julia> using Nemo
 
 julia> R, x = polynomial_ring(ZZ, "x")
-(Univariate Polynomial Ring in x over Integer Ring, x)
+(Univariate polynomial ring in x over ZZ, x)
 
 julia> S, y = polynomial_ring(R, "y")
-(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integer Ring, y)
+(Univariate polynomial ring in y over univariate polynomial ring, y)
 
 julia> T, z = polynomial_ring(S, "z")
-(Univariate Polynomial Ring in z over Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integer Ring, z)
+(Univariate polynomial ring in z over univariate polynomial ring, z)
 
 julia> f = x + y + z + 1
 z + y + x + 1
@@ -83,16 +83,16 @@ Here is an example using generic recursive ring constructions.
 julia> using Nemo
 
 julia> R, x = FiniteField(7, 11, "x")
-(Finite field of degree 11 over F_7, x)
+(Finite field of degree 11 over GF(7), x)
 
 julia> S, y = polynomial_ring(R, "y")
-(Univariate Polynomial Ring in y over Finite field of degree 11 over F_7, y)
+(Univariate polynomial ring in y over GF(7^11), y)
 
 julia> T = residue_ring(S, y^3 + 3x*y + 1)
-Residue ring of Univariate Polynomial Ring in y over Finite field of degree 11 over F_7 modulo y^3 + 3*x*y + 1
+Residue ring of univariate polynomial ring modulo y^3 + 3*x*y + 1
 
 julia> U, z = polynomial_ring(T, "z")
-(Univariate Polynomial Ring in z over Residue ring of Univariate Polynomial Ring in y over Finite field of degree 11 over F_7 modulo y^3 + 3*x*y + 1, z)
+(Univariate polynomial ring in z over residue ring, z)
 
 julia> f = (3y^2 + y + x)*z^2 + ((x + 2)*y^2 + x + 1)*z + 4x*y + 3;
 
@@ -113,10 +113,11 @@ Here is an example using matrices.
 julia> using Nemo
 
 julia> R, x = polynomial_ring(ZZ, "x")
-(Univariate Polynomial Ring in x over Integer Ring, x)
+(Univariate polynomial ring in x over ZZ, x)
 
 julia> S = matrix_space(R, 40, 40)
-Matrix Space of 40 rows and 40 columns over Univariate Polynomial Ring in x over Integer Ring
+Matrix space of 40 rows and 40 columns
+  over univariate polynomial ring in x over ZZ
 
 julia> M = rand(S, 2:2, -20:20);
 
@@ -130,10 +131,10 @@ And here is an example with power series.
 julia> using Nemo
 
 julia> R, x = QQ["x"]
-(Univariate Polynomial Ring in x over Rational Field, x)
+(Univariate polynomial ring in x over QQ, x)
 
 julia> S, t = power_series_ring(R, 100, "t")
-(Univariate power series ring in t over Univariate Polynomial Ring in x over Rational Field, t + O(t^101))
+(Univariate power series ring over univariate polynomial ring, t + O(t^101))
 
 julia> u = t + O(t^100)
 t + O(t^100)

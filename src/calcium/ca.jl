@@ -93,9 +93,9 @@ canonical_unit(a::ca) = a
 
 function show(io::IO, C::CalciumField)
    if C.extended
-     print(io, "Exact Complex Field (Extended)")
+     print(io, "Exact complex field (extended)")
    else
-     print(io, "Exact Complex Field")
+     print(io, "Exact complex field")
    end
 end
 

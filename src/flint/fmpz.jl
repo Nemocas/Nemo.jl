@@ -256,7 +256,16 @@ string(x::ZZRingElem) = dec(x)
 
 show(io::IO, x::ZZRingElem) = print(io, string(x))
 
-show(io::IO, a::ZZRing) = print(io, "Integer Ring")
+function show(io::IO, a::ZZRing)
+   if get(io, :supercompact, false)
+      io = pretty(io)
+      # no nested printing
+      print(io, LowercaseOff(), "ZZ")
+   else
+      # nested printing allowed, preferably supercompact
+      print(io, "Integer Ring")
+   end
+end
 
 ###############################################################################
 #

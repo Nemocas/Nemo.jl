@@ -166,8 +166,15 @@ end
 show(io::IO, a::fqPolyRepFieldElem) = print(io, AbstractAlgebra.obj_to_string(a, context = io))
 
 function show(io::IO, a::fqPolyRepField)
-   print(io, "Finite field of degree ", degree(a))
-   print(io, " over F_", characteristic(a))
+   if get(io, :supercompact, false)
+      # no nested printing
+      io = pretty(io)
+      print(io, LowercaseOff(), "GF($(characteristic(a))", degree(a)>1 ? "^$(degree(a))" : "", ")")
+   else
+      # nested printing allowed, preferably supercompact
+      print(io, "Finite field of degree ", degree(a), " over ")
+      print(io, "GF($(characteristic(a)))")
+   end
 end
 
 ###############################################################################

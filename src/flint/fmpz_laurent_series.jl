@@ -347,9 +347,14 @@ function show(io::IO, a::ZZLaurentSeriesRingElem)
    print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
-function show(io::IO, a::ZZLaurentSeriesRing)
-   print(io, "Laurent series ring in ", var(a), " over ")
-   show(io, base_ring(a))
+function show(io::IO, p::ZZLaurentSeriesRing)
+   if get(io, :supercompact, false)
+      print(io, "Laurent series ring")
+   else
+      io = pretty(io)
+      print(io, "Laurent series ring in ", var(p), " over ")
+      print(IOContext(io, :supercompact => true), Lowercase(), base_ring(p))
+   end
 end
 
 ###############################################################################

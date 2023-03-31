@@ -261,7 +261,12 @@ function show(io::IO, a::padic)
 end
 
 function show(io::IO, R::FlintPadicField)
-   print(io, "Field of ", prime(R), "-adic numbers")
+   if get(io, :supercompact, false)
+     io = pretty(io)
+     print(io, LowercaseOff(), "QQ_$(prime(R))")
+   else
+     print(io, "Field of ", prime(R), "-adic numbers")
+   end
 end
 
 ###############################################################################
