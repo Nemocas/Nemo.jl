@@ -249,7 +249,12 @@ function show(io::IO, a::qadic)
 end
 
 function show(io::IO, R::FlintQadicField)
-   print(io, "Unramified extension of $(prime(R))-adic numbers of degree $(degree(R))")
+   if get(io, :supercompact, false)
+     io = pretty(io)
+     print(io, LowercaseOff(), "QQ_$(prime(R))^$(degree(R))")
+   else
+     print(io, "Unramified extension of $(prime(R))-adic numbers of degree $(degree(R))")
+   end
 end
 
 ###############################################################################

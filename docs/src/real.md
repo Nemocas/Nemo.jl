@@ -60,7 +60,7 @@ parent object to coerce values into the resulting field.
 
 ```jldoctest
 julia> RR = RealField()
-Real Field with 64 bits of precision and error bounds
+Real field
 
 julia> a = RR("0.25")
 0.25000000000000000000
@@ -96,7 +96,7 @@ Using coercion into the real field, new elements can be created.
 
 ```jldoctest
 julia> RR = RealField()
-Real Field with 64 bits of precision and error bounds
+Real field
 
 julia> c = RR(1)
 1.0000000000000000000
@@ -118,7 +118,7 @@ d = RR(1//2, precision = 4)
 
 ```jldoctest
 julia> RR = RealField()
-Real Field with 64 bits of precision and error bounds
+Real field
 
 julia> convert(Float64, RR(1//3))
 0.3333333333333333
@@ -174,7 +174,7 @@ accuracy_bits(::RealFieldElem)
 
 ```jldoctest
 julia> RR = RealField()
-Real Field with 64 bits of precision and error bounds
+Real field
 
 julia> a = RR("1.2 +/- 0.001")
 [1.20 +/- 1.01e-3]
@@ -292,7 +292,7 @@ contains_nonpositive(::RealFieldElem)
 
 ```jldoctest
 julia> RR = RealField()
-Real Field with 64 bits of precision and error bounds
+Real field
 
 julia> x = RR("1 +/- 0.001")
 [1.00 +/- 1.01e-3]
@@ -359,7 +359,7 @@ Function                      |
 
 ```jldoctest
 julia> RR = RealField()
-Real Field with 64 bits of precision and error bounds
+Real field
 
 julia> x = RR("1 +/- 0.001")
 [1.00 +/- 1.01e-3]
@@ -389,7 +389,7 @@ true
 
 ```jldoctest
 julia> RR = RealField()
-Real Field with 64 bits of precision and error bounds
+Real field
 
 julia> x = RR("-1 +/- 0.001")
 [-1.00 +/- 1.01e-3]
@@ -404,7 +404,7 @@ julia> a = abs(x)
 
 ```jldoctest
 julia> RR = RealField()
-Real Field with 64 bits of precision and error bounds
+Real field
 
 julia> x = RR("-3 +/- 0.001")
 [-3.00 +/- 1.01e-3]
@@ -438,7 +438,7 @@ setunion(::RealFieldElem, ::RealFieldElem)
 
 ```jldoctest
 julia> RR = RealField()
-Real Field with 64 bits of precision and error bounds
+Real field
 
 julia> x = RR("-3 +/- 0.001")
 [-3.00 +/- 1.01e-3]
@@ -494,7 +494,7 @@ const_glaisher(::RealField)
 
 ```jldoctest
 julia> RR = RealField()
-Real Field with 64 bits of precision and error bounds
+Real field
 
 julia> a = const_pi(RR)
 [3.141592653589793239 +/- 5.96e-19]
@@ -683,7 +683,7 @@ airy_bi_prime(::RealFieldElem)
 
 ```jldoctest
 julia> RR = RealField()
-Real Field with 64 bits of precision and error bounds
+Real field
 
 julia> a = floor(exp(RR(1)))
 2.0000000000000000000

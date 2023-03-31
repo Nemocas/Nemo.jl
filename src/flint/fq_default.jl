@@ -350,17 +350,20 @@ end
 show(io::IO, a::FqFieldElem) = print(io, AbstractAlgebra.obj_to_string(a, context = io))
 
 function show(io::IO, a::FqField)
-   if is_absolute(a)
-     print(io, "Finite field of degree ", degree(a), " over F_", characteristic(a))
-     #print(io, "Finite field ", characteristic(a))
-     #if _degree(a) != 1
-     #  print(io, "^", _degree(a))
-     #end
-   else
-     print(io, "Finite field of degree ", degree(a))
-     print(io, " over ",)
-     print(io, "(", base_field(a), ")")
-   end
+  io = pretty(io)
+  if get(io, :supercompact, false)
+    print(io, LowercaseOff(), "GF($(order(base_field(a)))", degree(a) > 1 ? "^$(degree(a))" : "", ")")
+  else
+    if is_absolute(a)
+      # nested printing allowed, preferably supercompact
+      print(io, "Finite field of degree ", degree(a), " over ")
+      print(IOContext(io, :supercompact => true), base_field(a))
+    else
+      # nested printing allowed, preferably supercompact
+      print(io, "Relative finite field of degree ", degree(a), " over ")
+      print(IOContext(io, :supercompact => true), base_field(a))
+    end
+  end
 end
 
 ###############################################################################

@@ -122,19 +122,6 @@ canonical_unit(a::fqPolyRepPolyRingElem) = canonical_unit(leading_coefficient(a)
 
 ################################################################################
 #
-#  AbstractString I/O
-#
-################################################################################
-
-function show(io::IO, R::fqPolyRepPolyRing)
-  print(io, "Univariate Polynomial Ring in ")
-  print(io, var(R))
-  print(io, " over ")
-  show(io, base_ring(R))
-end
-
-################################################################################
-#
 #  Unary operations
 #
 ################################################################################

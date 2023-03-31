@@ -100,28 +100,6 @@ end
 
 # AA has enable all show via expressify for all MPolys
 
-function show(io::IO, p::FqMPolyRing)
-    local max_vars = 5 # largest number of variables to print
-    S = symbols(p)
-    n = length(S)
-    print(io, "Multivariate Polynomial Ring in ")
-    if n == 0 || n > max_vars
-        print(io, n)
-        print(io, " variables ")
-    end
-    for i in 1:min(n - 1, max_vars - 1)
-        print(io, string(S[i]), ", ")
-    end
-    if n > max_vars
-        print(io, "..., ")
-    end
-    if n > 0
-        print(io, string(S[n]))
-    end
-    print(io, " over ")
-    print(IOContext(io, :compact => true), base_ring(p))
-end
-
 ################################################################################
 #
 #  Getting coefficients

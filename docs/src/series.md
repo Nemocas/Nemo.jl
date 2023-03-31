@@ -163,7 +163,7 @@ rings.
 
 ```jldoctest
 julia> T, z = power_series_ring(QQ, 30, "z")
-(Univariate power series ring in z over Rational Field, z + O(z^31))
+(Univariate power series ring over QQ, z + O(z^31))
 
 julia> a = 1 + z + 3z^2 + O(z^5)
 1 + z + 3*z^2 + O(z^5)

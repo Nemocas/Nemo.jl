@@ -156,7 +156,12 @@ function native_string(x::qqbar)
 end
 
 function show(io::IO, F::CalciumQQBarField)
-  print(io, "Field of Algebraic Numbers in minimal polynomial representation")
+  if get(io, :supercompact, false)
+    io = pretty(io)
+    print(io, LowercaseOff(), "QQBar")
+  else
+    print(io, "Field of algebraic numbers")
+  end
 end
 
 function show(io::IO, x::qqbar)

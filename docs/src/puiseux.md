@@ -80,7 +80,7 @@ eta_qexp(x::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem})
 
 ```jldoctest
 julia> S, z = PuiseuxSeriesRing(ZZ, 30, "z")
-(Puiseux series ring in z over Integer Ring, z + O(z^31))
+(Puiseux series ring in z over ZZ, z + O(z^31))
 
 julia> a = 1 + z + 3z^2 + O(z^5)
 1 + z + 3*z^2 + O(z^5)

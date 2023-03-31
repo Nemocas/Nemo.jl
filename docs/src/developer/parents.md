@@ -217,7 +217,7 @@ Here is an example of their use:
 
 ```jldoctest
 julia> R = PolyRing(ZZ)
-Univariate Polynomial Ring in x over Integer Ring
+Univariate polynomial ring in x over ZZ
 
 julia> p = R([1, 2, 3])
 3*x^2 + 2*x + 1

@@ -99,7 +99,14 @@ end
 ###############################################################################
 
 function show(io::IO, R::zzModRing)
-   print(io, "Integers modulo ", signed(widen(R.n)))
+   if get(io, :supercompact, false)
+      # no nested printing
+      io = pretty(io)
+      print(io, LowercaseOff(), "ZZ/($(signed(widen(R.n))))")
+   else
+      # nested printing allowed, preferably supercompact
+      print(io, "Integers modulo ", signed(widen(R.n)))
+   end
 end
 
 function expressify(a::Nemo.zzModRingElem; context = nothing)

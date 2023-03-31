@@ -35,7 +35,13 @@ function Base.show(io::IO, a::fmpzi)
 end
 
 function Base.show(io::IO, a::FlintZZiRing)
-   print(io, "ZZ[im]")
+   if get(io, :supercompact, false)
+     io = pretty(io)
+     print(io, LowercaseOff(), "ZZ[im]")
+   else
+     io = pretty(io)
+     print(io, LowercaseOff(), "Gaussian integer ring")
+   end
 end
 
 ###############################################################################

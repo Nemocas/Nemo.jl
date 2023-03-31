@@ -73,7 +73,7 @@ Solving the quintic equation:
 
 ```jldoctest
 julia> R, x = polynomial_ring(QQ, "x")
-(Univariate Polynomial Ring in x over Rational Field, x)
+(Univariate polynomial ring in x over QQ, x)
 
 julia> v = roots(x^5-x-1, QQBar)
 5-element Vector{qqbar}:

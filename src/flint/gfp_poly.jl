@@ -99,19 +99,6 @@ function polynomial(R::fpField, arr::Vector{T}, var::VarName=:x; cached::Bool=tr
    return z
 end
 
-################################################################################
-#
-#  AbstractString I/O
-#
-################################################################################
-
-function show(io::IO, R::fpPolyRing)
-  print(io, "Univariate Polynomial Ring in ")
-  print(io, var(R))
-  print(io, " over ")
-  print(io, base_ring(R))
-end
-
 ###############################################################################
 #
 #  Ad hoc binary operations

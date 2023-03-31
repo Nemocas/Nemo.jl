@@ -112,19 +112,6 @@ canonical_unit(a::ZZPolyRingElem) = canonical_unit(leading_coefficient(a))
 
 ###############################################################################
 #
-#   AbstractString I/O
-#
-###############################################################################
-
-function show(io::IO, p::ZZPolyRing)
-   print(io, "Univariate Polynomial Ring in ")
-   print(io, var(p))
-   print(io, " over ")
-   show(io, FlintZZ)
-end
-
-###############################################################################
-#
 #   Unary operations
 #
 ###############################################################################

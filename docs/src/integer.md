@@ -487,7 +487,7 @@ The associated ring of integers and the fraction field can be retrieved by
 
 ```jldoctest
 julia> ZZi = Nemo.GaussianIntegers()
-ZZ[im]
+Gaussian integer ring
 
 julia> a = ZZ(5)*im
 5*im

@@ -168,9 +168,11 @@ function Base.show(io::IO, z::ComplexFieldElem)
 end
 
 function show(io::IO, x::ComplexField)
-  print(io, "Complex Field")# with ")
-  #print(io, precision(x))
-  #print(io, " bits of precision and error bounds")
+  if get(io, :supercompact, false)
+    print(io, LowercaseOff(), "CC")
+  else
+    print(io, "Complex field")
+  end
 end
 
 ################################################################################

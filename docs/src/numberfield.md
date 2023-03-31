@@ -189,10 +189,10 @@ tr(::nf_elem)
 
 ```jldoctest
 julia> R, x = polynomial_ring(QQ, "x")
-(Univariate Polynomial Ring in x over Rational Field, x)
+(Univariate polynomial ring in x over QQ, x)
 
 julia> K, a = number_field(x^3 + 3x + 1, "a")
-(Number field over Rational Field with defining polynomial x^3 + 3*x + 1, a)
+(Number field of degree 3 over QQ, a)
 
 julia> c = 3a^2 - a + 1
 3*a^2 - a + 1

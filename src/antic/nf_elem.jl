@@ -255,11 +255,25 @@ end
 #
 ###############################################################################
 
-function show(io::IO, a::AnticNumberField)
-   @show_name(io, a)
-   @show_special(io, a)
-   print(io, "Number field over Rational Field")
-   print(io, " with defining polynomial ", a.pol)
+function Base.show(io::IO, ::MIME"text/plain", a::AnticNumberField)
+   print(io, "Number field with defining polynomial ", defining_polynomial(a))
+   println(io)
+   io = AbstractAlgebra.pretty(io)
+   print(io, AbstractAlgebra.Indent(), "over ", AbstractAlgebra.Lowercase(), QQ)
+   #print(IOContext(io, :supercompact => true))
+end
+
+function Base.show(io::IO, a::AnticNumberField)
+  @show_name(io, a)
+  @show_special(io, a)
+  if get(io, :supercompact, false)
+    # no nested printing
+    print(io, "Number field")
+  else
+    # nested printing allowed, preferably supercompact
+    print(io, "Number field of degree $(degree(a))")
+    print(IOContext(io, :supercompact => true), " over ", Nemo.QQ)
+  end
 end
 
 function expressify(a::nf_elem; context = nothing)
