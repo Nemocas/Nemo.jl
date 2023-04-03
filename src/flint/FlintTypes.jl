@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-zz_ring_doc = md"""
+zz_ring_doc = raw"""
     ZZRing <: Ring
     ZZRingElem <: RingElem
 
@@ -137,7 +137,7 @@ end
 #
 ###############################################################################
 
-qq_field_doc = md"""
+qq_field_doc = raw"""
     QQField <: FracField{ZZRingElem}
     QQFieldElem <: FracFieldElem{ZZRingElem}
 
@@ -426,7 +426,7 @@ end
 #
 ###############################################################################
 
-@doc md"""
+@doc raw"""
     zzModRing <: Ring
 
 The ring $\mathbb Z/n\mathbb Z$ for some $n$. See [`residue_ring`](@ref).
@@ -447,7 +447,7 @@ end
 
 const NmodRingID = CacheDictType{UInt, zzModRing}()
 
-@doc md"""
+@doc raw"""
     zzModRingElem <: RingElem
 
 An element of a ring $\mathbb Z/n\mathbb Z$. See [`zzModRing`](@ref).
@@ -463,7 +463,7 @@ end
 #
 ###############################################################################
 
-@doc md"""
+@doc raw"""
     fpField <: FinField
 
 A Galois field $\mathbb F_p$ for some prime $p$. See [`GF`](@ref).
@@ -483,7 +483,7 @@ end
 
 const GaloisFieldID = CacheDictType{UInt, fpField}()
 
-@doc md"""
+@doc raw"""
     fpFieldElem <: FinFieldElem
 
 An element of a Galois field $\mathbb F_p$. See [`fpField`](@ref).
@@ -521,7 +521,7 @@ function _fmpz_mod_ctx_clear_fn(a::fmpz_mod_ctx_struct)
    ccall((:fmpz_mod_ctx_clear, libflint), Nothing, (Ref{fmpz_mod_ctx_struct},), a)
 end
 
-@doc md"""
+@doc raw"""
     ZZModRing <: Ring
 
 The ring $\mathbb Z/n\mathbb Z$ for some $n$. See [`residue_ring`](@ref).
@@ -543,7 +543,7 @@ end
 
 const FmpzModRingID = CacheDictType{ZZRingElem, ZZModRing}()
 
-@doc md"""
+@doc raw"""
     ZZModRingElem <: RingElem
 
 An element of a ring $\mathbb Z/n\mathbb Z$. See [`ZZModRing`](@ref).
@@ -559,7 +559,7 @@ end
 #
 ###############################################################################
 
-@doc md"""
+@doc raw"""
     FpField <: FinField
 
 A Galois field $\mathbb F_p$ for some prime $p$. See [`GF`](@ref).
@@ -581,7 +581,7 @@ end
 
 const GaloisFmpzFieldID = CacheDictType{ZZRingElem, FpField}()
 
-@doc md"""
+@doc raw"""
     FpFieldElem <: FinFieldElem
 
 An element of a Galois field $\mathbb F_p$. See [`FpField`](@ref).
@@ -2195,7 +2195,7 @@ end
 #
 ###############################################################################
 
-@doc md"""
+@doc raw"""
     fqPolyRepField <: FinField
 
 A finite field. Implemented as $\mathbb F_p[t]/f$ for the prime $p$ being an [`Int`](@ref).
@@ -2280,7 +2280,7 @@ function _FqNmodFiniteField_clear_fn(a :: fqPolyRepField)
    ccall((:fq_nmod_ctx_clear, libflint), Nothing, (Ref{fqPolyRepField},), a)
 end
 
-@doc md"""
+@doc raw"""
     fqPolyRepFieldElem <: FinFieldElem
 
 An element $\sum_{i=0}^{d-1} a_i t^i$ of a finite field $\mathbb F_{p^d} \cong \mathbb F_p[t]/f$.
@@ -2345,7 +2345,7 @@ end
 #
 ###############################################################################
 
-@doc md"""
+@doc raw"""
     FqField <: FinField
 
 A finite field. The constructor automatically determines a fast implementation.
@@ -2463,7 +2463,7 @@ function _FqDefaultFiniteField_clear_fn(a :: FqField)
    ccall((:fq_default_ctx_clear, libflint), Nothing, (Ref{FqField},), a)
 end
 
-@doc md"""
+@doc raw"""
     FqFieldElem <: FinFieldElem
 
 An element of a finite field. See [`FqField`](@ref).
@@ -2591,7 +2591,7 @@ end
 #
 ###############################################################################
 
-@doc md"""
+@doc raw"""
     FqPolyRepField <: FinField
 
 A finite field. Implemented as $\mathbb F_p[t]/f$ for the prime $p$ being a [`ZZRingElem`](@ref).
@@ -2673,7 +2673,7 @@ function _FqFiniteField_clear_fn(a :: FqPolyRepField)
    ccall((:fq_ctx_clear, libflint), Nothing, (Ref{FqPolyRepField},), a)
 end
 
-@doc md"""
+@doc raw"""
     FqPolyRepFieldElem <: FinFieldElem
 
 An element $\sum_{i=0}^{d-1} a_i t^i$ of a finite field $\mathbb F_{p^d} \cong \mathbb F_p[t]/f$.
@@ -2992,7 +2992,7 @@ const NALocalFieldElem = NonArchLocalFieldElem
 
 const flint_padic_printing_mode = [:terse, :series, :val_unit]
 
-@doc md"""
+@doc raw"""
     FlintPadicField <: FlintLocalField <: NonArchLocalField <: Field
 
 A $p$-adic field for some prime $p$.
@@ -3027,7 +3027,7 @@ function _padic_ctx_clear_fn(a::FlintPadicField)
    ccall((:padic_ctx_clear, libflint), Nothing, (Ref{FlintPadicField},), a)
 end
 
-@doc md"""
+@doc raw"""
     padic <: FlintLocalFieldElem <: NonArchLocalFieldElem <: FieldElem
 
 An element of a $p$-adic field. See [`FlintPadicField`](@ref).
@@ -3056,7 +3056,7 @@ end
 #
 ###############################################################################
 
-@doc md"""
+@doc raw"""
     FlintQadicField <: FlintLocalField <: NonArchLocalField <: Field
 
 A $p^n$-adic field for some prime power $p^n$.
@@ -3098,7 +3098,7 @@ function _qadic_ctx_clear_fn(a::FlintQadicField)
    ccall((:qadic_ctx_clear, libflint), Nothing, (Ref{FlintQadicField},), a)
 end
 
-@doc md"""
+@doc raw"""
     qadic <: FlintLocalFieldElem <: NonArchLocalFieldElem <: FieldElem
 
 An element of a $q$-adic field. See [`FlintQadicField`](@ref).
@@ -6842,7 +6842,7 @@ constructions = Dict(
     :MPolyRingElem => ("MPolyRingElem", "RingElem", "A multivariate polynomial", "polynomial_ring(R, :x, :y)"),
 )
 
-@doc md"""
+@doc raw"""
     docstring(base::Symbol, suffix::Symbol)
 
 Docstring for some constructions of rings.

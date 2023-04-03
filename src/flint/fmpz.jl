@@ -2644,7 +2644,7 @@ end
 
 (::ZZRing)(a::BigFloat) = ZZRingElem(BigInt(a))
 
-@doc md"""
+@doc raw"""
     (ZZ::ZZRing)(x)
 
 Coerce `x` into an element of $\mathbb Z$. Note that `ZZ(x)` is equivalent to [`ZZRingElem(x)`](@ref).
