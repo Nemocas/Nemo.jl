@@ -563,7 +563,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     gso(x::QQMatrix)
 
 Return the Gram-Schmidt Orthogonalisation of the matrix $x$.
@@ -581,7 +581,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     hilbert(R::QQMatrixSpace)
 
 Return the Hilbert matrix in the given matrix space. This is the matrix with
@@ -639,7 +639,7 @@ function solve(a::QQMatrix, b::QQMatrix)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     solve_dixon(a::QQMatrix, b::QQMatrix)
 
 Solve $ax = b$ by clearing denominators and using Dixon's algorithm. This is

@@ -808,7 +808,7 @@ function sqrt_classical(a::FpAbsPowerSeriesRingElem; check::Bool=true)
    return true, z
 end
  
-@doc Markdown.doc"""
+@doc raw"""
    sqrt(a::FpAbsPowerSeriesRingElem; check::Bool=true)
  
 Return the power series square root of $a$.

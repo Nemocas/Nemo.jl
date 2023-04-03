@@ -191,7 +191,7 @@ isless(a::QQFieldElem, b::ca) = isless(parent(b)(a), b)
 isless(a::ZZRingElem, b::ca) = isless(parent(b)(a), b)
 isless(a::Int, b::ca) = isless(parent(b)(a), b)
 
-@doc Markdown.doc"""
+@doc raw"""
     is_number(a::ca)
 
 Return whether `a` is a number, i.e. not an infinity or undefined.
@@ -203,7 +203,7 @@ function is_number(a::ca)
    return truth_as_bool(t, :is_number)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     iszero(a::ca)
 
 Return whether `a` is the number 0.
@@ -215,7 +215,7 @@ function iszero(a::ca)
    return truth_as_bool(t, :iszero)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isone(a::ca)
 
 Return whether `a` is the number 1.
@@ -227,7 +227,7 @@ function isone(a::ca)
    return truth_as_bool(t, :isone)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_algebraic(a::ca)
 
 Return whether `a` is an algebraic number.
@@ -239,7 +239,7 @@ function is_algebraic(a::ca)
    return truth_as_bool(t, :is_algebraic)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_rational(a::ca)
 
 Return whether `a` is a rational number.
@@ -251,7 +251,7 @@ function is_rational(a::ca)
    return truth_as_bool(t, :is_rational)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isinteger(a::ca)
 
 Return whether `a` is an integer.
@@ -263,7 +263,7 @@ function isinteger(a::ca)
    return truth_as_bool(t, :isinteger)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isreal(a::ca)
 
 Return whether `a` is a real number. This returns `false`
@@ -276,7 +276,7 @@ function isreal(a::ca)
    return truth_as_bool(t, :isreal)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_imaginary(a::ca)
 
 Return whether `a` is an imaginary number. This returns `false`
@@ -289,7 +289,7 @@ function is_imaginary(a::ca)
    return truth_as_bool(t, :is_imaginary)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_undefined(a::ca)
 
 Return whether `a` is the special value *Undefined*.
@@ -301,7 +301,7 @@ function is_undefined(a::ca)
    return truth_as_bool(t, :is_undefined)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isinf(a::ca)
 
 Return whether `a` is any infinity (signed or unsigned).
@@ -313,7 +313,7 @@ function isinf(a::ca)
    return truth_as_bool(t, :isinf)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_uinf(a::ca)
 
 Return whether `a` is unsigned infinity.
@@ -325,7 +325,7 @@ function is_uinf(a::ca)
    return truth_as_bool(t, :is_uinf)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_signed_inf(a::ca)
 
 Return whether `a` is any signed infinity.
@@ -337,7 +337,7 @@ function is_signed_inf(a::ca)
    return truth_as_bool(t, :is_signed_inf)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_unknown(a::ca)
 
 Return whether `a` is the special value *Unknown*. This is a representation
@@ -691,7 +691,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     const_pi(C::CalciumField)
 
 Return the constant $\pi$ as an element of `C`.
@@ -702,7 +702,7 @@ function const_pi(C::CalciumField)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     const_euler(C::CalciumField)
 
 Return Euler's constant $\gamma$ as an element of `C`.
@@ -713,7 +713,7 @@ function const_euler(C::CalciumField)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     onei(C::CalciumField)
 
 Return the imaginary unit $i$ as an element of `C`.
@@ -724,7 +724,7 @@ function onei(C::CalciumField)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     unsigned_infinity(C::CalciumField)
 
 Return unsigned infinity ($\hat \infty$) as an element of `C`.
@@ -738,7 +738,7 @@ function unsigned_infinity(C::CalciumField)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     infinity(C::CalciumField)
 
 Return positive infinity ($+\infty$) as an element of `C`.
@@ -752,7 +752,7 @@ function infinity(C::CalciumField)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     infinity(a::ca)
 
 Return the signed infinity ($a \cdot \infty$).
@@ -769,7 +769,7 @@ function infinity(a::ca)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     undefined(C::CalciumField)
 
 Return the special value Undefined as an element of `C`.
@@ -783,7 +783,7 @@ function undefined(C::CalciumField)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     unknown(C::CalciumField)
 
 Return the special meta-value Unknown as an element of `C`.
@@ -803,7 +803,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     real(a::ca)
 
 Return the real part of `a`.
@@ -817,7 +817,7 @@ function real(a::ca)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     imag(a::ca)
 
 Return the imaginary part of `a`.
@@ -831,7 +831,7 @@ function imag(a::ca)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     angle(a::ca)
 
 Return the complex argument of `a`.
@@ -845,7 +845,7 @@ function angle(a::ca)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     csgn(a::ca)
 
 Return the extension of the real sign function taking the value 1
@@ -863,7 +863,7 @@ function csgn(a::ca)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sign(a::ca)
 
 Return the complex sign of `a`, defined as zero if `a` is zero
@@ -879,7 +879,7 @@ function sign(a::ca)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     abs(a::ca)
 
 Return the absolute value of `a`.
@@ -893,7 +893,7 @@ function abs(a::ca)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     conj(a::ca; form::Symbol=:default)
 
 Return the complex conjugate of `a`. The optional `form` argument allows
@@ -921,7 +921,7 @@ function conj(a::ca; form::Symbol=:default)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     floor(a::ca)
 
 Return the floor function of `a`.
@@ -935,7 +935,7 @@ function floor(a::ca)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     ceil(a::ca)
 
 Return the ceiling function of `a`.
@@ -955,7 +955,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     Base.sqrt(a::ca; check::Bool=true)
 
 Return the principal square root of `a`.
@@ -969,7 +969,7 @@ function Base.sqrt(a::ca; check::Bool=true)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     exp(a::ca)
 
 Return the exponential function of `a`.
@@ -983,7 +983,7 @@ function exp(a::ca)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     log(a::ca)
 
 Return the natural logarithm of `a`.
@@ -997,7 +997,7 @@ function log(a::ca)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     pow(a::ca, b::Int; form::Symbol=:default)
 
 Return *a* raised to the integer power `b`. The optional `form` argument allows
@@ -1024,7 +1024,7 @@ function pow(a::ca, b::Int; form::Symbol=:default)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sin(a::ca; form::Symbol=:default)
 
 Return the sine of `a`.
@@ -1057,7 +1057,7 @@ function sin(a::ca; form::Symbol=:default)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     cos(a::ca; form::Symbol=:default)
 
 Return the cosine of `a`.
@@ -1090,7 +1090,7 @@ function cos(a::ca; form::Symbol=:default)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     tan(a::ca; form::Symbol=:default)
 
 Return the tangent of `a`.
@@ -1123,7 +1123,7 @@ function tan(a::ca; form::Symbol=:default)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     atan(a::ca; form::Symbol=:default)
 
 Return the inverse tangent of `a`.
@@ -1152,7 +1152,7 @@ function atan(a::ca; form::Symbol=:default)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     asin(a::ca; form::Symbol=:default)
 
 Return the inverse sine of `a`.
@@ -1181,7 +1181,7 @@ function asin(a::ca; form::Symbol=:default)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     acos(a::ca; form::Symbol=:default)
 
 Return the inverse cosine of `a`.
@@ -1210,7 +1210,7 @@ function acos(a::ca; form::Symbol=:default)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gamma(a::ca)
 
 Return the gamma function of `a`.
@@ -1224,7 +1224,7 @@ function gamma(a::ca)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     erf(a::ca)
 
 Return the error function of `a`.
@@ -1238,7 +1238,7 @@ function erf(a::ca)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     erfi(a::ca)
 
 Return the imaginary error function of `a`.
@@ -1252,7 +1252,7 @@ function erfi(a::ca)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     erfc(a::ca)
 
 Return the complementary error function of `a`.
@@ -1272,7 +1272,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     complex_normal_form(a::ca, deep::Bool=true)
 
 Returns the input rewritten using standardizing transformations over the

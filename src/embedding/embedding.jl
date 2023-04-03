@@ -27,7 +27,7 @@ function subfields(k::FinField)
 end
 
 
-@doc Markdown.doc"""
+@doc raw"""
     AddOverfield!(F::T, f::FinFieldMorphism{T, T}) where T <: FinField
 
 Add an overfield to $F$, represented by a morphism $f: F\to G$ where
@@ -46,7 +46,7 @@ function AddOverfield!(F::T, f::FinFieldMorphism{T, T}) where T <: FinField
     end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     AddSubfield!(F::T, f::FinFieldMorphism{T, T}) where T <: FinField
 
 Add a subfield to $F$, represented by a morphism $f: G\to F$ where
@@ -80,7 +80,7 @@ any_root(x::PolyRingElem) = -coeff(linear_factor(x), 0)
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     berlekamp_massey(a::Vector{Y}, n::Int) where Y <: FieldElem
 
 Compute the minimal polynomial of a linear recurring sequence $a$.
@@ -106,7 +106,7 @@ function berlekamp_massey(a::Vector{Y}, n::Int) where Y <: FieldElem
   return V1*leading_coefficient(V1)^(-1)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     generator_minimum_polynomial(f::FinFieldMorphism)
 
 Compute the minimal polynomial of the generator of the codomain
@@ -146,7 +146,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     is_embedded(k::T, K::T) where T <: FinField
 
 If $k$ is embedded in $K$, return the corresponding embedding.
@@ -167,7 +167,7 @@ function is_embedded(k::T, K::T) where T <: FinField
     end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     embed_any(k::T, K::T) where T <: FinField
 
 Embed $k$ in $K$ without worrying about compatibility conditions.
@@ -184,7 +184,7 @@ function embed_any(k::T, K::T) where T <: FinField
     return FinFieldMorphism(k, K, f, inv)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     find_morphism(k::T, K::T) where T <: FinField
 
 Returns a compatible embedding from $k$ to $K$.
@@ -235,7 +235,7 @@ function find_morphism(k::T, K::T) where T <: FinField
     return morph
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     transitive_closure(f::FinFieldMorphism)
 
 Compute the transitive closure.
@@ -292,7 +292,7 @@ function transitive_closure(f::FinFieldMorphism)
     end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     intersections(k::T, K::T) where T <: FinField
 
 For each subfield $S$ of $K$, embed $I$ in $S$ and $k$, where $I$ is the intersection
@@ -358,7 +358,7 @@ function intersections(k::T, K::T) where T <: FinField
     return needmore
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     embed(k::T, K::T) where T <: FinField
 
 Embed $k$ in $K$, with some additional computations in order to satisfy
@@ -435,7 +435,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     preimage_map(k::T, k::T) where T <: FinField
 
 Computes the preimage map corresponding to the embedding of $k$ into $K$.

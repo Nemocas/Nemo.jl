@@ -51,7 +51,7 @@ one(R::RealField) = R(1)
 
 # TODO: Add hash (and document under arb basic functionality)
 
-@doc Markdown.doc"""
+@doc raw"""
     accuracy_bits(x::RealFieldElem)
 
 Return the relative accuracy of $x$ measured in bits, capped between
@@ -83,7 +83,7 @@ characteristic(::RealField) = 0
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     Float64(x::RealFieldElem, round::RoundingMode=RoundNearest)
 
 Converts $x$ to a `Float64`, rounded in the direction specified by $round$.
@@ -96,7 +96,7 @@ function Float64(x::RealFieldElem, round::RoundingMode=RoundNearest)
   return _arf_get_d(t, round)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     BigFloat(x::RealFieldElem, round::RoundingMode=RoundNearest)
 
 Converts $x$ to a `BigFloat` of the currently used precision, rounded in the
@@ -143,7 +143,7 @@ function convert(::Type{BigFloat}, x::RealFieldElem)
     return BigFloat(x)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     ZZRingElem(x::RealFieldElem)
 
 Return $x$ as an `ZZRingElem` if it represents an unique integer, else throws an
@@ -208,7 +208,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     overlaps(x::RealFieldElem, y::RealFieldElem)
 
 Returns `true` if any part of the ball $x$ overlaps any part of the ball $y$,
@@ -224,7 +224,7 @@ end
 #  return Bool(r)
 #end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::RealFieldElem, y::QQFieldElem)
 
 Returns `true` if the ball $x$ contains the given rational value, otherwise
@@ -235,7 +235,7 @@ function contains(x::RealFieldElem, y::QQFieldElem)
   return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::RealFieldElem, y::ZZRingElem)
 
 Returns `true` if the ball $x$ contains the given integer value, otherwise
@@ -251,7 +251,7 @@ function contains(x::RealFieldElem, y::Int)
   return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::RealFieldElem, y::Integer)
 
 Returns `true` if the ball $x$ contains the given integer value, otherwise
@@ -259,7 +259,7 @@ return `false`.
 """
 contains(x::RealFieldElem, y::Integer) = contains(x, ZZRingElem(y))
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::RealFieldElem, y::Rational{T}) where {T <: Integer}
 
 Returns `true` if the ball $x$ contains the given rational value, otherwise
@@ -267,7 +267,7 @@ return `false`.
 """
 contains(x::RealFieldElem, y::Rational{T}) where {T <: Integer} = contains(x, QQFieldElem(y))
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::RealFieldElem, y::BigFloat)
 
 Returns `true` if the ball $x$ contains the given floating point value,
@@ -279,7 +279,7 @@ function contains(x::RealFieldElem, y::BigFloat)
   return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::RealFieldElem, y::RealFieldElem)
 
 Returns `true` if the ball $x$ contains the ball $y$, otherwise return
@@ -290,7 +290,7 @@ function contains(x::RealFieldElem, y::RealFieldElem)
   return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains_zero(x::RealFieldElem)
 
 Returns `true` if the ball $x$ contains zero, otherwise return `false`.
@@ -300,7 +300,7 @@ function contains_zero(x::RealFieldElem)
    return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains_negative(x::RealFieldElem)
 
 Returns `true` if the ball $x$ contains any negative value, otherwise return
@@ -311,7 +311,7 @@ function contains_negative(x::RealFieldElem)
    return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains_positive(x::RealFieldElem)
 
 Returns `true` if the ball $x$ contains any positive value, otherwise return
@@ -322,7 +322,7 @@ function contains_positive(x::RealFieldElem)
    return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains_nonnegative(x::RealFieldElem)
 
 Returns `true` if the ball $x$ contains any nonnegative value, otherwise
@@ -333,7 +333,7 @@ function contains_nonnegative(x::RealFieldElem)
    return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains_nonpositive(x::RealFieldElem)
 
 Returns `true` if the ball $x$ contains any nonpositive value, otherwise
@@ -350,7 +350,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     isequal(x::RealFieldElem, y::RealFieldElem)
 
 Return `true` if the balls $x$ and $y$ are precisely equal, i.e. have the
@@ -458,7 +458,7 @@ function is_unit(x::RealFieldElem)
    !contains_zero(x)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     iszero(x::RealFieldElem)
 
 Return `true` if $x$ is certainly zero, otherwise return `false`.
@@ -467,7 +467,7 @@ function iszero(x::RealFieldElem)
    return Bool(ccall((:arb_is_zero, libarb), Cint, (Ref{RealFieldElem},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_nonzero(x::RealFieldElem)
 
 Return `true` if $x$ is certainly not equal to zero, otherwise return
@@ -477,7 +477,7 @@ function is_nonzero(x::RealFieldElem)
    return Bool(ccall((:arb_is_nonzero, libarb), Cint, (Ref{RealFieldElem},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isone(x::RealFieldElem)
 
 Return `true` if $x$ is certainly one, otherwise return `false`.
@@ -486,7 +486,7 @@ function isone(x::RealFieldElem)
    return Bool(ccall((:arb_is_one, libarb), Cint, (Ref{RealFieldElem},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isfinite(x::RealFieldElem)
 
 Return `true` if $x$ is finite, i.e. having finite midpoint and radius,
@@ -496,7 +496,7 @@ function isfinite(x::RealFieldElem)
    return Bool(ccall((:arb_is_finite, libarb), Cint, (Ref{RealFieldElem},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_exact(x::RealFieldElem)
 
 Return `true` if $x$ is exact, i.e. has zero radius, otherwise return
@@ -506,7 +506,7 @@ function is_exact(x::RealFieldElem)
    return Bool(ccall((:arb_is_exact, libarb), Cint, (Ref{RealFieldElem},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isinteger(x::RealFieldElem)
 
 Return `true` if $x$ is an exact integer, otherwise return `false`.
@@ -515,7 +515,7 @@ function isinteger(x::RealFieldElem)
    return Bool(ccall((:arb_is_int, libarb), Cint, (Ref{RealFieldElem},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_positive(x::RealFieldElem)
 
 Return `true` if $x$ is certainly positive, otherwise return `false`.
@@ -524,7 +524,7 @@ function is_positive(x::RealFieldElem)
    return Bool(ccall((:arb_is_positive, libarb), Cint, (Ref{RealFieldElem},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_nonnegative(x::RealFieldElem)
 
 Return `true` if $x$ is certainly nonnegative, otherwise return `false`.
@@ -533,7 +533,7 @@ function is_nonnegative(x::RealFieldElem)
    return Bool(ccall((:arb_is_nonnegative, libarb), Cint, (Ref{RealFieldElem},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_negative(x::RealFieldElem)
 
 Return `true` if $x$ is certainly negative, otherwise return `false`.
@@ -542,7 +542,7 @@ function is_negative(x::RealFieldElem)
    return Bool(ccall((:arb_is_negative, libarb), Cint, (Ref{RealFieldElem},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_nonpositive(x::RealFieldElem)
 
 Return `true` if $x$ is certainly nonpositive, otherwise return `false`.
@@ -557,7 +557,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ball(x::RealFieldElem, y::RealFieldElem)
 
 Constructs an Arb ball enclosing $x_m \pm (|x_r| + |y_m| + |y_r|)$, given the
@@ -568,7 +568,7 @@ function ball(mid::RealFieldElem, rad::RealFieldElem)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     radius(x::RealFieldElem)
 
 Return the radius of the ball $x$ as an Arb ball.
@@ -579,7 +579,7 @@ function radius(x::RealFieldElem)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     midpoint(x::RealFieldElem)
 
 Return the midpoint of the ball $x$ as an Arb ball.
@@ -590,7 +590,7 @@ function midpoint(x::RealFieldElem)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     add_error!(x::RealFieldElem, y::RealFieldElem)
 
 Adds the absolute values of the midpoint and radius of $y$ to the radius of $x$.
@@ -934,7 +934,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     trim(x::RealFieldElem)
 
 Return an `arb` interval containing $x$ but which may be more economical,
@@ -946,7 +946,7 @@ function trim(x::RealFieldElem)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     unique_integer(x::RealFieldElem)
 
 Return a pair where the first value is a boolean and the second is an `ZZRingElem`
@@ -965,7 +965,7 @@ function (::ZZRing)(a::RealFieldElem)
    return ZZRingElem(a)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     setunion(x::RealFieldElem, y::RealFieldElem)
 
 Return an `arb` containing the union of the intervals represented by $x$ and
@@ -978,7 +978,7 @@ function setunion(x::RealFieldElem, y::RealFieldElem, prec::Int = precision(Ball
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     setintersection(x::RealFieldElem, y::RealFieldElem)
 
 Return an `arb` containing the intersection of the intervals represented by
@@ -997,7 +997,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     const_pi(r::RealField)
 
 Return $\pi = 3.14159\ldots$ as an element of $r$.
@@ -1008,7 +1008,7 @@ function const_pi(r::RealField, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     const_e(r::RealField)
 
 Return $e = 2.71828\ldots$ as an element of $r$.
@@ -1019,7 +1019,7 @@ function const_e(r::RealField, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     const_log2(r::RealField)
 
 Return $\log(2) = 0.69314\ldots$ as an element of $r$.
@@ -1030,7 +1030,7 @@ function const_log2(r::RealField, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     const_log10(r::RealField)
 
 Return $\log(10) = 2.302585\ldots$ as an element of $r$.
@@ -1041,7 +1041,7 @@ function const_log10(r::RealField, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     const_euler(r::RealField)
 
 Return Euler's constant $\gamma = 0.577215\ldots$ as an element of $r$.
@@ -1052,7 +1052,7 @@ function const_euler(r::RealField, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     const_catalan(r::RealField)
 
 Return Catalan's constant $C = 0.915965\ldots$ as an element of $r$.
@@ -1063,7 +1063,7 @@ function const_catalan(r::RealField, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     const_khinchin(r::RealField)
 
 Return Khinchin's constant $K = 2.685452\ldots$ as an element of $r$.
@@ -1074,7 +1074,7 @@ function const_khinchin(r::RealField, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     const_glaisher(r::RealField)
 
 Return Glaisher's constant $A = 1.282427\ldots$ as an element of $r$.
@@ -1119,7 +1119,7 @@ function Base.sqrt(x::RealFieldElem, prec::Int = precision(Balls); check::Bool=t
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rsqrt(x::RealFieldElem)
 
 Return the reciprocal of the square root of $x$, i.e. $1/\sqrt{x}$.
@@ -1130,7 +1130,7 @@ function rsqrt(x::RealFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sqrt1pm1(x::RealFieldElem)
 
 Return $\sqrt{1+x}-1$, evaluated accurately for small $x$.
@@ -1141,7 +1141,7 @@ function sqrt1pm1(x::RealFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sqrtpos(x::RealFieldElem)
 
 Return the sqrt root of $x$, assuming that $x$ represents a nonnegative
@@ -1285,7 +1285,7 @@ function acosh(x::RealFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gamma(x::RealFieldElem)
 
 Return the Gamma function evaluated at $x$.
@@ -1296,7 +1296,7 @@ function gamma(x::RealFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lgamma(x::RealFieldElem)
 
 Return the logarithm of the Gamma function evaluated at $x$.
@@ -1307,7 +1307,7 @@ function lgamma(x::RealFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rgamma(x::RealFieldElem)
 
 Return the reciprocal of the Gamma function evaluated at $x$.
@@ -1318,7 +1318,7 @@ function rgamma(x::RealFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     digamma(x::RealFieldElem)
 
 Return the  logarithmic derivative of the gamma function evaluated at $x$,
@@ -1330,7 +1330,7 @@ function digamma(x::RealFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gamma(s::RealFieldElem, x::RealFieldElem)
 
 Return the upper incomplete gamma function $\Gamma(s,x)$.
@@ -1342,7 +1342,7 @@ function gamma(s::RealFieldElem, x::RealFieldElem, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gamma_regularized(s::RealFieldElem, x::RealFieldElem)
 
 Return the regularized upper incomplete gamma function
@@ -1355,7 +1355,7 @@ function gamma_regularized(s::RealFieldElem, x::RealFieldElem, prec::Int = preci
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gamma_lower(s::RealFieldElem, x::RealFieldElem)
 
 Return the lower incomplete gamma function $\gamma(s,x) / \Gamma(s)$.
@@ -1367,7 +1367,7 @@ function gamma_lower(s::RealFieldElem, x::RealFieldElem, prec::Int = precision(B
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gamma_lower_regularized(s::RealFieldElem, x::RealFieldElem)
 
 Return the regularized lower incomplete gamma function
@@ -1381,7 +1381,7 @@ function gamma_lower_regularized(s::RealFieldElem, x::RealFieldElem, prec::Int =
 end
 
 
-@doc Markdown.doc"""
+@doc raw"""
     zeta(x::RealFieldElem)
 
 Return the Riemann zeta function evaluated at $x$.
@@ -1445,7 +1445,7 @@ function atan(y::RealFieldElem, x::RealFieldElem, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     atan2(y::RealFieldElem, x::RealFieldElem)
 
 Return $\operatorname{atan2}(y,x) = \arg(x+yi)$. Same as `atan(y, x)`.
@@ -1454,7 +1454,7 @@ function atan2(y::RealFieldElem, x::RealFieldElem, prec::Int = precision(Balls))
   return atan(y, x, prec)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     agm(x::RealFieldElem, y::RealFieldElem)
 
 Return the arithmetic-geometric mean of $x$ and $y$
@@ -1466,7 +1466,7 @@ function agm(x::RealFieldElem, y::RealFieldElem, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     zeta(s::RealFieldElem, a::RealFieldElem)
 
 Return the Hurwitz zeta function $\zeta(s,a)$.
@@ -1492,7 +1492,7 @@ function root(x::RealFieldElem, n::UInt, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     root(x::RealFieldElem, n::Int)
 
 Return the $n$-th root of $x$. We require $x \geq 0$.
@@ -1502,7 +1502,7 @@ function root(x::RealFieldElem, n::Int, prec::Int = precision(Balls))
   return root(x, UInt(n))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     factorial(x::RealFieldElem)
 
 Return the factorial of $x$.
@@ -1515,14 +1515,14 @@ function factorial(n::UInt, r::RealField, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     factorial(n::Int, r::RealField)
 
 Return the factorial of $n$ in the given Arb field.
 """
 factorial(n::Int, r::RealField, prec::Int = precision(Balls)) = n < 0 ? factorial(r(n), prec) : factorial(UInt(n), r, prec)
 
-@doc Markdown.doc"""
+@doc raw"""
     binomial(x::RealFieldElem, n::UInt)
 
 Return the binomial coefficient ${x \choose n}$.
@@ -1534,7 +1534,7 @@ function binomial(x::RealFieldElem, n::UInt, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     binomial(n::UInt, k::UInt, r::RealField)
 
 Return the binomial coefficient ${n \choose k}$ in the given Arb field.
@@ -1546,7 +1546,7 @@ function binomial(n::UInt, k::UInt, r::RealField, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     fibonacci(n::ZZRingElem, r::RealField)
 
 Return the $n$-th Fibonacci number in the given Arb field.
@@ -1565,14 +1565,14 @@ function fibonacci(n::UInt, r::RealField, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     fibonacci(n::Int, r::RealField)
 
 Return the $n$-th Fibonacci number in the given Arb field.
 """
 fibonacci(n::Int, r::RealField, prec::Int = precision(Balls)) = n >= 0 ? fibonacci(UInt(n), r, prec) : fibonacci(ZZRingElem(n), r, prec)
 
-@doc Markdown.doc"""
+@doc raw"""
     gamma(x::ZZRingElem, r::RealField)
 
 Return the Gamma function evaluated at $x$ in the given Arb field.
@@ -1584,7 +1584,7 @@ function gamma(x::ZZRingElem, r::RealField, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gamma(x::QQFieldElem, r::RealField)
 
 Return the Gamma function evaluated at $x$ in the given Arb field.
@@ -1604,7 +1604,7 @@ function zeta(n::UInt, r::RealField, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     zeta(n::Int, r::RealField)
 
 Return the Riemann zeta function $\zeta(n)$ as an element of the given Arb
@@ -1619,7 +1619,7 @@ function bernoulli(n::UInt, r::RealField, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     bernoulli(n::Int, r::RealField)
 
 Return the $n$-th Bernoulli number as an element of the given Arb field.
@@ -1633,7 +1633,7 @@ function rising_factorial(x::RealFieldElem, n::UInt, prec::Int = precision(Balls
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rising_factorial(x::RealFieldElem, n::Int)
 
 Return the rising factorial $x(x + 1)\ldots (x + n - 1)$ as an Arb.
@@ -1647,7 +1647,7 @@ function rising_factorial(x::QQFieldElem, n::UInt, r::RealField, prec::Int = pre
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rising_factorial(x::QQFieldElem, n::Int, r::RealField)
 
 Return the rising factorial $x(x + 1)\ldots (x + n - 1)$ as an element of the
@@ -1663,7 +1663,7 @@ function rising_factorial2(x::RealFieldElem, n::UInt, prec::Int = precision(Ball
   return (z, w)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rising_factorial2(x::RealFieldElem, n::Int)
 
 Return a tuple containing the rising factorial $x(x + 1)\ldots (x + n - 1)$
@@ -1685,7 +1685,7 @@ function polylog(s::Int, a::RealFieldElem, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     polylog(s::Union{RealFieldElem,Int}, a::RealFieldElem)
 
 Return the polylogarithm Li$_s(a)$.
@@ -1721,35 +1721,35 @@ function chebyshev_u2(n::UInt, x::RealFieldElem, prec::Int = precision(Balls))
   return z, w
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     chebyshev_t(n::Int, x::RealFieldElem)
 
 Return the value of the Chebyshev polynomial $T_n(x)$.
 """
 chebyshev_t(n::Int, x::RealFieldElem, prec::Int = precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : chebyshev_t(UInt(n), x, prec)
 
-@doc Markdown.doc"""
+@doc raw"""
     chebyshev_u(n::Int, x::RealFieldElem)
 
 Return the value of the Chebyshev polynomial $U_n(x)$.
 """
 chebyshev_u(n::Int, x::RealFieldElem, prec::Int = precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : chebyshev_u(UInt(n), x, prec)
 
-@doc Markdown.doc"""
+@doc raw"""
     chebyshev_t2(n::Int, x::RealFieldElem)
 
 Return the tuple $(T_{n}(x), T_{n-1}(x))$.
 """
 chebyshev_t2(n::Int, x::RealFieldElem, prec::Int = precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : chebyshev_t2(UInt(n), x, prec)
 
-@doc Markdown.doc"""
+@doc raw"""
     chebyshev_u2(n::Int, x::RealFieldElem)
 
 Return the tuple $(U_{n}(x), U_{n-1}(x))$
 """
 chebyshev_u2(n::Int, x::RealFieldElem, prec::Int = precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : chebyshev_u2(UInt(n), x, prec)
 
-@doc Markdown.doc"""
+@doc raw"""
     bell(n::ZZRingElem, r::RealField)
 
 Return the Bell number $B_n$ as an element of $r$.
@@ -1761,14 +1761,14 @@ function bell(n::ZZRingElem, r::RealField, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     bell(n::Int, r::RealField)
 
 Return the Bell number $B_n$ as an element of $r$.
 """
 bell(n::Int, r::RealField, prec::Int = precision(Balls)) = bell(ZZRingElem(n), r, prec)
 
-@doc Markdown.doc"""
+@doc raw"""
     numpart(n::ZZRingElem, r::RealField)
 
 Return the number of partitions $p(n)$ as an element of $r$.
@@ -1780,7 +1780,7 @@ function numpart(n::ZZRingElem, r::RealField, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     numpart(n::Int, r::RealField)
 
 Return the number of partitions $p(n)$ as an element of $r$.
@@ -1793,7 +1793,7 @@ numpart(n::Int, r::RealField, prec::Int = precision(Balls)) = numpart(ZZRingElem
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     airy_ai(x::RealFieldElem)
 
 Return the Airy function $\operatorname{Ai}(x)$.
@@ -1806,7 +1806,7 @@ function airy_ai(x::RealFieldElem, prec::Int = precision(Balls))
   return ai
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     airy_bi(x::RealFieldElem)
 
 Return the Airy function $\operatorname{Bi}(x)$.
@@ -1819,7 +1819,7 @@ function airy_bi(x::RealFieldElem, prec::Int = precision(Balls))
   return bi
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     airy_ai_prime(x::RealFieldElem)
 
 Return the derivative of the Airy function $\operatorname{Ai}^\prime(x)$.
@@ -1832,7 +1832,7 @@ function airy_ai_prime(x::RealFieldElem, prec::Int = precision(Balls))
   return ai_prime
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     airy_bi_prime(x::RealFieldElem)
 
 Return the derivative of the Airy function $\operatorname{Bi}^\prime(x)$.
@@ -1851,7 +1851,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     lindep(A::Vector{RealFieldElem}, bits::Int)
 
 Find a small linear combination of the entries of the array $A$ that is small
@@ -1908,7 +1908,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
       simplest_rational_inside(x::RealFieldElem)
 
 Return the simplest fraction inside the ball $x$. A canonical fraction
@@ -2124,7 +2124,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     rand(r::RealField; randtype::Symbol=:urandom)
 
 Return a random element in given Arb field.

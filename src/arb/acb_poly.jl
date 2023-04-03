@@ -127,7 +127,7 @@ function isequal(x::acb_poly, y::acb_poly)
                                       (Ref{acb_poly}, Ref{acb_poly}), x, y)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     overlaps(x::acb_poly, y::acb_poly)
 
 Return `true` if the coefficient boxes of $x$ overlap the coefficient boxes
@@ -138,7 +138,7 @@ function overlaps(x::acb_poly, y::acb_poly)
                                       (Ref{acb_poly}, Ref{acb_poly}), x, y)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::acb_poly, y::acb_poly)
 
 Return `true` if the coefficient boxes of $x$ contain the corresponding
@@ -149,7 +149,7 @@ function contains(x::acb_poly, y::acb_poly)
                                       (Ref{acb_poly}, Ref{acb_poly}), x, y)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::acb_poly, y::ZZPolyRingElem)
 
 Return `true` if the coefficient boxes of $x$ contain the corresponding
@@ -160,7 +160,7 @@ function contains(x::acb_poly, y::ZZPolyRingElem)
                                       (Ref{acb_poly}, Ref{ZZPolyRingElem}), x, y)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::acb_poly, y::QQPolyRingElem)
 
 Return `true` if the coefficient boxes of $x$ contain the corresponding
@@ -192,7 +192,7 @@ function !=(x::acb_poly, y::acb_poly)
     return false
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     unique_integer(x::acb_poly)
 
 Return a tuple `(t, z)` where $t$ is `true` if there is a unique integer
@@ -427,7 +427,7 @@ evaluate(x::acb_poly, y::Rational) = evaluate(x, base_ring(parent(x))(y))
 evaluate(x::acb_poly, y::Float64) = evaluate(x, base_ring(parent(x))(y))
 evaluate(x::acb_poly, y::Any) = evaluate(x, base_ring(parent(x))(y))
 
-@doc Markdown.doc"""
+@doc raw"""
     evaluate2(x::acb_poly, y::RingElement)
 
 Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
@@ -503,7 +503,7 @@ function array(R::AcbField, v::Ptr{acb_struct}, n::Int)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     from_roots(R::AcbPolyRing, b::Vector{acb})
 
 Construct a polynomial in the given polynomial ring from a list of its roots.
@@ -586,7 +586,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     roots(x::acb_poly; target=0, isolate_real=false, initial_prec=0, max_prec=0, max_iter=0)
 
 Attempts to isolate the complex roots of the complex polynomial $x$ by
@@ -691,7 +691,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     roots_upper_bound(x::acb_poly) -> arb
 
 Returns an upper bound for the absolute value of all complex roots of $x$.

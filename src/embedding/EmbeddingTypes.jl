@@ -65,7 +65,7 @@ function Base.show(io::IO, f::FinFieldPreimage)
     print(io, "Preimage of the morphism from $(domain(f)) to $(codomain(f))")
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     preimage_map(f::FinFieldMorphism)
 
 Compute the preimage map corresponding to the embedding $f$.
@@ -73,7 +73,7 @@ Compute the preimage map corresponding to the embedding $f$.
 preimage_map(f::FinFieldMorphism) = FinFieldPreimage(domain(f), codomain(f),
                                                      image_fn(f), inverse_fn(f))
 
-@doc Markdown.doc"""
+@doc raw"""
     preimage_map(f::FinFieldPreimage)
 
 Compute the preimage map corresponding to the preimage of the embedding $f$,

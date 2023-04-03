@@ -123,7 +123,7 @@ function isequal(x::RealPoly, y::RealPoly)
                                       (Ref{RealPoly}, Ref{RealPoly}), x, y)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     overlaps(x::RealPoly, y::RealPoly)
 
 Return `true` if the coefficient balls of $x$ overlap the coefficient balls
@@ -134,7 +134,7 @@ function overlaps(x::RealPoly, y::RealPoly)
                                       (Ref{RealPoly}, Ref{RealPoly}), x, y)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::RealPoly, y::RealPoly)
 
 Return `true` if the coefficient balls of $x$ contain the corresponding
@@ -145,7 +145,7 @@ function contains(x::RealPoly, y::RealPoly)
                                       (Ref{RealPoly}, Ref{RealPoly}), x, y)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::RealPoly, y::ZZPolyRingElem)
 
 Return `true` if the coefficient balls of $x$ contain the corresponding
@@ -156,7 +156,7 @@ function contains(x::RealPoly, y::ZZPolyRingElem)
                                       (Ref{RealPoly}, Ref{ZZPolyRingElem}), x, y)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::RealPoly, y::QQPolyRingElem)
 
 Return `true` if the coefficient balls of $x$ contain the corresponding
@@ -188,7 +188,7 @@ function !=(x::RealPoly, y::RealPoly)
     return false
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     unique_integer(x::RealPoly)
 
 Return a tuple `(t, z)` where $t$ is `true` if there is a unique integer
@@ -427,7 +427,7 @@ evaluate(x::RealPoly, y::Rational) = evaluate(x, base_ring(parent(x))(y))
 evaluate(x::RealPoly, y::Float64) = evaluate(x, base_ring(parent(x))(y))
 evaluate(x::RealPoly, y::Any) = evaluate(x, base_ring(parent(x))(y))
 
-@doc Markdown.doc"""
+@doc raw"""
     evaluate2(x::RealPoly, y::RingElement)
 
 Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
@@ -522,7 +522,7 @@ function arb_vec_clear(v::Ptr{arb_struct}, n::Int)
    ccall((:_arb_vec_clear, libarb), Nothing, (Ptr{arb_struct}, Int), v, n)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     from_roots(R::RealPolyRing, b::Vector{RealFieldElem})
 
 Construct a polynomial in the given polynomial ring from a list of its roots.
@@ -605,7 +605,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     roots_upper_bound(x::RealPoly) -> arb
 
 Returns an upper bound for the absolute value of all complex roots of $x$.

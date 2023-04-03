@@ -323,7 +323,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     lift(R::ZZPolyRing, y::fpPolyRingElem)
 
 Lift from a polynomial over $\mathbb{Z}/n\mathbb{Z}$ to a polynomial over
@@ -448,7 +448,7 @@ function _factor_squarefree(x::fpPolyRingElem)
   return res
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     factor_distinct_deg(x::fpPolyRingElem)
 
 Return the distinct degree factorisation of a squarefree polynomial $x$.

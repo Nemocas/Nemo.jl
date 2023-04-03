@@ -370,7 +370,7 @@ function strong_echelon_form!(a::T) where T <: Zmodn_mat
   ccall((:nmod_mat_strong_echelon_form, libflint), Nothing, (Ref{T}, ), a)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     strong_echelon_form(a::zzModMatrix)
 
 Return the strong echeleon form of $a$. The matrix $a$ must have at least as
@@ -388,7 +388,7 @@ function howell_form!(a::T) where T <: Zmodn_mat
   ccall((:nmod_mat_howell_form, libflint), Nothing, (Ref{T}, ), a)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     howell_form(a::zzModMatrix)
 
 Return the Howell normal form of $a$. The matrix $a$ must have at least as
@@ -635,7 +635,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     lift(a::T) where {T <: Zmodn_mat}
 
 Return a lift of the matrix $a$ to a matrix over $\mathbb{Z}$, i.e. where the

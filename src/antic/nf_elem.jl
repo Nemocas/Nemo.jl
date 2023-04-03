@@ -17,7 +17,7 @@ export AnticNumberField, defining_polynomial, nf_elem, norm,
 
 parent_type(::Type{nf_elem}) = AnticNumberField
 
-@doc Markdown.doc"""
+@doc raw"""
     parent(a::nf_elem)
 
 Return the parent of the given number field element.
@@ -26,14 +26,14 @@ parent(a::nf_elem) = a.parent
 
 elem_type(::Type{AnticNumberField}) = nf_elem
 
-@doc Markdown.doc"""
+@doc raw"""
     base_ring(a::AnticNumberField)
 
 Returns `Union{}` since a number field doesn't depend on any ring.
 """
 base_ring(a::AnticNumberField) = Union{}
 
-@doc Markdown.doc"""
+@doc raw"""
     base_ring(a::nf_elem)
 
 Returns `Union{}` since a number field doesn't depend on any ring.
@@ -42,7 +42,7 @@ base_ring(a::nf_elem) = Union{}
 
 is_domain_type(::Type{nf_elem}) = true
 
-@doc Markdown.doc"""
+@doc raw"""
     var(a::AnticNumberField)
 
 Returns the identifier (as a symbol, not a string), that is used for printing
@@ -95,7 +95,7 @@ function hash(a::nf_elem, h::UInt)
    return b
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     coeff(x::nf_elem, n::Int)
 
 Return the $n$-th coefficient of the polynomial representation of the given
@@ -117,7 +117,7 @@ function num_coeff!(z::ZZRingElem, x::nf_elem, n::Int)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gen(a::AnticNumberField)
 
 Return the generator of the given number field, i.e., a symbolic root of the
@@ -144,7 +144,7 @@ function zero(a::AnticNumberField)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_gen(a::nf_elem)
 
 Return `true` if the given number field element is the generator of the
@@ -165,7 +165,7 @@ function iszero(a::nf_elem)
                 (Ref{nf_elem}, Ref{AnticNumberField}), a, a.parent)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_unit(a::nf_elem)
 
 Return `true` if the given number field element is invertible, i.e. nonzero,
@@ -173,7 +173,7 @@ otherwise return `false`. Note, this does not take the maximal order into accoun
 """
 is_unit(a::nf_elem) = !iszero(a)
 
-@doc Markdown.doc"""
+@doc raw"""
     isinteger(a::nf_elem)
 
 Return `true` if the given number field element is an integer, i.e., in ZZ, otherwise
@@ -185,7 +185,7 @@ function isinteger(a::nf_elem)
    return Bool(b)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_rational(a::nf_elem)
 
 Return `true` if the given number field element is a rational number, i.e., in QQ,
@@ -197,7 +197,7 @@ function is_rational(a::nf_elem)
    return Bool(b)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     denominator(a::nf_elem)
 
 Return the denominator of the polynomial representation of the given number
@@ -228,7 +228,7 @@ function elem_to_mat_row!(a::ZZMatrix, i::Int, d::ZZRingElem, b::nf_elem)
    nothing
  end
 
-@doc Markdown.doc"""
+@doc raw"""
     degree(a::AnticNumberField)
 
 Return the degree of the given number field, i.e. the degree of its
@@ -560,7 +560,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     inv(a::nf_elem)
 
 Return $a^{-1}$. Requires $a \neq 0$.
@@ -638,7 +638,7 @@ divexact(a::QQFieldElem, b::nf_elem; check::Bool=true) = inv(b)*a
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     divides(a::nf_elem, b::nf_elem)
 
 Returns a pair consisting of a flag which is set to `true` if $b$ divides
@@ -661,7 +661,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     norm(a::nf_elem)
 
 Return the absolute norm of $a$. The result will be a rational number.
@@ -674,7 +674,7 @@ function norm(a::nf_elem)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     tr(a::nf_elem)
 
 Return the absolute trace of $a$. The result will be a rational number.
@@ -687,7 +687,7 @@ function tr(a::nf_elem)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     representation_matrix(a::nf_elem)
 
 Return a matrix with rational entries representing multiplication with $a$
@@ -702,7 +702,7 @@ function representation_matrix(a::nf_elem)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     representation_matrix_q(a::nf_elem)
 
 Return a matrix  representing multiplication with $a$ with respect to the
@@ -739,7 +739,7 @@ function mul!(z::nf_elem, x::nf_elem, y::nf_elem)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     mul_red!(z::nf_elem, x::nf_elem, y::nf_elem, red::Bool)
 
 Multiply $x$ by $y$ and set the existing number field element $z$ to the
@@ -769,7 +769,7 @@ function add!(a::nf_elem, b::nf_elem, c::nf_elem)
   return a
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     reduce!(x::nf_elem)
 
 Reduce the given number field element by the defining polynomial, in-place.
@@ -1062,7 +1062,7 @@ promote_rule(::Type{nf_elem}, ::Type{QQPolyRingElem}) = nf_elem
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     (a::AnticNumberField)()
 
 Return an empty (0) element.
@@ -1074,7 +1074,7 @@ function (a::AnticNumberField)()
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     (a::AnticNumberField)(c::Int)
 
 Return $c$ as an element in $a$.
@@ -1154,7 +1154,7 @@ rand(K::AnticNumberField, r) = rand(Random.GLOBAL_RNG, K, r)
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     number_field(f::QQPolyRingElem, s::Union{AbstractString, Char, Symbol};
                 cached::Bool = true, check::Bool = true)
 
@@ -1170,7 +1170,7 @@ function number_field(f::QQPolyRingElem, s::Union{AbstractString, Char, Symbol} 
 end
 @alias NumberField number_field
 
-@doc Markdown.doc"""
+@doc raw"""
     cyclotomic_field(n::Int, s::Union{AbstractString, Char, Symbol} = "z_$n", t = "_\$"; cached = true)
 
 Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$
@@ -1197,7 +1197,7 @@ function show_cyclo(io::IO, a::AnticNumberField)
 end
 
 
-@doc Markdown.doc"""
+@doc raw"""
     cyclotomic_real_subfield(n::Int, s::Union{AbstractString, Char, Symbol} = "(z_$n + 1/z_$n)", t = "\$"; cached = true)
 
 Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$

@@ -297,7 +297,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     isequal(x::arb_mat, y::arb_mat)
 
 Return `true` if the matrices of balls $x$ and $y$ are precisely equal,
@@ -321,7 +321,7 @@ function !=(x::arb_mat, y::arb_mat)
   return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     overlaps(x::arb_mat, y::arb_mat)
 
 Returns `true` if all entries of $x$ overlap with the corresponding entry of
@@ -333,7 +333,7 @@ function overlaps(x::arb_mat, y::arb_mat)
   return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::arb_mat, y::arb_mat)
 
 Returns `true` if all entries of $x$ contain the corresponding entry of
@@ -351,7 +351,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::arb_mat, y::ZZMatrix)
 
 Returns `true` if all entries of $x$ contain the corresponding entry of
@@ -364,7 +364,7 @@ function contains(x::arb_mat, y::ZZMatrix)
 end
 
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::arb_mat, y::QQMatrix)
 
 Returns `true` if all entries of $x$ contain the corresponding entry of
@@ -394,7 +394,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     inv(x::arb_mat)
 
 Given a  $n\times n$ matrix of type `arb_mat`, return an
@@ -591,7 +591,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     bound_inf_norm(x::arb_mat)
 
 Returns a nonnegative element $z$ of type `arb`, such that $z$ is an upper

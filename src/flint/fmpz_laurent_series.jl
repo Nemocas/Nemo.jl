@@ -12,7 +12,7 @@ export ZZLaurentSeriesRingElem, ZZLaurentSeriesRing
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     O(a::ZZLaurentSeriesRingElem)
 
 Returns $0 + O(x^\mathrm{val}(a))$. Usually this function is called with $x^n$
@@ -61,7 +61,7 @@ function Base.hash(a::ZZLaurentSeriesRingElem, h::UInt)
    return b
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     pol_length(a::ZZLaurentSeriesRingElem)
 
 Return the length of the polynomial underlying the given power series. This
@@ -69,7 +69,7 @@ will be zero if the power series has no nonzero terms.
 """
 pol_length(a::ZZLaurentSeriesRingElem) = a.length
 
-@doc Markdown.doc"""
+@doc raw"""
     precision(a::ZZLaurentSeriesRingElem)
 
 Return the precision of the given power series in absolute terms. This will
@@ -77,7 +77,7 @@ be the sum of the valuation and the length of the underlying polynomial.
 """
 precision(a::ZZLaurentSeriesRingElem) = a.prec
 
-@doc Markdown.doc"""
+@doc raw"""
     valuation(a::ZZLaurentSeriesRingElem)
 
 Return the valuation of the given power series, i.e. the degree of the first
@@ -85,7 +85,7 @@ nonzero term (or the precision if it is arithmetically zero).
 """
 valuation(a::ZZLaurentSeriesRingElem) = a.val
 
-@doc Markdown.doc"""
+@doc raw"""
     scale(a::ZZLaurentSeriesRingElem)
 
 Return the scale factor of the polynomial underlying the given power series.
@@ -94,7 +94,7 @@ scale(a::ZZLaurentSeriesRingElem) = a.scale
 
 max_precision(R::ZZLaurentSeriesRing) = R.prec_max
 
-@doc Markdown.doc"""
+@doc raw"""
     exp_gcd(a::ZZLaurentSeriesRingElem)
 
 Return the GCD of the exponents of the polynomial underlying the given Laurent series.
@@ -151,7 +151,7 @@ function coeff(a::ZZLaurentSeriesRingElem, n::Int)
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rescale!(a::ZZLaurentSeriesRingElem)
 
 Rescale the polynomial underlying the series so that the GCD of its exponents is 1.
@@ -175,7 +175,7 @@ function rescale!(a::ZZLaurentSeriesRingElem)
    return a
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     downscale(a::ZZLaurentSeriesRingElem, n::Int)
 
 Inflate the underlying polynomial by a factor of $n$. This inserts zero coefficients
@@ -207,7 +207,7 @@ function downscale(a::ZZLaurentSeriesRingElem, n::Int)
    return d
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     upscale(a::ZZLaurentSeriesRingElem, n::Int)
 
 Deflate the underlying polynomial by a factor of $n$. This removes zero coefficients
@@ -245,7 +245,7 @@ function gen(R::ZZLaurentSeriesRing)
    return R([S(1)], 1, max_precision(R) + 1, 1, 1)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     iszero(a::ZZLaurentSeriesRingElem)
 
 Return `true` if the given power series is arithmetically equal to zero to
@@ -253,7 +253,7 @@ its current precision, otherwise return `false`.
 """
 iszero(a::ZZLaurentSeriesRingElem) = pol_length(a) == 0
 
-@doc Markdown.doc"""
+@doc raw"""
     isone(a::ZZLaurentSeriesRingElem)
 
 Return `true` if the given power series is arithmetically equal to one to
@@ -263,7 +263,7 @@ function isone(a::ZZLaurentSeriesRingElem)
    return valuation(a) == 0 && pol_length(a) == 1 && isone(polcoeff(a, 0))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_gen(a::ZZLaurentSeriesRingElem)
 
 Return `true` if the given power series is arithmetically equal to the
@@ -274,7 +274,7 @@ function is_gen(a::ZZLaurentSeriesRingElem)
    return valuation(a) == 1 && pol_length(a) == 1 && isone(polcoeff(a, 0))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_unit(a::ZZLaurentSeriesRingElem)
 
 Return `true` if the given power series is arithmetically equal to a unit,
@@ -737,7 +737,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     ==(x::ZZLaurentSeriesRingElem, y::ZZLaurentSeriesRingElem)
 
 Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
@@ -793,7 +793,7 @@ function ==(x::ZZLaurentSeriesRingElem, y::ZZLaurentSeriesRingElem)
    return true
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isequal(x::ZZLaurentSeriesRingElem, y::ZZLaurentSeriesRingElem)
 
 Return `true` if $x == y$ exactly, otherwise return `false`. Only if the
@@ -1164,7 +1164,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     eta_qexp(x::ZZLaurentSeriesRingElem)
 
 Return the $q$-series for the eta function, without the leading $q^{1/24}$. It is
@@ -1283,7 +1283,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     laurent_series_ring(R::ZZRing, prec::Int, s::AbstractString; cached=true)
 
 Return a tuple $(S, x)$ consisting of the parent object `S` of a Laurent series

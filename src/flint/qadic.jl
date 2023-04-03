@@ -12,7 +12,7 @@ export FlintQadicField, qadic, prime, teichmuller, log
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     O(R::FlintQadicField, m::ZZRingElem)
 
 Construct the value $0 + O(p^n)$ given $m = p^n$. An exception results if $m$
@@ -35,7 +35,7 @@ function O(R::FlintQadicField, m::ZZRingElem)
    return d
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     O(R::FlintQadicField, m::QQFieldElem)
 
 Construct the value $0 + O(p^n)$ given $m = p^n$. An exception results if $m$
@@ -59,7 +59,7 @@ function O(R::FlintQadicField, m::QQFieldElem)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     O(R::FlintQadicField, m::Integer)
 
 Construct the value $0 + O(p^n)$ given $m = p^n$. An exception results if $m$
@@ -69,14 +69,14 @@ O(R::FlintQadicField, m::Integer) = O(R, ZZRingElem(m))
 
 elem_type(::Type{FlintQadicField}) = qadic
 
-@doc Markdown.doc"""
+@doc raw"""
     base_ring(a::FlintQadicField)
 
 Returns `Union{}` as this field is not dependent on another field.
 """
 base_ring(a::FlintQadicField) = Union{}
 
-@doc Markdown.doc"""
+@doc raw"""
     base_ring(a::qadic)
 
 Returns `Union{}` as this field is not dependent on another field.
@@ -126,7 +126,7 @@ function degree(R::FlintQadicField)
    return ccall((:qadic_ctx_degree, libflint), Int, (Ref{FlintQadicField}, ), R)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     prime(R::FlintQadicField)
 
 Return the prime $p$ for the given $q$-adic field.
@@ -138,7 +138,7 @@ function prime(R::FlintQadicField)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     precision(a::qadic)
 
 Return the precision of the given $q$-adic field element, i.e. if the element
@@ -146,7 +146,7 @@ is known to $O(p^n)$ this function will return $n$.
 """
 precision(a::qadic) = a.N
 
-@doc Markdown.doc"""
+@doc raw"""
     valuation(a::qadic)
 
 Return the valuation of the given $q$-adic field element, i.e. if the given
@@ -157,7 +157,7 @@ function valuation(a::qadic)
     iszero(a) ? precision(a) : ccall((:qadic_val, libflint), Int, (Ref{qadic}, ), a)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lift(R::QQPolyRing, a::qadic)
 
 Return a lift of the given $q$-adic field element to $\mathbb{Q}[x]$.
@@ -170,7 +170,7 @@ function lift(R::QQPolyRing, a::qadic)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lift(R::ZZPolyRing, a::qadic)
 
 Return a lift of the given $q$-adic field element to $\mathbb{Z}[x]$ if possible.
@@ -561,7 +561,7 @@ function log(a::qadic)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     teichmuller(a::qadic)
 
 Return the Teichmuller lift of the $q$-adic value $a$. We require the
@@ -580,7 +580,7 @@ function teichmuller(a::qadic)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     frobenius(a::qadic, e::Int = 1)
 
 Return the image of the $e$-th power of Frobenius on the $q$-adic value $a$.
@@ -789,7 +789,7 @@ end
 
 # inner constructor is also used directly
 
-@doc Markdown.doc"""
+@doc raw"""
     FlintQadicField(p::Integer, d::Int, prec::Int, var::String = "a")
 
 Returns the parent object for the $q$-adic field for given prime $p$ and

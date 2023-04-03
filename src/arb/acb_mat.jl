@@ -335,7 +335,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     isequal(x::acb_mat, y::acb_mat)
 
 Return `true` if the matrices of balls $x$ and $y$ are precisely equal,
@@ -359,7 +359,7 @@ function !=(x::acb_mat, y::acb_mat)
   return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     overlaps(x::acb_mat, y::acb_mat)
 
 Returns `true` if all entries of $x$ overlap with the corresponding entry of
@@ -371,7 +371,7 @@ function overlaps(x::acb_mat, y::acb_mat)
   return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::acb_mat, y::acb_mat)
 
 Returns `true` if all entries of $x$ contain the corresponding entry of
@@ -389,7 +389,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::acb_mat, y::ZZMatrix)
 
 Returns `true` if all entries of $x$ contain the corresponding entry of
@@ -401,7 +401,7 @@ function contains(x::acb_mat, y::ZZMatrix)
   return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::acb_mat, y::QQMatrix)
 
 Returns `true` if all entries of $x$ contain the corresponding entry of
@@ -436,7 +436,7 @@ isreal(x::acb_mat) =
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     inv(x::acb_mat)
 
 Given a $n\times n$ matrix of type `acb_mat`, return an
@@ -648,7 +648,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     bound_inf_norm(x::acb_mat)
 
 Returns a nonnegative element $z$ of type `acb`, such that $z$ is an upper
@@ -982,7 +982,7 @@ function _eig_simple(A::acb_mat; check::Bool = true, alg = :default)
   return z, L, R
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     eigvals_simple(A::acb_mat, alg = :default)
 
 Returns the eigenvalues of `A` as a vector of `acb`. It is assumed that `A`
@@ -998,7 +998,7 @@ function eigvals_simple(A::acb_mat, alg = :default)
   return E
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     eigvals(A::acb_mat)
 
 Returns the eigenvalues of `A` as a vector of tuples `(acb, Int)`.

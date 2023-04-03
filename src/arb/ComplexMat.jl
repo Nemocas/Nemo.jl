@@ -332,7 +332,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     isequal(x::ComplexMat, y::ComplexMat)
 
 Return `true` if the matrices of balls $x$ and $y$ are precisely equal,
@@ -356,7 +356,7 @@ function !=(x::ComplexMat, y::ComplexMat)
   return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     overlaps(x::ComplexMat, y::ComplexMat)
 
 Returns `true` if all entries of $x$ overlap with the corresponding entry of
@@ -368,7 +368,7 @@ function overlaps(x::ComplexMat, y::ComplexMat)
   return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::ComplexMat, y::ComplexMat)
 
 Returns `true` if all entries of $x$ contain the corresponding entry of
@@ -386,7 +386,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::ComplexMat, y::ZZMatrix)
 
 Returns `true` if all entries of $x$ contain the corresponding entry of
@@ -398,7 +398,7 @@ function contains(x::ComplexMat, y::ZZMatrix)
   return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::ComplexMat, y::QQMatrix)
 
 Returns `true` if all entries of $x$ contain the corresponding entry of
@@ -433,7 +433,7 @@ isreal(x::ComplexMat) =
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     inv(x::ComplexMat)
 
 Given a $n\times n$ matrix of type `acb_mat`, return an
@@ -645,7 +645,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     bound_inf_norm(x::ComplexMat)
 
 Returns a nonnegative element $z$ of type `acb`, such that $z$ is an upper
@@ -968,7 +968,7 @@ function _eig_simple(A::ComplexMat; check::Bool = true, alg = :default)
   return z, L, R
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     eigvals_simple(A::ComplexMat, alg = :default)
 
 Returns the eigenvalues of `A` as a vector of `acb`. It is assumed that `A`
@@ -984,7 +984,7 @@ function eigvals_simple(A::ComplexMat, alg = :default)
   return E
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     eigvals(A::ComplexMat)
 
 Returns the eigenvalues of `A` as a vector of tuples `(ComplexFieldElem, Int)`.

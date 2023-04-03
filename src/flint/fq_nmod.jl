@@ -569,7 +569,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     modulus(k::fqPolyRepField, var::String="T")
 
 Return the modulus defining the finite field $k$.

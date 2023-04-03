@@ -89,7 +89,7 @@ function denominator(a::QQFieldElem)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sign(a::QQFieldElem)
 
 Return the sign of $a$ ($-1$, $0$ or $1$) as a fraction.
@@ -121,7 +121,7 @@ end
 
 is_unit(a::QQFieldElem) = !iszero(a)
 
-@doc Markdown.doc"""
+@doc raw"""
     height(a::QQFieldElem)
 
 Return the height of the fraction $a$, namely the largest of the absolute
@@ -133,7 +133,7 @@ function height(a::QQFieldElem)
    return temp
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     height_bits(a::QQFieldElem)
 
 Return the number of bits of the height of the fraction $a$.
@@ -150,7 +150,7 @@ end
 
 characteristic(::QQField) = 0
 
-@doc Markdown.doc"""
+@doc raw"""
     floor(a::QQFieldElem)
 
 Return the greatest integer that is less than or equal to $a$. The result is
@@ -158,7 +158,7 @@ returned as a rational with denominator $1$.
 """
 Base.floor(a::QQFieldElem) = QQFieldElem(fdiv(numerator(a), denominator(a)), 1)
 
-@doc Markdown.doc"""
+@doc raw"""
     ceil(a::QQFieldElem)
 
 Return the least integer that is greater than or equal to $a$. The result is
@@ -393,7 +393,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     >>(a::QQFieldElem, b::Int)
 
 Return $a/2^b$.
@@ -405,7 +405,7 @@ function >>(a::QQFieldElem, b::Int)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     <<(a::QQFieldElem, b::Int)
 
 Return $a \times 2^b$.
@@ -448,7 +448,7 @@ function is_square_with_sqrt(a::QQFieldElem)
     return true, QQFieldElem(s1, s2)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     root(x::QQFieldElem, n::Int; check::Bool=true)
 
 Return the $n$-the root of $x$. We require $n > 0$ and that
@@ -543,7 +543,7 @@ divexact(a::Rational{T}, b::QQFieldElem; check::Bool=true) where {T <: Integer} 
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     mod(a::QQFieldElem, b::ZZRingElem)
     mod(a::QQFieldElem, b::Integer)
 
@@ -599,7 +599,7 @@ valuation(a::QQFieldElem, b::Integer) = valuation(a, ZZRingElem(b))
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     reconstruct(a::ZZRingElem, b::ZZRingElem)
     reconstruct(a::ZZRingElem, b::Integer)
     reconstruct(a::Integer, b::ZZRingElem)
@@ -644,7 +644,7 @@ reconstruct(a::Integer, b::Integer) =  reconstruct(ZZRingElem(a), ZZRingElem(b))
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     next_minimal(a::QQFieldElem)
 
 Given $a$, return the next rational number in the sequence obtained by
@@ -671,7 +671,7 @@ function next_minimal(a::QQFieldElem)
    return c
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     next_signed_minimal(a::QQFieldElem)
 
 Given a signed rational number $a$ assumed to be in canonical form,
@@ -695,7 +695,7 @@ function next_signed_minimal(a::QQFieldElem)
    return c
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     next_calkin_wilf(a::QQFieldElem)
 
 Return the next number after $a$ in the breadth-first traversal of the
@@ -722,7 +722,7 @@ function next_calkin_wilf(a::QQFieldElem)
    return c
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     next_signed_calkin_wilf(a::QQFieldElem)
 
 Given a signed rational number $a$ returns the next element in the
@@ -751,7 +751,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     harmonic(n::Int)
 
 Return the harmonic number $H_n = 1 + 1/2 + 1/3 + \cdots + 1/n$.
@@ -772,7 +772,7 @@ function harmonic(n::Int)
    return c
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     bernoulli(n::Int)
 
 Return the Bernoulli number $B_n$ for nonnegative $n$.
@@ -793,7 +793,7 @@ function bernoulli(n::Int)
    return c
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     bernoulli_cache(n::Int)
 
 Precomputes and caches all the Bernoulli numbers up to $B_n$.
@@ -818,7 +818,7 @@ function bernoulli_cache(n::Int)
    ccall((:bernoulli_cache_compute, libarb), Nothing, (Int,), n)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     dedekind_sum(h::ZZRingElem, k::ZZRingElem)
 
 Return the Dedekind sum $s(h,k)$ for arbitrary $h$ and $k$.
@@ -864,7 +864,7 @@ function _fmpq_simplest_between(l_num::ZZRingElem, l_den::ZZRingElem,
    return n//d
 end
 
-@doc Markdown.doc"""
+@doc raw"""
       simplest_between(l::QQFieldElem, r::QQFieldElem)
 
 Return the simplest fraction in the closed interval $[l, r]$. A canonical
@@ -1001,7 +1001,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     rand_bits(::QQField, b::Int)
 
 Return a random signed rational whose numerator and denominator both have $b$

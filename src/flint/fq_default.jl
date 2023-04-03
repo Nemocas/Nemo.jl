@@ -586,7 +586,7 @@ function is_square_with_sqrt(x::FqFieldElem)
    return (Bool(flag), z)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     pth_root(x::FqFieldElem)
 
 Return the $p$-th root of $x$ in the finite field of characteristic $p$. This
@@ -776,7 +776,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     NGFiniteField(char::IntegerUnion, deg::Int, s::AbstractString; cached = true, check = true)
 
 Returns a tuple $S, x$ consisting of a finite field $S$ of degree `deg` with
@@ -794,7 +794,7 @@ function NGFiniteField(char::IntegerUnion, deg::Int, s::AbstractString = "o"; ca
    return parent_obj, _gen(parent_obj)
 end
 
-# @doc Markdown.doc"""
+# @doc raw"""
 #     NGFiniteField(pol::Union{ZZModPolyRingElem, FpPolyRingElem}, s::AbstractString; cached = true, check = true)
 # 
 # Returns a tuple $S, x$ consisting of a finite field parent object $S$ and

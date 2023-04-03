@@ -1023,7 +1023,7 @@ function sqrt_classical(a::FpRelPowerSeriesRingElem; check::Bool=true)
    return true, z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sqrt(a::FpRelPowerSeriesRingElem)
 
 Return the square root of the power series $a$. By default the function raises

@@ -60,7 +60,7 @@ function one(r::ComplexField)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     onei(r::ComplexField)
 
 Return exact one times $i$ in the given Arb complex field.
@@ -71,7 +71,7 @@ function onei(r::ComplexField)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     accuracy_bits(x::ComplexFieldElem)
 
 Return the relative accuracy of $x$ measured in bits, capped between
@@ -391,7 +391,7 @@ divexact(x::ComplexFieldElem, y::Rational{T}; check::Bool=true) where {T <: Inte
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     isequal(x::ComplexFieldElem, y::ComplexFieldElem)
 
 Return `true` if the boxes $x$ and $y$ are precisely equal, i.e. their real
@@ -445,7 +445,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     overlaps(x::ComplexFieldElem, y::ComplexFieldElem)
 
 Returns `true` if any part of the box $x$ overlaps any part of the box $y$,
@@ -456,7 +456,7 @@ function overlaps(x::ComplexFieldElem, y::ComplexFieldElem)
   return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::ComplexFieldElem, y::ComplexFieldElem)
 
 Returns `true` if the box $x$ contains the box $y$, otherwise return
@@ -467,7 +467,7 @@ function contains(x::ComplexFieldElem, y::ComplexFieldElem)
   return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::ComplexFieldElem, y::QQFieldElem)
 
 Returns `true` if the box $x$ contains the given rational value, otherwise
@@ -478,7 +478,7 @@ function contains(x::ComplexFieldElem, y::QQFieldElem)
   return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::ComplexFieldElem, y::ZZRingElem)
 
 Returns `true` if the box $x$ contains the given integer value, otherwise
@@ -495,7 +495,7 @@ function contains(x::ComplexFieldElem, y::Int)
   return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::ComplexFieldElem, y::Integer)
 
 Returns `true` if the box $x$ contains the given integer value, otherwise
@@ -503,7 +503,7 @@ return `false`.
 """
 contains(x::ComplexFieldElem, y::Integer) = contains(x, ZZRingElem(y))
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::ComplexFieldElem, y::Rational{T}) where {T <: Integer}
 
 Returns `true` if the box $x$ contains the given rational value, otherwise
@@ -511,7 +511,7 @@ return `false`.
 """
 contains(x::ComplexFieldElem, y::Rational{T}) where {T <: Integer} = contains(x, ZZRingElem(y))
 
-@doc Markdown.doc"""
+@doc raw"""
     contains_zero(x::ComplexFieldElem)
 
 Returns `true` if the box $x$ contains zero, otherwise return `false`.
@@ -530,7 +530,7 @@ function is_unit(x::ComplexFieldElem)
    !iszero(x)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     iszero(x::ComplexFieldElem)
 
 Return `true` if $x$ is certainly zero, otherwise return `false`.
@@ -539,7 +539,7 @@ function iszero(x::ComplexFieldElem)
    return Bool(ccall((:acb_is_zero, libarb), Cint, (Ref{ComplexFieldElem},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isone(x::ComplexFieldElem)
 
 Return `true` if $x$ is certainly one, otherwise return `false`.
@@ -548,7 +548,7 @@ function isone(x::ComplexFieldElem)
    return Bool(ccall((:acb_is_one, libarb), Cint, (Ref{ComplexFieldElem},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isfinite(x::ComplexFieldElem)
 
 Return `true` if $x$ is finite, i.e. its real and imaginary parts have finite
@@ -558,7 +558,7 @@ function isfinite(x::ComplexFieldElem)
    return Bool(ccall((:acb_is_finite, libarb), Cint, (Ref{ComplexFieldElem},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_exact(x::ComplexFieldElem)
 
 Return `true` if $x$ is exact, i.e. has its real and imaginary parts have
@@ -568,7 +568,7 @@ function is_exact(x::ComplexFieldElem)
    return Bool(ccall((:acb_is_exact, libarb), Cint, (Ref{ComplexFieldElem},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isinteger(x::ComplexFieldElem)
 
 Return `true` if $x$ is an exact integer, otherwise return `false`.
@@ -634,7 +634,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     trim(x::ComplexFieldElem)
 
 Return an `acb` box containing $x$ but which may be more economical,
@@ -646,7 +646,7 @@ function trim(x::ComplexFieldElem)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     unique_integer(x::ComplexFieldElem)
 
 Return a pair where the first value is a boolean and the second is an `ZZRingElem`
@@ -681,7 +681,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     const_pi(r::ComplexField)
 
 Return $\pi = 3.14159\ldots$ as an element of $r$.
@@ -706,7 +706,7 @@ function Base.sqrt(x::ComplexFieldElem, prec::Int = precision(Balls); check::Boo
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rsqrt(x::ComplexFieldElem)
 
 Return the reciprocal of the square root of $x$, i.e. $1/\sqrt{x}$.
@@ -741,7 +741,7 @@ function Base.expm1(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     cispi(x::ComplexFieldElem)
 
 Return the exponential of $\pi i x$.
@@ -752,7 +752,7 @@ function cispi(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     root_of_unity(C::ComplexField, k::Int)
 
 Return $\exp(2\pi i/k)$.
@@ -842,7 +842,7 @@ function atan(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     log_sinpi(x::ComplexFieldElem)
 
 Return $\log\sin(\pi x)$, constructed without branch cuts off the real line.
@@ -853,7 +853,7 @@ function log_sinpi(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gamma(x::ComplexFieldElem)
 
 Return the Gamma function evaluated at $x$.
@@ -864,7 +864,7 @@ function gamma(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rgamma(x::ComplexFieldElem)
 
 Return the reciprocal of the Gamma function evaluated at $x$.
@@ -875,7 +875,7 @@ function rgamma(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lgamma(x::ComplexFieldElem)
 
 Return the logarithm of the Gamma function evaluated at $x$.
@@ -886,7 +886,7 @@ function lgamma(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     digamma(x::ComplexFieldElem)
 
 Return the  logarithmic derivative of the gamma function evaluated at $x$,
@@ -898,7 +898,7 @@ function digamma(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     zeta(x::ComplexFieldElem)
 
 Return the Riemann zeta function evaluated at $x$.
@@ -909,7 +909,7 @@ function zeta(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     barnes_g(x::ComplexFieldElem)
 
 Return the Barnes $G$-function, evaluated at $x$.
@@ -920,7 +920,7 @@ function barnes_g(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     log_barnes_g(x::ComplexFieldElem)
 
 Return the logarithm of the Barnes $G$-function, evaluated at $x$.
@@ -931,7 +931,7 @@ function log_barnes_g(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     agm(x::ComplexFieldElem)
 
 Return the arithmetic-geometric mean of $1$ and $x$.
@@ -942,7 +942,7 @@ function agm(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     erf(x::ComplexFieldElem)
 
 Return the error function evaluated at $x$.
@@ -953,7 +953,7 @@ function erf(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     erfi(x::ComplexFieldElem)
 
 Return the imaginary error function evaluated at $x$.
@@ -964,7 +964,7 @@ function erfi(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     erfc(x::ComplexFieldElem)
 
 Return the complementary error function evaluated at $x$.
@@ -975,7 +975,7 @@ function erfc(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     exp_integral_ei(x::ComplexFieldElem)
 
 Return the exponential integral evaluated at $x$.
@@ -986,7 +986,7 @@ function exp_integral_ei(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sin_integral(x::ComplexFieldElem)
 
 Return the sine integral evaluated at $x$.
@@ -997,7 +997,7 @@ function sin_integral(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     cos_integral(x::ComplexFieldElem)
 
 Return the exponential cosine integral evaluated at $x$.
@@ -1008,7 +1008,7 @@ function cos_integral(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sinh_integral(x::ComplexFieldElem)
 
 Return the hyperbolic sine integral evaluated at $x$.
@@ -1019,7 +1019,7 @@ function sinh_integral(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     cosh_integral(x::ComplexFieldElem)
 
 Return the hyperbolic cosine integral evaluated at $x$.
@@ -1030,7 +1030,7 @@ function cosh_integral(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     dedekind_eta(x::ComplexFieldElem)
 
 Return the Dedekind eta function $\eta(\tau)$ at $\tau = x$.
@@ -1041,7 +1041,7 @@ function dedekind_eta(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     modular_weber_f(x::ComplexFieldElem)
 
 Return the modular Weber function
@@ -1054,7 +1054,7 @@ function modular_weber_f(x::ComplexFieldElem)
    return divexact(dedekind_eta(x)^2, dedekind_eta(x_on_2)*dedekind_eta(x_times_2))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     modular_weber_f1(x::ComplexFieldElem)
 
 Return the modular Weber function
@@ -1066,7 +1066,7 @@ function modular_weber_f1(x::ComplexFieldElem)
    return divexact(dedekind_eta(x_on_2), dedekind_eta(x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     modular_weber_f2(x::ComplexFieldElem)
 
 Return the modular Weber function
@@ -1078,7 +1078,7 @@ function modular_weber_f2(x::ComplexFieldElem)
    return divexact(dedekind_eta(x_times_2), dedekind_eta(x))*sqrt(parent(x)(2))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     j_invariant(x::ComplexFieldElem)
 
 Return the $j$-invariant $j(\tau)$ at $\tau = x$.
@@ -1089,7 +1089,7 @@ function j_invariant(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     modular_lambda(x::ComplexFieldElem)
 
 Return the modular lambda function $\lambda(\tau)$ at $\tau = x$.
@@ -1100,7 +1100,7 @@ function modular_lambda(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     modular_delta(x::ComplexFieldElem)
 
 Return the modular delta function $\Delta(\tau)$ at $\tau = x$.
@@ -1111,7 +1111,7 @@ function modular_delta(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     eisenstein_g(k::Int, x::ComplexFieldElem)
 
 Return the non-normalized Eisenstein series $G_k(\tau)$ of
@@ -1134,7 +1134,7 @@ function eisenstein_g(k::Int, x::ComplexFieldElem, prec::Int = precision(Balls))
   return z[end]
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     hilbert_class_polynomial(D::Int, R::ZZPolyRing)
 
 Return in the ring $R$ the Hilbert class polynomial of discriminant $D$,
@@ -1149,7 +1149,7 @@ function hilbert_class_polynomial(D::Int, R::ZZPolyRing)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     elliptic_k(x::ComplexFieldElem)
 
 Return the complete elliptic integral $K(x)$.
@@ -1160,7 +1160,7 @@ function elliptic_k(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     elliptic_e(x::ComplexFieldElem)
 
 Return the complete elliptic integral $E(x)$.
@@ -1187,7 +1187,7 @@ function sincospi(x::ComplexFieldElem, prec::Int = precision(Balls))
   return (s, c)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sinhcosh(x::ComplexFieldElem)
 
 Return a tuple $s, c$ consisting of the hyperbolic sine and cosine of $x$.
@@ -1200,7 +1200,7 @@ function sinhcosh(x::ComplexFieldElem, prec::Int = precision(Balls))
   return (s, c)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     zeta(s::ComplexFieldElem, a::ComplexFieldElem)
 
 Return the Hurwitz zeta function $\zeta(s,a)$.
@@ -1212,7 +1212,7 @@ function zeta(s::ComplexFieldElem, a::ComplexFieldElem, prec::Int = precision(Ba
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     polygamma(s::ComplexFieldElem, a::ComplexFieldElem)
 
 Return the generalised polygamma function $\psi(s,z)$.
@@ -1231,7 +1231,7 @@ function rising_factorial(x::ComplexFieldElem, n::UInt, prec::Int = precision(Ba
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rising_factorial(x::ComplexFieldElem, n::Int)
 
 Return the rising factorial $x(x + 1)\ldots (x + n - 1)$ as an Acb.
@@ -1249,7 +1249,7 @@ function rising_factorial2(x::ComplexFieldElem, n::UInt, prec::Int = precision(B
   return (z, w)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rising_factorial2(x::ComplexFieldElem, n::Int)
 
 Return a tuple containing the rising factorial $x(x + 1)\ldots (x + n - 1)$
@@ -1274,13 +1274,13 @@ function polylog(s::Int, a::ComplexFieldElem, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     polylog(s::Union{ComplexFieldElem,Int}, a::ComplexFieldElem)
 
 Return the polylogarithm Li$_s(a)$.
 """ polylog(s::Union{ComplexFieldElem,Int}, ::ComplexFieldElem)
 
-@doc Markdown.doc"""
+@doc raw"""
     log_integral(x::ComplexFieldElem)
 
 Return the logarithmic integral, evaluated at $x$.
@@ -1292,7 +1292,7 @@ function log_integral(x::ComplexFieldElem, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     log_integral_offset(x::ComplexFieldElem)
 
 Return the offset logarithmic integral, evaluated at $x$.
@@ -1304,7 +1304,7 @@ function log_integral_offset(x::ComplexFieldElem, prec::Int = precision(Balls))
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     exp_integral_e(s::ComplexFieldElem, x::ComplexFieldElem)
 
 Return the generalised exponential integral $E_s(x)$.
@@ -1316,7 +1316,7 @@ function exp_integral_e(s::ComplexFieldElem, x::ComplexFieldElem, prec::Int = pr
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gamma(s::ComplexFieldElem, x::ComplexFieldElem)
 
 Return the upper incomplete gamma function $\Gamma(s,x)$.
@@ -1328,7 +1328,7 @@ function gamma(s::ComplexFieldElem, x::ComplexFieldElem, prec::Int = precision(B
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gamma_regularized(s::ComplexFieldElem, x::ComplexFieldElem)
 
 Return the regularized upper incomplete gamma function
@@ -1341,7 +1341,7 @@ function gamma_regularized(s::ComplexFieldElem, x::ComplexFieldElem, prec::Int =
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gamma_lower(s::ComplexFieldElem, x::ComplexFieldElem)
 
 Return the lower incomplete gamma function $\gamma(s,x) / \Gamma(s)$.
@@ -1353,7 +1353,7 @@ function gamma_lower(s::ComplexFieldElem, x::ComplexFieldElem, prec::Int = preci
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gamma_lower_regularized(s::ComplexFieldElem, x::ComplexFieldElem)
 
 Return the regularized lower incomplete gamma function
@@ -1366,7 +1366,7 @@ function gamma_lower_regularized(s::ComplexFieldElem, x::ComplexFieldElem, prec:
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     bessel_j(nu::ComplexFieldElem, x::ComplexFieldElem)
 
 Return the Bessel function $J_{\nu}(x)$.
@@ -1378,7 +1378,7 @@ function bessel_j(nu::ComplexFieldElem, x::ComplexFieldElem, prec::Int = precisi
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     bessel_y(nu::ComplexFieldElem, x::ComplexFieldElem)
 
 Return the Bessel function $Y_{\nu}(x)$.
@@ -1390,7 +1390,7 @@ function bessel_y(nu::ComplexFieldElem, x::ComplexFieldElem, prec::Int = precisi
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     bessel_i(nu::ComplexFieldElem, x::ComplexFieldElem)
 
 Return the Bessel function $I_{\nu}(x)$.
@@ -1402,7 +1402,7 @@ function bessel_i(nu::ComplexFieldElem, x::ComplexFieldElem, prec::Int = precisi
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     bessel_k(nu::ComplexFieldElem, x::ComplexFieldElem)
 
 Return the Bessel function $K_{\nu}(x)$.
@@ -1414,7 +1414,7 @@ function bessel_k(nu::ComplexFieldElem, x::ComplexFieldElem, prec::Int = precisi
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     airy_ai(x::ComplexFieldElem)
 
 Return the Airy function $\operatorname{Ai}(x)$.
@@ -1427,7 +1427,7 @@ function airy_ai(x::ComplexFieldElem, prec::Int = precision(Balls))
   return ai
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     airy_bi(x::ComplexFieldElem)
 
 Return the Airy function $\operatorname{Bi}(x)$.
@@ -1440,7 +1440,7 @@ function airy_bi(x::ComplexFieldElem, prec::Int = precision(Balls))
   return bi
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     airy_ai_prime(x::ComplexFieldElem)
 
 Return the derivative of the Airy function $\operatorname{Ai}^\prime(x)$.
@@ -1453,7 +1453,7 @@ function airy_ai_prime(x::ComplexFieldElem, prec::Int = precision(Balls))
   return ai_prime
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     airy_bi_prime(x::ComplexFieldElem)
 
 Return the derivative of the Airy function $\operatorname{Bi}^\prime(x)$.
@@ -1466,7 +1466,7 @@ function airy_bi_prime(x::ComplexFieldElem, prec::Int = precision(Balls))
   return bi_prime
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     hypergeometric_1f1(a::ComplexFieldElem, b::ComplexFieldElem, x::ComplexFieldElem)
 
 Return the confluent hypergeometric function ${}_1F_1(a,b,x)$.
@@ -1478,7 +1478,7 @@ function hypergeometric_1f1(a::ComplexFieldElem, b::ComplexFieldElem, x::Complex
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     hypergeometric_1f1_regularized(a::ComplexFieldElem, b::ComplexFieldElem, x::ComplexFieldElem)
 
 Return the regularized confluent hypergeometric function
@@ -1491,7 +1491,7 @@ function hypergeometric_1f1_regularized(a::ComplexFieldElem, b::ComplexFieldElem
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     hypergeometric_u(a::ComplexFieldElem, b::ComplexFieldElem, x::ComplexFieldElem)
 
 Return the confluent hypergeometric function $U(a,b,x)$.
@@ -1503,7 +1503,7 @@ function hypergeometric_u(a::ComplexFieldElem, b::ComplexFieldElem, x::ComplexFi
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     hypergeometric_2f1(a::ComplexFieldElem, b::ComplexFieldElem, c::ComplexFieldElem, x::ComplexFieldElem; flags=0)
 
 Return the Gauss hypergeometric function ${}_2F_1(a,b,c,x)$.
@@ -1515,7 +1515,7 @@ function hypergeometric_2f1(a::ComplexFieldElem, b::ComplexFieldElem, c::Complex
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     jacobi_theta(z::ComplexFieldElem, tau::ComplexFieldElem)
 
 Return a tuple of four elements containing the Jacobi theta function values
@@ -1532,7 +1532,7 @@ function jacobi_theta(z::ComplexFieldElem, tau::ComplexFieldElem, prec::Int = pr
   return (t1, t2, t3, t4)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     weierstrass_p(z::ComplexFieldElem, tau::ComplexFieldElem)
 
 Return the Weierstrass elliptic function $\wp(z,\tau)$.
@@ -1544,7 +1544,7 @@ function weierstrass_p(z::ComplexFieldElem, tau::ComplexFieldElem, prec::Int = p
   return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     weierstrass_p_prime(z::ComplexFieldElem, tau::ComplexFieldElem)
 
 Return the derivative of the Weierstrass elliptic function $\frac{\partial}{\partial z}\wp(z,\tau)$.
@@ -1556,7 +1556,7 @@ function weierstrass_p_prime(z::ComplexFieldElem, tau::ComplexFieldElem, prec::I
   return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     agm(x::ComplexFieldElem, y::ComplexFieldElem)
 
 Return the arithmetic-geometric mean of $x$ and $y$.
@@ -1571,7 +1571,7 @@ function agm(x::ComplexFieldElem, y::ComplexFieldElem)
   end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lindep(A::Vector{ComplexFieldElem}, bits::Int)
 
 Find a small linear combination of the entries of the array $A$ that is small
@@ -1597,7 +1597,7 @@ function lindep(A::Vector{ComplexFieldElem}, bits::Int)
   return [L[1, i] for i = 1:n]
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lindep(A::Matrix{ComplexFieldElem}, bits::Int)
 
 Find a (common) small linear combination of the entries in each row of the array $A$,

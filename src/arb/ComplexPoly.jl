@@ -127,7 +127,7 @@ function isequal(x::ComplexPoly, y::ComplexPoly)
                                       (Ref{ComplexPoly}, Ref{ComplexPoly}), x, y)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     overlaps(x::ComplexPoly, y::ComplexPoly)
 
 Return `true` if the coefficient boxes of $x$ overlap the coefficient boxes
@@ -138,7 +138,7 @@ function overlaps(x::ComplexPoly, y::ComplexPoly)
                                       (Ref{ComplexPoly}, Ref{ComplexPoly}), x, y)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::ComplexPoly, y::ComplexPoly)
 
 Return `true` if the coefficient boxes of $x$ contain the corresponding
@@ -149,7 +149,7 @@ function contains(x::ComplexPoly, y::ComplexPoly)
                                       (Ref{ComplexPoly}, Ref{ComplexPoly}), x, y)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::ComplexPoly, y::ZZPolyRingElem)
 
 Return `true` if the coefficient boxes of $x$ contain the corresponding
@@ -160,7 +160,7 @@ function contains(x::ComplexPoly, y::ZZPolyRingElem)
                                       (Ref{ComplexPoly}, Ref{ZZPolyRingElem}), x, y)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::ComplexPoly, y::QQPolyRingElem)
 
 Return `true` if the coefficient boxes of $x$ contain the corresponding
@@ -192,7 +192,7 @@ function !=(x::ComplexPoly, y::ComplexPoly)
     return false
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     unique_integer(x::ComplexPoly)
 
 Return a tuple `(t, z)` where $t$ is `true` if there is a unique integer
@@ -427,7 +427,7 @@ evaluate(x::ComplexPoly, y::Rational, prec::Int = precision(Balls)) = evaluate(x
 evaluate(x::ComplexPoly, y::Float64, prec::Int = precision(Balls)) = evaluate(x, base_ring(parent(x))(y), prec)
 evaluate(x::ComplexPoly, y::Any, prec::Int = precision(Balls)) = evaluate(x, base_ring(parent(x))(y), prec)
 
-@doc Markdown.doc"""
+@doc raw"""
     evaluate2(x::ComplexPoly, y::RingElement; prec::Int = precision(Balls))
 
 Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
@@ -513,7 +513,7 @@ function acb_vec_clear(v::Ptr{acb_struct}, n::Int)
    ccall((:_acb_vec_clear, libarb), Nothing, (Ptr{acb_struct}, Int), v, n)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     from_roots(R::ComplexPolyRing, b::Vector{ComplexFieldElem})
 
 Construct a polynomial in the given polynomial ring from a list of its roots.
@@ -596,7 +596,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     roots(x::ComplexPoly; target=0, isolate_real=false, initial_prec=0, max_prec=0, max_iter=0)
 
 Attempts to isolate the complex roots of the complex polynomial $x$ by
@@ -701,7 +701,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     roots_upper_bound(x::ComplexPoly) -> arb
 
 Returns an upper bound for the absolute value of all complex roots of $x$.

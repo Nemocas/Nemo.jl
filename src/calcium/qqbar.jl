@@ -175,7 +175,7 @@ zero(a::CalciumQQBarField) = a(0)
 
 one(a::CalciumQQBarField) = a(1)
 
-@doc Markdown.doc"""
+@doc raw"""
     degree(x::qqbar)
 
 Return the degree of the minimal polynomial of `x`.
@@ -184,7 +184,7 @@ function degree(x::qqbar)
    return ccall((:qqbar_degree, libcalcium), Int, (Ref{qqbar}, ), x)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     iszero(x::qqbar)
 
 Return whether `x` is the number 0.
@@ -193,7 +193,7 @@ function iszero(x::qqbar)
    return Bool(ccall((:qqbar_is_zero, libcalcium), Cint, (Ref{qqbar},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isone(x::qqbar)
 
 Return whether `x` is the number 1.
@@ -202,7 +202,7 @@ function isone(x::qqbar)
    return Bool(ccall((:qqbar_is_one, libcalcium), Cint, (Ref{qqbar},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isinteger(x::qqbar)
 
 Return whether `x` is an integer.
@@ -211,7 +211,7 @@ function isinteger(x::qqbar)
    return Bool(ccall((:qqbar_is_integer, libcalcium), Cint, (Ref{qqbar},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_rational(x::qqbar)
 
 Return whether `x` is a rational number.
@@ -220,7 +220,7 @@ function is_rational(x::qqbar)
    return Bool(ccall((:qqbar_is_rational, libcalcium), Cint, (Ref{qqbar},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isreal(x::qqbar)
 
 Return whether `x` is a real number.
@@ -229,7 +229,7 @@ function isreal(x::qqbar)
    return Bool(ccall((:qqbar_is_real, libcalcium), Cint, (Ref{qqbar},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_algebraic_integer(x::qqbar)
 
 Return whether `x` is an algebraic integer.
@@ -239,7 +239,7 @@ function is_algebraic_integer(x::qqbar)
         Cint, (Ref{qqbar},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     minpoly(R::ZZPolyRing, x::qqbar)
 
 Return the minimal polynomial of `x` as an element of the polynomial ring `R`.
@@ -251,7 +251,7 @@ function minpoly(R::ZZPolyRing, x::qqbar)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     minpoly(R::ZZPolyRing, x::qqbar)
 
 Return the minimal polynomial of `x` as an element of the polynomial ring `R`.
@@ -263,7 +263,7 @@ function minpoly(R::QQPolyRing, x::qqbar)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     denominator(x::qqbar)
 
 Return the denominator of `x`, defined as the leading coefficient of the
@@ -277,7 +277,7 @@ function denominator(x::qqbar)
    return q
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     numerator(x::qqbar)
 
 Return the numerator of `x`, defined as `x` multiplied by its denominator.
@@ -287,7 +287,7 @@ function numerator(x::qqbar)
    return x * denominator(x)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     height(x::qqbar)
 
 Return the height of the algebraic number `x`. The result is an `ZZRingElem` integer.
@@ -298,7 +298,7 @@ function height(x::qqbar)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     height_bits(x::qqbar)
 
 Return the height of the algebraic number `x` measured in bits.
@@ -315,7 +315,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     rand(R::CalciumQQBarField; degree::Int, bits::Int, randtype::Symbol=:null)
 
 Return a random algebraic number with degree up to `degree`
@@ -648,35 +648,35 @@ cmpabs_imag(a::qqbar, b::qqbar) = ccall((:qqbar_cmpabs_im, libcalcium),
 cmp_root_order(a::qqbar, b::qqbar) = ccall((:qqbar_cmp_root_order, libcalcium),
     Cint, (Ref{qqbar}, Ref{qqbar}), a, b)
 
-@doc Markdown.doc"""
+@doc raw"""
     is_equal_real(a::qqbar, b::qqbar)
 
 Compares the real parts of `a` and `b`.
 """
 is_equal_real(a::qqbar, b::qqbar) = cmp_real(a, b) == 0
 
-@doc Markdown.doc"""
+@doc raw"""
     is_equal_imag(a::qqbar, b::qqbar)
 
 Compares the imaginary parts of `a` and `b`.
 """
 is_equal_imag(a::qqbar, b::qqbar) = cmp_imag(a, b) == 0
 
-@doc Markdown.doc"""
+@doc raw"""
     is_equal_abs(a::qqbar, b::qqbar)
 
 Compares the absolute values of `a` and `b`.
 """
 is_equal_abs(a::qqbar, b::qqbar) = cmpabs(a, b) == 0
 
-@doc Markdown.doc"""
+@doc raw"""
     is_equal_abs_real(a::qqbar, b::qqbar)
 
 Compares the absolute values of the real parts of `a` and `b`.
 """
 is_equal_abs_real(a::qqbar, b::qqbar) = cmpabs_real(a, b) == 0
 
-@doc Markdown.doc"""
+@doc raw"""
     is_equal_abs_imag(a::qqbar, b::qqbar)
 
 Compares the absolute values of the imaginary parts of `a` and `b`.
@@ -684,21 +684,21 @@ Compares the absolute values of the imaginary parts of `a` and `b`.
 is_equal_abs_imag(a::qqbar, b::qqbar) = cmpabs_imag(a, b) == 0
 
 
-@doc Markdown.doc"""
+@doc raw"""
     is_less_real(a::qqbar, b::qqbar)
 
 Compares the real parts of `a` and `b`.
 """
 is_less_real(a::qqbar, b::qqbar) = cmp_real(a, b) < 0
 
-@doc Markdown.doc"""
+@doc raw"""
     is_less_imag(a::qqbar, b::qqbar)
 
 Compares the imaginary parts of `a` and `b`.
 """
 is_less_imag(a::qqbar, b::qqbar) = cmp_imag(a, b) < 0
 
-@doc Markdown.doc"""
+@doc raw"""
     is_less_abs(a::qqbar, b::qqbar)
 
 Compares the absolute values of `a` and `b`.
@@ -706,21 +706,21 @@ Compares the absolute values of `a` and `b`.
 is_less_abs(a::qqbar, b::qqbar) = cmpabs(a, b) < 0
 
 
-@doc Markdown.doc"""
+@doc raw"""
     is_less_abs_real(a::qqbar, b::qqbar)
 
 Compares the absolute values of the real parts of `a` and `b`.
 """
 is_less_abs_real(a::qqbar, b::qqbar) = cmpabs_real(a, b) < 0
 
-@doc Markdown.doc"""
+@doc raw"""
     is_less_abs_imag(a::qqbar, b::qqbar)
 
 Compares the absolute values of the imaginary parts of `a` and `b`.
 """
 is_less_abs_imag(a::qqbar, b::qqbar) = cmpabs_imag(a, b) < 0
 
-@doc Markdown.doc"""
+@doc raw"""
     is_less_root_order(a::qqbar, b::qqbar)
 
 Compares the `a` and `b` in root sort order.
@@ -735,7 +735,7 @@ is_less_root_order(a::qqbar, b::qqbar) = cmp_root_order(a, b) < 0
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     real(a::qqbar)
 
 Return the real part of `a`.
@@ -746,7 +746,7 @@ function real(a::qqbar)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     imag(a::qqbar)
 
 Return the imaginary part of `a`.
@@ -757,7 +757,7 @@ function imag(a::qqbar)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     abs(a::qqbar)
 
 Return the absolute value of `a`.
@@ -768,7 +768,7 @@ function abs(a::qqbar)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     conj(a::qqbar)
 
 Return the complex conjugate of `a`.
@@ -779,7 +779,7 @@ function conj(a::qqbar)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     abs2(a::qqbar)
 
 Return the squared absolute value of `a`.
@@ -790,7 +790,7 @@ function abs2(a::qqbar)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sign(a::qqbar)
 
 Return the complex sign of `a`, defined as zero if `a` is zero
@@ -802,7 +802,7 @@ function sign(a::qqbar)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     csgn(a::qqbar)
 
 Return the extension of the real sign function taking the value 1
@@ -815,7 +815,7 @@ function csgn(a::qqbar)
    return qqbar(Int(ccall((:qqbar_csgn, libcalcium), Cint, (Ref{qqbar}, ), a)))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sign_real(a::qqbar)
 
 Return the sign of the real part of `a` as a Julia integer.
@@ -825,7 +825,7 @@ function sign_real(a::qqbar)
         Cint, (Ref{qqbar}, ), a)))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sign_imag(a::qqbar)
 
 Return the sign of the imaginary part of `a` as a Julia integer.
@@ -835,7 +835,7 @@ function sign_imag(a::qqbar)
         Cint, (Ref{qqbar}, ), a)))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     floor(a::qqbar)
 
 Return the floor function of `a` as an algebraic number. Use `ZZRingElem(floor(a))`
@@ -847,7 +847,7 @@ function floor(a::qqbar)
    return qqbar(z)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     ceil(a::qqbar)
 
 Return the ceiling function of `b` as an algebraic number. Use `ZZRingElem(ceil(a))`
@@ -866,7 +866,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     sqrt(a::qqbar; check::Bool=true)
 
 Return the principal square root of `a`.
@@ -878,7 +878,7 @@ function sqrt(a::qqbar; check::Bool=true)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     root(a::qqbar, n::Int)
 
 Return the principal `n`-th root of `a`. Requires positive `n`.
@@ -910,7 +910,7 @@ function qqbar_vec_clear(v::Ptr{qqbar_struct}, n::Int)
         Nothing, (Ptr{qqbar_struct}, Int), v, n)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     roots(f::ZZPolyRingElem, R::CalciumQQBarField)
 
 Return all the roots of the polynomial `f` in the field of algebraic
@@ -931,7 +931,7 @@ function roots(f::ZZPolyRingElem, R::CalciumQQBarField)
    return res
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     roots(f::QQPolyRingElem, R::CalciumQQBarField)
 
 Return all the roots of the polynomial `f` in the field of algebraic
@@ -952,7 +952,7 @@ function roots(f::QQPolyRingElem, R::CalciumQQBarField)
    return res
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     conjugates(a::qqbar)
 
 Return all the roots of the polynomial `f` in the field of algebraic
@@ -972,7 +972,7 @@ function conjugates(a::qqbar)
    return res
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     eigenvalues(A::ZZMatrix, R::CalciumQQBarField)
 
 Return all the eigenvalues of the matrix `A` in the field of algebraic
@@ -994,7 +994,7 @@ function eigenvalues(A::ZZMatrix, R::CalciumQQBarField)
    return res
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     eigenvalues(A::QQMatrix, R::CalciumQQBarField)
 
 Return all the eigenvalues of the matrix `A` in the field of algebraic
@@ -1022,7 +1022,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     root_of_unity(C::CalciumQQBarField, n::Int)
 
 Return the root of unity $e^{2 \pi i / n}$ as an element of the field
@@ -1036,7 +1036,7 @@ function root_of_unity(C::CalciumQQBarField, n::Int)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     root_of_unity(C::CalciumQQBarField, n::Int, k::Int)
 
 Return the root of unity $e^{2 \pi i k / n}$ as an element of the field
@@ -1050,7 +1050,7 @@ function root_of_unity(C::CalciumQQBarField, n::Int, k::Int)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_root_of_unity(a::qqbar)
 
 Return whether the given algebraic number is a root of unity.
@@ -1060,7 +1060,7 @@ function is_root_of_unity(a::qqbar)
         Cint, (Ptr{Int}, Ptr{Int}, Ref{qqbar}), C_NULL, C_NULL, a))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     root_of_unity_as_args(a::qqbar)
 
 Return a pair of integers `(q, p)` such that the given `a` equals
@@ -1077,7 +1077,7 @@ function root_of_unity_as_args(a::qqbar)
    return (q[1], p[1])
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     exp_pi_i(a::qqbar)
 
 Return $e^{\pi i a}$ as an algebraic number.
@@ -1093,7 +1093,7 @@ function exp_pi_i(a::qqbar)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sinpi(a::qqbar)
 
 Return $\sin(\pi a)$ as an algebraic number.
@@ -1108,7 +1108,7 @@ function sinpi(a::qqbar)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     cospi(a::qqbar)
 
 Return $\cos(\pi a)$ as an algebraic number.
@@ -1123,7 +1123,7 @@ function cospi(a::qqbar)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     tanpi(a::qqbar)
 
 Return $\tan(\pi a)$ as an algebraic number.
@@ -1141,7 +1141,7 @@ function tanpi(a::qqbar)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     atanpi(a::qqbar)
 
 Return $\operatorname{atan}(a) / \pi$ as an algebraic number.
@@ -1157,7 +1157,7 @@ function atanpi(a::qqbar)
    return qqbar(p[1]) // q[1]
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     asinpi(a::qqbar)
 
 Return $\operatorname{asin}(a) / \pi$ as an algebraic number.
@@ -1173,7 +1173,7 @@ function asinpi(a::qqbar)
    return qqbar(p[1]) // q[1]
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     acospi(a::qqbar)
 
 Return $\operatorname{acos}(a) / \pi$ as an algebraic number.
@@ -1189,7 +1189,7 @@ function acospi(a::qqbar)
    return qqbar(p[1]) // q[1]
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     log_pi_i(a::qqbar)
 
 Return $\log(a) / (\pi i)$ as an algebraic number.
@@ -1213,7 +1213,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     guess(R::CalciumQQBarField, x::acb, maxdeg::Int, maxbits::Int=0)
 
 Try to reconstruct an algebraic number from a given numerical enclosure `x`.
@@ -1248,7 +1248,7 @@ function guess(R::CalciumQQBarField, x::acb, maxdeg::Int, maxbits::Int=0)
    return res
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     guess(R::CalciumQQBarField, x::acb, maxdeg::Int, maxbits::Int=0)
 
 Try to reconstruct an algebraic number from a given numerical enclosure `x`.
@@ -1279,7 +1279,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     (R::ArbField)(a::qqbar)
 
 Convert `a` to a real ball with the precision of the parent field `R`.
@@ -1294,7 +1294,7 @@ function (R::ArbField)(a::qqbar)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     (R::ArbField)(a::qqbar)
 
 Convert `a` to a complex ball with the precision of the parent field `R`.
@@ -1309,7 +1309,7 @@ function (R::AcbField)(a::qqbar)
 end
 
 # todo: provide qqbar_get_fmpq, qqbar_get_fmpz in C
-@doc Markdown.doc"""
+@doc raw"""
     QQFieldElem(a::qqbar)
 
 Convert `a` to a rational number of type `QQFieldElem`.
@@ -1327,7 +1327,7 @@ function QQFieldElem(a::qqbar)
    return p // q
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     ZZRingElem(a::qqbar)
 
 Convert `a` to an integer of type `ZZRingElem`.

@@ -44,7 +44,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     eta_qexp(x::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem})
 
 Return the $q$-series for eta evaluated at $x$, which must currently be a rational
@@ -75,7 +75,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     PuiseuxSeriesRing(R::ZZRing, prec::Int, s::AbstractString; cached=true)
 
 Return a tuple $(S, x)$ consisting of the parent object `S` of a Puiseux series

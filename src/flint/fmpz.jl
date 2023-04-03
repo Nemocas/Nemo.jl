@@ -56,7 +56,7 @@ export ZZRingElem, FlintZZ, ZZRing, parent, show, convert, hash, bell,
 
 parent_type(::Type{ZZRingElem}) = ZZRing
 
-@doc Markdown.doc"""
+@doc raw"""
     parent(a::ZZRingElem)
 
 Returns the unique Flint integer parent object `FlintZZ`.
@@ -65,14 +65,14 @@ parent(a::ZZRingElem) = FlintZZ
 
 elem_type(::Type{ZZRing}) = ZZRingElem
 
-@doc Markdown.doc"""
+@doc raw"""
     base_ring(a::ZZRing)
 
 Returns `Union{}` as this ring is not dependent on another ring.
 """
 base_ring(a::ZZRing) = Union{}
 
-@doc Markdown.doc"""
+@doc raw"""
     base_ring(a::ZZRingElem)
 
 Returns `Union{}` as the parent ring is not dependent on another ring.
@@ -165,7 +165,7 @@ zero(R::ZZRing) = ZZRingElem(0)
 # Exists only to support Julia functionality (no guarantees)
 zero(::Type{ZZRingElem}) = ZZRingElem(0)
 
-@doc Markdown.doc"""
+@doc raw"""
     sign(a::ZZRingElem)
 
 Return the sign of $a$, i.e. $+1$, $0$ or $-1$.
@@ -174,7 +174,7 @@ sign(a::ZZRingElem) = ZZRingElem(ccall((:fmpz_sgn, libflint), Cint, (Ref{ZZRingE
 
 sign(::Type{Int}, a::ZZRingElem) = Int(ccall((:fmpz_sgn, libflint), Cint, (Ref{ZZRingElem},), a))
 
-@doc Markdown.doc"""
+@doc raw"""
     fits(::Type{Int}, a::ZZRingElem)
 
 Return `true` if $a$ fits into an `Int`, otherwise return `false`.
@@ -182,7 +182,7 @@ Return `true` if $a$ fits into an `Int`, otherwise return `false`.
 fits(::Type{Int}, a::ZZRingElem) = ccall((:fmpz_fits_si, libflint), Bool,
                                    (Ref{ZZRingElem},), a)
 
-@doc Markdown.doc"""
+@doc raw"""
     fits(::Type{UInt}, a::ZZRingElem)
 
 Return `true` if $a$ fits into a `UInt`, otherwise return `false`.
@@ -196,7 +196,7 @@ if Culong !== UInt
     end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     size(a::ZZRingElem)
 
 Return the number of limbs required to store the absolute value of $a$.
@@ -209,7 +209,7 @@ iszero(a::ZZRingElem) = ccall((:fmpz_is_zero, libflint), Bool, (Ref{ZZRingElem},
 
 isone(a::ZZRingElem) = ccall((:fmpz_is_one, libflint), Bool, (Ref{ZZRingElem},), a)
 
-@doc Markdown.doc"""
+@doc raw"""
     denominator(a::ZZRingElem)
 
 Return the denominator of $a$ thought of as a rational. Always returns $1$.
@@ -218,7 +218,7 @@ function denominator(a::ZZRingElem)
    return ZZRingElem(1)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     numerator(a::ZZRingElem)
 
 Return the numerator of $a$ thought of as a rational. Always returns $a$.
@@ -553,7 +553,7 @@ rem(x::ZZRingElem, y::Integer) = rem(x, ZZRingElem(y))
 
 mod(x::Integer, y::ZZRingElem) = mod(ZZRingElem(x), y)
 
-@doc Markdown.doc"""
+@doc raw"""
     mod(x::ZZRingElem, y::Integer)
 
 Return the remainder after division of $x$ by $y$. The remainder will be
@@ -786,7 +786,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     <<(x::ZZRingElem, c::Int)
 
 Return $2^cx$ where $c \geq 0$.
@@ -800,7 +800,7 @@ function <<(x::ZZRingElem, c::Int)
     return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     >>(x::ZZRingElem, c::Int)
 
 Return $x/2^c$, discarding any remainder, where $c \geq 0$.
@@ -838,7 +838,7 @@ function mod(x::ZZRingElem, c::UInt)
     ccall((:fmpz_fdiv_ui, libflint), Base.GMP.Limb, (Ref{ZZRingElem}, Base.GMP.Limb), x, c)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     powermod(x::ZZRingElem, p::ZZRingElem, m::ZZRingElem)
 
 Return $x^p (\mod m)$. The remainder will be in the range $[0, m)$
@@ -856,7 +856,7 @@ function powermod(x::ZZRingElem, p::ZZRingElem, m::ZZRingElem)
     return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     powermod(x::ZZRingElem, p::Int, m::ZZRingElem)
 
 Return $x^p (\mod m)$. The remainder will be in the range $[0, m)$
@@ -874,7 +874,7 @@ function powermod(x::ZZRingElem, p::Int, m::ZZRingElem)
     return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     invmod(x::ZZRingElem, m::ZZRingElem)
 
 Return $x^{-1} (\mod m)$. The remainder will be in the range $[0, m)$
@@ -892,7 +892,7 @@ function invmod(x::ZZRingElem, m::ZZRingElem)
     return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sqrtmod(x::ZZRingElem, m::ZZRingElem)
 
 Return a square root of $x (\mod m)$ if one exists. The remainder will be in
@@ -937,7 +937,7 @@ function _normalize_crt_with_lcm(r::ZZRingElem, m::ZZRingElem, signed)
    return (signed ? nfdivrem(r, m)[2] : fdivrem(r, m)[2], m)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     crt(r1::ZZRingElem, m1::ZZRingElem, r2::ZZRingElem, m2::ZZRingElem, signed=false; check::Bool=true)
     crt(r1::ZZRingElem, m1::ZZRingElem, r2::Union{Int, UInt}, m2::Union{Int, UInt}, signed=false; check::Bool=true)
     crt(r::Vector{ZZRingElem}, m::Vector{ZZRingElem}, signed=false; check::Bool=true)
@@ -1053,7 +1053,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     flog(x::ZZRingElem, c::ZZRingElem)
     flog(x::ZZRingElem, c::Int)
 
@@ -1083,7 +1083,7 @@ function flog(x::ZZRingElem, c::Int)
                  (Ref{ZZRingElem}, Int), x, c)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     clog(x::ZZRingElem, c::ZZRingElem)
     clog(x::ZZRingElem, c::Int)
 
@@ -1119,7 +1119,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     gcd(x::ZZRingElem, y::ZZRingElem, z::ZZRingElem...)
 
 Return the greatest common divisor of $(x, y, ...)$. The returned result will
@@ -1138,7 +1138,7 @@ function gcd(x::ZZRingElem, y::ZZRingElem, z::ZZRingElem...)
    return d
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gcd(x::Vector{ZZRingElem})
 
 Return the greatest common divisor of the elements of $x$. The returned
@@ -1167,7 +1167,7 @@ function gcd(x::Vector{ZZRingElem})
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lcm(x::ZZRingElem, y::ZZRingElem, z::ZZRingElem...)
 
 Return the least common multiple of $(x, y, ...)$. The returned result will
@@ -1186,7 +1186,7 @@ function lcm(x::ZZRingElem, y::ZZRingElem, z::ZZRingElem...)
    return m
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lcm(x::Vector{ZZRingElem})
 
 Return the least common multiple of the elements of $x$. The returned result
@@ -1225,7 +1225,7 @@ lcm(a::Integer, b::ZZRingElem) = lcm(ZZRingElem(a), b)
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     gcdx(a::ZZRingElem, b::ZZRingElem)
 
 Return a tuple $g, s, t$ such that $g$ is the greatest common divisor of $a$
@@ -1243,7 +1243,7 @@ function gcdx(a::ZZRingElem, b::ZZRingElem)
   return d, x, y
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gcdinv(a::ZZRingElem, b::ZZRingElem)
 
 Return a tuple $g, s$ where $g$ is the greatest common divisor of $a$ and
@@ -1280,7 +1280,7 @@ gcdinv(a::Integer, b::ZZRingElem) = gcdinv(ZZRingElem(a), b)
 sqrt_moduli = [3, 5, 7, 8]
 sqrt_residues = [[0, 1], [0, 1, 4], [0, 1, 2, 4], [0, 1, 4]]
 
-@doc Markdown.doc"""
+@doc raw"""
     isqrt(x::ZZRingElem)
 
 Return the floor of the square root of $x$.
@@ -1300,7 +1300,7 @@ function isqrt(x::ZZRingElem)
     return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isqrtrem(x::ZZRingElem)
 
 Return a tuple $s, r$ consisting of the floor $s$ of the square root of $x$
@@ -1365,7 +1365,7 @@ function is_square_with_sqrt(x::ZZRingElem)
     return true, s
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     root(x::ZZRingElem, n::Int; check::Bool=true)
 
 Return the $n$-the root of $x$. We require $n > 0$ and that
@@ -1390,7 +1390,7 @@ function root(x::ZZRingElem, n::Int; check::Bool=true)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     iroot(x::ZZRingElem, n::Int)
 
 Return the integer truncation of the $n$-the root of $x$ (round towards zero).
@@ -1510,7 +1510,7 @@ function _factor_trial_range(N::ZZRingElem, start::Int = 0, np::Int = 10^5)
    return res, canonical_unit(N)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     factor(a::ZZRingElem)
     factor(a::UInt)
     factor(a::Int)
@@ -1546,7 +1546,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     divisible(x::ZZRingElem, y::ZZRingElem)
 
 Return `true` if $x$ is divisible by $y$, otherwise return `false`. We
@@ -1558,7 +1558,7 @@ function divisible(x::ZZRingElem, y::ZZRingElem)
               (Ref{ZZRingElem}, Ref{ZZRingElem}), x, y))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     divisible(x::ZZRingElem, y::Int)
 
 Return `true` if $x$ is divisible by $y$, otherwise return `false`. We
@@ -1570,7 +1570,7 @@ function divisible(x::ZZRingElem, y::Int)
               (Ref{ZZRingElem}, Int), x, y))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     divisors(a::Union{Int, ZZRingElem})
 
 Return the positive divisors of $a$ in an array, not necessarily in growing
@@ -1597,7 +1597,7 @@ end
 
 divisors(a::Int) = Int.(divisors(FlintZZ(a)))
 
-@doc Markdown.doc"""
+@doc raw"""
     prime_divisors(a::ZZRingElem)
 
 Return the prime divisors of $a$ in an array. We require $a \neq 0$.
@@ -1607,7 +1607,7 @@ function prime_divisors(a::ZZRingElem)
    ZZRingElem[p for (p, e) in factor(a)]
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     prime_divisors(a::Int)
 
 Return the prime divisors of $a$ in an array. We require $a \neq 0$.
@@ -1616,7 +1616,7 @@ prime_divisors(a::Int) = Int.(prime_divisors(FlintZZ(a)))
 
 is_prime(x::UInt) = Bool(ccall((:n_is_prime, libflint), Cint, (UInt,), x))
 
-@doc Markdown.doc"""
+@doc raw"""
     is_prime(x::ZZRingElem)
     is_prime(x::Int)
 
@@ -1641,7 +1641,7 @@ function is_prime(n::Int)
   return is_prime(n % UInt)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_probable_prime(x::ZZRingElem)
 
 Return `true` if $x$ is very probably a prime number, otherwise return
@@ -1651,7 +1651,7 @@ that infinitely many exist.
 is_probable_prime(x::ZZRingElem) = Bool(ccall((:fmpz_is_probabprime, libflint), Cint,
                                       (Ref{ZZRingElem},), x))
 
-@doc Markdown.doc"""
+@doc raw"""
     next_prime(x::ZZRingElem, proved = true)
 
 Return the smallest prime strictly greater than $x$.
@@ -1724,7 +1724,7 @@ function remove(x::Integer, y::Integer)
    return (v, convert(promote_type(typeof(x), typeof(y)), q))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     valuation(x::ZZRingElem, y::ZZRingElem)
 
 Return the largest $n$ such that $y^n$ divides $x$.
@@ -1741,7 +1741,7 @@ valuation(x::Integer, y::ZZRingElem) = valuation(ZZRingElem(x), y)
 
 valuation(x::Integer, y::Integer) = valuation(ZZRingElem(x), ZZRingElem(y))
 
-@doc Markdown.doc"""
+@doc raw"""
     divisor_lenstra(n::ZZRingElem, r::ZZRingElem, m::ZZRingElem)
 
 If $n$ has a factor which lies in the residue class $r (\mod m)$ for
@@ -1761,7 +1761,7 @@ function divisor_lenstra(n::ZZRingElem, r::ZZRingElem, m::ZZRingElem)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     factorial(x::ZZRingElem)
 
 Return the factorial of $x$, i.e. $x! = 1.2.3\ldots x$. We require
@@ -1781,7 +1781,7 @@ function factorial(x::ZZRingElem)
     return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rising_factorial(x::ZZRingElem, n::Int)
 
 Return the rising factorial of $x$, i.e. $x(x + 1)(x + 2)\ldots (x + n - 1)$.
@@ -1795,7 +1795,7 @@ function rising_factorial(x::ZZRingElem, n::Int)
     return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rising_factorial(x::ZZRingElem, n::ZZRingElem)
 
 Return the rising factorial of $x$, i.e. $x(x + 1)(x + 2)\cdots (x + n - 1)$.
@@ -1803,7 +1803,7 @@ If $n < 0$ we throw a `DomainError()`.
 """
 rising_factorial(x::ZZRingElem, n::ZZRingElem) = rising_factorial(x, Int(n))
 
-@doc Markdown.doc"""
+@doc raw"""
     rising_factorial(x::Int, n::Int)
 
 Return the rising factorial of $x$, i.e. $x(x + 1)(x + 2)\ldots (x + n - 1)$.
@@ -1824,7 +1824,7 @@ function rising_factorial(x::Int, n::Int)
     return Int(z)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     primorial(x::Int)
 
 Return the primorial of $x$, i.e. the product of all primes less than or
@@ -1838,7 +1838,7 @@ function primorial(x::Int)
     return Int(z)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     primorial(x::ZZRingElem)
 
 Return the primorial of $x$, i.e. the product of all primes less than or
@@ -1852,7 +1852,7 @@ function primorial(x::ZZRingElem)
     return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     fibonacci(x::Int)
 
 Return the $x$-th Fibonacci number $F_x$. We define $F_1 = 1$, $F_2 = 1$ and
@@ -1865,7 +1865,7 @@ function fibonacci(x::Int)
     return x < 0 ? (iseven(x) ? -Int(z) : Int(z)) : Int(z)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     fibonacci(x::ZZRingElem)
 
 Return the $x$-th Fibonacci number $F_x$. We define $F_1 = 1$, $F_2 = 1$ and
@@ -1878,7 +1878,7 @@ function fibonacci(x::ZZRingElem)
     return x < 0 ? (iseven(x) ? -z : z) : z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     bell(x::Int)
 
 Return the Bell number $B_x$.
@@ -1891,7 +1891,7 @@ function bell(x::Int)
     return Int(z)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     bell(x::ZZRingElem)
 
 Return the Bell number $B_x$.
@@ -1931,7 +1931,7 @@ function _binomial(n::ZZRingElem, k::ZZRingElem)
 end
 
 
-@doc Markdown.doc"""
+@doc raw"""
     binomial(n::ZZRingElem, k::ZZRingElem)
 
 Return the binomial coefficient $\frac{n (n-1) \cdots (n-k+1)}{k!}$.
@@ -1958,7 +1958,7 @@ function binomial(n::ZZRingElem, k::ZZRingElem)
     return negz ? neg!(z, z) : z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     binomial(n::UInt, k::UInt, ::ZZRing)
 
 Return the binomial coefficient $\frac{n!}{(n - k)!k!}$ as an `ZZRingElem`.
@@ -1970,7 +1970,7 @@ function binomial(n::UInt, k::UInt, ::ZZRing)
     return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     moebius_mu(x::ZZRingElem)
 
 Return the Moebius mu function of $x$ as an `Int`. The value
@@ -1982,7 +1982,7 @@ function moebius_mu(x::ZZRingElem)
                     (Ref{ZZRingElem},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     moebius_mu(x::Int)
 
 Return the Moebius mu function of $x$ as an `Int`. The value
@@ -1990,7 +1990,7 @@ returned is either $-1$, $0$ or $1$. If $x \leq 0$ we throw a `DomainError()`.
 """
 moebius_mu(x::Int) = moebius_mu(ZZRingElem(x))
 
-@doc Markdown.doc"""
+@doc raw"""
     jacobi_symbol(x::ZZRingElem, y::ZZRingElem)
 
 Return the value of the Jacobi symbol $\left(\frac{x}{y}\right)$. The modulus
@@ -2005,7 +2005,7 @@ function jacobi_symbol(x::ZZRingElem, y::ZZRingElem)
                     (Ref{ZZRingElem}, Ref{ZZRingElem}), x, y))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     jacobi_symbol(x::Int, y::Int)
 
 Return the value of the Jacobi symbol $\left(\frac{x}{y}\right)$. The modulus
@@ -2019,7 +2019,7 @@ function jacobi_symbol(x::Int, y::Int)
    return Int(ccall((:n_jacobi, libflint), Cint, (Int, UInt), x, UInt(y)))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     kronecker_symbol(x::ZZRingElem, y::ZZRingElem)
     kronecker_symbol(x::Int, y::Int)
 
@@ -2037,7 +2037,7 @@ function kronecker_symbol(x::ZZRingElem, y::ZZRingElem)
                     (Ref{ZZRingElem}, Ref{ZZRingElem}), x, y))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     divisor_sigma(x::ZZRingElem, y::Int)
     divisor_sigma(x::ZZRingElem, y::ZZRingElem)
     divisor_sigma(x::Int, y::Int)
@@ -2070,7 +2070,7 @@ end
 divisor_sigma(x::ZZRingElem, y::ZZRingElem) = divisor_sigma(x, Int(y))
 divisor_sigma(x::Int, y::Int) = Int(divisor_sigma(ZZRingElem(x), y))
 
-@doc Markdown.doc"""
+@doc raw"""
     euler_phi(x::ZZRingElem)
     euler_phi(x::Int)
 
@@ -2098,7 +2098,7 @@ end
 
 euler_phi(x::Int) = Int(euler_phi(ZZRingElem(x)))
 
-@doc Markdown.doc"""
+@doc raw"""
     number_of_partitions(x::Int)
     number_of_partitions(x::ZZRingElem)
 
@@ -2140,7 +2140,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     bin(n::ZZRingElem)
 
 Return $n$ as a binary string.
@@ -2154,7 +2154,7 @@ julia> bin(ZZ(12))
 """
 bin(n::ZZRingElem) = base(n, 2)
 
-@doc Markdown.doc"""
+@doc raw"""
     oct(n::ZZRingElem)
 
 Return $n$ as a octal string.
@@ -2168,7 +2168,7 @@ julia> oct(ZZ(12))
 """
 oct(n::ZZRingElem) = base(n, 8)
 
-@doc Markdown.doc"""
+@doc raw"""
     dec(n::ZZRingElem)
 
 Return $n$ as a decimal string.
@@ -2182,7 +2182,7 @@ julia> dec(ZZ(12))
 """
 dec(n::ZZRingElem) = base(n, 10)
 
-@doc Markdown.doc"""
+@doc raw"""
     hex(n::ZZRingElem) = base(n, 16)
 
 Return $n$ as a hexadecimal string.
@@ -2196,7 +2196,7 @@ julia> hex(ZZ(12))
 """
 hex(n::ZZRingElem) = base(n, 16)
 
-@doc Markdown.doc"""
+@doc raw"""
     base(n::ZZRingElem, b::Integer)
 
 Return $n$ as a string in base $b$. We require $2 \leq b \leq 62$.
@@ -2217,7 +2217,7 @@ function base(n::ZZRingElem, b::Integer)
     return s
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     ndigits(x::ZZRingElem, b::Integer)
 
 Return the number of digits of $x$ in the base $b$ (default is $b = 10$).
@@ -2268,7 +2268,7 @@ function Base.digits!(a::AbstractVector{T}, n::ZZRingElem; base::Integer = 10) w
    return a
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     nbits(x::ZZRingElem)
 
 Return the number of binary bits of $x$. We return zero if $x = 0$.
@@ -2289,7 +2289,7 @@ nbits(x::ZZRingElem) = iszero(x) ? 0 : Int(ccall((:fmpz_bits, libflint), Clong,
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     popcount(x::ZZRingElem)
 
 Return the number of ones in the binary representation of $x$.
@@ -2304,7 +2304,7 @@ julia> popcount(ZZ(12))
 popcount(x::ZZRingElem) = Int(ccall((:fmpz_popcnt, libflint), UInt,
                               (Ref{ZZRingElem},), x))
 
-@doc Markdown.doc"""
+@doc raw"""
     prevpow2(x::ZZRingElem)
 
 Return the previous power of $2$ up to including $x$.
@@ -2312,7 +2312,7 @@ Return the previous power of $2$ up to including $x$.
 prevpow2(x::ZZRingElem) = x < 0 ? -prevpow2(-x) :
                             (x <= 2 ? x : one(FlintZZ) << (ndigits(x, 2) - 1))
 
-@doc Markdown.doc"""
+@doc raw"""
     nextpow2(x::ZZRingElem)
 
 Return the next power of $2$ that is at least $x$.
@@ -2327,7 +2327,7 @@ julia> nextpow2(ZZ(12))
 nextpow2(x::ZZRingElem) = x < 0 ? -nextpow2(-x) :
                             (x <= 2 ? x : one(FlintZZ) << ndigits(x - 1, 2))
 
-@doc Markdown.doc"""
+@doc raw"""
     trailing_zeros(x::ZZRingElem)
 
 Return the number of trailing zeros in the binary representation of $x$.
@@ -2341,7 +2341,7 @@ trailing_zeros(x::ZZRingElem) = ccall((:fmpz_val2, libflint), Int,
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     clrbit!(x::ZZRingElem, c::Int)
 
 Clear bit $c$ of $x$, where the least significant bit is the $0$-th bit. Note
@@ -2364,7 +2364,7 @@ function clrbit!(x::ZZRingElem, c::Int)
     ccall((:fmpz_clrbit, libflint), Nothing, (Ref{ZZRingElem}, UInt), x, c)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     setbit!(x::ZZRingElem, c::Int)
 
 Set bit $c$ of $x$, where the least significant bit is the $0$-th bit. Note
@@ -2387,7 +2387,7 @@ function setbit!(x::ZZRingElem, c::Int)
     ccall((:fmpz_setbit, libflint), Nothing, (Ref{ZZRingElem}, UInt), x, c)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     combit!(x::ZZRingElem, c::Int)
 
 Complement bit $c$ of $x$, where the least significant bit is the $0$-th bit.
@@ -2410,7 +2410,7 @@ function combit!(x::ZZRingElem, c::Int)
     ccall((:fmpz_combit, libflint), Nothing, (Ref{ZZRingElem}, UInt), x, c)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     tstbit(x::ZZRingElem, c::Int)
 
 Return bit $i$ of x (numbered from 0) as `true` for 1 or `false` for 0.
@@ -2578,7 +2578,7 @@ function submul!(z::ZZRingElem, a::ZZRingElem, b::ZZRingElem)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     fmma!(r::ZZRingElem, a::ZZRingElem, b::ZZRingElem, c::ZZRingElem, d::ZZRingElem)
 
 Return $r = a b + c d$, changing $r$ in-place.
@@ -2589,7 +2589,7 @@ function fmma!(r::ZZRingElem, a::ZZRingElem, b::ZZRingElem, c::ZZRingElem, d::ZZ
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     fmms!(r::ZZRingElem, a::ZZRingElem, b::ZZRingElem, c::ZZRingElem, d::ZZRingElem)
 
 Return $r = a b - c d$, changing $r$ in-place.
@@ -2699,7 +2699,7 @@ rand(rng::AbstractRNG, R::ZZRing, n::AbstractArray) = R(rand(rng, n))
 
 rand(R::ZZRing, n::AbstractArray) = rand(Random.GLOBAL_RNG, R, n)
 
-@doc Markdown.doc"""
+@doc raw"""
     rand_bits(::ZZRing, b::Int)
 
 Return a random signed integer whose absolute value has $b$ bits.
@@ -2712,7 +2712,7 @@ function rand_bits(::ZZRing, b::Int)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rand_bits_prime(::ZZRing, n::Int, proved::Bool=true)
 
 Return a random prime number with the given number of bits. If only a
@@ -2898,7 +2898,7 @@ function _is_perfect_power(a::ZZRingElem)
   return rt, ex
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_perfect_power(a::IntegerUnion)
 
 Returns whether $a$ is a perfect power, that is, whether $a = m^r$ for some
@@ -2939,7 +2939,7 @@ function _maximal_integer_root(a::ZZRingElem)
   end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_prime_power(q::IntegerUnion) -> Bool
 
 Returns whether $q$ is a prime power.
@@ -2954,7 +2954,7 @@ end
 
 is_prime_power(q::Integer) = is_prime_power(ZZRingElem(q))
 
-@doc Markdown.doc"""
+@doc raw"""
     is_prime_power_with_data(q::IntegerUnion) -> Bool, ZZRingElem, Int
 
 Returns a flag indicating whether $q$ is a prime power and integers $p, e$ such

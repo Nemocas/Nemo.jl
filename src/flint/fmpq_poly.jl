@@ -28,7 +28,7 @@ var(a::QQPolyRing) = a.S
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     denominator(a::QQPolyRingElem)
 
 Return the least common denominator of the coefficients of the polynomial
@@ -736,7 +736,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     signature(f::QQPolyRingElem)
 
 Return the signature of $f$, i.e. a tuple $(r, s)$ such that $r$ is the number of

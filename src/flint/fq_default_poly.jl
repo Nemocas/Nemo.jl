@@ -706,7 +706,7 @@ function _factor_squarefree(x::FqPolyRingElem)
   return res
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     factor_distinct_deg(x::FqPolyRingElem)
 
 Return the distinct degree factorisation of a squarefree polynomial $x$.

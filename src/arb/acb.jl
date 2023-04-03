@@ -62,7 +62,7 @@ function one(r::AcbField)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     onei(r::AcbField)
 
 Return exact one times $i$ in the given Arb complex field.
@@ -74,7 +74,7 @@ function onei(r::AcbField)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     accuracy_bits(x::acb)
 
 Return the relative accuracy of $x$ measured in bits, capped between
@@ -397,7 +397,7 @@ divexact(x::acb, y::Rational{T}; check::Bool=true) where {T <: Integer} = x // y
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     isequal(x::acb, y::acb)
 
 Return `true` if the boxes $x$ and $y$ are precisely equal, i.e. their real
@@ -451,7 +451,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     overlaps(x::acb, y::acb)
 
 Returns `true` if any part of the box $x$ overlaps any part of the box $y$,
@@ -462,7 +462,7 @@ function overlaps(x::acb, y::acb)
   return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::acb, y::acb)
 
 Returns `true` if the box $x$ contains the box $y$, otherwise return
@@ -473,7 +473,7 @@ function contains(x::acb, y::acb)
   return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::acb, y::QQFieldElem)
 
 Returns `true` if the box $x$ contains the given rational value, otherwise
@@ -484,7 +484,7 @@ function contains(x::acb, y::QQFieldElem)
   return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::acb, y::ZZRingElem)
 
 Returns `true` if the box $x$ contains the given integer value, otherwise
@@ -501,7 +501,7 @@ function contains(x::acb, y::Int)
   return Bool(r)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::acb, y::Integer)
 
 Returns `true` if the box $x$ contains the given integer value, otherwise
@@ -509,7 +509,7 @@ return `false`.
 """
 contains(x::acb, y::Integer) = contains(x, ZZRingElem(y))
 
-@doc Markdown.doc"""
+@doc raw"""
     contains(x::acb, y::Rational{T}) where {T <: Integer}
 
 Returns `true` if the box $x$ contains the given rational value, otherwise
@@ -517,7 +517,7 @@ return `false`.
 """
 contains(x::acb, y::Rational{T}) where {T <: Integer} = contains(x, ZZRingElem(y))
 
-@doc Markdown.doc"""
+@doc raw"""
     contains_zero(x::acb)
 
 Returns `true` if the box $x$ contains zero, otherwise return `false`.
@@ -536,7 +536,7 @@ function is_unit(x::acb)
    !iszero(x)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     iszero(x::acb)
 
 Return `true` if $x$ is certainly zero, otherwise return `false`.
@@ -545,7 +545,7 @@ function iszero(x::acb)
    return Bool(ccall((:acb_is_zero, libarb), Cint, (Ref{acb},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isone(x::acb)
 
 Return `true` if $x$ is certainly one, otherwise return `false`.
@@ -554,7 +554,7 @@ function isone(x::acb)
    return Bool(ccall((:acb_is_one, libarb), Cint, (Ref{acb},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isfinite(x::acb)
 
 Return `true` if $x$ is finite, i.e. its real and imaginary parts have finite
@@ -564,7 +564,7 @@ function isfinite(x::acb)
    return Bool(ccall((:acb_is_finite, libarb), Cint, (Ref{acb},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_exact(x::acb)
 
 Return `true` if $x$ is exact, i.e. has its real and imaginary parts have
@@ -574,7 +574,7 @@ function is_exact(x::acb)
    return Bool(ccall((:acb_is_exact, libarb), Cint, (Ref{acb},), x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     isinteger(x::acb)
 
 Return `true` if $x$ is an exact integer, otherwise return `false`.
@@ -641,7 +641,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     trim(x::acb)
 
 Return an `acb` box containing $x$ but which may be more economical,
@@ -653,7 +653,7 @@ function trim(x::acb)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     unique_integer(x::acb)
 
 Return a pair where the first value is a boolean and the second is an `ZZRingElem`
@@ -688,7 +688,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     const_pi(r::AcbField)
 
 Return $\pi = 3.14159\ldots$ as an element of $r$.
@@ -713,7 +713,7 @@ function Base.sqrt(x::acb; check::Bool=true)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rsqrt(x::acb)
 
 Return the reciprocal of the square root of $x$, i.e. $1/\sqrt{x}$.
@@ -748,7 +748,7 @@ function Base.expm1(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     cispi(x::acb)
 
 Return the exponential of $\pi i x$.
@@ -759,7 +759,7 @@ function cispi(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     root_of_unity(C::AcbField, k::Int)
 
 Return $\exp(2\pi i/k)$.
@@ -849,7 +849,7 @@ function atan(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     log_sinpi(x::acb)
 
 Return $\log\sin(\pi x)$, constructed without branch cuts off the real line.
@@ -860,7 +860,7 @@ function log_sinpi(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gamma(x::acb)
 
 Return the Gamma function evaluated at $x$.
@@ -871,7 +871,7 @@ function gamma(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rgamma(x::acb)
 
 Return the reciprocal of the Gamma function evaluated at $x$.
@@ -882,7 +882,7 @@ function rgamma(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lgamma(x::acb)
 
 Return the logarithm of the Gamma function evaluated at $x$.
@@ -893,7 +893,7 @@ function lgamma(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     digamma(x::acb)
 
 Return the  logarithmic derivative of the gamma function evaluated at $x$,
@@ -905,7 +905,7 @@ function digamma(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     zeta(x::acb)
 
 Return the Riemann zeta function evaluated at $x$.
@@ -916,7 +916,7 @@ function zeta(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     barnes_g(x::acb)
 
 Return the Barnes $G$-function, evaluated at $x$.
@@ -927,7 +927,7 @@ function barnes_g(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     log_barnes_g(x::acb)
 
 Return the logarithm of the Barnes $G$-function, evaluated at $x$.
@@ -938,7 +938,7 @@ function log_barnes_g(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     agm(x::acb)
 
 Return the arithmetic-geometric mean of $1$ and $x$.
@@ -949,7 +949,7 @@ function agm(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     erf(x::acb)
 
 Return the error function evaluated at $x$.
@@ -960,7 +960,7 @@ function erf(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     erfi(x::acb)
 
 Return the imaginary error function evaluated at $x$.
@@ -971,7 +971,7 @@ function erfi(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     erfc(x::acb)
 
 Return the complementary error function evaluated at $x$.
@@ -982,7 +982,7 @@ function erfc(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     exp_integral_ei(x::acb)
 
 Return the exponential integral evaluated at $x$.
@@ -993,7 +993,7 @@ function exp_integral_ei(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sin_integral(x::acb)
 
 Return the sine integral evaluated at $x$.
@@ -1004,7 +1004,7 @@ function sin_integral(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     cos_integral(x::acb)
 
 Return the exponential cosine integral evaluated at $x$.
@@ -1015,7 +1015,7 @@ function cos_integral(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sinh_integral(x::acb)
 
 Return the hyperbolic sine integral evaluated at $x$.
@@ -1026,7 +1026,7 @@ function sinh_integral(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     cosh_integral(x::acb)
 
 Return the hyperbolic cosine integral evaluated at $x$.
@@ -1037,7 +1037,7 @@ function cosh_integral(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     dedekind_eta(x::acb)
 
 Return the Dedekind eta function $\eta(\tau)$ at $\tau = x$.
@@ -1048,7 +1048,7 @@ function dedekind_eta(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     modular_weber_f(x::acb)
 
 Return the modular Weber function
@@ -1061,7 +1061,7 @@ function modular_weber_f(x::acb)
    return divexact(dedekind_eta(x)^2, dedekind_eta(x_on_2)*dedekind_eta(x_times_2))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     modular_weber_f1(x::acb)
 
 Return the modular Weber function
@@ -1073,7 +1073,7 @@ function modular_weber_f1(x::acb)
    return divexact(dedekind_eta(x_on_2), dedekind_eta(x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     modular_weber_f2(x::acb)
 
 Return the modular Weber function
@@ -1085,7 +1085,7 @@ function modular_weber_f2(x::acb)
    return divexact(dedekind_eta(x_times_2), dedekind_eta(x))*sqrt(parent(x)(2))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     j_invariant(x::acb)
 
 Return the $j$-invariant $j(\tau)$ at $\tau = x$.
@@ -1096,7 +1096,7 @@ function j_invariant(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     modular_lambda(x::acb)
 
 Return the modular lambda function $\lambda(\tau)$ at $\tau = x$.
@@ -1107,7 +1107,7 @@ function modular_lambda(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     modular_delta(x::acb)
 
 Return the modular delta function $\Delta(\tau)$ at $\tau = x$.
@@ -1118,7 +1118,7 @@ function modular_delta(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     eisenstein_g(k::Int, x::acb)
 
 Return the non-normalized Eisenstein series $G_k(\tau)$ of
@@ -1141,7 +1141,7 @@ function eisenstein_g(k::Int, x::acb)
   return z[end]
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     elliptic_k(x::acb)
 
 Return the complete elliptic integral $K(x)$.
@@ -1152,7 +1152,7 @@ function elliptic_k(x::acb)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     elliptic_e(x::acb)
 
 Return the complete elliptic integral $E(x)$.
@@ -1179,7 +1179,7 @@ function sincospi(x::acb)
   return (s, c)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     sinhcosh(x::acb)
 
 Return a tuple $s, c$ consisting of the hyperbolic sine and cosine of $x$.
@@ -1192,7 +1192,7 @@ function sinhcosh(x::acb)
   return (s, c)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     zeta(s::acb, a::acb)
 
 Return the Hurwitz zeta function $\zeta(s,a)$.
@@ -1204,7 +1204,7 @@ function zeta(s::acb, a::acb)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     polygamma(s::acb, a::acb)
 
 Return the generalised polygamma function $\psi(s,z)$.
@@ -1223,7 +1223,7 @@ function rising_factorial(x::acb, n::UInt)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rising_factorial(x::acb, n::Int)
 
 Return the rising factorial $x(x + 1)\ldots (x + n - 1)$ as an Acb.
@@ -1241,7 +1241,7 @@ function rising_factorial2(x::acb, n::UInt)
   return (z, w)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     rising_factorial2(x::acb, n::Int)
 
 Return a tuple containing the rising factorial $x(x + 1)\ldots (x + n - 1)$
@@ -1266,13 +1266,13 @@ function polylog(s::Int, a::acb)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     polylog(s::Union{acb,Int}, a::acb)
 
 Return the polylogarithm Li$_s(a)$.
 """ polylog(s::Union{acb,Int}, ::acb)
 
-@doc Markdown.doc"""
+@doc raw"""
     log_integral(x::acb)
 
 Return the logarithmic integral, evaluated at $x$.
@@ -1284,7 +1284,7 @@ function log_integral(x::acb)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     log_integral_offset(x::acb)
 
 Return the offset logarithmic integral, evaluated at $x$.
@@ -1296,7 +1296,7 @@ function log_integral_offset(x::acb)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     exp_integral_e(s::acb, x::acb)
 
 Return the generalised exponential integral $E_s(x)$.
@@ -1308,7 +1308,7 @@ function exp_integral_e(s::acb, x::acb)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gamma(s::acb, x::acb)
 
 Return the upper incomplete gamma function $\Gamma(s,x)$.
@@ -1320,7 +1320,7 @@ function gamma(s::acb, x::acb)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gamma_regularized(s::acb, x::acb)
 
 Return the regularized upper incomplete gamma function
@@ -1333,7 +1333,7 @@ function gamma_regularized(s::acb, x::acb)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gamma_lower(s::acb, x::acb)
 
 Return the lower incomplete gamma function $\gamma(s,x) / \Gamma(s)$.
@@ -1345,7 +1345,7 @@ function gamma_lower(s::acb, x::acb)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gamma_lower_regularized(s::acb, x::acb)
 
 Return the regularized lower incomplete gamma function
@@ -1358,7 +1358,7 @@ function gamma_lower_regularized(s::acb, x::acb)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     bessel_j(nu::acb, x::acb)
 
 Return the Bessel function $J_{\nu}(x)$.
@@ -1370,7 +1370,7 @@ function bessel_j(nu::acb, x::acb)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     bessel_y(nu::acb, x::acb)
 
 Return the Bessel function $Y_{\nu}(x)$.
@@ -1382,7 +1382,7 @@ function bessel_y(nu::acb, x::acb)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     bessel_i(nu::acb, x::acb)
 
 Return the Bessel function $I_{\nu}(x)$.
@@ -1394,7 +1394,7 @@ function bessel_i(nu::acb, x::acb)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     bessel_k(nu::acb, x::acb)
 
 Return the Bessel function $K_{\nu}(x)$.
@@ -1406,7 +1406,7 @@ function bessel_k(nu::acb, x::acb)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     airy_ai(x::acb)
 
 Return the Airy function $\operatorname{Ai}(x)$.
@@ -1419,7 +1419,7 @@ function airy_ai(x::acb)
   return ai
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     airy_bi(x::acb)
 
 Return the Airy function $\operatorname{Bi}(x)$.
@@ -1432,7 +1432,7 @@ function airy_bi(x::acb)
   return bi
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     airy_ai_prime(x::acb)
 
 Return the derivative of the Airy function $\operatorname{Ai}^\prime(x)$.
@@ -1445,7 +1445,7 @@ function airy_ai_prime(x::acb)
   return ai_prime
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     airy_bi_prime(x::acb)
 
 Return the derivative of the Airy function $\operatorname{Bi}^\prime(x)$.
@@ -1458,7 +1458,7 @@ function airy_bi_prime(x::acb)
   return bi_prime
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     hypergeometric_1f1(a::acb, b::acb, x::acb)
 
 Return the confluent hypergeometric function ${}_1F_1(a,b,x)$.
@@ -1470,7 +1470,7 @@ function hypergeometric_1f1(a::acb, b::acb, x::acb)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     hypergeometric_1f1_regularized(a::acb, b::acb, x::acb)
 
 Return the regularized confluent hypergeometric function
@@ -1483,7 +1483,7 @@ function hypergeometric_1f1_regularized(a::acb, b::acb, x::acb)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     hypergeometric_u(a::acb, b::acb, x::acb)
 
 Return the confluent hypergeometric function $U(a,b,x)$.
@@ -1495,7 +1495,7 @@ function hypergeometric_u(a::acb, b::acb, x::acb)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     hypergeometric_2f1(a::acb, b::acb, c::acb, x::acb; flags=0)
 
 Return the Gauss hypergeometric function ${}_2F_1(a,b,c,x)$.
@@ -1507,7 +1507,7 @@ function hypergeometric_2f1(a::acb, b::acb, c::acb, x::acb; flags=0)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     jacobi_theta(z::acb, tau::acb)
 
 Return a tuple of four elements containing the Jacobi theta function values
@@ -1524,7 +1524,7 @@ function jacobi_theta(z::acb, tau::acb)
   return (t1, t2, t3, t4)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     weierstrass_p(z::acb, tau::acb)
 
 Return the Weierstrass elliptic function $\wp(z,\tau)$.
@@ -1536,7 +1536,7 @@ function weierstrass_p(z::acb, tau::acb)
   return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     weierstrass_p_prime(z::acb, tau::acb)
 
 Return the derivative of the Weierstrass elliptic function $\frac{\partial}{\partial z}\wp(z,\tau)$.
@@ -1548,7 +1548,7 @@ function weierstrass_p_prime(z::acb, tau::acb)
   return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     agm(x::acb, y::acb)
 
 Return the arithmetic-geometric mean of $x$ and $y$.
@@ -1563,7 +1563,7 @@ function agm(x::acb, y::acb)
   end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lindep(A::Vector{acb}, bits::Int)
 
 Find a small linear combination of the entries of the array $A$ that is small
@@ -1589,7 +1589,7 @@ function lindep(A::Vector{acb}, bits::Int)
   return [L[1, i] for i = 1:n]
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lindep(A::Matrix{acb}, bits::Int)
 
 Find a (common) small linear combination of the entries in each row of the array $A$,

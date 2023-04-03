@@ -13,7 +13,7 @@ export FlintPadicField, padic, prime, teichmuller, log, get_printing_mode,
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     O(R::FlintPadicField, m::ZZRingElem)
 
 Construct the value $0 + O(p^n)$ given $m = p^n$. An exception results if $m$
@@ -36,7 +36,7 @@ function O(R::FlintPadicField, m::ZZRingElem)
    return d
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     O(R::FlintPadicField, m::QQFieldElem)
 
 Construct the value $0 + O(p^n)$ given $m = p^n$. An exception results if $m$
@@ -60,7 +60,7 @@ function O(R::FlintPadicField, m::QQFieldElem)
    return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     O(R::FlintPadicField, m::Integer)
 
 Construct the value $0 + O(p^n)$ given $m = p^n$. An exception results if $m$
@@ -105,7 +105,7 @@ function Base.hash(a::padic, h::UInt)
    return xor(hash(lift(FlintQQ, a), h), xor(hash(prime(parent(a)), h), h))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     prime(R::FlintPadicField)
 
 Return the prime $p$ for the given $p$-adic field.
@@ -117,7 +117,7 @@ function prime(R::FlintPadicField)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     precision(a::padic)
 
 Return the precision of the given $p$-adic field element, i.e. if the element
@@ -125,7 +125,7 @@ is known to $O(p^n)$ this function will return $n$.
 """
 precision(a::padic) = a.N
 
-@doc Markdown.doc"""
+@doc raw"""
     valuation(a::padic)
 
 Return the valuation of the given $p$-adic field element, i.e. if the given
@@ -134,7 +134,7 @@ will return $n$.
 """
 valuation(a::padic) = iszero(a) ? a.N : a.v
 
-@doc Markdown.doc"""
+@doc raw"""
     lift(R::QQField, a::padic)
 
 Return a lift of the given $p$-adic field element to $\mathbb{Q}$.
@@ -147,7 +147,7 @@ function lift(R::QQField, a::padic)
     return r
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lift(R::ZZRing, a::padic)
 
 Return a lift of the given $p$-adic field element to $\mathbb{Z}$.
@@ -193,7 +193,7 @@ characteristic(R::FlintPadicField) = 0
 
 const PADIC_PRINTING_MODE = Ref(Cint(1))
 
-@doc Markdown.doc"""
+@doc raw"""
     get_printing_mode(::Type{FlintPadicField})
 
 Get the printing mode for the elements of the p-adic field `R`.
@@ -202,7 +202,7 @@ function get_printing_mode(::Type{FlintPadicField})
    return flint_padic_printing_mode[PADIC_PRINTING_MODE[] + 1]
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     set_printing_mode(::Type{FlintPadicField}, printing::Symbol)
 
 Set the printing mode for the elements of the p-adic field `R`. Possible values
@@ -605,7 +605,7 @@ function log(a::padic)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     teichmuller(a::padic)
 
 Return the Teichmuller lift of the $p$-adic value $a$. We require the
@@ -736,7 +736,7 @@ end
 
 # inner constructor is also used directly
 
-@doc Markdown.doc"""
+@doc raw"""
     FlintPadicField(p::Integer, prec::Int; kw...)
 
 Returns the parent object for the $p$-adic field for given prime $p$, where

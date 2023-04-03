@@ -388,7 +388,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     <<(x::ZZMatrix, y::Int)
 
 Return $2^yx$.
@@ -402,7 +402,7 @@ function <<(x::ZZMatrix, y::Int)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     >>(x::ZZMatrix, y::Int)
 
 Return $x/2^y$ where rounding is towards zero.
@@ -501,7 +501,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     pseudo_inv(x::ZZMatrix)
 
 Return a tuple $(z, d)$ consisting of a matrix $z$ and denominator $d$ such
@@ -570,7 +570,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     reduce_mod(x::ZZMatrix, y::ZZRingElem)
 
 Reduce the entries of $x$ modulo $y$ and return the result.
@@ -582,7 +582,7 @@ function reduce_mod(x::ZZMatrix, y::ZZRingElem)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     reduce_mod(x::ZZMatrix, y::Integer)
 
 Reduce the entries of $x$ modulo $y$ and return the result.
@@ -677,7 +677,7 @@ function det(x::ZZMatrix)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     det_divisor(x::ZZMatrix)
 
 Return some positive divisor of the determinant of $x$, if the determinant
@@ -691,7 +691,7 @@ function det_divisor(x::ZZMatrix)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     det_given_divisor(x::ZZMatrix, d::ZZRingElem, proved=true)
 
 Return the determinant of $x$ given a positive divisor of its determinant. If
@@ -706,7 +706,7 @@ function det_given_divisor(x::ZZMatrix, d::ZZRingElem, proved=true)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     det_given_divisor(x::ZZMatrix, d::Integer, proved=true)
 
 Return the determinant of $x$ given a positive divisor of its determinant. If
@@ -736,7 +736,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     hadamard(R::ZZMatrixSpace)
 
 Return the Hadamard matrix for the given matrix space. The number of rows and
@@ -751,7 +751,7 @@ function hadamard(R::ZZMatrixSpace)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_hadamard(x::ZZMatrix)
 
 Return `true` if the given matrix is Hadamard, otherwise return `false`.
@@ -771,7 +771,7 @@ end
 # hnf(x::ZZMatrix) call to something more performant, while at the same time
 # being able to call the Nemo/flint implementation.
 
-@doc Markdown.doc"""
+@doc raw"""
     hnf(x::ZZMatrix)
 
 Return the Hermite Normal Form of $x$.
@@ -787,7 +787,7 @@ function __hnf(x)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     hnf_with_transform(x::ZZMatrix)
 
 Compute a tuple $(H, T)$ where $H$ is the Hermite normal form of $x$ and $T$
@@ -805,7 +805,7 @@ function __hnf_with_transform(x::ZZMatrix)
    return z, u
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     hnf_modular(x::ZZMatrix, d::ZZRingElem)
 
 Compute the Hermite normal form of $x$ given that $d$ is a multiple of the
@@ -818,7 +818,7 @@ function hnf_modular(x::ZZMatrix, d::ZZRingElem)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     hnf_modular_eldiv(x::ZZMatrix, d::ZZRingElem)
 
 Compute the Hermite normal form of $x$ given that $d$ is a multiple of the
@@ -833,7 +833,7 @@ function hnf_modular_eldiv(x::ZZMatrix, d::ZZRingElem)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_hnf(x::ZZMatrix)
 
 Return `true` if the given matrix is in Hermite Normal Form, otherwise return
@@ -865,7 +865,7 @@ mutable struct lll_ctx
 end
 
 
-@doc Markdown.doc"""
+@doc raw"""
     lll_with_transform(x::ZZMatrix, ctx::lll_ctx = lll_ctx(0.99, 0.51))
 
 Compute a tuple $(L, T)$ where $L$ is the LLL reduction of $a$ and $T$ is a
@@ -883,7 +883,7 @@ function lll_with_transform(x::ZZMatrix, ctx::lll_ctx = lll_ctx(0.99, 0.51))
    return z, u
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lll(x::ZZMatrix, ctx::lll_ctx = lll_ctx(0.99, 0.51))
 
 Return the LLL reduction of the matrix $x$. By default the matrix $x$ is a
@@ -902,7 +902,7 @@ function lll(x::ZZMatrix, ctx::lll_ctx = lll_ctx(0.99, 0.51))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lll!(x::ZZMatrix, ctx::lll_ctx = lll_ctx(0.99, 0.51))
 
 Perform the LLL reduction of the matrix $x$ inplace. By default the matrix
@@ -920,7 +920,7 @@ function lll!(x::ZZMatrix, ctx::lll_ctx = lll_ctx(0.99, 0.51))
    return x
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lll_gram_with_transform(x::ZZMatrix, ctx::lll_ctx = lll_ctx(0.99, 0.51, :gram))
 
 Given the Gram matrix $x$ of a matrix $M$, compute a tuple $(L, T)$ where
@@ -938,7 +938,7 @@ function lll_gram_with_transform(x::ZZMatrix, ctx::lll_ctx = lll_ctx(0.99, 0.51,
    return z, u
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lll_gram(x::ZZMatrix, ctx::lll_ctx = lll_ctx(0.99, 0.51, :gram))
 
 Given the Gram matrix $x$ of a matrix, compute the Gram matrix of its LLL
@@ -951,7 +951,7 @@ function lll_gram(x::ZZMatrix, ctx::lll_ctx = lll_ctx(0.99, 0.51, :gram))
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lll_gram!(x::ZZMatrix, ctx::lll_ctx = lll_ctx(0.99, 0.51, :gram))
 
 Given the Gram matrix $x$ of a matrix, compute the Gram matrix of its LLL
@@ -964,7 +964,7 @@ function lll_gram!(x::ZZMatrix, ctx::lll_ctx = lll_ctx(0.99, 0.51, :gram))
 end
 
 
-@doc Markdown.doc"""
+@doc raw"""
     lll_with_removal_transform(x::ZZMatrix, b::ZZRingElem, ctx::lll_ctx = lll_ctx(0.99, 0.51))
 
 Compute a tuple $(r, L, T)$ where the first $r$ rows of $L$ are those
@@ -982,7 +982,7 @@ function lll_with_removal_transform(x::ZZMatrix, b::ZZRingElem, ctx::lll_ctx = l
    return d, z, u
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     lll_with_removal(x::ZZMatrix, b::ZZRingElem, ctx::lll_ctx = lll_ctx(0.99, 0.51))
 
 Compute the LLL reduction of $x$ and throw away rows whose norm exceeds
@@ -1020,7 +1020,7 @@ function nullspace(x::ZZMatrix)
   return ncols(x), identity_matrix(x, ncols(x))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     nullspace_right_rational(x::ZZMatrix)
 
 Return a tuple $(r, U)$ consisting of a matrix $U$ such that the first $r$ columns
@@ -1067,7 +1067,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     snf(x::ZZMatrix)
 
 Compute the Smith normal form of $x$.
@@ -1079,7 +1079,7 @@ function snf(x::ZZMatrix)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     snf_diagonal(x::ZZMatrix)
 
 Given a diagonal matrix $x$ compute the Smith normal form of $x$.
@@ -1091,7 +1091,7 @@ function snf_diagonal(x::ZZMatrix)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_snf(x::ZZMatrix)
 
 Return `true` if $x$ is in Smith normal form, otherwise return `false`.
@@ -1107,7 +1107,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     solve(a::ZZMatrix, b::ZZMatrix) -> ZZMatrix
 
 Return a matrix $x$ such that $ax = b$. An exception is raised
@@ -1133,7 +1133,7 @@ end
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     cansolve(a::ZZMatrix, b::ZZMatrix) -> Bool, ZZMatrix
 
 Return true and a matrix $x$ such that $ax = b$, or false and some matrix
@@ -1251,7 +1251,7 @@ function can_solve_with_solution(a::ZZMatrix, b::ZZMatrix; side::Symbol = :right
 end
 
 
-@doc Markdown.doc"""
+@doc raw"""
     cansolve_with_nullspace(a::ZZMatrix, b::ZZMatrix) -> Bool, ZZMatrix, ZZMatrix
 
 Return true, a matrix $x$ and a matrix $k$ such that $ax = b$ and the columns
@@ -1307,7 +1307,7 @@ function cansolve_with_nullspace(a::ZZMatrix, b::ZZMatrix)
    return true, (z*T), N
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     solve_rational(a::ZZMatrix, b::ZZMatrix)
 
 If it exists, return a tuple $(x, d)$ consisting of a column vector $x$ such
@@ -1330,7 +1330,7 @@ function Generic.solve_with_det(a::ZZMatrix, b::ZZMatrix)
    return solve_rational(a, b)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     solve_dixon(a::ZZMatrix, b::ZZMatrix)
 
 Return a tuple $(x, m)$ consisting of a column vector $x$ such that $ax = b

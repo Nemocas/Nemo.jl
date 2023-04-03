@@ -47,7 +47,7 @@ function Base.hash(a::FqPolyRepFieldElem, h::UInt)
    return b
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     coeff(x::FqPolyRepFieldElem, n::Int)
 
 Return the degree $n$ coefficient of the polynomial representing the given
@@ -73,7 +73,7 @@ function one(a::FqPolyRepField)
    return d
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gen(a::FqPolyRepField)
 
 Return the generator of the finite field. Note that this is only guaranteed
@@ -92,7 +92,7 @@ iszero(a::FqPolyRepFieldElem) = ccall((:fq_is_zero, libflint), Bool,
 isone(a::FqPolyRepFieldElem) = ccall((:fq_is_one, libflint), Bool,
                     (Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}), a, a.parent)
 
-@doc Markdown.doc"""
+@doc raw"""
     is_gen(a::FqPolyRepFieldElem)
 
 Return `true` if the given finite field element is the generator of the
@@ -117,7 +117,7 @@ function order(a::FqPolyRepField)
    return d
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     degree(a::FqPolyRepField)
 
 Return the degree of the given finite field.
@@ -394,7 +394,7 @@ function is_square_with_sqrt(x::FqPolyRepFieldElem)
    return (Bool(flag), z)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     pth_root(x::FqPolyRepFieldElem)
 
 Return the $p$-th root of $x$ in the finite field of characteristic $p$. This
@@ -407,7 +407,7 @@ function pth_root(x::FqPolyRepFieldElem)
    return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     tr(x::FqPolyRepFieldElem)
 
 Return the trace of $x$. This is an element of $\mathbb{F}_p$, but the value returned
@@ -420,7 +420,7 @@ function tr(x::FqPolyRepFieldElem)
    return parent(x)(z)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     norm(x::FqPolyRepFieldElem)
 
 Return the norm of $x$. This is an element of $\mathbb{F}_p$, but the value returned
@@ -433,7 +433,7 @@ function norm(x::FqPolyRepFieldElem)
    return parent(x)(z)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     frobenius(x::FqPolyRepFieldElem, n = 1)
 
 Return the iterated Frobenius $\sigma_p^n(x)$ where $\sigma_p$ is the
@@ -454,7 +454,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     lift(R::FpPolyRing, x::FqPolyRepFieldElem)
 
 Lift the finite field element `x` to a polynomial over the prime field.
@@ -526,7 +526,7 @@ Random.gentype(::Type{T}) where {T<:FinField} = elem_type(T)
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     modulus(k::FqPolyRepField, var::String="T")
 
 Return the modulus defining the finite field $k$.
@@ -619,7 +619,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     FlintFiniteField(char::ZZRingElem, deg::Int, s::AbstractString; cached = true)
 Returns a tuple $S, x$ consisting of a finite field parent object $S$ and
 generator $x$ for the finite field of the given characteristic and degree.
@@ -636,7 +636,7 @@ function FlintFiniteField(char::ZZRingElem, deg::Int, s::Union{AbstractString,Sy
    return parent_obj, gen(parent_obj)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     FlintFiniteField(pol::Union{ZZModPolyRingElem, FpPolyRingElem}, s::Union{AbstractString,Symbol}; cached = true, check = true)
 Returns a tuple $S, x$ consisting of a finite field parent object $S$ and
 generator $x$ for the finite field over $F_p$ defined by the given
@@ -656,7 +656,7 @@ function FlintFiniteField(pol::Union{ZZModPolyRingElem, FpPolyRingElem},
    return parent_obj, gen(parent_obj)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     FlintFiniteField(F::FqPolyRepField, deg::Int, s::AbstractString; cached = true)
 
 Return a finite field with the same type as `F` but with a possibly different

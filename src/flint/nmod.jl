@@ -324,7 +324,7 @@ function gcd(x::zzModRingElem, y::zzModRingElem)
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     gcdx(a::zzModRingElem, b::zzModRingElem)
 
 Compute the extended gcd with the Euclidean structure inherited from

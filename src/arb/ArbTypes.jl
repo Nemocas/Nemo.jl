@@ -289,7 +289,7 @@ end
 # arb as in arblib
 const ARB_DEFAULT_PRECISION = Ref{Int}(64)
 
-@doc Markdown.doc"""
+@doc raw"""
     set_precision!(::Type{Balls}, n::Int)
 
 Set the precision for all ball arithmetic to be `n`.
@@ -309,7 +309,7 @@ function set_precision!(::Type{Balls}, n::Int)
   ARB_DEFAULT_PRECISION[] = n
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     precision(::Type{Balls})
 
 Return the precision for ball arithmetic.
@@ -325,7 +325,7 @@ function Base.precision(::Type{Balls})
   return ARB_DEFAULT_PRECISION[]
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     set_precision!(f, ::Type{Balls}, n::Int)
 
 Change ball arithmetic precision to `n` for the duration of `f`..

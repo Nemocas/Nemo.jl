@@ -59,7 +59,7 @@ end
 
 characteristic(::ZZPolyRing) = 0
 
-@doc Markdown.doc"""
+@doc raw"""
     height(a::ZZPolyRingElem)
 
 Return the largest of the absolute values of the coefficients of a.
@@ -651,7 +651,7 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     signature(f::ZZPolyRingElem)
 
 Return the signature of $f$, i.e. a tuple $(r, s)$ such that $r$ is the number of
@@ -775,7 +775,7 @@ function chebyshev_u(n::Int, x::ZZPolyRingElem)
    return is_gen(x) ? z : compose(z, x)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     cyclotomic(n::Int, x::ZZPolyRingElem)
 
 Return the $n$th cyclotomic polynomial, defined as
@@ -789,7 +789,7 @@ function cyclotomic(n::Int, x::ZZPolyRingElem)
    return is_gen(x) ? z : compose(z, x)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     swinnerton_dyer(n::Int, x::ZZPolyRingElem)
 
 Return the Swinnerton-Dyer polynomial $S_n$, defined as the integer
@@ -806,7 +806,7 @@ function swinnerton_dyer(n::Int, x::ZZPolyRingElem)
    return is_gen(x) ? z : compose(z, x)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     cos_minpoly(n::Int, x::ZZPolyRingElem)
 
 Return the minimal polynomial of $2 \cos(2 \pi / n)$. For suitable choice of
@@ -820,7 +820,7 @@ function cos_minpoly(n::Int, x::ZZPolyRingElem)
    return is_gen(x) ? z : compose(z, x)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     theta_qexp(e::Int, n::Int, x::ZZPolyRingElem)
 
 Return the $q$-expansion to length $n$ of the Jacobi theta function raised to
@@ -834,7 +834,7 @@ function theta_qexp(e::Int, n::Int, x::ZZPolyRingElem)
    return is_gen(x) ? z : compose(z, x)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     eta_qexp(e::Int, n::Int, x::ZZPolyRingElem)
 
 Return the $q$-expansion to length $n$ of the Dedekind eta function (without

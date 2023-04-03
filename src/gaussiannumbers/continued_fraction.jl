@@ -315,7 +315,7 @@ function _left_and_right(x::arb)
    end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     continued_fraction(x; limit::Int = 0)
 
 Return the vector of the first `limit` partial quotients of the continued
@@ -328,7 +328,7 @@ function continued_fraction(x::arb; limit::Int = 0)
    return _continued_fraction_ball(xln, xld, xrn, xrd, limit, false)[1]
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     continued_fraction_with_matrix(x; limit::Int = 0)
 
 Return the vector of the first `limit` partial quotients of the continued
@@ -378,7 +378,7 @@ function Base.iterate(it::ConvergentsIterator{T, R}, state) where {T, R}
    return (m[1]//m[3], (m, n + 1))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     convergents(a::Vector)
 
 Gives the iterable sequence of convergents of a finite continued fraction from

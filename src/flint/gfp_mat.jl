@@ -112,7 +112,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     strong_echelon_form(a::fpMatrix)
 
 Return the strong echeleon form of $a$. The matrix $a$ must have at least as
@@ -136,7 +136,7 @@ function strong_echelon_form(a::fpMatrix)
   return z
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     howell_form(a::fpMatrix)
 
 Return the Howell normal form of $a$. The matrix $a$ must have at least as
@@ -219,7 +219,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     lift(a::fpMatrix)
 
 Return a lift of the matrix $a$ to a matrix over $\mathbb{Z}$, i.e. where the

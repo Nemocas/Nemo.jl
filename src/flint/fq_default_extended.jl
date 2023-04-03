@@ -9,7 +9,7 @@ import AbstractAlgebra: _absolute_basis
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     is_absolute(F::FqField)
 
 Return whether the base field of $F$ is a prime field.
@@ -22,7 +22,7 @@ is_absolute(F::FqField) = F.isabsolute
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     base_field(F::FqField)
 
 Return the base field of `F`.
@@ -44,7 +44,7 @@ end
 ################################################################################
 
 # Should be cached on the field
-@doc Markdown.doc"""
+@doc raw"""
     prime_field(F::FqField)
 
 Return the prime field of `F`.
@@ -77,7 +77,7 @@ function _coerce_to_prime_field(a::FqFieldElem)
   return K(lift(ZZ, a))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     defining_polynomial([R::FqPolyRing], L::FqField)
 
 Return the defining polynomial of `L` as a polynomial over the
@@ -113,7 +113,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     degree(a::FqField)
 
 Return the degree of the given finite field over the base field.
@@ -126,7 +126,7 @@ function degree(a::FqField)
   end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     absolute_degree(a::FqField)
 
 Return the degree of the given finite field over the prime field.
@@ -145,7 +145,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     gen(a::FqField)
 
 Return the algebra generator of the finite field over its base field.
@@ -161,7 +161,7 @@ function gen(L::FqField)
   end
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_gen(a::FqFieldElem)
 
 Return `true` if the given finite field element is the generator of the
@@ -199,7 +199,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     coeff(x::FqFieldElem, n::Int)
 
 Return the degree $n$ coefficient (as an element of the base field) of the
@@ -218,7 +218,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     frobenius(x::FqFieldElem, n = 1)
 
 Return the iterated Frobenius $x^{q^n}$ of an element $x$, where $q$ is
@@ -237,7 +237,7 @@ function frobenius(x::FqFieldElem, n = 1)
    return _frobenius(x, m)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     absolute_frobenius(x::FqFieldElem, n = 1)
 
 Return the iterated absolute Frobenius $x^{p^n}$, where $p$ is the
@@ -254,7 +254,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     basis(F::FqField)
 
 Return the list $1,a,a^2,\dotsc,a^{d-1}$, where $d$ is the degree of $F$
@@ -360,7 +360,7 @@ end
 #
 ################################################################################
 
-@doc Markdown.doc"""
+@doc raw"""
     norm(x::FqFieldElem)
 
 Return the norm of $x$. This is an element of the base field.
@@ -376,7 +376,7 @@ function norm(a::FqFieldElem)
   return isodd(d) ? -constant_coefficient(f) : constant_coefficient(f)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     absolute_norm(x::FqFieldElem)
 
 Return the absolute norm of $x$. This is an element of the prime field.
@@ -385,7 +385,7 @@ function absolute_norm(a::FqFieldElem)
   return prime_field(parent(a))(_norm(a))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     tr(x::FqFieldElem)
 
 Return the trace of $x$. This is an element of the base field.
@@ -399,7 +399,7 @@ function tr(a::FqFieldElem)
   return -coeff(f, d - 1)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     absolute_tr(x::FqFieldElem)
 
 Return the absolute trace of $x$. This is an element of the prime field.
@@ -646,7 +646,7 @@ function NGFiniteField(f::FqPolyRingElem, s::AbstractString = "o"; cached::Bool 
   return F, gen(F)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     _FiniteField(q::IntegerUnion, s::String; cached::Bool, check::Bool)
     _FiniteField(p::IntegerUnion, d::Int, s::String; cached::Bool, check::Bool)
     _FiniteField(f::FqPolyRingElem; s::String; cached::Bool, check::Bool)
@@ -660,7 +660,7 @@ $S = k[t]/(f)$ will be constructed as a finite field with base field $k$.
 """
 _FiniteField(a...; kw...) = NGFiniteField(a...; kw...)
 
-@doc Markdown.doc"""
+@doc raw"""
     _GF(q::IntegerUnion, s::String; cached::Bool, check::Bool)
     _GF(p::IntegerUnion, d::Int, s::String; cached::Bool, check::Bool)
     _GF(f::FqPolyRingElem; s::String; cached::Bool, check::Bool)

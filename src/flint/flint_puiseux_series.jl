@@ -18,7 +18,7 @@ laurent_ring(R::FlintPuiseuxSeriesRing{T}) where T <: RingElem = R.laurent_ring:
 
 laurent_ring(R::FlintPuiseuxSeriesField{T}) where T <: FieldElem = R.laurent_ring::parent_type(T)
 
-@doc Markdown.doc"""
+@doc raw"""
     O(a::FlintPuiseuxSeriesElem{T}) where T <: RingElem
 
 Returns $0 + O(x^\mathrm{val}(a))$. Usually this function is called with $x^n$
@@ -125,7 +125,7 @@ function gen(R::FlintPuiseuxSeriesField)
    return R(gen(S), 1)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     iszero(a::FlintPuiseuxSeriesElem)
 
 Return `true` if the given Puiseux series is arithmetically equal to zero to
@@ -133,7 +133,7 @@ its current precision, otherwise return `false`.
 """
 iszero(a::FlintPuiseuxSeriesElem) = iszero(a.data)
 
-@doc Markdown.doc"""
+@doc raw"""
     isone(a::FlintPuiseuxSeriesElem)
 
 Return `true` if the given Puiseux series is arithmetically equal to one to
@@ -143,7 +143,7 @@ function isone(a::FlintPuiseuxSeriesElem)
    return isone(a.data)
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_gen(a::FlintPuiseuxSeriesElem)
 
 Return `true` if the given Puiseux series is arithmetically equal to the
@@ -154,7 +154,7 @@ function is_gen(a::FlintPuiseuxSeriesElem)
    return valuation(a) == 1 && pol_length(a.data) == 1 && isone(polcoeff(a.data, 0))
 end
 
-@doc Markdown.doc"""
+@doc raw"""
     is_unit(a::FlintPuiseuxSeriesElem)
 
 Return `true` if the given Puiseux series is arithmetically equal to a unit,
@@ -162,14 +162,14 @@ i.e. is invertible, otherwise return `false`.
 """
 is_unit(a::FlintPuiseuxSeriesElem) = valuation(a) == 0 && is_unit(polcoeff(a.data, 0))
 
-@doc Markdown.doc"""
+@doc raw"""
     modulus(a::FlintPuiseuxSeriesElem)
 
 Return the modulus of the coefficients of the given Puiseux series.
 """
 modulus(a::FlintPuiseuxSeriesElem) = modulus(base_ring(a))
 
-@doc Markdown.doc"""
+@doc raw"""
     rescale!(a::FlintPuiseuxSeriesElem)
 
 Rescale so that the scale of the given Puiseux series and the scale of the underlying
