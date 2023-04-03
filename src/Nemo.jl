@@ -7,8 +7,6 @@ module Nemo
 
 import AbstractAlgebra
 
-using Markdown
-
 using InteractiveUtils
 
 using Libdl
