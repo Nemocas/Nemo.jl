@@ -6819,9 +6819,8 @@ end
 ###############################################################################
 
 module DocstringInfo
-using Markdown
 
-base_rings = Dict(
+const base_rings = Dict(
     :ZZ => ("ZZRing", "\\mathbb Z"),
     :QQ => ("QQField", "\\mathbb Q"),
     :ZZMod => ("ZZModRing", "\\mathbb Z/n\\mathbb Z"),
@@ -6833,7 +6832,7 @@ base_rings = Dict(
     :fqPolyRep => ("fqPolyRepField", "\\mathbb F_q"),
 )
 
-constructions = Dict(
+const constructions = Dict(
     :MatrixSpace => ("MatSpace", "Module", "A matrix space", "matrix_space"),
     :Matrix => ("MatElem", "ModuleElem", "A matrix", "matrix(::Ring)"),
     :PolyRing => ("PolyRing", "Ring", "The polynomial ring", "polynomial_ring(R, :x)"),
@@ -6846,26 +6845,16 @@ constructions = Dict(
     docstring(base::Symbol, suffix::Symbol)
 
 Docstring for some constructions of rings.
-
-# Examples
-```julia
-@doc docstring(:ZZ, :PolyRing)
-ZZPolyRing
-
-@doc Markdown.MD(docstring(:zzMod, :MatrixSpace), md"Contains $n^{rc}" elements.")
-zzModMatrixSpace
-```
 """
 function docstring(base::Symbol, suffix::Symbol)
     name = String(base) * String(suffix)
     ring_name, latex = base_rings[base]
-    latex = '$' * latex * '$'
     abstract_type, super_type, description, reference = constructions[suffix]
-    Markdown.parse("""
+    """
         $name <: $abstract_type{$(ring_name)Elem} <: $super_type
 
-    $description over $latex. See [`$reference`](@ref).
-    """)
+    $description over ``$latex``. See [`$reference`](@ref).
+    """
 end
 
 for base in keys(base_rings), suffix in keys(constructions)
