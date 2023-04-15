@@ -79,7 +79,7 @@ end
 
 function similar(f::PolyRingElem, R::ZZRing, s::Symbol=var(parent(f)); cached::Bool=true)
    z = ZZPolyRingElem()
-   if base_ring(f) === R && s == var(parent(f)) && typeof(f) == ZZPolyRingElem
+   if base_ring(f) === R && s == var(parent(f)) && f isa ZZPolyRingElem
       # steal parent in case it is not cached
       z.parent = parent(f)
    else

@@ -81,7 +81,7 @@ end
 
 function similar(f::PolyRingElem, R::QQField, s::Symbol=var(parent(f)); cached::Bool=true)
    z = QQPolyRingElem()
-   if base_ring(f) === R && s == var(parent(f)) && typeof(f) == QQPolyRingElem
+   if base_ring(f) === R && s == var(parent(f)) && f isa QQPolyRingElem
       # steal parent in case it is not cached
       z.parent = parent(f)
    else

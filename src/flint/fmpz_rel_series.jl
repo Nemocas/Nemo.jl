@@ -119,7 +119,7 @@ function similar(f::RelPowerSeriesRingElem, R::ZZRing, max_prec::Int,
                                    s::Symbol=var(parent(f)); cached::Bool=true)
    z = ZZRelPowerSeriesRingElem()
    if base_ring(f) === R && s == var(parent(f)) &&
-      typeof(f) == ZZRelPowerSeriesRingElem && max_precision(parent(f)) == max_prec
+      f isa ZZRelPowerSeriesRingElem && max_precision(parent(f)) == max_prec
       # steal parent in case it is not cached
       z.parent = parent(f)
    else

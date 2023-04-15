@@ -199,7 +199,6 @@ function downscale(a::ZZLaurentSeriesRingElem, n::Int)
          pn += n
       end
    end
-   S = typeof(a)
    d = set_precision!(d, precision(a))
    d = set_valuation!(d, valuation(a))
    d = set_scale!(d, div(scale(a), n))
@@ -228,7 +227,6 @@ function upscale(a::ZZLaurentSeriesRingElem, n::Int)
       setcoeff!(d, i, polcoeff(a, j))
       j += n
    end
-   S = typeof(a)
    d = set_precision!(d, precision(a))
    d = set_valuation!(d, valuation(a))
    d = set_scale!(d, scale(a)*n)

@@ -119,7 +119,7 @@ function similar(f::RelPowerSeriesRingElem, R::QQField, max_prec::Int,
                                    s::Symbol=var(parent(f)); cached::Bool=true)
    z = QQRelPowerSeriesRingElem()
    if base_ring(f) === R && s == var(parent(f)) &&
-      typeof(f) == QQRelPowerSeriesRingElem && max_precision(parent(f)) == max_prec
+      f isa QQRelPowerSeriesRingElem && max_precision(parent(f)) == max_prec
       # steal parent in case it is not cached
       z.parent = parent(f)
    else

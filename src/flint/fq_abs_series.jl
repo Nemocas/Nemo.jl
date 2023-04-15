@@ -143,7 +143,7 @@ function similar(f::AbsPowerSeriesRingElem, R::($ctype), max_prec::Int,
    par = ($rtype)(R, max_prec, s, cached)
    z = ($etype)(R)
    if base_ring(f) === R && s == var(parent(f)) &&
-      typeof(f) == ($etype) && max_precision(parent(f)) == max_prec
+      f isa ($etype) && max_precision(parent(f)) == max_prec
       # steal parent in case it is not cached
       z.parent = parent(f)
    else

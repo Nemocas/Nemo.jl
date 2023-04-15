@@ -90,7 +90,7 @@ characteristic(R::FqPolyRepPolyRing) = characteristic(base_ring(R))
 
 function similar(f::PolyRingElem, R::FqPolyRepField, s::Symbol=var(parent(f)); cached::Bool=true)
    z = FqPolyRepPolyRingElem()
-   if base_ring(f) === R && s == var(parent(f)) && typeof(f) == FqPolyRepPolyRingElem
+   if base_ring(f) === R && s == var(parent(f)) && f isa FqPolyRepPolyRingElem
       # steal parent in case it is not cached
       z.parent = parent(f)
    else
