@@ -144,7 +144,7 @@ end
 ###############################################################################
 
 function abs_series(R::FqField, arr::Vector{T},
-                           len::Int, prec::Int, var::String="x";
+                           len::Int, prec::Int, var::VarName=:x;
                             max_precision::Int=prec, cached::Bool=true) where T
    prec < len && error("Precision too small for given data")
    coeffs = T == FqFieldElem ? arr : map(R, arr)
@@ -737,7 +737,7 @@ end
 #
 ###############################################################################
 
-function power_series_ring(R::FqField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
+function power_series_ring(R::FqField, prec::Int, s::VarName; model=:capped_relative, cached = true)
    S = Symbol(s)
 
    if model == :capped_relative

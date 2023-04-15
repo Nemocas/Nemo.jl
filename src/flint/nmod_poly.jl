@@ -136,7 +136,7 @@ end
 #
 ###############################################################################
 
-function polynomial(R::zzModRing, arr::Vector{T}, var::String="x"; cached::Bool=true) where T
+function polynomial(R::zzModRing, arr::Vector{T}, var::VarName=:x; cached::Bool=true) where T
    coeffs = map(R, arr)
    coeffs = length(coeffs) == 0 ? zzModRingElem[] : coeffs
    z = zzModPolyRingElem(R.n, coeffs)
@@ -152,7 +152,7 @@ end
 
 function show(io::IO, R::zzModPolyRing)
   print(io, "Univariate Polynomial Ring in ")
-  print(io, string(var(R)))
+  print(io, var(R))
   print(io, " over ")
   print(io, base_ring(R))
 end

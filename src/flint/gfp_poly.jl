@@ -91,7 +91,7 @@ end
 #
 ###############################################################################
 
-function polynomial(R::fpField, arr::Vector{T}, var::String="x"; cached::Bool=true) where T
+function polynomial(R::fpField, arr::Vector{T}, var::VarName=:x; cached::Bool=true) where T
    coeffs = map(R, arr)
    coeffs = length(coeffs) == 0 ? fpFieldElem[] : coeffs
    z = fpPolyRingElem(R.n, coeffs)
@@ -107,7 +107,7 @@ end
 
 function show(io::IO, R::fpPolyRing)
   print(io, "Univariate Polynomial Ring in ")
-  print(io, string(var(R)))
+  print(io, var(R))
   print(io, " over ")
   print(io, base_ring(R))
 end

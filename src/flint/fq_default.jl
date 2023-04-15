@@ -777,7 +777,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    NGFiniteField(char::IntegerUnion, deg::Int, s::AbstractString; cached = true, check = true)
+    NGFiniteField(char::IntegerUnion, deg::Int, s::VarName; cached = true, check = true)
 
 Returns a tuple $S, x$ consisting of a finite field $S$ of degree `deg` with
 characteristic `char` and generator $x$ for the finite field of the given
@@ -785,7 +785,7 @@ characteristic and degree. The string $s$ is used to designate how the finite
 field generator will be
 printed.
 """
-function NGFiniteField(char::IntegerUnion, deg::Int, s::AbstractString = "o"; cached = true, check::Bool = true)
+function NGFiniteField(char::IntegerUnion, deg::Int, s::VarName = :o; cached = true, check::Bool = true)
    check && !is_prime(char) && error("Characteristic must be prime")
    _char = ZZRingElem(char)
    S = Symbol(s)
@@ -795,7 +795,7 @@ function NGFiniteField(char::IntegerUnion, deg::Int, s::AbstractString = "o"; ca
 end
 
 # @doc raw"""
-#     NGFiniteField(pol::Union{ZZModPolyRingElem, FpPolyRingElem}, s::AbstractString; cached = true, check = true)
+#     NGFiniteField(pol::Union{ZZModPolyRingElem, FpPolyRingElem}, s::VarName; cached = true, check = true)
 # 
 # Returns a tuple $S, x$ consisting of a finite field parent object $S$ and
 # generator $x$ for the finite field over $F_p$ defined by the given
@@ -808,7 +808,7 @@ end
 # general.
 # """
 # function NGFiniteField(pol::Union{ZZModPolyRingElem, FpPolyRingElem, zzModPolyRingElem, fpPolyRingElem},
-#                           s::AbstractString; cached = true, check::Bool=true)
+#                           s::VarName; cached = true, check::Bool=true)
 #    S = Symbol(s)
 #    parent_obj = FqField(pol, S, cached, check=check)
 # 
@@ -818,8 +818,7 @@ end
 # 
 
 # The following code is used in the intersection code
-function FlintFiniteField(F::FqField, deg::Int,
-                          s::Union{AbstractString,Symbol} = :o; cached = true)
+function FlintFiniteField(F::FqField, deg::Int, s::VarName = :o; cached = true)
     return FqField(characteristic(F), deg, Symbol(s), cached)
 end
 

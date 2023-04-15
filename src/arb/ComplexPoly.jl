@@ -81,7 +81,7 @@ characteristic(::ComplexPolyRing) = 0
 
 function show(io::IO, x::ComplexPolyRing)
   print(io, "Univariate Polynomial Ring in ")
-  print(io, string(var(x)))
+  print(io, var(x))
   print(io, " over ")
   show(io, base_ring(x))
 end
@@ -96,9 +96,9 @@ end
 #
 ###############################################################################
 
-function similar(f::PolyRingElem, R::ComplexField, var::Symbol=var(parent(f)); cached::Bool=true)
+function similar(f::PolyRingElem, R::ComplexField, var::VarName=var(parent(f)); cached::Bool=true)
    z = ComplexPoly()
-   z.parent = ComplexPolyRing(R, var, cached)
+   z.parent = ComplexPolyRing(R, Symbol(var), cached)
    return z
 end
 
@@ -108,7 +108,7 @@ end
 #
 ###############################################################################
 
-function polynomial(R::ComplexField, arr::Vector{T}, var::String="x"; cached::Bool=true) where T
+function polynomial(R::ComplexField, arr::Vector{T}, var::VarName=:x; cached::Bool=true) where T
    coeffs = map(R, arr)
    coeffs = length(coeffs) == 0 ? ComplexFieldElem[] : coeffs
    z = ComplexPoly(coeffs, R.prec)

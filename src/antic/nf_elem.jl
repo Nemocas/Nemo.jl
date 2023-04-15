@@ -1155,7 +1155,7 @@ rand(K::AnticNumberField, r) = rand(Random.GLOBAL_RNG, K, r)
 ###############################################################################
 
 @doc raw"""
-    number_field(f::QQPolyRingElem, s::Union{AbstractString, Char, Symbol};
+    number_field(f::QQPolyRingElem, s::VarName;
                 cached::Bool = true, check::Bool = true)
 
 Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$
@@ -1163,7 +1163,7 @@ of the number field $\mathbb{Q}[x]/(f)$ where $f$ is the supplied polynomial.
 The supplied string `s` specifies how the generator of the number field
 should be printed. If `s` is not specified, it defaults to `_a`.
 """
-function number_field(f::QQPolyRingElem, s::Union{AbstractString, Char, Symbol} = "_a"; cached::Bool = true, check::Bool = true)
+function number_field(f::QQPolyRingElem, s::VarName = "_a"; cached::Bool = true, check::Bool = true)
    parent_obj = AnticNumberField(f, Symbol(s), cached, check)
 
    return parent_obj, gen(parent_obj)
@@ -1171,7 +1171,7 @@ end
 @alias NumberField number_field
 
 @doc raw"""
-    cyclotomic_field(n::Int, s::Union{AbstractString, Char, Symbol} = "z_$n", t = "_\$"; cached = true)
+    cyclotomic_field(n::Int, s::VarName = "z_$n", t = "_\$"; cached = true)
 
 Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$
 of the $n$-th cyclotomic field, $\mathbb{Q}(\zeta_n)$. The supplied string
@@ -1180,7 +1180,7 @@ provided, the string `t` specifies how the generator of the polynomial ring
 from which the number field is constructed, should be printed. If it is not
 supplied, a default dollar sign will be used to represent the variable.
 """
-function cyclotomic_field(n::Int, s::Union{AbstractString, Char, Symbol} = "z_$n", t = "_\$"; cached = true)
+function cyclotomic_field(n::Int, s::VarName = "z_$n", t = "_\$"; cached = true)
    n > 0 || throw(ArgumentError("conductor must be positive, not $n"))
    Zx, x = PolynomialRing(FlintZZ, gensym(); cached = false)
    Qx, = PolynomialRing(FlintQQ, t; cached = cached)
@@ -1198,7 +1198,7 @@ end
 
 
 @doc raw"""
-    cyclotomic_real_subfield(n::Int, s::Union{AbstractString, Char, Symbol} = "(z_$n + 1/z_$n)", t = "\$"; cached = true)
+    cyclotomic_real_subfield(n::Int, s::VarName = "(z_$n + 1/z_$n)", t = "\$"; cached = true)
 
 Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$
 of the totally real subfield of the $n$-th cyclotomic field,
@@ -1208,7 +1208,7 @@ the generator of the polynomial ring from which the number field is
 constructed, should be printed. If it is not supplied, a default dollar sign
 will be used to represent the variable.
 """
-function cyclotomic_real_subfield(n::Int, s::Union{AbstractString, Char, Symbol} = "(z_$n + 1/z_$n)", t = "\$"; cached = true)
+function cyclotomic_real_subfield(n::Int, s::VarName = "(z_$n + 1/z_$n)", t = "\$"; cached = true)
    Zx, x = PolynomialRing(FlintZZ, gensym(); cached = false)
    Qx, = PolynomialRing(FlintQQ, t; cached = cached)
    f = cos_minpoly(n, x)

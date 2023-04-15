@@ -81,7 +81,7 @@ characteristic(::ArbPolyRing) = 0
 
 function show(io::IO, x::ArbPolyRing)
   print(io, "Univariate Polynomial Ring in ")
-  print(io, string(var(x)))
+  print(io, var(x))
   print(io, " over ")
   show(io, x.base_ring)
 end
@@ -92,9 +92,9 @@ end
 #
 ###############################################################################
 
-function similar(f::PolyRingElem, R::ArbField, var::Symbol=var(parent(f)); cached::Bool=true)
+function similar(f::PolyRingElem, R::ArbField, var::VarName=var(parent(f)); cached::Bool=true)
    z = arb_poly()
-   z.parent = ArbPolyRing(R, var, cached)
+   z.parent = ArbPolyRing(R, Symbol(var), cached)
    return z
 end
 
@@ -104,7 +104,7 @@ end
 #
 ###############################################################################
 
-function polynomial(R::ArbField, arr::Vector{T}, var::String="x"; cached::Bool=true) where T
+function polynomial(R::ArbField, arr::Vector{T}, var::VarName=:x; cached::Bool=true) where T
    coeffs = map(R, arr)
    coeffs = length(coeffs) == 0 ? arb[] : coeffs
    z = arb_poly(coeffs, R.prec)

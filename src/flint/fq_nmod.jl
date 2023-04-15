@@ -570,11 +570,11 @@ end
 ################################################################################
 
 @doc raw"""
-    modulus(k::fqPolyRepField, var::String="T")
+    modulus(k::fqPolyRepField, var::VarName=:T)
 
 Return the modulus defining the finite field $k$.
 """
-function modulus(k::fqPolyRepField, var::String="T")
+function modulus(k::fqPolyRepField, var::VarName=:T)
     p::Int = characteristic(k)
     Q = polynomial(GF(p), [], var)
     GC.@preserve k begin
@@ -680,21 +680,16 @@ end
 #
 ###############################################################################
 
-function FlintFiniteField(char::Int, deg::Int, s::Union{AbstractString,Symbol} = :o; cached = true)
-   S = Symbol(s)
-   parent_obj = fqPolyRepField(ZZRingElem(char), deg, S, cached)
-
+function FlintFiniteField(char::Int, deg::Int, s::VarName = :o; cached = true)
+   parent_obj = fqPolyRepField(ZZRingElem(char), deg, Symbol(s), cached)
    return parent_obj, gen(parent_obj)
 end
 
-function FlintFiniteField(pol::Zmodn_poly, s::Union{AbstractString,Symbol} = :o; cached = true, check::Bool=true)
-   S = Symbol(s)
-   parent_obj = fqPolyRepField(pol, S, cached, check=check)
-
+function FlintFiniteField(pol::Zmodn_poly, s::VarName = :o; cached = true, check::Bool=true)
+   parent_obj = fqPolyRepField(pol, Symbol(s), cached, check=check)
    return parent_obj, gen(parent_obj)
 end
 
-function FlintFiniteField(F::fqPolyRepField, deg::Int,
-                          s::Union{AbstractString,Symbol} = :o; cached = true)
+function FlintFiniteField(F::fqPolyRepField, deg::Int, s::VarName = :o; cached = true)
     return fqPolyRepField(characteristic(F), deg, Symbol(s), cached)
 end

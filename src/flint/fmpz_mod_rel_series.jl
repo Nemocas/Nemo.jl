@@ -156,7 +156,7 @@ end
 ###############################################################################
 
 function rel_series(R::($brtype), arr::Vector{T},
-                   len::Int, prec::Int, val::Int, var::String="x";
+                   len::Int, prec::Int, val::Int, var::VarName=:x;
                             max_precision::Int=prec, cached::Bool=true) where T
    prec < len + val && error("Precision too small for given data")
    coeffs = T == ($mtype) ? arr : map(R, arr)

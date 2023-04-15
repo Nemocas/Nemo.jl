@@ -60,8 +60,8 @@ for i in names(AbstractAlgebra)
    (i in AbstractAlgebra.import_exclude || !isdefined(AbstractAlgebra, i)) && continue
    i == :GF && continue
    i == :NumberField && continue
-   eval(Meta.parse("import AbstractAlgebra." * string(i)))
-   eval(Expr(:export, i))
+   @eval import AbstractAlgebra: $i
+   @eval export $i
 end
 
 export GF

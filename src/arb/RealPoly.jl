@@ -81,7 +81,7 @@ characteristic(::RealPolyRing) = 0
 
 function show(io::IO, x::RealPolyRing)
   print(io, "Univariate Polynomial Ring in ")
-  print(io, string(var(x)))
+  print(io, var(x))
   print(io, " over ")
   show(io, base_ring(x))
 end
@@ -92,9 +92,9 @@ end
 #
 ###############################################################################
 
-function similar(f::PolyRingElem, R::RealField, var::Symbol=var(parent(f)); cached::Bool=true)
+function similar(f::PolyRingElem, R::RealField, var::VarName=var(parent(f)); cached::Bool=true)
    z = RealPoly()
-   z.parent = RealPolyRing(R, var, cached)
+   z.parent = RealPolyRing(R, Symbol(var), cached)
    return z
 end
 
@@ -104,7 +104,7 @@ end
 #
 ###############################################################################
 
-function polynomial(R::RealField, arr::Vector{T}, var::String="x"; cached::Bool=true) where T
+function polynomial(R::RealField, arr::Vector{T}, var::VarName=:x; cached::Bool=true) where T
    coeffs = map(R, arr)
    coeffs = length(coeffs) == 0 ? RealFieldElem[] : coeffs
    z = RealPoly(coeffs, precision(Balls))

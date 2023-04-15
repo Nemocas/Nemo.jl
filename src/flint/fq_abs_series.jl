@@ -160,7 +160,7 @@ end
 ###############################################################################
 
 function abs_series(R::($ctype), arr::Vector{T},
-                           len::Int, prec::Int, var::String="x";
+                           len::Int, prec::Int, var::VarName=:x;
                             max_precision::Int=prec, cached::Bool=true) where T
    prec < len && error("Precision too small for given data")
    coeffs = T == ($btype) ? arr : map(R, arr)
@@ -750,20 +750,16 @@ end # for
 #
 ###############################################################################
 
-function power_series_ring(R::FqPolyRepField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
+function power_series_ring(R::FqPolyRepField, prec::Int, s::VarName; model=:capped_relative, cached = true)
    if model == :capped_relative
-      parent_obj = FqPolyRepRelPowerSeriesRing(R, prec, s, cached)
+      parent_obj = FqPolyRepRelPowerSeriesRing(R, prec, Symbol(s), cached)
    elseif model == :capped_absolute
-      parent_obj = FqPolyRepAbsPowerSeriesRing(R, prec, s, cached)
+      parent_obj = FqPolyRepAbsPowerSeriesRing(R, prec, Symbol(s), cached)
    else
       error("Unknown model")
    end
 
    return parent_obj, gen(parent_obj)
-end
-
-function power_series_ring(R::FqPolyRepField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
-   return power_series_ring(R, prec, Symbol(s); model=model, cached=cached)
 end
 
 function AbsPowerSeriesRing(R::FqPolyRepField, prec::Int)
@@ -774,20 +770,16 @@ function RelPowerSeriesRing(R::FqPolyRepField, prec::Int)
    return FqPolyRepRelPowerSeriesRing(R, prec, :x, false)
 end
 
-function power_series_ring(R::fqPolyRepField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
+function power_series_ring(R::fqPolyRepField, prec::Int, s::VarName; model=:capped_relative, cached = true)
    if model == :capped_relative
-      parent_obj = fqPolyRepRelPowerSeriesRing(R, prec, s, cached)
+      parent_obj = fqPolyRepRelPowerSeriesRing(R, prec, Symbol(s), cached)
    elseif model == :capped_absolute
-      parent_obj = fqPolyRepAbsPowerSeriesRing(R, prec, s, cached)
+      parent_obj = fqPolyRepAbsPowerSeriesRing(R, prec, Symbol(s), cached)
    else
       error("Unknown model")
    end
 
    return parent_obj, gen(parent_obj)
-end
-
-function power_series_ring(R::fqPolyRepField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
-   return power_series_ring(R, prec, Symbol(s); model=model, cached=cached)
 end
 
 function AbsPowerSeriesRing(R::fqPolyRepField, prec::Int)

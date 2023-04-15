@@ -96,7 +96,7 @@ end
 #
 ###############################################################################
 
-function polynomial(R::QQField, arr::Vector{T}, var::String="x"; cached::Bool=true) where T
+function polynomial(R::QQField, arr::Vector{T}, var::VarName=:x; cached::Bool=true) where T
    coeffs = T == QQFieldElem ? arr : map(R, arr)
    coeffs = length(coeffs) == 0 ? QQFieldElem[] : coeffs
    z = QQPolyRingElem(coeffs)
@@ -120,7 +120,7 @@ canonical_unit(a::QQPolyRingElem) = canonical_unit(leading_coefficient(a))
 
 function show(io::IO, p::QQPolyRing)
    print(io, "Univariate Polynomial Ring in ")
-   print(io, string(var(p)))
+   print(io, var(p))
    print(io, " over ")
    show(io, base_ring(p))
 end

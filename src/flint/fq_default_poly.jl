@@ -120,7 +120,7 @@ canonical_unit(a::FqPolyRingElem) = canonical_unit(leading_coefficient(a))
 
 function show(io::IO, R::FqPolyRing)
    print(io, "Univariate Polynomial Ring in ")
-   print(io, string(var(R)))
+   print(io, var(R))
    print(io, " over ")
    show(io, base_ring(R))
 end

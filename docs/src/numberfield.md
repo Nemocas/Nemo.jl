@@ -54,9 +54,9 @@ the number field itself. This is accomplished with one of the following
 constructors.
 
 ```@docs
-number_field(::QQPolyRingElem, ::String)
-CyclotomicField(::Int, ::String)
-CyclotomicRealSubfield(::Int, ::String)
+number_field(::QQPolyRingElem, ::VarName)
+cyclotomic_field(::Int, ::VarName)
+cyclotomic_real_subfield(::Int, ::VarName)
 ```
 
 Here are some examples of creating number fields and making use of the

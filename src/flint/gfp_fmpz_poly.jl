@@ -51,7 +51,7 @@ end
 #
 ###############################################################################
 
-function polynomial(R::FpField, arr::Vector{T}, var::String="x"; cached::Bool=true) where T
+function polynomial(R::FpField, arr::Vector{T}, var::VarName=:x; cached::Bool=true) where T
    coeffs = map(R, arr)
    coeffs = length(coeffs) == 0 ? FpFieldElem[] : coeffs
    z = FpPolyRingElem(R, coeffs)

@@ -94,7 +94,7 @@ end
 #
 ###############################################################################
 
-function polynomial(R::ZZRing, arr::Vector{T}, var::String="x"; cached::Bool=true) where T
+function polynomial(R::ZZRing, arr::Vector{T}, var::VarName=:x; cached::Bool=true) where T
    coeffs = T == ZZRingElem ? arr : map(R, arr)
    coeffs = length(coeffs) == 0 ? ZZRingElem[] : coeffs
    z = ZZPolyRingElem(coeffs)
@@ -118,7 +118,7 @@ canonical_unit(a::ZZPolyRingElem) = canonical_unit(leading_coefficient(a))
 
 function show(io::IO, p::ZZPolyRing)
    print(io, "Univariate Polynomial Ring in ")
-   print(io, string(var(p)))
+   print(io, var(p))
    print(io, " over ")
    show(io, FlintZZ)
 end

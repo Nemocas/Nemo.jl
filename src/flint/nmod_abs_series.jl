@@ -153,7 +153,7 @@ end
 ###############################################################################
 
 function abs_series(R::($brtype), arr::Vector{T},
-                           len::Int, prec::Int, var::String="x";
+                           len::Int, prec::Int, var::VarName=:x;
                             max_precision::Int=prec, cached::Bool=true) where T
    prec < len && error("Precision too small for given data")
    coeffs = T == ($mtype) ? arr : map(R, arr)
@@ -761,19 +761,15 @@ end
 #
 ###############################################################################
 
-function power_series_ring(R::zzModRing, prec::Int, s::Symbol; model=:capped_relative, cached = true)
+function power_series_ring(R::zzModRing, prec::Int, s::VarName = :x; model=:capped_relative, cached = true)
    if model == :capped_relative
-      parent_obj = zzModRelPowerSeriesRing(R, prec, s, cached)
+      parent_obj = zzModRelPowerSeriesRing(R, prec, Symbol(s), cached)
    elseif model == :capped_absolute
-      parent_obj = zzModAbsPowerSeriesRing(R, prec, s, cached)
+      parent_obj = zzModAbsPowerSeriesRing(R, prec, Symbol(s), cached)
    else
       error("Unknown model")
    end
    return parent_obj, gen(parent_obj)
-end
-
-function power_series_ring(R::zzModRing, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
-   return power_series_ring(R, prec, Symbol(s); model=model, cached=cached)
 end
 
 function AbsPowerSeriesRing(R::zzModRing, prec::Int)
@@ -784,19 +780,15 @@ function RelPowerSeriesRing(R::zzModRing, prec::Int)
    return zzModRelPowerSeriesRing(R, prec, :x, false)
 end
 
-function power_series_ring(R::fpField, prec::Int, s::Symbol; model=:capped_relative, cached = true)
+function power_series_ring(R::fpField, prec::Int, s::VarName = :x; model=:capped_relative, cached = true)
    if model == :capped_relative
-      parent_obj = fpRelPowerSeriesRing(R, prec, s, cached)
+      parent_obj = fpRelPowerSeriesRing(R, prec, Symbol(s), cached)
    elseif model == :capped_absolute
-      parent_obj = fpAbsPowerSeriesRing(R, prec, s, cached)
+      parent_obj = fpAbsPowerSeriesRing(R, prec, Symbol(s), cached)
    else
       error("Unknown model")
    end
    return parent_obj, gen(parent_obj)
-end
-
-function power_series_ring(R::fpField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
-   return power_series_ring(R, prec, Symbol(s); model=model, cached=cached)
 end
 
 function AbsPowerSeriesRing(R::fpField, prec::Int)
