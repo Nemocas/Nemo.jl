@@ -28,10 +28,6 @@ zero(m::ComplexMat, R::ComplexField, r::Int, c::Int) = similar(m, R, r, c)
 #
 ###############################################################################
 
-parent_type(::Type{ComplexMat}) = ComplexMatSpace
-
-parent(x::ComplexMat) = matrix_space(base_ring(x), nrows(x), ncols(x))
-
 dense_matrix_type(::Type{ComplexFieldElem}) = ComplexMat
 
 base_ring(a::ComplexMatSpace) = ComplexField()

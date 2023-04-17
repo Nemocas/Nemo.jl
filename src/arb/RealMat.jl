@@ -28,13 +28,9 @@ zero(m::RealMat, R::RealField, r::Int, c::Int) = similar(m, R, r, c)
 #
 ###############################################################################
 
-parent_type(::Type{RealMat}) = RealMatSpace
-
 base_ring(a::RealMatSpace) = RealField()
 
 base_ring(a::RealMat) = RealField()
-
-parent(x::RealMat) = matrix_space(base_ring(x), nrows(x), ncols(x))
 
 dense_matrix_type(::Type{RealFieldElem}) = RealMat
 

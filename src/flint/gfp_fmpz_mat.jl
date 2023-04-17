@@ -12,8 +12,6 @@ export FpMatrix, FpMatrixSpace
 #
 ################################################################################
 
-parent_type(::Type{FpMatrix}) = FpMatrixSpace
-
 dense_matrix_type(::Type{FpFieldElem}) = FpMatrix
 
 ###############################################################################
@@ -82,8 +80,6 @@ end
 nrows(a::FpMatrix) = a.r
 
 ncols(a::FpMatrix) = a.c
-
-parent(a::FpMatrix) = matrix_space(base_ring(a), nrows(a), ncols(a))
 
 base_ring(a::FpMatrix) = a.base_ring
 

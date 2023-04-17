@@ -12,13 +12,9 @@ export QQMatrix, QQMatrixSpace, gso, hilbert
 #
 ###############################################################################
 
-parent_type(::Type{QQMatrix}) = QQMatrixSpace
-
 base_ring(a::QQMatrix) = FlintQQ
 
 dense_matrix_type(::Type{QQFieldElem}) = QQMatrix
-
-parent(a::QQMatrix) = matrix_space(QQ, nrows(a), ncols(a))
 
 function check_parent(a::QQMatrix, b::QQMatrix, throw::Bool = true)
    fl = (nrows(a) != nrows(b) || ncols(a) != ncols(b) || base_ring(a) != base_ring(b))

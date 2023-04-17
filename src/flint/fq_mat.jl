@@ -16,8 +16,6 @@ export FqPolyRepMatrix, FqPolyRepMatrixSpace, getindex, setindex!, deepcopy,
 #
 ################################################################################
 
-parent_type(::Type{FqPolyRepMatrix}) = FqPolyRepMatrixSpace
-
 dense_matrix_type(::Type{FqPolyRepFieldElem}) = FqPolyRepMatrix
 
 function check_parent(x::FqPolyRepMatrix, y::FqPolyRepMatrix, throw::Bool = true)
@@ -85,8 +83,6 @@ end
 nrows(a::FqPolyRepMatrix) = a.r
 
 ncols(a::FqPolyRepMatrix) = a.c
-
-parent(a::FqPolyRepMatrix, cached::Bool = true) = matrix_space(base_ring(a), nrows(a), ncols(a))
 
 base_ring(a::FqPolyRepMatrix) = a.base_ring
 

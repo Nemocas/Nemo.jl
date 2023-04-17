@@ -29,10 +29,6 @@ zero(m::acb_mat, R::AcbField, r::Int, c::Int) = similar(m, R, r, c)
 #
 ###############################################################################
 
-parent_type(::Type{acb_mat}) = AcbMatSpace
-
-parent(x::acb_mat) = matrix_space(base_ring(x), nrows(x), ncols(x))
-
 dense_matrix_type(::Type{acb}) = acb_mat
 
 precision(x::AcbMatSpace) = precision(x.base_ring)

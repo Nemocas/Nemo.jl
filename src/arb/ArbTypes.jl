@@ -885,7 +885,7 @@ base_ring(a::AcbPolyRing) = a.base_ring
 #
 ################################################################################
 
-const RealMatSpace = AbstractAlgebra.Generic.MatSpace{RealFieldElem, RealField}
+const RealMatSpace = AbstractAlgebra.Generic.MatSpace{RealFieldElem}
 
 mutable struct RealMat <: MatElem{RealFieldElem}
   entries::Ptr{Nothing}
@@ -998,7 +998,7 @@ end
 
 # fixed precision
 
-const ArbMatSpace = AbstractAlgebra.Generic.MatSpace{arb, ArbField}
+const ArbMatSpace = AbstractAlgebra.Generic.MatSpace{arb}
 
 mutable struct arb_mat <: MatElem{arb}
   entries::Ptr{Nothing}
@@ -1115,7 +1115,7 @@ end
 #
 ################################################################################
 
-const ComplexMatSpace = AbstractAlgebra.Generic.MatSpace{ComplexFieldElem, ComplexField}
+const ComplexMatSpace = AbstractAlgebra.Generic.MatSpace{ComplexFieldElem}
 
 mutable struct ComplexMat <: MatElem{ComplexFieldElem}
   entries::Ptr{Nothing}
@@ -1372,7 +1372,7 @@ end
 
 # fixed precision
 
-const AcbMatSpace = AbstractAlgebra.Generic.MatSpace{acb, AcbField}
+const AcbMatSpace = AbstractAlgebra.Generic.MatSpace{acb}
 
 mutable struct acb_mat <: MatElem{acb}
   entries::Ptr{Nothing}

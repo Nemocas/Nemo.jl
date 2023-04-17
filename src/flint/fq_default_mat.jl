@@ -12,8 +12,6 @@ export FqMatrix, FqMatrixSpace
 #
 ################################################################################
 
-parent_type(::Type{FqMatrix}) = FqMatrixSpace
-
 dense_matrix_type(::Type{FqFieldElem}) = FqMatrix
 
 function check_parent(x::FqMatrix, y::FqMatrix, throw::Bool = true)
@@ -88,8 +86,6 @@ function ncols(a::FqMatrix)
    (Ref{FqMatrix}, Ref{FqField}),
     a, base_ring(a))
 end
-
-parent(a::FqMatrix) = matrix_space(base_ring(a), nrows(a), ncols(a))
 
 base_ring(a::FqMatrix) = a.base_ring
 

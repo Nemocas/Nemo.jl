@@ -12,8 +12,6 @@ export ZZModMatrix, ZZModMatrixSpace
 #
 ################################################################################
 
-parent_type(::Type{ZZModMatrix}) = ZZModMatrixSpace
-
 dense_matrix_type(::Type{ZZModRingElem}) = ZZModMatrix
 
 function check_parent(x::T, y::T, throw::Bool = true) where T <: Zmod_fmpz_mat
@@ -94,8 +92,6 @@ end
 nrows(a::T) where T <: Zmod_fmpz_mat = a.r
 
 ncols(a::T) where T <: Zmod_fmpz_mat = a.c
-
-parent(a::Zmod_fmpz_mat) = matrix_space(base_ring(a), nrows(a), ncols(a))
 
 base_ring(a::T) where T <: Zmod_fmpz_mat = a.base_ring
 

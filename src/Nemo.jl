@@ -359,8 +359,6 @@ export power_series_ring, polynomial_ring, SparsePolynomialRing, matrix_space,
 
 export Generic
 
-include("MatrixSpace.jl")
-
 ###############################################################################
 #
 #   Cache type

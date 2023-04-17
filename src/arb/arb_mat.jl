@@ -29,13 +29,9 @@ zero(m::arb_mat, R::ArbField, r::Int, c::Int) = similar(m, R, r, c)
 #
 ###############################################################################
 
-parent_type(::Type{arb_mat}) = ArbMatSpace
-
 base_ring(a::ArbMatSpace) = a.base_ring
 
 base_ring(a::arb_mat) = a.base_ring
-
-parent(x::arb_mat) = matrix_space(base_ring(x), nrows(x), ncols(x))
 
 dense_matrix_type(::Type{arb}) = arb_mat
 
@@ -654,21 +650,6 @@ function (x::ArbMatSpace)(y::AbstractVector{T}) where {T <: Union{Int, UInt, ZZR
   z = arb_mat(nrows(x), ncols(x), y, precision(x))
   z.base_ring = x.base_ring
   return z
-end
-
-function (x::ArbMatSpace)(y::Union{Int, UInt, ZZRingElem, QQFieldElem, Float64,
-                          BigFloat, arb, AbstractString})
-  z = x()
-  for i in 1:nrows(z)
-      for j = 1:ncols(z)
-         if i != j
-            z[i, j] = zero(base_ring(x))
-         else
-            z[i, j] = y
-         end
-      end
-   end
-   return z
 end
 
 ###############################################################################

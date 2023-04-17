@@ -4760,7 +4760,7 @@ end
 #
 ###############################################################################
 
-const QQMatrixSpace = AbstractAlgebra.Generic.MatSpace{QQFieldElem, QQField}
+const QQMatrixSpace = AbstractAlgebra.Generic.MatSpace{QQFieldElem}
 
 mutable struct QQMatrix <: MatElem{QQFieldElem}
    entries::Ptr{Nothing}
@@ -4915,7 +4915,7 @@ end
 #
 ###############################################################################
 
-const ZZMatrixSpace = AbstractAlgebra.Generic.MatSpace{ZZRingElem, ZZRing}
+const ZZMatrixSpace = AbstractAlgebra.Generic.MatSpace{ZZRingElem}
 
 mutable struct ZZMatrix <: MatElem{ZZRingElem}
    entries::Ptr{Nothing}
@@ -5034,7 +5034,7 @@ end
 #
 ###############################################################################
 
-const zzModMatrixSpace = AbstractAlgebra.Generic.MatSpace{zzModRingElem, zzModRing}
+const zzModMatrixSpace = AbstractAlgebra.Generic.MatSpace{zzModRingElem}
 
 mutable struct zzModMatrix <: MatElem{zzModRingElem}
   entries::Ptr{Nothing}
@@ -5197,7 +5197,7 @@ end
 #
 ###############################################################################
 
-const ZZModMatrixSpace = AbstractAlgebra.Generic.MatSpace{ZZModRingElem, ZZModRing}
+const ZZModMatrixSpace = AbstractAlgebra.Generic.MatSpace{ZZModRingElem}
 
 mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
    entries::Ptr{Nothing}
@@ -5322,7 +5322,7 @@ end
 #
 ###############################################################################
 
-const FpMatrixSpace = AbstractAlgebra.Generic.MatSpace{FpFieldElem, FpField}
+const FpMatrixSpace = AbstractAlgebra.Generic.MatSpace{FpFieldElem}
 
 mutable struct FpMatrix <: MatElem{FpFieldElem}
    entries::Ptr{Nothing}
@@ -5447,7 +5447,7 @@ end
 #
 ###############################################################################
 
-const fpMatrixSpace = AbstractAlgebra.Generic.MatSpace{fpFieldElem, fpField}
+const fpMatrixSpace = AbstractAlgebra.Generic.MatSpace{fpFieldElem}
 
 mutable struct fpMatrix <: MatElem{fpFieldElem}
   entries::Ptr{Nothing}
@@ -6046,7 +6046,7 @@ end
 #
 ###############################################################################
 
-const FqMatrixSpace = AbstractAlgebra.Generic.MatSpace{FqFieldElem, FqField}
+const FqMatrixSpace = AbstractAlgebra.Generic.MatSpace{FqFieldElem}
 
  mutable struct FqMatrix <: MatElem{FqFieldElem}
     # fq_default_mat_struct is 56 bytes on 64 bit machine
@@ -6267,7 +6267,7 @@ const FqMatrixSpace = AbstractAlgebra.Generic.MatSpace{FqFieldElem, FqField}
 #
 ###############################################################################
 
-const FqPolyRepMatrixSpace = AbstractAlgebra.Generic.MatSpace{FqPolyRepFieldElem, FqPolyRepField}
+const FqPolyRepMatrixSpace = AbstractAlgebra.Generic.MatSpace{FqPolyRepFieldElem}
 
 mutable struct FqPolyRepMatrix <: MatElem{FqPolyRepFieldElem}
    entries::Ptr{Nothing}
@@ -6436,7 +6436,7 @@ end
 #
 ###############################################################################
 
-const fqPolyRepMatrixSpace = AbstractAlgebra.Generic.MatSpace{fqPolyRepFieldElem, fqPolyRepField}
+const fqPolyRepMatrixSpace = AbstractAlgebra.Generic.MatSpace{fqPolyRepFieldElem}
 
 mutable struct fqPolyRepMatrix <: MatElem{fqPolyRepFieldElem}
    entries::Ptr{Nothing}

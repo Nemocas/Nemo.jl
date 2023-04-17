@@ -16,8 +16,6 @@ export zzModMatrix, zzModMatrixSpace, getindex, setindex!, deepcopy,
 #
 ################################################################################
 
-parent_type(::Type{zzModMatrix}) = zzModMatrixSpace
-
 dense_matrix_type(::Type{zzModRingElem}) = zzModMatrix
 
 function check_parent(x::T, y::T, throw::Bool = true) where T <: Zmodn_mat
@@ -110,8 +108,6 @@ end
 nrows(a::T) where T <: Zmodn_mat = a.r
 
 ncols(a::T) where T <: Zmodn_mat = a.c
-
-parent(a::Zmodn_mat) = matrix_space(base_ring(a), nrows(a), ncols(a))
 
 base_ring(a::T) where T <: Zmodn_mat = a.base_ring
 

@@ -20,13 +20,9 @@ export ZZMatrix, ZZMatrixSpace, getindex, getindex!, setindex!,
 #
 ###############################################################################
 
-parent_type(::Type{ZZMatrix}) = ZZMatrixSpace
-
 base_ring(a::ZZMatrix) = FlintZZ
 
 dense_matrix_type(::Type{ZZRingElem}) = ZZMatrix
-
-parent(a::ZZMatrix) = matrix_space(base_ring(a), nrows(a), ncols(a))
 
 function check_parent(a::ZZMatrix, b::ZZMatrix, throw::Bool = true)
    b = (nrows(a) != nrows(b) || ncols(a) != ncols(b))

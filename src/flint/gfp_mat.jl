@@ -12,8 +12,6 @@ export fpMatrix, fpMatrixSpace
 #
 ################################################################################
 
-parent_type(::Type{fpMatrix}) = fpMatrixSpace
-
 dense_matrix_type(::Type{fpFieldElem}) = fpMatrix
 
 ###############################################################################
