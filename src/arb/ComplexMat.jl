@@ -905,7 +905,7 @@ function _eig_multiple(A::ComplexMat, check::Bool = true)
   b = ccall((:acb_mat_eig_multiple, libarb), Cint,
             (Ptr{acb_struct}, Ref{ComplexMat}, Ptr{acb_struct}, Ref{ComplexMat}, Int),
              v_approx, A, v, R, precision(Balls))
-  check && b == 0 && throw(error("Could not isolate eigenvalues of matrix $A"))
+  check && b == 0 && error("Could not isolate eigenvalues of matrix $A")
   z = array(base_ring(A), v, n)
   acb_vec_clear(v, n)
   acb_vec_clear(v_approx, n)
@@ -927,7 +927,7 @@ function _eig_multiple(A::ComplexMat, check::Bool = true)
   return res, R
 end
 
-function _eig_simple(A::ComplexMat; check::Bool = true, alg = :default)
+function _eig_simple(A::ComplexMat; check::Bool = true, algorithm::Symbol = :default)
   n = nrows(A)
   v = acb_vec(n)
   v_approx = acb_vec(n)
@@ -935,30 +935,30 @@ function _eig_simple(A::ComplexMat; check::Bool = true, alg = :default)
   L = zero_matrix(base_ring(A), n, n)
   R = zero_matrix(base_ring(A), n, n)
   __approx_eig_qr!(v, Rapprox, A)
-  if alg == :vdhoeven_mourrain
+  if algorithm == :vdhoeven_mourrain
       b = ccall((:acb_mat_eig_simple_vdhoeven_mourrain, libarb), Cint,
                 (Ptr{acb_struct}, Ref{ComplexMat}, Ref{ComplexMat},
                  Ref{ComplexMat}, Ptr{acb_struct}, Ref{ComplexMat}, Int),
                  v_approx, L, R, A, v, Rapprox, precision(Balls))
-  elseif alg == :rump
+  elseif algorithm == :rump
       b = ccall((:acb_mat_eig_simple_rump, libarb), Cint,
                 (Ptr{acb_struct}, Ref{ComplexMat}, Ref{ComplexMat},
                  Ref{ComplexMat}, Ptr{acb_struct}, Ref{ComplexMat}, Int),
                  v_approx, L, R, A, v, Rapprox, precision(Balls))
-  elseif alg == :default
+  elseif algorithm == :default
       b = ccall((:acb_mat_eig_simple, libarb), Cint,
                 (Ptr{acb_struct}, Ref{ComplexMat}, Ref{ComplexMat},
                  Ref{ComplexMat}, Ptr{acb_struct}, Ref{ComplexMat}, Int),
                  v_approx, L, R, A, v, Rapprox, precision(Balls))
   else
-      throw(error("Algorithm $alg not supported"))
+      error("Algorithm $algorithm not supported")
   end
 
   if check && b == 0
     if nrows(A) <= 10
-      throw(error("Could not isolate eigenvalues of matrix $A"))
+      error("Could not isolate eigenvalues of matrix $A")
     else
-      throw(error("Could not isolate eigenvalues"))
+      error("Could not isolate eigenvalues")
     end
   end
   z = array(base_ring(A), v, n)
@@ -969,18 +969,18 @@ function _eig_simple(A::ComplexMat; check::Bool = true, alg = :default)
 end
 
 @doc raw"""
-    eigvals_simple(A::ComplexMat, alg = :default)
+    eigvals_simple(A::ComplexMat, algorithm::Symbol = :default)
 
 Returns the eigenvalues of `A` as a vector of `acb`. It is assumed that `A`
 has only simple eigenvalues.
 
-The algorithm used can be changed by setting the `alg` keyword to
+The algorithm used can be changed by setting the `algorithm` keyword to
 `:vdhoeven_mourrain` or `:rump`.
 
 This function is experimental.
 """
-function eigvals_simple(A::ComplexMat, alg = :default)
-  E, _, _ = _eig_simple(A, alg = alg)
+function eigvals_simple(A::ComplexMat, algorithm::Symbol = :default)
+  E, _, _ = _eig_simple(A, algorithm = algorithm)
   return E
 end
 

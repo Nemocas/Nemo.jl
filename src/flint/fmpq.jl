@@ -471,7 +471,7 @@ end
 
 function inv(a::QQFieldElem)
     if iszero(a)
-       throw(error("Element not invertible"))
+       error("Element not invertible")
     end
     z = QQFieldElem()
     ccall((:fmpq_inv, libflint), Nothing, (Ref{QQFieldElem}, Ref{QQFieldElem}), z, a)
