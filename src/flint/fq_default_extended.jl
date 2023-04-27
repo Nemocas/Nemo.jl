@@ -750,3 +750,33 @@ image(f::FqPolyRingToFqField, x::FqPolyRingElem) = f.f(x)::FqFieldElem
 (f::FqPolyRingToFqField)(x::FqPolyRingElem) = image(f, x)
 
 preimage(f::FqPolyRingToFqField, x::FqFieldElem) = f.g(x)::FqPolyRingElem
+
+################################################################################
+#
+#  Coercion of polynomials
+#
+################################################################################
+
+function (F::FqField)(p::FqPolyRingElem)
+  if isdefined(F, :forwardmap)
+    parent(p) !== parent(defining_polynomial(F)) && error("Polynomial has wrong coefficient ring")
+    return F.forwardmap(p)
+  else
+    # F was not created using a defining polynomial
+    @assert is_absolute(F)
+    K = base_field(F)
+    characteristic(base_ring(p)) != characteristic(F) && error("Polynomial has wrong coefficient ring")
+    if _fq_default_ctx_type(K) == _FQ_DEFAULT_NMOD
+      y = FqFieldElem(F)
+      ccall((:fq_default_set_nmod_poly, libflint), Nothing,
+            (Ref{FqFieldElem}, Ref{FqPolyRingElem}, Ref{FqField}), y, p, F)
+      return y
+    else
+      @assert _fq_default_ctx_type(K) == _FQ_DEFAULT_FMPZ_NMOD
+      y = FqFieldElem(F)
+      ccall((:fq_default_set_fmpz_mod_poly, libflint), Nothing,
+            (Ref{FqFieldElem}, Ref{FqPolyRingElem}, Ref{FqField}), y, p, F)
+      return y
+    end
+  end
+end

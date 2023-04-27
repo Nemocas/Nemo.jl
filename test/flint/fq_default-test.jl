@@ -106,6 +106,22 @@ end
    S, y = polynomial_ring(ZZ, "y")
 
    @test f == U(lift(S, f))
+
+   U, a = NGFiniteField(ZZ(7), 5, "a")
+   f = 3a^4 + 2a^3 + a + 5
+   S, y = Nemo._GF(7)["y"]
+   @test f == U(3y^4 + 2y^3 + y + 5)
+
+   S, y = Nemo._GF(5)["y"]
+   @test_throws ErrorException U(y)
+
+   U, a = NGFiniteField(ZZ(1180591620717411303449), 5, "a")
+   f = 3a^4 + 2a^3 + a + 5
+   S, y = Nemo._GF(ZZ(1180591620717411303449))["y"]
+   @test f == U(3y^4 + 2y^3 + y + 5)
+
+   S, y = Nemo._GF(5)["y"]
+   @test_throws ErrorException U(y)
 end
 
 @testset "FqFieldElem.unary_ops" begin

@@ -5,6 +5,9 @@
    F, b = NGFiniteField(f, "b")
    @test defining_polynomial(F) == f
 
+   @test F(x) == b
+   @test_throws ErrorException F(Nemo._GF(5)["x"][2])
+
    ff = defining_polynomial(Rx, F)
    @test ff == f
 
