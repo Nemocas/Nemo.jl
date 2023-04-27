@@ -1,12 +1,13 @@
 name: OscarCI
 
 on:
-  push:
-    branches:
-      - master
   pull_request:
     branches:
       - master
+  push:
+    branches:
+      - master
+  workflow_dispatch:
 
 concurrency:
   # group by workflow and ref; the last slightly strange component ensures that for pull
@@ -28,7 +29,7 @@ jobs:
     - name: "Set up Julia"
       uses: julia-actions/setup-julia@v1
       with:
-        version: '~1.6.0-0'
+        version: '~1.8.0-0'
     - name: OscarDevTools - CI
       if: github.repository == 'oscar-system/OscarDevTools.jl'
       run: |
@@ -82,6 +83,7 @@ jobs:
                                         Pkg.add(PackageSpec(name=\"OscarDevTools\",version=\"0.2\"));
                                         Pkg.instantiate();"
       - name: "Set up Oscar-dev configuration"
+        id: setupdev
         env:
           MATRIX_CONTEXT: ${{ toJSON(matrix) }}
         run: |
@@ -99,11 +101,12 @@ jobs:
                                            filename=\"${GITHUB_ENV}\");"
 
       - name: "Run tests"
+        if: steps.setupdev.outputs.skiptests != 'true'
         run: |
           echo '${{ env.oscar_run_tests }}'
           julia --project=oscar-dev/project/ -e '${{ env.oscar_run_tests }}'
       - name: "Run doctests"
-        if: matrix.julia-version == '~1.6.0-0' || matrix.julia-version == '1.6'
+        if: steps.setupdev.outputs.skiptests != 'true' && (matrix.julia-version == '~1.8.0-0' || matrix.julia-version == '1.8')
         run: |
           echo '${{ env.oscar_run_doctests }}'
           julia --project=oscar-dev/project/ -e '${{ env.oscar_run_doctests }}'
