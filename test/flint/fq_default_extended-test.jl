@@ -80,6 +80,13 @@
    F, b = NGFiniteField(f, "b")
    FF, bb = NGFiniteField(f, "b")
    @test F === FF
+
+   R, a = NGFiniteField(3, 2, "a")
+   Rx, x = R["x"]
+   f = x^3 + 2x + 1
+   F, b = NGFiniteField(f, "b", cached = false)
+   @test_throws ErrorException lift(ZZ["x"][1], b)
+   @test F(ZZ["x"][2] + 1) == b + 1
 end
 
 @testset "FqFieldElem.printing" begin

@@ -121,6 +121,7 @@ end
 
 function lift(R::ZZPolyRing, x::FqFieldElem)
    p = R()
+   !parent(x).isstandard && error("Cannot lift to integer polynomial")
    ccall((:fq_default_get_fmpz_poly, libflint), Nothing,
          (Ref{ZZPolyRingElem}, Ref{FqFieldElem}, Ref{FqField}),
           p, x, parent(x))
@@ -752,7 +753,11 @@ function (a::FqField)(b::ZZRingElem)
 end
 
 function (a::FqField)(b::ZZPolyRingElem)
-   z = FqFieldElem(a, b)
+   if a.isstandard
+     z = FqFieldElem(a, b)
+   else
+     return a.forwardmap(parent(defining_polynomial(a))(b))
+   end
    return z
 end
 
