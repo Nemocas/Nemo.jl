@@ -63,9 +63,9 @@ function FiniteField(p::ZZRingElem; cached::Bool = true)
   return k, k(1)
 end
 
-GF(p::Integer, k::Int, s::Union{AbstractString,Symbol}=:o; cached::Bool = true) = FiniteField(p, k, s, cached = cached)[1]
+GF(p::Integer, k::Int, s::VarName = :o; cached::Bool = true) = FiniteField(p, k, s, cached = cached)[1]
 
-GF(p::ZZRingElem, k::Int, s::Union{AbstractString,Symbol}=:o; cached::Bool = true) = FiniteField(p, k, s, cached = cached)[1]
+GF(p::ZZRingElem, k::Int, s::VarName = :o; cached::Bool = true) = FiniteField(p, k, s, cached = cached)[1]
 
 end # module
 
