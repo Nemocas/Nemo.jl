@@ -180,6 +180,9 @@ zero(a::CalciumQQBarField) = a(0)
 
 one(a::CalciumQQBarField) = a(1)
 
+# Exists only to support Julia functionality (no guarantees)
+zero(::Type{qqbar}) = CalciumQQBar(0)
+
 @doc raw"""
     degree(x::qqbar)
 
