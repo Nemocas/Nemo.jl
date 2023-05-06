@@ -357,14 +357,15 @@ end
    @test divexact(3*A, BigInt(3)//1) == A
 end
 
-@testset "QQMatrix.gso" begin
+@testset "QQMatrix.gram_schmidt_orthogonalisation" begin
    S = matrix_space(QQ, 3, 3)
 
    A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
 
-   @test gso(A) == S([QQFieldElem(2) QQFieldElem(65, 43) QQFieldElem(18, 23);
-                      QQFieldElem(1) QQFieldElem(140, 43) QQFieldElem(-9, 23);
-                      QQFieldElem(9) QQFieldElem(-30, 43) QQFieldElem(-3, 23)])
+   @test gram_schmidt_orthogonalisation(A) == S(
+      [QQFieldElem(2) QQFieldElem(65, 43) QQFieldElem(18, 23);
+       QQFieldElem(1) QQFieldElem(140, 43) QQFieldElem(-9, 23);
+       QQFieldElem(9) QQFieldElem(-30, 43) QQFieldElem(-3, 23)])
 end
 
 @testset "QQMatrix.trace" begin

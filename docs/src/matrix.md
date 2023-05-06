@@ -400,17 +400,7 @@ B = howell_form(A)
 ### Gram-Schmidt Orthogonalisation
 
 ```@docs
-gso(::QQMatrix)
-```
-
-**Examples**
-
-```julia
-S = matrix_space(QQ, 3, 3)
-
-A = S([4 7 3; 2 9 1; 0 5 3])
-
-B = gso(A)
+gram_schmidt_orthogonalisation(::QQMatrix)
 ```
 
 ### Exponential

@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export QQMatrix, QQMatrixSpace, gso, hilbert
+export QQMatrix, QQMatrixSpace, gram_schmidt_orthogonalisation, hilbert
 
 ###############################################################################
 #
@@ -564,11 +564,28 @@ end
 ###############################################################################
 
 @doc raw"""
-    gso(x::QQMatrix)
+    gram_schmidt_orthogonalisation(x::QQMatrix)
 
-Return the Gram-Schmidt Orthogonalisation of the matrix $x$.
+Takes the columns of $x$ as the generators of a subset of $\mathbb{Q}^m$ and
+returns a matrix whose columns are an orthogonal generating set for the same
+subspace.
+
+# Examples
+```jldctest
+julia> S = matrix_space(QQ, 3, 3);
+
+julia> A = S([4 7 3; 2 9 1; 0 5 3])
+[4   7   3]
+[2   9   1]
+[0   5   3]
+
+julia> B = gram_schmidt_orthogonalisation(A)
+[4   -11//5     95//123]
+[2    22//5   -190//123]
+[0        5    209//123]
+```
 """
-function gso(x::QQMatrix)
+function gram_schmidt_orthogonalisation(x::QQMatrix)
    z = similar(x)
    ccall((:fmpq_mat_gso, libflint), Nothing,
                 (Ref{QQMatrix}, Ref{QQMatrix}), z, x)
