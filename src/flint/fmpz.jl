@@ -2238,12 +2238,12 @@ julia> ndigits(ZZ(12), 3)
 3
 ```
 """
-function ndigits(x::ZZRingElem, b::Integer)::Int
+function Base.ndigits(x::ZZRingElem, b::Integer)::Int
    ndigits(x, base=b)
 end
 
 function Base.ndigits(a::ZZRingElem; base::Integer = 10, pad::Integer = 1)
-   iszero(a) && return 1
+   iszero(a) && return max(pad, 1)
    return max(pad, 1+flog(abs(a), ZZRingElem(abs(base))))
 end
 

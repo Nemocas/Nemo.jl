@@ -738,6 +738,14 @@ end
    @test digits(a, base = 17) == digits(BigInt(a), base = 17)
    @test digits(a, base = 5, pad = 50) == digits(BigInt(a), base = 5, pad = 50)
 
+   a = zero(ZZ)
+
+   @test ndigits(a, 257) == 1
+   @test ndigits(a, base = 257) == 1
+
+   @test digits(a) == digits(BigInt(a))
+   @test digits(a, base = 17) == digits(BigInt(a), base = 17)
+   @test digits(a, base = 5, pad = 50) == digits(BigInt(a), base = 5, pad = 50)
 end
 
 @testset "ZZRingElem.string_io" begin
