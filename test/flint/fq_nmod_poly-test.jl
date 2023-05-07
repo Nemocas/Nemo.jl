@@ -572,3 +572,11 @@ end
 
    @test !v
 end
+
+@testset "issue #1353" begin
+   F, _ = FiniteField(2, 1, "1")
+   E, a = FiniteField(2, 15, "a")
+   S, x = PolynomialRing(F, "x")
+   
+   @test_throws ErrorException x+a
+end

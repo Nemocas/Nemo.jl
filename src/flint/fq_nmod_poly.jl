@@ -823,9 +823,10 @@ function (R::fqPolyRepPolyRing)()
 end
 
 function (R::fqPolyRepPolyRing)(x::fqPolyRepFieldElem)
-  z = fqPolyRepPolyRingElem(x)
-  z.parent = R
-  return z
+   parent(x) !== base_ring(R) && error("Element not contained in coefficient ring")
+   z = fqPolyRepPolyRingElem(x)
+   z.parent = R
+   return z
 end
 
 function (R::fqPolyRepPolyRing)(x::ZZRingElem)
