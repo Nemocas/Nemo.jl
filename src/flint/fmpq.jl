@@ -104,12 +104,14 @@ function abs(a::QQFieldElem)
    return z
 end
 
-zero(a::QQField) = QQFieldElem(0)
+zero(_::QQField) = QQFieldElem(0)
 
-# Exists only to support Julia functionality (no guarantees)
+one(_::QQField) = QQFieldElem(1)
+
 zero(::Type{QQFieldElem}) = QQFieldElem(0)
 
-one(a::QQField) = QQFieldElem(1)
+one(::Type{QQFieldElem}) = QQFieldElem(1)
+
 
 function isone(a::QQFieldElem)
    return Bool(ccall((:fmpq_is_one, libflint), Cint, (Ref{QQFieldElem}, ), a))

@@ -49,6 +49,8 @@ end
    @test one(R) == 1
    @test isa(zero(R), qqbar)
    @test isa(one(R), qqbar)
+   @test zero(R) == zero(qqbar)
+   @test one(R) == one(qqbar)
 
    @test iszero(R(0))
    @test isone(R(1))

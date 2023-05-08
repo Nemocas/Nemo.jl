@@ -158,12 +158,13 @@ end
 
 characteristic(R::ZZRing) = 0
 
-one(R::ZZRing) = ZZRingElem(1)
+one(_::ZZRing) = ZZRingElem(1)
 
-zero(R::ZZRing) = ZZRingElem(0)
+zero(_::ZZRing) = ZZRingElem(0)
 
-# Exists only to support Julia functionality (no guarantees)
 zero(::Type{ZZRingElem}) = ZZRingElem(0)
+
+one(::Type{ZZRingElem}) = ZZRingElem(1)
 
 @doc raw"""
     sign(a::ZZRingElem)

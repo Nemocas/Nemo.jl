@@ -65,6 +65,10 @@ end
    @test QQFieldElem(typemax(Int)) == typemax(Int)
 
    @test QQFieldElem(typemin(Int)) == typemin(Int)
+
+   @test zero(R) == zero(QQFieldElem)
+
+   @test one(R) == one(QQFieldElem)
 end
 
 @testset "QQFieldElem.rand" begin

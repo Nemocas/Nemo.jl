@@ -165,7 +165,11 @@ end
 
    @test iszero(b)
 
+   @test zero(ZZRing()) == zero(ZZRingElem)
+
    @test isone(a)
+
+   @test one(ZZRing()) == one(ZZRingElem)
 
    @test numerator(ZZRingElem(12)) == ZZRingElem(12)
 
