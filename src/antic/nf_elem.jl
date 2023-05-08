@@ -260,6 +260,7 @@ function Base.show(io::IO, ::MIME"text/plain", a::AnticNumberField)
    println(io)
    io = AbstractAlgebra.pretty(io)
    print(io, AbstractAlgebra.Indent(), "over ", AbstractAlgebra.Lowercase(), QQ)
+   print(io, Dedent())
    #print(IOContext(io, :supercompact => true))
 end
 

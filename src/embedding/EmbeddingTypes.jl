@@ -33,6 +33,7 @@ function show(io::IO, ::MIME"text/plain", f::FinFieldMorphism)
   print(io, Indent(), "from ", Lowercase(), domain(f))
   println(io)
   print(io, "to ", Lowercase(), codomain(f))
+  print(io, Dedent())
 end
 
 function show(io::IO, f::FinFieldMorphism)
