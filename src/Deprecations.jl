@@ -97,3 +97,7 @@
 @deprecate fib(n::UInt, r::ArbField) fibonacci(n, r)
 
 @deprecate fib(n::Int, r::ArbField) fibonacci(n, r)
+
+# Deprecated in 0.34.*
+
+@deprecate gso(x::QQMatrix) gram_schmidt_orthogonalisation(x)
