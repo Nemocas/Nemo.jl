@@ -146,6 +146,13 @@ end
    end
 end
 
+@testset "QQMatrix.is_zero_entry" begin
+   M = matrix(FlintQQ, [1 2 3;4 0 6;0 8 9])
+   for i in 1:3, j in 1:3
+      @test is_zero_entry(M, i, j) == (M[i, j] == 0)
+   end
+end
+
 @testset "QQMatrix.printing" begin
    a = matrix_space(QQ, 2, 2)(1)
 

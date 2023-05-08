@@ -171,6 +171,13 @@ one(a::QQMatrixSpace) = a(1)
 iszero(a::QQMatrix) = ccall((:fmpq_mat_is_zero, libflint), Bool,
                             (Ref{QQMatrix},), a)
 
+@inline function is_zero_entry(A::QQMatrix, i::Int, j::Int)
+   GC.@preserve A begin
+      x = mat_entry_ptr(A, i, j)
+      return ccall((:fmpz_is_zero, libflint), Bool, (Ptr{QQFieldElem},), x)
+   end
+end
+
 isone(a::QQMatrix) = ccall((:fmpq_mat_is_one, libflint), Bool,
                            (Ref{QQMatrix},), a)
 
@@ -969,3 +976,13 @@ function matrix_space(R::QQField, r::Int, c::Int; cached = true)
    # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
    return QQMatrixSpace(r, c)
 end
+
+################################################################################
+#
+#  Entry pointers
+#
+################################################################################
+ 
+@inline mat_entry_ptr(A::QQMatrix, i::Int, j::Int) = 
+   ccall((:fmpq_mat_entry, libflint), 
+      Ptr{QQFieldElem}, (Ref{QQMatrix}, Int, Int), A, i-1, j-1)

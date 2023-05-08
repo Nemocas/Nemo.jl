@@ -170,6 +170,13 @@ iszero(a::ZZMatrix) = ccall((:fmpz_mat_is_zero, libflint), Bool,
 isone(a::ZZMatrix) = ccall((:fmpz_mat_is_one, libflint), Bool,
                            (Ref{ZZMatrix},), a)
 
+@inline function is_zero_entry(A::ZZMatrix, i::Int, j::Int)
+   GC.@preserve A begin
+      x = mat_entry_ptr(A, i, j)
+      return ccall((:fmpz_is_zero, libflint), Bool, (Ptr{ZZRingElem},), x)
+   end
+end
+
 function deepcopy_internal(d::ZZMatrix, dict::IdDict)
    z = ZZMatrix(d)
    return z
@@ -1122,17 +1129,6 @@ function solve(a::ZZMatrix, b::ZZMatrix)
    return z
 end
 
-@inline mat_entry_ptr(A::ZZMatrix, i::Int, j::Int) = 
-    ccall((:fmpz_mat_entry, libflint), 
-       Ptr{ZZRingElem}, (Ref{ZZMatrix}, Int, Int), A, i-1, j-1)
-
-@inline function is_zero_entry(A::ZZMatrix, i::Int, j::Int)
-   GC.@preserve A begin
-     x = mat_entry_ptr(A, i, j)
-     return ccall((:fmpz_is_zero, libflint), Bool, (Ptr{ZZRingElem},), x)
-   end
-end
-
 @doc raw"""
     cansolve(a::ZZMatrix, b::ZZMatrix) -> Bool, ZZMatrix
 
@@ -1590,7 +1586,7 @@ end
 ###############################################################################
 
 function identity_matrix(R::ZZRing, n::Int)
-  if n < 0
+   if n < 0
      error("dimension must not be negative")
    end
    z = ZZMatrix(n, n)
@@ -1608,3 +1604,13 @@ function matrix_space(R::ZZRing, r::Int, c::Int; cached::Bool = true)
    # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
    return ZZMatrixSpace(r, c)
 end
+
+################################################################################
+#
+#  Entry pointers
+#
+################################################################################
+ 
+@inline mat_entry_ptr(A::ZZMatrix, i::Int, j::Int) = 
+   ccall((:fmpz_mat_entry, libflint), 
+      Ptr{ZZRingElem}, (Ref{ZZMatrix}, Int, Int), A, i-1, j-1)
