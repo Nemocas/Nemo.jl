@@ -509,6 +509,7 @@ mutable struct fmpz_mod_ctx_struct
    norm::UInt
    n_limbs::Tuple{UInt, UInt, UInt}
    ninv_limbs::Tuple{UInt, UInt, UInt}
+   ninv_huge::Ptr{Nothing} # fmpz_preinvn_struct
 
    function fmpz_mod_ctx_struct()
       z = new()
