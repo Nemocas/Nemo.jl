@@ -206,6 +206,21 @@ promote_rule(::Type{FpMatrix}, ::Type{ZZRingElem}) = FpMatrix
 
 ################################################################################
 #
+#  Inverse
+#
+################################################################################
+
+function inv(a::FpMatrix)
+  !is_square(a) && error("Matrix must be a square matrix")
+  z = similar(a)
+  r = ccall((:fmpz_mod_mat_inv, libflint), Int,
+          (Ref{FpMatrix}, Ref{FpMatrix}), z, a)
+  !Bool(r) && error("Matrix not invertible")
+  return z
+end
+
+################################################################################
+#
 #  Parent object overloading
 #
 ################################################################################
@@ -350,4 +365,3 @@ function matrix_space(R::FpField, r::Int, c::Int; cached::Bool = true)
   # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
   FpMatrixSpace(R, r, c)
 end
-
