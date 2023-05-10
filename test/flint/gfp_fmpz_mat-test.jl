@@ -516,6 +516,29 @@ end
   @test c == 2
 end
 
+@testset "FpMatrix.inv" begin
+  Z17 = GF(ZZ(17))
+  R = matrix_space(Z17, 3, 4)
+  RR = matrix_space(Z17, 4, 3)
+  Z2 = GF(ZZ(2))
+  S = matrix_space(Z2, 3, 4)
+
+  a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
+
+  aa = matrix_space(Z17,3,3)([ 1 2 3; 3 2 1; 1 1 2])
+
+  b = R([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
+
+  c = inv(aa)
+
+  @test c == parent(aa)([12 13 1; 14 13 15; 4 4 1])
+
+  @test_throws ErrorException inv(a)
+
+  @test_throws ErrorException inv(transpose(a)*a)
+end
+
+
 @testset "FpMatrix.swap_rows" begin
   Z17 = GF(ZZ(17))
 
