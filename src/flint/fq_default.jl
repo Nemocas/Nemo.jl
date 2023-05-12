@@ -755,6 +755,18 @@ function (a::FqField)(b::ZZRingElem)
    return z
 end
 
+function (a::FqField)(b::Rational{<:Integer})
+   d = a(denominator(b))
+   is_zero(d) && error("Denominator not invertible")
+   return a(numerator(b))/d
+end
+
+function (a::FqField)(b::QQFieldElem)
+   d = a(denominator(b))
+   is_zero(d) && error("Denominator not invertible")
+   return a(numerator(b))/d
+end
+
 function (a::FqField)(b::ZZPolyRingElem)
    if a.isstandard
      z = FqFieldElem(a, b)
