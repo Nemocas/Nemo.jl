@@ -69,6 +69,8 @@ end
    @test zero(R) == zero(QQFieldElem)
 
    @test one(R) == one(QQFieldElem)
+
+   @test sprint(show, "text/plain", QQ) == "Rational field"
 end
 
 @testset "QQFieldElem.rand" begin
