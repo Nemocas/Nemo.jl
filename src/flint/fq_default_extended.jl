@@ -495,6 +495,7 @@ function _fq_field_from_fmpz_mod_poly_in_disguise(f::FqPolyRingElem, s)
   z.isabsolute = true
   z.isstandard = true
   z.base_field = K
+  z.defining_poly = f
   z.forwardmap = g -> begin
     y = FqFieldElem(z)
     ccall((:fq_default_set_fmpz_mod_poly, libflint), Nothing,
@@ -526,6 +527,7 @@ function _fq_field_from_nmod_poly_in_disguise(f::FqPolyRingElem, s)
   z.isabsolute = true
   z.isstandard = true
   z.base_field = K
+  z.defining_poly = f
   z.forwardmap = g -> begin
     y = FqFieldElem(z)
     ccall((:fq_default_set_nmod_poly, libflint), Nothing,
