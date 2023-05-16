@@ -1,6 +1,6 @@
 name = "Nemo"
 uuid = "2edaba10-b0f1-5616-af89-8c11ac63239a"
-version = "0.34.3"
+version = "0.34.4"
 
 [deps]
 AbstractAlgebra = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
@@ -22,6 +22,6 @@ AbstractAlgebra = "0.30"
 Antic_jll = "~0.201.500"
 Arb_jll = "~200.2300.000"
 Calcium_jll = "~0.401.100"
-FLINT_jll = "^200.900.005"
+FLINT_jll = "^200.900.006"
 RandomExtensions = "0.4.2"
 julia = "1.6"
