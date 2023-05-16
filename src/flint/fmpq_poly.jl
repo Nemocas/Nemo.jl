@@ -896,7 +896,7 @@ end
 function (a::QQPolyRing)(b::Vector{ZZRingElem}, copy::Bool=true) 
   x = a()
   for i=1:length(b)
-    ccall((:fmpq_poly_set_coeff_fmpz, libflint), Cvoid, (Ref{QQPolyRingElem}, Clong, Ref{ZZRingElem}), x, i-1, b[i])
+    ccall((:fmpq_poly_set_coeff_fmpz, libflint), Cvoid, (Ref{QQPolyRingElem}, Int, Ref{ZZRingElem}), x, i - 1, b[i])
   end
   return x
 end
