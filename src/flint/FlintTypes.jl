@@ -2057,6 +2057,7 @@ end
    norm::UInt
    n_limbs::Tuple{UInt, UInt, UInt}
    ninv_limbs::Tuple{UInt, UInt, UInt}
+   ninv_huge::Ptr{Nothing} # fmpz_preinvn_struct
    # end of flint struct
 
    base_ring::FpField
@@ -2353,7 +2354,7 @@ A finite field. The constructor automatically determines a fast implementation.
 """
 @attributes mutable struct FqField <: FinField
    # fq_default_ctx_struct is 200 bytes on 64 bit machine
-   opaque::NTuple{200, Int8}
+   opaque::NTuple{208, Int8}
    # end of flint struct
 
    var::String
@@ -2608,6 +2609,7 @@ See [`fqPolyRepField`](@ref) for $p$ being an [`Int`](@ref). See [`FqPolyRepFiel
    norm::UInt
    n_limbs::Tuple{UInt, UInt, UInt}
    ninv_limbs::Tuple{UInt, UInt, UInt}
+   ninv_huge::Ptr{Nothing} # fmpz_preinvn_struct
 
    sparse_modulus :: Cint
    is_conway :: Cint

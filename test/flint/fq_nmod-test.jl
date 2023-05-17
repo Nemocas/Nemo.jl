@@ -265,4 +265,3 @@ end
    S, y = polynomial_ring(GF(23), "y")
    @test lift(S, f) == 8y + 9
 end
-
