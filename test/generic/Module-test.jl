@@ -1,6 +1,4 @@
-import AbstractAlgebra
-
-function rand_module(R::AbstractAlgebra.Ring, vals...)
+function rand_module(R::Ring, vals...)
    rk = rand(0:5)
    M = FreeModule(R, rk)
    levels = rand(0:3)
