@@ -198,7 +198,6 @@ export finite_field
 export fits
 export flint_cleanup
 export flint_set_num_threads
-export FlintFiniteField
 export FlintLocalField
 export FlintLocalFieldElem
 export FlintPadicField
@@ -464,7 +463,6 @@ export next_signed_minimal
 export nextpow2
 export nf_elem
 export nfdivrem
-export NGFiniteField
 export NonArchLocalField
 export NonArchLocalFieldElem
 export norm

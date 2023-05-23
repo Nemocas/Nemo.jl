@@ -3,7 +3,7 @@
 end
 
 @testset "fpRelPowerSeriesRingElem.constructors" begin
-   R = GF(17)
+   R = Native.GF(17)
    
    S1 = RelPowerSeriesRing(R, 30)
    S2 = RelPowerSeriesRing(R, 30)
@@ -52,7 +52,7 @@ end
 end
 
 @testset "fpRelPowerSeriesRingElem.printing" begin
-   R = GF(17)
+   R = Native.GF(17)
    S, x = power_series_ring(R, 30, "x")
    b = x^2 + x + O(x^4)
 
@@ -60,7 +60,7 @@ end
 end
 
 @testset "fpRelPowerSeriesRingElem.manipulation" begin
-   R = GF(17)
+   R = Native.GF(17)
    S, x = power_series_ring(R, 30, "x")
 
    @test max_precision(S) == 30
@@ -96,7 +96,7 @@ end
 end
 
 @testset "fpRelPowerSeriesRingElem.similar" begin
-   R0 = GF(23)
+   R0 = Native.GF(23)
    R, x = power_series_ring(R0, 10, "x")
    S, y = power_series_ring(ZZ, 10, "y")
 
@@ -144,7 +144,7 @@ end
 end
 
 @testset "fpRelPowerSeriesRingElem.rel_series" begin
-   R = GF(23)
+   R = Native.GF(23)
    f = rel_series(R, [1, 2, 3], 3, 5, 2, "y")
 
    @test isa(f, fpRelPowerSeriesRingElem)
@@ -187,7 +187,7 @@ end
 end
 
 @testset "fpRelPowerSeriesRingElem.unary_ops" begin
-   R = GF(17)
+   R = Native.GF(17)
    S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
@@ -199,7 +199,7 @@ end
 end
 
 @testset "fpRelPowerSeriesRingElem.binary_ops" begin
-   R = GF(17)
+   R = Native.GF(17)
    S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
@@ -337,7 +337,7 @@ end
 end
 
 @testset "fpRelPowerSeriesRingElem.adhoc_binary_ops" begin
-   R = GF(17)
+   R = Native.GF(17)
    S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
@@ -355,7 +355,7 @@ end
 end
 
 @testset "fpRelPowerSeriesRingElem.comparison" begin
-   R = GF(17)
+   R = Native.GF(17)
    S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
@@ -375,7 +375,7 @@ end
 end
 
 @testset "fpRelPowerSeriesRingElem.adhoc_comparison" begin
-   R = GF(17)
+   R = Native.GF(17)
    S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
@@ -395,7 +395,7 @@ end
 end
 
 @testset "fpRelPowerSeriesRingElem.powering" begin
-   R = GF(17)
+   R = Native.GF(17)
    S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
@@ -415,7 +415,7 @@ end
 end
 
 @testset "fpRelPowerSeriesRingElem.shift" begin
-   R = GF(17)
+   R = Native.GF(17)
    S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
@@ -437,7 +437,7 @@ end
 end
 
 @testset "fpRelPowerSeriesRingElem.truncation" begin
-   R = GF(17)
+   R = Native.GF(17)
    S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
@@ -457,7 +457,7 @@ end
 end
 
 @testset "fpRelPowerSeriesRingElem.inversion" begin
-   R = GF(17)
+   R = Native.GF(17)
    S, x = power_series_ring(R, 30, "x")
 
    a = 1 + x + 2x^2 + O(x^5)
@@ -469,7 +469,7 @@ end
 end
 
 @testset "fpRelPowerSeriesRingElem.exact_division" begin
-   R = GF(17)
+   R = Native.GF(17)
    S, x = power_series_ring(R, 30, "x")
 
    a = x + x^3
@@ -487,7 +487,7 @@ end
 end
 
 @testset "fpRelPowerSeriesRingElem.adhoc_exact_division" begin
-   R = GF(17)
+   R = Native.GF(17)
    S, x = power_series_ring(R, 30, "x")
 
    a = x + x^3
@@ -509,7 +509,7 @@ end
 end
 
 @testset "fpRelPowerSeriesRingElem.square_root" begin
-   S = GF(31)
+   S = Native.GF(31)
    R, x = power_series_ring(S, 30, "x")
 
    for iter = 1:300
@@ -519,7 +519,7 @@ end
    end
 
    for p in [2, 7, 19, 65537]
-      R = GF(p)
+      R = Native.GF(p)
 
       S, x = power_series_ring(R, 10, "x")
 
@@ -550,7 +550,7 @@ end
 end
 
 @testset "fpRelPowerSeriesRingElem.special_functions" begin
-   R = GF(17)
+   R = Native.GF(17)
    S, x = power_series_ring(R, 30, "x")
 
    @test isequal(exp(x + O(x^5)), 1+x+9*x^2+3*x^3+5*x^4+O(x^5))
@@ -561,7 +561,7 @@ end
 end
 
 @testset "fpRelPowerSeriesRingElem.unsafe_operators" begin
-   S = GF(17)
+   S = Native.GF(17)
    R, x = power_series_ring(S, 30, "x")
 
    for iter = 1:300

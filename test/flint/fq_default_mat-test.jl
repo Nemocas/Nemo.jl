@@ -1,6 +1,6 @@
 @testset "FqMatrix.constructors" begin
-  F4, a = NGFiniteField(ZZRingElem(2), 2, "a")
-  F9, b = NGFiniteField(ZZRingElem(3), 2, "b")
+  F4, a = finite_field(ZZRingElem(2), 2, "a")
+  F9, b = finite_field(ZZRingElem(3), 2, "b")
 
   R = FqMatrixSpace(F4, 2, 2)
 
@@ -165,10 +165,10 @@
    @test a in keys(Dict(a => 1))
    @test !(a in keys(Dict(b => 1)))
 
-   R, x = NGFiniteField(ZZRingElem(23), 5, "x")
+   R, x = finite_field(ZZRingElem(23), 5, "x")
    S = matrix_space(R, 2, 2)
 
-   for R in [FlintZZ, residue_ring(FlintZZ, 23), residue_ring(FlintZZ, ZZ(23)), GF(23)]
+   for R in [FlintZZ, residue_ring(FlintZZ, 23), residue_ring(FlintZZ, ZZ(23)), Native.GF(23)]
       M = matrix(R, 2, 2, [1, 2, 3, 4])
 
       @test isa(S(M), MatElem)
@@ -176,7 +176,7 @@
 end
 
 @testset "FqMatrix.similar" begin
-   F9, b = NGFiniteField(ZZRingElem(3), 2, "b")
+   F9, b = finite_field(ZZRingElem(3), 2, "b")
    S = matrix_space(F9, 3, 3)
    s = S(ZZRingElem(3))
 
@@ -204,7 +204,7 @@ end
 end
 
 @testset "FqMatrix.printing" begin
-  F4, _  = NGFiniteField(ZZRingElem(2), 2, "a")
+  F4, _  = finite_field(ZZRingElem(2), 2, "a")
   R = FqMatrixSpace(F4, 2, 2)
 
   a = R(1)
@@ -214,9 +214,9 @@ end
 end
 
 @testset "FqMatrix.manipulation" begin
-  F4, _ = NGFiniteField(ZZRingElem(2), 2, "a")
+  F4, _ = finite_field(ZZRingElem(2), 2, "a")
   R = FqMatrixSpace(F4, 2, 2)
-  F9, _ = NGFiniteField(ZZRingElem(3), 2, "b")
+  F9, _ = finite_field(ZZRingElem(3), 2, "b")
   S = FqMatrixSpace(F9, 2, 2)
 
   ar = [ 1 2; 3 4]
@@ -282,7 +282,7 @@ end
 end
 
 @testset "FqMatrix.unary_ops" begin
-  F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
 
   R = matrix_space(F17, 3, 4)
   RR = matrix_space(F17, 4, 3)
@@ -299,7 +299,7 @@ end
 end
 
 @testset "FqMatrix.binary_ops" begin
-  F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
 
   R = matrix_space(F17, 3, 4)
 
@@ -327,7 +327,7 @@ end
 end
 
 @testset "FqMatrix.row_col_swapping" begin
-   R, _ = NGFiniteField(ZZRingElem(17), 1, "a")
+   R, _ = finite_field(ZZRingElem(17), 1, "a")
 
    a = matrix(R, [1 2; 3 4; 5 6])
 
@@ -366,10 +366,10 @@ end
 end
 
 @testset "FqMatrix.adhoc_binary" begin
-  F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
 
   R = matrix_space(F17, 3, 4)
-  F2, _ = NGFiniteField(ZZRingElem(2), 1, "a")
+  F2, _ = finite_field(ZZRingElem(2), 1, "a")
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 
@@ -405,7 +405,7 @@ end
 end
 
 @testset "FqMatrix.comparison" begin
-  F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
 
   R = matrix_space(F17, 3, 4)
 
@@ -419,7 +419,7 @@ end
 end
 
 @testset "FqMatrix.adhoc_comparison" begin
-  F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
 
   R = matrix_space(F17, 3, 4)
 
@@ -433,7 +433,7 @@ end
 end
 
 @testset "FqMatrix.powering" begin
-  F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
 
   R = matrix_space(F17, 3, 4)
 
@@ -447,7 +447,7 @@ end
 end
 
 @testset "FqMatrix.row_echelon_form" begin
-  F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
   R = matrix_space(F17, 3, 4)
   RR = matrix_space(F17, 4, 3)
 
@@ -476,7 +476,7 @@ end
 end
 
 @testset "FqMatrix.trace_det" begin
-  F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
   R = matrix_space(F17, 3, 4)
   RR = matrix_space(F17, 4, 3)
 
@@ -508,7 +508,7 @@ end
 end
 
 @testset "FqMatrix.rank" begin
-  F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
   R = matrix_space(F17, 3, 4)
   RR = matrix_space(F17, 4, 3)
 
@@ -532,7 +532,7 @@ end
 end
 
 @testset "FqMatrix.inv" begin
-  F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
   R = matrix_space(F17, 3, 4)
   RR = matrix_space(F17, 4, 3)
 
@@ -552,7 +552,7 @@ end
 end
 
 @testset "FqMatrix.solve" begin
-  F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
   R = matrix_space(F17, 3, 3)
   S = matrix_space(F17, 3, 4)
 
@@ -642,7 +642,7 @@ end
 
 @testset "FqMatrix.lu" begin
 
-  F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
   R = matrix_space(F17, 3, 3)
   S = matrix_space(F17, 3, 4)
 
@@ -669,7 +669,7 @@ end
 end
 
 @testset "FqMatrix.view" begin
-  F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
   R = matrix_space(F17, 3, 3)
   S = matrix_space(F17, 3, 4)
 
@@ -705,7 +705,7 @@ end
 end
 
 @testset "FqMatrix.sub" begin
-   F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
+   F17, _ = finite_field(ZZRingElem(17), 1, "a")
    S = matrix_space(F17, 3, 3)
 
    A = S([1 2 3; 4 5 6; 7 8 9])
@@ -729,7 +729,7 @@ end
 end
 
 @testset "FqMatrix.concatenation" begin
-  F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
   R = matrix_space(F17, 3, 3)
   S = matrix_space(F17, 3, 4)
 
@@ -765,7 +765,7 @@ end
 end
 
 @testset "FqMatrix.conversion" begin
-  F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
   R = matrix_space(F17, 3, 3)
 
   a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
@@ -776,7 +776,7 @@ end
 end
 
 @testset "FqMatrix.charpoly" begin
-   F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
+   F17, _ = finite_field(ZZRingElem(17), 1, "a")
 
    for dim = 0:5
       S = matrix_space(F17, dim, dim)
@@ -796,7 +796,7 @@ end
 end
 
 @testset "FqMatrix.rand" begin
-   F17, _ = NGFiniteField(ZZRingElem(17), 1, "a")
+   F17, _ = finite_field(ZZRingElem(17), 1, "a")
    S = matrix_space(F17, 3, 3)
    M = rand(S)
    @test parent(M) == S
@@ -807,7 +807,7 @@ end
   degs = [1, 2]
   for p in ps
     for d in degs
-      F, = NGFiniteField(p, d)
+      F, = finite_field(p, d)
       A = matrix(F, 2, 2, [rand(F) for i in 1:4])
       GC.@preserve A begin
         for i in 1:2

@@ -1,6 +1,6 @@
 @testset "fqPolyRepMatrix.constructors" begin
-  F4, a = FlintFiniteField(2, 2, "a")
-  F9, b = FlintFiniteField(3, 2, "b")
+  F4, a = Native.finite_field(2, 2, "a")
+  F9, b = Native.finite_field(3, 2, "b")
 
   R = fqPolyRepMatrixSpace(F4, 2, 2)
 
@@ -167,7 +167,7 @@
 end
 
 @testset "fqPolyRepMatrix.similar" begin
-   F9, b = finite_field(3, 2, "b")
+   F9, b = Native.finite_field(3, 2, "b")
    S = fqPolyRepMatrixSpace(F9, 2, 2)
    s = S(ZZRingElem(3))
 
@@ -195,7 +195,7 @@ end
 end
 
 @testset "fqPolyRepMatrix.printing" begin
-  F4, _  = FlintFiniteField(2, 2, "a")
+  F4, _  = Native.finite_field(2, 2, "a")
   R = fqPolyRepMatrixSpace(F4, 2, 2)
 
   a = R(1)
@@ -205,9 +205,9 @@ end
 end
 
 @testset "fqPolyRepMatrix.manipulation" begin
-  F4, _ = FlintFiniteField(2, 2, "a")
+  F4, _ = Native.finite_field(2, 2, "a")
   R = fqPolyRepMatrixSpace(F4, 2, 2)
-  F9, _ = FlintFiniteField(3, 2, "b")
+  F9, _ = Native.finite_field(3, 2, "b")
   S = fqPolyRepMatrixSpace(F9, 2, 2)
 
   ar = [ 1 2; 3 4]
@@ -273,7 +273,7 @@ end
 end
 
 @testset "fqPolyRepMatrix.unary_ops" begin
-  F17, _ = FlintFiniteField(17, 1, "a")
+  F17, _ = Native.finite_field(17, 1, "a")
 
   R = matrix_space(F17, 3, 4)
   RR = matrix_space(F17, 4, 3)
@@ -290,7 +290,7 @@ end
 end
 
 @testset "fqPolyRepMatrix.row_col_swapping" begin
-   R, _ = FlintFiniteField(17, 1, "a")
+   R, _ = Native.finite_field(17, 1, "a")
 
    a = matrix(R, [1 2; 3 4; 5 6])
 
@@ -329,7 +329,7 @@ end
 end
 
 @testset "fqPolyRepMatrix.binary_ops" begin
-  F17, _ = FlintFiniteField(17, 1, "a")
+  F17, _ = Native.finite_field(17, 1, "a")
 
   R = matrix_space(F17, 3, 4)
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
@@ -356,10 +356,10 @@ end
 end
 
 @testset "fqPolyRepMatrix.adhoc_binary" begin
-  F17, _ = FlintFiniteField(17, 1, "a")
+  F17, _ = Native.finite_field(17, 1, "a")
 
   R = matrix_space(F17, 3, 4)
-  F2, _ = FlintFiniteField(2, 1, "a")
+  F2, _ = Native.finite_field(2, 1, "a")
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 
@@ -395,7 +395,7 @@ end
 end
 
 @testset "fqPolyRepMatrix.comparison" begin
-  F17, _ = FlintFiniteField(17, 1, "a")
+  F17, _ = Native.finite_field(17, 1, "a")
 
   R = matrix_space(F17, 3, 4)
 
@@ -409,7 +409,7 @@ end
 end
 
 @testset "fqPolyRepMatrix.comparison" begin
-  F17, _ = FlintFiniteField(17, 1, "a")
+  F17, _ = Native.finite_field(17, 1, "a")
 
   R = matrix_space(F17, 3, 4)
 
@@ -423,7 +423,7 @@ end
 end
 
 @testset "fqPolyRepMatrix.powering" begin
-  F17, _ = FlintFiniteField(17, 1, "a")
+  F17, _ = Native.finite_field(17, 1, "a")
 
   R = matrix_space(F17, 3, 4)
 
@@ -437,7 +437,7 @@ end
 end
 
 @testset "fqPolyRepMatrix.row_echelon_form" begin
-  F17, _ = FlintFiniteField(17, 1, "a")
+  F17, _ = Native.finite_field(17, 1, "a")
   R = matrix_space(F17, 3, 4)
   RR = matrix_space(F17, 4, 3)
 
@@ -466,7 +466,7 @@ end
 end
 
 @testset "fqPolyRepMatrix.trace_det" begin
-  F17, _ = FlintFiniteField(17, 1, "a")
+  F17, _ = Native.finite_field(17, 1, "a")
   R = matrix_space(F17, 3, 4)
   RR = matrix_space(F17, 4, 3)
 
@@ -498,7 +498,7 @@ end
 end
 
 @testset "fqPolyRepMatrix.rank" begin
-  F17, _ = FlintFiniteField(17, 1, "a")
+  F17, _ = Native.finite_field(17, 1, "a")
   R = matrix_space(F17, 3, 4)
   RR = matrix_space(F17, 4, 3)
 
@@ -522,7 +522,7 @@ end
 end
 
 @testset "fqPolyRepMatrix.inv" begin
-  F17, _ = FlintFiniteField(17, 1, "a")
+  F17, _ = Native.finite_field(17, 1, "a")
   R = matrix_space(F17, 3, 4)
   RR = matrix_space(F17, 4, 3)
 
@@ -542,7 +542,7 @@ end
 end
 
 @testset "fqPolyRepMatrix.solve" begin
-  F17, _ = FlintFiniteField(17, 1, "a")
+  F17, _ = Native.finite_field(17, 1, "a")
   R = matrix_space(F17, 3, 3)
   S = matrix_space(F17, 3, 4)
 
@@ -632,7 +632,7 @@ end
 
 @testset "fqPolyRepMatrix.lu" begin
 
-  F17, _ = FlintFiniteField(17, 1, "a")
+  F17, _ = Native.finite_field(17, 1, "a")
   R = matrix_space(F17, 3, 3)
   S = matrix_space(F17, 3, 4)
 
@@ -659,7 +659,7 @@ end
 end
 
 @testset "fqPolyRepMatrix.view" begin
-  F17, _ = FlintFiniteField(17, 1, "a")
+  F17, _ = Native.finite_field(17, 1, "a")
   R = matrix_space(F17, 3, 3)
   S = matrix_space(F17, 3, 4)
 
@@ -695,7 +695,7 @@ end
 end
 
 @testset "fqPolyRepMatrix.sub" begin
-   F17, _ = FlintFiniteField(17, 1, "a")
+   F17, _ = Native.finite_field(17, 1, "a")
    S = matrix_space(F17, 3, 3)
 
    A = S([1 2 3; 4 5 6; 7 8 9])
@@ -719,7 +719,7 @@ end
 end
 
 @testset "fqPolyRepMatrix.concatenation" begin
-  F17, _ = FlintFiniteField(17, 1, "a")
+  F17, _ = Native.finite_field(17, 1, "a")
   R = matrix_space(F17, 3, 3)
   S = matrix_space(F17, 3, 4)
 
@@ -755,7 +755,7 @@ end
 end
 
 @testset "fqPolyRepMatrix.conversion" begin
-  F17, _ = FlintFiniteField(17, 1, "a")
+  F17, _ = Native.finite_field(17, 1, "a")
   R = matrix_space(F17, 3, 3)
 
   a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
@@ -766,7 +766,7 @@ end
 end
 
 @testset "fqPolyRepMatrix.charpoly" begin
-   F17, _ = FlintFiniteField(17, 1, "a")
+   F17, _ = Native.finite_field(17, 1, "a")
 
    for dim = 0:5
       S = matrix_space(F17, dim, dim)
@@ -786,7 +786,7 @@ end
 end
 
 @testset "fqPolyRepMatrix.rand" begin
-   F17, _ = FlintFiniteField(17, 1, "a")
+   F17, _ = Native.finite_field(17, 1, "a")
    S = matrix_space(F17, 3, 4)
    M = rand(S)
    @test parent(M) == S

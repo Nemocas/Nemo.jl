@@ -6893,13 +6893,13 @@ const _fq_default_mpoly_union = Union{AbstractAlgebra.Generic.MPoly{FqPolyRepFie
          m = modulus(R)
          p = characteristic(R)
          if fits(UInt, p)
-            Fq = GF(UInt(p))
+            Fq = Native.GF(UInt(p))
             if isone(degree(m))
                Fqx = polynomial_ring(Fq, s, cached = cached, ordering = ordering)[1]
                return new(Fqx, R, 3)
             end
             mm = polynomial_ring(Fq, "x")[1](lift(polynomial_ring(ZZ, "x")[1], m))
-            Fq = FlintFiniteField(mm, R.var, cached = cached, check = false)[1]
+            Fq = Native.FiniteField(mm, R.var, cached = cached, check = false)[1]
             Fqx = polynomial_ring(Fq, s, cached = cached, ordering = ordering)[1]
             return new(Fqx, R, 2)
          end

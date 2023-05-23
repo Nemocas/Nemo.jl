@@ -1,6 +1,6 @@
 @testset "fpMatrix.constructors" begin
-  Z2 = GF(2)
-  Z3 = GF(3)
+  Z2 = Native.GF(2)
+  Z3 = Native.GF(3)
 
   R = fpMatrixSpace(Z2, 2, 2)
 
@@ -171,7 +171,7 @@
 end
 
 @testset "fpMatrix.similar" begin
-   Z13 = GF(13)
+   Z13 = Native.GF(13)
    S = fpMatrixSpace(Z13, 2, 2)
    s = S(ZZRingElem(3))
 
@@ -199,7 +199,7 @@ end
 end
 
 @testset "fpMatrix.printing" begin
-  Z2 = GF(2)
+  Z2 = Native.GF(2)
   R = fpMatrixSpace(Z2, 2, 2)
 
   a = R(1)
@@ -209,9 +209,9 @@ end
 end
 
 @testset "fpMatrix.manipulation" begin
-  Z11 = GF(11)
+  Z11 = Native.GF(11)
   R = fpMatrixSpace(Z11, 2, 2)
-  Z23 = GF(23)
+  Z23 = Native.GF(23)
   S = fpMatrixSpace(Z23, 2, 2)
 
   ar = [ 1 2; 3 4]
@@ -260,7 +260,7 @@ end
 
   @test iszero(e)
 
-  @test_throws ErrorException one(matrix_space(GF(2), 1, 2))
+  @test_throws ErrorException one(matrix_space(Native.GF(2), 1, 2))
 
   @test is_square(a)
 
@@ -281,11 +281,11 @@ end
 end
 
 @testset "fpMatrix.unary_ops" begin
-  Z17 = GF(17)
+  Z17 = Native.GF(17)
 
   R = matrix_space(Z17, 3, 4)
   RR = matrix_space(Z17, 4, 3)
-  Z2 = GF(2)
+  Z2 = Native.GF(2)
   S = matrix_space(Z2, 3, 4)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
@@ -300,7 +300,7 @@ end
 end
 
 @testset "fpMatrix.binary_ops" begin
-  Z17 = GF(17)
+  Z17 = Native.GF(17)
 
   R = matrix_space(Z17, 3, 4)
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
@@ -363,10 +363,10 @@ end
 end
 
 @testset "fpMatrix.adhoc_binary" begin
-  Z17 = GF(17)
+  Z17 = Native.GF(17)
 
   R = matrix_space(Z17, 3, 4)
-  Z2 = GF(2)
+  Z2 = Native.GF(2)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 
@@ -402,7 +402,7 @@ end
 end
 
 @testset "fpMatrix.comparison" begin
-  Z17 = GF(17)
+  Z17 = Native.GF(17)
 
   R = matrix_space(Z17, 3, 4)
 
@@ -416,7 +416,7 @@ end
 end
 
 @testset "fpMatrix.adhoc_comparison" begin
-  Z17 = GF(17)
+  Z17 = Native.GF(17)
 
   R = matrix_space(Z17, 3, 4)
 
@@ -430,7 +430,7 @@ end
 end
 
 @testset "fpMatrix.powering" begin
-  Z17 = GF(17)
+  Z17 = Native.GF(17)
 
   R = matrix_space(Z17, 3, 4)
 
@@ -453,17 +453,17 @@ end
   for iters = 1:100
     m = rand(0:100)
     n = rand(0:100)
-    S = matrix_space(GF(7), m, n)
+    S = matrix_space(Native.GF(7), m, n)
     M = rand(S)
     r, N = rref(M)
 
     @test is_rref(N)
   end
 
-  Z17 = GF(17)
+  Z17 = Native.GF(17)
   R = matrix_space(Z17, 3, 4)
   RR = matrix_space(Z17, 4, 3)
-  Z2 = GF(2)
+  Z2 = Native.GF(2)
   S = matrix_space(Z2, 3, 4)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
@@ -491,7 +491,7 @@ end
 end
 
 @testset "fpMatrix.howell_form" begin
-  Z17 = GF(17)
+  Z17 = Native.GF(17)
   R = matrix_space(Z17, 3, 3)
 
   a = R([4 1 0; 0 0 5; 0 0 0 ])
@@ -511,10 +511,10 @@ end
 end
 
 @testset "fpMatrix.trace_det" begin
-  Z17 = GF(17)
+  Z17 = Native.GF(17)
   R = matrix_space(Z17, 3, 4)
   RR = matrix_space(Z17, 4, 3)
-  Z2 = GF(2)
+  Z2 = Native.GF(2)
   S = matrix_space(Z2, 3, 4)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
@@ -545,10 +545,10 @@ end
 end
 
 @testset "fpMatrix.rank" begin
-  Z17 = GF(17)
+  Z17 = Native.GF(17)
   R = matrix_space(Z17, 3, 4)
   RR = matrix_space(Z17, 4, 3)
-  Z2 = GF(2)
+  Z2 = Native.GF(2)
   S = matrix_space(Z2, 3, 4)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
@@ -571,10 +571,10 @@ end
 end
 
 @testset "fpMatrix.inv" begin
-  Z17 = GF(17)
+  Z17 = Native.GF(17)
   R = matrix_space(Z17, 3, 4)
   RR = matrix_space(Z17, 4, 3)
-  Z2 = GF(2)
+  Z2 = Native.GF(2)
   S = matrix_space(Z2, 3, 4)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
@@ -593,7 +593,7 @@ end
 end
 
 @testset "fpMatrix.solve" begin
-  Z17 = GF(17)
+  Z17 = Native.GF(17)
   R = matrix_space(Z17, 3, 3)
   S = matrix_space(Z17, 3, 4)
 
@@ -683,7 +683,7 @@ end
 
 @testset "fpMatrix.lu" begin
 
-  Z17 = GF(17)
+  Z17 = Native.GF(17)
   R = matrix_space(Z17, 3, 3)
   S = matrix_space(Z17, 3, 4)
 
@@ -710,7 +710,7 @@ end
 end
 
 @testset "fpMatrix.swap_rows" begin
-  Z17 = GF(17)
+  Z17 = Native.GF(17)
 
   A = matrix(Z17, 5, 1, [1, 2, 3, 4, 5])
 
@@ -724,7 +724,7 @@ end
   @test_throws BoundsError swap_rows(A, 4, 6)
 end
 @testset "fpMatrix.view" begin
-  Z17 = GF(17)
+  Z17 = Native.GF(17)
   R = matrix_space(Z17, 3, 3)
   S = matrix_space(Z17, 3, 4)
 
@@ -781,7 +781,7 @@ end
 end
 
 @testset "fpMatrix.sub" begin
-   Z17 = GF(17)
+   Z17 = Native.GF(17)
    S = matrix_space(Z17, 3, 3)
 
    A = S([1 2 3; 4 5 6; 7 8 9])
@@ -805,7 +805,7 @@ end
 end
 
 @testset "fpMatrix.concatenation" begin
-  Z17 = GF(17)
+  Z17 = Native.GF(17)
   R = matrix_space(Z17, 3, 3)
   S = matrix_space(Z17, 3, 4)
 
@@ -841,7 +841,7 @@ end
 end
 
 @testset "fpMatrix.conversion" begin
-  Z17 = GF(17)
+  Z17 = Native.GF(17)
   R = matrix_space(Z17, 3, 3)
   S = matrix_space(ZZ, 3, 3)
 
@@ -864,7 +864,7 @@ end
 end
 
 @testset "fpMatrix.charpoly" begin
-   R = GF(17)
+   R = Native.GF(17)
 
    for dim = 0:5
       S = matrix_space(R, dim, dim)
@@ -882,7 +882,7 @@ end
 end
 
 @testset "fpMatrix.rand" begin
-   R = GF(17)
+   R = Native.GF(17)
    S = matrix_space(R, 3, 3)
 
    M = rand(S, 1:5)

@@ -3,17 +3,17 @@
     for i in 1:10
         p = ZZRingElem(next_prime(rand(1:999)))
 
-        k1, x1 = NGFiniteField(p, 1, "x1")
-        k2, x2 = NGFiniteField(p, 2, "x2")
-        k3, x3 = NGFiniteField(p, 3, "x3")
-        k4, x4 = NGFiniteField(p, 4, "x4")
-        k6, x6 = NGFiniteField(p, 6, "x6")
-        k8, x8 = NGFiniteField(p, 8, "x8")
-        k9, x9 = NGFiniteField(p, 9, "x9")
-        k12, x12 = NGFiniteField(p, 12, "x12")
-        k16, x16 = NGFiniteField(p, 16, "x16")
-        k18, x18 = NGFiniteField(p, 18, "x18")
-        k24, x24 = NGFiniteField(p, 24, "x24")
+        k1, x1 = finite_field(p, 1, "x1")
+        k2, x2 = finite_field(p, 2, "x2")
+        k3, x3 = finite_field(p, 3, "x3")
+        k4, x4 = finite_field(p, 4, "x4")
+        k6, x6 = finite_field(p, 6, "x6")
+        k8, x8 = finite_field(p, 8, "x8")
+        k9, x9 = finite_field(p, 9, "x9")
+        k12, x12 = finite_field(p, 12, "x12")
+        k16, x16 = finite_field(p, 16, "x16")
+        k18, x18 = finite_field(p, 18, "x18")
+        k24, x24 = finite_field(p, 24, "x24")
 
         S = Set([(k4, k12),
                  (k6, k24),
@@ -81,8 +81,8 @@ end
         p = ZZRingElem(next_prime(rand(1:999)))
 
         a, b = rand(1:5), rand(1:5)
-        ka, xa = NGFiniteField(p, a, "xa")
-        kab, xab = NGFiniteField(p, a*b, "xab")
+        ka, xa = finite_field(p, a, "xa")
+        kab, xab = finite_field(p, a*b, "xab")
 
         f = preimage_map(ka, kab)
         g = embed(ka, kab)
@@ -107,8 +107,8 @@ end
         pop!(S, p)
         p = ZZRingElem(p)
 
-        F = NGFiniteField(p, 4, "s")[1]
-        Z = GF(p)
+        F = finite_field(p, 4, "s", cached = false)[1]
+        Z = Native.GF(p)
         R, x = polynomial_ring(Z, "x")
 
         P1 = R(rand(Z, 4)) + x^4

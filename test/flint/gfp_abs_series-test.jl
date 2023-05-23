@@ -3,7 +3,7 @@
 end
 
 @testset "fpAbsPowerSeriesRingElem.constructors" begin
-   S = GF(23)
+   S = Native.GF(23)
    
    R1 = AbsPowerSeriesRing(S, 30)
    R2 = AbsPowerSeriesRing(S, 30)
@@ -36,7 +36,7 @@ end
 end
 
 @testset "fpAbsPowerSeriesRingElem.printing" begin
-   S = GF(23)
+   S = Native.GF(23)
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    b = x^2 + 3x + O(x^4)
@@ -45,7 +45,7 @@ end
 end
 
 @testset "fpAbsPowerSeriesRingElem.manipulation" begin
-   S = GF(23)
+   S = Native.GF(23)
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -67,7 +67,7 @@ end
 end
 
 @testset "fpAbsPowerSeriesRingElem.similar" begin
-   R0 = GF(23)
+   R0 = Native.GF(23)
    R, x = power_series_ring(R0, 10, "x"; model=:capped_absolute)
    S, y = power_series_ring(ZZ, 10, "y"; model=:capped_absolute)
 
@@ -115,7 +115,7 @@ end
 end
 
 @testset "fpAbsPowerSeriesRingElem.abs_series" begin
-   R = GF(23)
+   R = Native.GF(23)
    f = abs_series(R, [1, 2, 3], 3, 5, "y")
 
    @test isa(f, fpAbsPowerSeriesRingElem)
@@ -158,7 +158,7 @@ end
 end
 
 @testset "fpAbsPowerSeriesRingElem.unary_ops" begin
-   S = GF(23)
+   S = Native.GF(23)
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -170,7 +170,7 @@ end
 end
 
 @testset "fpAbsPowerSeriesRingElem.binary_ops" begin
-   S = GF(23)
+   S = Native.GF(23)
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -190,7 +190,7 @@ end
 end
 
 @testset "fpAbsPowerSeriesRingElem.adhoc_binary_ops" begin
-   S = GF(23)
+   S = Native.GF(23)
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -208,7 +208,7 @@ end
 end
 
 @testset "fpAbsPowerSeriesRingElem.comparison" begin
-   S = GF(23)
+   S = Native.GF(23)
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -224,7 +224,7 @@ end
 end
 
 @testset "fpAbsPowerSeriesRingElem.adhoc_comparison" begin
-   S = GF(23)
+   S = Native.GF(23)
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -244,7 +244,7 @@ end
 end
 
 @testset "fpAbsPowerSeriesRingElem.powering" begin
-   S = GF(23)
+   S = Native.GF(23)
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -264,7 +264,7 @@ end
 end
 
 @testset "fpAbsPowerSeriesRingElem.shift" begin
-   S = GF(23)
+   S = Native.GF(23)
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -286,7 +286,7 @@ end
 end
 
 @testset "fpAbsPowerSeriesRingElem.truncation" begin
-   S = GF(23)
+   S = Native.GF(23)
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -307,7 +307,7 @@ end
 end
 
 @testset "fpAbsPowerSeriesRingElem.exact_division" begin
-   S = GF(23)
+   S = Native.GF(23)
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = x + x^3
@@ -325,7 +325,7 @@ end
 end
 
 @testset "fpAbsPowerSeriesRingElem.adhoc_exact_division" begin
-   S = GF(23)
+   S = Native.GF(23)
    R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
    a = x + x^3
@@ -345,7 +345,7 @@ end
 end
 
 @testset "fpAbsPowerSeriesRingElem.inversion" begin
-   S = GF(23)
+   S = Native.GF(23)
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 1 + x + 2x^2 + O(x^5)
@@ -357,7 +357,7 @@ end
 end
 
 @testset "fpAbsPowerSeriesRingElem.integral_derivative" begin
-   S = GF(31)
+   S = Native.GF(31)
    R, x = power_series_ring(S, 10, "x"; model=:capped_absolute)
 
    for iter = 1:100
@@ -368,7 +368,7 @@ end
 end
 
 @testset "fpAbsPowerSeriesRingElem.square_root" begin
-   S = GF(31)
+   S = Native.GF(31)
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    for iter = 1:300
@@ -378,7 +378,7 @@ end
    end
 
    for p in [2, 7, 19, 65537]
-      R = GF(p)
+      R = Native.GF(p)
 
       S, x = power_series_ring(R, 10, "x", model=:capped_absolute)
 
@@ -413,7 +413,7 @@ end
 end
 
 @testset "fpAbsPowerSeriesRingElem.unsafe_operators" begin
-   S = GF(31)
+   S = Native.GF(31)
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    for iter = 1:300

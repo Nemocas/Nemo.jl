@@ -106,6 +106,21 @@ end
 #
 ###############################################################################
 
+@doc raw"""
+    lift(::ZZRing, x::FqFieldElem) -> ZZRingElem
+
+Given an element $x$ of a prime field $\mathbf{F}_p$, return
+a preimage under the canonical map $\mathbf{Z} \to \mathbf{F}_p$.
+
+# Examples
+
+```jldoctest
+julia> K = GF(19);
+
+julia> lift(ZZ, K(3))
+3
+```
+"""
 function lift(R::ZZRing, x::FqFieldElem)
   z = R()
   ok = ccall((:fq_default_get_fmpz, libflint), Cint,
@@ -250,14 +265,14 @@ end
 
 function _get_raw_type(::Type{fqPolyRepField}, F::FqField)
   @assert _fq_default_ctx_type(F) == 2
-  Rx, _ = polynomial_ring(GF(UInt(characteristic(F))), "x", cached = false)
+  Rx, _ = polynomial_ring(Native.GF(UInt(characteristic(F))), "x", cached = false)
   m = map_coefficients(x -> _coeff(x, 0), defining_polynomial(F), parent = Rx)
   return fqPolyRepField(m, :$, false)
 end
 
 function _get_raw_type(::Type{FqPolyRepField}, F::FqField)
   @assert _fq_default_ctx_type(F) == 3
-  Rx, _ = polynomial_ring(GF(characteristic(F)), "x", cached = false)
+  Rx, _ = polynomial_ring(Native.GF(characteristic(F)), "x", cached = false)
   m = map_coefficients(x -> _coeff(x, 0), defining_polynomial(F), parent = Rx)
   return FqPolyRepField(m, :$, false)
 end
@@ -269,12 +284,12 @@ end
 
 function _get_raw_type(::Type{fpField}, F::FqField)
   @assert _fq_default_ctx_type(F) == 4
-  return GF(UInt(order(F)))
+  return Native.GF(UInt(order(F)))
 end
 
 function _get_raw_type(::Type{FpField}, F::FqField)
   @assert _fq_default_ctx_type(F) == 5
-  return GF(order(F))
+  return Native.GF(order(F))
 end
 
 # image/preimage
@@ -722,7 +737,7 @@ end
 
 function modulus(k::FqField, var::String="T")
     p = characteristic(k)
-    Q = polynomial(GF(p), [], var, cached = false)
+    Q = polynomial(Native.GF(p), [], var, cached = false)
     ccall((:fq_default_ctx_modulus, libflint), Nothing,
           (Ref{FpPolyRingElem}, Ref{FqField}),
           Q, k)
@@ -797,6 +812,13 @@ function (a::FqField)(b::Union{ZZModPolyRingElem, FpPolyRingElem})
    return z
 end
 
+function (a::FqField)(b::Vector{<:IntegerUnion})
+   da = degree(a)
+   db = length(b)
+   da == db || error("Coercion impossible")
+   return a(parent(defining_polynomial(a))(b))
+end
+
 ###############################################################################
 #
 #   FlintFiniteField constructor
@@ -804,15 +826,35 @@ end
 ###############################################################################
 
 @doc raw"""
-    NGFiniteField(char::IntegerUnion, deg::Int, s::VarName; cached = true, check = true)
+    finite_field(p::IntegerUnion, d::Int, s::VarName; cached = true, check = true)
+    finite_field(q::IntegerUnion, s::VarName; cached = true, check = true)
+    finite_field(f::FqPolyElem, s::VarName; cached = true, check = true)
 
-Returns a tuple $S, x$ consisting of a finite field $S$ of degree `deg` with
-characteristic `char` and generator $x$ for the finite field of the given
-characteristic and degree. The string $s$ is used to designate how the finite
-field generator will be
-printed.
+Return a tuple $K, a$ consisting of a finite field $K$ of order $q = p^d$ and
+algebra generator $x$. The string $s$ is used to designate how the finite field
+generator will be printed.
+
+If a polynomial $f \in k[X]$ over a finite field $k$ is specified, the relative finite field
+$K = k[X]/(f)$ will be constructed as a finite field with base field $k$.
+
+# Examples
+
+```jldoctest
+julia> K, a = finite_field(3, 2, "a")
+(Finite field of degree 2 over GF(3), a)
+
+julia> K, a = finite_field(9, "a")
+(Finite field of degree 2 over GF(3), a)
+
+julia> Kx, x = K["x"];
+
+julia> L, b = finite_field(x^3 + x^2 + x + 2, "b")
+(Relative finite field of degree 3 over GF(3^2), b)
+```
 """
-function NGFiniteField(char::IntegerUnion, deg::Int, s::VarName = :o; cached = true, check::Bool = true)
+finite_field
+
+function finite_field(char::IntegerUnion, deg::Int, s::VarName = :o; cached = true, check::Bool = true)
    check && !is_prime(char) && error("Characteristic must be prime")
    _char = ZZRingElem(char)
    S = Symbol(s)
@@ -821,31 +863,70 @@ function NGFiniteField(char::IntegerUnion, deg::Int, s::VarName = :o; cached = t
    return parent_obj, _gen(parent_obj)
 end
 
-# @doc raw"""
-#     NGFiniteField(pol::Union{ZZModPolyRingElem, FpPolyRingElem}, s::VarName; cached = true, check = true)
-# 
-# Returns a tuple $S, x$ consisting of a finite field parent object $S$ and
-# generator $x$ for the finite field over $F_p$ defined by the given
-# polynomial, i.e. $\mathbb{F}_p[t]/(pol)$. The characteristic is specified by
-# the modulus of `pol`. The polynomial is required to be irreducible, but this
-# is not checked. The base ring of the polynomial is required to be a field, which
-# is checked by default. Use `check = false` to disable the check.
-# The string $s$ is used to designate how the finite field
-# generator will be printed. The generator will not be multiplicative in
-# general.
-# """
-# function NGFiniteField(pol::Union{ZZModPolyRingElem, FpPolyRingElem, zzModPolyRingElem, fpPolyRingElem},
-#                           s::VarName; cached = true, check::Bool=true)
-#    S = Symbol(s)
-#    parent_obj = FqField(pol, S, cached, check=check)
-# 
-#    return parent_obj, _gen(parent_obj)
-# end
-# 
-# 
+function finite_field(q::IntegerUnion, s::VarName = :o; cached::Bool = true, check::Bool = true)
+  fl, e, p = is_prime_power_with_data(q)
+  !fl && error("Order must be a prime power")
+  return finite_field(p, e, s; cached = cached, check = false) 
+end
+
+function finite_field(f::FqPolyRingElem, s::VarName = :o; cached::Bool = true, check::Bool = true, absolute::Bool = false)
+  (check && !is_irreducible(f)) && error("Defining polynomial must be irreducible")
+  # Should probably have its own cache
+  F = FqField(f, Symbol(s), cached, absolute)
+  return F, gen(F)
+end
+
+@doc raw"""
+    GF(p::IntegerUnion, d::Int, s::String; cached::Bool, check::Bool)
+    GF(q::IntegerUnion, s::String; cached::Bool, check::Bool)
+    GF(f::FqPolyRingElem; s::String; cached::Bool, check::Bool)
+
+Return a finite field $K$ of order $q = p^d$. The string $s$ is
+used to designate how the finite field generator will be printed.
+
+If a polynomial $f \in k[X]$ over a finite field $k$ is specified,
+the finite field $K = k[X]/(f)$ will be constructed as a finite
+field with base field $k$.
+
+# Examples
+
+```jldoctest
+julia> K = GF(3, 2, "a")
+Finite field of degree 2 over GF(3)
+
+julia> K = GF(9, "a")
+Finite field of degree 2 over GF(3)
+
+julia> Kx, x = K["x"];
+
+julia> L = GF(x^3 + x^2 + x + 2, "b")
+Relative finite field of degree 3 over GF(3^2)
+```
+"""
+GF
+
+function GF(a::IntegerUnion, s::VarName = :o; cached::Bool = true, check::Bool = true)
+  return finite_field(a, s; cached = cached, check = check)[1]
+end
+
+function GF(p::IntegerUnion, d::Int, s::VarName = :o; cached::Bool = true, check::Bool = true)
+  return finite_field(p, d, s; cached = cached, check = check)[1]
+end
+
+function GF(f::FqPolyRingElem, s::VarName = :o; cached::Bool = true, check::Bool = true, absolute::Bool = false)
+  return finite_field(f, s; cached = cached, check = check)[1]
+end
+
+################################################################################
+#
+#  Intersection code
+#
+################################################################################
 
 # The following code is used in the intersection code
-function FlintFiniteField(F::FqField, deg::Int, s::VarName = :o; cached = true)
+function finite_field(F::FqField, deg::Int, s::VarName = :o; cached = true)
     return FqField(characteristic(F), deg, Symbol(s), cached)
 end
+
+similar(F::FqField, deg::Int, s::VarName = :o; cached = true) = finite_field(F, deg, s, cached = cached)
 

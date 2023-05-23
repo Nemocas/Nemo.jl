@@ -5,7 +5,7 @@
 ###############################################################################
 
 function _as_fq_finite_field(F::FqField)
-    return FlintFiniteField(modulus(F), :a; cached = false)[1]
+    return Native.FiniteField(modulus(F), :a; cached = false)[1]
 end
 
 
@@ -67,7 +67,7 @@ function embed_gens(k::FqField, K::FqField)
     a = k()
     b = K()
     p = ZZRingElem(characteristic(k))::ZZRingElem
-    R = GF(p)
+    R = Native.GF(p)
     PR = polynomial_ring(R, "T")[1]
     P = PR()
 

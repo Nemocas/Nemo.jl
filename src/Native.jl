@@ -13,6 +13,7 @@ import ..Nemo: is_prime
 import ..Nemo: is_probable_prime
 import ..Nemo: gen
 import ..Nemo: characteristic
+import ..Nemo: similar
 
 function GF(n::Int; cached::Bool=true)
   (n <= 0) && throw(DomainError(n, "Characteristic must be positive"))
@@ -48,6 +49,8 @@ function finite_field(F::FqPolyRepField, deg::Int, s::VarName = :o; cached = tru
   return FqPolyRepField(characteristic(F), deg, Symbol(s), cached)
 end
 
+similar(F::FqPolyRepField, deg::Int, s::VarName = :o; cached = true) = finite_field(F, deg, s, cached = cached)
+
 function finite_field(char::Int, deg::Int, s::VarName = :o; cached = true)
    parent_obj = fqPolyRepField(ZZRingElem(char), deg, Symbol(s), cached)
    return parent_obj, gen(parent_obj)
@@ -61,6 +64,8 @@ end
 function finite_field(F::fqPolyRepField, deg::Int, s::VarName = :o; cached = true)
     return fqPolyRepField(characteristic(F), deg, Symbol(s), cached)
 end
+
+similar(F::fqPolyRepField, deg::Int, s::VarName = :o; cached = true) = FiniteField(F, deg, s, cached = cached)
 
 # Additional from Hecke
 function finite_field(p::Integer; cached::Bool = true)

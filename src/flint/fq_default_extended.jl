@@ -46,7 +46,7 @@ Return the prime field of `F`.
 """
 function prime_field(F::FqField)
   # We want them to be equal among all finite fields
-  return FqField(characteristic(F), 1, Symbol("#"), true)
+  return FqField(characteristic(F), 1, :o, true)
 end
 
 ################################################################################
@@ -73,17 +73,33 @@ function _coerce_to_prime_field(a::FqFieldElem)
 end
 
 @doc raw"""
-    defining_polynomial([R::FqPolyRing], L::FqField)
+    defining_polynomial([R::FqPolyRing], K::FqField)
 
-Return the defining polynomial of `L` as a polynomial over the
-base field of `L`.
+Return the defining polynomial of `K` as a polynomial over the
+base field of `K`.
 
 If the polynomial ring `R` is specified, the polynomial will be
 an element of `R`.
+
+# Examples
+
+```jldoctest
+julia> K, a = finite_field(9, "a");
+
+julia> defining_polynomial(K)
+x^2 + 2*x + 2
+
+julia> Ky, y = K["y"];
+
+julia> L, b = finite_field(y^3 + y^2 + y + 2, "b");
+
+julia> defining_polynomial(L)
+y^3 + y^2 + y + 2
+```
 """
-function defining_polynomial(R::FqPolyRing, L::FqField)
-  coefficient_ring(R) !== base_field(L) && error("Coefficient ring must be base field of finite field")
-  f = defining_polynomial(L) # this is cached
+function defining_polynomial(R::FqPolyRing, K::FqField)
+  coefficient_ring(R) !== base_field(K) && error("Coefficient ring must be base field of finite field")
+  f = defining_polynomial(K) # this is cached
   if parent(f) === R
      return f
   else
@@ -93,13 +109,13 @@ function defining_polynomial(R::FqPolyRing, L::FqField)
   end
 end
 
-function defining_polynomial(L::FqField)
-  if !isdefined(L, :defining_poly)
-    @assert L.isstandard
-    F, = polynomial_ring(prime_field(L), "x", cached = false)
-    L.defining_poly = F(map(lift, collect(coefficients(modulus(L)))))
+function defining_polynomial(K::FqField)
+  if !isdefined(K, :defining_poly)
+    @assert K.isstandard
+    F, = polynomial_ring(prime_field(K), "x", cached = false)
+    K.defining_poly = F(map(lift, collect(coefficients(modulus(K)))))
   end
-  return L.defining_poly::FqPolyRingElem
+  return K.defining_poly::FqPolyRingElem
 end
 
 ################################################################################
@@ -109,15 +125,31 @@ end
 ################################################################################
 
 @doc raw"""
-    degree(a::FqField)
+    degree(K::FqField) -> Int
 
 Return the degree of the given finite field over the base field.
+
+# Examples
+
+```jldoctest
+julia> K, a = finite_field(3, 2, "a");
+
+julia> degree(K)
+2
+
+julia> Kx, x = K["x"];
+
+julia> L, b = finite_field(x^3 + x^2 + x + 2, "b");
+
+julia> degree(L)
+3
+```
 """
-function degree(a::FqField)
-  if is_absolute(a)
-    return _degree(a)
+function degree(K::FqField)
+  if is_absolute(K)
+    return _degree(K)
   else
-    return degree(defining_polynomial(a))
+    return degree(defining_polynomial(K))
   end
 end
 
@@ -197,10 +229,27 @@ end
 ################################################################################
 
 @doc raw"""
-    coeff(x::FqFieldElem, n::Int)
+    coeff(x::FqFieldElem, n::Int) -> FqFieldElem
 
-Return the degree $n$ coefficient (as an element of the base field) of the
-polynomial representing the given finite field element.
+Given an element $x$ of a finite field $K$, return the degree $n$
+coefficient (as an element of the base field) of $x$ when expressed
+in the power basis of $K$.
+
+# Examples
+
+```jldoctest
+julia> K, a = finite_field(9, "a");
+
+julia> x = 2 * a + 1
+2*a + 1
+
+julia> coeff(x, 1)
+2
+
+julia> x == sum([coeff(x, i - 1) * basis(K)[i] for i in 1:degree(K)]) ==
+            sum([coeff(x, i) * a^i for i in 0:degree(K) - 1])
+true
+```
 """
 function coeff(x::FqFieldElem, n::Int)
    if is_absolute(parent(x))
@@ -631,53 +680,6 @@ end
 #  Constructors
 #
 ################################################################################
-
-function NGFiniteField(a::IntegerUnion, s::VarName = :o; cached::Bool = true, check::Bool = true)
-  fl, e, p = is_prime_power_with_data(a)
-  !fl && error("Order must be a prime power")
-  return NGFiniteField(p, e, s; cached = cached, check = false) 
-end
-
-function NGFiniteField(f::FqPolyRingElem, s::VarName = :o; cached::Bool = true, check::Bool = true, absolute::Bool = false)
-  (check && !is_irreducible(f)) && error("Defining polynomial must be irreducible")
-  # Should probably have its own cache
-  F = FqField(f, Symbol(s), cached, absolute)
-  return F, gen(F)
-end
-
-@doc raw"""
-    _FiniteField(q::IntegerUnion, s::String; cached::Bool, check::Bool)
-    _FiniteField(p::IntegerUnion, d::Int, s::String; cached::Bool, check::Bool)
-    _FiniteField(f::FqPolyRingElem; s::String; cached::Bool, check::Bool)
-
-Return a tuple $S, x$ consisting of a finite field $S$ of order $q = p^d$ and
-algebra generator $x$. The string $s$ is used to designate how the finite field
-generator will be printed.
-
-If a polynomial $f \in k[t]$ over a finite field $k$ is specified, the finite field
-$S = k[t]/(f)$ will be constructed as a finite field with base field $k$.
-"""
-_FiniteField(a...; kw...) = NGFiniteField(a...; kw...)
-
-@doc raw"""
-    _GF(q::IntegerUnion, s::String; cached::Bool, check::Bool)
-    _GF(p::IntegerUnion, d::Int, s::String; cached::Bool, check::Bool)
-    _GF(f::FqPolyRingElem; s::String; cached::Bool, check::Bool)
-
-Return a finite field $S$ of order $q = p^d$.
-The string $s$ is used to designate how the finite field
-generator will be printed.
-
-If a polynomial $f \in k[t]$ over a finite field $k$ is specified, the finite field
-$S = k[t]/(f)$ will be constructed as a finite field with base field $k$.
-"""
-function _GF(a::IntegerUnion, s::VarName = :o; cached::Bool = true, check::Bool = true)
-  return NGFiniteField(a, s; cached = cached, check = check)[1]
-end
-
-function _GF(a::IntegerUnion, b::Int, s::VarName = :o; cached::Bool = true, check::Bool = true)
-  return NGFiniteField(a, b, s; cached = cached, check = check)[1]
-end
 
 ################################################################################
 #

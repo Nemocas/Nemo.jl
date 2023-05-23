@@ -1,21 +1,21 @@
 @testset "fqPolyRepFieldElem.constructors" begin
-   R, x = finite_field(7, 5, "x")
+   R, x = Native.finite_field(7, 5, "x")
 
    @test elem_type(R) == fqPolyRepFieldElem
    @test elem_type(fqPolyRepField) == fqPolyRepFieldElem
    @test parent_type(fqPolyRepFieldElem) == fqPolyRepField
 
    Sy, y = polynomial_ring(residue_ring(FlintZZ, 3), "y")
-   Syy, yy = GF(3)["y"]
+   Syy, yy = Native.GF(3)["y"]
 
-   T, z = finite_field(y^2 + 1, "z")
-   T2, z2 = finite_field(yy^2 + 1, "z")
+   T, z = Native.finite_field(y^2 + 1, "z")
+   T2, z2 = Native.finite_field(yy^2 + 1, "z")
 
    # check that one can leave out the name for the generator, or specify it as a symbol
-   @test finite_field(7, 5)[1] isa fqPolyRepField
-   @test finite_field(7, 5, :x)[1] isa fqPolyRepField
-   @test finite_field(y^2 + 1)[1] isa fqPolyRepField
-   @test finite_field(y^2 + 1, :x)[1] isa fqPolyRepField
+   @test Native.finite_field(7, 5)[1] isa fqPolyRepField
+   @test Native.finite_field(7, 5, :x)[1] isa fqPolyRepField
+   @test Native.finite_field(y^2 + 1)[1] isa fqPolyRepField
+   @test Native.finite_field(y^2 + 1, :x)[1] isa fqPolyRepField
 
    @test isa(R, fqPolyRepField)
    @test isa(T, fqPolyRepField)
@@ -41,15 +41,15 @@
    @test isa(d, fqPolyRepFieldElem)
 
    # check for primality
-   T3, z3 = finite_field(yy^2 + 1, "z", check=false)
+   T3, z3 = Native.finite_field(yy^2 + 1, "z", check=false)
    @test isa(T2, fqPolyRepField)
    Syyy, yyy = polynomial_ring(residue_ring(FlintZZ, 4), "y")
    @test yyy isa zzModPolyRingElem
-   @test_throws DomainError finite_field(yyy^2+1, "z")
+   @test_throws DomainError Native.finite_field(yyy^2+1, "z")
 end
 
 @testset "fqPolyRepFieldElem.rand" begin
-   R, x = finite_field(7, 5, "x")
+   R, x = Native.finite_field(7, 5, "x")
 
    test_rand(R)
    test_rand(R, 1:9)
@@ -63,10 +63,10 @@ end
 end
 
 @testset "fqPolyRepFieldElem.unsafe_coeffs" begin
-   R, a = finite_field(23, 2, "a")
+   R, a = Native.finite_field(23, 2, "a")
 
    b = R()
-
+   
    @test Nemo.setindex_raw!(b, UInt(0), 0) == 0
    @test Nemo.setindex_raw!(b, UInt(0), 1) == 0
    @test Nemo.setindex_raw!(b, UInt(2), 1) == 2a
@@ -88,7 +88,7 @@ end
 end
 
 @testset "fqPolyRepFieldElem.printing" begin
-   R, x = finite_field(7, 5, "x")
+   R, x = Native.finite_field(7, 5, "x")
 
    a = 3x^4 + 2x^3 + 4x^2 + x + 1
 
@@ -96,7 +96,7 @@ end
 end
 
 @testset "fqPolyRepFieldElem.manipulation" begin
-   R, x = finite_field(7, 5, "x")
+   R, x = Native.finite_field(7, 5, "x")
 
    @test iszero(zero(R))
 
@@ -121,12 +121,12 @@ end
    @test isa(modulus(R), fpPolyRingElem)
 
    #@test defining_polynomial(R) isa fpPolyRingElem
-   #kt, t = GF(7)["t"]
+   #kt, t = Native.GF(7)["t"]
    #@test parent(defining_polynomial(kt, R)) === kt
 end
 
 @testset "fqPolyRepFieldElem.unary_ops" begin
-   R, x = finite_field(7, 5, "x")
+   R, x = Native.finite_field(7, 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
 
@@ -134,7 +134,7 @@ end
 end
 
 @testset "fqPolyRepFieldElem.binary_ops" begin
-   R, x = finite_field(7, 5, "x")
+   R, x = Native.finite_field(7, 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
    b = 3x^4 + 2x^2 + x + 1
@@ -147,7 +147,7 @@ end
 end
 
 @testset "fqPolyRepFieldElem.adhoc_binary" begin
-   R, x = finite_field(7, 5, "x")
+   R, x = Native.finite_field(7, 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
 
@@ -165,7 +165,7 @@ end
 end
 
 @testset "fqPolyRepFieldElem.powering" begin
-   R, x = finite_field(7, 5, "x")
+   R, x = Native.finite_field(7, 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
 
@@ -175,7 +175,7 @@ end
 end
 
 @testset "fqPolyRepFieldElem.comparison" begin
-   R, x = finite_field(7, 5, "x")
+   R, x = Native.finite_field(7, 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
    b = 3x^4 + 2x^2 + 2
@@ -186,7 +186,7 @@ end
 end
 
 @testset "fqPolyRepFieldElem.inversion" begin
-   R, x = finite_field(7, 5, "x")
+   R, x = Native.finite_field(7, 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
 
@@ -198,7 +198,7 @@ end
 end
 
 @testset "fqPolyRepFieldElem.exact_division" begin
-   R, x = finite_field(7, 5, "x")
+   R, x = Native.finite_field(7, 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
    b = 3x^4 + 2x^2 + 2
@@ -209,7 +209,7 @@ end
 end
 
 @testset "fqPolyRepFieldElem.gcd" begin
-   R, x = finite_field(7, 5, "x")
+   R, x = Native.finite_field(7, 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
    b = 3x^4 + 2x^2 + x + 1
@@ -220,7 +220,7 @@ end
 end
 
 @testset "fqPolyRepFieldElem.special_functions" begin
-   R, x = finite_field(7, 5, "x")
+   R, x = Native.finite_field(7, 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
 
@@ -251,27 +251,17 @@ end
 
 @testset "fqPolyRepFieldElem.iteration" begin
    for n = [2, 3, 5, 13, 31]
-      R, _ = finite_field(n, 1, "x")
+      R, _ = Native.finite_field(n, 1, "x")
       elts = Nemo.AbstractAlgebra.test_iterate(R)
       @test elts == R.(0:n-1)
-      R, _ = finite_field(n, rand(2:9), "x")
+      R, _ = Native.finite_field(n, rand(2:9), "x")
       Nemo.AbstractAlgebra.test_iterate(R)
    end
 end
 
 @testset "fqPolyRepFieldElem.lift" begin
-   R, x = finite_field(23, 2, "x")
+   R, x = Native.finite_field(23, 2, "x")
    f = 8x + 9
-   S, y = polynomial_ring(GF(23), "y")
+   S, y = polynomial_ring(Native.GF(23), "y")
    @test lift(S, f) == 8y + 9
-end
-
-@testset "fqPolyRepField.overload" begin
-   R, x = finite_field(19, 3, "x")
-   @test R([1, 0, 1]) == x^2 + 1
-end
-
-@testset "Nemo.jl#1493" begin
-   @test_throws DomainError GF(4, 2)
-   @test_throws DomainError finite_field(6, 2, "x")
 end

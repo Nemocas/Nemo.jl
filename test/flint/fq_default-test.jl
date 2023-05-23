@@ -1,14 +1,14 @@
 @testset "FqFieldElem.constructors" begin
-   R, x = NGFiniteField(ZZRingElem(7), 5, "x")
+   R, x = finite_field(ZZRingElem(7), 5, "x")
 
    @test elem_type(R) == FqFieldElem
    @test elem_type(FqField) == FqFieldElem
    @test parent_type(FqFieldElem) == FqField
 
    Sy, y = polynomial_ring(residue_ring(FlintZZ, 36893488147419103363), "y")
-   Syy, yy = polynomial_ring(GF(ZZRingElem(36893488147419103363)), "y")
+   Syy, yy = polynomial_ring(Native.GF(ZZRingElem(36893488147419103363)), "y")
    St, t = polynomial_ring(residue_ring(FlintZZ, 23), "t")
-   Stt, tt = polynomial_ring(GF(23), "y")
+   Stt, tt = polynomial_ring(Native.GF(23), "y")
 
    T = FqField(y^2 + 1, :z)
    z = gen(T)
@@ -61,7 +61,7 @@
 end
 
 @testset "FqFieldElem.printing" begin
-   R, x = NGFiniteField(ZZRingElem(7), 5, "x")
+   R, x = finite_field(ZZRingElem(7), 5, "x")
 
    a = 3x^4 + 2x^3 + 4x^2 + x + 1
 
@@ -69,7 +69,7 @@ end
 end
 
 @testset "FqFieldElem.manipulation" begin
-   R, x = NGFiniteField(ZZRingElem(7), 5, "x")
+   R, x = finite_field(ZZRingElem(7), 5, "x")
 
    @test iszero(zero(R))
 
@@ -93,7 +93,7 @@ end
 end
 
 @testset "FqFieldElem.conversions" begin
-   U, a = NGFiniteField(ZZRingElem(7), 5, "a")
+   U, a = finite_field(ZZRingElem(7), 5, "a")
 
    for T in [Int, Int128, BigInt, ZZRingElem]
      @test isone(U(T(1)))
@@ -107,7 +107,7 @@ end
 
    f = 3a^4 + 2a^3 + a + 5
 
-   for R in [residue_ring(FlintZZ, 7), residue_ring(FlintZZ, ZZ(7)), GF(7), GF(ZZ(7))]
+   for R in [residue_ring(FlintZZ, 7), residue_ring(FlintZZ, ZZ(7)), Native.GF(7), Native.GF(ZZ(7))]
       S, y = polynomial_ring(R, "y")
 
       @test f == U(S(f))
@@ -117,29 +117,29 @@ end
 
    @test f == U(lift(S, f))
 
-   U, a = NGFiniteField(ZZ(7), 5, "a")
+   U, a = finite_field(ZZ(7), 5, "a")
    f = 3a^4 + 2a^3 + a + 5
-   S, y = Nemo._GF(7)["y"]
+   S, y = Nemo.GF(7)["y"]
    @test f == U(3y^4 + 2y^3 + y + 5)
    S, y = base_field(U)["y"]
    @test lift(S, f) == 3y^4 + 2y^3 + y + 5
 
-   S, y = Nemo._GF(5)["y"]
+   S, y = Nemo.GF(5)["y"]
    @test_throws ErrorException U(y)
 
-   U, a = NGFiniteField(ZZ(1180591620717411303449), 5, "a")
+   U, a = finite_field(ZZ(1180591620717411303449), 5, "a")
    f = 3a^4 + 2a^3 + a + 5
-   S, y = Nemo._GF(ZZ(1180591620717411303449))["y"]
+   S, y = Nemo.GF(ZZ(1180591620717411303449))["y"]
    @test f == U(3y^4 + 2y^3 + y + 5)
    S, y = base_field(U)["y"]
    @test lift(S, f) == 3y^4 + 2y^3 + y + 5
 
-   S, y = Nemo._GF(5)["y"]
+   S, y = Nemo.GF(5)["y"]
    @test_throws ErrorException U(y)
 end
 
 @testset "FqFieldElem.unary_ops" begin
-   R, x = NGFiniteField(ZZRingElem(7), 5, "x")
+   R, x = finite_field(ZZRingElem(7), 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
 
@@ -147,7 +147,7 @@ end
 end
 
 @testset "FqFieldElem.binary_ops" begin
-   R, x = NGFiniteField(ZZRingElem(7), 5, "x")
+   R, x = finite_field(ZZRingElem(7), 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
    b = 3x^4 + 2x^2 + x + 1
@@ -160,7 +160,7 @@ end
 end
 
 @testset "FqFieldElem.adhoc_binary" begin
-   R, x = NGFiniteField(ZZRingElem(7), 5, "x")
+   R, x = finite_field(ZZRingElem(7), 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
 
@@ -178,7 +178,7 @@ end
 end
 
 @testset "FqFieldElem.powering" begin
-   R, x = NGFiniteField(ZZRingElem(7), 5, "x")
+   R, x = finite_field(ZZRingElem(7), 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
 
@@ -188,7 +188,7 @@ end
 end
 
 @testset "FqFieldElem.comparison" begin
-   R, x = NGFiniteField(ZZRingElem(7), 5, "x")
+   R, x = finite_field(ZZRingElem(7), 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
    b = 3x^4 + 2x^2 + 2
@@ -199,7 +199,7 @@ end
 end
 
 @testset "FqFieldElem.inversion" begin
-   R, x = NGFiniteField(ZZRingElem(7), 5, "x")
+   R, x = finite_field(ZZRingElem(7), 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
 
@@ -211,7 +211,7 @@ end
 end
 
 @testset "FqFieldElem.exact_division" begin
-   R, x = NGFiniteField(ZZRingElem(7), 5, "x")
+   R, x = finite_field(ZZRingElem(7), 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
    b = 3x^4 + 2x^2 + 2
@@ -222,7 +222,7 @@ end
 end
 
 @testset "FqFieldElem.gcd" begin
-   R, x = NGFiniteField(ZZRingElem(7), 5, "x")
+   R, x = finite_field(ZZRingElem(7), 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
    b = 3x^4 + 2x^2 + x + 1
@@ -233,7 +233,7 @@ end
 end
 
 @testset "FqFieldElem.special_functions" begin
-   R, x = NGFiniteField(ZZRingElem(7), 5, "x")
+   R, x = finite_field(ZZRingElem(7), 5, "x")
 
    a = x^4 + 3x^2 + 6x + 1
 
@@ -263,26 +263,26 @@ end
 end
 
 @testset "FqFieldElem.rand" begin
-   R, x = NGFiniteField(ZZRingElem(17), 3, "x")
+   R, x = finite_field(ZZRingElem(17), 3, "x")
 
    test_rand(R)
 end
 
 @testset "FqFieldElem.iteration" begin
    for n = [2, 3, 5, 13, 31]
-      R, _ = NGFiniteField(ZZRingElem(n), 1, "x")
+      R, _ = finite_field(ZZRingElem(n), 1, "x")
       elts = Nemo.AbstractAlgebra.test_iterate(R)
       @test elts == R.(0:n-1)
-      R, _ = NGFiniteField(ZZRingElem(n), rand(2:9), "x")
+      R, _ = finite_field(ZZRingElem(n), rand(2:9), "x")
       Nemo.AbstractAlgebra.test_iterate(R)
    end
 end
 
 @testset "conversions" begin
-  F1, = NGFiniteField(7, 1)
-  F2, = NGFiniteField(ZZ(18446744073709551629), 1)
-  F3, = NGFiniteField(7, 10) # avoid zech
-  F4, = NGFiniteField(ZZ(18446744073709551629), 4)
+  F1, = finite_field(7, 1)
+  F2, = finite_field(ZZ(18446744073709551629), 1)
+  F3, = finite_field(7, 10) # avoid zech
+  F4, = finite_field(ZZ(18446744073709551629), 4)
   fields = [F1, F2, F3, F4]
   types = [Nemo.fpField, Nemo.FpField, fqPolyRepField, FqPolyRepField]
   for (F, T) in zip(fields, types)
@@ -312,8 +312,8 @@ end
 
   @test_throws AssertionError Nemo.canonical_raw_type(Nemo.FpField, F1)
 
-  F1, = NGFiniteField(7, 1)
-  F1w, = NGFiniteField(2, 1)
+  F1, = finite_field(7, 1)
+  F1w, = finite_field(2, 1)
   f = Nemo.canonical_raw_type(Nemo.fpField, F1)
   @test_throws AssertionError f(rand(F1w))
   @test_throws AssertionError f(rand(F2))

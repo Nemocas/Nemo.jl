@@ -1,7 +1,7 @@
 @testset "gfp_fmpz.constructors" begin
-   R = GF(ZZ(13))
+   R = Native.GF(ZZ(13))
 
-   @test_throws DomainError GF(-ZZ(13))
+   @test_throws DomainError Native.GF(-ZZ(13))
 
    @test elem_type(R) == Nemo.FpFieldElem
    @test elem_type(Nemo.FpField) == Nemo.FpFieldElem
@@ -22,7 +22,7 @@
    for i = 1:1000
       p = rand(BigInt(1):BigInt(4273673264873254848326487))*6 + 1
       if Nemo.is_probable_prime(ZZ(p))
-         R = GF(ZZ(p))
+         R = Native.GF(ZZ(p))
 
          a = R(rand(Int))
          d = a.data
@@ -34,7 +34,7 @@
    for i = 1:1000
       p = rand(1:24)
       if Nemo.is_prime(ZZ(p))
-         R = GF(ZZ(p))
+         R = Native.GF(ZZ(p))
 
          a = R(rand(Int))
          d = a.data
@@ -43,25 +43,25 @@
       end
    end
 
-   S = GF(ZZ(17))
-   T = GF(ZZ(17))
+   S = Native.GF(ZZ(17))
+   T = Native.GF(ZZ(17))
    @test T === S
 
-   S = GF(ZZ(19), cached = false)
-   T = GF(ZZ(19), cached = false)
+   S = Native.GF(ZZ(19), cached = false)
+   T = Native.GF(ZZ(19), cached = false)
    @test !(S === T)
 
-   S = GF(ZZRingElem(17))
-   T = GF(ZZRingElem(17))
+   S = Native.GF(ZZRingElem(17))
+   T = Native.GF(ZZRingElem(17))
    @test T === S
 
-   S = GF(ZZRingElem(19), cached = false)
-   T = GF(ZZRingElem(19), cached = false)
+   S = Native.GF(ZZRingElem(19), cached = false)
+   T = Native.GF(ZZRingElem(19), cached = false)
    @test !(S === T)
 end
 
 @testset "gfp_fmpz.rand" begin
-   R = GF(ZZ(13))
+   R = Native.GF(ZZ(13))
 
    test_rand(R)
    test_rand(R, 1:9)
@@ -75,14 +75,14 @@ end
 end
 
 @testset "gfp_fmpz.printing" begin
-   R = GF(ZZ(13))
+   R = Native.GF(ZZ(13))
 
    @test string(R(3)) == "3"
    @test string(R()) == "0"
 end
 
 @testset "gfp_fmpz.manipulation" begin
-   R = GF(ZZ(13))
+   R = Native.GF(ZZ(13))
 
    @test iszero(zero(R))
 
@@ -93,7 +93,7 @@ end
 
    @test deepcopy(R(3)) == R(3)
 
-   R1 = GF(ZZ(13))
+   R1 = Native.GF(ZZ(13))
 
    @test R === R1
 
@@ -105,9 +105,9 @@ end
    @test lift(R(3)) == 3
    @test isa(lift(R(3)), ZZRingElem)
 
-   R2 = GF(ZZ(2))
-   R22 = GF(2)
-   R3 = GF(ZZ(3))
+   R2 = Native.GF(ZZ(2))
+   R22 = Native.GF(2)
+   R3 = Native.GF(ZZ(3))
    R6 = residue_ring(ZZ, ZZ(6))
    @test R2(R6(2)) == 2  && parent(R2(R6(2))) == R2
    @test R22(R6(2)) == 2 && parent(R22(R6(2))) == R22
@@ -123,7 +123,7 @@ end
    for i = 1:1000
       p = rand(BigInt(1):BigInt(4273673264873254848326487))*6 + 1
       if Nemo.is_probable_prime(ZZ(p))
-         R = GF(ZZ(p))
+         R = Native.GF(ZZ(p))
 
          for iter = 1:1000
             a = rand(R)
@@ -136,7 +136,7 @@ end
    for i = 1:100
       p = rand(1:24)
       if Nemo.is_prime(ZZ(p))
-         R = GF(ZZ(p))
+         R = Native.GF(ZZ(p))
 
          for iter = 1:100
             a = rand(R)
@@ -151,7 +151,7 @@ end
    for i = 1:100
       p = rand(1:24)
       if Nemo.is_prime(ZZ(p))
-         R = GF(ZZ(p))
+         R = Native.GF(ZZ(p))
 
          for iter = 1:100
             a1 = rand(R)
@@ -173,7 +173,7 @@ end
    for i = 1:1000
       p = rand(BigInt(1):BigInt(4273673264873254848326487))*6 + 1
       if Nemo.is_probable_prime(ZZ(p))
-         R = GF(ZZ(p))
+         R = Native.GF(ZZ(p))
 
          for iter = 1:100
             a1 = rand(R)
@@ -197,7 +197,7 @@ end
    for i = 1:100
       p = rand(1:24)
       if Nemo.is_prime(ZZ(p))
-         R = GF(ZZ(p))
+         R = Native.GF(ZZ(p))
 
          for iter = 1:100
             a = rand(R)
@@ -222,7 +222,7 @@ end
    for i = 1:1000
       p = rand(BigInt(1):BigInt(4273673264873254848326487))*6 + 1
       if Nemo.is_probable_prime(ZZ(p))
-         R = GF(ZZ(p))
+         R = Native.GF(ZZ(p))
 
          for iter = 1:100
             a = rand(R)
@@ -249,7 +249,7 @@ end
   for i = 1:100
       p = rand(1:24)
       if Nemo.is_prime(ZZ(p))
-         R = GF(ZZ(p))
+         R = Native.GF(ZZ(p))
 
          for iter = 1:100
             a = R(1)
@@ -285,7 +285,7 @@ end
    for i = 1:1000
       p = rand(BigInt(1):BigInt(4273673264873254848326487))*6 + 1
       if Nemo.is_probable_prime(ZZ(p))
-         R = GF(ZZ(p))
+         R = Native.GF(ZZ(p))
 
          for iter = 1:100
             a = R(1)
@@ -318,7 +318,7 @@ end
       end
    end
 
-   R =  GF(ZZ(23))
+   R =  Native.GF(ZZ(23))
 
    a = R(11)
 
@@ -331,7 +331,7 @@ end
   for i = 1:100
       p = rand(1:24)
       if Nemo.is_prime(ZZ(p))
-         R = GF(ZZ(p))
+         R = Native.GF(ZZ(p))
 
          for iter = 1:100
             a = rand(R)
@@ -350,7 +350,7 @@ end
    for i = 1:1000
       p = rand(BigInt(1):BigInt(4273673264873254848326487))*6 + 1
       if Nemo.is_probable_prime(ZZ(p))
-         R = GF(ZZ(p))
+         R = Native.GF(ZZ(p))
 
          for iter = 1:100
             a = rand(R)
@@ -371,7 +371,7 @@ end
   for i = 1:100
       p = rand(1:24)
       if Nemo.is_prime(ZZ(p))
-         R = GF(ZZ(p))
+         R = Native.GF(ZZ(p))
 
          for iter = 1:100
             c = rand(0:100)
@@ -388,7 +388,7 @@ end
    for i = 1:1000
       p = rand(BigInt(1):BigInt(4273673264873254848326487))*6 + 1
       if Nemo.is_probable_prime(ZZ(p))
-         R = GF(ZZ(p))
+         R = Native.GF(ZZ(p))
 
          for iter = 1:100
             c = rand(Int)
@@ -407,7 +407,7 @@ end
   for i = 1:100
       p = rand(1:24)
       if Nemo.is_prime(ZZ(p))
-         R = GF(ZZ(p))
+         R = Native.GF(ZZ(p))
 
          for iter = 1:100
             a = rand(R)
@@ -422,7 +422,7 @@ end
    for i = 1:1000
       p = rand(BigInt(1):BigInt(4273673264873254848326487))*6 + 1
       if Nemo.is_probable_prime(ZZ(p))
-         R = GF(ZZ(p))
+         R = Native.GF(ZZ(p))
 
          for iter = 1:100
             a = rand(R)
@@ -439,7 +439,7 @@ end
   for i = 1:100
       p = rand(1:24)
       if Nemo.is_prime(ZZ(p))
-         R = GF(ZZ(p))
+         R = Native.GF(ZZ(p))
 
          for iter = 1:100
             a1 = rand(R)
@@ -461,7 +461,7 @@ end
    for i = 1:1000
       p = rand(BigInt(1):BigInt(4273673264873254848326487))*6 + 1
       if Nemo.is_probable_prime(ZZ(p))
-         R = GF(ZZ(p))
+         R = Native.GF(ZZ(p))
 
          for iter = 1:100
             a1 = rand(R)
@@ -481,7 +481,7 @@ end
    for i = 1:100
       p = rand(1:65537)
       if Nemo.is_prime(ZZ(p))
-         R = GF(ZZ(p))
+         R = Native.GF(ZZ(p))
 
          z = rand(R)
          if p != 2
@@ -516,6 +516,6 @@ end
 end
 
 @testset "gfp_fmpz.overload" begin
-   R = GF(ZZ(19))
+   R = Native.GF(ZZ(19))
    @test R([5]) == R(5)
 end

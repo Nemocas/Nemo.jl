@@ -3,7 +3,7 @@
 end
 
 @testset "FpAbsPowerSeriesRingElem.constructors" begin
-   S = GF(ZZ(123456789012345678949))
+   S = Native.GF(ZZ(123456789012345678949))
    
    R1 = AbsPowerSeriesRing(S, 30)
    R2 = AbsPowerSeriesRing(S, 30)
@@ -36,7 +36,7 @@ end
 end
 
 @testset "FpAbsPowerSeriesRingElem.printing" begin
-   S = GF(ZZ(123456789012345678949))
+   S = Native.GF(ZZ(123456789012345678949))
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    b = x^2 + 3x + O(x^4)
@@ -45,7 +45,7 @@ end
 end
 
 @testset "FpAbsPowerSeriesRingElem.manipulation" begin
-   S = GF(ZZ(123456789012345678949))
+   S = Native.GF(ZZ(123456789012345678949))
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -67,7 +67,7 @@ end
 end
 
 @testset "FpAbsPowerSeriesRingElem.similar" begin
-   R0 = GF(ZZ(23))
+   R0 = Native.GF(ZZ(23))
    R, x = power_series_ring(R0, 10, "x"; model=:capped_absolute)
    S, y = power_series_ring(ZZ, 10, "y"; model=:capped_absolute)
 
@@ -115,7 +115,7 @@ end
 end
 
 @testset "FpAbsPowerSeriesRingElem.abs_series" begin
-   R = GF(ZZ(23))
+   R = Native.GF(ZZ(23))
    f = abs_series(R, [1, 2, 3], 3, 5, "y")
 
    @test isa(f, FpAbsPowerSeriesRingElem)
@@ -158,7 +158,7 @@ end
 end
 
 @testset "FpAbsPowerSeriesRingElem.unary_ops" begin
-   S = GF(ZZ(123456789012345678949))
+   S = Native.GF(ZZ(123456789012345678949))
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -170,7 +170,7 @@ end
 end
 
 @testset "FpAbsPowerSeriesRingElem.binary_ops" begin
-   S = GF(ZZ(123456789012345678949))
+   S = Native.GF(ZZ(123456789012345678949))
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -190,7 +190,7 @@ end
 end
 
 @testset "FpAbsPowerSeriesRingElem.adhoc_binary_ops" begin
-   S = GF(ZZ(123456789012345678949))
+   S = Native.GF(ZZ(123456789012345678949))
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -208,7 +208,7 @@ end
 end
 
 @testset "FpAbsPowerSeriesRingElem.comparison" begin
-   S = GF(ZZ(123456789012345678949))
+   S = Native.GF(ZZ(123456789012345678949))
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -224,7 +224,7 @@ end
 end
 
 @testset "FpAbsPowerSeriesRingElem.adhoc_comparison" begin
-   S = GF(ZZ(123456789012345678949))
+   S = Native.GF(ZZ(123456789012345678949))
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -244,7 +244,7 @@ end
 end
 
 @testset "FpAbsPowerSeriesRingElem.powering" begin
-   S = GF(ZZ(123456789012345678949))
+   S = Native.GF(ZZ(123456789012345678949))
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -261,7 +261,7 @@ end
 end
 
 @testset "FpAbsPowerSeriesRingElem.shift" begin
-   S = GF(ZZ(123456789012345678949))
+   S = Native.GF(ZZ(123456789012345678949))
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -283,7 +283,7 @@ end
 end
 
 @testset "FpAbsPowerSeriesRingElem.truncation" begin
-   S = GF(ZZ(123456789012345678949))
+   S = Native.GF(ZZ(123456789012345678949))
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -304,7 +304,7 @@ end
 end
 
 @testset "FpAbsPowerSeriesRingElem.exact_division" begin
-   S = GF(ZZ(123456789012345678949))
+   S = Native.GF(ZZ(123456789012345678949))
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = x + x^3
@@ -322,7 +322,7 @@ end
 end
 
 @testset "FpAbsPowerSeriesRingElem.adhoc_exact_division" begin
-   S = GF(ZZ(123456789012345678949))
+   S = Native.GF(ZZ(123456789012345678949))
    R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
    a = x + x^3
@@ -342,7 +342,7 @@ end
 end
 
 @testset "FpAbsPowerSeriesRingElem.inversion" begin
-   S = GF(ZZ(123456789012345678949))
+   S = Native.GF(ZZ(123456789012345678949))
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 1 + x + 2x^2 + O(x^5)
@@ -354,7 +354,7 @@ end
 end
 
 @testset "FpAbsPowerSeriesRingElem.integral_derivative" begin
-   S = GF(ZZ(31))
+   S = Native.GF(ZZ(31))
    R, x = power_series_ring(S, 10, "x"; model=:capped_absolute)
 
    for iter = 1:100
@@ -365,7 +365,7 @@ end
 end
 
 @testset "FpAbsPowerSeriesRingElem.square_root" begin
-   S = GF(ZZ(31))
+   S = Native.GF(ZZ(31))
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    for iter = 1:300
@@ -375,7 +375,7 @@ end
    end
 
    for p in [2, 7, 19, 65537]
-      R = GF(ZZ(p))
+      R = Native.GF(ZZ(p))
 
       S, x = power_series_ring(R, 10, "x", model=:capped_absolute)
 
@@ -406,7 +406,7 @@ end
 end
 
 @testset "FpAbsPowerSeriesRingElem.unsafe_operators" begin
-   S = GF(ZZ(31))
+   S = Native.GF(ZZ(31))
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    for iter = 1:300

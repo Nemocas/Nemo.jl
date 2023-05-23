@@ -28,7 +28,7 @@ function embed_gens(k::FqPolyRepField, K::FqPolyRepField)
     a = k()
     b = K()
     p = ZZRingElem(characteristic(k))::ZZRingElem
-    R = GF(p)
+    R = Native.GF(p)
     PR = polynomial_ring(R, "T")[1]
     P = PR()
 

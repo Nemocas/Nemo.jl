@@ -3,7 +3,7 @@
 end
 
 @testset "fqPolyRepAbsPowerSeriesRingElem.constructors" begin
-   S, t = finite_field(23, 5, "t")
+   S, t = Native.finite_field(23, 5, "t")
    
    R1 = AbsPowerSeriesRing(S, 30)
    R2 = AbsPowerSeriesRing(S, 30)
@@ -36,7 +36,7 @@ end
 end
 
 @testset "fqPolyRepAbsPowerSeriesRingElem.printing" begin
-   S, t = finite_field(23, 5, "t")
+   S, t = Native.finite_field(23, 5, "t")
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    b = x^2 + 3x + O(x^4)
@@ -45,7 +45,7 @@ end
 end
 
 @testset "fqPolyRepAbsPowerSeriesRingElem.manipulation" begin
-   S, t = finite_field(23, 5, "t")
+   S, t = Native.finite_field(23, 5, "t")
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -67,7 +67,7 @@ end
 end
 
 @testset "fqPolyRepAbsPowerSeriesRingElem.similar" begin
-   R0, a = finite_field(23, 2, "a")
+   R0, a = Native.finite_field(23, 2, "a")
    R, x = power_series_ring(R0, 10, "x"; model=:capped_absolute)
    S, y = power_series_ring(ZZ, 10, "y"; model=:capped_absolute)
 
@@ -115,7 +115,7 @@ end
 end
 
 @testset "fqPolyRepAbsPowerSeriesRingElem.abs_series" begin
-   R, a = finite_field(23, 2, "a")
+   R, a = Native.finite_field(23, 2, "a")
    f = abs_series(R, [1, 2, 3], 3, 5, "y")
 
    @test isa(f, fqPolyRepAbsPowerSeriesRingElem)
@@ -158,7 +158,7 @@ end
 end
 
 @testset "fqPolyRepAbsPowerSeriesRingElem.unary_ops" begin
-   S, t = finite_field(23, 5, "t")
+   S, t = Native.finite_field(23, 5, "t")
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -170,7 +170,7 @@ end
 end
 
 @testset "fqPolyRepAbsPowerSeriesRingElem.binary_ops" begin
-   S, t = finite_field(23, 5, "t")
+   S, t = Native.finite_field(23, 5, "t")
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -190,7 +190,7 @@ end
 end
 
 @testset "fqPolyRepAbsPowerSeriesRingElem.adhoc_binary_ops" begin
-   S, t = finite_field(23, 5, "t")
+   S, t = Native.finite_field(23, 5, "t")
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -206,14 +206,14 @@ end
 
    @test d*ZZ(3) == 3x^2 + 9x^3 - 3x^4
 
-   F, x = finite_field(23, 1, "x")
+   F, x = Native.finite_field(23, 1, "x")
    R, t = power_series_ring(F, 6, "t", model=:capped_absolute)
 
    @test F(1) * t == t
 end
 
 @testset "fqPolyRepAbsPowerSeriesRingElem.comparison" begin
-   S, t = finite_field(23, 5, "t")
+   S, t = Native.finite_field(23, 5, "t")
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -229,7 +229,7 @@ end
 end
 
 @testset "fqPolyRepAbsPowerSeriesRingElem.adhoc_comparison" begin
-   S, t = finite_field(23, 5, "t")
+   S, t = Native.finite_field(23, 5, "t")
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -249,7 +249,7 @@ end
 end
 
 @testset "fqPolyRepAbsPowerSeriesRingElem.powering" begin
-   S, t = finite_field(23, 5, "t")
+   S, t = Native.finite_field(23, 5, "t")
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -269,7 +269,7 @@ end
 end
 
 @testset "fqPolyRepAbsPowerSeriesRingElem.shift" begin
-   S, t = finite_field(23, 5, "t")
+   S, t = Native.finite_field(23, 5, "t")
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -291,7 +291,7 @@ end
 end
 
 @testset "fqPolyRepAbsPowerSeriesRingElem.truncation" begin
-   S, t = finite_field(23, 5, "t")
+   S, t = Native.finite_field(23, 5, "t")
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
@@ -311,7 +311,7 @@ end
 end
 
 @testset "fqPolyRepAbsPowerSeriesRingElem.exact_division" begin
-   S, t = finite_field(23, 5, "t")
+   S, t = Native.finite_field(23, 5, "t")
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = x + x^3
@@ -329,7 +329,7 @@ end
 end
 
 @testset "fqPolyRepAbsPowerSeriesRingElem.adhoc_exact_division" begin
-   S, t = finite_field(23, 5, "t")
+   S, t = Native.finite_field(23, 5, "t")
    R, x = power_series_ring(ZZ, 30, "x", model=:capped_absolute)
 
    a = x + x^3
@@ -349,7 +349,7 @@ end
 end
 
 @testset "fqPolyRepAbsPowerSeriesRingElem.inversion" begin
-   S, t = finite_field(23, 5, "t")
+   S, t = Native.finite_field(23, 5, "t")
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    a = 1 + x + 2x^2 + O(x^5)
@@ -361,7 +361,7 @@ end
 end
 
 @testset "fqPolyRepAbsPowerSeriesRingElem.square_root" begin
-   S, t = finite_field(31, 5, "t")
+   S, t = Native.finite_field(31, 5, "t")
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    for iter = 1:300
@@ -371,7 +371,7 @@ end
    end
 
    for p in [2, 7, 19, 65537]
-      R, t = finite_field(p, 2, "t")
+      R, t = Native.finite_field(p, 2, "t")
       S, x = power_series_ring(R, 10, "x", model=:capped_absolute)
 
       for iter = 1:10
@@ -401,7 +401,7 @@ end
 end
 
 @testset "fqPolyRepAbsPowerSeriesRingElem.unsafe_operators" begin
-   S, t = finite_field(23, 5, "t")
+   S, t = Native.finite_field(23, 5, "t")
    R, x = power_series_ring(S, 30, "x", model=:capped_absolute)
 
    for iter = 1:300

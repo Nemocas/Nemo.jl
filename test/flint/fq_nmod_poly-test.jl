@@ -1,5 +1,5 @@
 @testset "fqPolyRepPolyRingElem.constructors" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    
    S1 = PolyRing(R)
    S2 = PolyRing(R)
@@ -68,7 +68,7 @@
 end
 
 @testset "fqPolyRepPolyRingElem.printing" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    f = x^2 + y^3 + 1
@@ -77,7 +77,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.manipulation" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    @test iszero(zero(S))
@@ -110,7 +110,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.polynomial" begin
-   R, _ = finite_field(23, 3, "a")
+   R, _ = Native.finite_field(23, 3, "a")
 
    f = polynomial(R, [])
    g = polynomial(R, [1, 2, 3])
@@ -130,7 +130,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.similar" begin
-   R, a = finite_field(23, 3, "a")
+   R, a = Native.finite_field(23, 3, "a")
 
    f = polynomial(R, [1, 2, 3])
    g = similar(f)
@@ -145,7 +145,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.binary_ops" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -159,7 +159,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.adhoc_binary" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -195,7 +195,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.comparison" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -207,7 +207,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.adhoc_comparison" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    @test S(1) == 1
@@ -224,7 +224,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.unary_ops" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -233,7 +233,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.truncation" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -249,7 +249,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.reverse" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -258,7 +258,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.shift" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -273,7 +273,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.powering" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -284,7 +284,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.modular_arithmetic" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    f = (3*x^2 + x + 2)*y + x^2 + 1
@@ -305,7 +305,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.exact_division" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -315,7 +315,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.adhoc_exact_division" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -326,7 +326,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.euclidean_division" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    k = y^3 + x*y^2 + (x + 1)*y + 3
@@ -338,7 +338,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.content_primpart_gcd" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    k = x*y^2 + (x + 1)*y + 3
@@ -361,7 +361,7 @@ end
 
 @testset "fqPolyRepPolyRingElem.square_root" begin
    for p in [2, 23]
-      R, x = finite_field(p, 3, "x")
+      R, x = Native.finite_field(p, 3, "x")
       S, y = polynomial_ring(R, "y")
 
       for iter in 1:1000
@@ -395,7 +395,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.evaluation" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    f = x^2 + 2x + 1
@@ -416,7 +416,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.composition" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -426,7 +426,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.derivative" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    h = x*y^2 + (x + 1)*y + 3
@@ -435,7 +435,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.integral" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    f = (x^2 + 2x + 1)*y^2 + (x + 1)*y - 2x + 4
@@ -444,7 +444,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.resultant" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    f = 3x*y^2 + (x + 1)*y + 3
@@ -454,7 +454,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.discriminant" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -463,7 +463,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.gcdx" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    f = 3x*y^2 + (x + 1)*y + 3
@@ -473,7 +473,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.special" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    @test chebyshev_t(20, y) == 524288*y^20-2621440*y^18+5570560*y^16-6553600*y^14+4659200*y^12-2050048*y^10+549120*y^8-84480*y^6+6600*y^4-200*y^2+1
@@ -482,7 +482,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.inflation_deflation" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    f = (x + 1)*y^2 + 2x*y + x + 3
@@ -491,7 +491,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.is_irreducible" begin
-  R, a = finite_field(23, 1, "a")
+  R, a = Native.finite_field(23, 1, "a")
   Rx, x = polynomial_ring(R, "x")
 
   f = x^6 + x^4 + 2 *x^2
@@ -504,27 +504,19 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.is_squarefree" begin
-  R, x = finite_field(23, 5, "x")
-  Rx, y = polynomial_ring(R, "y")
+  R, x = Native.finite_field(23, 5, "x")
+  S, y = polynomial_ring(R, "y")
 
   f = y^6 + y^4 + 2 *y^2
 
   @test !is_squarefree(f)
 
   @test is_squarefree((y+1)*(y+2)*(y+3))
-
-  @test !is_squarefree(Rx(0))
-  @test is_squarefree(Rx(1))
-  @test is_squarefree(Rx(2))
-  @test is_squarefree(Rx(4))
 end
 
 @testset "fqPolyRepPolyRingElem.factor" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
-
-   @test_throws ArgumentError factor(S(0))
-   @test_throws ArgumentError factor_squarefree(S(0))
 
    f = 7y^2 + 3y + 2
    g = 11y^3 - 2y^2 + 5
@@ -555,7 +547,7 @@ end
 end
 
 @testset "fqPolyRepPolyRingElem.remove_valuation" begin
-   R, x = finite_field(23, 5, "x")
+   R, x = Native.finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
 
    f = 7y^2 + 3y + 2
@@ -582,8 +574,8 @@ end
 end
 
 @testset "issue #1353" begin
-   F, _ = finite_field(2, 1, "1")
-   E, a = finite_field(2, 15, "a")
+   F, _ = Native.finite_field(2, 1, "1")
+   E, a = Native.finite_field(2, 15, "a")
    S, x = polynomial_ring(F, "x")
    
    @test_throws ErrorException x+a

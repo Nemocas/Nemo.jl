@@ -27,7 +27,7 @@ end
 end
 
 @testset "Benchmark.resultant" begin
-   R, x = FlintFiniteField(7, 11, "x")
+   R, x = Native.finite_field(7, 11, "x")
    S, y = polynomial_ring(R, "y")
    T = residue_ring(S, y^3 + 3x*y + 1)
    U, z = polynomial_ring(T, "z")

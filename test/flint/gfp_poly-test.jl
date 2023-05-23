@@ -1,5 +1,5 @@
 @testset "fpPolyRingElem.constructors" begin
-  R = GF(17)
+  R = Native.GF(17)
   
   S1 = PolyRing(R)
   S2 = PolyRing(R)
@@ -14,11 +14,11 @@
   @test parent_type(fpPolyRingElem) == fpPolyRing
   @test dense_poly_type(fpFieldElem) == fpPolyRingElem
 
-  S = GF(19)
+  S = Native.GF(19)
   Sy, y = polynomial_ring(R, "y")
 
   RRx, xx = polynomial_ring(R, "x")
-  RRRx, xxx = polynomial_ring(GF(17), "xx")
+  RRRx, xxx = polynomial_ring(Native.GF(17), "xx")
 
   @test var(Rx) == Symbol("x")
 
@@ -94,7 +94,7 @@
 end
 
 @testset "fpPolyRingElem.polynomial" begin
-   R = GF(23)
+   R = Native.GF(23)
 
    f = polynomial(R, [])
    g = polynomial(R, [1, 2, 3])
@@ -114,7 +114,7 @@ end
 end
 
 @testset "zzModPolyRingElem.similar" begin
-   R = GF(23)
+   R = Native.GF(23)
 
    f = polynomial(R, [1, 2, 3])
    g = similar(f)
@@ -129,7 +129,7 @@ end
 end
 
 @testset "fpPolyRingElem.printing" begin
-  R = GF(17)
+  R = Native.GF(17)
   Rx, x = polynomial_ring(R, "x")
 
   a = x^3 + x + 1
@@ -138,7 +138,7 @@ end
 end
 
 @testset "fpPolyRingElem.manipulation" begin
-  R = GF(17)
+  R = Native.GF(17)
   Rx, x = polynomial_ring(R, "x")
 
   @test isone(one(Rx))
@@ -171,7 +171,7 @@ end
 end
 
 @testset "fpPolyRingElem.unary_ops" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
 
   f = x^2 + R(13)*x + R(5)
@@ -180,7 +180,7 @@ end
 end
 
 @testset "fpPolyRingElem.binary_ops" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
 
   f = x^2 + R(13)*x + R(5)
@@ -197,10 +197,10 @@ end
 end
 
 @testset "fpPolyRingElem.adhoc_binary" begin
-  R = GF(113)
+  R = Native.GF(113)
   Rx, x = polynomial_ring(R, "x")
 
-  S = GF(19)
+  S = Native.GF(19)
 
   f = x^2 + R(2)x + R(1)
   g = x^3 + R(3)x^2 + x
@@ -233,7 +233,7 @@ end
 end
 
 @testset "fpPolyRingElem.powering" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
 
   f = x^2 + R(13)x + R(5)
@@ -246,7 +246,7 @@ end
 end
 
 @testset "fpPolyRingElem.comparison" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
   Ry, y = polynomial_ring(R, "y")
 
@@ -255,7 +255,7 @@ end
 end
 
 @testset "fpPolyRingElem.adhoc_comparison" begin
-   R = GF(7)
+   R = Native.GF(7)
    S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
@@ -274,7 +274,7 @@ end
 end
 
 @testset "fpPolyRingElem.truncation" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
 
   f = x^5 + x^4 + 2 *x^2
@@ -289,7 +289,7 @@ end
 end
 
 @testset "fpPolyRingElem.mullow" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
 
   f = x^5 + x^4 + 2 *x^2
@@ -300,7 +300,7 @@ end
 end
 
 @testset "fpPolyRingElem.reverse" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
 
   f = x^5 + x^4 + 2 *x^2 + 1
@@ -313,7 +313,7 @@ end
 end
 
 @testset "fpPolyRingElem.shift" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
 
   f = x^5 + x^4 + 2 *x^2 + 1
@@ -335,7 +335,7 @@ end
 end
 
 @testset "fpPolyRingElem.division" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
 
   f = x^5 + x^4 + 2 *x^2 + x
@@ -375,7 +375,7 @@ end
 end
 
 @testset "fpPolyRingElem.adhoc_exact_division" begin
-   R = GF(23)
+   R = Native.GF(23)
    S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
@@ -388,7 +388,7 @@ end
 end
 
 @testset "fpPolyRingElem.gcd" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
 
   f = x^5 + x^4 + 2 *x^2 + x
@@ -405,7 +405,7 @@ end
 end
 
 @testset "fpPolyRingElem.modular_arithmetic" begin
-  R = GF(487326487)
+  R = Native.GF(487326487)
   S, x = polynomial_ring(R, "x")
 
   f = 3*x^2 + x + 2
@@ -424,7 +424,7 @@ end
 end
 
 @testset "fpPolyRingElem.resultant" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
 
   f = x^5 + x^4 + 2 *x^2 + x
@@ -439,7 +439,7 @@ end
 end
 
 @testset "fpPolyRingElem.evaluate" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
 
   f = x^5 + x^4 + 2 *x^2 + x
@@ -463,7 +463,7 @@ end
 end
 
 @testset "fpPolyRingElem.derivative" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
 
   f = x^5 + x^4 + 2 *x^2 + x
@@ -476,7 +476,7 @@ end
 end
 
 @testset "fpPolyRingElem.integral" begin
-  R = GF(7)
+  R = Native.GF(7)
   S, x = polynomial_ring(R, "x")
 
   f = x^2 + 2x + 1
@@ -485,7 +485,7 @@ end
 end
 
 @testset "fpPolyRingElem.compose" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
 
   f = x^5 + x^4 + 2 *x^2 + x
@@ -499,7 +499,7 @@ end
 end
 
 @testset "fpPolyRingElem.interpolate" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
 
   xval = [ R(0), R(1), R(2), R(3) ]
@@ -513,7 +513,7 @@ end
 end
 
 @testset "fpPolyRingElem.inflate" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
 
   f = x^6 + x^4 + 2 *x^2
@@ -527,7 +527,7 @@ end
 end
 
 @testset "fpPolyRingElem.deflate" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
 
   f = x^6 + x^4 + 2 *x^2
@@ -541,7 +541,7 @@ end
 end
 
 @testset "fpPolyRingElem.lifting" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
   Zy,y = polynomial_ring(ZZ, "y")
 
@@ -554,7 +554,7 @@ end
 end
 
 @testset "fpPolyRingElem.is_irreducible" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
 
   f = x^6 + x^4 + 2 *x^2
@@ -567,7 +567,7 @@ end
 end
 
 @testset "fpPolyRingElem.is_squarefree" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
 
   f = x^6 + x^4 + 2 *x^2
@@ -583,7 +583,7 @@ end
 end
 
 @testset "fpPolyRingElem.square_root" begin
-   for R in [GF(2), GF(23)]
+   for R in [Native.GF(2), Native.GF(23)]
       S, x = polynomial_ring(R, "x")
 
       for iter in 1:1000
@@ -617,7 +617,7 @@ end
 end
 
 @testset "fpPolyRingElem.factor" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
 
   @test_throws ArgumentError factor(Rx(0))
@@ -650,14 +650,14 @@ end
 end
 
 @testset "fpPolyRingElem.canonicalization" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
 
   @test canonical_unit(5*x) == R(5)
 end
 
 @testset "fpPolyRingElem.remove_valuation" begin
-  R = GF(23)
+  R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
 
   f = (x + 1)^10 * (x + 2) * (x + 3)

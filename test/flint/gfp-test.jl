@@ -5,14 +5,14 @@ end
 @testset "gfp.conformance_tests" begin
    # TODO: make this work with test_Field_interface_recursive
    for p in [13, next_prime(2^8), next_prime(2^16), next_prime(2^32)]
-      test_Field_interface(GF(p))
+      test_Field_interface(Native.GF(p))
    end
 end
 
 @testset "gfp.constructors" begin
-   R = GF(13)
+   R = Native.GF(13)
 
-   @test_throws DomainError GF(-13)
+   @test_throws DomainError Native.GF(-13)
 
    @test elem_type(R) == Nemo.fpFieldElem
    @test elem_type(Nemo.fpField) == Nemo.fpFieldElem
@@ -38,7 +38,7 @@ end
       p = rand(UInt(1):typemax(UInt))
 
       if Nemo.is_prime(ZZ(p))
-         R = GF(p)
+         R = Native.GF(p)
 
          a = R(rand(Int))
          d = a.data
@@ -50,7 +50,7 @@ end
    for i = 1:1000
       p = rand(1:24)
       if Nemo.is_prime(ZZ(p))
-         R = GF(p)
+         R = Native.GF(p)
 
          a = R(rand(Int))
          d = a.data
@@ -59,28 +59,28 @@ end
       end
    end
 
-   S = GF(17)
-   T = GF(17)
+   S = Native.GF(17)
+   T = Native.GF(17)
    @test T === S
 
-   S = GF(19, cached = false)
-   T = GF(19, cached = false)
+   S = Native.GF(19, cached = false)
+   T = Native.GF(19, cached = false)
    @test !(S === T)
 
-   S = GF(ZZRingElem(17))
-   T = GF(ZZRingElem(17))
+   S = Native.GF(ZZRingElem(17))
+   T = Native.GF(ZZRingElem(17))
    @test T === S
 
-   S = GF(ZZRingElem(19), cached = false)
-   T = GF(ZZRingElem(19), cached = false)
+   S = Native.GF(ZZRingElem(19), cached = false)
+   T = Native.GF(ZZRingElem(19), cached = false)
    @test !(S === T)
 
-   @test_throws MethodError GF(big(3))
-   @test_throws MethodError GF(0x3)
+   @test_throws MethodError Native.GF(big(3))
+   @test_throws MethodError Native.GF(0x3)
 end
 
 @testset "gfp.rand" begin
-   R = GF(13)
+   R = Native.GF(13)
 
    test_rand(R)
    test_rand(R, 1:9)
@@ -94,14 +94,14 @@ end
 end
 
 @testset "gfp.printing" begin
-   R = GF(13)
+   R = Native.GF(13)
 
    @test string(R(3)) == "3"
    @test string(R()) == "0"
 end
 
 @testset "gfp.manipulation" begin
-   R = GF(13)
+   R = Native.GF(13)
 
    @test iszero(zero(R))
 
@@ -112,7 +112,7 @@ end
 
    @test deepcopy(R(3)) == R(3)
 
-   R1 = GF(13)
+   R1 = Native.GF(13)
 
    @test R === R1
 
@@ -123,8 +123,8 @@ end
    @test lift(R(3)) == 3
    @test isa(lift(R(3)), ZZRingElem)
 
-   R2 = GF(2)
-   R3 = GF(3)
+   R2 = Native.GF(2)
+   R3 = Native.GF(3)
    R6 = residue_ring(ZZ, 6)
    R66 = residue_ring(ZZ, ZZ(6))
    @test R2(R6(2)) == 2  && parent(R2(R6(2))) == R2
@@ -142,7 +142,7 @@ end
    for i = 1:100
       p = rand(UInt(1):typemax(UInt))
       if Nemo.is_prime(ZZ(p))
-         R = GF(p)
+         R = Native.GF(p)
 
          for iter = 1:100
             a = rand(R)
@@ -155,7 +155,7 @@ end
    for i = 1:100
       p = rand(1:24)
       if Nemo.is_prime(ZZ(p))
-         R = GF(p)
+         R = Native.GF(p)
 
          for iter = 1:100
             a = rand(R)
@@ -170,7 +170,7 @@ end
    for i = 1:100
       p = rand(1:24)
       if Nemo.is_prime(ZZ(p))
-         R = GF(p)
+         R = Native.GF(p)
 
          for iter = 1:100
             a1 = rand(R)
@@ -192,7 +192,7 @@ end
    for i = 1:100
       p = rand(UInt(1):typemax(UInt))
       if Nemo.is_prime(ZZ(p))
-         R = GF(p)
+         R = Native.GF(p)
 
          for iter = 1:100
             a1 = rand(R)
@@ -216,7 +216,7 @@ end
    for i = 1:100
       p = rand(1:24)
       if Nemo.is_prime(ZZ(p))
-         R = GF(p)
+         R = Native.GF(p)
 
          for iter = 1:100
             a = rand(R)
@@ -241,7 +241,7 @@ end
    for i = 1:100
       p = rand(UInt(1):typemax(UInt))
       if Nemo.is_prime(ZZ(p))
-         R = GF(p)
+         R = Native.GF(p)
 
          for iter = 1:100
             a = rand(R)
@@ -268,7 +268,7 @@ end
   for i = 1:100
       p = rand(1:24)
       if Nemo.is_prime(ZZ(p))
-         R = GF(p)
+         R = Native.GF(p)
 
          for iter = 1:100
             a = R(1)
@@ -304,7 +304,7 @@ end
    for i = 1:100
       p = rand(UInt(1):typemax(UInt))
       if Nemo.is_prime(ZZ(p))
-         R = GF(p)
+         R = Native.GF(p)
 
          for iter = 1:100
             a = R(1)
@@ -342,7 +342,7 @@ end
   for i = 1:100
       p = rand(1:24)
       if Nemo.is_prime(ZZ(p))
-         R = GF(p)
+         R = Native.GF(p)
 
          for iter = 1:100
             a = rand(R)
@@ -361,7 +361,7 @@ end
    for i = 1:100
       p = rand(UInt(1):typemax(UInt))
       if Nemo.is_prime(ZZ(p))
-         R = GF(p)
+         R = Native.GF(p)
 
          for iter = 1:100
             a = rand(R)
@@ -382,7 +382,7 @@ end
   for i = 1:100
       p = rand(1:24)
       if Nemo.is_prime(ZZ(p))
-         R = GF(p)
+         R = Native.GF(p)
 
          for iter = 1:100
             c = rand(0:100)
@@ -399,7 +399,7 @@ end
    for i = 1:100
       p = rand(UInt(1):typemax(UInt))
       if Nemo.is_prime(ZZ(p))
-         R = GF(p)
+         R = Native.GF(p)
 
          for iter = 1:100
             c = rand(Int)
@@ -418,7 +418,7 @@ end
   for i = 1:100
       p = rand(1:24)
       if Nemo.is_prime(ZZ(p))
-         R = GF(p)
+         R = Native.GF(p)
 
          for iter = 1:100
             a = rand(R)
@@ -433,7 +433,7 @@ end
    for i = 1:100
       p = rand(UInt(1):typemax(UInt))
       if Nemo.is_prime(ZZ(p))
-         R = GF(p)
+         R = Native.GF(p)
 
          for iter = 1:100
             a = rand(R)
@@ -450,7 +450,7 @@ end
   for i = 1:100
       p = rand(1:24)
       if Nemo.is_prime(ZZ(p))
-         R = GF(p)
+         R = Native.GF(p)
 
          for iter = 1:100
             a1 = rand(R)
@@ -469,7 +469,7 @@ end
    for i = 1:100
       p = rand(UInt(1):typemax(UInt))
       if Nemo.is_prime(ZZ(p))
-         R = GF(p)
+         R = Native.GF(p)
 
          for iter = 1:100
             a1 = rand(R)
@@ -489,7 +489,7 @@ end
   for i = 1:100
       p = rand(1:65537)
       if Nemo.is_prime(ZZ(p))
-         R = GF(p)
+         R = Native.GF(p)
 
          z = rand(R)
          if p != 2
@@ -524,6 +524,6 @@ end
 end
 
 @testset "gfp.overload" begin
-   R = GF(19)
+   R = Native.GF(19)
    @test R([5]) == R(5)
 end

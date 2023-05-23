@@ -1,5 +1,5 @@
 @testset "FpMPolyRingElem.constructors" begin
-   R = GF(ZZRingElem(23))
+   R = Native.GF(ZZRingElem(23))
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -61,7 +61,7 @@
 end
 
 @testset "FpMPolyRingElem.printing" begin
-   S, (x, y) = polynomial_ring(GF(ZZRingElem(23)), ["x", "y"])
+   S, (x, y) = polynomial_ring(Native.GF(ZZRingElem(23)), ["x", "y"])
 
    @test !occursin(r"{", string(S))
 
@@ -72,7 +72,7 @@ end
 end
 
 @testset "FpMPolyRingElem.manipulation" begin
-   R = GF(ZZRingElem(23))
+   R = Native.GF(ZZRingElem(23))
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -210,7 +210,7 @@ end
 end
 
 @testset "FpMPolyRingElem.multivariate_coeff" begin
-   R = GF(ZZRingElem(23))
+   R = Native.GF(ZZRingElem(23))
 
    for ord in Nemo.flint_orderings
       S, (x, y, z) = polynomial_ring(R, ["x", "y", "z"]; ordering=ord)
@@ -228,7 +228,7 @@ end
 end
 
 @testset "FpMPolyRingElem.unary_ops" begin
-   R = GF(ZZRingElem(23))
+   R = Native.GF(ZZRingElem(23))
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -245,7 +245,7 @@ end
 end
 
 @testset "FpMPolyRingElem.binary_ops" begin
-   R = GF(ZZRingElem(23))
+   R = Native.GF(ZZRingElem(23))
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -268,7 +268,7 @@ end
 end
 
 @testset "FpMPolyRingElem.adhoc_binary" begin
-   R = GF(ZZRingElem(23))
+   R = Native.GF(ZZRingElem(23))
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -304,7 +304,7 @@ end
 end
 
 @testset "FpMPolyRingElem.adhoc_comparison" begin
-   R = GF(ZZRingElem(23))
+   R = Native.GF(ZZRingElem(23))
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -326,7 +326,7 @@ end
 end
 
 @testset "FpMPolyRingElem.powering" begin
-   R = GF(ZZRingElem(23))
+   R = Native.GF(ZZRingElem(23))
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -353,7 +353,7 @@ end
 end
 
 @testset "FpMPolyRingElem.divides" begin
-   R = GF(ZZRingElem(23))
+   R = Native.GF(ZZRingElem(23))
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -387,7 +387,7 @@ end
 end
 
 @testset "FpMPolyRingElem.euclidean_division" begin
-   R = GF(ZZRingElem(23))
+   R = Native.GF(ZZRingElem(23))
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -423,7 +423,7 @@ end
 end
 
 @testset "FpMPolyRingElem.ideal_reduction" begin
-   R = GF(ZZRingElem(23))
+   R = Native.GF(ZZRingElem(23))
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -472,7 +472,7 @@ end
 end
 
 @testset "FpMPolyRingElem.gcd" begin
-   R = GF(ZZRingElem(23))
+   R = Native.GF(ZZRingElem(23))
 
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
@@ -498,7 +498,7 @@ end
 end
 
 @testset "FpMPolyRingElem.factor" begin
-   R = GF(ZZRingElem(23))
+   R = Native.GF(ZZRingElem(23))
    R, (x, y, z) = polynomial_ring(R, ["x", "y", "z"])
 
    @test_throws ArgumentError factor(R(0))
@@ -520,7 +520,7 @@ end
 end
 
 @testset "FpMPolyRingElem.sqrt" begin
-   R = GF(ZZRingElem(23))
+   R = Native.GF(ZZRingElem(23))
 
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
@@ -546,7 +546,7 @@ end
 end
 
 @testset "FpMPolyRingElem.evaluation" begin
-   R = GF(ZZRingElem(23))
+   R = Native.GF(ZZRingElem(23))
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -607,7 +607,7 @@ end
 end
 
 @testset "FpMPolyRingElem.valuation" begin
-   R = GF(ZZRingElem(23))
+   R = Native.GF(ZZRingElem(23))
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -645,7 +645,7 @@ end
 end
 
 @testset "FpMPolyRingElem.derivative" begin
-   R = GF(ZZRingElem(23))
+   R = Native.GF(ZZRingElem(23))
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -665,7 +665,7 @@ end
 end
 
 @testset "FpMPolyRingElem.unsafe" begin
-  R23 = GF(ZZRingElem(23))
+  R23 = Native.GF(ZZRingElem(23))
 
   for num_vars = 1:10
      var_names = ["x$j" for j in 1:num_vars]
@@ -723,7 +723,7 @@ end
 end
 
 @testset "FpMPolyRingElem.exponents" begin
-  R23 = GF(ZZRingElem(23))
+  R23 = Native.GF(ZZRingElem(23))
 
   for num_vars = 1:10
      var_names = ["x$j" for j in 1:num_vars]
@@ -798,7 +798,7 @@ end
 end
 
 @testset "FpMPolyRingElem.promote_rule" begin
-  R = GF(ZZRingElem(2))
+  R = Native.GF(ZZRingElem(2))
   Rx, (x, ) = polynomial_ring(R, ["x"])
   Sy, (y, ) = polynomial_ring(Rx, ["y"])
   @test y == @inferred (R(1) * y)

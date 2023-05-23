@@ -1,8 +1,8 @@
 
 begin
-local test_fields = (NGFiniteField(23, 1, "a"),
-                     NGFiniteField(23, 5, "a"),
-                     NGFiniteField(next_prime(ZZRingElem(2)^100), 2, "a"))
+local test_fields = (finite_field(23, 1, "a"),
+                     finite_field(23, 5, "a"),
+                     finite_field(next_prime(ZZRingElem(2)^100), 2, "a"))
 
 @testset "FqMPolyRingElem.constructors" begin
    for (R, a) in test_fields

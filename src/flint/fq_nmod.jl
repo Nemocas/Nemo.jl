@@ -579,7 +579,7 @@ Return the modulus defining the finite field $k$.
 """
 function modulus(k::fqPolyRepField, var::VarName=:T)
     p::Int = characteristic(k)
-    Q = polynomial(GF(p), [], var)
+    Q = polynomial(Native.GF(p), [], var)
     GC.@preserve k begin
         P = ccall((:fq_nmod_ctx_modulus, libflint), Ptr{fpPolyRingElem},
                      (Ref{fqPolyRepField},), k)
@@ -685,25 +685,4 @@ function fqPolyRepFieldElem(a::fqPolyRepField, b::Vector{UInt})
    end
    r.length = norm
    return r
-end
-
-
-###############################################################################
-#
-#   FlintFiniteField constructor
-#
-###############################################################################
-
-function FlintFiniteField(char::Int, deg::Int, s::VarName = :o; cached = true)
-   parent_obj = fqPolyRepField(ZZRingElem(char), deg, Symbol(s), cached)
-   return parent_obj, gen(parent_obj)
-end
-
-function FlintFiniteField(pol::Zmodn_poly, s::VarName = :o; cached = true, check::Bool=true)
-   parent_obj = fqPolyRepField(pol, Symbol(s), cached, check=check)
-   return parent_obj, gen(parent_obj)
-end
-
-function FlintFiniteField(F::fqPolyRepField, deg::Int, s::VarName = :o; cached = true)
-    return fqPolyRepField(characteristic(F), deg, Symbol(s), cached)
 end

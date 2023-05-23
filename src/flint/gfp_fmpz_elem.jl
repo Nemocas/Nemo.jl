@@ -456,15 +456,3 @@ function (R::FpField)(a::Vector{<:IntegerUnion})
    is_one(length(a)) || error("Coercion impossible")
    return R(a[1])
 end
-
-###############################################################################
-#
-#   GF constructor
-#
-###############################################################################
-
-function GF(n::ZZRingElem; cached::Bool=true)
-   (n <= 0) && throw(DomainError(n, "Characteristic must be positive"))
-   !is_probable_prime(n) && throw(DomainError(n, "Characteristic must be prime"))
-   return FpField(n, cached)
-end

@@ -1,5 +1,5 @@
 @testset "fpMPolyRingElem.constructors" begin
-   R = GF(23)
+   R = Native.GF(23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -79,14 +79,14 @@
       end
    end
 
-   RR = GF(29)
+   RR = Native.GF(29)
    S, (x, y) = polynomial_ring(R, ["x", "y"])
    M = MPolyBuildCtx(S)
    @test_throws ErrorException push_term!(M, one(RR), zeros(Int, 2))
 end
 
 @testset "fpMPolyRingElem.printing" begin
-   S, (x, y) = polynomial_ring(GF(23), ["x", "y"])
+   S, (x, y) = polynomial_ring(Native.GF(23), ["x", "y"])
 
    @test !occursin(r"{", string(S))
 
@@ -97,7 +97,7 @@ end
 end
 
 @testset "fpMPolyRingElem.manipulation" begin
-   R = GF(23)
+   R = Native.GF(23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -229,7 +229,7 @@ end
 end
 
 @testset "fpMPolyRingElem.multivariate_coeff" begin
-   R = GF(23)
+   R = Native.GF(23)
 
    for ord in Nemo.flint_orderings
       S, (x, y, z) = polynomial_ring(R, ["x", "y", "z"]; ordering=ord)
@@ -247,7 +247,7 @@ end
 end
 
 @testset "fpMPolyRingElem.unary_ops" begin
-   R = GF(23)
+   R = Native.GF(23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -264,7 +264,7 @@ end
 end
 
 @testset "fpMPolyRingElem.binary_ops" begin
-   R = GF(23)
+   R = Native.GF(23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -287,7 +287,7 @@ end
 end
 
 @testset "fpMPolyRingElem.adhoc_binary" begin
-   R = GF(23)
+   R = Native.GF(23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -323,7 +323,7 @@ end
 end
 
 @testset "fpMPolyRingElem.adhoc_comparison" begin
-   R = GF(23)
+   R = Native.GF(23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -345,7 +345,7 @@ end
 end
 
 @testset "fpMPolyRingElem.powering" begin
-   R = GF(23)
+   R = Native.GF(23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -372,7 +372,7 @@ end
 end
 
 @testset "fpMPolyRingElem.divides" begin
-   R = GF(23)
+   R = Native.GF(23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -406,7 +406,7 @@ end
 end
 
 @testset "fpMPolyRingElem.euclidean_division" begin
-   R = GF(23)
+   R = Native.GF(23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -442,7 +442,7 @@ end
 end
 
 @testset "fpMPolyRingElem.ideal_reduction" begin
-   R = GF(23)
+   R = Native.GF(23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -491,7 +491,7 @@ end
 end
 
 @testset "fpMPolyRingElem.gcd" begin
-   R = GF(23)
+   R = Native.GF(23)
 
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
@@ -517,7 +517,7 @@ end
 end
 
 @testset "fpMPolyRingElem.factor" begin
-   R = GF(23)
+   R = Native.GF(23)
    R, (x, y, z) = polynomial_ring(R, ["x", "y", "z"])
 
    @test_throws ArgumentError factor(R(0))
@@ -539,7 +539,7 @@ end
 end
 
 @testset "fpMPolyRingElem.sqrt" begin
-   R = GF(23)
+   R = Native.GF(23)
 
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
@@ -565,7 +565,7 @@ end
 end
 
 @testset "fpMPolyRingElem.evaluation" begin
-   R = GF(23)
+   R = Native.GF(23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -653,7 +653,7 @@ end
 end
 
 @testset "fpMPolyRingElem.valuation" begin
-   R = GF(23)
+   R = Native.GF(23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -691,7 +691,7 @@ end
 end
 
 @testset "fpMPolyRingElem.derivative" begin
-   R = GF(23)
+   R = Native.GF(23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -711,7 +711,7 @@ end
 end
 
 @testset "fpMPolyRingElem.unsafe" begin
-  R23 = GF(23)
+  R23 = Native.GF(23)
 
   for num_vars = 1:10
      var_names = ["x$j" for j in 1:num_vars]
@@ -769,7 +769,7 @@ end
 end
 
 @testset "fpMPolyRingElem.exponents" begin
-  R23 = GF(23)
+  R23 = Native.GF(23)
 
   for num_vars = 1:10
      var_names = ["x$j" for j in 1:num_vars]
@@ -844,14 +844,14 @@ end
 end
 
 @testset "fpMPolyRingElem.promote_rule" begin
-  R = GF(2)
+  R = Native.GF(2)
   Rx, (x, ) = polynomial_ring(R, ["x"])
   Sy, (y, ) = polynomial_ring(Rx, ["y"])
   @test y == @inferred (R(1) * y)
 end
 
 @testset "fpMPolyRingElem.gcd_with_cofactors" begin
-   R, (x, y, z) = polynomial_ring(GF(23), [:x, :y, :z])
+   R, (x, y, z) = polynomial_ring(Native.GF(23), [:x, :y, :z])
 
    @test gcd_with_cofactors(x, y) == (1, x, y)
 

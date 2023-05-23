@@ -1,21 +1,3 @@
-# additional constructors
-
-function FlintFiniteField(p::Integer; cached::Bool=true)
-    @assert is_prime(p)
-    k = GF(p, cached=cached)
-    return k, k(1)
-end
-
-function FlintFiniteField(p::ZZRingElem; cached::Bool=true)
-    @assert is_prime(p)
-    k = GF(p, cached=cached)
-    return k, k(1)
-end
-
-GF(p::Integer, k::Int, s::VarName=:o; cached::Bool=true) = FlintFiniteField(p, k, s, cached=cached)[1]
-GF(p::ZZRingElem, k::Int, s::VarName=:o; cached::Bool=true) = FlintFiniteField(p, k, s, cached=cached)[1]
-
-
 ##
 ## rand for Flint-Finite fields
 ##

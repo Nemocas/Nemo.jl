@@ -1,12 +1,12 @@
 @testset "FqFieldElem.constructors" begin
-   R, a = NGFiniteField(ZZRingElem(7), 5, "a")
+   R, a = finite_field(ZZRingElem(7), 5, "a")
    Rx, x = R["x"]
    f = x^2 + (2*a^4 + 5*a^3 + 5*a^2 + 3*a + 6)*x + a^4 + a^2 + 5*a + 5
-   F, b = NGFiniteField(f, "b")
+   F, b = finite_field(f, "b")
    @test defining_polynomial(F) == f
 
    @test F(x) == b
-   @test_throws ErrorException F(Nemo._GF(5)["x"][2])
+   @test_throws ErrorException F(GF(5)["x"][2])
 
    ff = defining_polynomial(Rx, F)
    @test ff == f
@@ -25,7 +25,7 @@
    Fy, y = F["y"]
    g = y^3 + 2*y + 1
 
-   FF, c = NGFiniteField(g, "c")
+   FF, c = finite_field(g, "c")
    @test defining_polynomial(FF) == g
 
    @test FF isa FqField
@@ -52,48 +52,48 @@
    @test FF(one(R)) == one(FF)
 
    # check for irreducibility
-   @test_throws ErrorException NGFiniteField(x^2-1, "z")
+   @test_throws ErrorException finite_field(x^2-1, "z")
 
-   F, = NGFiniteField(9)
+   F, = finite_field(9)
    @test order(F) == 9
-   @test NGFiniteField(9)[1] === NGFiniteField(9)[1]
-   @test NGFiniteField(9)[1] !== NGFiniteField(9, cached = false)[1]
-   @test_throws ErrorException NGFiniteField(6)
-   @test Nemo._GF(2, 1) === Nemo._GF(2)
-   @test Nemo._GF(6, 1, check = false) isa FqField
-   @test Nemo._FiniteField(2, 1)[1] isa FqField
+   @test finite_field(9)[1] === finite_field(9)[1]
+   @test finite_field(9)[1] !== finite_field(9, cached = false)[1]
+   @test_throws ErrorException finite_field(6)
+   @test GF(2, 1) === GF(2)
+   @test GF(6, 1, check = false) isa FqField
+   @test finite_field(2, 1)[1] isa FqField
 
    # check that the check is correct
-   R, a = NGFiniteField(3, 1, "a")
+   R, a = finite_field(3, 1, "a")
    Rx, x = R["x"]
    f = x^2 + 1
-   F, b = NGFiniteField(f, "b")
+   F, b = finite_field(f, "b")
    @test F isa FqField
 
    # check caching
-   R, a = NGFiniteField(3, 1, "a")
+   R, a = finite_field(3, 1, "a")
    Rx, x = R["x"]
    f = x^2 + 2x + 2
-   F, b = NGFiniteField(f, "b", cached = false)
-   FF, bb = NGFiniteField(f, "b", cached = false)
+   F, b = finite_field(f, "b", cached = false)
+   FF, bb = finite_field(f, "b", cached = false)
    @test F !== FF
-   F, b = NGFiniteField(f, "b")
-   FF, bb = NGFiniteField(f, "b")
+   F, b = finite_field(f, "b")
+   FF, bb = finite_field(f, "b")
    @test F === FF
 
-   R, a = NGFiniteField(3, 2, "a")
+   R, a = finite_field(3, 2, "a")
    Rx, x = R["x"]
    f = x^3 + 2x + 1
-   F, b = NGFiniteField(f, "b", cached = false)
+   F, b = finite_field(f, "b", cached = false)
    @test_throws ErrorException lift(ZZ["x"][1], b)
    @test F(ZZ["x"][2] + 1) == b + 1
    c = 2b^2 + 2b + 1
    @test lift(Rx, c) == 2x^2 + 2x + 1
 
-   R, a = NGFiniteField(ZZ(1180591620717411303449), 2, "a")
+   R, a = finite_field(ZZ(1180591620717411303449), 2, "a")
    Rx, x = R["x"]
    f = x^3 + 8*x^2 + 3*x + 5
-   F, b = NGFiniteField(f, "b", cached = false)
+   F, b = finite_field(f, "b", cached = false)
    @test_throws ErrorException lift(ZZ["x"][1], b)
    @test F(ZZ["x"][2] + 1) == b + 1
    c = 2b^2 + 2b + 1
@@ -101,10 +101,10 @@
 end
 
 @testset "FqFieldElem.printing" begin
-   R, a = NGFiniteField(ZZRingElem(7), 5, "a")
+   R, a = finite_field(ZZRingElem(7), 5, "a")
    Rx, x = R["x"]
    f = x^2 + (2*a^4 + 5*a^3 + 5*a^2 + 3*a + 6)*x + a^4 + a^2 + 5*a + 5
-   F, b = NGFiniteField(f, "b")
+   F, b = finite_field(f, "b")
    c = 2 * b + F(a)
    @test sprint(show, "text/plain", c) == "2*b + a"
 
@@ -112,10 +112,10 @@ end
 end
 
 @testset "FqFieldElem.manipulation" begin
-   R, a = NGFiniteField(ZZRingElem(7), 5, "a")
+   R, a = finite_field(ZZRingElem(7), 5, "a")
    Rx, x = R["x"]
    f = x^2 + (2*a^4 + 5*a^3 + 5*a^2 + 3*a + 6)*x + a^4 + a^2 + 5*a + 5
-   F, b = NGFiniteField(f, "b")
+   F, b = finite_field(f, "b")
 
    @test iszero(zero(F))
    @test isone(one(F))
@@ -146,24 +146,24 @@ end
    @test basis(R) == [a^i for i in 0:4]
    @test basis(F) == [b^0, b^1]
 
-   RR, aa = NGFiniteField(ZZRingElem(7), 2, "a")
+   RR, aa = finite_field(ZZRingElem(7), 2, "a")
    @test iszero(tr(zero(R)) + tr(zero(R)))
    @test isone(norm(one(R)) * norm(one(R)))
    @test prime_field(R) === prime_field(RR)
 end
 
 @testset "FqFieldElem.special_functions" begin
-   R, a = NGFiniteField(ZZRingElem(7), 5, "a")
+   R, a = finite_field(ZZRingElem(7), 5, "a")
 
    @test degree(minpoly(a)) == degree(R)
    @test degree(defining_polynomial(R)) == degree(R)
    @test degree(absolute_charpoly(a)) == degree(R)
    @test !iszero(absolute_norm(a))
-   @test_throws ErrorException NGFiniteField(ZZRingElem(11), 2, "a")[1](a)
+   @test_throws ErrorException finite_field(ZZRingElem(11), 2, "a")[1](a)
 
    Rx, x = R["x"]
    f = x^2 + (2*a^4 + 5*a^3 + 5*a^2 + 3*a + 6)*x + a^4 + a^2 + 5*a + 5
-   F, b = NGFiniteField(f, "b")
+   F, b = finite_field(f, "b")
 
    @test (@inferred tr(b)) == 5*a^4 + 2*a^3 + 2*a^2 + 4*a + 1
    @test (@inferred tr(tr(b))) == 6
@@ -182,16 +182,16 @@ end
 end
 
 @testset "FqFieldElem.iteration" begin
-   R, a = NGFiniteField(ZZRingElem(2), 2, "a")
+   R, a = finite_field(ZZRingElem(2), 2, "a")
    Rx, x = R["x"]
    f = x^3 + x + 1
-   F, _ = NGFiniteField(f, "b")
+   F, _ = finite_field(f, "b")
    AbstractAlgebra.test_iterate(F)
    @test length(collect(F)) == order(F)
 end
 
 @testset "FqFieldElem._residue_field" begin
-   R, a = NGFiniteField(ZZRingElem(2), 2, "a")
+   R, a = finite_field(ZZRingElem(2), 2, "a")
    Rx, x = R["x"]
    f = x^3 + x + 1
    F, RxtoF = Nemo._residue_field(f)
@@ -224,19 +224,19 @@ end
       @test RxtoF(preimage(RxtoF, c)) == c
    end
 
-   R, a = NGFiniteField(ZZRingElem(7), 1, "a")
+   R, a = finite_field(ZZRingElem(7), 1, "a")
    Rx, x = R["x"]
    f = x + 2
    F, RxtoF = Nemo._residue_field(f)
    @test defining_polynomial(Rx, F) == x + 2
 
-   R, a = NGFiniteField(ZZRingElem(7), 1, "a")
+   R, a = finite_field(ZZRingElem(7), 1, "a")
    Rx, x = R["x"]
    f = x + 2
    F, RxtoF = Nemo._residue_field(f)
    @test defining_polynomial(Rx, F) == x + 2
 
-   R, a = NGFiniteField(ZZRingElem(18446744073709551629), 1, "a")
+   R, a = finite_field(ZZRingElem(18446744073709551629), 1, "a")
    Rx, x = R["x"]
    f = x + 2
    F, RxtoF = Nemo._residue_field(f)
@@ -244,20 +244,20 @@ end
 end
 
 @testset "Conversions" begin
-  F = Nemo._GF(2)
+  F = GF(2)
   Fx, x = F["x"]
-  FF, = Nemo._FiniteField(x)
+  FF, = finite_field(x)
   @test iszero(FF(x))
 
-  F = Nemo._GF(ZZ(1180591620717411303449))
+  F = GF(ZZ(1180591620717411303449))
   Fx, x = F["x"]
-  FF, = Nemo._FiniteField(x)
+  FF, = finite_field(x)
   @test iszero(FF(x))
 end
 
 @testset "Implicit promotions" begin
-  F = Nemo._GF(2, 2)
-  FF = Nemo._GF(2, 3)
+  F = GF(2, 2)
+  FF = GF(2, 3)
   fl, = Nemo._try_promote(F, one(FF))
   @test !fl
   fl, = Nemo._try_promote(FF, one(F))
@@ -267,7 +267,7 @@ end
 
   Fx, x = F["x"]
   f = x^2 + gen(F)*x + 1
-  FF, = Nemo._FiniteField(f)
+  FF, = finite_field(f)
   for i in 1:10
     a, b = rand(F), rand(FF)
     @test a * b == FF(a) * b
@@ -288,7 +288,7 @@ end
     @test divexact(a, one(FF)) == divexact(FF(a), one(FF))
   end
 
-  F = Nemo._GF(3)
+  F = GF(3)
   Fx, x = F["x"]
   FF, = Nemo._residue_field(x - 2)
   a = one(F) * one(FF)

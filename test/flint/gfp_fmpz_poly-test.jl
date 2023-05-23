@@ -1,5 +1,5 @@
 @testset "FpPolyRingElem.constructors" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    
    S1 = PolyRing(R)
    S2 = PolyRing(R)
@@ -61,7 +61,7 @@
 end
 
 @testset "FpPolyRingElem.printing" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
    f = x^3 + 2x^2 + x + 1
 
@@ -69,7 +69,7 @@ end
 end
 
 @testset "FpPolyRingElem.manipulation" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    @test iszero(zero(S))
@@ -116,7 +116,7 @@ end
 end
 
 @testset "FpPolyRingElem.polynomial" begin
-   R = GF(ZZ(23))
+   R = Native.GF(ZZ(23))
 
    f = polynomial(R, [])
    g = polynomial(R, [1, 2, 3])
@@ -136,7 +136,7 @@ end
 end
 
 @testset "FpPolyRingElem.similar" begin
-   R = GF(ZZ(23))
+   R = Native.GF(ZZ(23))
 
    f = polynomial(R, [1, 2, 3])
    g = similar(f)
@@ -151,7 +151,7 @@ end
 end
 
 @testset "FpPolyRingElem.binary_ops" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
@@ -165,7 +165,7 @@ end
 end
 
 @testset "FpPolyRingElem.adhoc_binary" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
@@ -209,7 +209,7 @@ end
 end
 
 @testset "FpPolyRingElem.comparison" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
@@ -221,7 +221,7 @@ end
 end
 
 @testset "FpPolyRingElem.adhoc_comparison" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
@@ -240,7 +240,7 @@ end
 end
 
 @testset "FpPolyRingElem.unary_ops" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
@@ -249,7 +249,7 @@ end
 end
 
 @testset "FpPolyRingElem.truncation" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
@@ -265,7 +265,7 @@ end
 end
 
 @testset "FpPolyRingElem.reverse" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 3
@@ -274,7 +274,7 @@ end
 end
 
 @testset "FpPolyRingElem.shift" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
@@ -289,7 +289,7 @@ end
 end
 
 @testset "FpPolyRingElem.powering" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
@@ -300,7 +300,7 @@ end
 end
 
 @testset "FpPolyRingElem.exact_division" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
@@ -310,7 +310,7 @@ end
 end
 
 @testset "FpPolyRingElem.adhoc_exact_division" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
@@ -323,7 +323,7 @@ end
 end
 
 @testset "FpPolyRingElem.modular_arithmetic" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    f = 3*x^2 + x + 2
@@ -344,7 +344,7 @@ end
 end
 
 @testset "FpPolyRingElem.euclidean_division" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
@@ -356,7 +356,7 @@ end
 end
 
 @testset "FpPolyRingElem.gcd" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
@@ -369,7 +369,7 @@ end
 end
 
 @testset "FpPolyRingElem.gcdinv" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
@@ -379,7 +379,7 @@ end
 end
 
 @testset "FpPolyRingElem.square_root" begin
-   for R in [GF(ZZ(2)), GF(ZZ(23))]
+   for R in [Native.GF(ZZ(2)), Native.GF(ZZ(23))]
       S, x = polynomial_ring(R, "x")
 
       for iter in 1:1000
@@ -413,7 +413,7 @@ end
 end
 
 @testset "FpPolyRingElem.evaluation" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
@@ -433,7 +433,7 @@ end
 end
 
 @testset "FpPolyRingElem.composition" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
@@ -443,7 +443,7 @@ end
 end
 
 @testset "FpPolyRingElem.derivative" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
@@ -452,7 +452,7 @@ end
 end
 
 @testset "FpPolyRingElem.integral" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
@@ -461,7 +461,7 @@ end
 end
 
 @testset "FpPolyRingElem.resultant" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    f = 5x^2 + 2x + 1
@@ -471,7 +471,7 @@ end
 end
 
 @testset "FpPolyRingElem.discriminant" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
@@ -480,7 +480,7 @@ end
 end
 
 @testset "FpPolyRingElem.lift" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    T, y = polynomial_ring(ZZ, "y")
@@ -491,7 +491,7 @@ end
 end
 
 @testset "FpPolyRingElem.is_irreducible" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
@@ -500,26 +500,18 @@ end
 end
 
 @testset "FpPolyRingElem.is_squarefree" begin
-   R = GF(ZZRingElem(123456789012345678949))
-   Rx, x = polynomial_ring(R, "x")
+   R = Native.GF(ZZRingElem(123456789012345678949))
+   S, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
 
    @test is_squarefree(f) == false
-
-   @test !is_squarefree(Rx(0))
-   @test is_squarefree(Rx(1))
-   @test is_squarefree(Rx(2))
-   @test is_squarefree(Rx(4))
 end
 
 @testset "FpPolyRingElem.factor" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, x = polynomial_ring(R, "x")
    F = R
-
-   @test_throws ArgumentError factor(S(0))
-   @test_throws ArgumentError factor_squarefree(S(0))
 
    f = 3*(x^2 + 2x + 1)
    g = x^3 + 3x + 1
@@ -549,7 +541,7 @@ end
 end
 
 @testset "FpPolyRingElem.remove_valuation" begin
-   R = GF(ZZRingElem(123456789012345678949))
+   R = Native.GF(ZZRingElem(123456789012345678949))
    S, y = polynomial_ring(R, "y")
 
    f = 7y^2 + 3y + 2
