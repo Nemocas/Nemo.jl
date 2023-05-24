@@ -33,7 +33,7 @@ embed(::fqPolyRepField, ::fqPolyRepField)
 
 **Examples**
 
-```jldoctest
+```jldoctest; filter = r"gF"
 julia> k2, x2 = FiniteField(19, 2, "x2")
 (Finite field of degree 2 over GF(19), x2)
 
