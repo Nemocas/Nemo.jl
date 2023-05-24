@@ -7,8 +7,6 @@ module Nemo
 
 import AbstractAlgebra
 
-using InteractiveUtils
-
 using Libdl
 
 using Random
