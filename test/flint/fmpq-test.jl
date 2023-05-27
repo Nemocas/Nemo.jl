@@ -71,6 +71,10 @@ end
    @test one(R) == one(QQFieldElem)
 
    @test sprint(show, "text/plain", QQ) == "Rational field"
+
+   for T in [ZZRingElem, Int, BigInt, Rational{Int}, Rational{BigInt}]
+     @test Nemo.promote_rule(QQFieldElem, T) == QQFieldElem
+   end
 end
 
 @testset "QQFieldElem.rand" begin

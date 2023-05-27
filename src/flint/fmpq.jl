@@ -1045,6 +1045,10 @@ Base.promote_rule(::Type{QQFieldElem}, ::Type{ZZRingElem}) = QQFieldElem
 
 promote_rule(::Type{QQFieldElem}, ::Type{ZZRingElem}) = QQFieldElem
 
+promote_rule(::Type{QQFieldElem}, ::Type{T} where {T <: Integer}) = QQFieldElem
+
+promote_rule(::Type{QQFieldElem}, ::Type{Rational{T}} where {T <: Integer}) = QQFieldElem
+
 Base.promote_rule(::Type{QQFieldElem}, ::Type{Rational{T}}) where {T <: Integer} = QQFieldElem
 
 function Base.convert(::Type{Rational{T}}, a::QQFieldElem) where T <: Integer

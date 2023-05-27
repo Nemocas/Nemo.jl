@@ -685,3 +685,11 @@ end
    @test mul!([QQ(), QQ(), QQ()], [QQ(1), QQ(2)], A) == [9//4, 51//20, 8//3]
    @test mul!([QQ(), QQ(), QQ()], [ZZ(1), ZZ(2)], A) == [9//4, 51//20, 8//3]
 end
+
+@testset "QQMatrix.vector_mul" begin
+  A = matrix(QQ, 2, 3, [1, 2, 3, 4, 5, 6])
+  for T in [QQFieldElem, ZZRingElem, Int, BigInt, Rational{Int}, Rational{BigInt}]
+    @test A * T[1, 2, 3] == QQFieldElem[14, 32]
+    @test T[2, 1] * A == QQFieldElem[6, 9, 12]
+  end
+end
