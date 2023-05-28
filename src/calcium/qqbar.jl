@@ -1295,7 +1295,7 @@ Convert `a` to a real ball with the precision of the parent field `R`.
 Throws if `a` is not a real number.
 """
 function (R::ArbField)(a::qqbar)
-   prec = precision(Balls)
+   prec = precision(R)
    z = R()
    ccall((:qqbar_get_arb, libcalcium),
         Nothing, (Ref{arb}, Ref{qqbar}, Int), z, a, prec)
@@ -1310,7 +1310,7 @@ Convert `a` to a complex ball with the precision of the parent field `R`.
 Throws if `a` is not a real number.
 """
 function (R::AcbField)(a::qqbar)
-   prec = precision(Balls)
+   prec = precision(R)
    z = R()
    ccall((:qqbar_get_acb, libcalcium),
         Nothing, (Ref{acb}, Ref{qqbar}, Int), z, a, prec)
