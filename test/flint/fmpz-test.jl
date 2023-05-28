@@ -1157,11 +1157,11 @@ end
    # Prime power
    for T in [Int, BigInt, ZZRingElem]
      @test @inferred Nemo.is_prime_power(T(2))
-     @test (@inferred Nemo.is_prime_power_with_data(T(2))) == (true, T(2), 1)
+     @test (@inferred Nemo.is_prime_power_with_data(T(2))) == (true, 1, T(2))
      @test Nemo.is_prime_power(T(4))
-     @test (@inferred Nemo.is_prime_power_with_data(T(4))) == (true, T(2), 2)
+     @test (@inferred Nemo.is_prime_power_with_data(T(4))) == (true, 2, T(2))
      @test Nemo.is_prime_power(T(27))
-     @test (@inferred Nemo.is_prime_power_with_data(T(27))) == (true, T(3), 3)
+     @test (@inferred Nemo.is_prime_power_with_data(T(27))) == (true, 3, T(3))
      @test !Nemo.is_prime_power(T(1))
      @test !Nemo.is_prime_power(T(6))
      @test !Nemo.is_prime_power(T(-3))

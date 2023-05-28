@@ -2967,20 +2967,20 @@ is_prime_power(q::Integer) = is_prime_power(ZZRingElem(q))
 @doc raw"""
     is_prime_power_with_data(q::IntegerUnion) -> Bool, ZZRingElem, Int
 
-Returns a flag indicating whether $q$ is a prime power and integers $p, e$ such
+Returns a flag indicating whether $q$ is a prime power and integers $e, p$ such
 that $q = p^e$. If $q$ is a prime power, than $p$ is a prime.
 """
 is_prime_power_with_data(::IntegerUnion)
 
 function is_prime_power_with_data(q::ZZRingElem)
-  iszero(q) && return false, q, 1
+  iszero(q) && return false, 1, q
   e, a = _maximal_integer_root(q)
-  return isprime(a), a, e
+  return isprime(a), e, a
 end
 
 function is_prime_power_with_data(q::Integer)
   e, a = _maximal_integer_root(ZZRingElem(q))
-  return isprime(a), typeof(q)(a), e
+  return isprime(a), e, typeof(q)(a)
 end
 
 ###############################################################################

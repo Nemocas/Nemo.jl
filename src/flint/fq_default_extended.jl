@@ -636,7 +636,7 @@ end
 ################################################################################
 
 function NGFiniteField(a::IntegerUnion, s::VarName = :o; cached::Bool = true, check::Bool = true)
-  fl, p, e = is_prime_power_with_data(a)
+  fl, e, p = is_prime_power_with_data(a)
   !fl && error("Order must be a prime power")
   return NGFiniteField(p, e, s; cached = cached, check = false) 
 end
