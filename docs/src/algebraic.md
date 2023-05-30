@@ -120,7 +120,7 @@ julia> RR = ArbField(64); RR(sqrt(QQBar(2)))
 [1.414213562373095049 +/- 3.45e-19]
 
 julia> CC = AcbField(32); CC(QQBar(-1) ^ (QQBar(1) // 4))
-[0.7071067812 +/- 1.35e-11] + [0.7071067812 +/- 1.35e-11]*im
+[0.707106781 +/- 2.74e-10] + [0.707106781 +/- 2.74e-10]*im
 ```
 
 ### Minimal polynomials, conjugates, and properties
