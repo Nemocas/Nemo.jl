@@ -139,16 +139,16 @@ end
    @test root_of_unity_as_args(-i) == (4, 3)
    @test_throws DomainError root_of_unity_as_args(qqbar(2))
 
-   v = roots(x^5-x-1, CalciumQQBar)
+   v = roots(CalciumQQBar, x^5-x-1)
    @test v[1]^5 - v[1] - 1 == 0
 
-   v = roots(y^2+1, CalciumQQBar)
+   v = roots(CalciumQQBar, y^2+1)
    @test v == [i, -i]
 
-   @test roots(ZZx(0), CalciumQQBar) == []
-   @test roots(ZZx(1), CalciumQQBar) == []
-   @test roots(QQy(0), CalciumQQBar) == []
-   @test roots(QQy(1), CalciumQQBar) == []
+   @test roots(CalciumQQBar, ZZx(0)) == []
+   @test roots(CalciumQQBar, ZZx(1)) == []
+   @test roots(CalciumQQBar, QQy(0)) == []
+   @test roots(CalciumQQBar, QQy(1)) == []
 
    @test eigenvalues(zero(matrix_space(ZZ, 0, 0)), CalciumQQBar) == []
    @test eigenvalues(zero(matrix_space(QQ, 0, 0)), CalciumQQBar) == []

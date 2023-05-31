@@ -75,7 +75,7 @@ Solving the quintic equation:
 julia> R, x = polynomial_ring(QQ, "x")
 (Univariate polynomial ring in x over QQ, x)
 
-julia> v = roots(x^5-x-1, QQBar)
+julia> v = roots(QQBar, x^5-x-1)
 5-element Vector{qqbar}:
  Root 1.16730 of x^5 - x - 1
  Root 0.181232 + 1.08395*im of x^5 - x - 1
@@ -100,8 +100,8 @@ julia> eigenvalues(ZZ[1 1 0; 0 1 1; 1 0 1], QQBar)
 **Interface**
 
 ```@docs
-roots(f::ZZPolyRingElem, R::CalciumQQBarField)
-roots(f::QQPolyRingElem, R::CalciumQQBarField)
+roots(R::CalciumQQBarField, f::ZZPolyRingElem)
+roots(R::CalciumQQBarField, f::QQPolyRingElem)
 eigenvalues(A::ZZMatrix, R::CalciumQQBarField)
 eigenvalues(A::QQMatrix, R::CalciumQQBarField)
 rand(R::CalciumQQBarField; degree::Int, bits::Int, randtype::Symbol=:null)

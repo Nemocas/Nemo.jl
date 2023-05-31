@@ -124,7 +124,7 @@ function qqbar_vec_clear(v::Ptr{qqbar_struct}, n::Int)
         Nothing, (Ptr{qqbar_struct}, Int), v, n)
 end
 
-function roots(f::ZZPolyRingElem, R::CalciumQQBarField)
+function roots(R::CalciumQQBarField, f::ZZPolyRingElem)
    deg = degree(f)
    if deg <= 0
       return Array{qqbar}(undef, 0)
