@@ -920,14 +920,14 @@ function qqbar_vec_clear(v::Ptr{qqbar_struct}, n::Int)
 end
 
 @doc raw"""
-    roots(f::ZZPolyRingElem, R::CalciumQQBarField)
+    roots(R::CalciumQQBarField, f::ZZPolyRingElem)
 
 Return all the roots of the polynomial `f` in the field of algebraic
 numbers `R`. The output array is sorted in the default sort order for
 algebraic numbers. Roots of multiplicity higher than one are repeated
 according to their multiplicity.
 """
-function roots(f::ZZPolyRingElem, R::CalciumQQBarField)
+function roots(R::CalciumQQBarField, f::ZZPolyRingElem)
    deg = degree(f)
    if deg <= 0
       return Array{qqbar}(undef, 0)
@@ -941,14 +941,14 @@ function roots(f::ZZPolyRingElem, R::CalciumQQBarField)
 end
 
 @doc raw"""
-    roots(f::QQPolyRingElem, R::CalciumQQBarField)
+    roots(R::CalciumQQBarField, f::QQPolyRingElem)
 
 Return all the roots of the polynomial `f` in the field of algebraic
 numbers `R`. The output array is sorted in the default sort order for
 algebraic numbers. Roots of multiplicity higher than one are repeated
 according to their multiplicity.
 """
-function roots(f::QQPolyRingElem, R::CalciumQQBarField)
+function roots(R::CalciumQQBarField, f::QQPolyRingElem)
    deg = degree(f)
    if deg <= 0
       return Array{qqbar}(undef, 0)

@@ -101,3 +101,7 @@
 # Deprecated in 0.34.*
 
 @deprecate gso(x::QQMatrix) gram_schmidt_orthogonalisation(x)
+
+@deprecate roots(f::QQPolyRingElem, R::CalciumQQBarField) roots(R, f)
+
+@deprecate roots(f::ZZPolyRingElem, R::CalciumQQBarField) roots(R, f)
