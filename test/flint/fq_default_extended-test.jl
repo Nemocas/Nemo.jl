@@ -231,3 +231,15 @@ end
    F, RxtoF = Nemo._residue_field(f)
    @test defining_polynomial(Rx, F) == x + 2
 end
+
+@testset "Conversions" begin
+  F = Nemo._GF(2)
+  Fx, x = F["x"]
+  FF, = Nemo._FiniteField(x)
+  @test iszero(FF(x))
+
+  F = Nemo._GF(ZZ(1180591620717411303449))
+  Fx, x = F["x"]
+  FF, = Nemo._FiniteField(x)
+  @test iszero(FF(x))
+end

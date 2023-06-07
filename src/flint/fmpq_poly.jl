@@ -880,7 +880,13 @@ end
 
 (a::QQPolyRing)(b::Vector{Rational{T}}, copy::Bool=true) where {T <: Integer} = a(map(QQFieldElem, b))
 
-(a::QQPolyRing)(b::Vector{ZZRingElem}, copy::Bool=true) = a(map(QQFieldElem, b))
+function (a::QQPolyRing)(b::Vector{ZZRingElem}, copy::Bool=true) 
+  x = a()
+  for i=1:length(b)
+    ccall((:fmpq_poly_set_coeff_fmpz, libflint), Cvoid, (Ref{QQPolyRingElem}, Int, Ref{ZZRingElem}), x, i - 1, b[i])
+  end
+  return x
+end
 
 (a::QQPolyRing)(b::QQPolyRingElem) = b
 

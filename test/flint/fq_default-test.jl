@@ -95,6 +95,16 @@ end
 @testset "FqFieldElem.conversions" begin
    U, a = NGFiniteField(ZZRingElem(7), 5, "a")
 
+   for T in [Int, Int128, BigInt, fmpz]
+     @test isone(U(T(1)))
+   end
+
+   for T in [Int, Int128, BigInt, fmpz]
+     @test (U(1//T(2))) == inv(U(2))
+   end
+
+   @test_throws ErrorException U(1//7)
+
    f = 3a^4 + 2a^3 + a + 5
 
    for R in [residue_ring(FlintZZ, 7), residue_ring(FlintZZ, ZZ(7)), GF(7), GF(ZZ(7))]

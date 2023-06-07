@@ -325,6 +325,7 @@ end
    @test mod(k, l) == (18*x^4+5*x^3+17*x^2+7*x+1)*y+(5*x^4+17*x^3+6*x^2+15*x+1)
 
    @test divrem(k, l) == ((18*x^4+5*x^3+18*x^2+5*x+3)*y+(5*x^4+18*x^3+5*x^2+18*x+21), (18*x^4+5*x^3+17*x^2+7*x+1)*y+(5*x^4+17*x^3+6*x^2+15*x+1))
+   @test div(k, l) == divrem(k, l)[1]
 end
 
 @testset "FqPolyRingElem.content_primpart_gcd" begin

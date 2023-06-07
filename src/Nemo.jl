@@ -7,8 +7,6 @@ module Nemo
 
 import AbstractAlgebra
 
-using InteractiveUtils
-
 using Libdl
 
 using Random
@@ -105,6 +103,19 @@ const libflint = FLINT_jll.libflint
 function flint_abort()
   error("Problem in the Flint-Subsystem")
 end
+
+# check whether we are using flint version >= 3.0 (or some recent enough dev version),
+# which changed the layout of some structs
+_ptr = Libc.dlopen(libflint)
+if Libc.dlsym(_ptr, :_fmpz_mod_vec_set_fmpz_vec_threaded; throw_error = false) != nothing
+  const NEW_FLINT = true
+	libantic = libflint
+	libarb = libflint
+	libcalcium = libflint
+else
+  const NEW_FLINT = false
+end
+Libc.dlclose(_ptr)
 
 ################################################################################
 #
@@ -219,7 +230,6 @@ end
 
 const __isthreaded = Ref(false)
 
-
 function __init__()
    # In case libgmp picks up the wrong libgmp later on, we "unset" the jl_*
    # functions from the julia :libgmp.
@@ -303,7 +313,6 @@ else
       version() = VersionNumber("$(ver.version)")
    end
 end
-
 
 function versioninfo()
   print("Nemo version $(version())\n")

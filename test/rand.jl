@@ -1,5 +1,5 @@
-using Random
-using RandomExtensions: make
+using Nemo.Random
+using Nemo.RandomExtensions: make
 
 const rng = MersenneTwister()
 

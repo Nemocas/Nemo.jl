@@ -734,20 +734,17 @@ function evaluate(a::QQMPolyRingElem, b::Vector{<:Integer})
 end
 
 function (a::QQMPolyRingElem)(vals::QQFieldElem...)
-   length(vals) != nvars(parent(a)) && error("Number of variables does not match number o
-f values")
+   length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
    return evaluate(a, [vals...])
 end
 
 function (a::QQMPolyRingElem)(vals::Integer...)
-   length(vals) != nvars(parent(a)) && error("Number of variables does not match number o
-f values")
+   length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
    return evaluate(a, [vals...])
 end
 
 function (a::QQMPolyRingElem)(vals::Union{NCRingElem, RingElement}...)
-   length(vals) != nvars(parent(a)) && error("Number of variables does not match number o
-f values")
+   length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
    R = base_ring(a)
    # The best we can do here is to cache previously used powers of the values
    # being substituted, as we cannot assume anything about the relative
