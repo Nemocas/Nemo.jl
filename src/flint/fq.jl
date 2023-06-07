@@ -624,7 +624,7 @@ function (a::FqPolyRepField)(b::Vector{<:IntegerUnion})
    da = degree(a)
    db = length(b)
    da < db && error("Coercion impossible")
-   return a(polynomial(prime_field(a), b))
+   return a(polynomial(GF(characteristic(a)), b))
 end
 
 ###############################################################################
