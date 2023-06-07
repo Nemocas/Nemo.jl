@@ -534,7 +534,7 @@ function _fq_field_from_nmod_poly_in_disguise(f::FqPolyRingElem, s)
           (Ref{FqFieldElem}, Ref{FqPolyRingElem}, Ref{FqField}), y, g, z)
     return y
   end
-  z.backwardmap = function(g, R = parent(y))
+  z.backwardmap = function(g, R = parent(f))
     y = R()
     ccall((:fq_default_get_nmod_poly, libflint), Nothing,
           (Ref{FqPolyRingElem}, Ref{FqFieldElem}, Ref{FqField}), y, g, z)
