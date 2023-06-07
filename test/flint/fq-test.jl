@@ -256,5 +256,5 @@ end
 
 @testset "FqPolyRepField.overload" begin
    R, x = FiniteField(ZZ(19), 3, "x")
-   @test R([1,0,1]) == x^2 +1
+   @test R([1, 0, 1]) == x^2 + 1
 end
