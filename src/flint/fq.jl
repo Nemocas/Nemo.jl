@@ -620,7 +620,7 @@ function (a::FqPolyRepField)(b::FqPolyRepFieldElem)
     end
 end
 
-function (a::FqPolyRepField)(b::Vector{IntegerUnion})
+function (a::FqPolyRepField)(b::Vector{T}) where T <: IntegerUnion
    da = degree(a)
    db = length(b)
    da < db && error("Coercion impossible")

@@ -456,7 +456,7 @@ function (R::FpField)(a::Union{fpFieldElem, zzModRingElem, FpFieldElem, ZZModRin
    end
 end
 
-function (R::FpField)(a::Vector{IntegerUnion})
+function (R::FpField)(a::Vector{T}) where T <: IntegerUnion
    isone(length(a)) || error("Coercion impossible")
    return R(a[1])
 end
