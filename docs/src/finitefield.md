@@ -244,4 +244,5 @@ tr(::FqFieldElem)
 absolute_tr(::FqFieldElem)
 norm(::FqFieldElem)
 absolute_norm(::FqFieldElem)
+lift(::FqPolyRing, ::FqFieldElem)
 ```

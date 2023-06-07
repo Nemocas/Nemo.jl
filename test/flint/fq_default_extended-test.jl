@@ -87,6 +87,17 @@
    F, b = NGFiniteField(f, "b", cached = false)
    @test_throws ErrorException lift(ZZ["x"][1], b)
    @test F(ZZ["x"][2] + 1) == b + 1
+   c = 2b^2 + 2b + 1
+   @test lift(Rx, c) == 2x^2 + 2x + 1
+
+   R, a = NGFiniteField(ZZ(1180591620717411303449), 2, "a")
+   Rx, x = R["x"]
+   f = x^3 + 8*x^2 + 3*x + 5
+   F, b = NGFiniteField(f, "b", cached = false)
+   @test_throws ErrorException lift(ZZ["x"][1], b)
+   @test F(ZZ["x"][2] + 1) == b + 1
+   c = 2b^2 + 2b + 1
+   @test lift(Rx, c) == 2x^2 + 2x + 1
 end
 
 @testset "FqFieldElem.printing" begin

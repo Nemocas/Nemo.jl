@@ -503,8 +503,8 @@ function _fq_field_from_fmpz_mod_poly_in_disguise(f::FqPolyRingElem, s)
     @assert parent(y) === z
     return y
   end
-  z.backwardmap = g -> begin
-    y = parent(f)()
+  z.backwardmap = function(g, R = parent(f))
+    y = R()
     ccall((:fq_default_get_fmpz_mod_poly, libflint), Nothing,
           (Ref{FqPolyRingElem}, Ref{FqFieldElem}, Ref{FqField}), y, g, z)
     return y
@@ -534,8 +534,8 @@ function _fq_field_from_nmod_poly_in_disguise(f::FqPolyRingElem, s)
           (Ref{FqFieldElem}, Ref{FqPolyRingElem}, Ref{FqField}), y, g, z)
     return y
   end
-  z.backwardmap = g -> begin
-    y = parent(f)()
+  z.backwardmap = function(g, R = parent(y))
+    y = R()
     ccall((:fq_default_get_nmod_poly, libflint), Nothing,
           (Ref{FqPolyRingElem}, Ref{FqFieldElem}, Ref{FqField}), y, g, z)
     return y
@@ -597,10 +597,10 @@ function FqField(f::FqPolyRingElem, s::Symbol, cached::Bool = false, absolute::B
         end
       end
       forwardmatinv = inv(forwardmat)
-      backwardmap = y -> begin
+      backwardmap = function(y, R = parent(f))
         w = matrix(Fp, 1, d, [_coeff(y, j - 1) for j in 1:d])
         ww = [Fp(_coeff(y, j - 1)) for j in 1:d]
-        _abs_gen_rel = zero(parent(f))
+        _abs_gen_rel = zero(R)
         fl, vv = can_solve_with_solution(forwardmat, w, side = :left)
         vvv = ww * forwardmatinv
         @assert fl
@@ -780,5 +780,49 @@ function (F::FqField)(p::FqPolyRingElem)
             (Ref{FqFieldElem}, Ref{FqPolyRingElem}, Ref{FqField}), y, p, F)
       return y
     end
+  end
+end
+
+################################################################################
+#
+#  Lift
+#
+################################################################################
+
+function _lift_standard(R::FqPolyRing, a::FqFieldElem)
+  K = parent(a)
+  F = base_ring(R)
+  p = R()
+  @assert F === base_field(parent(a))
+  if _fq_default_ctx_type(F) == _FQ_DEFAULT_NMOD
+    ccall((:fq_default_get_nmod_poly, libflint), Nothing,
+          (Ref{FqPolyRingElem}, Ref{FqFieldElem}, Ref{FqField}),
+          p, a, K)
+    return p
+  else
+    @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FMPZ_NMOD
+    ccall((:fq_default_get_fmpz_mod_poly, libflint), Nothing,
+          (Ref{FqPolyRingElem}, Ref{FqFieldElem}, Ref{FqField}),
+          p, a, K)
+    return p
+  end
+end
+
+@doc raw"""
+    lift(R::FqPolyRing, a::FqFieldElem) -> FqPolyRingElem
+
+Given a polynomial ring over the base field of the parent of `a`, return a lift
+such that `parent(a)(lift(R, a)) == a` is `true`.
+"""
+function lift(R::FqPolyRing, a::FqFieldElem)
+  base_ring(R) !== base_field(parent(a)) &&
+      error("Polynomial ring has wrong coefficient ring")
+  K = parent(a)
+  if isdefined(K, :backwardmap)
+    return K.backwardmap(a)
+  else
+    @assert is_absolute(K)
+    @assert K.isstandard
+    return _lift_standard(R, a)
   end
 end
