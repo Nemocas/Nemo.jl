@@ -254,3 +254,37 @@ end
   FF, = Nemo._FiniteField(x)
   @test iszero(FF(x))
 end
+
+@testset "Implicit promotions" begin
+  F = Nemo._GF(2, 2)
+  FF = Nemo._GF(2, 3)
+  fl, = Nemo._try_promote(F, one(FF))
+  @test !fl
+  fl, = Nemo._try_promote(FF, one(F))
+  @test !fl
+  fl, = Nemo._try_promote(one(F), one(FF))
+  @test !fl
+
+  Fx, x = F["x"]
+  f = x^2 + gen(F)*x + 1
+  FF, = Nemo._FiniteField(f)
+  for i in 1:10
+    a, b = rand(F), rand(FF)
+    @test a * b == FF(a) * b
+    @test b * a == FF(a) * b
+    @test a + b == FF(a) + b
+    @test b + a == FF(a) + b
+    @test a - b == FF(a) - b
+    @test b - a == -(FF(a) - b)
+    @test divides(a, b) == divides(FF(a), b)
+    @test divides(b, a) == divides(b, FF(a))
+    if !iszero(a)
+      @test divexact(b, a) == divexact(b, FF(a))
+    end
+    @test divexact(b, one(F)) == divexact(b, one(FF))
+    if !iszero(b)
+      @test divexact(a, b) == divexact(FF(a), b)
+    end
+    @test divexact(a, one(FF)) == divexact(FF(a), one(FF))
+  end
+end

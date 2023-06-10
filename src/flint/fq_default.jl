@@ -387,27 +387,33 @@ end
 ###############################################################################
 
 function +(x::FqFieldElem, y::FqFieldElem)
-   check_parent(x, y)
-   z = parent(y)()
-   ccall((:fq_default_add, libflint), Nothing,
-        (Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), z, x, y, y.parent)
-   return z
+   if parent(x) === parent(y)
+     z = parent(y)()
+     ccall((:fq_default_add, libflint), Nothing,
+          (Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), z, x, y, y.parent)
+     return z
+   end
+   return +(_promote(x, y)...)
 end
 
 function -(x::FqFieldElem, y::FqFieldElem)
-   check_parent(x, y)
-   z = parent(y)()
-   ccall((:fq_default_sub, libflint), Nothing,
-        (Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), z, x, y, y.parent)
-   return z
+   if parent(x) === parent(y)
+     z = parent(y)()
+     ccall((:fq_default_sub, libflint), Nothing,
+          (Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), z, x, y, y.parent)
+     return z
+   end
+   return -(_promote(x, y)...)
 end
 
 function *(x::FqFieldElem, y::FqFieldElem)
-   check_parent(x, y)
-   z = parent(y)()
-   ccall((:fq_default_mul, libflint), Nothing,
-        (Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), z, x, y, y.parent)
-   return z
+   if parent(x) === parent(y)
+     z = parent(y)()
+     ccall((:fq_default_mul, libflint), Nothing,
+          (Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), z, x, y, y.parent)
+     return z
+   end
+   return *(_promote(x, y)...)
 end
 
 ###############################################################################
@@ -515,22 +521,27 @@ end
 ###############################################################################
 
 function divexact(x::FqFieldElem, y::FqFieldElem; check::Bool=true)
-   check_parent(x, y)
-   iszero(y) && throw(DivideError())
-   z = parent(y)()
-   ccall((:fq_default_div, libflint), Nothing,
-        (Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), z, x, y, y.parent)
-   return z
+   if parent(x) === parent(y)
+     iszero(y) && throw(DivideError())
+     z = parent(y)()
+     ccall((:fq_default_div, libflint), Nothing,
+          (Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), z, x, y, y.parent)
+     return z
+   end
+   return divexact(_promote(x, y)...)
 end
 
 function divides(a::FqFieldElem, b::FqFieldElem)
-   if iszero(a)
-      return true, zero(parent(a))
+   if parent(a) === parent(b)
+     if iszero(a)
+        return true, zero(parent(a))
+     end
+     if iszero(b)
+        return false, zero(parent(a))
+     end
+     return true, divexact(a, b)
    end
-   if iszero(b)
-      return false, zero(parent(a))
-   end
-   return true, divexact(a, b)
+   return divides(_promote(a, b)...)
 end
 
 ###############################################################################

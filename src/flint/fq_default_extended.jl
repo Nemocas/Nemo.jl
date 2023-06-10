@@ -709,11 +709,11 @@ function (a::FqField)(b::FqFieldElem)
   end
 
   if k === base_field(a)
-    return (a.image_basefield)(b)
+    return (a.image_basefield)(b)::FqFieldElem
   end
 
   # To make it work in towers
-  return a(base_field(a)(b))
+  return a(base_field(a)(b))::FqFieldElem
 end
 
 ################################################################################
@@ -825,4 +825,48 @@ function lift(R::FqPolyRing, a::FqFieldElem)
     @assert K.isstandard
     return _lift_standard(R, a)
   end
+end
+
+################################################################################
+#
+#  Promotion
+#
+################################################################################
+
+function _try_promote(K::FqField, a::FqFieldElem)
+  L = parent(a)
+  if degree(K) == 1 && K !== L
+    return false, a
+  end
+
+  if K === L
+    return true, a
+  end
+
+  fl, b = _try_promote(base_field(K), a)
+  if fl
+    return fl, K(a)::FqFieldElem
+  else
+    return false, a
+  end
+end
+
+function _try_promote(a::FqFieldElem, b::FqFieldElem)
+  fl, c = _try_promote(parent(a), b)
+  if fl
+    return true, a, c
+  end
+  fl, c = _try_promote(parent(b), a)
+  if fl
+    return true, c, b
+  end
+  return false, a, b
+end
+
+function _promote(a::FqFieldElem, b::FqFieldElem)
+  fl, aa, bb = _try_promote(a, b)
+  if fl
+    return aa, bb
+  end
+  error("Cannot promote to common finite field")
 end
