@@ -665,6 +665,16 @@ function (a::fqPolyRepField)(b::fqPolyRepFieldElem)
     end
 end
 
+function (a::fqPolyRepField)(b::Vector{<:IntegerUnion})
+   da = degree(a)
+   db = length(b)
+   da < db && error("Coercion impossible")
+   F = GF(Int(characteristic(a)))
+   z = fqPolyRepFieldElem(a, polynomial(F, b))
+   z.parent = a
+   return z
+end
+
 function fqPolyRepFieldElem(a::fqPolyRepField, b::Vector{UInt})
    r = a()
    len = degree(a)
@@ -681,13 +691,6 @@ function fqPolyRepFieldElem(a::fqPolyRepField, b::Vector{UInt})
    return r
 end
 
-function (a::fqPolyRepField)(b::Vector{<:IntegerUnion})
-   da = degree(a)
-   db = length(b)
-   da < db && error("Coercion impossible")
-   F = GF(Int(characteristic(a)))
-   return fqPolyRepFieldElem(a, polynomial(F, b))
-end
 
 ###############################################################################
 #
