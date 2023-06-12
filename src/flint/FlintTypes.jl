@@ -2341,7 +2341,7 @@ mutable struct fqPolyRepFieldElem <: FinFieldElem
             (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), d, ctx)
       finalizer(_fq_nmod_clear_fn, d)
       ccall((:fq_nmod_set_poly, libflint), Nothing,
-            (Ref{fqPolyRepFieldElem}, Ref{fpPolyRingElem}, Ref{fqPolyRepField})
+            (Ref{fqPolyRepFieldElem}, Ref{fpPolyRingElem}, Ref{fqPolyRepField}),
                   d, x, ctx)
       return d
    end
@@ -2803,7 +2803,7 @@ mutable struct FqPolyRepFieldElem <: FinFieldElem
       return d
    end
 
-   function FqPolyRepFieldElem(ctx::FqPolyRepField, x::FqPolyRepFieldElem)
+   function FqPolyRepFieldElem(ctx::FqPolyRepField, x::FpPolyRingElem)
       d = new()
       ccall((:fq_init2, libflint), Nothing,
             (Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}), d, ctx)
