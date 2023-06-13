@@ -470,7 +470,7 @@ function (R::fpField)(a::Union{fpFieldElem, zzModRingElem, FpFieldElem, ZZModRin
 end
 
 function (R::fpField)(a::Vector{<:IntegerUnion})
-   isone(length(a)) || error("Coercion impossible")
+   length(a) <= 1 || error("Coercion impossible")
    return R(a[1])
 end
 
