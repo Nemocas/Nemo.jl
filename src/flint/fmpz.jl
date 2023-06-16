@@ -1002,15 +1002,6 @@ function submod(a::UInt, b::UInt, n::UInt)
    return a >= b ? a - b : a - b + n
 end
 
-function mulmod(a::UInt, b::UInt, n::UInt)
-   return UInt(mod(widen(a)*b, n))
-end
-
-function divexact(a::UInt, b::UInt; check::Bool=true)
-   check && !iszero(mod(a, b)) && throw(ArgumentError("Not an exact division"))
-   return div(a, b)
-end
-
 function _crt_with_lcm(r1::ZZRingElem, m1::ZZRingElem, r2::UInt, m2::UInt; check::Bool=true)
    if iszero(m2)
       check && !is_divisible_by(r2 - r1, m1) && error("no crt solution")
