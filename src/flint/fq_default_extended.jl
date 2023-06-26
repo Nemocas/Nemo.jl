@@ -653,7 +653,7 @@ end
     _FiniteField(p::IntegerUnion, d::Int, s::String; cached::Bool, check::Bool)
     _FiniteField(f::FqPolyRingElem; s::String; cached::Bool, check::Bool)
 
-Returns a tuple $S, x$ consisting of a finite field $S$ of order $q = p^e$ and
+Return a tuple $S, x$ consisting of a finite field $S$ of order $q = p^d$ and
 algebra generator $x$. The string $s$ is used to designate how the finite field
 generator will be printed.
 
@@ -667,8 +667,8 @@ _FiniteField(a...; kw...) = NGFiniteField(a...; kw...)
     _GF(p::IntegerUnion, d::Int, s::String; cached::Bool, check::Bool)
     _GF(f::FqPolyRingElem; s::String; cached::Bool, check::Bool)
 
-Returns a tuple $S$ consisting of a finite field $S$ of order $q = p^e$ and
-algebra generator $x$. The string $s$ is used to designate how the finite field
+Return a finite field $S$ of order $q = p^d$.
+The string $s$ is used to designate how the finite field
 generator will be printed.
 
 If a polynomial $f \in k[t]$ over a finite field $k$ is specified, the finite field
