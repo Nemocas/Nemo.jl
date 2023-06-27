@@ -385,7 +385,7 @@ function embed(k::T, K::T) where T <: FinField
     # If k is already embedded in K, we return the corresponding embedding
 
     tr = is_embedded(k, K)
-    if tr != nothing
+    if tr !== nothing
         return tr
     end
 
@@ -395,7 +395,7 @@ function embed(k::T, K::T) where T <: FinField
 
     if degree(k) == degree(K)
         tr = is_embedded(K, k)
-        if tr != nothing
+        if tr !== nothing
             return preimage_map(tr)
         end
     end

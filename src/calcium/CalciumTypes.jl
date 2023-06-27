@@ -149,7 +149,7 @@ mutable struct CalciumField <: Field
 
       for (opt, value) in options
          i = findfirst(isequal(opt), ca_ctx_options)
-         (i == nothing) && error("unknown option ", opt)
+         (i === nothing) && error("unknown option ", opt)
          ccall((:ca_ctx_set_option, libcalcium), Nothing, (Ref{CalciumField}, Int, Int), C, i - 1, value)
       end
 
