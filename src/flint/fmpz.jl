@@ -158,13 +158,17 @@ end
 
 characteristic(R::ZZRing) = 0
 
-one(_::ZZRing) = ZZRingElem(1)
+one(::ZZRing) = ZZRingElem(1)
 
-zero(_::ZZRing) = ZZRingElem(0)
+zero(::ZZRing) = ZZRingElem(0)
+
+one(::Type{ZZRingElem}) = ZZRingElem(1)
 
 zero(::Type{ZZRingElem}) = ZZRingElem(0)
 
-one(::Type{ZZRingElem}) = ZZRingElem(1)
+one(::ZZRingElem) = ZZRingElem(1)
+
+zero(::ZZRingElem) = ZZRingElem(0)
 
 @doc raw"""
     sign(a::ZZRingElem)
@@ -209,6 +213,10 @@ is_unit(a::ZZRingElem) = ccall((:fmpz_is_pm1, libflint), Bool, (Ref{ZZRingElem},
 iszero(a::ZZRingElem) = ccall((:fmpz_is_zero, libflint), Bool, (Ref{ZZRingElem},), a)
 
 isone(a::ZZRingElem) = ccall((:fmpz_is_one, libflint), Bool, (Ref{ZZRingElem},), a)
+
+isinteger(::ZZRingElem) = true
+
+isfinite(::ZZRingElem) = true
 
 @doc raw"""
     denominator(a::ZZRingElem)
@@ -303,6 +311,10 @@ end
 floor(x::ZZRingElem) = x
 
 ceil(x::ZZRingElem) = x
+
+floor(::Type{ZZRingElem}, x::ZZRingElem) = x
+
+ceil(::Type{ZZRingElem}, x::ZZRingElem) = x
 
 ###############################################################################
 #
@@ -584,6 +596,8 @@ Base.div(x::ZZRingElem, y::Integer) = Base.div(x, ZZRingElem(y))
 divrem(x::ZZRingElem, y::Integer) = divrem(x, ZZRingElem(y))
 
 divrem(x::Integer, y::ZZRingElem) = divrem(ZZRingElem(x), y)
+
+Base.divrem(x::ZZRingElem, y::Int) = (Base.div(x, y), Base.rem(x, y))
 
 ###############################################################################
 #
@@ -882,6 +896,25 @@ function powermod(x::ZZRingElem, p::Int, m::ZZRingElem)
           (Ref{ZZRingElem}, Ref{ZZRingElem}, Int, Ref{ZZRingElem}),
           r, x, p, m)
     return r
+end
+
+#square-and-multiply algorithm to compute f^e mod g
+function powermod(f::T, e::ZZRingElem, g::T) where {T}
+   #small exponent -> use powermod
+   if nbits(e) <= 63
+      return powermod(f, Int(e), g)
+   else
+      #go through binary representation of exponent and multiply with res
+      #or (res and f)
+      res = parent(f)(1)
+      for b = bits(e)
+         res = mod(res^2, g)
+         if b
+            res = mod(res * f, g)
+         end
+      end
+      return res
+   end
 end
 
 @doc raw"""

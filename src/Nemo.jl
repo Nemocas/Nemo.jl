@@ -385,6 +385,8 @@ include("embedding/embedding.jl")
 
 include("Rings.jl")
 
+include("HeckeMiscInteger.jl")
+
 ###############################################################################
 #
 #   satellite functionality
