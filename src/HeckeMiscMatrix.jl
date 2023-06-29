@@ -1,4 +1,4 @@
-export is_zero_row, is_diagonal, is_positive_entry, diagonal
+export is_zero_row, is_diagonal, is_lower_triangular, is_positive_entry, is_upper_triangular, diagonal
 
 import LinearAlgebra
 LinearAlgebra.dot(a::RingElem, b::RingElem) = a * b

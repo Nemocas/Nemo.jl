@@ -624,6 +624,22 @@ end
 
 ################################################################################
 #
+#  Sign
+#
+################################################################################
+
+function sign(::Type{Int}, x::arb)
+  if is_positive(x)
+    return 1
+  elseif is_negative(x)
+    return -1
+  else
+    error("Could not determine sign")
+  end
+end
+
+################################################################################
+#
 #  Unary operations
 #
 ################################################################################
@@ -1991,6 +2007,12 @@ function addeq!(z::arb, x::arb)
     ccall((:arb_add, libarb), Nothing, (Ref{arb}, Ref{arb}, Ref{arb}, Int),
                            z, z, x, parent(x).prec)
     return z
+end
+
+function addmul!(z::arb, x::arb, y::ZZRingElem)
+  q = max(bits(z), bits(x))
+  ccall((:arb_addmul_fmpz, libarb), Nothing, (Ref{arb}, Ref{arb}, Ref{ZZRingElem}, Int), z, x, y, q)
+  return nothing
 end
 
 ################################################################################
