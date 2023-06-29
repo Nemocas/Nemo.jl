@@ -1,4 +1,4 @@
-export is_zero_row, is_diagonal, diagonal
+export is_zero_row, is_diagonal, is_positive_entry, diagonal
 
 import LinearAlgebra
 LinearAlgebra.dot(a::RingElem, b::RingElem) = a * b
@@ -333,7 +333,7 @@ function lift(x::FpMatrix)
     return map_entries(lift, x)
 end
 
-function lift(a::Generic.Mat{Nemo.ZZModRingElem})
+function lift(a::Generic.Mat{ZZModRingElem})
     z = zero_matrix(FlintZZ, nrows(a), ncols(a))
     for i in 1:nrows(a)
         for j in 1:ncols(a)
@@ -1220,7 +1220,7 @@ function sub(M::MatElem, rows::Vector{Int}, cols::Vector{Int})
     return N
 end
 
-function sub(M::Nemo.MatElem{T}, r::UnitRange{<:Integer}, c::UnitRange{<:Integer}) where {T}
+function sub(M::MatElem{T}, r::UnitRange{<:Integer}, c::UnitRange{<:Integer}) where {T}
     z = similar(M, length(r), length(c))
     for i in 1:length(r)
         for j in 1:length(c)
@@ -1242,7 +1242,7 @@ function map_entries(F::fpField, M::ZZMatrix)
     return MR
 end
 
-function map_entries(R::Nemo.ZZModRing, M::ZZMatrix)
+function map_entries(R::ZZModRing, M::ZZMatrix)
     N = zero_matrix(R, nrows(M), ncols(M))
     GC.@preserve M N begin
         for i = 1:nrows(M)

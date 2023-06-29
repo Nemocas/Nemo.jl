@@ -33,6 +33,7 @@
 @alias isnonzero is_nonzero
 @alias isnumber is_number
 @alias ispositive is_positive
+@alias ispositive_entry is_positive_entry
 @alias isprime is_prime
 @alias isrational is_rational
 @alias isroot_of_unity is_root_of_unity
