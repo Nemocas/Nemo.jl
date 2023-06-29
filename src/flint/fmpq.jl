@@ -1009,11 +1009,27 @@ add!(c::QQFieldElem, a::ZZRingElem, b::QQFieldElem) = add!(c, b, a)
 
 function add!(c::QQFieldElem, a::QQFieldElem, b::Int)
    ccall((:fmpq_add_si, libflint), Nothing,
-         (Ref{QQFieldElem}, Ref{QQFieldElem}, Int), c, a, b)
+      (Ref{QQFieldElem}, Ref{QQFieldElem}, Int), c, a, b)
    return c
 end
 
 add!(c::QQFieldElem, a::Int, b::QQFieldElem) = add!(c, b, a)
+
+@inline function sub!(z::QQFieldElem, a::QQFieldElem, b::QQFieldElem)
+   ccall((:fmpq_sub, libflint), Nothing, (Ref{QQFieldElem}, Ref{QQFieldElem}, Ref{QQFieldElem}), z, a, b)
+   return z
+end
+
+@inline function sub!(z::QQFieldElem, a::QQFieldElem, b::ZZRingElem)
+   ccall((:fmpq_sub_fmpz, libflint), Nothing,
+      (Ref{QQFieldElem}, Ref{QQFieldElem}, Ref{ZZRingElem}), z, a, b)
+   return z
+end
+
+@inline function neg!(z::QQFieldElem, a::QQFieldElem)
+   ccall((:fmpq_neg, libflint), Nothing, (Ref{QQFieldElem}, Ref{QQFieldElem}), z, a)
+   return z
+end
 
 ###############################################################################
 #

@@ -25,7 +25,7 @@ import Base: Array, abs, abs2, acos, acosh, asin, asinh, atan, atanh, bin, binom
              ceil, checkbounds, conj, convert, cmp, contains, cos, cosh, cospi, cot,
              coth, dec, deepcopy, deepcopy_internal, denominator,
              expm1, exp, factorial, floor, gcd, gcdx, getindex, hash, hcat,
-             hex, hypot, intersect, inv, invmod, isequal, iseven, isinf, isfinite,
+             hex, hypot, in, intersect, inv, invmod, isequal, iseven, isinf, isfinite,
              isinteger, isless, isodd, isone, isqrt, isreal, iszero, lcm,
              ldexp, length, log, log1p, mod, ndigits, numerator, oct, one,
              parent, parse, powermod,

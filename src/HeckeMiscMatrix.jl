@@ -234,6 +234,9 @@ function is_zero_row(M::Matrix{T}, i::Int) where {T<:RingElem}
     return true
 end
 
+export divexact!
+export mul!
+
 function divexact!(a::ZZMatrix, b::ZZMatrix, d::ZZRingElem)
     ccall((:fmpz_mat_scalar_divexact_fmpz, libflint), Nothing,
         (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}), a, b, d)
@@ -1112,6 +1115,8 @@ diagonal(A::MatrixElem{T}) where {T} = T[A[i, i] for i in 1:nrows(A)]
 #  Product of the diagonal entries
 #
 ################################################################################
+
+export prod_diagonal
 
 function prod_diagonal(A::ZZMatrix)
     a = one(ZZRingElem)

@@ -2534,6 +2534,11 @@ function add!(z::ZZRingElem, a::ZZRingElem, b::UInt)
    return z
 end
 
+function add!(a::ZZRingElem, b::ZZRingElem, c::Ptr{Int})
+   ccall((:fmpz_add, Nemo.libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ptr{Int}), a, b, c)
+   return a
+end
+
 add!(z::ZZRingElem, a::ZZRingElem, b::Integer) = add!(z, a, ZZRingElem(b))
 add!(z::ZZRingElem, x::Int, y::ZZRingElem) = add!(z, y, x)
 
@@ -2597,6 +2602,11 @@ end
 mul!(z::ZZRingElem, a::ZZRingElem, b::Integer) = mul!(z, a, ZZRingElem(b))
 
 mul!(z::ZZRingElem, x::Int, y::ZZRingElem) = mul!(z, y, x)
+
+function mul!(a::ZZRingElem, b::ZZRingElem, c::Ptr{Int})
+   ccall((:fmpz_mul, Nemo.libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ptr{Int}), a, b, c)
+   return a
+end
 
 function addmul!(z::ZZRingElem, x::ZZRingElem, y::ZZRingElem)
    ccall((:fmpz_addmul, libflint), Nothing,
