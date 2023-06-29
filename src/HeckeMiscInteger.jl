@@ -60,6 +60,8 @@ function valuation(z::Rational{T}, p::T) where {T<:Integer}
     return w - v
 end
 
+@inline __get_rounding_mode() = Base.MPFR.rounding_raw(BigFloat)
+
 function BigFloat(a::QQFieldElem)
     r = BigFloat(0)
     ccall((:fmpq_get_mpfr, libflint), Nothing, (Ref{BigFloat}, Ref{QQFieldElem}, Int32), r, a, __get_rounding_mode())

@@ -2,7 +2,7 @@ function test_elem(R::ZZRing)
    return rand_bits(ZZ, rand(0:100))
 end
 
-@testset "QQFieldElem.conformance_tests" begin
+@testset "ZZFieldElem.conformance_tests" begin
    test_Ring_interface_recursive(FlintZZ)
 end
 

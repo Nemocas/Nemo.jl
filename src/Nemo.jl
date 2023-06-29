@@ -386,6 +386,7 @@ include("embedding/embedding.jl")
 include("Rings.jl")
 
 include("HeckeMiscInteger.jl")
+include("HeckeMiscMatrix.jl")
 
 ###############################################################################
 #

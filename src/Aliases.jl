@@ -10,6 +10,7 @@
 @alias isalgebraic is_algebraic
 @alias isalgebraic_integer is_algebraic_integer
 @alias iscyclo_type is_cyclo_type
+@alias isdiagonal is_diagonal
 @alias isembedded is_embedded
 @alias isequal_abs is_equal_abs
 @alias isequal_abs_imag is_equal_abs_imag
@@ -25,6 +26,7 @@
 @alias isless_imag is_less_imag
 @alias isless_real is_less_real
 @alias isless_root_order is_less_root_order
+@alias islower_triangular is_lower_triangular
 @alias ismaxreal_type is_maxreal_type
 @alias isnonnegative is_nonnegative
 @alias isnonpositive is_nonpositive
@@ -38,6 +40,8 @@
 @alias isuinf is_uinf
 @alias isundefined is_undefined
 @alias isunknown is_unknown
+@alias isupper_triangular is_upper_triangular
+@alias iszero_row is_zero_row
 
 # old type names from before 0.33
 # may be remove at some point in the future
