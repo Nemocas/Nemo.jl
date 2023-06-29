@@ -430,6 +430,10 @@ function rem(x::ZZRingElem, c::ZZRingElem)
     return r
 end
 
+function rem(a::ZZRingElem, b::UInt)
+   return ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), a, b)
+end
+
 ###############################################################################
 #
 #   Ad hoc binary operators
@@ -1711,6 +1715,11 @@ end
 
 function next_prime(x::Int, proved::Bool = true)
    return x < 2 ? 2 : Int(next_prime(x % UInt, proved))
+end
+
+function remove!(a::ZZRingElem, b::ZZRingElem)
+   v = ccall((:fmpz_remove, libflint), Clong, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), a, a, b)
+   return v, a
 end
 
 function remove(x::ZZRingElem, y::ZZRingElem)

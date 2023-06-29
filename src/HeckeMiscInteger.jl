@@ -4,10 +4,6 @@
 #
 ################################################################################
 
-function rem(a::ZZRingElem, b::UInt)
-    return ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), a, b)
-end
-
 function isless(a::BigFloat, b::ZZRingElem)
     if _fmpz_is_small(b)
         c = ccall((:mpfr_cmp_si, :libmpfr), Int32, (Ref{BigFloat}, Int), a, b.d)
@@ -64,35 +60,6 @@ function valuation(z::Rational{T}, p::T) where {T<:Integer}
     return w - v
 end
 
-function remove!(a::ZZRingElem, b::ZZRingElem)
-    v = ccall((:fmpz_remove, libflint), Clong, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), a, a, b)
-    return v, a
-end
-
-function remove!(a::QQFieldElem, b::ZZRingElem)
-    nr = ccall((:fmpq_numerator_ptr, libflint), Ptr{ZZRingElem}, (Ref{QQFieldElem},), a)
-    vn = ccall((:fmpz_remove, libflint), Clong, (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), nr, nr, b)
-    #QQFieldElem's are simplified: either num OR den will be non-trivial
-    if vn != 0
-        return vn, a
-    end
-    nr = ccall((:fmpq_denominator_ptr, libflint), Ptr{ZZRingElem}, (Ref{QQFieldElem},), a)
-    vn = ccall((:fmpz_remove, libflint), Clong, (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), nr, nr, b)
-    return -vn, a
-end
-
-function valuation!(a::QQFieldElem, b::ZZRingElem)
-    nr = ccall((:fmpq_numerator_ptr, libflint), Ptr{ZZRingElem}, (Ref{QQFieldElem},), a)
-    vn = ccall((:fmpz_remove, libflint), Clong, (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), nr, nr, b)
-    #QQFieldElem's are simplified: either num OR den will be non-trivial
-    if vn != 0
-        return vn
-    end
-    nr = ccall((:fmpq_denominator_ptr, libflint), Ptr{ZZRingElem}, (Ref{QQFieldElem},), a)
-    vn = ccall((:fmpz_remove, libflint), Clong, (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), nr, nr, b)
-    return -vn
-end
-
 function BigFloat(a::QQFieldElem)
     r = BigFloat(0)
     ccall((:fmpq_get_mpfr, libflint), Nothing, (Ref{BigFloat}, Ref{QQFieldElem}, Int32), r, a, __get_rounding_mode())
@@ -100,17 +67,17 @@ function BigFloat(a::QQFieldElem)
 end
 
 function isless(a::Float64, b::QQFieldElem)
-    return a < b * 1.0
+    return a < BigFloat(b)
 end
 function isless(a::QQFieldElem, b::Float64)
-    return a * 1.0 < b
+    return BigFloat(a) < b
 end
 
 function isless(a::Float64, b::ZZRingElem)
-    return a < b * 1.0
+    return a < BigFloat(b)
 end
 function isless(a::ZZRingElem, b::Float64)
-    return a * 1.0 < b
+    return BigFloat(a) < b
 end
 
 #function ^(a::ZZRingElem, k::ZZRingElem)
@@ -134,30 +101,6 @@ end
 #  return a^Int(k)
 #end
 
-function ^(a::QQFieldElem, k::ZZRingElem)
-    if a == 0
-        if k == 0
-            return QQFieldElem(1)
-        end
-        return QQFieldElem(0)
-    end
-
-    if a == 1
-        return QQFieldElem(1)
-    end
-    if a == -1
-        if isodd(k)
-            return QQFieldElem(-1)
-        else
-            return QQFieldElem(1)
-        end
-    end
-    return a^Int(k)
-end
-
-function //(a::ZZRingElem, b::QQFieldElem)
-    return QQFieldElem(a) // b
-end
 
 function *(a::ZZRingElem, b::BigFloat)
     return BigInt(a) * b
