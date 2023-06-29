@@ -1,4 +1,4 @@
-function copy(a::ZZRingElem)
+function Base.copy(a::ZZRingElem)
     return deepcopy(a)
 end
 
