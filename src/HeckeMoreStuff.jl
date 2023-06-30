@@ -47,6 +47,8 @@ function evaluate(f::ZZPolyRingElem, r::fqPolyRepFieldElem)
     return s
 end
 
+export evaluate!
+
 function evaluate!(z::fqPolyRepFieldElem, f::ZZPolyRingElem, r::fqPolyRepFieldElem)
     #Horner - stolen from Claus
 
@@ -66,6 +68,8 @@ function evaluate!(z::fqPolyRepFieldElem, f::ZZPolyRingElem, r::fqPolyRepFieldEl
     end
     return z
 end
+
+export trunc, round, ceil, floor
 
 for (s, f) in ((:trunc, Base.trunc), (:round, Base.round), (:ceil, Base.ceil), (:floor, Base.floor))
     @eval begin
@@ -370,6 +374,8 @@ function AbstractAlgebra.map_coefficients(F::fpField, f::QQMPolyRingElem; parent
     end
     return finish(ctx)
 end
+
+export tdivpow2, tdivpow2!
 
 function tdivpow2!(B::ZZMatrix, t::Int)
     ccall((:fmpz_mat_scalar_tdiv_q_2exp, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}, Cint), B, B, t)

@@ -396,6 +396,7 @@ Integer(a::ZZRingElem) = BigInt(a)
 # So, we use an AbstractUnitRange here mostly copied from `base/range.jl`.
 # `StepRange`s on the other hand work out of the box thanks to duck typing.
 
+export fmpzUnitRange
 struct fmpzUnitRange <: AbstractUnitRange{ZZRingElem}
     start::ZZRingElem
     stop::ZZRingElem

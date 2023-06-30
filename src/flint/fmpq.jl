@@ -7,7 +7,8 @@
 export QQFieldElem, FlintQQ, fraction_field, Rational, QQField, height,
        height_bits, isless, reconstruct, next_minimal, next_signed_minimal,
        next_calkin_wilf, next_signed_calkin_wilf, dedekind_sum, harmonic,
-       bernoulli, bernoulli_cache, rand_bits, simplest_between
+       bernoulli, bernoulli_cache, rand_bits, simplest_between, valuation!,
+       remove!
 
 ###############################################################################
 #

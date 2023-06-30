@@ -145,6 +145,8 @@ function matrix(A::Vector{T}) where {T<:RingElem}
     return matrix(reshape(A, length(A), 1))
 end
 
+export scalar_matrix
+
 function scalar_matrix(R::Ring, n::Int, a::RingElement)
     b = R(a)
     z = zero_matrix(R, n, n)
@@ -962,6 +964,7 @@ function is_lower_triangular(M::MatElem)
     return true
 end
 
+export compare_index
 
 #Returns a positive integer if A[i, j] > b, negative if A[i, j] < b, 0 otherwise
 function compare_index(A::ZZMatrix, i::Int, j::Int, b::ZZRingElem)
@@ -969,6 +972,7 @@ function compare_index(A::ZZMatrix, i::Int, j::Int, b::ZZRingElem)
     return ccall((:fmpz_cmp, libflint), Int32, (Ptr{ZZRingElem}, Ref{ZZRingElem}), a, b)
 end
 
+export mult_by_2pow_diag!
 
 #scales the i-th column of a by 2^d[1,i]
 function mult_by_2pow_diag!(a::Matrix{BigFloat}, d::ZZMatrix, R=_RealRings[Threads.threadid()])
@@ -981,6 +985,8 @@ function mult_by_2pow_diag!(a::Matrix{BigFloat}, d::ZZMatrix, R=_RealRings[Threa
         end
     end
 end
+
+export round_scale, round_scale!
 
 #converts BigFloat -> ZZRingElem via round(a*2^l), in a clever(?) way
 function round_scale(a::Matrix{BigFloat}, l::Int)
@@ -1045,6 +1051,7 @@ function round!(b::ZZMatrix, a::arb_mat)
     return b
 end
 
+export shift!
 
 function shift!(g::ZZMatrix, l::Int)
     for i = 1:nrows(g)
@@ -1133,6 +1140,8 @@ function prod_diagonal(A::MatrixElem{T}) where {T}
     @assert nrows(A) == ncols(A)
     return prod(T[A[i, i] for i = 1:nrows(A)])
 end
+
+export reduce_mod!
 
 @doc raw"""
     reduce_mod!(A::MatElem{T}, B::MatElem{T}) where T <: FieldElem
