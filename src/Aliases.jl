@@ -28,6 +28,7 @@
 @alias isless_root_order is_less_root_order
 @alias islower_triangular is_lower_triangular
 @alias ismaxreal_type is_maxreal_type
+@alias isnilpotent is_nilpotent
 @alias isnonnegative is_nonnegative
 @alias isnonpositive is_nonpositive
 @alias isnonzero is_nonzero

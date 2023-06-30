@@ -789,6 +789,13 @@ function Base.hvcat(rows::Tuple{Vararg{Int}}, A::MatElem...)
 end
 =#
 
+export hnf!
+
+function hnf!(x::ZZMatrix)
+    ccall((:fmpz_mat_hnf, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}), x, x)
+    return x
+end
+
 ################################################################################
 #
 #  Smith normal form with trafo
@@ -970,75 +977,6 @@ export compare_index
 function compare_index(A::ZZMatrix, i::Int, j::Int, b::ZZRingElem)
     a = ccall((:fmpz_mat_entry, libflint), Ptr{ZZRingElem}, (Ref{ZZMatrix}, Int, Int), A, i - 1, j - 1)
     return ccall((:fmpz_cmp, libflint), Int32, (Ptr{ZZRingElem}, Ref{ZZRingElem}), a, b)
-end
-
-export mult_by_2pow_diag!
-
-#scales the i-th column of a by 2^d[1,i]
-function mult_by_2pow_diag!(a::Matrix{BigFloat}, d::ZZMatrix, R=_RealRings[Threads.threadid()])
-    s = size(a)
-    tmp_mpz::BigInt = R.z1
-    for i = 1:s[1]
-        for j = 1:s[2]
-            e = ccall((:mpfr_get_z_2exp, :libmpfr), Clong, (Ref{BigInt}, Ref{BigFloat}), tmp_mpz, a[i, j])
-            ccall((:mpfr_set_z_2exp, :libmpfr), Nothing, (Ref{BigFloat}, Ref{BigInt}, Clong, Int32), a[i, j], tmp_mpz, e + Clong(Int(d[1, j])), __get_rounding_mode())
-        end
-    end
-end
-
-export round_scale, round_scale!
-
-#converts BigFloat -> ZZRingElem via round(a*2^l), in a clever(?) way
-function round_scale(a::Matrix{BigFloat}, l::Int)
-    s = size(a)
-    b = zero_matrix(FlintZZ, s[1], s[2])
-    return round_scale!(b, a, l)
-end
-
-function round_scale!(b::ZZMatrix, a::Matrix{BigFloat}, l::Int, R=_RealRings[Threads.threadid()])
-    s = size(a)
-
-    local tmp_mpz::BigInt, tmp_fmpz::ZZRingElem
-    tmp_mpz = R.z1
-    tmp_fmpz = R.zz1
-    tmp_mpfr = deepcopy(a[1, 1])  #cannot use the R.?? tmp variable as it may/will
-    #have the wrong precision
-
-    rd = __get_rounding_mode()
-    for i = 1:s[1]
-        for j = 1:s[2]
-            e = a[i, j].exp
-            a[i, j].exp += l
-            ccall((:mpfr_round, :libmpfr), Int32, (Ref{BigFloat}, Ref{BigFloat}, Int32), tmp_mpfr, a[i, j], rd)
-            a[i, j].exp = e
-            f = ccall((:mpfr_get_z_2exp, :libmpfr), Clong, (Ref{BigInt}, Ref{BigFloat}),
-                tmp_mpz, tmp_mpfr)
-            ccall((:fmpz_set_mpz, libflint), Nothing, (Ref{ZZRingElem}, Ref{BigInt}), tmp_fmpz, tmp_mpz)
-            if f > 0
-                ccall((:fmpz_mul_2exp, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt), tmp_fmpz, tmp_fmpz, f)
-            else
-                ccall((:fmpz_tdiv_q_2exp, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt), tmp_fmpz, tmp_fmpz, -f)
-            end
-            setindex!(b, tmp_fmpz, i, j)
-        end
-    end
-    return b
-end
-
-function round_scale!(b::ZZMatrix, a::arb_mat, l::Int)
-    s = size(a)
-
-    R = base_ring(a)
-    r = R()
-    for i = 1:s[1]
-        for j = 1:s[2]
-            v = ccall((:arb_mat_entry_ptr, libarb), Ptr{arb},
-                (Ref{arb_mat}, Int, Int), a, i - 1, j - 1)
-            ccall((:arb_mul_2exp_si, libarb), Nothing, (Ref{arb}, Ptr{arb}, Int), r, v, l)
-            b[i, j] = round(ZZRingElem, r)
-        end
-    end
-    return b
 end
 
 function round!(b::ZZMatrix, a::arb_mat)

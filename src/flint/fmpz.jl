@@ -42,11 +42,11 @@ export ZZRingElem, FlintZZ, ZZRing, parent, show, convert, hash, bell,
        gcdinv, gcd_with_cofactors,
        is_probable_prime, jacobi_symbol, kronecker_symbol, remove, root, size,
        isqrtrem, sqrtmod, trailing_zeros, divisor_sigma, euler_phi, fibonacci,
-       moebius_mu, primorial, rising_factorial, number_of_partitions,
+       mod!, moebius_mu, primorial, rising_factorial, number_of_partitions,
        canonical_unit, is_unit, isequal, addeq!, mul!, fmma!, fmms!, is_square,
        sqrt, is_square_with_sqrt, next_prime, ndivrem, iszero, rand, rand_bits,
        binomial, factorial, rand_bits_prime, iroot, tdivrem, fdivrem, cdivrem,
-       ntdivrem, nfdivrem, ncdivrem, tstbit
+       ntdivrem, nfdivrem, ncdivrem, tstbit, neg!, lcm!, gcd!
 
 ###############################################################################
 #
@@ -2549,6 +2549,10 @@ function neg!(z::ZZRingElem, a::ZZRingElem)
    return z
 end
 
+function neg!(a::ZZRingElem)
+   return neg!(a,a)
+end
+
 function sub!(z::ZZRingElem, a::ZZRingElem, b::ZZRingElem)
    ccall((:fmpz_sub, libflint), Nothing,
          (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}),
@@ -2672,6 +2676,18 @@ function pow!(z::ZZRingElem, a::ZZRingElem, b::Union{Int, UInt})
    ccall((:fmpz_pow_ui, libflint), Nothing,
          (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt),
          z, a, UInt(b))
+   return z
+end
+
+function lcm!(z::ZZRingElem, x::ZZRingElem, y::ZZRingElem)
+   ccall((:fmpz_lcm, libflint), Nothing,
+       (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x, y)
+   return z
+end
+
+function gcd!(z::ZZRingElem, x::ZZRingElem, y::ZZRingElem)
+   ccall((:fmpz_gcd, libflint), Nothing,
+       (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x, y)
    return z
 end
 

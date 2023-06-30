@@ -27,9 +27,9 @@ import Base: Array, abs, abs2, acos, acosh, asin, asinh, atan, atanh, bin, binom
              expm1, exp, factorial, floor, gcd, gcdx, getindex, hash, hcat,
              hex, hypot, in, intersect, inv, invmod, isequal, iseven, isinf, isfinite,
              isinteger, isless, isodd, isone, isqrt, isreal, iszero, lcm,
-             ldexp, length, log, log1p, mod, ndigits, numerator, oct, one,
+             ldexp, length, log, log1p, maximum, minimum, mod, ndigits, numerator, oct, one,
              parent, parse, powermod,
-             precision, rand, Rational, rem, reverse, setindex!,
+             precision, rand, Rational, rem, reverse, round, setindex!,
              show, similar, sign, sin, sincos, sincospi, sinh, sinpi, size, sqrt, string,
              tan, tanh, trailing_zeros, transpose, truncate, typed_hvcat,
              typed_hcat, vcat, xor, zero, zeros, +, -, *, ==, ^, &, |, <<, >>,
@@ -386,6 +386,7 @@ include("embedding/embedding.jl")
 include("Rings.jl")
 
 include("HeckeMiscFiniteField.jl")
+include("HeckeMiscInfinity.jl")
 include("HeckeMiscInteger.jl")
 include("HeckeMiscMatrix.jl")
 include("HeckeMiscPoly.jl")
