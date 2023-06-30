@@ -15,9 +15,9 @@ const inf = PosInf()
 
 -(::PosInf, ::Int) = inf
 
-max(::Int, ::PosInf) = inf
+Base.max(::Int, ::PosInf) = inf
 
-max(::PosInf, ::Int) = inf
+Base.max(::PosInf, ::Int) = inf
 
 Base.isless(::Int, ::PosInf) = true
 

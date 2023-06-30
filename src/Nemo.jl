@@ -11,6 +11,7 @@ using Libdl
 
 using Random
 using Random: SamplerTrivial
+import Random: rand!
 
 using RandomExtensions: RandomExtensions, make, Make2, Make3
 
@@ -33,7 +34,7 @@ import Base: Array, abs, abs2, acos, acosh, asin, asinh, atan, atanh, bin, binom
              show, similar, sign, sin, sincos, sincospi, sinh, sinpi, size, sqrt, string,
              tan, tanh, trailing_zeros, transpose, truncate, typed_hvcat,
              typed_hcat, vcat, xor, zero, zeros, +, -, *, ==, ^, &, |, <<, >>,
-             ~, <=, >=, <, >, //, /, !=
+             ~, <=, >=, <, >, //, /, \, !=
 
 if isdefined(Base, :tanpi) # added in julia >= 1.10-DEV
   import Base: tanpi

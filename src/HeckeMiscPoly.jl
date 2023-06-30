@@ -428,66 +428,6 @@ function mulhigh(a::PolyElem{T}, b::PolyElem{T}, n::Int) where {T}
     return mulhigh_n(a, b, degree(a) + degree(b) - n)
 end
 
-function roots(f::ZZPolyRingElem, ::QQField; max_roots::Int=degree(f))
-    if degree(f) < 1
-        return QQFieldElem[]
-    end
-    if degree(f) == 1
-        return QQFieldElem[-constant_coefficient(f)//leading_coefficient(f)]
-    end
-
-    g = gcd(f, derivative(f))
-    if isone(g)
-        h = f
-    else
-        h = divexact(f, g)
-    end
-    if degree(h) == 1
-        return QQFieldElem[-constant_coefficient(h)//leading_coefficient(h)]
-    end
-    h = primpart(h)
-
-    global p_start
-    p = p_start
-    bd = leading_coefficient(h) + maximum(abs, coefficients(h))
-    while true
-        p = next_prime(p)
-        k = GF(p)
-        hp = change_base_ring(k, h)
-        if !is_squarefree(hp)
-            continue
-        end
-        k = ceil(Int, log(bd) / log(p))
-        Hp = factor_mod_pk(h, p, k)
-        pk = ZZRingElem(p)^k
-        r = QQFieldElem[mod_sym(-constant_coefficient(x) * leading_coefficient(h), pk) // leading_coefficient(h) for x = keys(Hp) if degree(x) == 1]
-        return [x for x = r if iszero(f(x))]
-    end
-end
-
-function roots(f::ZZPolyRingElem; max_roots::Int=degree(f))
-    r = roots(f, FlintQQ, max_roots=max_roots)
-    return ZZRingElem[FlintZZ(x) for x = r if denominator(x) == 1]
-end
-
-function roots(f::QQPolyRingElem; max_roots::Int=degree(f))
-    Zx, x = polynomial_ring(FlintZZ, cached=false)
-    g = Zx(denominator(f) * f)
-    return roots(g, FlintQQ)
-end
-
-function roots(f::Union{ZZPolyRingElem,QQPolyRingElem}, R::ArbField, abs_tol::Int=R.prec, initial_prec::Int...)
-    g = factor(f)
-    r = elem_type(R)[]
-    C = AcbField(precision(R))
-    for k = keys(g.fac)
-        s, _ = signature(k)
-        rt = roots(k, C)
-        append!(r, map(real, rt[1:s]))
-    end
-    return r
-end
-
 function (f::acb_poly)(x::acb)
     return evaluate(f, x)
 end

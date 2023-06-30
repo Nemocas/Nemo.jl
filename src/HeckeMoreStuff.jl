@@ -1688,9 +1688,9 @@ function coefficient_ring(Q::FlintQadicField)
     return FlintPadicField(prime(Q), precision(Q))
 end
 
-function prime(R::PadicField, i::Int)
+function prime(R::FlintPadicField, i::Int)
     p = ZZRingElem()
-    ccall((:padic_ctx_pow_ui, libflint), Nothing, (Ref{ZZRingElem}, Int, Ref{PadicField}), p, i, R)
+    ccall((:padic_ctx_pow_ui, libflint), Nothing, (Ref{ZZRingElem}, Int, Ref{FlintPadicField}), p, i, R)
     return p
 end
 
@@ -1919,8 +1919,30 @@ function lift!(x::Generic.ResidueFieldElem{ZZRingElem}, z::ZZRingElem)
     return z
 end
 
-degree(::fpField) = 1
 degree(::Generic.ResidueField{ZZRingElem}) = 1
 degree(::QQField) = 1
 
 Base.:(*)(x::QQFieldElem, y::AbstractAlgebra.Generic.MatSpaceElem{nf_elem}) = base_ring(y)(x) * y
+
+
+function mod_sym!(a::nf_elem, b::ZZRingElem)
+    ccall((:nf_elem_smod_fmpz, libantic), Nothing,
+        (Ref{nf_elem}, Ref{nf_elem}, Ref{ZZRingElem}, Ref{AnticNumberField}),
+        a, a, b, parent(a))
+    return a
+end
+
+function mod_sym(a::T, b::T) where {T}
+    return mod(a, b)
+end
+function mod_sym!(a::T, b::T) where {T}
+    return mod!(a, b)
+end
+
+function mod_sym!(a::ZZRingElem, b::ZZRingElem)
+    mod!(a, a, b)
+    if a > div(b, 2)
+        sub!(a, a, b)
+    end
+    return a
+end

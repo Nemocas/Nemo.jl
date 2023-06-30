@@ -596,6 +596,8 @@ function mod(M::ZZMatrix, p::ZZRingElem)
     return N
 end
 
+export mod_sym, mod_sym!
+
 @doc raw"""
     mod_sym!(M::ZZMatrix, p::ZZRingElem)
 
@@ -618,6 +620,20 @@ function mod_sym(M::ZZMatrix, B::ZZRingElem)
     return N
 end
 mod_sym(M::ZZMatrix, B::Integer) = mod_sym(M, ZZRingElem(B))
+
+
+@doc raw"""
+    mod_sym!(A::Generic.Mat{nf_elem}, m::ZZRingElem)
+
+Inplace: reduce all entries of $A$ modulo $m$, into the symmetric residue system.
+"""
+function mod_sym!(A::Generic.Mat{nf_elem}, m::ZZRingElem)
+    for i = 1:nrows(A)
+        for j = 1:ncols(A)
+            mod_sym!(A[i, j], m)
+        end
+    end
+end
 
 ################################################################################
 #
