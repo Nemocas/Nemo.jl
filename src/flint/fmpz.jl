@@ -46,7 +46,7 @@ export ZZRingElem, FlintZZ, ZZRing, parent, show, convert, hash, bell,
        canonical_unit, is_unit, isequal, addeq!, mul!, fmma!, fmms!, is_square,
        sqrt, is_square_with_sqrt, next_prime, ndivrem, iszero, rand, rand_bits,
        binomial, factorial, rand_bits_prime, iroot, tdivrem, fdivrem, cdivrem,
-       ntdivrem, nfdivrem, ncdivrem, tstbit, neg!, lcm!, gcd!
+       ntdivrem, nfdivrem, ncdivrem, tstbit, neg!, lcm!, gcd!, submul!
 
 ###############################################################################
 #

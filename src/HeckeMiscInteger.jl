@@ -411,6 +411,24 @@ function _generic_power(a, n::IntegerUnion)
     return r
 end
 
+################################################################################
+#
+#  Modular reduction with symmetric residue system
+#
+################################################################################
+
+function mod_sym(a::ZZRingElem, b::ZZRingElem)
+    c = mod(a, b)
+    @assert c >= 0
+    if b > 0 && 2 * c > b
+        return c - b
+    elseif b < 0 && 2 * c > -b
+        return c + b
+    else
+        return c
+    end
+end
+
 ##
 ## Ranges
 ##
@@ -444,6 +462,9 @@ mod(i::IntegerUnion, r::fmpzUnitRange) = mod(i - first(r), length(r)) + first(r)
 
 Base.:(:)(a::ZZRingElem, b::Integer) = (:)(promote(a, b)...)
 Base.:(:)(a::Integer, b::ZZRingElem) = (:)(promote(a, b)...)
+
+Base.:(:)(x::Int, y::Nothing) = 1:0
+Base.:(:)(x::Int, y::ZZRingElem) = ZZRingElem(x):y
 
 # Construct StepRange{ZZRingElem, T} where +(::ZZRingElem, zero(::T)) must be defined
 Base.:(:)(a::ZZRingElem, s, b::Integer) = ((a_, b_) = promote(a, b); a_:s:b_)

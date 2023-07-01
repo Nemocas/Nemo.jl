@@ -917,6 +917,10 @@ function round(x::acb, p::Int)
     return z
 end
 
+function bits(x::acb)
+    return ccall((:acb_bits, libarb), Int, (Ref{acb},), x)
+end
+
 function Base.Int128(x::ZZRingElem)
     return Base.Int128(BigInt(x))
 end
@@ -1472,7 +1476,7 @@ function rand(L::Loc{T}, num_scale::Vector, den_scale::Integer) where {T<:ZZRing
     return L(num // den)
 end
 
-promote_rule(::Type{LocElem{T}}, ::Type{T}) where {T} = LocElem{T}
+AbstractAlgebra.promote_rule(::Type{LocElem{T}}, ::Type{T}) where {T} = LocElem{T}
 
 function cmpabs(a::Int, b::Int)
     a = abs(a)
@@ -1946,3 +1950,298 @@ function mod_sym!(a::ZZRingElem, b::ZZRingElem)
     end
     return a
 end
+
+Base.replace!(::typeof(-), m::ZZMatrix) = -m
+
+function (A::AnticNumberField)(a::ZZPolyRingElem)
+    return A(FlintQQ["x"][1](a))
+end
+
+
+AbstractAlgebra.promote_rule(::Type{S}, ::Type{ZZRingElem}) where {S<:NumFieldElem} = S
+
+AbstractAlgebra.promote_rule(::Type{ZZRingElem}, ::Type{S}) where {S<:NumFieldElem} = S
+
+AbstractAlgebra.promote_rule(::Type{S}, ::Type{QQFieldElem}) where {S<:NumFieldElem} = S
+
+AbstractAlgebra.promote_rule(::Type{QQFieldElem}, ::Type{S}) where {S<:NumFieldElem} = S
+
+AbstractAlgebra.promote_rule(::Type{T}, ::Type{S}) where {S<:NumFieldElem,T<:Integer} = S
+
+AbstractAlgebra.promote_rule(::Type{S}, ::Type{T}) where {S<:NumFieldElem,T<:Integer} = S
+
+function is_positive(x::ZZRingElem, ::Union{PosInf,Vector{PosInf}})
+    return sign(x) == 1
+end
+
+function is_positive(x::QQFieldElem, ::Union{PosInf,Vector{PosInf}})
+    return sign(x) == 1
+end
+
+function is_negative(x::ZZRingElem, ::Union{PosInf,Vector{PosInf}})
+    return sign(x) == -1
+end
+
+function is_negative(x::QQFieldElem, ::Union{PosInf,Vector{PosInf}})
+    return sign(x) == -1
+end
+
+function (R::Generic.PolyRing{nf_elem})(f::Generic.MPoly)
+    if length(f) == 0
+        return R()
+    end
+    j = 1
+    c = 0
+    while j <= ngens(parent(f))
+        if f.exps[j, 1] != 0
+            if c == 0
+                c = j
+            else
+                error("poly is not univariate")
+            end
+        end
+        j += 1
+    end
+    g = R()
+    for i = 1:length(f)
+        setcoeff!(g, Int(f.exps[c, i]), f.coeffs[i])
+    end
+    return g
+end
+
+function Base.map!(f, M::ZZMatrix)
+    for i = 1:nrows(M)
+        for j = 1:ncols(M)
+            M[i, j] = f(M[i, j])
+        end
+    end
+end
+
+Base.log2(a::ZZRingElem) = log2(BigInt(a)) # stupid: there has to be faster way
+
+is_cyclo_type(::NumField) = false
+
+
+function nf_elem_to_fmpz_mod_poly!(r::ZZModPolyRingElem, a::nf_elem, useden::Bool=true)
+    ccall((:nf_elem_get_fmpz_mod_poly_den, libantic), Nothing,
+        (Ref{ZZModPolyRingElem}, Ref{nf_elem}, Ref{AnticNumberField}, Cint, Ref{fmpz_mod_ctx_struct}),
+        r, a, a.parent, Cint(useden), r.parent.base_ring.ninv)
+    return nothing
+end
+
+function (R::ZZModPolyRing)(a::nf_elem)
+    r = R()
+    nf_elem_to_fmpz_mod_poly!(r, a)
+    return r
+end
+
+function nf_elem_to_gfp_poly!(r::fpPolyRingElem, a::nf_elem, useden::Bool=true)
+    ccall((:nf_elem_get_nmod_poly_den, libantic), Nothing,
+        (Ref{fpPolyRingElem}, Ref{nf_elem}, Ref{AnticNumberField}, Cint),
+        r, a, a.parent, Cint(useden))
+    return nothing
+end
+
+function (R::fpPolyRing)(a::nf_elem)
+    r = R()
+    nf_elem_to_gfp_poly!(r, a)
+    return r
+end
+
+function nf_elem_to_nmod_poly!(r::zzModPolyRingElem, a::nf_elem, useden::Bool=true)
+    ccall((:nf_elem_get_nmod_poly_den, libantic), Nothing,
+        (Ref{zzModPolyRingElem}, Ref{nf_elem}, Ref{AnticNumberField}, Cint),
+        r, a, a.parent, Cint(useden))
+    return nothing
+end
+
+function (R::zzModPolyRing)(a::nf_elem)
+    r = R()
+    nf_elem_to_nmod_poly!(r, a)
+    return r
+end
+
+function nf_elem_to_gfp_fmpz_poly!(r::FpPolyRingElem, a::nf_elem, useden::Bool=true)
+    ccall((:nf_elem_get_fmpz_mod_poly_den, libantic), Nothing,
+        (Ref{FpPolyRingElem}, Ref{nf_elem}, Ref{AnticNumberField}, Cint, Ref{fmpz_mod_ctx_struct}),
+        r, a, a.parent, Cint(useden), r.parent.base_ring.ninv)
+    return nothing
+end
+
+function mod_sym!(f::ZZPolyRingElem, p::ZZRingElem)
+    for i = 0:degree(f)
+        setcoeff!(f, i, mod_sym(coeff(f, i), p))
+    end
+end
+
+function mod_sym(a::nf_elem, b::ZZRingElem, b2::ZZRingElem)
+    # TODO: this is not correct
+    return mod_sym(a, b)
+    return z
+end
+
+function mod_sym(a::nf_elem, b::ZZRingElem)
+    c = deepcopy(a)
+    mod_sym!(c, b)
+    return c
+end
+
+function ^(x::NumFieldElem, y::ZZRingElem)
+    if fits(Int, y)
+        return x^Int(y)
+    end
+
+    return _power(x, y)
+end
+
+# We test once if it fits, otherwise we would have to check for every ^-call
+function _power(x::NumFieldElem, y::ZZRingElem)
+    res = parent(x)()
+    if y < 0
+        res = _power(inv(x), -y)
+    elseif y == 0
+        res = parent(x)(1)
+    elseif y == 1
+        res = deepcopy(x)
+    elseif mod(y, 2) == 0
+        z = _power(x, Base.div(y, 2))
+        res = z * z
+    else
+        res = _power(x, y - 1) * x
+    end
+    return res
+end
+
+#TODO: in Nemo, rename to setprecision
+#      fix/report series add for different length
+function set_precision(a::SeriesElem, i::Int)
+    b = deepcopy(a)
+    set_precision!(b, i)
+    return b
+end
+
+function (Rx::fpPolyRing)(a::fqPolyRepFieldElem)
+    el = Rx()
+    for i = 0:degree(parent(a))
+        setcoeff!(el, i, base_ring(Rx)(coeff(a, i)))
+    end
+    return el
+end
+
+function (F::FpField)(a::FqPolyRepFieldElem)
+    for i = 1:degree(parent(a))-1
+        @assert iszero(coeff(a, i))
+    end
+    return F(coeff(a, 0))
+end
+
+function (F::fpField)(a::fqPolyRepFieldElem)
+    for i = 1:degree(parent(a))-1
+        @assert iszero(coeff(a, i))
+    end
+    return F(coeff(a, 0))
+end
+
+
+function (R::FqPolyRepField)(x::ZZModPolyRingElem)
+    z = R()
+    ccall((:fq_set_fmpz_mod_poly, libflint), Nothing, (Ref{FqPolyRepFieldElem}, Ref{ZZModPolyRingElem}, Ref{FqPolyRepField}), z, x, R)
+    #ccall((:fq_reduce, libflint), Nothing, (Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}), z, R)
+    return z
+end
+
+function (R::FqPolyRepField)(x::FpPolyRingElem)
+    z = R()
+    ccall((:fq_set_fmpz_mod_poly, libflint), Nothing, (Ref{FqPolyRepFieldElem}, Ref{FpPolyRingElem}, Ref{FqPolyRepField}), z, x, R)
+    ccall((:fq_reduce, libflint), Nothing, (Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}), z, R)
+    return z
+end
+
+@inline function rem!(a::ZZRingElem, b::ZZRingElem, c::ZZRingElem)
+    ccall((:fmpz_mod, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), a, b, c)
+    return a
+end
+
+function rem!(a::ZZModPolyRingElem, b::ZZModPolyRingElem, c::ZZModPolyRingElem)
+    ccall((:fmpz_mod_poly_rem, libflint), Nothing, (Ref{ZZModPolyRingElem}, Ref{ZZModPolyRingElem}, Ref{ZZModPolyRingElem}, Ref{fmpz_mod_ctx_struct}), a, b, c, a.parent.base_ring.ninv)
+    return a
+end
+
+function rem!(a::FpPolyRingElem, b::FpPolyRingElem, c::FpPolyRingElem)
+    ccall((:fmpz_mod_poly_rem, libflint), Nothing, (Ref{FpPolyRingElem}, Ref{FpPolyRingElem}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}), a, b, c, a.parent.base_ring.ninv)
+    return a
+end
+
+function rem!(x::AbstractAlgebra.Generic.Poly{T}, y::AbstractAlgebra.Generic.Poly{T}, z::AbstractAlgebra.Generic.Poly{T}) where {T<:Union{padic,qadic}}
+    x = rem(y, z)
+    return x
+end
+
+function setprecision!(f::Generic.Poly{qadic}, N::Int)
+    for i = 1:length(f)
+        setprecision!(f.coeffs[i], N)
+    end
+    set_length!(f, normalise(f, length(f)))
+    return f
+end
+
+function Base.setprecision(f::Generic.Poly{qadic}, N::Int)
+    g = map_coefficients(x -> setprecision(x, N), f, parent=parent(f))
+    return g
+end
+
+function Base.setprecision(f::Function, K::Union{FlintPadicField,FlintQadicField}, n::Int)
+    old = precision(K)
+    #  @assert n>=0
+    setprecision!(K, n)
+    v = try
+        f()
+    finally
+        setprecision!(K, old)
+    end
+    return v
+end
+
+function setprecision!(a::padic, n::Int)
+    return setprecision(a, n)
+end
+
+ngens(R::MPolyRing) = nvars(R)
+
+function (R::Generic.PolyRing{T})(x::AbstractAlgebra.Generic.RationalFunctionFieldElem{T,U}) where {T<:RingElem,U}
+    @assert isone(denominator(x))
+    @assert parent(numerator(x)) === R
+    return numerator(x)
+end
+
+function (R::PolyRing{T})(x::AbstractAlgebra.Generic.RationalFunctionFieldElem{T,U}) where {T<:RingElem,U}
+    @assert isone(denominator(x))
+    @assert parent(numerator(x)) === R
+    return numerator(x)
+end
+
+export base_ring_type
+
+base_ring_type(::Type{AbstractAlgebra.Generic.PolyRing{T}}) where {T} = parent_type(T)
+
+base_ring_type(::Type{AcbPolyRing}) = AcbField
+
+base_ring_type(::Type{ArbPolyRing}) = ArbField
+
+base_ring_type(::Type{QQPolyRing}) = QQField
+
+base_ring_type(::Type{ZZModPolyRing}) = Nemo.ZZModRing
+
+base_ring_type(::Type{ZZPolyRing}) = ZZRing
+
+base_ring_type(::Type{FqPolyRing}) = FqField
+
+base_ring_type(::Type{fqPolyRepPolyRing}) = fqPolyRepField
+
+base_ring_type(::Type{FqPolyRepPolyRing}) = FqPolyRepField
+
+base_ring_type(::Type{FpPolyRing}) = Nemo.FpField
+
+base_ring_type(::Type{fpPolyRing}) = Nemo.fpField
+
+base_ring_type(::Type{zzModPolyRing}) = Nemo.zzModRing
