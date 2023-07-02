@@ -100,7 +100,8 @@ function denominator(M::QQMatrix)
     return d
 end
 
-transpose!(A::Union{ZZMatrix,QQMatrix}) = transpose!(A, A)
+transpose!(A::Union{ZZMatrix, QQMatrix}) = is_square(A) ? transpose!(A, A) : transpose(A)
+transpose!(A::MatrixElem) = transpose(A)
 
 function transpose!(A::ZZMatrix, B::ZZMatrix)
     ccall((:fmpz_mat_transpose, libflint), Nothing,
