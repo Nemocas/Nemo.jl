@@ -656,7 +656,7 @@ end
 
 @doc raw"""
 vcat(A::Vector{Generic.Mat}) -> Generic.Mat
-vcat(A::Array{ZZMatrix}, 1}) -> ZZMatrix
+vcat(A::Vector{ZZMatrix}) -> ZZMatrix
 
 Forms a big matrix by vertically concatenating the matrices in $A$.
 All component matrices need to have the same number of columns.
