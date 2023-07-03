@@ -17,6 +17,49 @@ function mulmod(a::UInt, b::UInt, n::UInt, ni::UInt)
     ccall((:n_mulmod2_preinv, libflint), UInt, (UInt, UInt, UInt, UInt), a, b, n, ni)
 end
 
+# TODO (CF):
+# should be Bernstein'ed: this is slow for large valuations
+# returns the maximal v s.th. z mod p^v == 0 and z div p^v
+#   also useful if p is not prime....
+#
+# TODO: what happens to z = 0???
+
+function remove(z::T, p::T) where {T<:Integer}
+    z == 0 && return (0, z)
+    v = 0
+    @assert p > 1
+    while mod(z, p) == 0
+        z = Base.div(z, p)
+        v += 1
+    end
+    return (v, z)
+end
+
+function remove(z::Rational{T}, p::T) where {T<:Integer}
+    z == 0 && return (0, z)
+    v, d = remove(denominator(z), p)
+    w, n = remove(numerator(z), p)
+    return w - v, n // d
+end
+
+function valuation(z::T, p::T) where {T<:Integer}
+    iszero(z) && error("Not yet implemented")
+    v = 0
+    @assert p > 1
+    while mod(z, p) == 0
+        z = Base.div(z, p)
+        v += 1
+    end
+    return v
+end
+
+function valuation(z::Rational{T}, p::T) where {T<:Integer}
+    z == 0 && error("Not yet implemented")
+    v = valuation(denominator(z), p)
+    w = valuation(numerator(z), p)
+    return w - v
+end
+
 @inline __get_rounding_mode() = Base.MPFR.rounding_raw(BigFloat)
 
 function BigFloat(a::QQFieldElem)
@@ -94,6 +137,10 @@ log(a::QQFieldElem) = log(numerator(a)) - log(denominator(a))
 
 function log(a::ZZRingElem, b::ZZRingElem)
     log(b) / log(a)
+end
+
+function divisible(x::Integer, y::Integer)
+    return iszero(rem(x, y))
 end
 
 Base.in(x::IntegerUnion, r::AbstractRange{ZZRingElem}) =
@@ -246,8 +293,8 @@ end
 
 /(a::BigFloat, b::ZZRingElem) = a / BigInt(b)
 
-is_negative(n::ZZRingElem) = cmp(n, 0) < 0
-is_positive(n::ZZRingElem) = cmp(n, 0) > 0
+is_negative(n::IntegerUnion) = cmp(n, 0) < 0
+is_positive(n::IntegerUnion) = cmp(n, 0) > 0
 
 
 ################################################################################

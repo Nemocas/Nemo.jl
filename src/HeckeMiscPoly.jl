@@ -1,3 +1,11 @@
+function polynomial_ring(R::Ring; cached::Bool=false)
+    return polynomial_ring(R, "x", cached=cached)
+end
+
+function content(a::PolyElem{<:FieldElem})
+    return one(base_ring(a))
+end
+
 function ZZRingElem(a::Generic.ResidueRingElem{ZZRingElem})
     return a.data
 end
@@ -37,6 +45,10 @@ end
 function Base.div(f::PolyElem, g::PolyElem)
     q, r = divrem(f, g)
     return q
+end
+
+function Base.rem(f::PolyElem, g::PolyElem)
+    return mod(f, g)
 end
 
 function rem!(z::T, f::T, g::T) where {T<:PolyElem}
@@ -418,6 +430,30 @@ end
 
 function (f::acb_poly)(x::acb)
     return evaluate(f, x)
+end
+
+function mod(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T<:RingElem}
+    check_parent(f, g)
+    if length(g) == 0
+        throw(DivideError())
+    end
+    if length(f) >= length(g)
+        f = deepcopy(f)
+        b = leading_coefficient(g)
+        g = inv(b) * g
+        c = base_ring(f)()
+        while length(f) >= length(g)
+            l = -leading_coefficient(f)
+            for i = 1:length(g)
+                c = mul!(c, coeff(g, i - 1), l)
+                u = coeff(f, i + length(f) - length(g) - 1)
+                u = addeq!(u, c)
+                f = setcoeff!(f, i + length(f) - length(g) - 1, u)
+            end
+            set_length!(f, normalise(f, length(f) - 1))
+        end
+    end
+    return f
 end
 
 normalise(f::ZZPolyRingElem, ::Int) = degree(f) + 1
