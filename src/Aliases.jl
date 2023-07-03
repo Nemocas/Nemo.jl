@@ -26,7 +26,6 @@
 @alias isless_imag is_less_imag
 @alias isless_real is_less_real
 @alias isless_root_order is_less_root_order
-@alias islower_triangular is_lower_triangular
 @alias ismaxreal_type is_maxreal_type
 @alias isnilpotent is_nilpotent
 @alias isnonnegative is_nonnegative
@@ -42,7 +41,6 @@
 @alias isuinf is_uinf
 @alias isundefined is_undefined
 @alias isunknown is_unknown
-@alias isupper_triangular is_upper_triangular
 @alias iszero_row is_zero_row
 
 # old type names from before 0.33

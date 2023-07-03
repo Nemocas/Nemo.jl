@@ -12,10 +12,6 @@ function round(::Type{Int}, a::QQFieldElem)
     return round(Int, Rational{BigInt}(a))
 end
 
-function matrix(a::Vector{Vector{T}}) where {T}
-    return matrix(permutedims(reduce(hcat, a), (2, 1)))
-end
-
 function prime_field(_::NumField)
     return QQField()
 end
@@ -84,16 +80,6 @@ for (s, f) in ((:trunc, Base.trunc), (:round, Base.round), (:ceil, Base.ceil), (
             return m
         end
     end
-end
-
-export is_constant
-
-function is_constant(f::PolyElem)
-    return f.length < 2
-end
-
-function identity_matrix(::Type{MatElem}, R::Ring, n::Int)
-    return identity_matrix(R, n)
 end
 
 function norm(v::arb_mat)
@@ -173,57 +159,9 @@ end
 
 ZZMatrix(M::Matrix{Int}) = matrix(FlintZZ, M)
 
-zero_matrix(::Type{Int}, r, c) = zeros(Int, r, c)
-
-base_ring(::Vector{Int}) = Int
-
-function AbstractAlgebra.is_symmetric(M::MatElem)
-    for i in 1:nrows(M)
-        for j in i:ncols(M)
-            if M[i, j] != M[j, i]
-                return false
-            end
-        end
-    end
-    return true
-end
-
-################################################################################
-#
-#  Create a matrix from rows
-#
-################################################################################
-
-function matrix(K::Ring, R::Vector{<:Vector})
-    if length(R) == 0
-        return zero_matrix(K, 0, 0)
-    else
-        n = length(R)
-        m = length(R[1])
-        z = zero_matrix(K, n, m)
-        for i in 1:n
-            @assert length(R[i]) == m
-            for j in 1:m
-                z[i, j] = R[i][j]
-            end
-        end
-        return z
-    end
-end
-
 order(::ZZRingElem) = FlintZZ
 
-export neg!, rem!
-
-sub!(z::Rational{Int}, x::Rational{Int}, y::Int) = x - y
-
-neg!(z::Rational{Int}, x::Rational{Int}) = -x
-
-add!(z::Rational{Int}, x::Rational{Int}, y::Int) = x + y
-
-mul!(z::Rational{Int}, x::Rational{Int}, y::Int) = x * y
-
-is_negative(x::Rational) = x.num < 0
+export rem!
 
 function is_negative(x::QQFieldElem)
     c = ccall((:fmpq_sgn, libflint), Cint, (Ref{QQFieldElem},), x)
@@ -233,35 +171,6 @@ end
 function sub!(z::Vector{QQFieldElem}, x::Vector{QQFieldElem}, y::Vector{ZZRingElem})
     for i in 1:length(z)
         sub!(z[i], x[i], y[i])
-    end
-    return z
-end
-
-function is_upper_triangular(A::Generic.Mat)
-    m = nrows(A)
-    n = ncols(A)
-    d = 0
-    for r = 1:m
-        for c = 1:n
-            if !iszero(A[r, c])
-                if c <= d
-                    return false
-                end
-                d = c
-                break
-            end
-        end
-    end
-    return true
-end
-
-function sub(M::Generic.Mat, rows::UnitRange{Int}, cols::UnitRange{Int})
-    @assert step(rows) == 1 && step(cols) == 1
-    z = zero_matrix(base_ring(M), length(rows), length(cols))
-    for i in rows
-        for j in cols
-            z[i-first(rows)+1, j-first(cols)+1] = M[i, j]
-        end
     end
     return z
 end
@@ -329,27 +238,9 @@ norm(x::ZZRingElem) = abs(x)
 
 number_field(::ZZRing) = FlintQQ
 
-function change_base_ring(p::MPolyRingElem{T}, g, new_polynomial_ring) where {T<:RingElement}
-    cvzip = zip(coefficients(p), exponent_vectors(p))
-    M = MPolyBuildCtx(new_polynomial_ring)
-    for (c, v) in cvzip
-        res = g(c)
-        if !iszero(res)
-            push_term!(M, g(c), v)
-        end
-    end
-    return finish(M)::elem_type(new_polynomial_ring)
-end
-
-function mulmod(a::S, b::S, mod::Vector{S}) where {S<:MPolyRingElem{T}} where {T<:RingElem}
-    return Base.divrem(a * b, mod)[2]
-end
-
 function Base.hash(f::zzModMPolyRingElem, h::UInt)
     return UInt(1) # TODO: enhance or throw error
 end
-
-@inline ngens(R::AbstractAlgebra.Generic.MPolyRing) = R.num_vars
 
 #to make the MPoly module happy, divrem needs it...
 function Base.div(a::nf_elem, b::nf_elem)
@@ -523,30 +414,8 @@ end
 
 base_field(_::AnticNumberField) = FlintQQ
 
-#trivia to make life easier
 
-gens(L::SimpleNumField{T}) where {T} = [gen(L)]
 
-function gen(L::SimpleNumField{T}, i::Int) where {T}
-    i == 1 || error("index must be 1")
-    return gen(L)
-end
-
-function Base.getindex(L::SimpleNumField{T}, i::Int) where {T}
-    if i == 0
-        return one(L)
-    elseif i == 1
-        return gen(L)
-    else
-        error("index has to be 0 or 1")
-    end
-end
-
-ngens(L::SimpleNumField{T}) where {T} = 1
-
-is_unit(a::NumFieldElem) = !iszero(a)
-
-canonical_unit(a::NumFieldElem) = a
 
 ################################################################################
 #
@@ -676,23 +545,6 @@ function shift_left(a::qadic, n::Int)
     return b
 end
 
-export set_precision, set_precision!
-
-function set_precision(f::PolyElem{T}, n::Int) where {T<:SeriesElem}
-    g = parent(f)()
-    for i = 0:length(f)
-        setcoeff!(g, i, set_precision(coeff(f, i), n))
-    end
-    return g
-end
-
-function set_precision!(f::PolyElem{T}, n::Int) where {T<:SeriesElem}
-    for i = 0:length(f)
-        setcoeff!(f, i, set_precision!(coeff(f, i), n))
-    end
-    return f
-end
-
 #Assuming that the denominator of a is one, reduces all the coefficients modulo p
 # non-symmetric (positive) residue system
 function mod!(a::nf_elem, b::ZZRingElem)
@@ -766,12 +618,6 @@ function lift(R::ZZAbsPowerSeriesRing, f::ZZModAbsPowerSeriesRingElem)
     return r
 end
 
-function addmul!(z::T, x::T, y::T) where {T<:RingElement}
-    zz = parent(z)()
-    zz = mul!(zz, x, y)
-    return addeq!(z, zz)
-end
-
 function evaluate(f::fpPolyRingElem, v::Vector{fpFieldElem})
     F = base_ring(f)
     v1 = UInt[x.data for x in v]
@@ -792,7 +638,7 @@ function basis(K::fqPolyRepField)
     return b
 end
 
-function gcd(a::ResElem{T}, b::ResElem{T}) where {T<:IntegerUnion}
+function gcd(a::ResElem{ZZRingElem}, b::ResElem{ZZRingElem})
     m = modulus(a)
     return parent(a)(gcd(gcd(a.data, m), b.data))
 end
@@ -989,13 +835,6 @@ Base.copy(a::SeriesElem) = deepcopy(a)
 fit!(::QQRelPowerSeriesRingElem, Int) = nothing
 fit!(::QQAbsPowerSeriesRingElem, Int) = nothing
 
-function Base.minimum(::typeof(precision), a::Vector{<:SeriesElem})
-    return minimum(map(precision, a))
-end
-
-function Base.maximum(::typeof(precision), a::Vector{<:SeriesElem})
-    return maximum(map(precision, a))
-end
 Base.length(a::qadic) = a.length
 
 function setcoeff!(z::ZZPolyRingElem, n::Int, x::Ptr{ZZRingElem})
@@ -1010,44 +849,6 @@ end
 
 function iszero(a::Ref{ZZRingElem})
     return unsafe_load(reinterpret(Ptr{Int}, a)) == 0
-end
-
-function canonical_unit(a::SeriesElem)
-    iszero(a) && return one(parent(a))
-    v = valuation(a)
-    v == 0 && return a
-    v > 0 && return shift_right(a, v)
-    return shift_left(a, -v)
-end
-
-#TODO: this is for rings, not for fields, maybe different types?
-function Base.gcd(a::T, b::T) where {T<:SeriesElem}
-    iszero(a) && iszero(b) && return a
-    iszero(a) && return gen(parent(a))^valuation(b)
-    iszero(b) && return gen(parent(a))^valuation(a)
-    return gen(parent(a))^min(valuation(a), valuation(b))
-end
-
-function Base.lcm(a::T, b::T) where {T<:SeriesElem}
-    iszero(a) && iszero(b) && return a
-    iszero(a) && return a
-    iszero(b) && return b
-    return gen(parent(a))^max(valuation(a), valuation(b))
-end
-
-# should be Nemo/AA
-# TODO: symbols vs strings
-#       lift(PolyRing, Series)
-#       lift(FracField, Series)
-#       (to be in line with lift(ZZ, padic) and lift(QQ, padic)
-#TODO: some of this would only work for Abs, not Rel, however, this should be fine here
-function map_coefficients(f, a::RelPowerSeriesRingElem; parent::SeriesRing)
-    c = typeof(f(coeff(a, 0)))[]
-    for i = 0:pol_length(a)-1
-        push!(c, f(polcoeff(a, i)))
-    end
-    b = parent(c, length(c), precision(a), valuation(a))
-    return b
 end
 
 #=
@@ -1067,17 +868,6 @@ function map_coefficients(f, a::RelPowerSeriesRingElem)
   return b
 end
 =#
-function lift(R::PolyRing{S}, s::SeriesElem{S}) where {S}
-    t = R()
-    for x = 0:pol_length(s)
-        setcoeff!(t, x, polcoeff(s, x))
-    end
-    return shift_left(t, valuation(s))
-end
-
-function gen(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T<:PolyElem}
-    return R(gen(base_ring(R)))
-end
 
 function gen(R::Union{Generic.ResidueRing{fqPolyRepPolyRingElem},Generic.ResidueField{fqPolyRepPolyRingElem}}) ## this is not covered by above
     return R(gen(base_ring(R)))              ## and I don't know why
@@ -1095,25 +885,13 @@ function characteristic(R::Union{Generic.ResidueRing{zzModPolyRingElem},Generic.
     return characteristic(base_ring(base_ring(R)))
 end
 
-function characteristic(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T<:PolyElem}
-    return characteristic(base_ring(base_ring(R)))
-end
-
 # discuss: size = order? order = size?
 function size(R::Union{Generic.ResidueRing{zzModPolyRingElem},Generic.ResidueField{zzModPolyRingElem}})
     return characteristic(R)^degree(modulus(R))
 end
 
-function size(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T<:ResElem}
-    return size(base_ring(base_ring(R)))^degree(modulus(R))
-end
-
 function size(R::Union{Generic.ResidueRing{ZZRingElem},Generic.ResidueField{ZZRingElem}})
     return modulus(R)
-end
-
-function size(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T<:PolyElem}
-    return size(base_ring(base_ring(R)))^degree(R.modulus)
 end
 
 function size(R::Union{Generic.ResidueRing{fqPolyRepPolyRingElem},Generic.ResidueField{fqPolyRepPolyRingElem}})
@@ -1180,15 +958,6 @@ function rand(R::Generic.ResidueField{ZZRingElem})
     return R(rand(ZZRingElem(0):(order(R)-1)))
 end
 
-function rand(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T<:PolyElem}
-    r = rand(base_ring(base_ring(R)))
-    g = gen(R)
-    for i = 1:degree(R.modulus)
-        r = r * g + rand(base_ring(base_ring(R)))
-    end
-    return r
-end
-
 function rand(R::Union{Generic.ResidueRing{fqPolyRepPolyRingElem},Generic.ResidueField{fqPolyRepPolyRingElem}})
     r = rand(base_ring(base_ring(R)))
     g = gen(R)
@@ -1212,21 +981,6 @@ function rand(R::Union{Generic.ResidueRing{zzModPolyRingElem},Generic.ResidueFie
     g = gen(R)
     for i = 1:degree(R.modulus)
         r = r * g + rand(base_ring(base_ring(R)))
-    end
-    return r
-end
-
-function gens(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T<:PolyElem} ## probably needs more cases
-    ## as the other residue functions
-    g = gen(R)
-    r = Vector{typeof(g)}()
-    push!(r, one(R))
-    if degree(R.modulus) == 1
-        return r
-    end
-    push!(r, g)
-    for i = 2:degree(R.modulus)-1
-        push!(r, r[end] * g)
     end
     return r
 end
@@ -1265,14 +1019,6 @@ function divexact(a::ZZModRingElem, y::ZZRingElem; check::Bool=true)
     return divexact(a, parent(a)(y), check=check)
 end
 
-function lift(a::Generic.ResidueRingElem)
-    return a.data
-end
-
-function lift(a::Generic.ResidueFieldElem)
-    return a.data
-end
-
 function ^(a::ResElem, f::ZZRingElem)
     f == 0 && return one(parent(a))
     f == 1 && return a
@@ -1298,23 +1044,6 @@ function set!(z::fqPolyRepFieldElem, x::fqPolyRepFieldElem)
 end
 
 characteristic(F::Generic.ResidueField{ZZRingElem}) = abs(F.modulus)
-
-function leading_monomial(f::Generic.MPoly)
-    R = parent(f)
-    l = length(f)
-    if l == 0
-        return f
-    end
-    A = f.exps
-    r, c = size(A)
-    e = A[1:r, 1:1]
-    return R([one(base_ring(R))], e)
-end
-
-function leading_coefficient(f::Generic.MPoly)
-    return f.coeffs[1]
-end
-
 
 function is_prime(x::Integer)
     return is_prime(ZZRingElem(x))
@@ -1417,46 +1146,6 @@ end
 
 ngens(R::ZZMPolyRing) = length(gens(R))
 
-#check with Nemo/ Dan if there are better solutions
-#the block is also not used here I think
-#functionality to view mpoly as upoly in variable `i`, so the
-#coefficients are mpoly's without variable `i`.
-function leading_coefficient(f::MPolyRingElem, i::Int)
-    g = MPolyBuildCtx(parent(f))
-    d = degree(f, i)
-    for (c, e) = zip(coefficients(f), exponent_vectors(f))
-        if e[i] == d
-            e[i] = 0
-            push_term!(g, c, e)
-        end
-    end
-    return finish(g)
-end
-
-#not used here
-"""
-`content` as a polynomial in the variable `i`, i.e. the gcd of all the
-coefficients when viewed as univariate polynomial in `i`.
-"""
-function content(f::MPolyRingElem, i::Int)
-    return reduce(gcd, coefficients(f, i))
-end
-
-"""
-The coefficients of `f` when viewed as a univariate polynomial in the `i`-th
-variable.
-"""
-function coefficients(f::MPolyRingElem, i::Int)
-    d = degree(f, i)
-    cf = [MPolyBuildCtx(parent(f)) for j = 0:d]
-    for (c, e) = zip(coefficients(f), exponent_vectors(f))
-        a = e[i]
-        e[i] = 0
-        push_term!(cf[a+1], c, e)
-    end
-    return map(finish, cf)
-end
-
 # mainly for testing
 function rand(L::Loc{T}, num_scale=(1:1000), den_scale=(1:1000)) where {T<:ZZRingElem}
     num = rand(num_scale)
@@ -1535,51 +1224,6 @@ function rem!(z::fpPolyRingElem, a::fpPolyRingElem, b::fpPolyRingElem)
         z, a, b, pointer_from_objref(base_ring(z)) + sizeof(ZZRingElem))
     return z
 end
-
-function show(io::IO, M::Map)
-    @show_name(io, M)
-    if get(io, :compact, false)
-        print(io, domain(M), " --> ", codomain(M), "\n")
-        return
-    end
-    io = Base.IOContext(io, :compact => true)
-    print(io, "Map with following data\n")
-    print(io, "Domain:\n")
-    print(io, "=======\n")
-    print(io, domain(M))
-    print(io, "\nCodomain:\n")
-    print(io, "=========\n")
-    print(io, codomain(M))
-end
-
-function preimage(M::Map{D,C}, a) where {D,C}
-    if isdefined(M.header, :preimage)
-        p = M.header.preimage(a)::elem_type(D)
-        @assert parent(p) === domain(M)
-        return p
-    end
-    error("No preimage function known")
-end
-
-function image(M::Map{D,C}, a) where {D,C}
-    if isdefined(M, :header)
-        if isdefined(M.header, :image)
-            return M.header.image(a)::elem_type(C)
-        else
-            error("No image function known")
-        end
-    else
-        return M(a)
-    end
-end
-
-\(f::Map, x) = preimage(f, x)
-
-function preimage(f::AbstractAlgebra.Generic.CompositeMap, a)
-    return preimage(f.map1, preimage(f.map2, a))
-end
-
-
 
 function Base.setprecision(q::qadic, N::Int)
     r = parent(q)()
@@ -1705,9 +1349,6 @@ end
 Base.precision(Q::FlintPadicField) = Q.prec_max
 Base.precision(Q::FlintQadicField) = Q.prec_max
 
-nrows(A::Matrix{T}) where {T} = size(A)[1]
-ncols(A::Matrix{T}) where {T} = size(A)[2]
-
 import Base.^
 ^(a::qadic, b::qadic) = exp(b * log(a))
 ^(a::padic, b::padic) = exp(b * log(a))
@@ -1827,8 +1468,6 @@ function divexact!(A::Generic.Mat{nf_elem}, p::ZZRingElem)
         end
     end
 end
-
-elem_type(::Type{Generic.ResidueRing{T}}) where {T} = Generic.ResidueRingElem{T}
 
 #
 #  Lifts a matrix from F_p to Z/p^nZ
@@ -1965,10 +1604,6 @@ AbstractAlgebra.promote_rule(::Type{ZZRingElem}, ::Type{S}) where {S<:NumFieldEl
 AbstractAlgebra.promote_rule(::Type{S}, ::Type{QQFieldElem}) where {S<:NumFieldElem} = S
 
 AbstractAlgebra.promote_rule(::Type{QQFieldElem}, ::Type{S}) where {S<:NumFieldElem} = S
-
-AbstractAlgebra.promote_rule(::Type{T}, ::Type{S}) where {S<:NumFieldElem,T<:Integer} = S
-
-AbstractAlgebra.promote_rule(::Type{S}, ::Type{T}) where {S<:NumFieldElem,T<:Integer} = S
 
 function is_positive(x::ZZRingElem, ::Union{PosInf,Vector{PosInf}})
     return sign(x) == 1
@@ -2205,8 +1840,6 @@ end
 function setprecision!(a::padic, n::Int)
     return setprecision(a, n)
 end
-
-ngens(R::MPolyRing) = nvars(R)
 
 function (R::Generic.PolyRing{T})(x::AbstractAlgebra.Generic.RationalFunctionFieldElem{T,U}) where {T<:RingElem,U}
     @assert isone(denominator(x))
