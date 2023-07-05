@@ -487,7 +487,7 @@ function one!(a::QQMPolyRingElem)
 end
 
 (::QQField)(a::nf_elem) = (is_rational(a) && return coeff(a, 0)) || error("not a rational")
-(::ZZRing)(a::nf_elem) = (isinteger(a) && return numerator(coeff(a, 0))) || error("not an integer")
+(::ZZRing)(a::nf_elem) = (is_integer(a) && return numerator(coeff(a, 0))) || error("not an integer")
 
 function set_name!(K::AnticNumberField, s::String)
     set_attribute!(K, :name => s)
