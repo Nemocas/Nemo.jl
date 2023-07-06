@@ -824,6 +824,8 @@ function is_unit(f::T) where {T<:Union{ZZModPolyRingElem,zzModPolyRingElem}}
     return true
 end
 
+export is_nilpotent
+
 @doc raw"""
     is_nilpotent(a::ResElem{ZZRingElem}) -> Bool
     is_nilpotent(a::ResElem{Integer}) -> Bool
