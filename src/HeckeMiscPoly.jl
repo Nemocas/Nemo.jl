@@ -205,19 +205,19 @@ end
 # for fun: is_power(a::nf_elem)
 #
 
-function factor(f::QQPolyRingElem, R::T) where {T<:Union{fqPolyRepField,fpField}}
+function factor(R::T, f::QQPolyRingElem) where {T<:Union{fqPolyRepField,fpField}}
     Rt, t = polynomial_ring(R, "t", cached=false)
     return factor(Rt(f))
 end
 
-function roots(f::QQPolyRingElem, R::T) where {T<:Union{fqPolyRepField,fpField}}
+function roots(R::T, f::QQPolyRingElem) where {T<:Union{fqPolyRepField,fpField}}
     Rt, t = polynomial_ring(R, "t", cached=false)
     fp = polynomial_ring(FlintZZ, cached=false)[1](f * denominator(f))
     fpp = Rt(fp)
     return roots(fpp)
 end
 
-function roots(f::fpPolyRingElem, K::fqPolyRepField)
+function roots(K::fqPolyRepField, f::fpPolyRingElem)
     @assert characteristic(K) == characteristic(base_ring(f))
     Kx = polynomial_ring(K, cached=false)[1]
     coeffsff = Vector{elem_type(K)}(undef, degree(f) + 1)
@@ -228,7 +228,7 @@ function roots(f::fpPolyRingElem, K::fqPolyRepField)
     return roots(ff)
 end
 
-function roots(f::FpPolyRingElem, K::FqPolyRepField)
+function roots(K::FqPolyRepField, f::FpPolyRingElem)
     @assert characteristic(K) == characteristic(base_ring(f))
     Kx = polynomial_ring(K, cached=false)[1]
     coeffsff = Vector{FqPolyRepFieldElem}(undef, degree(f) + 1)
