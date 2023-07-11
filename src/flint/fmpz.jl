@@ -272,7 +272,7 @@ function show(io::IO, a::ZZRing)
       print(io, LowercaseOff(), "ZZ")
    else
       # nested printing allowed, preferably supercompact
-      print(io, "Integer Ring")
+      print(io, "Integer ring")
    end
 end
 
