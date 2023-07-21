@@ -515,23 +515,28 @@ end
 #
 ################################################################################
 
-function is_squarefree(f::PolyElem)
-    R = coefficient_ring(f)
+function is_squarefree(f::PolyElem{<:FieldElement})
+  R = coefficient_ring(f)
 
-    if iszero(f) || degree(f) == 0
-        return true
-    end
+  if iszero(f) || degree(f) == 0
+    return true
+  end
 
-    if !is_monic(f)
-        g = divexact(f, leading_coefficient(f))
-    else
-        g = f
-    end
+  if !is_monic(f)
+    g = divexact(f, leading_coefficient(f))
+  else
+    g = f
+  end
 
-    if characteristic(R) == 0 || R isa FinField
-        return is_constant(gcd(g, derivative(g)))
-    else
-        fac = factor_squarefree(g)
-        return all(e <= 1 for (_, e) in fac)
-    end
+  if characteristic(R) == 0 || R isa FinField
+    return is_constant(gcd(g, derivative(g)))
+  else
+    fac = factor_squarefree(g)
+    return all(e <= 1 for (_, e) in fac)
+  end
+end
+
+function is_squarefree(f::PolyElem{<:RingElement})
+  fac = factor_squarefree(f)
+  return all(e <= 1 for (_, e) in fac)
 end
