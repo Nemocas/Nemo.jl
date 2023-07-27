@@ -239,7 +239,7 @@ function roots(K::FqPolyRepField, f::FpPolyRingElem)
     return roots(ff)
 end
 
-function is_power(a::Union{fqPolyRepFieldElem,FqPolyRepFieldElem,FqFieldElem}, m::Int)
+function is_power(a::Union{fpField, FpFieldElem, fqPolyRepFieldElem,FqPolyRepFieldElem,FqFieldElem}, m::Int)
     if iszero(a)
         return true, a
     end
