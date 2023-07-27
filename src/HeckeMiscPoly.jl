@@ -537,6 +537,9 @@ function is_squarefree(f::PolyElem{<:FieldElement})
 end
 
 function is_squarefree(f::PolyElem{<:RingElement})
+  if iszero(f)
+    return true
+  end
   fac = factor_squarefree(f)
   return all(e <= 1 for (_, e) in fac)
 end
