@@ -169,6 +169,8 @@ returned as a rational with denominator $1$.
 """
 Base.ceil(a::QQFieldElem) = QQFieldElem(cdiv(numerator(a), denominator(a)), 1)
 
+nbits(a::QQFieldElem) = nbits(numerator(a)) + nbits(denominator(a))
+
 ###############################################################################
 #
 #   Canonicalisation

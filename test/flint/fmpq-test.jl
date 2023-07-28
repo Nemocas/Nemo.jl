@@ -155,6 +155,9 @@ end
    @test ceil(QQFieldElem(2, 3)) == 1
    @test ceil(QQFieldElem(-1, 3)) == 0
    @test ceil(QQFieldElem(2, 1)) == 2
+
+   @test nbits(QQFieldElem(12, 1)) == 5
+   @test nbits(QQFieldElem(1, 3)) == 3
 end
 
 @testset "QQFieldElem.unary_ops" begin

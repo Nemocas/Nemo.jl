@@ -429,6 +429,10 @@ function embed(k::T, K::T) where T <: FinField
     end
 end
 
+function embed(k::Nemo.fpField, K::fqPolyRepField)
+  @assert characteristic(K) == characteristic(k)
+end
+
 ################################################################################
 #
 #   Preimage map
