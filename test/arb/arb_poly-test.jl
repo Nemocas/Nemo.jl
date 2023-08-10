@@ -333,7 +333,6 @@ end
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
 
-   @test compose(g, f) == f(g(x))
    @test compose(g, f) == x^6+6*x^4+4*x^3+9*x^2+12*x+4
 end
 
