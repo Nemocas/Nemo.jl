@@ -454,7 +454,7 @@ function compose(x::acb_poly, y::acb_poly)
    z = parent(x)()
    ccall((:acb_poly_compose, libarb), Nothing,
                 (Ref{acb_poly}, Ref{acb_poly}, Ref{acb_poly}, Int),
-                z, x, y, precision(parent(x)))
+                z, y, x, precision(parent(x)))
    return z
 end
 

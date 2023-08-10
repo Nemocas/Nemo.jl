@@ -561,7 +561,7 @@ function compose(x::QQPolyRingElem, y::QQPolyRingElem)
    check_parent(x, y)
    z = parent(x)()
    ccall((:fmpq_poly_compose, libflint), Nothing,
-                (Ref{QQPolyRingElem}, Ref{QQPolyRingElem}, Ref{QQPolyRingElem}), z, x, y)
+                (Ref{QQPolyRingElem}, Ref{QQPolyRingElem}, Ref{QQPolyRingElem}), z, y, x)
    return z
 end
 

@@ -567,7 +567,7 @@ function compose(x::FqPolyRepPolyRingElem, y::FqPolyRepPolyRingElem)
    z = parent(x)()
    ccall((:fq_poly_compose, libflint), Nothing,
          (Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepPolyRingElem},
-         Ref{FqPolyRepField}), z, x, y, base_ring(parent(x)))
+         Ref{FqPolyRepField}), z, y, x, base_ring(parent(x)))
    return z
 end
 

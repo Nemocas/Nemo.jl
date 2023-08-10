@@ -514,10 +514,10 @@ end
   f = x^5 + x^4 + 2 *x^2 + x
   g = x+1
 
-  ff = compose(f,g)
+  ff = compose(g, f)
 
   @test parent(ff) == parent(f)
-
+  @test ff == f(g(x))
   @test ff == x^5 + 6*x^4 + 14*x^3 + 18*x^2 + 14*x + 5
 end
 

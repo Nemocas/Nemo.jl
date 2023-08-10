@@ -449,7 +449,7 @@ function compose(x::ComplexPoly, y::ComplexPoly, prec::Int = precision(Balls))
    z = parent(x)()
    ccall((:acb_poly_compose, libarb), Nothing,
                 (Ref{ComplexPoly}, Ref{ComplexPoly}, Ref{ComplexPoly}, Int),
-                z, x, y, prec)
+                z, y, x, prec)
    return z
 end
 
