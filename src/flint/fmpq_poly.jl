@@ -446,7 +446,15 @@ function Base.div(x::QQPolyRingElem, y::QQPolyRingElem)
    return z
 end
 
-divexact(x::QQPolyRingElem, y::QQPolyRingElem; check::Bool=true) = div(x,y)
+function divexact(x::QQPolyRingElem, y::QQPolyRingElem; check::Bool=true)
+   if !check
+      return div(x, y)
+   else
+      q, r = divrem(x, y)
+      !iszero(r) && throw(ArgumentError("not an exact division"))
+      return q
+   end
+end
 
 ###############################################################################
 #

@@ -361,6 +361,10 @@ end
 
    f = 3*y^2 + 7*y + 3
 
+   @test divexact(f, f) == one(S)
+
+   @test_throws ArgumentError divexact(f, y)
+
    @test divexact(3*f, 3) == f
 
    @test divexact(ZZRingElem(3)*f, ZZRingElem(3)) == f
