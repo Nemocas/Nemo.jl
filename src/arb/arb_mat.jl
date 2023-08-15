@@ -402,11 +402,17 @@ $n\times n$ matrix $X$ such that $AX$ contains the
 identity matrix. If $A$ cannot be inverted numerically an exception is raised.
 """
 function inv(x::arb_mat)
-  ncols(x) != nrows(x) && error("Matrix must be square")
+  fl, z = is_invertible_with_inverse(x)
+  fl && return z
+  error("Matrix singular or cannot be inverted numerically")
+end
+
+function is_invertible_with_inverse(x::arb_mat)
+  ncols(x) != nrows(x) && return false, x
   z = similar(x)
   r = ccall((:arb_mat_inv, libarb), Cint,
               (Ref{arb_mat}, Ref{arb_mat}, Int), z, x, precision(base_ring(x)))
-  Bool(r) ? (return z) : error("Matrix cannot be inverted numerically")
+  return Bool(r), z
 end
 
 ###############################################################################

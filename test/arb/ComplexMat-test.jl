@@ -325,6 +325,14 @@ end
 
    @test overlaps(A*C, one(S))
    @test contains(C, B)
+
+   fl, C = is_invertible_with_inverse(A)
+   @test fl && contains(C, B)
+
+   A = CC[1 1; 1 1] 
+   fl, C = is_invertible_with_inverse(A)
+   @test !fl
+   @test_throws ErrorException inv(A)
 end
 
 @testset "ComplexMat.divexact" begin
