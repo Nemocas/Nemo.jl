@@ -241,6 +241,12 @@ end
    @test trailing_coefficient(x) == 1
    @test trailing_coefficient(S(2)) == 2
    @test trailing_coefficient(S()) == 0
+
+   f = x^(ZZ(2)^100) * y^100
+   @test_throws InexactError degree(f, 1)
+   @test degree(f, 2) == 100
+   @test_throws OverflowError degrees(f)
+   @test_throws OverflowError total_degree(f)
 end
 
 @testset "zzModMPolyRingElem.multivariate_coeff" begin

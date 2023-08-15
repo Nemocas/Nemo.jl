@@ -208,10 +208,14 @@ end
 function degree(a::($etype), i::Int)
    n = nvars(parent(a))
    (i <= 0 || i > n) && error("Index must be between 1 and $n")
-   d = ccall((:fmpz_mod_mpoly_degree_si, libflint), Int,
+   if degrees_fit_int(a)
+      d = ccall((:fmpz_mod_mpoly_degree_si, libflint), Int,
              (Ref{($etype)}, Int, Ref{($rtype)}),
              a, i - 1, parent(a))
-   return d
+      return d
+   else
+      return Int(degree_fmpz(a, i))
+   end
 end
 
 # Degree in the i-th variable as an ZZRingElem
@@ -234,6 +238,9 @@ end
 
 # Return an array of the max degrees in each variable
 function degrees(a::($etype))
+   if !degrees_fit_int(a)
+      throw(OverflowError("degrees of polynomial do not fit into Int"))
+   end
    degs = Vector{Int}(undef, nvars(parent(a)))
    ccall((:fmpz_mod_mpoly_degrees_si, libflint), Nothing,
          (Ptr{Int}, Ref{($etype)}, Ref{($rtype)}),
@@ -263,6 +270,9 @@ end
 
 # Total degree as an Int
 function total_degree(a::($etype))
+   if !total_degree_fits_int(a)
+      throw(OverflowError("Total degree of polynomial does not fit into Int"))
+   end
    d = ccall((:fmpz_mod_mpoly_total_degree_si, libflint), Int,
              (Ref{($etype)}, Ref{($rtype)}),
              a, a.parent)

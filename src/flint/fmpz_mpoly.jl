@@ -180,9 +180,13 @@ end
 function degree(a::ZZMPolyRingElem, i::Int)
    n = nvars(parent(a))
    (i <= 0 || i > n) && error("Index must be between 1 and $n")
-   d = ccall((:fmpz_mpoly_degree_si, libflint), Int,
-             (Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}), a, i - 1, a.parent)
-   return d
+   if degrees_fit_int(a)
+      d = ccall((:fmpz_mpoly_degree_si, libflint), Int,
+                (Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}), a, i - 1, a.parent)
+      return d
+   else
+      return Int(degree_fmpz(a, i))
+   end
 end
 
 # Degree in the i-th variable as an ZZRingElem
@@ -205,6 +209,9 @@ end
 
 # Return an array of the max degrees in each variable
 function degrees(a::ZZMPolyRingElem)
+   if !degrees_fit_int(a)
+      throw(OverflowError("degrees of polynomial do not fit into Int"))
+   end
    degs = Vector{Int}(undef, nvars(parent(a)))
    ccall((:fmpz_mpoly_degrees_si, libflint), Nothing,
          (Ptr{Int}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
@@ -234,6 +241,9 @@ function total_degree_fits_int(a::ZZMPolyRingElem)
 
 # Total degree as an Int
 function total_degree(a::ZZMPolyRingElem)
+   if !total_degree_fits_int(a)
+      throw(OverflowError("Total degree of polynomial does not fit into Int"))
+   end
    d = ccall((:fmpz_mpoly_total_degree_si, libflint), Int,
              (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), a, a.parent)
    return d

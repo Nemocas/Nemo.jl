@@ -200,9 +200,13 @@ end
 function degree(a::QQMPolyRingElem, i::Int)
    n = nvars(parent(a))
    (i <= 0 || i > n) && error("Index must be between 1 and $n")
-   d = ccall((:fmpq_mpoly_degree_si, libflint), Int,
-             (Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}), a, i - 1, a.parent)
-   return d
+   if degrees_fit_int(a)
+      d = ccall((:fmpq_mpoly_degree_si, libflint), Int,
+                (Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}), a, i - 1, a.parent)
+      return d
+   else
+      return Int(degree_fmpz(a, i))
+   end
 end
 
 # Degree in the i-th variable as an ZZRingElem
@@ -225,6 +229,9 @@ end
 
 # Return an array of the max degrees in each variable
 function degrees(a::QQMPolyRingElem)
+   if !degrees_fit_int(a)
+      throw(OverflowError("degrees of polynomial do not fit into Int"))
+   end
    degs = Vector{Int}(undef, nvars(parent(a)))
    ccall((:fmpq_mpoly_degrees_si, libflint), Nothing,
          (Ptr{Int}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
@@ -254,6 +261,9 @@ function total_degree_fits_int(a::QQMPolyRingElem)
 
 # Total degree as an Int
 function total_degree(a::QQMPolyRingElem)
+   if !total_degree_fits_int(a)
+      throw(OverflowError("Total degree of polynomial does not fit into Int"))
+   end
    d = ccall((:fmpq_mpoly_total_degree_si, libflint), Int,
              (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), a, a.parent)
    return d
