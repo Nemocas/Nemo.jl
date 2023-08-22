@@ -253,15 +253,6 @@ function nbits(a::Integer)
     return ndigits(a, base=2)
 end
 
-@doc raw"""
-    isinteger(a::QQFieldElem) -> Bool
-
-Returns `true` iff the denominator of $a$ is one.
-"""
-function isinteger(a::QQFieldElem)
-    return isone(denominator(a))
-end
-
 function (::ZZRing)(x::Rational{Int})
     @assert denominator(x) == 1
     return ZZRingElem(numerator(x))

@@ -179,6 +179,8 @@ sign(a::ZZRingElem) = ZZRingElem(ccall((:fmpz_sgn, libflint), Cint, (Ref{ZZRingE
 
 sign(::Type{Int}, a::ZZRingElem) = Int(ccall((:fmpz_sgn, libflint), Cint, (Ref{ZZRingElem},), a))
 
+Base.signbit(a::ZZRingElem) = signbit(sign(Int, a))
+
 @doc raw"""
     fits(::Type{Int}, a::ZZRingElem)
 
@@ -217,6 +219,8 @@ isone(a::ZZRingElem) = ccall((:fmpz_is_one, libflint), Bool, (Ref{ZZRingElem},),
 isinteger(::ZZRingElem) = true
 
 isfinite(::ZZRingElem) = true
+
+isinf(::ZZRingElem) = false
 
 @doc raw"""
     denominator(a::ZZRingElem)

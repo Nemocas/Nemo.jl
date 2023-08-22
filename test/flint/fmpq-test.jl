@@ -132,13 +132,31 @@ end
    @test sign(Int, QQFieldElem()) == 0
    @test sign(Int, QQFieldElem(1, 7)) == 1
 
+   @test signbit(QQFieldElem(-2, 3))
+   @test !signbit(QQFieldElem())
+   @test !signbit(QQFieldElem(1, 7))
+
+   @test !isone(zero(R))
    @test isone(one(R))
 
    @test iszero(zero(R))
+   @test !iszero(one(R))
 
    @test is_unit(one(R))
-
    @test is_unit(QQFieldElem(1, 3))
+   @test !is_unit(QQFieldElem(0, 3))
+
+   @test isinteger(zero(R))
+   @test isinteger(one(R))
+   @test !isinteger(QQFieldElem(1, 3))
+
+   @test isfinite(zero(R))
+   @test isfinite(one(R))
+   @test isfinite(QQFieldElem(1, 3))
+
+   @test !isinf(zero(R))
+   @test !isinf(one(R))
+   @test !isinf(QQFieldElem(1, 3))
 
    @test deepcopy(QQFieldElem(2, 3)) == QQFieldElem(2, 3)
 

@@ -638,6 +638,8 @@ function sign(::Type{Int}, x::arb)
   end
 end
 
+Base.signbit(x::arb) = signbit(sign(Int, x))
+
 ################################################################################
 #
 #  Unary operations

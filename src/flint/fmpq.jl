@@ -99,6 +99,8 @@ sign(a::QQFieldElem) = QQFieldElem(sign(numerator(a)))
 
 sign(::Type{Int}, a::QQFieldElem) = sign(Int, numerator(a))
 
+Base.signbit(a::QQFieldElem) = signbit(sign(Int, a))
+
 function abs(a::QQFieldElem)
    z = QQFieldElem()
    ccall((:fmpq_abs, libflint), Nothing, (Ref{QQFieldElem}, Ref{QQFieldElem}), z, a)
@@ -123,6 +125,13 @@ function iszero(a::QQFieldElem)
 end
 
 is_unit(a::QQFieldElem) = !iszero(a)
+
+isinteger(a::QQFieldElem) = isone(denominator(a))
+
+isfinite(::QQFieldElem) = true
+
+isinf(::QQFieldElem) = false
+
 
 @doc raw"""
     height(a::QQFieldElem)

@@ -281,6 +281,12 @@ end
    b, i = unique_integer(RRR(2)^1000);
    b, i = unique_integer(RRR(2)^1000);
    b, i = unique_integer(RRR(2)^1000);
+
+   @test sign(Int, RR(2)) == 1
+   @test sign(Int, -RR(2)) == -1
+
+   @test !signbit(RR(2))
+   @test signbit(-RR(2))
 end
 
 @testset "arb.unsafe_ops" begin

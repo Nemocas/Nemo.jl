@@ -143,15 +143,21 @@ end
    b = zero(ZZRing())
    c = zero(ZZRingElem)
 
-   @test isa(a, RingElem)
-
-   @test isa(b, RingElem)
-
-   @test isa(c, RingElem)
+   @test isa(a, ZZRingElem)
+   @test isa(b, ZZRingElem)
+   @test isa(c, ZZRingElem)
 
    @test sign(a) == 1
-
    @test sign(a) isa ZZRingElem
+   @test !signbit(a)
+
+   @test sign(-a) == -1
+   @test sign(-a) isa ZZRingElem
+   @test signbit(-a)
+
+   @test sign(b) == 0
+   @test sign(b) isa ZZRingElem
+   @test !signbit(b)
 
    @test fits(Int, a)
 
@@ -163,12 +169,12 @@ end
 
    @test is_unit(ZZRingElem(-1))
 
+   @test !iszero(a)
    @test iszero(b)
-
    @test zero(ZZRing()) == zero(ZZRingElem)
 
    @test isone(a)
-
+   @test !isone(b)
    @test one(ZZRing()) == one(ZZRingElem)
 
    @test numerator(ZZRingElem(12)) == ZZRingElem(12)
@@ -186,6 +192,21 @@ end
    y = ZZRingElem(x)
    @test iseven(x) == iseven(y)
    @test isodd(x) == isodd(y)
+
+   @test isinteger(a)
+   @test isinteger(b)
+   @test isinteger(x)
+   @test isinteger(y)
+
+   @test isfinite(a)
+   @test isfinite(b)
+   @test isfinite(x)
+   @test isfinite(y)
+
+   @test !isinf(a)
+   @test !isinf(b)
+   @test !isinf(x)
+   @test !isinf(y)
 
    @test characteristic(ZZ) == 0
 end
