@@ -371,7 +371,6 @@ function embed(k::T, K::T) where T <: FinField
     # Special cases of k == K or degree(k) == 1
 
     if k == K
-        identity(x) = x
         morph = FinFieldMorphism(k, k, identity, identity)
         return morph
 
