@@ -67,11 +67,9 @@ export GF
 
 import AbstractAlgebra: Set, Module, Ring, Group, Field, promote_rule
 
-import AbstractAlgebra: pretty, Lowercase, LowercaseOff, Indent, Dedent
+import AbstractAlgebra: pretty, Lowercase, LowercaseOff, Indent, Dedent, ErrorConstrDimMismatch
 
 export flint_cleanup, flint_set_num_threads
-
-export error_dim_negative, ErrorConstrDimMismatch
 
 export PadicField, QadicField, NGFiniteField
 
