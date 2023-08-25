@@ -4,6 +4,8 @@
 #
 ###############################################################################
 
+const _err_dim_negative = ErrorException("Dimensions must be non-negative")
+
 ###############################################################################
 #
 #   ZZRing / ZZRingElem
@@ -5155,7 +5157,7 @@ struct zzModMatrixSpace <: MatSpace{zzModRingElem}
   ncols::Int
 
   function zzModMatrixSpace(R::zzModRing, r::Int, c::Int)
-    (r < 0 || c < 0) && throw(error_dim_negative)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     return new(R, r, c)
   end
 end
@@ -5327,7 +5329,7 @@ struct ZZModMatrixSpace <: MatSpace{ZZModRingElem}
   ncols::Int
 
   function ZZModMatrixSpace(R::ZZModRing, r::Int, c::Int)
-    (r < 0 || c < 0) && throw(error_dim_negative)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     return new(R, r, c)
   end
 end
@@ -5461,7 +5463,7 @@ struct FpMatrixSpace <: MatSpace{FpFieldElem}
   ncols::Int
 
   function FpMatrixSpace(R::FpField, r::Int, c::Int)
-    (r < 0 || c < 0) && throw(error_dim_negative)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     return new(R, r, c)
   end
 end
@@ -5597,7 +5599,7 @@ struct fpMatrixSpace <: MatSpace{fpFieldElem}
   ncols::Int
 
   function fpMatrixSpace(R::fpField, r::Int, c::Int)
-    (r < 0 || c < 0) && throw(error_dim_negative)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     return new(R, r, c)
   end
 end
@@ -6207,7 +6209,7 @@ struct FqMatrixSpace <: MatSpace{FqFieldElem}
    ncols::Int
 
    function FqMatrixSpace(R::FqField, r::Int, c::Int)
-     (r < 0 || c < 0) && throw(error_dim_negative)
+     (r < 0 || c < 0) && throw(_err_dim_negative)
      return new(R, r, c)
    end
  end
@@ -6437,7 +6439,7 @@ struct FqPolyRepMatrixSpace <: MatSpace{FqPolyRepFieldElem}
   ncols::Int
 
   function FqPolyRepMatrixSpace(R::FqPolyRepField, r::Int, c::Int)
-    (r < 0 || c < 0) && throw(error_dim_negative)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     return new(R, r, c)
   end
 end
@@ -6615,7 +6617,7 @@ struct fqPolyRepMatrixSpace <: MatSpace{fqPolyRepFieldElem}
   ncols::Int
 
   function fqPolyRepMatrixSpace(R::fqPolyRepField, r::Int, c::Int)
-    (r < 0 || c < 0) && throw(error_dim_negative)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     return new(R, r, c)
   end
 end
