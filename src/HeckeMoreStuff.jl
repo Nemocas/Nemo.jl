@@ -131,11 +131,6 @@ function mul!(z::acb, x::acb, y::arb)
     return z
 end
 
-#TODO: should be done in Nemo/AbstractAlgebra s.w.
-#      needed by ^ (the generic power in Base using square and multiply)
-Base.copy(f::Generic.MPoly) = deepcopy(f)
-Base.copy(f::Generic.Poly) = deepcopy(f)
-
 @doc raw"""
     valuation(G::QQMatrix, p)
 
@@ -173,21 +168,6 @@ end
 
 ZZMatrix(M::Matrix{Int}) = matrix(FlintZZ, M)
 
-zero_matrix(::Type{Int}, r, c) = zeros(Int, r, c)
-
-base_ring(::Vector{Int}) = Int
-
-function AbstractAlgebra.is_symmetric(M::MatElem)
-    for i in 1:nrows(M)
-        for j in i:ncols(M)
-            if M[i, j] != M[j, i]
-                return false
-            end
-        end
-    end
-    return true
-end
-
 ################################################################################
 #
 #  Create a matrix from rows
@@ -213,15 +193,7 @@ end
 
 order(::ZZRingElem) = FlintZZ
 
-export neg!, rem!
-
-sub!(z::Rational{Int}, x::Rational{Int}, y::Int) = x - y
-
-neg!(z::Rational{Int}, x::Rational{Int}) = -x
-
-add!(z::Rational{Int}, x::Rational{Int}, y::Int) = x + y
-
-mul!(z::Rational{Int}, x::Rational{Int}, y::Int) = x * y
+export rem!
 
 is_negative(x::Rational) = x.num < 0
 
@@ -522,31 +494,6 @@ function basis(K::AnticNumberField)
 end
 
 base_field(_::AnticNumberField) = FlintQQ
-
-#trivia to make life easier
-
-gens(L::SimpleNumField{T}) where {T} = [gen(L)]
-
-function gen(L::SimpleNumField{T}, i::Int) where {T}
-    i == 1 || error("index must be 1")
-    return gen(L)
-end
-
-function Base.getindex(L::SimpleNumField{T}, i::Int) where {T}
-    if i == 0
-        return one(L)
-    elseif i == 1
-        return gen(L)
-    else
-        error("index has to be 0 or 1")
-    end
-end
-
-ngens(L::SimpleNumField{T}) where {T} = 1
-
-is_unit(a::NumFieldElem) = !iszero(a)
-
-canonical_unit(a::NumFieldElem) = a
 
 ################################################################################
 #
@@ -1829,8 +1776,6 @@ function divexact!(A::Generic.Mat{nf_elem}, p::ZZRingElem)
         end
     end
 end
-
-elem_type(::Type{Generic.ResidueRing{T}}) where {T} = Generic.ResidueRingElem{T}
 
 #
 #  Lifts a matrix from F_p to Z/p^nZ
