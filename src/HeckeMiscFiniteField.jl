@@ -137,8 +137,6 @@ Base.length(F::FqPolyRepField) = BigInt(characteristic(F)^degree(F))
 
 Base.IteratorSize(::Type{FqPolyRepField}) = Base.HasLength()
 
-sub!(z::T, x::T, y::T) where {T} = x - y
-
 function (A::fqPolyRepField)(x::fpFieldElem)
     @assert characteristic(A) == characteristic(parent(x))
     return A(lift(x))

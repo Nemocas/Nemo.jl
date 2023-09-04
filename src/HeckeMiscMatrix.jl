@@ -11,76 +11,10 @@ LinearAlgebra.dot(a::RingElem, b::RingElem) = a * b
 
 dense_matrix_type(::Type{T}) where {T} = Generic.MatSpaceElem{T}
 
-################################################################################
-#
-#  Unsafe functions for generic matrices
-#
-################################################################################
-
-#function zero!(a::MatElem)
-#  for i in 1:nrows(a)
-#    for j in 1:ncols(a)
-#      a[i, j] = zero!(a[i, j])
-#    end
-#  end
-#  return a
-#end
-
-function mul!(c::MatElem, a::MatElem, b::MatElem)
-    ncols(a) != nrows(b) && error("Incompatible matrix dimensions")
-    nrows(c) != nrows(a) && error("Incompatible matrix dimensions")
-    ncols(c) != ncols(b) && error("Incompatible matrix dimensions")
-
-    if c === a || c === b
-        d = parent(a)()
-        return mul!(d, a, b)
-    end
-
-    t = base_ring(a)()
-    for i = 1:nrows(a)
-        for j = 1:ncols(b)
-            c[i, j] = zero!(c[i, j])
-            for k = 1:ncols(a)
-                c[i, j] = addmul_delayed_reduction!(c[i, j], a[i, k], b[k, j], t)
-            end
-            c[i, j] = reduce!(c[i, j])
-        end
-    end
-    return c
-end
-
-function add!(c::MatElem, a::MatElem, b::MatElem)
-    parent(a) != parent(b) && error("Parents don't match.")
-    parent(c) != parent(b) && error("Parents don't match.")
-    for i = 1:nrows(c)
-        for j = 1:ncols(c)
-            c[i, j] = add!(c[i, j], a[i, j], b[i, j])
-        end
-    end
-    return c
-end
-
 function mul!(a::zzModMatrix, b::zzModMatrix, c::zzModRingElem)
     ccall((:nmod_mat_scalar_mul, libflint), Nothing,
         (Ref{zzModMatrix}, Ref{zzModMatrix}, UInt), a, b, c.data)
     return a
-end
-
-function mul!(c::MatElem, a::MatElem, b::RingElement)
-    nrows(c) != nrows(a) && error("Incompatible matrix dimensions")
-
-    if c === a || c === b
-        d = parent(a)()
-        return mul!(d, a, b)
-    end
-
-    t = base_ring(a)()
-    for i = 1:nrows(a)
-        for j = 1:ncols(a)
-            c[i, j] = mul!(c[i, j], a[i, j], b)
-        end
-    end
-    return c
 end
 
 ################################################################################
@@ -115,46 +49,9 @@ function transpose!(A::QQMatrix, B::QQMatrix)
     return A
 end
 
-################################################################################
-#
-#  Zero matrix constructors
-#
-################################################################################
-
-function zero_matrix(::Type{MatElem}, R::Ring, n::Int)
-    return zero_matrix(R, n)
-end
-
-function zero_matrix(::Type{MatElem}, R::Ring, n::Int, m::Int)
-    return zero_matrix(R, n, m)
-end
-
-
 function matrix(A::Matrix{ZZRingElem})
     m = matrix(FlintZZ, A)
     return m
-end
-
-function matrix(A::Matrix{T}) where {T<:RingElem}
-    r, c = size(A)
-    (r < 0 || c < 0) && error("Array must be non-empty")
-    m = matrix(parent(A[1, 1]), A)
-    return m
-end
-
-function matrix(A::Vector{T}) where {T<:RingElem}
-    return matrix(reshape(A, length(A), 1))
-end
-
-export scalar_matrix
-
-function scalar_matrix(R::Ring, n::Int, a::RingElement)
-    b = R(a)
-    z = zero_matrix(R, n, n)
-    for i in 1:n
-        z[i, i] = b
-    end
-    return z
 end
 
 function Array(a::ZZMatrix; S::Type{T}=ZZRingElem) where {T}
@@ -188,8 +85,6 @@ function is_positive_entry(M::ZZMatrix, i::Int, j::Int)
     end
 end
 
-
-
 function is_zero_row(M::zzModMatrix, i::Int)
     zero = UInt(0)
     for j in 1:ncols(M)
@@ -201,27 +96,9 @@ function is_zero_row(M::zzModMatrix, i::Int)
     return true
 end
 
-function is_zero_row(M::MatElem{T}, i::Int) where {T}
-    for j in 1:ncols(M)
-        if !iszero(M[i, j])
-            return false
-        end
-    end
-    return true
-end
-
-function is_zero_row(M::Matrix{T}, i::Int) where {T<:Integer}
-    for j = 1:Base.size(M, 2)
-        if M[i, j] != 0
-            return false
-        end
-    end
-    return true
-end
-
 function is_zero_row(M::Matrix{ZZRingElem}, i::Int)
     for j = 1:Base.size(M, 2)
-        if M[i, j] != 0
+        if !iszero(M[i, j])
             return false
         end
     end
@@ -238,7 +115,6 @@ function is_zero_row(M::Matrix{T}, i::Int) where {T<:RingElem}
 end
 
 export divexact!
-export mul!
 
 function divexact!(a::ZZMatrix, b::ZZMatrix, d::ZZRingElem)
     ccall((:fmpz_mat_scalar_divexact_fmpz, libflint), Nothing,
@@ -391,13 +267,6 @@ function left_kernel(x::ZZMatrix)
     end
 end
 
-right_kernel(M::MatElem) = nullspace(M)
-
-function left_kernel(M::MatElem)
-    rk, M1 = nullspace(transpose(M))
-    return rk, transpose(M1)
-end
-
 function right_kernel(x::ZZMatrix)
     n, M = left_kernel(transpose(x))
     return n, transpose(M)
@@ -431,11 +300,6 @@ function right_kernel(M::zzModMatrix)
     return 0, zero_matrix(R, nrows(M), 0)
 end
 
-function left_kernel(a::zzModMatrix)
-    n, M = right_kernel(transpose(a))
-    return n, transpose(M)
-end
-
 function right_kernel(M::ZZModMatrix)
     R = base_ring(M)
     N = hcat(transpose(M), identity_matrix(R, ncols(M)))
@@ -457,28 +321,6 @@ function right_kernel(M::ZZModMatrix)
         end
     end
     return 0, zero_matrix(R, nrows(M), 0)
-end
-
-function left_kernel(a::ZZModMatrix)
-    n, M = right_kernel(transpose(a))
-    return n, transpose(M)
-end
-
-################################################################################
-#
-#  Kernel over different rings
-#
-################################################################################
-
-@doc raw"""
-kernel(a::MatrixElem{T}, R::Ring; side::Symbol = :right) -> n, MatElem{elem_type(R)}
-
-It returns a tuple $(n, M)$, where $n$ is the rank of the kernel over $R$ and $M$ is a basis for it. If side is $:right$ or not
-specified, the right kernel is computed. If side is $:left$, the left kernel is computed.
-"""
-function kernel(M::MatrixElem, R::Ring; side::Symbol=:right)
-    MP = change_base_ring(R, M)
-    return kernel(MP, side=side)
 end
 
 ################################################################################

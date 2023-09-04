@@ -12,10 +12,6 @@ function round(::Type{Int}, a::QQFieldElem)
     return round(Int, Rational{BigInt}(a))
 end
 
-function matrix(a::Vector{Vector{T}}) where {T}
-    return matrix(permutedims(reduce(hcat, a), (2, 1)))
-end
-
 function prime_field(_::NumField)
     return QQField()
 end
@@ -92,10 +88,6 @@ function is_constant(f::PolyElem)
     return f.length < 2
 end
 
-function identity_matrix(::Type{MatElem}, R::Ring, n::Int)
-    return identity_matrix(R, n)
-end
-
 function norm(v::arb_mat)
     return sqrt(sum([a^2 for a in v]))
 end
@@ -168,34 +160,9 @@ end
 
 ZZMatrix(M::Matrix{Int}) = matrix(FlintZZ, M)
 
-################################################################################
-#
-#  Create a matrix from rows
-#
-################################################################################
-
-function matrix(K::Ring, R::Vector{<:Vector})
-    if length(R) == 0
-        return zero_matrix(K, 0, 0)
-    else
-        n = length(R)
-        m = length(R[1])
-        z = zero_matrix(K, n, m)
-        for i in 1:n
-            @assert length(R[i]) == m
-            for j in 1:m
-                z[i, j] = R[i][j]
-            end
-        end
-        return z
-    end
-end
-
 order(::ZZRingElem) = FlintZZ
 
 export rem!
-
-is_negative(x::Rational) = x.num < 0
 
 function is_negative(x::QQFieldElem)
     c = ccall((:fmpq_sgn, libflint), Cint, (Ref{QQFieldElem},), x)
@@ -713,12 +680,6 @@ function lift(R::ZZAbsPowerSeriesRing, f::ZZModAbsPowerSeriesRingElem)
     return r
 end
 
-function addmul!(z::T, x::T, y::T) where {T<:RingElement}
-    zz = parent(z)()
-    zz = mul!(zz, x, y)
-    return addeq!(z, zz)
-end
-
 function evaluate(f::fpPolyRingElem, v::Vector{fpFieldElem})
     F = base_ring(f)
     v1 = UInt[x.data for x in v]
@@ -959,29 +920,6 @@ end
 
 function iszero(a::Ref{ZZRingElem})
     return unsafe_load(reinterpret(Ptr{Int}, a)) == 0
-end
-
-function canonical_unit(a::SeriesElem)
-    iszero(a) && return one(parent(a))
-    v = valuation(a)
-    v == 0 && return a
-    v > 0 && return shift_right(a, v)
-    return shift_left(a, -v)
-end
-
-#TODO: this is for rings, not for fields, maybe different types?
-function Base.gcd(a::T, b::T) where {T<:SeriesElem}
-    iszero(a) && iszero(b) && return a
-    iszero(a) && return gen(parent(a))^valuation(b)
-    iszero(b) && return gen(parent(a))^valuation(a)
-    return gen(parent(a))^min(valuation(a), valuation(b))
-end
-
-function Base.lcm(a::T, b::T) where {T<:SeriesElem}
-    iszero(a) && iszero(b) && return a
-    iszero(a) && return a
-    iszero(b) && return b
-    return gen(parent(a))^max(valuation(a), valuation(b))
 end
 
 # should be Nemo/AA
@@ -1389,21 +1327,6 @@ coefficients when viewed as univariate polynomial in `i`.
 """
 function content(f::MPolyRingElem, i::Int)
     return reduce(gcd, coefficients(f, i))
-end
-
-"""
-The coefficients of `f` when viewed as a univariate polynomial in the `i`-th
-variable.
-"""
-function coefficients(f::MPolyRingElem, i::Int)
-    d = degree(f, i)
-    cf = [MPolyBuildCtx(parent(f)) for j = 0:d]
-    for (c, e) = zip(coefficients(f), exponent_vectors(f))
-        a = e[i]
-        e[i] = 0
-        push_term!(cf[a+1], c, e)
-    end
-    return map(finish, cf)
 end
 
 # mainly for testing

@@ -1,11 +1,3 @@
-function polynomial_ring(R::Ring; cached::Bool=false)
-    return polynomial_ring(R, "x", cached=cached)
-end
-
-function content(a::PolyElem{<:FieldElem})
-    return one(base_ring(a))
-end
-
 function ZZRingElem(a::Generic.ResidueRingElem{ZZRingElem})
     return a.data
 end
