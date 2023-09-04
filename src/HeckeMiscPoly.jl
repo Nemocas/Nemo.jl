@@ -34,15 +34,6 @@ function (::ZZRing)(a::ZZModRingElem)
     return a.data
 end
 
-function Base.div(f::PolyElem, g::PolyElem)
-    q, r = divrem(f, g)
-    return q
-end
-
-function Base.rem(f::PolyElem, g::PolyElem)
-    return mod(f, g)
-end
-
 function rem!(z::T, f::T, g::T) where {T<:PolyElem}
     z = rem(f, g)
     return z

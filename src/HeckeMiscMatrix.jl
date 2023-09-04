@@ -1,16 +1,5 @@
 export is_zero_row, is_diagonal, is_lower_triangular, is_positive_entry, is_upper_triangular, diagonal
 
-import LinearAlgebra
-LinearAlgebra.dot(a::RingElem, b::RingElem) = a * b
-
-################################################################################
-#
-#  Dense matrix types
-#
-################################################################################
-
-dense_matrix_type(::Type{T}) where {T} = Generic.MatSpaceElem{T}
-
 function mul!(a::zzModMatrix, b::zzModMatrix, c::zzModRingElem)
     ccall((:nmod_mat_scalar_mul, libflint), Nothing,
         (Ref{zzModMatrix}, Ref{zzModMatrix}, UInt), a, b, c.data)
@@ -35,7 +24,6 @@ function denominator(M::QQMatrix)
 end
 
 transpose!(A::Union{ZZMatrix,QQMatrix}) = is_square(A) ? transpose!(A, A) : transpose(A)
-transpose!(A::MatrixElem) = transpose(A)
 
 function transpose!(A::ZZMatrix, B::ZZMatrix)
     ccall((:fmpz_mat_transpose, libflint), Nothing,
@@ -528,18 +516,6 @@ end
 #  IsUpper\Lower triangular
 #
 ################################################################################
-
-function is_upper_triangular(M::MatElem)
-    n = nrows(M)
-    for i = 2:n
-        for j = 1:min(i - 1, ncols(M))
-            if !iszero(M[i, j])
-                return false
-            end
-        end
-    end
-    return true
-end
 
 function is_upper_triangular(M::ZZMatrix)
     GC.@preserve M begin

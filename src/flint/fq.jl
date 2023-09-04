@@ -504,29 +504,6 @@ function add!(z::FqPolyRepFieldElem, x::FqPolyRepFieldElem, y::FqPolyRepFieldEle
    return z
 end
 
-###############################################################################
-#
-#   Random functions
-#
-###############################################################################
-
-Random.Sampler(::Type{RNG}, K::FinField, n::Random.Repetition) where {RNG<:AbstractRNG} =
-   Random.SamplerSimple(K, Random.Sampler(RNG, BigInt(0):BigInt(characteristic(K) - 1), n))
-
-function rand(rng::AbstractRNG, Ksp::Random.SamplerSimple{<:FinField})
-   K = Ksp[]
-   r = degree(K)
-   alpha = gen(K)
-   res = zero(K)
-   for i = 0 : (r-1)
-      c = rand(rng, Ksp.data)
-      res += c * alpha^i
-   end
-   return res
-end
-
-Random.gentype(::Type{T}) where {T<:FinField} = elem_type(T)
-
 ################################################################################
 #
 #   fqPolyRepField Modulus
