@@ -268,18 +268,6 @@ norm(x::ZZRingElem) = abs(x)
 
 number_field(::ZZRing) = FlintQQ
 
-function change_base_ring(p::MPolyRingElem{T}, g, new_polynomial_ring) where {T<:RingElement}
-    cvzip = zip(coefficients(p), exponent_vectors(p))
-    M = MPolyBuildCtx(new_polynomial_ring)
-    for (c, v) in cvzip
-        res = g(c)
-        if !iszero(res)
-            push_term!(M, g(c), v)
-        end
-    end
-    return finish(M)::elem_type(new_polynomial_ring)
-end
-
 function mulmod(a::S, b::S, mod::Vector{S}) where {S<:MPolyRingElem{T}} where {T<:RingElem}
     return Base.divrem(a * b, mod)[2]
 end
@@ -287,8 +275,6 @@ end
 function Base.hash(f::zzModMPolyRingElem, h::UInt)
     return UInt(1) # TODO: enhance or throw error
 end
-
-@inline ngens(R::AbstractAlgebra.Generic.MPolyRing) = R.num_vars
 
 #to make the MPoly module happy, divrem needs it...
 function Base.div(a::nf_elem, b::nf_elem)
@@ -893,9 +879,6 @@ function order(x::Generic.ResidueRingElem{ZZRingElem}, fp::Dict{ZZRingElem,Int64
     error("missing")
 end
 
-Base.copy(a::PolyElem) = deepcopy(a)
-Base.copy(a::SeriesElem) = deepcopy(a)
-
 fit!(::QQRelPowerSeriesRingElem, Int) = nothing
 fit!(::QQAbsPowerSeriesRingElem, Int) = nothing
 
@@ -962,10 +945,6 @@ function lift(R::PolyRing{S}, s::SeriesElem{S}) where {S}
     return shift_left(t, valuation(s))
 end
 
-function gen(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T<:PolyElem}
-    return R(gen(base_ring(R)))
-end
-
 function gen(R::Union{Generic.ResidueRing{fqPolyRepPolyRingElem},Generic.ResidueField{fqPolyRepPolyRingElem}}) ## this is not covered by above
     return R(gen(base_ring(R)))              ## and I don't know why
 end
@@ -982,25 +961,13 @@ function characteristic(R::Union{Generic.ResidueRing{zzModPolyRingElem},Generic.
     return characteristic(base_ring(base_ring(R)))
 end
 
-function characteristic(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T<:PolyElem}
-    return characteristic(base_ring(base_ring(R)))
-end
-
 # discuss: size = order? order = size?
 function size(R::Union{Generic.ResidueRing{zzModPolyRingElem},Generic.ResidueField{zzModPolyRingElem}})
     return characteristic(R)^degree(modulus(R))
 end
 
-function size(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T<:ResElem}
-    return size(base_ring(base_ring(R)))^degree(modulus(R))
-end
-
 function size(R::Union{Generic.ResidueRing{ZZRingElem},Generic.ResidueField{ZZRingElem}})
     return modulus(R)
-end
-
-function size(R::Union{Generic.ResidueRing{T},Generic.ResidueField{T}}) where {T<:PolyElem}
-    return size(base_ring(base_ring(R)))^degree(R.modulus)
 end
 
 function size(R::Union{Generic.ResidueRing{fqPolyRepPolyRingElem},Generic.ResidueField{fqPolyRepPolyRingElem}})
@@ -1147,17 +1114,8 @@ function gcd!(f::fpPolyRingElem, g::fpPolyRingElem, h::fpPolyRingElem)
     return f
 end
 
-
 function divexact(a::ZZModRingElem, y::ZZRingElem; check::Bool=true)
     return divexact(a, parent(a)(y), check=check)
-end
-
-function lift(a::Generic.ResidueRingElem)
-    return a.data
-end
-
-function lift(a::Generic.ResidueFieldElem)
-    return a.data
 end
 
 function ^(a::ResElem, f::ZZRingElem)
@@ -1198,9 +1156,7 @@ function leading_monomial(f::Generic.MPoly)
     return R([one(base_ring(R))], e)
 end
 
-function leading_coefficient(f::Generic.MPoly)
-    return f.coeffs[1]
-end
+
 
 
 function is_prime(x::Integer)
@@ -1300,33 +1256,6 @@ end
 
 function (R::ZZMPolyRing)(f::QQMPolyRingElem)
     return map_coefficients(ZZ, f, parent=R)
-end
-
-ngens(R::ZZMPolyRing) = length(gens(R))
-
-#check with Nemo/ Dan if there are better solutions
-#the block is also not used here I think
-#functionality to view mpoly as upoly in variable `i`, so the
-#coefficients are mpoly's without variable `i`.
-function leading_coefficient(f::MPolyRingElem, i::Int)
-    g = MPolyBuildCtx(parent(f))
-    d = degree(f, i)
-    for (c, e) = zip(coefficients(f), exponent_vectors(f))
-        if e[i] == d
-            e[i] = 0
-            push_term!(g, c, e)
-        end
-    end
-    return finish(g)
-end
-
-#not used here
-"""
-`content` as a polynomial in the variable `i`, i.e. the gcd of all the
-coefficients when viewed as univariate polynomial in `i`.
-"""
-function content(f::MPolyRingElem, i::Int)
-    return reduce(gcd, coefficients(f, i))
 end
 
 # mainly for testing

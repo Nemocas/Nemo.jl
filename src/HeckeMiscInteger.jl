@@ -463,7 +463,6 @@ mod(i::IntegerUnion, r::fmpzUnitRange) = mod(i - first(r), length(r)) + first(r)
 Base.:(:)(a::ZZRingElem, b::Integer) = (:)(promote(a, b)...)
 Base.:(:)(a::Integer, b::ZZRingElem) = (:)(promote(a, b)...)
 
-Base.:(:)(x::Int, y::Nothing) = 1:0
 Base.:(:)(x::Int, y::ZZRingElem) = ZZRingElem(x):y
 
 # Construct StepRange{ZZRingElem, T} where +(::ZZRingElem, zero(::T)) must be defined
