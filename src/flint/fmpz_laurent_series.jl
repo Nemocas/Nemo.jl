@@ -1201,7 +1201,7 @@ function RandomExtensions.make(S::ZZLaurentSeriesRing, val_range::AbstractUnitRa
    if length(vs) == 1 && elem_type(R) == Random.gentype(vs[1])
       RandomExtensions.Make(S, val_range, vs[1]) # forward to default Make constructor
    else
-      make(S, val_range, make(R, vs...))
+      RandomExtensions.Make(S, val_range, make(R, vs...))
    end
 end
 
