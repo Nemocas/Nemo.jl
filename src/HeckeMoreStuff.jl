@@ -1175,22 +1175,6 @@ function rem!(z::fpPolyRingElem, a::fpPolyRingElem, b::fpPolyRingElem)
     return z
 end
 
-function show(io::IO, M::Map)
-    @show_name(io, M)
-    if get(io, :compact, false)
-        print(io, domain(M), " --> ", codomain(M), "\n")
-        return
-    end
-    io = Base.IOContext(io, :compact => true)
-    print(io, "Map with following data\n")
-    print(io, "Domain:\n")
-    print(io, "=======\n")
-    print(io, domain(M))
-    print(io, "\nCodomain:\n")
-    print(io, "=========\n")
-    print(io, codomain(M))
-end
-
 function preimage(M::Map{D,C}, a) where {D,C}
     if isdefined(M.header, :preimage)
         p = M.header.preimage(a)::elem_type(D)
