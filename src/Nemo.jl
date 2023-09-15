@@ -32,7 +32,7 @@ import Base: Array, abs, abs2, acos, acosh, asin, asinh, atan, atanh, bin, binom
              parent, parse, powermod,
              precision, rand, Rational, rem, reverse, round, setindex!,
              show, similar, sign, sin, sincos, sincospi, sinh, sinpi, size, sqrt, string,
-             tan, tanh, trailing_zeros, transpose, truncate, typed_hvcat,
+             tan, tanh, trailing_zeros, transpose, trunc, truncate, typed_hvcat,
              typed_hcat, vcat, xor, zero, zeros, +, -, *, ==, ^, &, |, <<, >>,
              ~, <=, >=, <, >, //, /, \, !=
 
