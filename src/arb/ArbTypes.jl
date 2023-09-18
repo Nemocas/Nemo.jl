@@ -668,7 +668,7 @@ base_ring(a::ArbPolyRing) = a.base_ring
 #
 ################################################################################
 
-mutable struct ComplexPolyRing <: PolyRing{acb}
+mutable struct ComplexPolyRing <: PolyRing{ComplexFieldElem}
   S::Symbol
 
   function ComplexPolyRing(R::ComplexField, S::Symbol, cached::Bool = true)
