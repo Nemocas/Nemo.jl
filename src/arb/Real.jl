@@ -327,7 +327,7 @@ end
 @doc raw"""
     contains_nonnegative(x::RealFieldElem)
 
-Returns `true` if the ball $x$ contains any nonnegative value, otherwise
+Returns `true` if the ball $x$ contains any non-negative value, otherwise
 return `false`.
 """
 function contains_nonnegative(x::RealFieldElem)
@@ -529,7 +529,7 @@ end
 @doc raw"""
     is_nonnegative(x::RealFieldElem)
 
-Return `true` if $x$ is certainly nonnegative, otherwise return `false`.
+Return `true` if $x$ is certainly non-negative, otherwise return `false`.
 """
 function is_nonnegative(x::RealFieldElem)
    return Bool(ccall((:arb_is_nonnegative, libarb), Cint, (Ref{RealFieldElem},), x))
@@ -1146,7 +1146,7 @@ end
 @doc raw"""
     sqrtpos(x::RealFieldElem)
 
-Return the sqrt root of $x$, assuming that $x$ represents a nonnegative
+Return the sqrt root of $x$, assuming that $x$ represents a non-negative
 number. Thus any negative number in the input interval is discarded.
 """
 function sqrtpos(x::RealFieldElem, prec::Int = precision(Balls))

@@ -577,7 +577,7 @@ end
 @doc raw"""
     bound_inf_norm(x::arb_mat)
 
-Returns a nonnegative element $z$ of type `arb`, such that $z$ is an upper
+Returns a non-negative element $z$ of type `arb`, such that $z$ is an upper
 bound for the infinity norm for every matrix in $x$
 """
 function bound_inf_norm(x::arb_mat)

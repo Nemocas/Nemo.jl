@@ -1165,7 +1165,7 @@ end
     gcd(x::ZZRingElem, y::ZZRingElem, z::ZZRingElem...)
 
 Return the greatest common divisor of $(x, y, ...)$. The returned result will
-always be nonnegative and will be zero iff all inputs are zero.
+always be non-negative and will be zero iff all inputs are zero.
 """
 function gcd(x::ZZRingElem, y::ZZRingElem, z::ZZRingElem...)
    d = ZZRingElem()
@@ -1184,7 +1184,7 @@ end
     gcd(x::Vector{ZZRingElem})
 
 Return the greatest common divisor of the elements of $x$. The returned
-result will always be nonnegative and will be zero iff all elements of $x$
+result will always be non-negative and will be zero iff all elements of $x$
 are zero.
 """
 function gcd(x::Vector{ZZRingElem})
@@ -1213,7 +1213,7 @@ end
     lcm(x::ZZRingElem, y::ZZRingElem, z::ZZRingElem...)
 
 Return the least common multiple of $(x, y, ...)$. The returned result will
-always be nonnegative and will be zero if any input is zero.
+always be non-negative and will be zero if any input is zero.
 """
 function lcm(x::ZZRingElem, y::ZZRingElem, z::ZZRingElem...)
    m = ZZRingElem()
@@ -1232,7 +1232,7 @@ end
     lcm(x::Vector{ZZRingElem})
 
 Return the least common multiple of the elements of $x$. The returned result
-will always be nonnegative and will be zero iff the elements of $x$ are zero.
+will always be non-negative and will be zero iff the elements of $x$ are zero.
 """
 function lcm(x::Vector{ZZRingElem})
    if length(x) == 0

@@ -213,7 +213,7 @@ We then implement all the other operators, including `==` in terms of `cmp`.
 For convenience we also implement a `cmpabs(a, b)` function which returns
 a positive value if $|a| > |b|$, zero if $|a| == |b|$ and a negative value if
 $|a| < |b|$. This can be slightly faster than a call to `cmp` or one of the
-comparison operators when comparing nonnegative values for example.
+comparison operators when comparing non-negative values for example.
 
 Here is a list of the comparison functions implemented, with the understanding
 that `cmp` provides all of the comparison operators listed above.

@@ -347,7 +347,7 @@ end
 @doc raw"""
     contains_nonnegative(x::arb)
 
-Returns `true` if the ball $x$ contains any nonnegative value, otherwise
+Returns `true` if the ball $x$ contains any non-negative value, otherwise
 return `false`.
 """
 function contains_nonnegative(x::arb)
@@ -549,7 +549,7 @@ end
 @doc raw"""
     is_nonnegative(x::arb)
 
-Return `true` if $x$ is certainly nonnegative, otherwise return `false`.
+Return `true` if $x$ is certainly non-negative, otherwise return `false`.
 """
 function is_nonnegative(x::arb)
    return Bool(ccall((:arb_is_nonnegative, libarb), Cint, (Ref{arb},), x))
@@ -1185,7 +1185,7 @@ end
 @doc raw"""
     sqrtpos(x::arb)
 
-Return the sqrt root of $x$, assuming that $x$ represents a nonnegative
+Return the sqrt root of $x$, assuming that $x$ represents a non-negative
 number. Thus any negative number in the input interval is discarded.
 """
 function sqrtpos(x::arb)

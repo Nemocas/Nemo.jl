@@ -306,7 +306,7 @@ end
 ################################################################################
 
 function ^(x::T, y::Int) where T <: Zmodn_poly
-  y < 0 && throw(DomainError(y, "Exponent must be nonnegative"))
+  y < 0 && throw(DomainError(y, "Exponent must be non-negative"))
   z = parent(x)()
   ccall((:nmod_poly_pow, libflint), Nothing,
           (Ref{T}, Ref{T}, Int), z, x, y)
@@ -395,7 +395,7 @@ end
 ###############################################################################
 
 function shift_left(x::T, len::Int) where T <: Zmodn_poly
-  len < 0 && throw(DomainError(len, "Shift must be nonnegative."))
+  len < 0 && throw(DomainError(len, "Shift must be non-negative."))
   z = parent(x)()
   ccall((:nmod_poly_shift_left, libflint), Nothing,
           (Ref{T}, Ref{T}, Int), z, x, len)
@@ -403,7 +403,7 @@ function shift_left(x::T, len::Int) where T <: Zmodn_poly
 end
 
 function shift_right(x::T, len::Int) where T <: Zmodn_poly
-  len < 0 && throw(DomainError(len, "Shift must be nonnegative."))
+  len < 0 && throw(DomainError(len, "Shift must be non-negative."))
   z = parent(x)()
   ccall((:nmod_poly_shift_right, libflint), Nothing,
             (Ref{T}, Ref{T}, Int), z, x, len)
@@ -684,7 +684,7 @@ end
     lift(R::ZZPolyRing, y::zzModPolyRingElem)
 
 Lift from a polynomial over $\mathbb{Z}/n\mathbb{Z}$ to a polynomial over
-$\mathbb{Z}$ with minimal reduced nonnegative coefficients. The ring `R`
+$\mathbb{Z}$ with minimal reduced non-negative coefficients. The ring `R`
 specifies the ring to lift into.
 """
 function lift(R::ZZPolyRing, y::zzModPolyRingElem)
