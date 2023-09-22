@@ -65,22 +65,6 @@ function evaluate!(z::fqPolyRepFieldElem, f::ZZPolyRingElem, r::fqPolyRepFieldEl
     return z
 end
 
-export trunc, round, ceil, floor
-
-for (s, f) in ((:trunc, Base.trunc), (:round, Base.round), (:ceil, Base.ceil), (:floor, Base.floor))
-    @eval begin
-        function ($s)(a::Matrix{BigFloat})
-            s = Base.size(a)
-            m = zero_matrix(FlintZZ, s[1], s[2])
-            for i = 1:s[1]
-                for j = 1:s[2]
-                    m[i, j] = FlintZZ(BigInt(($f)(a[i, j])))
-                end
-            end
-            return m
-        end
-    end
-end
 
 function norm(v::arb_mat)
     return sqrt(sum([a^2 for a in v]))
@@ -157,11 +141,6 @@ ZZMatrix(M::Matrix{Int}) = matrix(FlintZZ, M)
 order(::ZZRingElem) = FlintZZ
 
 export rem!
-
-function is_negative(x::QQFieldElem)
-    c = ccall((:fmpq_sgn, libflint), Cint, (Ref{QQFieldElem},), x)
-    return c < 0
-end
 
 function sub!(z::Vector{QQFieldElem}, x::Vector{QQFieldElem}, y::Vector{ZZRingElem})
     for i in 1:length(z)

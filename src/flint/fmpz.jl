@@ -181,6 +181,9 @@ sign(::Type{Int}, a::ZZRingElem) = Int(ccall((:fmpz_sgn, libflint), Cint, (Ref{Z
 
 Base.signbit(a::ZZRingElem) = signbit(sign(Int, a))
 
+is_negative(n::ZZRingElem) = sign(Int, n) < 0
+is_positive(n::ZZRingElem) = sign(Int, n) > 0
+
 @doc raw"""
     fits(::Type{Int}, a::ZZRingElem)
 
@@ -312,12 +315,14 @@ function abs(x::ZZRingElem)
 end
 
 floor(x::ZZRingElem) = x
-
 ceil(x::ZZRingElem) = x
+trunc(x::ZZRingElem) = x
+round(x::ZZRingElem) = x
 
 floor(::Type{ZZRingElem}, x::ZZRingElem) = x
-
 ceil(::Type{ZZRingElem}, x::ZZRingElem) = x
+trunc(::Type{ZZRingElem}, x::ZZRingElem) = x
+round(::Type{ZZRingElem}, x::ZZRingElem) = x
 
 ###############################################################################
 #

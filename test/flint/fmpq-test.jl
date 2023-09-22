@@ -168,6 +168,11 @@ end
 
    @test characteristic(R) == 0
 
+   @test nbits(QQFieldElem(12, 1)) == 5
+   @test nbits(QQFieldElem(1, 3)) == 3
+end
+
+@testset "QQFieldElem.rounding" begin
    @test floor(QQFieldElem(2, 3)) == 0
    @test floor(QQFieldElem(-1, 3)) == -1
    @test floor(QQFieldElem(2, 1)) == 2
@@ -176,8 +181,51 @@ end
    @test ceil(QQFieldElem(-1, 3)) == 0
    @test ceil(QQFieldElem(2, 1)) == 2
 
-   @test nbits(QQFieldElem(12, 1)) == 5
-   @test nbits(QQFieldElem(1, 3)) == 3
+   @test trunc(QQFieldElem(2, 3)) == 0
+   @test trunc(QQFieldElem(-1, 3)) == 0
+   @test trunc(QQFieldElem(2, 1)) == 2
+
+   @testset "$func" for func in (trunc, round, ceil, floor)
+      for d in -15:15
+         val = d//3
+         valQ = QQFieldElem(val)
+         @test func(valQ) isa QQFieldElem
+         @test func(valQ) == func(val)
+
+         @test func(QQFieldElem, valQ) isa QQFieldElem
+         @test func(QQFieldElem, valQ) == func(QQFieldElem, val)
+
+         @test func(ZZRingElem, valQ) isa ZZRingElem
+         @test func(ZZRingElem, valQ) == func(ZZRingElem, val)
+
+         @test func(BigInt, valQ) isa BigInt
+         @test func(BigInt, valQ) == func(BigInt, val)
+
+         @test func(Int, valQ) isa Int
+         @test func(Int, valQ) == func(Int, val)
+      end
+   end
+
+   @testset "$mode" for mode in (RoundUp, RoundDown, RoundNearest, RoundNearestTiesAway)
+      for d in -5:5
+         val = d//3
+         valQ = QQFieldElem(val)
+         @test round(valQ, mode) isa QQFieldElem
+         @test round(valQ, mode) == round(val, mode)
+
+         @test round(QQFieldElem, valQ, mode) isa QQFieldElem
+         @test round(QQFieldElem, valQ, mode) == round(val, mode)
+
+         @test round(ZZRingElem, valQ, mode) isa ZZRingElem
+         @test round(ZZRingElem, valQ, mode) == round(val, mode)
+
+         @test round(BigInt, valQ, mode) isa BigInt
+         @test round(BigInt, valQ, mode) == round(val, mode)
+
+         @test round(Int, valQ, mode) isa Int
+         @test round(Int, valQ, mode) == round(val, mode)
+      end
+   end
 end
 
 @testset "QQFieldElem.unary_ops" begin

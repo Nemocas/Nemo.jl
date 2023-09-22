@@ -215,34 +215,7 @@ function (::ZZRing)(x::Rational{Int})
     return ZZRingElem(numerator(x))
 end
 
-function ceil(::Type{ZZRingElem}, a::BigFloat)
-    return ZZRingElem(ceil(BigInt, a))
-end
-
-function ceil(::Type{Int}, a::QQFieldElem)
-    return Int(ceil(ZZRingElem, a))
-end
-
-function floor(::Type{ZZRingElem}, a::BigFloat)
-    return ZZRingElem(floor(BigInt, a))
-end
-
-function floor(::Type{Int}, a::QQFieldElem)
-    return Int(floor(ZZRingElem, a))
-end
-
-function round(::Type{ZZRingElem}, a::BigFloat)
-    return ZZRingElem(round(BigInt, a))
-end
-
-function round(::Type{Int}, a::BigFloat)
-    return Int(round(ZZRingElem, a))
-end
-
 /(a::BigFloat, b::ZZRingElem) = a / BigInt(b)
-
-is_negative(n::ZZRingElem) = cmp(n, 0) < 0
-is_positive(n::ZZRingElem) = cmp(n, 0) > 0
 
 
 ################################################################################
@@ -278,54 +251,32 @@ end
 #
 ################################################################################
 
-Base.floor(::Type{ZZRingElem}, x::Int) = ZZRingElem(x)
+export trunc, round, ceil, floor
 
-Base.ceil(::Type{ZZRingElem}, x::Int) = ZZRingElem(x)
+for sym in (:trunc, :round, :ceil, :floor)
+    @eval begin
+        # support `trunc(ZZRingElem, 1.23)` etc. for arbitrary reals
+        Base.$sym(::Type{ZZRingElem}, a::Real) = ZZRingElem(Base.$sym(BigInt, a))
+        Base.$sym(::Type{ZZRingElem}, a::Rational) = ZZRingElem(Base.$sym(BigInt, a))
 
-Base.floor(::Type{ZZRingElem}, x::QQFieldElem) = fdiv(numerator(x), denominator(x))
+        # for integers we don't need to round in between
+        Base.$sym(::Type{ZZRingElem}, a::Integer) = ZZRingElem(a)
 
-Base.ceil(::Type{ZZRingElem}, x::QQFieldElem) = cdiv(numerator(x), denominator(x))
-
-Base.round(x::QQFieldElem, ::RoundingMode{:Up}) = ceil(x)
-
-Base.round(::Type{ZZRingElem}, x::QQFieldElem, ::RoundingMode{:Up}) = ceil(ZZRingElem, x)
-
-Base.round(x::QQFieldElem, ::RoundingMode{:Down}) = floor(x)
-
-Base.round(::Type{ZZRingElem}, x::QQFieldElem, ::RoundingMode{:Down}) = floor(ZZRingElem, x)
-
-function Base.round(x::QQFieldElem, ::RoundingMode{:Nearest})
-    d = denominator(x)
-    n = numerator(x)
-    if d == 2
-        if mod(n, 4) == 1
-            if n > 0
-                return Base.div(n, d)
-            else
-                return Base.div(n, d) - 1
+        # support `trunc(ZZRingElem, m)` etc. where m is a matrix of reals
+        function Base.$sym(::Type{ZZMatrix}, a::Matrix{<:Real})
+            s = Base.size(a)
+            m = zero_matrix(FlintZZ, s[1], s[2])
+            for i = 1:s[1], j = 1:s[2]
+                m[i, j] = Base.$sym(ZZRingElem, a[i, j])
             end
-        else
-            if n > 0
-                return Base.div(n, d) + 1
-            else
-                return Base.div(n, d)
-            end
+            return m
+        end
+
+        # rounding QQFieldElem to integer via ZZRingElem
+        function Base.$sym(::Type{T}, a::QQFieldElem) where T <: Integer
+            return T(Base.$sym(ZZRingElem, a))
         end
     end
-
-    return floor(x + 1 // 2)
-end
-
-Base.round(x::QQFieldElem, ::RoundingMode{:NearestTiesAway}) = sign(x) * floor(abs(x) + 1 // 2)
-
-Base.round(::Type{ZZRingElem}, x::QQFieldElem, ::RoundingMode{:NearestTiesAway}) = sign(x) == 1 ? floor(ZZRingElem, abs(x) + 1 // 2) : -floor(ZZRingElem, abs(x) + 1 // 2)
-
-function Base.round(::Type{ZZRingElem}, a::QQFieldElem)
-    return round(ZZRingElem, a, RoundNearestTiesAway)
-end
-
-function Base.round(a::QQFieldElem)
-    return round(ZZRingElem, a)
 end
 
 clog(a::Int, b::Int) = clog(ZZRingElem(a), b)

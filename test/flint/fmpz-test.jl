@@ -183,10 +183,6 @@ end
 
    @test denominator(ZZRingElem(12)) == ZZRingElem(1)
 
-   @test floor(ZZRingElem(12)) == ZZRingElem(12)
-
-   @test ceil(ZZRingElem(12)) == ZZRingElem(12)
-
    @test iseven(ZZRingElem(12))
    @test isodd(ZZRingElem(13))
    b = big(2)
@@ -211,6 +207,28 @@ end
    @test !isinf(y)
 
    @test characteristic(ZZ) == 0
+end
+
+@testset "QQFieldElem.rounding" begin
+   @test floor(ZZRingElem(12)) == ZZRingElem(12)
+   @test ceil(ZZRingElem(12)) == ZZRingElem(12)
+   @test trunc(ZZRingElem(12)) == ZZRingElem(12)
+
+   @test floor(ZZRingElem, ZZRingElem(12)) == ZZRingElem(12)
+   @test ceil(ZZRingElem, ZZRingElem(12)) == ZZRingElem(12)
+   @test trunc(ZZRingElem, ZZRingElem(12)) == ZZRingElem(12)
+
+
+   @testset "$func" for func in (trunc, round, ceil, floor)
+      for val in -5:5
+         valZ = ZZRingElem(val)
+         @test func(valZ) isa ZZRingElem
+         @test func(valZ) == func(val)
+         @test func(ZZRingElem, valZ) isa ZZRingElem
+         @test func(ZZRingElem, valZ) == func(ZZRingElem, val)
+      end
+   end
+
 end
 
 @testset "ZZRingElem.binary_ops" begin

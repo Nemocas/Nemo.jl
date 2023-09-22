@@ -97,9 +97,12 @@ Return the sign of $a$ ($-1$, $0$ or $1$) as a fraction.
 """
 sign(a::QQFieldElem) = QQFieldElem(sign(numerator(a)))
 
-sign(::Type{Int}, a::QQFieldElem) = sign(Int, numerator(a))
+sign(::Type{Int}, a::QQFieldElem) = Int(ccall((:fmpq_sgn, libflint), Cint, (Ref{QQFieldElem},), a))
 
 Base.signbit(a::QQFieldElem) = signbit(sign(Int, a))
+
+is_negative(n::QQFieldElem) = sign(Int, n) < 0
+is_positive(n::QQFieldElem) = sign(Int, n) > 0
 
 function abs(a::QQFieldElem)
    z = QQFieldElem()
@@ -168,7 +171,9 @@ characteristic(::QQField) = 0
 Return the greatest integer that is less than or equal to $a$. The result is
 returned as a rational with denominator $1$.
 """
-Base.floor(a::QQFieldElem) = QQFieldElem(fdiv(numerator(a), denominator(a)), 1)
+Base.floor(a::QQFieldElem) = floor(QQFieldElem, a)
+Base.floor(::Type{QQFieldElem}, a::QQFieldElem) = QQFieldElem(floor(ZZRingElem, a), 1)
+Base.floor(::Type{ZZRingElem}, a::QQFieldElem) = fdiv(numerator(a), denominator(a))
 
 @doc raw"""
     ceil(a::QQFieldElem)
@@ -176,7 +181,52 @@ Base.floor(a::QQFieldElem) = QQFieldElem(fdiv(numerator(a), denominator(a)), 1)
 Return the least integer that is greater than or equal to $a$. The result is
 returned as a rational with denominator $1$.
 """
-Base.ceil(a::QQFieldElem) = QQFieldElem(cdiv(numerator(a), denominator(a)), 1)
+Base.ceil(a::QQFieldElem) = ceil(QQFieldElem, a)
+Base.ceil(::Type{QQFieldElem}, a::QQFieldElem) = QQFieldElem(ceil(ZZRingElem, a), 1)
+Base.ceil(::Type{ZZRingElem}, a::QQFieldElem) = cdiv(numerator(a), denominator(a))
+
+Base.trunc(a::QQFieldElem) = trunc(QQFieldElem, a)
+Base.trunc(::Type{QQFieldElem}, a::QQFieldElem) = QQFieldElem(trunc(ZZRingElem, a), 1)
+Base.trunc(::Type{ZZRingElem}, a::QQFieldElem) = is_positive(a) ? floor(ZZRingElem, a) : ceil(ZZRingElem, a)
+
+Base.round(x::QQFieldElem, ::RoundingMode{:Up}) = ceil(x)
+Base.round(::Type{T}, x::QQFieldElem, ::RoundingMode{:Up}) where T = ceil(T, x)
+
+Base.round(x::QQFieldElem, ::RoundingMode{:Down}) = floor(x)
+Base.round(::Type{T}, x::QQFieldElem, ::RoundingMode{:Down}) where T = floor(T, x)
+
+Base.round(x::QQFieldElem, ::RoundingMode{:Nearest}) = round(QQFieldElem, x, RoundNearest)
+function Base.round(::Type{T}, x::QQFieldElem, ::RoundingMode{:Nearest}) where T
+    d = denominator(x)
+    n = numerator(x)
+    if d == 2
+        if mod(n, 4) == 1
+            if n > 0
+                return Base.div(n, d)
+            else
+                return Base.div(n, d) - 1
+            end
+        else
+            if n > 0
+                return Base.div(n, d) + 1
+            else
+                return Base.div(n, d)
+            end
+        end
+    end
+
+    return floor(T, x + 1 // 2)
+end
+
+Base.round(x::QQFieldElem, ::RoundingMode{:NearestTiesAway}) = sign(x) * floor(abs(x) + 1 // 2)
+function Base.round(::Type{T}, x::QQFieldElem, ::RoundingMode{:NearestTiesAway}) where T
+    tmp = floor(T, abs(x) + 1 // 2)
+    return is_positive(x) ? tmp : -tmp
+end
+
+Base.round(a::QQFieldElem) = round(QQFieldElem, a)
+Base.round(::Type{T}, a::QQFieldElem) where T =  round(T, a, RoundNearestTiesAway)
+
 
 nbits(a::QQFieldElem) = nbits(numerator(a)) + nbits(denominator(a))
 
@@ -1137,16 +1187,20 @@ end
 
 convert(::Type{Rational{BigInt}}, a::QQFieldElem) = Rational(a)
 
-function Rational(z::QQFieldElem)
+function Base.Rational{BigInt}(z::QQFieldElem)
    r = Rational{BigInt}(0)
    ccall((:fmpq_get_mpz_frac, libflint), Nothing,
          (Ref{BigInt}, Ref{BigInt}, Ref{QQFieldElem}), r.num, r.den, z)
    return r
 end
 
-function Rational(z::ZZRingElem)
+Rational(z::QQFieldElem) = Rational{BigInt}(z)
+
+function Base.Rational{BigInt}(z::ZZRingElem)
    return Rational{BigInt}(BigInt(z))
 end
+
+Rational(z::ZZRingElem) = Rational{BigInt}(z)
 
 
 ###############################################################################

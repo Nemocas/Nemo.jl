@@ -215,6 +215,24 @@ end
    end
 end
 
+@testset "Matrix.rounding" begin
+    m = [ -1.2 -1.0 -0.7 -0.5 -0.3 0.0  ; 0.0 0.3 0.5 0.7 1.0 1.2 ]
+    @test m isa Matrix{Float64}
+
+    @test trunc(ZZMatrix, m) == ZZMatrix(map(x->trunc(Int,x), m))
+    @test round(ZZMatrix, m) == ZZMatrix(map(x->round(Int,x), m))
+    @test ceil(ZZMatrix, m) == ZZMatrix(map(x->ceil(Int,x), m))
+    @test floor(ZZMatrix, m) == ZZMatrix(map(x->floor(Int,x), m))
+
+    M = map(big, m)
+    @test M isa Matrix{BigFloat}
+
+    @test trunc(ZZMatrix, M) == ZZMatrix(map(x->trunc(Int,x), M))
+    @test round(ZZMatrix, M) == ZZMatrix(map(x->round(Int,x), M))
+    @test ceil(ZZMatrix, M) == ZZMatrix(map(x->ceil(Int,x), M))
+    @test floor(ZZMatrix, M) == ZZMatrix(map(x->floor(Int,x), M))
+end
+
 #=
    TODO: Add tests for the following when there are rings that are not fields
          that have delayed reduction
