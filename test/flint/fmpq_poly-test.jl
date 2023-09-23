@@ -440,7 +440,8 @@ end
    f = 7y^2 + 12y + 3
    g = 11y + 9
 
-   @test compose(f, g) == 847*y^2 + 1518*y + 678
+   @test compose(g, f) == f(g(y))
+   @test compose(g, f) == 847*y^2 + 1518*y + 678
 end
 
 @testset "QQPolyRingElem.derivative" begin

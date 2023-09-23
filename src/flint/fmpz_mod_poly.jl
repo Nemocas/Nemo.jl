@@ -708,7 +708,7 @@ function compose(x::T, y::T) where {T <: Zmodn_fmpz_poly}
   z = parent(x)()
   ccall((:fmpz_mod_poly_compose, libflint), Nothing,
         (Ref{T}, Ref{T}, Ref{T}, Ref{fmpz_mod_ctx_struct}),
-        z, x, y, x.parent.base_ring.ninv)
+        z, y, x, x.parent.base_ring.ninv)
   return z
 end
 

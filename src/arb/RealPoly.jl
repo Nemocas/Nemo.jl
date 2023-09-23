@@ -452,7 +452,7 @@ function compose(x::RealPoly, y::RealPoly, prec::Int = precision(Balls))
    z = parent(x)()
    ccall((:arb_poly_compose, libarb), Nothing,
                 (Ref{RealPoly}, Ref{RealPoly}, Ref{RealPoly}, Int),
-                z, x, y, prec)
+                z, y, x, prec)
    return z
 end
 

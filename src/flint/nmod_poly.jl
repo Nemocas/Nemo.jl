@@ -624,7 +624,7 @@ function compose(x::T, y::T) where T <: Zmodn_poly
   check_parent(x,y)
   z = parent(x)()
   ccall((:nmod_poly_compose, libflint), Nothing,
-          (Ref{T}, Ref{T}, Ref{T}), z, x, y)
+          (Ref{T}, Ref{T}, Ref{T}), z, y, x)
   return z
 end
 

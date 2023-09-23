@@ -5,7 +5,7 @@ for T in [zzModPolyRingElem, fpPolyRingElem, ZZModPolyRingElem, FpPolyRingElem, 
      if parent(f) != parent(a)
         return subst(f, a)
      end
-     return compose(f, a)
+     return compose(a, f)
   end
 
   (f::T)(a::Integer) = evaluate(f, a)
