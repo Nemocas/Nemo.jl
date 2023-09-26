@@ -2014,7 +2014,7 @@ end
 function addmul!(z::arb, x::arb, y::ZZRingElem)
   q = max(bits(z), bits(x))
   ccall((:arb_addmul_fmpz, libarb), Nothing, (Ref{arb}, Ref{arb}, Ref{ZZRingElem}, Int), z, x, y, q)
-  return nothing
+  return z
 end
 
 ################################################################################

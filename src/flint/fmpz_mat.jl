@@ -1427,13 +1427,13 @@ end
 function addmul!(z::ZZMatrix, y::ZZMatrix, x::ZZRingElem)
    ccall((:fmpz_mat_scalar_addmul_fmpz, libflint), Nothing,
                 (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}), z, y, x)
-   return y
+   return z
 end
 
 function addmul!(z::ZZMatrix, y::ZZMatrix, x::Int)
    ccall((:fmpz_mat_scalar_addmul_si, libflint), Nothing,
                 (Ref{ZZMatrix}, Ref{ZZMatrix}, Int), z, y, x)
-   return y
+   return z
 end
 
 function addeq!(z::ZZMatrix, x::ZZMatrix)
