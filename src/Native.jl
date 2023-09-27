@@ -67,6 +67,8 @@ GF(p::Integer, k::Int, s::VarName = :o; cached::Bool = true) = finite_field(p, k
 
 GF(p::ZZRingElem, k::Int, s::VarName = :o; cached::Bool = true) = finite_field(p, k, s, cached = cached)[1]
 
+@alias FiniteField finite_field # for compatibility with Hecke
+
 end # module
 
 using .Native
