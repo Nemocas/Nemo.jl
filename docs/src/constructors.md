@@ -60,7 +60,7 @@ they represent.
 |---------------------------------------|-----------------------------------------------|
 | $R = \mathbb{Z}$                      | `R = ZZ`                                      |
 | $R = \mathbb{Q}$                      | `R = QQ`                                      |
-| $R = \mathbb{F}_{p^n}$                | `R, a = FiniteField(p, n, "a")`               |
+| $R = \mathbb{F}_{p^n}$                | `R, a = finite_field(p, n, "a")`              |
 | $R = \mathbb{Z}/n\mathbb{Z}$          | `R = residue_ring(ZZ, n)`                     |
 | $S = R[x]$                            | `S, x = polynomial_ring(R, "x")`              |
 | $S = R[x, y]$                         | `S, (x, y) = polynomial_ring(R, ["x", "y"])`  |

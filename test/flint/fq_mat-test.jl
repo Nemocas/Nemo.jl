@@ -1,6 +1,6 @@
 @testset "FqPolyRepMatrix.constructors" begin
-  F4, a = FiniteField(ZZRingElem(2), 2, "a")
-  F9, b = FiniteField(ZZRingElem(3), 2, "b")
+  F4, a = finite_field(ZZRingElem(2), 2, "a")
+  F9, b = finite_field(ZZRingElem(3), 2, "b")
 
   R = FqPolyRepMatrixSpace(F4, 2, 2)
 
@@ -167,7 +167,7 @@
 end
 
 @testset "FqPolyRepMatrix.similar" begin
-   F9, b = FiniteField(ZZRingElem(3), 2, "b")
+   F9, b = finite_field(ZZRingElem(3), 2, "b")
    S = matrix_space(F9, 3, 3)
    s = S(ZZRingElem(3))
 
@@ -195,7 +195,7 @@ end
 end
 
 @testset "FqPolyRepMatrix.printing" begin
-  F4, _  = FiniteField(ZZRingElem(2), 2, "a")
+  F4, _  = finite_field(ZZRingElem(2), 2, "a")
   R = FqPolyRepMatrixSpace(F4, 2, 2)
 
   a = R(1)
@@ -205,9 +205,9 @@ end
 end
 
 @testset "FqPolyRepMatrix.manipulation" begin
-  F4, _ = FiniteField(ZZRingElem(2), 2, "a")
+  F4, _ = finite_field(ZZRingElem(2), 2, "a")
   R = FqPolyRepMatrixSpace(F4, 2, 2)
-  F9, _ = FiniteField(ZZRingElem(3), 2, "b")
+  F9, _ = finite_field(ZZRingElem(3), 2, "b")
   S = FqPolyRepMatrixSpace(F9, 2, 2)
 
   ar = [ 1 2; 3 4]
@@ -273,7 +273,7 @@ end
 end
 
 @testset "FqPolyRepMatrix.unary_ops" begin
-  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
 
   R = matrix_space(F17, 3, 4)
   RR = matrix_space(F17, 4, 3)
@@ -290,7 +290,7 @@ end
 end
 
 @testset "FqPolyRepMatrix.binary_ops" begin
-  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
   R = matrix_space(F17, 3, 4)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
@@ -356,10 +356,10 @@ end
 end
 
 @testset "FqPolyRepMatrix.adhoc_binary" begin
-  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
 
   R = matrix_space(F17, 3, 4)
-  F2, _ = FiniteField(ZZRingElem(2), 1, "a")
+  F2, _ = finite_field(ZZRingElem(2), 1, "a")
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 
@@ -395,7 +395,7 @@ end
 end
 
 @testset "FqPolyRepMatrix.comparison" begin
-  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
 
   R = matrix_space(F17, 3, 4)
 
@@ -409,7 +409,7 @@ end
 end
 
 @testset "FqPolyRepMatrix.adhoc_comparison" begin
-  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
 
   R = matrix_space(F17, 3, 4)
 
@@ -423,7 +423,7 @@ end
 end
 
 @testset "FqPolyRepMatrix.powering" begin
-  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
 
   R = matrix_space(F17, 3, 4)
 
@@ -466,7 +466,7 @@ end
 end
 
 @testset "FqPolyRepMatrix.trace_det" begin
-  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
   R = matrix_space(F17, 3, 4)
   RR = matrix_space(F17, 4, 3)
 
@@ -498,7 +498,7 @@ end
 end
 
 @testset "FqPolyRepMatrix.rank" begin
-  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
   R = matrix_space(F17, 3, 4)
   RR = matrix_space(F17, 4, 3)
 
@@ -522,7 +522,7 @@ end
 end
 
 @testset "FqPolyRepMatrix.inv" begin
-  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
   R = matrix_space(F17, 3, 4)
   RR = matrix_space(F17, 4, 3)
 
@@ -542,7 +542,7 @@ end
 end
 
 @testset "FqPolyRepMatrix.solve" begin
-  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
   R = matrix_space(F17, 3, 3)
   S = matrix_space(F17, 3, 4)
 
@@ -632,7 +632,7 @@ end
 
 @testset "FqPolyRepMatrix.lu" begin
 
-  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
   R = matrix_space(F17, 3, 3)
   S = matrix_space(F17, 3, 4)
 
@@ -659,7 +659,7 @@ end
 end
 
 @testset "FqPolyRepMatrix.view" begin
-  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
   R = matrix_space(F17, 3, 3)
   S = matrix_space(F17, 3, 4)
 
@@ -695,7 +695,7 @@ end
 end
 
 @testset "FqPolyRepMatrix.sub" begin
-   F17, _ = FiniteField(ZZRingElem(17), 1, "a")
+   F17, _ = finite_field(ZZRingElem(17), 1, "a")
    S = matrix_space(F17, 3, 3)
 
    A = S([1 2 3; 4 5 6; 7 8 9])
@@ -719,7 +719,7 @@ end
 end
 
 @testset "FqPolyRepMatrix.concatenation" begin
-  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
   R = matrix_space(F17, 3, 3)
   S = matrix_space(F17, 3, 4)
 
@@ -755,7 +755,7 @@ end
 end
 
 @testset "FqPolyRepMatrix.conversion" begin
-  F17, _ = FiniteField(ZZRingElem(17), 1, "a")
+  F17, _ = finite_field(ZZRingElem(17), 1, "a")
   R = matrix_space(F17, 3, 3)
 
   a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
@@ -766,7 +766,7 @@ end
 end
 
 @testset "FqPolyRepMatrix.charpoly" begin
-   F17, _ = FiniteField(ZZRingElem(17), 1, "a")
+   F17, _ = finite_field(ZZRingElem(17), 1, "a")
 
    for dim = 0:5
       S = matrix_space(F17, dim, dim)
@@ -786,7 +786,7 @@ end
 end
 
 @testset "FqPolyRepMatrix.rand" begin
-   F17, _ = FiniteField(ZZRingElem(17), 1, "a")
+   F17, _ = finite_field(ZZRingElem(17), 1, "a")
    S = matrix_space(F17, 3, 3)
    M = rand(S)
    @test parent(M) == S

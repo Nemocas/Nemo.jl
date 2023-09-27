@@ -167,7 +167,7 @@
 end
 
 @testset "fqPolyRepMatrix.similar" begin
-   F9, b = FiniteField(3, 2, "b")
+   F9, b = finite_field(3, 2, "b")
    S = fqPolyRepMatrixSpace(F9, 2, 2)
    s = S(ZZRingElem(3))
 

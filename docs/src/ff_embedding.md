@@ -34,10 +34,10 @@ embed(::fqPolyRepField, ::fqPolyRepField)
 **Examples**
 
 ```jldoctest; filter = r"[gG]F"
-julia> k2, x2 = FiniteField(19, 2, "x2")
+julia> k2, x2 = finite_field(19, 2, "x2")
 (Finite field of degree 2 over GF(19), x2)
 
-julia> k4, x4 = FiniteField(19, 4, "x4")
+julia> k4, x4 = finite_field(19, 4, "x4")
 (Finite field of degree 4 over GF(19), x4)
 
 julia> f = embed(k2, k4)
@@ -62,10 +62,10 @@ preimage_map(::FinFieldMorphism)
 **Examples**
 
 ```jldoctest
-julia> k7, x7 = FiniteField(13, 7, "x7")
+julia> k7, x7 = finite_field(13, 7, "x7")
 (Finite field of degree 7 over GF(13), x7)
 
-julia> k21, x21 = FiniteField(13, 21, "x21")
+julia> k21, x21 = finite_field(13, 21, "x21")
 (Finite field of degree 21 over GF(13), x21)
 
 julia> s = preimage_map(k7, k21)

@@ -16,10 +16,10 @@ Finite fields are constructed using the `FlintFiniteField` function. However,
 for convenience we define
 
 ```
-FiniteField = FlintFiniteField
+finite_field = FlintFiniteField
 ```
 
-so that finite fields can be constructed using `FiniteField` rather than
+so that finite fields can be constructed using `finite_field` rather than
 `FlintFiniteField`. Note that this is the name of the constructor, but not of
 finite field type.
 
@@ -69,16 +69,16 @@ resulting parent objects to coerce various elements into those fields.
 **Examples**
 
 ```jldoctest
-julia> R, x = FiniteField(7, 3, "x")
+julia> R, x = finite_field(7, 3, "x")
 (Finite field of degree 3 over GF(7), x)
 
-julia> S, y = FiniteField(ZZ(12431351431561), 2, "y")
+julia> S, y = finite_field(ZZ(12431351431561), 2, "y")
 (Finite field of degree 2 over GF(12431351431561), y)
 
 julia> T, t = polynomial_ring(residue_ring(ZZ, 12431351431561), "t")
 (Univariate polynomial ring in t over ZZ/(12431351431561), t)
 
-julia> U, z = FiniteField(t^2 + 7, "z")
+julia> U, z = finite_field(t^2 + 7, "z")
 (Finite field of degree 2 over GF(12431351431561), z)
 
 julia> a = R(5)
@@ -119,7 +119,7 @@ modulus(::FqPolyRepField)
 **Examples**
 
 ```jldoctest
-julia> R, x = FiniteField(ZZ(7), 5, "x")
+julia> R, x = finite_field(ZZ(7), 5, "x")
 (Finite field of degree 5 over GF(7), x)
 
 julia> c = gen(R)
@@ -161,7 +161,7 @@ pth_root(::FqPolyRepFieldElem)
 **Examples**
 
 ```jldoctest
-julia> R, x = FiniteField(ZZ(7), 5, "x")
+julia> R, x = finite_field(ZZ(7), 5, "x")
 (Finite field of degree 5 over GF(7), x)
 
 julia> a = x^4 + 3x^2 + 6x + 1
@@ -192,7 +192,7 @@ lift(::FpPolyRing, ::FqPolyRepFieldElem)
 **Examples**
 
 ```jldoctest
-julia> R, x = FiniteField(23, 2, "x")
+julia> R, x = finite_field(23, 2, "x")
 (Finite field of degree 2 over GF(23), x)
 
 julia> S, y = polynomial_ring(GF(23), "y")

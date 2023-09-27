@@ -182,3 +182,5 @@
 @alias NmodRelSeriesRing zzModRelPowerSeriesRing
 
 @alias MPolyElem MPolyRingElem
+
+@alias FiniteField finite_field

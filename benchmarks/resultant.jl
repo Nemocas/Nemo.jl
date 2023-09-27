@@ -1,6 +1,6 @@
 function benchmark_resultant()
    print("benchmark_resultant ... ")
-   R, x = FiniteField(7, 11, "x")
+   R, x = finite_field(7, 11, "x")
    S, y = polynomial_ring(R, "y")
    T = residue_ring(S, y^3 + 3x*y + 1)
    U, z = polynomial_ring(T, "z")

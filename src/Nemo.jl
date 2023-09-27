@@ -48,7 +48,7 @@ import AbstractAlgebra: nullspace, @show_name, @show_special, find_name,
                         get_cached!,
                         @show_special_elem, force_coerce, force_op, expressify
 
-# We don't want the QQ, ZZ, FiniteField, number_field from AbstractAlgebra
+# We don't want the QQ, ZZ, finite_field, number_field from AbstractAlgebra
 # as they are for parents of Julia types or naive implementations
 # We only import AbstractAlgebra, not export
 # We do not want the AbstractAlgebra version of certain functions as the Base version
@@ -76,7 +76,7 @@ export PadicField, QadicField, NGFiniteField
 export QQBar
 
 # Things/constants which are also defined in AbstractAlgebra:
-export ZZ, QQ, FiniteField, number_field
+export ZZ, QQ, finite_field, number_field
 
 
 # FIXME/TODO: for compatibility with AbstractAlgebra before 0.28.x; remove in the future
@@ -477,7 +477,7 @@ const _ecm_nCs = Vector{Int}[_ecm_nC]
 
 ###############################################################################
 #
-#   Set domain for ZZ, QQ, PadicField, FiniteField to Flint
+#   Set domain for ZZ, QQ, PadicField, finite_field to Flint
 #
 ###############################################################################
 
@@ -485,7 +485,7 @@ const ZZ = FlintZZ
 const QQ = FlintQQ
 const PadicField = FlintPadicField
 const QadicField = FlintQadicField
-const FiniteField = FlintFiniteField
+const finite_field = FlintFiniteField
 
 ###############################################################################
 #

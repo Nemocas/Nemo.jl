@@ -82,7 +82,7 @@ Here is an example using generic recursive ring constructions.
 ```jldoctest
 julia> using Nemo
 
-julia> R, x = FiniteField(7, 11, "x")
+julia> R, x = finite_field(7, 11, "x")
 (Finite field of degree 11 over GF(7), x)
 
 julia> S, y = polynomial_ring(R, "y")

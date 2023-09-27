@@ -3,7 +3,7 @@
 end
 
 @testset "fqPolyRepRelPowerSeriesRingElem.constructors" begin
-   R, t = FiniteField(23, 5, "t")
+   R, t = finite_field(23, 5, "t")
    
    S1 = RelPowerSeriesRing(R, 30)
    S2 = RelPowerSeriesRing(R, 30)
@@ -45,7 +45,7 @@ end
 end
 
 @testset "fqPolyRepRelPowerSeriesRingElem.printing" begin
-   R, t = FiniteField(23, 5, "t")
+   R, t = finite_field(23, 5, "t")
    S, x = power_series_ring(R, 30, "x")
 
    b = (t^2 + 1)*x^2 + (t + 3)x + O(x^4)
@@ -54,7 +54,7 @@ end
 end
 
 @testset "fqPolyRepRelPowerSeriesRingElem.manipulation" begin
-   R, t = FiniteField(23, 5, "t")
+   R, t = finite_field(23, 5, "t")
    S, x = power_series_ring(R, 30, "x")
 
    @test max_precision(S) == 30
@@ -90,7 +90,7 @@ end
 end
 
 @testset "fqPolyRepRelPowerSeriesRingElem.similar" begin
-   R0, a = FiniteField(23, 2, "a")
+   R0, a = finite_field(23, 2, "a")
    R, x = power_series_ring(R0, 10, "x")
    S, y = power_series_ring(ZZ, 10, "y")
 
@@ -138,7 +138,7 @@ end
 end
 
 @testset "fqPolyRepRelPowerSeriesRingElem.rel_series" begin
-   R, a = FiniteField(23, 2, "a")
+   R, a = finite_field(23, 2, "a")
    f = rel_series(R, [1, 2, 3], 3, 5, 2, "y")
 
    @test isa(f, fqPolyRepRelPowerSeriesRingElem)
@@ -181,7 +181,7 @@ end
 end
 
 @testset "fqPolyRepRelPowerSeriesRingElem.unary_ops" begin
-   R, t = FiniteField(23, 5, "t")
+   R, t = finite_field(23, 5, "t")
    S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
@@ -193,7 +193,7 @@ end
 end
 
 @testset "fqPolyRepRelPowerSeriesRingElem.binary_ops" begin
-   R, t = FiniteField(23, 5, "t")
+   R, t = finite_field(23, 5, "t")
    S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
@@ -331,7 +331,7 @@ end
 end
 
 @testset "fqPolyRepRelPowerSeriesRingElem.adhoc_binary_ops" begin
-   R, t = FiniteField(23, 5, "t")
+   R, t = finite_field(23, 5, "t")
    S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
@@ -349,7 +349,7 @@ end
 end
 
 @testset "fqPolyRepRelPowerSeriesRingElem.comparison" begin
-   R, t = FiniteField(23, 5, "t")
+   R, t = finite_field(23, 5, "t")
    S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
@@ -369,7 +369,7 @@ end
 end
 
 @testset "fqPolyRepRelPowerSeriesRingElem.adhoc_comparison" begin
-   R, t = FiniteField(23, 5, "t")
+   R, t = finite_field(23, 5, "t")
    S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
@@ -389,7 +389,7 @@ end
 end
 
 @testset "fqPolyRepRelPowerSeriesRingElem.powering" begin
-   R, t = FiniteField(23, 5, "t")
+   R, t = finite_field(23, 5, "t")
    S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
@@ -409,7 +409,7 @@ end
 end
 
 @testset "fqPolyRepRelPowerSeriesRingElem.shift" begin
-   R, t = FiniteField(23, 5, "t")
+   R, t = finite_field(23, 5, "t")
    S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
@@ -431,7 +431,7 @@ end
 end
 
 @testset "fqPolyRepRelPowerSeriesRingElem.truncation" begin
-   R, t = FiniteField(23, 5, "t")
+   R, t = finite_field(23, 5, "t")
    S, x = power_series_ring(R, 30, "x")
 
    a = 2x + x^3
@@ -451,7 +451,7 @@ end
 end
 
 @testset "fqPolyRepRelPowerSeriesRingElem.inversion" begin
-   R, t = FiniteField(23, 5, "t")
+   R, t = finite_field(23, 5, "t")
    S, x = power_series_ring(R, 30, "x")
 
    a = 1 + x + 2x^2 + O(x^5)
@@ -463,7 +463,7 @@ end
 end
 
 @testset "fqPolyRepRelPowerSeriesRingElem.exact_division" begin
-   R, t = FiniteField(23, 5, "t")
+   R, t = finite_field(23, 5, "t")
    S, x = power_series_ring(R, 30, "x")
 
    a = x + x^3
@@ -481,7 +481,7 @@ end
 end
 
 @testset "fqPolyRepRelPowerSeriesRingElem.adhoc_exact_division" begin
-   R, t = FiniteField(23, 5, "t")
+   R, t = finite_field(23, 5, "t")
    S, x = power_series_ring(R, 30, "x")
 
    a = x + x^3
@@ -503,7 +503,7 @@ end
 end
 
 @testset "fqPolyRepRelPowerSeriesRingElem.square_root" begin
-   S, t = FiniteField(31, 5, "t")
+   S, t = finite_field(31, 5, "t")
    R, x = power_series_ring(S, 30, "x")
 
    for iter = 1:300
@@ -513,7 +513,7 @@ end
    end
 
    for p in [2, 7, 19, 65537]
-      R, t = FiniteField(p, 2, "t")
+      R, t = finite_field(p, 2, "t")
 
       S, x = power_series_ring(R, 10, "x")
 
@@ -544,7 +544,7 @@ end
 end
 
 @testset "fqPolyRepRelPowerSeriesRingElem.special_functions" begin
-   R, t = FiniteField(23, 5, "t")
+   R, t = finite_field(23, 5, "t")
    S, x = power_series_ring(R, 30, "x")
 
    @test isequal(exp(x + O(x^10)), 18*x^9+x^8+8*x^7+10*x^6+14*x^5+x^4+4*x^3+12*x^2+x+1+O(x^10))
@@ -553,7 +553,7 @@ end
 end
 
 @testset "fqPolyRepRelPowerSeriesRingElem.unsafe_operators" begin
-   S, t = FiniteField(23, 5, "t")
+   S, t = finite_field(23, 5, "t")
    R, x = power_series_ring(S, 30, "x")
 
    for iter = 1:300

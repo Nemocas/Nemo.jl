@@ -346,7 +346,7 @@ function intersections(k::T, K::T) where T <: FinField
         # and we embed it in k and S
         else
             # kc of same type as k but degree c
-            kc = FiniteField(k, c, string("x", c))
+            kc = finite_field(k, c, string("x", c))
             embed(kc, k)
             for g in subK[l]
                 embed(kc, domain(g))
