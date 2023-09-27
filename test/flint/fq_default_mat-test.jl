@@ -803,7 +803,7 @@ end
 end
 
 @testset "FqMatrix.pointer_fun" begin
-  ps = fmpz[2, 1073741827, 1180591620717411303449]
+  ps = ZZRingElem[2, 1073741827, 1180591620717411303449]
   degs = [1, 2]
   for p in ps
     for d in degs

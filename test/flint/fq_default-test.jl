@@ -95,11 +95,11 @@ end
 @testset "FqFieldElem.conversions" begin
    U, a = NGFiniteField(ZZRingElem(7), 5, "a")
 
-   for T in [Int, Int128, BigInt, fmpz]
+   for T in [Int, Int128, BigInt, ZZRingElem]
      @test isone(U(T(1)))
    end
 
-   for T in [Int, Int128, BigInt, fmpz]
+   for T in [Int, Int128, BigInt, ZZRingElem]
      @test (U(1//T(2))) == inv(U(2))
    end
 

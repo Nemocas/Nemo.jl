@@ -46,7 +46,7 @@ function test_poly_constructors(R)
     @test isa(c, PolyRingElem)
     @test parent(c) == Rx
 
-    d = Rx(fmpz(3))
+    d = Rx(ZZ(3))
 
     @test isa(d, PolyRingElem)
     @test parent(d) == Rx
@@ -66,7 +66,7 @@ function test_poly_constructors(R)
     @test isa(f, PolyRingElem)
     @test parent(f) == Rx
 
-    g = Rx([fmpz(1), fmpz(2), fmpz(3)])
+    g = Rx([ZZ(1), ZZ(2), ZZ(3)])
 
     @test isa(g, PolyRingElem)
     @test parent(g) == Rx
@@ -81,12 +81,12 @@ function test_poly_constructors(R)
     @test isa(m, PolyRingElem)
     @test parent(e) == Rx
 
-    n = Rx(fmpz(1):fmpz(3))
+    n = Rx(ZZ(1):ZZ(3))
 
     @test isa(n, PolyRingElem)
     @test parent(e) == Rx
 
-    _a = polynomial_ring(ZZ, "y")[1]([fmpz(1),fmpz(2),fmpz(3)])
+    _a = polynomial_ring(ZZ, "y")[1]([ZZ(1),ZZ(2),ZZ(3)])
 
     k = Rx(_a)
 

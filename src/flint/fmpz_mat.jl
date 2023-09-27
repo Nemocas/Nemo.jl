@@ -1141,7 +1141,7 @@ function cansolve(a::ZZMatrix, b::ZZMatrix)
    b = deepcopy(b)
    z = similar(a, ncols(b), ncols(a))
    l = min(nrows(a), ncols(a))
-   t = fmpz() # temp. variable
+   t = ZZRingElem() # temp. variable
 
    for i = 1:ncols(b)
      for j = 1:l
