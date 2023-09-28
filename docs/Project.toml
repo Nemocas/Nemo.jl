@@ -3,4 +3,4 @@ AbstractAlgebra = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 
 [compat]
-Documenter = "~0.27"
+Documenter = "1.0"
