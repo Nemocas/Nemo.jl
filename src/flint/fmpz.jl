@@ -1851,27 +1851,6 @@ If $n < 0$ we throw a `DomainError()`.
 rising_factorial(x::ZZRingElem, n::ZZRingElem) = rising_factorial(x, Int(n))
 
 @doc raw"""
-    rising_factorial(x::Int, n::Int)
-
-Return the rising factorial of $x$, i.e. $x(x + 1)(x + 2)\ldots (x + n - 1)$.
-If $n < 0$ we throw a `DomainError()`.
-"""
-function rising_factorial(x::Int, n::Int)
-    n < 0 && throw(DomainError(n, "Argument must be non-negative"))
-    z = ZZRingElem()
-    if x < 0
-       if n <= -x # we don't pass zero
-          z = isodd(n) ? -rising_factorial(-x - n + 1, n) :
-                          rising_factorial(-x - n + 1, n)
-       end
-    else
-       ccall((:fmpz_rfac_uiui, libflint), Nothing,
-             (Ref{ZZRingElem}, UInt, UInt), z, x, n)
-    end
-    return Int(z)
-end
-
-@doc raw"""
     primorial(x::Int)
 
 Return the primorial of $x$, i.e. the product of all primes less than or
