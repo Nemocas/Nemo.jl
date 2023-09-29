@@ -37,6 +37,8 @@ end
 
 const FlintZZ = ZZRing()
 
+integer_ring() = ZZRing()
+
 @doc zz_ring_doc
 mutable struct ZZRingElem <: RingElem
     d::Int
@@ -162,6 +164,8 @@ struct QQField <: FracField{ZZRingElem}
 end
 
 const FlintQQ = QQField()
+
+rational_field() = FlintQQ
 
 @doc qq_field_doc
 mutable struct QQFieldElem <: FracElem{ZZRingElem}

@@ -1,3 +1,5 @@
+import Nemo: AbstractAlgebra.PrettyPrinting
+
 function test_elem(R::QQField)
    return rand_bits(ZZ, rand(0:100))//rand_bits(ZZ, rand(1:100))
 end
@@ -537,4 +539,15 @@ end
 
   @test b_copy == b
   @test c_copy == c
+end
+
+@testset "QQFieldElem.printing" begin
+  @test FlintQQ === rational_field()
+  @test PrettyPrinting.detailed(FlintQQ) == "Rational field"
+  @test PrettyPrinting.oneline(FlintQQ) == "Rational field"
+  @test PrettyPrinting.supercompact(FlintQQ) == "QQ"
+
+  io = PrettyPrinting.pretty(IOBuffer())
+  print(IOContext(io, :supercompact => true), PrettyPrinting.Lowercase(), FlintQQ)
+  @test String(take!(io)) == "QQ"
 end

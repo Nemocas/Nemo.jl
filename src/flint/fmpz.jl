@@ -38,7 +38,7 @@ export ZZRingElem, FlintZZ, ZZRing, parent, show, convert, hash, bell,
        one, zero, divexact, fits, sign, nbits, deepcopy, tdivpow2, fdivpow2,
        cdivpow2, flog, clog, cmpabs, clrbit!, setbit!, combit!, crt,
        crt_with_lcm, divisible, divisors, prime_divisors, divisor_lenstra,
-       fmodpow2,
+       fmodpow2, integer_ring,
        gcdinv, gcd_with_cofactors,
        is_probable_prime, jacobi_symbol, kronecker_symbol, remove, root, size,
        isqrtrem, sqrtmod, trailing_zeros, divisor_sigma, euler_phi, fibonacci,
@@ -271,9 +271,8 @@ show(io::IO, x::ZZRingElem) = print(io, string(x))
 
 function show(io::IO, a::ZZRing)
    if get(io, :supercompact, false)
-      io = pretty(io)
       # no nested printing
-      print(io, LowercaseOff(), "ZZ")
+      print(pretty(io), LowercaseOff(), "ZZ")
    else
       # nested printing allowed, preferably supercompact
       print(io, "Integer ring")

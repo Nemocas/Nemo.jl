@@ -8,7 +8,7 @@ export QQFieldElem, FlintQQ, fraction_field, Rational, QQField, height,
        height_bits, isless, reconstruct, next_minimal, next_signed_minimal,
        next_calkin_wilf, next_signed_calkin_wilf, dedekind_sum, harmonic,
        bernoulli, bernoulli_cache, rand_bits, simplest_between, valuation!,
-       remove!
+       remove!, rational_field
 
 ###############################################################################
 #
@@ -218,8 +218,7 @@ end
 function show(io::IO, a::QQField)
   if get(io, :supercompact, false)
     # no nested printing
-    io = AbstractAlgebra.pretty(io)
-    print(io, AbstractAlgebra.LowercaseOff(), "QQ")
+    print(pretty(io), LowercaseOff(), "QQ")
   else
     # nested printing allowed, preferably supercompact
     print(io, "Rational field")

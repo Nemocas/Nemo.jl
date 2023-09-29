@@ -16,7 +16,7 @@ RandomExtensions = "fb686558-2515-59ef-acaa-46db3789a887"
 SHA = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 
 [compat]
-AbstractAlgebra = "0.32.3"
+AbstractAlgebra = "0.32.4"
 Antic_jll = "~0.201.500"
 Arb_jll = "~200.2300.000"
 Calcium_jll = "~0.401.100"

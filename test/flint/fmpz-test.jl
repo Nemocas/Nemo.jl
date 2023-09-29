@@ -1,8 +1,10 @@
+import Nemo: AbstractAlgebra.PrettyPrinting
+
 function test_elem(R::ZZRing)
    return rand_bits(ZZ, rand(0:100))
 end
 
-@testset "ZZFieldElem.conformance_tests" begin
+@testset "ZZRingElem.conformance_tests" begin
    test_Ring_interface_recursive(FlintZZ)
 end
 
@@ -1371,3 +1373,13 @@ end
    @test ncdivrem(ZZ(-6), ZZ(-4)) == (+2, +2)
 end
 
+@testset "ZZRingElem.printing" begin
+  @test FlintZZ === integer_ring()
+  @test PrettyPrinting.detailed(FlintZZ) == "Integer ring"
+  @test PrettyPrinting.oneline(FlintZZ) == "Integer ring"
+  @test PrettyPrinting.supercompact(FlintZZ) == "ZZ"
+
+  io = PrettyPrinting.pretty(IOBuffer())
+  print(IOContext(io, :supercompact => true), PrettyPrinting.Lowercase(), FlintZZ)
+  @test String(take!(io)) == "ZZ"
+end
