@@ -426,10 +426,18 @@ function Random.seed!(a::rand_ctx, s::Integer)
    # two given seeds which could be "not very different"
    # (cf. the documentation of `gmp_randseed`).
    # Hashing has a negligible cost compared to the call to `gmp_randseed`.
-   ctx = SHA.SHA2_512_CTX()
-   seed = Random.make_seed(s)::Vector{UInt32}
-   SHA.update!(ctx, reinterpret(UInt8, seed))
-   digest = reinterpret(UInt, SHA.digest!(ctx))
+   if VERSION >= v"1.11.0-DEV.575"
+      # make seed was removed and hash_seed takes its place
+      # but hash_seed already does the hashing
+      # (although with SHA2_256 instead)
+      digest = Random.hash_seed(s)
+   else
+      ctx = SHA.SHA2_512_CTX()
+      seed = Random.make_seed(s)::Vector{UInt32}
+      SHA.update!(ctx, reinterpret(UInt8, seed))
+      digest = SHA.digest!(ctx)
+   end
+   digest = reinterpret(UInt, digest)
    @assert Base.GMP.Limb == UInt
 
    # two last words go for flint_randseed!
