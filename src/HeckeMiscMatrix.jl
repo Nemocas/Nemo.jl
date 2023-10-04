@@ -547,17 +547,6 @@ function is_lower_triangular(M::ZZMatrix)
     return true
 end
 
-function is_lower_triangular(M::MatElem)
-    for i = 1:nrows(M)
-        for j = i+1:ncols(M)
-            if !iszero(M[i, j])
-                return false
-            end
-        end
-    end
-    return true
-end
-
 export compare_index
 
 #Returns a positive integer if A[i, j] > b, negative if A[i, j] < b, 0 otherwise
