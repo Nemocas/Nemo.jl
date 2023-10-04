@@ -67,7 +67,7 @@ resulting parent objects to coerce various elements into those fields.
 ```julia
 R, x = polynomial_ring(QQ, "x")
 K, a = number_field(x^3 + 3x + 1, "a")
-L, b = CyclotomicField(5, "b")
+L, b = cyclotomic_field(5, "b")
 M, c = CyclotomicRealField(5, "c")
 
 d = K(3)

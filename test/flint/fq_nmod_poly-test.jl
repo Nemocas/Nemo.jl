@@ -576,7 +576,7 @@ end
 @testset "issue #1353" begin
    F, _ = finite_field(2, 1, "1")
    E, a = finite_field(2, 15, "a")
-   S, x = PolynomialRing(F, "x")
+   S, x = polynomial_ring(F, "x")
    
    @test_throws ErrorException x+a
 end
