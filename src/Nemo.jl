@@ -421,13 +421,25 @@ different versions of Nemo.
 randseed!(seed::Union{Integer,Nothing}=nothing) =
    Random.seed!(_flint_rand_states[Threads.threadid()], seed)
 
+function make_seed(n::Integer)
+    n < 0 && throw(DomainError(n, "`n` must be non-negative."))
+    seed = UInt32[]
+    while true
+        push!(seed, n & 0xffffffff)
+        n >>= 32
+        if n == 0
+            return seed
+        end
+    end
+end
+
 function Random.seed!(a::rand_ctx, s::Integer)
    # we hash the seed to obtain better independence of streams for
    # two given seeds which could be "not very different"
    # (cf. the documentation of `gmp_randseed`).
    # Hashing has a negligible cost compared to the call to `gmp_randseed`.
    ctx = SHA.SHA2_512_CTX()
-   seed = Random.make_seed(s)::Vector{UInt32}
+   seed = make_seed(s)::Vector{UInt32}
    SHA.update!(ctx, reinterpret(UInt8, seed))
    digest = reinterpret(UInt, SHA.digest!(ctx))
    @assert Base.GMP.Limb == UInt
