@@ -41,9 +41,9 @@ julia> k4, x4 = finite_field(19, 4, "x4")
 (Finite field of degree 4 over GF(19), x4)
 
 julia> f = embed(k2, k4)
-Morphism of finite fields from
-  from finite field of degree 2 over gF(19)
-  to finite field of degree 4 over gF(19)
+Morphism of finite fields
+  from finite field of degree 2 over GF(19)
+  to finite field of degree 4 over GF(19)
 
 julia> y = f(x2)
 6*x4^3 + 5*x4^2 + 9*x4 + 17
@@ -69,7 +69,9 @@ julia> k21, x21 = finite_field(13, 21, "x21")
 (Finite field of degree 21 over GF(13), x21)
 
 julia> s = preimage_map(k7, k21)
-Preimage of the morphism from Finite field of degree 7 over GF(13) to Finite field of degree 21 over GF(13)
+Preimage of a morphism
+  from finite field of degree 7 over GF(13)
+  to finite field of degree 21 over GF(13)
 
 julia> y = k21(x7);
 
