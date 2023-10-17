@@ -3005,7 +3005,7 @@ is_prime_power(::IntegerUnion)
 function is_prime_power(q::ZZRingElem)
   iszero(q) && return false
   e, a = _maximal_integer_root(q)
-  return isprime(a)
+  return is_prime(a)
 end
 
 is_prime_power(q::Integer) = is_prime_power(ZZRingElem(q))
@@ -3021,12 +3021,12 @@ is_prime_power_with_data(::IntegerUnion)
 function is_prime_power_with_data(q::ZZRingElem)
   iszero(q) && return false, 1, q
   e, a = _maximal_integer_root(q)
-  return isprime(a), e, a
+  return is_prime(a), e, a
 end
 
 function is_prime_power_with_data(q::Integer)
   e, a = _maximal_integer_root(ZZRingElem(q))
-  return isprime(a), e, typeof(q)(a)
+  return is_prime(a), e, typeof(q)(a)
 end
 
 ###############################################################################

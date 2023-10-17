@@ -303,33 +303,33 @@ end
 
    @test sqrt(R(121)) == 3 + 5*7^1 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + O(R, 7^6)
 
-   @test issquare(a)
-   @test issquare(b)
-   @test issquare(c)
+   @test is_square(a)
+   @test is_square(b)
+   @test is_square(c)
 
    @test_throws ErrorException sqrt(3*7 + 1*7^2 + O(R, 7^3))
    @test_throws ErrorException sqrt(3*7^2 + 1*7^3 + O(R, 7^4))
    
-   @test !issquare(3*7 + 1*7^2 + O(R, 7^3))
-   @test !issquare(3*7^2 + 1*7^3 + O(R, 7^4))
+   @test !is_square(3*7 + 1*7^2 + O(R, 7^3))
+   @test !is_square(3*7^2 + 1*7^3 + O(R, 7^4))
 
-   f1, s1 = issquare_with_sqrt(a)
+   f1, s1 = is_square_with_sqrt(a)
 
    @test f1 && s1^2 == a
 
-   f2, s2 = issquare_with_sqrt(b)
+   f2, s2 = is_square_with_sqrt(b)
 
    @test f2 && s2^2 == b
 
-   f3, s3 = issquare_with_sqrt(c)
+   f3, s3 = is_square_with_sqrt(c)
 
    @test f3 && s3^2 == c
 
-   f4, s4 = issquare_with_sqrt(3*7 + 1*7^2 + O(R, 7^3))
+   f4, s4 = is_square_with_sqrt(3*7 + 1*7^2 + O(R, 7^3))
 
    @test !f4
 
-   f5, s5 = issquare_with_sqrt(3*7^2 + 1*7^3 + O(R, 7^4))
+   f5, s5 = is_square_with_sqrt(3*7^2 + 1*7^3 + O(R, 7^4))
 
    @test !f5
 
@@ -337,23 +337,23 @@ end
 
    d = 1 + 1*2 + 1*2^3 + O(R, 2^5)
 
-   @test !issquare(d)
+   @test !is_square(d)
 
    m = 1*2 + 1*2^2 + 1*2^3 + O(R, 2^5)
 
-   @test !issquare(m)
+   @test !is_square(m)
 
-   f6, s6 = issquare_with_sqrt(d)
+   f6, s6 = is_square_with_sqrt(d)
 
    @test !f6
 
-   f7, s7 = issquare_with_sqrt(d)
+   f7, s7 = is_square_with_sqrt(d)
 
    @test !f7
 
-   @test issquare(d^2)
+   @test is_square(d^2)
 
-   f8, s8 = issquare_with_sqrt(d^2)
+   f8, s8 = is_square_with_sqrt(d^2)
 
    @test f8 && s8^2 == d^2 
 end

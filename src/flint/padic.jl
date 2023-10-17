@@ -536,7 +536,7 @@ function Base.sqrt(a::padic; check::Bool=true)
    return z
 end
 
-function issquare(a::padic)
+function is_square(a::padic)
    if iszero(a)
       return true
    end
@@ -558,7 +558,7 @@ function issquare(a::padic)
    end 
 end
 
-function issquare_with_sqrt(a::padic)
+function is_square_with_sqrt(a::padic)
    R = parent(a)
    if (a.v % 2) != 0
       return false, zero(R)

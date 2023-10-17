@@ -384,27 +384,27 @@ end
 
       for iter in 1:1000
          f = rand(S, -1:10)
-         while issquare(f)
+         while is_square(f)
             f = rand(S, -1:10)
          end
 
          g0 = rand(S, -1:10)
          g = g0^2
 
-         @test issquare(g)
+         @test is_square(g)
          @test sqrt(g)^2 == g
 
          if !iszero(g)
-            @test !issquare(f*g)
+            @test !is_square(f*g)
             @test_throws ErrorException sqrt(f*g)
          end
 
-         f1, s1 = issquare_with_sqrt(g)
+         f1, s1 = is_square_with_sqrt(g)
 
          @test f1 && s1^2 == g
 
          if !iszero(g)
-            f2, s2 = issquare_with_sqrt(f*g)
+            f2, s2 = is_square_with_sqrt(f*g)
 
             @test !f2
          end

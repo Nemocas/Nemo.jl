@@ -870,7 +870,7 @@ end
 # in triplicate.... and probably cases missing...
 export elem_to_mat_row!
 
-function elem_to_mat_row!(M::MatElem, i::Int, a::ResElem{T}) where {T<:PolyElem}
+function elem_to_mat_row!(M::MatElem, i::Int, a::ResElem{T}) where {T<:PolyRingElem}
     z = zero(parent(M[1, 1]))
     for j = 0:degree(a.data)
         M[i, j+1] = coeff(a.data, j)
@@ -1037,7 +1037,7 @@ function mul!(res::QQMPolyRingElem, a::QQMPolyRingElem, c::ZZRingElem)
 end
 
 #@doc raw"""
-#    is_univariate(f::Generic.MPoly{T}) where T <: NumFieldElem -> Bool, PolyElem{T}
+#    is_univariate(f::Generic.MPoly{T}) where T <: NumFieldElem -> Bool, PolyRingElem{T}
 #
 #Tests if $f$ involves only one variable. If so, return a corresponding univariate polynomial.
 #"""
@@ -1387,7 +1387,7 @@ function defining_polynomial(k::fpField)
     return x - k(1)
 end
 
-function norm(f::PolyElem{padic})
+function norm(f::PolyRingElem{padic})
     return f
 end
 

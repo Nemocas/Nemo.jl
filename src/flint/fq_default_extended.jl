@@ -644,7 +644,7 @@ function NGFiniteField(a::IntegerUnion, s::VarName = :o; cached::Bool = true, ch
 end
 
 function NGFiniteField(f::FqPolyRingElem, s::VarName = :o; cached::Bool = true, check::Bool = true, absolute::Bool = false)
-  (check && !isirreducible(f)) && error("Defining polynomial must be irreducible")
+  (check && !is_irreducible(f)) && error("Defining polynomial must be irreducible")
   # Should probably have its own cache
   F = FqField(f, Symbol(s), cached, absolute)
   return F, gen(F)

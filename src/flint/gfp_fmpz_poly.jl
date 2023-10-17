@@ -325,7 +325,7 @@ function Base.sqrt(x::FpPolyRingElem; check::Bool=true)
    return s
 end
 
-function issquare(x::FpPolyRingElem)
+function is_square(x::FpPolyRingElem)
    s = parent(x)()
    flag = Bool(ccall((:fmpz_mod_poly_sqrt, libflint), Cint,
                      (Ref{FpPolyRingElem}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}),
@@ -333,7 +333,7 @@ function issquare(x::FpPolyRingElem)
    return flag
 end
 
-function issquare_with_sqrt(x::FpPolyRingElem)
+function is_square_with_sqrt(x::FpPolyRingElem)
    s = parent(x)()
    flag = Bool(ccall((:fmpz_mod_poly_sqrt, libflint), Cint,
                      (Ref{FpPolyRingElem}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}),

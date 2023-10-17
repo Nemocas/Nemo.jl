@@ -379,7 +379,7 @@ end
 
          s = f^2
 
-         @test issquare(s)
+         @test is_square(s)
 
          q = sqrt(s)
 
@@ -389,7 +389,7 @@ end
 
          @test q^2 == s
 
-         f1, s1 = issquare_with_sqrt(s)
+         f1, s1 = is_square_with_sqrt(s)
 
          @test f1 && s1^2 == s
 

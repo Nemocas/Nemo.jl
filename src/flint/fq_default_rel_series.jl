@@ -556,7 +556,7 @@ function sqrt_classical_char2(a::FqRelPowerSeriesRingElem; check::Bool=true)
    end
    for i = 0:prec - aval2 - 1
       c = polcoeff(a, 2*i)
-      if check && !issquare(c)
+      if check && !is_square(c)
          return false, S()
       end
       asqrt = setcoeff!(asqrt, i, sqrt(c; check=false))
@@ -585,7 +585,7 @@ function sqrt_classical(a::FqRelPowerSeriesRingElem; check::Bool=true)
    z.val = v2
    c = coeff(a, v)
    if check
-      flag, s = issquare_with_sqrt(c)
+      flag, s = is_square_with_sqrt(c)
       if !flag
          return false, S()
       end
@@ -611,12 +611,12 @@ function Base.sqrt(a::FqRelPowerSeriesRingElem; check::Bool=true)
    return q
 end
 
-function issquare(a::FqRelPowerSeriesRingElem)
+function is_square(a::FqRelPowerSeriesRingElem)
    flag, q = sqrt_classical(a; check=true)
    return flag
 end
 
-function issquare_with_sqrt(a::FqRelPowerSeriesRingElem)
+function is_square_with_sqrt(a::FqRelPowerSeriesRingElem)
    return sqrt_classical(a; check=true)
 end
 

@@ -775,7 +775,7 @@ function sqrt_classical(a::FpAbsPowerSeriesRingElem; check::Bool=true)
    a = shift_right(a, v)
    c = coeff(a, 0)
    if check
-      flag, s = issquare_with_sqrt(c)
+      flag, s = is_square_with_sqrt(c)
       if !flag
          return false, S()
       end
@@ -808,12 +808,12 @@ function Base.sqrt(a::FpAbsPowerSeriesRingElem; check::Bool=true)
    return s
 end
   
-function issquare(a::FpAbsPowerSeriesRingElem)
+function is_square(a::FpAbsPowerSeriesRingElem)
    flag, s = sqrt_classical(a; check=true)
    return flag
 end
  
-function issquare_with_sqrt(a::FpAbsPowerSeriesRingElem)
+function is_square_with_sqrt(a::FpAbsPowerSeriesRingElem)
    return sqrt_classical(a; check=true)
 end
 

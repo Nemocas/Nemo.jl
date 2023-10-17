@@ -400,7 +400,7 @@ function sqrt(x::fqPolyRepPolyRingElem; check::Bool=true)
    return s
 end
 
-function issquare(x::fqPolyRepPolyRingElem)
+function is_square(x::fqPolyRepPolyRingElem)
    if iszero(x)
       return true
    end
@@ -415,7 +415,7 @@ function issquare(x::fqPolyRepPolyRingElem)
    return flag
 end
 
-function issquare_with_sqrt(x::fqPolyRepPolyRingElem)
+function is_square_with_sqrt(x::fqPolyRepPolyRingElem)
    R = parent(x)
    if iszero(x)
       return true, zero(R)

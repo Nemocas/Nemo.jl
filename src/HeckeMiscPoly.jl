@@ -34,7 +34,7 @@ function (::ZZRing)(a::ZZModRingElem)
     return a.data
 end
 
-function rem!(z::T, f::T, g::T) where {T<:PolyElem}
+function rem!(z::T, f::T, g::T) where {T<:PolyRingElem}
     z = rem(f, g)
     return z
 end
@@ -311,7 +311,7 @@ end
 # This should avoid the full factorization for function fields
 # (and/or finitely generated fields in general?!)
 
-function factor_squarefree(f::PolyElem{<:FieldElement})
+function factor_squarefree(f::PolyRingElem{<:FieldElement})
     R = coefficient_ring(f)
     if iszero(characteristic(R))
         return _factor_squarefree_char_0(f)
@@ -333,7 +333,7 @@ end
 
 
 # This is Musser's algorithm
-function _factor_squarefree_char_0(f::PolyElem)
+function _factor_squarefree_char_0(f::PolyRingElem)
     @assert iszero(characteristic(base_ring(f)))
     res = Dict{typeof(f),Int}()
     if is_constant(f)
@@ -407,7 +407,7 @@ function mulhigh_n(a::ZZPolyRingElem, b::ZZPolyRingElem, n::Int)
     ccall((:fmpz_poly_mulhigh_n, libflint), Nothing, (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Cint), c, a, b, n)
     return c
 end
-function mulhigh(a::PolyElem{T}, b::PolyElem{T}, n::Int) where {T}
+function mulhigh(a::PolyRingElem{T}, b::PolyRingElem{T}, n::Int) where {T}
     return mulhigh_n(a, b, degree(a) + degree(b) - n)
 end
 
@@ -415,7 +415,7 @@ function (f::acb_poly)(x::acb)
     return evaluate(f, x)
 end
 
-function mod(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T<:RingElem}
+function mod(f::AbstractAlgebra.PolyRingElem{T}, g::AbstractAlgebra.PolyRingElem{T}) where {T<:RingElem}
     check_parent(f, g)
     if length(g) == 0
         throw(DivideError())
@@ -442,7 +442,7 @@ end
 normalise(f::ZZPolyRingElem, ::Int) = degree(f) + 1
 set_length!(f::ZZPolyRingElem, ::Int) = nothing
 
-function Base.divrem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T<:RingElem}
+function Base.divrem(f::AbstractAlgebra.PolyRingElem{T}, g::AbstractAlgebra.PolyRingElem{T}) where {T<:RingElem}
     check_parent(f, g)
     if length(g) == 0
         throw(DivideError())
@@ -479,7 +479,7 @@ end
 ################################################################################
 
 @doc raw"""
-    Base.rand(Rt::PolyRing{T}, n::Int) where T <: ResElem{ZZRingElem} -> PolyElem{T}
+    Base.rand(Rt::PolyRing{T}, n::Int) where T <: ResElem{ZZRingElem} -> PolyRingElem{T}
 
 Find a random polynomial of degree=$n$.
 """
@@ -498,7 +498,7 @@ end
 #
 ################################################################################
 
-function is_squarefree(f::PolyElem{<:FieldElement})
+function is_squarefree(f::PolyRingElem{<:FieldElement})
   R = coefficient_ring(f)
 
   if iszero(f) || degree(f) == 0
@@ -519,7 +519,7 @@ function is_squarefree(f::PolyElem{<:FieldElement})
   end
 end
 
-function is_squarefree(f::PolyElem{<:RingElement})
+function is_squarefree(f::PolyRingElem{<:RingElement})
   if iszero(f)
     return true
   end

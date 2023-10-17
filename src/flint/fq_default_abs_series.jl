@@ -490,7 +490,7 @@ function sqrt_classical_char2(a::FqAbsPowerSeriesRingElem; check::Bool=true)
    end
    for i = 0:prec - 1
       if check
-         flag, c = issquare_with_sqrt(coeff(a, 2*i))
+         flag, c = is_square_with_sqrt(coeff(a, 2*i))
          !flag && error("Not a square")
       else
          # degree of finite field could be > 1 so sqrt necessary here
@@ -519,7 +519,7 @@ function sqrt_classical(a::FqAbsPowerSeriesRingElem; check::Bool=true)
    a = shift_right(a, v)
    c = coeff(a, 0)
    if check
-      flag, s = issquare_with_sqrt(c)
+      flag, s = is_square_with_sqrt(c)
       if !flag
          return false, S()
       end
@@ -547,12 +547,12 @@ function Base.sqrt(a::FqAbsPowerSeriesRingElem; check::Bool=true)
    return s
 end
   
-function issquare(a::FqAbsPowerSeriesRingElem)
+function is_square(a::FqAbsPowerSeriesRingElem)
    flag, s = sqrt_classical(a; check=true)
    return flag
 end
  
-function issquare_with_sqrt(a::FqAbsPowerSeriesRingElem)
+function is_square_with_sqrt(a::FqAbsPowerSeriesRingElem)
    return sqrt_classical(a; check=true)
 end
 
