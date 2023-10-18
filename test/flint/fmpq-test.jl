@@ -222,7 +222,7 @@ end
          @test round(QQFieldElem, valQ, mode) == round(val, mode)
 
          @test round(ZZRingElem, valQ, mode) isa ZZRingElem
-         @test round(ZZRingElem, valQ, mode) == QQFieldElem(round(val, mode)) # HACK to work around missing adhoc comparision
+         @test round(ZZRingElem, valQ, mode) == round(val, mode)
 
          @test round(BigInt, valQ, mode) isa BigInt
          @test round(BigInt, valQ, mode) == round(val, mode)

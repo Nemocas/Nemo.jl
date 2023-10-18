@@ -530,57 +530,68 @@ end
 end
 
 @testset "ZZRingElem.adhoc_comparison" begin
-   a = ZZRingElem(-12)
 
-   @test a < 7
+   a = ZZRingElem(12)
 
-   @test a > -40
+   # values less than a
+   lt = [-40, UInt(3), 3, 3//1, big(5)//big(3)]
 
-   @test 7 > a
+   # values equal to a
+   eq = [12, UInt(12), 12//1, big(12), big(12)//1]
 
-   @test -40 < a
+   # values greater than a
+   gt = [40, UInt(40), 40//1, big(40)//big(3)]
 
-   @test a <= 7
+   @testset "lt $b" for b in lt
+     @test b < a
+     @test b <= a
+     @test !(b > a)
+     @test !(b >= a)
 
-   @test a >= -40
+     @test !(a < b)
+     @test !(a <= b)
+     @test a > b
+     @test a >= b
 
-   @test 7 >= a
+     @test !(a == b)
+     @test !(b == a)
+     @test a != b
+     @test b != a
+   end
 
-   @test -40 <= a
+   @testset "eq $b" for b in eq
+     @test !(b < a)
+     @test b <= a
+     @test !(b > a)
+     @test b >= a
 
-   @test a == -12
+     @test !(a < b)
+     @test a <= b
+     @test !(a > b)
+     @test a >= b
 
-   @test a != 4
+     @test a == b
+     @test b == a
+     @test !(a != b)
+     @test !(b != a)
+   end
 
-   @test -12 == a
+   @testset "gt $b" for b in gt
+     @test !(b < a)
+     @test !(b <= a)
+     @test b > a
+     @test b >= a
 
-   @test 4 != a
+     @test a < b
+     @test a <= b
+     @test !(a > b)
+     @test !(a >= b)
 
-   a = ZZRingElem(2)
-
-   @test a < UInt(7)
-
-   @test a > UInt(1)
-
-   @test UInt(7) > a
-
-   @test UInt(1) < a
-
-   @test a <= UInt(7)
-
-   @test a >= UInt(2)
-
-   @test UInt(7) >= a
-
-   @test UInt(1) <= a
-
-   @test a == UInt(2)
-
-   @test a != UInt(4)
-
-   @test UInt(2) == a
-
-   @test UInt(4) != a
+     @test !(a == b)
+     @test !(b == a)
+     @test a != b
+     @test b != a
+   end
 end
 
 @testset "ZZRingElem.unary_ops" begin

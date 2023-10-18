@@ -816,6 +816,19 @@ end
 
 <(x::UInt, y::ZZRingElem) = cmp(y,x) > 0
 
+
+==(x::ZZRingElem, y::Rational) = isinteger(y) && x == numerator(y)
+
+<=(x::ZZRingElem, y::Rational) = x*denominator(y) <= numerator(y)
+
+<(x::ZZRingElem, y::Rational) = x*denominator(y) < numerator(y)
+
+==(x::Rational, y::ZZRingElem) = isinteger(x) && numerator(x) == y
+
+<=(x::Rational, y::ZZRingElem) = numerator(x) <= y*denominator(x)
+
+<(x::Rational, y::ZZRingElem) = numerator(x) < y*denominator(x)
+
 ###############################################################################
 #
 #   Shifting
