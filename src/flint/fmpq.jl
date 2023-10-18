@@ -190,13 +190,13 @@ Base.trunc(::Type{QQFieldElem}, a::QQFieldElem) = QQFieldElem(trunc(ZZRingElem, 
 Base.trunc(::Type{ZZRingElem}, a::QQFieldElem) = is_positive(a) ? floor(ZZRingElem, a) : ceil(ZZRingElem, a)
 
 Base.round(x::QQFieldElem, ::RoundingMode{:Up}) = ceil(x)
-Base.round(::Type{T}, x::QQFieldElem, ::RoundingMode{:Up}) where T = ceil(T, x)
+Base.round(::Type{T}, x::QQFieldElem, ::RoundingMode{:Up}) where T <: RingElement = ceil(T, x)
 
 Base.round(x::QQFieldElem, ::RoundingMode{:Down}) = floor(x)
-Base.round(::Type{T}, x::QQFieldElem, ::RoundingMode{:Down}) where T = floor(T, x)
+Base.round(::Type{T}, x::QQFieldElem, ::RoundingMode{:Down}) where T <: RingElement = floor(T, x)
 
 Base.round(x::QQFieldElem, ::RoundingMode{:Nearest}) = round(QQFieldElem, x, RoundNearest)
-function Base.round(::Type{T}, x::QQFieldElem, ::RoundingMode{:Nearest}) where T
+function Base.round(::Type{T}, x::QQFieldElem, ::RoundingMode{:Nearest}) where T <: RingElement
     d = denominator(x)
     n = numerator(x)
     if d == 2
@@ -219,13 +219,13 @@ function Base.round(::Type{T}, x::QQFieldElem, ::RoundingMode{:Nearest}) where T
 end
 
 Base.round(x::QQFieldElem, ::RoundingMode{:NearestTiesAway}) = sign(x) * floor(abs(x) + 1 // 2)
-function Base.round(::Type{T}, x::QQFieldElem, ::RoundingMode{:NearestTiesAway}) where T
+function Base.round(::Type{T}, x::QQFieldElem, ::RoundingMode{:NearestTiesAway}) where T <: RingElement
     tmp = floor(T, abs(x) + 1 // 2)
     return is_positive(x) ? tmp : -tmp
 end
 
 Base.round(a::QQFieldElem) = round(QQFieldElem, a)
-Base.round(::Type{T}, a::QQFieldElem) where T =  round(T, a, RoundNearestTiesAway)
+Base.round(::Type{T}, a::QQFieldElem) where T <: RingElement =  round(T, a, RoundNearestTiesAway)
 
 
 nbits(a::QQFieldElem) = nbits(numerator(a)) + nbits(denominator(a))

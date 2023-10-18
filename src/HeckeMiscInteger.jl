@@ -258,6 +258,8 @@ for sym in (:trunc, :round, :ceil, :floor)
         # support `trunc(ZZRingElem, 1.23)` etc. for arbitrary reals
         Base.$sym(::Type{ZZRingElem}, a::Real) = ZZRingElem(Base.$sym(BigInt, a))
         Base.$sym(::Type{ZZRingElem}, a::Rational) = ZZRingElem(Base.$sym(BigInt, a))
+        Base.$sym(::Type{ZZRingElem}, a::Rational{T}) where T = ZZRingElem(Base.$sym(BigInt, a))
+        Base.$sym(::Type{ZZRingElem}, a::Rational{Bool}) = ZZRingElem(Base.$sym(BigInt, a))
 
         # for integers we don't need to round in between
         Base.$sym(::Type{ZZRingElem}, a::Integer) = ZZRingElem(a)
