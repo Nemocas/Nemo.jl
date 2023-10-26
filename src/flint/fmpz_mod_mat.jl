@@ -835,6 +835,13 @@ function (a::ZZModMatrixSpace)(arr::AbstractVector{ZZModRingElem})
   return z
 end
 
+function (a::ZZModMatrixSpace)(b::ZZMatrix)
+  (ncols(a) != b.c || nrows(a) != b.r) && error("Dimensions do not fit")
+  z = ZZModMatrix(modulus(base_ring(a)), b)
+  z.base_ring = a.base_ring
+  return z
+end
+
 ###############################################################################
 #
 #   Matrix constructor

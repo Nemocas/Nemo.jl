@@ -5449,7 +5449,30 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
     end
     return z
   end
+
+  function ZZModMatrix(n::UInt, b::ZZMatrix)
+    return ZZModMatrix(ZZ(n), b)
+  end
+
+  function ZZModMatrix(n::Int, b::ZZMatrix)
+    return ZZModMatrix(ZZ(n), b)
+  end
+
+  function ZZModMatrix(n::ZZRingElem, b::ZZMatrix)
+    (n < 2) && error("Modulus must be >= 2")
+    z = new()
+    ccall((:fmpz_mod_mat_init, libflint), Nothing,
+            (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, b.r, b.c, n)
+    finalizer(_fmpz_mod_mat_clear_fn, z)
+    for i = 1:b.r
+       for j = 1:b.c
+         setindex_raw!(z, mod(ZZRingElem(b[i,j]), n), i, j)
+       end
+    end
+    return z
+  end
 end
+
 
 function _fmpz_mod_mat_clear_fn(mat::ZZModMatrix)
   ccall((:fmpz_mod_mat_clear, libflint), Nothing, (Ref{ZZModMatrix}, ), mat)
