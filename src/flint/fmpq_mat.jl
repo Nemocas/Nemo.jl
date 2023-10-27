@@ -246,6 +246,12 @@ function transpose(x::QQMatrix)
    return z
 end
 
+function transpose!(A::QQMatrix, B::QQMatrix)
+    ccall((:fmpq_mat_transpose, libflint), Nothing,
+        (Ref{QQMatrix}, Ref{QQMatrix}), A, B)
+    return A
+end
+
 ###############################################################################
 #
 #   Row and column swapping

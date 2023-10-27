@@ -177,6 +177,14 @@ isone(a::ZZMatrix) = ccall((:fmpz_mat_is_one, libflint), Bool,
    end
 end
 
+function is_positive_entry(M::ZZMatrix, i::Int, j::Int)
+    GC.@preserve M begin
+        m = mat_entry_ptr(M, i, j)
+        fl = ccall((:fmpz_sgn, libflint), Int, (Ptr{ZZRingElem},), m)
+        return isone(fl)
+    end
+end
+
 function deepcopy_internal(d::ZZMatrix, dict::IdDict)
    z = ZZMatrix(d)
    return z
@@ -236,6 +244,12 @@ function transpose(x::ZZMatrix)
    ccall((:fmpz_mat_transpose, libflint), Nothing,
          (Ref{ZZMatrix}, Ref{ZZMatrix}), z, x)
    return z
+end
+
+function transpose!(A::ZZMatrix, B::ZZMatrix)
+    ccall((:fmpz_mat_transpose, libflint), Nothing,
+        (Ref{ZZMatrix}, Ref{ZZMatrix}), A, B)
+    return A
 end
 
 ###############################################################################

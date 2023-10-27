@@ -269,7 +269,6 @@ function __init__()
       println("Welcome to Nemo version $(version())")
       println("")
       println("Nemo comes with absolutely no warranty whatsoever")
-      println("")
    end
 
   # Initialize the thread local random state

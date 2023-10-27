@@ -1,10 +1,5 @@
 export is_zero_row, is_diagonal, is_lower_triangular, is_positive_entry, is_upper_triangular, diagonal
 
-function mul!(a::zzModMatrix, b::zzModMatrix, c::zzModRingElem)
-    ccall((:nmod_mat_scalar_mul, libflint), Nothing,
-        (Ref{zzModMatrix}, Ref{zzModMatrix}, UInt), a, b, c.data)
-    return a
-end
 
 ################################################################################
 #
@@ -24,18 +19,6 @@ function denominator(M::QQMatrix)
 end
 
 transpose!(A::Union{ZZMatrix,QQMatrix}) = is_square(A) ? transpose!(A, A) : transpose(A)
-
-function transpose!(A::ZZMatrix, B::ZZMatrix)
-    ccall((:fmpz_mat_transpose, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}), A, B)
-    return A
-end
-
-function transpose!(A::QQMatrix, B::QQMatrix)
-    ccall((:fmpq_mat_transpose, libflint), Nothing,
-        (Ref{QQMatrix}, Ref{QQMatrix}), A, B)
-    return A
-end
 
 function matrix(A::Matrix{ZZRingElem})
     m = matrix(FlintZZ, A)
@@ -63,14 +46,6 @@ function is_zero_row(M::ZZMatrix, i::Int)
         end
     end
     return true
-end
-
-function is_positive_entry(M::ZZMatrix, i::Int, j::Int)
-    GC.@preserve M begin
-        m = ccall((:fmpz_mat_entry, libflint), Ptr{ZZRingElem}, (Ref{ZZMatrix}, Int, Int), M, i - 1, j - 1)
-        fl = ccall((:fmpz_sgn, libflint), Int, (Ptr{ZZRingElem},), m)
-        return isone(fl)
-    end
 end
 
 function is_zero_row(M::zzModMatrix, i::Int)

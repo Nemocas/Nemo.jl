@@ -573,10 +573,6 @@ function addmul!(A::fpMatrix, B::fpMatrix, C::fpFieldElem, D::fpMatrix)
     return A
 end
 
-function mul!(A::fpMatrix, B::fpFieldElem, D::fpMatrix)
-    ccall((:nmod_mat_scalar_mul_ui, libflint), Nothing, (Ref{fpMatrix}, Ref{fpMatrix}, UInt), A, D, B.data)
-end
-
 function lift(R::ZZAbsPowerSeriesRing, f::ZZModAbsPowerSeriesRingElem)
     r = R()
     for i = 0:length(f)-1

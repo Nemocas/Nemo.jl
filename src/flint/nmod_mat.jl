@@ -296,6 +296,15 @@ function mul!(z::Vector{UInt}, a::Vector{UInt}, b::T) where T <: Zmodn_mat
    return z
 end
 
+function mul!(a::zzModMatrix, b::zzModMatrix, c::zzModRingElem)
+    ccall((:nmod_mat_scalar_mul, libflint), Nothing,
+        (Ref{zzModMatrix}, Ref{zzModMatrix}, UInt), a, b, c.data)
+    return a
+end
+
+function mul!(A::fpMatrix, B::fpFieldElem, D::fpMatrix)
+    ccall((:nmod_mat_scalar_mul_ui, libflint), Nothing, (Ref{fpMatrix}, Ref{fpMatrix}, UInt), A, D, B.data)
+end
 
 ################################################################################
 #
