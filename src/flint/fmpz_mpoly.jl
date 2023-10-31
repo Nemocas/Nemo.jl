@@ -690,6 +690,10 @@ function evaluate(a::ZZMPolyRingElem, b::Vector{<:Integer})
    return evaluate(a, fmpz_vec)
 end
 
+function (a::ZZMPolyRingElem)()
+   error("need at least one value")
+end
+
 function (a::ZZMPolyRingElem)(vals::ZZRingElem...)
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
    return evaluate(a, [vals...])

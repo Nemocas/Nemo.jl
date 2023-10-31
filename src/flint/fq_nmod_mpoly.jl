@@ -671,6 +671,10 @@ function evaluate(a::fqPolyRepMPolyRingElem, b::Vector{UInt})
    return evaluate(a, b2)
 end
 
+function (a::fqPolyRepMPolyRingElem)()
+   error("need at least one value")
+end
+
 function (a::fqPolyRepMPolyRingElem)(vals::fqPolyRepFieldElem...)
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
    return evaluate(a, [vals...])

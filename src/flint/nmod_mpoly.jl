@@ -712,6 +712,10 @@ function evaluate(a::($etype), b::Vector{UInt})
    return evaluate(a, b2)
 end
 
+function (a::($etype))()
+   error("need at least one value")
+end
+
 function (a::($etype))(vals::zzModRingElem...)
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
    return evaluate(a, [vals...])

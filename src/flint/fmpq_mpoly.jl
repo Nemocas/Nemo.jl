@@ -743,6 +743,10 @@ function evaluate(a::QQMPolyRingElem, b::Vector{<:Integer})
    return evaluate(a, fmpq_vec)
 end
 
+function (a::QQMPolyRingElem)()
+   error("need at least one value")
+end
+
 function (a::QQMPolyRingElem)(vals::QQFieldElem...)
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
    return evaluate(a, [vals...])
