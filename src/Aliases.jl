@@ -7,184 +7,184 @@
 @alias is_real isreal
 
 # for backwards compatibility
-@alias isalgebraic is_algebraic
-@alias isalgebraic_integer is_algebraic_integer
-@alias iscyclo_type is_cyclo_type
-@alias isdiagonal is_diagonal
-@alias isembedded is_embedded
-@alias isequal_abs is_equal_abs
-@alias isequal_abs_imag is_equal_abs_imag
-@alias isequal_abs_real is_equal_abs_real
-@alias isequal_imag is_equal_imag
-@alias isequal_real is_equal_real
-@alias isexact is_exact
-@alias ishadamard is_hadamard
-@alias isimaginary is_imaginary
-@alias isless_abs is_less_abs
-@alias isless_abs_imag is_less_abs_imag
-@alias isless_abs_real is_less_abs_real
-@alias isless_imag is_less_imag
-@alias isless_real is_less_real
-@alias isless_root_order is_less_root_order
-@alias islower_triangular is_lower_triangular
-@alias ismaxreal_type is_maxreal_type
-@alias isnilpotent is_nilpotent
-@alias isnonnegative is_nonnegative
-@alias isnonpositive is_nonpositive
-@alias isnonzero is_nonzero
-@alias isnumber is_number
-@alias ispositive is_positive
-@alias ispositive_entry is_positive_entry
-@alias isprime is_prime
-@alias isrational is_rational
-@alias isroot_of_unity is_root_of_unity
-@alias issigned_inf is_signed_inf
-@alias isuinf is_uinf
-@alias isundefined is_undefined
-@alias isunknown is_unknown
-@alias isupper_triangular is_upper_triangular
-@alias iszero_row is_zero_row
+Base.@deprecate_binding isalgebraic is_algebraic
+Base.@deprecate_binding isalgebraic_integer is_algebraic_integer
+Base.@deprecate_binding iscyclo_type is_cyclo_type
+Base.@deprecate_binding isdiagonal is_diagonal
+Base.@deprecate_binding isembedded is_embedded
+Base.@deprecate_binding isequal_abs is_equal_abs
+Base.@deprecate_binding isequal_abs_imag is_equal_abs_imag
+Base.@deprecate_binding isequal_abs_real is_equal_abs_real
+Base.@deprecate_binding isequal_imag is_equal_imag
+Base.@deprecate_binding isequal_real is_equal_real
+Base.@deprecate_binding isexact is_exact
+Base.@deprecate_binding ishadamard is_hadamard
+Base.@deprecate_binding isimaginary is_imaginary
+Base.@deprecate_binding isless_abs is_less_abs
+Base.@deprecate_binding isless_abs_imag is_less_abs_imag
+Base.@deprecate_binding isless_abs_real is_less_abs_real
+Base.@deprecate_binding isless_imag is_less_imag
+Base.@deprecate_binding isless_real is_less_real
+Base.@deprecate_binding isless_root_order is_less_root_order
+Base.@deprecate_binding islower_triangular is_lower_triangular
+Base.@deprecate_binding ismaxreal_type is_maxreal_type
+Base.@deprecate_binding isnilpotent is_nilpotent
+Base.@deprecate_binding isnonnegative is_nonnegative
+Base.@deprecate_binding isnonpositive is_nonpositive
+Base.@deprecate_binding isnonzero is_nonzero
+Base.@deprecate_binding isnumber is_number
+Base.@deprecate_binding ispositive is_positive
+Base.@deprecate_binding ispositive_entry is_positive_entry
+Base.@deprecate_binding isprime is_prime
+Base.@deprecate_binding isrational is_rational
+Base.@deprecate_binding isroot_of_unity is_root_of_unity
+Base.@deprecate_binding issigned_inf is_signed_inf
+Base.@deprecate_binding isuinf is_uinf
+Base.@deprecate_binding isundefined is_undefined
+Base.@deprecate_binding isunknown is_unknown
+Base.@deprecate_binding isupper_triangular is_upper_triangular
+Base.@deprecate_binding iszero_row is_zero_row
 
 # old type names from before 0.33
 # may be remove at some point in the future
-@alias fmpz ZZRingElem
-@alias fmpz_mat ZZMatrix
-@alias fmpz_mpoly ZZMPolyRingElem
-@alias fmpz_poly ZZPolyRingElem
+Base.@deprecate_binding fmpz ZZRingElem
+Base.@deprecate_binding fmpz_mat ZZMatrix
+Base.@deprecate_binding fmpz_mpoly ZZMPolyRingElem
+Base.@deprecate_binding fmpz_poly ZZPolyRingElem
 
-@alias fmpq QQFieldElem
-@alias fmpq_mat QQMatrix
-@alias fmpq_mpoly QQMPolyRingElem
-@alias fmpq_poly QQPolyRingElem
+Base.@deprecate_binding fmpq QQFieldElem
+Base.@deprecate_binding fmpq_mat QQMatrix
+Base.@deprecate_binding fmpq_mpoly QQMPolyRingElem
+Base.@deprecate_binding fmpq_poly QQPolyRingElem
 
-@alias fmpz_mod ZZModRingElem
-@alias fmpz_mod_mat ZZModMatrix
-@alias fmpz_mod_poly ZZModPolyRingElem
+Base.@deprecate_binding fmpz_mod ZZModRingElem
+Base.@deprecate_binding fmpz_mod_mat ZZModMatrix
+Base.@deprecate_binding fmpz_mod_poly ZZModPolyRingElem
 
-@alias nmod zzModRingElem
-@alias nmod_mat zzModMatrix
-@alias nmod_mpoly zzModMPolyRingElem
-@alias nmod_poly zzModPolyRingElem
+Base.@deprecate_binding nmod zzModRingElem
+Base.@deprecate_binding nmod_mat zzModMatrix
+Base.@deprecate_binding nmod_mpoly zzModMPolyRingElem
+Base.@deprecate_binding nmod_poly zzModPolyRingElem
 
-@alias fq_default FqFieldElem
-@alias fq_default_mat FqMatrix
-@alias fq_default_mpoly FqMPolyRingElem
-@alias fq_default_poly FqPolyRingElem
+Base.@deprecate_binding fq_default FqFieldElem
+Base.@deprecate_binding fq_default_mat FqMatrix
+Base.@deprecate_binding fq_default_mpoly FqMPolyRingElem
+Base.@deprecate_binding fq_default_poly FqPolyRingElem
 
-@alias gfp_fmpz_elem FpFieldElem
-@alias gfp_fmpz_mat FpMatrix
-@alias gfp_fmpz_mpoly FpMPolyRingElem
-@alias gfp_fmpz_poly FpPolyRingElem
+Base.@deprecate_binding gfp_fmpz_elem FpFieldElem
+Base.@deprecate_binding gfp_fmpz_mat FpMatrix
+Base.@deprecate_binding gfp_fmpz_mpoly FpMPolyRingElem
+Base.@deprecate_binding gfp_fmpz_poly FpPolyRingElem
 
-@alias gfp_elem fpFieldElem
-@alias gfp_mat fpMatrix
-@alias gfp_mpoly fpMPolyRingElem
-@alias gfp_poly fpPolyRingElem
+Base.@deprecate_binding gfp_elem fpFieldElem
+Base.@deprecate_binding gfp_mat fpMatrix
+Base.@deprecate_binding gfp_mpoly fpMPolyRingElem
+Base.@deprecate_binding gfp_poly fpPolyRingElem
 
-@alias fq FqPolyRepFieldElem
-@alias fq_mat FqPolyRepMatrix
-@alias fq_poly FqPolyRepPolyRingElem
+Base.@deprecate_binding fq FqPolyRepFieldElem
+Base.@deprecate_binding fq_mat FqPolyRepMatrix
+Base.@deprecate_binding fq_poly FqPolyRepPolyRingElem
 
-@alias fq_nmod fqPolyRepFieldElem
-@alias fq_nmod_mat fqPolyRepMatrix
-@alias fq_nmod_mpoly fqPolyRepMPolyRingElem
-@alias fq_nmod_poly fqPolyRepPolyRingElem
+Base.@deprecate_binding fq_nmod fqPolyRepFieldElem
+Base.@deprecate_binding fq_nmod_mat fqPolyRepMatrix
+Base.@deprecate_binding fq_nmod_mpoly fqPolyRepMPolyRingElem
+Base.@deprecate_binding fq_nmod_poly fqPolyRepPolyRingElem
 
-@alias FlintIntegerRing ZZRing
-@alias FmpzMatSpace ZZMatrixSpace
-@alias FmpzMPolyRing ZZMPolyRing
-@alias FmpzPolyRing ZZPolyRing
+Base.@deprecate_binding FlintIntegerRing ZZRing
+Base.@deprecate_binding FmpzMatSpace ZZMatrixSpace
+Base.@deprecate_binding FmpzMPolyRing ZZMPolyRing
+Base.@deprecate_binding FmpzPolyRing ZZPolyRing
 
-@alias FlintRationalField QQField
-@alias FmpqMatSpace QQMatrixSpace
-@alias FmpqMPolyRing QQMPolyRing
-@alias FmpqPolyRing QQPolyRing
+Base.@deprecate_binding FlintRationalField QQField
+Base.@deprecate_binding FmpqMatSpace QQMatrixSpace
+Base.@deprecate_binding FmpqMPolyRing QQMPolyRing
+Base.@deprecate_binding FmpqPolyRing QQPolyRing
 
-@alias FmpzModRing ZZModRing
-@alias FmpzModMatSpace ZZModMatrixSpace
-@alias FmpzModPolyRing ZZModPolyRing
+Base.@deprecate_binding FmpzModRing ZZModRing
+Base.@deprecate_binding FmpzModMatSpace ZZModMatrixSpace
+Base.@deprecate_binding FmpzModPolyRing ZZModPolyRing
 
-@alias NmodRing zzModRing
-@alias NmodMatSpace zzModMatrixSpace
-@alias NmodMPolyRing zzModMPolyRing
-@alias NmodPolyRing zzModPolyRing
+Base.@deprecate_binding NmodRing zzModRing
+Base.@deprecate_binding NmodMatSpace zzModMatrixSpace
+Base.@deprecate_binding NmodMPolyRing zzModMPolyRing
+Base.@deprecate_binding NmodPolyRing zzModPolyRing
 
-@alias FqDefaultFiniteField FqField
-@alias FqDefaultMatSpace FqMatrixSpace
-@alias FqDefaultMPolyRing FqMPolyRing
-@alias FqDefaultPolyRing FqPolyRing
+Base.@deprecate_binding FqDefaultFiniteField FqField
+Base.@deprecate_binding FqDefaultMatSpace FqMatrixSpace
+Base.@deprecate_binding FqDefaultMPolyRing FqMPolyRing
+Base.@deprecate_binding FqDefaultPolyRing FqPolyRing
 
-@alias GaloisFmpzField FpField
-@alias GaloisFmpzMatSpace FpMatrixSpace
-@alias GFPFmpzMPolyRing FpMPolyRing
-@alias GFPFmpzPolyRing FpPolyRing
+Base.@deprecate_binding GaloisFmpzField FpField
+Base.@deprecate_binding GaloisFmpzMatSpace FpMatrixSpace
+Base.@deprecate_binding GFPFmpzMPolyRing FpMPolyRing
+Base.@deprecate_binding GFPFmpzPolyRing FpPolyRing
 
-@alias GaloisField fpField
-@alias GFPMatSpace fpMatrixSpace
-@alias GFPMPolyRing fpMPolyRing
-@alias GFPPolyRing fpPolyRing
+Base.@deprecate_binding GaloisField fpField
+Base.@deprecate_binding GFPMatSpace fpMatrixSpace
+Base.@deprecate_binding GFPMPolyRing fpMPolyRing
+Base.@deprecate_binding GFPPolyRing fpPolyRing
 
-@alias FqFiniteField FqPolyRepField
-@alias FqMatSpace FqPolyRepMatrixSpace
-#@alias FqPolyRing FqPolyRepPolyRing        # DISABLED because FqPolyRing also is new name
+Base.@deprecate_binding FqFiniteField FqPolyRepField
+Base.@deprecate_binding FqMatSpace FqPolyRepMatrixSpace
+#Base.@deprecate_binding FqPolyRing FqPolyRepPolyRing        # DISABLED because FqPolyRing also is new name
 
-@alias FqNmodFiniteField fqPolyRepField
-@alias FqNmodMatSpace fqPolyRepMatrixSpace
-@alias FqNmodMPolyRing fqPolyRepMPolyRing
-@alias FqNmodPolyRing fqPolyRepPolyRing
+Base.@deprecate_binding FqNmodFiniteField fqPolyRepField
+Base.@deprecate_binding FqNmodMatSpace fqPolyRepMatrixSpace
+Base.@deprecate_binding FqNmodMPolyRing fqPolyRepMPolyRing
+Base.@deprecate_binding FqNmodPolyRing fqPolyRepPolyRing
 
-@alias fmpq_abs_series QQAbsPowerSeriesRingElem
-@alias fmpq_rel_series QQRelPowerSeriesRingElem
-@alias FmpqAbsSeriesRing QQAbsPowerSeriesRing
-@alias FmpqRelSeriesRing QQRelPowerSeriesRing
+Base.@deprecate_binding fmpq_abs_series QQAbsPowerSeriesRingElem
+Base.@deprecate_binding fmpq_rel_series QQRelPowerSeriesRingElem
+Base.@deprecate_binding FmpqAbsSeriesRing QQAbsPowerSeriesRing
+Base.@deprecate_binding FmpqRelSeriesRing QQRelPowerSeriesRing
 
-@alias fmpz_abs_series ZZAbsPowerSeriesRingElem
-@alias fmpz_rel_series ZZRelPowerSeriesRingElem
-@alias FmpzAbsSeriesRing ZZAbsPowerSeriesRing
-@alias FmpzRelSeriesRing ZZRelPowerSeriesRing
+Base.@deprecate_binding fmpz_abs_series ZZAbsPowerSeriesRingElem
+Base.@deprecate_binding fmpz_rel_series ZZRelPowerSeriesRingElem
+Base.@deprecate_binding FmpzAbsSeriesRing ZZAbsPowerSeriesRing
+Base.@deprecate_binding FmpzRelSeriesRing ZZRelPowerSeriesRing
 
-@alias fmpz_laurent_series ZZLaurentSeriesRingElem
-@alias FmpzLaurentSeriesRing ZZLaurentSeriesRing
+Base.@deprecate_binding fmpz_laurent_series ZZLaurentSeriesRingElem
+Base.@deprecate_binding FmpzLaurentSeriesRing ZZLaurentSeriesRing
 
-@alias fmpz_mod_abs_series ZZModAbsPowerSeriesRingElem
-@alias fmpz_mod_rel_series ZZModRelPowerSeriesRingElem
-@alias FmpzModAbsSeriesRing ZZModAbsPowerSeriesRing
-@alias FmpzModRelSeriesRing ZZModRelPowerSeriesRing
+Base.@deprecate_binding fmpz_mod_abs_series ZZModAbsPowerSeriesRingElem
+Base.@deprecate_binding fmpz_mod_rel_series ZZModRelPowerSeriesRingElem
+Base.@deprecate_binding FmpzModAbsSeriesRing ZZModAbsPowerSeriesRing
+Base.@deprecate_binding FmpzModRelSeriesRing ZZModRelPowerSeriesRing
 
-@alias fq_default_abs_series FqAbsPowerSeriesRingElem
-@alias fq_default_rel_series FqRelPowerSeriesRingElem
-@alias FqDefaultAbsSeriesRing FqAbsPowerSeriesRing
-@alias FqDefaultRelSeriesRing FqRelPowerSeriesRing
+Base.@deprecate_binding fq_default_abs_series FqAbsPowerSeriesRingElem
+Base.@deprecate_binding fq_default_rel_series FqRelPowerSeriesRingElem
+Base.@deprecate_binding FqDefaultAbsSeriesRing FqAbsPowerSeriesRing
+Base.@deprecate_binding FqDefaultRelSeriesRing FqRelPowerSeriesRing
 
-@alias fq_abs_series FqPolyRepAbsPowerSeriesRingElem
-@alias fq_rel_series FqPolyRepRelPowerSeriesRingElem
-@alias FqAbsSeriesRing FqPolyRepAbsPowerSeriesRing
-@alias FqRelSeriesRing FqPolyRepRelPowerSeriesRing
+Base.@deprecate_binding fq_abs_series FqPolyRepAbsPowerSeriesRingElem
+Base.@deprecate_binding fq_rel_series FqPolyRepRelPowerSeriesRingElem
+Base.@deprecate_binding FqAbsSeriesRing FqPolyRepAbsPowerSeriesRing
+Base.@deprecate_binding FqRelSeriesRing FqPolyRepRelPowerSeriesRing
 
-@alias fq_nmod_abs_series fqPolyRepAbsPowerSeriesRingElem
-@alias fq_nmod_rel_series fqPolyRepRelPowerSeriesRingElem
-@alias FqNmodAbsSeriesRing fqPolyRepAbsPowerSeriesRing
-@alias FqNmodRelSeriesRing fqPolyRepRelPowerSeriesRing
+Base.@deprecate_binding fq_nmod_abs_series fqPolyRepAbsPowerSeriesRingElem
+Base.@deprecate_binding fq_nmod_rel_series fqPolyRepRelPowerSeriesRingElem
+Base.@deprecate_binding FqNmodAbsSeriesRing fqPolyRepAbsPowerSeriesRing
+Base.@deprecate_binding FqNmodRelSeriesRing fqPolyRepRelPowerSeriesRing
 
-@alias gfp_abs_series fpAbsPowerSeriesRingElem
-@alias gfp_rel_series fpRelPowerSeriesRingElem
-@alias GFPAbsSeriesRing fpAbsPowerSeriesRing
-@alias GFPRelSeriesRing fpRelPowerSeriesRing
+Base.@deprecate_binding gfp_abs_series fpAbsPowerSeriesRingElem
+Base.@deprecate_binding gfp_rel_series fpRelPowerSeriesRingElem
+Base.@deprecate_binding GFPAbsSeriesRing fpAbsPowerSeriesRing
+Base.@deprecate_binding GFPRelSeriesRing fpRelPowerSeriesRing
 
-@alias gfp_fmpz_abs_series FpAbsPowerSeriesRingElem
-@alias gfp_fmpz_rel_series FpRelPowerSeriesRingElem
-@alias GFPFmpzAbsSeriesRing FpAbsPowerSeriesRing
-@alias GFPFmpzRelSeriesRing FpRelPowerSeriesRing
+Base.@deprecate_binding gfp_fmpz_abs_series FpAbsPowerSeriesRingElem
+Base.@deprecate_binding gfp_fmpz_rel_series FpRelPowerSeriesRingElem
+Base.@deprecate_binding GFPFmpzAbsSeriesRing FpAbsPowerSeriesRing
+Base.@deprecate_binding GFPFmpzRelSeriesRing FpRelPowerSeriesRing
 
-@alias nmod_abs_series zzModAbsPowerSeriesRingElem
-@alias nmod_rel_series zzModRelPowerSeriesRingElem
-@alias NmodAbsSeriesRing zzModAbsPowerSeriesRing
-@alias NmodRelSeriesRing zzModRelPowerSeriesRing
+Base.@deprecate_binding nmod_abs_series zzModAbsPowerSeriesRingElem
+Base.@deprecate_binding nmod_rel_series zzModRelPowerSeriesRingElem
+Base.@deprecate_binding NmodAbsSeriesRing zzModAbsPowerSeriesRing
+Base.@deprecate_binding NmodRelSeriesRing zzModRelPowerSeriesRing
 
-@alias MPolyElem MPolyRingElem
+Base.@deprecate_binding MPolyElem MPolyRingElem
 
-@alias FiniteField finite_field
+Base.@deprecate_binding FiniteField finite_field
 
-@alias NumberField number_field
-@alias CyclotomicField cyclotomic_field
-@alias CyclotomicRealSubfield cyclotomic_real_subfield
+Base.@deprecate_binding NumberField number_field
+Base.@deprecate_binding CyclotomicField cyclotomic_field
+Base.@deprecate_binding CyclotomicRealSubfield cyclotomic_real_subfield
