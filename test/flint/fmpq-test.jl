@@ -99,9 +99,19 @@ end
 end
 
 @testset "QQFieldElem.conversions" begin
+   @test convert(Rational{Int}, QQFieldElem(3, 7)) == 3//7
+   @test convert(Rational{BigInt}, QQFieldElem(3, 7)) == 3//7
+
+   @test convert(QQFieldElem, 3) == QQFieldElem(3)
+   @test convert(QQFieldElem, 3//7) == QQFieldElem(3, 7)
+
    @test Rational(ZZRingElem(12)) == 12
+   @test Rational{Int}(ZZRingElem(12)) == 12
+   @test Rational{BigInt}(ZZRingElem(12)) == 12
 
    @test Rational(QQFieldElem(3, 7)) == 3//7
+   @test Rational{Int}(QQFieldElem(3, 7)) == 3//7
+   @test Rational{BigInt}(QQFieldElem(3, 7)) == 3//7
 
    @test ZZ(QQFieldElem(3)) isa ZZRingElem
    @test_throws Exception ZZ(QQFieldElem(3, 2))

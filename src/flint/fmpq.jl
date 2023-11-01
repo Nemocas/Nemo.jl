@@ -1163,6 +1163,8 @@ end
 
 convert(::Type{QQFieldElem}, a::Integer) = QQFieldElem(a)
 
+convert(::Type{QQFieldElem}, a::Rational) = QQFieldElem(a)
+
 convert(::Type{QQFieldElem}, a::ZZRingElem) = QQFieldElem(a)
 
 Base.promote_rule(::Type{QQFieldElem}, ::Type{T}) where {T <: Integer} = QQFieldElem
@@ -1178,14 +1180,12 @@ promote_rule(::Type{QQFieldElem}, ::Type{Rational{T}} where {T <: Integer}) = QQ
 Base.promote_rule(::Type{QQFieldElem}, ::Type{Rational{T}}) where {T <: Integer} = QQFieldElem
 
 function Base.convert(::Type{Rational{T}}, a::QQFieldElem) where T <: Integer
-   return Rational{T}(convert(T, numerator(a)), convert(T, denominator(a)))
+   return Rational{T}(a)
 end
 
-function Base.convert(::Type{QQFieldElem}, a::Rational{T}) where T <: Integer
-   return convert(ZZRingElem, numerator(a))//convert(ZZRingElem, denominator(a))
+function Base.Rational{T}(z::QQFieldElem) where T <: Integer
+   return Rational{T}(T(numerator(z)), T(denominator(z)))
 end
-
-convert(::Type{Rational{BigInt}}, a::QQFieldElem) = Rational(a)
 
 function Base.Rational{BigInt}(z::QQFieldElem)
    r = Rational{BigInt}(0)
@@ -1196,8 +1196,8 @@ end
 
 Rational(z::QQFieldElem) = Rational{BigInt}(z)
 
-function Base.Rational{BigInt}(z::ZZRingElem)
-   return Rational{BigInt}(BigInt(z))
+function Base.Rational{T}(z::ZZRingElem) where T <: Integer
+   return Rational{T}(T(z))
 end
 
 Rational(z::ZZRingElem) = Rational{BigInt}(z)
