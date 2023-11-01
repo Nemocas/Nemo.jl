@@ -43,7 +43,6 @@ Base.@deprecate_binding isuinf is_uinf
 Base.@deprecate_binding isundefined is_undefined
 Base.@deprecate_binding isunknown is_unknown
 Base.@deprecate_binding isupper_triangular is_upper_triangular
-Base.@deprecate_binding iszero_row is_zero_row
 
 # old type names from before 0.33
 # may be remove at some point in the future
@@ -180,8 +179,6 @@ Base.@deprecate_binding nmod_abs_series zzModAbsPowerSeriesRingElem
 Base.@deprecate_binding nmod_rel_series zzModRelPowerSeriesRingElem
 Base.@deprecate_binding NmodAbsSeriesRing zzModAbsPowerSeriesRing
 Base.@deprecate_binding NmodRelSeriesRing zzModRelPowerSeriesRing
-
-Base.@deprecate_binding MPolyElem MPolyRingElem
 
 Base.@deprecate_binding FiniteField finite_field
 
