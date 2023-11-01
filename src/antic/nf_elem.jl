@@ -1183,7 +1183,6 @@ function number_field(f::QQPolyRingElem, s::VarName = "_a"; cached::Bool = true,
 
    return parent_obj, gen(parent_obj)
 end
-@alias NumberField number_field
 
 @doc raw"""
     cyclotomic_field(n::Int, s::VarName = "z_$n", t = "_\$"; cached = true)
@@ -1204,7 +1203,6 @@ function cyclotomic_field(n::Int, s::VarName = "z_$n", t = "_\$"; cached = true)
    set_attribute!(C, :show => show_cyclo, :cyclo => n)
    return C, g
 end
-@alias CyclotomicField cyclotomic_field
 
 function show_cyclo(io::IO, a::AnticNumberField)
   @assert is_cyclo_type(a)
@@ -1231,7 +1229,6 @@ function cyclotomic_real_subfield(n::Int, s::VarName = "(z_$n + 1/z_$n)", t = "\
    set_attribute!(R, :show => show_maxreal, :maxreal => n)
    return R, a
 end
-@alias CyclotomicRealSubfield cyclotomic_real_subfield
 
 function show_maxreal(io::IO, a::AnticNumberField)
   print(io, "Maximal real subfield of cyclotomic field of order $(get_attribute(a, :maxreal))")

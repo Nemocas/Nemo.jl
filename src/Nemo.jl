@@ -79,11 +79,6 @@ export QQBar
 export ZZ, QQ, finite_field, number_field
 
 
-# FIXME/TODO: for compatibility with AbstractAlgebra before 0.28.x; remove in the future
-@alias PolyRingElem PolyRingElem
-@alias MPolyRingElem MPolyRingElem
-
-
 ###############################################################################
 #
 #   Set up environment / load libraries

@@ -184,3 +184,7 @@
 @alias MPolyElem MPolyRingElem
 
 @alias FiniteField finite_field
+
+@alias NumberField number_field
+@alias CyclotomicField cyclotomic_field
+@alias CyclotomicRealSubfield cyclotomic_real_subfield
