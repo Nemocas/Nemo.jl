@@ -892,3 +892,27 @@ function (R::FqPolyRing)(x::FqPolyRingElem)
   parent(x) != R && error("Unable to coerce to polynomial")
   return x
 end
+
+################################################################################
+#
+#  Lift
+#
+################################################################################
+
+function lift(R::ZZPolyRing, f::FqPolyRingElem)
+  F = coefficient_ring(f)
+  absolute_degree(F) != 1 && error("Must be a prime field.")
+  if _fq_default_ctx_type(F) == _FQ_DEFAULT_NMOD
+    z = R()
+    ccall((:fmpz_poly_set_nmod_poly_unsigned, libflint), Nothing,
+          (Ref{ZZPolyRingElem}, Ref{FqPolyRingElem}), z, f)
+    return z
+  else
+    @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FMPZ_NMOD
+    z = R()
+    ccall((:fmpz_mod_poly_get_fmpz_poly, libflint), Nothing,
+          (Ref{ZZPolyRingElem}, Ref{FqPolyRingElem}, Ptr{Nothing}),
+          z, f, pointer_from_objref(F) + 2 * sizeof(Cint))
+    return z
+  end
+end

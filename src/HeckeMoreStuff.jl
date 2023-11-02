@@ -1272,6 +1272,10 @@ function setcoeff!(x::qadic, i::Int, y::padic)
 end
 
 function setcoeff!(x::qadic, i::Int, y::UInt)
+    return setcoeff!(x, i, ZZRingElem(y))
+end
+
+function setcoeff!(x::qadic, i::Int, y::ZZRingElem)
     R = FlintPadicField(prime(parent(x)), parent(x).prec_max)
     Y = R(ZZRingElem(y))
     ccall((:padic_poly_set_coeff_padic, libflint), Nothing,

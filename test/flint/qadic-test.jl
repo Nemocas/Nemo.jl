@@ -306,3 +306,11 @@ end
 
    @test 6 * log(R(2)) == log(R(2)^6)
 end
+
+@testset "qadic.setcoeff!" begin
+  R, _ = QadicField(7, 1, 30)
+  a = 1 + 7 + 2*7^2 + O(R, 7^3)
+  setcoeff!(a, 0, ZZ(2))
+  @test a == 2
+end
+

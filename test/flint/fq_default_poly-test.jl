@@ -563,3 +563,28 @@ end
 
    @test !v
 end
+
+@testset "FqPolyRingElem.lift" begin
+   R, x = NGFiniteField(23, 1, "x")
+   S, y = R["y"]
+   ZZy, z = ZZ["z"]
+   f = lift(ZZy, y^2 + 1)
+   @test parent(f) === ZZy
+   @test map_coefficients(R, f, parent = S) == y^2 + 1
+
+   R, x = NGFiniteField(next_prime(ZZ(2)^100), 1, "x")
+   S, y = R["y"]
+   ZZy, z = ZZ["z"]
+   f = lift(ZZy, y^2 + 1)
+   @test parent(f) === ZZy
+   @test map_coefficients(R, f, parent = S) == y^2 + 1
+
+   R, x = NGFiniteField(23, 2, "x")
+   S, y = R["y"]
+   ZZy, z = ZZ["z"]
+   @test_throws ErrorException lift(ZZy, y^2 + 1)
+   R, x = NGFiniteField(next_prime(ZZ(2)^100), 2, "x")
+   S, y = R["y"]
+   ZZy, z = ZZ["z"]
+   @test_throws ErrorException lift(ZZy, y^2 + 1)
+end
