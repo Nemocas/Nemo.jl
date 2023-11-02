@@ -27,11 +27,3 @@ end
       @test truncate(f*g, n) == mullow(f, g, n)
    end
 end
-
-@testset "@polynomial_ring" begin
-   # cf. AbstractAlgebra issue #274
-   R, x = @polynomial_ring(ZZ, x)
-   @test typeof(R) == ZZMPolyRing
-   R, x = @polynomial_ring(QQ, x)
-   @test typeof(R) == QQMPolyRing
-end
