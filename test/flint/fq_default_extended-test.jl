@@ -288,7 +288,7 @@ end
     @test divexact(a, one(FF)) == divexact(FF(a), one(FF))
   end
 
-  F = Nemo._GF(2)
+  F = Nemo._GF(3)
   Fx, x = F["x"]
   FF, = Nemo._residue_field(x - 2)
   a = one(F) * one(FF)
