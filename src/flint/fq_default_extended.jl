@@ -837,15 +837,21 @@ end
 
 function _try_promote(K::FqField, a::FqFieldElem)
   L = parent(a)
-  if degree(K) == 1 && K !== L
-    return false, a
-  end
 
   if K === L
     return true, a
   end
 
+  if absolute_degree(L) == 1 && L === base_field(K)
+    return true, K(lift(ZZ, a))
+  end
+
+  if degree(K) == 1 && K !== L
+    return false, a
+  end
+
   fl, b = _try_promote(base_field(K), a)
+
   if fl
     return fl, K(a)::FqFieldElem
   else

@@ -287,4 +287,12 @@ end
     end
     @test divexact(a, one(FF)) == divexact(FF(a), one(FF))
   end
+
+  F = Nemo._GF(2)
+  Fx, x = F["x"]
+  FF, = Nemo._residue_field(x - 2)
+  a = one(F) * one(FF)
+  @test parent(a) === FF && is_one(a)
+  a = one(FF) * one(F)
+  @test parent(a) === FF && is_one(a)
 end
