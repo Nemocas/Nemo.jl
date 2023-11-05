@@ -580,7 +580,7 @@ function invmod(x::T, y::T) where {T <: Zmodn_fmpz_poly}
   length(y) == 0 && error("Second argument must not be 0")
   check_parent(x, y)
   if length(y) == 1
-    return parent(x)(inv(eval(x, coeff(y, 0))))
+    return parent(x)(inv(evaluate(x, coeff(y, 0))))
   end
   z = parent(x)()
   r = ccall((:fmpz_mod_poly_invmod, libflint), Cint,
