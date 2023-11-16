@@ -4,6 +4,6 @@ using Aqua
     Aqua.test_all(
         Nemo;
         ambiguities=false,      # TODO: fix ambiguities
-        piracy=false            # TODO: fix piracy
+        piracies=false          # TODO: fix piracy
     )
 end
