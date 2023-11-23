@@ -1,5 +1,5 @@
 @testset "fmpz_puiseux_series.constructors" begin
-   R, x = PuiseuxSeriesRing(ZZ, 30, "x")
+   R, x = puiseux_series_ring(ZZ, 30, "x")
 
    @test elem_type(R) == FlintPuiseuxSeriesRingElem{ZZLaurentSeriesRingElem}
    @test elem_type(FlintPuiseuxSeriesRing{ZZLaurentSeriesRingElem}) == FlintPuiseuxSeriesRingElem{ZZLaurentSeriesRingElem}
@@ -25,7 +25,7 @@
 end
 
 @testset "fmpz_puiseux_series.printing" begin
-   R, x = PuiseuxSeriesRing(ZZ, 30, "x")
+   R, x = puiseux_series_ring(ZZ, 30, "x")
 
    @test !occursin(r"{", string(R))
 
@@ -33,17 +33,17 @@ end
 end
 
 @testset "fmpz_puiseux_series.rand" begin
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
    test_rand(R, -12:12, 1:6, -10:10)
    test_rand(R, -12:12, 1:6, make(ZZ, -10:10))
 
-   R, x = PuiseuxSeriesField(QQ, 10, "x")
+   R, x = puiseux_series_field(QQ, 10, "x")
    test_rand(R, -12:12, 1:6, -10:10)
    test_rand(R, -12:12, 1:6, make(ZZ, -10:10))
 end
 
 @testset "fmpz_puiseux_series.manipulation" begin
-   S, x = PuiseuxSeriesRing(ZZ, 30, "x")
+   S, x = puiseux_series_ring(ZZ, 30, "x")
 
    @test max_precision(S) == 30
 
@@ -84,7 +84,7 @@ end
 end
 
 @testset "fmpz_puiseux_series.unary_ops" begin
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6, -10:10)
 
@@ -94,7 +94,7 @@ end
 end
 
 @testset "fmpz_puiseux_series.binary_ops" begin
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
    for iter = 1:100
       f = rand(R, -12:12, 1:6, -10:10)
       g = rand(R, -12:12, 1:6, -10:10)
@@ -111,7 +111,7 @@ end
 end
 
 @testset "fmpz_puiseux_series.adhoc_binary_ops" begin
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
    for iter = 1:500
       f = rand(R, -12:12, 1:6, -10:10)
       c1 = rand(ZZ, -10:10)
@@ -132,7 +132,7 @@ end
 end
 
 @testset "fmpz_puiseux_series.comparison" begin
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
    for iter = 1:500
       f = rand(R, -12:12, 1:6, -10:10)
       g = deepcopy(f)
@@ -149,7 +149,7 @@ end
 end
 
 @testset "fmpz_puiseux_series.adhoc_comparison" begin
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
    for iter = 1:500
       f = R()
       while f == 0
@@ -172,7 +172,7 @@ end
 end
 
 @testset "fmpz_puiseux_series.powering" begin
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
 
    for iter = 1:100
       f = rand(R, -12:12, 1:6, -10:10)
@@ -193,7 +193,7 @@ end
 end
 
 @testset "fmpz_puiseux_series.inversion" begin
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = R()
       while iszero(f) || !is_unit(coeff(f, valuation(f)))
@@ -205,7 +205,7 @@ end
 end
 
 @testset "fmpz_puiseux_series.square_root" begin
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6, -10:10)
       g = f^2
@@ -217,7 +217,7 @@ end
 end
 
 @testset "fmpz_puiseux_series.exact_division" begin
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6, -10:10)
       g = rand(R, -12:12, 1:6, -10:10)
@@ -230,7 +230,7 @@ end
 end
 
 @testset "fmpz_puiseux_series.adhoc_exact_division" begin
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6, -10:10)
       c = ZZ()
@@ -243,7 +243,7 @@ end
 end
 
 @testset "fmpz_puiseux_series.special_functions" begin
-   S, x = PuiseuxSeriesRing(ZZ, 100, "x")
+   S, x = puiseux_series_ring(ZZ, 100, "x")
 
    @test isequal(exp(2x - x^2 + O(x^3)), 1+2*x+x^2+O(x^3))
 
@@ -251,7 +251,7 @@ end
 end
 
 @testset "fmpz_puiseux_series.unsafe" begin
-   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   R, x = puiseux_series_ring(ZZ, 10, "x")
    a = x
    zero!(a)
    @test iszero(a)

@@ -22,11 +22,11 @@ The following table shows each of the Puiseux series types available in
 Nemo, the base ring $R$, and the Julia/Nemo types for that kind of series (the
 type information is mainly of concern to developers).
 
-Base ring                             | Library            | Element type                       | Parent type
---------------------------------------|--------------------|--------------------------------------------------|----------------------------------------------
-Generic ring $R$                      | AbstractAlgebra.jl | `Generic.PuiseuxSeriesRingElem{T}                | `Generic.PuiseuxSeriesRing{T}`
-Generic field $K$                     | AbstractAlgebra.jl | `Generic.PuiseuxSeriesFieldElem{T}               | `Generic.PuiseuxSeriesField{T}`
-$\mathbb{Z}$                          | Flint              | `FlintPuiseuxSeriesRingElem{ZZLaurentSeriesRingElem}`| `FlintPuiseuxSeriesRing{ZZLaurentSeriesRingElem}`
+Base ring         | Library            | Element type                       | Parent type
+------------------|--------------------|--------------------------------------------------|----------------------------------------------
+Generic ring $R$  | AbstractAlgebra.jl | `Generic.PuiseuxSeriesRingElem{T}                | `Generic.PuiseuxSeriesRing{T}`
+Generic field $K$ | AbstractAlgebra.jl | `Generic.PuiseuxSeriesFieldElem{T}               | `Generic.PuiseuxSeriesField{T}`
+$\mathbb{Z}$      | Flint              | `FlintPuiseuxSeriesRingElem{ZZLaurentSeriesRingElem}`| `FlintPuiseuxSeriesRing{ZZLaurentSeriesRingElem}`
 
 For convenience, `FlintPuiseuxSeriesRingElem` and `FlintPuiseuxSeriesFieldElem` both
 belong to a union type called `FlintPuiseuxSeriesElem`.
@@ -79,7 +79,7 @@ eta_qexp(x::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem})
 **Examples**
 
 ```jldoctest
-julia> S, z = PuiseuxSeriesRing(ZZ, 30, "z")
+julia> S, z = puiseux_series_ring(ZZ, 30, "z")
 (Puiseux series ring in z over ZZ, z + O(z^31))
 
 julia> a = 1 + z + 3z^2 + O(z^5)
