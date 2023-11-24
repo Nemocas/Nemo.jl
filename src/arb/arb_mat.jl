@@ -7,7 +7,8 @@
 export zero, one, deepcopy, -, transpose, +, *, &, ==, !=,
        overlaps, contains, inv, divexact, charpoly, det, lu, lu!, solve,
        solve!, solve_lu_precomp, solve_lu_precomp!, swap_rows, swap_rows!,
-       bound_inf_norm
+       bound_inf_norm, cholesky, ldlt, solve_cholesky_precomp, 
+       solve_cholesky_precomp!
 
 ###############################################################################
 #
@@ -505,6 +506,15 @@ end
 #
 ###############################################################################
 
+function cholesky(x::arb_mat)
+  ncols(x) != nrows(x) && error("Matrix must be square")
+  z = similar(x, nrows(x), ncols(x))
+  p = precision(base_ring(x))
+  fl = ccall((:arb_mat_cho, libarb), Cint, (Ref{arb_mat}, Ref{arb_mat}, Int), z, x, p)
+  fl == 0 && error("Matrix is not positive definite")
+  return z
+end
+
 function lu!(P::Generic.Perm, x::arb_mat)
   parent(P).n != nrows(x) && error("Permutation does not match matrix")
   P.d .-= 1
@@ -545,6 +555,20 @@ function solve_lu_precomp(P::Generic.Perm, LU::arb_mat, y::arb_mat)
   ncols(LU) != nrows(y) && error("Matrix dimensions are wrong")
   z = similar(y)
   solve_lu_precomp!(z, P, LU, y)
+  return z
+end
+
+function solve_cholesky_precomp!(z::arb_mat, cho::arb_mat, y::arb_mat)
+  ccall((:arb_mat_solve_cho_precomp, libarb), Nothing,
+              (Ref{arb_mat}, Ref{arb_mat}, Ref{arb_mat}, Int),
+              z, cho, y, precision(base_ring(cho)))
+  nothing
+end
+
+function solve_cholesky_precomp(cho::arb_mat, y::arb_mat)
+  ncols(cho) != nrows(y) && error("Matrix dimensions are wrong")
+  z = similar(y)
+  solve_cholesky_precomp!(z, cho, y)
   return z
 end
 

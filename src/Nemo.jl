@@ -41,7 +41,7 @@ if isdefined(Base, :tanpi) # added in julia >= 1.10-DEV
 end
 
 import LinearAlgebra: det, norm, nullspace, rank, transpose!, hessenberg, tr,
-                      lu, lu!, eigvals
+                      lu, lu!, eigvals, cholesky
 
 import AbstractAlgebra: nullspace, @show_name, @show_special, find_name,
                         get_attribute, set_attribute!, @attributes,
