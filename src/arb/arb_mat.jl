@@ -7,8 +7,8 @@
 export zero, one, deepcopy, -, transpose, +, *, &, ==, !=,
        overlaps, contains, inv, divexact, charpoly, det, lu, lu!, solve,
        solve!, solve_lu_precomp, solve_lu_precomp!, swap_rows, swap_rows!,
-       bound_inf_norm, cholesky, ldlt, solve_cholesky_precomp, 
-       solve_cholesky_precomp!
+       bound_inf_norm, cholesky, solve_cholesky_precomp, solve_cholesky_precomp!
+       
 
 ###############################################################################
 #
