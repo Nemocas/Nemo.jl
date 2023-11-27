@@ -89,8 +89,22 @@ function Base.view(x::ZZMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
    return b
 end
 
-function Base.view(x::ZZMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
-   return Base.view(x, first(r), first(c), last(r), last(c))
+function Base.reshape(x::ZZMatrix, r::Int, c::Int)
+  @assert nrows(x) * ncols(x) == r*c
+  @assert r == 1
+
+   b = ZZMatrix()
+   b.view_parent = x
+   ccall((:fmpz_mat_window_init, libflint), Nothing,
+         (Ref{ZZMatrix}, Ref{ZZMatrix}, Int, Int, Int, Int),
+             b, x, 0, 0, r, c)
+   finalizer(_fmpz_mat_window_clear_fn, b)
+   return b
+end
+
+
+function Base.view(x::ZZMatrix, r::UnitRange{Int}, c::UnitRange{Int})
+   return Base.view(x, r.start, c.start, r.stop, c.stop)
 end
 
 function _fmpz_mat_window_clear_fn(a::ZZMatrix)
@@ -1433,6 +1447,12 @@ end
 
 function add!(z::ZZMatrix, x::ZZMatrix, y::ZZMatrix)
    ccall((:fmpz_mat_add, libflint), Nothing,
+                (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZMatrix}), z, x, y)
+   return z
+end
+
+function sub!(z::ZZMatrix, x::ZZMatrix, y::ZZMatrix)
+   ccall((:fmpz_mat_sub, libflint), Nothing,
                 (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZMatrix}), z, x, y)
    return z
 end

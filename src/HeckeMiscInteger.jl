@@ -391,11 +391,14 @@ function rand(rng::AbstractRNG, a::fmpzUnitRange)
         mask = m >> (nl * 8 * sizeof(Base.GMP.Limb))
     end
     s = ZZRingElem(0)
+    c = (8 * sizeof(Base.GMP.Limb))
     while true
         s = ZZRingElem(0)
         for i = 1:nl
-            s = s << (8 * sizeof(Base.GMP.Limb))
-            s += rand(rng, Base.GMP.Limb)
+            ccall((:fmpz_mul_2exp, libflint), Nothing,
+              (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), s, s, c)
+            ccall((:fmpz_add_ui, libflint), Nothing, 
+              (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt), s, s, rand(rng, Base.GMP.Limb))
         end
         if high > 0
             s = s << high

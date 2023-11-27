@@ -183,5 +183,5 @@ Base.@deprecate_binding NmodRelSeriesRing zzModRelPowerSeriesRing
 Base.@deprecate_binding FiniteField finite_field
 
 Base.@deprecate_binding NumberField number_field
-Base.@deprecate_binding CyclotomicField cyclotomic_field
+
 Base.@deprecate_binding CyclotomicRealSubfield cyclotomic_real_subfield

@@ -366,6 +366,12 @@ end
 export hnf!
 
 function hnf!(x::ZZMatrix)
+  if nrows(x) * ncols(x) > 100
+    z = hnf(x)
+    ccall((:fmpz_mat_set, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}), x, z)
+
+    return x
+  end
     ccall((:fmpz_mat_hnf, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}), x, x)
     return x
 end

@@ -275,6 +275,11 @@ function add!(a::T, b::T, c::T) where T <: Zmodn_mat
   return a
 end
 
+function sub!(a::T, b::T, c::T) where T <: Zmodn_mat
+  ccall((:nmod_mat_sub, libflint), Nothing, (Ref{T}, Ref{T}, Ref{T}), a, b, c)
+  return a
+end
+
 function zero!(a::T) where T <: Zmodn_mat
   ccall((:nmod_mat_zero, libflint), Nothing, (Ref{T}, ), a)
   return a
@@ -496,6 +501,32 @@ function solve(x::T, y::T) where T <: Zmodn_mat
           (Ref{T}, Ref{T}, Ref{T}), z, x, y)
   !Bool(r) && error("Singular matrix in solve")
   return z
+end
+
+function AbstractAlgebra.solve_triu(x::T, y::T) where T <: Zmodn_mat
+   (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
+   is_upper_trangular(x) || error("Matrix must be upper triangular")
+   z = similar(x, nrows(x), ncols(y))
+   solve_triu!(z, x, y, 0)
+   return z
+end
+
+#solves upper_triangular_part(B)A = C, 
+#if unit == 1, then only the strictly upper triangular part is used
+#and the diagonal is assumed to be 1
+#
+# useful in the context of solving/ lu decomposition: the lu
+# is done inplace, so the lower part wil be "l", the upper "u",
+# both are implicit only.
+function solve_triu!(A::T, B::T, C::T, unit::Int = 0) where T <: Zmodn_mat
+   ccall((:nmod_mat_solve_triu, Nemo.libflint), Cvoid, (Ref{T}, Ref{T}, Ref{T}, Cint), A, B, C, unit)
+end
+
+#solves lower_triangular_part(B)A = C, 
+#if unit == 1, then only the strictly lower triangular part is used
+#and the diagonal is assumed to be 1
+function solve_tril!(A::T, B::T, C::T, unit::Int = 0) where T <: Zmodn_mat
+   ccall((:nmod_mat_solve_tril, Nemo.libflint), Cvoid, (Ref{T}, Ref{T}, Ref{T}, Cint), A, B, C, unit)
 end
 
 ################################################################################
