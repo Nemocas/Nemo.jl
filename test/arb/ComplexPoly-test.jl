@@ -386,3 +386,11 @@ end
       @test all([ abs(z[i] + onei(CC)) <= b for i in 1:r])
    end
 end
+
+@testset "Issue #1587" begin
+   CC = ComplexField()
+   R, t = polynomial_ring(CC, "t")
+   D, Dt = polynomial_ring(R, "Dt")
+   A_scalarform = t^3 * (32 * t^2 - 1) * (32 * t^2 + 1) * Dt^4 + 2 * t^2 * (7168 * t^4 - 3) * Dt^3 + t * (55296 * t^4 - 7) * Dt^2 + (61440 * t^4 - 1) * Dt + 12288 * t^3
+   @test A_scalarform isa PolyRingElem{ComplexPoly}
+end

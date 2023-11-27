@@ -777,6 +777,8 @@ promote_rule(::Type{ComplexPoly}, ::Type{QQPolyRingElem}) = ComplexPoly
 
 promote_rule(::Type{ComplexPoly}, ::Type{arb_poly}) = ComplexPoly
 
+promote_rule(::Type{ComplexPoly}, ::Type{ComplexPoly}) = ComplexPoly
+
 function promote_rule(::Type{ComplexPoly}, ::Type{T}) where {T}
    return promote_rule(ComplexFieldElem, T) === ComplexFieldElem ? ComplexPoly : Union{}
 end

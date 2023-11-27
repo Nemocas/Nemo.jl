@@ -774,6 +774,8 @@ promote_rule(::Type{acb_poly}, ::Type{QQPolyRingElem}) = acb_poly
 
 promote_rule(::Type{acb_poly}, ::Type{arb_poly}) = acb_poly
 
+promote_rule(::Type{acb_poly}, ::Type{acb_poly}) = acb_poly
+
 function promote_rule(::Type{acb_poly}, ::Type{T}) where {T}
    return promote_rule(acb, T) === acb ? acb_poly : Union{}
 end
