@@ -802,6 +802,12 @@ end
    @test digits(a) == digits(BigInt(a))
    @test digits(a, base = 17) == digits(BigInt(a), base = 17)
    @test digits(a, base = 5, pad = 50) == digits(BigInt(a), base = 5, pad = 50)
+
+   a = -ZZRingElem(4611686837384281896)
+
+   @test digits(a) == digits(BigInt(a))
+   @test digits(a, base = 17) == digits(BigInt(a), base = 17)
+   @test digits(a, base = 5, pad = 50) == digits(BigInt(a), base = 5, pad = 50)
 end
 
 @testset "ZZRingElem.string_io" begin

@@ -2305,7 +2305,7 @@ function Base.digits!(a::AbstractVector{T}, n::ZZRingElem; base::Integer = 10) w
    end
 
    for i in eachindex(a)
-      n, r = divrem(n, base)
+      n, r = Base.divrem(n, base)
       a[i] = r
    end
    return a
