@@ -576,6 +576,18 @@ function lu(x::T, P = SymmetricGroup(nrows(x))) where T <: Zmodn_mat
   return rank, p, L, U
 end
 
+#to support FAST lu!
+function AbstractAlgebra.Strassen.apply!(A::fpMatrix, P::Perm{Int}; offset::Int = 0)
+  n = length(P.d)
+  t = zeros(Int, n-offset)
+  for i=1:n-offset
+    t[i] = unsafe_load(reinterpret(Ptr{Int}, A.rows), P.d[i] + offset)
+  end
+  for i=1:n-offset
+    unsafe_store!(reinterpret(Ptr{Int}, A.rows), t[i], i + offset)
+  end
+end
+
 ################################################################################
 #
 #  Windowing
