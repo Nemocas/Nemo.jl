@@ -6,13 +6,14 @@
 
 export ZZMatrix, ZZMatrixSpace, getindex, getindex!, setindex!,
        charpoly, det, det_divisor, det_given_divisor, gram, hadamard,
-       is_hadamard, hnf, is_hnf, hnf_with_transform, hnf_modular, lll, lll!,
-       lll_ctx, lll_gram, lll_gram!, lll_with_transform,
-       lll_gram_with_transform, lll_with_removal, lll_with_removal_transform,
-       nullspace, rank, rref, reduce_mod, similar, snf, snf_diagonal, is_snf,
-       solve, solve_rational, cansolve, cansolve_with_nullspace, solve_dixon,
-       tr, transpose, content, hcat, vcat, addmul!, zero!, pseudo_inv,
-       hnf_modular_eldiv, nullspace_right_rational, is_zero_entry
+       is_hadamard, hadamard_bound2, hnf, is_hnf, hnf_with_transform,
+       hnf_modular, lll, lll!, lll_ctx, lll_gram, lll_gram!,
+       lll_with_transform, lll_gram_with_transform, lll_with_removal,
+       lll_with_removal_transform, nullspace, rank, rref, reduce_mod, similar,
+       snf, snf_diagonal, is_snf, solve, solve_rational, cansolve,
+       cansolve_with_nullspace, solve_dixon, tr, transpose, content, hcat,
+       vcat, addmul!, zero!, pseudo_inv, hnf_modular_eldiv,
+       nullspace_right_rational, is_zero_entry
 
 ###############################################################################
 #
@@ -752,6 +753,52 @@ function det_given_divisor(x::ZZMatrix, d::Integer, proved=true)
    return det_given_divisor(x, ZZRingElem(d), proved)
 end
 
+
+@doc raw"""
+    hadamard_bound2(M::ZZMatrix)
+
+Return the Hadamard bound squared for the determinant, i.e. the product
+of the euclidean row-norms squared.
+"""
+function hadamard_bound2(M::ZZMatrix)
+  is_square(M) || error("Matrix must be square")
+  H = ZZ(1);
+  r = ZZ(0)
+  n = nrows(M)
+  for i in 1:n
+    ccall((:fmpz_set_si, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, Int), r, 0)
+    M_ptr = Nemo.mat_entry_ptr(M, i, 1)
+    for j in 1:n
+      ccall((:fmpz_addmul, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}), r, M_ptr, M_ptr)
+      M_ptr += sizeof(ZZRingElem)
+    end
+    if iszero(r)
+      return r
+    end
+    Nemo.mul!(H, H, r)
+  end
+  return H
+end
+
+function Base.maximum(::typeof(nbits), M::ZZMatrix)
+  mx = 0
+  n = nrows(M)
+  m = ncols(M)
+  M_ptr = Nemo.mat_entry_ptr(M, 1, 1)
+  for i in 1:n
+    for j in 1:m
+      #a zero fmpz is a binary zero, hence this works
+      #fmpz_bits does not work on 0 I think (at least is it unneccessary)
+      #this is not going through the "correct" order of the rows, but 
+      #for this is does not matter
+      if !iszero(unsafe_load(reinterpret(Ptr{Int}, M_ptr)))
+        mx = max(mx, ccall((:fmpz_bits, Nemo.libflint), Int, (Ptr{ZZRingElem},), M_ptr))
+      end
+      M_ptr += sizeof(ZZRingElem)
+    end
+  end
+  return mx
+end
 ###############################################################################
 #
 #   Gram matrix
@@ -1155,6 +1202,34 @@ end
 
 ###############################################################################
 #
+#   manual linear algebra: row and col operations
+#
+###############################################################################
+
+function AbstractAlgebra.add_row!(A::ZZMatrix, s::ZZRingElem, i::Int, j::Int)
+   @assert 1 <= i <= nrows(A)
+   @assert 1 <= j <= nrows(A)
+   i_ptr = mat_entry_ptr(A, i, 1)
+   j_ptr = mat_entry_ptr(A, j, 1)
+   for k = 1:ncols(A)
+      ccall((:fmpz_addmul, libflint), Cvoid, (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), i_ptr, s, j_ptr)
+      i_ptr += sizeof(ZZRingElem)
+      j_ptr += sizeof(ZZRingElem)
+   end
+end
+
+function AbstractAlgebra.add_column!(A::ZZMatrix, s::ZZRingElem, i::Int, j::Int)
+   @assert 1 <= i <= ncols(A)
+   @assert 1 <= j <= ncols(A)
+   for k = 1:nrows(A)
+      i_ptr = mat_entry_ptr(A, k, i)
+      j_ptr = mat_entry_ptr(A, k, j)
+      ccall((:fmpz_addmul, libflint), Cvoid, (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), i_ptr, s, j_ptr)
+   end
+end
+
+###############################################################################
+#
 #   Linear solving
 #
 ###############################################################################
@@ -1222,6 +1297,8 @@ function cansolve(a::ZZMatrix, b::ZZMatrix)
    end
    return true, transpose(z*T)
 end
+Base.reduce(::typeof(hcat), A::AbstractVector{ZZMatrix}) = _hcat(A)
+Base.reduce(::typeof(vcat), A::AbstractVector{ZZMatrix}) = _vcat(A)
 
 function Base.cat(A::ZZMatrix...;dims)
   @assert dims == (1,2) || isa(dims, Int)
@@ -1257,8 +1334,7 @@ function Base.cat(A::ZZMatrix...;dims)
   return X
 end
 
-
-function AbstractAlgebra._vcat(A::NTuple{<:Any, ZZMatrix})
+function AbstractAlgebra._vcat(A::AbstractVector{ZZMatrix})
   if any(x -> ncols(x) != ncols(A[1]), A)
     error("Matrices must have the same number of columns")
   end
@@ -1278,6 +1354,31 @@ function AbstractAlgebra._vcat(A::NTuple{<:Any, ZZMatrix})
       end
     end
     s += nrows(N)
+  end
+  return M
+end
+
+
+function AbstractAlgebra._hcat(A::AbstractVector{ZZMatrix})
+  if any(x -> nrows(x) != nrows(A[1]), A)
+    error("Matrices must have the same number of columns")
+  end
+
+  M = zero_matrix(ZZ, nrows(A[1]), sum(ncols, A, init = 0))
+  s = 0
+  for N in A
+    GC.@preserve M N begin
+      for j in 1:nrows(N)
+        M_ptr = mat_entry_ptr(M, j, s+1)
+        N_ptr = mat_entry_ptr(N, j, 1)
+        for k in 1:ncols(N)
+          ccall((:fmpz_set, libflint), Cvoid, (Ptr{ZZRingElem}, Ptr{ZZRingElem}), M_ptr, N_ptr)
+          M_ptr += sizeof(ZZRingElem)
+          N_ptr += sizeof(ZZRingElem)
+        end
+      end
+    end
+    s += ncols(N)
   end
   return M
 end
@@ -1390,6 +1491,91 @@ function solve_dixon(a::ZZMatrix, b::ZZMatrix)
    return z, d
 end
 
+#XU = B. only the upper triangular part of U is used
+function solve_triu_left(U::ZZMatrix, b::ZZMatrix)
+   n = ncols(U)
+   m = nrows(b)
+   R = base_ring(U)
+   X = zero(b)
+   tmp = zero_matrix(ZZ, 1, n)
+   t = R()
+   s = R()
+   for i = 1:m
+      tmp_p = Nemo.mat_entry_ptr(tmp, 1, 1)
+      X_p = Nemo.mat_entry_ptr(X, i, 1)
+      for j = 1:n
+         ccall((:fmpz_set, Nemo.libflint), Cvoid, (Ptr{ZZRingElem}, Ptr{ZZRingElem}), tmp_p, X_p)
+         X_p += sizeof(ZZRingElem)
+         tmp_p += sizeof(ZZRingElem)
+      end
+      for j = 1:n
+         ccall((:fmpz_zero, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, ), s) 
+
+         tmp_p = Nemo.mat_entry_ptr(tmp, 1, 1)
+         for k = 1:j-1
+            U_p = Nemo.mat_entry_ptr(U, k, j)
+            ccall((:fmpz_addmul, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}), s, U_p, tmp_p)
+            tmp_p += sizeof(ZZRingElem)
+         end
+         ccall((:fmpz_sub, Nemo.libflint), Cvoid, 
+          (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), s, Nemo.mat_entry_ptr(b, i, j), s)
+         ccall((:fmpz_divexact, Nemo.libflint), Cvoid, 
+          (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), Nemo.mat_entry_ptr(tmp, 1, j), s, Nemo.mat_entry_ptr(U, j, j))
+      end
+      tmp_p = Nemo.mat_entry_ptr(tmp, 1, 1)
+      X_p = Nemo.mat_entry_ptr(X, i, 1)
+      for j = 1:n
+         ccall((:fmpz_set, Nemo.libflint), Cvoid, (Ptr{ZZRingElem}, Ptr{ZZRingElem}), X_p, tmp_p)
+         X_p += sizeof(ZZRingElem)
+         tmp_p += sizeof(ZZRingElem)
+      end
+   end
+   return X
+end
+
+#UX = B
+function solve_triu(U::ZZMatrix, b::ZZMatrix) 
+   n = nrows(U)
+   m = ncols(b)
+   X = zero(b)
+   tmp = zero_matrix(ZZ, 1, n)
+   s = ZZ()
+   for i = 1:m
+      tmp_ptr = Nemo.mat_entry_ptr(tmp, 1, 1)
+      for j = 1:n
+         X_ptr = Nemo.mat_entry_ptr(X, j, i)
+         ccall((:fmpz_set, Nemo.libflint), Cvoid, (Ptr{ZZRingElem}, Ptr{ZZRingElem}), tmp_ptr, X_ptr)
+         tmp_ptr += sizeof(ZZRingElem)
+      end
+      for j = n:-1:1
+         ccall((:fmpz_zero, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, ), s)
+         tmp_ptr = Nemo.mat_entry_ptr(tmp, 1, j+1)
+         for k = j + 1:n
+            U_ptr = Nemo.mat_entry_ptr(U, j, k)
+            ccall((:fmpz_addmul, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}), s, U_ptr, tmp_ptr)
+            tmp_ptr += sizeof(ZZRingElem)
+#           s = addmul!(s, U[j, k], tmp[k])
+         end
+         b_ptr = Nemo.mat_entry_ptr(b, j, i)
+         ccall((:fmpz_sub, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), s, b_ptr, s)
+#         s = b[j, i] - s
+         tmp_ptr = Nemo.mat_entry_ptr(tmp, 1, j)
+         U_ptr = Nemo.mat_entry_ptr(U, j, j)
+         ccall((:fmpz_divexact, Nemo.libflint), Cvoid, (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), tmp_ptr, s, U_ptr)
+         
+#         tmp[j] = divexact(s, U[j,j])
+      end
+      tmp_ptr = Nemo.mat_entry_ptr(tmp, 1, 1)
+      for j = 1:n
+         X_ptr = Nemo.mat_entry_ptr(X, j, i)
+         ccall((:fmpz_set, Nemo.libflint), Cvoid, (Ptr{ZZRingElem}, Ptr{ZZRingElem}), X_ptr, tmp_ptr)
+         tmp_ptr += sizeof(ZZRingElem)
+      end
+   end
+   return X
+end
+
+
 ###############################################################################
 #
 #   Trace
@@ -1457,9 +1643,16 @@ function sub!(z::ZZMatrix, x::ZZMatrix, y::ZZMatrix)
    return z
 end
 
-function mul!(z::ZZMatrix, x::ZZMatrix, y::ZZMatrix)
-   ccall((:fmpz_mat_mul, libflint), Nothing,
-                (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZMatrix}), z, x, y)
+function mul!(z::ZZMatrix, x::ZZMatrix, y::ZZMatrix, fl::Bool = false)
+   if fl
+     n = similar(z)
+     ccall((:fmpz_mat_mul, libflint), Nothing,
+                  (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZMatrix}), n, x, y)
+     add!(z, z, n)             
+   else
+     ccall((:fmpz_mat_mul, libflint), Nothing,
+                  (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZMatrix}), z, x, y)
+   end               
    return z
 end
 
