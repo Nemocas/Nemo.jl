@@ -671,6 +671,16 @@ end
    B = matrix(ZZ, 2, 2, [0, 1, 0, 0])
    fl, X, Z = cansolve_with_nullspace(A, B)
    @test fl && A*X == B && iszero(A * Z)
+
+   A = matrix(ZZ, 2, 2, [1,2,3,4])
+   b = matrix(ZZ, 1, 2, [1, 6])
+   @test solve_triu_left(A, b) == matrix(ZZ, 1, 2, [1, 1])
+   b = matrix(ZZ, 2, 1, [3, 4])
+   @test solve_triu(A, b) == matrix(ZZ, 2, 1, [1, 1])
+   b = matrix(ZZ, 2, 1, [1, 7])
+   c = similar(b)
+   AbstractAlgebra.solve_tril!(c, A, b)
+   @test c == matrix(ZZ, 2, 1, [1, 1])
 end
 
 
@@ -696,6 +706,8 @@ end
    @test_throws ErrorException [A; A; C]
    @test cat(A, A, dims = (1, 2)) == block_diagonal_matrix([A, A])
    @test cat(A, A, dims = 1) == hcat(A, A)
+   @test reduce(hcat, A, A) == hcat(A, A) # -> _hcat
+   @test reduce(vcat, A, A) == vcat(A, A) # -> _vcat
    @test cat(A, A, dims = 2) == vcat(A, A)
    @test_throws ErrorException cat(A, A, dims = 3)
 end
