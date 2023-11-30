@@ -1209,22 +1209,26 @@ end
 function AbstractAlgebra.add_row!(A::ZZMatrix, s::ZZRingElem, i::Int, j::Int)
    @assert 1 <= i <= nrows(A)
    @assert 1 <= j <= nrows(A)
-   i_ptr = mat_entry_ptr(A, i, 1)
-   j_ptr = mat_entry_ptr(A, j, 1)
-   for k = 1:ncols(A)
-      ccall((:fmpz_addmul, libflint), Cvoid, (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), i_ptr, s, j_ptr)
-      i_ptr += sizeof(ZZRingElem)
-      j_ptr += sizeof(ZZRingElem)
+   GC.@preserve A begin
+     i_ptr = mat_entry_ptr(A, i, 1)
+     j_ptr = mat_entry_ptr(A, j, 1)
+     for k = 1:ncols(A)
+        ccall((:fmpz_addmul, libflint), Cvoid, (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), i_ptr, s, j_ptr)
+        i_ptr += sizeof(ZZRingElem)
+        j_ptr += sizeof(ZZRingElem)
+     end
    end
 end
 
 function AbstractAlgebra.add_column!(A::ZZMatrix, s::ZZRingElem, i::Int, j::Int)
    @assert 1 <= i <= ncols(A)
    @assert 1 <= j <= ncols(A)
-   for k = 1:nrows(A)
-      i_ptr = mat_entry_ptr(A, k, i)
-      j_ptr = mat_entry_ptr(A, k, j)
-      ccall((:fmpz_addmul, libflint), Cvoid, (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), i_ptr, s, j_ptr)
+   GC.@preserve A begin
+     for k = 1:nrows(A)
+        i_ptr = mat_entry_ptr(A, k, i)
+        j_ptr = mat_entry_ptr(A, k, j)
+        ccall((:fmpz_addmul, libflint), Cvoid, (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), i_ptr, s, j_ptr)
+     end
    end
 end
 
@@ -1500,35 +1504,37 @@ function solve_triu_left(U::ZZMatrix, b::ZZMatrix)
    tmp = zero_matrix(ZZ, 1, n)
    t = R()
    s = R()
-   for i = 1:m
-      tmp_p = Nemo.mat_entry_ptr(tmp, 1, 1)
-      X_p = Nemo.mat_entry_ptr(X, i, 1)
-      for j = 1:n
-         ccall((:fmpz_set, Nemo.libflint), Cvoid, (Ptr{ZZRingElem}, Ptr{ZZRingElem}), tmp_p, X_p)
-         X_p += sizeof(ZZRingElem)
-         tmp_p += sizeof(ZZRingElem)
-      end
-      for j = 1:n
-         ccall((:fmpz_zero, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, ), s) 
+   GC.@preserve x b tmp begin
+     for i = 1:m
+        tmp_p = Nemo.mat_entry_ptr(tmp, 1, 1)
+        X_p = Nemo.mat_entry_ptr(X, i, 1)
+        for j = 1:n
+           ccall((:fmpz_set, Nemo.libflint), Cvoid, (Ptr{ZZRingElem}, Ptr{ZZRingElem}), tmp_p, X_p)
+           X_p += sizeof(ZZRingElem)
+           tmp_p += sizeof(ZZRingElem)
+        end
+        for j = 1:n
+           ccall((:fmpz_zero, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, ), s) 
 
-         tmp_p = Nemo.mat_entry_ptr(tmp, 1, 1)
-         for k = 1:j-1
-            U_p = Nemo.mat_entry_ptr(U, k, j)
-            ccall((:fmpz_addmul, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}), s, U_p, tmp_p)
-            tmp_p += sizeof(ZZRingElem)
-         end
-         ccall((:fmpz_sub, Nemo.libflint), Cvoid, 
-          (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), s, Nemo.mat_entry_ptr(b, i, j), s)
-         ccall((:fmpz_divexact, Nemo.libflint), Cvoid, 
-          (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), Nemo.mat_entry_ptr(tmp, 1, j), s, Nemo.mat_entry_ptr(U, j, j))
-      end
-      tmp_p = Nemo.mat_entry_ptr(tmp, 1, 1)
-      X_p = Nemo.mat_entry_ptr(X, i, 1)
-      for j = 1:n
-         ccall((:fmpz_set, Nemo.libflint), Cvoid, (Ptr{ZZRingElem}, Ptr{ZZRingElem}), X_p, tmp_p)
-         X_p += sizeof(ZZRingElem)
-         tmp_p += sizeof(ZZRingElem)
-      end
+           tmp_p = Nemo.mat_entry_ptr(tmp, 1, 1)
+           for k = 1:j-1
+              U_p = Nemo.mat_entry_ptr(U, k, j)
+              ccall((:fmpz_addmul, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}), s, U_p, tmp_p)
+              tmp_p += sizeof(ZZRingElem)
+           end
+           ccall((:fmpz_sub, Nemo.libflint), Cvoid, 
+            (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), s, Nemo.mat_entry_ptr(b, i, j), s)
+           ccall((:fmpz_divexact, Nemo.libflint), Cvoid, 
+            (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), Nemo.mat_entry_ptr(tmp, 1, j), s, Nemo.mat_entry_ptr(U, j, j))
+        end
+        tmp_p = Nemo.mat_entry_ptr(tmp, 1, 1)
+        X_p = Nemo.mat_entry_ptr(X, i, 1)
+        for j = 1:n
+           ccall((:fmpz_set, Nemo.libflint), Cvoid, (Ptr{ZZRingElem}, Ptr{ZZRingElem}), X_p, tmp_p)
+           X_p += sizeof(ZZRingElem)
+           tmp_p += sizeof(ZZRingElem)
+        end
+     end
    end
    return X
 end
@@ -1540,41 +1546,71 @@ function solve_triu(U::ZZMatrix, b::ZZMatrix)
    X = zero(b)
    tmp = zero_matrix(ZZ, 1, n)
    s = ZZ()
-   for i = 1:m
-      tmp_ptr = Nemo.mat_entry_ptr(tmp, 1, 1)
-      for j = 1:n
-         X_ptr = Nemo.mat_entry_ptr(X, j, i)
-         ccall((:fmpz_set, Nemo.libflint), Cvoid, (Ptr{ZZRingElem}, Ptr{ZZRingElem}), tmp_ptr, X_ptr)
-         tmp_ptr += sizeof(ZZRingElem)
-      end
-      for j = n:-1:1
-         ccall((:fmpz_zero, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, ), s)
-         tmp_ptr = Nemo.mat_entry_ptr(tmp, 1, j+1)
-         for k = j + 1:n
-            U_ptr = Nemo.mat_entry_ptr(U, j, k)
-            ccall((:fmpz_addmul, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}), s, U_ptr, tmp_ptr)
-            tmp_ptr += sizeof(ZZRingElem)
-#           s = addmul!(s, U[j, k], tmp[k])
-         end
-         b_ptr = Nemo.mat_entry_ptr(b, j, i)
-         ccall((:fmpz_sub, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), s, b_ptr, s)
-#         s = b[j, i] - s
-         tmp_ptr = Nemo.mat_entry_ptr(tmp, 1, j)
-         U_ptr = Nemo.mat_entry_ptr(U, j, j)
-         ccall((:fmpz_divexact, Nemo.libflint), Cvoid, (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), tmp_ptr, s, U_ptr)
-         
-#         tmp[j] = divexact(s, U[j,j])
-      end
-      tmp_ptr = Nemo.mat_entry_ptr(tmp, 1, 1)
-      for j = 1:n
-         X_ptr = Nemo.mat_entry_ptr(X, j, i)
-         ccall((:fmpz_set, Nemo.libflint), Cvoid, (Ptr{ZZRingElem}, Ptr{ZZRingElem}), X_ptr, tmp_ptr)
-         tmp_ptr += sizeof(ZZRingElem)
-      end
+   GC.@preserve U b tmp begin
+     for i = 1:m
+        tmp_ptr = Nemo.mat_entry_ptr(tmp, 1, 1)
+        for j = 1:n
+           X_ptr = Nemo.mat_entry_ptr(X, j, i)
+           ccall((:fmpz_set, Nemo.libflint), Cvoid, (Ptr{ZZRingElem}, Ptr{ZZRingElem}), tmp_ptr, X_ptr)
+           tmp_ptr += sizeof(ZZRingElem)
+        end
+        for j = n:-1:1
+           ccall((:fmpz_zero, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, ), s)
+           tmp_ptr = Nemo.mat_entry_ptr(tmp, 1, j+1)
+           for k = j + 1:n
+              U_ptr = Nemo.mat_entry_ptr(U, j, k)
+              ccall((:fmpz_addmul, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}), s, U_ptr, tmp_ptr)
+              tmp_ptr += sizeof(ZZRingElem)
+  #           s = addmul!(s, U[j, k], tmp[k])
+           end
+           b_ptr = Nemo.mat_entry_ptr(b, j, i)
+           ccall((:fmpz_sub, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), s, b_ptr, s)
+  #         s = b[j, i] - s
+           tmp_ptr = Nemo.mat_entry_ptr(tmp, 1, j)
+           U_ptr = Nemo.mat_entry_ptr(U, j, j)
+           ccall((:fmpz_divexact, Nemo.libflint), Cvoid, (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), tmp_ptr, s, U_ptr)
+           
+  #         tmp[j] = divexact(s, U[j,j])
+        end
+        tmp_ptr = Nemo.mat_entry_ptr(tmp, 1, 1)
+        for j = 1:n
+           X_ptr = Nemo.mat_entry_ptr(X, j, i)
+           ccall((:fmpz_set, Nemo.libflint), Cvoid, (Ptr{ZZRingElem}, Ptr{ZZRingElem}), X_ptr, tmp_ptr)
+           tmp_ptr += sizeof(ZZRingElem)
+        end
+     end
    end
    return X
 end
 
+function AbstractAlgebra.solve_tril!(A::ZZMatrix, B::ZZMatrix, C::ZZMatrix, f::Int = 0) 
+
+  # a       x   u      ax = u
+  # b c   * y = v      bx + cy = v
+  # d e f   z   w      ....
+
+  @assert ncols(A) == ncols(C)
+  s = ZZ(0)
+  GC.@preserve A B C begin
+    for i=1:ncols(A)
+      for j = 1:nrows(A)
+        t = C[j, i]
+        B_ptr = mat_entry_ptr(B, j, 1)
+        for k = 1:j-1
+          A_ptr = mat_entry_ptr(B, k, i)
+          ccall((:fmpz_mul, libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}), s, A_ptr, B_ptr)
+          B_ptr += sizeof(ZZRingElem)
+          sub!(t, t, s)
+        end
+        if f == 1
+          A[j,i] = t
+        else
+          A[j,i] = divexact(t, B[j, j])
+        end
+      end
+    end
+  end
+end
 
 ###############################################################################
 #
