@@ -1504,7 +1504,7 @@ function solve_triu_left(U::ZZMatrix, b::ZZMatrix)
    tmp = zero_matrix(ZZ, 1, n)
    t = R()
    s = R()
-   GC.@preserve x b tmp begin
+   GC.@preserve X b tmp begin
      for i = 1:m
         tmp_p = Nemo.mat_entry_ptr(tmp, 1, 1)
         X_p = Nemo.mat_entry_ptr(X, i, 1)
@@ -1570,7 +1570,7 @@ function solve_triu(U::ZZMatrix, b::ZZMatrix)
            U_ptr = Nemo.mat_entry_ptr(U, j, j)
            ccall((:fmpz_divexact, Nemo.libflint), Cvoid, (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), tmp_ptr, s, U_ptr)
            
-  #         tmp[j] = divexact(s, U[j,j])
+#           tmp[j] = divexact(s, U[j,j])
         end
         tmp_ptr = Nemo.mat_entry_ptr(tmp, 1, 1)
         for j = 1:n
