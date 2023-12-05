@@ -21,8 +21,6 @@ parent_type(::Type{QQMPolyRingElem}) = QQMPolyRing
 
 elem_type(::Type{QQMPolyRing}) = QQMPolyRingElem
 
-elem_type(::QQMPolyRing) = QQMPolyRingElem
-
 mpoly_type(::Type{QQFieldElem}) = QQMPolyRingElem
 
 symbols(a::QQMPolyRing) = a.S

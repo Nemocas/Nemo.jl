@@ -12,8 +12,6 @@ parent_type(::Type{FqMPolyRingElem}) = FqMPolyRing
 
 elem_type(::Type{FqMPolyRing}) = FqMPolyRingElem
 
-elem_type(::FqMPolyRing) = FqMPolyRingElem
-
 mpoly_type(::Type{FqFieldElem}) = FqMPolyRingElem
 
 symbols(a::FqMPolyRing) = symbols(a.data)
