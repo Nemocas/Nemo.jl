@@ -1301,8 +1301,10 @@ function cansolve(a::ZZMatrix, b::ZZMatrix)
    end
    return true, transpose(z*T)
 end
-Base.reduce(::typeof(hcat), A::AbstractVector{ZZMatrix}) = _hcat(A)
-Base.reduce(::typeof(vcat), A::AbstractVector{ZZMatrix}) = _vcat(A)
+
+Base.reduce(::typeof(hcat), A::AbstractVector{ZZMatrix}) = AbstractAlgebra._hcat(A)
+
+Base.reduce(::typeof(vcat), A::AbstractVector{ZZMatrix}) = AbstractAlgebra._vcat(A)
 
 function Base.cat(A::ZZMatrix...;dims)
   @assert dims == (1,2) || isa(dims, Int)

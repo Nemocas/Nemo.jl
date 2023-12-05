@@ -706,8 +706,8 @@ end
    @test_throws ErrorException [A; A; C]
    @test cat(A, A, dims = (1, 2)) == block_diagonal_matrix([A, A])
    @test cat(A, A, dims = 1) == hcat(A, A)
-   @test reduce(hcat, A, A) == hcat(A, A) # -> _hcat
-   @test reduce(vcat, A, A) == vcat(A, A) # -> _vcat
+   @test reduce(hcat, [A, A]) == hcat(A, A) # -> _hcat
+   @test reduce(vcat, [A, A]) == vcat(A, A) # -> _vcat
    @test cat(A, A, dims = 2) == vcat(A, A)
    @test_throws ErrorException cat(A, A, dims = 3)
 end
