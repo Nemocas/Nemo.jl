@@ -42,8 +42,6 @@ elem_type(::Type{QQField}) = QQFieldElem
 
 base_ring(a::QQField) = FlintZZ
 
-base_ring(a::QQFieldElem) = FlintZZ
-
 is_domain_type(::Type{QQFieldElem}) = true
 
 ###############################################################################

@@ -71,8 +71,6 @@ function deepcopy_internal(a::RealPoly, dict::IdDict)
    return z
 end
 
-characteristic(::RealPolyRing) = 0
-
 ###############################################################################
 #
 #   Similar

@@ -72,13 +72,6 @@ Returns `Union{}` as this ring is not dependent on another ring.
 """
 base_ring(a::ZZRing) = Union{}
 
-@doc raw"""
-    base_ring(a::ZZRingElem)
-
-Returns `Union{}` as the parent ring is not dependent on another ring.
-"""
-base_ring(a::ZZRingElem) = Union{}
-
 is_domain_type(::Type{ZZRingElem}) = true
 
 ###############################################################################

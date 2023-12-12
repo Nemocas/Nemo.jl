@@ -48,8 +48,6 @@ base_ring(R::FlintPuiseuxSeriesRing{T}) where T <: RingElem = base_ring(laurent_
 
 base_ring(R::FlintPuiseuxSeriesField{T}) where T <: FieldElem = base_ring(laurent_ring(R))
 
-base_ring(a::FlintPuiseuxSeriesElem) = base_ring(parent(a))
-
 max_precision(R::FlintPuiseuxSeriesRing{T}) where T <: RingElem = max_precision(laurent_ring(R))
 
 max_precision(R::FlintPuiseuxSeriesField{T}) where T <: FieldElem = max_precision(laurent_ring(R))

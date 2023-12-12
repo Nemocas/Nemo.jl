@@ -23,11 +23,7 @@ parent(a::zzModPolyRingElem) = a.parent
 
 base_ring(R::zzModPolyRing) = R.base_ring
 
-base_ring(a::zzModPolyRingElem) = base_ring(parent(a))
-
 parent_type(::Type{zzModPolyRingElem}) = zzModPolyRing
-
-elem_type(::Type{zzModPolyRingElem}) = zzModPolyRingElem
 
 elem_type(::Type{zzModPolyRing}) = zzModPolyRingElem
 
@@ -110,8 +106,6 @@ function deepcopy_internal(a::zzModPolyRingElem, dict::IdDict)
   z.parent = a.parent
   return z
 end
-
-characteristic(R::zzModPolyRing) = modulus(R)
 
 ###############################################################################
 #

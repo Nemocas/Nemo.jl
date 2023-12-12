@@ -32,8 +32,6 @@ elem_type(::Type{ZZLaurentSeriesRing}) = ZZLaurentSeriesRingElem
 
 base_ring(R::ZZLaurentSeriesRing) = FlintZZ
 
-base_ring(a::ZZLaurentSeriesRingElem) = base_ring(parent(a))
-
 is_domain_type(::Type{ZZLaurentSeriesRingElem}) = true
 
 is_exact_type(a::Type{ZZLaurentSeriesRingElem}) = false

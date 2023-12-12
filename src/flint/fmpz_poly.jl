@@ -57,8 +57,6 @@ function deepcopy_internal(a::ZZPolyRingElem, dict::IdDict)
    return z
 end
 
-characteristic(::ZZPolyRing) = 0
-
 @doc raw"""
     height(a::ZZPolyRingElem)
 

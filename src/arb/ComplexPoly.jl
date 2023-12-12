@@ -71,8 +71,6 @@ function deepcopy_internal(a::ComplexPoly, dict::IdDict)
    return z
 end
 
-characteristic(::ComplexPolyRing) = 0
-
 ###############################################################################
 #
 #   AbstractString I/O

@@ -16,17 +16,11 @@ parent(a::FpPolyRingElem) = a.parent
 
 base_ring(R::FpPolyRing) = R.base_ring
 
-base_ring(a::FpPolyRingElem) = base_ring(parent(a))
-
-elem_type(::Type{FpPolyRingElem}) = FpPolyRingElem
-
 elem_type(::Type{FpPolyRing}) = FpPolyRingElem
 
 parent_type(::Type{FpPolyRingElem}) = FpPolyRing
 
 dense_poly_type(::Type{FpFieldElem}) = FpPolyRingElem
-
-characteristic(R::FpPolyRing) = characteristic(base_ring(R))
 
 ###############################################################################
 #

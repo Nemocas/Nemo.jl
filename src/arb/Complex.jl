@@ -41,8 +41,6 @@ parent_type(::Type{ComplexFieldElem}) = ComplexField
 
 base_ring(R::ComplexField) = Union{}
 
-base_ring(a::ComplexFieldElem) = Union{}
-
 parent(x::ComplexFieldElem) = ComplexField()
 
 is_domain_type(::Type{ComplexFieldElem}) = true

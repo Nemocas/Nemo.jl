@@ -31,8 +31,6 @@ nvars(a::fqPolyRepMPolyRing) = a.nvars
 
 base_ring(a::fqPolyRepMPolyRing) = a.base_ring
 
-base_ring(f::fqPolyRepMPolyRingElem) = f.parent.base_ring
-
 function ordering(a::fqPolyRepMPolyRing)
    b = a.ord
 #   b = ccall((:fq_nmod_mpoly_ctx_ord, libflint), Cint, (Ref{fqPolyRepMPolyRing}, ), a)
@@ -138,8 +136,6 @@ function is_constant(a::fqPolyRepMPolyRingElem)
              a, parent(a))
    return Bool(b)
 end
-
-characteristic(R::fqPolyRepMPolyRing) = characteristic(base_ring(R))
 
 ################################################################################
 #

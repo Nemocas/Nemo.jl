@@ -71,8 +71,6 @@ function deepcopy_internal(a::arb_poly, dict::IdDict)
    return z
 end
 
-characteristic(::ArbPolyRing) = 0
-
 ###############################################################################
 #
 #   AbstractString I/O

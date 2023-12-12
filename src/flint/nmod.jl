@@ -18,8 +18,6 @@ elem_type(::Type{zzModRing}) = zzModRingElem
 
 base_ring(a::zzModRing) = FlintZZ
 
-base_ring(a::zzModRingElem) = FlintZZ
-
 parent(a::zzModRingElem) = a.parent
 
 function check_parent(a::zzModRingElem, b::zzModRingElem)

@@ -19,8 +19,6 @@ elem_type(::Type{FqPolyRepField}) = FqPolyRepFieldElem
 
 base_ring(a::FqPolyRepField) = Union{}
 
-base_ring(a::FqPolyRepFieldElem) = Union{}
-
 parent(a::FqPolyRepFieldElem) = a.parent
 
 is_domain_type(::Type{FqPolyRepFieldElem}) = true

@@ -80,8 +80,6 @@ function deepcopy_internal(a::FqPolyRepPolyRingElem, dict::IdDict)
    return z
 end
 
-characteristic(R::FqPolyRepPolyRing) = characteristic(base_ring(R))
-
 ###############################################################################
 #
 #   Similar

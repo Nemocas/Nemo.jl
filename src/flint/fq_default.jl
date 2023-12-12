@@ -18,8 +18,6 @@ elem_type(::Type{FqField}) = FqFieldElem
 
 base_ring(a::FqField) = Union{}
 
-base_ring(a::FqFieldElem) = Union{}
-
 parent(a::FqFieldElem) = a.parent
 
 is_domain_type(::Type{FqFieldElem}) = true

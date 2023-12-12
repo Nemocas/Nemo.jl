@@ -32,8 +32,6 @@ nvars(a::ZZMPolyRing) = ccall((:fmpz_mpoly_ctx_nvars, libflint), Int,
 
 base_ring(a::ZZMPolyRing) = FlintZZ
 
-base_ring(f::ZZMPolyRingElem) = FlintZZ
-
 function ordering(a::ZZMPolyRing)
    b = ccall((:fmpz_mpoly_ctx_ord, libflint), Cint, (Ref{ZZMPolyRing}, ), a)
    return flint_orderings[b + 1]
@@ -255,8 +253,6 @@ function total_degree_fmpz(a::ZZMPolyRingElem)
             d, a, a.parent)
    return d
 end
-
-characteristic(::ZZMPolyRing) = 0
 
 ###############################################################################
 #

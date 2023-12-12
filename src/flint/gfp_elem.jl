@@ -18,8 +18,6 @@ elem_type(::Type{fpField}) = fpFieldElem
 
 base_ring(a::fpField) = Union{}
 
-base_ring(a::fpFieldElem) = Union{}
-
 parent(a::fpFieldElem) = a.parent
 
 function check_parent(a::fpFieldElem, b::fpFieldElem)

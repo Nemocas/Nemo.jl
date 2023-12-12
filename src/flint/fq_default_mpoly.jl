@@ -22,10 +22,6 @@ nvars(a::FqMPolyRing) = nvars(a.data)
 
 base_ring(a::FqMPolyRing) = a.base_ring
 
-base_ring(f::FqMPolyRingElem) = base_ring(parent(f))
-
-characteristic(R::FqMPolyRing) = characteristic(base_ring(R))
-
 modulus(R::FqMPolyRing) = modulus(base_ring(R))
 
 modulus(f::FqMPolyRingElem) = modulus(base_ring(parent(f)))

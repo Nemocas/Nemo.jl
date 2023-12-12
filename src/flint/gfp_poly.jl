@@ -16,11 +16,7 @@ parent(a::fpPolyRingElem) = a.parent
 
 base_ring(R::fpPolyRing) = R.base_ring
 
-base_ring(a::fpPolyRingElem) = base_ring(parent(a))
-
 parent_type(::Type{fpPolyRingElem}) = fpPolyRing
-
-elem_type(::Type{fpPolyRingElem}) = fpPolyRingElem
 
 elem_type(::Type{fpPolyRing}) = fpPolyRingElem
 
@@ -65,8 +61,6 @@ function deepcopy_internal(a::fpPolyRingElem, dict::IdDict)
   z.parent = a.parent
   return z
 end
-
-characteristic(R::fpPolyRing) = characteristic(base_ring(R))
 
 ###############################################################################
 #

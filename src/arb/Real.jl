@@ -37,8 +37,6 @@ parent_type(::Type{RealFieldElem}) = RealField
 
 base_ring(R::RealField) = Union{}
 
-base_ring(x::RealFieldElem) = Union{}
-
 parent(x::RealFieldElem) = RealField()
 
 is_domain_type(::Type{RealFieldElem}) = true

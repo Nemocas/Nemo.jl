@@ -37,8 +37,6 @@ nvars(a::QQMPolyRing) = ccall((:fmpq_mpoly_ctx_nvars, libflint), Int,
 
 base_ring(a::QQMPolyRing) = FlintQQ
 
-base_ring(f::QQMPolyRingElem) = FlintQQ
-
 function ordering(a::QQMPolyRing)
    b = ccall((:fmpq_mpoly_ctx_ord, libflint), Cint, (Ref{QQMPolyRing}, ), a)
    return flint_orderings[b + 1]
@@ -151,8 +149,6 @@ function denominator(a::QQMPolyRingElem)
         (Ref{ZZRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), c, a, parent(a))
   return c
 end
-
-characteristic(::QQMPolyRing) = 0
 
 ################################################################################
 #
