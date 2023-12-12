@@ -598,11 +598,19 @@ end
   @test !is_squarefree(f)
 
   @test is_squarefree((x+1)*(x+2)*(x+3))
+
+  @test !is_squarefree(Rx(0))
+  @test is_squarefree(Rx(1))
+  @test is_squarefree(Rx(2))
+  @test is_squarefree(Rx(4))
 end
 
 @testset "zzModPolyRingElem.factor" begin
   R = residue_ring(ZZ, 23)
   Rx, x = polynomial_ring(R, "x")
+
+  @test_throws ArgumentError factor(Rx(0))
+  @test_throws ArgumentError factor_squarefree(Rx(0))
 
   f = 2*((x^6 + x^4 + 2 *x^2 )^10 + x - 1)
 

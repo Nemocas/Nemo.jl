@@ -692,6 +692,7 @@ for (factor_fn, factor_fn_inner, flint_fn) in
    eval(quote
 
       function $factor_fn(x::QQPolyRingElem)
+         iszero(x) && throw(ArgumentError("Argument must be non-zero"))
          res, z = $factor_fn_inner(x)
          return Fac(parent(x)(z), res)
       end

@@ -505,18 +505,26 @@ end
 
 @testset "fqPolyRepPolyRingElem.is_squarefree" begin
   R, x = finite_field(23, 5, "x")
-  S, y = polynomial_ring(R, "y")
+  Rx, y = polynomial_ring(R, "y")
 
   f = y^6 + y^4 + 2 *y^2
 
   @test !is_squarefree(f)
 
   @test is_squarefree((y+1)*(y+2)*(y+3))
+
+  @test !is_squarefree(Rx(0))
+  @test is_squarefree(Rx(1))
+  @test is_squarefree(Rx(2))
+  @test is_squarefree(Rx(4))
 end
 
 @testset "fqPolyRepPolyRingElem.factor" begin
    R, x = finite_field(23, 5, "x")
    S, y = polynomial_ring(R, "y")
+
+   @test_throws ArgumentError factor(S(0))
+   @test_throws ArgumentError factor_squarefree(S(0))
 
    f = 7y^2 + 3y + 2
    g = 11y^3 - 2y^2 + 5

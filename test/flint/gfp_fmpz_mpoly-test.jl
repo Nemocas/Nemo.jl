@@ -501,6 +501,9 @@ end
    R = GF(ZZRingElem(23))
    R, (x, y, z) = polynomial_ring(R, ["x", "y", "z"])
 
+   @test_throws ArgumentError factor(R(0))
+   @test_throws ArgumentError factor_squarefree(R(0))
+
    function check_factor(a, esum)
       f = factor(a)
       @test a == unit(f) * prod([p^e for (p, e) in f])

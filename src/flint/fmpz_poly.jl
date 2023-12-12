@@ -699,6 +699,7 @@ for (factor_fn, factor_fn_inner, flint_fn) in
   eval(quote
     
     function $factor_fn(x::ZZPolyRingElem)
+      iszero(x) && throw(ArgumentError("Argument must be non-zero"))
       fac, z = $factor_fn_inner(x)
       ffac = factor(z)
 

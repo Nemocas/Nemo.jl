@@ -726,6 +726,7 @@ end
 ################################################################################
 
 function factor(x::zzModPolyRingElem)
+  iszero(x) && throw(ArgumentError("Argument must be non-zero"))
   fac, z = _factor(x)
   return Fac(parent(x)(z), fac)
 end
@@ -747,6 +748,7 @@ function _factor(x::zzModPolyRingElem)
 end
 
 function factor_squarefree(x::zzModPolyRingElem)
+  iszero(x) && throw(ArgumentError("Argument must be non-zero"))
   !is_prime(modulus(x)) && error("Modulus not prime in factor_squarefree")
   return Fac(parent(x)(leading_coefficient(x)), _factor_squarefree(x))
 end

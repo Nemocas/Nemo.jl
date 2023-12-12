@@ -532,6 +532,7 @@ function (::Type{Fac{($etype)}})(fac::($ftype), preserve_input::Bool = true)
 end
 
 function factor(a::($etype))
+   iszero(a) && throw(ArgumentError("Argument must be non-zero"))
    R = parent(a)
    fac = ($ftype)(R)
    ok = ccall((:fmpz_mod_mpoly_factor, libflint), Cint,
@@ -542,6 +543,7 @@ function factor(a::($etype))
 end
 
 function factor_squarefree(a::($etype))
+   iszero(a) && throw(ArgumentError("Argument must be non-zero"))
    R = parent(a)
    fac = ($ftype)(R)
    ok = ccall((:fmpz_mod_mpoly_factor_squarefree, libflint), Cint,

@@ -513,11 +513,19 @@ end
   @test !is_squarefree(f)
 
   @test is_squarefree((x+1)*(x+2)*(x+3))
+
+  @test !is_squarefree(Rx(0))
+  @test is_squarefree(Rx(1))
+  @test is_squarefree(Rx(2))
+  @test is_squarefree(Rx(4))
 end
 
 @testset "FqPolyRepPolyRingElem.factor" begin
    R, x = finite_field(ZZRingElem(23), 5, "x")
    S, y = polynomial_ring(R, "y")
+
+   @test_throws ArgumentError factor(S(0))
+   @test_throws ArgumentError factor_squarefree(S(0))
 
    f = 7y^2 + 3y + 2
    g = 11y^3 - 2y^2 + 5

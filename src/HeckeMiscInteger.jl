@@ -231,12 +231,8 @@ end
 Returns true if $n$ is squarefree, false otherwise.
 """
 function is_squarefree(n::Union{Int,ZZRingElem})
-    if iszero(n)
-        error("Argument must be non-zero")
-    end
-    if isone(abs(n))
-        return true
-    end
+    iszero(n) && return false
+    is_unit(n) && return true
     e, b = is_power(n)
     if e > 1
         return false

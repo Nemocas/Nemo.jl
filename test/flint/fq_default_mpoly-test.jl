@@ -537,6 +537,10 @@ end
    for (R, a) in test_fields
       characteristic(R) == 23 || continue
       S, (x, y, z) = polynomial_ring(R, ["x", "y", "z"])
+
+      @test_throws ArgumentError factor(S(0))
+      @test_throws ArgumentError factor_squarefree(S(0))
+
       a = iszero(a) ? one(R) : a
       check_factor(3*a^3*x^23+2*a^2*y^23+a*z^23, 23)
       check_factor(x^99-a^33*y^99*z^33, 22)

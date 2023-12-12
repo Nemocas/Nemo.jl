@@ -803,6 +803,7 @@ function _sum_of_squares(p::ZZRingElem)
 end
 
 function factor(a::fmpzi)
+   iszero(a) && throw(ArgumentError("Argument must be non-zero"))
    f = Fac{fmpzi}()
    g = gcd(a.x, a.y)
    f.unit = divexact(a, g)   # throw if a=0

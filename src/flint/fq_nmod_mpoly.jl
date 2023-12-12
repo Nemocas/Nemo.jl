@@ -449,6 +449,7 @@ function (::Type{Fac{fqPolyRepMPolyRingElem}})(fac::fq_nmod_mpoly_factor, preser
 end
 
 function factor(a::fqPolyRepMPolyRingElem)
+   iszero(a) && throw(ArgumentError("Argument must be non-zero"))
    R = parent(a)
    fac = fq_nmod_mpoly_factor(R)
    ok = ccall((:fq_nmod_mpoly_factor, libflint), Cint,
@@ -459,6 +460,7 @@ function factor(a::fqPolyRepMPolyRingElem)
 end
 
 function factor_squarefree(a::fqPolyRepMPolyRingElem)
+   iszero(a) && throw(ArgumentError("Argument must be non-zero"))
    R = parent(a)
    fac = fq_nmod_mpoly_factor(R)
    ok = ccall((:fq_nmod_mpoly_factor_squarefree, libflint), Cint,

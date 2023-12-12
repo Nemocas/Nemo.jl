@@ -501,9 +501,8 @@ end
 function is_squarefree(f::PolyRingElem{<:FieldElement})
   R = coefficient_ring(f)
 
-  if iszero(f) || degree(f) == 0
-    return true
-  end
+  iszero(f) && return false
+  degree(f) == 0 && return true
 
   if !is_monic(f)
     g = divexact(f, leading_coefficient(f))
@@ -520,9 +519,8 @@ function is_squarefree(f::PolyRingElem{<:FieldElement})
 end
 
 function is_squarefree(f::PolyRingElem{<:RingElement})
-  if iszero(f)
-    return true
-  end
+  iszero(f) && return false
+  degree(f) == 0 && return is_squarefree(leading_coefficient(f))
   fac = factor_squarefree(f)
   return all(e <= 1 for (_, e) in fac)
 end

@@ -397,6 +397,7 @@ end
 ################################################################################
 
 function factor(x::fpPolyRingElem)
+  iszero(x) && throw(ArgumentError("Argument must be non-zero"))
   fac, z = _factor(x)
   return Fac(parent(x)(z), fac)
 end
@@ -417,6 +418,7 @@ function _factor(x::fpPolyRingElem)
 end
 
 function factor_squarefree(x::fpPolyRingElem)
+  iszero(x) && throw(ArgumentError("Argument must be non-zero"))
   return Fac(parent(x)(leading_coefficient(x)), _factor_squarefree(x))
 end
 

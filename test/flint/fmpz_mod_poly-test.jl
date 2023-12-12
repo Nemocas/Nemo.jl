@@ -502,16 +502,24 @@ end
 
 @testset "ZZModPolyRingElem.is_squarefree" begin
    R = residue_ring(ZZ, 123456789012345678949)
-   S, x = polynomial_ring(R, "x")
+   Rx, x = polynomial_ring(R, "x")
 
    f = x^2 + 2x + 1
 
    @test is_squarefree(f) == false
+
+   @test !is_squarefree(Rx(0))
+   @test is_squarefree(Rx(1))
+   @test is_squarefree(Rx(2))
+   @test is_squarefree(Rx(4))
 end
 
 @testset "ZZModPolyRingElem.factor" begin
    R = residue_ring(ZZ, 123456789012345678949)
    S, x = polynomial_ring(R, "x")
+
+   @test_throws ArgumentError factor(S(0))
+   @test_throws ArgumentError factor_squarefree(S(0))
 
    f = 3*(x^2 + 2x + 1)
    g = x^3 + 3x + 1

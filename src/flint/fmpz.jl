@@ -1491,9 +1491,7 @@ function _factor(a::ZZRingElem)
 end
 
 function factor(a::T) where T <: Union{Int, UInt}
-   if iszero(a)
-      throw(ArgumentError("Argument is not non-zero"))
-   end
+   iszero(a) && throw(ArgumentError("Argument must be non-zero"))
    u = sign(a)
    a = u < 0 ? -a : a
    F = n_factor()
@@ -1592,9 +1590,7 @@ julia> factor(12)
 ```
 """
 function factor(a::ZZRingElem)
-   if iszero(a)
-      throw(ArgumentError("Argument is not non-zero"))
-   end
+   iszero(a) && throw(ArgumentError("Argument must be non-zero"))
    fac, z = _factor(a)
    return Fac(z, fac)
 end

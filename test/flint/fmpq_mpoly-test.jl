@@ -525,6 +525,9 @@ end
 @testset "QQMPolyRingElem.factor" begin
    R, (x, y, z) = polynomial_ring(FlintQQ, ["x", "y", "z"])
 
+   @test_throws ArgumentError factor(R(0))
+   @test_throws ArgumentError factor_squarefree(R(0))
+
    function check_factor(a, esum)
       f = factor(a)
       @test a == unit(f) * prod([p^e for (p, e) in f])

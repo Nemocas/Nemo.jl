@@ -488,6 +488,9 @@ end
 @testset "QQPolyRingElem.factor" begin
    S, y = polynomial_ring(QQ, "y")
 
+   @test_throws ArgumentError factor(S(0))
+   @test_throws ArgumentError factor_squarefree(S(0))
+
    f = (2y + 1)^10*(5*y^3 + 1)^100*(-QQFieldElem(1,5))
 
    fac = factor(f)
@@ -499,6 +502,11 @@ end
 
    @test f == unit(fac) * prod([ p^e for (p, e) in fac])
 
+   @test_throws ArgumentError factor(S(0))
+   @test_throws ArgumentError factor_squarefree(S(0))
+
+   @test !is_irreducible(S(0))
+   @test !is_irreducible(S(1))
    @test !is_irreducible(S(2))
    @test is_irreducible(y^4 + 1)
    @test is_irreducible(y + 1)
@@ -506,6 +514,10 @@ end
    @test is_irreducible(2y + 2)
    @test !is_irreducible(y^2)
 
+   @test !is_squarefree(S(0))
+   @test is_squarefree(S(1))
+   @test is_squarefree(S(2))
+   @test is_squarefree(S(4))
    @test is_squarefree(7*y^2 + 2)
    @test is_squarefree(2*y)
    @test is_squarefree(4*y)

@@ -271,10 +271,12 @@ function _convert_fac(a::FqMPolyRing, b::Fac)
 end
 
 function factor(a::FqMPolyRingElem)
+    iszero(a) && throw(ArgumentError("Argument must be non-zero"))
     return _convert_fac(parent(a), factor(a.data))
 end
 
 function factor_squarefree(a::FqMPolyRingElem)
+    iszero(a) && throw(ArgumentError("Argument must be non-zero"))
     return _convert_fac(parent(a), factor_squarefree(a.data))
 end
 

@@ -389,6 +389,9 @@ end
 @testset "ZZPolyRingElem.factor" begin
   Rx, x = polynomial_ring(FlintZZ, "x")
 
+  @test_throws ArgumentError factor(Rx(0))
+  @test_throws ArgumentError factor_squarefree(Rx(0))
+
   f = x^24 - x^23 + x^19 - x^18 + x^17 - x^16 + x^14 - x^13 + x^12 - x^11 + x^10 - x^8 + x^7 - x^6 + x^5 - x + 1
   g = x - 1
 
@@ -406,10 +409,12 @@ end
   @test -10*f^10 * g^20 == unit(fac) * prod([ p^e for (p, e) in fac])
   @test length(fac.fac) == 4
 
+  @test !is_irreducible(Rx(0))
+  @test !is_irreducible(Rx(1))
   @test is_irreducible(Rx(2))
+  @test !is_irreducible(Rx(4))
   @test is_irreducible(x^4 + 1)
   @test is_irreducible(x + 1)
-  @test !is_irreducible(Rx(4))
   @test !is_irreducible(2x + 2)
   @test !is_irreducible(x^2)
 
@@ -417,6 +422,10 @@ end
   @test length(factor(g)) == 6
   @test length(factor(4 * g)) == 7
 
+  @test !is_squarefree(Rx(0))
+  @test is_squarefree(Rx(1))
+  @test is_squarefree(Rx(2))
+  @test !is_squarefree(Rx(4))
   @test is_squarefree(7*x^2 + 2)
   @test is_squarefree(2*x)
   @test !is_squarefree(4*x)

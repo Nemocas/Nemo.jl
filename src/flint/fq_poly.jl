@@ -637,6 +637,7 @@ end
 ################################################################################
 
 function factor(x::FqPolyRepPolyRingElem)
+  iszero(x) && throw(ArgumentError("Argument must be non-zero"))
    fac, z = _factor(x)
    return Fac(parent(x)(z), fac)
 end
@@ -662,6 +663,7 @@ function _factor(x::FqPolyRepPolyRingElem)
 end
 
 function factor_squarefree(x::FqPolyRepPolyRingElem)
+  iszero(x) && throw(ArgumentError("Argument must be non-zero"))
   # _factor_squareefree does weird things if the polynomial is not monic
   return Fac(parent(x)(leading_coefficient(x)),
 	      _factor_squarefree(divexact(x, leading_coefficient(x))))
