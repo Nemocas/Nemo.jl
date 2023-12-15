@@ -2648,7 +2648,9 @@ if NEW_FLINT
      overfields :: Dict{Int, Vector{FinFieldMorphism}}
      subfields :: Dict{Int, Vector{FinFieldMorphism}}
 
-     function FqPolyRepField(char::ZZRingElem, deg::Int, s::Symbol, cached::Bool = true)
+     function FqPolyRepField(char::ZZRingElem, deg::Int, s::Symbol, cached::Bool = true; check::Bool = true)
+        check && !is_probable_prime(char) &&
+          throw(DomainError(char, "the characteristic must be a prime"))
         return get_cached!(FqFiniteFieldID, (char, deg, s), cached) do
            d = new()
            finalizer(_FqFiniteField_clear_fn, d)
@@ -2719,7 +2721,9 @@ else
      overfields :: Dict{Int, Vector{FinFieldMorphism}}
      subfields :: Dict{Int, Vector{FinFieldMorphism}}
 
-     function FqPolyRepField(char::ZZRingElem, deg::Int, s::Symbol, cached::Bool = true)
+     function FqPolyRepField(char::ZZRingElem, deg::Int, s::Symbol, cached::Bool = true; check::Bool = true)
+        check && !is_probable_prime(char) &&
+          throw(DomainError(char, "the characteristic must be a prime"))
         return get_cached!(FqFiniteFieldID, (char, deg, s), cached) do
            d = new()
            finalizer(_FqFiniteField_clear_fn, d)
