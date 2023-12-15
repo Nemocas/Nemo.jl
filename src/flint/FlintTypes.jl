@@ -2237,7 +2237,9 @@ See [`FqPolyRepField`](@ref) for $p$ being a [`ZZRingElem`](@ref). See [`fqPolyR
    overfields :: Dict{Int, Vector{FinFieldMorphism}}
    subfields :: Dict{Int, Vector{FinFieldMorphism}}
 
-   function fqPolyRepField(c::ZZRingElem, deg::Int, s::Symbol, cached::Bool = true)
+   function fqPolyRepField(c::ZZRingElem, deg::Int, s::Symbol, cached::Bool = true; check::Bool = true)
+      check && !is_prime(c) &&
+         throw(DomainError(c, "the characteristic must be a prime"))
       return get_cached!(FqNmodFiniteFieldID, (c, deg, s), cached) do
          d = new()
          ccall((:fq_nmod_ctx_init, libflint), Nothing,

@@ -270,3 +270,8 @@ end
    R, x = finite_field(19, 3, "x")
    @test R([1, 0, 1]) == x^2 + 1
 end
+
+@testset "Nemo.jl#1493" begin
+   @test_throws DomainError GF(4, 2)
+   @test_throws DomainError finite_field(6, 2, "x")
+end
