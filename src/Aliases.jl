@@ -1,3 +1,5 @@
+include(joinpath(pathof(AbstractAlgebra), "..", "Aliases.jl"))
+
 # make some Julia names compatible with our naming conventions
 @alias is_equal isequal
 @alias is_finite isfinite
