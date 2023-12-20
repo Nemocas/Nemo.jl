@@ -888,7 +888,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::ZZLaurentSeriesRingElem, y::Union{Integer, Rational, AbstractFloat})
+function divexact(x::ZZLaurentSeriesRingElem, y::Union{Integer, Rational, AbstractFloat}; check::Bool=true)
    y == 0 && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()

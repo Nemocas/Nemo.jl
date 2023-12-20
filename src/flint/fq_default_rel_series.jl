@@ -492,7 +492,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::FqRelPowerSeriesRingElem, y::FqFieldElem)
+function divexact(x::FqRelPowerSeriesRingElem, y::FqFieldElem; check::Bool=true)
    iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
