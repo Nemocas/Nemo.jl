@@ -33,6 +33,8 @@ is_domain_type(::Type{qqbar}) = true
 
 check_parent(a::qqbar, b::qqbar, throw::Bool = true) = true
 
+characteristic(::CalciumQQBarField) = 0
+
 ###############################################################################
 #
 #   Hashing
