@@ -370,8 +370,6 @@ include("calcium/CalciumTypes.jl")
 
 include("gaussiannumbers/GaussianNumberTypes.jl")
 
-#include("ambiguities.jl") # remove ambiguity warnings
-
 include("flint/adhoc.jl")
 
 include("embedding/embedding.jl")
