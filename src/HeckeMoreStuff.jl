@@ -1299,11 +1299,9 @@ end
 Base.precision(Q::FlintPadicField) = Q.prec_max
 Base.precision(Q::FlintQadicField) = Q.prec_max
 
-import Base.^
 ^(a::qadic, b::qadic) = exp(b * log(a))
 ^(a::padic, b::padic) = exp(b * log(a))
 
-import Base.//
 //(a::qadic, b::qadic) = divexact(a, b)
 //(a::padic, b::qadic) = divexact(a, b)
 //(a::qadic, b::padic) = divexact(a, b)

@@ -19,34 +19,138 @@ using Pkg
 
 import SHA
 
-import AbstractAlgebra: div, divrem
-
 # N.B: do not import div, divrem from Base
-import Base: Array, abs, abs2, acos, acosh, asin, asinh, atan, atanh, bin, binomial,
-             ceil, checkbounds, conj, convert, cmp, contains, cos, cosh, cospi, cot,
-             coth, dec, deepcopy, deepcopy_internal, denominator,
-             expm1, exp, factorial, floor, gcd, gcdx, getindex, hash, hcat,
-             hex, hypot, in, intersect, inv, invmod, isequal, iseven, isinf, isfinite,
-             isinteger, isless, isodd, isone, isqrt, isreal, iszero, lcm,
-             ldexp, length, log, log1p, maximum, minimum, mod, ndigits, numerator, oct, one,
-             parent, parse, powermod,
-             precision, rand, Rational, rem, reverse, round, setindex!,
-             show, similar, sign, sin, sincos, sincospi, sinh, sinpi, size, sqrt, string,
-             tan, tanh, trailing_zeros, transpose, trunc, truncate, typed_hvcat,
-             typed_hcat, vcat, xor, zero, zeros, +, -, *, ==, ^, &, |, <<, >>,
-             ~, <=, >=, <, >, //, /, \, !=
+import Base: Array
+import Base: abs
+import Base: abs2
+import Base: acos
+import Base: acosh
+import Base: asin
+import Base: asinh
+import Base: atan
+import Base: atanh
+import Base: bin
+import Base: binomial
+import Base: ceil
+import Base: checkbounds
+import Base: conj
+import Base: convert
+import Base: cmp
+import Base: contains
+import Base: cos
+import Base: cosh
+import Base: cospi
+import Base: cot
+import Base: coth
+import Base: dec
+import Base: deepcopy
+import Base: deepcopy_internal
+import Base: denominator
+import Base: expm1
+import Base: exp
+import Base: factorial
+import Base: floor
+import Base: gcd
+import Base: gcdx
+import Base: getindex
+import Base: hash
+import Base: hcat
+import Base: hex
+import Base: hypot
+import Base: in
+import Base: intersect
+import Base: inv
+import Base: invmod
+import Base: isequal
+import Base: iseven
+import Base: isinf
+import Base: isfinite
+import Base: isinteger
+import Base: isless
+import Base: isodd
+import Base: isone
+import Base: isqrt
+import Base: isreal
+import Base: iszero
+import Base: lcm
+import Base: ldexp
+import Base: length
+import Base: log
+import Base: log1p
+import Base: maximum
+import Base: minimum
+import Base: mod
+import Base: ndigits
+import Base: numerator
+import Base: oct
+import Base: one
+import Base: parent
+import Base: parse
+import Base: powermod
+import Base: precision
+import Base: rand
+import Base: Rational
+import Base: rem
+import Base: reverse
+import Base: round
+import Base: setindex!
+import Base: show
+import Base: similar
+import Base: sign
+import Base: sin
+import Base: sincos
+import Base: sincospi
+import Base: sinh
+import Base: sinpi
+import Base: size
+import Base: sqrt
+import Base: string
+import Base: tan
+import Base: tanh
+import Base: trailing_zeros
+import Base: transpose
+import Base: trunc
+import Base: truncate
+import Base: typed_hvcat
+import Base: typed_hcat
+import Base: vcat
+import Base: xor
+import Base: zero
+import Base: zeros
+import Base: +
+import Base: -
+import Base: *
+import Base: ==
+import Base: ^
+import Base: &
+import Base: |
+import Base: <<
+import Base: >>
+import Base: ~
+import Base: <=
+import Base: >=
+import Base: <
+import Base: >
+import Base: //
+import Base: /
+import Base: \
+import Base: !=
 
 if isdefined(Base, :tanpi) # added in julia >= 1.10-DEV
   import Base: tanpi
 end
 
-import LinearAlgebra: det, norm, nullspace, rank, transpose!, hessenberg, tr,
-                      lu, lu!, eigvals, cholesky
-
-import AbstractAlgebra: nullspace, @show_name, @show_special, find_name,
-                        get_attribute, set_attribute!, @attributes,
-                        get_cached!,
-                        @show_special_elem, force_coerce, force_op, expressify
+import LinearAlgebra: det
+import LinearAlgebra: norm
+import LinearAlgebra: nullspace
+import LinearAlgebra: rank
+import LinearAlgebra: transpose!
+import LinearAlgebra: hessenberg
+import LinearAlgebra: tr
+import LinearAlgebra: lu
+import LinearAlgebra: lu!
+import LinearAlgebra: eigvals
+import LinearAlgebra: cholesky
 
 # We don't want the QQ, ZZ, finite_field, number_field from AbstractAlgebra
 # as they are for parents of Julia types or naive implementations
@@ -57,17 +161,40 @@ import AbstractAlgebra: nullspace, @show_name, @show_special, find_name,
 # Set, Module, Ring, Group and Field are too generic to pollute the users namespace with
 for i in names(AbstractAlgebra)
    (i in AbstractAlgebra.import_exclude || !isdefined(AbstractAlgebra, i)) && continue
-   i == :GF && continue
-   i == :NumberField && continue
+   i == :GF && continue           # remove once Nemocas/AbstractAlgebra.jl#1538 is available
+   i == :NumberField && continue  # remove once Nemocas/AbstractAlgebra.jl#1538 is available
    @eval import AbstractAlgebra: $i
    @eval export $i
 end
 
+import AbstractAlgebra: @attributes
+import AbstractAlgebra: @show_name
+import AbstractAlgebra: @show_special
+import AbstractAlgebra: @show_special_elem
+import AbstractAlgebra: Dedent
+import AbstractAlgebra: div
+import AbstractAlgebra: divrem
+import AbstractAlgebra: ErrorConstrDimMismatch
+import AbstractAlgebra: expressify
+import AbstractAlgebra: Field
+import AbstractAlgebra: find_name
+import AbstractAlgebra: force_coerce
+import AbstractAlgebra: force_op
+import AbstractAlgebra: get_attribute
+import AbstractAlgebra: get_cached!
+import AbstractAlgebra: Group
+import AbstractAlgebra: Indent
+import AbstractAlgebra: Lowercase
+import AbstractAlgebra: LowercaseOff
+import AbstractAlgebra: Module
+import AbstractAlgebra: nullspace
+import AbstractAlgebra: pretty
+import AbstractAlgebra: promote_rule
+import AbstractAlgebra: Ring
+import AbstractAlgebra: Set
+import AbstractAlgebra: set_attribute!
+
 export GF
-
-import AbstractAlgebra: Set, Module, Ring, Group, Field, promote_rule
-
-import AbstractAlgebra: pretty, Lowercase, LowercaseOff, Indent, Dedent, ErrorConstrDimMismatch
 
 export flint_cleanup, flint_set_num_threads
 

@@ -1,6 +1,18 @@
 module Native
 
-import ..Nemo: ZZRingElem, VarName, ZZModPolyRingElem, FpPolyRingElem, FqPolyRepField, Zmodn_poly, fpField, FpField, fqPolyRepField, is_prime, is_probable_prime, gen, characteristic
+import ..Nemo: ZZRingElem
+import ..Nemo: VarName
+import ..Nemo: ZZModPolyRingElem
+import ..Nemo: FpPolyRingElem
+import ..Nemo: FqPolyRepField
+import ..Nemo: Zmodn_poly
+import ..Nemo: fpField
+import ..Nemo: FpField
+import ..Nemo: fqPolyRepField
+import ..Nemo: is_prime
+import ..Nemo: is_probable_prime
+import ..Nemo: gen
+import ..Nemo: characteristic
 
 function GF(n::Int; cached::Bool=true)
   (n <= 0) && throw(DomainError(n, "Characteristic must be positive"))

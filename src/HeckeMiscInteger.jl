@@ -434,7 +434,13 @@ function bits end
 module BitsMod
 
 using ..Nemo
-import Base: ^, show, getindex, iterate, length
+
+import Base: ^
+import Base: show
+import Base: getindex
+import Base: iterate
+import Base: length
+
 export bits, Limbs
 
 
