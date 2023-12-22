@@ -4,9 +4,6 @@
 #
 ###############################################################################
 
-export fqPolyRepMPolyRing
-export fqPolyRepMPolyRingElem
-
 ###############################################################################
 #
 #   Data type and parent object methods

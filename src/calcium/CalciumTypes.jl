@@ -4,12 +4,6 @@
 #
 ###############################################################################
 
-export CalciumQQBarField
-export qqbar
-export CalciumField
-export ca
-export options
-
 ################################################################################
 #
 #  truth_t triple-valued logic

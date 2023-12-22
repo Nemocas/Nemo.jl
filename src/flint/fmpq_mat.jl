@@ -4,11 +4,6 @@
 #
 ###############################################################################
 
-export QQMatrix
-export QQMatrixSpace
-export gram_schmidt_orthogonalisation
-export hilbert
-
 ###############################################################################
 #
 #   Data type and parent object methods

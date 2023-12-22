@@ -194,23 +194,7 @@ import AbstractAlgebra: Ring
 import AbstractAlgebra: Set
 import AbstractAlgebra: set_attribute!
 
-export GF
-
-export flint_cleanup
-export flint_set_num_threads
-
-export PadicField
-export QadicField
-export NGFiniteField
-
-export QQBar
-
-# Things/constants which are also defined in AbstractAlgebra:
-export ZZ
-export QQ
-export finite_field
-export number_field
-
+include("Exports.jl")
 
 ###############################################################################
 #
@@ -463,32 +447,6 @@ end
 macro new_struct(T, args...)
    return esc(Expr(:new, T, args...))
 end
-
-###############################################################################
-#
-#   Generic submodule
-#
-###############################################################################
-
-export power_series_ring
-export polynomial_ring
-export SparsePolynomialRing
-export matrix_space
-export fraction_field
-export residue_ring
-export Partition
-export SymmetricGroup
-export YoungTableau
-export AllParts
-export SkewDiagram
-export AllPerms
-export Perm
-export laurent_series_ring
-export laurent_series_field
-export puiseux_series_ring
-export residue_field
-
-export Generic
 
 ###############################################################################
 #

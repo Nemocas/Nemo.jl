@@ -1,6 +1,3 @@
-export representation_matrix
-export frobenius_matrix
-
 # additional constructors
 
 function FlintFiniteField(p::Integer; cached::Bool=true)
@@ -272,8 +269,6 @@ function frobenius_matrix(F::fqPolyRepField, n::Int=1)
     ccall((:nmod_mat_transpose, libflint), Nothing, (Ref{fpMatrix}, Ref{fpMatrix}), m, m)
     return m
 end
-
-export frobenius!
 
 function frobenius!(a::fqPolyRepFieldElem, b::fqPolyRepFieldElem, i::Int=1)
     ccall((:fq_nmod_frobenius, libflint), Nothing,

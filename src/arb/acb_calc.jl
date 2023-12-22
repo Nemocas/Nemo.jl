@@ -1,5 +1,3 @@
-export integrate
-
 function acb_calc_func_wrap(res::Ptr{ComplexFieldElem}, x::Ptr{ComplexFieldElem}, param::Ptr{Nothing}, order::Int, prec::Int)
     xx = unsafe_load(x)
     F = unsafe_pointer_to_objref(param)

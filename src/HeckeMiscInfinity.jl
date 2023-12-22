@@ -1,9 +1,3 @@
-export PosInf
-export NegInf
-export inf
-export IntExt
-export is_infinite
-
 """
     PosInf
 

@@ -1,11 +1,3 @@
-export is_zero_row
-export is_diagonal
-export is_lower_triangular
-export is_positive_entry
-export is_upper_triangular
-export diagonal
-
-
 ################################################################################
 #
 #  Denominator
@@ -73,7 +65,6 @@ function is_zero_row(M::Matrix{ZZRingElem}, i::Int)
     return true
 end
 
-export divexact!
 
 function divexact!(a::ZZMatrix, b::ZZMatrix, d::ZZRingElem)
     ccall((:fmpz_mat_scalar_divexact_fmpz, libflint), Nothing,
@@ -317,9 +308,6 @@ function mod(M::ZZMatrix, p::ZZRingElem)
     return N
 end
 
-export mod_sym
-export mod_sym!
-
 @doc raw"""
     mod_sym!(M::ZZMatrix, p::ZZRingElem)
 
@@ -369,7 +357,6 @@ function map_entries(R::zzModRing, M::ZZMatrix)
     return MR
 end
 
-export hnf!
 
 function hnf!(x::ZZMatrix)
   if nrows(x) * ncols(x) > 100
@@ -534,8 +521,6 @@ function is_lower_triangular(M::ZZMatrix)
     return true
 end
 
-export compare_index
-
 #Returns a positive integer if A[i, j] > b, negative if A[i, j] < b, 0 otherwise
 function compare_index(A::ZZMatrix, i::Int, j::Int, b::ZZRingElem)
     a = ccall((:fmpz_mat_entry, libflint), Ptr{ZZRingElem}, (Ref{ZZMatrix}, Int, Int), A, i - 1, j - 1)
@@ -552,7 +537,6 @@ function round!(b::ZZMatrix, a::arb_mat)
     return b
 end
 
-export shift!
 
 function shift!(g::ZZMatrix, l::Int)
     for i = 1:nrows(g)
@@ -624,7 +608,6 @@ diagonal(A::MatrixElem{T}) where {T} = T[A[i, i] for i in 1:nrows(A)]
 #
 ################################################################################
 
-export prod_diagonal
 
 function prod_diagonal(A::ZZMatrix)
     a = one(ZZRingElem)
@@ -642,7 +625,6 @@ function prod_diagonal(A::MatrixElem{T}) where {T}
     return prod(T[A[i, i] for i = 1:nrows(A)])
 end
 
-export reduce_mod!
 
 @doc raw"""
     reduce_mod!(A::MatElem{T}, B::MatElem{T}) where T <: FieldElem

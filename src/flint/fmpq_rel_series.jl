@@ -4,9 +4,6 @@
 #
 ###############################################################################
 
-export QQRelPowerSeriesRingElem
-export QQRelPowerSeriesRing
-
 ###############################################################################
 #
 #   Data type and parent object methods

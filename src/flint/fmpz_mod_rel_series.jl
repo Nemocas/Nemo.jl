@@ -6,11 +6,6 @@
 #
 ###############################################################################
 
-export ZZModRelPowerSeriesRingElem
-export ZZModRelPowerSeriesRing
-export FpRelPowerSeriesRingElem
-export FpRelPowerSeriesRing
-
 for (etype, rtype, ctype, mtype, brtype, flint_fn) in (
    (ZZModRelPowerSeriesRingElem, ZZModRelPowerSeriesRing, fmpz_mod_ctx_struct, ZZModRingElem, ZZModRing, "fmpz_mod_poly"),
    (FpRelPowerSeriesRingElem, FpRelPowerSeriesRing, fmpz_mod_ctx_struct, FpFieldElem, FpField, "fmpz_mod_poly"))

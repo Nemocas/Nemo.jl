@@ -1,7 +1,3 @@
-export fmpqi
-export FlintQQi
-export FlintQQiField
-
 ###############################################################################
 #
 #   Data type and parent methods

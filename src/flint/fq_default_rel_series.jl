@@ -4,9 +4,6 @@
 #
 ###############################################################################
 
-export FqRelPowerSeriesRingElem
-export FqRelPowerSeriesRing
-
 ###############################################################################
 #
 #   Data type and parent object methods

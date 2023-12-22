@@ -4,10 +4,6 @@
 #
 ###############################################################################
 
-export fqPolyRepFieldElem
-export fqPolyRepField
-export coeffs_raw
-
 ###############################################################################
 #
 #   Type and parent object methods

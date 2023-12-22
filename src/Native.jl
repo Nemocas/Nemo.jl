@@ -85,5 +85,3 @@ import ..Nemo: @alias
 end # module
 
 using .Native
-
-export Native

@@ -4,10 +4,6 @@
 #
 ################################################################################
 
-export ZZModPolyRing
-export ZZModPolyRingElem
-export factor
-
 ################################################################################
 #
 #  Type and parent object methods

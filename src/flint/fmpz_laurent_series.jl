@@ -4,9 +4,6 @@
 #
 ###############################################################################
 
-export ZZLaurentSeriesRingElem
-export ZZLaurentSeriesRing
-
 ###############################################################################
 #
 #   Data type and parent object methods

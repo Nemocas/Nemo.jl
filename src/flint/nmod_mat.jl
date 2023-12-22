@@ -4,38 +4,6 @@
 #
 ################################################################################
 
-export zzModMatrix
-export zzModMatrixSpace
-export getindex
-export setindex!
-export deepcopy
-export parent
-export base_ring
-export zero
-export one
-export transpose
-export transpose!
-export rref
-export rref!
-export tr
-export det
-export rank
-export inv
-export solve
-export lu
-export sub
-export hcat
-export vcat
-export Array
-export lift
-export lift!
-export matrix_space
-export check_parent
-export howell_form
-export howell_form!
-export strong_echelon_form
-export strong_echelon_form!
-
 ################################################################################
 #
 #  Data type and parent object methods

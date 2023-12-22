@@ -4,58 +4,6 @@
 #
 ################################################################################
 
-export zzModPolyRing
-export zzModPolyRingElem
-export parent
-export base_ring
-export elem_type
-export length
-export zero
-export one
-export gen
-export is_gen
-export iszero
-export var
-export deepcopy
-export show
-export truncate
-export mullow
-export reverse
-export shift_left
-export shift_right
-export divexact
-export rem
-export gcd
-export resultant
-export evaluate
-export derivative
-export compose
-export interpolate
-export inflate
-export deflate
-export lift
-export is_irreducible
-export is_squarefree
-export factor
-export factor_squarefree
-export factor_distinct_deg
-export factor_shape
-export setcoeff!
-export canonical_unit
-export add!
-export sub!
-export mul!
-export polynomial_ring
-export check_parent
-export gcdx
-export mod
-export invmod
-export gcdinv
-export mulmod
-export powermod
-export zero!
-export one!
-
 ################################################################################
 #
 #  Type and parent object methods

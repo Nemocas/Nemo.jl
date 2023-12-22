@@ -361,8 +361,6 @@ function _factor_squarefree_char_0(f::PolyRingElem)
     return Fac(parent(f)(c), res)
 end
 
-export factor_equal_deg
-
 function factor_equal_deg(x::fpPolyRingElem, d::Int)
     if degree(x) == d
         return fpPolyRingElem[x]
@@ -398,9 +396,6 @@ function factor_equal_deg(x::FpPolyRingElem, d::Int)
     end
     return res
 end
-
-export mulhigh_n
-export mulhigh
 
 function mulhigh_n(a::ZZPolyRingElem, b::ZZPolyRingElem, n::Int)
     c = parent(a)()

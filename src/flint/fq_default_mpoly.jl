@@ -1,8 +1,3 @@
-
-
-export FqMPolyRing
-export FqMPolyRingElem
-
 ###############################################################################
 #
 #   Data type and parent object methods

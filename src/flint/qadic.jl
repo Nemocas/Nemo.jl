@@ -4,12 +4,6 @@
 #
 ###############################################################################
 
-export FlintQadicField
-export qadic
-export prime
-export teichmuller
-export log
-
 ###############################################################################
 #
 #   Data type and parent object methods

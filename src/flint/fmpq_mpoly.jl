@@ -4,26 +4,6 @@
 #
 ###############################################################################
 
-export QQMPolyRing
-export QQMPolyRingElem
-export degrees
-export symbols
-export degree_fmpz
-export degrees_fit_int
-export degrees_fmpz
-export total_degree_fits_int
-export total_degree_fmpz
-export exponent_vector_fits_int
-export exponent_vector_fits_ui
-export exponent_vector
-export exponent_vector_ui
-export exponent_vector_fmpz
-export exponent_vectors
-export exponent_vectors_fmpz
-export set_exponent_vector!
-export combine_like_terms!
-export sort_terms!
-
 ###############################################################################
 #
 #   Data type and parent object methods

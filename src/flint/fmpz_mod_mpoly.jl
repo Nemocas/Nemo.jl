@@ -5,9 +5,6 @@
 #
 ###############################################################################
 
-export FpMPolyRing
-export FpMPolyRingElem
-
 for (etype, rtype, ftype, ctype) in (
       (FpMPolyRingElem, FpMPolyRing, gfp_fmpz_mpoly_factor, FpFieldElem),)
 @eval begin

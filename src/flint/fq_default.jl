@@ -4,11 +4,6 @@
 #
 ###############################################################################
 
-export FqPolyRepField
-export FqFieldElem
-export FqField
-export is_absolute
-
 ###############################################################################
 #
 #   Type and parent object methods

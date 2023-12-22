@@ -4,23 +4,6 @@
 #
 ###############################################################################
 
-export ArbPolyRing
-export arb_poly
-export derivative
-export integral
-export evaluate
-export evaluate2
-export compose
-export from_roots
-export evaluate_iter
-export evaluate_fast
-export evaluate
-export interpolate
-export interpolate_newton
-export interpolate_barycentric
-export interpolate_fast
-export roots_upper_bound
-
 ###############################################################################
 #
 #   Basic manipulation

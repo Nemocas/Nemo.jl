@@ -4,16 +4,6 @@
 #
 ###############################################################################
 
-export FlintFiniteField
-export characteristic
-export order
-export FqPolyRepFieldElem
-export FqPolyRepField
-export frobenius
-export pth_root
-export tr
-export norm
-
 ###############################################################################
 #
 #   Type and parent object methods

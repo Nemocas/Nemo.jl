@@ -43,8 +43,6 @@ function evaluate(f::ZZPolyRingElem, r::fqPolyRepFieldElem)
     return s
 end
 
-export evaluate!
-
 function evaluate!(z::fqPolyRepFieldElem, f::ZZPolyRingElem, r::fqPolyRepFieldElem)
     #Horner - stolen from Claus
 
@@ -139,8 +137,6 @@ end
 ZZMatrix(M::Matrix{Int}) = matrix(FlintZZ, M)
 
 order(::ZZRingElem) = FlintZZ
-
-export rem!
 
 function sub!(z::Vector{QQFieldElem}, x::Vector{QQFieldElem}, y::Vector{ZZRingElem})
     for i in 1:length(z)
@@ -239,9 +235,6 @@ function AbstractAlgebra.map_coefficients(F::fpField, f::QQMPolyRingElem; parent
     end
     return finish(ctx)
 end
-
-export tdivpow2
-export tdivpow2!
 
 function tdivpow2!(B::ZZMatrix, t::Int)
     ccall((:fmpz_mat_scalar_tdiv_q_2exp, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}, Cint), B, B, t)
@@ -443,9 +436,6 @@ function *(a::ZZMatrix, b::Matrix{BigFloat})
     return mult!(c, a, b)
 end
 
-export setprecision
-export setprecision!
-
 function Base.setprecision(x::BigFloat, p::Int)
     setprecision(BigFloat, p) do
         y = BigFloat()
@@ -635,8 +625,6 @@ function is_unit(f::T) where {T<:Union{ZZModPolyRingElem,zzModPolyRingElem}}
     return true
 end
 
-export is_nilpotent
-
 @doc raw"""
     is_nilpotent(a::ResElem{ZZRingElem}) -> Bool
     is_nilpotent(a::ResElem{Integer}) -> Bool
@@ -703,8 +691,6 @@ function divexact!(a::ZZRingElem, b::ZZRingElem)
         (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), a, a, b)
     return a
 end
-
-export round!
 
 function round!(z::arb, x::arb, p::Int)
     ccall((:arb_set_round, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, p)
@@ -866,8 +852,6 @@ end
 
 #################################################
 # in triplicate.... and probably cases missing...
-export elem_to_mat_row!
-
 function elem_to_mat_row!(M::MatElem, i::Int, a::ResElem{T}) where {T<:PolyRingElem}
     z = zero(parent(M[1, 1]))
     for j = 0:degree(a.data)

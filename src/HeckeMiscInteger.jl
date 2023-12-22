@@ -247,11 +247,6 @@ end
 #
 ################################################################################
 
-export trunc
-export round
-export ceil
-export floor
-
 for sym in (:trunc, :round, :ceil, :floor)
     @eval begin
         # support `trunc(ZZRingElem, 1.23)` etc. for arbitrary reals
@@ -336,7 +331,6 @@ end
 # So, we use an AbstractUnitRange here mostly copied from `base/range.jl`.
 # `StepRange`s on the other hand work out of the box thanks to duck typing.
 
-export fmpzUnitRange
 struct fmpzUnitRange <: AbstractUnitRange{ZZRingElem}
     start::ZZRingElem
     stop::ZZRingElem
@@ -578,6 +572,3 @@ end
 end
 
 using .BitsMod
-
-export bits
-export Limbs

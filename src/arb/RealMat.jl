@@ -4,26 +4,6 @@
 #
 ###############################################################################
 
-export zero
-export one
-export deepcopy
-export transpose
-export overlaps
-export contains
-export inv
-export divexact
-export charpoly
-export det
-export lu
-export lu!
-export solve
-export solve!
-export solve_lu_precomp
-export solve_lu_precomp!
-export swap_rows
-export swap_rows!
-export bound_inf_norm
-
 ###############################################################################
 #
 #   Similar & zero
