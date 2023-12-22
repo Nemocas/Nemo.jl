@@ -1,5 +1,9 @@
-export absolute_degree, absolute_norm, absolute_tr, absolute_frobenius,
-       absolute_charpoly, prime_field
+export absolute_degree
+export absolute_norm
+export absolute_tr
+export absolute_frobenius
+export absolute_charpoly
+export prime_field
 
 import AbstractAlgebra: _absolute_basis
 

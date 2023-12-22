@@ -4,7 +4,11 @@
 #
 ###############################################################################
 
-export CalciumQQBarField, qqbar, CalciumField, ca, options
+export CalciumQQBarField
+export qqbar
+export CalciumField
+export ca
+export options
 
 ################################################################################
 #

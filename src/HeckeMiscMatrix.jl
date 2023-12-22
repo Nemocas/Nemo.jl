@@ -1,4 +1,9 @@
-export is_zero_row, is_diagonal, is_lower_triangular, is_positive_entry, is_upper_triangular, diagonal
+export is_zero_row
+export is_diagonal
+export is_lower_triangular
+export is_positive_entry
+export is_upper_triangular
+export diagonal
 
 
 ################################################################################
@@ -312,7 +317,8 @@ function mod(M::ZZMatrix, p::ZZRingElem)
     return N
 end
 
-export mod_sym, mod_sym!
+export mod_sym
+export mod_sym!
 
 @doc raw"""
     mod_sym!(M::ZZMatrix, p::ZZRingElem)

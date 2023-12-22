@@ -1,4 +1,6 @@
-export fmpzi, FlintZZi, FlintZZiRing
+export fmpzi
+export FlintZZi
+export FlintZZiRing
 
 ###############################################################################
 #

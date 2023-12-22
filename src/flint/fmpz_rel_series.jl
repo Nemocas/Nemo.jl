@@ -4,7 +4,8 @@
 #
 ###############################################################################
 
-export ZZRelPowerSeriesRingElem, ZZRelPowerSeriesRing
+export ZZRelPowerSeriesRingElem
+export ZZRelPowerSeriesRing
 
 ###############################################################################
 #

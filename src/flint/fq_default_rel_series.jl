@@ -4,7 +4,8 @@
 #
 ###############################################################################
 
-export FqRelPowerSeriesRingElem, FqRelPowerSeriesRing
+export FqRelPowerSeriesRingElem
+export FqRelPowerSeriesRing
 
 ###############################################################################
 #

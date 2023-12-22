@@ -4,11 +4,37 @@
 #
 ################################################################################
 
-export fqPolyRepMatrix, fqPolyRepMatrixSpace, getindex, setindex!, deepcopy,
-       parent, base_ring, zero, one, show, transpose,
-       transpose!, rref, rref!, tr, det, rank, inv, solve,
-       sub, hcat, vcat, Array, lift, lift!, matrix_space, check_parent,
-       howell_form, howell_form!, strong_echelon_form, strong_echelon_form!
+export fqPolyRepMatrix
+export fqPolyRepMatrixSpace
+export getindex
+export setindex!
+export deepcopy
+export parent
+export base_ring
+export zero
+export one
+export show
+export transpose
+export transpose!
+export rref
+export rref!
+export tr
+export det
+export rank
+export inv
+export solve
+export sub
+export hcat
+export vcat
+export Array
+export lift
+export lift!
+export matrix_space
+export check_parent
+export howell_form
+export howell_form!
+export strong_echelon_form
+export strong_echelon_form!
 
 ################################################################################
 #

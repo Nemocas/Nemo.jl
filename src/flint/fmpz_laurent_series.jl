@@ -4,7 +4,8 @@
 #
 ###############################################################################
 
-export ZZLaurentSeriesRingElem, ZZLaurentSeriesRing
+export ZZLaurentSeriesRingElem
+export ZZLaurentSeriesRing
 
 ###############################################################################
 #

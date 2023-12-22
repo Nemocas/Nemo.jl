@@ -1,4 +1,6 @@
-export continued_fraction, continued_fraction_with_matrix, convergents
+export continued_fraction
+export continued_fraction_with_matrix
+export convergents
 
 mutable struct _fmpq_ball
    left_num::Int

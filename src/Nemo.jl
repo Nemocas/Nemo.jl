@@ -196,14 +196,20 @@ import AbstractAlgebra: set_attribute!
 
 export GF
 
-export flint_cleanup, flint_set_num_threads
+export flint_cleanup
+export flint_set_num_threads
 
-export PadicField, QadicField, NGFiniteField
+export PadicField
+export QadicField
+export NGFiniteField
 
 export QQBar
 
 # Things/constants which are also defined in AbstractAlgebra:
-export ZZ, QQ, finite_field, number_field
+export ZZ
+export QQ
+export finite_field
+export number_field
 
 
 ###############################################################################
@@ -464,10 +470,23 @@ end
 #
 ###############################################################################
 
-export power_series_ring, polynomial_ring, SparsePolynomialRing, matrix_space,
-       fraction_field, residue_ring, Partition, SymmetricGroup, YoungTableau,
-       AllParts, SkewDiagram, AllPerms, Perm, laurent_series_ring,
-       laurent_series_field, puiseux_series_ring, residue_field
+export power_series_ring
+export polynomial_ring
+export SparsePolynomialRing
+export matrix_space
+export fraction_field
+export residue_ring
+export Partition
+export SymmetricGroup
+export YoungTableau
+export AllParts
+export SkewDiagram
+export AllPerms
+export Perm
+export laurent_series_ring
+export laurent_series_field
+export puiseux_series_ring
+export residue_field
 
 export Generic
 

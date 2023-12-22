@@ -6,8 +6,10 @@
 #
 ###############################################################################
 
-export zzModAbsPowerSeriesRingElem, zzModAbsPowerSeriesRing,
-       fpAbsPowerSeriesRingElem, fpAbsPowerSeriesRing
+export zzModAbsPowerSeriesRingElem
+export zzModAbsPowerSeriesRing
+export fpAbsPowerSeriesRingElem
+export fpAbsPowerSeriesRing
 
 for (etype, rtype, mtype, brtype, flint_fn) in (
    (zzModAbsPowerSeriesRingElem, zzModAbsPowerSeriesRing, zzModRingElem, zzModRing, "nmod_poly"),

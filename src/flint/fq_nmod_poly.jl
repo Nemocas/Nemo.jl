@@ -4,7 +4,8 @@
 #
 ################################################################################
 
-export fqPolyRepPolyRingElem, fqPolyRepPolyRing
+export fqPolyRepPolyRingElem
+export fqPolyRepPolyRing
 
 ################################################################################
 #

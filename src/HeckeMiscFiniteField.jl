@@ -1,4 +1,5 @@
-export representation_matrix, frobenius_matrix
+export representation_matrix
+export frobenius_matrix
 
 # additional constructors
 

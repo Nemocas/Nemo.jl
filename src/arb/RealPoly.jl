@@ -4,10 +4,20 @@
 #
 ###############################################################################
 
-export derivative, integral, evaluate, evaluate2,
-       compose, from_roots, evaluate_iter, evaluate_fast, evaluate,
-       interpolate, interpolate_newton, interpolate_barycentric,
-       interpolate_fast, roots_upper_bound
+export derivative
+export integral
+export evaluate
+export evaluate2
+export compose
+export from_roots
+export evaluate_iter
+export evaluate_fast
+export evaluate
+export interpolate
+export interpolate_newton
+export interpolate_barycentric
+export interpolate_fast
+export roots_upper_bound
 
 ###############################################################################
 #

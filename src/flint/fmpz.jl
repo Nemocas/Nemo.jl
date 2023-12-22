@@ -32,21 +32,110 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 # do not export div and divrem
-export ZZRingElem, FlintZZ, ZZRing, parent, show, convert, hash, bell,
-       is_perfect_power, is_prime, is_prime_power_with_data, fdiv, cdiv, tdiv, rem, mod, gcd, lcm, invmod, powermod, abs,
-       isqrt, popcount, prevpow2, nextpow2, ndigits, dec, bin, oct, hex, base,
-       one, zero, divexact, fits, sign, nbits, deepcopy, tdivpow2, fdivpow2,
-       cdivpow2, flog, clog, cmpabs, clrbit!, setbit!, combit!, crt,
-       crt_with_lcm, divisible, divisors, prime_divisors, divisor_lenstra,
-       fmodpow2, integer_ring,
-       gcdinv, gcd_with_cofactors,
-       is_probable_prime, jacobi_symbol, kronecker_symbol, remove, root, size,
-       isqrtrem, sqrtmod, trailing_zeros, divisor_sigma, euler_phi, fibonacci,
-       mod!, moebius_mu, primorial, rising_factorial, number_of_partitions,
-       canonical_unit, is_unit, isequal, addeq!, mul!, fmma!, fmms!, is_square,
-       sqrt, is_square_with_sqrt, next_prime, ndivrem, iszero, rand, rand_bits,
-       binomial, factorial, rand_bits_prime, iroot, tdivrem, fdivrem, cdivrem,
-       ntdivrem, nfdivrem, ncdivrem, tstbit, neg!, lcm!, gcd!, submul!
+export ZZRingElem
+export FlintZZ
+export ZZRing
+export parent
+export show
+export convert
+export hash
+export bell
+export is_perfect_power
+export is_prime
+export is_prime_power_with_data
+export fdiv
+export cdiv
+export tdiv
+export rem
+export mod
+export gcd
+export lcm
+export invmod
+export powermod
+export abs
+export isqrt
+export popcount
+export prevpow2
+export nextpow2
+export ndigits
+export dec
+export bin
+export oct
+export hex
+export base
+export one
+export zero
+export divexact
+export fits
+export sign
+export nbits
+export deepcopy
+export tdivpow2
+export fdivpow2
+export cdivpow2
+export flog
+export clog
+export cmpabs
+export clrbit!
+export setbit!
+export combit!
+export crt
+export crt_with_lcm
+export divisible
+export divisors
+export prime_divisors
+export divisor_lenstra
+export fmodpow2
+export integer_ring
+export gcdinv
+export gcd_with_cofactors
+export is_probable_prime
+export jacobi_symbol
+export kronecker_symbol
+export remove
+export root
+export size
+export isqrtrem
+export sqrtmod
+export trailing_zeros
+export divisor_sigma
+export euler_phi
+export fibonacci
+export mod!
+export moebius_mu
+export primorial
+export rising_factorial
+export number_of_partitions
+export canonical_unit
+export is_unit
+export isequal
+export addeq!
+export mul!
+export fmma!
+export fmms!
+export is_square
+export sqrt
+export is_square_with_sqrt
+export next_prime
+export ndivrem
+export iszero
+export rand
+export rand_bits
+export binomial
+export factorial
+export rand_bits_prime
+export iroot
+export tdivrem
+export fdivrem
+export cdivrem
+export ntdivrem
+export nfdivrem
+export ncdivrem
+export tstbit
+export neg!
+export lcm!
+export gcd!
+export submul!
 
 ###############################################################################
 #

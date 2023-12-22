@@ -240,7 +240,8 @@ function AbstractAlgebra.map_coefficients(F::fpField, f::QQMPolyRingElem; parent
     return finish(ctx)
 end
 
-export tdivpow2, tdivpow2!
+export tdivpow2
+export tdivpow2!
 
 function tdivpow2!(B::ZZMatrix, t::Int)
     ccall((:fmpz_mat_scalar_tdiv_q_2exp, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}, Cint), B, B, t)
@@ -442,7 +443,8 @@ function *(a::ZZMatrix, b::Matrix{BigFloat})
     return mult!(c, a, b)
 end
 
-export setprecision, setprecision!
+export setprecision
+export setprecision!
 
 function Base.setprecision(x::BigFloat, p::Int)
     setprecision(BigFloat, p) do

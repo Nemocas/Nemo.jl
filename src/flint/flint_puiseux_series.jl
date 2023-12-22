@@ -4,9 +4,11 @@
 #
 ###############################################################################
 
-export FlintPuiseuxSeriesRing, FlintPuiseuxSeriesField,
-       FlintPuiseuxSeriesRingElem, FlintPuiseuxSeriesFieldElem,
-       FlintPuiseuxSeriesElem
+export FlintPuiseuxSeriesRing
+export FlintPuiseuxSeriesField
+export FlintPuiseuxSeriesRingElem
+export FlintPuiseuxSeriesFieldElem
+export FlintPuiseuxSeriesElem
 
 ###############################################################################
 #

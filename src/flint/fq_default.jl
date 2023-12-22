@@ -4,7 +4,10 @@
 #
 ###############################################################################
 
-export FqPolyRepField, FqFieldElem, FqField, is_absolute
+export FqPolyRepField
+export FqFieldElem
+export FqField
+export is_absolute
 
 ###############################################################################
 #

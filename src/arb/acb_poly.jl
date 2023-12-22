@@ -4,10 +4,23 @@
 #
 ###############################################################################
 
-export AcbPolyRing, acb_poly, isreal, derivative, integral, evaluate,
-       evaluate2, compose, from_roots, evaluate_iter, evaluate_fast, evaluate,
-       interpolate_newton, interpolate_barycentric, interpolate_fast,
-       interpolate, roots
+export AcbPolyRing
+export acb_poly
+export isreal
+export derivative
+export integral
+export evaluate
+export evaluate2
+export compose
+export from_roots
+export evaluate_iter
+export evaluate_fast
+export evaluate
+export interpolate_newton
+export interpolate_barycentric
+export interpolate_fast
+export interpolate
+export roots
 
 ###############################################################################
 #

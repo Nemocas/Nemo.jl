@@ -7,27 +7,111 @@
 #
 ###############################################################################
 
-import Base: real, imag, abs, conj, angle, log, log1p, sin, cos,
-             tan, cot, sinpi, cospi, sinh, cosh, tanh, coth, atan, expm1
-
+import Base: real
+import Base: imag
+import Base: abs
+import Base: conj
+import Base: angle
+import Base: log
+import Base: log1p
+import Base: sin
+import Base: cos
+import Base: tan
+import Base: cot
+import Base: sinpi
+import Base: cospi
+import Base: sinh
+import Base: cosh
+import Base: tanh
+import Base: coth
+import Base: atan
+import Base: expm1
 import Base: cispi
 
-export one, onei, real, imag, conj, abs, inv, angle, isreal, polygamma, erf,
-       erfi, erfc, bessel_j, bessel_k, bessel_i, bessel_y, airy_ai, airy_bi,
-       airy_ai_prime, airy_bi_prime
+export one
+export onei
+export real
+export imag
+export conj
+export abs
+export inv
+export angle
+export isreal
+export polygamma
+export erf
+export erfi
+export erfc
+export bessel_j
+export bessel_k
+export bessel_i
+export bessel_y
+export airy_ai
+export airy_bi
+export airy_ai_prime
+export airy_bi_prime
 
-export rsqrt, log, log1p, cispi, sin, cos, tan, cot, sinpi, cospi, tanpi,
-       cotpi, sincos, sincospi, sinh, cosh, tanh, coth, sinhcosh, atan,
-       log_sinpi, gamma, rgamma, lgamma, gamma_regularized, gamma_lower,
-       gamma_lower_regularized, rising_factorial, rising_factorial2, polylog,
-       barnes_g, log_barnes_g, agm, exp_integral_ei, sin_integral,
-       cos_integral, sinh_integral, cosh_integral, log_integral,
-       log_integral_offset, exp_integral_e, gamma, hypergeometric_1f1,
-       hypergeometric_1f1_regularized, hypergeometric_u, hypergeometric_2f1,
-       jacobi_theta, modular_delta, dedekind_eta, eisenstein_g, j_invariant,
-       modular_lambda, modular_weber_f, modular_weber_f1, modular_weber_f2,
-       weierstrass_p, weierstrass_p_prime, elliptic_k, elliptic_e,
-       canonical_unit, root_of_unity, hilbert_class_polynomial
+export rsqrt
+export log
+export log1p
+export cispi
+export sin
+export cos
+export tan
+export cot
+export sinpi
+export cospi
+export tanpi
+export cotpi
+export sincos
+export sincospi
+export sinh
+export cosh
+export tanh
+export coth
+export sinhcosh
+export atan
+export log_sinpi
+export gamma
+export rgamma
+export lgamma
+export gamma_regularized
+export gamma_lower
+export gamma_lower_regularized
+export rising_factorial
+export rising_factorial2
+export polylog
+export barnes_g
+export log_barnes_g
+export agm
+export exp_integral_ei
+export sin_integral
+export cos_integral
+export sinh_integral
+export cosh_integral
+export log_integral
+export log_integral_offset
+export exp_integral_e
+export gamma
+export hypergeometric_1f1
+export hypergeometric_1f1_regularized
+export hypergeometric_u
+export hypergeometric_2f1
+export jacobi_theta
+export modular_delta
+export dedekind_eta
+export eisenstein_g
+export j_invariant
+export modular_lambda
+export modular_weber_f
+export modular_weber_f1
+export modular_weber_f2
+export weierstrass_p
+export weierstrass_p_prime
+export elliptic_k
+export elliptic_e
+export canonical_unit
+export root_of_unity
+export hilbert_class_polynomial
 
 ###############################################################################
 #

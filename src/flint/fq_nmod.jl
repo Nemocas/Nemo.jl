@@ -4,7 +4,9 @@
 #
 ###############################################################################
 
-export fqPolyRepFieldElem, fqPolyRepField, coeffs_raw
+export fqPolyRepFieldElem
+export fqPolyRepField
+export coeffs_raw
 
 ###############################################################################
 #

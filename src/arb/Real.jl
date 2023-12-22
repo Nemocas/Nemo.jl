@@ -7,23 +7,108 @@
 #
 ###############################################################################
 
-import Base: ceil, isinteger
+import Base: ceil
+import Base: isinteger
 
-export add_error!, ball, radius, midpoint, contains, contains_zero, contains_negative,
-       contains_positive, contains_nonnegative, contains_nonpositive, convert,
-       iszero, is_nonzero, is_exact, is_positive, isfinite, is_nonnegative,
-       is_negative, is_nonpositive, add!, mul!, sub!, div!, overlaps,
-       unique_integer, accuracy_bits, trim, ldexp, setunion, setintersection,
-       const_pi, const_e, const_log2, const_log10, const_euler, const_catalan,
-       const_khinchin, const_glaisher, floor, ceil, hypot, rsqrt, sqrt1pm1,
-       sqrtpos, root, log, log1p, expm1, sin, cos, sinpi, cospi, tan, cot,
-       tanpi, cotpi, sinh, cosh, tanh, coth, atan, asin, acos, atanh, asinh,
-       acosh, gamma, lgamma, rgamma, digamma, gamma_regularized, gamma_lower,
-       gamma_lower_regularized, zeta, sincos, sincospi, sinhcosh, atan2, agm,
-       factorial, binomial, fibonacci, bernoulli, rising_factorial,
-       rising_factorial2, polylog, chebyshev_t, chebyshev_t2, chebyshev_u,
-       chebyshev_u2, bell, numpart, lindep, airy_ai, airy_bi, airy_ai_prime,
-       airy_bi_prime, canonical_unit, simplest_rational_inside
+export add_error!
+export ball
+export radius
+export midpoint
+export contains
+export contains_zero
+export contains_negative
+export contains_positive
+export contains_nonnegative
+export contains_nonpositive
+export convert
+export iszero
+export is_nonzero
+export is_exact
+export is_positive
+export isfinite
+export is_nonnegative
+export is_negative
+export is_nonpositive
+export add!
+export mul!
+export sub!
+export div!
+export overlaps
+export unique_integer
+export accuracy_bits
+export trim
+export ldexp
+export setunion
+export setintersection
+export const_pi
+export const_e
+export const_log2
+export const_log10
+export const_euler
+export const_catalan
+export const_khinchin
+export const_glaisher
+export floor
+export ceil
+export hypot
+export rsqrt
+export sqrt1pm1
+export sqrtpos
+export root
+export log
+export log1p
+export expm1
+export sin
+export cos
+export sinpi
+export cospi
+export tan
+export cot
+export tanpi
+export cotpi
+export sinh
+export cosh
+export tanh
+export coth
+export atan
+export asin
+export acos
+export atanh
+export asinh
+export acosh
+export gamma
+export lgamma
+export rgamma
+export digamma
+export gamma_regularized
+export gamma_lower
+export gamma_lower_regularized
+export zeta
+export sincos
+export sincospi
+export sinhcosh
+export atan2
+export agm
+export factorial
+export binomial
+export fibonacci
+export bernoulli
+export rising_factorial
+export rising_factorial2
+export polylog
+export chebyshev_t
+export chebyshev_t2
+export chebyshev_u
+export chebyshev_u2
+export bell
+export numpart
+export lindep
+export airy_ai
+export airy_bi
+export airy_ai_prime
+export airy_bi_prime
+export canonical_unit
+export simplest_rational_inside
 
 ###############################################################################
 #

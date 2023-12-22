@@ -4,12 +4,25 @@
 #
 ###############################################################################
 
-export QQMPolyRing, QQMPolyRingElem, degrees, symbols, degree_fmpz,
-       degrees_fit_int, degrees_fmpz, total_degree_fits_int, total_degree_fmpz,
-       exponent_vector_fits_int, exponent_vector_fits_ui,
-       exponent_vector, exponent_vector_ui, exponent_vector_fmpz,
-       exponent_vectors, exponent_vectors_fmpz, set_exponent_vector!,
-       combine_like_terms!, sort_terms!
+export QQMPolyRing
+export QQMPolyRingElem
+export degrees
+export symbols
+export degree_fmpz
+export degrees_fit_int
+export degrees_fmpz
+export total_degree_fits_int
+export total_degree_fmpz
+export exponent_vector_fits_int
+export exponent_vector_fits_ui
+export exponent_vector
+export exponent_vector_ui
+export exponent_vector_fmpz
+export exponent_vectors
+export exponent_vectors_fmpz
+export set_exponent_vector!
+export combine_like_terms!
+export sort_terms!
 
 ###############################################################################
 #

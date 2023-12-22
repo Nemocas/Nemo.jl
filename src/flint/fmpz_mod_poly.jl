@@ -4,7 +4,9 @@
 #
 ################################################################################
 
-export ZZModPolyRing, ZZModPolyRingElem, factor
+export ZZModPolyRing
+export ZZModPolyRingElem
+export factor
 
 ################################################################################
 #

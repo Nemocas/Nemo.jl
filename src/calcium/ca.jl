@@ -4,10 +4,30 @@
 #
 ###############################################################################
 
-export ca, CalciumField, complex_normal_form, const_euler, const_pi, csgn, erf,
-       erfc, erfi, gamma, infinity, is_algebraic, is_imaginary, isinf, is_number,
-       is_signed_inf, is_uinf, is_undefined, is_unknown, onei, pow, undefined,
-       unknown, unsigned_infinity
+export ca
+export CalciumField
+export complex_normal_form
+export const_euler
+export const_pi
+export csgn
+export erf
+export erfc
+export erfi
+export gamma
+export infinity
+export is_algebraic
+export is_imaginary
+export isinf
+export is_number
+export is_signed_inf
+export is_uinf
+export is_undefined
+export is_unknown
+export onei
+export pow
+export undefined
+export unknown
+export unsigned_infinity
 
 ###############################################################################
 #

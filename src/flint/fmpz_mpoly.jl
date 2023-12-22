@@ -4,7 +4,9 @@
 #
 ###############################################################################
 
-export ZZMPolyRing, ZZMPolyRingElem, trailing_coefficient
+export ZZMPolyRing
+export ZZMPolyRingElem
+export trailing_coefficient
 
 ###############################################################################
 #

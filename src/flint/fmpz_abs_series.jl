@@ -4,7 +4,9 @@
 #
 ###############################################################################
 
-export ZZAbsPowerSeriesRingElem, ZZAbsPowerSeriesRing, power_series_ring
+export ZZAbsPowerSeriesRingElem
+export ZZAbsPowerSeriesRing
+export power_series_ring
 
 ###############################################################################
 #

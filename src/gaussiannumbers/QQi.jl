@@ -1,4 +1,6 @@
-export fmpqi, FlintQQi, FlintQQiField
+export fmpqi
+export FlintQQi
+export FlintQQiField
 
 ###############################################################################
 #

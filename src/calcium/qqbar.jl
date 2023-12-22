@@ -4,14 +4,40 @@
 #
 ###############################################################################
 
-export qqbar, CalciumQQBar, CalciumQQBarField, is_algebraic_integer, rand, abs2,
-       csgn, sign_real, sign_imag, QQFieldElem, ZZRingElem, exp_pi_i, atanpi, asinpi, acospi,
-       conjugates, eigenvalues, guess, root_of_unity_as_args, is_root_of_unity,
-       log_pi_i, rand
+export qqbar
+export CalciumQQBar
+export CalciumQQBarField
+export is_algebraic_integer
+export rand
+export abs2
+export csgn
+export sign_real
+export sign_imag
+export QQFieldElem
+export ZZRingElem
+export exp_pi_i
+export atanpi
+export asinpi
+export acospi
+export conjugates
+export eigenvalues
+export guess
+export root_of_unity_as_args
+export is_root_of_unity
+export log_pi_i
+export rand
 
-export is_equal_real, is_equal_imag, is_equal_abs, is_equal_abs_real,
-       is_equal_abs_imag, is_less_real, is_less_imag, is_less_abs, is_less_abs_real,
-       is_less_abs_imag, is_less_root_order
+export is_equal_real
+export is_equal_imag
+export is_equal_abs
+export is_equal_abs_real
+export is_equal_abs_imag
+export is_less_real
+export is_less_imag
+export is_less_abs
+export is_less_abs_real
+export is_less_abs_imag
+export is_less_root_order
 
 ###############################################################################
 #

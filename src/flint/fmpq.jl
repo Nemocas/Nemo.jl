@@ -4,11 +4,28 @@
 #
 ###############################################################################
 
-export QQFieldElem, FlintQQ, fraction_field, Rational, QQField, height,
-       height_bits, isless, reconstruct, next_minimal, next_signed_minimal,
-       next_calkin_wilf, next_signed_calkin_wilf, dedekind_sum, harmonic,
-       bernoulli, bernoulli_cache, rand_bits, simplest_between, valuation!,
-       remove!, rational_field
+export QQFieldElem
+export FlintQQ
+export fraction_field
+export Rational
+export QQField
+export height
+export height_bits
+export isless
+export reconstruct
+export next_minimal
+export next_signed_minimal
+export next_calkin_wilf
+export next_signed_calkin_wilf
+export dedekind_sum
+export harmonic
+export bernoulli
+export bernoulli_cache
+export rand_bits
+export simplest_between
+export valuation!
+export remove!
+export rational_field
 
 ###############################################################################
 #

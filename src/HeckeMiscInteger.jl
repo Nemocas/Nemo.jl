@@ -247,7 +247,10 @@ end
 #
 ################################################################################
 
-export trunc, round, ceil, floor
+export trunc
+export round
+export ceil
+export floor
 
 for sym in (:trunc, :round, :ceil, :floor)
     @eval begin
@@ -441,7 +444,8 @@ import Base: getindex
 import Base: iterate
 import Base: length
 
-export bits, Limbs
+export bits
+export Limbs
 
 
 const hb = UInt(1) << 63
@@ -574,4 +578,6 @@ end
 end
 
 using .BitsMod
-export bits, Limbs
+
+export bits
+export Limbs

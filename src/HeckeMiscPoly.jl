@@ -399,7 +399,8 @@ function factor_equal_deg(x::FpPolyRingElem, d::Int)
     return res
 end
 
-export mulhigh_n, mulhigh
+export mulhigh_n
+export mulhigh
 
 function mulhigh_n(a::ZZPolyRingElem, b::ZZPolyRingElem, n::Int)
     c = parent(a)()

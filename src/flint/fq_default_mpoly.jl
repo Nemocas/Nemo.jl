@@ -1,6 +1,7 @@
 
 
-export FqMPolyRing, FqMPolyRingElem
+export FqMPolyRing
+export FqMPolyRingElem
 
 ###############################################################################
 #

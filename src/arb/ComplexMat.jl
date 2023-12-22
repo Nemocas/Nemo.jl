@@ -4,10 +4,28 @@
 #
 ###############################################################################
 
-export zero, one, deepcopy, -, transpose, +, *, &, ==, !=,
-       overlaps, contains, inv, divexact, charpoly, det, lu, lu!, solve,
-       solve!, solve_lu_precomp, solve_lu_precomp!, swap_rows, swap_rows!,
-       bound_inf_norm, isreal, eigvals, eigvals_simple
+export zero
+export one
+export deepcopy
+export transpose
+export overlaps
+export contains
+export inv
+export divexact
+export charpoly
+export det
+export lu
+export lu!
+export solve
+export solve!
+export solve_lu_precomp
+export solve_lu_precomp!
+export swap_rows
+export swap_rows!
+export bound_inf_norm
+export isreal
+export eigvals
+export eigvals_simple
 
 ###############################################################################
 #

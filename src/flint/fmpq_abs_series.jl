@@ -4,8 +4,17 @@
 #
 ###############################################################################
 
-export QQAbsPowerSeriesRingElem, QQAbsPowerSeriesRing, tan, tanh, sin, sinh, asin, asinh,
-       atan, atanh, log
+export QQAbsPowerSeriesRingElem
+export QQAbsPowerSeriesRing
+export tan
+export tanh
+export sin
+export sinh
+export asin
+export asinh
+export atan
+export atanh
+export log
 
 ###############################################################################
 #

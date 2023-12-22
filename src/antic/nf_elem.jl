@@ -4,10 +4,22 @@
 #
 ###############################################################################
 
-export AnticNumberField, defining_polynomial, nf_elem, norm,
-       representation_matrix, representation_matrix_q, tr, cyclotomic_field,
-       cyclotomic_real_subfield, add!, sub!, mul!, signature, sqr_classical,
-       is_rational, isinteger
+export AnticNumberField
+export defining_polynomial
+export nf_elem
+export norm
+export representation_matrix
+export representation_matrix_q
+export tr
+export cyclotomic_field
+export cyclotomic_real_subfield
+export add!
+export sub!
+export mul!
+export signature
+export sqr_classical
+export is_rational
+export isinteger
 
 ###############################################################################
 #

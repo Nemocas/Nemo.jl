@@ -4,7 +4,8 @@
 #
 ###############################################################################
 
-export QQRelPowerSeriesRingElem, QQRelPowerSeriesRing
+export QQRelPowerSeriesRingElem
+export QQRelPowerSeriesRing
 
 ###############################################################################
 #

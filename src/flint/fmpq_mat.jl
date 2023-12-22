@@ -4,7 +4,10 @@
 #
 ###############################################################################
 
-export QQMatrix, QQMatrixSpace, gram_schmidt_orthogonalisation, hilbert
+export QQMatrix
+export QQMatrixSpace
+export gram_schmidt_orthogonalisation
+export hilbert
 
 ###############################################################################
 #

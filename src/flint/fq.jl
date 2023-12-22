@@ -4,8 +4,15 @@
 #
 ###############################################################################
 
-export FlintFiniteField, characteristic, order, FqPolyRepFieldElem, FqPolyRepField, frobenius,
-       pth_root, tr, norm
+export FlintFiniteField
+export characteristic
+export order
+export FqPolyRepFieldElem
+export FqPolyRepField
+export frobenius
+export pth_root
+export tr
+export norm
 
 ###############################################################################
 #

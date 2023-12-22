@@ -4,7 +4,11 @@
 #
 ###############################################################################
 
-export FlintQadicField, qadic, prime, teichmuller, log
+export FlintQadicField
+export qadic
+export prime
+export teichmuller
+export log
 
 ###############################################################################
 #

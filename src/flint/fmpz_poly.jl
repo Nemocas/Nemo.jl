@@ -4,8 +4,15 @@
 #
 ###############################################################################
 
-export ZZPolyRing, ZZPolyRingElem, cyclotomic, theta_qexp, eta_qexp, cos_minpoly,
-       swinnerton_dyer, signature, height
+export ZZPolyRing
+export ZZPolyRingElem
+export cyclotomic
+export theta_qexp
+export eta_qexp
+export cos_minpoly
+export swinnerton_dyer
+export signature
+export height
 
 ###############################################################################
 #

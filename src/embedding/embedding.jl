@@ -4,7 +4,10 @@
 #
 ################################################################################
 
-export is_embedded, embed, preimage, preimage_map
+export is_embedded
+export embed
+export preimage
+export preimage_map
 
 ################################################################################
 #
