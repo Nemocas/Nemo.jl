@@ -7,27 +7,6 @@
 #
 ###############################################################################
 
-import Base: real
-import Base: imag
-import Base: abs
-import Base: conj
-import Base: angle
-import Base: log
-import Base: log1p
-import Base: sin
-import Base: cos
-import Base: tan
-import Base: cot
-import Base: sinpi
-import Base: cospi
-import Base: sinh
-import Base: cosh
-import Base: tanh
-import Base: coth
-import Base: atan
-import Base: expm1
-import Base: cispi
-
 ###############################################################################
 #
 #   Basic manipulation

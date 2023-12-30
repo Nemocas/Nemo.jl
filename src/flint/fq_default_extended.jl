@@ -1,5 +1,3 @@
-import AbstractAlgebra: _absolute_basis
-
 ################################################################################
 #
 #  Additional predicate
