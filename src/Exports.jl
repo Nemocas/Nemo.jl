@@ -153,7 +153,6 @@ export divisible
 export divisor_lenstra
 export divisor_sigma
 export divisors
-export eigenvalues
 export eigvals
 export eigvals_simple
 export eisenstein_g
