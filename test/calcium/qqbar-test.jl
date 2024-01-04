@@ -150,10 +150,10 @@ end
    @test roots(CalciumQQBar, QQy(0)) == []
    @test roots(CalciumQQBar, QQy(1)) == []
 
-   @test eigvals(zero(matrix_space(ZZ, 0, 0)), CalciumQQBar) == []
-   @test eigvals(zero(matrix_space(QQ, 0, 0)), CalciumQQBar) == []
-   @test eigvals(ZZ[1 1; 1 -1], CalciumQQBar) == [u, -u]
-   @test eigvals(QQ[1 1; 1 -1], CalciumQQBar) == [u, -u]
+   @test eigvals(CalciumQQBar, zero(matrix_space(ZZ, 0, 0))) == []
+   @test eigvals(CalciumQQBar, zero(matrix_space(QQ, 0, 0))) == []
+   @test eigvals(CalciumQQBar, ZZ[1 1; 1 -1]) == [u, -u]
+   @test eigvals(CalciumQQBar, QQ[1 1; 1 -1]) == [u, -u]
 
    @test conjugates(qqbar(3)) == [qqbar(3)]
    @test conjugates(u) == [u, -u]

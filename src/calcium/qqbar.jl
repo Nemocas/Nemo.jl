@@ -975,14 +975,14 @@ function conjugates(a::qqbar)
 end
 
 @doc raw"""
-    eigvals(A::ZZMatrix, R::CalciumQQBarField)
+    eigvals(R::CalciumQQBarField, A::ZZMatrix)
 
 Return all the eigenvalues of the matrix `A` in the field of algebraic
 numbers `R`. The output array is sorted in the default sort order for
 algebraic numbers. Eigenvalues of multiplicity higher than one are repeated
 according to their multiplicity.
 """
-function eigvals(A::ZZMatrix, R::CalciumQQBarField)
+function eigvals(R::CalciumQQBarField, A::ZZMatrix)
    n = nrows(A)
    !is_square(A) && throw(DomainError(A, "a square matrix is required"))
    if n == 0
@@ -997,14 +997,14 @@ function eigvals(A::ZZMatrix, R::CalciumQQBarField)
 end
 
 @doc raw"""
-    eigvals(A::QQMatrix, R::CalciumQQBarField)
+    eigvals(R::CalciumQQBarField, A::QQMatrix)
 
 Return all the eigenvalues of the matrix `A` in the field of algebraic
 numbers `R`. The output array is sorted in the default sort order for
 algebraic numbers. Eigenvalues of multiplicity higher than one are repeated
 according to their multiplicity.
 """
-function eigvals(A::QQMatrix, R::CalciumQQBarField)
+function eigvals(R::CalciumQQBarField, A::QQMatrix)
    n = nrows(A)
    !is_square(A) && throw(DomainError(A, "a square matrix is required"))
    if n == 0
