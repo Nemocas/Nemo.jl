@@ -720,11 +720,11 @@ end
 ################################################################################
 
 @doc raw"""
-    spectrum(M::MatElem{T}) where T <: FieldElem -> Dict{T, Int}
+    eigvals(M::MatElem{T}) where T <: FieldElem
 
-Returns the spectrum of a matrix, i.e. the set of eigenvalues of $M$ with multiplicities.
+Return the eigenvalues of `M`.
 """
-function spectrum(M::MatElem{T}) where T <: FieldElem
+function eigvals(M::MatElem{T}) where T <: FieldElem
   @assert is_square(M)
   K = base_ring(M)
   f = charpoly(M)
@@ -742,18 +742,15 @@ function spectrum(M::MatElem{T}) where T <: FieldElem
 end
 
 @doc raw"""
-    spectrum(M::MatElem{T}, L) where T <: FieldElem -> Dict{T, Int}
+    eigvals(M::MatElem{T}, L) where T <: FieldElem
 
-Returns the spectrum of a matrix over the field $L$, i.e. the set of eigenvalues of $M$ with multiplicities.
+Return the eigenvalues of `M` over the field `L`.
 """
-function spectrum(M::MatElem{T}, L) where T <: FieldElem
+function eigvals(M::MatElem{T}, L) where T <: FieldElem
   @assert is_square(M)
   M1 = change_base_ring(L, M)
-  return spectrum(M1)
+  return eigvals(M1)
 end
-
-eigvals(M::MatElem{T}) where T <: FieldElem = spectrum(M)
-eigvals(M::MatElem{T}, L) where T <: FieldElem = spectrum(M, L)
 
 @doc raw"""
     eigenspace(M::MatElem{T}, lambda::T; side::Symbol = :right)
@@ -786,7 +783,7 @@ See also `eigenspace`.
 """
 function eigenspaces(M::MatElem{T}; side::Symbol = :right) where T<:FieldElem
 
-  S = spectrum(M)
+  S = eigenvalues(M)
   L = Dict{elem_type(base_ring(M)), typeof(M)}()
   for k in keys(S)
     push!(L, k => vcat(eigenspace(M, k, side = side)))
