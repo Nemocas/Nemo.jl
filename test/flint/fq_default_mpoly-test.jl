@@ -34,6 +34,7 @@ local test_fields = (finite_field(23, 1, "a"),
          @test Nemo.promote_rule(elem_type(S), ZZRingElem) == elem_type(S)
 
          @test typeof(S) <: FqMPolyRing
+         @test length(@inferred gens(S)) == num_vars
 
          isa(symbols(S), Vector{Symbol})
 
