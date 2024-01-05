@@ -27,7 +27,7 @@ function ordering(a::FqMPolyRing)
 end
 
 function gens(R::FqMPolyRing)
-    return [FqMPolyRingElem(R, a)::FqMPolyRingElem for a in gens(R.data)]
+    return FqMPolyRingElem[FqMPolyRingElem(R, a)::FqMPolyRingElem for a in gens(R.data)]
 end
 
 function gen(R::FqMPolyRing, i::Int)
