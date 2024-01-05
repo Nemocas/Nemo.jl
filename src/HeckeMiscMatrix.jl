@@ -728,17 +728,22 @@ function eigvals(M::MatElem{T}) where T <: FieldElem
   @assert is_square(M)
   K = base_ring(M)
   f = charpoly(M)
-  fac = factor(f) #Should use roots! But needs to take into account
-                  #multiplicities
-  D = Dict{elem_type(K), Int}()
-  for (g, v) in fac
-    if degree(g) > 1
-      continue
-    end
-    lambda = -divexact(coeff(g, 0), leading_coefficient(g))
-    D[lambda] = v
-  end
-  return D
+  return roots(f)
+end
+
+@doc raw"""
+    eigenvalues_with_multiplicities(M::MatElem{T}) where T <: FieldElem
+
+Return the eigenvalues `M` together with their algebraic multiplicities as a
+vector of tuples.
+"""
+function eigenvalues_with_multiplicities(M::MatElem{T}) where T <: FieldElem
+  @assert is_square(M)
+  K = base_ring(M)
+  Kx, x = polynomial_ring(K, "x", cached = false)
+  f = charpoly(Kx, M)
+  r = roots(f)
+  return [ (a, valuation(f, x - a)) for a in r ]
 end
 
 @doc raw"""
@@ -750,6 +755,18 @@ function eigvals(L::Field, M::MatElem{T}) where T <: RingElem
   @assert is_square(M)
   M1 = change_base_ring(L, M)
   return eigvals(M1)
+end
+
+@doc raw"""
+    eigenvalues_with_multiplicities(L::Field, M::MatElem{T}) where T <: RingElem
+
+Return the eigenvalues `M` over the field `L` together with their algebraic
+multiplicities as a vector of tuples.
+"""
+function eigenvalues_with_multiplicities(L::Field, M::MatElem{T}) where T <: RingElem
+  @assert is_square(M)
+  M1 = change_base_ring(L, M)
+  return eigenvalues_with_multiplicities(M1)
 end
 
 @doc raw"""
@@ -785,7 +802,7 @@ function eigenspaces(M::MatElem{T}; side::Symbol = :right) where T<:FieldElem
 
   S = eigenvalues(M)
   L = Dict{elem_type(base_ring(M)), typeof(M)}()
-  for k in keys(S)
+  for k in S
     push!(L, k => vcat(eigenspace(M, k, side = side)))
   end
   return L
