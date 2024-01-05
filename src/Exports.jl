@@ -153,6 +153,7 @@ export divisible
 export divisor_lenstra
 export divisor_sigma
 export divisors
+export eigenspaces
 export eigenvalues_with_multiplicities
 export eigvals
 export eigvals_simple
