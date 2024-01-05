@@ -742,11 +742,11 @@ function eigvals(M::MatElem{T}) where T <: FieldElem
 end
 
 @doc raw"""
-    eigvals(M::MatElem{T}, L) where T <: FieldElem
+    eigvals(L::Field, M::MatElem{T}) where T <: RingElem
 
 Return the eigenvalues of `M` over the field `L`.
 """
-function eigvals(M::MatElem{T}, L) where T <: FieldElem
+function eigvals(L::Field, M::MatElem{T}) where T <: RingElem
   @assert is_square(M)
   M1 = change_base_ring(L, M)
   return eigvals(M1)

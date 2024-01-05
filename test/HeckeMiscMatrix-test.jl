@@ -8,7 +8,7 @@
 
   L = GF(5, 2)
   a = 2*gen(L) + 1 # third root of 1
-  lL = eigvals(M, L)
+  lL = eigvals(L, M)
   @test length(keys(lL)) == 3
   @test haskey(lL, one(L)) && haskey(lL, a) && haskey(lL, a^-1)
   @test lL[one(L)] == 2
