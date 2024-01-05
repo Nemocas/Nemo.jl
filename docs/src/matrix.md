@@ -471,7 +471,8 @@ In case the matrix cannot be converted without loss, an `InexactError` is thrown
 ### Eigenvalues and Eigenvectors (experimental)
 
 ```@docs
-eigvals(::ComplexMat)
+eigenvalues(::ComplexMat)
+eigenvalues_with_multiplicities(::ComplexMat)
 eigvals_simple(a::ComplexMat)
 ```
 
@@ -479,5 +480,6 @@ eigvals_simple(a::ComplexMat)
 A = CC[1 2 3; 0 4 5; 0 0 6]
 eigvals_simple(A)
 A = CC[2 2 3; 0 2 5; 0 0 2])
-eigvals(A)
+eigenvalues(A)
+eigenvalues_with_multiplicities(A)
 ```

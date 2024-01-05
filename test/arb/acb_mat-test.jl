@@ -464,7 +464,13 @@ end
 @testset "acb_mat.eigvals" begin
    A = matrix(CC, 3, 3, [1, 2, 3, 0, 4, 5, 0, 0, 6])
 
-   E = eigvals(A)
+   E = eigenvalues(A)
+   @test length(E) == 3
+   @test contains(E[1], 1)
+   @test contains(E[2], 4)
+   @test contains(E[3], 6)
+
+   E = eigenvalues_with_multiplicities(A)
    @test length(E) == 3
    @test E[1][2] == 1
    @test E[2][2] == 1
@@ -481,7 +487,11 @@ end
 
    A = matrix(CC, 3, 3, [2, 2, 3, 0, 2, 5, 0, 0, 2])
 
-   E = eigvals(A)
+   E = eigenvalues(A)
+   @test length(E) == 1
+   @test contains(E[1], 2)
+
+   E = eigenvalues_with_multiplicities(A)
    @test length(E) == 1
    @test E[1][2] == 3
    @test contains(E[1][1], 2)

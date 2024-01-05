@@ -977,17 +977,29 @@ function eigvals_simple(A::acb_mat, algorithm::Symbol = :default)
 end
 
 @doc raw"""
+    eigenvalues_with_multiplicities(A::acb_mat)
+
+Return the eigenvalues of `A` with their algebraic multiplicities as a vector of
+tuples `(acb, Int)`. Each tuple `(z, k)` corresponds to a cluster of `k`
+eigenvalues of $A$.
+
+This function is experimental.
+"""
+function eigenvalues_with_multiplicities(A::acb_mat)
+   e, _ = _eig_multiple(A)
+   return e
+end
+
+@doc raw"""
     eigvals(A::acb_mat)
 
-Returns the eigenvalues of `A` as a vector of tuples `(acb, Int)`.
-Each tuple `(z, k)` corresponds to a cluster of `k` eigenvalues
-of $A$.
+Return the eigenvalues of `A`.
 
 This function is experimental.
 """
 function eigvals(A::acb_mat)
-  e, _ = _eig_multiple(A)
-  return e
+   e, _ = _eig_multiple(A)
+   return [ x[1] for x in e ]
 end
 
 ###############################################################################

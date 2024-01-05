@@ -90,7 +90,7 @@ true
 Computing exact eigenvalues of a matrix:
 
 ```jldoctest
-julia> eigvals(QQBar, ZZ[1 1 0; 0 1 1; 1 0 1])
+julia> eigenvalues(QQBar, ZZ[1 1 0; 0 1 1; 1 0 1])
 3-element Vector{qqbar}:
  Root 2.00000 of x - 2
  Root 0.500000 + 0.866025*im of x^2 - x + 1
@@ -102,8 +102,10 @@ julia> eigvals(QQBar, ZZ[1 1 0; 0 1 1; 1 0 1])
 ```@docs
 roots(R::CalciumQQBarField, f::ZZPolyRingElem)
 roots(R::CalciumQQBarField, f::QQPolyRingElem)
-eigvals(R::CalciumQQBarField, A::ZZMatrix)
-eigvals(R::CalciumQQBarField, A::QQMatrix)
+eigenvalues(R::CalciumQQBarField, A::ZZMatrix)
+eigenvalues_with_multiplicities(R::CalciumQQBarField, A::ZZMatrix)
+eigenvalues(R::CalciumQQBarField, A::QQMatrix)
+eigenvalues_with_multiplicities(R::CalciumQQBarField, A::QQMatrix)
 rand(R::CalciumQQBarField; degree::Int, bits::Int, randtype::Symbol=:null)
 ```
 
