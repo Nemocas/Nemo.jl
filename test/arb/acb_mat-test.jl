@@ -464,13 +464,13 @@ end
 @testset "acb_mat.eigenvalues" begin
    A = matrix(CC, 3, 3, [1, 2, 3, 0, 4, 5, 0, 0, 6])
 
-   E = eigenvalues(A)
+   E = @inferred eigenvalues(A)
    @test length(E) == 3
    @test contains(E[1], 1)
    @test contains(E[2], 4)
    @test contains(E[3], 6)
 
-   E = eigenvalues_with_multiplicities(A)
+   E = @inferred eigenvalues_with_multiplicities(A)
    @test length(E) == 3
    @test E[1][2] == 1
    @test E[2][2] == 1
@@ -479,7 +479,7 @@ end
    @test contains(E[2][1], 4)
    @test contains(E[3][1], 6)
 
-   EE = eigenvalues_simple(A)
+   EE = @inferred eigenvalues_simple(A)
    @test length(EE) == 3
    @test contains(EE[1], 1)
    @test contains(EE[2], 4)
@@ -487,11 +487,11 @@ end
 
    A = matrix(CC, 3, 3, [2, 2, 3, 0, 2, 5, 0, 0, 2])
 
-   E = eigenvalues(A)
+   E = @inferred eigenvalues(A)
    @test length(E) == 1
    @test contains(E[1], 2)
 
-   E = eigenvalues_with_multiplicities(A)
+   E = @inferred eigenvalues_with_multiplicities(A)
    @test length(E) == 1
    @test E[1][2] == 3
    @test contains(E[1][1], 2)

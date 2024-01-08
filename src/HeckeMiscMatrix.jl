@@ -788,7 +788,7 @@ function eigenspace(M::MatElem{T}, lambda::T; side::Symbol = :right) where T <: 
 end
 
 @doc raw"""
-    eigenspace(M::MatElem{T}; side::Symbol = :right)
+    eigenspaces(M::MatElem{T}; side::Symbol = :right)
       where T <: FieldElem -> Dict{T, MatElem{T}}
 
 Return a dictionary containing the eigenvalues of $M$ as keys and bases for the
