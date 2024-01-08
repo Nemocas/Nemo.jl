@@ -1004,16 +1004,15 @@ function _eigvals_internal(R::CalciumQQBarField, A::QQMatrix)
    return res
 end
 
-
 @doc raw"""
-    eigvals(R::CalciumQQBarField, A::ZZMatrix)
-    eigvals(R::CalciumQQBarField, A::QQMatrix)
+    eigenvalues(R::CalciumQQBarField, A::ZZMatrix)
+    eigenvalues(R::CalciumQQBarField, A::QQMatrix)
 
 Return the eigenvalues `A` in the field of algebraic numbers `R`.
 The output array is sorted in the default sort order for
 algebraic numbers.
 """
-function eigvals(R::CalciumQQBarField, A::Union{ZZMatrix, QQMatrix})
+function eigenvalues(R::CalciumQQBarField, A::Union{ZZMatrix, QQMatrix})
    return unique(_eigvals_internal(R, A))
 end
 

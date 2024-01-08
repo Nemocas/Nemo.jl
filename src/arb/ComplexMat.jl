@@ -947,7 +947,7 @@ function _eig_simple(A::ComplexMat; check::Bool = true, algorithm::Symbol = :def
 end
 
 @doc raw"""
-    eigvals_simple(A::ComplexMat, algorithm::Symbol = :default)
+    eigenvalues_simple(A::ComplexMat, algorithm::Symbol = :default)
 
 Returns the eigenvalues of `A` as a vector of `acb`. It is assumed that `A`
 has only simple eigenvalues.
@@ -957,7 +957,7 @@ The algorithm used can be changed by setting the `algorithm` keyword to
 
 This function is experimental.
 """
-function eigvals_simple(A::ComplexMat, algorithm::Symbol = :default)
+function eigenvalues_simple(A::ComplexMat, algorithm::Symbol = :default)
   E, _, _ = _eig_simple(A, algorithm = algorithm)
   return E
 end
@@ -977,13 +977,13 @@ function eigenvalues_with_multiplicities(A::ComplexMat)
 end
 
 @doc raw"""
-    eigvals(A::ComplexMat)
+    eigenvalues(A::ComplexMat)
 
 Return the eigenvalues of `A`.
 
 This function is experimental.
 """
-function eigvals(A::ComplexMat)
+function eigenvalues(A::ComplexMat)
    e, _ = _eig_multiple(A)
    return [ x[1] for x in e ]
 end

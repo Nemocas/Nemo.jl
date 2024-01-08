@@ -461,7 +461,7 @@ end
    end
 end
 
-@testset "acb_mat.eigvals" begin
+@testset "acb_mat.eigenvalues" begin
    A = matrix(CC, 3, 3, [1, 2, 3, 0, 4, 5, 0, 0, 6])
 
    E = eigenvalues(A)
@@ -479,7 +479,7 @@ end
    @test contains(E[2][1], 4)
    @test contains(E[3][1], 6)
 
-   EE = eigvals_simple(A)
+   EE = eigenvalues_simple(A)
    @test length(EE) == 3
    @test contains(EE[1], 1)
    @test contains(EE[2], 4)
@@ -496,5 +496,5 @@ end
    @test E[1][2] == 3
    @test contains(E[1][1], 2)
 
-   @test_throws ErrorException eigvals_simple(A)
+   @test_throws ErrorException eigenvalues_simple(A)
 end

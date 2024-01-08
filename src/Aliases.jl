@@ -8,8 +8,7 @@ include(joinpath(pathof(AbstractAlgebra), "..", "Aliases.jl"))
 @alias is_less isless
 @alias is_real isreal
 
-@alias eigenvalues eigvals
-@alias eigenvalues_simple eigvals_simple
+@alias eigvals_simple eigenvalues_simple # for consistency with eigvals/eigenvalues
 
 # for backwards compatibility
 Base.@deprecate_binding isalgebraic is_algebraic

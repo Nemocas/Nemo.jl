@@ -155,9 +155,9 @@ export divisor_sigma
 export divisors
 export eigenspace
 export eigenspaces
+export eigenvalues
+export eigenvalues_simple
 export eigenvalues_with_multiplicities
-export eigvals
-export eigvals_simple
 export eisenstein_g
 export elem_to_mat_row!
 export elem_type

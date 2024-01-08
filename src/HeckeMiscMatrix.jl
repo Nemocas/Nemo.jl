@@ -720,11 +720,11 @@ end
 ################################################################################
 
 @doc raw"""
-    eigvals(M::MatElem{T}) where T <: FieldElem
+    eigenvalues(M::MatElem{T}) where T <: FieldElem
 
 Return the eigenvalues of `M`.
 """
-function eigvals(M::MatElem{T}) where T <: FieldElem
+function eigenvalues(M::MatElem{T}) where T <: FieldElem
   @assert is_square(M)
   K = base_ring(M)
   f = charpoly(M)
@@ -734,7 +734,7 @@ end
 @doc raw"""
     eigenvalues_with_multiplicities(M::MatElem{T}) where T <: FieldElem
 
-Return the eigenvalues `M` together with their algebraic multiplicities as a
+Return the eigenvalues of `M` together with their algebraic multiplicities as a
 vector of tuples.
 """
 function eigenvalues_with_multiplicities(M::MatElem{T}) where T <: FieldElem
@@ -747,20 +747,20 @@ function eigenvalues_with_multiplicities(M::MatElem{T}) where T <: FieldElem
 end
 
 @doc raw"""
-    eigvals(L::Field, M::MatElem{T}) where T <: RingElem
+    eigenvalues(L::Field, M::MatElem{T}) where T <: RingElem
 
 Return the eigenvalues of `M` over the field `L`.
 """
-function eigvals(L::Field, M::MatElem{T}) where T <: RingElem
+function eigenvalues(L::Field, M::MatElem{T}) where T <: RingElem
   @assert is_square(M)
   M1 = change_base_ring(L, M)
-  return eigvals(M1)
+  return eigenvalues(M1)
 end
 
 @doc raw"""
     eigenvalues_with_multiplicities(L::Field, M::MatElem{T}) where T <: RingElem
 
-Return the eigenvalues `M` over the field `L` together with their algebraic
+Return the eigenvalues of `M` over the field `L` together with their algebraic
 multiplicities as a vector of tuples.
 """
 function eigenvalues_with_multiplicities(L::Field, M::MatElem{T}) where T <: RingElem

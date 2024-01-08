@@ -201,6 +201,8 @@ import AbstractAlgebra: set_attribute!
 
 include("Exports.jl")
 
+const eigenvalues = eigvals # alternative name for the function from LinearAlgebra
+
 ###############################################################################
 #
 #   Set up environment / load libraries
