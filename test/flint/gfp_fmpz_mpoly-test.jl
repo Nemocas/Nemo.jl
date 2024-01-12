@@ -1,7 +1,7 @@
 @testset "FpMPolyRingElem.constructors" begin
    R = Native.GF(ZZRingElem(23))
 
-   for num_vars = 1:10
+   for num_vars = 0:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
@@ -16,10 +16,14 @@
 
       @test !(SSS === SSSS)
 
-      @test string(varlist[1]) == var_names[1]
+      if num_vars > 0
+         @test string(varlist[1]) == var_names[1]
+      end
       @test nvars(S) == num_vars
       @test modulus(S) == modulus(R)
-      @test modulus(varlist[1]) == modulus(R)
+      if num_vars > 0
+         @test modulus(varlist[1]) == modulus(R)
+      end
 
       @test elem_type(S) == FpMPolyRingElem
       @test elem_type(FpMPolyRing) == FpMPolyRingElem

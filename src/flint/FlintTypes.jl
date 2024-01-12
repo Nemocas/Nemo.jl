@@ -1267,8 +1267,6 @@ const flint_orderings = [:lex, :deglex, :degrevlex]
             error("$S is not a valid ordering")
          end
 
-         isempty(s) && error("need at least one indeterminate")
-
          z = new()
          ccall((:fmpz_mpoly_ctx_init, libflint), Nothing,
                (Ref{ZZMPolyRing}, Int, Int),
@@ -1462,8 +1460,6 @@ end
          else
             error("$S is not a valid ordering")
          end
-
-         isempty(s) && error("need at least one indeterminate")
 
          z = new()
          ccall((:fmpq_mpoly_ctx_init, libflint), Nothing,
@@ -1677,8 +1673,6 @@ end
             error("$S is not a valid ordering")
          end
 
-         isempty(s) && error("need at least one indeterminate")
-
          z = new()
          ccall((:nmod_mpoly_ctx_init, libflint), Nothing,
                (Ref{zzModMPolyRing}, Int, Cint, UInt),
@@ -1867,8 +1861,6 @@ end
          else
             error("$S is not a valid ordering")
          end
-
-         isempty(s) && error("need at least one indeterminate")
 
          z = new()
          ccall((:nmod_mpoly_ctx_init, libflint), Nothing,
@@ -2909,8 +2901,6 @@ end
          else
             error("$S is not a valid ordering")
          end
-
-         isempty(s) && error("need at least one indeterminate")
 
          z = new()
          ccall((:fq_nmod_mpoly_ctx_init, libflint), Nothing,
