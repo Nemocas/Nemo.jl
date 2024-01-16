@@ -972,46 +972,6 @@ function next_prime(x::T, proved::Bool=true) where {T<:Integer}
     return T(next_prime(BigInt(x), proved))
 end
 
-#TODO: only makes sense if f is univ (uses only one var)
-function (Rx::ZZPolyRing)(f::QQMPolyRingElem)
-    fp = Rx()
-    R = base_ring(Rx)
-    d = denominator(f)
-    @assert d == 1
-    for t = terms(f)
-        e = total_degree(t)
-        @assert length(t) == 1
-        c = coeff(t, 1)
-        setcoeff!(fp, e, numerator(c * d))
-    end
-    return fp
-end
-
-function (Rx::QQPolyRing)(f::QQMPolyRingElem)
-    fp = Rx()
-    R = base_ring(Rx)
-    for t = terms(f)
-        e = total_degree(t)
-        @assert length(t) == 1
-        c = coeff(t, 1)
-        setcoeff!(fp, e, c)
-    end
-    return fp
-end
-
-function (Rx::fpPolyRing)(f::QQMPolyRingElem)
-    fp = Rx()
-    R = base_ring(Rx)
-    d = denominator(f)
-    for t = terms(f)
-        e = total_degree(t)
-        @assert length(t) == 1
-        c = coeff(t, 1)
-        setcoeff!(fp, e, R(numerator(c * d)))
-    end
-    return fp * inv(R(d))
-end
-
 function mul!(res::QQMPolyRingElem, a::QQMPolyRingElem, c::ZZRingElem)
     ccall((:fmpq_mpoly_scalar_mul_fmpz, libflint), Nothing,
         (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{ZZRingElem}, Ref{QQMPolyRing}), res, a, c, parent(a))
