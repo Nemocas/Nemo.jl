@@ -39,10 +39,10 @@ end
 @testset "arf.hecke_semantics" begin
     x = Nemo.arf_struct(0, 0, 0, 0)
     y = ZZRingElem(3)^100
-    ccall((:arf_set_fmpz, Nemo.libarb), Nothing,
+    ccall((:arf_set_fmpz, Nemo.libflint), Nothing,
           (Ref{Nemo.arf_struct}, Ref{ZZRingElem}),
           x, y)
-    ccall((:arf_clear, Nemo.libarb), Nothing,
+    ccall((:arf_clear, Nemo.libflint), Nothing,
           (Ref{Nemo.arf_struct},),
           x)
 end

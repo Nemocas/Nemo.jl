@@ -16,11 +16,11 @@ elem_type(::Type{RealPolyRing}) = RealPoly
 
 dense_poly_type(::Type{RealFieldElem}) = RealPoly
 
-length(x::RealPoly) = ccall((:arb_poly_length, libarb), Int,
+length(x::RealPoly) = ccall((:arb_poly_length, libflint), Int,
                                    (Ref{RealPoly},), x)
 
 function set_length!(x::RealPoly, n::Int)
-   ccall((:_arb_poly_set_length, libarb), Nothing,
+   ccall((:_arb_poly_set_length, libflint), Nothing,
                                    (Ref{RealPoly}, Int), x, n)
    return x
 end
@@ -30,7 +30,7 @@ degree(x::RealPoly) = length(x) - 1
 function coeff(a::RealPoly, n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
   t = base_ring(parent(a))()
-  ccall((:arb_poly_get_coeff_arb, libarb), Nothing,
+  ccall((:arb_poly_get_coeff_arb, libflint), Nothing,
               (Ref{RealFieldElem}, Ref{RealPoly}, Int), t, a, n)
   return t
 end
@@ -41,7 +41,7 @@ one(a::RealPolyRing) = a(1)
 
 function gen(a::RealPolyRing)
    z = RealPoly()
-   ccall((:arb_poly_set_coeff_si, libarb), Nothing,
+   ccall((:arb_poly_set_coeff_si, libflint), Nothing,
         (Ref{RealPoly}, Int, Int), z, 1, 1)
    z.parent = a
    return z
@@ -99,7 +99,7 @@ end
 ###############################################################################
 
 function isequal(x::RealPoly, y::RealPoly)
-   return ccall((:arb_poly_equal, libarb), Bool,
+   return ccall((:arb_poly_equal, libflint), Bool,
                                       (Ref{RealPoly}, Ref{RealPoly}), x, y)
 end
 
@@ -110,7 +110,7 @@ Return `true` if the coefficient balls of $x$ overlap the coefficient balls
 of $y$, otherwise return `false`.
 """
 function overlaps(x::RealPoly, y::RealPoly)
-   return ccall((:arb_poly_overlaps, libarb), Bool,
+   return ccall((:arb_poly_overlaps, libflint), Bool,
                                       (Ref{RealPoly}, Ref{RealPoly}), x, y)
 end
 
@@ -121,7 +121,7 @@ Return `true` if the coefficient balls of $x$ contain the corresponding
 coefficient balls of $y$, otherwise return `false`.
 """
 function contains(x::RealPoly, y::RealPoly)
-   return ccall((:arb_poly_contains, libarb), Bool,
+   return ccall((:arb_poly_contains, libflint), Bool,
                                       (Ref{RealPoly}, Ref{RealPoly}), x, y)
 end
 
@@ -132,7 +132,7 @@ Return `true` if the coefficient balls of $x$ contain the corresponding
 exact coefficients of $y$, otherwise return `false`.
 """
 function contains(x::RealPoly, y::ZZPolyRingElem)
-   return ccall((:arb_poly_contains_fmpz_poly, libarb), Bool,
+   return ccall((:arb_poly_contains_fmpz_poly, libflint), Bool,
                                       (Ref{RealPoly}, Ref{ZZPolyRingElem}), x, y)
 end
 
@@ -143,7 +143,7 @@ Return `true` if the coefficient balls of $x$ contain the corresponding
 exact coefficients of $y$, otherwise return `false`.
 """
 function contains(x::RealPoly, y::QQPolyRingElem)
-   return ccall((:arb_poly_contains_fmpq_poly, libarb), Bool,
+   return ccall((:arb_poly_contains_fmpq_poly, libflint), Bool,
                                       (Ref{RealPoly}, Ref{QQPolyRingElem}), x, y)
 end
 
@@ -177,7 +177,7 @@ In the former case, $z$ is set to the integer polynomial.
 """
 function unique_integer(x::RealPoly)
   z = ZZPolyRing(FlintZZ, var(parent(x)))()
-  unique = ccall((:arb_poly_get_unique_fmpz_poly, libarb), Int,
+  unique = ccall((:arb_poly_get_unique_fmpz_poly, libflint), Int,
     (Ref{ZZPolyRingElem}, Ref{RealPoly}), z, x)
   return (unique != 0, z)
 end
@@ -191,7 +191,7 @@ end
 function shift_left(x::RealPoly, len::Int)
   len < 0 && throw(DomainError(len, "Shift must be non-negative"))
    z = parent(x)()
-   ccall((:arb_poly_shift_left, libarb), Nothing,
+   ccall((:arb_poly_shift_left, libflint), Nothing,
       (Ref{RealPoly}, Ref{RealPoly}, Int), z, x, len)
    return z
 end
@@ -199,7 +199,7 @@ end
 function shift_right(x::RealPoly, len::Int)
    len < 0 && throw(DomainError(len, "Shift must be non-negative"))
    z = parent(x)()
-   ccall((:arb_poly_shift_right, libarb), Nothing,
+   ccall((:arb_poly_shift_right, libflint), Nothing,
        (Ref{RealPoly}, Ref{RealPoly}, Int), z, x, len)
    return z
 end
@@ -212,7 +212,7 @@ end
 
 function -(x::RealPoly)
   z = parent(x)()
-  ccall((:arb_poly_neg, libarb), Nothing, (Ref{RealPoly}, Ref{RealPoly}), z, x)
+  ccall((:arb_poly_neg, libflint), Nothing, (Ref{RealPoly}, Ref{RealPoly}), z, x)
   return z
 end
 
@@ -224,7 +224,7 @@ end
 
 function +(x::RealPoly, y::RealPoly)
   z = parent(x)()
-  ccall((:arb_poly_add, libarb), Nothing,
+  ccall((:arb_poly_add, libflint), Nothing,
               (Ref{RealPoly}, Ref{RealPoly}, Ref{RealPoly}, Int),
               z, x, y, precision(Balls))
   return z
@@ -232,7 +232,7 @@ end
 
 function *(x::RealPoly, y::RealPoly)
   z = parent(x)()
-  ccall((:arb_poly_mul, libarb), Nothing,
+  ccall((:arb_poly_mul, libflint), Nothing,
               (Ref{RealPoly}, Ref{RealPoly}, Ref{RealPoly}, Int),
               z, x, y, precision(Balls))
   return z
@@ -240,7 +240,7 @@ end
 
 function -(x::RealPoly, y::RealPoly)
   z = parent(x)()
-  ccall((:arb_poly_sub, libarb), Nothing,
+  ccall((:arb_poly_sub, libflint), Nothing,
               (Ref{RealPoly}, Ref{RealPoly}, Ref{RealPoly}, Int),
               z, x, y, precision(Balls))
   return z
@@ -249,7 +249,7 @@ end
 function ^(x::RealPoly, y::Int)
   y < 0 && throw(DomainError(y, "Exponent must be non-negative"))
   z = parent(x)()
-  ccall((:arb_poly_pow_ui, libarb), Nothing,
+  ccall((:arb_poly_pow_ui, libflint), Nothing,
               (Ref{RealPoly}, Ref{RealPoly}, UInt, Int),
               z, x, y, precision(Balls))
   return z
@@ -321,7 +321,7 @@ function Base.divrem(x::RealPoly, y::RealPoly)
    iszero(y) && throw(DivideError())
    q = parent(x)()
    r = parent(x)()
-   if (ccall((:arb_poly_divrem, libarb), Int,
+   if (ccall((:arb_poly_divrem, libflint), Int,
          (Ref{RealPoly}, Ref{RealPoly}, Ref{RealPoly}, Ref{RealPoly}, Int),
                q, r, x, y, precision(Balls)) == 1)
       return (q, r)
@@ -351,7 +351,7 @@ function truncate(a::RealPoly, n::Int)
    end
    # todo: implement set_trunc in arb
    z = deepcopy(a)
-   ccall((:arb_poly_truncate, libarb), Nothing,
+   ccall((:arb_poly_truncate, libflint), Nothing,
                 (Ref{RealPoly}, Int), z, n)
    return z
 end
@@ -359,7 +359,7 @@ end
 function mullow(x::RealPoly, y::RealPoly, n::Int, prec::Int = precision(Balls))
    n < 0 && throw(DomainError(n, "Index must be non-negative"))
    z = parent(x)()
-   ccall((:arb_poly_mullow, libarb), Nothing,
+   ccall((:arb_poly_mullow, libflint), Nothing,
          (Ref{RealPoly}, Ref{RealPoly}, Ref{RealPoly}, Int, Int),
             z, x, y, n, prec)
    return z
@@ -374,7 +374,7 @@ end
 #function reverse(x::RealPoly, len::Int)
 #   len < 0 && throw(DomainError())
 #   z = parent(x)()
-#   ccall((:arb_poly_reverse, libarb), Nothing,
+#   ccall((:arb_poly_reverse, libflint), Nothing,
 #                (Ref{RealPoly}, Ref{RealPoly}, Int), z, x, len)
 #   return z
 #end
@@ -387,7 +387,7 @@ end
 
 function evaluate(x::RealPoly, y::RealFieldElem, prec::Int = precision(Balls))
    z = parent(y)()
-   ccall((:arb_poly_evaluate, libarb), Nothing,
+   ccall((:arb_poly_evaluate, libflint), Nothing,
                 (Ref{RealFieldElem}, Ref{RealPoly}, Ref{RealFieldElem}, Int),
                 z, x, y, prec)
    return z
@@ -395,7 +395,7 @@ end
 
 function evaluate(x::RealPoly, y::acb, prec::Int = precision(Balls))
    z = parent(y)()
-   ccall((:arb_poly_evaluate_acb, libarb), Nothing,
+   ccall((:arb_poly_evaluate_acb, libflint), Nothing,
                 (Ref{acb}, Ref{RealPoly}, Ref{acb}, Int),
                 z, x, y, prec)
    return z
@@ -416,7 +416,7 @@ its derivative evaluated at $y$.
 function evaluate2(x::RealPoly, y::RealFieldElem, prec::Int = precision(Balls))
    z = parent(y)()
    w = parent(y)()
-   ccall((:arb_poly_evaluate2, libarb), Nothing,
+   ccall((:arb_poly_evaluate2, libflint), Nothing,
                 (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealPoly}, Ref{RealFieldElem}, Int),
                 z, w, x, y, prec)
    return z, w
@@ -425,7 +425,7 @@ end
 function evaluate2(x::RealPoly, y::ComplexFieldElem, prec::Int = precision(Balls))
    z = parent(y)()
    w = parent(y)()
-   ccall((:arb_poly_evaluate2_acb, libarb), Nothing,
+   ccall((:arb_poly_evaluate2_acb, libflint), Nothing,
                 (Ref{acb}, Ref{acb}, Ref{RealPoly}, Ref{acb}, Int),
                 z, w, x, y, prec)
    return z, w
@@ -443,7 +443,7 @@ end
 
 function compose(x::RealPoly, y::RealPoly, prec::Int = precision(Balls))
    z = parent(x)()
-   ccall((:arb_poly_compose, libarb), Nothing,
+   ccall((:arb_poly_compose, libflint), Nothing,
                 (Ref{RealPoly}, Ref{RealPoly}, Ref{RealPoly}, Int),
                 z, x, y, prec)
    return z
@@ -457,14 +457,14 @@ end
 
 function derivative(x::RealPoly, prec::Int = precision(Balls))
    z = parent(x)()
-   ccall((:arb_poly_derivative, libarb), Nothing,
+   ccall((:arb_poly_derivative, libflint), Nothing,
                 (Ref{RealPoly}, Ref{RealPoly}, Int), z, x, prec)
    return z
 end
 
 function integral(x::RealPoly, prec::Int = precision(Balls))
    z = parent(x)()
-   ccall((:arb_poly_integral, libarb), Nothing,
+   ccall((:arb_poly_integral, libflint), Nothing,
                 (Ref{RealPoly}, Ref{RealPoly}, Int), z, x, prec)
    return z
 end
@@ -476,13 +476,13 @@ end
 ###############################################################################
 
 function arb_vec(n::Int)
-   return ccall((:_arb_vec_init, libarb), Ptr{arb_struct}, (Int,), n)
+   return ccall((:_arb_vec_init, libflint), Ptr{arb_struct}, (Int,), n)
 end
 
 function arb_vec(b::Vector{RealFieldElem})
-   v = ccall((:_arb_vec_init, libarb), Ptr{arb_struct}, (Int,), length(b))
+   v = ccall((:_arb_vec_init, libflint), Ptr{arb_struct}, (Int,), length(b))
    for i=1:length(b)
-       ccall((:arb_set, libarb), Nothing, (Ptr{arb_struct}, Ref{RealFieldElem}),
+       ccall((:arb_set, libflint), Nothing, (Ptr{arb_struct}, Ref{RealFieldElem}),
            v + (i-1)*sizeof(arb_struct), b[i])
    end
    return v
@@ -492,14 +492,14 @@ function array(R::RealField, v::Ptr{arb_struct}, n::Int)
    r = Vector{RealFieldElem}(undef, n)
    for i=1:n
        r[i] = R()
-       ccall((:arb_set, libarb), Nothing, (Ref{RealFieldElem}, Ptr{arb_struct}),
+       ccall((:arb_set, libflint), Nothing, (Ref{RealFieldElem}, Ptr{arb_struct}),
            r[i], v + (i-1)*sizeof(arb_struct))
    end
    return r
 end
 
 function arb_vec_clear(v::Ptr{arb_struct}, n::Int)
-   ccall((:_arb_vec_clear, libarb), Nothing, (Ptr{arb_struct}, Int), v, n)
+   ccall((:_arb_vec_clear, libflint), Nothing, (Ptr{arb_struct}, Int), v, n)
 end
 
 @doc raw"""
@@ -510,7 +510,7 @@ Construct a polynomial in the given polynomial ring from a list of its roots.
 function from_roots(R::RealPolyRing, b::Vector{RealFieldElem}, prec::Int = precision(Balls))
    z = R()
    tmp = arb_vec(b)
-   ccall((:arb_poly_product_roots, libarb), Nothing,
+   ccall((:arb_poly_product_roots, libflint), Nothing,
                 (Ref{RealPoly}, Ptr{arb_struct}, Int, Int), z, tmp, length(b), prec)
    arb_vec_clear(tmp, length(b))
    return z
@@ -522,7 +522,7 @@ end
 
 function evaluate_fast(x::RealPoly, b::Vector{RealFieldElem}, prec::Int = precision(Balls))
    tmp = arb_vec(b)
-   ccall((:arb_poly_evaluate_vec_fast, libarb), Nothing,
+   ccall((:arb_poly_evaluate_vec_fast, libflint), Nothing,
                 (Ptr{arb_struct}, Ref{RealPoly}, Ptr{arb_struct}, Int, Int),
             tmp, x, tmp, length(b), prec)
    res = array(base_ring(parent(x)), tmp, length(b))
@@ -535,7 +535,7 @@ function interpolate_newton(R::RealPolyRing, xs::Vector{RealFieldElem}, ys::Vect
    z = R()
    xsv = arb_vec(xs)
    ysv = arb_vec(ys)
-   ccall((:arb_poly_interpolate_newton, libarb), Nothing,
+   ccall((:arb_poly_interpolate_newton, libflint), Nothing,
                 (Ref{RealPoly}, Ptr{arb_struct}, Ptr{arb_struct}, Int, Int),
             z, xsv, ysv, length(xs), prec)
    arb_vec_clear(xsv, length(xs))
@@ -548,7 +548,7 @@ function interpolate_barycentric(R::RealPolyRing, xs::Vector{RealFieldElem}, ys:
    z = R()
    xsv = arb_vec(xs)
    ysv = arb_vec(ys)
-   ccall((:arb_poly_interpolate_barycentric, libarb), Nothing,
+   ccall((:arb_poly_interpolate_barycentric, libflint), Nothing,
                 (Ref{RealPoly}, Ptr{arb_struct}, Ptr{arb_struct}, Int, Int),
             z, xsv, ysv, length(xs), prec)
    arb_vec_clear(xsv, length(xs))
@@ -561,7 +561,7 @@ function interpolate_fast(R::RealPolyRing, xs::Vector{RealFieldElem}, ys::Vector
    z = R()
    xsv = arb_vec(xs)
    ysv = arb_vec(ys)
-   ccall((:arb_poly_interpolate_fast, libarb), Nothing,
+   ccall((:arb_poly_interpolate_fast, libflint), Nothing,
                 (Ref{RealPoly}, Ptr{arb_struct}, Ptr{arb_struct}, Int, Int),
             z, xsv, ysv, length(xs), prec)
    arb_vec_clear(xsv, length(xs))
@@ -594,14 +594,14 @@ function roots_upper_bound(x::RealPoly)
    z = base_ring(x)()
    p = precision(Balls)
    GC.@preserve x z begin
-      t = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ref{RealFieldElem}, ), z)
-      ccall((:arb_poly_root_bound_fujiwara, libarb), Nothing,
+      t = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (Ref{RealFieldElem}, ), z)
+      ccall((:arb_poly_root_bound_fujiwara, libflint), Nothing,
             (Ptr{mag_struct}, Ref{RealPoly}), t, x)
-      s = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ref{RealFieldElem}, ), z)
-      ccall((:arf_set_mag, libarb), Nothing, (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
-      ccall((:arf_set_round, libarb), Nothing,
+      s = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (Ref{RealFieldElem}, ), z)
+      ccall((:arf_set_mag, libflint), Nothing, (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
+      ccall((:arf_set_round, libflint), Nothing,
             (Ptr{arf_struct}, Ptr{arf_struct}, Int, Cint), s, s, p, ARB_RND_CEIL)
-      ccall((:mag_zero, libarb), Nothing, (Ptr{mag_struct},), t)
+      ccall((:mag_zero, libflint), Nothing, (Ptr{mag_struct},), t)
    end
    return z
 end
@@ -613,45 +613,45 @@ end
 ###############################################################################
 
 function zero!(z::RealPoly)
-   ccall((:arb_poly_zero, libarb), Nothing,
+   ccall((:arb_poly_zero, libflint), Nothing,
                     (Ref{RealPoly}, ), z)
    return z
 end
 
 function fit!(z::RealPoly, n::Int)
-   ccall((:arb_poly_fit_length, libarb), Nothing,
+   ccall((:arb_poly_fit_length, libflint), Nothing,
                     (Ref{RealPoly}, Int), z, n)
    return nothing
 end
 
 function setcoeff!(z::RealPoly, n::Int, x::ZZRingElem)
-   ccall((:arb_poly_set_coeff_fmpz, libarb), Nothing,
+   ccall((:arb_poly_set_coeff_fmpz, libflint), Nothing,
                     (Ref{RealPoly}, Int, Ref{ZZRingElem}), z, n, x)
    return z
 end
 
 function setcoeff!(z::RealPoly, n::Int, x::RealFieldElem)
-   ccall((:arb_poly_set_coeff_arb, libarb), Nothing,
+   ccall((:arb_poly_set_coeff_arb, libflint), Nothing,
                     (Ref{RealPoly}, Int, Ref{RealFieldElem}), z, n, x)
    return z
 end
 
 function mul!(z::RealPoly, x::RealPoly, y::RealPoly)
-   ccall((:arb_poly_mul, libarb), Nothing,
+   ccall((:arb_poly_mul, libflint), Nothing,
                 (Ref{RealPoly}, Ref{RealPoly}, Ref{RealPoly}, Int),
                     z, x, y, precision(parent(z)))
    return z
 end
 
 function addeq!(z::RealPoly, x::RealPoly)
-   ccall((:arb_poly_add, libarb), Nothing,
+   ccall((:arb_poly_add, libflint), Nothing,
                 (Ref{RealPoly}, Ref{RealPoly}, Ref{RealPoly}, Int),
                     z, z, x, precision(parent(z)))
    return z
 end
 
 function add!(z::RealPoly, x::RealPoly, y::RealPoly)
-   ccall((:arb_poly_add, libarb), Nothing,
+   ccall((:arb_poly_add, libflint), Nothing,
                 (Ref{RealPoly}, Ref{RealPoly}, Ref{RealPoly}, Int),
                     z, x, y, precision(parent(z)))
    return z

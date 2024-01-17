@@ -301,7 +301,7 @@ function _left_and_right(x::arb)
    a = ZZRingElem()
    b = ZZRingElem()
    f = ZZRingElem()
-   ccall((:arb_get_interval_fmpz_2exp, libarb), Nothing,
+   ccall((:arb_get_interval_fmpz_2exp, libflint), Nothing,
          (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{arb}),
          a, b, f, x)
    fits(Int, f) || error("Ball endpoints do not fit into QQFieldElem")

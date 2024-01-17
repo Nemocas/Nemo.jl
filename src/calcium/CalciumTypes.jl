@@ -83,7 +83,7 @@ mutable struct qqbar <: FieldElem
 
   function qqbar()
     z = new()
-    ccall((:qqbar_init, libcalcium), Nothing, (Ref{qqbar}, ), z)
+    ccall((:qqbar_init, libflint), Nothing, (Ref{qqbar}, ), z)
     finalizer(_qqbar_clear_fn, z)
     return z
   end
@@ -91,7 +91,7 @@ mutable struct qqbar <: FieldElem
 end
 
 function _qqbar_clear_fn(a::qqbar)
-   ccall((:qqbar_clear, libcalcium), Nothing, (Ref{qqbar},), a)
+   ccall((:qqbar_clear, libflint), Nothing, (Ref{qqbar},), a)
 end
 
 ################################################################################
@@ -141,14 +141,14 @@ mutable struct CalciumField <: Field
    function CalciumField(; extended::Bool=false, options::Dict{Symbol,Int}=Dict{Symbol,Int}())
       C = new()
 
-      ccall((:ca_ctx_init, libcalcium), Nothing, (Ref{CalciumField}, ), C)
+      ccall((:ca_ctx_init, libflint), Nothing, (Ref{CalciumField}, ), C)
       finalizer(_CalciumField_clear_fn, C)
       C.extended = extended
 
       for (opt, value) in options
          i = findfirst(isequal(opt), ca_ctx_options)
          (i === nothing) && error("unknown option ", opt)
-         ccall((:ca_ctx_set_option, libcalcium), Nothing, (Ref{CalciumField}, Int, Int), C, i - 1, value)
+         ccall((:ca_ctx_set_option, libflint), Nothing, (Ref{CalciumField}, Int, Int), C, i - 1, value)
       end
 
       C.refcount = 1
@@ -159,7 +159,7 @@ end
 function options(C::CalciumField)
    d = Dict{Symbol,Int}()
    for i=1:length(ca_ctx_options)
-      d[ca_ctx_options[i]] = ccall((:ca_ctx_get_option, libcalcium), Int, (Ref{CalciumField}, Int), C, i - 1)
+      d[ca_ctx_options[i]] = ccall((:ca_ctx_get_option, libflint), Int, (Ref{CalciumField}, Int), C, i - 1)
    end
    return d
 end
@@ -167,7 +167,7 @@ end
 function decrement_refcount(C::CalciumField)
    C.refcount -= 1
    if C.refcount == 0
-      ccall((:ca_ctx_clear, libcalcium), Nothing, (Ref{CalciumField},), C)
+      ccall((:ca_ctx_clear, libflint), Nothing, (Ref{CalciumField},), C)
    end
 end
 
@@ -187,7 +187,7 @@ mutable struct ca <: FieldElem
 
    function ca(ctx::CalciumField)
       z = new()
-      ccall((:ca_init, libcalcium), Nothing,
+      ccall((:ca_init, libflint), Nothing,
                 (Ref{ca}, Ref{CalciumField}), z, ctx)
       z.parent = ctx
       z.parent.refcount += 1
@@ -198,7 +198,7 @@ mutable struct ca <: FieldElem
 end
 
 function _ca_clear_fn(a::ca)
-   ccall((:ca_clear, libcalcium),
+   ccall((:ca_clear, libflint),
         Nothing, (Ref{ca}, Ref{CalciumField}), a, a.parent)
    decrement_refcount(a.parent)
 end

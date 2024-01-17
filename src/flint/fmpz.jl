@@ -2135,7 +2135,7 @@ function number_of_partitions(x::Int)
       return 0
    end
    z = ZZRingElem()
-   ccall((:partitions_fmpz_ui, libarb), Nothing,
+   ccall((:partitions_fmpz_ui, libflint), Nothing,
          (Ref{ZZRingElem}, UInt), z, x)
    return Int(z)
 end
@@ -2145,7 +2145,7 @@ function number_of_partitions(x::ZZRingElem)
    if x < 0
       return z
    end
-   ccall((:partitions_fmpz_fmpz, libarb), Nothing,
+   ccall((:partitions_fmpz_fmpz, libflint), Nothing,
          (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), z, x, 0)
    return z
 end

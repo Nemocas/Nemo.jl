@@ -94,7 +94,7 @@ function _acb_mat(A::arb_mat)
 end
 
 function mul!(z::acb, x::acb, y::arb)
-    ccall((:acb_mul_arb, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{arb}, Int),
+    ccall((:acb_mul_arb, libflint), Nothing, (Ref{acb}, Ref{acb}, Ref{arb}, Int),
         z, x, y, parent(z).prec)
     return z
 end
@@ -359,7 +359,7 @@ end
 
 function Base.:(^)(a::nf_elem, e::UInt)
     b = parent(a)()
-    ccall((:nf_elem_pow, libantic), Nothing,
+    ccall((:nf_elem_pow, libflint), Nothing,
         (Ref{nf_elem}, Ref{nf_elem}, UInt, Ref{AnticNumberField}),
         b, a, e, parent(a))
     return b
@@ -425,7 +425,7 @@ function (R::FqPolyRing)(g::QQPolyRingElem)
 end
 
 function bits(x::arb)
-    return ccall((:arb_bits, libarb), Int, (Ref{arb},), x)
+    return ccall((:arb_bits, libflint), Int, (Ref{arb},), x)
 end
 
 function *(a::ZZMatrix, b::Matrix{BigFloat})
@@ -507,7 +507,7 @@ end
 #Assuming that the denominator of a is one, reduces all the coefficients modulo p
 # non-symmetric (positive) residue system
 function mod!(a::nf_elem, b::ZZRingElem)
-    ccall((:nf_elem_mod_fmpz, libantic), Nothing,
+    ccall((:nf_elem_mod_fmpz, libflint), Nothing,
         (Ref{nf_elem}, Ref{nf_elem}, Ref{ZZRingElem}, Ref{AnticNumberField}),
         a, a, b, parent(a))
     return a
@@ -523,7 +523,7 @@ This function returns $b$.
 function numerator(a::nf_elem)
     _one = one(FlintZZ)
     z = deepcopy(a)
-    ccall((:nf_elem_set_den, libantic), Nothing,
+    ccall((:nf_elem_set_den, libflint), Nothing,
         (Ref{nf_elem}, Ref{ZZRingElem}, Ref{AnticNumberField}),
         z, _one, a.parent)
     return z
@@ -531,7 +531,7 @@ end
 
 function one!(r::nf_elem)
     a = parent(r)
-    ccall((:nf_elem_one, libantic), Nothing,
+    ccall((:nf_elem_one, libflint), Nothing,
         (Ref{nf_elem}, Ref{AnticNumberField}), r, a)
     return r
 end
@@ -546,14 +546,14 @@ function zero(r::nf_elem)
 end
 
 function divexact!(z::nf_elem, x::nf_elem, y::ZZRingElem)
-    ccall((:nf_elem_scalar_div_fmpz, libantic), Nothing,
+    ccall((:nf_elem_scalar_div_fmpz, libflint), Nothing,
         (Ref{nf_elem}, Ref{nf_elem}, Ref{ZZRingElem}, Ref{AnticNumberField}),
         z, x, y, parent(x))
     return z
 end
 
 function sub!(a::nf_elem, b::nf_elem, c::nf_elem)
-    ccall((:nf_elem_sub, libantic), Nothing,
+    ccall((:nf_elem_sub, libflint), Nothing,
         (Ref{nf_elem}, Ref{nf_elem}, Ref{nf_elem}, Ref{AnticNumberField}),
         a, b, c, a.parent)
 end
@@ -693,31 +693,31 @@ function divexact!(a::ZZRingElem, b::ZZRingElem)
 end
 
 function round!(z::arb, x::arb, p::Int)
-    ccall((:arb_set_round, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, p)
+    ccall((:arb_set_round, libflint), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, p)
     z.parent = ArbField(p, cached=false)
     return z
 end
 
 function round!(z::acb, x::acb, p::Int)
-    ccall((:acb_set_round, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, p)
+    ccall((:acb_set_round, libflint), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, p)
     z.parent = AcbField(p, cached=false)
     return z
 end
 
 function round(x::arb, p::Int)
     z = ArbField(p, cached=false)()
-    ccall((:arb_set_round, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, p)
+    ccall((:arb_set_round, libflint), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, p)
     return z
 end
 
 function round(x::acb, p::Int)
     z = AcbField(p, cached=false)()
-    ccall((:acb_set_round, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, p)
+    ccall((:acb_set_round, libflint), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, p)
     return z
 end
 
 function bits(x::acb)
-    return ccall((:acb_bits, libarb), Int, (Ref{acb},), x)
+    return ccall((:acb_bits, libflint), Int, (Ref{acb},), x)
 end
 
 function Base.Int128(x::ZZRingElem)
@@ -1504,7 +1504,7 @@ Base.:(*)(x::QQFieldElem, y::AbstractAlgebra.Generic.MatSpaceElem{nf_elem}) = ba
 
 
 function mod_sym!(a::nf_elem, b::ZZRingElem)
-    ccall((:nf_elem_smod_fmpz, libantic), Nothing,
+    ccall((:nf_elem_smod_fmpz, libflint), Nothing,
         (Ref{nf_elem}, Ref{nf_elem}, Ref{ZZRingElem}, Ref{AnticNumberField}),
         a, a, b, parent(a))
     return a
@@ -1593,7 +1593,7 @@ is_cyclo_type(::NumField) = false
 
 
 function nf_elem_to_fmpz_mod_poly!(r::ZZModPolyRingElem, a::nf_elem, useden::Bool=true)
-    ccall((:nf_elem_get_fmpz_mod_poly_den, libantic), Nothing,
+    ccall((:nf_elem_get_fmpz_mod_poly_den, libflint), Nothing,
         (Ref{ZZModPolyRingElem}, Ref{nf_elem}, Ref{AnticNumberField}, Cint, Ref{fmpz_mod_ctx_struct}),
         r, a, a.parent, Cint(useden), r.parent.base_ring.ninv)
     return nothing
@@ -1606,7 +1606,7 @@ function (R::ZZModPolyRing)(a::nf_elem)
 end
 
 function nf_elem_to_gfp_poly!(r::fpPolyRingElem, a::nf_elem, useden::Bool=true)
-    ccall((:nf_elem_get_nmod_poly_den, libantic), Nothing,
+    ccall((:nf_elem_get_nmod_poly_den, libflint), Nothing,
         (Ref{fpPolyRingElem}, Ref{nf_elem}, Ref{AnticNumberField}, Cint),
         r, a, a.parent, Cint(useden))
     return nothing
@@ -1619,7 +1619,7 @@ function (R::fpPolyRing)(a::nf_elem)
 end
 
 function nf_elem_to_nmod_poly!(r::zzModPolyRingElem, a::nf_elem, useden::Bool=true)
-    ccall((:nf_elem_get_nmod_poly_den, libantic), Nothing,
+    ccall((:nf_elem_get_nmod_poly_den, libflint), Nothing,
         (Ref{zzModPolyRingElem}, Ref{nf_elem}, Ref{AnticNumberField}, Cint),
         r, a, a.parent, Cint(useden))
     return nothing
@@ -1632,7 +1632,7 @@ function (R::zzModPolyRing)(a::nf_elem)
 end
 
 function nf_elem_to_gfp_fmpz_poly!(r::FpPolyRingElem, a::nf_elem, useden::Bool=true)
-    ccall((:nf_elem_get_fmpz_mod_poly_den, libantic), Nothing,
+    ccall((:nf_elem_get_fmpz_mod_poly_den, libflint), Nothing,
         (Ref{FpPolyRingElem}, Ref{nf_elem}, Ref{AnticNumberField}, Cint, Ref{fmpz_mod_ctx_struct}),
         r, a, a.parent, Cint(useden), r.parent.base_ring.ninv)
     return nothing
