@@ -19,7 +19,7 @@ objects.
 
  Library | Field            | Element type | Parent type
 ---------|----------------|----------------|---------------------
-Flint    | $\mathbb{Q}_q$ | `qadic`        | `QadicField`
+Flint    | $\mathbb{Q}_q$ | `QadicFieldElem`        | `QadicField`
 
 All the $q$-adic field types belong to the `Field` abstract type and the
 $q$-adic field element types belong to the `FieldElem` abstract type.
@@ -122,16 +122,16 @@ prime(::QadicField)
 ```
 
 ```@docs
-precision(::qadic)
+precision(::QadicFieldElem)
 ```
 
 ```@docs
-valuation(::qadic)
+valuation(::QadicFieldElem)
 ```
 
 ```@docs
-lift(::QQPolyRing, ::qadic)
-lift(::ZZPolyRing, ::qadic)
+lift(::QQPolyRing, ::QadicFieldElem)
+lift(::ZZPolyRing, ::QadicFieldElem)
 ```
 
 **Examples**
@@ -155,7 +155,7 @@ q = lift(Zy, divexact(a, b))
 ### Square root
 
 ```@docs
-Base.sqrt(::qadic)
+Base.sqrt(::QadicFieldElem)
 ```
 
 **Examples**
@@ -188,19 +188,19 @@ julia> g = sqrt(R(121))
 ### Special functions
 
 ```@docs
-Base.exp(::qadic)
+Base.exp(::QadicFieldElem)
 ```
 
 ```@docs
-log(::qadic)
+log(::QadicFieldElem)
 ```
 
 ```@docs
-teichmuller(::qadic)
+teichmuller(::QadicFieldElem)
 ```
 
 ```@docs
-frobenius(::qadic, ::Int)
+frobenius(::QadicFieldElem, ::Int)
 ```
 
 **Examples**

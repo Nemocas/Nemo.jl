@@ -3163,7 +3163,7 @@ end
 
 ###############################################################################
 #
-#   QadicField / qadic
+#   QadicField / QadicFieldElem
 #
 ###############################################################################
 
@@ -3210,11 +3210,11 @@ function _qadic_ctx_clear_fn(a::QadicField)
 end
 
 @doc raw"""
-    qadic <: FlintLocalFieldElem <: NonArchLocalFieldElem <: FieldElem
+    QadicFieldElem <: FlintLocalFieldElem <: NonArchLocalFieldElem <: FieldElem
 
 An element of a $q$-adic field. See [`QadicField`](@ref).
 """
-mutable struct qadic <: FlintLocalFieldElem
+mutable struct QadicFieldElem <: FlintLocalFieldElem
    coeffs::Int
    alloc::Int
    length::Int
@@ -3222,16 +3222,16 @@ mutable struct qadic <: FlintLocalFieldElem
    N::Int
    parent::QadicField
 
-   function qadic(prec::Int)
+   function QadicFieldElem(prec::Int)
       z = new()
-      ccall((:qadic_init2, libflint), Nothing, (Ref{qadic}, Int), z, prec)
+      ccall((:qadic_init2, libflint), Nothing, (Ref{QadicFieldElem}, Int), z, prec)
       finalizer(_qadic_clear_fn, z)
       return z
    end
 end
 
-function _qadic_clear_fn(a::qadic)
-   ccall((:qadic_clear, libflint), Nothing, (Ref{qadic},), a)
+function _qadic_clear_fn(a::QadicFieldElem)
+   ccall((:qadic_clear, libflint), Nothing, (Ref{QadicFieldElem},), a)
 end
 
 ###############################################################################

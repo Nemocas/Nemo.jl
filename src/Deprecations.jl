@@ -119,3 +119,4 @@
 Base.@deprecate_binding FlintPadicField PadicField
 Base.@deprecate_binding padic PadicFieldElem
 Base.@deprecate_binding FlintQadicField QadicField
+Base.@deprecate_binding qadic QadicFieldElem
