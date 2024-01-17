@@ -2210,7 +2210,6 @@ A finite field. Implemented as $\mathbb F_p[t]/f$ for the prime $p$ being an [`I
 See [`FqPolyRepField`](@ref) for $p$ being a [`ZZRingElem`](@ref). See [`fqPolyRepFieldElem`](@ref) for elements.
 """
 @attributes mutable struct fqPolyRepField <: FinField
-   p :: Int
    n :: Int
    ninv :: Int
    norm :: Int
@@ -2237,17 +2236,21 @@ See [`FqPolyRepField`](@ref) for $p$ being a [`ZZRingElem`](@ref). See [`fqPolyR
    overfields :: Dict{Int, Vector{FinFieldMorphism}}
    subfields :: Dict{Int, Vector{FinFieldMorphism}}
 
-   function fqPolyRepField(c::ZZRingElem, deg::Int, s::Symbol, cached::Bool = true; check::Bool = true)
+   function fqPolyRepField(c::UInt, deg::Int, s::Symbol, cached::Bool = true; check::Bool = true)
       check && !is_prime(c) &&
          throw(DomainError(c, "the characteristic must be a prime"))
       return get_cached!(FqNmodFiniteFieldID, (c, deg, s), cached) do
          d = new()
-         ccall((:fq_nmod_ctx_init, libflint), Nothing,
-               (Ref{fqPolyRepField}, Ref{ZZRingElem}, Int, Ptr{UInt8}),
-			    d, c, deg, string(s))
+         ccall((:fq_nmod_ctx_init_ui, libflint), Nothing,
+               (Ref{fqPolyRepField}, UInt, Int, Ptr{UInt8}),
+               d, c, deg, string(s))
          finalizer(_FqNmodFiniteField_clear_fn, d)
          return d
       end
+   end
+
+   function fqPolyRepField(c::T, deg::Int, s::Symbol, cached::Bool = true; check::Bool = true) where T <: Union{Int, ZZRingElem}
+       return fqPolyRepField(UInt(c), deg, s, cached, check = check)
    end
 
    function fqPolyRepField(f::zzModPolyRingElem, s::Symbol, cached::Bool = true; check::Bool = true)
@@ -2277,7 +2280,7 @@ See [`FqPolyRepField`](@ref) for $p$ being a [`ZZRingElem`](@ref). See [`fqPolyR
 
 end
 
-const FqNmodFiniteFieldID = CacheDictType{Tuple{ZZRingElem, Int, Symbol}, fqPolyRepField}()
+const FqNmodFiniteFieldID = CacheDictType{Tuple{UInt, Int, Symbol}, fqPolyRepField}()
 
 const FqNmodFiniteFieldIDNmodPol = CacheDictType{Tuple{zzModPolyRing, zzModPolyRingElem, Symbol},
                                     fqPolyRepField}()
