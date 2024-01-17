@@ -187,3 +187,10 @@ Base.@deprecate_binding FiniteField finite_field
 Base.@deprecate_binding NumberField number_field
 
 Base.@deprecate_binding CyclotomicRealSubfield cyclotomic_real_subfield
+
+# TODO: deprecate the following
+
+@alias FlintPadicField PadicField
+@alias padic PadicFieldElem
+@alias FlintQadicField QadicField
+@alias qadic QadicFieldElem
