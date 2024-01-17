@@ -363,16 +363,32 @@ show(io::IO, a::FqFieldElem) = print(io, AbstractAlgebra.obj_to_string(a, contex
 
 function show(io::IO, a::FqField)
   io = pretty(io)
-  if get(io, :supercompact, false)
-    print(io, LowercaseOff(), "GF($(order(base_field(a)))", degree(a) > 1 ? "^$(degree(a))" : "", ")")
-  else
-    if is_absolute(a)
-      # nested printing allowed, preferably supercompact
-      print(io, "Finite field of degree ", degree(a), " over ")
-      print(IOContext(io, :supercompact => true), base_field(a))
+  if is_absolute(a)
+    deg = degree(a)
+    if get(io, :supercompact, false)
+      if deg == 1
+        print(io, LowercaseOff(), "GF($(characteristic(a)))")
+      else
+        print(io, LowercaseOff(), "GF($(characteristic(a)), $(deg))")
+      end
     else
-      # nested printing allowed, preferably supercompact
-      print(io, "Relative finite field of degree ", degree(a), " over ")
+      if deg == 1
+        print(io, "Prime field of characteristic $(characteristic(a))")
+      else
+        print(io, "Finite field of characteristic $(characteristic(a)) of degree $(deg)")
+      end
+    end
+  else
+    if get(io, :supercompact, false)
+      degrees = Int[]
+      b = a
+      while !is_absolute(b)
+        push!(degrees, degree(b))
+        b = base_field(b)
+      end
+      print(io, LowercaseOff(), "GF($(characteristic(a)), $(join(reverse(degrees), '*')))")
+    else
+      print(io, "Finite field of degree $(degree(a)) over ")
       print(IOContext(io, :supercompact => true), base_field(a))
     end
   end
