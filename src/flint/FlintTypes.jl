@@ -3163,16 +3163,16 @@ end
 
 ###############################################################################
 #
-#   FlintQadicField / qadic
+#   QadicField / qadic
 #
 ###############################################################################
 
 @doc raw"""
-    FlintQadicField <: FlintLocalField <: NonArchLocalField <: Field
+    QadicField <: FlintLocalField <: NonArchLocalField <: Field
 
 A $p^n$-adic field for some prime power $p^n$.
 """
-mutable struct FlintQadicField <: FlintLocalField
+mutable struct QadicField <: FlintLocalField
    p::Int
    pinv::Float64
    pow::Ptr{Nothing}
@@ -3185,14 +3185,14 @@ mutable struct FlintQadicField <: FlintLocalField
    var::Cstring   # char*
    prec_max::Int
 
-   function FlintQadicField(p::ZZRingElem, d::Int, prec::Int, var::String = "a"; cached::Bool = true, check::Bool = true)
+   function QadicField(p::ZZRingElem, d::Int, prec::Int, var::String = "a"; cached::Bool = true, check::Bool = true)
 
       check && !is_probable_prime(p) && throw(DomainError(p, "Characteristic must be prime"))
 
       z = get_cached!(QadicBase, (p, d, prec), cached) do
          zz = new()
          ccall((:qadic_ctx_init, libflint), Nothing,
-              (Ref{FlintQadicField}, Ref{ZZRingElem}, Int, Int, Int, Cstring, Cint),
+              (Ref{QadicField}, Ref{ZZRingElem}, Int, Int, Int, Cstring, Cint),
                                         zz, p, d, 0, 0, var, 0)
          finalizer(_qadic_ctx_clear_fn, zz)
          zz.prec_max = prec
@@ -3203,16 +3203,16 @@ mutable struct FlintQadicField <: FlintLocalField
    end
 end
 
-const QadicBase = CacheDictType{Tuple{ZZRingElem, Int, Int}, FlintQadicField}()
+const QadicBase = CacheDictType{Tuple{ZZRingElem, Int, Int}, QadicField}()
 
-function _qadic_ctx_clear_fn(a::FlintQadicField)
-   ccall((:qadic_ctx_clear, libflint), Nothing, (Ref{FlintQadicField},), a)
+function _qadic_ctx_clear_fn(a::QadicField)
+   ccall((:qadic_ctx_clear, libflint), Nothing, (Ref{QadicField},), a)
 end
 
 @doc raw"""
     qadic <: FlintLocalFieldElem <: NonArchLocalFieldElem <: FieldElem
 
-An element of a $q$-adic field. See [`FlintQadicField`](@ref).
+An element of a $q$-adic field. See [`QadicField`](@ref).
 """
 mutable struct qadic <: FlintLocalFieldElem
    coeffs::Int
@@ -3220,7 +3220,7 @@ mutable struct qadic <: FlintLocalFieldElem
    length::Int
    val::Int
    N::Int
-   parent::FlintQadicField
+   parent::QadicField
 
    function qadic(prec::Int)
       z = new()

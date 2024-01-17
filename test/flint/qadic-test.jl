@@ -4,14 +4,14 @@
    QX, x = polynomial_ring(FlintQQ, "x") 
 
    @test elem_type(R) == qadic
-   @test elem_type(FlintQadicField) == qadic
-   @test parent_type(qadic) == FlintQadicField
+   @test elem_type(QadicField) == qadic
+   @test parent_type(qadic) == QadicField
 
-   @test isa(R, FlintQadicField)
+   @test isa(R, QadicField)
 
    S, _ = @inferred QadicField(ZZRingElem(1009), 1, 30)
 
-   @test isa(S, FlintQadicField)
+   @test isa(S, QadicField)
 
    @test isa(R(), qadic)
 
