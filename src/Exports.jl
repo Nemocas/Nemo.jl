@@ -477,8 +477,8 @@ export onei
 export options
 export order
 export overlaps
-export padic
 export PadicField
+export PadicFieldElem
 export parent
 export Partition
 export Perm

@@ -226,7 +226,7 @@ function expressify(b::qadic, x = var(parent(b)); context = nothing)
    c = R()
    for i in degree(parent(b)):-1:0
       ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
-            (Ref{padic}, Ref{qadic}, Int, Ref{QadicField}),
+            (Ref{PadicFieldElem}, Ref{qadic}, Int, Ref{QadicField}),
             c, b, i, parent(b))
       ec = expressify(c, context = context)
       if !iszero(c)
@@ -653,7 +653,7 @@ promote_rule(::Type{qadic}, ::Type{ZZRingElem}) = qadic
 
 promote_rule(::Type{qadic}, ::Type{QQFieldElem}) = qadic
 
-promote_rule(::Type{qadic}, ::Type{padic}) = qadic
+promote_rule(::Type{qadic}, ::Type{PadicFieldElem}) = qadic
 
 ###############################################################################
 #

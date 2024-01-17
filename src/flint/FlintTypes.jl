@@ -3097,7 +3097,7 @@ const NALocalFieldElem = NonArchLocalFieldElem
 
 ###############################################################################
 #
-#   PadicField / padic
+#   PadicField / PadicFieldElem
 #
 ###############################################################################
 
@@ -3139,26 +3139,26 @@ function _padic_ctx_clear_fn(a::PadicField)
 end
 
 @doc raw"""
-    padic <: FlintLocalFieldElem <: NonArchLocalFieldElem <: FieldElem
+    PadicFieldElem <: FlintLocalFieldElem <: NonArchLocalFieldElem <: FieldElem
 
 An element of a $p$-adic field. See [`PadicField`](@ref).
 """
-mutable struct padic <: FlintLocalFieldElem
+mutable struct PadicFieldElem <: FlintLocalFieldElem
    u :: Int
    v :: Int
    N :: Int
    parent::PadicField
 
-   function padic(prec::Int)
+   function PadicFieldElem(prec::Int)
       d = new()
-      ccall((:padic_init2, libflint), Nothing, (Ref{padic}, Int), d, prec)
+      ccall((:padic_init2, libflint), Nothing, (Ref{PadicFieldElem}, Int), d, prec)
       finalizer(_padic_clear_fn, d)
       return d
    end
 end
 
-function _padic_clear_fn(a::padic)
-   ccall((:padic_clear, libflint), Nothing, (Ref{padic},), a)
+function _padic_clear_fn(a::PadicFieldElem)
+   ccall((:padic_clear, libflint), Nothing, (Ref{PadicFieldElem},), a)
 end
 
 ###############################################################################

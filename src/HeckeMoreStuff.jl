@@ -1164,10 +1164,10 @@ function Base.setprecision(q::qadic, N::Int)
     return r
 end
 
-function Base.setprecision(q::padic, N::Int)
+function Base.setprecision(q::PadicFieldElem, N::Int)
     r = parent(q)()
     r.N = N
-    ccall((:padic_set, libflint), Nothing, (Ref{padic}, Ref{padic}, Ref{PadicField}), r, q, parent(q))
+    ccall((:padic_set, libflint), Nothing, (Ref{PadicFieldElem}, Ref{PadicFieldElem}, Ref{PadicField}), r, q, parent(q))
     return r
 end
 
@@ -1215,13 +1215,13 @@ end
 
 function tr(r::qadic)
     t = coefficient_ring(parent(r))()
-    ccall((:qadic_trace, libflint), Nothing, (Ref{padic}, Ref{qadic}, Ref{QadicField}), t, r, parent(r))
+    ccall((:qadic_trace, libflint), Nothing, (Ref{PadicFieldElem}, Ref{qadic}, Ref{QadicField}), t, r, parent(r))
     return t
 end
 
 function norm(r::qadic)
     t = coefficient_ring(parent(r))()
-    ccall((:qadic_norm, libflint), Nothing, (Ref{padic}, Ref{qadic}, Ref{QadicField}), t, r, parent(r))
+    ccall((:qadic_norm, libflint), Nothing, (Ref{PadicFieldElem}, Ref{qadic}, Ref{QadicField}), t, r, parent(r))
     return t
 end
 
@@ -1230,15 +1230,15 @@ function setcoeff!(x::fqPolyRepFieldElem, n::Int, u::UInt)
         (Ref{fqPolyRepFieldElem}, Int, UInt), x, n, u)
 end
 
-function (Rx::Generic.PolyRing{padic})(a::qadic)
+function (Rx::Generic.PolyRing{PadicFieldElem})(a::qadic)
     Qq = parent(a)
     #@assert Rx === parent(defining_polynomial(Qq))
     R = base_ring(Rx)
-    coeffs = Vector{padic}(undef, degree(Qq))
+    coeffs = Vector{PadicFieldElem}(undef, degree(Qq))
     for i = 1:length(coeffs)
         c = R()
         ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
-            (Ref{padic}, Ref{qadic}, Int, Ref{QadicField}), c, a, i - 1, parent(a))
+            (Ref{PadicFieldElem}, Ref{qadic}, Int, Ref{QadicField}), c, a, i - 1, parent(a))
         coeffs[i] = c
     end
     return Rx(coeffs)
@@ -1248,13 +1248,13 @@ function coeff(x::qadic, i::Int)
     R = PadicField(prime(parent(x)), parent(x).prec_max)
     c = R()
     ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
-        (Ref{padic}, Ref{qadic}, Int, Ref{QadicField}), c, x, i, parent(x))
+        (Ref{PadicFieldElem}, Ref{qadic}, Int, Ref{QadicField}), c, x, i, parent(x))
     return c
 end
 
-function setcoeff!(x::qadic, i::Int, y::padic)
+function setcoeff!(x::qadic, i::Int, y::PadicFieldElem)
     ccall((:padic_poly_set_coeff_padic, libflint), Nothing,
-        (Ref{qadic}, Int, Ref{padic}, Ref{QadicField}), x, i, y, parent(x))
+        (Ref{qadic}, Int, Ref{PadicFieldElem}, Ref{QadicField}), x, i, y, parent(x))
 end
 
 function setcoeff!(x::qadic, i::Int, y::UInt)
@@ -1265,7 +1265,7 @@ function setcoeff!(x::qadic, i::Int, y::ZZRingElem)
     R = PadicField(prime(parent(x)), parent(x).prec_max)
     Y = R(ZZRingElem(y))
     ccall((:padic_poly_set_coeff_padic, libflint), Nothing,
-        (Ref{qadic}, Int, Ref{padic}, Ref{QadicField}), x, i, Y, parent(x))
+        (Ref{qadic}, Int, Ref{PadicFieldElem}, Ref{QadicField}), x, i, Y, parent(x))
 end
 
 function coefficient_ring(Q::QadicField)
@@ -1278,7 +1278,7 @@ function prime(R::PadicField, i::Int)
     return p
 end
 
-function *(A::ZZMatrix, B::MatElem{padic})
+function *(A::ZZMatrix, B::MatElem{PadicFieldElem})
     return matrix(base_ring(B), A) * B
 end
 
@@ -1286,30 +1286,30 @@ Base.precision(Q::PadicField) = Q.prec_max
 Base.precision(Q::QadicField) = Q.prec_max
 
 ^(a::qadic, b::qadic) = exp(b * log(a))
-^(a::padic, b::padic) = exp(b * log(a))
+^(a::PadicFieldElem, b::PadicFieldElem) = exp(b * log(a))
 
 //(a::qadic, b::qadic) = divexact(a, b)
-//(a::padic, b::qadic) = divexact(a, b)
-//(a::qadic, b::padic) = divexact(a, b)
+//(a::PadicFieldElem, b::qadic) = divexact(a, b)
+//(a::qadic, b::PadicFieldElem) = divexact(a, b)
 
 @doc raw"""
-    lift(a::padic) -> ZZRingElem
+    lift(a::PadicFieldElem) -> ZZRingElem
 
 Returns the positive canonical representative in $\mathbb{Z}$. $a$ needs
 to be integral.
 """
-function lift(a::padic)
+function lift(a::PadicFieldElem)
     b = ZZRingElem()
     R = parent(a)
 
     if iszero(a)
         return ZZ(0)
     end
-    ccall((:padic_get_fmpz, libflint), Nothing, (Ref{ZZRingElem}, Ref{padic}, Ref{PadicField}), b, a, R)
+    ccall((:padic_get_fmpz, libflint), Nothing, (Ref{ZZRingElem}, Ref{PadicFieldElem}, Ref{PadicField}), b, a, R)
     return b
 end
 
-function Base.setprecision(f::Generic.Poly{padic}, N::Int)
+function Base.setprecision(f::Generic.Poly{PadicFieldElem}, N::Int)
     g = parent(f)()
     fit!(g, length(f))
     for i = 1:length(f)
@@ -1319,7 +1319,7 @@ function Base.setprecision(f::Generic.Poly{padic}, N::Int)
     return g
 end
 
-function setprecision!(f::Generic.Poly{padic}, N::Int)
+function setprecision!(f::Generic.Poly{PadicFieldElem}, N::Int)
     for i = 1:length(f)
         f.coeffs[i] = setprecision!(f.coeffs[i], N)
     end
@@ -1371,7 +1371,7 @@ function defining_polynomial(k::fpField)
     return x - k(1)
 end
 
-function norm(f::PolyRingElem{padic})
+function norm(f::PolyRingElem{PadicFieldElem})
     return f
 end
 
@@ -1734,7 +1734,7 @@ function rem!(a::FpPolyRingElem, b::FpPolyRingElem, c::FpPolyRingElem)
     return a
 end
 
-function rem!(x::AbstractAlgebra.Generic.Poly{T}, y::AbstractAlgebra.Generic.Poly{T}, z::AbstractAlgebra.Generic.Poly{T}) where {T<:Union{padic,qadic}}
+function rem!(x::AbstractAlgebra.Generic.Poly{T}, y::AbstractAlgebra.Generic.Poly{T}, z::AbstractAlgebra.Generic.Poly{T}) where {T<:Union{PadicFieldElem,qadic}}
     x = rem(y, z)
     return x
 end
@@ -1764,7 +1764,7 @@ function Base.setprecision(f::Function, K::Union{PadicField,QadicField}, n::Int)
     return v
 end
 
-function setprecision!(a::padic, n::Int)
+function setprecision!(a::PadicFieldElem, n::Int)
     return setprecision(a, n)
 end
 

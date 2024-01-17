@@ -18,7 +18,7 @@ objects.
 
  Library | Field            | Element type | Parent type
 ---------|----------------|----------------|---------------------
-Flint    | $\mathbb{Q}_p$ | `padic`        | `PadicField`
+Flint    | $\mathbb{Q}_p$ | `PadicFieldElem`        | `PadicField`
 
 All the $p$-adic field types belong to the `Field` abstract type and the
 $p$-adic field element types belong to the `FieldElem` abstract type.
@@ -105,16 +105,16 @@ prime(::PadicField)
 ```
 
 ```@docs
-precision(::padic)
+precision(::PadicFieldElem)
 ```
 
 ```@docs
-valuation(::padic)
+valuation(::PadicFieldElem)
 ```
 
 ```@docs
-lift(::ZZRing, ::padic)
-lift(::QQField, ::padic)
+lift(::ZZRing, ::PadicFieldElem)
+lift(::QQField, ::PadicFieldElem)
 ```
 
 **Examples**
@@ -136,7 +136,7 @@ q = lift(FlintQQ, divexact(a, b))
 ### Square root
 
 ```@docs
-Base.sqrt(::padic)
+Base.sqrt(::PadicFieldElem)
 ```
 
 **Examples**
@@ -157,15 +157,15 @@ g = sqrt(R(121))
 ### Special functions
 
 ```@docs
-Base.exp(::padic)
+Base.exp(::PadicFieldElem)
 ```
 
 ```@docs
-log(::padic)
+log(::PadicFieldElem)
 ```
 
 ```@docs
-teichmuller(::padic)
+teichmuller(::PadicFieldElem)
 ```
 
 **Examples**

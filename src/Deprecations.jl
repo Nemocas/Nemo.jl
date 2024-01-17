@@ -117,4 +117,5 @@
 @deprecate factor(f::QQPolyRingElem, R::T) where {T<:Union{fqPolyRepField,fpField}} factor(R, f)
 
 Base.@deprecate_binding FlintPadicField PadicField
+Base.@deprecate_binding padic PadicFieldElem
 Base.@deprecate_binding FlintQadicField QadicField
