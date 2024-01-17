@@ -218,7 +218,7 @@ function var(Q::FlintQadicField)
 end
 
 function expressify(b::qadic, x = var(parent(b)); context = nothing)
-   R = FlintPadicField(prime(parent(b)), parent(b).prec_max)
+   R = PadicField(prime(parent(b)), parent(b).prec_max)
    if iszero(b)
       return 0
    end

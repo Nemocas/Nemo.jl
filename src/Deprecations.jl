@@ -115,3 +115,5 @@
 @deprecate roots(f::QQPolyRingElem, R::T) where {T<:Union{fqPolyRepField,fpField}} roots(R, f)
 
 @deprecate factor(f::QQPolyRingElem, R::T) where {T<:Union{fqPolyRepField,fpField}} factor(R, f)
+
+Base.@deprecate_binding FlintPadicField PadicField

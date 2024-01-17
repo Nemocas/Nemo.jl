@@ -1,4 +1,4 @@
-function test_elem(R::FlintPadicField)
+function test_elem(R::PadicField)
    p = prime(R)
    prec = rand(1:R.prec_max)
    r = ZZRingElem(0):p-1
@@ -16,14 +16,14 @@ end
    R = PadicField(7, 30)
 
    @test elem_type(R) == padic
-   @test elem_type(FlintPadicField) == padic
-   @test parent_type(padic) == FlintPadicField
+   @test elem_type(PadicField) == padic
+   @test parent_type(padic) == PadicField
 
-   @test isa(R, FlintPadicField)
+   @test isa(R, PadicField)
 
    S = PadicField(ZZRingElem(65537), 30)
 
-   @test isa(S, FlintPadicField)
+   @test isa(S, PadicField)
 
    @test isa(R(), padic)
 
