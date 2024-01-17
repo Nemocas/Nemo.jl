@@ -60,7 +60,7 @@ Below we describe the functionality that is provided in addition to these.
 
 ```jldoctest
 julia> F = GF(3)
-Finite field of degree 1 over GF(3)
+Prime field of characteristic 3
 
 julia> a = characteristic(F)
 3

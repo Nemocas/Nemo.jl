@@ -857,15 +857,15 @@ $K = k[X]/(f)$ will be constructed as a finite field with base field $k$.
 
 ```jldoctest
 julia> K, a = finite_field(3, 2, "a")
-(Finite field of degree 2 over GF(3), a)
+(Finite field of characteristic 3 of degree 2, a)
 
 julia> K, a = finite_field(9, "a")
-(Finite field of degree 2 over GF(3), a)
+(Finite field of characteristic 3 of degree 2, a)
 
 julia> Kx, x = K["x"];
 
 julia> L, b = finite_field(x^3 + x^2 + x + 2, "b")
-(Relative finite field of degree 3 over GF(3^2), b)
+(Finite field of degree 3 over GF(3, 2), b)
 ```
 """
 finite_field
@@ -908,15 +908,15 @@ field with base field $k$.
 
 ```jldoctest
 julia> K = GF(3, 2, "a")
-Finite field of degree 2 over GF(3)
+Finite field of characteristic 3 of degree 2
 
 julia> K = GF(9, "a")
-Finite field of degree 2 over GF(3)
+Finite field of characteristic 3 of degree 2
 
 julia> Kx, x = K["x"];
 
 julia> L = GF(x^3 + x^2 + x + 2, "b")
-Relative finite field of degree 3 over GF(3^2)
+Finite field of degree 3 over GF(3, 2)
 ```
 """
 GF
