@@ -101,7 +101,6 @@ import Base: log1p
 import Base: maximum
 import Base: minimum
 import Base: mod
-import Base: ndigits
 import Base: numerator
 import Base: oct
 import Base: one

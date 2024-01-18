@@ -428,7 +428,7 @@ base(::ZZRingElem, ::Integer)
 ```
 
 ```@docs
-ndigits(::ZZRingElem, ::Integer)
+number_of_digits(::ZZRingElem, ::Integer)
 ```
 
 ```@docs

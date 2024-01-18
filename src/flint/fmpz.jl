@@ -2234,22 +2234,22 @@ function base(n::ZZRingElem, b::Integer)
 end
 
 @doc raw"""
-    ndigits(x::ZZRingElem, b::Integer)
+    number_of_digits(x::ZZRingElem, b::Integer)
 
 Return the number of digits of $x$ in the base $b$ (default is $b = 10$).
 
 # Examples
 
 ```jldoctest
-julia> ndigits(ZZ(12), 3)
+julia> number_of_digits(ZZ(12), 3)
 3
 ```
 """
-function Base.ndigits(x::ZZRingElem, b::Integer)::Int
-   ndigits(x, base=b)
+function number_of_digits(x::ZZRingElem, b::Integer)::Int
+   number_of_digits(x, base=b)
 end
 
-function Base.ndigits(a::ZZRingElem; base::Integer = 10, pad::Integer = 1)
+function number_of_digits(a::ZZRingElem; base::Integer = 10, pad::Integer = 1)
    iszero(a) && return max(pad, 1)
    return max(pad, 1+flog(abs(a), ZZRingElem(abs(base))))
 end
