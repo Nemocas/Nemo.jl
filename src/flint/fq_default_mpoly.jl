@@ -14,7 +14,7 @@ symbols(a::FqMPolyRing) = symbols(a.data)
 
 parent(a::FqMPolyRingElem) = a.parent
 
-nvars(a::FqMPolyRing) = nvars(a.data)
+number_of_variables(a::FqMPolyRing) = number_of_variables(a.data)
 
 base_ring(a::FqMPolyRing) = a.base_ring
 

@@ -25,7 +25,7 @@ function check_parent(a::ZZMPolyRingElem, b::ZZMPolyRingElem)
       error("Incompatible polynomial rings in polynomial operation")
 end
 
-nvars(a::ZZMPolyRing) = ccall((:fmpz_mpoly_ctx_nvars, libflint), Int,
+number_of_variables(a::ZZMPolyRing) = ccall((:fmpz_mpoly_ctx_nvars, libflint), Int,
                                 (Ref{ZZMPolyRing}, ), a)
 
 base_ring(a::ZZMPolyRing) = FlintZZ

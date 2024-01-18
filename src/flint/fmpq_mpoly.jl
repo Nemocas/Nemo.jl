@@ -25,7 +25,7 @@ function check_parent(a::QQMPolyRingElem, b::QQMPolyRingElem)
       error("Incompatible polynomial rings in polynomial operation")
 end
 
-nvars(a::QQMPolyRing) = ccall((:fmpq_mpoly_ctx_nvars, libflint), Int,
+number_of_variables(a::QQMPolyRing) = ccall((:fmpq_mpoly_ctx_nvars, libflint), Int,
                                 (Ref{QQMPolyRing}, ), a)
 
 base_ring(a::QQMPolyRing) = FlintQQ

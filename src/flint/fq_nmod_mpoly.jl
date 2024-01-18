@@ -25,7 +25,7 @@ function check_parent(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
       error("Incompatible polynomial rings in polynomial operation")
 end
 
-nvars(a::fqPolyRepMPolyRing) = a.nvars
+number_of_variables(a::fqPolyRepMPolyRing) = a.nvars
 
 base_ring(a::fqPolyRepMPolyRing) = a.base_ring
 
