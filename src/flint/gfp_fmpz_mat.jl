@@ -81,11 +81,11 @@ end
 
 nrows(a::FpMatrix) = a.r
 
-ncols(a::FpMatrix) = a.c
+number_of_columns(a::FpMatrix) = a.c
 
 nrows(a::FpMatrixSpace) = a.nrows
 
-ncols(a::FpMatrixSpace) = a.ncols
+number_of_columns(a::FpMatrixSpace) = a.ncols
 
 parent(a::FpMatrix) = matrix_space(base_ring(a), nrows(a), ncols(a))
 

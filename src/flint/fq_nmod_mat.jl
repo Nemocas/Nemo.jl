@@ -80,11 +80,11 @@ end
 
 nrows(a::fqPolyRepMatrix) = a.r
 
-ncols(a::fqPolyRepMatrix) = a.c
+number_of_columns(a::fqPolyRepMatrix) = a.c
 
 nrows(a::fqPolyRepMatrixSpace) = a.nrows
 
-ncols(a::fqPolyRepMatrixSpace) = a.ncols
+number_of_columns(a::fqPolyRepMatrixSpace) = a.ncols
 
 parent(a::fqPolyRepMatrix) = matrix_space(base_ring(a), nrows(a), ncols(a))
 

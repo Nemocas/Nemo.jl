@@ -110,11 +110,11 @@ end
 
 nrows(a::acb_mat) = a.r
 
-ncols(a::acb_mat) = a.c
+number_of_columns(a::acb_mat) = a.c
 
 nrows(a::AcbMatSpace) = a.nrows
 
-ncols(a::AcbMatSpace) = a.ncols
+number_of_columns(a::AcbMatSpace) = a.ncols
 
 function deepcopy_internal(x::acb_mat, dict::IdDict)
   z = similar(x)

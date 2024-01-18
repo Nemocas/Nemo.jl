@@ -61,7 +61,7 @@ end
 
 nrows(a::fpMatrixSpace) = a.nrows
 
-ncols(a::fpMatrixSpace) = a.ncols
+number_of_columns(a::fpMatrixSpace) = a.ncols
 
 base_ring(a::fpMatrixSpace) = a.base_ring
 

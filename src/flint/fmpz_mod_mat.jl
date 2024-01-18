@@ -93,11 +93,11 @@ end
 
 nrows(a::T) where T <: Zmod_fmpz_mat = a.r
 
-ncols(a::T) where T <: Zmod_fmpz_mat = a.c
+number_of_columns(a::T) where T <: Zmod_fmpz_mat = a.c
 
 nrows(a::ZZModMatrixSpace) = a.nrows
 
-ncols(a::ZZModMatrixSpace) = a.ncols
+number_of_columns(a::ZZModMatrixSpace) = a.ncols
 
 parent(a::Zmod_fmpz_mat) = matrix_space(base_ring(a), nrows(a), ncols(a))
 

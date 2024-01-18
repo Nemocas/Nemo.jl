@@ -158,11 +158,11 @@ end
 
 @inline nrows(a::ZZMatrix) = a.r
 
-@inline ncols(a::ZZMatrix) = a.c
+@inline number_of_columns(a::ZZMatrix) = a.c
 
 nrows(a::ZZMatrixSpace) = a.nrows
 
-ncols(a::ZZMatrixSpace) = a.ncols
+number_of_columns(a::ZZMatrixSpace) = a.ncols
 
 zero(a::ZZMatrixSpace) = a()
 
