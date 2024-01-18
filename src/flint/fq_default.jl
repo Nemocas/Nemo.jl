@@ -375,7 +375,7 @@ function show(io::IO, a::FqField)
       if deg == 1
         print(io, "Prime field of characteristic $(characteristic(a))")
       else
-        print(io, "Finite field of characteristic $(characteristic(a)) of degree $(deg)")
+        print(io, "Finite field of degree $(deg) and characteristic $(characteristic(a))")
       end
     end
   else
@@ -857,10 +857,10 @@ $K = k[X]/(f)$ will be constructed as a finite field with base field $k$.
 
 ```jldoctest
 julia> K, a = finite_field(3, 2, "a")
-(Finite field of characteristic 3 of degree 2, a)
+(Finite field of degree 2 and characteristic 3, a)
 
 julia> K, a = finite_field(9, "a")
-(Finite field of characteristic 3 of degree 2, a)
+(Finite field of degree 2 and characteristic 3, a)
 
 julia> Kx, x = K["x"];
 
@@ -908,10 +908,10 @@ field with base field $k$.
 
 ```jldoctest
 julia> K = GF(3, 2, "a")
-Finite field of characteristic 3 of degree 2
+Finite field of degree 2 and characteristic 3
 
 julia> K = GF(9, "a")
-Finite field of characteristic 3 of degree 2
+Finite field of degree 2 and characteristic 3
 
 julia> Kx, x = K["x"];
 
