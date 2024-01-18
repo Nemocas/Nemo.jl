@@ -92,11 +92,11 @@ function one(x::RealMatSpace)
   return z
 end
 
-nrows(a::RealMat) = a.r
+number_of_rows(a::RealMat) = a.r
 
 number_of_columns(a::RealMat) = a.c
 
-nrows(a::RealMatSpace) = a.nrows
+number_of_rows(a::RealMatSpace) = a.nrows
 
 number_of_columns(a::RealMatSpace) = a.ncols
 

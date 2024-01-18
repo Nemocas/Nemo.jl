@@ -78,11 +78,11 @@ function deepcopy_internal(a::fqPolyRepMatrix, dict::IdDict)
   return z
 end
 
-nrows(a::fqPolyRepMatrix) = a.r
+number_of_rows(a::fqPolyRepMatrix) = a.r
 
 number_of_columns(a::fqPolyRepMatrix) = a.c
 
-nrows(a::fqPolyRepMatrixSpace) = a.nrows
+number_of_rows(a::fqPolyRepMatrixSpace) = a.nrows
 
 number_of_columns(a::fqPolyRepMatrixSpace) = a.ncols
 

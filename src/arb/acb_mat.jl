@@ -108,11 +108,11 @@ function one(x::AcbMatSpace)
   return z
 end
 
-nrows(a::acb_mat) = a.r
+number_of_rows(a::acb_mat) = a.r
 
 number_of_columns(a::acb_mat) = a.c
 
-nrows(a::AcbMatSpace) = a.nrows
+number_of_rows(a::AcbMatSpace) = a.nrows
 
 number_of_columns(a::AcbMatSpace) = a.ncols
 

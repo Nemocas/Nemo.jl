@@ -91,11 +91,11 @@ function deepcopy_internal(a::ZZModMatrix, dict::IdDict)
   return z
 end
 
-nrows(a::T) where T <: Zmod_fmpz_mat = a.r
+number_of_rows(a::T) where T <: Zmod_fmpz_mat = a.r
 
 number_of_columns(a::T) where T <: Zmod_fmpz_mat = a.c
 
-nrows(a::ZZModMatrixSpace) = a.nrows
+number_of_rows(a::ZZModMatrixSpace) = a.nrows
 
 number_of_columns(a::ZZModMatrixSpace) = a.ncols
 

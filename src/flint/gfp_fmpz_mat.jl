@@ -79,11 +79,11 @@ function deepcopy_internal(a::FpMatrix, dict::IdDict)
   return z
 end
 
-nrows(a::FpMatrix) = a.r
+number_of_rows(a::FpMatrix) = a.r
 
 number_of_columns(a::FpMatrix) = a.c
 
-nrows(a::FpMatrixSpace) = a.nrows
+number_of_rows(a::FpMatrixSpace) = a.nrows
 
 number_of_columns(a::FpMatrixSpace) = a.ncols
 
