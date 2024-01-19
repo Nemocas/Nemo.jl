@@ -924,9 +924,4 @@ end
 ################################################################################
 
 # The following code is used in the intersection code
-function finite_field(F::FqField, deg::Int, s::VarName = :o; cached = true)
-    return FqField(characteristic(F), deg, Symbol(s), cached)
-end
-
-similar(F::FqField, deg::Int, s::VarName = :o; cached = true) = finite_field(F, deg, s, cached = cached)
-
+similar(F::FqField, deg::Int, s::VarName = :o; cached = true) = finite_field(characteristic(F), deg, s, cached = cached)[1]
