@@ -521,7 +521,7 @@ show_raw(io::IO, a::FqFieldElem) =
 # In this case we call directly the corresponding flint function
 # to construct FF and p.
 
-function _fq_field_from_fmpz_mod_poly_in_disguise(f::FqPolyRingElem, s)
+function _fq_field_from_fmpz_mod_poly_in_disguise(f::FqPolyRingElem, s::Symbol)
   K = base_ring(f)
   @assert _fq_default_ctx_type(K) == _FQ_DEFAULT_FMPZ_NMOD
   # f is an fmpz_mod_poly in disguise
@@ -533,11 +533,14 @@ function _fq_field_from_fmpz_mod_poly_in_disguise(f::FqPolyRingElem, s)
   # It is in K but the first 4 bytes are the type
   # Temporary hack
   #_K = _get_raw_type(FpField, K)
-  ccall((:fq_default_ctx_init_modulus, libflint), Nothing,
-        (Ref{FqField}, Ref{FqPolyRingElem}, Ptr{Nothing}, Ptr{UInt8}),
-        #z, f, _K.ninv, string(s))
-        z, f, pointer_from_objref(K) + 2 * sizeof(Cint), string(s))
-  finalizer(_FqDefaultFiniteField_clear_fn, z)
+  ss = string(s)
+  GC.@preserve K ss begin
+    ccall((:fq_default_ctx_init_modulus, libflint), Nothing,
+          (Ref{FqField}, Ref{FqPolyRingElem}, Ptr{Nothing}, Ptr{UInt8}),
+          #z, f, _K.ninv, string(s))
+          z, f, pointer_from_objref(K) + 2 * sizeof(Cint), ss)
+    finalizer(_FqDefaultFiniteField_clear_fn, z)
+  end
   z.isabsolute = true
   z.isstandard = true
   z.base_field = K
@@ -558,7 +561,7 @@ function _fq_field_from_fmpz_mod_poly_in_disguise(f::FqPolyRingElem, s)
   return z
 end
 
-function _fq_field_from_nmod_poly_in_disguise(f::FqPolyRingElem, s)
+function _fq_field_from_nmod_poly_in_disguise(f::FqPolyRingElem, s::Symbol)
   K = base_ring(f)
   @assert _fq_default_ctx_type(K) == _FQ_DEFAULT_NMOD
   # f is an nmod_poly in disguise
@@ -566,10 +569,13 @@ function _fq_field_from_nmod_poly_in_disguise(f::FqPolyRingElem, s)
   # on the julia side
   z = @new_struct(FqField) # this is just new() usable outside the type definition
   z.var = string(s)
-  ccall((:fq_default_ctx_init_modulus_nmod, libflint), Nothing,
-        (Ref{FqField}, Ref{FqPolyRingElem}, Ptr{UInt8}),
-              z, f, string(s))
-  finalizer(_FqDefaultFiniteField_clear_fn, z)
+  ss = string(s)
+  GC.@preserve ss begin
+    ccall((:fq_default_ctx_init_modulus_nmod, libflint), Nothing,
+          (Ref{FqField}, Ref{FqPolyRingElem}, Ptr{UInt8}),
+                z, f, ss)
+    finalizer(_FqDefaultFiniteField_clear_fn, z)
+  end
   z.isabsolute = true
   z.isstandard = true
   z.base_field = K
