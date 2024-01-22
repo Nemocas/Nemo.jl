@@ -43,9 +43,9 @@ end
 
 function getindex!(z::ComplexFieldElem, x::ComplexMat, r::Int, c::Int)
   GC.@preserve x begin
-    v = ccall((:acb_mat_entry_ptr, libarb), Ptr{ComplexFieldElem},
+    v = ccall((:acb_mat_entry_ptr, libflint), Ptr{ComplexFieldElem},
                 (Ref{ComplexMat}, Int, Int), x, r - 1, c - 1)
-    ccall((:acb_set, libarb), Nothing, (Ref{ComplexFieldElem}, Ptr{ComplexFieldElem}), z, v)
+    ccall((:acb_set, libflint), Nothing, (Ref{ComplexFieldElem}, Ptr{ComplexFieldElem}), z, v)
   end
   return z
 end
@@ -55,9 +55,9 @@ end
 
   z = base_ring(x)()
   GC.@preserve x begin
-     v = ccall((:acb_mat_entry_ptr, libarb), Ptr{ComplexFieldElem},
+     v = ccall((:acb_mat_entry_ptr, libflint), Ptr{ComplexFieldElem},
                (Ref{ComplexMat}, Int, Int), x, r - 1, c - 1)
-     ccall((:acb_set, libarb), Nothing, (Ref{ComplexFieldElem}, Ptr{ComplexFieldElem}), z, v)
+     ccall((:acb_set, libflint), Nothing, (Ref{ComplexFieldElem}, Ptr{ComplexFieldElem}), z, v)
   end
   return z
 end
@@ -68,7 +68,7 @@ for T in [Integer, Float64, ZZRingElem, QQFieldElem, RealFieldElem, BigFloat, Co
          @boundscheck Generic._checkbounds(x, r, c)
 
          GC.@preserve x begin
-            z = ccall((:acb_mat_entry_ptr, libarb), Ptr{ComplexFieldElem},
+            z = ccall((:acb_mat_entry_ptr, libflint), Ptr{ComplexFieldElem},
                       (Ref{ComplexMat}, Int, Int), x, r - 1, c - 1)
             _acb_set(z, y, precision(Balls))
          end
@@ -86,7 +86,7 @@ for T in [Integer, Float64, ZZRingElem, QQFieldElem, RealFieldElem, BigFloat, Ab
          @boundscheck Generic._checkbounds(x, r, c)
 
          GC.@preserve x begin
-            z = ccall((:acb_mat_entry_ptr, libarb), Ptr{ComplexFieldElem},
+            z = ccall((:acb_mat_entry_ptr, libflint), Ptr{ComplexFieldElem},
                       (Ref{ComplexMat}, Int, Int), x, r - 1, c - 1)
             _acb_set(z, y[1], y[2], precision(Balls))
          end
@@ -101,7 +101,7 @@ zero(x::ComplexMatSpace) = x()
 
 function one(x::ComplexMatSpace)
   z = x()
-  ccall((:acb_mat_one, libarb), Nothing, (Ref{ComplexMat}, ), z)
+  ccall((:acb_mat_one, libflint), Nothing, (Ref{ComplexMat}, ), z)
   return z
 end
 
@@ -115,7 +115,7 @@ ncols(a::ComplexMatSpace) = a.ncols
 
 function deepcopy_internal(x::ComplexMat, dict::IdDict)
   z = similar(x)
-  ccall((:acb_mat_set, libarb), Nothing, (Ref{ComplexMat}, Ref{ComplexMat}), z, x)
+  ccall((:acb_mat_set, libflint), Nothing, (Ref{ComplexMat}, Ref{ComplexMat}), z, x)
   return z
 end
 
@@ -127,7 +127,7 @@ end
 
 function -(x::ComplexMat)
   z = similar(x)
-  ccall((:acb_mat_neg, libarb), Nothing, (Ref{ComplexMat}, Ref{ComplexMat}), z, x)
+  ccall((:acb_mat_neg, libflint), Nothing, (Ref{ComplexMat}, Ref{ComplexMat}), z, x)
   return z
 end
 
@@ -139,7 +139,7 @@ end
 
 function transpose(x::ComplexMat)
   z = similar(x, ncols(x), nrows(x))
-  ccall((:acb_mat_transpose, libarb), Nothing,
+  ccall((:acb_mat_transpose, libflint), Nothing,
               (Ref{ComplexMat}, Ref{ComplexMat}), z, x)
   return z
 end
@@ -153,7 +153,7 @@ end
 function +(x::ComplexMat, y::ComplexMat)
   check_parent(x, y)
   z = similar(x)
-  ccall((:acb_mat_add, libarb), Nothing,
+  ccall((:acb_mat_add, libflint), Nothing,
               (Ref{ComplexMat}, Ref{ComplexMat}, Ref{ComplexMat}, Int),
               z, x, y, precision(Balls))
   return z
@@ -162,7 +162,7 @@ end
 function -(x::ComplexMat, y::ComplexMat)
   check_parent(x, y)
   z = similar(x)
-  ccall((:acb_mat_sub, libarb), Nothing,
+  ccall((:acb_mat_sub, libflint), Nothing,
               (Ref{ComplexMat}, Ref{ComplexMat}, Ref{ComplexMat}, Int),
               z, x, y, precision(Balls))
   return z
@@ -171,7 +171,7 @@ end
 function *(x::ComplexMat, y::ComplexMat)
   ncols(x) != nrows(y) && error("Matrices have wrong dimensions")
   z = similar(x, nrows(x), ncols(y))
-  ccall((:acb_mat_mul, libarb), Nothing,
+  ccall((:acb_mat_mul, libflint), Nothing,
               (Ref{ComplexMat}, Ref{ComplexMat}, Ref{ComplexMat}, Int),
               z, x, y, precision(Balls))
   return z
@@ -186,7 +186,7 @@ end
 function ^(x::ComplexMat, y::UInt)
   nrows(x) != ncols(x) && error("Matrix must be square")
   z = similar(x)
-  ccall((:acb_mat_pow_ui, libarb), Nothing,
+  ccall((:acb_mat_pow_ui, libflint), Nothing,
               (Ref{ComplexMat}, Ref{ComplexMat}, UInt, Int),
               z, x, y, precision(Balls))
   return z
@@ -194,7 +194,7 @@ end
 
 function *(x::ComplexMat, y::Int)
   z = similar(x)
-  ccall((:acb_mat_scalar_mul_si, libarb), Nothing,
+  ccall((:acb_mat_scalar_mul_si, libflint), Nothing,
               (Ref{ComplexMat}, Ref{ComplexMat}, Int, Int),
               z, x, y, precision(Balls))
   return z
@@ -204,7 +204,7 @@ end
 
 function *(x::ComplexMat, y::ZZRingElem)
   z = similar(x)
-  ccall((:acb_mat_scalar_mul_fmpz, libarb), Nothing,
+  ccall((:acb_mat_scalar_mul_fmpz, libflint), Nothing,
               (Ref{ComplexMat}, Ref{ComplexMat}, Ref{ZZRingElem}, Int),
               z, x, y, precision(Balls))
   return z
@@ -214,7 +214,7 @@ end
 
 function *(x::ComplexMat, y::RealFieldElem)
   z = similar(x)
-  ccall((:acb_mat_scalar_mul_arb, libarb), Nothing,
+  ccall((:acb_mat_scalar_mul_arb, libflint), Nothing,
               (Ref{ComplexMat}, Ref{ComplexMat}, Ref{RealFieldElem}, Int),
               z, x, y, precision(Balls))
   return z
@@ -224,7 +224,7 @@ end
 
 function *(x::ComplexMat, y::ComplexFieldElem)
   z = similar(x)
-  ccall((:acb_mat_scalar_mul_acb, libarb), Nothing,
+  ccall((:acb_mat_scalar_mul_acb, libflint), Nothing,
               (Ref{ComplexMat}, Ref{ComplexMat}, Ref{ComplexFieldElem}, Int),
               z, x, y, precision(Balls))
   return z
@@ -316,7 +316,7 @@ end
 
 function ldexp(x::ComplexMat, y::Int)
   z = similar(x)
-  ccall((:acb_mat_scalar_mul_2exp_si, libarb), Nothing,
+  ccall((:acb_mat_scalar_mul_2exp_si, libflint), Nothing,
               (Ref{ComplexMat}, Ref{ComplexMat}, Int), z, x, y)
   return z
 end
@@ -334,7 +334,7 @@ Return `true` if the matrices of balls $x$ and $y$ are precisely equal,
 i.e. if all matrix entries have the same midpoints and radii.
 """
 function isequal(x::ComplexMat, y::ComplexMat)
-  r = ccall((:acb_mat_equal, libarb), Cint,
+  r = ccall((:acb_mat_equal, libflint), Cint,
               (Ref{ComplexMat}, Ref{ComplexMat}), x, y)
   return Bool(r)
 end
@@ -342,12 +342,12 @@ end
 function ==(x::ComplexMat, y::ComplexMat)
   fl = check_parent(x, y, false)
   !fl && return false
-  r = ccall((:acb_mat_eq, libarb), Cint, (Ref{ComplexMat}, Ref{ComplexMat}), x, y)
+  r = ccall((:acb_mat_eq, libflint), Cint, (Ref{ComplexMat}, Ref{ComplexMat}), x, y)
   return Bool(r)
 end
 
 function !=(x::ComplexMat, y::ComplexMat)
-  r = ccall((:acb_mat_ne, libarb), Cint, (Ref{ComplexMat}, Ref{ComplexMat}), x, y)
+  r = ccall((:acb_mat_ne, libflint), Cint, (Ref{ComplexMat}, Ref{ComplexMat}), x, y)
   return Bool(r)
 end
 
@@ -358,7 +358,7 @@ Returns `true` if all entries of $x$ overlap with the corresponding entry of
 $y$, otherwise return `false`.
 """
 function overlaps(x::ComplexMat, y::ComplexMat)
-  r = ccall((:acb_mat_overlaps, libarb), Cint,
+  r = ccall((:acb_mat_overlaps, libflint), Cint,
               (Ref{ComplexMat}, Ref{ComplexMat}), x, y)
   return Bool(r)
 end
@@ -370,7 +370,7 @@ Returns `true` if all entries of $x$ contain the corresponding entry of
 $y$, otherwise return `false`.
 """
 function contains(x::ComplexMat, y::ComplexMat)
-  r = ccall((:acb_mat_contains, libarb), Cint,
+  r = ccall((:acb_mat_contains, libflint), Cint,
               (Ref{ComplexMat}, Ref{ComplexMat}), x, y)
   return Bool(r)
 end
@@ -388,7 +388,7 @@ Returns `true` if all entries of $x$ contain the corresponding entry of
 $y$, otherwise return `false`.
 """
 function contains(x::ComplexMat, y::ZZMatrix)
-  r = ccall((:acb_mat_contains_fmpz_mat, libarb), Cint,
+  r = ccall((:acb_mat_contains_fmpz_mat, libflint), Cint,
               (Ref{ComplexMat}, Ref{ZZMatrix}), x, y)
   return Bool(r)
 end
@@ -400,7 +400,7 @@ Returns `true` if all entries of $x$ contain the corresponding entry of
 $y$, otherwise return `false`.
 """
 function contains(x::ComplexMat, y::QQMatrix)
-  r = ccall((:acb_mat_contains_fmpq_mat, libarb), Cint,
+  r = ccall((:acb_mat_contains_fmpq_mat, libflint), Cint,
               (Ref{ComplexMat}, Ref{QQMatrix}), x, y)
   return Bool(r)
 end
@@ -420,7 +420,7 @@ end
 ################################################################################
 
 isreal(x::ComplexMat) =
-            Bool(ccall((:acb_mat_is_real, libarb), Cint, (Ref{ComplexMat}, ), x))
+            Bool(ccall((:acb_mat_is_real, libflint), Cint, (Ref{ComplexMat}, ), x))
 
 ###############################################################################
 #
@@ -444,7 +444,7 @@ end
 function is_invertible_with_inverse(x::ComplexMat)
   ncols(x) != nrows(x) && return false, x
   z = similar(x)
-  r = ccall((:acb_mat_inv, libarb), Cint,
+  r = ccall((:acb_mat_inv, libflint), Cint,
             (Ref{ComplexMat}, Ref{ComplexMat}, Int), z, x, precision(Balls))
   return Bool(r), z
 end
@@ -469,7 +469,7 @@ end
 function divexact(x::ComplexMat, y::Int; check::Bool=true)
   y == 0 && throw(DivideError())
   z = similar(x)
-  ccall((:acb_mat_scalar_div_si, libarb), Nothing,
+  ccall((:acb_mat_scalar_div_si, libflint), Nothing,
               (Ref{ComplexMat}, Ref{ComplexMat}, Int, Int),
               z, x, y, precision(Balls))
   return z
@@ -477,7 +477,7 @@ end
 
 function divexact(x::ComplexMat, y::ZZRingElem; check::Bool=true)
   z = similar(x)
-  ccall((:acb_mat_scalar_div_fmpz, libarb), Nothing,
+  ccall((:acb_mat_scalar_div_fmpz, libflint), Nothing,
               (Ref{ComplexMat}, Ref{ComplexMat}, Ref{ZZRingElem}, Int),
               z, x, y, precision(Balls))
   return z
@@ -485,7 +485,7 @@ end
 
 function divexact(x::ComplexMat, y::RealFieldElem; check::Bool=true)
   z = similar(x)
-  ccall((:acb_mat_scalar_div_arb, libarb), Nothing,
+  ccall((:acb_mat_scalar_div_arb, libflint), Nothing,
               (Ref{ComplexMat}, Ref{ComplexMat}, Ref{RealFieldElem}, Int),
               z, x, y, precision(Balls))
   return z
@@ -493,7 +493,7 @@ end
 
 function divexact(x::ComplexMat, y::ComplexFieldElem; check::Bool=true)
   z = similar(x)
-  ccall((:acb_mat_scalar_div_acb, libarb), Nothing,
+  ccall((:acb_mat_scalar_div_acb, libflint), Nothing,
               (Ref{ComplexMat}, Ref{ComplexMat}, Ref{ComplexFieldElem}, Int),
               z, x, y, precision(Balls))
   return z
@@ -516,7 +516,7 @@ divexact(x::ComplexMat, y::Rational{T}; check::Bool=true) where T <: Union{Int, 
 function charpoly(x::AcbPolyRing, y::ComplexMat, prec::Int = precision(Balls))
   base_ring(x) != base_ring(y) && error("Base rings must coincide")
   z = x()
-  ccall((:acb_mat_charpoly, libarb), Nothing,
+  ccall((:acb_mat_charpoly, libflint), Nothing,
               (Ref{acb_poly}, Ref{ComplexMat}, Int), z, y, prec)
   return z
 end
@@ -530,7 +530,7 @@ end
 function det(x::ComplexMat, prec::Int = precision(Balls))
   ncols(x) != nrows(x) && error("Matrix must be square")
   z = base_ring(x)()
-  ccall((:acb_mat_det, libarb), Nothing,
+  ccall((:acb_mat_det, libflint), Nothing,
               (Ref{ComplexFieldElem}, Ref{ComplexMat}, Int), z, x, prec)
   return z
 end
@@ -544,7 +544,7 @@ end
 function Base.exp(x::ComplexMat)
   ncols(x) != nrows(x) && error("Matrix must be square")
   z = similar(x)
-  ccall((:acb_mat_exp, libarb), Nothing,
+  ccall((:acb_mat_exp, libflint), Nothing,
               (Ref{ComplexMat}, Ref{ComplexMat}, Int), z, x, precision(Balls))
   return z
 end
@@ -557,7 +557,7 @@ end
 
 function lu!(P::Generic.Perm, x::ComplexMat)
   P.d .-= 1
-  r = ccall((:acb_mat_lu, libarb), Cint,
+  r = ccall((:acb_mat_lu, libflint), Cint,
               (Ptr{Int}, Ref{ComplexMat}, Ref{ComplexMat}, Int),
               P.d, x, x, precision(Balls))
   r == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
@@ -567,7 +567,7 @@ function lu!(P::Generic.Perm, x::ComplexMat)
 end
 
 function solve!(z::ComplexMat, x::ComplexMat, y::ComplexMat)
-  r = ccall((:acb_mat_solve, libarb), Cint,
+  r = ccall((:acb_mat_solve, libflint), Cint,
               (Ref{ComplexMat}, Ref{ComplexMat}, Ref{ComplexMat}, Int),
               z, x, y, precision(Balls))
   r == 0 && error("Matrix cannot be inverted numerically")
@@ -584,7 +584,7 @@ end
 
 function solve_lu_precomp!(z::ComplexMat, P::Generic.Perm, LU::ComplexMat, y::ComplexMat)
   Q = inv(P)
-  ccall((:acb_mat_solve_lu_precomp, libarb), Nothing,
+  ccall((:acb_mat_solve_lu_precomp, libflint), Nothing,
               (Ref{ComplexMat}, Ptr{Int}, Ref{ComplexMat}, Ref{ComplexMat}, Int),
               z, Q.d .- 1, LU, y, precision(Balls))
   nothing
@@ -612,7 +612,7 @@ function swap_rows(x::ComplexMat, i::Int, j::Int)
 end
 
 function swap_rows!(x::ComplexMat, i::Int, j::Int)
-  ccall((:acb_mat_swap_rows, libarb), Nothing,
+  ccall((:acb_mat_swap_rows, libflint), Nothing,
               (Ref{ComplexMat}, Ptr{Nothing}, Int, Int),
               x, C_NULL, i - 1, j - 1)
 end
@@ -632,13 +632,13 @@ bound for the infinity norm for every matrix in $x$
 function bound_inf_norm(x::ComplexMat)
   z = RealFieldElem()
   GC.@preserve x z begin
-     t = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ref{RealFieldElem}, ), z)
-     ccall((:acb_mat_bound_inf_norm, libarb), Nothing,
+     t = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (Ref{RealFieldElem}, ), z)
+     ccall((:acb_mat_bound_inf_norm, libflint), Nothing,
                  (Ptr{mag_struct}, Ref{ComplexMat}), t, x)
-     s = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ref{RealFieldElem}, ), z)
-     ccall((:arf_set_mag, libarb), Nothing,
+     s = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (Ref{RealFieldElem}, ), z)
+     ccall((:arf_set_mag, libflint), Nothing,
                  (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
-     ccall((:mag_zero, libarb), Nothing,
+     ccall((:mag_zero, libflint), Nothing,
                  (Ptr{mag_struct},), t)
   end
   return z
@@ -654,7 +654,7 @@ for (s,f) in (("add!","acb_mat_add"), ("mul!","acb_mat_mul"),
               ("sub!","acb_mat_sub"))
   @eval begin
     function ($(Symbol(s)))(z::ComplexMat, x::ComplexMat, y::ComplexMat, prec::Int = precision(Balls))
-      ccall(($f, libarb), Nothing,
+      ccall(($f, libflint), Nothing,
                   (Ref{ComplexMat}, Ref{ComplexMat}, Ref{ComplexMat}, Int),
                   z, x, y, prec)
       return z
@@ -821,7 +821,7 @@ function identity_matrix(R::ComplexField, n::Int)
      error("dimension must not be negative")
    end
    z = ComplexMat(n, n)
-   ccall((:acb_mat_one, libarb), Nothing, (Ref{ComplexMat}, ), z)
+   ccall((:acb_mat_one, libflint), Nothing, (Ref{ComplexMat}, ), z)
    return z
 end
 
@@ -857,7 +857,7 @@ promote_rule(::Type{ComplexMat}, ::Type{arb_mat}) = ComplexMat
 
 function __approx_eig_qr!(v::Ptr{acb_struct}, R::ComplexMat, A::ComplexMat)
   n = nrows(A)
-  ccall((:acb_mat_approx_eig_qr, libarb), Cint,
+  ccall((:acb_mat_approx_eig_qr, libflint), Cint,
         (Ptr{acb_struct}, Ptr{Nothing}, Ref{ComplexMat},
         Ref{ComplexMat}, Ptr{Nothing}, Int, Int),
         v, C_NULL, R, A, C_NULL, 0, precision(Balls))
@@ -880,7 +880,7 @@ function _eig_multiple(A::ComplexMat, check::Bool = true)
   v_approx = acb_vec(n)
   R = zero_matrix(base_ring(A), n, n)
   __approx_eig_qr!(v, R, A)
-  b = ccall((:acb_mat_eig_multiple, libarb), Cint,
+  b = ccall((:acb_mat_eig_multiple, libflint), Cint,
             (Ptr{acb_struct}, Ref{ComplexMat}, Ptr{acb_struct}, Ref{ComplexMat}, Int),
              v_approx, A, v, R, precision(Balls))
   check && b == 0 && error("Could not isolate eigenvalues of matrix $A")
@@ -914,17 +914,17 @@ function _eig_simple(A::ComplexMat; check::Bool = true, algorithm::Symbol = :def
   R = zero_matrix(base_ring(A), n, n)
   __approx_eig_qr!(v, Rapprox, A)
   if algorithm == :vdhoeven_mourrain
-      b = ccall((:acb_mat_eig_simple_vdhoeven_mourrain, libarb), Cint,
+      b = ccall((:acb_mat_eig_simple_vdhoeven_mourrain, libflint), Cint,
                 (Ptr{acb_struct}, Ref{ComplexMat}, Ref{ComplexMat},
                  Ref{ComplexMat}, Ptr{acb_struct}, Ref{ComplexMat}, Int),
                  v_approx, L, R, A, v, Rapprox, precision(Balls))
   elseif algorithm == :rump
-      b = ccall((:acb_mat_eig_simple_rump, libarb), Cint,
+      b = ccall((:acb_mat_eig_simple_rump, libflint), Cint,
                 (Ptr{acb_struct}, Ref{ComplexMat}, Ref{ComplexMat},
                  Ref{ComplexMat}, Ptr{acb_struct}, Ref{ComplexMat}, Int),
                  v_approx, L, R, A, v, Rapprox, precision(Balls))
   elseif algorithm == :default
-      b = ccall((:acb_mat_eig_simple, libarb), Cint,
+      b = ccall((:acb_mat_eig_simple, libflint), Cint,
                 (Ptr{acb_struct}, Ref{ComplexMat}, Ref{ComplexMat},
                  Ref{ComplexMat}, Ptr{acb_struct}, Ref{ComplexMat}, Int),
                  v_approx, L, R, A, v, Rapprox, precision(Balls))

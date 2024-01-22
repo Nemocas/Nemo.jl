@@ -207,9 +207,6 @@ include("Exports.jl")
 #
 ###############################################################################
 
-using Arb_jll
-using Antic_jll
-using Calcium_jll
 using FLINT_jll
 
 const pkgdir = realpath(joinpath(dirname(@__DIR__)))
@@ -219,19 +216,6 @@ const libflint = FLINT_jll.libflint
 function flint_abort()
   error("Problem in the Flint-Subsystem")
 end
-
-# check whether we are using flint version >= 3.0 (or some recent enough dev version),
-# which changed the layout of some structs
-_ptr = Libdl.dlopen(libflint)
-if Libdl.dlsym(_ptr, :_fmpz_mod_vec_set_fmpz_vec_threaded; throw_error = false) !== nothing
-  const NEW_FLINT = true
-	libantic = libflint
-	libarb = libflint
-	libcalcium = libflint
-else
-  const NEW_FLINT = false
-end
-Libdl.dlclose(_ptr)
 
 ################################################################################
 #

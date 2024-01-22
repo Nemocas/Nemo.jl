@@ -43,7 +43,7 @@ for some more specialized fields.
      return get_cached!(AnticNumberFieldID, (parent(pol), pol, s), cached) do
         nf = new()
         nf.pol = pol
-        ccall((:nf_init, libantic), Nothing, 
+        ccall((:nf_init, libflint), Nothing, 
            (Ref{AnticNumberField}, Ref{QQPolyRingElem}), nf, pol)
         finalizer(_AnticNumberField_clear_fn, nf)
         nf.S = s
@@ -56,7 +56,7 @@ const AnticNumberFieldID = CacheDictType{Tuple{QQPolyRing, QQPolyRingElem, Symbo
 
 
 function _AnticNumberField_clear_fn(a::AnticNumberField)
-   ccall((:nf_clear, libantic), Nothing, (Ref{AnticNumberField},), a)
+   ccall((:nf_clear, libflint), Nothing, (Ref{AnticNumberField},), a)
 end
 
 """
@@ -81,7 +81,7 @@ mutable struct nf_elem <: SimpleNumFieldElem{QQFieldElem}
 
    function nf_elem(p::AnticNumberField)
       r = new()
-      ccall((:nf_elem_init, libantic), Nothing, 
+      ccall((:nf_elem_init, libflint), Nothing, 
             (Ref{nf_elem}, Ref{AnticNumberField}), r, p)
       r.parent = p
       finalizer(_nf_elem_clear_fn, r)
@@ -90,9 +90,9 @@ mutable struct nf_elem <: SimpleNumFieldElem{QQFieldElem}
 
    function nf_elem(p::AnticNumberField, a::nf_elem)
       r = new()
-      ccall((:nf_elem_init, libantic), Nothing, 
+      ccall((:nf_elem_init, libflint), Nothing, 
             (Ref{nf_elem}, Ref{AnticNumberField}), r, p)
-      ccall((:nf_elem_set, libantic), Nothing,
+      ccall((:nf_elem_set, libflint), Nothing,
             (Ref{nf_elem}, Ref{nf_elem}, Ref{AnticNumberField}), r, a, p)
       r.parent = p
       finalizer(_nf_elem_clear_fn, r)
@@ -101,6 +101,6 @@ mutable struct nf_elem <: SimpleNumFieldElem{QQFieldElem}
 end
 
 function _nf_elem_clear_fn(a::nf_elem)
-   ccall((:nf_elem_clear, libantic), Nothing, 
+   ccall((:nf_elem_clear, libflint), Nothing, 
          (Ref{nf_elem}, Ref{AnticNumberField}), a, a.parent)
 end

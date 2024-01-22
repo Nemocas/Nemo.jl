@@ -100,14 +100,14 @@ constant coefficient.
 function coeff(x::nf_elem, n::Int)
    n < 0 && throw(DomainError(n, "Index must be non-negative"))
    z = QQFieldElem()
-   ccall((:nf_elem_get_coeff_fmpq, libantic), Nothing,
+   ccall((:nf_elem_get_coeff_fmpq, libflint), Nothing,
      (Ref{QQFieldElem}, Ref{nf_elem}, Int, Ref{AnticNumberField}), z, x, n, parent(x))
    return z
 end
 
 function num_coeff!(z::ZZRingElem, x::nf_elem, n::Int)
    n < 0 && throw(DomainError(n, "Index must be non-negative"))
-   ccall((:nf_elem_get_coeff_fmpz, libantic), Nothing,
+   ccall((:nf_elem_get_coeff_fmpz, libflint), Nothing,
      (Ref{ZZRingElem}, Ref{nf_elem}, Int, Ref{AnticNumberField}), z, x, n, parent(x))
    return z
 end
@@ -120,21 +120,21 @@ defining polynomial.
 """
 function gen(a::AnticNumberField)
    r = nf_elem(a)
-   ccall((:nf_elem_gen, libantic), Nothing,
+   ccall((:nf_elem_gen, libflint), Nothing,
          (Ref{nf_elem}, Ref{AnticNumberField}), r, a)
    return r
 end
 
 function one(a::AnticNumberField)
    r = nf_elem(a)
-   ccall((:nf_elem_one, libantic), Nothing,
+   ccall((:nf_elem_one, libflint), Nothing,
          (Ref{nf_elem}, Ref{AnticNumberField}), r, a)
    return r
 end
 
 function zero(a::AnticNumberField)
    r = nf_elem(a)
-   ccall((:nf_elem_zero, libantic), Nothing,
+   ccall((:nf_elem_zero, libflint), Nothing,
          (Ref{nf_elem}, Ref{AnticNumberField}), r, a)
    return r
 end
@@ -146,17 +146,17 @@ Return `true` if the given number field element is the generator of the
 number field, otherwise return `false`.
 """
 function is_gen(a::nf_elem)
-   return ccall((:nf_elem_is_gen, libantic), Bool,
+   return ccall((:nf_elem_is_gen, libflint), Bool,
                 (Ref{nf_elem}, Ref{AnticNumberField}), a, a.parent)
 end
 
 function isone(a::nf_elem)
-   return ccall((:nf_elem_is_one, libantic), Bool,
+   return ccall((:nf_elem_is_one, libflint), Bool,
                 (Ref{nf_elem}, Ref{AnticNumberField}), a, a.parent)
 end
 
 function iszero(a::nf_elem)
-   return ccall((:nf_elem_is_zero, libantic), Bool,
+   return ccall((:nf_elem_is_zero, libflint), Bool,
                 (Ref{nf_elem}, Ref{AnticNumberField}), a, a.parent)
 end
 
@@ -175,7 +175,7 @@ Return `true` if the given number field element is an integer, i.e., in ZZ, othe
 return `false`.
 """
 function isinteger(a::nf_elem)
-   b = ccall((:nf_elem_is_integer, libantic), Cint,
+   b = ccall((:nf_elem_is_integer, libflint), Cint,
              (Ref{nf_elem}, Ref{AnticNumberField}), a, a.parent)
    return Bool(b)
 end
@@ -187,7 +187,7 @@ Return `true` if the given number field element is a rational number, i.e., in Q
 otherwise `false`.
 """
 function is_rational(a::nf_elem)
-   b = ccall((:nf_elem_is_rational, libantic), Cint,
+   b = ccall((:nf_elem_is_rational, libflint), Cint,
              (Ref{nf_elem}, Ref{AnticNumberField}), a, a.parent)
    return Bool(b)
 end
@@ -200,7 +200,7 @@ field element.
 """
 function denominator(a::nf_elem)
    z = ZZRingElem()
-   ccall((:nf_elem_get_den, libantic), Nothing,
+   ccall((:nf_elem_get_den, libflint), Nothing,
          (Ref{ZZRingElem}, Ref{nf_elem}, Ref{AnticNumberField}),
          z, a, a.parent)
    return z
@@ -210,14 +210,14 @@ function elem_from_mat_row(a::AnticNumberField, b::ZZMatrix, i::Int, d::ZZRingEl
    Generic._checkbounds(nrows(b), i) || throw(BoundsError())
    ncols(b) == degree(a) || error("Wrong number of columns")
    z = a()
-   ccall((:nf_elem_set_fmpz_mat_row, libantic), Nothing,
+   ccall((:nf_elem_set_fmpz_mat_row, libflint), Nothing,
         (Ref{nf_elem}, Ref{ZZMatrix}, Int, Ref{ZZRingElem}, Ref{AnticNumberField}),
         z, b, i - 1, d, a)
    return z
 end
 
 function elem_to_mat_row!(a::ZZMatrix, i::Int, d::ZZRingElem, b::nf_elem)
-   ccall((:nf_elem_get_fmpz_mat_row, libantic), Nothing,
+   ccall((:nf_elem_get_fmpz_mat_row, libflint), Nothing,
          (Ref{ZZMatrix}, Int, Ref{ZZRingElem}, Ref{nf_elem}, Ref{AnticNumberField}),
          a, i - 1, d, b, b.parent)
    nothing
@@ -290,7 +290,7 @@ canonical_unit(x::nf_elem) = x
 
 function -(a::nf_elem)
    r = a.parent()
-   ccall((:nf_elem_neg, libantic), Nothing,
+   ccall((:nf_elem_neg, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{AnticNumberField}),
          r, a, a.parent)
    return r
@@ -306,7 +306,7 @@ function +(a::nf_elem, b::nf_elem)
    parent(a) == parent(b) || return force_op(+, a, b)::nf_elem
    check_parent(a, b)
    r = a.parent()
-   ccall((:nf_elem_add, libantic), Nothing,
+   ccall((:nf_elem_add, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{nf_elem}, Ref{AnticNumberField}),
          r, a, b, a.parent)
    return r
@@ -316,7 +316,7 @@ function -(a::nf_elem, b::nf_elem)
    parent(a) == parent(b) || return force_op(-, a, b)::nf_elem
    check_parent(a, b)
    r = a.parent()
-   ccall((:nf_elem_sub, libantic), Nothing,
+   ccall((:nf_elem_sub, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{nf_elem}, Ref{AnticNumberField}),
          r, a, b, a.parent)
    return r
@@ -326,7 +326,7 @@ function *(a::nf_elem, b::nf_elem)
    parent(a) == parent(b) || return force_op(*, a, b)::nf_elem
    check_parent(a, b)
    r = a.parent()
-   ccall((:nf_elem_mul, libantic), Nothing,
+   ccall((:nf_elem_mul, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{nf_elem}, Ref{AnticNumberField}),
          r, a, b, a.parent)
    return r
@@ -340,7 +340,7 @@ end
 
 function +(a::nf_elem, b::Int)
    r = a.parent()
-   ccall((:nf_elem_add_si, libantic), Nothing,
+   ccall((:nf_elem_add_si, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Int, Ref{AnticNumberField}),
          r, a, b, a.parent)
    return r
@@ -348,7 +348,7 @@ end
 
 function +(a::nf_elem, b::ZZRingElem)
    r = a.parent()
-   ccall((:nf_elem_add_fmpz, libantic), Nothing,
+   ccall((:nf_elem_add_fmpz, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{ZZRingElem}, Ref{AnticNumberField}),
          r, a, b, a.parent)
    return r
@@ -356,7 +356,7 @@ end
 
 function +(a::nf_elem, b::QQFieldElem)
    r = a.parent()
-   ccall((:nf_elem_add_fmpq, libantic), Nothing,
+   ccall((:nf_elem_add_fmpq, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{QQFieldElem}, Ref{AnticNumberField}),
          r, a, b, a.parent)
    return r
@@ -364,7 +364,7 @@ end
 
 function -(a::nf_elem, b::Int)
    r = a.parent()
-   ccall((:nf_elem_sub_si, libantic), Nothing,
+   ccall((:nf_elem_sub_si, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Int, Ref{AnticNumberField}),
          r, a, b, a.parent)
    return r
@@ -372,7 +372,7 @@ end
 
 function -(a::nf_elem, b::ZZRingElem)
    r = a.parent()
-   ccall((:nf_elem_sub_fmpz, libantic), Nothing,
+   ccall((:nf_elem_sub_fmpz, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{ZZRingElem}, Ref{AnticNumberField}),
          r, a, b, a.parent)
    return r
@@ -380,7 +380,7 @@ end
 
 function -(a::nf_elem, b::QQFieldElem)
    r = a.parent()
-   ccall((:nf_elem_sub_fmpq, libantic), Nothing,
+   ccall((:nf_elem_sub_fmpq, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{QQFieldElem}, Ref{AnticNumberField}),
          r, a, b, a.parent)
    return r
@@ -388,7 +388,7 @@ end
 
 function -(a::Int, b::nf_elem)
    r = b.parent()
-   ccall((:nf_elem_si_sub, libantic), Nothing,
+   ccall((:nf_elem_si_sub, libflint), Nothing,
          (Ref{nf_elem}, Int, Ref{nf_elem}, Ref{AnticNumberField}),
          r, a, b, b.parent)
    return r
@@ -396,7 +396,7 @@ end
 
 function -(a::ZZRingElem, b::nf_elem)
    r = b.parent()
-   ccall((:nf_elem_fmpz_sub, libantic), Nothing,
+   ccall((:nf_elem_fmpz_sub, libflint), Nothing,
          (Ref{nf_elem}, Ref{ZZRingElem}, Ref{nf_elem}, Ref{AnticNumberField}),
          r, a, b, b.parent)
    return r
@@ -404,7 +404,7 @@ end
 
 function -(a::QQFieldElem, b::nf_elem)
    r = b.parent()
-   ccall((:nf_elem_fmpq_sub, libantic), Nothing,
+   ccall((:nf_elem_fmpq_sub, libflint), Nothing,
          (Ref{nf_elem}, Ref{QQFieldElem}, Ref{nf_elem}, Ref{AnticNumberField}),
          r, a, b, b.parent)
    return r
@@ -430,7 +430,7 @@ end
 
 function *(a::nf_elem, b::Int)
    r = a.parent()
-   ccall((:nf_elem_scalar_mul_si, libantic), Nothing,
+   ccall((:nf_elem_scalar_mul_si, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Int, Ref{AnticNumberField}),
          r, a, b, a.parent)
    return r
@@ -438,7 +438,7 @@ end
 
 function *(a::nf_elem, b::ZZRingElem)
    r = a.parent()
-   ccall((:nf_elem_scalar_mul_fmpz, libantic), Nothing,
+   ccall((:nf_elem_scalar_mul_fmpz, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{ZZRingElem}, Ref{AnticNumberField}),
          r, a, b, a.parent)
    return r
@@ -446,7 +446,7 @@ end
 
 function *(a::nf_elem, b::QQFieldElem)
    r = a.parent()
-   ccall((:nf_elem_scalar_mul_fmpq, libantic), Nothing,
+   ccall((:nf_elem_scalar_mul_fmpq, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{QQFieldElem}, Ref{AnticNumberField}),
          r, a, b, a.parent)
    return r
@@ -492,7 +492,7 @@ end
 
 function ^(a::nf_elem, n::Int)
    r = a.parent()
-   ccall((:nf_elem_pow, libantic), Nothing,
+   ccall((:nf_elem_pow, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Int, Ref{AnticNumberField}),
          r, a, abs(n), a.parent)
    if n < 0
@@ -510,7 +510,7 @@ end
 function ==(a::nf_elem, b::nf_elem)
    parent(a) == parent(b) || return force_op(==, a, b)::Bool
    check_parent(a, b)
-   return ccall((:nf_elem_equal, libantic), Bool,
+   return ccall((:nf_elem_equal, libflint), Bool,
            (Ref{nf_elem}, Ref{nf_elem}, Ref{AnticNumberField}), a, b, a.parent)
 end
 
@@ -521,28 +521,28 @@ end
 ###############################################################################
 
 function ==(a::nf_elem, b::ZZRingElem)
-   b = ccall((:nf_elem_equal_fmpz, libantic), Cint,
+   b = ccall((:nf_elem_equal_fmpz, libflint), Cint,
              (Ref{nf_elem}, Ref{ZZRingElem}, Ref{AnticNumberField}),
               a, b, a.parent)
    return Bool(b)
 end
 
 function ==(a::nf_elem, b::QQFieldElem)
-   b = ccall((:nf_elem_equal_fmpq, libantic), Cint,
+   b = ccall((:nf_elem_equal_fmpq, libflint), Cint,
              (Ref{nf_elem}, Ref{QQFieldElem}, Ref{AnticNumberField}),
               a, b, a.parent)
    return Bool(b)
 end
 
 function ==(a::nf_elem, b::Int)
-   b = ccall((:nf_elem_equal_si, libantic), Cint,
+   b = ccall((:nf_elem_equal_si, libflint), Cint,
              (Ref{nf_elem}, Int, Ref{AnticNumberField}),
               a, b, a.parent)
    return Bool(b)
 end
 
 function ==(a::nf_elem, b::UInt)
-   b = ccall((:nf_elem_equal_ui, libantic), Cint,
+   b = ccall((:nf_elem_equal_ui, libflint), Cint,
              (Ref{nf_elem}, UInt, Ref{AnticNumberField}),
               a, b, a.parent)
    return Bool(b)
@@ -578,7 +578,7 @@ Return $a^{-1}$. Requires $a \neq 0$.
 function inv(a::nf_elem)
    iszero(a) && throw(DivideError())
    r = a.parent()
-   ccall((:nf_elem_inv, libantic), Nothing,
+   ccall((:nf_elem_inv, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{AnticNumberField}),
          r, a, a.parent)
    return r
@@ -595,7 +595,7 @@ function divexact(a::nf_elem, b::nf_elem; check::Bool=true)
    parent(a) == parent(b) || return force_op(divexact, a, b)::nf_elem
    check_parent(a, b)
    r = a.parent()
-   ccall((:nf_elem_div, libantic), Nothing,
+   ccall((:nf_elem_div, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{nf_elem}, Ref{AnticNumberField}),
          r, a, b, a.parent)
    return r
@@ -610,7 +610,7 @@ end
 function divexact(a::nf_elem, b::Int; check::Bool=true)
    b == 0 && throw(DivideError())
    r = a.parent()
-   ccall((:nf_elem_scalar_div_si, libantic), Nothing,
+   ccall((:nf_elem_scalar_div_si, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Int, Ref{AnticNumberField}),
          r, a, b, a.parent)
    return r
@@ -619,7 +619,7 @@ end
 function divexact(a::nf_elem, b::ZZRingElem; check::Bool=true)
    iszero(b) && throw(DivideError())
    r = a.parent()
-   ccall((:nf_elem_scalar_div_fmpz, libantic), Nothing,
+   ccall((:nf_elem_scalar_div_fmpz, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{ZZRingElem}, Ref{AnticNumberField}),
          r, a, b, a.parent)
    return r
@@ -630,7 +630,7 @@ divexact(a::nf_elem, b::Integer; check::Bool=true) = divexact(a, ZZRingElem(b); 
 function divexact(a::nf_elem, b::QQFieldElem; check::Bool=true)
    iszero(b) && throw(DivideError())
    r = a.parent()
-   ccall((:nf_elem_scalar_div_fmpq, libantic), Nothing,
+   ccall((:nf_elem_scalar_div_fmpq, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{QQFieldElem}, Ref{AnticNumberField}),
          r, a, b, a.parent)
    return r
@@ -678,7 +678,7 @@ Return the absolute norm of $a$. The result will be a rational number.
 """
 function norm(a::nf_elem)
    z = QQFieldElem()
-   ccall((:nf_elem_norm, libantic), Nothing,
+   ccall((:nf_elem_norm, libflint), Nothing,
          (Ref{QQFieldElem}, Ref{nf_elem}, Ref{AnticNumberField}),
          z, a, a.parent)
    return z
@@ -691,7 +691,7 @@ Return the absolute trace of $a$. The result will be a rational number.
 """
 function tr(a::nf_elem)
    z = QQFieldElem()
-   ccall((:nf_elem_trace, libantic), Nothing,
+   ccall((:nf_elem_trace, libflint), Nothing,
          (Ref{QQFieldElem}, Ref{nf_elem}, Ref{AnticNumberField}),
          z, a, a.parent)
    return z
@@ -707,7 +707,7 @@ The matrix is of type QQMatrix.
 function representation_matrix(a::nf_elem)
   K = parent(a)
   z = QQMatrix(degree(K), degree(K))
-  ccall((:nf_elem_rep_mat, libantic), Nothing,
+  ccall((:nf_elem_rep_mat, libflint), Nothing,
         (Ref{QQMatrix}, Ref{nf_elem}, Ref{AnticNumberField}), z, a, K)
   return z
 end
@@ -724,7 +724,7 @@ function representation_matrix_q(a::nf_elem)
   K = parent(a)
   z = ZZMatrix(degree(K), degree(K))
   d = ZZRingElem()
-  ccall((:nf_elem_rep_mat_fmpz_mat_den, libantic), Nothing,
+  ccall((:nf_elem_rep_mat_fmpz_mat_den, libflint), Nothing,
         (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{nf_elem}, Ref{AnticNumberField}),
         z, d, a, K)
   return z, d
@@ -737,13 +737,13 @@ end
 ###############################################################################
 
 function zero!(a::nf_elem)
-   ccall((:nf_elem_zero, libantic), Nothing,
+   ccall((:nf_elem_zero, libflint), Nothing,
          (Ref{nf_elem}, Ref{AnticNumberField}), a, parent(a))
    return a
 end
 
 function mul!(z::nf_elem, x::nf_elem, y::nf_elem)
-   ccall((:nf_elem_mul, libantic), Nothing,
+   ccall((:nf_elem_mul, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{nf_elem}, Ref{AnticNumberField}),
                                                   z, x, y, parent(x))
    return z
@@ -759,21 +759,21 @@ for performance reasons as it saves allocating a new object for the result and
 eliminates associated garbage collection.
 """
 function mul_red!(z::nf_elem, x::nf_elem, y::nf_elem, red::Bool)
-   ccall((:nf_elem_mul_red, libantic), Nothing,
+   ccall((:nf_elem_mul_red, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{nf_elem}, Ref{AnticNumberField}, Cint),
                                                 z, x, y, parent(x), red)
    return z
 end
 
 function addeq!(z::nf_elem, x::nf_elem)
-   ccall((:nf_elem_add, libantic), Nothing,
+   ccall((:nf_elem_add, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{nf_elem}, Ref{AnticNumberField}),
                                                   z, z, x, parent(x))
    return z
 end
 
 function add!(a::nf_elem, b::nf_elem, c::nf_elem)
-   ccall((:nf_elem_add, libantic), Nothing,
+   ccall((:nf_elem_add, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{nf_elem}, Ref{AnticNumberField}),
          a, b, c, a.parent)
   return a
@@ -788,7 +788,7 @@ where reduction has not been performed. All standard Nemo number field
 functions automatically reduce their outputs.
 """
 function reduce!(x::nf_elem)
-   ccall((:nf_elem_reduce, libantic), Nothing,
+   ccall((:nf_elem_reduce, libflint), Nothing,
          (Ref{nf_elem}, Ref{AnticNumberField}), x, parent(x))
    return x
 end
@@ -800,21 +800,21 @@ end
 ###############################################################################
 
 function add!(c::nf_elem, a::nf_elem, b::QQFieldElem)
-   ccall((:nf_elem_add_fmpq, libantic), Nothing,
+   ccall((:nf_elem_add_fmpq, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{QQFieldElem}, Ref{AnticNumberField}),
          c, a, b, a.parent)
    return c
 end
 
 function add!(c::nf_elem, a::nf_elem, b::ZZRingElem)
-   ccall((:nf_elem_add_fmpz, libantic), Nothing,
+   ccall((:nf_elem_add_fmpz, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{ZZRingElem}, Ref{AnticNumberField}),
          c, a, b, a.parent)
    return c
 end
 
 function add!(c::nf_elem, a::nf_elem, b::Int)
-   ccall((:nf_elem_add_si, libantic), Nothing,
+   ccall((:nf_elem_add_si, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Int, Ref{AnticNumberField}),
          c, a, b, a.parent)
    return c
@@ -823,21 +823,21 @@ end
 add!(c::nf_elem, a::nf_elem, b::Integer) = add!(c, a, ZZRingElem(b))
 
 function sub!(c::nf_elem, a::nf_elem, b::QQFieldElem)
-   ccall((:nf_elem_sub_fmpq, libantic), Nothing,
+   ccall((:nf_elem_sub_fmpq, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{QQFieldElem}, Ref{AnticNumberField}),
          c, a, b, a.parent)
    return c
 end
 
 function sub!(c::nf_elem, a::nf_elem, b::ZZRingElem)
-   ccall((:nf_elem_sub_fmpz, libantic), Nothing,
+   ccall((:nf_elem_sub_fmpz, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{ZZRingElem}, Ref{AnticNumberField}),
          c, a, b, a.parent)
    return c
 end
 
 function sub!(c::nf_elem, a::nf_elem, b::Int)
-   ccall((:nf_elem_sub_si, libantic), Nothing,
+   ccall((:nf_elem_sub_si, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Int, Ref{AnticNumberField}),
          c, a, b, a.parent)
    return c
@@ -846,21 +846,21 @@ end
 sub!(c::nf_elem, a::nf_elem, b::Integer) = sub!(c, a, ZZRingElem(b))
 
 function sub!(c::nf_elem, a::QQFieldElem, b::nf_elem)
-   ccall((:nf_elem_fmpq_sub, libantic), Nothing,
+   ccall((:nf_elem_fmpq_sub, libflint), Nothing,
          (Ref{nf_elem}, Ref{QQFieldElem}, Ref{nf_elem}, Ref{AnticNumberField}),
          c, a, b, a.parent)
    return c
 end
 
 function sub!(c::nf_elem, a::ZZRingElem, b::nf_elem)
-   ccall((:nf_elem_fmpz_sub, libantic), Nothing,
+   ccall((:nf_elem_fmpz_sub, libflint), Nothing,
          (Ref{nf_elem}, Ref{ZZRingElem}, Ref{nf_elem}, Ref{AnticNumberField}),
          c, a, b, a.parent)
    return c
 end
 
 function sub!(c::nf_elem, a::Int, b::nf_elem)
-   ccall((:nf_elem_si_sub, libantic), Nothing,
+   ccall((:nf_elem_si_sub, libflint), Nothing,
          (Ref{nf_elem}, Int, Ref{nf_elem}, Ref{AnticNumberField}),
          c, a, b, b.parent)
    return c
@@ -869,21 +869,21 @@ end
 sub!(c::nf_elem, a::Integer, b::nf_elem) = sub!(c, ZZRingElem(a), b)
 
 function mul!(c::nf_elem, a::nf_elem, b::QQFieldElem)
-   ccall((:nf_elem_scalar_mul_fmpq, libantic), Nothing,
+   ccall((:nf_elem_scalar_mul_fmpq, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{QQFieldElem}, Ref{AnticNumberField}),
          c, a, b, a.parent)
    return c
 end
 
 function mul!(c::nf_elem, a::nf_elem, b::ZZRingElem)
-   ccall((:nf_elem_scalar_mul_fmpz, libantic), Nothing,
+   ccall((:nf_elem_scalar_mul_fmpz, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Ref{ZZRingElem}, Ref{AnticNumberField}),
          c, a, b, a.parent)
    return c
 end
 
 function mul!(c::nf_elem, a::nf_elem, b::Int)
-   ccall((:nf_elem_scalar_mul_si, libantic), Nothing,
+   ccall((:nf_elem_scalar_mul_si, libflint), Nothing,
          (Ref{nf_elem}, Ref{nf_elem}, Int, Ref{AnticNumberField}),
          c, a, b, a.parent)
    return c
@@ -1079,7 +1079,7 @@ Return an empty (0) element.
 """
 function (a::AnticNumberField)()
    z = nf_elem(a)
-   ccall((:nf_elem_set_si, libantic), Nothing,
+   ccall((:nf_elem_set_si, libflint), Nothing,
          (Ref{nf_elem}, Int, Ref{AnticNumberField}), z, 0, a)
    return z
 end
@@ -1091,7 +1091,7 @@ Return $c$ as an element in $a$.
 """
 function (a::AnticNumberField)(c::Int)
    z = nf_elem(a)
-   ccall((:nf_elem_set_si, libantic), Nothing,
+   ccall((:nf_elem_set_si, libflint), Nothing,
          (Ref{nf_elem}, Int, Ref{AnticNumberField}), z, c, a)
    return z
 end
@@ -1100,14 +1100,14 @@ end
 
 function (a::AnticNumberField)(c::ZZRingElem)
    z = nf_elem(a)
-   ccall((:nf_elem_set_fmpz, libantic), Nothing,
+   ccall((:nf_elem_set_fmpz, libflint), Nothing,
          (Ref{nf_elem}, Ref{ZZRingElem}, Ref{AnticNumberField}), z, c, a)
    return z
 end
 
 function (a::AnticNumberField)(c::QQFieldElem)
    z = nf_elem(a)
-   ccall((:nf_elem_set_fmpq, libantic), Nothing,
+   ccall((:nf_elem_set_fmpq, libflint), Nothing,
          (Ref{nf_elem}, Ref{QQFieldElem}, Ref{AnticNumberField}), z, c, a)
    return z
 end
@@ -1125,7 +1125,7 @@ function (a::AnticNumberField)(pol::QQPolyRingElem)
    if length(pol) >= length(a.pol)
       pol = mod(pol, a.pol)
    end
-   ccall((:nf_elem_set_fmpq_poly, libantic), Nothing,
+   ccall((:nf_elem_set_fmpq_poly, libflint), Nothing,
          (Ref{nf_elem}, Ref{QQPolyRingElem}, Ref{AnticNumberField}), z, pol, a)
    return z
 end
@@ -1133,7 +1133,7 @@ end
 function (a::QQPolyRing)(b::nf_elem)
    parent(parent(b).pol) != a && error("Cannot coerce from number field to polynomial ring")
    r = a()
-   ccall((:nf_elem_get_fmpq_poly, libantic), Nothing,
+   ccall((:nf_elem_get_fmpq_poly, libflint), Nothing,
          (Ref{QQPolyRingElem}, Ref{nf_elem}, Ref{AnticNumberField}), r, b, parent(b))
    return r
 end

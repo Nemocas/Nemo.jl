@@ -2,7 +2,7 @@ function acb_calc_func_wrap(res::Ptr{ComplexFieldElem}, x::Ptr{ComplexFieldElem}
     xx = unsafe_load(x)
     F = unsafe_pointer_to_objref(param)
     w = F(xx)
-    ccall((:acb_set, libarb), Ptr{Nothing}, (Ptr{ComplexFieldElem}, Ref{ComplexFieldElem}), res, w)
+    ccall((:acb_set, libflint), Ptr{Nothing}, (Ptr{ComplexFieldElem}, Ref{ComplexFieldElem}), res, w)
     return zero(Cint)
 end
 
@@ -37,10 +37,10 @@ function integrate(C::ComplexField, F, a, b;
    end
 
    ctol = mag_struct(0, 0)
-   ccall((:mag_init, libarb), Nothing, (Ref{mag_struct},), ctol)
+   ccall((:mag_init, libflint), Nothing, (Ref{mag_struct},), ctol)
 
    if abs_tol === -1.0
-      ccall((:mag_set_ui_2exp_si, libarb), Nothing, (Ref{mag_struct}, UInt, Int), ctol, 1, -precision(Balls))
+      ccall((:mag_set_ui_2exp_si, libflint), Nothing, (Ref{mag_struct}, UInt, Int), ctol, 1, -precision(Balls))
    else
       t = BigFloat(abs_tol, RoundDown)
       expo = Ref{Clong}()
@@ -48,14 +48,14 @@ function integrate(C::ComplexField, F, a, b;
                 (Ref{Clong}, Ref{BigFloat}, Cint),
                 expo, t,
                 Base.convert(Base.MPFR.MPFRRoundingMode, RoundDown))
-      ccall((:mag_set_d, libarb), Nothing, (Ref{mag_struct}, Float64), ctol, d)
-      ccall((:mag_mul_2exp_si, libarb), Nothing,
+      ccall((:mag_set_d, libflint), Nothing, (Ref{mag_struct}, Float64), ctol, d)
+      ccall((:mag_mul_2exp_si, libflint), Nothing,
             (Ref{mag_struct}, Ref{mag_struct}, Int), ctol, ctol, Int(expo[]))
    end
 
    res = C()
 
-   status = ccall((:acb_calc_integrate, libarb), UInt,
+   status = ccall((:acb_calc_integrate, libflint), UInt,
                   (Ref{ComplexFieldElem},                       #res
                    Ptr{Nothing},                      #func
                    Any,                            #params
@@ -67,7 +67,7 @@ function integrate(C::ComplexField, F, a, b;
                    Int),
       res, acb_calc_func_wrap_c(), F, lower, upper, cgoal, ctol, opts, precision(Balls))
 
-   ccall((:mag_clear, libarb), Nothing, (Ref{mag_struct},), ctol)
+   ccall((:mag_clear, libflint), Nothing, (Ref{mag_struct},), ctol)
 
    if status == ARB_CALC_SUCCESS
       nothing

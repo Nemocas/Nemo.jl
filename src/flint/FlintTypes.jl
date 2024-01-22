@@ -2210,7 +2210,6 @@ A finite field. Implemented as $\mathbb F_p[t]/f$ for the prime $p$ being an [`I
 See [`FqPolyRepField`](@ref) for $p$ being a [`ZZRingElem`](@ref). See [`fqPolyRepFieldElem`](@ref) for elements.
 """
 @attributes mutable struct fqPolyRepField <: FinField
-   p :: Int
    n :: Int
    ninv :: Int
    norm :: Int
@@ -2237,17 +2236,21 @@ See [`FqPolyRepField`](@ref) for $p$ being a [`ZZRingElem`](@ref). See [`fqPolyR
    overfields :: Dict{Int, Vector{FinFieldMorphism}}
    subfields :: Dict{Int, Vector{FinFieldMorphism}}
 
-   function fqPolyRepField(c::ZZRingElem, deg::Int, s::Symbol, cached::Bool = true; check::Bool = true)
+   function fqPolyRepField(c::UInt, deg::Int, s::Symbol, cached::Bool = true; check::Bool = true)
       check && !is_prime(c) &&
          throw(DomainError(c, "the characteristic must be a prime"))
       return get_cached!(FqNmodFiniteFieldID, (c, deg, s), cached) do
          d = new()
-         ccall((:fq_nmod_ctx_init, libflint), Nothing,
-               (Ref{fqPolyRepField}, Ref{ZZRingElem}, Int, Ptr{UInt8}),
-			    d, c, deg, string(s))
+         ccall((:fq_nmod_ctx_init_ui, libflint), Nothing,
+               (Ref{fqPolyRepField}, UInt, Int, Ptr{UInt8}),
+               d, c, deg, string(s))
          finalizer(_FqNmodFiniteField_clear_fn, d)
          return d
       end
+   end
+
+   function fqPolyRepField(c::T, deg::Int, s::Symbol, cached::Bool = true; check::Bool = true) where T <: Union{Int, ZZRingElem}
+       return fqPolyRepField(UInt(c), deg, s, cached, check = check)
    end
 
    function fqPolyRepField(f::zzModPolyRingElem, s::Symbol, cached::Bool = true; check::Bool = true)
@@ -2277,7 +2280,7 @@ See [`FqPolyRepField`](@ref) for $p$ being a [`ZZRingElem`](@ref). See [`fqPolyR
 
 end
 
-const FqNmodFiniteFieldID = CacheDictType{Tuple{ZZRingElem, Int, Symbol}, fqPolyRepField}()
+const FqNmodFiniteFieldID = CacheDictType{Tuple{UInt, Int, Symbol}, fqPolyRepField}()
 
 const FqNmodFiniteFieldIDNmodPol = CacheDictType{Tuple{zzModPolyRing, zzModPolyRingElem, Symbol},
                                     fqPolyRepField}()
@@ -2612,152 +2615,77 @@ end
 #
 ###############################################################################
 
-if NEW_FLINT
-  @doc raw"""
-      FqPolyRepField <: FinField
+@doc raw"""
+    FqPolyRepField <: FinField
 
-  A finite field. Implemented as $\mathbb F_p[t]/f$ for the prime $p$ being a [`ZZRingElem`](@ref).
-  See [`fqPolyRepField`](@ref) for $p$ being an [`Int`](@ref). See [`FqPolyRepFieldElem`](@ref) for elements.
-  """
-  @attributes mutable struct FqPolyRepField <: FinField
-     p::Int # fmpz_t
-     add_fxn::Ptr{Nothing}
-     sub_fxn::Ptr{Nothing}
-     mul_fxn::Ptr{Nothing}
-     n2::UInt
-     ninv::UInt
-     norm::UInt
-     n_limbs::Tuple{UInt, UInt, UInt}
-     ninv_limbs::Tuple{UInt, UInt, UInt}
-     ninv_huge::Ptr{Nothing} # fmpz_preinvn_struct
+A finite field. Implemented as $\mathbb F_p[t]/f$ for the prime $p$ being a [`ZZRingElem`](@ref).
+See [`fqPolyRepField`](@ref) for $p$ being an [`Int`](@ref). See [`FqPolyRepFieldElem`](@ref) for elements.
+"""
+@attributes mutable struct FqPolyRepField <: FinField
+   p::Int # fmpz_t
+   add_fxn::Ptr{Nothing}
+   sub_fxn::Ptr{Nothing}
+   mul_fxn::Ptr{Nothing}
+   n2::UInt
+   ninv::UInt
+   norm::UInt
+   n_limbs::Tuple{UInt, UInt, UInt}
+   ninv_limbs::Tuple{UInt, UInt, UInt}
+   ninv_huge::Ptr{Nothing} # fmpz_preinvn_struct
 
-     sparse_modulus :: Cint
-     is_conway :: Cint
-     a::Ptr{Nothing}
-     j::Ptr{Nothing}
-     len::Int
-     mod_coeffs::Ptr{Nothing}
-     mod_alloc::Int
-     mod_length::Int
-     inv_coeffs::Ptr{Nothing}
-     inv_alloc::Int
-     inv_length::Int
-     var::Ptr{Nothing}
-     # end of flint struct
+   sparse_modulus :: Cint
+   is_conway :: Cint
+   a::Ptr{Nothing}
+   j::Ptr{Nothing}
+   len::Int
+   mod_coeffs::Ptr{Nothing}
+   mod_alloc::Int
+   mod_length::Int
+   inv_coeffs::Ptr{Nothing}
+   inv_alloc::Int
+   inv_length::Int
+   var::Ptr{Nothing}
+   # end of flint struct
 
-     overfields :: Dict{Int, Vector{FinFieldMorphism}}
-     subfields :: Dict{Int, Vector{FinFieldMorphism}}
+   overfields :: Dict{Int, Vector{FinFieldMorphism}}
+   subfields :: Dict{Int, Vector{FinFieldMorphism}}
 
-     function FqPolyRepField(char::ZZRingElem, deg::Int, s::Symbol, cached::Bool = true; check::Bool = true)
-        check && !is_probable_prime(char) &&
-          throw(DomainError(char, "the characteristic must be a prime"))
-        return get_cached!(FqFiniteFieldID, (char, deg, s), cached) do
-           d = new()
-           finalizer(_FqFiniteField_clear_fn, d)
-           ccall((:fq_ctx_init, libflint), Nothing,
-                 (Ref{FqPolyRepField}, Ref{ZZRingElem}, Int, Ptr{UInt8}),
-                    d, char, deg, string(s))
-           return d
-        end
-     end
+   function FqPolyRepField(char::ZZRingElem, deg::Int, s::Symbol, cached::Bool = true; check::Bool = true)
+      check && !is_probable_prime(char) &&
+        throw(DomainError(char, "the characteristic must be a prime"))
+      return get_cached!(FqFiniteFieldID, (char, deg, s), cached) do
+         d = new()
+         finalizer(_FqFiniteField_clear_fn, d)
+         ccall((:fq_ctx_init, libflint), Nothing,
+               (Ref{FqPolyRepField}, Ref{ZZRingElem}, Int, Ptr{UInt8}),
+                  d, char, deg, string(s))
+         return d
+      end
+   end
 
-     function FqPolyRepField(f::ZZModPolyRingElem, s::Symbol, cached::Bool = true; check::Bool = true)
-        check && !is_probable_prime(modulus(f)) &&
-           throw(DomainError(base_ring(f), "the base ring of the polynomial must be a field"))
-        return get_cached!(FqFiniteFieldIDFmpzPol, (f, s), cached) do
-           z = new()
-           ccall((:fq_ctx_init_modulus, libflint), Nothing,
-                 (Ref{FqPolyRepField}, Ref{ZZModPolyRingElem}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
-                    z, f, base_ring(parent(f)).ninv, string(s))
-           finalizer(_FqFiniteField_clear_fn, z)
-           return z
-        end
-     end
+   function FqPolyRepField(f::ZZModPolyRingElem, s::Symbol, cached::Bool = true; check::Bool = true)
+      check && !is_probable_prime(modulus(f)) &&
+         throw(DomainError(base_ring(f), "the base ring of the polynomial must be a field"))
+      return get_cached!(FqFiniteFieldIDFmpzPol, (f, s), cached) do
+         z = new()
+         ccall((:fq_ctx_init_modulus, libflint), Nothing,
+               (Ref{FqPolyRepField}, Ref{ZZModPolyRingElem}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
+                  z, f, base_ring(parent(f)).ninv, string(s))
+         finalizer(_FqFiniteField_clear_fn, z)
+         return z
+      end
+   end
 
-     function FqPolyRepField(f::FpPolyRingElem, s::Symbol, cached::Bool = true; check::Bool = true)
-        # check ignored
-        return get_cached!(FqFiniteFieldIDGFPPol, (f, s), cached) do
-           z = new()
-           ccall((:fq_ctx_init_modulus, libflint), Nothing,
-                 (Ref{FqPolyRepField}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
-                    z, f, base_ring(parent(f)).ninv, string(s))
-           finalizer(_FqFiniteField_clear_fn, z)
-           return z
-        end
-     end
-  end
-else
-  @doc raw"""
-      FqPolyRepField <: FinField
-
-  A finite field. Implemented as $\mathbb F_p[t]/f$ for the prime $p$ being a [`ZZRingElem`](@ref).
-  See [`fqPolyRepField`](@ref) for $p$ being an [`Int`](@ref). See [`FqPolyRepFieldElem`](@ref) for elements.
-  """
-  @attributes mutable struct FqPolyRepField <: FinField
-     p::Int # fmpz_t
-     add_fxn::Ptr{Nothing}
-     sub_fxn::Ptr{Nothing}
-     mul_fxn::Ptr{Nothing}
-     n2::UInt
-     ninv::UInt
-     norm::UInt
-     n_limbs::Tuple{UInt, UInt, UInt}
-     ninv_limbs::Tuple{UInt, UInt, UInt}
-
-     sparse_modulus :: Cint
-     is_conway :: Cint
-     a::Ptr{Nothing}
-     j::Ptr{Nothing}
-     len::Int
-     mod_coeffs::Ptr{Nothing}
-     mod_alloc::Int
-     mod_length::Int
-     inv_coeffs::Ptr{Nothing}
-     inv_alloc::Int
-     inv_length::Int
-     var::Ptr{Nothing}
-     # end of flint struct
-
-     overfields :: Dict{Int, Vector{FinFieldMorphism}}
-     subfields :: Dict{Int, Vector{FinFieldMorphism}}
-
-     function FqPolyRepField(char::ZZRingElem, deg::Int, s::Symbol, cached::Bool = true; check::Bool = true)
-        check && !is_probable_prime(char) &&
-          throw(DomainError(char, "the characteristic must be a prime"))
-        return get_cached!(FqFiniteFieldID, (char, deg, s), cached) do
-           d = new()
-           finalizer(_FqFiniteField_clear_fn, d)
-           ccall((:fq_ctx_init, libflint), Nothing,
-                 (Ref{FqPolyRepField}, Ref{ZZRingElem}, Int, Ptr{UInt8}),
-                    d, char, deg, string(s))
-           return d
-        end
-     end
-
-     function FqPolyRepField(f::ZZModPolyRingElem, s::Symbol, cached::Bool = true; check::Bool = true)
-        check && !is_probable_prime(modulus(f)) &&
-           throw(DomainError(base_ring(f), "the base ring of the polynomial must be a field"))
-        return get_cached!(FqFiniteFieldIDFmpzPol, (f, s), cached) do
-           z = new()
-           ccall((:fq_ctx_init_modulus, libflint), Nothing,
-                 (Ref{FqPolyRepField}, Ref{ZZModPolyRingElem}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
-                    z, f, base_ring(parent(f)).ninv, string(s))
-           finalizer(_FqFiniteField_clear_fn, z)
-           return z
-        end
-     end
-
-     function FqPolyRepField(f::FpPolyRingElem, s::Symbol, cached::Bool = true; check::Bool = true)
-        # check ignored
-        return get_cached!(FqFiniteFieldIDGFPPol, (f, s), cached) do
-           z = new()
-           ccall((:fq_ctx_init_modulus, libflint), Nothing,
-                 (Ref{FqPolyRepField}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
-                    z, f, base_ring(parent(f)).ninv, string(s))
-           finalizer(_FqFiniteField_clear_fn, z)
-           return z
-        end
-     end
+   function FqPolyRepField(f::FpPolyRingElem, s::Symbol, cached::Bool = true; check::Bool = true)
+      # check ignored
+      return get_cached!(FqFiniteFieldIDGFPPol, (f, s), cached) do
+         z = new()
+         ccall((:fq_ctx_init_modulus, libflint), Nothing,
+               (Ref{FqPolyRepField}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
+                  z, f, base_ring(parent(f)).ninv, string(s))
+         finalizer(_FqFiniteField_clear_fn, z)
+         return z
+      end
    end
 end
 

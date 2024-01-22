@@ -916,7 +916,7 @@ julia> d = bernoulli(12)
 function bernoulli(n::Int)
    n < 0 && throw(DomainError(n, "Index must be non-negative"))
    c = QQFieldElem()
-   ccall((:bernoulli_fmpq_ui, libarb), Nothing, (Ref{QQFieldElem}, Int), c, n)
+   ccall((:bernoulli_fmpq_ui, libflint), Nothing, (Ref{QQFieldElem}, Int), c, n)
    return c
 end
 
@@ -942,7 +942,7 @@ julia> e = bernoulli(100)
 function bernoulli_cache(n::Int)
    n = n + 1
    n < 0 && throw(DomainError(n, "Index must be non-negative"))
-   ccall((:bernoulli_cache_compute, libarb), Nothing, (Int,), n)
+   ccall((:bernoulli_cache_compute, libflint), Nothing, (Int,), n)
 end
 
 @doc raw"""
