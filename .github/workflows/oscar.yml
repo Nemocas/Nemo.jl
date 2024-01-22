@@ -9,6 +9,11 @@ on:
       - master
   workflow_dispatch:
 
+# needed to allow julia-actions/cache to delete old caches that it has created
+permissions:
+  actions: write
+  contents: read
+
 concurrency:
   # group by workflow and ref; the last slightly strange component ensures that for pull
   # requests, we limit to 1 concurrent job, but for the master branch we don't
@@ -30,6 +35,7 @@ jobs:
       uses: julia-actions/setup-julia@v1
       with:
         version: '1.10'
+    - uses: julia-actions/cache@v1
     - name: OscarDevTools - CI
       if: github.repository == 'oscar-system/OscarDevTools.jl'
       run: |
@@ -70,6 +76,7 @@ jobs:
         uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.julia-version }}
+      - uses: julia-actions/cache@v1
       - name: re-using OscarDevTools checkout
         if: github.repository == 'oscar-system/OscarDevTools.jl'
         run: |

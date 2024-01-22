@@ -3,6 +3,11 @@ name: Invalidations
 on:
   pull_request:
 
+# needed to allow julia-actions/cache to delete old caches that it has created
+permissions:
+  actions: write
+  contents: read
+
 concurrency:
   # Skip intermediate builds: always.
   # Cancel intermediate builds: always.
@@ -19,6 +24,7 @@ jobs:
     - uses: julia-actions/setup-julia@v1
       with:
         version: '1'
+    - uses: julia-actions/cache@v1
     - uses: actions/checkout@v3
     - uses: julia-actions/julia-buildpkg@v1
     - uses: julia-actions/julia-invalidations@v1
