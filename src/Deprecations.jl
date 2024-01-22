@@ -118,4 +118,5 @@
 
 # Deprecated in 0.39.*
 
-Base.@deprecate_binding divisible is_divisible_by
+@deprecate divisible(x::ZZRingElem, y::Int) is_divisible_by(x, y)
+@deprecate divisible(x::ZZRingElem, y::ZZRingElem) is_divisible_by(x, y)
