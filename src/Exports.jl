@@ -220,7 +220,7 @@ export fmms!
 export fmodpow2
 export QQiFieldElem
 export ZZiRingElem
-export fmpzUnitRange
+export ZZRingElemUnitRange
 export fpAbsPowerSeriesRing
 export FpAbsPowerSeriesRing
 export fpAbsPowerSeriesRingElem

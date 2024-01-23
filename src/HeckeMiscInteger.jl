@@ -331,28 +331,28 @@ end
 # So, we use an AbstractUnitRange here mostly copied from `base/range.jl`.
 # `StepRange`s on the other hand work out of the box thanks to duck typing.
 
-struct fmpzUnitRange <: AbstractUnitRange{ZZRingElem}
+struct ZZRingElemUnitRange <: AbstractUnitRange{ZZRingElem}
     start::ZZRingElem
     stop::ZZRingElem
-    fmpzUnitRange(start, stop) = new(start, fmpz_unitrange_last(start, stop))
+    ZZRingElemUnitRange(start, stop) = new(start, fmpz_unitrange_last(start, stop))
 end
 fmpz_unitrange_last(start::ZZRingElem, stop::ZZRingElem) =
     ifelse(stop >= start, stop, start - one(ZZRingElem))
 
-Base.:(:)(a::ZZRingElem, b::ZZRingElem) = fmpzUnitRange(a, b)
+Base.:(:)(a::ZZRingElem, b::ZZRingElem) = ZZRingElemUnitRange(a, b)
 
-@inline function getindex(r::fmpzUnitRange, i::ZZRingElem)
+@inline function getindex(r::ZZRingElemUnitRange, i::ZZRingElem)
     val = r.start + (i - 1)
     @boundscheck _in_unit_range(r, val) || throw_boundserror(r, i)
     val
 end
-_in_unit_range(r::fmpzUnitRange, val::ZZRingElem) = r.start <= val <= r.stop
+_in_unit_range(r::ZZRingElemUnitRange, val::ZZRingElem) = r.start <= val <= r.stop
 
-show(io::IO, r::fmpzUnitRange) = print(io, repr(first(r)), ':', repr(last(r)))
+show(io::IO, r::ZZRingElemUnitRange) = print(io, repr(first(r)), ':', repr(last(r)))
 
-in(x::IntegerUnion, r::fmpzUnitRange) = first(r) <= x <= last(r)
+in(x::IntegerUnion, r::ZZRingElemUnitRange) = first(r) <= x <= last(r)
 
-mod(i::IntegerUnion, r::fmpzUnitRange) = mod(i - first(r), length(r)) + first(r)
+mod(i::IntegerUnion, r::ZZRingElemUnitRange) = mod(i - first(r), length(r)) + first(r)
 
 Base.:(:)(a::ZZRingElem, b::Integer) = (:)(promote(a, b)...)
 Base.:(:)(a::Integer, b::ZZRingElem) = (:)(promote(a, b)...)
@@ -375,7 +375,7 @@ Base.:(:)(a::Integer, s, b::ZZRingElem) = ((a_, b_) = promote(a, b); a_:s:b_)
 # `Random/src/generation.jl`
 #
 
-function rand(rng::AbstractRNG, a::fmpzUnitRange)
+function rand(rng::AbstractRNG, a::ZZRingElemUnitRange)
     m = Base.last(a) - Base.first(a)
     m < 0 && error("range empty")
     nd = ndigits(m, 2)
