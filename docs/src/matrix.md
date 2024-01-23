@@ -276,7 +276,7 @@ Nemo provides LLL lattice basis reduction. Optionally one can specify the setup
 using a context object created by the following function.
 
 ```
-lll_ctx(delta::Float64, eta::Float64, rep=:zbasis, gram=:approx)
+LLLContext(delta::Float64, eta::Float64, rep=:zbasis, gram=:approx)
 ```
 
 Return a LLL context object specifying LLL parameters $\delta$ and $\eta$ and
@@ -284,35 +284,35 @@ specifying the representation as either `:zbasis` or `:gram` and the Gram type
 as either `:approx` or `:exact`.
 
 ```@docs
-lll(::ZZMatrix, ::lll_ctx)
+lll(::ZZMatrix, ::LLLContext)
 ```
 
 ```@docs
-lll_with_transform(::ZZMatrix, ::lll_ctx)
+lll_with_transform(::ZZMatrix, ::LLLContext)
 ```
 
 ```@docs
-lll_gram(::ZZMatrix, ::lll_ctx)
+lll_gram(::ZZMatrix, ::LLLContext)
 ```
 
 ```@docs
-lll_gram_with_transform(::ZZMatrix, ::lll_ctx)
+lll_gram_with_transform(::ZZMatrix, ::LLLContext)
 ```
 
 ```@docs
-lll_with_removal(::ZZMatrix, ::ZZRingElem, ::lll_ctx)
+lll_with_removal(::ZZMatrix, ::ZZRingElem, ::LLLContext)
 ```
 
 ```@docs
-lll_with_removal_transform(::ZZMatrix, ::ZZRingElem, ::lll_ctx)
+lll_with_removal_transform(::ZZMatrix, ::ZZRingElem, ::LLLContext)
 ```
 
 ```@docs
-lll!(::ZZMatrix, ::lll_ctx)
+lll!(::ZZMatrix, ::LLLContext)
 ```
 
 ```@docs
-lll_gram!(::ZZMatrix, ::lll_ctx)
+lll_gram!(::ZZMatrix, ::LLLContext)
 ```
 
 **Examples**
@@ -322,7 +322,7 @@ S = matrix_space(ZZ, 3, 3)
 
 A = S([ZZ(2) 3 5; 1 4 7; 19 3 7])
 
-L = lll(A, lll_ctx(0.95, 0.55, :zbasis, :approx)
+L = lll(A, LLLContext(0.95, 0.55, :zbasis, :approx)
 L, T = lll_with_transform(A)
 
 G == lll_gram(gram(A))

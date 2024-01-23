@@ -412,7 +412,7 @@ export lift!
 export Limbs
 export lindep
 export lll
-export lll_ctx
+export LLLContext
 export lll_gram
 export lll_gram_with_transform
 export lll_gram!
