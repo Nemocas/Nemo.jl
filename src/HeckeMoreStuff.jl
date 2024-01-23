@@ -1167,7 +1167,7 @@ end
 function Base.setprecision(q::padic, N::Int)
     r = parent(q)()
     r.N = N
-    ccall((:padic_set, libflint), Nothing, (Ref{padic}, Ref{padic}, Ref{FlintPadicField}), r, q, parent(q))
+    ccall((:padic_set, libflint), Nothing, (Ref{padic}, Ref{padic}, Ref{PadicField}), r, q, parent(q))
     return r
 end
 
@@ -1185,7 +1185,7 @@ function setprecision!(Q::FlintQadicField, n::Int)
     Q.prec_max = n
 end
 
-function setprecision!(Q::FlintPadicField, n::Int)
+function setprecision!(Q::PadicField, n::Int)
     Q.prec_max = n
 end
 
@@ -1245,7 +1245,7 @@ function (Rx::Generic.PolyRing{padic})(a::qadic)
 end
 
 function coeff(x::qadic, i::Int)
-    R = FlintPadicField(prime(parent(x)), parent(x).prec_max)
+    R = PadicField(prime(parent(x)), parent(x).prec_max)
     c = R()
     ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
         (Ref{padic}, Ref{qadic}, Int, Ref{FlintQadicField}), c, x, i, parent(x))
@@ -1262,19 +1262,19 @@ function setcoeff!(x::qadic, i::Int, y::UInt)
 end
 
 function setcoeff!(x::qadic, i::Int, y::ZZRingElem)
-    R = FlintPadicField(prime(parent(x)), parent(x).prec_max)
+    R = PadicField(prime(parent(x)), parent(x).prec_max)
     Y = R(ZZRingElem(y))
     ccall((:padic_poly_set_coeff_padic, libflint), Nothing,
         (Ref{qadic}, Int, Ref{padic}, Ref{FlintQadicField}), x, i, Y, parent(x))
 end
 
 function coefficient_ring(Q::FlintQadicField)
-    return FlintPadicField(prime(Q), precision(Q))
+    return PadicField(prime(Q), precision(Q))
 end
 
-function prime(R::FlintPadicField, i::Int)
+function prime(R::PadicField, i::Int)
     p = ZZRingElem()
-    ccall((:padic_ctx_pow_ui, libflint), Nothing, (Ref{ZZRingElem}, Int, Ref{FlintPadicField}), p, i, R)
+    ccall((:padic_ctx_pow_ui, libflint), Nothing, (Ref{ZZRingElem}, Int, Ref{PadicField}), p, i, R)
     return p
 end
 
@@ -1282,7 +1282,7 @@ function *(A::ZZMatrix, B::MatElem{padic})
     return matrix(base_ring(B), A) * B
 end
 
-Base.precision(Q::FlintPadicField) = Q.prec_max
+Base.precision(Q::PadicField) = Q.prec_max
 Base.precision(Q::FlintQadicField) = Q.prec_max
 
 ^(a::qadic, b::qadic) = exp(b * log(a))
@@ -1305,7 +1305,7 @@ function lift(a::padic)
     if iszero(a)
         return ZZ(0)
     end
-    ccall((:padic_get_fmpz, libflint), Nothing, (Ref{ZZRingElem}, Ref{padic}, Ref{FlintPadicField}), b, a, R)
+    ccall((:padic_get_fmpz, libflint), Nothing, (Ref{ZZRingElem}, Ref{padic}, Ref{PadicField}), b, a, R)
     return b
 end
 
@@ -1352,13 +1352,13 @@ function root(a::FinFieldElem, n::Integer)
     return r[1]
 end
 
-prime_field(k::FlintPadicField) = k
+prime_field(k::PadicField) = k
 
 function base_field(K::fqPolyRepField)
     return Native.GF(Int(characteristic(K)))
 end
 
-function gens(k::FlintPadicField, K::FlintPadicField)
+function gens(k::PadicField, K::PadicField)
     return [k(1)]
 end
 
@@ -1375,7 +1375,7 @@ function norm(f::PolyRingElem{padic})
     return f
 end
 
-degree(::FlintPadicField) = 1
+degree(::PadicField) = 1
 
 
 @doc raw"""
@@ -1752,7 +1752,7 @@ function Base.setprecision(f::Generic.Poly{qadic}, N::Int)
     return g
 end
 
-function Base.setprecision(f::Function, K::Union{FlintPadicField,FlintQadicField}, n::Int)
+function Base.setprecision(f::Function, K::Union{PadicField,FlintQadicField}, n::Int)
     old = precision(K)
     #  @assert n>=0
     setprecision!(K, n)

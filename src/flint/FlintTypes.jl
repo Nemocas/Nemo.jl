@@ -3097,18 +3097,18 @@ const NALocalFieldElem = NonArchLocalFieldElem
 
 ###############################################################################
 #
-#   FlintPadicField / padic
+#   PadicField / padic
 #
 ###############################################################################
 
 const flint_padic_printing_mode = [:terse, :series, :val_unit]
 
 @doc raw"""
-    FlintPadicField <: FlintLocalField <: NonArchLocalField <: Field
+    PadicField <: FlintLocalField <: NonArchLocalField <: Field
 
 A $p$-adic field for some prime $p$.
 """
-mutable struct FlintPadicField <: FlintLocalField
+mutable struct PadicField <: FlintLocalField
    p::Int
    pinv::Float64
    pow::Ptr{Nothing}
@@ -3117,13 +3117,13 @@ mutable struct FlintPadicField <: FlintLocalField
    mode::Cint
    prec_max::Int
 
-   function FlintPadicField(p::ZZRingElem, prec::Int; cached::Bool = true, check::Bool = true)
+   function PadicField(p::ZZRingElem, prec::Int; cached::Bool = true, check::Bool = true)
       check && !is_probable_prime(p) && throw(DomainError(p, "Characteristic must be prime"))
 
       return get_cached!(PadicBase, (p, prec), cached) do
          d = new()
          ccall((:padic_ctx_init, libflint), Nothing,
-               (Ref{FlintPadicField}, Ref{ZZRingElem}, Int, Int, Cint),
+               (Ref{PadicField}, Ref{ZZRingElem}, Int, Int, Cint),
                d, p, 0, 0, 0)
          finalizer(_padic_ctx_clear_fn, d)
          d.prec_max = prec
@@ -3132,22 +3132,22 @@ mutable struct FlintPadicField <: FlintLocalField
    end
 end
 
-const PadicBase = CacheDictType{Tuple{ZZRingElem, Int}, FlintPadicField}()
+const PadicBase = CacheDictType{Tuple{ZZRingElem, Int}, PadicField}()
 
-function _padic_ctx_clear_fn(a::FlintPadicField)
-   ccall((:padic_ctx_clear, libflint), Nothing, (Ref{FlintPadicField},), a)
+function _padic_ctx_clear_fn(a::PadicField)
+   ccall((:padic_ctx_clear, libflint), Nothing, (Ref{PadicField},), a)
 end
 
 @doc raw"""
     padic <: FlintLocalFieldElem <: NonArchLocalFieldElem <: FieldElem
 
-An element of a $p$-adic field. See [`FlintPadicField`](@ref).
+An element of a $p$-adic field. See [`PadicField`](@ref).
 """
 mutable struct padic <: FlintLocalFieldElem
    u :: Int
    v :: Int
    N :: Int
-   parent::FlintPadicField
+   parent::PadicField
 
    function padic(prec::Int)
       d = new()

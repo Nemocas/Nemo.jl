@@ -200,7 +200,7 @@ export flint_cleanup
 export flint_set_num_threads
 export FlintLocalField
 export FlintLocalFieldElem
-export FlintPadicField
+export PadicField
 export FlintPuiseuxSeriesElem
 export FlintPuiseuxSeriesField
 export FlintPuiseuxSeriesFieldElem
