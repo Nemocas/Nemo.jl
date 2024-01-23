@@ -15,7 +15,7 @@ end
 
 const FlintQQi = QQiField()
 
-struct fmpqi <: FieldElem
+struct QQiFieldElem <: FieldElem
   num::fmpzi
   den::ZZRingElem
 end

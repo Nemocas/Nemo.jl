@@ -218,7 +218,7 @@ export floor
 export fmma!
 export fmms!
 export fmodpow2
-export fmpqi
+export QQiFieldElem
 export fmpzi
 export fmpzUnitRange
 export fpAbsPowerSeriesRing
