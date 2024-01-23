@@ -1,4 +1,4 @@
-function ZZRingElem(a::Generic.ResidueRingElem{ZZRingElem})
+function ZZRingElem(a::Generic.EuclideanRingResidueRingElem{ZZRingElem})
     return a.data
 end
 
@@ -6,11 +6,11 @@ function ZZRingElem(a::zzModRingElem)
     return ZZRingElem(a.data)
 end
 
-function lift(::ZZRing, a::Generic.ResidueRingElem{ZZRingElem})
+function lift(::ZZRing, a::Generic.EuclideanRingResidueRingElem{ZZRingElem})
     return a.data
 end
 
-function (::ZZRing)(a::Generic.ResidueRingElem{ZZRingElem})
+function (::ZZRing)(a::Generic.EuclideanRingResidueRingElem{ZZRingElem})
     return a.data
 end
 
@@ -161,9 +161,9 @@ function fmpz_poly_to_fmpz_mod_poly(Rx::ZZModPolyRing, f::ZZPolyRingElem)
     return g
 end
 
-modulus(F::Generic.ResidueRing{ZZRingElem}) = F.modulus
+modulus(F::EuclideanRingResidueRing{ZZRingElem}) = F.modulus
 
-modulus(F::Generic.ResidueField{ZZRingElem}) = F.modulus
+modulus(F::EuclideanRingResidueField{ZZRingElem}) = F.modulus
 
 ################################################################################
 #

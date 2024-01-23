@@ -778,7 +778,7 @@ Base.eltype(::Type{fpField}) = fpFieldElem
 Base.IteratorSize(::Type{fpField}) = Base.HasLength()
 Base.length(R::fpField) = R.n
 
-function order(x::Generic.ResidueRingElem{ZZRingElem}, fp::Dict{ZZRingElem,Int64})
+function order(x::Generic.EuclideanRingResidueRingElem{ZZRingElem}, fp::Dict{ZZRingElem,Int64})
     error("missing")
 end
 
@@ -801,32 +801,32 @@ function iszero(a::Ref{ZZRingElem})
     return unsafe_load(reinterpret(Ptr{Int}, a)) == 0
 end
 
-function gen(R::Union{Generic.ResidueRing{fqPolyRepPolyRingElem},Generic.ResidueField{fqPolyRepPolyRingElem}}) ## this is not covered by above
+function gen(R::Union{EuclideanRingResidueRing{fqPolyRepPolyRingElem},EuclideanRingResidueField{fqPolyRepPolyRingElem}}) ## this is not covered by above
     return R(gen(base_ring(R)))              ## and I don't know why
 end
 
-function gen(R::Union{Generic.ResidueRing{zzModPolyRingElem},Generic.ResidueField{zzModPolyRingElem}})
+function gen(R::Union{EuclideanRingResidueRing{zzModPolyRingElem},EuclideanRingResidueField{zzModPolyRingElem}})
     return R(gen(base_ring(R)))
 end
 
-function characteristic(R::Union{Generic.ResidueRing{ZZRingElem},Generic.ResidueField{ZZRingElem}})
+function characteristic(R::Union{EuclideanRingResidueRing{ZZRingElem},EuclideanRingResidueField{ZZRingElem}})
     return modulus(R)
 end
 
-function characteristic(R::Union{Generic.ResidueRing{zzModPolyRingElem},Generic.ResidueField{zzModPolyRingElem}})
+function characteristic(R::Union{EuclideanRingResidueRing{zzModPolyRingElem},EuclideanRingResidueField{zzModPolyRingElem}})
     return characteristic(base_ring(base_ring(R)))
 end
 
 # discuss: size = order? order = size?
-function size(R::Union{Generic.ResidueRing{zzModPolyRingElem},Generic.ResidueField{zzModPolyRingElem}})
+function size(R::Union{EuclideanRingResidueRing{zzModPolyRingElem},EuclideanRingResidueField{zzModPolyRingElem}})
     return characteristic(R)^degree(modulus(R))
 end
 
-function size(R::Union{Generic.ResidueRing{ZZRingElem},Generic.ResidueField{ZZRingElem}})
+function size(R::Union{EuclideanRingResidueRing{ZZRingElem},EuclideanRingResidueField{ZZRingElem}})
     return modulus(R)
 end
 
-function size(R::Union{Generic.ResidueRing{fqPolyRepPolyRingElem},Generic.ResidueField{fqPolyRepPolyRingElem}})
+function size(R::Union{EuclideanRingResidueRing{fqPolyRepPolyRingElem},EuclideanRingResidueField{fqPolyRepPolyRingElem}})
     return size(base_ring(base_ring(R)))^degree(R.modulus)
 end
 
@@ -880,15 +880,15 @@ function elem_to_mat_row!(M::MatElem, i::Int, a::ResElem{fqPolyRepPolyRingElem})
     end
 end
 
-function rand(R::Union{Generic.ResidueRing{ZZRingElem},Generic.ResidueField{ZZRingElem}})
+function rand(R::Union{EuclideanRingResidueRing{ZZRingElem},EuclideanRingResidueField{ZZRingElem}})
     return R(rand(ZZRingElem(0):(size(R)-1)))
 end
 
-function rand(R::Generic.ResidueField{ZZRingElem})
+function rand(R::EuclideanRingResidueField{ZZRingElem})
     return R(rand(ZZRingElem(0):(order(R)-1)))
 end
 
-function rand(R::Union{Generic.ResidueRing{fqPolyRepPolyRingElem},Generic.ResidueField{fqPolyRepPolyRingElem}})
+function rand(R::Union{EuclideanRingResidueRing{fqPolyRepPolyRingElem},EuclideanRingResidueField{fqPolyRepPolyRingElem}})
     r = rand(base_ring(base_ring(R)))
     g = gen(R)
     for i = 1:degree(R.modulus)
@@ -897,7 +897,7 @@ function rand(R::Union{Generic.ResidueRing{fqPolyRepPolyRingElem},Generic.Residu
     return r
 end
 
-function rand(R::Union{Generic.ResidueRing{FqPolyRepPolyRingElem},Generic.ResidueField{FqPolyRepPolyRingElem}})
+function rand(R::Union{EuclideanRingResidueRing{FqPolyRepPolyRingElem},EuclideanRingResidueField{FqPolyRepPolyRingElem}})
     r = rand(base_ring(base_ring(R)))
     g = gen(R)
     for i = 1:degree(R.modulus)
@@ -906,7 +906,7 @@ function rand(R::Union{Generic.ResidueRing{FqPolyRepPolyRingElem},Generic.Residu
     return r
 end
 
-function rand(R::Union{Generic.ResidueRing{zzModPolyRingElem},Generic.ResidueField{zzModPolyRingElem}})
+function rand(R::Union{EuclideanRingResidueRing{zzModPolyRingElem},EuclideanRingResidueField{zzModPolyRingElem}})
     r = rand(base_ring(base_ring(R)))
     g = gen(R)
     for i = 1:degree(R.modulus)
@@ -958,7 +958,7 @@ function set!(z::fqPolyRepFieldElem, x::fqPolyRepFieldElem)
         z, x, parent(z))
 end
 
-characteristic(F::Generic.ResidueField{ZZRingElem}) = abs(F.modulus)
+characteristic(F::EuclideanRingResidueField{ZZRingElem}) = abs(F.modulus)
 
 function is_prime(x::Integer)
     return is_prime(ZZRingElem(x))
@@ -1492,12 +1492,12 @@ function lift!(x::fpFieldElem, z::ZZRingElem)
     return z
 end
 
-function lift!(x::Generic.ResidueFieldElem{ZZRingElem}, z::ZZRingElem)
+function lift!(x::Generic.EuclideanRingResidueFieldElem{ZZRingElem}, z::ZZRingElem)
     ccall((:fmpz_set, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}), z, x.data)
     return z
 end
 
-degree(::Generic.ResidueField{ZZRingElem}) = 1
+degree(::EuclideanRingResidueField{ZZRingElem}) = 1
 degree(::QQField) = 1
 
 Base.:(*)(x::QQFieldElem, y::AbstractAlgebra.Generic.MatSpaceElem{nf_elem}) = base_ring(y)(x) * y
