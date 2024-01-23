@@ -503,7 +503,7 @@ export prod_diagonal
 export pseudo_inv
 export pth_root
 export puiseux_series_ring
-export qadic
+export QadicFieldElem
 export QadicField
 export QQ
 export QQAbsPowerSeriesRing
