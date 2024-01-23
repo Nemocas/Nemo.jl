@@ -1007,3 +1007,22 @@ end
 @inline mat_entry_ptr(A::QQMatrix, i::Int, j::Int) = 
    ccall((:fmpq_mat_entry, libflint), 
       Ptr{QQFieldElem}, (Ref{QQMatrix}, Int, Int), A, i-1, j-1)
+
+################################################################################
+#
+#  Nullspace
+#
+################################################################################
+
+function nullspace(A::QQMatrix)
+   AZZ = zero_matrix(FlintZZ, nrows(A), ncols(A))
+   ccall((:fmpq_mat_get_fmpz_mat_rowwise, libflint), Nothing,
+         (Ref{ZZMatrix}, Ptr{Nothing}, Ref{QQMatrix}), AZZ, C_NULL, A)
+   N = similar(AZZ, ncols(A), ncols(A))
+   nullity = ccall((:fmpz_mat_nullspace, libflint), Cint,
+                   (Ref{ZZMatrix}, Ref{ZZMatrix}), N, AZZ)
+   NQQ = similar(A, ncols(A), ncols(A))
+   ccall((:fmpq_mat_set_fmpz_mat, libflint), Nothing,
+         (Ref{QQMatrix}, Ref{ZZMatrix}), NQQ, N)
+   return nullity, NQQ
+end
