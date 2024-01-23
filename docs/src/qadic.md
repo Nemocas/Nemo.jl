@@ -11,15 +11,24 @@ Q-adic fields, that is, unramified extensions of p-adic fields, are provided in
 Nemo by Flint. This allows construction of $q$-adic fields for any prime power
 $q$.
 
-Q-adic fields are constructed using the `QadicField` function.
+Q-adic fields are constructed using the `FlintQadicField` function. However,
+for convenience we define
+
+```
+QadicField = FlintQadicField
+```
+
+so that $q$-adic fields can be constructed using `QadicField` rather than
+`FlintQadicField`. Note that this is the name of the constructor, but not of
+qadic field type.
 
 The types of $q$-adic fields in Nemo are given in the following table, along
 with the libraries that provide them and the associated types of the parent
 objects.
 
- Library | Field          | Element type     | Parent type
----------|----------------|------------------|---------------
-Flint    | $\mathbb{Q}_q$ | `QadicFieldElem` | `QadicField`
+ Library | Field            | Element type | Parent type
+---------|----------------|----------------|---------------------
+Flint    | $\mathbb{Q}_q$ | `qadic`        | `QadicField`
 
 All the $q$-adic field types belong to the `Field` abstract type and the
 $q$-adic field element types belong to the `FieldElem` abstract type.
@@ -41,14 +50,14 @@ the $q$-adic field itself. This is accomplished with one of the following
 constructors.
 
 ```@docs
-QadicField(::Integer, ::Int, ::Int)
+FlintQadicField(::Integer, ::Int, ::Int)
 ```
 
 It is also possible to call the inner constructor directly. It has the following
 form.
 
 ```
-QadicField(p::ZZRingElem, d::Int, prec::Int)
+FlintQadicField(p::ZZRingElem, d::Int, prec::Int)
 ```
 
 Returns the parent object for the $q$-adic field for given prime $p$ and degree
@@ -84,9 +93,9 @@ Elements of p-adic fields can  be constructed using the big-oh notation. For thi
 purpose we define the following functions.
 
 ```@docs
-O(::QadicField, ::Integer)
-O(::QadicField, ::ZZRingElem)
-O(::QadicField, ::QQFieldElem)
+O(::FlintQadicField, ::Integer)
+O(::FlintQadicField, ::ZZRingElem)
+O(::FlintQadicField, ::QQFieldElem)
 ```
 
 The $O(p^n)$ construction can be used to construct $q$-adic values of precision
@@ -118,20 +127,20 @@ value.
 ### Basic manipulation
 
 ```@docs
-prime(::QadicField)
+prime(::FlintQadicField)
 ```
 
 ```@docs
-precision(::QadicFieldElem)
+precision(::qadic)
 ```
 
 ```@docs
-valuation(::QadicFieldElem)
+valuation(::qadic)
 ```
 
 ```@docs
-lift(::QQPolyRing, ::QadicFieldElem)
-lift(::ZZPolyRing, ::QadicFieldElem)
+lift(::QQPolyRing, ::qadic)
+lift(::ZZPolyRing, ::qadic)
 ```
 
 **Examples**
@@ -155,7 +164,7 @@ q = lift(Zy, divexact(a, b))
 ### Square root
 
 ```@docs
-Base.sqrt(::QadicFieldElem)
+Base.sqrt(::qadic)
 ```
 
 **Examples**
@@ -188,19 +197,19 @@ julia> g = sqrt(R(121))
 ### Special functions
 
 ```@docs
-Base.exp(::QadicFieldElem)
+Base.exp(::qadic)
 ```
 
 ```@docs
-log(::QadicFieldElem)
+log(::qadic)
 ```
 
 ```@docs
-teichmuller(::QadicFieldElem)
+teichmuller(::qadic)
 ```
 
 ```@docs
-frobenius(::QadicFieldElem, ::Int)
+frobenius(::qadic, ::Int)
 ```
 
 **Examples**

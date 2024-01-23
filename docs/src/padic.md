@@ -10,15 +10,15 @@ end
 P-adic fields are provided in Nemo by Flint. This allows construction of
 $p$-adic fields for any prime $p$.
 
-P-adic fields are constructed using the `PadicField` function. However,
+P-adic fields are constructed using the `FlintPadicField` function. However,
 for convenience we define
 
 ```
-PadicField = PadicField
+PadicField = FlintPadicField
 ```
 
 so that $p$-adic fields can be constructed using `PadicField` rather than
-`PadicField`. Note that this is the name of the constructor, but not of
+`FlintPadicField`. Note that this is the name of the constructor, but not of
 padic field type.
 
 The types of $p$-adic fields in Nemo are given in the following table, along
@@ -48,14 +48,14 @@ the $p$-adic field itself. This is accomplished with one of the following
 constructors.
 
 ```@docs
-PadicField(::Integer, ::Int)
+FlintPadicField(::Integer, ::Int)
 ```
 
 It is also possible to call the inner constructor directly. It has the following
 form.
 
 ```
-PadicField(p::ZZRingElem, prec::Int)
+FlintPadicField(p::ZZRingElem, prec::Int)
 ```
 
 Returns the parent object for the $p$-adic field for given prime $p$, where
@@ -82,9 +82,9 @@ Elements of p-adic fields can  be constructed using the big-oh notation. For thi
 purpose we define the following functions.
 
 ```@docs
-O(::PadicField, ::Integer)
-O(::PadicField, ::ZZRingElem)
-O(::PadicField, ::QQFieldElem)
+O(::FlintPadicField, ::Integer)
+O(::FlintPadicField, ::ZZRingElem)
+O(::FlintPadicField, ::QQFieldElem)
 ```
 
 The $O(p^n)$ construction can be used to construct $p$-adic values of precision
@@ -110,7 +110,7 @@ value.
 ### Basic manipulation
 
 ```@docs
-prime(::PadicField)
+prime(::FlintPadicField)
 ```
 
 ```@docs

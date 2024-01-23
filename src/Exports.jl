@@ -200,13 +200,13 @@ export flint_cleanup
 export flint_set_num_threads
 export FlintLocalField
 export FlintLocalFieldElem
-export PadicField
+export FlintPadicField
 export FlintPuiseuxSeriesElem
 export FlintPuiseuxSeriesField
 export FlintPuiseuxSeriesFieldElem
 export FlintPuiseuxSeriesRing
 export FlintPuiseuxSeriesRingElem
-export QadicField
+export FlintQadicField
 export FlintQQ
 export FlintQQi
 export QQiField
@@ -503,7 +503,7 @@ export prod_diagonal
 export pseudo_inv
 export pth_root
 export puiseux_series_ring
-export QadicFieldElem
+export qadic
 export QadicField
 export QQ
 export QQAbsPowerSeriesRing
