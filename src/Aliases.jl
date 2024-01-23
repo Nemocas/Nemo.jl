@@ -45,6 +45,13 @@ Base.@deprecate_binding isuinf is_uinf
 Base.@deprecate_binding isundefined is_undefined
 Base.@deprecate_binding isunknown is_unknown
 Base.@deprecate_binding isupper_triangular is_upper_triangular
+Base.@deprecate_binding lll_ctx LLLContext
+Base.@deprecate_binding FlintQQiField QQiField
+Base.@deprecate_binding fmpqi QQiFieldElem
+Base.@deprecate_binding FlintZZiRing ZZiRing
+Base.@deprecate_binding fmpzi ZZiRingElem
+Base.@deprecate_binding fmpzUnitRange ZZRingElemUnitRange
+
 
 # old type names from before 0.33
 # may be remove at some point in the future
