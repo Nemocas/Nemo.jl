@@ -132,11 +132,11 @@ end
 ################################################################################
 
 @doc raw"""
-    lift(a::Generic.Mat{Generic.EuclideanRingResidueRingElem{ZZRingElem}}) -> ZZMatrix
+    lift(a::Generic.Mat{EuclideanRingResidueRingElem{ZZRingElem}}) -> ZZMatrix
 
 It returns a lift of the matrix to the integers.
 """
-function lift(a::Generic.Mat{Generic.EuclideanRingResidueRingElem{ZZRingElem}})
+function lift(a::Generic.Mat{EuclideanRingResidueRingElem{ZZRingElem}})
     z = zero_matrix(FlintZZ, nrows(a), ncols(a))
     for i in 1:nrows(a)
         for j in 1:ncols(a)

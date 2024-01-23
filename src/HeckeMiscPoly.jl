@@ -1,4 +1,4 @@
-function ZZRingElem(a::Generic.EuclideanRingResidueRingElem{ZZRingElem})
+function ZZRingElem(a::EuclideanRingResidueRingElem{ZZRingElem})
     return a.data
 end
 
@@ -6,11 +6,11 @@ function ZZRingElem(a::zzModRingElem)
     return ZZRingElem(a.data)
 end
 
-function lift(::ZZRing, a::Generic.EuclideanRingResidueRingElem{ZZRingElem})
+function lift(::ZZRing, a::EuclideanRingResidueRingElem{ZZRingElem})
     return a.data
 end
 
-function (::ZZRing)(a::Generic.EuclideanRingResidueRingElem{ZZRingElem})
+function (::ZZRing)(a::EuclideanRingResidueRingElem{ZZRingElem})
     return a.data
 end
 

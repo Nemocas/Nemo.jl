@@ -24,7 +24,7 @@ Nemo are given in the following table.
 
 Base ring                   | Library            | Element type     | Parent type
 ----------------------------|--------------------|------------------|--------------------
-Generic ring $R$            | AbstractAlgebra.jl | `Generic.EuclideanRingResidueRingElem{T}` | `EuclideanRingResidueRing{T}`
+Generic ring $R$            | AbstractAlgebra.jl | `EuclideanRingResidueRingElem{T}` | `EuclideanRingResidueRing{T}`
 $\mathbb{Z}$ (Int modulus)  | Flint              | `zzModRingElem`  | `zzModRing`
 $\mathbb{Z}$ (ZZ modulus)   | Flint              | `ZZModRingElem`  | `ZZModRing`
 

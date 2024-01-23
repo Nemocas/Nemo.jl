@@ -778,7 +778,7 @@ Base.eltype(::Type{fpField}) = fpFieldElem
 Base.IteratorSize(::Type{fpField}) = Base.HasLength()
 Base.length(R::fpField) = R.n
 
-function order(x::Generic.EuclideanRingResidueRingElem{ZZRingElem}, fp::Dict{ZZRingElem,Int64})
+function order(x::EuclideanRingResidueRingElem{ZZRingElem}, fp::Dict{ZZRingElem,Int64})
     error("missing")
 end
 
@@ -1452,7 +1452,7 @@ function lift!(x::fpFieldElem, z::ZZRingElem)
     return z
 end
 
-function lift!(x::Generic.EuclideanRingResidueFieldElem{ZZRingElem}, z::ZZRingElem)
+function lift!(x::EuclideanRingResidueFieldElem{ZZRingElem}, z::ZZRingElem)
     ccall((:fmpz_set, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}), z, x.data)
     return z
 end
