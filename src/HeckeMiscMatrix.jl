@@ -600,7 +600,7 @@ end
 
 Returns the diagonal of `A` as an array.
 """
-diagonal(A::MatrixElem{T}) where {T} = T[A[i, i] for i in 1:nrows(A)]
+diagonal(A::MatrixElem{T}) where {T} = T[A[i, i] for i in 1:min(nrows(A),ncols(A))]
 
 ################################################################################
 #
@@ -612,7 +612,7 @@ diagonal(A::MatrixElem{T}) where {T} = T[A[i, i] for i in 1:nrows(A)]
 function prod_diagonal(A::ZZMatrix)
     a = one(ZZRingElem)
     GC.@preserve a A begin
-        for i = 1:nrows(A)
+        for i = 1:min(nrows(A),ncols(A))
             b = ccall((:fmpz_mat_entry, libflint), Ptr{ZZRingElem}, (Ref{ZZMatrix}, Int, Int), A, i - 1, i - 1)
             ccall((:fmpz_mul, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), a, a, b)
         end
