@@ -19,7 +19,7 @@ parent objects of the given rings and structures.
      - `FpFieldElem` (`FpField`)
      - `FqPolyRepFieldElem` (`FqPolyRepField`)
      - `padic` (`PadicField`)
-     - `qadic` (`QadicField`)
+     - `QadicFieldElem` (`QadicField`)
      - `ZZPolyRingElem` (`ZZPolyRing`)
      - `QQPolyRingElem` (`QQPolyRing`)
      - `zzModPolyRingElem` (`zzModPolyRing`)
