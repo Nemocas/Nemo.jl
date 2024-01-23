@@ -51,21 +51,21 @@ end
 ###############################################################################
 
 function QQiFieldElem()
-   return QQiFieldElem(fmpzi(), ZZRingElem(1))
+   return QQiFieldElem(ZZiRingElem(), ZZRingElem(1))
 end
 
-function QQiFieldElem(a::fmpzi)
+function QQiFieldElem(a::ZZiRingElem)
    return QQiFieldElem(a, ZZRingElem(1))
 end
 
 function QQiFieldElem(a::QQFieldElem)
-   return QQiFieldElem(fmpzi(numerator(a)), denominator(a))
+   return QQiFieldElem(ZZiRingElem(numerator(a)), denominator(a))
 end
 
 function QQiFieldElem(a::QQFieldElem, b::QQFieldElem)
    da = denominator(a)
    db = denominator(b)
-   return reduce!(QQiFieldElem(fmpzi(numerator(a)*db, numerator(b)*da), da*db))
+   return reduce!(QQiFieldElem(ZZiRingElem(numerator(a)*db, numerator(b)*da), da*db))
 end
 
 ###############################################################################
@@ -79,7 +79,7 @@ function (a::QQiField)()
 end
 
 function (a::QQiField)(b::IntegerUnion)
-   return QQiFieldElem(fmpzi(b))
+   return QQiFieldElem(ZZiRingElem(b))
 end
 
 function (a::QQiField)(b::Union{Rational, QQFieldElem})
@@ -91,7 +91,7 @@ function (a::QQiField)(b::Union{Integer, ZZRingElem, Rational, QQFieldElem},
    return QQiFieldElem(QQFieldElem(b), QQFieldElem(c))
 end
 
-function (a::QQiField)(b::Union{Complex{<:Integer}, fmpzi, Complex{<:Rational}})
+function (a::QQiField)(b::Union{Complex{<:Integer}, ZZiRingElem, Complex{<:Rational}})
    return QQiFieldElem(QQFieldElem(real(b)), QQFieldElem(imag(b)))
 end
 
@@ -260,11 +260,11 @@ function ==(a::QQiFieldElem, b::QQiFieldElem)
    return a.den == b.den && a.num == b.num
 end
 
-function ==(a::QQiFieldElem, b::Union{Complex{<:Integer}, fmpzi, Complex{<:Rational}})
+function ==(a::QQiFieldElem, b::Union{Complex{<:Integer}, ZZiRingElem, Complex{<:Rational}})
    return real(a) == real(b) && imag(a) == imag(b)
 end
 
-function ==(b::Union{Complex{<:Integer}, fmpzi, Complex{<:Rational}}, a::QQiFieldElem)
+function ==(b::Union{Complex{<:Integer}, ZZiRingElem, Complex{<:Rational}}, a::QQiFieldElem)
    return a == b
 end
 
@@ -348,7 +348,7 @@ function mul!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem)
    return z
 end
 
-function mul!(z::QQiFieldElem, a::QQiFieldElem, b::Union{Integer, ZZRingElem, fmpzi})
+function mul!(z::QQiFieldElem, a::QQiFieldElem, b::Union{Integer, ZZRingElem, ZZiRingElem})
    mul!(z.num, a.num, b)
    set!(z.den, a.den)
    reduce!(z)
@@ -445,8 +445,8 @@ end
 ###############################################################################
 
 for (A, Bs) in [
-    [QQiFieldElem, [Integer, ZZRingElem, Complex{<:Integer}, fmpzi, Rational, QQFieldElem, Complex{<:Rational}]],
-    [fmpzi, [Rational, QQFieldElem, Complex{<:Rational}]],
+    [QQiFieldElem, [Integer, ZZRingElem, Complex{<:Integer}, ZZiRingElem, Rational, QQFieldElem, Complex{<:Rational}]],
+    [ZZiRingElem, [Rational, QQFieldElem, Complex{<:Rational}]],
     [QQFieldElem, [Complex{<:Integer}, Complex{<:Rational}]],
     [ZZRingElem, [Complex{<:Rational}]]]
    for B in Bs
@@ -484,11 +484,11 @@ end
 
 # // overloads in AA easily lead to ambiguities
 for (As, Bs) in [
-      [(Integer, Rational), (fmpzi, QQiFieldElem)],
-      [(Complex{<:Integer}, Complex{<:Rational}), (ZZRingElem, QQFieldElem, fmpzi, QQiFieldElem)], 
-      [(ZZRingElem, QQFieldElem), (Complex{<:Integer}, Complex{<:Rational}, fmpzi, QQiFieldElem)],
-      [(fmpzi, QQiFieldElem), (Integer, Rational, ZZRingElem, QQFieldElem, Complex{<:Integer},
-                                           Complex{<:Rational}, fmpzi, QQiFieldElem)]]
+      [(Integer, Rational), (ZZiRingElem, QQiFieldElem)],
+      [(Complex{<:Integer}, Complex{<:Rational}), (ZZRingElem, QQFieldElem, ZZiRingElem, QQiFieldElem)], 
+      [(ZZRingElem, QQFieldElem), (Complex{<:Integer}, Complex{<:Rational}, ZZiRingElem, QQiFieldElem)],
+      [(ZZiRingElem, QQiFieldElem), (Integer, Rational, ZZRingElem, QQFieldElem, Complex{<:Integer},
+                                           Complex{<:Rational}, ZZiRingElem, QQiFieldElem)]]
    for A in As, B in Bs
       @eval begin
          function //(a::($A), b::($B))

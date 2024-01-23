@@ -5,7 +5,7 @@ end
 
 const FlintZZi = ZZiRing()
 
-struct fmpzi <: RingElem
+struct ZZiRingElem <: RingElem
   x::ZZRingElem
   y::ZZRingElem
 end
@@ -16,7 +16,7 @@ end
 const FlintQQi = QQiField()
 
 struct QQiFieldElem <: FieldElem
-  num::fmpzi
+  num::ZZiRingElem
   den::ZZRingElem
 end
 

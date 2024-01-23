@@ -1,29 +1,29 @@
 ZZi = Nemo.GaussianIntegers()
 QQi = Nemo.GaussianRationals()
 
-@testset "fmpzi.abstract_types" begin
-   @test fmpzi <: RingElem
+@testset "ZZiRingElem.abstract_types" begin
+   @test ZZiRingElem <: RingElem
    @test ZZiRing <: Nemo.Ring
-   @test elem_type(ZZi) == fmpzi
-   @test parent_type(fmpzi) == ZZiRing
+   @test elem_type(ZZi) == ZZiRingElem
+   @test parent_type(ZZiRingElem) == ZZiRing
    @test base_ring(ZZi) == ZZ
    @test base_ring(ZZi()) == ZZ
 end
 
-@testset "fmpzi.hash" begin
+@testset "ZZiRingElem.hash" begin
    @test hash(ZZi(2, 3)) == hash(ZZi(2 + 3*im))
    @test hash(ZZi) == hash(deepcopy(ZZi))
    @test ZZi === Base.deepcopy_internal(ZZi, IdDict())
 end
 
-@testset "fmpzi.printing" begin
+@testset "ZZiRingElem.printing" begin
    @test string(zero(ZZi)) == "0"
    @test string(one(ZZi)) == "1"
    @test string(ZZi(2,-3)) == "2 - 3*im"
    @test string(ZZi) == "Gaussian integer ring"
 end
 
-@testset "fmpzi.constructors" begin
+@testset "ZZiRingElem.constructors" begin
    for a in Any[true, false, 1, big(1), ZZRingElem(1)]
       @test ZZi(a) == a
       @test ZZ(a) + im == ZZi(a, 1)
@@ -35,22 +35,22 @@ end
    end
 end
 
-@testset "fmpzi.conversions" begin
+@testset "ZZiRingElem.conversions" begin
    @test ZZ(ZZi(9)) == 9
    @test_throws Exception ZZ(ZZi(0,9))
    @test convert(Complex{BigInt}, ZZi(8,9)) == 8 + 9*im
-   @test 8 + 9*im == convert(fmpzi, 8 + 9*im)
-   @test 8 == convert(fmpzi, 8)
-   @test convert(fmpzi, ZZRingElem(8)) == 8
+   @test 8 + 9*im == convert(ZZiRingElem, 8 + 9*im)
+   @test 8 == convert(ZZiRingElem, 8)
+   @test convert(ZZiRingElem, ZZRingElem(8)) == 8
 end
 
-@testset "fmpzi.pow" begin
+@testset "ZZiRingElem.pow" begin
    @test_throws Exception ZZi(1,1)^-1
    @test ZZi(0,1)^-1 == -im
    @test ZZi(0,1)^2 == -1
 end
 
-@testset "fmpzi.canonical_mod" begin
+@testset "ZZiRingElem.canonical_mod" begin
    function test_ncdivrem(a, b)
       @test Nemo.ncdivrem(ZZRingElem(a), ZZRingElem(b)) == divrem(a, b, RoundNearestTiesUp)
    end
@@ -64,7 +64,7 @@ end
          m = ZZi(1, 1)
       end
       n = abs2(m)
-      s = Set{fmpzi}([zero(ZZi)])
+      s = Set{ZZiRingElem}([zero(ZZi)])
       for j in 1:10*Int(n)
          a = rand_bits(ZZi, rand(1:15))
          push!(s, mod(a, m))
@@ -73,7 +73,7 @@ end
    end
 end
 
-@testset "fmpzi.Euclidean" begin
+@testset "ZZiRingElem.Euclidean" begin
    @test_throws Exception invmod(ZZi(1,1), ZZi(2))
    m = ZZi(3)
    @test is_divisible_by(invmod(ZZi(1,1), m) - powermod(ZZi(1,1), -1, m), m)
@@ -82,7 +82,7 @@ end
    @test remove(ZZi(-10,-2), ZZi(1,1)) == (3, ZZi(2,3))
 end
 
-@testset "fmpzi.gcd" begin
+@testset "ZZiRingElem.gcd" begin
    for a in (ZZi(0,0), ZZi(1,0), ZZi(2,1), ZZi(1,1), ZZi(1,2),
                        ZZi(0,1), ZZi(-1,2), ZZi(-1,1), ZZi(-2,1),
                        ZZi(1,-0), ZZi(2,-1), ZZi(1,-1), ZZi(1,-2),
@@ -135,7 +135,7 @@ end
    end
 end
 
-@testset "fmpzi.factor" begin
+@testset "ZZiRingElem.factor" begin
    let l = 26
       for k in 1:100
          a = one(ZZi)
@@ -157,7 +157,7 @@ end
    end
 end
 
-@testset "fmpzi.adhoc" begin
+@testset "ZZiRingElem.adhoc" begin
    @test ZZ(5) + im == ZZi(5, 1)
    @test im + ZZ(5) == ZZi(5, 1)
    @test ZZ(5) - im == ZZi(5, -1)
@@ -168,8 +168,8 @@ end
    for (a, bs) in [[ZZi(1,1), [2, ZZ(2), 2*im, ZZi(2)]],
                    [ZZ(2),    [2*im]]]
       for b in bs
-         @test Nemo.AbstractAlgebra.promote_rule(typeof(a), typeof(b)) == fmpzi
-         @test Nemo.AbstractAlgebra.promote_rule(typeof(b), typeof(a)) == fmpzi
+         @test Nemo.AbstractAlgebra.promote_rule(typeof(a), typeof(b)) == ZZiRingElem
+         @test Nemo.AbstractAlgebra.promote_rule(typeof(b), typeof(a)) == ZZiRingElem
          @test ZZi == parent(a*b)
          @test ZZi == parent(b*a)
          @test ZZi == parent(a + b)
@@ -186,7 +186,7 @@ end
    end
 end
 
-@testset "fmpzi.unsafe" begin
+@testset "ZZiRingElem.unsafe" begin
    a = rand_bits(ZZi, 600); A = deepcopy(a)
    b = rand_bits(ZZi, 600); B = deepcopy(b)
    t = rand_bits(ZZi, 600)
@@ -198,9 +198,9 @@ end
    @test mul!(t, t, t) == a^4*b^4
    @test 1 + 0*im == one!(t)
    @test addmul!(t, a, b) == 1 + a*b
-   @test addmul!(t, a, b, fmpzi()) == 1 + 2*a*b
+   @test addmul!(t, a, b, ZZiRingElem()) == 1 + 2*a*b
    @test Nemo.submul!(t, a, b) == 1 + a*b
-   @test Nemo.submul!(t, a, b, fmpzi()) == 1
+   @test Nemo.submul!(t, a, b, ZZiRingElem()) == 1
    @test addmul!(t, t, b) == 1 + b
    @test Nemo.submul!(t, t, a) == (1 + b)*(1 - a)
    @test Nemo.set!(t, a) == a
@@ -218,7 +218,7 @@ function test_elem(R::ZZiRing)
    return rand_bits(R, rand(0:200))
 end
 
-@testset "fmpzi.conformance_tests" begin
+@testset "ZZiRingElem.conformance_tests" begin
    test_Ring_interface(ZZi)
    test_EuclideanRing_interface(ZZi)
 end

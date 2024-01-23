@@ -219,7 +219,7 @@ export fmma!
 export fmms!
 export fmodpow2
 export QQiFieldElem
-export fmpzi
+export ZZiRingElem
 export fmpzUnitRange
 export fpAbsPowerSeriesRing
 export FpAbsPowerSeriesRing
