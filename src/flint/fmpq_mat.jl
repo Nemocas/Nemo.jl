@@ -704,7 +704,7 @@ function can_solve(a::QQMatrix, b::QQMatrix; side::Symbol = :right)
    return fl
 end
 
-function AbstractAlgebra.Solve._can_solve_internal(A::QQMatrix, b::QQMatrix, task::Symbol; side = Symbol = :right)
+function AbstractAlgebra.Solve._can_solve_internal(A::QQMatrix, b::QQMatrix, task::Symbol; side::Symbol = :right)
    if task !== :only_check && task !== :with_solution && task !== :with_kernel
       error("task $(task) not recognized")
    end
@@ -721,13 +721,13 @@ function AbstractAlgebra.Solve._can_solve_internal(A::QQMatrix, b::QQMatrix, tas
    nrows(A) != nrows(b) && error("Incompatible matrices")
 
    x = similar(A, ncols(A), ncols(b))
-   fl = ccall((:fmpq_mat_can_solve_multi_mod, libflint), Cint,
+   fl = ccall((:fmpq_mat_can_solve, libflint), Cint,
               (Ref{QQMatrix}, Ref{QQMatrix}, Ref{QQMatrix}), x, A, b)
 
    if task === :only_check || task === :with_solution
       return Bool(fl), x, zero(A, 0, 0)
    end
-   return Bool(fl), x, kernel(A)[2]
+   return Bool(fl), x, AbstractAlgebra.Solve.kernel(A)
 end
 
 ###############################################################################
@@ -1033,3 +1033,22 @@ end
 @inline mat_entry_ptr(A::QQMatrix, i::Int, j::Int) = 
    ccall((:fmpq_mat_entry, libflint), 
       Ptr{QQFieldElem}, (Ref{QQMatrix}, Int, Int), A, i-1, j-1)
+
+################################################################################
+#
+#  Nullspace
+#
+################################################################################
+
+function nullspace(A::QQMatrix)
+   AZZ = zero_matrix(FlintZZ, nrows(A), ncols(A))
+   ccall((:fmpq_mat_get_fmpz_mat_rowwise, libflint), Nothing,
+         (Ref{ZZMatrix}, Ptr{Nothing}, Ref{QQMatrix}), AZZ, C_NULL, A)
+   N = similar(AZZ, ncols(A), ncols(A))
+   nullity = ccall((:fmpz_mat_nullspace, libflint), Cint,
+                   (Ref{ZZMatrix}, Ref{ZZMatrix}), N, AZZ)
+   NQQ = similar(A, ncols(A), ncols(A))
+   ccall((:fmpq_mat_set_fmpz_mat, libflint), Nothing,
+         (Ref{QQMatrix}, Ref{ZZMatrix}), NQQ, N)
+   return nullity, NQQ
+end
