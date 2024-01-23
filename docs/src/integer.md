@@ -322,8 +322,8 @@ iroot(::ZZRingElem, ::Int)
 ### Number theoretic functionality
 
 ```@docs
-divisible(::ZZRingElem, ::Int)
-divisible(::ZZRingElem, ::ZZRingElem)
+is_divisible_by(::ZZRingElem, ::Int)
+is_divisible_by(::ZZRingElem, ::ZZRingElem)
 ```
 
 ```@docs

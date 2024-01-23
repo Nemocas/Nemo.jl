@@ -505,6 +505,8 @@ end
   @test c == F17(13)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
+
+  @test is_one(zero_matrix(F17, 0, 0))
 end
 
 @testset "FqMatrix.rank" begin

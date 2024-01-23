@@ -149,7 +149,6 @@ export digamma
 export div!
 export divexact
 export divexact!
-export divisible
 export divisor_lenstra
 export divisor_sigma
 export divisors

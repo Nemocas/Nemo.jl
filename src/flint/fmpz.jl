@@ -372,6 +372,11 @@ end
 
 divides(x::ZZRingElem, y::Integer) = divides(x, ZZRingElem(y))
 
+@doc raw"""
+    is_divisible_by(x::ZZRingElem, y::ZZRingElem)
+
+Return `true` if $x$ is divisible by $y$, otherwise return `false`.
+"""
 function is_divisible_by(x::ZZRingElem, y::ZZRingElem)
    if iszero(x)
       return true
@@ -387,6 +392,11 @@ function is_divisible_by(x::ZZRingElem, y::ZZRingElem)
    end
 end
 
+@doc raw"""
+    is_divisible_by(x::ZZRingElem, y::ZZRingElem)
+
+Return `true` if $x$ is divisible by $y$, otherwise return `false`.
+"""
 function is_divisible_by(x::ZZRingElem, y::Integer)
    if iszero(x)
       return true
@@ -1577,30 +1587,6 @@ end
 #   Number theoretic/combinatorial
 #
 ###############################################################################
-
-@doc raw"""
-    divisible(x::ZZRingElem, y::ZZRingElem)
-
-Return `true` if $x$ is divisible by $y$, otherwise return `false`. We
-require $x \neq 0$.
-"""
-function divisible(x::ZZRingElem, y::ZZRingElem)
-   iszero(y) && throw(DivideError())
-   Bool(ccall((:fmpz_divisible, libflint), Cint,
-              (Ref{ZZRingElem}, Ref{ZZRingElem}), x, y))
-end
-
-@doc raw"""
-    divisible(x::ZZRingElem, y::Int)
-
-Return `true` if $x$ is divisible by $y$, otherwise return `false`. We
-require $x \neq 0$.
-"""
-function divisible(x::ZZRingElem, y::Int)
-   y == 0 && throw(DivideError())
-   Bool(ccall((:fmpz_divisible_si, libflint), Cint,
-              (Ref{ZZRingElem}, Int), x, y))
-end
 
 @doc raw"""
     divisors(a::Union{Int, ZZRingElem})

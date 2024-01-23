@@ -6,7 +6,7 @@ local test_fields = (finite_field(23, 1, "a"),
 
 @testset "FqMPolyRingElem.constructors" begin
    for (R, a) in test_fields
-      for num_vars = 1:10
+      for num_vars = 0:10
          var_names = ["x$j" for j in 1:num_vars]
          ord = rand_ordering()
 

@@ -1014,7 +1014,7 @@ end
 
    @test is_probable_prime(ZZRingElem(13))
 
-   @test divisible(ZZRingElem(12), ZZRingElem(6))
+   @test is_divisible_by(ZZRingElem(12), ZZRingElem(6))
 
    n = ZZRingElem(2^2 * 3 * 13^2)
    d = ZZRingElem.([1, 2, 3, 4, 6, 12, 13, 26, 39, 52, 78, 156, 169, 338, 507, 676, 1014, 2028])
