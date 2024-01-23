@@ -10,10 +10,10 @@ struct fmpzi <: RingElem
   y::ZZRingElem
 end
 
-struct FlintQQiField <: Nemo.Field
+struct QQiField <: Nemo.Field
 end
 
-const FlintQQi = FlintQQiField()
+const FlintQQi = QQiField()
 
 struct fmpqi <: FieldElem
   num::fmpzi

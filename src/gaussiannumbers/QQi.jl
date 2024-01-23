@@ -4,19 +4,19 @@
 #
 ###############################################################################
 
-elem_type(::Type{FlintQQiField}) = fmpqi
+elem_type(::Type{QQiField}) = fmpqi
 
-parent_type(::Type{fmpqi}) = FlintQQiField
+parent_type(::Type{fmpqi}) = QQiField
 
 parent(a::fmpqi) = FlintQQi
 
-base_ring(a::FlintQQiField) = FlintZZi
+base_ring(a::QQiField) = FlintZZi
 
 base_ring(a::fmpqi) = FlintZZi
 
 is_domain_type(::Type{fmpqi}) = true
 
-characteristic(a::FlintQQiField) = 0
+characteristic(a::QQiField) = 0
 
 ###############################################################################
 #
@@ -34,7 +34,7 @@ function Base.show(io::IO, a::fmpqi)
    AbstractAlgebra.show_via_expressify(io, a)
 end
 
-function Base.show(io::IO, a::FlintQQiField)
+function Base.show(io::IO, a::QQiField)
    if get(io, :supercompact, false)
      io = pretty(io)
      print(io, LowercaseOff(), "QQ[im]")
@@ -74,28 +74,28 @@ end
 #
 ###############################################################################
 
-function (a::FlintQQiField)()
+function (a::QQiField)()
    return fmpqi()
 end
 
-function (a::FlintQQiField)(b::IntegerUnion)
+function (a::QQiField)(b::IntegerUnion)
    return fmpqi(fmpzi(b))
 end
 
-function (a::FlintQQiField)(b::Union{Rational, QQFieldElem})
+function (a::QQiField)(b::Union{Rational, QQFieldElem})
    return fmpqi(QQFieldElem(b))
 end
 
-function (a::FlintQQiField)(b::Union{Integer, ZZRingElem, Rational, QQFieldElem},
+function (a::QQiField)(b::Union{Integer, ZZRingElem, Rational, QQFieldElem},
                             c::Union{Integer, ZZRingElem, Rational, QQFieldElem})
    return fmpqi(QQFieldElem(b), QQFieldElem(c))
 end
 
-function (a::FlintQQiField)(b::Union{Complex{<:Integer}, fmpzi, Complex{<:Rational}})
+function (a::QQiField)(b::Union{Complex{<:Integer}, fmpzi, Complex{<:Rational}})
    return fmpqi(QQFieldElem(real(b)), QQFieldElem(imag(b)))
 end
 
-function (a::FlintQQiField)(b::fmpqi)
+function (a::QQiField)(b::fmpqi)
    return b
 end
 
@@ -151,7 +151,7 @@ end
 #
 ###############################################################################
 
-function rand_bits(a::FlintQQiField, b::Int)
+function rand_bits(a::QQiField, b::Int)
    b = max(1, b)
    t = clamp(cld(rand(0:b)^2, b), 1, b)  # average b/3 for the denominator
    return reduce!(fmpqi(rand_bits(FlintZZi, clamp(b - t, 0, b)), rand_bits(ZZ, t)))
@@ -168,7 +168,7 @@ function deepcopy_internal(a::fmpqi, d::IdDict)
    return fmpqi(deepcopy_internal(a.num, d), deepcopy_internal(a.den, d))
 end
 
-function deepcopy_internal(a::FlintQQiField, d::IdDict)
+function deepcopy_internal(a::QQiField, d::IdDict)
    return a
 end
 
@@ -184,11 +184,11 @@ function abs2(a::fmpqi)
    return abs2(a.num)//a.den^2
 end
 
-function zero(a::FlintQQiField)
+function zero(a::QQiField)
    return fmpqi(zero(FlintZZi), ZZRingElem(1))
 end
 
-function one(a::FlintQQiField)
+function one(a::QQiField)
    return fmpqi(one(FlintZZi), ZZRingElem(1))
 end
 

@@ -3,9 +3,9 @@ QQi = Nemo.GaussianRationals()
 
 @testset "fmpqi.abstract_types" begin
    @test fmpqi <: FieldElem
-   @test FlintQQiField <: Nemo.Field
+   @test QQiField <: Nemo.Field
    @test elem_type(QQi) == fmpqi
-   @test parent_type(fmpqi) == FlintQQiField
+   @test parent_type(fmpqi) == QQiField
    @test base_ring(QQi) == ZZi
    @test base_ring(QQi()) == ZZi
 end
@@ -130,7 +130,7 @@ end
    end
 end
 
-function test_elem(R::FlintQQiField)
+function test_elem(R::QQiField)
    return rand_bits(R, rand(0:200))
 end
 

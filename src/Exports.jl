@@ -209,7 +209,7 @@ export FlintPuiseuxSeriesRingElem
 export QadicField
 export FlintQQ
 export FlintQQi
-export FlintQQiField
+export QQiField
 export FlintZZ
 export FlintZZi
 export FlintZZiRing
