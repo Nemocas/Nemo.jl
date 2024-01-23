@@ -188,9 +188,8 @@ Base.@deprecate_binding NumberField number_field
 
 Base.@deprecate_binding CyclotomicRealSubfield cyclotomic_real_subfield
 
-# TODO: deprecate the following
-
-@alias FlintPadicField PadicField
-@alias padic PadicFieldElem
-@alias FlintQadicField QadicField
-@alias qadic QadicFieldElem
+# renamed for 0.40.0
+Base.@deprecate_binding FlintPadicField PadicField
+Base.@deprecate_binding padic PadicFieldElem
+Base.@deprecate_binding FlintQadicField QadicField
+Base.@deprecate_binding qadic QadicFieldElem
