@@ -206,7 +206,7 @@ export FlintPuiseuxSeriesField
 export FlintPuiseuxSeriesFieldElem
 export FlintPuiseuxSeriesRing
 export FlintPuiseuxSeriesRingElem
-export FlintQadicField
+export QadicField
 export FlintQQ
 export FlintQQi
 export FlintQQiField

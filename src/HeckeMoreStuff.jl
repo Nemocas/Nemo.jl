@@ -1160,7 +1160,7 @@ end
 function Base.setprecision(q::qadic, N::Int)
     r = parent(q)()
     r.N = N
-    ccall((:padic_poly_set, libflint), Nothing, (Ref{qadic}, Ref{qadic}, Ref{FlintQadicField}), r, q, parent(q))
+    ccall((:padic_poly_set, libflint), Nothing, (Ref{qadic}, Ref{qadic}, Ref{QadicField}), r, q, parent(q))
     return r
 end
 
@@ -1176,12 +1176,12 @@ function setprecision!(q::qadic, N::Int)
         q.N = N
     end
     q.N = N
-    ccall((:qadic_reduce, libflint), Nothing, (Ref{qadic}, Ref{FlintQadicField}), q, parent(q))
+    ccall((:qadic_reduce, libflint), Nothing, (Ref{qadic}, Ref{QadicField}), q, parent(q))
     #  @assert N >= q.N
     return q
 end
 
-function setprecision!(Q::FlintQadicField, n::Int)
+function setprecision!(Q::QadicField, n::Int)
     Q.prec_max = n
 end
 
@@ -1215,13 +1215,13 @@ end
 
 function tr(r::qadic)
     t = coefficient_ring(parent(r))()
-    ccall((:qadic_trace, libflint), Nothing, (Ref{padic}, Ref{qadic}, Ref{FlintQadicField}), t, r, parent(r))
+    ccall((:qadic_trace, libflint), Nothing, (Ref{padic}, Ref{qadic}, Ref{QadicField}), t, r, parent(r))
     return t
 end
 
 function norm(r::qadic)
     t = coefficient_ring(parent(r))()
-    ccall((:qadic_norm, libflint), Nothing, (Ref{padic}, Ref{qadic}, Ref{FlintQadicField}), t, r, parent(r))
+    ccall((:qadic_norm, libflint), Nothing, (Ref{padic}, Ref{qadic}, Ref{QadicField}), t, r, parent(r))
     return t
 end
 
@@ -1238,7 +1238,7 @@ function (Rx::Generic.PolyRing{padic})(a::qadic)
     for i = 1:length(coeffs)
         c = R()
         ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
-            (Ref{padic}, Ref{qadic}, Int, Ref{FlintQadicField}), c, a, i - 1, parent(a))
+            (Ref{padic}, Ref{qadic}, Int, Ref{QadicField}), c, a, i - 1, parent(a))
         coeffs[i] = c
     end
     return Rx(coeffs)
@@ -1248,13 +1248,13 @@ function coeff(x::qadic, i::Int)
     R = PadicField(prime(parent(x)), parent(x).prec_max)
     c = R()
     ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
-        (Ref{padic}, Ref{qadic}, Int, Ref{FlintQadicField}), c, x, i, parent(x))
+        (Ref{padic}, Ref{qadic}, Int, Ref{QadicField}), c, x, i, parent(x))
     return c
 end
 
 function setcoeff!(x::qadic, i::Int, y::padic)
     ccall((:padic_poly_set_coeff_padic, libflint), Nothing,
-        (Ref{qadic}, Int, Ref{padic}, Ref{FlintQadicField}), x, i, y, parent(x))
+        (Ref{qadic}, Int, Ref{padic}, Ref{QadicField}), x, i, y, parent(x))
 end
 
 function setcoeff!(x::qadic, i::Int, y::UInt)
@@ -1265,10 +1265,10 @@ function setcoeff!(x::qadic, i::Int, y::ZZRingElem)
     R = PadicField(prime(parent(x)), parent(x).prec_max)
     Y = R(ZZRingElem(y))
     ccall((:padic_poly_set_coeff_padic, libflint), Nothing,
-        (Ref{qadic}, Int, Ref{padic}, Ref{FlintQadicField}), x, i, Y, parent(x))
+        (Ref{qadic}, Int, Ref{padic}, Ref{QadicField}), x, i, Y, parent(x))
 end
 
-function coefficient_ring(Q::FlintQadicField)
+function coefficient_ring(Q::QadicField)
     return PadicField(prime(Q), precision(Q))
 end
 
@@ -1283,7 +1283,7 @@ function *(A::ZZMatrix, B::MatElem{padic})
 end
 
 Base.precision(Q::PadicField) = Q.prec_max
-Base.precision(Q::FlintQadicField) = Q.prec_max
+Base.precision(Q::QadicField) = Q.prec_max
 
 ^(a::qadic, b::qadic) = exp(b * log(a))
 ^(a::padic, b::padic) = exp(b * log(a))
@@ -1752,7 +1752,7 @@ function Base.setprecision(f::Generic.Poly{qadic}, N::Int)
     return g
 end
 
-function Base.setprecision(f::Function, K::Union{PadicField,FlintQadicField}, n::Int)
+function Base.setprecision(f::Function, K::Union{PadicField,QadicField}, n::Int)
     old = precision(K)
     #  @assert n>=0
     setprecision!(K, n)

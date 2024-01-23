@@ -11,15 +11,15 @@ Q-adic fields, that is, unramified extensions of p-adic fields, are provided in
 Nemo by Flint. This allows construction of $q$-adic fields for any prime power
 $q$.
 
-Q-adic fields are constructed using the `FlintQadicField` function. However,
+Q-adic fields are constructed using the `QadicField` function. However,
 for convenience we define
 
 ```
-QadicField = FlintQadicField
+QadicField = QadicField
 ```
 
 so that $q$-adic fields can be constructed using `QadicField` rather than
-`FlintQadicField`. Note that this is the name of the constructor, but not of
+`QadicField`. Note that this is the name of the constructor, but not of
 qadic field type.
 
 The types of $q$-adic fields in Nemo are given in the following table, along
@@ -50,14 +50,14 @@ the $q$-adic field itself. This is accomplished with one of the following
 constructors.
 
 ```@docs
-FlintQadicField(::Integer, ::Int, ::Int)
+QadicField(::Integer, ::Int, ::Int)
 ```
 
 It is also possible to call the inner constructor directly. It has the following
 form.
 
 ```
-FlintQadicField(p::ZZRingElem, d::Int, prec::Int)
+QadicField(p::ZZRingElem, d::Int, prec::Int)
 ```
 
 Returns the parent object for the $q$-adic field for given prime $p$ and degree
@@ -93,9 +93,9 @@ Elements of p-adic fields can  be constructed using the big-oh notation. For thi
 purpose we define the following functions.
 
 ```@docs
-O(::FlintQadicField, ::Integer)
-O(::FlintQadicField, ::ZZRingElem)
-O(::FlintQadicField, ::QQFieldElem)
+O(::QadicField, ::Integer)
+O(::QadicField, ::ZZRingElem)
+O(::QadicField, ::QQFieldElem)
 ```
 
 The $O(p^n)$ construction can be used to construct $q$-adic values of precision
@@ -127,7 +127,7 @@ value.
 ### Basic manipulation
 
 ```@docs
-prime(::FlintQadicField)
+prime(::QadicField)
 ```
 
 ```@docs
