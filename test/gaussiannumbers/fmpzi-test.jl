@@ -3,9 +3,9 @@ QQi = Nemo.GaussianRationals()
 
 @testset "fmpzi.abstract_types" begin
    @test fmpzi <: RingElem
-   @test FlintZZiRing <: Nemo.Ring
+   @test ZZiRing <: Nemo.Ring
    @test elem_type(ZZi) == fmpzi
-   @test parent_type(fmpzi) == FlintZZiRing
+   @test parent_type(fmpzi) == ZZiRing
    @test base_ring(ZZi) == ZZ
    @test base_ring(ZZi()) == ZZ
 end
@@ -214,7 +214,7 @@ end
    @test b == A && a == B
 end
 
-function test_elem(R::FlintZZiRing)
+function test_elem(R::ZZiRing)
    return rand_bits(R, rand(0:200))
 end
 

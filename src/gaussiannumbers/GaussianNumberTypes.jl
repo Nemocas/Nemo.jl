@@ -1,9 +1,9 @@
 #### QQ(i) and ZZ(i) ####
 
-struct FlintZZiRing <: Nemo.Ring
+struct ZZiRing <: Nemo.Ring
 end
 
-const FlintZZi = FlintZZiRing()
+const FlintZZi = ZZiRing()
 
 struct fmpzi <: RingElem
   x::ZZRingElem

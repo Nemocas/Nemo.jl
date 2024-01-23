@@ -4,19 +4,19 @@
 #
 ###############################################################################
 
-elem_type(::Type{FlintZZiRing}) = fmpzi
+elem_type(::Type{ZZiRing}) = fmpzi
 
-parent_type(::Type{fmpzi}) = FlintZZiRing
+parent_type(::Type{fmpzi}) = ZZiRing
 
 parent(a::fmpzi) = FlintZZi
 
-base_ring(a::FlintZZiRing) = FlintZZ
+base_ring(a::ZZiRing) = FlintZZ
 
 base_ring(a::fmpzi) = FlintZZ
 
 is_domain_type(::Type{fmpzi}) = true
 
-characteristic(a::FlintZZiRing) = 0
+characteristic(a::ZZiRing) = 0
 
 ###############################################################################
 #
@@ -32,7 +32,7 @@ function Base.show(io::IO, a::fmpzi)
    AbstractAlgebra.show_via_expressify(io, a)
 end
 
-function Base.show(io::IO, a::FlintZZiRing)
+function Base.show(io::IO, a::ZZiRing)
    if get(io, :supercompact, false)
      io = pretty(io)
      print(io, LowercaseOff(), "ZZ[im]")
@@ -56,19 +56,19 @@ function fmpzi(a::IntegerUnion)
    return fmpzi(ZZRingElem(a), ZZRingElem(0))
 end
 
-function (a::FlintZZiRing)()
+function (a::ZZiRing)()
    return fmpzi()
 end
 
-function (a::FlintZZiRing)(b::IntegerUnion)
+function (a::ZZiRing)(b::IntegerUnion)
    return fmpzi(ZZRingElem(b), ZZRingElem(0))
 end
 
-function (a::FlintZZiRing)(b::IntegerUnion, c::IntegerUnion)
+function (a::ZZiRing)(b::IntegerUnion, c::IntegerUnion)
    return fmpzi(ZZRingElem(b), ZZRingElem(c))
 end
 
-function (R::FlintZZiRing)(a::Complex{T}) where T <: Integer
+function (R::ZZiRing)(a::Complex{T}) where T <: Integer
    return FlintZZi(ZZRingElem(real(a)), ZZRingElem(imag(a)))
 end
 
@@ -83,7 +83,7 @@ function (a::ZZRing)(b::fmpzi)
    return b.x
 end
 
-function (a::FlintZZiRing)(b::fmpzi)
+function (a::ZZiRing)(b::fmpzi)
    return b
 end
 
@@ -123,7 +123,7 @@ end
 #
 ###############################################################################
 
-function rand_bits(::FlintZZiRing, b::Int)
+function rand_bits(::ZZiRing, b::Int)
    t = rand(0:b)
    return fmpzi(rand_bits(FlintZZ, t), rand_bits(FlintZZ, b - t))
 end
@@ -139,7 +139,7 @@ function deepcopy_internal(a::fmpzi, d::IdDict)
    return fmpzi(deepcopy_internal(a.x, d), deepcopy_internal(a.y, d))
 end
 
-function deepcopy_internal(a::FlintZZiRing, d::IdDict)
+function deepcopy_internal(a::ZZiRing, d::IdDict)
    return a
 end
 
@@ -159,11 +159,11 @@ function abs2(a::fmpzi)
    return a.x^2 + a.y^2
 end
 
-function zero(a::FlintZZiRing)
+function zero(a::ZZiRing)
    return fmpzi(ZZRingElem(0), ZZRingElem(0))
 end
 
-function one(a::FlintZZiRing)
+function one(a::ZZiRing)
    return fmpzi(ZZRingElem(1), ZZRingElem(0))
 end
 

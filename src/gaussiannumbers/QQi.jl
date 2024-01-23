@@ -109,7 +109,7 @@ function (a::QQField)(b::QQiFieldElem)
    return b.num.x//b.den
 end
 
-function (a::FlintZZiRing)(b::QQiFieldElem)
+function (a::ZZiRing)(b::QQiFieldElem)
    isone(b.den) || error("cannot coerce")
    return b.num
 end

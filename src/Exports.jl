@@ -212,7 +212,7 @@ export FlintQQi
 export QQiField
 export FlintZZ
 export FlintZZi
-export FlintZZiRing
+export ZZiRing
 export flog
 export floor
 export fmma!
