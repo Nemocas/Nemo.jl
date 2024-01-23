@@ -143,7 +143,7 @@ lift(::ZZPolyRing, ::FpPolyRingElem)
 **Examples**
 
 ```julia
-R = residue_ring(ZZ, 123456789012345678949)
+R, = residue_ring(ZZ, 123456789012345678949)
 S, x = polynomial_ring(R, "x")
 T, y = polynomial_ring(ZZ, "y")
 
@@ -224,7 +224,7 @@ factor_distinct_deg(::fqPolyRepPolyRingElem)
 **Examples**
 
 ```
-R = residue_ring(ZZ, 23)
+R, = residue_ring(ZZ, 23)
 S, x = polynomial_ring(R, "x")
 
 f = x^2 + 2x + 1

@@ -1228,3 +1228,20 @@ end
 function show_maxreal(io::IO, a::AnticNumberField)
   print(io, "Maximal real subfield of cyclotomic field of order $(get_attribute(a, :maxreal))")
 end
+
+################################################################################
+#
+#  Residue field is number field
+#
+################################################################################
+
+function residue_field(R::QQPolyRing, f::QQPolyRingElem; cached::Bool = true)
+  K, a = number_field(f, :$, cached = cached)
+  f = Generic.EuclideanRingResidueMap(R, K)
+  return K, f
+end
+
+function preimage(f::Generic.EuclideanRingResidueMap{QQPolyRing, AnticNumberField}, x)
+  parent(x) !== codomain(f) && error("Not an element of the codomain")
+  return domain(f)(x)
+end

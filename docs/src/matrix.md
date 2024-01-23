@@ -201,7 +201,7 @@ lift(::fpMatrix)
 **Examples**
 
 ```julia
-R = residue_ring(ZZ, 7)
+R, = residue_ring(ZZ, 7)
 S = matrix_space(R, 3, 3)
 
 a = S([4 5 6; 7 3 2; 1 4 5])
@@ -371,7 +371,7 @@ strong_echelon_form(::fpMatrix)
 **Examples**
 
 ```julia
-R = residue_ring(ZZ, 12)
+R, = residue_ring(ZZ, 12)
 S = matrix_space(R, 3, 3)
 
 A = S([4 1 0; 0 0 5; 0 0 0 ])
@@ -389,7 +389,7 @@ howell_form(::fpMatrix)
 **Examples**
 
 ```julia
-R = residue_ring(ZZ, 12)
+R, = residue_ring(ZZ, 12)
 S = matrix_space(R, 3, 3)
 
 A = S([4 1 0; 0 0 5; 0 0 0 ])

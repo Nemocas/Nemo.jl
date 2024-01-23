@@ -245,12 +245,12 @@ end
   ignore = ZZModMatrix(ZZ(81), M0)
   # Now check conversion via matrix_space: first use a modulus of type Int/UInt
   m = 81
-  ZZmodm = residue_ring(ZZ,m)
+  ZZmodm, = residue_ring(ZZ,m)
   S81 = matrix_space(ZZmodm,2,2)
   M81 = S81(M0)
   @test M81[1,1] == 1 && M81[1,2] == 18 && M81[2,1] == 37 && M81[2,2] == -13;
   # Now use matrix_space with modulus of type ZZRingElem (see GitHub issue #2947)
-  ZZmodM = residue_ring(ZZ,ZZ(m))
+  ZZmodM, = residue_ring(ZZ,ZZ(m))
   SZZ81 = matrix_space(ZZmodM,2,2)
   MZZ81 = SZZ81(M0)
   @test MZZ81[1,1] == 1 && MZZ81[1,2] == 18 && MZZ81[2,1] == 37 && MZZ81[2,2] == -13;

@@ -168,7 +168,7 @@
    R, x = finite_field(ZZRingElem(23), 5, "x")
    S = matrix_space(R, 2, 2)
 
-   for R in [FlintZZ, residue_ring(FlintZZ, 23), residue_ring(FlintZZ, ZZ(23)), Native.GF(23)]
+   for R in [FlintZZ, residue_ring(FlintZZ, 23)[1], residue_ring(FlintZZ, ZZ(23))[1], Native.GF(23)]
       M = matrix(R, 2, 2, [1, 2, 3, 4])
 
       @test isa(S(M), MatElem)

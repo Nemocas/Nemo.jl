@@ -241,7 +241,7 @@ _FQ_DEFAULT_FQ        = 3
 _FQ_DEFAULT_NMOD      = 4
 _FQ_DEFAULT_FMPZ_NMOD = 5
 
-mutable struct CanonicalFqDefaultMap{T} <: Map{FqField, T, SetMap, CanonicalFqDefaultMap}
+mutable struct CanonicalFqDefaultMap{T}# <: Map{FqField, T, SetMap, CanonicalFqDefaultMap}
   D::FqField
   C::T
 end
@@ -250,7 +250,7 @@ domain(f::CanonicalFqDefaultMap) = f.D
 
 codomain(f::CanonicalFqDefaultMap) = f.C
 
-mutable struct CanonicalFqDefaultMapInverse{T} <: Map{T, FqField, SetMap, CanonicalFqDefaultMapInverse}
+mutable struct CanonicalFqDefaultMapInverse{T}# <: Map{T, FqField, SetMap, CanonicalFqDefaultMapInverse}
   D::T
   C::FqField
 end
@@ -925,3 +925,20 @@ end
 
 # The following code is used in the intersection code
 similar(F::FqField, deg::Int, s::VarName = :o; cached = true) = finite_field(characteristic(F), deg, s, cached = cached)[1]
+
+################################################################################
+#
+#  Residue field of ZZ
+#
+################################################################################
+
+function residue_field(R::ZZRing, p::IntegerUnion; cached::Bool = true)
+  S = GF(p; cached = cached)
+  f = Generic.EuclideanRingResidueMap(R, S)
+  return S, f
+end
+
+function preimage(f::Generic.EuclideanRingResidueMap{ZZRing, FqField}, x)
+  parent(x) !== codomain(f) && error("Not an element of the codomain")
+  return lift(ZZ, x)
+end

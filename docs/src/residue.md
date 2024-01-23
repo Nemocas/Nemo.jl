@@ -55,8 +55,7 @@ gcdx(::ZZModRingElem, ::ZZModRingElem)
 **Examples**
 
 ```jldoctest
-julia> R = residue_ring(ZZ, 123456789012345678949)
-Integers modulo 123456789012345678949
+julia> R, = residue_ring(ZZ, 123456789012345678949);
 
 julia> g, s, t = gcdx(R(123), R(456))
 (1, 123456789012345678928, 41152263004115226322)

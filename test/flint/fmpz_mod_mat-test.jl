@@ -1,6 +1,6 @@
 @testset "ZZModMatrix.constructors" begin
-  Z2 = residue_ring(ZZ, ZZ(2))
-  Z3 = residue_ring(ZZ, ZZ(3))
+  Z2, = residue_ring(ZZ, ZZ(2))
+  Z3, = residue_ring(ZZ, ZZ(3))
 
   R = ZZModMatrixSpace(Z2, 2, 2)
 
@@ -141,7 +141,7 @@
 end
 
 @testset "ZZModMatrix.similar" begin
-   Z13 = residue_ring(ZZ, ZZ(13))
+   Z13, = residue_ring(ZZ, ZZ(13))
    S = ZZModMatrixSpace(Z13, 2, 2)
    s = S(ZZRingElem(3))
 
@@ -163,7 +163,7 @@ end
 end
 
 @testset "ZZModMatrix.printing" begin
-  Z2 = residue_ring(ZZ, ZZ(2))
+  Z2, = residue_ring(ZZ, ZZ(2))
   R = ZZModMatrixSpace(Z2, 2, 2)
 
   a = R(1)
@@ -173,9 +173,9 @@ end
 end
 
 @testset "ZZModMatrix.manipulation" begin
-  Z10 = residue_ring(ZZ, ZZ(10))
+  Z10, = residue_ring(ZZ, ZZ(10))
   R = ZZModMatrixSpace(Z10, 2, 2)
-  Z20 = residue_ring(ZZ, ZZ(20))
+  Z20, = residue_ring(ZZ, ZZ(20))
   S = ZZModMatrixSpace(Z20, 2, 2)
 
   ar = [ 1 2; 3 4]
@@ -224,7 +224,7 @@ end
 
   @test iszero(e)
 
-  @test_throws ErrorException one(matrix_space(residue_ring(ZZ, ZZ(2)), 1, 2))
+  @test_throws ErrorException one(matrix_space(residue_ring(ZZ, ZZ(2))[1], 1, 2))
 
   @test is_square(a)
 
@@ -245,11 +245,11 @@ end
 end
 
 @testset "ZZModMatrix.unary_ops" begin
-  Z17 = residue_ring(ZZ, ZZ(17))
+  Z17, = residue_ring(ZZ, ZZ(17))
 
   R = matrix_space(Z17, 3, 4)
   RR = matrix_space(Z17, 4, 3)
-  Z2 = residue_ring(ZZ, ZZ(2))
+  Z2, = residue_ring(ZZ, ZZ(2))
   S = matrix_space(Z2, 3, 4)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
@@ -264,7 +264,7 @@ end
 end
 
 @testset "ZZModMatrix.binary_ops" begin
-  Z17 = residue_ring(ZZ, ZZ(17))
+  Z17, = residue_ring(ZZ, ZZ(17))
 
   R = matrix_space(Z17, 3, 4)
 
@@ -292,7 +292,7 @@ end
 end
 
 @testset "ZZModMatrix.row_col_swapping" begin
-   R = residue_ring(FlintZZ, ZZ(17))
+   R, = residue_ring(FlintZZ, ZZ(17))
 
    a = matrix(R, [1 2; 3 4; 5 6])
 
@@ -331,10 +331,10 @@ end
 end
 
 @testset "ZZModMatrix.adhoc_binary" begin
-  Z17 = residue_ring(ZZ, ZZ(17))
+  Z17, = residue_ring(ZZ, ZZ(17))
 
   R = matrix_space(Z17, 3, 4)
-  Z2 = residue_ring(ZZ, ZZ(2))
+  Z2, = residue_ring(ZZ, ZZ(2))
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 
@@ -370,7 +370,7 @@ end
 end
 
 @testset "ZZModMatrix.comparison" begin
-  Z17 = residue_ring(ZZ, ZZ(17))
+  Z17, = residue_ring(ZZ, ZZ(17))
 
   R = matrix_space(Z17, 3, 4)
 
@@ -384,7 +384,7 @@ end
 end
 
 @testset "ZZModMatrix.adhoc_comparison" begin
-  Z17 = residue_ring(ZZ, ZZ(17))
+  Z17, = residue_ring(ZZ, ZZ(17))
 
   R = matrix_space(Z17, 3, 4)
 
@@ -398,7 +398,7 @@ end
 end
 
 @testset "ZZModMatrix.powering" begin
-  Z17 = residue_ring(ZZ, ZZ(17))
+  Z17, = residue_ring(ZZ, ZZ(17))
 
   R = matrix_space(Z17, 3, 4)
 
@@ -418,10 +418,10 @@ end
 end
 
 @testset "ZZModMatrix.row_echelon_form" begin
-  Z17 = residue_ring(ZZ, ZZ(17))
+  Z17, = residue_ring(ZZ, ZZ(17))
   R = matrix_space(Z17, 3, 4)
   RR = matrix_space(Z17, 4, 3)
-  Z2 = residue_ring(ZZ, ZZ(2))
+  Z2, = residue_ring(ZZ, ZZ(2))
   S = matrix_space(Z2, 3, 4)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
@@ -452,7 +452,7 @@ end
 end
 
 @testset "ZZModMatrix.howell_form" begin
-  Z17 = residue_ring(ZZ, ZZ(12))
+  Z17, = residue_ring(ZZ, ZZ(12))
   R = matrix_space(Z17, 3, 3)
 
   a = R([4 1 0; 0 0 5; 0 0 0 ])
@@ -469,10 +469,10 @@ end
 end
 
 @testset "ZZModMatrix.trace_det" begin
-  Z17 = residue_ring(ZZ, ZZ(17))
+  Z17, = residue_ring(ZZ, ZZ(17))
   R = matrix_space(Z17, 3, 4)
   RR = matrix_space(Z17, 4, 3)
-  Z2 = residue_ring(ZZ, ZZ(2))
+  Z2, = residue_ring(ZZ, ZZ(2))
   S = matrix_space(Z2, 3, 4)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
@@ -501,16 +501,16 @@ end
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
 
-  R = residue_ring(ZZ, 3^5)
+  R, = residue_ring(ZZ, 3^5)
   a = R[1;]
   @test @inferred isone(det(a))
 end
 
 @testset "ZZModMatrix.rank" begin
-  Z17 = residue_ring(ZZ, ZZ(17))
+  Z17, = residue_ring(ZZ, ZZ(17))
   R = matrix_space(Z17, 3, 4)
   RR = matrix_space(Z17, 4, 3)
-  Z2 = residue_ring(ZZ, ZZ(2))
+  Z2, = residue_ring(ZZ, ZZ(2))
   S = matrix_space(Z2, 3, 4)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
@@ -533,10 +533,10 @@ end
 end
 
 @testset "ZZModMatrix.inv" begin
-  Z17 = residue_ring(ZZ, ZZ(17))
+  Z17, = residue_ring(ZZ, ZZ(17))
   R = matrix_space(Z17, 3, 4)
   RR = matrix_space(Z17, 4, 3)
-  Z2 = residue_ring(ZZ, ZZ(2))
+  Z2, = residue_ring(ZZ, ZZ(2))
   S = matrix_space(Z2, 3, 4)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
@@ -553,7 +553,7 @@ end
 
   @test_throws ErrorException inv(transpose(a)*a)
 
-  R = residue_ring(ZZ, 8)
+  R, = residue_ring(ZZ, 8)
   G = matrix(R, 2, 2, [2 ,1 ,1 , 2])
   Ginv = @inferred inv(G)
   @test isone(G * Ginv)
@@ -566,7 +566,7 @@ end
 #=  Not implemented in Flint yet
 
 @testset "ZZModMatrix.solve" begin
-  Z17 = residue_ring(ZZ, ZZ(17))
+  Z17, = residue_ring(ZZ, ZZ(17))
   R = matrix_space(Z17, 3, 3)
   S = matrix_space(Z17, 3, 4)
 
@@ -591,7 +591,7 @@ end
 
 @testset "ZZModMatrix.lu" begin
 
-  Z17 = residue_ring(ZZ, ZZ(17))
+  Z17, = residue_ring(ZZ, ZZ(17))
   R = matrix_space(Z17, 3, 3)
   S = matrix_space(Z17, 3, 4)
 
@@ -620,7 +620,7 @@ end
 =#
 
 @testset "ZZModMatrix.swap_rows" begin
-  Z17 = residue_ring(ZZ, ZZ(17))
+  Z17, = residue_ring(ZZ, ZZ(17))
 
   A = matrix(Z17, 5, 1, [1, 2, 3, 4, 5])
 
@@ -635,7 +635,7 @@ end
 end
 
 @testset "ZZModMatrix.view" begin
-  Z17 = residue_ring(ZZ, ZZ(17))
+  Z17, = residue_ring(ZZ, ZZ(17))
   R = matrix_space(Z17, 3, 3)
   S = matrix_space(Z17, 3, 4)
 
@@ -692,7 +692,7 @@ end
 end
 
 @testset "ZZModMatrix.sub" begin
-   Z17 = residue_ring(ZZ, ZZ(17))
+   Z17, = residue_ring(ZZ, ZZ(17))
    S = matrix_space(Z17, 3, 3)
 
    A = S([1 2 3; 4 5 6; 7 8 9])
@@ -716,7 +716,7 @@ end
 end
 
 @testset "ZZModMatrix.concatenation" begin
-  Z17 = residue_ring(ZZ, ZZ(17))
+  Z17, = residue_ring(ZZ, ZZ(17))
   R = matrix_space(Z17, 3, 3)
   S = matrix_space(Z17, 3, 4)
 
@@ -752,7 +752,7 @@ end
 end
 
 @testset "ZZModMatrix.conversion" begin
-  Z17 = residue_ring(ZZ, ZZ(17))
+  Z17, = residue_ring(ZZ, ZZ(17))
   R = matrix_space(Z17, 3, 3)
   S = matrix_space(ZZ, 3, 3)
 
@@ -778,7 +778,7 @@ end
 end
 
 @testset "ZZModMatrix.charpoly" begin
-   R = residue_ring(ZZ, ZZ(17))
+   R, = residue_ring(ZZ, ZZ(17))
 
    for dim = 0:5
       S = matrix_space(R, dim, dim)
@@ -796,7 +796,7 @@ end
 end
 
 @testset "ZZModMatrix.rand" begin
-   R = residue_ring(ZZ, ZZ(17))
+   R, = residue_ring(ZZ, ZZ(17))
    S = matrix_space(R, 3, 3)
 
    M = rand(S, 1:5)
