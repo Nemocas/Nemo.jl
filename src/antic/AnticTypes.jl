@@ -6,7 +6,7 @@
 
 ###############################################################################
 #
-#   AnticNumberField / nf_elem
+#   AnticNumberField / AnticNumberFieldElem
 #
 ###############################################################################
 
@@ -60,7 +60,7 @@ function _AnticNumberField_clear_fn(a::AnticNumberField)
 end
 
 """
-    nf_elem
+    AnticNumberFieldElem
  
 The element type of an (absolute simple) number field, i.e., an extension
 of QQ by an irreducible polynomial.
@@ -70,7 +70,7 @@ Essentially never called directly.
 
 See also [`number_field`](@ref).
 """
-mutable struct nf_elem <: SimpleNumFieldElem{QQFieldElem}
+mutable struct AnticNumberFieldElem <: SimpleNumFieldElem{QQFieldElem}
    elem_coeffs::Ptr{Nothing}
    elem_alloc::Int
    elem_length::Int
@@ -79,28 +79,28 @@ mutable struct nf_elem <: SimpleNumFieldElem{QQFieldElem}
 
    parent::AnticNumberField
 
-   function nf_elem(p::AnticNumberField)
+   function AnticNumberFieldElem(p::AnticNumberField)
       r = new()
       ccall((:nf_elem_init, libantic), Nothing, 
-            (Ref{nf_elem}, Ref{AnticNumberField}), r, p)
+            (Ref{AnticNumberFieldElem}, Ref{AnticNumberField}), r, p)
       r.parent = p
       finalizer(_nf_elem_clear_fn, r)
       return r
    end
 
-   function nf_elem(p::AnticNumberField, a::nf_elem)
+   function AnticNumberFieldElem(p::AnticNumberField, a::AnticNumberFieldElem)
       r = new()
       ccall((:nf_elem_init, libantic), Nothing, 
-            (Ref{nf_elem}, Ref{AnticNumberField}), r, p)
+            (Ref{AnticNumberFieldElem}, Ref{AnticNumberField}), r, p)
       ccall((:nf_elem_set, libantic), Nothing,
-            (Ref{nf_elem}, Ref{nf_elem}, Ref{AnticNumberField}), r, a, p)
+            (Ref{AnticNumberFieldElem}, Ref{AnticNumberFieldElem}, Ref{AnticNumberField}), r, a, p)
       r.parent = p
       finalizer(_nf_elem_clear_fn, r)
       return r
    end
 end
 
-function _nf_elem_clear_fn(a::nf_elem)
+function _nf_elem_clear_fn(a::AnticNumberFieldElem)
    ccall((:nf_elem_clear, libantic), Nothing, 
-         (Ref{nf_elem}, Ref{AnticNumberField}), a, a.parent)
+         (Ref{AnticNumberFieldElem}, Ref{AnticNumberField}), a, a.parent)
 end

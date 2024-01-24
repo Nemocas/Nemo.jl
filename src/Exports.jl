@@ -457,7 +457,7 @@ export next_prime
 export next_signed_calkin_wilf
 export next_signed_minimal
 export nextpow2
-export nf_elem
+export AnticNumberFieldElem
 export nfdivrem
 export NonArchLocalField
 export NonArchLocalFieldElem

@@ -185,7 +185,7 @@ end
 #TODO:
 # expand systematically for all finite fields
 # and for ZZRingElem/QQFieldElem poly
-# for fun: is_power(a::nf_elem)
+# for fun: is_power(a::AnticNumberFieldElem)
 #
 
 function factor(R::T, f::QQPolyRingElem) where {T<:Union{fqPolyRepField,fpField}}
