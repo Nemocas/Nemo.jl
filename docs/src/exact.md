@@ -30,7 +30,7 @@ stores various options for evaluation (documented further below).
 
  Library        | Element type  | Parent type
 ----------------|---------------|--------------------
-Calcium         | `ca`          | `CalciumField`
+Calcium         | `CalciumFieldElem`          | `CalciumField`
 
 
 Please note the following:
@@ -62,7 +62,7 @@ Please note the following:
   You must create a separate parent object for each thread
   to do parallel computation.
 
-* When performing an operation involving two `ca` operands with different
+* When performing an operation involving two `CalciumFieldElem` operands with different
   parent objects, Nemo will arbitrarily coerce the operands (and hence
   the result) to one of the parents.
 
@@ -188,7 +188,7 @@ julia> CC(exp(C(1im)))
 The constructor
 
 ```julia
-(R::AcbField)(a::ca; parts::Bool=false)
+(R::AcbField)(a::CalciumFieldElem; parts::Bool=false)
 ```
 
 returns an enclosure of the complex number *a*.
@@ -216,7 +216,7 @@ julia> AcbField(64)(x, parts=true)
 The constructor
 
 ```julia
-(R::ArbField)(a::ca; check::Bool=true)
+(R::ArbField)(a::CalciumFieldElem; check::Bool=true)
 ```
 
 returns a real enclosure.
@@ -288,7 +288,7 @@ We illustrate finding square roots that are well-approximated by integers:
 
 ```julia
 julia> sort([sqrt(C(n)) for n=0:10], by=x -> abs(x - floor(x + C(1)//2)))
-11-element Vector{ca}:
+11-element Vector{CalciumFieldElem}:
  0
  1
  2
@@ -320,13 +320,13 @@ may become configurable in the future.
 **Interface**
 
 ```@docs
-iszero(a::ca)
-isone(a::ca)
-is_algebraic(a::ca)
-is_rational(a::ca)
-isinteger(a::ca)
-isreal(a::ca)
-is_imaginary(a::ca)
+iszero(a::CalciumFieldElem)
+isone(a::CalciumFieldElem)
+is_algebraic(a::CalciumFieldElem)
+is_rational(a::CalciumFieldElem)
+isinteger(a::CalciumFieldElem)
+isreal(a::CalciumFieldElem)
+is_imaginary(a::CalciumFieldElem)
 ```
 
 ## Infinities and special values
@@ -361,15 +361,15 @@ infinities in matrices or polynomials.
 ```@docs
 unsigned_infinity(C::CalciumField)
 infinity(C::CalciumField)
-infinity(a::ca)
+infinity(a::CalciumFieldElem)
 undefined(C::CalciumField)
 unknown(C::CalciumField)
-is_number(a::ca)
-is_undefined(a::ca)
-isinf(a::ca)
-is_uinf(a::ca)
-is_signed_inf(a::ca)
-is_unknown(a::ca)
+is_number(a::CalciumFieldElem)
+is_undefined(a::CalciumFieldElem)
+isinf(a::CalciumFieldElem)
+is_uinf(a::CalciumFieldElem)
+is_signed_inf(a::CalciumFieldElem)
+is_unknown(a::CalciumFieldElem)
 ```
 
 ## Complex parts
@@ -407,15 +407,15 @@ julia> ZZ(floor(C(pi) ^ 100))
 **Interface**
 
 ```@docs
-real(a::ca)
-imag(a::ca)
-angle(a::ca)
-csgn(a::ca)
-sign(a::ca)
-abs(a::ca)
-conj(a::ca; form::Symbol=:default)
-floor(a::ca)
-ceil(a::ca)
+real(a::CalciumFieldElem)
+imag(a::CalciumFieldElem)
+angle(a::CalciumFieldElem)
+csgn(a::CalciumFieldElem)
+sign(a::CalciumFieldElem)
+abs(a::CalciumFieldElem)
+conj(a::CalciumFieldElem; form::Symbol=:default)
+floor(a::CalciumFieldElem)
+ceil(a::CalciumFieldElem)
 ```
 
 ## Elementary and special functions
@@ -512,25 +512,25 @@ Of course, this is not a rigorous proof that the numbers are equal, and
 const_pi(C::CalciumField)
 const_euler(C::CalciumField)
 onei(C::CalciumField)
-sqrt(a::ca)
-exp(a::ca)
-log(a::ca)
-pow(a::ca, b::Int; form::Symbol=:default)
-sin(a::ca; form::Symbol=:default)
-cos(a::ca; form::Symbol=:default)
-tan(a::ca; form::Symbol=:default)
-atan(a::ca; form::Symbol=:default)
-asin(a::ca; form::Symbol=:default)
-acos(a::ca; form::Symbol=:default)
-gamma(a::ca)
-erf(a::ca)
-erfi(a::ca)
-erfc(a::ca)
+sqrt(a::CalciumFieldElem)
+exp(a::CalciumFieldElem)
+log(a::CalciumFieldElem)
+pow(a::CalciumFieldElem, b::Int; form::Symbol=:default)
+sin(a::CalciumFieldElem; form::Symbol=:default)
+cos(a::CalciumFieldElem; form::Symbol=:default)
+tan(a::CalciumFieldElem; form::Symbol=:default)
+atan(a::CalciumFieldElem; form::Symbol=:default)
+asin(a::CalciumFieldElem; form::Symbol=:default)
+acos(a::CalciumFieldElem; form::Symbol=:default)
+gamma(a::CalciumFieldElem)
+erf(a::CalciumFieldElem)
+erfi(a::CalciumFieldElem)
+erfc(a::CalciumFieldElem)
 ```
 
 ## Rewriting and simplification
 
 ```@docs
-complex_normal_form(a::ca; deep::Bool=true)
+complex_normal_form(a::CalciumFieldElem; deep::Bool=true)
 ```
 

@@ -59,7 +59,7 @@ export bin
 export binomial
 export bits
 export bound_inf_norm
-export ca
+export CalciumFieldElem
 export CalciumField
 export CalciumQQBar
 export CalciumQQBarField
