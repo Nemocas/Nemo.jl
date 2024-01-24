@@ -1,3 +1,5 @@
+using Nemo: QQiFieldElem
+
 ZZi = Nemo.GaussianIntegers()
 QQi = Nemo.GaussianRationals()
 
