@@ -1,6 +1,6 @@
 # Deprecated in 0.22.*
 
-@deprecate binom(x::arb, n::UInt) binomial(x, n)
+@deprecate binom(x::ArbFieldElem, n::UInt) binomial(x, n)
 
 @deprecate binom(n::UInt, k::UInt, r::ArbField) binomial(n, k, r)
 
@@ -74,19 +74,19 @@
 
 @deprecate risingfac2(x::acb, n::Int) rising_factorial2(x, n)
 
-@deprecate risingfac(x::arb, n::UInt) rising_factorial(x, n)
+@deprecate risingfac(x::ArbFieldElem, n::UInt) rising_factorial(x, n)
 
-@deprecate risingfac(x::arb, n::Int) rising_factorial(x, n)
+@deprecate risingfac(x::ArbFieldElem, n::Int) rising_factorial(x, n)
 
 @deprecate risingfac(x::QQFieldElem, n::UInt, r::ArbField) rising_factorial(x, n, r)
 
 @deprecate risingfac(x::QQFieldElem, n::Int, r::ArbField) rising_factorial(x, n, r)
 
-@deprecate risingfac2(x::arb, n::UInt) rising_factorial2(x, n)
+@deprecate risingfac2(x::ArbFieldElem, n::UInt) rising_factorial2(x, n)
 
-@deprecate risingfac2(x::arb, n::Int) rising_factorial2(x, n)
+@deprecate risingfac2(x::ArbFieldElem, n::Int) rising_factorial2(x, n)
 
-@deprecate fac(x::arb) factorial(x)
+@deprecate fac(x::ArbFieldElem) factorial(x)
 
 @deprecate fac(n::UInt, r::ArbField) factorial(n, r)
 
