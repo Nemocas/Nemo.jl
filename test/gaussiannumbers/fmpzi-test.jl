@@ -1,3 +1,5 @@
+using Nemo: ZZiRingElem
+
 ZZi = Nemo.GaussianIntegers()
 QQi = Nemo.GaussianRationals()
 

@@ -218,7 +218,6 @@ export fmma!
 export fmms!
 export fmodpow2
 export QQiFieldElem
-export ZZiRingElem
 export ZZRingElemUnitRange
 export fpAbsPowerSeriesRing
 export FpAbsPowerSeriesRing
