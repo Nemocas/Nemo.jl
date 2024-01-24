@@ -204,3 +204,8 @@ Base.@deprecate_binding fmpqi QQiFieldElem
 Base.@deprecate_binding FlintZZiRing ZZiRing
 Base.@deprecate_binding fmpzi ZZiRingElem
 Base.@deprecate_binding fmpzUnitRange ZZRingElemUnitRange
+Base.@deprecate_binding qqbar QQBarFieldElem
+Base.@deprecate_binding ca CalciumFieldElem
+Base.@deprecate_binding nf_elem AnticNumberFieldElem
+Base.@deprecate_binding arb ArbFieldElem
+Base.@deprecate_binding arb_poly ArbPolyRingElem
