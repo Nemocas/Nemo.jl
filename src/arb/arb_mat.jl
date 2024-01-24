@@ -34,7 +34,7 @@ base_ring(a::arb_mat) = a.base_ring
 
 parent(x::arb_mat) = matrix_space(base_ring(x), nrows(x), ncols(x))
 
-dense_matrix_type(::Type{arb}) = arb_mat
+dense_matrix_type(::Type{ArbFieldElem}) = arb_mat
 
 precision(x::ArbMatSpace) = precision(x.base_ring)
 
@@ -44,11 +44,11 @@ function check_parent(x::arb_mat, y::arb_mat, throw::Bool = true)
    return !fl
 end
 
-function getindex!(z::arb, x::arb_mat, r::Int, c::Int)
+function getindex!(z::ArbFieldElem, x::arb_mat, r::Int, c::Int)
   GC.@preserve x begin
-     v = ccall((:arb_mat_entry_ptr, libarb), Ptr{arb},
+     v = ccall((:arb_mat_entry_ptr, libarb), Ptr{ArbFieldElem},
                  (Ref{arb_mat}, Int, Int), x, r - 1, c - 1)
-     ccall((:arb_set, libarb), Nothing, (Ref{arb}, Ptr{arb}), z, v)
+     ccall((:arb_set, libarb), Nothing, (Ref{ArbFieldElem}, Ptr{ArbFieldElem}), z, v)
   end
   return z
 end
@@ -58,20 +58,20 @@ end
 
   z = base_ring(x)()
   GC.@preserve x begin
-     v = ccall((:arb_mat_entry_ptr, libarb), Ptr{arb},
+     v = ccall((:arb_mat_entry_ptr, libarb), Ptr{ArbFieldElem},
                  (Ref{arb_mat}, Int, Int), x, r - 1, c - 1)
-     ccall((:arb_set, libarb), Nothing, (Ref{arb}, Ptr{arb}), z, v)
+     ccall((:arb_set, libarb), Nothing, (Ref{ArbFieldElem}, Ptr{ArbFieldElem}), z, v)
   end
   return z
 end
 
-for T in [Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, arb, AbstractString]
+for T in [Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AbstractString]
    @eval begin
       @inline function setindex!(x::arb_mat, y::$T, r::Int, c::Int)
          @boundscheck Generic._checkbounds(x, r, c)
 
          GC.@preserve x begin
-            z = ccall((:arb_mat_entry_ptr, libarb), Ptr{arb},
+            z = ccall((:arb_mat_entry_ptr, libarb), Ptr{ArbFieldElem},
                       (Ref{arb_mat}, Int, Int), x, r - 1, c - 1)
             Nemo._arb_set(z, y, precision(base_ring(x)))
          end
@@ -207,17 +207,17 @@ end
 
 *(x::ZZRingElem, y::arb_mat) = y*x
 
-function *(x::arb_mat, y::arb)
+function *(x::arb_mat, y::ArbFieldElem)
   z = similar(x)
   ccall((:arb_mat_scalar_mul_arb, libarb), Nothing,
-              (Ref{arb_mat}, Ref{arb_mat}, Ref{arb}, Int),
+              (Ref{arb_mat}, Ref{arb_mat}, Ref{ArbFieldElem}, Int),
               z, x, y, precision(base_ring(x)))
   return z
 end
 
-*(x::arb, y::arb_mat) = y*x
+*(x::ArbFieldElem, y::arb_mat) = y*x
 
-for T in [Integer, ZZRingElem, QQFieldElem, arb]
+for T in [Integer, ZZRingElem, QQFieldElem, ArbFieldElem]
    @eval begin
       function +(x::arb_mat, y::$T)
          z = deepcopy(x)
@@ -444,10 +444,10 @@ function divexact(x::arb_mat, y::ZZRingElem; check::Bool=true)
   return z
 end
 
-function divexact(x::arb_mat, y::arb; check::Bool=true)
+function divexact(x::arb_mat, y::ArbFieldElem; check::Bool=true)
   z = similar(x)
   ccall((:arb_mat_scalar_div_arb, libarb), Nothing,
-              (Ref{arb_mat}, Ref{arb_mat}, Ref{arb}, Int),
+              (Ref{arb_mat}, Ref{arb_mat}, Ref{ArbFieldElem}, Int),
               z, x, y, precision(base_ring(x)))
   return z
 end
@@ -476,7 +476,7 @@ function det(x::arb_mat)
   ncols(x) != nrows(x) && error("Matrix must be square")
   z = base_ring(x)()
   ccall((:arb_mat_det, libarb), Nothing,
-              (Ref{arb}, Ref{arb_mat}, Int), z, x, precision(base_ring(x)))
+              (Ref{ArbFieldElem}, Ref{arb_mat}, Int), z, x, precision(base_ring(x)))
   return z
 end
 
@@ -595,16 +595,16 @@ end
 @doc raw"""
     bound_inf_norm(x::arb_mat)
 
-Returns a non-negative element $z$ of type `arb`, such that $z$ is an upper
+Returns a non-negative element $z$ of type `ArbFieldElem`, such that $z$ is an upper
 bound for the infinity norm for every matrix in $x$
 """
 function bound_inf_norm(x::arb_mat)
-  z = arb()
+  z = ArbFieldElem()
   GC.@preserve x z begin
-     t = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ref{arb}, ), z)
+     t = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ref{ArbFieldElem}, ), z)
      ccall((:arb_mat_bound_inf_norm, libarb), Nothing,
                  (Ptr{mag_struct}, Ref{arb_mat}), t, x)
-     s = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ref{arb}, ), z)
+     s = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ref{ArbFieldElem}, ), z)
      ccall((:arf_set_mag, libarb), Nothing,
                  (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
      ccall((:mag_zero, libarb), Nothing,
@@ -651,14 +651,14 @@ function (x::ArbMatSpace)(y::ZZMatrix)
   return z
 end
 
-function (x::ArbMatSpace)(y::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, arb, AbstractString}}
+function (x::ArbMatSpace)(y::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AbstractString}}
   _check_dim(nrows(x), ncols(x), y)
   z = arb_mat(nrows(x), ncols(x), y, precision(x))
   z.base_ring = x.base_ring
   return z
 end
 
-function (x::ArbMatSpace)(y::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, arb, AbstractString}}
+function (x::ArbMatSpace)(y::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AbstractString}}
   _check_dim(nrows(x), ncols(x), y)
   z = arb_mat(nrows(x), ncols(x), y, precision(x))
   z.base_ring = x.base_ring
@@ -666,7 +666,7 @@ function (x::ArbMatSpace)(y::AbstractVector{T}) where {T <: Union{Int, UInt, ZZR
 end
 
 function (x::ArbMatSpace)(y::Union{Int, UInt, ZZRingElem, QQFieldElem, Float64,
-                          BigFloat, arb, AbstractString})
+                          BigFloat, ArbFieldElem, AbstractString})
   z = x()
   for i in 1:nrows(z)
       for j = 1:ncols(z)
@@ -686,13 +686,13 @@ end
 #
 ###############################################################################
 
-function matrix(R::ArbField, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, arb, AbstractString}}
+function matrix(R::ArbField, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AbstractString}}
    z = arb_mat(size(arr, 1), size(arr, 2), arr, precision(R))
    z.base_ring = R
    return z
 end
 
-function matrix(R::ArbField, r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, arb, AbstractString}}
+function matrix(R::ArbField, r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AbstractString}}
    _check_dim(r, c, arr)
    z = arb_mat(r, c, arr, precision(R))
    z.base_ring = R
@@ -764,7 +764,7 @@ promote_rule(::Type{arb_mat}, ::Type{ZZRingElem}) = arb_mat
 
 promote_rule(::Type{arb_mat}, ::Type{QQFieldElem}) = arb_mat
 
-promote_rule(::Type{arb_mat}, ::Type{arb}) = arb_mat
+promote_rule(::Type{arb_mat}, ::Type{ArbFieldElem}) = arb_mat
 
 promote_rule(::Type{arb_mat}, ::Type{Float64}) = arb_mat
 

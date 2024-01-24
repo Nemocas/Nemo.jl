@@ -92,7 +92,7 @@ end
    end
 end
 
-@testset "continued_fraction.arb" begin
+@testset "continued_fraction.ArbFieldElem" begin
    set_precision!(Balls, 100) do 
      CC = ArbField()
      @test continued_fraction(CC(11//8)) == ZZRingElem[1, 2, 1, 2]
@@ -105,7 +105,7 @@ end
                                    (ZZRingElem[-1, 1, 2, 7], matrix(ZZ, [-7 -1; 22 3]))
 
      z = CC()
-     ccall((:arb_zero_pm_one, Nemo.libarb), Nothing, (Ref{arb},), z)
+     ccall((:arb_zero_pm_one, Nemo.libarb), Nothing, (Ref{ArbFieldElem},), z)
      @test_throws Exception continued_fraction(inv(z))
      # need exact intervals [-1, 1], [543//512, 17/16], [542//512, 17//16] here
      @test continued_fraction(z) == ZZRingElem[]

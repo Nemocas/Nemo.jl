@@ -1373,11 +1373,11 @@ end
 function (::Type{ComplexF64})(x::CalciumFieldElem)
    set_precision!(Balls, 53) do
       z = AcbField()(x)
-      x = arb()
-      ccall((:acb_get_real, libarb), Nothing, (Ref{arb}, Ref{acb}), x, z)
+      x = ArbFieldElem()
+      ccall((:acb_get_real, libarb), Nothing, (Ref{ArbFieldElem}, Ref{acb}), x, z)
       xx = Float64(x)
-      y = arb()
-      ccall((:acb_get_imag, libarb), Nothing, (Ref{arb}, Ref{acb}), y, z)
+      y = ArbFieldElem()
+      ccall((:acb_get_imag, libarb), Nothing, (Ref{ArbFieldElem}, Ref{acb}), y, z)
       yy = Float64(y)
       return ComplexF64(xx, yy)
    end

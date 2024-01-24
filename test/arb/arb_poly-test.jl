@@ -12,7 +12,7 @@ RR = ArbField(64)
    @test elem_type(R) == arb_poly
    @test elem_type(ArbPolyRing) == arb_poly
    @test parent_type(arb_poly) == ArbPolyRing
-   @test dense_poly_type(arb) == arb_poly
+   @test dense_poly_type(ArbFieldElem) == arb_poly
 
    @test typeof(R) <: ArbPolyRing
 
@@ -350,8 +350,8 @@ end
    R, x = polynomial_ring(RR, "x")
 
    n = 5
-   xs = arb[inv(RR(i)) for i=1:n]
-   ys = arb[RR(i) for i=1:n]
+   xs = ArbFieldElem[inv(RR(i)) for i=1:n]
+   ys = ArbFieldElem[RR(i) for i=1:n]
 
    f = interpolate(R, xs, ys)
    vs = evaluate(f, xs)

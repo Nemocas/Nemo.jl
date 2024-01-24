@@ -84,7 +84,7 @@ end
 +(x::acb_mat, y::arb_mat) = y + x
 -(x::arb_mat, y::acb_mat) = x + (-y)
 -(x::acb_mat, y::arb_mat) = x + (-y)
-//(x::arb_mat, y::arb) = map(t -> t // y, x)
+//(x::arb_mat, y::ArbFieldElem) = map(t -> t // y, x)
 
 
 function _acb_mat(A::arb_mat)
@@ -93,8 +93,8 @@ function _acb_mat(A::arb_mat)
     return change_base_ring(Cc, A)
 end
 
-function mul!(z::acb, x::acb, y::arb)
-    ccall((:acb_mul_arb, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{arb}, Int),
+function mul!(z::acb, x::acb, y::ArbFieldElem)
+    ccall((:acb_mul_arb, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{ArbFieldElem}, Int),
         z, x, y, parent(z).prec)
     return z
 end
@@ -176,7 +176,7 @@ function (Zx::ZZPolyRing)(a::AnticNumberFieldElem)
     return b
 end
 
-function Base.round(::Type{ZZRingElem}, x::arb)
+function Base.round(::Type{ZZRingElem}, x::ArbFieldElem)
     if radius(x) > 1e-1
         throw(InexactError(:round, ZZRingElem, x))
     end
@@ -424,8 +424,8 @@ function (R::FqPolyRing)(g::QQPolyRingElem)
     return fmpq_poly_to_fq_default_poly(R, g)
 end
 
-function bits(x::arb)
-    return ccall((:arb_bits, libarb), Int, (Ref{arb},), x)
+function bits(x::ArbFieldElem)
+    return ccall((:arb_bits, libarb), Int, (Ref{ArbFieldElem},), x)
 end
 
 function *(a::ZZMatrix, b::Matrix{BigFloat})
@@ -692,8 +692,8 @@ function divexact!(a::ZZRingElem, b::ZZRingElem)
     return a
 end
 
-function round!(z::arb, x::arb, p::Int)
-    ccall((:arb_set_round, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, p)
+function round!(z::ArbFieldElem, x::ArbFieldElem, p::Int)
+    ccall((:arb_set_round, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, p)
     z.parent = ArbField(p, cached=false)
     return z
 end
@@ -704,9 +704,9 @@ function round!(z::acb, x::acb, p::Int)
     return z
 end
 
-function round(x::arb, p::Int)
+function round(x::ArbFieldElem, p::Int)
     z = ArbField(p, cached=false)()
-    ccall((:arb_set_round, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, p)
+    ccall((:arb_set_round, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, p)
     return z
 end
 

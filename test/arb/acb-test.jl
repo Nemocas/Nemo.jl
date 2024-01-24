@@ -14,7 +14,7 @@ CC = AcbField(64)
    @test AcbField(10, cached = true) === AcbField(10, cached = true)
    @test AcbField(11, cached = false) !== AcbField(11, cached = false)
 
-   for T in [Int32, Int, BigInt, Complex{Int}, Complex{Float64}, Rational{Int}, Rational{BigInt}, Float64, BigFloat, ZZRingElem, QQFieldElem, arb]
+   for T in [Int32, Int, BigInt, Complex{Int}, Complex{Float64}, Rational{Int}, Rational{BigInt}, Float64, BigFloat, ZZRingElem, QQFieldElem, ArbFieldElem]
      @test acb === Nemo.promote_rule(acb, T)
    end
 end
@@ -154,7 +154,7 @@ end
       @test x ^ T(4) == 16
    end
 
-   for T in [Float64, BigFloat, arb]
+   for T in [Float64, BigFloat, ArbFieldElem]
       @test contains(x + T(4), 6)
       @test contains(x - T(4), -2)
       @test contains(x * T(4), 8)

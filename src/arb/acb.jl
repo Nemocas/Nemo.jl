@@ -92,8 +92,8 @@ function convert(::Type{ComplexF64}, x::acb)
     GC.@preserve x begin
       re = ccall((:acb_real_ptr, libarb), Ptr{arb_struct}, (Ref{acb}, ), x)
       im = ccall((:acb_imag_ptr, libarb), Ptr{arb_struct}, (Ref{acb}, ), x)
-      t = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ptr{arb}, ), re)
-      u = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ptr{arb}, ), im)
+      t = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ptr{ArbFieldElem}, ), re)
+      u = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ptr{ArbFieldElem}, ), im)
       # 4 == round to nearest
       v = ccall((:arf_get_d, libarb), Float64, (Ptr{arf_struct}, Int), t, 4)
       w = ccall((:arf_get_d, libarb), Float64, (Ptr{arf_struct}, Int), u, 4)
@@ -108,15 +108,15 @@ end
 ################################################################################
 
 function real(x::acb)
-  z = arb()
-  ccall((:acb_get_real, libarb), Nothing, (Ref{arb}, Ref{acb}), z, x)
+  z = ArbFieldElem()
+  ccall((:acb_get_real, libarb), Nothing, (Ref{ArbFieldElem}, Ref{acb}), z, x)
   z.parent = ArbField(parent(x).prec)
   return z
 end
 
 function imag(x::acb)
-  z = arb()
-  ccall((:acb_get_imag, libarb), Nothing, (Ref{arb}, Ref{acb}), z, x)
+  z = ArbFieldElem()
+  ccall((:acb_get_imag, libarb), Nothing, (Ref{ArbFieldElem}, Ref{acb}), z, x)
   z.parent = ArbField(parent(x).prec)
   return z
 end
@@ -214,10 +214,10 @@ for (f,s) in ((:+, "add"), (:-, "sub"), (:*, "mul"), (://, "div"), (:^, "pow"))
       return z
     end
 
-    function ($f)(x::acb, y::arb)
+    function ($f)(x::acb, y::ArbFieldElem)
       z = parent(x)()
       ccall(($("acb_"*s*"_arb"), libarb), Nothing,
-                  (Ref{acb}, Ref{acb}, Ref{arb}, Int),
+                  (Ref{acb}, Ref{acb}, Ref{ArbFieldElem}, Int),
                   z, x, y, parent(x).prec)
       return z
     end
@@ -228,22 +228,22 @@ end
 +(x::UInt,y::acb) = +(y,x)
 +(x::Int,y::acb) = +(y,x)
 +(x::ZZRingElem,y::acb) = +(y,x)
-+(x::arb,y::acb) = +(y,x)
++(x::ArbFieldElem,y::acb) = +(y,x)
 
 *(x::UInt,y::acb) = *(y,x)
 *(x::Int,y::acb) = *(y,x)
 *(x::ZZRingElem,y::acb) = *(y,x)
-*(x::arb,y::acb) = *(y,x)
+*(x::ArbFieldElem,y::acb) = *(y,x)
 
 //(x::UInt,y::acb) = (x == 1) ? inv(y) : parent(y)(x) // y
 //(x::Int,y::acb) = (x == 1) ? inv(y) : parent(y)(x) // y
 //(x::ZZRingElem,y::acb) = isone(x) ? inv(y) : parent(y)(x) // y
-//(x::arb,y::acb) = isone(x) ? inv(y) : parent(y)(x) // y
+//(x::ArbFieldElem,y::acb) = isone(x) ? inv(y) : parent(y)(x) // y
 
 ^(x::UInt,y::acb) = parent(y)(x) ^ y
 ^(x::Int,y::acb) = parent(y)(x) ^ y
 ^(x::ZZRingElem,y::acb) = parent(y)(x) ^ y
-^(x::arb,y::acb) = parent(y)(x) ^ y
+^(x::ArbFieldElem,y::acb) = parent(y)(x) ^ y
 ^(x::Integer, y::acb) = ZZRingElem(x)^y
 
 function -(x::UInt, y::acb)
@@ -267,9 +267,9 @@ function -(x::ZZRingElem, y::acb)
   return z
 end
 
-function -(x::arb, y::acb)
+function -(x::ArbFieldElem, y::acb)
   z = parent(y)()
-  ccall((:acb_sub_arb, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{arb}, Int), z, y, x, parent(y).prec)
+  ccall((:acb_sub_arb, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{ArbFieldElem}, Int), z, y, x, parent(y).prec)
   ccall((:acb_neg, libarb), Nothing, (Ref{acb}, Ref{acb}), z, z)
   return z
 end
@@ -313,8 +313,8 @@ divexact(x::UInt, y::acb; check::Bool=true) = x // y
 divexact(x::acb, y::UInt; check::Bool=true) = x // y
 divexact(x::QQFieldElem, y::acb; check::Bool=true) = x // y
 divexact(x::acb, y::QQFieldElem; check::Bool=true) = x // y
-divexact(x::arb, y::acb; check::Bool=true) = x // y
-divexact(x::acb, y::arb; check::Bool=true) = x // y
+divexact(x::ArbFieldElem, y::acb; check::Bool=true) = x // y
+divexact(x::acb, y::ArbFieldElem; check::Bool=true) = x // y
 divexact(x::Float64, y::acb; check::Bool=true) = x // y
 divexact(x::acb, y::Float64; check::Bool=true) = x // y
 divexact(x::BigFloat, y::acb; check::Bool=true) = x // y
@@ -333,8 +333,8 @@ divexact(x::acb, y::Rational{T}; check::Bool=true) where {T <: Integer} = x // y
 /(x::acb, y::UInt) = x // y
 /(x::QQFieldElem, y::acb) = x // y
 /(x::acb, y::QQFieldElem) = x // y
-/(x::arb, y::acb) = x // y
-/(x::acb, y::arb) = x // y
+/(x::ArbFieldElem, y::acb) = x // y
+/(x::acb, y::ArbFieldElem) = x // y
 
 +(x::Rational{T}, y::acb) where {T <: Integer} = QQFieldElem(x) + y
 +(x::acb, y::Rational{T}) where {T <: Integer} = x + QQFieldElem(y)
@@ -399,8 +399,8 @@ end
 ==(x::acb,y::Int) = (x == parent(x)(y))
 ==(x::Int,y::acb) = (y == parent(y)(x))
 
-==(x::acb,y::arb) = (x == parent(x)(y))
-==(x::arb,y::acb) = (y == parent(y)(x))
+==(x::acb,y::ArbFieldElem) = (x == parent(x)(y))
+==(x::ArbFieldElem,y::acb) = (y == parent(y)(x))
 
 ==(x::acb,y::ZZRingElem) = (x == parent(x)(y))
 ==(x::ZZRingElem,y::acb) = (y == parent(y)(x))
@@ -414,8 +414,8 @@ end
 !=(x::acb,y::Int) = (x != parent(x)(y))
 !=(x::Int,y::acb) = (y != parent(y)(x))
 
-!=(x::acb,y::arb) = (x != parent(x)(y))
-!=(x::arb,y::acb) = (y != parent(y)(x))
+!=(x::acb,y::ArbFieldElem) = (x != parent(x)(y))
+!=(x::ArbFieldElem,y::acb) = (y != parent(y)(x))
 
 !=(x::acb,y::ZZRingElem) = (x != parent(x)(y))
 !=(x::ZZRingElem,y::acb) = (y != parent(y)(x))
@@ -574,9 +574,9 @@ is_negative(x::acb) = isreal(x) && is_negative(real(x))
 ################################################################################
 
 function abs(x::acb)
-  z = arb()
+  z = ArbFieldElem()
   ccall((:acb_abs, libarb), Nothing,
-                (Ref{arb}, Ref{acb}, Int), z, x, parent(x).prec)
+                (Ref{ArbFieldElem}, Ref{acb}, Int), z, x, parent(x).prec)
   z.parent = ArbField(parent(x).prec)
   return z
 end
@@ -667,9 +667,9 @@ function conj(x::acb)
 end
 
 function angle(x::acb)
-  z = arb()
+  z = ArbFieldElem()
   ccall((:acb_arg, libarb), Nothing,
-                (Ref{arb}, Ref{acb}, Int), z, x, parent(x).prec)
+                (Ref{ArbFieldElem}, Ref{acb}, Int), z, x, parent(x).prec)
   z.parent = ArbField(parent(x).prec)
   return z
 end
@@ -1690,11 +1690,11 @@ for (typeofx, passtoc) in ((acb, Ref{acb}), (Ptr{acb}, Ptr{acb}))
                   (($passtoc), Ref{QQFieldElem}, Int), x, y, p)
     end
 
-    function _acb_set(x::($typeofx), y::arb)
-      ccall((:acb_set_arb, libarb), Nothing, (($passtoc), Ref{arb}), x, y)
+    function _acb_set(x::($typeofx), y::ArbFieldElem)
+      ccall((:acb_set_arb, libarb), Nothing, (($passtoc), Ref{ArbFieldElem}), x, y)
     end
 
-    function _acb_set(x::($typeofx), y::arb, p::Int)
+    function _acb_set(x::($typeofx), y::ArbFieldElem, p::Int)
       _acb_set(x, y)
       ccall((:acb_set_round, libarb), Nothing,
                   (($passtoc), ($passtoc), Int), x, x, p)
@@ -1710,24 +1710,24 @@ for (typeofx, passtoc) in ((acb, Ref{acb}), (Ptr{acb}, Ptr{acb}))
     end
 
     function _acb_set(x::($typeofx), y::AbstractString, p::Int)
-      r = ccall((:acb_real_ptr, libarb), Ptr{arb}, (($passtoc), ), x)
+      r = ccall((:acb_real_ptr, libarb), Ptr{ArbFieldElem}, (($passtoc), ), x)
       _arb_set(r, y, p)
-      i = ccall((:acb_imag_ptr, libarb), Ptr{arb}, (($passtoc), ), x)
-      ccall((:arb_zero, libarb), Nothing, (Ptr{arb}, ), i)
+      i = ccall((:acb_imag_ptr, libarb), Ptr{ArbFieldElem}, (($passtoc), ), x)
+      ccall((:arb_zero, libarb), Nothing, (Ptr{ArbFieldElem}, ), i)
     end
 
     function _acb_set(x::($typeofx), y::BigFloat)
-      r = ccall((:acb_real_ptr, libarb), Ptr{arb}, (($passtoc), ), x)
+      r = ccall((:acb_real_ptr, libarb), Ptr{ArbFieldElem}, (($passtoc), ), x)
       _arb_set(r, y)
-      i = ccall((:acb_imag_ptr, libarb), Ptr{arb}, (($passtoc), ), x)
-      ccall((:arb_zero, libarb), Nothing, (Ptr{arb}, ), i)
+      i = ccall((:acb_imag_ptr, libarb), Ptr{ArbFieldElem}, (($passtoc), ), x)
+      ccall((:arb_zero, libarb), Nothing, (Ptr{ArbFieldElem}, ), i)
     end
 
     function _acb_set(x::($typeofx), y::BigFloat, p::Int)
-      r = ccall((:acb_real_ptr, libarb), Ptr{arb}, (($passtoc), ), x)
+      r = ccall((:acb_real_ptr, libarb), Ptr{ArbFieldElem}, (($passtoc), ), x)
       _arb_set(r, y, p)
-      i = ccall((:acb_imag_ptr, libarb), Ptr{arb}, (($passtoc), ), x)
-      ccall((:arb_zero, libarb), Nothing, (Ptr{arb}, ), i)
+      i = ccall((:acb_imag_ptr, libarb), Ptr{ArbFieldElem}, (($passtoc), ), x)
+      ccall((:arb_zero, libarb), Nothing, (Ptr{ArbFieldElem}, ), i)
     end
 
     function _acb_set(x::($typeofx), y::Int, z::Int, p::Int)
@@ -1737,28 +1737,28 @@ for (typeofx, passtoc) in ((acb, Ref{acb}), (Ptr{acb}, Ptr{acb}))
                   (($passtoc), ($passtoc), Int), x, x, p)
     end
 
-    function _acb_set(x::($typeofx), y::arb, z::arb)
+    function _acb_set(x::($typeofx), y::ArbFieldElem, z::ArbFieldElem)
       ccall((:acb_set_arb_arb, libarb), Nothing,
-                  (($passtoc), Ref{arb}, Ref{arb}), x, y, z)
+                  (($passtoc), Ref{ArbFieldElem}, Ref{ArbFieldElem}), x, y, z)
     end
 
-    function _acb_set(x::($typeofx), y::arb, z::arb, p::Int)
+    function _acb_set(x::($typeofx), y::ArbFieldElem, z::ArbFieldElem, p::Int)
       _acb_set(x, y, z)
       ccall((:acb_set_round, libarb), Nothing,
                   (($passtoc), ($passtoc), Int), x, x, p)
     end
 
     function _acb_set(x::($typeofx), y::QQFieldElem, z::QQFieldElem, p::Int)
-      r = ccall((:acb_real_ptr, libarb), Ptr{arb}, (($passtoc), ), x)
+      r = ccall((:acb_real_ptr, libarb), Ptr{ArbFieldElem}, (($passtoc), ), x)
       _arb_set(r, y, p)
-      i = ccall((:acb_imag_ptr, libarb), Ptr{arb}, (($passtoc), ), x)
+      i = ccall((:acb_imag_ptr, libarb), Ptr{ArbFieldElem}, (($passtoc), ), x)
       _arb_set(i, z, p)
     end
 
     function _acb_set(x::($typeofx), y::T, z::T, p::Int) where {T <: AbstractString}
-      r = ccall((:acb_real_ptr, libarb), Ptr{arb}, (($passtoc), ), x)
+      r = ccall((:acb_real_ptr, libarb), Ptr{ArbFieldElem}, (($passtoc), ), x)
       _arb_set(r, y, p)
-      i = ccall((:acb_imag_ptr, libarb), Ptr{arb}, (($passtoc), ), x)
+      i = ccall((:acb_imag_ptr, libarb), Ptr{ArbFieldElem}, (($passtoc), ), x)
       _arb_set(i, z, p)
     end
 
@@ -1767,16 +1767,16 @@ for (typeofx, passtoc) in ((acb, Ref{acb}), (Ptr{acb}, Ptr{acb}))
   for T in (Float64, BigFloat, UInt, ZZRingElem)
     @eval begin
       function _acb_set(x::($typeofx), y::($T), z::($T))
-        r = ccall((:acb_real_ptr, libarb), Ptr{arb}, (($passtoc), ), x)
+        r = ccall((:acb_real_ptr, libarb), Ptr{ArbFieldElem}, (($passtoc), ), x)
         _arb_set(r, y)
-        i = ccall((:acb_imag_ptr, libarb), Ptr{arb}, (($passtoc), ), x)
+        i = ccall((:acb_imag_ptr, libarb), Ptr{ArbFieldElem}, (($passtoc), ), x)
         _arb_set(i, z)
       end
 
       function _acb_set(x::($typeofx), y::($T), z::($T), p::Int)
-        r = ccall((:acb_real_ptr, libarb), Ptr{arb}, (($passtoc), ), x)
+        r = ccall((:acb_real_ptr, libarb), Ptr{ArbFieldElem}, (($passtoc), ), x)
         _arb_set(r, y, p)
-        i = ccall((:acb_imag_ptr, libarb), Ptr{arb}, (($passtoc), ), x)
+        i = ccall((:acb_imag_ptr, libarb), Ptr{ArbFieldElem}, (($passtoc), ), x)
         _arb_set(i, z, p)
       end
     end
@@ -1795,7 +1795,7 @@ promote_rule(::Type{acb}, ::Type{ZZRingElem}) = acb
 
 promote_rule(::Type{acb}, ::Type{QQFieldElem}) = acb
 
-promote_rule(::Type{acb}, ::Type{arb}) = acb
+promote_rule(::Type{acb}, ::Type{ArbFieldElem}) = acb
 
 ################################################################################
 #
@@ -1809,7 +1809,7 @@ function (r::AcbField)()
   return z
 end
 
-function (r::AcbField)(x::Union{Int, UInt, ZZRingElem, QQFieldElem, arb, acb, Float64,
+function (r::AcbField)(x::Union{Int, UInt, ZZRingElem, QQFieldElem, ArbFieldElem, acb, Float64,
                                 BigFloat, AbstractString})
   z = acb(x, r.prec)
   z.parent = r
@@ -1820,14 +1820,14 @@ end
 
 (r::AcbField)(x::Rational{T}) where {T <: Integer} = r(QQFieldElem(x))
 
-function (r::AcbField)(x::T, y::T) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, arb, Float64, BigFloat, AbstractString}}
+function (r::AcbField)(x::T, y::T) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, ArbFieldElem, Float64, BigFloat, AbstractString}}
   z = acb(x, y, r.prec)
   z.parent = r
   return z
 end
 
-for S in (Int, UInt, ZZRingElem, QQFieldElem, arb, Float64, BigFloat, AbstractString, BigInt)
-  for T in (Int, UInt, ZZRingElem, QQFieldElem, arb, Float64, BigFloat, AbstractString, BigInt)
+for S in (Int, UInt, ZZRingElem, QQFieldElem, ArbFieldElem, Float64, BigFloat, AbstractString, BigInt)
+  for T in (Int, UInt, ZZRingElem, QQFieldElem, ArbFieldElem, Float64, BigFloat, AbstractString, BigInt)
     if S != T
       @eval begin
         function (r::AcbField)(x::$(S), y::$(T))
@@ -1841,7 +1841,7 @@ for S in (Int, UInt, ZZRingElem, QQFieldElem, arb, Float64, BigFloat, AbstractSt
   end
 end
 
-for T in (Int, UInt, ZZRingElem, QQFieldElem, arb, Float64, BigFloat, AbstractString, BigInt)
+for T in (Int, UInt, ZZRingElem, QQFieldElem, ArbFieldElem, Float64, BigFloat, AbstractString, BigInt)
   @eval begin
     function (r::AcbField)(x::Rational{S}, y::$(T)) where {S <: Integer}
       RR = ArbField(r.prec, cached = false)

@@ -296,13 +296,13 @@ function _continued_fraction_ball(
 end
 
 # return four mutatable ZZRingElem's
-function _left_and_right(x::arb)
+function _left_and_right(x::ArbFieldElem)
    isfinite(x) || error("Ball must be finite")
    a = ZZRingElem()
    b = ZZRingElem()
    f = ZZRingElem()
    ccall((:arb_get_interval_fmpz_2exp, libarb), Nothing,
-         (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{arb}),
+         (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ArbFieldElem}),
          a, b, f, x)
    fits(Int, f) || error("Ball endpoints do not fit into QQFieldElem")
    e = Int(f)
@@ -321,7 +321,7 @@ fraction of $x$. `limit = 0` corresponds to no limit, that is, all partial
 quotients are generated or as many as can be justified by the precision of the
 input.
 """
-function continued_fraction(x::arb; limit::Int = 0)
+function continued_fraction(x::ArbFieldElem; limit::Int = 0)
    xln, xld, xrn, xrd = _left_and_right(x)
    return _continued_fraction_ball(xln, xld, xrn, xrd, limit, false)[1]
 end
@@ -332,7 +332,7 @@ end
 Return the vector of the first `limit` partial quotients of the continued
 fraction of $x$ along with the matrix giving the last two convergents.
 """
-function continued_fraction_with_matrix(x::arb; limit::Int = 0)
+function continued_fraction_with_matrix(x::ArbFieldElem; limit::Int = 0)
    xln, xld, xrn, xrd = _left_and_right(x)
    cf, m = _continued_fraction_ball(xln, xld, xrn, xrd, limit, true)
    return cf, matrix(FlintZZ, 2, 2, [m...])

@@ -13,50 +13,50 @@
 #
 ###############################################################################
 
-elem_type(::Type{ArbField}) = arb
+elem_type(::Type{ArbField}) = ArbFieldElem
 
-parent_type(::Type{arb}) = ArbField
+parent_type(::Type{ArbFieldElem}) = ArbField
 
 base_ring(R::ArbField) = Union{}
 
-base_ring(x::arb) = Union{}
+base_ring(x::ArbFieldElem) = Union{}
 
-parent(x::arb) = x.parent
+parent(x::ArbFieldElem) = x.parent
 
-is_domain_type(::Type{arb}) = true
+is_domain_type(::Type{ArbFieldElem}) = true
 
-is_exact_type(::Type{arb}) = false
+is_exact_type(::Type{ArbFieldElem}) = false
 
 zero(R::ArbField) = R(0)
 
 one(R::ArbField) = R(1)
 
-# TODO: Add hash (and document under arb basic functionality)
+# TODO: Add hash (and document under ArbFieldElem basic functionality)
 
 @doc raw"""
-    accuracy_bits(x::arb)
+    accuracy_bits(x::ArbFieldElem)
 
 Return the relative accuracy of $x$ measured in bits, capped between
 `typemax(Int)` and `-typemax(Int)`.
 """
-function accuracy_bits(x::arb)
-  return ccall((:arb_rel_accuracy_bits, libarb), Int, (Ref{arb},), x)
+function accuracy_bits(x::ArbFieldElem)
+  return ccall((:arb_rel_accuracy_bits, libarb), Int, (Ref{ArbFieldElem},), x)
 end
 
-function deepcopy_internal(a::arb, dict::IdDict)
+function deepcopy_internal(a::ArbFieldElem, dict::IdDict)
   b = parent(a)()
-  ccall((:arb_set, libarb), Nothing, (Ref{arb}, Ref{arb}), b, a)
+  ccall((:arb_set, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), b, a)
   return b
 end
 
 
-function canonical_unit(x::arb)
+function canonical_unit(x::ArbFieldElem)
    return x
 end
 
-function check_parent(a::arb, b::arb)
+function check_parent(a::ArbFieldElem, b::ArbFieldElem)
    parent(a) != parent(b) &&
-             error("Incompatible arb elements")
+             error("Incompatible ArbFieldElem elements")
 end
 
 characteristic(::ArbField) = 0
@@ -68,36 +68,36 @@ characteristic(::ArbField) = 0
 ################################################################################
 
 @doc raw"""
-    Float64(x::arb, round::RoundingMode=RoundNearest)
+    Float64(x::ArbFieldElem, round::RoundingMode=RoundNearest)
 
 Converts $x$ to a `Float64`, rounded in the direction specified by $round$.
 For `RoundNearest` the return value approximates the midpoint of $x$. For
 `RoundDown` or `RoundUp` the return value is a lower bound or upper bound for
 all values in $x$.
 """
-function Float64(x::arb, round::RoundingMode=RoundNearest)
+function Float64(x::ArbFieldElem, round::RoundingMode=RoundNearest)
   t = _arb_get_arf(x, round)
   return _arf_get_d(t, round)
 end
 
 @doc raw"""
-    BigFloat(x::arb, round::RoundingMode=RoundNearest)
+    BigFloat(x::ArbFieldElem, round::RoundingMode=RoundNearest)
 
 Converts $x$ to a `BigFloat` of the currently used precision, rounded in the
 direction specified by $round$. For `RoundNearest` the return value
 approximates the midpoint of $x$. For `RoundDown` or `RoundUp` the return
 value is a lower bound or upper bound for all values in $x$.
 """
-function BigFloat(x::arb, round::RoundingMode=RoundNearest)
+function BigFloat(x::ArbFieldElem, round::RoundingMode=RoundNearest)
   t = _arb_get_arf(x, round)
   return _arf_get_mpfr(t, round)
 end
 
-function _arb_get_arf(x::arb, ::RoundingMode{:Nearest})
+function _arb_get_arf(x::ArbFieldElem, ::RoundingMode{:Nearest})
   t = arf_struct()
   GC.@preserve x begin
     t1 = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct},
-               (Ref{arb}, ),
+               (Ref{ArbFieldElem}, ),
                x)
     ccall((:arf_set, libarb), Nothing,
           (Ref{arf_struct}, Ptr{arf_struct}),
@@ -109,10 +109,10 @@ end
 for (b, f) in ((RoundingMode{:Down}, :arb_get_lbound_arf),
                (RoundingMode{:Up}, :arb_get_ubound_arf))
   @eval begin
-    function _arb_get_arf(x::arb, ::$b)
+    function _arb_get_arf(x::ArbFieldElem, ::$b)
       t = arf_struct()
       ccall(($(string(f)), libarb), Nothing,
-            (Ref{arf_struct}, Ref{arb}, Int),
+            (Ref{arf_struct}, Ref{ArbFieldElem}, Int),
             t, x, parent(x).prec)
       return t
     end
@@ -139,21 +139,21 @@ for (b, i) in ((RoundingMode{:Down}, 2),
   end
 end
 
-function convert(::Type{Float64}, x::arb)
+function convert(::Type{Float64}, x::ArbFieldElem)
     return Float64(x)
 end
 
-function convert(::Type{BigFloat}, x::arb)
+function convert(::Type{BigFloat}, x::ArbFieldElem)
     return BigFloat(x)
 end
 
 @doc raw"""
-    ZZRingElem(x::arb)
+    ZZRingElem(x::ArbFieldElem)
 
 Return $x$ as an `ZZRingElem` if it represents an unique integer, else throws an
 error.
 """
-function ZZRingElem(x::arb)
+function ZZRingElem(x::ArbFieldElem)
    if is_exact(x)
       ok, z = unique_integer(x)
       ok && return z
@@ -161,9 +161,9 @@ function ZZRingElem(x::arb)
    error("Argument must represent a unique integer")
 end
 
-BigInt(x::arb) = BigInt(ZZRingElem(x))
+BigInt(x::ArbFieldElem) = BigInt(ZZRingElem(x))
 
-function (::Type{T})(x::arb) where {T <: Integer}
+function (::Type{T})(x::ArbFieldElem) where {T <: Integer}
   typemin(T) <= x <= typemax(T) ||
       error("Argument does not fit inside datatype.")
   return T(ZZRingElem(x))
@@ -175,10 +175,10 @@ end
 #
 ################################################################################
 
-function native_string(x::arb)
+function native_string(x::ArbFieldElem)
    d = ceil(parent(x).prec * 0.30102999566398119521)
    cstr = ccall((:arb_get_str, libarb), Ptr{UInt8},
-                (Ref{arb}, Int, UInt),
+                (Ref{ArbFieldElem}, Int, UInt),
                 x, Int(d), UInt(0))
    res = unsafe_string(cstr)
    ccall((:flint_free, libflint), Nothing,
@@ -187,7 +187,7 @@ function native_string(x::arb)
    return res
 end
 
-function expressify(x::arb; context = nothing)
+function expressify(x::ArbFieldElem; context = nothing)
    if is_exact(x) && is_negative(x)
       # TODO is_exact does not imply it is printed without radius
       return Expr(:call, :-, native_string(-x))
@@ -202,7 +202,7 @@ function show(io::IO, x::ArbField)
   print(io, " bits of precision and error bounds")
 end
 
-function show(io::IO, x::arb)
+function show(io::IO, x::ArbFieldElem)
    print(io, native_string(x))
 end
 
@@ -213,138 +213,138 @@ end
 ################################################################################
 
 @doc raw"""
-    overlaps(x::arb, y::arb)
+    overlaps(x::ArbFieldElem, y::ArbFieldElem)
 
 Returns `true` if any part of the ball $x$ overlaps any part of the ball $y$,
 otherwise return `false`.
 """
-function overlaps(x::arb, y::arb)
-  r = ccall((:arb_overlaps, libarb), Cint, (Ref{arb}, Ref{arb}), x, y)
+function overlaps(x::ArbFieldElem, y::ArbFieldElem)
+  r = ccall((:arb_overlaps, libarb), Cint, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), x, y)
   return Bool(r)
 end
 
-#function contains(x::arb, y::arf)
-#  r = ccall((:arb_contains_arf, libarb), Cint, (Ref{arb}, Ref{arf}), x, y)
+#function contains(x::ArbFieldElem, y::arf)
+#  r = ccall((:arb_contains_arf, libarb), Cint, (Ref{ArbFieldElem}, Ref{arf}), x, y)
 #  return Bool(r)
 #end
 
 @doc raw"""
-    contains(x::arb, y::QQFieldElem)
+    contains(x::ArbFieldElem, y::QQFieldElem)
 
 Returns `true` if the ball $x$ contains the given rational value, otherwise
 return `false`.
 """
-function contains(x::arb, y::QQFieldElem)
-  r = ccall((:arb_contains_fmpq, libarb), Cint, (Ref{arb}, Ref{QQFieldElem}), x, y)
+function contains(x::ArbFieldElem, y::QQFieldElem)
+  r = ccall((:arb_contains_fmpq, libarb), Cint, (Ref{ArbFieldElem}, Ref{QQFieldElem}), x, y)
   return Bool(r)
 end
 
 @doc raw"""
-    contains(x::arb, y::ZZRingElem)
+    contains(x::ArbFieldElem, y::ZZRingElem)
 
 Returns `true` if the ball $x$ contains the given integer value, otherwise
 return `false`.
 """
-function contains(x::arb, y::ZZRingElem)
-  r = ccall((:arb_contains_fmpz, libarb), Cint, (Ref{arb}, Ref{ZZRingElem}), x, y)
+function contains(x::ArbFieldElem, y::ZZRingElem)
+  r = ccall((:arb_contains_fmpz, libarb), Cint, (Ref{ArbFieldElem}, Ref{ZZRingElem}), x, y)
   return Bool(r)
 end
 
-function contains(x::arb, y::Int)
-  r = ccall((:arb_contains_si, libarb), Cint, (Ref{arb}, Int), x, y)
+function contains(x::ArbFieldElem, y::Int)
+  r = ccall((:arb_contains_si, libarb), Cint, (Ref{ArbFieldElem}, Int), x, y)
   return Bool(r)
 end
 
 @doc raw"""
-    contains(x::arb, y::Integer)
+    contains(x::ArbFieldElem, y::Integer)
 
 Returns `true` if the ball $x$ contains the given integer value, otherwise
 return `false`.
 """
-contains(x::arb, y::Integer) = contains(x, ZZRingElem(y))
+contains(x::ArbFieldElem, y::Integer) = contains(x, ZZRingElem(y))
 
 @doc raw"""
-    contains(x::arb, y::Rational{T}) where {T <: Integer}
+    contains(x::ArbFieldElem, y::Rational{T}) where {T <: Integer}
 
 Returns `true` if the ball $x$ contains the given rational value, otherwise
 return `false`.
 """
-contains(x::arb, y::Rational{T}) where {T <: Integer} = contains(x, QQFieldElem(y))
+contains(x::ArbFieldElem, y::Rational{T}) where {T <: Integer} = contains(x, QQFieldElem(y))
 
 @doc raw"""
-    contains(x::arb, y::BigFloat)
+    contains(x::ArbFieldElem, y::BigFloat)
 
 Returns `true` if the ball $x$ contains the given floating point value,
 otherwise return `false`.
 """
-function contains(x::arb, y::BigFloat)
+function contains(x::ArbFieldElem, y::BigFloat)
   r = ccall((:arb_contains_mpfr, libarb), Cint,
-              (Ref{arb}, Ref{BigFloat}), x, y)
+              (Ref{ArbFieldElem}, Ref{BigFloat}), x, y)
   return Bool(r)
 end
 
 @doc raw"""
-    contains(x::arb, y::arb)
+    contains(x::ArbFieldElem, y::ArbFieldElem)
 
 Returns `true` if the ball $x$ contains the ball $y$, otherwise return
 `false`.
 """
-function contains(x::arb, y::arb)
-  r = ccall((:arb_contains, libarb), Cint, (Ref{arb}, Ref{arb}), x, y)
+function contains(x::ArbFieldElem, y::ArbFieldElem)
+  r = ccall((:arb_contains, libarb), Cint, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), x, y)
   return Bool(r)
 end
 
 @doc raw"""
-    contains_zero(x::arb)
+    contains_zero(x::ArbFieldElem)
 
 Returns `true` if the ball $x$ contains zero, otherwise return `false`.
 """
-function contains_zero(x::arb)
-   r = ccall((:arb_contains_zero, libarb), Cint, (Ref{arb}, ), x)
+function contains_zero(x::ArbFieldElem)
+   r = ccall((:arb_contains_zero, libarb), Cint, (Ref{ArbFieldElem}, ), x)
    return Bool(r)
 end
 
 @doc raw"""
-    contains_negative(x::arb)
+    contains_negative(x::ArbFieldElem)
 
 Returns `true` if the ball $x$ contains any negative value, otherwise return
 `false`.
 """
-function contains_negative(x::arb)
-   r = ccall((:arb_contains_negative, libarb), Cint, (Ref{arb}, ), x)
+function contains_negative(x::ArbFieldElem)
+   r = ccall((:arb_contains_negative, libarb), Cint, (Ref{ArbFieldElem}, ), x)
    return Bool(r)
 end
 
 @doc raw"""
-    contains_positive(x::arb)
+    contains_positive(x::ArbFieldElem)
 
 Returns `true` if the ball $x$ contains any positive value, otherwise return
 `false`.
 """
-function contains_positive(x::arb)
-   r = ccall((:arb_contains_positive, libarb), Cint, (Ref{arb}, ), x)
+function contains_positive(x::ArbFieldElem)
+   r = ccall((:arb_contains_positive, libarb), Cint, (Ref{ArbFieldElem}, ), x)
    return Bool(r)
 end
 
 @doc raw"""
-    contains_nonnegative(x::arb)
+    contains_nonnegative(x::ArbFieldElem)
 
 Returns `true` if the ball $x$ contains any non-negative value, otherwise
 return `false`.
 """
-function contains_nonnegative(x::arb)
-   r = ccall((:arb_contains_nonnegative, libarb), Cint, (Ref{arb}, ), x)
+function contains_nonnegative(x::ArbFieldElem)
+   r = ccall((:arb_contains_nonnegative, libarb), Cint, (Ref{ArbFieldElem}, ), x)
    return Bool(r)
 end
 
 @doc raw"""
-    contains_nonpositive(x::arb)
+    contains_nonpositive(x::ArbFieldElem)
 
 Returns `true` if the ball $x$ contains any nonpositive value, otherwise
 return `false`.
 """
-function contains_nonpositive(x::arb)
-   r = ccall((:arb_contains_nonpositive, libarb), Cint, (Ref{arb}, ), x)
+function contains_nonpositive(x::ArbFieldElem)
+   r = ccall((:arb_contains_nonpositive, libarb), Cint, (Ref{ArbFieldElem}, ), x)
    return Bool(r)
 end
 
@@ -355,102 +355,102 @@ end
 ################################################################################
 
 @doc raw"""
-    isequal(x::arb, y::arb)
+    isequal(x::ArbFieldElem, y::ArbFieldElem)
 
 Return `true` if the balls $x$ and $y$ are precisely equal, i.e. have the
 same midpoints and radii.
 """
-function isequal(x::arb, y::arb)
-  r = ccall((:arb_equal, libarb), Cint, (Ref{arb}, Ref{arb}), x, y)
+function isequal(x::ArbFieldElem, y::ArbFieldElem)
+  r = ccall((:arb_equal, libarb), Cint, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), x, y)
   return Bool(r)
 end
 
-function ==(x::arb, y::arb)
-    return Bool(ccall((:arb_eq, libarb), Cint, (Ref{arb}, Ref{arb}), x, y))
+function ==(x::ArbFieldElem, y::ArbFieldElem)
+    return Bool(ccall((:arb_eq, libarb), Cint, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), x, y))
 end
 
-function !=(x::arb, y::arb)
-    return Bool(ccall((:arb_ne, libarb), Cint, (Ref{arb}, Ref{arb}), x, y))
+function !=(x::ArbFieldElem, y::ArbFieldElem)
+    return Bool(ccall((:arb_ne, libarb), Cint, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), x, y))
 end
 
-function isless(x::arb, y::arb)
-    return Bool(ccall((:arb_lt, libarb), Cint, (Ref{arb}, Ref{arb}), x, y))
+function isless(x::ArbFieldElem, y::ArbFieldElem)
+    return Bool(ccall((:arb_lt, libarb), Cint, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), x, y))
 end
 
-function <=(x::arb, y::arb)
-    return Bool(ccall((:arb_le, libarb), Cint, (Ref{arb}, Ref{arb}), x, y))
+function <=(x::ArbFieldElem, y::ArbFieldElem)
+    return Bool(ccall((:arb_le, libarb), Cint, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), x, y))
 end
 
-==(x::arb, y::Int) = x == arb(y)
-!=(x::arb, y::Int) = x != arb(y)
-<=(x::arb, y::Int) = x <= arb(y)
-<(x::arb, y::Int) = x < arb(y)
+==(x::ArbFieldElem, y::Int) = x == ArbFieldElem(y)
+!=(x::ArbFieldElem, y::Int) = x != ArbFieldElem(y)
+<=(x::ArbFieldElem, y::Int) = x <= ArbFieldElem(y)
+<(x::ArbFieldElem, y::Int) = x < ArbFieldElem(y)
 
-==(x::Int, y::arb) = arb(x) == y
-!=(x::Int, y::arb) = arb(x) != y
-<=(x::Int, y::arb) = arb(x) <= y
-<(x::Int, y::arb) = arb(x) < y
+==(x::Int, y::ArbFieldElem) = ArbFieldElem(x) == y
+!=(x::Int, y::ArbFieldElem) = ArbFieldElem(x) != y
+<=(x::Int, y::ArbFieldElem) = ArbFieldElem(x) <= y
+<(x::Int, y::ArbFieldElem) = ArbFieldElem(x) < y
 
-==(x::arb, y::ZZRingElem) = x == arb(y)
-!=(x::arb, y::ZZRingElem) = x != arb(y)
-<=(x::arb, y::ZZRingElem) = x <= arb(y)
-<(x::arb, y::ZZRingElem) = x < arb(y)
+==(x::ArbFieldElem, y::ZZRingElem) = x == ArbFieldElem(y)
+!=(x::ArbFieldElem, y::ZZRingElem) = x != ArbFieldElem(y)
+<=(x::ArbFieldElem, y::ZZRingElem) = x <= ArbFieldElem(y)
+<(x::ArbFieldElem, y::ZZRingElem) = x < ArbFieldElem(y)
 
-==(x::ZZRingElem, y::arb) = arb(x) == y
-!=(x::ZZRingElem, y::arb) = arb(x) != y
-<=(x::ZZRingElem, y::arb) = arb(x) <= y
-<(x::ZZRingElem, y::arb) = arb(x) < y
+==(x::ZZRingElem, y::ArbFieldElem) = ArbFieldElem(x) == y
+!=(x::ZZRingElem, y::ArbFieldElem) = ArbFieldElem(x) != y
+<=(x::ZZRingElem, y::ArbFieldElem) = ArbFieldElem(x) <= y
+<(x::ZZRingElem, y::ArbFieldElem) = ArbFieldElem(x) < y
 
-==(x::arb, y::Integer) = x == ZZRingElem(y)
-!=(x::arb, y::Integer) = x != ZZRingElem(y)
-<=(x::arb, y::Integer) = x <= ZZRingElem(y)
-<(x::arb, y::Integer) = x < ZZRingElem(y)
+==(x::ArbFieldElem, y::Integer) = x == ZZRingElem(y)
+!=(x::ArbFieldElem, y::Integer) = x != ZZRingElem(y)
+<=(x::ArbFieldElem, y::Integer) = x <= ZZRingElem(y)
+<(x::ArbFieldElem, y::Integer) = x < ZZRingElem(y)
 
 
-==(x::Integer, y::arb) = ZZRingElem(x) == y
-!=(x::Integer, y::arb) = ZZRingElem(x) != y
-<=(x::Integer, y::arb) = ZZRingElem(x) <= y
-<(x::Integer, y::arb) = ZZRingElem(x) < y
+==(x::Integer, y::ArbFieldElem) = ZZRingElem(x) == y
+!=(x::Integer, y::ArbFieldElem) = ZZRingElem(x) != y
+<=(x::Integer, y::ArbFieldElem) = ZZRingElem(x) <= y
+<(x::Integer, y::ArbFieldElem) = ZZRingElem(x) < y
 
-==(x::arb, y::Float64) = x == arb(y)
-!=(x::arb, y::Float64) = x != arb(y)
-<=(x::arb, y::Float64) = x <= arb(y)
-<(x::arb, y::Float64) = x < arb(y)
+==(x::ArbFieldElem, y::Float64) = x == ArbFieldElem(y)
+!=(x::ArbFieldElem, y::Float64) = x != ArbFieldElem(y)
+<=(x::ArbFieldElem, y::Float64) = x <= ArbFieldElem(y)
+<(x::ArbFieldElem, y::Float64) = x < ArbFieldElem(y)
 
-==(x::Float64, y::arb) = arb(x) == y
-!=(x::Float64, y::arb) = arb(x) != y
-<=(x::Float64, y::arb) = arb(x) <= y
-<(x::Float64, y::arb) = arb(x) < y
+==(x::Float64, y::ArbFieldElem) = ArbFieldElem(x) == y
+!=(x::Float64, y::ArbFieldElem) = ArbFieldElem(x) != y
+<=(x::Float64, y::ArbFieldElem) = ArbFieldElem(x) <= y
+<(x::Float64, y::ArbFieldElem) = ArbFieldElem(x) < y
 
-==(x::arb, y::BigFloat) = x == arb(y)
-!=(x::arb, y::BigFloat) = x != arb(y)
-<=(x::arb, y::BigFloat) = x <= arb(y)
-<(x::arb, y::BigFloat) = x < arb(y)
+==(x::ArbFieldElem, y::BigFloat) = x == ArbFieldElem(y)
+!=(x::ArbFieldElem, y::BigFloat) = x != ArbFieldElem(y)
+<=(x::ArbFieldElem, y::BigFloat) = x <= ArbFieldElem(y)
+<(x::ArbFieldElem, y::BigFloat) = x < ArbFieldElem(y)
 
-==(x::BigFloat, y::arb) = arb(x) == y
-!=(x::BigFloat, y::arb) = arb(x) != y
-<=(x::BigFloat, y::arb) = arb(x) <= y
-<(x::BigFloat, y::arb) = arb(x) < y
+==(x::BigFloat, y::ArbFieldElem) = ArbFieldElem(x) == y
+!=(x::BigFloat, y::ArbFieldElem) = ArbFieldElem(x) != y
+<=(x::BigFloat, y::ArbFieldElem) = ArbFieldElem(x) <= y
+<(x::BigFloat, y::ArbFieldElem) = ArbFieldElem(x) < y
 
-==(x::arb, y::QQFieldElem) = x == arb(y, precision(parent(x)))
-!=(x::arb, y::QQFieldElem) = x != arb(y, precision(parent(x)))
-<=(x::arb, y::QQFieldElem) = x <= arb(y, precision(parent(x)))
-<(x::arb, y::QQFieldElem) = x < arb(y, precision(parent(x)))
+==(x::ArbFieldElem, y::QQFieldElem) = x == ArbFieldElem(y, precision(parent(x)))
+!=(x::ArbFieldElem, y::QQFieldElem) = x != ArbFieldElem(y, precision(parent(x)))
+<=(x::ArbFieldElem, y::QQFieldElem) = x <= ArbFieldElem(y, precision(parent(x)))
+<(x::ArbFieldElem, y::QQFieldElem) = x < ArbFieldElem(y, precision(parent(x)))
 
-==(x::QQFieldElem, y::arb) = arb(x, precision(parent(y))) == y
-!=(x::QQFieldElem, y::arb) = arb(x, precision(parent(y))) != y
-<=(x::QQFieldElem, y::arb) = arb(x, precision(parent(y))) <= y
-<(x::QQFieldElem, y::arb) = arb(x, precision(parent(y))) < y
+==(x::QQFieldElem, y::ArbFieldElem) = ArbFieldElem(x, precision(parent(y))) == y
+!=(x::QQFieldElem, y::ArbFieldElem) = ArbFieldElem(x, precision(parent(y))) != y
+<=(x::QQFieldElem, y::ArbFieldElem) = ArbFieldElem(x, precision(parent(y))) <= y
+<(x::QQFieldElem, y::ArbFieldElem) = ArbFieldElem(x, precision(parent(y))) < y
 
-==(x::arb, y::Rational{T}) where {T <: Integer} = x == QQFieldElem(y)
-!=(x::arb, y::Rational{T}) where {T <: Integer} = x != QQFieldElem(y)
-<=(x::arb, y::Rational{T}) where {T <: Integer} = x <= QQFieldElem(y)
-<(x::arb, y::Rational{T}) where {T <: Integer} = x < QQFieldElem(y)
+==(x::ArbFieldElem, y::Rational{T}) where {T <: Integer} = x == QQFieldElem(y)
+!=(x::ArbFieldElem, y::Rational{T}) where {T <: Integer} = x != QQFieldElem(y)
+<=(x::ArbFieldElem, y::Rational{T}) where {T <: Integer} = x <= QQFieldElem(y)
+<(x::ArbFieldElem, y::Rational{T}) where {T <: Integer} = x < QQFieldElem(y)
 
-==(x::Rational{T}, y::arb) where {T <: Integer} = QQFieldElem(x) == y
-!=(x::Rational{T}, y::arb) where {T <: Integer} = QQFieldElem(x) != y
-<=(x::Rational{T}, y::arb) where {T <: Integer} = QQFieldElem(x) <= y
-<(x::Rational{T}, y::arb) where {T <: Integer} = QQFieldElem(x) < y
+==(x::Rational{T}, y::ArbFieldElem) where {T <: Integer} = QQFieldElem(x) == y
+!=(x::Rational{T}, y::ArbFieldElem) where {T <: Integer} = QQFieldElem(x) != y
+<=(x::Rational{T}, y::ArbFieldElem) where {T <: Integer} = QQFieldElem(x) <= y
+<(x::Rational{T}, y::ArbFieldElem) where {T <: Integer} = QQFieldElem(x) < y
 
 ################################################################################
 #
@@ -458,101 +458,101 @@ end
 #
 ################################################################################
 
-function is_unit(x::arb)
+function is_unit(x::ArbFieldElem)
    !iszero(x)
 end
 
 @doc raw"""
-    iszero(x::arb)
+    iszero(x::ArbFieldElem)
 
 Return `true` if $x$ is certainly zero, otherwise return `false`.
 """
-function iszero(x::arb)
-   return Bool(ccall((:arb_is_zero, libarb), Cint, (Ref{arb},), x))
+function iszero(x::ArbFieldElem)
+   return Bool(ccall((:arb_is_zero, libarb), Cint, (Ref{ArbFieldElem},), x))
 end
 
 @doc raw"""
-    is_nonzero(x::arb)
+    is_nonzero(x::ArbFieldElem)
 
 Return `true` if $x$ is certainly not equal to zero, otherwise return
 `false`.
 """
-function is_nonzero(x::arb)
-   return Bool(ccall((:arb_is_nonzero, libarb), Cint, (Ref{arb},), x))
+function is_nonzero(x::ArbFieldElem)
+   return Bool(ccall((:arb_is_nonzero, libarb), Cint, (Ref{ArbFieldElem},), x))
 end
 
 @doc raw"""
-    isone(x::arb)
+    isone(x::ArbFieldElem)
 
 Return `true` if $x$ is certainly one, otherwise return `false`.
 """
-function isone(x::arb)
-   return Bool(ccall((:arb_is_one, libarb), Cint, (Ref{arb},), x))
+function isone(x::ArbFieldElem)
+   return Bool(ccall((:arb_is_one, libarb), Cint, (Ref{ArbFieldElem},), x))
 end
 
 @doc raw"""
-    isfinite(x::arb)
+    isfinite(x::ArbFieldElem)
 
 Return `true` if $x$ is finite, i.e. having finite midpoint and radius,
 otherwise return `false`.
 """
-function isfinite(x::arb)
-   return Bool(ccall((:arb_is_finite, libarb), Cint, (Ref{arb},), x))
+function isfinite(x::ArbFieldElem)
+   return Bool(ccall((:arb_is_finite, libarb), Cint, (Ref{ArbFieldElem},), x))
 end
 
 @doc raw"""
-    is_exact(x::arb)
+    is_exact(x::ArbFieldElem)
 
 Return `true` if $x$ is exact, i.e. has zero radius, otherwise return
 `false`.
 """
-function is_exact(x::arb)
-   return Bool(ccall((:arb_is_exact, libarb), Cint, (Ref{arb},), x))
+function is_exact(x::ArbFieldElem)
+   return Bool(ccall((:arb_is_exact, libarb), Cint, (Ref{ArbFieldElem},), x))
 end
 
 @doc raw"""
-    isinteger(x::arb)
+    isinteger(x::ArbFieldElem)
 
 Return `true` if $x$ is an exact integer, otherwise return `false`.
 """
-function isinteger(x::arb)
-   return Bool(ccall((:arb_is_int, libarb), Cint, (Ref{arb},), x))
+function isinteger(x::ArbFieldElem)
+   return Bool(ccall((:arb_is_int, libarb), Cint, (Ref{ArbFieldElem},), x))
 end
 
 @doc raw"""
-    is_positive(x::arb)
+    is_positive(x::ArbFieldElem)
 
 Return `true` if $x$ is certainly positive, otherwise return `false`.
 """
-function is_positive(x::arb)
-   return Bool(ccall((:arb_is_positive, libarb), Cint, (Ref{arb},), x))
+function is_positive(x::ArbFieldElem)
+   return Bool(ccall((:arb_is_positive, libarb), Cint, (Ref{ArbFieldElem},), x))
 end
 
 @doc raw"""
-    is_nonnegative(x::arb)
+    is_nonnegative(x::ArbFieldElem)
 
 Return `true` if $x$ is certainly non-negative, otherwise return `false`.
 """
-function is_nonnegative(x::arb)
-   return Bool(ccall((:arb_is_nonnegative, libarb), Cint, (Ref{arb},), x))
+function is_nonnegative(x::ArbFieldElem)
+   return Bool(ccall((:arb_is_nonnegative, libarb), Cint, (Ref{ArbFieldElem},), x))
 end
 
 @doc raw"""
-    is_negative(x::arb)
+    is_negative(x::ArbFieldElem)
 
 Return `true` if $x$ is certainly negative, otherwise return `false`.
 """
-function is_negative(x::arb)
-   return Bool(ccall((:arb_is_negative, libarb), Cint, (Ref{arb},), x))
+function is_negative(x::ArbFieldElem)
+   return Bool(ccall((:arb_is_negative, libarb), Cint, (Ref{ArbFieldElem},), x))
 end
 
 @doc raw"""
-    is_nonpositive(x::arb)
+    is_nonpositive(x::ArbFieldElem)
 
 Return `true` if $x$ is certainly nonpositive, otherwise return `false`.
 """
-function is_nonpositive(x::arb)
-   return Bool(ccall((:arb_is_nonpositive, libarb), Cint, (Ref{arb},), x))
+function is_nonpositive(x::ArbFieldElem)
+   return Bool(ccall((:arb_is_nonpositive, libarb), Cint, (Ref{ArbFieldElem},), x))
 end
 
 ################################################################################
@@ -562,46 +562,46 @@ end
 ################################################################################
 
 @doc raw"""
-    ball(x::arb, y::arb)
+    ball(x::ArbFieldElem, y::ArbFieldElem)
 
 Constructs an Arb ball enclosing $x_m \pm (|x_r| + |y_m| + |y_r|)$, given the
 pair $(x, y) = (x_m \pm x_r, y_m \pm y_r)$.
 """
-function ball(mid::arb, rad::arb)
-  z = arb(mid, rad)
+function ball(mid::ArbFieldElem, rad::ArbFieldElem)
+  z = ArbFieldElem(mid, rad)
   z.parent = parent(mid)
   return z
 end
 
 @doc raw"""
-    radius(x::arb)
+    radius(x::ArbFieldElem)
 
 Return the radius of the ball $x$ as an Arb ball.
 """
-function radius(x::arb)
+function radius(x::ArbFieldElem)
   z = parent(x)()
-  ccall((:arb_get_rad_arb, libarb), Nothing, (Ref{arb}, Ref{arb}), z, x)
+  ccall((:arb_get_rad_arb, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), z, x)
   return z
 end
 
 @doc raw"""
-    midpoint(x::arb)
+    midpoint(x::ArbFieldElem)
 
 Return the midpoint of the ball $x$ as an Arb ball.
 """
-function midpoint(x::arb)
+function midpoint(x::ArbFieldElem)
   z = parent(x)()
-  ccall((:arb_get_mid_arb, libarb), Nothing, (Ref{arb}, Ref{arb}), z, x)
+  ccall((:arb_get_mid_arb, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), z, x)
   return z
 end
 
 @doc raw"""
-    add_error!(x::arb, y::arb)
+    add_error!(x::ArbFieldElem, y::ArbFieldElem)
 
 Adds the absolute values of the midpoint and radius of $y$ to the radius of $x$.
 """
-function add_error!(x::arb, y::arb)
-  ccall((:arb_add_error, libarb), Nothing, (Ref{arb}, Ref{arb}), x, y)
+function add_error!(x::ArbFieldElem, y::ArbFieldElem)
+  ccall((:arb_add_error, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), x, y)
 end
 
 ################################################################################
@@ -610,7 +610,7 @@ end
 #
 ################################################################################
 
-function sign(::Type{Int}, x::arb)
+function sign(::Type{Int}, x::ArbFieldElem)
   if is_positive(x)
     return 1
   elseif is_negative(x)
@@ -620,7 +620,7 @@ function sign(::Type{Int}, x::arb)
   end
 end
 
-Base.signbit(x::arb) = signbit(sign(Int, x))
+Base.signbit(x::ArbFieldElem) = signbit(sign(Int, x))
 
 ################################################################################
 #
@@ -628,9 +628,9 @@ Base.signbit(x::arb) = signbit(sign(Int, x))
 #
 ################################################################################
 
-function -(x::arb)
+function -(x::ArbFieldElem)
   z = parent(x)()
-  ccall((:arb_neg, libarb), Nothing, (Ref{arb}, Ref{arb}), z, x)
+  ccall((:arb_neg, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), z, x)
   return z
 end
 
@@ -642,9 +642,9 @@ end
 
 for (s,f) in ((:+,"arb_add"), (:*,"arb_mul"), (://, "arb_div"), (:-,"arb_sub"))
   @eval begin
-    function ($s)(x::arb, y::arb)
+    function ($s)(x::ArbFieldElem, y::ArbFieldElem)
       z = parent(x)()
-      ccall(($f, libarb), Nothing, (Ref{arb}, Ref{arb}, Ref{arb}, Int),
+      ccall(($f, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int),
                            z, x, y, parent(x).prec)
       return z
     end
@@ -653,258 +653,258 @@ end
 
 for (f,s) in ((:+, "add"), (:*, "mul"))
   @eval begin
-    #function ($f)(x::arb, y::arf)
+    #function ($f)(x::ArbFieldElem, y::arf)
     #  z = parent(x)()
     #  ccall(($("arb_"*s*"_arf"), libarb), Nothing,
-    #              (Ref{arb}, Ref{arb}, Ref{arf}, Int),
+    #              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{arf}, Int),
     #              z, x, y, parent(x).prec)
     #  return z
     #end
 
-    #($f)(x::arf, y::arb) = ($f)(y, x)
+    #($f)(x::arf, y::ArbFieldElem) = ($f)(y, x)
 
-    function ($f)(x::arb, y::UInt)
+    function ($f)(x::ArbFieldElem, y::UInt)
       z = parent(x)()
       ccall(($("arb_"*s*"_ui"), libarb), Nothing,
-                  (Ref{arb}, Ref{arb}, UInt, Int),
+                  (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int),
                   z, x, y, parent(x).prec)
       return z
     end
 
-    ($f)(x::UInt, y::arb) = ($f)(y, x)
+    ($f)(x::UInt, y::ArbFieldElem) = ($f)(y, x)
 
-    function ($f)(x::arb, y::Int)
+    function ($f)(x::ArbFieldElem, y::Int)
       z = parent(x)()
       ccall(($("arb_"*s*"_si"), libarb), Nothing,
-      (Ref{arb}, Ref{arb}, Int, Int), z, x, y, parent(x).prec)
+      (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int, Int), z, x, y, parent(x).prec)
       return z
     end
 
-    ($f)(x::Int, y::arb) = ($f)(y,x)
+    ($f)(x::Int, y::ArbFieldElem) = ($f)(y,x)
 
-    function ($f)(x::arb, y::ZZRingElem)
+    function ($f)(x::ArbFieldElem, y::ZZRingElem)
       z = parent(x)()
       ccall(($("arb_"*s*"_fmpz"), libarb), Nothing,
-                  (Ref{arb}, Ref{arb}, Ref{ZZRingElem}, Int),
+                  (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ZZRingElem}, Int),
                   z, x, y, parent(x).prec)
       return z
     end
 
-    ($f)(x::ZZRingElem, y::arb) = ($f)(y,x)
+    ($f)(x::ZZRingElem, y::ArbFieldElem) = ($f)(y,x)
   end
 end
 
-#function -(x::arb, y::arf)
+#function -(x::ArbFieldElem, y::arf)
 #  z = parent(x)()
 #  ccall((:arb_sub_arf, libarb), Nothing,
-#              (Ref{arb}, Ref{arb}, Ref{arf}, Int), z, x, y, parent(x).prec)
+#              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{arf}, Int), z, x, y, parent(x).prec)
 #  return z
 #end
 
-#-(x::arf, y::arb) = -(y - x)
+#-(x::arf, y::ArbFieldElem) = -(y - x)
 
-function -(x::arb, y::UInt)
+function -(x::ArbFieldElem, y::UInt)
   z = parent(x)()
   ccall((:arb_sub_ui, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, UInt, Int), z, x, y, parent(x).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int), z, x, y, parent(x).prec)
   return z
 end
 
--(x::UInt, y::arb) = -(y - x)
+-(x::UInt, y::ArbFieldElem) = -(y - x)
 
-function -(x::arb, y::Int)
+function -(x::ArbFieldElem, y::Int)
   z = parent(x)()
   ccall((:arb_sub_si, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Int, Int), z, x, y, parent(x).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int, Int), z, x, y, parent(x).prec)
   return z
 end
 
--(x::Int, y::arb) = -(y - x)
+-(x::Int, y::ArbFieldElem) = -(y - x)
 
-function -(x::arb, y::ZZRingElem)
+function -(x::ArbFieldElem, y::ZZRingElem)
   z = parent(x)()
   ccall((:arb_sub_fmpz, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{ZZRingElem}, Int),
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ZZRingElem}, Int),
               z, x, y, parent(x).prec)
   return z
 end
 
--(x::ZZRingElem, y::arb) = -(y-x)
+-(x::ZZRingElem, y::ArbFieldElem) = -(y-x)
 
-+(x::arb, y::Integer) = x + ZZRingElem(y)
++(x::ArbFieldElem, y::Integer) = x + ZZRingElem(y)
 
--(x::arb, y::Integer) = x - ZZRingElem(y)
+-(x::ArbFieldElem, y::Integer) = x - ZZRingElem(y)
 
-*(x::arb, y::Integer) = x*ZZRingElem(y)
+*(x::ArbFieldElem, y::Integer) = x*ZZRingElem(y)
 
-//(x::arb, y::Integer) = x//ZZRingElem(y)
+//(x::ArbFieldElem, y::Integer) = x//ZZRingElem(y)
 
-+(x::Integer, y::arb) = ZZRingElem(x) + y
++(x::Integer, y::ArbFieldElem) = ZZRingElem(x) + y
 
--(x::Integer, y::arb) = ZZRingElem(x) - y
+-(x::Integer, y::ArbFieldElem) = ZZRingElem(x) - y
 
-*(x::Integer, y::arb) = ZZRingElem(x)*y
+*(x::Integer, y::ArbFieldElem) = ZZRingElem(x)*y
 
-//(x::Integer, y::arb) = ZZRingElem(x)//y
+//(x::Integer, y::ArbFieldElem) = ZZRingElem(x)//y
 
-#function //(x::arb, y::arf)
+#function //(x::ArbFieldElem, y::arf)
 #  z = parent(x)()
 #  ccall((:arb_div_arf, libarb), Nothing,
-#              (Ref{arb}, Ref{arb}, Ref{arf}, Int), z, x, y, parent(x).prec)
+#              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{arf}, Int), z, x, y, parent(x).prec)
 #  return z
 #end
 
-function //(x::arb, y::UInt)
+function //(x::ArbFieldElem, y::UInt)
   z = parent(x)()
   ccall((:arb_div_ui, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, UInt, Int), z, x, y, parent(x).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int), z, x, y, parent(x).prec)
   return z
 end
 
-function //(x::arb, y::Int)
+function //(x::ArbFieldElem, y::Int)
   z = parent(x)()
   ccall((:arb_div_si, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Int, Int), z, x, y, parent(x).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int, Int), z, x, y, parent(x).prec)
   return z
 end
 
-function //(x::arb, y::ZZRingElem)
+function //(x::ArbFieldElem, y::ZZRingElem)
   z = parent(x)()
   ccall((:arb_div_fmpz, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{ZZRingElem}, Int),
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ZZRingElem}, Int),
               z, x, y, parent(x).prec)
   return z
 end
 
-function //(x::UInt, y::arb)
+function //(x::UInt, y::ArbFieldElem)
   z = parent(y)()
   ccall((:arb_ui_div, libarb), Nothing,
-              (Ref{arb}, UInt, Ref{arb}, Int), z, x, y, parent(y).prec)
+              (Ref{ArbFieldElem}, UInt, Ref{ArbFieldElem}, Int), z, x, y, parent(y).prec)
   return z
 end
 
-function //(x::Int, y::arb)
+function //(x::Int, y::ArbFieldElem)
   z = parent(y)()
-  t = arb(x)
+  t = ArbFieldElem(x)
   ccall((:arb_div, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, t, y, parent(y).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, t, y, parent(y).prec)
   return z
 end
 
-function //(x::ZZRingElem, y::arb)
+function //(x::ZZRingElem, y::ArbFieldElem)
   z = parent(y)()
-  t = arb(x)
+  t = ArbFieldElem(x)
   ccall((:arb_div, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, t, y, parent(y).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, t, y, parent(y).prec)
   return z
 end
 
-function ^(x::arb, y::arb)
+function ^(x::ArbFieldElem, y::ArbFieldElem)
   z = parent(x)()
   ccall((:arb_pow, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, parent(x).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, y, parent(x).prec)
   return z
 end
 
-function ^(x::arb, y::ZZRingElem)
+function ^(x::ArbFieldElem, y::ZZRingElem)
   z = parent(x)()
   ccall((:arb_pow_fmpz, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{ZZRingElem}, Int),
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ZZRingElem}, Int),
               z, x, y, parent(x).prec)
   return z
 end
 
-^(x::arb, y::Integer) = x^ZZRingElem(y)
+^(x::ArbFieldElem, y::Integer) = x^ZZRingElem(y)
 
-function ^(x::arb, y::UInt)
+function ^(x::ArbFieldElem, y::UInt)
   z = parent(x)()
   ccall((:arb_pow_ui, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, UInt, Int), z, x, y, parent(x).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int), z, x, y, parent(x).prec)
   return z
 end
 
-function ^(x::arb, y::QQFieldElem)
+function ^(x::ArbFieldElem, y::QQFieldElem)
   z = parent(x)()
   ccall((:arb_pow_fmpq, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{QQFieldElem}, Int),
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{QQFieldElem}, Int),
               z, x, y, parent(x).prec)
   return z
 end
 
-+(x::QQFieldElem, y::arb) = parent(y)(x) + y
-+(x::arb, y::QQFieldElem) = x + parent(x)(y)
--(x::QQFieldElem, y::arb) = parent(y)(x) - y
-//(x::arb, y::QQFieldElem) = x//parent(x)(y)
-//(x::QQFieldElem, y::arb) = parent(y)(x)//y
--(x::arb, y::QQFieldElem) = x - parent(x)(y)
-*(x::QQFieldElem, y::arb) = parent(y)(x) * y
-*(x::arb, y::QQFieldElem) = x * parent(x)(y)
-^(x::QQFieldElem, y::arb) = parent(y)(x) ^ y
++(x::QQFieldElem, y::ArbFieldElem) = parent(y)(x) + y
++(x::ArbFieldElem, y::QQFieldElem) = x + parent(x)(y)
+-(x::QQFieldElem, y::ArbFieldElem) = parent(y)(x) - y
+//(x::ArbFieldElem, y::QQFieldElem) = x//parent(x)(y)
+//(x::QQFieldElem, y::ArbFieldElem) = parent(y)(x)//y
+-(x::ArbFieldElem, y::QQFieldElem) = x - parent(x)(y)
+*(x::QQFieldElem, y::ArbFieldElem) = parent(y)(x) * y
+*(x::ArbFieldElem, y::QQFieldElem) = x * parent(x)(y)
+^(x::QQFieldElem, y::ArbFieldElem) = parent(y)(x) ^ y
 
-+(x::Float64, y::arb) = parent(y)(x) + y
-+(x::arb, y::Float64) = x + parent(x)(y)
--(x::Float64, y::arb) = parent(y)(x) - y
-//(x::arb, y::Float64) = x//parent(x)(y)
-//(x::Float64, y::arb) = parent(y)(x)//y
--(x::arb, y::Float64) = x - parent(x)(y)
-*(x::Float64, y::arb) = parent(y)(x) * y
-*(x::arb, y::Float64) = x * parent(x)(y)
-^(x::Float64, y::arb) = parent(y)(x) ^ y
-^(x::arb, y::Float64) = x ^ parent(x)(y)
++(x::Float64, y::ArbFieldElem) = parent(y)(x) + y
++(x::ArbFieldElem, y::Float64) = x + parent(x)(y)
+-(x::Float64, y::ArbFieldElem) = parent(y)(x) - y
+//(x::ArbFieldElem, y::Float64) = x//parent(x)(y)
+//(x::Float64, y::ArbFieldElem) = parent(y)(x)//y
+-(x::ArbFieldElem, y::Float64) = x - parent(x)(y)
+*(x::Float64, y::ArbFieldElem) = parent(y)(x) * y
+*(x::ArbFieldElem, y::Float64) = x * parent(x)(y)
+^(x::Float64, y::ArbFieldElem) = parent(y)(x) ^ y
+^(x::ArbFieldElem, y::Float64) = x ^ parent(x)(y)
 
-+(x::BigFloat, y::arb) = parent(y)(x) + y
-+(x::arb, y::BigFloat) = x + parent(x)(y)
--(x::BigFloat, y::arb) = parent(y)(x) - y
-//(x::arb, y::BigFloat) = x//parent(x)(y)
-//(x::BigFloat, y::arb) = parent(y)(x)//y
--(x::arb, y::BigFloat) = x - parent(x)(y)
-*(x::BigFloat, y::arb) = parent(y)(x) * y
-*(x::arb, y::BigFloat) = x * parent(x)(y)
-^(x::BigFloat, y::arb) = parent(y)(x) ^ y
-^(x::arb, y::BigFloat) = x ^ parent(x)(y)
++(x::BigFloat, y::ArbFieldElem) = parent(y)(x) + y
++(x::ArbFieldElem, y::BigFloat) = x + parent(x)(y)
+-(x::BigFloat, y::ArbFieldElem) = parent(y)(x) - y
+//(x::ArbFieldElem, y::BigFloat) = x//parent(x)(y)
+//(x::BigFloat, y::ArbFieldElem) = parent(y)(x)//y
+-(x::ArbFieldElem, y::BigFloat) = x - parent(x)(y)
+*(x::BigFloat, y::ArbFieldElem) = parent(y)(x) * y
+*(x::ArbFieldElem, y::BigFloat) = x * parent(x)(y)
+^(x::BigFloat, y::ArbFieldElem) = parent(y)(x) ^ y
+^(x::ArbFieldElem, y::BigFloat) = x ^ parent(x)(y)
 
-+(x::Rational{T}, y::arb) where {T <: Integer} = QQFieldElem(x) + y
-+(x::arb, y::Rational{T}) where {T <: Integer} = x + QQFieldElem(y)
--(x::Rational{T}, y::arb) where {T <: Integer} = QQFieldElem(x) - y
--(x::arb, y::Rational{T}) where {T <: Integer} = x - QQFieldElem(y)
-//(x::Rational{T}, y::arb) where {T <: Integer} = QQFieldElem(x)//y
-//(x::arb, y::Rational{T}) where {T <: Integer} = x//QQFieldElem(y)
-*(x::Rational{T}, y::arb) where {T <: Integer} = QQFieldElem(x) * y
-*(x::arb, y::Rational{T}) where {T <: Integer} = x * QQFieldElem(y)
-^(x::Rational{T}, y::arb) where {T <: Integer} = QQFieldElem(x) ^ y
-^(x::arb, y::Rational{T}) where {T <: Integer} = x ^ QQFieldElem(y)
++(x::Rational{T}, y::ArbFieldElem) where {T <: Integer} = QQFieldElem(x) + y
++(x::ArbFieldElem, y::Rational{T}) where {T <: Integer} = x + QQFieldElem(y)
+-(x::Rational{T}, y::ArbFieldElem) where {T <: Integer} = QQFieldElem(x) - y
+-(x::ArbFieldElem, y::Rational{T}) where {T <: Integer} = x - QQFieldElem(y)
+//(x::Rational{T}, y::ArbFieldElem) where {T <: Integer} = QQFieldElem(x)//y
+//(x::ArbFieldElem, y::Rational{T}) where {T <: Integer} = x//QQFieldElem(y)
+*(x::Rational{T}, y::ArbFieldElem) where {T <: Integer} = QQFieldElem(x) * y
+*(x::ArbFieldElem, y::Rational{T}) where {T <: Integer} = x * QQFieldElem(y)
+^(x::Rational{T}, y::ArbFieldElem) where {T <: Integer} = QQFieldElem(x) ^ y
+^(x::ArbFieldElem, y::Rational{T}) where {T <: Integer} = x ^ QQFieldElem(y)
 
-/(x::arb, y::arb) = x // y
-/(x::ZZRingElem, y::arb) = x // y
-/(x::arb, y::ZZRingElem) = x // y
-/(x::Int, y::arb) = x // y
-/(x::arb, y::Int) = x // y
-/(x::UInt, y::arb) = x // y
-/(x::arb, y::UInt) = x // y
-/(x::QQFieldElem, y::arb) = x // y
-/(x::arb, y::QQFieldElem) = x // y
-/(x::Float64, y::arb) = x // y
-/(x::arb, y::Float64) = x // y
-/(x::BigFloat, y::arb) = x // y
-/(x::arb, y::BigFloat) = x // y
-/(x::Rational{T}, y::arb) where {T <: Integer} = x // y
-/(x::arb, y::Rational{T}) where {T <: Integer} = x // y
+/(x::ArbFieldElem, y::ArbFieldElem) = x // y
+/(x::ZZRingElem, y::ArbFieldElem) = x // y
+/(x::ArbFieldElem, y::ZZRingElem) = x // y
+/(x::Int, y::ArbFieldElem) = x // y
+/(x::ArbFieldElem, y::Int) = x // y
+/(x::UInt, y::ArbFieldElem) = x // y
+/(x::ArbFieldElem, y::UInt) = x // y
+/(x::QQFieldElem, y::ArbFieldElem) = x // y
+/(x::ArbFieldElem, y::QQFieldElem) = x // y
+/(x::Float64, y::ArbFieldElem) = x // y
+/(x::ArbFieldElem, y::Float64) = x // y
+/(x::BigFloat, y::ArbFieldElem) = x // y
+/(x::ArbFieldElem, y::BigFloat) = x // y
+/(x::Rational{T}, y::ArbFieldElem) where {T <: Integer} = x // y
+/(x::ArbFieldElem, y::Rational{T}) where {T <: Integer} = x // y
 
-divexact(x::arb, y::arb; check::Bool=true) = x // y
-divexact(x::ZZRingElem, y::arb; check::Bool=true) = x // y
-divexact(x::arb, y::ZZRingElem; check::Bool=true) = x // y
-divexact(x::Int, y::arb; check::Bool=true) = x // y
-divexact(x::arb, y::Int; check::Bool=true) = x // y
-divexact(x::UInt, y::arb; check::Bool=true) = x // y
-divexact(x::arb, y::UInt; check::Bool=true) = x // y
-divexact(x::QQFieldElem, y::arb; check::Bool=true) = x // y
-divexact(x::arb, y::QQFieldElem; check::Bool=true) = x // y
-divexact(x::Float64, y::arb; check::Bool=true) = x // y
-divexact(x::arb, y::Float64; check::Bool=true) = x // y
-divexact(x::BigFloat, y::arb; check::Bool=true) = x // y
-divexact(x::arb, y::BigFloat; check::Bool=true) = x // y
-divexact(x::Rational{T}, y::arb; check::Bool=true) where {T <: Integer} = x // y
-divexact(x::arb, y::Rational{T}; check::Bool=true) where {T <: Integer} = x // y
+divexact(x::ArbFieldElem, y::ArbFieldElem; check::Bool=true) = x // y
+divexact(x::ZZRingElem, y::ArbFieldElem; check::Bool=true) = x // y
+divexact(x::ArbFieldElem, y::ZZRingElem; check::Bool=true) = x // y
+divexact(x::Int, y::ArbFieldElem; check::Bool=true) = x // y
+divexact(x::ArbFieldElem, y::Int; check::Bool=true) = x // y
+divexact(x::UInt, y::ArbFieldElem; check::Bool=true) = x // y
+divexact(x::ArbFieldElem, y::UInt; check::Bool=true) = x // y
+divexact(x::QQFieldElem, y::ArbFieldElem; check::Bool=true) = x // y
+divexact(x::ArbFieldElem, y::QQFieldElem; check::Bool=true) = x // y
+divexact(x::Float64, y::ArbFieldElem; check::Bool=true) = x // y
+divexact(x::ArbFieldElem, y::Float64; check::Bool=true) = x // y
+divexact(x::BigFloat, y::ArbFieldElem; check::Bool=true) = x // y
+divexact(x::ArbFieldElem, y::BigFloat; check::Bool=true) = x // y
+divexact(x::Rational{T}, y::ArbFieldElem; check::Bool=true) where {T <: Integer} = x // y
+divexact(x::ArbFieldElem, y::Rational{T}; check::Bool=true) where {T <: Integer} = x // y
 
 ################################################################################
 #
@@ -912,9 +912,9 @@ divexact(x::arb, y::Rational{T}; check::Bool=true) where {T <: Integer} = x // y
 #
 ################################################################################
 
-function abs(x::arb)
+function abs(x::ArbFieldElem)
   z = parent(x)()
-  ccall((:arb_abs, libarb), Nothing, (Ref{arb}, Ref{arb}), z, x)
+  ccall((:arb_abs, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), z, x)
   return z
 end
 
@@ -924,10 +924,10 @@ end
 #
 ################################################################################
 
-function inv(x::arb)
+function inv(x::ArbFieldElem)
   z = parent(x)()
   ccall((:arb_inv, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
   return parent(x)(z)
 end
 
@@ -937,17 +937,17 @@ end
 #
 ################################################################################
 
-function ldexp(x::arb, y::Int)
+function ldexp(x::ArbFieldElem, y::Int)
   z = parent(x)()
   ccall((:arb_mul_2exp_si, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Int), z, x, y)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, y)
   return z
 end
 
-function ldexp(x::arb, y::ZZRingElem)
+function ldexp(x::ArbFieldElem, y::ZZRingElem)
   z = parent(x)()
   ccall((:arb_mul_2exp_fmpz, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{ZZRingElem}), z, x, y)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ZZRingElem}), z, x, y)
   return z
 end
 
@@ -958,59 +958,59 @@ end
 ################################################################################
 
 @doc raw"""
-    trim(x::arb)
+    trim(x::ArbFieldElem)
 
-Return an `arb` interval containing $x$ but which may be more economical,
+Return an `ArbFieldElem` interval containing $x$ but which may be more economical,
 by rounding off insignificant bits from the midpoint.
 """
-function trim(x::arb)
+function trim(x::ArbFieldElem)
   z = parent(x)()
-  ccall((:arb_trim, libarb), Nothing, (Ref{arb}, Ref{arb}), z, x)
+  ccall((:arb_trim, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), z, x)
   return z
 end
 
 @doc raw"""
-    unique_integer(x::arb)
+    unique_integer(x::ArbFieldElem)
 
 Return a pair where the first value is a boolean and the second is an `ZZRingElem`
 integer. The boolean indicates whether the interval $x$ contains a unique
 integer. If this is the case, the second return value is set to this unique
 integer.
 """
-function unique_integer(x::arb)
+function unique_integer(x::ArbFieldElem)
   z = ZZRingElem()
   unique = ccall((:arb_get_unique_fmpz, libarb), Int,
-    (Ref{ZZRingElem}, Ref{arb}), z, x)
+    (Ref{ZZRingElem}, Ref{ArbFieldElem}), z, x)
   return (unique != 0, z)
 end
 
-function (::ZZRing)(a::arb)
+function (::ZZRing)(a::ArbFieldElem)
    return ZZRingElem(a)
 end
 
 @doc raw"""
-    setunion(x::arb, y::arb)
+    setunion(x::ArbFieldElem, y::ArbFieldElem)
 
-Return an `arb` containing the union of the intervals represented by $x$ and
+Return an `ArbFieldElem` containing the union of the intervals represented by $x$ and
 $y$.
 """
-function setunion(x::arb, y::arb)
+function setunion(x::ArbFieldElem, y::ArbFieldElem)
   z = parent(x)()
   ccall((:arb_union, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, parent(x).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, y, parent(x).prec)
   return z
 end
 
 @doc raw"""
-    setintersection(x::arb, y::arb)
+    setintersection(x::ArbFieldElem, y::ArbFieldElem)
 
-Return an `arb` containing the intersection of the intervals represented by
+Return an `ArbFieldElem` containing the intersection of the intervals represented by
 $x$ and $y$.
 """
-function setintersection(x::arb, y::arb)
+function setintersection(x::ArbFieldElem, y::ArbFieldElem)
   z = parent(x)()
   ccall((:arb_intersection, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, parent(x).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, y, parent(x).prec)
   return z
 end
 
@@ -1027,7 +1027,7 @@ Return $\pi = 3.14159\ldots$ as an element of $r$.
 """
 function const_pi(r::ArbField)
   z = r()
-  ccall((:arb_const_pi, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
+  ccall((:arb_const_pi, libarb), Nothing, (Ref{ArbFieldElem}, Int), z, precision(r))
   return z
 end
 
@@ -1038,7 +1038,7 @@ Return $e = 2.71828\ldots$ as an element of $r$.
 """
 function const_e(r::ArbField)
   z = r()
-  ccall((:arb_const_e, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
+  ccall((:arb_const_e, libarb), Nothing, (Ref{ArbFieldElem}, Int), z, precision(r))
   return z
 end
 
@@ -1049,7 +1049,7 @@ Return $\log(2) = 0.69314\ldots$ as an element of $r$.
 """
 function const_log2(r::ArbField)
   z = r()
-  ccall((:arb_const_log2, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
+  ccall((:arb_const_log2, libarb), Nothing, (Ref{ArbFieldElem}, Int), z, precision(r))
   return z
 end
 
@@ -1060,7 +1060,7 @@ Return $\log(10) = 2.302585\ldots$ as an element of $r$.
 """
 function const_log10(r::ArbField)
   z = r()
-  ccall((:arb_const_log10, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
+  ccall((:arb_const_log10, libarb), Nothing, (Ref{ArbFieldElem}, Int), z, precision(r))
   return z
 end
 
@@ -1071,7 +1071,7 @@ Return Euler's constant $\gamma = 0.577215\ldots$ as an element of $r$.
 """
 function const_euler(r::ArbField)
   z = r()
-  ccall((:arb_const_euler, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
+  ccall((:arb_const_euler, libarb), Nothing, (Ref{ArbFieldElem}, Int), z, precision(r))
   return z
 end
 
@@ -1082,7 +1082,7 @@ Return Catalan's constant $C = 0.915965\ldots$ as an element of $r$.
 """
 function const_catalan(r::ArbField)
   z = r()
-  ccall((:arb_const_catalan, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
+  ccall((:arb_const_catalan, libarb), Nothing, (Ref{ArbFieldElem}, Int), z, precision(r))
   return z
 end
 
@@ -1093,7 +1093,7 @@ Return Khinchin's constant $K = 2.685452\ldots$ as an element of $r$.
 """
 function const_khinchin(r::ArbField)
   z = r()
-  ccall((:arb_const_khinchin, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
+  ccall((:arb_const_khinchin, libarb), Nothing, (Ref{ArbFieldElem}, Int), z, precision(r))
   return z
 end
 
@@ -1104,7 +1104,7 @@ Return Glaisher's constant $A = 1.282427\ldots$ as an element of $r$.
 """
 function const_glaisher(r::ArbField)
   z = r()
-  ccall((:arb_const_glaisher, libarb), Nothing, (Ref{arb}, Int), z, precision(r))
+  ccall((:arb_const_glaisher, libarb), Nothing, (Ref{ArbFieldElem}, Int), z, precision(r))
   return z
 end
 
@@ -1116,332 +1116,332 @@ end
 
 # real - real functions
 
-function floor(x::arb)
+function floor(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_floor, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_floor, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-floor(::Type{arb}, x::arb) = floor(x)
-floor(::Type{ZZRingElem}, x::arb) = ZZRingElem(floor(x))
-floor(::Type{T}, x::arb) where {T <: Integer} = T(floor(x))
+floor(::Type{ArbFieldElem}, x::ArbFieldElem) = floor(x)
+floor(::Type{ZZRingElem}, x::ArbFieldElem) = ZZRingElem(floor(x))
+floor(::Type{T}, x::ArbFieldElem) where {T <: Integer} = T(floor(x))
 
-function ceil(x::arb)
+function ceil(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_ceil, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_ceil, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-ceil(::Type{arb}, x::arb) = ceil(x)
-ceil(::Type{ZZRingElem}, x::arb) = ZZRingElem(ceil(x))
-ceil(::Type{T}, x::arb) where {T <: Integer} = T(ceil(x))
+ceil(::Type{ArbFieldElem}, x::ArbFieldElem) = ceil(x)
+ceil(::Type{ZZRingElem}, x::ArbFieldElem) = ZZRingElem(ceil(x))
+ceil(::Type{T}, x::ArbFieldElem) where {T <: Integer} = T(ceil(x))
 
-function Base.sqrt(x::arb; check::Bool=true)
+function Base.sqrt(x::ArbFieldElem; check::Bool=true)
    z = parent(x)()
-   ccall((:arb_sqrt, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_sqrt, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    rsqrt(x::arb)
+    rsqrt(x::ArbFieldElem)
 
 Return the reciprocal of the square root of $x$, i.e. $1/\sqrt{x}$.
 """
-function rsqrt(x::arb)
+function rsqrt(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_rsqrt, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_rsqrt, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    sqrt1pm1(x::arb)
+    sqrt1pm1(x::ArbFieldElem)
 
 Return $\sqrt{1+x}-1$, evaluated accurately for small $x$.
 """
-function sqrt1pm1(x::arb)
+function sqrt1pm1(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_sqrt1pm1, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_sqrt1pm1, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    sqrtpos(x::arb)
+    sqrtpos(x::ArbFieldElem)
 
 Return the sqrt root of $x$, assuming that $x$ represents a non-negative
 number. Thus any negative number in the input interval is discarded.
 """
-function sqrtpos(x::arb)
+function sqrtpos(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_sqrtpos, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_sqrtpos, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function log(x::arb)
+function log(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_log, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_log, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function log1p(x::arb)
+function log1p(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_log1p, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_log1p, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function Base.exp(x::arb)
+function Base.exp(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_exp, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_exp, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function expm1(x::arb)
+function expm1(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_expm1, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_expm1, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function sin(x::arb)
+function sin(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_sin, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_sin, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function cos(x::arb)
+function cos(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_cos, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_cos, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function sinpi(x::arb)
+function sinpi(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_sin_pi, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_sin_pi, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function cospi(x::arb)
+function cospi(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_cos_pi, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_cos_pi, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function tan(x::arb)
+function tan(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_tan, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_tan, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function cot(x::arb)
+function cot(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_cot, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_cot, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function tanpi(x::arb)
+function tanpi(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_tan_pi, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_tan_pi, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function cotpi(x::arb)
+function cotpi(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_cot_pi, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_cot_pi, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function sinh(x::arb)
+function sinh(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_sinh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_sinh, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function cosh(x::arb)
+function cosh(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_cosh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_cosh, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function tanh(x::arb)
+function tanh(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_tanh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_tanh, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function coth(x::arb)
+function coth(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_coth, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_coth, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function atan(x::arb)
+function atan(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_atan, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_atan, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function asin(x::arb)
+function asin(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_asin, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_asin, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function acos(x::arb)
+function acos(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_acos, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_acos, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function atanh(x::arb)
+function atanh(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_atanh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_atanh, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function asinh(x::arb)
+function asinh(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_asinh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_asinh, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function acosh(x::arb)
+function acosh(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_acosh, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_acosh, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    gamma(x::arb)
+    gamma(x::ArbFieldElem)
 
 Return the Gamma function evaluated at $x$.
 """
-function gamma(x::arb)
+function gamma(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_gamma, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_gamma, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    lgamma(x::arb)
+    lgamma(x::ArbFieldElem)
 
 Return the logarithm of the Gamma function evaluated at $x$.
 """
-function lgamma(x::arb)
+function lgamma(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_lgamma, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_lgamma, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    rgamma(x::arb)
+    rgamma(x::ArbFieldElem)
 
 Return the reciprocal of the Gamma function evaluated at $x$.
 """
-function rgamma(x::arb)
+function rgamma(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_rgamma, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_rgamma, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    digamma(x::arb)
+    digamma(x::ArbFieldElem)
 
 Return the  logarithmic derivative of the gamma function evaluated at $x$,
 i.e. $\psi(x)$.
 """
-function digamma(x::arb)
+function digamma(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_digamma, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_digamma, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    gamma(s::arb, x::arb)
+    gamma(s::ArbFieldElem, x::ArbFieldElem)
 
 Return the upper incomplete gamma function $\Gamma(s,x)$.
 """
-function gamma(s::arb, x::arb)
+function gamma(s::ArbFieldElem, x::ArbFieldElem)
   z = parent(s)()
   ccall((:arb_hypgeom_gamma_upper, libarb), Nothing,
-        (Ref{arb}, Ref{arb}, Ref{arb}, Int, Int), z, s, x, 0, parent(s).prec)
+        (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int, Int), z, s, x, 0, parent(s).prec)
   return z
 end
 
 @doc raw"""
-    gamma_regularized(s::arb, x::arb)
+    gamma_regularized(s::ArbFieldElem, x::ArbFieldElem)
 
 Return the regularized upper incomplete gamma function
 $\Gamma(s,x) / \Gamma(s)$.
 """
-function gamma_regularized(s::arb, x::arb)
+function gamma_regularized(s::ArbFieldElem, x::ArbFieldElem)
   z = parent(s)()
   ccall((:arb_hypgeom_gamma_upper, libarb), Nothing,
-        (Ref{arb}, Ref{arb}, Ref{arb}, Int, Int), z, s, x, 1, parent(s).prec)
+        (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int, Int), z, s, x, 1, parent(s).prec)
   return z
 end
 
 @doc raw"""
-    gamma_lower(s::arb, x::arb)
+    gamma_lower(s::ArbFieldElem, x::ArbFieldElem)
 
 Return the lower incomplete gamma function $\gamma(s,x) / \Gamma(s)$.
 """
-function gamma_lower(s::arb, x::arb)
+function gamma_lower(s::ArbFieldElem, x::ArbFieldElem)
   z = parent(s)()
   ccall((:arb_hypgeom_gamma_lower, libarb), Nothing,
-        (Ref{arb}, Ref{arb}, Ref{arb}, Int, Int), z, s, x, 0, parent(s).prec)
+        (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int, Int), z, s, x, 0, parent(s).prec)
   return z
 end
 
 @doc raw"""
-    gamma_lower_regularized(s::arb, x::arb)
+    gamma_lower_regularized(s::ArbFieldElem, x::ArbFieldElem)
 
 Return the regularized lower incomplete gamma function
 $\gamma(s,x) / \Gamma(s)$.
 """
-function gamma_lower_regularized(s::arb, x::arb)
+function gamma_lower_regularized(s::ArbFieldElem, x::ArbFieldElem)
   z = parent(s)()
   ccall((:arb_hypgeom_gamma_lower, libarb), Nothing,
-        (Ref{arb}, Ref{arb}, Ref{arb}, Int, Int), z, s, x, 1, parent(s).prec)
+        (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int, Int), z, s, x, 1, parent(s).prec)
   return z
 end
 
 
 @doc raw"""
-    zeta(x::arb)
+    zeta(x::ArbFieldElem)
 
 Return the Riemann zeta function evaluated at $x$.
 """
-function zeta(x::arb)
+function zeta(x::ArbFieldElem)
    z = parent(x)()
-   ccall((:arb_zeta, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
+   ccall((:arb_zeta, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function sincos(x::arb)
+function sincos(x::ArbFieldElem)
   s = parent(x)()
   c = parent(x)()
   ccall((:arb_sin_cos, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), s, c, x, parent(x).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), s, c, x, parent(x).prec)
   return (s, c)
 end
 
-function sincospi(x::arb)
+function sincospi(x::ArbFieldElem)
   s = parent(x)()
   c = parent(x)()
   ccall((:arb_sin_cos_pi, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), s, c, x, parent(x).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), s, c, x, parent(x).prec)
   return (s, c)
 end
 
 function sinpi(x::QQFieldElem, r::ArbField)
   z = r()
   ccall((:arb_sin_pi_fmpq, libarb), Nothing,
-        (Ref{arb}, Ref{QQFieldElem}, Int), z, x, precision(r))
+        (Ref{ArbFieldElem}, Ref{QQFieldElem}, Int), z, x, precision(r))
   return z
 end
 
 function cospi(x::QQFieldElem, r::ArbField)
   z = r()
   ccall((:arb_cos_pi_fmpq, libarb), Nothing,
-        (Ref{arb}, Ref{QQFieldElem}, Int), z, x, precision(r))
+        (Ref{ArbFieldElem}, Ref{QQFieldElem}, Int), z, x, precision(r))
   return z
 end
 
@@ -1449,92 +1449,92 @@ function sincospi(x::QQFieldElem, r::ArbField)
   s = r()
   c = r()
   ccall((:arb_sin_cos_pi_fmpq, libarb), Nothing,
-        (Ref{arb}, Ref{arb}, Ref{QQFieldElem}, Int), s, c, x, precision(r))
+        (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{QQFieldElem}, Int), s, c, x, precision(r))
   return (s, c)
 end
 
-function sinhcosh(x::arb)
+function sinhcosh(x::ArbFieldElem)
   s = parent(x)()
   c = parent(x)()
   ccall((:arb_sinh_cosh, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), s, c, x, parent(x).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), s, c, x, parent(x).prec)
   return (s, c)
 end
 
-function atan(y::arb, x::arb)
+function atan(y::ArbFieldElem, x::ArbFieldElem)
   z = parent(y)()
   ccall((:arb_atan2, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, y, x, parent(y).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, y, x, parent(y).prec)
   return z
 end
 
 @doc raw"""
-    atan2(y::arb, x::arb)
+    atan2(y::ArbFieldElem, x::ArbFieldElem)
 
 Return $\operatorname{atan2}(y,x) = \arg(x+yi)$. Same as `atan(y, x)`.
 """
-function atan2(y::arb, x::arb)
+function atan2(y::ArbFieldElem, x::ArbFieldElem)
   return atan(y, x)
 end
 
 @doc raw"""
-    agm(x::arb, y::arb)
+    agm(x::ArbFieldElem, y::ArbFieldElem)
 
 Return the arithmetic-geometric mean of $x$ and $y$
 """
-function agm(x::arb, y::arb)
+function agm(x::ArbFieldElem, y::ArbFieldElem)
   z = parent(x)()
   ccall((:arb_agm, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, parent(x).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, y, parent(x).prec)
   return z
 end
 
 @doc raw"""
-    zeta(s::arb, a::arb)
+    zeta(s::ArbFieldElem, a::ArbFieldElem)
 
 Return the Hurwitz zeta function $\zeta(s,a)$.
 """
-function zeta(s::arb, a::arb)
+function zeta(s::ArbFieldElem, a::ArbFieldElem)
   z = parent(s)()
   ccall((:arb_hurwitz_zeta, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, s, a, parent(s).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, s, a, parent(s).prec)
   return z
 end
 
-function hypot(x::arb, y::arb)
+function hypot(x::ArbFieldElem, y::ArbFieldElem)
   z = parent(x)()
   ccall((:arb_hypot, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, x, y, parent(x).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, y, parent(x).prec)
   return z
 end
 
-function root(x::arb, n::UInt)
+function root(x::ArbFieldElem, n::UInt)
   z = parent(x)()
   ccall((:arb_root, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, UInt, Int), z, x, n, parent(x).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int), z, x, n, parent(x).prec)
   return z
 end
 
 @doc raw"""
-    root(x::arb, n::Int)
+    root(x::ArbFieldElem, n::Int)
 
 Return the $n$-th root of $x$. We require $x \geq 0$.
 """
-function root(x::arb, n::Int)
+function root(x::ArbFieldElem, n::Int)
   x < 0 && throw(DomainError(x, "Argument must be positive"))
   return root(x, UInt(n))
 end
 
 @doc raw"""
-    factorial(x::arb)
+    factorial(x::ArbFieldElem)
 
 Return the factorial of $x$.
 """
-factorial(x::arb) = gamma(x+1)
+factorial(x::ArbFieldElem) = gamma(x+1)
 
 function factorial(n::UInt, r::ArbField)
   z = r()
-  ccall((:arb_fac_ui, libarb), Nothing, (Ref{arb}, UInt, Int), z, n, r.prec)
+  ccall((:arb_fac_ui, libarb), Nothing, (Ref{ArbFieldElem}, UInt, Int), z, n, r.prec)
   return z
 end
 
@@ -1546,14 +1546,14 @@ Return the factorial of $n$ in the given Arb field.
 factorial(n::Int, r::ArbField) = n < 0 ? factorial(r(n)) : factorial(UInt(n), r)
 
 @doc raw"""
-    binomial(x::arb, n::UInt)
+    binomial(x::ArbFieldElem, n::UInt)
 
 Return the binomial coefficient ${x \choose n}$.
 """
-function binomial(x::arb, n::UInt)
+function binomial(x::ArbFieldElem, n::UInt)
   z = parent(x)()
   ccall((:arb_bin_ui, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, UInt, Int), z, x, n, parent(x).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int), z, x, n, parent(x).prec)
   return z
 end
 
@@ -1565,7 +1565,7 @@ Return the binomial coefficient ${n \choose k}$ in the given Arb field.
 function binomial(n::UInt, k::UInt, r::ArbField)
   z = r()
   ccall((:arb_bin_uiui, libarb), Nothing,
-              (Ref{arb}, UInt, UInt, Int), z, n, k, r.prec)
+              (Ref{ArbFieldElem}, UInt, UInt, Int), z, n, k, r.prec)
   return z
 end
 
@@ -1577,14 +1577,14 @@ Return the $n$-th Fibonacci number in the given Arb field.
 function fibonacci(n::ZZRingElem, r::ArbField)
   z = r()
   ccall((:arb_fib_fmpz, libarb), Nothing,
-              (Ref{arb}, Ref{ZZRingElem}, Int), z, n, r.prec)
+              (Ref{ArbFieldElem}, Ref{ZZRingElem}, Int), z, n, r.prec)
   return z
 end
 
 function fibonacci(n::UInt, r::ArbField)
   z = r()
   ccall((:arb_fib_ui, libarb), Nothing,
-              (Ref{arb}, UInt, Int), z, n, r.prec)
+              (Ref{ArbFieldElem}, UInt, Int), z, n, r.prec)
   return z
 end
 
@@ -1603,7 +1603,7 @@ Return the Gamma function evaluated at $x$ in the given Arb field.
 function gamma(x::ZZRingElem, r::ArbField)
   z = r()
   ccall((:arb_gamma_fmpz, libarb), Nothing,
-              (Ref{arb}, Ref{ZZRingElem}, Int), z, x, r.prec)
+              (Ref{ArbFieldElem}, Ref{ZZRingElem}, Int), z, x, r.prec)
   return z
 end
 
@@ -1615,7 +1615,7 @@ Return the Gamma function evaluated at $x$ in the given Arb field.
 function gamma(x::QQFieldElem, r::ArbField)
   z = r()
   ccall((:arb_gamma_fmpq, libarb), Nothing,
-              (Ref{arb}, Ref{QQFieldElem}, Int), z, x, r.prec)
+              (Ref{ArbFieldElem}, Ref{QQFieldElem}, Int), z, x, r.prec)
   return z
 end
 
@@ -1623,7 +1623,7 @@ end
 function zeta(n::UInt, r::ArbField)
   z = r()
   ccall((:arb_zeta_ui, libarb), Nothing,
-              (Ref{arb}, UInt, Int), z, n, r.prec)
+              (Ref{ArbFieldElem}, UInt, Int), z, n, r.prec)
   return z
 end
 
@@ -1638,7 +1638,7 @@ zeta(n::Int, r::ArbField) = n >= 0 ? zeta(UInt(n), r) : zeta(r(n))
 function bernoulli(n::UInt, r::ArbField)
   z = r()
   ccall((:arb_bernoulli_ui, libarb), Nothing,
-              (Ref{arb}, UInt, Int), z, n, r.prec)
+              (Ref{ArbFieldElem}, UInt, Int), z, n, r.prec)
   return z
 end
 
@@ -1649,24 +1649,24 @@ Return the $n$-th Bernoulli number as an element of the given Arb field.
 """
 bernoulli(n::Int, r::ArbField) = n >= 0 ? bernoulli(UInt(n), r) : throw(DomainError(n, "Index must be non-negative"))
 
-function rising_factorial(x::arb, n::UInt)
+function rising_factorial(x::ArbFieldElem, n::UInt)
   z = parent(x)()
   ccall((:arb_rising_ui, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, UInt, Int), z, x, n, parent(x).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int), z, x, n, parent(x).prec)
   return z
 end
 
 @doc raw"""
-    rising_factorial(x::arb, n::Int)
+    rising_factorial(x::ArbFieldElem, n::Int)
 
 Return the rising factorial $x(x + 1)\ldots (x + n - 1)$ as an Arb.
 """
-rising_factorial(x::arb, n::Int) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : rising_factorial(x, UInt(n))
+rising_factorial(x::ArbFieldElem, n::Int) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : rising_factorial(x, UInt(n))
 
 function rising_factorial(x::QQFieldElem, n::UInt, r::ArbField)
   z = r()
   ccall((:arb_rising_fmpq_ui, libarb), Nothing,
-              (Ref{arb}, Ref{QQFieldElem}, UInt, Int), z, x, n, r.prec)
+              (Ref{ArbFieldElem}, Ref{QQFieldElem}, UInt, Int), z, x, n, r.prec)
   return z
 end
 
@@ -1678,99 +1678,99 @@ given Arb field.
 """
 rising_factorial(x::QQFieldElem, n::Int, r::ArbField) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : rising_factorial(x, UInt(n), r)
 
-function rising_factorial2(x::arb, n::UInt)
+function rising_factorial2(x::ArbFieldElem, n::UInt)
   z = parent(x)()
   w = parent(x)()
   ccall((:arb_rising2_ui, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, UInt, Int), z, w, x, n, parent(x).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int), z, w, x, n, parent(x).prec)
   return (z, w)
 end
 
 @doc raw"""
-    rising_factorial2(x::arb, n::Int)
+    rising_factorial2(x::ArbFieldElem, n::Int)
 
 Return a tuple containing the rising factorial $x(x + 1)\ldots (x + n - 1)$
 and its derivative.
 """
-rising_factorial2(x::arb, n::Int) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : rising_factorial2(x, UInt(n))
+rising_factorial2(x::ArbFieldElem, n::Int) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : rising_factorial2(x, UInt(n))
 
-function polylog(s::arb, a::arb)
+function polylog(s::ArbFieldElem, a::ArbFieldElem)
   z = parent(s)()
   ccall((:arb_polylog, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, Ref{arb}, Int), z, s, a, parent(s).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, s, a, parent(s).prec)
   return z
 end
 
-function polylog(s::Int, a::arb)
+function polylog(s::Int, a::ArbFieldElem)
   z = parent(a)()
   ccall((:arb_polylog_si, libarb), Nothing,
-              (Ref{arb}, Int, Ref{arb}, Int), z, s, a, parent(a).prec)
+              (Ref{ArbFieldElem}, Int, Ref{ArbFieldElem}, Int), z, s, a, parent(a).prec)
   return z
 end
 
 @doc raw"""
-    polylog(s::Union{arb,Int}, a::arb)
+    polylog(s::Union{ArbFieldElem,Int}, a::ArbFieldElem)
 
 Return the polylogarithm Li$_s(a)$.
-""" polylog(s::Union{arb,Int}, a::arb)
+""" polylog(s::Union{ArbFieldElem,Int}, a::ArbFieldElem)
 
-function chebyshev_t(n::UInt, x::arb)
+function chebyshev_t(n::UInt, x::ArbFieldElem)
   z = parent(x)()
   ccall((:arb_chebyshev_t_ui, libarb), Nothing,
-              (Ref{arb}, UInt, Ref{arb}, Int), z, n, x, parent(x).prec)
+              (Ref{ArbFieldElem}, UInt, Ref{ArbFieldElem}, Int), z, n, x, parent(x).prec)
   return z
 end
 
-function chebyshev_u(n::UInt, x::arb)
+function chebyshev_u(n::UInt, x::ArbFieldElem)
   z = parent(x)()
   ccall((:arb_chebyshev_u_ui, libarb), Nothing,
-              (Ref{arb}, UInt, Ref{arb}, Int), z, n, x, parent(x).prec)
+              (Ref{ArbFieldElem}, UInt, Ref{ArbFieldElem}, Int), z, n, x, parent(x).prec)
   return z
 end
 
-function chebyshev_t2(n::UInt, x::arb)
+function chebyshev_t2(n::UInt, x::ArbFieldElem)
   z = parent(x)()
   w = parent(x)()
   ccall((:arb_chebyshev_t2_ui, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, UInt, Ref{arb}, Int), z, w, n, x, parent(x).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Ref{ArbFieldElem}, Int), z, w, n, x, parent(x).prec)
   return z, w
 end
 
-function chebyshev_u2(n::UInt, x::arb)
+function chebyshev_u2(n::UInt, x::ArbFieldElem)
   z = parent(x)()
   w = parent(x)()
   ccall((:arb_chebyshev_u2_ui, libarb), Nothing,
-              (Ref{arb}, Ref{arb}, UInt, Ref{arb}, Int), z, w, n, x, parent(x).prec)
+              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Ref{ArbFieldElem}, Int), z, w, n, x, parent(x).prec)
   return z, w
 end
 
 @doc raw"""
-    chebyshev_t(n::Int, x::arb)
+    chebyshev_t(n::Int, x::ArbFieldElem)
 
 Return the value of the Chebyshev polynomial $T_n(x)$.
 """
-chebyshev_t(n::Int, x::arb) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : chebyshev_t(UInt(n), x)
+chebyshev_t(n::Int, x::ArbFieldElem) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : chebyshev_t(UInt(n), x)
 
 @doc raw"""
-    chebyshev_u(n::Int, x::arb)
+    chebyshev_u(n::Int, x::ArbFieldElem)
 
 Return the value of the Chebyshev polynomial $U_n(x)$.
 """
-chebyshev_u(n::Int, x::arb) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : chebyshev_u(UInt(n), x)
+chebyshev_u(n::Int, x::ArbFieldElem) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : chebyshev_u(UInt(n), x)
 
 @doc raw"""
-    chebyshev_t2(n::Int, x::arb)
+    chebyshev_t2(n::Int, x::ArbFieldElem)
 
 Return the tuple $(T_{n}(x), T_{n-1}(x))$.
 """
-chebyshev_t2(n::Int, x::arb) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : chebyshev_t2(UInt(n), x)
+chebyshev_t2(n::Int, x::ArbFieldElem) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : chebyshev_t2(UInt(n), x)
 
 @doc raw"""
-    chebyshev_u2(n::Int, x::arb)
+    chebyshev_u2(n::Int, x::ArbFieldElem)
 
 Return the tuple $(U_{n}(x), U_{n-1}(x))$
 """
-chebyshev_u2(n::Int, x::arb) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : chebyshev_u2(UInt(n), x)
+chebyshev_u2(n::Int, x::ArbFieldElem) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : chebyshev_u2(UInt(n), x)
 
 @doc raw"""
     bell(n::ZZRingElem, r::ArbField)
@@ -1780,7 +1780,7 @@ Return the Bell number $B_n$ as an element of $r$.
 function bell(n::ZZRingElem, r::ArbField)
   z = r()
   ccall((:arb_bell_fmpz, libarb), Nothing,
-              (Ref{arb}, Ref{ZZRingElem}, Int), z, n, r.prec)
+              (Ref{ArbFieldElem}, Ref{ZZRingElem}, Int), z, n, r.prec)
   return z
 end
 
@@ -1799,7 +1799,7 @@ Return the number of partitions $p(n)$ as an element of $r$.
 function numpart(n::ZZRingElem, r::ArbField)
   z = r()
   ccall((:arb_partitions_fmpz, libarb), Nothing,
-              (Ref{arb}, Ref{ZZRingElem}, Int), z, n, r.prec)
+              (Ref{ArbFieldElem}, Ref{ZZRingElem}, Int), z, n, r.prec)
   return z
 end
 
@@ -1817,53 +1817,53 @@ numpart(n::Int, r::ArbField) = numpart(ZZRingElem(n), r)
 ################################################################################
 
 @doc raw"""
-    airy_ai(x::arb)
+    airy_ai(x::ArbFieldElem)
 
 Return the Airy function $\operatorname{Ai}(x)$.
 """
-function airy_ai(x::arb)
+function airy_ai(x::ArbFieldElem)
   ai = parent(x)()
   ccall((:arb_hypgeom_airy, libarb), Nothing,
-              (Ref{arb}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{arb}, Int),
+              (Ref{ArbFieldElem}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{ArbFieldElem}, Int),
               ai, C_NULL, C_NULL, C_NULL, x, parent(x).prec)
   return ai
 end
 
 @doc raw"""
-    airy_bi(x::arb)
+    airy_bi(x::ArbFieldElem)
 
 Return the Airy function $\operatorname{Bi}(x)$.
 """
-function airy_bi(x::arb)
+function airy_bi(x::ArbFieldElem)
   bi = parent(x)()
   ccall((:arb_hypgeom_airy, libarb), Nothing,
-              (Ptr{Cvoid}, Ptr{Cvoid}, Ref{arb}, Ptr{Cvoid}, Ref{arb}, Int),
+              (Ptr{Cvoid}, Ptr{Cvoid}, Ref{ArbFieldElem}, Ptr{Cvoid}, Ref{ArbFieldElem}, Int),
               C_NULL, C_NULL, bi, C_NULL, x, parent(x).prec)
   return bi
 end
 
 @doc raw"""
-    airy_ai_prime(x::arb)
+    airy_ai_prime(x::ArbFieldElem)
 
 Return the derivative of the Airy function $\operatorname{Ai}^\prime(x)$.
 """
-function airy_ai_prime(x::arb)
+function airy_ai_prime(x::ArbFieldElem)
   ai_prime = parent(x)()
   ccall((:arb_hypgeom_airy, libarb), Nothing,
-              (Ptr{Cvoid}, Ref{arb}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{arb}, Int),
+              (Ptr{Cvoid}, Ref{ArbFieldElem}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{ArbFieldElem}, Int),
               C_NULL, ai_prime, C_NULL, C_NULL, x, parent(x).prec)
   return ai_prime
 end
 
 @doc raw"""
-    airy_bi_prime(x::arb)
+    airy_bi_prime(x::ArbFieldElem)
 
 Return the derivative of the Airy function $\operatorname{Bi}^\prime(x)$.
 """
-function airy_bi_prime(x::arb)
+function airy_bi_prime(x::ArbFieldElem)
   bi_prime = parent(x)()
   ccall((:arb_hypgeom_airy, libarb), Nothing,
-              (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{arb}, Ref{arb}, Int),
+              (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int),
               C_NULL, C_NULL, C_NULL, bi_prime, x, parent(x).prec)
   return bi_prime
 end
@@ -1875,7 +1875,7 @@ end
 ################################################################################
 
 @doc raw"""
-    lindep(A::Vector{arb}, bits::Int)
+    lindep(A::Vector{ArbFieldElem}, bits::Int)
 
 Find a small linear combination of the entries of the array $A$ that is small
 (using LLL). The entries are first scaled by the given number of bits before
@@ -1893,7 +1893,7 @@ julia> a = RR(-0.33198902958450931620250069492231652319)
 [-0.33198902958450932088 +/- 4.15e-22]
 
 julia> V = [RR(1), a, a^2, a^3, a^4, a^5]
-6-element Vector{arb}:
+6-element Vector{ArbFieldElem}:
  1.0000000000000000000
  [-0.33198902958450932088 +/- 4.15e-22]
  [0.11021671576446420510 +/- 7.87e-21]
@@ -1911,7 +1911,7 @@ julia> W = lindep(V, 20)
  1
 ```
 """
-function lindep(A::Vector{arb}, bits::Int)
+function lindep(A::Vector{ArbFieldElem}, bits::Int)
   bits < 0 && throw(DomainError(bits, "Number of bits must be non-negative"))
   n = length(A)
   V = [floor(ldexp(s, bits) + 0.5) for s in A]
@@ -1932,7 +1932,7 @@ end
 ################################################################################
 
 @doc raw"""
-      simplest_rational_inside(x::arb)
+      simplest_rational_inside(x::ArbFieldElem)
 
 Return the simplest fraction inside the ball $x$. A canonical fraction
 $a_1/b_1$ is defined to be simpler than $a_2/b_2$ iff $b_1 < b_2$ or $b_1 =
@@ -1948,13 +1948,13 @@ julia> simplest_rational_inside(const_pi(RR))
 8717442233//2774848045
 ```
 """
-function simplest_rational_inside(x::arb)
+function simplest_rational_inside(x::ArbFieldElem)
    a = ZZRingElem()
    b = ZZRingElem()
    e = ZZRingElem()
 
    ccall((:arb_get_interval_fmpz_2exp, libarb), Nothing,
-         (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{arb}), a, b, e, x)
+         (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ArbFieldElem}), a, b, e, x)
    !fits(Int, e) && error("Result does not fit into an QQFieldElem")
    _e = Int(e)
    if e >= 0
@@ -1971,31 +1971,31 @@ end
 #
 ################################################################################
 
-function zero!(z::arb)
-   ccall((:arb_zero, libarb), Nothing, (Ref{arb},), z)
+function zero!(z::ArbFieldElem)
+   ccall((:arb_zero, libarb), Nothing, (Ref{ArbFieldElem},), z)
    return z
 end
 
 for (s,f) in (("add!","arb_add"), ("mul!","arb_mul"), ("div!", "arb_div"),
               ("sub!","arb_sub"))
   @eval begin
-    function ($(Symbol(s)))(z::arb, x::arb, y::arb)
-      ccall(($f, libarb), Nothing, (Ref{arb}, Ref{arb}, Ref{arb}, Int),
+    function ($(Symbol(s)))(z::ArbFieldElem, x::ArbFieldElem, y::ArbFieldElem)
+      ccall(($f, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int),
                            z, x, y, parent(x).prec)
       return z
     end
   end
 end
 
-function addeq!(z::arb, x::arb)
-    ccall((:arb_add, libarb), Nothing, (Ref{arb}, Ref{arb}, Ref{arb}, Int),
+function addeq!(z::ArbFieldElem, x::ArbFieldElem)
+    ccall((:arb_add, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int),
                            z, z, x, parent(x).prec)
     return z
 end
 
-function addmul!(z::arb, x::arb, y::ZZRingElem)
+function addmul!(z::ArbFieldElem, x::ArbFieldElem, y::ZZRingElem)
   q = max(bits(z), bits(x))
-  ccall((:arb_addmul_fmpz, libarb), Nothing, (Ref{arb}, Ref{arb}, Ref{ZZRingElem}, Int), z, x, y, q)
+  ccall((:arb_addmul_fmpz, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ZZRingElem}, Int), z, x, y, q)
   return z
 end
 
@@ -2005,7 +2005,7 @@ end
 #
 ################################################################################
 
-for (typeofx, passtoc) in ((arb, Ref{arb}), (Ptr{arb}, Ptr{arb}))
+for (typeofx, passtoc) in ((ArbFieldElem, Ref{ArbFieldElem}), (Ptr{ArbFieldElem}, Ptr{ArbFieldElem}))
   for (f,t) in (("arb_set_si", Int), ("arb_set_ui", UInt),
                 ("arb_set_d", Float64))
     @eval begin
@@ -2036,13 +2036,13 @@ for (typeofx, passtoc) in ((arb, Ref{arb}), (Ptr{arb}, Ptr{arb}))
                   (($passtoc), Ref{QQFieldElem}, Int), x, y, p)
     end
 
-    function _arb_set(x::($typeofx), y::arb)
-      ccall((:arb_set, libarb), Nothing, (($passtoc), Ref{arb}), x, y)
+    function _arb_set(x::($typeofx), y::ArbFieldElem)
+      ccall((:arb_set, libarb), Nothing, (($passtoc), Ref{ArbFieldElem}), x, y)
     end
 
-    function _arb_set(x::($typeofx), y::arb, p::Int)
+    function _arb_set(x::($typeofx), y::ArbFieldElem, p::Int)
       ccall((:arb_set_round, libarb), Nothing,
-                  (($passtoc), Ref{arb}, Int), x, y, p)
+                  (($passtoc), Ref{ArbFieldElem}, Int), x, y, p)
     end
 
     function _arb_set(x::($typeofx), y::AbstractString, p::Int)
@@ -2081,25 +2081,25 @@ end
 ################################################################################
 
 function (r::ArbField)()
-  z = arb()
+  z = ArbFieldElem()
   z.parent = r
   return z
 end
 
 function (r::ArbField)(x::Int)
-  z = arb(ZZRingElem(x), r.prec)
+  z = ArbFieldElem(ZZRingElem(x), r.prec)
   z.parent = r
   return z
 end
 
 function (r::ArbField)(x::UInt)
-  z = arb(ZZRingElem(x), r.prec)
+  z = ArbFieldElem(ZZRingElem(x), r.prec)
   z.parent = r
   return z
 end
 
 function (r::ArbField)(x::ZZRingElem)
-  z = arb(x, r.prec)
+  z = ArbFieldElem(x, r.prec)
   z.parent = r
   return z
 end
@@ -2107,7 +2107,7 @@ end
 (r::ArbField)(x::Integer) = r(ZZRingElem(x))
 
 function (r::ArbField)(x::QQFieldElem)
-  z = arb(x, r.prec)
+  z = ArbFieldElem(x, r.prec)
   z.parent = r
   return z
 end
@@ -2115,25 +2115,25 @@ end
 (r::ArbField)(x::Rational{T}) where {T <: Integer} = r(QQFieldElem(x))
 
 #function call(r::ArbField, x::arf)
-#  z = arb(arb(x), r.prec)
+#  z = ArbFieldElem(ArbFieldElem(x), r.prec)
 #  z.parent = r
 #  return z
 #end
 
 function (r::ArbField)(x::Float64)
-  z = arb(x, r.prec)
+  z = ArbFieldElem(x, r.prec)
   z.parent = r
   return z
 end
 
-function (r::ArbField)(x::arb)
-  z = arb(x, r.prec)
+function (r::ArbField)(x::ArbFieldElem)
+  z = ArbFieldElem(x, r.prec)
   z.parent = r
   return z
 end
 
 function (r::ArbField)(x::AbstractString)
-  z = arb(x, r.prec)
+  z = ArbFieldElem(x, r.prec)
   z.parent = r
   return z
 end
@@ -2149,7 +2149,7 @@ function (r::ArbField)(x::Irrational)
 end
 
 function (r::ArbField)(x::BigFloat)
-  z = arb(x, r.prec)
+  z = ArbFieldElem(x, r.prec)
   z.parent = r
   return z
 end
@@ -2173,13 +2173,13 @@ end
 
 Return a random element in given Arb field.
 
-The `randtype` default is `:urandom` which return an `arb` contained in
+The `randtype` default is `:urandom` which return an `ArbFieldElem` contained in
 $[0,1]$.
 
 The rest of the methods return non-uniformly distributed values in order to
 exercise corner cases. The option `:randtest` will return a finite number, and
 `:randtest_exact` the same but with a zero radius. The option
-`:randtest_precise` return an `arb` with a radius around $2^{-\mathrm{prec}}$
+`:randtest_precise` return an `ArbFieldElem` with a radius around $2^{-\mathrm{prec}}$
 the magnitude of the midpoint, while `:randtest_wide` return a radius that
 might be big relative to its midpoint. The `:randtest_special`-option might
 return a midpoint and radius whose values are `NaN` or `inf`.
@@ -2190,22 +2190,22 @@ function rand(r::ArbField; randtype::Symbol=:urandom)
 
   if randtype == :urandom
     ccall((:arb_urandom, libarb), Nothing,
-          (Ref{arb}, Ptr{Cvoid}, Int), x, state.ptr, r.prec)
+          (Ref{ArbFieldElem}, Ptr{Cvoid}, Int), x, state.ptr, r.prec)
   elseif randtype == :randtest
     ccall((:arb_randtest, libarb), Nothing,
-          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
+          (Ref{ArbFieldElem}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
   elseif randtype == :randtest_exact
     ccall((:arb_randtest_exact, libarb), Nothing,
-          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
+          (Ref{ArbFieldElem}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
   elseif randtype == :randtest_precise
     ccall((:arb_randtest_precise, libarb), Nothing,
-          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
+          (Ref{ArbFieldElem}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
   elseif randtype == :randtest_wide
     ccall((:arb_randtest_wide, libarb), Nothing,
-          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
+          (Ref{ArbFieldElem}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
   elseif randtype == :randtest_special
     ccall((:arb_randtest_special, libarb), Nothing,
-          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
+          (Ref{ArbFieldElem}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
   else
     error("Arb random generation `" * String(randtype) * "` is not defined")
   end

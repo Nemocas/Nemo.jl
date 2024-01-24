@@ -282,7 +282,7 @@ end
 #
 ###############################################################################
 
-for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, arb, acb, ZZPolyRingElem, QQPolyRingElem]
+for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, acb, ZZPolyRingElem, QQPolyRingElem]
    @eval begin
       +(x::acb_poly, y::$T) = x + parent(x)(y)
 
@@ -316,7 +316,7 @@ end
 #
 ###############################################################################
 
-for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, arb, acb]
+for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, acb]
    @eval begin
       divexact(x::acb_poly, y::$T; check::Bool=true) = x * inv(base_ring(parent(x))(y))
 
@@ -625,8 +625,8 @@ function roots(x::acb_poly; target=0, isolate_real=false, initial_prec=0, max_pr
                         (Ptr{acb}, ), roots + i * sizeof(acb_struct))
                     im = ccall((:acb_imag_ptr, libarb), Ptr{arb_struct},
                         (Ptr{acb}, ), roots + i * sizeof(acb_struct))
-                    t = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ptr{arb}, ), re)
-                    u = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ptr{arb}, ), im)
+                    t = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ptr{ArbFieldElem}, ), re)
+                    u = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ptr{ArbFieldElem}, ), im)
                     ok = ok && (ccall((:mag_cmp_2exp_si, libarb), Cint,
                         (Ptr{mag_struct}, Int), t, -target) <= 0)
                     ok = ok && (ccall((:mag_cmp_2exp_si, libarb), Cint,
@@ -685,7 +685,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    roots_upper_bound(x::acb_poly) -> arb
+    roots_upper_bound(x::acb_poly) -> ArbFieldElem
 
 Returns an upper bound for the absolute value of all complex roots of $x$.
 """
@@ -693,10 +693,10 @@ function roots_upper_bound(x::acb_poly)
    z = ArbField(precision(base_ring(x)))()
    p = precision(base_ring(x))
    GC.@preserve x z begin
-      t = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ref{arb}, ), z)
+      t = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ref{ArbFieldElem}, ), z)
       ccall((:acb_poly_root_bound_fujiwara, libarb), Nothing,
             (Ptr{mag_struct}, Ref{acb_poly}), t, x)
-      s = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ref{arb}, ), z)
+      s = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ref{ArbFieldElem}, ), z)
       ccall((:arf_set_mag, libarb), Nothing, (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
       ccall((:arf_set_round, libarb), Nothing,
             (Ptr{arf_struct}, Ptr{arf_struct}, Int, Cint), s, s, p, ARB_RND_CEIL)
@@ -786,7 +786,7 @@ function (a::AcbPolyRing)()
 end
 
 for T in [Integer, ZZRingElem, QQFieldElem, Float64, Complex{Float64},
-          Complex{Int}, arb, acb]
+          Complex{Int}, ArbFieldElem, acb]
   @eval begin
     function (a::AcbPolyRing)(b::$T)
       z = acb_poly(base_ring(a)(b), a.base_ring.prec)
@@ -804,7 +804,7 @@ function (a::AcbPolyRing)(b::Vector{acb})
    return z
 end
 
-for T in [ZZRingElem, QQFieldElem, Float64, Complex{Float64}, Complex{Int}, arb]
+for T in [ZZRingElem, QQFieldElem, Float64, Complex{Float64}, Complex{Int}, ArbFieldElem]
   @eval begin
     (a::AcbPolyRing)(b::Vector{$T}) = a(map(base_ring(a), b))
   end

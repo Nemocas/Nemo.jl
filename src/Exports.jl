@@ -29,7 +29,7 @@ export AllParts
 export AllPerms
 export angle
 export AnticNumberField
-export arb
+export ArbFieldElem
 export arb_mat
 export arb_poly
 export ArbField

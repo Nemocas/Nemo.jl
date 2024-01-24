@@ -1297,7 +1297,7 @@ performance, one should invoke this function repeatedly with successively
 larger parameters when the size of the intended solution is unknown or
 may be much smaller than a worst-case bound.
 """
-function guess(R::CalciumQQBarField, x::arb, maxdeg::Int, maxbits::Int=0)
+function guess(R::CalciumQQBarField, x::ArbFieldElem, maxdeg::Int, maxbits::Int=0)
    CC = AcbField()
    return guess(R, CC(x), maxdeg, maxbits)
 end
@@ -1318,7 +1318,7 @@ function (R::ArbField)(a::QQBarFieldElem)
    prec = precision(R)
    z = R()
    ccall((:qqbar_get_arb, libcalcium),
-        Nothing, (Ref{arb}, Ref{QQBarFieldElem}, Int), z, a, prec)
+        Nothing, (Ref{ArbFieldElem}, Ref{QQBarFieldElem}, Int), z, a, prec)
    !isfinite(z) && throw(DomainError(a, "nonreal algebraic number"))
    return z
 end

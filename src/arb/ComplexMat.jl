@@ -839,7 +839,7 @@ promote_rule(::Type{ComplexMat}, ::Type{ZZRingElem}) = ComplexMat
 
 promote_rule(::Type{ComplexMat}, ::Type{QQFieldElem}) = ComplexMat
 
-promote_rule(::Type{ComplexMat}, ::Type{arb}) = ComplexMat
+promote_rule(::Type{ComplexMat}, ::Type{ArbFieldElem}) = ComplexMat
 
 promote_rule(::Type{ComplexMat}, ::Type{ComplexFieldElem}) = ComplexMat
 
