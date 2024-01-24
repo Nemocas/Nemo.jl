@@ -101,7 +101,6 @@ import Base: log1p
 import Base: maximum
 import Base: minimum
 import Base: mod
-import Base: ndigits
 import Base: numerator
 import Base: oct
 import Base: one
@@ -200,6 +199,8 @@ import AbstractAlgebra: Set
 import AbstractAlgebra: set_attribute!
 
 include("Exports.jl")
+
+const eigenvalues = eigvals # alternative name for the function from LinearAlgebra
 
 ###############################################################################
 #
@@ -596,8 +597,6 @@ const _ecm_nCs = Vector{Int}[_ecm_nC]
 
 const ZZ = FlintZZ
 const QQ = FlintQQ
-const PadicField = FlintPadicField
-const QadicField = FlintQadicField
 #const FiniteField = FlintFiniteField
 
 ###############################################################################

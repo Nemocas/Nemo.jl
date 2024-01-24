@@ -132,11 +132,11 @@ end
 ################################################################################
 
 @doc raw"""
-    lift(a::Generic.Mat{Generic.ResidueRingElem{ZZRingElem}}) -> ZZMatrix
+    lift(a::Generic.Mat{EuclideanRingResidueRingElem{ZZRingElem}}) -> ZZMatrix
 
 It returns a lift of the matrix to the integers.
 """
-function lift(a::Generic.Mat{Generic.ResidueRingElem{ZZRingElem}})
+function lift(a::Generic.Mat{EuclideanRingResidueRingElem{ZZRingElem}})
     z = zero_matrix(FlintZZ, nrows(a), ncols(a))
     for i in 1:nrows(a)
         for j in 1:ncols(a)
@@ -711,4 +711,99 @@ function map_entries(R::ZZModRing, M::ZZMatrix)
         end
     end
     return N
+end
+
+################################################################################
+#
+#  Eigenvalues and eigenspaces
+#
+################################################################################
+
+@doc raw"""
+    eigenvalues(M::MatElem{T}) where T <: FieldElem
+
+Return the eigenvalues of `M`.
+"""
+function eigenvalues(M::MatElem{T}) where T <: FieldElem
+  @assert is_square(M)
+  K = base_ring(M)
+  f = charpoly(M)
+  return roots(f)
+end
+
+@doc raw"""
+    eigenvalues_with_multiplicities(M::MatElem{T}) where T <: FieldElem
+
+Return the eigenvalues of `M` together with their algebraic multiplicities as a
+vector of tuples.
+"""
+function eigenvalues_with_multiplicities(M::MatElem{T}) where T <: FieldElem
+  @assert is_square(M)
+  K = base_ring(M)
+  Kx, x = polynomial_ring(K, "x", cached = false)
+  f = charpoly(Kx, M)
+  r = roots(f)
+  return [ (a, valuation(f, x - a)) for a in r ]
+end
+
+@doc raw"""
+    eigenvalues(L::Field, M::MatElem{T}) where T <: RingElem
+
+Return the eigenvalues of `M` over the field `L`.
+"""
+function eigenvalues(L::Field, M::MatElem{T}) where T <: RingElem
+  @assert is_square(M)
+  M1 = change_base_ring(L, M)
+  return eigenvalues(M1)
+end
+
+@doc raw"""
+    eigenvalues_with_multiplicities(L::Field, M::MatElem{T}) where T <: RingElem
+
+Return the eigenvalues of `M` over the field `L` together with their algebraic
+multiplicities as a vector of tuples.
+"""
+function eigenvalues_with_multiplicities(L::Field, M::MatElem{T}) where T <: RingElem
+  @assert is_square(M)
+  M1 = change_base_ring(L, M)
+  return eigenvalues_with_multiplicities(M1)
+end
+
+@doc raw"""
+    eigenspace(M::MatElem{T}, lambda::T; side::Symbol = :right)
+      where T <: FieldElem -> Vector{MatElem{T}}
+
+Return a basis of the eigenspace of $M$ with respect to the eigenvalue $\lambda$.
+If side is `:right`, the right eigenspace is computed, i.e. vectors $v$ such that
+$Mv = \lambda v$. If side is `:left`, the left eigenspace is computed, i.e. vectors
+$v$ such that $vM = \lambda v$.
+"""
+function eigenspace(M::MatElem{T}, lambda::T; side::Symbol = :right) where T <: FieldElem
+  @assert is_square(M)
+  N = deepcopy(M)
+  for i = 1:ncols(N)
+    N[i, i] -= lambda
+  end
+  return kernel(N, side = side)[2]
+end
+
+@doc raw"""
+    eigenspaces(M::MatElem{T}; side::Symbol = :right)
+      where T <: FieldElem -> Dict{T, MatElem{T}}
+
+Return a dictionary containing the eigenvalues of $M$ as keys and bases for the
+corresponding eigenspaces as values.
+If side is `:right`, the right eigenspaces are computed, if it is `:left` then the
+left eigenspaces are computed.
+
+See also `eigenspace`.
+"""
+function eigenspaces(M::MatElem{T}; side::Symbol = :right) where T<:FieldElem
+
+  S = eigenvalues(M)
+  L = Dict{elem_type(base_ring(M)), typeof(M)}()
+  for k in S
+    push!(L, k => vcat(eigenspace(M, k, side = side)))
+  end
+  return L
 end

@@ -30,7 +30,7 @@ function check_parent(a::($etype), b::($etype))
       error("Incompatible polynomial rings in polynomial operation")
 end
 
-nvars(a::($rtype)) = a.nvars
+number_of_variables(a::($rtype)) = a.nvars
 
 base_ring(a::($rtype)) = a.base_ring
 

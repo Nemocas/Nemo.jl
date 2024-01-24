@@ -1,43 +1,43 @@
-function test_elem(R::FlintPadicField)
+function test_elem(R::PadicField)
    p = prime(R)
    prec = rand(1:R.prec_max)
    r = ZZRingElem(0):p-1
    return R(sum(rand(r)*p^i for i in 0:prec))
 end
 
-@testset "padic.conformance_tests" begin
+@testset "PadicFieldElem.conformance_tests" begin
 # TODO: make the following work; for now they fail because the conformance
-# tests want to use isapprox on padic elements, but no such method exists
+# tests want to use isapprox on PadicFieldElem elements, but no such method exists
 #   test_Field_interface_recursive(PadicField(7, 30))
 #   test_Field_interface_recursive(PadicField(ZZRingElem(65537), 30))
 end
 
-@testset "padic.constructors" begin
+@testset "PadicFieldElem.constructors" begin
    R = PadicField(7, 30)
 
-   @test elem_type(R) == padic
-   @test elem_type(FlintPadicField) == padic
-   @test parent_type(padic) == FlintPadicField
+   @test elem_type(R) == PadicFieldElem
+   @test elem_type(PadicField) == PadicFieldElem
+   @test parent_type(PadicFieldElem) == PadicField
 
-   @test isa(R, FlintPadicField)
+   @test isa(R, PadicField)
 
    S = PadicField(ZZRingElem(65537), 30)
 
-   @test isa(S, FlintPadicField)
+   @test isa(S, PadicField)
 
-   @test isa(R(), padic)
+   @test isa(R(), PadicFieldElem)
 
-   @test isa(R(1), padic)
+   @test isa(R(1), PadicFieldElem)
 
-   @test isa(R(ZZ(123)), padic)
+   @test isa(R(ZZ(123)), PadicFieldElem)
 
-   @test isa(R(ZZ(1)//7^2), padic)
+   @test isa(R(ZZ(1)//7^2), PadicFieldElem)
 
-   @test isa(1 + 2*7 + 4*7^2 + O(R, 7^3), padic)
+   @test isa(1 + 2*7 + 4*7^2 + O(R, 7^3), PadicFieldElem)
 
-   @test isa(13 + 357*ZZRingElem(65537) + O(S, ZZRingElem(65537)^12), padic)
+   @test isa(13 + 357*ZZRingElem(65537) + O(S, ZZRingElem(65537)^12), PadicFieldElem)
 
-   @test isa(ZZRingElem(1)//7^2 + ZZRingElem(2)//7 + 3 + 4*7 + O(R, 7^2), padic)
+   @test isa(ZZRingElem(1)//7^2 + ZZRingElem(2)//7 + 3 + 4*7 + O(R, 7^2), PadicFieldElem)
 
    @test precision(R(QQFieldElem(2//3)^100)) == precision(R(QQFieldElem(2//3))^100)
     
@@ -45,12 +45,12 @@ end
 
    t = deepcopy(s)
 
-   @test isa(t, padic)
+   @test isa(t, PadicFieldElem)
 
    @test parent(t) === R
 end
 
-@testset "padic.printing" begin
+@testset "PadicFieldElem.printing" begin
    R = PadicField(7, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
@@ -76,7 +76,7 @@ end
    @test string(a) == "31*7^1 + O(7^3)"
 end
 
-@testset "padic.manipulation" begin
+@testset "PadicFieldElem.manipulation" begin
    R = PadicField(7, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
@@ -100,7 +100,7 @@ end
    @test characteristic(R) == 0
 end
 
-@testset "padic.unary_ops" begin
+@testset "PadicFieldElem.unary_ops" begin
    R = PadicField(7, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
@@ -111,7 +111,7 @@ end
    @test iszero(-b)
 end
 
-@testset "padic.binary_ops" begin
+@testset "PadicFieldElem.binary_ops" begin
    R = PadicField(7, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
@@ -130,7 +130,7 @@ end
    @test a*d == 2 + 4*7^1 + 1*7^2 + O(R, 7^3)
 end
 
-@testset "padic.adhoc_binary" begin
+@testset "PadicFieldElem.adhoc_binary" begin
    R = PadicField(7, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
@@ -159,7 +159,7 @@ end
    @test c*(ZZRingElem(1)//7) == O(R, 7^2)
 end
 
-@testset "padic.comparison" begin
+@testset "PadicFieldElem.comparison" begin
    R = PadicField(7, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
@@ -176,7 +176,7 @@ end
    @test d == R(2)
 end
 
-@testset "padic.adhoc_comparison" begin
+@testset "PadicFieldElem.adhoc_comparison" begin
    R = PadicField(7, 30)
 
    a = 1 + O(R, 7^3)
@@ -194,7 +194,7 @@ end
    @test a == ZZRingElem(344)//1
 end
 
-@testset "padic.powering" begin
+@testset "PadicFieldElem.powering" begin
    R = PadicField(7, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -208,7 +208,7 @@ end
    @test c^7 == 2 + 4*7^1 + 2*7^2
 end
 
-@testset "padic.inversion" begin
+@testset "PadicFieldElem.inversion" begin
    R = PadicField(7, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -227,7 +227,7 @@ end
    @test inv(R(1)) == 1
 end
 
-@testset "padic.exact_division" begin
+@testset "PadicFieldElem.exact_division" begin
    R = PadicField(7, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -244,7 +244,7 @@ end
    @test divexact(R(34), R(17)) == 2
 end
 
-@testset "padic.adhoc_exact_division" begin
+@testset "PadicFieldElem.adhoc_exact_division" begin
    R = PadicField(7, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -265,7 +265,7 @@ end
    @test divexact(ZZRingElem(5)//7, R(5)) == ZZRingElem(1)//7
 end
 
-@testset "padic.divides" begin
+@testset "PadicFieldElem.divides" begin
    R = PadicField(7, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -277,7 +277,7 @@ end
    @test q == divexact(a, b)
 end
 
-@testset "padic.adhoc_gcd" begin
+@testset "PadicFieldElem.adhoc_gcd" begin
    R = PadicField(7, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -288,7 +288,7 @@ end
    @test gcd(zero(R), zero(R)) == 0
 end
 
-@testset "padic.square_root" begin
+@testset "PadicFieldElem.square_root" begin
    R = PadicField(7, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -358,7 +358,7 @@ end
    @test f8 && s8^2 == d^2 
 end
 
-@testset "padic.special_functions" begin
+@testset "PadicFieldElem.special_functions" begin
    R = PadicField(7, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)

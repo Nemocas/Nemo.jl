@@ -154,13 +154,13 @@ Base.@propagate_inbounds setindex!(a::QQMatrix, d::Rational,
                                  r::Int, c::Int) =
          setindex!(a, QQFieldElem(d), r, c)
 
-nrows(a::QQMatrix) = a.r
+number_of_rows(a::QQMatrix) = a.r
 
-ncols(a::QQMatrix) = a.c
+number_of_columns(a::QQMatrix) = a.c
 
-nrows(a::QQMatrixSpace) = a.nrows
+number_of_rows(a::QQMatrixSpace) = a.nrows
 
-ncols(a::QQMatrixSpace) = a.ncols
+number_of_columns(a::QQMatrixSpace) = a.ncols
 
 zero(a::QQMatrixSpace) = a()
 

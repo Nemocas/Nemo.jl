@@ -108,13 +108,13 @@ function one(x::AcbMatSpace)
   return z
 end
 
-nrows(a::acb_mat) = a.r
+number_of_rows(a::acb_mat) = a.r
 
-ncols(a::acb_mat) = a.c
+number_of_columns(a::acb_mat) = a.c
 
-nrows(a::AcbMatSpace) = a.nrows
+number_of_rows(a::AcbMatSpace) = a.nrows
 
-ncols(a::AcbMatSpace) = a.ncols
+number_of_columns(a::AcbMatSpace) = a.ncols
 
 function deepcopy_internal(x::acb_mat, dict::IdDict)
   z = similar(x)
@@ -961,7 +961,7 @@ function _eig_simple(A::acb_mat; check::Bool = true, algorithm::Symbol = :defaul
 end
 
 @doc raw"""
-    eigvals_simple(A::acb_mat, algorithm::Symbol = :default)
+    eigenvalues_simple(A::acb_mat, algorithm::Symbol = :default)
 
 Returns the eigenvalues of `A` as a vector of `acb`. It is assumed that `A`
 has only simple eigenvalues.
@@ -971,23 +971,35 @@ The algorithm used can be changed by setting the `algorithm` keyword to
 
 This function is experimental.
 """
-function eigvals_simple(A::acb_mat, algorithm::Symbol = :default)
+function eigenvalues_simple(A::acb_mat, algorithm::Symbol = :default)
   E, _, _ = _eig_simple(A, algorithm = algorithm)
   return E
 end
 
 @doc raw"""
-    eigvals(A::acb_mat)
+    eigenvalues_with_multiplicities(A::acb_mat)
 
-Returns the eigenvalues of `A` as a vector of tuples `(acb, Int)`.
-Each tuple `(z, k)` corresponds to a cluster of `k` eigenvalues
-of $A$.
+Return the eigenvalues of `A` with their algebraic multiplicities as a vector of
+tuples `(acb, Int)`. Each tuple `(z, k)` corresponds to a cluster of `k`
+eigenvalues of $A$.
 
 This function is experimental.
 """
-function eigvals(A::acb_mat)
-  e, _ = _eig_multiple(A)
-  return e
+function eigenvalues_with_multiplicities(A::acb_mat)
+   e, _ = _eig_multiple(A)
+   return e
+end
+
+@doc raw"""
+    eigenvalues(A::acb_mat)
+
+Return the eigenvalues of `A`.
+
+This function is experimental.
+"""
+function eigenvalues(A::acb_mat)
+   e, _ = _eig_multiple(A)
+   return [ x[1] for x in e ]
 end
 
 ###############################################################################

@@ -125,8 +125,8 @@ end
 
    R2 = Native.GF(2)
    R3 = Native.GF(3)
-   R6 = residue_ring(ZZ, 6)
-   R66 = residue_ring(ZZ, ZZ(6))
+   R6, = residue_ring(ZZ, 6)
+   R66, = residue_ring(ZZ, ZZ(6))
    @test R2(R6(2)) == 2  && parent(R2(R6(2))) == R2
    @test R3(R6(2)) == 2  && parent(R3(R6(2))) == R3
    @test R2(R66(2)) == 2 && parent(R2(R66(2))) == R2

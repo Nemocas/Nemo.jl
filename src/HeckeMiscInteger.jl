@@ -96,10 +96,6 @@ function log(a::ZZRingElem, b::ZZRingElem)
     log(b) / log(a)
 end
 
-function divisible(x::Integer, y::Integer)
-    return iszero(rem(x, y))
-end
-
 Base.in(x::IntegerUnion, r::AbstractRange{ZZRingElem}) =
     !isempty(r) && first(r) <= x <= last(r) &&
     mod(convert(ZZRingElem, x), step(r)) == mod(first(r), step(r))

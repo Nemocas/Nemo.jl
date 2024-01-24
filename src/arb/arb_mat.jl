@@ -95,13 +95,13 @@ function one(x::ArbMatSpace)
   return z
 end
 
-nrows(a::arb_mat) = a.r
+number_of_rows(a::arb_mat) = a.r
 
-ncols(a::arb_mat) = a.c
+number_of_columns(a::arb_mat) = a.c
 
-nrows(a::ArbMatSpace) = a.nrows
+number_of_rows(a::ArbMatSpace) = a.nrows
 
-ncols(a::ArbMatSpace) = a.ncols
+number_of_columns(a::ArbMatSpace) = a.ncols
 
 function deepcopy_internal(x::arb_mat, dict::IdDict)
   z = arb_mat(nrows(x), ncols(x))

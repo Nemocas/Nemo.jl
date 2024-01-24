@@ -78,13 +78,13 @@ function deepcopy_internal(a::FqPolyRepMatrix, dict::IdDict)
   return z
 end
 
-nrows(a::FqPolyRepMatrix) = a.r
+number_of_rows(a::FqPolyRepMatrix) = a.r
 
-ncols(a::FqPolyRepMatrix) = a.c
+number_of_columns(a::FqPolyRepMatrix) = a.c
 
-nrows(a::FqPolyRepMatrixSpace) = a.nrows
+number_of_rows(a::FqPolyRepMatrixSpace) = a.nrows
 
-ncols(a::FqPolyRepMatrixSpace) = a.ncols
+number_of_columns(a::FqPolyRepMatrixSpace) = a.ncols
 
 parent(a::FqPolyRepMatrix) = matrix_space(base_ring(a), nrows(a), ncols(a))
 

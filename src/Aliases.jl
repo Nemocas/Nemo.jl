@@ -8,6 +8,8 @@ include(joinpath(pathof(AbstractAlgebra), "..", "Aliases.jl"))
 @alias is_less isless
 @alias is_real isreal
 
+@alias eigvals_simple eigenvalues_simple # for consistency with eigvals/eigenvalues
+
 # for backwards compatibility
 Base.@deprecate_binding isalgebraic is_algebraic
 Base.@deprecate_binding isalgebraic_integer is_algebraic_integer
@@ -189,6 +191,13 @@ Base.@deprecate_binding NumberField number_field
 
 Base.@deprecate_binding CyclotomicRealSubfield cyclotomic_real_subfield
 
+# renamed for 0.40.0
+Base.@deprecate_binding FlintPadicField PadicField
+Base.@deprecate_binding padic PadicFieldElem
+Base.@deprecate_binding FlintQadicField QadicField
+Base.@deprecate_binding qadic QadicFieldElem
+
+# renamed for 0.41.0
 Base.@deprecate_binding lll_ctx LLLContext
 Base.@deprecate_binding FlintQQiField QQiField
 Base.@deprecate_binding fmpqi QQiFieldElem

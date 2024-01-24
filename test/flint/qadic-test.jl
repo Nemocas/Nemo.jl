@@ -1,31 +1,31 @@
-@testset "qadic.constructors" begin
+@testset "QadicFieldElem.constructors" begin
    R, _     = @inferred QadicField(7, 1, 30)
    K, _     = @inferred QadicField(7, 3, 30) 
    QX, x = polynomial_ring(FlintQQ, "x") 
 
-   @test elem_type(R) == qadic
-   @test elem_type(FlintQadicField) == qadic
-   @test parent_type(qadic) == FlintQadicField
+   @test elem_type(R) == QadicFieldElem
+   @test elem_type(QadicField) == QadicFieldElem
+   @test parent_type(QadicFieldElem) == QadicField
 
-   @test isa(R, FlintQadicField)
+   @test isa(R, QadicField)
 
    S, _ = @inferred QadicField(ZZRingElem(1009), 1, 30)
 
-   @test isa(S, FlintQadicField)
+   @test isa(S, QadicField)
 
-   @test isa(R(), qadic)
+   @test isa(R(), QadicFieldElem)
 
-   @test isa(R(1), qadic)
+   @test isa(R(1), QadicFieldElem)
 
-   @test isa(R(ZZ(123)), qadic)
+   @test isa(R(ZZ(123)), QadicFieldElem)
 
-   @test isa(R(ZZ(1)//7^2), qadic)
+   @test isa(R(ZZ(1)//7^2), QadicFieldElem)
 
-   @test isa(1 + 2*7 + 4*7^2 + O(R, 7^3), qadic)
+   @test isa(1 + 2*7 + 4*7^2 + O(R, 7^3), QadicFieldElem)
 
-   @test isa(13 + 357*ZZRingElem(1009) + O(S, ZZRingElem(1009)^12), qadic)
+   @test isa(13 + 357*ZZRingElem(1009) + O(S, ZZRingElem(1009)^12), QadicFieldElem)
 
-   @test isa(ZZRingElem(1)//7^2 + ZZRingElem(2)//7 + 3 + 4*7 + O(R, 7^2), qadic)
+   @test isa(ZZRingElem(1)//7^2 + ZZRingElem(2)//7 + 3 + 4*7 + O(R, 7^2), QadicFieldElem)
 
    @test precision( R(QQFieldElem(2//3)^100) ) == precision( R(QQFieldElem(2//3))^100 )
 
@@ -35,7 +35,7 @@
 
    t = deepcopy(s)
 
-   @test isa(t, qadic)
+   @test isa(t, QadicFieldElem)
 
    @test parent(t) === R
    
@@ -45,14 +45,14 @@
 
    R, _ = QadicField(13, 1, 10)
    a = gen(R)
-   @test a isa qadic
+   @test a isa QadicFieldElem
    b = R(prime(R))
 
    @test !iszero(b^20)
    @test !iszero(deepcopy(b^20))
 end
 
-@testset "qadic.printing" begin
+@testset "QadicFieldElem.printing" begin
    R, _ = QadicField(7, 3, 30)
 
    @test string(zero(R)) isa String
@@ -61,7 +61,7 @@ end
    @test string(gen(R)^10) isa String
 end
 
-@testset "qadic.manipulation" begin
+@testset "QadicFieldElem.manipulation" begin
    R, _ = QadicField(7, 1, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
@@ -83,7 +83,7 @@ end
    @test characteristic(R) == 0
 end
 
-@testset "qadic.unary_ops" begin
+@testset "QadicFieldElem.unary_ops" begin
    R, _ = QadicField(7, 1, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
@@ -94,7 +94,7 @@ end
    @test iszero(-b)
 end
 
-@testset "qadic.binary_ops" begin
+@testset "QadicFieldElem.binary_ops" begin
    R, _ = QadicField(7, 1, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
@@ -113,7 +113,7 @@ end
    @test a*d == 2 + 4*7^1 + 1*7^2 + O(R, 7^3)
 end
 
-@testset "qadic.adhoc_binary" begin
+@testset "QadicFieldElem.adhoc_binary" begin
    R, _ = QadicField(7, 1, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
@@ -142,7 +142,7 @@ end
    @test c*(ZZRingElem(1)//7) == O(R, 7^2)
 end
 
-@testset "qadic.comparison" begin
+@testset "QadicFieldElem.comparison" begin
    R, _ = QadicField(7, 1, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
@@ -159,7 +159,7 @@ end
    @test d == R(2)
 end
 
-@testset "qadic.adhoc_comparison" begin
+@testset "QadicFieldElem.adhoc_comparison" begin
    R, _ = QadicField(7, 1, 30)
 
    a = 1 + O(R, 7^3)
@@ -177,7 +177,7 @@ end
    @test a == ZZRingElem(344)//1
 end
 
-@testset "qadic.powering" begin
+@testset "QadicFieldElem.powering" begin
    R, _ = QadicField(7, 1, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -191,7 +191,7 @@ end
    @test c^7 == 2 + 4*7^1 + 2*7^2
 end
 
-@testset "qadic.inversion" begin
+@testset "QadicFieldElem.inversion" begin
    R, _ = QadicField(7, 1, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -210,7 +210,7 @@ end
    @test inv(R(1)) == 1
 end
 
-@testset "qadic.exact_division" begin
+@testset "QadicFieldElem.exact_division" begin
    R, _ = QadicField(7, 1, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -227,7 +227,7 @@ end
    @test divexact(R(34), R(17)) == 2
 end
 
-@testset "qadic.adhoc_exact_division" begin
+@testset "QadicFieldElem.adhoc_exact_division" begin
    R, _ = QadicField(7, 1, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -248,7 +248,7 @@ end
    @test divexact(ZZRingElem(5)//7, R(5)) == ZZRingElem(1)//7
 end
 
-@testset "qadic.divides" begin
+@testset "QadicFieldElem.divides" begin
    R, _ = QadicField(7, 1, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -260,7 +260,7 @@ end
    @test q == divexact(a, b)
 end
 
-@testset "qadic.adhoc_gcd" begin
+@testset "QadicFieldElem.adhoc_gcd" begin
    R, _ = QadicField(7, 1, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -271,7 +271,7 @@ end
    @test gcd(zero(R), zero(R)) == 0
 end
 
-@testset "qadic.square_root" begin
+@testset "QadicFieldElem.square_root" begin
    R, _ = QadicField(7, 1, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -287,7 +287,7 @@ end
    @test sqrt(R(121))^2 == R(121)
 end
 
-@testset "qadic.special_functions" begin
+@testset "QadicFieldElem.special_functions" begin
    R, _ = QadicField(7, 1, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -307,7 +307,7 @@ end
    @test 6 * log(R(2)) == log(R(2)^6)
 end
 
-@testset "qadic.setcoeff!" begin
+@testset "QadicFieldElem.setcoeff!" begin
   R, _ = QadicField(7, 1, 30)
   a = 1 + 7 + 2*7^2 + O(R, 7^3)
   setcoeff!(a, 0, ZZ(2))

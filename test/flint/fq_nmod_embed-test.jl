@@ -114,7 +114,7 @@ end
         pop!(S, p)
 
         F = Native.finite_field(p, 4, "s")[1]
-        Z = residue_ring(ZZ, p)
+        Z, = residue_ring(ZZ, p)
         R, x = polynomial_ring(Z, "x")
 
         P1 = R(rand(Z, 4)) + x^4

@@ -201,7 +201,7 @@ lift(::fpMatrix)
 **Examples**
 
 ```julia
-R = residue_ring(ZZ, 7)
+R, = residue_ring(ZZ, 7)
 S = matrix_space(R, 3, 3)
 
 a = S([4 5 6; 7 3 2; 1 4 5])
@@ -371,7 +371,7 @@ strong_echelon_form(::fpMatrix)
 **Examples**
 
 ```julia
-R = residue_ring(ZZ, 12)
+R, = residue_ring(ZZ, 12)
 S = matrix_space(R, 3, 3)
 
 A = S([4 1 0; 0 0 5; 0 0 0 ])
@@ -389,7 +389,7 @@ howell_form(::fpMatrix)
 **Examples**
 
 ```julia
-R = residue_ring(ZZ, 12)
+R, = residue_ring(ZZ, 12)
 S = matrix_space(R, 3, 3)
 
 A = S([4 1 0; 0 0 5; 0 0 0 ])
@@ -471,13 +471,15 @@ In case the matrix cannot be converted without loss, an `InexactError` is thrown
 ### Eigenvalues and Eigenvectors (experimental)
 
 ```@docs
-eigvals(::ComplexMat)
-eigvals_simple(a::ComplexMat)
+eigenvalues(::ComplexMat)
+eigenvalues_with_multiplicities(::ComplexMat)
+eigenvalues_simple(a::ComplexMat)
 ```
 
 ```julia
 A = CC[1 2 3; 0 4 5; 0 0 6]
-eigvals_simple(A)
+eigenvalues_simple(A)
 A = CC[2 2 3; 0 2 5; 0 0 2])
-eigvals(A)
+eigenvalues(A)
+eigenvalues_with_multiplicities(A)
 ```

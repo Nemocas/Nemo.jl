@@ -103,13 +103,13 @@ function deepcopy_internal(a::zzModMatrix, dict::IdDict)
   return z
 end
 
-nrows(a::T) where T <: Zmodn_mat = a.r
+number_of_rows(a::T) where T <: Zmodn_mat = a.r
 
-ncols(a::T) where T <: Zmodn_mat = a.c
+number_of_columns(a::T) where T <: Zmodn_mat = a.c
 
-nrows(a::zzModMatrixSpace) = a.nrows
+number_of_rows(a::zzModMatrixSpace) = a.nrows
 
-ncols(a::zzModMatrixSpace) = a.ncols
+number_of_columns(a::zzModMatrixSpace) = a.ncols
 
 parent(a::Zmodn_mat) = matrix_space(base_ring(a), nrows(a), ncols(a))
 

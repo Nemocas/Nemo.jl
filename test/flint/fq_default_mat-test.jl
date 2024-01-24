@@ -168,7 +168,7 @@
    R, x = finite_field(ZZRingElem(23), 5, "x")
    S = matrix_space(R, 2, 2)
 
-   for R in [FlintZZ, residue_ring(FlintZZ, 23), residue_ring(FlintZZ, ZZ(23)), Native.GF(23)]
+   for R in [FlintZZ, residue_ring(FlintZZ, 23)[1], residue_ring(FlintZZ, ZZ(23))[1], Native.GF(23)]
       M = matrix(R, 2, 2, [1, 2, 3, 4])
 
       @test isa(S(M), MatElem)
@@ -505,6 +505,8 @@ end
   @test c == F17(13)
 
   a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
+
+  @test is_one(zero_matrix(F17, 0, 0))
 end
 
 @testset "FqMatrix.rank" begin

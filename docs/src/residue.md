@@ -24,7 +24,7 @@ Nemo are given in the following table.
 
 Base ring                   | Library            | Element type     | Parent type
 ----------------------------|--------------------|------------------|--------------------
-Generic ring $R$            | AbstractAlgebra.jl | `Generic.ResidueRingElem{T}` | `Generic.ResidueRing{T}`
+Generic ring $R$            | AbstractAlgebra.jl | `EuclideanRingResidueRingElem{T}` | `EuclideanRingResidueRing{T}`
 $\mathbb{Z}$ (Int modulus)  | Flint              | `zzModRingElem`  | `zzModRing`
 $\mathbb{Z}$ (ZZ modulus)   | Flint              | `ZZModRingElem`  | `ZZModRing`
 
@@ -55,8 +55,7 @@ gcdx(::ZZModRingElem, ::ZZModRingElem)
 **Examples**
 
 ```jldoctest
-julia> R = residue_ring(ZZ, 123456789012345678949)
-Integers modulo 123456789012345678949
+julia> R, = residue_ring(ZZ, 123456789012345678949);
 
 julia> g, s, t = gcdx(R(123), R(456))
 (1, 123456789012345678928, 41152263004115226322)

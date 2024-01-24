@@ -6,12 +6,16 @@ end
    # TODO: using test_Ring_interface_recursive below fails because zzModPolyRingElem does
    # not support initialization from arbitrary Integer subtypes such as BigInt
    for i in [1, 6, 13, 2^8, 2^16, 2^32, next_prime(2^8), next_prime(2^16), next_prime(2^32)]
-      test_Ring_interface(residue_ring(ZZ, i))
+      test_Ring_interface(residue_ring(ZZ, i)[1])
    end
 end
 
 @testset "zzModRingElem.constructors" begin
-   R = residue_ring(ZZ, 13)
+   R, f = residue_ring(ZZ, 13)
+   @test domain(f) === ZZ
+   @test codomain(f) === R
+   @test_throws ErrorException f(QQ(1//2))
+   @test_throws ErrorException preimage(f, QQ(1//2))
 
    @test_throws DomainError residue_ring(ZZ, -13)
    @test_throws DomainError residue_ring(ZZ, 0)
@@ -35,7 +39,7 @@ end
    @test isa(R(a), Nemo.zzModRingElem)
 
    for i = 1:1000
-      R = residue_ring(ZZ, rand(UInt(1):typemax(UInt)))
+      R, = residue_ring(ZZ, rand(UInt(1):typemax(UInt)))
 
       a = R(rand(Int))
       d = a.data
@@ -44,7 +48,7 @@ end
    end
 
    for i = 1:1000
-      R = residue_ring(ZZ, rand(1:24))
+      R, = residue_ring(ZZ, rand(1:24))
 
       a = R(rand(Int))
       d = a.data
@@ -54,7 +58,7 @@ end
 end
 
 @testset "zzModRingElem.rand" begin
-   R = residue_ring(ZZ, 13)
+   R, = residue_ring(ZZ, 13)
 
    test_rand(R)
    test_rand(R, 1:9)
@@ -68,14 +72,14 @@ end
 end
 
 @testset "zzModRingElem.printing" begin
-   R = residue_ring(ZZ, 13)
+   R, = residue_ring(ZZ, 13)
 
    @test string(R(3)) == "3"
    @test string(R()) == "0"
 end
 
 @testset "zzModRingElem.manipulation" begin
-   R = residue_ring(ZZ, 13)
+   R, = residue_ring(ZZ, 13)
 
    @test iszero(zero(R))
 
@@ -86,11 +90,11 @@ end
 
    @test deepcopy(R(3)) == R(3)
 
-   R1 = residue_ring(ZZ, 13)
+   R1, = residue_ring(ZZ, 13)
 
    @test R === R1
 
-   S = residue_ring(ZZ, 1)
+   S, = residue_ring(ZZ, 1)
 
    @test iszero(zero(S))
 
@@ -104,10 +108,10 @@ end
    @test lift(R(3)) == 3
    @test isa(lift(R(3)), ZZRingElem)
 
-   R2 = residue_ring(ZZ, 2)
-   R3 = residue_ring(ZZ, 3)
-   R6 = residue_ring(ZZ, 6)
-   R66 = residue_ring(ZZ, ZZ(6))
+   R2,  = residue_ring(ZZ, 2)
+   R3,  = residue_ring(ZZ, 3)
+   R6,  = residue_ring(ZZ, 6)
+   R66, = residue_ring(ZZ, ZZ(6))
    @test R2(R6(2)) == 2  && parent(R2(R6(2))) == R2
    @test R3(R6(2)) == 2  && parent(R3(R6(2))) == R3
    @test R2(R66(2)) == 2 && parent(R2(R66(2))) == R2
@@ -121,7 +125,7 @@ end
 
 @testset "zzModRingElem.unary_ops" begin
    for i = 1:100
-      R = residue_ring(ZZ, rand(UInt(1):typemax(UInt)))
+      R, = residue_ring(ZZ, rand(UInt(1):typemax(UInt)))
 
       for iter = 1:100
          a = rand(R)
@@ -131,7 +135,7 @@ end
    end
 
    for i = 1:100
-      R = residue_ring(ZZ, rand(1:24))
+      R, = residue_ring(ZZ, rand(1:24))
 
       for iter = 1:100
          a = rand(R)
@@ -143,7 +147,7 @@ end
 
 @testset "zzModRingElem.binary_ops" begin
    for i = 1:100
-      R = residue_ring(ZZ, rand(1:24))
+      R, = residue_ring(ZZ, rand(1:24))
 
       for iter = 1:100
          a1 = rand(R)
@@ -162,7 +166,7 @@ end
    end
 
    for i = 1:100
-      R = residue_ring(ZZ, rand(UInt(1):typemax(UInt)))
+      R, = residue_ring(ZZ, rand(UInt(1):typemax(UInt)))
 
       for iter = 1:100
          a1 = rand(R)
@@ -183,7 +187,7 @@ end
 
 @testset "zzModRingElem.adhoc_binary" begin
    for i = 1:100
-      R = residue_ring(ZZ, rand(1:24))
+      R, = residue_ring(ZZ, rand(1:24))
 
       for iter = 1:100
          a = rand(R)
@@ -205,7 +209,7 @@ end
    end
 
    for i = 1:100
-      R = residue_ring(ZZ, rand(UInt(1):typemax(UInt)))
+      R, = residue_ring(ZZ, rand(UInt(1):typemax(UInt)))
 
       for iter = 1:100
          a = rand(R)
@@ -229,7 +233,7 @@ end
 
 @testset "zzModRingElem.powering" begin
    for i = 1:100
-      R = residue_ring(ZZ, rand(1:24))
+      R, = residue_ring(ZZ, rand(1:24))
 
       for iter = 1:100
          a = R(1)
@@ -262,7 +266,7 @@ end
    end
 
    for i = 1:100
-      R = residue_ring(ZZ, rand(UInt(1):typemax(UInt)))
+      R, = residue_ring(ZZ, rand(UInt(1):typemax(UInt)))
 
       for iter = 1:100
          a = R(1)
@@ -297,7 +301,7 @@ end
 
 @testset "zzModRingElem.comparison" begin
    for i = 1:100
-      R = residue_ring(ZZ, rand(1:24))
+      R, = residue_ring(ZZ, rand(1:24))
 
       for iter = 1:100
          a = rand(R)
@@ -313,7 +317,7 @@ end
    end
 
    for i = 1:100
-      R = residue_ring(ZZ, rand(UInt(1):typemax(UInt)))
+      R, = residue_ring(ZZ, rand(UInt(1):typemax(UInt)))
 
       for iter = 1:100
          a = rand(R)
@@ -331,7 +335,7 @@ end
 
 @testset "zzModRingElem.adhoc_comparison" begin
    for i = 1:100
-      R = residue_ring(ZZ, rand(1:24))
+      R, = residue_ring(ZZ, rand(1:24))
 
       for iter = 1:100
          c = rand(0:100)
@@ -345,7 +349,7 @@ end
    end
 
    for i = 1:100
-      R = residue_ring(ZZ, rand(UInt(1):typemax(UInt)))
+      R, = residue_ring(ZZ, rand(UInt(1):typemax(UInt)))
 
       for iter = 1:100
          c = rand(Int)
@@ -361,7 +365,7 @@ end
 
 @testset "zzModRingElem.inversion" begin
    for i = 1:100
-      R = residue_ring(ZZ, rand(1:24))
+      R, = residue_ring(ZZ, rand(1:24))
 
       for iter = 1:100
          a = rand(R)
@@ -373,7 +377,7 @@ end
    end
 
    for i = 1:100
-      R = residue_ring(ZZ, rand(UInt(1):typemax(UInt)))
+      R, = residue_ring(ZZ, rand(UInt(1):typemax(UInt)))
 
       for iter = 1:100
          a = rand(R)
@@ -387,7 +391,7 @@ end
 
 @testset "zzModRingElem.exact_division" begin
    for i = 1:100
-      R = residue_ring(ZZ, rand(1:24))
+      R, = residue_ring(ZZ, rand(1:24))
 
       for iter = 1:100
          a1 = rand(R)
@@ -402,7 +406,7 @@ end
    end
 
    for i = 1:100
-      R = residue_ring(ZZ, rand(UInt(1):typemax(UInt)))
+      R, = residue_ring(ZZ, rand(UInt(1):typemax(UInt)))
 
       for iter = 1:100
          a1 = rand(R)
@@ -419,7 +423,7 @@ end
 
 @testset "zzModRingElem.gcd" begin
    for i = 1:100
-      R = residue_ring(ZZ, rand(1:24))
+      R, = residue_ring(ZZ, rand(1:24))
 
       for iter = 1:100
          a = rand(R)
@@ -433,7 +437,7 @@ end
 
 @testset "zzModRingElem.gcdx" begin
    for i = 1:100
-      R = residue_ring(ZZ, rand(1:24))
+      R, = residue_ring(ZZ, rand(1:24))
 
       for iter = 1:100
          a = rand(R)

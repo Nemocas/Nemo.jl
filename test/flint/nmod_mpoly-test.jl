@@ -1,7 +1,7 @@
 @testset "zzModMPolyRingElem.constructors" begin
-   R = residue_ring(FlintZZ, 23)
+   R, = residue_ring(FlintZZ, 23)
 
-   for num_vars = 1:10
+   for num_vars = 0:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
@@ -16,10 +16,14 @@
 
       @test !(SSS === SSSS)
 
-      @test string(varlist[1]) == var_names[1]
+      if num_vars > 0
+         @test string(varlist[1]) == var_names[1]
+      end
       @test nvars(S) == num_vars
       @test modulus(S) == modulus(R)
-      @test modulus(varlist[1]) == modulus(R)
+      if num_vars > 0
+         @test modulus(varlist[1]) == modulus(R)
+      end
 
       @test elem_type(S) == zzModMPolyRingElem
       @test elem_type(zzModMPolyRing) == zzModMPolyRingElem
@@ -69,7 +73,9 @@
 
       bctx = MPolyBuildCtx(S)
       @test_throws ErrorException push_term!(bctx, one(R), zeros(Int, num_vars + 1))
-      @test_throws ErrorException push_term!(bctx, one(R), zeros(Int, num_vars - 1))
+      if num_vars > 0
+         @test_throws ErrorException push_term!(bctx, one(R), zeros(Int, num_vars - 1))
+      end
       @test (@which finish(bctx)).module === Nemo
 
       for i in 1:num_vars
@@ -81,14 +87,14 @@
       end
    end
 
-   RR = residue_ring(FlintZZ, 29)
+   RR, = residue_ring(FlintZZ, 29)
    S, (x, y) = polynomial_ring(R, ["x", "y"])
    M = MPolyBuildCtx(S)
    @test_throws ErrorException push_term!(M, one(RR), zeros(Int, 2))
 end
 
 @testset "zzModMPolyRingElem.printing" begin
-   S, (x, y) = polynomial_ring(residue_ring(FlintZZ, 23), ["x", "y"])
+   S, (x, y) = polynomial_ring(residue_ring(FlintZZ, 23)[1], ["x", "y"])
 
    @test !occursin(r"{", string(S))
 
@@ -103,7 +109,7 @@ end
 end
 
 @testset "zzModMPolyRingElem.hash" begin
-   S, (x, y) = polynomial_ring(residue_ring(FlintZZ, 23), ["x", "y"])
+   S, (x, y) = polynomial_ring(residue_ring(FlintZZ, 23)[1], ["x", "y"])
 
    p = y^ZZRingElem(2)^100
 
@@ -112,7 +118,7 @@ end
 end
 
 @testset "zzModMPolyRingElem.manipulation" begin
-   R = residue_ring(FlintZZ, 23)
+   R, = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -250,7 +256,7 @@ end
 end
 
 @testset "zzModMPolyRingElem.multivariate_coeff" begin
-   R = residue_ring(FlintZZ, 23)
+   R, = residue_ring(FlintZZ, 23)
 
    for ord in Nemo.flint_orderings
       S, (x, y, z) = polynomial_ring(R, ["x", "y", "z"]; ordering=ord)
@@ -268,7 +274,7 @@ end
 end
 
 @testset "zzModMPolyRingElem.unary_ops" begin
-   R = residue_ring(FlintZZ, 23)
+   R, = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -285,7 +291,7 @@ end
 end
 
 @testset "zzModMPolyRingElem.binary_ops" begin
-   R = residue_ring(FlintZZ, 23)
+   R, = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -308,7 +314,7 @@ end
 end
 
 @testset "zzModMPolyRingElem.adhoc_binary" begin
-   R = residue_ring(FlintZZ, 23)
+   R, = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -344,7 +350,7 @@ end
 end
 
 @testset "zzModMPolyRingElem.adhoc_comparison" begin
-   R = residue_ring(FlintZZ, 23)
+   R, = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -366,7 +372,7 @@ end
 end
 
 @testset "zzModMPolyRingElem.powering" begin
-   R = residue_ring(FlintZZ, 23)
+   R, = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -393,7 +399,7 @@ end
 end
 
 @testset "zzModMPolyRingElem.divides" begin
-   R = residue_ring(FlintZZ, 23)
+   R, = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -427,7 +433,7 @@ end
 end
 
 @testset "zzModMPolyRingElem.euclidean_division" begin
-   R = residue_ring(FlintZZ, 23)
+   R, = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -463,7 +469,7 @@ end
 end
 
 @testset "zzModMPolyRingElem.ideal_reduction" begin
-   R = residue_ring(FlintZZ, 23)
+   R, = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -512,7 +518,7 @@ end
 end
 
 @testset "zzModMPolyRingElem.gcd" begin
-   R = residue_ring(FlintZZ, 23)
+   R, = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
@@ -538,7 +544,7 @@ end
 end
 
 @testset "zzModMPolyRingElem.factor" begin
-   R = residue_ring(FlintZZ, 23)
+   R, = residue_ring(FlintZZ, 23)
    R, (x, y, z) = polynomial_ring(R, ["x", "y", "z"])
 
    @test_throws ArgumentError factor(R(0))
@@ -558,7 +564,7 @@ end
 end
 
 @testset "zzModMPolyRingElem.sqrt" begin
-   R = residue_ring(FlintZZ, 23)
+   R, = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
@@ -584,7 +590,7 @@ end
 end
 
 @testset "zzModMPolyRingElem.evaluation" begin
-   R = residue_ring(FlintZZ, 23)
+   R, = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -672,7 +678,7 @@ end
 end
 
 @testset "zzModMPolyRingElem.valuation" begin
-   R = residue_ring(FlintZZ, 23)
+   R, = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -710,7 +716,7 @@ end
 end
 
 @testset "zzModMPolyRingElem.derivative" begin
-   R = residue_ring(FlintZZ, 23)
+   R, = residue_ring(FlintZZ, 23)
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -730,7 +736,7 @@ end
 end
 
 @testset "zzModMPolyRingElem.unsafe" begin
-  R23 = residue_ring(FlintZZ, 23)
+  R23, = residue_ring(FlintZZ, 23)
 
   for num_vars = 1:10
      var_names = ["x$j" for j in 1:num_vars]
@@ -788,7 +794,7 @@ end
 end
 
 @testset "zzModMPolyRingElem.exponents" begin
-  R23 = residue_ring(FlintZZ, 23)
+  R23, = residue_ring(FlintZZ, 23)
 
   for num_vars = 1:10
      var_names = ["x$j" for j in 1:num_vars]

@@ -974,15 +974,8 @@ function conjugates(a::qqbar)
    return res
 end
 
-@doc raw"""
-    eigenvalues(A::ZZMatrix, R::CalciumQQBarField)
-
-Return all the eigenvalues of the matrix `A` in the field of algebraic
-numbers `R`. The output array is sorted in the default sort order for
-algebraic numbers. Eigenvalues of multiplicity higher than one are repeated
-according to their multiplicity.
-"""
-function eigenvalues(A::ZZMatrix, R::CalciumQQBarField)
+# Return the eigenvalues with repetition according to the algebraic multiplicity
+function _eigvals_internal(R::CalciumQQBarField, A::ZZMatrix)
    n = nrows(A)
    !is_square(A) && throw(DomainError(A, "a square matrix is required"))
    if n == 0
@@ -996,15 +989,8 @@ function eigenvalues(A::ZZMatrix, R::CalciumQQBarField)
    return res
 end
 
-@doc raw"""
-    eigenvalues(A::QQMatrix, R::CalciumQQBarField)
-
-Return all the eigenvalues of the matrix `A` in the field of algebraic
-numbers `R`. The output array is sorted in the default sort order for
-algebraic numbers. Eigenvalues of multiplicity higher than one are repeated
-according to their multiplicity.
-"""
-function eigenvalues(A::QQMatrix, R::CalciumQQBarField)
+# Return the eigenvalues with repetition according to the algebraic multiplicity
+function _eigvals_internal(R::CalciumQQBarField, A::QQMatrix)
    n = nrows(A)
    !is_square(A) && throw(DomainError(A, "a square matrix is required"))
    if n == 0
@@ -1015,6 +1001,47 @@ function eigenvalues(A::QQMatrix, R::CalciumQQBarField)
         Nothing, (Ptr{qqbar_struct}, Ref{QQMatrix}, Int), roots, A, 0)
    res = array(R, roots, n)
    qqbar_vec_clear(roots, n)
+   return res
+end
+
+@doc raw"""
+    eigenvalues(R::CalciumQQBarField, A::ZZMatrix)
+    eigenvalues(R::CalciumQQBarField, A::QQMatrix)
+
+Return the eigenvalues `A` in the field of algebraic numbers `R`.
+The output array is sorted in the default sort order for
+algebraic numbers.
+"""
+function eigenvalues(R::CalciumQQBarField, A::Union{ZZMatrix, QQMatrix})
+   return unique(_eigvals_internal(R, A))
+end
+
+@doc raw"""
+    eigenvalues_with_multiplicities(R::CalciumQQBarField, A::ZZMatrix)
+    eigenvalues_with_multiplicities(R::CalciumQQBarField, A::QQMatrix)
+
+Return the eigenvalues `A` in the field of algebraic numbers `R` together with
+their algebraic multiplicities as a vector of tuples.
+The output array is sorted in the default sort order for algebraic numbers.
+"""
+function eigenvalues_with_multiplicities(R::CalciumQQBarField, A::Union{ZZMatrix, QQMatrix})
+   eig = _eigvals_internal(R, A)
+   res = Vector{Tuple{qqbar, Int}}()
+   k = 1
+   n = length(eig)
+   for i in 1:n
+      if i < n && isequal(eig[i], eig[i + 1])
+         k = k + 1
+         if i == n - 1
+            push!(res, (eig[i], k))
+            break
+         end
+      else
+         push!(res, (eig[i], k))
+         k = 1
+      end
+   end
+
    return res
 end
 

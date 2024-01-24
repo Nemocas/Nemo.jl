@@ -1,7 +1,7 @@
 @testset "QQMPolyRingElem.constructors" begin
    R = FlintQQ
 
-   for num_vars = 1:10
+   for num_vars = 0:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
@@ -64,7 +64,9 @@
 
       bctx = MPolyBuildCtx(S)
       @test_throws ErrorException push_term!(bctx, one(R), zeros(Int, num_vars + 1))
-      @test_throws ErrorException push_term!(bctx, one(R), zeros(Int, num_vars - 1))
+      if num_vars > 0
+         @test_throws ErrorException push_term!(bctx, one(R), zeros(Int, num_vars - 1))
+      end
       @test (@which push_term!(bctx, UInt(1), zeros(Int, num_vars))).module === Nemo
       @test (@which finish(bctx)).module === Nemo
       push_term!(bctx, UInt(1), zeros(Int, num_vars))

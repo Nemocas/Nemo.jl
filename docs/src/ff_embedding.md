@@ -35,15 +35,15 @@ embed(::fqPolyRepField, ::fqPolyRepField)
 
 ```jldoctest; filter = r"[gG]F"
 julia> k2, x2 = finite_field(19, 2, "x2")
-(Finite field of degree 2 over GF(19), x2)
+(Finite field of degree 2 and characteristic 19, x2)
 
 julia> k4, x4 = finite_field(19, 4, "x4")
-(Finite field of degree 4 over GF(19), x4)
+(Finite field of degree 4 and characteristic 19, x4)
 
 julia> f = embed(k2, k4)
 Morphism of finite fields
-  from finite field of degree 2 over GF(19)
-  to finite field of degree 4 over GF(19)
+  from finite field of degree 2 and characteristic 19
+  to finite field of degree 4 and characteristic 19
 
 julia> y = f(x2)
 6*x4^3 + 5*x4^2 + 9*x4 + 17
@@ -63,15 +63,15 @@ preimage_map(::FinFieldMorphism)
 
 ```jldoctest
 julia> k7, x7 = finite_field(13, 7, "x7")
-(Finite field of degree 7 over GF(13), x7)
+(Finite field of degree 7 and characteristic 13, x7)
 
 julia> k21, x21 = finite_field(13, 21, "x21")
-(Finite field of degree 21 over GF(13), x21)
+(Finite field of degree 21 and characteristic 13, x21)
 
 julia> s = preimage_map(k7, k21)
 Preimage of a morphism
-  from finite field of degree 7 over GF(13)
-  to finite field of degree 21 over GF(13)
+  from finite field of degree 7 and characteristic 13
+  to finite field of degree 21 and characteristic 13
 
 julia> y = k21(x7);
 

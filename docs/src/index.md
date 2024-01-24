@@ -83,13 +83,13 @@ Here is an example using generic recursive ring constructions.
 julia> using Nemo
 
 julia> R, x = finite_field(7, 11, "x")
-(Finite field of degree 11 over GF(7), x)
+(Finite field of degree 11 and characteristic 7, x)
 
 julia> S, y = polynomial_ring(R, "y")
-(Univariate polynomial ring in y over GF(7^11), y)
+(Univariate polynomial ring in y over GF(7, 11), y)
 
-julia> T = residue_ring(S, y^3 + 3x*y + 1)
-Residue ring of univariate polynomial ring modulo y^3 + 3*x*y + 1
+julia> T, _ = residue_ring(S, y^3 + 3x*y + 1)
+(Residue ring of univariate polynomial ring modulo y^3 + 3*x*y + 1, Map: univariate polynomial ring -> residue ring)
 
 julia> U, z = polynomial_ring(T, "z")
 (Univariate polynomial ring in z over residue ring, z)

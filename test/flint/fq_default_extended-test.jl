@@ -34,6 +34,7 @@
    @test sprint(show, "text/plain", R) isa String
    @test sprint(show, "text/plain", F) isa String
    @test sprint(show, "text/plain", FF) isa String
+   @test sprint(show, "text/plain", FF, context=:supercompact => true) == "GF(7, 2*3)"
 
    a = F()
 

@@ -241,7 +241,7 @@ _FQ_DEFAULT_FQ        = 3
 _FQ_DEFAULT_NMOD      = 4
 _FQ_DEFAULT_FMPZ_NMOD = 5
 
-mutable struct CanonicalFqDefaultMap{T} <: Map{FqField, T, SetMap, CanonicalFqDefaultMap}
+mutable struct CanonicalFqDefaultMap{T}# <: Map{FqField, T, SetMap, CanonicalFqDefaultMap}
   D::FqField
   C::T
 end
@@ -250,7 +250,7 @@ domain(f::CanonicalFqDefaultMap) = f.D
 
 codomain(f::CanonicalFqDefaultMap) = f.C
 
-mutable struct CanonicalFqDefaultMapInverse{T} <: Map{T, FqField, SetMap, CanonicalFqDefaultMapInverse}
+mutable struct CanonicalFqDefaultMapInverse{T}# <: Map{T, FqField, SetMap, CanonicalFqDefaultMapInverse}
   D::T
   C::FqField
 end
@@ -363,16 +363,32 @@ show(io::IO, a::FqFieldElem) = print(io, AbstractAlgebra.obj_to_string(a, contex
 
 function show(io::IO, a::FqField)
   io = pretty(io)
-  if get(io, :supercompact, false)
-    print(io, LowercaseOff(), "GF($(order(base_field(a)))", degree(a) > 1 ? "^$(degree(a))" : "", ")")
-  else
-    if is_absolute(a)
-      # nested printing allowed, preferably supercompact
-      print(io, "Finite field of degree ", degree(a), " over ")
-      print(IOContext(io, :supercompact => true), base_field(a))
+  if is_absolute(a)
+    deg = degree(a)
+    if get(io, :supercompact, false)
+      if deg == 1
+        print(io, LowercaseOff(), "GF($(characteristic(a)))")
+      else
+        print(io, LowercaseOff(), "GF($(characteristic(a)), $(deg))")
+      end
     else
-      # nested printing allowed, preferably supercompact
-      print(io, "Relative finite field of degree ", degree(a), " over ")
+      if deg == 1
+        print(io, "Prime field of characteristic $(characteristic(a))")
+      else
+        print(io, "Finite field of degree $(deg) and characteristic $(characteristic(a))")
+      end
+    end
+  else
+    if get(io, :supercompact, false)
+      degrees = Int[]
+      b = a
+      while !is_absolute(b)
+        push!(degrees, degree(b))
+        b = base_field(b)
+      end
+      print(io, LowercaseOff(), "GF($(characteristic(a)), $(join(reverse(degrees), '*')))")
+    else
+      print(io, "Finite field of degree $(degree(a)) over ")
       print(IOContext(io, :supercompact => true), base_field(a))
     end
   end
@@ -841,15 +857,15 @@ $K = k[X]/(f)$ will be constructed as a finite field with base field $k$.
 
 ```jldoctest
 julia> K, a = finite_field(3, 2, "a")
-(Finite field of degree 2 over GF(3), a)
+(Finite field of degree 2 and characteristic 3, a)
 
 julia> K, a = finite_field(9, "a")
-(Finite field of degree 2 over GF(3), a)
+(Finite field of degree 2 and characteristic 3, a)
 
 julia> Kx, x = K["x"];
 
 julia> L, b = finite_field(x^3 + x^2 + x + 2, "b")
-(Relative finite field of degree 3 over GF(3^2), b)
+(Finite field of degree 3 over GF(3, 2), b)
 ```
 """
 finite_field
@@ -892,15 +908,15 @@ field with base field $k$.
 
 ```jldoctest
 julia> K = GF(3, 2, "a")
-Finite field of degree 2 over GF(3)
+Finite field of degree 2 and characteristic 3
 
 julia> K = GF(9, "a")
-Finite field of degree 2 over GF(3)
+Finite field of degree 2 and characteristic 3
 
 julia> Kx, x = K["x"];
 
 julia> L = GF(x^3 + x^2 + x + 2, "b")
-Relative finite field of degree 3 over GF(3^2)
+Finite field of degree 3 over GF(3, 2)
 ```
 """
 GF
@@ -924,9 +940,21 @@ end
 ################################################################################
 
 # The following code is used in the intersection code
-function finite_field(F::FqField, deg::Int, s::VarName = :o; cached = true)
-    return FqField(characteristic(F), deg, Symbol(s), cached)
+similar(F::FqField, deg::Int, s::VarName = :o; cached = true) = finite_field(characteristic(F), deg, s, cached = cached)[1]
+
+################################################################################
+#
+#  Residue field of ZZ
+#
+################################################################################
+
+function residue_field(R::ZZRing, p::IntegerUnion; cached::Bool = true)
+  S = GF(p; cached = cached)
+  f = Generic.EuclideanRingResidueMap(R, S)
+  return S, f
 end
 
-similar(F::FqField, deg::Int, s::VarName = :o; cached = true) = finite_field(F, deg, s, cached = cached)
-
+function preimage(f::Generic.EuclideanRingResidueMap{ZZRing, FqField}, x)
+  parent(x) !== codomain(f) && error("Not an element of the codomain")
+  return lift(ZZ, x)
+end

@@ -115,3 +115,9 @@
 @deprecate roots(f::QQPolyRingElem, R::T) where {T<:Union{fqPolyRepField,fpField}} roots(R, f)
 
 @deprecate factor(f::QQPolyRingElem, R::T) where {T<:Union{fqPolyRepField,fpField}} factor(R, f)
+
+# Deprecated in 0.39.*
+
+@deprecate divisible(x::Int, y::Int) is_divisible_by(x, y)
+@deprecate divisible(x::ZZRingElem, y::Int) is_divisible_by(x, y)
+@deprecate divisible(x::ZZRingElem, y::ZZRingElem) is_divisible_by(x, y)

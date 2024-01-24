@@ -108,7 +108,7 @@ end
    R2 = Native.GF(ZZ(2))
    R22 = Native.GF(2)
    R3 = Native.GF(ZZ(3))
-   R6 = residue_ring(ZZ, ZZ(6))
+   R6, = residue_ring(ZZ, ZZ(6))
    @test R2(R6(2)) == 2  && parent(R2(R6(2))) == R2
    @test R22(R6(2)) == 2 && parent(R22(R6(2))) == R22
    @test R3(R6(2)) == 2  && parent(R3(R6(2))) == R3

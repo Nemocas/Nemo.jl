@@ -372,6 +372,11 @@ end
 
 divides(x::ZZRingElem, y::Integer) = divides(x, ZZRingElem(y))
 
+@doc raw"""
+    is_divisible_by(x::ZZRingElem, y::ZZRingElem)
+
+Return `true` if $x$ is divisible by $y$, otherwise return `false`.
+"""
 function is_divisible_by(x::ZZRingElem, y::ZZRingElem)
    if iszero(x)
       return true
@@ -387,6 +392,11 @@ function is_divisible_by(x::ZZRingElem, y::ZZRingElem)
    end
 end
 
+@doc raw"""
+    is_divisible_by(x::ZZRingElem, y::ZZRingElem)
+
+Return `true` if $x$ is divisible by $y$, otherwise return `false`.
+"""
 function is_divisible_by(x::ZZRingElem, y::Integer)
    if iszero(x)
       return true
@@ -1579,30 +1589,6 @@ end
 ###############################################################################
 
 @doc raw"""
-    divisible(x::ZZRingElem, y::ZZRingElem)
-
-Return `true` if $x$ is divisible by $y$, otherwise return `false`. We
-require $x \neq 0$.
-"""
-function divisible(x::ZZRingElem, y::ZZRingElem)
-   iszero(y) && throw(DivideError())
-   Bool(ccall((:fmpz_divisible, libflint), Cint,
-              (Ref{ZZRingElem}, Ref{ZZRingElem}), x, y))
-end
-
-@doc raw"""
-    divisible(x::ZZRingElem, y::Int)
-
-Return `true` if $x$ is divisible by $y$, otherwise return `false`. We
-require $x \neq 0$.
-"""
-function divisible(x::ZZRingElem, y::Int)
-   y == 0 && throw(DivideError())
-   Bool(ccall((:fmpz_divisible_si, libflint), Cint,
-              (Ref{ZZRingElem}, Int), x, y))
-end
-
-@doc raw"""
     divisors(a::Union{Int, ZZRingElem})
 
 Return the positive divisors of $a$ in an array, not necessarily in growing
@@ -2234,22 +2220,22 @@ function base(n::ZZRingElem, b::Integer)
 end
 
 @doc raw"""
-    ndigits(x::ZZRingElem, b::Integer)
+    number_of_digits(x::ZZRingElem, b::Integer)
 
 Return the number of digits of $x$ in the base $b$ (default is $b = 10$).
 
 # Examples
 
 ```jldoctest
-julia> ndigits(ZZ(12), 3)
+julia> number_of_digits(ZZ(12), 3)
 3
 ```
 """
-function Base.ndigits(x::ZZRingElem, b::Integer)::Int
-   ndigits(x, base=b)
+function number_of_digits(x::ZZRingElem, b::Integer)::Int
+   number_of_digits(x, base=b)
 end
 
-function Base.ndigits(a::ZZRingElem; base::Integer = 10, pad::Integer = 1)
+function number_of_digits(a::ZZRingElem; base::Integer = 10, pad::Integer = 1)
    iszero(a) && return max(pad, 1)
    return max(pad, 1+flog(abs(a), ZZRingElem(abs(base))))
 end

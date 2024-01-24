@@ -1267,8 +1267,6 @@ const flint_orderings = [:lex, :deglex, :degrevlex]
             error("$S is not a valid ordering")
          end
 
-         isempty(s) && error("need at least one indeterminate")
-
          z = new()
          ccall((:fmpz_mpoly_ctx_init, libflint), Nothing,
                (Ref{ZZMPolyRing}, Int, Int),
@@ -1462,8 +1460,6 @@ end
          else
             error("$S is not a valid ordering")
          end
-
-         isempty(s) && error("need at least one indeterminate")
 
          z = new()
          ccall((:fmpq_mpoly_ctx_init, libflint), Nothing,
@@ -1677,8 +1673,6 @@ end
             error("$S is not a valid ordering")
          end
 
-         isempty(s) && error("need at least one indeterminate")
-
          z = new()
          ccall((:nmod_mpoly_ctx_init, libflint), Nothing,
                (Ref{zzModMPolyRing}, Int, Cint, UInt),
@@ -1867,8 +1861,6 @@ end
          else
             error("$S is not a valid ordering")
          end
-
-         isempty(s) && error("need at least one indeterminate")
 
          z = new()
          ccall((:nmod_mpoly_ctx_init, libflint), Nothing,
@@ -2910,8 +2902,6 @@ end
             error("$S is not a valid ordering")
          end
 
-         isempty(s) && error("need at least one indeterminate")
-
          z = new()
          ccall((:fq_nmod_mpoly_ctx_init, libflint), Nothing,
                (Ref{fqPolyRepMPolyRing}, Int, Cint, Ref{fqPolyRepField}),
@@ -3097,18 +3087,18 @@ const NALocalFieldElem = NonArchLocalFieldElem
 
 ###############################################################################
 #
-#   FlintPadicField / padic
+#   PadicField / PadicFieldElem
 #
 ###############################################################################
 
 const flint_padic_printing_mode = [:terse, :series, :val_unit]
 
 @doc raw"""
-    FlintPadicField <: FlintLocalField <: NonArchLocalField <: Field
+    PadicField <: FlintLocalField <: NonArchLocalField <: Field
 
 A $p$-adic field for some prime $p$.
 """
-mutable struct FlintPadicField <: FlintLocalField
+mutable struct PadicField <: FlintLocalField
    p::Int
    pinv::Float64
    pow::Ptr{Nothing}
@@ -3117,13 +3107,13 @@ mutable struct FlintPadicField <: FlintLocalField
    mode::Cint
    prec_max::Int
 
-   function FlintPadicField(p::ZZRingElem, prec::Int; cached::Bool = true, check::Bool = true)
+   function PadicField(p::ZZRingElem, prec::Int; cached::Bool = true, check::Bool = true)
       check && !is_probable_prime(p) && throw(DomainError(p, "Characteristic must be prime"))
 
       return get_cached!(PadicBase, (p, prec), cached) do
          d = new()
          ccall((:padic_ctx_init, libflint), Nothing,
-               (Ref{FlintPadicField}, Ref{ZZRingElem}, Int, Int, Cint),
+               (Ref{PadicField}, Ref{ZZRingElem}, Int, Int, Cint),
                d, p, 0, 0, 0)
          finalizer(_padic_ctx_clear_fn, d)
          d.prec_max = prec
@@ -3132,47 +3122,47 @@ mutable struct FlintPadicField <: FlintLocalField
    end
 end
 
-const PadicBase = CacheDictType{Tuple{ZZRingElem, Int}, FlintPadicField}()
+const PadicBase = CacheDictType{Tuple{ZZRingElem, Int}, PadicField}()
 
-function _padic_ctx_clear_fn(a::FlintPadicField)
-   ccall((:padic_ctx_clear, libflint), Nothing, (Ref{FlintPadicField},), a)
+function _padic_ctx_clear_fn(a::PadicField)
+   ccall((:padic_ctx_clear, libflint), Nothing, (Ref{PadicField},), a)
 end
 
 @doc raw"""
-    padic <: FlintLocalFieldElem <: NonArchLocalFieldElem <: FieldElem
+    PadicFieldElem <: FlintLocalFieldElem <: NonArchLocalFieldElem <: FieldElem
 
-An element of a $p$-adic field. See [`FlintPadicField`](@ref).
+An element of a $p$-adic field. See [`PadicField`](@ref).
 """
-mutable struct padic <: FlintLocalFieldElem
+mutable struct PadicFieldElem <: FlintLocalFieldElem
    u :: Int
    v :: Int
    N :: Int
-   parent::FlintPadicField
+   parent::PadicField
 
-   function padic(prec::Int)
+   function PadicFieldElem(prec::Int)
       d = new()
-      ccall((:padic_init2, libflint), Nothing, (Ref{padic}, Int), d, prec)
+      ccall((:padic_init2, libflint), Nothing, (Ref{PadicFieldElem}, Int), d, prec)
       finalizer(_padic_clear_fn, d)
       return d
    end
 end
 
-function _padic_clear_fn(a::padic)
-   ccall((:padic_clear, libflint), Nothing, (Ref{padic},), a)
+function _padic_clear_fn(a::PadicFieldElem)
+   ccall((:padic_clear, libflint), Nothing, (Ref{PadicFieldElem},), a)
 end
 
 ###############################################################################
 #
-#   FlintQadicField / qadic
+#   QadicField / QadicFieldElem
 #
 ###############################################################################
 
 @doc raw"""
-    FlintQadicField <: FlintLocalField <: NonArchLocalField <: Field
+    QadicField <: FlintLocalField <: NonArchLocalField <: Field
 
 A $p^n$-adic field for some prime power $p^n$.
 """
-mutable struct FlintQadicField <: FlintLocalField
+mutable struct QadicField <: FlintLocalField
    p::Int
    pinv::Float64
    pow::Ptr{Nothing}
@@ -3185,14 +3175,14 @@ mutable struct FlintQadicField <: FlintLocalField
    var::Cstring   # char*
    prec_max::Int
 
-   function FlintQadicField(p::ZZRingElem, d::Int, prec::Int, var::String = "a"; cached::Bool = true, check::Bool = true)
+   function QadicField(p::ZZRingElem, d::Int, prec::Int, var::String = "a"; cached::Bool = true, check::Bool = true)
 
       check && !is_probable_prime(p) && throw(DomainError(p, "Characteristic must be prime"))
 
       z = get_cached!(QadicBase, (p, d, prec), cached) do
          zz = new()
          ccall((:qadic_ctx_init, libflint), Nothing,
-              (Ref{FlintQadicField}, Ref{ZZRingElem}, Int, Int, Int, Cstring, Cint),
+              (Ref{QadicField}, Ref{ZZRingElem}, Int, Int, Int, Cstring, Cint),
                                         zz, p, d, 0, 0, var, 0)
          finalizer(_qadic_ctx_clear_fn, zz)
          zz.prec_max = prec
@@ -3203,35 +3193,35 @@ mutable struct FlintQadicField <: FlintLocalField
    end
 end
 
-const QadicBase = CacheDictType{Tuple{ZZRingElem, Int, Int}, FlintQadicField}()
+const QadicBase = CacheDictType{Tuple{ZZRingElem, Int, Int}, QadicField}()
 
-function _qadic_ctx_clear_fn(a::FlintQadicField)
-   ccall((:qadic_ctx_clear, libflint), Nothing, (Ref{FlintQadicField},), a)
+function _qadic_ctx_clear_fn(a::QadicField)
+   ccall((:qadic_ctx_clear, libflint), Nothing, (Ref{QadicField},), a)
 end
 
 @doc raw"""
-    qadic <: FlintLocalFieldElem <: NonArchLocalFieldElem <: FieldElem
+    QadicFieldElem <: FlintLocalFieldElem <: NonArchLocalFieldElem <: FieldElem
 
-An element of a $q$-adic field. See [`FlintQadicField`](@ref).
+An element of a $q$-adic field. See [`QadicField`](@ref).
 """
-mutable struct qadic <: FlintLocalFieldElem
+mutable struct QadicFieldElem <: FlintLocalFieldElem
    coeffs::Int
    alloc::Int
    length::Int
    val::Int
    N::Int
-   parent::FlintQadicField
+   parent::QadicField
 
-   function qadic(prec::Int)
+   function QadicFieldElem(prec::Int)
       z = new()
-      ccall((:qadic_init2, libflint), Nothing, (Ref{qadic}, Int), z, prec)
+      ccall((:qadic_init2, libflint), Nothing, (Ref{QadicFieldElem}, Int), z, prec)
       finalizer(_qadic_clear_fn, z)
       return z
    end
 end
 
-function _qadic_clear_fn(a::qadic)
-   ccall((:qadic_clear, libflint), Nothing, (Ref{qadic},), a)
+function _qadic_clear_fn(a::QadicFieldElem)
+   ccall((:qadic_clear, libflint), Nothing, (Ref{QadicFieldElem},), a)
 end
 
 ###############################################################################
