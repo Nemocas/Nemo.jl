@@ -765,7 +765,7 @@ promote_rule(::Type{acb_poly}, ::Type{ZZPolyRingElem}) = acb_poly
 
 promote_rule(::Type{acb_poly}, ::Type{QQPolyRingElem}) = acb_poly
 
-promote_rule(::Type{acb_poly}, ::Type{arb_poly}) = acb_poly
+promote_rule(::Type{acb_poly}, ::Type{ArbPolyRingElem}) = acb_poly
 
 promote_rule(::Type{acb_poly}, ::Type{acb_poly}) = acb_poly
 
@@ -826,7 +826,7 @@ function (a::AcbPolyRing)(b::QQPolyRingElem)
    return z
 end
 
-function (a::AcbPolyRing)(b::arb_poly)
+function (a::AcbPolyRing)(b::ArbPolyRingElem)
    z = acb_poly(b, a.base_ring.prec)
    z.parent = a
    return z

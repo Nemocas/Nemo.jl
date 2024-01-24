@@ -61,9 +61,9 @@ parent objects of the given rings and structures.
      - `nf_elem` (`AnticNumberField`)
 
   - Arb
-     - `arb` (`ArbField`)
+     - `ArbFieldElem` (`ArbField`)
      - `acb` (`AcbField`)
-     - `arb_poly` (`ArbPolyRing`)
+     - `ArbPolyRingElem` (`ArbPolyRing`)
      - `acb_poly` (`AcbPolyRing`)
      - `arb_mat` (`ArbMatSpace`)
      - `acb_mat` (`AcbMatSpace`)

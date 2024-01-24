@@ -31,7 +31,7 @@ export angle
 export AnticNumberField
 export ArbFieldElem
 export arb_mat
-export arb_poly
+export ArbPolyRingElem
 export ArbField
 export ArbMatSpace
 export ArbPolyRing

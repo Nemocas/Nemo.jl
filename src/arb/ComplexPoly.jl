@@ -768,7 +768,7 @@ promote_rule(::Type{ComplexPoly}, ::Type{ZZPolyRingElem}) = ComplexPoly
 
 promote_rule(::Type{ComplexPoly}, ::Type{QQPolyRingElem}) = ComplexPoly
 
-promote_rule(::Type{ComplexPoly}, ::Type{arb_poly}) = ComplexPoly
+promote_rule(::Type{ComplexPoly}, ::Type{ArbPolyRingElem}) = ComplexPoly
 
 promote_rule(::Type{ComplexPoly}, ::Type{ComplexPoly}) = ComplexPoly
 
