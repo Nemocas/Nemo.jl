@@ -1293,6 +1293,28 @@ function cansolve(a::ZZMatrix, b::ZZMatrix)
    return true, transpose(z*T)
 end
 
+function AbstractAlgebra.Solve._can_solve_internal(A::ZZMatrix, b::ZZMatrix, task::Symbol; side::Symbol = :right)
+   if task !== :only_check && task !== :with_solution && task !== :with_kernel
+      error("task $(task) not recognized")
+   end
+
+   if side !== :right && side !== :left
+      throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
+   end
+
+   if side === :left
+      fl, sol, K = AbstractAlgebra.Solve._can_solve_internal(transpose(A), transpose(b), task, side = :right)
+      return fl, transpose(sol), transpose(K)
+   end
+
+   nrows(A) != nrows(b) && error("Incompatible matrices")
+   fl, sol = Nemo.cansolve(A, b)
+   if task === :only_check || task === :with_solution
+     return fl, sol, zero(A, 0, 0)
+   end
+   return fl, sol, AbstractAlgebra.Solve.kernel(A)
+ end
+
 Base.reduce(::typeof(hcat), A::AbstractVector{ZZMatrix}) = AbstractAlgebra._hcat(A)
 
 Base.reduce(::typeof(vcat), A::AbstractVector{ZZMatrix}) = AbstractAlgebra._vcat(A)
