@@ -177,11 +177,11 @@ function isless(a::ca, b::ca)
    return truth_as_bool(t, :isless)
 end
 
-isless(a::ca, b::qqbar) = isless(a, parent(a)(b))
+isless(a::ca, b::QQBarFieldElem) = isless(a, parent(a)(b))
 isless(a::ca, b::ZZRingElem) = isless(a, parent(a)(b))
 isless(a::ca, b::QQFieldElem) = isless(a, parent(a)(b))
 isless(a::ca, b::Int) = isless(a, parent(a)(b))
-isless(a::qqbar, b::ca) = isless(parent(b)(a), b)
+isless(a::QQBarFieldElem, b::ca) = isless(parent(b)(a), b)
 isless(a::QQFieldElem, b::ca) = isless(parent(b)(a), b)
 isless(a::ZZRingElem, b::ca) = isless(parent(b)(a), b)
 isless(a::Int, b::ca) = isless(parent(b)(a), b)
@@ -428,12 +428,12 @@ function +(a::ca, b::QQFieldElem)
    return r
 end
 
-+(a::ca, b::qqbar) = a + parent(a)(b)
++(a::ca, b::QQBarFieldElem) = a + parent(a)(b)
 
 +(a::Int, b::ca) = b + a
 +(a::ZZRingElem, b::ca) = b + a
 +(a::QQFieldElem, b::ca) = b + a
-+(a::qqbar, b::ca) = b + a
++(a::QQBarFieldElem, b::ca) = b + a
 
 function -(a::ca, b::ca)
    a, b = same_parent(a, b)
@@ -472,7 +472,7 @@ function -(a::ca, b::QQFieldElem)
    return r
 end
 
--(a::ca, b::qqbar) = a - parent(a)(b)
+-(a::ca, b::QQBarFieldElem) = a - parent(a)(b)
 
 function -(a::ZZRingElem, b::ca)
    C = b.parent
@@ -492,7 +492,7 @@ function -(a::QQFieldElem, b::ca)
    return r
 end
 
--(a::qqbar, b::ca) = parent(b)(a) - b
+-(a::QQBarFieldElem, b::ca) = parent(b)(a) - b
 
 
 function *(a::ca, b::Int)
@@ -522,12 +522,12 @@ function *(a::ca, b::QQFieldElem)
    return r
 end
 
-*(a::ca, b::qqbar) = a * parent(a)(b)
+*(a::ca, b::QQBarFieldElem) = a * parent(a)(b)
 
 *(a::Int, b::ca) = b * a
 *(a::ZZRingElem, b::ca) = b * a
 *(a::QQFieldElem, b::ca) = b * a
-*(a::qqbar, b::ca) = b * a
+*(a::QQBarFieldElem, b::ca) = b * a
 
 ###############################################################################
 #
@@ -589,7 +589,7 @@ function //(a::ca, b::QQFieldElem)
    return r
 end
 
-//(a::ca, b::qqbar) = a // parent(a)(b)
+//(a::ca, b::QQBarFieldElem) = a // parent(a)(b)
 
 function //(a::Int, b::ca)
    C = b.parent
@@ -618,16 +618,16 @@ function //(a::QQFieldElem, b::ca)
    return r
 end
 
-//(a::qqbar, b::ca) = parent(b)(a) // b
+//(a::QQBarFieldElem, b::ca) = parent(b)(a) // b
 
 divexact(a::ca, b::Int; check::Bool=true) = a // b
 divexact(a::ca, b::ZZRingElem; check::Bool=true) = a // b
 divexact(a::ca, b::QQFieldElem; check::Bool=true) = a // b
-divexact(a::ca, b::qqbar; check::Bool=true) = a // b
+divexact(a::ca, b::QQBarFieldElem; check::Bool=true) = a // b
 divexact(a::Int, b::ca; check::Bool=true) = a // b
 divexact(a::ZZRingElem, b::ca; check::Bool=true) = a // b
 divexact(a::QQFieldElem, b::ca; check::Bool=true) = a // b
-divexact(a::qqbar, b::ca; check::Bool=true) = a // b
+divexact(a::QQBarFieldElem, b::ca; check::Bool=true) = a // b
 
 ###############################################################################
 #
@@ -672,12 +672,12 @@ function ^(a::ca, b::QQFieldElem)
    return r
 end
 
-^(a::ca, b::qqbar) = a ^ parent(a)(b)
+^(a::ca, b::QQBarFieldElem) = a ^ parent(a)(b)
 
 ^(a::Int, b::ca) = parent(b)(a) ^ b
 ^(a::ZZRingElem, b::ca) = parent(b)(a) ^ b
 ^(a::QQFieldElem, b::ca) = parent(b)(a) ^ b
-^(a::qqbar, b::ca) = parent(b)(a) ^ b
+^(a::QQBarFieldElem, b::ca) = parent(b)(a) ^ b
 
 
 ###############################################################################
@@ -1324,18 +1324,18 @@ function ZZRingElem(a::ca)
    return res
 end
 
-function qqbar(a::ca)
+function QQBarFieldElem(a::ca)
    C = a.parent
-   res = qqbar()
+   res = QQBarFieldElem()
    ok = Bool(ccall((:ca_get_qqbar, libcalcium), Cint,
-        (Ref{qqbar}, Ref{ca}, Ref{CalciumField}), res, a, C))
+        (Ref{QQBarFieldElem}, Ref{ca}, Ref{CalciumField}), res, a, C))
    !ok && error("unable to convert to an algebraic number")
    return res
 end
 
 (R::QQField)(a::ca) = QQFieldElem(a)
 (R::ZZRing)(a::ca) = ZZRingElem(a)
-(R::CalciumQQBarField)(a::ca) = qqbar(a)
+(R::CalciumQQBarField)(a::ca) = QQBarFieldElem(a)
 
 function (R::AcbField)(a::ca; parts::Bool=false)
    C = a.parent
@@ -1473,10 +1473,10 @@ function (C::CalciumField)(v::QQFieldElem)
    return z
 end
 
-function (C::CalciumField)(v::qqbar)
+function (C::CalciumField)(v::QQBarFieldElem)
    z = ca(C)
    ccall((:ca_set_qqbar, libcalcium), Nothing,
-         (Ref{ca}, Ref{qqbar}, Ref{CalciumField}), z, v, C)
+         (Ref{ca}, Ref{QQBarFieldElem}, Ref{CalciumField}), z, v, C)
    return z
 end
 

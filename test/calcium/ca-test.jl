@@ -15,7 +15,7 @@
    @test isa(C(2+3im), ca)
    @test isa(C(ZZRingElem(2)), ca)
    @test isa(C(QQFieldElem(2)), ca)
-   @test isa(C(qqbar(2)), ca)
+   @test isa(C(QQBarFieldElem(2)), ca)
    @test isa(C(C(2)), ca)
 
    C2 = CalciumField()
@@ -167,71 +167,71 @@ end
    @test C(2) + 3 == 5
    @test C(2) + ZZRingElem(3) == 5
    @test C(2) + QQFieldElem(3) == 5
-   @test C(2) + qqbar(3) == 5
+   @test C(2) + QQBarFieldElem(3) == 5
    @test 3 + C(2) == 5
    @test ZZRingElem(3) + C(2) == 5
    @test QQFieldElem(3) + C(2) == 5
-   @test qqbar(3) + C(2) == 5
+   @test QQBarFieldElem(3) + C(2) == 5
 
    @test C(2) - C(3) == -1
    @test C(2) - 3 == -1
    @test C(2) - ZZRingElem(3) == -1
    @test C(2) - QQFieldElem(3) == -1
-   @test C(2) - qqbar(3) == -1
+   @test C(2) - QQBarFieldElem(3) == -1
    @test 3 - C(2) == 1
    @test ZZRingElem(3) - C(2) == 1
    @test QQFieldElem(3) - C(2) == 1
-   @test qqbar(3) - C(2) == 1
+   @test QQBarFieldElem(3) - C(2) == 1
 
    @test C(2) * C(3) == 6
    @test C(2) * 3 == 6
    @test C(2) * ZZRingElem(3) == 6
    @test C(2) * QQFieldElem(3) == 6
-   @test C(2) * qqbar(3) == 6
+   @test C(2) * QQBarFieldElem(3) == 6
    @test 3 * C(2) == 6
    @test ZZRingElem(3) * C(2) == 6
    @test QQFieldElem(3) * C(2) == 6
-   @test qqbar(3) * C(2) == 6
+   @test QQBarFieldElem(3) * C(2) == 6
 
    @test C(6) // C(2) == 3
    @test C(6) // 2 == 3
    @test C(6) // ZZRingElem(2) == 3
    @test C(6) // QQFieldElem(2) == 3
-   @test C(6) // qqbar(2) == 3
+   @test C(6) // QQBarFieldElem(2) == 3
    @test 6 // C(2) == 3
    @test ZZRingElem(6) // C(2) == 3
    @test QQFieldElem(6) // C(2) == 3
-   @test qqbar(6) // C(2) == 3
+   @test QQBarFieldElem(6) // C(2) == 3
 
    @test divexact(C(6), C(2)) == 3
    @test divexact(C(6), 2) == 3
    @test divexact(C(6), ZZRingElem(2)) == 3
    @test divexact(C(6), QQFieldElem(2)) == 3
-   @test divexact(C(6), qqbar(2)) == 3
+   @test divexact(C(6), QQBarFieldElem(2)) == 3
    @test divexact(6, C(2)) == 3
    @test divexact(ZZRingElem(6), C(2)) == 3
    @test divexact(QQFieldElem(6), C(2)) == 3
-   @test divexact(qqbar(6), C(2)) == 3
+   @test divexact(QQBarFieldElem(6), C(2)) == 3
 
    @test C(2) ^ C(3) == 8
    @test C(2) ^ 3 == 8
    @test C(2) ^ ZZRingElem(3) == 8
    @test C(2) ^ QQFieldElem(3) == 8
-   @test C(2) ^ qqbar(3) == 8
+   @test C(2) ^ QQBarFieldElem(3) == 8
    @test 2 ^ C(3) == 8
    @test ZZRingElem(2) ^ C(3) == 8
    @test QQFieldElem(2) ^ C(3) == 8
-   @test qqbar(2) ^ C(3) == 8
+   @test QQBarFieldElem(2) ^ C(3) == 8
 
    @test C(2) < C(3)
    @test C(2) < 3
    @test C(2) < ZZRingElem(3)
    @test C(2) < QQFieldElem(3)
-   @test C(2) < qqbar(3)
+   @test C(2) < QQBarFieldElem(3)
    @test 2 < C(3)
    @test ZZRingElem(2) < C(3)
    @test QQFieldElem(2) < C(3)
-   @test qqbar(2) < C(3)
+   @test QQBarFieldElem(2) < C(3)
 
 end
 
@@ -248,8 +248,8 @@ end
    @test FlintQQ(h) == QQFieldElem(1) // 2
    @test_throws ErrorException FlintZZ(h)
 
-   @test CalciumQQBar(h) == qqbar(1) // 2
-   @test CalciumQQBar(c) == qqbar(1+2im)
+   @test CalciumQQBar(h) == QQBarFieldElem(1) // 2
+   @test CalciumQQBar(c) == QQBarFieldElem(1+2im)
    @test_throws ErrorException CalciumQQBar(t)
 
    RR = ArbField()

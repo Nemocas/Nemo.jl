@@ -64,7 +64,7 @@ end
 
 const CalciumQQBar = CalciumQQBarField()
 
-mutable struct qqbar <: FieldElem
+mutable struct QQBarFieldElem <: FieldElem
   coeffs::Ptr{Nothing}
   alloc::Int
   length::Int
@@ -81,17 +81,17 @@ mutable struct qqbar <: FieldElem
   imag_rad_exp::Int     # ZZRingElem
   imag_rad_man::UInt
 
-  function qqbar()
+  function QQBarFieldElem()
     z = new()
-    ccall((:qqbar_init, libcalcium), Nothing, (Ref{qqbar}, ), z)
+    ccall((:qqbar_init, libcalcium), Nothing, (Ref{QQBarFieldElem}, ), z)
     finalizer(_qqbar_clear_fn, z)
     return z
   end
 
 end
 
-function _qqbar_clear_fn(a::qqbar)
-   ccall((:qqbar_clear, libcalcium), Nothing, (Ref{qqbar},), a)
+function _qqbar_clear_fn(a::QQBarFieldElem)
+   ccall((:qqbar_clear, libcalcium), Nothing, (Ref{QQBarFieldElem},), a)
 end
 
 ################################################################################

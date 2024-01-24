@@ -504,7 +504,7 @@ export QadicFieldElem
 export QQ
 export QQAbsPowerSeriesRing
 export QQAbsPowerSeriesRingElem
-export qqbar
+export QQBarFieldElem
 export QQBar
 export QQField
 export QQFieldElem
