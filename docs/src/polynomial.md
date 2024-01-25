@@ -108,7 +108,7 @@ r = roots(n, isolate_real = true)
 
 ```@docs
 from_roots(::ArbPolyRing, ::Vector{arb})
-from_roots(::AcbPolyRing, ::Vector{acb})
+from_roots(::AcbPolyRing, ::Vector{AcbFieldElem})
 ```
 
 **Examples**

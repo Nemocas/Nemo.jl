@@ -369,7 +369,7 @@ const AcbFieldID = CacheDictType{Int, AcbField}()
 
 precision(x::AcbField) = x.prec
 
-mutable struct acb <: FieldElem
+mutable struct AcbFieldElem <: FieldElem
   real_mid_exp::Int     # ZZRingElem
   real_mid_size::UInt # mp_size_t
   real_mid_d1::UInt    # mantissa_struct
@@ -384,49 +384,49 @@ mutable struct acb <: FieldElem
   imag_rad_man::UInt
   parent::AcbField
 
-  function acb()
+  function AcbFieldElem()
     z = new()
-    ccall((:acb_init, libarb), Nothing, (Ref{acb}, ), z)
+    ccall((:acb_init, libarb), Nothing, (Ref{AcbFieldElem}, ), z)
     finalizer(_acb_clear_fn, z)
     return z
   end
 
-  function acb(x::Union{Int, UInt, Float64, ZZRingElem, BigFloat, ArbFieldElem, acb})
+  function AcbFieldElem(x::Union{Int, UInt, Float64, ZZRingElem, BigFloat, ArbFieldElem, AcbFieldElem})
     z = new()
-    ccall((:acb_init, libarb), Nothing, (Ref{acb}, ), z)
+    ccall((:acb_init, libarb), Nothing, (Ref{AcbFieldElem}, ), z)
     _acb_set(z, x)
     finalizer(_acb_clear_fn, z)
     return z
   end
 
-  function acb(x::Union{Int, UInt, Float64, ZZRingElem, QQFieldElem,
-                        BigFloat, ArbFieldElem, acb, AbstractString}, p::Int)
+  function AcbFieldElem(x::Union{Int, UInt, Float64, ZZRingElem, QQFieldElem,
+                        BigFloat, ArbFieldElem, AcbFieldElem, AbstractString}, p::Int)
     z = new()
-    ccall((:acb_init, libarb), Nothing, (Ref{acb}, ), z)
+    ccall((:acb_init, libarb), Nothing, (Ref{AcbFieldElem}, ), z)
     _acb_set(z, x, p)
     finalizer(_acb_clear_fn, z)
     return z
   end
 
-  #function acb{T <: Union{Int, UInt, Float64, ZZRingElem, BigFloat, ArbFieldElem}}(x::T, y::T)
+  #function AcbFieldElem{T <: Union{Int, UInt, Float64, ZZRingElem, BigFloat, ArbFieldElem}}(x::T, y::T)
   #  z = new()
-  #  ccall((:acb_init, libarb), Nothing, (Ref{acb}, ), z)
+  #  ccall((:acb_init, libarb), Nothing, (Ref{AcbFieldElem}, ), z)
   #  _acb_set(z, x, y)
   #  finalizer(_acb_clear_fn, z)
   #  return z
   #end
 
-  function acb(x::T, y::T, p::Int) where {T <: Union{Int, UInt, Float64, ZZRingElem, QQFieldElem, BigFloat, AbstractString, ArbFieldElem}}
+  function AcbFieldElem(x::T, y::T, p::Int) where {T <: Union{Int, UInt, Float64, ZZRingElem, QQFieldElem, BigFloat, AbstractString, ArbFieldElem}}
     z = new()
-    ccall((:acb_init, libarb), Nothing, (Ref{acb}, ), z)
+    ccall((:acb_init, libarb), Nothing, (Ref{AcbFieldElem}, ), z)
     _acb_set(z, x, y, p)
     finalizer(_acb_clear_fn, z)
     return z
   end
 end
 
-function _acb_clear_fn(x::acb)
-  ccall((:acb_clear, libarb), Nothing, (Ref{acb}, ), x)
+function _acb_clear_fn(x::AcbFieldElem)
+  ccall((:acb_clear, libarb), Nothing, (Ref{AcbFieldElem}, ), x)
 end
 
 ################################################################################
@@ -758,7 +758,7 @@ base_ring(a::ComplexPolyRing) = ComplexField()
 
 # fixed precision
 
-mutable struct AcbPolyRing <: PolyRing{acb}
+mutable struct AcbPolyRing <: PolyRing{AcbFieldElem}
   base_ring::AcbField
   S::Symbol
 
@@ -771,7 +771,7 @@ end
 
 const AcbPolyRingID = CacheDictType{Tuple{AcbField, Symbol}, AcbPolyRing}()
 
-mutable struct acb_poly <: PolyRingElem{acb}
+mutable struct acb_poly <: PolyRingElem{AcbFieldElem}
   coeffs::Ptr{Nothing}
   length::Int
   alloc::Int
@@ -784,21 +784,21 @@ mutable struct acb_poly <: PolyRingElem{acb}
     return z
   end
 
-  function acb_poly(x::acb, p::Int)
+  function acb_poly(x::AcbFieldElem, p::Int)
     z = new() 
     ccall((:acb_poly_init, libarb), Nothing, (Ref{acb_poly}, ), z)
     ccall((:acb_poly_set_coeff_acb, libarb), Nothing,
-                (Ref{acb_poly}, Int, Ref{acb}), z, 0, x)
+                (Ref{acb_poly}, Int, Ref{AcbFieldElem}), z, 0, x)
     finalizer(_acb_poly_clear_fn, z)
     return z
   end
 
-  function acb_poly(x::Vector{acb}, p::Int)
+  function acb_poly(x::Vector{AcbFieldElem}, p::Int)
     z = new() 
     ccall((:acb_poly_init, libarb), Nothing, (Ref{acb_poly}, ), z)
     for i = 1:length(x)
         ccall((:acb_poly_set_coeff_acb, libarb), Nothing,
-                (Ref{acb_poly}, Int, Ref{acb}), z, i - 1, x[i])
+                (Ref{acb_poly}, Int, Ref{AcbFieldElem}), z, i - 1, x[i])
     end
     finalizer(_acb_poly_clear_fn, z)
     return z
@@ -1193,7 +1193,7 @@ mutable struct ComplexMat <: MatElem{ComplexFieldElem}
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{acb},
+        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
                     (Ref{ComplexMat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j])
       end
@@ -1208,7 +1208,7 @@ mutable struct ComplexMat <: MatElem{ComplexFieldElem}
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{acb},
+        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
                     (Ref{ComplexMat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j])
       end
@@ -1223,7 +1223,7 @@ mutable struct ComplexMat <: MatElem{ComplexFieldElem}
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{acb},
+        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
                     (Ref{ComplexMat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j])
       end
@@ -1238,7 +1238,7 @@ mutable struct ComplexMat <: MatElem{ComplexFieldElem}
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{acb},
+        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
                     (Ref{ComplexMat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j])
       end
@@ -1253,7 +1253,7 @@ mutable struct ComplexMat <: MatElem{ComplexFieldElem}
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{acb},
+        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
                     (Ref{ComplexMat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j], prec)
       end
@@ -1387,7 +1387,7 @@ end
 
 # fixed precision
 
-struct AcbMatSpace <: MatSpace{acb}
+struct AcbMatSpace <: MatSpace{AcbFieldElem}
   nrows::Int
   ncols::Int
   base_ring::AcbField
@@ -1399,7 +1399,7 @@ end
 
 const AcbMatSpaceID = CacheDictType{Tuple{AcbField, Int, Int}, AcbMatSpace}()
 
-mutable struct acb_mat <: MatElem{acb}
+mutable struct acb_mat <: MatElem{AcbFieldElem}
   entries::Ptr{Nothing}
   r::Int
   c::Int
@@ -1460,7 +1460,7 @@ mutable struct acb_mat <: MatElem{acb}
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{acb},
+        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j])
       end
@@ -1468,14 +1468,14 @@ mutable struct acb_mat <: MatElem{acb}
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: Union{BigFloat, acb, ArbFieldElem}}
+  function acb_mat(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: Union{BigFloat, AcbFieldElem, ArbFieldElem}}
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
                 (Ref{acb_mat}, Int, Int), z, r, c)
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{acb},
+        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j])
       end
@@ -1490,7 +1490,7 @@ mutable struct acb_mat <: MatElem{acb}
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{acb},
+        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j])
       end
@@ -1498,14 +1498,14 @@ mutable struct acb_mat <: MatElem{acb}
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{BigFloat, acb, ArbFieldElem}}
+  function acb_mat(r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{BigFloat, AcbFieldElem, ArbFieldElem}}
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
                 (Ref{acb_mat}, Int, Int), z, r, c)
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{acb},
+        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j])
       end
@@ -1520,7 +1520,7 @@ mutable struct acb_mat <: MatElem{acb}
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{acb},
+        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j], prec)
       end
@@ -1528,14 +1528,14 @@ mutable struct acb_mat <: MatElem{acb}
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractMatrix{T}, prec::Int) where {T <: Union{BigFloat, ArbFieldElem, AbstractString, acb}}
+  function acb_mat(r::Int, c::Int, arr::AbstractMatrix{T}, prec::Int) where {T <: Union{BigFloat, ArbFieldElem, AbstractString, AcbFieldElem}}
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
                 (Ref{acb_mat}, Int, Int), z, r, c)
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{acb},
+        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j], prec)
       end
@@ -1550,7 +1550,7 @@ mutable struct acb_mat <: MatElem{acb}
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{acb},
+        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j], prec)
       end
@@ -1558,14 +1558,14 @@ mutable struct acb_mat <: MatElem{acb}
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractVector{T}, prec::Int) where {T <: Union{BigFloat, ArbFieldElem, AbstractString, acb}}
+  function acb_mat(r::Int, c::Int, arr::AbstractVector{T}, prec::Int) where {T <: Union{BigFloat, ArbFieldElem, AbstractString, AcbFieldElem}}
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
                 (Ref{acb_mat}, Int, Int), z, r, c)
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{acb},
+        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j], prec)
       end
@@ -1581,7 +1581,7 @@ mutable struct acb_mat <: MatElem{acb}
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{acb},
+        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j][1], arr[i,j][2], prec)
       end
@@ -1597,7 +1597,7 @@ mutable struct acb_mat <: MatElem{acb}
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{acb},
+        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j][1], arr[i,j][2], prec)
       end
@@ -1613,7 +1613,7 @@ mutable struct acb_mat <: MatElem{acb}
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{acb},
+        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j][1], arr[(i-1)*c+j][2], prec)
       end
@@ -1629,7 +1629,7 @@ mutable struct acb_mat <: MatElem{acb}
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{acb},
+        el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j][1], arr[(i-1)*c+j][2], prec)
       end

@@ -1243,7 +1243,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    guess(R::CalciumQQBarField, x::acb, maxdeg::Int, maxbits::Int=0)
+    guess(R::CalciumQQBarField, x::AcbFieldElem, maxdeg::Int, maxbits::Int=0)
 
 Try to reconstruct an algebraic number from a given numerical enclosure `x`.
 The algorithm looks for candidates up to degree `maxdeg` and with
@@ -1262,14 +1262,14 @@ performance, one should invoke this function repeatedly with successively
 larger parameters when the size of the intended solution is unknown or
 may be much smaller than a worst-case bound.
 """
-function guess(R::CalciumQQBarField, x::acb, maxdeg::Int, maxbits::Int=0)
+function guess(R::CalciumQQBarField, x::AcbFieldElem, maxdeg::Int, maxbits::Int=0)
    prec = precision(Balls)
    if maxbits <= 0
       maxbits = prec
    end
    res = QQBarFieldElem()
    found = Bool(ccall((:qqbar_guess, libcalcium),
-        Cint, (Ref{QQBarFieldElem}, Ref{acb}, Int, Int, Int, Int),
+        Cint, (Ref{QQBarFieldElem}, Ref{AcbFieldElem}, Int, Int, Int, Int),
             res, x, maxdeg, maxbits, 0, prec))
    if !found
       error("No suitable algebraic number found")
@@ -1278,7 +1278,7 @@ function guess(R::CalciumQQBarField, x::acb, maxdeg::Int, maxbits::Int=0)
 end
 
 @doc raw"""
-    guess(R::CalciumQQBarField, x::acb, maxdeg::Int, maxbits::Int=0)
+    guess(R::CalciumQQBarField, x::AcbFieldElem, maxdeg::Int, maxbits::Int=0)
 
 Try to reconstruct an algebraic number from a given numerical enclosure `x`.
 The algorithm looks for candidates up to degree `maxdeg` and with
@@ -1333,7 +1333,7 @@ function (R::AcbField)(a::QQBarFieldElem)
    prec = precision(R)
    z = R()
    ccall((:qqbar_get_acb, libcalcium),
-        Nothing, (Ref{acb}, Ref{QQBarFieldElem}, Int), z, a, prec)
+        Nothing, (Ref{AcbFieldElem}, Ref{QQBarFieldElem}, Int), z, a, prec)
    return z
 end
 

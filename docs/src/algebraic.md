@@ -342,6 +342,6 @@ Root 0.100000 of 10x - 1
 
 ```@docs
 guess(R::CalciumQQBarField, x::arb, maxdeg::Int, maxbits::Int=0)
-guess(R::CalciumQQBarField, x::acb, maxdeg::Int, maxbits::Int=0)
+guess(R::CalciumQQBarField, x::AcbFieldElem, maxdeg::Int, maxbits::Int=0)
 ```
 

@@ -76,8 +76,8 @@ function imag(tau::acb_mat)
     return map(imag, tau)
 end
 
-*(x::acb, y::ArbMatrix) = x * _acb_mat(y)
-*(x::ArbMatrix, y::acb) = y * x
+*(x::AcbFieldElem, y::ArbMatrix) = x * _acb_mat(y)
+*(x::ArbMatrix, y::AcbFieldElem) = y * x
 *(x::ArbMatrix, y::acb_mat) = _acb_mat(x) * y
 *(x::acb_mat, y::ArbMatrix) = x * _acb_mat(y)
 +(x::ArbMatrix, y::acb_mat) = _acb_mat(x) + y
@@ -93,8 +93,8 @@ function _acb_mat(A::ArbMatrix)
     return change_base_ring(Cc, A)
 end
 
-function mul!(z::acb, x::acb, y::ArbFieldElem)
-    ccall((:acb_mul_arb, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{ArbFieldElem}, Int),
+function mul!(z::AcbFieldElem, x::AcbFieldElem, y::ArbFieldElem)
+    ccall((:acb_mul_arb, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ArbFieldElem}, Int),
         z, x, y, parent(z).prec)
     return z
 end
@@ -698,8 +698,8 @@ function round!(z::ArbFieldElem, x::ArbFieldElem, p::Int)
     return z
 end
 
-function round!(z::acb, x::acb, p::Int)
-    ccall((:acb_set_round, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, p)
+function round!(z::AcbFieldElem, x::AcbFieldElem, p::Int)
+    ccall((:acb_set_round, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, p)
     z.parent = AcbField(p, cached=false)
     return z
 end
@@ -710,14 +710,14 @@ function round(x::ArbFieldElem, p::Int)
     return z
 end
 
-function round(x::acb, p::Int)
+function round(x::AcbFieldElem, p::Int)
     z = AcbField(p, cached=false)()
-    ccall((:acb_set_round, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, p)
+    ccall((:acb_set_round, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, p)
     return z
 end
 
-function bits(x::acb)
-    return ccall((:acb_bits, libarb), Int, (Ref{acb},), x)
+function bits(x::AcbFieldElem)
+    return ccall((:acb_bits, libarb), Int, (Ref{AcbFieldElem},), x)
 end
 
 function Base.Int128(x::ZZRingElem)

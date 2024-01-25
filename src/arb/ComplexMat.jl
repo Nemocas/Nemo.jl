@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   acb_mat.jl : Arb matrices over acb
+#   acb_mat.jl : Arb matrices over AcbFieldElem
 #
 ###############################################################################
 
@@ -626,7 +626,7 @@ end
 @doc raw"""
     bound_inf_norm(x::ComplexMat)
 
-Returns a non-negative element $z$ of type `acb`, such that $z$ is an upper
+Returns a non-negative element $z$ of type `AcbFieldElem`, such that $z$ is an upper
 bound for the infinity norm for every matrix in $x$
 """
 function bound_inf_norm(x::ComplexMat)
@@ -949,7 +949,7 @@ end
 @doc raw"""
     eigenvalues_simple(A::ComplexMat, algorithm::Symbol = :default)
 
-Returns the eigenvalues of `A` as a vector of `acb`. It is assumed that `A`
+Returns the eigenvalues of `A` as a vector of `AcbFieldElem`. It is assumed that `A`
 has only simple eigenvalues.
 
 The algorithm used can be changed by setting the `algorithm` keyword to

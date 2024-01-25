@@ -393,10 +393,10 @@ function evaluate(x::RealPoly, y::RealFieldElem, prec::Int = precision(Balls))
    return z
 end
 
-function evaluate(x::RealPoly, y::acb, prec::Int = precision(Balls))
+function evaluate(x::RealPoly, y::AcbFieldElem, prec::Int = precision(Balls))
    z = parent(y)()
    ccall((:arb_poly_evaluate_acb, libarb), Nothing,
-                (Ref{acb}, Ref{RealPoly}, Ref{acb}, Int),
+                (Ref{AcbFieldElem}, Ref{RealPoly}, Ref{AcbFieldElem}, Int),
                 z, x, y, prec)
    return z
 end
@@ -426,7 +426,7 @@ function evaluate2(x::RealPoly, y::ComplexFieldElem, prec::Int = precision(Balls
    z = parent(y)()
    w = parent(y)()
    ccall((:arb_poly_evaluate2_acb, libarb), Nothing,
-                (Ref{acb}, Ref{acb}, Ref{RealPoly}, Ref{acb}, Int),
+                (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{RealPoly}, Ref{AcbFieldElem}, Int),
                 z, w, x, y, prec)
    return z, w
 end

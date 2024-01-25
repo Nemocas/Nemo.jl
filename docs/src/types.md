@@ -62,7 +62,7 @@ parent objects of the given rings and structures.
 
   - Arb
      - `ArbFieldElem` (`ArbField`)
-     - `acb` (`AcbField`)
+     - `AcbFieldElem` (`AcbField`)
      - `ArbPolyRingElem` (`ArbPolyRing`)
      - `acb_poly` (`AcbPolyRing`)
      - `ArbMatrix` (`ArbMatSpace`)

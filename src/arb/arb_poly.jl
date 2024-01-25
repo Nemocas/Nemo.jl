@@ -406,10 +406,10 @@ function evaluate(x::ArbPolyRingElem, y::ArbFieldElem)
    return z
 end
 
-function evaluate(x::ArbPolyRingElem, y::acb)
+function evaluate(x::ArbPolyRingElem, y::AcbFieldElem)
    z = parent(y)()
    ccall((:arb_poly_evaluate_acb, libarb), Nothing,
-                (Ref{acb}, Ref{ArbPolyRingElem}, Ref{acb}, Int),
+                (Ref{AcbFieldElem}, Ref{ArbPolyRingElem}, Ref{AcbFieldElem}, Int),
                 z, x, y, precision(parent(y)))
    return z
 end
@@ -435,11 +435,11 @@ function evaluate2(x::ArbPolyRingElem, y::ArbFieldElem)
    return z, w
 end
 
-function evaluate2(x::ArbPolyRingElem, y::acb)
+function evaluate2(x::ArbPolyRingElem, y::AcbFieldElem)
    z = parent(y)()
    w = parent(y)()
    ccall((:arb_poly_evaluate2_acb, libarb), Nothing,
-                (Ref{acb}, Ref{acb}, Ref{ArbPolyRingElem}, Ref{acb}, Int),
+                (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ArbPolyRingElem}, Ref{AcbFieldElem}, Int),
                 z, w, x, y, precision(parent(y)))
    return z, w
 end

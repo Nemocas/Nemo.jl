@@ -6,7 +6,7 @@ export absolute_degree
 export absolute_frobenius
 export absolute_norm
 export absolute_tr
-export acb
+export AcbFieldElem
 export acb_mat
 export acb_poly
 export AcbField

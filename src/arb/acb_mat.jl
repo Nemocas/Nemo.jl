@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   acb_mat.jl : Arb matrices over acb
+#   acb_mat.jl : Arb matrices over AcbFieldElem
 #
 ###############################################################################
 
@@ -30,7 +30,7 @@ elem_type(::Type{AcbMatSpace}) = acb_mat
 
 parent(x::acb_mat) = matrix_space(base_ring(x), nrows(x), ncols(x))
 
-dense_matrix_type(::Type{acb}) = acb_mat
+dense_matrix_type(::Type{AcbFieldElem}) = acb_mat
 
 precision(x::AcbMatSpace) = precision(x.base_ring)
 
@@ -44,11 +44,11 @@ function check_parent(x::acb_mat, y::acb_mat, throw::Bool = true)
    return !fl
 end
 
-function getindex!(z::acb, x::acb_mat, r::Int, c::Int)
+function getindex!(z::AcbFieldElem, x::acb_mat, r::Int, c::Int)
   GC.@preserve x begin
-    v = ccall((:acb_mat_entry_ptr, libarb), Ptr{acb},
+    v = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
                 (Ref{acb_mat}, Int, Int), x, r - 1, c - 1)
-    ccall((:acb_set, libarb), Nothing, (Ref{acb}, Ptr{acb}), z, v)
+    ccall((:acb_set, libarb), Nothing, (Ref{AcbFieldElem}, Ptr{AcbFieldElem}), z, v)
   end
   return z
 end
@@ -58,20 +58,20 @@ end
 
   z = base_ring(x)()
   GC.@preserve x begin
-     v = ccall((:acb_mat_entry_ptr, libarb), Ptr{acb},
+     v = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
                (Ref{acb_mat}, Int, Int), x, r - 1, c - 1)
-     ccall((:acb_set, libarb), Nothing, (Ref{acb}, Ptr{acb}), z, v)
+     ccall((:acb_set, libarb), Nothing, (Ref{AcbFieldElem}, Ptr{AcbFieldElem}), z, v)
   end
   return z
 end
 
-for T in [Integer, Float64, ZZRingElem, QQFieldElem, ArbFieldElem, BigFloat, acb, AbstractString]
+for T in [Integer, Float64, ZZRingElem, QQFieldElem, ArbFieldElem, BigFloat, AcbFieldElem, AbstractString]
    @eval begin
       @inline function setindex!(x::acb_mat, y::$T, r::Int, c::Int)
          @boundscheck Generic._checkbounds(x, r, c)
 
          GC.@preserve x begin
-            z = ccall((:acb_mat_entry_ptr, libarb), Ptr{acb},
+            z = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
                       (Ref{acb_mat}, Int, Int), x, r - 1, c - 1)
             _acb_set(z, y, precision(base_ring(x)))
          end
@@ -89,7 +89,7 @@ for T in [Integer, Float64, ZZRingElem, QQFieldElem, ArbFieldElem, BigFloat, Abs
          @boundscheck Generic._checkbounds(x, r, c)
 
          GC.@preserve x begin
-            z = ccall((:acb_mat_entry_ptr, libarb), Ptr{acb},
+            z = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
                       (Ref{acb_mat}, Int, Int), x, r - 1, c - 1)
             _acb_set(z, y[1], y[2], precision(base_ring(x)))
          end
@@ -225,15 +225,15 @@ end
 
 *(x::ArbFieldElem, y::acb_mat) = y*x
 
-function *(x::acb_mat, y::acb)
+function *(x::acb_mat, y::AcbFieldElem)
   z = similar(x)
   ccall((:acb_mat_scalar_mul_acb, libarb), Nothing,
-              (Ref{acb_mat}, Ref{acb_mat}, Ref{acb}, Int),
+              (Ref{acb_mat}, Ref{acb_mat}, Ref{AcbFieldElem}, Int),
               z, x, y, precision(base_ring(x)))
   return z
 end
 
-*(x::acb, y::acb_mat) = y*x
+*(x::AcbFieldElem, y::acb_mat) = y*x
 
 *(x::Integer, y::acb_mat) = ZZRingElem(x) * y
 
@@ -255,7 +255,7 @@ end
 
 *(x::acb_mat, y::Rational{T}) where T <: Union{Int, BigInt} = y * x
 
-for T in [Integer, ZZRingElem, QQFieldElem, ArbFieldElem, acb]
+for T in [Integer, ZZRingElem, QQFieldElem, ArbFieldElem, AcbFieldElem]
    @eval begin
       function +(x::acb_mat, y::$T)
          z = deepcopy(x)
@@ -494,10 +494,10 @@ function divexact(x::acb_mat, y::ArbFieldElem; check::Bool=true)
   return z
 end
 
-function divexact(x::acb_mat, y::acb; check::Bool=true)
+function divexact(x::acb_mat, y::AcbFieldElem; check::Bool=true)
   z = similar(x)
   ccall((:acb_mat_scalar_div_acb, libarb), Nothing,
-              (Ref{acb_mat}, Ref{acb_mat}, Ref{acb}, Int),
+              (Ref{acb_mat}, Ref{acb_mat}, Ref{AcbFieldElem}, Int),
               z, x, y, precision(base_ring(x)))
   return z
 end
@@ -534,7 +534,7 @@ function det(x::acb_mat)
   ncols(x) != nrows(x) && error("Matrix must be square")
   z = base_ring(x)()
   ccall((:acb_mat_det, libarb), Nothing,
-              (Ref{acb}, Ref{acb_mat}, Int), z, x, precision(base_ring(x)))
+              (Ref{AcbFieldElem}, Ref{acb_mat}, Int), z, x, precision(base_ring(x)))
   return z
 end
 
@@ -629,7 +629,7 @@ end
 @doc raw"""
     bound_inf_norm(x::acb_mat)
 
-Returns a non-negative element $z$ of type `acb`, such that $z$ is an upper
+Returns a non-negative element $z$ of type `AcbFieldElem`, such that $z$ is an upper
 bound for the infinity norm for every matrix in $x$
 """
 function bound_inf_norm(x::acb_mat)
@@ -693,7 +693,7 @@ function (x::AcbMatSpace)(y::ArbMatrix)
   return z
 end
 
-for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, ArbFieldElem, acb, String]
+for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, ArbFieldElem, AcbFieldElem, String]
    @eval begin
       function (x::AcbMatSpace)(y::AbstractMatrix{$T})
          _check_dim(nrows(x), ncols(x), y)
@@ -749,7 +749,7 @@ end
 (x::AcbMatSpace)(y::AbstractVector{Tuple{Rational{T}, Rational{T}}}) where {T <: Integer} =
          x(map(z -> (QQFieldElem(z[1]), QQFieldElem(z[2])), y))
 
-for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, acb, String]
+for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AcbFieldElem, String]
    @eval begin
       function (x::AcbMatSpace)(y::$T)
          z = x()
@@ -775,13 +775,13 @@ end
 #
 ###############################################################################
 
-function matrix(R::AcbField, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, acb, AbstractString}}
+function matrix(R::AcbField, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AcbFieldElem, AbstractString}}
    z = acb_mat(size(arr, 1), size(arr, 2), arr, precision(R))
    z.base_ring = R
    return z
 end
 
-function matrix(R::AcbField, r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, acb, AbstractString}}
+function matrix(R::AcbField, r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AcbFieldElem, AbstractString}}
    _check_dim(r, c, arr)
    z = acb_mat(r, c, arr, precision(R))
    z.base_ring = R
@@ -855,7 +855,7 @@ promote_rule(::Type{acb_mat}, ::Type{QQFieldElem}) = acb_mat
 
 promote_rule(::Type{acb_mat}, ::Type{ArbFieldElem}) = acb_mat
 
-promote_rule(::Type{acb_mat}, ::Type{acb}) = acb_mat
+promote_rule(::Type{acb_mat}, ::Type{AcbFieldElem}) = acb_mat
 
 promote_rule(::Type{acb_mat}, ::Type{ZZMatrix}) = acb_mat
 
@@ -901,7 +901,7 @@ function _eig_multiple(A::acb_mat, check::Bool = true)
   z = array(base_ring(A), v, n)
   acb_vec_clear(v, n)
   acb_vec_clear(v_approx, n)
-  res = Vector{Tuple{acb, Int}}()
+  res = Vector{Tuple{AcbFieldElem, Int}}()
   k = 1
   for i in 1:n
     if i < n && isequal(z[i], z[i + 1])
@@ -963,7 +963,7 @@ end
 @doc raw"""
     eigenvalues_simple(A::acb_mat, algorithm::Symbol = :default)
 
-Returns the eigenvalues of `A` as a vector of `acb`. It is assumed that `A`
+Returns the eigenvalues of `A` as a vector of `AcbFieldElem`. It is assumed that `A`
 has only simple eigenvalues.
 
 The algorithm used can be changed by setting the `algorithm` keyword to
@@ -980,7 +980,7 @@ end
     eigenvalues_with_multiplicities(A::acb_mat)
 
 Return the eigenvalues of `A` with their algebraic multiplicities as a vector of
-tuples `(acb, Int)`. Each tuple `(z, k)` corresponds to a cluster of `k`
+tuples `(AcbFieldElem, Int)`. Each tuple `(z, k)` corresponds to a cluster of `k`
 eigenvalues of $A$.
 
 This function is experimental.

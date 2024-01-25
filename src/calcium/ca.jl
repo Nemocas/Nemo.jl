@@ -1343,10 +1343,10 @@ function (R::AcbField)(a::CalciumFieldElem; parts::Bool=false)
    z = R()
    if parts
       ccall((:ca_get_acb_accurate_parts, libcalcium),
-        Nothing, (Ref{acb}, Ref{CalciumFieldElem}, Int, Ref{CalciumField}), z, a, prec, C)
+        Nothing, (Ref{AcbFieldElem}, Ref{CalciumFieldElem}, Int, Ref{CalciumField}), z, a, prec, C)
    else
       ccall((:ca_get_acb, libcalcium),
-        Nothing, (Ref{acb}, Ref{CalciumFieldElem}, Int, Ref{CalciumField}), z, a, prec, C)
+        Nothing, (Ref{AcbFieldElem}, Ref{CalciumFieldElem}, Int, Ref{CalciumField}), z, a, prec, C)
    end
    return z
 end
@@ -1374,10 +1374,10 @@ function (::Type{ComplexF64})(x::CalciumFieldElem)
    set_precision!(Balls, 53) do
       z = AcbField()(x)
       x = ArbFieldElem()
-      ccall((:acb_get_real, libarb), Nothing, (Ref{ArbFieldElem}, Ref{acb}), x, z)
+      ccall((:acb_get_real, libarb), Nothing, (Ref{ArbFieldElem}, Ref{AcbFieldElem}), x, z)
       xx = Float64(x)
       y = ArbFieldElem()
-      ccall((:acb_get_imag, libarb), Nothing, (Ref{ArbFieldElem}, Ref{acb}), y, z)
+      ccall((:acb_get_imag, libarb), Nothing, (Ref{ArbFieldElem}, Ref{AcbFieldElem}), y, z)
       yy = Float64(y)
       return ComplexF64(xx, yy)
    end

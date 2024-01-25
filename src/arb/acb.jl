@@ -13,29 +13,29 @@
 #
 ###############################################################################
 
-elem_type(::Type{AcbField}) = acb
+elem_type(::Type{AcbField}) = AcbFieldElem
 
-parent_type(::Type{acb}) = AcbField
+parent_type(::Type{AcbFieldElem}) = AcbField
 
 base_ring(R::AcbField) = Union{}
 
-base_ring(a::acb) = Union{}
+base_ring(a::AcbFieldElem) = Union{}
 
-parent(x::acb) = x.parent
+parent(x::AcbFieldElem) = x.parent
 
-is_domain_type(::Type{acb}) = true
+is_domain_type(::Type{AcbFieldElem}) = true
 
-is_exact_type(::Type{acb}) = false
+is_exact_type(::Type{AcbFieldElem}) = false
 
 function zero(r::AcbField)
-  z = acb()
+  z = AcbFieldElem()
   z.parent = r
   return z
 end
 
 function one(r::AcbField)
-  z = acb()
-  ccall((:acb_one, libarb), Nothing, (Ref{acb}, ), z)
+  z = AcbFieldElem()
+  ccall((:acb_one, libarb), Nothing, (Ref{AcbFieldElem}, ), z)
   z.parent = r
   return z
 end
@@ -46,38 +46,38 @@ end
 Return exact one times $i$ in the given Arb complex field.
 """
 function onei(r::AcbField)
-  z = acb()
-  ccall((:acb_onei, libarb), Nothing, (Ref{acb}, ), z)
+  z = AcbFieldElem()
+  ccall((:acb_onei, libarb), Nothing, (Ref{AcbFieldElem}, ), z)
   z.parent = r
   return z
 end
 
 @doc raw"""
-    accuracy_bits(x::acb)
+    accuracy_bits(x::AcbFieldElem)
 
 Return the relative accuracy of $x$ measured in bits, capped between
 `typemax(Int)` and `-typemax(Int)`.
 """
-function accuracy_bits(x::acb)
-  # bug in acb.h: rel_accuracy_bits is not in the library
-  return -ccall((:acb_rel_error_bits, libarb), Int, (Ref{acb},), x)
+function accuracy_bits(x::AcbFieldElem)
+  # bug in AcbFieldElem.h: rel_accuracy_bits is not in the library
+  return -ccall((:acb_rel_error_bits, libarb), Int, (Ref{AcbFieldElem},), x)
 end
 
-function deepcopy_internal(a::acb, dict::IdDict)
+function deepcopy_internal(a::AcbFieldElem, dict::IdDict)
   b = parent(a)()
-  ccall((:acb_set, libarb), Nothing, (Ref{acb}, Ref{acb}), b, a)
+  ccall((:acb_set, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), b, a)
   return b
 end
 
-function canonical_unit(x::acb)
+function canonical_unit(x::AcbFieldElem)
    return x
 end
 
 # TODO: implement hash
 
-function check_parent(a::acb, b::acb)
+function check_parent(a::AcbFieldElem, b::AcbFieldElem)
    parent(a) != parent(b) &&
-             error("Incompatible acb elements")
+             error("Incompatible AcbFieldElem elements")
 end
 
 characteristic(::AcbField) = 0
@@ -88,10 +88,10 @@ characteristic(::AcbField) = 0
 #
 ################################################################################
 
-function convert(::Type{ComplexF64}, x::acb)
+function convert(::Type{ComplexF64}, x::AcbFieldElem)
     GC.@preserve x begin
-      re = ccall((:acb_real_ptr, libarb), Ptr{arb_struct}, (Ref{acb}, ), x)
-      im = ccall((:acb_imag_ptr, libarb), Ptr{arb_struct}, (Ref{acb}, ), x)
+      re = ccall((:acb_real_ptr, libarb), Ptr{arb_struct}, (Ref{AcbFieldElem}, ), x)
+      im = ccall((:acb_imag_ptr, libarb), Ptr{arb_struct}, (Ref{AcbFieldElem}, ), x)
       t = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ptr{ArbFieldElem}, ), re)
       u = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ptr{ArbFieldElem}, ), im)
       # 4 == round to nearest
@@ -107,16 +107,16 @@ end
 #
 ################################################################################
 
-function real(x::acb)
+function real(x::AcbFieldElem)
   z = ArbFieldElem()
-  ccall((:acb_get_real, libarb), Nothing, (Ref{ArbFieldElem}, Ref{acb}), z, x)
+  ccall((:acb_get_real, libarb), Nothing, (Ref{ArbFieldElem}, Ref{AcbFieldElem}), z, x)
   z.parent = ArbField(parent(x).prec)
   return z
 end
 
-function imag(x::acb)
+function imag(x::AcbFieldElem)
   z = ArbFieldElem()
-  ccall((:acb_get_imag, libarb), Nothing, (Ref{ArbFieldElem}, Ref{acb}), z, x)
+  ccall((:acb_get_imag, libarb), Nothing, (Ref{ArbFieldElem}, Ref{AcbFieldElem}), z, x)
   z.parent = ArbField(parent(x).prec)
   return z
 end
@@ -127,7 +127,7 @@ end
 #
 ################################################################################
 
-function expressify(z::acb; context = nothing)
+function expressify(z::AcbFieldElem; context = nothing)
    x = real(z)
    y = imag(z)
    if iszero(y) # is exact zero!
@@ -143,11 +143,11 @@ function expressify(z::acb; context = nothing)
    end
 end
 
-function Base.show(io::IO, ::MIME"text/plain", z::acb)
+function Base.show(io::IO, ::MIME"text/plain", z::AcbFieldElem)
    print(io, AbstractAlgebra.obj_to_string(z, context = io))
 end
 
-function Base.show(io::IO, z::acb)
+function Base.show(io::IO, z::AcbFieldElem)
    print(io, AbstractAlgebra.obj_to_string(z, context = io))
 end
 
@@ -163,9 +163,9 @@ end
 #
 ################################################################################
 
-function -(x::acb)
+function -(x::AcbFieldElem)
   z = parent(x)()
-  ccall((:acb_neg, libarb), Nothing, (Ref{acb}, Ref{acb}), z, x)
+  ccall((:acb_neg, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), z, x)
   return z
 end
 
@@ -175,13 +175,13 @@ end
 #
 ################################################################################
 
-# acb - acb
+# AcbFieldElem - AcbFieldElem
 
 for (s,f) in ((:+,"acb_add"), (:*,"acb_mul"), (://, "acb_div"), (:-,"acb_sub"), (:^,"acb_pow"))
   @eval begin
-    function ($s)(x::acb, y::acb)
+    function ($s)(x::AcbFieldElem, y::AcbFieldElem)
       z = parent(x)()
-      ccall(($f, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{acb}, Int),
+      ccall(($f, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int),
                            z, x, y, parent(x).prec)
       return z
     end
@@ -191,33 +191,33 @@ end
 for (f,s) in ((:+, "add"), (:-, "sub"), (:*, "mul"), (://, "div"), (:^, "pow"))
   @eval begin
 
-    function ($f)(x::acb, y::UInt)
+    function ($f)(x::AcbFieldElem, y::UInt)
       z = parent(x)()
       ccall(($("acb_"*s*"_ui"), libarb), Nothing,
-                  (Ref{acb}, Ref{acb}, UInt, Int),
+                  (Ref{AcbFieldElem}, Ref{AcbFieldElem}, UInt, Int),
                   z, x, y, parent(x).prec)
       return z
     end
 
-    function ($f)(x::acb, y::Int)
+    function ($f)(x::AcbFieldElem, y::Int)
       z = parent(x)()
       ccall(($("acb_"*s*"_si"), libarb), Nothing,
-      (Ref{acb}, Ref{acb}, Int, Int), z, x, y, parent(x).prec)
+      (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int), z, x, y, parent(x).prec)
       return z
     end
 
-    function ($f)(x::acb, y::ZZRingElem)
+    function ($f)(x::AcbFieldElem, y::ZZRingElem)
       z = parent(x)()
       ccall(($("acb_"*s*"_fmpz"), libarb), Nothing,
-                  (Ref{acb}, Ref{acb}, Ref{ZZRingElem}, Int),
+                  (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ZZRingElem}, Int),
                   z, x, y, parent(x).prec)
       return z
     end
 
-    function ($f)(x::acb, y::ArbFieldElem)
+    function ($f)(x::AcbFieldElem, y::ArbFieldElem)
       z = parent(x)()
       ccall(($("acb_"*s*"_arb"), libarb), Nothing,
-                  (Ref{acb}, Ref{acb}, Ref{ArbFieldElem}, Int),
+                  (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ArbFieldElem}, Int),
                   z, x, y, parent(x).prec)
       return z
     end
@@ -225,149 +225,149 @@ for (f,s) in ((:+, "add"), (:-, "sub"), (:*, "mul"), (://, "div"), (:^, "pow"))
 end
 
 
-+(x::UInt,y::acb) = +(y,x)
-+(x::Int,y::acb) = +(y,x)
-+(x::ZZRingElem,y::acb) = +(y,x)
-+(x::ArbFieldElem,y::acb) = +(y,x)
++(x::UInt,y::AcbFieldElem) = +(y,x)
++(x::Int,y::AcbFieldElem) = +(y,x)
++(x::ZZRingElem,y::AcbFieldElem) = +(y,x)
++(x::ArbFieldElem,y::AcbFieldElem) = +(y,x)
 
-*(x::UInt,y::acb) = *(y,x)
-*(x::Int,y::acb) = *(y,x)
-*(x::ZZRingElem,y::acb) = *(y,x)
-*(x::ArbFieldElem,y::acb) = *(y,x)
+*(x::UInt,y::AcbFieldElem) = *(y,x)
+*(x::Int,y::AcbFieldElem) = *(y,x)
+*(x::ZZRingElem,y::AcbFieldElem) = *(y,x)
+*(x::ArbFieldElem,y::AcbFieldElem) = *(y,x)
 
-//(x::UInt,y::acb) = (x == 1) ? inv(y) : parent(y)(x) // y
-//(x::Int,y::acb) = (x == 1) ? inv(y) : parent(y)(x) // y
-//(x::ZZRingElem,y::acb) = isone(x) ? inv(y) : parent(y)(x) // y
-//(x::ArbFieldElem,y::acb) = isone(x) ? inv(y) : parent(y)(x) // y
+//(x::UInt,y::AcbFieldElem) = (x == 1) ? inv(y) : parent(y)(x) // y
+//(x::Int,y::AcbFieldElem) = (x == 1) ? inv(y) : parent(y)(x) // y
+//(x::ZZRingElem,y::AcbFieldElem) = isone(x) ? inv(y) : parent(y)(x) // y
+//(x::ArbFieldElem,y::AcbFieldElem) = isone(x) ? inv(y) : parent(y)(x) // y
 
-^(x::UInt,y::acb) = parent(y)(x) ^ y
-^(x::Int,y::acb) = parent(y)(x) ^ y
-^(x::ZZRingElem,y::acb) = parent(y)(x) ^ y
-^(x::ArbFieldElem,y::acb) = parent(y)(x) ^ y
-^(x::Integer, y::acb) = ZZRingElem(x)^y
+^(x::UInt,y::AcbFieldElem) = parent(y)(x) ^ y
+^(x::Int,y::AcbFieldElem) = parent(y)(x) ^ y
+^(x::ZZRingElem,y::AcbFieldElem) = parent(y)(x) ^ y
+^(x::ArbFieldElem,y::AcbFieldElem) = parent(y)(x) ^ y
+^(x::Integer, y::AcbFieldElem) = ZZRingElem(x)^y
 
-function -(x::UInt, y::acb)
+function -(x::UInt, y::AcbFieldElem)
   z = parent(y)()
-  ccall((:acb_sub_ui, libarb), Nothing, (Ref{acb}, Ref{acb}, UInt, Int), z, y, x, parent(y).prec)
-  ccall((:acb_neg, libarb), Nothing, (Ref{acb}, Ref{acb}), z, z)
+  ccall((:acb_sub_ui, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, UInt, Int), z, y, x, parent(y).prec)
+  ccall((:acb_neg, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), z, z)
   return z
 end
 
-function -(x::Int, y::acb)
+function -(x::Int, y::AcbFieldElem)
   z = parent(y)()
-  ccall((:acb_sub_si, libarb), Nothing, (Ref{acb}, Ref{acb}, Int, Int), z, y, x, parent(y).prec)
-  ccall((:acb_neg, libarb), Nothing, (Ref{acb}, Ref{acb}), z, z)
+  ccall((:acb_sub_si, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int), z, y, x, parent(y).prec)
+  ccall((:acb_neg, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), z, z)
   return z
 end
 
-function -(x::ZZRingElem, y::acb)
+function -(x::ZZRingElem, y::AcbFieldElem)
   z = parent(y)()
-  ccall((:acb_sub_fmpz, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{ZZRingElem}, Int), z, y, x, parent(y).prec)
-  ccall((:acb_neg, libarb), Nothing, (Ref{acb}, Ref{acb}), z, z)
+  ccall((:acb_sub_fmpz, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ZZRingElem}, Int), z, y, x, parent(y).prec)
+  ccall((:acb_neg, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), z, z)
   return z
 end
 
-function -(x::ArbFieldElem, y::acb)
+function -(x::ArbFieldElem, y::AcbFieldElem)
   z = parent(y)()
-  ccall((:acb_sub_arb, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{ArbFieldElem}, Int), z, y, x, parent(y).prec)
-  ccall((:acb_neg, libarb), Nothing, (Ref{acb}, Ref{acb}), z, z)
+  ccall((:acb_sub_arb, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ArbFieldElem}, Int), z, y, x, parent(y).prec)
+  ccall((:acb_neg, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), z, z)
   return z
 end
 
-+(x::acb, y::Integer) = x + ZZRingElem(y)
++(x::AcbFieldElem, y::Integer) = x + ZZRingElem(y)
 
--(x::acb, y::Integer) = x - ZZRingElem(y)
+-(x::AcbFieldElem, y::Integer) = x - ZZRingElem(y)
 
-*(x::acb, y::Integer) = x*ZZRingElem(y)
+*(x::AcbFieldElem, y::Integer) = x*ZZRingElem(y)
 
-//(x::acb, y::Integer) = x//ZZRingElem(y)
+//(x::AcbFieldElem, y::Integer) = x//ZZRingElem(y)
 
-+(x::Integer, y::acb) = ZZRingElem(x) + y
++(x::Integer, y::AcbFieldElem) = ZZRingElem(x) + y
 
--(x::Integer, y::acb) = ZZRingElem(x) - y
+-(x::Integer, y::AcbFieldElem) = ZZRingElem(x) - y
 
-*(x::Integer, y::acb) = ZZRingElem(x)*y
+*(x::Integer, y::AcbFieldElem) = ZZRingElem(x)*y
 
-//(x::Integer, y::acb) = ZZRingElem(x)//y
+//(x::Integer, y::AcbFieldElem) = ZZRingElem(x)//y
 
-^(x::acb, y::Integer) = x ^ parent(x)(y)
+^(x::AcbFieldElem, y::Integer) = x ^ parent(x)(y)
 
-+(x::acb, y::QQFieldElem) = x + parent(x)(y)
--(x::acb, y::QQFieldElem) = x - parent(x)(y)
-*(x::acb, y::QQFieldElem) = x * parent(x)(y)
-//(x::acb, y::QQFieldElem) = x // parent(x)(y)
-^(x::acb, y::QQFieldElem) = x ^ parent(x)(y)
++(x::AcbFieldElem, y::QQFieldElem) = x + parent(x)(y)
+-(x::AcbFieldElem, y::QQFieldElem) = x - parent(x)(y)
+*(x::AcbFieldElem, y::QQFieldElem) = x * parent(x)(y)
+//(x::AcbFieldElem, y::QQFieldElem) = x // parent(x)(y)
+^(x::AcbFieldElem, y::QQFieldElem) = x ^ parent(x)(y)
 
-+(x::QQFieldElem, y::acb) = parent(y)(x) + y
--(x::QQFieldElem, y::acb) = parent(y)(x) - y
-*(x::QQFieldElem, y::acb) = parent(y)(x) * y
-//(x::QQFieldElem, y::acb) = parent(y)(x) // y
-^(x::QQFieldElem, y::acb) = parent(y)(x) ^ y
++(x::QQFieldElem, y::AcbFieldElem) = parent(y)(x) + y
+-(x::QQFieldElem, y::AcbFieldElem) = parent(y)(x) - y
+*(x::QQFieldElem, y::AcbFieldElem) = parent(y)(x) * y
+//(x::QQFieldElem, y::AcbFieldElem) = parent(y)(x) // y
+^(x::QQFieldElem, y::AcbFieldElem) = parent(y)(x) ^ y
 
-divexact(x::acb, y::acb; check::Bool=true) = x // y
-divexact(x::ZZRingElem, y::acb; check::Bool=true) = x // y
-divexact(x::acb, y::ZZRingElem; check::Bool=true) = x // y
-divexact(x::Int, y::acb; check::Bool=true) = x // y
-divexact(x::acb, y::Int; check::Bool=true) = x // y
-divexact(x::UInt, y::acb; check::Bool=true) = x // y
-divexact(x::acb, y::UInt; check::Bool=true) = x // y
-divexact(x::QQFieldElem, y::acb; check::Bool=true) = x // y
-divexact(x::acb, y::QQFieldElem; check::Bool=true) = x // y
-divexact(x::ArbFieldElem, y::acb; check::Bool=true) = x // y
-divexact(x::acb, y::ArbFieldElem; check::Bool=true) = x // y
-divexact(x::Float64, y::acb; check::Bool=true) = x // y
-divexact(x::acb, y::Float64; check::Bool=true) = x // y
-divexact(x::BigFloat, y::acb; check::Bool=true) = x // y
-divexact(x::acb, y::BigFloat; check::Bool=true) = x // y
-divexact(x::Integer, y::acb; check::Bool=true) = x // y
-divexact(x::acb, y::Integer; check::Bool=true) = x // y
-divexact(x::Rational{T}, y::acb; check::Bool=true) where {T <: Integer} = x // y
-divexact(x::acb, y::Rational{T}; check::Bool=true) where {T <: Integer} = x // y
+divexact(x::AcbFieldElem, y::AcbFieldElem; check::Bool=true) = x // y
+divexact(x::ZZRingElem, y::AcbFieldElem; check::Bool=true) = x // y
+divexact(x::AcbFieldElem, y::ZZRingElem; check::Bool=true) = x // y
+divexact(x::Int, y::AcbFieldElem; check::Bool=true) = x // y
+divexact(x::AcbFieldElem, y::Int; check::Bool=true) = x // y
+divexact(x::UInt, y::AcbFieldElem; check::Bool=true) = x // y
+divexact(x::AcbFieldElem, y::UInt; check::Bool=true) = x // y
+divexact(x::QQFieldElem, y::AcbFieldElem; check::Bool=true) = x // y
+divexact(x::AcbFieldElem, y::QQFieldElem; check::Bool=true) = x // y
+divexact(x::ArbFieldElem, y::AcbFieldElem; check::Bool=true) = x // y
+divexact(x::AcbFieldElem, y::ArbFieldElem; check::Bool=true) = x // y
+divexact(x::Float64, y::AcbFieldElem; check::Bool=true) = x // y
+divexact(x::AcbFieldElem, y::Float64; check::Bool=true) = x // y
+divexact(x::BigFloat, y::AcbFieldElem; check::Bool=true) = x // y
+divexact(x::AcbFieldElem, y::BigFloat; check::Bool=true) = x // y
+divexact(x::Integer, y::AcbFieldElem; check::Bool=true) = x // y
+divexact(x::AcbFieldElem, y::Integer; check::Bool=true) = x // y
+divexact(x::Rational{T}, y::AcbFieldElem; check::Bool=true) where {T <: Integer} = x // y
+divexact(x::AcbFieldElem, y::Rational{T}; check::Bool=true) where {T <: Integer} = x // y
 
-/(x::acb, y::acb) = x // y
-/(x::ZZRingElem, y::acb) = x // y
-/(x::acb, y::ZZRingElem) = x // y
-/(x::Int, y::acb) = x // y
-/(x::acb, y::Int) = x // y
-/(x::UInt, y::acb) = x // y
-/(x::acb, y::UInt) = x // y
-/(x::QQFieldElem, y::acb) = x // y
-/(x::acb, y::QQFieldElem) = x // y
-/(x::ArbFieldElem, y::acb) = x // y
-/(x::acb, y::ArbFieldElem) = x // y
+/(x::AcbFieldElem, y::AcbFieldElem) = x // y
+/(x::ZZRingElem, y::AcbFieldElem) = x // y
+/(x::AcbFieldElem, y::ZZRingElem) = x // y
+/(x::Int, y::AcbFieldElem) = x // y
+/(x::AcbFieldElem, y::Int) = x // y
+/(x::UInt, y::AcbFieldElem) = x // y
+/(x::AcbFieldElem, y::UInt) = x // y
+/(x::QQFieldElem, y::AcbFieldElem) = x // y
+/(x::AcbFieldElem, y::QQFieldElem) = x // y
+/(x::ArbFieldElem, y::AcbFieldElem) = x // y
+/(x::AcbFieldElem, y::ArbFieldElem) = x // y
 
-+(x::Rational{T}, y::acb) where {T <: Integer} = QQFieldElem(x) + y
-+(x::acb, y::Rational{T}) where {T <: Integer} = x + QQFieldElem(y)
--(x::Rational{T}, y::acb) where {T <: Integer} = QQFieldElem(x) - y
--(x::acb, y::Rational{T}) where {T <: Integer} = x - QQFieldElem(y)
-*(x::Rational{T}, y::acb) where {T <: Integer} = QQFieldElem(x) * y
-*(x::acb, y::Rational{T}) where {T <: Integer} = x * QQFieldElem(y)
-//(x::Rational{T}, y::acb) where {T <: Integer} = QQFieldElem(x) // y
-//(x::acb, y::Rational{T}) where {T <: Integer} = x // QQFieldElem(y)
-^(x::Rational{T}, y::acb) where {T <: Integer} = QQFieldElem(x)^y
-^(x::acb, y::Rational{T}) where {T <: Integer} = x ^ QQFieldElem(y)
++(x::Rational{T}, y::AcbFieldElem) where {T <: Integer} = QQFieldElem(x) + y
++(x::AcbFieldElem, y::Rational{T}) where {T <: Integer} = x + QQFieldElem(y)
+-(x::Rational{T}, y::AcbFieldElem) where {T <: Integer} = QQFieldElem(x) - y
+-(x::AcbFieldElem, y::Rational{T}) where {T <: Integer} = x - QQFieldElem(y)
+*(x::Rational{T}, y::AcbFieldElem) where {T <: Integer} = QQFieldElem(x) * y
+*(x::AcbFieldElem, y::Rational{T}) where {T <: Integer} = x * QQFieldElem(y)
+//(x::Rational{T}, y::AcbFieldElem) where {T <: Integer} = QQFieldElem(x) // y
+//(x::AcbFieldElem, y::Rational{T}) where {T <: Integer} = x // QQFieldElem(y)
+^(x::Rational{T}, y::AcbFieldElem) where {T <: Integer} = QQFieldElem(x)^y
+^(x::AcbFieldElem, y::Rational{T}) where {T <: Integer} = x ^ QQFieldElem(y)
 
-+(x::Float64, y::acb) = parent(y)(x) + y
-+(x::acb, y::Float64) = x + parent(x)(y)
--(x::Float64, y::acb) = parent(y)(x) - y
--(x::acb, y::Float64) = x - parent(x)(y)
-*(x::Float64, y::acb) = parent(y)(x) * y
-*(x::acb, y::Float64) = x * parent(x)(y)
-//(x::Float64, y::acb) = parent(y)(x) // y
-//(x::acb, y::Float64) = x // parent(x)(y)
-^(x::Float64, y::acb) = parent(y)(x)^y
-^(x::acb, y::Float64) = x ^ parent(x)(y)
++(x::Float64, y::AcbFieldElem) = parent(y)(x) + y
++(x::AcbFieldElem, y::Float64) = x + parent(x)(y)
+-(x::Float64, y::AcbFieldElem) = parent(y)(x) - y
+-(x::AcbFieldElem, y::Float64) = x - parent(x)(y)
+*(x::Float64, y::AcbFieldElem) = parent(y)(x) * y
+*(x::AcbFieldElem, y::Float64) = x * parent(x)(y)
+//(x::Float64, y::AcbFieldElem) = parent(y)(x) // y
+//(x::AcbFieldElem, y::Float64) = x // parent(x)(y)
+^(x::Float64, y::AcbFieldElem) = parent(y)(x)^y
+^(x::AcbFieldElem, y::Float64) = x ^ parent(x)(y)
 
-+(x::BigFloat, y::acb) = parent(y)(x) + y
-+(x::acb, y::BigFloat) = x + parent(x)(y)
--(x::BigFloat, y::acb) = parent(y)(x) - y
--(x::acb, y::BigFloat) = x - parent(x)(y)
-*(x::BigFloat, y::acb) = parent(y)(x) * y
-*(x::acb, y::BigFloat) = x * parent(x)(y)
-//(x::BigFloat, y::acb) = parent(y)(x) // y
-//(x::acb, y::BigFloat) = x // parent(x)(y)
-^(x::BigFloat, y::acb) = parent(y)(x)^y
-^(x::acb, y::BigFloat) = x ^ parent(x)(y)
++(x::BigFloat, y::AcbFieldElem) = parent(y)(x) + y
++(x::AcbFieldElem, y::BigFloat) = x + parent(x)(y)
+-(x::BigFloat, y::AcbFieldElem) = parent(y)(x) - y
+-(x::AcbFieldElem, y::BigFloat) = x - parent(x)(y)
+*(x::BigFloat, y::AcbFieldElem) = parent(y)(x) * y
+*(x::AcbFieldElem, y::BigFloat) = x * parent(x)(y)
+//(x::BigFloat, y::AcbFieldElem) = parent(y)(x) // y
+//(x::AcbFieldElem, y::BigFloat) = x // parent(x)(y)
+^(x::BigFloat, y::AcbFieldElem) = parent(y)(x)^y
+^(x::AcbFieldElem, y::BigFloat) = x ^ parent(x)(y)
 
 ################################################################################
 #
@@ -376,52 +376,52 @@ divexact(x::acb, y::Rational{T}; check::Bool=true) where {T <: Integer} = x // y
 ################################################################################
 
 @doc raw"""
-    isequal(x::acb, y::acb)
+    isequal(x::AcbFieldElem, y::AcbFieldElem)
 
 Return `true` if the boxes $x$ and $y$ are precisely equal, i.e. their real
 and imaginary parts have the same midpoints and radii.
 """
-function isequal(x::acb, y::acb)
-  r = ccall((:acb_equal, libarb), Cint, (Ref{acb}, Ref{acb}), x, y)
+function isequal(x::AcbFieldElem, y::AcbFieldElem)
+  r = ccall((:acb_equal, libarb), Cint, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), x, y)
   return Bool(r)
 end
 
-function ==(x::acb, y::acb)
-  r = ccall((:acb_eq, libarb), Cint, (Ref{acb}, Ref{acb}), x, y)
+function ==(x::AcbFieldElem, y::AcbFieldElem)
+  r = ccall((:acb_eq, libarb), Cint, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), x, y)
   return Bool(r)
 end
 
-function !=(x::acb, y::acb)
-  r = ccall((:acb_ne, libarb), Cint, (Ref{acb}, Ref{acb}), x, y)
+function !=(x::AcbFieldElem, y::AcbFieldElem)
+  r = ccall((:acb_ne, libarb), Cint, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), x, y)
   return Bool(r)
 end
 
-==(x::acb,y::Int) = (x == parent(x)(y))
-==(x::Int,y::acb) = (y == parent(y)(x))
+==(x::AcbFieldElem,y::Int) = (x == parent(x)(y))
+==(x::Int,y::AcbFieldElem) = (y == parent(y)(x))
 
-==(x::acb,y::ArbFieldElem) = (x == parent(x)(y))
-==(x::ArbFieldElem,y::acb) = (y == parent(y)(x))
+==(x::AcbFieldElem,y::ArbFieldElem) = (x == parent(x)(y))
+==(x::ArbFieldElem,y::AcbFieldElem) = (y == parent(y)(x))
 
-==(x::acb,y::ZZRingElem) = (x == parent(x)(y))
-==(x::ZZRingElem,y::acb) = (y == parent(y)(x))
+==(x::AcbFieldElem,y::ZZRingElem) = (x == parent(x)(y))
+==(x::ZZRingElem,y::AcbFieldElem) = (y == parent(y)(x))
 
-==(x::acb,y::Integer) = x == ZZRingElem(y)
-==(x::Integer,y::acb) = ZZRingElem(x) == y
+==(x::AcbFieldElem,y::Integer) = x == ZZRingElem(y)
+==(x::Integer,y::AcbFieldElem) = ZZRingElem(x) == y
 
-==(x::acb,y::Float64) = (x == parent(x)(y))
-==(x::Float64,y::acb) = (y == parent(y)(x))
+==(x::AcbFieldElem,y::Float64) = (x == parent(x)(y))
+==(x::Float64,y::AcbFieldElem) = (y == parent(y)(x))
 
-!=(x::acb,y::Int) = (x != parent(x)(y))
-!=(x::Int,y::acb) = (y != parent(y)(x))
+!=(x::AcbFieldElem,y::Int) = (x != parent(x)(y))
+!=(x::Int,y::AcbFieldElem) = (y != parent(y)(x))
 
-!=(x::acb,y::ArbFieldElem) = (x != parent(x)(y))
-!=(x::ArbFieldElem,y::acb) = (y != parent(y)(x))
+!=(x::AcbFieldElem,y::ArbFieldElem) = (x != parent(x)(y))
+!=(x::ArbFieldElem,y::AcbFieldElem) = (y != parent(y)(x))
 
-!=(x::acb,y::ZZRingElem) = (x != parent(x)(y))
-!=(x::ZZRingElem,y::acb) = (y != parent(y)(x))
+!=(x::AcbFieldElem,y::ZZRingElem) = (x != parent(x)(y))
+!=(x::ZZRingElem,y::AcbFieldElem) = (y != parent(y)(x))
 
-!=(x::acb,y::Float64) = (x != parent(x)(y))
-!=(x::Float64,y::acb) = (y != parent(y)(x))
+!=(x::AcbFieldElem,y::Float64) = (x != parent(x)(y))
+!=(x::Float64,y::AcbFieldElem) = (y != parent(y)(x))
 
 ################################################################################
 #
@@ -430,78 +430,78 @@ end
 ################################################################################
 
 @doc raw"""
-    overlaps(x::acb, y::acb)
+    overlaps(x::AcbFieldElem, y::AcbFieldElem)
 
 Returns `true` if any part of the box $x$ overlaps any part of the box $y$,
 otherwise return `false`.
 """
-function overlaps(x::acb, y::acb)
-  r = ccall((:acb_overlaps, libarb), Cint, (Ref{acb}, Ref{acb}), x, y)
+function overlaps(x::AcbFieldElem, y::AcbFieldElem)
+  r = ccall((:acb_overlaps, libarb), Cint, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), x, y)
   return Bool(r)
 end
 
 @doc raw"""
-    contains(x::acb, y::acb)
+    contains(x::AcbFieldElem, y::AcbFieldElem)
 
 Returns `true` if the box $x$ contains the box $y$, otherwise return
 `false`.
 """
-function contains(x::acb, y::acb)
-  r = ccall((:acb_contains, libarb), Cint, (Ref{acb}, Ref{acb}), x, y)
+function contains(x::AcbFieldElem, y::AcbFieldElem)
+  r = ccall((:acb_contains, libarb), Cint, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), x, y)
   return Bool(r)
 end
 
 @doc raw"""
-    contains(x::acb, y::QQFieldElem)
+    contains(x::AcbFieldElem, y::QQFieldElem)
 
 Returns `true` if the box $x$ contains the given rational value, otherwise
 return `false`.
 """
-function contains(x::acb, y::QQFieldElem)
-  r = ccall((:acb_contains_fmpq, libarb), Cint, (Ref{acb}, Ref{QQFieldElem}), x, y)
+function contains(x::AcbFieldElem, y::QQFieldElem)
+  r = ccall((:acb_contains_fmpq, libarb), Cint, (Ref{AcbFieldElem}, Ref{QQFieldElem}), x, y)
   return Bool(r)
 end
 
 @doc raw"""
-    contains(x::acb, y::ZZRingElem)
+    contains(x::AcbFieldElem, y::ZZRingElem)
 
 Returns `true` if the box $x$ contains the given integer value, otherwise
 return `false`.
 """
-function contains(x::acb, y::ZZRingElem)
-  r = ccall((:acb_contains_fmpz, libarb), Cint, (Ref{acb}, Ref{ZZRingElem}), x, y)
+function contains(x::AcbFieldElem, y::ZZRingElem)
+  r = ccall((:acb_contains_fmpz, libarb), Cint, (Ref{AcbFieldElem}, Ref{ZZRingElem}), x, y)
   return Bool(r)
 end
 
-function contains(x::acb, y::Int)
+function contains(x::AcbFieldElem, y::Int)
   v = ZZRingElem(y)
-  r = ccall((:acb_contains_fmpz, libarb), Cint, (Ref{acb}, Ref{ZZRingElem}), x, v)
+  r = ccall((:acb_contains_fmpz, libarb), Cint, (Ref{AcbFieldElem}, Ref{ZZRingElem}), x, v)
   return Bool(r)
 end
 
 @doc raw"""
-    contains(x::acb, y::Integer)
+    contains(x::AcbFieldElem, y::Integer)
 
 Returns `true` if the box $x$ contains the given integer value, otherwise
 return `false`.
 """
-contains(x::acb, y::Integer) = contains(x, ZZRingElem(y))
+contains(x::AcbFieldElem, y::Integer) = contains(x, ZZRingElem(y))
 
 @doc raw"""
-    contains(x::acb, y::Rational{T}) where {T <: Integer}
+    contains(x::AcbFieldElem, y::Rational{T}) where {T <: Integer}
 
 Returns `true` if the box $x$ contains the given rational value, otherwise
 return `false`.
 """
-contains(x::acb, y::Rational{T}) where {T <: Integer} = contains(x, ZZRingElem(y))
+contains(x::AcbFieldElem, y::Rational{T}) where {T <: Integer} = contains(x, ZZRingElem(y))
 
 @doc raw"""
-    contains_zero(x::acb)
+    contains_zero(x::AcbFieldElem)
 
 Returns `true` if the box $x$ contains zero, otherwise return `false`.
 """
-function contains_zero(x::acb)
-   return Bool(ccall((:acb_contains_zero, libarb), Cint, (Ref{acb},), x))
+function contains_zero(x::AcbFieldElem)
+   return Bool(ccall((:acb_contains_zero, libarb), Cint, (Ref{AcbFieldElem},), x))
 end
 
 ################################################################################
@@ -510,62 +510,62 @@ end
 #
 ################################################################################
 
-function is_unit(x::acb)
+function is_unit(x::AcbFieldElem)
    !iszero(x)
 end
 
 @doc raw"""
-    iszero(x::acb)
+    iszero(x::AcbFieldElem)
 
 Return `true` if $x$ is certainly zero, otherwise return `false`.
 """
-function iszero(x::acb)
-   return Bool(ccall((:acb_is_zero, libarb), Cint, (Ref{acb},), x))
+function iszero(x::AcbFieldElem)
+   return Bool(ccall((:acb_is_zero, libarb), Cint, (Ref{AcbFieldElem},), x))
 end
 
 @doc raw"""
-    isone(x::acb)
+    isone(x::AcbFieldElem)
 
 Return `true` if $x$ is certainly one, otherwise return `false`.
 """
-function isone(x::acb)
-   return Bool(ccall((:acb_is_one, libarb), Cint, (Ref{acb},), x))
+function isone(x::AcbFieldElem)
+   return Bool(ccall((:acb_is_one, libarb), Cint, (Ref{AcbFieldElem},), x))
 end
 
 @doc raw"""
-    isfinite(x::acb)
+    isfinite(x::AcbFieldElem)
 
 Return `true` if $x$ is finite, i.e. its real and imaginary parts have finite
 midpoint and radius, otherwise return `false`.
 """
-function isfinite(x::acb)
-   return Bool(ccall((:acb_is_finite, libarb), Cint, (Ref{acb},), x))
+function isfinite(x::AcbFieldElem)
+   return Bool(ccall((:acb_is_finite, libarb), Cint, (Ref{AcbFieldElem},), x))
 end
 
 @doc raw"""
-    is_exact(x::acb)
+    is_exact(x::AcbFieldElem)
 
 Return `true` if $x$ is exact, i.e. has its real and imaginary parts have
 zero radius, otherwise return `false`.
 """
-function is_exact(x::acb)
-   return Bool(ccall((:acb_is_exact, libarb), Cint, (Ref{acb},), x))
+function is_exact(x::AcbFieldElem)
+   return Bool(ccall((:acb_is_exact, libarb), Cint, (Ref{AcbFieldElem},), x))
 end
 
 @doc raw"""
-    isinteger(x::acb)
+    isinteger(x::AcbFieldElem)
 
 Return `true` if $x$ is an exact integer, otherwise return `false`.
 """
-function isinteger(x::acb)
-   return Bool(ccall((:acb_is_int, libarb), Cint, (Ref{acb},), x))
+function isinteger(x::AcbFieldElem)
+   return Bool(ccall((:acb_is_int, libarb), Cint, (Ref{AcbFieldElem},), x))
 end
 
-function isreal(x::acb)
-   return Bool(ccall((:acb_is_real, libarb), Cint, (Ref{acb},), x))
+function isreal(x::AcbFieldElem)
+   return Bool(ccall((:acb_is_real, libarb), Cint, (Ref{AcbFieldElem},), x))
 end
 
-is_negative(x::acb) = isreal(x) && is_negative(real(x))
+is_negative(x::AcbFieldElem) = isreal(x) && is_negative(real(x))
 
 ################################################################################
 #
@@ -573,10 +573,10 @@ is_negative(x::acb) = isreal(x) && is_negative(real(x))
 #
 ################################################################################
 
-function abs(x::acb)
+function abs(x::AcbFieldElem)
   z = ArbFieldElem()
   ccall((:acb_abs, libarb), Nothing,
-                (Ref{ArbFieldElem}, Ref{acb}, Int), z, x, parent(x).prec)
+                (Ref{ArbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
   z.parent = ArbField(parent(x).prec)
   return z
 end
@@ -587,9 +587,9 @@ end
 #
 ################################################################################
 
-function inv(x::acb)
+function inv(x::AcbFieldElem)
   z = parent(x)()
-  ccall((:acb_inv, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+  ccall((:acb_inv, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
   return z
 end
 
@@ -599,7 +599,7 @@ end
 #
 ################################################################################
  
-function sign(::Type{Int}, x::acb)
+function sign(::Type{Int}, x::AcbFieldElem)
   if isreal(x)
     return sign(Int, real(x))
   else
@@ -613,17 +613,17 @@ end
 #
 ################################################################################
 
-function ldexp(x::acb, y::Int)
+function ldexp(x::AcbFieldElem, y::Int)
   z = parent(x)()
   ccall((:acb_mul_2exp_si, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Int), z, x, y)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, y)
   return z
 end
 
-function ldexp(x::acb, y::ZZRingElem)
+function ldexp(x::AcbFieldElem, y::ZZRingElem)
   z = parent(x)()
   ccall((:acb_mul_2exp_fmpz, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{ZZRingElem}), z, x, y)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ZZRingElem}), z, x, y)
   return z
 end
 
@@ -634,42 +634,42 @@ end
 ################################################################################
 
 @doc raw"""
-    trim(x::acb)
+    trim(x::AcbFieldElem)
 
-Return an `acb` box containing $x$ but which may be more economical,
+Return an `AcbFieldElem` box containing $x$ but which may be more economical,
 by rounding off insignificant bits from midpoints.
 """
-function trim(x::acb)
+function trim(x::AcbFieldElem)
   z = parent(x)()
-  ccall((:acb_trim, libarb), Nothing, (Ref{acb}, Ref{acb}), z, x)
+  ccall((:acb_trim, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), z, x)
   return z
 end
 
 @doc raw"""
-    unique_integer(x::acb)
+    unique_integer(x::AcbFieldElem)
 
 Return a pair where the first value is a boolean and the second is an `ZZRingElem`
 integer. The boolean indicates whether the box $x$ contains a unique
 integer. If this is the case, the second return value is set to this unique
 integer.
 """
-function unique_integer(x::acb)
+function unique_integer(x::AcbFieldElem)
   z = ZZRingElem()
   unique = ccall((:acb_get_unique_fmpz, libarb), Int,
-    (Ref{ZZRingElem}, Ref{acb}), z, x)
+    (Ref{ZZRingElem}, Ref{AcbFieldElem}), z, x)
   return (unique != 0, z)
 end
 
-function conj(x::acb)
+function conj(x::AcbFieldElem)
   z = parent(x)()
-  ccall((:acb_conj, libarb), Nothing, (Ref{acb}, Ref{acb}), z, x)
+  ccall((:acb_conj, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), z, x)
   return z
 end
 
-function angle(x::acb)
+function angle(x::AcbFieldElem)
   z = ArbFieldElem()
   ccall((:acb_arg, libarb), Nothing,
-                (Ref{ArbFieldElem}, Ref{acb}, Int), z, x, parent(x).prec)
+                (Ref{ArbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
   z.parent = ArbField(parent(x).prec)
   return z
 end
@@ -687,7 +687,7 @@ Return $\pi = 3.14159\ldots$ as an element of $r$.
 """
 function const_pi(r::AcbField)
   z = r()
-  ccall((:acb_const_pi, libarb), Nothing, (Ref{acb}, Int), z, precision(r))
+  ccall((:acb_const_pi, libarb), Nothing, (Ref{AcbFieldElem}, Int), z, precision(r))
   return z
 end
 
@@ -699,55 +699,55 @@ end
 
 # complex - complex functions
 
-function Base.sqrt(x::acb; check::Bool=true)
+function Base.sqrt(x::AcbFieldElem; check::Bool=true)
    z = parent(x)()
-   ccall((:acb_sqrt, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_sqrt, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    rsqrt(x::acb)
+    rsqrt(x::AcbFieldElem)
 
 Return the reciprocal of the square root of $x$, i.e. $1/\sqrt{x}$.
 """
-function rsqrt(x::acb)
+function rsqrt(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_rsqrt, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_rsqrt, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function log(x::acb)
+function log(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_log, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_log, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function log1p(x::acb)
+function log1p(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_log1p, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_log1p, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function Base.exp(x::acb)
+function Base.exp(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_exp, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_exp, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function Base.expm1(x::acb)
+function Base.expm1(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_expm1, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_expm1, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    cispi(x::acb)
+    cispi(x::AcbFieldElem)
 
 Return the exponential of $\pi i x$.
 """
-function cispi(x::acb)
+function cispi(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_exp_pi_i, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_exp_pi_i, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
@@ -759,364 +759,364 @@ Return $\exp(2\pi i/k)$.
 function root_of_unity(C::AcbField, k::Int)
    k <= 0 && throw(ArgumentError("Order must be positive ($k)"))
    z = C()
-   ccall((:acb_unit_root, libarb), Nothing, (Ref{acb}, UInt, Int), z, k, C.prec)
+   ccall((:acb_unit_root, libarb), Nothing, (Ref{AcbFieldElem}, UInt, Int), z, k, C.prec)
    return z
 end
 
-function sin(x::acb)
+function sin(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_sin, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_sin, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function cos(x::acb)
+function cos(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_cos, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_cos, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function tan(x::acb)
+function tan(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_tan, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_tan, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function cot(x::acb)
+function cot(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_cot, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_cot, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function sinpi(x::acb)
+function sinpi(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_sin_pi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_sin_pi, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function cospi(x::acb)
+function cospi(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_cos_pi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_cos_pi, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function tanpi(x::acb)
+function tanpi(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_tan_pi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_tan_pi, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function cotpi(x::acb)
+function cotpi(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_cot_pi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_cot_pi, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function sinh(x::acb)
+function sinh(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_sinh, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_sinh, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function cosh(x::acb)
+function cosh(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_cosh, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_cosh, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function tanh(x::acb)
+function tanh(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_tanh, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_tanh, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function coth(x::acb)
+function coth(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_coth, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_coth, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function atan(x::acb)
+function atan(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_atan, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_atan, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    log_sinpi(x::acb)
+    log_sinpi(x::AcbFieldElem)
 
 Return $\log\sin(\pi x)$, constructed without branch cuts off the real line.
 """
-function log_sinpi(x::acb)
+function log_sinpi(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_log_sin_pi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_log_sin_pi, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    gamma(x::acb)
+    gamma(x::AcbFieldElem)
 
 Return the Gamma function evaluated at $x$.
 """
-function gamma(x::acb)
+function gamma(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_gamma, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_gamma, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    rgamma(x::acb)
+    rgamma(x::AcbFieldElem)
 
 Return the reciprocal of the Gamma function evaluated at $x$.
 """
-function rgamma(x::acb)
+function rgamma(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_rgamma, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_rgamma, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    lgamma(x::acb)
+    lgamma(x::AcbFieldElem)
 
 Return the logarithm of the Gamma function evaluated at $x$.
 """
-function lgamma(x::acb)
+function lgamma(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_lgamma, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_lgamma, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    digamma(x::acb)
+    digamma(x::AcbFieldElem)
 
 Return the  logarithmic derivative of the gamma function evaluated at $x$,
 i.e. $\psi(x)$.
 """
-function digamma(x::acb)
+function digamma(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_digamma, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_digamma, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    zeta(x::acb)
+    zeta(x::AcbFieldElem)
 
 Return the Riemann zeta function evaluated at $x$.
 """
-function zeta(x::acb)
+function zeta(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_zeta, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_zeta, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    barnes_g(x::acb)
+    barnes_g(x::AcbFieldElem)
 
 Return the Barnes $G$-function, evaluated at $x$.
 """
-function barnes_g(x::acb)
+function barnes_g(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_barnes_g, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_barnes_g, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    log_barnes_g(x::acb)
+    log_barnes_g(x::AcbFieldElem)
 
 Return the logarithm of the Barnes $G$-function, evaluated at $x$.
 """
-function log_barnes_g(x::acb)
+function log_barnes_g(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_log_barnes_g, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_log_barnes_g, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    agm(x::acb)
+    agm(x::AcbFieldElem)
 
 Return the arithmetic-geometric mean of $1$ and $x$.
 """
-function agm(x::acb)
+function agm(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_agm1, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_agm1, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    erf(x::acb)
+    erf(x::AcbFieldElem)
 
 Return the error function evaluated at $x$.
 """
-function erf(x::acb)
+function erf(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_hypgeom_erf, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_hypgeom_erf, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    erfi(x::acb)
+    erfi(x::AcbFieldElem)
 
 Return the imaginary error function evaluated at $x$.
 """
-function erfi(x::acb)
+function erfi(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_hypgeom_erfi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_hypgeom_erfi, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    erfc(x::acb)
+    erfc(x::AcbFieldElem)
 
 Return the complementary error function evaluated at $x$.
 """
-function erfc(x::acb)
+function erfc(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_hypgeom_erfc, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_hypgeom_erfc, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    exp_integral_ei(x::acb)
+    exp_integral_ei(x::AcbFieldElem)
 
 Return the exponential integral evaluated at $x$.
 """
-function exp_integral_ei(x::acb)
+function exp_integral_ei(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_hypgeom_ei, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_hypgeom_ei, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    sin_integral(x::acb)
+    sin_integral(x::AcbFieldElem)
 
 Return the sine integral evaluated at $x$.
 """
-function sin_integral(x::acb)
+function sin_integral(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_hypgeom_si, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_hypgeom_si, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    cos_integral(x::acb)
+    cos_integral(x::AcbFieldElem)
 
 Return the exponential cosine integral evaluated at $x$.
 """
-function cos_integral(x::acb)
+function cos_integral(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_hypgeom_ci, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_hypgeom_ci, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    sinh_integral(x::acb)
+    sinh_integral(x::AcbFieldElem)
 
 Return the hyperbolic sine integral evaluated at $x$.
 """
-function sinh_integral(x::acb)
+function sinh_integral(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_hypgeom_shi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_hypgeom_shi, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    cosh_integral(x::acb)
+    cosh_integral(x::AcbFieldElem)
 
 Return the hyperbolic cosine integral evaluated at $x$.
 """
-function cosh_integral(x::acb)
+function cosh_integral(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_hypgeom_chi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_hypgeom_chi, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    dedekind_eta(x::acb)
+    dedekind_eta(x::AcbFieldElem)
 
 Return the Dedekind eta function $\eta(\tau)$ at $\tau = x$.
 """
-function dedekind_eta(x::acb)
+function dedekind_eta(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_modular_eta, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_modular_eta, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    modular_weber_f(x::acb)
+    modular_weber_f(x::AcbFieldElem)
 
 Return the modular Weber function
 $\mathfrak{f}(\tau) = \frac{\eta^2(\tau)}{\eta(\tau/2)\eta(2\tau)},$
 at $x$ in the complex upper half plane.
 """
-function modular_weber_f(x::acb)
+function modular_weber_f(x::AcbFieldElem)
    x_on_2 = divexact(x, 2)
    x_times_2 = 2*x
    return divexact(dedekind_eta(x)^2, dedekind_eta(x_on_2)*dedekind_eta(x_times_2))
 end
 
 @doc raw"""
-    modular_weber_f1(x::acb)
+    modular_weber_f1(x::AcbFieldElem)
 
 Return the modular Weber function
 $\mathfrak{f}_1(\tau) = \frac{\eta(\tau/2)}{\eta(\tau)},$
 at $x$ in the complex upper half plane.
 """
-function modular_weber_f1(x::acb)
+function modular_weber_f1(x::AcbFieldElem)
    x_on_2 = divexact(x, 2)
    return divexact(dedekind_eta(x_on_2), dedekind_eta(x))
 end
 
 @doc raw"""
-    modular_weber_f2(x::acb)
+    modular_weber_f2(x::AcbFieldElem)
 
 Return the modular Weber function
 $\mathfrak{f}_2(\tau) = \frac{\sqrt{2}\eta(2\tau)}{\eta(\tau)}$
 at $x$ in the complex upper half plane.
 """
-function modular_weber_f2(x::acb)
+function modular_weber_f2(x::AcbFieldElem)
    x_times_2 = x*2
    return divexact(dedekind_eta(x_times_2), dedekind_eta(x))*sqrt(parent(x)(2))
 end
 
 @doc raw"""
-    j_invariant(x::acb)
+    j_invariant(x::AcbFieldElem)
 
 Return the $j$-invariant $j(\tau)$ at $\tau = x$.
 """
-function j_invariant(x::acb)
+function j_invariant(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_modular_j, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_modular_j, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    modular_lambda(x::acb)
+    modular_lambda(x::AcbFieldElem)
 
 Return the modular lambda function $\lambda(\tau)$ at $\tau = x$.
 """
-function modular_lambda(x::acb)
+function modular_lambda(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_modular_lambda, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_modular_lambda, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    modular_delta(x::acb)
+    modular_delta(x::AcbFieldElem)
 
 Return the modular delta function $\Delta(\tau)$ at $\tau = x$.
 """
-function modular_delta(x::acb)
+function modular_delta(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_modular_delta, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_modular_delta, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    eisenstein_g(k::Int, x::acb)
+    eisenstein_g(k::Int, x::AcbFieldElem)
 
 Return the non-normalized Eisenstein series $G_k(\tau)$ of
 $\mathrm{SL}_2(\mathbb{Z})$. Also defined for $\tau = i \infty$.
 """
-function eisenstein_g(k::Int, x::acb)
+function eisenstein_g(k::Int, x::AcbFieldElem)
   CC = parent(x)
 
   k <= 2 && error("Eisenstein series are not absolute convergent for k = $k")
@@ -1127,425 +1127,425 @@ function eisenstein_g(k::Int, x::acb)
   len = div(k, 2) - 1
   vec = acb_vec(len)
   ccall((:acb_modular_eisenstein, libarb), Nothing,
-        (Ptr{acb_struct}, Ref{acb}, Int, Int), vec, x, len, CC.prec)
+        (Ptr{acb_struct}, Ref{AcbFieldElem}, Int, Int), vec, x, len, CC.prec)
   z = array(CC, vec, len)
   acb_vec_clear(vec, len)
   return z[end]
 end
 
 @doc raw"""
-    elliptic_k(x::acb)
+    elliptic_k(x::AcbFieldElem)
 
 Return the complete elliptic integral $K(x)$.
 """
-function elliptic_k(x::acb)
+function elliptic_k(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_modular_elliptic_k, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_modular_elliptic_k, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
 @doc raw"""
-    elliptic_e(x::acb)
+    elliptic_e(x::AcbFieldElem)
 
 Return the complete elliptic integral $E(x)$.
 """
-function elliptic_e(x::acb)
+function elliptic_e(x::AcbFieldElem)
    z = parent(x)()
-   ccall((:acb_modular_elliptic_e, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
+   ccall((:acb_modular_elliptic_e, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
    return z
 end
 
-function sincos(x::acb)
+function sincos(x::AcbFieldElem)
   s = parent(x)()
   c = parent(x)()
   ccall((:acb_sin_cos, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), s, c, x, parent(x).prec)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), s, c, x, parent(x).prec)
   return (s, c)
 end
 
-function sincospi(x::acb)
+function sincospi(x::AcbFieldElem)
   s = parent(x)()
   c = parent(x)()
   ccall((:acb_sin_cos_pi, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), s, c, x, parent(x).prec)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), s, c, x, parent(x).prec)
   return (s, c)
 end
 
 @doc raw"""
-    sinhcosh(x::acb)
+    sinhcosh(x::AcbFieldElem)
 
 Return a tuple $s, c$ consisting of the hyperbolic sine and cosine of $x$.
 """
-function sinhcosh(x::acb)
+function sinhcosh(x::AcbFieldElem)
   s = parent(x)()
   c = parent(x)()
   ccall((:acb_sinh_cosh, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), s, c, x, parent(x).prec)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), s, c, x, parent(x).prec)
   return (s, c)
 end
 
 @doc raw"""
-    zeta(s::acb, a::acb)
+    zeta(s::AcbFieldElem, a::AcbFieldElem)
 
 Return the Hurwitz zeta function $\zeta(s,a)$.
 """
-function zeta(s::acb, a::acb)
+function zeta(s::AcbFieldElem, a::AcbFieldElem)
   z = parent(s)()
   ccall((:acb_hurwitz_zeta, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, s, a, parent(s).prec)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, s, a, parent(s).prec)
   return z
 end
 
 @doc raw"""
-    polygamma(s::acb, a::acb)
+    polygamma(s::AcbFieldElem, a::AcbFieldElem)
 
 Return the generalised polygamma function $\psi(s,z)$.
 """
-function polygamma(s::acb, a::acb)
+function polygamma(s::AcbFieldElem, a::AcbFieldElem)
   z = parent(s)()
   ccall((:acb_polygamma, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, s, a, parent(s).prec)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, s, a, parent(s).prec)
   return z
 end
 
-function rising_factorial(x::acb, n::UInt)
+function rising_factorial(x::AcbFieldElem, n::UInt)
   z = parent(x)()
   ccall((:acb_rising_ui, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, UInt, Int), z, x, n, parent(x).prec)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, UInt, Int), z, x, n, parent(x).prec)
   return z
 end
 
 @doc raw"""
-    rising_factorial(x::acb, n::Int)
+    rising_factorial(x::AcbFieldElem, n::Int)
 
 Return the rising factorial $x(x + 1)\ldots (x + n - 1)$ as an Acb.
 """
-function rising_factorial(x::acb, n::Int)
+function rising_factorial(x::AcbFieldElem, n::Int)
   n < 0 && throw(DomainError(n, "Argument must be non-negative"))
   return rising_factorial(x, UInt(n))
 end
 
-function rising_factorial2(x::acb, n::UInt)
+function rising_factorial2(x::AcbFieldElem, n::UInt)
   z = parent(x)()
   w = parent(x)()
   ccall((:acb_rising2_ui, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, UInt, Int), z, w, x, n, parent(x).prec)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, UInt, Int), z, w, x, n, parent(x).prec)
   return (z, w)
 end
 
 @doc raw"""
-    rising_factorial2(x::acb, n::Int)
+    rising_factorial2(x::AcbFieldElem, n::Int)
 
 Return a tuple containing the rising factorial $x(x + 1)\ldots (x + n - 1)$
 and its derivative.
 """
-function rising_factorial2(x::acb, n::Int)
+function rising_factorial2(x::AcbFieldElem, n::Int)
   n < 0 && throw(DomainError(n, "Argument must be non-negative"))
   return rising_factorial2(x, UInt(n))
 end
 
-function polylog(s::acb, a::acb)
+function polylog(s::AcbFieldElem, a::AcbFieldElem)
   z = parent(s)()
   ccall((:acb_polylog, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, s, a, parent(s).prec)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, s, a, parent(s).prec)
   return z
 end
 
-function polylog(s::Int, a::acb)
+function polylog(s::Int, a::AcbFieldElem)
   z = parent(a)()
   ccall((:acb_polylog_si, libarb), Nothing,
-              (Ref{acb}, Int, Ref{acb}, Int), z, s, a, parent(a).prec)
+              (Ref{AcbFieldElem}, Int, Ref{AcbFieldElem}, Int), z, s, a, parent(a).prec)
   return z
 end
 
 @doc raw"""
-    polylog(s::Union{acb,Int}, a::acb)
+    polylog(s::Union{AcbFieldElem,Int}, a::AcbFieldElem)
 
 Return the polylogarithm Li$_s(a)$.
-""" polylog(s::Union{acb,Int}, ::acb)
+""" polylog(s::Union{AcbFieldElem,Int}, ::AcbFieldElem)
 
 @doc raw"""
-    log_integral(x::acb)
+    log_integral(x::AcbFieldElem)
 
 Return the logarithmic integral, evaluated at $x$.
 """
-function log_integral(x::acb)
+function log_integral(x::AcbFieldElem)
   z = parent(x)()
   ccall((:acb_hypgeom_li, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Int, Int), z, x, 0, parent(x).prec)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int), z, x, 0, parent(x).prec)
   return z
 end
 
 @doc raw"""
-    log_integral_offset(x::acb)
+    log_integral_offset(x::AcbFieldElem)
 
 Return the offset logarithmic integral, evaluated at $x$.
 """
-function log_integral_offset(x::acb)
+function log_integral_offset(x::AcbFieldElem)
   z = parent(x)()
   ccall((:acb_hypgeom_li, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Int, Int), z, x, 1, parent(x).prec)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int), z, x, 1, parent(x).prec)
   return z
 end
 
 @doc raw"""
-    exp_integral_e(s::acb, x::acb)
+    exp_integral_e(s::AcbFieldElem, x::AcbFieldElem)
 
 Return the generalised exponential integral $E_s(x)$.
 """
-function exp_integral_e(s::acb, x::acb)
+function exp_integral_e(s::AcbFieldElem, x::AcbFieldElem)
   z = parent(s)()
   ccall((:acb_hypgeom_expint, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, s, x, parent(s).prec)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, s, x, parent(s).prec)
   return z
 end
 
 @doc raw"""
-    gamma(s::acb, x::acb)
+    gamma(s::AcbFieldElem, x::AcbFieldElem)
 
 Return the upper incomplete gamma function $\Gamma(s,x)$.
 """
-function gamma(s::acb, x::acb)
+function gamma(s::AcbFieldElem, x::AcbFieldElem)
   z = parent(s)()
   ccall((:acb_hypgeom_gamma_upper, libarb), Nothing,
-        (Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, s, x, 0, parent(s).prec)
+        (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int), z, s, x, 0, parent(s).prec)
   return z
 end
 
 @doc raw"""
-    gamma_regularized(s::acb, x::acb)
+    gamma_regularized(s::AcbFieldElem, x::AcbFieldElem)
 
 Return the regularized upper incomplete gamma function
 $\Gamma(s,x) / \Gamma(s)$.
 """
-function gamma_regularized(s::acb, x::acb)
+function gamma_regularized(s::AcbFieldElem, x::AcbFieldElem)
   z = parent(s)()
   ccall((:acb_hypgeom_gamma_upper, libarb), Nothing,
-        (Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, s, x, 1, parent(s).prec)
+        (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int), z, s, x, 1, parent(s).prec)
   return z
 end
 
 @doc raw"""
-    gamma_lower(s::acb, x::acb)
+    gamma_lower(s::AcbFieldElem, x::AcbFieldElem)
 
 Return the lower incomplete gamma function $\gamma(s,x) / \Gamma(s)$.
 """
-function gamma_lower(s::acb, x::acb)
+function gamma_lower(s::AcbFieldElem, x::AcbFieldElem)
   z = parent(s)()
   ccall((:acb_hypgeom_gamma_lower, libarb), Nothing,
-        (Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, s, x, 0, parent(s).prec)
+        (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int), z, s, x, 0, parent(s).prec)
   return z
 end
 
 @doc raw"""
-    gamma_lower_regularized(s::acb, x::acb)
+    gamma_lower_regularized(s::AcbFieldElem, x::AcbFieldElem)
 
 Return the regularized lower incomplete gamma function
 $\gamma(s,x) / \Gamma(s)$.
 """
-function gamma_lower_regularized(s::acb, x::acb)
+function gamma_lower_regularized(s::AcbFieldElem, x::AcbFieldElem)
   z = parent(s)()
   ccall((:acb_hypgeom_gamma_lower, libarb), Nothing,
-        (Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, s, x, 1, parent(s).prec)
+        (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int), z, s, x, 1, parent(s).prec)
   return z
 end
 
 @doc raw"""
-    bessel_j(nu::acb, x::acb)
+    bessel_j(nu::AcbFieldElem, x::AcbFieldElem)
 
 Return the Bessel function $J_{\nu}(x)$.
 """
-function bessel_j(nu::acb, x::acb)
+function bessel_j(nu::AcbFieldElem, x::AcbFieldElem)
   z = parent(x)()
   ccall((:acb_hypgeom_bessel_j, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, nu, x, parent(x).prec)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, nu, x, parent(x).prec)
   return z
 end
 
 @doc raw"""
-    bessel_y(nu::acb, x::acb)
+    bessel_y(nu::AcbFieldElem, x::AcbFieldElem)
 
 Return the Bessel function $Y_{\nu}(x)$.
 """
-function bessel_y(nu::acb, x::acb)
+function bessel_y(nu::AcbFieldElem, x::AcbFieldElem)
   z = parent(x)()
   ccall((:acb_hypgeom_bessel_y, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, nu, x, parent(x).prec)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, nu, x, parent(x).prec)
   return z
 end
 
 @doc raw"""
-    bessel_i(nu::acb, x::acb)
+    bessel_i(nu::AcbFieldElem, x::AcbFieldElem)
 
 Return the Bessel function $I_{\nu}(x)$.
 """
-function bessel_i(nu::acb, x::acb)
+function bessel_i(nu::AcbFieldElem, x::AcbFieldElem)
   z = parent(x)()
   ccall((:acb_hypgeom_bessel_i, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, nu, x, parent(x).prec)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, nu, x, parent(x).prec)
   return z
 end
 
 @doc raw"""
-    bessel_k(nu::acb, x::acb)
+    bessel_k(nu::AcbFieldElem, x::AcbFieldElem)
 
 Return the Bessel function $K_{\nu}(x)$.
 """
-function bessel_k(nu::acb, x::acb)
+function bessel_k(nu::AcbFieldElem, x::AcbFieldElem)
   z = parent(x)()
   ccall((:acb_hypgeom_bessel_k, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, nu, x, parent(x).prec)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, nu, x, parent(x).prec)
   return z
 end
 
 @doc raw"""
-    airy_ai(x::acb)
+    airy_ai(x::AcbFieldElem)
 
 Return the Airy function $\operatorname{Ai}(x)$.
 """
-function airy_ai(x::acb)
+function airy_ai(x::AcbFieldElem)
   ai = parent(x)()
   ccall((:acb_hypgeom_airy, libarb), Nothing,
-              (Ref{acb}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{acb}, Int),
+              (Ref{AcbFieldElem}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{AcbFieldElem}, Int),
               ai, C_NULL, C_NULL, C_NULL, x, parent(x).prec)
   return ai
 end
 
 @doc raw"""
-    airy_bi(x::acb)
+    airy_bi(x::AcbFieldElem)
 
 Return the Airy function $\operatorname{Bi}(x)$.
 """
-function airy_bi(x::acb)
+function airy_bi(x::AcbFieldElem)
   bi = parent(x)()
   ccall((:acb_hypgeom_airy, libarb), Nothing,
-              (Ptr{Cvoid}, Ptr{Cvoid}, Ref{acb}, Ptr{Cvoid}, Ref{acb}, Int),
+              (Ptr{Cvoid}, Ptr{Cvoid}, Ref{AcbFieldElem}, Ptr{Cvoid}, Ref{AcbFieldElem}, Int),
               C_NULL, C_NULL, bi, C_NULL, x, parent(x).prec)
   return bi
 end
 
 @doc raw"""
-    airy_ai_prime(x::acb)
+    airy_ai_prime(x::AcbFieldElem)
 
 Return the derivative of the Airy function $\operatorname{Ai}^\prime(x)$.
 """
-function airy_ai_prime(x::acb)
+function airy_ai_prime(x::AcbFieldElem)
   ai_prime = parent(x)()
   ccall((:acb_hypgeom_airy, libarb), Nothing,
-              (Ptr{Cvoid}, Ref{acb}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{acb}, Int),
+              (Ptr{Cvoid}, Ref{AcbFieldElem}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{AcbFieldElem}, Int),
               C_NULL, ai_prime, C_NULL, C_NULL, x, parent(x).prec)
   return ai_prime
 end
 
 @doc raw"""
-    airy_bi_prime(x::acb)
+    airy_bi_prime(x::AcbFieldElem)
 
 Return the derivative of the Airy function $\operatorname{Bi}^\prime(x)$.
 """
-function airy_bi_prime(x::acb)
+function airy_bi_prime(x::AcbFieldElem)
   bi_prime = parent(x)()
   ccall((:acb_hypgeom_airy, libarb), Nothing,
-              (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{acb}, Ref{acb}, Int),
+              (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int),
               C_NULL, C_NULL, C_NULL, bi_prime, x, parent(x).prec)
   return bi_prime
 end
 
 @doc raw"""
-    hypergeometric_1f1(a::acb, b::acb, x::acb)
+    hypergeometric_1f1(a::AcbFieldElem, b::AcbFieldElem, x::AcbFieldElem)
 
 Return the confluent hypergeometric function ${}_1F_1(a,b,x)$.
 """
-function hypergeometric_1f1(a::acb, b::acb, x::acb)
+function hypergeometric_1f1(a::AcbFieldElem, b::AcbFieldElem, x::AcbFieldElem)
   z = parent(x)()
   ccall((:acb_hypgeom_m, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, a, b, x, 0, parent(x).prec)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int), z, a, b, x, 0, parent(x).prec)
   return z
 end
 
 @doc raw"""
-    hypergeometric_1f1_regularized(a::acb, b::acb, x::acb)
+    hypergeometric_1f1_regularized(a::AcbFieldElem, b::AcbFieldElem, x::AcbFieldElem)
 
 Return the regularized confluent hypergeometric function
 ${}_1F_1(a,b,x) / \Gamma(b)$.
 """
-function hypergeometric_1f1_regularized(a::acb, b::acb, x::acb)
+function hypergeometric_1f1_regularized(a::AcbFieldElem, b::AcbFieldElem, x::AcbFieldElem)
   z = parent(x)()
   ccall((:acb_hypgeom_m, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, a, b, x, 1, parent(x).prec)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int), z, a, b, x, 1, parent(x).prec)
   return z
 end
 
 @doc raw"""
-    hypergeometric_u(a::acb, b::acb, x::acb)
+    hypergeometric_u(a::AcbFieldElem, b::AcbFieldElem, x::AcbFieldElem)
 
 Return the confluent hypergeometric function $U(a,b,x)$.
 """
-function hypergeometric_u(a::acb, b::acb, x::acb)
+function hypergeometric_u(a::AcbFieldElem, b::AcbFieldElem, x::AcbFieldElem)
   z = parent(x)()
   ccall((:acb_hypgeom_u, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Int), z, a, b, x, parent(x).prec)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, a, b, x, parent(x).prec)
   return z
 end
 
 @doc raw"""
-    hypergeometric_2f1(a::acb, b::acb, c::acb, x::acb; flags=0)
+    hypergeometric_2f1(a::AcbFieldElem, b::AcbFieldElem, c::AcbFieldElem, x::AcbFieldElem; flags=0)
 
 Return the Gauss hypergeometric function ${}_2F_1(a,b,c,x)$.
 """
-function hypergeometric_2f1(a::acb, b::acb, c::acb, x::acb; flags=0)
+function hypergeometric_2f1(a::AcbFieldElem, b::AcbFieldElem, c::AcbFieldElem, x::AcbFieldElem; flags=0)
   z = parent(x)()
   ccall((:acb_hypgeom_2f1, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, a, b, c, x, flags, parent(x).prec)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int), z, a, b, c, x, flags, parent(x).prec)
   return z
 end
 
 @doc raw"""
-    jacobi_theta(z::acb, tau::acb)
+    jacobi_theta(z::AcbFieldElem, tau::AcbFieldElem)
 
 Return a tuple of four elements containing the Jacobi theta function values
 $\theta_1, \theta_2, \theta_3, \theta_4$ evaluated at $z, \tau$.
 """
-function jacobi_theta(z::acb, tau::acb)
+function jacobi_theta(z::AcbFieldElem, tau::AcbFieldElem)
   t1 = parent(z)()
   t2 = parent(z)()
   t3 = parent(z)()
   t4 = parent(z)()
   ccall((:acb_modular_theta, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Int),
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int),
                 t1, t2, t3, t4, z, tau, parent(z).prec)
   return (t1, t2, t3, t4)
 end
 
 @doc raw"""
-    weierstrass_p(z::acb, tau::acb)
+    weierstrass_p(z::AcbFieldElem, tau::AcbFieldElem)
 
 Return the Weierstrass elliptic function $\wp(z,\tau)$.
 """
-function weierstrass_p(z::acb, tau::acb)
+function weierstrass_p(z::AcbFieldElem, tau::AcbFieldElem)
   r = parent(z)()
   ccall((:acb_elliptic_p, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), r, z, tau, parent(z).prec)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), r, z, tau, parent(z).prec)
   return r
 end
 
 @doc raw"""
-    weierstrass_p_prime(z::acb, tau::acb)
+    weierstrass_p_prime(z::AcbFieldElem, tau::AcbFieldElem)
 
 Return the derivative of the Weierstrass elliptic function $\frac{\partial}{\partial z}\wp(z,\tau)$.
 """
-function weierstrass_p_prime(z::acb, tau::acb)
+function weierstrass_p_prime(z::AcbFieldElem, tau::AcbFieldElem)
   r = parent(z)()
   ccall((:acb_elliptic_p_prime, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int), r, z, tau, parent(z).prec)
+              (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), r, z, tau, parent(z).prec)
   return r
 end
 
 @doc raw"""
-    agm(x::acb, y::acb)
+    agm(x::AcbFieldElem, y::AcbFieldElem)
 
 Return the arithmetic-geometric mean of $x$ and $y$.
 """
-function agm(x::acb, y::acb)
+function agm(x::AcbFieldElem, y::AcbFieldElem)
   v = inv(y)
   if isfinite(v)
     return agm(x * v) * y
@@ -1556,7 +1556,7 @@ function agm(x::acb, y::acb)
 end
 
 @doc raw"""
-    lindep(A::Vector{acb}, bits::Int)
+    lindep(A::Vector{AcbFieldElem}, bits::Int)
 
 Find a small linear combination of the entries of the array $A$ that is small
 (using LLL). The entries are first scaled by the given number of bits before
@@ -1565,7 +1565,7 @@ be used to find linear dependence between a list of complex numbers. The algorit
 heuristic only and returns an array of Nemo integers representing the linear
 combination.
 """
-function lindep(A::Vector{acb}, bits::Int)
+function lindep(A::Vector{AcbFieldElem}, bits::Int)
   bits < 0 && throw(DomainError(bits, "Number of bits must be non-negative"))
   n = length(A)
   V = [ldexp(s, bits) for s in A]
@@ -1582,7 +1582,7 @@ function lindep(A::Vector{acb}, bits::Int)
 end
 
 @doc raw"""
-    lindep(A::Matrix{acb}, bits::Int)
+    lindep(A::Matrix{AcbFieldElem}, bits::Int)
 
 Find a (common) small linear combination of the entries in each row of the array $A$,
 that is small (using LLL). It is assumed that the complex numbers in each row of the
@@ -1592,7 +1592,7 @@ LLL. This function can be used to find a common linear dependence shared across 
 number of lists of complex numbers. The algorithm is heuristic only and returns an
 array of Nemo integers representing the common linear combination.
 """
-function lindep(A::Matrix{acb}, bits::Int)
+function lindep(A::Matrix{AcbFieldElem}, bits::Int)
   bits < 0 && throw(DomainError(bits, "Number of bits must be non-negative"))
   m, n = size(A)
   V = [ldexp(s, bits) for s in A]
@@ -1618,37 +1618,37 @@ end
 #
 ################################################################################
 
-function zero!(z::acb)
-   ccall((:acb_zero, libarb), Nothing, (Ref{acb},), z)
+function zero!(z::AcbFieldElem)
+   ccall((:acb_zero, libarb), Nothing, (Ref{AcbFieldElem},), z)
    return z
 end
 
-function add!(z::acb, x::acb, y::acb)
-  ccall((:acb_add, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{acb}, Int),
+function add!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem)
+  ccall((:acb_add, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int),
          z, x, y, parent(z).prec)
   return z
 end
 
-function addeq!(z::acb, y::acb)
-  ccall((:acb_add, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{acb}, Int),
+function addeq!(z::AcbFieldElem, y::AcbFieldElem)
+  ccall((:acb_add, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int),
          z, z, y, parent(z).prec)
   return z
 end
 
-function sub!(z::acb, x::acb, y::acb)
-  ccall((:acb_sub, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{acb}, Int),
+function sub!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem)
+  ccall((:acb_sub, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int),
         z, x, y, parent(z).prec)
   return z
 end
 
-function mul!(z::acb, x::acb, y::acb)
-  ccall((:acb_mul, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{acb}, Int),
+function mul!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem)
+  ccall((:acb_mul, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int),
         z, x, y, parent(z).prec)
   return z
 end
 
-function div!(z::acb, x::acb, y::acb)
-  ccall((:acb_div, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{acb}, Int),
+function div!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem)
+  ccall((:acb_div, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int),
         z, x, y, parent(z).prec)
   return z
 end
@@ -1659,7 +1659,7 @@ end
 #
 ################################################################################
 
-for (typeofx, passtoc) in ((acb, Ref{acb}), (Ptr{acb}, Ptr{acb}))
+for (typeofx, passtoc) in ((AcbFieldElem, Ref{AcbFieldElem}), (Ptr{AcbFieldElem}, Ptr{AcbFieldElem}))
   for (f,t) in (("acb_set_si", Int), ("acb_set_ui", UInt),
                 ("acb_set_d", Float64))
     @eval begin
@@ -1700,13 +1700,13 @@ for (typeofx, passtoc) in ((acb, Ref{acb}), (Ptr{acb}, Ptr{acb}))
                   (($passtoc), ($passtoc), Int), x, x, p)
     end
 
-    function _acb_set(x::($typeofx), y::acb)
-      ccall((:acb_set, libarb), Nothing, (($passtoc), Ref{acb}), x, y)
+    function _acb_set(x::($typeofx), y::AcbFieldElem)
+      ccall((:acb_set, libarb), Nothing, (($passtoc), Ref{AcbFieldElem}), x, y)
     end
 
-    function _acb_set(x::($typeofx), y::acb, p::Int)
+    function _acb_set(x::($typeofx), y::AcbFieldElem, p::Int)
       ccall((:acb_set_round, libarb), Nothing,
-                  (($passtoc), Ref{acb}, Int), x, y, p)
+                  (($passtoc), Ref{AcbFieldElem}, Int), x, y, p)
     end
 
     function _acb_set(x::($typeofx), y::AbstractString, p::Int)
@@ -1789,13 +1789,13 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{acb}, ::Type{T}) where {T <: Number} = acb
+promote_rule(::Type{AcbFieldElem}, ::Type{T}) where {T <: Number} = AcbFieldElem
 
-promote_rule(::Type{acb}, ::Type{ZZRingElem}) = acb
+promote_rule(::Type{AcbFieldElem}, ::Type{ZZRingElem}) = AcbFieldElem
 
-promote_rule(::Type{acb}, ::Type{QQFieldElem}) = acb
+promote_rule(::Type{AcbFieldElem}, ::Type{QQFieldElem}) = AcbFieldElem
 
-promote_rule(::Type{acb}, ::Type{ArbFieldElem}) = acb
+promote_rule(::Type{AcbFieldElem}, ::Type{ArbFieldElem}) = AcbFieldElem
 
 ################################################################################
 #
@@ -1804,14 +1804,14 @@ promote_rule(::Type{acb}, ::Type{ArbFieldElem}) = acb
 ################################################################################
 
 function (r::AcbField)()
-  z = acb()
+  z = AcbFieldElem()
   z.parent = r
   return z
 end
 
-function (r::AcbField)(x::Union{Int, UInt, ZZRingElem, QQFieldElem, ArbFieldElem, acb, Float64,
+function (r::AcbField)(x::Union{Int, UInt, ZZRingElem, QQFieldElem, ArbFieldElem, AcbFieldElem, Float64,
                                 BigFloat, AbstractString})
-  z = acb(x, r.prec)
+  z = AcbFieldElem(x, r.prec)
   z.parent = r
   return z
 end
@@ -1821,7 +1821,7 @@ end
 (r::AcbField)(x::Rational{T}) where {T <: Integer} = r(QQFieldElem(x))
 
 function (r::AcbField)(x::T, y::T) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, ArbFieldElem, Float64, BigFloat, AbstractString}}
-  z = acb(x, y, r.prec)
+  z = AcbFieldElem(x, y, r.prec)
   z.parent = r
   return z
 end
@@ -1832,7 +1832,7 @@ for S in (Int, UInt, ZZRingElem, QQFieldElem, ArbFieldElem, Float64, BigFloat, A
       @eval begin
         function (r::AcbField)(x::$(S), y::$(T))
           RR = ArbField(r.prec, cached = false)
-          z = acb(RR(x), RR(y), r.prec)
+          z = AcbFieldElem(RR(x), RR(y), r.prec)
           z.parent = r
           return z
         end
@@ -1845,13 +1845,13 @@ for T in (Int, UInt, ZZRingElem, QQFieldElem, ArbFieldElem, Float64, BigFloat, A
   @eval begin
     function (r::AcbField)(x::Rational{S}, y::$(T)) where {S <: Integer}
       RR = ArbField(r.prec, cached = false)
-      z = acb(RR(x), RR(y), r.prec)
+      z = AcbFieldElem(RR(x), RR(y), r.prec)
       z.parent = r
       return z
     end
     function (r::AcbField)(x::$(T), y::Rational{S}) where {S <: Integer}
       RR = ArbField(r.prec, cached = false)
-      z = acb(RR(x), RR(y), r.prec)
+      z = AcbFieldElem(RR(x), RR(y), r.prec)
       z.parent = r
       return z
     end

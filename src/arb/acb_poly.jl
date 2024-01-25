@@ -14,7 +14,7 @@ parent_type(::Type{acb_poly}) = AcbPolyRing
 
 elem_type(::Type{AcbPolyRing}) = acb_poly
 
-dense_poly_type(::Type{acb}) = acb_poly
+dense_poly_type(::Type{AcbFieldElem}) = acb_poly
 
 length(x::acb_poly) = ccall((:acb_poly_length, libarb), Int,
                                    (Ref{acb_poly},), x)
@@ -31,7 +31,7 @@ function coeff(a::acb_poly, n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
   t = parent(a).base_ring()
   ccall((:acb_poly_get_coeff_acb, libarb), Nothing,
-              (Ref{acb}, Ref{acb_poly}, Int), t, a, n)
+              (Ref{AcbFieldElem}, Ref{acb_poly}, Int), t, a, n)
   return t
 end
 
@@ -103,7 +103,7 @@ end
 
 function polynomial(R::AcbField, arr::Vector{T}, var::VarName=:x; cached::Bool=true) where T
    coeffs = map(R, arr)
-   coeffs = length(coeffs) == 0 ? acb[] : coeffs
+   coeffs = length(coeffs) == 0 ? AcbFieldElem[] : coeffs
    z = acb_poly(coeffs, R.prec)
    z.parent = AcbPolyRing(R, Symbol(var), cached)
    return z
@@ -282,7 +282,7 @@ end
 #
 ###############################################################################
 
-for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, acb, ZZPolyRingElem, QQPolyRingElem]
+for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AcbFieldElem, ZZPolyRingElem, QQPolyRingElem]
    @eval begin
       +(x::acb_poly, y::$T) = x + parent(x)(y)
 
@@ -316,7 +316,7 @@ end
 #
 ###############################################################################
 
-for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, acb]
+for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AcbFieldElem]
    @eval begin
       divexact(x::acb_poly, y::$T; check::Bool=true) = x * inv(base_ring(parent(x))(y))
 
@@ -406,10 +406,10 @@ end
 #
 ###############################################################################
 
-function evaluate(x::acb_poly, y::acb)
+function evaluate(x::acb_poly, y::AcbFieldElem)
    z = parent(y)()
    ccall((:acb_poly_evaluate, libarb), Nothing,
-                (Ref{acb}, Ref{acb_poly}, Ref{acb}, Int),
+                (Ref{AcbFieldElem}, Ref{acb_poly}, Ref{AcbFieldElem}, Int),
                 z, x, y, precision(parent(y)))
    return z
 end
@@ -426,11 +426,11 @@ evaluate(x::acb_poly, y::Any) = evaluate(x, base_ring(parent(x))(y))
 Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
 its derivative evaluated at $y$.
 """
-function evaluate2(x::acb_poly, y::acb)
+function evaluate2(x::acb_poly, y::AcbFieldElem)
    z = parent(y)()
    w = parent(y)()
    ccall((:acb_poly_evaluate2, libarb), Nothing,
-                (Ref{acb}, Ref{acb}, Ref{acb_poly}, Ref{acb}, Int),
+                (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{acb_poly}, Ref{AcbFieldElem}, Int),
                 z, w, x, y, precision(parent(y)))
    return z, w
 end
@@ -477,31 +477,31 @@ end
 #
 ###############################################################################
 
-function acb_vec(b::Vector{acb})
+function acb_vec(b::Vector{AcbFieldElem})
    v = ccall((:_acb_vec_init, libarb), Ptr{acb_struct}, (Int,), length(b))
    for i=1:length(b)
-       ccall((:acb_set, libarb), Nothing, (Ptr{acb_struct}, Ref{acb}),
+       ccall((:acb_set, libarb), Nothing, (Ptr{acb_struct}, Ref{AcbFieldElem}),
            v + (i-1)*sizeof(acb_struct), b[i])
    end
    return v
 end
 
 function array(R::AcbField, v::Ptr{acb_struct}, n::Int)
-   r = Vector{acb}(undef, n)
+   r = Vector{AcbFieldElem}(undef, n)
    for i=1:n
        r[i] = R()
-       ccall((:acb_set, libarb), Nothing, (Ref{acb}, Ptr{acb_struct}),
+       ccall((:acb_set, libarb), Nothing, (Ref{AcbFieldElem}, Ptr{acb_struct}),
            r[i], v + (i-1)*sizeof(acb_struct))
    end
    return r
 end
 
 @doc raw"""
-    from_roots(R::AcbPolyRing, b::Vector{acb})
+    from_roots(R::AcbPolyRing, b::Vector{AcbFieldElem})
 
 Construct a polynomial in the given polynomial ring from a list of its roots.
 """
-function from_roots(R::AcbPolyRing, b::Vector{acb})
+function from_roots(R::AcbPolyRing, b::Vector{AcbFieldElem})
    z = R()
    tmp = acb_vec(b)
    ccall((:acb_poly_product_roots, libarb), Nothing,
@@ -510,11 +510,11 @@ function from_roots(R::AcbPolyRing, b::Vector{acb})
    return z
 end
 
-function evaluate_iter(x::acb_poly, b::Vector{acb})
-   return acb[evaluate(x, b[i]) for i=1:length(b)]
+function evaluate_iter(x::acb_poly, b::Vector{AcbFieldElem})
+   return AcbFieldElem[evaluate(x, b[i]) for i=1:length(b)]
 end
 
-function evaluate_fast(x::acb_poly, b::Vector{acb})
+function evaluate_fast(x::acb_poly, b::Vector{AcbFieldElem})
    tmp = acb_vec(b)
    ccall((:acb_poly_evaluate_vec_fast, libarb), Nothing,
                 (Ptr{acb_struct}, Ref{acb_poly}, Ptr{acb_struct}, Int, Int),
@@ -524,7 +524,7 @@ function evaluate_fast(x::acb_poly, b::Vector{acb})
    return res
 end
 
-function interpolate_newton(R::AcbPolyRing, xs::Vector{acb}, ys::Vector{acb})
+function interpolate_newton(R::AcbPolyRing, xs::Vector{AcbFieldElem}, ys::Vector{AcbFieldElem})
    length(xs) != length(ys) && error()
    z = R()
    xsv = acb_vec(xs)
@@ -537,7 +537,7 @@ function interpolate_newton(R::AcbPolyRing, xs::Vector{acb}, ys::Vector{acb})
    return z
 end
 
-function interpolate_barycentric(R::AcbPolyRing, xs::Vector{acb}, ys::Vector{acb})
+function interpolate_barycentric(R::AcbPolyRing, xs::Vector{AcbFieldElem}, ys::Vector{AcbFieldElem})
    length(xs) != length(ys) && error()
    z = R()
    xsv = acb_vec(xs)
@@ -550,7 +550,7 @@ function interpolate_barycentric(R::AcbPolyRing, xs::Vector{acb}, ys::Vector{acb
    return z
 end
 
-function interpolate_fast(R::AcbPolyRing, xs::Vector{acb}, ys::Vector{acb})
+function interpolate_fast(R::AcbPolyRing, xs::Vector{AcbFieldElem}, ys::Vector{AcbFieldElem})
    length(xs) != length(ys) && error()
    z = R()
    xsv = acb_vec(xs)
@@ -564,12 +564,12 @@ function interpolate_fast(R::AcbPolyRing, xs::Vector{acb}, ys::Vector{acb})
 end
 
 # todo: cutoffs for fast algorithm
-function interpolate(R::AcbPolyRing, xs::Vector{acb}, ys::Vector{acb})
+function interpolate(R::AcbPolyRing, xs::Vector{AcbFieldElem}, ys::Vector{AcbFieldElem})
    return interpolate_newton(R, xs, ys)
 end
 
 # todo: cutoffs for fast algorithm
-function evaluate(x::acb_poly, b::Vector{acb})
+function evaluate(x::acb_poly, b::Vector{AcbFieldElem})
    return evaluate_iter(x, b)
 end
 
@@ -598,7 +598,7 @@ It is assumed that $x$ is squarefree.
 function roots(x::acb_poly; target=0, isolate_real=false, initial_prec=0, max_prec=0, max_iter=0)
     deg = degree(x)
     if deg <= 0
-        return Array{acb}(undef, 0)
+        return Array{AcbFieldElem}(undef, 0)
     end
 
     initial_prec = (initial_prec >= 2) ? initial_prec : 32
@@ -622,9 +622,9 @@ function roots(x::acb_poly; target=0, isolate_real=false, initial_prec=0, max_pr
             if target > 0
                 for i = 0 : deg-1
                     re = ccall((:acb_real_ptr, libarb), Ptr{arb_struct},
-                        (Ptr{acb}, ), roots + i * sizeof(acb_struct))
+                        (Ptr{AcbFieldElem}, ), roots + i * sizeof(acb_struct))
                     im = ccall((:acb_imag_ptr, libarb), Ptr{arb_struct},
-                        (Ptr{acb}, ), roots + i * sizeof(acb_struct))
+                        (Ptr{AcbFieldElem}, ), roots + i * sizeof(acb_struct))
                     t = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ptr{ArbFieldElem}, ), re)
                     u = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ptr{ArbFieldElem}, ), im)
                     ok = ok && (ccall((:mag_cmp_2exp_si, libarb), Cint,
@@ -645,7 +645,7 @@ function roots(x::acb_poly; target=0, isolate_real=false, initial_prec=0, max_pr
                 if real_ok
                     for i = 0 : deg - 1
                         im = ccall((:acb_imag_ptr, libarb), Ptr{arb_struct},
-                            (Ptr{acb}, ), roots + i * sizeof(acb_struct))
+                            (Ptr{AcbFieldElem}, ), roots + i * sizeof(acb_struct))
                         if ccall((:arb_contains_zero, libarb), Bool, (Ptr{arb_struct}, ), im)
                             ccall((:arb_zero, libarb), Nothing, (Ptr{arb_struct}, ), im)
                         end
@@ -728,9 +728,9 @@ function setcoeff!(z::acb_poly, n::Int, x::ZZRingElem)
    return z
 end
 
-function setcoeff!(z::acb_poly, n::Int, x::acb)
+function setcoeff!(z::acb_poly, n::Int, x::AcbFieldElem)
    ccall((:acb_poly_set_coeff_acb, libarb), Nothing,
-                    (Ref{acb_poly}, Int, Ref{acb}), z, n, x)
+                    (Ref{acb_poly}, Int, Ref{AcbFieldElem}), z, n, x)
    return z
 end
 
@@ -770,7 +770,7 @@ promote_rule(::Type{acb_poly}, ::Type{ArbPolyRingElem}) = acb_poly
 promote_rule(::Type{acb_poly}, ::Type{acb_poly}) = acb_poly
 
 function promote_rule(::Type{acb_poly}, ::Type{T}) where {T}
-   return promote_rule(acb, T) === acb ? acb_poly : Union{}
+   return promote_rule(AcbFieldElem, T) === AcbFieldElem ? acb_poly : Union{}
 end
 
 ################################################################################
@@ -786,7 +786,7 @@ function (a::AcbPolyRing)()
 end
 
 for T in [Integer, ZZRingElem, QQFieldElem, Float64, Complex{Float64},
-          Complex{Int}, ArbFieldElem, acb]
+          Complex{Int}, ArbFieldElem, AcbFieldElem]
   @eval begin
     function (a::AcbPolyRing)(b::$T)
       z = acb_poly(base_ring(a)(b), a.base_ring.prec)
@@ -798,7 +798,7 @@ end
 
 (a::AcbPolyRing)(b::Rational{T}) where {T <: Integer} = a(QQFieldElem(b))
 
-function (a::AcbPolyRing)(b::Vector{acb})
+function (a::AcbPolyRing)(b::Vector{AcbFieldElem})
    z = acb_poly(b, a.base_ring.prec)
    z.parent = a
    return z

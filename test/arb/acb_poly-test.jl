@@ -13,7 +13,7 @@ CC = AcbField(64)
    @test elem_type(R) == acb_poly
    @test elem_type(AcbPolyRing) == acb_poly
    @test parent_type(acb_poly) == AcbPolyRing
-   @test dense_poly_type(acb) == acb_poly
+   @test dense_poly_type(AcbFieldElem) == acb_poly
 
    @test typeof(R) <: AcbPolyRing
 
@@ -335,8 +335,8 @@ end
    R, x = polynomial_ring(CC, "x")
 
    n = 5
-   xs = acb[inv(CC(i)) for i=1:n]
-   ys = acb[CC(i) for i=1:n]
+   xs = AcbFieldElem[inv(CC(i)) for i=1:n]
+   ys = AcbFieldElem[CC(i) for i=1:n]
 
    f = interpolate(R, xs, ys)
    vs = evaluate(f, xs)

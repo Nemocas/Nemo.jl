@@ -407,7 +407,7 @@ function mulhigh(a::PolyRingElem{T}, b::PolyRingElem{T}, n::Int) where {T}
     return mulhigh_n(a, b, degree(a) + degree(b) - n)
 end
 
-function (f::acb_poly)(x::acb)
+function (f::acb_poly)(x::AcbFieldElem)
     return evaluate(f, x)
 end
 
