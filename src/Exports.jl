@@ -62,7 +62,7 @@ export bound_inf_norm
 export CalciumFieldElem
 export CalciumField
 export CalciumQQBar
-export CalciumQQBarField
+export QQBarField
 export canonical_unit
 export cansolve
 export cansolve_with_nullspace

@@ -1335,7 +1335,7 @@ end
 
 (R::QQField)(a::CalciumFieldElem) = QQFieldElem(a)
 (R::ZZRing)(a::CalciumFieldElem) = ZZRingElem(a)
-(R::CalciumQQBarField)(a::CalciumFieldElem) = QQBarFieldElem(a)
+(R::QQBarField)(a::CalciumFieldElem) = QQBarFieldElem(a)
 
 function (R::AcbField)(a::CalciumFieldElem; parts::Bool=false)
    C = a.parent

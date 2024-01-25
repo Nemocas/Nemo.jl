@@ -26,7 +26,7 @@ not the name of its type.
 
  Library        | Element type  | Parent type
 ----------------|---------------|--------------------
-Calcium         | `QQBarFieldElem`       | `CalciumQQBarField`
+Calcium         | `QQBarFieldElem`       | `QQBarField`
 
 **Important note on performance**
 
@@ -100,13 +100,13 @@ julia> eigenvalues(QQBar, ZZ[1 1 0; 0 1 1; 1 0 1])
 **Interface**
 
 ```@docs
-roots(R::CalciumQQBarField, f::ZZPolyRingElem)
-roots(R::CalciumQQBarField, f::QQPolyRingElem)
-eigenvalues(R::CalciumQQBarField, A::ZZMatrix)
-eigenvalues_with_multiplicities(R::CalciumQQBarField, A::ZZMatrix)
-eigenvalues(R::CalciumQQBarField, A::QQMatrix)
-eigenvalues_with_multiplicities(R::CalciumQQBarField, A::QQMatrix)
-rand(R::CalciumQQBarField; degree::Int, bits::Int, randtype::Symbol=:null)
+roots(R::QQBarField, f::ZZPolyRingElem)
+roots(R::QQBarField, f::QQPolyRingElem)
+eigenvalues(R::QQBarField, A::ZZMatrix)
+eigenvalues_with_multiplicities(R::QQBarField, A::ZZMatrix)
+eigenvalues(R::QQBarField, A::QQMatrix)
+eigenvalues_with_multiplicities(R::QQBarField, A::QQMatrix)
+rand(R::QQBarField; degree::Int, bits::Int, randtype::Symbol=:null)
 ```
 
 ### Numerical evaluation
@@ -296,8 +296,8 @@ julia> root_of_unity_as_args(w)
 ```@docs
 sqrt(a::QQBarFieldElem)
 root(a::QQBarFieldElem, n::Int)
-root_of_unity(C::CalciumQQBarField, n::Int)
-root_of_unity(C::CalciumQQBarField, n::Int, k::Int)
+root_of_unity(C::QQBarField, n::Int)
+root_of_unity(C::QQBarField, n::Int, k::Int)
 is_root_of_unity(a::QQBarFieldElem)
 root_of_unity_as_args(a::QQBarFieldElem)
 exp_pi_i(a::QQBarFieldElem)
@@ -341,7 +341,7 @@ Root 0.100000 of 10x - 1
 **Interface**
 
 ```@docs
-guess(R::CalciumQQBarField, x::arb, maxdeg::Int, maxbits::Int=0)
-guess(R::CalciumQQBarField, x::AcbFieldElem, maxdeg::Int, maxbits::Int=0)
+guess(R::QQBarField, x::arb, maxdeg::Int, maxbits::Int=0)
+guess(R::QQBarField, x::AcbFieldElem, maxdeg::Int, maxbits::Int=0)
 ```
 

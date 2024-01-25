@@ -104,9 +104,9 @@
 
 # Deprecated in 0.35.*
 
-@deprecate roots(f::QQPolyRingElem, R::CalciumQQBarField) roots(R, f)
+@deprecate roots(f::QQPolyRingElem, R::QQBarField) roots(R, f)
 
-@deprecate roots(f::ZZPolyRingElem, R::CalciumQQBarField) roots(R, f)
+@deprecate roots(f::ZZPolyRingElem, R::QQBarField) roots(R, f)
 
 @deprecate roots(f::fpPolyRingElem, K::fqPolyRepField) roots(K, f)
 

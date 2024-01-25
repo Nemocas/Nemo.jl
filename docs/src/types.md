@@ -70,5 +70,5 @@ parent objects of the given rings and structures.
 
   - Calcium
 
-     - `QQBarFieldElem` (`CalciumQQBarField`)
+     - `QQBarFieldElem` (`QQBarField`)
      - `CalciumFieldElem` (`CalciumField`)

@@ -12,11 +12,11 @@
 
 parent(a::QQBarFieldElem) = CalciumQQBar
 
-parent_type(::Type{QQBarFieldElem}) = CalciumQQBarField
+parent_type(::Type{QQBarFieldElem}) = QQBarField
 
-elem_type(::Type{CalciumQQBarField}) = QQBarFieldElem
+elem_type(::Type{QQBarField}) = QQBarFieldElem
 
-base_ring(a::CalciumQQBarField) = CalciumQQBar
+base_ring(a::QQBarField) = CalciumQQBar
 
 base_ring(a::QQBarFieldElem) = CalciumQQBar
 
@@ -24,7 +24,7 @@ is_domain_type(::Type{QQBarFieldElem}) = true
 
 check_parent(a::QQBarFieldElem, b::QQBarFieldElem, throw::Bool = true) = true
 
-characteristic(::CalciumQQBarField) = 0
+characteristic(::QQBarField) = 0
 
 ###############################################################################
 #
@@ -102,7 +102,7 @@ function qqbar_vec(n::Int)
    return ccall((:_qqbar_vec_init, libcalcium), Ptr{qqbar_struct}, (Int,), n)
 end
 
-function array(R::CalciumQQBarField, v::Ptr{qqbar_struct}, n::Int)
+function array(R::QQBarField, v::Ptr{qqbar_struct}, n::Int)
    r = Vector{QQBarFieldElem}(undef, n)
    for i=1:n
        r[i] = R()
@@ -117,7 +117,7 @@ function qqbar_vec_clear(v::Ptr{qqbar_struct}, n::Int)
         Nothing, (Ptr{qqbar_struct}, Int), v, n)
 end
 
-function roots(R::CalciumQQBarField, f::ZZPolyRingElem)
+function roots(R::QQBarField, f::ZZPolyRingElem)
    deg = degree(f)
    if deg <= 0
       return Array{QQBarFieldElem}(undef, 0)
@@ -148,7 +148,7 @@ function native_string(x::QQBarFieldElem)
    return res
 end
 
-function show(io::IO, F::CalciumQQBarField)
+function show(io::IO, F::QQBarField)
   if get(io, :supercompact, false)
     io = pretty(io)
     print(io, LowercaseOff(), "QQBar")
@@ -169,9 +169,9 @@ end
 
 is_unit(x::QQBarFieldElem) = !is_zero(x)
 
-zero(a::CalciumQQBarField) = a(0)
+zero(a::QQBarField) = a(0)
 
-one(a::CalciumQQBarField) = a(1)
+one(a::QQBarField) = a(1)
 
 zero(::Type{QQBarFieldElem}) = CalciumQQBar(0)
 
@@ -318,7 +318,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    rand(R::CalciumQQBarField; degree::Int, bits::Int, randtype::Symbol=:null)
+    rand(R::QQBarField; degree::Int, bits::Int, randtype::Symbol=:null)
 
 Return a random algebraic number with degree up to `degree`
 and coefficients up to `bits` in size. By default, both real and
@@ -326,7 +326,7 @@ complex numbers are generated. Set the optional `randtype` to `:real` or
 `:nonreal` to generate a specific type of number. Note that
 nonreal numbers require `degree` at least 2.
 """
-function rand(R::CalciumQQBarField; degree::Int, bits::Int,
+function rand(R::QQBarField; degree::Int, bits::Int,
                                             randtype::Symbol=:null)
    state = _flint_rand_states[Threads.threadid()]
    x = R()
@@ -897,7 +897,7 @@ function qqbar_vec(n::Int)
    return ccall((:_qqbar_vec_init, libcalcium), Ptr{qqbar_struct}, (Int,), n)
 end
 
-function array(R::CalciumQQBarField, v::Ptr{qqbar_struct}, n::Int)
+function array(R::QQBarField, v::Ptr{qqbar_struct}, n::Int)
    r = Vector{QQBarFieldElem}(undef, n)
    for i=1:n
        r[i] = R()
@@ -913,14 +913,14 @@ function qqbar_vec_clear(v::Ptr{qqbar_struct}, n::Int)
 end
 
 @doc raw"""
-    roots(R::CalciumQQBarField, f::ZZPolyRingElem)
+    roots(R::QQBarField, f::ZZPolyRingElem)
 
 Return all the roots of the polynomial `f` in the field of algebraic
 numbers `R`. The output array is sorted in the default sort order for
 algebraic numbers. Roots of multiplicity higher than one are repeated
 according to their multiplicity.
 """
-function roots(R::CalciumQQBarField, f::ZZPolyRingElem)
+function roots(R::QQBarField, f::ZZPolyRingElem)
    deg = degree(f)
    if deg <= 0
       return Array{QQBarFieldElem}(undef, 0)
@@ -934,14 +934,14 @@ function roots(R::CalciumQQBarField, f::ZZPolyRingElem)
 end
 
 @doc raw"""
-    roots(R::CalciumQQBarField, f::QQPolyRingElem)
+    roots(R::QQBarField, f::QQPolyRingElem)
 
 Return all the roots of the polynomial `f` in the field of algebraic
 numbers `R`. The output array is sorted in the default sort order for
 algebraic numbers. Roots of multiplicity higher than one are repeated
 according to their multiplicity.
 """
-function roots(R::CalciumQQBarField, f::QQPolyRingElem)
+function roots(R::QQBarField, f::QQPolyRingElem)
    deg = degree(f)
    if deg <= 0
       return Array{QQBarFieldElem}(undef, 0)
@@ -975,7 +975,7 @@ function conjugates(a::QQBarFieldElem)
 end
 
 # Return the eigenvalues with repetition according to the algebraic multiplicity
-function _eigvals_internal(R::CalciumQQBarField, A::ZZMatrix)
+function _eigvals_internal(R::QQBarField, A::ZZMatrix)
    n = nrows(A)
    !is_square(A) && throw(DomainError(A, "a square matrix is required"))
    if n == 0
@@ -990,7 +990,7 @@ function _eigvals_internal(R::CalciumQQBarField, A::ZZMatrix)
 end
 
 # Return the eigenvalues with repetition according to the algebraic multiplicity
-function _eigvals_internal(R::CalciumQQBarField, A::QQMatrix)
+function _eigvals_internal(R::QQBarField, A::QQMatrix)
    n = nrows(A)
    !is_square(A) && throw(DomainError(A, "a square matrix is required"))
    if n == 0
@@ -1005,26 +1005,26 @@ function _eigvals_internal(R::CalciumQQBarField, A::QQMatrix)
 end
 
 @doc raw"""
-    eigenvalues(R::CalciumQQBarField, A::ZZMatrix)
-    eigenvalues(R::CalciumQQBarField, A::QQMatrix)
+    eigenvalues(R::QQBarField, A::ZZMatrix)
+    eigenvalues(R::QQBarField, A::QQMatrix)
 
 Return the eigenvalues `A` in the field of algebraic numbers `R`.
 The output array is sorted in the default sort order for
 algebraic numbers.
 """
-function eigenvalues(R::CalciumQQBarField, A::Union{ZZMatrix, QQMatrix})
+function eigenvalues(R::QQBarField, A::Union{ZZMatrix, QQMatrix})
    return unique(_eigvals_internal(R, A))
 end
 
 @doc raw"""
-    eigenvalues_with_multiplicities(R::CalciumQQBarField, A::ZZMatrix)
-    eigenvalues_with_multiplicities(R::CalciumQQBarField, A::QQMatrix)
+    eigenvalues_with_multiplicities(R::QQBarField, A::ZZMatrix)
+    eigenvalues_with_multiplicities(R::QQBarField, A::QQMatrix)
 
 Return the eigenvalues `A` in the field of algebraic numbers `R` together with
 their algebraic multiplicities as a vector of tuples.
 The output array is sorted in the default sort order for algebraic numbers.
 """
-function eigenvalues_with_multiplicities(R::CalciumQQBarField, A::Union{ZZMatrix, QQMatrix})
+function eigenvalues_with_multiplicities(R::QQBarField, A::Union{ZZMatrix, QQMatrix})
    eig = _eigvals_internal(R, A)
    res = Vector{Tuple{QQBarFieldElem, Int}}()
    k = 1
@@ -1052,12 +1052,12 @@ end
 ###############################################################################
 
 @doc raw"""
-    root_of_unity(C::CalciumQQBarField, n::Int)
+    root_of_unity(C::QQBarField, n::Int)
 
 Return the root of unity $e^{2 \pi i / n}$ as an element of the field
 of algebraic numbers `C`.
 """
-function root_of_unity(C::CalciumQQBarField, n::Int)
+function root_of_unity(C::QQBarField, n::Int)
    n <= 0 && throw(DomainError(n))
    z = QQBarFieldElem()
    ccall((:qqbar_root_of_unity, libcalcium),
@@ -1066,12 +1066,12 @@ function root_of_unity(C::CalciumQQBarField, n::Int)
 end
 
 @doc raw"""
-    root_of_unity(C::CalciumQQBarField, n::Int, k::Int)
+    root_of_unity(C::QQBarField, n::Int, k::Int)
 
 Return the root of unity $e^{2 \pi i k / n}$ as an element of the field
 of algebraic numbers `C`.
 """
-function root_of_unity(C::CalciumQQBarField, n::Int, k::Int)
+function root_of_unity(C::QQBarField, n::Int, k::Int)
    n <= 0 && throw(DomainError(n))
    z = QQBarFieldElem()
    ccall((:qqbar_root_of_unity, libcalcium),
@@ -1243,7 +1243,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    guess(R::CalciumQQBarField, x::AcbFieldElem, maxdeg::Int, maxbits::Int=0)
+    guess(R::QQBarField, x::AcbFieldElem, maxdeg::Int, maxbits::Int=0)
 
 Try to reconstruct an algebraic number from a given numerical enclosure `x`.
 The algorithm looks for candidates up to degree `maxdeg` and with
@@ -1262,7 +1262,7 @@ performance, one should invoke this function repeatedly with successively
 larger parameters when the size of the intended solution is unknown or
 may be much smaller than a worst-case bound.
 """
-function guess(R::CalciumQQBarField, x::AcbFieldElem, maxdeg::Int, maxbits::Int=0)
+function guess(R::QQBarField, x::AcbFieldElem, maxdeg::Int, maxbits::Int=0)
    prec = precision(Balls)
    if maxbits <= 0
       maxbits = prec
@@ -1278,7 +1278,7 @@ function guess(R::CalciumQQBarField, x::AcbFieldElem, maxdeg::Int, maxbits::Int=
 end
 
 @doc raw"""
-    guess(R::CalciumQQBarField, x::AcbFieldElem, maxdeg::Int, maxbits::Int=0)
+    guess(R::QQBarField, x::AcbFieldElem, maxdeg::Int, maxbits::Int=0)
 
 Try to reconstruct an algebraic number from a given numerical enclosure `x`.
 The algorithm looks for candidates up to degree `maxdeg` and with
@@ -1297,7 +1297,7 @@ performance, one should invoke this function repeatedly with successively
 larger parameters when the size of the intended solution is unknown or
 may be much smaller than a worst-case bound.
 """
-function guess(R::CalciumQQBarField, x::ArbFieldElem, maxdeg::Int, maxbits::Int=0)
+function guess(R::QQBarField, x::ArbFieldElem, maxdeg::Int, maxbits::Int=0)
    CC = AcbField()
    return guess(R, CC(x), maxdeg, maxbits)
 end
@@ -1406,17 +1406,17 @@ end
 #
 ###############################################################################
 
-(a::CalciumQQBarField)() = QQBarFieldElem()
+(a::QQBarField)() = QQBarFieldElem()
 
-(a::CalciumQQBarField)(b::Int) = QQBarFieldElem(b)
+(a::QQBarField)(b::Int) = QQBarFieldElem(b)
 
-(a::CalciumQQBarField)(b::Complex{Int}) = QQBarFieldElem(b)
+(a::QQBarField)(b::Complex{Int}) = QQBarFieldElem(b)
 
-(a::CalciumQQBarField)(b::ZZRingElem) = QQBarFieldElem(b)
+(a::QQBarField)(b::ZZRingElem) = QQBarFieldElem(b)
 
-(a::CalciumQQBarField)(b::Integer) = QQBarFieldElem(ZZRingElem(b))
+(a::QQBarField)(b::Integer) = QQBarFieldElem(ZZRingElem(b))
 
-(a::CalciumQQBarField)(b::QQFieldElem) = QQBarFieldElem(b)
+(a::QQBarField)(b::QQFieldElem) = QQBarFieldElem(b)
 
-(a::CalciumQQBarField)(b::QQBarFieldElem) = b
+(a::QQBarField)(b::QQBarFieldElem) = b
 

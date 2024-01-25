@@ -59,10 +59,10 @@ end
 #
 ################################################################################
 
-mutable struct CalciumQQBarField <: Field
+mutable struct QQBarField <: Field
 end
 
-const CalciumQQBar = CalciumQQBarField()
+const CalciumQQBar = QQBarField()
 
 mutable struct QQBarFieldElem <: FieldElem
   coeffs::Ptr{Nothing}

@@ -4,13 +4,13 @@
    @test R == QQBar
 
    @test elem_type(R) == QQBarFieldElem
-   @test elem_type(CalciumQQBarField) == QQBarFieldElem
-   @test parent_type(QQBarFieldElem) == CalciumQQBarField
+   @test elem_type(QQBarField) == QQBarFieldElem
+   @test parent_type(QQBarFieldElem) == QQBarField
    @test is_domain_type(QQBarFieldElem) == true
    @test base_ring(CalciumQQBar) == CalciumQQBar
    @test base_ring(QQBarFieldElem(3)) == CalciumQQBar
 
-   @test isa(R, CalciumQQBarField)
+   @test isa(R, QQBarField)
 
    @test isa(R(), QQBarFieldElem)
    @test isa(R(2), QQBarFieldElem)
@@ -336,7 +336,7 @@ end
 
 end
 
-function test_elem(R::CalciumQQBarField)
+function test_elem(R::QQBarField)
    return rand(R, degree=5, bits=5)
 end
 
