@@ -711,10 +711,12 @@ end
       A = rand(M)
       B = rand(N)
 
-      fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B)
+      fl, X, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B)
 
       if fl
          @test A * X == B
+         @test is_zero(A*K)
+         @test rank(A) + ncols(K) == ncols(A)
       end
    end
 
