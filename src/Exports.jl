@@ -8,7 +8,7 @@ export absolute_norm
 export absolute_tr
 export AcbFieldElem
 export acb_mat
-export acb_poly
+export AcbPolyRingElem
 export AcbField
 export AcbMatSpace
 export AcbPolyRing

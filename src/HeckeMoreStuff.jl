@@ -1440,7 +1440,7 @@ function zeros(f::ZZPolyRingElem)
 end
 
 #This should probably go somewhere else. (Taking the nth derivative)
-function derivative(x::acb_poly, n::Int64)
+function derivative(x::AcbPolyRingElem, n::Int64)
     for i in (1:n)
         x = derivative(x)
     end

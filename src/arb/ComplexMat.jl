@@ -517,7 +517,7 @@ function charpoly(x::AcbPolyRing, y::ComplexMat, prec::Int = precision(Balls))
   base_ring(x) != base_ring(y) && error("Base rings must coincide")
   z = x()
   ccall((:acb_mat_charpoly, libarb), Nothing,
-              (Ref{acb_poly}, Ref{ComplexMat}, Int), z, y, prec)
+              (Ref{AcbPolyRingElem}, Ref{ComplexMat}, Int), z, y, prec)
   return z
 end
 

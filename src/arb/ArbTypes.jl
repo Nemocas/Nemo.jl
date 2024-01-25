@@ -771,91 +771,91 @@ end
 
 const AcbPolyRingID = CacheDictType{Tuple{AcbField, Symbol}, AcbPolyRing}()
 
-mutable struct acb_poly <: PolyRingElem{AcbFieldElem}
+mutable struct AcbPolyRingElem <: PolyRingElem{AcbFieldElem}
   coeffs::Ptr{Nothing}
   length::Int
   alloc::Int
   parent::AcbPolyRing
 
-  function acb_poly()
+  function AcbPolyRingElem()
     z = new()
-    ccall((:acb_poly_init, libarb), Nothing, (Ref{acb_poly}, ), z)
+    ccall((:acb_poly_init, libarb), Nothing, (Ref{AcbPolyRingElem}, ), z)
     finalizer(_acb_poly_clear_fn, z)
     return z
   end
 
-  function acb_poly(x::AcbFieldElem, p::Int)
+  function AcbPolyRingElem(x::AcbFieldElem, p::Int)
     z = new() 
-    ccall((:acb_poly_init, libarb), Nothing, (Ref{acb_poly}, ), z)
+    ccall((:acb_poly_init, libarb), Nothing, (Ref{AcbPolyRingElem}, ), z)
     ccall((:acb_poly_set_coeff_acb, libarb), Nothing,
-                (Ref{acb_poly}, Int, Ref{AcbFieldElem}), z, 0, x)
+                (Ref{AcbPolyRingElem}, Int, Ref{AcbFieldElem}), z, 0, x)
     finalizer(_acb_poly_clear_fn, z)
     return z
   end
 
-  function acb_poly(x::Vector{AcbFieldElem}, p::Int)
+  function AcbPolyRingElem(x::Vector{AcbFieldElem}, p::Int)
     z = new() 
-    ccall((:acb_poly_init, libarb), Nothing, (Ref{acb_poly}, ), z)
+    ccall((:acb_poly_init, libarb), Nothing, (Ref{AcbPolyRingElem}, ), z)
     for i = 1:length(x)
         ccall((:acb_poly_set_coeff_acb, libarb), Nothing,
-                (Ref{acb_poly}, Int, Ref{AcbFieldElem}), z, i - 1, x[i])
+                (Ref{AcbPolyRingElem}, Int, Ref{AcbFieldElem}), z, i - 1, x[i])
     end
     finalizer(_acb_poly_clear_fn, z)
     return z
   end
 
-  function acb_poly(x::acb_poly)
+  function AcbPolyRingElem(x::AcbPolyRingElem)
     z = new() 
-    ccall((:acb_poly_init, libarb), Nothing, (Ref{acb_poly}, ), z)
-    ccall((:acb_poly_set, libarb), Nothing, (Ref{acb_poly}, Ref{acb_poly}), z, x)
+    ccall((:acb_poly_init, libarb), Nothing, (Ref{AcbPolyRingElem}, ), z)
+    ccall((:acb_poly_set, libarb), Nothing, (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}), z, x)
     finalizer(_acb_poly_clear_fn, z)
     return z
   end
 
-  function acb_poly(x::ArbPolyRingElem, p::Int)
+  function AcbPolyRingElem(x::ArbPolyRingElem, p::Int)
     z = new() 
-    ccall((:acb_poly_init, libarb), Nothing, (Ref{acb_poly}, ), z)
+    ccall((:acb_poly_init, libarb), Nothing, (Ref{AcbPolyRingElem}, ), z)
     ccall((:acb_poly_set_arb_poly, libarb), Nothing,
-                (Ref{acb_poly}, Ref{ArbPolyRingElem}, Int), z, x, p)
+                (Ref{AcbPolyRingElem}, Ref{ArbPolyRingElem}, Int), z, x, p)
     ccall((:acb_poly_set_round, libarb), Nothing,
-                (Ref{acb_poly}, Ref{acb_poly}, Int), z, z, p)
+                (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Int), z, z, p)
     finalizer(_acb_poly_clear_fn, z)
     return z
   end
 
-  function acb_poly(x::acb_poly, p::Int)
+  function AcbPolyRingElem(x::AcbPolyRingElem, p::Int)
     z = new() 
-    ccall((:acb_poly_init, libarb), Nothing, (Ref{acb_poly}, ), z)
+    ccall((:acb_poly_init, libarb), Nothing, (Ref{AcbPolyRingElem}, ), z)
     ccall((:acb_poly_set_round, libarb), Nothing,
-                (Ref{acb_poly}, Ref{acb_poly}, Int), z, x, p)
+                (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Int), z, x, p)
     finalizer(_acb_poly_clear_fn, z)
     return z
   end
 
-  function acb_poly(x::ZZPolyRingElem, p::Int)
+  function AcbPolyRingElem(x::ZZPolyRingElem, p::Int)
     z = new() 
-    ccall((:acb_poly_init, libarb), Nothing, (Ref{acb_poly}, ), z)
+    ccall((:acb_poly_init, libarb), Nothing, (Ref{AcbPolyRingElem}, ), z)
     ccall((:acb_poly_set_fmpz_poly, libarb), Nothing,
-                (Ref{acb_poly}, Ref{ZZPolyRingElem}, Int), z, x, p)
+                (Ref{AcbPolyRingElem}, Ref{ZZPolyRingElem}, Int), z, x, p)
     finalizer(_acb_poly_clear_fn, z)
     return z
   end
 
-  function acb_poly(x::QQPolyRingElem, p::Int)
+  function AcbPolyRingElem(x::QQPolyRingElem, p::Int)
     z = new() 
-    ccall((:acb_poly_init, libarb), Nothing, (Ref{acb_poly}, ), z)
+    ccall((:acb_poly_init, libarb), Nothing, (Ref{AcbPolyRingElem}, ), z)
     ccall((:acb_poly_set_fmpq_poly, libarb), Nothing,
-                (Ref{acb_poly}, Ref{QQPolyRingElem}, Int), z, x, p)
+                (Ref{AcbPolyRingElem}, Ref{QQPolyRingElem}, Int), z, x, p)
     finalizer(_acb_poly_clear_fn, z)
     return z
   end
 end
 
-function _acb_poly_clear_fn(x::acb_poly)
-  ccall((:acb_poly_clear, libarb), Nothing, (Ref{acb_poly}, ), x)
+function _acb_poly_clear_fn(x::AcbPolyRingElem)
+  ccall((:acb_poly_clear, libarb), Nothing, (Ref{AcbPolyRingElem}, ), x)
 end
 
-parent(x::acb_poly) = x.parent
+parent(x::AcbPolyRingElem) = x.parent
 
 var(x::AcbPolyRing) = x.S
 
