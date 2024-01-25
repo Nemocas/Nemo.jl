@@ -597,6 +597,25 @@ function solve_lu_precomp(P::Generic.Perm, LU::ComplexMat, y::ComplexMat)
   return z
 end
 
+function AbstractAlgebra.Solve._can_solve_internal_no_check(A::ComplexMat, b::ComplexMat, task::Symbol; side::Symbol = :right)
+   nrows(A) != ncols(A) && error("Only implemented for square matrices")
+   if side === :left
+      fl, sol, K = AbstractAlgebra.Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
+      return fl, transpose(sol), transpose(K)
+   end
+
+   x = similar(A, ncols(A), ncols(b))
+   fl = ccall((:acb_mat_solve, libarb), Cint,
+              (Ref{ComplexMat}, Ref{ComplexMat}, Ref{ComplexMat}, Int),
+              x, A, b, precision(Balls))
+   fl == 0 && error("Matrix cannot be inverted numerically")
+   if task === :only_check || task === :with_solution
+      return true, x, zero(A, 0, 0)
+   end
+   # If we ended up here, then A is invertible, so the kernel is trivial
+   return true, x, zero(A, ncols(A), 0)
+end
+
 ################################################################################
 #
 #   Row swapping
