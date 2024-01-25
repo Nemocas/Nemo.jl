@@ -1121,7 +1121,7 @@ $\mathbb{Q}$.
 function nullspace_right_rational(x::ZZMatrix)
    z = similar(x)
    u = similar(x, ncols(x), ncols(x))
-   rank = ccall((:fmpz_mat_nullspace, libflint), Cint,
+   rank = ccall((:fmpz_mat_nullspace, libflint), Int,
                 (Ref{ZZMatrix}, Ref{ZZMatrix}), u, x)
    return rank, u
 end
