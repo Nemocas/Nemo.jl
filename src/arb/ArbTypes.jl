@@ -1399,256 +1399,256 @@ end
 
 const AcbMatSpaceID = CacheDictType{Tuple{AcbField, Int, Int}, AcbMatSpace}()
 
-mutable struct acb_mat <: MatElem{AcbFieldElem}
+mutable struct AcbMatrix <: MatElem{AcbFieldElem}
   entries::Ptr{Nothing}
   r::Int
   c::Int
   rows::Ptr{Nothing}
   base_ring::AcbField
 
-  function acb_mat(r::Int, c::Int)
+  function AcbMatrix(r::Int, c::Int)
     z = new()
-    ccall((:acb_mat_init, libarb), Nothing, (Ref{acb_mat}, Int, Int), z, r, c)
+    ccall((:acb_mat_init, libarb), Nothing, (Ref{AcbMatrix}, Int, Int), z, r, c)
     finalizer(_acb_mat_clear_fn, z)
     return z
   end
 
-  function acb_mat(a::ZZMatrix)
+  function AcbMatrix(a::ZZMatrix)
     z = new()
     ccall((:acb_mat_init, libarb), Nothing,
-                (Ref{acb_mat}, Int, Int), z, a.r, a.c)
+                (Ref{AcbMatrix}, Int, Int), z, a.r, a.c)
     ccall((:acb_mat_set_fmpz_mat, libarb), Nothing,
-                (Ref{acb_mat}, Ref{ZZMatrix}), z, a)
+                (Ref{AcbMatrix}, Ref{ZZMatrix}), z, a)
     finalizer(_acb_mat_clear_fn, z)
     return z
   end
   
-  function acb_mat(a::ZZMatrix, prec::Int)
+  function AcbMatrix(a::ZZMatrix, prec::Int)
     z = new()
     ccall((:acb_mat_init, libarb), Nothing,
-                (Ref{acb_mat}, Int, Int), z, a.r, a.c)
+                (Ref{AcbMatrix}, Int, Int), z, a.r, a.c)
     ccall((:acb_mat_set_round_fmpz_mat, libarb), Nothing,
-                (Ref{acb_mat}, Ref{ZZMatrix}, Int), z, a, prec)
+                (Ref{AcbMatrix}, Ref{ZZMatrix}, Int), z, a, prec)
     finalizer(_acb_mat_clear_fn, z)
     return z
   end
 
-  function acb_mat(a::ArbMatrix)
+  function AcbMatrix(a::ArbMatrix)
     z = new()
     ccall((:acb_mat_init, libarb), Nothing,
-                (Ref{acb_mat}, Int, Int), z, a.r, a.c)
+                (Ref{AcbMatrix}, Int, Int), z, a.r, a.c)
     ccall((:acb_mat_set_arb_mat, libarb), Nothing,
-                (Ref{acb_mat}, Ref{ArbMatrix}), z, a)
+                (Ref{AcbMatrix}, Ref{ArbMatrix}), z, a)
     finalizer(_acb_mat_clear_fn, z)
     return z
   end
 
-  function acb_mat(a::ArbMatrix, prec::Int)
+  function AcbMatrix(a::ArbMatrix, prec::Int)
     z = new()
     ccall((:acb_mat_init, libarb), Nothing,
-                (Ref{acb_mat}, Int, Int), z, a.r, a.c)
+                (Ref{AcbMatrix}, Int, Int), z, a.r, a.c)
     ccall((:acb_mat_set_round_arb_mat, libarb), Nothing,
-                (Ref{acb_mat}, Ref{ArbMatrix}, Int), z, a, prec)
+                (Ref{AcbMatrix}, Ref{ArbMatrix}, Int), z, a, prec)
     finalizer(_acb_mat_clear_fn, z)
     return z
   end
    
-  function acb_mat(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, Float64, ZZRingElem}}
+  function AcbMatrix(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, Float64, ZZRingElem}}
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
-                (Ref{acb_mat}, Int, Int), z, r, c)
+                (Ref{AcbMatrix}, Int, Int), z, r, c)
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
-                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
+                    (Ref{AcbMatrix}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j])
       end
     end
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: Union{BigFloat, AcbFieldElem, ArbFieldElem}}
+  function AcbMatrix(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: Union{BigFloat, AcbFieldElem, ArbFieldElem}}
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
-                (Ref{acb_mat}, Int, Int), z, r, c)
+                (Ref{AcbMatrix}, Int, Int), z, r, c)
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
-                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
+                    (Ref{AcbMatrix}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j])
       end
     end
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, Float64, ZZRingElem}}
+  function AcbMatrix(r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, Float64, ZZRingElem}}
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
-                (Ref{acb_mat}, Int, Int), z, r, c)
+                (Ref{AcbMatrix}, Int, Int), z, r, c)
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
-                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
+                    (Ref{AcbMatrix}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j])
       end
     end
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{BigFloat, AcbFieldElem, ArbFieldElem}}
+  function AcbMatrix(r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{BigFloat, AcbFieldElem, ArbFieldElem}}
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
-                (Ref{acb_mat}, Int, Int), z, r, c)
+                (Ref{AcbMatrix}, Int, Int), z, r, c)
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
-                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
+                    (Ref{AcbMatrix}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j])
       end
     end
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractMatrix{T}, prec::Int) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64}}
+  function AcbMatrix(r::Int, c::Int, arr::AbstractMatrix{T}, prec::Int) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64}}
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
-                (Ref{acb_mat}, Int, Int), z, r, c)
+                (Ref{AcbMatrix}, Int, Int), z, r, c)
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
-                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
+                    (Ref{AcbMatrix}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j], prec)
       end
     end
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractMatrix{T}, prec::Int) where {T <: Union{BigFloat, ArbFieldElem, AbstractString, AcbFieldElem}}
+  function AcbMatrix(r::Int, c::Int, arr::AbstractMatrix{T}, prec::Int) where {T <: Union{BigFloat, ArbFieldElem, AbstractString, AcbFieldElem}}
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
-                (Ref{acb_mat}, Int, Int), z, r, c)
+                (Ref{AcbMatrix}, Int, Int), z, r, c)
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
-                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
+                    (Ref{AcbMatrix}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j], prec)
       end
     end
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractVector{T}, prec::Int) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64}}
+  function AcbMatrix(r::Int, c::Int, arr::AbstractVector{T}, prec::Int) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64}}
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
-                (Ref{acb_mat}, Int, Int), z, r, c)
+                (Ref{AcbMatrix}, Int, Int), z, r, c)
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
-                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
+                    (Ref{AcbMatrix}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j], prec)
       end
     end
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractVector{T}, prec::Int) where {T <: Union{BigFloat, ArbFieldElem, AbstractString, AcbFieldElem}}
+  function AcbMatrix(r::Int, c::Int, arr::AbstractVector{T}, prec::Int) where {T <: Union{BigFloat, ArbFieldElem, AbstractString, AcbFieldElem}}
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
-                (Ref{acb_mat}, Int, Int), z, r, c)
+                (Ref{AcbMatrix}, Int, Int), z, r, c)
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
-                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
+                    (Ref{AcbMatrix}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j], prec)
       end
     end
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractMatrix{Tuple{T, T}}, prec::Int) where {T <: Union{Int, UInt, Float64, ZZRingElem}}
+  function AcbMatrix(r::Int, c::Int, arr::AbstractMatrix{Tuple{T, T}}, prec::Int) where {T <: Union{Int, UInt, Float64, ZZRingElem}}
 
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
-                (Ref{acb_mat}, Int, Int), z, r, c)
+                (Ref{AcbMatrix}, Int, Int), z, r, c)
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
-                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
+                    (Ref{AcbMatrix}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j][1], arr[i,j][2], prec)
       end
     end
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractMatrix{Tuple{T, T}}, prec::Int) where {T <: Union{QQFieldElem, BigFloat, ArbFieldElem, AbstractString}}
+  function AcbMatrix(r::Int, c::Int, arr::AbstractMatrix{Tuple{T, T}}, prec::Int) where {T <: Union{QQFieldElem, BigFloat, ArbFieldElem, AbstractString}}
 
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
-                (Ref{acb_mat}, Int, Int), z, r, c)
+                (Ref{AcbMatrix}, Int, Int), z, r, c)
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
-                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
+                    (Ref{AcbMatrix}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j][1], arr[i,j][2], prec)
       end
     end
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractVector{Tuple{T, T}}, prec::Int) where {T <: Union{Int, UInt, Float64, ZZRingElem}}
+  function AcbMatrix(r::Int, c::Int, arr::AbstractVector{Tuple{T, T}}, prec::Int) where {T <: Union{Int, UInt, Float64, ZZRingElem}}
 
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
-                (Ref{acb_mat}, Int, Int), z, r, c)
+                (Ref{AcbMatrix}, Int, Int), z, r, c)
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
-                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
+                    (Ref{AcbMatrix}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j][1], arr[(i-1)*c+j][2], prec)
       end
     end
     return z
   end
 
-  function acb_mat(r::Int, c::Int, arr::AbstractVector{Tuple{T, T}}, prec::Int) where {T <: Union{QQFieldElem, BigFloat, ArbFieldElem, AbstractString}}
+  function AcbMatrix(r::Int, c::Int, arr::AbstractVector{Tuple{T, T}}, prec::Int) where {T <: Union{QQFieldElem, BigFloat, ArbFieldElem, AbstractString}}
 
     z = new()
     ccall((:acb_mat_init, libarb), Nothing, 
-                (Ref{acb_mat}, Int, Int), z, r, c)
+                (Ref{AcbMatrix}, Int, Int), z, r, c)
     finalizer(_acb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
-                    (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
+                    (Ref{AcbMatrix}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j][1], arr[(i-1)*c+j][2], prec)
       end
     end
     return z
   end
 
-  function acb_mat(a::QQMatrix, prec::Int)
+  function AcbMatrix(a::QQMatrix, prec::Int)
     z = new()
     ccall((:acb_mat_init, libarb), Nothing,
-                (Ref{acb_mat}, Int, Int), z, a.r, a.c)
+                (Ref{AcbMatrix}, Int, Int), z, a.r, a.c)
     ccall((:acb_mat_set_fmpq_mat, libarb), Nothing,
-                (Ref{acb_mat}, Ref{QQMatrix}, Int), z, a, prec)
+                (Ref{AcbMatrix}, Ref{QQMatrix}, Int), z, a, prec)
     finalizer(_acb_mat_clear_fn, z)
     return z
   end
 end
 
-function _acb_mat_clear_fn(x::acb_mat)
-  ccall((:acb_mat_clear, libarb), Nothing, (Ref{acb_mat}, ), x)
+function _acb_mat_clear_fn(x::AcbMatrix)
+  ccall((:acb_mat_clear, libarb), Nothing, (Ref{AcbMatrix}, ), x)
 end
 

@@ -68,22 +68,22 @@ function norm(v::ArbMatrix)
     return sqrt(sum([a^2 for a in v]))
 end
 
-function real(tau::acb_mat)
+function real(tau::AcbMatrix)
     return map(real, tau)
 end
 
-function imag(tau::acb_mat)
+function imag(tau::AcbMatrix)
     return map(imag, tau)
 end
 
 *(x::AcbFieldElem, y::ArbMatrix) = x * _acb_mat(y)
 *(x::ArbMatrix, y::AcbFieldElem) = y * x
-*(x::ArbMatrix, y::acb_mat) = _acb_mat(x) * y
-*(x::acb_mat, y::ArbMatrix) = x * _acb_mat(y)
-+(x::ArbMatrix, y::acb_mat) = _acb_mat(x) + y
-+(x::acb_mat, y::ArbMatrix) = y + x
--(x::ArbMatrix, y::acb_mat) = x + (-y)
--(x::acb_mat, y::ArbMatrix) = x + (-y)
+*(x::ArbMatrix, y::AcbMatrix) = _acb_mat(x) * y
+*(x::AcbMatrix, y::ArbMatrix) = x * _acb_mat(y)
++(x::ArbMatrix, y::AcbMatrix) = _acb_mat(x) + y
++(x::AcbMatrix, y::ArbMatrix) = y + x
+-(x::ArbMatrix, y::AcbMatrix) = x + (-y)
+-(x::AcbMatrix, y::ArbMatrix) = x + (-y)
 //(x::ArbMatrix, y::ArbFieldElem) = map(t -> t // y, x)
 
 

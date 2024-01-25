@@ -431,7 +431,7 @@ isreal(x::ComplexMat) =
 @doc raw"""
     inv(x::ComplexMat)
 
-Given a $n\times n$ matrix of type `acb_mat`, return an
+Given a $n\times n$ matrix of type `AcbMatrix`, return an
 $n\times n$ matrix $X$ such that $AX$ contains the
 identity matrix. If $A$ cannot be inverted numerically an exception is raised.
 """

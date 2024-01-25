@@ -7,7 +7,7 @@ export absolute_frobenius
 export absolute_norm
 export absolute_tr
 export AcbFieldElem
-export acb_mat
+export AcbMatrix
 export AcbPolyRingElem
 export AcbField
 export AcbMatSpace
