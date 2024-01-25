@@ -566,6 +566,25 @@ function solve_cholesky_precomp(cho::ArbMatrix, y::ArbMatrix)
   return z
 end
 
+function AbstractAlgebra.Solve._can_solve_internal_no_check(A::arb_mat, b::arb_mat, task::Symbol; side::Symbol = :right)
+   nrows(A) != ncols(A) && error("Only implemented for square matrices")
+   if side === :left
+      fl, sol, K = AbstractAlgebra.Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
+      return fl, transpose(sol), transpose(K)
+   end
+
+   x = similar(A, ncols(A), ncols(b))
+   fl = ccall((:arb_mat_solve, libarb), Cint,
+              (Ref{arb_mat}, Ref{arb_mat}, Ref{arb_mat}, Int),
+              x, A, b, precision(base_ring(A)))
+   fl == 0 && error("Matrix cannot be inverted numerically")
+   if task === :only_check || task === :with_solution
+      return true, x, zero(A, 0, 0)
+   end
+   # If we ended up here, then A is invertible, so the kernel is trivial
+   return true, x, zero(A, ncols(A), 0)
+end
+
 ################################################################################
 #
 #   Row swapping
