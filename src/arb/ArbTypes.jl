@@ -1005,113 +1005,113 @@ end
 
 const ArbMatSpaceID = CacheDictType{Tuple{ArbField, Int, Int}, ArbMatSpace}()
 
-mutable struct arb_mat <: MatElem{ArbFieldElem}
+mutable struct ArbMatrix <: MatElem{ArbFieldElem}
   entries::Ptr{Nothing}
   r::Int
   c::Int
   rows::Ptr{Nothing}
   base_ring::ArbField
 
-  function arb_mat(r::Int, c::Int)
+  function ArbMatrix(r::Int, c::Int)
     z = new()
-    ccall((:arb_mat_init, libarb), Nothing, (Ref{arb_mat}, Int, Int), z, r, c)
+    ccall((:arb_mat_init, libarb), Nothing, (Ref{ArbMatrix}, Int, Int), z, r, c)
     finalizer(_arb_mat_clear_fn, z)
     return z
   end
 
-  function arb_mat(a::ZZMatrix)
+  function ArbMatrix(a::ZZMatrix)
     z = new()
     ccall((:arb_mat_init, libarb), Nothing,
-                (Ref{arb_mat}, Int, Int), z, a.r, a.c)
+                (Ref{ArbMatrix}, Int, Int), z, a.r, a.c)
     ccall((:arb_mat_set_fmpz_mat, libarb), Nothing,
-                (Ref{arb_mat}, Ref{ZZMatrix}), z, a)
+                (Ref{ArbMatrix}, Ref{ZZMatrix}), z, a)
     finalizer(_arb_mat_clear_fn, z)
     return z
   end
   
-  function arb_mat(a::ZZMatrix, prec::Int)
+  function ArbMatrix(a::ZZMatrix, prec::Int)
     z = new()
     ccall((:arb_mat_init, libarb), Nothing,
-                (Ref{arb_mat}, Int, Int), z, a.r, a.c)
+                (Ref{ArbMatrix}, Int, Int), z, a.r, a.c)
     ccall((:arb_mat_set_round_fmpz_mat, libarb), Nothing,
-                (Ref{arb_mat}, Ref{ZZMatrix}, Int), z, a, prec)
+                (Ref{ArbMatrix}, Ref{ZZMatrix}, Int), z, a, prec)
     finalizer(_arb_mat_clear_fn, z)
     return z
   end
 
-  function arb_mat(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, Float64, BigFloat, ArbFieldElem}}
+  function ArbMatrix(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, Float64, BigFloat, ArbFieldElem}}
     z = new()
     ccall((:arb_mat_init, libarb), Nothing, 
-                (Ref{arb_mat}, Int, Int), z, r, c)
+                (Ref{ArbMatrix}, Int, Int), z, r, c)
     finalizer(_arb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = ccall((:arb_mat_entry_ptr, libarb), Ptr{ArbFieldElem},
-                    (Ref{arb_mat}, Int, Int), z, i - 1, j - 1)
+                    (Ref{ArbMatrix}, Int, Int), z, i - 1, j - 1)
         Nemo._arb_set(el, arr[i, j])
       end
     end
     return z
   end
 
-  function arb_mat(r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, Float64, BigFloat, ArbFieldElem}}
+  function ArbMatrix(r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, Float64, BigFloat, ArbFieldElem}}
     z = new()
     ccall((:arb_mat_init, libarb), Nothing, 
-                (Ref{arb_mat}, Int, Int), z, r, c)
+                (Ref{ArbMatrix}, Int, Int), z, r, c)
     finalizer(_arb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = ccall((:arb_mat_entry_ptr, libarb), Ptr{ArbFieldElem},
-                    (Ref{arb_mat}, Int, Int), z, i - 1, j - 1)
+                    (Ref{ArbMatrix}, Int, Int), z, i - 1, j - 1)
         Nemo._arb_set(el, arr[(i-1)*c+j])
       end
     end
     return z
   end
 
-  function arb_mat(r::Int, c::Int, arr::AbstractMatrix{T}, prec::Int) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AbstractString}}
+  function ArbMatrix(r::Int, c::Int, arr::AbstractMatrix{T}, prec::Int) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AbstractString}}
     z = new()
     ccall((:arb_mat_init, libarb), Nothing, 
-                (Ref{arb_mat}, Int, Int), z, r, c)
+                (Ref{ArbMatrix}, Int, Int), z, r, c)
     finalizer(_arb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = ccall((:arb_mat_entry_ptr, libarb), Ptr{ArbFieldElem},
-                    (Ref{arb_mat}, Int, Int), z, i - 1, j - 1)
+                    (Ref{ArbMatrix}, Int, Int), z, i - 1, j - 1)
         _arb_set(el, arr[i, j], prec)
       end
     end
     return z
   end
      
-  function arb_mat(r::Int, c::Int, arr::AbstractVector{T}, prec::Int) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AbstractString}}
+  function ArbMatrix(r::Int, c::Int, arr::AbstractVector{T}, prec::Int) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AbstractString}}
     z = new()
     ccall((:arb_mat_init, libarb), Nothing, 
-                (Ref{arb_mat}, Int, Int), z, r, c)
+                (Ref{ArbMatrix}, Int, Int), z, r, c)
     finalizer(_arb_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = ccall((:arb_mat_entry_ptr, libarb), Ptr{ArbFieldElem},
-                    (Ref{arb_mat}, Int, Int), z, i - 1, j - 1)
+                    (Ref{ArbMatrix}, Int, Int), z, i - 1, j - 1)
         _arb_set(el, arr[(i-1)*c+j], prec)
       end
     end
     return z
   end
 
-  function arb_mat(a::QQMatrix, prec::Int)
+  function ArbMatrix(a::QQMatrix, prec::Int)
     z = new()
     ccall((:arb_mat_init, libarb), Nothing,
-                (Ref{arb_mat}, Int, Int), z, a.r, a.c)
+                (Ref{ArbMatrix}, Int, Int), z, a.r, a.c)
     ccall((:arb_mat_set_fmpq_mat, libarb), Nothing,
-                (Ref{arb_mat}, Ref{QQMatrix}, Int), z, a, prec)
+                (Ref{ArbMatrix}, Ref{QQMatrix}, Int), z, a, prec)
     finalizer(_arb_mat_clear_fn, z)
     return z
   end
 end
 
-function _arb_mat_clear_fn(x::arb_mat)
-  ccall((:arb_mat_clear, libarb), Nothing, (Ref{arb_mat}, ), x)
+function _arb_mat_clear_fn(x::ArbMatrix)
+  ccall((:arb_mat_clear, libarb), Nothing, (Ref{ArbMatrix}, ), x)
 end
 
 ################################################################################
@@ -1171,17 +1171,17 @@ mutable struct ComplexMat <: MatElem{ComplexFieldElem}
     ccall((:acb_mat_init, libarb), Nothing,
                 (Ref{ComplexMat}, Int, Int), z, a.r, a.c)
     ccall((:acb_mat_set_arb_mat, libarb), Nothing,
-                (Ref{ComplexMat}, Ref{arb_mat}), z, a)
+                (Ref{ComplexMat}, Ref{ArbMatrix}), z, a)
     finalizer(_acb_mat_clear_fn, z)
     return z
   end
 
-  function ComplexMat(a::arb_mat, prec::Int)
+  function ComplexMat(a::ArbMatrix, prec::Int)
     z = new()
     ccall((:acb_mat_init, libarb), Nothing,
                 (Ref{ComplexMat}, Int, Int), z, a.r, a.c)
     ccall((:acb_mat_set_round_arb_mat, libarb), Nothing,
-                (Ref{ComplexMat}, Ref{arb_mat}, Int), z, a, prec)
+                (Ref{ComplexMat}, Ref{ArbMatrix}, Int), z, a, prec)
     finalizer(_acb_mat_clear_fn, z)
     return z
   end
@@ -1433,22 +1433,22 @@ mutable struct acb_mat <: MatElem{acb}
     return z
   end
 
-  function acb_mat(a::arb_mat)
+  function acb_mat(a::ArbMatrix)
     z = new()
     ccall((:acb_mat_init, libarb), Nothing,
                 (Ref{acb_mat}, Int, Int), z, a.r, a.c)
     ccall((:acb_mat_set_arb_mat, libarb), Nothing,
-                (Ref{acb_mat}, Ref{arb_mat}), z, a)
+                (Ref{acb_mat}, Ref{ArbMatrix}), z, a)
     finalizer(_acb_mat_clear_fn, z)
     return z
   end
 
-  function acb_mat(a::arb_mat, prec::Int)
+  function acb_mat(a::ArbMatrix, prec::Int)
     z = new()
     ccall((:acb_mat_init, libarb), Nothing,
                 (Ref{acb_mat}, Int, Int), z, a.r, a.c)
     ccall((:acb_mat_set_round_arb_mat, libarb), Nothing,
-                (Ref{acb_mat}, Ref{arb_mat}, Int), z, a, prec)
+                (Ref{acb_mat}, Ref{ArbMatrix}, Int), z, a, prec)
     finalizer(_acb_mat_clear_fn, z)
     return z
   end

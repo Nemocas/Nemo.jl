@@ -847,7 +847,7 @@ promote_rule(::Type{ComplexMat}, ::Type{ZZMatrix}) = ComplexMat
 
 promote_rule(::Type{ComplexMat}, ::Type{QQMatrix}) = ComplexMat
 
-promote_rule(::Type{ComplexMat}, ::Type{arb_mat}) = ComplexMat
+promote_rule(::Type{ComplexMat}, ::Type{ArbMatrix}) = ComplexMat
 
 ###############################################################################
 #

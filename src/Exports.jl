@@ -30,7 +30,7 @@ export AllPerms
 export angle
 export AnticNumberField
 export ArbFieldElem
-export arb_mat
+export ArbMatrix
 export ArbPolyRingElem
 export ArbField
 export ArbMatSpace

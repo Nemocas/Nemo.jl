@@ -527,7 +527,7 @@ function compare_index(A::ZZMatrix, i::Int, j::Int, b::ZZRingElem)
     return ccall((:fmpz_cmp, libflint), Int32, (Ptr{ZZRingElem}, Ref{ZZRingElem}), a, b)
 end
 
-function round!(b::ZZMatrix, a::arb_mat)
+function round!(b::ZZMatrix, a::ArbMatrix)
     s = size(a)
     for i = 1:s[1]
         for j = 1:s[2]

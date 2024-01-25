@@ -65,7 +65,7 @@ parent objects of the given rings and structures.
      - `acb` (`AcbField`)
      - `ArbPolyRingElem` (`ArbPolyRing`)
      - `acb_poly` (`AcbPolyRing`)
-     - `arb_mat` (`ArbMatSpace`)
+     - `ArbMatrix` (`ArbMatSpace`)
      - `acb_mat` (`AcbMatSpace`)
 
   - Calcium

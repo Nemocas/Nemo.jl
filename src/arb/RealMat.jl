@@ -388,7 +388,7 @@ end
 @doc raw"""
     inv(x::RealMat)
 
-Given a  $n\times n$ matrix of type `arb_mat`, return an
+Given a  $n\times n$ matrix of type `ArbMatrix`, return an
 $n\times n$ matrix $X$ such that $AX$ contains the
 identity matrix. If $A$ cannot be inverted numerically an exception is raised.
 """

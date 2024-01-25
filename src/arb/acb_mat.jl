@@ -412,9 +412,9 @@ end
 
 ==(x::ZZMatrix, y::acb_mat) = y == x
 
-==(x::acb_mat, y::arb_mat) = x == parent(x)(y)
+==(x::acb_mat, y::ArbMatrix) = x == parent(x)(y)
 
-==(x::arb_mat, y::acb_mat) = y == x
+==(x::ArbMatrix, y::acb_mat) = y == x
 
 ################################################################################
 #
@@ -685,7 +685,7 @@ function (x::AcbMatSpace)(y::ZZMatrix)
   return z
 end
 
-function (x::AcbMatSpace)(y::arb_mat)
+function (x::AcbMatSpace)(y::ArbMatrix)
   (ncols(x) != ncols(y) || nrows(x) != nrows(y)) &&
       error("Dimensions are wrong")
   z = acb_mat(y, precision(x))
@@ -861,7 +861,7 @@ promote_rule(::Type{acb_mat}, ::Type{ZZMatrix}) = acb_mat
 
 promote_rule(::Type{acb_mat}, ::Type{QQMatrix}) = acb_mat
 
-promote_rule(::Type{acb_mat}, ::Type{arb_mat}) = acb_mat
+promote_rule(::Type{acb_mat}, ::Type{ArbMatrix}) = acb_mat
 
 ###############################################################################
 #

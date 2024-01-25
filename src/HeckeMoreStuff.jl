@@ -64,7 +64,7 @@ function evaluate!(z::fqPolyRepFieldElem, f::ZZPolyRingElem, r::fqPolyRepFieldEl
 end
 
 
-function norm(v::arb_mat)
+function norm(v::ArbMatrix)
     return sqrt(sum([a^2 for a in v]))
 end
 
@@ -76,18 +76,18 @@ function imag(tau::acb_mat)
     return map(imag, tau)
 end
 
-*(x::acb, y::arb_mat) = x * _acb_mat(y)
-*(x::arb_mat, y::acb) = y * x
-*(x::arb_mat, y::acb_mat) = _acb_mat(x) * y
-*(x::acb_mat, y::arb_mat) = x * _acb_mat(y)
-+(x::arb_mat, y::acb_mat) = _acb_mat(x) + y
-+(x::acb_mat, y::arb_mat) = y + x
--(x::arb_mat, y::acb_mat) = x + (-y)
--(x::acb_mat, y::arb_mat) = x + (-y)
-//(x::arb_mat, y::ArbFieldElem) = map(t -> t // y, x)
+*(x::acb, y::ArbMatrix) = x * _acb_mat(y)
+*(x::ArbMatrix, y::acb) = y * x
+*(x::ArbMatrix, y::acb_mat) = _acb_mat(x) * y
+*(x::acb_mat, y::ArbMatrix) = x * _acb_mat(y)
++(x::ArbMatrix, y::acb_mat) = _acb_mat(x) + y
++(x::acb_mat, y::ArbMatrix) = y + x
+-(x::ArbMatrix, y::acb_mat) = x + (-y)
+-(x::acb_mat, y::ArbMatrix) = x + (-y)
+//(x::ArbMatrix, y::ArbFieldElem) = map(t -> t // y, x)
 
 
-function _acb_mat(A::arb_mat)
+function _acb_mat(A::ArbMatrix)
     p = precision(base_ring(A))
     Cc = AcbField(p)
     return change_base_ring(Cc, A)
@@ -185,7 +185,7 @@ function Base.round(::Type{ZZRingElem}, x::ArbFieldElem)
     end
 end
 
-function Base.round(::Type{ZZMatrix}, C::arb_mat)
+function Base.round(::Type{ZZMatrix}, C::ArbMatrix)
     v = zero_matrix(FlintZZ, nrows(C), ncols(C))
 
     for i = 1:nrows(C)
