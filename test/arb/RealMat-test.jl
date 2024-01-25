@@ -413,6 +413,32 @@ end
    @test contains(transpose(y), ZZ[1 1 1])
 end
 
+@testset "RealMat.Solve.solve" begin
+   S = matrix_space(RR, 3, 3)
+
+   A = S(["1.0 +/- 0.01" "2.0 +/- 0.01" "3.0 +/- 0.01";
+          "4.0 +/- 0.01" "5.0 +/- 0.01" "6.0 +/- 0.01";
+          "8.0 +/- 0.01" "8.0 +/- 0.01" "9.0 +/- 0.01"])
+
+   b = transpose(RR["6.0 +/- 0.1" "15.0 +/- 0.1" "25.0 +/- 0.1"])
+
+   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, b)
+   @test fl
+   @test overlaps(A*y, b)
+   @test contains(transpose(y), ZZ[1 1 1])
+   @test ncols(K) == 0
+
+   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, transpose(b), side = :left)
+   @test fl
+   @test overlaps(y*A, transpose(b))
+   @test nrows(K) == 0
+
+   y = AbstractAlgebra.Solve.solve(A, b)
+   @test fl
+   @test overlaps(A*y, b)
+   @test contains(transpose(y), ZZ[1 1 1])
+end
+
 @testset "RealMat.bound_inf_norm" begin
    S = matrix_space(RR, 3, 3)
 
