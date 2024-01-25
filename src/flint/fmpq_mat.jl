@@ -704,21 +704,11 @@ function can_solve(a::QQMatrix, b::QQMatrix; side::Symbol = :right)
    return fl
 end
 
-function AbstractAlgebra.Solve._can_solve_internal(A::QQMatrix, b::QQMatrix, task::Symbol; side::Symbol = :right)
-   if task !== :only_check && task !== :with_solution && task !== :with_kernel
-      error("task $(task) not recognized")
-   end
-
-   if side !== :right && side !== :left
-      throw(ArgumentError("Unsupported argument :$side for side: Must be :left or :right."))
-   end
-
+function AbstractAlgebra.Solve._can_solve_internal_no_check(A::QQMatrix, b::QQMatrix, task::Symbol; side::Symbol = :right)
    if side === :left
-      fl, sol, K = AbstractAlgebra.Solve._can_solve_internal(transpose(A), transpose(b), task, side = :right)
+      fl, sol, K = AbstractAlgebra.Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
       return fl, transpose(sol), transpose(K)
    end
-
-   nrows(A) != nrows(b) && error("Incompatible matrices")
 
    x = similar(A, ncols(A), ncols(b))
    fl = ccall((:fmpq_mat_can_solve, libflint), Cint,
