@@ -588,15 +588,15 @@ end
 =#
 
 @testset "ZZModMatrix.Solve.solve" begin
-  Z17 = residue_ring(ZZ, ZZ(17))
+  Z17, = residue_ring(ZZ, ZZ(17))
   a = matrix(Z17, [1 2 3; 3 2 1; 0 0 2])
   b = matrix(Z17, [2 1 0 1; 0 0 0 0; 0 1 2 0])
   c = a*b
   d = AbstractAlgebra.Solve.solve(a, c)
   @test d == b
 
-  a = zero(R)
-  @test_throws ArgumentError solve(a, c)
+  a = zero(a, 3, 3)
+  @test_throws ArgumentError AbstractAlgebra.Solve.solve(a, c)
 
   A = matrix(Z17, [1 2 3; 4 5 6])
   B = matrix(Z17, 2, 1, [1, 1])
