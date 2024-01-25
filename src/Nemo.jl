@@ -619,6 +619,16 @@ const QQBar = CalciumQQBar
 
 ###############################################################################
 #
+#   Some explicit type piracy against AbstractAlgebra
+#
+###############################################################################
+
+AbstractAlgebra._order(G::AbstractAlgebra.Group) = order(ZZRingElem, G)
+AbstractAlgebra._order(g::AbstractAlgebra.GroupElem) = order(ZZRingElem, g)
+
+
+###############################################################################
+#
 #   Test code
 #
 ###############################################################################
