@@ -209,3 +209,8 @@ Base.@deprecate_binding ca CalciumFieldElem
 Base.@deprecate_binding nf_elem AnticNumberFieldElem
 Base.@deprecate_binding arb ArbFieldElem
 Base.@deprecate_binding arb_poly ArbPolyRingElem
+Base.@deprecate_binding arb_mat ArbMatrix 
+Base.@deprecate_binding acb AcbFieldElem
+Base.@deprecate_binding acb_poly AcbPolyRingElem
+Base.@deprecate_binding acb_mat AcbMatrix
+Base.@deprecate_binding CalciumQQBarField QQBarField
