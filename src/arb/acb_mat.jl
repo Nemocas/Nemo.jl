@@ -621,6 +621,92 @@ end
 
 ################################################################################
 #
+#   Linear solving via context object
+#
+################################################################################
+
+function AbstractAlgebra.Solve.solve_init(A::acb_mat)
+   return AbstractAlgebra.Solve.SolveCtx{acb, acb_mat, acb_mat}(A)
+end
+
+function AbstractAlgebra.Solve._init_reduce(C::AbstractAlgebra.Solve.SolveCtx{acb})
+   if isdefined(C, :red) && isdefined(C, :lu_perm)
+      return nothing
+   end
+
+   nrows(C) != ncols(C) && error("Only implemented for square matrices")
+
+   A = matrix(C)
+   P = Generic.Perm(nrows(C))
+   x = similar(A, nrows(A), ncols(A))
+   P.d .-= 1
+   fl = ccall((:acb_mat_lu, libarb), Cint,
+               (Ptr{Int}, Ref{acb_mat}, Ref{acb_mat}, Int),
+               P.d, x, A, precision(base_ring(A)))
+   fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
+   P.d .+= 1
+   inv!(P)
+
+   C.red = x
+   C.lu_perm = P
+   return nothing
+end
+
+function AbstractAlgebra.Solve._init_reduce_transpose(C::AbstractAlgebra.Solve.SolveCtx{acb})
+   if isdefined(C, :red_transp) && isdefined(C, :lu_perm_transp)
+      return nothing
+   end
+
+   nrows(C) != ncols(C) && error("Only implemented for square matrices")
+
+   A = transpose(matrix(C))
+   P = Generic.Perm(nrows(C))
+   x = similar(A, nrows(A), ncols(A))
+   P.d .-= 1
+   fl = ccall((:acb_mat_lu, libarb), Cint,
+               (Ptr{Int}, Ref{acb_mat}, Ref{acb_mat}, Int),
+               P.d, x, A, precision(base_ring(A)))
+   fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
+   P.d .+= 1
+   inv!(P)
+
+   C.red_transp = x
+   C.lu_perm_transp = P
+   return nothing
+end
+
+function AbstractAlgebra.Solve._can_solve_internal_no_check(C::AbstractAlgebra.Solve.SolveCtx{acb}, b::acb_mat, task::Symbol; side::Symbol = :right)
+   if side === :right
+      LU = AbstractAlgebra.Solve.reduced_matrix(C)
+      p = AbstractAlgebra.Solve.lu_permutation(C)
+   else
+      LU = AbstractAlgebra.Solve.reduced_matrix_of_transpose(C)
+      p = AbstractAlgebra.Solve.lu_permutation_of_transpose(C)
+      b = transpose(b)
+   end
+
+   x = similar(b, ncols(C), ncols(b))
+   ccall((:acb_mat_solve_lu_precomp, libarb), Nothing,
+         (Ref{acb_mat}, Ptr{Int}, Ref{acb_mat}, Ref{acb_mat}, Int),
+         x, inv(p).d .- 1, LU, b, precision(base_ring(LU)))
+
+   if side === :left
+     x = transpose(x)
+   end
+
+   if task === :only_check || task === :with_solution
+      return true, x, zero(b, 0, 0)
+   end
+   # If we ended up here, then the matrix is invertible, so the kernel is trivial
+   if side === :right
+      return true, x, zero(b, ncols(C), 0)
+   else
+      return true, x, zero(b, 0, nrows(C))
+   end
+end
+
+################################################################################
+#
 #   Row swapping
 #
 ################################################################################
