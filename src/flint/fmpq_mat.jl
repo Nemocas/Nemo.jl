@@ -1045,10 +1045,10 @@ function nullspace(A::QQMatrix)
    ccall((:fmpq_mat_get_fmpz_mat_rowwise, libflint), Nothing,
          (Ref{ZZMatrix}, Ptr{Nothing}, Ref{QQMatrix}), AZZ, C_NULL, A)
    N = similar(AZZ, ncols(A), ncols(A))
-   nullity = ccall((:fmpz_mat_nullspace, libflint), Cint,
+   nullity = ccall((:fmpz_mat_nullspace, libflint), Int,
                    (Ref{ZZMatrix}, Ref{ZZMatrix}), N, AZZ)
    NQQ = similar(A, ncols(A), ncols(A))
    ccall((:fmpq_mat_set_fmpz_mat, libflint), Nothing,
          (Ref{QQMatrix}, Ref{ZZMatrix}), NQQ, N)
-   return Int(nullity), NQQ
+   return nullity, NQQ
 end
