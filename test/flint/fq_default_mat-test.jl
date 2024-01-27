@@ -795,6 +795,18 @@ end
   a = 0
   GC.gc()
   @test t[1, 1] == 2
+
+  S = matrix_space(F17, 3, 3)
+  A = S([1 2 3; 4 5 6; 7 8 9])
+  v = @view A[2, :]
+  @test length(v) == 3
+  v[2] = 7
+  @test A == S([1 2 3; 4 7 6; 7 8 9])
+  A = S([1 2 3; 4 5 6; 7 8 9])
+  v = @view A[:, 3]
+  @test length(v) == 3
+  v[1] = 1
+  @test A == S([1 2 1; 4 5 6; 7 8 9])
 end
 
 @testset "FqMatrix.sub" begin
