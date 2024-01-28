@@ -326,15 +326,15 @@ end
 ################################################################################
 
 function rref(a::FqMatrix)
-   z = deepcopy(a)
+   z = similar(a)
    r = ccall((:fq_default_mat_rref, libflint), Int,
-             (Ref{FqMatrix}, Ref{FqField}), z, base_ring(a))
+             (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), z, a, base_ring(a))
    return r, z
 end
 
 function rref!(a::FqMatrix)
    r = ccall((:fq_default_mat_rref, libflint), Int,
-         (Ref{FqMatrix}, Ref{FqField}), a, base_ring(a))
+         (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), a, a, base_ring(a))
    return r
 end
 

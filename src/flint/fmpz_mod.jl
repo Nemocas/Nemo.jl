@@ -62,6 +62,14 @@ end
 
 characteristic(R::ZZModRing) = modulus(R)
 
+function _reduce(a::ZZRingElem, ctx::fmpz_mod_ctx_struct)
+    b = ZZRingElem()
+    ccall((:fmpz_mod_set_fmpz, libflint), Nothing,
+          (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{fmpz_mod_ctx_struct}),
+          b, a, ctx)
+    return b
+end
+
 ###############################################################################
 #
 #   Canonicalisation

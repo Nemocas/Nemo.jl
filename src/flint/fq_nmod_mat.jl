@@ -321,15 +321,17 @@ end
 ################################################################################
 
 function rref(a::fqPolyRepMatrix)
-   z = deepcopy(a)
+   z = similar(a)
    r = ccall((:fq_nmod_mat_rref, libflint), Int,
-             (Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), z, base_ring(a))
+             (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}),
+             z, a, base_ring(a))
    return r, z
 end
 
 function rref!(a::fqPolyRepMatrix)
    r = ccall((:fq_nmod_mat_rref, libflint), Int,
-         (Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), a, base_ring(a))
+             (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}),
+             a, a, base_ring(a))
    return r
 end
 

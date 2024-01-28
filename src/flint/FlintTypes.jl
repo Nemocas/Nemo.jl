@@ -5277,7 +5277,6 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
    r::Int
    c::Int
    rows::Ptr{Nothing}
-   mod::Int              # ZZRingElem
    # end flint struct
 
    base_ring::ZZModRing
@@ -5289,50 +5288,63 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
     return z
   end
 
-  function ZZModMatrix(r::Int, c::Int, n::ZZRingElem)
+  function ZZModMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct)
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-            (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{ZZModMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_fmpz_mod_mat_clear_fn, z)
     return z
   end
 
-  function ZZModMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
-    z = new()
-    ccall((:fmpz_mod_mat_init, libflint), Nothing,
-            (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
-    finalizer(_fmpz_mod_mat_clear_fn, z)
-    if transpose
-       arr = Base.transpose(arr)
-    end
-    for i = 1:r
-      for j = 1:c
-         setindex_raw!(z, mod(arr[i, j], n), i, j)
-      end
-    end
-    return z
+  function ZZModMatrix(r::Int, c::Int, R::ZZModRing)
+      ZZModMatrix(r, c, R.ninv)
   end
 
-  function ZZModMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractMatrix{T}, transpose::Bool = false) where T <: Integer
+  function ZZModMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-	  (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{ZZModMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_fmpz_mod_mat_clear_fn, z)
     if transpose
        arr = Base.transpose(arr)
     end
     for i = 1:r
       for j = 1:c
-         setindex_raw!(z, mod(ZZRingElem(arr[i, j]), n), i, j)
+        setindex_raw!(z, _reduce(arr[i, j], ctx), i, j)
       end
     end
     return z
   end
 
-  function ZZModMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractMatrix{ZZModRingElem}, transpose::Bool = false)
+  function ZZModMatrix(r::Int, c::Int, R::ZZModRing, arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
+      ZZModMatrix(r, c, R.ninv, arr, transpose)
+  end
+
+  function ZZModMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{T}, transpose::Bool = false) where T <: Integer
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-	  (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{ZZModMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
+    finalizer(_fmpz_mod_mat_clear_fn, z)
+    if transpose
+       arr = Base.transpose(arr)
+    end
+    for i = 1:r
+      for j = 1:c
+        setindex_raw!(z, _reduce(ZZRingElem(arr[i, j]), ctx), i, j)
+      end
+    end
+    return z
+  end
+
+  function ZZModMatrix(r::Int, c::Int, R::ZZModRing, arr::AbstractMatrix{T}, transpose::Bool = false) where T <: Integer
+      ZZModMatrix(r, c, R.ninv, arr, transpose)
+  end
+
+  function ZZModMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{ZZModRingElem}, transpose::Bool = false)
+    # FIXME: Check compatibility between ctx and arr?
+    z = new()
+    ccall((:fmpz_mod_mat_init, libflint), Nothing,
+          (Ref{ZZModMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_fmpz_mod_mat_clear_fn, z)
     if transpose
        arr = Base.transpose(arr)
@@ -5345,36 +5357,49 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
     return z
   end
 
-  function ZZModMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractVector{ZZRingElem})
+  function ZZModMatrix(r::Int, c::Int, R::ZZModRing, arr::AbstractMatrix{ZZModRingElem}, transpose::Bool = false)
+      ZZModMatrix(r, c, R, arr, transpose)
+  end
+
+  function ZZModMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractVector{ZZRingElem})
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-            (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{ZZModMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_fmpz_mod_mat_clear_fn, z)
     for i = 1:r
       for j = 1:c
-        setindex_raw!(z, mod(arr[(i - 1)*c + j], n), i, j)
+        setindex_raw!(z, _reduce(arr[(i - 1)*c + j], ctx), i, j)
       end
     end
     return z
   end
 
-  function ZZModMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractVector{T}) where T <: Integer
+  function ZZModMatrix(r::Int, c::Int, R::ZZModRing, arr::AbstractVector{ZZRingElem})
+      ZZModMatrix(r, c, R.ninv, arr)
+  end
+
+  function ZZModMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractVector{T}) where T <: Integer
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-          (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{ZZModMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_fmpz_mod_mat_clear_fn, z)
     for i = 1:r
        for j = 1:c
-          setindex_raw!(z, mod(ZZRingElem(arr[(i - 1)*c + j]), n), i, j)
+          setindex_raw!(z, _reduce(ZZRingElem(arr[(i - 1)*c + j]), ctx), i, j)
        end
     end
     return z
   end
 
-  function ZZModMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractVector{ZZModRingElem})
+  function ZZModMatrix(r::Int, c::Int, R::ZZModRing, arr::AbstractVector{T}) where T <: Integer
+      ZZModMatrix(r, c, R.ninv, arr)
+  end
+
+  function ZZModMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractVector{ZZModRingElem})
+    # FIXME: Check compatibility between ctx and arr?
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-	  (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{ZZModMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_fmpz_mod_mat_clear_fn, z)
     for i = 1:r
        for j = 1:c
@@ -5395,12 +5420,14 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
   function ZZModMatrix(n::ZZRingElem, b::ZZMatrix)
     (n < 2) && error("Modulus must be >= 2")
     z = new()
+    R = ZZModRing(n)
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-            (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, b.r, b.c, n)
+          (Ref{ZZModMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}),
+          z, b.r, b.c, R.ninv)
     finalizer(_fmpz_mod_mat_clear_fn, z)
     for i = 1:b.r
        for j = 1:b.c
-         setindex_raw!(z, mod(ZZRingElem(b[i,j]), n), i, j)
+         setindex_raw!(z, _reduce(b[i,j], R.ninv), i, j)
        end
     end
     return z
@@ -5409,7 +5436,8 @@ end
 
 
 function _fmpz_mod_mat_clear_fn(mat::ZZModMatrix)
-  ccall((:fmpz_mod_mat_clear, libflint), Nothing, (Ref{ZZModMatrix}, ), mat)
+  ccall((:fmpz_mod_mat_clear, libflint), Nothing,
+        (Ref{ZZModMatrix}, Ref{fmpz_mod_ctx_struct}), mat, mat.base_ring.ninv)
 end
 
 ###############################################################################
@@ -5436,7 +5464,6 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
    r::Int
    c::Int
    rows::Ptr{Nothing}
-   mod::Int              # ZZRingElem
    # end flint struct
 
    base_ring::FpField
@@ -5448,50 +5475,51 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
     return z
   end
 
-  function FpMatrix(r::Int, c::Int, n::ZZRingElem)
+  function FpMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct)
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-            (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{FpMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_gfp_fmpz_mat_clear_fn, z)
     return z
   end
 
-  function FpMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
+  function FpMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-          (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
-    finalizer(_gfp_fmpz_mat_clear_fn, z)
-    if transpose
-       arr = Base.transpose(arr)
-    end
-    for i = 1:r
-      for j = 1:c
-         setindex_raw!(z, mod(arr[i, j], n), i, j)
-      end
-    end
-    return z
-  end
-
-  function FpMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractMatrix{T}, transpose::Bool = false) where T <: Integer
-    z = new()
-    ccall((:fmpz_mod_mat_init, libflint), Nothing,
-          (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{FpMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_gfp_fmpz_mat_clear_fn, z)
     if transpose
        arr = Base.transpose(arr)
     end
     for i = 1:r
       for j = 1:c
-         setindex_raw!(z, mod(ZZRingElem(arr[i, j]), n), i, j)
+        setindex_raw!(z, _reduce(arr[i, j], ctx), i, j)
       end
     end
     return z
   end
 
-  function FpMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractMatrix{FpFieldElem}, transpose::Bool = false)
+  function FpMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{T}, transpose::Bool = false) where T <: Integer
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-          (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{FpMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
+    finalizer(_gfp_fmpz_mat_clear_fn, z)
+    if transpose
+       arr = Base.transpose(arr)
+    end
+    for i = 1:r
+      for j = 1:c
+        setindex_raw!(z, _reduce(ZZRingElem(arr[i, j]), ctx), i, j)
+      end
+    end
+    return z
+  end
+
+  function FpMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{FpFieldElem}, transpose::Bool = false)
+    # FIXME: Check compatibility between ctx and arr?
+    z = new()
+    ccall((:fmpz_mod_mat_init, libflint), Nothing,
+          (Ref{FpMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_gfp_fmpz_mat_clear_fn, z)
     if transpose
        arr = Base.transpose(arr)
@@ -5504,36 +5532,37 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
     return z
   end
 
-  function FpMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractVector{ZZRingElem})
+  function FpMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractVector{ZZRingElem})
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-          (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{FpMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_gfp_fmpz_mat_clear_fn, z)
     for i = 1:r
       for j = 1:c
-        setindex_raw!(z, mod(arr[(i - 1)*c + j], n), i, j)
+        setindex_raw!(z, _reduce(arr[(i - 1)*c + j], ctx), i, j)
       end
     end
     return z
   end
 
-  function FpMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractVector{T}) where T <: Integer
+  function FpMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractVector{T}) where T <: Integer
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-          (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{FpMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_gfp_fmpz_mat_clear_fn, z)
     for i = 1:r
        for j = 1:c
-          setindex_raw!(z, mod(ZZRingElem(arr[(i - 1)*c + j]), n), i, j)
+          setindex_raw!(z, _reduce(ZZRingElem(arr[(i - 1)*c + j]), ctx), i, j)
        end
     end
     return z
   end
 
-  function FpMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractVector{FpFieldElem})
+  function FpMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractVector{FpFieldElem})
+    # FIXME: Check compatibility between ctx and arr?
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-          (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{FpMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_gfp_fmpz_mat_clear_fn, z)
     for i = 1:r
        for j = 1:c
@@ -5545,7 +5574,8 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
 end
 
 function _gfp_fmpz_mat_clear_fn(mat::FpMatrix)
-  ccall((:fmpz_mod_mat_clear, libflint), Nothing, (Ref{FpMatrix}, ), mat)
+    ccall((:fmpz_mod_mat_clear, libflint), Nothing,
+          (Ref{FpMatrix}, Ref{fmpz_mod_ctx_struct}), mat, mat.base_ring.ninv)
 end
 
 ################################################################################
