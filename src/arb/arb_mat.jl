@@ -566,7 +566,7 @@ function solve_cholesky_precomp(cho::ArbMatrix, y::ArbMatrix)
   return z
 end
 
-function AbstractAlgebra.Solve._can_solve_internal_no_check(A::arb_mat, b::arb_mat, task::Symbol; side::Symbol = :right)
+function AbstractAlgebra.Solve._can_solve_internal_no_check(A::ArbMatrix, b::ArbMatrix, task::Symbol; side::Symbol = :right)
    nrows(A) != ncols(A) && error("Only implemented for square matrices")
    if side === :left
       fl, sol, K = AbstractAlgebra.Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
@@ -575,7 +575,7 @@ function AbstractAlgebra.Solve._can_solve_internal_no_check(A::arb_mat, b::arb_m
 
    x = similar(A, ncols(A), ncols(b))
    fl = ccall((:arb_mat_solve, libarb), Cint,
-              (Ref{arb_mat}, Ref{arb_mat}, Ref{arb_mat}, Int),
+              (Ref{ArbMatrix}, Ref{ArbMatrix}, Ref{ArbMatrix}, Int),
               x, A, b, precision(base_ring(A)))
    fl == 0 && error("Matrix cannot be inverted numerically")
    if task === :only_check || task === :with_solution
@@ -591,11 +591,11 @@ end
 #
 ################################################################################
 
-function AbstractAlgebra.Solve.solve_init(A::arb_mat)
-   return AbstractAlgebra.Solve.SolveCtx{arb, arb_mat, arb_mat}(A)
+function AbstractAlgebra.Solve.solve_init(A::ArbMatrix)
+   return AbstractAlgebra.Solve.SolveCtx{ArbFieldElem, ArbMatrix, ArbMatrix}(A)
 end
 
-function AbstractAlgebra.Solve._init_reduce(C::AbstractAlgebra.Solve.SolveCtx{arb})
+function AbstractAlgebra.Solve._init_reduce(C::AbstractAlgebra.Solve.SolveCtx{ArbFieldElem})
    if isdefined(C, :red) && isdefined(C, :lu_perm)
       return nothing
    end
@@ -607,7 +607,7 @@ function AbstractAlgebra.Solve._init_reduce(C::AbstractAlgebra.Solve.SolveCtx{ar
    x = similar(A, nrows(A), ncols(A))
    P.d .-= 1
    fl = ccall((:arb_mat_lu, libarb), Cint,
-               (Ptr{Int}, Ref{arb_mat}, Ref{arb_mat}, Int),
+               (Ptr{Int}, Ref{ArbMatrix}, Ref{ArbMatrix}, Int),
                P.d, x, A, precision(base_ring(A)))
    fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
    P.d .+= 1
@@ -618,7 +618,7 @@ function AbstractAlgebra.Solve._init_reduce(C::AbstractAlgebra.Solve.SolveCtx{ar
    return nothing
 end
 
-function AbstractAlgebra.Solve._init_reduce_transpose(C::AbstractAlgebra.Solve.SolveCtx{arb})
+function AbstractAlgebra.Solve._init_reduce_transpose(C::AbstractAlgebra.Solve.SolveCtx{ArbFieldElem})
    if isdefined(C, :red_transp) && isdefined(C, :lu_perm_transp)
       return nothing
    end
@@ -630,7 +630,7 @@ function AbstractAlgebra.Solve._init_reduce_transpose(C::AbstractAlgebra.Solve.S
    x = similar(A, nrows(A), ncols(A))
    P.d .-= 1
    fl = ccall((:arb_mat_lu, libarb), Cint,
-               (Ptr{Int}, Ref{arb_mat}, Ref{arb_mat}, Int),
+               (Ptr{Int}, Ref{ArbMatrix}, Ref{ArbMatrix}, Int),
                P.d, x, A, precision(base_ring(A)))
    fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
    P.d .+= 1
@@ -641,7 +641,7 @@ function AbstractAlgebra.Solve._init_reduce_transpose(C::AbstractAlgebra.Solve.S
    return nothing
 end
 
-function AbstractAlgebra.Solve._can_solve_internal_no_check(C::AbstractAlgebra.Solve.SolveCtx{arb}, b::arb_mat, task::Symbol; side::Symbol = :right)
+function AbstractAlgebra.Solve._can_solve_internal_no_check(C::AbstractAlgebra.Solve.SolveCtx{ArbFieldElem}, b::ArbMatrix, task::Symbol; side::Symbol = :right)
    if side === :right
       LU = AbstractAlgebra.Solve.reduced_matrix(C)
       p = AbstractAlgebra.Solve.lu_permutation(C)
@@ -653,7 +653,7 @@ function AbstractAlgebra.Solve._can_solve_internal_no_check(C::AbstractAlgebra.S
 
    x = similar(b, ncols(C), ncols(b))
    ccall((:arb_mat_solve_lu_precomp, libarb), Nothing,
-         (Ref{arb_mat}, Ptr{Int}, Ref{arb_mat}, Ref{arb_mat}, Int),
+         (Ref{ArbMatrix}, Ptr{Int}, Ref{ArbMatrix}, Ref{ArbMatrix}, Int),
          x, inv(p).d .- 1, LU, b, precision(base_ring(LU)))
 
    if side === :left
