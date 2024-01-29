@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   qqbar.jl : Calcium algebraic numbers in minimal polynomial representation
+#   QQBarFieldElem.jl : Calcium algebraic numbers in minimal polynomial representation
 #
 ###############################################################################
 
@@ -10,21 +10,21 @@
 #
 ###############################################################################
 
-parent(a::qqbar) = CalciumQQBar
+parent(a::QQBarFieldElem) = CalciumQQBar
 
-parent_type(::Type{qqbar}) = CalciumQQBarField
+parent_type(::Type{QQBarFieldElem}) = QQBarField
 
-elem_type(::Type{CalciumQQBarField}) = qqbar
+elem_type(::Type{QQBarField}) = QQBarFieldElem
 
-base_ring(a::CalciumQQBarField) = CalciumQQBar
+base_ring(a::QQBarField) = CalciumQQBar
 
-base_ring(a::qqbar) = CalciumQQBar
+base_ring(a::QQBarFieldElem) = CalciumQQBar
 
-is_domain_type(::Type{qqbar}) = true
+is_domain_type(::Type{QQBarFieldElem}) = true
 
-check_parent(a::qqbar, b::qqbar, throw::Bool = true) = true
+check_parent(a::QQBarFieldElem, b::QQBarFieldElem, throw::Bool = true) = true
 
-characteristic(::CalciumQQBarField) = 0
+characteristic(::QQBarField) = 0
 
 ###############################################################################
 #
@@ -33,7 +33,7 @@ characteristic(::CalciumQQBarField) = 0
 ###############################################################################
 
 # todo: want a C function for this
-function Base.hash(a::qqbar, h::UInt)
+function Base.hash(a::QQBarFieldElem, h::UInt)
    R, x = polynomial_ring(FlintZZ, "x")
    return xor(hash(minpoly(R, a)), h)
 end
@@ -44,38 +44,38 @@ end
 #
 ###############################################################################
 
-function qqbar(a::Int)
-   z = qqbar()
-   ccall((:qqbar_set_si, libcalcium), Nothing, (Ref{qqbar}, Int, ), z, a)
+function QQBarFieldElem(a::Int)
+   z = QQBarFieldElem()
+   ccall((:qqbar_set_si, libcalcium), Nothing, (Ref{QQBarFieldElem}, Int, ), z, a)
   return z
 end
 
-function qqbar(a::Complex{Int})
-   r = qqbar(real(a))
-   s = qqbar(imag(a))
-   z = qqbar()
+function QQBarFieldElem(a::Complex{Int})
+   r = QQBarFieldElem(real(a))
+   s = QQBarFieldElem(imag(a))
+   z = QQBarFieldElem()
    ccall((:qqbar_set_re_im, libcalcium),
-        Nothing, (Ref{qqbar}, Ref{qqbar}, Ref{qqbar}), z, r, s)
+        Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, r, s)
   return z
 end
 
-function qqbar(a::ZZRingElem)
-   z = qqbar()
+function QQBarFieldElem(a::ZZRingElem)
+   z = QQBarFieldElem()
    ccall((:qqbar_set_fmpz, libcalcium),
-        Nothing, (Ref{qqbar}, Ref{ZZRingElem}, ), z, a)
+        Nothing, (Ref{QQBarFieldElem}, Ref{ZZRingElem}, ), z, a)
    return z
 end
 
-function qqbar(a::QQFieldElem)
-   z = qqbar()
+function QQBarFieldElem(a::QQFieldElem)
+   z = QQBarFieldElem()
    ccall((:qqbar_set_fmpq, libcalcium),
-        Nothing, (Ref{qqbar}, Ref{QQFieldElem}, ), z, a)
+        Nothing, (Ref{QQBarFieldElem}, Ref{QQFieldElem}, ), z, a)
    return z
 end
 
-function deepcopy_internal(a::qqbar, dict::IdDict)
-   z = qqbar()
-   ccall((:qqbar_set, libcalcium), Nothing, (Ref{qqbar}, Ref{qqbar}), z, a)
+function deepcopy_internal(a::QQBarFieldElem, dict::IdDict)
+   z = QQBarFieldElem()
+   ccall((:qqbar_set, libcalcium), Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
    return z
 end
 
@@ -85,7 +85,7 @@ end
 #
 ###############################################################################
 
-canonical_unit(a::qqbar) = a
+canonical_unit(a::QQBarFieldElem) = a
 
 ###############################################################################
 #
@@ -94,7 +94,7 @@ canonical_unit(a::qqbar) = a
 ###############################################################################
 
 # todo
-# function expressify(a::qqbar; context = nothing)::Any
+# function expressify(a::QQBarFieldElem; context = nothing)::Any
 # end
 
 #=
@@ -102,11 +102,11 @@ function qqbar_vec(n::Int)
    return ccall((:_qqbar_vec_init, libcalcium), Ptr{qqbar_struct}, (Int,), n)
 end
 
-function array(R::CalciumQQBarField, v::Ptr{qqbar_struct}, n::Int)
-   r = Vector{qqbar}(undef, n)
+function array(R::QQBarField, v::Ptr{qqbar_struct}, n::Int)
+   r = Vector{QQBarFieldElem}(undef, n)
    for i=1:n
        r[i] = R()
-       ccall((:qqbar_set, libcalcium), Nothing, (Ref{qqbar}, Ptr{qqbar_struct}),
+       ccall((:qqbar_set, libcalcium), Nothing, (Ref{QQBarFieldElem}, Ptr{qqbar_struct}),
            r[i], v + (i-1)*sizeof(qqbar_struct))
    end
    return r
@@ -117,10 +117,10 @@ function qqbar_vec_clear(v::Ptr{qqbar_struct}, n::Int)
         Nothing, (Ptr{qqbar_struct}, Int), v, n)
 end
 
-function roots(R::CalciumQQBarField, f::ZZPolyRingElem)
+function roots(R::QQBarField, f::ZZPolyRingElem)
    deg = degree(f)
    if deg <= 0
-      return Array{qqbar}(undef, 0)
+      return Array{QQBarFieldElem}(undef, 0)
    end
    roots = qqbar_vec(deg)
    ccall((:qqbar_roots_fmpz_poly, libcalcium),
@@ -131,9 +131,9 @@ function roots(R::CalciumQQBarField, f::ZZPolyRingElem)
 end
 =#
 
-function native_string(x::qqbar)
+function native_string(x::QQBarFieldElem)
    cstr = ccall((:qqbar_get_str_nd, libcalcium),
-        Ptr{UInt8}, (Ref{qqbar}, Int), x, Int(6))
+        Ptr{UInt8}, (Ref{QQBarFieldElem}, Int), x, Int(6))
    number = unsafe_string(cstr)
    ccall((:flint_free, libflint), Nothing, (Ptr{UInt8},), cstr)
 
@@ -148,7 +148,7 @@ function native_string(x::qqbar)
    return res
 end
 
-function show(io::IO, F::CalciumQQBarField)
+function show(io::IO, F::QQBarField)
   if get(io, :supercompact, false)
     io = pretty(io)
     print(io, LowercaseOff(), "QQBar")
@@ -157,7 +157,7 @@ function show(io::IO, F::CalciumQQBarField)
   end
 end
 
-function show(io::IO, x::qqbar)
+function show(io::IO, x::QQBarFieldElem)
    print(io, native_string(x))
 end
 
@@ -167,147 +167,147 @@ end
 #
 ###############################################################################
 
-is_unit(x::qqbar) = !is_zero(x)
+is_unit(x::QQBarFieldElem) = !is_zero(x)
 
-zero(a::CalciumQQBarField) = a(0)
+zero(a::QQBarField) = a(0)
 
-one(a::CalciumQQBarField) = a(1)
+one(a::QQBarField) = a(1)
 
-zero(::Type{qqbar}) = CalciumQQBar(0)
+zero(::Type{QQBarFieldElem}) = CalciumQQBar(0)
 
-one(::Type{qqbar}) = CalciumQQBar(1)
+one(::Type{QQBarFieldElem}) = CalciumQQBar(1)
 
 @doc raw"""
-    degree(x::qqbar)
+    degree(x::QQBarFieldElem)
 
 Return the degree of the minimal polynomial of `x`.
 """
-function degree(x::qqbar)
-   return ccall((:qqbar_degree, libcalcium), Int, (Ref{qqbar}, ), x)
+function degree(x::QQBarFieldElem)
+   return ccall((:qqbar_degree, libcalcium), Int, (Ref{QQBarFieldElem}, ), x)
 end
 
 @doc raw"""
-    iszero(x::qqbar)
+    iszero(x::QQBarFieldElem)
 
 Return whether `x` is the number 0.
 """
-function iszero(x::qqbar)
-   return Bool(ccall((:qqbar_is_zero, libcalcium), Cint, (Ref{qqbar},), x))
+function iszero(x::QQBarFieldElem)
+   return Bool(ccall((:qqbar_is_zero, libcalcium), Cint, (Ref{QQBarFieldElem},), x))
 end
 
 @doc raw"""
-    isone(x::qqbar)
+    isone(x::QQBarFieldElem)
 
 Return whether `x` is the number 1.
 """
-function isone(x::qqbar)
-   return Bool(ccall((:qqbar_is_one, libcalcium), Cint, (Ref{qqbar},), x))
+function isone(x::QQBarFieldElem)
+   return Bool(ccall((:qqbar_is_one, libcalcium), Cint, (Ref{QQBarFieldElem},), x))
 end
 
 @doc raw"""
-    isinteger(x::qqbar)
+    isinteger(x::QQBarFieldElem)
 
 Return whether `x` is an integer.
 """
-function isinteger(x::qqbar)
-   return Bool(ccall((:qqbar_is_integer, libcalcium), Cint, (Ref{qqbar},), x))
+function isinteger(x::QQBarFieldElem)
+   return Bool(ccall((:qqbar_is_integer, libcalcium), Cint, (Ref{QQBarFieldElem},), x))
 end
 
 @doc raw"""
-    is_rational(x::qqbar)
+    is_rational(x::QQBarFieldElem)
 
 Return whether `x` is a rational number.
 """
-function is_rational(x::qqbar)
-   return Bool(ccall((:qqbar_is_rational, libcalcium), Cint, (Ref{qqbar},), x))
+function is_rational(x::QQBarFieldElem)
+   return Bool(ccall((:qqbar_is_rational, libcalcium), Cint, (Ref{QQBarFieldElem},), x))
 end
 
 @doc raw"""
-    isreal(x::qqbar)
+    isreal(x::QQBarFieldElem)
 
 Return whether `x` is a real number.
 """
-function isreal(x::qqbar)
-   return Bool(ccall((:qqbar_is_real, libcalcium), Cint, (Ref{qqbar},), x))
+function isreal(x::QQBarFieldElem)
+   return Bool(ccall((:qqbar_is_real, libcalcium), Cint, (Ref{QQBarFieldElem},), x))
 end
 
 @doc raw"""
-    is_algebraic_integer(x::qqbar)
+    is_algebraic_integer(x::QQBarFieldElem)
 
 Return whether `x` is an algebraic integer.
 """
-function is_algebraic_integer(x::qqbar)
+function is_algebraic_integer(x::QQBarFieldElem)
    return Bool(ccall((:qqbar_is_algebraic_integer, libcalcium),
-        Cint, (Ref{qqbar},), x))
+        Cint, (Ref{QQBarFieldElem},), x))
 end
 
 @doc raw"""
-    minpoly(R::ZZPolyRing, x::qqbar)
+    minpoly(R::ZZPolyRing, x::QQBarFieldElem)
 
 Return the minimal polynomial of `x` as an element of the polynomial ring `R`.
 """
-function minpoly(R::ZZPolyRing, x::qqbar)
+function minpoly(R::ZZPolyRing, x::QQBarFieldElem)
    z = R()
    ccall((:fmpz_poly_set, libflint),
-        Nothing, (Ref{ZZPolyRingElem}, Ref{qqbar}, ), z, x)
+        Nothing, (Ref{ZZPolyRingElem}, Ref{QQBarFieldElem}, ), z, x)
    return z
 end
 
 @doc raw"""
-    minpoly(R::ZZPolyRing, x::qqbar)
+    minpoly(R::ZZPolyRing, x::QQBarFieldElem)
 
 Return the minimal polynomial of `x` as an element of the polynomial ring `R`.
 """
-function minpoly(R::QQPolyRing, x::qqbar)
+function minpoly(R::QQPolyRing, x::QQBarFieldElem)
    z = R()
    ccall((:fmpq_poly_set_fmpz_poly, libflint),
-        Nothing, (Ref{QQPolyRingElem}, Ref{qqbar}, ), z, x)
+        Nothing, (Ref{QQPolyRingElem}, Ref{QQBarFieldElem}, ), z, x)
    return z
 end
 
 @doc raw"""
-    denominator(x::qqbar)
+    denominator(x::QQBarFieldElem)
 
 Return the denominator of `x`, defined as the leading coefficient of the
 minimal polynomial of `x`. The result is returned as an `ZZRingElem`.
 """
-function denominator(x::qqbar)
+function denominator(x::QQBarFieldElem)
    d = degree(x)
    q = ZZRingElem()
    ccall((:fmpz_poly_get_coeff_fmpz, libflint),
-        Nothing, (Ref{ZZRingElem}, Ref{qqbar}, Int), q, x, d)
+        Nothing, (Ref{ZZRingElem}, Ref{QQBarFieldElem}, Int), q, x, d)
    return q
 end
 
 @doc raw"""
-    numerator(x::qqbar)
+    numerator(x::QQBarFieldElem)
 
 Return the numerator of `x`, defined as `x` multiplied by its denominator.
 The result is an algebraic integer.
 """
-function numerator(x::qqbar)
+function numerator(x::QQBarFieldElem)
    return x * denominator(x)
 end
 
 @doc raw"""
-    height(x::qqbar)
+    height(x::QQBarFieldElem)
 
 Return the height of the algebraic number `x`. The result is an `ZZRingElem` integer.
 """
-function height(x::qqbar)
+function height(x::QQBarFieldElem)
    z = ZZRingElem()
-   ccall((:qqbar_height, libcalcium), Nothing, (Ref{ZZRingElem}, Ref{qqbar}, ), z, x)
+   ccall((:qqbar_height, libcalcium), Nothing, (Ref{ZZRingElem}, Ref{QQBarFieldElem}, ), z, x)
    return z
 end
 
 @doc raw"""
-    height_bits(x::qqbar)
+    height_bits(x::QQBarFieldElem)
 
 Return the height of the algebraic number `x` measured in bits.
 The result is a Julia integer.
 """
-function height_bits(x::qqbar)
-   return ccall((:qqbar_height_bits, libcalcium), Int, (Ref{qqbar}, ), x)
+function height_bits(x::QQBarFieldElem)
+   return ccall((:qqbar_height_bits, libcalcium), Int, (Ref{QQBarFieldElem}, ), x)
 end
 
 
@@ -318,7 +318,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    rand(R::CalciumQQBarField; degree::Int, bits::Int, randtype::Symbol=:null)
+    rand(R::QQBarField; degree::Int, bits::Int, randtype::Symbol=:null)
 
 Return a random algebraic number with degree up to `degree`
 and coefficients up to `bits` in size. By default, both real and
@@ -326,7 +326,7 @@ complex numbers are generated. Set the optional `randtype` to `:real` or
 `:nonreal` to generate a specific type of number. Note that
 nonreal numbers require `degree` at least 2.
 """
-function rand(R::CalciumQQBarField; degree::Int, bits::Int,
+function rand(R::QQBarField; degree::Int, bits::Int,
                                             randtype::Symbol=:null)
    state = _flint_rand_states[Threads.threadid()]
    x = R()
@@ -336,14 +336,14 @@ function rand(R::CalciumQQBarField; degree::Int, bits::Int,
 
    if randtype == :null
       ccall((:qqbar_randtest, libcalcium), Nothing,
-          (Ref{qqbar}, Ptr{Cvoid}, Int, Int), x, state.ptr, degree, bits)
+          (Ref{QQBarFieldElem}, Ptr{Cvoid}, Int, Int), x, state.ptr, degree, bits)
    elseif randtype == :real
       ccall((:qqbar_randtest_real, libcalcium), Nothing,
-          (Ref{qqbar}, Ptr{Cvoid}, Int, Int), x, state.ptr, degree, bits)
+          (Ref{QQBarFieldElem}, Ptr{Cvoid}, Int, Int), x, state.ptr, degree, bits)
    elseif randtype == :nonreal
       degree < 2 && error("nonreal requires degree >= 2")
       ccall((:qqbar_randtest_nonreal, libcalcium), Nothing,
-          (Ref{qqbar}, Ptr{Cvoid}, Int, Int), x, state.ptr, degree, bits)
+          (Ref{QQBarFieldElem}, Ptr{Cvoid}, Int, Int), x, state.ptr, degree, bits)
    else
       error("randtype not defined")
    end
@@ -357,9 +357,9 @@ end
 #
 ###############################################################################
 
-function -(a::qqbar)
-   z = qqbar()
-   ccall((:qqbar_neg, libcalcium), Nothing, (Ref{qqbar}, Ref{qqbar}), z, a)
+function -(a::QQBarFieldElem)
+   z = QQBarFieldElem()
+   ccall((:qqbar_neg, libcalcium), Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
    return z
 end
 
@@ -369,134 +369,134 @@ end
 #
 ###############################################################################
 
-function +(a::qqbar, b::qqbar)
-   z = qqbar()
+function +(a::QQBarFieldElem, b::QQBarFieldElem)
+   z = QQBarFieldElem()
    ccall((:qqbar_add, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Ref{qqbar}), z, a, b)
+         (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a, b)
    return z
 end
 
-function +(a::qqbar, b::QQFieldElem)
-   z = qqbar()
+function +(a::QQBarFieldElem, b::QQFieldElem)
+   z = QQBarFieldElem()
    ccall((:qqbar_add_fmpq, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Ref{QQFieldElem}), z, a, b)
+         (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQFieldElem}), z, a, b)
    return z
 end
 
-function +(a::qqbar, b::ZZRingElem)
-   z = qqbar()
+function +(a::QQBarFieldElem, b::ZZRingElem)
+   z = QQBarFieldElem()
    ccall((:qqbar_add_fmpz, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Ref{ZZRingElem}), z, a, b)
+         (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{ZZRingElem}), z, a, b)
    return z
 end
 
-function +(a::qqbar, b::Int)
-   z = qqbar()
+function +(a::QQBarFieldElem, b::Int)
+   z = QQBarFieldElem()
    ccall((:qqbar_add_si, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Int), z, a, b)
+         (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Int), z, a, b)
    return z
 end
 
-+(a::QQFieldElem, b::qqbar) = b + a
-+(a::ZZRingElem, b::qqbar) = b + a
-+(a::Int, b::qqbar) = b + a
++(a::QQFieldElem, b::QQBarFieldElem) = b + a
++(a::ZZRingElem, b::QQBarFieldElem) = b + a
++(a::Int, b::QQBarFieldElem) = b + a
 
-function -(a::qqbar, b::qqbar)
-   z = qqbar()
+function -(a::QQBarFieldElem, b::QQBarFieldElem)
+   z = QQBarFieldElem()
    ccall((:qqbar_sub, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Ref{qqbar}), z, a, b)
+         (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a, b)
    return z
 end
 
-function -(a::qqbar, b::QQFieldElem)
-   z = qqbar()
+function -(a::QQBarFieldElem, b::QQFieldElem)
+   z = QQBarFieldElem()
    ccall((:qqbar_sub_fmpq, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Ref{QQFieldElem}), z, a, b)
+         (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQFieldElem}), z, a, b)
    return z
 end
 
-function -(a::qqbar, b::ZZRingElem)
-   z = qqbar()
+function -(a::QQBarFieldElem, b::ZZRingElem)
+   z = QQBarFieldElem()
    ccall((:qqbar_sub_fmpz, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Ref{ZZRingElem}), z, a, b)
+         (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{ZZRingElem}), z, a, b)
    return z
 end
 
-function -(a::qqbar, b::Int)
-   z = qqbar()
+function -(a::QQBarFieldElem, b::Int)
+   z = QQBarFieldElem()
    ccall((:qqbar_sub_si, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Int), z, a, b)
+         (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Int), z, a, b)
    return z
 end
 
-function -(a::QQFieldElem, b::qqbar)
-   z = qqbar()
+function -(a::QQFieldElem, b::QQBarFieldElem)
+   z = QQBarFieldElem()
    ccall((:qqbar_fmpq_sub, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{QQFieldElem}, Ref{qqbar}), z, a, b)
+         (Ref{QQBarFieldElem}, Ref{QQFieldElem}, Ref{QQBarFieldElem}), z, a, b)
    return z
 end
 
-function -(a::ZZRingElem, b::qqbar)
-   z = qqbar()
+function -(a::ZZRingElem, b::QQBarFieldElem)
+   z = QQBarFieldElem()
    ccall((:qqbar_fmpz_sub, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{ZZRingElem}, Ref{qqbar}), z, a, b)
+         (Ref{QQBarFieldElem}, Ref{ZZRingElem}, Ref{QQBarFieldElem}), z, a, b)
    return z
 end
 
-function -(a::Int, b::qqbar)
-   z = qqbar()
+function -(a::Int, b::QQBarFieldElem)
+   z = QQBarFieldElem()
    ccall((:qqbar_si_sub, libcalcium), Nothing,
-         (Ref{qqbar}, Int, Ref{qqbar}), z, a, b)
+         (Ref{QQBarFieldElem}, Int, Ref{QQBarFieldElem}), z, a, b)
    return z
 end
 
-function *(a::qqbar, b::qqbar)
-   z = qqbar()
+function *(a::QQBarFieldElem, b::QQBarFieldElem)
+   z = QQBarFieldElem()
    ccall((:qqbar_mul, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Ref{qqbar}), z, a, b)
+         (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a, b)
    return z
 end
 
-function *(a::qqbar, b::QQFieldElem)
-   z = qqbar()
+function *(a::QQBarFieldElem, b::QQFieldElem)
+   z = QQBarFieldElem()
    ccall((:qqbar_mul_fmpq, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Ref{QQFieldElem}), z, a, b)
+         (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQFieldElem}), z, a, b)
    return z
 end
 
-function *(a::qqbar, b::ZZRingElem)
-   z = qqbar()
+function *(a::QQBarFieldElem, b::ZZRingElem)
+   z = QQBarFieldElem()
    ccall((:qqbar_mul_fmpz, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Ref{ZZRingElem}), z, a, b)
+         (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{ZZRingElem}), z, a, b)
    return z
 end
 
-function *(a::qqbar, b::Int)
-   z = qqbar()
+function *(a::QQBarFieldElem, b::Int)
+   z = QQBarFieldElem()
    ccall((:qqbar_mul_si, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Int), z, a, b)
+         (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Int), z, a, b)
    return z
 end
 
-*(a::QQFieldElem, b::qqbar) = b * a
-*(a::ZZRingElem, b::qqbar) = b * a
-*(a::Int, b::qqbar) = b * a
+*(a::QQFieldElem, b::QQBarFieldElem) = b * a
+*(a::ZZRingElem, b::QQBarFieldElem) = b * a
+*(a::Int, b::QQBarFieldElem) = b * a
 
-function ^(a::qqbar, b::qqbar)
-   z = qqbar()
+function ^(a::QQBarFieldElem, b::QQBarFieldElem)
+   z = QQBarFieldElem()
    ok = Bool(ccall((:qqbar_pow, libcalcium), Cint,
-         (Ref{qqbar}, Ref{qqbar}, Ref{qqbar}), z, a, b))
+         (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a, b))
    !ok && throw(DomainError((a, b)))
    return z
 end
 
 # todo: want qqbar_pow_fmpz, qqbar_pow_fmpq, qqbar_pow_si
-^(a::qqbar, b::ZZRingElem) = a ^ qqbar(b)
-^(a::qqbar, b::QQFieldElem) = a ^ qqbar(b)
-^(a::qqbar, b::Int) = a ^ qqbar(b)
-^(a::ZZRingElem, b::qqbar) = qqbar(a) ^ b
-^(a::QQFieldElem, b::qqbar) = qqbar(a) ^ b
-^(a::Int, b::qqbar) = qqbar(a) ^ b
+^(a::QQBarFieldElem, b::ZZRingElem) = a ^ QQBarFieldElem(b)
+^(a::QQBarFieldElem, b::QQFieldElem) = a ^ QQBarFieldElem(b)
+^(a::QQBarFieldElem, b::Int) = a ^ QQBarFieldElem(b)
+^(a::ZZRingElem, b::QQBarFieldElem) = QQBarFieldElem(a) ^ b
+^(a::QQFieldElem, b::QQBarFieldElem) = QQBarFieldElem(a) ^ b
+^(a::Int, b::QQBarFieldElem) = QQBarFieldElem(a) ^ b
 
 ###############################################################################
 #
@@ -504,89 +504,89 @@ end
 #
 ###############################################################################
 
-function inv(a::qqbar)
+function inv(a::QQBarFieldElem)
    iszero(a) && throw(DivideError())
-   z = qqbar()
-   ccall((:qqbar_inv, libcalcium), Nothing, (Ref{qqbar}, Ref{qqbar}), z, a)
+   z = QQBarFieldElem()
+   ccall((:qqbar_inv, libcalcium), Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
    return z
 end
 
-function divexact(a::qqbar, b::qqbar; check::Bool=true)
+function divexact(a::QQBarFieldElem, b::QQBarFieldElem; check::Bool=true)
    iszero(b) && throw(DivideError())
-   z = qqbar()
+   z = QQBarFieldElem()
    ccall((:qqbar_div, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Ref{qqbar}), z, a, b)
+         (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a, b)
    return z
 end
 
-function divexact(a::qqbar, b::QQFieldElem; check::Bool=true)
+function divexact(a::QQBarFieldElem, b::QQFieldElem; check::Bool=true)
    iszero(b) && throw(DivideError())
-   z = qqbar()
+   z = QQBarFieldElem()
    ccall((:qqbar_div_fmpq, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Ref{QQFieldElem}), z, a, b)
+         (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQFieldElem}), z, a, b)
    return z
 end
 
-function divexact(a::qqbar, b::ZZRingElem; check::Bool=true)
+function divexact(a::QQBarFieldElem, b::ZZRingElem; check::Bool=true)
    iszero(b) && throw(DivideError())
-   z = qqbar()
+   z = QQBarFieldElem()
    ccall((:qqbar_div_fmpz, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Ref{ZZRingElem}), z, a, b)
+         (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{ZZRingElem}), z, a, b)
    return z
 end
 
-function divexact(a::qqbar, b::Int; check::Bool=true)
+function divexact(a::QQBarFieldElem, b::Int; check::Bool=true)
    iszero(b) && throw(DivideError())
-   z = qqbar()
+   z = QQBarFieldElem()
    ccall((:qqbar_div_si, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Int), z, a, b)
+         (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Int), z, a, b)
    return z
 end
 
-function divexact(a::QQFieldElem, b::qqbar; check::Bool=true)
+function divexact(a::QQFieldElem, b::QQBarFieldElem; check::Bool=true)
    iszero(b) && throw(DivideError())
-   z = qqbar()
+   z = QQBarFieldElem()
    ccall((:qqbar_fmpq_div, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{QQFieldElem}, Ref{qqbar}), z, a, b)
+         (Ref{QQBarFieldElem}, Ref{QQFieldElem}, Ref{QQBarFieldElem}), z, a, b)
    return z
 end
 
-function divexact(a::ZZRingElem, b::qqbar; check::Bool=true)
+function divexact(a::ZZRingElem, b::QQBarFieldElem; check::Bool=true)
    iszero(b) && throw(DivideError())
-   z = qqbar()
+   z = QQBarFieldElem()
    ccall((:qqbar_fmpz_div, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{ZZRingElem}, Ref{qqbar}), z, a, b)
+         (Ref{QQBarFieldElem}, Ref{ZZRingElem}, Ref{QQBarFieldElem}), z, a, b)
    return z
 end
 
-function divexact(a::Int, b::qqbar; check::Bool=true)
+function divexact(a::Int, b::QQBarFieldElem; check::Bool=true)
    iszero(b) && throw(DivideError())
-   z = qqbar()
+   z = QQBarFieldElem()
    ccall((:qqbar_si_div, libcalcium), Nothing,
-         (Ref{qqbar}, Int, Ref{qqbar}), z, a, b)
+         (Ref{QQBarFieldElem}, Int, Ref{QQBarFieldElem}), z, a, b)
    return z
 end
 
-//(a::qqbar, b::qqbar) = divexact(a, b)
-//(a::qqbar, b::QQFieldElem) = divexact(a, b)
-//(a::qqbar, b::ZZRingElem) = divexact(a, b)
-//(a::qqbar, b::Int) = divexact(a, b)
-//(a::QQFieldElem, b::qqbar) = divexact(a, b)
-//(a::ZZRingElem, b::qqbar) = divexact(a, b)
-//(a::Int, b::qqbar) = divexact(a, b)
+//(a::QQBarFieldElem, b::QQBarFieldElem) = divexact(a, b)
+//(a::QQBarFieldElem, b::QQFieldElem) = divexact(a, b)
+//(a::QQBarFieldElem, b::ZZRingElem) = divexact(a, b)
+//(a::QQBarFieldElem, b::Int) = divexact(a, b)
+//(a::QQFieldElem, b::QQBarFieldElem) = divexact(a, b)
+//(a::ZZRingElem, b::QQBarFieldElem) = divexact(a, b)
+//(a::Int, b::QQBarFieldElem) = divexact(a, b)
 
 
-function <<(a::qqbar, b::Int)
-   z = qqbar()
+function <<(a::QQBarFieldElem, b::Int)
+   z = QQBarFieldElem()
    ccall((:qqbar_mul_2exp_si, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Int), z, a, b)
+         (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Int), z, a, b)
    return z
 end
 
-function >>(a::qqbar, b::Int)
-   z = qqbar()
+function >>(a::QQBarFieldElem, b::Int)
+   z = QQBarFieldElem()
    ccall((:qqbar_mul_2exp_si, libcalcium), Nothing,
-         (Ref{qqbar}, Ref{qqbar}, Int), z, a, -b)
+         (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Int), z, a, -b)
    return z
 end
 
@@ -596,17 +596,17 @@ end
 #
 ###############################################################################
 
-function evaluate(x::QQPolyRingElem, y::qqbar)
-   z = qqbar()
+function evaluate(x::QQPolyRingElem, y::QQBarFieldElem)
+   z = QQBarFieldElem()
    ccall((:qqbar_evaluate_fmpq_poly, libcalcium), Nothing,
-                (Ref{qqbar}, Ref{QQPolyRingElem}, Ref{qqbar}), z, x, y)
+                (Ref{QQBarFieldElem}, Ref{QQPolyRingElem}, Ref{QQBarFieldElem}), z, x, y)
    return z
 end
 
-function evaluate(x::ZZPolyRingElem, y::qqbar)
-   z = qqbar()
+function evaluate(x::ZZPolyRingElem, y::QQBarFieldElem)
+   z = QQBarFieldElem()
    ccall((:qqbar_evaluate_fmpz_poly, libcalcium), Nothing,
-                (Ref{qqbar}, Ref{ZZPolyRingElem}, Ref{qqbar}), z, x, y)
+                (Ref{QQBarFieldElem}, Ref{ZZPolyRingElem}, Ref{QQBarFieldElem}), z, x, y)
    return z
 end
 
@@ -616,118 +616,118 @@ end
 #
 ###############################################################################
 
-function ==(a::qqbar, b::qqbar)
+function ==(a::QQBarFieldElem, b::QQBarFieldElem)
    return Bool(ccall((:qqbar_equal, libcalcium), Cint,
-                (Ref{qqbar}, Ref{qqbar}), a, b))
+                (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), a, b))
 end
 
-function cmp(a::qqbar, b::qqbar)
+function cmp(a::QQBarFieldElem, b::QQBarFieldElem)
    !isreal(a) && throw(DomainError(a, "comparing nonreal numbers"))
    !isreal(b) && throw(DomainError(b, "comparing nonreal numbers"))
    return ccall((:qqbar_cmp_re, libcalcium), Cint,
-                (Ref{qqbar}, Ref{qqbar}), a, b)
+                (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), a, b)
 end
 
-isless(a::qqbar, b::qqbar) = cmp(a, b) < 0
-isless(a::qqbar, b::ZZRingElem) = isless(a, qqbar(b))
-isless(a::qqbar, b::QQFieldElem) = isless(a, qqbar(b))
-isless(a::qqbar, b::Int) = isless(a, qqbar(b))
-isless(a::QQFieldElem, b::qqbar) = isless(qqbar(a), b)
-isless(a::ZZRingElem, b::qqbar) = isless(qqbar(a), b)
-isless(a::Int, b::qqbar) = isless(qqbar(a), b)
+isless(a::QQBarFieldElem, b::QQBarFieldElem) = cmp(a, b) < 0
+isless(a::QQBarFieldElem, b::ZZRingElem) = isless(a, QQBarFieldElem(b))
+isless(a::QQBarFieldElem, b::QQFieldElem) = isless(a, QQBarFieldElem(b))
+isless(a::QQBarFieldElem, b::Int) = isless(a, QQBarFieldElem(b))
+isless(a::QQFieldElem, b::QQBarFieldElem) = isless(QQBarFieldElem(a), b)
+isless(a::ZZRingElem, b::QQBarFieldElem) = isless(QQBarFieldElem(a), b)
+isless(a::Int, b::QQBarFieldElem) = isless(QQBarFieldElem(a), b)
 
 # todo: export the cmp functions?
-cmp_real(a::qqbar, b::qqbar) = ccall((:qqbar_cmp_re, libcalcium),
-    Cint, (Ref{qqbar}, Ref{qqbar}), a, b)
-cmp_imag(a::qqbar, b::qqbar) = ccall((:qqbar_cmp_im, libcalcium),
-    Cint, (Ref{qqbar}, Ref{qqbar}), a, b)
-cmpabs(a::qqbar, b::qqbar) = ccall((:qqbar_cmpabs, libcalcium),
-    Cint, (Ref{qqbar}, Ref{qqbar}), a, b)
-cmpabs_real(a::qqbar, b::qqbar) = ccall((:qqbar_cmpabs_re, libcalcium),
-    Cint, (Ref{qqbar}, Ref{qqbar}), a, b)
-cmpabs_imag(a::qqbar, b::qqbar) = ccall((:qqbar_cmpabs_im, libcalcium),
-    Cint, (Ref{qqbar}, Ref{qqbar}), a, b)
-cmp_root_order(a::qqbar, b::qqbar) = ccall((:qqbar_cmp_root_order, libcalcium),
-    Cint, (Ref{qqbar}, Ref{qqbar}), a, b)
+cmp_real(a::QQBarFieldElem, b::QQBarFieldElem) = ccall((:qqbar_cmp_re, libcalcium),
+    Cint, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), a, b)
+cmp_imag(a::QQBarFieldElem, b::QQBarFieldElem) = ccall((:qqbar_cmp_im, libcalcium),
+    Cint, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), a, b)
+cmpabs(a::QQBarFieldElem, b::QQBarFieldElem) = ccall((:qqbar_cmpabs, libcalcium),
+    Cint, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), a, b)
+cmpabs_real(a::QQBarFieldElem, b::QQBarFieldElem) = ccall((:qqbar_cmpabs_re, libcalcium),
+    Cint, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), a, b)
+cmpabs_imag(a::QQBarFieldElem, b::QQBarFieldElem) = ccall((:qqbar_cmpabs_im, libcalcium),
+    Cint, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), a, b)
+cmp_root_order(a::QQBarFieldElem, b::QQBarFieldElem) = ccall((:qqbar_cmp_root_order, libcalcium),
+    Cint, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), a, b)
 
 @doc raw"""
-    is_equal_real(a::qqbar, b::qqbar)
+    is_equal_real(a::QQBarFieldElem, b::QQBarFieldElem)
 
 Compares the real parts of `a` and `b`.
 """
-is_equal_real(a::qqbar, b::qqbar) = cmp_real(a, b) == 0
+is_equal_real(a::QQBarFieldElem, b::QQBarFieldElem) = cmp_real(a, b) == 0
 
 @doc raw"""
-    is_equal_imag(a::qqbar, b::qqbar)
+    is_equal_imag(a::QQBarFieldElem, b::QQBarFieldElem)
 
 Compares the imaginary parts of `a` and `b`.
 """
-is_equal_imag(a::qqbar, b::qqbar) = cmp_imag(a, b) == 0
+is_equal_imag(a::QQBarFieldElem, b::QQBarFieldElem) = cmp_imag(a, b) == 0
 
 @doc raw"""
-    is_equal_abs(a::qqbar, b::qqbar)
+    is_equal_abs(a::QQBarFieldElem, b::QQBarFieldElem)
 
 Compares the absolute values of `a` and `b`.
 """
-is_equal_abs(a::qqbar, b::qqbar) = cmpabs(a, b) == 0
+is_equal_abs(a::QQBarFieldElem, b::QQBarFieldElem) = cmpabs(a, b) == 0
 
 @doc raw"""
-    is_equal_abs_real(a::qqbar, b::qqbar)
+    is_equal_abs_real(a::QQBarFieldElem, b::QQBarFieldElem)
 
 Compares the absolute values of the real parts of `a` and `b`.
 """
-is_equal_abs_real(a::qqbar, b::qqbar) = cmpabs_real(a, b) == 0
+is_equal_abs_real(a::QQBarFieldElem, b::QQBarFieldElem) = cmpabs_real(a, b) == 0
 
 @doc raw"""
-    is_equal_abs_imag(a::qqbar, b::qqbar)
+    is_equal_abs_imag(a::QQBarFieldElem, b::QQBarFieldElem)
 
 Compares the absolute values of the imaginary parts of `a` and `b`.
 """
-is_equal_abs_imag(a::qqbar, b::qqbar) = cmpabs_imag(a, b) == 0
+is_equal_abs_imag(a::QQBarFieldElem, b::QQBarFieldElem) = cmpabs_imag(a, b) == 0
 
 
 @doc raw"""
-    is_less_real(a::qqbar, b::qqbar)
+    is_less_real(a::QQBarFieldElem, b::QQBarFieldElem)
 
 Compares the real parts of `a` and `b`.
 """
-is_less_real(a::qqbar, b::qqbar) = cmp_real(a, b) < 0
+is_less_real(a::QQBarFieldElem, b::QQBarFieldElem) = cmp_real(a, b) < 0
 
 @doc raw"""
-    is_less_imag(a::qqbar, b::qqbar)
+    is_less_imag(a::QQBarFieldElem, b::QQBarFieldElem)
 
 Compares the imaginary parts of `a` and `b`.
 """
-is_less_imag(a::qqbar, b::qqbar) = cmp_imag(a, b) < 0
+is_less_imag(a::QQBarFieldElem, b::QQBarFieldElem) = cmp_imag(a, b) < 0
 
 @doc raw"""
-    is_less_abs(a::qqbar, b::qqbar)
+    is_less_abs(a::QQBarFieldElem, b::QQBarFieldElem)
 
 Compares the absolute values of `a` and `b`.
 """
-is_less_abs(a::qqbar, b::qqbar) = cmpabs(a, b) < 0
+is_less_abs(a::QQBarFieldElem, b::QQBarFieldElem) = cmpabs(a, b) < 0
 
 
 @doc raw"""
-    is_less_abs_real(a::qqbar, b::qqbar)
+    is_less_abs_real(a::QQBarFieldElem, b::QQBarFieldElem)
 
 Compares the absolute values of the real parts of `a` and `b`.
 """
-is_less_abs_real(a::qqbar, b::qqbar) = cmpabs_real(a, b) < 0
+is_less_abs_real(a::QQBarFieldElem, b::QQBarFieldElem) = cmpabs_real(a, b) < 0
 
 @doc raw"""
-    is_less_abs_imag(a::qqbar, b::qqbar)
+    is_less_abs_imag(a::QQBarFieldElem, b::QQBarFieldElem)
 
 Compares the absolute values of the imaginary parts of `a` and `b`.
 """
-is_less_abs_imag(a::qqbar, b::qqbar) = cmpabs_imag(a, b) < 0
+is_less_abs_imag(a::QQBarFieldElem, b::QQBarFieldElem) = cmpabs_imag(a, b) < 0
 
 @doc raw"""
-    is_less_root_order(a::qqbar, b::qqbar)
+    is_less_root_order(a::QQBarFieldElem, b::QQBarFieldElem)
 
 Compares the `a` and `b` in root sort order.
 """
-is_less_root_order(a::qqbar, b::qqbar) = cmp_root_order(a, b) < 0
+is_less_root_order(a::QQBarFieldElem, b::QQBarFieldElem) = cmp_root_order(a, b) < 0
 
 # todo: wrap qqbar_equal_fmpq_poly_val
 
@@ -738,74 +738,74 @@ is_less_root_order(a::qqbar, b::qqbar) = cmp_root_order(a, b) < 0
 ###############################################################################
 
 @doc raw"""
-    real(a::qqbar)
+    real(a::QQBarFieldElem)
 
 Return the real part of `a`.
 """
-function real(a::qqbar)
-   z = qqbar()
-   ccall((:qqbar_re, libcalcium), Nothing, (Ref{qqbar}, Ref{qqbar}), z, a)
+function real(a::QQBarFieldElem)
+   z = QQBarFieldElem()
+   ccall((:qqbar_re, libcalcium), Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
    return z
 end
 
 @doc raw"""
-    imag(a::qqbar)
+    imag(a::QQBarFieldElem)
 
 Return the imaginary part of `a`.
 """
-function imag(a::qqbar)
-   z = qqbar()
-   ccall((:qqbar_im, libcalcium), Nothing, (Ref{qqbar}, Ref{qqbar}), z, a)
+function imag(a::QQBarFieldElem)
+   z = QQBarFieldElem()
+   ccall((:qqbar_im, libcalcium), Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
    return z
 end
 
 @doc raw"""
-    abs(a::qqbar)
+    abs(a::QQBarFieldElem)
 
 Return the absolute value of `a`.
 """
-function abs(a::qqbar)
-   z = qqbar()
-   ccall((:qqbar_abs, libcalcium), Nothing, (Ref{qqbar}, Ref{qqbar}), z, a)
+function abs(a::QQBarFieldElem)
+   z = QQBarFieldElem()
+   ccall((:qqbar_abs, libcalcium), Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
    return z
 end
 
 @doc raw"""
-    conj(a::qqbar)
+    conj(a::QQBarFieldElem)
 
 Return the complex conjugate of `a`.
 """
-function conj(a::qqbar)
-   z = qqbar()
-   ccall((:qqbar_conj, libcalcium), Nothing, (Ref{qqbar}, Ref{qqbar}), z, a)
+function conj(a::QQBarFieldElem)
+   z = QQBarFieldElem()
+   ccall((:qqbar_conj, libcalcium), Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
    return z
 end
 
 @doc raw"""
-    abs2(a::qqbar)
+    abs2(a::QQBarFieldElem)
 
 Return the squared absolute value of `a`.
 """
-function abs2(a::qqbar)
-   z = qqbar()
-   ccall((:qqbar_abs2, libcalcium), Nothing, (Ref{qqbar}, Ref{qqbar}), z, a)
+function abs2(a::QQBarFieldElem)
+   z = QQBarFieldElem()
+   ccall((:qqbar_abs2, libcalcium), Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
    return z
 end
 
 @doc raw"""
-    sign(a::qqbar)
+    sign(a::QQBarFieldElem)
 
 Return the complex sign of `a`, defined as zero if `a` is zero
 and as $a / |a|$ otherwise.
 """
-function sign(a::qqbar)
-   z = qqbar()
-   ccall((:qqbar_sgn, libcalcium), Nothing, (Ref{qqbar}, Ref{qqbar}), z, a)
+function sign(a::QQBarFieldElem)
+   z = QQBarFieldElem()
+   ccall((:qqbar_sgn, libcalcium), Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
    return z
 end
 
 @doc raw"""
-    csgn(a::qqbar)
+    csgn(a::QQBarFieldElem)
 
 Return the extension of the real sign function taking the value 1
 strictly in the right half plane, -1 strictly in the left half plane,
@@ -813,52 +813,52 @@ and the sign of the imaginary part when on the imaginary axis.
 Equivalently, $\operatorname{csgn}(x) = x / \sqrt{x^2}$ except that the value is 0
 at zero. The value is returned as a Julia integer.
 """
-function csgn(a::qqbar)
-   return qqbar(Int(ccall((:qqbar_csgn, libcalcium), Cint, (Ref{qqbar}, ), a)))
+function csgn(a::QQBarFieldElem)
+   return QQBarFieldElem(Int(ccall((:qqbar_csgn, libcalcium), Cint, (Ref{QQBarFieldElem}, ), a)))
 end
 
 @doc raw"""
-    sign_real(a::qqbar)
+    sign_real(a::QQBarFieldElem)
 
 Return the sign of the real part of `a` as a Julia integer.
 """
-function sign_real(a::qqbar)
-   return qqbar(Int(ccall((:qqbar_sgn_re, libcalcium),
-        Cint, (Ref{qqbar}, ), a)))
+function sign_real(a::QQBarFieldElem)
+   return QQBarFieldElem(Int(ccall((:qqbar_sgn_re, libcalcium),
+        Cint, (Ref{QQBarFieldElem}, ), a)))
 end
 
 @doc raw"""
-    sign_imag(a::qqbar)
+    sign_imag(a::QQBarFieldElem)
 
 Return the sign of the imaginary part of `a` as a Julia integer.
 """
-function sign_imag(a::qqbar)
-   return qqbar(Int(ccall((:qqbar_sgn_im, libcalcium),
-        Cint, (Ref{qqbar}, ), a)))
+function sign_imag(a::QQBarFieldElem)
+   return QQBarFieldElem(Int(ccall((:qqbar_sgn_im, libcalcium),
+        Cint, (Ref{QQBarFieldElem}, ), a)))
 end
 
 @doc raw"""
-    floor(a::qqbar)
+    floor(a::QQBarFieldElem)
 
 Return the floor function of `a` as an algebraic number. Use `ZZRingElem(floor(a))`
 to construct a Nemo integer instead.
 """
-function floor(a::qqbar)
+function floor(a::QQBarFieldElem)
    z = ZZRingElem()
-   ccall((:qqbar_floor, libcalcium), Nothing, (Ref{ZZRingElem}, Ref{qqbar}, ), z, a)
-   return qqbar(z)
+   ccall((:qqbar_floor, libcalcium), Nothing, (Ref{ZZRingElem}, Ref{QQBarFieldElem}, ), z, a)
+   return QQBarFieldElem(z)
 end
 
 @doc raw"""
-    ceil(a::qqbar)
+    ceil(a::QQBarFieldElem)
 
 Return the ceiling function of `b` as an algebraic number. Use `ZZRingElem(ceil(a))`
 to construct a Nemo integer instead.
 """
-function ceil(a::qqbar)
+function ceil(a::QQBarFieldElem)
    z = ZZRingElem()
-   ccall((:qqbar_ceil, libcalcium), Nothing, (Ref{ZZRingElem}, Ref{qqbar}, ), z, a)
-   return qqbar(z)
+   ccall((:qqbar_ceil, libcalcium), Nothing, (Ref{ZZRingElem}, Ref{QQBarFieldElem}, ), z, a)
+   return QQBarFieldElem(z)
 end
 
 
@@ -869,27 +869,27 @@ end
 ###############################################################################
 
 @doc raw"""
-    sqrt(a::qqbar; check::Bool=true)
+    sqrt(a::QQBarFieldElem; check::Bool=true)
 
 Return the principal square root of `a`.
 """
-function sqrt(a::qqbar; check::Bool=true)
-   z = qqbar()
+function sqrt(a::QQBarFieldElem; check::Bool=true)
+   z = QQBarFieldElem()
    ccall((:qqbar_sqrt, libcalcium),
-        Nothing, (Ref{qqbar}, Ref{qqbar}), z, a)
+        Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
    return z
 end
 
 @doc raw"""
-    root(a::qqbar, n::Int)
+    root(a::QQBarFieldElem, n::Int)
 
 Return the principal `n`-th root of `a`. Requires positive `n`.
 """
-function root(a::qqbar, n::Int)
+function root(a::QQBarFieldElem, n::Int)
    n <= 0 && throw(DomainError(n))
-   z = qqbar()
+   z = QQBarFieldElem()
    ccall((:qqbar_root_ui, libcalcium),
-        Nothing, (Ref{qqbar}, Ref{qqbar}, UInt), z, a, n)
+        Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, UInt), z, a, n)
    return z
 end
 
@@ -897,11 +897,11 @@ function qqbar_vec(n::Int)
    return ccall((:_qqbar_vec_init, libcalcium), Ptr{qqbar_struct}, (Int,), n)
 end
 
-function array(R::CalciumQQBarField, v::Ptr{qqbar_struct}, n::Int)
-   r = Vector{qqbar}(undef, n)
+function array(R::QQBarField, v::Ptr{qqbar_struct}, n::Int)
+   r = Vector{QQBarFieldElem}(undef, n)
    for i=1:n
        r[i] = R()
-       ccall((:qqbar_set, libcalcium), Nothing, (Ref{qqbar}, Ptr{qqbar_struct}),
+       ccall((:qqbar_set, libcalcium), Nothing, (Ref{QQBarFieldElem}, Ptr{qqbar_struct}),
            r[i], v + (i-1)*sizeof(qqbar_struct))
    end
    return r
@@ -913,17 +913,17 @@ function qqbar_vec_clear(v::Ptr{qqbar_struct}, n::Int)
 end
 
 @doc raw"""
-    roots(R::CalciumQQBarField, f::ZZPolyRingElem)
+    roots(R::QQBarField, f::ZZPolyRingElem)
 
 Return all the roots of the polynomial `f` in the field of algebraic
 numbers `R`. The output array is sorted in the default sort order for
 algebraic numbers. Roots of multiplicity higher than one are repeated
 according to their multiplicity.
 """
-function roots(R::CalciumQQBarField, f::ZZPolyRingElem)
+function roots(R::QQBarField, f::ZZPolyRingElem)
    deg = degree(f)
    if deg <= 0
-      return Array{qqbar}(undef, 0)
+      return Array{QQBarFieldElem}(undef, 0)
    end
    roots = qqbar_vec(deg)
    ccall((:qqbar_roots_fmpz_poly, libcalcium),
@@ -934,17 +934,17 @@ function roots(R::CalciumQQBarField, f::ZZPolyRingElem)
 end
 
 @doc raw"""
-    roots(R::CalciumQQBarField, f::QQPolyRingElem)
+    roots(R::QQBarField, f::QQPolyRingElem)
 
 Return all the roots of the polynomial `f` in the field of algebraic
 numbers `R`. The output array is sorted in the default sort order for
 algebraic numbers. Roots of multiplicity higher than one are repeated
 according to their multiplicity.
 """
-function roots(R::CalciumQQBarField, f::QQPolyRingElem)
+function roots(R::QQBarField, f::QQPolyRingElem)
    deg = degree(f)
    if deg <= 0
-      return Array{qqbar}(undef, 0)
+      return Array{QQBarFieldElem}(undef, 0)
    end
    roots = qqbar_vec(deg)
    ccall((:qqbar_roots_fmpq_poly, libcalcium),
@@ -955,31 +955,31 @@ function roots(R::CalciumQQBarField, f::QQPolyRingElem)
 end
 
 @doc raw"""
-    conjugates(a::qqbar)
+    conjugates(a::QQBarFieldElem)
 
 Return all the roots of the polynomial `f` in the field of algebraic
 numbers `R`. The output array is sorted in the default sort order for
 algebraic numbers.
 """
-function conjugates(a::qqbar)
+function conjugates(a::QQBarFieldElem)
    deg = degree(a)
    if deg == 1
       return [a]
    end
    conjugates = qqbar_vec(deg)
    ccall((:qqbar_conjugates, libcalcium),
-        Nothing, (Ptr{qqbar_struct}, Ref{qqbar}), conjugates, a)
+        Nothing, (Ptr{qqbar_struct}, Ref{QQBarFieldElem}), conjugates, a)
    res = array(parent(a), conjugates, deg)
    qqbar_vec_clear(conjugates, deg)
    return res
 end
 
 # Return the eigenvalues with repetition according to the algebraic multiplicity
-function _eigvals_internal(R::CalciumQQBarField, A::ZZMatrix)
+function _eigvals_internal(R::QQBarField, A::ZZMatrix)
    n = nrows(A)
    !is_square(A) && throw(DomainError(A, "a square matrix is required"))
    if n == 0
-      return Array{qqbar}(undef, 0)
+      return Array{QQBarFieldElem}(undef, 0)
    end
    roots = qqbar_vec(n)
    ccall((:qqbar_eigenvalues_fmpz_mat, libcalcium),
@@ -990,11 +990,11 @@ function _eigvals_internal(R::CalciumQQBarField, A::ZZMatrix)
 end
 
 # Return the eigenvalues with repetition according to the algebraic multiplicity
-function _eigvals_internal(R::CalciumQQBarField, A::QQMatrix)
+function _eigvals_internal(R::QQBarField, A::QQMatrix)
    n = nrows(A)
    !is_square(A) && throw(DomainError(A, "a square matrix is required"))
    if n == 0
-      return Array{qqbar}(undef, 0)
+      return Array{QQBarFieldElem}(undef, 0)
    end
    roots = qqbar_vec(n)
    ccall((:qqbar_eigenvalues_fmpq_mat, libcalcium),
@@ -1005,28 +1005,28 @@ function _eigvals_internal(R::CalciumQQBarField, A::QQMatrix)
 end
 
 @doc raw"""
-    eigenvalues(R::CalciumQQBarField, A::ZZMatrix)
-    eigenvalues(R::CalciumQQBarField, A::QQMatrix)
+    eigenvalues(R::QQBarField, A::ZZMatrix)
+    eigenvalues(R::QQBarField, A::QQMatrix)
 
 Return the eigenvalues `A` in the field of algebraic numbers `R`.
 The output array is sorted in the default sort order for
 algebraic numbers.
 """
-function eigenvalues(R::CalciumQQBarField, A::Union{ZZMatrix, QQMatrix})
+function eigenvalues(R::QQBarField, A::Union{ZZMatrix, QQMatrix})
    return unique(_eigvals_internal(R, A))
 end
 
 @doc raw"""
-    eigenvalues_with_multiplicities(R::CalciumQQBarField, A::ZZMatrix)
-    eigenvalues_with_multiplicities(R::CalciumQQBarField, A::QQMatrix)
+    eigenvalues_with_multiplicities(R::QQBarField, A::ZZMatrix)
+    eigenvalues_with_multiplicities(R::QQBarField, A::QQMatrix)
 
 Return the eigenvalues `A` in the field of algebraic numbers `R` together with
 their algebraic multiplicities as a vector of tuples.
 The output array is sorted in the default sort order for algebraic numbers.
 """
-function eigenvalues_with_multiplicities(R::CalciumQQBarField, A::Union{ZZMatrix, QQMatrix})
+function eigenvalues_with_multiplicities(R::QQBarField, A::Union{ZZMatrix, QQMatrix})
    eig = _eigvals_internal(R, A)
-   res = Vector{Tuple{qqbar, Int}}()
+   res = Vector{Tuple{QQBarFieldElem, Int}}()
    k = 1
    n = length(eig)
    for i in 1:n
@@ -1052,186 +1052,186 @@ end
 ###############################################################################
 
 @doc raw"""
-    root_of_unity(C::CalciumQQBarField, n::Int)
+    root_of_unity(C::QQBarField, n::Int)
 
 Return the root of unity $e^{2 \pi i / n}$ as an element of the field
 of algebraic numbers `C`.
 """
-function root_of_unity(C::CalciumQQBarField, n::Int)
+function root_of_unity(C::QQBarField, n::Int)
    n <= 0 && throw(DomainError(n))
-   z = qqbar()
+   z = QQBarFieldElem()
    ccall((:qqbar_root_of_unity, libcalcium),
-        Nothing, (Ref{qqbar}, Int, UInt), z, 1, n)
+        Nothing, (Ref{QQBarFieldElem}, Int, UInt), z, 1, n)
    return z
 end
 
 @doc raw"""
-    root_of_unity(C::CalciumQQBarField, n::Int, k::Int)
+    root_of_unity(C::QQBarField, n::Int, k::Int)
 
 Return the root of unity $e^{2 \pi i k / n}$ as an element of the field
 of algebraic numbers `C`.
 """
-function root_of_unity(C::CalciumQQBarField, n::Int, k::Int)
+function root_of_unity(C::QQBarField, n::Int, k::Int)
    n <= 0 && throw(DomainError(n))
-   z = qqbar()
+   z = QQBarFieldElem()
    ccall((:qqbar_root_of_unity, libcalcium),
-        Nothing, (Ref{qqbar}, Int, UInt), z, k, n)
+        Nothing, (Ref{QQBarFieldElem}, Int, UInt), z, k, n)
    return z
 end
 
 @doc raw"""
-    is_root_of_unity(a::qqbar)
+    is_root_of_unity(a::QQBarFieldElem)
 
 Return whether the given algebraic number is a root of unity.
 """
-function is_root_of_unity(a::qqbar)
+function is_root_of_unity(a::QQBarFieldElem)
    return Bool(ccall((:qqbar_is_root_of_unity, libcalcium),
-        Cint, (Ptr{Int}, Ptr{Int}, Ref{qqbar}), C_NULL, C_NULL, a))
+        Cint, (Ptr{Int}, Ptr{Int}, Ref{QQBarFieldElem}), C_NULL, C_NULL, a))
 end
 
 @doc raw"""
-    root_of_unity_as_args(a::qqbar)
+    root_of_unity_as_args(a::QQBarFieldElem)
 
 Return a pair of integers `(q, p)` such that the given `a` equals
 $e^{2 \pi i p / q}$. The denominator `q` will be minimal, with
 $0 \le p < q$. Throws if `a` is not a root of unity.
 """
-function root_of_unity_as_args(a::qqbar)
+function root_of_unity_as_args(a::QQBarFieldElem)
    p = Vector{Int}(undef, 1)
    q = Vector{Int}(undef, 1)
    if !Bool(ccall((:qqbar_is_root_of_unity, libcalcium),
-        Cint, (Ptr{Int}, Ptr{Int}, Ref{qqbar}), p, q, a))
+        Cint, (Ptr{Int}, Ptr{Int}, Ref{QQBarFieldElem}), p, q, a))
       throw(DomainError(a, "value is not a root of unity"))
    end
    return (q[1], p[1])
 end
 
 @doc raw"""
-    exp_pi_i(a::qqbar)
+    exp_pi_i(a::QQBarFieldElem)
 
 Return $e^{\pi i a}$ as an algebraic number.
 Throws if this value is transcendental.
 """
-function exp_pi_i(a::qqbar)
+function exp_pi_i(a::QQBarFieldElem)
    r = QQFieldElem(a)
    p = Int(numerator(r))
    q = Int(denominator(r))
-   z = qqbar()
+   z = QQBarFieldElem()
    ccall((:qqbar_exp_pi_i, libcalcium),
-        Nothing, (Ref{qqbar}, Int, Int), z, p, q)
+        Nothing, (Ref{QQBarFieldElem}, Int, Int), z, p, q)
    return z
 end
 
 @doc raw"""
-    sinpi(a::qqbar)
+    sinpi(a::QQBarFieldElem)
 
 Return $\sin(\pi a)$ as an algebraic number.
 Throws if this value is transcendental.
 """
-function sinpi(a::qqbar)
+function sinpi(a::QQBarFieldElem)
    r = QQFieldElem(a)
    p = Int(numerator(r))
    q = Int(denominator(r))
-   z = qqbar()
-   ccall((:qqbar_sin_pi, libcalcium), Nothing, (Ref{qqbar}, Int, Int), z, p, q)
+   z = QQBarFieldElem()
+   ccall((:qqbar_sin_pi, libcalcium), Nothing, (Ref{QQBarFieldElem}, Int, Int), z, p, q)
    return z
 end
 
 @doc raw"""
-    cospi(a::qqbar)
+    cospi(a::QQBarFieldElem)
 
 Return $\cos(\pi a)$ as an algebraic number.
 Throws if this value is transcendental.
 """
-function cospi(a::qqbar)
+function cospi(a::QQBarFieldElem)
    r = QQFieldElem(a)
    p = Int(numerator(r))
    q = Int(denominator(r))
-   z = qqbar()
-   ccall((:qqbar_cos_pi, libcalcium), Nothing, (Ref{qqbar}, Int, Int), z, p, q)
+   z = QQBarFieldElem()
+   ccall((:qqbar_cos_pi, libcalcium), Nothing, (Ref{QQBarFieldElem}, Int, Int), z, p, q)
    return z
 end
 
 @doc raw"""
-    tanpi(a::qqbar)
+    tanpi(a::QQBarFieldElem)
 
 Return $\tan(\pi a)$ as an algebraic number.
 Throws if this value is transcendental or undefined.
 """
-function tanpi(a::qqbar)
+function tanpi(a::QQBarFieldElem)
    r = QQFieldElem(a)
    p = Int(numerator(r))
    q = Int(denominator(r))
-   z = qqbar()
+   z = QQBarFieldElem()
    if !Bool(ccall((:qqbar_tan_pi, libcalcium),
-        Cint, (Ref{qqbar}, Int, Int), z, p, q))
+        Cint, (Ref{QQBarFieldElem}, Int, Int), z, p, q))
       throw(DomainError(a, "function value is not algebraic"))
    end
    return z
 end
 
 @doc raw"""
-    atanpi(a::qqbar)
+    atanpi(a::QQBarFieldElem)
 
 Return $\operatorname{atan}(a) / \pi$ as an algebraic number.
 Throws if this value is transcendental or undefined.
 """
-function atanpi(a::qqbar)
+function atanpi(a::QQBarFieldElem)
    p = Vector{Int}(undef, 1)
    q = Vector{Int}(undef, 1)
    if !Bool(ccall((:qqbar_atan_pi, libcalcium),
-        Cint, (Ptr{Int}, Ptr{Int}, Ref{qqbar}), p, q, a))
+        Cint, (Ptr{Int}, Ptr{Int}, Ref{QQBarFieldElem}), p, q, a))
       throw(DomainError(a, "function value is not algebraic"))
    end
-   return qqbar(p[1]) // q[1]
+   return QQBarFieldElem(p[1]) // q[1]
 end
 
 @doc raw"""
-    asinpi(a::qqbar)
+    asinpi(a::QQBarFieldElem)
 
 Return $\operatorname{asin}(a) / \pi$ as an algebraic number.
 Throws if this value is transcendental.
 """
-function asinpi(a::qqbar)
+function asinpi(a::QQBarFieldElem)
    p = Vector{Int}(undef, 1)
    q = Vector{Int}(undef, 1)
    if !Bool(ccall((:qqbar_asin_pi, libcalcium),
-        Cint, (Ptr{Int}, Ptr{Int}, Ref{qqbar}), p, q, a))
+        Cint, (Ptr{Int}, Ptr{Int}, Ref{QQBarFieldElem}), p, q, a))
       throw(DomainError(a, "function value is not algebraic"))
    end
-   return qqbar(p[1]) // q[1]
+   return QQBarFieldElem(p[1]) // q[1]
 end
 
 @doc raw"""
-    acospi(a::qqbar)
+    acospi(a::QQBarFieldElem)
 
 Return $\operatorname{acos}(a) / \pi$ as an algebraic number.
 Throws if this value is transcendental.
 """
-function acospi(a::qqbar)
+function acospi(a::QQBarFieldElem)
    p = Vector{Int}(undef, 1)
    q = Vector{Int}(undef, 1)
    if !Bool(ccall((:qqbar_acos_pi, libcalcium),
-        Cint, (Ptr{Int}, Ptr{Int}, Ref{qqbar}), p, q, a))
+        Cint, (Ptr{Int}, Ptr{Int}, Ref{QQBarFieldElem}), p, q, a))
       throw(DomainError(a, "function value is not algebraic"))
    end
-   return qqbar(p[1]) // q[1]
+   return QQBarFieldElem(p[1]) // q[1]
 end
 
 @doc raw"""
-    log_pi_i(a::qqbar)
+    log_pi_i(a::QQBarFieldElem)
 
 Return $\log(a) / (\pi i)$ as an algebraic number.
 Throws if this value is transcendental or undefined.
 """
-function log_pi_i(a::qqbar)
+function log_pi_i(a::QQBarFieldElem)
    p = Vector{Int}(undef, 1)
    q = Vector{Int}(undef, 1)
    if !Bool(ccall((:qqbar_log_pi_i, libcalcium),
-        Cint, (Ptr{Int}, Ptr{Int}, Ref{qqbar}), p, q, a))
+        Cint, (Ptr{Int}, Ptr{Int}, Ref{QQBarFieldElem}), p, q, a))
       throw(DomainError(a, "function value is not algebraic"))
    end
-   return qqbar(p[1]) // q[1]
+   return QQBarFieldElem(p[1]) // q[1]
 end
 
 
@@ -1243,7 +1243,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    guess(R::CalciumQQBarField, x::acb, maxdeg::Int, maxbits::Int=0)
+    guess(R::QQBarField, x::AcbFieldElem, maxdeg::Int, maxbits::Int=0)
 
 Try to reconstruct an algebraic number from a given numerical enclosure `x`.
 The algorithm looks for candidates up to degree `maxdeg` and with
@@ -1262,14 +1262,14 @@ performance, one should invoke this function repeatedly with successively
 larger parameters when the size of the intended solution is unknown or
 may be much smaller than a worst-case bound.
 """
-function guess(R::CalciumQQBarField, x::acb, maxdeg::Int, maxbits::Int=0)
+function guess(R::QQBarField, x::AcbFieldElem, maxdeg::Int, maxbits::Int=0)
    prec = precision(Balls)
    if maxbits <= 0
       maxbits = prec
    end
-   res = qqbar()
+   res = QQBarFieldElem()
    found = Bool(ccall((:qqbar_guess, libcalcium),
-        Cint, (Ref{qqbar}, Ref{acb}, Int, Int, Int, Int),
+        Cint, (Ref{QQBarFieldElem}, Ref{AcbFieldElem}, Int, Int, Int, Int),
             res, x, maxdeg, maxbits, 0, prec))
    if !found
       error("No suitable algebraic number found")
@@ -1278,7 +1278,7 @@ function guess(R::CalciumQQBarField, x::acb, maxdeg::Int, maxbits::Int=0)
 end
 
 @doc raw"""
-    guess(R::CalciumQQBarField, x::acb, maxdeg::Int, maxbits::Int=0)
+    guess(R::QQBarField, x::AcbFieldElem, maxdeg::Int, maxbits::Int=0)
 
 Try to reconstruct an algebraic number from a given numerical enclosure `x`.
 The algorithm looks for candidates up to degree `maxdeg` and with
@@ -1297,7 +1297,7 @@ performance, one should invoke this function repeatedly with successively
 larger parameters when the size of the intended solution is unknown or
 may be much smaller than a worst-case bound.
 """
-function guess(R::CalciumQQBarField, x::arb, maxdeg::Int, maxbits::Int=0)
+function guess(R::QQBarField, x::ArbFieldElem, maxdeg::Int, maxbits::Int=0)
    CC = AcbField()
    return guess(R, CC(x), maxdeg, maxbits)
 end
@@ -1309,64 +1309,64 @@ end
 ###############################################################################
 
 @doc raw"""
-    (R::ArbField)(a::qqbar)
+    (R::ArbField)(a::QQBarFieldElem)
 
 Convert `a` to a real ball with the precision of the parent field `R`.
 Throws if `a` is not a real number.
 """
-function (R::ArbField)(a::qqbar)
+function (R::ArbField)(a::QQBarFieldElem)
    prec = precision(R)
    z = R()
    ccall((:qqbar_get_arb, libcalcium),
-        Nothing, (Ref{arb}, Ref{qqbar}, Int), z, a, prec)
+        Nothing, (Ref{ArbFieldElem}, Ref{QQBarFieldElem}, Int), z, a, prec)
    !isfinite(z) && throw(DomainError(a, "nonreal algebraic number"))
    return z
 end
 
 @doc raw"""
-    (R::ArbField)(a::qqbar)
+    (R::ArbField)(a::QQBarFieldElem)
 
 Convert `a` to a complex ball with the precision of the parent field `R`.
 Throws if `a` is not a real number.
 """
-function (R::AcbField)(a::qqbar)
+function (R::AcbField)(a::QQBarFieldElem)
    prec = precision(R)
    z = R()
    ccall((:qqbar_get_acb, libcalcium),
-        Nothing, (Ref{acb}, Ref{qqbar}, Int), z, a, prec)
+        Nothing, (Ref{AcbFieldElem}, Ref{QQBarFieldElem}, Int), z, a, prec)
    return z
 end
 
 # todo: provide qqbar_get_fmpq, qqbar_get_fmpz in C
 @doc raw"""
-    QQFieldElem(a::qqbar)
+    QQFieldElem(a::QQBarFieldElem)
 
 Convert `a` to a rational number of type `QQFieldElem`.
 Throws if `a` is not a rational number.
 """
-function QQFieldElem(a::qqbar)
+function QQFieldElem(a::QQBarFieldElem)
    !is_rational(a) && throw(DomainError(a, "nonrational algebraic number"))
    p = ZZRingElem()
    q = ZZRingElem()
    ccall((:fmpz_poly_get_coeff_fmpz, libflint),
-        Nothing, (Ref{ZZRingElem}, Ref{qqbar}, Int), p, a, 0)
+        Nothing, (Ref{ZZRingElem}, Ref{QQBarFieldElem}, Int), p, a, 0)
    ccall((:fmpz_poly_get_coeff_fmpz, libflint),
-        Nothing, (Ref{ZZRingElem}, Ref{qqbar}, Int), q, a, 1)
+        Nothing, (Ref{ZZRingElem}, Ref{QQBarFieldElem}, Int), q, a, 1)
    ccall((:fmpz_neg, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}), p, p)
    return p // q
 end
 
 @doc raw"""
-    ZZRingElem(a::qqbar)
+    ZZRingElem(a::QQBarFieldElem)
 
 Convert `a` to an integer of type `ZZRingElem`.
 Throws if `a` is not an integer.
 """
-function ZZRingElem(a::qqbar)
+function ZZRingElem(a::QQBarFieldElem)
    !isinteger(a) && throw(DomainError(a, "noninteger algebraic number"))
    z = ZZRingElem()
    ccall((:fmpz_poly_get_coeff_fmpz, libflint),
-        Nothing, (Ref{ZZRingElem}, Ref{qqbar}, Int), z, a, 0)
+        Nothing, (Ref{ZZRingElem}, Ref{QQBarFieldElem}, Int), z, a, 0)
    ccall((:fmpz_neg, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}), z, z)
    return z
 end
@@ -1377,26 +1377,26 @@ end
 #
 ###############################################################################
 
-function zero!(z::qqbar)
-   ccall((:qqbar_zero, libcalcium), Nothing, (Ref{qqbar},), z)
+function zero!(z::QQBarFieldElem)
+   ccall((:qqbar_zero, libcalcium), Nothing, (Ref{QQBarFieldElem},), z)
    return z
 end
 
-function mul!(z::qqbar, x::qqbar, y::qqbar)
+function mul!(z::QQBarFieldElem, x::QQBarFieldElem, y::QQBarFieldElem)
    ccall((:qqbar_mul, libcalcium), Nothing,
-                (Ref{qqbar}, Ref{qqbar}, Ref{qqbar}), z, x, y)
+                (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, x, y)
    return z
 end
 
-function addeq!(z::qqbar, x::qqbar)
+function addeq!(z::QQBarFieldElem, x::QQBarFieldElem)
    ccall((:qqbar_add, libcalcium), Nothing,
-                (Ref{qqbar}, Ref{qqbar}, Ref{qqbar}), z, z, x)
+                (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, z, x)
    return z
 end
 
-function add!(z::qqbar, x::qqbar, y::qqbar)
+function add!(z::QQBarFieldElem, x::QQBarFieldElem, y::QQBarFieldElem)
    ccall((:qqbar_add, libcalcium), Nothing,
-                (Ref{qqbar}, Ref{qqbar}, Ref{qqbar}), z, x, y)
+                (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, x, y)
    return z
 end
 
@@ -1406,17 +1406,17 @@ end
 #
 ###############################################################################
 
-(a::CalciumQQBarField)() = qqbar()
+(a::QQBarField)() = QQBarFieldElem()
 
-(a::CalciumQQBarField)(b::Int) = qqbar(b)
+(a::QQBarField)(b::Int) = QQBarFieldElem(b)
 
-(a::CalciumQQBarField)(b::Complex{Int}) = qqbar(b)
+(a::QQBarField)(b::Complex{Int}) = QQBarFieldElem(b)
 
-(a::CalciumQQBarField)(b::ZZRingElem) = qqbar(b)
+(a::QQBarField)(b::ZZRingElem) = QQBarFieldElem(b)
 
-(a::CalciumQQBarField)(b::Integer) = qqbar(ZZRingElem(b))
+(a::QQBarField)(b::Integer) = QQBarFieldElem(ZZRingElem(b))
 
-(a::CalciumQQBarField)(b::QQFieldElem) = qqbar(b)
+(a::QQBarField)(b::QQFieldElem) = QQBarFieldElem(b)
 
-(a::CalciumQQBarField)(b::qqbar) = b
+(a::QQBarField)(b::QQBarFieldElem) = b
 

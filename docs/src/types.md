@@ -58,17 +58,17 @@ parent objects of the given rings and structures.
      - `perm` (`SymmetricGroup`)
 
   - Antic
-     - `nf_elem` (`AnticNumberField`)
+     - `AbsSimpleNumFieldElem` (`AbsSimpleNumField`)
 
   - Arb
-     - `arb` (`ArbField`)
-     - `acb` (`AcbField`)
-     - `arb_poly` (`ArbPolyRing`)
-     - `acb_poly` (`AcbPolyRing`)
-     - `arb_mat` (`ArbMatSpace`)
-     - `acb_mat` (`AcbMatSpace`)
+     - `ArbFieldElem` (`ArbField`)
+     - `AcbFieldElem` (`AcbField`)
+     - `ArbPolyRingElem` (`ArbPolyRing`)
+     - `AcbPolyRingElem` (`AcbPolyRing`)
+     - `ArbMatrix` (`ArbMatSpace`)
+     - `AcbMatrix` (`AcbMatSpace`)
 
   - Calcium
 
-     - `qqbar` (`CalciumQQBarField`)
-     - `ca` (`CalciumField`)
+     - `QQBarFieldElem` (`QQBarField`)
+     - `CalciumFieldElem` (`CalciumField`)

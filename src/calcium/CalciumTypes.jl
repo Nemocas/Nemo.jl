@@ -59,12 +59,12 @@ end
 #
 ################################################################################
 
-mutable struct CalciumQQBarField <: Field
+mutable struct QQBarField <: Field
 end
 
-const CalciumQQBar = CalciumQQBarField()
+const CalciumQQBar = QQBarField()
 
-mutable struct qqbar <: FieldElem
+mutable struct QQBarFieldElem <: FieldElem
   coeffs::Ptr{Nothing}
   alloc::Int
   length::Int
@@ -81,17 +81,17 @@ mutable struct qqbar <: FieldElem
   imag_rad_exp::Int     # ZZRingElem
   imag_rad_man::UInt
 
-  function qqbar()
+  function QQBarFieldElem()
     z = new()
-    ccall((:qqbar_init, libcalcium), Nothing, (Ref{qqbar}, ), z)
+    ccall((:qqbar_init, libcalcium), Nothing, (Ref{QQBarFieldElem}, ), z)
     finalizer(_qqbar_clear_fn, z)
     return z
   end
 
 end
 
-function _qqbar_clear_fn(a::qqbar)
-   ccall((:qqbar_clear, libcalcium), Nothing, (Ref{qqbar},), a)
+function _qqbar_clear_fn(a::QQBarFieldElem)
+   ccall((:qqbar_clear, libcalcium), Nothing, (Ref{QQBarFieldElem},), a)
 end
 
 ################################################################################
@@ -175,7 +175,7 @@ function _CalciumField_clear_fn(C::CalciumField)
    decrement_refcount(C)
 end
 
-mutable struct ca <: FieldElem
+mutable struct CalciumFieldElem <: FieldElem
    field::Int
    data0::UInt
    data1::UInt
@@ -185,10 +185,10 @@ mutable struct ca <: FieldElem
 
    parent::CalciumField
 
-   function ca(ctx::CalciumField)
+   function CalciumFieldElem(ctx::CalciumField)
       z = new()
       ccall((:ca_init, libcalcium), Nothing,
-                (Ref{ca}, Ref{CalciumField}), z, ctx)
+                (Ref{CalciumFieldElem}, Ref{CalciumField}), z, ctx)
       z.parent = ctx
       z.parent.refcount += 1
       finalizer(_ca_clear_fn, z)
@@ -197,9 +197,9 @@ mutable struct ca <: FieldElem
 
 end
 
-function _ca_clear_fn(a::ca)
+function _ca_clear_fn(a::CalciumFieldElem)
    ccall((:ca_clear, libcalcium),
-        Nothing, (Ref{ca}, Ref{CalciumField}), a, a.parent)
+        Nothing, (Ref{CalciumFieldElem}, Ref{CalciumField}), a, a.parent)
    decrement_refcount(a.parent)
 end
 

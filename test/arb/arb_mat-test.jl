@@ -1,12 +1,12 @@
 RR = ArbField(64)
 
-@testset "arb_mat.constructors" begin
+@testset "ArbMatrix.constructors" begin
    S = matrix_space(RR, 3, 3)
    R = matrix_space(ZZ, 3, 3)
 
-   @test elem_type(S) == arb_mat
-   @test elem_type(ArbMatSpace) == arb_mat
-   @test parent_type(arb_mat) == ArbMatSpace
+   @test elem_type(S) == ArbMatrix
+   @test elem_type(ArbMatSpace) == ArbMatrix
+   @test parent_type(ArbMatrix) == ArbMatSpace
    @test nrows(S) == 3
    @test ncols(S) == 3
 
@@ -62,13 +62,13 @@ RR = ArbField(64)
 
    for T in [ZZRingElem, QQFieldElem, Int, BigInt, Float64, BigFloat, RR, string, Rational{Int}, Rational{BigInt}]
       M = matrix(RR, map(T, arr))
-      @test isa(M, arb_mat)
+      @test isa(M, ArbMatrix)
       @test base_ring(M) == RR
       @test nrows(M) == 2
       @test ncols(M) == 2
 
       M2 = matrix(RR, 2, 3, map(T, arr2))
-      @test isa(M2, arb_mat)
+      @test isa(M2, ArbMatrix)
       @test base_ring(M2) == RR
       @test nrows(M2) == 2
       @test ncols(M2) == 3
@@ -78,12 +78,12 @@ RR = ArbField(64)
 
    M3 = zero_matrix(RR, 2, 3)
 
-   @test isa(M3, arb_mat)
+   @test isa(M3, ArbMatrix)
    @test base_ring(M3) == RR
 
    M4 = identity_matrix(RR, 3)
 
-   @test isa(M4, arb_mat)
+   @test isa(M4, ArbMatrix)
    @test base_ring(M4) == RR
 
    a = zero_matrix(RR, 2, 2)
@@ -93,16 +93,16 @@ RR = ArbField(64)
    @test !(a in [b])
 end
 
-@testset "arb_mat.similar" begin
+@testset "ArbMatrix.similar" begin
    S = matrix_space(RR, 3, 3)
    s = S(ZZRingElem(3))
 
    t = similar(s)
-   @test t isa arb_mat
+   @test t isa ArbMatrix
    @test size(t) == size(s)
 
    t = similar(s, 2, 3)
-   @test t isa arb_mat
+   @test t isa ArbMatrix
    @test size(t) == (2, 3)
 
    for (R, M) in ring_to_mat
@@ -114,13 +114,13 @@ end
    end
 
    # issue #651
-   m = one(Generic.MatSpace{arb}(RR, 2, 2))
+   m = one(Generic.MatSpace{ArbFieldElem}(RR, 2, 2))
    for n = (m, -m, m*m, m+m, 2m)
-      @test n isa Generic.MatSpaceElem{arb}
+      @test n isa Generic.MatSpaceElem{ArbFieldElem}
    end
 end
 
-@testset "arb_mat.printing" begin
+@testset "ArbMatrix.printing" begin
    S = matrix_space(RR, 3, 3)
    f = S(ZZRingElem(3))
 
@@ -128,7 +128,7 @@ end
    @test !occursin(string(typeof(f)), string(f))
 end
 
-@testset "arb_mat.manipulation" begin
+@testset "ArbMatrix.manipulation" begin
    S = matrix_space(RR, 3, 3)
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
    B = S([ZZRingElem(1) 4 7; 9 6 7; 4 3 3])
@@ -150,7 +150,7 @@ end
    @test deepcopy(A) == A
 end
 
-@testset "arb_mat.unary_ops" begin
+@testset "ArbMatrix.unary_ops" begin
    S = matrix_space(RR, 3, 3)
    R = matrix_space(ZZ, 3, 3)
 
@@ -160,7 +160,7 @@ end
    @test contains(-A, B)
 end
 
-@testset "arb_mat.transpose" begin
+@testset "ArbMatrix.transpose" begin
    S = matrix_space(RR, 3, 3)
    T = matrix_space(ZZ, 3, 3)
 
@@ -175,7 +175,7 @@ end
    @test overlaps(transpose(C), C)
 end
 
-@testset "arb_mat.binary_ops" begin
+@testset "ArbMatrix.binary_ops" begin
    S = matrix_space(RR, 3, 3)
    R = matrix_space(ZZ, 3, 3)
 
@@ -189,7 +189,7 @@ end
    @test contains(A*B, R([49 41 50; 65 49 56; 75 81 114]))
 end
 
-@testset "arb_mat.adhoc_binary" begin
+@testset "ArbMatrix.adhoc_binary" begin
    S = matrix_space(RR, 3, 3)
    R = matrix_space(ZZ, 3, 3)
    T = matrix_space(QQ, 3, 3)
@@ -227,7 +227,7 @@ end
    @test contains(A*q, C*q)
 end
 
-@testset "arb_mat.shifting" begin
+@testset "ArbMatrix.shifting" begin
    S = matrix_space(RR, 3, 3)
    R = matrix_space(ZZ, 3, 3)
 
@@ -240,7 +240,7 @@ end
    @test contains(C, 16*B)
 end
 
-@testset "arb_mat.comparison" begin
+@testset "ArbMatrix.comparison" begin
    S = matrix_space(RR, 3, 3)
    R = matrix_space(ZZ, 3, 3)
 
@@ -262,7 +262,7 @@ end
    @test contains(C, A)
 end
 
-@testset "arb_mat.adhoc_comparison" begin
+@testset "ArbMatrix.adhoc_comparison" begin
    S = matrix_space(RR, 3, 3)
    R = matrix_space(ZZ, 3, 3)
    T = matrix_space(QQ, 3, 3)
@@ -283,7 +283,7 @@ end
    @test B == A
 end
 
-@testset "arb_mat.inversion" begin
+@testset "ArbMatrix.inversion" begin
    S = matrix_space(RR, 3, 3)
    R = matrix_space(ZZ, 3, 3)
 
@@ -304,7 +304,7 @@ end
    @test_throws ErrorException inv(A)
 end
 
-@testset "arb_mat.divexact" begin
+@testset "ArbMatrix.divexact" begin
    S = matrix_space(RR, 3, 3)
    R = matrix_space(ZZ, 3, 3)
 
@@ -315,7 +315,7 @@ end
    @test contains(divexact(one(S), A), B)
 end
 
-@testset "arb_mat.adhoc_divexact" begin
+@testset "ArbMatrix.adhoc_divexact" begin
    S = matrix_space(RR, 3, 3)
    R = matrix_space(ZZ, 3, 3)
 
@@ -327,7 +327,7 @@ end
    @test contains(divexact(A, RR("3.0 +/- 0.5")), B)
 end
 
-@testset "arb_mat.charpoly" begin
+@testset "ArbMatrix.charpoly" begin
    S = matrix_space(RR, 3, 3)
    R, x = polynomial_ring(RR, "x")
    ZZy, y = polynomial_ring(ZZ, "y")
@@ -343,7 +343,7 @@ end
    @test contains(g, f)
 end
 
-@testset "arb_mat.det" begin
+@testset "ArbMatrix.det" begin
    S = matrix_space(RR, 3, 3)
 
    A = S(["2.0 +/- 0.1" "3.0 +/- 0.1" "5.0 +/- 0.1";
@@ -355,7 +355,7 @@ end
    @test contains(d, 24)
 end
 
-@testset "arb_mat.exp" begin
+@testset "ArbMatrix.exp" begin
    S = matrix_space(RR, 3, 3)
 
    A = S(["2.0 +/- 0.1" "0.0 +/- 0.1" "0.0 +/- 0.1";
@@ -369,7 +369,7 @@ end
    @test overlaps(B, C)
 end
 
-@testset "arb_mat.lu_nonsquare" begin
+@testset "ArbMatrix.lu_nonsquare" begin
    S = matrix_space(RR, 2, 3)
 
    A = S(["1.0 +/- 0.01" "1.0 +/- 0.01" "1.0 +/- 0.01";
@@ -381,7 +381,7 @@ end
     @test r == 2
 end
 
-@testset "arb_mat.cholesky_solving" begin
+@testset "ArbMatrix.cholesky_solving" begin
    S = matrix_space(RR, 3, 3)
 
    A = S(["4.0 +/- 0.01" "1.0 +/- 0.01" "1.0 +/- 0.01";
@@ -401,7 +401,7 @@ end
    @test contains(transpose(y), ZZ[1 1 1])
 end
 
-@testset "arb_mat.linear_solving" begin
+@testset "ArbMatrix.linear_solving" begin
    S = matrix_space(RR, 3, 3)
    T = matrix_space(ZZ, 3, 3)
 
@@ -433,7 +433,7 @@ end
    @test contains(transpose(y), ZZ[1 1 1])
 end
 
-@testset "arb_mat.bound_inf_norm" begin
+@testset "ArbMatrix.bound_inf_norm" begin
    S = matrix_space(RR, 3, 3)
 
    A = S([2 3 5; 1 4 7; 9 6 3])

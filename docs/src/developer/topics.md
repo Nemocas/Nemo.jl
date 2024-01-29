@@ -486,10 +486,10 @@ To support delayed reduction, a ring must support the delayed reduction
 interface which we describe here.
 
 Two additional functions must be supplied for the element type. We give
-examples for the Nemo `nf_elem` type:
+examples for the Nemo `AbsSimpleNumFieldElem` type:
 
 ```julia
-mul_red!(z::nf_elem, x::nf_elem, y::nf_elem, red::Bool)
+mul_red!(z::AbsSimpleNumFieldElem, x::AbsSimpleNumFieldElem, y::AbsSimpleNumFieldElem, red::Bool)
 ```
 
 This function behaves as per `mul!` but only performs reduction if the
@@ -497,7 +497,7 @@ additional boolean argument `red` is set to `true`. This function can
 assume that both the inputs are reduced.
 
 ```julia
-reduce!(x::nf_elem)
+reduce!(x::AbsSimpleNumFieldElem)
 ```
 
 This function must perform reduction on an unreduced element (mutating it).

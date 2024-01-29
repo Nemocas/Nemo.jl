@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   acb.jl : Arb complex numbers
+#   AcbFieldElem.jl : Arb complex numbers
 #
 #   Copyright (C) 2015 Tommy Hofmann
 #   Copyright (C) 2015 Fredrik Johansson
@@ -54,7 +54,7 @@ Return the relative accuracy of $x$ measured in bits, capped between
 `typemax(Int)` and `-typemax(Int)`.
 """
 function accuracy_bits(x::ComplexFieldElem)
-  # bug in acb.h: rel_accuracy_bits is not in the library
+  # bug in AcbFieldElem.h: rel_accuracy_bits is not in the library
   return -ccall((:acb_rel_error_bits, libarb), Int, (Ref{ComplexFieldElem},), x)
 end
 
@@ -169,7 +169,7 @@ end
 #
 ################################################################################
 
-# acb - acb
+# AcbFieldElem - AcbFieldElem
 
 for (s,f) in ((:+,"acb_add"), (:*,"acb_mul"), (://, "acb_div"), (:-,"acb_sub"), (:^,"acb_pow"))
   @eval begin
@@ -615,7 +615,7 @@ end
 @doc raw"""
     trim(x::ComplexFieldElem)
 
-Return an `acb` box containing $x$ but which may be more economical,
+Return an `AcbFieldElem` box containing $x$ but which may be more economical,
 by rounding off insignificant bits from midpoints.
 """
 function trim(x::ComplexFieldElem)

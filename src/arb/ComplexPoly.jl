@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   acb_poly.jl : Polynomials over arb
+#   AcbPolyRingElem.jl : Polynomials over ArbFieldElem
 #
 ###############################################################################
 
@@ -363,7 +363,7 @@ function truncate(a::ComplexPoly, n::Int)
    if length(a) <= n
       return a
    end
-   # todo: implement set_trunc in arb
+   # todo: implement set_trunc in ArbFieldElem
    z = deepcopy(a)
    ccall((:acb_poly_truncate, libarb), Nothing,
                 (Ref{ComplexPoly}, Int), z, n)
@@ -628,8 +628,8 @@ function roots(x::ComplexPoly; target=0, isolate_real=false, initial_prec=0, max
                         (Ptr{acb_struct}, ), roots + i * sizeof(acb_struct))
                     im = ccall((:acb_imag_ptr, libarb), Ptr{arb_struct},
                         (Ptr{acb_struct}, ), roots + i * sizeof(acb_struct))
-                    t = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ptr{arb}, ), re)
-                    u = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ptr{arb}, ), im)
+                    t = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ptr{ArbFieldElem}, ), re)
+                    u = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ptr{ArbFieldElem}, ), im)
                     ok = ok && (ccall((:mag_cmp_2exp_si, libarb), Cint,
                         (Ptr{mag_struct}, Int), t, -target) <= 0)
                     ok = ok && (ccall((:mag_cmp_2exp_si, libarb), Cint,
@@ -688,7 +688,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    roots_upper_bound(x::ComplexPoly) -> arb
+    roots_upper_bound(x::ComplexPoly) -> ArbFieldElem
 
 Returns an upper bound for the absolute value of all complex roots of $x$.
 """
@@ -768,7 +768,7 @@ promote_rule(::Type{ComplexPoly}, ::Type{ZZPolyRingElem}) = ComplexPoly
 
 promote_rule(::Type{ComplexPoly}, ::Type{QQPolyRingElem}) = ComplexPoly
 
-promote_rule(::Type{ComplexPoly}, ::Type{arb_poly}) = ComplexPoly
+promote_rule(::Type{ComplexPoly}, ::Type{ArbPolyRingElem}) = ComplexPoly
 
 promote_rule(::Type{ComplexPoly}, ::Type{ComplexPoly}) = ComplexPoly
 

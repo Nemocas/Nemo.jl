@@ -9,7 +9,7 @@ end
 
 Arbitrary precision complex ball arithmetic is supplied by Arb which provides a
 ball representation which tracks error bounds rigorously. Complex numbers are 
-represented in rectangular form $a+bi$ where $a,b$ are `arb` balls.
+represented in rectangular form $a+bi$ where $a,b$ are `ArbFieldElem` balls.
 
 The corresponding field is constructed using the `ComplexField` constructor. This
 constructs the parent object for the Arb complex field.
@@ -167,7 +167,7 @@ Coerce the decimal number, given as a string, into the Arb complex field. In
 each case $f$ is the real part and $g$ is the imaginary part.
 
 ```
-R(f::arb)
+R(f::ArbFieldElem)
 ```
 
 Coerce the given Arb real ball into the Arb complex field.
@@ -297,8 +297,8 @@ Function                     |
 `==(x::Integer, y::ComplexFieldElem)`     |
 `==(x::ComplexFieldElem, y::ZZRingElem)`        |
 `==(x::ZZRingElem, y::ComplexFieldElem)`        |
-`==(x::arb, y::ZZRingElem)`        |
-`==(x::ZZRingElem, y::arb)`        |
+`==(x::ArbFieldElem, y::ZZRingElem)`        |
+`==(x::ZZRingElem, y::ArbFieldElem)`        |
 `==(x::ComplexFieldElem, y::Float64)`     |
 `==(x::Float64, y::ComplexFieldElem)`     |
 

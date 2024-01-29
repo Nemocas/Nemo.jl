@@ -1,56 +1,56 @@
-@testset "qqbar.constructors" begin
+@testset "QQBarFieldElem.constructors" begin
    R = CalciumQQBar
 
    @test R == QQBar
 
-   @test elem_type(R) == qqbar
-   @test elem_type(CalciumQQBarField) == qqbar
-   @test parent_type(qqbar) == CalciumQQBarField
-   @test is_domain_type(qqbar) == true
+   @test elem_type(R) == QQBarFieldElem
+   @test elem_type(QQBarField) == QQBarFieldElem
+   @test parent_type(QQBarFieldElem) == QQBarField
+   @test is_domain_type(QQBarFieldElem) == true
    @test base_ring(CalciumQQBar) == CalciumQQBar
-   @test base_ring(qqbar(3)) == CalciumQQBar
+   @test base_ring(QQBarFieldElem(3)) == CalciumQQBar
 
-   @test isa(R, CalciumQQBarField)
+   @test isa(R, QQBarField)
 
-   @test isa(R(), qqbar)
-   @test isa(R(2), qqbar)
-   @test isa(R(2+3im), qqbar)
-   @test isa(R(ZZRingElem(2)), qqbar)
-   @test isa(R(QQFieldElem(2)), qqbar)
-   @test isa(R(qqbar(2)), qqbar)
+   @test isa(R(), QQBarFieldElem)
+   @test isa(R(2), QQBarFieldElem)
+   @test isa(R(2+3im), QQBarFieldElem)
+   @test isa(R(ZZRingElem(2)), QQBarFieldElem)
+   @test isa(R(QQFieldElem(2)), QQBarFieldElem)
+   @test isa(R(QQBarFieldElem(2)), QQBarFieldElem)
 
-   @test isa(qqbar(), qqbar)
-   @test isa(qqbar(2), qqbar)
-   @test isa(qqbar(2+3im), qqbar)
-   @test isa(qqbar(ZZRingElem(2)), qqbar)
-   @test isa(qqbar(QQFieldElem(2)), qqbar)
+   @test isa(QQBarFieldElem(), QQBarFieldElem)
+   @test isa(QQBarFieldElem(2), QQBarFieldElem)
+   @test isa(QQBarFieldElem(2+3im), QQBarFieldElem)
+   @test isa(QQBarFieldElem(ZZRingElem(2)), QQBarFieldElem)
+   @test isa(QQBarFieldElem(QQFieldElem(2)), QQBarFieldElem)
 
    x = R(1)
    @test deepcopy(x) !== x
 
 end
 
-@testset "qqbar.printing" begin
+@testset "QQBarFieldElem.printing" begin
    a = CalciumQQBar(1)
 
    @test string(a) == "Root 1.00000 of x - 1"
    @test string(parent(a)) == "Field of algebraic numbers"
 
-   @test string(-(qqbar(10) ^ 20)) == "Root -1.00000e+20 of x + 100000000000000000000"
+   @test string(-(QQBarFieldElem(10) ^ 20)) == "Root -1.00000e+20 of x + 100000000000000000000"
    @test string(root_of_unity(CalciumQQBar, 3)) == "Root -0.500000 + 0.866025*im of x^2 + x + 1"
-   @test string(sqrt(qqbar(-1)) // 3) == "Root 0.333333*im of 9x^2 + 1"
+   @test string(sqrt(QQBarFieldElem(-1)) // 3) == "Root 0.333333*im of 9x^2 + 1"
 end
 
 
-@testset "qqbar.manipulation" begin
+@testset "QQBarFieldElem.manipulation" begin
    R = CalciumQQBar
 
    @test zero(R) == 0
    @test one(R) == 1
-   @test isa(zero(R), qqbar)
-   @test isa(one(R), qqbar)
-   @test zero(R) == zero(qqbar)
-   @test one(R) == one(qqbar)
+   @test isa(zero(R), QQBarFieldElem)
+   @test isa(one(R), QQBarFieldElem)
+   @test zero(R) == zero(QQBarFieldElem)
+   @test one(R) == one(QQBarFieldElem)
 
    @test iszero(R(0))
    @test isone(R(1))
@@ -74,10 +74,10 @@ end
    @test !isreal(i)
    @test is_algebraic_integer(u)
 
-   @test denominator(qqbar(3+4im) // 5) == 5
-   @test numerator(qqbar(3+4im) // 5) == qqbar(3+4im)
-   @test height(qqbar(1+10im)) == 101
-   @test height_bits(qqbar(1+10im)) == 7
+   @test denominator(QQBarFieldElem(3+4im) // 5) == 5
+   @test numerator(QQBarFieldElem(3+4im) // 5) == QQBarFieldElem(3+4im)
+   @test height(QQBarFieldElem(1+10im)) == 101
+   @test height_bits(QQBarFieldElem(1+10im)) == 7
 
    @test inv(u) == u // 2
 
@@ -103,29 +103,29 @@ end
    @test minpoly(ZZx, u) == x^2 - 2
    @test minpoly(QQy, u) == y^2 - 2
 
-   @test evaluate(x^2, u) == qqbar(2)
-   @test evaluate(y^2, u) == qqbar(2)
+   @test evaluate(x^2, u) == QQBarFieldElem(2)
+   @test evaluate(y^2, u) == QQBarFieldElem(2)
 
-   @test root(qqbar(-1), 3) == root_of_unity(R, 6)
+   @test root(QQBarFieldElem(-1), 3) == root_of_unity(R, 6)
    @test root_of_unity(R, 4) == i
    @test root_of_unity(R, 4, 3) == -i
 
-   @test sinpi(qqbar(1)//6) == qqbar(1)//2
-   @test cospi(qqbar(1)//3) == qqbar(1)//2
-   @test tanpi(qqbar(1)//3) == sqrt(qqbar(3))
-   @test_throws DomainError tanpi(qqbar(1)//2)
+   @test sinpi(QQBarFieldElem(1)//6) == QQBarFieldElem(1)//2
+   @test cospi(QQBarFieldElem(1)//3) == QQBarFieldElem(1)//2
+   @test tanpi(QQBarFieldElem(1)//3) == sqrt(QQBarFieldElem(3))
+   @test_throws DomainError tanpi(QQBarFieldElem(1)//2)
 
-   @test atanpi(sqrt(qqbar(3))) == qqbar(1)//3
-   @test asinpi(sqrt(qqbar(2))//2) == qqbar(1)//4
-   @test acospi(sqrt(qqbar(3))//2) == qqbar(1)//6
+   @test atanpi(sqrt(QQBarFieldElem(3))) == QQBarFieldElem(1)//3
+   @test asinpi(sqrt(QQBarFieldElem(2))//2) == QQBarFieldElem(1)//4
+   @test acospi(sqrt(QQBarFieldElem(3))//2) == QQBarFieldElem(1)//6
 
-   @test exp_pi_i(qqbar(1)//2) == i
-   @test log_pi_i(i) == qqbar(1)//2
+   @test exp_pi_i(QQBarFieldElem(1)//2) == i
+   @test log_pi_i(i) == QQBarFieldElem(1)//2
 
-   @test_throws DomainError atanpi(qqbar(2))
-   @test_throws DomainError asinpi(qqbar(2))
-   @test_throws DomainError acospi(qqbar(2))
-   @test_throws DomainError log_pi_i(qqbar(2))
+   @test_throws DomainError atanpi(QQBarFieldElem(2))
+   @test_throws DomainError asinpi(QQBarFieldElem(2))
+   @test_throws DomainError acospi(QQBarFieldElem(2))
+   @test_throws DomainError log_pi_i(QQBarFieldElem(2))
 
    @test_throws DivideError (R(1) // R(0))
    @test_throws DomainError (R(0) ^ R(-1))
@@ -135,9 +135,9 @@ end
    @test_throws DomainError (root_of_unity(R, 0, 1))
 
    @test is_root_of_unity(i)
-   @test !is_root_of_unity(qqbar(2))
+   @test !is_root_of_unity(QQBarFieldElem(2))
    @test root_of_unity_as_args(-i) == (4, 3)
-   @test_throws DomainError root_of_unity_as_args(qqbar(2))
+   @test_throws DomainError root_of_unity_as_args(QQBarFieldElem(2))
 
    v = roots(CalciumQQBar, x^5-x-1)
    @test v[1]^5 - v[1] - 1 == 0
@@ -161,23 +161,23 @@ end
    @test eigenvalues(CalciumQQBar, diagonal_matrix(QQ[1 1; 1 -1], QQ[1 1; 1 -1])) == [u, -u]
    @test eigenvalues_with_multiplicities(CalciumQQBar, diagonal_matrix(QQ[1 1; 1 -1], QQ[1 1; 1 -1])) == [(u, 2), (-u, 2)]
 
-   @test conjugates(qqbar(3)) == [qqbar(3)]
+   @test conjugates(QQBarFieldElem(3)) == [QQBarFieldElem(3)]
    @test conjugates(u) == [u, -u]
 
-   @test ZZRingElem(qqbar(3)) == 3
-   @test QQFieldElem(qqbar(3) // 2) == QQFieldElem(3,2)
+   @test ZZRingElem(QQBarFieldElem(3)) == 3
+   @test QQFieldElem(QQBarFieldElem(3) // 2) == QQFieldElem(3,2)
 
    set_precision!(Balls, 128) do
      RR = ArbField()
      CC = AcbField()
 
-     @test RR(qqbar(3)) == 3
-     @test CC(qqbar(3)) == 3
+     @test RR(QQBarFieldElem(3)) == 3
+     @test CC(QQBarFieldElem(3)) == 3
      @test_throws DomainError (RR(i))
 
      v = sqrt(RR(2)) + sqrt(RR(3))
-     @test guess(CalciumQQBar, v, 4) == sqrt(qqbar(2)) + sqrt(qqbar(3))
-     @test guess(CalciumQQBar, v, 4, 10) == sqrt(qqbar(2)) + sqrt(qqbar(3))
+     @test guess(CalciumQQBar, v, 4) == sqrt(QQBarFieldElem(2)) + sqrt(QQBarFieldElem(3))
+     @test guess(CalciumQQBar, v, 4, 10) == sqrt(QQBarFieldElem(2)) + sqrt(QQBarFieldElem(3))
      @test_throws ErrorException guess(CalciumQQBar, v, 2)
 
      @test guess(CalciumQQBar, CC(2+i), 2, 10) == 2+i
@@ -187,60 +187,60 @@ end
    end
 end
 
-@testset "qqbar.adhoc_operations" begin
+@testset "QQBarFieldElem.adhoc_operations" begin
    R = CalciumQQBar
 
-   @test qqbar(2) + qqbar(3) == 5
-   @test qqbar(2) + 3 == 5
-   @test qqbar(2) + ZZRingElem(3) == 5
-   @test qqbar(2) + QQFieldElem(3) == 5
-   @test 3 + qqbar(2) == 5
-   @test ZZRingElem(3) + qqbar(2) == 5
-   @test QQFieldElem(3) + qqbar(2) == 5
+   @test QQBarFieldElem(2) + QQBarFieldElem(3) == 5
+   @test QQBarFieldElem(2) + 3 == 5
+   @test QQBarFieldElem(2) + ZZRingElem(3) == 5
+   @test QQBarFieldElem(2) + QQFieldElem(3) == 5
+   @test 3 + QQBarFieldElem(2) == 5
+   @test ZZRingElem(3) + QQBarFieldElem(2) == 5
+   @test QQFieldElem(3) + QQBarFieldElem(2) == 5
 
-   @test qqbar(2) - qqbar(3) == -1
-   @test qqbar(2) - 3 == -1
-   @test qqbar(2) - ZZRingElem(3) == -1
-   @test qqbar(2) - QQFieldElem(3) == -1
-   @test 3 - qqbar(2) == 1
-   @test ZZRingElem(3) - qqbar(2) == 1
-   @test QQFieldElem(3) - qqbar(2) == 1
+   @test QQBarFieldElem(2) - QQBarFieldElem(3) == -1
+   @test QQBarFieldElem(2) - 3 == -1
+   @test QQBarFieldElem(2) - ZZRingElem(3) == -1
+   @test QQBarFieldElem(2) - QQFieldElem(3) == -1
+   @test 3 - QQBarFieldElem(2) == 1
+   @test ZZRingElem(3) - QQBarFieldElem(2) == 1
+   @test QQFieldElem(3) - QQBarFieldElem(2) == 1
 
-   @test qqbar(2) * qqbar(3) == 6
-   @test qqbar(2) * 3 == 6
-   @test qqbar(2) * ZZRingElem(3) == 6
-   @test qqbar(2) * QQFieldElem(3) == 6
-   @test 3 * qqbar(2) == 6
-   @test ZZRingElem(3) * qqbar(2) == 6
-   @test QQFieldElem(3) * qqbar(2) == 6
+   @test QQBarFieldElem(2) * QQBarFieldElem(3) == 6
+   @test QQBarFieldElem(2) * 3 == 6
+   @test QQBarFieldElem(2) * ZZRingElem(3) == 6
+   @test QQBarFieldElem(2) * QQFieldElem(3) == 6
+   @test 3 * QQBarFieldElem(2) == 6
+   @test ZZRingElem(3) * QQBarFieldElem(2) == 6
+   @test QQFieldElem(3) * QQBarFieldElem(2) == 6
 
-   @test qqbar(6) // qqbar(2) == 3
-   @test qqbar(6) // 2 == 3
-   @test qqbar(6) // ZZRingElem(2) == 3
-   @test qqbar(6) // QQFieldElem(2) == 3
-   @test 6 // qqbar(2) == 3
-   @test ZZRingElem(6) // qqbar(2) == 3
-   @test QQFieldElem(6) // qqbar(2) == 3
+   @test QQBarFieldElem(6) // QQBarFieldElem(2) == 3
+   @test QQBarFieldElem(6) // 2 == 3
+   @test QQBarFieldElem(6) // ZZRingElem(2) == 3
+   @test QQBarFieldElem(6) // QQFieldElem(2) == 3
+   @test 6 // QQBarFieldElem(2) == 3
+   @test ZZRingElem(6) // QQBarFieldElem(2) == 3
+   @test QQFieldElem(6) // QQBarFieldElem(2) == 3
 
-   @test qqbar(2) ^ qqbar(3) == 8
-   @test qqbar(2) ^ 3 == 8
-   @test qqbar(2) ^ ZZRingElem(3) == 8
-   @test qqbar(2) ^ QQFieldElem(3) == 8
-   @test 2 ^ qqbar(3) == 8
-   @test ZZRingElem(2) ^ qqbar(3) == 8
-   @test QQFieldElem(2) ^ qqbar(3) == 8
+   @test QQBarFieldElem(2) ^ QQBarFieldElem(3) == 8
+   @test QQBarFieldElem(2) ^ 3 == 8
+   @test QQBarFieldElem(2) ^ ZZRingElem(3) == 8
+   @test QQBarFieldElem(2) ^ QQFieldElem(3) == 8
+   @test 2 ^ QQBarFieldElem(3) == 8
+   @test ZZRingElem(2) ^ QQBarFieldElem(3) == 8
+   @test QQFieldElem(2) ^ QQBarFieldElem(3) == 8
 
-   @test qqbar(2) < qqbar(3)
-   @test qqbar(2) < 3
-   @test qqbar(2) < ZZRingElem(3)
-   @test qqbar(2) < QQFieldElem(3)
-   @test 2 < qqbar(3)
-   @test ZZRingElem(2) < qqbar(3)
-   @test QQFieldElem(2) < qqbar(3)
+   @test QQBarFieldElem(2) < QQBarFieldElem(3)
+   @test QQBarFieldElem(2) < 3
+   @test QQBarFieldElem(2) < ZZRingElem(3)
+   @test QQBarFieldElem(2) < QQFieldElem(3)
+   @test 2 < QQBarFieldElem(3)
+   @test ZZRingElem(2) < QQBarFieldElem(3)
+   @test QQFieldElem(2) < QQBarFieldElem(3)
 
 end
 
-@testset "qqbar.comparison" begin
+@testset "QQBarFieldElem.comparison" begin
    R = CalciumQQBar
 
    u = R(3) // 2
@@ -289,7 +289,7 @@ end
 end
 
 
-@testset "qqbar.inplace" begin
+@testset "QQBarFieldElem.inplace" begin
    R = CalciumQQBar
 
    x = R(7)
@@ -313,7 +313,7 @@ end
 
 end
 
-@testset "qqbar.rand" begin
+@testset "QQBarFieldElem.rand" begin
    R = CalciumQQBar
 
    for i=1:10
@@ -336,11 +336,11 @@ end
 
 end
 
-function test_elem(R::CalciumQQBarField)
+function test_elem(R::QQBarField)
    return rand(R, degree=5, bits=5)
 end
 
-@testset "qqbar.conformance_tests" begin
+@testset "QQBarFieldElem.conformance_tests" begin
    test_Field_interface(CalciumQQBar)
 end
 

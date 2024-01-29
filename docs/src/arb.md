@@ -19,7 +19,7 @@ the libraries that provide them and the associated types of the parent objects.
 
  Library | Field                | Element type  | Parent type
 ---------|----------------------|---------------|--------------
-Arb      | $\mathbb{R}$ (balls) | `arb`         | `ArbField`
+Arb      | $\mathbb{R}$ (balls) | `ArbFieldElem`         | `ArbField`
 
 All the real field types belong to the `Field` abstract type and the types of
 elements in this field, i.e. balls in this case, belong to the `FieldElem`
@@ -76,7 +76,7 @@ information.
 ### Real ball constructors
 
 ```@docs
-ball(::arb, ::arb)
+ball(::ArbFieldElem, ::ArbFieldElem)
 ```
 
 **Examples**
@@ -98,47 +98,47 @@ convert(Float64, RR(1//3))
 ### Basic manipulation
 
 ```@docs
-is_nonzero(::arb)
+is_nonzero(::ArbFieldElem)
 ```
 
 ```@docs
-isfinite(::arb)
+isfinite(::ArbFieldElem)
 ```
 
 ```@docs
-is_exact(::arb)
+is_exact(::ArbFieldElem)
 ```
 
 ```@docs
-isinteger(::arb)
+isinteger(::ArbFieldElem)
 ```
 
 ```@docs
-is_positive(::arb)
+is_positive(::ArbFieldElem)
 ```
 
 ```@docs
-is_nonnegative(::arb)
+is_nonnegative(::ArbFieldElem)
 ```
 
 ```@docs
-is_negative(::arb)
+is_negative(::ArbFieldElem)
 ```
 
 ```@docs
-is_nonpositive(::arb)
+is_nonpositive(::ArbFieldElem)
 ```
 
 ```@docs
-midpoint(::arb)
+midpoint(::ArbFieldElem)
 ```
 
 ```@docs
-radius(::arb)
+radius(::ArbFieldElem)
 ```
 
 ```@docs
-accuracy_bits(::arb)
+accuracy_bits(::ArbFieldElem)
 ```
 
 **Examples**
@@ -204,42 +204,42 @@ contained in a given real ball or whether two balls overlap. The following
 functions are provided for this purpose.
 
 ```@docs
-overlaps(::arb, ::arb)
+overlaps(::ArbFieldElem, ::ArbFieldElem)
 ```
 
 ```@docs
-contains(::arb, ::arb)
+contains(::ArbFieldElem, ::ArbFieldElem)
 ```
 
 ```@docs
-contains(::arb, ::Integer)
-contains(::arb, ::ZZRingElem)
-contains(::arb, ::QQFieldElem)
-contains{T <: Integer}(::arb, ::Rational{T})
-contains(::arb, ::BigFloat)
+contains(::ArbFieldElem, ::Integer)
+contains(::ArbFieldElem, ::ZZRingElem)
+contains(::ArbFieldElem, ::QQFieldElem)
+contains{T <: Integer}(::ArbFieldElem, ::Rational{T})
+contains(::ArbFieldElem, ::BigFloat)
 ```
 
 The following functions are also provided for determining if a ball intersects
 a certain part of the real number line.
 
 ```@docs
-contains_zero(::arb)
+contains_zero(::ArbFieldElem)
 ```
 
 ```@docs
-contains_negative(::arb)
+contains_negative(::ArbFieldElem)
 ```
 
 ```@docs
-contains_positive(::arb)
+contains_positive(::ArbFieldElem)
 ```
 
 ```@docs
-contains_nonnegative(::arb)
+contains_nonnegative(::ArbFieldElem)
 ```
 
 ```@docs
-contains_nonpositive(::arb)
+contains_nonpositive(::ArbFieldElem)
 ```
 
 **Examples**
@@ -268,7 +268,7 @@ is distinct from arithmetic equality implemented by `==`, which merely compares 
 the minimum of the precisions of its operands.
 
 ```@docs
-isequal(::arb, ::arb)
+isequal(::ArbFieldElem, ::ArbFieldElem)
 ```
 
 We also provide a full range of ad hoc comparison operators. These are implemented
@@ -276,22 +276,22 @@ directly in Julia, but we document them as though `isless` and `==` were provide
 
 Function                      |
 ------------------------------|
-`==(x::arb, y::Integer)`      |
-`==(x::Integer, y::arb)`      |
-`==(x::arb, y::ZZRingElem)`         |
-`==(x::ZZRingElem, y::arb)`         |
-`==(x::arb, y::Float64)`      |
-`==(x::Float64, y::arb)`      |
-`isless(x::arb, y::Integer)`  |
-`isless(x::Integer, y::arb)`  |
-`isless(x::arb, y::ZZRingElem)`     |
-`isless(x::ZZRingElem, y::arb)`     |
-`isless(x::arb, y::Float64)`  |
-`isless(x::Float64, y::arb)`  |
-`isless(x::arb, y::BigFloat)` |
-`isless(x::BigFloat, y::arb)` |
-`isless(x::arb, y::QQFieldElem)`     |
-`isless(x::QQFieldElem, y::arb)`     |
+`==(x::ArbFieldElem, y::Integer)`      |
+`==(x::Integer, y::ArbFieldElem)`      |
+`==(x::ArbFieldElem, y::ZZRingElem)`         |
+`==(x::ZZRingElem, y::ArbFieldElem)`         |
+`==(x::ArbFieldElem, y::Float64)`      |
+`==(x::Float64, y::ArbFieldElem)`      |
+`isless(x::ArbFieldElem, y::Integer)`  |
+`isless(x::Integer, y::ArbFieldElem)`  |
+`isless(x::ArbFieldElem, y::ZZRingElem)`     |
+`isless(x::ZZRingElem, y::ArbFieldElem)`     |
+`isless(x::ArbFieldElem, y::Float64)`  |
+`isless(x::Float64, y::ArbFieldElem)`  |
+`isless(x::ArbFieldElem, y::BigFloat)` |
+`isless(x::BigFloat, y::ArbFieldElem)` |
+`isless(x::ArbFieldElem, y::QQFieldElem)`     |
+`isless(x::QQFieldElem, y::ArbFieldElem)`     |
 
 **Examples**
 
@@ -333,19 +333,19 @@ b = ldexp(x, -ZZ(15))
 ### Miscellaneous operations
 
 ```@docs
-add_error!(::arb, ::arb)
+add_error!(::ArbFieldElem, ::ArbFieldElem)
 ```
 
 ```@docs
-trim(::arb)
+trim(::ArbFieldElem)
 ```
 
 ```@docs
-unique_integer(::arb)
+unique_integer(::ArbFieldElem)
 ```
 
 ```@docs
-setunion(::arb, ::arb)
+setunion(::ArbFieldElem, ::ArbFieldElem)
 ```
 
 **Examples**
@@ -408,71 +408,71 @@ d = const_glaisher(RR)
 ### Mathematical and special functions
 
 ```@docs
-rsqrt(::arb)
+rsqrt(::ArbFieldElem)
 ```
 
 ```@docs
-sqrt1pm1(::arb)
+sqrt1pm1(::ArbFieldElem)
 ```
 
 ```@docs
-sqrtpos(::arb)
+sqrtpos(::ArbFieldElem)
 ```
 
 ```@docs
-gamma(::arb)
+gamma(::ArbFieldElem)
 ```
 
 ```@docs
-lgamma(::arb)
+lgamma(::ArbFieldElem)
 ```
 
 ```@docs
-rgamma(::arb)
+rgamma(::ArbFieldElem)
 ```
 
 ```@docs
-digamma(::arb)
+digamma(::ArbFieldElem)
 ```
 
 ```@docs
-gamma(::arb, ::arb)
+gamma(::ArbFieldElem, ::ArbFieldElem)
 ```
 
 ```@docs
-gamma_regularized(::arb, ::arb)
+gamma_regularized(::ArbFieldElem, ::ArbFieldElem)
 ```
 
 ```@docs
-gamma_lower(::arb, ::arb)
+gamma_lower(::ArbFieldElem, ::ArbFieldElem)
 ```
 
 ```@docs
-gamma_lower_regularized(::arb, ::arb)
+gamma_lower_regularized(::ArbFieldElem, ::ArbFieldElem)
 ```
 
 ```@docs
-zeta(::arb)
+zeta(::ArbFieldElem)
 ```
 
 ```@docs
-atan2(::arb, ::arb)
+atan2(::ArbFieldElem, ::ArbFieldElem)
 ```
 
 ```@docs
-agm(::arb, ::arb)
+agm(::ArbFieldElem, ::ArbFieldElem)
 ```
 
 ```@docs
-zeta(::arb, ::arb)
+zeta(::ArbFieldElem, ::ArbFieldElem)
 ```
 
 ```@docs
-root(::arb, ::Int)
+root(::ArbFieldElem, ::Int)
 ```
 
 ```@docs
-factorial(::arb)
+factorial(::ArbFieldElem)
 ```
 
 ```@docs
@@ -480,7 +480,7 @@ factorial(::Int, ::ArbField)
 ```
 
 ```@docs
-binomial(::arb, ::UInt)
+binomial(::ArbFieldElem, ::UInt)
 ```
 
 ```@docs
@@ -512,7 +512,7 @@ bernoulli(::Int, ::ArbField)
 ```
 
 ```@docs
-rising_factorial(::arb, ::Int)
+rising_factorial(::ArbFieldElem, ::Int)
 ```
 
 ```@docs
@@ -520,27 +520,27 @@ rising_factorial(::QQFieldElem, ::Int, ::ArbField)
 ```
 
 ```@docs
-rising_factorial2(::arb, ::Int)
+rising_factorial2(::ArbFieldElem, ::Int)
 ```
 
 ```@docs
-polylog(::Union{arb,Int}, ::arb)
+polylog(::Union{ArbFieldElem,Int}, ::ArbFieldElem)
 ```
 
 ```@docs
-chebyshev_t(::Int, ::arb)
+chebyshev_t(::Int, ::ArbFieldElem)
 ```
 
 ```@docs
-chebyshev_u(::Int, ::arb)
+chebyshev_u(::Int, ::ArbFieldElem)
 ```
 
 ```@docs
-chebyshev_t2(::Int, ::arb)
+chebyshev_t2(::Int, ::ArbFieldElem)
 ```
 
 ```@docs
-chebyshev_u2(::Int, ::arb)
+chebyshev_u2(::Int, ::ArbFieldElem)
 ```
 
 ```@docs
@@ -560,19 +560,19 @@ numpart(::Int, ::ArbField)
 ```
 
 ```@docs
-airy_ai(::arb)
+airy_ai(::ArbFieldElem)
 ```
 
 ```@docs
-airy_ai_prime(::arb)
+airy_ai_prime(::ArbFieldElem)
 ```
 
 ```@docs
-airy_bi(::arb)
+airy_bi(::ArbFieldElem)
 ```
 
 ```@docs
-airy_bi_prime(::arb)
+airy_bi_prime(::ArbFieldElem)
 ```
 
 **Examples**
@@ -590,7 +590,7 @@ f = polylog(3, RR(-10))
 ### Linear dependence
 
 ```@docs
-lindep(::Vector{arb}, n::Int)
+lindep(::Vector{ArbFieldElem}, n::Int)
 ```
 
 **Examples**
@@ -605,7 +605,7 @@ W = lindep(V, 20)
 ```
 
 ```@docs
-simplest_rational_inside(::arb)
+simplest_rational_inside(::ArbFieldElem)
 ```
 
 **Examples**

@@ -76,9 +76,9 @@ include("flint/fmpq_poly.jl")
 
 include("flint/fmpq_mpoly.jl")
 
-include("flint/padic.jl")
+include("flint/PadicFieldElem.jl")
 
-include("flint/qadic.jl")
+include("flint/QadicFieldElem.jl")
 
 include("flint/local_field.jl")
 
@@ -102,21 +102,21 @@ include("flint/fq_nmod_poly.jl")
 
 include("flint/fq_default_poly.jl")
 
-include("arb/arb_poly.jl")
+include("ArbFieldElem/ArbPolyRingElem.jl")
 
-include("arb/RealPoly.jl")
+include("ArbFieldElem/RealPoly.jl")
 
-include("arb/acb_poly.jl")
+include("ArbFieldElem/AcbPolyRingElem.jl")
 
-include("arb/ComplexPoly.jl")
+include("ArbFieldElem/ComplexPoly.jl")
 
-include("arb/arb_mat.jl")
+include("ArbFieldElem/ArbMatrix.jl")
 
-include("arb/RealMat.jl")
+include("ArbFieldElem/RealMat.jl")
 
-include("arb/acb_mat.jl")
+include("ArbFieldElem/AcbMatrix.jl")
 
-include("arb/ComplexMat.jl")
+include("ArbFieldElem/ComplexMat.jl")
 include("gaussiannumbers/ZZi.jl")
 
 include("Factor.jl")

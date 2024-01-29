@@ -1,25 +1,25 @@
 RR = ArbField(64)
 CC = AcbField(64)
 
-@testset "acb.constructors" begin
+@testset "AcbFieldElem.constructors" begin
    @test isa(CC, AcbField)
    @test isa(CC(2), FieldElem)
 
-   @test elem_type(CC) == acb
+   @test elem_type(CC) == AcbFieldElem
    @test base_ring(CC) == Union{}
 
-   @test elem_type(AcbField) == acb
-   @test parent_type(acb) == AcbField
+   @test elem_type(AcbField) == AcbFieldElem
+   @test parent_type(AcbFieldElem) == AcbField
 
    @test AcbField(10, cached = true) === AcbField(10, cached = true)
    @test AcbField(11, cached = false) !== AcbField(11, cached = false)
 
-   for T in [Int32, Int, BigInt, Complex{Int}, Complex{Float64}, Rational{Int}, Rational{BigInt}, Float64, BigFloat, ZZRingElem, QQFieldElem, arb]
-     @test acb === Nemo.promote_rule(acb, T)
+   for T in [Int32, Int, BigInt, Complex{Int}, Complex{Float64}, Rational{Int}, Rational{BigInt}, Float64, BigFloat, ZZRingElem, QQFieldElem, ArbFieldElem]
+     @test AcbFieldElem === Nemo.promote_rule(AcbFieldElem, T)
    end
 end
 
-@testset "acb.printing" begin
+@testset "AcbFieldElem.printing" begin
    @test occursin(r"\A0\Z", string(CC(0)))
    @test occursin(r"\A1\.[0]+\Z", string(CC(1)))
    @test occursin(r"\A1\.[0]+[ ]*\*[ ]*?im\Z", string(onei(CC)))
@@ -27,7 +27,7 @@ end
                                                       string(CC(1) + onei(CC)))
 end
 
-@testset "acb.basic_ops" begin
+@testset "AcbFieldElem.basic_ops" begin
    @test one(CC) == 1
    @test zero(CC) == 0
 
@@ -66,7 +66,7 @@ end
    @test characteristic(CC) == 0
 end
 
-@testset "acb.comparison" begin
+@testset "AcbFieldElem.comparison" begin
    exact3 = CC(3)
    exact4 = CC(4)
    approx3 = CC("3 +/- 0.000001")
@@ -100,7 +100,7 @@ end
 end
 
 
-@testset "acb.predicates" begin
+@testset "AcbFieldElem.predicates" begin
    @test iszero(CC(0))
    @test !iszero(CC(1))
    @test !iszero(CC("0 +/- 0.01"))
@@ -125,14 +125,14 @@ end
    @test !isinteger(CC("3 +/- 0.01"))
 end
 
-@testset "acb.unary_ops" begin
+@testset "AcbFieldElem.unary_ops" begin
    @test -CC(3) == CC(-3)
    @test abs(-CC(3)) == 3
    @test abs(CC(3)) == 3
    @test inv(CC(2)) == CC(QQ(1,2))
 end
 
-@testset "acb.binary_ops" begin
+@testset "AcbFieldElem.binary_ops" begin
    x = CC(2)
    y = CC(4)
 
@@ -154,7 +154,7 @@ end
       @test x ^ T(4) == 16
    end
 
-   for T in [Float64, BigFloat, arb]
+   for T in [Float64, BigFloat, ArbFieldElem]
       @test contains(x + T(4), 6)
       @test contains(x - T(4), -2)
       @test contains(x * T(4), 8)
@@ -167,7 +167,7 @@ end
    end
 end
 
-@testset "acb.misc_ops" begin
+@testset "AcbFieldElem.misc_ops" begin
    @test ldexp(CC(3), 2) == 12
    @test ldexp(CC(3), ZZ(2)) == 12
    @test contains(trim(CC("1.1 +/- 0.001")), CC("1.1"))
@@ -187,7 +187,7 @@ end
    @test !uniq
 end
 
-@testset "acb.unsafe_ops" begin
+@testset "AcbFieldElem.unsafe_ops" begin
    z = CC(1)
    x = CC(2)
    y = CC(3)
@@ -205,11 +205,11 @@ end
    @test z == 1.5
 end
 
-@testset "acb.constants" begin
+@testset "AcbFieldElem.constants" begin
    @test overlaps(const_pi(CC), CC("3.141592653589793238462643 +/- 4.03e-25"))
 end
 
-@testset "acb.functions" begin
+@testset "AcbFieldElem.functions" begin
    z = CC("0.2", "0.3")
    a = CC("0.3", "0.4")
    b = CC("0.4", "0.5")
@@ -434,14 +434,14 @@ end
    @test overlaps(prod_sqr, CC(2))
 end
 
-@testset "acb.ZZPolyRingElem" begin
+@testset "AcbFieldElem.ZZPolyRingElem" begin
    R, x = polynomial_ring(ZZ, "x")
    @test hilbert_class_polynomial(-3, R) == x
    @test_throws ArgumentError hilbert_class_polynomial(2, R)
    @test_throws ArgumentError hilbert_class_polynomial(-2, R)
 end
 
-@testset "acb.lindep" begin
+@testset "AcbFieldElem.lindep" begin
    CC = AcbField(512)
    tau1 = CC(1//3, 8//7)
    tau2 = CC(1//5, 9//8)

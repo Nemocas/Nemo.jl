@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   qadic.jl : flint qadic numbers
+#   QadicFieldElem.jl : flint QadicFieldElem numbers
 #
 ###############################################################################
 
@@ -89,7 +89,7 @@ is_exact_type(R::Type{QadicFieldElem}) = false
 
 function check_parent(a::QadicFieldElem, b::QadicFieldElem)
    parent(a) != parent(b) &&
-      error("Incompatible qadic rings in qadic operation")
+      error("Incompatible QadicFieldElem rings in QadicFieldElem operation")
 end
 
 parent_type(::Type{QadicFieldElem}) = QadicField
@@ -225,7 +225,7 @@ function expressify(b::QadicFieldElem, x = var(parent(b)); context = nothing)
    sum = Expr(:call, :+)
    c = R()
    for i in degree(parent(b)):-1:0
-      ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
+      ccall((:padic_poly_get_coeff_PadicFieldElem, libflint), Nothing,
             (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Int, Ref{QadicField}),
             c, b, i, parent(b))
       ec = expressify(c, context = context)
@@ -515,7 +515,7 @@ end
 
 function Base.sqrt(a::QadicFieldElem; check::Bool=true)
    av = valuation(a)
-   check && (av % 2) != 0 && error("Unable to take qadic square root")
+   check && (av % 2) != 0 && error("Unable to take QadicFieldElem square root")
    ctx = parent(a)
    z = QadicFieldElem(a.N - div(av, 2))
    z.parent = ctx
@@ -757,7 +757,7 @@ end
 function (R::QadicField)(n::QQPolyRingElem)
 
    if degree(n) > degree(R) + 1
-       error("Polynomial degree larger than degree of qadic field.")
+       error("Polynomial degree larger than degree of QadicFieldElem field.")
    end
    m = denominator(n)
    p = prime(R)

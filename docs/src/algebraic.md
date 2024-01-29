@@ -26,7 +26,7 @@ not the name of its type.
 
  Library        | Element type  | Parent type
 ----------------|---------------|--------------------
-Calcium         | `qqbar`       | `CalciumQQBarField`
+Calcium         | `QQBarFieldElem`       | `QQBarField`
 
 **Important note on performance**
 
@@ -76,7 +76,7 @@ julia> R, x = polynomial_ring(QQ, "x")
 (Univariate polynomial ring in x over QQ, x)
 
 julia> v = roots(QQBar, x^5-x-1)
-5-element Vector{qqbar}:
+5-element Vector{QQBarFieldElem}:
  Root 1.16730 of x^5 - x - 1
  Root 0.181232 + 1.08395*im of x^5 - x - 1
  Root 0.181232 - 1.08395*im of x^5 - x - 1
@@ -91,7 +91,7 @@ Computing exact eigenvalues of a matrix:
 
 ```jldoctest
 julia> eigenvalues(QQBar, ZZ[1 1 0; 0 1 1; 1 0 1])
-3-element Vector{qqbar}:
+3-element Vector{QQBarFieldElem}:
  Root 2.00000 of x - 2
  Root 0.500000 + 0.866025*im of x^2 - x + 1
  Root 0.500000 - 0.866025*im of x^2 - x + 1
@@ -100,13 +100,13 @@ julia> eigenvalues(QQBar, ZZ[1 1 0; 0 1 1; 1 0 1])
 **Interface**
 
 ```@docs
-roots(R::CalciumQQBarField, f::ZZPolyRingElem)
-roots(R::CalciumQQBarField, f::QQPolyRingElem)
-eigenvalues(R::CalciumQQBarField, A::ZZMatrix)
-eigenvalues_with_multiplicities(R::CalciumQQBarField, A::ZZMatrix)
-eigenvalues(R::CalciumQQBarField, A::QQMatrix)
-eigenvalues_with_multiplicities(R::CalciumQQBarField, A::QQMatrix)
-rand(R::CalciumQQBarField; degree::Int, bits::Int, randtype::Symbol=:null)
+roots(R::QQBarField, f::ZZPolyRingElem)
+roots(R::QQBarField, f::QQPolyRingElem)
+eigenvalues(R::QQBarField, A::ZZMatrix)
+eigenvalues_with_multiplicities(R::QQBarField, A::ZZMatrix)
+eigenvalues(R::QQBarField, A::QQMatrix)
+eigenvalues_with_multiplicities(R::QQBarField, A::QQMatrix)
+rand(R::QQBarField; degree::Int, bits::Int, randtype::Symbol=:null)
 ```
 
 ### Numerical evaluation
@@ -137,7 +137,7 @@ julia> minpoly(polynomial_ring(ZZ, "x")[1], QQBar(1+2im))
 x^2 - 2*x + 5
 
 julia> conjugates(QQBar(1+2im))
-2-element Vector{qqbar}:
+2-element Vector{QQBarFieldElem}:
  Root 1.00000 + 2.00000*im of x^2 - 2x + 5
  Root 1.00000 - 2.00000*im of x^2 - 2x + 5
 ```
@@ -145,20 +145,20 @@ julia> conjugates(QQBar(1+2im))
 **Interface**
 
 ```@docs
-iszero(x::qqbar)
-isone(x::qqbar)
-isinteger(x::qqbar)
-is_rational(x::qqbar)
-isreal(x::qqbar)
-degree(x::qqbar)
-is_algebraic_integer(x::qqbar)
-minpoly(R::ZZPolyRing, x::qqbar)
-minpoly(R::QQPolyRing, x::qqbar)
-conjugates(a::qqbar)
-denominator(x::qqbar)
-numerator(x::qqbar)
-height(x::qqbar)
-height_bits(x::qqbar)
+iszero(x::QQBarFieldElem)
+isone(x::QQBarFieldElem)
+isinteger(x::QQBarFieldElem)
+is_rational(x::QQBarFieldElem)
+isreal(x::QQBarFieldElem)
+degree(x::QQBarFieldElem)
+is_algebraic_integer(x::QQBarFieldElem)
+minpoly(R::ZZPolyRing, x::QQBarFieldElem)
+minpoly(R::QQPolyRing, x::QQBarFieldElem)
+conjugates(a::QQBarFieldElem)
+denominator(x::QQBarFieldElem)
+numerator(x::QQBarFieldElem)
+height(x::QQBarFieldElem)
+height_bits(x::QQBarFieldElem)
 ```
 
 ### Complex parts
@@ -182,17 +182,17 @@ Root -0.447214 - 0.894427*im of 5x^4 + 6x^2 + 5
 **Interface**
 
 ```@docs
-real(a::qqbar)
-imag(a::qqbar)
-abs(a::qqbar)
-abs2(a::qqbar)
-conj(a::qqbar)
-sign(a::qqbar)
-csgn(a::qqbar)
-sign_real(a::qqbar)
-sign_imag(a::qqbar)
-floor(a::qqbar)
-ceil(a::qqbar)
+real(a::QQBarFieldElem)
+imag(a::QQBarFieldElem)
+abs(a::QQBarFieldElem)
+abs2(a::QQBarFieldElem)
+conj(a::QQBarFieldElem)
+sign(a::QQBarFieldElem)
+csgn(a::QQBarFieldElem)
+sign_real(a::QQBarFieldElem)
+sign_imag(a::QQBarFieldElem)
+floor(a::QQBarFieldElem)
+ceil(a::QQBarFieldElem)
 ```
 
 ### Comparing algebraic numbers
@@ -245,17 +245,17 @@ false
 **Interface**
 
 ```@docs
-is_equal_real(a::qqbar, b::qqbar)
-is_equal_imag(a::qqbar, b::qqbar)
-is_equal_abs(a::qqbar, b::qqbar)
-is_equal_abs_real(a::qqbar, b::qqbar)
-is_equal_abs_imag(a::qqbar, b::qqbar)
-is_less_real(a::qqbar, b::qqbar)
-is_less_imag(a::qqbar, b::qqbar)
-is_less_abs(a::qqbar, b::qqbar)
-is_less_abs_real(a::qqbar, b::qqbar)
-is_less_abs_imag(a::qqbar, b::qqbar)
-is_less_root_order(a::qqbar, b::qqbar)
+is_equal_real(a::QQBarFieldElem, b::QQBarFieldElem)
+is_equal_imag(a::QQBarFieldElem, b::QQBarFieldElem)
+is_equal_abs(a::QQBarFieldElem, b::QQBarFieldElem)
+is_equal_abs_real(a::QQBarFieldElem, b::QQBarFieldElem)
+is_equal_abs_imag(a::QQBarFieldElem, b::QQBarFieldElem)
+is_less_real(a::QQBarFieldElem, b::QQBarFieldElem)
+is_less_imag(a::QQBarFieldElem, b::QQBarFieldElem)
+is_less_abs(a::QQBarFieldElem, b::QQBarFieldElem)
+is_less_abs_real(a::QQBarFieldElem, b::QQBarFieldElem)
+is_less_abs_imag(a::QQBarFieldElem, b::QQBarFieldElem)
+is_less_root_order(a::QQBarFieldElem, b::QQBarFieldElem)
 ```
 
 ### Roots and trigonometric functions
@@ -294,20 +294,20 @@ julia> root_of_unity_as_args(w)
 **Interface**
 
 ```@docs
-sqrt(a::qqbar)
-root(a::qqbar, n::Int)
-root_of_unity(C::CalciumQQBarField, n::Int)
-root_of_unity(C::CalciumQQBarField, n::Int, k::Int)
-is_root_of_unity(a::qqbar)
-root_of_unity_as_args(a::qqbar)
-exp_pi_i(a::qqbar)
-log_pi_i(a::qqbar)
-sinpi(a::qqbar)
-cospi(a::qqbar)
-tanpi(a::qqbar)
-asinpi(a::qqbar)
-acospi(a::qqbar)
-atanpi(a::qqbar)
+sqrt(a::QQBarFieldElem)
+root(a::QQBarFieldElem, n::Int)
+root_of_unity(C::QQBarField, n::Int)
+root_of_unity(C::QQBarField, n::Int, k::Int)
+is_root_of_unity(a::QQBarFieldElem)
+root_of_unity_as_args(a::QQBarFieldElem)
+exp_pi_i(a::QQBarFieldElem)
+log_pi_i(a::QQBarFieldElem)
+sinpi(a::QQBarFieldElem)
+cospi(a::QQBarFieldElem)
+tanpi(a::QQBarFieldElem)
+asinpi(a::QQBarFieldElem)
+acospi(a::QQBarFieldElem)
+atanpi(a::QQBarFieldElem)
 ```
 
 ### Guessing
@@ -341,7 +341,7 @@ Root 0.100000 of 10x - 1
 **Interface**
 
 ```@docs
-guess(R::CalciumQQBarField, x::arb, maxdeg::Int, maxbits::Int=0)
-guess(R::CalciumQQBarField, x::acb, maxdeg::Int, maxbits::Int=0)
+guess(R::QQBarField, x::ArbFieldElem, maxdeg::Int, maxbits::Int=0)
+guess(R::QQBarField, x::AcbFieldElem, maxdeg::Int, maxbits::Int=0)
 ```
 

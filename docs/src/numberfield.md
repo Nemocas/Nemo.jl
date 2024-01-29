@@ -10,15 +10,15 @@ end
 Number fields are provided in Nemo by Antic. This allows construction of
 absolute number fields and basic arithmetic computations therein.
 
-Number fields are constructed using the `AnticNumberField` function. However,
+Number fields are constructed using the `AbsSimpleNumField` function. However,
 for convenience we define
 
 ```
-number_field = AnticNumberField
+number_field = AbsSimpleNumField
 ```
 
 so that number fields can be constructed using `number_field` rather than
-`AnticNumberField`. 
+`AbsSimpleNumField`. 
 
 The types of number field elements in Nemo are given in the following table,
 along with the libraries that provide them and the associated types of the
@@ -26,7 +26,7 @@ parent objects.
 
  Library | Field                          | Element type  | Parent type
 ---------|--------------------------------|---------------|---------------------
-Antic    | $\mathbb{Q}[x]/(f)$            | `nf_elem`     | `AnticNumberField`
+Antic    | $\mathbb{Q}[x]/(f)$            | `AbsSimpleNumFieldElem`     | `AbsSimpleNumField`
 
 All the number field types belong to the `Field` abstract type and the number
 field element types belong to the `FieldElem` abstract type.
@@ -80,7 +80,7 @@ k = M(x)
 ### Number field element constructors
 
 ```@docs
-gen(::AnticNumberField)
+gen(::AbsSimpleNumField)
 ```
 
 The easiest way of constructing number field elements is to use element
@@ -100,11 +100,11 @@ f = a^2 + 2a - 7
 ### Basic functionality
 
 ```@docs
-mul_red!(::nf_elem, ::nf_elem, ::nf_elem, ::Bool)
+mul_red!(::AbsSimpleNumFieldElem, ::AbsSimpleNumFieldElem, ::AbsSimpleNumFieldElem, ::Bool)
 ```
 
 ```@docs
-reduce!(::nf_elem)
+reduce!(::AbsSimpleNumFieldElem)
 ```
 
 The following coercion function is provided for a number field $R$.
@@ -121,7 +121,7 @@ field belongs, then we can coerce number field elements into the ring $R$ using
 the following function.
 
 ```julia
-R(b::nf_elem)
+R(b::AbsSimpleNumFieldElem)
 ```
 
 Coerce the given number field element into the polynomial ring $R$ of which the
@@ -140,23 +140,23 @@ g = K(x^2 + 2x + 1)
 ### Basic manipulation
 
 ```@docs
-var(::AnticNumberField)
+var(::AbsSimpleNumField)
 ```
 
 ```@docs
-is_gen(::nf_elem)
+is_gen(::AbsSimpleNumFieldElem)
 ```
 
 ```@docs
-coeff(::nf_elem, ::Int)
+coeff(::AbsSimpleNumFieldElem, ::Int)
 ```
 
 ```@docs
-denominator(::nf_elem)
+denominator(::AbsSimpleNumFieldElem)
 ```
 
 ```@docs
-degree(::AnticNumberField)
+degree(::AbsSimpleNumField)
 ```
 
 **Examples**
@@ -178,11 +178,11 @@ v = var(R)
 ### Norm and trace
 
 ```@docs
-norm(::nf_elem)
+norm(::AbsSimpleNumFieldElem)
 ```
 
 ```@docs
-tr(::nf_elem)
+tr(::AbsSimpleNumFieldElem)
 ```
 
 **Examples**

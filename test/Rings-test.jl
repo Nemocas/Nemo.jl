@@ -4,8 +4,8 @@ const ring_to_mat = Dict(FlintZZ                         => ZZMatrix,
                          GF(5)                           => fpMatrix,
                          finite_field(3, 2, "b")[1]      => fqPolyRepMatrix,
                          finite_field(ZZRingElem(3), 2, "b")[1] => FqPolyRepMatrix,
-                         ArbField()                      => arb_mat,
-                         AcbField()                      => acb_mat,
+                         ArbField()                      => ArbMatrix,
+                         AcbField()                      => AcbMatrix,
                          RealField()                     => RealMat,
                          ComplexField()                  => ComplexMat,
                          )
@@ -52,14 +52,14 @@ include("flint/fq_default_mat-test.jl")
 include("flint/fmpz_mat-test.jl")
 include("flint/fmpq_mat-test.jl")
 
-include("arb/arb_poly-test.jl")
-include("arb/RealPoly-test.jl")
-include("arb/acb_poly-test.jl")
-include("arb/ComplexPoly-test.jl")
-include("arb/arb_mat-test.jl")
-include("arb/RealMat-test.jl")
-include("arb/acb_mat-test.jl")
-include("arb/ComplexMat-test.jl")
+include("ArbFieldElem/ArbPolyRingElem-test.jl")
+include("ArbFieldElem/RealPoly-test.jl")
+include("ArbFieldElem/AcbPolyRingElem-test.jl")
+include("ArbFieldElem/ComplexPoly-test.jl")
+include("ArbFieldElem/ArbMatrix-test.jl")
+include("ArbFieldElem/RealMat-test.jl")
+include("ArbFieldElem/AcbMatrix-test.jl")
+include("ArbFieldElem/ComplexMat-test.jl")
 
 include("flint/fmpz_mpoly-test.jl")
 include("flint/fmpq_mpoly-test.jl")
@@ -69,4 +69,4 @@ include("flint/gfp_fmpz_mpoly-test.jl")
 include("flint/fq_nmod_mpoly-test.jl")
 include("flint/fq_default_mpoly-test.jl")
 
-include("gaussiannumbers/fmpzi-test.jl")
+include("gaussiannumbers/ZZiRingElem-test.jl")

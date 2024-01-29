@@ -185,7 +185,7 @@ end
 #TODO:
 # expand systematically for all finite fields
 # and for ZZRingElem/QQFieldElem poly
-# for fun: is_power(a::nf_elem)
+# for fun: is_power(a::AbsSimpleNumFieldElem)
 #
 
 function factor(R::T, f::QQPolyRingElem) where {T<:Union{fqPolyRepField,fpField}}
@@ -407,7 +407,7 @@ function mulhigh(a::PolyRingElem{T}, b::PolyRingElem{T}, n::Int) where {T}
     return mulhigh_n(a, b, degree(a) + degree(b) - n)
 end
 
-function (f::acb_poly)(x::acb)
+function (f::AcbPolyRingElem)(x::AcbFieldElem)
     return evaluate(f, x)
 end
 

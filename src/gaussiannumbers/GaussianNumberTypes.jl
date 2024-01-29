@@ -1,22 +1,22 @@
 #### QQ(i) and ZZ(i) ####
 
-struct FlintZZiRing <: Nemo.Ring
+struct ZZiRing <: Nemo.Ring
 end
 
-const FlintZZi = FlintZZiRing()
+const FlintZZi = ZZiRing()
 
-struct fmpzi <: RingElem
+struct ZZiRingElem <: RingElem
   x::ZZRingElem
   y::ZZRingElem
 end
 
-struct FlintQQiField <: Nemo.Field
+struct QQiField <: Nemo.Field
 end
 
-const FlintQQi = FlintQQiField()
+const FlintQQi = QQiField()
 
-struct fmpqi <: FieldElem
-  num::fmpzi
+struct QQiFieldElem <: FieldElem
+  num::ZZiRingElem
   den::ZZRingElem
 end
 

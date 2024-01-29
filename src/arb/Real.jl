@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   arb.jl : Arb real numbers
+#   ArbFieldElem.jl : Arb real numbers
 #
 #   Copyright (C) 2015 Tommy Hofmann
 #   Copyright (C) 2015 Fredrik Johansson
@@ -29,7 +29,7 @@ zero(R::RealField) = R(0)
 
 one(R::RealField) = R(1)
 
-# TODO: Add hash (and document under arb basic functionality)
+# TODO: Add hash (and document under ArbFieldElem basic functionality)
 
 @doc raw"""
     accuracy_bits(x::RealFieldElem)
@@ -919,7 +919,7 @@ end
 @doc raw"""
     trim(x::RealFieldElem)
 
-Return an `arb` interval containing $x$ but which may be more economical,
+Return an `ArbFieldElem` interval containing $x$ but which may be more economical,
 by rounding off insignificant bits from the midpoint.
 """
 function trim(x::RealFieldElem)
@@ -950,7 +950,7 @@ end
 @doc raw"""
     setunion(x::RealFieldElem, y::RealFieldElem)
 
-Return an `arb` containing the union of the intervals represented by $x$ and
+Return an `ArbFieldElem` containing the union of the intervals represented by $x$ and
 $y$.
 """
 function setunion(x::RealFieldElem, y::RealFieldElem, prec::Int = precision(Balls))
@@ -963,7 +963,7 @@ end
 @doc raw"""
     setintersection(x::RealFieldElem, y::RealFieldElem)
 
-Return an `arb` containing the intersection of the intervals represented by
+Return an `ArbFieldElem` containing the intersection of the intervals represented by
 $x$ and $y$.
 """
 function setintersection(x::RealFieldElem, y::RealFieldElem, prec::Int = precision(Balls))
@@ -2111,13 +2111,13 @@ end
 
 Return a random element in given Arb field.
 
-The `randtype` default is `:urandom` which return an `arb` contained in
+The `randtype` default is `:urandom` which return an `ArbFieldElem` contained in
 $[0,1]$.
 
 The rest of the methods return non-uniformly distributed values in order to
 exercise corner cases. The option `:randtest` will return a finite number, and
 `:randtest_exact` the same but with a zero radius. The option
-`:randtest_precise` return an `arb` with a radius around $2^{-\mathrm{prec}}$
+`:randtest_precise` return an `ArbFieldElem` with a radius around $2^{-\mathrm{prec}}$
 the magnitude of the midpoint, while `:randtest_wide` return a radius that
 might be big relative to its midpoint. The `:randtest_special`-option might
 return a midpoint and radius whose values are `NaN` or `inf`.

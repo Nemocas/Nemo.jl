@@ -4,19 +4,19 @@
 #
 ###############################################################################
 
-elem_type(::Type{FlintZZiRing}) = fmpzi
+elem_type(::Type{ZZiRing}) = ZZiRingElem
 
-parent_type(::Type{fmpzi}) = FlintZZiRing
+parent_type(::Type{ZZiRingElem}) = ZZiRing
 
-parent(a::fmpzi) = FlintZZi
+parent(a::ZZiRingElem) = FlintZZi
 
-base_ring(a::FlintZZiRing) = FlintZZ
+base_ring(a::ZZiRing) = FlintZZ
 
-base_ring(a::fmpzi) = FlintZZ
+base_ring(a::ZZiRingElem) = FlintZZ
 
-is_domain_type(::Type{fmpzi}) = true
+is_domain_type(::Type{ZZiRingElem}) = true
 
-characteristic(a::FlintZZiRing) = 0
+characteristic(a::ZZiRing) = 0
 
 ###############################################################################
 #
@@ -24,15 +24,15 @@ characteristic(a::FlintZZiRing) = 0
 #
 ###############################################################################
 
-function expressify(a::fmpzi; context = nothing)
+function expressify(a::ZZiRingElem; context = nothing)
    return Expr(:call, :+, a.x, Expr(:call, :*, a.y, :im))
 end
 
-function Base.show(io::IO, a::fmpzi)
+function Base.show(io::IO, a::ZZiRingElem)
    AbstractAlgebra.show_via_expressify(io, a)
 end
 
-function Base.show(io::IO, a::FlintZZiRing)
+function Base.show(io::IO, a::ZZiRing)
    if get(io, :supercompact, false)
      io = pretty(io)
      print(io, LowercaseOff(), "ZZ[im]")
@@ -48,27 +48,27 @@ end
 #
 ###############################################################################
 
-function fmpzi()
-   return fmpzi(ZZRingElem(), ZZRingElem())
+function ZZiRingElem()
+   return ZZiRingElem(ZZRingElem(), ZZRingElem())
 end
 
-function fmpzi(a::IntegerUnion)
-   return fmpzi(ZZRingElem(a), ZZRingElem(0))
+function ZZiRingElem(a::IntegerUnion)
+   return ZZiRingElem(ZZRingElem(a), ZZRingElem(0))
 end
 
-function (a::FlintZZiRing)()
-   return fmpzi()
+function (a::ZZiRing)()
+   return ZZiRingElem()
 end
 
-function (a::FlintZZiRing)(b::IntegerUnion)
-   return fmpzi(ZZRingElem(b), ZZRingElem(0))
+function (a::ZZiRing)(b::IntegerUnion)
+   return ZZiRingElem(ZZRingElem(b), ZZRingElem(0))
 end
 
-function (a::FlintZZiRing)(b::IntegerUnion, c::IntegerUnion)
-   return fmpzi(ZZRingElem(b), ZZRingElem(c))
+function (a::ZZiRing)(b::IntegerUnion, c::IntegerUnion)
+   return ZZiRingElem(ZZRingElem(b), ZZRingElem(c))
 end
 
-function (R::FlintZZiRing)(a::Complex{T}) where T <: Integer
+function (R::ZZiRing)(a::Complex{T}) where T <: Integer
    return FlintZZi(ZZRingElem(real(a)), ZZRingElem(imag(a)))
 end
 
@@ -78,12 +78,12 @@ end
 #
 ###############################################################################
 
-function (a::ZZRing)(b::fmpzi)
+function (a::ZZRing)(b::ZZiRingElem)
    iszero(b.y) || error("cannot coerce")
    return b.x
 end
 
-function (a::FlintZZiRing)(b::fmpzi)
+function (a::ZZiRing)(b::ZZiRingElem)
    return b
 end
 
@@ -95,16 +95,16 @@ end
 
 # see adhoc section for promotions
 
-function Base.convert(::Type{Complex{T}}, a::fmpzi) where T <: Integer
+function Base.convert(::Type{Complex{T}}, a::ZZiRingElem) where T <: Integer
    return Complex{T}(Base.convert(T, real(a)), Base.convert(T, imag(a)))
 end
 
-function Base.convert(::Type{fmpzi}, a::Complex{T}) where T <: Integer
-   return fmpzi(convert(ZZRingElem, real(a)), convert(ZZRingElem, imag(a)))
+function Base.convert(::Type{ZZiRingElem}, a::Complex{T}) where T <: Integer
+   return ZZiRingElem(convert(ZZRingElem, real(a)), convert(ZZRingElem, imag(a)))
 end
 
-function Base.convert(::Type{fmpzi}, a::IntegerUnion)
-   return fmpzi(convert(ZZRingElem, a), ZZRingElem(0))
+function Base.convert(::Type{ZZiRingElem}, a::IntegerUnion)
+   return ZZiRingElem(convert(ZZRingElem, a), ZZRingElem(0))
 end
 
 ###############################################################################
@@ -113,7 +113,7 @@ end
 #
 ###############################################################################
 
-function Base.hash(a::fmpzi, h::UInt)
+function Base.hash(a::ZZiRingElem, h::UInt)
    return hash(a.x, xor(hash(a.y, h), 0x94405bdfac6c8acd%UInt))
 end
 
@@ -123,9 +123,9 @@ end
 #
 ###############################################################################
 
-function rand_bits(::FlintZZiRing, b::Int)
+function rand_bits(::ZZiRing, b::Int)
    t = rand(0:b)
-   return fmpzi(rand_bits(FlintZZ, t), rand_bits(FlintZZ, b - t))
+   return ZZiRingElem(rand_bits(FlintZZ, t), rand_bits(FlintZZ, b - t))
 end
 
 ###############################################################################
@@ -135,69 +135,69 @@ end
 ###############################################################################
 
 # ???
-function deepcopy_internal(a::fmpzi, d::IdDict)
-   return fmpzi(deepcopy_internal(a.x, d), deepcopy_internal(a.y, d))
+function deepcopy_internal(a::ZZiRingElem, d::IdDict)
+   return ZZiRingElem(deepcopy_internal(a.x, d), deepcopy_internal(a.y, d))
 end
 
-function deepcopy_internal(a::FlintZZiRing, d::IdDict)
+function deepcopy_internal(a::ZZiRing, d::IdDict)
    return a
 end
 
-function real(a::fmpzi)
+function real(a::ZZiRingElem)
    return a.x
 end
 
-function imag(a::fmpzi)
+function imag(a::ZZiRingElem)
    return a.y
 end
 
-function conj(a::fmpzi)
-   return fmpzi(a.x, -a.y)
+function conj(a::ZZiRingElem)
+   return ZZiRingElem(a.x, -a.y)
 end
 
-function abs2(a::fmpzi)
+function abs2(a::ZZiRingElem)
    return a.x^2 + a.y^2
 end
 
-function zero(a::FlintZZiRing)
-   return fmpzi(ZZRingElem(0), ZZRingElem(0))
+function zero(a::ZZiRing)
+   return ZZiRingElem(ZZRingElem(0), ZZRingElem(0))
 end
 
-function one(a::FlintZZiRing)
-   return fmpzi(ZZRingElem(1), ZZRingElem(0))
+function one(a::ZZiRing)
+   return ZZiRingElem(ZZRingElem(1), ZZRingElem(0))
 end
 
-function iszero(a::fmpzi)
+function iszero(a::ZZiRingElem)
    return iszero(a.x) && iszero(a.y)
 end
 
-function isone(a::fmpzi)
+function isone(a::ZZiRingElem)
    return isone(a.x) && iszero(a.y)
 end
 
-function nbits(a::fmpzi)
+function nbits(a::ZZiRingElem)
    return nbits(a.x) + nbits(a.y)
 end
 
-function zero!(z::fmpzi)
+function zero!(z::ZZiRingElem)
    zero!(z.x)
    zero!(z.y)
    return z
 end
 
-function one!(z::fmpzi)
+function one!(z::ZZiRingElem)
    one!(z.x)
    zero!(z.y)
    return z
 end
 
-function set!(z::fmpzi, a::fmpzi)
+function set!(z::ZZiRingElem, a::ZZiRingElem)
    set!(z.x, a.x)
    set!(z.y, a.y)
    return z
 end
 
-function swap!(a::fmpzi, b::fmpzi)
+function swap!(a::ZZiRingElem, b::ZZiRingElem)
    swap!(a.x, b.x)
    swap!(a.y, b.y)
 end
@@ -209,7 +209,7 @@ end
 ###############################################################################
 
 # return k with canonical_unit(a) = i^-k
-function canonical_unit_i_pow(a::fmpzi)
+function canonical_unit_i_pow(a::ZZiRingElem)
    s = cmp(a.x, a.y)
    if s == 0
       t = cmp(a.x, 0)
@@ -224,7 +224,7 @@ function canonical_unit_i_pow(a::fmpzi)
    end
 end
 
-function mul_i_pow!(z::fmpzi, k::Int)
+function mul_i_pow!(z::ZZiRingElem, k::Int)
    k = mod(k%UInt, 4)
    if k == 1
       neg!(z.y, z.y)
@@ -240,16 +240,16 @@ function mul_i_pow!(z::fmpzi, k::Int)
 end
 
 # for -pi/4 < angle(a/canonical_unit(a)) <= pi/4
-function canonical_unit(a::fmpzi)
+function canonical_unit(a::ZZiRingElem)
    k = canonical_unit_i_pow(a)
    if k == 0
-      return fmpzi(1,0)
+      return ZZiRingElem(1,0)
    elseif k == 1
-      return fmpzi(0,-1)
+      return ZZiRingElem(0,-1)
    elseif k == 2
-      return fmpzi(-1,0)
+      return ZZiRingElem(-1,0)
    else
-      return fmpzi(0,1)
+      return ZZiRingElem(0,1)
    end
 end
 
@@ -259,23 +259,23 @@ end
 #
 ###############################################################################
 
-function ==(a::fmpzi, b::fmpzi)
+function ==(a::ZZiRingElem, b::ZZiRingElem)
    return a.x == b.x && a.y == b.y
 end
 
-function ==(a::fmpzi, b::Complex{T}) where T <: Integer
+function ==(a::ZZiRingElem, b::Complex{T}) where T <: Integer
    return a.x == real(b) && a.y == imag(b)
 end
 
-function ==(b::Complex{T}, a::fmpzi) where T <: Integer
+function ==(b::Complex{T}, a::ZZiRingElem) where T <: Integer
    return a == b
 end
 
-function ==(a::fmpzi, b::IntegerUnion)
+function ==(a::ZZiRingElem, b::IntegerUnion)
    return iszero(a.y) && a.x == b
 end
 
-function ==(b::IntegerUnion, a::fmpzi)
+function ==(b::IntegerUnion, a::ZZiRingElem)
    return a == b
 end
 
@@ -285,76 +285,76 @@ end
 #
 ###############################################################################
 
-function addeq!(z::fmpzi, a::fmpzi)
+function addeq!(z::ZZiRingElem, a::ZZiRingElem)
    add!(z.x, z.x, a.x)
    add!(z.y, z.y, a.y)
    return z
 end
 
-function add!(z::fmpzi, a::fmpzi, b::fmpzi)
+function add!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem)
    add!(z.x, a.x, b.x)
    add!(z.y, a.y, b.y)
    return z
 end
 
-function add!(z::fmpzi, a::fmpzi, b::IntegerUnion)
+function add!(z::ZZiRingElem, a::ZZiRingElem, b::IntegerUnion)
    add!(z.x, a.x, b)
    set!(z.y, a.y)
    return z
 end
 
-function add!(z::fmpzi, b::IntegerUnion, a::fmpzi)
+function add!(z::ZZiRingElem, b::IntegerUnion, a::ZZiRingElem)
    return add!(z, a, b)
 end
 
-function +(a::fmpzi, b::Union{Integer, ZZRingElem, fmpzi})
-   return add!(fmpzi(), a, b)
+function +(a::ZZiRingElem, b::Union{Integer, ZZRingElem, ZZiRingElem})
+   return add!(ZZiRingElem(), a, b)
 end
 
-function +(a::IntegerUnion, b::fmpzi)
-   return add!(fmpzi(), a, b)
+function +(a::IntegerUnion, b::ZZiRingElem)
+   return add!(ZZiRingElem(), a, b)
 end
 
 
-function sub!(z::fmpzi, a::fmpzi, b::fmpzi)
+function sub!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem)
    sub!(z.x, a.x, b.x)
    sub!(z.y, a.y, b.y)
    return z
 end
 
-function sub!(z::fmpzi, a::fmpzi, b::IntegerUnion)
+function sub!(z::ZZiRingElem, a::ZZiRingElem, b::IntegerUnion)
    sub!(z.x, a.x, b)
    set!(z.y, a.y)
    return z
 end
 
-function sub!(z::fmpzi, a::IntegerUnion, b::fmpzi)
+function sub!(z::ZZiRingElem, a::IntegerUnion, b::ZZiRingElem)
    sub!(z.x, a, b.x)
    neg!(z.y, b.y)
    return z
 end
 
-function -(a::fmpzi, b::Union{Integer, ZZRingElem, fmpzi})
-   return sub!(fmpzi(), a, b)
+function -(a::ZZiRingElem, b::Union{Integer, ZZRingElem, ZZiRingElem})
+   return sub!(ZZiRingElem(), a, b)
 end
 
-function -(a::IntegerUnion, b::fmpzi)
-   return sub!(fmpzi(), a, b)
+function -(a::IntegerUnion, b::ZZiRingElem)
+   return sub!(ZZiRingElem(), a, b)
 end
 
 
-function neg!(z::fmpzi, a::fmpzi)
+function neg!(z::ZZiRingElem, a::ZZiRingElem)
    neg!(z.x, a.x)
    neg!(z.y, a.y)
    return z
 end
 
-function -(a::fmpzi)
-   return neg!(fmpzi(), a)
+function -(a::ZZiRingElem)
+   return neg!(ZZiRingElem(), a)
 end
 
 # output does not alias input
-function _muleq!(z::fmpzi, b::fmpzi)
+function _muleq!(z::ZZiRingElem, b::ZZiRingElem)
    zx = submul!(mul!(ZZRingElem(), z.x, b.x), z.y, b.y)
    mul!(z.y, z.y, b.x)
    addmul!(z.y, z.x, b.y)
@@ -362,7 +362,7 @@ function _muleq!(z::fmpzi, b::fmpzi)
    return z
 end
 
-function muleq!(z::fmpzi, b::fmpzi)
+function muleq!(z::ZZiRingElem, b::ZZiRingElem)
    if z !== b
       return _muleq!(z, b)
    else
@@ -375,7 +375,7 @@ function muleq!(z::fmpzi, b::fmpzi)
 end
 
 # output does not alias either input
-function _mul!(z::fmpzi, a::fmpzi, b::fmpzi)
+function _mul!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem)
    mul!(z.x, a.x, b.x)
    submul!(z.x, a.y, b.y)
    mul!(z.y, a.y, b.x)
@@ -383,7 +383,7 @@ function _mul!(z::fmpzi, a::fmpzi, b::fmpzi)
    return z
 end
 
-function mul!(z::fmpzi, a::fmpzi, b::fmpzi)
+function mul!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem)
    if z !== a
       if z !== b
          return _mul!(z, a, b)
@@ -395,36 +395,36 @@ function mul!(z::fmpzi, a::fmpzi, b::fmpzi)
    end
 end
 
-function mul!(z::fmpzi, a::fmpzi, b::IntegerUnion)
+function mul!(z::ZZiRingElem, a::ZZiRingElem, b::IntegerUnion)
    mul!(z.x, a.x, b)
    mul!(z.y, a.y, b)
    return z
 end
 
-function mul!(z::fmpzi, a::IntegerUnion, b::fmpzi)
+function mul!(z::ZZiRingElem, a::IntegerUnion, b::ZZiRingElem)
    return mul!(z, b, a)
 end
 
-function *(a::fmpzi, b::fmpzi)
-   return _mul!(fmpzi(), a, b)
+function *(a::ZZiRingElem, b::ZZiRingElem)
+   return _mul!(ZZiRingElem(), a, b)
 end
 
-function *(a::fmpzi, b::IntegerUnion)
-   return mul!(fmpzi(), a, b)
+function *(a::ZZiRingElem, b::IntegerUnion)
+   return mul!(ZZiRingElem(), a, b)
 end
 
-function *(a::IntegerUnion, b::fmpzi)
-   return mul!(fmpzi(), a, b)
+function *(a::IntegerUnion, b::ZZiRingElem)
+   return mul!(ZZiRingElem(), a, b)
 end
 
 
-function addmul!(z::fmpzi, a::fmpzi, b::ZZRingElem)
+function addmul!(z::ZZiRingElem, a::ZZiRingElem, b::ZZRingElem)
    addmul!(z.x, a.x, b)
    addmul!(z.y, a.y, b)
    return z
 end
 
-function addmul!(z::fmpzi, a::fmpzi, b::fmpzi)
+function addmul!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem)
    if z !== a && z !== b
       addmul!(z.x, a.x, b.x)
       submul!(z.x, a.y, b.y)
@@ -432,23 +432,23 @@ function addmul!(z::fmpzi, a::fmpzi, b::fmpzi)
       addmul!(z.y, a.x, b.y)
       return z
    else
-      return addmul!(z, a, b, fmpzi())
+      return addmul!(z, a, b, ZZiRingElem())
    end
 end
 
-function addmul!(z::fmpzi, a::fmpzi, b::fmpzi, t::fmpzi)
+function addmul!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem, t::ZZiRingElem)
    _mul!(t, a, b)
    return add!(z, z, t)
 end
 
 
-function submul!(z::fmpzi, a::fmpzi, b::ZZRingElem)
+function submul!(z::ZZiRingElem, a::ZZiRingElem, b::ZZRingElem)
    submul!(z.x, a.x, b)
    submul!(z.y, a.y, b)
    return z
 end
 
-function submul!(z::fmpzi, a::fmpzi, b::fmpzi)
+function submul!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem)
    if z !== a && z !== b
       submul!(z.x, a.x, b.x)
       addmul!(z.x, a.y, b.y)
@@ -456,11 +456,11 @@ function submul!(z::fmpzi, a::fmpzi, b::fmpzi)
       submul!(z.y, a.y, b.x)
       return z
    else
-      return submul!(z, a, b, fmpzi())
+      return submul!(z, a, b, ZZiRingElem())
    end
 end
 
-function submul!(z::fmpzi, a::fmpzi, b::fmpzi, t::fmpzi)
+function submul!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem, t::ZZiRingElem)
    _mul!(t, a, b)
    return sub!(z, z, t)
 end
@@ -476,44 +476,44 @@ end
 #     -1/2 <= x < 1/2
 #     -1/2 <= y < 1/2
 
-function divrem(a::fmpzi, b::ZZRingElem)
+function divrem(a::ZZiRingElem, b::ZZRingElem)
    qx, rx = ncdivrem(a.x, b)
    qy, ry = ncdivrem(a.y, b)
-   return fmpzi(qx, qy), fmpzi(rx, ry)
+   return ZZiRingElem(qx, qy), ZZiRingElem(rx, ry)
 end
 
-function divrem(a::fmpzi, b::fmpzi)
+function divrem(a::ZZiRingElem, b::ZZiRingElem)
    d = abs2(b)
    qx, r = ncdivrem(a.x*b.x + a.y*b.y, d)
    qy, r = ncdivrem(a.y*b.x - a.x*b.y, d)
-   q = fmpzi(qx, qy)
+   q = ZZiRingElem(qx, qy)
    return q, a - q*b
 end
 
-function Base.div(a::fmpzi, b::fmpzi)
+function Base.div(a::ZZiRingElem, b::ZZiRingElem)
    return divrem(a, b)[1]
 end
 
-function rem(a::fmpzi, b::fmpzi)
+function rem(a::ZZiRingElem, b::ZZiRingElem)
    return divrem(a, b)[2]
 end
 
-function mod(a::fmpzi, b::fmpzi)
+function mod(a::ZZiRingElem, b::ZZiRingElem)
    return divrem(a, b)[2]
 end
 
-function divides(a::fmpzi, b::Union{ZZRingElem, fmpzi})
+function divides(a::ZZiRingElem, b::Union{ZZRingElem, ZZiRingElem})
    q, r = divrem(a, b)
    return iszero(r), q
 end
 
-function divexact!(z::fmpzi, a::fmpzi, b::IntegerUnion)
+function divexact!(z::ZZiRingElem, a::ZZiRingElem, b::IntegerUnion)
    divexact!(z.x, a.x, b)
    divexact!(z.y, a.y, b)
    return z
 end
 
-function divexact!(z::fmpzi, a::fmpzi, b::fmpzi)
+function divexact!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem)
    A = a.x*b.x + a.y*b.y
    B = a.y*b.x - a.x*b.y
    C = abs2(b)
@@ -522,23 +522,23 @@ function divexact!(z::fmpzi, a::fmpzi, b::fmpzi)
    return z
 end
 
-function divexact(a::fmpzi, b::Union{Integer, ZZRingElem, fmpzi}; check=true)
+function divexact(a::ZZiRingElem, b::Union{Integer, ZZRingElem, ZZiRingElem}; check=true)
    if check
       ok, q = divides(a, b)
       ok || throw("non-exact division")
       return q
    else
-      return divexact!(fmpzi(), a, b)
+      return divexact!(ZZiRingElem(), a, b)
    end
 end
 
-function is_unit(a::fmpzi)
+function is_unit(a::ZZiRingElem)
    return iszero(a.y) && is_unit(a.x) || iszero(a.x) && is_unit(a.y)
 end
 
-function inv(a::fmpzi)
+function inv(a::ZZiRingElem)
    is_unit(a) || error("not invertible")
-   return fmpzi(a.x, -a.y)
+   return ZZiRingElem(a.x, -a.y)
 end
 
 ###############################################################################
@@ -547,7 +547,7 @@ end
 #
 ###############################################################################
 
-function sqr!(z::fmpzi, a::fmpzi, t::fmpzi)
+function sqr!(z::ZZiRingElem, a::ZZiRingElem, t::ZZiRingElem)
    mul!(t.x, a.x, a.x)
    mul!(t.y, a.y, a.y)
    nx = size(a.x)
@@ -570,18 +570,18 @@ function sqr!(z::fmpzi, a::fmpzi, t::fmpzi)
    return z
 end
 
-function _pow!(z::fmpzi, Z::fmpzi, n::UInt)
+function _pow!(z::ZZiRingElem, Z::ZZiRingElem, n::UInt)
    if n < 2
       @assert n == 1
       return set!(z, Z)
    end
-   t = fmpzi()
+   t = ZZiRingElem()
    while iseven(n)
       sqr!(z, Z, t); Z = z
       n >>= 1
    end
    if n > 1
-      x = fmpzi()
+      x = ZZiRingElem()
       X = Z
       while !iszero(n >>= 1)
          sqr!(x, X, t); X = x
@@ -594,7 +594,7 @@ function _pow!(z::fmpzi, Z::fmpzi, n::UInt)
    return z
 end
 
-function pow!(z::fmpzi, a::fmpzi, n::Union{Int, UInt})
+function pow!(z::ZZiRingElem, a::ZZiRingElem, n::Union{Int, UInt})
    if n < 0
       return _pow!(z, inv(a), (-n)%UInt)
    elseif n > 0
@@ -604,8 +604,8 @@ function pow!(z::fmpzi, a::fmpzi, n::Union{Int, UInt})
    end
 end
 
-function ^(a::fmpzi, n::Union{Int, UInt})
-   return pow!(fmpzi(), a, n)
+function ^(a::ZZiRingElem, n::Union{Int, UInt})
+   return pow!(ZZiRingElem(), a, n)
 end
 
 ###############################################################################
@@ -614,11 +614,11 @@ end
 #
 ###############################################################################
 
-function mulmod(a::fmpzi, b::fmpzi, c::fmpzi)
+function mulmod(a::ZZiRingElem, b::ZZiRingElem, c::ZZiRingElem)
    return mod(a*b, c)
 end
 
-function powermod(a::fmpzi, b::Int, c::fmpzi)
+function powermod(a::ZZiRingElem, b::Int, c::ZZiRingElem)
    if b < 0
       return mod(invmod(a,c)^((-b)%UInt), c)
    else
@@ -626,18 +626,18 @@ function powermod(a::fmpzi, b::Int, c::fmpzi)
    end
 end
 
-function invmod(a::fmpzi, b::fmpzi)
+function invmod(a::ZZiRingElem, b::ZZiRingElem)
    g, x, y = gcdx(a, b)
    isone(g) || error("impossible inverse")
    return x
 end
 
-function gcdinv(a::fmpzi, b::fmpzi)
+function gcdinv(a::ZZiRingElem, b::ZZiRingElem)
    g, x, y = gcdx(a, b)
    return (g, x)
 end
 
-function remove(a::fmpzi, b::fmpzi)
+function remove(a::ZZiRingElem, b::ZZiRingElem)
    if (iszero(b) || is_unit(b))
       throw(ArgumentError("Second argument must be a non-zero non-unit"))
    end
@@ -652,11 +652,11 @@ function remove(a::fmpzi, b::fmpzi)
    return v, a
 end
 
-function valuation(a::fmpzi, b::fmpzi)
+function valuation(a::ZZiRingElem, b::ZZiRingElem)
    return remove(a, b)[1]
 end
 
-function lcm(a::fmpzi, b::fmpzi)
+function lcm(a::ZZiRingElem, b::ZZiRingElem)
    g = gcd(a, b)
    iszero(g) && return g
    return a*divexact(b, g)
@@ -679,7 +679,7 @@ function smod(a::ZZRingElem, b::ZZRingElem)
    return z
 end
 
-function gcd(a::fmpzi, b::fmpzi)
+function gcd(a::ZZiRingElem, b::ZZiRingElem)
    if iszero(b.y)
       return gcd(a, b.x)
    elseif iszero(b.x)
@@ -707,11 +707,11 @@ function gcd(a::fmpzi, b::fmpzi)
    (m1, m3) = (m1*u + m3*v, _divexact(ga,g)*m3 - _divexact(gb,g)*m1)
    A = gcd(m2, m3, m4)
    v, _ = _shortest_l_infinity(ZZRingElem(1), mod(m1, A), A)
-   z = isone(g) ? fmpzi(v[1], v[2]) : fmpzi(v[1]*g, v[2]*g)
+   z = isone(g) ? ZZiRingElem(v[1], v[2]) : ZZiRingElem(v[1]*g, v[2]*g)
    return mul_i_pow!(z, canonical_unit_i_pow(z))
 end
 
-function gcd(a::fmpzi, b::ZZRingElem)
+function gcd(a::ZZiRingElem, b::ZZRingElem)
    if iszero(b)
       return mul_i_pow!(deepcopy(a), canonical_unit_i_pow(a))
    end
@@ -722,9 +722,9 @@ function gcd(a::fmpzi, b::ZZRingElem)
    ax = cmpabs(a.x, b) < 0 ? a.x : smod(a.x, b)
    ay = cmpabs(a.y, b) < 0 ? a.y : smod(a.y, b)
    if iszero(ax)
-      return fmpzi(gcd(ay, b), zero(ZZRingElem))
+      return ZZiRingElem(gcd(ay, b), zero(ZZRingElem))
    elseif iszero(ay)
-      return fmpzi(gcd(ax, b), zero(ZZRingElem))
+      return ZZiRingElem(gcd(ax, b), zero(ZZRingElem))
    end
    ga, ua, va = gcdx(ax, ay)
    g, u, _ = gcdx(ga, b)
@@ -734,19 +734,19 @@ function gcd(a::fmpzi, b::ZZRingElem)
    m2 = _divexact(ax,ga)*axog + _divexact(ay,ga)*ayog
    A = gcd(m2, _divexact(b, g))
    v, _ = _shortest_l_infinity(ZZRingElem(1), mod(m1*u, A), A)
-   z = isone(g) ? fmpzi(v[1], v[2]) : fmpzi(v[1]*g, v[2]*g)
+   z = isone(g) ? ZZiRingElem(v[1], v[2]) : ZZiRingElem(v[1]*g, v[2]*g)
    return mul_i_pow!(z, canonical_unit_i_pow(z))
 end
 
-function gcd(a::fmpzi, b::Integer)
+function gcd(a::ZZiRingElem, b::Integer)
   return gcd(a, ZZRingElem(b))
 end
 
-function gcd(b::Union{ZZRingElem, Integer}, a::fmpzi)
+function gcd(b::Union{ZZRingElem, Integer}, a::ZZiRingElem)
   return gcd(a, ZZRingElem(b))
 end
 
-function gcdx(a::fmpzi, b::fmpzi)
+function gcdx(a::ZZiRingElem, b::ZZiRingElem)
    if iszero(a)
       if iszero(b)
          return (zero(FlintZZi), zero(FlintZZi), zero(FlintZZi))
@@ -764,9 +764,9 @@ function gcdx(a::fmpzi, b::fmpzi)
    m[3,1] =  b.x; m[3,2] = b.y
    m[4,1] = -b.y; m[4,2] = b.x
    v, t = shortest_l_infinity_with_transform(m)
-   z = fmpzi(v[1], v[2])
-   w1 = fmpzi(t[1], t[2])
-   w2 = fmpzi(t[3], t[4])
+   z = ZZiRingElem(v[1], v[2])
+   w1 = ZZiRingElem(t[1], t[2])
+   w2 = ZZiRingElem(t[3], t[4])
    k = canonical_unit_i_pow(z)
    g = mul_i_pow!(z,k)
    x = mul_i_pow!(w1,k)
@@ -797,15 +797,15 @@ function _sum_of_squares(p::ZZRingElem)
    while !is_divisible_by(x^2+1, p)
       x = powermod(rand(ZZRingElem(2):(p-2)), div(p-1,4), p)
    end
-   return gcd(fmpzi(x, 1), p)
+   return gcd(ZZiRingElem(x, 1), p)
 end
 
-function factor(a::fmpzi)
+function factor(a::ZZiRingElem)
    iszero(a) && throw(ArgumentError("Argument must be non-zero"))
-   f = Fac{fmpzi}()
+   f = Fac{ZZiRingElem}()
    g = gcd(a.x, a.y)
    f.unit = divexact(a, g)   # throw if a=0
-   c = fmpzi(1, 1)
+   c = ZZiRingElem(1, 1)
    for (p, e) in factor(g)
       if isone(mod(p, UInt(4)))
          c1 = _sum_of_squares(p)
@@ -815,7 +815,7 @@ function factor(a::fmpzi)
          addeqindex!(f, 2*e, c)
          mul_i_pow!(f.unit, -e)
       else
-         setindex!(f, e, fmpzi(p, 0))
+         setindex!(f, e, ZZiRingElem(p, 0))
       end
    end
    if mod(f.unit.x, UInt(2)) == mod(f.unit.y, UInt(2))
@@ -841,26 +841,26 @@ end
 ###############################################################################
 
 # +,-,* operations defined above
-promote_rule(a::Type{fmpzi}, b::Type{ZZRingElem}) = fmpzi
-promote_rule(a::Type{ZZRingElem}, b::Type{fmpzi}) = fmpzi
-promote_rule(a::Type{fmpzi}, b::Type{<:Integer}) = fmpzi
-promote_rule(a::Type{<:Integer}, b::Type{fmpzi}) = fmpzi
+promote_rule(a::Type{ZZiRingElem}, b::Type{ZZRingElem}) = ZZiRingElem
+promote_rule(a::Type{ZZRingElem}, b::Type{ZZiRingElem}) = ZZiRingElem
+promote_rule(a::Type{ZZiRingElem}, b::Type{<:Integer}) = ZZiRingElem
+promote_rule(a::Type{<:Integer}, b::Type{ZZiRingElem}) = ZZiRingElem
 
-promote_rule(a::Type{ZZRingElem}, b::Type{<:Complex{<:Integer}}) = fmpzi
-promote_rule(a::Type{<:Complex{<:Integer}}, b::Type{ZZRingElem}) = fmpzi
-*(a::ZZRingElem, b::Complex{<:Integer}) = fmpzi(a*real(b), a*imag(b))
-*(b::Complex{<:Integer}, a::ZZRingElem) = fmpzi(a*real(b), a*imag(b))
-+(a::ZZRingElem, b::Complex{<:Integer}) = fmpzi(a + real(b), imag(b))
-+(b::Complex{<:Integer}, a::ZZRingElem) = fmpzi(a + real(b), imag(b))
--(a::ZZRingElem, b::Complex{<:Integer}) = fmpzi(a - real(b), -imag(b))
--(b::Complex{<:Integer}, a::ZZRingElem) = fmpzi(real(b) - a, imag(b))
+promote_rule(a::Type{ZZRingElem}, b::Type{<:Complex{<:Integer}}) = ZZiRingElem
+promote_rule(a::Type{<:Complex{<:Integer}}, b::Type{ZZRingElem}) = ZZiRingElem
+*(a::ZZRingElem, b::Complex{<:Integer}) = ZZiRingElem(a*real(b), a*imag(b))
+*(b::Complex{<:Integer}, a::ZZRingElem) = ZZiRingElem(a*real(b), a*imag(b))
++(a::ZZRingElem, b::Complex{<:Integer}) = ZZiRingElem(a + real(b), imag(b))
++(b::Complex{<:Integer}, a::ZZRingElem) = ZZiRingElem(a + real(b), imag(b))
+-(a::ZZRingElem, b::Complex{<:Integer}) = ZZiRingElem(a - real(b), -imag(b))
+-(b::Complex{<:Integer}, a::ZZRingElem) = ZZiRingElem(real(b) - a, imag(b))
 
-promote_rule(a::Type{fmpzi}, b::Type{<:Complex{<:Integer}}) = fmpzi
-promote_rule(a::Type{<:Complex{<:Integer}}, b::Type{fmpzi}) = fmpzi
-*(a::fmpzi, b::Complex{<:Integer}) = a*FlintZZi(b)
-*(b::Complex{<:Integer}, a::fmpzi) = a*FlintZZi(b)
-+(a::fmpzi, b::Complex{<:Integer}) = fmpzi(a.x + real(b), a.y + imag(b))
-+(b::Complex{<:Integer}, a::fmpzi) = fmpzi(a.x + real(b), a.y + imag(b))
--(a::fmpzi, b::Complex{<:Integer}) = fmpzi(a.x - real(b), a.y - imag(b))
--(b::Complex{<:Integer}, a::fmpzi) = fmpzi(real(b) - a.x, imag(b) - a.y)
+promote_rule(a::Type{ZZiRingElem}, b::Type{<:Complex{<:Integer}}) = ZZiRingElem
+promote_rule(a::Type{<:Complex{<:Integer}}, b::Type{ZZiRingElem}) = ZZiRingElem
+*(a::ZZiRingElem, b::Complex{<:Integer}) = a*FlintZZi(b)
+*(b::Complex{<:Integer}, a::ZZiRingElem) = a*FlintZZi(b)
++(a::ZZiRingElem, b::Complex{<:Integer}) = ZZiRingElem(a.x + real(b), a.y + imag(b))
++(b::Complex{<:Integer}, a::ZZiRingElem) = ZZiRingElem(a.x + real(b), a.y + imag(b))
+-(a::ZZiRingElem, b::Complex{<:Integer}) = ZZiRingElem(a.x - real(b), a.y - imag(b))
+-(b::Complex{<:Integer}, a::ZZiRingElem) = ZZiRingElem(real(b) - a.x, imag(b) - a.y)
 

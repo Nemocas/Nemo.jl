@@ -620,7 +620,7 @@ end
 
       # Individual tests
       S, (x, y) = polynomial_ring(R, ["x", "y"])
-      T = MatrixAlgebra(R, 2)
+      T = matrix_ring(R, 2)
 
       f = x^2*y^2+2*x+1
 

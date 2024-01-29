@@ -32,8 +32,8 @@ $\mathbb{F}_{p^n}$ (small $p$)              | Flint               | `fqPolyRepPo
 $\mathbb{F}_{p^n}$ (large $p$)              | Flint               | `FqPolyRepPolyRingElem` | `FqPolyRepPolyRing`
 $\mathbb{R}$ (arbitrary precision)          | Arb                 | `RealPoly`              | `RealPolyRing`
 $\mathbb{C}$ (arbitrary precision)          | Arb                 | `ComplexPoly`           | `ComplexPolyRing`
-$\mathbb{R}$ (fixed precision)              | Arb                 | `arb_poly`              | `ArbPolyRing`
-$\mathbb{C}$ (fixed precision)              | Arb                 | `acb_poly`              | `AcbPolyRing`
+$\mathbb{R}$ (fixed precision)              | Arb                 | `ArbPolyRingElem`              | `ArbPolyRing`
+$\mathbb{C}$ (fixed precision)              | Arb                 | `AcbPolyRingElem`              | `AcbPolyRing`
 
 The string representation of the variable and the base ring $R$ of a generic
 polynomial is stored in its parent object. 
@@ -107,8 +107,8 @@ r = roots(n, isolate_real = true)
 ### Construction from roots
 
 ```@docs
-from_roots(::ArbPolyRing, ::Vector{arb})
-from_roots(::AcbPolyRing, ::Vector{acb})
+from_roots(::ArbPolyRing, ::Vector{ArbFieldElem})
+from_roots(::AcbPolyRing, ::Vector{AcbFieldElem})
 ```
 
 **Examples**
@@ -117,7 +117,7 @@ from_roots(::AcbPolyRing, ::Vector{acb})
 RR = RealField(64)
 R, x = polynomial_ring(RR, "x")
 
-xs = arb[inv(RR(i)) for i=1:5]
+xs = ArbFieldElem[inv(RR(i)) for i=1:5]
 f = from_roots(R, xs)
 ```
 

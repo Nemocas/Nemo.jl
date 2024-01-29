@@ -4,19 +4,19 @@
 #
 ###############################################################################
 
-elem_type(::Type{FlintQQiField}) = fmpqi
+elem_type(::Type{QQiField}) = QQiFieldElem
 
-parent_type(::Type{fmpqi}) = FlintQQiField
+parent_type(::Type{QQiFieldElem}) = QQiField
 
-parent(a::fmpqi) = FlintQQi
+parent(a::QQiFieldElem) = FlintQQi
 
-base_ring(a::FlintQQiField) = FlintZZi
+base_ring(a::QQiField) = FlintZZi
 
-base_ring(a::fmpqi) = FlintZZi
+base_ring(a::QQiFieldElem) = FlintZZi
 
-is_domain_type(::Type{fmpqi}) = true
+is_domain_type(::Type{QQiFieldElem}) = true
 
-characteristic(a::FlintQQiField) = 0
+characteristic(a::QQiField) = 0
 
 ###############################################################################
 #
@@ -24,17 +24,17 @@ characteristic(a::FlintQQiField) = 0
 #
 ###############################################################################
 
-function expressify(a::fmpqi; context = nothing)
+function expressify(a::QQiFieldElem; context = nothing)
    x = expressify(real(a), context=context)
    y = expressify(imag(a), context=context)
    return Expr(:call, :+, x, Expr(:call, :*, y, :im))
 end
 
-function Base.show(io::IO, a::fmpqi)
+function Base.show(io::IO, a::QQiFieldElem)
    AbstractAlgebra.show_via_expressify(io, a)
 end
 
-function Base.show(io::IO, a::FlintQQiField)
+function Base.show(io::IO, a::QQiField)
    if get(io, :supercompact, false)
      io = pretty(io)
      print(io, LowercaseOff(), "QQ[im]")
@@ -50,22 +50,22 @@ end
 #
 ###############################################################################
 
-function fmpqi()
-   return fmpqi(fmpzi(), ZZRingElem(1))
+function QQiFieldElem()
+   return QQiFieldElem(ZZiRingElem(), ZZRingElem(1))
 end
 
-function fmpqi(a::fmpzi)
-   return fmpqi(a, ZZRingElem(1))
+function QQiFieldElem(a::ZZiRingElem)
+   return QQiFieldElem(a, ZZRingElem(1))
 end
 
-function fmpqi(a::QQFieldElem)
-   return fmpqi(fmpzi(numerator(a)), denominator(a))
+function QQiFieldElem(a::QQFieldElem)
+   return QQiFieldElem(ZZiRingElem(numerator(a)), denominator(a))
 end
 
-function fmpqi(a::QQFieldElem, b::QQFieldElem)
+function QQiFieldElem(a::QQFieldElem, b::QQFieldElem)
    da = denominator(a)
    db = denominator(b)
-   return reduce!(fmpqi(fmpzi(numerator(a)*db, numerator(b)*da), da*db))
+   return reduce!(QQiFieldElem(ZZiRingElem(numerator(a)*db, numerator(b)*da), da*db))
 end
 
 ###############################################################################
@@ -74,42 +74,42 @@ end
 #
 ###############################################################################
 
-function (a::FlintQQiField)()
-   return fmpqi()
+function (a::QQiField)()
+   return QQiFieldElem()
 end
 
-function (a::FlintQQiField)(b::IntegerUnion)
-   return fmpqi(fmpzi(b))
+function (a::QQiField)(b::IntegerUnion)
+   return QQiFieldElem(ZZiRingElem(b))
 end
 
-function (a::FlintQQiField)(b::Union{Rational, QQFieldElem})
-   return fmpqi(QQFieldElem(b))
+function (a::QQiField)(b::Union{Rational, QQFieldElem})
+   return QQiFieldElem(QQFieldElem(b))
 end
 
-function (a::FlintQQiField)(b::Union{Integer, ZZRingElem, Rational, QQFieldElem},
+function (a::QQiField)(b::Union{Integer, ZZRingElem, Rational, QQFieldElem},
                             c::Union{Integer, ZZRingElem, Rational, QQFieldElem})
-   return fmpqi(QQFieldElem(b), QQFieldElem(c))
+   return QQiFieldElem(QQFieldElem(b), QQFieldElem(c))
 end
 
-function (a::FlintQQiField)(b::Union{Complex{<:Integer}, fmpzi, Complex{<:Rational}})
-   return fmpqi(QQFieldElem(real(b)), QQFieldElem(imag(b)))
+function (a::QQiField)(b::Union{Complex{<:Integer}, ZZiRingElem, Complex{<:Rational}})
+   return QQiFieldElem(QQFieldElem(real(b)), QQFieldElem(imag(b)))
 end
 
-function (a::FlintQQiField)(b::fmpqi)
+function (a::QQiField)(b::QQiFieldElem)
    return b
 end
 
-function (a::ZZRing)(b::fmpqi)
+function (a::ZZRing)(b::QQiFieldElem)
    iszero(b.num.y) && isone(b.den) || error("cannot coerce")
    return b.num.x
 end
 
-function (a::QQField)(b::fmpqi)
+function (a::QQField)(b::QQiFieldElem)
    iszero(b.num.y) || error("cannot coerce")
    return b.num.x//b.den
 end
 
-function (a::FlintZZiRing)(b::fmpqi)
+function (a::ZZiRing)(b::QQiFieldElem)
    isone(b.den) || error("cannot coerce")
    return b.num
 end
@@ -122,17 +122,17 @@ end
 
 # see adhoc section for promotions
 
-function Base.convert(::Type{Complex{Rational{T}}}, a::fmpqi) where T <: Integer
+function Base.convert(::Type{Complex{Rational{T}}}, a::QQiFieldElem) where T <: Integer
    return Complex{Rational{T}}(Base.convert(Rational{T}, real(a)),
                                Base.convert(Rational{T}, imag(a)))
 end
 
-function Base.convert(::Type{fmpqi}, a::Complex{T}) where T <: Union{Integer, Rational}
-   return fmpqi(convert(QQFieldElem, real(a)), convert(QQFieldElem, imag(a)))
+function Base.convert(::Type{QQiFieldElem}, a::Complex{T}) where T <: Union{Integer, Rational}
+   return QQiFieldElem(convert(QQFieldElem, real(a)), convert(QQFieldElem, imag(a)))
 end
 
-function Base.convert(::Type{fmpqi}, a::Union{Integer, ZZRingElem, Rational, QQFieldElem})
-   return fmpqi(convert(QQFieldElem, a), QQFieldElem(0))
+function Base.convert(::Type{QQiFieldElem}, a::Union{Integer, ZZRingElem, Rational, QQFieldElem})
+   return QQiFieldElem(convert(QQFieldElem, a), QQFieldElem(0))
 end
 
 ###############################################################################
@@ -141,7 +141,7 @@ end
 #
 ###############################################################################
 
-function Base.hash(a::fmpqi, h::UInt)
+function Base.hash(a::QQiFieldElem, h::UInt)
    return hash(a.num, xor(hash(a.den, h), 0x6edeadc6d0447c19%UInt))
 end
 
@@ -151,10 +151,10 @@ end
 #
 ###############################################################################
 
-function rand_bits(a::FlintQQiField, b::Int)
+function rand_bits(a::QQiField, b::Int)
    b = max(1, b)
    t = clamp(cld(rand(0:b)^2, b), 1, b)  # average b/3 for the denominator
-   return reduce!(fmpqi(rand_bits(FlintZZi, clamp(b - t, 0, b)), rand_bits(ZZ, t)))
+   return reduce!(QQiFieldElem(rand_bits(FlintZZi, clamp(b - t, 0, b)), rand_bits(ZZ, t)))
 end
 
 ###############################################################################
@@ -164,65 +164,65 @@ end
 ###############################################################################
 
 # ???
-function deepcopy_internal(a::fmpqi, d::IdDict)
-   return fmpqi(deepcopy_internal(a.num, d), deepcopy_internal(a.den, d))
+function deepcopy_internal(a::QQiFieldElem, d::IdDict)
+   return QQiFieldElem(deepcopy_internal(a.num, d), deepcopy_internal(a.den, d))
 end
 
-function deepcopy_internal(a::FlintQQiField, d::IdDict)
+function deepcopy_internal(a::QQiField, d::IdDict)
    return a
 end
 
-function real(a::fmpqi)
+function real(a::QQiFieldElem)
    return a.num.x//a.den
 end
 
-function imag(a::fmpqi)
+function imag(a::QQiFieldElem)
    return a.num.y//a.den
 end
 
-function abs2(a::fmpqi)
+function abs2(a::QQiFieldElem)
    return abs2(a.num)//a.den^2
 end
 
-function zero(a::FlintQQiField)
-   return fmpqi(zero(FlintZZi), ZZRingElem(1))
+function zero(a::QQiField)
+   return QQiFieldElem(zero(FlintZZi), ZZRingElem(1))
 end
 
-function one(a::FlintQQiField)
-   return fmpqi(one(FlintZZi), ZZRingElem(1))
+function one(a::QQiField)
+   return QQiFieldElem(one(FlintZZi), ZZRingElem(1))
 end
 
-function iszero(a::fmpqi)
+function iszero(a::QQiFieldElem)
    return iszero(a.num)
 end
 
-function isone(a::fmpqi)
+function isone(a::QQiFieldElem)
    return a.num == a.den
 end
 
-function nbits(a::fmpqi)
+function nbits(a::QQiFieldElem)
    return nbits(a.num) + nbits(a.den)
 end
 
-function zero!(z::fmpqi)
+function zero!(z::QQiFieldElem)
    zero!(z.num)
    one!(z.den)
    return z
 end
 
-function one!(z::fmpqi)
+function one!(z::QQiFieldElem)
    one!(z.num)
    one!(z.den)
    return z
 end
 
-function set!(z::fmpqi, a::fmpqi)
+function set!(z::QQiFieldElem, a::QQiFieldElem)
    set!(z.num, a.num)
    set!(z.den, a.den)
    return z
 end
 
-function swap!(a::fmpqi, b::fmpqi)
+function swap!(a::QQiFieldElem, b::QQiFieldElem)
    swap!(a.num, b.num)
    swap!(a.den, b.den)
 end
@@ -233,7 +233,7 @@ end
 #
 ###############################################################################
 
-function reduce!(z::fmpqi)
+function reduce!(z::QQiFieldElem)
    g = ZZRingElem()
    ccall((:fmpz_gcd3, libflint), Nothing,
          (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}),
@@ -246,7 +246,7 @@ function reduce!(z::fmpqi)
    return z
 end
 
-function canonical_unit(a::fmpqi)
+function canonical_unit(a::QQiFieldElem)
    return a
 end
 
@@ -256,15 +256,15 @@ end
 #
 ###############################################################################
 
-function ==(a::fmpqi, b::fmpqi)
+function ==(a::QQiFieldElem, b::QQiFieldElem)
    return a.den == b.den && a.num == b.num
 end
 
-function ==(a::fmpqi, b::Union{Complex{<:Integer}, fmpzi, Complex{<:Rational}})
+function ==(a::QQiFieldElem, b::Union{Complex{<:Integer}, ZZiRingElem, Complex{<:Rational}})
    return real(a) == real(b) && imag(a) == imag(b)
 end
 
-function ==(b::Union{Complex{<:Integer}, fmpzi, Complex{<:Rational}}, a::fmpqi)
+function ==(b::Union{Complex{<:Integer}, ZZiRingElem, Complex{<:Rational}}, a::QQiFieldElem)
    return a == b
 end
 
@@ -274,7 +274,7 @@ end
 #
 ###############################################################################
 
-function addeq!(z::fmpqi, a::fmpqi)
+function addeq!(z::QQiFieldElem, a::QQiFieldElem)
    if z !== a
       mul!(z.num, z.num, a.den)
       addmul!(z.num, a.num, z.den)
@@ -286,7 +286,7 @@ function addeq!(z::fmpqi, a::fmpqi)
    return z
 end
 
-function add!(z::fmpqi, a::fmpqi, b::fmpqi)
+function add!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem)
    if z !== b
       mul!(z.num, a.num, b.den)
       addmul!(z.num, b.num, a.den)
@@ -298,11 +298,11 @@ function add!(z::fmpqi, a::fmpqi, b::fmpqi)
    return z
 end
 
-function +(a::fmpqi, b::fmpqi)
-   return add!(fmpqi(), a, b)
+function +(a::QQiFieldElem, b::QQiFieldElem)
+   return add!(QQiFieldElem(), a, b)
 end
 
-function subeq!(z::fmpqi, a::fmpqi)
+function subeq!(z::QQiFieldElem, a::QQiFieldElem)
    if z !== a
       mul!(z.num, z.num, a.den)
       submul!(z.num, a.num, z.den)
@@ -314,7 +314,7 @@ function subeq!(z::fmpqi, a::fmpqi)
    return z
 end
 
-function sub!(z::fmpqi, a::fmpqi, b::fmpqi)
+function sub!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem)
    if z !== b
       mul!(z.num, a.num, b.den)
       submul!(z.num, b.num, a.den)
@@ -327,56 +327,56 @@ function sub!(z::fmpqi, a::fmpqi, b::fmpqi)
    return z
 end
 
-function -(a::fmpqi, b::fmpqi)
-   return sub!(fmpqi(), a, b)
+function -(a::QQiFieldElem, b::QQiFieldElem)
+   return sub!(QQiFieldElem(), a, b)
 end
 
-function neg!(z::fmpqi, a::fmpqi)
+function neg!(z::QQiFieldElem, a::QQiFieldElem)
    neg!(z.num, a.num)
    set!(z.den, a.den)
    return z
 end
 
-function -(a::fmpqi)
-   return neg!(fmpqi(), a)
+function -(a::QQiFieldElem)
+   return neg!(QQiFieldElem(), a)
 end
 
-function mul!(z::fmpqi, a::fmpqi, b::fmpqi)
+function mul!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem)
    mul!(z.num, a.num, b.num)
    mul!(z.den, a.den, b.den)
    reduce!(z)
    return z
 end
 
-function mul!(z::fmpqi, a::fmpqi, b::Union{Integer, ZZRingElem, fmpzi})
+function mul!(z::QQiFieldElem, a::QQiFieldElem, b::Union{Integer, ZZRingElem, ZZiRingElem})
    mul!(z.num, a.num, b)
    set!(z.den, a.den)
    reduce!(z)
    return z
 end
 
-function *(a::fmpqi, b::fmpqi)
-   return mul!(fmpqi(), a, b)
+function *(a::QQiFieldElem, b::QQiFieldElem)
+   return mul!(QQiFieldElem(), a, b)
 end
 
-function addmul!(z::fmpqi, a::fmpqi, b::fmpqi, t::fmpqi)
+function addmul!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem, t::QQiFieldElem)
    mul!(t, a, b)
    add!(z, z, t)
    return z
 end
 
-function addmul!(z::fmpqi, a::fmpqi, b::fmpqi)
-   return addmul!(z, a, b, fmpqi())
+function addmul!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem)
+   return addmul!(z, a, b, QQiFieldElem())
 end
 
-function submul!(z::fmpqi, a::fmpqi, b::fmpqi, t::fmpqi)
+function submul!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem, t::QQiFieldElem)
    mul!(t, a, b)
    sub!(z, z, t)
    return z
 end
 
-function submul!(z::fmpqi, a::fmpqi, b::fmpqi)
-   return submul!(z, a, b, fmpqi())
+function submul!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem)
+   return submul!(z, a, b, QQiFieldElem())
 end
 
 ###############################################################################
@@ -385,11 +385,11 @@ end
 #
 ###############################################################################
 
-function is_unit(a::fmpqi)
+function is_unit(a::QQiFieldElem)
    return !iszero(a)
 end
 
-function inv!(z::fmpqi, a::fmpqi)
+function inv!(z::QQiFieldElem, a::QQiFieldElem)
    d = abs2(a.num)
    mul!(z.num.x, a.num.x, a.den)
    mul!(z.num.y, a.num.y, a.den)
@@ -399,16 +399,16 @@ function inv!(z::fmpqi, a::fmpqi)
    return z
 end
 
-function inv(a::fmpqi)
-   return inv!(fmpqi(), a)
+function inv(a::QQiFieldElem)
+   return inv!(QQiFieldElem(), a)
 end
 
-function divexact!(z::fmpqi, a::fmpqi, b::fmpqi)
+function divexact!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem)
    return mul!(z, a, inv(b))
 end
 
-function divexact(a::fmpqi, b::fmpqi; check::Bool = true)
-   return divexact!(fmpqi(), a, b)
+function divexact(a::QQiFieldElem, b::QQiFieldElem; check::Bool = true)
+   return divexact!(QQiFieldElem(), a, b)
 end
 
 ###############################################################################
@@ -417,14 +417,14 @@ end
 #
 ###############################################################################
 
-function pow!(z::fmpqi, a::fmpqi, b::UInt)
+function pow!(z::QQiFieldElem, a::QQiFieldElem, b::UInt)
    pow!(z.num, a.num, b)
    pow!(z.den, a.den, b)
    reduce!(z)  # bummer: a.num and a.den are not comprime over ZZ[i]
    return z
 end
 
-function pow!(z::fmpqi, a::fmpqi, b::Int)
+function pow!(z::QQiFieldElem, a::QQiFieldElem, b::Int)
    if b < 0
       n = (-b)%UInt
       a = inv(a)
@@ -434,8 +434,8 @@ function pow!(z::fmpqi, a::fmpqi, b::Int)
    return pow!(z, a, n)
 end
 
-function ^(a::fmpqi, b::Int)
-   return pow!(fmpqi(), a, b)
+function ^(a::QQiFieldElem, b::Int)
+   return pow!(QQiFieldElem(), a, b)
 end
 
 ###############################################################################
@@ -445,8 +445,8 @@ end
 ###############################################################################
 
 for (A, Bs) in [
-    [fmpqi, [Integer, ZZRingElem, Complex{<:Integer}, fmpzi, Rational, QQFieldElem, Complex{<:Rational}]],
-    [fmpzi, [Rational, QQFieldElem, Complex{<:Rational}]],
+    [QQiFieldElem, [Integer, ZZRingElem, Complex{<:Integer}, ZZiRingElem, Rational, QQFieldElem, Complex{<:Rational}]],
+    [ZZiRingElem, [Rational, QQFieldElem, Complex{<:Rational}]],
     [QQFieldElem, [Complex{<:Integer}, Complex{<:Rational}]],
     [ZZRingElem, [Complex{<:Rational}]]]
    for B in Bs
@@ -455,10 +455,10 @@ for (A, Bs) in [
       TB = @eval Type{<:($(B))}
       @eval begin
          function Nemo.AbstractAlgebra.promote_rule(::($TA), ::($TB))
-            return fmpqi
+            return QQiFieldElem
          end
          function Nemo.AbstractAlgebra.promote_rule(::($TB), ::($TA))
-            return fmpqi
+            return QQiFieldElem
          end
          function +(a::($A), b::($B))
             return FlintQQi(a) + FlintQQi(b)
@@ -484,11 +484,11 @@ end
 
 # // overloads in AA easily lead to ambiguities
 for (As, Bs) in [
-      [(Integer, Rational), (fmpzi, fmpqi)],
-      [(Complex{<:Integer}, Complex{<:Rational}), (ZZRingElem, QQFieldElem, fmpzi, fmpqi)], 
-      [(ZZRingElem, QQFieldElem), (Complex{<:Integer}, Complex{<:Rational}, fmpzi, fmpqi)],
-      [(fmpzi, fmpqi), (Integer, Rational, ZZRingElem, QQFieldElem, Complex{<:Integer},
-                                           Complex{<:Rational}, fmpzi, fmpqi)]]
+      [(Integer, Rational), (ZZiRingElem, QQiFieldElem)],
+      [(Complex{<:Integer}, Complex{<:Rational}), (ZZRingElem, QQFieldElem, ZZiRingElem, QQiFieldElem)], 
+      [(ZZRingElem, QQFieldElem), (Complex{<:Integer}, Complex{<:Rational}, ZZiRingElem, QQiFieldElem)],
+      [(ZZiRingElem, QQiFieldElem), (Integer, Rational, ZZRingElem, QQFieldElem, Complex{<:Integer},
+                                           Complex{<:Rational}, ZZiRingElem, QQiFieldElem)]]
    for A in As, B in Bs
       @eval begin
          function //(a::($A), b::($B))

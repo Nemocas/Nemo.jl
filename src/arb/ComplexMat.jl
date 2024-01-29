@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   acb_mat.jl : Arb matrices over acb
+#   AcbMatrix.jl : Arb matrices over AcbFieldElem
 #
 ###############################################################################
 
@@ -431,7 +431,7 @@ isreal(x::ComplexMat) =
 @doc raw"""
     inv(x::ComplexMat)
 
-Given a $n\times n$ matrix of type `acb_mat`, return an
+Given a $n\times n$ matrix of type `AcbMatrix`, return an
 $n\times n$ matrix $X$ such that $AX$ contains the
 identity matrix. If $A$ cannot be inverted numerically an exception is raised.
 """
@@ -517,7 +517,7 @@ function charpoly(x::AcbPolyRing, y::ComplexMat, prec::Int = precision(Balls))
   base_ring(x) != base_ring(y) && error("Base rings must coincide")
   z = x()
   ccall((:acb_mat_charpoly, libarb), Nothing,
-              (Ref{acb_poly}, Ref{ComplexMat}, Int), z, y, prec)
+              (Ref{AcbPolyRingElem}, Ref{ComplexMat}, Int), z, y, prec)
   return z
 end
 
@@ -626,7 +626,7 @@ end
 @doc raw"""
     bound_inf_norm(x::ComplexMat)
 
-Returns a non-negative element $z$ of type `acb`, such that $z$ is an upper
+Returns a non-negative element $z$ of type `AcbFieldElem`, such that $z$ is an upper
 bound for the infinity norm for every matrix in $x$
 """
 function bound_inf_norm(x::ComplexMat)
@@ -839,7 +839,7 @@ promote_rule(::Type{ComplexMat}, ::Type{ZZRingElem}) = ComplexMat
 
 promote_rule(::Type{ComplexMat}, ::Type{QQFieldElem}) = ComplexMat
 
-promote_rule(::Type{ComplexMat}, ::Type{arb}) = ComplexMat
+promote_rule(::Type{ComplexMat}, ::Type{ArbFieldElem}) = ComplexMat
 
 promote_rule(::Type{ComplexMat}, ::Type{ComplexFieldElem}) = ComplexMat
 
@@ -847,7 +847,7 @@ promote_rule(::Type{ComplexMat}, ::Type{ZZMatrix}) = ComplexMat
 
 promote_rule(::Type{ComplexMat}, ::Type{QQMatrix}) = ComplexMat
 
-promote_rule(::Type{ComplexMat}, ::Type{arb_mat}) = ComplexMat
+promote_rule(::Type{ComplexMat}, ::Type{ArbMatrix}) = ComplexMat
 
 ###############################################################################
 #
@@ -949,7 +949,7 @@ end
 @doc raw"""
     eigenvalues_simple(A::ComplexMat, algorithm::Symbol = :default)
 
-Returns the eigenvalues of `A` as a vector of `acb`. It is assumed that `A`
+Returns the eigenvalues of `A` as a vector of `AcbFieldElem`. It is assumed that `A`
 has only simple eigenvalues.
 
 The algorithm used can be changed by setting the `algorithm` keyword to

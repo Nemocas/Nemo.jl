@@ -24,8 +24,8 @@ make -j
 mkdir flint
 cp *.h flint
 cd ..
-git clone https://github.com/fredrik-johansson/arb
-cd arb
+git clone https://github.com/fredrik-johansson/ArbFieldElem
+cd ArbFieldElem
 ./configure --enable-shared --disable-static --with-mpir=/home/user/mpir-2.7.2 --with-mpfr=/home/user/mpfr-3.1.4 --with-flint=/home/user/flint2
 # edit Makefile
 # in CLFAGS replace -ansi -pedantic with -std=c99

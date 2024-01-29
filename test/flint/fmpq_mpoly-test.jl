@@ -642,7 +642,7 @@ end
    @test r3 == r1 + r2
    @test (@which evaluate(f, w)).module === Nemo
 
-   T = MatrixAlgebra(R, 2)
+   T = matrix_ring(R, 2)
 
    f = x^2*y^2+2*x+1
 

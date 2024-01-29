@@ -1,51 +1,51 @@
-@testset "nf_elem.constructors" begin
+@testset "AbsSimpleNumFieldElem.constructors" begin
    R, x = polynomial_ring(QQ, "x")
    K, a = number_field(x^3 + 3x + 1, "a")
 
-   @test elem_type(K) == nf_elem
-   @test elem_type(AnticNumberField) == nf_elem
-   @test parent_type(nf_elem) == AnticNumberField
+   @test elem_type(K) == AbsSimpleNumFieldElem
+   @test elem_type(AbsSimpleNumField) == AbsSimpleNumFieldElem
+   @test parent_type(AbsSimpleNumFieldElem) == AbsSimpleNumField
    @test defining_polynomial(K) == x^3 + 3x + 1
 
-   @test isa(K, AnticNumberField)
+   @test isa(K, AbsSimpleNumField)
 
    a = K(123)
 
-   @test isa(a, nf_elem)
+   @test isa(a, AbsSimpleNumFieldElem)
 
    b = K(a)
 
-   @test isa(b, nf_elem)
+   @test isa(b, AbsSimpleNumFieldElem)
 
    c = K(ZZRingElem(12))
 
-   @test isa(c, nf_elem)
+   @test isa(c, AbsSimpleNumFieldElem)
 
    d = K()
 
-   @test isa(d, nf_elem)
+   @test isa(d, AbsSimpleNumFieldElem)
 
    f = K(QQFieldElem(2, 3))
 
-   @test isa(f, nf_elem)
+   @test isa(f, AbsSimpleNumFieldElem)
 
    h = K(1//2)
 
-   @test isa(h, nf_elem)
+   @test isa(h, AbsSimpleNumFieldElem)
 
    g = K(x^2 + 2x - 7)
 
-   @test isa(g, nf_elem)
+   @test isa(g, AbsSimpleNumFieldElem)
 end
 
-@testset "nf_elem.rand" begin
+@testset "AbsSimpleNumFieldElem.rand" begin
    R, x = polynomial_ring(QQ, "x")
    K, a = number_field(x^3 + 3x + 1, "a")
 
    test_rand(K, 1:9)
 end
 
-@testset "nf_elem.printing" begin
+@testset "AbsSimpleNumFieldElem.printing" begin
    R, x = polynomial_ring(QQ, "x")
    K, a = number_field(x^3 + 3x + 1, "a")
    g = K(x^2 + 2x - 7)
@@ -53,7 +53,7 @@ end
    @test string(g) == "a^2 + 2*a - 7"
 end
 
-@testset "nf_elem.fmpz_mat_conversions" begin
+@testset "AbsSimpleNumFieldElem.fmpz_mat_conversions" begin
    R, x = polynomial_ring(QQ, "x")
    K, a = number_field(x^3 + 3x + 1, "a")
    M = matrix_space(FlintZZ, 1, 3)(0)
@@ -73,7 +73,7 @@ end
    @test M == matrix_space(FlintZZ, 1, 3)([1 1 5])
 end
 
-@testset "nf_elem.fmpq_poly_conversion" begin
+@testset "AbsSimpleNumFieldElem.fmpq_poly_conversion" begin
    R, x = polynomial_ring(QQ, "x")
    K, a = number_field(x^3 + 3x + 1, "a")
 
@@ -88,7 +88,7 @@ end
    @test R(a) == R(7)
 end
 
-@testset "nf_elem.denominator" begin
+@testset "AbsSimpleNumFieldElem.denominator" begin
    R, x = polynomial_ring(QQ, "x")
    K, a = number_field(x^3 + 3x + 1, "a")
 
@@ -97,7 +97,7 @@ end
    @test denominator(b) == 5
 end
 
-@testset "nf_elem.conversions" begin
+@testset "AbsSimpleNumFieldElem.conversions" begin
    R, x = polynomial_ring(QQ, "x")
    K, a = number_field(x^3 + 3x + 1, "a")
 
@@ -106,7 +106,7 @@ end
    @test R(K(f)) == f
 end
 
-@testset "nf_elem.manipulation" begin
+@testset "AbsSimpleNumFieldElem.manipulation" begin
    R, x = polynomial_ring(QQ, "x")
    K, a = number_field(x^3 + 3x + 1, "a")
 
@@ -134,7 +134,7 @@ end
    @test characteristic(K) == 0
 end
 
-@testset "nf_elem.unary_ops" begin
+@testset "AbsSimpleNumFieldElem.unary_ops" begin
    R, x = polynomial_ring(QQ, "x")
    K, a = number_field(x^3 + 3x + 1, "a")
 
@@ -143,7 +143,7 @@ end
    @test -d == -a^2 - 2a + 7
 end
 
-@testset "nf_elem.binary_ops" begin
+@testset "AbsSimpleNumFieldElem.binary_ops" begin
    R, x = polynomial_ring(QQ, "x")
    K, a = number_field(x^3 + 3x + 1, "a")
 
@@ -157,7 +157,7 @@ end
    @test c*d == -31*a^2 - 9*a - 12
 end
 
-@testset "nf_elem.adhoc_binary" begin
+@testset "AbsSimpleNumFieldElem.adhoc_binary" begin
    R, x = polynomial_ring(QQ, "x")
    K, a = number_field(x^3 + 3x + 1, "a")
 
@@ -202,7 +202,7 @@ end
    end
 end
 
-@testset "nf_elem.powering" begin
+@testset "AbsSimpleNumFieldElem.powering" begin
    R, x = polynomial_ring(QQ, "x")
    K, a = number_field(x^3 + 3x + 1, "a")
 
@@ -213,7 +213,7 @@ end
    @test d^0 == 1
 end
 
-@testset "nf_elem.comparison" begin
+@testset "AbsSimpleNumFieldElem.comparison" begin
    R, x = polynomial_ring(QQ, "x")
    K, a = number_field(x^3 + 3x + 1, "a")
 
@@ -224,7 +224,7 @@ end
    @test c == 3a^2 - a + 1
 end
 
-@testset "nf_elem.adhoc_comparison" begin
+@testset "AbsSimpleNumFieldElem.adhoc_comparison" begin
    R, x = polynomial_ring(QQ, "x")
    K, a = number_field(x^3 + 3x + 1, "a")
 
@@ -245,7 +245,7 @@ end
    @test QQFieldElem(2, 3) == K(QQFieldElem(2, 3))
 end
 
-@testset "nf_elem.inversion" begin
+@testset "AbsSimpleNumFieldElem.inversion" begin
    R, x = polynomial_ring(QQ, "x")
    K, a = number_field(x^3 + 3x + 1, "a")
 
@@ -254,7 +254,7 @@ end
    @test inv(c)*c == 1
 end
 
-@testset "nf_elem.exact_division" begin
+@testset "AbsSimpleNumFieldElem.exact_division" begin
    R, x = polynomial_ring(QQ, "x")
    K, a = number_field(x^3 + 3x + 1, "a")
 
@@ -264,7 +264,7 @@ end
    @test divexact(c, d) == c*inv(d)
 end
 
-@testset "nf_elem.adhoc_exact_division" begin
+@testset "AbsSimpleNumFieldElem.adhoc_exact_division" begin
    R, x = polynomial_ring(QQ, "x")
    K, a = number_field(x^3 + 3x + 1, "a")
 
@@ -275,7 +275,7 @@ end
    @test divexact(QQFieldElem(2, 3)*c, QQFieldElem(2, 3)) == c
 end
 
-@testset "nf_elem.divides" begin
+@testset "AbsSimpleNumFieldElem.divides" begin
    R, x = polynomial_ring(QQ, "x")
    K, a = number_field(x^3 + 3x + 1, "a")
 
@@ -288,7 +288,7 @@ end
    @test q == divexact(c, d)
 end
 
-@testset "nf_elem.norm_trace" begin
+@testset "AbsSimpleNumFieldElem.norm_trace" begin
    R, x = polynomial_ring(QQ, "x")
    K, a = number_field(x^3 + 3x + 1, "a")
 
@@ -298,7 +298,7 @@ end
    @test tr(c) == -15
 end
 
-@testset "nf_elem.representation_matrix" begin
+@testset "AbsSimpleNumFieldElem.representation_matrix" begin
   R, x = polynomial_ring(QQ, "x")
   K, a = number_field(x^3 + 3x + 1, "a")
 
@@ -323,7 +323,7 @@ end
   @test base_ring(Mbb) == FlintZZ
 end
 
-@testset "nf_elem.Polynomials" begin
+@testset "AbsSimpleNumFieldElem.Polynomials" begin
    R, x = polynomial_ring(QQ, "x")
    K, a = number_field(x^3 + 3x + 1, "a")
    S, y = polynomial_ring(K, "y")

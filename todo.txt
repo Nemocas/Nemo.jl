@@ -66,10 +66,10 @@ Poly.jl/ZZPolyRingElem.jl
 
 * implement fmpz_mod_poly_get_str_pretty and use it in show
 
-* Add generic multipoint evaluation a la arb_poly evaluate(x::arb_poly, b::Vector{arb}).
+* Add generic multipoint evaluation a la ArbPolyRingElem evaluate(x::ArbPolyRingElem, b::Vector{ArbFieldElem}).
 
 * Add generic function for constructing a polynomial from its roots, a la the
-arb_poly function from_roots.
+ArbPolyRingElem function from_roots.
 
 * implement Sylvester matrix version of generic resultant
 
@@ -151,14 +151,14 @@ ZZMatrix
 
 * fix _checkbounds
 
-arb/acb(_poly/mat)
+ArbFieldElem/AcbFieldElem(_poly/mat)
 ------------------
 
 * add hash functions
 
 * add missing ad hoc operators
 
-* document flags for roots() in acb_poly
+* document flags for roots() in AcbPolyRingElem
 
 Matrix.jl
 ---------

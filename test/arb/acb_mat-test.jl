@@ -1,13 +1,13 @@
 CC = AcbField(64)
 RR = ArbField(64)
 
-@testset "acb_mat.constructors" begin
+@testset "AcbMatrix.constructors" begin
    S = matrix_space(CC, 3, 3)
    R = matrix_space(ZZ, 3, 3)
 
-   @test elem_type(S) == acb_mat
-   @test elem_type(AcbMatSpace) == acb_mat
-   @test parent_type(acb_mat) == AcbMatSpace
+   @test elem_type(S) == AcbMatrix
+   @test elem_type(AcbMatSpace) == AcbMatrix
+   @test parent_type(AcbMatrix) == AcbMatSpace
    @test nrows(S) == 3
    @test ncols(S) == 3
 
@@ -63,13 +63,13 @@ RR = ArbField(64)
 
    for T in [ZZRingElem, QQFieldElem, Int, BigInt, Float64, BigFloat, RR, CC, string, Rational{Int}, Rational{BigInt}]
       M = matrix(CC, map(T, arr))
-      @test isa(M, acb_mat)
+      @test isa(M, AcbMatrix)
       @test base_ring(M) == CC
       @test nrows(M) == 2
       @test ncols(M) == 2
 
       M2 = matrix(CC, 2, 3, map(T, arr2))
-      @test isa(M2, acb_mat)
+      @test isa(M2, AcbMatrix)
       @test base_ring(M2) == CC
       @test nrows(M2) == 2
       @test ncols(M2) == 3
@@ -79,12 +79,12 @@ RR = ArbField(64)
 
    M3 = zero_matrix(CC, 2, 3)
 
-   @test isa(M3, acb_mat)
+   @test isa(M3, AcbMatrix)
    @test base_ring(M3) == CC
 
    M4 = identity_matrix(CC, 3)
 
-   @test isa(M4, acb_mat)
+   @test isa(M4, AcbMatrix)
    @test base_ring(M4) == CC
 
    a = zero_matrix(CC, 2, 2)
@@ -94,16 +94,16 @@ RR = ArbField(64)
    @test !(a in [b])
 end
 
-@testset "acb_mat.similar" begin
+@testset "AcbMatrix.similar" begin
    S = matrix_space(CC, 3, 3)
    s = S(ZZRingElem(3))
 
    t = similar(s)
-   @test t isa acb_mat
+   @test t isa AcbMatrix
    @test size(t) == size(s)
 
    t = similar(s, 2, 3)
-   @test t isa acb_mat
+   @test t isa AcbMatrix
    @test size(t) == (2, 3)
 
    for (R, M) in ring_to_mat
@@ -115,13 +115,13 @@ end
    end
 
    # issue #651
-   m = one(Generic.MatSpace{acb}(CC, 2, 2))
+   m = one(Generic.MatSpace{AcbFieldElem}(CC, 2, 2))
    for n = (m, -m, m*m, m+m, 2m)
-      @test n isa Generic.MatSpaceElem{acb}
+      @test n isa Generic.MatSpaceElem{AcbFieldElem}
    end
 end
 
-@testset "acb_mat.printing" begin
+@testset "AcbMatrix.printing" begin
    S = matrix_space(CC, 3, 3)
    f = S(ZZRingElem(3))
 
@@ -129,7 +129,7 @@ end
    @test !occursin(string(typeof(f)), string(f))
 end
 
-@testset "acb_mat.manipulation" begin
+@testset "AcbMatrix.manipulation" begin
    S = matrix_space(CC, 3, 3)
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
    B = S([ZZRingElem(1) 4 7; 9 6 7; 4 3 3])
@@ -147,7 +147,7 @@ end
    @test deepcopy(A) == A
 end
 
-@testset "acb_mat.unary_ops" begin
+@testset "AcbMatrix.unary_ops" begin
    S = matrix_space(CC, 3, 3)
    R = matrix_space(ZZ, 3, 3)
 
@@ -157,7 +157,7 @@ end
    @test contains(-A, B)
 end
 
-@testset "acb_mat.transpose" begin
+@testset "AcbMatrix.transpose" begin
    S = matrix_space(CC, 3, 3)
    T = matrix_space(ZZ, 3, 3)
 
@@ -172,7 +172,7 @@ end
    @test overlaps(transpose(C), C)
 end
 
-@testset "acb_mat.binary_ops" begin
+@testset "AcbMatrix.binary_ops" begin
    S = matrix_space(CC, 3, 3)
    R = matrix_space(ZZ, 3, 3)
 
@@ -186,7 +186,7 @@ end
    @test contains(A*B, R([49 41 50; 65 49 56; 75 81 114]))
 end
 
-@testset "acb_mat.adhoc_binary" begin
+@testset "AcbMatrix.adhoc_binary" begin
    S = matrix_space(CC, 3, 3)
    R = matrix_space(ZZ, 3, 3)
    T = matrix_space(QQ, 3, 3)
@@ -247,7 +247,7 @@ end
    end
 end
 
-@testset "acb_mat.shifting" begin
+@testset "AcbMatrix.shifting" begin
    S = matrix_space(CC, 3, 3)
    R = matrix_space(ZZ, 3, 3)
 
@@ -260,7 +260,7 @@ end
    @test contains(C, 16*B)
 end
 
-@testset "acb_mat.comparison" begin
+@testset "AcbMatrix.comparison" begin
    S = matrix_space(CC, 3, 3)
    R = matrix_space(ZZ, 3, 3)
 
@@ -282,7 +282,7 @@ end
    @test contains(C, A)
 end
 
-@testset "acb_mat.adhoc_comparison" begin
+@testset "AcbMatrix.adhoc_comparison" begin
    S = matrix_space(CC, 3, 3)
    R = matrix_space(ZZ, 3, 3)
    T = matrix_space(QQ, 3, 3)
@@ -303,7 +303,7 @@ end
    @test B == A
 end
 
-@testset "acb_mat.predicates" begin
+@testset "AcbMatrix.predicates" begin
    S = matrix_space(CC, 3, 3)
    A = S([1 2 1000; 0 3 1; 0 2 1])
 
@@ -314,7 +314,7 @@ end
    @test !isreal(A)
 end
 
-@testset "acb_mat.inversion" begin
+@testset "AcbMatrix.inversion" begin
    S = matrix_space(CC, 3, 3)
    R = matrix_space(ZZ, 3, 3)
 
@@ -335,7 +335,7 @@ end
    @test_throws ErrorException inv(A)
 end
 
-@testset "acb_mat.divexact" begin
+@testset "AcbMatrix.divexact" begin
    S = matrix_space(CC, 3, 3)
    R = matrix_space(ZZ, 3, 3)
 
@@ -346,7 +346,7 @@ end
    @test contains(divexact(one(S), A), B)
 end
 
-@testset "acb_mat.adhoc_divexact" begin
+@testset "AcbMatrix.adhoc_divexact" begin
    S = matrix_space(CC, 3, 3)
    R = matrix_space(ZZ, 3, 3)
 
@@ -361,7 +361,7 @@ end
    @test contains(divexact(A, CC("3.0 +/- 0.5")), B)
 end
 
-@testset "acb_mat.charpoly" begin
+@testset "AcbMatrix.charpoly" begin
    S = matrix_space(CC, 3, 3)
    R, x = polynomial_ring(CC, "x")
    ZZy, y = polynomial_ring(ZZ, "y")
@@ -377,7 +377,7 @@ end
    @test contains(g, f)
 end
 
-@testset "acb_mat.det" begin
+@testset "AcbMatrix.det" begin
    S = matrix_space(CC, 3, 3)
 
    A = S(["2.0 +/- 0.1" "3.0 +/- 0.1" "5.0 +/- 0.1";
@@ -389,7 +389,7 @@ end
    @test contains(d, 24)
 end
 
-@testset "acb_mat.exp" begin
+@testset "AcbMatrix.exp" begin
    S = matrix_space(CC, 3, 3)
 
    A = S(["2.0 +/- 0.1" "0.0 +/- 0.1" "0.0 +/- 0.1";
@@ -403,7 +403,7 @@ end
    @test overlaps(B, C)
 end
 
-@testset "acb_mat.lu_nonsquare" begin
+@testset "AcbMatrix.lu_nonsquare" begin
    S = matrix_space(CC, 2, 3)
 
    A = S(["1.0 +/- 0.01" "1.0 +/- 0.01" "1.0 +/- 0.01";
@@ -415,7 +415,7 @@ end
     @test r == 2
 end
 
-@testset "acb_mat.linear_solving" begin
+@testset "AcbMatrix.linear_solving" begin
    S = matrix_space(CC, 3, 3)
    T = matrix_space(ZZ, 3, 3)
 
@@ -447,7 +447,7 @@ end
    @test contains(transpose(y), ZZ[1 1 1])
 end
 
-@testset "acb_mat.bound_inf_norm" begin
+@testset "AcbMatrix.bound_inf_norm" begin
    S = matrix_space(CC, 3, 3)
 
    A = S([2 3 5; 1 4 7; 9 6 3])
@@ -461,7 +461,7 @@ end
    end
 end
 
-@testset "acb_mat.eigenvalues" begin
+@testset "AcbMatrix.eigenvalues" begin
    A = matrix(CC, 3, 3, [1, 2, 3, 0, 4, 5, 0, 0, 6])
 
    E = @inferred eigenvalues(A)

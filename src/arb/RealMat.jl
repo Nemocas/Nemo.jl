@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   arb_mat.jl : Arb matrices over arb
+#   ArbMatrix.jl : Arb matrices over ArbFieldElem
 #
 ###############################################################################
 
@@ -41,7 +41,7 @@ function check_parent(x::RealMat, y::RealMat, throw::Bool = true)
    return !fl
 end
 
-function getindex!(z::arb, x::RealMat, r::Int, c::Int)
+function getindex!(z::ArbFieldElem, x::RealMat, r::Int, c::Int)
   GC.@preserve x begin
      v = ccall((:arb_mat_entry_ptr, libarb), Ptr{RealFieldElem},
                  (Ref{RealMat}, Int, Int), x, r - 1, c - 1)
@@ -203,7 +203,7 @@ end
 
 *(x::ZZRingElem, y::RealMat) = y*x
 
-function *(x::RealMat, y::arb)
+function *(x::RealMat, y::ArbFieldElem)
   z = similar(x)
   ccall((:arb_mat_scalar_mul_arb, libarb), Nothing,
               (Ref{RealMat}, Ref{RealMat}, Ref{RealFieldElem}, Int),
@@ -211,7 +211,7 @@ function *(x::RealMat, y::arb)
   return z
 end
 
-*(x::arb, y::RealMat) = y*x
+*(x::ArbFieldElem, y::RealMat) = y*x
 
 for T in [Integer, ZZRingElem, QQFieldElem, RealFieldElem]
    @eval begin
@@ -388,7 +388,7 @@ end
 @doc raw"""
     inv(x::RealMat)
 
-Given a  $n\times n$ matrix of type `arb_mat`, return an
+Given a  $n\times n$ matrix of type `ArbMatrix`, return an
 $n\times n$ matrix $X$ such that $AX$ contains the
 identity matrix. If $A$ cannot be inverted numerically an exception is raised.
 """
@@ -440,7 +440,7 @@ function divexact(x::RealMat, y::ZZRingElem; check::Bool=true)
   return z
 end
 
-function divexact(x::RealMat, y::arb; check::Bool=true)
+function divexact(x::RealMat, y::ArbFieldElem; check::Bool=true)
   z = similar(x)
   ccall((:arb_mat_scalar_div_arb, libarb), Nothing,
               (Ref{RealMat}, Ref{RealMat}, Ref{RealFieldElem}, Int),
@@ -568,7 +568,7 @@ end
 @doc raw"""
     bound_inf_norm(x::RealMat)
 
-Returns a non-negative element $z$ of type `arb`, such that $z$ is an upper
+Returns a non-negative element $z$ of type `ArbFieldElem`, such that $z$ is an upper
 bound for the infinity norm for every matrix in $x$
 """
 function bound_inf_norm(x::RealMat)

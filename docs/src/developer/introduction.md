@@ -50,7 +50,7 @@ performant C code (around half a million lines of it).
 
 ## Layout of files
 
-In the `src` directory of Nemo are four directories `flint`, `arb`, `antic` and
+In the `src` directory of Nemo are four directories `flint`, `ArbFieldElem`, `antic` and
 `calcium`, each containing the wrappers for the relevant C libraries. The
 `test` directory is similarly organised.
 
@@ -61,23 +61,23 @@ univariate polynomials over `fmpz` integers, and so on.
 
 The `QQFieldElem` prefix is for Flint rationals, `FqPolyRepFieldElem` for Flint finite fields with
 multiprecision characteristic, `fqPolyRepFieldElem` is the same but for single word
-characteristic. The `padic` prefix is for the field of p-adic numbers for a
+characteristic. The `PadicFieldElem` prefix is for the field of p-adic numbers for a
 given `p`. The `zzModRingElem` prefix is for `Z/nZ` for a given `n`. The `gfp` prefix is
 the same as `Z/nZ` but where `n` is prime, so that we are dealing with a field.
 
 The `FlintTypes.jl` file contains the implementation of all the Flint types.
 
-In the `antic` directory, `nf_elem` is for elements of a number field.
+In the `antic` directory, `AbsSimpleNumFieldElem` is for elements of a number field.
 
 The `AnticTypes.jl` file contains the Antic types.
 
-In the `arb` directory the `arb` prefix is for arbitrary precision ball
-arithmetic over the reals. The `acb` prefix is similar but for complex numbers.
+In the `ArbFieldElem` directory the `ArbFieldElem` prefix is for arbitrary precision ball
+arithmetic over the reals. The `AcbFieldElem` prefix is similar but for complex numbers.
 
 The `ArbTypes.jl` file contains the Arb types.
 
-In the `calcium` directory the `ca` prefix is for Calcium's type. There is also
-a `qqbar` file for the field of algebraic numbers.
+In the `calcium` directory the `CalciumFieldElem` prefix is for Calcium's type. There is also
+a `QQBarFieldElem` file for the field of algebraic numbers.
 
 In the AbstractAlgebra.jl package the `src` directory contains a directory
 called `generic`. This is where the implementations of generic types, such as

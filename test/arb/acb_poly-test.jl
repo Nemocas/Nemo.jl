@@ -1,7 +1,7 @@
 RR = AcbField(64)
 CC = AcbField(64)
 
-@testset "acb_poly.constructors" begin
+@testset "AcbPolyRingElem.constructors" begin
    S1 = PolyRing(CC)
    S2 = PolyRing(CC)
 
@@ -10,10 +10,10 @@ CC = AcbField(64)
 
    R, x = polynomial_ring(CC, "x")
 
-   @test elem_type(R) == acb_poly
-   @test elem_type(AcbPolyRing) == acb_poly
-   @test parent_type(acb_poly) == AcbPolyRing
-   @test dense_poly_type(acb) == acb_poly
+   @test elem_type(R) == AcbPolyRingElem
+   @test elem_type(AcbPolyRing) == AcbPolyRingElem
+   @test parent_type(AcbPolyRingElem) == AcbPolyRing
+   @test dense_poly_type(AcbFieldElem) == AcbPolyRingElem
 
    @test typeof(R) <: AcbPolyRing
 
@@ -46,7 +46,7 @@ CC = AcbField(64)
    end
 end
 
-@testset "acb_poly.printing" begin
+@testset "AcbPolyRingElem.printing" begin
    R, x = polynomial_ring(CC, "x")
    f = x^3 + 2x^2 + x + 1
 
@@ -54,7 +54,7 @@ end
    @test occursin(r"2.[0]+", string(f))
 end
 
-@testset "acb_poly.manipulation" begin
+@testset "AcbPolyRingElem.manipulation" begin
    R, x = polynomial_ring(CC, "x")
 
    @test iszero(zero(R))
@@ -84,7 +84,7 @@ end
    @test characteristic(R) == 0
 end
 
-@testset "acb_poly.binary_ops" begin
+@testset "AcbPolyRingElem.binary_ops" begin
    R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
@@ -97,7 +97,7 @@ end
    @test f - g == -x^3+x^2-x-1
 end
 
-@testset "acb_poly.adhoc_binary" begin
+@testset "AcbPolyRingElem.adhoc_binary" begin
    R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
@@ -124,7 +124,7 @@ end
    end
 end
 
-@testset "acb_poly.comparison" begin
+@testset "AcbPolyRingElem.comparison" begin
    R, x = polynomial_ring(CC, "x")
    Zx, zx = polynomial_ring(ZZ, "x")
    Qx, qx = polynomial_ring(QQ, "x")
@@ -170,7 +170,7 @@ end
    @test !uniq
 end
 
-@testset "acb_poly.adhoc_comparison" begin
+@testset "AcbPolyRingElem.adhoc_comparison" begin
    R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
@@ -194,7 +194,7 @@ end
    @test R(7) == RR(7.0)
 end
 
-@testset "acb_poly.unary_ops" begin
+@testset "AcbPolyRingElem.unary_ops" begin
    R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
@@ -202,7 +202,7 @@ end
    @test -f == -x^2 - 2x - 1
 end
 
-@testset "acb_poly.truncation" begin
+@testset "AcbPolyRingElem.truncation" begin
    R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
@@ -217,7 +217,7 @@ end
    @test_throws DomainError mullow(f, g, -1)
 end
 
-@testset "acb_poly.reverse" begin
+@testset "AcbPolyRingElem.reverse" begin
    R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 3
@@ -225,7 +225,7 @@ end
    #@test reverse(f) == 3x^2 + 2x + 1
 end
 
-@testset "acb_poly.shift" begin
+@testset "AcbPolyRingElem.shift" begin
    R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
@@ -239,7 +239,7 @@ end
    @test_throws DomainError shift_right(f, -1)
 end
 
-@testset "acb_poly.powering" begin
+@testset "AcbPolyRingElem.powering" begin
    R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
@@ -249,7 +249,7 @@ end
    @test_throws DomainError f^-1
 end
 
-@testset "acb_poly.exact_division" begin
+@testset "AcbPolyRingElem.exact_division" begin
    R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
@@ -258,7 +258,7 @@ end
    @test divexact(f*g, f) == g
 end
 
-@testset "acb_poly.scalar_division" begin
+@testset "AcbPolyRingElem.scalar_division" begin
    R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
@@ -274,7 +274,7 @@ end
    @test divexact(2*f, 2.0) == f
 end
 
-@testset "acb_poly.evaluation" begin
+@testset "AcbPolyRingElem.evaluation" begin
    R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
@@ -300,7 +300,7 @@ end
    @test evaluate2(f, CC(10)) == (121, 22)
 end
 
-@testset "acb_poly.roots" begin
+@testset "AcbPolyRingElem.roots" begin
    R, x = polynomial_ring(CC, "x")
 
    f = (x - 1)*(x - 2)*(x - CC("5 +/- 0.001"))
@@ -312,7 +312,7 @@ end
    @test contains(r[3], 5)
 end
 
-@testset "acb_poly.composition" begin
+@testset "AcbPolyRingElem.composition" begin
    R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
@@ -321,7 +321,7 @@ end
    @test compose(f, g) == x^6+6*x^4+4*x^3+9*x^2+12*x+4
 end
 
-@testset "acb_poly.derivative_integral" begin
+@testset "AcbPolyRingElem.derivative_integral" begin
    R, x = polynomial_ring(CC, "x")
 
    f = x^2 + 2x + 1
@@ -331,12 +331,12 @@ end
    @test contains(derivative(integral(f)), f)
 end
 
-@testset "acb_poly.evaluation_interpolation" begin
+@testset "AcbPolyRingElem.evaluation_interpolation" begin
    R, x = polynomial_ring(CC, "x")
 
    n = 5
-   xs = acb[inv(CC(i)) for i=1:n]
-   ys = acb[CC(i) for i=1:n]
+   xs = AcbFieldElem[inv(CC(i)) for i=1:n]
+   ys = AcbFieldElem[CC(i) for i=1:n]
 
    f = interpolate(R, xs, ys)
    vs = evaluate(f, xs)
@@ -375,7 +375,7 @@ end
    end
 end
 
-@testset "acb_poly.root_bound" begin
+@testset "AcbPolyRingElem.root_bound" begin
    Rx, x = polynomial_ring(CC, "x")
 
    for i in 1:2
@@ -392,5 +392,5 @@ end
    R, t = polynomial_ring(CC, "t")
    D, Dt = polynomial_ring(R, "Dt")
    A_scalarform = t^3 * (32 * t^2 - 1) * (32 * t^2 + 1) * Dt^4 + 2 * t^2 * (7168 * t^4 - 3) * Dt^3 + t * (55296 * t^4 - 7) * Dt^2 + (61440 * t^4 - 1) * Dt + 12288 * t^3
-   @test A_scalarform isa PolyRingElem{acb_poly}
+   @test A_scalarform isa PolyRingElem{AcbPolyRingElem}
 end

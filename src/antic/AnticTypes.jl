@@ -6,12 +6,12 @@
 
 ###############################################################################
 #
-#   AnticNumberField / nf_elem
+#   AbsSimpleNumField / AbsSimpleNumFieldElem
 #
 ###############################################################################
 
 """
-    AnticNumberField
+    AbsSimpleNumField
 
 This is the basic type for absolute extensions, i.e., an extension of QQ by some
 irreducible monic polyomial with coefficients in either ZZ or QQ.
@@ -20,7 +20,7 @@ Creation is usually by calling [`number_field`](@ref), but see also
 [`cyclotomic_field`](@ref) and [`cyclotomic_real_subfield`](@ref)
 for some more specialized fields.
 """
-@attributes mutable struct AnticNumberField <: SimpleNumField{QQFieldElem}
+@attributes mutable struct AbsSimpleNumField <: SimpleNumField{QQFieldElem}
    pol_coeffs::Ptr{Nothing}
    pol_alloc::Int
    pol_length::Int
@@ -38,13 +38,13 @@ for some more specialized fields.
    pol::QQPolyRingElem
    S::Symbol
 
-   function AnticNumberField(pol::QQPolyRingElem, s::Symbol, cached::Bool = false, check::Bool = true)
+   function AbsSimpleNumField(pol::QQPolyRingElem, s::Symbol, cached::Bool = false, check::Bool = true)
      check && !is_irreducible(pol) && error("Polynomial must be irreducible")
      return get_cached!(AnticNumberFieldID, (parent(pol), pol, s), cached) do
         nf = new()
         nf.pol = pol
         ccall((:nf_init, libantic), Nothing, 
-           (Ref{AnticNumberField}, Ref{QQPolyRingElem}), nf, pol)
+           (Ref{AbsSimpleNumField}, Ref{QQPolyRingElem}), nf, pol)
         finalizer(_AnticNumberField_clear_fn, nf)
         nf.S = s
         return nf
@@ -52,15 +52,15 @@ for some more specialized fields.
    end
 end
 
-const AnticNumberFieldID = CacheDictType{Tuple{QQPolyRing, QQPolyRingElem, Symbol}, AnticNumberField}()
+const AnticNumberFieldID = CacheDictType{Tuple{QQPolyRing, QQPolyRingElem, Symbol}, AbsSimpleNumField}()
 
 
-function _AnticNumberField_clear_fn(a::AnticNumberField)
-   ccall((:nf_clear, libantic), Nothing, (Ref{AnticNumberField},), a)
+function _AnticNumberField_clear_fn(a::AbsSimpleNumField)
+   ccall((:nf_clear, libantic), Nothing, (Ref{AbsSimpleNumField},), a)
 end
 
 """
-    nf_elem
+    AbsSimpleNumFieldElem
  
 The element type of an (absolute simple) number field, i.e., an extension
 of QQ by an irreducible polynomial.
@@ -70,37 +70,37 @@ Essentially never called directly.
 
 See also [`number_field`](@ref).
 """
-mutable struct nf_elem <: SimpleNumFieldElem{QQFieldElem}
+mutable struct AbsSimpleNumFieldElem <: SimpleNumFieldElem{QQFieldElem}
    elem_coeffs::Ptr{Nothing}
    elem_alloc::Int
    elem_length::Int
    elem_den::Int
    # end antic struct
 
-   parent::AnticNumberField
+   parent::AbsSimpleNumField
 
-   function nf_elem(p::AnticNumberField)
+   function AbsSimpleNumFieldElem(p::AbsSimpleNumField)
       r = new()
       ccall((:nf_elem_init, libantic), Nothing, 
-            (Ref{nf_elem}, Ref{AnticNumberField}), r, p)
+            (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}), r, p)
       r.parent = p
       finalizer(_nf_elem_clear_fn, r)
       return r
    end
 
-   function nf_elem(p::AnticNumberField, a::nf_elem)
+   function AbsSimpleNumFieldElem(p::AbsSimpleNumField, a::AbsSimpleNumFieldElem)
       r = new()
       ccall((:nf_elem_init, libantic), Nothing, 
-            (Ref{nf_elem}, Ref{AnticNumberField}), r, p)
+            (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}), r, p)
       ccall((:nf_elem_set, libantic), Nothing,
-            (Ref{nf_elem}, Ref{nf_elem}, Ref{AnticNumberField}), r, a, p)
+            (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}), r, a, p)
       r.parent = p
       finalizer(_nf_elem_clear_fn, r)
       return r
    end
 end
 
-function _nf_elem_clear_fn(a::nf_elem)
+function _nf_elem_clear_fn(a::AbsSimpleNumFieldElem)
    ccall((:nf_elem_clear, libantic), Nothing, 
-         (Ref{nf_elem}, Ref{AnticNumberField}), a, a.parent)
+         (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}), a, a.parent)
 end

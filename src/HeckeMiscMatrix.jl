@@ -333,11 +333,11 @@ mod_sym(M::ZZMatrix, B::Integer) = mod_sym(M, ZZRingElem(B))
 
 
 @doc raw"""
-    mod_sym!(A::Generic.Mat{nf_elem}, m::ZZRingElem)
+    mod_sym!(A::Generic.Mat{AbsSimpleNumFieldElem}, m::ZZRingElem)
 
 Inplace: reduce all entries of $A$ modulo $m$, into the symmetric residue system.
 """
-function mod_sym!(A::Generic.Mat{nf_elem}, m::ZZRingElem)
+function mod_sym!(A::Generic.Mat{AbsSimpleNumFieldElem}, m::ZZRingElem)
     for i = 1:nrows(A)
         for j = 1:ncols(A)
             mod_sym!(A[i, j], m)
@@ -527,7 +527,7 @@ function compare_index(A::ZZMatrix, i::Int, j::Int, b::ZZRingElem)
     return ccall((:fmpz_cmp, libflint), Int32, (Ptr{ZZRingElem}, Ref{ZZRingElem}), a, b)
 end
 
-function round!(b::ZZMatrix, a::arb_mat)
+function round!(b::ZZMatrix, a::ArbMatrix)
     s = size(a)
     for i = 1:s[1]
         for j = 1:s[2]

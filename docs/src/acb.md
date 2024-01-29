@@ -9,7 +9,7 @@ end
 
 Arbitrary precision complex ball arithmetic is supplied by Arb which provides a
 ball representation which tracks error bounds rigorously. Complex numbers are 
-represented in rectangular form $a+bi$ where $a,b$ are `arb` balls.
+represented in rectangular form $a+bi$ where $a,b$ are `ArbFieldElem` balls.
 
 The Arb complex field is constructed using the `AcbField` constructor. This
 constructs the parent object for the Arb complex field.
@@ -19,7 +19,7 @@ the libraries that provide them and the associated types of the parent objects.
 
  Library | Field                | Element type  | Parent type
 ---------|----------------------|---------------|--------------
-Arb      | $\mathbb{C}$ (boxes) | `acb`         | `AcbField`
+Arb      | $\mathbb{C}$ (boxes) | `AcbFieldElem`         | `AcbField`
 
 All the complex field types belong to the `Field` abstract type and the types of
 elements in this field, i.e. complex boxes in this case, belong to the
@@ -105,7 +105,7 @@ fields. Any custom complex field implementation in Nemo should provide analogues
 of these functions along with the usual arithmetic operations.
 
 ```
-parent_type(::Type{acb})
+parent_type(::Type{AcbFieldElem})
 ```
 
 Gives the type of the parent object of an Arb complex field element.
@@ -118,7 +118,7 @@ Given the parent object for an Arb complex field, return the type of elements
 of the field.
 
 ```
-mul!(c::acb, a::acb, b::acb)
+mul!(c::AcbFieldElem, a::AcbFieldElem, b::AcbFieldElem)
 ```
 
 Multiply $a$ by $b$ and set the existing Arb complex field element $c$ to the
@@ -127,7 +127,7 @@ allocating a new object for the result and eliminates associated garbage
 collection.
 
 ```
-addeq!(c::acb, a::acb)
+addeq!(c::AcbFieldElem, a::AcbFieldElem)
 ```
 
 In-place addition adds $a$ to $c$ and sets $c$ to the result. This function
@@ -135,7 +135,7 @@ is provided for performance reasons as it saves allocating a new object for
 the result and eliminates associated garbage collection.
 
 ```
-deepcopy(a::acb)
+deepcopy(a::AcbFieldElem)
 ```
 
 Return a copy of the Arb complex field element $a$, recursively copying the
@@ -177,13 +177,13 @@ Coerce the decimal number, given as a string, into the Arb complex field. In
 each case $f$ is the real part and $g$ is the imaginary part.
 
 ```
-R(f::arb)
+R(f::ArbFieldElem)
 ```
 
 Coerce the given Arb real ball into the Arb complex field.
 
 ```
-R(f::acb)
+R(f::AcbFieldElem)
 ```
 
 Take an Arb complex field element that is already in an Arb field and simply
@@ -222,25 +222,25 @@ that they provide the equivalent of the function `base_ring(R::AcbField)`
 which should return `Union{}`. In addition to this they should ensure that
 each complex field element contains a field `parent` specifying the parent
 object of the complex field element, or at least supply the equivalent of the
-function `parent(a::acb)` to return the parent object of a complex field
+function `parent(a::AcbFieldElem)` to return the parent object of a complex field
 element.
 
 ### Basic manipulation
 
 ```@docs
-isfinite(::acb)
+isfinite(::AcbFieldElem)
 ```
 
 ```@docs
-is_exact(::acb)
+is_exact(::AcbFieldElem)
 ```
 
 ```@docs
-isinteger(::acb)
+isinteger(::AcbFieldElem)
 ```
 
 ```@docs
-accuracy_bits(::acb)
+accuracy_bits(::AcbFieldElem)
 ```
 
 **Examples**
@@ -282,24 +282,24 @@ contained in a given complex box or whether two boxes overlap. The following
 functions are provided for this purpose.
 
 ```@docs
-overlaps(::acb, ::acb)
+overlaps(::AcbFieldElem, ::AcbFieldElem)
 ```
 
 ```@docs
-contains(::acb, ::acb)
+contains(::AcbFieldElem, ::AcbFieldElem)
 ```
 
 ```@docs
-contains(::acb, ::Integer)
-contains(::acb, ::ZZRingElem)
-contains(::acb, ::QQFieldElem)
+contains(::AcbFieldElem, ::Integer)
+contains(::AcbFieldElem, ::ZZRingElem)
+contains(::AcbFieldElem, ::QQFieldElem)
 ```
 
 The following functions are also provided for determining if a box intersects
 a certain part of the complex number plane.
 
 ```@docs
-contains_zero(::acb)
+contains_zero(::AcbFieldElem)
 ```
 
 **Examples**
@@ -339,7 +339,7 @@ distinct from arithmetic equality implemented by `==`, which merely compares up 
 minimum of the precisions of its operands.
 
 ```@docs
-isequal(::acb, ::acb)
+isequal(::AcbFieldElem, ::AcbFieldElem)
 ```
 
 A full range of ad hoc comparison operators is provided. These are implemented directly
@@ -347,14 +347,14 @@ in Julia, but we document them as though only `==` were provided.
 
 Function                     |
 -----------------------------|
-`==(x::acb, y::Integer)`     |
-`==(x::Integer, y::acb)`     |
-`==(x::acb, y::ZZRingElem)`        |
-`==(x::ZZRingElem, y::acb)`        |
-`==(x::arb, y::ZZRingElem)`        |
-`==(x::ZZRingElem, y::arb)`        |
-`==(x::acb, y::Float64)`     |
-`==(x::Float64, y::acb)`     |
+`==(x::AcbFieldElem, y::Integer)`     |
+`==(x::Integer, y::AcbFieldElem)`     |
+`==(x::AcbFieldElem, y::ZZRingElem)`        |
+`==(x::ZZRingElem, y::AcbFieldElem)`        |
+`==(x::ArbFieldElem, y::ZZRingElem)`        |
+`==(x::ZZRingElem, y::ArbFieldElem)`        |
+`==(x::AcbFieldElem, y::Float64)`     |
+`==(x::Float64, y::AcbFieldElem)`     |
 
 **Examples**
 
@@ -420,11 +420,11 @@ julia> b = ldexp(x, -ZZ(15))
 ### Miscellaneous operations
 
 ```@docs
-trim(::acb)
+trim(::AcbFieldElem)
 ```
 
 ```@docs
-unique_integer(::acb)
+unique_integer(::AcbFieldElem)
 ```
 
 **Examples**
@@ -469,11 +469,11 @@ julia> a = const_pi(CC)
 ### Mathematical and special functions
 
 ```@docs
-rsqrt(::acb)
+rsqrt(::AcbFieldElem)
 ```
 
 ```@docs
-cispi(::acb)
+cispi(::AcbFieldElem)
 ```
 
 ```@docs
@@ -481,212 +481,212 @@ root_of_unity(::AcbField, k::Int)
 ```
 
 ```@docs
-log_sinpi(::acb)
+log_sinpi(::AcbFieldElem)
 ```
 
 ```@docs
-gamma(::acb)
+gamma(::AcbFieldElem)
 ```
 
 ```@docs
-lgamma(::acb)
+lgamma(::AcbFieldElem)
 ```
 
 ```@docs
-rgamma(::acb)
+rgamma(::AcbFieldElem)
 ```
 
 ```@docs
-digamma(::acb)
+digamma(::AcbFieldElem)
 ```
 
 ```@docs
-zeta(::acb)
+zeta(::AcbFieldElem)
 ```
 
 ```@docs
-barnes_g(::acb)
+barnes_g(::AcbFieldElem)
 ```
 
 ```@docs
-log_barnes_g(::acb)
+log_barnes_g(::AcbFieldElem)
 ```
 
 ```@docs
-erf(::acb)
+erf(::AcbFieldElem)
 ```
 
 ```@docs
-erfi(::acb)
+erfi(::AcbFieldElem)
 ```
 
 ```@docs
-exp_integral_ei(::acb)
+exp_integral_ei(::AcbFieldElem)
 ```
 
 ```@docs
-sin_integral(::acb)
+sin_integral(::AcbFieldElem)
 ```
 
 ```@docs
-cos_integral(::acb)
+cos_integral(::AcbFieldElem)
 ```
 
 ```@docs
-sinh_integral(::acb)
+sinh_integral(::AcbFieldElem)
 ```
 
 ```@docs
-cosh_integral(::acb)
+cosh_integral(::AcbFieldElem)
 ```
 
 ```@docs
-dedekind_eta(::acb)
+dedekind_eta(::AcbFieldElem)
 ```
 
 ```@docs
-modular_weber_f(::acb)
+modular_weber_f(::AcbFieldElem)
 ```
 
 ```@docs
-modular_weber_f1(::acb)
+modular_weber_f1(::AcbFieldElem)
 ```
 
 ```@docs
-modular_weber_f2(::acb)
+modular_weber_f2(::AcbFieldElem)
 ```
 
 ```@docs
-j_invariant(::acb)
+j_invariant(::AcbFieldElem)
 ```
 
 ```@docs
-modular_lambda(::acb)
+modular_lambda(::AcbFieldElem)
 ```
 
 ```@docs
-modular_delta(::acb)
+modular_delta(::AcbFieldElem)
 ```
 
 ```@docs
-eisenstein_g(::Int, ::acb)
+eisenstein_g(::Int, ::AcbFieldElem)
 ```
 
 ```@docs
-elliptic_k(::acb)
+elliptic_k(::AcbFieldElem)
 ```
 
 ```@docs
-elliptic_e(::acb)
+elliptic_e(::AcbFieldElem)
 ```
 
 ```@docs
-agm(::acb)
-agm(::acb, ::acb)
+agm(::AcbFieldElem)
+agm(::AcbFieldElem, ::AcbFieldElem)
 ```
 
 ```@docs
-polygamma(::acb, ::acb)
+polygamma(::AcbFieldElem, ::AcbFieldElem)
 ```
 
 ```@docs
-zeta(::acb, ::acb)
+zeta(::AcbFieldElem, ::AcbFieldElem)
 ```
 
 ```@docs
-rising_factorial(::acb, ::Int)
+rising_factorial(::AcbFieldElem, ::Int)
 ```
 
 ```@docs
-rising_factorial2(::acb, ::Int)
+rising_factorial2(::AcbFieldElem, ::Int)
 ```
 
 ```@docs
-polylog(::Union{acb,Int}, ::acb)
+polylog(::Union{AcbFieldElem,Int}, ::AcbFieldElem)
 ```
 
 ```@docs
-log_integral(::acb)
+log_integral(::AcbFieldElem)
 ```
 
 ```@docs
-log_integral_offset(::acb)
+log_integral_offset(::AcbFieldElem)
 ```
 
 ```@docs
-exp_integral_e(::acb, ::acb)
+exp_integral_e(::AcbFieldElem, ::AcbFieldElem)
 ```
 
 ```@docs
-gamma(::acb, ::acb)
+gamma(::AcbFieldElem, ::AcbFieldElem)
 ```
 
 ```@docs
-gamma_regularized(::acb, ::acb)
+gamma_regularized(::AcbFieldElem, ::AcbFieldElem)
 ```
 
 ```@docs
-gamma_lower(::acb, ::acb)
+gamma_lower(::AcbFieldElem, ::AcbFieldElem)
 ```
 
 ```@docs
-gamma_lower_regularized(::acb, ::acb)
+gamma_lower_regularized(::AcbFieldElem, ::AcbFieldElem)
 ```
 
 ```@docs
-airy_ai(::acb)
+airy_ai(::AcbFieldElem)
 ```
 
 ```@docs
-airy_ai_prime(::acb)
+airy_ai_prime(::AcbFieldElem)
 ```
 
 ```@docs
-airy_bi(::acb)
+airy_bi(::AcbFieldElem)
 ```
 
 ```@docs
-airy_bi_prime(::acb)
+airy_bi_prime(::AcbFieldElem)
 ```
 
 ```@docs
-bessel_j(::acb, ::acb)
+bessel_j(::AcbFieldElem, ::AcbFieldElem)
 ```
 
 ```@docs
-bessel_y(::acb, ::acb)
+bessel_y(::AcbFieldElem, ::AcbFieldElem)
 ```
 
 ```@docs
-bessel_i(::acb, ::acb)
+bessel_i(::AcbFieldElem, ::AcbFieldElem)
 ```
 
 ```@docs
-bessel_k(::acb, ::acb)
+bessel_k(::AcbFieldElem, ::AcbFieldElem)
 ```
 
 ```@docs
-hypergeometric_1f1(::acb, ::acb, ::acb)
+hypergeometric_1f1(::AcbFieldElem, ::AcbFieldElem, ::AcbFieldElem)
 ```
 
 ```@docs
-hypergeometric_1f1_regularized(::acb, ::acb, ::acb)
+hypergeometric_1f1_regularized(::AcbFieldElem, ::AcbFieldElem, ::AcbFieldElem)
 ```
 
 ```@docs
-hypergeometric_u(::acb, ::acb, ::acb)
+hypergeometric_u(::AcbFieldElem, ::AcbFieldElem, ::AcbFieldElem)
 ```
 
 ```@docs
-hypergeometric_2f1(::acb, ::acb, ::acb, ::acb)
+hypergeometric_2f1(::AcbFieldElem, ::AcbFieldElem, ::AcbFieldElem, ::AcbFieldElem)
 ```
 
 ```@docs
-jacobi_theta(::acb, ::acb)
+jacobi_theta(::AcbFieldElem, ::AcbFieldElem)
 ```
 
 ```@docs
-weierstrass_p(::acb, ::acb)
+weierstrass_p(::AcbFieldElem, ::AcbFieldElem)
 ```
 
 **Examples**
@@ -717,11 +717,11 @@ julia> d = hypergeometric_1f1(s, s+1, z)
 ### Linear dependence
 
 ```@docs
-lindep(::Vector{acb}, n::Int)
+lindep(::Vector{AcbFieldElem}, n::Int)
 ```
 
 ```@docs
-lindep(A::Matrix{acb}, bits::Int)
+lindep(A::Matrix{AcbFieldElem}, bits::Int)
 ```
 
 **Examples**

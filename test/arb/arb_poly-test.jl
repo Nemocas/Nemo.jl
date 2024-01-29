@@ -1,6 +1,6 @@
 RR = ArbField(64)
 
-@testset "arb_poly.constructors" begin
+@testset "ArbPolyRingElem.constructors" begin
    S1 = PolyRing(RR)
    S2 = PolyRing(RR)
 
@@ -9,10 +9,10 @@ RR = ArbField(64)
 
    R, x = polynomial_ring(RR, "x")
 
-   @test elem_type(R) == arb_poly
-   @test elem_type(ArbPolyRing) == arb_poly
-   @test parent_type(arb_poly) == ArbPolyRing
-   @test dense_poly_type(arb) == arb_poly
+   @test elem_type(R) == ArbPolyRingElem
+   @test elem_type(ArbPolyRing) == ArbPolyRingElem
+   @test parent_type(ArbPolyRingElem) == ArbPolyRing
+   @test dense_poly_type(ArbFieldElem) == ArbPolyRingElem
 
    @test typeof(R) <: ArbPolyRing
 
@@ -37,18 +37,18 @@ RR = ArbField(64)
    for T in [Int, UInt, BigInt, Float64, BigFloat, ZZRingElem, QQFieldElem, Rational{Int}, Rational{BigInt}]
       l = R(T[1, 2, 3])
 
-      @test isa(l, arb_poly)
+      @test isa(l, ArbPolyRingElem)
    end
 end
 
-@testset "arb_poly.printing" begin
+@testset "ArbPolyRingElem.printing" begin
    R, x = polynomial_ring(RR, "x")
    f = x^3 + 2x^2 + x + 1
 
    @test sprint(show, "text/plain", f) == "x^3 + 2.0000000000000000000*x^2 + x + 1"
 end
 
-@testset "arb_poly.manipulation" begin
+@testset "ArbPolyRingElem.manipulation" begin
    R, x = polynomial_ring(RR, "x")
 
    @test iszero(zero(R))
@@ -78,7 +78,7 @@ end
    @test characteristic(R) == 0
 end
 
-@testset "arb_poly.polynomial" begin
+@testset "ArbPolyRingElem.polynomial" begin
    R = ArbField(53)
 
    f = polynomial(R, [])
@@ -87,33 +87,33 @@ end
    k = polynomial(R, [R(1), R(2), R(3)])
    p = polynomial(R, [1, 2, 3], "y")
 
-   @test isa(f, arb_poly)
-   @test isa(g, arb_poly)
-   @test isa(h, arb_poly)
-   @test isa(k, arb_poly)
-   @test isa(p, arb_poly)
+   @test isa(f, ArbPolyRingElem)
+   @test isa(g, ArbPolyRingElem)
+   @test isa(h, ArbPolyRingElem)
+   @test isa(k, ArbPolyRingElem)
+   @test isa(p, ArbPolyRingElem)
 
    q = polynomial(R, [1, 2, 3], cached=false)
 
    @test parent(g) != parent(q)
 end
 
-@testset "arb_poly.similar" begin
+@testset "ArbPolyRingElem.similar" begin
    R = ArbField(53)
 
    f = polynomial(R, [1, 2, 3])
    g = similar(f)
    h = similar(f, "y")
 
-   @test isa(g, arb_poly)
-   @test isa(h, arb_poly)
+   @test isa(g, ArbPolyRingElem)
+   @test isa(h, ArbPolyRingElem)
 
    q = similar(g, cached=false)
 
    @test parent(g) != parent(q)
 end
 
-@testset "arb_poly.binary_ops" begin
+@testset "ArbPolyRingElem.binary_ops" begin
    R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
@@ -126,7 +126,7 @@ end
    @test f - g == -x^3+x^2-x-1
 end
 
-@testset "arb_poly.adhoc_binary" begin
+@testset "ArbPolyRingElem.adhoc_binary" begin
    R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
@@ -153,7 +153,7 @@ end
    end
 end
 
-@testset "arb_poly.comparison" begin
+@testset "ArbPolyRingElem.comparison" begin
    R, x = polynomial_ring(RR, "x")
    Zx, zx = polynomial_ring(ZZ, "x")
    Qx, qx = polynomial_ring(QQ, "x")
@@ -199,7 +199,7 @@ end
    @test !uniq
 end
 
-@testset "arb_poly.adhoc_comparison" begin
+@testset "ArbPolyRingElem.adhoc_comparison" begin
    R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
@@ -221,7 +221,7 @@ end
    @test QQ(7) != f
 end
 
-@testset "arb_poly.unary_ops" begin
+@testset "ArbPolyRingElem.unary_ops" begin
    R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
@@ -229,7 +229,7 @@ end
    @test -f == -x^2 - 2x - 1
 end
 
-@testset "arb_poly.truncation" begin
+@testset "ArbPolyRingElem.truncation" begin
    R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
@@ -244,7 +244,7 @@ end
    @test_throws DomainError mullow(f, g, -1)
 end
 
-@testset "arb_poly.reverse" begin
+@testset "ArbPolyRingElem.reverse" begin
    R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 3
@@ -252,7 +252,7 @@ end
    #@test reverse(f) == 3x^2 + 2x + 1
 end
 
-@testset "arb_poly.shift" begin
+@testset "ArbPolyRingElem.shift" begin
    R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
@@ -266,7 +266,7 @@ end
    @test_throws DomainError shift_right(f, -1)
 end
 
-@testset "arb_poly.powering" begin
+@testset "ArbPolyRingElem.powering" begin
    R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
@@ -276,7 +276,7 @@ end
    @test_throws DomainError f^-1
 end
 
-@testset "arb_poly.exact_division" begin
+@testset "ArbPolyRingElem.exact_division" begin
    R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
@@ -301,7 +301,7 @@ end
    @test divexact(2*f, 2.0) == f
 end
 
-@testset "arb_poly.evaluation" begin
+@testset "ArbPolyRingElem.evaluation" begin
    R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
@@ -327,7 +327,7 @@ end
    @test evaluate2(f, RR(10)) == (121, 22)
 end
 
-@testset "arb_poly.composition" begin
+@testset "ArbPolyRingElem.composition" begin
    R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
@@ -336,7 +336,7 @@ end
    @test compose(f, g) == x^6+6*x^4+4*x^3+9*x^2+12*x+4
 end
 
-@testset "arb_poly.derivative_integral" begin
+@testset "ArbPolyRingElem.derivative_integral" begin
    R, x = polynomial_ring(RR, "x")
 
    f = x^2 + 2x + 1
@@ -346,12 +346,12 @@ end
    @test contains(derivative(integral(f)), f)
 end
 
-@testset "arb_poly.evaluation_interpolation" begin
+@testset "ArbPolyRingElem.evaluation_interpolation" begin
    R, x = polynomial_ring(RR, "x")
 
    n = 5
-   xs = arb[inv(RR(i)) for i=1:n]
-   ys = arb[RR(i) for i=1:n]
+   xs = ArbFieldElem[inv(RR(i)) for i=1:n]
+   ys = ArbFieldElem[RR(i) for i=1:n]
 
    f = interpolate(R, xs, ys)
    vs = evaluate(f, xs)
@@ -390,7 +390,7 @@ end
    end
 end
 
-@testset "arb_poly.root_bound" begin
+@testset "ArbPolyRingElem.root_bound" begin
    Rx, x = polynomial_ring(RR, "x")
 
    for i in 1:2

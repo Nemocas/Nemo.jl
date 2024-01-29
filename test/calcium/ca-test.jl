@@ -1,22 +1,22 @@
-@testset "ca.constructors" begin
+@testset "CalciumFieldElem.constructors" begin
    C = CalciumField()
 
-   @test elem_type(C) == ca
-   @test elem_type(CalciumField) == ca
-   @test parent_type(ca) == CalciumField
-   @test is_domain_type(ca) == true
+   @test elem_type(C) == CalciumFieldElem
+   @test elem_type(CalciumField) == CalciumFieldElem
+   @test parent_type(CalciumFieldElem) == CalciumField
+   @test is_domain_type(CalciumFieldElem) == true
    @test base_ring(C) == Union{}      # ?
    @test base_ring(C(3)) == Union{}      # ?
 
    @test isa(C, CalciumField)
 
-   @test isa(C(), ca)
-   @test isa(C(2), ca)
-   @test isa(C(2+3im), ca)
-   @test isa(C(ZZRingElem(2)), ca)
-   @test isa(C(QQFieldElem(2)), ca)
-   @test isa(C(qqbar(2)), ca)
-   @test isa(C(C(2)), ca)
+   @test isa(C(), CalciumFieldElem)
+   @test isa(C(2), CalciumFieldElem)
+   @test isa(C(2+3im), CalciumFieldElem)
+   @test isa(C(ZZRingElem(2)), CalciumFieldElem)
+   @test isa(C(QQFieldElem(2)), CalciumFieldElem)
+   @test isa(C(QQBarFieldElem(2)), CalciumFieldElem)
+   @test isa(C(C(2)), CalciumFieldElem)
 
    C2 = CalciumField()
 
@@ -34,12 +34,12 @@
 
 end
 
-@testset "ca.options" begin
+@testset "CalciumFieldElem.options" begin
    C = CalciumField(options=Dict(:prec_limit => 256))
    @test options(C)[:prec_limit] == 256
 end
 
-@testset "ca.printing" begin
+@testset "CalciumFieldElem.printing" begin
    C = CalciumField()
    Cext = CalciumField(extended=true)
 
@@ -53,14 +53,14 @@ end
 
 end
 
-@testset "ca.manipulation" begin
+@testset "CalciumFieldElem.manipulation" begin
    C = CalciumField()
    Cext = CalciumField(extended=true)
 
    @test zero(C) == 0
    @test one(C) == 1
-   @test isa(zero(C), ca)
-   @test isa(one(C), ca)
+   @test isa(zero(C), CalciumFieldElem)
+   @test isa(one(C), CalciumFieldElem)
 
    @test iszero(C(0))
    @test isone(C(1))
@@ -160,82 +160,82 @@ end
 
 end
 
-@testset "ca.adhoc_operations" begin
+@testset "CalciumFieldElem.adhoc_operations" begin
    C = CalciumField()
 
    @test C(2) + C(3) == 5
    @test C(2) + 3 == 5
    @test C(2) + ZZRingElem(3) == 5
    @test C(2) + QQFieldElem(3) == 5
-   @test C(2) + qqbar(3) == 5
+   @test C(2) + QQBarFieldElem(3) == 5
    @test 3 + C(2) == 5
    @test ZZRingElem(3) + C(2) == 5
    @test QQFieldElem(3) + C(2) == 5
-   @test qqbar(3) + C(2) == 5
+   @test QQBarFieldElem(3) + C(2) == 5
 
    @test C(2) - C(3) == -1
    @test C(2) - 3 == -1
    @test C(2) - ZZRingElem(3) == -1
    @test C(2) - QQFieldElem(3) == -1
-   @test C(2) - qqbar(3) == -1
+   @test C(2) - QQBarFieldElem(3) == -1
    @test 3 - C(2) == 1
    @test ZZRingElem(3) - C(2) == 1
    @test QQFieldElem(3) - C(2) == 1
-   @test qqbar(3) - C(2) == 1
+   @test QQBarFieldElem(3) - C(2) == 1
 
    @test C(2) * C(3) == 6
    @test C(2) * 3 == 6
    @test C(2) * ZZRingElem(3) == 6
    @test C(2) * QQFieldElem(3) == 6
-   @test C(2) * qqbar(3) == 6
+   @test C(2) * QQBarFieldElem(3) == 6
    @test 3 * C(2) == 6
    @test ZZRingElem(3) * C(2) == 6
    @test QQFieldElem(3) * C(2) == 6
-   @test qqbar(3) * C(2) == 6
+   @test QQBarFieldElem(3) * C(2) == 6
 
    @test C(6) // C(2) == 3
    @test C(6) // 2 == 3
    @test C(6) // ZZRingElem(2) == 3
    @test C(6) // QQFieldElem(2) == 3
-   @test C(6) // qqbar(2) == 3
+   @test C(6) // QQBarFieldElem(2) == 3
    @test 6 // C(2) == 3
    @test ZZRingElem(6) // C(2) == 3
    @test QQFieldElem(6) // C(2) == 3
-   @test qqbar(6) // C(2) == 3
+   @test QQBarFieldElem(6) // C(2) == 3
 
    @test divexact(C(6), C(2)) == 3
    @test divexact(C(6), 2) == 3
    @test divexact(C(6), ZZRingElem(2)) == 3
    @test divexact(C(6), QQFieldElem(2)) == 3
-   @test divexact(C(6), qqbar(2)) == 3
+   @test divexact(C(6), QQBarFieldElem(2)) == 3
    @test divexact(6, C(2)) == 3
    @test divexact(ZZRingElem(6), C(2)) == 3
    @test divexact(QQFieldElem(6), C(2)) == 3
-   @test divexact(qqbar(6), C(2)) == 3
+   @test divexact(QQBarFieldElem(6), C(2)) == 3
 
    @test C(2) ^ C(3) == 8
    @test C(2) ^ 3 == 8
    @test C(2) ^ ZZRingElem(3) == 8
    @test C(2) ^ QQFieldElem(3) == 8
-   @test C(2) ^ qqbar(3) == 8
+   @test C(2) ^ QQBarFieldElem(3) == 8
    @test 2 ^ C(3) == 8
    @test ZZRingElem(2) ^ C(3) == 8
    @test QQFieldElem(2) ^ C(3) == 8
-   @test qqbar(2) ^ C(3) == 8
+   @test QQBarFieldElem(2) ^ C(3) == 8
 
    @test C(2) < C(3)
    @test C(2) < 3
    @test C(2) < ZZRingElem(3)
    @test C(2) < QQFieldElem(3)
-   @test C(2) < qqbar(3)
+   @test C(2) < QQBarFieldElem(3)
    @test 2 < C(3)
    @test ZZRingElem(2) < C(3)
    @test QQFieldElem(2) < C(3)
-   @test qqbar(2) < C(3)
+   @test QQBarFieldElem(2) < C(3)
 
 end
 
-@testset "ca.conversions" begin
+@testset "CalciumFieldElem.conversions" begin
    C = CalciumField()
 
    n = C(3)
@@ -248,8 +248,8 @@ end
    @test FlintQQ(h) == QQFieldElem(1) // 2
    @test_throws ErrorException FlintZZ(h)
 
-   @test CalciumQQBar(h) == qqbar(1) // 2
-   @test CalciumQQBar(c) == qqbar(1+2im)
+   @test CalciumQQBar(h) == QQBarFieldElem(1) // 2
+   @test CalciumQQBar(c) == QQBarFieldElem(1+2im)
    @test_throws ErrorException CalciumQQBar(t)
 
    RR = ArbField()
@@ -277,7 +277,7 @@ end
    @test ComplexF64(s) == 1 + 2 * im
 end
 
-@testset "ca.inplace" begin
+@testset "CalciumFieldElem.inplace" begin
    C = CalciumField()
    C2 = CalciumField()
 
@@ -312,7 +312,7 @@ end
 
 Base.@irrational mynumber 1.0 BigFloat("1")
 
-@testset "ca.functions" begin
+@testset "CalciumFieldElem.functions" begin
    C = CalciumField()
 
    u = sqrt(C(2))
@@ -386,7 +386,7 @@ Base.@irrational mynumber 1.0 BigFloat("1")
 
 end
 
-@testset "ca.rand" begin
+@testset "CalciumFieldElem.rand" begin
    C = CalciumField()
    Cext = CalciumField(extended=true)
 

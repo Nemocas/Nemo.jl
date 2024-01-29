@@ -21,10 +21,10 @@ pages:
 - Exact real and complex numbers:  complex.md
 - Finite fields:                finitefield.md
 - Finite field embeddings:      ff_embedding.md
-- P-adic fields:                padic.md
-- Q-adic fields:                qadic.md
-- Real balls:                   arb.md
-- Complex boxes:                acb.md
+- P-adic fields:                PadicFieldElem.md
+- Q-adic fields:                QadicFieldElem.md
+- Real balls:                   ArbFieldElem.md
+- Complex boxes:                AcbFieldElem.md
 - Number fields:                numberfield.md
 - Factorization:                factor.md
 - Developer Introduction:       developer/introduction.md

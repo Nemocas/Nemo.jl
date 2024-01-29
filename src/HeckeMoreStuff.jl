@@ -64,37 +64,37 @@ function evaluate!(z::fqPolyRepFieldElem, f::ZZPolyRingElem, r::fqPolyRepFieldEl
 end
 
 
-function norm(v::arb_mat)
+function norm(v::ArbMatrix)
     return sqrt(sum([a^2 for a in v]))
 end
 
-function real(tau::acb_mat)
+function real(tau::AcbMatrix)
     return map(real, tau)
 end
 
-function imag(tau::acb_mat)
+function imag(tau::AcbMatrix)
     return map(imag, tau)
 end
 
-*(x::acb, y::arb_mat) = x * _acb_mat(y)
-*(x::arb_mat, y::acb) = y * x
-*(x::arb_mat, y::acb_mat) = _acb_mat(x) * y
-*(x::acb_mat, y::arb_mat) = x * _acb_mat(y)
-+(x::arb_mat, y::acb_mat) = _acb_mat(x) + y
-+(x::acb_mat, y::arb_mat) = y + x
--(x::arb_mat, y::acb_mat) = x + (-y)
--(x::acb_mat, y::arb_mat) = x + (-y)
-//(x::arb_mat, y::arb) = map(t -> t // y, x)
+*(x::AcbFieldElem, y::ArbMatrix) = x * _acb_mat(y)
+*(x::ArbMatrix, y::AcbFieldElem) = y * x
+*(x::ArbMatrix, y::AcbMatrix) = _acb_mat(x) * y
+*(x::AcbMatrix, y::ArbMatrix) = x * _acb_mat(y)
++(x::ArbMatrix, y::AcbMatrix) = _acb_mat(x) + y
++(x::AcbMatrix, y::ArbMatrix) = y + x
+-(x::ArbMatrix, y::AcbMatrix) = x + (-y)
+-(x::AcbMatrix, y::ArbMatrix) = x + (-y)
+//(x::ArbMatrix, y::ArbFieldElem) = map(t -> t // y, x)
 
 
-function _acb_mat(A::arb_mat)
+function _acb_mat(A::ArbMatrix)
     p = precision(base_ring(A))
     Cc = AcbField(p)
     return change_base_ring(Cc, A)
 end
 
-function mul!(z::acb, x::acb, y::arb)
-    ccall((:acb_mul_arb, libarb), Nothing, (Ref{acb}, Ref{acb}, Ref{arb}, Int),
+function mul!(z::AcbFieldElem, x::AcbFieldElem, y::ArbFieldElem)
+    ccall((:acb_mul_arb, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ArbFieldElem}, Int),
         z, x, y, parent(z).prec)
     return z
 end
@@ -156,7 +156,7 @@ function fits(::Type{Int}, a::Integer)
     return a % Int == a
 end
 
-function (Zx::ZZPolyRing)(a::nf_elem)
+function (Zx::ZZPolyRing)(a::AbsSimpleNumFieldElem)
     b = Zx()
     @assert denominator(a) == 1
     if degree(parent(a)) == 1
@@ -176,7 +176,7 @@ function (Zx::ZZPolyRing)(a::nf_elem)
     return b
 end
 
-function Base.round(::Type{ZZRingElem}, x::arb)
+function Base.round(::Type{ZZRingElem}, x::ArbFieldElem)
     if radius(x) > 1e-1
         throw(InexactError(:round, ZZRingElem, x))
     end
@@ -185,7 +185,7 @@ function Base.round(::Type{ZZRingElem}, x::arb)
     end
 end
 
-function Base.round(::Type{ZZMatrix}, C::arb_mat)
+function Base.round(::Type{ZZMatrix}, C::ArbMatrix)
     v = zero_matrix(FlintZZ, nrows(C), ncols(C))
 
     for i = 1:nrows(C)
@@ -213,11 +213,11 @@ function Base.hash(f::zzModMPolyRingElem, h::UInt)
 end
 
 #to make the MPoly module happy, divrem needs it...
-function Base.div(a::nf_elem, b::nf_elem)
+function Base.div(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem)
     return a // b
 end
 
-function rem(a::nf_elem, b::nf_elem)
+function rem(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem)
     return parent(a)(0)
 end
 
@@ -260,11 +260,11 @@ function Base.round(::Type{ZZRingElem}, a::ZZRingElem, b::ZZRingElem)
     return r
 end
 
-function is_squarefree(x::Generic.Poly{nf_elem})
+function is_squarefree(x::Generic.Poly{AbsSimpleNumFieldElem})
     return isone(gcd(x, derivative(x), true))
 end
 
-function degree(a::nf_elem)
+function degree(a::AbsSimpleNumFieldElem)
     return degree(minpoly(a))
 end
 
@@ -274,21 +274,21 @@ end
 #
 ################################################################################
 
-function charpoly(Qx::QQPolyRing, a::nf_elem)
+function charpoly(Qx::QQPolyRing, a::AbsSimpleNumFieldElem)
     f = charpoly(Qx, representation_matrix(a))
     return f
 end
 
-function charpoly(a::nf_elem)
+function charpoly(a::AbsSimpleNumFieldElem)
     f = charpoly(parent(parent(a).pol), a)
     return f
 end
 
-function charpoly(a::nf_elem, ::QQField)
+function charpoly(a::AbsSimpleNumFieldElem, ::QQField)
     return charpoly(a)
 end
 
-function charpoly(Zx::ZZPolyRing, a::nf_elem)
+function charpoly(Zx::ZZPolyRing, a::AbsSimpleNumFieldElem)
     f = charpoly(a)
     if !isone(denominator(f))
         error("Element is not integral")
@@ -296,7 +296,7 @@ function charpoly(Zx::ZZPolyRing, a::nf_elem)
     return Zx(f)
 end
 
-function charpoly(a::nf_elem, Z::ZZRing)
+function charpoly(a::AbsSimpleNumFieldElem, Z::ZZRing)
     return charpoly(polynomial_ring(Z, cached=false)[1], a)
 end
 
@@ -307,29 +307,29 @@ end
 ################################################################################
 
 @doc raw"""
-    minpoly(a::nf_elem) -> QQPolyRingElem
+    minpoly(a::AbsSimpleNumFieldElem) -> QQPolyRingElem
 
 The minimal polynomial of $a$.
 """
-function minpoly(Qx::QQPolyRing, a::nf_elem)
+function minpoly(Qx::QQPolyRing, a::AbsSimpleNumFieldElem)
     f = minpoly(Qx, representation_matrix(a))
     return f
 end
 
-function minpoly(a::nf_elem)
+function minpoly(a::AbsSimpleNumFieldElem)
     f = minpoly(parent(parent(a).pol), a)
     return f
 end
 
-function minpoly(a::nf_elem, ::QQField)
+function minpoly(a::AbsSimpleNumFieldElem, ::QQField)
     return minpoly(a)
 end
 
-function minpoly(a::nf_elem, ZZ::ZZRing)
+function minpoly(a::AbsSimpleNumFieldElem, ZZ::ZZRing)
     return minpoly(polynomial_ring(ZZ, cached=false)[1], a)
 end
 
-function minpoly(Zx::ZZPolyRing, a::nf_elem)
+function minpoly(Zx::ZZPolyRing, a::AbsSimpleNumFieldElem)
     f = minpoly(a)
     if !isone(denominator(f))
         error("Element is not integral")
@@ -345,29 +345,29 @@ function one!(a::QQMPolyRingElem)
     return a
 end
 
-(::QQField)(a::nf_elem) = (is_rational(a) && return coeff(a, 0)) || error("not a rational")
-(::ZZRing)(a::nf_elem) = (is_integer(a) && return numerator(coeff(a, 0))) || error("not an integer")
+(::QQField)(a::AbsSimpleNumFieldElem) = (is_rational(a) && return coeff(a, 0)) || error("not a rational")
+(::ZZRing)(a::AbsSimpleNumFieldElem) = (is_integer(a) && return numerator(coeff(a, 0))) || error("not an integer")
 
-function set_name!(K::AnticNumberField, s::String)
+function set_name!(K::AbsSimpleNumField, s::String)
     set_attribute!(K, :name => s)
 end
 
-function set_name!(K::AnticNumberField)
+function set_name!(K::AbsSimpleNumField)
     s = find_name(K)
     s === nothing || set_name!(K, string(s))
 end
 
-function Base.:(^)(a::nf_elem, e::UInt)
+function Base.:(^)(a::AbsSimpleNumFieldElem, e::UInt)
     b = parent(a)()
     ccall((:nf_elem_pow, libantic), Nothing,
-        (Ref{nf_elem}, Ref{nf_elem}, UInt, Ref{AnticNumberField}),
+        (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, UInt, Ref{AbsSimpleNumField}),
         b, a, e, parent(a))
     return b
 end
 
 Base.copy(f::QQPolyRingElem) = parent(f)(f)
 
-function basis(K::AnticNumberField)
+function basis(K::AbsSimpleNumField)
     n = degree(K)
     g = gen(K)
     d = Array{typeof(g)}(undef, n)
@@ -380,7 +380,7 @@ function basis(K::AnticNumberField)
     return d
 end
 
-base_field(_::AnticNumberField) = FlintQQ
+base_field(_::AbsSimpleNumField) = FlintQQ
 
 ################################################################################
 #
@@ -424,8 +424,8 @@ function (R::FqPolyRing)(g::QQPolyRingElem)
     return fmpq_poly_to_fq_default_poly(R, g)
 end
 
-function bits(x::arb)
-    return ccall((:arb_bits, libarb), Int, (Ref{arb},), x)
+function bits(x::ArbFieldElem)
+    return ccall((:arb_bits, libarb), Int, (Ref{ArbFieldElem},), x)
 end
 
 function *(a::ZZMatrix, b::Matrix{BigFloat})
@@ -506,59 +506,59 @@ end
 
 #Assuming that the denominator of a is one, reduces all the coefficients modulo p
 # non-symmetric (positive) residue system
-function mod!(a::nf_elem, b::ZZRingElem)
+function mod!(a::AbsSimpleNumFieldElem, b::ZZRingElem)
     ccall((:nf_elem_mod_fmpz, libantic), Nothing,
-        (Ref{nf_elem}, Ref{nf_elem}, Ref{ZZRingElem}, Ref{AnticNumberField}),
+        (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{ZZRingElem}, Ref{AbsSimpleNumField}),
         a, a, b, parent(a))
     return a
 end
 
 @doc raw"""
-    numerator(a::nf_elem) -> nf_elem
+    numerator(a::AbsSimpleNumFieldElem) -> AbsSimpleNumFieldElem
 
 For an element $a\in K = Q[t]/f$ write $a$ as $b/d$ with
 $b\in Z[t]$, $\deg(a) = \deg(b)$ and $d>0$ minimal in $Z$.
 This function returns $b$.
 """
-function numerator(a::nf_elem)
+function numerator(a::AbsSimpleNumFieldElem)
     _one = one(FlintZZ)
     z = deepcopy(a)
     ccall((:nf_elem_set_den, libantic), Nothing,
-        (Ref{nf_elem}, Ref{ZZRingElem}, Ref{AnticNumberField}),
+        (Ref{AbsSimpleNumFieldElem}, Ref{ZZRingElem}, Ref{AbsSimpleNumField}),
         z, _one, a.parent)
     return z
 end
 
-function one!(r::nf_elem)
+function one!(r::AbsSimpleNumFieldElem)
     a = parent(r)
     ccall((:nf_elem_one, libantic), Nothing,
-        (Ref{nf_elem}, Ref{AnticNumberField}), r, a)
+        (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}), r, a)
     return r
 end
 
-function one(r::nf_elem)
+function one(r::AbsSimpleNumFieldElem)
     a = parent(r)
     return one(a)
 end
 
-function zero(r::nf_elem)
+function zero(r::AbsSimpleNumFieldElem)
     return zero(parent(r))
 end
 
-function divexact!(z::nf_elem, x::nf_elem, y::ZZRingElem)
+function divexact!(z::AbsSimpleNumFieldElem, x::AbsSimpleNumFieldElem, y::ZZRingElem)
     ccall((:nf_elem_scalar_div_fmpz, libantic), Nothing,
-        (Ref{nf_elem}, Ref{nf_elem}, Ref{ZZRingElem}, Ref{AnticNumberField}),
+        (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{ZZRingElem}, Ref{AbsSimpleNumField}),
         z, x, y, parent(x))
     return z
 end
 
-function sub!(a::nf_elem, b::nf_elem, c::nf_elem)
+function sub!(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem, c::AbsSimpleNumFieldElem)
     ccall((:nf_elem_sub, libantic), Nothing,
-        (Ref{nf_elem}, Ref{nf_elem}, Ref{nf_elem}, Ref{AnticNumberField}),
+        (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}),
         a, b, c, a.parent)
 end
 
-Base.copy(d::nf_elem) = deepcopy(d)
+Base.copy(d::AbsSimpleNumFieldElem) = deepcopy(d)
 
 function addmul!(A::fpMatrix, B::fpMatrix, C::fpFieldElem, D::fpMatrix)
     ccall((:nmod_mat_scalar_addmul_ui, libflint), Nothing, (Ref{fpMatrix}, Ref{fpMatrix}, Ref{fpMatrix}, UInt), A, B, D, C.data)
@@ -692,32 +692,32 @@ function divexact!(a::ZZRingElem, b::ZZRingElem)
     return a
 end
 
-function round!(z::arb, x::arb, p::Int)
-    ccall((:arb_set_round, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, p)
+function round!(z::ArbFieldElem, x::ArbFieldElem, p::Int)
+    ccall((:arb_set_round, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, p)
     z.parent = ArbField(p, cached=false)
     return z
 end
 
-function round!(z::acb, x::acb, p::Int)
-    ccall((:acb_set_round, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, p)
+function round!(z::AcbFieldElem, x::AcbFieldElem, p::Int)
+    ccall((:acb_set_round, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, p)
     z.parent = AcbField(p, cached=false)
     return z
 end
 
-function round(x::arb, p::Int)
+function round(x::ArbFieldElem, p::Int)
     z = ArbField(p, cached=false)()
-    ccall((:arb_set_round, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, p)
+    ccall((:arb_set_round, libarb), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, p)
     return z
 end
 
-function round(x::acb, p::Int)
+function round(x::AcbFieldElem, p::Int)
     z = AcbField(p, cached=false)()
-    ccall((:acb_set_round, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, p)
+    ccall((:acb_set_round, libarb), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, p)
     return z
 end
 
-function bits(x::acb)
-    return ccall((:acb_bits, libarb), Int, (Ref{acb},), x)
+function bits(x::AcbFieldElem)
+    return ccall((:acb_bits, libarb), Int, (Ref{AcbFieldElem},), x)
 end
 
 function Base.Int128(x::ZZRingElem)
@@ -1020,7 +1020,7 @@ function (R::ZZMPolyRing)(f::QQMPolyRingElem)
 end
 
 # mainly for testing
-function rand(L::Loc{T}, num_scale=(1:1000), den_scale=(1:1000)) where {T<:ZZRingElem}
+function rand(L::LocalizedEuclideanRing{T}, num_scale=(1:1000), den_scale=(1:1000)) where {T<:ZZRingElem}
     num = rand(num_scale)
     den = rand(den_scale)
     while gcd(den, prime(L)) != 1
@@ -1029,7 +1029,7 @@ function rand(L::Loc{T}, num_scale=(1:1000), den_scale=(1:1000)) where {T<:ZZRin
     return L(num // den)
 end
 
-function rand(L::Loc{T}, num_scale::Vector, den_scale::Integer) where {T<:ZZRingElem}
+function rand(L::LocalizedEuclideanRing{T}, num_scale::Vector, den_scale::Integer) where {T<:ZZRingElem}
     num = rand(num_scale)
     den = rand(den_scale)
     while gcd(den, prime(L)) != 1
@@ -1050,7 +1050,7 @@ function cmpabs(a::Int, b::Int)
     end
 end
 
-function evaluate(f::QQPolyRingElem, a::nf_elem)
+function evaluate(f::QQPolyRingElem, a::AbsSimpleNumFieldElem)
     #Base.show_backtrace(stdout, Base.stacktrace())
     R = parent(a)
     if iszero(f)
@@ -1197,7 +1197,7 @@ function (Rx::Generic.PolyRing{PadicFieldElem})(a::QadicFieldElem)
     coeffs = Vector{PadicFieldElem}(undef, degree(Qq))
     for i = 1:length(coeffs)
         c = R()
-        ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
+        ccall((:padic_poly_get_coeff_PadicFieldElem, libflint), Nothing,
             (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Int, Ref{QadicField}), c, a, i - 1, parent(a))
         coeffs[i] = c
     end
@@ -1207,13 +1207,13 @@ end
 function coeff(x::QadicFieldElem, i::Int)
     R = PadicField(prime(parent(x)), parent(x).prec_max)
     c = R()
-    ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
+    ccall((:padic_poly_get_coeff_PadicFieldElem, libflint), Nothing,
         (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Int, Ref{QadicField}), c, x, i, parent(x))
     return c
 end
 
 function setcoeff!(x::QadicFieldElem, i::Int, y::PadicFieldElem)
-    ccall((:padic_poly_set_coeff_padic, libflint), Nothing,
+    ccall((:padic_poly_set_coeff_PadicFieldElem, libflint), Nothing,
         (Ref{QadicFieldElem}, Int, Ref{PadicFieldElem}, Ref{QadicField}), x, i, y, parent(x))
 end
 
@@ -1224,7 +1224,7 @@ end
 function setcoeff!(x::QadicFieldElem, i::Int, y::ZZRingElem)
     R = PadicField(prime(parent(x)), parent(x).prec_max)
     Y = R(ZZRingElem(y))
-    ccall((:padic_poly_set_coeff_padic, libflint), Nothing,
+    ccall((:padic_poly_set_coeff_PadicFieldElem, libflint), Nothing,
         (Ref{QadicFieldElem}, Int, Ref{PadicFieldElem}, Ref{QadicField}), x, i, Y, parent(x))
 end
 
@@ -1339,11 +1339,11 @@ degree(::PadicField) = 1
 
 
 @doc raw"""
-    mod!(A::Generic.Mat{nf_elem}, m::ZZRingElem)
+    mod!(A::Generic.Mat{AbsSimpleNumFieldElem}, m::ZZRingElem)
 
 Inplace: reduce all entries of $A$ modulo $m$, into the positive residue system.
 """
-function mod!(A::Generic.Mat{nf_elem}, m::ZZRingElem)
+function mod!(A::Generic.Mat{AbsSimpleNumFieldElem}, m::ZZRingElem)
     for i = 1:nrows(A)
         for j = 1:ncols(A)
             mod!(A[i, j], m)
@@ -1352,11 +1352,11 @@ function mod!(A::Generic.Mat{nf_elem}, m::ZZRingElem)
 end
 
 @doc raw"""
-    divexact!(A::Generic.Mat{nf_elem}, p::ZZRingElem)
+    divexact!(A::Generic.Mat{AbsSimpleNumFieldElem}, p::ZZRingElem)
 
 Inplace: divide each entry of $A$ by $p$.
 """
-function divexact!(A::Generic.Mat{nf_elem}, p::ZZRingElem)
+function divexact!(A::Generic.Mat{AbsSimpleNumFieldElem}, p::ZZRingElem)
     for i = 1:nrows(A)
         for j = 1:ncols(A)
             A[i, j] = A[i, j] // p
@@ -1440,7 +1440,7 @@ function zeros(f::ZZPolyRingElem)
 end
 
 #This should probably go somewhere else. (Taking the nth derivative)
-function derivative(x::acb_poly, n::Int64)
+function derivative(x::AcbPolyRingElem, n::Int64)
     for i in (1:n)
         x = derivative(x)
     end
@@ -1460,12 +1460,12 @@ end
 degree(::EuclideanRingResidueField{ZZRingElem}) = 1
 degree(::QQField) = 1
 
-Base.:(*)(x::QQFieldElem, y::AbstractAlgebra.Generic.MatSpaceElem{nf_elem}) = base_ring(y)(x) * y
+Base.:(*)(x::QQFieldElem, y::AbstractAlgebra.Generic.MatSpaceElem{AbsSimpleNumFieldElem}) = base_ring(y)(x) * y
 
 
-function mod_sym!(a::nf_elem, b::ZZRingElem)
+function mod_sym!(a::AbsSimpleNumFieldElem, b::ZZRingElem)
     ccall((:nf_elem_smod_fmpz, libantic), Nothing,
-        (Ref{nf_elem}, Ref{nf_elem}, Ref{ZZRingElem}, Ref{AnticNumberField}),
+        (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{ZZRingElem}, Ref{AbsSimpleNumField}),
         a, a, b, parent(a))
     return a
 end
@@ -1487,7 +1487,7 @@ end
 
 Base.replace!(::typeof(-), m::ZZMatrix) = -m
 
-function (A::AnticNumberField)(a::ZZPolyRingElem)
+function (A::AbsSimpleNumField)(a::ZZPolyRingElem)
     return A(FlintQQ["x"][1](a))
 end
 
@@ -1516,7 +1516,7 @@ function is_negative(x::QQFieldElem, ::Union{PosInf,Vector{PosInf}})
     return sign(x) == -1
 end
 
-function (R::Generic.PolyRing{nf_elem})(f::Generic.MPoly)
+function (R::Generic.PolyRing{AbsSimpleNumFieldElem})(f::Generic.MPoly)
     if length(f) == 0
         return R()
     end
@@ -1552,48 +1552,48 @@ Base.log2(a::ZZRingElem) = log2(BigInt(a)) # stupid: there has to be faster way
 is_cyclo_type(::NumField) = false
 
 
-function nf_elem_to_fmpz_mod_poly!(r::ZZModPolyRingElem, a::nf_elem, useden::Bool=true)
+function nf_elem_to_fmpz_mod_poly!(r::ZZModPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
     ccall((:nf_elem_get_fmpz_mod_poly_den, libantic), Nothing,
-        (Ref{ZZModPolyRingElem}, Ref{nf_elem}, Ref{AnticNumberField}, Cint, Ref{fmpz_mod_ctx_struct}),
+        (Ref{ZZModPolyRingElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}, Cint, Ref{fmpz_mod_ctx_struct}),
         r, a, a.parent, Cint(useden), r.parent.base_ring.ninv)
     return nothing
 end
 
-function (R::ZZModPolyRing)(a::nf_elem)
+function (R::ZZModPolyRing)(a::AbsSimpleNumFieldElem)
     r = R()
     nf_elem_to_fmpz_mod_poly!(r, a)
     return r
 end
 
-function nf_elem_to_gfp_poly!(r::fpPolyRingElem, a::nf_elem, useden::Bool=true)
+function nf_elem_to_gfp_poly!(r::fpPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
     ccall((:nf_elem_get_nmod_poly_den, libantic), Nothing,
-        (Ref{fpPolyRingElem}, Ref{nf_elem}, Ref{AnticNumberField}, Cint),
+        (Ref{fpPolyRingElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}, Cint),
         r, a, a.parent, Cint(useden))
     return nothing
 end
 
-function (R::fpPolyRing)(a::nf_elem)
+function (R::fpPolyRing)(a::AbsSimpleNumFieldElem)
     r = R()
     nf_elem_to_gfp_poly!(r, a)
     return r
 end
 
-function nf_elem_to_nmod_poly!(r::zzModPolyRingElem, a::nf_elem, useden::Bool=true)
+function nf_elem_to_nmod_poly!(r::zzModPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
     ccall((:nf_elem_get_nmod_poly_den, libantic), Nothing,
-        (Ref{zzModPolyRingElem}, Ref{nf_elem}, Ref{AnticNumberField}, Cint),
+        (Ref{zzModPolyRingElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}, Cint),
         r, a, a.parent, Cint(useden))
     return nothing
 end
 
-function (R::zzModPolyRing)(a::nf_elem)
+function (R::zzModPolyRing)(a::AbsSimpleNumFieldElem)
     r = R()
     nf_elem_to_nmod_poly!(r, a)
     return r
 end
 
-function nf_elem_to_gfp_fmpz_poly!(r::FpPolyRingElem, a::nf_elem, useden::Bool=true)
+function nf_elem_to_gfp_fmpz_poly!(r::FpPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
     ccall((:nf_elem_get_fmpz_mod_poly_den, libantic), Nothing,
-        (Ref{FpPolyRingElem}, Ref{nf_elem}, Ref{AnticNumberField}, Cint, Ref{fmpz_mod_ctx_struct}),
+        (Ref{FpPolyRingElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}, Cint, Ref{fmpz_mod_ctx_struct}),
         r, a, a.parent, Cint(useden), r.parent.base_ring.ninv)
     return nothing
 end
@@ -1604,13 +1604,13 @@ function mod_sym!(f::ZZPolyRingElem, p::ZZRingElem)
     end
 end
 
-function mod_sym(a::nf_elem, b::ZZRingElem, b2::ZZRingElem)
+function mod_sym(a::AbsSimpleNumFieldElem, b::ZZRingElem, b2::ZZRingElem)
     # TODO: this is not correct
     return mod_sym(a, b)
     return z
 end
 
-function mod_sym(a::nf_elem, b::ZZRingElem)
+function mod_sym(a::AbsSimpleNumFieldElem, b::ZZRingElem)
     c = deepcopy(a)
     mod_sym!(c, b)
     return c
