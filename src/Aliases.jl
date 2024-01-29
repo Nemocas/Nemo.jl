@@ -214,3 +214,5 @@ Base.@deprecate_binding fmpqi QQiFieldElem
 Base.@deprecate_binding FlintZZiRing ZZiRing
 Base.@deprecate_binding fmpzi ZZiRingElem
 Base.@deprecate_binding fmpzUnitRange ZZRingElemUnitRange
+Base.@deprecate_binding AnticNumberField AbsSimpleNumField
+Base.@deprecate_binding nf_elem AbsSimpleNumFieldElem
