@@ -209,10 +209,10 @@ Base.@deprecate_binding LocElem LocalizedEuclideanRingElem
 Base.@deprecate_binding lll_ctx LLLContext
 Base.@deprecate_binding qqbar QQBarFieldElem
 Base.@deprecate_binding CalciumQQBarField QQBarField
-Base.@deprecate_binding FlintQQiField QQiField
-Base.@deprecate_binding fmpqi QQiFieldElem
-Base.@deprecate_binding FlintZZiRing ZZiRing
-Base.@deprecate_binding fmpzi ZZiRingElem
+Base.@deprecate_binding FlintQQiField Nemo.QQiField
+Base.@deprecate_binding fmpqi Nemo.QQiFieldElem
+Base.@deprecate_binding FlintZZiRing Nemo.ZZiRing
+Base.@deprecate_binding fmpzi Nemo.ZZiRingElem
 Base.@deprecate_binding fmpzUnitRange ZZRingElemUnitRange
 Base.@deprecate_binding AnticNumberField AbsSimpleNumField
 Base.@deprecate_binding nf_elem AbsSimpleNumFieldElem
