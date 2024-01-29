@@ -2,10 +2,10 @@ ZZi = Nemo.GaussianIntegers()
 QQi = Nemo.GaussianRationals()
 
 @testset "ZZiRingElem.abstract_types" begin
-   @test ZZiRingElem <: RingElem
-   @test ZZiRing <: Nemo.Ring
-   @test elem_type(ZZi) == ZZiRingElem
-   @test parent_type(ZZiRingElem) == ZZiRing
+   @test Nemo.ZZiRingElem <: RingElem
+   @test Nemo.ZZiRing <: Nemo.Ring
+   @test elem_type(ZZi) == Nemo.ZZiRingElem
+   @test parent_type(Nemo.ZZiRingElem) == Nemo.ZZiRing
    @test base_ring(ZZi) == ZZ
    @test base_ring(ZZi()) == ZZ
 end
@@ -39,9 +39,9 @@ end
    @test ZZ(ZZi(9)) == 9
    @test_throws Exception ZZ(ZZi(0,9))
    @test convert(Complex{BigInt}, ZZi(8,9)) == 8 + 9*im
-   @test 8 + 9*im == convert(ZZiRingElem, 8 + 9*im)
-   @test 8 == convert(ZZiRingElem, 8)
-   @test convert(ZZiRingElem, ZZRingElem(8)) == 8
+   @test 8 + 9*im == convert(Nemo.ZZiRingElem, 8 + 9*im)
+   @test 8 == convert(Nemo.ZZiRingElem, 8)
+   @test convert(Nemo.ZZiRingElem, ZZRingElem(8)) == 8
 end
 
 @testset "ZZiRingElem.pow" begin
@@ -64,7 +64,7 @@ end
          m = ZZi(1, 1)
       end
       n = abs2(m)
-      s = Set{ZZiRingElem}([zero(ZZi)])
+      s = Set{Nemo.ZZiRingElem}([zero(ZZi)])
       for j in 1:10*Int(n)
          a = rand_bits(ZZi, rand(1:15))
          push!(s, mod(a, m))
@@ -168,8 +168,8 @@ end
    for (a, bs) in [[ZZi(1,1), [2, ZZ(2), 2*im, ZZi(2)]],
                    [ZZ(2),    [2*im]]]
       for b in bs
-         @test Nemo.AbstractAlgebra.promote_rule(typeof(a), typeof(b)) == ZZiRingElem
-         @test Nemo.AbstractAlgebra.promote_rule(typeof(b), typeof(a)) == ZZiRingElem
+         @test Nemo.AbstractAlgebra.promote_rule(typeof(a), typeof(b)) == Nemo.ZZiRingElem
+         @test Nemo.AbstractAlgebra.promote_rule(typeof(b), typeof(a)) == Nemo.ZZiRingElem
          @test ZZi == parent(a*b)
          @test ZZi == parent(b*a)
          @test ZZi == parent(a + b)
@@ -198,9 +198,9 @@ end
    @test mul!(t, t, t) == a^4*b^4
    @test 1 + 0*im == one!(t)
    @test addmul!(t, a, b) == 1 + a*b
-   @test addmul!(t, a, b, ZZiRingElem()) == 1 + 2*a*b
+   @test addmul!(t, a, b, Nemo.ZZiRingElem()) == 1 + 2*a*b
    @test Nemo.submul!(t, a, b) == 1 + a*b
-   @test Nemo.submul!(t, a, b, ZZiRingElem()) == 1
+   @test Nemo.submul!(t, a, b, Nemo.ZZiRingElem()) == 1
    @test addmul!(t, t, b) == 1 + b
    @test Nemo.submul!(t, t, a) == (1 + b)*(1 - a)
    @test Nemo.set!(t, a) == a
@@ -214,7 +214,7 @@ end
    @test b == A && a == B
 end
 
-function test_elem(R::ZZiRing)
+function test_elem(R::Nemo.ZZiRing)
    return rand_bits(R, rand(0:200))
 end
 

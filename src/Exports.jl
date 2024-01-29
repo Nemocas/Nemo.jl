@@ -505,8 +505,6 @@ export QQBarField
 export QQBarFieldElem
 export QQField
 export QQFieldElem
-export QQiField
-export QQiFieldElem
 export QQMatrix
 export QQMatrixSpace
 export QQMPolyRing
@@ -649,8 +647,6 @@ export zeta
 export ZZ
 export ZZAbsPowerSeriesRing
 export ZZAbsPowerSeriesRingElem
-export ZZiRing
-export ZZiRingElem
 export ZZLaurentSeriesRing
 export ZZLaurentSeriesRingElem
 export ZZMatrix
