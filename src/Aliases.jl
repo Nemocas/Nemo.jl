@@ -195,3 +195,22 @@ Base.@deprecate_binding FlintPadicField PadicField
 Base.@deprecate_binding padic PadicFieldElem
 Base.@deprecate_binding FlintQadicField QadicField
 Base.@deprecate_binding qadic QadicFieldElem
+
+# renamed for 0.41.0
+Base.@deprecate_binding arb_poly ArbPolyRingElem
+Base.@deprecate_binding arb_mat ArbMatrix
+Base.@deprecate_binding arb ArbFieldElem
+Base.@deprecate_binding acb_poly AcbPolyRingElem
+Base.@deprecate_binding acb_mat AcbMatrix
+Base.@deprecate_binding acb AcbFieldElem
+Base.@deprecate_binding ca CalciumFieldElem
+Base.@deprecate_binding Loc LocalizedEuclideanRing
+Base.@deprecate_binding LocElem LocalizedEuclideanRingElem
+Base.@deprecate_binding lll_ctx LLLContext
+Base.@deprecate_binding qqbar QQBarFieldElem
+Base.@deprecate_binding CalciumQQBarField QQBarField
+Base.@deprecate_binding FlintQQiField QQiField
+Base.@deprecate_binding fmpqi QQiFieldElem
+Base.@deprecate_binding FlintZZiRing ZZiRing
+Base.@deprecate_binding fmpzi ZZiRingElem
+Base.@deprecate_binding fmpzUnitRange ZZRingElemUnitRange
