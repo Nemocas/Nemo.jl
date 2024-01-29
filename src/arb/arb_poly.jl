@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   ArbPolyRingElem.jl : Polynomials over ArbFieldElem
+#   arb_poly.jl : Polynomials over ArbFieldElem
 #
 ###############################################################################
 

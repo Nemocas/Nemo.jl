@@ -474,7 +474,7 @@ include("flint/FlintTypes.jl")
 
 include("antic/AnticTypes.jl")
 
-include("ArbFieldElem/ArbTypes.jl")
+include("arb/ArbTypes.jl")
 
 include("calcium/CalciumTypes.jl")
 
@@ -641,7 +641,7 @@ function test_module(x, y)
    test_file = test_file * "$y-test.jl";
    test_function_name = "test_"
 
-   if x in ["flint", "ArbFieldElem", "antic"]
+   if x in ["flint", "arb", "antic"]
      test_function_name *= y
    else x == "generic"
      if y == "RelSeries"

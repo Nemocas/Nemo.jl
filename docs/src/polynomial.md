@@ -32,8 +32,8 @@ $\mathbb{F}_{p^n}$ (small $p$)              | Flint               | `fqPolyRepPo
 $\mathbb{F}_{p^n}$ (large $p$)              | Flint               | `FqPolyRepPolyRingElem` | `FqPolyRepPolyRing`
 $\mathbb{R}$ (arbitrary precision)          | Arb                 | `RealPoly`              | `RealPolyRing`
 $\mathbb{C}$ (arbitrary precision)          | Arb                 | `ComplexPoly`           | `ComplexPolyRing`
-$\mathbb{R}$ (fixed precision)              | Arb                 | `ArbPolyRingElem`              | `ArbPolyRing`
-$\mathbb{C}$ (fixed precision)              | Arb                 | `AcbPolyRingElem`              | `AcbPolyRing`
+$\mathbb{R}$ (fixed precision)              | Arb                 | `ArbPolyRingElem`       | `ArbPolyRing`
+$\mathbb{C}$ (fixed precision)              | Arb                 | `AcbPolyRingElem`       | `AcbPolyRing`
 
 The string representation of the variable and the base ring $R$ of a generic
 polynomial is stored in its parent object. 

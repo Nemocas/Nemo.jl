@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   QQBarFieldElem.jl : Calcium algebraic numbers in minimal polynomial representation
+#   qqbar.jl : Calcium algebraic numbers in minimal polynomial representation
 #
 ###############################################################################
 

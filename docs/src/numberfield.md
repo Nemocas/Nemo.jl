@@ -10,15 +10,7 @@ end
 Number fields are provided in Nemo by Antic. This allows construction of
 absolute number fields and basic arithmetic computations therein.
 
-Number fields are constructed using the `AbsSimpleNumField` function. However,
-for convenience we define
-
-```
-number_field = AbsSimpleNumField
-```
-
-so that number fields can be constructed using `number_field` rather than
-`AbsSimpleNumField`. 
+Number fields are constructed using the `number_field` function.
 
 The types of number field elements in Nemo are given in the following table,
 along with the libraries that provide them and the associated types of the

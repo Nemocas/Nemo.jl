@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   PadicFieldElem.jl : flint PadicFieldElem numbers
+#   padic.jl : flint padic numbers
 #
 ###############################################################################
 
@@ -79,7 +79,7 @@ is_exact_type(R::Type{PadicFieldElem}) = false
 
 function check_parent(a::PadicFieldElem, b::PadicFieldElem)
    parent(a) != parent(b) &&
-      error("Incompatible PadicFieldElem rings in PadicFieldElem operation")
+      error("Incompatible padic rings in padic operation")
 end
 
 parent_type(::Type{PadicFieldElem}) = PadicField
@@ -523,7 +523,7 @@ end
 ###############################################################################
 
 function Base.sqrt(a::PadicFieldElem; check::Bool=true)
-   check && (a.v % 2) != 0 && error("Unable to take PadicFieldElem square root")
+   check && (a.v % 2) != 0 && error("Unable to take padic square root")
    ctx = parent(a)
    z = PadicFieldElem(a.N - div(a.v, 2))
    z.parent = ctx

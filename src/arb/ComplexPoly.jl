@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   AcbPolyRingElem.jl : Polynomials over ArbFieldElem
+#   ComplexPoly.jl : Polynomials over AcbFieldElem
 #
 ###############################################################################
 

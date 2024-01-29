@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   ArbFieldElem.jl : Arb real numbers
+#   Real.jl : Arb real numbers
 #
 #   Copyright (C) 2015 Tommy Hofmann
 #   Copyright (C) 2015 Fredrik Johansson

@@ -29,8 +29,8 @@ $\mathbb{F}_{p^n}$ (small $p$)        | Flint               | `fqPolyRepMatrix` 
 $\mathbb{F}_{p^n}$ (large $p$)        | Flint               | `FqPolyRepMatrix`   | `FqPolyRepMatrixSpace
 $\mathbb{R}$ (arbitrary precision)    | Arb                 | `RealMat`           | `RealMatSpace`
 $\mathbb{C}$ (arbitrary precision)    | Arb                 | `ComplexMat`        | `ComplexMatSpace`
-$\mathbb{R}$ (fixed precision)        | Arb                 | `ArbMatrix`           | `ArbMatSpace`
-$\mathbb{C}$ (fixed precision)        | Arb                 | `AcbMatrix`           | `AcbMatSpace`
+$\mathbb{R}$ (fixed precision)        | Arb                 | `ArbMatrix`         | `ArbMatSpace`
+$\mathbb{C}$ (fixed precision)        | Arb                 | `AcbMatrix`         | `AcbMatSpace`
 
 The dimensions and base ring $R$ of a generic matrix are stored in its parent
 object.

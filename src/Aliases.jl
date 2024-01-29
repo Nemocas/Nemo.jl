@@ -191,7 +191,7 @@ Base.@deprecate_binding NumberField number_field
 Base.@deprecate_binding CyclotomicRealSubfield cyclotomic_real_subfield
 
 # renamed for 0.40.0
-Base.@deprecate_binding PadicField PadicField
-Base.@deprecate_binding PadicFieldElem PadicFieldElem
-Base.@deprecate_binding QadicField QadicField
-Base.@deprecate_binding QadicFieldElem QadicFieldElem
+Base.@deprecate_binding FlintPadicField PadicField
+Base.@deprecate_binding padic PadicFieldElem
+Base.@deprecate_binding FlintQadicField QadicField
+Base.@deprecate_binding qadic QadicFieldElem

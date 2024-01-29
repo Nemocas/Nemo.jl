@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   AcbFieldElem.jl : Arb complex numbers
+#   Complex.jl : Arb complex numbers
 #
 #   Copyright (C) 2015 Tommy Hofmann
 #   Copyright (C) 2015 Fredrik Johansson
@@ -54,7 +54,7 @@ Return the relative accuracy of $x$ measured in bits, capped between
 `typemax(Int)` and `-typemax(Int)`.
 """
 function accuracy_bits(x::ComplexFieldElem)
-  # bug in AcbFieldElem.h: rel_accuracy_bits is not in the library
+  # bug in acb.h: rel_accuracy_bits is not in the library
   return -ccall((:acb_rel_error_bits, libarb), Int, (Ref{ComplexFieldElem},), x)
 end
 

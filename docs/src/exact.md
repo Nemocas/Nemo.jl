@@ -28,9 +28,9 @@ numbers and fields used to represent individual elements. It also
 stores various options for evaluation (documented further below).
 
 
- Library        | Element type  | Parent type
-----------------|---------------|--------------------
-Calcium         | `CalciumFieldElem`          | `CalciumField`
+ Library        | Element type        | Parent type
+----------------|---------------------|--------------------
+Calcium         | `CalciumFieldElem`  | `CalciumField`
 
 
 Please note the following:
@@ -115,7 +115,7 @@ try to find an answer before it gives up. For example:
 
 For a detailed explanation, refer to the following section
 in the Calcium documentation:
-<https://fredrikj.net/calcium/CalciumFieldElem.html#context-options>
+<https://fredrikj.net/calcium/ca.html#context-options>
 
 ## Basic examples
 

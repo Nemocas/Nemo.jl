@@ -20,21 +20,21 @@ include("flint/fq_default_embed.jl")
 
 include("flint/fq_default_extended.jl")
 
-include("antic/AbsSimpleNumFieldElem.jl")
+include("antic/nf_elem.jl")
 
-include("ArbFieldElem/ArbFieldElem.jl")
+include("arb/arb.jl")
 
-include("ArbFieldElem/AcbFieldElem.jl")
+include("arb/acb.jl")
 
-include("ArbFieldElem/Real.jl")
+include("arb/Real.jl")
 
-include("ArbFieldElem/Complex.jl")
+include("arb/Complex.jl")
 
-include("ArbFieldElem/acb_calc.jl")
+include("arb/acb_calc.jl")
 
-include("calcium/QQBarFieldElem.jl")
+include("calcium/qqbar.jl")
 
-include("calcium/CalciumFieldElem.jl")
+include("calcium/ca.jl")
 
 include("gaussiannumbers/QQi.jl")
 

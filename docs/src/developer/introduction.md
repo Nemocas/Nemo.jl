@@ -50,7 +50,7 @@ performant C code (around half a million lines of it).
 
 ## Layout of files
 
-In the `src` directory of Nemo are four directories `flint`, `ArbFieldElem`, `antic` and
+In the `src` directory of Nemo are four directories `flint`, `arb`, `antic` and
 `calcium`, each containing the wrappers for the relevant C libraries. The
 `test` directory is similarly organised.
 

@@ -1197,7 +1197,7 @@ function (Rx::Generic.PolyRing{PadicFieldElem})(a::QadicFieldElem)
     coeffs = Vector{PadicFieldElem}(undef, degree(Qq))
     for i = 1:length(coeffs)
         c = R()
-        ccall((:padic_poly_get_coeff_PadicFieldElem, libflint), Nothing,
+        ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
             (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Int, Ref{QadicField}), c, a, i - 1, parent(a))
         coeffs[i] = c
     end
@@ -1207,13 +1207,13 @@ end
 function coeff(x::QadicFieldElem, i::Int)
     R = PadicField(prime(parent(x)), parent(x).prec_max)
     c = R()
-    ccall((:padic_poly_get_coeff_PadicFieldElem, libflint), Nothing,
+    ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
         (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Int, Ref{QadicField}), c, x, i, parent(x))
     return c
 end
 
 function setcoeff!(x::QadicFieldElem, i::Int, y::PadicFieldElem)
-    ccall((:padic_poly_set_coeff_PadicFieldElem, libflint), Nothing,
+    ccall((:padic_poly_set_coeff_padic, libflint), Nothing,
         (Ref{QadicFieldElem}, Int, Ref{PadicFieldElem}, Ref{QadicField}), x, i, y, parent(x))
 end
 
@@ -1224,7 +1224,7 @@ end
 function setcoeff!(x::QadicFieldElem, i::Int, y::ZZRingElem)
     R = PadicField(prime(parent(x)), parent(x).prec_max)
     Y = R(ZZRingElem(y))
-    ccall((:padic_poly_set_coeff_PadicFieldElem, libflint), Nothing,
+    ccall((:padic_poly_set_coeff_padic, libflint), Nothing,
         (Ref{QadicFieldElem}, Int, Ref{PadicFieldElem}, Ref{QadicField}), x, i, Y, parent(x))
 end
 
