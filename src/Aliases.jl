@@ -210,7 +210,7 @@ Base.@deprecate_binding lll_ctx LLLContext
 Base.@deprecate_binding qqbar QQBarFieldElem
 Base.@deprecate_binding CalciumQQBarField QQBarField
 Base.@deprecate_binding FlintQQiField Nemo.QQiField false
-Base.@deprecate_binding fmpqi Nemo.QQiField Elems false
+Base.@deprecate_binding fmpqi Nemo.QQiFieldElem false
 Base.@deprecate_binding FlintZZiRing Nemo.ZZiRing false
 Base.@deprecate_binding fmpzi Nemo.ZZiRingElem false
 Base.@deprecate_binding fmpzUnitRange ZZRingElemUnitRange
