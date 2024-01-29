@@ -429,10 +429,10 @@ module BitsMod
 using ..Nemo
 
 import Base: ^
-import Base: show
 import Base: getindex
 import Base: iterate
 import Base: length
+import Base: show
 
 export bits
 export Limbs
