@@ -600,7 +600,7 @@ function solve_lu_precomp(P::Generic.Perm, LU::AcbMatrix, y::AcbMatrix)
   return z
 end
 
-function AbstractAlgebra.Solve._can_solve_internal_no_check(A::acb_mat, b::acb_mat, task::Symbol; side::Symbol = :right)
+function AbstractAlgebra.Solve._can_solve_internal_no_check(A::AcbMatrix, b::AcbMatrix, task::Symbol; side::Symbol = :right)
    nrows(A) != ncols(A) && error("Only implemented for square matrices")
    if side === :left
       fl, sol, K = AbstractAlgebra.Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
@@ -609,7 +609,7 @@ function AbstractAlgebra.Solve._can_solve_internal_no_check(A::acb_mat, b::acb_m
 
    x = similar(A, ncols(A), ncols(b))
    fl = ccall((:acb_mat_solve, libarb), Cint,
-              (Ref{acb_mat}, Ref{acb_mat}, Ref{acb_mat}, Int),
+              (Ref{AcbMatrix}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
               x, A, b, precision(base_ring(A)))
    fl == 0 && error("Matrix cannot be inverted numerically")
    if task === :only_check || task === :with_solution
@@ -625,11 +625,11 @@ end
 #
 ################################################################################
 
-function AbstractAlgebra.Solve.solve_init(A::acb_mat)
-   return AbstractAlgebra.Solve.SolveCtx{acb, acb_mat, acb_mat}(A)
+function AbstractAlgebra.Solve.solve_init(A::AcbMatrix)
+   return AbstractAlgebra.Solve.SolveCtx{AcbFieldElem, AcbMatrix, AcbMatrix}(A)
 end
 
-function AbstractAlgebra.Solve._init_reduce(C::AbstractAlgebra.Solve.SolveCtx{acb})
+function AbstractAlgebra.Solve._init_reduce(C::AbstractAlgebra.Solve.SolveCtx{AcbFieldElem})
    if isdefined(C, :red) && isdefined(C, :lu_perm)
       return nothing
    end
@@ -641,7 +641,7 @@ function AbstractAlgebra.Solve._init_reduce(C::AbstractAlgebra.Solve.SolveCtx{ac
    x = similar(A, nrows(A), ncols(A))
    P.d .-= 1
    fl = ccall((:acb_mat_lu, libarb), Cint,
-               (Ptr{Int}, Ref{acb_mat}, Ref{acb_mat}, Int),
+               (Ptr{Int}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
                P.d, x, A, precision(base_ring(A)))
    fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
    P.d .+= 1
@@ -652,7 +652,7 @@ function AbstractAlgebra.Solve._init_reduce(C::AbstractAlgebra.Solve.SolveCtx{ac
    return nothing
 end
 
-function AbstractAlgebra.Solve._init_reduce_transpose(C::AbstractAlgebra.Solve.SolveCtx{acb})
+function AbstractAlgebra.Solve._init_reduce_transpose(C::AbstractAlgebra.Solve.SolveCtx{AcbFieldElem})
    if isdefined(C, :red_transp) && isdefined(C, :lu_perm_transp)
       return nothing
    end
@@ -664,7 +664,7 @@ function AbstractAlgebra.Solve._init_reduce_transpose(C::AbstractAlgebra.Solve.S
    x = similar(A, nrows(A), ncols(A))
    P.d .-= 1
    fl = ccall((:acb_mat_lu, libarb), Cint,
-               (Ptr{Int}, Ref{acb_mat}, Ref{acb_mat}, Int),
+               (Ptr{Int}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
                P.d, x, A, precision(base_ring(A)))
    fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
    P.d .+= 1
@@ -675,7 +675,7 @@ function AbstractAlgebra.Solve._init_reduce_transpose(C::AbstractAlgebra.Solve.S
    return nothing
 end
 
-function AbstractAlgebra.Solve._can_solve_internal_no_check(C::AbstractAlgebra.Solve.SolveCtx{acb}, b::acb_mat, task::Symbol; side::Symbol = :right)
+function AbstractAlgebra.Solve._can_solve_internal_no_check(C::AbstractAlgebra.Solve.SolveCtx{AcbFieldElem}, b::AcbMatrix, task::Symbol; side::Symbol = :right)
    if side === :right
       LU = AbstractAlgebra.Solve.reduced_matrix(C)
       p = AbstractAlgebra.Solve.lu_permutation(C)
@@ -687,7 +687,7 @@ function AbstractAlgebra.Solve._can_solve_internal_no_check(C::AbstractAlgebra.S
 
    x = similar(b, ncols(C), ncols(b))
    ccall((:acb_mat_solve_lu_precomp, libarb), Nothing,
-         (Ref{acb_mat}, Ptr{Int}, Ref{acb_mat}, Ref{acb_mat}, Int),
+         (Ref{AcbMatrix}, Ptr{Int}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
          x, inv(p).d .- 1, LU, b, precision(base_ring(LU)))
 
    if side === :left
