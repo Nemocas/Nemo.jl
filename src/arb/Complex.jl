@@ -695,6 +695,23 @@ function rsqrt(x::ComplexFieldElem, prec::Int = precision(Balls))
    return z
 end
 
+@doc raw"""
+    root(x::ComplexFieldElem, n::Int)
+
+Return the principal $n$-th root of $x$.
+"""
+function root(x::ComplexFieldElem, n::Int, prec::Int = precision(Balls))
+   z = ComplexFieldElem()
+   n == 0 && error("cannot take 0-th root")
+   if n < 0
+     n = -n
+     x = inv(x)
+   end
+   ccall((:acb_root_ui, libarb), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Culong, Int), z, x, Culong(n), prec)
+   return z
+end
+
+
 function log(x::ComplexFieldElem, prec::Int = precision(Balls))
    z = ComplexFieldElem()
    ccall((:acb_log, libarb), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int), z, x, prec)
