@@ -24,7 +24,7 @@ end
 
 function GF(n::UInt; cached::Bool=true, check::Bool=true)
   check && !is_prime(n) && throw(DomainError(n, "Characteristic must be prime"))
-  return fpField(un, cached)
+  return fpField(n, cached)
 end
 
 function GF(n::ZZRingElem; cached::Bool=true, check::Bool=true)
