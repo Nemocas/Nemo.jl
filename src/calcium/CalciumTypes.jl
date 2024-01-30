@@ -59,7 +59,7 @@ end
 #
 ################################################################################
 
-mutable struct QQBarField <: Field
+struct QQBarField <: Field
 end
 
 const CalciumQQBar = QQBarField()
