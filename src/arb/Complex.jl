@@ -707,7 +707,7 @@ function root(x::ComplexFieldElem, n::Int, prec::Int = precision(Balls))
      n = -n
      x = inv(x)
    end
-   ccall((:acb_root_ui, libarb), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Culong, Int), z, x, Culong(n), prec)
+   ccall((:acb_root_ui, libarb), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, UInt, Int), z, x, UInt(n), prec)
    return z
 end
 
