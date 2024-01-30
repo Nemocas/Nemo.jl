@@ -1591,7 +1591,7 @@ end
 @doc raw"""
     divisors(a::Union{Int, ZZRingElem})
 
-Return the positive divisors of $a$ in an array, not necessarily in growing
+Return the positive divisors of $a$ in an array, not necessarily in ascending
 order. We require $a \neq 0$.
 """
 function divisors end
