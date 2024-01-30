@@ -112,6 +112,7 @@ end
 
    @test sinpi(QQBarFieldElem(1)//6) == QQBarFieldElem(1)//2
    @test cospi(QQBarFieldElem(1)//3) == QQBarFieldElem(1)//2
+   @test sincospi(QQBarFieldElem(1)//3) == (sinpi(QQBarFieldElem(1)//3), cospi(QQBarFieldElem(1)//3))
    @test tanpi(QQBarFieldElem(1)//3) == sqrt(QQBarFieldElem(3))
    @test_throws DomainError tanpi(QQBarFieldElem(1)//2)
 

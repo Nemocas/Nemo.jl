@@ -1127,6 +1127,17 @@ end
 
 Return $\sin(\pi a)$ as an algebraic number.
 Throws if this value is transcendental.
+
+# Examples
+
+```jldoctest
+julia> x = sinpi(QQBar(1)//3)
+Root 0.866025 of 4x^2 - 3
+
+julia> sinpi(x)
+ERROR: DomainError with Root 0.866025 of 4x^2 - 3:
+nonrational algebraic number
+```
 """
 function sinpi(a::QQBarFieldElem)
    r = QQFieldElem(a)
@@ -1142,6 +1153,17 @@ end
 
 Return $\cos(\pi a)$ as an algebraic number.
 Throws if this value is transcendental.
+
+# Examples
+
+```jldoctest
+julia> x = cospi(QQBar(1)//6)
+Root 0.866025 of 4x^2 - 3
+
+julia> cospi(x)
+ERROR: DomainError with Root 0.866025 of 4x^2 - 3:
+nonrational algebraic number
+```
 """
 function cospi(a::QQBarFieldElem)
    r = QQFieldElem(a)
@@ -1151,6 +1173,35 @@ function cospi(a::QQBarFieldElem)
    ccall((:qqbar_cos_pi, libcalcium), Nothing, (Ref{QQBarFieldElem}, Int, Int), z, p, q)
    return z
 end
+
+@doc raw"""
+    sincospi(a::QQBarFieldElem)
+
+Return $\sin(\pi a)$ and $\cos(\pi a)$ as a pair of algebraic numbers.
+Throws if either value is transcendental.
+
+# Examples
+
+```jldoctest
+julia> s, c = sincospi(QQBar(1)//3)
+(Root 0.866025 of 4x^2 - 3, Root 0.500000 of 2x - 1)
+
+julia> sincospi(s)
+ERROR: DomainError with Root 0.866025 of 4x^2 - 3:
+nonrational algebraic number
+```
+"""
+function sincospi(a::QQBarFieldElem)
+   r = QQFieldElem(a)
+   p = Int(numerator(r))
+   q = Int(denominator(r))
+   s = QQBarFieldElem()
+   ccall((:qqbar_sin_pi, libcalcium), Nothing, (Ref{QQBarFieldElem}, Int, Int), s, p, q)
+   c = QQBarFieldElem()
+   ccall((:qqbar_cos_pi, libcalcium), Nothing, (Ref{QQBarFieldElem}, Int, Int), c, p, q)
+   return s, c
+end
+
 
 @doc raw"""
     tanpi(a::QQBarFieldElem)
