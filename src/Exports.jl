@@ -29,6 +29,7 @@ export airy_bi
 export airy_bi_prime
 export AllParts
 export AllPerms
+export algebraic_closure
 export angle
 export ArbField
 export ArbFieldElem
