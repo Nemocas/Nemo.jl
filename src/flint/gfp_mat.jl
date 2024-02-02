@@ -312,6 +312,23 @@ function can_solve(a::fpMatrix, b::fpMatrix; side::Symbol = :right)
    return fl
 end
 
+function AbstractAlgebra.Solve._can_solve_internal_no_check(A::fpMatrix, b::fpMatrix, task::Symbol; side::Symbol = :right)
+   check_parent(A, b)
+   if side === :left
+      fl, sol, K = AbstractAlgebra.Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
+      return fl, transpose(sol), transpose(K)
+   end
+
+   x = similar(A, ncols(A), ncols(b))
+   fl = ccall((:nmod_mat_can_solve, libflint), Cint,
+             (Ref{fpMatrix}, Ref{fpMatrix}, Ref{fpMatrix}),
+              x, A, b)
+   if task === :only_check || task === :with_solution
+      return Bool(fl), x, zero(A, 0, 0)
+   end
+   return Bool(fl), x, AbstractAlgebra.Solve.kernel(A)
+end
+
 ################################################################################
 #
 #  Parent object overloading

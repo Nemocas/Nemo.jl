@@ -433,6 +433,66 @@ end
    @test contains(transpose(y), ZZ[1 1 1])
 end
 
+@testset "ArbMatrix.Solve.solve" begin
+   S = matrix_space(RR, 3, 3)
+
+   A = S(["1.0 +/- 0.01" "2.0 +/- 0.01" "3.0 +/- 0.01";
+          "4.0 +/- 0.01" "5.0 +/- 0.01" "6.0 +/- 0.01";
+          "8.0 +/- 0.01" "8.0 +/- 0.01" "9.0 +/- 0.01"])
+
+   b = transpose(RR["6.0 +/- 0.1" "15.0 +/- 0.1" "25.0 +/- 0.1"])
+   b2 = 2*b
+
+   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, b)
+   @test fl
+   @test overlaps(A*y, b)
+   @test contains(transpose(y), ZZ[1 1 1])
+   @test ncols(K) == 0
+
+   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, transpose(b), side = :left)
+   @test fl
+   @test overlaps(y*A, transpose(b))
+   @test nrows(K) == 0
+
+   y = AbstractAlgebra.Solve.solve(A, b)
+   @test fl
+   @test overlaps(A*y, b)
+   @test contains(transpose(y), ZZ[1 1 1])
+
+   C = AbstractAlgebra.Solve.solve_init(A)
+   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(C, b)
+   @test fl
+   @test overlaps(A*y, b)
+   @test contains(transpose(y), ZZ[1 1 1])
+   @test ncols(K) == 0
+
+   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(C, transpose(b), side = :left)
+   @test fl
+   @test overlaps(y*A, transpose(b))
+   @test nrows(K) == 0
+
+   y = AbstractAlgebra.Solve.solve(C, b)
+   @test fl
+   @test overlaps(A*y, b)
+   @test contains(transpose(y), ZZ[1 1 1])
+
+   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(C, b2)
+   @test fl
+   @test overlaps(A*y, b2)
+   @test contains(transpose(y), ZZ[2 2 2])
+   @test ncols(K) == 0
+
+   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(C, transpose(b2), side = :left)
+   @test fl
+   @test overlaps(y*A, transpose(b2))
+   @test nrows(K) == 0
+
+   y = AbstractAlgebra.Solve.solve(C, b2)
+   @test fl
+   @test overlaps(A*y, b2)
+   @test contains(transpose(y), ZZ[2 2 2])
+end
+
 @testset "ArbMatrix.bound_inf_norm" begin
    S = matrix_space(RR, 3, 3)
 

@@ -683,6 +683,53 @@ end
    @test c == matrix(ZZ, 2, 1, [1, 1])
 end
 
+@testset "ZZMatrix.Solve.solve" begin
+   S = matrix_space(FlintZZ, 3, 3)
+
+   A = S([ZZRingElem(2) 3 5; 1 4 7; 9 2 2])
+
+   T = matrix_space(FlintZZ, 3, 1)
+
+   B = T([ZZRingElem(4), 5, 7])
+
+   X = AbstractAlgebra.Solve.solve(A, B)
+
+   @test X == T([3, -24, 14])
+   @test A*X == B
+
+   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B)
+   @test fl && A * X == B
+
+   A = matrix(ZZ, 2, 2, [1, 0, 0, 0])
+   B = matrix(ZZ, 2, 2, [0, 0, 0, 1])
+   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B)
+   @test !fl
+   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :left)
+   @test !fl
+   fl, X, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B)
+   @test !fl
+
+   A = matrix(ZZ, 2, 2, [1, 0, 0, 0])
+   B = matrix(ZZ, 2, 2, [0, 1, 0, 0])
+   fl, X, Z = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B)
+   @test fl && A*X == B && iszero(A * Z)
+
+   # Non-square example
+   A = matrix(ZZ, [1 2 3; 4 5 6])
+   B = matrix(ZZ, 2, 1, [1, 1])
+   fl, x, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B)
+   @test fl
+   @test A*x == B
+   @test is_zero(A*K)
+   @test ncols(K) + rank(A) == ncols(A)
+
+   B = matrix(ZZ, 1, 3, [1, 2, 3])
+   fl, x, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B, side = :left)
+   @test fl
+   @test x*A == B
+   @test is_zero(K*A)
+   @test nrows(K) + rank(A) == nrows(A)
+end
 
 @testset "ZZMatrix.concat" begin
    S = matrix_space(FlintZZ, 3, 3)
