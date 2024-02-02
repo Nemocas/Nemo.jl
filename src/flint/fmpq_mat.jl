@@ -1025,6 +1025,12 @@ function nullspace(A::QQMatrix)
    ccall((:fmpq_mat_set_fmpz_mat, libflint), Nothing,
          (Ref{QQMatrix}, Ref{ZZMatrix}), NQQ, N)
 
+   # Now massage the result until it looks like what the generic AbstractAlgebra
+   # nullspace would return: remove zero columns and rescale the columns so that
+   # the lowest non-zero entry is 1.
+   # This is necessary because code in Hecke expects this structure, see e.g.
+   # https://github.com/thofma/Hecke.jl/issues/1385 .
+
    NQQ = view(NQQ, 1:nrows(NQQ), 1:nullity)
 
    # Produce a 1 in the lowest non-zero entry of any column
