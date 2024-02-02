@@ -432,6 +432,14 @@ end
    t = CC(rand(), abs(rand()) + eps())
    prod_sqr = (modular_weber_f(t)*modular_weber_f1(t)*modular_weber_f2(t))^2
    @test overlaps(prod_sqr, CC(2))
+
+   t = CC(-2)
+   s = root(t, 3)
+   @test overlaps(s^3, t)
+   t = CC(1, 1)
+   s = root(t, -5)
+   @test overlaps(s^(-5), t)
+   @test_throws ErrorException root(one(CC), 0)
 end
 
 @testset "ComplexFieldElem.ZZPolyRingElem" begin
