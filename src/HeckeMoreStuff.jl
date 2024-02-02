@@ -348,15 +348,6 @@ end
 (::QQField)(a::AbsSimpleNumFieldElem) = (is_rational(a) && return coeff(a, 0)) || error("not a rational")
 (::ZZRing)(a::AbsSimpleNumFieldElem) = (is_integer(a) && return numerator(coeff(a, 0))) || error("not an integer")
 
-function set_name!(K::AbsSimpleNumField, s::String)
-    set_attribute!(K, :name => s)
-end
-
-function set_name!(K::AbsSimpleNumField)
-    s = find_name(K)
-    s === nothing || set_name!(K, string(s))
-end
-
 function Base.:(^)(a::AbsSimpleNumFieldElem, e::UInt)
     b = parent(a)()
     ccall((:nf_elem_pow, libantic), Nothing,

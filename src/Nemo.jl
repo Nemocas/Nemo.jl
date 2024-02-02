@@ -181,7 +181,6 @@ import AbstractAlgebra: divrem
 import AbstractAlgebra: ErrorConstrDimMismatch
 import AbstractAlgebra: expressify
 import AbstractAlgebra: Field
-import AbstractAlgebra: find_name
 import AbstractAlgebra: force_coerce
 import AbstractAlgebra: force_op
 import AbstractAlgebra: get_attribute
