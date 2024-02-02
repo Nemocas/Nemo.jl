@@ -1040,5 +1040,5 @@ function nullspace(A::QQMatrix)
    NQQ = similar(A, ncols(A), ncols(A))
    ccall((:fmpq_mat_set_fmpz_mat, libflint), Nothing,
          (Ref{QQMatrix}, Ref{ZZMatrix}), NQQ, N)
-   return nullity, NQQ
+   return nullity, view(NQQ, 1:nrows(NQQ), 1:nullity)
 end
