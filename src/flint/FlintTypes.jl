@@ -5437,7 +5437,7 @@ end
 
 function _fmpz_mod_mat_clear_fn(mat::ZZModMatrix)
   ccall((:fmpz_mod_mat_clear, libflint), Nothing,
-        (Ref{ZZModMatrix}, Ref{fmpz_mod_ctx_struct}), mat, mat.base_ring.ninv)
+        (Ref{ZZModMatrix}, Ref{Nothing}), mat, C_NULL) # Hack
 end
 
 ###############################################################################
@@ -5575,7 +5575,7 @@ end
 
 function _gfp_fmpz_mat_clear_fn(mat::FpMatrix)
     ccall((:fmpz_mod_mat_clear, libflint), Nothing,
-          (Ref{FpMatrix}, Ref{fmpz_mod_ctx_struct}), mat, mat.base_ring.ninv)
+          (Ref{FpMatrix}, Ref{Nothing}), mat, C_NULL) # Hack
 end
 
 ################################################################################
