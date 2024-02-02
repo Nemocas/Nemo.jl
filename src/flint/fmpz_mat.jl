@@ -1121,7 +1121,7 @@ $\mathbb{Q}$.
 function nullspace_right_rational(x::ZZMatrix)
    z = similar(x)
    u = similar(x, ncols(x), ncols(x))
-   rank = ccall((:fmpz_mat_nullspace, libflint), Int,
+   rank = ccall((:fmpz_mat_nullspace, libflint), Cint,
                 (Ref{ZZMatrix}, Ref{ZZMatrix}), u, x)
    return rank, u
 end
@@ -1292,19 +1292,6 @@ function cansolve(a::ZZMatrix, b::ZZMatrix)
    end
    return true, transpose(z*T)
 end
-
-function AbstractAlgebra.Solve._can_solve_internal_no_check(A::ZZMatrix, b::ZZMatrix, task::Symbol; side::Symbol = :right)
-   if side === :left
-      fl, sol, K = AbstractAlgebra.Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
-      return fl, transpose(sol), transpose(K)
-   end
-
-   fl, sol = Nemo.cansolve(A, b)
-   if task === :only_check || task === :with_solution
-     return fl, sol, zero(A, 0, 0)
-   end
-   return fl, sol, AbstractAlgebra.Solve.kernel(A)
- end
 
 Base.reduce(::typeof(hcat), A::AbstractVector{ZZMatrix}) = AbstractAlgebra._hcat(A)
 

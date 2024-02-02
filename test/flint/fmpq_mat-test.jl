@@ -490,15 +490,11 @@ end
 
    A = S([QQFieldElem(2) 3 5; 1 4 7; 4 1 1])
 
-   r, N = nullspace(A)
-   @test iszero(A*N)
-   @test r == 1
+   @test nullspace(A) == (1, T([QQFieldElem(1, 5); QQFieldElem(-9, 5); QQFieldElem(1)]))
 
-   # A "properly" rational example (since the implementation works over ZZ)
-   A = QQ[ 1//2 1//3 1//5 ]
    r, N = nullspace(A)
-   @test is_zero(A*N)
-   @test r == 2
+
+   @test iszero(A*N)
 end
 
 @testset "QQMatrix.rank" begin
@@ -627,128 +623,6 @@ end
 
    @test_throws ErrorException can_solve_with_solution(A, B, side = :garbage)
    @test_throws ErrorException can_solve(A, B, side = :garbage)
-end
-
-@testset "QQMatrix.Solve.solve" begin
-   S = matrix_space(QQ, 3, 3)
-
-   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 2 2])
-
-   T = matrix_space(QQ, 3, 1)
-
-   B = T([QQFieldElem(4), 5, 7])
-
-   X = AbstractAlgebra.Solve.solve(A, B)
-
-   @test X == T([3, -24, 14])
-
-   @test A*X == B
-
-   m1 = [1 1; 1 0; 1 0]
-   m2 = [ 1 0 ; 0 1; 0 1 ]
-   m1Q = matrix(QQ, m1)
-   m2Q = matrix(QQ, m2);
-
-   N = AbstractAlgebra.Solve.solve(m1Q, m2Q)
-
-   @test N == matrix(QQ, 2, 2, [0 1; 1 -1])
-
-   for i in 1:10
-      m = rand(0:10)
-      n = rand(0:10)
-      k = rand(0:10)
-
-      M = matrix_space(QQ, n, k)
-      N = matrix_space(QQ, n, m)
-
-      A = rand(M, -10:10)
-      B = rand(N, -10:10)
-
-      fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B)
-
-      if fl
-         @test A * X == B
-      end
-
-      fl, X, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B)
-
-      if fl
-        @test A*X == B
-        @test is_zero(A*K)
-        @test ncols(K) + rank(A) == ncols(A)
-      end
-   end
-
-   A = matrix(QQ, 2, 2, [1, 2, 2, 5])
-   B = matrix(QQ, 2, 1, [1, 2])
-   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B)
-   @test fl
-   @test A * X == B
-   @test AbstractAlgebra.Solve.can_solve(A, B)
-   fl, X, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B)
-   @test fl
-   @test A*X == B
-   @test is_zero(A*K)
-   @test ncols(K) + rank(A) == ncols(A)
-
-   A = matrix(QQ, 2, 2, [1, 2, 2, 4])
-   B = matrix(QQ, 2, 1, [1, 2])
-   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B)
-   @test fl
-   @test A * X == B
-   @test AbstractAlgebra.Solve.can_solve(A, B)
-   fl, X, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B)
-   @test fl
-   @test A*X == B
-   @test is_zero(A*K)
-   @test ncols(K) + rank(A) == ncols(A)
-
-   A = matrix(QQ, 2, 2, [1, 2, 2, 4])
-   B = matrix(QQ, 2, 1, [1, 3])
-   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B)
-   @test !fl
-   @test !AbstractAlgebra.Solve.can_solve(A, B)
-   fl, X, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B)
-   @test !fl
-
-   A = zero_matrix(QQ, 2, 3)
-   B = identity_matrix(QQ, 3)
-   @test_throws ErrorException AbstractAlgebra.Solve.can_solve_with_solution(A, B)
-
-   # Transpose
-   A = transpose(matrix(QQ, 2, 2, [1, 2, 2, 5]))
-   B = transpose(matrix(QQ, 2, 1, [1, 2]))
-   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :left)
-   @test fl
-   @test X * A == B
-   @test AbstractAlgebra.Solve.can_solve(A, B, side = :left)
-
-   A = transpose(matrix(QQ, 2, 2, [1, 2, 2, 4]))
-   B = transpose(matrix(QQ, 2, 1, [1, 2]))
-   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :left)
-   @test fl
-   @test X * A == B
-   @test AbstractAlgebra.Solve.can_solve(A, B, side = :left)
-   fl, X, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B, side = :left)
-   @test fl
-   @test X*A == B
-   @test is_zero(K*A)
-   @test nrows(K) + rank(A) == nrows(A)
-
-   A = transpose(matrix(QQ, 2, 2, [1, 2, 2, 4]))
-   B = transpose(matrix(QQ, 2, 1, [1, 3]))
-   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :left)
-   @test !fl
-   @test !AbstractAlgebra.Solve.can_solve(A, B, side = :left)
-   fl, X, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B, side = :left)
-   @test !fl
-
-   A = transpose(zero_matrix(QQ, 2, 3))
-   B = transpose(identity_matrix(QQ, 3))
-   @test_throws ErrorException AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :left)
-
-   @test_throws ArgumentError AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :garbage)
-   @test_throws ArgumentError AbstractAlgebra.Solve.can_solve(A, B, side = :garbage)
 end
 
 @testset "QQMatrix.concat" begin
