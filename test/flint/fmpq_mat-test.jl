@@ -490,6 +490,8 @@ end
 
    A = S([QQFieldElem(2) 3 5; 1 4 7; 4 1 1])
 
+   @test nullspace(A) == (1, T([QQFieldElem(1, 5); QQFieldElem(-9, 5); QQFieldElem(1)]))
+
    r, N = nullspace(A)
    @test iszero(A*N)
    @test r == 1
