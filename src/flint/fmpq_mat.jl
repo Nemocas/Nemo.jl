@@ -1040,5 +1040,27 @@ function nullspace(A::QQMatrix)
    NQQ = similar(A, ncols(A), ncols(A))
    ccall((:fmpq_mat_set_fmpz_mat, libflint), Nothing,
          (Ref{QQMatrix}, Ref{ZZMatrix}), NQQ, N)
-   return nullity, view(NQQ, 1:nrows(NQQ), 1:nullity)
+
+   NQQ = view(NQQ, 1:nrows(NQQ), 1:nullity)
+
+   # Produce a 1 in the lowest non-zero entry of any column
+   s = FlintQQ()
+   t = FlintQQ()
+   for j in 1:nullity
+      # Find lowest non-zero entry
+      for i in nrows(NQQ):-1:1
+         getindex!(s, NQQ, i, j)
+         !is_zero(s) && break
+      end
+      # Scale the column by the inverse
+      s = inv(s)
+      for i in nrows(NQQ):-1:1
+         is_zero_entry(NQQ, i, j) && continue
+         getindex!(t, NQQ, i, j)
+         mul!(t, t, s)
+         NQQ[i, j] = t # creates a copy of t
+      end
+   end
+
+   return nullity, NQQ
 end
