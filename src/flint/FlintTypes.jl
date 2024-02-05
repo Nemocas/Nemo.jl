@@ -3098,7 +3098,7 @@ const flint_padic_printing_mode = [:terse, :series, :val_unit]
 
 A $p$-adic field for some prime $p$.
 """
-mutable struct PadicField <: FlintLocalField
+@attributes mutable struct PadicField <: FlintLocalField
    p::Int
    pinv::Float64
    pow::Ptr{Nothing}
@@ -3162,7 +3162,7 @@ end
 
 A $p^n$-adic field for some prime power $p^n$.
 """
-mutable struct QadicField <: FlintLocalField
+@attributes mutable struct QadicField <: FlintLocalField
    p::Int
    pinv::Float64
    pow::Ptr{Nothing}
