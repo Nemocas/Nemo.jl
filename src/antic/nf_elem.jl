@@ -268,6 +268,7 @@ function Base.show(io::IO, a::AbsSimpleNumField)
     print(io, "Number field")
   else
     # nested printing allowed, preferably supercompact
+    io = pretty(io)
     print(io, "Number field of degree $(degree(a))")
     print(IOContext(io, :supercompact => true), " over ", Lowercase(), QQ)
   end
