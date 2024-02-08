@@ -18,12 +18,16 @@
    @test isa(R(ZZRingElem(2)), QQBarFieldElem)
    @test isa(R(QQFieldElem(2)), QQBarFieldElem)
    @test isa(R(QQBarFieldElem(2)), QQBarFieldElem)
+   @test isa(R(1//2), QQBarFieldElem)
+   @test R(1//2) == R(QQ(1//2))
 
    @test isa(QQBarFieldElem(), QQBarFieldElem)
    @test isa(QQBarFieldElem(2), QQBarFieldElem)
    @test isa(QQBarFieldElem(2+3im), QQBarFieldElem)
    @test isa(QQBarFieldElem(ZZRingElem(2)), QQBarFieldElem)
    @test isa(QQBarFieldElem(QQFieldElem(2)), QQBarFieldElem)
+   @test isa(QQBarFieldElem(1//2), QQBarFieldElem)
+   @test QQBarFieldElem(1//2) == QQBarFieldElem(QQ(1//2))
 
    x = R(1)
    @test deepcopy(x) !== x
