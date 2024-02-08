@@ -919,3 +919,43 @@ function matrix_space(R::zzModRing, r::Int, c::Int; cached::Bool = true)
   zzModMatrixSpace(R, r, c)
 end
 
+################################################################################
+#
+#  Kernel
+#
+################################################################################
+
+function AbstractAlgebra.Solve.kernel(M::zzModMatrix; side::Symbol = :right)
+   AbstractAlgebra.Solve.check_option(side, [:right, :left], "side")
+
+   if side === :left
+      K = AbstractAlgebra.Solve.kernel(transpose(M), side = :right)
+      return transpose(K)
+   end
+
+   R = base_ring(M)
+   if is_prime(modulus(R))
+      k = zero_matrix(R, ncols(M), ncols(M))
+      n = ccall((:nmod_mat_nullspace, libflint), Int, (Ref{zzModMatrix}, Ref{zzModMatrix}), k, M)
+      return view(k, 1:nrows(k), 1:n)
+   end
+
+   H = hcat(transpose(M), identity_matrix(R, ncols(M)))
+   if nrows(H) < ncols(H)
+      H = vcat(H, zero_matrix(R, ncols(H) - nrows(H), ncols(H)))
+   end
+   howell_form!(H)
+   nr = 1
+   while nr <= nrows(H) && !is_zero_row(H, nr)
+      nr += 1
+   end
+   nr -= 1
+   h = view(H, 1:nr, 1:nrows(M))
+   for i = 1:nrows(h)
+      if is_zero_row(h, i)
+         k = view(H, i:nrows(h), nrows(M) + 1:ncols(H))
+         return transpose(k)
+      end
+   end
+   return zero_matrix(R, ncols(M), 0)
+end

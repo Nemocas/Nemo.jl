@@ -508,3 +508,22 @@ function matrix_space(R::fpField, r::Int, c::Int; cached::Bool = true)
    # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
   fpMatrixSpace(R, r, c)
 end
+
+################################################################################
+#
+#  Kernel
+#
+################################################################################
+
+function AbstractAlgebra.Solve.kernel(A::fpMatrix; side::Symbol = :right)
+   AbstractAlgebra.Solve.check_option(side, [:right, :left], "side")
+
+   if side === :left
+      K = AbstractAlgebra.Solve.kernel(transpose(A), side = :right)
+      return transpose(K)
+   end
+
+   K = zero_matrix(base_ring(A), ncols(A), max(nrows(A), ncols(A)))
+   n = ccall((:nmod_mat_nullspace, libflint), Int, (Ref{fpMatrix}, Ref{fpMatrix}), K, A)
+   return view(K, 1:nrows(K), 1:n)
+end

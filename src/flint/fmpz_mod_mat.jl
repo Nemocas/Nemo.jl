@@ -916,3 +916,38 @@ function matrix_space(R::ZZModRing, r::Int, c::Int; cached::Bool = true)
   ZZModMatrixSpace(R, r, c)
 end
 
+################################################################################
+#
+#  Kernel
+#
+################################################################################
+
+function AbstractAlgebra.Solve.kernel(M::ZZModMatrix; side::Symbol = :right)
+   AbstractAlgebra.Solve.check_option(side, [:right, :left], "side")
+
+   if side === :left
+      K = AbstractAlgebra.Solve.kernel(transpose(M), side = :right)
+      return transpose(K)
+   end
+
+   R = base_ring(M)
+   N = hcat(transpose(M), identity_matrix(R, ncols(M)))
+   if nrows(N) < ncols(N)
+      N = vcat(N, zero_matrix(R, ncols(N) - nrows(N), ncols(N)))
+   end
+   howell_form!(N)
+   H = N
+   nr = 1
+   while nr <= nrows(H) && !is_zero_row(H, nr)
+      nr += 1
+   end
+   nr -= 1
+   h = view(H, 1:nr, 1:nrows(M))
+   for i = 1:nrows(h)
+      if is_zero_row(h, i)
+         k = view(H, i:nrows(h), nrows(M) + 1:ncols(H))
+         return transpose(k)
+      end
+   end
+   return zero_matrix(R, ncols(M), 0)
+end
