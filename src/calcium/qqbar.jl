@@ -73,6 +73,8 @@ function QQBarFieldElem(a::QQFieldElem)
    return z
 end
 
+QQBarFieldElem(a::Rational) = QQBarFieldElem(QQFieldElem(a))
+
 function deepcopy_internal(a::QQBarFieldElem, dict::IdDict)
    z = QQBarFieldElem()
    ccall((:qqbar_set, libcalcium), Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
@@ -1465,6 +1467,8 @@ end
 (a::QQBarField)(b::ZZRingElem) = QQBarFieldElem(b)
 
 (a::QQBarField)(b::Integer) = QQBarFieldElem(ZZRingElem(b))
+
+(a::QQBarField)(b::Rational) = QQBarFieldElem(b)
 
 (a::QQBarField)(b::QQFieldElem) = QQBarFieldElem(b)
 
