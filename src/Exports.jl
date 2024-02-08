@@ -670,6 +670,7 @@ export zzModRelPowerSeriesRing
 export ZZModRelPowerSeriesRing
 export zzModRelPowerSeriesRingElem
 export ZZModRelPowerSeriesRingElem
+export zzModRing
 export ZZModRing
 export zzModRingElem
 export ZZModRingElem
