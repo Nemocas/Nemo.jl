@@ -751,6 +751,20 @@ end
 
    @test_throws ArgumentError AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :garbage)
    @test_throws ArgumentError AbstractAlgebra.Solve.can_solve(A, B, side = :garbage)
+
+   A = matrix(QQ, [ 1 2 3 ; 4 5 6 ])
+   K = @inferred AbstractAlgebra.Solve.kernel(A, side = :right)
+   @test is_zero(A*K)
+   @test ncols(K) == 1
+
+   K = @inferred AbstractAlgebra.Solve.kernel(A, side = :left)
+   @test is_zero(K*A)
+   @test nrows(K) == 0
+
+   A = transpose(A)
+   K = @inferred AbstractAlgebra.Solve.kernel(A, side = :left)
+   @test is_zero(K*A)
+   @test nrows(K) == 1
 end
 
 @testset "QQMatrix.concat" begin

@@ -830,3 +830,40 @@ end
    M = rand(S)
    @test parent(M) == S
 end
+
+
+@testset "zzModMatrix.Solve.kernel" begin
+   # Prime modulus
+   R, _ = residue_ring(ZZ, 17)
+   M = matrix(R, [ 1 2 3 ; 4 5 6 ])
+
+   K = @inferred AbstractAlgebra.Solve.kernel(M, side = :right)
+   @test is_zero(M*K)
+   @test ncols(K) == 1
+
+   K = @inferred AbstractAlgebra.Solve.kernel(M, side = :left)
+   @test is_zero(K*M)
+   @test nrows(K) == 0
+
+   M = transpose(M)
+   K = @inferred AbstractAlgebra.Solve.kernel(M, side = :left)
+   @test is_zero(K*M)
+   @test nrows(K) == 1
+
+   # Composite modulus
+   R, _ = residue_ring(ZZ, 18)
+   M = matrix(R, [ 1 2 3 ; 4 5 6 ])
+
+   K = @inferred AbstractAlgebra.Solve.kernel(M, side = :right)
+   @test is_zero(M*K)
+   @test ncols(K) == 2
+
+   K = @inferred AbstractAlgebra.Solve.kernel(M, side = :left)
+   @test is_zero(K*M)
+   @test nrows(K) == 1
+
+   M = transpose(M)
+   K = @inferred AbstractAlgebra.Solve.kernel(M, side = :left)
+   @test is_zero(K*M)
+   @test nrows(K) == 2
+end
