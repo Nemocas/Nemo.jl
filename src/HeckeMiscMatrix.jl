@@ -770,7 +770,7 @@ function eigenvalues_with_multiplicities(L::Field, M::MatElem{T}) where T <: Rin
 end
 
 @doc raw"""
-    eigenspace(M::MatElem{T}, lambda::T; side::Symbol = :right)
+    eigenspace(M::MatElem{T}, lambda::T; side::Symbol = :left)
       where T <: FieldElem -> Vector{MatElem{T}}
 
 Return a basis of the eigenspace of $M$ with respect to the eigenvalue $\lambda$.
@@ -778,7 +778,7 @@ If side is `:right`, the right eigenspace is computed, i.e. vectors $v$ such tha
 $Mv = \lambda v$. If side is `:left`, the left eigenspace is computed, i.e. vectors
 $v$ such that $vM = \lambda v$.
 """
-function eigenspace(M::MatElem{T}, lambda::T; side::Symbol = :right) where T <: FieldElem
+function eigenspace(M::MatElem{T}, lambda::T; side::Symbol = :left) where T <: FieldElem
   @assert is_square(M)
   N = deepcopy(M)
   for i = 1:ncols(N)
@@ -788,7 +788,7 @@ function eigenspace(M::MatElem{T}, lambda::T; side::Symbol = :right) where T <: 
 end
 
 @doc raw"""
-    eigenspaces(M::MatElem{T}; side::Symbol = :right)
+    eigenspaces(M::MatElem{T}; side::Symbol = :left)
       where T <: FieldElem -> Dict{T, MatElem{T}}
 
 Return a dictionary containing the eigenvalues of $M$ as keys and bases for the
@@ -798,7 +798,7 @@ left eigenspaces are computed.
 
 See also `eigenspace`.
 """
-function eigenspaces(M::MatElem{T}; side::Symbol = :right) where T<:FieldElem
+function eigenspaces(M::MatElem{T}; side::Symbol = :left) where T<:FieldElem
 
   S = eigenvalues(M)
   L = Dict{elem_type(base_ring(M)), typeof(M)}()
