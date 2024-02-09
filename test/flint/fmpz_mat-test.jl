@@ -743,6 +743,14 @@ end
    K = @inferred AbstractAlgebra.Solve.kernel(A, side = :left)
    @test is_zero(K*A)
    @test nrows(K) == 1
+
+   K = @inferred AbstractAlgebra.Solve.kernel(zero_matrix(ZZ, 2, 2))
+   @test ncols(K) == 2
+   @test hnf(K) == identity_matrix(ZZ, 2)
+
+   K = @inferred AbstractAlgebra.Solve.kernel(zero_matrix(ZZ, 2, 2), side = :left)
+   @test nrows(K) == 2
+   @test hnf(K) == identity_matrix(ZZ, 2)
 end
 
 @testset "ZZMatrix.concat" begin

@@ -866,4 +866,13 @@ end
    K = @inferred AbstractAlgebra.Solve.kernel(M, side = :left)
    @test is_zero(K*M)
    @test nrows(K) == 2
+
+   M = identity_matrix(R, 2)
+   K = @inferred AbstractAlgebra.Solve.kernel(M, side = :right)
+   @test is_zero(M*K)
+   @test ncols(K) == 0
+
+   K = @inferred AbstractAlgebra.Solve.kernel(M, side = :left)
+   @test is_zero(K*M)
+   @test nrows(K) == 0
 end
