@@ -592,22 +592,22 @@ end
    a = matrix(Z17, [1 2 3; 3 2 1; 0 0 2])
    b = matrix(Z17, [2 1 0 1; 0 0 0 0; 0 1 2 0])
    c = a*b
-   d = AbstractAlgebra.Solve.solve(a, c)
+   d = AbstractAlgebra.Solve.solve(a, c, side = :right)
    @test d == b
- 
+
    a = zero(a, 3, 3)
-   @test_throws ArgumentError AbstractAlgebra.Solve.solve(a, c)
- 
+   @test_throws ArgumentError AbstractAlgebra.Solve.solve(a, c, side = :right)
+
    A = matrix(Z17, [1 2 3; 4 5 6])
    B = matrix(Z17, 2, 1, [1, 1])
-   fl, x, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B)
+   fl, x, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B, side = :right)
    @test fl
    @test A*x == B
    @test is_zero(A*K)
    @test ncols(K) + rank(A) == ncols(A)
- 
+
    B = matrix(Z17, 1, 3, [1, 2, 3])
-   fl, x, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B, side = :left)
+   fl, x, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B)
    @test fl
    @test x*A == B
    @test is_zero(K*A)
@@ -618,12 +618,12 @@ end
    @test is_zero(A*K)
    @test ncols(K) == 1
 
-   K = @inferred AbstractAlgebra.Solve.kernel(A, side = :left)
+   K = @inferred AbstractAlgebra.Solve.kernel(A)
    @test is_zero(K*A)
    @test nrows(K) == 0
 
    A = transpose(A)
-   K = @inferred AbstractAlgebra.Solve.kernel(A, side = :left)
+   K = @inferred AbstractAlgebra.Solve.kernel(A)
    @test is_zero(K*A)
    @test nrows(K) == 1
 end

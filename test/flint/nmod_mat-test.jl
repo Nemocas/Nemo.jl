@@ -841,12 +841,12 @@ end
    @test is_zero(M*K)
    @test ncols(K) == 1
 
-   K = @inferred AbstractAlgebra.Solve.kernel(M, side = :left)
+   K = @inferred AbstractAlgebra.Solve.kernel(M)
    @test is_zero(K*M)
    @test nrows(K) == 0
 
    M = transpose(M)
-   K = @inferred AbstractAlgebra.Solve.kernel(M, side = :left)
+   K = @inferred AbstractAlgebra.Solve.kernel(M)
    @test is_zero(K*M)
    @test nrows(K) == 1
 
@@ -858,12 +858,12 @@ end
    @test is_zero(M*K)
    @test ncols(K) == 2
 
-   K = @inferred AbstractAlgebra.Solve.kernel(M, side = :left)
+   K = @inferred AbstractAlgebra.Solve.kernel(M)
    @test is_zero(K*M)
    @test nrows(K) == 1
 
    M = transpose(M)
-   K = @inferred AbstractAlgebra.Solve.kernel(M, side = :left)
+   K = @inferred AbstractAlgebra.Solve.kernel(M)
    @test is_zero(K*M)
    @test nrows(K) == 2
 
@@ -872,7 +872,7 @@ end
    @test is_zero(M*K)
    @test ncols(K) == 0
 
-   K = @inferred AbstractAlgebra.Solve.kernel(M, side = :left)
+   K = @inferred AbstractAlgebra.Solve.kernel(M)
    @test is_zero(K*M)
    @test nrows(K) == 0
 end

@@ -704,7 +704,7 @@ function can_solve(a::QQMatrix, b::QQMatrix; side::Symbol = :right)
    return fl
 end
 
-function AbstractAlgebra.Solve._can_solve_internal_no_check(A::QQMatrix, b::QQMatrix, task::Symbol; side::Symbol = :right)
+function AbstractAlgebra.Solve._can_solve_internal_no_check(A::QQMatrix, b::QQMatrix, task::Symbol; side::Symbol = :left)
    if side === :left
       fl, sol, K = AbstractAlgebra.Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
       return fl, transpose(sol), transpose(K)

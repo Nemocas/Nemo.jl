@@ -653,13 +653,13 @@ end
 
   c = a*b
 
-  d = AbstractAlgebra.Solve.solve(a, c)
+  d = AbstractAlgebra.Solve.solve(a, c, side = :right)
 
   @test d == b
 
   a = zero(R)
 
-  @test_throws ArgumentError AbstractAlgebra.Solve.solve(a, c)
+  @test_throws ArgumentError AbstractAlgebra.Solve.solve(a, c, side = :right)
 
    for i in 1:10
       m = rand(0:10)
@@ -672,7 +672,7 @@ end
       A = rand(M)
       B = rand(N)
 
-      fl, X, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B)
+      fl, X, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B, side = :right)
 
       if fl
          @test A * X == B
@@ -683,51 +683,51 @@ end
 
    A = matrix(F17, 2, 2, [1, 2, 2, 5])
    B = matrix(F17, 2, 1, [1, 2])
-   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B)
+   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :right)
    @test fl
    @test A * X == B
-   @test AbstractAlgebra.Solve.can_solve(A, B)
+   @test AbstractAlgebra.Solve.can_solve(A, B, side = :right)
 
    A = matrix(F17, 2, 2, [1, 2, 2, 4])
    B = matrix(F17, 2, 1, [1, 2])
-   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B)
+   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :right)
    @test fl
    @test A * X == B
-   @test AbstractAlgebra.Solve.can_solve(A, B)
+   @test AbstractAlgebra.Solve.can_solve(A, B, side = :right)
 
    A = matrix(F17, 2, 2, [1, 2, 2, 4])
    B = matrix(F17, 2, 1, [1, 3])
-   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B)
+   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :right)
    @test !fl
    @test !can_solve(A, B)
 
    A = zero_matrix(F17, 2, 3)
    B = identity_matrix(F17, 3)
-   @test_throws ErrorException AbstractAlgebra.Solve.can_solve_with_solution(A, B)
+   @test_throws ErrorException AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :right)
 
    A = transpose(matrix(F17, 2, 2, [1, 2, 2, 5]))
    B = transpose(matrix(F17, 2, 1, [1, 2]))
-   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :left)
+   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B)
    @test fl
    @test X * A == B
-   @test AbstractAlgebra.Solve.can_solve(A, B, side = :left)
+   @test AbstractAlgebra.Solve.can_solve(A, B)
 
    A = transpose(matrix(F17, 2, 2, [1, 2, 2, 4]))
    B = transpose(matrix(F17, 2, 1, [1, 2]))
-   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :left)
+   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B)
    @test fl
    @test X * A == B
-   @test AbstractAlgebra.Solve.can_solve(A, B, side = :left)
+   @test AbstractAlgebra.Solve.can_solve(A, B)
 
    A = transpose(matrix(F17, 2, 2, [1, 2, 2, 4]))
    B = transpose(matrix(F17, 2, 1, [1, 3]))
-   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :left)
+   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B)
    @test !fl
-   @test !AbstractAlgebra.Solve.can_solve(A, B, side = :left)
+   @test !AbstractAlgebra.Solve.can_solve(A, B)
 
    A = transpose(zero_matrix(F17, 2, 3))
    B = transpose(identity_matrix(F17, 3))
-   @test_throws ErrorException AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :left)
+   @test_throws ErrorException AbstractAlgebra.Solve.can_solve_with_solution(A, B)
 
    @test_throws ArgumentError AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :garbage)
    @test_throws ArgumentError AbstractAlgebra.Solve.can_solve(A, B, side = :garbage)

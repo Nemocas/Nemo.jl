@@ -925,7 +925,7 @@ end
 #
 ################################################################################
 
-function AbstractAlgebra.Solve.kernel(M::zzModMatrix; side::Symbol = :right)
+function AbstractAlgebra.Solve.kernel(M::zzModMatrix; side::Symbol = :left)
    AbstractAlgebra.Solve.check_option(side, [:right, :left], "side")
 
    if side === :left

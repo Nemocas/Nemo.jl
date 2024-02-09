@@ -457,7 +457,7 @@ function can_solve(a::FqPolyRepMatrix, b::FqPolyRepMatrix; side::Symbol = :right
    return fl
 end
 
-function AbstractAlgebra.Solve._can_solve_internal_no_check(A::FqPolyRepMatrix, b::FqPolyRepMatrix, task::Symbol; side::Symbol = :right)
+function AbstractAlgebra.Solve._can_solve_internal_no_check(A::FqPolyRepMatrix, b::FqPolyRepMatrix, task::Symbol; side::Symbol = :left)
    check_parent(A, b)
    if side === :left
       fl, sol, K = AbstractAlgebra.Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
@@ -471,7 +471,7 @@ function AbstractAlgebra.Solve._can_solve_internal_no_check(A::FqPolyRepMatrix, 
    if task === :only_check || task === :with_solution
       return Bool(fl), x, zero(A, 0, 0)
    end
-   return Bool(fl), x, AbstractAlgebra.Solve.kernel(A)
+   return Bool(fl), x, AbstractAlgebra.Solve.kernel(A, side = :right)
 end
 
 ################################################################################

@@ -1110,7 +1110,7 @@ function nullspace(x::ZZMatrix)
   return ncols(x), identity_matrix(x, ncols(x))
 end
 
-function AbstractAlgebra.Solve.kernel(A::ZZMatrix; side::Symbol = :right)
+function AbstractAlgebra.Solve.kernel(A::ZZMatrix; side::Symbol = :left)
    AbstractAlgebra.Solve.check_option(side, [:right, :left], "side")
 
    if side === :left
@@ -1314,7 +1314,7 @@ function cansolve(a::ZZMatrix, b::ZZMatrix)
    return true, transpose(z*T)
 end
 
-function AbstractAlgebra.Solve._can_solve_internal_no_check(A::ZZMatrix, b::ZZMatrix, task::Symbol; side::Symbol = :right)
+function AbstractAlgebra.Solve._can_solve_internal_no_check(A::ZZMatrix, b::ZZMatrix, task::Symbol; side::Symbol = :left)
    if side === :left
       fl, sol, K = AbstractAlgebra.Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
       return fl, transpose(sol), transpose(K)
@@ -1324,7 +1324,7 @@ function AbstractAlgebra.Solve._can_solve_internal_no_check(A::ZZMatrix, b::ZZMa
    if task === :only_check || task === :with_solution
      return fl, sol, zero(A, 0, 0)
    end
-   return fl, sol, AbstractAlgebra.Solve.kernel(A)
+   return fl, sol, AbstractAlgebra.Solve.kernel(A, side = :right)
  end
 
 Base.reduce(::typeof(hcat), A::AbstractVector{ZZMatrix}) = AbstractAlgebra._hcat(A)

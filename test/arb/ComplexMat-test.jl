@@ -457,51 +457,51 @@ end
    b = transpose(CC["6.0 +/- 0.1" "15.0 +/- 0.1" "25.0 +/- 0.1"])
    b2 = 2*b
 
-   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, b)
+   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, b, side = :right)
    @test fl
    @test overlaps(A*y, b)
    @test contains(transpose(y), ZZ[1 1 1])
    @test ncols(K) == 0
 
-   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, transpose(b), side = :left)
+   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, transpose(b))
    @test fl
    @test overlaps(y*A, transpose(b))
    @test nrows(K) == 0
 
-   y = AbstractAlgebra.Solve.solve(A, b)
+   y = AbstractAlgebra.Solve.solve(A, b, side = :right)
    @test fl
    @test overlaps(A*y, b)
    @test contains(transpose(y), ZZ[1 1 1])
 
    C = AbstractAlgebra.Solve.solve_init(A)
-   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(C, b)
+   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(C, b, side = :right)
    @test fl
    @test overlaps(A*y, b)
    @test contains(transpose(y), ZZ[1 1 1])
    @test ncols(K) == 0
 
-   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(C, transpose(b), side = :left)
+   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(C, transpose(b))
    @test fl
    @test overlaps(y*A, transpose(b))
    @test nrows(K) == 0
 
-   y = AbstractAlgebra.Solve.solve(C, b)
+   y = AbstractAlgebra.Solve.solve(C, b, side = :right)
    @test fl
    @test overlaps(A*y, b)
    @test contains(transpose(y), ZZ[1 1 1])
 
-   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(C, b2)
+   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(C, b2, side = :right)
    @test fl
    @test overlaps(A*y, b2)
    @test contains(transpose(y), ZZ[2 2 2])
    @test ncols(K) == 0
 
-   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(C, transpose(b2), side = :left)
+   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(C, transpose(b2))
    @test fl
    @test overlaps(y*A, transpose(b2))
    @test nrows(K) == 0
 
-   y = AbstractAlgebra.Solve.solve(C, b2)
+   y = AbstractAlgebra.Solve.solve(C, b2, side = :right)
    @test fl
    @test overlaps(A*y, b2)
    @test contains(transpose(y), ZZ[2 2 2])

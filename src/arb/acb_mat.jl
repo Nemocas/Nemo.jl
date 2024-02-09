@@ -600,7 +600,7 @@ function solve_lu_precomp(P::Generic.Perm, LU::AcbMatrix, y::AcbMatrix)
   return z
 end
 
-function AbstractAlgebra.Solve._can_solve_internal_no_check(A::AcbMatrix, b::AcbMatrix, task::Symbol; side::Symbol = :right)
+function AbstractAlgebra.Solve._can_solve_internal_no_check(A::AcbMatrix, b::AcbMatrix, task::Symbol; side::Symbol = :left)
    nrows(A) != ncols(A) && error("Only implemented for square matrices")
    if side === :left
       fl, sol, K = AbstractAlgebra.Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
@@ -675,7 +675,7 @@ function AbstractAlgebra.Solve._init_reduce_transpose(C::AbstractAlgebra.Solve.S
    return nothing
 end
 
-function AbstractAlgebra.Solve._can_solve_internal_no_check(C::AbstractAlgebra.Solve.SolveCtx{AcbFieldElem}, b::AcbMatrix, task::Symbol; side::Symbol = :right)
+function AbstractAlgebra.Solve._can_solve_internal_no_check(C::AbstractAlgebra.Solve.SolveCtx{AcbFieldElem}, b::AcbMatrix, task::Symbol; side::Symbol = :left)
    if side === :right
       LU = AbstractAlgebra.Solve.reduced_matrix(C)
       p = AbstractAlgebra.Solve.lu_permutation(C)
