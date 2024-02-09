@@ -233,7 +233,7 @@ function is_squarefree(n::Union{Int,ZZRingElem})
     if e > 1
         return false
     end
-    return isone(maximum(values(factor(n).fac)))
+    return isone(maximum(values(factor(n).fac); init = 1))
 end
 
 

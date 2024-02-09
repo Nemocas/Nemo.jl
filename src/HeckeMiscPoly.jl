@@ -516,7 +516,7 @@ end
 
 function is_squarefree(f::PolyRingElem{<:RingElement})
   iszero(f) && return false
-  degree(f) == 0 && return is_squarefree(leading_coefficient(f))
+  degree(f) == 0 && return is_squarefree(leading_coefficient(f))::Bool
   fac = factor_squarefree(f)
   return all(e <= 1 for (_, e) in fac)
 end
