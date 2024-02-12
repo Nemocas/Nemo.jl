@@ -181,24 +181,24 @@ end
 #
 ################################################################################
 
-function right_kernel(x::fpMatrix)
+function _right_kernel(x::fpMatrix)
     z = zero_matrix(base_ring(x), ncols(x), max(nrows(x), ncols(x)))
     n = ccall((:nmod_mat_nullspace, libflint), Int, (Ref{fpMatrix}, Ref{fpMatrix}), z, x)
     return n, z
 end
 
-function left_kernel(x::fpMatrix)
-    n, M = right_kernel(transpose(x))
+function _left_kernel(x::fpMatrix)
+    n, M = _right_kernel(transpose(x))
     return n, transpose(M)
 end
 
 @doc raw"""
-    left_kernel(a::ZZMatrix) -> Int, ZZMatrix
+    _left_kernel(a::ZZMatrix) -> Int, ZZMatrix
 
 It returns a tuple $(n, M)$ where $M$ is a matrix whose rows generate
 the kernel of $a$ and $n$ is the rank of the kernel.
 """
-function left_kernel(x::ZZMatrix)
+function _left_kernel(x::ZZMatrix)
     if nrows(x) == 0
         return 0, zero(x, 0, 0)
     end
@@ -217,12 +217,12 @@ function left_kernel(x::ZZMatrix)
     end
 end
 
-function right_kernel(x::ZZMatrix)
-    n, M = left_kernel(transpose(x))
+function _right_kernel(x::ZZMatrix)
+    n, M = _left_kernel(transpose(x))
     return n, transpose(M)
 end
 
-function right_kernel(M::zzModMatrix)
+function _right_kernel(M::zzModMatrix)
     R = base_ring(M)
     if is_prime(modulus(R))
         k = zero_matrix(R, ncols(M), ncols(M))
@@ -250,7 +250,7 @@ function right_kernel(M::zzModMatrix)
     return 0, zero_matrix(R, nrows(M), 0)
 end
 
-function right_kernel(M::ZZModMatrix)
+function _right_kernel(M::ZZModMatrix)
     R = base_ring(M)
     N = hcat(transpose(M), identity_matrix(R, ncols(M)))
     if nrows(N) < ncols(N)
@@ -784,7 +784,7 @@ function eigenspace(M::MatElem{T}, lambda::T; side::Symbol = :left) where T <: F
   for i = 1:ncols(N)
     N[i, i] -= lambda
   end
-  return kernel(N, side = side)[2]
+  return kernel(N, side = side)
 end
 
 @doc raw"""

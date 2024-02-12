@@ -521,7 +521,7 @@ function lu!(P::Generic.Perm, x::ArbMatrix)
   return nrows(x)
 end
 
-function solve!(z::ArbMatrix, x::ArbMatrix, y::ArbMatrix)
+function _solve!(z::ArbMatrix, x::ArbMatrix, y::ArbMatrix)
   r = ccall((:arb_mat_solve, libarb), Cint,
               (Ref{ArbMatrix}, Ref{ArbMatrix}, Ref{ArbMatrix}, Int),
               z, x, y, precision(base_ring(x)))
@@ -529,15 +529,15 @@ function solve!(z::ArbMatrix, x::ArbMatrix, y::ArbMatrix)
   nothing
 end
 
-function solve(x::ArbMatrix, y::ArbMatrix)
+function _solve(x::ArbMatrix, y::ArbMatrix)
   ncols(x) != nrows(x) && error("First argument must be square")
   ncols(x) != nrows(y) && error("Matrix dimensions are wrong")
   z = similar(y)
-  solve!(z, x, y)
+  _solve!(z, x, y)
   return z
 end
 
-function solve_lu_precomp!(z::ArbMatrix, P::Generic.Perm, LU::ArbMatrix, y::ArbMatrix)
+function _solve_lu_precomp!(z::ArbMatrix, P::Generic.Perm, LU::ArbMatrix, y::ArbMatrix)
   Q = inv(P)
   ccall((:arb_mat_solve_lu_precomp, libarb), Nothing,
               (Ref{ArbMatrix}, Ptr{Int}, Ref{ArbMatrix}, Ref{ArbMatrix}, Int),
@@ -545,24 +545,24 @@ function solve_lu_precomp!(z::ArbMatrix, P::Generic.Perm, LU::ArbMatrix, y::ArbM
   nothing
 end
 
-function solve_lu_precomp(P::Generic.Perm, LU::ArbMatrix, y::ArbMatrix)
+function _solve_lu_precomp(P::Generic.Perm, LU::ArbMatrix, y::ArbMatrix)
   ncols(LU) != nrows(y) && error("Matrix dimensions are wrong")
   z = similar(y)
-  solve_lu_precomp!(z, P, LU, y)
+  _solve_lu_precomp!(z, P, LU, y)
   return z
 end
 
-function solve_cholesky_precomp!(z::ArbMatrix, cho::ArbMatrix, y::ArbMatrix)
+function _solve_cholesky_precomp!(z::ArbMatrix, cho::ArbMatrix, y::ArbMatrix)
   ccall((:arb_mat_solve_cho_precomp, libarb), Nothing,
               (Ref{ArbMatrix}, Ref{ArbMatrix}, Ref{ArbMatrix}, Int),
               z, cho, y, precision(base_ring(cho)))
   nothing
 end
 
-function solve_cholesky_precomp(cho::ArbMatrix, y::ArbMatrix)
+function _solve_cholesky_precomp(cho::ArbMatrix, y::ArbMatrix)
   ncols(cho) != nrows(y) && error("Matrix dimensions are wrong")
   z = similar(y)
-  solve_cholesky_precomp!(z, cho, y)
+  _solve_cholesky_precomp!(z, cho, y)
   return z
 end
 
@@ -591,7 +591,7 @@ end
 #
 ################################################################################
 
-function AbstractAlgebra.Solve.solve_init(A::ArbMatrix)
+function solve_init(A::ArbMatrix)
    return AbstractAlgebra.Solve.SolveCtx{ArbFieldElem, ArbMatrix, ArbMatrix}(A)
 end
 

@@ -20,7 +20,7 @@ function benchmark_solve_poly()
      end
    end
 
-   tt = @elapsed solve_rational(M, b)
+   tt = @elapsed _solve_rational(M, b)
    println("$tt")
 end
 

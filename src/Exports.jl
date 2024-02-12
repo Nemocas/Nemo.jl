@@ -65,8 +65,6 @@ export CalciumField
 export CalciumFieldElem
 export CalciumQQBar
 export canonical_unit
-export cansolve
-export cansolve_with_nullspace
 export cdiv
 export cdivpow2
 export cdivrem
@@ -587,13 +585,6 @@ export SkewDiagram
 export snf
 export snf_diagonal
 export solve
-export solve_cholesky_precomp
-export solve_cholesky_precomp!
-export solve_dixon
-export solve_lu_precomp
-export solve_lu_precomp!
-export solve_rational
-export solve!
 export sort_terms!
 export SparsePolynomialRing
 export sqr_classical

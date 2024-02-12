@@ -569,7 +569,7 @@ function lu!(P::Generic.Perm, x::AcbMatrix)
   return nrows(x)
 end
 
-function solve!(z::AcbMatrix, x::AcbMatrix, y::AcbMatrix)
+function _solve!(z::AcbMatrix, x::AcbMatrix, y::AcbMatrix)
   r = ccall((:acb_mat_solve, libarb), Cint,
               (Ref{AcbMatrix}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
               z, x, y, precision(base_ring(x)))
@@ -577,15 +577,15 @@ function solve!(z::AcbMatrix, x::AcbMatrix, y::AcbMatrix)
   nothing
 end
 
-function solve(x::AcbMatrix, y::AcbMatrix)
+function _solve(x::AcbMatrix, y::AcbMatrix)
   ncols(x) != nrows(x) && error("First argument must be square")
   ncols(x) != nrows(y) && error("Matrix dimensions are wrong")
   z = similar(y)
-  solve!(z, x, y)
+  _solve!(z, x, y)
   return z
 end
 
-function solve_lu_precomp!(z::AcbMatrix, P::Generic.Perm, LU::AcbMatrix, y::AcbMatrix)
+function _solve_lu_precomp!(z::AcbMatrix, P::Generic.Perm, LU::AcbMatrix, y::AcbMatrix)
   Q = inv(P)
   ccall((:acb_mat_solve_lu_precomp, libarb), Nothing,
               (Ref{AcbMatrix}, Ptr{Int}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
@@ -593,10 +593,10 @@ function solve_lu_precomp!(z::AcbMatrix, P::Generic.Perm, LU::AcbMatrix, y::AcbM
   nothing
 end
 
-function solve_lu_precomp(P::Generic.Perm, LU::AcbMatrix, y::AcbMatrix)
+function _solve_lu_precomp(P::Generic.Perm, LU::AcbMatrix, y::AcbMatrix)
   ncols(LU) != nrows(y) && error("Matrix dimensions are wrong")
   z = similar(y)
-  solve_lu_precomp!(z, P, LU, y)
+  _solve_lu_precomp!(z, P, LU, y)
   return z
 end
 
@@ -625,7 +625,7 @@ end
 #
 ################################################################################
 
-function AbstractAlgebra.Solve.solve_init(A::AcbMatrix)
+function solve_init(A::AcbMatrix)
    return AbstractAlgebra.Solve.SolveCtx{AcbFieldElem, AcbMatrix, AcbMatrix}(A)
 end
 

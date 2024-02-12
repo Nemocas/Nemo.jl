@@ -566,7 +566,7 @@ function lu!(P::Generic.Perm, x::ComplexMat)
   return min(nrows(x), ncols(x))
 end
 
-function solve!(z::ComplexMat, x::ComplexMat, y::ComplexMat)
+function _solve!(z::ComplexMat, x::ComplexMat, y::ComplexMat)
   r = ccall((:acb_mat_solve, libarb), Cint,
               (Ref{ComplexMat}, Ref{ComplexMat}, Ref{ComplexMat}, Int),
               z, x, y, precision(Balls))
@@ -574,15 +574,15 @@ function solve!(z::ComplexMat, x::ComplexMat, y::ComplexMat)
   nothing
 end
 
-function solve(x::ComplexMat, y::ComplexMat)
+function _solve(x::ComplexMat, y::ComplexMat)
   ncols(x) != nrows(x) && error("First argument must be square")
   ncols(x) != nrows(y) && error("Matrix dimensions are wrong")
   z = similar(y)
-  solve!(z, x, y)
+  _solve!(z, x, y)
   return z
 end
 
-function solve_lu_precomp!(z::ComplexMat, P::Generic.Perm, LU::ComplexMat, y::ComplexMat)
+function _solve_lu_precomp!(z::ComplexMat, P::Generic.Perm, LU::ComplexMat, y::ComplexMat)
   Q = inv(P)
   ccall((:acb_mat_solve_lu_precomp, libarb), Nothing,
               (Ref{ComplexMat}, Ptr{Int}, Ref{ComplexMat}, Ref{ComplexMat}, Int),
@@ -590,10 +590,10 @@ function solve_lu_precomp!(z::ComplexMat, P::Generic.Perm, LU::ComplexMat, y::Co
   nothing
 end
 
-function solve_lu_precomp(P::Generic.Perm, LU::ComplexMat, y::ComplexMat)
+function _solve_lu_precomp(P::Generic.Perm, LU::ComplexMat, y::ComplexMat)
   ncols(LU) != nrows(y) && error("Matrix dimensions are wrong")
   z = similar(y)
-  solve_lu_precomp!(z, P, LU, y)
+  _solve_lu_precomp!(z, P, LU, y)
   return z
 end
 
@@ -622,7 +622,7 @@ end
 #
 ################################################################################
 
-function AbstractAlgebra.Solve.solve_init(A::ComplexMat)
+function solve_init(A::ComplexMat)
    return AbstractAlgebra.Solve.SolveCtx{ComplexFieldElem, ComplexMat, ComplexMat}(A)
 end
 

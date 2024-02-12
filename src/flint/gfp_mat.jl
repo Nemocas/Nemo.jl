@@ -290,11 +290,11 @@ end
 #
 ################################################################################
 
-function can_solve_with_solution(a::fpMatrix, b::fpMatrix; side::Symbol = :right)
+function _can_solve_with_solution(a::fpMatrix, b::fpMatrix; side::Symbol = :right)
    (base_ring(a) != base_ring(b)) && error("Matrices must have same base ring")
    if side == :left
       (ncols(a) != ncols(b)) && error("Matrices must have same number of columns")
-      (f, x) = can_solve_with_solution(transpose(a), transpose(b); side=:right)
+      (f, x) = _can_solve_with_solution(transpose(a), transpose(b); side=:right)
       return (f, transpose(x))
    elseif side == :right
       (nrows(a) != nrows(b)) && error("Matrices must have same number of rows")
@@ -307,8 +307,8 @@ function can_solve_with_solution(a::fpMatrix, b::fpMatrix; side::Symbol = :right
    end
 end
 
-function can_solve(a::fpMatrix, b::fpMatrix; side::Symbol = :right)
-   fl, _ = can_solve_with_solution(a, b, side = side)
+function _can_solve(a::fpMatrix, b::fpMatrix; side::Symbol = :right)
+   fl, _ = _can_solve_with_solution(a, b, side = side)
    return fl
 end
 
@@ -326,7 +326,7 @@ function AbstractAlgebra.Solve._can_solve_internal_no_check(A::fpMatrix, b::fpMa
    if task === :only_check || task === :with_solution
       return Bool(fl), x, zero(A, 0, 0)
    end
-   return Bool(fl), x, AbstractAlgebra.Solve.kernel(A, side = :right)
+   return Bool(fl), x, kernel(A, side = :right)
 end
 
 ################################################################################
@@ -515,11 +515,11 @@ end
 #
 ################################################################################
 
-function AbstractAlgebra.Solve.kernel(A::fpMatrix; side::Symbol = :left)
+function kernel(A::fpMatrix; side::Symbol = :left)
    AbstractAlgebra.Solve.check_option(side, [:right, :left], "side")
 
    if side === :left
-      K = AbstractAlgebra.Solve.kernel(transpose(A), side = :right)
+      K = kernel(transpose(A), side = :right)
       return transpose(K)
    end
 

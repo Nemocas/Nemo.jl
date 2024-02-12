@@ -1110,11 +1110,11 @@ function nullspace(x::ZZMatrix)
   return ncols(x), identity_matrix(x, ncols(x))
 end
 
-function AbstractAlgebra.Solve.kernel(A::ZZMatrix; side::Symbol = :left)
+function kernel(A::ZZMatrix; side::Symbol = :left)
    AbstractAlgebra.Solve.check_option(side, [:right, :left], "side")
 
    if side === :left
-      K = AbstractAlgebra.Solve.kernel(transpose(A), side = :right)
+      K = kernel(transpose(A), side = :right)
       return transpose(K)
    end
 
@@ -1251,14 +1251,14 @@ end
 ###############################################################################
 
 @doc raw"""
-    solve(a::ZZMatrix, b::ZZMatrix) -> ZZMatrix
+    _solve(a::ZZMatrix, b::ZZMatrix) -> ZZMatrix
 
 Return a matrix $x$ such that $ax = b$. An exception is raised
 if this is not possible.
 """
-function solve(a::ZZMatrix, b::ZZMatrix)
+function _solve(a::ZZMatrix, b::ZZMatrix)
    nrows(b) != nrows(a) && error("Incompatible dimensions in solve")
-   fl, z = cansolve(a, b)
+   fl, z = _cansolve(a, b)
    if !fl
      error("system is inconsistent")
    end
@@ -1266,13 +1266,13 @@ function solve(a::ZZMatrix, b::ZZMatrix)
 end
 
 @doc raw"""
-    cansolve(a::ZZMatrix, b::ZZMatrix) -> Bool, ZZMatrix
+    _cansolve(a::ZZMatrix, b::ZZMatrix) -> Bool, ZZMatrix
 
 Return true and a matrix $x$ such that $ax = b$, or false and some matrix
 in case $x$ does not exist.
 """
-function cansolve(a::ZZMatrix, b::ZZMatrix)
-   nrows(b) != nrows(a) && error("Incompatible dimensions in cansolve")
+function _cansolve(a::ZZMatrix, b::ZZMatrix)
+   nrows(b) != nrows(a) && error("Incompatible dimensions in _cansolve")
    H, T = hnf_with_transform(transpose(a))
    b = deepcopy(b)
    z = similar(a, ncols(b), ncols(a))
@@ -1320,11 +1320,11 @@ function AbstractAlgebra.Solve._can_solve_internal_no_check(A::ZZMatrix, b::ZZMa
       return fl, transpose(sol), transpose(K)
    end
 
-   fl, sol = Nemo.cansolve(A, b)
+   fl, sol = Nemo._cansolve(A, b)
    if task === :only_check || task === :with_solution
      return fl, sol, zero(A, 0, 0)
    end
-   return fl, sol, AbstractAlgebra.Solve.kernel(A, side = :right)
+   return fl, sol, kernel(A, side = :right)
  end
 
 Base.reduce(::typeof(hcat), A::AbstractVector{ZZMatrix}) = AbstractAlgebra._hcat(A)
@@ -1415,24 +1415,24 @@ function AbstractAlgebra._hcat(A::AbstractVector{ZZMatrix})
 end
 
 #to override the generic one in AA
-function can_solve_with_solution(a::ZZMatrix, b::ZZMatrix; side::Symbol = :right)
+function _can_solve_with_solution(a::ZZMatrix, b::ZZMatrix; side::Symbol = :right)
    if side == :left
-      fl, x = Nemo.cansolve(transpose(a), transpose(b))
+      fl, x = Nemo._cansolve(transpose(a), transpose(b))
       return fl, transpose(x)
    end
-   return Nemo.cansolve(a, b)
+   return Nemo._cansolve(a, b)
 end
 
 
 @doc raw"""
-    cansolve_with_nullspace(a::ZZMatrix, b::ZZMatrix) -> Bool, ZZMatrix, ZZMatrix
+    _cansolve_with_nullspace(a::ZZMatrix, b::ZZMatrix) -> Bool, ZZMatrix, ZZMatrix
 
 Return true, a matrix $x$ and a matrix $k$ such that $ax = b$ and the columns
 of $k$ form a basis for the nullspace of $a$. In case $x$ does not exist, false
 and two arbitrary matrices are returned.
 """
-function cansolve_with_nullspace(a::ZZMatrix, b::ZZMatrix)
-   nrows(b) != nrows(a) && error("Incompatible dimensions in cansolve_with_nullspace")
+function _cansolve_with_nullspace(a::ZZMatrix, b::ZZMatrix)
+   nrows(b) != nrows(a) && error("Incompatible dimensions in _cansolve_with_nullspace")
    H, T = hnf_with_transform(transpose(a))
    b = deepcopy(b)
    z = similar(a, ncols(b), ncols(a))
@@ -1481,37 +1481,37 @@ function cansolve_with_nullspace(a::ZZMatrix, b::ZZMatrix)
 end
 
 @doc raw"""
-    solve_rational(a::ZZMatrix, b::ZZMatrix)
+    _solve_rational(a::ZZMatrix, b::ZZMatrix)
 
 If it exists, return a tuple $(x, d)$ consisting of a column vector $x$ such
 that $ax = db$. The element $b$ must be a column vector with the same number
 of rows as $a$ and $a$ must be a square matrix. If these conditions are not
 met or $(x, d)$ does not exist, an exception is raised.
 """
-function solve_rational(a::ZZMatrix, b::ZZMatrix)
-   nrows(a) != ncols(a) && error("Not a square matrix in solve_rational")
-   nrows(b) != nrows(a) && error("Incompatible dimensions in solve_rational")
+function _solve_rational(a::ZZMatrix, b::ZZMatrix)
+   nrows(a) != ncols(a) && error("Not a square matrix in _solve_rational")
+   nrows(b) != nrows(a) && error("Incompatible dimensions in _solve_rational")
    z = similar(b)
    d = ZZRingElem()
    nonsing = ccall((:fmpz_mat_solve, libflint), Bool,
       (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{ZZMatrix}, Ref{ZZMatrix}), z, d, a, b)
-   !nonsing && error("Singular matrix in solve_rational")
+   !nonsing && error("Singular matrix in _solve_rational")
    return z, d
 end
 
-function Generic.solve_with_det(a::ZZMatrix, b::ZZMatrix)
-   return solve_rational(a, b)
+function _solve_with_det(a::ZZMatrix, b::ZZMatrix)
+   return _solve_rational(a, b)
 end
 
 @doc raw"""
-    solve_dixon(a::ZZMatrix, b::ZZMatrix)
+    _solve_dixon(a::ZZMatrix, b::ZZMatrix)
 
 Return a tuple $(x, m)$ consisting of a column vector $x$ such that $ax = b
 \pmod{m}$. The element  $b$ must be a column vector with the same number > of
 rows as $a$ and $a$ must be a square matrix. If these conditions are not met
 or $(x, d)$ does not exist, an exception is raised.
 """
-function solve_dixon(a::ZZMatrix, b::ZZMatrix)
+function _solve_dixon(a::ZZMatrix, b::ZZMatrix)
    nrows(a) != ncols(a) && error("Not a square matrix in solve")
    nrows(b) != nrows(a) && error("Incompatible dimensions in solve")
    z = similar(b)
@@ -1523,7 +1523,7 @@ function solve_dixon(a::ZZMatrix, b::ZZMatrix)
 end
 
 #XU = B. only the upper triangular part of U is used
-function solve_triu_left(U::ZZMatrix, b::ZZMatrix)
+function _solve_triu_left(U::ZZMatrix, b::ZZMatrix)
    n = ncols(U)
    m = nrows(b)
    R = base_ring(U)
@@ -1567,7 +1567,7 @@ function solve_triu_left(U::ZZMatrix, b::ZZMatrix)
 end
 
 #UX = B
-function solve_triu(U::ZZMatrix, b::ZZMatrix) 
+function _solve_triu(U::ZZMatrix, b::ZZMatrix) 
    n = nrows(U)
    m = ncols(b)
    X = zero(b)
@@ -1610,7 +1610,7 @@ function solve_triu(U::ZZMatrix, b::ZZMatrix)
    return X
 end
 
-function AbstractAlgebra.solve_tril!(A::ZZMatrix, B::ZZMatrix, C::ZZMatrix, f::Int = 0) 
+function AbstractAlgebra._solve_tril!(A::ZZMatrix, B::ZZMatrix, C::ZZMatrix, f::Int = 0) 
 
   # a       x   u      ax = u
   # b c   * y = v      bx + cy = v

@@ -606,13 +606,13 @@ end
 
   c = a*b
 
-  d = solve(a,c)
+  d = Nemo._solve(a,c)
 
   @test d == b
 
   a = zero(R)
 
-  @test_throws ErrorException  solve(a,c)
+  @test_throws ErrorException  Nemo._solve(a,c)
 end
 
 @testset "zzModMatrix.lu" begin
@@ -837,16 +837,16 @@ end
    R, _ = residue_ring(ZZ, 17)
    M = matrix(R, [ 1 2 3 ; 4 5 6 ])
 
-   K = @inferred AbstractAlgebra.Solve.kernel(M, side = :right)
+   K = @inferred kernel(M, side = :right)
    @test is_zero(M*K)
    @test ncols(K) == 1
 
-   K = @inferred AbstractAlgebra.Solve.kernel(M)
+   K = @inferred kernel(M)
    @test is_zero(K*M)
    @test nrows(K) == 0
 
    M = transpose(M)
-   K = @inferred AbstractAlgebra.Solve.kernel(M)
+   K = @inferred kernel(M)
    @test is_zero(K*M)
    @test nrows(K) == 1
 
@@ -854,25 +854,25 @@ end
    R, _ = residue_ring(ZZ, 18)
    M = matrix(R, [ 1 2 3 ; 4 5 6 ])
 
-   K = @inferred AbstractAlgebra.Solve.kernel(M, side = :right)
+   K = @inferred kernel(M, side = :right)
    @test is_zero(M*K)
    @test ncols(K) == 2
 
-   K = @inferred AbstractAlgebra.Solve.kernel(M)
+   K = @inferred kernel(M)
    @test is_zero(K*M)
    @test nrows(K) == 1
 
    M = transpose(M)
-   K = @inferred AbstractAlgebra.Solve.kernel(M)
+   K = @inferred kernel(M)
    @test is_zero(K*M)
    @test nrows(K) == 2
 
    M = identity_matrix(R, 2)
-   K = @inferred AbstractAlgebra.Solve.kernel(M, side = :right)
+   K = @inferred kernel(M, side = :right)
    @test is_zero(M*K)
    @test ncols(K) == 0
 
-   K = @inferred AbstractAlgebra.Solve.kernel(M)
+   K = @inferred kernel(M)
    @test is_zero(K*M)
    @test nrows(K) == 0
 end

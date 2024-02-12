@@ -486,22 +486,22 @@ end
 #
 ################################################################################
 
-function solve(x::T, y::T) where T <: Zmodn_mat
+function _solve(x::T, y::T) where T <: Zmodn_mat
   (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
-  !is_square(x)&& error("First argument not a square matrix in solve")
-  (y.r != x.r) || y.c != 1 && ("Not a column vector in solve")
+  !is_square(x)&& error("First argument not a square matrix in _solve")
+  (y.r != x.r) || y.c != 1 && ("Not a column vector in _solve")
   z = similar(y)
   r = ccall((:nmod_mat_solve, libflint), Int,
           (Ref{T}, Ref{T}, Ref{T}), z, x, y)
-  !Bool(r) && error("Singular matrix in solve")
+  !Bool(r) && error("Singular matrix in _solve")
   return z
 end
 
-function AbstractAlgebra.solve_triu(x::T, y::T) where T <: Zmodn_mat
+function AbstractAlgebra._solve_triu(x::T, y::T) where T <: Zmodn_mat
    (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
    is_upper_trangular(x) || error("Matrix must be upper triangular")
    z = similar(x, nrows(x), ncols(y))
-   solve_triu!(z, x, y, 0)
+   _solve_triu!(z, x, y, 0)
    return z
 end
 
@@ -512,14 +512,14 @@ end
 # useful in the context of solving/ lu decomposition: the lu
 # is done inplace, so the lower part wil be "l", the upper "u",
 # both are implicit only.
-function solve_triu!(A::T, B::T, C::T, unit::Int = 0) where T <: Zmodn_mat
+function _solve_triu!(A::T, B::T, C::T, unit::Int = 0) where T <: Zmodn_mat
    ccall((:nmod_mat_solve_triu, Nemo.libflint), Cvoid, (Ref{T}, Ref{T}, Ref{T}, Cint), A, B, C, unit)
 end
 
 #solves lower_triangular_part(B)A = C, 
 #if unit == 1, then only the strictly lower triangular part is used
 #and the diagonal is assumed to be 1
-function solve_tril!(A::T, B::T, C::T, unit::Int = 0) where T <: Zmodn_mat
+function AbstractAlgebra._solve_tril!(A::T, B::T, C::T, unit::Int = 0) where T <: Zmodn_mat
    ccall((:nmod_mat_solve_tril, Nemo.libflint), Cvoid, (Ref{T}, Ref{T}, Ref{T}, Cint), A, B, C, unit)
 end
 
@@ -925,11 +925,11 @@ end
 #
 ################################################################################
 
-function AbstractAlgebra.Solve.kernel(M::zzModMatrix; side::Symbol = :left)
+function kernel(M::zzModMatrix; side::Symbol = :left)
    AbstractAlgebra.Solve.check_option(side, [:right, :left], "side")
 
    if side === :left
-      K = AbstractAlgebra.Solve.kernel(transpose(M), side = :right)
+      K = kernel(transpose(M), side = :right)
       return transpose(K)
    end
 

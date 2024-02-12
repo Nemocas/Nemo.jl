@@ -128,29 +128,6 @@ c = det_divisor(A)
 d = det_given_divisor(A, c)
 ```
 
-### Linear solving
-
-```@docs
-cansolve(::ZZMatrix, ::ZZMatrix)
-```
-
-```@docs
-solve_dixon(::ZZMatrix, ::ZZMatrix)
-solve_dixon(::QQMatrix, ::QQMatrix)
-```
-
-**Examples**
-
-```julia
-S = matrix_space(ZZ, 3, 3)
-T = matrix_space(ZZ, 3, 1)
-
-A = S([ZZ(2) 3 5; 1 4 7; 9 2 2])
-B = T([ZZ(4), 5, 7])
-
-X, m = solve_dixon(A, B)
-```
-
 ### Pseudo inverse
 
 ```@docs

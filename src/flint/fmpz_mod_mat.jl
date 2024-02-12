@@ -487,7 +487,7 @@ end
 
 #= Not implemented in Flint yet
 
-function solve(x::T, y::T) where T <: Zmod_fmpz_mat
+function _solve(x::T, y::T) where T <: Zmod_fmpz_mat
   (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
   !is_square(x)&& error("First argument not a square matrix in solve")
   (y.r != x.r) || y.c != 1 && ("Not a column vector in solve")
@@ -513,7 +513,7 @@ function AbstractAlgebra.Solve._can_solve_internal_no_check(A::ZZModMatrix, b::Z
    if task === :only_check || task === :with_solution
      return Bool(fl), x, zero(A, 0, 0)
    end
-   return Bool(fl), x, AbstractAlgebra.Solve.kernel(A, side = :right)
+   return Bool(fl), x, kernel(A, side = :right)
 end
 
 ################################################################################
@@ -922,11 +922,11 @@ end
 #
 ################################################################################
 
-function AbstractAlgebra.Solve.kernel(M::ZZModMatrix; side::Symbol = :left)
+function kernel(M::ZZModMatrix; side::Symbol = :left)
    AbstractAlgebra.Solve.check_option(side, [:right, :left], "side")
 
    if side === :left
-      K = AbstractAlgebra.Solve.kernel(transpose(M), side = :right)
+      K = kernel(transpose(M), side = :right)
       return transpose(K)
    end
 

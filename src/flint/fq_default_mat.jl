@@ -415,23 +415,23 @@ end
 #
 ################################################################################
 
-function solve(x::FqMatrix, y::FqMatrix)
+function _solve(x::FqMatrix, y::FqMatrix)
    (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
-   !is_square(x)&& error("First argument not a square matrix in solve")
-   (nrows(y) != nrows(x)) || ncols(y) != 1 && ("Not a column vector in solve")
+   !is_square(x)&& error("First argument not a square matrix in _solve")
+   (nrows(y) != nrows(x)) || ncols(y) != 1 && ("Not a column vector in _solve")
    z = similar(y)
    r = ccall((:fq_default_mat_solve, libflint), Int,
              (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}),
              z, x, y, base_ring(x))
-   !Bool(r) && error("Singular matrix in solve")
+   !Bool(r) && error("Singular matrix in _solve")
    return z
 end
 
-function can_solve_with_solution(a::FqMatrix, b::FqMatrix; side::Symbol = :right)
+function _can_solve_with_solution(a::FqMatrix, b::FqMatrix; side::Symbol = :right)
    (base_ring(a) != base_ring(b)) && error("Matrices must have same base ring")
    if side == :left
       (ncols(a) != ncols(b)) && error("Matrices must have same number of columns")
-      (f, x) = can_solve_with_solution(transpose(a), transpose(b); side=:right)
+      (f, x) = _can_solve_with_solution(transpose(a), transpose(b); side=:right)
       return (f, transpose(x))
    elseif side == :right
       (nrows(a) != nrows(b)) && error("Matrices must have same number of rows")
@@ -445,8 +445,8 @@ function can_solve_with_solution(a::FqMatrix, b::FqMatrix; side::Symbol = :right
    end
 end
 
-function can_solve(a::FqMatrix, b::FqMatrix; side::Symbol = :right)
-   fl, _ = can_solve_with_solution(a, b, side = side)
+function _can_solve(a::FqMatrix, b::FqMatrix; side::Symbol = :right)
+   fl, _ = _can_solve_with_solution(a, b, side = side)
    return fl
 end
 
@@ -464,7 +464,7 @@ function AbstractAlgebra.Solve._can_solve_internal_no_check(A::FqMatrix, b::FqMa
    if task === :only_check || task === :with_solution
       return Bool(fl), x, zero(A, 0, 0)
    end
-   return Bool(fl), x, AbstractAlgebra.Solve.kernel(A, side = :right)
+   return Bool(fl), x, kernel(A, side = :right)
 end
 
 ################################################################################

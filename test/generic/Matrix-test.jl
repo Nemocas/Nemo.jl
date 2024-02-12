@@ -91,8 +91,8 @@ end
       M = randmat_with_rank(S, dim, -100:100)
       b = rand(T, -100:100)
 
-      if isdefined(Generic, :can_solve_with_solution_fflu) 
-         flag, x, d = Generic.can_solve_with_solution_fflu(M, b)
+      if isdefined(Generic, :_can_solve_with_solution_fflu) 
+         flag, x, d = Generic._can_solve_with_solution_fflu(M, b)
          @test flag
       else
          x, d = Generic.solve_fflu(M, b)
@@ -113,8 +113,8 @@ end
       M = randmat_with_rank(S, dim, -100:100)
       b = rand(T, -100:100)
 
-      if isdefined(Generic, :can_solve_with_solution_lu)
-         flag, x = Generic.can_solve_with_solution_lu(M, b)
+      if isdefined(Generic, :_can_solve_with_solution_lu)
+         flag, x = Generic._can_solve_with_solution_lu(M, b)
          @test flag
       else
          x = Generic.solve_lu(M, b)
@@ -135,7 +135,7 @@ end
       M = randmat_triu(S, -100:100)
       b = rand(U, -100:100)
 
-      x = solve_triu(M, b, false)
+      x = AbstractAlgebra._solve_triu(M, b, false)
 
       @test M*x == b
    end

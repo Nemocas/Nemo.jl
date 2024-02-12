@@ -619,7 +619,7 @@ end
    @test is_snf(snf_diagonal(B))
 end
 
-@testset "ZZMatrix.solve_rational" begin
+@testset "ZZMatrix._solve_rational" begin
    S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 2 2])
@@ -628,7 +628,7 @@ end
 
    B = T([ZZRingElem(4), 5, 7])
 
-   X, d = solve_rational(A, B)
+   X, d = Nemo._solve_rational(A, B)
 
    @test (X, d) == (T([3, -24, 14]), 1)
 
@@ -636,7 +636,7 @@ end
 
    @test A*X == B
 
-   (Y, k) = solve_dixon(A, B)
+   (Y, k) = Nemo._solve_dixon(A, B)
 
    @test reduce_mod(Y, k) == reduce_mod(X, k)
 end
@@ -650,36 +650,36 @@ end
 
    B = T([ZZRingElem(4), 5, 7])
 
-   X = solve(A, B)
+   X = Nemo._solve(A, B)
 
    @test X == T([3, -24, 14])
    @test A*X == B
     
-   fl, X = can_solve_with_solution(A, B)
+   fl, X = Nemo._can_solve_with_solution(A, B)
    @test fl && A * X == B
 
    A = matrix(ZZ, 2, 2, [1, 0, 0, 0])
    B = matrix(ZZ, 2, 2, [0, 0, 0, 1])
-   fl, X = can_solve_with_solution(A, B)
+   fl, X = Nemo._can_solve_with_solution(A, B)
    @test !fl
-   fl, X = can_solve_with_solution(A, B, side = :left)
+   fl, X = Nemo._can_solve_with_solution(A, B, side = :left)
    @test !fl
-   fl, X = cansolve_with_nullspace(A, B)
+   fl, X = Nemo._cansolve_with_nullspace(A, B)
    @test !fl
 
    A = matrix(ZZ, 2, 2, [1, 0, 0, 0])
    B = matrix(ZZ, 2, 2, [0, 1, 0, 0])
-   fl, X, Z = cansolve_with_nullspace(A, B)
+   fl, X, Z = Nemo._cansolve_with_nullspace(A, B)
    @test fl && A*X == B && iszero(A * Z)
 
    A = matrix(ZZ, 2, 2, [1,2,3,4])
    b = matrix(ZZ, 1, 2, [1, 6])
-   @test Nemo.solve_triu_left(A, b) == matrix(ZZ, 1, 2, [1, 1])
+   @test Nemo._solve_triu_left(A, b) == matrix(ZZ, 1, 2, [1, 1])
    b = matrix(ZZ, 2, 1, [3, 4])
-   @test Nemo.solve_triu(A, b) == matrix(ZZ, 2, 1, [1, 1])
+   @test Nemo._solve_triu(A, b) == matrix(ZZ, 2, 1, [1, 1])
    b = matrix(ZZ, 2, 1, [1, 7])
    c = similar(b)
-   AbstractAlgebra.solve_tril!(c, A, b)
+   AbstractAlgebra._solve_tril!(c, A, b)
    @test c == matrix(ZZ, 2, 1, [1, 1])
 end
 
@@ -692,63 +692,63 @@ end
 
    B = T([ZZRingElem(4), 5, 7])
 
-   X = AbstractAlgebra.Solve.solve(A, B, side = :right)
+   X = solve(A, B, side = :right)
 
    @test X == T([3, -24, 14])
    @test A*X == B
 
-   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :right)
+   fl, X = can_solve_with_solution(A, B, side = :right)
    @test fl && A * X == B
 
    A = matrix(ZZ, 2, 2, [1, 0, 0, 0])
    B = matrix(ZZ, 2, 2, [0, 0, 0, 1])
-   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :right)
+   fl, X = can_solve_with_solution(A, B, side = :right)
    @test !fl
-   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B)
+   fl, X = can_solve_with_solution(A, B)
    @test !fl
-   fl, X, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B, side = :right)
+   fl, X, K = can_solve_with_solution_and_kernel(A, B, side = :right)
    @test !fl
 
    A = matrix(ZZ, 2, 2, [1, 0, 0, 0])
    B = matrix(ZZ, 2, 2, [0, 1, 0, 0])
-   fl, X, Z = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B, side = :right)
+   fl, X, Z = can_solve_with_solution_and_kernel(A, B, side = :right)
    @test fl && A*X == B && iszero(A * Z)
 
    # Non-square example
    A = matrix(ZZ, [1 2 3; 4 5 6])
    B = matrix(ZZ, 2, 1, [1, 1])
-   fl, x, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B, side = :right)
+   fl, x, K = can_solve_with_solution_and_kernel(A, B, side = :right)
    @test fl
    @test A*x == B
    @test is_zero(A*K)
    @test ncols(K) + rank(A) == ncols(A)
 
    B = matrix(ZZ, 1, 3, [1, 2, 3])
-   fl, x, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B)
+   fl, x, K = can_solve_with_solution_and_kernel(A, B)
    @test fl
    @test x*A == B
    @test is_zero(K*A)
    @test nrows(K) + rank(A) == nrows(A)
 
    A = matrix(ZZ, [ 1 2 3 ; 4 5 6 ])
-   K = @inferred AbstractAlgebra.Solve.kernel(A, side = :right)
+   K = @inferred kernel(A, side = :right)
    @test is_zero(A*K)
    @test ncols(K) == 1
 
-   K = @inferred AbstractAlgebra.Solve.kernel(A)
+   K = @inferred kernel(A)
    @test is_zero(K*A)
    @test nrows(K) == 0
 
    A = transpose(A)
-   K = @inferred AbstractAlgebra.Solve.kernel(A)
+   K = @inferred kernel(A)
    @test is_zero(K*A)
    @test nrows(K) == 1
 
-   K = @inferred AbstractAlgebra.Solve.kernel(zero_matrix(ZZ, 2, 2), side = :right)
+   K = @inferred kernel(zero_matrix(ZZ, 2, 2), side = :right)
    @test ncols(K) == 2
    @test hnf(K) == identity_matrix(ZZ, 2)
 
-   K = @inferred AbstractAlgebra.Solve.kernel(zero_matrix(ZZ, 2, 2))
+   K = @inferred kernel(zero_matrix(ZZ, 2, 2))
    @test nrows(K) == 2
    @test hnf(K) == identity_matrix(ZZ, 2)
 end

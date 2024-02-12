@@ -541,13 +541,13 @@ end
 
    B = T([QQFieldElem(4), 5, 7])
 
-   X = solve(A, B)
+   X = Nemo._solve(A, B)
 
    @test X == T([3, -24, 14])
 
    @test A*X == B
 
-   Y = solve_dixon(A, B)
+   Y = Nemo._solve_dixon(A, B)
 
    @test X == Y
 
@@ -556,7 +556,7 @@ end
    m1Q = matrix(QQ, m1)
    m2Q = matrix(QQ, m2);
    
-   N = solve(m1Q, m2Q)
+   N = Nemo._solve(m1Q, m2Q)
 
    @test N == matrix(QQ, 2, 2, [0 1; 1 -1])
 
@@ -571,7 +571,7 @@ end
       A = rand(M, -10:10)
       B = rand(N, -10:10)
 
-      fl, X = can_solve_with_solution(A, B)
+      fl, X = Nemo._can_solve_with_solution(A, B)
 
       if fl
          @test A * X == B
@@ -580,55 +580,55 @@ end
 
    A = matrix(QQ, 2, 2, [1, 2, 2, 5])
    B = matrix(QQ, 2, 1, [1, 2])
-   fl, X = can_solve_with_solution(A, B)
+   fl, X = Nemo._can_solve_with_solution(A, B)
    @test fl
    @test A * X == B
-   @test can_solve(A, B)
+   @test Nemo._can_solve(A, B)
 
    A = matrix(QQ, 2, 2, [1, 2, 2, 4])
    B = matrix(QQ, 2, 1, [1, 2])
-   fl, X = can_solve_with_solution(A, B)
+   fl, X = Nemo._can_solve_with_solution(A, B)
    @test fl
    @test A * X == B
-   @test can_solve(A, B)
+   @test Nemo._can_solve(A, B)
 
    A = matrix(QQ, 2, 2, [1, 2, 2, 4])
    B = matrix(QQ, 2, 1, [1, 3])
-   fl, X = can_solve_with_solution(A, B)
+   fl, X = Nemo._can_solve_with_solution(A, B)
    @test !fl
-   @test !can_solve(A, B)
+   @test !Nemo._can_solve(A, B)
 
    A = zero_matrix(QQ, 2, 3)
    B = identity_matrix(QQ, 3)
-   @test_throws ErrorException can_solve_with_solution(A, B)
+   @test_throws ErrorException Nemo._can_solve_with_solution(A, B)
 
    # Transpose
    A = transpose(matrix(QQ, 2, 2, [1, 2, 2, 5]))
    B = transpose(matrix(QQ, 2, 1, [1, 2]))
-   fl, X = can_solve_with_solution(A, B, side = :left)
+   fl, X = Nemo._can_solve_with_solution(A, B, side = :left)
    @test fl
    @test X * A == B
-   @test can_solve(A, B, side = :left)
+   @test Nemo._can_solve(A, B, side = :left)
 
    A = transpose(matrix(QQ, 2, 2, [1, 2, 2, 4]))
    B = transpose(matrix(QQ, 2, 1, [1, 2]))
-   fl, X = can_solve_with_solution(A, B, side = :left)
+   fl, X = Nemo._can_solve_with_solution(A, B, side = :left)
    @test fl
    @test X * A == B
-   @test can_solve(A, B, side = :left)
+   @test Nemo._can_solve(A, B, side = :left)
 
    A = transpose(matrix(QQ, 2, 2, [1, 2, 2, 4]))
    B = transpose(matrix(QQ, 2, 1, [1, 3]))
-   fl, X = can_solve_with_solution(A, B, side = :left)
+   fl, X = Nemo._can_solve_with_solution(A, B, side = :left)
    @test !fl
-   @test !can_solve(A, B, side = :left)
+   @test !Nemo._can_solve(A, B, side = :left)
 
    A = transpose(zero_matrix(QQ, 2, 3))
    B = transpose(identity_matrix(QQ, 3))
-   @test_throws ErrorException can_solve_with_solution(A, B, side = :left)
+   @test_throws ErrorException Nemo._can_solve_with_solution(A, B, side = :left)
 
-   @test_throws ErrorException can_solve_with_solution(A, B, side = :garbage)
-   @test_throws ErrorException can_solve(A, B, side = :garbage)
+   @test_throws ErrorException Nemo._can_solve_with_solution(A, B, side = :garbage)
+   @test_throws ErrorException Nemo._can_solve(A, B, side = :garbage)
 end
 
 @testset "QQMatrix.Solve.solve" begin
@@ -640,7 +640,7 @@ end
 
    B = T([QQFieldElem(4), 5, 7])
 
-   X = AbstractAlgebra.Solve.solve(A, B, side = :right)
+   X = solve(A, B, side = :right)
 
    @test X == T([3, -24, 14])
 
@@ -651,7 +651,7 @@ end
    m1Q = matrix(QQ, m1)
    m2Q = matrix(QQ, m2);
 
-   N = AbstractAlgebra.Solve.solve(m1Q, m2Q, side = :right)
+   N = solve(m1Q, m2Q, side = :right)
 
    @test N == matrix(QQ, 2, 2, [0 1; 1 -1])
 
@@ -666,13 +666,13 @@ end
       A = rand(M, -10:10)
       B = rand(N, -10:10)
 
-      fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :right)
+      fl, X = can_solve_with_solution(A, B, side = :right)
 
       if fl
          @test A * X == B
       end
 
-      fl, X, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B, side = :right)
+      fl, X, K = can_solve_with_solution_and_kernel(A, B, side = :right)
 
       if fl
         @test A*X == B
@@ -683,11 +683,11 @@ end
 
    A = matrix(QQ, 2, 2, [1, 2, 2, 5])
    B = matrix(QQ, 2, 1, [1, 2])
-   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :right)
+   fl, X = can_solve_with_solution(A, B, side = :right)
    @test fl
    @test A * X == B
-   @test AbstractAlgebra.Solve.can_solve(A, B, side = :right)
-   fl, X, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B, side = :right)
+   @test can_solve(A, B, side = :right)
+   fl, X, K = can_solve_with_solution_and_kernel(A, B, side = :right)
    @test fl
    @test A*X == B
    @test is_zero(A*K)
@@ -695,11 +695,11 @@ end
 
    A = matrix(QQ, 2, 2, [1, 2, 2, 4])
    B = matrix(QQ, 2, 1, [1, 2])
-   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :right)
+   fl, X = can_solve_with_solution(A, B, side = :right)
    @test fl
    @test A * X == B
-   @test AbstractAlgebra.Solve.can_solve(A, B, side = :right)
-   fl, X, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B, side = :right)
+   @test can_solve(A, B, side = :right)
+   fl, X, K = can_solve_with_solution_and_kernel(A, B, side = :right)
    @test fl
    @test A*X == B
    @test is_zero(A*K)
@@ -707,31 +707,31 @@ end
 
    A = matrix(QQ, 2, 2, [1, 2, 2, 4])
    B = matrix(QQ, 2, 1, [1, 3])
-   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :right)
+   fl, X = can_solve_with_solution(A, B, side = :right)
    @test !fl
-   @test !AbstractAlgebra.Solve.can_solve(A, B, side = :right)
-   fl, X, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B, side = :right)
+   @test !can_solve(A, B, side = :right)
+   fl, X, K = can_solve_with_solution_and_kernel(A, B, side = :right)
    @test !fl
 
    A = zero_matrix(QQ, 2, 3)
    B = identity_matrix(QQ, 3)
-   @test_throws ErrorException AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :right)
+   @test_throws ErrorException can_solve_with_solution(A, B, side = :right)
 
    # Transpose
    A = transpose(matrix(QQ, 2, 2, [1, 2, 2, 5]))
    B = transpose(matrix(QQ, 2, 1, [1, 2]))
-   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B)
+   fl, X = can_solve_with_solution(A, B)
    @test fl
    @test X * A == B
-   @test AbstractAlgebra.Solve.can_solve(A, B)
+   @test can_solve(A, B)
 
    A = transpose(matrix(QQ, 2, 2, [1, 2, 2, 4]))
    B = transpose(matrix(QQ, 2, 1, [1, 2]))
-   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B)
+   fl, X = can_solve_with_solution(A, B)
    @test fl
    @test X * A == B
-   @test AbstractAlgebra.Solve.can_solve(A, B)
-   fl, X, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B)
+   @test can_solve(A, B)
+   fl, X, K = can_solve_with_solution_and_kernel(A, B)
    @test fl
    @test X*A == B
    @test is_zero(K*A)
@@ -739,30 +739,30 @@ end
 
    A = transpose(matrix(QQ, 2, 2, [1, 2, 2, 4]))
    B = transpose(matrix(QQ, 2, 1, [1, 3]))
-   fl, X = AbstractAlgebra.Solve.can_solve_with_solution(A, B)
+   fl, X = can_solve_with_solution(A, B)
    @test !fl
-   @test !AbstractAlgebra.Solve.can_solve(A, B)
-   fl, X, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, B)
+   @test !can_solve(A, B)
+   fl, X, K = can_solve_with_solution_and_kernel(A, B)
    @test !fl
 
    A = transpose(zero_matrix(QQ, 2, 3))
    B = transpose(identity_matrix(QQ, 3))
-   @test_throws ErrorException AbstractAlgebra.Solve.can_solve_with_solution(A, B)
+   @test_throws ErrorException can_solve_with_solution(A, B)
 
-   @test_throws ArgumentError AbstractAlgebra.Solve.can_solve_with_solution(A, B, side = :garbage)
-   @test_throws ArgumentError AbstractAlgebra.Solve.can_solve(A, B, side = :garbage)
+   @test_throws ArgumentError can_solve_with_solution(A, B, side = :garbage)
+   @test_throws ArgumentError can_solve(A, B, side = :garbage)
 
    A = matrix(QQ, [ 1 2 3 ; 4 5 6 ])
-   K = @inferred AbstractAlgebra.Solve.kernel(A, side = :right)
+   K = @inferred kernel(A, side = :right)
    @test is_zero(A*K)
    @test ncols(K) == 1
 
-   K = @inferred AbstractAlgebra.Solve.kernel(A)
+   K = @inferred kernel(A)
    @test is_zero(K*A)
    @test nrows(K) == 0
 
    A = transpose(A)
-   K = @inferred AbstractAlgebra.Solve.kernel(A)
+   K = @inferred kernel(A)
    @test is_zero(K*A)
    @test nrows(K) == 1
 end

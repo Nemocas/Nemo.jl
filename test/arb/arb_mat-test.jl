@@ -394,7 +394,7 @@ end
 
    b = RR["6.0 +/- 0.1" "4.0 +/- 0.1" "4.0 +/- 0.1"]
 
-   y = solve_cholesky_precomp(cho, transpose(b))
+   y = Nemo._solve_cholesky_precomp(cho, transpose(b))
 
    @test overlaps(A*y, transpose(b))
 
@@ -418,7 +418,7 @@ end
    @test overlaps(L*U, p*A)
    @test r == 3
 
-   y = solve(A, transpose(b))
+   y = Nemo._solve(A, transpose(b))
 
    @test overlaps(A*y, transpose(b))
 
@@ -426,7 +426,7 @@ end
 
    Nemo.lu!(p, A)
 
-   y = solve_lu_precomp(p, A, transpose(b))
+   y = Nemo._solve_lu_precomp(p, A, transpose(b))
 
    @test overlaps(B*y, transpose(b))
 
@@ -443,51 +443,51 @@ end
    b = transpose(RR["6.0 +/- 0.1" "15.0 +/- 0.1" "25.0 +/- 0.1"])
    b2 = 2*b
 
-   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, b, side = :right)
+   fl, y, K = can_solve_with_solution_and_kernel(A, b, side = :right)
    @test fl
    @test overlaps(A*y, b)
    @test contains(transpose(y), ZZ[1 1 1])
    @test ncols(K) == 0
 
-   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(A, transpose(b))
+   fl, y, K = can_solve_with_solution_and_kernel(A, transpose(b))
    @test fl
    @test overlaps(y*A, transpose(b))
    @test nrows(K) == 0
 
-   y = AbstractAlgebra.Solve.solve(A, b, side = :right)
+   y = solve(A, b, side = :right)
    @test fl
    @test overlaps(A*y, b)
    @test contains(transpose(y), ZZ[1 1 1])
 
-   C = AbstractAlgebra.Solve.solve_init(A)
-   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(C, b, side = :right)
+   C = solve_init(A)
+   fl, y, K = can_solve_with_solution_and_kernel(C, b, side = :right)
    @test fl
    @test overlaps(A*y, b)
    @test contains(transpose(y), ZZ[1 1 1])
    @test ncols(K) == 0
 
-   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(C, transpose(b))
+   fl, y, K = can_solve_with_solution_and_kernel(C, transpose(b))
    @test fl
    @test overlaps(y*A, transpose(b))
    @test nrows(K) == 0
 
-   y = AbstractAlgebra.Solve.solve(C, b, side = :right)
+   y = solve(C, b, side = :right)
    @test fl
    @test overlaps(A*y, b)
    @test contains(transpose(y), ZZ[1 1 1])
 
-   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(C, b2, side = :right)
+   fl, y, K = can_solve_with_solution_and_kernel(C, b2, side = :right)
    @test fl
    @test overlaps(A*y, b2)
    @test contains(transpose(y), ZZ[2 2 2])
    @test ncols(K) == 0
 
-   fl, y, K = AbstractAlgebra.Solve.can_solve_with_solution_and_kernel(C, transpose(b2))
+   fl, y, K = can_solve_with_solution_and_kernel(C, transpose(b2))
    @test fl
    @test overlaps(y*A, transpose(b2))
    @test nrows(K) == 0
 
-   y = AbstractAlgebra.Solve.solve(C, b2, side = :right)
+   y = solve(C, b2, side = :right)
    @test fl
    @test overlaps(A*y, b2)
    @test contains(transpose(y), ZZ[2 2 2])

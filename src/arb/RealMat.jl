@@ -508,7 +508,7 @@ function lu!(P::Generic.Perm, x::RealMat)
   return min(nrows(x), ncols(x))
 end
 
-function solve!(z::RealMat, x::RealMat, y::RealMat)
+function _solve!(z::RealMat, x::RealMat, y::RealMat)
   r = ccall((:arb_mat_solve, libarb), Cint,
               (Ref{RealMat}, Ref{RealMat}, Ref{RealMat}, Int),
               z, x, y, precision(Balls))
@@ -516,15 +516,15 @@ function solve!(z::RealMat, x::RealMat, y::RealMat)
   nothing
 end
 
-function solve(x::RealMat, y::RealMat)
+function _solve(x::RealMat, y::RealMat)
   ncols(x) != nrows(x) && error("First argument must be square")
   ncols(x) != nrows(y) && error("Matrix dimensions are wrong")
   z = similar(y)
-  solve!(z, x, y)
+  _solve!(z, x, y)
   return z
 end
 
-function solve_lu_precomp!(z::RealMat, P::Generic.Perm, LU::RealMat, y::RealMat)
+function _solve_lu_precomp!(z::RealMat, P::Generic.Perm, LU::RealMat, y::RealMat)
   Q = inv(P)
   ccall((:arb_mat_solve_lu_precomp, libarb), Nothing,
               (Ref{RealMat}, Ptr{Int}, Ref{RealMat}, Ref{RealMat}, Int),
@@ -532,10 +532,10 @@ function solve_lu_precomp!(z::RealMat, P::Generic.Perm, LU::RealMat, y::RealMat)
   nothing
 end
 
-function solve_lu_precomp(P::Generic.Perm, LU::RealMat, y::RealMat)
+function _solve_lu_precomp(P::Generic.Perm, LU::RealMat, y::RealMat)
   ncols(LU) != nrows(y) && error("Matrix dimensions are wrong")
   z = similar(y)
-  solve_lu_precomp!(z, P, LU, y)
+  _solve_lu_precomp!(z, P, LU, y)
   return z
 end
 
@@ -564,7 +564,7 @@ end
 #
 ################################################################################
 
-function AbstractAlgebra.Solve.solve_init(A::RealMat)
+function solve_init(A::RealMat)
    return AbstractAlgebra.Solve.SolveCtx{RealFieldElem, RealMat, RealMat}(A)
 end
 
