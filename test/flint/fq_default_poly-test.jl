@@ -411,7 +411,7 @@ end
    f = x*y^2 + (x + 1)*y + 3
    g = (x + 1)*y + (x^3 + 2x + 2)
 
-   @test compose(f, g) == (x^3+2*x^2+x)*y^2+(2*x^5+2*x^4+4*x^3+9*x^2+6*x+1)*y+(x^7+4*x^5+5*x^4+5*x^3+10*x^2+8*x+5)
+   @test compose(f, g; inner = :second) == (x^3+2*x^2+x)*y^2+(2*x^5+2*x^4+4*x^3+9*x^2+6*x+1)*y+(x^7+4*x^5+5*x^4+5*x^3+10*x^2+8*x+5)
 end
 
 @testset "FqPolyRingElem.derivative" begin

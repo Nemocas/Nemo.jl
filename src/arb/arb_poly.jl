@@ -452,7 +452,7 @@ evaluate2(x::ArbPolyRingElem, y::Any) = evaluate2(x, base_ring(parent(x))(y))
 #
 ###############################################################################
 
-function compose(x::ArbPolyRingElem, y::ArbPolyRingElem)
+function AbstractAlgebra._compose_right(x::ArbPolyRingElem, y::ArbPolyRingElem)
    z = parent(x)()
    ccall((:arb_poly_compose, libarb), Nothing,
                 (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int),

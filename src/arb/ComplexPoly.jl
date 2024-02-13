@@ -438,7 +438,11 @@ end
 #
 ###############################################################################
 
-function compose(x::ComplexPoly, y::ComplexPoly, prec::Int = precision(Balls))
+function compose(x::ComplexPoly, y::ComplexPoly, prec::Int = precision(Balls); inner::Symbol)
+   if inner == :first
+     x, y = y, x
+   end
+   @assert inner == :second
    z = parent(x)()
    ccall((:acb_poly_compose, libarb), Nothing,
                 (Ref{ComplexPoly}, Ref{ComplexPoly}, Ref{ComplexPoly}, Int),

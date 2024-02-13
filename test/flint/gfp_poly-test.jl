@@ -491,7 +491,7 @@ end
   f = x^5 + x^4 + 2 *x^2 + x
   g = x+1
 
-  ff = compose(f,g)
+  ff = compose(f, g; inner = :second)
 
   @test parent(ff) == parent(f)
 

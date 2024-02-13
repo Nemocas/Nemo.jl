@@ -333,7 +333,7 @@ end
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
 
-   @test compose(f, g) == x^6+6*x^4+4*x^3+9*x^2+12*x+4
+   @test compose(f, g; inner = :second) == x^6+6*x^4+4*x^3+9*x^2+12*x+4
 end
 
 @testset "RealPoly.derivative_integral" begin

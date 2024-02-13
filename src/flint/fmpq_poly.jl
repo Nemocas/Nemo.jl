@@ -565,7 +565,7 @@ evaluate(x::QQPolyRingElem, y::Rational) = evaluate(x, QQFieldElem(y))
 #
 ###############################################################################
 
-function compose(x::QQPolyRingElem, y::QQPolyRingElem)
+function AbstractAlgebra._compose_right(x::QQPolyRingElem, y::QQPolyRingElem)
    check_parent(x, y)
    z = parent(x)()
    ccall((:fmpq_poly_compose, libflint), Nothing,

@@ -539,7 +539,7 @@ evaluate(x::ZZPolyRingElem, y::Integer) = evaluate(x, ZZRingElem(y))
 #
 ###############################################################################
 
-function compose(x::ZZPolyRingElem, y::ZZPolyRingElem)
+function AbstractAlgebra._compose_right(x::ZZPolyRingElem, y::ZZPolyRingElem)
    check_parent(x, y)
    z = parent(x)()
    ccall((:fmpz_poly_compose, libflint), Nothing,
@@ -769,7 +769,7 @@ function cyclotomic(n::Int, x::ZZPolyRingElem)
    z = parent(x)()
    ccall((:fmpz_poly_cyclotomic, libflint), Nothing,
                                                   (Ref{ZZPolyRingElem}, Int), z, n)
-   return is_gen(x) ? z : compose(z, x)
+   return is_gen(x) ? z : compose(z, x; inner = :second)
 end
 
 @doc raw"""

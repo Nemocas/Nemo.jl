@@ -560,7 +560,7 @@ end
 #
 ################################################################################
 
-function compose(x::fqPolyRepPolyRingElem, y::fqPolyRepPolyRingElem)
+function AbstractAlgebra._compose_right(x::fqPolyRepPolyRingElem, y::fqPolyRepPolyRingElem)
    check_parent(x,y)
    z = parent(x)()
    ccall((:fq_nmod_poly_compose, libflint), Nothing,

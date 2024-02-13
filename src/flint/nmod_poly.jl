@@ -605,7 +605,7 @@ end
 #
 ################################################################################
 
-function compose(x::T, y::T) where T <: Zmodn_poly
+function AbstractAlgebra._compose_right(x::T, y::T) where T <: Zmodn_poly
   check_parent(x,y)
   z = parent(x)()
   ccall((:nmod_poly_compose, libflint), Nothing,

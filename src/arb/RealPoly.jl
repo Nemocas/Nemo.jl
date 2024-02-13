@@ -441,7 +441,12 @@ end
 #
 ###############################################################################
 
-function compose(x::RealPoly, y::RealPoly, prec::Int = precision(Balls))
+function compose(x::RealPoly, y::RealPoly, prec::Int = precision(Balls); inner::Symbol)
+  if inner == :first
+     x, y = y, x
+   end
+   @assert inner == :second
+
    z = parent(x)()
    ccall((:arb_poly_compose, libarb), Nothing,
                 (Ref{RealPoly}, Ref{RealPoly}, Ref{RealPoly}, Int),
