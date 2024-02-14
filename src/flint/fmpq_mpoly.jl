@@ -30,7 +30,7 @@ number_of_variables(a::QQMPolyRing) = ccall((:fmpq_mpoly_ctx_nvars, libflint), I
 
 base_ring(a::QQMPolyRing) = FlintQQ
 
-function ordering(a::QQMPolyRing)
+function internal_ordering(a::QQMPolyRing)
    b = ccall((:fmpq_mpoly_ctx_ord, libflint), Cint, (Ref{QQMPolyRing}, ), a)
    return flint_orderings[b + 1]
 end

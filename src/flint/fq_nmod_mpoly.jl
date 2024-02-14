@@ -29,7 +29,7 @@ number_of_variables(a::fqPolyRepMPolyRing) = a.nvars
 
 base_ring(a::fqPolyRepMPolyRing) = a.base_ring
 
-function ordering(a::fqPolyRepMPolyRing)
+function internal_ordering(a::fqPolyRepMPolyRing)
    b = a.ord
 #   b = ccall((:fq_nmod_mpoly_ctx_ord, libflint), Cint, (Ref{fqPolyRepMPolyRing}, ), a)
    return flint_orderings[b + 1]

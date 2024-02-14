@@ -5,14 +5,14 @@
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
-      SS, varlist = polynomial_ring(R, var_names, ordering = ord)
+      SS, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       @test S === SS
 
-      SSS, varlist = polynomial_ring(R, var_names, ordering = ord, cached = false)
-      SSSS, varlist = polynomial_ring(R, var_names, ordering = ord, cached = false)
+      SSS, varlist = polynomial_ring(R, var_names, internal_ordering = ord, cached = false)
+      SSSS, varlist = polynomial_ring(R, var_names, internal_ordering = ord, cached = false)
 
       @test !(SSS === SSSS)
 
@@ -112,7 +112,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
       g = gens(S)
 
       @test characteristic(S) == 0
@@ -171,10 +171,10 @@ end
          @test (i1 == i2) == (monomial(f, i1) == monomial(f, i2))
       end
 
-      deg = is_degree(ordering(S))
-      rev = is_reverse(ordering(S))
+      deg = is_degree(internal_ordering(S))
+      rev = is_reverse(internal_ordering(S))
 
-      @test ord == ordering(S)
+      @test ord == internal_ordering(S)
 
       @test isone(one(S))
 
@@ -238,7 +238,7 @@ end
    R = FlintQQ
 
    for ord in Nemo.flint_orderings
-      S, (x, y, z) = polynomial_ring(R, ["x", "y", "z"]; ordering=ord)
+      S, (x, y, z) = polynomial_ring(R, ["x", "y", "z"]; internal_ordering=ord)
 
       f = -8*x^5*y^3*z^5+9*x^5*y^2*z^3-8*x^4*y^5*z^4-10*x^4*y^3*z^2+8*x^3*y^2*z-10*x*y^3*
 z^4-4*x*y-10*x*z^2+8*y^2*z^5-9*y^2*z^3
@@ -260,7 +260,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100, -100:100)
@@ -277,7 +277,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100, -100:100)
@@ -300,7 +300,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:100
          f = rand(S, 0:5, 0:100, -100:100)
@@ -340,7 +340,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:100
          d = rand(-100:100)
@@ -366,7 +366,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100, -100:100)
@@ -393,7 +393,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100, -100:100)
@@ -422,7 +422,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = S(0)
@@ -458,7 +458,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = S(0)
@@ -505,7 +505,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(FlintQQ, var_names, ordering = ord)
+      S, varlist = polynomial_ring(FlintQQ, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:4, 0:5, -10:10)
@@ -550,7 +550,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(FlintQQ, var_names, ordering = ord)
+      S, varlist = polynomial_ring(FlintQQ, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:4, 0:5, -10:10)
@@ -576,7 +576,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:100
          f = rand(S, 0:5, 0:100, -100:100)
@@ -659,7 +659,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:100
          f = S()
@@ -697,7 +697,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for j in 1:100
          f = rand(S, 0:5, 0:100, -100:100)
@@ -715,7 +715,7 @@ end
      var_names = ["x$j" for j in 1:num_vars]
      ord = rand_ordering()
 
-     R, vars_R = polynomial_ring(FlintQQ, var_names; ordering=ord)
+     R, vars_R = polynomial_ring(FlintQQ, var_names; internal_ordering=ord)
 
      for iter in 1:10
         f = R()
@@ -749,7 +749,7 @@ end
      var_names = ["x$j" for j in 1:num_vars]
      ord = rand_ordering()
 
-     R, vars_R = polynomial_ring(FlintQQ, var_names; ordering=ord)
+     R, vars_R = polynomial_ring(FlintQQ, var_names; internal_ordering=ord)
 
      for iter in 1:10
         f = R()

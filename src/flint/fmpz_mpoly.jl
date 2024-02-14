@@ -30,7 +30,7 @@ number_of_variables(a::ZZMPolyRing) = ccall((:fmpz_mpoly_ctx_nvars, libflint), I
 
 base_ring(a::ZZMPolyRing) = FlintZZ
 
-function ordering(a::ZZMPolyRing)
+function internal_ordering(a::ZZMPolyRing)
    b = ccall((:fmpz_mpoly_ctx_ord, libflint), Cint, (Ref{ZZMPolyRing}, ), a)
    return flint_orderings[b + 1]
 end

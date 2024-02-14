@@ -5,14 +5,14 @@
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
-      SS, varlist = polynomial_ring(R, var_names, ordering = ord)
+      SS, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       @test S === SS
 
-      SSS, varlist = polynomial_ring(R, var_names, ordering = ord, cached = false)
-      SSSS, varlist = polynomial_ring(R, var_names, ordering = ord, cached = false)
+      SSS, varlist = polynomial_ring(R, var_names, internal_ordering = ord, cached = false)
+      SSSS, varlist = polynomial_ring(R, var_names, internal_ordering = ord, cached = false)
 
       @test !(SSS === SSSS)
 
@@ -109,7 +109,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
       g = gens(S)
 
       @test characteristic(S) == 23
@@ -162,10 +162,10 @@ end
         @test f == sum((coeff(f, i) * S([R(1)], [Nemo.exponent_vector_fmpz(f, i)])  for i in 1:length(f)))
       end
 
-      deg = is_degree(ordering(S))
-      rev = is_reverse(ordering(S))
+      deg = is_degree(internal_ordering(S))
+      rev = is_reverse(internal_ordering(S))
 
-      @test ord == ordering(S)
+      @test ord == internal_ordering(S)
 
       @test isone(one(S))
 
@@ -238,7 +238,7 @@ end
    R = Native.GF(23)
 
    for ord in Nemo.flint_orderings
-      S, (x, y, z) = polynomial_ring(R, ["x", "y", "z"]; ordering=ord)
+      S, (x, y, z) = polynomial_ring(R, ["x", "y", "z"]; internal_ordering=ord)
 
       f = 15*x^5*y^3*z^5+9*x^5*y^2*z^3+15*x^4*y^5*z^4+13*x^4*y^3*z^2+8*x^3*y^2*z+13*x*y^3*z^4+19*x*y+13*x*z^2+8*y^2*z^5+14*y^2*z^3
 
@@ -259,7 +259,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100)
@@ -276,7 +276,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100)
@@ -299,7 +299,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:100
          f = rand(S, 0:5, 0:100)
@@ -335,7 +335,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:100
          d = rand(-100:100)
@@ -357,7 +357,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100)
@@ -384,7 +384,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100)
@@ -418,7 +418,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = S(0)
@@ -454,7 +454,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = S(0)
@@ -503,7 +503,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:4, 0:5)
@@ -551,7 +551,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:4, 0:5, -10:10)
@@ -577,7 +577,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:100
          f = rand(S, 0:5, 0:100)
@@ -665,7 +665,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for iter = 1:100
          f = S()
@@ -703,7 +703,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(R, var_names, ordering = ord)
+      S, varlist = polynomial_ring(R, var_names, internal_ordering = ord)
 
       for j in 1:100
          f = rand(S, 0:5, 0:100)
@@ -723,7 +723,7 @@ end
      var_names = ["x$j" for j in 1:num_vars]
      ord = rand_ordering()
 
-     R, vars_R = polynomial_ring(R23, var_names; ordering=ord)
+     R, vars_R = polynomial_ring(R23, var_names; internal_ordering=ord)
 
      for iter in 1:10
         f = R()
@@ -781,7 +781,7 @@ end
      var_names = ["x$j" for j in 1:num_vars]
      ord = rand_ordering()
 
-     R, vars_R = polynomial_ring(R23, var_names; ordering=ord)
+     R, vars_R = polynomial_ring(R23, var_names; internal_ordering=ord)
 
      for iter in 1:10
         f = R()

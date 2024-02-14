@@ -22,8 +22,8 @@ modulus(R::FqMPolyRing) = modulus(base_ring(R))
 
 modulus(f::FqMPolyRingElem) = modulus(base_ring(parent(f)))
 
-function ordering(a::FqMPolyRing)
-    return ordering(a.data)
+function internal_ordering(a::FqMPolyRing)
+    return internal_ordering(a.data)
 end
 
 function gens(R::FqMPolyRing)

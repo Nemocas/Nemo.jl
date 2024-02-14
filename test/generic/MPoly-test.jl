@@ -6,7 +6,7 @@
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(K, var_names, ordering = ord)
+      S, varlist = polynomial_ring(K, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100, -100:100)
@@ -30,7 +30,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(K, var_names, ordering = ord)
+      S, varlist = polynomial_ring(K, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:5, 0:100, -100:100)
@@ -55,7 +55,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(K, var_names, ordering = ord)
+      S, varlist = polynomial_ring(K, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = S(0)
@@ -90,7 +90,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(K, var_names, ordering = ord)
+      S, varlist = polynomial_ring(K, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = S(0)

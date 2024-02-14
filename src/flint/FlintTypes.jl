@@ -6877,24 +6877,24 @@ const _fq_default_mpoly_union = Union{AbstractAlgebra.Generic.MPoly{FqPolyRepFie
    base_ring::FqField
    typ::Int    # keep these in sync with @fq_default_mpoly_do_op
 
-   function FqMPolyRing(R::FqField, s::Vector{Symbol}, ordering::Symbol = :lex, cached::Bool = true)
-      return get_cached!(FqDefaultMPolyID, (R, s, ordering), cached) do
+   function FqMPolyRing(R::FqField, s::Vector{Symbol}, internal_ordering::Symbol = :lex, cached::Bool = true)
+      return get_cached!(FqDefaultMPolyID, (R, s, internal_ordering), cached) do
          # in the following all constructors should use chached = false
          m = modulus(R)
          p = characteristic(R)
          if fits(UInt, p)
             Fq = Native.GF(UInt(p))
             if isone(degree(m))
-               Fqx = polynomial_ring(Fq, s, cached = cached, ordering = ordering)[1]
+               Fqx = polynomial_ring(Fq, s, cached = cached, internal_ordering = internal_ordering)[1]
                return new(Fqx, R, 3)
             end
             mm = polynomial_ring(Fq, "x")[1](lift(polynomial_ring(ZZ, "x")[1], m))
             Fq = Native.FiniteField(mm, R.var, cached = cached, check = false)[1]
-            Fqx = polynomial_ring(Fq, s, cached = cached, ordering = ordering)[1]
+            Fqx = polynomial_ring(Fq, s, cached = cached, internal_ordering = internal_ordering)[1]
             return new(Fqx, R, 2)
          end
          Fq = FqPolyRepField(m, Symbol(R.var), cached, check = false)
-         Fqx = AbstractAlgebra.Generic.polynomial_ring(Fq, s, cached = cached, ordering = ordering)[1]
+         Fqx = AbstractAlgebra.Generic.polynomial_ring(Fq, s, cached = cached, internal_ordering = internal_ordering)[1]
          return new(Fqx, R, 1)
       end::FqMPolyRing
    end

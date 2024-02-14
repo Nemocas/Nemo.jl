@@ -47,7 +47,7 @@ modulus(R::($rtype)) = modulus(base_ring(R))
 modulus(f::($etype)) = modulus(base_ring(parent(f)))
 
 
-function ordering(a::($rtype))
+function internal_ordering(a::($rtype))
    b = a.ord
 #   b = ccall((:fmpz_mod_mpoly_ctx_ord, libflint), Cint, (Ref{zzModMPolyRing}, ), a)
    return flint_orderings[b + 1]
