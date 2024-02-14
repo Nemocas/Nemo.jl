@@ -748,14 +748,14 @@ function chebyshev_t(n::Int, x::ZZPolyRingElem)
    z = parent(x)()
    ccall((:fmpz_poly_chebyshev_t, libflint), Nothing,
                                                   (Ref{ZZPolyRingElem}, Int), z, n)
-   return is_gen(x) ? z : compose(z, x)
+   return is_gen(x) ? z : compose(z, x, inner = :second)
 end
 
 function chebyshev_u(n::Int, x::ZZPolyRingElem)
    z = parent(x)()
    ccall((:fmpz_poly_chebyshev_u, libflint), Nothing,
                                                   (Ref{ZZPolyRingElem}, Int), z, n)
-   return is_gen(x) ? z : compose(z, x)
+   return is_gen(x) ? z : compose(z, x, inner = :second)
 end
 
 @doc raw"""
@@ -786,7 +786,7 @@ function swinnerton_dyer(n::Int, x::ZZPolyRingElem)
    z = parent(x)()
    ccall((:fmpz_poly_swinnerton_dyer, libflint), Nothing,
                                                   (Ref{ZZPolyRingElem}, Int), z, n)
-   return is_gen(x) ? z : compose(z, x)
+   return is_gen(x) ? z : compose(z, x, inner = :second)
 end
 
 @doc raw"""
@@ -800,7 +800,7 @@ function cos_minpoly(n::Int, x::ZZPolyRingElem)
    z = parent(x)()
    ccall((:fmpz_poly_cos_minpoly, libflint), Nothing,
                                                   (Ref{ZZPolyRingElem}, Int), z, n)
-   return is_gen(x) ? z : compose(z, x)
+   return is_gen(x) ? z : compose(z, x, inner = :second)
 end
 
 @doc raw"""
@@ -814,7 +814,7 @@ function theta_qexp(e::Int, n::Int, x::ZZPolyRingElem)
    z = parent(x)()
    ccall((:fmpz_poly_theta_qexp, libflint), Nothing,
                                           (Ref{ZZPolyRingElem}, Int, Int), z, e, n)
-   return is_gen(x) ? z : compose(z, x)
+   return is_gen(x) ? z : compose(z, x, inner = :second)
 end
 
 @doc raw"""
@@ -832,7 +832,7 @@ function eta_qexp(e::Int, n::Int, x::ZZPolyRingElem)
    z = parent(x)()
    ccall((:fmpz_poly_eta_qexp, libflint), Nothing,
                                           (Ref{ZZPolyRingElem}, Int, Int), z, e, n)
-   return is_gen(x) ? z : compose(z, x)
+   return is_gen(x) ? z : compose(z, x, inner = :second)
 end
 
 ###############################################################################
