@@ -1236,6 +1236,14 @@ function cyclotomic_real_subfield(n::Int, s::VarName = "(z_$n + 1/z_$n)", t = "\
    return R, a
 end
 
+function show_maxreal(io::IO, ::MIME"text/plain", a::AbsSimpleNumField)
+  # TODO: adjust once show_cyclo is adjusted
+  print(io, "Number field with defining polynomial ", defining_polynomial(a))
+  println(io)
+  io = pretty(io)
+  print(io, Indent(), "over ", Lowercase(), QQ, Dedent())
+end
+
 function show_maxreal(io::IO, a::AbsSimpleNumField)
   print(io, "Maximal real subfield of cyclotomic field of order $(get_attribute(a, :maxreal))")
 end
