@@ -363,3 +363,25 @@ function matrix_space(R::FpField, r::Int, c::Int; cached::Bool = true)
   # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
   FpMatrixSpace(R, r, c)
 end
+
+################################################################################
+#
+#  Kernel
+#
+################################################################################
+
+function nullspace(M::FpMatrix)
+  N = similar(M, ncols(M), ncols(M))
+  nullity = ccall((:fmpz_mod_mat_nullspace, libflint), Int,
+                  (Ref{FpMatrix}, Ref{FpMatrix}, Ref{FpField}), N, M, base_ring(M))
+  return nullity, view(N, 1:nrows(N), 1:nullity)
+end
+
+# For compatibility with the generic `kernel` method in AbstractAlgebra:
+# Otherwise the generic nullspace would be used for a "lazy transposed FpMatrix"
+# instead of flint.
+function nullspace(A::AbstractAlgebra.Solve.LazyTransposeMatElem{FpFieldElem, FpMatrix})
+   B = transpose(AbstractAlgebra.Solve.data(A))
+   n, N = nullspace(B)
+   return n, AbstractAlgebra.Solve.lazy_transpose(transpose(N))
+end
