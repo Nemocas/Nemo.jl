@@ -612,7 +612,10 @@ end
    @test x*A == B
    @test is_zero(K*A)
    @test nrows(K) + rank(A) == nrows(A)
+end
 
+@testset "ZZModMatrix.kernel" begin
+   Z17, = residue_ring(ZZ, ZZ(17))
    A = matrix(Z17, [ 1 2 3 ; 4 5 6 ])
    K = @inferred kernel(A, side = :right)
    @test is_zero(A*K)
@@ -626,6 +629,22 @@ end
    K = @inferred kernel(A)
    @test is_zero(K*A)
    @test nrows(K) == 1
+
+   # With zero divisors
+   Z18, = residue_ring(ZZ, ZZ(18))
+   A = matrix(Z18, [ 1 2 3 ; 4 5 6 ])
+   K = @inferred kernel(A, side = :right)
+   @test is_zero(A*K)
+   @test ncols(K) == 2
+
+   K = @inferred kernel(A)
+   @test is_zero(K*A)
+   @test nrows(K) == 1
+
+   A = transpose(A)
+   K = @inferred kernel(A)
+   @test is_zero(K*A)
+   @test nrows(K) == 2
 end
 
 #= Not implemented in Flint yet

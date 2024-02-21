@@ -931,6 +931,10 @@ function kernel(M::ZZModMatrix; side::Symbol = :left)
    end
 
    R = base_ring(M)
+   if is_prime(modulus(R))
+     return nullspace(M)[2]
+   end
+
    N = hcat(transpose(M), identity_matrix(R, ncols(M)))
    if nrows(N) < ncols(N)
       N = vcat(N, zero_matrix(R, ncols(N) - nrows(N), ncols(N)))
@@ -950,4 +954,21 @@ function kernel(M::ZZModMatrix; side::Symbol = :left)
       end
    end
    return zero_matrix(R, ncols(M), 0)
+end
+
+function nullspace(M::ZZModMatrix)
+  # Apparently this only works correctly if base_ring(M) is a field
+  N = similar(M, ncols(M), ncols(M))
+  nullity = ccall((:fmpz_mod_mat_nullspace, libflint), Int,
+                  (Ref{ZZModMatrix}, Ref{ZZModMatrix}), N, M)
+  return nullity, view(N, 1:nrows(N), 1:nullity)
+end
+
+# For compatibility with the generic `kernel` method in AbstractAlgebra:
+# Otherwise the generic nullspace would be used for a "lazy transposed ZZModMatrix"
+# instead of flint.
+function nullspace(A::AbstractAlgebra.Solve.LazyTransposeMatElem{ZZModRingElem, ZZModMatrix})
+   B = transpose(AbstractAlgebra.Solve.data(A))
+   n, N = nullspace(B)
+   return n, AbstractAlgebra.Solve.lazy_transpose(transpose(N))
 end
