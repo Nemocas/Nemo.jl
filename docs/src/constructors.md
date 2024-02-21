@@ -61,16 +61,15 @@ they represent.
 | $R = \mathbb{Z}$                      | `R = ZZ`                                      |
 | $R = \mathbb{Q}$                      | `R = QQ`                                      |
 | $R = \mathbb{F}_{p^n}$                | `R, a = finite_field(p, n, "a")`              |
-| $R = \mathbb{Z}/n\mathbb{Z}$          | `R, = residue_ring(ZZ, n)`                     |
+| $R = \mathbb{Z}/n\mathbb{Z}$          | `R, = residue_ring(ZZ, n)`                    |
 | $S = R[x]$                            | `S, x = polynomial_ring(R, "x")`              |
 | $S = R[x, y]$                         | `S, (x, y) = polynomial_ring(R, ["x", "y"])`  |
 | $S = R[[x]]$ (to precision $n$)       | `S, x = power_series_ring(R, n, "x")`         |
 | $S = R((x))$ (to precision $n$)       | `S, x = laurent_series_ring(R, n, "x")`       |
 | $S = \mathrm{Frac}_R$                 | `S = fraction_field(R)`                       |
-| $S = R/(f)$                           | `S, = residue_ring(R, f)`                      |
+| $S = R/(f)$                           | `S, = residue_ring(R, f)`                     |
 | $S = \mathrm{Mat}_{m\times n}(R)$     | `S = matrix_space(R, m, n)`                   |
 | $S = \mathbb{Q}[x]/(f)$               | `S, a = number_field(f, "a")`                 |
 | $S = \mathbb{Q}_p$ (to precision $N$) | `S = PadicField(p, n)`                        |
-| $S = \mathbb{R}$ (to precision $n$)   | `S = RealField(n)`                            |
-| $S = \mathbb{C}$ (to precision $n$)   | `S = ComplexField(n)`                         |
-
+| $S = \mathbb{R}$                      | `S = RealField()`                             |
+| $S = \mathbb{C}$                      | `S = ComplexField()`                          |

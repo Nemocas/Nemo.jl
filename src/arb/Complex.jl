@@ -649,7 +649,6 @@ function angle(x::ComplexFieldElem, prec::Int = precision(Balls))
   z = RealFieldElem()
   ccall((:acb_arg, libarb), Nothing,
                 (Ref{RealFieldElem}, Ref{ComplexFieldElem}, Int), z, x, prec)
-  z.parent = RealField(precision(Balls))
   return z
 end
 

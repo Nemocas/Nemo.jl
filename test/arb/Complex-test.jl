@@ -130,6 +130,10 @@ end
    @test abs(-CC(3)) == 3
    @test abs(CC(3)) == 3
    @test inv(CC(2)) == CC(QQ(1,2))
+
+   @test angle(CC(3)) == 0
+   @test contains_zero(angle(CC(0,1)) - const_pi(RR)/2)
+   @test contains_zero(angle(CC(-3)) - const_pi(RR))
 end
 
 @testset "ComplexFieldElem.binary_ops" begin

@@ -67,7 +67,7 @@ evaluate2(::ComplexPoly, ::ComplexFieldElem)
 **Examples**
 
 ```julia
-RR = RealField(64)
+RR = RealField()
 T, z = polynomial_ring(RR, "z")
    
 h = z^2 + 2z + 1
@@ -91,7 +91,7 @@ roots(::ComplexPoly)
 **Examples**
 
 ```julia
-CC = ComplexField(64)
+CC = ComplexField()
 C, y = polynomial_ring(CC, "y")
 
 m = y^2 + 2y + 3
@@ -114,7 +114,7 @@ from_roots(::AcbPolyRing, ::Vector{AcbFieldElem})
 **Examples**
 
 ```julia
-RR = RealField(64)
+RR = RealField()
 R, x = polynomial_ring(RR, "x")
 
 xs = ArbFieldElem[inv(RR(i)) for i=1:5]
@@ -186,8 +186,8 @@ unique_integer(::ComplexPoly)
 **Examples**
 
 ```julia
-RR = RealField(64)
-CC = ComplexField(64)
+RR = RealField()
+CC = ComplexField()
 R, x = polynomial_ring(RR, "x")
 C, y = polynomial_ring(CC, "y")
 Zx, zx = polynomial_ring(ZZ, "x")

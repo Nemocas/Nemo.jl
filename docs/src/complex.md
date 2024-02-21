@@ -43,7 +43,7 @@ In order to construct complex boxes in Nemo, one must first construct the Arb
 complex field itself. This is accomplished with the following constructor.
 
 ```
-ComplexField(prec::Int)
+ComplexField()
 ```
 
 Here is an example of creating an Arb complex field and using the resulting
@@ -52,7 +52,7 @@ parent object to coerce values into the resulting field.
 **Examples**
 
 ```julia
-CC = ComplexField(64)
+CC = ComplexField()
 
 a = CC("0.25")
 b = CC("0.1")
@@ -82,7 +82,7 @@ onei(::ComplexField)
 **Examples**
 
 ```julia
-CC = ComplexField(64)
+CC = ComplexField()
 
 c = onei(CC)
 ```
@@ -182,8 +182,8 @@ return it. A copy of the original is not made.
 Here are some examples of coercing elements into the Arb complex field.
 
 ```
-RR = RealField(64)
-CC = ComplexField(64)
+RR = RealField()
+CC = ComplexField()
 
 a = CC(3)
 b = CC(QQ(2,3))
@@ -222,7 +222,7 @@ accuracy_bits(::ComplexFieldElem)
 **Examples**
 
 ```julia
-CC = ComplexField(64)
+CC = ComplexField()
 
 a = CC("1.2 +/- 0.001")
 b = CC(3)
@@ -265,7 +265,7 @@ contains_zero(::ComplexFieldElem)
 **Examples**
 
 ```julia
-CC = ComplexField(64)
+CC = ComplexField()
 x = CC("1 +/- 0.001")
 y = CC("3")
 
@@ -305,7 +305,7 @@ Function                     |
 **Examples**
 
 ```julia
-CC = ComplexField(64)
+CC = ComplexField()
 x = CC("1 +/- 0.001")
 y = CC("3")
 z = CC("4")
@@ -321,7 +321,7 @@ x != 1.23
 **Examples**
 
 ```julia
-CC = ComplexField(64)
+CC = ComplexField()
 x = CC("-1 +/- 0.001")
 
 a = abs(x)
@@ -332,7 +332,7 @@ a = abs(x)
 **Examples**
 
 ```julia
-CC = ComplexField(64)
+CC = ComplexField()
 x = CC("-3 +/- 0.001")
 
 a = ldexp(x, 23)
@@ -352,7 +352,7 @@ unique_integer(::ComplexFieldElem)
 **Examples**
 
 ```julia
-CC = ComplexField(64)
+CC = ComplexField()
 x = CC("-3 +/- 0.001", "0.1")
 
 a = trim(x)
@@ -371,9 +371,10 @@ const_pi(::ComplexField)
 **Examples**
 
 ```julia
-CC = ComplexField(200)
-
-a = const_pi(CC)
+CC = ComplexField()
+set_precision!(ComplexField, 200) do
+  a = const_pi(CC)
+end
 ```
 
 ### Mathematical and special functions
@@ -606,7 +607,7 @@ weierstrass_p(::ComplexFieldElem, ::ComplexFieldElem)
 **Examples**
 
 ```julia
-CC = ComplexField(64)
+CC = ComplexField()
 
 s = CC(1, 2)
 z = CC("1.23", "3.45")
@@ -630,7 +631,7 @@ lindep(A::Matrix{ComplexFieldElem}, bits::Int)
 **Examples**
 
 ```julia
-CC = ComplexField(128)
+CC = ComplexField()
 
 # These are two of the roots of x^5 + 3x + 1
 a = CC(1.0050669478588622428791051888364775253, - 0.93725915669289182697903585868761513585)
