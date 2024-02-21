@@ -842,8 +842,7 @@ end
    @test parent(M) == S
 end
 
-
-@testset "zzModMatrix.Solve.kernel" begin
+@testset "zzModMatrix.kernel" begin
    # Prime modulus
    R, _ = residue_ring(ZZ, 17)
    M = matrix(R, [ 1 2 3 ; 4 5 6 ])
