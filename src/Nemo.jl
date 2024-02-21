@@ -485,7 +485,7 @@ include("embedding/embedding.jl")
 
 include("Rings.jl")
 
-include("view.jl")
+include("matrix.jl")
 
 include("HeckeMiscFiniteField.jl")
 include("HeckeMiscInfinity.jl")

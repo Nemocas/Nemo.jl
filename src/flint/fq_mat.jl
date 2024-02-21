@@ -818,12 +818,3 @@ function nullspace(M::FqPolyRepMatrix)
                   (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}), N, M, base_ring(M))
   return nullity, view(N, 1:nrows(N), 1:nullity)
 end
-
-# For compatibility with the generic `kernel` method in AbstractAlgebra:
-# Otherwise the generic nullspace would be used for a "lazy transposed FqPolyRepMatrix"
-# instead of flint.
-function nullspace(A::AbstractAlgebra.Solve.LazyTransposeMatElem{FqPolyRepFieldElem, FqPolyRepMatrix})
-   B = transpose(AbstractAlgebra.Solve.data(A))
-   n, N = nullspace(B)
-   return n, AbstractAlgebra.Solve.lazy_transpose(transpose(N))
-end

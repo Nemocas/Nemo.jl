@@ -855,12 +855,3 @@ function nullspace(M::FqMatrix)
                   (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), N, M, base_ring(M))
   return nullity, view(N, 1:nrows(N), 1:nullity)
 end
-
-# For compatibility with the generic `kernel` method in AbstractAlgebra:
-# Otherwise the generic nullspace would be used for a "lazy transposed FqMatrix"
-# instead of flint.
-function nullspace(A::AbstractAlgebra.Solve.LazyTransposeMatElem{FqFieldElem, FqMatrix})
-   B = transpose(AbstractAlgebra.Solve.data(A))
-   n, N = nullspace(B)
-   return n, AbstractAlgebra.Solve.lazy_transpose(transpose(N))
-end

@@ -933,15 +933,6 @@ function nullspace(M::zzModMatrix)
   return nullity, view(N, 1:nrows(N), 1:nullity)
 end
 
-# For compatibility with the generic `kernel` method in AbstractAlgebra:
-# Otherwise the generic nullspace would be used for a "lazy transposed zzModMatrix"
-# instead of flint.
-function nullspace(A::AbstractAlgebra.Solve.LazyTransposeMatElem{zzModRingElem, zzModMatrix})
-   B = transpose(AbstractAlgebra.Solve.data(A))
-   n, N = nullspace(B)
-   return n, AbstractAlgebra.Solve.lazy_transpose(transpose(N))
-end
-
 function kernel(M::zzModMatrix; side::Symbol = :left)
    AbstractAlgebra.Solve.check_option(side, [:right, :left], "side")
 

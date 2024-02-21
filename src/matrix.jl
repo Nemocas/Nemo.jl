@@ -25,3 +25,16 @@ function Base.view(x::_MatTypes, r::UnitRange{Int}, c::Int)
   A = view(x, r, c:c)
 	return MatrixView{typeof(x), typeof(base_ring(x))}(A)
 end
+
+# Generic kernel (calling nullspace in flint)
+
+function kernel(A::Union{QQMatrix, fpMatrix, FpMatrix, FqMatrix, fqPolyRepMatrix, FqPolyRepMatrix}; side::Symbol = :left)
+  AbstractAlgebra.Solve.check_option(side, [:right, :left], "side")
+
+  if side === :left
+    K = kernel(transpose(A), side = :right)
+    return transpose(K)
+  end
+
+  return nullspace(A)[2]
+end
