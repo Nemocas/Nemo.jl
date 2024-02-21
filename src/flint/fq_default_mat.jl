@@ -842,3 +842,25 @@ function fq_default_mat_entry_ptr(a::FqMatrix, i, j)
   end
   return pptr
 end
+
+################################################################################
+#
+#  Kernel
+#
+################################################################################
+
+function nullspace(M::FqMatrix)
+  N = similar(M, ncols(M), ncols(M))
+  nullity = ccall((:fq_default_mat_nullspace, libflint), Int,
+                  (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), N, M, base_ring(M))
+  return nullity, view(N, 1:nrows(N), 1:nullity)
+end
+
+# For compatibility with the generic `kernel` method in AbstractAlgebra:
+# Otherwise the generic nullspace would be used for a "lazy transposed FqMatrix"
+# instead of flint.
+function nullspace(A::AbstractAlgebra.Solve.LazyTransposeMatElem{FqFieldElem, FqMatrix})
+   B = transpose(AbstractAlgebra.Solve.data(A))
+   n, N = nullspace(B)
+   return n, AbstractAlgebra.Solve.lazy_transpose(transpose(N))
+end
