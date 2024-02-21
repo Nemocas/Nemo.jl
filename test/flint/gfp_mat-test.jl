@@ -786,6 +786,23 @@ end
    @test nrows(K) == 1
 end
 
+@testset "fpMatrix.kernel" begin
+   Z17 = Native.GF(17)
+   A = matrix(Z17, [ 1 2 3 ; 4 5 6 ])
+   K = @inferred kernel(A, side = :right)
+   @test is_zero(A*K)
+   @test ncols(K) == 1
+
+   K = @inferred kernel(A)
+   @test is_zero(K*A)
+   @test nrows(K) == 0
+
+   A = transpose(A)
+   K = @inferred kernel(A)
+   @test is_zero(K*A)
+   @test nrows(K) == 1
+end
+
 @testset "fpMatrix.lu" begin
 
   Z17 = Native.GF(17)

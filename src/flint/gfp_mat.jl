@@ -515,15 +515,18 @@ end
 #
 ################################################################################
 
-function kernel(A::fpMatrix; side::Symbol = :left)
-   AbstractAlgebra.Solve.check_option(side, [:right, :left], "side")
+function nullspace(M::fpMatrix)
+  N = similar(M, ncols(M), ncols(M))
+  nullity = ccall((:nmod_mat_nullspace, libflint), Int,
+                  (Ref{fpMatrix}, Ref{fpMatrix}), N, M)
+  return nullity, view(N, 1:nrows(N), 1:nullity)
+end
 
-   if side === :left
-      K = kernel(transpose(A), side = :right)
-      return transpose(K)
-   end
-
-   K = zero_matrix(base_ring(A), ncols(A), max(nrows(A), ncols(A)))
-   n = ccall((:nmod_mat_nullspace, libflint), Int, (Ref{fpMatrix}, Ref{fpMatrix}), K, A)
-   return view(K, 1:nrows(K), 1:n)
+# For compatibility with the generic `kernel` method in AbstractAlgebra:
+# Otherwise the generic nullspace would be used for a "lazy transposed ppMatrix"
+# instead of flint.
+function nullspace(A::AbstractAlgebra.Solve.LazyTransposeMatElem{fpFieldElem, fpMatrix})
+   B = transpose(AbstractAlgebra.Solve.data(A))
+   n, N = nullspace(B)
+   return n, AbstractAlgebra.Solve.lazy_transpose(transpose(N))
 end
