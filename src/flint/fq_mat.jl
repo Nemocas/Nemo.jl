@@ -805,3 +805,25 @@ function matrix_space(R::FqPolyRepField, r::Int, c::Int; cached::Bool = true)
   # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
   FqPolyRepMatrixSpace(R, r, c)
 end
+
+################################################################################
+#
+#  Kernel
+#
+################################################################################
+
+function nullspace(M::FqPolyRepMatrix)
+  N = similar(M, ncols(M), ncols(M))
+  nullity = ccall((:fq_mat_nullspace, libflint), Int,
+                  (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}), N, M, base_ring(M))
+  return nullity, view(N, 1:nrows(N), 1:nullity)
+end
+
+# For compatibility with the generic `kernel` method in AbstractAlgebra:
+# Otherwise the generic nullspace would be used for a "lazy transposed FqPolyRepMatrix"
+# instead of flint.
+function nullspace(A::AbstractAlgebra.Solve.LazyTransposeMatElem{FqPolyRepFieldElem, FqPolyRepMatrix})
+   B = transpose(AbstractAlgebra.Solve.data(A))
+   n, N = nullspace(B)
+   return n, AbstractAlgebra.Solve.lazy_transpose(transpose(N))
+end
