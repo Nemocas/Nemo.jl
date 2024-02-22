@@ -1,4 +1,8 @@
 RR = RealField()
+coeff_types = [Int8, Int, UInt, BigInt,
+               Float32, Float64, BigFloat,
+               Rational{Int8}, Rational{Int}, Rational{BigInt},
+               ZZRingElem, QQFieldElem]
 
 @testset "RealPoly.constructors" begin
    S1 = PolyRing(RR)
@@ -30,14 +34,15 @@ RR = RealField()
 
    @test isa(h, PolyRingElem)
 
-   k = R([RR(1), RR(0), RR(3)])
+   k = R([RR(1), RR(2), RR(3)])
 
    @test isa(k, PolyRingElem)
 
-   for T in [Int, UInt, BigInt, Float64, BigFloat, ZZRingElem, QQFieldElem, Rational{Int}, Rational{BigInt}]
+   for T in coeff_types
       l = R(T[1, 2, 3])
 
-      @test isa(l, RealPoly)
+      @test isa(l, PolyRingElem)
+      @test k == l
    end
 end
 
@@ -132,7 +137,7 @@ end
    f = x^2 + 2x + 1
    g = x^3 + 3x + 2
 
-   for T in [Int, BigInt, RR, ZZRingElem, QQFieldElem, Rational{Int}, Rational{BigInt}]
+   for T in coeff_types
       @test f * T(12) == 12*x^2+24*x+12
 
       @test T(7) * g == 7*x^3+21*x+14

@@ -275,7 +275,8 @@ end
 #
 ###############################################################################
 
-for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, ComplexFieldElem, ZZPolyRingElem, QQPolyRingElem]
+# to avoid method ambiguity errors, include `AbstractFloat, Integer, Rational` in addition to `Real`
+for T in [AbstractFloat, Integer, Rational, Real, Complex, ZZRingElem, QQFieldElem, RealFieldElem, ComplexFieldElem, ZZPolyRingElem, QQPolyRingElem]
    @eval begin
       +(x::ComplexPoly, y::$T) = x + parent(x)(y)
 
@@ -291,25 +292,14 @@ for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, Co
    end
 end
 
-+(x::ComplexPoly, y::Rational{T}) where T <: Union{Int, BigInt} = x + parent(x)(y)
-
-+(x::Rational{T}, y::ComplexPoly) where T <: Union{Int, BigInt} = y + x
-
--(x::ComplexPoly, y::Rational{T}) where T <: Union{Int, BigInt} = x - parent(x)(y)
-
--(x::Rational{T}, y::ComplexPoly) where T <: Union{Int, BigInt} = parent(y)(x) - y
-
-*(x::ComplexPoly, y::Rational{T}) where T <: Union{Int, BigInt} = x * parent(x)(y)
-
-*(x::Rational{T}, y::ComplexPoly) where T <: Union{Int, BigInt} = y * x
-
 ###############################################################################
 #
 #   Scalar division
 #
 ###############################################################################
 
-for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, ComplexFieldElem]
+# to avoid method ambiguity errors, include `AbstractFloat, Integer, Rational` in addition to `Real`
+for T in [AbstractFloat, Integer, Rational, Real, Complex, ZZRingElem, QQFieldElem, RealFieldElem, ComplexFieldElem]
    @eval begin
       divexact(x::ComplexPoly, y::$T; check::Bool=true) = x * inv(base_ring(parent(x))(y))
 
@@ -318,12 +308,6 @@ for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, Co
       /(x::ComplexPoly, y::$T) = divexact(x, y)
    end
 end
-
-divexact(x::ComplexPoly, y::Rational{T}; check::Bool=true) where {T <: Integer} = x * inv(base_ring(parent(x))(y))
-
-//(x::ComplexPoly, y::Rational{T}) where {T <: Integer} = divexact(x, y)
-
-/(x::ComplexPoly, y::Rational{T}) where {T <: Integer} = divexact(x, y)
 
 ###############################################################################
 #
@@ -792,8 +776,7 @@ function (a::ComplexPolyRing)()
    return z
 end
 
-for T in [Integer, ZZRingElem, QQFieldElem, Float64, Complex{Float64},
-          Complex{Int}, RealFieldElem, ComplexFieldElem]
+for T in [Real, Complex, ZZRingElem, QQFieldElem, RealFieldElem, ComplexFieldElem]
   @eval begin
     function (a::ComplexPolyRing)(b::$T)
       z = ComplexPoly(base_ring(a)(b), precision(Balls))
@@ -803,23 +786,17 @@ for T in [Integer, ZZRingElem, QQFieldElem, Float64, Complex{Float64},
   end
 end
 
-(a::ComplexPolyRing)(b::Rational{T}) where {T <: Integer} = a(QQFieldElem(b))
-
 function (a::ComplexPolyRing)(b::Vector{ComplexFieldElem})
    z = ComplexPoly(b, precision(Balls))
    z.parent = a
    return z
 end
 
-for T in [ZZRingElem, QQFieldElem, Float64, Complex{Float64}, Complex{Int}, RealFieldElem]
+for T in [Real, Complex, ZZRingElem, QQFieldElem, RealFieldElem, ComplexFieldElem]
   @eval begin
-    (a::ComplexPolyRing)(b::Vector{$T}) = a(map(base_ring(a), b))
+    (a::ComplexPolyRing)(b::AbstractVector{<:$T}) = a(map(base_ring(a), b))
   end
 end
-
-(a::ComplexPolyRing)(b::Vector{T}) where {T <: Integer} = a(map(base_ring(a), b))
-
-(a::ComplexPolyRing)(b::Vector{Rational{T}}) where {T <: Integer} = a(map(base_ring(a), b))
 
 function (a::ComplexPolyRing)(b::ZZPolyRingElem)
    z = ComplexPoly(b, precision(Balls))

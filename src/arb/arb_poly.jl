@@ -274,7 +274,8 @@ end
 #
 ###############################################################################
 
-for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, ZZPolyRingElem, QQPolyRingElem]
+# to avoid method ambiguity errors, include `AbstractFloat, Integer, Rational` in addition to `Real`
+for T in [AbstractFloat, Integer, Rational, Real, ZZRingElem, QQFieldElem, ArbFieldElem, ZZPolyRingElem, QQPolyRingElem]
    @eval begin
       +(x::ArbPolyRingElem, y::$T) = x + parent(x)(y)
 
@@ -290,25 +291,14 @@ for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, ZZP
    end
 end
 
-+(x::ArbPolyRingElem, y::Rational{T}) where T <: Union{Int, BigInt} = x + parent(x)(y)
-
-+(x::Rational{T}, y::ArbPolyRingElem) where T <: Union{Int, BigInt} = y + x
-
--(x::ArbPolyRingElem, y::Rational{T}) where T <: Union{Int, BigInt} = x - parent(x)(y)
-
--(x::Rational{T}, y::ArbPolyRingElem) where T <: Union{Int, BigInt} = parent(y)(x) - y
-
-*(x::ArbPolyRingElem, y::Rational{T}) where T <: Union{Int, BigInt} = x * parent(x)(y)
-
-*(x::Rational{T}, y::ArbPolyRingElem) where T <: Union{Int, BigInt} = y * x
-
 ###############################################################################
 #
 #   Scalar division
 #
 ###############################################################################
 
-for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem]
+# to avoid method ambiguity errors, include `AbstractFloat, Integer, Rational` in addition to `Real`
+for T in [AbstractFloat, Integer, Rational, Real, ZZRingElem, QQFieldElem, ArbFieldElem]
    @eval begin
       divexact(x::ArbPolyRingElem, y::$T; check::Bool=true) = x * inv(base_ring(parent(x))(y))
 
@@ -317,12 +307,6 @@ for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem]
       /(x::ArbPolyRingElem, y::$T) = divexact(x, y)
    end
 end
-
-divexact(x::ArbPolyRingElem, y::Rational{T}; check::Bool=true) where {T <: Integer} = x * inv(base_ring(parent(x))(y))
-
-//(x::ArbPolyRingElem, y::Rational{T}) where {T <: Integer} = divexact(x, y)
-
-/(x::ArbPolyRingElem, y::Rational{T}) where {T <: Integer} = divexact(x, y)
 
 ###############################################################################
 #
@@ -696,7 +680,7 @@ function (a::ArbPolyRing)()
    return z
 end
 
-for T in [Integer, ZZRingElem, QQFieldElem, Float64, ArbFieldElem, BigFloat]
+for T in [Real, ZZRingElem, QQFieldElem, ArbFieldElem]
    @eval begin
       function (a::ArbPolyRing)(b::$T)
          z = ArbPolyRingElem(base_ring(a)(b), a.base_ring.prec)
@@ -706,27 +690,17 @@ for T in [Integer, ZZRingElem, QQFieldElem, Float64, ArbFieldElem, BigFloat]
    end
 end
 
-function (a::ArbPolyRing)(b::Rational{T}) where {T <: Integer}
-   z = ArbPolyRingElem(base_ring(a)(b), a.base_ring.prec)
-   z.parent = a
-   return z
-end
-
 function (a::ArbPolyRing)(b::Vector{ArbFieldElem})
    z = ArbPolyRingElem(b, a.base_ring.prec)
    z.parent = a
    return z
 end
 
-for T in [ZZRingElem, QQFieldElem, Float64, BigFloat]
+for T in [Real, ZZRingElem, QQFieldElem, ArbFieldElem]
    @eval begin
-      (a::ArbPolyRing)(b::Vector{$T}) = a(map(base_ring(a), b))
+      (a::ArbPolyRing)(b::AbstractVector{<:$T}) = a(map(base_ring(a), b))
    end
 end
-
-(a::ArbPolyRing)(b::Vector{T}) where {T <: Integer} = a(map(base_ring(a), b))
-
-(a::ArbPolyRing)(b::Vector{Rational{T}}) where {T <: Integer} = a(map(base_ring(a), b))
 
 function (a::ArbPolyRing)(b::ZZPolyRingElem)
    z = ArbPolyRingElem(b, a.base_ring.prec)

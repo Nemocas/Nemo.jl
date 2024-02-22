@@ -261,7 +261,8 @@ end
 #
 ###############################################################################
 
-for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, ZZPolyRingElem, QQPolyRingElem]
+# to avoid method ambiguity errors, include `AbstractFloat, Integer, Rational` in addition to `Real`
+for T in [AbstractFloat, Integer, Rational, Real, ZZRingElem, QQFieldElem, RealFieldElem, ZZPolyRingElem, QQPolyRingElem]
    @eval begin
       +(x::RealPoly, y::$T) = x + parent(x)(y)
 
@@ -277,25 +278,14 @@ for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, ZZ
    end
 end
 
-+(x::RealPoly, y::Rational{T}) where T <: Union{Int, BigInt} = x + parent(x)(y)
-
-+(x::Rational{T}, y::RealPoly) where T <: Union{Int, BigInt} = y + x
-
--(x::RealPoly, y::Rational{T}) where T <: Union{Int, BigInt} = x - parent(x)(y)
-
--(x::Rational{T}, y::RealPoly) where T <: Union{Int, BigInt} = parent(y)(x) - y
-
-*(x::RealPoly, y::Rational{T}) where T <: Union{Int, BigInt} = x * parent(x)(y)
-
-*(x::Rational{T}, y::RealPoly) where T <: Union{Int, BigInt} = y * x
-
 ###############################################################################
 #
 #   Scalar division
 #
 ###############################################################################
 
-for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem]
+# to avoid method ambiguity errors, include `AbstractFloat, Integer, Rational` in addition to `Real`
+for T in [AbstractFloat, Integer, Rational, Real, ZZRingElem, QQFieldElem,  RealFieldElem]
    @eval begin
       divexact(x::RealPoly, y::$T; check::Bool=true) = x * inv(base_ring(parent(x))(y))
 
@@ -304,12 +294,6 @@ for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem]
       /(x::RealPoly, y::$T) = divexact(x, y)
    end
 end
-
-divexact(x::RealPoly, y::Rational{T}; check::Bool=true) where {T <: Integer} = x * inv(base_ring(parent(x))(y))
-
-//(x::RealPoly, y::Rational{T}) where {T <: Integer} = divexact(x, y)
-
-/(x::RealPoly, y::Rational{T}) where {T <: Integer} = divexact(x, y)
 
 ###############################################################################
 #
@@ -698,7 +682,7 @@ function (a::RealPolyRing)()
    return z
 end
 
-for T in [Integer, ZZRingElem, QQFieldElem, Float64, RealFieldElem, BigFloat]
+for T in [Real, ZZRingElem, QQFieldElem, RealFieldElem]
    @eval begin
       function (a::RealPolyRing)(b::$T)
          z = RealPoly(base_ring(a)(b), precision(Balls))
@@ -708,27 +692,17 @@ for T in [Integer, ZZRingElem, QQFieldElem, Float64, RealFieldElem, BigFloat]
    end
 end
 
-function (a::RealPolyRing)(b::Rational{T}) where {T <: Integer}
-   z = RealPoly(base_ring(a)(b), precision(Balls))
-   z.parent = a
-   return z
-end
-
 function (a::RealPolyRing)(b::Vector{RealFieldElem})
    z = RealPoly(b, precision(Balls))
    z.parent = a
    return z
 end
 
-for T in [ZZRingElem, QQFieldElem, Float64, BigFloat]
+for T in [Real, ZZRingElem, QQFieldElem, RealFieldElem]
    @eval begin
-      (a::RealPolyRing)(b::Vector{$T}) = a(map(base_ring(a), b))
+      (a::RealPolyRing)(b::AbstractVector{<:$T}) = a(map(base_ring(a), b))
    end
 end
-
-(a::RealPolyRing)(b::Vector{T}) where {T <: Integer} = a(map(base_ring(a), b))
-
-(a::RealPolyRing)(b::Vector{Rational{T}}) where {T <: Integer} = a(map(base_ring(a), b))
 
 function (a::RealPolyRing)(b::ZZPolyRingElem)
    z = RealPoly(b, precision(Balls))

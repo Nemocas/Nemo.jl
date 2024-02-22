@@ -2024,6 +2024,22 @@ for (typeofx, passtoc) in ((RealFieldElem, Ref{RealFieldElem}), (Ptr{RealFieldEl
       ccall((:arb_set_round, libarb), Nothing,
                   (($passtoc), ($passtoc), Int), x, x, p)
     end
+
+    function _arb_set(x::($typeofx), y::Integer)
+      _arb_set(x, ZZRingElem(y))
+    end
+
+    function _arb_set(x::($typeofx), y::Integer, p::Int)
+      _arb_set(x, ZZRingElem(y), p)
+    end
+
+    function _arb_set(x::($typeofx), y::Real)
+      _arb_set(x, BigFloat(y))
+    end
+
+    function _arb_set(x::($typeofx), y::Real, p::Int)
+      _arb_set(x, BigFloat(y), p)
+    end
   end
 end
 
@@ -2033,49 +2049,9 @@ end
 #
 ################################################################################
 
-function (r::RealField)()
-  z = RealFieldElem()
-  return z
-end
+(r::RealField)() = RealFieldElem()
 
-function (r::RealField)(x::Int, prec::Int = precision(Balls))
-  z = RealFieldElem(ZZRingElem(x), prec)
-  return z
-end
-
-function (r::RealField)(x::UInt, prec::Int = precision(Balls))
-  z = RealFieldElem(ZZRingElem(x), prec)
-  return z
-end
-
-function (r::RealField)(x::ZZRingElem, prec::Int = precision(Balls))
-  z = RealFieldElem(x, prec)
-  return z
-end
-
-(r::RealField)(x::Integer, prec::Int = precision(Balls)) = r(ZZRingElem(x), prec)
-
-function (r::RealField)(x::QQFieldElem, prec::Int = precision(Balls))
-  z = RealFieldElem(x, prec)
-  return z
-end
-
-(r::RealField)(x::Rational{T}, prec::Int = precision(Balls)) where {T <: Integer} = r(QQFieldElem(x), prec)
-
-function (r::RealField)(x::Float64, prec::Int = precision(Balls))
-  z = RealFieldElem(x, prec)
-  return z
-end
-
-function (r::RealField)(x::RealFieldElem, prec::Int = precision(Balls))
-  z = RealFieldElem(x, prec)
-  return z
-end
-
-function (r::RealField)(x::AbstractString, prec::Int = precision(Balls))
-  z = RealFieldElem(x, prec)
-  return z
-end
+(r::RealField)(x::Any, prec::Int = precision(Balls)) = RealFieldElem(x, prec)
 
 function (r::RealField)(x::Irrational, prec::Int = precision(Balls))
   if x == pi
@@ -2085,11 +2061,6 @@ function (r::RealField)(x::Irrational, prec::Int = precision(Balls))
   else
     error("constant not supported")
   end
-end
-
-function (r::RealField)(x::BigFloat, prec::Int = precision(Balls))
-  z = RealFieldElem(x, prec)
-  return z
 end
 
 ################################################################################

@@ -1,5 +1,10 @@
 RR = RealField()
 CC = ComplexField()
+coeff_types = [Int8, Int, UInt, BigInt,
+               Float32, Float64, BigFloat,
+               Rational{Int8}, Rational{Int}, Rational{BigInt},
+               Complex{Int8}, Complex{Float32}, Complex{BigInt}, Complex{Rational{BigInt}},
+               ZZRingElem, QQFieldElem]
 
 @testset "ComplexPoly.constructors" begin
    S1 = PolyRing(CC)
@@ -31,18 +36,20 @@ CC = ComplexField()
 
    @test isa(h, PolyRingElem)
 
-   k = R([CC(1), CC(0), CC(3)])
+   k = R([CC(1), CC(2), CC(3)])
 
    @test isa(k, PolyRingElem)
 
-   l = R([1, 2, 3])
+   l = R([RR(1), RR(2), RR(3)])
 
    @test isa(l, PolyRingElem)
+   @test k == l
 
-   for T in [RR, ZZRingElem, QQFieldElem, Int, BigInt, Rational{Int}, Rational{BigInt}]
+   for T in coeff_types
      m = R(map(T, [1, 2, 3]))
 
      @test isa(m, PolyRingElem)
+     @test k == m
    end
 end
 
@@ -103,7 +110,7 @@ end
    f = x^2 + 2x + 1
    g = x^3 + 3x + 2
 
-   for T in [Int, BigInt, RR, CC, ZZRingElem, QQFieldElem, Rational{Int}, Rational{BigInt}]
+   for T in coeff_types
       @test f * T(12) == 12*x^2+24*x+12
 
       @test T(7) * g == 7*x^3+21*x+14

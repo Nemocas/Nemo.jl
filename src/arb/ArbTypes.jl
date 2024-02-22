@@ -98,8 +98,7 @@ mutable struct RealFieldElem <: FieldElem
     return z
   end
 
-  function RealFieldElem(x::Union{Int, UInt, Float64, ZZRingElem, QQFieldElem,
-                        BigFloat, AbstractString, RealFieldElem}, p::Int)
+  function RealFieldElem(x::Union{Real, ZZRingElem, QQFieldElem, AbstractString, RealFieldElem}, p::Int)
     z = new()
     ccall((:arb_init, libarb), Nothing, (Ref{RealFieldElem}, ), z)
     _arb_set(z, x, p)
@@ -107,7 +106,7 @@ mutable struct RealFieldElem <: FieldElem
     return z
   end
 
-  function RealFieldElem(x::Union{Int, UInt, Float64, ZZRingElem, BigFloat})
+  function RealFieldElem(x::Union{Real, ZZRingElem})
     z = new()
     ccall((:arb_init, libarb), Nothing, (Ref{RealFieldElem}, ), z)
     _arb_set(z, x)
@@ -163,8 +162,7 @@ mutable struct ArbFieldElem <: FieldElem
     return z
   end
 
-  function ArbFieldElem(x::Union{Int, UInt, Float64, ZZRingElem, QQFieldElem,
-                        BigFloat, AbstractString, ArbFieldElem}, p::Int)
+  function ArbFieldElem(x::Union{Real, ZZRingElem, QQFieldElem, AbstractString, ArbFieldElem}, p::Int)
     z = new()
     ccall((:arb_init, libarb), Nothing, (Ref{ArbFieldElem}, ), z)
     _arb_set(z, x, p)
@@ -172,7 +170,7 @@ mutable struct ArbFieldElem <: FieldElem
     return z
   end
 
-  function ArbFieldElem(x::Union{Int, UInt, Float64, ZZRingElem, BigFloat, ArbFieldElem})
+  function ArbFieldElem(x::Union{Real, ZZRingElem, ArbFieldElem})
     z = new()
     ccall((:arb_init, libarb), Nothing, (Ref{ArbFieldElem}, ), z)
     _arb_set(z, x)
@@ -233,7 +231,7 @@ mutable struct ComplexFieldElem <: FieldElem
     return z
   end
 
-  function ComplexFieldElem(x::Union{Int, UInt, Float64, ZZRingElem, BigFloat, RealFieldElem, ComplexFieldElem})
+  function ComplexFieldElem(x::Union{Number, ZZRingElem, RealFieldElem, ComplexFieldElem})
     z = new()
     ccall((:acb_init, libarb), Nothing, (Ref{ComplexFieldElem}, ), z)
     _acb_set(z, x)
@@ -241,8 +239,7 @@ mutable struct ComplexFieldElem <: FieldElem
     return z
   end
 
-  function ComplexFieldElem(x::Union{Int, UInt, Float64, ZZRingElem, QQFieldElem,
-                        BigFloat, RealFieldElem, ComplexFieldElem, AbstractString}, p::Int)
+  function ComplexFieldElem(x::Union{Number, ZZRingElem, QQFieldElem, RealFieldElem, ComplexFieldElem, AbstractString}, p::Int)
     z = new()
     ccall((:acb_init, libarb), Nothing, (Ref{ComplexFieldElem}, ), z)
     _acb_set(z, x, p)
@@ -250,7 +247,7 @@ mutable struct ComplexFieldElem <: FieldElem
     return z
   end
 
-  function ComplexFieldElem(x::T, y::T, p::Int) where {T <: Union{Int, UInt, Float64, ZZRingElem, QQFieldElem, BigFloat, AbstractString, RealFieldElem}}
+  function ComplexFieldElem(x::T, y::T, p::Int) where {T <: Union{Real, ZZRingElem, QQFieldElem, AbstractString, RealFieldElem}}
     z = new()
     ccall((:acb_init, libarb), Nothing, (Ref{ComplexFieldElem}, ), z)
     _acb_set(z, x, y, p)
@@ -391,7 +388,7 @@ mutable struct AcbFieldElem <: FieldElem
     return z
   end
 
-  function AcbFieldElem(x::Union{Int, UInt, Float64, ZZRingElem, BigFloat, ArbFieldElem, AcbFieldElem})
+  function AcbFieldElem(x::Union{Number, ZZRingElem, ArbFieldElem, AcbFieldElem})
     z = new()
     ccall((:acb_init, libarb), Nothing, (Ref{AcbFieldElem}, ), z)
     _acb_set(z, x)
@@ -399,8 +396,7 @@ mutable struct AcbFieldElem <: FieldElem
     return z
   end
 
-  function AcbFieldElem(x::Union{Int, UInt, Float64, ZZRingElem, QQFieldElem,
-                        BigFloat, ArbFieldElem, AcbFieldElem, AbstractString}, p::Int)
+  function AcbFieldElem(x::Union{Number, ZZRingElem, QQFieldElem, ArbFieldElem, AcbFieldElem, AbstractString}, p::Int)
     z = new()
     ccall((:acb_init, libarb), Nothing, (Ref{AcbFieldElem}, ), z)
     _acb_set(z, x, p)
@@ -416,7 +412,7 @@ mutable struct AcbFieldElem <: FieldElem
   #  return z
   #end
 
-  function AcbFieldElem(x::T, y::T, p::Int) where {T <: Union{Int, UInt, Float64, ZZRingElem, QQFieldElem, BigFloat, AbstractString, ArbFieldElem}}
+  function AcbFieldElem(x::T, y::T, p::Int) where {T <: Union{Real, ZZRingElem, QQFieldElem, AbstractString, ArbFieldElem}}
     z = new()
     ccall((:acb_init, libarb), Nothing, (Ref{AcbFieldElem}, ), z)
     _acb_set(z, x, y, p)

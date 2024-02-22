@@ -234,11 +234,8 @@ end
 //(x::ZZRingElem,y::ComplexFieldElem) = isone(x) ? inv(y) : parent(y)(x) // y
 //(x::RealFieldElem,y::ComplexFieldElem) = isone(x) ? inv(y) : parent(y)(x) // y
 
-^(x::UInt,y::ComplexFieldElem) = parent(y)(x) ^ y
-^(x::Int,y::ComplexFieldElem) = parent(y)(x) ^ y
 ^(x::ZZRingElem,y::ComplexFieldElem) = parent(y)(x) ^ y
 ^(x::RealFieldElem,y::ComplexFieldElem) = parent(y)(x) ^ y
-^(x::Integer, y::ComplexFieldElem) = ZZRingElem(x)^y
 
 function -(x::UInt, y::ComplexFieldElem)
   z = ComplexFieldElem()
@@ -284,84 +281,41 @@ end
 
 //(x::Integer, y::ComplexFieldElem) = ZZRingElem(x)//y
 
-^(x::ComplexFieldElem, y::Integer) = x ^ parent(x)(y)
-
-+(x::ComplexFieldElem, y::QQFieldElem) = x + parent(x)(y)
--(x::ComplexFieldElem, y::QQFieldElem) = x - parent(x)(y)
-*(x::ComplexFieldElem, y::QQFieldElem) = x * parent(x)(y)
-//(x::ComplexFieldElem, y::QQFieldElem) = x // parent(x)(y)
-^(x::ComplexFieldElem, y::QQFieldElem) = x ^ parent(x)(y)
-
-+(x::QQFieldElem, y::ComplexFieldElem) = parent(y)(x) + y
--(x::QQFieldElem, y::ComplexFieldElem) = parent(y)(x) - y
-*(x::QQFieldElem, y::ComplexFieldElem) = parent(y)(x) * y
-//(x::QQFieldElem, y::ComplexFieldElem) = parent(y)(x) // y
-^(x::QQFieldElem, y::ComplexFieldElem) = parent(y)(x) ^ y
-
 divexact(x::ComplexFieldElem, y::ComplexFieldElem; check::Bool=true) = x // y
 divexact(x::ZZRingElem, y::ComplexFieldElem; check::Bool=true) = x // y
 divexact(x::ComplexFieldElem, y::ZZRingElem; check::Bool=true) = x // y
-divexact(x::Int, y::ComplexFieldElem; check::Bool=true) = x // y
-divexact(x::ComplexFieldElem, y::Int; check::Bool=true) = x // y
-divexact(x::UInt, y::ComplexFieldElem; check::Bool=true) = x // y
-divexact(x::ComplexFieldElem, y::UInt; check::Bool=true) = x // y
-divexact(x::QQFieldElem, y::ComplexFieldElem; check::Bool=true) = x // y
-divexact(x::ComplexFieldElem, y::QQFieldElem; check::Bool=true) = x // y
 divexact(x::RealFieldElem, y::ComplexFieldElem; check::Bool=true) = x // y
 divexact(x::ComplexFieldElem, y::RealFieldElem; check::Bool=true) = x // y
-divexact(x::Float64, y::ComplexFieldElem; check::Bool=true) = x // y
-divexact(x::ComplexFieldElem, y::Float64; check::Bool=true) = x // y
-divexact(x::BigFloat, y::ComplexFieldElem; check::Bool=true) = x // y
-divexact(x::ComplexFieldElem, y::BigFloat; check::Bool=true) = x // y
-divexact(x::Integer, y::ComplexFieldElem; check::Bool=true) = x // y
-divexact(x::ComplexFieldElem, y::Integer; check::Bool=true) = x // y
-divexact(x::Rational{T}, y::ComplexFieldElem; check::Bool=true) where {T <: Integer} = x // y
-divexact(x::ComplexFieldElem, y::Rational{T}; check::Bool=true) where {T <: Integer} = x // y
 
 /(x::ComplexFieldElem, y::ComplexFieldElem) = x // y
 /(x::ZZRingElem, y::ComplexFieldElem) = x // y
 /(x::ComplexFieldElem, y::ZZRingElem) = x // y
-/(x::Int, y::ComplexFieldElem) = x // y
-/(x::ComplexFieldElem, y::Int) = x // y
-/(x::UInt, y::ComplexFieldElem) = x // y
-/(x::ComplexFieldElem, y::UInt) = x // y
-/(x::QQFieldElem, y::ComplexFieldElem) = x // y
-/(x::ComplexFieldElem, y::QQFieldElem) = x // y
 /(x::RealFieldElem, y::ComplexFieldElem) = x // y
 /(x::ComplexFieldElem, y::RealFieldElem) = x // y
 
-+(x::Rational{T}, y::ComplexFieldElem) where {T <: Integer} = QQFieldElem(x) + y
-+(x::ComplexFieldElem, y::Rational{T}) where {T <: Integer} = x + QQFieldElem(y)
--(x::Rational{T}, y::ComplexFieldElem) where {T <: Integer} = QQFieldElem(x) - y
--(x::ComplexFieldElem, y::Rational{T}) where {T <: Integer} = x - QQFieldElem(y)
-*(x::Rational{T}, y::ComplexFieldElem) where {T <: Integer} = QQFieldElem(x) * y
-*(x::ComplexFieldElem, y::Rational{T}) where {T <: Integer} = x * QQFieldElem(y)
-//(x::Rational{T}, y::ComplexFieldElem) where {T <: Integer} = QQFieldElem(x) // y
-//(x::ComplexFieldElem, y::Rational{T}) where {T <: Integer} = x // QQFieldElem(y)
-^(x::Rational{T}, y::ComplexFieldElem) where {T <: Integer} = QQFieldElem(x)^y
-^(x::ComplexFieldElem, y::Rational{T}) where {T <: Integer} = x ^ QQFieldElem(y)
+for T in (Float64, BigFloat, Rational, QQFieldElem)
+  @eval begin
+    +(x::$T, y::ComplexFieldElem) = parent(y)(x) + y
+    +(x::ComplexFieldElem, y::$T) = x + parent(x)(y)
+    -(x::$T, y::ComplexFieldElem) = parent(y)(x) - y
+    -(x::ComplexFieldElem, y::$T) = x - parent(x)(y)
+    *(x::$T, y::ComplexFieldElem) = parent(y)(x) * y
+    *(x::ComplexFieldElem, y::$T) = x * parent(x)(y)
+    //(x::$T, y::ComplexFieldElem) = parent(y)(x) // y
+    //(x::ComplexFieldElem, y::$T) = x // parent(x)(y)
+  end
+end
 
-+(x::Float64, y::ComplexFieldElem) = parent(y)(x) + y
-+(x::ComplexFieldElem, y::Float64) = x + parent(x)(y)
--(x::Float64, y::ComplexFieldElem) = parent(y)(x) - y
--(x::ComplexFieldElem, y::Float64) = x - parent(x)(y)
-*(x::Float64, y::ComplexFieldElem) = parent(y)(x) * y
-*(x::ComplexFieldElem, y::Float64) = x * parent(x)(y)
-//(x::Float64, y::ComplexFieldElem) = parent(y)(x) // y
-//(x::ComplexFieldElem, y::Float64) = x // parent(x)(y)
-^(x::Float64, y::ComplexFieldElem) = parent(y)(x)^y
-^(x::ComplexFieldElem, y::Float64) = x ^ parent(x)(y)
-
-+(x::BigFloat, y::ComplexFieldElem) = parent(y)(x) + y
-+(x::ComplexFieldElem, y::BigFloat) = x + parent(x)(y)
--(x::BigFloat, y::ComplexFieldElem) = parent(y)(x) - y
--(x::ComplexFieldElem, y::BigFloat) = x - parent(x)(y)
-*(x::BigFloat, y::ComplexFieldElem) = parent(y)(x) * y
-*(x::ComplexFieldElem, y::BigFloat) = x * parent(x)(y)
-//(x::BigFloat, y::ComplexFieldElem) = parent(y)(x) // y
-//(x::ComplexFieldElem, y::BigFloat) = x // parent(x)(y)
-^(x::BigFloat, y::ComplexFieldElem) = parent(y)(x)^y
-^(x::ComplexFieldElem, y::BigFloat) = x ^ parent(x)(y)
+for T in (Float64, BigFloat, Integer, Rational, QQFieldElem)
+  @eval begin
+    ^(x::$T, y::ComplexFieldElem) = parent(y)(x)^y
+    ^(x::ComplexFieldElem, y::$T) = x ^ parent(x)(y)
+    /(x::$T, y::ComplexFieldElem) = x // y
+    /(x::ComplexFieldElem, y::$T) = x // y
+    divexact(x::$T, y::ComplexFieldElem; check::Bool=true) = x // y
+    divexact(x::ComplexFieldElem, y::$T; check::Bool=true) = x // y
+  end
+end
 
 ################################################################################
 #
@@ -1772,17 +1726,24 @@ for (typeofx, passtoc) in ((ComplexFieldElem, Ref{ComplexFieldElem}), (Ptr{Compl
       _arb_set(i, z, p)
     end
 
+    function _acb_set(x::($typeofx), y::Real, p::Int)
+      r = ccall((:acb_real_ptr, libarb), Ptr{RealFieldElem}, (($passtoc), ), x)
+      _arb_set(r, y, p)
+      i = ccall((:acb_imag_ptr, libarb), Ptr{RealFieldElem}, (($passtoc), ), x)
+      ccall((:arb_zero, libarb), Nothing, (Ptr{ArbFieldElem}, ), i)
+    end
+
+    function _acb_set(x::($typeofx), y::Complex, p::Int)
+      r = ccall((:acb_real_ptr, libarb), Ptr{RealFieldElem}, (($passtoc), ), x)
+      _arb_set(r, real(y), p)
+      i = ccall((:acb_imag_ptr, libarb), Ptr{RealFieldElem}, (($passtoc), ), x)
+      _arb_set(i, imag(y), p)
+    end
+
   end
 
-  for T in (Float64, BigFloat, UInt, ZZRingElem)
+  for T in (Real, ZZRingElem)
     @eval begin
-      function _acb_set(x::($typeofx), y::($T), z::($T))
-        r = ccall((:acb_real_ptr, libarb), Ptr{RealFieldElem}, (($passtoc), ), x)
-        _arb_set(r, y)
-        i = ccall((:acb_imag_ptr, libarb), Ptr{RealFieldElem}, (($passtoc), ), x)
-        _arb_set(i, z)
-      end
-
       function _acb_set(x::($typeofx), y::($T), z::($T), p::Int)
         r = ccall((:acb_real_ptr, libarb), Ptr{RealFieldElem}, (($passtoc), ), x)
         _arb_set(r, y, p)
@@ -1813,29 +1774,15 @@ promote_rule(::Type{ComplexFieldElem}, ::Type{RealFieldElem}) = ComplexFieldElem
 #
 ################################################################################
 
-function (r::ComplexField)()
-  z = ComplexFieldElem()
-  return z
-end
+(r::ComplexField)() = ComplexFieldElem()
 
-function (r::ComplexField)(x::Union{Int, UInt, ZZRingElem, QQFieldElem, RealFieldElem, ComplexFieldElem, Float64,
-                                    BigFloat, AbstractString}; precision::Int = precision(Balls))
-  z = ComplexFieldElem(x, precision)
-  return z
-end
+(r::ComplexField)(x::Any; precision::Int = precision(Balls)) = ComplexFieldElem(x, precision)
 
-(r::ComplexField)(x::Integer; precision::Int = precision(Balls)) = r(ZZRingElem(x); precision = precision)
+(r::ComplexField)(x::T, y::T; precision::Int = precision(Balls)) where T = ComplexFieldElem(x, y, precision)
 
-(r::ComplexField)(x::Rational{T}; precision::Int = precision(Balls)) where {T <: Integer} = r(QQFieldElem(x), precision = precision)
-
-function (r::ComplexField)(x::T, y::T; precision::Int = precision(Balls)) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, RealFieldElem, Float64, BigFloat, AbstractString}}
-  z = ComplexFieldElem(x, y, precision)
-  return z
-end
-
-for S in (Int, UInt, ZZRingElem, QQFieldElem, RealFieldElem, Float64, BigFloat, AbstractString, BigInt)
-  for T in (Int, UInt, ZZRingElem, QQFieldElem, RealFieldElem, Float64, BigFloat, AbstractString, BigInt)
-    if S != T
+for S in (Real, ZZRingElem, QQFieldElem, RealFieldElem, AbstractString)
+  for T in (Real, ZZRingElem, QQFieldElem, RealFieldElem, AbstractString)
+    if S != T || S == Real
       @eval begin
         function (r::ComplexField)(x::$(S), y::$(T); precision::Int = precision(Balls))
           z = ComplexFieldElem(RealField()(x), RealField()(y), precision)
@@ -1845,24 +1792,6 @@ for S in (Int, UInt, ZZRingElem, QQFieldElem, RealFieldElem, Float64, BigFloat, 
     end
   end
 end
-
-for T in (Int, UInt, ZZRingElem, QQFieldElem, RealFieldElem, Float64, BigFloat, AbstractString, BigInt)
-  @eval begin
-    function (r::ComplexField)(x::Rational{S}, y::$(T); precision::Int = precision(Balls)) where {S <: Integer}
-      z = ComplexFieldElem(RealField()(x), RealField()(y), precision)
-      return z
-    end
-    function (r::ComplexField)(x::$(T), y::Rational{S}; precision::Int = precision(Balls)) where {S <: Integer}
-      z = ComplexFieldElem(RealField()(x), RealField()(y), precision)
-      return z
-    end
-  end
-end
-
-(r::ComplexField)(x::BigInt, y::BigInt; precision::Int = precision(Balls)) = r(ZZRingElem(x), ZZRingElem(y), precision = precision)
-
-(r::ComplexField)(x::Rational{S}, y::Rational{T}; precision::Int = precision(Balls)) where {S <: Integer, T <: Integer} =
-      r(QQFieldElem(x), QQFieldElem(y); precision = precision)
 
 ################################################################################
 #

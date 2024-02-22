@@ -831,80 +831,43 @@ function ^(x::ArbFieldElem, y::QQFieldElem)
   return z
 end
 
-+(x::QQFieldElem, y::ArbFieldElem) = parent(y)(x) + y
-+(x::ArbFieldElem, y::QQFieldElem) = x + parent(x)(y)
--(x::QQFieldElem, y::ArbFieldElem) = parent(y)(x) - y
-//(x::ArbFieldElem, y::QQFieldElem) = x//parent(x)(y)
-//(x::QQFieldElem, y::ArbFieldElem) = parent(y)(x)//y
--(x::ArbFieldElem, y::QQFieldElem) = x - parent(x)(y)
-*(x::QQFieldElem, y::ArbFieldElem) = parent(y)(x) * y
-*(x::ArbFieldElem, y::QQFieldElem) = x * parent(x)(y)
-^(x::QQFieldElem, y::ArbFieldElem) = parent(y)(x) ^ y
 
-+(x::Float64, y::ArbFieldElem) = parent(y)(x) + y
-+(x::ArbFieldElem, y::Float64) = x + parent(x)(y)
--(x::Float64, y::ArbFieldElem) = parent(y)(x) - y
-//(x::ArbFieldElem, y::Float64) = x//parent(x)(y)
-//(x::Float64, y::ArbFieldElem) = parent(y)(x)//y
--(x::ArbFieldElem, y::Float64) = x - parent(x)(y)
-*(x::Float64, y::ArbFieldElem) = parent(y)(x) * y
-*(x::ArbFieldElem, y::Float64) = x * parent(x)(y)
-^(x::Float64, y::ArbFieldElem) = parent(y)(x) ^ y
-^(x::ArbFieldElem, y::Float64) = x ^ parent(x)(y)
+for T in (Float64, BigFloat, Rational, QQFieldElem)
+  @eval begin
+    +(x::$T, y::ArbFieldElem) = parent(y)(x) + y
+    +(x::ArbFieldElem, y::$T) = x + parent(x)(y)
+    -(x::$T, y::ArbFieldElem) = parent(y)(x) - y
+    //(x::ArbFieldElem, y::$T) = x//parent(x)(y)
+    //(x::$T, y::ArbFieldElem) = parent(y)(x)//y
+    -(x::ArbFieldElem, y::$T) = x - parent(x)(y)
+    *(x::$T, y::ArbFieldElem) = parent(y)(x) * y
+    *(x::ArbFieldElem, y::$T) = x * parent(x)(y)
+    ^(x::$T, y::ArbFieldElem) = parent(y)(x) ^ y
+  end
+end
 
-+(x::BigFloat, y::ArbFieldElem) = parent(y)(x) + y
-+(x::ArbFieldElem, y::BigFloat) = x + parent(x)(y)
--(x::BigFloat, y::ArbFieldElem) = parent(y)(x) - y
-//(x::ArbFieldElem, y::BigFloat) = x//parent(x)(y)
-//(x::BigFloat, y::ArbFieldElem) = parent(y)(x)//y
--(x::ArbFieldElem, y::BigFloat) = x - parent(x)(y)
-*(x::BigFloat, y::ArbFieldElem) = parent(y)(x) * y
-*(x::ArbFieldElem, y::BigFloat) = x * parent(x)(y)
-^(x::BigFloat, y::ArbFieldElem) = parent(y)(x) ^ y
-^(x::ArbFieldElem, y::BigFloat) = x ^ parent(x)(y)
+for T in (Float64, BigFloat, Rational)
+  @eval begin
+    ^(x::ArbFieldElem, y::$T) = x ^ parent(x)(y)
+  end
+end
 
-+(x::Rational{T}, y::ArbFieldElem) where {T <: Integer} = QQFieldElem(x) + y
-+(x::ArbFieldElem, y::Rational{T}) where {T <: Integer} = x + QQFieldElem(y)
--(x::Rational{T}, y::ArbFieldElem) where {T <: Integer} = QQFieldElem(x) - y
--(x::ArbFieldElem, y::Rational{T}) where {T <: Integer} = x - QQFieldElem(y)
-//(x::Rational{T}, y::ArbFieldElem) where {T <: Integer} = QQFieldElem(x)//y
-//(x::ArbFieldElem, y::Rational{T}) where {T <: Integer} = x//QQFieldElem(y)
-*(x::Rational{T}, y::ArbFieldElem) where {T <: Integer} = QQFieldElem(x) * y
-*(x::ArbFieldElem, y::Rational{T}) where {T <: Integer} = x * QQFieldElem(y)
-^(x::Rational{T}, y::ArbFieldElem) where {T <: Integer} = QQFieldElem(x) ^ y
-^(x::ArbFieldElem, y::Rational{T}) where {T <: Integer} = x ^ QQFieldElem(y)
+for T in (Float64, BigFloat, Integer, Rational, QQFieldElem)
+  @eval begin
+    /(x::$T, y::ArbFieldElem) = x // y
+    /(x::ArbFieldElem, y::$T) = x // y
+    divexact(x::$T, y::ArbFieldElem; check::Bool=true) = x // y
+    divexact(x::ArbFieldElem, y::$T; check::Bool=true) = x // y
+  end
+end
 
 /(x::ArbFieldElem, y::ArbFieldElem) = x // y
 /(x::ZZRingElem, y::ArbFieldElem) = x // y
 /(x::ArbFieldElem, y::ZZRingElem) = x // y
-/(x::Int, y::ArbFieldElem) = x // y
-/(x::ArbFieldElem, y::Int) = x // y
-/(x::UInt, y::ArbFieldElem) = x // y
-/(x::ArbFieldElem, y::UInt) = x // y
-/(x::QQFieldElem, y::ArbFieldElem) = x // y
-/(x::ArbFieldElem, y::QQFieldElem) = x // y
-/(x::Float64, y::ArbFieldElem) = x // y
-/(x::ArbFieldElem, y::Float64) = x // y
-/(x::BigFloat, y::ArbFieldElem) = x // y
-/(x::ArbFieldElem, y::BigFloat) = x // y
-/(x::Rational{T}, y::ArbFieldElem) where {T <: Integer} = x // y
-/(x::ArbFieldElem, y::Rational{T}) where {T <: Integer} = x // y
 
 divexact(x::ArbFieldElem, y::ArbFieldElem; check::Bool=true) = x // y
 divexact(x::ZZRingElem, y::ArbFieldElem; check::Bool=true) = x // y
 divexact(x::ArbFieldElem, y::ZZRingElem; check::Bool=true) = x // y
-divexact(x::Int, y::ArbFieldElem; check::Bool=true) = x // y
-divexact(x::ArbFieldElem, y::Int; check::Bool=true) = x // y
-divexact(x::UInt, y::ArbFieldElem; check::Bool=true) = x // y
-divexact(x::ArbFieldElem, y::UInt; check::Bool=true) = x // y
-divexact(x::QQFieldElem, y::ArbFieldElem; check::Bool=true) = x // y
-divexact(x::ArbFieldElem, y::QQFieldElem; check::Bool=true) = x // y
-divexact(x::Float64, y::ArbFieldElem; check::Bool=true) = x // y
-divexact(x::ArbFieldElem, y::Float64; check::Bool=true) = x // y
-divexact(x::BigFloat, y::ArbFieldElem; check::Bool=true) = x // y
-divexact(x::ArbFieldElem, y::BigFloat; check::Bool=true) = x // y
-divexact(x::Rational{T}, y::ArbFieldElem; check::Bool=true) where {T <: Integer} = x // y
-divexact(x::ArbFieldElem, y::Rational{T}; check::Bool=true) where {T <: Integer} = x // y
 
 ################################################################################
 #
@@ -2071,6 +2034,22 @@ for (typeofx, passtoc) in ((ArbFieldElem, Ref{ArbFieldElem}), (Ptr{ArbFieldElem}
       ccall((:arb_set_round, libarb), Nothing,
                   (($passtoc), ($passtoc), Int), x, x, p)
     end
+
+    function _arb_set(x::($typeofx), y::Integer)
+      _arb_set(x, ZZRingElem(y))
+    end
+
+    function _arb_set(x::($typeofx), y::Integer, p::Int)
+      _arb_set(x, ZZRingElem(y), p)
+    end
+
+    function _arb_set(x::($typeofx), y::Real)
+      _arb_set(x, BigFloat(y))
+    end
+
+    function _arb_set(x::($typeofx), y::Real, p::Int)
+      _arb_set(x, BigFloat(y), p)
+    end
   end
 end
 
@@ -2086,53 +2065,7 @@ function (r::ArbField)()
   return z
 end
 
-function (r::ArbField)(x::Int)
-  z = ArbFieldElem(ZZRingElem(x), r.prec)
-  z.parent = r
-  return z
-end
-
-function (r::ArbField)(x::UInt)
-  z = ArbFieldElem(ZZRingElem(x), r.prec)
-  z.parent = r
-  return z
-end
-
-function (r::ArbField)(x::ZZRingElem)
-  z = ArbFieldElem(x, r.prec)
-  z.parent = r
-  return z
-end
-
-(r::ArbField)(x::Integer) = r(ZZRingElem(x))
-
-function (r::ArbField)(x::QQFieldElem)
-  z = ArbFieldElem(x, r.prec)
-  z.parent = r
-  return z
-end
-
-(r::ArbField)(x::Rational{T}) where {T <: Integer} = r(QQFieldElem(x))
-
-#function call(r::ArbField, x::arf)
-#  z = ArbFieldElem(ArbFieldElem(x), r.prec)
-#  z.parent = r
-#  return z
-#end
-
-function (r::ArbField)(x::Float64)
-  z = ArbFieldElem(x, r.prec)
-  z.parent = r
-  return z
-end
-
-function (r::ArbField)(x::ArbFieldElem)
-  z = ArbFieldElem(x, r.prec)
-  z.parent = r
-  return z
-end
-
-function (r::ArbField)(x::AbstractString)
+function (r::ArbField)(x::Any)
   z = ArbFieldElem(x, r.prec)
   z.parent = r
   return z
@@ -2146,12 +2079,6 @@ function (r::ArbField)(x::Irrational)
   else
     error("constant not supported")
   end
-end
-
-function (r::ArbField)(x::BigFloat)
-  z = ArbFieldElem(x, r.prec)
-  z.parent = r
-  return z
 end
 
 ################################################################################
