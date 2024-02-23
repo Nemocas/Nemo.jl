@@ -764,6 +764,24 @@ end
    @test_throws ArgumentError can_solve_with_solution(A, B, side = :garbage)
    @test_throws ArgumentError can_solve(A, B, side = :garbage)
 
+   A = matrix(QQ, [1 2 3; 4 5 6])
+   C = solve_init(A)
+   B = matrix(QQ, 2, 1, [1, 1])
+   fl, x, K = can_solve_with_solution_and_kernel(C, B, side = :right)
+   @test fl
+   @test A*x == B
+   @test is_zero(A*K)
+   @test ncols(K) + rank(A) == ncols(A)
+
+   B = matrix(QQ, 1, 3, [1, 2, 3])
+   fl, x, K = can_solve_with_solution_and_kernel(C, B)
+   @test fl
+   @test x*A == B
+   @test is_zero(K*A)
+   @test nrows(K) + rank(A) == nrows(A)
+end
+
+@testset "QQMatrix.kernel" begin
    A = matrix(QQ, [ 1 2 3 ; 4 5 6 ])
    K = @inferred kernel(A, side = :right)
    @test is_zero(A*K)

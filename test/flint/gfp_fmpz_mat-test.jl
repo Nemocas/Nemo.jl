@@ -759,3 +759,109 @@ end
    @test is_zero(K*A)
    @test nrows(K) == 1
 end
+
+@testset "FpMatrix.Solve.solve" begin
+  F17, _ = Native.finite_field(ZZRingElem(17))
+  R = matrix_space(F17, 3, 3)
+  S = matrix_space(F17, 3, 4)
+
+  a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
+
+  b = S([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
+
+  c = a*b
+
+  d = solve(a, c, side = :right)
+
+  @test d == b
+
+  a = zero(R)
+
+  @test_throws ArgumentError solve(a, c, side = :right)
+
+   for i in 1:10
+      m = rand(0:10)
+      n = rand(0:10)
+      k = rand(0:10)
+
+      M = matrix_space(F17, n, k)
+      N = matrix_space(F17, n, m)
+
+      A = rand(M)
+      B = rand(N)
+
+      fl, X, K = can_solve_with_solution_and_kernel(A, B, side = :right)
+
+      if fl
+         @test A * X == B
+         @test is_zero(A*K)
+         @test rank(A) + ncols(K) == ncols(A)
+      end
+   end
+
+   A = matrix(F17, 2, 2, [1, 2, 2, 5])
+   B = matrix(F17, 2, 1, [1, 2])
+   fl, X = can_solve_with_solution(A, B, side = :right)
+   @test fl
+   @test A * X == B
+   @test can_solve(A, B, side = :right)
+
+   A = matrix(F17, 2, 2, [1, 2, 2, 4])
+   B = matrix(F17, 2, 1, [1, 2])
+   fl, X = can_solve_with_solution(A, B, side = :right)
+   @test fl
+   @test A * X == B
+   @test can_solve(A, B, side = :right)
+
+   A = matrix(F17, 2, 2, [1, 2, 2, 4])
+   B = matrix(F17, 2, 1, [1, 3])
+   fl, X = can_solve_with_solution(A, B, side = :right)
+   @test !fl
+
+   A = zero_matrix(F17, 2, 3)
+   B = identity_matrix(F17, 3)
+   @test_throws ErrorException can_solve_with_solution(A, B, side = :right)
+
+   A = transpose(matrix(F17, 2, 2, [1, 2, 2, 5]))
+   B = transpose(matrix(F17, 2, 1, [1, 2]))
+   fl, X = can_solve_with_solution(A, B)
+   @test fl
+   @test X * A == B
+   @test can_solve(A, B)
+
+   A = transpose(matrix(F17, 2, 2, [1, 2, 2, 4]))
+   B = transpose(matrix(F17, 2, 1, [1, 2]))
+   fl, X = can_solve_with_solution(A, B)
+   @test fl
+   @test X * A == B
+   @test can_solve(A, B)
+
+   A = transpose(matrix(F17, 2, 2, [1, 2, 2, 4]))
+   B = transpose(matrix(F17, 2, 1, [1, 3]))
+   fl, X = can_solve_with_solution(A, B)
+   @test !fl
+   @test !can_solve(A, B)
+
+   A = transpose(zero_matrix(F17, 2, 3))
+   B = transpose(identity_matrix(F17, 3))
+   @test_throws ErrorException can_solve_with_solution(A, B)
+
+   @test_throws ArgumentError can_solve_with_solution(A, B, side = :garbage)
+   @test_throws ArgumentError can_solve(A, B, side = :garbage)
+
+   A = matrix(F17, [1 2 3; 4 5 6])
+   C = solve_init(A)
+   B = matrix(F17, 2, 1, [1, 1])
+   fl, x, K = can_solve_with_solution_and_kernel(C, B, side = :right)
+   @test fl
+   @test A*x == B
+   @test is_zero(A*K)
+   @test ncols(K) + rank(A) == ncols(A)
+
+   B = matrix(F17, 1, 3, [1, 2, 3])
+   fl, x, K = can_solve_with_solution_and_kernel(C, B)
+   @test fl
+   @test x*A == B
+   @test is_zero(K*A)
+   @test nrows(K) + rank(A) == nrows(A)
+end

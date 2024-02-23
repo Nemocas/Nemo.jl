@@ -1327,6 +1327,35 @@ function Solve._can_solve_internal_no_check(A::ZZMatrix, b::ZZMatrix, task::Symb
    return fl, sol, kernel(A, side = :right)
  end
 
+# Overwrite some solve context functionality so that it uses `transpose` and not
+# `lazy_transpose`
+
+function solve_init(A::ZZMatrix)
+  return Solve.SolveCtx{ZZRingElem, ZZMatrix, ZZMatrix}(A)
+end
+
+function Solve._init_reduce_transpose(C::Solve.SolveCtx{ZZRingElem})
+  if isdefined(C, :red_transp) && isdefined(C, :trafo_transp)
+    return nothing
+  end
+
+  R, U = hnf_with_transform(transpose(matrix(C)))
+  C.red_transp = R
+  C.trafo_transp = U
+  return nothing
+end
+
+function Solve.kernel(C::Solve.SolveCtx{ZZRingElem}; side::Symbol = :left)
+  Solve.check_option(side, [:right, :left], "side")
+
+  if side === :right
+    return Solve._kernel_of_hnf(matrix(C), Solve.reduced_matrix_of_transpose(C), Solve.transformation_matrix_of_transpose(C))[2]
+  else
+    nullity, X = Solve._kernel_of_hnf(matrix(C), Solve.reduced_matrix(C), Solve.transformation_matrix(C))
+    return transpose(X)
+  end
+end
+
 Base.reduce(::typeof(hcat), A::AbstractVector{ZZMatrix}) = AbstractAlgebra._hcat(A)
 
 Base.reduce(::typeof(vcat), A::AbstractVector{ZZMatrix}) = AbstractAlgebra._vcat(A)
