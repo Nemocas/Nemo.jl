@@ -934,7 +934,7 @@ function nullspace(M::zzModMatrix)
 end
 
 function kernel(M::zzModMatrix; side::Symbol = :left)
-   AbstractAlgebra.Solve.check_option(side, [:right, :left], "side")
+   Solve.check_option(side, [:right, :left], "side")
 
    if side === :left
       K = kernel(transpose(M), side = :right)

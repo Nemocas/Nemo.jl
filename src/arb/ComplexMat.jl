@@ -597,10 +597,10 @@ function _solve_lu_precomp(P::Generic.Perm, LU::ComplexMat, y::ComplexMat)
   return z
 end
 
-function AbstractAlgebra.Solve._can_solve_internal_no_check(A::ComplexMat, b::ComplexMat, task::Symbol; side::Symbol = :left)
+function Solve._can_solve_internal_no_check(A::ComplexMat, b::ComplexMat, task::Symbol; side::Symbol = :left)
    nrows(A) != ncols(A) && error("Only implemented for square matrices")
    if side === :left
-      fl, sol, K = AbstractAlgebra.Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
+      fl, sol, K = Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
       return fl, transpose(sol), transpose(K)
    end
 
@@ -623,10 +623,10 @@ end
 ################################################################################
 
 function solve_init(A::ComplexMat)
-   return AbstractAlgebra.Solve.SolveCtx{ComplexFieldElem, ComplexMat, ComplexMat}(A)
+   return Solve.SolveCtx{ComplexFieldElem, ComplexMat, ComplexMat}(A)
 end
 
-function AbstractAlgebra.Solve._init_reduce(C::AbstractAlgebra.Solve.SolveCtx{ComplexFieldElem})
+function Solve._init_reduce(C::Solve.SolveCtx{ComplexFieldElem})
    if isdefined(C, :red) && isdefined(C, :lu_perm)
       return nothing
    end
@@ -649,7 +649,7 @@ function AbstractAlgebra.Solve._init_reduce(C::AbstractAlgebra.Solve.SolveCtx{Co
    return nothing
 end
 
-function AbstractAlgebra.Solve._init_reduce_transpose(C::AbstractAlgebra.Solve.SolveCtx{ComplexFieldElem})
+function Solve._init_reduce_transpose(C::Solve.SolveCtx{ComplexFieldElem})
    if isdefined(C, :red_transp) && isdefined(C, :lu_perm_transp)
       return nothing
    end
@@ -672,13 +672,13 @@ function AbstractAlgebra.Solve._init_reduce_transpose(C::AbstractAlgebra.Solve.S
    return nothing
 end
 
-function AbstractAlgebra.Solve._can_solve_internal_no_check(C::AbstractAlgebra.Solve.SolveCtx{ComplexFieldElem}, b::ComplexMat, task::Symbol; side::Symbol = :left)
+function Solve._can_solve_internal_no_check(C::Solve.SolveCtx{ComplexFieldElem}, b::ComplexMat, task::Symbol; side::Symbol = :left)
    if side === :right
-      LU = AbstractAlgebra.Solve.reduced_matrix(C)
-      p = AbstractAlgebra.Solve.lu_permutation(C)
+      LU = Solve.reduced_matrix(C)
+      p = Solve.lu_permutation(C)
    else
-      LU = AbstractAlgebra.Solve.reduced_matrix_of_transpose(C)
-      p = AbstractAlgebra.Solve.lu_permutation_of_transpose(C)
+      LU = Solve.reduced_matrix_of_transpose(C)
+      p = Solve.lu_permutation_of_transpose(C)
       b = transpose(b)
    end
 

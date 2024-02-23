@@ -29,7 +29,7 @@ end
 # Generic kernel (calling nullspace in flint)
 
 function kernel(A::Union{QQMatrix, fpMatrix, FpMatrix, FqMatrix, fqPolyRepMatrix, FqPolyRepMatrix}; side::Symbol = :left)
-  AbstractAlgebra.Solve.check_option(side, [:right, :left], "side")
+  Solve.check_option(side, [:right, :left], "side")
 
   if side === :left
     K = kernel(transpose(A), side = :right)

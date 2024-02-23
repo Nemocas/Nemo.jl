@@ -1111,7 +1111,7 @@ function nullspace(x::ZZMatrix)
 end
 
 function kernel(A::ZZMatrix; side::Symbol = :left)
-   AbstractAlgebra.Solve.check_option(side, [:right, :left], "side")
+   Solve.check_option(side, [:right, :left], "side")
 
    if side === :left
       K = kernel(transpose(A), side = :right)
@@ -1314,9 +1314,9 @@ function _cansolve(a::ZZMatrix, b::ZZMatrix)
    return true, transpose(z*T)
 end
 
-function AbstractAlgebra.Solve._can_solve_internal_no_check(A::ZZMatrix, b::ZZMatrix, task::Symbol; side::Symbol = :left)
+function Solve._can_solve_internal_no_check(A::ZZMatrix, b::ZZMatrix, task::Symbol; side::Symbol = :left)
    if side === :left
-      fl, sol, K = AbstractAlgebra.Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
+      fl, sol, K = Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
       return fl, transpose(sol), transpose(K)
    end
 

@@ -450,10 +450,10 @@ function _can_solve(a::FqMatrix, b::FqMatrix; side::Symbol = :right)
    return fl
 end
 
-function AbstractAlgebra.Solve._can_solve_internal_no_check(A::FqMatrix, b::FqMatrix, task::Symbol; side::Symbol = :left)
+function Solve._can_solve_internal_no_check(A::FqMatrix, b::FqMatrix, task::Symbol; side::Symbol = :left)
    check_parent(A, b)
    if side === :left
-      fl, sol, K = AbstractAlgebra.Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
+      fl, sol, K = Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
       return fl, transpose(sol), transpose(K)
    end
 

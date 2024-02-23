@@ -196,6 +196,7 @@ import AbstractAlgebra: promote_rule
 import AbstractAlgebra: Ring
 import AbstractAlgebra: Set
 import AbstractAlgebra: set_attribute!
+import AbstractAlgebra: Solve
 
 include("Exports.jl")
 
