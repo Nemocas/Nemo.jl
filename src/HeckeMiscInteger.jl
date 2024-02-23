@@ -61,30 +61,6 @@ end
 #end
 
 
-function *(a::ZZRingElem, b::BigFloat)
-    return BigInt(a) * b
-end
-
-function *(a::BigFloat, b::ZZRingElem)
-    return BigInt(a) * b
-end
-
-function *(a::ZZRingElem, b::Float64)
-    return BigInt(a) * b
-end
-
-function *(b::Float64, a::ZZRingElem)
-    return BigInt(a) * b
-end
-
-function *(a::QQFieldElem, b::Float64)
-    return Rational(a) * b
-end
-
-function *(b::Float64, a::QQFieldElem)
-    return Rational(a) * b
-end
-
 function convert(R::Type{Rational{Base.GMP.BigInt}}, a::ZZRingElem)
     return R(BigInt(a))
 end
