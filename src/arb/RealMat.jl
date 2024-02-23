@@ -516,14 +516,6 @@ function _solve!(z::RealMat, x::RealMat, y::RealMat)
   nothing
 end
 
-function _solve(x::RealMat, y::RealMat)
-  ncols(x) != nrows(x) && error("First argument must be square")
-  ncols(x) != nrows(y) && error("Matrix dimensions are wrong")
-  z = similar(y)
-  _solve!(z, x, y)
-  return z
-end
-
 function _solve_lu_precomp!(z::RealMat, P::Generic.Perm, LU::RealMat, y::RealMat)
   Q = inv(P)
   ccall((:arb_mat_solve_lu_precomp, libarb), Nothing,

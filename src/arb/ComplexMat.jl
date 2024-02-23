@@ -574,14 +574,6 @@ function _solve!(z::ComplexMat, x::ComplexMat, y::ComplexMat)
   nothing
 end
 
-function _solve(x::ComplexMat, y::ComplexMat)
-  ncols(x) != nrows(x) && error("First argument must be square")
-  ncols(x) != nrows(y) && error("Matrix dimensions are wrong")
-  z = similar(y)
-  _solve!(z, x, y)
-  return z
-end
-
 function _solve_lu_precomp!(z::ComplexMat, P::Generic.Perm, LU::ComplexMat, y::ComplexMat)
   Q = inv(P)
   ccall((:acb_mat_solve_lu_precomp, libarb), Nothing,

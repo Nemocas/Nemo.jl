@@ -485,21 +485,6 @@ end
 #
 ################################################################################
 
-#= Not implemented in Flint yet
-
-function _solve(x::T, y::T) where T <: Zmod_fmpz_mat
-  (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
-  !is_square(x)&& error("First argument not a square matrix in solve")
-  (y.r != x.r) || y.c != 1 && ("Not a column vector in solve")
-  z = similar(y)
-  r = ccall((:fmpz_mod_mat_solve, libflint), Int,
-          (Ref{T}, Ref{T}, Ref{T}), z, x, y)
-  !Bool(r) && error("Singular matrix in solve")
-  return z
-end
-
-=#
-
 function Solve._can_solve_internal_no_check(A::ZZModMatrix, b::ZZModMatrix, task::Symbol; side::Symbol = :left)
    check_parent(A, b)
    if side === :left
@@ -508,6 +493,7 @@ function Solve._can_solve_internal_no_check(A::ZZModMatrix, b::ZZModMatrix, task
    end
 
    x = similar(A, ncols(A), ncols(b))
+   # This is probably only correct if the characteristic is prime
    fl = ccall((:fmpz_mod_mat_can_solve, libflint), Cint,
               (Ref{ZZModMatrix}, Ref{ZZModMatrix}, Ref{ZZModMatrix}), x, A, b)
    if task === :only_check || task === :with_solution

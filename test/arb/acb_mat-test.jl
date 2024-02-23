@@ -432,12 +432,6 @@ end
    @test overlaps(L*U, p*A)
    @test r == 3
 
-   y = Nemo._solve(A, transpose(b))
-
-   @test overlaps(A * y, transpose(b))
-
-   @test contains(transpose(y), ZZ[1 1 1])
-
    Nemo.lu!(p, A)
 
    y = Nemo._solve_lu_precomp(p, A, transpose(b))

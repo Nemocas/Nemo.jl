@@ -553,106 +553,13 @@ end
 
    B = T([QQFieldElem(4), 5, 7])
 
-   X = Nemo._solve(A, B)
+   X = solve(A, B, side = :right)
 
    @test X == T([3, -24, 14])
 
    @test A*X == B
 
-   Y = Nemo._solve_dixon(A, B)
-
-   @test X == Y
-
-   m1 = [1 1; 1 0; 1 0]
-   m2 = [ 1 0 ; 0 1; 0 1 ]
-   m1Q = matrix(QQ, m1)
-   m2Q = matrix(QQ, m2);
-   
-   N = Nemo._solve(m1Q, m2Q)
-
-   @test N == matrix(QQ, 2, 2, [0 1; 1 -1])
-
-   for i in 1:10
-      m = rand(0:10)
-      n = rand(0:10)
-      k = rand(0:10)
-
-      M = matrix_space(QQ, n, k)
-      N = matrix_space(QQ, n, m)
-
-      A = rand(M, -10:10)
-      B = rand(N, -10:10)
-
-      fl, X = Nemo._can_solve_with_solution(A, B)
-
-      if fl
-         @test A * X == B
-      end
-   end
-
-   A = matrix(QQ, 2, 2, [1, 2, 2, 5])
-   B = matrix(QQ, 2, 1, [1, 2])
-   fl, X = Nemo._can_solve_with_solution(A, B)
-   @test fl
-   @test A * X == B
-   @test Nemo._can_solve(A, B)
-
-   A = matrix(QQ, 2, 2, [1, 2, 2, 4])
-   B = matrix(QQ, 2, 1, [1, 2])
-   fl, X = Nemo._can_solve_with_solution(A, B)
-   @test fl
-   @test A * X == B
-   @test Nemo._can_solve(A, B)
-
-   A = matrix(QQ, 2, 2, [1, 2, 2, 4])
-   B = matrix(QQ, 2, 1, [1, 3])
-   fl, X = Nemo._can_solve_with_solution(A, B)
-   @test !fl
-   @test !Nemo._can_solve(A, B)
-
-   A = zero_matrix(QQ, 2, 3)
-   B = identity_matrix(QQ, 3)
-   @test_throws ErrorException Nemo._can_solve_with_solution(A, B)
-
-   # Transpose
-   A = transpose(matrix(QQ, 2, 2, [1, 2, 2, 5]))
-   B = transpose(matrix(QQ, 2, 1, [1, 2]))
-   fl, X = Nemo._can_solve_with_solution(A, B, side = :left)
-   @test fl
-   @test X * A == B
-   @test Nemo._can_solve(A, B, side = :left)
-
-   A = transpose(matrix(QQ, 2, 2, [1, 2, 2, 4]))
-   B = transpose(matrix(QQ, 2, 1, [1, 2]))
-   fl, X = Nemo._can_solve_with_solution(A, B, side = :left)
-   @test fl
-   @test X * A == B
-   @test Nemo._can_solve(A, B, side = :left)
-
-   A = transpose(matrix(QQ, 2, 2, [1, 2, 2, 4]))
-   B = transpose(matrix(QQ, 2, 1, [1, 3]))
-   fl, X = Nemo._can_solve_with_solution(A, B, side = :left)
-   @test !fl
-   @test !Nemo._can_solve(A, B, side = :left)
-
-   A = transpose(zero_matrix(QQ, 2, 3))
-   B = transpose(identity_matrix(QQ, 3))
-   @test_throws ErrorException Nemo._can_solve_with_solution(A, B, side = :left)
-
-   @test_throws ErrorException Nemo._can_solve_with_solution(A, B, side = :garbage)
-   @test_throws ErrorException Nemo._can_solve(A, B, side = :garbage)
-end
-
-@testset "QQMatrix.Solve.solve" begin
-   S = matrix_space(QQ, 3, 3)
-
-   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 2 2])
-
-   T = matrix_space(QQ, 3, 1)
-
-   B = T([QQFieldElem(4), 5, 7])
-
-   X = solve(A, B, side = :right)
+   X = Nemo._solve_dixon(A, B)
 
    @test X == T([3, -24, 14])
 

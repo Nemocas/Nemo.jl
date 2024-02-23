@@ -1251,21 +1251,6 @@ end
 ###############################################################################
 
 @doc raw"""
-    _solve(a::ZZMatrix, b::ZZMatrix) -> ZZMatrix
-
-Return a matrix $x$ such that $ax = b$. An exception is raised
-if this is not possible.
-"""
-function _solve(a::ZZMatrix, b::ZZMatrix)
-   nrows(b) != nrows(a) && error("Incompatible dimensions in solve")
-   fl, z = _cansolve(a, b)
-   if !fl
-     error("system is inconsistent")
-   end
-   return z
-end
-
-@doc raw"""
     _cansolve(a::ZZMatrix, b::ZZMatrix) -> Bool, ZZMatrix
 
 Return true and a matrix $x$ such that $ax = b$, or false and some matrix
@@ -1442,16 +1427,6 @@ function AbstractAlgebra._hcat(A::AbstractVector{ZZMatrix})
   end
   return M
 end
-
-#to override the generic one in AA
-function _can_solve_with_solution(a::ZZMatrix, b::ZZMatrix; side::Symbol = :right)
-   if side == :left
-      fl, x = Nemo._cansolve(transpose(a), transpose(b))
-      return fl, transpose(x)
-   end
-   return Nemo._cansolve(a, b)
-end
-
 
 @doc raw"""
     _cansolve_with_nullspace(a::ZZMatrix, b::ZZMatrix) -> Bool, ZZMatrix, ZZMatrix

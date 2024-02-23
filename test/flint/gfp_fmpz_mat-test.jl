@@ -760,7 +760,7 @@ end
    @test nrows(K) == 1
 end
 
-@testset "FpMatrix.Solve.solve" begin
+@testset "FpMatrix.solve" begin
   F17, _ = Native.finite_field(ZZRingElem(17))
   R = matrix_space(F17, 3, 3)
   S = matrix_space(F17, 3, 4)

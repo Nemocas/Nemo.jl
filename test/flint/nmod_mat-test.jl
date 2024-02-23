@@ -596,7 +596,7 @@ end
 end
 
 @testset "zzModMatrix.solve" begin
-  Z17, = residue_ring(ZZ,17)
+  Z17, = residue_ring(ZZ, 17)
   R = matrix_space(Z17, 3, 3)
   S = matrix_space(Z17, 3, 4)
 
@@ -606,13 +606,84 @@ end
 
   c = a*b
 
-  d = Nemo._solve(a,c)
+  d = solve(a, c, side = :right)
 
   @test d == b
 
   a = zero(R)
 
-  @test_throws ErrorException  Nemo._solve(a,c)
+  @test_throws ArgumentError solve(a, c, side = :right)
+
+  for i in 1:10
+      m = rand(0:10)
+      n = rand(0:10)
+      k = rand(0:10)
+
+      M = matrix_space(Z17, n, k)
+      N = matrix_space(Z17, n, m)
+
+      A = rand(M)
+      B = rand(N)
+
+      fl, X, K = can_solve_with_solution_and_kernel(A, B, side = :right)
+
+      if fl
+         @test A * X == B
+         @test is_zero(A*K)
+         @test rank(A) + ncols(K) == ncols(A)
+      end
+   end
+
+   A = matrix(Z17, 2, 2, [1, 2, 2, 5])
+   B = matrix(Z17, 2, 1, [1, 2])
+   fl, X = can_solve_with_solution(A, B, side = :right)
+   @test fl
+   @test A * X == B
+   @test can_solve(A, B, side = :right)
+
+   A = matrix(Z17, 2, 2, [1, 2, 2, 4])
+   B = matrix(Z17, 2, 1, [1, 2])
+   fl, X = can_solve_with_solution(A, B, side = :right)
+   @test fl
+   @test A * X == B
+   @test can_solve(A, B, side = :right)
+
+   A = matrix(Z17, 2, 2, [1, 2, 2, 4])
+   B = matrix(Z17, 2, 1, [1, 3])
+   fl, X = can_solve_with_solution(A, B, side = :right)
+   @test !fl
+   @test !can_solve(A, B, side = :right)
+
+   A = zero_matrix(Z17, 2, 3)
+   B = identity_matrix(Z17, 3)
+   @test_throws ErrorException can_solve_with_solution(A, B, side = :right)
+
+   A = transpose(matrix(Z17, 2, 2, [1, 2, 2, 5]))
+   B = transpose(matrix(Z17, 2, 1, [1, 2]))
+   fl, X = can_solve_with_solution(A, B)
+   @test fl
+   @test X * A == B
+   @test can_solve(A, B)
+
+   A = transpose(matrix(Z17, 2, 2, [1, 2, 2, 4]))
+   B = transpose(matrix(Z17, 2, 1, [1, 2]))
+   fl, X = can_solve_with_solution(A, B)
+   @test fl
+   @test X * A == B
+   @test can_solve(A, B)
+
+   A = transpose(matrix(Z17, 2, 2, [1, 2, 2, 4]))
+   B = transpose(matrix(Z17, 2, 1, [1, 3]))
+   fl, X = can_solve_with_solution(A, B)
+   @test !fl
+   @test !can_solve(A, B)
+
+   A = transpose(zero_matrix(Z17, 2, 3))
+   B = transpose(identity_matrix(Z17, 3))
+   @test_throws ErrorException can_solve_with_solution(A, B)
+
+   @test_throws ArgumentError can_solve_with_solution(A, B, side = :garbage)
+   @test_throws ArgumentError can_solve(A, B, side = :garbage)
 end
 
 @testset "zzModMatrix.lu" begin

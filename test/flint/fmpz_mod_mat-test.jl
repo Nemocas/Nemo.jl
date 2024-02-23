@@ -563,31 +563,7 @@ end
   @test_throws ErrorException inv(matrix(R, 2, 1, [1, 1]))
 end
 
-#=  Not implemented in Flint yet
-
 @testset "ZZModMatrix.solve" begin
-  Z17, = residue_ring(ZZ, ZZ(17))
-  R = matrix_space(Z17, 3, 3)
-  S = matrix_space(Z17, 3, 4)
-
-  a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
-
-  b = S([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
-
-  c = a*b
-
-  d = Nemo._solve(a,c)
-
-  @test d == b
-
-  a = zero(R)
-
-  @test_throws ErrorException  Nemo._solve(a,c)
-end
-
-=#
-
-@testset "ZZModMatrix.Solve.solve" begin
    Z17, = residue_ring(ZZ, ZZ(17))
    a = matrix(Z17, [1 2 3; 3 2 1; 0 0 2])
    b = matrix(Z17, [2 1 0 1; 0 0 0 0; 0 1 2 0])

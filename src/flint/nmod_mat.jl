@@ -486,17 +486,6 @@ end
 #
 ################################################################################
 
-function _solve(x::T, y::T) where T <: Zmodn_mat
-  (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
-  !is_square(x)&& error("First argument not a square matrix in _solve")
-  (y.r != x.r) || y.c != 1 && ("Not a column vector in _solve")
-  z = similar(y)
-  r = ccall((:nmod_mat_solve, libflint), Int,
-          (Ref{T}, Ref{T}, Ref{T}), z, x, y)
-  !Bool(r) && error("Singular matrix in _solve")
-  return z
-end
-
 function AbstractAlgebra._solve_triu(x::T, y::T) where T <: Zmodn_mat
    (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
    is_upper_trangular(x) || error("Matrix must be upper triangular")
@@ -521,6 +510,24 @@ end
 #and the diagonal is assumed to be 1
 function AbstractAlgebra._solve_tril!(A::T, B::T, C::T, unit::Int = 0) where T <: Zmodn_mat
    ccall((:nmod_mat_solve_tril, Nemo.libflint), Cvoid, (Ref{T}, Ref{T}, Ref{T}, Cint), A, B, C, unit)
+end
+
+function Solve._can_solve_internal_no_check(A::zzModMatrix, b::zzModMatrix, task::Symbol; side::Symbol = :left)
+   check_parent(A, b)
+   if side === :left
+      fl, sol, K = Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
+      return fl, transpose(sol), transpose(K)
+   end
+
+   x = similar(A, ncols(A), ncols(b))
+   # This is probably only correct if the characteristic is prime
+   fl = ccall((:nmod_mat_can_solve, libflint), Cint,
+             (Ref{zzModMatrix}, Ref{zzModMatrix}, Ref{zzModMatrix}),
+              x, A, b)
+   if task === :only_check || task === :with_solution
+      return Bool(fl), x, zero(A, 0, 0)
+   end
+   return Bool(fl), x, kernel(A, side = :right)
 end
 
 ################################################################################

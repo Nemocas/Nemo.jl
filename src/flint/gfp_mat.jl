@@ -290,28 +290,6 @@ end
 #
 ################################################################################
 
-function _can_solve_with_solution(a::fpMatrix, b::fpMatrix; side::Symbol = :right)
-   (base_ring(a) != base_ring(b)) && error("Matrices must have same base ring")
-   if side == :left
-      (ncols(a) != ncols(b)) && error("Matrices must have same number of columns")
-      (f, x) = _can_solve_with_solution(transpose(a), transpose(b); side=:right)
-      return (f, transpose(x))
-   elseif side == :right
-      (nrows(a) != nrows(b)) && error("Matrices must have same number of rows")
-      x = similar(a, ncols(a), ncols(b))
-      r = ccall((:nmod_mat_can_solve, libflint), Cint,
-                (Ref{fpMatrix}, Ref{fpMatrix}, Ref{fpMatrix}), x, a, b)
-      return Bool(r), x
-   else
-      error("Unsupported argument :$side for side: Must be :left or :right.")
-   end
-end
-
-function _can_solve(a::fpMatrix, b::fpMatrix; side::Symbol = :right)
-   fl, _ = _can_solve_with_solution(a, b, side = side)
-   return fl
-end
-
 function Solve._can_solve_internal_no_check(A::fpMatrix, b::fpMatrix, task::Symbol; side::Symbol = :left)
    check_parent(A, b)
    if side === :left

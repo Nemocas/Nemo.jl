@@ -663,20 +663,8 @@ end
 
    B = T([ZZRingElem(4), 5, 7])
 
-   X = Nemo._solve(A, B)
-
-   @test X == T([3, -24, 14])
-   @test A*X == B
-    
-   fl, X = Nemo._can_solve_with_solution(A, B)
-   @test fl && A * X == B
-
    A = matrix(ZZ, 2, 2, [1, 0, 0, 0])
    B = matrix(ZZ, 2, 2, [0, 0, 0, 1])
-   fl, X = Nemo._can_solve_with_solution(A, B)
-   @test !fl
-   fl, X = Nemo._can_solve_with_solution(A, B, side = :left)
-   @test !fl
    fl, X = Nemo._cansolve_with_nullspace(A, B)
    @test !fl
 

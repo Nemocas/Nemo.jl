@@ -415,41 +415,6 @@ end
 #
 ################################################################################
 
-function _solve(x::FqMatrix, y::FqMatrix)
-   (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
-   !is_square(x)&& error("First argument not a square matrix in _solve")
-   (nrows(y) != nrows(x)) || ncols(y) != 1 && ("Not a column vector in _solve")
-   z = similar(y)
-   r = ccall((:fq_default_mat_solve, libflint), Int,
-             (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}),
-             z, x, y, base_ring(x))
-   !Bool(r) && error("Singular matrix in _solve")
-   return z
-end
-
-function _can_solve_with_solution(a::FqMatrix, b::FqMatrix; side::Symbol = :right)
-   (base_ring(a) != base_ring(b)) && error("Matrices must have same base ring")
-   if side == :left
-      (ncols(a) != ncols(b)) && error("Matrices must have same number of columns")
-      (f, x) = _can_solve_with_solution(transpose(a), transpose(b); side=:right)
-      return (f, transpose(x))
-   elseif side == :right
-      (nrows(a) != nrows(b)) && error("Matrices must have same number of rows")
-      x = similar(a, ncols(a), ncols(b))
-      r = ccall((:fq_default_mat_can_solve, libflint), Cint,
-                (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqMatrix},
-                 Ref{FqField}), x, a, b, base_ring(a))
-      return Bool(r), x
-   else
-      error("Unsupported argument :$side for side: Must be :left or :right.")
-   end
-end
-
-function _can_solve(a::FqMatrix, b::FqMatrix; side::Symbol = :right)
-   fl, _ = _can_solve_with_solution(a, b, side = side)
-   return fl
-end
-
 function Solve._can_solve_internal_no_check(A::FqMatrix, b::FqMatrix, task::Symbol; side::Symbol = :left)
    check_parent(A, b)
    if side === :left
