@@ -655,24 +655,6 @@ end
 end
 
 @testset "ZZMatrix.solve" begin
-   S = matrix_space(FlintZZ, 3, 3)
-
-   A = S([ZZRingElem(2) 3 5; 1 4 7; 9 2 2])
-
-   T = matrix_space(FlintZZ, 3, 1)
-
-   B = T([ZZRingElem(4), 5, 7])
-
-   A = matrix(ZZ, 2, 2, [1, 0, 0, 0])
-   B = matrix(ZZ, 2, 2, [0, 0, 0, 1])
-   fl, X = Nemo._cansolve_with_nullspace(A, B)
-   @test !fl
-
-   A = matrix(ZZ, 2, 2, [1, 0, 0, 0])
-   B = matrix(ZZ, 2, 2, [0, 1, 0, 0])
-   fl, X, Z = Nemo._cansolve_with_nullspace(A, B)
-   @test fl && A*X == B && iszero(A * Z)
-
    A = matrix(ZZ, 2, 2, [1,2,3,4])
    b = matrix(ZZ, 1, 2, [1, 6])
    @test Nemo._solve_triu_left(A, b) == matrix(ZZ, 1, 2, [1, 1])
@@ -682,9 +664,7 @@ end
    c = similar(b)
    AbstractAlgebra._solve_tril!(c, A, b)
    @test c == matrix(ZZ, 2, 1, [1, 1])
-end
 
-@testset "ZZMatrix.Solve.solve" begin
    S = matrix_space(FlintZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 2 2])

@@ -1250,18 +1250,16 @@ end
 #
 ###############################################################################
 
-@doc raw"""
-    _cansolve(a::ZZMatrix, b::ZZMatrix) -> Bool, ZZMatrix
+function Solve._can_solve_internal_no_check(A::ZZMatrix, b::ZZMatrix, task::Symbol; side::Symbol = :left)
+   if side === :left
+      fl, sol, K = Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
+      return fl, transpose(sol), transpose(K)
+   end
 
-Return true and a matrix $x$ such that $ax = b$, or false and some matrix
-in case $x$ does not exist.
-"""
-function _cansolve(a::ZZMatrix, b::ZZMatrix)
-   nrows(b) != nrows(a) && error("Incompatible dimensions in _cansolve")
-   H, T = hnf_with_transform(transpose(a))
+   H, T = hnf_with_transform(transpose(A))
    b = deepcopy(b)
-   z = similar(a, ncols(b), ncols(a))
-   l = min(nrows(a), ncols(a))
+   z = similar(A, ncols(b), ncols(A))
+   l = min(nrows(A), ncols(A))
    t = ZZRingElem() # temp. variable
 
    for i = 1:ncols(b)
@@ -1275,9 +1273,10 @@ function _cansolve(a::ZZMatrix, b::ZZMatrix)
        end
        q, r = divrem(b[k, i], H[j, k])
        if !iszero(r)
-         return false, b
+         return false, b, zero(A, 0, 0)
        end
        if !iszero(q)
+          # b[h, i] -= q*H[j, h]
           GC.@preserve b H q t begin
              H_ptr = mat_entry_ptr(H, j, k)
              for h = k:ncols(H)
@@ -1285,31 +1284,27 @@ function _cansolve(a::ZZMatrix, b::ZZMatrix)
                ccall((:fmpz_mul, libflint), Cvoid, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), t, q, H_ptr)
                ccall((:fmpz_sub, libflint), Cvoid, (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), b_ptr, b_ptr, t)
                H_ptr += sizeof(ZZRingElem)
-
-#                b[h, i] -= q*H[j, h]
              end
-          end   
+          end
        end
        z[i, j] = q
      end
    end
-   if !iszero(b)
-     return false, b
-   end
-   return true, transpose(z*T)
-end
 
-function Solve._can_solve_internal_no_check(A::ZZMatrix, b::ZZMatrix, task::Symbol; side::Symbol = :left)
-   if side === :left
-      fl, sol, K = Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
-      return fl, transpose(sol), transpose(K)
+   fl = is_zero(b)
+   if !fl
+     return false, zero(A, 0, 0), zero(A, 0, 0)
+   end
+   if task === :only_check
+     return true, zero(A, 0, 0), zero(A, 0, 0)
    end
 
-   fl, sol = Nemo._cansolve(A, b)
-   if task === :only_check || task === :with_solution
-     return fl, sol, zero(A, 0, 0)
+   sol = transpose(z*T)
+   if task === :with_solution
+     return true, sol, zero(A, 0, 0)
    end
-   return fl, sol, kernel(A, side = :right)
+   _, K = Solve._kernel_of_hnf(A, H, T)
+   return fl, sol, K
  end
 
 # Overwrite some solve context functionality so that it uses `transpose` and not
@@ -1426,62 +1421,6 @@ function AbstractAlgebra._hcat(A::AbstractVector{ZZMatrix})
     s += ncols(N)
   end
   return M
-end
-
-@doc raw"""
-    _cansolve_with_nullspace(a::ZZMatrix, b::ZZMatrix) -> Bool, ZZMatrix, ZZMatrix
-
-Return true, a matrix $x$ and a matrix $k$ such that $ax = b$ and the columns
-of $k$ form a basis for the nullspace of $a$. In case $x$ does not exist, false
-and two arbitrary matrices are returned.
-"""
-function _cansolve_with_nullspace(a::ZZMatrix, b::ZZMatrix)
-   nrows(b) != nrows(a) && error("Incompatible dimensions in _cansolve_with_nullspace")
-   H, T = hnf_with_transform(transpose(a))
-   b = deepcopy(b)
-   z = similar(a, ncols(b), ncols(a))
-   l = min(nrows(a), ncols(a))
-   for i=1:ncols(b)
-     for j=1:l
-       k = 1
-       while k <= ncols(H) && is_zero_entry(H, j, k)
-         k += 1
-       end
-       if k > ncols(H)
-         continue
-       end
-       q, r = divrem(b[k, i], H[j, k])
-       if !iszero(r)
-         return false, b, b
-       end
-       if !iszero(q)
-         for h=k:ncols(H)
-           b[h, i] -= q*H[j, h]
-         end
-       end
-       z[i, k] = q
-     end
-   end
-   if !iszero(b)
-     return false, b, b
-   end
-
-   for i = nrows(H):-1:1
-     for j = 1:ncols(H)
-       if !is_zero_entry(H, i, j)
-         N = similar(a, ncols(a), nrows(H) - i)
-         for k = 1:nrows(N)
-           for l = 1:ncols(N)
-             N[k,l] = T[nrows(T) - l + 1, k]
-           end
-         end
-         return true, transpose(z*T), N
-       end
-     end
-   end
-   N =  similar(a, ncols(a), 0)
-
-   return true, (z*T), N
 end
 
 @doc raw"""
