@@ -2231,8 +2231,8 @@ julia> number_of_digits(ZZ(12), 3)
 3
 ```
 """
-function number_of_digits(x::ZZRingElem, b::Integer)::Int
-   number_of_digits(x, base=b)
+function number_of_digits(x::ZZRingElem, b::Integer)
+   number_of_digits(x, base=b)::Int
 end
 
 function number_of_digits(a::ZZRingElem; base::Integer = 10, pad::Integer = 1)
