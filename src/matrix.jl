@@ -1,3 +1,8 @@
+# Types of all Flint-backed matrices
+const _FieldMatTypes = Union{QQMatrix, fpMatrix, FpMatrix, FqMatrix, fqPolyRepMatrix, FqPolyRepMatrix}
+const _MatTypes = Union{_FieldMatTypes, ZZMatrix, zzModMatrix, ZZModMatrix}
+
+
 ################################################################################
 #
 #  Support for view(A, :, i) and view(A, i, :)
@@ -19,8 +24,6 @@ Base.setindex!(V::MatrixView, z, i::Int) = setindex!(V, ZZ(z), i)
 
 Base.size(V::MatrixView) = (length(V.A), )
 
-const _MatTypes = Union{ZZMatrix, QQMatrix, zzModMatrix, ZZModMatrix, fpMatrix, FpMatrix, FqMatrix, fqPolyRepMatrix, FqPolyRepMatrix}
-
 function Base.view(x::_MatTypes, r::Int, c::UnitRange{Int})
   A = view(x, r:r, c)
 	return MatrixView{typeof(x), elem_type(base_ring(x))}(A)
@@ -36,8 +39,6 @@ end
 #  Generic kernel (calling nullspace in flint)
 #
 ################################################################################
-
-const _FieldMatTypes = Union{QQMatrix, fpMatrix, FpMatrix, FqMatrix, fqPolyRepMatrix, FqPolyRepMatrix}
 
 function kernel(A::_FieldMatTypes; side::Symbol = :left)
   Solve.check_option(side, [:right, :left], "side")
