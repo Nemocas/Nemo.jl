@@ -51,7 +51,6 @@ import Base: atanh
 import Base: bin
 import Base: binomial
 import Base: ceil
-import Base: checkbounds
 import Base: cispi
 import Base: cmp
 import Base: conj
@@ -79,7 +78,6 @@ import Base: hex
 import Base: hypot
 import Base: imag
 import Base: in
-import Base: intersect
 import Base: inv
 import Base: invmod
 import Base: isequal
@@ -132,8 +130,6 @@ import Base: trailing_zeros
 import Base: transpose
 import Base: trunc
 import Base: truncate
-import Base: typed_hcat
-import Base: typed_hvcat
 import Base: vcat
 import Base: xor
 import Base: zero
@@ -146,7 +142,6 @@ end
 import LinearAlgebra: cholesky
 import LinearAlgebra: det
 import LinearAlgebra: eigvals
-import LinearAlgebra: hessenberg
 import LinearAlgebra: lu
 import LinearAlgebra: lu!
 import LinearAlgebra: norm
