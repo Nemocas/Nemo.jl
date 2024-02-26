@@ -4,6 +4,7 @@
 #
 ################################################################################
 
+# MatrixView{MatrixType, ElemType}
 struct MatrixView{S, T} <: AbstractVector{T}
   A::S
 end
@@ -22,12 +23,12 @@ const _MatTypes = Union{ZZMatrix, QQMatrix, zzModMatrix, ZZModMatrix, fpMatrix, 
 
 function Base.view(x::_MatTypes, r::Int, c::UnitRange{Int})
   A = view(x, r:r, c)
-	return MatrixView{typeof(x), typeof(base_ring(x))}(A)
+	return MatrixView{typeof(x), elem_type(base_ring(x))}(A)
 end
 
 function Base.view(x::_MatTypes, r::UnitRange{Int}, c::Int)
   A = view(x, r, c:c)
-	return MatrixView{typeof(x), typeof(base_ring(x))}(A)
+	return MatrixView{typeof(x), elem_type(base_ring(x))}(A)
 end
 
 ################################################################################
