@@ -728,12 +728,18 @@ end
 
   A = S([1 2 3; 4 5 6; 7 8 9])
   v = @view A[2, :]
+  @test v isa AbstractVector{elem_type(Z17)}
   @test length(v) == 3
+  @test v[1] == 4
+  @test collect(v) == [4, 5, 6]
   v[2] = 7
   @test A == S([1 2 3; 4 7 6; 7 8 9])
   A = S([1 2 3; 4 5 6; 7 8 9])
   v = @view A[:, 3]
+  @test v isa AbstractVector{elem_type(Z17)}
   @test length(v) == 3
+  @test v[3] == 9
+  @test collect(v) == [3, 6, 9]
   v[1] = 1
   @test A == S([1 2 1; 4 5 6; 7 8 9])
 end
