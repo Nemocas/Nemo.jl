@@ -419,6 +419,16 @@ end
    @test 5*a == -60
 
    @test a%5 == -2
+
+   a = one(ZZ)
+   @test a * 1.5 isa BigFloat
+   @test isapprox(a * 1.5, 1.5)
+   @test 1.5 * a isa BigFloat
+   @test isapprox(1.5 * a, 1.5)
+   @test a * big"1.5" isa BigFloat
+   @test isapprox(a * big"1.5", big"1.5")
+   @test big"1.5" * a isa BigFloat
+   @test isapprox(big"1.5" * a, big"1.5") 
 end
 
 @testset "ZZRingElem.adhoc_division" begin

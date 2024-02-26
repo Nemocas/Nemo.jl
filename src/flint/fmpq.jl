@@ -236,7 +236,7 @@ canonical_unit(a::QQFieldElem) = a
 #
 ###############################################################################
 
-function expressify(a::QQFieldElem; context = nothing)::Any
+function expressify(a::QQFieldElem; context = nothing)
     n = numerator(a)
     d = denominator(a)
     if isone(d)

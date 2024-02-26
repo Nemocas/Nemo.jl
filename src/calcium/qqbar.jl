@@ -96,7 +96,7 @@ canonical_unit(a::QQBarFieldElem) = a
 ###############################################################################
 
 # todo
-# function expressify(a::QQBarFieldElem; context = nothing)::Any
+# function expressify(a::QQBarFieldElem; context = nothing)
 # end
 
 #=
