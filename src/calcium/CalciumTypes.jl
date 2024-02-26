@@ -117,7 +117,7 @@ ca_ctx_options = [
     :vieta_limit,
     :trig_form]
 
-mutable struct CalciumField <: Field
+@attributes mutable struct CalciumField <: Field
    ext_cache_items::Ptr{Nothing}
    ext_cache_length::Int
    ext_cache_alloc::Int

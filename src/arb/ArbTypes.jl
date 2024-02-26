@@ -132,7 +132,7 @@ end
 
 # fixed precision
 
-mutable struct ArbField <: Field
+@attributes mutable struct ArbField <: Field
   prec::Int
 
   function ArbField(p::Int = 256; cached::Bool = true)
@@ -354,7 +354,7 @@ end
 
 # fixed precision
 
-mutable struct AcbField <: Field
+@attributes mutable struct AcbField <: Field
   prec::Int
 
   function AcbField(p::Int = 256; cached::Bool = true)
@@ -461,7 +461,7 @@ end
 #
 ################################################################################
 
-mutable struct RealPolyRing <: PolyRing{RealFieldElem}
+@attributes mutable struct RealPolyRing <: PolyRing{RealFieldElem}
   S::Symbol
 
   function RealPolyRing(R::RealField, S::Symbol, cached::Bool = true)
@@ -554,7 +554,7 @@ base_ring(a::RealPolyRing) = RealField()
 
 # fixed precision
 
-mutable struct ArbPolyRing <: PolyRing{ArbFieldElem}
+@attributes mutable struct ArbPolyRing <: PolyRing{ArbFieldElem}
   base_ring::ArbField
   S::Symbol
 
@@ -654,7 +654,7 @@ base_ring(a::ArbPolyRing) = a.base_ring
 #
 ################################################################################
 
-mutable struct ComplexPolyRing <: PolyRing{ComplexFieldElem}
+@attributes mutable struct ComplexPolyRing <: PolyRing{ComplexFieldElem}
   S::Symbol
 
   function ComplexPolyRing(R::ComplexField, S::Symbol, cached::Bool = true)
@@ -758,7 +758,7 @@ base_ring(a::ComplexPolyRing) = ComplexField()
 
 # fixed precision
 
-mutable struct AcbPolyRing <: PolyRing{AcbFieldElem}
+@attributes mutable struct AcbPolyRing <: PolyRing{AcbFieldElem}
   base_ring::AcbField
   S::Symbol
 
