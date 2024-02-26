@@ -320,6 +320,17 @@ end
    @test QQFieldElem(1, 2) // (BigInt(1)//BigInt(2)) == 1
 
    @test QQFieldElem(1, 2) // (1//2) == 1
+
+   a = QQ(1//2)
+   @test a * 1.5 isa BigFloat
+   @test isapprox(a * 1.5, 0.75)
+   @test 1.5 * a isa BigFloat
+   @test isapprox(1.5 * a, 0.75)
+   @test a * big"1.5" isa BigFloat
+   @test isapprox(a * big"1.5", big"0.75")
+   @test big"1.5" * a isa BigFloat
+   @test isapprox(big"0.75", big"1.5" * a)
+
 end
 
 @testset "QQFieldElem.comparison" begin
