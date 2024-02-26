@@ -9,8 +9,7 @@ import AbstractAlgebra
 
 using Libdl
 
-using Random
-using Random: SamplerTrivial
+using Random: Random, AbstractRNG, SamplerTrivial
 import Random: rand!
 
 using RandomExtensions: RandomExtensions, make, Make2, Make3
@@ -203,14 +202,12 @@ const eigenvalues = eigvals # alternative name for the function from LinearAlgeb
 #
 ###############################################################################
 
-using Arb_jll
-using Antic_jll
-using Calcium_jll
-using FLINT_jll
+using Arb_jll: libarb
+using Antic_jll: libantic
+using Calcium_jll: libcalcium
+using FLINT_jll: libflint
 
 const pkgdir = realpath(joinpath(dirname(@__DIR__)))
-
-const libflint = FLINT_jll.libflint
 
 function flint_abort()
   error("Problem in the Flint-Subsystem")
