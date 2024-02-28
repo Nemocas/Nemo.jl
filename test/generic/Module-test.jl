@@ -1,6 +1,6 @@
 function rand_module(R::Ring, vals...)
    rk = rand(0:5)
-   M = FreeModule(R, rk)
+   M = free_module(R, rk)
    levels = rand(0:3)
    for i = 1:levels
       if ngens(M) == 0
