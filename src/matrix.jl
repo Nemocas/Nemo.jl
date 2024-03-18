@@ -76,7 +76,7 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{S, T}) where {S <: Field
   return nothing
 end
 
-function Solve._can_solve_internal_no_check(C::Solve.SolveCtx{S, T}, b::T, task::Symbol; side::Symbol = :left) where {S <: FieldElem, T <: _FieldMatTypes}
+function Solve._can_solve_internal_no_check(C::Solve.SolveCtx{S, T}, b::T, task::Symbol; side::Symbol = :left) where {S <: FieldElem, T <: Union{fpMatrix, FpMatrix, FqMatrix, fqPolyRepMatrix, FqPolyRepMatrix}}
   if side === :right
     fl, sol = Solve._can_solve_with_rref(b, Solve.transformation_matrix(C), rank(C), Solve.pivot_and_non_pivot_cols(C), task)
   else
@@ -90,7 +90,7 @@ function Solve._can_solve_internal_no_check(C::Solve.SolveCtx{S, T}, b::T, task:
   return true, sol, kernel(C, side = side)
 end
 
-function Solve.kernel(C::Solve.SolveCtx{S, T}; side::Symbol = :left) where {S <: FieldElem, T <: _FieldMatTypes}
+function Solve.kernel(C::Solve.SolveCtx{S, T}; side::Symbol = :left) where {S <: FieldElem, T <: Union{fpMatrix, FpMatrix, FqMatrix, fqPolyRepMatrix, FqPolyRepMatrix}}
   Solve.check_option(side, [:right, :left], "side")
 
   if side === :right
