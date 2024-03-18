@@ -66,6 +66,14 @@ end
    nothing
 end
 
+function AbstractAlgebra._vcat(A::Vector{FqMatrix})
+  B = zero_matrix(base_ring(A[1]), length(A), ncols(A[1]))
+  for i=1:length(A)
+    B[i, :] = A[i]
+  end
+  return B
+end
+
 @inline function setindex!(a::FqMatrix, u::ZZRingElem, i::Int, j::Int)
    @boundscheck Generic._checkbounds(a, i, j)
    ccall((:fq_default_mat_entry_set_fmpz, libflint), Nothing,
@@ -77,6 +85,29 @@ end
 
 setindex!(a::FqMatrix, u::Integer, i::Int, j::Int) =
         setindex!(a, base_ring(a)(u), i, j)
+
+function setindex!(a::FqMatrix, b::FqMatrix, i::Int, r::Colon)
+  A = view(a, i:i, :)
+  ccall((:fq_default_mat_set, libflint), Nothing, 
+          (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), A, b, base_ring(a))
+end
+
+function setindex!(a::FqMatrix, b::FqMatrix, r::UnitRange{Int64}, c::UnitRange{Int64})
+  A = view(a, r, c)
+  ccall((:fq_default_mat_set, libflint), Nothing, 
+          (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), A, b, base_ring(a))
+end
+
+function Generic.add_one!(a::FqMatrix, i::Int, j::Int)
+  k = base_ring(a)
+  if _fq_default_ctx_type(k) == _FQ_DEFAULT_NMOD
+    x = ccall((:nmod_mat_get_entry, libflint), Int, (Ref{FqMatrix}, Int, Int), a, i-1, j-1)
+    x = ccall((:nmod_add, libflint), Int, (Int, Int, Ref{FqField}), x, 1, k)
+    ccall((:nmod_mat_set_entry, libflint), Int, (Ref{FqMatrix}, Int, Int, Int), a, i-1, j-1, x)
+  else
+    a[i,j] += 1
+  end
+end
 
 function deepcopy_internal(a::FqMatrix, dict::IdDict)
   z = FqMatrix(nrows(a), ncols(a), base_ring(a))
@@ -154,6 +185,10 @@ isequal(a::FqMatrix, b::FqMatrix) = ==(a, b)
 
 function transpose(a::FqMatrix)
    z = FqMatrix(ncols(a), nrows(a), base_ring(a))
+   if _fq_default_ctx_type(base_ring(a)) == _FQ_DEFAULT_NMOD
+     ccall((:nmod_mat_transpose, libflint), Nothing, (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), z, a, base_ring(a))
+     return z
+   end
    for i in 1:nrows(a)
       for j in 1:ncols(a)
          z[j, i] = a[i, j]
