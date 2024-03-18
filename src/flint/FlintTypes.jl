@@ -2490,7 +2490,9 @@ mutable struct FqFieldElem <: FinFieldElem
       d = new()
       ccall((:fq_default_init2, libflint), Nothing,
             (Ref{FqFieldElem}, Ref{FqField}), d, ctx)
-      finalizer(_fq_default_clear_fn, d)
+      if _fq_default_ctx_type(ctx) != _FQ_DEFAULT_NMOD
+        finalizer(_fq_default_clear_fn, d)
+      end
       d.poly = nothing
       d.parent = ctx
       return d
