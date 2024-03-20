@@ -103,6 +103,171 @@ end
 
 ################################################################################
 #
+#  Solve context for matrices over finite fields
+#
+################################################################################
+
+function Solve._init_reduce(C::Solve.SolveCtx{T}) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
+   if isdefined(C, :red) && isdefined(C, :lu_perm)
+      return nothing
+   end
+
+   LU = deepcopy(matrix(C))
+   p = Generic.Perm(1:nrows(LU))
+   r = lu!(p, LU)
+
+   Solve.set_rank!(C, r)
+   C.red = LU
+   C.lu_perm = p
+   if r < nrows(C)
+      pA = p*matrix(C)
+      set_attribute!(C, :permuted_matrix_lu => view(pA, r + 1:nrows(C), :))
+   else
+      set_attribute!(C, :permuted_matrix_lu => zero(matrix(C), 0, ncols(C)))
+   end
+   return nothing
+end
+
+function permuted_matrix_lu(C::Solve.SolveCtx{T, MatT}) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}, MatT}
+   Solve._init_reduce(C)
+   return get_attribute(C, :permuted_matrix_lu)::MatT
+end
+
+function Solve._init_reduce_transpose(C::Solve.SolveCtx{T}) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
+   if isdefined(C, :red_transp) && isdefined(C, :lu_perm_transp)
+      return nothing
+   end
+
+   LU = transpose(matrix(C))
+   p = Generic.Perm(1:nrows(LU))
+   r = lu!(p, LU)
+
+   Solve.set_rank!(C, r)
+   C.red_transp = LU
+   C.lu_perm_transp = p
+   if r < ncols(C)
+      Ap = matrix(C)*p
+      set_attribute!(C, :permuted_matrix_of_transpose_lu => view(Ap, :, r + 1:ncols(C)))
+   else
+      set_attribute!(C, :permuted_matrix_of_transpose_lu => zero(matrix(C), nrows(C), 0))
+   end
+   return nothing
+end
+
+function permuted_matrix_of_transpose_lu(C::Solve.SolveCtx{T, MatT}) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}, MatT}
+   Solve._init_reduce_transpose(C)
+   return get_attribute(C, :permuted_matrix_of_transpose_lu)::MatT
+end
+
+function Solve._can_solve_internal_no_check(C::Solve.SolveCtx{T, MatT}, b::MatT, task::Symbol; side::Symbol = :left) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}, MatT}
+  # Split up in separate functions to make the compiler happy
+  if side === :right
+    return Solve._can_solve_internal_no_check_right(C, b, task)
+  else
+    return Solve._can_solve_internal_no_check_left(C, b, task)
+  end
+end
+
+function Solve._can_solve_internal_no_check_right(C::Solve.SolveCtx{T, MatT}, b::MatT, task::Symbol) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}, MatT}
+   LU = Solve.reduced_matrix(C)
+   p = Solve.lu_permutation(C)
+   pb = p*b
+   r = rank(C)
+
+   x = similar(b, r, ncols(b))
+   # Solve L x = b for the first r rows. We tell flint to pretend that there
+   # are ones on the diagonal of LU (fourth argument)
+   _solve_tril_right_flint!(x, view(LU, 1:r, 1:r), view(pb, 1:r, :), true)
+
+   # Check whether x solves Lx = b also for the lower part of L
+   if r < nrows(C) && view(LU, r + 1:nrows(LU), 1:r)*x != view(pb, r + 1:nrows(b), :)
+      return false, zero(b, 0, 0), zero(b, 0, 0)
+   end
+
+   # Solve U y = x. We need to take extra care as U might have non-pivot columns.
+   y = _solve_triu_right(view(LU, 1:r, :), x)
+
+   fl = true
+   if r < nrows(C)
+      fl = permuted_matrix_lu(C)*y == view(pb, r + 1:nrows(C), :)
+   end
+
+   if task !== :with_kernel
+      return fl, y, zero(b, 0, 0)
+   else
+      return fl, y, kernel(C, side = :right)
+   end
+end
+
+function Solve._can_solve_internal_no_check_left(C::Solve.SolveCtx{T, MatT}, b::MatT, task::Symbol) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}, MatT}
+   LU = Solve.reduced_matrix_of_transpose(C)
+   p = Solve.lu_permutation_of_transpose(C)
+   pbt = p*transpose(b)
+   r = rank(C)
+
+   x = similar(b, r, nrows(b))
+   _solve_tril_right_flint!(x, view(LU, 1:r, 1:r), view(pbt, 1:r, :), true)
+
+   # Check whether x solves Lx = b also for the lower part of L
+   if r < ncols(C) && view(LU, r + 1:nrows(LU), 1:r)*x != view(pbt, r + 1:nrows(pbt), :)
+      return false, zero(b, 0, 0), zero(b, 0, 0)
+   end
+
+   # Solve U y = x. We need to take extra care as U might have non-pivot columns.
+   yy = _solve_triu_right(view(LU, 1:r, :), x)
+   y = transpose(yy)
+
+   fl = true
+   if r < ncols(C)
+      bp = b*p
+      fl = y*permuted_matrix_of_transpose_lu(C) == view(bp, :, r + 1:ncols(C))
+   end
+
+   if task !== :with_kernel
+      return fl, y, zero(b, 0, 0)
+   else
+      return fl, y, kernel(C, side = :left)
+   end
+end
+
+# Solves A x = B with A in upper triangular shape of full rank, so something
+# like
+#   ( + * * * * )
+#   ( 0 0 + * * )
+#   ( 0 0 0 + * )
+# where + is non-zero and * is anything.
+# This is a helper functions because flint can only do the case where the
+# diagonal entries are non-zero.
+function _solve_triu_right(A::MatT, B::MatT) where {MatT <: Union{fpMatrix, FpMatrix, FqMatrix, fqPolyRepMatrix, FqPolyRepMatrix}}
+   @assert nrows(A) == nrows(B)
+   pivot_cols = Int[]
+   next_pivot_col = ncols(A) + 1
+   for r in nrows(A):-1:1
+      for c in r:next_pivot_col - 1
+         if is_zero_entry(A, r, c)
+            if c == next_pivot_col - 1
+               error("Matrix is not in upper triangular shape")
+            end
+            continue
+         end
+         push!(pivot_cols, c)
+         next_pivot_col = c
+         break
+      end
+   end
+   reverse!(pivot_cols)
+   AA = reduce(hcat, view(A, 1:nrows(A), c:c) for c in pivot_cols; init = zero(A, nrows(A), 0))
+   xx = similar(B, nrows(A), ncols(B))
+   _solve_triu_right_flint!(xx, AA, B, false)
+   x = zero(B, ncols(A), ncols(B))
+   for i in 1:nrows(xx)
+      view(x, pivot_cols[i]:pivot_cols[i], :) .= view(xx, i:i, :)
+   end
+   return x
+end
+
+################################################################################
+#
 #  Eigenvalues and eigenspaces
 #
 ################################################################################
