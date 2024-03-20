@@ -656,35 +656,6 @@ end
 
 ###############################################################################
 #
-#   Permutation
-#
-###############################################################################
-
-# Unfortunately, there is no fmpq_mat_set_perm in flint
-function *(P::Perm, x::QQMatrix)
-   z = similar(x)
-   t = QQ()
-   @inbounds for i = 1:nrows(x)
-      for j = 1:ncols(x)
-         z[P[i], j] = getindex!(t, x, i, j)
-      end
-   end
-   return z
-end
-
-function *(x::QQMatrix, P::Perm)
-   z = similar(x)
-   t = QQ()
-   @inbounds for i = 1:nrows(x)
-      for j = 1:ncols(x)
-        z[i, P[j]] = getindex!(t, x, i, j)
-      end
-   end
-   return z
-end
-
-###############################################################################
-#
 #   Linear solving
 #
 ###############################################################################
