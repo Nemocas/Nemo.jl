@@ -170,6 +170,7 @@ iszero(a::QQMatrix) = ccall((:fmpq_mat_is_zero, libflint), Bool,
                             (Ref{QQMatrix},), a)
 
 @inline function is_zero_entry(A::QQMatrix, i::Int, j::Int)
+   @boundscheck Generic._checkbounds(A, i, j)
    GC.@preserve A begin
       x = mat_entry_ptr(A, i, j)
       return ccall((:fmpz_is_zero, libflint), Bool, (Ptr{QQFieldElem},), x)

@@ -64,43 +64,6 @@ function solve_init(A::_FieldMatTypes)
   return Solve.SolveCtx{elem_type(base_ring(A)), typeof(A), typeof(A)}(A)
 end
 
-function Solve._init_reduce_transpose(C::Solve.SolveCtx{S, T}) where {S <: FieldElem, T <: Union{fpMatrix, FpMatrix, fqPolyRepMatrix, FqPolyRepMatrix}}
-  if isdefined(C, :red_transp) && isdefined(C, :trafo_transp)
-    return nothing
-  end
-
-  r, R, U = Solve._rref_with_transformation(transpose(matrix(C)))
-  Solve.set_rank!(C, r)
-  C.red_transp = R
-  C.trafo_transp = U
-  return nothing
-end
-
-function Solve._can_solve_internal_no_check(C::Solve.SolveCtx{S, T}, b::T, task::Symbol; side::Symbol = :left) where {S <: FieldElem, T <: Union{fpMatrix, FpMatrix, fqPolyRepMatrix, FqPolyRepMatrix}}
-  if side === :right
-    fl, sol = Solve._can_solve_with_rref(b, Solve.transformation_matrix(C), rank(C), Solve.pivot_and_non_pivot_cols(C), task)
-  else
-    fl, sol = Solve._can_solve_with_rref(transpose(b), Solve.transformation_matrix_of_transpose(C), rank(C), Solve.pivot_and_non_pivot_cols_of_transpose(C), task)
-    sol = transpose(sol)
-  end
-  if !fl || task !== :with_kernel
-    return fl, sol, zero(b, 0, 0)
-  end
-
-  return true, sol, kernel(C, side = side)
-end
-
-function Solve.kernel(C::Solve.SolveCtx{S, T}; side::Symbol = :left) where {S <: FieldElem, T <: Union{fpMatrix, FpMatrix, fqPolyRepMatrix, FqPolyRepMatrix}}
-  Solve.check_option(side, [:right, :left], "side")
-
-  if side === :right
-    return Solve._kernel_of_rref(Solve.reduced_matrix(C), rank(C), Solve.pivot_and_non_pivot_cols(C))[2]
-  else
-    nullity, X = Solve._kernel_of_rref(Solve.reduced_matrix_of_transpose(C), rank(C), Solve.pivot_and_non_pivot_cols_of_transpose(C))
-    return transpose(X)
-  end
-end
-
 ################################################################################
 #
 #  Solve context for matrices over finite fields
@@ -242,17 +205,16 @@ function _solve_triu_right(A::MatT, B::MatT) where {MatT <: Union{fpMatrix, FpMa
    @assert nrows(A) == nrows(B)
    pivot_cols = Int[]
    next_pivot_col = ncols(A) + 1
-   for r in nrows(A):-1:1
+   @inbounds for r in nrows(A):-1:1
       for c in r:next_pivot_col - 1
-         if is_zero_entry(A, r, c)
-            if c == next_pivot_col - 1
-               error("Matrix is not in upper triangular shape")
-            end
-            continue
+         if !is_zero_entry(A, r, c)
+            push!(pivot_cols, c)
+            next_pivot_col = c
+            break
          end
-         push!(pivot_cols, c)
-         next_pivot_col = c
-         break
+         if c == next_pivot_col - 1
+            error("Matrix is not in upper triangular shape")
+         end
       end
    end
    reverse!(pivot_cols)

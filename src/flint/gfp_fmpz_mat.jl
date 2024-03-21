@@ -34,6 +34,16 @@ end
 #
 ################################################################################
 
+function getindex!(v::FpFieldElem, a::FpMatrix, i::Int, j::Int)
+   @boundscheck Generic._checkbounds(a, i, j)
+   GC.@preserve a begin
+      z = ccall((:fmpz_mod_mat_entry, libflint), Ptr{ZZRingElem},
+                (Ref{FpMatrix}, Int, Int), a, i - 1, j - 1)
+      ccall((:fmpz_mod_set_fmpz, libflint), Nothing, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ref{FpField}), v.data, z, base_ring(a))
+   end
+   return v
+end
+
 # return plain ZZRingElem, no bounds checking
 @inline function getindex_raw(a::FpMatrix, i::Int, j::Int)
   u = ZZRingElem()
@@ -105,6 +115,14 @@ end
 function iszero(a::FpMatrix)
   r = ccall((:fmpz_mod_mat_is_zero, libflint), Cint, (Ref{FpMatrix}, ), a)
   return Bool(r)
+end
+
+@inline function is_zero_entry(A::FpMatrix, i::Int, j::Int)
+   @boundscheck Generic._checkbounds(A, i, j)
+   GC.@preserve A begin
+      x = mat_entry_ptr(A, i, j)
+      return ccall((:fmpz_is_zero, libflint), Bool, (Ptr{ZZRingElem},), x)
+   end
 end
 
 ################################################################################
@@ -398,3 +416,77 @@ function Solve._can_solve_internal_no_check(A::FpMatrix, b::FpMatrix, task::Symb
    end
    return Bool(fl), x, kernel(A, side = :right)
 end
+
+# Direct interface to the C functions to be able to write 'generic' code for
+# different matrix types
+function _solve_tril_right_flint!(x::FpMatrix, L::FpMatrix, B::FpMatrix, unit::Bool)
+   ccall((:fmpz_mod_mat_solve_tril, libflint), Nothing,
+         (Ref{FpMatrix}, Ref{FpMatrix}, Ref{FpMatrix}, Int),
+         x, L, B, Int(unit))
+   return nothing
+end
+
+function _solve_triu_right_flint!(x::FpMatrix, U::FpMatrix, B::FpMatrix, unit::Bool)
+   ccall((:fmpz_mod_mat_solve_triu, libflint), Nothing,
+         (Ref{FpMatrix}, Ref{FpMatrix}, Ref{FpMatrix}, Int),
+         x, U, B, Int(unit))
+   return nothing
+end
+
+################################################################################
+#
+#  LU decomposition
+#
+################################################################################
+
+function lu!(P::Generic.Perm, x::FpMatrix)
+   P.d .-= 1
+
+   rank = ccall((:fmpz_mod_mat_lu, libflint), Int,
+                (Ptr{Int}, Ref{FpMatrix}, Int),
+                P.d, x, 0)
+
+  P.d .+= 1
+
+  # flint does x == PLU instead of Px == LU (docs are wrong)
+  inv!(P)
+
+  return rank
+end
+
+function lu(x::FpMatrix, P = SymmetricGroup(nrows(x)))
+   m = nrows(x)
+   n = ncols(x)
+   P.n != m && error("Permutation does not match matrix")
+   p = one(P)
+   R = base_ring(x)
+   U = deepcopy(x)
+
+   L = similar(x, m, m)
+
+   rank = lu!(p, U)
+
+   for i = 1:m
+      for j = 1:n
+         if i > j
+            L[i, j] = U[i, j]
+            U[i, j] = R()
+         elseif i == j
+            L[i, j] = one(R)
+         elseif j <= m
+            L[i, j] = R()
+         end
+      end
+   end
+   return rank, p, L, U
+end
+
+################################################################################
+#
+#  Entry pointers
+#
+################################################################################
+
+@inline mat_entry_ptr(A::FpMatrix, i::Int, j::Int) =
+   ccall((:fmpz_mod_mat_entry, libflint),
+      Ptr{ZZRingElem}, (Ref{FpMatrix}, Int, Int), A, i - 1, j - 1)
