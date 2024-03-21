@@ -57,9 +57,6 @@ end
 #
 ################################################################################
 
-# Overwrite some solve context functionality so that it uses `transpose` and not
-# `lazy_transpose`
-
 function solve_init(A::_FieldMatTypes)
   return Solve.SolveCtx{elem_type(base_ring(A)), typeof(A), typeof(A)}(A)
 end
@@ -136,6 +133,30 @@ function Solve._can_solve_internal_no_check_right(C::Solve.SolveCtx{T, MatT}, b:
    p = Solve.lu_permutation(C)
    pb = p*b
    r = rank(C)
+
+   # Let A = matrix(C) be m x n of rank r. Then LU is build as follows (modulo
+   # the permutation p).
+   # For example, m = 5, n = 6, r = 3:
+   #   (d u u u u u)
+   #   (l d u u u u)
+   #   (l l d u u u)
+   #   (l l l 0 0 0)
+   #   (l l l 0 0 0)
+   # L is the m x r matrix
+   #   (1 0 0)
+   #   (l 1 0)
+   #   (l l 1)
+   #   (l l l)
+   #   (l l l)
+   #
+   # and U is the r x n matrix
+   #   (d u u u u u)
+   #   (0 d u u u u)
+   #   (0 0 d u u u)
+   # Notice that the diagonal entries d need not be non-zero!
+
+   # Would be great if there were a `*_solve_lu_precomp` for the finite field
+   # types in flint.
 
    x = similar(b, r, ncols(b))
    # Solve L x = b for the first r rows. We tell flint to pretend that there
