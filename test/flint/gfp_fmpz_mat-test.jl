@@ -854,20 +854,106 @@ end
 
    @test_throws ArgumentError can_solve_with_solution(A, B, side = :garbage)
    @test_throws ArgumentError can_solve(A, B, side = :garbage)
+end
 
-   A = matrix(F17, [1 2 3; 4 5 6])
+@testset "FpMatrix.solve_context" begin
+   F, _ = Native.finite_field(ZZRingElem(101))
+   A = matrix(F, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
    C = solve_init(A)
-   B = matrix(F17, 2, 1, [1, 1])
-   fl, x, K = can_solve_with_solution_and_kernel(C, B, side = :right)
-   @test fl
-   @test A*x == B
-   @test is_zero(A*K)
-   @test ncols(K) + rank(A) == ncols(A)
 
-   B = matrix(F17, 1, 3, [1, 2, 3])
-   fl, x, K = can_solve_with_solution_and_kernel(C, B)
+   @test_throws ErrorException solve(C, [ F(1) ])
+   @test_throws ErrorException solve(C, [ F(1) ], side = :right)
+   @test_throws ErrorException solve(C, matrix(F, 1, 1, [ F(1) ]))
+   @test_throws ErrorException solve(C, matrix(F, 1, 1, [ F(1) ]), side = :right)
+   @test_throws ArgumentError solve(C, [ F(1), F(2), F(3) ], side = :test)
+   @test_throws ArgumentError solve(C, matrix(F, 3, 1, [ F(1), F(2), F(3) ]), side = :test)
+
+   for b in [ [ F(1), F(2), F(3) ],
+              matrix(F, 3, 1, [ F(1), F(2), F(3) ]),
+              matrix(F, 3, 2, [ F(1), F(2), F(3), F(4), F(5), F(6) ]) ]
+      @test @inferred can_solve(C, b, side = :right)
+      x = @inferred solve(C, b, side = :right)
+      @test A*x == b
+      fl, x = @inferred can_solve_with_solution(C, b, side = :right)
+      @test fl
+      @test A*x == b
+      fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b, side = :right)
+      @test fl
+      @test A*x == b
+      @test is_zero(A*K)
+      @test ncols(K) == 2
+      K = @inferred kernel(C, side = :right)
+      @test is_zero(A*K)
+      @test ncols(K) == 2
+   end
+
+   for b in [ [ F(1), F(1), F(1), F(1), F(1) ],
+              matrix(F, 1, 5, [ F(1), F(1), F(1), F(1), F(1) ]),
+              matrix(F, 2, 5, [ F(1), F(1), F(1), F(1), F(1),
+                                 F(1), F(1), F(1), F(1), F(1) ]) ]
+      @test_throws ArgumentError solve(C, b)
+      @test @inferred !can_solve(C, b)
+      fl, x = @inferred can_solve_with_solution(C, b)
+      @test !fl
+      fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b)
+      @test !fl
+   end
+
+   for b in [ [ F(1), F(2), F(3), F(4), F(5) ],
+              matrix(F, 1, 5, [ F(1), F(2), F(3), F(4), F(5)]),
+              matrix(F, 2, 5, [ F(1), F(2), F(3), F(4), F(5),
+                                 F(0), F(0), F(8), F(9), F(10) ]) ]
+      @test @inferred can_solve(C, b)
+      x = @inferred solve(C, b)
+      @test x*A == b
+      fl, x = @inferred can_solve_with_solution(C, b)
+      @test fl
+      @test x*A == b
+      fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b)
+      @test fl
+      @test x*A == b
+      @test is_zero(K*A)
+      @test nrows(K) == 0
+      K = @inferred kernel(C)
+      @test is_zero(K*A)
+      @test nrows(K) == 0
+   end
+
+   N = zero_matrix(F, 2, 1)
+   C = solve_init(N)
+   b = zeros(F, 2)
+   fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b, side = :right)
    @test fl
-   @test x*A == B
-   @test is_zero(K*A)
-   @test nrows(K) + rank(A) == nrows(A)
+   @test N*x == b
+   @test K == identity_matrix(F, 1)
+   K = @inferred kernel(C, side = :right)
+   @test K == identity_matrix(F, 1)
+
+   N = zero_matrix(F, 1, 2)
+   C = solve_init(N)
+   b = zeros(F, 1)
+   fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b, side = :right)
+   @test fl
+   @test N*x == b
+   @test K == identity_matrix(F, 2) || K == swap_cols!(identity_matrix(F, 2), 1, 2)
+   K = @inferred kernel(C, side = :right)
+   @test K == identity_matrix(F, 2) || K == swap_cols!(identity_matrix(F, 2), 1, 2)
+end
+
+@testset "FpMatrix.lu" begin
+   F, _ = Native.finite_field(ZZRingElem(101))
+   a = F[1 2 3 ; 3 2 1 ; 0 0 2]
+   b = F[2 1 0 1; 0 0 0 0; 0 1 2 0]
+
+   r, P, l, u = lu(a)
+   @test l*u == P*a
+
+   r, P, l, u = lu(b)
+   @test l*u == F[2 1 0 1; 0 1 2 0; 0 0 0 0]
+   @test l*u == P*b
+
+   c = F[0 0 1; 0 0 0; 0 0 0; 1 0 0; 0 1 0; 0 0 1]
+   r, P, l, u = lu(c)
+   @test r == 3
+   @test l*u == P*c
 end

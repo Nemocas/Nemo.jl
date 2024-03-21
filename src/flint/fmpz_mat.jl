@@ -175,6 +175,7 @@ isone(a::ZZMatrix) = ccall((:fmpz_mat_is_one, libflint), Bool,
                            (Ref{ZZMatrix},), a)
 
 @inline function is_zero_entry(A::ZZMatrix, i::Int, j::Int)
+   @boundscheck Generic._checkbounds(A, i, j)
    GC.@preserve A begin
       x = mat_entry_ptr(A, i, j)
       return ccall((:fmpz_is_zero, libflint), Bool, (Ptr{ZZRingElem},), x)

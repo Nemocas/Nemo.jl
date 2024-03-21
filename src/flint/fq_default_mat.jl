@@ -122,6 +122,7 @@ function iszero(a::FqMatrix)
 end
 
 @inline function is_zero_entry(A::FqMatrix, i::Int, j::Int)
+   @boundscheck Generic._checkbounds(A, i, j)
    GC.@preserve A begin
       x = fq_default_mat_entry_ptr(A, i, j)
       return ccall((:fq_default_is_zero, libflint), Bool, (Ptr{FqFieldElem}, Ref{FqField}), x, base_ring(A))

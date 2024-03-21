@@ -36,6 +36,9 @@ zero(m::fpMatrix, R::fpField, r::Int, c::Int) = similar(m, R, r, c)
 #
 ################################################################################
 
+# v.data is immutable so we can't do anything in-place
+getindex!(v::fpFieldElem, a::fpMatrix, i::Int, j::Int) = getindex(a, i, j)
+
 @inline function getindex(a::fpMatrix, i::Int, j::Int)
   @boundscheck Generic._checkbounds(a, i, j)
   u = ccall((:nmod_mat_get_entry, libflint), UInt,
@@ -72,6 +75,13 @@ function one(a::fpMatrixSpace)
   z = a()
   ccall((:nmod_mat_one, libflint), Nothing, (Ref{fpMatrix}, ), z)
   return z
+end
+
+@inline function is_zero_entry(A::fpMatrix, i::Int, j::Int)
+  @boundscheck Generic._checkbounds(A, i, j)
+   x = ccall((:nmod_mat_get_entry, libflint), UInt,
+            (Ref{fpMatrix}, Int, Int), A, i - 1, j - 1)
+   return x == 0
 end
 
 ################################################################################
@@ -307,6 +317,22 @@ function Solve._can_solve_internal_no_check(A::fpMatrix, b::fpMatrix, task::Symb
    return Bool(fl), x, kernel(A, side = :right)
 end
 
+# Direct interface to the C functions to be able to write 'generic' code for
+# different matrix types
+function _solve_tril_right_flint!(x::fpMatrix, L::fpMatrix, B::fpMatrix, unit::Bool)
+   ccall((:nmod_mat_solve_tril, libflint), Nothing,
+         (Ref{fpMatrix}, Ref{fpMatrix}, Ref{fpMatrix}, Int),
+         x, L, B, Int(unit))
+   return nothing
+end
+
+function _solve_triu_right_flint!(x::fpMatrix, U::fpMatrix, B::fpMatrix, unit::Bool)
+   ccall((:nmod_mat_solve_triu, libflint), Nothing,
+         (Ref{fpMatrix}, Ref{fpMatrix}, Ref{fpMatrix}, Int),
+         x, U, B, Int(unit))
+   return nothing
+end
+
 ################################################################################
 #
 #  Parent object overloading
@@ -498,4 +524,52 @@ function nullspace(M::fpMatrix)
   nullity = ccall((:nmod_mat_nullspace, libflint), Int,
                   (Ref{fpMatrix}, Ref{fpMatrix}), N, M)
   return nullity, view(N, 1:nrows(N), 1:nullity)
+end
+
+################################################################################
+#
+#  LU decomposition
+#
+################################################################################
+
+function lu!(P::Generic.Perm, x::fpMatrix)
+   P.d .-= 1
+
+   rank = ccall((:nmod_mat_lu, libflint), Int,
+                (Ptr{Int}, Ref{fpMatrix}, Int),
+                P.d, x, 0)
+
+  P.d .+= 1
+
+  # flint does x == PLU instead of Px == LU (docs are wrong)
+  inv!(P)
+
+  return rank
+end
+
+function lu(x::fpMatrix, P = SymmetricGroup(nrows(x)))
+   m = nrows(x)
+   n = ncols(x)
+   P.n != m && error("Permutation does not match matrix")
+   p = one(P)
+   R = base_ring(x)
+   U = deepcopy(x)
+
+   L = similar(x, m, m)
+
+   rank = lu!(p, U)
+
+   for i = 1:m
+      for j = 1:n
+         if i > j
+            L[i, j] = U[i, j]
+            U[i, j] = R()
+         elseif i == j
+            L[i, j] = one(R)
+         elseif j <= m
+            L[i, j] = R()
+         end
+      end
+   end
+   return rank, p, L, U
 end
