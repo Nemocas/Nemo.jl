@@ -2,7 +2,6 @@
 const _FieldMatTypes = Union{QQMatrix, fpMatrix, FpMatrix, FqMatrix, fqPolyRepMatrix, FqPolyRepMatrix}
 const _MatTypes = Union{_FieldMatTypes, ZZMatrix, zzModMatrix, ZZModMatrix}
 
-
 ################################################################################
 #
 #  Support for view(A, :, i) and view(A, i, :)
@@ -351,7 +350,7 @@ end
 ###############################################################################
 
 # Unfortunately, there is no fmpq_mat_set_perm etc. in flint
-function *(P::Perm, x::_MatTypes)
+function *(P::Perm, x::_FieldMatTypes)
    z = similar(x)
    t = base_ring(x)()
    @inbounds for i = 1:nrows(x)
@@ -362,7 +361,7 @@ function *(P::Perm, x::_MatTypes)
    return z
 end
 
-function *(x::_MatTypes, P::Perm)
+function *(x::_FieldMatTypes, P::Perm)
    z = similar(x)
    t = base_ring(x)()
    @inbounds for i = 1:nrows(x)
