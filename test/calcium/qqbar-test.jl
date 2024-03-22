@@ -96,7 +96,9 @@ end
    @test sign_real(-3+4*i) == -1
    @test sign_imag(-3+4*i) == 1
    @test floor(u) == 1
+   @test floor(ZZRingElem, u) == 1 && floor(ZZRingElem, u) isa ZZRingElem
    @test ceil(u) == 2
+   @test ceil(ZZRingElem, u) == 2 && ceil(ZZRingElem, u) isa ZZRingElem
 
    @test (u >> 3) == u // 8
    @test (u << 3) == 8 * u
@@ -190,6 +192,31 @@ end
      Rx, x = polynomial_ring(QQBar, "x")
      @test gcd(x^4 - 4*x^2 + 4, x^2 + sqrt(QQBar(18))*x + 4) == x + sqrt(QQBar(2))
    end
+
+   # floor, ceil, round
+   a = sqrt(R(2))
+   test_data = [(a, 1, 2, 1, 1, 2, 1),
+                (R(1), 1, 1, 1, 1, 1, 1),
+                (R(0), 0, 0, 0, 0, 0, 0),
+                (R(1//2), 0, 1, 1, 0, 1, 0),
+                (R(3//2), 1, 2, 2, 1, 2, 2),
+                (R(-1//2), -1, 0, -1, -1, 0, 0),
+                (sqrt(R(3)), 1, 2, 2, 1, 2, 2),
+               ]
+   for (e, f, c, r, rd, ru, rn) in test_data
+      @test floor(e) == f && parent(floor(e)) === R
+      @test floor(ZZRingElem, e) == f && floor(ZZRingElem, e) isa ZZRingElem
+      @test ceil(e) == R(c) && parent(ceil(e)) === R
+      @test ceil(ZZRingElem, e) == c && ceil(ZZRingElem, e) isa ZZRingElem
+      @test round(e) == r && parent(round(e)) === R
+      @test round(ZZRingElem, e) == r && round(ZZRingElem, e) isa ZZRingElem
+      @test round(e, RoundDown) == rd && parent(round(e, RoundDown)) === R
+      @test round(ZZRingElem, e, RoundDown) == rd && round(ZZRingElem, e, RoundDown) isa ZZRingElem
+      @test round(e, RoundUp) == ru && parent(round(e, RoundUp)) === R
+      @test round(ZZRingElem, e, RoundUp) == ru && round(ZZRingElem, e, RoundUp) isa ZZRingElem
+      @test round(e, RoundNearest) == rn && parent(round(e, RoundNearest)) === R
+      @test round(ZZRingElem, e, RoundNearest) == rn && round(ZZRingElem, e, RoundNearest) isa ZZRingElem
+   end
 end
 
 @testset "QQBarFieldElem.adhoc_operations" begin
@@ -253,6 +280,10 @@ end
 
    @test u < 2
    @test u > 1
+   @test is_positive(u)
+   @test !is_negative(u)
+   @test !is_positive(R(0))
+   @test !is_negative(R(0))
    @test_throws DomainError (i > 1)
 
    @test is_equal_abs(u, -u)

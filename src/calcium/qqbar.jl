@@ -638,6 +638,9 @@ isless(a::QQFieldElem, b::QQBarFieldElem) = isless(QQBarFieldElem(a), b)
 isless(a::ZZRingElem, b::QQBarFieldElem) = isless(QQBarFieldElem(a), b)
 isless(a::Int, b::QQBarFieldElem) = isless(QQBarFieldElem(a), b)
 
+is_positive(a::QQBarFieldElem) = a > 0
+is_negative(a::QQBarFieldElem) = a < 0
+
 # todo: export the cmp functions?
 cmp_real(a::QQBarFieldElem, b::QQBarFieldElem) = ccall((:qqbar_cmp_re, libcalcium),
     Cint, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), a, b)
@@ -839,30 +842,67 @@ function sign_imag(a::QQBarFieldElem)
         Cint, (Ref{QQBarFieldElem}, ), a)))
 end
 
-@doc raw"""
-    floor(a::QQBarFieldElem)
-
-Return the floor function of `a` as an algebraic number. Use `ZZRingElem(floor(a))`
-to construct a Nemo integer instead.
-"""
 function floor(a::QQBarFieldElem)
+   return QQBarFieldElem(floor(ZZRingElem, a))
+end
+
+function floor(::Type{ZZRingElem}, a::QQBarFieldElem)
    z = ZZRingElem()
    ccall((:qqbar_floor, libcalcium), Nothing, (Ref{ZZRingElem}, Ref{QQBarFieldElem}, ), z, a)
-   return QQBarFieldElem(z)
+   return z
 end
 
-@doc raw"""
-    ceil(a::QQBarFieldElem)
-
-Return the ceiling function of `b` as an algebraic number. Use `ZZRingElem(ceil(a))`
-to construct a Nemo integer instead.
-"""
 function ceil(a::QQBarFieldElem)
+   return QQBarFieldElem(ceil(ZZRingElem, a))
+end
+
+function ceil(::Type{ZZRingElem}, a::QQBarFieldElem)
    z = ZZRingElem()
    ccall((:qqbar_ceil, libcalcium), Nothing, (Ref{ZZRingElem}, Ref{QQBarFieldElem}, ), z, a)
-   return QQBarFieldElem(z)
+   return z
 end
 
+###############################################################################
+#
+#  Round
+#
+###############################################################################
+
+# rounding
+function round(::Type{ZZRingElem}, a::QQBarFieldElem, ::RoundingMode{:Nearest})
+  if is_zero(a)
+    return zero(ZZ)
+  end
+
+  ca = floor(ZZRingElem, a)
+  if a < ca + QQ(1//2)
+    return ca
+  elseif a > ca + QQ(1//2)
+    return ca + 1
+  else
+    return is_even(ca) ? ca : ca + 1
+  end
+end
+
+function round(a::QQBarFieldElem, ::RoundingMode{:Nearest})
+  return parent(a)(round(ZZRingElem, a, RoundNearest))
+end
+
+round(x::QQBarFieldElem, ::RoundingMode{:Up}) = ceil(x)
+round(::Type{ZZRingElem}, x::QQBarFieldElem, ::RoundingMode{:Up})= ceil(ZZRingElem, x)
+
+round(x::QQBarFieldElem, ::RoundingMode{:Down}) = floor(x)
+round(::Type{ZZRingElem}, x::QQBarFieldElem, ::RoundingMode{:Down}) = floor(ZZRingElem, x)
+
+round(x::QQBarFieldElem, ::RoundingMode{:NearestTiesAway}) = sign(x) * floor(abs(x) + 1//2)
+function round(::Type{ZZRingElem}, x::QQBarFieldElem, ::RoundingMode{:NearestTiesAway})
+    tmp = floor(ZZRingElem, abs(x) + 1//2)
+    return is_positive(x) ? tmp : -tmp
+end
+
+# default
+round(a::QQBarFieldElem) = round(a, RoundNearestTiesAway)
+round(::Type{ZZRingElem}, a::QQBarFieldElem) = round(ZZRingElem, a, RoundNearestTiesAway)
 
 ###############################################################################
 #

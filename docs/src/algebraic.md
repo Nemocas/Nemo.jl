@@ -191,8 +191,6 @@ sign(a::QQBarFieldElem)
 csgn(a::QQBarFieldElem)
 sign_real(a::QQBarFieldElem)
 sign_imag(a::QQBarFieldElem)
-floor(a::QQBarFieldElem)
-ceil(a::QQBarFieldElem)
 ```
 
 ### Comparing algebraic numbers
