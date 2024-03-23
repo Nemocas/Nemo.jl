@@ -2,7 +2,6 @@
 const _FieldMatTypes = Union{QQMatrix, fpMatrix, FpMatrix, FqMatrix, fqPolyRepMatrix, FqPolyRepMatrix}
 const _MatTypes = Union{_FieldMatTypes, ZZMatrix, zzModMatrix, ZZModMatrix}
 
-
 ################################################################################
 #
 #  Support for view(A, :, i) and view(A, i, :)
@@ -57,48 +56,196 @@ end
 #
 ################################################################################
 
-# Overwrite some solve context functionality so that it uses `transpose` and not
-# `lazy_transpose`
-
 function solve_init(A::_FieldMatTypes)
   return Solve.SolveCtx{elem_type(base_ring(A)), typeof(A), typeof(A)}(A)
 end
 
-function Solve._init_reduce_transpose(C::Solve.SolveCtx{S, T}) where {S <: FieldElem, T <: _FieldMatTypes}
-  if isdefined(C, :red_transp) && isdefined(C, :trafo_transp)
-    return nothing
-  end
+################################################################################
+#
+#  Solve context for matrices over finite fields
+#
+################################################################################
 
-  r, R, U = Solve._rref_with_transformation(transpose(matrix(C)))
-  Solve.set_rank!(C, r)
-  C.red_transp = R
-  C.trafo_transp = U
-  return nothing
+function Solve._init_reduce(C::Solve.SolveCtx{T}) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
+   if isdefined(C, :red) && isdefined(C, :lu_perm)
+      return nothing
+   end
+
+   LU = deepcopy(matrix(C))
+   p = Generic.Perm(1:nrows(LU))
+   r = lu!(p, LU)
+
+   Solve.set_rank!(C, r)
+   C.red = LU
+   C.lu_perm = p
+   if r < nrows(C)
+      pA = p*matrix(C)
+      set_attribute!(C, :permuted_matrix_lu => view(pA, r + 1:nrows(C), :))
+   else
+      set_attribute!(C, :permuted_matrix_lu => zero(matrix(C), 0, ncols(C)))
+   end
+   return nothing
 end
 
-function Solve._can_solve_internal_no_check(C::Solve.SolveCtx{S, T}, b::T, task::Symbol; side::Symbol = :left) where {S <: FieldElem, T <: _FieldMatTypes}
-  if side === :right
-    fl, sol = Solve._can_solve_with_rref(b, Solve.transformation_matrix(C), rank(C), Solve.pivot_and_non_pivot_cols(C), task)
-  else
-    fl, sol = Solve._can_solve_with_rref(transpose(b), Solve.transformation_matrix_of_transpose(C), rank(C), Solve.pivot_and_non_pivot_cols_of_transpose(C), task)
-    sol = transpose(sol)
-  end
-  if !fl || task !== :with_kernel
-    return fl, sol, zero(b, 0, 0)
-  end
-
-  return true, sol, kernel(C, side = side)
+function permuted_matrix_lu(C::Solve.SolveCtx{T, MatT}) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}, MatT}
+   Solve._init_reduce(C)
+   return get_attribute(C, :permuted_matrix_lu)::MatT
 end
 
-function Solve.kernel(C::Solve.SolveCtx{S, T}; side::Symbol = :left) where {S <: FieldElem, T <: _FieldMatTypes}
-  Solve.check_option(side, [:right, :left], "side")
+function Solve._init_reduce_transpose(C::Solve.SolveCtx{T}) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
+   if isdefined(C, :red_transp) && isdefined(C, :lu_perm_transp)
+      return nothing
+   end
 
+   LU = transpose(matrix(C))
+   p = Generic.Perm(1:nrows(LU))
+   r = lu!(p, LU)
+
+   Solve.set_rank!(C, r)
+   C.red_transp = LU
+   C.lu_perm_transp = p
+   if r < ncols(C)
+      Ap = matrix(C)*p
+      set_attribute!(C, :permuted_matrix_of_transpose_lu => view(Ap, :, r + 1:ncols(C)))
+   else
+      set_attribute!(C, :permuted_matrix_of_transpose_lu => zero(matrix(C), nrows(C), 0))
+   end
+   return nothing
+end
+
+function permuted_matrix_of_transpose_lu(C::Solve.SolveCtx{T, MatT}) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}, MatT}
+   Solve._init_reduce_transpose(C)
+   return get_attribute(C, :permuted_matrix_of_transpose_lu)::MatT
+end
+
+function Solve._can_solve_internal_no_check(C::Solve.SolveCtx{T, MatT}, b::MatT, task::Symbol; side::Symbol = :left) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}, MatT}
+  # Split up in separate functions to make the compiler happy
   if side === :right
-    return Solve._kernel_of_rref(Solve.reduced_matrix(C), rank(C), Solve.pivot_and_non_pivot_cols(C))[2]
+    return Solve._can_solve_internal_no_check_right(C, b, task)
   else
-    nullity, X = Solve._kernel_of_rref(Solve.reduced_matrix_of_transpose(C), rank(C), Solve.pivot_and_non_pivot_cols_of_transpose(C))
-    return transpose(X)
+    return Solve._can_solve_internal_no_check_left(C, b, task)
   end
+end
+
+function Solve._can_solve_internal_no_check_right(C::Solve.SolveCtx{T, MatT}, b::MatT, task::Symbol) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}, MatT}
+   LU = Solve.reduced_matrix(C)
+   p = Solve.lu_permutation(C)
+   pb = p*b
+   r = rank(C)
+
+   # Let A = matrix(C) be m x n of rank r. Then LU is build as follows (modulo
+   # the permutation p).
+   # For example, m = 5, n = 6, r = 3:
+   #   (d u u u u u)
+   #   (l d u u u u)
+   #   (l l d u u u)
+   #   (l l l 0 0 0)
+   #   (l l l 0 0 0)
+   # L is the m x r matrix
+   #   (1 0 0)
+   #   (l 1 0)
+   #   (l l 1)
+   #   (l l l)
+   #   (l l l)
+   #
+   # and U is the r x n matrix
+   #   (d u u u u u)
+   #   (0 d u u u u)
+   #   (0 0 d u u u)
+   # Notice that the diagonal entries d need not be non-zero!
+
+   # Would be great if there were a `*_solve_lu_precomp` for the finite field
+   # types in flint.
+
+   x = similar(b, r, ncols(b))
+   # Solve L x = b for the first r rows. We tell flint to pretend that there
+   # are ones on the diagonal of LU (fourth argument)
+   _solve_tril_right_flint!(x, view(LU, 1:r, 1:r), view(pb, 1:r, :), true)
+
+   # Check whether x solves Lx = b also for the lower part of L
+   if r < nrows(C) && view(LU, r + 1:nrows(LU), 1:r)*x != view(pb, r + 1:nrows(b), :)
+      return false, zero(b, 0, 0), zero(b, 0, 0)
+   end
+
+   # Solve U y = x. We need to take extra care as U might have non-pivot columns.
+   y = _solve_triu_right(view(LU, 1:r, :), x)
+
+   fl = true
+   if r < nrows(C)
+      fl = permuted_matrix_lu(C)*y == view(pb, r + 1:nrows(C), :)
+   end
+
+   if task !== :with_kernel
+      return fl, y, zero(b, 0, 0)
+   else
+      return fl, y, kernel(C, side = :right)
+   end
+end
+
+function Solve._can_solve_internal_no_check_left(C::Solve.SolveCtx{T, MatT}, b::MatT, task::Symbol) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}, MatT}
+   LU = Solve.reduced_matrix_of_transpose(C)
+   p = Solve.lu_permutation_of_transpose(C)
+   pbt = p*transpose(b)
+   r = rank(C)
+
+   x = similar(b, r, nrows(b))
+   _solve_tril_right_flint!(x, view(LU, 1:r, 1:r), view(pbt, 1:r, :), true)
+
+   # Check whether x solves Lx = b also for the lower part of L
+   if r < ncols(C) && view(LU, r + 1:nrows(LU), 1:r)*x != view(pbt, r + 1:nrows(pbt), :)
+      return false, zero(b, 0, 0), zero(b, 0, 0)
+   end
+
+   # Solve U y = x. We need to take extra care as U might have non-pivot columns.
+   yy = _solve_triu_right(view(LU, 1:r, :), x)
+   y = transpose(yy)
+
+   fl = true
+   if r < ncols(C)
+      bp = b*p
+      fl = y*permuted_matrix_of_transpose_lu(C) == view(bp, :, r + 1:ncols(C))
+   end
+
+   if task !== :with_kernel
+      return fl, y, zero(b, 0, 0)
+   else
+      return fl, y, kernel(C, side = :left)
+   end
+end
+
+# Solves A x = B with A in upper triangular shape of full rank, so something
+# like
+#   ( + * * * * )
+#   ( 0 0 + * * )
+#   ( 0 0 0 + * )
+# where + is non-zero and * is anything.
+# This is a helper functions because flint can only do the case where the
+# diagonal entries are non-zero.
+function _solve_triu_right(A::MatT, B::MatT) where {MatT <: Union{fpMatrix, FpMatrix, FqMatrix, fqPolyRepMatrix, FqPolyRepMatrix}}
+   @assert nrows(A) == nrows(B)
+   pivot_cols = Int[]
+   next_pivot_col = ncols(A) + 1
+   @inbounds for r in nrows(A):-1:1
+      for c in r:next_pivot_col - 1
+         if !is_zero_entry(A, r, c)
+            push!(pivot_cols, c)
+            next_pivot_col = c
+            break
+         end
+         if c == next_pivot_col - 1
+            error("Matrix is not in upper triangular shape")
+         end
+      end
+   end
+   reverse!(pivot_cols)
+   AA = reduce(hcat, view(A, 1:nrows(A), c:c) for c in pivot_cols; init = zero(A, nrows(A), 0))
+   xx = similar(B, nrows(A), ncols(B))
+   _solve_triu_right_flint!(xx, AA, B, false)
+   x = zero(B, ncols(A), ncols(B))
+   for i in 1:nrows(xx)
+      view(x, pivot_cols[i]:pivot_cols[i], :) .= view(xx, i:i, :)
+   end
+   return x
 end
 
 ################################################################################
@@ -194,4 +341,33 @@ function eigenspaces(M::MatElem{T}; side::Symbol = :left) where T<:FieldElem
     push!(L, k => vcat(eigenspace(M, k, side = side)))
   end
   return L
+end
+
+###############################################################################
+#
+#   Permutation
+#
+###############################################################################
+
+# Unfortunately, there is no fmpq_mat_set_perm etc. in flint
+function *(P::Perm, x::_FieldMatTypes)
+   z = similar(x)
+   t = base_ring(x)()
+   @inbounds for i = 1:nrows(x)
+      for j = 1:ncols(x)
+         z[P[i], j] = getindex!(t, x, i, j)
+      end
+   end
+   return z
+end
+
+function *(x::_FieldMatTypes, P::Perm)
+   z = similar(x)
+   t = base_ring(x)()
+   @inbounds for i = 1:nrows(x)
+      for j = 1:ncols(x)
+        z[i, P[j]] = getindex!(t, x, i, j)
+      end
+   end
+   return z
 end

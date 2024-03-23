@@ -40,6 +40,16 @@ zero(m::FqPolyRepMatrix, R::FqPolyRepField, r::Int, c::Int) = FqPolyRepMatrix(r,
 #
 ################################################################################
 
+function getindex!(v::FqPolyRepFieldElem, a::FqPolyRepMatrix, i::Int, j::Int)
+   @boundscheck Generic._checkbounds(a, i, j)
+   GC.@preserve a begin
+      z = ccall((:fq_mat_entry, libflint), Ptr{FqPolyRepFieldElem},
+                (Ref{FqPolyRepMatrix}, Int, Int), a, i - 1, j - 1)
+      ccall((:fq_set, libflint), Nothing, (Ref{FqPolyRepFieldElem}, Ptr{FqPolyRepFieldElem}), v, z)
+   end
+   return v
+end
+
 @inline function getindex(a::FqPolyRepMatrix, i::Int, j::Int)
    @boundscheck Generic._checkbounds(a, i, j)
    GC.@preserve a begin
@@ -103,6 +113,14 @@ function iszero(a::FqPolyRepMatrix)
    r = ccall((:fq_mat_is_zero, libflint), Cint,
              (Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}), a, base_ring(a))
   return Bool(r)
+end
+
+@inline function is_zero_entry(A::FqPolyRepMatrix, i::Int, j::Int)
+   @boundscheck Generic._checkbounds(A, i, j)
+   GC.@preserve A begin
+      x = mat_entry_ptr(A, i, j)
+      return ccall((:fq_is_zero, libflint), Bool, (Ptr{FqPolyRepFieldElem}, Ref{FqPolyRepField}), x, base_ring(A))
+   end
 end
 
 ################################################################################
@@ -437,6 +455,22 @@ function Solve._can_solve_internal_no_check(A::FqPolyRepMatrix, b::FqPolyRepMatr
       return Bool(fl), x, zero(A, 0, 0)
    end
    return Bool(fl), x, kernel(A, side = :right)
+end
+
+# Direct interface to the C functions to be able to write 'generic' code for
+# different matrix types
+function _solve_tril_right_flint!(x::FqPolyRepMatrix, L::FqPolyRepMatrix, B::FqPolyRepMatrix, unit::Bool)
+   ccall((:fq_mat_solve_tril, libflint), Nothing,
+         (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Int, Ref{FqPolyRepField}),
+         x, L, B, Int(unit), base_ring(L))
+   return nothing
+end
+
+function _solve_triu_right_flint!(x::FqPolyRepMatrix, U::FqPolyRepMatrix, B::FqPolyRepMatrix, unit::Bool)
+   ccall((:fq_mat_solve_triu, libflint), Nothing,
+         (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Int, Ref{FqPolyRepField}),
+         x, U, B, Int(unit), base_ring(U))
+   return nothing
 end
 
 ################################################################################
@@ -783,3 +817,13 @@ function nullspace(M::FqPolyRepMatrix)
                   (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}), N, M, base_ring(M))
   return nullity, view(N, 1:nrows(N), 1:nullity)
 end
+
+################################################################################
+#
+#  Entry pointers
+#
+################################################################################
+
+@inline mat_entry_ptr(A::FqPolyRepMatrix, i::Int, j::Int) =
+   ccall((:fq_mat_entry, libflint),
+      Ptr{FqPolyRepFieldElem}, (Ref{FqPolyRepMatrix}, Int, Int), A, i - 1, j - 1)

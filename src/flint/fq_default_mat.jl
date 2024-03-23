@@ -40,6 +40,15 @@ zero(m::FqMatrix, R::FqField, r::Int, c::Int) = FqMatrix(r, c, R)
 #
 ################################################################################
 
+function getindex!(v::FqFieldElem, a::FqMatrix, i::Int, j::Int)
+   @boundscheck Generic._checkbounds(a, i, j)
+   ccall((:fq_default_mat_entry, libflint), Ptr{FqFieldElem},
+         (Ref{FqFieldElem}, Ref{FqMatrix}, Int, Int,
+          Ref{FqField}),
+          v, a, i - 1 , j - 1, base_ring(a))
+   return v
+end
+
 @inline function getindex(a::FqMatrix, i::Int, j::Int)
    @boundscheck Generic._checkbounds(a, i, j)
    z = base_ring(a)()
@@ -110,6 +119,14 @@ function iszero(a::FqMatrix)
    r = ccall((:fq_default_mat_is_zero, libflint), Cint,
              (Ref{FqMatrix}, Ref{FqField}), a, base_ring(a))
   return Bool(r)
+end
+
+@inline function is_zero_entry(A::FqMatrix, i::Int, j::Int)
+   @boundscheck Generic._checkbounds(A, i, j)
+   GC.@preserve A begin
+      x = fq_default_mat_entry_ptr(A, i, j)
+      return ccall((:fq_default_is_zero, libflint), Bool, (Ptr{FqFieldElem}, Ref{FqField}), x, base_ring(A))
+   end
 end
 
 ################################################################################
@@ -430,6 +447,22 @@ function Solve._can_solve_internal_no_check(A::FqMatrix, b::FqMatrix, task::Symb
       return Bool(fl), x, zero(A, 0, 0)
    end
    return Bool(fl), x, kernel(A, side = :right)
+end
+
+# Direct interface to the C functions to be able to write 'generic' code for
+# different matrix types
+function _solve_tril_right_flint!(x::FqMatrix, L::FqMatrix, B::FqMatrix, unit::Bool)
+   ccall((:fq_default_mat_solve_tril, libflint), Nothing,
+         (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqMatrix}, Int, Ref{FqField}),
+         x, L, B, Int(unit), base_ring(L))
+   return nothing
+end
+
+function _solve_triu_right_flint!(x::FqMatrix, U::FqMatrix, B::FqMatrix, unit::Bool)
+   ccall((:fq_default_mat_solve_triu, libflint), Nothing,
+         (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqMatrix}, Int, Ref{FqField}),
+         x, U, B, Int(unit), base_ring(U))
+   return nothing
 end
 
 ################################################################################
