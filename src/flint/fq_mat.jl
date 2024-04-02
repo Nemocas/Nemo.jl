@@ -119,7 +119,8 @@ end
    @boundscheck Generic._checkbounds(A, i, j)
    GC.@preserve A begin
       x = mat_entry_ptr(A, i, j)
-      return ccall((:fq_is_zero, libflint), Bool, (Ptr{FqPolyRepFieldElem}, Ref{FqPolyRepField}), x, base_ring(A))
+      return ccall((:fq_is_zero, libflint), Bool,
+                   (Ptr{FqPolyRepFieldElem}, Ref{FqPolyRepField}), x, base_ring(A))
    end
 end
 
@@ -825,5 +826,5 @@ end
 ################################################################################
 
 @inline mat_entry_ptr(A::FqPolyRepMatrix, i::Int, j::Int) =
-   ccall((:fq_mat_entry, libflint),
-      Ptr{FqPolyRepFieldElem}, (Ref{FqPolyRepMatrix}, Int, Int), A, i - 1, j - 1)
+   ccall((:fq_mat_entry, libflint), Ptr{FqPolyRepFieldElem},
+         (Ref{FqPolyRepMatrix}, Int, Int), A, i - 1, j - 1)

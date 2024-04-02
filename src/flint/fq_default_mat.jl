@@ -43,9 +43,8 @@ zero(m::FqMatrix, R::FqField, r::Int, c::Int) = FqMatrix(r, c, R)
 function getindex!(v::FqFieldElem, a::FqMatrix, i::Int, j::Int)
    @boundscheck Generic._checkbounds(a, i, j)
    ccall((:fq_default_mat_entry, libflint), Ptr{FqFieldElem},
-         (Ref{FqFieldElem}, Ref{FqMatrix}, Int, Int,
-          Ref{FqField}),
-          v, a, i - 1 , j - 1, base_ring(a))
+         (Ref{FqFieldElem}, Ref{FqMatrix}, Int, Int, Ref{FqField}),
+         v, a, i - 1 , j - 1, base_ring(a))
    return v
 end
 

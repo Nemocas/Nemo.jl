@@ -78,9 +78,9 @@ function one(a::fpMatrixSpace)
 end
 
 @inline function is_zero_entry(A::fpMatrix, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(A, i, j)
+   @boundscheck Generic._checkbounds(A, i, j)
    x = ccall((:nmod_mat_get_entry, libflint), UInt,
-            (Ref{fpMatrix}, Int, Int), A, i - 1, j - 1)
+             (Ref{fpMatrix}, Int, Int), A, i - 1, j - 1)
    return x == 0
 end
 
@@ -539,12 +539,12 @@ function lu!(P::Generic.Perm, x::fpMatrix)
                 (Ptr{Int}, Ref{fpMatrix}, Int),
                 P.d, x, 0)
 
-  P.d .+= 1
+   P.d .+= 1
 
-  # flint does x == PLU instead of Px == LU (docs are wrong)
-  inv!(P)
+   # flint does x == PLU instead of Px == LU (docs are wrong)
+   inv!(P)
 
-  return rank
+   return rank
 end
 
 function lu(x::fpMatrix, P = SymmetricGroup(nrows(x)))

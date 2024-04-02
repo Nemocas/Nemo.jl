@@ -10,7 +10,7 @@ const _MatTypes = Union{_FieldMatTypes, ZZMatrix, zzModMatrix, ZZModMatrix}
 
 # MatrixView{MatrixType, ElemType}
 struct MatrixView{S, T} <: AbstractVector{T}
-  A::S
+   A::S
 end
 
 Base.length(V::MatrixView) = length(V.A)
@@ -24,13 +24,13 @@ Base.setindex!(V::MatrixView, z, i::Int) = setindex!(V, ZZ(z), i)
 Base.size(V::MatrixView) = (length(V.A), )
 
 function Base.view(x::_MatTypes, r::Int, c::UnitRange{Int})
-  A = view(x, r:r, c)
-	return MatrixView{typeof(x), elem_type(base_ring(x))}(A)
+   A = view(x, r:r, c)
+   return MatrixView{typeof(x), elem_type(base_ring(x))}(A)
 end
 
 function Base.view(x::_MatTypes, r::UnitRange{Int}, c::Int)
-  A = view(x, r, c:c)
-	return MatrixView{typeof(x), elem_type(base_ring(x))}(A)
+   A = view(x, r, c:c)
+   return MatrixView{typeof(x), elem_type(base_ring(x))}(A)
 end
 
 ################################################################################
@@ -40,14 +40,14 @@ end
 ################################################################################
 
 function kernel(A::_FieldMatTypes; side::Symbol = :left)
-  Solve.check_option(side, [:right, :left], "side")
+   Solve.check_option(side, [:right, :left], "side")
 
-  if side === :left
-    K = kernel(transpose(A), side = :right)
-    return transpose(K)
-  end
+   if side === :left
+      K = kernel(transpose(A), side = :right)
+      return transpose(K)
+   end
 
-  return nullspace(A)[2]
+   return nullspace(A)[2]
 end
 
 ################################################################################
@@ -57,7 +57,7 @@ end
 ################################################################################
 
 function solve_init(A::_FieldMatTypes)
-  return Solve.SolveCtx{elem_type(base_ring(A)), typeof(A), typeof(A)}(A)
+   return Solve.SolveCtx{elem_type(base_ring(A)), typeof(A), typeof(A)}(A)
 end
 
 ################################################################################
@@ -119,12 +119,12 @@ function permuted_matrix_of_transpose_lu(C::Solve.SolveCtx{T, MatT}) where {T <:
 end
 
 function Solve._can_solve_internal_no_check(C::Solve.SolveCtx{T, MatT}, b::MatT, task::Symbol; side::Symbol = :left) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}, MatT}
-  # Split up in separate functions to make the compiler happy
-  if side === :right
-    return Solve._can_solve_internal_no_check_right(C, b, task)
-  else
-    return Solve._can_solve_internal_no_check_left(C, b, task)
-  end
+   # Split up in separate functions to make the compiler happy
+   if side === :right
+      return Solve._can_solve_internal_no_check_right(C, b, task)
+   else
+      return Solve._can_solve_internal_no_check_left(C, b, task)
+   end
 end
 
 function Solve._can_solve_internal_no_check_right(C::Solve.SolveCtx{T, MatT}, b::MatT, task::Symbol) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}, MatT}
@@ -136,22 +136,23 @@ function Solve._can_solve_internal_no_check_right(C::Solve.SolveCtx{T, MatT}, b:
    # Let A = matrix(C) be m x n of rank r. Then LU is build as follows (modulo
    # the permutation p).
    # For example, m = 5, n = 6, r = 3:
-   #   (d u u u u u)
-   #   (l d u u u u)
-   #   (l l d u u u)
-   #   (l l l 0 0 0)
-   #   (l l l 0 0 0)
+   #   (d b b b b b)
+   #   (a d b b b b)
+   #   (a a d b b b)
+   #   (a a a 0 0 0)
+   #   (a a a 0 0 0)
+   #
    # L is the m x r matrix
    #   (1 0 0)
-   #   (l 1 0)
-   #   (l l 1)
-   #   (l l l)
-   #   (l l l)
+   #   (a 1 0)
+   #   (a a 1)
+   #   (a a a)
+   #   (a a a)
    #
    # and U is the r x n matrix
-   #   (d u u u u u)
-   #   (0 d u u u u)
-   #   (0 0 d u u u)
+   #   (d b b b b b)
+   #   (0 d b b b b)
+   #   (0 0 d b b b)
    # Notice that the diagonal entries d need not be non-zero!
 
    # Would be great if there were a `*_solve_lu_precomp` for the finite field
@@ -260,10 +261,10 @@ end
 Return the eigenvalues of `M`.
 """
 function eigenvalues(M::MatElem{T}) where T <: FieldElem
-  @assert is_square(M)
-  K = base_ring(M)
-  f = charpoly(M)
-  return roots(f)
+   @assert is_square(M)
+   K = base_ring(M)
+   f = charpoly(M)
+   return roots(f)
 end
 
 @doc raw"""
@@ -273,12 +274,12 @@ Return the eigenvalues of `M` together with their algebraic multiplicities as a
 vector of tuples.
 """
 function eigenvalues_with_multiplicities(M::MatElem{T}) where T <: FieldElem
-  @assert is_square(M)
-  K = base_ring(M)
-  Kx, x = polynomial_ring(K, "x", cached = false)
-  f = charpoly(Kx, M)
-  r = roots(f)
-  return [ (a, valuation(f, x - a)) for a in r ]
+   @assert is_square(M)
+   K = base_ring(M)
+   Kx, x = polynomial_ring(K, "x", cached = false)
+   f = charpoly(Kx, M)
+   r = roots(f)
+   return [ (a, valuation(f, x - a)) for a in r ]
 end
 
 @doc raw"""
@@ -287,9 +288,9 @@ end
 Return the eigenvalues of `M` over the field `L`.
 """
 function eigenvalues(L::Field, M::MatElem{T}) where T <: RingElem
-  @assert is_square(M)
-  M1 = change_base_ring(L, M)
-  return eigenvalues(M1)
+   @assert is_square(M)
+   M1 = change_base_ring(L, M)
+   return eigenvalues(M1)
 end
 
 @doc raw"""
@@ -299,9 +300,9 @@ Return the eigenvalues of `M` over the field `L` together with their algebraic
 multiplicities as a vector of tuples.
 """
 function eigenvalues_with_multiplicities(L::Field, M::MatElem{T}) where T <: RingElem
-  @assert is_square(M)
-  M1 = change_base_ring(L, M)
-  return eigenvalues_with_multiplicities(M1)
+   @assert is_square(M)
+   M1 = change_base_ring(L, M)
+   return eigenvalues_with_multiplicities(M1)
 end
 
 @doc raw"""
@@ -314,12 +315,12 @@ $Mv = \lambda v$. If side is `:left`, the left eigenspace is computed, i.e. vect
 $v$ such that $vM = \lambda v$.
 """
 function eigenspace(M::MatElem{T}, lambda::T; side::Symbol = :left) where T <: FieldElem
-  @assert is_square(M)
-  N = deepcopy(M)
-  for i = 1:ncols(N)
-    N[i, i] -= lambda
-  end
-  return kernel(N, side = side)
+   @assert is_square(M)
+   N = deepcopy(M)
+   for i = 1:ncols(N)
+      N[i, i] -= lambda
+   end
+   return kernel(N, side = side)
 end
 
 @doc raw"""
@@ -335,12 +336,12 @@ See also `eigenspace`.
 """
 function eigenspaces(M::MatElem{T}; side::Symbol = :left) where T<:FieldElem
 
-  S = eigenvalues(M)
-  L = Dict{elem_type(base_ring(M)), typeof(M)}()
-  for k in S
-    push!(L, k => vcat(eigenspace(M, k, side = side)))
-  end
-  return L
+   S = eigenvalues(M)
+   L = Dict{elem_type(base_ring(M)), typeof(M)}()
+   for k in S
+      push!(L, k => vcat(eigenspace(M, k, side = side)))
+   end
+   return L
 end
 
 ###############################################################################
@@ -366,7 +367,7 @@ function *(x::_FieldMatTypes, P::Perm)
    t = base_ring(x)()
    @inbounds for i = 1:nrows(x)
       for j = 1:ncols(x)
-        z[i, P[j]] = getindex!(t, x, i, j)
+         z[i, P[j]] = getindex!(t, x, i, j)
       end
    end
    return z

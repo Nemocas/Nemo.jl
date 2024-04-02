@@ -39,7 +39,8 @@ function getindex!(v::FpFieldElem, a::FpMatrix, i::Int, j::Int)
    GC.@preserve a begin
       z = ccall((:fmpz_mod_mat_entry, libflint), Ptr{ZZRingElem},
                 (Ref{FpMatrix}, Int, Int), a, i - 1, j - 1)
-      ccall((:fmpz_mod_set_fmpz, libflint), Nothing, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ref{FpField}), v.data, z, base_ring(a))
+      ccall((:fmpz_mod_set_fmpz, libflint), Nothing,
+            (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ref{FpField}), v.data, z, base_ring(a))
    end
    return v
 end
@@ -446,12 +447,12 @@ function lu!(P::Generic.Perm, x::FpMatrix)
                 (Ptr{Int}, Ref{FpMatrix}, Int),
                 P.d, x, 0)
 
-  P.d .+= 1
+   P.d .+= 1
 
-  # flint does x == PLU instead of Px == LU (docs are wrong)
-  inv!(P)
+   # flint does x == PLU instead of Px == LU (docs are wrong)
+   inv!(P)
 
-  return rank
+   return rank
 end
 
 function lu(x::FpMatrix, P = SymmetricGroup(nrows(x)))
@@ -488,5 +489,5 @@ end
 ################################################################################
 
 @inline mat_entry_ptr(A::FpMatrix, i::Int, j::Int) =
-   ccall((:fmpz_mod_mat_entry, libflint),
-      Ptr{ZZRingElem}, (Ref{FpMatrix}, Int, Int), A, i - 1, j - 1)
+   ccall((:fmpz_mod_mat_entry, libflint), Ptr{ZZRingElem},
+         (Ref{FpMatrix}, Int, Int), A, i - 1, j - 1)

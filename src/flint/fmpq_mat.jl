@@ -694,138 +694,138 @@ function Solve._can_solve_internal_no_check(A::QQMatrix, b::QQMatrix, task::Symb
 end
 
 function Solve._init_reduce_fflu(C::Solve.SolveCtx{QQFieldElem})
-  if has_attribute(C, :reduced_matrix_lu)
-    return nothing
-  end
+   if has_attribute(C, :reduced_matrix_lu)
+      return nothing
+   end
 
-  A = matrix(C)
-  Aint = zero_matrix(FlintZZ, nrows(A), ncols(A))
-  dA = FlintZZ()
-  ccall((:fmpq_mat_get_fmpz_mat_matwise, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{QQMatrix}), Aint, dA, A)
-  p = Generic.Perm(nrows(A))
-  dLU = ZZ()
-  p.d .-= 1
-  r = ccall((:fmpz_mat_fflu, libflint), Int,
-            (Ref{ZZMatrix}, Ref{ZZRingElem}, Ptr{Int}, Ref{ZZMatrix}, Int),
-            Aint, dLU, p.d, Aint, 0)
-  p.d .+= 1
-  inv!(p)
-  Solve.set_rank!(C, r)
-  C.lu_perm = p
-  d = divexact(dA, base_ring(C)(dLU))
-  set_attribute!(C, :reduced_matrix_lu => Aint, :scaling_factor_fflu => d)
-  if r < nrows(A)
-    A2 = p*A
-    A3 = view(A2, r + 1:nrows(A), 1:ncols(A))
-    set_attribute!(C, :permuted_matrix_fflu => A3)
-  else
-    set_attribute!(C, :permuted_matrix_fflu => zero(A, 0, ncols(A)))
-  end
-  return nothing
+   A = matrix(C)
+   Aint = zero_matrix(FlintZZ, nrows(A), ncols(A))
+   dA = FlintZZ()
+   ccall((:fmpq_mat_get_fmpz_mat_matwise, libflint), Nothing,
+         (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{QQMatrix}), Aint, dA, A)
+   p = Generic.Perm(nrows(A))
+   dLU = ZZ()
+   p.d .-= 1
+   r = ccall((:fmpz_mat_fflu, libflint), Int,
+             (Ref{ZZMatrix}, Ref{ZZRingElem}, Ptr{Int}, Ref{ZZMatrix}, Int),
+             Aint, dLU, p.d, Aint, 0)
+   p.d .+= 1
+   inv!(p)
+   Solve.set_rank!(C, r)
+   C.lu_perm = p
+   d = divexact(dA, base_ring(C)(dLU))
+   set_attribute!(C, :reduced_matrix_lu => Aint, :scaling_factor_fflu => d)
+   if r < nrows(A)
+      A2 = p*A
+      A3 = view(A2, r + 1:nrows(A), 1:ncols(A))
+      set_attribute!(C, :permuted_matrix_fflu => A3)
+   else
+      set_attribute!(C, :permuted_matrix_fflu => zero(A, 0, ncols(A)))
+   end
+   return nothing
 end
 
 function Solve.lu_permutation(C::Solve.SolveCtx{QQFieldElem})
-  Solve._init_reduce_fflu(C)
-  return C.lu_perm
+   Solve._init_reduce_fflu(C)
+   return C.lu_perm
 end
 
 function Solve.reduced_matrix_lu(C::Solve.SolveCtx{QQFieldElem})
-  Solve._init_reduce_fflu(C)
-  return get_attribute(C, :reduced_matrix_lu)::ZZMatrix
+   Solve._init_reduce_fflu(C)
+   return get_attribute(C, :reduced_matrix_lu)::ZZMatrix
 end
 
 # Factor by which any solution needs to be multiplied.
 # This is the chosen denominator of matrix(C) divided by the denominator computed
 # by fmpz_mat_fflu.
 function Solve.scaling_factor_fflu(C::Solve.SolveCtx{QQFieldElem})
-  Solve._init_reduce_fflu(C)
-  return get_attribute(C, :scaling_factor_fflu)::QQFieldElem
+   Solve._init_reduce_fflu(C)
+   return get_attribute(C, :scaling_factor_fflu)::QQFieldElem
 end
 
 # Let A = matrix(C).
 # Return the matrix (p*A)[rank(A) + 1:nrows(A), :] where p is lu_permutation(C).
 function Solve.permuted_matrix_fflu(C::Solve.SolveCtx{QQFieldElem})
-  Solve._init_reduce_fflu(C)
-  return get_attribute(C, :permuted_matrix_fflu)::QQMatrix
+   Solve._init_reduce_fflu(C)
+   return get_attribute(C, :permuted_matrix_fflu)::QQMatrix
 end
 
 function Solve._init_reduce_transpose_fflu(C::Solve.SolveCtx{QQFieldElem})
-  if has_attribute(C, :reduced_matrix_of_transpose_lu)
-    return nothing
-  end
+   if has_attribute(C, :reduced_matrix_of_transpose_lu)
+      return nothing
+   end
 
-  A = matrix(C)
-  Aint = zero_matrix(FlintZZ, ncols(A), nrows(A))
-  dA = FlintZZ()
-  ccall((:fmpq_mat_get_fmpz_mat_matwise, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{QQMatrix}), Aint, dA, transpose(A))
-  p = Generic.Perm(ncols(A))
-  dLU = ZZ()
-  p.d .-= 1
-  r = ccall((:fmpz_mat_fflu, libflint), Int,
-            (Ref{ZZMatrix}, Ref{ZZRingElem}, Ptr{Int}, Ref{ZZMatrix}, Int),
-            Aint, dLU, p.d, Aint, 0)
-  p.d .+= 1
-  inv!(p)
-  Solve.set_rank!(C, r)
-  C.lu_perm_transp = p
-  d = divexact(dA, base_ring(C)(dLU))
-  set_attribute!(C, :reduced_matrix_of_transpose_lu => Aint, :scaling_factor_of_transpose_fflu => d)
-  if r < ncols(A)
-    A2 = A*p
-    A3 = view(A2, 1:nrows(A), r + 1:ncols(A))
-    set_attribute!(C, :permuted_matrix_of_transpose_fflu => A3)
-  else
-    set_attribute!(C, :permuted_matrix_of_transpose_fflu => zero(A, nrows(A), 0))
-  end
-  return nothing
+   A = matrix(C)
+   Aint = zero_matrix(FlintZZ, ncols(A), nrows(A))
+   dA = FlintZZ()
+   ccall((:fmpq_mat_get_fmpz_mat_matwise, libflint), Nothing,
+         (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{QQMatrix}), Aint, dA, transpose(A))
+   p = Generic.Perm(ncols(A))
+   dLU = ZZ()
+   p.d .-= 1
+   r = ccall((:fmpz_mat_fflu, libflint), Int,
+             (Ref{ZZMatrix}, Ref{ZZRingElem}, Ptr{Int}, Ref{ZZMatrix}, Int),
+             Aint, dLU, p.d, Aint, 0)
+   p.d .+= 1
+   inv!(p)
+   Solve.set_rank!(C, r)
+   C.lu_perm_transp = p
+   d = divexact(dA, base_ring(C)(dLU))
+   set_attribute!(C, :reduced_matrix_of_transpose_lu => Aint, :scaling_factor_of_transpose_fflu => d)
+   if r < ncols(A)
+      A2 = A*p
+      A3 = view(A2, 1:nrows(A), r + 1:ncols(A))
+      set_attribute!(C, :permuted_matrix_of_transpose_fflu => A3)
+   else
+      set_attribute!(C, :permuted_matrix_of_transpose_fflu => zero(A, nrows(A), 0))
+   end
+   return nothing
 end
 
 function Solve.lu_permutation_of_transpose(C::Solve.SolveCtx{QQFieldElem})
-  Solve._init_reduce_transpose_fflu(C)
-  return C.lu_perm_transp
+   Solve._init_reduce_transpose_fflu(C)
+   return C.lu_perm_transp
 end
 
 function Solve.reduced_matrix_of_transpose_lu(C::Solve.SolveCtx{QQFieldElem})
-  Solve._init_reduce_transpose_fflu(C)
-  return get_attribute(C, :reduced_matrix_of_transpose_lu)::ZZMatrix
+   Solve._init_reduce_transpose_fflu(C)
+   return get_attribute(C, :reduced_matrix_of_transpose_lu)::ZZMatrix
 end
 
 # Factor by which any solution needs to be multiplied.
 # This is the chosen denominator of matrix(C) divided by the denominator computed
 # by fmpz_mat_fflu.
 function Solve.scaling_factor_of_transpose_fflu(C::Solve.SolveCtx{QQFieldElem})
-  Solve._init_reduce_transpose_fflu(C)
-  return get_attribute(C, :scaling_factor_of_transpose_fflu)::QQFieldElem
+   Solve._init_reduce_transpose_fflu(C)
+   return get_attribute(C, :scaling_factor_of_transpose_fflu)::QQFieldElem
 end
 
 # Let A = matrix(C).
 # Return the matrix (p*A)[rank(A) + 1:nrows(A), :] where p is lu_permutation_of_transpose(C).
 function Solve.permuted_matrix_of_transpose_fflu(C::Solve.SolveCtx{QQFieldElem})
-  Solve._init_reduce_transpose_fflu(C)
-  return get_attribute(C, :permuted_matrix_of_transpose_fflu)::QQMatrix
+   Solve._init_reduce_transpose_fflu(C)
+   return get_attribute(C, :permuted_matrix_of_transpose_fflu)::QQMatrix
 end
 
 function Solve._can_solve_internal_no_check(C::Solve.SolveCtx{QQFieldElem}, b::QQMatrix, task::Symbol; side::Symbol = :left)
-  # Split up in separate functions to make the compiler happy
-  if side === :right
-    return Solve._can_solve_internal_no_check_right(C, b, task)
-  else
-    return Solve._can_solve_internal_no_check_left(C, b, task)
-  end
+   # Split up in separate functions to make the compiler happy
+   if side === :right
+      return Solve._can_solve_internal_no_check_right(C, b, task)
+   else
+      return Solve._can_solve_internal_no_check_left(C, b, task)
+   end
 end
 
 function Solve._can_solve_internal_no_check_right(C::Solve.SolveCtx{QQFieldElem}, b::QQMatrix, task::Symbol)
    bint = zero_matrix(FlintZZ, nrows(b), ncols(b))
    db = FlintZZ()
    ccall((:fmpq_mat_get_fmpz_mat_matwise, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{QQMatrix}), bint, db, b)
+         (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{QQMatrix}), bint, db, b)
    yint = zero_matrix(FlintZZ, ncols(C), ncols(b))
    p = inv(Solve.lu_permutation(C)).d .- 1
    flag = ccall((:fmpz_mat_solve_fflu_precomp, libflint), Int,
-              (Ref{ZZMatrix}, Ptr{Int}, Ref{ZZMatrix}, Ref{ZZMatrix}),
-              yint, p, Solve.reduced_matrix_lu(C), bint)
+                (Ref{ZZMatrix}, Ptr{Int}, Ref{ZZMatrix}, Ref{ZZMatrix}),
+                yint, p, Solve.reduced_matrix_lu(C), bint)
    fl = Bool(flag)
    if !fl
       return fl, zero(b, 0, 0), zero(b, 0, 0)
@@ -862,8 +862,8 @@ function Solve._can_solve_internal_no_check_left(C::Solve.SolveCtx{QQFieldElem},
    yint = zero_matrix(FlintZZ, nrows(C), ncols(bint))
    p = inv(Solve.lu_permutation_of_transpose(C)).d .- 1
    flag = ccall((:fmpz_mat_solve_fflu_precomp, libflint), Int,
-              (Ref{ZZMatrix}, Ptr{Int}, Ref{ZZMatrix}, Ref{ZZMatrix}),
-              yint, p, Solve.reduced_matrix_of_transpose_lu(C), bint)
+                (Ref{ZZMatrix}, Ptr{Int}, Ref{ZZMatrix}, Ref{ZZMatrix}),
+                yint, p, Solve.reduced_matrix_of_transpose_lu(C), bint)
    fl = Bool(flag)
    if !fl
       return fl, zero(b, 0, 0), zero(b, 0, 0)
