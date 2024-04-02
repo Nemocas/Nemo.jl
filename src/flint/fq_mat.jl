@@ -45,7 +45,8 @@ function getindex!(v::FqPolyRepFieldElem, a::FqPolyRepMatrix, i::Int, j::Int)
    GC.@preserve a begin
       z = ccall((:fq_mat_entry, libflint), Ptr{FqPolyRepFieldElem},
                 (Ref{FqPolyRepMatrix}, Int, Int), a, i - 1, j - 1)
-      ccall((:fq_set, libflint), Nothing, (Ref{FqPolyRepFieldElem}, Ptr{FqPolyRepFieldElem}), v, z)
+      ccall((:fq_set, libflint), Nothing,
+            (Ref{FqPolyRepFieldElem}, Ptr{FqPolyRepFieldElem}), v, z)
    end
    return v
 end
@@ -462,15 +463,17 @@ end
 # different matrix types
 function _solve_tril_right_flint!(x::FqPolyRepMatrix, L::FqPolyRepMatrix, B::FqPolyRepMatrix, unit::Bool)
    ccall((:fq_mat_solve_tril, libflint), Nothing,
-         (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Int, Ref{FqPolyRepField}),
-         x, L, B, Int(unit), base_ring(L))
+         (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix},
+          Cint, Ref{FqPolyRepField}),
+         x, L, B, Cint(unit), base_ring(L))
    return nothing
 end
 
 function _solve_triu_right_flint!(x::FqPolyRepMatrix, U::FqPolyRepMatrix, B::FqPolyRepMatrix, unit::Bool)
    ccall((:fq_mat_solve_triu, libflint), Nothing,
-         (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Int, Ref{FqPolyRepField}),
-         x, U, B, Int(unit), base_ring(U))
+         (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix},
+          Cint, Ref{FqPolyRepField}),
+         x, U, B, Cint(unit), base_ring(U))
    return nothing
 end
 

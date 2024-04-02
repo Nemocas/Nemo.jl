@@ -124,7 +124,8 @@ end
    @boundscheck Generic._checkbounds(A, i, j)
    GC.@preserve A begin
       x = fq_default_mat_entry_ptr(A, i, j)
-      return ccall((:fq_default_is_zero, libflint), Bool, (Ptr{FqFieldElem}, Ref{FqField}), x, base_ring(A))
+      return ccall((:fq_default_is_zero, libflint), Bool,
+                   (Ptr{FqFieldElem}, Ref{FqField}), x, base_ring(A))
    end
 end
 
@@ -452,15 +453,15 @@ end
 # different matrix types
 function _solve_tril_right_flint!(x::FqMatrix, L::FqMatrix, B::FqMatrix, unit::Bool)
    ccall((:fq_default_mat_solve_tril, libflint), Nothing,
-         (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqMatrix}, Int, Ref{FqField}),
-         x, L, B, Int(unit), base_ring(L))
+         (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqMatrix}, Cint, Ref{FqField}),
+         x, L, B, Cint(unit), base_ring(L))
    return nothing
 end
 
 function _solve_triu_right_flint!(x::FqMatrix, U::FqMatrix, B::FqMatrix, unit::Bool)
    ccall((:fq_default_mat_solve_triu, libflint), Nothing,
-         (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqMatrix}, Int, Ref{FqField}),
-         x, U, B, Int(unit), base_ring(U))
+         (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqMatrix}, Cint, Ref{FqField}),
+         x, U, B, Cint(unit), base_ring(U))
    return nothing
 end
 

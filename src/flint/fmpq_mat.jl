@@ -707,8 +707,8 @@ function Solve._init_reduce_fflu(C::Solve.SolveCtx{QQFieldElem})
    dLU = ZZ()
    p.d .-= 1
    r = ccall((:fmpz_mat_fflu, libflint), Int,
-             (Ref{ZZMatrix}, Ref{ZZRingElem}, Ptr{Int}, Ref{ZZMatrix}, Int),
-             Aint, dLU, p.d, Aint, 0)
+             (Ref{ZZMatrix}, Ref{ZZRingElem}, Ptr{Int}, Ref{ZZMatrix}, Cint),
+             Aint, dLU, p.d, Aint, Cint(false))
    p.d .+= 1
    inv!(p)
    Solve.set_rank!(C, r)
@@ -764,8 +764,8 @@ function Solve._init_reduce_transpose_fflu(C::Solve.SolveCtx{QQFieldElem})
    dLU = ZZ()
    p.d .-= 1
    r = ccall((:fmpz_mat_fflu, libflint), Int,
-             (Ref{ZZMatrix}, Ref{ZZRingElem}, Ptr{Int}, Ref{ZZMatrix}, Int),
-             Aint, dLU, p.d, Aint, 0)
+             (Ref{ZZMatrix}, Ref{ZZRingElem}, Ptr{Int}, Ref{ZZMatrix}, Cint),
+             Aint, dLU, p.d, Aint, Cint(false))
    p.d .+= 1
    inv!(p)
    Solve.set_rank!(C, r)
@@ -823,7 +823,7 @@ function Solve._can_solve_internal_no_check_right(C::Solve.SolveCtx{QQFieldElem}
          (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{QQMatrix}), bint, db, b)
    yint = zero_matrix(FlintZZ, ncols(C), ncols(b))
    p = inv(Solve.lu_permutation(C)).d .- 1
-   flag = ccall((:fmpz_mat_solve_fflu_precomp, libflint), Int,
+   flag = ccall((:fmpz_mat_solve_fflu_precomp, libflint), Cint,
                 (Ref{ZZMatrix}, Ptr{Int}, Ref{ZZMatrix}, Ref{ZZMatrix}),
                 yint, p, Solve.reduced_matrix_lu(C), bint)
    fl = Bool(flag)
@@ -861,7 +861,7 @@ function Solve._can_solve_internal_no_check_left(C::Solve.SolveCtx{QQFieldElem},
          (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{QQMatrix}), bint, db, transpose(b))
    yint = zero_matrix(FlintZZ, nrows(C), ncols(bint))
    p = inv(Solve.lu_permutation_of_transpose(C)).d .- 1
-   flag = ccall((:fmpz_mat_solve_fflu_precomp, libflint), Int,
+   flag = ccall((:fmpz_mat_solve_fflu_precomp, libflint), Cint,
                 (Ref{ZZMatrix}, Ptr{Int}, Ref{ZZMatrix}, Ref{ZZMatrix}),
                 yint, p, Solve.reduced_matrix_of_transpose_lu(C), bint)
    fl = Bool(flag)

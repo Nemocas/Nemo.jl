@@ -321,15 +321,15 @@ end
 # different matrix types
 function _solve_tril_right_flint!(x::fpMatrix, L::fpMatrix, B::fpMatrix, unit::Bool)
    ccall((:nmod_mat_solve_tril, libflint), Nothing,
-         (Ref{fpMatrix}, Ref{fpMatrix}, Ref{fpMatrix}, Int),
-         x, L, B, Int(unit))
+         (Ref{fpMatrix}, Ref{fpMatrix}, Ref{fpMatrix}, Cint),
+         x, L, B, Cint(unit))
    return nothing
 end
 
 function _solve_triu_right_flint!(x::fpMatrix, U::fpMatrix, B::fpMatrix, unit::Bool)
    ccall((:nmod_mat_solve_triu, libflint), Nothing,
-         (Ref{fpMatrix}, Ref{fpMatrix}, Ref{fpMatrix}, Int),
-         x, U, B, Int(unit))
+         (Ref{fpMatrix}, Ref{fpMatrix}, Ref{fpMatrix}, Cint),
+         x, U, B, Cint(unit))
    return nothing
 end
 
@@ -536,8 +536,8 @@ function lu!(P::Generic.Perm, x::fpMatrix)
    P.d .-= 1
 
    rank = ccall((:nmod_mat_lu, libflint), Int,
-                (Ptr{Int}, Ref{fpMatrix}, Int),
-                P.d, x, 0)
+                (Ptr{Int}, Ref{fpMatrix}, Cint),
+                P.d, x, Cint(false))
 
    P.d .+= 1
 

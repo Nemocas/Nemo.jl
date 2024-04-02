@@ -451,15 +451,17 @@ end
 # different matrix types
 function _solve_tril_right_flint!(x::fqPolyRepMatrix, L::fqPolyRepMatrix, B::fqPolyRepMatrix, unit::Bool)
    ccall((:fq_nmod_mat_solve_tril, libflint), Nothing,
-         (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Int, Ref{fqPolyRepField}),
-         x, L, B, Int(unit), base_ring(L))
+         (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix},
+          Cint, Ref{fqPolyRepField}),
+         x, L, B, Cint(unit), base_ring(L))
    return nothing
 end
 
 function _solve_triu_right_flint!(x::fqPolyRepMatrix, U::fqPolyRepMatrix, B::fqPolyRepMatrix, unit::Bool)
    ccall((:fq_nmod_mat_solve_triu, libflint), Nothing,
-         (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Int, Ref{fqPolyRepField}),
-         x, U, B, Int(unit), base_ring(U))
+         (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix},
+          Cint, Ref{fqPolyRepField}),
+         x, U, B, Cint(unit), base_ring(U))
    return nothing
 end
 
