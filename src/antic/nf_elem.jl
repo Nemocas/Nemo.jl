@@ -253,21 +253,17 @@ end
 function Base.show(io::IO, ::MIME"text/plain", a::AbsSimpleNumField)
    @show_name(io, a)
    @show_special(io, MIME"text/plain"(), a)
-   print(io, "Number field with defining polynomial ", defining_polynomial(a))
-   println(io)
+   println(io, "Number field with defining polynomial ", defining_polynomial(a))
    io = pretty(io)
    print(io, Indent(), "over ", Lowercase(), QQ, Dedent())
-   #print(IOContext(io, :supercompact => true))
 end
 
 function Base.show(io::IO, a::AbsSimpleNumField)
   @show_name(io, a)
   @show_special(io, a)
   if get(io, :supercompact, false)
-    # no nested printing
     print(io, "Number field")
   else
-    # nested printing allowed, preferably supercompact
     io = pretty(io)
     print(io, "Number field of degree $(degree(a))")
     print(IOContext(io, :supercompact => true), " over ", Lowercase(), QQ)
@@ -1174,6 +1170,19 @@ Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$
 of the number field $\mathbb{Q}[x]/(f)$ where $f$ is the supplied polynomial.
 The supplied string `s` specifies how the generator of the number field
 should be printed. If `s` is not specified, it defaults to `_a`.
+
+# Examples
+
+```jldoctest
+julia> R, x = polynomial_ring(QQ, "x");
+
+julia> K, a = number_field(x^3 + 3x + 1, "a")
+(Number field of degree 3 over QQ, a)
+
+julia> K
+Number field with defining polynomial x^3 + 3*x + 1
+  over rational field
+```
 """
 function number_field(f::QQPolyRingElem, s::VarName = "_a"; cached::Bool = true, check::Bool = true)
    parent_obj = AbsSimpleNumField(f, Symbol(s), cached, check)
