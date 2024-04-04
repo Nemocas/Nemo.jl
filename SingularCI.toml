@@ -1,4 +1,4 @@
-title = "metadata for Oscar CI run"
+title = "metadata for Singular CI run"
 
 [env]
 # os = [ "ubuntu-latest" ]
@@ -6,11 +6,5 @@ title = "metadata for Oscar CI run"
 # branches = [ "<matching>", "release" ]
 
 [pkgs]
-  [pkgs.Oscar]
-  test = true
-
   [pkgs.Singular]
-  test = false
-
-  [pkgs.Hecke]
-  test = false
+  test = true
