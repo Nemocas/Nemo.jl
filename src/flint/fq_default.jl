@@ -776,16 +776,7 @@ promote_rule(::Type{FqFieldElem}, ::Type{ZZRingElem}) = FqFieldElem
 #
 ###############################################################################
 
-fq_calls = Dict(backtrace()=>1)
 function (a::FqField)()
-  global fq_calls
-  b = backtrace()
-  if haskey(fq_calls, b)
-    fq_calls[b] += 1
-  else
-    fq_calls[b] = 1
-  end
-   
    z = FqFieldElem(a)
    return z
 end
