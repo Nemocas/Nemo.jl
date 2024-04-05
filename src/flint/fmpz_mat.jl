@@ -535,7 +535,7 @@ that $z/d$ is the inverse of $x$.
 
 # Examples
 ```jldoctest
-julia> A = S[1 0 1; 2 3 1; 5 6 7]
+julia> A = ZZ[1 0 1; 2 3 1; 5 6 7]
 [1   0   1]
 [2   3   1]
 [5   6   7]

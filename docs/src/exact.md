@@ -180,7 +180,7 @@ ERROR: unable to convert to a rational number
 To compute arbitrary-precision numerical enclosures, convert to
 `ArbField` or `AcbField`:
 
-```jldoctest
+```jldoctest; setup = :(C = CalciumField())
 julia> CC = AcbField(64)
 Complex Field with 64 bits of precision and error bounds
 
