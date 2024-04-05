@@ -582,7 +582,7 @@ julia> A = CC[2 2 3; 0 2 5; 0 0 2]
 [                    0                       0   2.0000000000000000000]
 
 julia> eigenvalues(A)
-1-element Vector{AcbFieldElem}:
+1-element Vector{ComplexFieldElem}:
  2.0000000000000000000
 
 julia> eigenvalues_with_multiplicities(A)
