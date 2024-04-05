@@ -1363,7 +1363,7 @@ may be much smaller than a worst-case bound.
 function guess end
 
 function guess(R::QQBarField, x::T, maxdeg::Int, maxbits::Int=0) where {T <: Union{AcbFieldElem, ComplexFieldElem}}
-   prec = precision(Balls)
+   prec = precision(parent(x))
    if maxbits <= 0
       maxbits = prec
    end
@@ -1378,7 +1378,7 @@ function guess(R::QQBarField, x::T, maxdeg::Int, maxbits::Int=0) where {T <: Uni
 end
 
 function guess(R::QQBarField, x::ArbFieldElem, maxdeg::Int, maxbits::Int=0)
-   CC = AcbField()
+   CC = AcbField(precision(parent(x)))
    return guess(R, CC(x), maxdeg, maxbits)
 end
 
@@ -1428,7 +1428,7 @@ Convert `a` to a real ball with the precision of the parent field `R`.
 Throws if `a` is not a real number.
 """
 function (R::RealField)(a::QQBarFieldElem)
-   prec = precision(R)
+   prec = precision(Balls)
    z = R()
    ccall((:qqbar_get_arb, libcalcium),
         Nothing, (Ref{RealFieldElem}, Ref{QQBarFieldElem}, Int), z, a, prec)
@@ -1442,7 +1442,7 @@ end
 Convert `a` to a complex ball with the precision of the parent field `R`.
 """
 function (R::ComplexField)(a::QQBarFieldElem)
-   prec = precision(R)
+   prec = precision(Balls)
    z = R()
    ccall((:qqbar_get_acb, libcalcium),
         Nothing, (Ref{ComplexFieldElem}, Ref{QQBarFieldElem}, Int), z, a, prec)

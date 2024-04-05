@@ -5,7 +5,7 @@ DocTestSetup = quote
 end
 ```
 
-# Fixed precisioncomplex balls
+# Fixed precision complex balls
 
 Arbitrary precision complex ball arithmetic is supplied by Arb which provides a
 ball representation which tracks error bounds rigorously. Complex numbers are 
@@ -17,9 +17,9 @@ constructs the parent object for the Arb complex field.
 The types of complex boxes in Nemo are given in the following table, along with
 the libraries that provide them and the associated types of the parent objects.
 
- Library | Field                | Element type  | Parent type
----------|----------------------|---------------|--------------
-Arb      | $\mathbb{C}$ (boxes) | `AcbFieldElem`         | `AcbField`
+ Library | Field                | Element type   | Parent type
+---------|----------------------|----------------|--------------
+Arb      | $\mathbb{C}$ (boxes) | `AcbFieldElem` | `AcbField`
 
 All the complex field types belong to the `Field` abstract type and the types of
 elements in this field, i.e. complex boxes in this case, belong to the
