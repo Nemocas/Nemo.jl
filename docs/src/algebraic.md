@@ -323,7 +323,7 @@ Root 1.41421 of x^2 - 2
 Warning: the input should be an enclosure. If you have a floating-point
 approximation, you should add an error estimate; otherwise, at best the only
 algebraic number that can be guessed is the binary floating-point number
-itself, at worst no guess is possible
+itself, at worst no guess is possible.
 
 ```jldoctest
 julia> RR = RealField();
