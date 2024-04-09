@@ -181,16 +181,30 @@ return it. A copy of the original is not made.
 
 Here are some examples of coercing elements into the Arb complex field.
 
-```
-RR = RealField()
-CC = ComplexField()
+```jldoctest
+julia> RR = RealField()
+Real field
 
-a = CC(3)
-b = CC(QQ(2,3))
-c = CC("3 +/- 0.0001")
-d = CC("-1.24e+12345")
-f = CC("nan +/- inf")
-g = CC(RR(3))
+julia> CC = ComplexField()
+Complex field
+
+julia> a = CC(3)
+3.0000000000000000000
+
+julia> b = CC(QQ(2,3))
+[0.6666666666666666666 +/- 8.48e-20]
+
+julia> c = CC("3 +/- 0.0001")
+[3.000 +/- 1.01e-4]
+
+julia> d = CC("-1.24e+12345")
+[-1.240000000000000000e+12345 +/- 1.16e+12326]
+
+julia> f = CC("nan +/- inf")
+nan
+
+julia> g = CC(RR(3))
+3.0000000000000000000
 ```
 
 In addition to the above, developers of custom complex field types must ensure

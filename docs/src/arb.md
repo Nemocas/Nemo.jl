@@ -163,25 +163,32 @@ f = accuracy_bits(a)
 Printing real balls can at first sight be confusing. Lets look at the following
 example:
 
-```julia
-RR = ArbField(64)
+```jldoctest
+julia> RR = ArbField(64)
+Real Field with 64 bits of precision and error bounds
 
-a = RR(1)
-b = RR(2)
-c = RR(12)
+julia> a = RR(1)
+1.0000000000000000000
 
-x = ball(a, b)
-y = ball(c, b)
+julia> b = RR(2)
+2.0000000000000000000
 
-mid = midpoint(x)
-rad = radius(x)
+julia> c = RR(12)
+12.000000000000000000
 
-print(x, "\n", y, "\n", mid, "\n", rad)
-```
+julia> x = ball(a, b)
+[+/- 3.01]
 
-which generates
+julia> y = ball(c, b)
+[1e+1 +/- 4.01]
 
-```
+julia> mid = midpoint(x)
+1.0000000000000000000
+
+julia> rad = radius(x)
+[2.0000000037252902985 +/- 3.81e-20]
+
+julia> print(x, "\n", y, "\n", mid, "\n", rad)
 [+/- 3.01]
 [1e+1 +/- 4.01]
 1.0000000000000000000

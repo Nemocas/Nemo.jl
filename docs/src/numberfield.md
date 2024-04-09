@@ -97,12 +97,18 @@ representation as a polynomial. See the following examples for how to do this.
 
 **Examples**
 
-```
-R, x = polynomial_ring(QQ, "x")
-K, a = number_field(x^3 + 3x + 1, "a")
+```jldoctest
+julia> R, x = polynomial_ring(QQ, "x")
+(Univariate polynomial ring in x over QQ, x)
 
-d = gen(K)
-f = a^2 + 2a - 7
+julia> K, a = number_field(x^3 + 3x + 1, "a")
+(Number field of degree 3 over QQ, a)
+
+julia> d = gen(K)
+a
+
+julia> f = a^2 + 2a - 7
+a^2 + 2*a - 7
 ```
 
 ### Basic functionality
@@ -137,12 +143,18 @@ number field is a quotient.
 
 **Examples**
 
-```
-R, x = polynomial_ring(QQ, "x")
-K, a = number_field(x^3 + 3x + 1, "a")
+```jldoctest
+julia> R, x = polynomial_ring(QQ, "x")
+(Univariate polynomial ring in x over QQ, x)
 
-f = R(a^2 + 2a + 3)
-g = K(x^2 + 2x + 1)
+julia> K, a = number_field(x^3 + 3x + 1, "a")
+(Number field of degree 3 over QQ, a)
+
+julia> f = R(a^2 + 2a + 3)
+x^2 + 2*x + 3
+
+julia> g = K(x^2 + 2x + 1)
+a^2 + 2*a + 1
 ```
 
 ### Basic manipulation

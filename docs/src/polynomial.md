@@ -295,7 +295,7 @@ factor_distinct_deg(::fqPolyRepPolyRingElem)
 
 **Examples**
 
-```
+```jldoctest
 julia> R, = residue_ring(ZZ, 23)
 (Integers modulo 23, Map: ZZ -> ZZ/(23))
 
