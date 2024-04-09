@@ -1,3 +1,10 @@
+```@meta
+CurrentModule = Nemo
+DocTestSetup = quote
+    using Nemo
+end
+```
+
 # Constructing mathematical objects in Nemo
 
 ## Constructing objects in Julia
