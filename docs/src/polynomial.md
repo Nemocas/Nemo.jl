@@ -108,7 +108,9 @@ y^2 + 2.0000000000000000000*y + 3.0000000000000000000
 julia> n = m + CC("0 +/- 0.0001", "0 +/- 0.0001")
 y^2 + 2.0000000000000000000*y + [3.000 +/- 1.01e-4] + [+/- 1.01e-4]*im
 
-julia> r = roots(n)
+julia> r = roots(n);
+
+julia> sort(r; by=x->(real(x), imag(x))) # sort roots to make printing consistent
 2-element Vector{ComplexFieldElem}:
  [-1.00 +/- 1.01e-4] + [-1.414 +/- 3.14e-4]*im
  [-1.00 +/- 1.01e-4] + [1.414 +/- 3.14e-4]*im
@@ -116,7 +118,9 @@ julia> r = roots(n)
 julia> p = y^7 - 1
 y^7 - 1.0000000000000000000
 
-julia> r = roots(n, isolate_real = true)
+julia> r = roots(n, isolate_real = true);
+
+julia> sort(r; by=x->(real(x), imag(x))) # sort roots to make printing consistent
 2-element Vector{ComplexFieldElem}:
  [-1.00 +/- 1.01e-4] + [-1.414 +/- 3.14e-4]*im
  [-1.00 +/- 1.01e-4] + [1.414 +/- 3.14e-4]*im
