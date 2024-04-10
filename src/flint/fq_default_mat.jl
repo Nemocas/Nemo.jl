@@ -93,7 +93,7 @@ function Generic.add_one!(a::FqMatrix, i::Int, j::Int)
     x = ccall((:nmod_add, libflint), Int, (Int, Int, Ref{FqField}), x, 1, k)
     ccall((:nmod_mat_set_entry, libflint), Int, (Ref{FqMatrix}, Int, Int, Int), a, i-1, j-1, x)
   else
-    a[i,j] += 1
+    a[i, j] += 1
   end
 end
 
@@ -172,32 +172,24 @@ isequal(a::FqMatrix, b::FqMatrix) = ==(a, b)
 ################################################################################
 
 function transpose(a::FqMatrix)
-   z = FqMatrix(ncols(a), nrows(a), base_ring(a))
-   if _fq_default_ctx_type(base_ring(a)) == _FQ_DEFAULT_NMOD
-     ccall((:nmod_mat_transpose, libflint), Nothing, (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), z, a, base_ring(a))
-     return z
-   end
-   for i in 1:nrows(a)
-      for j in 1:ncols(a)
-         z[j, i] = a[i, j]
-      end
-   end
-   return z
+  z = similar(a, ncols(a), nrows(a))
+  if _fq_default_ctx_type(base_ring(a)) == _FQ_DEFAULT_NMOD
+    ccall((:nmod_mat_transpose, libflint), Nothing, (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), z, a, base_ring(a))
+    return z
+  elseif _fq_default_ctx_type(base_ring(a)) == _FQ_DEFAULT_FMPZ_NMOD
+    ccall((:fmpz_mod_mat_transpose, libflint), Nothing, (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), z, a, base_ring(a))
+    return z
+  end
+  # There is no flint functionality for the other cases
+  t = base_ring(a)()
+  for i in 1:nrows(a)
+    for j in 1:ncols(a)
+      getindex!(t, a, i, j)
+      z[j, i] = t
+    end
+  end
+  return z
 end
-
-# There is no transpose for FqMatrix
-#function transpose(a::FqMatrix)
-#  z = FqMatrixSpace(base_ring(a), ncols(a), nrows(a))()
-#  ccall((:fq_default_mat_transpose, libflint), Nothing,
-#        (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), z, a, base_ring(a))
-#  return z
-#end
-#
-#function transpose!(a::FqMatrix)
-#  !is_square(a) && error("Matrix must be a square matrix")
-#  ccall((:fq_default_mat_transpose, libflint), Nothing,
-#        (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), a, a, base_ring(a))
-#end
 
 ###############################################################################
 #
