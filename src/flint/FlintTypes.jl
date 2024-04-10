@@ -4884,7 +4884,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
    end
 
    function QQMatrix(r::Int, c::Int)
-     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
+     (r < 0 || c < 0) && throw(_err_dim_negative)
       z = new()
       ccall((:fmpq_mat_init, libflint), Nothing,
             (Ref{QQMatrix}, Int, Int), z, r, c)
@@ -4893,7 +4893,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
    end
 
    function QQMatrix(r::Int, c::Int, arr::AbstractMatrix{QQFieldElem})
-     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
+     (r < 0 || c < 0) && throw(_err_dim_negative)
       z = new()
       ccall((:fmpq_mat_init, libflint), Nothing,
             (Ref{QQMatrix}, Int, Int), z, r, c)
@@ -4910,7 +4910,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
    end
 
    function QQMatrix(r::Int, c::Int, arr::AbstractMatrix{ZZRingElem})
-     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
+     (r < 0 || c < 0) && throw(_err_dim_negative)
       z = new()
       ccall((:fmpq_mat_init, libflint), Nothing,
             (Ref{QQMatrix}, Int, Int), z, r, c)
@@ -4929,7 +4929,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
 
 
    function QQMatrix(r::Int, c::Int, arr::AbstractVector{QQFieldElem})
-     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
+     (r < 0 || c < 0) && throw(_err_dim_negative)
       z = new()
       ccall((:fmpq_mat_init, libflint), Nothing,
             (Ref{QQMatrix}, Int, Int), z, r, c)
@@ -4946,7 +4946,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
    end
 
    function QQMatrix(r::Int, c::Int, arr::AbstractVector{ZZRingElem})
-     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
+     (r < 0 || c < 0) && throw(_err_dim_negative)
       z = new()
       ccall((:fmpq_mat_init, libflint), Nothing,
             (Ref{QQMatrix}, Int, Int), z, r, c)
@@ -4965,7 +4965,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
 
 
    function QQMatrix(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: Integer}
-     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
+     (r < 0 || c < 0) && throw(_err_dim_negative)
       z = new()
       ccall((:fmpq_mat_init, libflint), Nothing,
             (Ref{QQMatrix}, Int, Int), z, r, c)
@@ -4982,7 +4982,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
    end
 
    function QQMatrix(r::Int, c::Int, arr::AbstractVector{T}) where {T <: Integer}
-     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
+     (r < 0 || c < 0) && throw(_err_dim_negative)
       z = new()
       ccall((:fmpq_mat_init, libflint), Nothing,
             (Ref{QQMatrix}, Int, Int), z, r, c)
@@ -4999,7 +4999,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
    end
 
    function QQMatrix(r::Int, c::Int, d::QQFieldElem)
-     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
+     (r < 0 || c < 0) && throw(_err_dim_negative)
       z = new()
       ccall((:fmpq_mat_init, libflint), Nothing,
             (Ref{QQMatrix}, Int, Int), z, r, c)
@@ -5038,7 +5038,7 @@ struct ZZMatrixSpace <: MatSpace{ZZRingElem}
    ncols::Int
 
    function ZZMatrixSpace(r::Int, c::Int)
-     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
+     (r < 0 || c < 0) && throw(_err_dim_negative)
       return new(r, c)
    end
 end
@@ -5056,7 +5056,7 @@ mutable struct ZZMatrix <: MatElem{ZZRingElem}
    end
 
    function ZZMatrix(r::Int, c::Int)
-     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
+     (r < 0 || c < 0) && throw(_err_dim_negative)
       z = new()
       ccall((:fmpz_mat_init, libflint), Nothing,
             (Ref{ZZMatrix}, Int, Int), z, r, c)
@@ -5065,7 +5065,7 @@ mutable struct ZZMatrix <: MatElem{ZZRingElem}
    end
 
    function ZZMatrix(r::Int, c::Int, arr::AbstractMatrix{ZZRingElem})
-     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
+     (r < 0 || c < 0) && throw(_err_dim_negative)
       z = new()
       ccall((:fmpz_mat_init, libflint), Nothing,
             (Ref{ZZMatrix}, Int, Int), z, r, c)
@@ -5082,7 +5082,7 @@ mutable struct ZZMatrix <: MatElem{ZZRingElem}
    end
 
    function ZZMatrix(r::Int, c::Int, arr::AbstractVector{ZZRingElem})
-     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
+     (r < 0 || c < 0) && throw(_err_dim_negative)
       z = new()
       ccall((:fmpz_mat_init, libflint), Nothing,
             (Ref{ZZMatrix}, Int, Int), z, r, c)
@@ -5099,7 +5099,7 @@ mutable struct ZZMatrix <: MatElem{ZZRingElem}
    end
 
    function ZZMatrix(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: Integer}
-     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
+     (r < 0 || c < 0) && throw(_err_dim_negative)
       z = new()
       ccall((:fmpz_mat_init, libflint), Nothing,
             (Ref{ZZMatrix}, Int, Int), z, r, c)
@@ -5116,7 +5116,7 @@ mutable struct ZZMatrix <: MatElem{ZZRingElem}
    end
 
    function ZZMatrix(r::Int, c::Int, arr::AbstractVector{T}) where {T <: Integer}
-     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
+     (r < 0 || c < 0) && throw(_err_dim_negative)
       z = new()
       ccall((:fmpz_mat_init, libflint), Nothing,
             (Ref{ZZMatrix}, Int, Int), z, r, c)
@@ -5133,7 +5133,7 @@ mutable struct ZZMatrix <: MatElem{ZZRingElem}
    end
 
    function ZZMatrix(r::Int, c::Int, d::ZZRingElem)
-     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
+     (r < 0 || c < 0) && throw(_err_dim_negative)
       z = new()
       ccall((:fmpz_mat_init, libflint), Nothing,
             (Ref{ZZMatrix}, Int, Int), z, r, c)
@@ -5195,6 +5195,7 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
   end
 
   function zzModMatrix(r::Int, c::Int, n::UInt)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:nmod_mat_init, libflint), Nothing,
             (Ref{zzModMatrix}, Int, Int, UInt), z, r, c, n)
@@ -5203,6 +5204,7 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
   end
 
   function zzModMatrix(r::Int, c::Int, n::UInt, arr::AbstractMatrix{UInt}, transpose::Bool = false)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:nmod_mat_init, libflint), Nothing,
             (Ref{zzModMatrix}, Int, Int, UInt), z, r, c, n)
@@ -5219,6 +5221,7 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
   end
 
   function zzModMatrix(r::Int, c::Int, n::UInt, arr::AbstractVector{UInt})
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:nmod_mat_init, libflint), Nothing,
             (Ref{zzModMatrix}, Int, Int, UInt), z, r, c, n)
@@ -5232,6 +5235,7 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
   end
 
   function zzModMatrix(r::Int, c::Int, n::UInt, arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:nmod_mat_init, libflint), Nothing,
             (Ref{zzModMatrix}, Int, Int, UInt), z, r, c, n)
@@ -5251,6 +5255,7 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
   end
 
   function zzModMatrix(r::Int, c::Int, n::UInt, arr::AbstractVector{ZZRingElem})
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:nmod_mat_init, libflint), Nothing,
             (Ref{zzModMatrix}, Int, Int, UInt), z, r, c, n)
@@ -5277,6 +5282,7 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
   end
 
   function zzModMatrix(r::Int, c::Int, n::UInt, arr::AbstractMatrix{zzModRingElem}, transpose::Bool = false)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:nmod_mat_init, libflint), Nothing,
             (Ref{zzModMatrix}, Int, Int, UInt), z, r, c, n)
@@ -5293,6 +5299,7 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
   end
 
   function zzModMatrix(r::Int, c::Int, n::UInt, arr::AbstractVector{zzModRingElem})
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:nmod_mat_init, libflint), Nothing,
             (Ref{zzModMatrix}, Int, Int, UInt), z, r, c, n)
@@ -5367,6 +5374,7 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
   end
 
   function ZZModMatrix(r::Int, c::Int, n::ZZRingElem)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
             (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
@@ -5375,6 +5383,7 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
   end
 
   function ZZModMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
             (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
@@ -5391,6 +5400,7 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
   end
 
   function ZZModMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractMatrix{T}, transpose::Bool = false) where T <: Integer
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
 	  (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
@@ -5407,6 +5417,7 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
   end
 
   function ZZModMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractMatrix{ZZModRingElem}, transpose::Bool = false)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
 	  (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
@@ -5423,6 +5434,7 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
   end
 
   function ZZModMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractVector{ZZRingElem})
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
             (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
@@ -5436,6 +5448,7 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
   end
 
   function ZZModMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractVector{T}) where T <: Integer
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
           (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
@@ -5449,6 +5462,7 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
   end
 
   function ZZModMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractVector{ZZModRingElem})
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
 	  (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
@@ -5526,6 +5540,7 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
   end
 
   function FpMatrix(r::Int, c::Int, n::ZZRingElem)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
             (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
@@ -5534,6 +5549,7 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
   end
 
   function FpMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
           (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
@@ -5550,6 +5566,7 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
   end
 
   function FpMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractMatrix{T}, transpose::Bool = false) where T <: Integer
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
           (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
@@ -5566,6 +5583,7 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
   end
 
   function FpMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractMatrix{FpFieldElem}, transpose::Bool = false)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
           (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
@@ -5582,6 +5600,7 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
   end
 
   function FpMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractVector{ZZRingElem})
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
           (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
@@ -5595,6 +5614,7 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
   end
 
   function FpMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractVector{T}) where T <: Integer
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
           (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
@@ -5608,6 +5628,7 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
   end
 
   function FpMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractVector{FpFieldElem})
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
           (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
@@ -5662,6 +5683,7 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
   end
 
   function fpMatrix(r::Int, c::Int, n::UInt)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:nmod_mat_init, libflint), Nothing,
             (Ref{fpMatrix}, Int, Int, UInt), z, r, c, n)
@@ -5670,6 +5692,7 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
   end
 
   function fpMatrix(r::Int, c::Int, n::UInt, arr::AbstractMatrix{UInt}, transpose::Bool = false)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:nmod_mat_init, libflint), Nothing,
             (Ref{fpMatrix}, Int, Int, UInt), z, r, c, n)
@@ -5686,6 +5709,7 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
   end
 
   function fpMatrix(r::Int, c::Int, n::UInt, arr::AbstractVector{UInt})
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:nmod_mat_init, libflint), Nothing,
             (Ref{fpMatrix}, Int, Int, UInt), z, r, c, n)
@@ -5699,6 +5723,7 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
   end
 
   function fpMatrix(r::Int, c::Int, n::UInt, arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:nmod_mat_init, libflint), Nothing,
             (Ref{fpMatrix}, Int, Int, UInt), z, r, c, n)
@@ -5718,6 +5743,7 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
   end
 
   function fpMatrix(r::Int, c::Int, n::UInt, arr::AbstractVector{ZZRingElem})
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:nmod_mat_init, libflint), Nothing,
             (Ref{fpMatrix}, Int, Int, UInt), z, r, c, n)
@@ -5744,6 +5770,7 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
   end
 
   function fpMatrix(r::Int, c::Int, n::UInt, arr::AbstractMatrix{fpFieldElem}, transpose::Bool = false)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:nmod_mat_init, libflint), Nothing,
             (Ref{fpMatrix}, Int, Int, UInt), z, r, c, n)
@@ -5760,6 +5787,7 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
   end
 
   function fpMatrix(r::Int, c::Int, n::UInt, arr::AbstractVector{fpFieldElem})
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     z = new()
     ccall((:nmod_mat_init, libflint), Nothing,
             (Ref{fpMatrix}, Int, Int, UInt), z, r, c, n)
