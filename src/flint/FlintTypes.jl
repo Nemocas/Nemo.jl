@@ -4884,6 +4884,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
    end
 
    function QQMatrix(r::Int, c::Int)
+     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
       z = new()
       ccall((:fmpq_mat_init, libflint), Nothing,
             (Ref{QQMatrix}, Int, Int), z, r, c)
@@ -4892,6 +4893,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
    end
 
    function QQMatrix(r::Int, c::Int, arr::AbstractMatrix{QQFieldElem})
+     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
       z = new()
       ccall((:fmpq_mat_init, libflint), Nothing,
             (Ref{QQMatrix}, Int, Int), z, r, c)
@@ -4908,6 +4910,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
    end
 
    function QQMatrix(r::Int, c::Int, arr::AbstractMatrix{ZZRingElem})
+     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
       z = new()
       ccall((:fmpq_mat_init, libflint), Nothing,
             (Ref{QQMatrix}, Int, Int), z, r, c)
@@ -4926,6 +4929,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
 
 
    function QQMatrix(r::Int, c::Int, arr::AbstractVector{QQFieldElem})
+     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
       z = new()
       ccall((:fmpq_mat_init, libflint), Nothing,
             (Ref{QQMatrix}, Int, Int), z, r, c)
@@ -4942,6 +4946,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
    end
 
    function QQMatrix(r::Int, c::Int, arr::AbstractVector{ZZRingElem})
+     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
       z = new()
       ccall((:fmpq_mat_init, libflint), Nothing,
             (Ref{QQMatrix}, Int, Int), z, r, c)
@@ -4960,6 +4965,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
 
 
    function QQMatrix(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: Integer}
+     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
       z = new()
       ccall((:fmpq_mat_init, libflint), Nothing,
             (Ref{QQMatrix}, Int, Int), z, r, c)
@@ -4976,6 +4982,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
    end
 
    function QQMatrix(r::Int, c::Int, arr::AbstractVector{T}) where {T <: Integer}
+     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
       z = new()
       ccall((:fmpq_mat_init, libflint), Nothing,
             (Ref{QQMatrix}, Int, Int), z, r, c)
@@ -4992,6 +4999,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
    end
 
    function QQMatrix(r::Int, c::Int, d::QQFieldElem)
+     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
       z = new()
       ccall((:fmpq_mat_init, libflint), Nothing,
             (Ref{QQMatrix}, Int, Int), z, r, c)
@@ -5030,6 +5038,7 @@ struct ZZMatrixSpace <: MatSpace{ZZRingElem}
    ncols::Int
 
    function ZZMatrixSpace(r::Int, c::Int)
+     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
       return new(r, c)
    end
 end
@@ -5047,6 +5056,7 @@ mutable struct ZZMatrix <: MatElem{ZZRingElem}
    end
 
    function ZZMatrix(r::Int, c::Int)
+     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
       z = new()
       ccall((:fmpz_mat_init, libflint), Nothing,
             (Ref{ZZMatrix}, Int, Int), z, r, c)
@@ -5055,6 +5065,7 @@ mutable struct ZZMatrix <: MatElem{ZZRingElem}
    end
 
    function ZZMatrix(r::Int, c::Int, arr::AbstractMatrix{ZZRingElem})
+     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
       z = new()
       ccall((:fmpz_mat_init, libflint), Nothing,
             (Ref{ZZMatrix}, Int, Int), z, r, c)
@@ -5071,6 +5082,7 @@ mutable struct ZZMatrix <: MatElem{ZZRingElem}
    end
 
    function ZZMatrix(r::Int, c::Int, arr::AbstractVector{ZZRingElem})
+     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
       z = new()
       ccall((:fmpz_mat_init, libflint), Nothing,
             (Ref{ZZMatrix}, Int, Int), z, r, c)
@@ -5087,6 +5099,7 @@ mutable struct ZZMatrix <: MatElem{ZZRingElem}
    end
 
    function ZZMatrix(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: Integer}
+     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
       z = new()
       ccall((:fmpz_mat_init, libflint), Nothing,
             (Ref{ZZMatrix}, Int, Int), z, r, c)
@@ -5103,6 +5116,7 @@ mutable struct ZZMatrix <: MatElem{ZZRingElem}
    end
 
    function ZZMatrix(r::Int, c::Int, arr::AbstractVector{T}) where {T <: Integer}
+     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
       z = new()
       ccall((:fmpz_mat_init, libflint), Nothing,
             (Ref{ZZMatrix}, Int, Int), z, r, c)
@@ -5119,6 +5133,7 @@ mutable struct ZZMatrix <: MatElem{ZZRingElem}
    end
 
    function ZZMatrix(r::Int, c::Int, d::ZZRingElem)
+     @req (r >= 0 && c >= 0)  "Number of rows/columns must be non-negative"
       z = new()
       ccall((:fmpz_mat_init, libflint), Nothing,
             (Ref{ZZMatrix}, Int, Int), z, r, c)
