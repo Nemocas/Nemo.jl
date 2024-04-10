@@ -66,20 +66,6 @@ end
    nothing
 end
 
-function AbstractAlgebra._vcat(A::Vector{FqMatrix})
-   if any(x -> ncols(x) != ncols(A[1]), A)
-      error("Matrices must have the same number of columns")
-   end
-
-   B = zero_matrix(base_ring(A[1]), sum(nrows, A, init = 0), ncols(A[1]))
-   i = 1
-   for j in 1:length(A)
-      B[i:i + nrows(A[j]) - 1, :] = A[j]
-      i += nrows(A[j])
-   end
-   return B
-end
-
 @inline function setindex!(a::FqMatrix, u::ZZRingElem, i::Int, j::Int)
    @boundscheck Generic._checkbounds(a, i, j)
    ccall((:fq_default_mat_entry_set_fmpz, libflint), Nothing,
