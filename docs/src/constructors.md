@@ -14,7 +14,7 @@ with the same name as the type itself. For example, to construct a `BigInt` obje
 call the `BigInt` constructor:
 
 ```jldoctest
-julia> n = parse(BigInt, "1234567898765434567898765434567876543456787654567890")
+julia> BigInt(1234567898765434567898765434567876543456787654567890)
 1234567898765434567898765434567876543456787654567890
 ```
 
@@ -37,7 +37,7 @@ refer to as parent objects. They behave a lot like Julia types.
 Consider the following simple example, to create a Flint multiprecision integer:
 
 ```jldoctest
-julia> n = ZZ("12345678765456787654567890987654567898765678909876567890")
+julia> n = ZZ(12345678765456787654567890987654567898765678909876567890)
 12345678765456787654567890987654567898765678909876567890
 ```
 

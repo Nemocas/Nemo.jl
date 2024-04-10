@@ -751,10 +751,14 @@ julia> W = lindep(V1, 20)
 
 julia> V2 = [CC(1), b, b^2, b^3, b^4, b^5]; # ...or from two
 
-julia> Vs = [V1 V2];
+julia> Vs = [transpose(V1); transpose(V2)];
 
 julia> X = lindep(Vs, 20)
-2-element Vector{ZZRingElem}:
+6-element Vector{ZZRingElem}:
+ 1
+ 3
+ 0
+ 0
  0
  1
 ```
