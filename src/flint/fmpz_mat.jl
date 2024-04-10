@@ -156,6 +156,14 @@ end
    end
 end
 
+function setindex!(a::ZZMatrix, b::ZZMatrix, r::UnitRange{Int64}, c::UnitRange{Int64})
+  _checkbounds(a, r, c)
+  size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
+  A = view(a, r, c)
+  ccall((:fmpz_mat_set, libflint), Nothing,
+        (Ref{ZZMatrix}, Ref{ZZMatrix}), A, b)
+end
+
 @inline number_of_rows(a::ZZMatrix) = a.r
 
 @inline number_of_columns(a::ZZMatrix) = a.c

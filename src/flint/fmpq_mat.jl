@@ -150,6 +150,14 @@ Base.@propagate_inbounds setindex!(a::QQMatrix, d::Integer,
    end
 end
 
+function setindex!(a::QQMatrix, b::QQMatrix, r::UnitRange{Int64}, c::UnitRange{Int64})
+  _checkbounds(a, r, c)
+  size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
+  A = view(a, r, c)
+  ccall((:fmpq_mat_set, libflint), Nothing,
+        (Ref{QQMatrix}, Ref{QQMatrix}), A, b)
+end
+
 Base.@propagate_inbounds setindex!(a::QQMatrix, d::Rational,
                                  r::Int, c::Int) =
          setindex!(a, QQFieldElem(d), r, c)

@@ -82,6 +82,14 @@ end
 setindex!(a::fqPolyRepMatrix, u::Integer, i::Int, j::Int) =
         setindex!(a, base_ring(a)(u), i, j)
 
+function setindex!(a::fqPolyRepMatrix, b::fqPolyRepMatrix, r::UnitRange{Int64}, c::UnitRange{Int64})
+  _checkbounds(a, r, c)
+  size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
+  A = view(a, r, c)
+  ccall((:fq_nmod_mat_set, libflint), Nothing,
+        (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), A, b, base_ring(A))
+end
+
 function deepcopy_internal(a::fqPolyRepMatrix, dict::IdDict)
   z = fqPolyRepMatrix(nrows(a), ncols(a), base_ring(a))
   ccall((:fq_nmod_mat_set, libflint), Nothing,

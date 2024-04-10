@@ -78,16 +78,12 @@ end
 setindex!(a::FqMatrix, u::Integer, i::Int, j::Int) =
         setindex!(a, base_ring(a)(u), i, j)
 
-function setindex!(a::FqMatrix, b::FqMatrix, i::Int, r::Colon)
-  A = view(a, i:i, :)
-  ccall((:fq_default_mat_set, libflint), Nothing, 
-          (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), A, b, base_ring(a))
-end
-
 function setindex!(a::FqMatrix, b::FqMatrix, r::UnitRange{Int64}, c::UnitRange{Int64})
+  _checkbounds(a, r, c)
+  size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
   A = view(a, r, c)
-  ccall((:fq_default_mat_set, libflint), Nothing, 
-          (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), A, b, base_ring(a))
+  ccall((:fq_default_mat_set, libflint), Nothing,
+        (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), A, b, base_ring(a))
 end
 
 function Generic.add_one!(a::FqMatrix, i::Int, j::Int)
