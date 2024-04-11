@@ -10,23 +10,12 @@ end
 Nemo allows working with exact real and complex algebraic numbers.
 
 The default algebraic number type in Nemo is provided by Calcium. The
-associated field of algebraic numbers is represented by the constant
-parent object called `CalciumQQBar`.
+associated field of algebraic numbers can be constructed using
+`QQBar = algebraic_closure(QQ)`.
 
-For convenience we define
-
-```
-QQBar = CalciumQQBar
-```
-
-so that algebraic numbers can be constructed using `QQBar` instead of
-`CalciumQQBar`. Note that this is the name of a specific parent object,
-not the name of its type.
-
-
- Library        | Element type  | Parent type
-----------------|---------------|--------------------
-Calcium         | `QQBarFieldElem`       | `QQBarField`
+ Library        | Element type     | Parent type
+----------------|------------------|--------------------
+Calcium         | `QQBarFieldElem` | `QQBarField`
 
 **Important note on performance**
 
@@ -38,8 +27,7 @@ For fast calculation in $\overline{\mathbb{Q}}$,
 `CalciumField` should typically be used instead (see the section
 on *Exact real and complex numbers*).
 Alternatively, to compute in a fixed subfield of $\overline{\mathbb{Q}}$,
-you may fix a generator $a$ and construct an
-Antic number field to represent $\mathbb{Q}(a)$.
+you may fix a generator $a$ and construct a number field to represent $\mathbb{Q}(a)$.
 
 ## Algebraic number functionality
 
