@@ -353,7 +353,7 @@ function __init__()
    ccall((:flint_set_abort, libflint), Nothing,
          (Ptr{Nothing},), @cfunction(flint_abort, Nothing, ()))
 
-   if AbstractAlgebra.should_show_banner()
+   if AbstractAlgebra.should_show_banner() && get(ENV, "NEMO_PRINT_BANNER", "true") != "false"
       println("")
       println("Welcome to Nemo version $(version())")
       println("")
