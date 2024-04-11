@@ -87,14 +87,14 @@ function setindex!(a::FqMatrix, b::FqMatrix, r::UnitRange{Int64}, c::UnitRange{I
 end
 
 function Generic.add_one!(a::FqMatrix, i::Int, j::Int)
-  k = base_ring(a)
-  if _fq_default_ctx_type(k) == _FQ_DEFAULT_NMOD
-    x = ccall((:nmod_mat_get_entry, libflint), Int, (Ref{FqMatrix}, Int, Int), a, i-1, j-1)
-    x = ccall((:nmod_add, libflint), Int, (Int, Int, Ref{FqField}), x, 1, k)
-    ccall((:nmod_mat_set_entry, libflint), Int, (Ref{FqMatrix}, Int, Int, Int), a, i-1, j-1, x)
-  else
-    a[i, j] += 1
+  @boundscheck Generic._checkbounds(a, i, j)
+  F = base_ring(a)
+  GC.@preserve a begin
+     x = fq_default_mat_entry_ptr(a, i, j)
+     ccall((:fq_default_add, libflint), Nothing,
+           (Ptr{FqFieldElem}, Ptr{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), x, x, one(F), F)
   end
+  return a
 end
 
 function deepcopy_internal(a::FqMatrix, dict::IdDict)

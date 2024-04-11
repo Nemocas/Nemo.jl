@@ -958,3 +958,17 @@ end
     end
   end
 end
+
+@testset "FqMatrix.add_one!" begin
+  # This is accessing the matrix via pointers, so test all different
+  # flint "backends"
+  for p in ZZRingElem[2, 1073741827, 1180591620717411303449]
+    for d in [1, 2]
+      F = GF(p, d)
+      A = F[1 2; 3 4]
+      Generic.add_one!(A, 1, 1)
+      @test A == F[2 2; 3 4]
+      @test_throws BoundsError Generic.add_one!(A, 3, 1)
+    end
+  end
+end
