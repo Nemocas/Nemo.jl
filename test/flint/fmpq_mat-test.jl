@@ -196,6 +196,19 @@ end
    a = matrix(FlintQQ, 4, 4, [-1//2 ZZRingElem(2)^100 3 -4; 5 -1//2 ZZRingElem(2)^100 6; 7 5 -1//2 8; 9 10 11 12])
    @test hash(a, UInt(5)) == hash(deepcopy(a), UInt(5))
    @test hash(view(a, 1,1, 2,2)) == hash(view(a, 1,1, 2,2))
+
+   C = QQ[1 2 3; 4 5 6; 7 8 9]
+   C[3, :] = QQ[7 7 7]
+   @test C == QQ[1 2 3; 4 5 6; 7 7 7]
+
+   C[:, 3] = QQ[5; 5; 5]
+   @test C == QQ[1 2 5; 4 5 5; 7 7 5]
+
+   C[1:2, 2:3] = QQ[3 3; 3 3]
+   @test C == QQ[1 3 3; 4 3 3; 7 7 5]
+
+   @test_throws DimensionMismatch C[1:2, 2:3] = QQ[3 3]
+   @test_throws BoundsError C[1:2, 3:4] = QQ[3 3; 3 3]
 end
 
 @testset "QQMatrix.view" begin

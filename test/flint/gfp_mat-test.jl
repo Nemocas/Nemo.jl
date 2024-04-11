@@ -278,6 +278,19 @@ end
           matrix_space(Z11,2,1)(reshape([ 1 ; 2],2,1))
 
   @test_throws ErrorConstrDimMismatch transpose!(R([ 1 2 ;]))
+
+  C = Z23[1 2 3; 4 5 6; 7 8 9]
+  C[3, :] = Z23[7 7 7]
+  @test C == Z23[1 2 3; 4 5 6; 7 7 7]
+
+  C[:, 3] = Z23[5; 5; 5]
+  @test C == Z23[1 2 5; 4 5 5; 7 7 5]
+
+  C[1:2, 2:3] = Z23[3 3; 3 3]
+  @test C == Z23[1 3 3; 4 3 3; 7 7 5]
+
+  @test_throws DimensionMismatch C[1:2, 2:3] = Z23[3 3]
+  @test_throws BoundsError C[1:2, 3:4] = Z23[3 3; 3 3]
 end
 
 @testset "fpMatrix.unary_ops" begin
