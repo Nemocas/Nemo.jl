@@ -693,203 +693,87 @@ function Solve._can_solve_internal_no_check(A::QQMatrix, b::QQMatrix, task::Symb
    return Bool(fl), x, kernel(A, side = :right)
 end
 
-function Solve._init_reduce_fflu(C::Solve.SolveCtx{QQFieldElem})
-   if has_attribute(C, :reduced_matrix_lu)
-      return nothing
-   end
+function Solve._init_reduce(C::Solve.SolveCtx{QQFieldElem})
+  if isdefined(C, :red) && isdefined(C, :trafo)
+    return nothing
+  end
 
-   A = matrix(C)
-   Aint = zero_matrix(FlintZZ, nrows(A), ncols(A))
-   dA = FlintZZ()
-   ccall((:fmpq_mat_get_fmpz_mat_matwise, libflint), Nothing,
-         (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{QQMatrix}), Aint, dA, A)
-   p = Generic.Perm(nrows(A))
-   dLU = ZZ()
-   p.d .-= 1
-   r = ccall((:fmpz_mat_fflu, libflint), Int,
-             (Ref{ZZMatrix}, Ref{ZZRingElem}, Ptr{Int}, Ref{ZZMatrix}, Cint),
-             Aint, dLU, p.d, Aint, Cint(false))
-   p.d .+= 1
-   inv!(p)
-   Solve.set_rank!(C, r)
-   C.lu_perm = p
-   d = divexact(dA, base_ring(C)(dLU))
-   set_attribute!(C, :reduced_matrix_lu => Aint, :scaling_factor_fflu => d)
-   if r < nrows(A)
-      A2 = p*A
-      A3 = view(A2, r + 1:nrows(A), 1:ncols(A))
-      set_attribute!(C, :permuted_matrix_fflu => A3)
-   else
-      set_attribute!(C, :permuted_matrix_fflu => zero(A, 0, ncols(A)))
-   end
-   return nothing
+  # fflu is much slower in some cases, so we do an rref (with transformation)
+  # here and let flint choose an algorithm, see
+  # https://github.com/Nemocas/Nemo.jl/issues/1710.
+  A = matrix(C)
+  B = hcat(deepcopy(A), identity_matrix(base_ring(A), nrows(A)))
+  rref!(B)
+  r = nrows(B)
+  while r > 0 && is_zero(view(B, r:r, 1:ncols(A)))
+    r -= 1
+  end
+  Solve.set_rank!(C, r)
+  C.red = view(B, 1:nrows(A), 1:ncols(A))
+  C.trafo = view(B, 1:nrows(A), ncols(A) + 1:ncols(B))
+  return nothing
 end
 
-function Solve.lu_permutation(C::Solve.SolveCtx{QQFieldElem})
-   Solve._init_reduce_fflu(C)
-   return C.lu_perm
+function Solve.reduced_matrix(C::Solve.SolveCtx{QQFieldElem})
+   Solve._init_reduce(C)
+   return C.red
 end
 
-function Solve.reduced_matrix_lu(C::Solve.SolveCtx{QQFieldElem})
-   Solve._init_reduce_fflu(C)
-   return get_attribute(C, :reduced_matrix_lu)::ZZMatrix
+function Solve.transformation_matrix(C::Solve.SolveCtx{QQFieldElem})
+   Solve._init_reduce(C)
+   return C.trafo
 end
 
-# Factor by which any solution needs to be multiplied.
-# This is the chosen denominator of matrix(C) divided by the denominator computed
-# by fmpz_mat_fflu.
-function Solve.scaling_factor_fflu(C::Solve.SolveCtx{QQFieldElem})
-   Solve._init_reduce_fflu(C)
-   return get_attribute(C, :scaling_factor_fflu)::QQFieldElem
+function Solve._init_reduce_transpose(C::Solve.SolveCtx{QQFieldElem})
+  if isdefined(C, :red_transp) && isdefined(C, :trafo_transp)
+    return nothing
+  end
+
+  # fflu is much slower in some cases, so we do an rref (with transformation)
+  # here and let flint choose an algorithm, see
+  # https://github.com/Nemocas/Nemo.jl/issues/1710.
+  A = matrix(C)
+  B = hcat(transpose(A), identity_matrix(base_ring(A), ncols(A)))
+  rref!(B)
+  r = nrows(B)
+  while r > 0 && is_zero(view(B, r:r, 1:nrows(A)))
+    r -= 1
+  end
+  Solve.set_rank!(C, r)
+  C.red_transp = view(B, 1:ncols(A), 1:nrows(A))
+  C.trafo_transp = view(B, 1:ncols(A), nrows(A) + 1:ncols(B))
+  return nothing
 end
 
-# Let A = matrix(C).
-# Return the matrix (p*A)[rank(A) + 1:nrows(A), :] where p is lu_permutation(C).
-function Solve.permuted_matrix_fflu(C::Solve.SolveCtx{QQFieldElem})
-   Solve._init_reduce_fflu(C)
-   return get_attribute(C, :permuted_matrix_fflu)::QQMatrix
+function Solve.reduced_matrix_of_transpose(C::Solve.SolveCtx{QQFieldElem})
+   Solve._init_reduce_transpose(C)
+   return C.red_transp
 end
 
-function Solve._init_reduce_transpose_fflu(C::Solve.SolveCtx{QQFieldElem})
-   if has_attribute(C, :reduced_matrix_of_transpose_lu)
-      return nothing
-   end
-
-   A = matrix(C)
-   Aint = zero_matrix(FlintZZ, ncols(A), nrows(A))
-   dA = FlintZZ()
-   ccall((:fmpq_mat_get_fmpz_mat_matwise, libflint), Nothing,
-         (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{QQMatrix}), Aint, dA, transpose(A))
-   p = Generic.Perm(ncols(A))
-   dLU = ZZ()
-   p.d .-= 1
-   r = ccall((:fmpz_mat_fflu, libflint), Int,
-             (Ref{ZZMatrix}, Ref{ZZRingElem}, Ptr{Int}, Ref{ZZMatrix}, Cint),
-             Aint, dLU, p.d, Aint, Cint(false))
-   p.d .+= 1
-   inv!(p)
-   Solve.set_rank!(C, r)
-   C.lu_perm_transp = p
-   d = divexact(dA, base_ring(C)(dLU))
-   set_attribute!(C, :reduced_matrix_of_transpose_lu => Aint, :scaling_factor_of_transpose_fflu => d)
-   if r < ncols(A)
-      A2 = A*p
-      A3 = view(A2, 1:nrows(A), r + 1:ncols(A))
-      set_attribute!(C, :permuted_matrix_of_transpose_fflu => A3)
-   else
-      set_attribute!(C, :permuted_matrix_of_transpose_fflu => zero(A, nrows(A), 0))
-   end
-   return nothing
-end
-
-function Solve.lu_permutation_of_transpose(C::Solve.SolveCtx{QQFieldElem})
-   Solve._init_reduce_transpose_fflu(C)
-   return C.lu_perm_transp
-end
-
-function Solve.reduced_matrix_of_transpose_lu(C::Solve.SolveCtx{QQFieldElem})
-   Solve._init_reduce_transpose_fflu(C)
-   return get_attribute(C, :reduced_matrix_of_transpose_lu)::ZZMatrix
-end
-
-# Factor by which any solution needs to be multiplied.
-# This is the chosen denominator of matrix(C) divided by the denominator computed
-# by fmpz_mat_fflu.
-function Solve.scaling_factor_of_transpose_fflu(C::Solve.SolveCtx{QQFieldElem})
-   Solve._init_reduce_transpose_fflu(C)
-   return get_attribute(C, :scaling_factor_of_transpose_fflu)::QQFieldElem
-end
-
-# Let A = matrix(C).
-# Return the matrix (p*A)[rank(A) + 1:nrows(A), :] where p is lu_permutation_of_transpose(C).
-function Solve.permuted_matrix_of_transpose_fflu(C::Solve.SolveCtx{QQFieldElem})
-   Solve._init_reduce_transpose_fflu(C)
-   return get_attribute(C, :permuted_matrix_of_transpose_fflu)::QQMatrix
+function Solve.transformation_matrix_of_transpose(C::Solve.SolveCtx{QQFieldElem})
+   Solve._init_reduce_transpose(C)
+   return C.trafo_transp
 end
 
 function Solve._can_solve_internal_no_check(C::Solve.SolveCtx{QQFieldElem}, b::QQMatrix, task::Symbol; side::Symbol = :left)
-   # Split up in separate functions to make the compiler happy
-   if side === :right
-      return Solve._can_solve_internal_no_check_right(C, b, task)
-   else
-      return Solve._can_solve_internal_no_check_left(C, b, task)
-   end
-end
+  if side === :right
+    fl, sol = Solve._can_solve_with_rref(b, Solve.transformation_matrix(C), rank(C), Solve.pivot_and_non_pivot_cols(C), task)
+    if !fl || task !== :with_kernel
+      return fl, sol, zero(b, 0, 0)
+    end
 
-function Solve._can_solve_internal_no_check_right(C::Solve.SolveCtx{QQFieldElem}, b::QQMatrix, task::Symbol)
-   bint = zero_matrix(FlintZZ, nrows(b), ncols(b))
-   db = FlintZZ()
-   ccall((:fmpq_mat_get_fmpz_mat_matwise, libflint), Nothing,
-         (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{QQMatrix}), bint, db, b)
-   yint = zero_matrix(FlintZZ, ncols(C), ncols(b))
-   p = inv(Solve.lu_permutation(C)).d .- 1
-   flag = ccall((:fmpz_mat_solve_fflu_precomp, libflint), Cint,
-                (Ref{ZZMatrix}, Ptr{Int}, Ref{ZZMatrix}, Ref{ZZMatrix}),
-                yint, p, Solve.reduced_matrix_lu(C), bint)
-   fl = Bool(flag)
-   if !fl
-      return fl, zero(b, 0, 0), zero(b, 0, 0)
-   end
-   # We have fl == true, but we still have to check whether this really is a solution
-   y = zero_matrix(FlintQQ, nrows(yint), ncols(yint))
-   ccall((:fmpq_mat_set_fmpz_mat_div_fmpz, libflint), Nothing,
-         (Ref{QQMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}),
-         y, yint, db)
-   ccall((:fmpq_mat_scalar_mul_fmpq, libflint), Nothing,
-         (Ref{QQMatrix}, Ref{QQMatrix}, Ref{QQFieldElem}),
-         y, y, Solve.scaling_factor_fflu(C))
-   # Now y == (yint//db)*scaling_factor_fflu(C)
-   if rank(C) < nrows(C)
-      # We have to check whether y is also a solution for the "lower part"
-      # of the system
-      pb = Solve.lu_permutation(C)*b
-      pA = Solve.permuted_matrix_fflu(C)
-      fl = pA*y == view(pb, rank(C) + 1:nrows(C), 1:ncols(b))
-   end
-   if task === :with_kernel
-      # I don't know how to compute the kernel using an (ff)lu factoring
-      return fl, y, kernel(C, side = :right)
-   else
-      return fl, y, zero(b, 0, 0)
-   end
-end
+    _, K = Solve._kernel_of_rref(Solve.reduced_matrix(C), rank(C), Solve.pivot_and_non_pivot_cols(C))
+    return fl, sol, K
+  else# side === :left
+    fl, sol_transp = Solve._can_solve_with_rref(transpose(b), Solve.transformation_matrix_of_transpose(C), rank(C), Solve.pivot_and_non_pivot_cols_of_transpose(C), task)
+    sol = transpose(sol_transp)
+    if !fl || task !== :with_kernel
+      return fl, sol, zero(b, 0, 0)
+    end
 
-function Solve._can_solve_internal_no_check_left(C::Solve.SolveCtx{QQFieldElem}, b::QQMatrix, task::Symbol)
-   bint = zero_matrix(FlintZZ, ncols(b), nrows(b))
-   db = FlintZZ()
-   ccall((:fmpq_mat_get_fmpz_mat_matwise, libflint), Nothing,
-         (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{QQMatrix}), bint, db, transpose(b))
-   yint = zero_matrix(FlintZZ, nrows(C), ncols(bint))
-   p = inv(Solve.lu_permutation_of_transpose(C)).d .- 1
-   flag = ccall((:fmpz_mat_solve_fflu_precomp, libflint), Cint,
-                (Ref{ZZMatrix}, Ptr{Int}, Ref{ZZMatrix}, Ref{ZZMatrix}),
-                yint, p, Solve.reduced_matrix_of_transpose_lu(C), bint)
-   fl = Bool(flag)
-   if !fl
-      return fl, zero(b, 0, 0), zero(b, 0, 0)
-   end
-   # We have fl == true, but we still have to check whether this really is a solution
-   y = zero_matrix(FlintQQ, ncols(yint), nrows(yint))
-   ccall((:fmpq_mat_set_fmpz_mat_div_fmpz, libflint), Nothing,
-         (Ref{QQMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}),
-         y, transpose(yint), db)
-   ccall((:fmpq_mat_scalar_mul_fmpq, libflint), Nothing,
-         (Ref{QQMatrix}, Ref{QQMatrix}, Ref{QQFieldElem}),
-         y, y, Solve.scaling_factor_of_transpose_fflu(C))
-   # Now y == (transpose(yint)//db)*scaling_factor_fflu(C)
-   if rank(C) < ncols(C)
-      # We have to check whether y is also a solution for the "right hand part"
-      # of the system
-      pb = b*Solve.lu_permutation_of_transpose(C)
-      pA = Solve.permuted_matrix_of_transpose_fflu(C)
-      fl = y*pA == view(pb, 1:nrows(b), rank(C) + 1:ncols(C))
-   end
-   if task === :with_kernel
-      # I don't know how to compute the kernel using an (ff)lu factoring
-      return fl, y, kernel(C, side = :left)
-   else
-      return fl, y, zero(b, 0, 0)
-   end
+    _, K = Solve._kernel_of_rref(Solve.reduced_matrix_of_transpose(C), rank(C), Solve.pivot_and_non_pivot_cols_of_transpose(C))
+    return fl, sol, transpose(K)
+  end
 end
 
 ###############################################################################
