@@ -1721,6 +1721,16 @@ function mul!(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::ZZMatrix)
    return z
 end
 
+function Generic.add_one!(a::ZZMatrix, i::Int, j::Int)
+  @boundscheck Generic._checkbounds(a, i, j)
+  GC.@preserve a begin
+    x = mat_entry_ptr(a, i, j)
+    ccall((:fmpz_add_si, libflint), Nothing,
+          (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Int),
+          x, x, 1)
+  end
+  return a
+end
 
 ###############################################################################
 #

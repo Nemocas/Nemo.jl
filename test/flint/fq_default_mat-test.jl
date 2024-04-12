@@ -965,9 +965,12 @@ end
   for p in ZZRingElem[2, 1073741827, 1180591620717411303449]
     for d in [1, 2]
       F = GF(p, d)
-      A = F[1 2; 3 4]
+      A = F[p - 2 0; 0 0]
       Generic.add_one!(A, 1, 1)
-      @test A == F[2 2; 3 4]
+      @test A == F[p - 1 0; 0 0]
+      # Make sure reduction works
+      Generic.add_one!(A, 1, 1)
+      @test A == F[0 0; 0 0]
       @test_throws BoundsError Generic.add_one!(A, 3, 1)
     end
   end

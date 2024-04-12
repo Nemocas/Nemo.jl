@@ -857,3 +857,10 @@ end
     @test T[2, 1] * A == QQFieldElem[6, 9, 12]
   end
 end
+
+@testset "QQMatrix.add_one!" begin
+  A = QQ[0 0; 0 0]
+  Generic.add_one!(A, 1, 1)
+  @test A == QQ[1 0; 0 0]
+  @test_throws BoundsError Generic.add_one!(A, 3, 1)
+end

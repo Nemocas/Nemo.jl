@@ -304,6 +304,25 @@ function mul!(z::Vector{fqPolyRepFieldElem}, a::Vector{fqPolyRepFieldElem}, b::f
    return z
 end
 
+function Generic.add_one!(a::fqPolyRepMatrix, i::Int, j::Int)
+  @boundscheck Generic._checkbounds(a, i, j)
+  F = base_ring(a)
+  GC.@preserve a begin
+    x = mat_entry_ptr(a, i, j)
+    # There is no fq_nmod_add_one, but only ...sub_one
+    ccall((:fq_nmod_neg, libflint), Nothing,
+          (Ptr{fqPolyRepFieldElem}, Ptr{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
+          x, x, F)
+    ccall((:fq_nmod_sub_one, libflint), Nothing,
+          (Ptr{fqPolyRepFieldElem}, Ptr{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
+          x, x, F)
+    ccall((:fq_nmod_neg, libflint), Nothing,
+          (Ptr{fqPolyRepFieldElem}, Ptr{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
+          x, x, F)
+  end
+  return a
+end
+
 ################################################################################
 #
 #  Ad hoc binary operators

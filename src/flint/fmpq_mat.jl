@@ -901,6 +901,17 @@ function zero!(z::QQMatrix)
    return z
 end
 
+function Generic.add_one!(a::QQMatrix, i::Int, j::Int)
+  @boundscheck Generic._checkbounds(a, i, j)
+  GC.@preserve a begin
+    x = mat_entry_ptr(a, i, j)
+    ccall((:fmpq_add_si, libflint), Nothing,
+          (Ptr{QQFieldElem}, Ptr{QQFieldElem}, Int),
+          x, x, 1)
+  end
+  return a
+end
+
 ###############################################################################
 #
 #   Parent object call overloads

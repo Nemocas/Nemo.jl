@@ -149,6 +149,26 @@ end
 
 ################################################################################
 #
+#  Unsafe operations
+#
+################################################################################
+
+function Generic.add_one!(a::FpMatrix, i::Int, j::Int)
+  @boundscheck Generic._checkbounds(a, i, j)
+  GC.@preserve a begin
+    x = mat_entry_ptr(a, i, j)
+    ccall((:fmpz_mod_add_si, libflint), Nothing,
+          (Ptr{FpFieldElem}, Ptr{FpFieldElem}, Int, Ref{FpField}),
+          x, x, 1, base_ring(a))
+    ccall((:fmpz_mod, libflint), Nothing,
+          (Ptr{FpFieldElem}, Ptr{FpFieldElem}, Ref{ZZRingElem}),
+          x, x, base_ring(a).n)
+  end
+  return a
+end
+
+################################################################################
+#
 #  Trace
 #
 ################################################################################

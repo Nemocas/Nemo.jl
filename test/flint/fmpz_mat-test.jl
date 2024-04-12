@@ -804,3 +804,10 @@ end
       @test M[i, j] in 1:9
    end
 end
+
+@testset "ZZMatrix.add_one!" begin
+  A = ZZ[0 0; 0 0]
+  Generic.add_one!(A, 1, 1)
+  @test A == ZZ[1 0; 0 0]
+  @test_throws BoundsError Generic.add_one!(A, 3, 1)
+end

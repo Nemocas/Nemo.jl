@@ -313,6 +313,19 @@ function mul!(A::fpMatrix, B::fpFieldElem, D::fpMatrix)
     ccall((:nmod_mat_scalar_mul_ui, libflint), Nothing, (Ref{fpMatrix}, Ref{fpMatrix}, UInt), A, D, B.data)
 end
 
+function Generic.add_one!(a::zzModMatrix, i::Int, j::Int)
+  @boundscheck Generic._checkbounds(a, i, j)
+  x = ccall((:nmod_mat_get_entry, libflint), UInt,
+            (Ref{zzModMatrix}, Int, Int), a, i - 1, j - 1)
+  x += 1
+  if x == base_ring(a).n
+    x = UInt(0)
+  end
+  ccall((:nmod_mat_set_entry, libflint), Nothing,
+        (Ref{zzModMatrix}, Int, Int, UInt), a, i - 1, j - 1, x)
+  return a
+end
+
 ################################################################################
 #
 #  Ad hoc binary operators

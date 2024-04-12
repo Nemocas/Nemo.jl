@@ -288,6 +288,20 @@ function mul!(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::T) where T <: Zmo
    return z
 end
 
+function Generic.add_one!(a::ZZModMatrix, i::Int, j::Int)
+  @boundscheck Generic._checkbounds(a, i, j)
+  GC.@preserve a begin
+    x = mat_entry_ptr(a, i, j)
+    ccall((:fmpz_mod_add_si, libflint), Nothing,
+          (Ptr{ZZModRingElem}, Ptr{ZZModRingElem}, Int, Ref{ZZModRing}),
+          x, x, 1, base_ring(a))
+    ccall((:fmpz_mod, libflint), Nothing,
+          (Ptr{ZZModRingElem}, Ptr{ZZModRingElem}, Ref{ZZRingElem}),
+          x, x, base_ring(a).n)
+  end
+  return a
+end
+
 ################################################################################
 #
 #  Ad hoc binary operators
@@ -957,3 +971,13 @@ function nullspace(M::ZZModMatrix)
                   (Ref{ZZModMatrix}, Ref{ZZModMatrix}), N, M)
   return nullity, view(N, 1:nrows(N), 1:nullity)
 end
+
+################################################################################
+#
+#  Entry pointers
+#
+################################################################################
+
+@inline mat_entry_ptr(A::ZZModMatrix, i::Int, j::Int) =
+   ccall((:fmpz_mod_mat_entry, libflint), Ptr{ZZRingElem},
+         (Ref{ZZModMatrix}, Int, Int), A, i - 1, j - 1)

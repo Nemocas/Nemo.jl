@@ -976,3 +976,14 @@ end
    @test is_zero(K*M)
    @test nrows(K) == 0
 end
+
+@testset "zzModMatrix.add_one!" begin
+  R, _ = residue_ring(ZZ, 2)
+  A = R[0 0; 0 0]
+  Generic.add_one!(A, 1, 1)
+  @test A == R[1 0; 0 0]
+  # Make sure reduction works
+  Generic.add_one!(A, 1, 1)
+  @test A == R[0 0; 0 0]
+  @test_throws BoundsError Generic.add_one!(A, 3, 1)
+end

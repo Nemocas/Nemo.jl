@@ -925,3 +925,13 @@ end
    @test is_zero(K*A)
    @test nrows(K) == 1
 end
+
+@testset "fqPolyRepMatrix.add_one!" begin
+  F = Native.GF(2, 2)
+  A = F[0 0; 0 0]
+  Generic.add_one!(A, 1, 1)
+  @test A == F[1 0; 0 0]
+  Generic.add_one!(A, 1, 1)
+  @test A == F[0 0; 0 0]
+  @test_throws BoundsError Generic.add_one!(A, 3, 1)
+end

@@ -86,17 +86,6 @@ function setindex!(a::FqMatrix, b::FqMatrix, r::UnitRange{Int64}, c::UnitRange{I
         (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), A, b, base_ring(a))
 end
 
-function Generic.add_one!(a::FqMatrix, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
-  F = base_ring(a)
-  GC.@preserve a begin
-     x = fq_default_mat_entry_ptr(a, i, j)
-     ccall((:fq_default_add, libflint), Nothing,
-           (Ptr{FqFieldElem}, Ptr{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), x, x, one(F), F)
-  end
-  return a
-end
-
 function deepcopy_internal(a::FqMatrix, dict::IdDict)
   z = FqMatrix(nrows(a), ncols(a), base_ring(a))
   ccall((:fq_default_mat_set, libflint), Nothing,
@@ -311,6 +300,25 @@ function zero!(a::FqMatrix)
    ccall((:fq_default_mat_zero, libflint), Nothing,
          (Ref{FqMatrix}, Ref{FqField}), a, base_ring(a))
    return a
+end
+
+function Generic.add_one!(a::FqMatrix, i::Int, j::Int)
+  @boundscheck Generic._checkbounds(a, i, j)
+  F = base_ring(a)
+  GC.@preserve a begin
+    x = fq_default_mat_entry_ptr(a, i, j)
+    # There is no fq_default_add_one, but only ...sub_one
+    ccall((:fq_default_neg, libflint), Nothing,
+          (Ptr{FqFieldElem}, Ptr{FqFieldElem}, Ref{FqField}),
+          x, x, F)
+    ccall((:fq_default_sub_one, libflint), Nothing,
+          (Ptr{FqFieldElem}, Ptr{FqFieldElem}, Ref{FqField}),
+          x, x, F)
+    ccall((:fq_default_neg, libflint), Nothing,
+          (Ptr{FqFieldElem}, Ptr{FqFieldElem}, Ref{FqField}),
+          x, x, F)
+  end
+  return a
 end
 
 ################################################################################

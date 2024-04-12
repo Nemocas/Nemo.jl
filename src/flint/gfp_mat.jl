@@ -107,6 +107,25 @@ end
 
 ################################################################################
 #
+#  Unsafe operations
+#
+################################################################################
+
+function Generic.add_one!(a::fpMatrix, i::Int, j::Int)
+  @boundscheck Generic._checkbounds(a, i, j)
+  x = ccall((:nmod_mat_get_entry, libflint), UInt,
+            (Ref{fpMatrix}, Int, Int), a, i - 1, j - 1)
+  x += 1
+  if x == base_ring(a).n
+    x = UInt(0)
+  end
+  ccall((:nmod_mat_set_entry, libflint), Nothing,
+        (Ref{fpMatrix}, Int, Int, UInt), a, i - 1, j - 1, x)
+  return a
+end
+
+################################################################################
+#
 #  Row reduced echelon form
 #
 ################################################################################
