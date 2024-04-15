@@ -202,9 +202,6 @@ const eigenvalues = eigvals # alternative name for the function from LinearAlgeb
 #
 ###############################################################################
 
-using Arb_jll: libarb
-using Antic_jll: libantic
-using Calcium_jll: libcalcium
 using FLINT_jll: libflint
 
 const pkgdir = realpath(joinpath(dirname(@__DIR__)))
@@ -218,11 +215,14 @@ end
 _ptr = Libdl.dlopen(libflint)
 if Libdl.dlsym(_ptr, :_fmpz_mod_vec_set_fmpz_vec_threaded; throw_error = false) !== nothing
   const NEW_FLINT = true
-	libantic = libflint
-	libarb = libflint
-	libcalcium = libflint
+  const libantic = libflint
+  const libarb = libflint
+  const libcalcium = libflint
 else
   const NEW_FLINT = false
+  using Arb_jll: libarb
+  using Antic_jll: libantic
+  using Calcium_jll: libcalcium
 end
 Libdl.dlclose(_ptr)
 
