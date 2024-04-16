@@ -158,11 +158,8 @@ function Generic.add_one!(a::FpMatrix, i::Int, j::Int)
   GC.@preserve a begin
     x = mat_entry_ptr(a, i, j)
     ccall((:fmpz_mod_add_si, libflint), Nothing,
-          (Ptr{FpFieldElem}, Ptr{FpFieldElem}, Int, Ref{FpField}),
-          x, x, 1, base_ring(a))
-    ccall((:fmpz_mod, libflint), Nothing,
-          (Ptr{FpFieldElem}, Ptr{FpFieldElem}, Ref{ZZRingElem}),
-          x, x, base_ring(a).n)
+          (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Int, Ref{fmpz_mod_ctx_struct}),
+          x, x, 1, base_ring(a).ninv)
   end
   return a
 end
