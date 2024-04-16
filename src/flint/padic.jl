@@ -258,6 +258,8 @@ function show(io::IO, a::PadicFieldElem)
 end
 
 function show(io::IO, R::PadicField)
+   @show_name(io, R)
+   @show_special(io, R)
    if get(io, :supercompact, false)
      io = pretty(io)
      print(io, LowercaseOff(), "QQ_$(prime(R))")

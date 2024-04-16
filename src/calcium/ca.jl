@@ -87,6 +87,8 @@ canonical_unit(a::CalciumFieldElem) = a
 ###############################################################################
 
 function show(io::IO, C::CalciumField)
+   @show_name(io, C)
+   @show_special(io, C)
    if C.extended
      print(io, "Exact complex field (extended)")
    else

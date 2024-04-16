@@ -362,6 +362,8 @@ end
 show(io::IO, a::FqFieldElem) = print(io, AbstractAlgebra.obj_to_string(a, context = io))
 
 function show(io::IO, a::FqField)
+  @show_name(io, a)
+  @show_special(io, a)
   io = pretty(io)
   if is_absolute(a)
     deg = degree(a)

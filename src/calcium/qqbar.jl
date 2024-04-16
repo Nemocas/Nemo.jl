@@ -153,6 +153,7 @@ function native_string(x::QQBarFieldElem)
 end
 
 function show(io::IO, F::QQBarField)
+  # deliberately no @show_name or @show_special here as this is a singleton type
   if get(io, :supercompact, false)
     io = pretty(io)
     print(io, LowercaseOff(), "QQBar")

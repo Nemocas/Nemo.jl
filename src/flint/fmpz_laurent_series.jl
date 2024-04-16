@@ -344,6 +344,8 @@ function show(io::IO, a::ZZLaurentSeriesRingElem)
 end
 
 function show(io::IO, p::ZZLaurentSeriesRing)
+   @show_name(io, p)
+   @show_special(io, p)
    if get(io, :supercompact, false)
       print(io, "Laurent series ring")
    else

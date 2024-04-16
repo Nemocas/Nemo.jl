@@ -85,6 +85,8 @@ canonical_unit(x::FpFieldElem) = x
 ###############################################################################
 
 function show(io::IO, a::FpField)
+   @show_name(io, a)
+   @show_special(io, a)
    if get(io, :supercompact, false)
       # no nested printing
       io = pretty(io)

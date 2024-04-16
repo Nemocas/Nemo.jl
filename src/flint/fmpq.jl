@@ -258,6 +258,7 @@ function show(io::IO, ::MIME"text/plain", a::QQField)
 end
 
 function show(io::IO, a::QQField)
+  # deliberately no @show_name or @show_special here as this is a singleton type
   if get(io, :supercompact, false)
     # no nested printing
     print(pretty(io), LowercaseOff(), "QQ")

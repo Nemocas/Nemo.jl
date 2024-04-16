@@ -173,6 +173,7 @@ function expressify(x::RealFieldElem; context = nothing)
 end
 
 function show(io::IO, x::RealField)
+  # deliberately no @show_name or @show_special here as this is a singleton type
   if get(io, :supercompact, false)
     print(io, LowercaseOff(), "RR")
   else

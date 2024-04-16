@@ -162,6 +162,8 @@ end
 show(io::IO, a::fqPolyRepFieldElem) = print(io, AbstractAlgebra.obj_to_string(a, context = io))
 
 function show(io::IO, a::fqPolyRepField)
+   @show_name(io, a)
+   @show_special(io, a)
    if get(io, :supercompact, false)
       # no nested printing
       io = pretty(io)

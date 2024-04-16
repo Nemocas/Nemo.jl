@@ -35,6 +35,7 @@ function Base.show(io::IO, a::QQiFieldElem)
 end
 
 function Base.show(io::IO, a::QQiField)
+   # deliberately no @show_name or @show_special here as this is a singleton type
    if get(io, :supercompact, false)
      io = pretty(io)
      print(io, LowercaseOff(), "QQ[im]")

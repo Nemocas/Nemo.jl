@@ -197,6 +197,8 @@ function expressify(x::ArbFieldElem; context = nothing)
 end
 
 function show(io::IO, x::ArbField)
+  @show_name(io, x)
+  @show_special(io, x)
   print(io, "Real Field with ")
   print(io, precision(x))
   print(io, " bits of precision and error bounds")

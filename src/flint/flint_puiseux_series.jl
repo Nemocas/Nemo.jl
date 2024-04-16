@@ -241,6 +241,8 @@ function show(io::IO, p::FlintPuiseuxSeriesRing)
 end
 
 function show(io::IO, p::FlintPuiseuxSeriesField)
+   @show_name(io, p)
+   @show_special(io, p)
    if get(io, :supercompact, false)
       print(io, "Puiseux series field")
    else

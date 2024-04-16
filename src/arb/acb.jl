@@ -152,6 +152,8 @@ function Base.show(io::IO, z::AcbFieldElem)
 end
 
 function show(io::IO, x::AcbField)
+  @show_name(io, x)
+  @show_special(io, x)
   print(io, "Complex Field with ")
   print(io, precision(x))
   print(io, " bits of precision and error bounds")

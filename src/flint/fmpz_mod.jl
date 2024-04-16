@@ -95,6 +95,8 @@ end
 ###############################################################################
 
 function show(io::IO, R::ZZModRing)
+   @show_name(io, R)
+   @show_special(io, R)
    if get(io, :supercompact, false)
       # no nested printing
       io = pretty(io)

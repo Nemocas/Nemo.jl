@@ -83,6 +83,8 @@ end
 ###############################################################################
 
 function show(io::IO, a::fpField)
+   @show_name(io, a)
+   @show_special(io, a)
    if get(io, :supercompact, false)
       # no nested printing
       io = pretty(io)
