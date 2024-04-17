@@ -564,13 +564,12 @@ const _ecm_nCs = Vector{Int}[_ecm_nC]
 
 ###############################################################################
 #
-#   Set domain for ZZ, QQ, PadicField, finite_field to Flint
+#   Set domain for ZZ, QQ to Flint
 #
 ###############################################################################
 
 const FlintZZ = ZZ
 const FlintQQ = QQ
-#const FiniteField = FlintFiniteField
 
 ###############################################################################
 #
