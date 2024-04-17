@@ -51,13 +51,21 @@ parent object to coerce values into the resulting field.
 
 **Examples**
 
-```julia
-CC = ComplexField()
+```jldoctest
+julia> CC = ComplexField()
+Complex field
 
-a = CC("0.25")
-b = CC("0.1")
-c = CC(0.5)
-d = CC(12)
+julia> a = CC("0.25")
+0.25000000000000000000
+
+julia> b = CC("0.1")
+[0.100000000000000000 +/- 1.22e-20]
+
+julia> c = CC(0.5)
+0.50000000000000000000
+
+julia> d = CC(12)
+12.000000000000000000
 ```
 
 Note that whilst one can coerce double precision floating point values into an
@@ -81,10 +89,9 @@ onei(::ComplexField)
 
 **Examples**
 
-```julia
-CC = ComplexField()
-
-c = onei(CC)
+```jldoctest; setup = :(CC = ComplexField())
+julia> c = onei(CC)
+1.0000000000000000000*im
 ```
 
 ## Basic functionality
@@ -181,16 +188,30 @@ return it. A copy of the original is not made.
 
 Here are some examples of coercing elements into the Arb complex field.
 
-```
-RR = RealField()
-CC = ComplexField()
+```jldoctest
+julia> RR = RealField()
+Real field
 
-a = CC(3)
-b = CC(QQ(2,3))
-c = CC("3 +/- 0.0001")
-d = CC("-1.24e+12345")
-f = CC("nan +/- inf")
-g = CC(RR(3))
+julia> CC = ComplexField()
+Complex field
+
+julia> a = CC(3)
+3.0000000000000000000
+
+julia> b = CC(QQ(2,3))
+[0.6666666666666666666 +/- 8.48e-20]
+
+julia> c = CC("3 +/- 0.0001")
+[3.000 +/- 1.01e-4]
+
+julia> d = CC("-1.24e+12345")
+[-1.240000000000000000e+12345 +/- 1.16e+12326]
+
+julia> f = CC("nan +/- inf")
+nan
+
+julia> g = CC(RR(3))
+3.0000000000000000000
 ```
 
 In addition to the above, developers of custom complex field types must ensure
@@ -221,18 +242,30 @@ accuracy_bits(::ComplexFieldElem)
 
 **Examples**
 
-```julia
-CC = ComplexField()
+```jldoctest; setup = :(CC = ComplexField())
+julia> a = CC("1.2 +/- 0.001")
+[1.20 +/- 1.01e-3]
 
-a = CC("1.2 +/- 0.001")
-b = CC(3)
+julia> b = CC(3)
+3.0000000000000000000
 
-isreal(a)
-isfinite(b)
-isinteger(b)
-c = real(a)
-d = imag(b)
-f = accuracy_bits(a)
+julia> isreal(a)
+true
+
+julia> isfinite(b)
+true
+
+julia> isinteger(b)
+true
+
+julia> c = real(a)
+[1.20 +/- 1.01e-3]
+
+julia> d = imag(b)
+0
+
+julia> f = accuracy_bits(a)
+9
 ```
 
 ### Containment
@@ -264,16 +297,27 @@ contains_zero(::ComplexFieldElem)
 
 **Examples**
 
-```julia
-CC = ComplexField()
-x = CC("1 +/- 0.001")
-y = CC("3")
+```jldoctest; setup = :(CC = ComplexField())
+julia> x = CC("1 +/- 0.001")
+[1.00 +/- 1.01e-3]
 
-overlaps(x, y)
-contains(x, y)
-contains(y, 3)
-contains(x, ZZ(1)//2)
-contains_zero(x)
+julia> y = CC("3")
+3.0000000000000000000
+
+julia> overlaps(x, y)
+false
+
+julia> contains(x, y)
+false
+
+julia> contains(y, 3)
+true
+
+julia> contains(x, ZZ(1)//2)
+false
+
+julia> contains_zero(x)
+false
 ```
 
 ### Comparison
@@ -304,39 +348,54 @@ Function                     |
 
 **Examples**
 
-```julia
-CC = ComplexField()
-x = CC("1 +/- 0.001")
-y = CC("3")
-z = CC("4")
+```jldoctest; setup = :(CC = ComplexField())
+julia> x = CC("1 +/- 0.001")
+[1.00 +/- 1.01e-3]
 
-isequal(x, deepcopy(x))
-x == 3
-ZZ(3) == z
-x != 1.23
+julia> y = CC("3")
+3.0000000000000000000
+
+julia> z = CC("4")
+4.0000000000000000000
+
+julia> isequal(x, deepcopy(x))
+true
+
+julia> x == 3
+false
+
+julia> ZZ(3) == y
+true
+
+julia> z != 1.23
+true
 ```
 
 ### Absolute value
 
 **Examples**
 
-```julia
-CC = ComplexField()
-x = CC("-1 +/- 0.001")
+```jldoctest; setup = :(CC = ComplexField())
+julia> x = CC("-1 +/- 0.001")
+[-1.00 +/- 1.01e-3]
 
-a = abs(x)
+julia> a = abs(x)
+[1.00 +/- 1.01e-3]
 ```
 
 ### Shifting
 
 **Examples**
 
-```julia
-CC = ComplexField()
-x = CC("-3 +/- 0.001")
+```jldoctest; setup = :(CC = ComplexField())
+julia> x = CC("-3 +/- 0.001")
+[-3.00 +/- 1.01e-3]
 
-a = ldexp(x, 23)
-b = ldexp(x, -ZZ(15))
+julia> a = ldexp(x, 23)
+[-2.52e+7 +/- 4.26e+4]
+
+julia> b = ldexp(x, -ZZ(15))
+[-9.16e-5 +/- 7.78e-8]
 ```
 
 ### Miscellaneous operations
@@ -351,14 +410,21 @@ unique_integer(::ComplexFieldElem)
 
 **Examples**
 
-```julia
-CC = ComplexField()
-x = CC("-3 +/- 0.001", "0.1")
+```jldoctest; setup = :(CC = ComplexField())
+julia> x = CC("-3 +/- 0.001", "0.1")
+[-3.00 +/- 1.01e-3] + [0.100000000000000000 +/- 1.22e-20]*im
 
-a = trim(x)
-b, c = unique_integer(x)
-d = conj(x)
-f = angle(x)
+julia> a = trim(x)
+[-3.00 +/- 1.01e-3] + [0.100000000000000000 +/- 1.22e-20]*im
+
+julia> b, c = unique_integer(x)
+(false, 0)
+
+julia> d = conj(x)
+[-3.00 +/- 1.01e-3] + [-0.100000000000000000 +/- 1.22e-20]*im
+
+julia> f = angle(x)
+[3.1083 +/- 3.95e-5]
 ```
 
 ### Constants
@@ -606,16 +672,24 @@ weierstrass_p(::ComplexFieldElem, ::ComplexFieldElem)
 
 **Examples**
 
-```julia
-CC = ComplexField()
+```jldoctest; setup = :(CC = ComplexField())
+julia> s = CC(1, 2)
+1.0000000000000000000 + 2.0000000000000000000*im
 
-s = CC(1, 2)
-z = CC("1.23", "3.45")
+julia> z = CC("1.23", "3.45")
+[1.230000000000000000 +/- 2.00e-19] + [3.450000000000000000 +/- 3.91e-19]*im
 
-a = sin(z)^2 + cos(z)^2
-b = zeta(z)
-c = bessel_j(s, z)
-d = hypergeometric_1f1(s, s+1, z)
+julia> a = sin(z)^2 + cos(z)^2
+[1.000000000000000 +/- 4.92e-16] + [+/- 4.12e-16]*im
+
+julia> b = zeta(z)
+[0.685803329024164062 +/- 6.30e-19] + [-0.038574782404586856 +/- 7.54e-19]*im
+
+julia> c = bessel_j(s, z)
+[0.63189634741402481 +/- 4.85e-18] + [0.00970090757446076 +/- 4.66e-18]*im
+
+julia> d = hypergeometric_1f1(s, s+1, z)
+[-1.3355297330012291 +/- 5.83e-17] + [-0.1715020340928697 +/- 4.97e-17]*im
 ```
 
 ### Linear dependence
@@ -630,20 +704,37 @@ lindep(A::Matrix{ComplexFieldElem}, bits::Int)
 
 **Examples**
 
-```julia
-CC = ComplexField()
+```jldoctest; setup = :(CC = ComplexField())
+julia> # These are two of the roots of x^5 + 3x + 1
 
-# These are two of the roots of x^5 + 3x + 1
-a = CC(1.0050669478588622428791051888364775253, - 0.93725915669289182697903585868761513585)
-b = CC(-0.33198902958450931620250069492231652319)
+julia> a = CC(1.0050669478588622428791051888364775253, -0.93725915669289182697903585868761513585)
+[1.0050669478588623029 +/- 2.25e-20] - [0.93725915669289183718 +/- 1.50e-21]*im
 
-# We recover the polynomial from one root....
-V1 = [CC(1), a, a^2, a^3, a^4, a^5];
-W = lindep(V1, 20)
+julia> b = CC(-0.33198902958450931620250069492231652319)
+-[0.33198902958450932088 +/- 4.15e-22]
 
-# ...or from two
-V2 = [CC(1), b, b^2, b^3, b^4, b^5];
-Vs = [V1 V2]
-X = lindep(Vs, 20)
+julia> V1 = [CC(1), a, a^2, a^3, a^4, a^5]; # We recover the polynomial from one root....
+
+julia> W = lindep(V1, 20)
+6-element Vector{ZZRingElem}:
+ 1
+ 3
+ 0
+ 0
+ 0
+ 1
+
+julia> V2 = [CC(1), b, b^2, b^3, b^4, b^5]; # ...or from two
+
+julia> Vs = [transpose(V1); transpose(V2)];
+
+julia> X = lindep(Vs, 20)
+6-element Vector{ZZRingElem}:
+ 1
+ 3
+ 0
+ 0
+ 0
+ 1
 ```
 

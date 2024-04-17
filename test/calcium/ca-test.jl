@@ -252,8 +252,8 @@ end
    @test CalciumQQBar(c) == QQBarFieldElem(1+2im)
    @test_throws ErrorException CalciumQQBar(t)
 
-   RR = ArbField()
-   CC = AcbField()
+   RR = ArbField(64)
+   CC = AcbField(64)
 
    @test RR(h) == 0.5
    @test CC(h) == 0.5
@@ -275,6 +275,14 @@ end
 
    s = 1 * one(C) + 2 * onei(C)
    @test ComplexF64(s) == 1 + 2 * im
+
+   # verify precision bug https://github.com/Nemocas/Nemo.jl/issues/1580 is fixed
+   x = C(pi)
+   F = ArbField(333)
+   y = F(x)
+   @test radius(y) < 1e-113
+   z = F("3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170680 +/- 1.79e-101")
+   @test contains(z,y)
 end
 
 @testset "CalciumFieldElem.inplace" begin

@@ -56,17 +56,33 @@ resulting parent objects to coerce various elements into those fields.
 
 **Examples**
 
-```julia
-R, x = polynomial_ring(QQ, "x")
-K, a = number_field(x^3 + 3x + 1, "a")
-L, b = cyclotomic_field(5, "b")
-M, c = CyclotomicRealField(5, "c")
+```jldoctest
+julia> R, x = polynomial_ring(QQ, "x")
+(Univariate polynomial ring in x over QQ, x)
 
-d = K(3)
-f = L(b)
-g = L(ZZ(11))
-h = L(ZZ(11)//3)
-k = M(x)
+julia> K, a = number_field(x^3 + 3x + 1, "a")
+(Number field of degree 3 over QQ, a)
+
+julia> L, b = cyclotomic_field(5, "b")
+(Cyclotomic field of order 5, b)
+
+julia> M, c = cyclotomic_real_subfield(5, "c")
+(Maximal real subfield of cyclotomic field of order 5, c)
+
+julia> d = K(3)
+3
+
+julia> f = L(b)
+b
+
+julia> g = L(ZZ(11))
+11
+
+julia> h = L(ZZ(11)//3)
+11//3
+
+julia> k = M(x)
+c
 ```
 
 ### Number field element constructors
@@ -81,12 +97,18 @@ representation as a polynomial. See the following examples for how to do this.
 
 **Examples**
 
-```
-R, x = polynomial_ring(QQ, "x")
-K, a = number_field(x^3 + 3x + 1, "a")
+```jldoctest
+julia> R, x = polynomial_ring(QQ, "x")
+(Univariate polynomial ring in x over QQ, x)
 
-d = gen(K)
-f = a^2 + 2a - 7
+julia> K, a = number_field(x^3 + 3x + 1, "a")
+(Number field of degree 3 over QQ, a)
+
+julia> d = gen(K)
+a
+
+julia> f = a^2 + 2a - 7
+a^2 + 2*a - 7
 ```
 
 ### Basic functionality
@@ -121,12 +143,18 @@ number field is a quotient.
 
 **Examples**
 
-```
-R, x = polynomial_ring(QQ, "x")
-K, a = number_field(x^3 + 3x + 1, "a")
+```jldoctest
+julia> R, x = polynomial_ring(QQ, "x")
+(Univariate polynomial ring in x over QQ, x)
 
-f = R(a^2 + 2a + 3)
-g = K(x^2 + 2x + 1)
+julia> K, a = number_field(x^3 + 3x + 1, "a")
+(Number field of degree 3 over QQ, a)
+
+julia> f = R(a^2 + 2a + 3)
+x^2 + 2*x + 3
+
+julia> g = K(x^2 + 2x + 1)
+a^2 + 2*a + 1
 ```
 
 ### Basic manipulation
@@ -153,18 +181,27 @@ degree(::AbsSimpleNumField)
 
 **Examples**
 
-```julia
-R, x = polynomial_ring(QQ, "x")
-K, a = number_field(x^3 + 3x + 1, "a")
+```jldoctest
+julia> R, x = polynomial_ring(QQ, "x")
+(Univariate polynomial ring in x over QQ, x)
 
-d = a^2 + 2a - 7
-m = gen(K)
+julia> K, a = number_field(x^3 + 3x + 1, "a")
+(Number field of degree 3 over QQ, a)
 
-c = coeff(d, 1)
-is_gen(m)
-q = degree(K)
-r, s = signature(K)
-v = var(R)
+julia> d = a^2 + 2a - 7
+a^2 + 2*a - 7
+
+julia> m = gen(K)
+a
+
+julia> c = coeff(d, 1)
+2
+
+julia> is_gen(m)
+true
+
+julia> q = degree(K)
+3
 ```
 
 ### Norm and trace

@@ -78,6 +78,14 @@ end
 setindex!(a::FqMatrix, u::Integer, i::Int, j::Int) =
         setindex!(a, base_ring(a)(u), i, j)
 
+function setindex!(a::FqMatrix, b::FqMatrix, r::UnitRange{Int64}, c::UnitRange{Int64})
+  _checkbounds(a, r, c)
+  size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
+  A = view(a, r, c)
+  ccall((:fq_default_mat_set, libflint), Nothing,
+        (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), A, b, base_ring(a))
+end
+
 function deepcopy_internal(a::FqMatrix, dict::IdDict)
   z = FqMatrix(nrows(a), ncols(a), base_ring(a))
   ccall((:fq_default_mat_set, libflint), Nothing,
@@ -153,28 +161,24 @@ isequal(a::FqMatrix, b::FqMatrix) = ==(a, b)
 ################################################################################
 
 function transpose(a::FqMatrix)
-   z = FqMatrix(ncols(a), nrows(a), base_ring(a))
-   for i in 1:nrows(a)
-      for j in 1:ncols(a)
-         z[j, i] = a[i, j]
-      end
-   end
-   return z
+  z = similar(a, ncols(a), nrows(a))
+  if _fq_default_ctx_type(base_ring(a)) == _FQ_DEFAULT_NMOD
+    ccall((:nmod_mat_transpose, libflint), Nothing, (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), z, a, base_ring(a))
+    return z
+  elseif _fq_default_ctx_type(base_ring(a)) == _FQ_DEFAULT_FMPZ_NMOD
+    ccall((:fmpz_mod_mat_transpose, libflint), Nothing, (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), z, a, base_ring(a))
+    return z
+  end
+  # There is no flint functionality for the other cases
+  t = base_ring(a)()
+  for i in 1:nrows(a)
+    for j in 1:ncols(a)
+      getindex!(t, a, i, j)
+      z[j, i] = t
+    end
+  end
+  return z
 end
-
-# There is no transpose for FqMatrix
-#function transpose(a::FqMatrix)
-#  z = FqMatrixSpace(base_ring(a), ncols(a), nrows(a))()
-#  ccall((:fq_default_mat_transpose, libflint), Nothing,
-#        (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), z, a, base_ring(a))
-#  return z
-#end
-#
-#function transpose!(a::FqMatrix)
-#  !is_square(a) && error("Matrix must be a square matrix")
-#  ccall((:fq_default_mat_transpose, libflint), Nothing,
-#        (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), a, a, base_ring(a))
-#end
 
 ###############################################################################
 #
@@ -296,6 +300,25 @@ function zero!(a::FqMatrix)
    ccall((:fq_default_mat_zero, libflint), Nothing,
          (Ref{FqMatrix}, Ref{FqField}), a, base_ring(a))
    return a
+end
+
+function Generic.add_one!(a::FqMatrix, i::Int, j::Int)
+  @boundscheck Generic._checkbounds(a, i, j)
+  F = base_ring(a)
+  GC.@preserve a begin
+    x = fq_default_mat_entry_ptr(a, i, j)
+    # There is no fq_default_add_one, but only ...sub_one
+    ccall((:fq_default_neg, libflint), Nothing,
+          (Ptr{FqFieldElem}, Ptr{FqFieldElem}, Ref{FqField}),
+          x, x, F)
+    ccall((:fq_default_sub_one, libflint), Nothing,
+          (Ptr{FqFieldElem}, Ptr{FqFieldElem}, Ref{FqField}),
+          x, x, F)
+    ccall((:fq_default_neg, libflint), Nothing,
+          (Ptr{FqFieldElem}, Ptr{FqFieldElem}, Ref{FqField}),
+          x, x, F)
+  end
+  return a
 end
 
 ################################################################################

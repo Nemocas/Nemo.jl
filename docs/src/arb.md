@@ -51,13 +51,21 @@ parent object to coerce values into the resulting field.
 
 **Examples**
 
-```julia
-RR = ArbField(64)
+```jldoctest
+julia> RR = ArbField(64)
+Real Field with 64 bits of precision and error bounds
 
-a = RR("0.25")
-b = RR("0.1 +/- 0.001")
-c = RR(0.5)
-d = RR(12)
+julia> a = RR("0.25")
+0.25000000000000000000
+
+julia> b = RR("0.1 +/- 0.001")
+[0.1 +/- 1.01e-3]
+
+julia> c = RR(0.5)
+0.50000000000000000000
+
+julia> d = RR(12)
+12.000000000000000000
 ```
 
 Note that whilst one can coerce double precision floating point values into an
@@ -81,18 +89,22 @@ ball(::ArbFieldElem, ::ArbFieldElem)
 
 **Examples**
 
-```julia
-RR = ArbField(64)
+```jldoctest
+julia> RR = ArbField(64)
+Real Field with 64 bits of precision and error bounds
 
-c = ball(RR(3), RR("0.0001"))
+julia> c = ball(RR(3), RR("0.0001"))
+[3.000 +/- 1.01e-4]
 ```
 
 ### Conversions
 
-```julia
-RR = ArbField(64)
+```jldoctest
+julia> RR = ArbField(64)
+Real Field with 64 bits of precision and error bounds
 
-convert(Float64, RR(1//3))
+julia> convert(Float64, RR(1//3))
+0.3333333333333333
 ```
 
 ### Basic manipulation
@@ -143,19 +155,36 @@ accuracy_bits(::ArbFieldElem)
 
 **Examples**
 
-```julia
-RR = ArbField(64)
+```jldoctest
+julia> RR = ArbField(64)
+Real Field with 64 bits of precision and error bounds
 
-a = RR("1.2 +/- 0.001")
-b = RR(3)
+julia> a = RR("1.2 +/- 0.001")
+[1.20 +/- 1.01e-3]
 
-is_positive(a)
-isfinite(b)
-isinteger(b)
-is_negative(a)
-c = radius(a)
-d = midpoint(b)
-f = accuracy_bits(a)
+julia> b = RR(3)
+3.0000000000000000000
+
+julia> is_positive(a)
+true
+
+julia> isfinite(b)
+true
+
+julia> isinteger(b)
+true
+
+julia> is_negative(a)
+false
+
+julia> c = radius(a)
+[0.0010000000038417056203 +/- 1.12e-23]
+
+julia> d = midpoint(b)
+3.0000000000000000000
+
+julia> f = accuracy_bits(a)
+9
 ```
 
 ### Printing
@@ -163,25 +192,32 @@ f = accuracy_bits(a)
 Printing real balls can at first sight be confusing. Lets look at the following
 example:
 
-```julia
-RR = ArbField(64)
+```jldoctest
+julia> RR = ArbField(64)
+Real Field with 64 bits of precision and error bounds
 
-a = RR(1)
-b = RR(2)
-c = RR(12)
+julia> a = RR(1)
+1.0000000000000000000
 
-x = ball(a, b)
-y = ball(c, b)
+julia> b = RR(2)
+2.0000000000000000000
 
-mid = midpoint(x)
-rad = radius(x)
+julia> c = RR(12)
+12.000000000000000000
 
-print(x, "\n", y, "\n", mid, "\n", rad)
-```
+julia> x = ball(a, b)
+[+/- 3.01]
 
-which generates
+julia> y = ball(c, b)
+[1e+1 +/- 4.01]
 
-```
+julia> mid = midpoint(x)
+1.0000000000000000000
+
+julia> rad = radius(x)
+[2.0000000037252902985 +/- 3.81e-20]
+
+julia> print(x, "\n", y, "\n", mid, "\n", rad)
 [+/- 3.01]
 [1e+1 +/- 4.01]
 1.0000000000000000000
@@ -244,17 +280,33 @@ contains_nonpositive(::ArbFieldElem)
 
 **Examples**
 
-```julia
-RR = ArbField(64)
-x = RR("1 +/- 0.001")
-y = RR("3")
+```jldoctest
+julia> RR = ArbField(64)
+Real Field with 64 bits of precision and error bounds
 
-overlaps(x, y)
-contains(x, y)
-contains(y, 3)
-contains(x, ZZ(1)//2)
-contains_zero(x)
-contains_positive(y)
+julia> x = RR("1 +/- 0.001")
+[1.00 +/- 1.01e-3]
+
+julia> y = RR("3")
+3.0000000000000000000
+
+julia> overlaps(x, y)
+false
+
+julia> contains(x, y)
+false
+
+julia> contains(y, 3)
+true
+
+julia> contains(x, ZZ(1)//2)
+false
+
+julia> contains_zero(x)
+false
+
+julia> contains_positive(y)
+true
 ```
 
 ### Comparison
@@ -295,39 +347,66 @@ Function                      |
 
 **Examples**
 
-```julia
-RR = ArbField(64)
-x = RR("1 +/- 0.001")
-y = RR("3")
-z = RR("4")
+```jldoctest
+julia> RR = ArbField(64)
+Real Field with 64 bits of precision and error bounds
 
-isequal(x, deepcopy(x))
-x == 3
-ZZ(3) < z
-x != 1.23
+julia> x = RR("1 +/- 0.001")
+[1.00 +/- 1.01e-3]
+
+julia> y = RR("3")
+3.0000000000000000000
+
+julia> z = RR("4")
+4.0000000000000000000
+
+julia> isequal(x, deepcopy(x))
+true
+
+julia> x == 3
+false
+
+julia> ZZ(3) < z
+true
+
+julia> x != 1.23
+true
+
+julia> 3 == y
+true
 ```
 
 ### Absolute value
 
 **Examples**
 
-```julia
-RR = ArbField(64)
-x = RR("-1 +/- 0.001")
+```jldoctest
+julia> RR = ArbField(64)
+Real Field with 64 bits of precision and error bounds
 
-a = abs(x)
+julia> x = RR("-1 +/- 0.001")
+[-1.00 +/- 1.01e-3]
+
+julia> a = abs(x)
+[1.00 +/- 1.01e-3]
 ```
 
 ### Shifting
 
 **Examples**
 
-```julia
-RR = ArbField(64)
-x = RR("-3 +/- 0.001")
+```jldoctest
+julia> RR = ArbField(64)
+Real Field with 64 bits of precision and error bounds
 
-a = ldexp(x, 23)
-b = ldexp(x, -ZZ(15))
+julia> x = RR("-3 +/- 0.001")
+[-3.00 +/- 1.01e-3]
+
+julia> a = ldexp(x, 23)
+[-2.52e+7 +/- 4.26e+4]
+
+julia> b = ldexp(x, -ZZ(15))
+[-9.16e-5 +/- 7.78e-8]
 ```
 
 ### Miscellaneous operations
@@ -350,14 +429,24 @@ setunion(::ArbFieldElem, ::ArbFieldElem)
 
 **Examples**
 
-```julia
-RR = ArbField(64)
-x = RR("-3 +/- 0.001")
-y = RR("2 +/- 0.5")
+```jldoctest
+julia> RR = ArbField(64)
+Real Field with 64 bits of precision and error bounds
 
-a = trim(x)
-b, c = unique_integer(x)
-d = setunion(x, y)
+julia> x = RR("-3 +/- 0.001")
+[-3.00 +/- 1.01e-3]
+
+julia> y = RR("2 +/- 0.5")
+[2e+0 +/- 0.501]
+
+julia> a = trim(x)
+[-3.00 +/- 1.01e-3]
+
+julia> b, c = unique_integer(x)
+(true, -3)
+
+julia> d = setunion(x, y)
+[+/- 3.01]
 ```
 
 ### Constants
@@ -396,13 +485,21 @@ const_glaisher(::ArbField)
 
 **Examples**
 
-```julia
-RR = ArbField(200)
+```jldoctest
+julia> RR = ArbField(200)
+Real Field with 200 bits of precision and error bounds
 
-a = const_pi(RR)
-b = const_e(RR)
-c = const_euler(RR)
-d = const_glaisher(RR)
+julia> a = const_pi(RR)
+[3.14159265358979323846264338327950288419716939937510582097494 +/- 5.73e-60]
+
+julia> b = const_e(RR)
+[2.71828182845904523536028747135266249775724709369995957496697 +/- 7.06e-60]
+
+julia> c = const_euler(RR)
+[0.577215664901532860606512090082402431042159335939923598805767 +/- 5.37e-61]
+
+julia> d = const_glaisher(RR)
+[1.28242712910062263687534256886979172776768892732500119206374 +/- 2.18e-60]
 ```
 
 ### Mathematical and special functions
@@ -577,14 +674,24 @@ airy_bi_prime(::ArbFieldElem)
 
 **Examples**
 
-```julia
-RR = ArbField(64)
+```jldoctest
+julia> RR = ArbField(64)
+Real Field with 64 bits of precision and error bounds
 
-a = floor(exp(RR(1)))
-b = sinpi(QQ(5,6), RR)
-c = gamma(QQ(1,3), ArbField(256))
-d = bernoulli(1000, ArbField(53))
-f = polylog(3, RR(-10))
+julia> a = floor(exp(RR(1)))
+2.0000000000000000000
+
+julia> b = sinpi(QQ(5,6), RR)
+0.50000000000000000000
+
+julia> c = gamma(QQ(1,3), ArbField(256))
+[2.6789385347077476336556929409746776441286893779573011009504283275904176101677 +/- 6.71e-77]
+
+julia> d = bernoulli(1000, ArbField(53))
+[-5.318704469415522e+1769 +/- 8.20e+1753]
+
+julia> f = polylog(3, RR(-10))
+[-5.92106480375697 +/- 6.68e-15]
 ```
 
 ### Linear dependence
@@ -595,24 +702,34 @@ lindep(::Vector{ArbFieldElem}, n::Int)
 
 **Examples**
 
-```julia
-RR = ArbField(128)
+```jldoctest
+julia> RR = ArbField(128)
+Real Field with 128 bits of precision and error bounds
 
-a = RR(-0.33198902958450931620250069492231652319)
+julia> a = RR(-0.33198902958450931620250069492231652319) # real root of x^5 + 3x + 1
+[-0.331989029584509320880414406929048709571 +/- 3.62e-40]
 
-V = [RR(1), a, a^2, a^3, a^4, a^5]
-W = lindep(V, 20)
+julia> V = [RR(1), a, a^2, a^3, a^4, a^5]
+6-element Vector{ArbFieldElem}:
+ 1.00000000000000000000000000000000000000
+ [-0.331989029584509320880414406929048709571 +/- 3.62e-40]
+ [0.110216715764464205102727554344054759368 +/- 3.32e-40]
+ [-0.0365907405106361618384680031506015710184 +/- 8.30e-41]
+ [0.0121477244339046924274232580429164920524 +/- 2.83e-41]
+ [-0.00403291124647205167662794872826031818905 +/- 7.87e-42]
+
+julia> W = lindep(V, 20)
+6-element Vector{ZZRingElem}:
+ 1
+ 3
+ 0
+ 0
+ 0
+ 1
 ```
 
 ```@docs
 simplest_rational_inside(::ArbFieldElem)
-```
-
-**Examples**
-
-```julia
-RR = ArbField(64)
-simplest_rational_inside(const_pi(RR))
 ```
 
 ### Random generation

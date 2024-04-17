@@ -242,6 +242,19 @@ end
           matrix_space(Z10,2,1)(reshape([ 1 ; 2],2,1))
 
   @test_throws ErrorConstrDimMismatch transpose!(R([ 1 2 ;]))
+
+  C = Z20[1 2 3; 4 5 6; 7 8 9]
+  C[3, :] = Z20[7 7 7]
+  @test C == Z20[1 2 3; 4 5 6; 7 7 7]
+
+  C[:, 3] = Z20[5; 5; 5]
+  @test C == Z20[1 2 5; 4 5 5; 7 7 5]
+
+  C[1:2, 2:3] = Z20[3 3; 3 3]
+  @test C == Z20[1 3 3; 4 3 3; 7 7 5]
+
+  @test_throws DimensionMismatch C[1:2, 2:3] = Z20[3 3]
+  @test_throws BoundsError C[1:2, 3:4] = Z20[3 3; 3 3]
 end
 
 @testset "ZZModMatrix.unary_ops" begin
@@ -861,4 +874,15 @@ end
 
    M = rand(S)
    @test parent(M) == S
+end
+
+@testset "ZZModMatrix.add_one!" begin
+  R, _ = residue_ring(ZZ, ZZ(2))
+  A = R[0 0; 0 0]
+  Generic.add_one!(A, 1, 1)
+  @test A == R[1 0; 0 0]
+  # Make sure reduction works
+  Generic.add_one!(A, 1, 1)
+  @test A == R[0 0; 0 0]
+  @test_throws BoundsError Generic.add_one!(A, 3, 1)
 end

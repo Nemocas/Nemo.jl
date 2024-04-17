@@ -160,6 +160,19 @@ end
    a = matrix(FlintZZ, 4, 4, [-1 ZZRingElem(2)^100 3 -4; 5 -1 ZZRingElem(2)^100 6; 7 5 -1 8; 9 10 11 12])
    @test hash(a, UInt(5)) == hash(deepcopy(a), UInt(5))
    @test hash(view(a, 1,1, 2,2)) == hash(view(a, 2,2, 3,3))
+
+   C = ZZ[1 2 3; 4 5 6; 7 8 9]
+   C[3, :] = ZZ[7 7 7]
+   @test C == ZZ[1 2 3; 4 5 6; 7 7 7]
+
+   C[:, 3] = ZZ[5; 5; 5]
+   @test C == ZZ[1 2 5; 4 5 5; 7 7 5]
+
+   C[1:2, 2:3] = ZZ[3 3; 3 3]
+   @test C == ZZ[1 3 3; 4 3 3; 7 7 5]
+
+   @test_throws DimensionMismatch C[1:2, 2:3] = ZZ[3 3]
+   @test_throws BoundsError C[1:2, 3:4] = ZZ[3 3; 3 3]
 end
 
 @testset "ZZMatrix.view" begin
@@ -790,4 +803,11 @@ end
    for i=1:3, j=1:3
       @test M[i, j] in 1:9
    end
+end
+
+@testset "ZZMatrix.add_one!" begin
+  A = ZZ[0 0; 0 0]
+  Generic.add_one!(A, 1, 1)
+  @test A == ZZ[1 0; 0 0]
+  @test_throws BoundsError Generic.add_one!(A, 3, 1)
 end

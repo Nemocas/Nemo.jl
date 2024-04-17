@@ -253,6 +253,19 @@ end
   @test R(m2, true) == R(transpose(m2))
   m3 = map(Z11, m)
   @test R(m3, true) == R(transpose(m3))
+
+  C = Z23[1 2 3; 4 5 6; 7 8 9]
+  C[3, :] = Z23[7 7 7]
+  @test C == Z23[1 2 3; 4 5 6; 7 7 7]
+
+  C[:, 3] = Z23[5; 5; 5]
+  @test C == Z23[1 2 5; 4 5 5; 7 7 5]
+
+  C[1:2, 2:3] = Z23[3 3; 3 3]
+  @test C == Z23[1 3 3; 4 3 3; 7 7 5]
+
+  @test_throws DimensionMismatch C[1:2, 2:3] = Z23[3 3]
+  @test_throws BoundsError C[1:2, 3:4] = Z23[3 3; 3 3]
 end
 
 @testset "FpMatrix.unary_ops" begin
@@ -956,4 +969,15 @@ end
    r, P, l, u = lu(c)
    @test r == 3
    @test l*u == P*c
+end
+
+@testset "FpMatrix.add_one!" begin
+  F = Native.GF(ZZ(2))
+  A = F[0 0; 0 0]
+  Generic.add_one!(A, 1, 1)
+  @test A == F[1 0; 0 0]
+  # Make sure reduction works
+  Generic.add_one!(A, 1, 1)
+  @test A == F[0 0; 0 0]
+  @test_throws BoundsError Generic.add_one!(A, 3, 1)
 end

@@ -2490,105 +2490,67 @@ mutable struct FqFieldElem <: FinFieldElem
       d = new()
       ccall((:fq_default_init2, libflint), Nothing,
             (Ref{FqFieldElem}, Ref{FqField}), d, ctx)
-      finalizer(_fq_default_clear_fn, d)
+      if _fq_default_ctx_type(ctx) != _FQ_DEFAULT_NMOD
+         finalizer(_fq_default_clear_fn, d)
+      end
       d.poly = nothing
       d.parent = ctx
       return d
    end
 
    function FqFieldElem(ctx::FqField, x::Int)
-      d = new()
-      ccall((:fq_default_init2, libflint), Nothing,
-            (Ref{FqFieldElem}, Ref{FqField}), d, ctx)
-      finalizer(_fq_default_clear_fn, d)
+      d = FqFieldElem(ctx)
       ccall((:fq_default_set_si, libflint), Nothing,
                 (Ref{FqFieldElem}, Int, Ref{FqField}), d, x, ctx)
-      d.parent = ctx
-      d.poly = nothing
       return d
    end
 
    function FqFieldElem(ctx::FqField, x::ZZRingElem)
-      d = new()
-      ccall((:fq_default_init2, libflint), Nothing,
-            (Ref{FqFieldElem}, Ref{FqField}), d, ctx)
-      finalizer(_fq_default_clear_fn, d)
+      d = FqFieldElem(ctx)
       ccall((:fq_default_set_fmpz, libflint), Nothing,
             (Ref{FqFieldElem}, Ref{ZZRingElem}, Ref{FqField}), d, x, ctx)
-      d.parent = ctx
-      d.poly = nothing
       return d
    end
 
    function FqFieldElem(ctx::FqField, x::ZZPolyRingElem)
-      d = new()
-      ccall((:fq_default_init2, libflint), Nothing,
-            (Ref{FqFieldElem}, Ref{FqField}), d, ctx)
-      finalizer(_fq_default_clear_fn, d)
+      d = FqFieldElem(ctx)
       ccall((:fq_default_set_fmpz_poly, libflint), Nothing,
             (Ref{FqFieldElem}, Ref{ZZPolyRingElem}, Ref{FqField}), d, x, ctx)
-      d.parent = ctx
-      d.poly = nothing
       return d
    end
 
    function FqFieldElem(ctx::FqField, x::zzModPolyRingElem)
-      d = new()
-      ccall((:fq_default_init2, libflint), Nothing,
-            (Ref{FqFieldElem}, Ref{FqField}), d, ctx)
-      finalizer(_fq_default_clear_fn, d)
+      d = FqFieldElem(ctx)
       ccall((:fq_default_set_nmod_poly, libflint), Nothing,
             (Ref{FqFieldElem}, Ref{zzModPolyRingElem}, Ref{FqField}), d, x, ctx)
-      d.parent = ctx
-      d.poly = nothing
       return d
    end
 
    function FqFieldElem(ctx::FqField, x::fpPolyRingElem)
-      d = new()
-      ccall((:fq_default_init2, libflint), Nothing,
-            (Ref{FqFieldElem}, Ref{FqField}), d, ctx)
-      finalizer(_fq_default_clear_fn, d)
+      d = FqFieldElem(ctx)
       ccall((:fq_default_set_nmod_poly, libflint), Nothing,
             (Ref{FqFieldElem}, Ref{fpPolyRingElem}, Ref{FqField}), d, x, ctx)
-      d.parent = ctx
-      d.poly = nothing
       return d
    end
 
    function FqFieldElem(ctx::FqField, x::ZZModPolyRingElem)
-      d = new()
-      ccall((:fq_default_init2, libflint), Nothing,
-            (Ref{FqFieldElem}, Ref{FqField}), d, ctx)
-      finalizer(_fq_default_clear_fn, d)
+      d = FqFieldElem(ctx)
       ccall((:fq_default_set_fmpz_mod_poly, libflint), Nothing,
             (Ref{FqFieldElem}, Ref{ZZModPolyRingElem}, Ref{FqField}), d, x, ctx)
-      d.parent = ctx
-      d.poly = nothing
       return d
    end
 
    function FqFieldElem(ctx::FqField, x::FpPolyRingElem)
-      d = new()
-      ccall((:fq_default_init2, libflint), Nothing,
-            (Ref{FqFieldElem}, Ref{FqField}), d, ctx)
-      finalizer(_fq_default_clear_fn, d)
+      d = FqFieldElem(ctx)
       ccall((:fq_default_set_fmpz_mod_poly, libflint), Nothing,
             (Ref{FqFieldElem}, Ref{FpPolyRingElem}, Ref{FqField}), d, x, ctx)
-      d.parent = ctx
-      d.poly = nothing
       return d
    end
 
    function FqFieldElem(ctx::FqField, x::FqFieldElem)
-      d = new()
-      ccall((:fq_default_init2, libflint), Nothing,
-            (Ref{FqFieldElem}, Ref{FqField}), d, ctx)
-      finalizer(_fq_default_clear_fn, d)
+      d = FqFieldElem(ctx)
       ccall((:fq_default_set, libflint), Nothing,
             (Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), d, x, ctx)
-      d.parent = ctx
-      d.poly = nothing
       return d
    end
 end

@@ -119,9 +119,9 @@ in the Calcium documentation:
 
 ## Basic examples
 
-```julia
+```jldoctest
 julia> C = CalciumField()
-Exact Complex Field
+Exact complex field
 
 julia> exp(C(pi) * C(1im)) + 1
 0
@@ -139,13 +139,13 @@ julia> 4*atan(C(1)//5) - atan(C(1)//239) == C(pi)//4
 true
 
 julia> Cx, x = polynomial_ring(C, "x")
-(Univariate Polynomial Ring in x over Exact Complex Field, x)
+(Univariate polynomial ring in x over exact complex field, x)
 
 julia> (a, b) = (sqrt(C(2)), sqrt(C(3)))
 (1.41421 {a where a = 1.41421 [a^2-2=0]}, 1.73205 {a where a = 1.73205 [a^2-3=0]})
 
 julia> (x-a-b)*(x-a+b)*(x+a-b)*(x+a+b)
-x^4 + (-10)*x^2 + 1
+x^4 + -10*x^2 + 1
 ```
 
 ## Conversions and numerical evaluation
@@ -161,7 +161,7 @@ if Calcium is unable to prove that the value belongs
 to the target domain, or if Calcium is unable to compute the explicit
 value because of evaluation limits.
 
-```julia
+```jldoctest; setup = :(C = CalciumField())
 julia> QQ(C(1))
 1
 
@@ -170,16 +170,19 @@ Root 0.707107 of 2x^2 - 1
 
 julia> QQ(C(pi))
 ERROR: unable to convert to a rational number
+[...]
 
 julia> QQ(C(10) ^ C(10^9))
 ERROR: unable to convert to a rational number
+[...]
 ```
 
 To compute arbitrary-precision numerical enclosures, convert to
 `ArbField` or `AcbField`:
 
-```julia
-julia> CC = AcbField(64);
+```jldoctest; setup = :(C = CalciumField())
+julia> CC = AcbField(64)
+Complex Field with 64 bits of precision and error bounds
 
 julia> CC(exp(C(1im)))
 [0.54030230586813971740 +/- 9.37e-22] + [0.84147098480789650665 +/- 2.51e-21]*im
@@ -202,7 +205,7 @@ more expensive if one part is smaller than the other, or if the
 number is nontrivially purely real or purely imaginary (in which
 case an exact proof attempt is made).
 
-```julia
+```jldoctest; setup = :(C = CalciumField())
 julia> x = sin(C(1), form=:exponential)
 0.841471 + 0e-24*I {(-a^2*b+b)/(2*a) where a = 0.540302 + 0.841471*I [Exp(1.00000*I {b})], b = I [b^2+1=0]}
 
@@ -235,7 +238,7 @@ results in different internal representations ($x \in \mathbb{Q}(\sqrt{3}, \sqrt
 and $y \in \mathbb{Q}(\sqrt{6})$),
 the numbers compare as equal:
 
-```julia
+```jldoctest; setup = :(C = CalciumField())
 julia> x = sqrt(C(2)) * sqrt(C(3))
 2.44949 {a*b where a = 1.73205 [a^2-3=0], b = 1.41421 [b^2-2=0]}
 
@@ -259,7 +262,7 @@ For example, with default settings, Calcium is currently
 able to prove that $e^{e^{-1000}} \ne 1$,
 but it fails to prove $e^{e^{-3000}} \ne 1$:
 
-```julia
+```jldoctest; setup = :(C = CalciumField())
 julia> x = exp(exp(C(-1000)))
 1.00000 {a where a = 1.00000 [Exp(5.07596e-435 {b})], b = 5.07596e-435 [Exp(-1000)]}
 
@@ -271,12 +274,12 @@ julia> x = exp(exp(C(-3000)))
 
 julia> x == 1
 ERROR: Unable to perform operation (failed deciding truth of a predicate): isequal
-...
+[...]
 ```
 
 In this case, we can get an answer by allowing a higher working precision:
 
-```julia
+```jldoctest
 julia> C2 = CalciumField(options=Dict(:prec_limit => 10^5));
 
 julia> exp(exp(C2(-3000))) == 1
@@ -286,7 +289,7 @@ false
 Real numbers can be ordered and sorted the usual way.
 We illustrate finding square roots that are well-approximated by integers:
 
-```julia
+```jldoctest; setup = :(C = CalciumField())
 julia> sort([sqrt(C(n)) for n=0:10], by=x -> abs(x - floor(x + C(1)//2)))
 11-element Vector{CalciumFieldElem}:
  0
@@ -306,7 +309,7 @@ As currently implemented, order comparisons involving nonreal numbers yield
 *false* (in both directions)
 rather than throwing an exception:
 
-```julia
+```jldoctest; setup = :(C = CalciumField())
 julia> C(1im) < C(1im)
 false
 
@@ -338,17 +341,17 @@ This also applies to the special value Unknown, used in situations
 where Calcium is unable to prove that a value is a number.
 To enable special values, use `extended=true`.
 
-```julia
+```jldoctest
 julia> C = CalciumField()
-Exact Complex Field
+Exact complex field
 
 julia> 1 // C(0)
 ERROR: DomainError with UnsignedInfinity:
 Non-number result
-...
+[...]
 
 julia> Cext = CalciumField(extended=true)
-Exact Complex Field (Extended)
+Exact complex field (extended)
 
 julia> 1 // Cext(0)
 UnsignedInfinity
@@ -378,7 +381,7 @@ Functions for computing components of real and complex numbers
 will perform automatic symbolic simplifications in special cases.
 In general, such operations will introduce new extension numbers.
 
-```julia
+```jldoctest; setup = :(C = CalciumField())
 julia> real(C(2+3im))
 2
 
@@ -423,7 +426,7 @@ ceil(a::CalciumFieldElem)
 Elementary and special functions generally create new extension numbers.
 In special cases, simplifications occur automatically.
 
-```julia
+```jldoctest; setup = :(C = CalciumField())
 julia> exp(C(1))
 2.71828 {a where a = 2.71828 [Exp(1)]}
 
@@ -454,15 +457,15 @@ julia> erf(C(1)) + erfc(C(1))
 
 Some functions allow representing the result in different forms:
 
-```julia
+```jldoctest; setup = :(C = CalciumField())
 julia> s1 = sin(C(1))
-0.841471 - 0e-24*I {(-a^2*b+b)/(2*a) where a = 0.540302 + 0.841471*I [Exp(1.00000*I {b})], b = I [b^2+1=0]}
+0.841471 + 0e-24*I {(-a^2*b+b)/(2*a) where a = 0.540302 + 0.841471*I [Exp(1.00000*I {b})], b = I [b^2+1=0]}
 
 julia> s2 = sin(C(1), form=:direct)
 0.841471 {a where a = 0.841471 [Sin(1)]}
 
 julia> s3 = sin(C(1), form=:exponential)
-0.841471 - 0e-24*I {(-a^2*b+b)/(2*a) where a = 0.540302 + 0.841471*I [Exp(1.00000*I {b})], b = I [b^2+1=0]}
+0.841471 + 0e-24*I {(-a^2*b+b)/(2*a) where a = 0.540302 + 0.841471*I [Exp(1.00000*I {b})], b = I [b^2+1=0]}
 
 julia> s4 = sin(C(1), form=:tangent)
 0.841471 {(2*a)/(a^2+1) where a = 0.546302 [Tan(0.500000 {1/2})]}
@@ -485,7 +488,7 @@ problem in general. Calcium will sometimes fail even in elementary cases.
 Here is an example of two constant trigonometric identities where
 the first succeeds and the second fails:
 
-```julia
+```jldoctest; setup = :(C = CalciumField())
 julia> a = sqrt(C(2)) + 1;
 
 julia> cos(a) + cos(2*a) + cos(3*a) == sin(7*a//2)//(2*sin(a//2)) - C(1)//2
@@ -493,11 +496,12 @@ true
 
 julia> sin(3*a) == 4 * sin(a) * sin(C(pi)//3 - a) * sin(C(pi)//3 + a)
 ERROR: Unable to perform operation (failed deciding truth of a predicate): isequal
+[...]
 ```
 
 A possible workaround is to fall back on a numerical comparison:
 
-```julia
+```jldoctest; setup = :(C = CalciumField(); a = sqrt(C(2)) + 1;)
 julia> abs(cos(a) + cos(2*a) + cos(3*a) - (sin(7*a//2)//(2*sin(a//2)) - C(1)//2)) <= C(10)^-100
 true
 ```
