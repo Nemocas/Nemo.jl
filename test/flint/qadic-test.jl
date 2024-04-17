@@ -1,7 +1,7 @@
 @testset "QadicFieldElem.constructors" begin
    R, _     = @inferred QadicField(7, 1, 30)
    K, _     = @inferred QadicField(7, 3, 30) 
-   QX, x = polynomial_ring(FlintQQ, "x") 
+   QX, x = polynomial_ring(QQ, "x") 
 
    @test elem_type(R) == QadicFieldElem
    @test elem_type(QadicField) == QadicFieldElem

@@ -110,7 +110,7 @@ end
    @test (u << 3) == 8 * u
 
    ZZx, x = polynomial_ring(FlintZZ, "x")
-   QQy, y = polynomial_ring(FlintQQ, "x")
+   QQy, y = polynomial_ring(QQ, "x")
 
    @test minpoly(ZZx, u) == x^2 - 2
    @test minpoly(QQy, u) == y^2 - 2

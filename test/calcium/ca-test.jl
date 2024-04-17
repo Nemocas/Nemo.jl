@@ -245,7 +245,7 @@ end
 
    @test FlintZZ(n) == 3
 
-   @test FlintQQ(h) == QQFieldElem(1) // 2
+   @test QQ(h) == QQFieldElem(1) // 2
    @test_throws ErrorException FlintZZ(h)
 
    @test CalciumQQBar(h) == QQBarFieldElem(1) // 2

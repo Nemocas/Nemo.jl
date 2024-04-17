@@ -163,9 +163,9 @@ julia> QQ(1//6) - QQ(1//7)
 struct QQField <: FracField{ZZRingElem}
 end
 
-const FlintQQ = QQField()
+const QQ = QQField()
 
-rational_field() = FlintQQ
+rational_field() = QQ
 
 @doc qq_field_doc
 mutable struct QQFieldElem <: FracElem{ZZRingElem}

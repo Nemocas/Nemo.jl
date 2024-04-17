@@ -1203,7 +1203,7 @@ supplied, a default dollar sign will be used to represent the variable.
 function cyclotomic_field(n::Int, s::VarName = "z_$n", t = "_\$"; cached = true)
    n > 0 || throw(ArgumentError("conductor must be positive, not $n"))
    Zx, x = polynomial_ring(FlintZZ, gensym(); cached = false)
-   Qx, = polynomial_ring(FlintQQ, t; cached = cached)
+   Qx, = polynomial_ring(QQ, t; cached = cached)
    f = cyclotomic(n, x)
    C, g = number_field(Qx(f), Symbol(s); cached = cached, check = false)
    set_attribute!(C, :show => show_cyclo, :cyclo => n)
@@ -1238,7 +1238,7 @@ will be used to represent the variable.
 """
 function cyclotomic_real_subfield(n::Int, s::VarName = "(z_$n + 1/z_$n)", t = "\$"; cached = true)
    Zx, x = polynomial_ring(FlintZZ, gensym(); cached = false)
-   Qx, = polynomial_ring(FlintQQ, t; cached = cached)
+   Qx, = polynomial_ring(QQ, t; cached = cached)
    f = cos_minpoly(n, x)
    R, a =  number_field(Qx(f), Symbol(s); cached = cached, check = false)
    set_attribute!(R, :show => show_maxreal, :maxreal => n)

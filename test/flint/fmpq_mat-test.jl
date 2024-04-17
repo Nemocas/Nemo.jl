@@ -4,7 +4,7 @@
    @test elem_type(S) == QQMatrix
    @test elem_type(QQMatrixSpace) == QQMatrix
    @test parent_type(QQMatrix) == QQMatrixSpace
-   @test base_ring(S) == FlintQQ
+   @test base_ring(S) == QQ
    @test nrows(S) == 3
    @test ncols(S) == 3
 
@@ -87,31 +87,31 @@
    arr2 = [1, 2, 3, 4, 5, 6]
 
    for T in [ZZRingElem, Int, BigInt, Rational{Int}, Rational{BigInt}]
-      M = matrix(FlintQQ, map(T, arr))
+      M = matrix(QQ, map(T, arr))
       @test isa(M, QQMatrix)
-      @test base_ring(M) == FlintQQ
+      @test base_ring(M) == QQ
 
-      M2 = matrix(FlintQQ, 2, 3, map(T, arr2))
+      M2 = matrix(QQ, 2, 3, map(T, arr2))
       @test isa(M2, QQMatrix)
-      @test base_ring(M2) == FlintQQ
+      @test base_ring(M2) == QQ
       @test nrows(M2) == 2
       @test ncols(M2) == 3
-      @test_throws ErrorConstrDimMismatch matrix(FlintQQ, 2, 2, map(T, arr2))
-      @test_throws ErrorConstrDimMismatch matrix(FlintQQ, 2, 4, map(T, arr2))
+      @test_throws ErrorConstrDimMismatch matrix(QQ, 2, 2, map(T, arr2))
+      @test_throws ErrorConstrDimMismatch matrix(QQ, 2, 4, map(T, arr2))
    end
 
-   M3 = zero_matrix(FlintQQ, 2, 3)
+   M3 = zero_matrix(QQ, 2, 3)
 
    @test isa(M3, QQMatrix)
-   @test base_ring(M3) == FlintQQ
+   @test base_ring(M3) == QQ
 
-   M4 = identity_matrix(FlintQQ, 3)
+   M4 = identity_matrix(QQ, 3)
 
    @test isa(M4, QQMatrix)
-   @test base_ring(M4) == FlintQQ
+   @test base_ring(M4) == QQ
 
-   a = zero_matrix(FlintQQ, 2, 2)
-   b = zero_matrix(FlintQQ, 2, 3)
+   a = zero_matrix(QQ, 2, 2)
+   b = zero_matrix(QQ, 2, 3)
    @test a in [a, b]
    @test a in [b, a]
    @test !(a in [b])
@@ -147,7 +147,7 @@ end
 end
 
 @testset "QQMatrix.is_zero_entry" begin
-   M = matrix(FlintQQ, [1 2 3;4 0 6;0 8 9])
+   M = matrix(QQ, [1 2 3;4 0 6;0 8 9])
    for i in 1:3, j in 1:3
       @test is_zero_entry(M, i, j) == (M[i, j] == 0)
    end
@@ -193,7 +193,7 @@ end
 
    @test deepcopy(A) == A
 
-   a = matrix(FlintQQ, 4, 4, [-1//2 ZZRingElem(2)^100 3 -4; 5 -1//2 ZZRingElem(2)^100 6; 7 5 -1//2 8; 9 10 11 12])
+   a = matrix(QQ, 4, 4, [-1//2 ZZRingElem(2)^100 3 -4; 5 -1//2 ZZRingElem(2)^100 6; 7 5 -1//2 8; 9 10 11 12])
    @test hash(a, UInt(5)) == hash(deepcopy(a), UInt(5))
    @test hash(view(a, 1,1, 2,2)) == hash(view(a, 1,1, 2,2))
 
@@ -257,14 +257,14 @@ end
 end
 
 @testset "QQMatrix.sub" begin
-   S = matrix_space(FlintQQ, 3, 3)
+   S = matrix_space(QQ, 3, 3)
 
    A = S([1 2 3; 4 5 6; 7 8 9])
 
    B = @inferred sub(A, 1, 1, 2, 2)
 
    @test typeof(B) == QQMatrix
-   @test B == matrix_space(FlintQQ, 2, 2)([1 2; 4 5])
+   @test B == matrix_space(QQ, 2, 2)([1 2; 4 5])
 
    B[1, 1] = 10
    @test A == S([1 2 3; 4 5 6; 7 8 9])
@@ -272,10 +272,10 @@ end
    C = @inferred sub(B, 1:2, 1:2)
 
    @test typeof(C) == QQMatrix
-   @test C == matrix_space(FlintQQ, 2, 2)([10 2; 4 5])
+   @test C == matrix_space(QQ, 2, 2)([10 2; 4 5])
 
    C[1, 1] = 20
-   @test B == matrix_space(FlintQQ, 2, 2)([10 2; 4 5])
+   @test B == matrix_space(QQ, 2, 2)([10 2; 4 5])
    @test A == S([1 2 3; 4 5 6; 7 8 9])
 end
 
@@ -428,40 +428,40 @@ end
 end
 
 @testset "QQMatrix.row_col_swapping" begin
-   a = matrix(FlintQQ, [1 2; 3 4; 5 6])
+   a = matrix(QQ, [1 2; 3 4; 5 6])
 
-   @test swap_rows(a, 1, 3) == matrix(FlintQQ, [5 6; 3 4; 1 2])
+   @test swap_rows(a, 1, 3) == matrix(QQ, [5 6; 3 4; 1 2])
 
    swap_rows!(a, 2, 3)
 
-   @test a == matrix(FlintQQ, [1 2; 5 6; 3 4])
+   @test a == matrix(QQ, [1 2; 5 6; 3 4])
 
-   @test swap_cols(a, 1, 2) == matrix(FlintQQ, [2 1; 6 5; 4 3])
+   @test swap_cols(a, 1, 2) == matrix(QQ, [2 1; 6 5; 4 3])
 
    swap_cols!(a, 2, 1)
 
-   @test a == matrix(FlintQQ, [2 1; 6 5; 4 3])
+   @test a == matrix(QQ, [2 1; 6 5; 4 3])
 
-   a = matrix(FlintQQ, [1 2; 3 4])
-   @test reverse_rows(a) == matrix(FlintQQ, [3 4; 1 2])
+   a = matrix(QQ, [1 2; 3 4])
+   @test reverse_rows(a) == matrix(QQ, [3 4; 1 2])
    reverse_rows!(a)
-   @test a == matrix(FlintQQ, [3 4; 1 2])
+   @test a == matrix(QQ, [3 4; 1 2])
 
-   a = matrix(FlintQQ, [1 2; 3 4])
-   @test reverse_cols(a) == matrix(FlintQQ, [2 1; 4 3])
+   a = matrix(QQ, [1 2; 3 4])
+   @test reverse_cols(a) == matrix(QQ, [2 1; 4 3])
    reverse_cols!(a)
-   @test a == matrix(FlintQQ, [2 1; 4 3])
+   @test a == matrix(QQ, [2 1; 4 3])
 
-   a = matrix(FlintQQ, [1 2 3; 3 4 5; 5 6 7])
+   a = matrix(QQ, [1 2 3; 3 4 5; 5 6 7])
 
-   @test reverse_rows(a) == matrix(FlintQQ, [5 6 7; 3 4 5; 1 2 3])
+   @test reverse_rows(a) == matrix(QQ, [5 6 7; 3 4 5; 1 2 3])
    reverse_rows!(a)
-   @test a == matrix(FlintQQ, [5 6 7; 3 4 5; 1 2 3])
+   @test a == matrix(QQ, [5 6 7; 3 4 5; 1 2 3])
 
-   a = matrix(FlintQQ, [1 2 3; 3 4 5; 5 6 7])
-   @test reverse_cols(a) == matrix(FlintQQ, [3 2 1; 5 4 3; 7 6 5])
+   a = matrix(QQ, [1 2 3; 3 4 5; 5 6 7])
+   @test reverse_cols(a) == matrix(QQ, [3 2 1; 5 4 3; 7 6 5])
    reverse_cols!(a)
-   @test a == matrix(FlintQQ, [3 2 1; 5 4 3; 7 6 5])
+   @test a == matrix(QQ, [3 2 1; 5 4 3; 7 6 5])
 end
 
 @testset "QQMatrix.inversion" begin

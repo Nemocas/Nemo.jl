@@ -1,7 +1,7 @@
 @testset "Localization" begin
 
     R = FlintZZ
-    Qx, x = FlintQQ["x"]
+    Qx, x = QQ["x"]
 
     @testset "Constructor" begin
 

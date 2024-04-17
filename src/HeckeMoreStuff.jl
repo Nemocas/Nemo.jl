@@ -3,7 +3,7 @@ function Base.copy(a::ZZRingElem)
 end
 
 function QQMatrix(x::ZZMatrix)
-    z = zero_matrix(FlintQQ, nrows(x), ncols(x))
+    z = zero_matrix(QQ, nrows(x), ncols(x))
     ccall((:fmpq_mat_set_fmpz_mat, libflint), Nothing, (Ref{QQMatrix}, Ref{ZZMatrix}), z, x)
     return z
 end
@@ -206,7 +206,7 @@ real(x::QQFieldElem) = x
 
 norm(x::ZZRingElem) = abs(x)
 
-number_field(::ZZRing) = FlintQQ
+number_field(::ZZRing) = QQ
 
 function Base.hash(f::zzModMPolyRingElem, h::UInt)
     return UInt(1) # TODO: enhance or throw error
@@ -371,7 +371,7 @@ function basis(K::AbsSimpleNumField)
     return d
 end
 
-base_field(_::AbsSimpleNumField) = FlintQQ
+base_field(_::AbsSimpleNumField) = QQ
 
 ################################################################################
 #
@@ -1479,7 +1479,7 @@ end
 Base.replace!(::typeof(-), m::ZZMatrix) = -m
 
 function (A::AbsSimpleNumField)(a::ZZPolyRingElem)
-    return A(FlintQQ["x"][1](a))
+    return A(QQ["x"][1](a))
 end
 
 

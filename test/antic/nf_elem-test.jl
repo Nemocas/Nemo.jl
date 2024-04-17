@@ -315,8 +315,8 @@ end
   K, a = number_field(x^2 + 28, "a")
   b = -1//4 * a + 1//2
   Mb = representation_matrix(b)
-  @test base_ring(Mb) == FlintQQ
-  @test Mb == FlintQQ[1//2 -1//4; 7 1//2]
+  @test base_ring(Mb) == QQ
+  @test Mb == QQ[1//2 -1//4; 7 1//2]
   Mbb, d = representation_matrix_q(b)
   @test Mbb == FlintZZ[2 -1; 28 2]
   @test d == 4

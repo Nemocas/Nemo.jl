@@ -16,7 +16,7 @@ elem_type(::Type{QQPolyRing}) = QQPolyRingElem
 
 dense_poly_type(::Type{QQFieldElem}) = QQPolyRingElem
 
-base_ring(a::QQPolyRing) = FlintQQ
+base_ring(a::QQPolyRing) = QQ
 
 parent(a::QQPolyRingElem) = a.parent
 

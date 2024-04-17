@@ -1,6 +1,6 @@
 function benchmark_nf_det()
    print("benchmark_nf_det ... ")
-   QQx, x = polynomial_ring(FlintQQ, "x")
+   QQx, x = polynomial_ring(QQ, "x")
    K, a = AbsSimpleNumField(x^3 + 3*x + 1, "a")
    M = matrix_space(K, 80, 80)()
 

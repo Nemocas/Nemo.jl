@@ -588,7 +588,7 @@ end
 end
 
 @testset "QQPolyRingElem.remove_valuation" begin
-   S, y = polynomial_ring(FlintQQ, "y")
+   S, y = polynomial_ring(QQ, "y")
 
    f = 7y^2 + 3y + 2
    g = f^5*(11y^3 - 2y^2 + 5)
