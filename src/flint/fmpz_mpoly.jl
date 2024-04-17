@@ -28,7 +28,7 @@ end
 number_of_variables(a::ZZMPolyRing) = ccall((:fmpz_mpoly_ctx_nvars, libflint), Int,
                                 (Ref{ZZMPolyRing}, ), a)
 
-base_ring(a::ZZMPolyRing) = FlintZZ
+base_ring(a::ZZMPolyRing) = ZZ
 
 function internal_ordering(a::ZZMPolyRing)
    b = ccall((:fmpz_mpoly_ctx_ord, libflint), Cint, (Ref{ZZMPolyRing}, ), a)
@@ -1128,8 +1128,8 @@ end
 function (R::ZZMPolyRing)(a::Vector{Any}, b::Vector{Vector{T}}) where T
    n = nvars(R)
    length(a) != length(b) && error("Coefficient and exponent vector must have the same length")
-   newa = map(FlintZZ, a)
-   newb = map(x -> map(FlintZZ, x), b)
+   newa = map(ZZ, a)
+   newb = map(x -> map(ZZ, x), b)
    newaa = convert(Vector{ZZRingElem}, newa)
    newbb = convert(Vector{Vector{ZZRingElem}}, newb)
 

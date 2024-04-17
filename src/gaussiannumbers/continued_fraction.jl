@@ -228,7 +228,7 @@ end
 
 function continued_fraction_with_matrix(x::QQFieldElem; limit::Int = 0)
    cf, m = _continued_fraction_exact(numerator(x), denominator(x), limit, true)
-   return cf, matrix(FlintZZ, 2, 2, [m...])
+   return cf, matrix(ZZ, 2, 2, [m...])
 end
 
 function _doit_ball!(
@@ -335,7 +335,7 @@ fraction of $x$ along with the matrix giving the last two convergents.
 function continued_fraction_with_matrix(x::ArbFieldElem; limit::Int = 0)
    xln, xld, xrn, xrd = _left_and_right(x)
    cf, m = _continued_fraction_ball(xln, xld, xrn, xrd, limit, true)
-   return cf, matrix(FlintZZ, 2, 2, [m...])
+   return cf, matrix(ZZ, 2, 2, [m...])
 end
 
 ###############################################################################

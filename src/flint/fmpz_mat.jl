@@ -14,9 +14,9 @@ elem_type(::Type{ZZMatrixSpace}) = ZZMatrix
 
 parent_type(::Type{ZZMatrix}) = ZZMatrixSpace
 
-base_ring(a::ZZMatrixSpace) = FlintZZ
+base_ring(a::ZZMatrixSpace) = ZZ
 
-base_ring(a::ZZMatrix) = FlintZZ
+base_ring(a::ZZMatrix) = ZZ
 
 dense_matrix_type(::Type{ZZRingElem}) = ZZMatrix
 

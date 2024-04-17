@@ -34,7 +34,7 @@ characteristic(::QQBarField) = 0
 
 # todo: want a C function for this
 function Base.hash(a::QQBarFieldElem, h::UInt)
-   R, x = polynomial_ring(FlintZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
    return xor(hash(minpoly(R, a)), h)
 end
 

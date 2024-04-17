@@ -34,7 +34,7 @@ parent_type(::Type{QQFieldElem}) = QQField
 
 elem_type(::Type{QQField}) = QQFieldElem
 
-base_ring(a::QQField) = FlintZZ
+base_ring(a::QQField) = ZZ
 
 is_domain_type(::Type{QQFieldElem}) = true
 

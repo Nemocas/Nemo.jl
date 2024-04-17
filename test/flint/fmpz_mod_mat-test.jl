@@ -305,7 +305,7 @@ end
 end
 
 @testset "ZZModMatrix.row_col_swapping" begin
-   R, = residue_ring(FlintZZ, ZZ(17))
+   R, = residue_ring(ZZ, ZZ(17))
 
    a = matrix(R, [1 2; 3 4; 5 6])
 

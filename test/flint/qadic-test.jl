@@ -40,7 +40,7 @@
    @test parent(t) === R
    
    Q, _ = QadicField(13, 3, 10)
-   _, t = polynomial_ring(FlintZZ, "t")
+   _, t = polynomial_ring(ZZ, "t")
    @test Q(t^4) == Q(t)^4
 
    R, _ = QadicField(13, 1, 10)

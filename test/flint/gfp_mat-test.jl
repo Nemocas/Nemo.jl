@@ -337,7 +337,7 @@ end
 end
 
 @testset "fpMatrix.row_col_swapping" begin
-   R, = residue_field(FlintZZ, 17)
+   R, = residue_field(ZZ, 17)
 
    a = matrix(R, [1 2; 3 4; 5 6])
 

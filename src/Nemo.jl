@@ -568,7 +568,7 @@ const _ecm_nCs = Vector{Int}[_ecm_nC]
 #
 ###############################################################################
 
-const ZZ = FlintZZ
+const FlintZZ = ZZ
 const FlintQQ = QQ
 #const FiniteField = FlintFiniteField
 

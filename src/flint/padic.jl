@@ -231,12 +231,12 @@ function expressify(x::PadicFieldElem; context = nothing)
       p = BigInt(pp)
       v = valuation(x)
       if v >= 0
-        u = BigInt(lift(FlintZZ, x))
+        u = BigInt(lift(ZZ, x))
         if v > 0
           u = div(u, p^v)
         end
       else
-        u = lift(FlintZZ, x*p^-v)
+        u = lift(ZZ, x*p^-v)
       end
 
       if pmode == 1  # series

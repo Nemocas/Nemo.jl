@@ -93,7 +93,7 @@ end
 
    @test valuation(b) == 2
 
-   @test lift(FlintZZ, a) == 211
+   @test lift(ZZ, a) == 211
 
    @test lift(QQ, divexact(a, b)) == QQFieldElem(337, 49)
 

@@ -90,7 +90,7 @@
   @test parent(e) == R
   @test nrows(e) == 2 && ncols(e) == 2
 
-  ar = matrix(FlintZZ, [ 1 1 1 ; 1 1 1; 1 1 1])
+  ar = matrix(ZZ, [ 1 1 1 ; 1 1 1; 1 1 1])
 
   @test_throws ErrorException R(ar)
 

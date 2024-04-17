@@ -61,7 +61,7 @@
 
    @test isa(r, PolyRingElem)
 
-   for R in [FlintZZ, residue_ring(FlintZZ, 23)[1], residue_ring(FlintZZ, ZZ(23))[1], Native.GF(23), Native.GF(ZZ(23))]
+   for R in [ZZ, residue_ring(ZZ, 23)[1], residue_ring(ZZ, ZZ(23))[1], Native.GF(23), Native.GF(ZZ(23))]
       T, y = polynomial_ring(R, "y")
 
       f = 3y^2 + 2y + 1

@@ -8,15 +8,15 @@ end
 # Integers
 
 The default integer type in Nemo is provided by Flint. The associated ring of
-integers is represented by the constant parent object called `FlintZZ`.
+integers is represented by the constant parent object called `ZZ`.
 
 For convenience we define
 
 ```
-ZZ = FlintZZ
+ZZ = ZZ
 ```
 
-so that integers can be constructed using `ZZ` instead of `FlintZZ`. Note that
+so that integers can be constructed using `ZZ` instead of `ZZ`. Note that
 this is the name of a specific parent object, not the name of its type.
 
 The types of the integer ring parent objects and elements of the associated

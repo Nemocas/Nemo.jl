@@ -43,9 +43,9 @@ parent_type(::Type{ZZRingElem}) = ZZRing
 @doc raw"""
     parent(a::ZZRingElem)
 
-Returns the unique Flint integer parent object `FlintZZ`.
+Returns the unique Flint integer parent object `ZZ`.
 """
-parent(a::ZZRingElem) = FlintZZ
+parent(a::ZZRingElem) = ZZ
 
 elem_type(::Type{ZZRing}) = ZZRingElem
 
@@ -1279,11 +1279,11 @@ and $b$ and integers $s$ and $t$ such that $g = as + bt$.
 """
 function gcdx(a::ZZRingElem, b::ZZRingElem)
   # Just to conform with Julia's definition
-  a == b == 0 && return zero(FlintZZ), one(FlintZZ), zero(FlintZZ)
+  a == b == 0 && return zero(ZZ), one(ZZ), zero(ZZ)
 
-  d = FlintZZ()
-  x = FlintZZ()
-  y = FlintZZ()
+  d = ZZ()
+  x = ZZ()
+  y = ZZ()
   ccall((:fmpz_xgcd_canonical_bezout, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), d, x, y, a, b)
   return d, x, y
@@ -1599,7 +1599,7 @@ function divisors end
 function divisors(a::ZZRingElem)
    iszero(a) && throw(DomainError("Argument must be non-zero"))
 
-   divs = ZZRingElem[one(FlintZZ)]
+   divs = ZZRingElem[one(ZZ)]
    isone(a) && return divs
 
    for (p,e) in factor(a)
@@ -1613,7 +1613,7 @@ function divisors(a::ZZRingElem)
    return divs
 end
 
-divisors(a::Int) = Int.(divisors(FlintZZ(a)))
+divisors(a::Int) = Int.(divisors(ZZ(a)))
 
 @doc raw"""
     prime_divisors(a::ZZRingElem)
@@ -1630,7 +1630,7 @@ end
 
 Return the prime divisors of $a$ in an array. We require $a \neq 0$.
 """
-prime_divisors(a::Int) = Int.(prime_divisors(FlintZZ(a)))
+prime_divisors(a::Int) = Int.(prime_divisors(ZZ(a)))
 
 is_prime(x::UInt) = Bool(ccall((:n_is_prime, libflint), Cint, (UInt,), x))
 
@@ -2312,7 +2312,7 @@ popcount(x::ZZRingElem) = Int(ccall((:fmpz_popcnt, libflint), UInt,
 Return the previous power of $2$ up to including $x$.
 """
 prevpow2(x::ZZRingElem) = x < 0 ? -prevpow2(-x) :
-                            (x <= 2 ? x : one(FlintZZ) << (ndigits(x, 2) - 1))
+                            (x <= 2 ? x : one(ZZ) << (ndigits(x, 2) - 1))
 
 @doc raw"""
     nextpow2(x::ZZRingElem)
@@ -2327,7 +2327,7 @@ julia> nextpow2(ZZ(12))
 ```
 """
 nextpow2(x::ZZRingElem) = x < 0 ? -nextpow2(-x) :
-                            (x <= 2 ? x : one(FlintZZ) << ndigits(x - 1, 2))
+                            (x <= 2 ? x : one(ZZ) << ndigits(x - 1, 2))
 
 @doc raw"""
     trailing_zeros(x::ZZRingElem)

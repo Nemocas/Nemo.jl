@@ -35,7 +35,7 @@ julia> ZZ(2)^100
 struct ZZRing <: Ring
 end
 
-const FlintZZ = ZZRing()
+const ZZ = ZZRing()
 
 integer_ring() = ZZRing()
 

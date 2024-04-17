@@ -76,7 +76,7 @@ Base.eltype(::fqPolyRepField) = fqPolyRepFieldElem
 # FqPolyRepField
 
 function Base.iterate(F::FqPolyRepField)
-    return zero(F), zeros(FlintZZ, degree(F))
+    return zero(F), zeros(ZZ, degree(F))
 end
 
 function Base.iterate(F::FqPolyRepField, st::Vector{ZZRingElem})

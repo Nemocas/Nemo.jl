@@ -1219,7 +1219,7 @@ function (R::QQMPolyRing)(a::Vector{Any}, b::Vector{Vector{T}}) where T
    n = nvars(R)
    length(a) != length(b) && error("Coefficient and exponent vector must have the same length")
    newa = map(QQ, a)
-   newb = map(x -> map(FlintZZ, x), b)
+   newb = map(x -> map(ZZ, x), b)
    newaa = convert(Vector{QQFieldElem}, newa)
    newbb = convert(Vector{Vector{ZZRingElem}}, newb)
 

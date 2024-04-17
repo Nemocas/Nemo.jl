@@ -1106,7 +1106,7 @@ end
 ################################################################################
 
 function nullspace(A::QQMatrix)
-   AZZ = zero_matrix(FlintZZ, nrows(A), ncols(A))
+   AZZ = zero_matrix(ZZ, nrows(A), ncols(A))
    ccall((:fmpq_mat_get_fmpz_mat_rowwise, libflint), Nothing,
          (Ref{ZZMatrix}, Ptr{Nothing}, Ref{QQMatrix}), AZZ, C_NULL, A)
    N = similar(AZZ, ncols(A), ncols(A))

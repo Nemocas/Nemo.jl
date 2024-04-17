@@ -388,7 +388,7 @@ end
 end
 
 @testset "ZZPolyRingElem.factor" begin
-  Rx, x = polynomial_ring(FlintZZ, "x")
+  Rx, x = polynomial_ring(ZZ, "x")
 
   @test_throws ArgumentError factor(Rx(0))
   @test_throws ArgumentError factor_squarefree(Rx(0))

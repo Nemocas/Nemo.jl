@@ -148,7 +148,7 @@ m = prime(R)
 n = valuation(b)
 Qx, x = QQ["x"]
 p = lift(Qx, a)
-Zy, y = FlintZZ["y"]
+Zy, y = ZZ["y"]
 q = lift(Zy, divexact(a, b))
 ```
 
