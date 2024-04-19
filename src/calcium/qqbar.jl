@@ -50,7 +50,7 @@ function QQBarFieldElem(a::Int)
   return z
 end
 
-function QQBarFieldElem(a::Complex)
+function QQBarFieldElem(a::Complex{Int})
    r = QQBarFieldElem(real(a))
    s = QQBarFieldElem(imag(a))
    z = QQBarFieldElem()
@@ -74,8 +74,6 @@ function QQBarFieldElem(a::QQFieldElem)
 end
 
 QQBarFieldElem(a::Rational) = QQBarFieldElem(QQFieldElem(a))
-
-QQBarFieldElem(a::Integer) = QQBarFieldElem(ZZRingElem(a))
 
 function deepcopy_internal(a::QQBarFieldElem, dict::IdDict)
    z = QQBarFieldElem()
@@ -1520,7 +1518,17 @@ end
 
 (a::QQBarField)() = QQBarFieldElem()
 
-(a::QQBarField)(b::Any) = QQBarFieldElem(b)
+(a::QQBarField)(b::Int) = QQBarFieldElem(b)
+
+(a::QQBarField)(b::Complex{Int}) = QQBarFieldElem(b)
+
+(a::QQBarField)(b::ZZRingElem) = QQBarFieldElem(b)
+
+(a::QQBarField)(b::Integer) = QQBarFieldElem(ZZRingElem(b))
+
+(a::QQBarField)(b::Rational) = QQBarFieldElem(b)
+
+(a::QQBarField)(b::QQFieldElem) = QQBarFieldElem(b)
 
 (a::QQBarField)(b::QQBarFieldElem) = b
 
