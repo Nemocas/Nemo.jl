@@ -1,5 +1,5 @@
-const ring_to_mat = Dict(FlintZZ                         => ZZMatrix,
-                         FlintQQ                         => QQMatrix,
+const ring_to_mat = Dict(ZZ                         => ZZMatrix,
+                         QQ                         => QQMatrix,
                          residue_ring(ZZ, 9)[1]          => zzModMatrix,
                          GF(5)                           => fpMatrix,
                          finite_field(3, 2, "b")[1]      => fqPolyRepMatrix,

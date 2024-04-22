@@ -21,14 +21,16 @@ GF(n::ZZRingElem)
 
 For example, one can create the Galois field of characteristic $7$ as follows.
 
-```julia
-R = GF(7)
+```jldoctest
+julia> R = GF(7)
+Prime field of characteristic 7
 ```
 
 Elements of the field are then created in the usual way.
 
-```julia
-a = R(3)
+```jldoctest; setup = :(R = GF(7))
+julia> a = R(3)
+3
 ```
 
 Elements of Galois fields have type `fpFieldElem` when $p$ is given to the

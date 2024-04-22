@@ -192,9 +192,11 @@ import AbstractAlgebra: Set
 import AbstractAlgebra: set_attribute!
 import AbstractAlgebra: Solve
 
+AbstractAlgebra.@include_deprecated_bindings()
+
 include("Exports.jl")
 
-const eigenvalues = eigvals # alternative name for the function from LinearAlgebra
+include("Aliases.jl")
 
 ###############################################################################
 #
@@ -202,9 +204,6 @@ const eigenvalues = eigvals # alternative name for the function from LinearAlgeb
 #
 ###############################################################################
 
-using Arb_jll: libarb
-using Antic_jll: libantic
-using Calcium_jll: libcalcium
 using FLINT_jll: libflint
 
 const pkgdir = realpath(joinpath(dirname(@__DIR__)))
@@ -218,11 +217,14 @@ end
 _ptr = Libdl.dlopen(libflint)
 if Libdl.dlsym(_ptr, :_fmpz_mod_vec_set_fmpz_vec_threaded; throw_error = false) !== nothing
   const NEW_FLINT = true
-	libantic = libflint
-	libarb = libflint
-	libcalcium = libflint
+  const libantic = libflint
+  const libarb = libflint
+  const libcalcium = libflint
 else
   const NEW_FLINT = false
+  using Arb_jll: libarb
+  using Antic_jll: libantic
+  using Calcium_jll: libcalcium
 end
 Libdl.dlclose(_ptr)
 
@@ -353,28 +355,7 @@ function __init__()
    ccall((:flint_set_abort, libflint), Nothing,
          (Ptr{Nothing},), @cfunction(flint_abort, Nothing, ()))
 
-   # Check if were loaded from another package
-   # if VERSION < 1.7.*, only the "other" package will have the
-   # _tryrequire_from_serialized in the backtrace.
-   # if VERSION >= 1.8, also doing 'using Package' will have
-   # _tryrequire_from_serialized the backtrace.
-   #
-   # To still distinguish both scenarios, notice that
-   # 'using OtherPackage' will either have _tryrequire_from_serialized at least twice,
-   # or one with four arguments (hence five as the function name is the first argument)
-   # 'using Package' serialized will have a version with less arguments
-   bt = Base.process_backtrace(Base.backtrace())
-   filter!(sf -> sf[1].func === :_tryrequire_from_serialized, bt)
-   isinteractive_manual =
-      length(bt) == 0 || (length(bt) == 1 && length(only(bt)[1].linfo.specTypes.parameters) < 4)
-
-   # Respect the -q and --banner flag
-   allowbanner = Base.JLOptions().banner != 0
-
-   if allowbanner && isinteractive_manual && isinteractive() &&
-         !any(x -> x.name in ("Hecke", "Oscar", "Singular"), keys(Base.package_locks)) &&
-         get(ENV, "NEMO_PRINT_BANNER", "true") != "false"
-
+   if AbstractAlgebra.should_show_banner() && get(ENV, "NEMO_PRINT_BANNER", "true") != "false"
       println("")
       println("Welcome to Nemo version $(version())")
       println("")
@@ -585,15 +566,15 @@ const _ecm_nCs = Vector{Int}[_ecm_nC]
 
 ###############################################################################
 #
-#   Set domain for ZZ, QQ, PadicField, finite_field to Flint
+#   Set domain for ZZ, QQ to Flint
 #
 ###############################################################################
 
 @doc zz_ring_doc
-const ZZ = FlintZZ
-
+const FlintZZ = ZZ
+  
 @doc qq_field_doc
-const QQ = FlintQQ
+const FlintQQ = QQ
 
 ###############################################################################
 #
@@ -668,8 +649,6 @@ end
 ################################################################################
 
 include("Deprecations.jl")
-
-include("Aliases.jl")
 
 include("Native.jl")
 

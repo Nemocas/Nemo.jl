@@ -28,13 +28,13 @@ QQFieldElem(a::ZZRingElem, b::Integer) = QQFieldElem(a, ZZRingElem(b))
 
 QQFieldElem(a::Integer, b::ZZRingElem) = QQFieldElem(ZZRingElem(a), b)
 
-parent(a::QQFieldElem) = FlintQQ
+parent(a::QQFieldElem) = QQ
 
 parent_type(::Type{QQFieldElem}) = QQField
 
 elem_type(::Type{QQField}) = QQFieldElem
 
-base_ring(a::QQField) = FlintZZ
+base_ring(a::QQField) = ZZ
 
 is_domain_type(::Type{QQFieldElem}) = true
 
@@ -1230,4 +1230,4 @@ Rational(z::ZZRingElem) = Rational{BigInt}(z)
 #
 ###############################################################################
 
-fraction_field(base::ZZRing) = FlintQQ
+fraction_field(base::ZZRing) = QQ

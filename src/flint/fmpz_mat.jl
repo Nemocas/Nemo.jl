@@ -14,9 +14,9 @@ elem_type(::Type{ZZMatrixSpace}) = ZZMatrix
 
 parent_type(::Type{ZZMatrix}) = ZZMatrixSpace
 
-base_ring(a::ZZMatrixSpace) = FlintZZ
+base_ring(a::ZZMatrixSpace) = ZZ
 
-base_ring(a::ZZMatrix) = FlintZZ
+base_ring(a::ZZMatrix) = ZZ
 
 dense_matrix_type(::Type{ZZRingElem}) = ZZMatrix
 
@@ -154,6 +154,14 @@ end
                 (Ref{ZZMatrix}, Int, Int), a, r - 1, c - 1)
       ccall((:fmpz_set_si, libflint), Nothing, (Ptr{ZZRingElem}, Int), z, d)
    end
+end
+
+function setindex!(a::ZZMatrix, b::ZZMatrix, r::UnitRange{Int64}, c::UnitRange{Int64})
+  _checkbounds(a, r, c)
+  size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
+  A = view(a, r, c)
+  ccall((:fmpz_mat_set, libflint), Nothing,
+        (Ref{ZZMatrix}, Ref{ZZMatrix}), A, b)
 end
 
 @inline number_of_rows(a::ZZMatrix) = a.r
@@ -532,6 +540,17 @@ end
 
 Return a tuple $(z, d)$ consisting of a matrix $z$ and denominator $d$ such
 that $z/d$ is the inverse of $x$.
+
+# Examples
+```jldoctest
+julia> A = ZZ[1 0 1; 2 3 1; 5 6 7]
+[1   0   1]
+[2   3   1]
+[5   6   7]
+
+julia> B, d = pseudo_inv(A)
+([15 6 -3; -9 2 1; -3 -6 3], 12)
+```
 """
 function pseudo_inv(x::ZZMatrix)
    z = similar(x)
@@ -1713,6 +1732,16 @@ function mul!(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::ZZMatrix)
    return z
 end
 
+function Generic.add_one!(a::ZZMatrix, i::Int, j::Int)
+  @boundscheck Generic._checkbounds(a, i, j)
+  GC.@preserve a begin
+    x = mat_entry_ptr(a, i, j)
+    ccall((:fmpz_add_si, libflint), Nothing,
+          (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Int),
+          x, x, 1)
+  end
+  return a
+end
 
 ###############################################################################
 #

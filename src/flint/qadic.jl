@@ -116,7 +116,7 @@ function Base.deepcopy_internal(a::QadicFieldElem, dict::IdDict{Any, Any})
 end
 
 function Base.hash(a::QadicFieldElem, h::UInt)
-   return xor(hash(lift(QQPolyRing(FlintQQ, :x), a), h),
+   return xor(hash(lift(QQPolyRing(QQ, :x), a), h),
               xor(hash([prime(parent(a)),degree(parent(a))], h), h))
 end
 

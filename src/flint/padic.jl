@@ -99,7 +99,7 @@ function Base.deepcopy_internal(a::PadicFieldElem, dict::IdDict)
 end
 
 function Base.hash(a::PadicFieldElem, h::UInt)
-   return xor(hash(lift(FlintQQ, a), h), xor(hash(prime(parent(a)), h), h))
+   return xor(hash(lift(QQ, a), h), xor(hash(prime(parent(a)), h), h))
 end
 
 @doc raw"""
@@ -225,18 +225,18 @@ function expressify(x::PadicFieldElem; context = nothing)
    if iszero(x)
       push!(sum.args, 0)
    elseif pmode == 0  # terse
-      push!(sum.args, expressify(lift(FlintQQ, x), context = context))
+      push!(sum.args, expressify(lift(QQ, x), context = context))
    else
       pp = prime(parent(x))
       p = BigInt(pp)
       v = valuation(x)
       if v >= 0
-        u = BigInt(lift(FlintZZ, x))
+        u = BigInt(lift(ZZ, x))
         if v > 0
           u = div(u, p^v)
         end
       else
-        u = lift(FlintZZ, x*p^-v)
+        u = lift(ZZ, x*p^-v)
       end
 
       if pmode == 1  # series

@@ -5,7 +5,7 @@ function test_elem(R::ZZRing)
 end
 
 @testset "ZZRingElem.conformance_tests" begin
-   test_Ring_interface_recursive(FlintZZ)
+   test_Ring_interface_recursive(ZZ)
 end
 
 @testset "ZZRingElem.issingletontype" begin
@@ -55,30 +55,30 @@ end
 end
 
 @testset "ZZRingElem.rand" begin
-   test_rand(FlintZZ, 1:9)
-   test_rand(FlintZZ, Int16(1):Int16(9))
-   test_rand(FlintZZ, big(1):big(9))
-   test_rand(FlintZZ, ZZRingElem(1):ZZRingElem(9))
-   test_rand(FlintZZ, [3,9,2])
-   test_rand(FlintZZ, Int16[3,9,2])
-   test_rand(FlintZZ, BigInt[3,9,2])
-   test_rand(FlintZZ, ZZRingElem[3,9,2])
+   test_rand(ZZ, 1:9)
+   test_rand(ZZ, Int16(1):Int16(9))
+   test_rand(ZZ, big(1):big(9))
+   test_rand(ZZ, ZZRingElem(1):ZZRingElem(9))
+   test_rand(ZZ, [3,9,2])
+   test_rand(ZZ, Int16[3,9,2])
+   test_rand(ZZ, BigInt[3,9,2])
+   test_rand(ZZ, ZZRingElem[3,9,2])
 
    for bits in 0:100
-      t = rand_bits(FlintZZ, bits)
+      t = rand_bits(ZZ, bits)
       @test abs(t) < ZZRingElem(2)^bits
       @test bits < 1 || abs(t) >= ZZRingElem(2)^(bits - 1)
    end
 
    for i = 1:100
       nbits = rand(2:100)
-      n = rand_bits_prime(FlintZZ, nbits)
+      n = rand_bits_prime(ZZ, nbits)
       @test ndigits(n, 2) == nbits
       @test is_prime(n)
    end
-   @test_throws DomainError rand_bits_prime(FlintZZ, -1)
-   @test_throws DomainError rand_bits_prime(FlintZZ, 0)
-   @test_throws DomainError rand_bits_prime(FlintZZ, 1)
+   @test_throws DomainError rand_bits_prime(ZZ, -1)
+   @test_throws DomainError rand_bits_prime(ZZ, 0)
+   @test_throws DomainError rand_bits_prime(ZZ, 1)
 
    # in a range
    for e in [0, 1, 2, 3, 32, 64, 65, 100, 129, 500]
@@ -731,7 +731,7 @@ end
 @testset "ZZRingElem.unsafe" begin
   a = ZZRingElem(32)
   b = ZZRingElem(23)
-  c = one(FlintZZ)
+  c = one(ZZ)
   d = ZZRingElem(-3)
   r = ZZRingElem()
   b_copy = deepcopy(b)
@@ -1419,12 +1419,12 @@ end
 end
 
 @testset "ZZRingElem.printing" begin
-  @test FlintZZ === integer_ring()
-  @test PrettyPrinting.detailed(FlintZZ) == "Integer ring"
-  @test PrettyPrinting.oneline(FlintZZ) == "Integer ring"
-  @test PrettyPrinting.supercompact(FlintZZ) == "ZZ"
+  @test ZZ === integer_ring()
+  @test PrettyPrinting.detailed(ZZ) == "Integer ring"
+  @test PrettyPrinting.oneline(ZZ) == "Integer ring"
+  @test PrettyPrinting.supercompact(ZZ) == "ZZ"
 
   io = PrettyPrinting.pretty(IOBuffer())
-  print(IOContext(io, :supercompact => true), PrettyPrinting.Lowercase(), FlintZZ)
+  print(IOContext(io, :supercompact => true), PrettyPrinting.Lowercase(), ZZ)
   @test String(take!(io)) == "ZZ"
 end

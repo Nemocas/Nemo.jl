@@ -316,22 +316,23 @@ atanpi(a::QQBarFieldElem)
 An algebraic number can be recovered from a numerical value:
 
 ```jldoctest
-julia> RR = ArbField(53); guess(QQBar, RR("1.41421356 +/- 1e-6"), 2)
+julia> RR = RealField(); guess(QQBar, RR("1.41421356 +/- 1e-6"), 2)
 Root 1.41421 of x^2 - 2
 ```
 
 Warning: the input should be an enclosure. If you have a floating-point
-approximation, you should add an error estimate; otherwise, the only
+approximation, you should add an error estimate; otherwise, at best the only
 algebraic number that can be guessed is the binary floating-point number
-itself.
+itself, at worst no guess is possible.
 
-```julia
-julia> RR = ArbField(128);
+```jldoctest
+julia> RR = RealField();
 
-julia> x = RR(0.1);       # note: 53-bit binary approximation of 1//10 without radius
+julia> x = RR(0.1)       # note: 53-bit binary approximation of 1//10 without radius
+[0.10000000000000000555 +/- 1.12e-21]
 
 julia> guess(QQBar, x, 1)
-Root 0.100000 of 36028797018963968x - 3602879701896397
+ERROR: No suitable algebraic number found
 
 julia> guess(QQBar, x + RR("+/- 1e-10"), 1)
 Root 0.100000 of 10x - 1

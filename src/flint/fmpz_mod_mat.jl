@@ -81,6 +81,14 @@ end
         (Ref{T}, Int, Int, Ref{ZZRingElem}), a, i - 1, j - 1, u)
 end
 
+function setindex!(a::ZZModMatrix, b::ZZModMatrix, r::UnitRange{Int64}, c::UnitRange{Int64})
+  _checkbounds(a, r, c)
+  size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
+  A = view(a, r, c)
+  ccall((:fmpz_mod_mat_set, libflint), Nothing,
+        (Ref{ZZModMatrix}, Ref{ZZModMatrix}), A, b)
+end
+
 function deepcopy_internal(a::ZZModMatrix, dict::IdDict)
   z = ZZModMatrix(nrows(a), ncols(a), modulus(base_ring(a)))
   if isdefined(a, :base_ring)
@@ -278,6 +286,17 @@ function mul!(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::T) where T <: Zmo
          (Ptr{Ref{ZZRingElem}}, Ptr{Ref{ZZRingElem}}, Int, Ref{T}),
          z, a, length(a), b)
    return z
+end
+
+function Generic.add_one!(a::ZZModMatrix, i::Int, j::Int)
+  @boundscheck Generic._checkbounds(a, i, j)
+  GC.@preserve a begin
+    x = mat_entry_ptr(a, i, j)
+    ccall((:fmpz_mod_add_si, libflint), Nothing,
+          (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Int, Ref{fmpz_mod_ctx_struct}),
+          x, x, 1, base_ring(a).ninv)
+  end
+  return a
 end
 
 ################################################################################
@@ -949,3 +968,13 @@ function nullspace(M::ZZModMatrix)
                   (Ref{ZZModMatrix}, Ref{ZZModMatrix}), N, M)
   return nullity, view(N, 1:nrows(N), 1:nullity)
 end
+
+################################################################################
+#
+#  Entry pointers
+#
+################################################################################
+
+@inline mat_entry_ptr(A::ZZModMatrix, i::Int, j::Int) =
+   ccall((:fmpz_mod_mat_entry, libflint), Ptr{ZZRingElem},
+         (Ref{ZZModMatrix}, Int, Int), A, i - 1, j - 1)

@@ -66,13 +66,18 @@ evaluate2(::ComplexPoly, ::ComplexFieldElem)
 
 **Examples**
 
-```julia
-RR = RealField()
-T, z = polynomial_ring(RR, "z")
-   
-h = z^2 + 2z + 1
+```jldoctest
+julia> RR = RealField()
+Real field
 
-s, t = evaluate2(h, RR("2.0 +/- 0.1"))
+julia> T, z = polynomial_ring(RR, "z")
+(Univariate polynomial ring in z over RR, z)
+
+julia> h = z^2 + 2z + 1
+z^2 + 2.0000000000000000000*z + 1
+
+julia> s, t = evaluate2(h, RR("2.0 +/- 0.1"))
+([9e+0 +/- 0.611], [6e+0 +/- 0.201])
 ```
 
 ### Signature
@@ -90,18 +95,35 @@ roots(::ComplexPoly)
 
 **Examples**
 
-```julia
-CC = ComplexField()
-C, y = polynomial_ring(CC, "y")
+```jldoctest
+julia> CC = ComplexField()
+Complex field
 
-m = y^2 + 2y + 3
-n = m + CC("0 +/- 0.0001", "0 +/- 0.0001")
+julia> C, y = polynomial_ring(CC, "y")
+(Univariate polynomial ring in y over CC, y)
 
-r = roots(n)
+julia> m = y^2 + 2y + 3
+y^2 + 2.0000000000000000000*y + 3.0000000000000000000
 
-p = y^7 - 1
+julia> n = m + CC("0 +/- 0.0001", "0 +/- 0.0001")
+y^2 + 2.0000000000000000000*y + [3.000 +/- 1.01e-4] + [+/- 1.01e-4]*im
 
-r = roots(n, isolate_real = true)
+julia> r = roots(n);
+
+julia> sort(r; by=x->(real(x), imag(x))) # sort roots to make printing consistent
+2-element Vector{ComplexFieldElem}:
+ [-1.00 +/- 1.01e-4] + [-1.414 +/- 3.14e-4]*im
+ [-1.00 +/- 1.01e-4] + [1.414 +/- 3.14e-4]*im
+
+julia> p = y^7 - 1
+y^7 - 1.0000000000000000000
+
+julia> r = roots(n, isolate_real = true);
+
+julia> sort(r; by=x->(real(x), imag(x))) # sort roots to make printing consistent
+2-element Vector{ComplexFieldElem}:
+ [-1.00 +/- 1.01e-4] + [-1.414 +/- 3.14e-4]*im
+ [-1.00 +/- 1.01e-4] + [1.414 +/- 3.14e-4]*im
 ```
 
 ### Construction from roots
@@ -113,12 +135,26 @@ from_roots(::AcbPolyRing, ::Vector{AcbFieldElem})
 
 **Examples**
 
-```julia
-RR = RealField()
-R, x = polynomial_ring(RR, "x")
+```jldoctest
+julia> RR = RealField()
+Real field
 
-xs = ArbFieldElem[inv(RR(i)) for i=1:5]
-f = from_roots(R, xs)
+julia> R, x = polynomial_ring(RR, "x")
+(Univariate polynomial ring in x over RR, x)
+
+julia> xs = [inv(RR(i)) for i=1:5]
+5-element Vector{RealFieldElem}:
+ 1.0000000000000000000
+ 0.50000000000000000000
+ [0.3333333333333333333 +/- 4.24e-20]
+ 0.25000000000000000000
+ [0.2000000000000000000 +/- 2.44e-20]
+
+julia> f = from_roots(R, xs)
+x^5 + [-2.283333333333333333 +/- 4.54e-19]*x^4 + [1.875000000000000000 +/- 5.10e-19]*x^3 + [-0.708333333333333333 +/- 3.99e-19]*x^2 + [0.1250000000000000000 +/- 3.69e-20]*x + [-0.00833333333333333333 +/- 4.13e-21]
+
+julia> all(x -> contains_zero(evaluate(f, x)), xs)
+true
 ```
 
 ### Bounding absolute values of roots
@@ -142,14 +178,21 @@ lift(::ZZPolyRing, ::FpPolyRingElem)
 
 **Examples**
 
-```julia
-R, = residue_ring(ZZ, 123456789012345678949)
-S, x = polynomial_ring(R, "x")
-T, y = polynomial_ring(ZZ, "y")
+```jldoctest
+julia> R, = residue_ring(ZZ, 123456789012345678949)
+(Integers modulo 123456789012345678949, Map: ZZ -> ZZ/(123456789012345678949))
 
-f = x^2 + 2x + 1
+julia> S, x = polynomial_ring(R, "x")
+(Univariate polynomial ring in x over ZZ/(123456789012345678949), x)
 
-a = lift(T, f)
+julia> T, y = polynomial_ring(ZZ, "y")
+(Univariate polynomial ring in y over ZZ, y)
+
+julia> f = x^2 + 2x + 1
+x^2 + 2*x + 1
+
+julia> a = lift(T, f)
+y^2 + 2*y + 1
 ```
 
 ### Overlapping and containment
@@ -185,26 +228,55 @@ unique_integer(::ComplexPoly)
 
 **Examples**
 
-```julia
-RR = RealField()
-CC = ComplexField()
-R, x = polynomial_ring(RR, "x")
-C, y = polynomial_ring(CC, "y")
-Zx, zx = polynomial_ring(ZZ, "x")
-Qx, qx = polynomial_ring(QQ, "x")
+```jldoctest
+julia> RR = RealField()
+Real field
 
-f = x^2 + 2x + 1
-h = f + RR("0 +/- 0.0001")
-k = f + RR("0 +/- 0.0001") * x^4
-m = y^2 + 2y + 1
-n = m + CC("0 +/- 0.0001", "0 +/- 0.0001")
+julia> R, x = polynomial_ring(RR, "x")
+(Univariate polynomial ring in x over RR, x)
 
-contains(h, f)
-overlaps(f, k)
-contains(n, m)
-t, z = unique_integer(k)
-isreal(n)
+julia> f = x^2 + 2x + 1
+x^2 + 2.0000000000000000000*x + 1
+
+julia> h = f + RR("0 +/- 0.0001")
+x^2 + 2.0000000000000000000*x + [1.000 +/- 1.01e-4]
+
+julia> k = f + RR("0 +/- 0.0001") * x^4
+[+/- 1.01e-4]*x^4 + x^2 + 2.0000000000000000000*x + 1
+
+julia> contains(h, f)
+true
+
+julia> overlaps(f, k)
+true
+
+julia> t, z = unique_integer(k)
+(true, x^2 + 2*x + 1)
 ```
+
+```jldoctest
+julia> CC = ComplexField()
+Complex field
+
+julia> C, y = polynomial_ring(CC, "y")
+(Univariate polynomial ring in y over CC, y)
+
+julia> m = y^2 + 2y + 1
+y^2 + 2.0000000000000000000*y + 1
+
+julia> n = m + CC("0 +/- 0.0001", "0 +/- 0.0001")
+y^2 + 2.0000000000000000000*y + [1.000 +/- 1.01e-4] + [+/- 1.01e-4]*im
+
+julia> contains(n, m)
+true
+
+julia> isreal(n)
+false
+
+julia> isreal(m)
+true
+```
+
 ### Factorisation
 
 Certain polynomials can be factored (`ZZPolyRingElem', `zzModPolyRingElem`, `fpPolyRingElem`,
@@ -223,16 +295,30 @@ factor_distinct_deg(::fqPolyRepPolyRingElem)
 
 **Examples**
 
-```
-R, = residue_ring(ZZ, 23)
-S, x = polynomial_ring(R, "x")
+```jldoctest
+julia> R, = residue_ring(ZZ, 23)
+(Integers modulo 23, Map: ZZ -> ZZ/(23))
 
-f = x^2 + 2x + 1
-g = x^3 + 3x + 1
+julia> S, x = polynomial_ring(R, "x")
+(Univariate polynomial ring in x over ZZ/(23), x)
 
-R = factor(f*g)
-S = factor_squarefree(f*g)
-T = factor_distinct_deg((x + 1)*g*(x^5+x^3+x+1))
+julia> f = x^2 + 2x + 1
+x^2 + 2*x + 1
+
+julia> g = x^3 + 3x + 1
+x^3 + 3*x + 1
+
+julia> R = factor(f*g)
+1 * (x + 1)^2 * (x^3 + 3*x + 1)
+
+julia> S = factor_squarefree(f*g)
+1 * (x + 1)^2 * (x^3 + 3*x + 1)
+
+julia> T = factor_distinct_deg((x + 1)*g*(x^5+x^3+x+1))
+Dict{Int64, zzModPolyRingElem} with 3 entries:
+  4 => x^4 + 7*x^3 + 4*x^2 + 5*x + 13
+  3 => x^3 + 3*x + 1
+  1 => x^2 + 17*x + 16
 ```
 
 ### Special functions
@@ -259,14 +345,25 @@ eta_qexp(::Int, ::Int, ::ZZPolyRingElem)
 
 **Examples**
 
-```julia
-R, x = polynomial_ring(ZZ, "x")
-S, y = polynomial_ring(R, "y")
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, "x")
+(Univariate polynomial ring in x over ZZ, x)
 
-h = cyclotomic(120, x)
-j = swinnerton_dyer(5, x)
-k = cos_minpoly(30, x)
-l = theta_qexp(3, 30, x)
-m = eta_qexp(24, 30, x)
-o = cyclotomic(10, 1 + x + x^2)
+julia> h = cyclotomic(120, x)
+x^32 + x^28 - x^20 - x^16 - x^12 + x^4 + 1
+
+julia> j = swinnerton_dyer(5, x)
+x^32 - 448*x^30 + 84864*x^28 - 9028096*x^26 + 602397952*x^24 - 26625650688*x^22 + 801918722048*x^20 - 16665641517056*x^18 + 239210760462336*x^16 - 2349014746136576*x^14 + 15459151516270592*x^12 - 65892492886671360*x^10 + 172580952324702208*x^8 - 255690851718529024*x^6 + 183876928237731840*x^4 - 44660812492570624*x^2 + 2000989041197056
+
+julia> k = cos_minpoly(30, x)
+x^4 + x^3 - 4*x^2 - 4*x + 1
+
+julia> l = theta_qexp(3, 30, x)
+72*x^29 + 32*x^27 + 72*x^26 + 30*x^25 + 24*x^24 + 24*x^22 + 48*x^21 + 24*x^20 + 24*x^19 + 36*x^18 + 48*x^17 + 6*x^16 + 48*x^14 + 24*x^13 + 8*x^12 + 24*x^11 + 24*x^10 + 30*x^9 + 12*x^8 + 24*x^6 + 24*x^5 + 6*x^4 + 8*x^3 + 12*x^2 + 6*x + 1
+
+julia> m = eta_qexp(24, 30, x)
+-29211840*x^29 + 128406630*x^28 + 24647168*x^27 - 73279080*x^26 + 13865712*x^25 - 25499225*x^24 + 21288960*x^23 + 18643272*x^22 - 12830688*x^21 - 4219488*x^20 - 7109760*x^19 + 10661420*x^18 + 2727432*x^17 - 6905934*x^16 + 987136*x^15 + 1217160*x^14 + 401856*x^13 - 577738*x^12 - 370944*x^11 + 534612*x^10 - 115920*x^9 - 113643*x^8 + 84480*x^7 - 16744*x^6 - 6048*x^5 + 4830*x^4 - 1472*x^3 + 252*x^2 - 24*x + 1
+
+julia> o = cyclotomic(10, 1 + x + x^2)
+x^8 + 4*x^7 + 9*x^6 + 13*x^5 + 14*x^4 + 11*x^3 + 6*x^2 + 2*x + 1
 ```

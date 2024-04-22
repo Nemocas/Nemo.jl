@@ -1339,7 +1339,7 @@ end
 
 function (R::AcbField)(a::CalciumFieldElem; parts::Bool=false)
    C = a.parent
-   prec = precision(Balls)
+   prec = precision(R)
    z = R()
    if parts
       ccall((:ca_get_acb_accurate_parts, libcalcium),
@@ -1353,16 +1353,16 @@ end
 
 function (R::ArbField)(a::CalciumFieldElem; check::Bool=true)
    C = a.parent
-   prec = precision(Balls)
+   prec = precision(R)
    if check
-      z = AcbField()(a, parts=true)
+      z = AcbField(prec)(a, parts=true)
       if isreal(z)
          return real(z)
       else
          error("unable to convert to a real number")
       end
    else
-      z = AcbField()(a, parts=false)
+      z = AcbField(prec)(a, parts=false)
       if accuracy_bits(real(z)) < prec - 5
           z = AcbField()(a, parts=true)
       end
@@ -1371,16 +1371,14 @@ function (R::ArbField)(a::CalciumFieldElem; check::Bool=true)
 end
 
 function (::Type{ComplexF64})(x::CalciumFieldElem)
-   set_precision!(Balls, 53) do
-      z = AcbField()(x)
-      x = ArbFieldElem()
-      ccall((:acb_get_real, libarb), Nothing, (Ref{ArbFieldElem}, Ref{AcbFieldElem}), x, z)
-      xx = Float64(x)
-      y = ArbFieldElem()
-      ccall((:acb_get_imag, libarb), Nothing, (Ref{ArbFieldElem}, Ref{AcbFieldElem}), y, z)
-      yy = Float64(y)
-      return ComplexF64(xx, yy)
-   end
+   z = AcbField(53, cached = false)(x)
+   x = ArbFieldElem()
+   ccall((:acb_get_real, libarb), Nothing, (Ref{ArbFieldElem}, Ref{AcbFieldElem}), x, z)
+   xx = Float64(x)
+   y = ArbFieldElem()
+   ccall((:acb_get_imag, libarb), Nothing, (Ref{ArbFieldElem}, Ref{AcbFieldElem}), y, z)
+   yy = Float64(y)
+   return ComplexF64(xx, yy)
 end
 
 ###############################################################################

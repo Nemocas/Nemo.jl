@@ -1,7 +1,7 @@
 function benchmark_minpoly_finite_field()
    print("benchmark_minpoly_finite_field ... ")
 
-   F, s = FlintFiniteField(103, 2, "s")
+   F, s = finite_field(103, 2, "s")
 
    M = matrix_space(F, 80, 80)()
 

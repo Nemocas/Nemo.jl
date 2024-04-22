@@ -1,3 +1,10 @@
+```@meta
+CurrentModule = Nemo
+DocTestSetup = quote
+    using Nemo
+end
+```
+
 # Constructing mathematical objects in Nemo
 
 ## Constructing objects in Julia
@@ -6,14 +13,16 @@ In Julia, one constructs objects of a given type by calling a type constructor. 
 with the same name as the type itself. For example, to construct a `BigInt` object in Julia, we simply
 call the `BigInt` constructor:
 
-```
-n = BigInt("1234567898765434567898765434567876543456787654567890")
+```jldoctest
+julia> BigInt(1234567898765434567898765434567876543456787654567890)
+1234567898765434567898765434567876543456787654567890
 ```
 
 Julia also uses constructors to convert between types. For example, to convert an `Int` to a `BigInt`:
 
-```
-m = BigInt(123)
+```jldoctest
+julia> m = BigInt(123)
+123
 ```
 
 ## How we construct objects in Nemo
@@ -27,8 +36,9 @@ refer to as parent objects. They behave a lot like Julia types.
 
 Consider the following simple example, to create a Flint multiprecision integer:
 
-```
-n = ZZ("12345678765456787654567890987654567898765678909876567890")
+```jldoctest
+julia> n = ZZ(12345678765456787654567890987654567898765678909876567890)
+12345678765456787654567890987654567898765678909876567890
 ```
 
 Here `ZZ` is not a Julia type, but a callable object. However, for most purposes one can think of such
@@ -42,10 +52,15 @@ one can use it to construct element objects.
 Nemo provides a set of functions for constructing such parent objects. For example, to create a parent
 object for polynomials over the integers, we use the `polynomial_ring` parent object constructor.
 
-```
-R, x = polynomial_ring(ZZ, "x")
-f = x^3 + 3x + 1
-g = R(12)
+```jldoctest
+julia> R, x = polynomial_ring(ZZ, "x")
+(Univariate polynomial ring in x over ZZ, x)
+
+julia> f = x^3 + 3x + 1
+x^3 + 3*x + 1
+
+julia> g = R(12)
+12
 ```
 
 In this example, $R$ is the parent object and we use it to convert the `Int` value $12$ to an element
