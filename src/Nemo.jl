@@ -192,9 +192,11 @@ import AbstractAlgebra: Set
 import AbstractAlgebra: set_attribute!
 import AbstractAlgebra: Solve
 
+AbstractAlgebra.@include_deprecated_bindings()
+
 include("Exports.jl")
 
-const eigenvalues = eigvals # alternative name for the function from LinearAlgebra
+include("Aliases.jl")
 
 ###############################################################################
 #
@@ -643,8 +645,6 @@ end
 ################################################################################
 
 include("Deprecations.jl")
-
-include("Aliases.jl")
 
 include("Native.jl")
 

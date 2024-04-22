@@ -595,7 +595,7 @@ function _fq_field_from_nmod_poly_in_disguise(f::FqPolyRingElem, s::Symbol)
   return z
 end
 
-const FqDefaultFiniteFieldIDFqDefaultPoly = Dict{Tuple{FqPolyRingElem, Symbol, Bool}, FqField}()
+const FqDefaultFiniteFieldIDFqDefaultPoly = CacheDictType{Tuple{FqPolyRingElem, Symbol, Bool}, FqField}()
 
 function FqField(f::FqPolyRingElem, s::Symbol, cached::Bool = false, absolute::Bool = false)
   return get_cached!(FqDefaultFiniteFieldIDFqDefaultPoly, (f, s, absolute), cached) do
