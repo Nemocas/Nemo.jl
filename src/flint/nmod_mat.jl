@@ -93,6 +93,14 @@ function setindex_raw!(a::T, u::ZZRingElem, i::Int, j::Int) where T <: Zmodn_mat
   setindex_raw!(a, tt, i, j)
 end
 
+function setindex!(a::zzModMatrix, b::zzModMatrix, r::UnitRange{Int64}, c::UnitRange{Int64})
+  _checkbounds(a, r, c)
+  size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
+  A = view(a, r, c)
+  ccall((:nmod_mat_set, libflint), Nothing,
+        (Ref{zzModMatrix}, Ref{zzModMatrix}), A, b)
+end
+
 function deepcopy_internal(a::zzModMatrix, dict::IdDict)
   z = zzModMatrix(nrows(a), ncols(a), a.n)
   if isdefined(a, :base_ring)
@@ -303,6 +311,19 @@ end
 
 function mul!(A::fpMatrix, B::fpFieldElem, D::fpMatrix)
     ccall((:nmod_mat_scalar_mul_ui, libflint), Nothing, (Ref{fpMatrix}, Ref{fpMatrix}, UInt), A, D, B.data)
+end
+
+function Generic.add_one!(a::zzModMatrix, i::Int, j::Int)
+  @boundscheck Generic._checkbounds(a, i, j)
+  x = ccall((:nmod_mat_get_entry, libflint), UInt,
+            (Ref{zzModMatrix}, Int, Int), a, i - 1, j - 1)
+  x += 1
+  if x == base_ring(a).n
+    x = UInt(0)
+  end
+  ccall((:nmod_mat_set_entry, libflint), Nothing,
+        (Ref{zzModMatrix}, Int, Int, UInt), a, i - 1, j - 1, x)
+  return a
 end
 
 ################################################################################

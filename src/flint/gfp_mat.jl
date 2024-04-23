@@ -52,6 +52,14 @@ end
   setindex_raw!(a, u.data, i, j) # no reduction necessary
 end
 
+function setindex!(a::fpMatrix, b::fpMatrix, r::UnitRange{Int64}, c::UnitRange{Int64})
+  _checkbounds(a, r, c)
+  size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
+  A = view(a, r, c)
+  ccall((:nmod_mat_set, libflint), Nothing,
+        (Ref{fpMatrix}, Ref{fpMatrix}), A, b)
+end
+
 function deepcopy_internal(a::fpMatrix, dict::IdDict)
   z = fpMatrix(nrows(a), ncols(a), modulus(base_ring(a)))
   if isdefined(a, :base_ring)
@@ -96,6 +104,25 @@ function *(x::fpMatrix, y::fpFieldElem)
 end
 
 *(x::fpFieldElem, y::fpMatrix) = y*x
+
+################################################################################
+#
+#  Unsafe operations
+#
+################################################################################
+
+function Generic.add_one!(a::fpMatrix, i::Int, j::Int)
+  @boundscheck Generic._checkbounds(a, i, j)
+  x = ccall((:nmod_mat_get_entry, libflint), UInt,
+            (Ref{fpMatrix}, Int, Int), a, i - 1, j - 1)
+  x += 1
+  if x == base_ring(a).n
+    x = UInt(0)
+  end
+  ccall((:nmod_mat_set_entry, libflint), Nothing,
+        (Ref{fpMatrix}, Int, Int, UInt), a, i - 1, j - 1, x)
+  return a
+end
 
 ################################################################################
 #

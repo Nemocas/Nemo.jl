@@ -57,14 +57,24 @@ resulting parent objects to coerce various elements into those fields.
 
 **Examples**
 
-```julia
-R = PadicField(7, 30)
-S = PadicField(ZZ(65537), 30)
+```jldoctest
+julia> R = PadicField(7, 30)
+Field of 7-adic numbers
 
-a = R()
-b = S(1)
-c = S(ZZ(123))
-d = R(ZZ(1)//7^2)
+julia> S = PadicField(ZZ(65537), 30)
+Field of 65537-adic numbers
+
+julia> a = R()
+O(7^30)
+
+julia> b = S(1)
+65537^0 + O(65537^30)
+
+julia> c = S(ZZ(123))
+123*65537^0 + O(65537^30)
+
+julia> d = R(ZZ(1)//7^2)
+7^-2 + O(7^28)
 ```
 
 ### Big-oh notation
@@ -84,18 +94,26 @@ $p^n$ as in the examples.
 
 **Examples**
 
-```julia
-R = PadicField(7, 30)
-S = PadicField(ZZ(65537), 30)
+```jldoctest
+julia> R = PadicField(7, 30)
+Field of 7-adic numbers
 
-c = 1 + 2*7 + 4*7^2 + O(R, 7^3)
-d = 13 + 357*ZZ(65537) + O(S, ZZ(65537)^12)
-f = ZZ(1)//7^2 + ZZ(2)//7 + 3 + 4*7 + O(R, 7^2)
+julia> S = PadicField(ZZ(65537), 30)
+Field of 65537-adic numbers
+
+julia> c = 1 + 2*7 + 4*7^2 + O(R, 7^3)
+7^0 + 2*7^1 + 4*7^2 + O(7^3)
+
+julia> d = 13 + 357*ZZ(65537) + O(S, ZZ(65537)^12)
+13*65537^0 + 357*65537^1 + O(65537^12)
+
+julia> f = ZZ(1)//7^2 + ZZ(2)//7 + 3 + 4*7 + O(R, 7^2)
+7^-2 + 2*7^-1 + 3*7^0 + 4*7^1 + O(7^2)
 ```
 
 Beware that the expression `1 + 2*p + 3*p^2 + O(R, p^n)` is actually computed
-as a normal Julia expression. Therefore if `{Int}` values are used instead
-of Flint integers or Julia bignums, overflow may result in evaluating the
+as a normal Julia expression. Therefore if `Int` values are used instead
+of `ZZRingElem`s or Julia `BigInt`s, overflow may result in evaluating the
 value.
 
 ### Basic manipulation
@@ -119,18 +137,33 @@ lift(::QQField, ::PadicFieldElem)
 
 **Examples**
 
-```julia
-R = PadicField(7, 30)
+```jldoctest
+julia> R = PadicField(7, 30)
+Field of 7-adic numbers
 
-a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
-b = 7^2 + 3*7^3 + O(R, 7^5)
-c = R(2)
+julia> a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
+7^0 + 2*7^1 + 4*7^2 + O(7^3)
 
-k = precision(a)
-m = prime(R)
-n = valuation(b)
-p = lift(FlintZZ, a)
-q = lift(FlintQQ, divexact(a, b))
+julia> b = 7^2 + 3*7^3 + O(R, 7^5)
+7^2 + 3*7^3 + O(7^5)
+
+julia> c = R(2)
+2*7^0 + O(7^30)
+
+julia> k = precision(a)
+3
+
+julia> m = prime(R)
+7
+
+julia> n = valuation(b)
+2
+
+julia> p = lift(ZZ, a)
+211
+
+julia> q = lift(QQ, divexact(a, b))
+337//49
 ```
 
 ### Square root
@@ -141,17 +174,33 @@ Base.sqrt(::PadicFieldElem)
 
 **Examples**
 
-```julia
-R = PadicField(7, 30)
+```jldoctest
+julia> R = PadicField(7, 30)
+Field of 7-adic numbers
 
-a = 1 + 7 + 2*7^2 + O(R, 7^3)
-b = 2 + 3*7 + O(R, 7^5)
-c = 7^2 + 2*7^3 + O(R, 7^4)
+julia> a = 1 + 7 + 2*7^2 + O(R, 7^3)
+7^0 + 7^1 + 2*7^2 + O(7^3)
 
-d = sqrt(a)
-f = sqrt(b)
-f = sqrt(c)
-g = sqrt(R(121))
+julia> b = 2 + 3*7 + O(R, 7^5)
+2*7^0 + 3*7^1 + O(7^5)
+
+julia> c = 7^2 + 2*7^3 + O(R, 7^4)
+7^2 + 2*7^3 + O(7^4)
+
+julia> d = sqrt(a)
+7^0 + 4*7^1 + 3*7^2 + O(7^3)
+
+julia> f = sqrt(b)
+3*7^0 + 5*7^1 + 7^2 + 7^3 + O(7^5)
+
+julia> f = sqrt(c)
+7^1 + 7^2 + O(7^3)
+
+julia> g = sqrt(R(121))
+3*7^0 + 5*7^1 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + 6*7^10 + 6*7^11 + 6*7^12 + 6*7^13 + 6*7^14 + 6*7^15 + 6*7^16 + 6*7^17 + 6*7^18 + 6*7^19 + 6*7^20 + 6*7^21 + 6*7^22 + 6*7^23 + 6*7^24 + 6*7^25 + 6*7^26 + 6*7^27 + 6*7^28 + 6*7^29 + O(7^30)
+
+julia> g^2 == R(121)
+true
 ```
 
 ### Special functions
@@ -170,16 +219,31 @@ teichmuller(::PadicFieldElem)
 
 **Examples**
 
-```julia
-R = PadicField(7, 30)
+```jldoctest
+julia> R = PadicField(7, 30)
+Field of 7-adic numbers
 
-a = 1 + 7 + 2*7^2 + O(R, 7^3)
-b = 2 + 5*7 + 3*7^2 + O(R, 7^3)
-c = 3*7 + 2*7^2 + O(R, 7^5)
+julia> a = 1 + 7 + 2*7^2 + O(R, 7^3)
+7^0 + 7^1 + 2*7^2 + O(7^3)
 
-c = exp(c)
-d = log(a)
-c = exp(R(0))
-d = log(R(1))
-f = teichmuller(b)
+julia> b = 2 + 5*7 + 3*7^2 + O(R, 7^3)
+2*7^0 + 5*7^1 + 3*7^2 + O(7^3)
+
+julia> c = 3*7 + 2*7^2 + O(R, 7^5)
+3*7^1 + 2*7^2 + O(7^5)
+
+julia> c = exp(c)
+7^0 + 3*7^1 + 3*7^2 + 4*7^3 + 4*7^4 + O(7^5)
+
+julia> d = log(a)
+7^1 + 5*7^2 + O(7^3)
+
+julia> c = exp(R(0))
+7^0 + O(7^30)
+
+julia> d = log(R(1))
+O(7^30)
+
+julia> f = teichmuller(b)
+2*7^0 + 4*7^1 + 6*7^2 + O(7^3)
 ``` 

@@ -1,10 +1,10 @@
 @testset "ZZMatrix.constructors" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    @test elem_type(S) == ZZMatrix
    @test elem_type(ZZMatrixSpace) == ZZMatrix
    @test parent_type(ZZMatrix) == ZZMatrixSpace
-   @test base_ring(S) == FlintZZ
+   @test base_ring(S) == ZZ
    @test nrows(S) == 3
    @test ncols(S) == 3
 
@@ -43,31 +43,31 @@
    arr2 = [1, 2, 3, 4, 5, 6]
 
    for T in [ZZRingElem, Int, BigInt]
-      M = matrix(FlintZZ, map(T, arr))
+      M = matrix(ZZ, map(T, arr))
       @test isa(M, ZZMatrix)
-      @test base_ring(M) == FlintZZ
+      @test base_ring(M) == ZZ
 
-      M2 = matrix(FlintZZ, 2, 3, map(T, arr2))
+      M2 = matrix(ZZ, 2, 3, map(T, arr2))
       @test isa(M2, ZZMatrix)
-      @test base_ring(M2) == FlintZZ
+      @test base_ring(M2) == ZZ
       @test nrows(M2) == 2
       @test ncols(M2) == 3
-      @test_throws ErrorConstrDimMismatch matrix(FlintZZ, 2, 2, map(T, arr2))
-      @test_throws ErrorConstrDimMismatch matrix(FlintZZ, 2, 4, map(T, arr2))
+      @test_throws ErrorConstrDimMismatch matrix(ZZ, 2, 2, map(T, arr2))
+      @test_throws ErrorConstrDimMismatch matrix(ZZ, 2, 4, map(T, arr2))
    end
 
-   M3 = zero_matrix(FlintZZ, 2, 3)
+   M3 = zero_matrix(ZZ, 2, 3)
 
    @test isa(M3, ZZMatrix)
-   @test base_ring(M3) == FlintZZ
+   @test base_ring(M3) == ZZ
 
-   M4 = identity_matrix(FlintZZ, 3)
+   M4 = identity_matrix(ZZ, 3)
 
    @test isa(M4, ZZMatrix)
-   @test base_ring(M4) == FlintZZ
+   @test base_ring(M4) == ZZ
 
-   a = zero_matrix(FlintZZ, 2, 2)
-   b = zero_matrix(FlintZZ, 2, 3)
+   a = zero_matrix(ZZ, 2, 2)
+   b = zero_matrix(ZZ, 2, 3)
    @test a in [a, b]
    @test a in [b, a]
    @test !(a in [b])
@@ -76,7 +76,7 @@
 end
 
 @testset "ZZMatrix.$sim_zero" for sim_zero in (similar, zero)
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
    s = S(ZZRingElem(3))
 
    t = sim_zero(s)
@@ -111,14 +111,14 @@ end
 end
 
 @testset "ZZMatrix.is_zero_entry" begin
-   M = matrix(FlintZZ, [1 2 3;4 0 6;0 8 9])
+   M = matrix(ZZ, [1 2 3;4 0 6;0 8 9])
    for i in 1:3, j in 1:3
       @test is_zero_entry(M, i, j) == (M[i, j] == 0)
    end
 end
 
 @testset "ZZMatrix.printing" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
    f = S(ZZRingElem(3))
 
    # test that default Julia printing is not used
@@ -129,7 +129,7 @@ end
    # Basic tests.
    A = [[1 2 3]; [4 5 6]]
    Abig = BigInt[[1 2 3]; [4 5 6]]
-   S = matrix_space(FlintZZ, 2, 3)
+   S = matrix_space(ZZ, 2, 3)
    B = S(A)
 
    @test Matrix{Int}(B) == A
@@ -141,7 +141,7 @@ end
 end
 
 @testset "ZZMatrix.manipulation" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
    B = S([ZZRingElem(1) 4 7; 9 6 7; 4 3 3])
 
@@ -157,20 +157,33 @@ end
 
    @test deepcopy(A) == A
 
-   a = matrix(FlintZZ, 4, 4, [-1 ZZRingElem(2)^100 3 -4; 5 -1 ZZRingElem(2)^100 6; 7 5 -1 8; 9 10 11 12])
+   a = matrix(ZZ, 4, 4, [-1 ZZRingElem(2)^100 3 -4; 5 -1 ZZRingElem(2)^100 6; 7 5 -1 8; 9 10 11 12])
    @test hash(a, UInt(5)) == hash(deepcopy(a), UInt(5))
    @test hash(view(a, 1,1, 2,2)) == hash(view(a, 2,2, 3,3))
+
+   C = ZZ[1 2 3; 4 5 6; 7 8 9]
+   C[3, :] = ZZ[7 7 7]
+   @test C == ZZ[1 2 3; 4 5 6; 7 7 7]
+
+   C[:, 3] = ZZ[5; 5; 5]
+   @test C == ZZ[1 2 5; 4 5 5; 7 7 5]
+
+   C[1:2, 2:3] = ZZ[3 3; 3 3]
+   @test C == ZZ[1 3 3; 4 3 3; 7 7 5]
+
+   @test_throws DimensionMismatch C[1:2, 2:3] = ZZ[3 3]
+   @test_throws BoundsError C[1:2, 3:4] = ZZ[3 3; 3 3]
 end
 
 @testset "ZZMatrix.view" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([1 2 3; 4 5 6; 7 8 9])
 
    B = @inferred view(A, 1, 1, 2, 2)
 
    @test typeof(B) == ZZMatrix
-   @test B == matrix_space(FlintZZ, 2, 2)([1 2; 4 5])
+   @test B == matrix_space(ZZ, 2, 2)([1 2; 4 5])
 
    B[1, 1] = 10
    @test A[1, 1] == 10
@@ -178,7 +191,7 @@ end
    C = @inferred view(B, 1:2, 1:2)
 
    @test typeof(C) == ZZMatrix
-   @test C == matrix_space(FlintZZ, 2, 2)([10 2; 4 5])
+   @test C == matrix_space(ZZ, 2, 2)([10 2; 4 5])
 
    C[1, 1] = 20
    @test B[1, 1] == 20
@@ -191,7 +204,7 @@ end
 
    A = S([1 2 3; 4 5 6; 7 8 9])
    v = @view A[2, :]
-   @test v isa AbstractVector{elem_type(FlintZZ)}
+   @test v isa AbstractVector{elem_type(ZZ)}
    @test length(v) == 3
    @test v[1] == 4
    @test collect(v) == [4, 5, 6]
@@ -199,7 +212,7 @@ end
    @test A == S([1 2 3; 4 7 6; 7 8 9])
    A = S([1 2 3; 4 5 6; 7 8 9])
    v = @view A[:, 3]
-   @test v isa AbstractVector{elem_type(FlintZZ)}
+   @test v isa AbstractVector{elem_type(ZZ)}
    @test length(v) == 3
    @test v[3] == 9
    @test collect(v) == [3, 6, 9]
@@ -208,14 +221,14 @@ end
 end
 
 @testset "ZZMatrix.sub" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([1 2 3; 4 5 6; 7 8 9])
 
    B = @inferred sub(A, 1, 1, 2, 2)
 
    @test typeof(B) == ZZMatrix
-   @test B == matrix_space(FlintZZ, 2, 2)([1 2; 4 5])
+   @test B == matrix_space(ZZ, 2, 2)([1 2; 4 5])
 
    B[1, 1] = 10
    @test A == S([1 2 3; 4 5 6; 7 8 9])
@@ -223,15 +236,15 @@ end
    C = @inferred sub(B, 1:2, 1:2)
 
    @test typeof(C) == ZZMatrix
-   @test C == matrix_space(FlintZZ, 2, 2)([10 2; 4 5])
+   @test C == matrix_space(ZZ, 2, 2)([10 2; 4 5])
 
    C[1, 1] = 20
-   @test B == matrix_space(FlintZZ, 2, 2)([10 2; 4 5])
+   @test B == matrix_space(ZZ, 2, 2)([10 2; 4 5])
    @test A == S([1 2 3; 4 5 6; 7 8 9])
 end
 
 @testset "ZZMatrix.unary_ops" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
    B = S([ZZRingElem(-2) (-3) (-5); (-1) (-4) (-7); (-9) (-6) (-3)])
@@ -240,7 +253,7 @@ end
 end
 
 @testset "ZZMatrix.binary_ops" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
    B = S([ZZRingElem(1) 4 7; 9 6 7; 4 3 3])
@@ -254,7 +267,7 @@ end
 end
 
 @testset "ZZMatrix.adhoc_binary" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -280,7 +293,7 @@ end
 end
 
 @testset "ZZMatrix.comparison" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
    B = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
@@ -291,7 +304,7 @@ end
 end
 
 @testset "ZZMatrix.adhoc_comparison" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -304,7 +317,7 @@ end
 end
 
 @testset "ZZMatrix.powering" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -316,7 +329,7 @@ end
 end
 
 @testset "ZZMatrix.adhoc_exact_division" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -325,7 +338,7 @@ end
 end
 
 @testset "ZZMatrix.gram" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -333,7 +346,7 @@ end
 end
 
 @testset "ZZMatrix.trace" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -341,7 +354,7 @@ end
 end
 
 @testset "ZZMatrix.content" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -349,7 +362,7 @@ end
 end
 
 @testset "ZZMatrix.transpose" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -363,44 +376,44 @@ end
 end
 
 @testset "ZZMatrix.row_col_swapping" begin
-   a = matrix(FlintZZ, [1 2; 3 4; 5 6])
+   a = matrix(ZZ, [1 2; 3 4; 5 6])
 
-   @test swap_rows(a, 1, 3) == matrix(FlintZZ, [5 6; 3 4; 1 2])
+   @test swap_rows(a, 1, 3) == matrix(ZZ, [5 6; 3 4; 1 2])
 
    swap_rows!(a, 2, 3)
 
-   @test a == matrix(FlintZZ, [1 2; 5 6; 3 4])
+   @test a == matrix(ZZ, [1 2; 5 6; 3 4])
 
-   @test swap_cols(a, 1, 2) == matrix(FlintZZ, [2 1; 6 5; 4 3])
+   @test swap_cols(a, 1, 2) == matrix(ZZ, [2 1; 6 5; 4 3])
 
    swap_cols!(a, 2, 1)
 
-   @test a == matrix(FlintZZ, [2 1; 6 5; 4 3])
+   @test a == matrix(ZZ, [2 1; 6 5; 4 3])
 
-   a = matrix(FlintZZ, [1 2; 3 4])
-   @test reverse_rows(a) == matrix(FlintZZ, [3 4; 1 2])
+   a = matrix(ZZ, [1 2; 3 4])
+   @test reverse_rows(a) == matrix(ZZ, [3 4; 1 2])
    reverse_rows!(a)
-   @test a == matrix(FlintZZ, [3 4; 1 2])
+   @test a == matrix(ZZ, [3 4; 1 2])
 
-   a = matrix(FlintZZ, [1 2; 3 4])
-   @test reverse_cols(a) == matrix(FlintZZ, [2 1; 4 3])
+   a = matrix(ZZ, [1 2; 3 4])
+   @test reverse_cols(a) == matrix(ZZ, [2 1; 4 3])
    reverse_cols!(a)
-   @test a == matrix(FlintZZ, [2 1; 4 3])
+   @test a == matrix(ZZ, [2 1; 4 3])
 
-   a = matrix(FlintZZ, [1 2 3; 3 4 5; 5 6 7])
+   a = matrix(ZZ, [1 2 3; 3 4 5; 5 6 7])
 
-   @test reverse_rows(a) == matrix(FlintZZ, [5 6 7; 3 4 5; 1 2 3])
+   @test reverse_rows(a) == matrix(ZZ, [5 6 7; 3 4 5; 1 2 3])
    reverse_rows!(a)
-   @test a == matrix(FlintZZ, [5 6 7; 3 4 5; 1 2 3])
+   @test a == matrix(ZZ, [5 6 7; 3 4 5; 1 2 3])
 
-   a = matrix(FlintZZ, [1 2 3; 3 4 5; 5 6 7])
-   @test reverse_cols(a) == matrix(FlintZZ, [3 2 1; 5 4 3; 7 6 5])
+   a = matrix(ZZ, [1 2 3; 3 4 5; 5 6 7])
+   @test reverse_cols(a) == matrix(ZZ, [3 2 1; 5 4 3; 7 6 5])
    reverse_cols!(a)
-   @test a == matrix(FlintZZ, [3 2 1; 5 4 3; 7 6 5])
+   @test a == matrix(ZZ, [3 2 1; 5 4 3; 7 6 5])
 end
 
 @testset "ZZMatrix.scaling" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
 
@@ -411,7 +424,7 @@ end
 end
 
 @testset "ZZMatrix.inversion" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 2 2])
    B = S([-6 4 1; 61 (-41) (-9); -34 23 5])
@@ -431,7 +444,7 @@ end
 end
 
 @testset "ZZMatrix.pseudo_inversion" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([1 2 3; 1 2 3; 1 2 3])
    B = S([1 0 1; 2 3 1; 5 6 7])
@@ -443,7 +456,7 @@ end
 end
 
 @testset "ZZMatrix.exact_division" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 2 2])
    B = S([2 3 4; 7 9 1; 5 4 5])
@@ -452,7 +465,7 @@ end
 end
 
 @testset "ZZMatrix.modular_reduction" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 2 2])
    B = S([2 0 2; 1 1 1; 0 2 2])
@@ -463,7 +476,7 @@ end
 end
 
 @testset "ZZMatrix.det" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 19 3 7])
 
@@ -477,7 +490,7 @@ end
 end
 
 @testset "ZZMatrix.hadamard" begin
-   S = matrix_space(FlintZZ, 4, 4)
+   S = matrix_space(ZZ, 4, 4)
 
    @test is_hadamard(hadamard(S))
 end
@@ -515,7 +528,7 @@ end
 end
 
 @testset "ZZMatrix.hnf" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 19 3 7])
 
@@ -538,7 +551,7 @@ end
 end
 
 @testset "ZZMatrix.lll" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 19 3 7])
 
@@ -570,8 +583,8 @@ end
 end
 
 @testset "ZZMatrix.nullspace" begin
-   S = matrix_space(FlintZZ, 3, 3)
-   T = matrix_space(FlintZZ, 3, 1)
+   S = matrix_space(ZZ, 3, 3)
+   T = matrix_space(ZZ, 3, 1)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 4 1 1])
 
@@ -589,7 +602,7 @@ end
 end
 
 @testset "ZZMatrix.rank" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 4 1 1])
 
@@ -600,7 +613,7 @@ end
    for iters = 1:100
       m = rand(0:100)
       n = rand(0:100)
-      S = matrix_space(FlintZZ, m, n)
+      S = matrix_space(ZZ, m, n)
       M = rand(S, -100:100)
       r, N, d = rref_rational(M)
 
@@ -612,7 +625,7 @@ end
       @test is_rref(N2)
    end 
 
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 4 1 1])
 
@@ -623,7 +636,7 @@ end
 end
 
 @testset "ZZMatrix.snf" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 19 3 7])
 
@@ -637,11 +650,11 @@ end
 end
 
 @testset "ZZMatrix._solve_rational" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 2 2])
 
-   T = matrix_space(FlintZZ, 3, 1)
+   T = matrix_space(ZZ, 3, 1)
 
    B = T([ZZRingElem(4), 5, 7])
 
@@ -669,11 +682,11 @@ end
    AbstractAlgebra._solve_tril!(c, A, b)
    @test c == matrix(ZZ, 2, 1, [1, 1])
 
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 2 2])
 
-   T = matrix_space(FlintZZ, 3, 1)
+   T = matrix_space(ZZ, 3, 1)
 
    B = T([ZZRingElem(4), 5, 7])
 
@@ -756,9 +769,9 @@ end
 end
 
 @testset "ZZMatrix.concat" begin
-   S = matrix_space(FlintZZ, 3, 3)
-   T = matrix_space(FlintZZ, 3, 6)
-   U = matrix_space(FlintZZ, 6, 3)
+   S = matrix_space(ZZ, 3, 3)
+   T = matrix_space(ZZ, 3, 6)
+   U = matrix_space(ZZ, 6, 3)
 
    A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
    B = S([ZZRingElem(1) 4 7; 9 6 7; 4 3 3])
@@ -784,10 +797,17 @@ end
 end
 
 @testset "ZZMatrix.rand" begin
-   S = matrix_space(FlintZZ, 3, 3)
+   S = matrix_space(ZZ, 3, 3)
    M = rand(S, 1:9)
    @test parent(M) == S
    for i=1:3, j=1:3
       @test M[i, j] in 1:9
    end
+end
+
+@testset "ZZMatrix.add_one!" begin
+  A = ZZ[0 0; 0 0]
+  Generic.add_one!(A, 1, 1)
+  @test A == ZZ[1 0; 0 0]
+  @test_throws BoundsError Generic.add_one!(A, 3, 1)
 end

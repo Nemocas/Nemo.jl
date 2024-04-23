@@ -80,6 +80,14 @@ end
         (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), a, i - 1, j - 1, u)
 end
 
+function setindex!(a::FpMatrix, b::FpMatrix, r::UnitRange{Int64}, c::UnitRange{Int64})
+  _checkbounds(a, r, c)
+  size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
+  A = view(a, r, c)
+  ccall((:fmpz_mod_mat_set, libflint), Nothing,
+        (Ref{FpMatrix}, Ref{FpMatrix}), A, b)
+end
+
 function deepcopy_internal(a::FpMatrix, dict::IdDict)
   z = FpMatrix(nrows(a), ncols(a), modulus(base_ring(a)))
   if isdefined(a, :base_ring)
@@ -138,6 +146,23 @@ function *(x::FpMatrix, y::FpFieldElem)
 end
 
 *(x::FpFieldElem, y::FpMatrix) = y*x
+
+################################################################################
+#
+#  Unsafe operations
+#
+################################################################################
+
+function Generic.add_one!(a::FpMatrix, i::Int, j::Int)
+  @boundscheck Generic._checkbounds(a, i, j)
+  GC.@preserve a begin
+    x = mat_entry_ptr(a, i, j)
+    ccall((:fmpz_mod_add_si, libflint), Nothing,
+          (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Int, Ref{fmpz_mod_ctx_struct}),
+          x, x, 1, base_ring(a).ninv)
+  end
+  return a
+end
 
 ################################################################################
 #

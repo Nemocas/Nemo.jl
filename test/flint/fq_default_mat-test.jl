@@ -90,7 +90,7 @@
   @test parent(e) == R
   @test nrows(e) == 2 && ncols(e) == 2
 
-  ar = matrix(FlintZZ, [ 1 1 1 ; 1 1 1; 1 1 1])
+  ar = matrix(ZZ, [ 1 1 1 ; 1 1 1; 1 1 1])
 
   @test_throws ErrorException R(ar)
 
@@ -168,7 +168,7 @@
    R, x = finite_field(ZZRingElem(23), 5, "x")
    S = matrix_space(R, 2, 2)
 
-   for R in [FlintZZ, residue_ring(FlintZZ, 23)[1], residue_ring(FlintZZ, ZZ(23))[1], Native.GF(23)]
+   for R in [ZZ, residue_ring(ZZ, 23)[1], residue_ring(ZZ, ZZ(23))[1], Native.GF(23)]
       M = matrix(R, 2, 2, [1, 2, 3, 4])
 
       @test isa(S(M), MatElem)
@@ -279,6 +279,19 @@ end
           matrix_space(F4,2,1)(reshape([ 1 ; 2],2,1))
 
   @test_throws ErrorConstrDimMismatch transpose!(R([ 1 2 ;]))
+
+  C = F9[1 2 3; 4 5 6; 7 8 9]
+  C[3, :] = F9[7 7 7]
+  @test C == F9[1 2 3; 4 5 6; 7 7 7]
+
+  C[:, 3] = F9[5; 5; 5]
+  @test C == F9[1 2 5; 4 5 5; 7 7 5]
+
+  C[1:2, 2:3] = F9[3 3; 3 3]
+  @test C == F9[1 3 3; 4 3 3; 7 7 5]
+
+  @test_throws DimensionMismatch C[1:2, 2:3] = F9[3 3]
+  @test_throws BoundsError C[1:2, 3:4] = F9[3 3; 3 3]
 end
 
 @testset "FqMatrix.unary_ops" begin
@@ -942,6 +955,23 @@ end
           end
         end
       end
+    end
+  end
+end
+
+@testset "FqMatrix.add_one!" begin
+  # This is accessing the matrix via pointers, so test all different
+  # flint "backends"
+  for p in ZZRingElem[2, 1073741827, 1180591620717411303449]
+    for d in [1, 2]
+      F = GF(p, d)
+      A = F[p - 2 0; 0 0]
+      Generic.add_one!(A, 1, 1)
+      @test A == F[p - 1 0; 0 0]
+      # Make sure reduction works
+      Generic.add_one!(A, 1, 1)
+      @test A == F[0 0; 0 0]
+      @test_throws BoundsError Generic.add_one!(A, 3, 1)
     end
   end
 end

@@ -26,7 +26,7 @@ end
 
    @test Nemo.promote_rule(elem_type(R), ZZRingElem) == elem_type(R)
 
-   @test base_ring(R) == FlintZZ
+   @test base_ring(R) == ZZ
 
    @test isa(R, Nemo.zzModRing)
 

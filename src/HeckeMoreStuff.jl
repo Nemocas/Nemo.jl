@@ -3,7 +3,7 @@ function Base.copy(a::ZZRingElem)
 end
 
 function QQMatrix(x::ZZMatrix)
-    z = zero_matrix(FlintQQ, nrows(x), ncols(x))
+    z = zero_matrix(QQ, nrows(x), ncols(x))
     ccall((:fmpq_mat_set_fmpz_mat, libflint), Nothing, (Ref{QQMatrix}, Ref{ZZMatrix}), z, x)
     return z
 end
@@ -134,9 +134,9 @@ function roots(f::ZZModPolyRingElem, fac::Fac{ZZRingElem})
     return _res
 end
 
-ZZMatrix(M::Matrix{Int}) = matrix(FlintZZ, M)
+ZZMatrix(M::Matrix{Int}) = matrix(ZZ, M)
 
-order(::ZZRingElem) = FlintZZ
+order(::ZZRingElem) = ZZ
 
 function sub!(z::Vector{QQFieldElem}, x::Vector{QQFieldElem}, y::Vector{ZZRingElem})
     for i in 1:length(z)
@@ -186,7 +186,7 @@ function Base.round(::Type{ZZRingElem}, x::ArbFieldElem)
 end
 
 function Base.round(::Type{ZZMatrix}, C::ArbMatrix)
-    v = zero_matrix(FlintZZ, nrows(C), ncols(C))
+    v = zero_matrix(ZZ, nrows(C), ncols(C))
 
     for i = 1:nrows(C)
         for j = 1:ncols(C)
@@ -206,7 +206,7 @@ real(x::QQFieldElem) = x
 
 norm(x::ZZRingElem) = abs(x)
 
-number_field(::ZZRing) = FlintQQ
+number_field(::ZZRing) = QQ
 
 function Base.hash(f::zzModMPolyRingElem, h::UInt)
     return UInt(1) # TODO: enhance or throw error
@@ -371,7 +371,7 @@ function basis(K::AbsSimpleNumField)
     return d
 end
 
-base_field(_::AbsSimpleNumField) = FlintQQ
+base_field(_::AbsSimpleNumField) = QQ
 
 ################################################################################
 #
@@ -512,7 +512,7 @@ $b\in Z[t]$, $\deg(a) = \deg(b)$ and $d>0$ minimal in $Z$.
 This function returns $b$.
 """
 function numerator(a::AbsSimpleNumFieldElem)
-    _one = one(FlintZZ)
+    _one = one(ZZ)
     z = deepcopy(a)
     ccall((:nf_elem_set_den, libantic), Nothing,
         (Ref{AbsSimpleNumFieldElem}, Ref{ZZRingElem}, Ref{AbsSimpleNumField}),
@@ -1364,7 +1364,7 @@ function lift(M::fqPolyRepMatrix, R::zzModRing)
     N = zero_matrix(R, nrows(M), ncols(M))
     for i = 1:nrows(M)
         for j = 1:ncols(M)
-            N[i, j] = FlintZZ(coeff(M[i, j], 0))
+            N[i, j] = ZZ(coeff(M[i, j], 0))
         end
     end
     return N
@@ -1479,7 +1479,7 @@ end
 Base.replace!(::typeof(-), m::ZZMatrix) = -m
 
 function (A::AbsSimpleNumField)(a::ZZPolyRingElem)
-    return A(FlintQQ["x"][1](a))
+    return A(QQ["x"][1](a))
 end
 
 

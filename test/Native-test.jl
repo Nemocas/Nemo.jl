@@ -26,4 +26,9 @@
 
   @test Native.GF(2, 2) isa fqPolyRepField
   @test Native.GF(ZZ(2), 2) isa FqPolyRepField
+
+  F2 = Native.GF(2, cached = false)
+  @test F2([1]) == one(F2)
+  F4 = Native.GF(2, 2)
+  @test F4([1, 0]) == one(F4)
 end

@@ -45,7 +45,7 @@ As all elements and parents in Nemo are objects, those objects have types
 which we refer to as the element type and parent type respectively.
 
 For example, Flint integers have type `ZZRingElem` and the parent object they all
-belong to, `FlintZZ` has type `ZZRing`.
+belong to, `ZZ` has type `ZZRing`.
 
 More complex parents and elements are parameterised. For example, generic
 univariate polynomials over a base ring `R` are parameterised by `R`. The

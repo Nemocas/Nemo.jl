@@ -726,19 +726,39 @@ lindep(A::Matrix{AcbFieldElem}, bits::Int)
 
 **Examples**
 
-```julia
-CC = AcbField(128)
+```jldoctest
+julia> CC = AcbField(128)
+Complex Field with 128 bits of precision and error bounds
 
-# These are two of the roots of x^5 + 3x + 1
-a = CC(1.0050669478588622428791051888364775253, - 0.93725915669289182697903585868761513585)
-b = CC(-0.33198902958450931620250069492231652319)
+julia> # These are two of the roots of x^5 + 3x + 1
 
-# We recover the polynomial from one root....
-V1 = [CC(1), a, a^2, a^3, a^4, a^5];
-W = lindep(V1, 20)
+julia> a = CC(1.0050669478588622428791051888364775253, -0.93725915669289182697903585868761513585)
+[1.00506694785886230292248910700436681509 +/- 1.80e-40] - [0.937259156692891837181491609953809529543 +/- 7.71e-41]*im
 
-# ...or from two
-V2 = [CC(1), b, b^2, b^3, b^4, b^5];
-Vs = [V1 V2]
-X = lindep(Vs, 20)
+julia> b = CC(-0.33198902958450931620250069492231652319)
+-[0.331989029584509320880414406929048709571 +/- 3.62e-40]
+
+julia> V1 = [CC(1), a, a^2, a^3, a^4, a^5]; # We recover the polynomial from one root....
+
+julia> W = lindep(V1, 20)
+6-element Vector{ZZRingElem}:
+ 1
+ 3
+ 0
+ 0
+ 0
+ 1
+
+julia> V2 = [CC(1), b, b^2, b^3, b^4, b^5]; # ...or from two
+
+julia> Vs = [transpose(V1); transpose(V2)];
+
+julia> X = lindep(Vs, 20)
+6-element Vector{ZZRingElem}:
+ 1
+ 3
+ 0
+ 0
+ 0
+ 1
 ```
