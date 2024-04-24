@@ -844,6 +844,5 @@ promote_rule(::Type{RealMat}, ::Type{QQMatrix}) = RealMat
 
 function matrix_space(R::RealField, r::Int, c::Int; cached = true)
   # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
-  (r <= 0 || c <= 0) && error("Dimensions must be positive")
   return RealMatSpace(R, r, c)
 end
