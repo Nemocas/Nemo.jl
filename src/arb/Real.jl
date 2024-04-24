@@ -176,7 +176,7 @@ end
 
 function show(io::IO, x::RealField)
   # deliberately no @show_name or @show_special here as this is a singleton type
-  if get(io, :supercompact, false)
+   if is_terse(io)
     print(io, LowercaseOff(), "RR")
   else
     print(io, "Real field")

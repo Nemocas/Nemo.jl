@@ -181,6 +181,7 @@ import AbstractAlgebra: get_attribute
 import AbstractAlgebra: get_cached!
 import AbstractAlgebra: Group
 import AbstractAlgebra: Indent
+import AbstractAlgebra: is_terse
 import AbstractAlgebra: Lowercase
 import AbstractAlgebra: LowercaseOff
 import AbstractAlgebra: Module
@@ -191,6 +192,7 @@ import AbstractAlgebra: Ring
 import AbstractAlgebra: Set
 import AbstractAlgebra: set_attribute!
 import AbstractAlgebra: Solve
+import AbstractAlgebra: terse
 
 AbstractAlgebra.@include_deprecated_bindings()
 

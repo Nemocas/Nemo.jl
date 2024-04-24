@@ -147,7 +147,7 @@ end
 
 function show(io::IO, x::ComplexField)
   # deliberately no @show_name or @show_special here as this is a singleton type
-  if get(io, :supercompact, false)
+   if is_terse(io)
     print(io, LowercaseOff(), "CC")
   else
     print(io, "Complex field")

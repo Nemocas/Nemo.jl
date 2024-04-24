@@ -261,11 +261,9 @@ end
 
 function show(io::IO, a::QQField)
   # deliberately no @show_name or @show_special here as this is a singleton type
-  if get(io, :supercompact, false)
-    # no nested printing
+   if is_terse(io)
     print(pretty(io), LowercaseOff(), "QQ")
   else
-    # nested printing allowed, preferably supercompact
     print(io, "Rational field")
   end
 end

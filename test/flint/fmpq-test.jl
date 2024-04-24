@@ -636,6 +636,6 @@ end
   @test PrettyPrinting.supercompact(QQ) == "QQ"
 
   io = PrettyPrinting.pretty(IOBuffer())
-  print(IOContext(io, :supercompact => true), PrettyPrinting.Lowercase(), QQ)
+  print(PrettyPrinting.terse(io), PrettyPrinting.Lowercase(), QQ)
   @test String(take!(io)) == "QQ"
 end

@@ -248,11 +248,9 @@ show(io::IO, x::ZZRingElem) = print(io, string(x))
 
 function show(io::IO, a::ZZRing)
    # deliberately no @show_name or @show_special here as this is a singleton type
-   if get(io, :supercompact, false)
-      # no nested printing
+   if is_terse(io)
       print(pretty(io), LowercaseOff(), "ZZ")
    else
-      # nested printing allowed, preferably supercompact
       print(io, "Integer ring")
    end
 end

@@ -89,12 +89,10 @@ canonical_unit(x::FpFieldElem) = x
 function show(io::IO, a::FpField)
    @show_name(io, a)
    @show_special(io, a)
-   if get(io, :supercompact, false)
-      # no nested printing
+   if is_terse(io)
       io = pretty(io)
       print(io, LowercaseOff(), "GF(", a.n, ")")
    else
-      # nested printing allowed, preferably supercompact
       print(io, "Finite field of characteristic ", a.n)
    end
 end

@@ -251,12 +251,12 @@ end
 function Base.show(io::IO, a::AbsSimpleNumField)
   @show_name(io, a)
   @show_special(io, a)
-  if get(io, :supercompact, false)
+  if is_terse(io)
     print(io, "Number field")
   else
     io = pretty(io)
     print(io, "Number field of degree $(degree(a))")
-    print(IOContext(io, :supercompact => true), " over ", Lowercase(), QQ)
+    print(terse(io), " over ", Lowercase(), QQ)
   end
 end
 

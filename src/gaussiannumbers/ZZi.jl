@@ -34,7 +34,7 @@ end
 
 function Base.show(io::IO, a::ZZiRing)
    # deliberately no @show_name or @show_special here as this is a singleton type
-   if get(io, :supercompact, false)
+   if is_terse(io)
      io = pretty(io)
      print(io, LowercaseOff(), "ZZ[im]")
    else
