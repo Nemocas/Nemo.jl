@@ -615,7 +615,7 @@ end
 ################################################################################
 
 function solve_init(A::ComplexMat)
-   return Solve.SolveCtx{ComplexFieldElem, ComplexMat, ComplexMat}(A)
+   return Solve.SolveCtx{ComplexFieldElem, ComplexMat, ComplexMat, ComplexMat}(A)
 end
 
 function Solve._init_reduce(C::Solve.SolveCtx{ComplexFieldElem})

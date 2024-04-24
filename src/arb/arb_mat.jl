@@ -584,7 +584,7 @@ end
 ################################################################################
 
 function solve_init(A::ArbMatrix)
-   return Solve.SolveCtx{ArbFieldElem, ArbMatrix, ArbMatrix}(A)
+   return Solve.SolveCtx{ArbFieldElem, ArbMatrix, ArbMatrix, ArbMatrix}(A)
 end
 
 function Solve._init_reduce(C::Solve.SolveCtx{ArbFieldElem})

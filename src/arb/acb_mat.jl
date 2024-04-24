@@ -618,7 +618,7 @@ end
 ################################################################################
 
 function solve_init(A::AcbMatrix)
-   return Solve.SolveCtx{AcbFieldElem, AcbMatrix, AcbMatrix}(A)
+   return Solve.SolveCtx{AcbFieldElem, AcbMatrix, AcbMatrix, AcbMatrix}(A)
 end
 
 function Solve._init_reduce(C::Solve.SolveCtx{AcbFieldElem})
