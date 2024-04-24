@@ -1486,6 +1486,8 @@ end
 function (C::CalciumField)(x::Irrational)
   if x == pi
     return const_pi(C)
+  elseif x == MathConstants.eulergamma
+    return const_euler(C)
   else
     error("constant not supported")
   end

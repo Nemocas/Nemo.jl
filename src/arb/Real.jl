@@ -2055,9 +2055,13 @@ end
 
 function (r::RealField)(x::Irrational, prec::Int = precision(Balls))
   if x == pi
-    return const_pi(r)
-  elseif x == e
-    return const_e(precision(Balls))
+    return const_pi(r, prec)
+  elseif x == MathConstants.e
+    return const_e(r, prec)
+  elseif x == MathConstants.catalan
+    return const_catalan(r, prec)
+  elseif x == MathConstants.eulergamma
+    return const_euler(r, prec)
   else
     error("constant not supported")
   end
