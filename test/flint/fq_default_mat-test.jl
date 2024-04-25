@@ -2,6 +2,13 @@
   F4, a = finite_field(ZZRingElem(2), 2, "a")
   F9, b = finite_field(ZZRingElem(3), 2, "b")
 
+  @test_throws ErrorException matrix_space(F4, -1, 5)
+  @test_throws ErrorException matrix_space(F4, 0, -2)
+  @test_throws ErrorException matrix_space(F4, -3, -4)
+  @test_throws ErrorException FqMatrixSpace(F4, 2, -1)
+  @test_throws ErrorException FqMatrixSpace(F4, -1, 2)
+  @test_throws ErrorException FqMatrixSpace(F4, -1, -1)
+
   R = FqMatrixSpace(F4, 2, 2)
 
   @test elem_type(R) == FqMatrix
@@ -23,10 +30,6 @@
   @test isa(RR, FqMatrixSpace)
 
   @test R == RR
-
-  @test_throws ErrorException FqMatrixSpace(F4, 2, -1)
-  @test_throws ErrorException FqMatrixSpace(F4, -1, 2)
-  @test_throws ErrorException FqMatrixSpace(F4, -1, -1)
 
   a = R()
 

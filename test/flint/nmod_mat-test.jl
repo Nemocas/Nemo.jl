@@ -2,6 +2,13 @@
   Z2, = residue_ring(ZZ, 2)
   Z3, = residue_ring(ZZ, 3)
 
+  @test_throws ErrorException matrix_space(Z2, -1, 5)
+  @test_throws ErrorException matrix_space(Z2, 0, -2)
+  @test_throws ErrorException matrix_space(Z2, -3, -4)
+  @test_throws ErrorException zzModMatrixSpace(Z2, 2, -1)
+  @test_throws ErrorException zzModMatrixSpace(Z2, -1, 2)
+  @test_throws ErrorException zzModMatrixSpace(Z2, -1, -1)
+
   R = zzModMatrixSpace(Z2, 2, 2)
 
   @test elem_type(R) == zzModMatrix
@@ -23,10 +30,6 @@
   @test isa(RR, zzModMatrixSpace)
 
   @test R == RR
-
-  @test_throws ErrorException zzModMatrixSpace(Z2, 2, -1)
-  @test_throws ErrorException zzModMatrixSpace(Z2, -1, 2)
-  @test_throws ErrorException zzModMatrixSpace(Z2, -1, -1)
 
   a = R()
 

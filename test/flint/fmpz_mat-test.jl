@@ -1,4 +1,11 @@
 @testset "ZZMatrix.constructors" begin
+   @test_throws ErrorException matrix_space(ZZ, -1, 5)
+   @test_throws ErrorException matrix_space(ZZ, 0, -2)
+   @test_throws ErrorException matrix_space(ZZ, -3, -4)
+   @test_throws ErrorException ZZMatrixSpace(2, -1)
+   @test_throws ErrorException ZZMatrixSpace(-1, 2)
+   @test_throws ErrorException ZZMatrixSpace(-1, -1)
+
    S = matrix_space(ZZ, 3, 3)
 
    @test elem_type(S) == ZZMatrix
