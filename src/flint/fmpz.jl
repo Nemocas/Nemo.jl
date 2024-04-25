@@ -1834,6 +1834,11 @@ equal to $x$. If $x < 0$ we throw a `DomainError()`.
 """
 function primorial(x::Int)
     x < 0 && throw(DomainError(x, "Argument must be non-negative"))
+    # Up to 28 is OK for Int32, up to 52 is OK for Int64, up to 100 is OK for Int128; beyond is too large
+    if (Int == Int32 && x > 28) || (Int == Int64 && x > 52) || (Int == Int128 && x > 100)
+      throw(OverflowError("primorial(::Int)"))
+##      throw(InexactError(:primorial, Int, "large_integer_value"))
+    end
     z = ZZRingElem()
     ccall((:fmpz_primorial, libflint), Nothing,
           (Ref{ZZRingElem}, UInt), z, UInt(x))
@@ -1861,6 +1866,11 @@ Return the $x$-th Fibonacci number $F_x$. We define $F_1 = 1$, $F_2 = 1$ and
 $F_{i + 1} = F_i + F_{i - 1}$ for all integers $i$.
 """
 function fibonacci(x::Int)
+    # Up to 46 is OK for Int32; up to 92 is OK for Int64; up to 184 is OK for Int128; beyond is too large
+    if (Int == Int32 && abs(x) > 46) || (Int == Int64 && abs(x) > 92) || (Int == Int128 && abs(x) > 184)
+      throw(OverflowError("fibonacci(::Int)"))
+##      throw(InexactError(:fibonacci, Int, "large_integer_value"))
+    end
     z = ZZRingElem()
     ccall((:fmpz_fib_ui, libflint), Nothing,
           (Ref{ZZRingElem}, UInt), z, UInt(abs(x)))
