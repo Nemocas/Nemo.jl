@@ -1093,6 +1093,5 @@ end
 
 function matrix_space(R::ComplexField, r::Int, c::Int; cached = true)
   # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
-  (r <= 0 || c <= 0) && error("Dimensions must be positive")
   return ComplexMatSpace(R, r, c)
 end

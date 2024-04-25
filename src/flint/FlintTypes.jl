@@ -4829,6 +4829,7 @@ struct QQMatrixSpace <: MatSpace{QQFieldElem}
    ncols::Int
 
    function QQMatrixSpace(r::Int, c::Int)
+      (r < 0 || c < 0) && throw(_err_dim_negative)
       return new(r, c)
    end
 end
@@ -4992,7 +4993,8 @@ struct ZZMatrixSpace <: MatSpace{ZZRingElem}
    ncols::Int
 
    function ZZMatrixSpace(r::Int, c::Int)
-      return new(r, c)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
+    return new(r, c)
    end
 end
 
