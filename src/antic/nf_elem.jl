@@ -21,19 +21,9 @@ parent(a::AbsSimpleNumFieldElem) = a.parent
 
 elem_type(::Type{AbsSimpleNumField}) = AbsSimpleNumFieldElem
 
-@doc raw"""
-    base_ring(a::AbsSimpleNumField)
+base_ring_type(::Type{AbsSimpleNumField}) = typeof(Union{})
 
-Returns `Union{}` since a number field doesn't depend on any ring.
-"""
 base_ring(a::AbsSimpleNumField) = Union{}
-
-@doc raw"""
-    base_ring(a::AbsSimpleNumFieldElem)
-
-Returns `Union{}` since a number field doesn't depend on any ring.
-"""
-base_ring(a::AbsSimpleNumFieldElem) = Union{}
 
 is_domain_type(::Type{AbsSimpleNumFieldElem}) = true
 

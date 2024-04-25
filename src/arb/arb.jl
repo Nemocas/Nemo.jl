@@ -17,9 +17,9 @@ elem_type(::Type{ArbField}) = ArbFieldElem
 
 parent_type(::Type{ArbFieldElem}) = ArbField
 
-base_ring(R::ArbField) = Union{}
+base_ring_type(::Type{ArbField}) = typeof(Union{})
 
-base_ring(x::ArbFieldElem) = Union{}
+base_ring(R::ArbField) = Union{}
 
 parent(x::ArbFieldElem) = x.parent
 

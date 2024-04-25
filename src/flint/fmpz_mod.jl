@@ -14,6 +14,8 @@ parent_type(::Type{ZZModRingElem}) = ZZModRing
 
 elem_type(::Type{ZZModRing}) = ZZModRingElem
 
+base_ring_type(::Type{ZZModRing}) = ZZRing
+
 base_ring(a::ZZModRing) = ZZ
 
 parent(a::ZZModRingElem) = a.parent

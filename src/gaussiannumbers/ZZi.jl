@@ -10,9 +10,9 @@ parent_type(::Type{ZZiRingElem}) = ZZiRing
 
 parent(a::ZZiRingElem) = FlintZZi
 
-base_ring(a::ZZiRing) = ZZ
+base_ring_type(::Type{ZZiRing}) = ZZRing
 
-base_ring(a::ZZiRingElem) = ZZ
+base_ring(a::ZZiRing) = ZZ
 
 is_domain_type(::Type{ZZiRingElem}) = true
 

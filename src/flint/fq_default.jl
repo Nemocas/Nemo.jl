@@ -14,6 +14,8 @@ parent_type(::Type{FqFieldElem}) = FqField
 
 elem_type(::Type{FqField}) = FqFieldElem
 
+base_ring_type(::Type{FqField}) = typeof(Union{})
+
 base_ring(a::FqField) = Union{}
 
 parent(a::FqFieldElem) = a.parent

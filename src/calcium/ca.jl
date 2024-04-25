@@ -16,9 +16,9 @@ parent_type(::Type{CalciumFieldElem}) = CalciumField
 
 elem_type(::Type{CalciumField}) = CalciumFieldElem
 
-base_ring(a::CalciumField) = Union{}
+base_ring_type(::Type{CalciumField}) = typeof(Union{})
 
-base_ring(a::CalciumFieldElem) = Union{}
+base_ring(a::CalciumField) = Union{}
 
 is_domain_type(::Type{CalciumFieldElem}) = true
 
