@@ -1837,7 +1837,6 @@ function primorial(x::Int)
     # Up to 28 is OK for Int32, up to 52 is OK for Int64, up to 100 is OK for Int128; beyond is too large
     if (Int == Int32 && x > 28) || (Int == Int64 && x > 52) || (Int == Int128 && x > 100)
       throw(OverflowError("primorial(::Int)"))
-##      throw(InexactError(:primorial, Int, "large_integer_value"))
     end
     z = ZZRingElem()
     ccall((:fmpz_primorial, libflint), Nothing,
@@ -1869,7 +1868,6 @@ function fibonacci(x::Int)
     # Up to 46 is OK for Int32; up to 92 is OK for Int64; up to 184 is OK for Int128; beyond is too large
     if (Int == Int32 && abs(x) > 46) || (Int == Int64 && abs(x) > 92) || (Int == Int128 && abs(x) > 184)
       throw(OverflowError("fibonacci(::Int)"))
-##      throw(InexactError(:fibonacci, Int, "large_integer_value"))
     end
     z = ZZRingElem()
     ccall((:fmpz_fib_ui, libflint), Nothing,

@@ -1119,6 +1119,7 @@ end
    @test_throws DomainError rising_factorial(12, -1)
 
    @test primorial(7) == 210
+
    @test_throws OverflowError primorial(999)
 
    @test_throws DomainError primorial(-7)
