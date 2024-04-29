@@ -1428,6 +1428,7 @@ end
   @test PrettyPrinting.oneline(ZZ) == "Integer ring"
   @test PrettyPrinting.supercompact(ZZ) == "ZZ"
 
+  # test LowercaseOff
   io = PrettyPrinting.pretty(IOBuffer())
   print(PrettyPrinting.terse(io), PrettyPrinting.Lowercase(), ZZ)
   @test String(take!(io)) == "ZZ"

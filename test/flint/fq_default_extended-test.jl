@@ -34,7 +34,12 @@
    @test sprint(show, "text/plain", R) isa String
    @test sprint(show, "text/plain", F) isa String
    @test sprint(show, "text/plain", FF) isa String
-   @test sprint(show, "text/plain", FF, context=:supercompact => true) == "GF(7, 2*3)"
+   @test PrettyPrinting.supercompact(FF) == "GF(7, 2*3)"
+
+   # test LowercaseOff
+   io = PrettyPrinting.pretty(IOBuffer())
+   print(PrettyPrinting.terse(io), PrettyPrinting.Lowercase(), FF)
+   @test String(take!(io)) == "GF(7, 2*3)"
 
    a = F()
 
