@@ -40,6 +40,10 @@ elem_type(::Type{FlintPuiseuxSeriesRing{T}}) where T <: RingElem = FlintPuiseuxS
 
 elem_type(::Type{FlintPuiseuxSeriesField{T}}) where T <: FieldElem = FlintPuiseuxSeriesFieldElem{T}
 
+base_ring_type(R::Type{FlintPuiseuxSeriesRing{T}}) where T <: RingElem = base_ring_type(parent_type(T))
+
+base_ring_type(R::Type{FlintPuiseuxSeriesField{T}}) where T <: FieldElem = base_ring_type(parent_type(T))
+
 base_ring(R::FlintPuiseuxSeriesRing{T}) where T <: RingElem = base_ring(laurent_ring(R))
 
 base_ring(R::FlintPuiseuxSeriesField{T}) where T <: FieldElem = base_ring(laurent_ring(R))

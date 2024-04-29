@@ -7,8 +7,8 @@
    @test elem_type(QQBarField) == QQBarFieldElem
    @test parent_type(QQBarFieldElem) == QQBarField
    @test is_domain_type(QQBarFieldElem) == true
-   @test base_ring(CalciumQQBar) == CalciumQQBar
-   @test base_ring(QQBarFieldElem(3)) == CalciumQQBar
+   @test base_ring(CalciumQQBar) == Union{}
+   @test base_ring(QQBarFieldElem(3)) == Union{}
 
    @test isa(R, QQBarField)
 

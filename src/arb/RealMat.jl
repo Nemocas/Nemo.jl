@@ -557,7 +557,7 @@ end
 ################################################################################
 
 function solve_init(A::RealMat)
-   return Solve.SolveCtx{RealFieldElem, RealMat, RealMat}(A)
+   return Solve.SolveCtx{RealFieldElem, RealMat, RealMat, RealMat}(A)
 end
 
 function Solve._init_reduce(C::Solve.SolveCtx{RealFieldElem})

@@ -67,9 +67,9 @@ O(R::PadicField, m::Integer) = O(R, ZZRingElem(m))
 
 elem_type(::Type{PadicField}) = PadicFieldElem
 
-base_ring(a::PadicField) = Union{}
+base_ring_type(::Type{PadicField}) = typeof(Union{})
 
-base_ring(a::PadicFieldElem) = Union{}
+base_ring(a::PadicField) = Union{}
 
 parent(a::PadicFieldElem) = a.parent
 

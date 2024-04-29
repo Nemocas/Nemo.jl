@@ -1718,25 +1718,3 @@ end
 function setprecision!(a::PadicFieldElem, n::Int)
     return setprecision(a, n)
 end
-
-base_ring_type(::Type{AcbPolyRing}) = AcbField
-
-base_ring_type(::Type{ArbPolyRing}) = ArbField
-
-base_ring_type(::Type{QQPolyRing}) = QQField
-
-base_ring_type(::Type{ZZModPolyRing}) = Nemo.ZZModRing
-
-base_ring_type(::Type{ZZPolyRing}) = ZZRing
-
-base_ring_type(::Type{FqPolyRing}) = FqField
-
-base_ring_type(::Type{fqPolyRepPolyRing}) = fqPolyRepField
-
-base_ring_type(::Type{FqPolyRepPolyRing}) = FqPolyRepField
-
-base_ring_type(::Type{FpPolyRing}) = Nemo.FpField
-
-base_ring_type(::Type{fpPolyRing}) = Nemo.fpField
-
-base_ring_type(::Type{zzModPolyRing}) = Nemo.zzModRing

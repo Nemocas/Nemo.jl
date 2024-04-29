@@ -2,6 +2,13 @@ CC = AcbField(64)
 RR = ArbField(64)
 
 @testset "AcbMatrix.constructors" begin
+   @test_throws ErrorException matrix_space(CC, -1, 5)
+   @test_throws ErrorException matrix_space(CC, 0, -2)
+   @test_throws ErrorException matrix_space(CC, -3, -4)
+   @test_throws ErrorException AcbMatSpace(CC, 2, -1)
+   @test_throws ErrorException AcbMatSpace(CC, -1, 2)
+   @test_throws ErrorException AcbMatSpace(CC, -1, -1)
+
    S = matrix_space(CC, 3, 3)
    R = matrix_space(ZZ, 3, 3)
 

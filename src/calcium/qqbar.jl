@@ -16,9 +16,9 @@ parent_type(::Type{QQBarFieldElem}) = QQBarField
 
 elem_type(::Type{QQBarField}) = QQBarFieldElem
 
-base_ring(a::QQBarField) = CalciumQQBar
+base_ring_type(::Type{QQBarField}) = typeof(Union{})
 
-base_ring(a::QQBarFieldElem) = CalciumQQBar
+base_ring(::QQBarField) = Union{}
 
 is_domain_type(::Type{QQBarFieldElem}) = true
 
@@ -1538,4 +1538,20 @@ end
 #
 ###############################################################################
 
+"""
+    algebraic_closure(::QQField)
+
+Return a field representing the algebraic closure of the field of
+rational numbers.
+
+# Examples
+
+```jldoctest
+julia> K = algebraic_closure(QQ)
+Field of algebraic numbers
+
+julia> sqrt(K(2))
+Root 1.41421 of x^2 - 2
+```
+"""
 algebraic_closure(::QQField) = QQBar

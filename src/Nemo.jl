@@ -570,7 +570,10 @@ const _ecm_nCs = Vector{Int}[_ecm_nC]
 #
 ###############################################################################
 
+@doc zz_ring_doc
 const FlintZZ = ZZ
+  
+@doc qq_field_doc
 const FlintQQ = QQ
 
 ###############################################################################
@@ -588,6 +591,7 @@ GaussianRationals() = FlintQQi
 #
 ###############################################################################
 
+@doc qqbar_field_doc
 const QQBar = CalciumQQBar
 
 

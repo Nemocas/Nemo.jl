@@ -49,11 +49,8 @@ parent(a::ZZRingElem) = ZZ
 
 elem_type(::Type{ZZRing}) = ZZRingElem
 
-@doc raw"""
-    base_ring(a::ZZRing)
+base_ring_type(::Type{ZZRing}) = typeof(Union{})
 
-Returns `Union{}` as this ring is not dependent on another ring.
-"""
 base_ring(a::ZZRing) = Union{}
 
 is_domain_type(::Type{ZZRingElem}) = true
@@ -1278,8 +1275,10 @@ Return a tuple $g, s, t$ such that $g$ is the greatest common divisor of $a$
 and $b$ and integers $s$ and $t$ such that $g = as + bt$.
 """
 function gcdx(a::ZZRingElem, b::ZZRingElem)
-  # Just to conform with Julia's definition
-  a == b == 0 && return zero(ZZ), one(ZZ), zero(ZZ)
+  @static if VERSION < v"1.12.0-DEV.410"
+    # Just to conform with Julia's definition
+    a == b == 0 && return zero(ZZ), one(ZZ), zero(ZZ)
+  end
 
   d = ZZ()
   x = ZZ()
@@ -1834,6 +1833,10 @@ equal to $x$. If $x < 0$ we throw a `DomainError()`.
 """
 function primorial(x::Int)
     x < 0 && throw(DomainError(x, "Argument must be non-negative"))
+    # Up to 28 is OK for Int32, up to 52 is OK for Int64, up to 100 is OK for Int128; beyond is too large
+    if (Int == Int32 && x > 28) || (Int == Int64 && x > 52) || (Int == Int128 && x > 100)
+      throw(OverflowError("primorial(::Int)"))
+    end
     z = ZZRingElem()
     ccall((:fmpz_primorial, libflint), Nothing,
           (Ref{ZZRingElem}, UInt), z, UInt(x))
@@ -1861,6 +1864,10 @@ Return the $x$-th Fibonacci number $F_x$. We define $F_1 = 1$, $F_2 = 1$ and
 $F_{i + 1} = F_i + F_{i - 1}$ for all integers $i$.
 """
 function fibonacci(x::Int)
+    # Up to 46 is OK for Int32; up to 92 is OK for Int64; up to 184 is OK for Int128; beyond is too large
+    if (Int == Int32 && abs(x) > 46) || (Int == Int64 && abs(x) > 92) || (Int == Int128 && abs(x) > 184)
+      throw(OverflowError("fibonacci(::Int)"))
+    end
     z = ZZRingElem()
     ccall((:fmpz_fib_ui, libflint), Nothing,
           (Ref{ZZRingElem}, UInt), z, UInt(abs(x)))
