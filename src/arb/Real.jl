@@ -2054,9 +2054,9 @@ end
 
 (r::RealField)() = RealFieldElem()
 
-(r::RealField)(x::Any, prec::Int = precision(Balls)) = RealFieldElem(x, prec)
+(r::RealField)(x::Any, prec::Int) = RealFieldElem(x, prec)
 
-function (r::RealField)(x::Irrational, prec::Int = precision(Balls))
+function (r::RealField)(x::Irrational, prec::Int)
   if x == pi
     return const_pi(r, prec)
   elseif x == MathConstants.e
@@ -2069,6 +2069,8 @@ function (r::RealField)(x::Irrational, prec::Int = precision(Balls))
     error("constant not supported")
   end
 end
+
+(r::RealField)(x::Any; precision::Int = precision(Balls)) = r(x, precision)
 
 ################################################################################
 #
