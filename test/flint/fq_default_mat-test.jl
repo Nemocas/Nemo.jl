@@ -2,6 +2,13 @@
   F4, a = finite_field(ZZRingElem(2), 2, "a")
   F9, b = finite_field(ZZRingElem(3), 2, "b")
 
+  @test_throws ErrorException matrix_space(F4, -1, 5)
+  @test_throws ErrorException matrix_space(F4, 0, -2)
+  @test_throws ErrorException matrix_space(F4, -3, -4)
+  @test_throws ErrorException FqMatrixSpace(F4, 2, -1)
+  @test_throws ErrorException FqMatrixSpace(F4, -1, 2)
+  @test_throws ErrorException FqMatrixSpace(F4, -1, -1)
+
   R = FqMatrixSpace(F4, 2, 2)
 
   @test elem_type(R) == FqMatrix
@@ -23,10 +30,6 @@
   @test isa(RR, FqMatrixSpace)
 
   @test R == RR
-
-  @test_throws ErrorException FqMatrixSpace(F4, 2, -1)
-  @test_throws ErrorException FqMatrixSpace(F4, -1, 2)
-  @test_throws ErrorException FqMatrixSpace(F4, -1, -1)
 
   a = R()
 
@@ -90,7 +93,7 @@
   @test parent(e) == R
   @test nrows(e) == 2 && ncols(e) == 2
 
-  ar = matrix(FlintZZ, [ 1 1 1 ; 1 1 1; 1 1 1])
+  ar = matrix(ZZ, [ 1 1 1 ; 1 1 1; 1 1 1])
 
   @test_throws ErrorException R(ar)
 
@@ -168,7 +171,7 @@
    R, x = finite_field(ZZRingElem(23), 5, "x")
    S = matrix_space(R, 2, 2)
 
-   for R in [FlintZZ, residue_ring(FlintZZ, 23)[1], residue_ring(FlintZZ, ZZ(23))[1], Native.GF(23)]
+   for R in [ZZ, residue_ring(ZZ, 23)[1], residue_ring(ZZ, ZZ(23))[1], Native.GF(23)]
       M = matrix(R, 2, 2, [1, 2, 3, 4])
 
       @test isa(S(M), MatElem)

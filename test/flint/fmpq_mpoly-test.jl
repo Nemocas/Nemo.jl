@@ -1,5 +1,5 @@
 @testset "QQMPolyRingElem.constructors" begin
-   R = FlintQQ
+   R = QQ
 
    for num_vars = 0:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -82,7 +82,7 @@
 end
 
 @testset "QQMPolyRingElem.printing" begin
-   S, (x, y) = polynomial_ring(FlintQQ, ["x", "y"])
+   S, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    @test !occursin(r"{", string(S))
 
@@ -97,7 +97,7 @@ end
 end
 
 @testset "QQMPolyRingElem.hash" begin
-   S, (x, y) = polynomial_ring(FlintQQ, ["x", "y"])
+  S, (x, y) = polynomial_ring(QQ, ["x", "y"])
 
    p = y^ZZRingElem(2)^100
 
@@ -106,7 +106,7 @@ end
 end
 
 @testset "QQMPolyRingElem.manipulation" begin
-   R = FlintQQ
+   R = QQ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -197,7 +197,7 @@ end
       @test !is_monomial(2*gen(S, 1)*gen(S, num_vars))
 
       monomialexp = unique([UInt[rand(0:10) for j in 1:num_vars] for k in 1:10])
-      coeffs = [rand(FlintQQ, 1:10) for k in 1:length(monomialexp)]
+      coeffs = [rand(QQ, 1:10) for k in 1:length(monomialexp)]
       h = S(coeffs, monomialexp)
       @test length(h) == length(monomialexp)
       for k in 1:length(h)
@@ -235,7 +235,7 @@ end
 end
 
 @testset "QQMPolyRingElem.multivariate_coeff" begin
-   R = FlintQQ
+   R = QQ
 
    for ord in Nemo.flint_orderings
       S, (x, y, z) = polynomial_ring(R, ["x", "y", "z"]; internal_ordering=ord)
@@ -254,7 +254,7 @@ z^4-4*x*y-10*x*z^2+8*y^2*z^5-9*y^2*z^3
 end
 
 @testset "QQMPolyRingElem.unary_ops" begin
-   R = FlintQQ
+   R = QQ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -271,7 +271,7 @@ end
 end
 
 @testset "QQMPolyRingElem.binary_ops" begin
-   R = FlintQQ
+   R = QQ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -294,7 +294,7 @@ end
 end
 
 @testset "QQMPolyRingElem.adhoc_binary" begin
-   R = FlintQQ
+   R = QQ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -334,7 +334,7 @@ end
 end
 
 @testset "QQMPolyRingElem.adhoc_comparison" begin
-   R = FlintQQ
+   R = QQ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -360,7 +360,7 @@ end
 end
 
 @testset "QQMPolyRingElem.powering" begin
-   R = FlintQQ
+   R = QQ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -387,7 +387,7 @@ end
 end
 
 @testset "QQMPolyRingElem.divides" begin
-   R = FlintQQ
+   R = QQ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -416,7 +416,7 @@ end
 end
 
 @testset "QQMPolyRingElem.euclidean_division" begin
-   R = FlintQQ
+   R = QQ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -452,7 +452,7 @@ end
 end
 
 @testset "QQMPolyRingElem.ideal_reduction" begin
-   R = FlintQQ
+   R = QQ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -505,7 +505,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(FlintQQ, var_names, internal_ordering = ord)
+      S, varlist = polynomial_ring(QQ, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:4, 0:5, -10:10)
@@ -525,7 +525,7 @@ end
 end
 
 @testset "QQMPolyRingElem.factor" begin
-   R, (x, y, z) = polynomial_ring(FlintQQ, ["x", "y", "z"])
+   R, (x, y, z) = polynomial_ring(QQ, ["x", "y", "z"])
 
    @test_throws ArgumentError factor(R(0))
    @test_throws ArgumentError factor_squarefree(R(0))
@@ -550,7 +550,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(FlintQQ, var_names, internal_ordering = ord)
+      S, varlist = polynomial_ring(QQ, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:4, 0:5, -10:10)
@@ -570,7 +570,7 @@ end
 end
 
 @testset "QQMPolyRingElem.evaluation" begin
-   R = FlintQQ
+   R = QQ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -653,7 +653,7 @@ end
 end
 
 @testset "QQMPolyRingElem.valuation" begin
-   R = FlintQQ
+   R = QQ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -691,7 +691,7 @@ end
 end
 
 @testset "QQMPolyRingElem.derivative_integral" begin
-   R = FlintQQ
+   R = QQ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -715,7 +715,7 @@ end
      var_names = ["x$j" for j in 1:num_vars]
      ord = rand_ordering()
 
-     R, vars_R = polynomial_ring(FlintQQ, var_names; internal_ordering=ord)
+     R, vars_R = polynomial_ring(QQ, var_names; internal_ordering=ord)
 
      for iter in 1:10
         f = R()
@@ -749,7 +749,7 @@ end
      var_names = ["x$j" for j in 1:num_vars]
      ord = rand_ordering()
 
-     R, vars_R = polynomial_ring(FlintQQ, var_names; internal_ordering=ord)
+     R, vars_R = polynomial_ring(QQ, var_names; internal_ordering=ord)
 
      for iter in 1:10
         f = R()

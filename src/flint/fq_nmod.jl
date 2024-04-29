@@ -14,6 +14,8 @@ parent_type(::Type{fqPolyRepFieldElem}) = fqPolyRepField
 
 elem_type(::Type{fqPolyRepField}) = fqPolyRepFieldElem
 
+base_ring_type(::Type{fqPolyRepField}) = typeof(Union{})
+
 base_ring(a::fqPolyRepField) = Union{}
 
 parent(a::fqPolyRepFieldElem) = a.parent
@@ -667,7 +669,7 @@ function (a::fqPolyRepField)(b::Vector{<:IntegerUnion})
    da = degree(a)
    db = length(b)
    da == db || error("Coercion impossible")
-   F = GF(Int(characteristic(a)), cached = false)
+   F = Native.GF(Int(characteristic(a)), cached = false)
    z = fqPolyRepFieldElem(a, polynomial(F, b))
    z.parent = a
    return z

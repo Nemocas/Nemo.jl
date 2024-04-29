@@ -1,6 +1,6 @@
 function benchmark_solve_poly()
    print("benchmark_solve_poly ... ")
-   R, x = polynomial_ring(FlintZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
    S, y = polynomial_ring(R, "y")
    M = matrix_space(S, 20, 20)()
 

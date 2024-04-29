@@ -76,7 +76,7 @@ Base.eltype(::fqPolyRepField) = fqPolyRepFieldElem
 # FqPolyRepField
 
 function Base.iterate(F::FqPolyRepField)
-    return zero(F), zeros(FlintZZ, degree(F))
+    return zero(F), zeros(ZZ, degree(F))
 end
 
 function Base.iterate(F::FqPolyRepField, st::Vector{ZZRingElem})
@@ -220,6 +220,15 @@ end
 
 function (k::FqPolyRepField)(a::QQFieldElem)
     return k(numerator(a)) // k(denominator(a))
+end
+
+function (k::Nemo.fpField)(a::Vector)
+  @assert length(a) == 1
+  return k(a[1])
+end
+
+function (k::fqPolyRepField)(a::Vector)
+  return k(polynomial(Native.GF(Int(characteristic(k))), a))
 end
 
 

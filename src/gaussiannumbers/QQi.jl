@@ -10,9 +10,9 @@ parent_type(::Type{QQiFieldElem}) = QQiField
 
 parent(a::QQiFieldElem) = FlintQQi
 
-base_ring(a::QQiField) = FlintZZi
+base_ring_type(::Type{QQiField}) = ZZiRing
 
-base_ring(a::QQiFieldElem) = FlintZZi
+base_ring(a::QQiField) = FlintZZi
 
 is_domain_type(::Type{QQiFieldElem}) = true
 

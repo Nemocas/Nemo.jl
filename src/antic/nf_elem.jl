@@ -21,19 +21,9 @@ parent(a::AbsSimpleNumFieldElem) = a.parent
 
 elem_type(::Type{AbsSimpleNumField}) = AbsSimpleNumFieldElem
 
-@doc raw"""
-    base_ring(a::AbsSimpleNumField)
+base_ring_type(::Type{AbsSimpleNumField}) = typeof(Union{})
 
-Returns `Union{}` since a number field doesn't depend on any ring.
-"""
 base_ring(a::AbsSimpleNumField) = Union{}
-
-@doc raw"""
-    base_ring(a::AbsSimpleNumFieldElem)
-
-Returns `Union{}` since a number field doesn't depend on any ring.
-"""
-base_ring(a::AbsSimpleNumFieldElem) = Union{}
 
 is_domain_type(::Type{AbsSimpleNumFieldElem}) = true
 
@@ -1202,8 +1192,8 @@ supplied, a default dollar sign will be used to represent the variable.
 """
 function cyclotomic_field(n::Int, s::VarName = "z_$n", t = "_\$"; cached = true)
    n > 0 || throw(ArgumentError("conductor must be positive, not $n"))
-   Zx, x = polynomial_ring(FlintZZ, gensym(); cached = false)
-   Qx, = polynomial_ring(FlintQQ, t; cached = cached)
+   Zx, x = polynomial_ring(ZZ, gensym(); cached = false)
+   Qx, = polynomial_ring(QQ, t; cached = cached)
    f = cyclotomic(n, x)
    C, g = number_field(Qx(f), Symbol(s); cached = cached, check = false)
    set_attribute!(C, :show => show_cyclo, :cyclo => n)
@@ -1237,8 +1227,8 @@ constructed, should be printed. If it is not supplied, a default dollar sign
 will be used to represent the variable.
 """
 function cyclotomic_real_subfield(n::Int, s::VarName = "(z_$n + 1/z_$n)", t = "\$"; cached = true)
-   Zx, x = polynomial_ring(FlintZZ, gensym(); cached = false)
-   Qx, = polynomial_ring(FlintQQ, t; cached = cached)
+   Zx, x = polynomial_ring(ZZ, gensym(); cached = false)
+   Qx, = polynomial_ring(QQ, t; cached = cached)
    f = cos_minpoly(n, x)
    R, a =  number_field(Qx(f), Symbol(s); cached = cached, check = false)
    set_attribute!(R, :show => show_maxreal, :maxreal => n)

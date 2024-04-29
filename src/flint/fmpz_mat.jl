@@ -14,9 +14,9 @@ elem_type(::Type{ZZMatrixSpace}) = ZZMatrix
 
 parent_type(::Type{ZZMatrix}) = ZZMatrixSpace
 
-base_ring(a::ZZMatrixSpace) = FlintZZ
+base_ring(a::ZZMatrixSpace) = ZZ
 
-base_ring(a::ZZMatrix) = FlintZZ
+base_ring(a::ZZMatrix) = ZZ
 
 dense_matrix_type(::Type{ZZRingElem}) = ZZMatrix
 
@@ -540,6 +540,17 @@ end
 
 Return a tuple $(z, d)$ consisting of a matrix $z$ and denominator $d$ such
 that $z/d$ is the inverse of $x$.
+
+# Examples
+```jldoctest
+julia> A = ZZ[1 0 1; 2 3 1; 5 6 7]
+[1   0   1]
+[2   3   1]
+[5   6   7]
+
+julia> B, d = pseudo_inv(A)
+([15 6 -3; -9 2 1; -3 -6 3], 12)
+```
 """
 function pseudo_inv(x::ZZMatrix)
    z = similar(x)
@@ -1320,7 +1331,7 @@ function Solve._can_solve_internal_no_check(A::ZZMatrix, b::ZZMatrix, task::Symb
 # `lazy_transpose`
 
 function solve_init(A::ZZMatrix)
-  return Solve.SolveCtx{ZZRingElem, ZZMatrix, ZZMatrix}(A)
+  return Solve.SolveCtx{ZZRingElem, ZZMatrix, ZZMatrix, ZZMatrix}(A)
 end
 
 function Solve._init_reduce_transpose(C::Solve.SolveCtx{ZZRingElem})

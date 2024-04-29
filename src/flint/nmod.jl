@@ -14,7 +14,9 @@ parent_type(::Type{zzModRingElem}) = zzModRing
 
 elem_type(::Type{zzModRing}) = zzModRingElem
 
-base_ring(a::zzModRing) = FlintZZ
+base_ring_type(::Type{zzModRing}) = ZZRing
+
+base_ring(a::zzModRing) = ZZ
 
 parent(a::zzModRingElem) = a.parent
 

@@ -7,32 +7,26 @@
    @test elem_type(QQBarField) == QQBarFieldElem
    @test parent_type(QQBarFieldElem) == QQBarField
    @test is_domain_type(QQBarFieldElem) == true
-   @test base_ring(CalciumQQBar) == CalciumQQBar
-   @test base_ring(QQBarFieldElem(3)) == CalciumQQBar
+   @test base_ring(CalciumQQBar) == Union{}
+   @test base_ring(QQBarFieldElem(3)) == Union{}
 
    @test isa(R, QQBarField)
 
    @test isa(R(), QQBarFieldElem)
    @test isa(R(2), QQBarFieldElem)
-   @test isa(R(big(2)), QQBarFieldElem)
    @test isa(R(2+3im), QQBarFieldElem)
-   @test isa(R(big(2)+3im), QQBarFieldElem)
    @test isa(R(ZZRingElem(2)), QQBarFieldElem)
    @test isa(R(QQFieldElem(2)), QQBarFieldElem)
    @test isa(R(QQBarFieldElem(2)), QQBarFieldElem)
    @test isa(R(1//2), QQBarFieldElem)
-   @test isa(R(big(1)//2), QQBarFieldElem)
    @test R(1//2) == R(QQ(1//2))
 
    @test isa(QQBarFieldElem(), QQBarFieldElem)
    @test isa(QQBarFieldElem(2), QQBarFieldElem)
-   @test isa(QQBarFieldElem(big(2)), QQBarFieldElem)
    @test isa(QQBarFieldElem(2+3im), QQBarFieldElem)
-   @test isa(QQBarFieldElem(big(2)+3im), QQBarFieldElem)
    @test isa(QQBarFieldElem(ZZRingElem(2)), QQBarFieldElem)
    @test isa(QQBarFieldElem(QQFieldElem(2)), QQBarFieldElem)
    @test isa(QQBarFieldElem(1//2), QQBarFieldElem)
-   @test isa(QQBarFieldElem(big(1)//2), QQBarFieldElem)
    @test QQBarFieldElem(1//2) == QQBarFieldElem(QQ(1//2))
 
    x = R(1)
@@ -109,8 +103,8 @@ end
    @test (u >> 3) == u // 8
    @test (u << 3) == 8 * u
 
-   ZZx, x = polynomial_ring(FlintZZ, "x")
-   QQy, y = polynomial_ring(FlintQQ, "x")
+   ZZx, x = polynomial_ring(ZZ, "x")
+   QQy, y = polynomial_ring(QQ, "x")
 
    @test minpoly(ZZx, u) == x^2 - 2
    @test minpoly(QQy, u) == y^2 - 2

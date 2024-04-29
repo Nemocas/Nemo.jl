@@ -6,7 +6,7 @@
 
 # This function is really slow...
 function denominator(M::QQMatrix)
-    d = one(FlintZZ)
+    d = one(ZZ)
     for i in 1:nrows(M)
         for j in 1:ncols(M)
             d = lcm!(d, d, denominator(M[i, j]))
@@ -18,7 +18,7 @@ end
 transpose!(A::Union{ZZMatrix,QQMatrix}) = is_square(A) ? transpose!(A, A) : transpose(A)
 
 function matrix(A::Matrix{ZZRingElem})
-    m = matrix(FlintZZ, A)
+    m = matrix(ZZ, A)
     return m
 end
 
@@ -137,7 +137,7 @@ end
 It returns a lift of the matrix to the integers.
 """
 function lift(a::Generic.Mat{EuclideanRingResidueRingElem{ZZRingElem}})
-    z = zero_matrix(FlintZZ, nrows(a), ncols(a))
+    z = zero_matrix(ZZ, nrows(a), ncols(a))
     for i in 1:nrows(a)
         for j in 1:ncols(a)
             z[i, j] = lift(a[i, j])
@@ -147,7 +147,7 @@ function lift(a::Generic.Mat{EuclideanRingResidueRingElem{ZZRingElem}})
 end
 
 function lift(a::ZZModMatrix)
-    z = zero_matrix(FlintZZ, nrows(a), ncols(a))
+    z = zero_matrix(ZZ, nrows(a), ncols(a))
     GC.@preserve a z begin
         for i in 1:nrows(a)
             for j in 1:ncols(a)
@@ -166,7 +166,7 @@ function lift(x::FpMatrix)
 end
 
 function lift(a::Generic.Mat{ZZModRingElem})
-    z = zero_matrix(FlintZZ, nrows(a), ncols(a))
+    z = zero_matrix(ZZ, nrows(a), ncols(a))
     for i in 1:nrows(a)
         for j in 1:ncols(a)
             z[i, j] = lift(a[i, j])
@@ -227,7 +227,7 @@ mod_sym!(M::ZZMatrix, B::Integer) = mod_sym!(M, ZZRingElem(B))
 Reduces every entry modulo $p$ into the symmetric residue system.
 """
 function mod_sym(M::ZZMatrix, B::ZZRingElem)
-    N = zero_matrix(FlintZZ, nrows(M), ncols(M))
+    N = zero_matrix(ZZ, nrows(M), ncols(M))
     ccall((:fmpz_mat_scalar_smod, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}), N, M, B)
     return N
 end
@@ -293,11 +293,11 @@ left and/ or right transformation matrices are computed as well.
 """
 function snf_with_transform(A::ZZMatrix, l::Bool=true, r::Bool=true)
     if r
-        R = identity_matrix(FlintZZ, ncols(A))
+        R = identity_matrix(ZZ, ncols(A))
     end
 
     if l
-        L = identity_matrix(FlintZZ, nrows(A))
+        L = identity_matrix(ZZ, nrows(A))
     end
     # TODO: if only one trafo is required, start with the HNF that does not
     #       compute the trafo

@@ -249,7 +249,7 @@ for sym in (:trunc, :round, :ceil, :floor)
         # support `trunc(ZZRingElem, m)` etc. where m is a matrix of reals
         function Base.$sym(::Type{ZZMatrix}, a::Matrix{<:Real})
             s = Base.size(a)
-            m = zero_matrix(FlintZZ, s[1], s[2])
+            m = zero_matrix(ZZ, s[1], s[2])
             for i = 1:s[1], j = 1:s[2]
                 m[i, j] = Base.$sym(ZZRingElem, a[i, j])
             end

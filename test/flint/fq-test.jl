@@ -5,7 +5,7 @@ end
 @testset "FqPolyRepFieldElem.conformance_tests" begin
    test_Field_interface_recursive(Native.finite_field(ZZRingElem(7), 5, "z")[1])
 
-   Sy, y = polynomial_ring(residue_ring(FlintZZ, 36893488147419103363)[1], "y")
+   Sy, y = polynomial_ring(residue_ring(ZZ, 36893488147419103363)[1], "y")
    T, z = Native.finite_field(y^2 + 1, "z")
    test_Field_interface_recursive(T)
 
@@ -21,7 +21,7 @@ end
    @test elem_type(FqPolyRepField) == FqPolyRepFieldElem
    @test parent_type(FqPolyRepFieldElem) == FqPolyRepField
 
-   Sy, y = polynomial_ring(residue_ring(FlintZZ, 36893488147419103363)[1], "y")
+   Sy, y = polynomial_ring(residue_ring(ZZ, 36893488147419103363)[1], "y")
    Syy, yy = polynomial_ring(Native.GF(ZZRingElem(36893488147419103363)), "y")
 
    T, z = Native.finite_field(y^2 + 1, "z")
@@ -64,7 +64,7 @@ end
    # check for primality
    T3, z3 = Native.finite_field(yy^2 + 1, "z", check=false)
    @test isa(T2, FqPolyRepField)
-   Syyy, yyy = polynomial_ring(residue_ring(FlintZZ, ZZ(4))[1], "y")
+   Syyy, yyy = polynomial_ring(residue_ring(ZZ, ZZ(4))[1], "y")
    @test yyy isa ZZModPolyRingElem
    @test_throws DomainError Native.finite_field(yyy^2+1, "z")
 end

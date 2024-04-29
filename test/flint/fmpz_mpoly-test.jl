@@ -1,5 +1,5 @@
 @testset "ZZMPolyRingElem.constructors" begin
-   R = FlintZZ
+   R = ZZ
 
    for num_vars = 0:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -82,7 +82,7 @@
 end
 
 @testset "ZZMPolyRingElem.printing" begin
-   S, (x, y) = polynomial_ring(FlintZZ, ["x", "y"])
+   S, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 
    @test !occursin(r"{", string(S))
 
@@ -97,7 +97,7 @@ end
 end
 
 @testset "ZZMPolyRingElem.hash" begin
-   S, (x, y) = polynomial_ring(FlintZZ, ["x", "y"])
+   S, (x, y) = polynomial_ring(ZZ, ["x", "y"])
 
    p = y^ZZRingElem(2)^100
 
@@ -106,7 +106,7 @@ end
 end
 
 @testset "ZZMPolyRingElem.manipulation" begin
-   R = FlintZZ
+   R = ZZ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -186,7 +186,7 @@ end
       @test !is_monomial(2*gen(S, 1)*gen(S, num_vars))
 
       monomialexp = unique([UInt[rand(0:10) for j in 1:num_vars] for k in 1:10])
-      coeffs = [rand(FlintZZ, 1:10) for k in 1:length(monomialexp)]
+      coeffs = [rand(ZZ, 1:10) for k in 1:length(monomialexp)]
       h = S(coeffs, monomialexp)
       @test length(h) == length(monomialexp)
       for k in 1:length(h)
@@ -224,7 +224,7 @@ end
 end
 
 @testset "ZZMPolyRingElem.multivariate_coeff" begin
-   R = FlintZZ
+   R = ZZ
 
    for ord in Nemo.flint_orderings
       S, (x, y, z) = polynomial_ring(R, ["x", "y", "z"]; internal_ordering=ord)
@@ -242,7 +242,7 @@ end
 end
 
 @testset "ZZMPolyRingElem.unary_ops" begin
-   R = FlintZZ
+   R = ZZ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -259,7 +259,7 @@ end
 end
 
 @testset "ZZMPolyRingElem.binary_ops" begin
-   R = FlintZZ
+   R = ZZ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -282,7 +282,7 @@ end
 end
 
 @testset "ZZMPolyRingElem.adhoc_binary" begin
-   R = FlintZZ
+   R = ZZ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -318,7 +318,7 @@ end
 end
 
 @testset "ZZMPolyRingElem.adhoc_comparison" begin
-   R = FlintZZ
+   R = ZZ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -340,7 +340,7 @@ end
 end
 
 @testset "ZZMPolyRingElem.powering" begin
-   R = FlintZZ
+   R = ZZ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -367,7 +367,7 @@ end
 end
 
 @testset "ZZMPolyRingElem.divides" begin
-   R = FlintZZ
+   R = ZZ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -396,7 +396,7 @@ end
 end
 
 @testset "ZZMPolyRingElem.euclidean_division" begin
-   R = FlintZZ
+   R = ZZ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -432,7 +432,7 @@ end
 end
 
 @testset "ZZMPolyRingElem.ideal_reduction" begin
-   R = FlintZZ
+   R = ZZ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -485,7 +485,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(FlintZZ, var_names, internal_ordering = ord)
+      S, varlist = polynomial_ring(ZZ, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:4, 0:5, -10:10)
@@ -505,7 +505,7 @@ end
 end
 
 @testset "ZZMPolyRingElem.factor" begin
-   R, (x, y, z) = polynomial_ring(FlintZZ, ["x", "y", "z"])
+   R, (x, y, z) = polynomial_ring(ZZ, ["x", "y", "z"])
 
    @test_throws ArgumentError factor(R(0))
    @test_throws ArgumentError factor_squarefree(R(0))
@@ -534,7 +534,7 @@ end
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = polynomial_ring(FlintZZ, var_names, internal_ordering = ord)
+      S, varlist = polynomial_ring(ZZ, var_names, internal_ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:4, 0:5, -10:10)
@@ -554,7 +554,7 @@ end
 end
 
 @testset "ZZMPolyRingElem.evaluation" begin
-   R = FlintZZ
+   R = ZZ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -638,7 +638,7 @@ end
 end
 
 @testset "ZZMPolyRingElem.valuation" begin
-   R = FlintZZ
+   R = ZZ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -676,7 +676,7 @@ end
 end
 
 @testset "ZZMPolyRingElem.derivative" begin
-   R = FlintZZ
+   R = ZZ
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -700,7 +700,7 @@ end
      var_names = ["x$j" for j in 1:num_vars]
      ord = rand_ordering()
 
-     R, vars_R = polynomial_ring(FlintZZ, var_names; internal_ordering=ord)
+     R, vars_R = polynomial_ring(ZZ, var_names; internal_ordering=ord)
 
      for iter in 1:10
         f = R()
@@ -734,7 +734,7 @@ end
      var_names = ["x$j" for j in 1:num_vars]
      ord = rand_ordering()
 
-     R, vars_R = polynomial_ring(FlintZZ, var_names; internal_ordering=ord)
+     R, vars_R = polynomial_ring(ZZ, var_names; internal_ordering=ord)
 
      for iter in 1:10
         f = R()

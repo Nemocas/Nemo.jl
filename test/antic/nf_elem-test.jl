@@ -56,7 +56,7 @@ end
 @testset "AbsSimpleNumFieldElem.fmpz_mat_conversions" begin
    R, x = polynomial_ring(QQ, "x")
    K, a = number_field(x^3 + 3x + 1, "a")
-   M = matrix_space(FlintZZ, 1, 3)(0)
+   M = matrix_space(ZZ, 1, 3)(0)
 
    M[1, 1] = 1
    M[1, 2] = 2
@@ -70,7 +70,7 @@ end
    Nemo.elem_to_mat_row!(M, 1, d, b)
 
    @test d == 3
-   @test M == matrix_space(FlintZZ, 1, 3)([1 1 5])
+   @test M == matrix_space(ZZ, 1, 3)([1 1 5])
 end
 
 @testset "AbsSimpleNumFieldElem.fmpq_poly_conversion" begin
@@ -315,12 +315,12 @@ end
   K, a = number_field(x^2 + 28, "a")
   b = -1//4 * a + 1//2
   Mb = representation_matrix(b)
-  @test base_ring(Mb) == FlintQQ
-  @test Mb == FlintQQ[1//2 -1//4; 7 1//2]
+  @test base_ring(Mb) == QQ
+  @test Mb == QQ[1//2 -1//4; 7 1//2]
   Mbb, d = representation_matrix_q(b)
-  @test Mbb == FlintZZ[2 -1; 28 2]
+  @test Mbb == ZZ[2 -1; 28 2]
   @test d == 4
-  @test base_ring(Mbb) == FlintZZ
+  @test base_ring(Mbb) == ZZ
 end
 
 @testset "AbsSimpleNumFieldElem.Polynomials" begin

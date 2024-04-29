@@ -192,9 +192,11 @@ import AbstractAlgebra: Set
 import AbstractAlgebra: set_attribute!
 import AbstractAlgebra: Solve
 
+AbstractAlgebra.@include_deprecated_bindings()
+
 include("Exports.jl")
 
-const eigenvalues = eigvals # alternative name for the function from LinearAlgebra
+include("Aliases.jl")
 
 ###############################################################################
 #
@@ -564,13 +566,15 @@ const _ecm_nCs = Vector{Int}[_ecm_nC]
 
 ###############################################################################
 #
-#   Set domain for ZZ, QQ, PadicField, finite_field to Flint
+#   Set domain for ZZ, QQ to Flint
 #
 ###############################################################################
 
-const ZZ = FlintZZ
-const QQ = FlintQQ
-#const FiniteField = FlintFiniteField
+@doc zz_ring_doc
+const FlintZZ = ZZ
+  
+@doc qq_field_doc
+const FlintQQ = QQ
 
 ###############################################################################
 #
@@ -587,6 +591,7 @@ GaussianRationals() = FlintQQi
 #
 ###############################################################################
 
+@doc qqbar_field_doc
 const QQBar = CalciumQQBar
 
 
@@ -644,8 +649,6 @@ end
 ################################################################################
 
 include("Deprecations.jl")
-
-include("Aliases.jl")
 
 include("Native.jl")
 

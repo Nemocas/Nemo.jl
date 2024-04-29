@@ -5,9 +5,9 @@
    @test elem_type(FqField) == FqFieldElem
    @test parent_type(FqFieldElem) == FqField
 
-   Sy, y = polynomial_ring(residue_ring(FlintZZ, 36893488147419103363)[1], "y")
+   Sy, y = polynomial_ring(residue_ring(ZZ, 36893488147419103363)[1], "y")
    Syy, yy = polynomial_ring(Native.GF(ZZRingElem(36893488147419103363)), "y")
-   St, t = polynomial_ring(residue_ring(FlintZZ, 23)[1], "t")
+   St, t = polynomial_ring(residue_ring(ZZ, 23)[1], "t")
    Stt, tt = polynomial_ring(Native.GF(23), "y")
 
    T = FqField(y^2 + 1, :z)
@@ -55,7 +55,7 @@
    # check for primality
    T3, z3 = FqField(yy^2 + 1, :z, check=false)
    @test isa(T2, FqField)
-   Syyy, yyy = polynomial_ring(residue_ring(FlintZZ, ZZ(4))[1], "y")
+   Syyy, yyy = polynomial_ring(residue_ring(ZZ, ZZ(4))[1], "y")
    @test yyy isa ZZModPolyRingElem
    @test_throws DomainError FqField(yyy^2+1, :z)
 end
@@ -107,7 +107,7 @@ end
 
    f = 3a^4 + 2a^3 + a + 5
 
-   for R in [residue_ring(FlintZZ, 7)[1], residue_ring(FlintZZ, ZZ(7))[1], Native.GF(7), Native.GF(ZZ(7))]
+   for R in [residue_ring(ZZ, 7)[1], residue_ring(ZZ, ZZ(7))[1], Native.GF(7), Native.GF(ZZ(7))]
       S, y = polynomial_ring(R, "y")
 
       @test f == U(S(f))

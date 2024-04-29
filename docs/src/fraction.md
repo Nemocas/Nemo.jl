@@ -93,7 +93,7 @@ ceil(::QQFieldElem)
 
 **Examples**
 
-```julia
+```jldoctest
 julia> d = abs(ZZ(11)//3)
 11//3
 

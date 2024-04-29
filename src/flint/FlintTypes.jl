@@ -35,7 +35,7 @@ julia> ZZ(2)^100
 struct ZZRing <: Ring
 end
 
-const FlintZZ = ZZRing()
+const ZZ = ZZRing()
 
 integer_ring() = ZZRing()
 
@@ -163,9 +163,9 @@ julia> QQ(1//6) - QQ(1//7)
 struct QQField <: FracField{ZZRingElem}
 end
 
-const FlintQQ = QQField()
+const QQ = QQField()
 
-rational_field() = FlintQQ
+rational_field() = QQ
 
 @doc qq_field_doc
 mutable struct QQFieldElem <: FracElem{ZZRingElem}
@@ -4829,6 +4829,7 @@ struct QQMatrixSpace <: MatSpace{QQFieldElem}
    ncols::Int
 
    function QQMatrixSpace(r::Int, c::Int)
+      (r < 0 || c < 0) && throw(_err_dim_negative)
       return new(r, c)
    end
 end
@@ -4992,7 +4993,8 @@ struct ZZMatrixSpace <: MatSpace{ZZRingElem}
    ncols::Int
 
    function ZZMatrixSpace(r::Int, c::Int)
-      return new(r, c)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
+    return new(r, c)
    end
 end
 

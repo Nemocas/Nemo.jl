@@ -6,7 +6,7 @@ end
 
 @testset "QQFieldElem.conformance_tests" begin
    # TODO: make this work with test_Field_interface_recursive
-   test_Field_interface_recursive(FlintQQ)
+   test_Field_interface_recursive(QQ)
 end
 
 @testset "QQFieldElem.issingletontype" begin
@@ -56,7 +56,7 @@ end
 
    @test QQFieldElem(3, -5) == -QQFieldElem(3, 5)
 
-   @test FlintQQ(2//typemin(Int)) == 1//(div(typemin(Int), 2))
+   @test QQ(2//typemin(Int)) == 1//(div(typemin(Int), 2))
 
    @test QQFieldElem(2^62, 1) == 2^62
 
@@ -81,7 +81,7 @@ end
 
 @testset "QQFieldElem.rand" begin
    for bits in 1:100
-      t = rand_bits(FlintQQ, bits)
+      t = rand_bits(QQ, bits)
       @test height_bits(t) <= bits
    end
 
@@ -93,7 +93,7 @@ end
 end
 
 @testset "QQFieldElem.printing" begin
-   a = FlintQQ(1, 2)
+   a = QQ(1, 2)
 
    @test string(a) == "1//2"
 end
@@ -596,7 +596,7 @@ end
 @testset "QQFieldElem.unsafe" begin
   a = QQFieldElem(32//17)
   b = QQFieldElem(23//11)
-  c = one(FlintQQ)
+  c = one(QQ)
   b_copy = deepcopy(b)
   c_copy = deepcopy(c)
 
@@ -630,12 +630,12 @@ end
 end
 
 @testset "QQFieldElem.printing" begin
-  @test FlintQQ === rational_field()
-  @test PrettyPrinting.detailed(FlintQQ) == "Rational field"
-  @test PrettyPrinting.oneline(FlintQQ) == "Rational field"
-  @test PrettyPrinting.supercompact(FlintQQ) == "QQ"
+  @test QQ === rational_field()
+  @test PrettyPrinting.detailed(QQ) == "Rational field"
+  @test PrettyPrinting.oneline(QQ) == "Rational field"
+  @test PrettyPrinting.supercompact(QQ) == "QQ"
 
   io = PrettyPrinting.pretty(IOBuffer())
-  print(IOContext(io, :supercompact => true), PrettyPrinting.Lowercase(), FlintQQ)
+  print(IOContext(io, :supercompact => true), PrettyPrinting.Lowercase(), QQ)
   @test String(take!(io)) == "QQ"
 end

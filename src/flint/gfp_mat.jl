@@ -537,7 +537,7 @@ end
 
 function matrix_space(R::fpField, r::Int, c::Int; cached::Bool = true)
    # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
-  fpMatrixSpace(R, r, c)
+   fpMatrixSpace(R, r, c)
 end
 
 ################################################################################

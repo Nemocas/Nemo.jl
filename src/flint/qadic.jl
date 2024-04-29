@@ -67,19 +67,9 @@ O(R::QadicField, m::Integer) = O(R, ZZRingElem(m))
 
 elem_type(::Type{QadicField}) = QadicFieldElem
 
-@doc raw"""
-    base_ring(a::QadicField)
+base_ring_type(::Type{QadicField}) = typeof(Union{})
 
-Returns `Union{}` as this field is not dependent on another field.
-"""
 base_ring(a::QadicField) = Union{}
-
-@doc raw"""
-    base_ring(a::QadicFieldElem)
-
-Returns `Union{}` as this field is not dependent on another field.
-"""
-base_ring(a::QadicFieldElem) = Union{}
 
 parent(a::QadicFieldElem) = a.parent
 
@@ -116,7 +106,7 @@ function Base.deepcopy_internal(a::QadicFieldElem, dict::IdDict{Any, Any})
 end
 
 function Base.hash(a::QadicFieldElem, h::UInt)
-   return xor(hash(lift(QQPolyRing(FlintQQ, :x), a), h),
+   return xor(hash(lift(QQPolyRing(QQ, :x), a), h),
               xor(hash([prime(parent(a)),degree(parent(a))], h), h))
 end
 

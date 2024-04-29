@@ -1,6 +1,6 @@
 function benchmark_fateman()
    print("benchmark_fateman ... ")
-   R, x = polynomial_ring(FlintZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
    S, y = polynomial_ring(R, "y")
    T, z = polynomial_ring(S, "z")
    U, t = polynomial_ring(T, "t")

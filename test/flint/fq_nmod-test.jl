@@ -5,7 +5,7 @@
    @test elem_type(fqPolyRepField) == fqPolyRepFieldElem
    @test parent_type(fqPolyRepFieldElem) == fqPolyRepField
 
-   Sy, y = polynomial_ring(residue_ring(FlintZZ, 3)[1], "y")
+   Sy, y = polynomial_ring(residue_ring(ZZ, 3)[1], "y")
    Syy, yy = Native.GF(3)["y"]
 
    T, z = Native.finite_field(y^2 + 1, "z")
@@ -43,7 +43,7 @@
    # check for primality
    T3, z3 = Native.finite_field(yy^2 + 1, "z", check=false)
    @test isa(T2, fqPolyRepField)
-   Syyy, yyy = polynomial_ring(residue_ring(FlintZZ, 4)[1], "y")
+   Syyy, yyy = polynomial_ring(residue_ring(ZZ, 4)[1], "y")
    @test yyy isa zzModPolyRingElem
    @test_throws DomainError Native.finite_field(yyy^2+1, "z")
 end

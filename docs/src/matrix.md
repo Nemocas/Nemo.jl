@@ -78,11 +78,20 @@ In addition we have the following ad hoc comparison operators.
 
 **Examples**
 
-```julia
-C = RR[1 2; 3 4]
-D = RR["1 +/- 0.1" "2 +/- 0.1"; "3 +/- 0.1" "4 +/- 0.1"]
-overlaps(C, D)
-contains(D, C)
+```jldoctest; setup = :(RR = RealField())
+julia> C = RR[1 2; 3 4]
+[1.0000000000000000000   2.0000000000000000000]
+[3.0000000000000000000   4.0000000000000000000]
+
+julia> D = RR["1 +/- 0.1" "2 +/- 0.1"; "3 +/- 0.1" "4 +/- 0.1"]
+[[1e+0 +/- 0.101]   [2e+0 +/- 0.101]]
+[[3e+0 +/- 0.101]   [4e+0 +/- 0.101]]
+
+julia> overlaps(C, D)
+true
+
+julia> contains(D, C)
+true
 ```
 
 ### Scaling
@@ -97,13 +106,21 @@ contains(D, C)
 
 **Examples**
 
-```julia
-S = matrix_space(ZZ, 3, 3)
+```jldoctest
+julia> A = ZZ[2 3 5; 1 4 7; 9 6 3]
+[2   3   5]
+[1   4   7]
+[9   6   3]
 
-A = S([ZZ(2) 3 5; 1 4 7; 9 6 3])
+julia> B = A<<5
+[ 64    96   160]
+[ 32   128   224]
+[288   192    96]
 
-B = A<<5
-C = B>>2
+julia> C = B>>2
+[16   24   40]
+[ 8   32   56]
+[72   48   24]
 ```
 
 ### Determinant
@@ -119,13 +136,17 @@ det_given_divisor(::ZZMatrix, ::ZZRingElem, ::Bool)
 
 **Examples**
 
-```julia
-S = matrix_space(ZZ, 3, 3)
+```jldoctest
+julia> A = ZZ[2 3 5; 1 4 7; 9 6 3]
+[2   3   5]
+[1   4   7]
+[9   6   3]
 
-A = S([ZZ(2) 3 5; 1 4 7; 9 6 3])
+julia> c = det_divisor(A)
+3
 
-c = det_divisor(A)
-d = det_given_divisor(A, c)
+julia> d = det_given_divisor(A, c)
+-30
 ```
 
 ### Pseudo inverse
@@ -134,15 +155,6 @@ d = det_given_divisor(A, c)
 pseudo_inv(::ZZMatrix)
 ```
 
-**Examples**
-
-```julia
-S = matrix_space(ZZ, 3, 3)
-
-A = S([1 0 1; 2 3 1; 5 6 7])
-
-B, d = pseudo_inv(A)
-```
 
 ### Nullspace
 
@@ -159,13 +171,21 @@ reduce_mod(::ZZMatrix, ::ZZRingElem)
 
 **Examples**
 
-```julia
-S = matrix_space(ZZ, 3, 3)
+```jldoctest
+julia> A = ZZ[2 3 5; 1 4 7; 9 2 2]
+[2   3   5]
+[1   4   7]
+[9   2   2]
 
-A = S([ZZ(2) 3 5; 1 4 7; 9 2 2])
+julia> reduce_mod(A, ZZ(5))
+[2   3   0]
+[1   4   2]
+[4   2   2]
 
-reduce_mod(A, ZZ(5))
-reduce_mod(A, 2)
+julia> reduce_mod(A, 2)
+[0   1   1]
+[1   0   1]
+[1   0   0]
 ```
 
 ### Lifting
@@ -177,13 +197,19 @@ lift(::fpMatrix)
 
 **Examples**
 
-```julia
-R, = residue_ring(ZZ, 7)
-S = matrix_space(R, 3, 3)
+```jldoctest
+julia> R, = residue_ring(ZZ, 7)
+(Integers modulo 7, Map: ZZ -> ZZ/(7))
 
-a = S([4 5 6; 7 3 2; 1 4 5])
+julia> a = R[4 5 6; 7 3 2; 1 4 5]
+[4   5   6]
+[0   3   2]
+[1   4   5]
 
- b = lift(a)
+julia> b = lift(a)
+[-3   -2   -1]
+[ 0    3    2]
+[ 1   -3   -2]
 ```
 
 ### Special matrices
@@ -202,13 +228,24 @@ hilbert(::QQMatrixSpace)
 
 **Examples**
 
-```julia
-R = matrix_space(ZZ, 3, 3)
-S = matrix_space(QQ, 3, 3)
+```jldoctest
+julia> hadamard(matrix_space(ZZ, 3, 3))
+ERROR: Unable to create Hadamard matrix
+[...]
 
-A = hadamard(R)
-is_hadamard(A)
-B = hilbert(R)
+julia> A = hadamard(matrix_space(ZZ, 4, 4))
+[1    1    1    1]
+[1   -1    1   -1]
+[1    1   -1   -1]
+[1   -1   -1    1]
+
+julia> is_hadamard(A)
+true
+
+julia> B = hilbert(matrix_space(QQ, 3, 3))
+[   1   1//2   1//3]
+[1//2   1//3   1//4]
+[1//3   1//4   1//5]
 ```
 
 ### Hermite Normal Form
@@ -235,16 +272,32 @@ is_hnf(::ZZMatrix)
 
 **Examples**
 
-```julia
-S = matrix_space(ZZ, 3, 3)
+```jldoctest
+julia> A = ZZ[2 3 5; 1 4 7; 19 3 7]
+[ 2   3   5]
+[ 1   4   7]
+[19   3   7]
 
-A = S([ZZ(2) 3 5; 1 4 7; 19 3 7])
+julia> B = hnf(A)
+[1   0   16]
+[0   1   18]
+[0   0   27]
 
-B = hnf(A)
-H, T = hnf_with_transform(A)
-M = hnf_modular(A, ZZ(27))
-N = hnf_modular_eldiv(A, ZZ(27))
-is_hnf(M)
+julia> H, T = hnf_with_transform(A)
+([1 0 16; 0 1 18; 0 0 27], [-43 30 3; -44 31 3; -73 51 5])
+
+julia> M = hnf_modular(A, ZZ(27))
+[1   0   16]
+[0   1   18]
+[0   0   27]
+
+julia> N = hnf_modular_eldiv(A, ZZ(27))
+[1   0   16]
+[0   1   18]
+[0   0   27]
+
+julia> is_hnf(M)
+true
 ```
 
 ### Lattice basis reduction
@@ -294,19 +347,33 @@ lll_gram!(::ZZMatrix, ::LLLContext)
 
 **Examples**
 
-```julia
-S = matrix_space(ZZ, 3, 3)
+```jldoctest
+julia> A = ZZ[2 3 5; 1 4 7; 19 3 7]
+[ 2   3   5]
+[ 1   4   7]
+[19   3   7]
 
-A = S([ZZ(2) 3 5; 1 4 7; 19 3 7])
+julia> L = lll(A, LLLContext(0.95, 0.55, :zbasis, :approx))
+[-1    1   2]
+[-1   -2   2]
+[ 4    1   1]
 
-L = lll(A, LLLContext(0.95, 0.55, :zbasis, :approx)
-L, T = lll_with_transform(A)
+julia> L, T = lll_with_transform(A)
+([-1 1 2; -1 -2 2; 4 1 1], [-1 1 0; -15 10 1; 3 -2 0])
 
-G == lll_gram(gram(A))
-G, T = lll_gram_with_transform(gram(A))
+julia> G = lll_gram(gram(A))
+[ 6    3   -1]
+[ 3    9   -4]
+[-1   -4   18]
 
-r, L = lll_with_removal(A, ZZ(100))
-r, L, T = lll_with_removal_transform(A, ZZ(100))
+julia> G, T = lll_gram_with_transform(gram(A))
+([6 3 -1; 3 9 -4; -1 -4 18], [-1 1 0; -15 10 1; 3 -2 0])
+
+julia> r, L = lll_with_removal(A, ZZ(100))
+(3, [-1 1 2; -1 -2 2; 4 1 1])
+
+julia> r, L, T = lll_with_removal_transform(A, ZZ(100))
+(3, [-1 1 2; -1 -2 2; 4 1 1], [-1 1 0; -15 10 1; 3 -2 0])
 ```
 
 ### Smith Normal Form
@@ -325,17 +392,29 @@ is_snf(::ZZMatrix)
 
 **Examples**
 
-```julia
-S = matrix_space(ZZ, 3, 3)
+```jldoctest
+julia> A = ZZ[2 3 5; 1 4 7; 19 3 7]
+[ 2   3   5]
+[ 1   4   7]
+[19   3   7]
 
-A = S([ZZ(2) 3 5; 1 4 7; 19 3 7])
+julia> B = snf(A)
+[1   0    0]
+[0   1    0]
+[0   0   27]
 
-B = snf(A)
-is_snf(B) == true
+julia> is_snf(B) == true
+true
 
-B = S([ZZ(2) 0 0; 0 4 0; 0 0 7])
+julia> B = ZZ[2 0 0; 0 4 0; 0 0 7]
+[2   0   0]
+[0   4   0]
+[0   0   7]
 
-C = snf_diagonal(B)
+julia> C = snf_diagonal(B)
+[1   0    0]
+[0   2    0]
+[0   0   28]
 ```
 
 ### Strong Echelon Form
@@ -347,13 +426,18 @@ strong_echelon_form(::fpMatrix)
 
 **Examples**
 
-```julia
-R, = residue_ring(ZZ, 12)
-S = matrix_space(R, 3, 3)
+```jldoctest
+julia> R, = residue_ring(ZZ, 12);
 
-A = S([4 1 0; 0 0 5; 0 0 0 ])
+julia> A = R[4 1 0; 0 0 5; 0 0 0 ]
+[4   1   0]
+[0   0   5]
+[0   0   0]
 
-B = strong_echelon_form(A)
+julia> B = strong_echelon_form(A)
+[4   1   0]
+[0   3   0]
+[0   0   1]
 ```
 
 ### Howell Form
@@ -365,13 +449,18 @@ howell_form(::fpMatrix)
 
 **Examples**
 
-```julia
-R, = residue_ring(ZZ, 12)
-S = matrix_space(R, 3, 3)
+```jldoctest
+julia> R, = residue_ring(ZZ, 12);
 
-A = S([4 1 0; 0 0 5; 0 0 0 ])
+julia> A = R[4 1 0; 0 0 5; 0 0 0 ]
+[4   1   0]
+[0   0   5]
+[0   0   0]
 
-B = howell_form(A)
+julia> B = howell_form(A)
+[4   1   0]
+[0   3   0]
+[0   0   1]
 ```
 
 ### Gram-Schmidt Orthogonalisation
@@ -384,10 +473,16 @@ gram_schmidt_orthogonalisation(::QQMatrix)
 
 **Examples**
 
-```julia
-A = RR[2 0 0; 0 3 0; 0 0 1]
+```jldoctest; setup = :(RR = RealField())
+julia> A = RR[2 0 0; 0 3 0; 0 0 1]
+[2.0000000000000000000                       0                       0]
+[                    0   3.0000000000000000000                       0]
+[                    0                       0   1.0000000000000000000]
 
-B = exp(A)
+julia> B = exp(A)
+[[7.389056098930650227 +/- 4.72e-19]                                     0                                     0]
+[                                  0   [20.08553692318766774 +/- 1.94e-18]                                     0]
+[                                  0                                     0   [2.718281828459045235 +/- 4.30e-19]]
 ```
 
 ### Norm
@@ -402,34 +497,50 @@ bound_inf_norm(::ComplexMat)
 
 **Examples**
 
-```julia
-A = RR[1 2 3; 4 5 6; 7 8 9]
+```jldoctest; setup = :(RR = RealField())
+julia> A = RR[1 2 3; 4 5 6; 7 8 9]
+[1.0000000000000000000   2.0000000000000000000   3.0000000000000000000]
+[4.0000000000000000000   5.0000000000000000000   6.0000000000000000000]
+[7.0000000000000000000   8.0000000000000000000   9.0000000000000000000]
 
-d = bound_inf_norm(A)
+julia> d = bound_inf_norm(A)
+[24.000000059604644775 +/- 3.91e-19]
 ```
 
 ### Shifting
 
 **Examples**
 
-```julia
-A = RR[1 2 3; 4 5 6; 7 8 9]
+```jldoctest; setup = :(RR = RealField())
+julia> A = RR[1 2 3; 4 5 6; 7 8 9]
+[1.0000000000000000000   2.0000000000000000000   3.0000000000000000000]
+[4.0000000000000000000   5.0000000000000000000   6.0000000000000000000]
+[7.0000000000000000000   8.0000000000000000000   9.0000000000000000000]
 
-B = ldexp(A, 4)
+julia> B = ldexp(A, 4)
+[16.000000000000000000   32.000000000000000000   48.000000000000000000]
+[64.000000000000000000   80.000000000000000000   96.000000000000000000]
+[112.00000000000000000   128.00000000000000000   144.00000000000000000]
 
-overlaps(16*A, B)
+julia> overlaps(16*A, B)
+true
 ```
 
 ### Predicates
 
 **Examples**
 
-```julia
-A = CC[1 2 3; 4 5 6; 7 8 9]
+```jldoctest; setup = :(CC = ComplexField())
+julia> A = CC[1 2 3; 4 5 6; 7 8 9]
+[1.0000000000000000000   2.0000000000000000000   3.0000000000000000000]
+[4.0000000000000000000   5.0000000000000000000   6.0000000000000000000]
+[7.0000000000000000000   8.0000000000000000000   9.0000000000000000000]
 
-isreal(A)
+julia> isreal(A)
+true
 
-isreal(onei(CC)*A)
+julia> isreal(onei(CC)*A)
+false
 ```
 
 ### Conversion to Julia matrices
@@ -453,10 +564,28 @@ eigenvalues_with_multiplicities(::ComplexMat)
 eigenvalues_simple(a::ComplexMat)
 ```
 
-```julia
-A = CC[1 2 3; 0 4 5; 0 0 6]
-eigenvalues_simple(A)
-A = CC[2 2 3; 0 2 5; 0 0 2])
-eigenvalues(A)
-eigenvalues_with_multiplicities(A)
+```jldoctest; setup = :(CC = ComplexField())
+julia> A = CC[1 2 3; 0 4 5; 0 0 6]
+[1.0000000000000000000   2.0000000000000000000   3.0000000000000000000]
+[                    0   4.0000000000000000000   5.0000000000000000000]
+[                    0                       0   6.0000000000000000000]
+
+julia> eigenvalues_simple(A)
+3-element Vector{ComplexFieldElem}:
+ 1.0000000000000000000
+ 4.0000000000000000000
+ 6.0000000000000000000
+
+julia> A = CC[2 2 3; 0 2 5; 0 0 2]
+[2.0000000000000000000   2.0000000000000000000   3.0000000000000000000]
+[                    0   2.0000000000000000000   5.0000000000000000000]
+[                    0                       0   2.0000000000000000000]
+
+julia> eigenvalues(A)
+1-element Vector{ComplexFieldElem}:
+ 2.0000000000000000000
+
+julia> eigenvalues_with_multiplicities(A)
+1-element Vector{Tuple{ComplexFieldElem, Int64}}:
+ (2.0000000000000000000, 3)
 ```

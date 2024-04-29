@@ -17,9 +17,9 @@ elem_type(::Type{ArbField}) = ArbFieldElem
 
 parent_type(::Type{ArbFieldElem}) = ArbField
 
-base_ring(R::ArbField) = Union{}
+base_ring_type(::Type{ArbField}) = typeof(Union{})
 
-base_ring(x::ArbFieldElem) = Union{}
+base_ring(R::ArbField) = Union{}
 
 parent(x::ArbFieldElem) = x.parent
 
@@ -2076,8 +2076,12 @@ end
 function (r::ArbField)(x::Irrational)
   if x == pi
     return const_pi(r)
-  elseif x == e
-    return const_e(r.prec)
+  elseif x == MathConstants.e
+    return const_e(r)
+  elseif x == MathConstants.catalan
+    return const_catalan(r)
+  elseif x == MathConstants.eulergamma
+    return const_euler(r)
   else
     error("constant not supported")
   end
