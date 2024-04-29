@@ -558,9 +558,26 @@ for (factor_fn, factor_fn_inner, flint_fn) in
        end)
 end
 
+################################################################################
+#
+#  Irreducibility
+#
+################################################################################
+
 function is_irreducible(x::QQPolyRingElem)
   res, _ = _factor(x)
   return length(res) == 1 && first(values(res)) == 1
+end
+
+################################################################################
+#
+#  Squarefree testing
+#
+################################################################################
+
+function is_squarefree(x::QQPolyRingElem)
+   iszero(x) && return false
+   return Bool(@ccall libflint.fmpq_poly_is_squarefree(x::Ref{QQPolyRingElem})::Cint)
 end
 
 ###############################################################################

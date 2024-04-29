@@ -1535,6 +1535,7 @@ function is_squarefree(n::Union{Int, ZZRingElem})
   end
   return isone(maximum(values(factor(n).fac); init = 1))
 end
+
 ################################################################################
 #
 #   Factor trial range
