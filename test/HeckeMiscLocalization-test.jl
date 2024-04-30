@@ -1,7 +1,7 @@
 @testset "Localization" begin
 
-    R = FlintZZ
-    Qx, x = FlintQQ["x"]
+    R = ZZ
+    Qx, x = QQ["x"]
 
     @testset "Constructor" begin
 
@@ -9,13 +9,13 @@
 
         L = localization(R, 17)
         @test elem_type(L) == LocalizedEuclideanRingElem{ZZRingElem}
-        @test base_ring(L) == FlintZZ
-        @test base_ring(L()) == FlintZZ
+        @test base_ring(L) == ZZ
+        @test base_ring(L()) == ZZ
 
         L = localization(R, [2, R(3)])
         @test elem_type(L) == LocalizedEuclideanRingElem{ZZRingElem}
-        @test base_ring(L) == FlintZZ
-        @test base_ring(L()) == FlintZZ
+        @test base_ring(L) == ZZ
+        @test base_ring(L()) == ZZ
 
         @test parent_type(LocalizedEuclideanRingElem{QQPolyRingElem}) == LocalizedEuclideanRing{QQPolyRingElem}
 

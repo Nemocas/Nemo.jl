@@ -28,11 +28,11 @@ function (f::FinFieldMorphism)(x)
 end
 
 function show(io::IO, f::FinFieldMorphism)
-  if get(io, :supercompact, false)
+  if is_terse(io)
     print(io, "Morphism of finite fields")
   else
     print(io, "Hom: ")
-    print(IOContext(io, :supercompact => true), domain(f), " -> ", codomain(f))
+    print(terse(io), domain(f), " -> ", codomain(f))
   end
 end
 
@@ -67,11 +67,11 @@ function (f::FinFieldPreimage)(x)
 end
 
 function Base.show(io::IO, f::FinFieldPreimage)
-  if get(io, :supercompact, false)
+  if is_terse(io)
     print(io, "Preimage of a morphism")
   else
     print(io, "Hom: ")
-    print(IOContext(io, :supercompact => true), domain(f), " -> ", codomain(f))
+    print(terse(io), domain(f), " -> ", codomain(f))
   end
 end
 

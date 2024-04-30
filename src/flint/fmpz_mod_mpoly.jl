@@ -1047,7 +1047,7 @@ function (R::($rtype))(a::Vector, b::Vector{Vector{T}}) where T
    n = nvars(R)
    length(a) != length(b) && error("Coefficient and exponent vector must have the same length")
    newa = map(base_ring(R), a)
-   newb = map(x -> map(FlintZZ, x), b)
+   newb = map(x -> map(ZZ, x), b)
    newaa = convert(Vector{($ctype)}, newa)
    newbb = convert(Vector{Vector{ZZRingElem}}, newb)
    for i in 1:length(newbb)

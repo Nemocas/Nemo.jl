@@ -195,7 +195,7 @@ end
 
 function roots(R::T, f::QQPolyRingElem) where {T<:Union{fqPolyRepField,fpField}}
     Rt, t = polynomial_ring(R, "t", cached=false)
-    fp = polynomial_ring(FlintZZ, cached=false)[1](f * denominator(f))
+    fp = polynomial_ring(ZZ, cached=false)[1](f * denominator(f))
     fpp = Rt(fp)
     return roots(fpp)
 end
@@ -228,7 +228,7 @@ function is_power(a::Union{fpField, FpFieldElem, fqPolyRepFieldElem,FqPolyRepFie
     end
     s = order(parent(a))
     if gcd(s - 1, m) == 1
-        return true, a^invmod(FlintZZ(m), s - 1)
+        return true, a^invmod(ZZ(m), s - 1)
     end
     St, t = polynomial_ring(parent(a), "t", cached=false)
     f = t^m - a

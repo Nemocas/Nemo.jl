@@ -243,10 +243,10 @@ end
    c = C(1+2im)
    t = C(pi)
 
-   @test FlintZZ(n) == 3
+   @test ZZ(n) == 3
 
-   @test FlintQQ(h) == QQFieldElem(1) // 2
-   @test_throws ErrorException FlintZZ(h)
+   @test QQ(h) == QQFieldElem(1) // 2
+   @test_throws ErrorException ZZ(h)
 
    @test CalciumQQBar(h) == QQBarFieldElem(1) // 2
    @test CalciumQQBar(c) == QQBarFieldElem(1+2im)

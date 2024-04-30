@@ -17,6 +17,8 @@ elem_type(::Type{ComplexField}) = ComplexFieldElem
 
 parent_type(::Type{ComplexFieldElem}) = ComplexField
 
+base_ring_type(::Type{ComplexField}) = typeof(Union{})
+
 base_ring(R::ComplexField) = Union{}
 
 parent(x::ComplexFieldElem) = ComplexField()
@@ -144,7 +146,8 @@ function Base.show(io::IO, z::ComplexFieldElem)
 end
 
 function show(io::IO, x::ComplexField)
-  if get(io, :supercompact, false)
+  # deliberately no @show_name or @show_special here as this is a singleton type
+   if is_terse(io)
     print(io, LowercaseOff(), "CC")
   else
     print(io, "Complex field")

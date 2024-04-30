@@ -28,13 +28,15 @@ QQFieldElem(a::ZZRingElem, b::Integer) = QQFieldElem(a, ZZRingElem(b))
 
 QQFieldElem(a::Integer, b::ZZRingElem) = QQFieldElem(ZZRingElem(a), b)
 
-parent(a::QQFieldElem) = FlintQQ
+parent(a::QQFieldElem) = QQ
 
 parent_type(::Type{QQFieldElem}) = QQField
 
 elem_type(::Type{QQField}) = QQFieldElem
 
-base_ring(a::QQField) = FlintZZ
+base_ring_type(::Type{QQField}) = ZZRing
+
+base_ring(a::QQField) = ZZ
 
 is_domain_type(::Type{QQFieldElem}) = true
 
@@ -258,11 +260,10 @@ function show(io::IO, ::MIME"text/plain", a::QQField)
 end
 
 function show(io::IO, a::QQField)
-  if get(io, :supercompact, false)
-    # no nested printing
+  # deliberately no @show_name or @show_special here as this is a singleton type
+   if is_terse(io)
     print(pretty(io), LowercaseOff(), "QQ")
   else
-    # nested printing allowed, preferably supercompact
     print(io, "Rational field")
   end
 end
@@ -1230,4 +1231,4 @@ Rational(z::ZZRingElem) = Rational{BigInt}(z)
 #
 ###############################################################################
 
-fraction_field(base::ZZRing) = FlintQQ
+fraction_field(base::ZZRing) = QQ

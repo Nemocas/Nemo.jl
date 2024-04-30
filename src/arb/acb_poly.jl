@@ -73,6 +73,8 @@ end
 ###############################################################################
 
 function show(io::IO, x::AcbPolyRing)
+  @show_name(io, x)
+  @show_special(io, x)
   print(io, "Univariate Polynomial Ring in ")
   print(io, var(x))
   print(io, " over ")
@@ -193,7 +195,7 @@ contained in the (constant) polynomial $x$, along with that integer $z$
 in case it is, otherwise sets $t$ to `false`.
 """
 function unique_integer(x::AcbPolyRingElem)
-  z = ZZPolyRing(FlintZZ, var(parent(x)))()
+  z = ZZPolyRing(ZZ, var(parent(x)))()
   unique = ccall((:acb_poly_get_unique_fmpz_poly, libarb), Int,
     (Ref{ZZPolyRingElem}, Ref{AcbPolyRingElem}), z, x)
   return (unique != 0, z)

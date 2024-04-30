@@ -2,6 +2,13 @@
   Z2 = Native.GF(ZZ(2))
   Z3 = Native.GF(ZZ(3))
 
+  @test_throws ErrorException matrix_space(Z2, -1, 5)
+  @test_throws ErrorException matrix_space(Z2, 0, -2)
+  @test_throws ErrorException matrix_space(Z2, -3, -4)
+  @test_throws ErrorException FpMatrixSpace(Z2, 2, -1)
+  @test_throws ErrorException FpMatrixSpace(Z2, -1, 2)
+  @test_throws ErrorException FpMatrixSpace(Z2, -1, -1)
+
   R = FpMatrixSpace(Z2, 2, 2)
 
   @test elem_type(R) == FpMatrix
@@ -24,10 +31,6 @@
   @test isa(RR, FpMatrixSpace)
 
   @test R == RR
-
-  @test_throws ErrorException FpMatrixSpace(Z2, 2, -1)
-  @test_throws ErrorException FpMatrixSpace(Z2, -1, 2)
-  @test_throws ErrorException FpMatrixSpace(Z2, -1, -1)
 
   a = R()
 

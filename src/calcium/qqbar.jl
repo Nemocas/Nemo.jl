@@ -16,9 +16,9 @@ parent_type(::Type{QQBarFieldElem}) = QQBarField
 
 elem_type(::Type{QQBarField}) = QQBarFieldElem
 
-base_ring(a::QQBarField) = CalciumQQBar
+base_ring_type(::Type{QQBarField}) = typeof(Union{})
 
-base_ring(a::QQBarFieldElem) = CalciumQQBar
+base_ring(::QQBarField) = Union{}
 
 is_domain_type(::Type{QQBarFieldElem}) = true
 
@@ -34,7 +34,7 @@ characteristic(::QQBarField) = 0
 
 # todo: want a C function for this
 function Base.hash(a::QQBarFieldElem, h::UInt)
-   R, x = polynomial_ring(FlintZZ, "x")
+   R, x = polynomial_ring(ZZ, "x")
    return xor(hash(minpoly(R, a)), h)
 end
 
@@ -153,7 +153,8 @@ function native_string(x::QQBarFieldElem)
 end
 
 function show(io::IO, F::QQBarField)
-  if get(io, :supercompact, false)
+  # deliberately no @show_name or @show_special here as this is a singleton type
+   if is_terse(io)
     io = pretty(io)
     print(io, LowercaseOff(), "QQBar")
   else
@@ -1530,4 +1531,20 @@ end
 #
 ###############################################################################
 
+"""
+    algebraic_closure(::QQField)
+
+Return a field representing the algebraic closure of the field of
+rational numbers.
+
+# Examples
+
+```jldoctest
+julia> K = algebraic_closure(QQ)
+Field of algebraic numbers
+
+julia> sqrt(K(2))
+Root 1.41421 of x^2 - 2
+```
+"""
 algebraic_closure(::QQField) = QQBar

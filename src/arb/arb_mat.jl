@@ -584,7 +584,7 @@ end
 ################################################################################
 
 function solve_init(A::ArbMatrix)
-   return Solve.SolveCtx{ArbFieldElem, ArbMatrix, ArbMatrix}(A)
+   return Solve.SolveCtx{ArbFieldElem, ArbMatrix, ArbMatrix, ArbMatrix}(A)
 end
 
 function Solve._init_reduce(C::Solve.SolveCtx{ArbFieldElem})
@@ -879,6 +879,5 @@ promote_rule(::Type{ArbMatrix}, ::Type{QQMatrix}) = ArbMatrix
 
 function matrix_space(R::ArbField, r::Int, c::Int; cached = true)
   # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
-  (r <= 0 || c <= 0) && error("Dimensions must be positive")
   return ArbMatSpace(R, r, c)
 end

@@ -28,7 +28,7 @@ end
 number_of_variables(a::QQMPolyRing) = ccall((:fmpq_mpoly_ctx_nvars, libflint), Int,
                                 (Ref{QQMPolyRing}, ), a)
 
-base_ring(a::QQMPolyRing) = FlintQQ
+base_ring(a::QQMPolyRing) = QQ
 
 function internal_ordering(a::QQMPolyRing)
    b = ccall((:fmpq_mpoly_ctx_ord, libflint), Cint, (Ref{QQMPolyRing}, ), a)
@@ -1218,8 +1218,8 @@ end
 function (R::QQMPolyRing)(a::Vector{Any}, b::Vector{Vector{T}}) where T
    n = nvars(R)
    length(a) != length(b) && error("Coefficient and exponent vector must have the same length")
-   newa = map(FlintQQ, a)
-   newb = map(x -> map(FlintZZ, x), b)
+   newa = map(QQ, a)
+   newb = map(x -> map(ZZ, x), b)
    newaa = convert(Vector{QQFieldElem}, newa)
    newbb = convert(Vector{Vector{ZZRingElem}}, newb)
 

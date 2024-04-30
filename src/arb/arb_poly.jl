@@ -73,6 +73,8 @@ end
 ###############################################################################
 
 function show(io::IO, x::ArbPolyRing)
+  @show_name(io, x)
+  @show_special(io, x)
   print(io, "Univariate Polynomial Ring in ")
   print(io, var(x))
   print(io, " over ")
@@ -189,7 +191,7 @@ contained in each of the coefficients of $x$, otherwise sets $t$ to `false`.
 In the former case, $z$ is set to the integer polynomial.
 """
 function unique_integer(x::ArbPolyRingElem)
-  z = ZZPolyRing(FlintZZ, var(parent(x)))()
+  z = ZZPolyRing(ZZ, var(parent(x)))()
   unique = ccall((:arb_poly_get_unique_fmpz_poly, libarb), Int,
     (Ref{ZZPolyRingElem}, Ref{ArbPolyRingElem}), z, x)
   return (unique != 0, z)

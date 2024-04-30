@@ -14,9 +14,9 @@ elem_type(::Type{ZZMatrixSpace}) = ZZMatrix
 
 parent_type(::Type{ZZMatrix}) = ZZMatrixSpace
 
-base_ring(a::ZZMatrixSpace) = FlintZZ
+base_ring(a::ZZMatrixSpace) = ZZ
 
-base_ring(a::ZZMatrix) = FlintZZ
+base_ring(a::ZZMatrix) = ZZ
 
 dense_matrix_type(::Type{ZZRingElem}) = ZZMatrix
 
@@ -1331,7 +1331,7 @@ function Solve._can_solve_internal_no_check(A::ZZMatrix, b::ZZMatrix, task::Symb
 # `lazy_transpose`
 
 function solve_init(A::ZZMatrix)
-  return Solve.SolveCtx{ZZRingElem, ZZMatrix, ZZMatrix}(A)
+  return Solve.SolveCtx{ZZRingElem, ZZMatrix, ZZMatrix, ZZMatrix}(A)
 end
 
 function Solve._init_reduce_transpose(C::Solve.SolveCtx{ZZRingElem})

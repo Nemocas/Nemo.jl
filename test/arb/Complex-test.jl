@@ -61,7 +61,7 @@ end
    @test CC(UInt(4), Int(2)) == CC(4.0, ZZ(2))
    @test CC("4 +/- 0", BigFloat(2)) == CC(RR(4), QQ(2))
    @test CC(UInt(8)//UInt(2), BigInt(2)) == CC(4, 2)
-@test CC(2, UInt(8)//UInt(2)) == CC(2, 4)
+   @test CC(2, UInt(8)//UInt(2)) == CC(2, 4)
 
    @test characteristic(CC) == 0
 end
@@ -179,6 +179,9 @@ end
    @test accuracy_bits(CC(0)) == typemax(Int)
    @test accuracy_bits(CC("+/- inf")) == -typemax(Int)
    @test accuracy_bits(CC("0.1")) > precision(Balls) - 4
+   @testset for n in [10, 64, 200]
+     @test accuracy_bits(CC("0.1"; precision=n)) > n - 4
+   end
 
    uniq, n = unique_integer(CC("3 +/- 0.001"))
    @test uniq

@@ -2,6 +2,13 @@
   Z2, = residue_ring(ZZ, ZZ(2))
   Z3, = residue_ring(ZZ, ZZ(3))
 
+  @test_throws ErrorException matrix_space(Z2, -1, 5)
+  @test_throws ErrorException matrix_space(Z2, 0, -2)
+  @test_throws ErrorException matrix_space(Z2, -3, -4)
+  @test_throws ErrorException ZZModMatrixSpace(Z2, 2, -1)
+  @test_throws ErrorException ZZModMatrixSpace(Z2, -1, 2)
+  @test_throws ErrorException ZZModMatrixSpace(Z2, -1, -1)
+
   R = ZZModMatrixSpace(Z2, 2, 2)
 
   @test elem_type(R) == ZZModMatrix
@@ -23,10 +30,6 @@
   @test isa(RR, ZZModMatrixSpace)
 
   @test R == RR
-
-  @test_throws ErrorException ZZModMatrixSpace(Z2, 2, -1)
-  @test_throws ErrorException ZZModMatrixSpace(Z2, -1, 2)
-  @test_throws ErrorException ZZModMatrixSpace(Z2, -1, -1)
 
   a = R()
 
@@ -305,7 +308,7 @@ end
 end
 
 @testset "ZZModMatrix.row_col_swapping" begin
-   R, = residue_ring(FlintZZ, ZZ(17))
+   R, = residue_ring(ZZ, ZZ(17))
 
    a = matrix(R, [1 2; 3 4; 5 6])
 

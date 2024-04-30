@@ -16,7 +16,7 @@ elem_type(::Type{ZZPolyRing}) = ZZPolyRingElem
 
 dense_poly_type(::Type{ZZRingElem}) = ZZPolyRingElem
 
-base_ring(a::ZZPolyRing) = FlintZZ
+base_ring(a::ZZPolyRing) = ZZ
 
 parent(a::ZZPolyRingElem) = a.parent
 

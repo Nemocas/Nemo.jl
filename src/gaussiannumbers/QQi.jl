@@ -10,9 +10,9 @@ parent_type(::Type{QQiFieldElem}) = QQiField
 
 parent(a::QQiFieldElem) = FlintQQi
 
-base_ring(a::QQiField) = FlintZZi
+base_ring_type(::Type{QQiField}) = ZZiRing
 
-base_ring(a::QQiFieldElem) = FlintZZi
+base_ring(a::QQiField) = FlintZZi
 
 is_domain_type(::Type{QQiFieldElem}) = true
 
@@ -35,7 +35,8 @@ function Base.show(io::IO, a::QQiFieldElem)
 end
 
 function Base.show(io::IO, a::QQiField)
-   if get(io, :supercompact, false)
+   # deliberately no @show_name or @show_special here as this is a singleton type
+   if is_terse(io)
      io = pretty(io)
      print(io, LowercaseOff(), "QQ[im]")
    else

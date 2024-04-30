@@ -14,9 +14,9 @@ elem_type(::Type{QQMatrixSpace}) = QQMatrix
 
 parent_type(::Type{QQMatrix}) = QQMatrixSpace
 
-base_ring(a::QQMatrixSpace) = FlintQQ
+base_ring(a::QQMatrixSpace) = QQ
 
-base_ring(a::QQMatrix) = FlintQQ
+base_ring(a::QQMatrix) = QQ
 
 dense_matrix_type(::Type{QQFieldElem}) = QQMatrix
 
@@ -1106,7 +1106,7 @@ end
 ################################################################################
 
 function nullspace(A::QQMatrix)
-   AZZ = zero_matrix(FlintZZ, nrows(A), ncols(A))
+   AZZ = zero_matrix(ZZ, nrows(A), ncols(A))
    ccall((:fmpq_mat_get_fmpz_mat_rowwise, libflint), Nothing,
          (Ref{ZZMatrix}, Ptr{Nothing}, Ref{QQMatrix}), AZZ, C_NULL, A)
    N = similar(AZZ, ncols(A), ncols(A))
@@ -1125,8 +1125,8 @@ function nullspace(A::QQMatrix)
    NQQ = view(NQQ, 1:nrows(NQQ), 1:nullity)
 
    # Produce a 1 in the lowest non-zero entry of any column
-   s = FlintQQ()
-   t = FlintQQ()
+   s = QQ()
+   t = QQ()
    for j in 1:nullity
       # Find lowest non-zero entry
       for i in nrows(NQQ):-1:1

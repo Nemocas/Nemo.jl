@@ -25,7 +25,7 @@ elem_type(::Type{ZZAbsPowerSeriesRing}) = ZZAbsPowerSeriesRingElem
 
 parent_type(::Type{ZZAbsPowerSeriesRingElem}) = ZZAbsPowerSeriesRing
 
-base_ring(R::ZZAbsPowerSeriesRing) = FlintZZ
+base_ring(R::ZZAbsPowerSeriesRing) = ZZ
 
 abs_series_type(::Type{ZZRingElem}) = ZZAbsPowerSeriesRingElem
 
@@ -159,6 +159,8 @@ end
 ###############################################################################
 
 function show(io::IO, a::ZZAbsPowerSeriesRing)
+   @show_name(io, a)
+   @show_special(io, a)
    print(io, "Univariate power series ring in ", var(a), " over ")
    show(io, base_ring(a))
 end

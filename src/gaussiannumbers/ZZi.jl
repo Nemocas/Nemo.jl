@@ -10,9 +10,9 @@ parent_type(::Type{ZZiRingElem}) = ZZiRing
 
 parent(a::ZZiRingElem) = FlintZZi
 
-base_ring(a::ZZiRing) = FlintZZ
+base_ring_type(::Type{ZZiRing}) = ZZRing
 
-base_ring(a::ZZiRingElem) = FlintZZ
+base_ring(a::ZZiRing) = ZZ
 
 is_domain_type(::Type{ZZiRingElem}) = true
 
@@ -33,7 +33,8 @@ function Base.show(io::IO, a::ZZiRingElem)
 end
 
 function Base.show(io::IO, a::ZZiRing)
-   if get(io, :supercompact, false)
+   # deliberately no @show_name or @show_special here as this is a singleton type
+   if is_terse(io)
      io = pretty(io)
      print(io, LowercaseOff(), "ZZ[im]")
    else
@@ -125,7 +126,7 @@ end
 
 function rand_bits(::ZZiRing, b::Int)
    t = rand(0:b)
-   return ZZiRingElem(rand_bits(FlintZZ, t), rand_bits(FlintZZ, b - t))
+   return ZZiRingElem(rand_bits(ZZ, t), rand_bits(ZZ, b - t))
 end
 
 ###############################################################################
@@ -758,7 +759,7 @@ function gcdx(a::ZZiRingElem, b::ZZiRingElem)
       u = canonical_unit(a)
       return (divexact(a, u), inv(u), zero(FlintZZi))
    end
-   m = zero_matrix(FlintZZ, 4, 2)
+   m = zero_matrix(ZZ, 4, 2)
    m[1,1] =  a.x; m[1,2] = a.y
    m[2,1] = -a.y; m[2,2] = a.x
    m[3,1] =  b.x; m[3,2] = b.y

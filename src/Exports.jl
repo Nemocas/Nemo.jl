@@ -586,7 +586,6 @@ export snf
 export snf_diagonal
 export solve
 export sort_terms!
-export SparsePolynomialRing
 export sqr_classical
 export sqrt
 export sqrt1pm1
