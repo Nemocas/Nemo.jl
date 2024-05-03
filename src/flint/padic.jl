@@ -749,3 +749,56 @@ the default absolute precision of elements of the field is given by `prec`.
 function PadicField(p::Integer, prec::Int; kw...)
   return PadicField(ZZRingElem(p), prec; kw...)
 end
+
+###############################################################################
+#
+#   Precision handling
+#
+###############################################################################
+
+Base.precision(Q::PadicField) = Q.prec_max
+
+function Base.setprecision(q::PadicFieldElem, N::Int)
+  r = parent(q)()
+  r.N = N
+  ccall((:padic_set, libflint), Nothing, (Ref{PadicFieldElem}, Ref{PadicFieldElem}, Ref{PadicField}), r, q, parent(q))
+  return r
+end
+
+setprecision!(a::PadicFieldElem, n::Int) = setprecision(a, n)
+
+function setprecision!(Q::PadicField, n::Int)
+  Q.prec_max = n
+  return Q
+end
+
+function Base.setprecision(f::Generic.Poly{PadicFieldElem}, N::Int)
+  g = parent(f)()
+  fit!(g, length(f))
+  for i = 1:length(f)
+    g.coeffs[i] = setprecision!(f.coeffs[i], N)
+  end
+  set_length!(g, normalise(g, length(f)))
+  return g
+end
+
+function setprecision!(f::Generic.Poly{PadicFieldElem}, N::Int)
+  for i = 1:length(f)
+    f.coeffs[i] = setprecision!(f.coeffs[i], N)
+  end
+  return f
+end
+
+function with_precision(f::Function, K::PadicField, n::Int)
+  @assert n >= 0
+  old = precision(K)
+  setprecision!(K, n)
+  v = try
+    f()
+  finally
+    setprecision!(K, old)
+  end
+  return v
+end
+
+Base.setprecision(f, K::PadicField, n::Int) = with_precision(f, K, n)

@@ -631,6 +631,7 @@ export var
 export vcat
 export weierstrass_p
 export weierstrass_p_prime
+export with_precision
 export YoungTableau
 export zero
 export zero!
