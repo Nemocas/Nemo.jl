@@ -525,8 +525,6 @@ rand(R::fqPolyRepField, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
 #
 ###############################################################################
 
-# the two definitions are merged (with `Union`) so that this doesn't produce a compilation
-# warning due to similar definitions in Hecke
 Base.iterate(F::Union{fqPolyRepField,FqPolyRepField}) =
 zero(F), zeros(F isa fqPolyRepField ? UInt : ZZRingElem, degree(F))
 
