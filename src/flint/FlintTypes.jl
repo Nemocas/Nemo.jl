@@ -3016,7 +3016,7 @@ A $p$-adic field for some prime $p$.
   end
 end
 
-const PadicBase = CacheDictType{Tuple{ZZRingElem, Int}, PadicField}()
+const PadicBase = CacheDictType{ZZRingElem, PadicField}()
 
 function _padic_ctx_clear_fn(a::PadicField)
   ccall((:padic_ctx_clear, libflint), Nothing, (Ref{PadicField},), a)
