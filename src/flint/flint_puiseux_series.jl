@@ -40,6 +40,10 @@ elem_type(::Type{FlintPuiseuxSeriesRing{T}}) where T <: RingElem = FlintPuiseuxS
 
 elem_type(::Type{FlintPuiseuxSeriesField{T}}) where T <: FieldElem = FlintPuiseuxSeriesFieldElem{T}
 
+base_ring_type(R::Type{FlintPuiseuxSeriesRing{T}}) where T <: RingElem = base_ring_type(parent_type(T))
+
+base_ring_type(R::Type{FlintPuiseuxSeriesField{T}}) where T <: FieldElem = base_ring_type(parent_type(T))
+
 base_ring(R::FlintPuiseuxSeriesRing{T}) where T <: RingElem = base_ring(laurent_ring(R))
 
 base_ring(R::FlintPuiseuxSeriesField{T}) where T <: FieldElem = base_ring(laurent_ring(R))
@@ -231,22 +235,24 @@ function Base.show(io::IO, a::FlintPuiseuxSeriesElem)
 end
 
 function show(io::IO, p::FlintPuiseuxSeriesRing)
-   if get(io, :supercompact, false)
+   if is_terse(io)
       print(io, "Puiseux series ring")
    else
       io = pretty(io)
       print(io, "Puiseux series ring in ", var(laurent_ring(p)), " over ")
-      print(IOContext(io, :supercompact => true), Lowercase(), base_ring(p))
+      print(terse(io), Lowercase(), base_ring(p))
    end
 end
 
 function show(io::IO, p::FlintPuiseuxSeriesField)
-   if get(io, :supercompact, false)
+   @show_name(io, p)
+   @show_special(io, p)
+   if is_terse(io)
       print(io, "Puiseux series field")
    else
       io = pretty(io)
       print(io, "Puiseux series field in ", var(laurent_ring(p)), " over ")
-      print(IOContext(io, :supercompact => true), Lowercase(), base_ring(p))
+      print(terse(io), Lowercase(), base_ring(p))
    end
 end
 

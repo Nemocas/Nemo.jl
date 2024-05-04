@@ -34,8 +34,6 @@ number_of_variables(a::($rtype)) = a.nvars
 
 base_ring(a::($rtype)) = a.base_ring
 
-base_ring(f::($etype)) = base_ring(parent(f))
-
 characteristic(R::($rtype)) = characteristic(base_ring(R)) # characteristic of Z/4Z?
 
 modulus(R::($rtype)) = modulus(base_ring(R))

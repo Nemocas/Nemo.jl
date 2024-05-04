@@ -159,6 +159,8 @@ end
 ###############################################################################
 
 function show(io::IO, a::ZZAbsPowerSeriesRing)
+   @show_name(io, a)
+   @show_special(io, a)
    print(io, "Univariate power series ring in ", var(a), " over ")
    show(io, base_ring(a))
 end

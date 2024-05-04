@@ -97,6 +97,14 @@ end
       end
    end
 
+   @test setprecision(BigFloat, 1000) do
+       abs(BigFloat(RR("2.3", 1000)) - BigFloat("2.3")) < 1e-299
+   end
+
+   @test setprecision(BigFloat, 1000) do
+       abs(BigFloat(RR("2.3"; precision=1000)) - BigFloat("2.3")) < 1e-299
+   end
+
    for T in [Float64, BigFloat]
       x = RR(-1)/3
       y = T(-1)/3
@@ -289,6 +297,10 @@ end
    @test accuracy_bits(RR(0)) == typemax(Int)
    @test accuracy_bits(RR("+/- inf")) == -typemax(Int)
    @test accuracy_bits(RR("0.1")) > precision(Balls) - 4
+   @testset for n in [10, 64, 200]
+     @test accuracy_bits(RR("0.1", n)) > n - 4
+     @test accuracy_bits(RR("0.1"; precision=n)) > n - 4
+   end
 
    uniq, n = unique_integer(RR("3 +/- 0.001"))
    @test uniq

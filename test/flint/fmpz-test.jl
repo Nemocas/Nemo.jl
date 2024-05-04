@@ -1070,6 +1070,8 @@ end
 
    @test fibonacci(ZZRingElem(-2)) == -1
 
+   @test_throws OverflowError fibonacci(999)
+
    @test_throws DomainError  euler_phi(-ZZRingElem(12480))
 
    @test remove(ZZRingElem(12), ZZRingElem(2)) == (2, 3)
@@ -1117,6 +1119,8 @@ end
    @test_throws DomainError rising_factorial(12, -1)
 
    @test primorial(7) == 210
+
+   @test_throws OverflowError primorial(999)
 
    @test_throws DomainError primorial(-7)
 
@@ -1424,7 +1428,8 @@ end
   @test PrettyPrinting.oneline(ZZ) == "Integer ring"
   @test PrettyPrinting.supercompact(ZZ) == "ZZ"
 
+  # test LowercaseOff
   io = PrettyPrinting.pretty(IOBuffer())
-  print(IOContext(io, :supercompact => true), PrettyPrinting.Lowercase(), ZZ)
+  print(PrettyPrinting.terse(io), PrettyPrinting.Lowercase(), ZZ)
   @test String(take!(io)) == "ZZ"
 end

@@ -16,9 +16,9 @@ parent_type(::Type{QQBarFieldElem}) = QQBarField
 
 elem_type(::Type{QQBarField}) = QQBarFieldElem
 
-base_ring(a::QQBarField) = CalciumQQBar
+base_ring_type(::Type{QQBarField}) = typeof(Union{})
 
-base_ring(a::QQBarFieldElem) = CalciumQQBar
+base_ring(::QQBarField) = Union{}
 
 is_domain_type(::Type{QQBarFieldElem}) = true
 
@@ -50,7 +50,7 @@ function QQBarFieldElem(a::Int)
   return z
 end
 
-function QQBarFieldElem(a::Complex{Int})
+function QQBarFieldElem(a::Complex)
    r = QQBarFieldElem(real(a))
    s = QQBarFieldElem(imag(a))
    z = QQBarFieldElem()
@@ -74,6 +74,8 @@ function QQBarFieldElem(a::QQFieldElem)
 end
 
 QQBarFieldElem(a::Rational) = QQBarFieldElem(QQFieldElem(a))
+
+QQBarFieldElem(a::Integer) = QQBarFieldElem(ZZRingElem(a))
 
 function deepcopy_internal(a::QQBarFieldElem, dict::IdDict)
    z = QQBarFieldElem()
@@ -151,7 +153,8 @@ function native_string(x::QQBarFieldElem)
 end
 
 function show(io::IO, F::QQBarField)
-  if get(io, :supercompact, false)
+  # deliberately no @show_name or @show_special here as this is a singleton type
+   if is_terse(io)
     io = pretty(io)
     print(io, LowercaseOff(), "QQBar")
   else
@@ -1518,17 +1521,7 @@ end
 
 (a::QQBarField)() = QQBarFieldElem()
 
-(a::QQBarField)(b::Int) = QQBarFieldElem(b)
-
-(a::QQBarField)(b::Complex{Int}) = QQBarFieldElem(b)
-
-(a::QQBarField)(b::ZZRingElem) = QQBarFieldElem(b)
-
-(a::QQBarField)(b::Integer) = QQBarFieldElem(ZZRingElem(b))
-
-(a::QQBarField)(b::Rational) = QQBarFieldElem(b)
-
-(a::QQBarField)(b::QQFieldElem) = QQBarFieldElem(b)
+(a::QQBarField)(b::Any) = QQBarFieldElem(b)
 
 (a::QQBarField)(b::QQBarFieldElem) = b
 
@@ -1538,4 +1531,20 @@ end
 #
 ###############################################################################
 
+"""
+    algebraic_closure(::QQField)
+
+Return a field representing the algebraic closure of the field of
+rational numbers.
+
+# Examples
+
+```jldoctest
+julia> K = algebraic_closure(QQ)
+Field of algebraic numbers
+
+julia> sqrt(K(2))
+Root 1.41421 of x^2 - 2
+```
+"""
 algebraic_closure(::QQField) = QQBar

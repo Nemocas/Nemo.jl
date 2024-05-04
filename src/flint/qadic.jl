@@ -67,19 +67,9 @@ O(R::QadicField, m::Integer) = O(R, ZZRingElem(m))
 
 elem_type(::Type{QadicField}) = QadicFieldElem
 
-@doc raw"""
-    base_ring(a::QadicField)
+base_ring_type(::Type{QadicField}) = typeof(Union{})
 
-Returns `Union{}` as this field is not dependent on another field.
-"""
 base_ring(a::QadicField) = Union{}
-
-@doc raw"""
-    base_ring(a::QadicFieldElem)
-
-Returns `Union{}` as this field is not dependent on another field.
-"""
-base_ring(a::QadicFieldElem) = Union{}
 
 parent(a::QadicFieldElem) = a.parent
 
@@ -247,7 +237,9 @@ function show(io::IO, a::QadicFieldElem)
 end
 
 function show(io::IO, R::QadicField)
-   if get(io, :supercompact, false)
+   @show_name(io, R)
+   @show_special(io, R)
+   if is_terse(io)
      io = pretty(io)
      print(io, LowercaseOff(), "QQ_$(prime(R))^$(degree(R))")
    else

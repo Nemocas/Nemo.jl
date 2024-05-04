@@ -28,6 +28,8 @@ parent(a::ZZLaurentSeriesRingElem) = a.parent
 
 elem_type(::Type{ZZLaurentSeriesRing}) = ZZLaurentSeriesRingElem
 
+base_ring_type(::Type{ZZLaurentSeriesRing}) = ZZRing
+
 base_ring(R::ZZLaurentSeriesRing) = ZZ
 
 is_domain_type(::Type{ZZLaurentSeriesRingElem}) = true
@@ -344,12 +346,14 @@ function show(io::IO, a::ZZLaurentSeriesRingElem)
 end
 
 function show(io::IO, p::ZZLaurentSeriesRing)
-   if get(io, :supercompact, false)
+   @show_name(io, p)
+   @show_special(io, p)
+   if is_terse(io)
       print(io, "Laurent series ring")
    else
       io = pretty(io)
       print(io, "Laurent series ring in ", var(p), " over ")
-      print(IOContext(io, :supercompact => true), Lowercase(), base_ring(p))
+      print(terse(io), Lowercase(), base_ring(p))
    end
 end
 

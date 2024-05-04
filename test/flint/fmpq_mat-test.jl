@@ -1,4 +1,11 @@
 @testset "QQMatrix.constructors" begin
+   @test_throws ErrorException matrix_space(QQ, -1, 5)
+   @test_throws ErrorException matrix_space(QQ, 0, -2)
+   @test_throws ErrorException matrix_space(QQ, -3, -4)
+   @test_throws ErrorException QQMatrixSpace(2, -1)
+   @test_throws ErrorException QQMatrixSpace(-1, 2)
+   @test_throws ErrorException QQMatrixSpace(-1, -1)
+
    S = matrix_space(QQ, 3, 3)
 
    @test elem_type(S) == QQMatrix

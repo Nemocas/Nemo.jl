@@ -10,9 +10,9 @@ parent_type(::Type{ZZiRingElem}) = ZZiRing
 
 parent(a::ZZiRingElem) = FlintZZi
 
-base_ring(a::ZZiRing) = ZZ
+base_ring_type(::Type{ZZiRing}) = ZZRing
 
-base_ring(a::ZZiRingElem) = ZZ
+base_ring(a::ZZiRing) = ZZ
 
 is_domain_type(::Type{ZZiRingElem}) = true
 
@@ -33,7 +33,8 @@ function Base.show(io::IO, a::ZZiRingElem)
 end
 
 function Base.show(io::IO, a::ZZiRing)
-   if get(io, :supercompact, false)
+   # deliberately no @show_name or @show_special here as this is a singleton type
+   if is_terse(io)
      io = pretty(io)
      print(io, LowercaseOff(), "ZZ[im]")
    else

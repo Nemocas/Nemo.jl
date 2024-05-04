@@ -618,7 +618,7 @@ end
 ################################################################################
 
 function solve_init(A::AcbMatrix)
-   return Solve.SolveCtx{AcbFieldElem, AcbMatrix, AcbMatrix}(A)
+   return Solve.SolveCtx{AcbFieldElem, AcbMatrix, AcbMatrix, AcbMatrix}(A)
 end
 
 function Solve._init_reduce(C::Solve.SolveCtx{AcbFieldElem})
@@ -1107,6 +1107,5 @@ end
 
 function matrix_space(R::AcbField, r::Int, c::Int; cached = true)
   # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
-  (r <= 0 || c <= 0) && error("Dimensions must be positive")
   return AcbMatSpace(R, r, c)
 end

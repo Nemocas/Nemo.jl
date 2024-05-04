@@ -14,6 +14,8 @@ parent_type(::Type{zzModRingElem}) = zzModRing
 
 elem_type(::Type{zzModRing}) = zzModRingElem
 
+base_ring_type(::Type{zzModRing}) = ZZRing
+
 base_ring(a::zzModRing) = ZZ
 
 parent(a::zzModRingElem) = a.parent
@@ -95,12 +97,12 @@ end
 ###############################################################################
 
 function show(io::IO, R::zzModRing)
-   if get(io, :supercompact, false)
-      # no nested printing
+   @show_name(io, R)
+   @show_special(io, R)
+   if is_terse(io)
       io = pretty(io)
       print(io, LowercaseOff(), "ZZ/($(signed(widen(R.n))))")
    else
-      # nested printing allowed, preferably supercompact
       print(io, "Integers modulo ", signed(widen(R.n)))
    end
 end

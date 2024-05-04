@@ -635,7 +635,8 @@ end
   @test PrettyPrinting.oneline(QQ) == "Rational field"
   @test PrettyPrinting.supercompact(QQ) == "QQ"
 
+  # test LowercaseOff
   io = PrettyPrinting.pretty(IOBuffer())
-  print(IOContext(io, :supercompact => true), PrettyPrinting.Lowercase(), QQ)
+  print(PrettyPrinting.terse(io), PrettyPrinting.Lowercase(), QQ)
   @test String(take!(io)) == "QQ"
 end

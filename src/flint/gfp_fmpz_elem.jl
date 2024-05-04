@@ -14,6 +14,8 @@ parent_type(::Type{FpFieldElem}) = FpField
 
 elem_type(::Type{FpField}) = FpFieldElem
 
+base_ring_type(::Type{FpField}) = typeof(Union{})
+
 base_ring(a::FpField) = Union{}
 
 parent(a::FpFieldElem) = a.parent
@@ -85,12 +87,12 @@ canonical_unit(x::FpFieldElem) = x
 ###############################################################################
 
 function show(io::IO, a::FpField)
-   if get(io, :supercompact, false)
-      # no nested printing
+   @show_name(io, a)
+   @show_special(io, a)
+   if is_terse(io)
       io = pretty(io)
       print(io, LowercaseOff(), "GF(", a.n, ")")
    else
-      # nested printing allowed, preferably supercompact
       print(io, "Finite field of characteristic ", a.n)
    end
 end

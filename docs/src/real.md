@@ -105,10 +105,10 @@ julia> d = RR(1//2)
 Note that for the construction, also the precision can be supplied:
 
 ```jldoctest; setup = :(RR = RealField())
-julia> c = RR(1//3, 100)
+julia> c = RR(1//3, precision=100)
 [0.33333333333333333333 +/- 3.34e-21]
 
-julia> d = RR(1//3, 4)
+julia> d = RR(1//3, precision=4)
 [0.3 +/- 0.0438]
 ```
 

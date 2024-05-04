@@ -67,9 +67,9 @@ O(R::PadicField, m::Integer) = O(R, ZZRingElem(m))
 
 elem_type(::Type{PadicField}) = PadicFieldElem
 
-base_ring(a::PadicField) = Union{}
+base_ring_type(::Type{PadicField}) = typeof(Union{})
 
-base_ring(a::PadicFieldElem) = Union{}
+base_ring(a::PadicField) = Union{}
 
 parent(a::PadicFieldElem) = a.parent
 
@@ -258,7 +258,9 @@ function show(io::IO, a::PadicFieldElem)
 end
 
 function show(io::IO, R::PadicField)
-   if get(io, :supercompact, false)
+   @show_name(io, R)
+   @show_special(io, R)
+   if is_terse(io)
      io = pretty(io)
      print(io, LowercaseOff(), "QQ_$(prime(R))")
    else

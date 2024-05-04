@@ -17,6 +17,8 @@ elem_type(::Type{RealField}) = RealFieldElem
 
 parent_type(::Type{RealFieldElem}) = RealField
 
+base_ring_type(::Type{RealField}) = typeof(Union{})
+
 base_ring(R::RealField) = Union{}
 
 parent(x::RealFieldElem) = RealField()
@@ -173,7 +175,8 @@ function expressify(x::RealFieldElem; context = nothing)
 end
 
 function show(io::IO, x::RealField)
-  if get(io, :supercompact, false)
+  # deliberately no @show_name or @show_special here as this is a singleton type
+   if is_terse(io)
     print(io, LowercaseOff(), "RR")
   else
     print(io, "Real field")
@@ -2051,17 +2054,23 @@ end
 
 (r::RealField)() = RealFieldElem()
 
-(r::RealField)(x::Any, prec::Int = precision(Balls)) = RealFieldElem(x, prec)
+(r::RealField)(x::Any, prec::Int) = RealFieldElem(x, prec)
 
-function (r::RealField)(x::Irrational, prec::Int = precision(Balls))
+function (r::RealField)(x::Irrational, prec::Int)
   if x == pi
-    return const_pi(r)
-  elseif x == e
-    return const_e(precision(Balls))
+    return const_pi(r, prec)
+  elseif x == MathConstants.e
+    return const_e(r, prec)
+  elseif x == MathConstants.catalan
+    return const_catalan(r, prec)
+  elseif x == MathConstants.eulergamma
+    return const_euler(r, prec)
   else
     error("constant not supported")
   end
 end
+
+(r::RealField)(x::Any; precision::Int = precision(Balls)) = r(x, precision)
 
 ################################################################################
 #

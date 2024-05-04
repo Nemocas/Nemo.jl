@@ -14,6 +14,8 @@ parent_type(::Type{FqPolyRepFieldElem}) = FqPolyRepField
 
 elem_type(::Type{FqPolyRepField}) = FqPolyRepFieldElem
 
+base_ring_type(::Type{FqPolyRepField}) = typeof(Union{})
+
 base_ring(a::FqPolyRepField) = Union{}
 
 parent(a::FqPolyRepFieldElem) = a.parent
@@ -162,12 +164,12 @@ end
 show(io::IO, a::FqPolyRepFieldElem) = print(io, AbstractAlgebra.obj_to_string(a, context = io))
 
 function show(io::IO, a::FqPolyRepField)
-   if get(io, :supercompact, false)
-      # no nested printing
+   @show_name(io, a)
+   @show_special(io, a)
+   if is_terse(io)
       io = pretty(io)
       print(io, LowercaseOff(), "GF($(characteristic(a))^$(degree(a)))")
    else
-      # nested printing allowed, preferably supercompact
       print(io, "Finite field of degree ", degree(a))
       print(io, " over GF(", characteristic(a),")")
    end

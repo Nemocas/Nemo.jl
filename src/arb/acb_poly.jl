@@ -73,6 +73,8 @@ end
 ###############################################################################
 
 function show(io::IO, x::AcbPolyRing)
+  @show_name(io, x)
+  @show_special(io, x)
   print(io, "Univariate Polynomial Ring in ")
   print(io, var(x))
   print(io, " over ")

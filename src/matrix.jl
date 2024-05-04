@@ -57,7 +57,7 @@ end
 ################################################################################
 
 function solve_init(A::_FieldMatTypes)
-   return Solve.SolveCtx{elem_type(base_ring(A)), typeof(A), typeof(A)}(A)
+   return Solve.SolveCtx{elem_type(base_ring(A)), typeof(A), typeof(A), typeof(A)}(A)
 end
 
 ################################################################################
@@ -80,16 +80,11 @@ function Solve._init_reduce(C::Solve.SolveCtx{T}) where {T <: Union{fpFieldElem,
    C.lu_perm = p
    if r < nrows(C)
       pA = p*matrix(C)
-      set_attribute!(C, :permuted_matrix_lu => view(pA, r + 1:nrows(C), :))
+      C.permuted_matrix = view(pA, r + 1:nrows(C), :)
    else
-      set_attribute!(C, :permuted_matrix_lu => zero(matrix(C), 0, ncols(C)))
+      C.permuted_matrix = zero(matrix(C), 0, ncols(C))
    end
    return nothing
-end
-
-function permuted_matrix_lu(C::Solve.SolveCtx{T, MatT}) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}, MatT}
-   Solve._init_reduce(C)
-   return get_attribute(C, :permuted_matrix_lu)::MatT
 end
 
 function Solve._init_reduce_transpose(C::Solve.SolveCtx{T}) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
@@ -106,19 +101,14 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{T}) where {T <: Union{fp
    C.lu_perm_transp = p
    if r < ncols(C)
       Ap = matrix(C)*p
-      set_attribute!(C, :permuted_matrix_of_transpose_lu => view(Ap, :, r + 1:ncols(C)))
+      C.permuted_matrix_transp = view(Ap, :, r + 1:ncols(C))
    else
-      set_attribute!(C, :permuted_matrix_of_transpose_lu => zero(matrix(C), nrows(C), 0))
+      C.permuted_matrix_transp = zero(matrix(C), nrows(C), 0)
    end
    return nothing
 end
 
-function permuted_matrix_of_transpose_lu(C::Solve.SolveCtx{T, MatT}) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}, MatT}
-   Solve._init_reduce_transpose(C)
-   return get_attribute(C, :permuted_matrix_of_transpose_lu)::MatT
-end
-
-function Solve._can_solve_internal_no_check(C::Solve.SolveCtx{T, MatT}, b::MatT, task::Symbol; side::Symbol = :left) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}, MatT}
+function Solve._can_solve_internal_no_check(C::Solve.SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
    # Split up in separate functions to make the compiler happy
    if side === :right
       return Solve._can_solve_internal_no_check_right(C, b, task)
@@ -127,7 +117,7 @@ function Solve._can_solve_internal_no_check(C::Solve.SolveCtx{T, MatT}, b::MatT,
    end
 end
 
-function Solve._can_solve_internal_no_check_right(C::Solve.SolveCtx{T, MatT}, b::MatT, task::Symbol) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}, MatT}
+function Solve._can_solve_internal_no_check_right(C::Solve.SolveCtx{T}, b::MatElem{T}, task::Symbol) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
    LU = Solve.reduced_matrix(C)
    p = Solve.lu_permutation(C)
    pb = p*b
@@ -173,7 +163,7 @@ function Solve._can_solve_internal_no_check_right(C::Solve.SolveCtx{T, MatT}, b:
 
    fl = true
    if r < nrows(C)
-      fl = permuted_matrix_lu(C)*y == view(pb, r + 1:nrows(C), :)
+      fl = Solve.permuted_matrix(C)*y == view(pb, r + 1:nrows(C), :)
    end
 
    if task !== :with_kernel
@@ -183,7 +173,7 @@ function Solve._can_solve_internal_no_check_right(C::Solve.SolveCtx{T, MatT}, b:
    end
 end
 
-function Solve._can_solve_internal_no_check_left(C::Solve.SolveCtx{T, MatT}, b::MatT, task::Symbol) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}, MatT}
+function Solve._can_solve_internal_no_check_left(C::Solve.SolveCtx{T}, b::MatElem{T}, task::Symbol) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
    LU = Solve.reduced_matrix_of_transpose(C)
    p = Solve.lu_permutation_of_transpose(C)
    pbt = p*transpose(b)
@@ -204,7 +194,7 @@ function Solve._can_solve_internal_no_check_left(C::Solve.SolveCtx{T, MatT}, b::
    fl = true
    if r < ncols(C)
       bp = b*p
-      fl = y*permuted_matrix_of_transpose_lu(C) == view(bp, :, r + 1:ncols(C))
+      fl = y*Solve.permuted_matrix_of_transpose(C) == view(bp, :, r + 1:ncols(C))
    end
 
    if task !== :with_kernel

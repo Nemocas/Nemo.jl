@@ -872,6 +872,7 @@ struct RealMatSpace <: MatSpace{RealFieldElem}
   ncols::Int
 
   function RealMatSpace(R::RealField, r::Int, c::Int)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     return new(r, c)
   end
 end
@@ -995,6 +996,7 @@ struct ArbMatSpace <: MatSpace{ArbFieldElem}
   base_ring::ArbField
 
   function ArbMatSpace(R::ArbField, r::Int, c::Int)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     return new(r, c, R)
   end
 end
@@ -1122,6 +1124,7 @@ struct ComplexMatSpace <: MatSpace{ComplexFieldElem}
   #base_ring::AcbField
 
   function ComplexMatSpace(R::ComplexField, r::Int, c::Int)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     return new(r, c)
   end
 end
@@ -1389,6 +1392,7 @@ struct AcbMatSpace <: MatSpace{AcbFieldElem}
   base_ring::AcbField
 
   function AcbMatSpace(R::AcbField, r::Int, c::Int)
+    (r < 0 || c < 0) && throw(_err_dim_negative)
     return new(r, c, R)
   end
 end

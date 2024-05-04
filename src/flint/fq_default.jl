@@ -14,6 +14,8 @@ parent_type(::Type{FqFieldElem}) = FqField
 
 elem_type(::Type{FqField}) = FqFieldElem
 
+base_ring_type(::Type{FqField}) = typeof(Union{})
+
 base_ring(a::FqField) = Union{}
 
 parent(a::FqFieldElem) = a.parent
@@ -362,10 +364,12 @@ end
 show(io::IO, a::FqFieldElem) = print(io, AbstractAlgebra.obj_to_string(a, context = io))
 
 function show(io::IO, a::FqField)
+  @show_name(io, a)
+  @show_special(io, a)
   io = pretty(io)
   if is_absolute(a)
     deg = degree(a)
-    if get(io, :supercompact, false)
+    if is_terse(io)
       if deg == 1
         print(io, LowercaseOff(), "GF($(characteristic(a)))")
       else
@@ -379,7 +383,7 @@ function show(io::IO, a::FqField)
       end
     end
   else
-    if get(io, :supercompact, false)
+    if is_terse(io)
       degrees = Int[]
       b = a
       while !is_absolute(b)
@@ -389,7 +393,7 @@ function show(io::IO, a::FqField)
       print(io, LowercaseOff(), "GF($(characteristic(a)), $(join(reverse(degrees), '*')))")
     else
       print(io, "Finite field of degree $(degree(a)) over ")
-      print(IOContext(io, :supercompact => true), base_field(a))
+      print(terse(io), base_field(a))
     end
   end
 end

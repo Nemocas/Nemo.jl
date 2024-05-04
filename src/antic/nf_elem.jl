@@ -21,19 +21,9 @@ parent(a::AbsSimpleNumFieldElem) = a.parent
 
 elem_type(::Type{AbsSimpleNumField}) = AbsSimpleNumFieldElem
 
-@doc raw"""
-    base_ring(a::AbsSimpleNumField)
+base_ring_type(::Type{AbsSimpleNumField}) = typeof(Union{})
 
-Returns `Union{}` since a number field doesn't depend on any ring.
-"""
 base_ring(a::AbsSimpleNumField) = Union{}
-
-@doc raw"""
-    base_ring(a::AbsSimpleNumFieldElem)
-
-Returns `Union{}` since a number field doesn't depend on any ring.
-"""
-base_ring(a::AbsSimpleNumFieldElem) = Union{}
 
 is_domain_type(::Type{AbsSimpleNumFieldElem}) = true
 
@@ -261,12 +251,12 @@ end
 function Base.show(io::IO, a::AbsSimpleNumField)
   @show_name(io, a)
   @show_special(io, a)
-  if get(io, :supercompact, false)
+  if is_terse(io)
     print(io, "Number field")
   else
     io = pretty(io)
     print(io, "Number field of degree $(degree(a))")
-    print(IOContext(io, :supercompact => true), " over ", Lowercase(), QQ)
+    print(terse(io), " over ", Lowercase(), QQ)
   end
 end
 

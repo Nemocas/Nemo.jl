@@ -2,6 +2,13 @@
   F4, a = Native.finite_field(ZZRingElem(2), 2, "a")
   F9, b = Native.finite_field(ZZRingElem(3), 2, "b")
 
+  @test_throws ErrorException matrix_space(F4, -1, 5)
+  @test_throws ErrorException matrix_space(F4, 0, -2)
+  @test_throws ErrorException matrix_space(F4, -3, -4)
+  @test_throws ErrorException FqPolyRepMatrixSpace(F4, 2, -1)
+  @test_throws ErrorException FqPolyRepMatrixSpace(F4, -1, 2)
+  @test_throws ErrorException FqPolyRepMatrixSpace(F4, -1, -1)
+
   R = FqPolyRepMatrixSpace(F4, 2, 2)
 
   @test elem_type(R) == FqPolyRepMatrix
@@ -23,10 +30,6 @@
   @test isa(RR, FqPolyRepMatrixSpace)
 
   @test R == RR
-
-  @test_throws ErrorException FqPolyRepMatrixSpace(F4, 2, -1)
-  @test_throws ErrorException FqPolyRepMatrixSpace(F4, -1, 2)
-  @test_throws ErrorException FqPolyRepMatrixSpace(F4, -1, -1)
 
   a = R()
 

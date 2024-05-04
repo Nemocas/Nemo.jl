@@ -17,9 +17,9 @@ elem_type(::Type{AcbField}) = AcbFieldElem
 
 parent_type(::Type{AcbFieldElem}) = AcbField
 
-base_ring(R::AcbField) = Union{}
+base_ring_type(::Type{AcbField}) = typeof(Union{})
 
-base_ring(a::AcbFieldElem) = Union{}
+base_ring(R::AcbField) = Union{}
 
 parent(x::AcbFieldElem) = x.parent
 
@@ -152,6 +152,8 @@ function Base.show(io::IO, z::AcbFieldElem)
 end
 
 function show(io::IO, x::AcbField)
+  @show_name(io, x)
+  @show_special(io, x)
   print(io, "Complex Field with ")
   print(io, precision(x))
   print(io, " bits of precision and error bounds")

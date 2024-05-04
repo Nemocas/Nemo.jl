@@ -1,6 +1,13 @@
 RR = ArbField(64)
 
 @testset "ArbMatrix.constructors" begin
+   @test_throws ErrorException matrix_space(RR, -1, 5)
+   @test_throws ErrorException matrix_space(RR, 0, -2)
+   @test_throws ErrorException matrix_space(RR, -3, -4)
+   @test_throws ErrorException ArbMatSpace(RR, 2, -1)
+   @test_throws ErrorException ArbMatSpace(RR, -1, 2)
+   @test_throws ErrorException ArbMatSpace(RR, -1, -1)
+
    S = matrix_space(RR, 3, 3)
    R = matrix_space(ZZ, 3, 3)
 
