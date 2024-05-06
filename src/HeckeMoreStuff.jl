@@ -1109,15 +1109,15 @@ function image(M::Map{D,C}, a) where {D,C}
 end
 
 function tr(r::QadicFieldElem)
-  t = coefficient_ring(parent(r))()
-  ccall((:qadic_trace, libflint), Nothing, (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}), t, r, parent(r))
-  return t
+    t = base_field(parent(r))()
+    ccall((:qadic_trace, libflint), Nothing, (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}), t, r, parent(r))
+    return t
 end
 
 function norm(r::QadicFieldElem)
-  t = coefficient_ring(parent(r))()
-  ccall((:qadic_norm, libflint), Nothing, (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}), t, r, parent(r))
-  return t
+    t = base_field(parent(r))()
+    ccall((:qadic_norm, libflint), Nothing, (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}), t, r, parent(r))
+    return t
 end
 
 function setcoeff!(x::fqPolyRepFieldElem, n::Int, u::UInt)
@@ -1140,9 +1140,9 @@ function (Rx::Generic.PolyRing{PadicFieldElem})(a::QadicFieldElem)
 end
 
 function coeff(x::QadicFieldElem, i::Int)
-  R = PadicField(prime(parent(x)), parent(x).prec_max)
-  c = R()
-  ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
+    R = base_field(parent(x))
+    c = R()
+    ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
         (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Int, Ref{QadicField}), c, x, i, parent(x))
   return c
 end
@@ -1157,14 +1157,10 @@ function setcoeff!(x::QadicFieldElem, i::Int, y::UInt)
 end
 
 function setcoeff!(x::QadicFieldElem, i::Int, y::ZZRingElem)
-  R = PadicField(prime(parent(x)), parent(x).prec_max)
-  Y = R(ZZRingElem(y))
-  ccall((:padic_poly_set_coeff_padic, libflint), Nothing,
+    R = base_field(parent(x))
+    Y = R(ZZRingElem(y))
+    ccall((:padic_poly_set_coeff_padic, libflint), Nothing,
         (Ref{QadicFieldElem}, Int, Ref{PadicFieldElem}, Ref{QadicField}), x, i, Y, parent(x))
-end
-
-function coefficient_ring(Q::QadicField)
-  return PadicField(prime(Q), precision(Q))
 end
 
 function prime(R::PadicField, i::Int)

@@ -91,6 +91,10 @@ function _prime(R::QadicField, n::Int = 1)
   return z
 end
 
+@attr PadicField function base_field(K::QadicField)
+  return PadicField(prime(K), precision(K), cached = false)
+end
+
 ###############################################################################
 #
 #   Basic manipulation
