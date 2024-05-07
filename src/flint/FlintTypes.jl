@@ -3001,8 +3001,8 @@ A $p$-adic field for some prime $p$.
   mode::Cint
   prec_max::Int
 
-  function PadicField(p::ZZRingElem, prec::Int; cached::Bool = true, check::Bool = true)
-    check && !is_probable_prime(p) && throw(DomainError(p, "Characteristic must be prime"))
+   function PadicField(p::ZZRingElem, prec::Int = 64; cached::Bool = true, check::Bool = true)
+      check && !is_probable_prime(p) && throw(DomainError(p, "Characteristic must be prime"))
 
     return get_cached!(PadicBase, (p, prec), cached) do
       d = new()
@@ -3069,7 +3069,7 @@ A $p^n$-adic field for some prime power $p^n$.
   var::Cstring   # char*
   prec_max::Int
 
-  function QadicField(p::ZZRingElem, d::Int, prec::Int, var::String = "a"; cached::Bool = true, check::Bool = true)
+   function QadicField(p::ZZRingElem, d::Int, prec::Int = 64, var::String = "a"; cached::Bool = true, check::Bool = true)
 
     check && !is_probable_prime(p) && throw(DomainError(p, "Characteristic must be prime"))
 

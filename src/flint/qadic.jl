@@ -792,11 +792,12 @@ end
     QadicField(p::Integer, d::Int, prec::Int, var::String = "a")
 
 Returns the parent object for the $q$-adic field for given prime $p$ and
-degree $d$, where the default absolute precision of elements of the field
-is given by `prec` and the generator is printed as `var`.
+degree $d$.
+The default absolute precision of elements of the field may be set with `prec`
+and the generator is printed as `var`.
 """
-function QadicField(p::Integer, d::Int, prec::Int, var::String = "a"; cached::Bool = true)
-  return QadicField(ZZRingElem(p), d, prec, var, cached = cached)
+function QadicField(p::Integer, d::Int, prec::Int = 64, var::String = "a"; cached::Bool = true)
+   return QadicField(ZZRingElem(p), d, prec, var, cached = cached)
 end
 
 ###############################################################################

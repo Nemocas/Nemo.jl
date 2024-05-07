@@ -741,13 +741,13 @@ end
 # inner constructor is also used directly
 
 @doc raw"""
-    PadicField(p::Integer, prec::Int; kw...)
+    PadicField(p::Integer, prec::Int = 64; kw...)
 
-Returns the parent object for the $p$-adic field for given prime $p$, where
-the default absolute precision of elements of the field is given by `prec`.
+Returns the parent object for the $p$-adic field for given prime $p$.
+The default absolute precision of elements of the field may be set with `prec`.
 """
-function PadicField(p::Integer, prec::Int; kw...)
-  return PadicField(ZZRingElem(p), prec; kw...)
+function PadicField(p::Integer, prec::Int = 64; kw...)
+   return PadicField(ZZRingElem(p), prec; kw...)
 end
 
 ###############################################################################
