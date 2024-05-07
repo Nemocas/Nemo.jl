@@ -212,24 +212,27 @@ function var(Q::QadicField)
 end
 
 function expressify(b::QadicFieldElem, x = var(parent(b)); context = nothing)
-  R = PadicField(prime(parent(b)), parent(b).prec_max)
-  if iszero(b)
-    return 0
-  end
-  sum = Expr(:call, :+)
-  c = R()
-  for i in degree(parent(b)):-1:0
-    ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
-          (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Int, Ref{QadicField}),
-          c, b, i, parent(b))
-    ec = expressify(c, context = context)
-    if !iszero(c)
-      if iszero(i)
-        push!(sum.args, ec)
-      elseif isone(i)
-        push!(sum.args, Expr(:call, :*, ec, x))
-      else
-        push!(sum.args, Expr(:call, :*, ec, Expr(:call, :^, x, i)))
+   R = base_field(parent(b))
+   if iszero(b)
+      return 0
+   end
+   sum = Expr(:call, :+)
+   c = with_precision(R, precision(parent(b))) do
+     R()
+   end
+   for i in degree(parent(b)):-1:0
+      ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
+            (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Int, Ref{QadicField}),
+            c, b, i, parent(b))
+      ec = expressify(c, context = context)
+      if !iszero(c)
+         if iszero(i)
+            push!(sum.args, ec)
+         elseif isone(i)
+            push!(sum.args, Expr(:call, :*, ec, x))
+         else
+            push!(sum.args, Expr(:call, :*, ec, Expr(:call, :^, x, i)))
+         end
       end
     end
   end
