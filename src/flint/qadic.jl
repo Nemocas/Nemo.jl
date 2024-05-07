@@ -865,7 +865,11 @@ function setprecision!(f::Generic.Poly{QadicFieldElem}, N::Int)
 end
 
 function Base.setprecision(f::Generic.Poly{QadicFieldElem}, N::Int)
-  g = map_coefficients(x -> setprecision(x, N), f, parent=parent(f))
+  # map_coefficients handles the coefficient 0 weirdly, so we have to set the
+  # 'global' precision
+  g = with_precision(base_ring(f), N) do
+    map_coefficients(x -> setprecision(x, N), f, parent=parent(f))
+  end
   return g
 end
 
