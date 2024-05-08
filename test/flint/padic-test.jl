@@ -381,3 +381,45 @@ end
 
   @test_throws DomainError teichmuller(R(7)^-1)
 end
+
+@testset "PadicField.feature_parity" begin
+  R = PadicField(2, 10)
+  @test degree(R) == 1
+  @test base_field(R) === R
+  @test gens(R, R) == [one(R)]
+  @test_throws AssertionError gens(R, PadicField(3, 10))
+end
+
+@testset "PadicField.setprecision" begin
+  K = PadicField(2, 10)
+  @test precision(K) == 10
+  setprecision!(K, 20)
+  @test precision(K) == 20
+  a = with_precision(K, 30) do
+    zero(K)
+  end
+  @test precision(a) == 30
+  @test precision(K) == 20
+  a = with_precision(K, 10) do
+    zero(K)
+  end
+  @test precision(a) == 10
+  @test precision(K) == 20
+
+  a = 1 + 2 + 2^2 + O(K, 2^3)
+  @test precision(a) == 3
+  b = setprecision(a, 5)
+  @test precision(b) == 5
+  @test precision(a) == 3
+  setprecision!(a, 5)
+  @test precision(a) == 5
+
+  Kx, x = K["x"]
+  f = x^2 + 1
+  @test all(x -> precision(x) == precision(K), coefficients(f))
+  g = setprecision(f, 30)
+  @test all(x -> precision(x) == precision(K), coefficients(f))
+  @test all(x -> precision(x) == 30, coefficients(g))
+  setprecision!(f, 30)
+  @test all(x -> precision(x) == 30, coefficients(f))
+end

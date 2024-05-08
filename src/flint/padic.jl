@@ -130,7 +130,7 @@ function prime(R::PadicField)
   return z
 end
 
-function _prime(R::PadicField, i::Int = 1)
+function prime(R::PadicField, i::Int)
    p = ZZRingElem()
    ccall((:padic_ctx_pow_ui, libflint), Nothing, (Ref{ZZRingElem}, Int, Ref{PadicField}), p, i, R)
    return p
@@ -792,7 +792,11 @@ function Base.setprecision(q::PadicFieldElem, N::Int)
   return r
 end
 
-setprecision!(a::PadicFieldElem, n::Int) = setprecision(a, n)
+function setprecision!(a::PadicFieldElem, n::Int)
+  a.N = n
+  ccall((:padic_reduce, libflint), Nothing, (Ref{PadicFieldElem}, Ref{PadicField}), a, parent(a))
+  return a
+end
 
 function setprecision!(Q::PadicField, n::Int)
   Q.prec_max = n
@@ -803,7 +807,7 @@ function Base.setprecision(f::Generic.Poly{PadicFieldElem}, N::Int)
   g = parent(f)()
   fit!(g, length(f))
   for i = 1:length(f)
-    g.coeffs[i] = setprecision!(f.coeffs[i], N)
+    g.coeffs[i] = setprecision(f.coeffs[i], N)
   end
   set_length!(g, normalise(g, length(f)))
   return g

@@ -80,7 +80,10 @@ end
 
   @test valuation(R(0)) == precision(R(0))
 
-  @test characteristic(R) == 0
+   @test characteristic(R) == 0
+
+   @test shift_right(a, 2) == R(7)^-2 + 2*R(7)^-1 + 4*7^0 + O(R, 7^3)
+   @test shift_left(a, 2) == 7^2 + 2*7^3 + 4*7^4 + O(R, 7^5)
 end
 
 @testset "QadicFieldElem.unary_ops" begin
@@ -314,3 +317,42 @@ end
   @test a == 2
 end
 
+@testset "QadicFieldElem.base_field" begin
+  L, _ = QadicField(7, 2, 10)
+  @test base_field(L) isa PadicField
+  @test prime(base_field(L)) == 7
+end
+
+@testset "QadicField.setprecision" begin
+  K, _  = QadicField(2, 2, 10)
+  @test precision(K) == 10
+  setprecision!(K, 20)
+  @test precision(K) == 20
+  a = with_precision(K, 30) do
+    zero(K)
+  end
+  @test precision(a) == 30
+  @test precision(K) == 20
+  a = with_precision(K, 10) do
+    zero(K)
+  end
+  @test precision(a) == 10
+  @test precision(K) == 20
+
+  a = 1 + 2 + 2^2 + O(K, 2^3)
+  @test precision(a) == 3
+  b = setprecision(a, 5)
+  @test precision(b) == 5
+  @test precision(a) == 3
+  setprecision!(a, 5)
+  @test precision(a) == 5
+
+  Kx, x = K["x"]
+  f = x^2 + 1
+  @test all(x -> precision(x) == precision(K), coefficients(f))
+  g = setprecision(f, 30)
+  @test all(x -> precision(x) == precision(K), coefficients(f))
+  @test all(x -> precision(x) == 30, coefficients(g))
+  setprecision!(f, 30)
+  @test all(x -> precision(x) == 30, coefficients(f))
+end
