@@ -122,7 +122,7 @@ end
    end
 
    # issue #651
-   m = one(Generic.MatSpace{ComplexFieldElem}(CC, 2, 2))
+   m = one(Generic.MatSpaceElem{ComplexFieldElem}(CC, 2, 2))
    for n = (m, -m, m*m, m+m, 2m)
       @test n isa Generic.MatSpaceElem{ComplexFieldElem}
    end

@@ -111,7 +111,7 @@ end
    end
 
    # issue #651
-   m = one(Generic.MatSpace{ZZRingElem}(ZZ, 2, 2))
+   m = one(Generic.MatSpaceElem{ZZRingElem}(ZZ, 2, 2))
    for n = (m, -m, m*m, m+m, 2m)
       @test n isa Generic.MatSpaceElem{ZZRingElem}
    end
