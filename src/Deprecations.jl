@@ -65,3 +65,5 @@ end
 # Deprecated in 0.45.*
 @deprecate defining_polynomial(Q::fqPolyRepField, P::Ring) defining_polynomial(P, Q)
 @deprecate coefficient_ring(K::QadicField) base_field(K)
+@deprecate lift(a::PadicFieldElem) lift(ZZ, a)
+@deprecate prime_field(k::PadicField) base_field(k)

@@ -201,6 +201,18 @@ is_unit(a::QadicFieldElem) = !Bool(ccall((:qadic_is_zero, libflint), Cint,
 
 characteristic(R::QadicField) = 0
 
+function shift_right(a::QadicFieldElem, n::Int)
+   b = deepcopy(a)
+   b.val -= n
+   return b
+end
+
+function shift_left(a::QadicFieldElem, n::Int)
+   b = deepcopy(a)
+   b.val += n
+   return b
+end
+
 ###############################################################################
 #
 #   AbstractString I/O
@@ -361,6 +373,14 @@ end
 *(a::ZZRingElem, b::QadicFieldElem) = b*a
 
 *(a::QQFieldElem, b::QadicFieldElem) = b*a
+
+^(a::QadicFieldElem, b::QadicFieldElem) = exp(b * log(a))
+
+//(a::QadicFieldElem, b::QadicFieldElem) = divexact(a, b)
+
+//(a::PadicFieldElem, b::QadicFieldElem) = divexact(a, b)
+
+//(a::QadicFieldElem, b::PadicFieldElem) = divexact(a, b)
 
 ###############################################################################
 #
@@ -640,6 +660,24 @@ end
 
 ###############################################################################
 #
+#   Trace and norm
+#
+###############################################################################
+
+function tr(r::QadicFieldElem)
+    t = base_field(parent(r))()
+    ccall((:qadic_trace, libflint), Nothing, (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}), t, r, parent(r))
+    return t
+end
+
+function norm(r::QadicFieldElem)
+    t = base_field(parent(r))()
+    ccall((:qadic_norm, libflint), Nothing, (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}), t, r, parent(r))
+    return t
+end
+
+###############################################################################
+#
 #   Conversions and promotions
 #
 ###############################################################################
@@ -785,6 +823,52 @@ end
 
 ###############################################################################
 #
+#   As p-adic polynomial
+#
+###############################################################################
+
+function (Rx::Generic.PolyRing{PadicFieldElem})(a::QadicFieldElem)
+  Qq = parent(a)
+  #@assert Rx === parent(defining_polynomial(Qq))
+  R = base_ring(Rx)
+  coeffs = Vector{PadicFieldElem}(undef, degree(Qq))
+  for i = 1:length(coeffs)
+    c = R()
+    ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
+          (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Int, Ref{QadicField}), c, a, i - 1, parent(a))
+    coeffs[i] = c
+  end
+  return Rx(coeffs)
+end
+
+function coeff(x::QadicFieldElem, i::Int)
+  R = base_field(parent(x))
+  c = R()
+  ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
+        (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Int, Ref{QadicField}), c, x, i, parent(x))
+  return c
+end
+
+function setcoeff!(x::QadicFieldElem, i::Int, y::PadicFieldElem)
+  ccall((:padic_poly_set_coeff_padic, libflint), Nothing,
+        (Ref{QadicFieldElem}, Int, Ref{PadicFieldElem}, Ref{QadicField}), x, i, y, parent(x))
+end
+
+function setcoeff!(x::QadicFieldElem, i::Int, y::UInt)
+  return setcoeff!(x, i, ZZRingElem(y))
+end
+
+function setcoeff!(x::QadicFieldElem, i::Int, y::ZZRingElem)
+  R = base_field(parent(x))
+  Y = R(ZZRingElem(y))
+  ccall((:padic_poly_set_coeff_padic, libflint), Nothing,
+        (Ref{QadicFieldElem}, Int, Ref{PadicFieldElem}, Ref{QadicField}), x, i, Y, parent(x))
+end
+
+Base.length(a::QadicFieldElem) = a.length
+
+###############################################################################
+#
 #   QadicField constructor
 #
 ###############################################################################
@@ -819,45 +903,14 @@ function Base.setprecision(q::QadicFieldElem, N::Int)
 end
 
 function setprecision!(q::QadicFieldElem, N::Int)
-  # TODO: What is this doing?
-  if N >= q.N
-    q.N = N
-  end
   q.N = N
   ccall((:qadic_reduce, libflint), Nothing, (Ref{QadicFieldElem}, Ref{QadicField}), q, parent(q))
-  #  @assert N >= q.N
   return q
 end
 
 function setprecision!(Q::QadicField, n::Int)
   Q.prec_max = n
   return Q
-end
-
-function Base.setprecision(f::Generic.MPoly{QadicFieldElem}, N::Int)
-  return map_coefficients(x -> setprecision(x, N), f, parent=parent(f))
-end
-
-function setprecision!(a::AbstractArray{QadicFieldElem}, N::Int)
-  for x in a
-    setprecision!(x, N)
-  end
-  return x
-end
-
-function Base.setprecision(a::AbstractArray{QadicFieldElem}, N::Int)
-  return map(x -> setprecision(x, N), a)
-end
-
-function setprecision!(a::Generic.MatSpaceElem{QadicFieldElem}, N::Int)
-  setprecision!(a.entries, N)
-  return a
-end
-
-function Base.setprecision(a::Generic.MatSpaceElem{QadicFieldElem}, N::Int)
-  b = deepcopy(a)
-  setprecision!(b, N)
-  return b
 end
 
 function setprecision!(f::Generic.Poly{QadicFieldElem}, N::Int)

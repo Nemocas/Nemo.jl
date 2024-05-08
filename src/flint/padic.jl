@@ -86,6 +86,22 @@ parent_type(::Type{PadicFieldElem}) = PadicField
 
 ###############################################################################
 #
+#   Feature parity
+#
+###############################################################################
+
+degree(::PadicField) = 1
+
+base_field(k::PadicField) = k
+
+# Return generators of k "over" K
+function gens(k::PadicField, K::PadicField)
+  @assert k === K
+  return [one(k)]
+end
+
+###############################################################################
+#
 #   Basic manipulation
 #
 ###############################################################################
@@ -112,6 +128,12 @@ function prime(R::PadicField)
   ccall((:padic_ctx_pow_ui, libflint), Nothing,
         (Ref{ZZRingElem}, Int, Ref{PadicField}), z, 1, R)
   return z
+end
+
+function _prime(R::PadicField, i::Int = 1)
+   p = ZZRingElem()
+   ccall((:padic_ctx_pow_ui, libflint), Nothing, (Ref{ZZRingElem}, Int, Ref{PadicField}), p, i, R)
+   return p
 end
 
 @doc raw"""
@@ -150,11 +172,14 @@ end
 Return a lift of the given $p$-adic field element to $\mathbb{Z}$.
 """
 function lift(R::ZZRing, a::PadicFieldElem)
-  ctx = parent(a)
-  r = ZZRingElem()
-  ccall((:padic_get_fmpz, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{PadicFieldElem}, Ref{PadicField}), r, a, ctx)
-  return r
+    ctx = parent(a)
+    r = ZZRingElem()
+    if iszero(a)
+        return r
+    end
+    ccall((:padic_get_fmpz, libflint), Nothing,
+          (Ref{ZZRingElem}, Ref{PadicFieldElem}, Ref{PadicField}), r, a, ctx)
+    return r
 end
 
 function zero(R::PadicField)
@@ -375,6 +400,8 @@ end
 *(a::ZZRingElem, b::PadicFieldElem) = b*a
 
 *(a::QQFieldElem, b::PadicFieldElem) = b*a
+
+^(a::PadicFieldElem, b::PadicFieldElem) = exp(b * log(a))
 
 ###############################################################################
 #
