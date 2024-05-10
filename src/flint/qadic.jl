@@ -378,10 +378,6 @@ end
 
 //(a::QadicFieldElem, b::QadicFieldElem) = divexact(a, b)
 
-//(a::PadicFieldElem, b::QadicFieldElem) = divexact(a, b)
-
-//(a::QadicFieldElem, b::PadicFieldElem) = divexact(a, b)
-
 ###############################################################################
 #
 #   Comparison
