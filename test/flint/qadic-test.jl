@@ -47,7 +47,14 @@
 
   @test isa(t, QadicFieldElem)
 
-  @test parent(t) === R
+   R, _ = QadicField(13, 1, 10)
+   a = gen(R)
+   @test a isa QadicFieldElem
+   a = gen(R; precision = 20)
+   @test a isa QadicFieldElem
+   @test precision(a) == 20
+
+   b = R(prime(R))
 
   Q, _ = QadicField(13, 3, 10)
   _, t = polynomial_ring(ZZ, "t")
@@ -78,9 +85,13 @@ end
   b = 7^2 + 3*7^3 + O(R, 7^5)
   c = R(2)
 
-  @test isone(one(R))
+   @test isone(one(R))
+   @test isone(one(R, precision = 60))
+   @test precision(one(R, precision = 60)) == 60
 
-  @test iszero(zero(R))
+   @test iszero(zero(R))
+   @test iszero(zero(R, precision = 60))
+   @test precision(zero(R, precision = 60)) == 60
 
   @test precision(a) == 3
 
@@ -325,6 +336,41 @@ end
   a = 1 + 7 + 2*7^2 + O(R, 7^3)
   setcoeff!(a, 0, ZZ(2))
   @test a == 2
+end
+
+@testset "QadicFieldElem.parent_overloading" begin
+  K, _ = qadic_field(7, 2)
+
+  for a in [K(), K(0), K(ZZ(0)), K(QQ(0))]
+    a = K()
+    @test is_zero(a)
+    @test precision(a) == precision(K)
+  end
+  for a in [K(precision = 30), K(UInt(0), precision = 30), K(0, precision = 30), K(ZZ(0), precision = 30), K(QQ(0), precision = 30)]
+    @test is_zero(a)
+    @test precision(a) == 30
+  end
+
+  for a in [K(UInt(1), precision = 30), K(1, precision = 30), K(ZZ(1), precision = 30), K(QQ(1), precision = 30)]
+    @test is_one(a)
+    @test precision(a) == 30
+  end
+
+  a = K(7, precision = 30)
+  @test precision(a) == 31
+
+  a = K(QQ(1//7), precision = 30)
+  @test precision(a) == 29
+
+  ZZx, x = polynomial_ring(ZZ, "x", cached = false)
+  z = gen(K)
+  @test K(x + 1) == z + 1
+  @test K(x + 1, precision = 30) == gen(K, precision = 30) + one(K, precision = 30)
+
+  QQx, x = polynomial_ring(QQ, "x", cached = false)
+  z = gen(K)
+  @test K(x + 1) == z + 1
+  @test K(x + 1, precision = 30) == gen(K, precision = 30) + one(K, precision = 30)
 end
 
 @testset "QadicFieldElem.base_field" begin

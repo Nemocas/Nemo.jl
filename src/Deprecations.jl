@@ -67,3 +67,8 @@ end
 @deprecate coefficient_ring(K::QadicField) base_field(K)
 @deprecate lift(a::PadicFieldElem) lift(ZZ, a)
 @deprecate prime_field(k::PadicField) base_field(k)
+
+function (R::QadicField)(n::ZZPolyRingElem, pr::Int)
+  Base.depwarn("`(::QadicField)(::ZZPolyRingElem, ::Int)` is deprecated, use `(::QadicField)(::ZZPolyRingElem; precision::Int)` instead.", :QadicField)
+  return (R::QadicField)(n::ZZPolyRingElem; precision=pr)
+end

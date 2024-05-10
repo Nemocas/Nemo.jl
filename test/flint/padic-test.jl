@@ -93,9 +93,13 @@ end
   b = 7^2 + 3*7^3 + O(R, 7^5)
   c = R(2)
 
-  @test isone(one(R))
+   @test isone(one(R))
+   @test isone(one(R, precision = 60))
+   @test precision(one(R, precision = 60)) == 60
 
-  @test iszero(zero(R))
+   @test iszero(zero(R))
+   @test iszero(zero(R, precision = 60))
+   @test precision(zero(R, precision = 60)) == 60
 
   @test precision(a) == 3
 
@@ -390,6 +394,31 @@ end
   @test teichmuller(b) == 2 + 4*7^1 + 6*7^2 + O(R, 7^3)
 
   @test_throws DomainError teichmuller(R(7)^-1)
+end
+
+@testset "PadicFieldElem.parent_overloading" begin
+  K = padic_field(7)
+
+  for a in [K(), K(0), K(ZZ(0)), K(QQ(0))]
+    a = K()
+    @test is_zero(a)
+    @test precision(a) == precision(K)
+  end
+  for a in [K(precision = 30), K(0, precision = 30), K(ZZ(0), precision = 30), K(QQ(0), precision = 30)]
+    @test is_zero(a)
+    @test precision(a) == 30
+  end
+
+  for a in [K(1, precision = 30), K(ZZ(1), precision = 30), K(QQ(1), precision = 30)]
+    @test is_one(a)
+    @test precision(a) == 30
+  end
+
+  a = K(7, precision = 30)
+  @test precision(a) == 31
+
+  a = K(QQ(1//7), precision = 30)
+  @test precision(a) == 29
 end
 
 @testset "PadicField.feature_parity" begin

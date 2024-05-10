@@ -182,18 +182,18 @@ function lift(R::ZZRing, a::PadicFieldElem)
     return r
 end
 
-function zero(R::PadicField)
-  z = PadicFieldElem(R.prec_max)
-  ccall((:padic_zero, libflint), Nothing, (Ref{PadicFieldElem},), z)
-  z.parent = R
-  return z
+function zero(R::PadicField; precision::Int=precision(R))
+   z = PadicFieldElem(precision)
+   ccall((:padic_zero, libflint), Nothing, (Ref{PadicFieldElem},), z)
+   z.parent = R
+   return z
 end
 
-function one(R::PadicField)
-  z = PadicFieldElem(R.prec_max)
-  ccall((:padic_one, libflint), Nothing, (Ref{PadicFieldElem},), z)
-  z.parent = R
-  return z
+function one(R::PadicField; precision::Int=precision(R))
+   z = PadicFieldElem(precision)
+   ccall((:padic_one, libflint), Nothing, (Ref{PadicFieldElem},), z)
+   z.parent = R
+   return z
 end
 
 iszero(a::PadicFieldElem) = Bool(ccall((:padic_is_zero, libflint), Cint,
@@ -661,12 +661,12 @@ end
 #
 ###############################################################################
 
-function zero!(z::PadicFieldElem)
-  z.N = parent(z).prec_max
-  ctx = parent(z)
-  ccall((:padic_zero, libflint), Nothing,
-        (Ref{PadicFieldElem}, Ref{PadicField}), z, ctx)
-  return z
+function zero!(z::PadicFieldElem; precision::Int=precision(parent(z)))
+   z.N = precision
+   ctx = parent(z)
+   ccall((:padic_zero, libflint), Nothing,
+         (Ref{PadicFieldElem}, Ref{PadicField}), z, ctx)
+   return z
 end
 
 function mul!(z::PadicFieldElem, x::PadicFieldElem, y::PadicFieldElem)
@@ -714,45 +714,45 @@ promote_rule(::Type{PadicFieldElem}, ::Type{QQFieldElem}) = PadicFieldElem
 #
 ###############################################################################
 
-function (R::PadicField)()
-  z = PadicFieldElem(R.prec_max)
-  z.parent = R
-  return z
+function (R::PadicField)(; precision::Int=precision(R))
+   z = PadicFieldElem(precision)
+   z.parent = R
+   return z
 end
 
-function (R::PadicField)(n::ZZRingElem)
-  if isone(n)
-    N = 0
-  else
-    p = prime(R)
-    N, = remove(n, p)
-  end
-  z = PadicFieldElem(N + R.prec_max)
-  ccall((:padic_set_fmpz, libflint), Nothing,
-        (Ref{PadicFieldElem}, Ref{ZZRingElem}, Ref{PadicField}), z, n, R)
-  z.parent = R
-  return z
+function (R::PadicField)(n::ZZRingElem; precision::Int=precision(R))
+   if is_one(n) || is_zero(n)
+      N = 0
+   else
+      p = prime(R)
+      N, = remove(n, p)
+   end
+   z = PadicFieldElem(N + precision)
+   ccall((:padic_set_fmpz, libflint), Nothing,
+         (Ref{PadicFieldElem}, Ref{ZZRingElem}, Ref{PadicField}), z, n, R)
+   z.parent = R
+   return z
 end
 
-function (R::PadicField)(n::QQFieldElem)
-  m = denominator(n)
-  if isone(m)
-    return R(numerator(n))
-  end
-  p = prime(R)
-  if m == p
-    N = -1
-  else
-    N = -remove(m, p)[1]
-  end
-  z = PadicFieldElem(N + R.prec_max)
-  ccall((:padic_set_fmpq, libflint), Nothing,
-        (Ref{PadicFieldElem}, Ref{QQFieldElem}, Ref{PadicField}), z, n, R)
-  z.parent = R
-  return z
+function (R::PadicField)(n::QQFieldElem; precision::Int=precision(R))
+   m = denominator(n)
+   if isone(m)
+      return R(numerator(n); precision=precision)
+   end
+   p = prime(R)
+   if m == p
+      N = -1
+   else
+     N = -remove(m, p)[1]
+   end
+   z = PadicFieldElem(N + precision)
+   ccall((:padic_set_fmpq, libflint), Nothing,
+         (Ref{PadicFieldElem}, Ref{QQFieldElem}, Ref{PadicField}), z, n, R)
+   z.parent = R
+   return z
 end
 
-(R::PadicField)(n::Integer) = R(ZZRingElem(n))
+(R::PadicField)(n::Integer; precision::Int=precision(R)) = R(ZZRingElem(n); precision)
 
 function (R::PadicField)(n::PadicFieldElem)
   parent(n) != R && error("Unable to coerce into p-adic field")
