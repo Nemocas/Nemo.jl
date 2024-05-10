@@ -93,7 +93,13 @@ end
    @test iszero(zero(R, precision = 60))
    @test precision(zero(R, precision = 60)) == 60
 
-  @test precision(a) == 3
+   d = one(R)
+   @test !iszero(d)
+   zero!(d, precision = 60)
+   @test iszero(d)
+   @test precision(d) == 60
+
+   @test precision(a) == 3
 
   @test prime(R) == 7
 
@@ -242,7 +248,8 @@ end
   c = 7^2 + 2*7^3 + O(R, 7^4)
   d = 7 + 2*7^2 + O(R, 7^5)
 
-  @test divexact(a, b) == 4 + 1*7^1 + 2*7^2 + O(R, 7^3)
+   @test divexact(a, b) == 4 + 1*7^1 + 2*7^2 + O(R, 7^3)
+   @test a//b == 4 + 1*7^1 + 2*7^2 + O(R, 7^3)
 
   @test divexact(c, d) == 1*7^1 + O(R, 7^3)
 
@@ -359,7 +366,16 @@ end
   a = K(7, precision = 30)
   @test precision(a) == 31
 
+  a = K(ZZRingElem(7), precision = 30)
+  @test precision(a) == 31
+
+  a = K(BigInt(7), precision = 30)
+  @test precision(a) == 31
+
   a = K(QQ(1//7), precision = 30)
+  @test precision(a) == 29
+
+  a = K(1//7, precision = 30)
   @test precision(a) == 29
 
   ZZx, x = polynomial_ring(ZZ, "x", cached = false)
@@ -420,7 +436,6 @@ end
   setprecision!(f, 30)
   @test all(x -> precision(x) == 30, coefficients(f))
 end
-
 
 @testset "QadicField.as_polynomial" begin
   L, _ = qadic_field(5, 4)

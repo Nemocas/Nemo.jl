@@ -101,13 +101,22 @@ end
    @test iszero(zero(R, precision = 60))
    @test precision(zero(R, precision = 60)) == 60
 
-  @test precision(a) == 3
+   d = one(R)
+   @test !iszero(d)
+   zero!(d, precision = 60)
+   @test iszero(d)
+   @test precision(d) == 60
 
-  @test prime(R) == 7
+   @test precision(a) == 3
+
+   @test prime(R) == 7
+   @test prime(R, 3) == 7^3
 
   @test valuation(b) == 2
 
-  @test lift(ZZ, a) == 211
+
+   @test lift(ZZ, a) == 211
+   @test is_zero(lift(ZZ, R()))
 
   @test lift(QQ, divexact(a, b)) == QQFieldElem(337, 49)
 
