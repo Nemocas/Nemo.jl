@@ -420,3 +420,22 @@ end
   setprecision!(f, 30)
   @test all(x -> precision(x) == 30, coefficients(f))
 end
+
+
+@testset "QadicField.as_polynomial" begin
+  L, _ = qadic_field(5, 4)
+  K = base_field(L)
+  Kx, x = K["x"]
+
+  for i in 1:100
+    a = L(rand(-1000:1000))
+    f = map_coefficients(y -> lift(QQ, y), Kx(a))
+    @test L(f) == a
+  end
+
+  a = 2*gen(L) + gen(L)
+  setcoeff!(a, 1, K(1))
+  @test a == gen(L)
+  setcoeff!(a, 1, UInt(2))
+  @test coeff(a, 1) == K(2)
+end
