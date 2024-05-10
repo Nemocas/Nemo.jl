@@ -395,6 +395,14 @@ end
   @test precision(a) == 10
   @test precision(K) == 20
 
+  # Make sure the precision of the base field is set as well
+  b = with_precision(K, 30) do
+    a = one(K)
+    return coeff(a, 0) + 1
+  end
+  @test parent(b) === base_field(K)
+  @test precision(b) == 30
+
   a = 1 + 2 + 2^2 + O(K, 2^3)
   @test precision(a) == 3
   b = setprecision(a, 5)

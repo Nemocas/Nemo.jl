@@ -933,11 +933,14 @@ end
 function with_precision(f, K::QadicField, n::Int)
   @assert n >= 0
   old = precision(K)
+  old_base = precision(base_field(K))
   setprecision!(K, n)
+  setprecision!(base_field(K), n)
   v = try
     f()
   finally
     setprecision!(K, old)
+    setprecision!(base_field(K), old_base)
   end
   return v
 end
