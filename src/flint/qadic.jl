@@ -550,6 +550,12 @@ end
 #
 ###############################################################################
 
+@doc raw"""
+    exp(a::QadicFieldElem)
+
+Return the $p$-adic exponential of $a$, assuming the $p$-adic exponential
+function converges at $a$.
+"""
 function Base.exp(a::QadicFieldElem)
   !iszero(a) && valuation(a) <= 0 && throw(DomainError(a, "Valuation must be positive"))
   ctx = parent(a)
@@ -561,6 +567,12 @@ function Base.exp(a::QadicFieldElem)
   return z
 end
 
+@doc raw"""
+    log(a::QadicFieldElem)
+
+Return the $p$-adic logarithm of $a$, assuming the $p$-adic logarithm
+converges at $a$.
+"""
 function log(a::QadicFieldElem)
   av = valuation(a)
   (av > 0 || av < 0 || iszero(a)) && throw(DomainError(a, "Valuation must be zero"))

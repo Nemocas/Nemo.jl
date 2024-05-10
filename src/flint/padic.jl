@@ -123,17 +123,11 @@ end
 
 Return the prime $p$ for the given $p$-adic field.
 """
-function prime(R::PadicField)
-  z = ZZRingElem()
-  ccall((:padic_ctx_pow_ui, libflint), Nothing,
-        (Ref{ZZRingElem}, Int, Ref{PadicField}), z, 1, R)
-  return z
-end
-
-function prime(R::PadicField, i::Int)
-   p = ZZRingElem()
-   ccall((:padic_ctx_pow_ui, libflint), Nothing, (Ref{ZZRingElem}, Int, Ref{PadicField}), p, i, R)
-   return p
+function prime(R::PadicField, i::Int = 1)
+   z = ZZRingElem()
+   ccall((:padic_ctx_pow_ui, libflint), Nothing,
+         (Ref{ZZRingElem}, Int, Ref{PadicField}), z, i, R)
+   return z
 end
 
 @doc raw"""
@@ -606,6 +600,12 @@ end
 #
 ###############################################################################
 
+@doc raw"""
+    exp(a::PadicFieldElem)
+
+Return the $p$-adic exponential of $a$, assuming the $p$-adic exponential
+function converges at $a$.
+"""
 function Base.exp(a::PadicFieldElem)
   !iszero(a) && a.v <= 0 && throw(DomainError(a, "Valuation must be positive"))
   ctx = parent(a)
@@ -617,6 +617,12 @@ function Base.exp(a::PadicFieldElem)
   return z
 end
 
+@doc raw"""
+    log(a::PadicFieldElem)
+
+Return the $p$-adic logarithm of $a$, assuming the $p$-adic logarithm
+converges at $a$.
+"""
 function log(a::PadicFieldElem)
   ctx = parent(a)
   z = PadicFieldElem(a.N)
