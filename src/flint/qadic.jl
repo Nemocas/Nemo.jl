@@ -705,22 +705,11 @@ function (R::QadicField)()
 end
 
 function gen(R::QadicField)
-  if degree(R) == 1
-    # Work around flint limitation
-    # https://github.com/wbhart/flint2/issues/898
-    a = ZZRingElem()
-    GC.@preserve R begin
-      ccall((:fmpz_set, libflint), Nothing, (Ref{ZZRingElem}, Ptr{ZZRingElem}),
-            a, reinterpret(Ptr{ZZRingElem}, R.a))
-    end
-    return R(-a)
-  end
-
-  z = QadicFieldElem(R.prec_max)
-  ccall((:qadic_gen, libflint), Nothing,
-        (Ref{QadicFieldElem}, Ref{QadicField}), z, R)
-  z.parent = R
-  return z
+   z = QadicFieldElem(R.prec_max)
+   ccall((:qadic_gen, libflint), Nothing,
+         (Ref{QadicFieldElem}, Ref{QadicField}), z, R)
+   z.parent = R
+   return z
 end
 
 function (R::QadicField)(a::UInt)
