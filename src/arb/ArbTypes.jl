@@ -867,17 +867,7 @@ base_ring(a::AcbPolyRing) = a.base_ring
 #
 ################################################################################
 
-struct RealMatSpace <: MatSpace{RealFieldElem}
-  nrows::Int
-  ncols::Int
-
-  function RealMatSpace(R::RealField, r::Int, c::Int)
-    (r < 0 || c < 0) && throw(_err_dim_negative)
-    return new(r, c)
-  end
-end
-
-const RealMatSpaceID = CacheDictType{Tuple{Int, Int}, RealMatSpace}()
+const RealMatSpace = AbstractAlgebra.Generic.MatSpace{RealFieldElem}
 
 mutable struct RealMat <: MatElem{RealFieldElem}
   entries::Ptr{Nothing}
@@ -990,18 +980,7 @@ end
 
 # fixed precision
 
-struct ArbMatSpace <: MatSpace{ArbFieldElem}
-  nrows::Int
-  ncols::Int
-  base_ring::ArbField
-
-  function ArbMatSpace(R::ArbField, r::Int, c::Int)
-    (r < 0 || c < 0) && throw(_err_dim_negative)
-    return new(r, c, R)
-  end
-end
-
-const ArbMatSpaceID = CacheDictType{Tuple{ArbField, Int, Int}, ArbMatSpace}()
+const ArbMatSpace = AbstractAlgebra.Generic.MatSpace{ArbFieldElem}
 
 mutable struct ArbMatrix <: MatElem{ArbFieldElem}
   entries::Ptr{Nothing}
@@ -1118,18 +1097,7 @@ end
 #
 ################################################################################
 
-struct ComplexMatSpace <: MatSpace{ComplexFieldElem}
-  nrows::Int
-  ncols::Int
-  #base_ring::AcbField
-
-  function ComplexMatSpace(R::ComplexField, r::Int, c::Int)
-    (r < 0 || c < 0) && throw(_err_dim_negative)
-    return new(r, c)
-  end
-end
-
-const ComplexMatSpaceID = CacheDictType{Tuple{Int, Int}, ComplexMatSpace}()
+const ComplexMatSpace = AbstractAlgebra.Generic.MatSpace{ComplexFieldElem}
 
 mutable struct ComplexMat <: MatElem{ComplexFieldElem}
   entries::Ptr{Nothing}
@@ -1386,18 +1354,7 @@ end
 
 # fixed precision
 
-struct AcbMatSpace <: MatSpace{AcbFieldElem}
-  nrows::Int
-  ncols::Int
-  base_ring::AcbField
-
-  function AcbMatSpace(R::AcbField, r::Int, c::Int)
-    (r < 0 || c < 0) && throw(_err_dim_negative)
-    return new(r, c, R)
-  end
-end
-
-const AcbMatSpaceID = CacheDictType{Tuple{AcbField, Int, Int}, AcbMatSpace}()
+const AcbMatSpace = AbstractAlgebra.Generic.MatSpace{AcbFieldElem}
 
 mutable struct AcbMatrix <: MatElem{AcbFieldElem}
   entries::Ptr{Nothing}

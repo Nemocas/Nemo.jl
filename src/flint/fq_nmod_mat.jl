@@ -10,10 +10,6 @@
 #
 ################################################################################
 
-parent_type(::Type{fqPolyRepMatrix}) = fqPolyRepMatrixSpace
-
-elem_type(::Type{fqPolyRepMatrixSpace}) = fqPolyRepMatrix
-
 dense_matrix_type(::Type{fqPolyRepFieldElem}) = fqPolyRepMatrix
 
 function check_parent(x::fqPolyRepMatrix, y::fqPolyRepMatrix)
@@ -101,17 +97,7 @@ number_of_rows(a::fqPolyRepMatrix) = a.r
 
 number_of_columns(a::fqPolyRepMatrix) = a.c
 
-number_of_rows(a::fqPolyRepMatrixSpace) = a.nrows
-
-number_of_columns(a::fqPolyRepMatrixSpace) = a.ncols
-
-parent(a::fqPolyRepMatrix) = matrix_space(base_ring(a), nrows(a), ncols(a))
-
-base_ring(a::fqPolyRepMatrixSpace) = a.base_ring
-
 base_ring(a::fqPolyRepMatrix) = a.base_ring
-
-zero(a::fqPolyRepMatrixSpace) = a()
 
 function one(a::fqPolyRepMatrixSpace)
   (nrows(a) != ncols(a)) && error("Matrices must be square")
@@ -700,34 +686,6 @@ function (a::fqPolyRepMatrixSpace)()
   return z
 end
 
-function (a::fqPolyRepMatrixSpace)(b::Integer)
-   M = a()
-   for i = 1:nrows(a)
-      for j = 1:ncols(a)
-         if i != j
-            M[i, j] = zero(base_ring(a))
-         else
-            M[i, j] = base_ring(a)(b)
-         end
-      end
-   end
-   return M
-end
-
-function (a::fqPolyRepMatrixSpace)(b::ZZRingElem)
-   M = a()
-   for i = 1:nrows(a)
-      for j = 1:ncols(a)
-         if i != j
-            M[i, j] = zero(base_ring(a))
-         else
-            M[i, j] = base_ring(a)(b)
-         end
-      end
-   end
-   return M
-end
-
 function (a::fqPolyRepMatrixSpace)(b::fqPolyRepFieldElem)
    parent(b) != base_ring(a) && error("Unable to coerce to matrix")
    return fqPolyRepMatrix(nrows(a), ncols(a), b)
@@ -813,17 +771,6 @@ function identity_matrix(R::fqPolyRepField, n::Int)
       z[i, i] = one(R)
    end
    return z
-end
-
-################################################################################
-#
-#  Matrix space constructor
-#
-################################################################################
-
-function matrix_space(R::fqPolyRepField, r::Int, c::Int; cached::Bool = true)
-  # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
-  fqPolyRepMatrixSpace(R, r, c)
 end
 
 ################################################################################

@@ -10,17 +10,9 @@
 #
 ###############################################################################
 
-elem_type(::Type{QQMatrixSpace}) = QQMatrix
-
-parent_type(::Type{QQMatrix}) = QQMatrixSpace
-
-base_ring(a::QQMatrixSpace) = QQ
-
 base_ring(a::QQMatrix) = QQ
 
 dense_matrix_type(::Type{QQFieldElem}) = QQMatrix
-
-parent(a::QQMatrix) = matrix_space(QQ, nrows(a), ncols(a))
 
 function check_parent(a::QQMatrix, b::QQMatrix, throw::Bool = true)
    fl = (nrows(a) != nrows(b) || ncols(a) != ncols(b) || base_ring(a) != base_ring(b))
@@ -165,14 +157,6 @@ Base.@propagate_inbounds setindex!(a::QQMatrix, d::Rational,
 number_of_rows(a::QQMatrix) = a.r
 
 number_of_columns(a::QQMatrix) = a.c
-
-number_of_rows(a::QQMatrixSpace) = a.nrows
-
-number_of_columns(a::QQMatrixSpace) = a.ncols
-
-zero(a::QQMatrixSpace) = a()
-
-one(a::QQMatrixSpace) = a(1)
 
 iszero(a::QQMatrix) = ccall((:fmpq_mat_is_zero, libflint), Bool,
                             (Ref{QQMatrix},), a)
@@ -1076,17 +1060,6 @@ function identity_matrix(R::QQField, n::Int)
    z = QQMatrix(n, n)
    ccall((:fmpq_mat_one, libflint), Nothing, (Ref{QQMatrix}, ), z)
    return z
-end
-
-###############################################################################
-#
-#   matrix_space constructor
-#
-###############################################################################
-
-function matrix_space(R::QQField, r::Int, c::Int; cached = true)
-   # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
-   return QQMatrixSpace(r, c)
 end
 
 ################################################################################

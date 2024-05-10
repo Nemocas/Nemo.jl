@@ -10,17 +10,9 @@
 #
 ###############################################################################
 
-elem_type(::Type{ZZMatrixSpace}) = ZZMatrix
-
-parent_type(::Type{ZZMatrix}) = ZZMatrixSpace
-
-base_ring(a::ZZMatrixSpace) = ZZ
-
 base_ring(a::ZZMatrix) = ZZ
 
 dense_matrix_type(::Type{ZZRingElem}) = ZZMatrix
-
-parent(a::ZZMatrix) = matrix_space(base_ring(a), nrows(a), ncols(a))
 
 function check_parent(a::ZZMatrix, b::ZZMatrix, throw::Bool = true)
    b = (nrows(a) != nrows(b) || ncols(a) != ncols(b))
@@ -167,14 +159,6 @@ end
 @inline number_of_rows(a::ZZMatrix) = a.r
 
 @inline number_of_columns(a::ZZMatrix) = a.c
-
-number_of_rows(a::ZZMatrixSpace) = a.nrows
-
-number_of_columns(a::ZZMatrixSpace) = a.ncols
-
-zero(a::ZZMatrixSpace) = a()
-
-one(a::ZZMatrixSpace) = a(1)
 
 iszero(a::ZZMatrix) = ccall((:fmpz_mat_is_zero, libflint), Bool,
                             (Ref{ZZMatrix},), a)
@@ -1872,17 +1856,6 @@ function identity_matrix(R::ZZRing, n::Int)
    z = ZZMatrix(n, n)
    ccall((:fmpz_mat_one, libflint), Nothing, (Ref{ZZMatrix}, ), z)
    return z
-end
-
-###############################################################################
-#
-#   matrix_space constructor
-#
-###############################################################################
-
-function matrix_space(R::ZZRing, r::Int, c::Int; cached::Bool = true)
-   # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
-   return ZZMatrixSpace(r, c)
 end
 
 ################################################################################

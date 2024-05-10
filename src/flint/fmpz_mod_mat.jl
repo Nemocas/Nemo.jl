@@ -10,10 +10,6 @@
 #
 ################################################################################
 
-parent_type(::Type{ZZModMatrix}) = ZZModMatrixSpace
-
-elem_type(::Type{ZZModMatrixSpace}) = ZZModMatrix
-
 dense_matrix_type(::Type{ZZModRingElem}) = ZZModMatrix
 
 function check_parent(x::T, y::T, throw::Bool = true) where T <: Zmod_fmpz_mat
@@ -107,17 +103,7 @@ number_of_rows(a::T) where T <: Zmod_fmpz_mat = a.r
 
 number_of_columns(a::T) where T <: Zmod_fmpz_mat = a.c
 
-number_of_rows(a::ZZModMatrixSpace) = a.nrows
-
-number_of_columns(a::ZZModMatrixSpace) = a.ncols
-
-parent(a::Zmod_fmpz_mat) = matrix_space(base_ring(a), nrows(a), ncols(a))
-
-base_ring(a::ZZModMatrixSpace) = a.base_ring
-
 base_ring(a::T) where T <: Zmod_fmpz_mat = a.base_ring
-
-zero(a::ZZModMatrixSpace) = a()
 
 function one(a::ZZModMatrixSpace)
   (nrows(a) != ncols(a)) && error("Matrices must be square")
@@ -777,49 +763,6 @@ function (a::ZZModMatrixSpace)()
   return z
 end
 
-function (a::ZZModMatrixSpace)(b::Integer)
-   M = a()
-   for i = 1:nrows(a)
-      for j = 1:ncols(a)
-         if i != j
-            M[i, j] = zero(base_ring(a))
-         else
-            M[i, j] = base_ring(a)(b)
-         end
-      end
-   end
-   return M
-end
-
-function (a::ZZModMatrixSpace)(b::ZZRingElem)
-   M = a()
-   for i = 1:nrows(a)
-      for j = 1:ncols(a)
-         if i != j
-            M[i, j] = zero(base_ring(a))
-         else
-            M[i, j] = base_ring(a)(b)
-         end
-      end
-   end
-   return M
-end
-
-function (a::ZZModMatrixSpace)(b::ZZModRingElem)
-   parent(b) != base_ring(a) && error("Unable to coerce to matrix")
-   M = a()
-   for i = 1:nrows(a)
-      for j = 1:ncols(a)
-         if i != j
-            M[i, j] = zero(base_ring(a))
-         else
-            M[i, j] = deepcopy(b)
-         end
-      end
-   end
-   return M
-end
-
 function (a::ZZModMatrixSpace)(arr::AbstractMatrix{BigInt}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
   z = ZZModMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr, transpose)
@@ -935,17 +878,6 @@ function identity_matrix(R::ZZModRing, n::Int)
    end
    z.base_ring = R
    return z
-end
-
-################################################################################
-#
-#  Matrix space constructor
-#
-################################################################################
-
-function matrix_space(R::ZZModRing, r::Int, c::Int; cached::Bool = true)
-  # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
-  ZZModMatrixSpace(R, r, c)
 end
 
 ################################################################################

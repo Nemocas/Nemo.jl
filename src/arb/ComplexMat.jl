@@ -23,17 +23,9 @@ zero(m::ComplexMat, R::ComplexField, r::Int, c::Int) = similar(m, R, r, c)
 #
 ###############################################################################
 
-parent_type(::Type{ComplexMat}) = ComplexMatSpace
-
-elem_type(::Type{ComplexMatSpace}) = ComplexMat
-
-parent(x::ComplexMat) = matrix_space(base_ring(x), nrows(x), ncols(x))
+base_ring(a::ComplexMat) = ComplexField()
 
 dense_matrix_type(::Type{ComplexFieldElem}) = ComplexMat
-
-base_ring(a::ComplexMatSpace) = ComplexField()
-
-base_ring(a::ComplexMat) = ComplexField()
 
 function check_parent(x::ComplexMat, y::ComplexMat, throw::Bool = true)
    fl = (nrows(x) != nrows(y) || ncols(x) != ncols(y) || base_ring(x) != base_ring(y))
@@ -97,8 +89,6 @@ end
 setindex!(x::ComplexMat, y::Tuple{Rational{T}, Rational{T}}, r::Int, c::Int) where {T <: Integer} =
          setindex!(x, map(QQFieldElem, y), r, c)
 
-zero(x::ComplexMatSpace) = x()
-
 function one(x::ComplexMatSpace)
   z = x()
   ccall((:acb_mat_one, libflint), Nothing, (Ref{ComplexMat}, ), z)
@@ -108,10 +98,6 @@ end
 number_of_rows(a::ComplexMat) = a.r
 
 number_of_columns(a::ComplexMat) = a.c
-
-number_of_rows(a::ComplexMatSpace) = a.nrows
-
-number_of_columns(a::ComplexMatSpace) = a.ncols
 
 function deepcopy_internal(x::ComplexMat, dict::IdDict)
   z = similar(x)
@@ -1083,15 +1069,4 @@ This function is experimental.
 function eigenvalues(A::ComplexMat)
    e, _ = _eig_multiple(A)
    return [ x[1] for x in e ]
-end
-
-###############################################################################
-#
-#   matrix_space constructor
-#
-###############################################################################
-
-function matrix_space(R::ComplexField, r::Int, c::Int; cached = true)
-  # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
-  return ComplexMatSpace(R, r, c)
 end

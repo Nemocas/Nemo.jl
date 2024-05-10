@@ -24,15 +24,7 @@ zero(m::ArbMatrix, R::ArbField, r::Int, c::Int) = similar(m, R, r, c)
 #
 ###############################################################################
 
-parent_type(::Type{ArbMatrix}) = ArbMatSpace
-
-elem_type(::Type{ArbMatSpace}) = ArbMatrix
-
-base_ring(a::ArbMatSpace) = a.base_ring
-
 base_ring(a::ArbMatrix) = a.base_ring
-
-parent(x::ArbMatrix) = matrix_space(base_ring(x), nrows(x), ncols(x))
 
 dense_matrix_type(::Type{ArbFieldElem}) = ArbMatrix
 
@@ -87,8 +79,6 @@ Base.@propagate_inbounds setindex!(x::ArbMatrix, y::Rational{T},
                                  r::Int, c::Int) where {T <: Integer} =
          setindex!(x, ZZRingElem(y), r, c)
 
-zero(a::ArbMatSpace) = a()
-
 function one(x::ArbMatSpace)
   z = x()
   ccall((:arb_mat_one, libflint), Nothing, (Ref{ArbMatrix}, ), z)
@@ -98,10 +88,6 @@ end
 number_of_rows(a::ArbMatrix) = a.r
 
 number_of_columns(a::ArbMatrix) = a.c
-
-number_of_rows(a::ArbMatSpace) = a.nrows
-
-number_of_columns(a::ArbMatSpace) = a.ncols
 
 function deepcopy_internal(x::ArbMatrix, dict::IdDict)
   z = ArbMatrix(nrows(x), ncols(x))
@@ -762,21 +748,6 @@ function (x::ArbMatSpace)(y::AbstractVector{T}) where {T <: Union{Int, UInt, ZZR
   return z
 end
 
-function (x::ArbMatSpace)(y::Union{Int, UInt, ZZRingElem, QQFieldElem, Float64,
-                          BigFloat, ArbFieldElem, AbstractString})
-  z = x()
-  for i in 1:nrows(z)
-      for j = 1:ncols(z)
-         if i != j
-            z[i, j] = zero(base_ring(x))
-         else
-            z[i, j] = y
-         end
-      end
-   end
-   return z
-end
-
 ###############################################################################
 #
 #   Matrix constructor
@@ -870,14 +841,3 @@ promote_rule(::Type{ArbMatrix}, ::Type{BigFloat}) = ArbMatrix
 promote_rule(::Type{ArbMatrix}, ::Type{ZZMatrix}) = ArbMatrix
 
 promote_rule(::Type{ArbMatrix}, ::Type{QQMatrix}) = ArbMatrix
-
-###############################################################################
-#
-#   matrix_space constructor
-#
-###############################################################################
-
-function matrix_space(R::ArbField, r::Int, c::Int; cached = true)
-  # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
-  return ArbMatSpace(R, r, c)
-end

@@ -23,15 +23,7 @@ zero(m::RealMat, R::RealField, r::Int, c::Int) = similar(m, R, r, c)
 #
 ###############################################################################
 
-parent_type(::Type{RealMat}) = RealMatSpace
-
-elem_type(::Type{RealMatSpace}) = RealMat
-
-base_ring(a::RealMatSpace) = RealField()
-
 base_ring(a::RealMat) = RealField()
-
-parent(x::RealMat) = matrix_space(base_ring(x), nrows(x), ncols(x))
 
 dense_matrix_type(::Type{RealFieldElem}) = RealMat
 
@@ -84,8 +76,6 @@ Base.@propagate_inbounds setindex!(x::RealMat, y::Rational{T},
                                  r::Int, c::Int) where {T <: Integer} =
          setindex!(x, ZZRingElem(y), r, c)
 
-zero(a::RealMatSpace) = a()
-
 function one(x::RealMatSpace)
   z = x()
   ccall((:arb_mat_one, libflint), Nothing, (Ref{RealMat}, ), z)
@@ -95,10 +85,6 @@ end
 number_of_rows(a::RealMat) = a.r
 
 number_of_columns(a::RealMat) = a.c
-
-number_of_rows(a::RealMatSpace) = a.nrows
-
-number_of_columns(a::RealMatSpace) = a.ncols
 
 function deepcopy_internal(x::RealMat, dict::IdDict)
   z = RealMat(nrows(x), ncols(x))
@@ -835,14 +821,3 @@ promote_rule(::Type{RealMat}, ::Type{BigFloat}) = RealMat
 promote_rule(::Type{RealMat}, ::Type{ZZMatrix}) = RealMat
 
 promote_rule(::Type{RealMat}, ::Type{QQMatrix}) = RealMat
-
-###############################################################################
-#
-#   matrix_space constructor
-#
-###############################################################################
-
-function matrix_space(R::RealField, r::Int, c::Int; cached = true)
-  # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
-  return RealMatSpace(R, r, c)
-end

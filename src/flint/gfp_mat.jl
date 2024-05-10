@@ -10,10 +10,6 @@
 #
 ################################################################################
 
-parent_type(::Type{fpMatrix}) = fpMatrixSpace
-
-elem_type(::Type{fpMatrixSpace}) = fpMatrix
-
 dense_matrix_type(::Type{fpFieldElem}) = fpMatrix
 
 ###############################################################################
@@ -69,14 +65,6 @@ function deepcopy_internal(a::fpMatrix, dict::IdDict)
           (Ref{fpMatrix}, Ref{fpMatrix}), z, a)
   return z
 end
-
-number_of_rows(a::fpMatrixSpace) = a.nrows
-
-number_of_columns(a::fpMatrixSpace) = a.ncols
-
-base_ring(a::fpMatrixSpace) = a.base_ring
-
-zero(a::fpMatrixSpace) = a()
 
 function one(a::fpMatrixSpace)
   (nrows(a) != ncols(a)) && error("Matrices must be square")
@@ -372,49 +360,6 @@ function (a::fpMatrixSpace)()
   return z
 end
 
-function (a::fpMatrixSpace)(b::Integer)
-   M = a()
-   for i = 1:nrows(a)
-      for j = 1:ncols(a)
-         if i != j
-            M[i, j] = zero(base_ring(a))
-         else
-            M[i, j] = base_ring(a)(b)
-         end
-      end
-   end
-   return M
-end
-
-function (a::fpMatrixSpace)(b::ZZRingElem)
-   M = a()
-   for i = 1:nrows(a)
-      for j = 1:ncols(a)
-         if i != j
-            M[i, j] = zero(base_ring(a))
-         else
-            M[i, j] = base_ring(a)(b)
-         end
-      end
-   end
-   return M
-end
-
-function (a::fpMatrixSpace)(b::fpFieldElem)
-   parent(b) != base_ring(a) && error("Unable to coerce to matrix")
-   M = a()
-   for i = 1:nrows(a)
-      for j = 1:ncols(a)
-         if i != j
-            M[i, j] = zero(base_ring(a))
-         else
-            M[i, j] = deepcopy(b)
-         end
-      end
-   end
-   return M
-end
-
 function (a::fpMatrixSpace)(arr::AbstractMatrix{BigInt}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
   z = fpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr, transpose)
@@ -527,17 +472,6 @@ function identity_matrix(R::fpField, n::Int)
    end
    z.base_ring = R
    return z
-end
-
-################################################################################
-#
-#  Matrix space constructor
-#
-################################################################################
-
-function matrix_space(R::fpField, r::Int, c::Int; cached::Bool = true)
-   # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
-   fpMatrixSpace(R, r, c)
 end
 
 ################################################################################

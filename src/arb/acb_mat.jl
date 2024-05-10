@@ -24,19 +24,11 @@ zero(m::AcbMatrix, R::AcbField, r::Int, c::Int) = similar(m, R, r, c)
 #
 ###############################################################################
 
-parent_type(::Type{AcbMatrix}) = AcbMatSpace
-
-elem_type(::Type{AcbMatSpace}) = AcbMatrix
-
-parent(x::AcbMatrix) = matrix_space(base_ring(x), nrows(x), ncols(x))
+base_ring(a::AcbMatrix) = a.base_ring
 
 dense_matrix_type(::Type{AcbFieldElem}) = AcbMatrix
 
-precision(x::AcbMatSpace) = precision(x.base_ring)
-
-base_ring(a::AcbMatSpace) = a.base_ring
-
-base_ring(a::AcbMatrix) = a.base_ring
+precision(x::AcbMatSpace) = precision(base_ring(x))
 
 function check_parent(x::AcbMatrix, y::AcbMatrix, throw::Bool = true)
    fl = (nrows(x) != nrows(y) || ncols(x) != ncols(y) || base_ring(x) != base_ring(y))
@@ -100,8 +92,6 @@ end
 setindex!(x::AcbMatrix, y::Tuple{Rational{T}, Rational{T}}, r::Int, c::Int) where {T <: Integer} =
          setindex!(x, map(QQFieldElem, y), r, c)
 
-zero(x::AcbMatSpace) = x()
-
 function one(x::AcbMatSpace)
   z = x()
   ccall((:acb_mat_one, libflint), Nothing, (Ref{AcbMatrix}, ), z)
@@ -111,10 +101,6 @@ end
 number_of_rows(a::AcbMatrix) = a.r
 
 number_of_columns(a::AcbMatrix) = a.c
-
-number_of_rows(a::AcbMatSpace) = a.nrows
-
-number_of_columns(a::AcbMatSpace) = a.ncols
 
 function deepcopy_internal(x::AcbMatrix, dict::IdDict)
   z = similar(x)
@@ -1097,15 +1083,4 @@ This function is experimental.
 function eigenvalues(A::AcbMatrix)
    e, _ = _eig_multiple(A)
    return [ x[1] for x in e ]
-end
-
-###############################################################################
-#
-#   matrix_space constructor
-#
-###############################################################################
-
-function matrix_space(R::AcbField, r::Int, c::Int; cached = true)
-  # TODO/FIXME: `cached` is ignored and only exists for backwards compatibility
-  return AcbMatSpace(R, r, c)
 end
