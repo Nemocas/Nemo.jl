@@ -470,6 +470,7 @@ export onei
 export options
 export order
 export overlaps
+export padic_field
 export PadicField
 export PadicFieldElem
 export parent
@@ -494,6 +495,7 @@ export prod_diagonal
 export pseudo_inv
 export pth_root
 export puiseux_series_ring
+export qadic_field
 export QadicField
 export QadicFieldElem
 export QQ

@@ -873,18 +873,29 @@ Base.length(a::QadicFieldElem) = a.length
 #
 ###############################################################################
 
-# inner constructor is also used directly
-
-@doc raw"""
-    QadicField(p::Integer, d::Int, prec::Int, var::String = "a")
-
-Returns the parent object for the $q$-adic field for given prime $p$ and
-degree $d$.
-The default absolute precision of elements of the field may be set with `prec`
-and the generator is printed as `var`.
-"""
+# Kept for backwards compatibility; the user facing constructor is `qadic_field`
 function QadicField(p::Integer, d::Int, prec::Int = 64, var::String = "a"; cached::Bool = true)
    return QadicField(ZZRingElem(p), d, prec, var, cached = cached)
+end
+
+@doc raw"""
+    qadic_field(p::Integer, d::Int; precision::Int=64, cached::Bool=true, check::Bool=true)
+    qadic_field(p::ZZRingElem, d::Int; precision::Int=64, cached::Bool=true, check::Bool=true)
+
+Return an unramified extension $K$ of degree $d$ of a $p$-adic field for the given
+prime $p$.
+The generator of $K$ is printed as `var`.
+
+The default absolute precision of elements of $K$ may be set with `precision`.
+"""
+qadic_field
+
+function qadic_field(p::Integer, d::Int, var::String = "a"; precision::Int=64, cached::Bool=true, check::Bool=true)
+  return qadic_field(ZZRingElem(p), d, var; precision=precision, cached=cached, check=check)
+end
+
+function qadic_field(p::ZZRingElem, d::Int, var::String = "a"; precision::Int=64, cached::Bool=true, check::Bool=true)
+  return QadicField(p, d, precision, var; cached=cached, check=check)
 end
 
 ###############################################################################

@@ -765,16 +765,26 @@ end
 #
 ###############################################################################
 
-# inner constructor is also used directly
-
-@doc raw"""
-    PadicField(p::Integer, prec::Int = 64; kw...)
-
-Returns the parent object for the $p$-adic field for given prime $p$.
-The default absolute precision of elements of the field may be set with `prec`.
-"""
+# Kept for backwards compatibility; the user facing constructor is `padic_field`
 function PadicField(p::Integer, prec::Int = 64; kw...)
    return PadicField(ZZRingElem(p), prec; kw...)
+end
+
+@doc raw"""
+    padic_field(p::Integer; precision::Int=64, cached::Bool=true, check::Bool=true)
+    padic_field(p::ZZRingElem; precision::Int=64, cached::Bool=true, check::Bool=true)
+
+Return the $p$-adic field for the given prime $p$.
+The default absolute precision of elements of the field may be set with `precision`.
+"""
+padic_field
+
+function padic_field(p::Integer; precision::Int=64, cached::Bool=true, check::Bool=true)
+  return padic_field(ZZRingElem(p), precision=precision, cached=cached, check=check)
+end
+
+function padic_field(p::ZZRingElem; precision::Int=64, cached::Bool=true, check::Bool=true)
+  return PadicField(p, precision, cached=cached, check=check)
 end
 
 ###############################################################################

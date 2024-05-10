@@ -25,7 +25,17 @@ end
 
   @test isa(S, PadicField)
 
-  @test isa(R(), PadicFieldElem)
+   R = padic_field(7)
+   @test isa(R, PadicField)
+
+   @test_throws DomainError padic_field(4)
+
+   R = padic_field(7, precision = 30)
+
+   @test isa(R, PadicField)
+   @test precision(R) == 30
+
+   @test isa(R(), PadicFieldElem)
 
   @test isa(R(1), PadicFieldElem)
 

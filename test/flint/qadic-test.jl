@@ -13,7 +13,17 @@
 
   @test isa(S, QadicField)
 
-  @test isa(R(), QadicFieldElem)
+   R, _ = qadic_field(7, 1)
+   @test isa(R, QadicField)
+
+   @test_throws DomainError qadic_field(4, 2)
+
+   R, _ = qadic_field(7, 1, precision = 30)
+
+   @test isa(R, QadicField)
+   @test precision(R) == 30
+
+   @test isa(R(), QadicFieldElem)
 
   @test isa(R(1), QadicFieldElem)
 
