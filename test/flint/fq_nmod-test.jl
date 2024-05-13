@@ -148,6 +148,12 @@ end
   @test a - b == 5*x^4+x^2+5*x
 
   @test a*b == 3*x^3+2
+
+  F7 = Native.GF(7)
+  @test F7(5) + a == x^4 + 3x^2 + 6x + 6
+  @test a + F7(5) == x^4 + 3x^2 + 6x + 6
+  @test F7(5) * a == 5*x^4+x^2+2*x+5
+  @test a * F7(5) == 5*x^4+x^2+2*x+5
 end
 
 @testset "fqPolyRepFieldElem.adhoc_binary" begin

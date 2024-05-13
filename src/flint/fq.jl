@@ -552,6 +552,8 @@ promote_rule(::Type{FqPolyRepFieldElem}, ::Type{T}) where {T <: Integer} = FqPol
 
 promote_rule(::Type{FqPolyRepFieldElem}, ::Type{ZZRingElem}) = FqPolyRepFieldElem
 
+promote_rule(::Type{FqPolyRepFieldElem}, ::Type{FpFieldElem}) = FqPolyRepFieldElem
+
 ###############################################################################
 #
 #   Parent object call overload

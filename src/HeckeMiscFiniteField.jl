@@ -1,7 +1,3 @@
-AbstractAlgebra.promote_rule(::Type{fqPolyRepFieldElem}, ::Type{fpFieldElem}) = fqPolyRepFieldElem
-
-AbstractAlgebra.promote_rule(::Type{FqPolyRepFieldElem}, ::Type{FpFieldElem}) = FqPolyRepFieldElem
-
 ## Minpoly/ Charpoly
 
 function minpoly(a::fqPolyRepFieldElem)
