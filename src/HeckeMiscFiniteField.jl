@@ -1,8 +1,3 @@
-function (A::FqPolyRepField)(x::EuclideanRingResidueFieldElem{ZZRingElem})
-  @assert characteristic(A) == characteristic(parent(x))
-  return A(lift(x))
-end
-
 AbstractAlgebra.promote_rule(::Type{fqPolyRepFieldElem}, ::Type{fpFieldElem}) = fqPolyRepFieldElem
 
 AbstractAlgebra.promote_rule(::Type{FqPolyRepFieldElem}, ::Type{FpFieldElem}) = FqPolyRepFieldElem
