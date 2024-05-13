@@ -60,14 +60,6 @@ end
 #
 ################################################################################
 
-function *(a::FqPolyRepFieldElem, b::FpFieldElem)
-  return a * parent(a)(b)
-end
-
-function *(a::FpFieldElem, b::FqPolyRepFieldElem)
-  return parent(b)(a) * b
-end
-
 function preimage(phi::FinFieldMorphism, x::FinFieldElem)
   return preimage_map(phi)(x)
 end
