@@ -667,6 +667,11 @@ function (a::fqPolyRepField)(b::Vector{<:IntegerUnion})
   return z
 end
 
+function (A::fqPolyRepField)(x::fpFieldElem)
+   @assert characteristic(A) == characteristic(parent(x))
+   return A(lift(x))
+end
+
 function fqPolyRepFieldElem(a::fqPolyRepField, b::Vector{UInt})
   r = a()
   len = degree(a)

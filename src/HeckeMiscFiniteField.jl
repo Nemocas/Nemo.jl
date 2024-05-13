@@ -1,8 +1,3 @@
-function (A::fqPolyRepField)(x::fpFieldElem)
-  @assert characteristic(A) == characteristic(parent(x))
-  return A(lift(x))
-end
-
 function (A::FqPolyRepField)(x::EuclideanRingResidueFieldElem{ZZRingElem})
   @assert characteristic(A) == characteristic(parent(x))
   return A(lift(x))
