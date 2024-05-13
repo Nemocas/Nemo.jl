@@ -446,4 +446,4 @@ function preimage_map(k::T, K::T) where T <: FinField
   return preimage_map(f)
 end
 
-preimage(f::FinFieldMorphism{S, T}, x::T) where {S <: FinField, T <: FinField} = preimage_map(f)(x)
+preimage(f::FinFieldMorphism, x::FinFieldElem) = preimage_map(f)(x)::elem_type(domain(f))

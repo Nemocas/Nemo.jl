@@ -56,10 +56,6 @@ end
 #
 ################################################################################
 
-function preimage(phi::FinFieldMorphism, x::FinFieldElem)
-  return preimage_map(phi)(x)
-end
-
 function (R::zzModRing)(a::fpFieldElem)
   @assert modulus(R) == characteristic(parent(a))
   return R(data(a))

@@ -18,13 +18,13 @@ struct FinFieldMorphism{S, T} <: AbstractAlgebra.Map{S, T, AbstractAlgebra.SetMa
 end
 
 
-domain(f::FinFieldMorphism) = domain(f.map)
-codomain(f::FinFieldMorphism) = codomain(f.map)
+domain(f::FinFieldMorphism{S, T}) where {S, T} = domain(f.map)::S
+codomain(f::FinFieldMorphism{S, T}) where {S, T} = codomain(f.map)::T
 image_fn(f::FinFieldMorphism) = image_fn(f.map)
 inverse_fn(f::FinFieldMorphism) = image_fn(f.preimage)
 
-function (f::FinFieldMorphism)(x) 
-  return image_fn(f)(x)::elem_type(codomain(f))
+function (f::FinFieldMorphism{S, T})(x) where {S, T}
+  return image_fn(f)(x)::elem_type(T)
 end
 
 function show(io::IO, f::FinFieldMorphism)
@@ -49,8 +49,8 @@ struct FinFieldPreimage{S, T} <: AbstractAlgebra.Map{S, T, AbstractAlgebra.SetMa
   end
 end
 
-domain(f::FinFieldPreimage) = domain(f.map)
-codomain(f::FinFieldPreimage) = codomain(f.map)
+domain(f::FinFieldPreimage{S, T}) where {S, T} = domain(f.map)::S
+codomain(f::FinFieldPreimage{S, T}) where {S, T} = codomain(f.map)::T
 image_fn(f::FinFieldPreimage) = image_fn(f.map)
 inverse_fn(f::FinFieldPreimage) = image_fn(f.preimage)
 
@@ -80,8 +80,9 @@ end
 
 Compute the preimage map corresponding to the embedding $f$.
 """
-preimage_map(f::FinFieldMorphism) = FinFieldPreimage(domain(f), codomain(f),
-                                                     image_fn(f), inverse_fn(f))
+function preimage_map(f::FinFieldMorphism{S, T}) where {S, T}
+  return FinFieldPreimage(domain(f), codomain(f), image_fn(f), inverse_fn(f))::FinFieldPreimage{S, T}
+end
 
 @doc raw"""
     preimage_map(f::FinFieldPreimage)
@@ -89,4 +90,4 @@ preimage_map(f::FinFieldMorphism) = FinFieldPreimage(domain(f), codomain(f),
 Compute the preimage map corresponding to the preimage of the embedding $f$,
 i.e. return the embedding $f$.
 """
-preimage_map(f::FinFieldPreimage) = embed(domain(f), codomain(f))
+preimage_map(f::FinFieldPreimage{S, T}) where {S, T} = embed(domain(f), codomain(f))::FinFieldMorphism{S, T}
