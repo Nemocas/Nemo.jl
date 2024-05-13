@@ -60,10 +60,6 @@ end
 #
 ################################################################################
 
-function (R::FqPolyRepField)(x::FpFieldElem)
-  return R(lift(x))
-end
-
 function *(a::FqPolyRepFieldElem, b::FpFieldElem)
   return a * parent(a)(b)
 end

@@ -61,6 +61,10 @@ end
 
   @test isa(d, FqPolyRepFieldElem)
 
+  e = R(Native.GF(ZZ(7))(1))
+  @test isa(e, FqPolyRepFieldElem)
+  @test isone(e)
+
   # check for primality
   T3, z3 = Native.finite_field(yy^2 + 1, "z", check=false)
   @test isa(T2, FqPolyRepField)

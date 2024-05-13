@@ -594,6 +594,11 @@ function (a::FqPolyRepField)(b::FqPolyRepFieldElem)
   end
 end
 
+function (A::FqPolyRepField)(x::FpFieldElem)
+   @assert characteristic(A) == characteristic(parent(x))
+   return A(lift(x))
+end
+
 function (a::FqPolyRepField)(b::Vector{<:IntegerUnion})
   da = degree(a)
   db = length(b)
