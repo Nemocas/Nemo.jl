@@ -56,11 +56,6 @@ end
 #
 ################################################################################
 
-function (k::Nemo.fpField)(a::Vector)
-  @assert length(a) == 1
-  return k(a[1])
-end
-
 function (k::fqPolyRepField)(a::Vector)
   return k(polynomial(Native.GF(Int(characteristic(k))), a))
 end
