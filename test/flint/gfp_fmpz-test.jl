@@ -19,10 +19,12 @@
 
   @test isa(R(a), Nemo.FpFieldElem)
 
-  for i = 1:1000
-    p = rand(BigInt(1):BigInt(4273673264873254848326487))*6 + 1
-    if Nemo.is_probable_prime(ZZ(p))
-      R = Native.GF(ZZ(p))
+   @test isa(R(QQ(1)), Nemo.FpFieldElem)
+
+   for i = 1:1000
+      p = rand(BigInt(1):BigInt(4273673264873254848326487))*6 + 1
+      if Nemo.is_probable_prime(ZZ(p))
+         R = Native.GF(ZZ(p))
 
       a = R(rand(Int))
       d = a.data

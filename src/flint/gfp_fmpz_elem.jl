@@ -458,3 +458,7 @@ function (R::FpField)(a::Vector{<:IntegerUnion})
   is_one(length(a)) || error("Coercion impossible")
   return R(a[1])
 end
+
+function (k::FpField)(a::QQFieldElem)
+   return k(numerator(a)) // k(denominator(a))
+end
