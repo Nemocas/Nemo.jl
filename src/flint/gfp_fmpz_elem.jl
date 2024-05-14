@@ -40,6 +40,7 @@ end
 data(a::FpFieldElem) = a.data
 
 lift(a::FpFieldElem) = data(a)
+lift(::ZZRing, x::FpFieldElem) = lift(x)
 
 iszero(a::FpFieldElem) = iszero(a.data)
 

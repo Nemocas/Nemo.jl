@@ -119,9 +119,11 @@ end
   @test characteristic(R) == 13
   @test degree(R) == 1
 
-  @test data(R(3)) == 3
-  @test lift(R(3)) == 3
-  @test isa(lift(R(3)), ZZRingElem)
+   @test data(R(3)) == 3
+   @test lift(R(3)) == 3
+   @test isa(lift(R(3)), ZZRingElem)
+   @test lift(ZZ, R(3)) == 3
+   @test isa(lift(ZZ, R(3)), ZZRingElem)
 
   R2 = Native.GF(2)
   R3 = Native.GF(3)

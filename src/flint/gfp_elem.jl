@@ -40,6 +40,7 @@ end
 data(a::fpFieldElem) = a.data
 
 lift(a::fpFieldElem) = ZZRingElem(data(a))
+lift(::ZZRing, x::fpFieldElem) = lift(x)
 
 function zero(R::fpField)
   return fpFieldElem(UInt(0), R)

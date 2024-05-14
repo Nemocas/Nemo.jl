@@ -17,7 +17,3 @@ function defining_polynomial(Q::fqPolyRepField, P::Ring=Native.GF(Int(characteri
   end
   return f
 end
-
-lift(::ZZRing, x::fpFieldElem) = lift(x)
-
-lift(::ZZRing, x::FpFieldElem) = lift(x)
