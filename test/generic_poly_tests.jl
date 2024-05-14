@@ -1,5 +1,4 @@
 function test_poly_constructors(R)
-
   @testset "poly.constructors for $(R) of type $(typeof(R))" begin
     S1 = PolyRing(R)
     S2 = PolyRing(R)
@@ -86,7 +85,7 @@ function test_poly_constructors(R)
     @test isa(n, PolyRingElem)
     @test parent(e) == Rx
 
-    _a = polynomial_ring(ZZ, "y")[1]([ZZ(1),ZZ(2),ZZ(3)])
+    _a = polynomial_ring(ZZ, "y")[1]([ZZ(1), ZZ(2), ZZ(3)])
 
     k = Rx(_a)
 
@@ -105,5 +104,4 @@ function test_poly_constructors(R)
     @test l == m
     @test m == n
   end
-
 end

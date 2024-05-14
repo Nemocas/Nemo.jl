@@ -49,14 +49,12 @@ function deepcopy_internal(a::ArbFieldElem, dict::IdDict)
   return b
 end
 
-
 function canonical_unit(x::ArbFieldElem)
-   return x
+  return x
 end
 
 function check_parent(a::ArbFieldElem, b::ArbFieldElem)
-   parent(a) != parent(b) &&
-             error("Incompatible ArbFieldElem elements")
+  parent(a) != parent(b) && error("Incompatible ArbFieldElem elements")
 end
 
 characteristic(::ArbField) = 0
@@ -96,55 +94,42 @@ end
 function _arb_get_arf(x::ArbFieldElem, ::RoundingMode{:Nearest})
   t = arf_struct()
   GC.@preserve x begin
-    t1 = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct},
-               (Ref{ArbFieldElem}, ),
-               x)
-    ccall((:arf_set, libflint), Nothing,
-          (Ref{arf_struct}, Ptr{arf_struct}),
-          t, t1)
+    t1 = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (Ref{ArbFieldElem},), x)
+    ccall((:arf_set, libflint), Nothing, (Ref{arf_struct}, Ptr{arf_struct}), t, t1)
   end
   return t
 end
 
-for (b, f) in ((RoundingMode{:Down}, :arb_get_lbound_arf),
-               (RoundingMode{:Up}, :arb_get_ubound_arf))
+for (b, f) in ((RoundingMode{:Down}, :arb_get_lbound_arf), (RoundingMode{:Up}, :arb_get_ubound_arf))
   @eval begin
     function _arb_get_arf(x::ArbFieldElem, ::$b)
       t = arf_struct()
-      ccall(($(string(f)), libflint), Nothing,
-            (Ref{arf_struct}, Ref{ArbFieldElem}, Int),
-            t, x, parent(x).prec)
+      ccall(($(string(f)), libflint), Nothing, (Ref{arf_struct}, Ref{ArbFieldElem}, Int), t, x, parent(x).prec)
       return t
     end
   end
 end
 
-for (b, i) in ((RoundingMode{:Down}, 2),
-               (RoundingMode{:Up}, 3),
-               (RoundingMode{:Nearest}, 4))
+for (b, i) in ((RoundingMode{:Down}, 2), (RoundingMode{:Up}, 3), (RoundingMode{:Nearest}, 4))
   @eval begin
     function _arf_get_d(t::arf_struct, ::$b)
-      d = ccall((:arf_get_d, libflint), Float64,
-                (Ref{arf_struct}, Int),
-                t, $i)
+      d = ccall((:arf_get_d, libflint), Float64, (Ref{arf_struct}, Int), t, $i)
       return d
     end
     function _arf_get_mpfr(t::arf_struct, ::$b)
       d = BigFloat()
-      ccall((:arf_get_mpfr, libflint), Int32,
-            (Ref{BigFloat}, Ref{arf_struct}, Base.MPFR.MPFRRoundingMode),
-            d, t, $b())
+      ccall((:arf_get_mpfr, libflint), Int32, (Ref{BigFloat}, Ref{arf_struct}, Base.MPFR.MPFRRoundingMode), d, t, $b())
       return d
     end
   end
 end
 
 function convert(::Type{Float64}, x::ArbFieldElem)
-    return Float64(x)
+  return Float64(x)
 end
 
 function convert(::Type{BigFloat}, x::ArbFieldElem)
-    return BigFloat(x)
+  return BigFloat(x)
 end
 
 @doc raw"""
@@ -154,18 +139,17 @@ Return $x$ as an `ZZRingElem` if it represents an unique integer, else throws an
 error.
 """
 function ZZRingElem(x::ArbFieldElem)
-   if is_exact(x)
-      ok, z = unique_integer(x)
-      ok && return z
-   end
-   error("Argument must represent a unique integer")
+  if is_exact(x)
+    ok, z = unique_integer(x)
+    ok && return z
+  end
+  error("Argument must represent a unique integer")
 end
 
 BigInt(x::ArbFieldElem) = BigInt(ZZRingElem(x))
 
-function (::Type{T})(x::ArbFieldElem) where {T <: Integer}
-  typemin(T) <= x <= typemax(T) ||
-      error("Argument does not fit inside datatype.")
+function (::Type{T})(x::ArbFieldElem) where {T<:Integer}
+  typemin(T) <= x <= typemax(T) || error("Argument does not fit inside datatype.")
   return T(ZZRingElem(x))
 end
 
@@ -176,24 +160,20 @@ end
 ################################################################################
 
 function native_string(x::ArbFieldElem)
-   d = ceil(parent(x).prec * 0.30102999566398119521)
-   cstr = ccall((:arb_get_str, libflint), Ptr{UInt8},
-                (Ref{ArbFieldElem}, Int, UInt),
-                x, Int(d), UInt(0))
-   res = unsafe_string(cstr)
-   ccall((:flint_free, libflint), Nothing,
-         (Ptr{UInt8},),
-         cstr)
-   return res
+  d = ceil(parent(x).prec * 0.30102999566398119521)
+  cstr = ccall((:arb_get_str, libflint), Ptr{UInt8}, (Ref{ArbFieldElem}, Int, UInt), x, Int(d), UInt(0))
+  res = unsafe_string(cstr)
+  ccall((:flint_free, libflint), Nothing, (Ptr{UInt8},), cstr)
+  return res
 end
 
-function expressify(x::ArbFieldElem; context = nothing)
-   if is_exact(x) && is_negative(x)
-      # TODO is_exact does not imply it is printed without radius
-      return Expr(:call, :-, native_string(-x))
-   else
-      return native_string(x)
-   end
+function expressify(x::ArbFieldElem; context=nothing)
+  if is_exact(x) && is_negative(x)
+    # TODO is_exact does not imply it is printed without radius
+    return Expr(:call, :-, native_string(-x))
+  else
+    return native_string(x)
+  end
 end
 
 function show(io::IO, x::ArbField)
@@ -205,7 +185,7 @@ function show(io::IO, x::ArbField)
 end
 
 function show(io::IO, x::ArbFieldElem)
-   print(io, native_string(x))
+  print(io, native_string(x))
 end
 
 ################################################################################
@@ -271,7 +251,7 @@ contains(x::ArbFieldElem, y::Integer) = contains(x, ZZRingElem(y))
 Returns `true` if the ball $x$ contains the given rational value, otherwise
 return `false`.
 """
-contains(x::ArbFieldElem, y::Rational{T}) where {T <: Integer} = contains(x, QQFieldElem(y))
+contains(x::ArbFieldElem, y::Rational{T}) where {T<:Integer} = contains(x, QQFieldElem(y))
 
 @doc raw"""
     contains(x::ArbFieldElem, y::BigFloat)
@@ -280,8 +260,7 @@ Returns `true` if the ball $x$ contains the given floating point value,
 otherwise return `false`.
 """
 function contains(x::ArbFieldElem, y::BigFloat)
-  r = ccall((:arb_contains_mpfr, libflint), Cint,
-              (Ref{ArbFieldElem}, Ref{BigFloat}), x, y)
+  r = ccall((:arb_contains_mpfr, libflint), Cint, (Ref{ArbFieldElem}, Ref{BigFloat}), x, y)
   return Bool(r)
 end
 
@@ -302,8 +281,8 @@ end
 Returns `true` if the ball $x$ contains zero, otherwise return `false`.
 """
 function contains_zero(x::ArbFieldElem)
-   r = ccall((:arb_contains_zero, libflint), Cint, (Ref{ArbFieldElem}, ), x)
-   return Bool(r)
+  r = ccall((:arb_contains_zero, libflint), Cint, (Ref{ArbFieldElem},), x)
+  return Bool(r)
 end
 
 @doc raw"""
@@ -313,8 +292,8 @@ Returns `true` if the ball $x$ contains any negative value, otherwise return
 `false`.
 """
 function contains_negative(x::ArbFieldElem)
-   r = ccall((:arb_contains_negative, libflint), Cint, (Ref{ArbFieldElem}, ), x)
-   return Bool(r)
+  r = ccall((:arb_contains_negative, libflint), Cint, (Ref{ArbFieldElem},), x)
+  return Bool(r)
 end
 
 @doc raw"""
@@ -324,8 +303,8 @@ Returns `true` if the ball $x$ contains any positive value, otherwise return
 `false`.
 """
 function contains_positive(x::ArbFieldElem)
-   r = ccall((:arb_contains_positive, libflint), Cint, (Ref{ArbFieldElem}, ), x)
-   return Bool(r)
+  r = ccall((:arb_contains_positive, libflint), Cint, (Ref{ArbFieldElem},), x)
+  return Bool(r)
 end
 
 @doc raw"""
@@ -335,8 +314,8 @@ Returns `true` if the ball $x$ contains any non-negative value, otherwise
 return `false`.
 """
 function contains_nonnegative(x::ArbFieldElem)
-   r = ccall((:arb_contains_nonnegative, libflint), Cint, (Ref{ArbFieldElem}, ), x)
-   return Bool(r)
+  r = ccall((:arb_contains_nonnegative, libflint), Cint, (Ref{ArbFieldElem},), x)
+  return Bool(r)
 end
 
 @doc raw"""
@@ -346,8 +325,8 @@ Returns `true` if the ball $x$ contains any nonpositive value, otherwise
 return `false`.
 """
 function contains_nonpositive(x::ArbFieldElem)
-   r = ccall((:arb_contains_nonpositive, libflint), Cint, (Ref{ArbFieldElem}, ), x)
-   return Bool(r)
+  r = ccall((:arb_contains_nonpositive, libflint), Cint, (Ref{ArbFieldElem},), x)
+  return Bool(r)
 end
 
 ################################################################################
@@ -368,19 +347,19 @@ function isequal(x::ArbFieldElem, y::ArbFieldElem)
 end
 
 function ==(x::ArbFieldElem, y::ArbFieldElem)
-    return Bool(ccall((:arb_eq, libflint), Cint, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), x, y))
+  return Bool(ccall((:arb_eq, libflint), Cint, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), x, y))
 end
 
 function !=(x::ArbFieldElem, y::ArbFieldElem)
-    return Bool(ccall((:arb_ne, libflint), Cint, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), x, y))
+  return Bool(ccall((:arb_ne, libflint), Cint, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), x, y))
 end
 
 function isless(x::ArbFieldElem, y::ArbFieldElem)
-    return Bool(ccall((:arb_lt, libflint), Cint, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), x, y))
+  return Bool(ccall((:arb_lt, libflint), Cint, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), x, y))
 end
 
 function <=(x::ArbFieldElem, y::ArbFieldElem)
-    return Bool(ccall((:arb_le, libflint), Cint, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), x, y))
+  return Bool(ccall((:arb_le, libflint), Cint, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), x, y))
 end
 
 ==(x::ArbFieldElem, y::Int) = x == ArbFieldElem(y)
@@ -407,7 +386,6 @@ end
 !=(x::ArbFieldElem, y::Integer) = x != ZZRingElem(y)
 <=(x::ArbFieldElem, y::Integer) = x <= ZZRingElem(y)
 <(x::ArbFieldElem, y::Integer) = x < ZZRingElem(y)
-
 
 ==(x::Integer, y::ArbFieldElem) = ZZRingElem(x) == y
 !=(x::Integer, y::ArbFieldElem) = ZZRingElem(x) != y
@@ -444,15 +422,15 @@ end
 <=(x::QQFieldElem, y::ArbFieldElem) = ArbFieldElem(x, precision(parent(y))) <= y
 <(x::QQFieldElem, y::ArbFieldElem) = ArbFieldElem(x, precision(parent(y))) < y
 
-==(x::ArbFieldElem, y::Rational{T}) where {T <: Integer} = x == QQFieldElem(y)
-!=(x::ArbFieldElem, y::Rational{T}) where {T <: Integer} = x != QQFieldElem(y)
-<=(x::ArbFieldElem, y::Rational{T}) where {T <: Integer} = x <= QQFieldElem(y)
-<(x::ArbFieldElem, y::Rational{T}) where {T <: Integer} = x < QQFieldElem(y)
+==(x::ArbFieldElem, y::Rational{T}) where {T<:Integer} = x == QQFieldElem(y)
+!=(x::ArbFieldElem, y::Rational{T}) where {T<:Integer} = x != QQFieldElem(y)
+<=(x::ArbFieldElem, y::Rational{T}) where {T<:Integer} = x <= QQFieldElem(y)
+<(x::ArbFieldElem, y::Rational{T}) where {T<:Integer} = x < QQFieldElem(y)
 
-==(x::Rational{T}, y::ArbFieldElem) where {T <: Integer} = QQFieldElem(x) == y
-!=(x::Rational{T}, y::ArbFieldElem) where {T <: Integer} = QQFieldElem(x) != y
-<=(x::Rational{T}, y::ArbFieldElem) where {T <: Integer} = QQFieldElem(x) <= y
-<(x::Rational{T}, y::ArbFieldElem) where {T <: Integer} = QQFieldElem(x) < y
+==(x::Rational{T}, y::ArbFieldElem) where {T<:Integer} = QQFieldElem(x) == y
+!=(x::Rational{T}, y::ArbFieldElem) where {T<:Integer} = QQFieldElem(x) != y
+<=(x::Rational{T}, y::ArbFieldElem) where {T<:Integer} = QQFieldElem(x) <= y
+<(x::Rational{T}, y::ArbFieldElem) where {T<:Integer} = QQFieldElem(x) < y
 
 ################################################################################
 #
@@ -461,7 +439,7 @@ end
 ################################################################################
 
 function is_unit(x::ArbFieldElem)
-   !iszero(x)
+  !iszero(x)
 end
 
 @doc raw"""
@@ -470,7 +448,7 @@ end
 Return `true` if $x$ is certainly zero, otherwise return `false`.
 """
 function iszero(x::ArbFieldElem)
-   return Bool(ccall((:arb_is_zero, libflint), Cint, (Ref{ArbFieldElem},), x))
+  return Bool(ccall((:arb_is_zero, libflint), Cint, (Ref{ArbFieldElem},), x))
 end
 
 @doc raw"""
@@ -480,7 +458,7 @@ Return `true` if $x$ is certainly not equal to zero, otherwise return
 `false`.
 """
 function is_nonzero(x::ArbFieldElem)
-   return Bool(ccall((:arb_is_nonzero, libflint), Cint, (Ref{ArbFieldElem},), x))
+  return Bool(ccall((:arb_is_nonzero, libflint), Cint, (Ref{ArbFieldElem},), x))
 end
 
 @doc raw"""
@@ -489,7 +467,7 @@ end
 Return `true` if $x$ is certainly one, otherwise return `false`.
 """
 function isone(x::ArbFieldElem)
-   return Bool(ccall((:arb_is_one, libflint), Cint, (Ref{ArbFieldElem},), x))
+  return Bool(ccall((:arb_is_one, libflint), Cint, (Ref{ArbFieldElem},), x))
 end
 
 @doc raw"""
@@ -499,7 +477,7 @@ Return `true` if $x$ is finite, i.e. having finite midpoint and radius,
 otherwise return `false`.
 """
 function isfinite(x::ArbFieldElem)
-   return Bool(ccall((:arb_is_finite, libflint), Cint, (Ref{ArbFieldElem},), x))
+  return Bool(ccall((:arb_is_finite, libflint), Cint, (Ref{ArbFieldElem},), x))
 end
 
 @doc raw"""
@@ -509,7 +487,7 @@ Return `true` if $x$ is exact, i.e. has zero radius, otherwise return
 `false`.
 """
 function is_exact(x::ArbFieldElem)
-   return Bool(ccall((:arb_is_exact, libflint), Cint, (Ref{ArbFieldElem},), x))
+  return Bool(ccall((:arb_is_exact, libflint), Cint, (Ref{ArbFieldElem},), x))
 end
 
 @doc raw"""
@@ -518,7 +496,7 @@ end
 Return `true` if $x$ is an exact integer, otherwise return `false`.
 """
 function isinteger(x::ArbFieldElem)
-   return Bool(ccall((:arb_is_int, libflint), Cint, (Ref{ArbFieldElem},), x))
+  return Bool(ccall((:arb_is_int, libflint), Cint, (Ref{ArbFieldElem},), x))
 end
 
 @doc raw"""
@@ -527,7 +505,7 @@ end
 Return `true` if $x$ is certainly positive, otherwise return `false`.
 """
 function is_positive(x::ArbFieldElem)
-   return Bool(ccall((:arb_is_positive, libflint), Cint, (Ref{ArbFieldElem},), x))
+  return Bool(ccall((:arb_is_positive, libflint), Cint, (Ref{ArbFieldElem},), x))
 end
 
 @doc raw"""
@@ -536,7 +514,7 @@ end
 Return `true` if $x$ is certainly non-negative, otherwise return `false`.
 """
 function is_nonnegative(x::ArbFieldElem)
-   return Bool(ccall((:arb_is_nonnegative, libflint), Cint, (Ref{ArbFieldElem},), x))
+  return Bool(ccall((:arb_is_nonnegative, libflint), Cint, (Ref{ArbFieldElem},), x))
 end
 
 @doc raw"""
@@ -545,7 +523,7 @@ end
 Return `true` if $x$ is certainly negative, otherwise return `false`.
 """
 function is_negative(x::ArbFieldElem)
-   return Bool(ccall((:arb_is_negative, libflint), Cint, (Ref{ArbFieldElem},), x))
+  return Bool(ccall((:arb_is_negative, libflint), Cint, (Ref{ArbFieldElem},), x))
 end
 
 @doc raw"""
@@ -554,7 +532,7 @@ end
 Return `true` if $x$ is certainly nonpositive, otherwise return `false`.
 """
 function is_nonpositive(x::ArbFieldElem)
-   return Bool(ccall((:arb_is_nonpositive, libflint), Cint, (Ref{ArbFieldElem},), x))
+  return Bool(ccall((:arb_is_nonpositive, libflint), Cint, (Ref{ArbFieldElem},), x))
 end
 
 ################################################################################
@@ -642,18 +620,17 @@ end
 #
 ################################################################################
 
-for (s,f) in ((:+,"arb_add"), (:*,"arb_mul"), (://, "arb_div"), (:-,"arb_sub"))
+for (s, f) in ((:+, "arb_add"), (:*, "arb_mul"), (://, "arb_div"), (:-, "arb_sub"))
   @eval begin
     function ($s)(x::ArbFieldElem, y::ArbFieldElem)
       z = parent(x)()
-      ccall(($f, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int),
-                           z, x, y, parent(x).prec)
+      ccall(($f, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, y, parent(x).prec)
       return z
     end
   end
 end
 
-for (f,s) in ((:+, "add"), (:*, "mul"))
+for (f, s) in ((:+, "add"), (:*, "mul"))
   @eval begin
     #function ($f)(x::ArbFieldElem, y::arf)
     #  z = parent(x)()
@@ -667,9 +644,7 @@ for (f,s) in ((:+, "add"), (:*, "mul"))
 
     function ($f)(x::ArbFieldElem, y::UInt)
       z = parent(x)()
-      ccall(($("arb_"*s*"_ui"), libflint), Nothing,
-                  (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int),
-                  z, x, y, parent(x).prec)
+      ccall(($("arb_" * s * "_ui"), libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int), z, x, y, parent(x).prec)
       return z
     end
 
@@ -677,22 +652,19 @@ for (f,s) in ((:+, "add"), (:*, "mul"))
 
     function ($f)(x::ArbFieldElem, y::Int)
       z = parent(x)()
-      ccall(($("arb_"*s*"_si"), libflint), Nothing,
-      (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int, Int), z, x, y, parent(x).prec)
+      ccall(($("arb_" * s * "_si"), libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int, Int), z, x, y, parent(x).prec)
       return z
     end
 
-    ($f)(x::Int, y::ArbFieldElem) = ($f)(y,x)
+    ($f)(x::Int, y::ArbFieldElem) = ($f)(y, x)
 
     function ($f)(x::ArbFieldElem, y::ZZRingElem)
       z = parent(x)()
-      ccall(($("arb_"*s*"_fmpz"), libflint), Nothing,
-                  (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ZZRingElem}, Int),
-                  z, x, y, parent(x).prec)
+      ccall(($("arb_" * s * "_fmpz"), libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ZZRingElem}, Int), z, x, y, parent(x).prec)
       return z
     end
 
-    ($f)(x::ZZRingElem, y::ArbFieldElem) = ($f)(y,x)
+    ($f)(x::ZZRingElem, y::ArbFieldElem) = ($f)(y, x)
   end
 end
 
@@ -707,8 +679,7 @@ end
 
 function -(x::ArbFieldElem, y::UInt)
   z = parent(x)()
-  ccall((:arb_sub_ui, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int), z, x, y, parent(x).prec)
+  ccall((:arb_sub_ui, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int), z, x, y, parent(x).prec)
   return z
 end
 
@@ -716,8 +687,7 @@ end
 
 function -(x::ArbFieldElem, y::Int)
   z = parent(x)()
-  ccall((:arb_sub_si, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int, Int), z, x, y, parent(x).prec)
+  ccall((:arb_sub_si, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int, Int), z, x, y, parent(x).prec)
   return z
 end
 
@@ -725,19 +695,17 @@ end
 
 function -(x::ArbFieldElem, y::ZZRingElem)
   z = parent(x)()
-  ccall((:arb_sub_fmpz, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ZZRingElem}, Int),
-              z, x, y, parent(x).prec)
+  ccall((:arb_sub_fmpz, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ZZRingElem}, Int), z, x, y, parent(x).prec)
   return z
 end
 
--(x::ZZRingElem, y::ArbFieldElem) = -(y-x)
+-(x::ZZRingElem, y::ArbFieldElem) = -(y - x)
 
 +(x::ArbFieldElem, y::Integer) = x + ZZRingElem(y)
 
 -(x::ArbFieldElem, y::Integer) = x - ZZRingElem(y)
 
-*(x::ArbFieldElem, y::Integer) = x*ZZRingElem(y)
+*(x::ArbFieldElem, y::Integer) = x * ZZRingElem(y)
 
 //(x::ArbFieldElem, y::Integer) = x//ZZRingElem(y)
 
@@ -745,7 +713,7 @@ end
 
 -(x::Integer, y::ArbFieldElem) = ZZRingElem(x) - y
 
-*(x::Integer, y::ArbFieldElem) = ZZRingElem(x)*y
+*(x::Integer, y::ArbFieldElem) = ZZRingElem(x) * y
 
 //(x::Integer, y::ArbFieldElem) = ZZRingElem(x)//y
 
@@ -758,61 +726,51 @@ end
 
 function //(x::ArbFieldElem, y::UInt)
   z = parent(x)()
-  ccall((:arb_div_ui, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int), z, x, y, parent(x).prec)
+  ccall((:arb_div_ui, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int), z, x, y, parent(x).prec)
   return z
 end
 
 function //(x::ArbFieldElem, y::Int)
   z = parent(x)()
-  ccall((:arb_div_si, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int, Int), z, x, y, parent(x).prec)
+  ccall((:arb_div_si, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int, Int), z, x, y, parent(x).prec)
   return z
 end
 
 function //(x::ArbFieldElem, y::ZZRingElem)
   z = parent(x)()
-  ccall((:arb_div_fmpz, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ZZRingElem}, Int),
-              z, x, y, parent(x).prec)
+  ccall((:arb_div_fmpz, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ZZRingElem}, Int), z, x, y, parent(x).prec)
   return z
 end
 
 function //(x::UInt, y::ArbFieldElem)
   z = parent(y)()
-  ccall((:arb_ui_div, libflint), Nothing,
-              (Ref{ArbFieldElem}, UInt, Ref{ArbFieldElem}, Int), z, x, y, parent(y).prec)
+  ccall((:arb_ui_div, libflint), Nothing, (Ref{ArbFieldElem}, UInt, Ref{ArbFieldElem}, Int), z, x, y, parent(y).prec)
   return z
 end
 
 function //(x::Int, y::ArbFieldElem)
   z = parent(y)()
   t = ArbFieldElem(x)
-  ccall((:arb_div, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, t, y, parent(y).prec)
+  ccall((:arb_div, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, t, y, parent(y).prec)
   return z
 end
 
 function //(x::ZZRingElem, y::ArbFieldElem)
   z = parent(y)()
   t = ArbFieldElem(x)
-  ccall((:arb_div, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, t, y, parent(y).prec)
+  ccall((:arb_div, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, t, y, parent(y).prec)
   return z
 end
 
 function ^(x::ArbFieldElem, y::ArbFieldElem)
   z = parent(x)()
-  ccall((:arb_pow, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, y, parent(x).prec)
+  ccall((:arb_pow, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, y, parent(x).prec)
   return z
 end
 
 function ^(x::ArbFieldElem, y::ZZRingElem)
   z = parent(x)()
-  ccall((:arb_pow_fmpz, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ZZRingElem}, Int),
-              z, x, y, parent(x).prec)
+  ccall((:arb_pow_fmpz, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ZZRingElem}, Int), z, x, y, parent(x).prec)
   return z
 end
 
@@ -820,19 +778,15 @@ end
 
 function ^(x::ArbFieldElem, y::UInt)
   z = parent(x)()
-  ccall((:arb_pow_ui, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int), z, x, y, parent(x).prec)
+  ccall((:arb_pow_ui, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int), z, x, y, parent(x).prec)
   return z
 end
 
 function ^(x::ArbFieldElem, y::QQFieldElem)
   z = parent(x)()
-  ccall((:arb_pow_fmpq, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{QQFieldElem}, Int),
-              z, x, y, parent(x).prec)
+  ccall((:arb_pow_fmpq, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{QQFieldElem}, Int), z, x, y, parent(x).prec)
   return z
 end
-
 
 for T in (Float64, BigFloat, Rational, QQFieldElem)
   @eval begin
@@ -844,32 +798,32 @@ for T in (Float64, BigFloat, Rational, QQFieldElem)
     -(x::ArbFieldElem, y::$T) = x - parent(x)(y)
     *(x::$T, y::ArbFieldElem) = parent(y)(x) * y
     *(x::ArbFieldElem, y::$T) = x * parent(x)(y)
-    ^(x::$T, y::ArbFieldElem) = parent(y)(x) ^ y
+    ^(x::$T, y::ArbFieldElem) = parent(y)(x)^y
   end
 end
 
 for T in (Float64, BigFloat, Rational)
   @eval begin
-    ^(x::ArbFieldElem, y::$T) = x ^ parent(x)(y)
+    ^(x::ArbFieldElem, y::$T) = x^parent(x)(y)
   end
 end
 
 for T in (Float64, BigFloat, Integer, Rational, QQFieldElem)
   @eval begin
-    /(x::$T, y::ArbFieldElem) = x // y
-    /(x::ArbFieldElem, y::$T) = x // y
-    divexact(x::$T, y::ArbFieldElem; check::Bool=true) = x // y
-    divexact(x::ArbFieldElem, y::$T; check::Bool=true) = x // y
+    /(x::$T, y::ArbFieldElem) = x//y
+    /(x::ArbFieldElem, y::$T) = x//y
+    divexact(x::$T, y::ArbFieldElem; check::Bool=true) = x//y
+    divexact(x::ArbFieldElem, y::$T; check::Bool=true) = x//y
   end
 end
 
-/(x::ArbFieldElem, y::ArbFieldElem) = x // y
-/(x::ZZRingElem, y::ArbFieldElem) = x // y
-/(x::ArbFieldElem, y::ZZRingElem) = x // y
+/(x::ArbFieldElem, y::ArbFieldElem) = x//y
+/(x::ZZRingElem, y::ArbFieldElem) = x//y
+/(x::ArbFieldElem, y::ZZRingElem) = x//y
 
-divexact(x::ArbFieldElem, y::ArbFieldElem; check::Bool=true) = x // y
-divexact(x::ZZRingElem, y::ArbFieldElem; check::Bool=true) = x // y
-divexact(x::ArbFieldElem, y::ZZRingElem; check::Bool=true) = x // y
+divexact(x::ArbFieldElem, y::ArbFieldElem; check::Bool=true) = x//y
+divexact(x::ZZRingElem, y::ArbFieldElem; check::Bool=true) = x//y
+divexact(x::ArbFieldElem, y::ZZRingElem; check::Bool=true) = x//y
 
 ################################################################################
 #
@@ -891,8 +845,7 @@ end
 
 function inv(x::ArbFieldElem)
   z = parent(x)()
-  ccall((:arb_inv, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  ccall((:arb_inv, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
   return parent(x)(z)
 end
 
@@ -904,15 +857,13 @@ end
 
 function ldexp(x::ArbFieldElem, y::Int)
   z = parent(x)()
-  ccall((:arb_mul_2exp_si, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, y)
+  ccall((:arb_mul_2exp_si, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, y)
   return z
 end
 
 function ldexp(x::ArbFieldElem, y::ZZRingElem)
   z = parent(x)()
-  ccall((:arb_mul_2exp_fmpz, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ZZRingElem}), z, x, y)
+  ccall((:arb_mul_2exp_fmpz, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ZZRingElem}), z, x, y)
   return z
 end
 
@@ -944,13 +895,12 @@ integer.
 """
 function unique_integer(x::ArbFieldElem)
   z = ZZRingElem()
-  unique = ccall((:arb_get_unique_fmpz, libflint), Int,
-    (Ref{ZZRingElem}, Ref{ArbFieldElem}), z, x)
+  unique = ccall((:arb_get_unique_fmpz, libflint), Int, (Ref{ZZRingElem}, Ref{ArbFieldElem}), z, x)
   return (unique != 0, z)
 end
 
 function (::ZZRing)(a::ArbFieldElem)
-   return ZZRingElem(a)
+  return ZZRingElem(a)
 end
 
 @doc raw"""
@@ -961,8 +911,7 @@ $y$.
 """
 function setunion(x::ArbFieldElem, y::ArbFieldElem)
   z = parent(x)()
-  ccall((:arb_union, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, y, parent(x).prec)
+  ccall((:arb_union, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, y, parent(x).prec)
   return z
 end
 
@@ -974,8 +923,7 @@ $x$ and $y$.
 """
 function setintersection(x::ArbFieldElem, y::ArbFieldElem)
   z = parent(x)()
-  ccall((:arb_intersection, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, y, parent(x).prec)
+  ccall((:arb_intersection, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, y, parent(x).prec)
   return z
 end
 
@@ -1082,29 +1030,29 @@ end
 # real - real functions
 
 function floor(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_floor, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_floor, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 floor(::Type{ArbFieldElem}, x::ArbFieldElem) = floor(x)
 floor(::Type{ZZRingElem}, x::ArbFieldElem) = ZZRingElem(floor(x))
-floor(::Type{T}, x::ArbFieldElem) where {T <: Integer} = T(floor(x))
+floor(::Type{T}, x::ArbFieldElem) where {T<:Integer} = T(floor(x))
 
 function ceil(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_ceil, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_ceil, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 ceil(::Type{ArbFieldElem}, x::ArbFieldElem) = ceil(x)
 ceil(::Type{ZZRingElem}, x::ArbFieldElem) = ZZRingElem(ceil(x))
-ceil(::Type{T}, x::ArbFieldElem) where {T <: Integer} = T(ceil(x))
+ceil(::Type{T}, x::ArbFieldElem) where {T<:Integer} = T(ceil(x))
 
 function Base.sqrt(x::ArbFieldElem; check::Bool=true)
-   z = parent(x)()
-   ccall((:arb_sqrt, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_sqrt, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 @doc raw"""
@@ -1113,9 +1061,9 @@ end
 Return the reciprocal of the square root of $x$, i.e. $1/\sqrt{x}$.
 """
 function rsqrt(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_rsqrt, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_rsqrt, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 @doc raw"""
@@ -1124,9 +1072,9 @@ end
 Return $\sqrt{1+x}-1$, evaluated accurately for small $x$.
 """
 function sqrt1pm1(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_sqrt1pm1, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_sqrt1pm1, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 @doc raw"""
@@ -1136,141 +1084,141 @@ Return the sqrt root of $x$, assuming that $x$ represents a non-negative
 number. Thus any negative number in the input interval is discarded.
 """
 function sqrtpos(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_sqrtpos, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_sqrtpos, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function log(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_log, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_log, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function log1p(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_log1p, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_log1p, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function Base.exp(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_exp, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_exp, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function expm1(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_expm1, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_expm1, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function sin(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_sin, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_sin, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function cos(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_cos, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_cos, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function sinpi(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_sin_pi, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_sin_pi, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function cospi(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_cos_pi, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_cos_pi, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function tan(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_tan, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_tan, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function cot(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_cot, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_cot, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function tanpi(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_tan_pi, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_tan_pi, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function cotpi(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_cot_pi, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_cot_pi, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function sinh(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_sinh, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_sinh, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function cosh(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_cosh, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_cosh, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function tanh(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_tanh, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_tanh, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function coth(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_coth, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_coth, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function atan(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_atan, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_atan, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function asin(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_asin, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_asin, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function acos(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_acos, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_acos, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function atanh(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_atanh, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_atanh, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function asinh(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_asinh, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_asinh, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function acosh(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_acosh, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_acosh, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 @doc raw"""
@@ -1279,9 +1227,9 @@ end
 Return the Gamma function evaluated at $x$.
 """
 function gamma(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_gamma, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_gamma, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 @doc raw"""
@@ -1290,9 +1238,9 @@ end
 Return the logarithm of the Gamma function evaluated at $x$.
 """
 function lgamma(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_lgamma, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_lgamma, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 @doc raw"""
@@ -1301,9 +1249,9 @@ end
 Return the reciprocal of the Gamma function evaluated at $x$.
 """
 function rgamma(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_rgamma, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_rgamma, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 @doc raw"""
@@ -1313,9 +1261,9 @@ Return the  logarithmic derivative of the gamma function evaluated at $x$,
 i.e. $\psi(x)$.
 """
 function digamma(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_digamma, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_digamma, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 @doc raw"""
@@ -1325,8 +1273,7 @@ Return the upper incomplete gamma function $\Gamma(s,x)$.
 """
 function gamma(s::ArbFieldElem, x::ArbFieldElem)
   z = parent(s)()
-  ccall((:arb_hypgeom_gamma_upper, libflint), Nothing,
-        (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int, Int), z, s, x, 0, parent(s).prec)
+  ccall((:arb_hypgeom_gamma_upper, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int, Int), z, s, x, 0, parent(s).prec)
   return z
 end
 
@@ -1338,8 +1285,7 @@ $\Gamma(s,x) / \Gamma(s)$.
 """
 function gamma_regularized(s::ArbFieldElem, x::ArbFieldElem)
   z = parent(s)()
-  ccall((:arb_hypgeom_gamma_upper, libflint), Nothing,
-        (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int, Int), z, s, x, 1, parent(s).prec)
+  ccall((:arb_hypgeom_gamma_upper, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int, Int), z, s, x, 1, parent(s).prec)
   return z
 end
 
@@ -1350,8 +1296,7 @@ Return the lower incomplete gamma function $\gamma(s,x) / \Gamma(s)$.
 """
 function gamma_lower(s::ArbFieldElem, x::ArbFieldElem)
   z = parent(s)()
-  ccall((:arb_hypgeom_gamma_lower, libflint), Nothing,
-        (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int, Int), z, s, x, 0, parent(s).prec)
+  ccall((:arb_hypgeom_gamma_lower, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int, Int), z, s, x, 0, parent(s).prec)
   return z
 end
 
@@ -1363,11 +1308,9 @@ $\gamma(s,x) / \Gamma(s)$.
 """
 function gamma_lower_regularized(s::ArbFieldElem, x::ArbFieldElem)
   z = parent(s)()
-  ccall((:arb_hypgeom_gamma_lower, libflint), Nothing,
-        (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int, Int), z, s, x, 1, parent(s).prec)
+  ccall((:arb_hypgeom_gamma_lower, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int, Int), z, s, x, 1, parent(s).prec)
   return z
 end
-
 
 @doc raw"""
     zeta(x::ArbFieldElem)
@@ -1375,61 +1318,54 @@ end
 Return the Riemann zeta function evaluated at $x$.
 """
 function zeta(x::ArbFieldElem)
-   z = parent(x)()
-   ccall((:arb_zeta, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
-   return z
+  z = parent(x)()
+  ccall((:arb_zeta, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, parent(x).prec)
+  return z
 end
 
 function sincos(x::ArbFieldElem)
   s = parent(x)()
   c = parent(x)()
-  ccall((:arb_sin_cos, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), s, c, x, parent(x).prec)
+  ccall((:arb_sin_cos, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), s, c, x, parent(x).prec)
   return (s, c)
 end
 
 function sincospi(x::ArbFieldElem)
   s = parent(x)()
   c = parent(x)()
-  ccall((:arb_sin_cos_pi, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), s, c, x, parent(x).prec)
+  ccall((:arb_sin_cos_pi, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), s, c, x, parent(x).prec)
   return (s, c)
 end
 
 function sinpi(x::QQFieldElem, r::ArbField)
   z = r()
-  ccall((:arb_sin_pi_fmpq, libflint), Nothing,
-        (Ref{ArbFieldElem}, Ref{QQFieldElem}, Int), z, x, precision(r))
+  ccall((:arb_sin_pi_fmpq, libflint), Nothing, (Ref{ArbFieldElem}, Ref{QQFieldElem}, Int), z, x, precision(r))
   return z
 end
 
 function cospi(x::QQFieldElem, r::ArbField)
   z = r()
-  ccall((:arb_cos_pi_fmpq, libflint), Nothing,
-        (Ref{ArbFieldElem}, Ref{QQFieldElem}, Int), z, x, precision(r))
+  ccall((:arb_cos_pi_fmpq, libflint), Nothing, (Ref{ArbFieldElem}, Ref{QQFieldElem}, Int), z, x, precision(r))
   return z
 end
 
 function sincospi(x::QQFieldElem, r::ArbField)
   s = r()
   c = r()
-  ccall((:arb_sin_cos_pi_fmpq, libflint), Nothing,
-        (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{QQFieldElem}, Int), s, c, x, precision(r))
+  ccall((:arb_sin_cos_pi_fmpq, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{QQFieldElem}, Int), s, c, x, precision(r))
   return (s, c)
 end
 
 function sinhcosh(x::ArbFieldElem)
   s = parent(x)()
   c = parent(x)()
-  ccall((:arb_sinh_cosh, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), s, c, x, parent(x).prec)
+  ccall((:arb_sinh_cosh, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), s, c, x, parent(x).prec)
   return (s, c)
 end
 
 function atan(y::ArbFieldElem, x::ArbFieldElem)
   z = parent(y)()
-  ccall((:arb_atan2, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, y, x, parent(y).prec)
+  ccall((:arb_atan2, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, y, x, parent(y).prec)
   return z
 end
 
@@ -1449,8 +1385,7 @@ Return the arithmetic-geometric mean of $x$ and $y$
 """
 function agm(x::ArbFieldElem, y::ArbFieldElem)
   z = parent(x)()
-  ccall((:arb_agm, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, y, parent(x).prec)
+  ccall((:arb_agm, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, y, parent(x).prec)
   return z
 end
 
@@ -1461,22 +1396,19 @@ Return the Hurwitz zeta function $\zeta(s,a)$.
 """
 function zeta(s::ArbFieldElem, a::ArbFieldElem)
   z = parent(s)()
-  ccall((:arb_hurwitz_zeta, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, s, a, parent(s).prec)
+  ccall((:arb_hurwitz_zeta, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, s, a, parent(s).prec)
   return z
 end
 
 function hypot(x::ArbFieldElem, y::ArbFieldElem)
   z = parent(x)()
-  ccall((:arb_hypot, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, y, parent(x).prec)
+  ccall((:arb_hypot, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, y, parent(x).prec)
   return z
 end
 
 function root(x::ArbFieldElem, n::UInt)
   z = parent(x)()
-  ccall((:arb_root, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int), z, x, n, parent(x).prec)
+  ccall((:arb_root, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int), z, x, n, parent(x).prec)
   return z
 end
 
@@ -1495,7 +1427,7 @@ end
 
 Return the factorial of $x$.
 """
-factorial(x::ArbFieldElem) = gamma(x+1)
+factorial(x::ArbFieldElem) = gamma(x + 1)
 
 function factorial(n::UInt, r::ArbField)
   z = r()
@@ -1517,8 +1449,7 @@ Return the binomial coefficient ${x \choose n}$.
 """
 function binomial(x::ArbFieldElem, n::UInt)
   z = parent(x)()
-  ccall((:arb_bin_ui, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int), z, x, n, parent(x).prec)
+  ccall((:arb_bin_ui, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int), z, x, n, parent(x).prec)
   return z
 end
 
@@ -1529,8 +1460,7 @@ Return the binomial coefficient ${n \choose k}$ in the given Arb field.
 """
 function binomial(n::UInt, k::UInt, r::ArbField)
   z = r()
-  ccall((:arb_bin_uiui, libflint), Nothing,
-              (Ref{ArbFieldElem}, UInt, UInt, Int), z, n, k, r.prec)
+  ccall((:arb_bin_uiui, libflint), Nothing, (Ref{ArbFieldElem}, UInt, UInt, Int), z, n, k, r.prec)
   return z
 end
 
@@ -1541,15 +1471,13 @@ Return the $n$-th Fibonacci number in the given Arb field.
 """
 function fibonacci(n::ZZRingElem, r::ArbField)
   z = r()
-  ccall((:arb_fib_fmpz, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ZZRingElem}, Int), z, n, r.prec)
+  ccall((:arb_fib_fmpz, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ZZRingElem}, Int), z, n, r.prec)
   return z
 end
 
 function fibonacci(n::UInt, r::ArbField)
   z = r()
-  ccall((:arb_fib_ui, libflint), Nothing,
-              (Ref{ArbFieldElem}, UInt, Int), z, n, r.prec)
+  ccall((:arb_fib_ui, libflint), Nothing, (Ref{ArbFieldElem}, UInt, Int), z, n, r.prec)
   return z
 end
 
@@ -1567,8 +1495,7 @@ Return the Gamma function evaluated at $x$ in the given Arb field.
 """
 function gamma(x::ZZRingElem, r::ArbField)
   z = r()
-  ccall((:arb_gamma_fmpz, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ZZRingElem}, Int), z, x, r.prec)
+  ccall((:arb_gamma_fmpz, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ZZRingElem}, Int), z, x, r.prec)
   return z
 end
 
@@ -1579,16 +1506,13 @@ Return the Gamma function evaluated at $x$ in the given Arb field.
 """
 function gamma(x::QQFieldElem, r::ArbField)
   z = r()
-  ccall((:arb_gamma_fmpq, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{QQFieldElem}, Int), z, x, r.prec)
+  ccall((:arb_gamma_fmpq, libflint), Nothing, (Ref{ArbFieldElem}, Ref{QQFieldElem}, Int), z, x, r.prec)
   return z
 end
 
-
 function zeta(n::UInt, r::ArbField)
   z = r()
-  ccall((:arb_zeta_ui, libflint), Nothing,
-              (Ref{ArbFieldElem}, UInt, Int), z, n, r.prec)
+  ccall((:arb_zeta_ui, libflint), Nothing, (Ref{ArbFieldElem}, UInt, Int), z, n, r.prec)
   return z
 end
 
@@ -1602,8 +1526,7 @@ zeta(n::Int, r::ArbField) = n >= 0 ? zeta(UInt(n), r) : zeta(r(n))
 
 function bernoulli(n::UInt, r::ArbField)
   z = r()
-  ccall((:arb_bernoulli_ui, libflint), Nothing,
-              (Ref{ArbFieldElem}, UInt, Int), z, n, r.prec)
+  ccall((:arb_bernoulli_ui, libflint), Nothing, (Ref{ArbFieldElem}, UInt, Int), z, n, r.prec)
   return z
 end
 
@@ -1616,8 +1539,7 @@ bernoulli(n::Int, r::ArbField) = n >= 0 ? bernoulli(UInt(n), r) : throw(DomainEr
 
 function rising_factorial(x::ArbFieldElem, n::UInt)
   z = parent(x)()
-  ccall((:arb_rising_ui, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int), z, x, n, parent(x).prec)
+  ccall((:arb_rising_ui, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int), z, x, n, parent(x).prec)
   return z
 end
 
@@ -1630,8 +1552,7 @@ rising_factorial(x::ArbFieldElem, n::Int) = n < 0 ? throw(DomainError(n, "Index 
 
 function rising_factorial(x::QQFieldElem, n::UInt, r::ArbField)
   z = r()
-  ccall((:arb_rising_fmpq_ui, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{QQFieldElem}, UInt, Int), z, x, n, r.prec)
+  ccall((:arb_rising_fmpq_ui, libflint), Nothing, (Ref{ArbFieldElem}, Ref{QQFieldElem}, UInt, Int), z, x, n, r.prec)
   return z
 end
 
@@ -1646,8 +1567,7 @@ rising_factorial(x::QQFieldElem, n::Int, r::ArbField) = n < 0 ? throw(DomainErro
 function rising_factorial2(x::ArbFieldElem, n::UInt)
   z = parent(x)()
   w = parent(x)()
-  ccall((:arb_rising2_ui, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int), z, w, x, n, parent(x).prec)
+  ccall((:arb_rising2_ui, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int), z, w, x, n, parent(x).prec)
   return (z, w)
 end
 
@@ -1661,15 +1581,13 @@ rising_factorial2(x::ArbFieldElem, n::Int) = n < 0 ? throw(DomainError(n, "Index
 
 function polylog(s::ArbFieldElem, a::ArbFieldElem)
   z = parent(s)()
-  ccall((:arb_polylog, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, s, a, parent(s).prec)
+  ccall((:arb_polylog, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, s, a, parent(s).prec)
   return z
 end
 
 function polylog(s::Int, a::ArbFieldElem)
   z = parent(a)()
-  ccall((:arb_polylog_si, libflint), Nothing,
-              (Ref{ArbFieldElem}, Int, Ref{ArbFieldElem}, Int), z, s, a, parent(a).prec)
+  ccall((:arb_polylog_si, libflint), Nothing, (Ref{ArbFieldElem}, Int, Ref{ArbFieldElem}, Int), z, s, a, parent(a).prec)
   return z
 end
 
@@ -1681,31 +1599,27 @@ Return the polylogarithm Li$_s(a)$.
 
 function chebyshev_t(n::UInt, x::ArbFieldElem)
   z = parent(x)()
-  ccall((:arb_chebyshev_t_ui, libflint), Nothing,
-              (Ref{ArbFieldElem}, UInt, Ref{ArbFieldElem}, Int), z, n, x, parent(x).prec)
+  ccall((:arb_chebyshev_t_ui, libflint), Nothing, (Ref{ArbFieldElem}, UInt, Ref{ArbFieldElem}, Int), z, n, x, parent(x).prec)
   return z
 end
 
 function chebyshev_u(n::UInt, x::ArbFieldElem)
   z = parent(x)()
-  ccall((:arb_chebyshev_u_ui, libflint), Nothing,
-              (Ref{ArbFieldElem}, UInt, Ref{ArbFieldElem}, Int), z, n, x, parent(x).prec)
+  ccall((:arb_chebyshev_u_ui, libflint), Nothing, (Ref{ArbFieldElem}, UInt, Ref{ArbFieldElem}, Int), z, n, x, parent(x).prec)
   return z
 end
 
 function chebyshev_t2(n::UInt, x::ArbFieldElem)
   z = parent(x)()
   w = parent(x)()
-  ccall((:arb_chebyshev_t2_ui, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Ref{ArbFieldElem}, Int), z, w, n, x, parent(x).prec)
+  ccall((:arb_chebyshev_t2_ui, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Ref{ArbFieldElem}, Int), z, w, n, x, parent(x).prec)
   return z, w
 end
 
 function chebyshev_u2(n::UInt, x::ArbFieldElem)
   z = parent(x)()
   w = parent(x)()
-  ccall((:arb_chebyshev_u2_ui, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Ref{ArbFieldElem}, Int), z, w, n, x, parent(x).prec)
+  ccall((:arb_chebyshev_u2_ui, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Ref{ArbFieldElem}, Int), z, w, n, x, parent(x).prec)
   return z, w
 end
 
@@ -1744,8 +1658,7 @@ Return the Bell number $B_n$ as an element of $r$.
 """
 function bell(n::ZZRingElem, r::ArbField)
   z = r()
-  ccall((:arb_bell_fmpz, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ZZRingElem}, Int), z, n, r.prec)
+  ccall((:arb_bell_fmpz, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ZZRingElem}, Int), z, n, r.prec)
   return z
 end
 
@@ -1763,8 +1676,7 @@ Return the number of partitions $p(n)$ as an element of $r$.
 """
 function numpart(n::ZZRingElem, r::ArbField)
   z = r()
-  ccall((:arb_partitions_fmpz, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ref{ZZRingElem}, Int), z, n, r.prec)
+  ccall((:arb_partitions_fmpz, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ZZRingElem}, Int), z, n, r.prec)
   return z
 end
 
@@ -1788,9 +1700,7 @@ Return the Airy function $\operatorname{Ai}(x)$.
 """
 function airy_ai(x::ArbFieldElem)
   ai = parent(x)()
-  ccall((:arb_hypgeom_airy, libflint), Nothing,
-              (Ref{ArbFieldElem}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{ArbFieldElem}, Int),
-              ai, C_NULL, C_NULL, C_NULL, x, parent(x).prec)
+  ccall((:arb_hypgeom_airy, libflint), Nothing, (Ref{ArbFieldElem}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{ArbFieldElem}, Int), ai, C_NULL, C_NULL, C_NULL, x, parent(x).prec)
   return ai
 end
 
@@ -1801,9 +1711,7 @@ Return the Airy function $\operatorname{Bi}(x)$.
 """
 function airy_bi(x::ArbFieldElem)
   bi = parent(x)()
-  ccall((:arb_hypgeom_airy, libflint), Nothing,
-              (Ptr{Cvoid}, Ptr{Cvoid}, Ref{ArbFieldElem}, Ptr{Cvoid}, Ref{ArbFieldElem}, Int),
-              C_NULL, C_NULL, bi, C_NULL, x, parent(x).prec)
+  ccall((:arb_hypgeom_airy, libflint), Nothing, (Ptr{Cvoid}, Ptr{Cvoid}, Ref{ArbFieldElem}, Ptr{Cvoid}, Ref{ArbFieldElem}, Int), C_NULL, C_NULL, bi, C_NULL, x, parent(x).prec)
   return bi
 end
 
@@ -1814,9 +1722,7 @@ Return the derivative of the Airy function $\operatorname{Ai}^\prime(x)$.
 """
 function airy_ai_prime(x::ArbFieldElem)
   ai_prime = parent(x)()
-  ccall((:arb_hypgeom_airy, libflint), Nothing,
-              (Ptr{Cvoid}, Ref{ArbFieldElem}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{ArbFieldElem}, Int),
-              C_NULL, ai_prime, C_NULL, C_NULL, x, parent(x).prec)
+  ccall((:arb_hypgeom_airy, libflint), Nothing, (Ptr{Cvoid}, Ref{ArbFieldElem}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{ArbFieldElem}, Int), C_NULL, ai_prime, C_NULL, C_NULL, x, parent(x).prec)
   return ai_prime
 end
 
@@ -1827,9 +1733,7 @@ Return the derivative of the Airy function $\operatorname{Bi}^\prime(x)$.
 """
 function airy_bi_prime(x::ArbFieldElem)
   bi_prime = parent(x)()
-  ccall((:arb_hypgeom_airy, libflint), Nothing,
-              (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int),
-              C_NULL, C_NULL, C_NULL, bi_prime, x, parent(x).prec)
+  ccall((:arb_hypgeom_airy, libflint), Nothing, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), C_NULL, C_NULL, C_NULL, bi_prime, x, parent(x).prec)
   return bi_prime
 end
 
@@ -1881,13 +1785,13 @@ function lindep(A::Vector{ArbFieldElem}, bits::Int)
   n = length(A)
   V = [floor(ldexp(s, bits) + 0.5) for s in A]
   M = zero_matrix(ZZ, n, n + 1)
-  for i = 1:n
+  for i in 1:n
     M[i, i] = ZZ(1)
     flag, M[i, n + 1] = unique_integer(V[i])
     !flag && error("Insufficient precision in lindep")
   end
   L = lll(M)
-  return [L[1, i] for i = 1:n]
+  return [L[1, i] for i in 1:n]
 end
 
 ################################################################################
@@ -1914,20 +1818,19 @@ julia> simplest_rational_inside(const_pi(RR))
 ```
 """
 function simplest_rational_inside(x::ArbFieldElem)
-   a = ZZRingElem()
-   b = ZZRingElem()
-   e = ZZRingElem()
+  a = ZZRingElem()
+  b = ZZRingElem()
+  e = ZZRingElem()
 
-   ccall((:arb_get_interval_fmpz_2exp, libflint), Nothing,
-         (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ArbFieldElem}), a, b, e, x)
-   !fits(Int, e) && error("Result does not fit into an QQFieldElem")
-   _e = Int(e)
-   if e >= 0
-      return a << _e
-   end
-   _e = -_e
-   d = ZZRingElem(1) << _e
-   return _fmpq_simplest_between(a, d, b, d)
+  ccall((:arb_get_interval_fmpz_2exp, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ArbFieldElem}), a, b, e, x)
+  !fits(Int, e) && error("Result does not fit into an QQFieldElem")
+  _e = Int(e)
+  if e >= 0
+    return a << _e
+  end
+  _e = -_e
+  d = ZZRingElem(1) << _e
+  return _fmpq_simplest_between(a, d, b, d)
 end
 
 ################################################################################
@@ -1937,25 +1840,22 @@ end
 ################################################################################
 
 function zero!(z::ArbFieldElem)
-   ccall((:arb_zero, libflint), Nothing, (Ref{ArbFieldElem},), z)
-   return z
+  ccall((:arb_zero, libflint), Nothing, (Ref{ArbFieldElem},), z)
+  return z
 end
 
-for (s,f) in (("add!","arb_add"), ("mul!","arb_mul"), ("div!", "arb_div"),
-              ("sub!","arb_sub"))
+for (s, f) in (("add!", "arb_add"), ("mul!", "arb_mul"), ("div!", "arb_div"), ("sub!", "arb_sub"))
   @eval begin
     function ($(Symbol(s)))(z::ArbFieldElem, x::ArbFieldElem, y::ArbFieldElem)
-      ccall(($f, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int),
-                           z, x, y, parent(x).prec)
+      ccall(($f, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, y, parent(x).prec)
       return z
     end
   end
 end
 
 function addeq!(z::ArbFieldElem, x::ArbFieldElem)
-    ccall((:arb_add, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int),
-                           z, z, x, parent(x).prec)
-    return z
+  ccall((:arb_add, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, z, x, parent(x).prec)
+  return z
 end
 
 function addmul!(z::ArbFieldElem, x::ArbFieldElem, y::ZZRingElem)
@@ -1971,8 +1871,7 @@ end
 ################################################################################
 
 for (typeofx, passtoc) in ((ArbFieldElem, Ref{ArbFieldElem}), (Ptr{ArbFieldElem}, Ptr{ArbFieldElem}))
-  for (f,t) in (("arb_set_si", Int), ("arb_set_ui", UInt),
-                ("arb_set_d", Float64))
+  for (f, t) in (("arb_set_si", Int), ("arb_set_ui", UInt), ("arb_set_d", Float64))
     @eval begin
       function _arb_set(x::($typeofx), y::($t))
         ccall(($f, libflint), Nothing, (($passtoc), ($t)), x, y)
@@ -1980,8 +1879,7 @@ for (typeofx, passtoc) in ((ArbFieldElem, Ref{ArbFieldElem}), (Ptr{ArbFieldElem}
 
       function _arb_set(x::($typeofx), y::($t), p::Int)
         _arb_set(x, y)
-        ccall((:arb_set_round, libflint), Nothing,
-                    (($passtoc), ($passtoc), Int), x, x, p)
+        ccall((:arb_set_round, libflint), Nothing, (($passtoc), ($passtoc), Int), x, x, p)
       end
     end
   end
@@ -1992,13 +1890,11 @@ for (typeofx, passtoc) in ((ArbFieldElem, Ref{ArbFieldElem}), (Ptr{ArbFieldElem}
     end
 
     function _arb_set(x::($typeofx), y::ZZRingElem, p::Int)
-      ccall((:arb_set_round_fmpz, libflint), Nothing,
-                  (($passtoc), Ref{ZZRingElem}, Int), x, y, p)
+      ccall((:arb_set_round_fmpz, libflint), Nothing, (($passtoc), Ref{ZZRingElem}, Int), x, y, p)
     end
 
     function _arb_set(x::($typeofx), y::QQFieldElem, p::Int)
-      ccall((:arb_set_fmpq, libflint), Nothing,
-                  (($passtoc), Ref{QQFieldElem}, Int), x, y, p)
+      ccall((:arb_set_fmpq, libflint), Nothing, (($passtoc), Ref{QQFieldElem}, Int), x, y, p)
     end
 
     function _arb_set(x::($typeofx), y::ArbFieldElem)
@@ -2006,35 +1902,28 @@ for (typeofx, passtoc) in ((ArbFieldElem, Ref{ArbFieldElem}), (Ptr{ArbFieldElem}
     end
 
     function _arb_set(x::($typeofx), y::ArbFieldElem, p::Int)
-      ccall((:arb_set_round, libflint), Nothing,
-                  (($passtoc), Ref{ArbFieldElem}, Int), x, y, p)
+      ccall((:arb_set_round, libflint), Nothing, (($passtoc), Ref{ArbFieldElem}, Int), x, y, p)
     end
 
     function _arb_set(x::($typeofx), y::AbstractString, p::Int)
       s = string(y)
-      err = ccall((:arb_set_str, libflint), Int32,
-                  (($passtoc), Ptr{UInt8}, Int), x, s, p)
+      err = ccall((:arb_set_str, libflint), Int32, (($passtoc), Ptr{UInt8}, Int), x, s, p)
       err == 0 || error("Invalid real string: $(repr(s))")
     end
 
     function _arb_set(x::($typeofx), y::BigFloat)
-      m = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct},
-                  (($passtoc), ), x)
-      r = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct},
-                  (($passtoc), ), x)
-      ccall((:arf_set_mpfr, libflint), Nothing,
-                  (Ptr{arf_struct}, Ref{BigFloat}), m, y)
-      ccall((:mag_zero, libflint), Nothing, (Ptr{mag_struct}, ), r)
+      m = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (($passtoc),), x)
+      r = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (($passtoc),), x)
+      ccall((:arf_set_mpfr, libflint), Nothing, (Ptr{arf_struct}, Ref{BigFloat}), m, y)
+      ccall((:mag_zero, libflint), Nothing, (Ptr{mag_struct},), r)
     end
 
     function _arb_set(x::($typeofx), y::BigFloat, p::Int)
-      m = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (($passtoc), ), x)
-      r = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (($passtoc), ), x)
-      ccall((:arf_set_mpfr, libflint), Nothing,
-                  (Ptr{arf_struct}, Ref{BigFloat}), m, y)
-      ccall((:mag_zero, libflint), Nothing, (Ptr{mag_struct}, ), r)
-      ccall((:arb_set_round, libflint), Nothing,
-                  (($passtoc), ($passtoc), Int), x, x, p)
+      m = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (($passtoc),), x)
+      r = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (($passtoc),), x)
+      ccall((:arf_set_mpfr, libflint), Nothing, (Ptr{arf_struct}, Ref{BigFloat}), m, y)
+      ccall((:mag_zero, libflint), Nothing, (Ptr{mag_struct},), r)
+      ccall((:arb_set_round, libflint), Nothing, (($passtoc), ($passtoc), Int), x, x, p)
     end
 
     function _arb_set(x::($typeofx), y::Integer)
@@ -2122,23 +2011,17 @@ function rand(r::ArbField; randtype::Symbol=:urandom)
   x = r()
 
   if randtype == :urandom
-    ccall((:arb_urandom, libflint), Nothing,
-          (Ref{ArbFieldElem}, Ref{rand_ctx}, Int), x, state, r.prec)
+    ccall((:arb_urandom, libflint), Nothing, (Ref{ArbFieldElem}, Ref{rand_ctx}, Int), x, state, r.prec)
   elseif randtype == :randtest
-    ccall((:arb_randtest, libflint), Nothing,
-          (Ref{ArbFieldElem}, Ref{rand_ctx}, Int, Int), x, state, r.prec, 30)
+    ccall((:arb_randtest, libflint), Nothing, (Ref{ArbFieldElem}, Ref{rand_ctx}, Int, Int), x, state, r.prec, 30)
   elseif randtype == :randtest_exact
-    ccall((:arb_randtest_exact, libflint), Nothing,
-          (Ref{ArbFieldElem}, Ref{rand_ctx}, Int, Int), x, state, r.prec, 30)
+    ccall((:arb_randtest_exact, libflint), Nothing, (Ref{ArbFieldElem}, Ref{rand_ctx}, Int, Int), x, state, r.prec, 30)
   elseif randtype == :randtest_precise
-    ccall((:arb_randtest_precise, libflint), Nothing,
-          (Ref{ArbFieldElem}, Ref{rand_ctx}, Int, Int), x, state, r.prec, 30)
+    ccall((:arb_randtest_precise, libflint), Nothing, (Ref{ArbFieldElem}, Ref{rand_ctx}, Int, Int), x, state, r.prec, 30)
   elseif randtype == :randtest_wide
-    ccall((:arb_randtest_wide, libflint), Nothing,
-          (Ref{ArbFieldElem}, Ref{rand_ctx}, Int, Int), x, state, r.prec, 30)
+    ccall((:arb_randtest_wide, libflint), Nothing, (Ref{ArbFieldElem}, Ref{rand_ctx}, Int, Int), x, state, r.prec, 30)
   elseif randtype == :randtest_special
-    ccall((:arb_randtest_special, libflint), Nothing,
-          (Ref{ArbFieldElem}, Ref{rand_ctx}, Int, Int), x, state, r.prec, 30)
+    ccall((:arb_randtest_special, libflint), Nothing, (Ref{ArbFieldElem}, Ref{rand_ctx}, Int, Int), x, state, r.prec, 30)
   else
     error("Arb random generation `" * String(randtype) * "` is not defined")
   end

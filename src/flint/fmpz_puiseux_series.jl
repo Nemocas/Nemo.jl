@@ -11,12 +11,12 @@
 ###############################################################################
 
 function *(x::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem}, y::ZZRingElem)
-   z = parent(x)(x.data*y, x.scale)
-   z = rescale!(z)
-   return z
+  z = parent(x)(x.data * y, x.scale)
+  z = rescale!(z)
+  return z
 end
 
-*(x::ZZRingElem, y::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem}) = y*x
+*(x::ZZRingElem, y::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem}) = y * x
 
 ###############################################################################
 #
@@ -25,7 +25,7 @@ end
 ###############################################################################
 
 function divexact(x::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem}, y::ZZRingElem; check::Bool=true)
-   return parent(x)(divexact(x.data, y; check=check), x.scale)
+  return parent(x)(divexact(x.data, y; check=check), x.scale)
 end
 
 ###############################################################################
@@ -51,10 +51,10 @@ Return the $q$-series for eta evaluated at $x$, which must currently be a ration
 power of the generator of the Puiseux series ring.
 """
 function eta_qexp(x::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem})
-   v = valuation(x)
-   d = eta_qexp(x.data)
-   z = parent(x)(d, x.scale)
-   return z*x^(1//24)
+  v = valuation(x)
+  d = eta_qexp(x.data)
+  z = parent(x)(d, x.scale)
+  return z * x^(1//24)
 end
 
 ###############################################################################
@@ -64,9 +64,9 @@ end
 ###############################################################################
 
 function (R::FlintPuiseuxSeriesRing{ZZLaurentSeriesRingElem})(b::ZZRingElem)
-   z = FlintPuiseuxSeriesRingElem{ZZLaurentSeriesRingElem}(laurent_ring(R)(b), 1)
-   z.parent = R
-   return z
+  z = FlintPuiseuxSeriesRingElem{ZZLaurentSeriesRingElem}(laurent_ring(R)(b), 1)
+  z.parent = R
+  return z
 end
 
 ###############################################################################
@@ -89,9 +89,9 @@ precision in future will return the same parent object and generator. If
 caching of the parent object is not required, `cached` can be set to `false`.
 """
 function puiseux_series_ring(R::ZZRing, prec::Int, s::VarName; cached=true)
-   S, x = laurent_series_ring(R, prec, Symbol(s); cached=cached)
+  S, x = laurent_series_ring(R, prec, Symbol(s); cached=cached)
 
-   parent_obj = FlintPuiseuxSeriesRing{ZZLaurentSeriesRingElem}(S, cached)
+  parent_obj = FlintPuiseuxSeriesRing{ZZLaurentSeriesRingElem}(S, cached)
 
-   return parent_obj, gen(parent_obj)
+  return parent_obj, gen(parent_obj)
 end

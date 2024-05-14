@@ -1,78 +1,77 @@
 function acb_calc_func_wrap(res::Ptr{ComplexFieldElem}, x::Ptr{ComplexFieldElem}, param::Ptr{Nothing}, order::Int, prec::Int)
-    xx = unsafe_load(x)
-    F = unsafe_pointer_to_objref(param)
-    w = F(xx)
-    ccall((:acb_set, libflint), Ptr{Nothing}, (Ptr{ComplexFieldElem}, Ref{ComplexFieldElem}), res, w)
-    return zero(Cint)
+  xx = unsafe_load(x)
+  F = unsafe_pointer_to_objref(param)
+  w = F(xx)
+  ccall((:acb_set, libflint), Ptr{Nothing}, (Ptr{ComplexFieldElem}, Ref{ComplexFieldElem}), res, w)
+  return zero(Cint)
 end
 
-acb_calc_func_wrap_c() = @cfunction(acb_calc_func_wrap, Cint,
-        (Ptr{ComplexFieldElem}, Ptr{ComplexFieldElem}, Ptr{Nothing}, Int, Int))
+acb_calc_func_wrap_c() = @cfunction(acb_calc_func_wrap, Cint, (Ptr{ComplexFieldElem}, Ptr{ComplexFieldElem}, Ptr{Nothing}, Int, Int))
 
 const ARB_CALC_SUCCESS = UInt(0)
 const ARB_CALC_NO_CONVERGENCE = UInt(2)
 
-function integrate(C::ComplexField, F, a, b;
-                   rel_tol = -1.0,
-                   abs_tol = -1.0,
-                   deg_limit::Int = 0,
-                   eval_limit::Int = 0,
-                   depth_limit::Int = 0,
-                   use_heap::Int = 0,
-                   verbose::Int = 0)
+function integrate(C::ComplexField, F, a, b; rel_tol=-1.0, abs_tol=-1.0, deg_limit::Int=0, eval_limit::Int=0, depth_limit::Int=0, use_heap::Int=0, verbose::Int=0)
+  opts = acb_calc_integrate_opts(deg_limit, eval_limit, depth_limit, Cint(use_heap), Cint(verbose))
 
-   opts = acb_calc_integrate_opts(deg_limit, eval_limit, depth_limit,
-                                  Cint(use_heap), Cint(verbose))
+  lower = C(a)
+  upper = C(b)
 
-   lower = C(a)
-   upper = C(b)
+  cgoal = 0
 
-   cgoal = 0
+  if rel_tol === -1.0
+    cgoal = precision(Balls)
+  else
+    cgoal = -Int(exponent(rel_tol))
+    @assert big(2.0)^(-cgoal) <= rel_tol
+  end
 
-   if rel_tol === -1.0
-      cgoal = precision(Balls)
-   else
-      cgoal = -Int(exponent(rel_tol))
-      @assert big(2.0)^(-cgoal) <= rel_tol
-   end
+  ctol = mag_struct(0, 0)
+  ccall((:mag_init, libflint), Nothing, (Ref{mag_struct},), ctol)
 
-   ctol = mag_struct(0, 0)
-   ccall((:mag_init, libflint), Nothing, (Ref{mag_struct},), ctol)
+  if abs_tol === -1.0
+    ccall((:mag_set_ui_2exp_si, libflint), Nothing, (Ref{mag_struct}, UInt, Int), ctol, 1, -precision(Balls))
+  else
+    t = BigFloat(abs_tol, RoundDown)
+    expo = Ref{Clong}()
+    d = ccall((:mpfr_get_d_2exp, :libmpfr), Float64, (Ref{Clong}, Ref{BigFloat}, Cint), expo, t, Base.convert(Base.MPFR.MPFRRoundingMode, RoundDown))
+    ccall((:mag_set_d, libflint), Nothing, (Ref{mag_struct}, Float64), ctol, d)
+    ccall((:mag_mul_2exp_si, libflint), Nothing, (Ref{mag_struct}, Ref{mag_struct}, Int), ctol, ctol, Int(expo[]))
+  end
 
-   if abs_tol === -1.0
-      ccall((:mag_set_ui_2exp_si, libflint), Nothing, (Ref{mag_struct}, UInt, Int), ctol, 1, -precision(Balls))
-   else
-      t = BigFloat(abs_tol, RoundDown)
-      expo = Ref{Clong}()
-      d = ccall((:mpfr_get_d_2exp, :libmpfr), Float64,
-                (Ref{Clong}, Ref{BigFloat}, Cint),
-                expo, t,
-                Base.convert(Base.MPFR.MPFRRoundingMode, RoundDown))
-      ccall((:mag_set_d, libflint), Nothing, (Ref{mag_struct}, Float64), ctol, d)
-      ccall((:mag_mul_2exp_si, libflint), Nothing,
-            (Ref{mag_struct}, Ref{mag_struct}, Int), ctol, ctol, Int(expo[]))
-   end
+  res = C()
 
-   res = C()
+  status = ccall(
+    (:acb_calc_integrate, libflint),
+    UInt,
+    (
+      Ref{ComplexFieldElem},                       #res
+      Ptr{Nothing},                      #func
+      Any,                            #params
+      Ref{ComplexFieldElem},                       #a
+      Ref{ComplexFieldElem},                       #b
+      Int,                            #rel_goal
+      Ref{mag_struct},                #abs_tol
+      Ref{acb_calc_integrate_opts},   #opts
+      Int,
+    ),
+    res,
+    acb_calc_func_wrap_c(),
+    F,
+    lower,
+    upper,
+    cgoal,
+    ctol,
+    opts,
+    precision(Balls),
+  )
 
-   status = ccall((:acb_calc_integrate, libflint), UInt,
-                  (Ref{ComplexFieldElem},                       #res
-                   Ptr{Nothing},                      #func
-                   Any,                            #params
-                   Ref{ComplexFieldElem},                       #a
-                   Ref{ComplexFieldElem},                       #b
-                   Int,                            #rel_goal
-                   Ref{mag_struct},                #abs_tol
-                   Ref{acb_calc_integrate_opts},   #opts
-                   Int),
-      res, acb_calc_func_wrap_c(), F, lower, upper, cgoal, ctol, opts, precision(Balls))
+  ccall((:mag_clear, libflint), Nothing, (Ref{mag_struct},), ctol)
 
-   ccall((:mag_clear, libflint), Nothing, (Ref{mag_struct},), ctol)
-
-   if status == ARB_CALC_SUCCESS
-      nothing
-   elseif status == ARB_CALC_NO_CONVERGENCE
-      @warn("Integration did not converge")
-   end
-   return res
+  if status == ARB_CALC_SUCCESS
+    nothing
+  elseif status == ARB_CALC_NO_CONVERGENCE
+    @warn("Integration did not converge")
+  end
+  return res
 end

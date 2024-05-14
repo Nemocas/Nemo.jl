@@ -7,8 +7,7 @@ function gcdx_fmpz(a::ZZRingElem, b::ZZRingElem)
   d = ZZ()
   x = ZZ()
   y = ZZ()
-  ccall((:fmpz_xgcd_canonical_bezout, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), d, x, y, a, b)
+  ccall((:fmpz_xgcd_canonical_bezout, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), d, x, y, a, b)
   return d, x, y
 end
 
@@ -17,7 +16,7 @@ function run_gcdx_bigint(x::Vector{ZZRingElem}, y::Vector{ZZRingElem})
     gcdx_bigint(ix, iy)
   end
 end
-    
+
 function run_gcdx_fmpz(x::Vector{ZZRingElem}, y::Vector{ZZRingElem})
   for ix in x, iy in y
     gcdx_fmpz(ix, iy)
@@ -28,7 +27,7 @@ function benchmark_gcdx()
   print("benchmark_gcdx ...\n")
 
   # small size
-  range = ZZ(0):ZZ(2)^(Sys.WORD_SIZE - 2) - 1
+  range = ZZ(0):(ZZ(2)^(Sys.WORD_SIZE - 2) - 1)
   x = [rand(range) for _ in 1:100]
   y = [rand(range) for _ in 1:100]
 
@@ -38,7 +37,7 @@ function benchmark_gcdx()
   println("Small sized integers for ZZRingElem-solution:   $tt")
 
   # mixed integers
-  range = ZZ(0):ZZ(2)^Sys.WORD_SIZE
+  range = ZZ(0):(ZZ(2)^Sys.WORD_SIZE)
   x = [rand(range) for _ in 1:100]
   y = [rand(range) for _ in 1:100]
 
@@ -48,7 +47,7 @@ function benchmark_gcdx()
   println("Mixed sized integers for ZZRingElem-solution:   $tt")
 
   # big integers
-  range = ZZ(0):ZZ(2)^512
+  range = ZZ(0):(ZZ(2)^512)
   x = [rand(range) for _ in 1:100]
   y = [rand(range) for _ in 1:100]
 

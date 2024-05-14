@@ -37,57 +37,59 @@
   @test isa(a, FpMatrix)
   @test parent(a) == R
 
-  ar = [ BigInt(1) BigInt(1); BigInt(1) BigInt(1) ]
+  ar = [BigInt(1) BigInt(1); BigInt(1) BigInt(1)]
 
   b = R(ar)
 
   @test isa(b, FpMatrix)
   @test parent(b) == R
   @test nrows(b) == 2 && ncols(b) == 2
-  @test_throws ErrorConstrDimMismatch R(reshape(ar,1,4))
+  @test_throws ErrorConstrDimMismatch R(reshape(ar, 1, 4))
   @test b == R([BigInt(1), BigInt(1), BigInt(1), BigInt(1)])
   @test_throws ErrorConstrDimMismatch R([BigInt(1) BigInt(1)])
-  @test_throws ErrorConstrDimMismatch R([BigInt(1) BigInt(1) ; BigInt(1) BigInt(1) ;
-                                 BigInt(1) BigInt(1)])
+  @test_throws ErrorConstrDimMismatch R([
+    BigInt(1) BigInt(1)
+    BigInt(1) BigInt(1)
+    BigInt(1) BigInt(1)
+  ])
   @test_throws ErrorConstrDimMismatch R([BigInt(1), BigInt(1), BigInt(1)])
-  @test_throws ErrorConstrDimMismatch R([BigInt(1), BigInt(1),
-                                  BigInt(1), BigInt(1), BigInt(1)])
+  @test_throws ErrorConstrDimMismatch R([BigInt(1), BigInt(1), BigInt(1), BigInt(1), BigInt(1)])
 
-  ar = [ ZZ(1) ZZ(1); ZZ(1) ZZ(1) ]
+  ar = [ZZ(1) ZZ(1); ZZ(1) ZZ(1)]
 
   c = R(ar)
   @test isa(c, FpMatrix)
   @test parent(c) == R
   @test nrows(c) == 2 && ncols(c) == 2
-  @test_throws ErrorConstrDimMismatch R(reshape(ar,4,1))
-  @test c == R([ ZZ(1), ZZ(1), ZZ(1), ZZ(1)])
+  @test_throws ErrorConstrDimMismatch R(reshape(ar, 4, 1))
+  @test c == R([ZZ(1), ZZ(1), ZZ(1), ZZ(1)])
   @test_throws ErrorConstrDimMismatch R([ZZ(1) ZZ(1)])
-  @test_throws ErrorConstrDimMismatch R([ZZ(1) ZZ(1) ; ZZ(1) ZZ(1) ; ZZ(1) ZZ(1)])
+  @test_throws ErrorConstrDimMismatch R([ZZ(1) ZZ(1); ZZ(1) ZZ(1); ZZ(1) ZZ(1)])
   @test_throws ErrorConstrDimMismatch R([ZZ(1), ZZ(1), ZZ(1)])
   @test_throws ErrorConstrDimMismatch R([ZZ(1), ZZ(1), ZZ(1), ZZ(1), ZZ(1)])
 
-  ar = [ 1 1; 1 1]
+  ar = [1 1; 1 1]
 
   d = R(ar)
 
   @test isa(d, FpMatrix)
   @test parent(d) == R
   @test nrows(d) == 2 && ncols(d) == 2
-  @test_throws ErrorConstrDimMismatch R(reshape(ar,1,4))
-  @test d == R([1,1,1,1])
-  @test_throws ErrorConstrDimMismatch R([1 1 ])
-  @test_throws ErrorConstrDimMismatch R([1 1 ; 1 1 ; 1 1 ])
+  @test_throws ErrorConstrDimMismatch R(reshape(ar, 1, 4))
+  @test d == R([1, 1, 1, 1])
+  @test_throws ErrorConstrDimMismatch R([1 1])
+  @test_throws ErrorConstrDimMismatch R([1 1; 1 1; 1 1])
   @test_throws ErrorConstrDimMismatch R([1, 1, 1])
   @test_throws ErrorConstrDimMismatch R([1, 1, 1, 1, 1])
 
-  ar = [ 1 1; 1 1]'
+  ar = [1 1; 1 1]'
 
   d = R(ar)
 
   @test isa(d, FpMatrix)
 
-  @test_throws ErrorConstrDimMismatch R([Z2(1) Z2(1) ])
-  @test_throws ErrorConstrDimMismatch R([Z2(1) Z2(1) ; Z2(1) Z2(1) ; Z2(1) Z2(1) ])
+  @test_throws ErrorConstrDimMismatch R([Z2(1) Z2(1)])
+  @test_throws ErrorConstrDimMismatch R([Z2(1) Z2(1); Z2(1) Z2(1); Z2(1) Z2(1)])
   @test_throws ErrorConstrDimMismatch R([Z2(1), Z2(1), Z2(1)])
   @test_throws ErrorConstrDimMismatch R([Z2(1), Z2(1), Z2(1), Z2(1), Z2(1)])
 
@@ -100,70 +102,70 @@
   @test b == c
   @test c == d
 
-   arr = [1 2; 3 4]
-   arr2 = [1, 2, 3, 4, 5, 6]
+  arr = [1 2; 3 4]
+  arr2 = [1, 2, 3, 4, 5, 6]
 
-   for T in [Z3, ZZRingElem, Int, BigInt]
-      M = matrix(Z3, map(T, arr))
-      @test isa(M, FpMatrix)
-      @test base_ring(M) == Z3
+  for T in [Z3, ZZRingElem, Int, BigInt]
+    M = matrix(Z3, map(T, arr))
+    @test isa(M, FpMatrix)
+    @test base_ring(M) == Z3
 
-      M2 = matrix(Z3, 2, 3, map(T, arr2))
-      @test isa(M2, FpMatrix)
-      @test base_ring(M2) == Z3
-      @test nrows(M2) == 2
-      @test ncols(M2) == 3
-      @test_throws ErrorConstrDimMismatch matrix(Z3, 2, 2, map(T, arr2))
-      @test_throws ErrorConstrDimMismatch matrix(Z3, 2, 4, map(T, arr2))
-   end
+    M2 = matrix(Z3, 2, 3, map(T, arr2))
+    @test isa(M2, FpMatrix)
+    @test base_ring(M2) == Z3
+    @test nrows(M2) == 2
+    @test ncols(M2) == 3
+    @test_throws ErrorConstrDimMismatch matrix(Z3, 2, 2, map(T, arr2))
+    @test_throws ErrorConstrDimMismatch matrix(Z3, 2, 4, map(T, arr2))
+  end
 
-   M3 = zero_matrix(Z3, 2, 3)
+  M3 = zero_matrix(Z3, 2, 3)
 
-   @test isa(M3, FpMatrix)
-   @test base_ring(M3) == Z3
+  @test isa(M3, FpMatrix)
+  @test base_ring(M3) == Z3
 
-   M4 = identity_matrix(Z3, 3)
+  M4 = identity_matrix(Z3, 3)
 
-   @test isa(M4, FpMatrix)
-   @test base_ring(M4) == Z3
+  @test isa(M4, FpMatrix)
+  @test base_ring(M4) == Z3
 
-   a = zero_matrix(Z2, 2, 2)
-   b = zero_matrix(Z2, 2, 3)
-   @test a in [a, b]
-   @test a in [b, a]
-   @test !(a in [b])
-   @test a in keys(Dict(a => 1))
-   @test !(a in keys(Dict(b => 1)))
+  a = zero_matrix(Z2, 2, 2)
+  b = zero_matrix(Z2, 2, 3)
+  @test a in [a, b]
+  @test a in [b, a]
+  @test !(a in [b])
+  @test a in keys(Dict(a => 1))
+  @test !(a in keys(Dict(b => 1)))
 
-   a = zero_matrix(Z2, 2, 2)
-   b = zero_matrix(Z3, 2, 2)
-   @test a in [a, b]
-   @test a in [b, a]
-   @test !(a in [b])
-   @test a in keys(Dict(a => 1))
-   @test !(a in keys(Dict(b => 1)))
+  a = zero_matrix(Z2, 2, 2)
+  b = zero_matrix(Z3, 2, 2)
+  @test a in [a, b]
+  @test a in [b, a]
+  @test !(a in [b])
+  @test a in keys(Dict(a => 1))
+  @test !(a in keys(Dict(b => 1)))
 end
 
 @testset "FpMatrix.similar" begin
-   Z13 = Native.GF(ZZ(13))
-   S = FpMatrixSpace(Z13, 2, 2)
-   s = S(ZZRingElem(3))
+  Z13 = Native.GF(ZZ(13))
+  S = FpMatrixSpace(Z13, 2, 2)
+  s = S(ZZRingElem(3))
 
-   t = similar(s)
-   @test t isa FpMatrix
-   @test size(t) == size(s)
+  t = similar(s)
+  @test t isa FpMatrix
+  @test size(t) == size(s)
 
-   t = similar(s, 2, 3)
-   @test t isa FpMatrix
-   @test size(t) == (2, 3)
+  t = similar(s, 2, 3)
+  @test t isa FpMatrix
+  @test size(t) == (2, 3)
 
-   for (R, M) in ring_to_mat
-      t = similar(s, R)
-      @test size(t) == size(s)
+  for (R, M) in ring_to_mat
+    t = similar(s, R)
+    @test size(t) == size(s)
 
-      t = similar(s, R, 2, 3)
-      @test size(t) == (2, 3)
-   end
+    t = similar(s, R, 2, 3)
+    @test size(t) == (2, 3)
+  end
 end
 
 @testset "FpMatrix.printing" begin
@@ -182,7 +184,7 @@ end
   Z23 = Native.GF(ZZ(23))
   S = FpMatrixSpace(Z23, 2, 2)
 
-  ar = [ 1 2; 3 4]
+  ar = [1 2; 3 4]
 
   a = R(ar)
   aa = S(ar)
@@ -192,29 +194,29 @@ end
 
   b = deepcopy(a)
 
-  c = R([ 1 3; 2 4])
+  c = R([1 3; 2 4])
 
-  @test a[1,1] == Z11(1)
+  @test a[1, 1] == Z11(1)
 
-  a[1,1] = UInt(2)
+  a[1, 1] = UInt(2)
 
-  @test a[1,1] == Z11(2)
-  @test_throws BoundsError a[0,-1] = Z11(2)
+  @test a[1, 1] == Z11(2)
+  @test_throws BoundsError a[0, -1] = Z11(2)
 
-  a[2,1] = ZZ(3)
+  a[2, 1] = ZZ(3)
 
-  @test a[2,1] == Z11(ZZ(3))
-  @test_throws BoundsError a[-10,-10] = ZZ(3)
+  @test a[2, 1] == Z11(ZZ(3))
+  @test_throws BoundsError a[-10, -10] = ZZ(3)
 
-  a[2,2] = Z11(4)
+  a[2, 2] = Z11(4)
 
-  @test a[2,2] == Z11(4)
-  @test_throws BoundsError a[-2,2] = Z11(4)
+  @test a[2, 2] == Z11(4)
+  @test_throws BoundsError a[-2, 2] = Z11(4)
 
-  a[1,2] = 5
+  a[1, 2] = 5
 
-  @test a[1,2] == Z11(5)
-  @test_throws BoundsError a[-2,2] = 5
+  @test a[1, 2] == Z11(5)
+  @test_throws BoundsError a[-2, 2] = 5
 
   @test a != b
 
@@ -242,10 +244,9 @@ end
 
   @test b == c
 
-  @test transpose(matrix_space(Z11,1,2)([ 1 2; ])) ==
-          matrix_space(Z11,2,1)(reshape([ 1 ; 2],2,1))
+  @test transpose(matrix_space(Z11, 1, 2)([1 2;])) == matrix_space(Z11, 2, 1)(reshape([1; 2], 2, 1))
 
-  @test_throws ErrorConstrDimMismatch transpose!(R([ 1 2 ;]))
+  @test_throws ErrorConstrDimMismatch transpose!(R([1 2;]))
 
   R = matrix_space(Z11, 4, 4)
   m = [1 2 3 4; 2 4 6 2; 6 4 2 4; 2 6 4 0]
@@ -279,34 +280,34 @@ end
   Z2 = Native.GF(ZZ(2))
   S = matrix_space(Z2, 3, 4)
 
-  a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
+  a = R([1 2 3 1; 3 2 1 2; 1 3 2 0])
 
-  b = R([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
+  b = R([2 1 0 1; 0 0 0 0; 0 1 2 0])
 
   c = R()
 
   d = -b
 
-  @test d == R([ 15 16 0 16; 0 0 0 0; 0 16 15 0])
+  @test d == R([15 16 0 16; 0 0 0 0; 0 16 15 0])
 end
 
 @testset "FpMatrix.binary_ops" begin
   Z17 = Native.GF(ZZ(17))
 
   R = matrix_space(Z17, 3, 4)
-  a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
-  b = R([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
+  a = R([1 2 3 1; 3 2 1 2; 1 3 2 0])
+  b = R([2 1 0 1; 0 0 0 0; 0 1 2 0])
   c = R()
   d = a + b
   @test d == R([3 3 3 2; 3 2 1 2; 1 4 4 0])
 
   d = a - b
-  @test d == R([ 16 1 3 0; 3 2 1 2; 1 2 0 0 ])
+  @test d == R([16 1 3 0; 3 2 1 2; 1 2 0 0])
 
-  d = a*transpose(a)
+  d = a * transpose(a)
   @test d == matrix_space(Z17, 3, 3)([15 12 13; 12 1 11; 13 11 14])
 
-  d = transpose(a)*a
+  d = transpose(a) * a
   @test d == matrix_space(Z17, 4, 4)([11 11 8 7; 11 0 14 6; 8 14 14 5; 7 6 5 5])
 
   a = matrix(Z17, [1 2; 3 4])
@@ -315,42 +316,42 @@ end
 end
 
 @testset "FpMatrix.row_col_swapping" begin
-   R = Native.GF(ZZ(17))
+  R = Native.GF(ZZ(17))
 
-   a = matrix(R, [1 2; 3 4; 5 6])
+  a = matrix(R, [1 2; 3 4; 5 6])
 
-   @test swap_rows(a, 1, 3) == matrix(R, [5 6; 3 4; 1 2])
+  @test swap_rows(a, 1, 3) == matrix(R, [5 6; 3 4; 1 2])
 
-   swap_rows!(a, 2, 3)
+  swap_rows!(a, 2, 3)
 
-   @test a == matrix(R, [1 2; 5 6; 3 4])
+  @test a == matrix(R, [1 2; 5 6; 3 4])
 
-   @test swap_cols(a, 1, 2) == matrix(R, [2 1; 6 5; 4 3])
+  @test swap_cols(a, 1, 2) == matrix(R, [2 1; 6 5; 4 3])
 
-   swap_cols!(a, 2, 1)
+  swap_cols!(a, 2, 1)
 
-   @test a == matrix(R, [2 1; 6 5; 4 3])
+  @test a == matrix(R, [2 1; 6 5; 4 3])
 
-   a = matrix(R, [1 2; 3 4])
-   @test reverse_rows(a) == matrix(R, [3 4; 1 2])
-   reverse_rows!(a)
-   @test a == matrix(R, [3 4; 1 2])
+  a = matrix(R, [1 2; 3 4])
+  @test reverse_rows(a) == matrix(R, [3 4; 1 2])
+  reverse_rows!(a)
+  @test a == matrix(R, [3 4; 1 2])
 
-   a = matrix(R, [1 2; 3 4])
-   @test reverse_cols(a) == matrix(R, [2 1; 4 3])
-   reverse_cols!(a)
-   @test a == matrix(R, [2 1; 4 3])
+  a = matrix(R, [1 2; 3 4])
+  @test reverse_cols(a) == matrix(R, [2 1; 4 3])
+  reverse_cols!(a)
+  @test a == matrix(R, [2 1; 4 3])
 
-   a = matrix(R, [1 2 3; 3 4 5; 5 6 7])
+  a = matrix(R, [1 2 3; 3 4 5; 5 6 7])
 
-   @test reverse_rows(a) == matrix(R, [5 6 7; 3 4 5; 1 2 3])
-   reverse_rows!(a)
-   @test a == matrix(R, [5 6 7; 3 4 5; 1 2 3])
+  @test reverse_rows(a) == matrix(R, [5 6 7; 3 4 5; 1 2 3])
+  reverse_rows!(a)
+  @test a == matrix(R, [5 6 7; 3 4 5; 1 2 3])
 
-   a = matrix(R, [1 2 3; 3 4 5; 5 6 7])
-   @test reverse_cols(a) == matrix(R, [3 2 1; 5 4 3; 7 6 5])
-   reverse_cols!(a)
-   @test a == matrix(R, [3 2 1; 5 4 3; 7 6 5])
+  a = matrix(R, [1 2 3; 3 4 5; 5 6 7])
+  @test reverse_cols(a) == matrix(R, [3 2 1; 5 4 3; 7 6 5])
+  reverse_cols!(a)
+  @test a == matrix(R, [3 2 1; 5 4 3; 7 6 5])
 end
 
 @testset "FpMatrix.adhoc_binary" begin
@@ -359,37 +360,36 @@ end
   R = matrix_space(Z17, 3, 4)
   Z2 = Native.GF(ZZ(2))
 
-  a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
+  a = R([1 2 3 1; 3 2 1 2; 1 3 2 0])
 
-  b = R([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
+  b = R([2 1 0 1; 0 0 0 0; 0 1 2 0])
 
   c = R()
-  d = UInt(2)*a
-  dd = a*UInt(2)
+  d = UInt(2) * a
+  dd = a * UInt(2)
 
-  @test d == R([ 2 4 6 2; 6 4 2 4; 2 6 4 0])
-  @test dd == R([ 2 4 6 2; 6 4 2 4; 2 6 4 0])
+  @test d == R([2 4 6 2; 6 4 2 4; 2 6 4 0])
+  @test dd == R([2 4 6 2; 6 4 2 4; 2 6 4 0])
 
+  d = 2 * a
+  dd = a * 2
 
-  d = 2*a
-  dd = a*2
+  @test d == R([2 4 6 2; 6 4 2 4; 2 6 4 0])
+  @test dd == R([2 4 6 2; 6 4 2 4; 2 6 4 0])
 
-  @test d == R([ 2 4 6 2; 6 4 2 4; 2 6 4 0])
-  @test dd == R([ 2 4 6 2; 6 4 2 4; 2 6 4 0])
+  d = ZZ(2) * a
+  dd = a * ZZ(2)
 
-  d = ZZ(2)*a
-  dd = a*ZZ(2)
+  @test d == R([2 4 6 2; 6 4 2 4; 2 6 4 0])
+  @test dd == R([2 4 6 2; 6 4 2 4; 2 6 4 0])
 
-  @test d == R([ 2 4 6 2; 6 4 2 4; 2 6 4 0])
-  @test dd == R([ 2 4 6 2; 6 4 2 4; 2 6 4 0])
+  d = Z17(2) * a
+  dd = a * Z17(2)
 
-  d = Z17(2)*a
-  dd = a*Z17(2)
+  @test d == R([2 4 6 2; 6 4 2 4; 2 6 4 0])
+  @test dd == R([2 4 6 2; 6 4 2 4; 2 6 4 0])
 
-  @test d == R([ 2 4 6 2; 6 4 2 4; 2 6 4 0])
-  @test dd == R([ 2 4 6 2; 6 4 2 4; 2 6 4 0])
-
-  @test_throws ErrorException Z2(1)*a
+  @test_throws ErrorException Z2(1) * a
 end
 
 @testset "FpMatrix.comparison" begin
@@ -397,7 +397,7 @@ end
 
   R = matrix_space(Z17, 3, 4)
 
-  a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
+  a = R([1 2 3 1; 3 2 1 2; 1 3 2 0])
 
   @test a == a
 
@@ -425,9 +425,9 @@ end
 
   R = matrix_space(Z17, 3, 4)
 
-  a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
+  a = R([1 2 3 1; 3 2 1 2; 1 3 2 0])
 
-  f = a*transpose(a)
+  f = a * transpose(a)
 
   g = f^1000
 
@@ -447,29 +447,29 @@ end
   Z2 = Native.GF(ZZ(2))
   S = matrix_space(Z2, 3, 4)
 
-  a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
+  a = R([1 2 3 1; 3 2 1 2; 1 3 2 0])
 
-  b = R([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
+  b = R([2 1 0 1; 0 0 0 0; 0 1 2 0])
 
   b = transpose(b)
 
-  c = a*transpose(a)
+  c = a * transpose(a)
 
   r, d, den = rref_rational(a)
 
-  @test d == R([ 12 0 0 11; 0 12 0 10; 0 0 12 5])
+  @test d == R([12 0 0 11; 0 12 0 10; 0 0 12 5])
   @test r == 3
   @test den == Z17(12)
 
   r, den = rref_rational!(a)
 
-  @test a == R([ 12 0 0 11; 0 12 0 10; 0 0 12 5])
+  @test a == R([12 0 0 11; 0 12 0 10; 0 0 12 5])
   @test r == 3
   @test den == Z17(12)
 
   r, d, den = rref_rational(b)
 
-  @test d == parent(b)([ 2 0 0 ; 0 0 2; 0 0 0; 0 0 0])
+  @test d == parent(b)([2 0 0; 0 0 2; 0 0 0; 0 0 0])
   @test r == 2
   @test den == Z17(2)
 end
@@ -481,13 +481,13 @@ end
   Z2 = Native.GF(ZZ(2))
   S = matrix_space(Z2, 3, 4)
 
-  a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
+  a = R([1 2 3 1; 3 2 1 2; 1 3 2 0])
 
-  aa = matrix_space(Z17,3,3)([ 1 2 3; 3 2 1; 1 1 2])
+  aa = matrix_space(Z17, 3, 3)([1 2 3; 3 2 1; 1 1 2])
 
-  b = R([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
+  b = R([2 1 0 1; 0 0 0 0; 0 1 2 0])
 
-  a = transpose(a)*a
+  a = transpose(a) * a
 
   c = tr(a)
 
@@ -513,11 +513,11 @@ end
   Z2 = Native.GF(ZZ(2))
   S = matrix_space(Z2, 3, 4)
 
-  a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
+  a = R([1 2 3 1; 3 2 1 2; 1 3 2 0])
 
-  aa = matrix_space(Z17,3,3)([ 1 2 3; 3 2 1; 1 1 2])
+  aa = matrix_space(Z17, 3, 3)([1 2 3; 3 2 1; 1 1 2])
 
-  b = R([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
+  b = R([2 1 0 1; 0 0 0 0; 0 1 2 0])
 
   c = rank(a)
 
@@ -539,11 +539,11 @@ end
   Z2 = Native.GF(ZZ(2))
   S = matrix_space(Z2, 3, 4)
 
-  a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
+  a = R([1 2 3 1; 3 2 1 2; 1 3 2 0])
 
-  aa = matrix_space(Z17,3,3)([ 1 2 3; 3 2 1; 1 1 2])
+  aa = matrix_space(Z17, 3, 3)([1 2 3; 3 2 1; 1 1 2])
 
-  b = R([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
+  b = R([2 1 0 1; 0 0 0 0; 0 1 2 0])
 
   c = inv(aa)
 
@@ -551,9 +551,8 @@ end
 
   @test_throws ErrorException inv(a)
 
-  @test_throws ErrorException inv(transpose(a)*a)
+  @test_throws ErrorException inv(transpose(a) * a)
 end
-
 
 @testset "FpMatrix.swap_rows" begin
   Z17 = Native.GF(ZZ(17))
@@ -575,9 +574,9 @@ end
   R = matrix_space(Z17, 3, 3)
   S = matrix_space(Z17, 3, 4)
 
-  a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
+  a = R([1 2 3; 3 2 1; 0 0 2])
 
-  b = S([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
+  b = S([2 1 0 1; 0 0 0 0; 0 1 2 0])
 
   t = view(a, 1, 1, 3, 3)
 
@@ -597,7 +596,7 @@ end
 
   @test t == transpose(Z17[2 0])
 
-  @test view(a, 2, 2, 3, 2) == view(a, 2:3,  2:2)
+  @test view(a, 2, 2, 3, 2) == view(a, 2:3, 2:2)
   @test view(a, 2, 2, 3, 2) == sub(a, 2, 2, 3, 2)
   @test view(a, 2, 2, 3, 2) == sub(a, 2:3, 2:2)
 
@@ -647,27 +646,27 @@ end
 end
 
 @testset "FpMatrix.sub" begin
-   Z17 = Native.GF(ZZ(17))
-   S = matrix_space(Z17, 3, 3)
+  Z17 = Native.GF(ZZ(17))
+  S = matrix_space(Z17, 3, 3)
 
-   A = S([1 2 3; 4 5 6; 7 8 9])
+  A = S([1 2 3; 4 5 6; 7 8 9])
 
-   B = @inferred sub(A, 1, 1, 2, 2)
+  B = @inferred sub(A, 1, 1, 2, 2)
 
-   @test typeof(B) == FpMatrix
-   @test B == matrix_space(Z17, 2, 2)([1 2; 4 5])
+  @test typeof(B) == FpMatrix
+  @test B == matrix_space(Z17, 2, 2)([1 2; 4 5])
 
-   B[1, 1] = 10
-   @test A == S([1 2 3; 4 5 6; 7 8 9])
+  B[1, 1] = 10
+  @test A == S([1 2 3; 4 5 6; 7 8 9])
 
-   C = @inferred sub(B, 1:2, 1:2)
+  C = @inferred sub(B, 1:2, 1:2)
 
-   @test typeof(C) == FpMatrix
-   @test C == matrix_space(Z17, 2, 2)([10 2; 4 5])
+  @test typeof(C) == FpMatrix
+  @test C == matrix_space(Z17, 2, 2)([10 2; 4 5])
 
-   C[1, 1] = 20
-   @test B == matrix_space(Z17, 2, 2)([10 2; 4 5])
-   @test A == S([1 2 3; 4 5 6; 7 8 9])
+  C[1, 1] = 20
+  @test B == matrix_space(Z17, 2, 2)([10 2; 4 5])
+  @test A == S([1 2 3; 4 5 6; 7 8 9])
 end
 
 @testset "FpMatrix.concatenation" begin
@@ -675,35 +674,25 @@ end
   R = matrix_space(Z17, 3, 3)
   S = matrix_space(Z17, 3, 4)
 
-  a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
+  a = R([1 2 3; 3 2 1; 0 0 2])
 
-  b = S([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
+  b = S([2 1 0 1; 0 0 0 0; 0 1 2 0])
 
-  c = hcat(a,a)
+  c = hcat(a, a)
 
-  @test c == matrix_space(Z17, 3, 6)([1, 2, 3, 1, 2, 3,
-                                     3, 2, 1, 3, 2, 1,
-                                     0, 0, 2, 0, 0, 2])
+  @test c == matrix_space(Z17, 3, 6)([1, 2, 3, 1, 2, 3, 3, 2, 1, 3, 2, 1, 0, 0, 2, 0, 0, 2])
 
-  c = hcat(a,b)
+  c = hcat(a, b)
 
-  @test c == matrix_space(Z17, 3, 7)([1, 2, 3, 2, 1, 0, 1,
-                                     3, 2, 1, 0, 0, 0, 0,
-                                     0, 0, 2, 0, 1, 2, 0])
+  @test c == matrix_space(Z17, 3, 7)([1, 2, 3, 2, 1, 0, 1, 3, 2, 1, 0, 0, 0, 0, 0, 0, 2, 0, 1, 2, 0])
 
-  @test_throws ErrorException c = hcat(a,transpose(b))
+  @test_throws ErrorException c = hcat(a, transpose(b))
 
-  c = vcat(a,transpose(b))
+  c = vcat(a, transpose(b))
 
-  @test c == matrix_space(Z17, 7, 3)([1, 2, 3,
-                                     3, 2, 1,
-                                     0, 0, 2,
-                                     2, 0, 0,
-                                     1, 0, 1,
-                                     0, 0, 2,
-                                     1, 0, 0])
+  @test c == matrix_space(Z17, 7, 3)([1, 2, 3, 3, 2, 1, 0, 0, 2, 2, 0, 0, 1, 0, 1, 0, 0, 2, 1, 0, 0])
 
-  @test_throws ErrorException vcat(a,b)
+  @test_throws ErrorException vcat(a, b)
 end
 
 @testset "FpMatrix.conversion" begin
@@ -713,73 +702,75 @@ end
 
   c = S()
 
-  a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
+  a = R([1 2 3; 3 2 1; 0 0 2])
 
-  @test Array(a) == [Z17(1) Z17(2) Z17(3);
-                     Z17(3) Z17(2) Z17(1);
-                     Z17(0) Z17(0) Z17(2) ]
+  @test Array(a) == [
+    Z17(1) Z17(2) Z17(3)
+    Z17(3) Z17(2) Z17(1)
+    Z17(0) Z17(0) Z17(2)
+  ]
 
-#= Not implemented in Flint yet
-  b = lift(a)
+  #= Not implemented in Flint yet
+    b = lift(a)
 
-  @test b == S([ 1 2 3; 3 2 1; 0 0 2])
-  @test parent(b) == S
+    @test b == S([ 1 2 3; 3 2 1; 0 0 2])
+    @test parent(b) == S
 
-  lift!(c,a)
+    lift!(c,a)
 
-  @test c == S([ 1 2 3; 3 2 1; 0 0 2])
-=#
+    @test c == S([ 1 2 3; 3 2 1; 0 0 2])
+  =#
 
 end
 
 @testset "FpMatrix.charpoly" begin
-   R = Native.GF(ZZ(17))
+  R = Native.GF(ZZ(17))
 
-   for dim = 0:5
-      S = matrix_space(R, dim, dim)
-      U, x = polynomial_ring(R, "x")
+  for dim in 0:5
+    S = matrix_space(R, dim, dim)
+    U, x = polynomial_ring(R, "x")
 
-      for i = 1:10
-         M = rand(S, -5:5)
+    for i in 1:10
+      M = rand(S, -5:5)
 
-         p1 = charpoly(U, M)
-         p2 = charpoly_danilevsky!(U, M)
+      p1 = charpoly(U, M)
+      p2 = charpoly_danilevsky!(U, M)
 
-         @test p1 == p2
-      end
-   end
+      @test p1 == p2
+    end
+  end
 end
 
 @testset "FpMatrix.rand" begin
-   R = Native.GF(ZZ(17))
-   S = matrix_space(R, 3, 3)
+  R = Native.GF(ZZ(17))
+  S = matrix_space(R, 3, 3)
 
-   M = rand(S, 1:5)
-   @test parent(M) == S
+  M = rand(S, 1:5)
+  @test parent(M) == S
 
-   for i=1:3, j=1:3
-      @test M[i, j] in 1:5
-   end
+  for i in 1:3, j in 1:3
+    @test M[i, j] in 1:5
+  end
 
-   M = rand(S)
-   @test parent(M) == S
+  M = rand(S)
+  @test parent(M) == S
 end
 
 @testset "FpMatrix.kernel" begin
-   F17, _ = Native.finite_field(ZZRingElem(17))
-   A = matrix(F17, [ 1 2 3 ; 4 5 6 ])
-   K = @inferred kernel(A, side = :right)
-   @test is_zero(A*K)
-   @test ncols(K) == 1
+  F17, _ = Native.finite_field(ZZRingElem(17))
+  A = matrix(F17, [1 2 3; 4 5 6])
+  K = @inferred kernel(A, side=:right)
+  @test is_zero(A * K)
+  @test ncols(K) == 1
 
-   K = @inferred kernel(A)
-   @test is_zero(K*A)
-   @test nrows(K) == 0
+  K = @inferred kernel(A)
+  @test is_zero(K * A)
+  @test nrows(K) == 0
 
-   A = transpose(A)
-   K = @inferred kernel(A)
-   @test is_zero(K*A)
-   @test nrows(K) == 1
+  A = transpose(A)
+  K = @inferred kernel(A)
+  @test is_zero(K * A)
+  @test nrows(K) == 1
 end
 
 @testset "FpMatrix.solve" begin
@@ -787,191 +778,183 @@ end
   R = matrix_space(F17, 3, 3)
   S = matrix_space(F17, 3, 4)
 
-  a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
+  a = R([1 2 3; 3 2 1; 0 0 2])
 
-  b = S([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
+  b = S([2 1 0 1; 0 0 0 0; 0 1 2 0])
 
-  c = a*b
+  c = a * b
 
-  d = solve(a, c, side = :right)
+  d = solve(a, c; side=:right)
 
   @test d == b
 
   a = zero(R)
 
-  @test_throws ArgumentError solve(a, c, side = :right)
+  @test_throws ArgumentError solve(a, c, side=:right)
 
-   for i in 1:10
-      m = rand(0:10)
-      n = rand(0:10)
-      k = rand(0:10)
+  for i in 1:10
+    m = rand(0:10)
+    n = rand(0:10)
+    k = rand(0:10)
 
-      M = matrix_space(F17, n, k)
-      N = matrix_space(F17, n, m)
+    M = matrix_space(F17, n, k)
+    N = matrix_space(F17, n, m)
 
-      A = rand(M)
-      B = rand(N)
+    A = rand(M)
+    B = rand(N)
 
-      fl, X, K = can_solve_with_solution_and_kernel(A, B, side = :right)
+    fl, X, K = can_solve_with_solution_and_kernel(A, B; side=:right)
 
-      if fl
-         @test A * X == B
-         @test is_zero(A*K)
-         @test rank(A) + ncols(K) == ncols(A)
-      end
-   end
+    if fl
+      @test A * X == B
+      @test is_zero(A * K)
+      @test rank(A) + ncols(K) == ncols(A)
+    end
+  end
 
-   A = matrix(F17, 2, 2, [1, 2, 2, 5])
-   B = matrix(F17, 2, 1, [1, 2])
-   fl, X = can_solve_with_solution(A, B, side = :right)
-   @test fl
-   @test A * X == B
-   @test can_solve(A, B, side = :right)
+  A = matrix(F17, 2, 2, [1, 2, 2, 5])
+  B = matrix(F17, 2, 1, [1, 2])
+  fl, X = can_solve_with_solution(A, B; side=:right)
+  @test fl
+  @test A * X == B
+  @test can_solve(A, B, side=:right)
 
-   A = matrix(F17, 2, 2, [1, 2, 2, 4])
-   B = matrix(F17, 2, 1, [1, 2])
-   fl, X = can_solve_with_solution(A, B, side = :right)
-   @test fl
-   @test A * X == B
-   @test can_solve(A, B, side = :right)
+  A = matrix(F17, 2, 2, [1, 2, 2, 4])
+  B = matrix(F17, 2, 1, [1, 2])
+  fl, X = can_solve_with_solution(A, B; side=:right)
+  @test fl
+  @test A * X == B
+  @test can_solve(A, B, side=:right)
 
-   A = matrix(F17, 2, 2, [1, 2, 2, 4])
-   B = matrix(F17, 2, 1, [1, 3])
-   fl, X = can_solve_with_solution(A, B, side = :right)
-   @test !fl
+  A = matrix(F17, 2, 2, [1, 2, 2, 4])
+  B = matrix(F17, 2, 1, [1, 3])
+  fl, X = can_solve_with_solution(A, B; side=:right)
+  @test !fl
 
-   A = zero_matrix(F17, 2, 3)
-   B = identity_matrix(F17, 3)
-   @test_throws ErrorException can_solve_with_solution(A, B, side = :right)
+  A = zero_matrix(F17, 2, 3)
+  B = identity_matrix(F17, 3)
+  @test_throws ErrorException can_solve_with_solution(A, B, side=:right)
 
-   A = transpose(matrix(F17, 2, 2, [1, 2, 2, 5]))
-   B = transpose(matrix(F17, 2, 1, [1, 2]))
-   fl, X = can_solve_with_solution(A, B)
-   @test fl
-   @test X * A == B
-   @test can_solve(A, B)
+  A = transpose(matrix(F17, 2, 2, [1, 2, 2, 5]))
+  B = transpose(matrix(F17, 2, 1, [1, 2]))
+  fl, X = can_solve_with_solution(A, B)
+  @test fl
+  @test X * A == B
+  @test can_solve(A, B)
 
-   A = transpose(matrix(F17, 2, 2, [1, 2, 2, 4]))
-   B = transpose(matrix(F17, 2, 1, [1, 2]))
-   fl, X = can_solve_with_solution(A, B)
-   @test fl
-   @test X * A == B
-   @test can_solve(A, B)
+  A = transpose(matrix(F17, 2, 2, [1, 2, 2, 4]))
+  B = transpose(matrix(F17, 2, 1, [1, 2]))
+  fl, X = can_solve_with_solution(A, B)
+  @test fl
+  @test X * A == B
+  @test can_solve(A, B)
 
-   A = transpose(matrix(F17, 2, 2, [1, 2, 2, 4]))
-   B = transpose(matrix(F17, 2, 1, [1, 3]))
-   fl, X = can_solve_with_solution(A, B)
-   @test !fl
-   @test !can_solve(A, B)
+  A = transpose(matrix(F17, 2, 2, [1, 2, 2, 4]))
+  B = transpose(matrix(F17, 2, 1, [1, 3]))
+  fl, X = can_solve_with_solution(A, B)
+  @test !fl
+  @test !can_solve(A, B)
 
-   A = transpose(zero_matrix(F17, 2, 3))
-   B = transpose(identity_matrix(F17, 3))
-   @test_throws ErrorException can_solve_with_solution(A, B)
+  A = transpose(zero_matrix(F17, 2, 3))
+  B = transpose(identity_matrix(F17, 3))
+  @test_throws ErrorException can_solve_with_solution(A, B)
 
-   @test_throws ArgumentError can_solve_with_solution(A, B, side = :garbage)
-   @test_throws ArgumentError can_solve(A, B, side = :garbage)
+  @test_throws ArgumentError can_solve_with_solution(A, B, side=:garbage)
+  @test_throws ArgumentError can_solve(A, B, side=:garbage)
 end
 
 @testset "FpMatrix.solve_context" begin
-   F, _ = Native.finite_field(ZZRingElem(101))
-   A = matrix(F, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
-   C = solve_init(A)
+  F, _ = Native.finite_field(ZZRingElem(101))
+  A = matrix(F, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
+  C = solve_init(A)
 
-   @test_throws ErrorException solve(C, [ F(1) ])
-   @test_throws ErrorException solve(C, [ F(1) ], side = :right)
-   @test_throws ErrorException solve(C, matrix(F, 1, 1, [ F(1) ]))
-   @test_throws ErrorException solve(C, matrix(F, 1, 1, [ F(1) ]), side = :right)
-   @test_throws ArgumentError solve(C, [ F(1), F(2), F(3) ], side = :test)
-   @test_throws ArgumentError solve(C, matrix(F, 3, 1, [ F(1), F(2), F(3) ]), side = :test)
+  @test_throws ErrorException solve(C, [F(1)])
+  @test_throws ErrorException solve(C, [F(1)], side=:right)
+  @test_throws ErrorException solve(C, matrix(F, 1, 1, [F(1)]))
+  @test_throws ErrorException solve(C, matrix(F, 1, 1, [F(1)]), side=:right)
+  @test_throws ArgumentError solve(C, [F(1), F(2), F(3)], side=:test)
+  @test_throws ArgumentError solve(C, matrix(F, 3, 1, [F(1), F(2), F(3)]), side=:test)
 
-   for b in [ [ F(1), F(2), F(3) ],
-              matrix(F, 3, 1, [ F(1), F(2), F(3) ]),
-              matrix(F, 3, 2, [ F(1), F(2), F(3), F(4), F(5), F(6) ]) ]
-      @test @inferred can_solve(C, b, side = :right)
-      x = @inferred solve(C, b, side = :right)
-      @test A*x == b
-      fl, x = @inferred can_solve_with_solution(C, b, side = :right)
-      @test fl
-      @test A*x == b
-      fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b, side = :right)
-      @test fl
-      @test A*x == b
-      @test is_zero(A*K)
-      @test ncols(K) == 2
-      K = @inferred kernel(C, side = :right)
-      @test is_zero(A*K)
-      @test ncols(K) == 2
-   end
+  for b in [[F(1), F(2), F(3)], matrix(F, 3, 1, [F(1), F(2), F(3)]), matrix(F, 3, 2, [F(1), F(2), F(3), F(4), F(5), F(6)])]
+    @test @inferred can_solve(C, b, side=:right)
+    x = @inferred solve(C, b, side=:right)
+    @test A * x == b
+    fl, x = @inferred can_solve_with_solution(C, b, side=:right)
+    @test fl
+    @test A * x == b
+    fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b, side=:right)
+    @test fl
+    @test A * x == b
+    @test is_zero(A * K)
+    @test ncols(K) == 2
+    K = @inferred kernel(C, side=:right)
+    @test is_zero(A * K)
+    @test ncols(K) == 2
+  end
 
-   for b in [ [ F(1), F(1), F(1), F(1), F(1) ],
-              matrix(F, 1, 5, [ F(1), F(1), F(1), F(1), F(1) ]),
-              matrix(F, 2, 5, [ F(1), F(1), F(1), F(1), F(1),
-                                 F(1), F(1), F(1), F(1), F(1) ]) ]
-      @test_throws ArgumentError solve(C, b)
-      @test @inferred !can_solve(C, b)
-      fl, x = @inferred can_solve_with_solution(C, b)
-      @test !fl
-      fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b)
-      @test !fl
-   end
+  for b in [[F(1), F(1), F(1), F(1), F(1)], matrix(F, 1, 5, [F(1), F(1), F(1), F(1), F(1)]), matrix(F, 2, 5, [F(1), F(1), F(1), F(1), F(1), F(1), F(1), F(1), F(1), F(1)])]
+    @test_throws ArgumentError solve(C, b)
+    @test @inferred !can_solve(C, b)
+    fl, x = @inferred can_solve_with_solution(C, b)
+    @test !fl
+    fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b)
+    @test !fl
+  end
 
-   for b in [ [ F(1), F(2), F(3), F(4), F(5) ],
-              matrix(F, 1, 5, [ F(1), F(2), F(3), F(4), F(5)]),
-              matrix(F, 2, 5, [ F(1), F(2), F(3), F(4), F(5),
-                                 F(0), F(0), F(8), F(9), F(10) ]) ]
-      @test @inferred can_solve(C, b)
-      x = @inferred solve(C, b)
-      @test x*A == b
-      fl, x = @inferred can_solve_with_solution(C, b)
-      @test fl
-      @test x*A == b
-      fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b)
-      @test fl
-      @test x*A == b
-      @test is_zero(K*A)
-      @test nrows(K) == 0
-      K = @inferred kernel(C)
-      @test is_zero(K*A)
-      @test nrows(K) == 0
-   end
+  for b in [[F(1), F(2), F(3), F(4), F(5)], matrix(F, 1, 5, [F(1), F(2), F(3), F(4), F(5)]), matrix(F, 2, 5, [F(1), F(2), F(3), F(4), F(5), F(0), F(0), F(8), F(9), F(10)])]
+    @test @inferred can_solve(C, b)
+    x = @inferred solve(C, b)
+    @test x * A == b
+    fl, x = @inferred can_solve_with_solution(C, b)
+    @test fl
+    @test x * A == b
+    fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b)
+    @test fl
+    @test x * A == b
+    @test is_zero(K * A)
+    @test nrows(K) == 0
+    K = @inferred kernel(C)
+    @test is_zero(K * A)
+    @test nrows(K) == 0
+  end
 
-   N = zero_matrix(F, 2, 1)
-   C = solve_init(N)
-   b = zeros(F, 2)
-   fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b, side = :right)
-   @test fl
-   @test N*x == b
-   @test K == identity_matrix(F, 1)
-   K = @inferred kernel(C, side = :right)
-   @test K == identity_matrix(F, 1)
+  N = zero_matrix(F, 2, 1)
+  C = solve_init(N)
+  b = zeros(F, 2)
+  fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b, side=:right)
+  @test fl
+  @test N * x == b
+  @test K == identity_matrix(F, 1)
+  K = @inferred kernel(C, side=:right)
+  @test K == identity_matrix(F, 1)
 
-   N = zero_matrix(F, 1, 2)
-   C = solve_init(N)
-   b = zeros(F, 1)
-   fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b, side = :right)
-   @test fl
-   @test N*x == b
-   @test K == identity_matrix(F, 2) || K == swap_cols!(identity_matrix(F, 2), 1, 2)
-   K = @inferred kernel(C, side = :right)
-   @test K == identity_matrix(F, 2) || K == swap_cols!(identity_matrix(F, 2), 1, 2)
+  N = zero_matrix(F, 1, 2)
+  C = solve_init(N)
+  b = zeros(F, 1)
+  fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b, side=:right)
+  @test fl
+  @test N * x == b
+  @test K == identity_matrix(F, 2) || K == swap_cols!(identity_matrix(F, 2), 1, 2)
+  K = @inferred kernel(C, side=:right)
+  @test K == identity_matrix(F, 2) || K == swap_cols!(identity_matrix(F, 2), 1, 2)
 end
 
 @testset "FpMatrix.lu" begin
-   F, _ = Native.finite_field(ZZRingElem(101))
-   a = F[1 2 3 ; 3 2 1 ; 0 0 2]
-   b = F[2 1 0 1; 0 0 0 0; 0 1 2 0]
+  F, _ = Native.finite_field(ZZRingElem(101))
+  a = F[1 2 3; 3 2 1; 0 0 2]
+  b = F[2 1 0 1; 0 0 0 0; 0 1 2 0]
 
-   r, P, l, u = lu(a)
-   @test l*u == P*a
+  r, P, l, u = lu(a)
+  @test l * u == P * a
 
-   r, P, l, u = lu(b)
-   @test l*u == F[2 1 0 1; 0 1 2 0; 0 0 0 0]
-   @test l*u == P*b
+  r, P, l, u = lu(b)
+  @test l * u == F[2 1 0 1; 0 1 2 0; 0 0 0 0]
+  @test l * u == P * b
 
-   c = F[0 0 1; 0 0 0; 0 0 0; 1 0 0; 0 1 0; 0 0 1]
-   r, P, l, u = lu(c)
-   @test r == 3
-   @test l*u == P*c
+  c = F[0 0 1; 0 0 0; 0 0 0; 1 0 0; 0 1 0; 0 0 1]
+  r, P, l, u = lu(c)
+  @test r == 3
+  @test l * u == P * c
 end
 
 @testset "FpMatrix.add_one!" begin

@@ -11,19 +11,18 @@
 ################################################################################
 
 function overfields(k::FinField)
-    if !isdefined(k, :overfields)
-        k.overfields = Dict{Int, Vector{FinFieldMorphism}}()
-    end
-    return k.overfields
+  if !isdefined(k, :overfields)
+    k.overfields = Dict{Int,Vector{FinFieldMorphism}}()
+  end
+  return k.overfields
 end
 
 function subfields(k::FinField)
-    if !isdefined(k, :subfields)
-        k.subfields = Dict{Int, Vector{FinFieldMorphism}}()
-    end
-    return k.subfields
+  if !isdefined(k, :subfields)
+    k.subfields = Dict{Int,Vector{FinFieldMorphism}}()
+  end
+  return k.subfields
 end
-
 
 @doc raw"""
     AddOverfield!(F::T, f::FinFieldMorphism{T, T}) where T <: FinField
@@ -31,17 +30,16 @@ end
 Add an overfield to $F$, represented by a morphism $f: F\to G$ where
 $G$ is the codomain of $f$.
 """
-function AddOverfield!(F::T, f::FinFieldMorphism{T, T}) where T <: FinField
+function AddOverfield!(F::T, f::FinFieldMorphism{T,T}) where {T<:FinField}
+  d = degree(codomain(f))
+  over = overfields(F)
 
-    d = degree(codomain(f))
-    over = overfields(F)
-
-    if haskey(over, d)
-        push!(over[d], f)
-    else
-        a = FinFieldMorphism{T, T}[f]
-        over[d] = a
-    end
+  if haskey(over, d)
+    push!(over[d], f)
+  else
+    a = FinFieldMorphism{T,T}[f]
+    over[d] = a
+  end
 end
 
 @doc raw"""
@@ -50,19 +48,17 @@ end
 Add a subfield to $F$, represented by a morphism $f: G\to F$ where
 $G$ is the domain of $f$.
 """
-function AddSubfield!(F::T, f::FinFieldMorphism{T, T}) where T <: FinField
+function AddSubfield!(F::T, f::FinFieldMorphism{T,T}) where {T<:FinField}
+  d = degree(domain(f))
+  sub = subfields(F)
 
-    d = degree(domain(f))
-    sub = subfields(F)
-
-    if haskey(sub, d)
-        push!(sub[d], f)
-    else
-        a = FinFieldMorphism{T, T}[f]
-        sub[d] = a
-    end
+  if haskey(sub, d)
+    push!(sub[d], f)
+  else
+    a = FinFieldMorphism{T,T}[f]
+    sub[d] = a
+  end
 end
-
 
 ################################################################################
 #
@@ -83,25 +79,24 @@ any_root(x::PolyRingElem) = -coeff(linear_factor(x), 0)
 
 Compute the minimal polynomial of a linear recurring sequence $a$.
 """
-function berlekamp_massey(a::Vector{Y}, n::Int) where Y <: FieldElem
-
+function berlekamp_massey(a::Vector{Y}, n::Int) where {Y<:FieldElem}
   S, T = polynomial_ring(parent(a[1]), "T")
-  m = 2*n - 1
-  R0 = T^(2*n)
+  m = 2 * n - 1
+  R0 = T^(2 * n)
   R1 = S(reverse(a))
   V0 = S(0)
   V1 = S(1)
 
   while n <= degree(R1)
-    Q, R = divrem(R0,R1)
-    V = V0-Q*V1
+    Q, R = divrem(R0, R1)
+    V = V0 - Q * V1
     V0 = V1
     V1 = V
     R0 = R1
     R1 = R
   end
 
-  return V1*leading_coefficient(V1)^(-1)
+  return V1 * leading_coefficient(V1)^(-1)
 end
 
 @doc raw"""
@@ -111,31 +106,30 @@ Compute the minimal polynomial of the generator of the codomain
 of $f$ over the domain of $f$.
 """
 function generator_minimum_polynomial(f::FinFieldMorphism)
+  E = domain(f)
+  F = codomain(f)
+  d::Int = div(degree(F), degree(E))
+  b = 2 * d
 
-    E = domain(f)
-    F = codomain(f)
-    d::Int = div(degree(F), degree(E))
-    b = 2*d
+  # We define `sec`, the preimage of the morphism `f`
 
-    # We define `sec`, the preimage of the morphism `f`
+  sec = inverse_fn(f)
+  x = gen(F)
+  y = one(F)
 
-    sec = inverse_fn(f)
-    x = gen(F)
-    y = one(F)
+  # We compute the recurring sequence sec(x^j) for j from 0 to 2d - 1
 
-    # We compute the recurring sequence sec(x^j) for j from 0 to 2d - 1
+  A = Array{typeof(x)}(undef, b)
 
-    A = Array{typeof(x)}(undef, b)
+  for j in 1:(b - 1)
+    A[j] = sec(y)
+    y *= x
+  end
+  A[b] = sec(y)
 
-    for j in 1:(b - 1)
-        A[j] = sec(y)
-        y *= x
-    end
-    A[b] = sec(y)
+  # We apply Berlekamp Massey algorithm to the sequence
 
-    # We apply Berlekamp Massey algorithm to the sequence
-
-    return berlekamp_massey(A, d)
+  return berlekamp_massey(A, d)
 end
 
 ################################################################################
@@ -149,20 +143,19 @@ end
 
 If $k$ is embedded in $K$, return the corresponding embedding.
 """
-function is_embedded(k::T, K::T) where T <: FinField
+function is_embedded(k::T, K::T) where {T<:FinField}
+  d = degree(K)
+  ov = overfields(k)
 
-    d = degree(K)
-    ov = overfields(k)
+  # We look for an embedding that has k as domain and K as codomain
 
-    # We look for an embedding that has k as domain and K as codomain
-
-    if haskey(ov, d)
-        for f in ov[d]
-            if domain(f) == k && codomain(f) == K
-                return f
-            end
-        end
+  if haskey(ov, d)
+    for f in ov[d]
+      if domain(f) == k && codomain(f) == K
+        return f
+      end
     end
+  end
 end
 
 @doc raw"""
@@ -170,16 +163,16 @@ end
 
 Embed $k$ in $K$ without worrying about compatibility conditions.
 """
-function embed_any(k::T, K::T) where T <: FinField
+function embed_any(k::T, K::T) where {T<:FinField}
 
-    # We call the Flint algorithms directly, currently this is based on
-    # factorization
+  # We call the Flint algorithms directly, currently this is based on
+  # factorization
 
-    M, N = embed_matrices(k, K)
-    f(x) = embed_pre_mat(x, K, M)
-    inv(y) = embed_pre_mat(y, k, N)
+  M, N = embed_matrices(k, K)
+  f(x) = embed_pre_mat(x, K, M)
+  inv(y) = embed_pre_mat(y, k, N)
 
-    return FinFieldMorphism(k, K, f, inv)
+  return FinFieldMorphism(k, K, f, inv)
 end
 
 @doc raw"""
@@ -187,50 +180,49 @@ end
 
 Returns a compatible embedding from $k$ to $K$.
 """
-function find_morphism(k::T, K::T) where T <: FinField
+function find_morphism(k::T, K::T) where {T<:FinField}
+  S = polynomial_ring(K, "T")[1]
+  Q = S()
+  needy = false
+  m, n = degree(k), degree(K)
 
-    S = polynomial_ring(K, "T")[1]
-    Q = S()
-    needy = false
-    m, n = degree(k), degree(K)
+  # For each common subfield S of k and K, we compute the minimal polynomial
+  # of the canonical generator of k over S, with coefficient seen in K and we
+  # compute the gcd of all these polynomials
 
-    # For each common subfield S of k and K, we compute the minimal polynomial
-    # of the canonical generator of k over S, with coefficient seen in K and we
-    # compute the gcd of all these polynomials
-
-    for l in keys(subfields(k))
-        if haskey(subfields(K), l)
-            f = subfields(k)[l][1]
-            g = subfields(K)[l][1]
-            P = embed_polynomial(generator_minimum_polynomial(f), g)
-            if needy
-                Q = gcd(Q, P)
-            else
-                Q = P
-            end
-            needy = true
-        end
+  for l in keys(subfields(k))
+    if haskey(subfields(K), l)
+      f = subfields(k)[l][1]
+      g = subfields(K)[l][1]
+      P = embed_polynomial(generator_minimum_polynomial(f), g)
+      if needy
+        Q = gcd(Q, P)
+      else
+        Q = P
+      end
+      needy = true
     end
+  end
 
-    # If there is at least one common subfield, we define the embedding from k
-    # to K by sending the canonical generator of k to a root of the gcd
-    # computed above
+  # If there is at least one common subfield, we define the embedding from k
+  # to K by sending the canonical generator of k to a root of the gcd
+  # computed above
 
-    if needy
-        defPol = modulus(k)
-        t = any_root(Q)
-        M, N = embed_matrices_pre(gen(k), t, defPol)
-        f(x) = embed_pre_mat(x, K, M)
-        g(y) = embed_pre_mat(y, k, N)
-        morph = FinFieldMorphism(k, K, f, g)
+  if needy
+    defPol = modulus(k)
+    t = any_root(Q)
+    M, N = embed_matrices_pre(gen(k), t, defPol)
+    f(x) = embed_pre_mat(x, K, M)
+    g(y) = embed_pre_mat(y, k, N)
+    morph = FinFieldMorphism(k, K, f, g)
 
     # If there is no common subfield, there is no compatibility condition to
     # fulfill
-    else
-        morph = embed_any(k, K)
-    end
+  else
+    morph = embed_any(k, K)
+  end
 
-    return morph
+  return morph
 end
 
 @doc raw"""
@@ -239,55 +231,54 @@ end
 Compute the transitive closure.
 """
 function transitive_closure(f::FinFieldMorphism)
+  k = domain(f)
+  K = codomain(f)
 
-    k = domain(f)
-    K = codomain(f)
+  # Subfields
 
-    # Subfields
+  subk = subfields(k)
+  subK = subfields(K)
 
-    subk = subfields(k)
-    subK = subfields(K)
+  # We go through all subfields of k and check if they are also subfields of
+  # K, we add them if they are not
 
-    # We go through all subfields of k and check if they are also subfields of
-    # K, we add them if they are not
+  for d in keys(subk)
+    if !haskey(subK, d)
+      for g in subk[d]
+        t(y) = f(g(y))
+        tinv(x) = inverse_fn(g)(inverse_fn(f)(x))
+        phi = FinFieldMorphism(domain(g), K, t, tinv)
 
-    for d in keys(subk)
-        if !haskey(subK, d)
-            for g in subk[d]
-                t(y) = f(g(y))
-                tinv(x) = inverse_fn(g)(inverse_fn(f)(x))
-                phi = FinFieldMorphism(domain(g), K, t, tinv)
+        AddSubfield!(K, phi)
+        AddOverfield!(domain(g), phi)
+      end
+    else
+      val = [domain(v) for v in subK[d]]
 
-                AddSubfield!(K, phi)
-                AddOverfield!(domain(g), phi)
-            end
-        else
-            val = [domain(v) for v in subK[d]]
+      for g in subk[d]
+        if !(domain(g) in val)
+          t(y) = f(g(y))
+          tinv(x) = inverse_fn(g)(inverse_fn(f)(x))
+          phi = FinFieldMorphism(domain(g), K, t, tinv)
 
-            for g in subk[d]
-                if !(domain(g) in val)
-                    t(y) = f(g(y))
-                    tinv(x) = inverse_fn(g)(inverse_fn(f)(x))
-                    phi = FinFieldMorphism(domain(g), K, t, tinv)
-
-                    AddSubfield!(K, phi)
-                    AddOverfield!(domain(g), phi)
-               end
-            end
+          AddSubfield!(K, phi)
+          AddOverfield!(domain(g), phi)
         end
+      end
     end
+  end
 
-    # Overfields
+  # Overfields
 
-    ov = overfields(K)
+  ov = overfields(K)
 
-    # We call the same procedure on the overfields
+  # We call the same procedure on the overfields
 
-    for d in keys(ov)
-        for g in ov[d]
-            transitive_closure(g)
-        end
+  for d in keys(ov)
+    for g in ov[d]
+      transitive_closure(g)
     end
+  end
 end
 
 @doc raw"""
@@ -296,64 +287,63 @@ end
 For each subfield $S$ of $K$, embed $I$ in $S$ and $k$, where $I$ is the intersection
 between $S$ and $k$.
 """
-function intersections(k::T, K::T) where T <: FinField
+function intersections(k::T, K::T) where {T<:FinField}
+  d = degree(k)
+  subk = subfields(k)
+  subK = subfields(K)
+  needmore = true
 
-    d = degree(k)
-    subk = subfields(k)
-    subK = subfields(K)
-    needmore = true
+  # We loop through the subfields of K and we have different cases
+  for l in keys(subK)
+    c = gcd(d, l)
 
-    # We loop through the subfields of K and we have different cases
-    for l in keys(subK)
-        c = gcd(d, l)
+    # The intersection may be trivial, I = F_p
+    if c == 1
 
-        # The intersection may be trivial, I = F_p
-        if c == 1
+      # I = k, so k is a subfield of S and we embed k in S
+      # In that case, we finally have the embeddings k in S and S in K, so by
+      # transitive closure we have k in K and we do not need more work
+    elseif c == d
+      for g in subK[l]
+        embed(k, domain(g))
+      end
+      needmore = false
 
-        # I = k, so k is a subfield of S and we embed k in S
-        # In that case, we finally have the embeddings k in S and S in K, so by
-        # transitive closure we have k in K and we do not need more work
-        elseif c == d
-            for g in subK[l]
-                embed(k, domain(g))
-            end
-            needmore = false
+      # I = S, so S is a subfield of k, and we embed S in k
+    elseif c == l
+      for g in subK[l]
+        embed(domain(g), k)
+      end
 
-        # I = S, so S is a subfield of k, and we embed S in k
-        elseif c == l
-            for g in subK[l]
-                embed(domain(g), k)
-            end
+      # If I is a subfield of k, we embed it in S
+    elseif haskey(subk, c)
+      L = domain(subk[c][1])
+      for h in subK[l]
+        embed(L, domain(h))
+      end
 
-        # If I is a subfield of k, we embed it in S
-        elseif haskey(subk, c)
-            L = domain(subk[c][1])
-            for h in subK[l]
-                embed(L, domain(h))
-            end
+      # If I is a subfield of K, we embed it in k and S
+    elseif haskey(subK, c)
+      L = domain(subK[c][1])
+      embed(L, k)
+      for h in subK[l]
+        embed(L, domain(h))
+      end
 
-        # If I is a subfield of K, we embed it in k and S
-        elseif haskey(subK, c)
-            L = domain(subK[c][1])
-            embed(L, k)
-            for h in subK[l]
-                embed(L, domain(h))
-            end
-
-        # Otherwise it means that there is no field I around so we create one
-        # and we embed it in k and S
-        else
-            # kc of same type as k but degree c
-            kc = similar(k, c, string("x", c))
-            embed(kc, k)
-            for g in subK[l]
-                embed(kc, domain(g))
-            end
-        end
+      # Otherwise it means that there is no field I around so we create one
+      # and we embed it in k and S
+    else
+      # kc of same type as k but degree c
+      kc = similar(k, c, string("x", c))
+      embed(kc, k)
+      for g in subK[l]
+        embed(kc, domain(g))
+      end
     end
+  end
 
-    # We return a boolean to tell if some more work needs to be done
-    return needmore
+  # We return a boolean to tell if some more work needs to be done
+  return needmore
 end
 
 @doc raw"""
@@ -362,68 +352,65 @@ end
 Embed $k$ in $K$, with some additional computations in order to satisfy
 compatibility conditions with previous and future embeddings.
 """
-function embed(k::T, K::T) where T <: FinField
+function embed(k::T, K::T) where {T<:FinField}
+  degree(K) % degree(k) != 0 && error("Embedding impossible")
 
-    degree(K) % degree(k) != 0 && error("Embedding impossible")
+  # Special cases of k == K or degree(k) == 1
 
-    # Special cases of k == K or degree(k) == 1
-
-    if k == K
-        morph = FinFieldMorphism(k, k, identity, identity)
-        return morph
-
-    elseif degree(k) == 1
-        f(x) = K(k isa FqField ? _coeff(x, 0) : coeff(x, 0))
-        finv(y) = k(k isa FqField ? _coeff(y, 0) : coeff(y, 0))
-        morph = FinFieldMorphism(k, K, f, finv)
-        return morph
-    end
-
-    # If k is already embedded in K, we return the corresponding embedding
-
-    tr = is_embedded(k, K)
-    if tr !== nothing
-        return tr
-    end
-
-    # If the finite fields are different but have the same degree, we check that
-    # the embedding in the other direction does not exist. This is done in order
-    # to prevent the creation of loops in the lattice
-
-    if degree(k) == degree(K)
-        tr = is_embedded(K, k)
-        if tr !== nothing
-            morph = FinFieldMorphism(k, K, inverse_fn(tr), image_fn(tr))
-            return morph
-        end
-    end
-
-    # Prior to embed k in K, we compute the needed embeddings
-    # The embedding might be computed during the process !
-
-    needmore = intersections(k, K) # recursive calls to embed
-
-
-    morph = is_embedded(k,K)
-
-    # If the embedding has already been computing, we return it
-    isnothing(morph) || return morph
-
-    # And, if the wanted embeddings has not been computed during the process, we
-    # finally compute a compatible embedding
-
-
-    morph = find_morphism(k, K)
-
-    # We add it to the over and sub fields of k and K
-    AddOverfield!(k, morph)
-    AddSubfield!(K, morph)
-
-    # We compute the transitive closure induced by the new embedding
-    transitive_closure(morph)
-
-    # And return the embedding
+  if k == K
+    morph = FinFieldMorphism(k, k, identity, identity)
     return morph
+
+  elseif degree(k) == 1
+    f(x) = K(k isa FqField ? _coeff(x, 0) : coeff(x, 0))
+    finv(y) = k(k isa FqField ? _coeff(y, 0) : coeff(y, 0))
+    morph = FinFieldMorphism(k, K, f, finv)
+    return morph
+  end
+
+  # If k is already embedded in K, we return the corresponding embedding
+
+  tr = is_embedded(k, K)
+  if tr !== nothing
+    return tr
+  end
+
+  # If the finite fields are different but have the same degree, we check that
+  # the embedding in the other direction does not exist. This is done in order
+  # to prevent the creation of loops in the lattice
+
+  if degree(k) == degree(K)
+    tr = is_embedded(K, k)
+    if tr !== nothing
+      morph = FinFieldMorphism(k, K, inverse_fn(tr), image_fn(tr))
+      return morph
+    end
+  end
+
+  # Prior to embed k in K, we compute the needed embeddings
+  # The embedding might be computed during the process !
+
+  needmore = intersections(k, K) # recursive calls to embed
+
+  morph = is_embedded(k, K)
+
+  # If the embedding has already been computing, we return it
+  isnothing(morph) || return morph
+
+  # And, if the wanted embeddings has not been computed during the process, we
+  # finally compute a compatible embedding
+
+  morph = find_morphism(k, K)
+
+  # We add it to the over and sub fields of k and K
+  AddOverfield!(k, morph)
+  AddSubfield!(K, morph)
+
+  # We compute the transitive closure induced by the new embedding
+  transitive_closure(morph)
+
+  # And return the embedding
+  return morph
 end
 
 function embed(k::Nemo.fpField, K::fqPolyRepField)
@@ -441,9 +428,9 @@ end
 
 Computes the preimage map corresponding to the embedding of $k$ into $K$.
 """
-function preimage_map(k::T, K::T) where T <: FinField
-    f = embed(k, K)
-    return preimage_map(f)
+function preimage_map(k::T, K::T) where {T<:FinField}
+  f = embed(k, K)
+  return preimage_map(f)
 end
 
-preimage(f::FinFieldMorphism{S, T}, x::T) where {S <: FinField, T <: FinField} = preimage_map(f)(x)
+preimage(f::FinFieldMorphism{S,T}, x::T) where {S<:FinField,T<:FinField} = preimage_map(f)(x)

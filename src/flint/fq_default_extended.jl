@@ -101,18 +101,18 @@ function defining_polynomial(R::FqPolyRing, K::FqField)
   coefficient_ring(R) !== base_field(K) && error("Coefficient ring must be base field of finite field")
   f = defining_polynomial(K) # this is cached
   if parent(f) === R
-     return f
+    return f
   else
-     g = deepcopy(f)
-     g.parent = R
-     return g
+    g = deepcopy(f)
+    g.parent = R
+    return g
   end
 end
 
 function defining_polynomial(K::FqField)
   if !isdefined(K, :defining_poly)
     @assert K.isstandard
-    F, = polynomial_ring(prime_field(K), "x", cached = false)
+    F, = polynomial_ring(prime_field(K), "x"; cached=false)
     K.defining_poly = F(map(lift, collect(coefficients(modulus(K)))))
   end
   return K.defining_poly::FqPolyRingElem
@@ -252,10 +252,10 @@ true
 ```
 """
 function coeff(x::FqFieldElem, n::Int)
-   if is_absolute(parent(x))
-     return base_field(parent(x))(_coeff(x, n))
-   end
-   return coeff(_as_poly(x), n)
+  if is_absolute(parent(x))
+    return base_field(parent(x))(_coeff(x, n))
+  end
+  return coeff(_as_poly(x), n)
 end
 
 ################################################################################
@@ -272,15 +272,15 @@ the order of the base field. By default the Frobenius map is applied $n =
 1$
 times if $n$ is not specified.
 """
-function frobenius(x::FqFieldElem, n = 1)
-   # we want x -> x^#base_field
-   z = parent(x)()
-   if is_absolute(parent(x))
-     m = n
-   else
-     m = n * absolute_degree(base_field(parent(x)))
-   end
-   return _frobenius(x, m)
+function frobenius(x::FqFieldElem, n=1)
+  # we want x -> x^#base_field
+  z = parent(x)()
+  if is_absolute(parent(x))
+    m = n
+  else
+    m = n * absolute_degree(base_field(parent(x)))
+  end
+  return _frobenius(x, m)
 end
 
 @doc raw"""
@@ -290,7 +290,7 @@ Return the iterated absolute Frobenius $x^{p^n}$, where $p$ is the
 characteristic of the parent of $x$. By default the Frobenius map is
 applied $n = 1$ times if $n$ is not specified.
 """
-function absolute_frobenius(x::FqFieldElem, n = 1)
+function absolute_frobenius(x::FqFieldElem, n=1)
   return _frobenius(x, n)
 end
 
@@ -333,7 +333,7 @@ end
 ################################################################################
 
 function minpoly(a::FqFieldElem)
-  return minpoly(polynomial_ring(base_field(parent(a)), "x", cached = false)[1], a)
+  return minpoly(polynomial_ring(base_field(parent(a)), "x"; cached=false)[1], a)
 end
 
 function minpoly(Rx::FqPolyRing, a::FqFieldElem)
@@ -344,17 +344,17 @@ function minpoly(Rx::FqPolyRing, a::FqFieldElem)
     push!(c, fa)
     fa = frobenius(fa)
   end
-  St = polynomial_ring(parent(a), "x", cached = false)[1]
-  f = prod([gen(St) - x for x = c], init = one(St))
+  St = polynomial_ring(parent(a), "x"; cached=false)[1]
+  f = prod([gen(St) - x for x in c]; init=one(St))
   g = Rx()
-  for i = 0:degree(f)
+  for i in 0:degree(f)
     setcoeff!(g, i, _coerce_to_base_field(coeff(f, i)))
   end
   return g
 end
 
 function absolute_minpoly(a::FqFieldElem)
-  return absolute_minpoly(polynomial_ring(prime_field(parent(a)), "x", cached = false)[1], a)
+  return absolute_minpoly(polynomial_ring(prime_field(parent(a)), "x"; cached=false)[1], a)
 end
 
 function absolute_minpoly(Rx::FqPolyRing, a::FqFieldElem)
@@ -365,10 +365,10 @@ function absolute_minpoly(Rx::FqPolyRing, a::FqFieldElem)
     push!(c, fa)
     fa = absolute_frobenius(fa)
   end
-  St = polynomial_ring(parent(a), "x", cached = false)[1]
-  f = prod([gen(St) - x for x = c], init = one(St))
+  St = polynomial_ring(parent(a), "x"; cached=false)[1]
+  f = prod([gen(St) - x for x in c]; init=one(St))
   g = Rx()
-  for i = 0:degree(f)
+  for i in 0:degree(f)
     setcoeff!(g, i, _coerce_to_prime_field(coeff(f, i)))
   end
   return g
@@ -381,7 +381,7 @@ end
 ################################################################################
 
 function charpoly(a::FqFieldElem)
-  return charpoly(polynomial_ring(base_field(parent(a)), "x", cached = false)[1], a)
+  return charpoly(polynomial_ring(base_field(parent(a)), "x"; cached=false)[1], a)
 end
 
 function charpoly(Rx::FqPolyRing, a::FqFieldElem)
@@ -391,7 +391,7 @@ function charpoly(Rx::FqPolyRing, a::FqFieldElem)
 end
 
 function absolute_charpoly(a::FqFieldElem)
-  return absolute_charpoly(polynomial_ring(prime_field(parent(a)), "x", cached = false)[1], a)
+  return absolute_charpoly(polynomial_ring(prime_field(parent(a)), "x"; cached=false)[1], a)
 end
 
 function absolute_charpoly(Rx::FqPolyRing, a::FqFieldElem)
@@ -472,9 +472,9 @@ function _embed(K::FqField, L::FqField)
     # must be absolute minpoly
     g = absolute_minpoly(_gen(K))
     e = _embed(prime_field(K), L)
-    a = roots(map_coefficients(e, g, cached = false))[1]
+    a = roots(map_coefficients(e, g; cached=false))[1]
     return x -> begin
-      return sum(_coeff(x, i)*a^i for i in 0:(absolute_degree(K) - 1))
+      return sum(_coeff(x, i) * a^i for i in 0:(absolute_degree(K) - 1))
     end::FqFieldElem
   end
 end
@@ -486,26 +486,30 @@ end
 ################################################################################
 
 struct _fq_default_dummy
-  a
+  a::Any
 end
 
-function expressify(a::_fq_default_dummy; context = nothing)
-   x = a.a.parent.var
-   d = _degree(a.a.parent)
+function expressify(a::_fq_default_dummy; context=nothing)
+  x = a.a.parent.var
+  d = _degree(a.a.parent)
 
-   sum = Expr(:call, :+)
-   for k in (d - 1):-1:0
-        c = _coeff(a.a, k)
-        iszero(c) && continue
-        xk = k < 1 ? 1 : k == 1 ? x : Expr(:call, :^, x, k)
-        push!(sum.args, isone(c) ? Expr(:call, :*, xk) :
-                         Expr(:call, :*, expressify(c, context = context), xk))
+  sum = Expr(:call, :+)
+  for k in (d - 1):-1:0
+    c = _coeff(a.a, k)
+    iszero(c) && continue
+    xk = if k < 1
+      1
+    elseif k == 1
+      x
+    else
+      Expr(:call, :^, x, k)
     end
-    return sum
+    push!(sum.args, isone(c) ? Expr(:call, :*, xk) : Expr(:call, :*, expressify(c; context=context), xk))
+  end
+  return sum
 end
 
-show_raw(io::IO, a::FqFieldElem) =
-  println(io, AbstractAlgebra.obj_to_string(_fq_default_dummy(a), context = io))
+show_raw(io::IO, a::FqFieldElem) = println(io, AbstractAlgebra.obj_to_string(_fq_default_dummy(a); context=io))
 
 ################################################################################
 #
@@ -545,8 +549,8 @@ function _fq_field_from_fmpz_mod_poly_in_disguise(f::FqPolyRingElem, s::Symbol)
   #   finalizer(_FqDefaultFiniteField_clear_fn, z)
   # end
   _K = _get_raw_type(FpField, K)
-  ff = map_coefficients(c -> _K(lift(ZZ, c)), f; cached = false)
-  z = FqField(ff, s, false; check = false)
+  ff = map_coefficients(c -> _K(lift(ZZ, c)), f; cached=false)
+  z = FqField(ff, s, false; check=false)
 
   z.isabsolute = true
   z.isstandard = true
@@ -554,15 +558,13 @@ function _fq_field_from_fmpz_mod_poly_in_disguise(f::FqPolyRingElem, s::Symbol)
   z.defining_poly = f
   z.forwardmap = g -> begin
     y = FqFieldElem(z)
-    ccall((:fq_default_set_fmpz_mod_poly, libflint), Nothing,
-          (Ref{FqFieldElem}, Ref{FqPolyRingElem}, Ref{FqField}), y, g, z)
+    ccall((:fq_default_set_fmpz_mod_poly, libflint), Nothing, (Ref{FqFieldElem}, Ref{FqPolyRingElem}, Ref{FqField}), y, g, z)
     @assert parent(y) === z
     return y
   end
-  z.backwardmap = function(g, R = parent(f))
+  z.backwardmap = function (g, R=parent(f))
     y = R()
-    ccall((:fq_default_get_fmpz_mod_poly, libflint), Nothing,
-          (Ref{FqPolyRingElem}, Ref{FqFieldElem}, Ref{FqField}), y, g, z)
+    ccall((:fq_default_get_fmpz_mod_poly, libflint), Nothing, (Ref{FqPolyRingElem}, Ref{FqFieldElem}, Ref{FqField}), y, g, z)
     return y
   end
   return z
@@ -578,9 +580,7 @@ function _fq_field_from_nmod_poly_in_disguise(f::FqPolyRingElem, s::Symbol)
   z.var = string(s)
   ss = string(s)
   GC.@preserve ss begin
-    ccall((:fq_default_ctx_init_modulus_nmod, libflint), Nothing,
-          (Ref{FqField}, Ref{FqPolyRingElem}, Ptr{UInt8}),
-                z, f, ss)
+    ccall((:fq_default_ctx_init_modulus_nmod, libflint), Nothing, (Ref{FqField}, Ref{FqPolyRingElem}, Ptr{UInt8}), z, f, ss)
     finalizer(_FqDefaultFiniteField_clear_fn, z)
   end
   z.isabsolute = true
@@ -589,22 +589,20 @@ function _fq_field_from_nmod_poly_in_disguise(f::FqPolyRingElem, s::Symbol)
   z.defining_poly = f
   z.forwardmap = g -> begin
     y = FqFieldElem(z)
-    ccall((:fq_default_set_nmod_poly, libflint), Nothing,
-          (Ref{FqFieldElem}, Ref{FqPolyRingElem}, Ref{FqField}), y, g, z)
+    ccall((:fq_default_set_nmod_poly, libflint), Nothing, (Ref{FqFieldElem}, Ref{FqPolyRingElem}, Ref{FqField}), y, g, z)
     return y
   end
-  z.backwardmap = function(g, R = parent(f))
+  z.backwardmap = function (g, R=parent(f))
     y = R()
-    ccall((:fq_default_get_nmod_poly, libflint), Nothing,
-          (Ref{FqPolyRingElem}, Ref{FqFieldElem}, Ref{FqField}), y, g, z)
+    ccall((:fq_default_get_nmod_poly, libflint), Nothing, (Ref{FqPolyRingElem}, Ref{FqFieldElem}, Ref{FqField}), y, g, z)
     return y
   end
   return z
 end
 
-const FqDefaultFiniteFieldIDFqDefaultPoly = CacheDictType{Tuple{FqPolyRingElem, Symbol, Bool}, FqField}()
+const FqDefaultFiniteFieldIDFqDefaultPoly = CacheDictType{Tuple{FqPolyRingElem,Symbol,Bool},FqField}()
 
-function FqField(f::FqPolyRingElem, s::Symbol, cached::Bool = false, absolute::Bool = false)
+function FqField(f::FqPolyRingElem, s::Symbol, cached::Bool=false, absolute::Bool=false)
   return get_cached!(FqDefaultFiniteFieldIDFqDefaultPoly, (f, s, absolute), cached) do
     K = base_ring(f)
     if absolute_degree(K) == 1
@@ -631,11 +629,11 @@ function FqField(f::FqPolyRingElem, s::Symbol, cached::Bool = false, absolute::B
       # First embed K into L
       e = _embed(K, L)
       # Push f to L
-			Lx, _ = polynomial_ring(L, "\$", cached = false)
-      foverL = map_coefficients(e, f, parent = Lx)
+      Lx, _ = polynomial_ring(L, "\$"; cached=false)
+      foverL = map_coefficients(e, f; parent=Lx)
       a = roots(foverL)[1]
       # Found the map K[x]/(f) -> L
-      forwardmap = y -> evaluate(map_coefficients(e, y, parent = Lx), a)
+      forwardmap = y -> evaluate(map_coefficients(e, y; parent=Lx), a)
       Kabs = _absolute_basis(K)
       Fp = prime_field(K)
       # We have no natural coercion Fp -> K
@@ -656,11 +654,11 @@ function FqField(f::FqPolyRingElem, s::Symbol, cached::Bool = false, absolute::B
         end
       end
       forwardmatinv = inv(forwardmat)
-      backwardmap = function(y, R = parent(f))
+      backwardmap = function (y, R=parent(f))
         w = matrix(Fp, 1, d, [_coeff(y, j - 1) for j in 1:d])
         ww = [Fp(_coeff(y, j - 1)) for j in 1:d]
         _abs_gen_rel = zero(R)
-        fl, vv = can_solve_with_solution(forwardmat, w, side = :left)
+        fl, vv = can_solve_with_solution(forwardmat, w; side=:left)
         vvv = ww * forwardmatinv
         @assert fl
         l = 1
@@ -674,7 +672,7 @@ function FqField(f::FqPolyRingElem, s::Symbol, cached::Bool = false, absolute::B
       end
       backwardmap_basefield = y -> begin
         w = matrix(Fp, 1, d, [_coeff(y, j - 1) for j in 1:d])
-        fl, vv = can_solve_with_solution(forwardmat, w, side = :left)
+        fl, vv = can_solve_with_solution(forwardmat, w; side=:left)
         @assert fl
         return sum(eabs(vv[1, i]) * Kabs[i] for i in 1:absolute_degree(K))
       end
@@ -735,7 +733,7 @@ end
 ################################################################################
 
 # Note: the modulus might be rescaled to be monic
-function _residue_field(f::FqPolyRingElem, s = "o"; absolute::Bool = false, check::Bool = true)
+function _residue_field(f::FqPolyRingElem, s="o"; absolute::Bool=false, check::Bool=true)
   if check
     !is_irreducible(f) && throw(ArgumentError("Polynomial must be irreducible"))
   end
@@ -743,11 +741,11 @@ function _residue_field(f::FqPolyRingElem, s = "o"; absolute::Bool = false, chec
   return F, FqPolyRingToFqField(parent(f), F)
 end
 
-@attributes mutable struct FqPolyRingToFqField <: Map{FqPolyRing, FqField, SetMap, FqPolyRingToFqField}
+@attributes mutable struct FqPolyRingToFqField <: Map{FqPolyRing,FqField,SetMap,FqPolyRingToFqField}
   D::FqPolyRing
   C::FqField
-  f# the actual map
-  g# the inverse
+  f::Any# the actual map
+  g::Any# the inverse
 
   function FqPolyRingToFqField(R::FqPolyRing, F::FqField)
     z = new(R, F, F.forwardmap, F.backwardmap)
@@ -782,14 +780,12 @@ function (F::FqField)(p::FqPolyRingElem)
     characteristic(base_ring(p)) != characteristic(F) && error("Polynomial has wrong coefficient ring")
     if _fq_default_ctx_type(K) == _FQ_DEFAULT_NMOD
       y = FqFieldElem(F)
-      ccall((:fq_default_set_nmod_poly, libflint), Nothing,
-            (Ref{FqFieldElem}, Ref{FqPolyRingElem}, Ref{FqField}), y, p, F)
+      ccall((:fq_default_set_nmod_poly, libflint), Nothing, (Ref{FqFieldElem}, Ref{FqPolyRingElem}, Ref{FqField}), y, p, F)
       return y
     else
       @assert _fq_default_ctx_type(K) == _FQ_DEFAULT_FMPZ_NMOD
       y = FqFieldElem(F)
-      ccall((:fq_default_set_fmpz_mod_poly, libflint), Nothing,
-            (Ref{FqFieldElem}, Ref{FqPolyRingElem}, Ref{FqField}), y, p, F)
+      ccall((:fq_default_set_fmpz_mod_poly, libflint), Nothing, (Ref{FqFieldElem}, Ref{FqPolyRingElem}, Ref{FqField}), y, p, F)
       return y
     end
   end
@@ -807,15 +803,11 @@ function _lift_standard(R::FqPolyRing, a::FqFieldElem)
   p = R()
   @assert F === base_field(parent(a))
   if _fq_default_ctx_type(F) == _FQ_DEFAULT_NMOD
-    ccall((:fq_default_get_nmod_poly, libflint), Nothing,
-          (Ref{FqPolyRingElem}, Ref{FqFieldElem}, Ref{FqField}),
-          p, a, K)
+    ccall((:fq_default_get_nmod_poly, libflint), Nothing, (Ref{FqPolyRingElem}, Ref{FqFieldElem}, Ref{FqField}), p, a, K)
     return p
   else
     @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FMPZ_NMOD
-    ccall((:fq_default_get_fmpz_mod_poly, libflint), Nothing,
-          (Ref{FqPolyRingElem}, Ref{FqFieldElem}, Ref{FqField}),
-          p, a, K)
+    ccall((:fq_default_get_fmpz_mod_poly, libflint), Nothing, (Ref{FqPolyRingElem}, Ref{FqFieldElem}, Ref{FqField}), p, a, K)
     return p
   end
 end
@@ -827,8 +819,7 @@ Given a polynomial ring over the base field of the parent of `a`, return a lift
 such that `parent(a)(lift(R, a)) == a` is `true`.
 """
 function lift(R::FqPolyRing, a::FqFieldElem)
-  base_ring(R) !== base_field(parent(a)) &&
-      error("Polynomial ring has wrong coefficient ring")
+  base_ring(R) !== base_field(parent(a)) && error("Polynomial ring has wrong coefficient ring")
   K = parent(a)
   if isdefined(K, :backwardmap)
     return K.backwardmap(a)

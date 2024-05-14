@@ -50,11 +50,11 @@ function deepcopy_internal(a::RealFieldElem, dict::IdDict)
 end
 
 function canonical_unit(x::RealFieldElem)
-   return x
+  return x
 end
 
 function check_parent(a::RealFieldElem, b::RealFieldElem)
-   return true
+  return true
 end
 
 characteristic(::RealField) = 0
@@ -94,35 +94,28 @@ end
 function _arb_get_arf(x::RealFieldElem, ::RoundingMode{:Nearest})
   t = arf_struct()
   GC.@preserve x begin
-    t1 = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct},
-               (Ref{RealFieldElem}, ),
-               x)
-    ccall((:arf_set, libflint), Nothing,
-          (Ref{arf_struct}, Ptr{arf_struct}),
-          t, t1)
+    t1 = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (Ref{RealFieldElem},), x)
+    ccall((:arf_set, libflint), Nothing, (Ref{arf_struct}, Ptr{arf_struct}), t, t1)
   end
   return t
 end
 
-for (b, f) in ((RoundingMode{:Down}, :arb_get_lbound_arf),
-               (RoundingMode{:Up}, :arb_get_ubound_arf))
+for (b, f) in ((RoundingMode{:Down}, :arb_get_lbound_arf), (RoundingMode{:Up}, :arb_get_ubound_arf))
   @eval begin
-    function _arb_get_arf(x::RealFieldElem, ::$b, prec::Int = precision(Balls))
+    function _arb_get_arf(x::RealFieldElem, ::$b, prec::Int=precision(Balls))
       t = arf_struct()
-      ccall(($(string(f)), libflint), Nothing,
-            (Ref{arf_struct}, Ref{RealFieldElem}, Int),
-            t, x, prec)
+      ccall(($(string(f)), libflint), Nothing, (Ref{arf_struct}, Ref{RealFieldElem}, Int), t, x, prec)
       return t
     end
   end
 end
 
 function convert(::Type{Float64}, x::RealFieldElem)
-    return Float64(x)
+  return Float64(x)
 end
 
 function convert(::Type{BigFloat}, x::RealFieldElem)
-    return BigFloat(x)
+  return BigFloat(x)
 end
 
 @doc raw"""
@@ -132,18 +125,17 @@ Return $x$ as an `ZZRingElem` if it represents an unique integer, else throws an
 error.
 """
 function ZZRingElem(x::RealFieldElem)
-   if is_exact(x)
-      ok, z = unique_integer(x)
-      ok && return z
-   end
-   error("Argument must represent a unique integer")
+  if is_exact(x)
+    ok, z = unique_integer(x)
+    ok && return z
+  end
+  error("Argument must represent a unique integer")
 end
 
 BigInt(x::RealFieldElem) = BigInt(ZZRingElem(x))
 
-function (::Type{T})(x::RealFieldElem) where {T <: Integer}
-  typemin(T) <= x <= typemax(T) ||
-      error("Argument does not fit inside datatype.")
+function (::Type{T})(x::RealFieldElem) where {T<:Integer}
+  typemin(T) <= x <= typemax(T) || error("Argument does not fit inside datatype.")
   return T(ZZRingElem(x))
 end
 
@@ -154,29 +146,25 @@ end
 ################################################################################
 
 function native_string(x::RealFieldElem)
-   d = ceil(precision(Balls) * 0.30102999566398119521)
-   cstr = ccall((:arb_get_str, libflint), Ptr{UInt8},
-                (Ref{RealFieldElem}, Int, UInt),
-                x, Int(d), UInt(0))
-   res = unsafe_string(cstr)
-   ccall((:flint_free, libflint), Nothing,
-         (Ptr{UInt8},),
-         cstr)
-   return res
+  d = ceil(precision(Balls) * 0.30102999566398119521)
+  cstr = ccall((:arb_get_str, libflint), Ptr{UInt8}, (Ref{RealFieldElem}, Int, UInt), x, Int(d), UInt(0))
+  res = unsafe_string(cstr)
+  ccall((:flint_free, libflint), Nothing, (Ptr{UInt8},), cstr)
+  return res
 end
 
-function expressify(x::RealFieldElem; context = nothing)
-   if is_exact(x) && is_negative(x)
-      # TODO is_exact does not imply it is printed without radius
-      return Expr(:call, :-, native_string(-x))
-   else
-      return native_string(x)
-   end
+function expressify(x::RealFieldElem; context=nothing)
+  if is_exact(x) && is_negative(x)
+    # TODO is_exact does not imply it is printed without radius
+    return Expr(:call, :-, native_string(-x))
+  else
+    return native_string(x)
+  end
 end
 
 function show(io::IO, x::RealField)
   # deliberately no @show_name or @show_special here as this is a singleton type
-   if is_terse(io)
+  if is_terse(io)
     print(io, LowercaseOff(), "RR")
   else
     print(io, "Real field")
@@ -184,7 +172,7 @@ function show(io::IO, x::RealField)
 end
 
 function show(io::IO, x::RealFieldElem)
-   print(io, native_string(x))
+  print(io, native_string(x))
 end
 
 ################################################################################
@@ -250,7 +238,7 @@ contains(x::RealFieldElem, y::Integer) = contains(x, ZZRingElem(y))
 Returns `true` if the ball $x$ contains the given rational value, otherwise
 return `false`.
 """
-contains(x::RealFieldElem, y::Rational{T}) where {T <: Integer} = contains(x, QQFieldElem(y))
+contains(x::RealFieldElem, y::Rational{T}) where {T<:Integer} = contains(x, QQFieldElem(y))
 
 @doc raw"""
     contains(x::RealFieldElem, y::BigFloat)
@@ -259,8 +247,7 @@ Returns `true` if the ball $x$ contains the given floating point value,
 otherwise return `false`.
 """
 function contains(x::RealFieldElem, y::BigFloat)
-  r = ccall((:arb_contains_mpfr, libflint), Cint,
-              (Ref{RealFieldElem}, Ref{BigFloat}), x, y)
+  r = ccall((:arb_contains_mpfr, libflint), Cint, (Ref{RealFieldElem}, Ref{BigFloat}), x, y)
   return Bool(r)
 end
 
@@ -281,8 +268,8 @@ end
 Returns `true` if the ball $x$ contains zero, otherwise return `false`.
 """
 function contains_zero(x::RealFieldElem)
-   r = ccall((:arb_contains_zero, libflint), Cint, (Ref{RealFieldElem}, ), x)
-   return Bool(r)
+  r = ccall((:arb_contains_zero, libflint), Cint, (Ref{RealFieldElem},), x)
+  return Bool(r)
 end
 
 @doc raw"""
@@ -292,8 +279,8 @@ Returns `true` if the ball $x$ contains any negative value, otherwise return
 `false`.
 """
 function contains_negative(x::RealFieldElem)
-   r = ccall((:arb_contains_negative, libflint), Cint, (Ref{RealFieldElem}, ), x)
-   return Bool(r)
+  r = ccall((:arb_contains_negative, libflint), Cint, (Ref{RealFieldElem},), x)
+  return Bool(r)
 end
 
 @doc raw"""
@@ -303,8 +290,8 @@ Returns `true` if the ball $x$ contains any positive value, otherwise return
 `false`.
 """
 function contains_positive(x::RealFieldElem)
-   r = ccall((:arb_contains_positive, libflint), Cint, (Ref{RealFieldElem}, ), x)
-   return Bool(r)
+  r = ccall((:arb_contains_positive, libflint), Cint, (Ref{RealFieldElem},), x)
+  return Bool(r)
 end
 
 @doc raw"""
@@ -314,8 +301,8 @@ Returns `true` if the ball $x$ contains any non-negative value, otherwise
 return `false`.
 """
 function contains_nonnegative(x::RealFieldElem)
-   r = ccall((:arb_contains_nonnegative, libflint), Cint, (Ref{RealFieldElem}, ), x)
-   return Bool(r)
+  r = ccall((:arb_contains_nonnegative, libflint), Cint, (Ref{RealFieldElem},), x)
+  return Bool(r)
 end
 
 @doc raw"""
@@ -325,8 +312,8 @@ Returns `true` if the ball $x$ contains any nonpositive value, otherwise
 return `false`.
 """
 function contains_nonpositive(x::RealFieldElem)
-   r = ccall((:arb_contains_nonpositive, libflint), Cint, (Ref{RealFieldElem}, ), x)
-   return Bool(r)
+  r = ccall((:arb_contains_nonpositive, libflint), Cint, (Ref{RealFieldElem},), x)
+  return Bool(r)
 end
 
 ################################################################################
@@ -347,19 +334,19 @@ function isequal(x::RealFieldElem, y::RealFieldElem)
 end
 
 function ==(x::RealFieldElem, y::RealFieldElem)
-    return Bool(ccall((:arb_eq, libflint), Cint, (Ref{RealFieldElem}, Ref{RealFieldElem}), x, y))
+  return Bool(ccall((:arb_eq, libflint), Cint, (Ref{RealFieldElem}, Ref{RealFieldElem}), x, y))
 end
 
 function !=(x::RealFieldElem, y::RealFieldElem)
-    return Bool(ccall((:arb_ne, libflint), Cint, (Ref{RealFieldElem}, Ref{RealFieldElem}), x, y))
+  return Bool(ccall((:arb_ne, libflint), Cint, (Ref{RealFieldElem}, Ref{RealFieldElem}), x, y))
 end
 
 function isless(x::RealFieldElem, y::RealFieldElem)
-    return Bool(ccall((:arb_lt, libflint), Cint, (Ref{RealFieldElem}, Ref{RealFieldElem}), x, y))
+  return Bool(ccall((:arb_lt, libflint), Cint, (Ref{RealFieldElem}, Ref{RealFieldElem}), x, y))
 end
 
 function <=(x::RealFieldElem, y::RealFieldElem)
-    return Bool(ccall((:arb_le, libflint), Cint, (Ref{RealFieldElem}, Ref{RealFieldElem}), x, y))
+  return Bool(ccall((:arb_le, libflint), Cint, (Ref{RealFieldElem}, Ref{RealFieldElem}), x, y))
 end
 
 ==(x::RealFieldElem, y::Int) = x == RealFieldElem(y)
@@ -386,7 +373,6 @@ end
 !=(x::RealFieldElem, y::Integer) = x != ZZRingElem(y)
 <=(x::RealFieldElem, y::Integer) = x <= ZZRingElem(y)
 <(x::RealFieldElem, y::Integer) = x < ZZRingElem(y)
-
 
 ==(x::Integer, y::RealFieldElem) = ZZRingElem(x) == y
 !=(x::Integer, y::RealFieldElem) = ZZRingElem(x) != y
@@ -423,15 +409,15 @@ end
 <=(x::QQFieldElem, y::RealFieldElem) = RealFieldElem(x, precision(Balls)) <= y
 <(x::QQFieldElem, y::RealFieldElem) = RealFieldElem(x, precision(Balls)) < y
 
-==(x::RealFieldElem, y::Rational{T}) where {T <: Integer} = x == QQFieldElem(y)
-!=(x::RealFieldElem, y::Rational{T}) where {T <: Integer} = x != QQFieldElem(y)
-<=(x::RealFieldElem, y::Rational{T}) where {T <: Integer} = x <= QQFieldElem(y)
-<(x::RealFieldElem, y::Rational{T}) where {T <: Integer} = x < QQFieldElem(y)
+==(x::RealFieldElem, y::Rational{T}) where {T<:Integer} = x == QQFieldElem(y)
+!=(x::RealFieldElem, y::Rational{T}) where {T<:Integer} = x != QQFieldElem(y)
+<=(x::RealFieldElem, y::Rational{T}) where {T<:Integer} = x <= QQFieldElem(y)
+<(x::RealFieldElem, y::Rational{T}) where {T<:Integer} = x < QQFieldElem(y)
 
-==(x::Rational{T}, y::RealFieldElem) where {T <: Integer} = QQFieldElem(x) == y
-!=(x::Rational{T}, y::RealFieldElem) where {T <: Integer} = QQFieldElem(x) != y
-<=(x::Rational{T}, y::RealFieldElem) where {T <: Integer} = QQFieldElem(x) <= y
-<(x::Rational{T}, y::RealFieldElem) where {T <: Integer} = QQFieldElem(x) < y
+==(x::Rational{T}, y::RealFieldElem) where {T<:Integer} = QQFieldElem(x) == y
+!=(x::Rational{T}, y::RealFieldElem) where {T<:Integer} = QQFieldElem(x) != y
+<=(x::Rational{T}, y::RealFieldElem) where {T<:Integer} = QQFieldElem(x) <= y
+<(x::Rational{T}, y::RealFieldElem) where {T<:Integer} = QQFieldElem(x) < y
 
 ################################################################################
 #
@@ -440,7 +426,7 @@ end
 ################################################################################
 
 function is_unit(x::RealFieldElem)
-   !contains_zero(x)
+  !contains_zero(x)
 end
 
 @doc raw"""
@@ -449,7 +435,7 @@ end
 Return `true` if $x$ is certainly zero, otherwise return `false`.
 """
 function iszero(x::RealFieldElem)
-   return Bool(ccall((:arb_is_zero, libflint), Cint, (Ref{RealFieldElem},), x))
+  return Bool(ccall((:arb_is_zero, libflint), Cint, (Ref{RealFieldElem},), x))
 end
 
 @doc raw"""
@@ -459,7 +445,7 @@ Return `true` if $x$ is certainly not equal to zero, otherwise return
 `false`.
 """
 function is_nonzero(x::RealFieldElem)
-   return Bool(ccall((:arb_is_nonzero, libflint), Cint, (Ref{RealFieldElem},), x))
+  return Bool(ccall((:arb_is_nonzero, libflint), Cint, (Ref{RealFieldElem},), x))
 end
 
 @doc raw"""
@@ -468,7 +454,7 @@ end
 Return `true` if $x$ is certainly one, otherwise return `false`.
 """
 function isone(x::RealFieldElem)
-   return Bool(ccall((:arb_is_one, libflint), Cint, (Ref{RealFieldElem},), x))
+  return Bool(ccall((:arb_is_one, libflint), Cint, (Ref{RealFieldElem},), x))
 end
 
 @doc raw"""
@@ -478,7 +464,7 @@ Return `true` if $x$ is finite, i.e. having finite midpoint and radius,
 otherwise return `false`.
 """
 function isfinite(x::RealFieldElem)
-   return Bool(ccall((:arb_is_finite, libflint), Cint, (Ref{RealFieldElem},), x))
+  return Bool(ccall((:arb_is_finite, libflint), Cint, (Ref{RealFieldElem},), x))
 end
 
 @doc raw"""
@@ -488,7 +474,7 @@ Return `true` if $x$ is exact, i.e. has zero radius, otherwise return
 `false`.
 """
 function is_exact(x::RealFieldElem)
-   return Bool(ccall((:arb_is_exact, libflint), Cint, (Ref{RealFieldElem},), x))
+  return Bool(ccall((:arb_is_exact, libflint), Cint, (Ref{RealFieldElem},), x))
 end
 
 @doc raw"""
@@ -497,7 +483,7 @@ end
 Return `true` if $x$ is an exact integer, otherwise return `false`.
 """
 function isinteger(x::RealFieldElem)
-   return Bool(ccall((:arb_is_int, libflint), Cint, (Ref{RealFieldElem},), x))
+  return Bool(ccall((:arb_is_int, libflint), Cint, (Ref{RealFieldElem},), x))
 end
 
 @doc raw"""
@@ -506,7 +492,7 @@ end
 Return `true` if $x$ is certainly positive, otherwise return `false`.
 """
 function is_positive(x::RealFieldElem)
-   return Bool(ccall((:arb_is_positive, libflint), Cint, (Ref{RealFieldElem},), x))
+  return Bool(ccall((:arb_is_positive, libflint), Cint, (Ref{RealFieldElem},), x))
 end
 
 @doc raw"""
@@ -515,7 +501,7 @@ end
 Return `true` if $x$ is certainly non-negative, otherwise return `false`.
 """
 function is_nonnegative(x::RealFieldElem)
-   return Bool(ccall((:arb_is_nonnegative, libflint), Cint, (Ref{RealFieldElem},), x))
+  return Bool(ccall((:arb_is_nonnegative, libflint), Cint, (Ref{RealFieldElem},), x))
 end
 
 @doc raw"""
@@ -524,7 +510,7 @@ end
 Return `true` if $x$ is certainly negative, otherwise return `false`.
 """
 function is_negative(x::RealFieldElem)
-   return Bool(ccall((:arb_is_negative, libflint), Cint, (Ref{RealFieldElem},), x))
+  return Bool(ccall((:arb_is_negative, libflint), Cint, (Ref{RealFieldElem},), x))
 end
 
 @doc raw"""
@@ -533,7 +519,7 @@ end
 Return `true` if $x$ is certainly nonpositive, otherwise return `false`.
 """
 function is_nonpositive(x::RealFieldElem)
-   return Bool(ccall((:arb_is_nonpositive, libflint), Cint, (Ref{RealFieldElem},), x))
+  return Bool(ccall((:arb_is_nonpositive, libflint), Cint, (Ref{RealFieldElem},), x))
 end
 
 ################################################################################
@@ -602,18 +588,17 @@ end
 #
 ################################################################################
 
-for (s,f) in ((:+,"arb_add"), (:*,"arb_mul"), (://, "arb_div"), (:-,"arb_sub"))
+for (s, f) in ((:+, "arb_add"), (:*, "arb_mul"), (://, "arb_div"), (:-, "arb_sub"))
   @eval begin
-    function ($s)(x::RealFieldElem, y::RealFieldElem, prec::Int = precision(Balls))
+    function ($s)(x::RealFieldElem, y::RealFieldElem, prec::Int=precision(Balls))
       z = RealFieldElem()
-      ccall(($f, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int),
-                           z, x, y, prec)
+      ccall(($f, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, y, prec)
       return z
     end
   end
 end
 
-for (f,s) in ((:+, "add"), (:*, "mul"))
+for (f, s) in ((:+, "add"), (:*, "mul"))
   @eval begin
     #function ($f)(x::RealFieldElem, y::arf)
     #  z = RealFieldElem()
@@ -625,34 +610,29 @@ for (f,s) in ((:+, "add"), (:*, "mul"))
 
     #($f)(x::arf, y::RealFieldElem) = ($f)(y, x)
 
-    function ($f)(x::RealFieldElem, y::UInt, prec::Int = precision(Balls))
+    function ($f)(x::RealFieldElem, y::UInt, prec::Int=precision(Balls))
       z = RealFieldElem()
-      ccall(($("arb_"*s*"_ui"), libflint), Nothing,
-                  (Ref{RealFieldElem}, Ref{RealFieldElem}, UInt, Int),
-                  z, x, y, prec)
+      ccall(($("arb_" * s * "_ui"), libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, UInt, Int), z, x, y, prec)
       return z
     end
 
     ($f)(x::UInt, y::RealFieldElem) = ($f)(y, x)
 
-    function ($f)(x::RealFieldElem, y::Int, prec::Int = precision(Balls))
+    function ($f)(x::RealFieldElem, y::Int, prec::Int=precision(Balls))
       z = RealFieldElem()
-      ccall(($("arb_"*s*"_si"), libflint), Nothing,
-      (Ref{RealFieldElem}, Ref{RealFieldElem}, Int, Int), z, x, y, prec)
+      ccall(($("arb_" * s * "_si"), libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int, Int), z, x, y, prec)
       return z
     end
 
-    ($f)(x::Int, y::RealFieldElem, prec::Int = precision(Balls)) = ($f)(y, x, prec)
+    ($f)(x::Int, y::RealFieldElem, prec::Int=precision(Balls)) = ($f)(y, x, prec)
 
-    function ($f)(x::RealFieldElem, y::ZZRingElem, prec::Int = precision(Balls))
+    function ($f)(x::RealFieldElem, y::ZZRingElem, prec::Int=precision(Balls))
       z = RealFieldElem()
-      ccall(($("arb_"*s*"_fmpz"), libflint), Nothing,
-                  (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{ZZRingElem}, Int),
-                  z, x, y, prec)
+      ccall(($("arb_" * s * "_fmpz"), libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{ZZRingElem}, Int), z, x, y, prec)
       return z
     end
 
-    ($f)(x::ZZRingElem, y::RealFieldElem, prec::Int = precision(Balls)) = ($f)(y, x, prec)
+    ($f)(x::ZZRingElem, y::RealFieldElem, prec::Int=precision(Balls)) = ($f)(y, x, prec)
   end
 end
 
@@ -667,8 +647,7 @@ end
 
 function -(x::RealFieldElem, y::UInt, prec::Int = precision(Balls))
   z = RealFieldElem()
-  ccall((:arb_sub_ui, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, UInt, Int), z, x, y, prec)
+  ccall((:arb_sub_ui, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, UInt, Int), z, x, y, prec)
   return z
 end
 
@@ -676,8 +655,7 @@ end
 
 function -(x::RealFieldElem, y::Int, prec::Int = precision(Balls))
   z = RealFieldElem()
-  ccall((:arb_sub_si, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Int, Int), z, x, y, prec)
+  ccall((:arb_sub_si, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int, Int), z, x, y, prec)
   return z
 end
 
@@ -685,19 +663,17 @@ end
 
 function -(x::RealFieldElem, y::ZZRingElem, prec::Int = precision(Balls))
   z = RealFieldElem()
-  ccall((:arb_sub_fmpz, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{ZZRingElem}, Int),
-              z, x, y, prec)
+  ccall((:arb_sub_fmpz, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{ZZRingElem}, Int), z, x, y, prec)
   return z
 end
 
--(x::ZZRingElem, y::RealFieldElem) = -(y-x)
+-(x::ZZRingElem, y::RealFieldElem) = -(y - x)
 
 +(x::RealFieldElem, y::Integer) = x + ZZRingElem(y)
 
 -(x::RealFieldElem, y::Integer) = x - ZZRingElem(y)
 
-*(x::RealFieldElem, y::Integer) = x*ZZRingElem(y)
+*(x::RealFieldElem, y::Integer) = x * ZZRingElem(y)
 
 //(x::RealFieldElem, y::Integer) = x//ZZRingElem(y)
 
@@ -705,7 +681,7 @@ end
 
 -(x::Integer, y::RealFieldElem) = ZZRingElem(x) - y
 
-*(x::Integer, y::RealFieldElem) = ZZRingElem(x)*y
+*(x::Integer, y::RealFieldElem) = ZZRingElem(x) * y
 
 //(x::Integer, y::RealFieldElem) = ZZRingElem(x)//y
 
@@ -716,80 +692,67 @@ end
 #  return z
 #end
 
-function //(x::RealFieldElem, y::UInt, prec::Int = precision(Balls))
+function //(x::RealFieldElem, y::UInt, prec::Int=precision(Balls))
   z = RealFieldElem()
-  ccall((:arb_div_ui, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, UInt, Int), z, x, y, prec)
+  ccall((:arb_div_ui, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, UInt, Int), z, x, y, prec)
   return z
 end
 
-function //(x::RealFieldElem, y::Int, prec::Int = precision(Balls))
+function //(x::RealFieldElem, y::Int, prec::Int=precision(Balls))
   z = RealFieldElem()
-  ccall((:arb_div_si, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Int, Int), z, x, y, prec)
+  ccall((:arb_div_si, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int, Int), z, x, y, prec)
   return z
 end
 
-function //(x::RealFieldElem, y::ZZRingElem, prec::Int = precision(Balls))
+function //(x::RealFieldElem, y::ZZRingElem, prec::Int=precision(Balls))
   z = RealFieldElem()
-  ccall((:arb_div_fmpz, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{ZZRingElem}, Int),
-              z, x, y, prec)
+  ccall((:arb_div_fmpz, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{ZZRingElem}, Int), z, x, y, prec)
   return z
 end
 
-function //(x::UInt, y::RealFieldElem, prec::Int = precision(Balls))
+function //(x::UInt, y::RealFieldElem, prec::Int=precision(Balls))
   z = parent(y)()
-  ccall((:arb_ui_div, libflint), Nothing,
-              (Ref{RealFieldElem}, UInt, Ref{RealFieldElem}, Int), z, x, y, prec)
+  ccall((:arb_ui_div, libflint), Nothing, (Ref{RealFieldElem}, UInt, Ref{RealFieldElem}, Int), z, x, y, prec)
   return z
 end
 
-function //(x::Int, y::RealFieldElem, prec::Int = precision(Balls))
+function //(x::Int, y::RealFieldElem, prec::Int=precision(Balls))
   z = parent(y)()
   t = RealFieldElem(x)
-  ccall((:arb_div, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, t, y, prec)
+  ccall((:arb_div, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, t, y, prec)
   return z
 end
 
-function //(x::ZZRingElem, y::RealFieldElem, prec::Int = precision(Balls))
+function //(x::ZZRingElem, y::RealFieldElem, prec::Int=precision(Balls))
   z = parent(y)()
   t = RealFieldElem(x)
-  ccall((:arb_div, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, t, y, prec)
+  ccall((:arb_div, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, t, y, prec)
   return z
 end
 
-function ^(x::RealFieldElem, y::RealFieldElem, prec::Int = precision(Balls))
+function ^(x::RealFieldElem, y::RealFieldElem, prec::Int=precision(Balls))
   z = RealFieldElem()
-  ccall((:arb_pow, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, y, prec)
+  ccall((:arb_pow, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, y, prec)
   return z
 end
 
-function ^(x::RealFieldElem, y::ZZRingElem, prec::Int = precision(Balls))
+function ^(x::RealFieldElem, y::ZZRingElem, prec::Int=precision(Balls))
   z = RealFieldElem()
-  ccall((:arb_pow_fmpz, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{ZZRingElem}, Int),
-              z, x, y, prec)
+  ccall((:arb_pow_fmpz, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{ZZRingElem}, Int), z, x, y, prec)
   return z
 end
 
-^(x::RealFieldElem, y::Integer, prec::Int = precision(Balls)) = ^(x, ZZRingElem(y), prec)
+^(x::RealFieldElem, y::Integer, prec::Int=precision(Balls)) = ^(x, ZZRingElem(y), prec)
 
-function ^(x::RealFieldElem, y::UInt, prec::Int = precision(Balls))
+function ^(x::RealFieldElem, y::UInt, prec::Int=precision(Balls))
   z = RealFieldElem()
-  ccall((:arb_pow_ui, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, UInt, Int), z, x, y, prec)
+  ccall((:arb_pow_ui, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, UInt, Int), z, x, y, prec)
   return z
 end
 
-function ^(x::RealFieldElem, y::QQFieldElem, prec::Int = precision(Balls))
+function ^(x::RealFieldElem, y::QQFieldElem, prec::Int=precision(Balls))
   z = RealFieldElem()
-  ccall((:arb_pow_fmpq, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{QQFieldElem}, Int),
-              z, x, y, prec)
+  ccall((:arb_pow_fmpq, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{QQFieldElem}, Int), z, x, y, prec)
   return z
 end
 
@@ -801,7 +764,7 @@ end
 -(x::RealFieldElem, y::QQFieldElem) = x - parent(x)(y)
 *(x::QQFieldElem, y::RealFieldElem) = parent(y)(x) * y
 *(x::RealFieldElem, y::QQFieldElem) = x * parent(x)(y)
-^(x::QQFieldElem, y::RealFieldElem) = parent(y)(x) ^ y
+^(x::QQFieldElem, y::RealFieldElem) = parent(y)(x)^y
 
 +(x::Float64, y::RealFieldElem) = parent(y)(x) + y
 +(x::RealFieldElem, y::Float64) = x + parent(x)(y)
@@ -811,8 +774,8 @@ end
 -(x::RealFieldElem, y::Float64) = x - parent(x)(y)
 *(x::Float64, y::RealFieldElem) = parent(y)(x) * y
 *(x::RealFieldElem, y::Float64) = x * parent(x)(y)
-^(x::Float64, y::RealFieldElem) = parent(y)(x) ^ y
-^(x::RealFieldElem, y::Float64) = x ^ parent(x)(y)
+^(x::Float64, y::RealFieldElem) = parent(y)(x)^y
+^(x::RealFieldElem, y::Float64) = x^parent(x)(y)
 
 +(x::BigFloat, y::RealFieldElem) = parent(y)(x) + y
 +(x::RealFieldElem, y::BigFloat) = x + parent(x)(y)
@@ -822,51 +785,51 @@ end
 -(x::RealFieldElem, y::BigFloat) = x - parent(x)(y)
 *(x::BigFloat, y::RealFieldElem) = parent(y)(x) * y
 *(x::RealFieldElem, y::BigFloat) = x * parent(x)(y)
-^(x::BigFloat, y::RealFieldElem) = parent(y)(x) ^ y
-^(x::RealFieldElem, y::BigFloat) = x ^ parent(x)(y)
+^(x::BigFloat, y::RealFieldElem) = parent(y)(x)^y
+^(x::RealFieldElem, y::BigFloat) = x^parent(x)(y)
 
-+(x::Rational{T}, y::RealFieldElem) where {T <: Integer} = QQFieldElem(x) + y
-+(x::RealFieldElem, y::Rational{T}) where {T <: Integer} = x + QQFieldElem(y)
--(x::Rational{T}, y::RealFieldElem) where {T <: Integer} = QQFieldElem(x) - y
--(x::RealFieldElem, y::Rational{T}) where {T <: Integer} = x - QQFieldElem(y)
-//(x::Rational{T}, y::RealFieldElem) where {T <: Integer} = QQFieldElem(x)//y
-//(x::RealFieldElem, y::Rational{T}) where {T <: Integer} = x//QQFieldElem(y)
-*(x::Rational{T}, y::RealFieldElem) where {T <: Integer} = QQFieldElem(x) * y
-*(x::RealFieldElem, y::Rational{T}) where {T <: Integer} = x * QQFieldElem(y)
-^(x::Rational{T}, y::RealFieldElem) where {T <: Integer} = QQFieldElem(x) ^ y
-^(x::RealFieldElem, y::Rational{T}) where {T <: Integer} = x ^ QQFieldElem(y)
++(x::Rational{T}, y::RealFieldElem) where {T<:Integer} = QQFieldElem(x) + y
++(x::RealFieldElem, y::Rational{T}) where {T<:Integer} = x + QQFieldElem(y)
+-(x::Rational{T}, y::RealFieldElem) where {T<:Integer} = QQFieldElem(x) - y
+-(x::RealFieldElem, y::Rational{T}) where {T<:Integer} = x - QQFieldElem(y)
+//(x::Rational{T}, y::RealFieldElem) where {T<:Integer} = QQFieldElem(x)//y
+//(x::RealFieldElem, y::Rational{T}) where {T<:Integer} = x//QQFieldElem(y)
+*(x::Rational{T}, y::RealFieldElem) where {T<:Integer} = QQFieldElem(x) * y
+*(x::RealFieldElem, y::Rational{T}) where {T<:Integer} = x * QQFieldElem(y)
+^(x::Rational{T}, y::RealFieldElem) where {T<:Integer} = QQFieldElem(x)^y
+^(x::RealFieldElem, y::Rational{T}) where {T<:Integer} = x^QQFieldElem(y)
 
-/(x::RealFieldElem, y::RealFieldElem) = x // y
-/(x::ZZRingElem, y::RealFieldElem) = x // y
-/(x::RealFieldElem, y::ZZRingElem) = x // y
-/(x::Int, y::RealFieldElem) = x // y
-/(x::RealFieldElem, y::Int) = x // y
-/(x::UInt, y::RealFieldElem) = x // y
-/(x::RealFieldElem, y::UInt) = x // y
-/(x::QQFieldElem, y::RealFieldElem) = x // y
-/(x::RealFieldElem, y::QQFieldElem) = x // y
-/(x::Float64, y::RealFieldElem) = x // y
-/(x::RealFieldElem, y::Float64) = x // y
-/(x::BigFloat, y::RealFieldElem) = x // y
-/(x::RealFieldElem, y::BigFloat) = x // y
-/(x::Rational{T}, y::RealFieldElem) where {T <: Integer} = x // y
-/(x::RealFieldElem, y::Rational{T}) where {T <: Integer} = x // y
+/(x::RealFieldElem, y::RealFieldElem) = x//y
+/(x::ZZRingElem, y::RealFieldElem) = x//y
+/(x::RealFieldElem, y::ZZRingElem) = x//y
+/(x::Int, y::RealFieldElem) = x//y
+/(x::RealFieldElem, y::Int) = x//y
+/(x::UInt, y::RealFieldElem) = x//y
+/(x::RealFieldElem, y::UInt) = x//y
+/(x::QQFieldElem, y::RealFieldElem) = x//y
+/(x::RealFieldElem, y::QQFieldElem) = x//y
+/(x::Float64, y::RealFieldElem) = x//y
+/(x::RealFieldElem, y::Float64) = x//y
+/(x::BigFloat, y::RealFieldElem) = x//y
+/(x::RealFieldElem, y::BigFloat) = x//y
+/(x::Rational{T}, y::RealFieldElem) where {T<:Integer} = x//y
+/(x::RealFieldElem, y::Rational{T}) where {T<:Integer} = x//y
 
-divexact(x::RealFieldElem, y::RealFieldElem; check::Bool=true) = x // y
-divexact(x::ZZRingElem, y::RealFieldElem; check::Bool=true) = x // y
-divexact(x::RealFieldElem, y::ZZRingElem; check::Bool=true) = x // y
-divexact(x::Int, y::RealFieldElem; check::Bool=true) = x // y
-divexact(x::RealFieldElem, y::Int; check::Bool=true) = x // y
-divexact(x::UInt, y::RealFieldElem; check::Bool=true) = x // y
-divexact(x::RealFieldElem, y::UInt; check::Bool=true) = x // y
-divexact(x::QQFieldElem, y::RealFieldElem; check::Bool=true) = x // y
-divexact(x::RealFieldElem, y::QQFieldElem; check::Bool=true) = x // y
-divexact(x::Float64, y::RealFieldElem; check::Bool=true) = x // y
-divexact(x::RealFieldElem, y::Float64; check::Bool=true) = x // y
-divexact(x::BigFloat, y::RealFieldElem; check::Bool=true) = x // y
-divexact(x::RealFieldElem, y::BigFloat; check::Bool=true) = x // y
-divexact(x::Rational{T}, y::RealFieldElem; check::Bool=true) where {T <: Integer} = x // y
-divexact(x::RealFieldElem, y::Rational{T}; check::Bool=true) where {T <: Integer} = x // y
+divexact(x::RealFieldElem, y::RealFieldElem; check::Bool=true) = x//y
+divexact(x::ZZRingElem, y::RealFieldElem; check::Bool=true) = x//y
+divexact(x::RealFieldElem, y::ZZRingElem; check::Bool=true) = x//y
+divexact(x::Int, y::RealFieldElem; check::Bool=true) = x//y
+divexact(x::RealFieldElem, y::Int; check::Bool=true) = x//y
+divexact(x::UInt, y::RealFieldElem; check::Bool=true) = x//y
+divexact(x::RealFieldElem, y::UInt; check::Bool=true) = x//y
+divexact(x::QQFieldElem, y::RealFieldElem; check::Bool=true) = x//y
+divexact(x::RealFieldElem, y::QQFieldElem; check::Bool=true) = x//y
+divexact(x::Float64, y::RealFieldElem; check::Bool=true) = x//y
+divexact(x::RealFieldElem, y::Float64; check::Bool=true) = x//y
+divexact(x::BigFloat, y::RealFieldElem; check::Bool=true) = x//y
+divexact(x::RealFieldElem, y::BigFloat; check::Bool=true) = x//y
+divexact(x::Rational{T}, y::RealFieldElem; check::Bool=true) where {T<:Integer} = x//y
+divexact(x::RealFieldElem, y::Rational{T}; check::Bool=true) where {T<:Integer} = x//y
 
 ################################################################################
 #
@@ -886,10 +849,9 @@ end
 #
 ################################################################################
 
-function inv(x::RealFieldElem, prec::Int = precision(Balls))
+function inv(x::RealFieldElem, prec::Int=precision(Balls))
   z = RealFieldElem()
-  ccall((:arb_inv, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  ccall((:arb_inv, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
   return parent(x)(z)
 end
 
@@ -901,15 +863,13 @@ end
 
 function ldexp(x::RealFieldElem, y::Int)
   z = RealFieldElem()
-  ccall((:arb_mul_2exp_si, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, y)
+  ccall((:arb_mul_2exp_si, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, y)
   return z
 end
 
 function ldexp(x::RealFieldElem, y::ZZRingElem)
   z = RealFieldElem()
-  ccall((:arb_mul_2exp_fmpz, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{ZZRingElem}), z, x, y)
+  ccall((:arb_mul_2exp_fmpz, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{ZZRingElem}), z, x, y)
   return z
 end
 
@@ -941,13 +901,12 @@ integer.
 """
 function unique_integer(x::RealFieldElem)
   z = ZZRingElem()
-  unique = ccall((:arb_get_unique_fmpz, libflint), Int,
-    (Ref{ZZRingElem}, Ref{RealFieldElem}), z, x)
+  unique = ccall((:arb_get_unique_fmpz, libflint), Int, (Ref{ZZRingElem}, Ref{RealFieldElem}), z, x)
   return (unique != 0, z)
 end
 
 function (::ZZRing)(a::RealFieldElem)
-   return ZZRingElem(a)
+  return ZZRingElem(a)
 end
 
 @doc raw"""
@@ -956,10 +915,9 @@ end
 Return an `ArbFieldElem` containing the union of the intervals represented by $x$ and
 $y$.
 """
-function setunion(x::RealFieldElem, y::RealFieldElem, prec::Int = precision(Balls))
+function setunion(x::RealFieldElem, y::RealFieldElem, prec::Int=precision(Balls))
   z = RealFieldElem()
-  ccall((:arb_union, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, y, prec)
+  ccall((:arb_union, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, y, prec)
   return z
 end
 
@@ -969,10 +927,9 @@ end
 Return an `ArbFieldElem` containing the intersection of the intervals represented by
 $x$ and $y$.
 """
-function setintersection(x::RealFieldElem, y::RealFieldElem, prec::Int = precision(Balls))
+function setintersection(x::RealFieldElem, y::RealFieldElem, prec::Int=precision(Balls))
   z = RealFieldElem()
-  ccall((:arb_intersection, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, y, prec)
+  ccall((:arb_intersection, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, y, prec)
   return z
 end
 
@@ -987,7 +944,7 @@ end
 
 Return $\pi = 3.14159\ldots$ as an element of $r$.
 """
-function const_pi(r::RealField, prec::Int = precision(Balls))
+function const_pi(r::RealField, prec::Int=precision(Balls))
   z = r()
   ccall((:arb_const_pi, libflint), Nothing, (Ref{RealFieldElem}, Int), z, prec)
   return z
@@ -998,7 +955,7 @@ end
 
 Return $e = 2.71828\ldots$ as an element of $r$.
 """
-function const_e(r::RealField, prec::Int = precision(Balls))
+function const_e(r::RealField, prec::Int=precision(Balls))
   z = r()
   ccall((:arb_const_e, libflint), Nothing, (Ref{RealFieldElem}, Int), z, prec)
   return z
@@ -1009,7 +966,7 @@ end
 
 Return $\log(2) = 0.69314\ldots$ as an element of $r$.
 """
-function const_log2(r::RealField, prec::Int = precision(Balls))
+function const_log2(r::RealField, prec::Int=precision(Balls))
   z = r()
   ccall((:arb_const_log2, libflint), Nothing, (Ref{RealFieldElem}, Int), z, prec)
   return z
@@ -1020,7 +977,7 @@ end
 
 Return $\log(10) = 2.302585\ldots$ as an element of $r$.
 """
-function const_log10(r::RealField, prec::Int = precision(Balls))
+function const_log10(r::RealField, prec::Int=precision(Balls))
   z = r()
   ccall((:arb_const_log10, libflint), Nothing, (Ref{RealFieldElem}, Int), z, prec)
   return z
@@ -1031,7 +988,7 @@ end
 
 Return Euler's constant $\gamma = 0.577215\ldots$ as an element of $r$.
 """
-function const_euler(r::RealField, prec::Int = precision(Balls))
+function const_euler(r::RealField, prec::Int=precision(Balls))
   z = r()
   ccall((:arb_const_euler, libflint), Nothing, (Ref{RealFieldElem}, Int), z, prec)
   return z
@@ -1042,7 +999,7 @@ end
 
 Return Catalan's constant $C = 0.915965\ldots$ as an element of $r$.
 """
-function const_catalan(r::RealField, prec::Int = precision(Balls))
+function const_catalan(r::RealField, prec::Int=precision(Balls))
   z = r()
   ccall((:arb_const_catalan, libflint), Nothing, (Ref{RealFieldElem}, Int), z, prec)
   return z
@@ -1053,7 +1010,7 @@ end
 
 Return Khinchin's constant $K = 2.685452\ldots$ as an element of $r$.
 """
-function const_khinchin(r::RealField, prec::Int = precision(Balls))
+function const_khinchin(r::RealField, prec::Int=precision(Balls))
   z = r()
   ccall((:arb_const_khinchin, libflint), Nothing, (Ref{RealFieldElem}, Int), z, prec)
   return z
@@ -1064,7 +1021,7 @@ end
 
 Return Glaisher's constant $A = 1.282427\ldots$ as an element of $r$.
 """
-function const_glaisher(r::RealField, prec::Int = precision(Balls))
+function const_glaisher(r::RealField, prec::Int=precision(Balls))
   z = r()
   ccall((:arb_const_glaisher, libflint), Nothing, (Ref{RealFieldElem}, Int), z, prec)
   return z
@@ -1078,30 +1035,30 @@ end
 
 # real - real functions
 
-function floor(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_floor, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function floor(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_floor, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
 floor(::Type{RealFieldElem}, x::RealFieldElem) = floor(x)
 floor(::Type{ZZRingElem}, x::RealFieldElem) = ZZRingElem(floor(x))
-floor(::Type{T}, x::RealFieldElem) where {T <: Integer} = T(floor(x))
+floor(::Type{T}, x::RealFieldElem) where {T<:Integer} = T(floor(x))
 
-function ceil(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_ceil, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function ceil(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_ceil, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
 ceil(::Type{RealFieldElem}, x::RealFieldElem) = ceil(x)
 ceil(::Type{ZZRingElem}, x::RealFieldElem) = ZZRingElem(ceil(x))
-ceil(::Type{T}, x::RealFieldElem) where {T <: Integer} = T(ceil(x))
+ceil(::Type{T}, x::RealFieldElem) where {T<:Integer} = T(ceil(x))
 
-function Base.sqrt(x::RealFieldElem, prec::Int = precision(Balls); check::Bool=true)
-   z = RealFieldElem()
-   ccall((:arb_sqrt, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function Base.sqrt(x::RealFieldElem, prec::Int=precision(Balls); check::Bool=true)
+  z = RealFieldElem()
+  ccall((:arb_sqrt, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
 @doc raw"""
@@ -1109,10 +1066,10 @@ end
 
 Return the reciprocal of the square root of $x$, i.e. $1/\sqrt{x}$.
 """
-function rsqrt(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_rsqrt, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function rsqrt(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_rsqrt, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
 @doc raw"""
@@ -1120,10 +1077,10 @@ end
 
 Return $\sqrt{1+x}-1$, evaluated accurately for small $x$.
 """
-function sqrt1pm1(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_sqrt1pm1, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function sqrt1pm1(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_sqrt1pm1, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
 @doc raw"""
@@ -1132,142 +1089,142 @@ end
 Return the sqrt root of $x$, assuming that $x$ represents a non-negative
 number. Thus any negative number in the input interval is discarded.
 """
-function sqrtpos(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_sqrtpos, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function sqrtpos(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_sqrtpos, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
-function log(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_log, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function log(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_log, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
-function log1p(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_log1p, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function log1p(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_log1p, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
-function Base.exp(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_exp, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function Base.exp(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_exp, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
-function expm1(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_expm1, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function expm1(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_expm1, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
-function sin(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_sin, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function sin(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_sin, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
-function cos(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_cos, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function cos(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_cos, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
-function sinpi(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_sin_pi, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function sinpi(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_sin_pi, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
-function cospi(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_cos_pi, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function cospi(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_cos_pi, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
-function tan(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_tan, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function tan(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_tan, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
-function cot(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_cot, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function cot(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_cot, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
-function tanpi(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_tan_pi, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function tanpi(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_tan_pi, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
-function cotpi(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_cot_pi, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function cotpi(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_cot_pi, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
-function sinh(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_sinh, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function sinh(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_sinh, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
-function cosh(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_cosh, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function cosh(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_cosh, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
-function tanh(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_tanh, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function tanh(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_tanh, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
-function coth(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_coth, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function coth(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_coth, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
-function atan(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_atan, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function atan(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_atan, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
-function asin(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_asin, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function asin(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_asin, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
-function acos(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_acos, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function acos(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_acos, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
-function atanh(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_atanh, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function atanh(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_atanh, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
-function asinh(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_asinh, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function asinh(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_asinh, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
-function acosh(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_acosh, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function acosh(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_acosh, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
 @doc raw"""
@@ -1275,10 +1232,10 @@ end
 
 Return the Gamma function evaluated at $x$.
 """
-function gamma(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_gamma, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function gamma(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_gamma, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
 @doc raw"""
@@ -1286,10 +1243,10 @@ end
 
 Return the logarithm of the Gamma function evaluated at $x$.
 """
-function lgamma(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_lgamma, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function lgamma(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_lgamma, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
 @doc raw"""
@@ -1297,10 +1254,10 @@ end
 
 Return the reciprocal of the Gamma function evaluated at $x$.
 """
-function rgamma(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_rgamma, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function rgamma(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_rgamma, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
 @doc raw"""
@@ -1309,10 +1266,10 @@ end
 Return the  logarithmic derivative of the gamma function evaluated at $x$,
 i.e. $\psi(x)$.
 """
-function digamma(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_digamma, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
+function digamma(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_digamma, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
+  return z
 end
 
 @doc raw"""
@@ -1320,10 +1277,9 @@ end
 
 Return the upper incomplete gamma function $\Gamma(s,x)$.
 """
-function gamma(s::RealFieldElem, x::RealFieldElem, prec::Int = precision(Balls))
+function gamma(s::RealFieldElem, x::RealFieldElem, prec::Int=precision(Balls))
   z = parent(s)()
-  ccall((:arb_hypgeom_gamma_upper, libflint), Nothing,
-        (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int, Int), z, s, x, 0, prec)
+  ccall((:arb_hypgeom_gamma_upper, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int, Int), z, s, x, 0, prec)
   return z
 end
 
@@ -1333,10 +1289,9 @@ end
 Return the regularized upper incomplete gamma function
 $\Gamma(s,x) / \Gamma(s)$.
 """
-function gamma_regularized(s::RealFieldElem, x::RealFieldElem, prec::Int = precision(Balls))
+function gamma_regularized(s::RealFieldElem, x::RealFieldElem, prec::Int=precision(Balls))
   z = parent(s)()
-  ccall((:arb_hypgeom_gamma_upper, libflint), Nothing,
-        (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int, Int), z, s, x, 1, prec)
+  ccall((:arb_hypgeom_gamma_upper, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int, Int), z, s, x, 1, prec)
   return z
 end
 
@@ -1345,10 +1300,9 @@ end
 
 Return the lower incomplete gamma function $\gamma(s,x) / \Gamma(s)$.
 """
-function gamma_lower(s::RealFieldElem, x::RealFieldElem, prec::Int = precision(Balls))
+function gamma_lower(s::RealFieldElem, x::RealFieldElem, prec::Int=precision(Balls))
   z = parent(s)()
-  ccall((:arb_hypgeom_gamma_lower, libflint), Nothing,
-        (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int, Int), z, s, x, 0, prec)
+  ccall((:arb_hypgeom_gamma_lower, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int, Int), z, s, x, 0, prec)
   return z
 end
 
@@ -1358,75 +1312,66 @@ end
 Return the regularized lower incomplete gamma function
 $\gamma(s,x) / \Gamma(s)$.
 """
-function gamma_lower_regularized(s::RealFieldElem, x::RealFieldElem, prec::Int = precision(Balls))
+function gamma_lower_regularized(s::RealFieldElem, x::RealFieldElem, prec::Int=precision(Balls))
   z = parent(s)()
-  ccall((:arb_hypgeom_gamma_lower, libflint), Nothing,
-        (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int, Int), z, s, x, 1, prec)
+  ccall((:arb_hypgeom_gamma_lower, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int, Int), z, s, x, 1, prec)
   return z
 end
-
 
 @doc raw"""
     zeta(x::RealFieldElem)
 
 Return the Riemann zeta function evaluated at $x$.
 """
-function zeta(x::RealFieldElem, prec::Int = precision(Balls))
-   z = RealFieldElem()
-   ccall((:arb_zeta, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
-   return z
-end
-
-function sincos(x::RealFieldElem, prec::Int = precision(Balls))
-  s = RealFieldElem()
-  c = RealFieldElem()
-  ccall((:arb_sin_cos, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), s, c, x, prec)
-  return (s, c)
-end
-
-function sincospi(x::RealFieldElem, prec::Int = precision(Balls))
-  s = RealFieldElem()
-  c = RealFieldElem()
-  ccall((:arb_sin_cos_pi, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), s, c, x, prec)
-  return (s, c)
-end
-
-function sinpi(x::QQFieldElem, r::RealField, prec::Int = precision(Balls))
-  z = r()
-  ccall((:arb_sin_pi_fmpq, libflint), Nothing,
-        (Ref{RealFieldElem}, Ref{QQFieldElem}, Int), z, x, prec)
+function zeta(x::RealFieldElem, prec::Int=precision(Balls))
+  z = RealFieldElem()
+  ccall((:arb_zeta, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, prec)
   return z
 end
 
-function cospi(x::QQFieldElem, r::RealField, prec::Int = precision(Balls))
+function sincos(x::RealFieldElem, prec::Int=precision(Balls))
+  s = RealFieldElem()
+  c = RealFieldElem()
+  ccall((:arb_sin_cos, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), s, c, x, prec)
+  return (s, c)
+end
+
+function sincospi(x::RealFieldElem, prec::Int=precision(Balls))
+  s = RealFieldElem()
+  c = RealFieldElem()
+  ccall((:arb_sin_cos_pi, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), s, c, x, prec)
+  return (s, c)
+end
+
+function sinpi(x::QQFieldElem, r::RealField, prec::Int=precision(Balls))
   z = r()
-  ccall((:arb_cos_pi_fmpq, libflint), Nothing,
-        (Ref{RealFieldElem}, Ref{QQFieldElem}, Int), z, x, prec)
+  ccall((:arb_sin_pi_fmpq, libflint), Nothing, (Ref{RealFieldElem}, Ref{QQFieldElem}, Int), z, x, prec)
   return z
 end
 
-function sincospi(x::QQFieldElem, r::RealField, prec::Int = precision(Balls))
+function cospi(x::QQFieldElem, r::RealField, prec::Int=precision(Balls))
+  z = r()
+  ccall((:arb_cos_pi_fmpq, libflint), Nothing, (Ref{RealFieldElem}, Ref{QQFieldElem}, Int), z, x, prec)
+  return z
+end
+
+function sincospi(x::QQFieldElem, r::RealField, prec::Int=precision(Balls))
   s = r()
   c = r()
-  ccall((:arb_sin_cos_pi_fmpq, libflint), Nothing,
-        (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{QQFieldElem}, Int), s, c, x, prec)
+  ccall((:arb_sin_cos_pi_fmpq, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{QQFieldElem}, Int), s, c, x, prec)
   return (s, c)
 end
 
-function sinhcosh(x::RealFieldElem, prec::Int = precision(Balls))
+function sinhcosh(x::RealFieldElem, prec::Int=precision(Balls))
   s = RealFieldElem()
   c = RealFieldElem()
-  ccall((:arb_sinh_cosh, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), s, c, x, prec)
+  ccall((:arb_sinh_cosh, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), s, c, x, prec)
   return (s, c)
 end
 
-function atan(y::RealFieldElem, x::RealFieldElem, prec::Int = precision(Balls))
+function atan(y::RealFieldElem, x::RealFieldElem, prec::Int=precision(Balls))
   z = parent(y)()
-  ccall((:arb_atan2, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, y, x, prec)
+  ccall((:arb_atan2, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, y, x, prec)
   return z
 end
 
@@ -1435,7 +1380,7 @@ end
 
 Return $\operatorname{atan2}(y,x) = \arg(x+yi)$. Same as `atan(y, x)`.
 """
-function atan2(y::RealFieldElem, x::RealFieldElem, prec::Int = precision(Balls))
+function atan2(y::RealFieldElem, x::RealFieldElem, prec::Int=precision(Balls))
   return atan(y, x, prec)
 end
 
@@ -1444,10 +1389,9 @@ end
 
 Return the arithmetic-geometric mean of $x$ and $y$
 """
-function agm(x::RealFieldElem, y::RealFieldElem, prec::Int = precision(Balls))
+function agm(x::RealFieldElem, y::RealFieldElem, prec::Int=precision(Balls))
   z = RealFieldElem()
-  ccall((:arb_agm, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, y, prec)
+  ccall((:arb_agm, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, y, prec)
   return z
 end
 
@@ -1456,24 +1400,21 @@ end
 
 Return the Hurwitz zeta function $\zeta(s,a)$.
 """
-function zeta(s::RealFieldElem, a::RealFieldElem, prec::Int = precision(Balls))
+function zeta(s::RealFieldElem, a::RealFieldElem, prec::Int=precision(Balls))
   z = parent(s)()
-  ccall((:arb_hurwitz_zeta, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, s, a, prec)
+  ccall((:arb_hurwitz_zeta, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, s, a, prec)
   return z
 end
 
-function hypot(x::RealFieldElem, y::RealFieldElem, prec::Int = precision(Balls))
+function hypot(x::RealFieldElem, y::RealFieldElem, prec::Int=precision(Balls))
   z = RealFieldElem()
-  ccall((:arb_hypot, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, y, prec)
+  ccall((:arb_hypot, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, y, prec)
   return z
 end
 
-function root(x::RealFieldElem, n::UInt, prec::Int = precision(Balls))
+function root(x::RealFieldElem, n::UInt, prec::Int=precision(Balls))
   z = RealFieldElem()
-  ccall((:arb_root, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, UInt, Int), z, x, n, prec)
+  ccall((:arb_root, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, UInt, Int), z, x, n, prec)
   return z
 end
 
@@ -1482,7 +1423,7 @@ end
 
 Return the $n$-th root of $x$. We require $x \geq 0$.
 """
-function root(x::RealFieldElem, n::Int, prec::Int = precision(Balls))
+function root(x::RealFieldElem, n::Int, prec::Int=precision(Balls))
   x < 0 && throw(DomainError(x, "Argument must be positive"))
   return root(x, UInt(n))
 end
@@ -1492,9 +1433,9 @@ end
 
 Return the factorial of $x$.
 """
-factorial(x::RealFieldElem, prec::Int = precision(Balls)) = gamma(x+1)
+factorial(x::RealFieldElem, prec::Int=precision(Balls)) = gamma(x + 1)
 
-function factorial(n::UInt, r::RealField, prec::Int = precision(Balls))
+function factorial(n::UInt, r::RealField, prec::Int=precision(Balls))
   z = r()
   ccall((:arb_fac_ui, libflint), Nothing, (Ref{RealFieldElem}, UInt, Int), z, n, prec)
   return z
@@ -1505,17 +1446,16 @@ end
 
 Return the factorial of $n$ in the given Arb field.
 """
-factorial(n::Int, r::RealField, prec::Int = precision(Balls)) = n < 0 ? factorial(r(n), prec) : factorial(UInt(n), r, prec)
+factorial(n::Int, r::RealField, prec::Int=precision(Balls)) = n < 0 ? factorial(r(n), prec) : factorial(UInt(n), r, prec)
 
 @doc raw"""
     binomial(x::RealFieldElem, n::UInt)
 
 Return the binomial coefficient ${x \choose n}$.
 """
-function binomial(x::RealFieldElem, n::UInt, prec::Int = precision(Balls))
+function binomial(x::RealFieldElem, n::UInt, prec::Int=precision(Balls))
   z = RealFieldElem()
-  ccall((:arb_bin_ui, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, UInt, Int), z, x, n, prec)
+  ccall((:arb_bin_ui, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, UInt, Int), z, x, n, prec)
   return z
 end
 
@@ -1524,10 +1464,9 @@ end
 
 Return the binomial coefficient ${n \choose k}$ in the given Arb field.
 """
-function binomial(n::UInt, k::UInt, r::RealField, prec::Int = precision(Balls))
+function binomial(n::UInt, k::UInt, r::RealField, prec::Int=precision(Balls))
   z = r()
-  ccall((:arb_bin_uiui, libflint), Nothing,
-              (Ref{RealFieldElem}, UInt, UInt, Int), z, n, k, prec)
+  ccall((:arb_bin_uiui, libflint), Nothing, (Ref{RealFieldElem}, UInt, UInt, Int), z, n, k, prec)
   return z
 end
 
@@ -1536,17 +1475,15 @@ end
 
 Return the $n$-th Fibonacci number in the given Arb field.
 """
-function fibonacci(n::ZZRingElem, r::RealField, prec::Int = precision(Balls))
+function fibonacci(n::ZZRingElem, r::RealField, prec::Int=precision(Balls))
   z = r()
-  ccall((:arb_fib_fmpz, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{ZZRingElem}, Int), z, n, prec)
+  ccall((:arb_fib_fmpz, libflint), Nothing, (Ref{RealFieldElem}, Ref{ZZRingElem}, Int), z, n, prec)
   return z
 end
 
-function fibonacci(n::UInt, r::RealField, prec::Int = precision(Balls))
+function fibonacci(n::UInt, r::RealField, prec::Int=precision(Balls))
   z = r()
-  ccall((:arb_fib_ui, libflint), Nothing,
-              (Ref{RealFieldElem}, UInt, Int), z, n, prec)
+  ccall((:arb_fib_ui, libflint), Nothing, (Ref{RealFieldElem}, UInt, Int), z, n, prec)
   return z
 end
 
@@ -1555,17 +1492,16 @@ end
 
 Return the $n$-th Fibonacci number in the given Arb field.
 """
-fibonacci(n::Int, r::RealField, prec::Int = precision(Balls)) = n >= 0 ? fibonacci(UInt(n), r, prec) : fibonacci(ZZRingElem(n), r, prec)
+fibonacci(n::Int, r::RealField, prec::Int=precision(Balls)) = n >= 0 ? fibonacci(UInt(n), r, prec) : fibonacci(ZZRingElem(n), r, prec)
 
 @doc raw"""
     gamma(x::ZZRingElem, r::RealField)
 
 Return the Gamma function evaluated at $x$ in the given Arb field.
 """
-function gamma(x::ZZRingElem, r::RealField, prec::Int = precision(Balls))
+function gamma(x::ZZRingElem, r::RealField, prec::Int=precision(Balls))
   z = r()
-  ccall((:arb_gamma_fmpz, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{ZZRingElem}, Int), z, x, prec)
+  ccall((:arb_gamma_fmpz, libflint), Nothing, (Ref{RealFieldElem}, Ref{ZZRingElem}, Int), z, x, prec)
   return z
 end
 
@@ -1574,18 +1510,15 @@ end
 
 Return the Gamma function evaluated at $x$ in the given Arb field.
 """
-function gamma(x::QQFieldElem, r::RealField, prec::Int = precision(Balls))
+function gamma(x::QQFieldElem, r::RealField, prec::Int=precision(Balls))
   z = r()
-  ccall((:arb_gamma_fmpq, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{QQFieldElem}, Int), z, x, prec)
+  ccall((:arb_gamma_fmpq, libflint), Nothing, (Ref{RealFieldElem}, Ref{QQFieldElem}, Int), z, x, prec)
   return z
 end
 
-
-function zeta(n::UInt, r::RealField, prec::Int = precision(Balls))
+function zeta(n::UInt, r::RealField, prec::Int=precision(Balls))
   z = r()
-  ccall((:arb_zeta_ui, libflint), Nothing,
-              (Ref{RealFieldElem}, UInt, Int), z, n, prec)
+  ccall((:arb_zeta_ui, libflint), Nothing, (Ref{RealFieldElem}, UInt, Int), z, n, prec)
   return z
 end
 
@@ -1595,12 +1528,11 @@ end
 Return the Riemann zeta function $\zeta(n)$ as an element of the given Arb
 field.
 """
-zeta(n::Int, r::RealField, prec::Int = precision(Balls)) = n >= 0 ? zeta(UInt(n), r, prec) : zeta(r(n), prec)
+zeta(n::Int, r::RealField, prec::Int=precision(Balls)) = n >= 0 ? zeta(UInt(n), r, prec) : zeta(r(n), prec)
 
-function bernoulli(n::UInt, r::RealField, prec::Int = precision(Balls))
+function bernoulli(n::UInt, r::RealField, prec::Int=precision(Balls))
   z = r()
-  ccall((:arb_bernoulli_ui, libflint), Nothing,
-              (Ref{RealFieldElem}, UInt, Int), z, n, prec)
+  ccall((:arb_bernoulli_ui, libflint), Nothing, (Ref{RealFieldElem}, UInt, Int), z, n, prec)
   return z
 end
 
@@ -1609,12 +1541,11 @@ end
 
 Return the $n$-th Bernoulli number as an element of the given Arb field.
 """
-bernoulli(n::Int, r::RealField, prec::Int = precision(Balls)) = n >= 0 ? bernoulli(UInt(n), r, prec) : throw(DomainError(n, "Index must be non-negative"))
+bernoulli(n::Int, r::RealField, prec::Int=precision(Balls)) = n >= 0 ? bernoulli(UInt(n), r, prec) : throw(DomainError(n, "Index must be non-negative"))
 
-function rising_factorial(x::RealFieldElem, n::UInt, prec::Int = precision(Balls))
+function rising_factorial(x::RealFieldElem, n::UInt, prec::Int=precision(Balls))
   z = RealFieldElem()
-  ccall((:arb_rising_ui, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, UInt, Int), z, x, n, prec)
+  ccall((:arb_rising_ui, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, UInt, Int), z, x, n, prec)
   return z
 end
 
@@ -1623,12 +1554,11 @@ end
 
 Return the rising factorial $x(x + 1)\ldots (x + n - 1)$ as an Arb.
 """
-rising_factorial(x::RealFieldElem, n::Int, prec::Int = precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : rising_factorial(x, UInt(n), prec)
+rising_factorial(x::RealFieldElem, n::Int, prec::Int=precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : rising_factorial(x, UInt(n), prec)
 
-function rising_factorial(x::QQFieldElem, n::UInt, r::RealField, prec::Int = precision(Balls))
+function rising_factorial(x::QQFieldElem, n::UInt, r::RealField, prec::Int=precision(Balls))
   z = r()
-  ccall((:arb_rising_fmpq_ui, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{QQFieldElem}, UInt, Int), z, x, n, prec)
+  ccall((:arb_rising_fmpq_ui, libflint), Nothing, (Ref{RealFieldElem}, Ref{QQFieldElem}, UInt, Int), z, x, n, prec)
   return z
 end
 
@@ -1638,13 +1568,12 @@ end
 Return the rising factorial $x(x + 1)\ldots (x + n - 1)$ as an element of the
 given Arb field.
 """
-rising_factorial(x::QQFieldElem, n::Int, r::RealField, prec::Int = precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : rising_factorial(x, UInt(n), r, prec)
+rising_factorial(x::QQFieldElem, n::Int, r::RealField, prec::Int=precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : rising_factorial(x, UInt(n), r, prec)
 
-function rising_factorial2(x::RealFieldElem, n::UInt, prec::Int = precision(Balls))
+function rising_factorial2(x::RealFieldElem, n::UInt, prec::Int=precision(Balls))
   z = RealFieldElem()
   w = RealFieldElem()
-  ccall((:arb_rising2_ui, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, UInt, Int), z, w, x, n, prec)
+  ccall((:arb_rising2_ui, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, UInt, Int), z, w, x, n, prec)
   return (z, w)
 end
 
@@ -1654,19 +1583,17 @@ end
 Return a tuple containing the rising factorial $x(x + 1)\ldots (x + n - 1)$
 and its derivative.
 """
-rising_factorial2(x::RealFieldElem, n::Int, prec::Int = precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : rising_factorial2(x, UInt(n), prec)
+rising_factorial2(x::RealFieldElem, n::Int, prec::Int=precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : rising_factorial2(x, UInt(n), prec)
 
-function polylog(s::RealFieldElem, a::RealFieldElem, prec::Int = precision(Balls))
+function polylog(s::RealFieldElem, a::RealFieldElem, prec::Int=precision(Balls))
   z = parent(s)()
-  ccall((:arb_polylog, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, s, a, prec)
+  ccall((:arb_polylog, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, s, a, prec)
   return z
 end
 
-function polylog(s::Int, a::RealFieldElem, prec::Int = precision(Balls))
+function polylog(s::Int, a::RealFieldElem, prec::Int=precision(Balls))
   z = parent(a)()
-  ccall((:arb_polylog_si, libflint), Nothing,
-              (Ref{RealFieldElem}, Int, Ref{RealFieldElem}, Int), z, s, a, prec)
+  ccall((:arb_polylog_si, libflint), Nothing, (Ref{RealFieldElem}, Int, Ref{RealFieldElem}, Int), z, s, a, prec)
   return z
 end
 
@@ -1676,33 +1603,29 @@ end
 Return the polylogarithm Li$_s(a)$.
 """ polylog(s::Union{RealFieldElem,Int}, a::RealFieldElem)
 
-function chebyshev_t(n::UInt, x::RealFieldElem, prec::Int = precision(Balls))
+function chebyshev_t(n::UInt, x::RealFieldElem, prec::Int=precision(Balls))
   z = RealFieldElem()
-  ccall((:arb_chebyshev_t_ui, libflint), Nothing,
-              (Ref{RealFieldElem}, UInt, Ref{RealFieldElem}, Int), z, n, x, prec)
+  ccall((:arb_chebyshev_t_ui, libflint), Nothing, (Ref{RealFieldElem}, UInt, Ref{RealFieldElem}, Int), z, n, x, prec)
   return z
 end
 
-function chebyshev_u(n::UInt, x::RealFieldElem, prec::Int = precision(Balls))
+function chebyshev_u(n::UInt, x::RealFieldElem, prec::Int=precision(Balls))
   z = RealFieldElem()
-  ccall((:arb_chebyshev_u_ui, libflint), Nothing,
-              (Ref{RealFieldElem}, UInt, Ref{RealFieldElem}, Int), z, n, x, prec)
+  ccall((:arb_chebyshev_u_ui, libflint), Nothing, (Ref{RealFieldElem}, UInt, Ref{RealFieldElem}, Int), z, n, x, prec)
   return z
 end
 
-function chebyshev_t2(n::UInt, x::RealFieldElem, prec::Int = precision(Balls))
+function chebyshev_t2(n::UInt, x::RealFieldElem, prec::Int=precision(Balls))
   z = RealFieldElem()
   w = RealFieldElem()
-  ccall((:arb_chebyshev_t2_ui, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, UInt, Ref{RealFieldElem}, Int), z, w, n, x, prec)
+  ccall((:arb_chebyshev_t2_ui, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, UInt, Ref{RealFieldElem}, Int), z, w, n, x, prec)
   return z, w
 end
 
-function chebyshev_u2(n::UInt, x::RealFieldElem, prec::Int = precision(Balls))
+function chebyshev_u2(n::UInt, x::RealFieldElem, prec::Int=precision(Balls))
   z = RealFieldElem()
   w = RealFieldElem()
-  ccall((:arb_chebyshev_u2_ui, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{RealFieldElem}, UInt, Ref{RealFieldElem}, Int), z, w, n, x, prec)
+  ccall((:arb_chebyshev_u2_ui, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, UInt, Ref{RealFieldElem}, Int), z, w, n, x, prec)
   return z, w
 end
 
@@ -1711,38 +1634,37 @@ end
 
 Return the value of the Chebyshev polynomial $T_n(x)$.
 """
-chebyshev_t(n::Int, x::RealFieldElem, prec::Int = precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : chebyshev_t(UInt(n), x, prec)
+chebyshev_t(n::Int, x::RealFieldElem, prec::Int=precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : chebyshev_t(UInt(n), x, prec)
 
 @doc raw"""
     chebyshev_u(n::Int, x::RealFieldElem)
 
 Return the value of the Chebyshev polynomial $U_n(x)$.
 """
-chebyshev_u(n::Int, x::RealFieldElem, prec::Int = precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : chebyshev_u(UInt(n), x, prec)
+chebyshev_u(n::Int, x::RealFieldElem, prec::Int=precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : chebyshev_u(UInt(n), x, prec)
 
 @doc raw"""
     chebyshev_t2(n::Int, x::RealFieldElem)
 
 Return the tuple $(T_{n}(x), T_{n-1}(x))$.
 """
-chebyshev_t2(n::Int, x::RealFieldElem, prec::Int = precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : chebyshev_t2(UInt(n), x, prec)
+chebyshev_t2(n::Int, x::RealFieldElem, prec::Int=precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : chebyshev_t2(UInt(n), x, prec)
 
 @doc raw"""
     chebyshev_u2(n::Int, x::RealFieldElem)
 
 Return the tuple $(U_{n}(x), U_{n-1}(x))$
 """
-chebyshev_u2(n::Int, x::RealFieldElem, prec::Int = precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : chebyshev_u2(UInt(n), x, prec)
+chebyshev_u2(n::Int, x::RealFieldElem, prec::Int=precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : chebyshev_u2(UInt(n), x, prec)
 
 @doc raw"""
     bell(n::ZZRingElem, r::RealField)
 
 Return the Bell number $B_n$ as an element of $r$.
 """
-function bell(n::ZZRingElem, r::RealField, prec::Int = precision(Balls))
+function bell(n::ZZRingElem, r::RealField, prec::Int=precision(Balls))
   z = r()
-  ccall((:arb_bell_fmpz, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{ZZRingElem}, Int), z, n, prec)
+  ccall((:arb_bell_fmpz, libflint), Nothing, (Ref{RealFieldElem}, Ref{ZZRingElem}, Int), z, n, prec)
   return z
 end
 
@@ -1751,17 +1673,16 @@ end
 
 Return the Bell number $B_n$ as an element of $r$.
 """
-bell(n::Int, r::RealField, prec::Int = precision(Balls)) = bell(ZZRingElem(n), r, prec)
+bell(n::Int, r::RealField, prec::Int=precision(Balls)) = bell(ZZRingElem(n), r, prec)
 
 @doc raw"""
     numpart(n::ZZRingElem, r::RealField)
 
 Return the number of partitions $p(n)$ as an element of $r$.
 """
-function numpart(n::ZZRingElem, r::RealField, prec::Int = precision(Balls))
+function numpart(n::ZZRingElem, r::RealField, prec::Int=precision(Balls))
   z = r()
-  ccall((:arb_partitions_fmpz, libflint), Nothing,
-              (Ref{RealFieldElem}, Ref{ZZRingElem}, Int), z, n, prec)
+  ccall((:arb_partitions_fmpz, libflint), Nothing, (Ref{RealFieldElem}, Ref{ZZRingElem}, Int), z, n, prec)
   return z
 end
 
@@ -1770,7 +1691,7 @@ end
 
 Return the number of partitions $p(n)$ as an element of $r$.
 """
-numpart(n::Int, r::RealField, prec::Int = precision(Balls)) = numpart(ZZRingElem(n), r, prec)
+numpart(n::Int, r::RealField, prec::Int=precision(Balls)) = numpart(ZZRingElem(n), r, prec)
 
 ################################################################################
 #
@@ -1783,11 +1704,9 @@ numpart(n::Int, r::RealField, prec::Int = precision(Balls)) = numpart(ZZRingElem
 
 Return the Airy function $\operatorname{Ai}(x)$.
 """
-function airy_ai(x::RealFieldElem, prec::Int = precision(Balls))
+function airy_ai(x::RealFieldElem, prec::Int=precision(Balls))
   ai = RealFieldElem()
-  ccall((:arb_hypgeom_airy, libflint), Nothing,
-              (Ref{RealFieldElem}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{RealFieldElem}, Int),
-              ai, C_NULL, C_NULL, C_NULL, x, prec)
+  ccall((:arb_hypgeom_airy, libflint), Nothing, (Ref{RealFieldElem}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{RealFieldElem}, Int), ai, C_NULL, C_NULL, C_NULL, x, prec)
   return ai
 end
 
@@ -1796,11 +1715,9 @@ end
 
 Return the Airy function $\operatorname{Bi}(x)$.
 """
-function airy_bi(x::RealFieldElem, prec::Int = precision(Balls))
+function airy_bi(x::RealFieldElem, prec::Int=precision(Balls))
   bi = RealFieldElem()
-  ccall((:arb_hypgeom_airy, libflint), Nothing,
-              (Ptr{Cvoid}, Ptr{Cvoid}, Ref{RealFieldElem}, Ptr{Cvoid}, Ref{RealFieldElem}, Int),
-              C_NULL, C_NULL, bi, C_NULL, x, prec)
+  ccall((:arb_hypgeom_airy, libflint), Nothing, (Ptr{Cvoid}, Ptr{Cvoid}, Ref{RealFieldElem}, Ptr{Cvoid}, Ref{RealFieldElem}, Int), C_NULL, C_NULL, bi, C_NULL, x, prec)
   return bi
 end
 
@@ -1809,11 +1726,9 @@ end
 
 Return the derivative of the Airy function $\operatorname{Ai}^\prime(x)$.
 """
-function airy_ai_prime(x::RealFieldElem, prec::Int = precision(Balls))
+function airy_ai_prime(x::RealFieldElem, prec::Int=precision(Balls))
   ai_prime = RealFieldElem()
-  ccall((:arb_hypgeom_airy, libflint), Nothing,
-              (Ptr{Cvoid}, Ref{RealFieldElem}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{RealFieldElem}, Int),
-              C_NULL, ai_prime, C_NULL, C_NULL, x, prec)
+  ccall((:arb_hypgeom_airy, libflint), Nothing, (Ptr{Cvoid}, Ref{RealFieldElem}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{RealFieldElem}, Int), C_NULL, ai_prime, C_NULL, C_NULL, x, prec)
   return ai_prime
 end
 
@@ -1822,11 +1737,9 @@ end
 
 Return the derivative of the Airy function $\operatorname{Bi}^\prime(x)$.
 """
-function airy_bi_prime(x::RealFieldElem, prec::Int = precision(Balls))
+function airy_bi_prime(x::RealFieldElem, prec::Int=precision(Balls))
   bi_prime = RealFieldElem()
-  ccall((:arb_hypgeom_airy, libflint), Nothing,
-              (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int),
-              C_NULL, C_NULL, C_NULL, bi_prime, x, prec)
+  ccall((:arb_hypgeom_airy, libflint), Nothing, (Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), C_NULL, C_NULL, C_NULL, bi_prime, x, prec)
   return bi_prime
 end
 
@@ -1878,13 +1791,13 @@ function lindep(A::Vector{RealFieldElem}, bits::Int)
   n = length(A)
   V = [floor(ldexp(s, bits) + 0.5) for s in A]
   M = zero_matrix(ZZ, n, n + 1)
-  for i = 1:n
+  for i in 1:n
     M[i, i] = ZZ(1)
     flag, M[i, n + 1] = unique_integer(V[i])
     !flag && error("Insufficient precision in lindep")
   end
   L = lll(M)
-  return [L[1, i] for i = 1:n]
+  return [L[1, i] for i in 1:n]
 end
 
 ################################################################################
@@ -1911,20 +1824,19 @@ julia> simplest_rational_inside(const_pi(RR))
 ```
 """
 function simplest_rational_inside(x::RealFieldElem)
-   a = ZZRingElem()
-   b = ZZRingElem()
-   e = ZZRingElem()
+  a = ZZRingElem()
+  b = ZZRingElem()
+  e = ZZRingElem()
 
-   ccall((:arb_get_interval_fmpz_2exp, libflint), Nothing,
-         (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{RealFieldElem}), a, b, e, x)
-   !fits(Int, e) && error("Result does not fit into an QQFieldElem")
-   _e = Int(e)
-   if e >= 0
-      return a << _e
-   end
-   _e = -_e
-   d = ZZRingElem(1) << _e
-   return _fmpq_simplest_between(a, d, b, d)
+  ccall((:arb_get_interval_fmpz_2exp, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{RealFieldElem}), a, b, e, x)
+  !fits(Int, e) && error("Result does not fit into an QQFieldElem")
+  _e = Int(e)
+  if e >= 0
+    return a << _e
+  end
+  _e = -_e
+  d = ZZRingElem(1) << _e
+  return _fmpq_simplest_between(a, d, b, d)
 end
 
 ################################################################################
@@ -1934,25 +1846,22 @@ end
 ################################################################################
 
 function zero!(z::RealFieldElem)
-   ccall((:arb_zero, libflint), Nothing, (Ref{RealFieldElem},), z)
-   return z
+  ccall((:arb_zero, libflint), Nothing, (Ref{RealFieldElem},), z)
+  return z
 end
 
-for (s,f) in (("add!","arb_add"), ("mul!","arb_mul"), ("div!", "arb_div"),
-              ("sub!","arb_sub"))
+for (s, f) in (("add!", "arb_add"), ("mul!", "arb_mul"), ("div!", "arb_div"), ("sub!", "arb_sub"))
   @eval begin
-    function ($(Symbol(s)))(z::RealFieldElem, x::RealFieldElem, y::RealFieldElem, prec::Int = precision(Balls))
-      ccall(($f, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int),
-                           z, x, y, prec)
+    function ($(Symbol(s)))(z::RealFieldElem, x::RealFieldElem, y::RealFieldElem, prec::Int=precision(Balls))
+      ccall(($f, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, x, y, prec)
       return z
     end
   end
 end
 
-function addeq!(z::RealFieldElem, x::RealFieldElem, prec::Int = precision(Balls))
-    ccall((:arb_add, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int),
-                           z, z, x, prec)
-    return z
+function addeq!(z::RealFieldElem, x::RealFieldElem, prec::Int=precision(Balls))
+  ccall((:arb_add, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int), z, z, x, prec)
+  return z
 end
 
 ################################################################################
@@ -1962,8 +1871,7 @@ end
 ################################################################################
 
 for (typeofx, passtoc) in ((RealFieldElem, Ref{RealFieldElem}), (Ptr{RealFieldElem}, Ptr{RealFieldElem}))
-  for (f,t) in (("arb_set_si", Int), ("arb_set_ui", UInt),
-                ("arb_set_d", Float64))
+  for (f, t) in (("arb_set_si", Int), ("arb_set_ui", UInt), ("arb_set_d", Float64))
     @eval begin
       function _arb_set(x::($typeofx), y::($t))
         ccall(($f, libflint), Nothing, (($passtoc), ($t)), x, y)
@@ -1971,8 +1879,7 @@ for (typeofx, passtoc) in ((RealFieldElem, Ref{RealFieldElem}), (Ptr{RealFieldEl
 
       function _arb_set(x::($typeofx), y::($t), p::Int)
         _arb_set(x, y)
-        ccall((:arb_set_round, libflint), Nothing,
-                    (($passtoc), ($passtoc), Int), x, x, p)
+        ccall((:arb_set_round, libflint), Nothing, (($passtoc), ($passtoc), Int), x, x, p)
       end
     end
   end
@@ -1983,13 +1890,11 @@ for (typeofx, passtoc) in ((RealFieldElem, Ref{RealFieldElem}), (Ptr{RealFieldEl
     end
 
     function _arb_set(x::($typeofx), y::ZZRingElem, p::Int)
-      ccall((:arb_set_round_fmpz, libflint), Nothing,
-                  (($passtoc), Ref{ZZRingElem}, Int), x, y, p)
+      ccall((:arb_set_round_fmpz, libflint), Nothing, (($passtoc), Ref{ZZRingElem}, Int), x, y, p)
     end
 
     function _arb_set(x::($typeofx), y::QQFieldElem, p::Int)
-      ccall((:arb_set_fmpq, libflint), Nothing,
-                  (($passtoc), Ref{QQFieldElem}, Int), x, y, p)
+      ccall((:arb_set_fmpq, libflint), Nothing, (($passtoc), Ref{QQFieldElem}, Int), x, y, p)
     end
 
     function _arb_set(x::($typeofx), y::RealFieldElem)
@@ -1997,35 +1902,28 @@ for (typeofx, passtoc) in ((RealFieldElem, Ref{RealFieldElem}), (Ptr{RealFieldEl
     end
 
     function _arb_set(x::($typeofx), y::RealFieldElem, p::Int)
-      ccall((:arb_set_round, libflint), Nothing,
-                  (($passtoc), Ref{RealFieldElem}, Int), x, y, p)
+      ccall((:arb_set_round, libflint), Nothing, (($passtoc), Ref{RealFieldElem}, Int), x, y, p)
     end
 
     function _arb_set(x::($typeofx), y::AbstractString, p::Int)
       s = string(y)
-      err = ccall((:arb_set_str, libflint), Int32,
-                  (($passtoc), Ptr{UInt8}, Int), x, s, p)
+      err = ccall((:arb_set_str, libflint), Int32, (($passtoc), Ptr{UInt8}, Int), x, s, p)
       err == 0 || error("Invalid real string: $(repr(s))")
     end
 
     function _arb_set(x::($typeofx), y::BigFloat)
-      m = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct},
-                  (($passtoc), ), x)
-      r = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct},
-                  (($passtoc), ), x)
-      ccall((:arf_set_mpfr, libflint), Nothing,
-                  (Ptr{arf_struct}, Ref{BigFloat}), m, y)
-      ccall((:mag_zero, libflint), Nothing, (Ptr{mag_struct}, ), r)
+      m = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (($passtoc),), x)
+      r = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (($passtoc),), x)
+      ccall((:arf_set_mpfr, libflint), Nothing, (Ptr{arf_struct}, Ref{BigFloat}), m, y)
+      ccall((:mag_zero, libflint), Nothing, (Ptr{mag_struct},), r)
     end
 
     function _arb_set(x::($typeofx), y::BigFloat, p::Int)
-      m = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (($passtoc), ), x)
-      r = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (($passtoc), ), x)
-      ccall((:arf_set_mpfr, libflint), Nothing,
-                  (Ptr{arf_struct}, Ref{BigFloat}), m, y)
-      ccall((:mag_zero, libflint), Nothing, (Ptr{mag_struct}, ), r)
-      ccall((:arb_set_round, libflint), Nothing,
-                  (($passtoc), ($passtoc), Int), x, x, p)
+      m = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (($passtoc),), x)
+      r = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (($passtoc),), x)
+      ccall((:arf_set_mpfr, libflint), Nothing, (Ptr{arf_struct}, Ref{BigFloat}), m, y)
+      ccall((:mag_zero, libflint), Nothing, (Ptr{mag_struct},), r)
+      ccall((:arb_set_round, libflint), Nothing, (($passtoc), ($passtoc), Int), x, x, p)
     end
 
     function _arb_set(x::($typeofx), y::Integer)
@@ -2070,7 +1968,7 @@ function (r::RealField)(x::Irrational, prec::Int)
   end
 end
 
-(r::RealField)(x::Any; precision::Int = precision(Balls)) = r(x, precision)
+(r::RealField)(x::Any; precision::Int=precision(Balls)) = r(x, precision)
 
 ################################################################################
 #
@@ -2102,28 +2000,22 @@ the magnitude of the midpoint, while `:randtest_wide` return a radius that
 might be big relative to its midpoint. The `:randtest_special`-option might
 return a midpoint and radius whose values are `NaN` or `inf`.
 """
-function rand(r::RealField, prec::Int = precision(Balls); randtype::Symbol=:urandom)
+function rand(r::RealField, prec::Int=precision(Balls); randtype::Symbol=:urandom)
   state = _flint_rand_states[Threads.threadid()]
   x = r()
 
   if randtype == :urandom
-    ccall((:arb_urandom, libflint), Nothing,
-          (Ref{RealFieldElem}, Ref{rand_ctx}, Int), x, state, prec)
+    ccall((:arb_urandom, libflint), Nothing, (Ref{RealFieldElem}, Ref{rand_ctx}, Int), x, state, prec)
   elseif randtype == :randtest
-    ccall((:arb_randtest, libflint), Nothing,
-          (Ref{RealFieldElem}, Ref{rand_ctx}, Int, Int), x, state, prec, 30)
+    ccall((:arb_randtest, libflint), Nothing, (Ref{RealFieldElem}, Ref{rand_ctx}, Int, Int), x, state, prec, 30)
   elseif randtype == :randtest_exact
-    ccall((:arb_randtest_exact, libflint), Nothing,
-          (Ref{RealFieldElem}, Ref{rand_ctx}, Int, Int), x, state, prec, 30)
+    ccall((:arb_randtest_exact, libflint), Nothing, (Ref{RealFieldElem}, Ref{rand_ctx}, Int, Int), x, state, prec, 30)
   elseif randtype == :randtest_precise
-    ccall((:arb_randtest_precise, libflint), Nothing,
-          (Ref{RealFieldElem}, Ref{rand_ctx}, Int, Int), x, state, prec, 30)
+    ccall((:arb_randtest_precise, libflint), Nothing, (Ref{RealFieldElem}, Ref{rand_ctx}, Int, Int), x, state, prec, 30)
   elseif randtype == :randtest_wide
-    ccall((:arb_randtest_wide, libflint), Nothing,
-          (Ref{RealFieldElem}, Ref{rand_ctx}, Int, Int), x, state, prec, 30)
+    ccall((:arb_randtest_wide, libflint), Nothing, (Ref{RealFieldElem}, Ref{rand_ctx}, Int, Int), x, state, prec, 30)
   elseif randtype == :randtest_special
-    ccall((:arb_randtest_special, libflint), Nothing,
-          (Ref{RealFieldElem}, Ref{rand_ctx}, Int, Int), x, state, prec, 30)
+    ccall((:arb_randtest_special, libflint), Nothing, (Ref{RealFieldElem}, Ref{rand_ctx}, Int, Int), x, state, prec, 30)
   else
     error("Arb random generation `" * String(randtype) * "` is not defined")
   end

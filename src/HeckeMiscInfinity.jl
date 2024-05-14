@@ -6,8 +6,7 @@ than any real number. For use in valuations and elsewhere.
 
 See [`NegInf`](@ref).
 """
-struct PosInf
-end
+struct PosInf end
 
 """
     NegInf
@@ -17,8 +16,7 @@ than any real number. For use in valuations and elsewhere.
 
 See [`PosInf`](@ref).
 """
-struct NegInf
-end
+struct NegInf end
 
 # type union for convenience later on
 const AnyInf = Union{PosInf,NegInf}
@@ -63,7 +61,6 @@ Base.:(==)(inf1::AnyInf, inf2::AnyInf) = signbit(inf1) == signbit(inf2)
 Base.:(==)(x::AnyInf, y::Real) = isinf(y) && signbit(y) == signbit(x)
 Base.:(==)(y::Real, x::AnyInf) = x == y
 
-
 Base.isless(x::Real, ::PosInf) = isfinite(x) || signbit(x)
 Base.isless(::PosInf, ::Real) = false
 
@@ -71,7 +68,6 @@ Base.isless(::Real, ::NegInf) = false
 Base.isless(::NegInf, x::Real) = isfinite(x) || !signbit(x)
 
 Base.isless(inf1::AnyInf, inf2::AnyInf) = signbit(inf1) && !signbit(inf2)
-
 
 Base.isless(::PosInf, ::Union{ZZRingElem,QQFieldElem}) = false
 Base.isless(::Union{ZZRingElem,QQFieldElem}, ::PosInf) = true

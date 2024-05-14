@@ -33,55 +33,54 @@ function GF(n::ZZRingElem; cached::Bool=true, check::Bool=true)
   return FpField(n, cached)
 end
 
-function finite_field(char::ZZRingElem, deg::Int, s::VarName = :o; cached = true, check::Bool = true)
-  parent_obj = FqPolyRepField(char, deg, Symbol(s), cached, check = check)
+function finite_field(char::ZZRingElem, deg::Int, s::VarName=:o; cached=true, check::Bool=true)
+  parent_obj = FqPolyRepField(char, deg, Symbol(s), cached; check=check)
   return parent_obj, gen(parent_obj)
 end
 
-function finite_field(pol::Union{ZZModPolyRingElem, FpPolyRingElem},
-    s::VarName = :o; cached::Bool = true, check::Bool = true)
-  parent_obj = FqPolyRepField(pol, Symbol(s), cached, check=check)
+function finite_field(pol::Union{ZZModPolyRingElem,FpPolyRingElem}, s::VarName=:o; cached::Bool=true, check::Bool=true)
+  parent_obj = FqPolyRepField(pol, Symbol(s), cached; check=check)
   return parent_obj, gen(parent_obj)
 end
 
-function finite_field(F::FqPolyRepField, deg::Int, s::VarName = :o; cached::Bool = true, check::Bool=true)
-  return FqPolyRepField(characteristic(F), deg, Symbol(s), cached, check=check)
+function finite_field(F::FqPolyRepField, deg::Int, s::VarName=:o; cached::Bool=true, check::Bool=true)
+  return FqPolyRepField(characteristic(F), deg, Symbol(s), cached; check=check)
 end
 
-similar(F::FqPolyRepField, deg::Int, s::VarName = :o; cached::Bool = true) = finite_field(F, deg, s, cached = cached, check = false)
+similar(F::FqPolyRepField, deg::Int, s::VarName=:o; cached::Bool=true) = finite_field(F, deg, s; cached=cached, check=false)
 
-function finite_field(char::Int, deg::Int, s::VarName = :o; cached::Bool = true, check::Bool = true)
-   parent_obj = fqPolyRepField(ZZRingElem(char), deg, Symbol(s), cached, check = check)
-   return parent_obj, gen(parent_obj)
+function finite_field(char::Int, deg::Int, s::VarName=:o; cached::Bool=true, check::Bool=true)
+  parent_obj = fqPolyRepField(ZZRingElem(char), deg, Symbol(s), cached; check=check)
+  return parent_obj, gen(parent_obj)
 end
 
-function finite_field(pol::Zmodn_poly, s::VarName = :o; cached::Bool = true, check::Bool=true)
-   parent_obj = fqPolyRepField(pol, Symbol(s), cached, check=check)
-   return parent_obj, gen(parent_obj)
+function finite_field(pol::Zmodn_poly, s::VarName=:o; cached::Bool=true, check::Bool=true)
+  parent_obj = fqPolyRepField(pol, Symbol(s), cached; check=check)
+  return parent_obj, gen(parent_obj)
 end
 
-function finite_field(F::fqPolyRepField, deg::Int, s::VarName = :o; cached::Bool = true, check::Bool = true)
-    return fqPolyRepField(characteristic(F), deg, Symbol(s), cached, check = check)
+function finite_field(F::fqPolyRepField, deg::Int, s::VarName=:o; cached::Bool=true, check::Bool=true)
+  return fqPolyRepField(characteristic(F), deg, Symbol(s), cached; check=check)
 end
 
-similar(F::fqPolyRepField, deg::Int, s::VarName = :o; cached::Bool = true) = FiniteField(F, deg, s, cached = cached, check = false)
+similar(F::fqPolyRepField, deg::Int, s::VarName=:o; cached::Bool=true) = FiniteField(F, deg, s; cached=cached, check=false)
 
 # Additional from Hecke
-function finite_field(p::Integer; cached::Bool = true, check::Bool = true)
+function finite_field(p::Integer; cached::Bool=true, check::Bool=true)
   @assert (!check) || is_prime(p)
-  k = GF(p, cached=cached, check = check)
+  k = GF(p; cached=cached, check=check)
   return k, k(1)
 end
 
-function finite_field(p::ZZRingElem; cached::Bool = true, check::Bool = true)
+function finite_field(p::ZZRingElem; cached::Bool=true, check::Bool=true)
   @assert (!check) || is_prime(p)
-  k = GF(p, cached=cached)
+  k = GF(p; cached=cached)
   return k, k(1)
 end
 
-GF(p::Integer, k::Int, s::VarName = :o; cached::Bool = true, check::Bool = true) = finite_field(p, k, s, cached = cached, check = check)[1]
+GF(p::Integer, k::Int, s::VarName=:o; cached::Bool=true, check::Bool=true) = finite_field(p, k, s; cached=cached, check=check)[1]
 
-GF(p::ZZRingElem, k::Int, s::VarName = :o; cached::Bool = true, check::Bool = true) = finite_field(p, k, s, cached = cached, check = check)[1]
+GF(p::ZZRingElem, k::Int, s::VarName=:o; cached::Bool=true, check::Bool=true) = finite_field(p, k, s; cached=cached, check=check)[1]
 
 import ..Nemo: @alias
 @alias FiniteField finite_field # for compatibility with Hecke

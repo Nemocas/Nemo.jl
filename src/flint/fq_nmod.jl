@@ -23,7 +23,7 @@ parent(a::fqPolyRepFieldElem) = a.parent
 is_domain_type(::Type{fqPolyRepFieldElem}) = true
 
 function check_parent(a::fqPolyRepFieldElem, b::fqPolyRepFieldElem)
-   a.parent != b.parent && error("Operations on distinct finite fields not supported")
+  a.parent != b.parent && error("Operations on distinct finite fields not supported")
 end
 
 ###############################################################################
@@ -33,95 +33,86 @@ end
 ###############################################################################
 
 function Base.hash(a::fqPolyRepFieldElem, h::UInt)
-   b = 0x78e5f766c8ace18d%UInt
-   for i in 0:degree(parent(a)) - 1
-      b = xor(b, xor(hash(coeff(a, i), h), h))
-      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
-   end
-   return b
+  b = 0x78e5f766c8ace18d % UInt
+  for i in 0:(degree(parent(a)) - 1)
+    b = xor(b, xor(hash(coeff(a, i), h), h))
+    b = (b << 1) | (b >> (sizeof(Int) * 8 - 1))
+  end
+  return b
 end
 
 function coeff(x::fqPolyRepFieldElem, n::Int)
-   n < 0 && throw(DomainError(n, "Index must be non-negative"))
-   return ccall((:nmod_poly_get_coeff_ui, libflint), UInt,
-                (Ref{fqPolyRepFieldElem}, Int), x, n)
+  n < 0 && throw(DomainError(n, "Index must be non-negative"))
+  return ccall((:nmod_poly_get_coeff_ui, libflint), UInt, (Ref{fqPolyRepFieldElem}, Int), x, n)
 end
 
 function coeffs_raw(x::fqPolyRepFieldElem)
-   @GC.preserve x begin
-      len = degree(parent(x))
-      V = unsafe_wrap(Vector{UInt}, reinterpret(Ptr{UInt}, x.coeffs), x.length)
-      Vcopy = Vector{UInt}(undef, len)
-      for i = 1:x.length
-         Vcopy[i] = V[i]
-      end
-      for i = x.length + 1:len
-         Vcopy[i] = 0
-      end
-   end
-   return Vcopy
+  GC.@preserve x begin
+    len = degree(parent(x))
+    V = unsafe_wrap(Vector{UInt}, reinterpret(Ptr{UInt}, x.coeffs), x.length)
+    Vcopy = Vector{UInt}(undef, len)
+    for i in 1:(x.length)
+      Vcopy[i] = V[i]
+    end
+    for i in (x.length + 1):len
+      Vcopy[i] = 0
+    end
+  end
+  return Vcopy
 end
 
 # set the i-th coeff of x to c, internal use only
 function setindex_raw!(x::fqPolyRepFieldElem, c::UInt, i::Int)
-   len = degree(parent(x))
-   i > len - 1 && error("Index out of range")
-   ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-         (Ref{fqPolyRepFieldElem}, Int, UInt), x, i, c)
-   return x
+  len = degree(parent(x))
+  i > len - 1 && error("Index out of range")
+  ccall((:nmod_poly_set_coeff_ui, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Int, UInt), x, i, c)
+  return x
 end
 
 function zero(a::fqPolyRepField)
-   d = a()
-   ccall((:fq_nmod_zero, libflint), Nothing,
-         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), d, a)
-   return d
+  d = a()
+  ccall((:fq_nmod_zero, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), d, a)
+  return d
 end
 
 function one(a::fqPolyRepField)
-   d = a()
-   ccall((:fq_nmod_one, libflint), Nothing,
-         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), d, a)
-   return d
+  d = a()
+  ccall((:fq_nmod_one, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), d, a)
+  return d
 end
 
 function gen(a::fqPolyRepField)
-   d = a()
-   ccall((:fq_nmod_gen, libflint), Nothing,
-         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), d, a)
-   return d
+  d = a()
+  ccall((:fq_nmod_gen, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), d, a)
+  return d
 end
 
-iszero(a::fqPolyRepFieldElem) = ccall((:fq_nmod_is_zero, libflint), Bool,
-                     (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), a, a.parent)
+iszero(a::fqPolyRepFieldElem) = ccall((:fq_nmod_is_zero, libflint), Bool, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), a, a.parent)
 
-isone(a::fqPolyRepFieldElem) = ccall((:fq_nmod_is_one, libflint), Bool,
-                    (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), a, a.parent)
+isone(a::fqPolyRepFieldElem) = ccall((:fq_nmod_is_one, libflint), Bool, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), a, a.parent)
 
 is_gen(a::fqPolyRepFieldElem) = a == gen(parent(a)) # there is no is_gen in flint
 
-is_unit(a::fqPolyRepFieldElem) = ccall((:fq_nmod_is_invertible, libflint), Bool,
-                     (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), a, a.parent)
+is_unit(a::fqPolyRepFieldElem) = ccall((:fq_nmod_is_invertible, libflint), Bool, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), a, a.parent)
 
 function characteristic(a::fqPolyRepField)
-   return ZZ(a.n)
+  return ZZ(a.n)
 end
 
 function order(a::fqPolyRepField)
-   d = ZZRingElem()
-   ccall((:fq_nmod_ctx_order, libflint), Nothing,
-         (Ref{ZZRingElem}, Ref{fqPolyRepField}), d, a)
-   return d
+  d = ZZRingElem()
+  ccall((:fq_nmod_ctx_order, libflint), Nothing, (Ref{ZZRingElem}, Ref{fqPolyRepField}), d, a)
+  return d
 end
 
 function degree(a::fqPolyRepField)
-   return ccall((:fq_nmod_ctx_degree, libflint), Int, (Ref{fqPolyRepField},), a)
+  return ccall((:fq_nmod_ctx_degree, libflint), Int, (Ref{fqPolyRepField},), a)
 end
 
 function deepcopy_internal(d::fqPolyRepFieldElem, dict::IdDict)
-   z = fqPolyRepFieldElem(parent(d), d)
-   z.parent = parent(d)
-   return z
+  z = fqPolyRepFieldElem(parent(d), d)
+  z.parent = parent(d)
+  return z
 end
 
 ###############################################################################
@@ -138,37 +129,43 @@ canonical_unit(x::fqPolyRepFieldElem) = x
 #
 ###############################################################################
 
-function expressify(a::fqPolyRepFieldElem; context = nothing)
-   x = unsafe_string(reinterpret(Cstring, a.parent.var))
-   d = degree(a.parent)
+function expressify(a::fqPolyRepFieldElem; context=nothing)
+  x = unsafe_string(reinterpret(Cstring, a.parent.var))
+  d = degree(a.parent)
 
-   sum = Expr(:call, :+)
-   for k in (d - 1):-1:0
-        c = coeff(a, k)
-        if !iszero(c)
-            xk = k < 1 ? 1 : k == 1 ? x : Expr(:call, :^, x, k)
-            if isone(c)
-                push!(sum.args, Expr(:call, :*, xk))
-            else
-                push!(sum.args, Expr(:call, :*, expressify(c, context = context), xk))
-            end
-        end
+  sum = Expr(:call, :+)
+  for k in (d - 1):-1:0
+    c = coeff(a, k)
+    if !iszero(c)
+      xk = if k < 1
+        1
+      elseif k == 1
+        x
+      else
+        Expr(:call, :^, x, k)
+      end
+      if isone(c)
+        push!(sum.args, Expr(:call, :*, xk))
+      else
+        push!(sum.args, Expr(:call, :*, expressify(c; context=context), xk))
+      end
     end
-    return sum
+  end
+  return sum
 end
 
-show(io::IO, a::fqPolyRepFieldElem) = print(io, AbstractAlgebra.obj_to_string(a, context = io))
+show(io::IO, a::fqPolyRepFieldElem) = print(io, AbstractAlgebra.obj_to_string(a; context=io))
 
 function show(io::IO, a::fqPolyRepField)
-   @show_name(io, a)
-   @show_special(io, a)
-   if is_terse(io)
-      io = pretty(io)
-      print(io, LowercaseOff(), "GF($(characteristic(a))", degree(a)>1 ? "^$(degree(a))" : "", ")")
-   else
-      print(io, "Finite field of degree ", degree(a), " over ")
-      print(io, "GF($(characteristic(a)))")
-   end
+  @show_name(io, a)
+  @show_special(io, a)
+  if is_terse(io)
+    io = pretty(io)
+    print(io, LowercaseOff(), "GF($(characteristic(a))", degree(a) > 1 ? "^$(degree(a))" : "", ")")
+  else
+    print(io, "Finite field of degree ", degree(a), " over ")
+    print(io, "GF($(characteristic(a)))")
+  end
 end
 
 ###############################################################################
@@ -178,10 +175,9 @@ end
 ###############################################################################
 
 function -(x::fqPolyRepFieldElem)
-   z = parent(x)()
-   ccall((:fq_nmod_neg, libflint), Nothing,
-       (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, x.parent)
-   return z
+  z = parent(x)()
+  ccall((:fq_nmod_neg, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, x.parent)
+  return z
 end
 
 ###############################################################################
@@ -191,30 +187,24 @@ end
 ###############################################################################
 
 function +(x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
-   check_parent(x, y)
-   z = parent(y)()
-   ccall((:fq_nmod_add, libflint), Nothing,
-         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
-                                                       z, x, y, y.parent)
-   return z
+  check_parent(x, y)
+  z = parent(y)()
+  ccall((:fq_nmod_add, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, y, y.parent)
+  return z
 end
 
 function -(x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
-   check_parent(x, y)
-   z = parent(y)()
-   ccall((:fq_nmod_sub, libflint), Nothing,
-         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
-                                                       z, x, y, y.parent)
-   return z
+  check_parent(x, y)
+  z = parent(y)()
+  ccall((:fq_nmod_sub, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, y, y.parent)
+  return z
 end
 
 function *(x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
-   check_parent(x, y)
-   z = parent(y)()
-   ccall((:fq_nmod_mul, libflint), Nothing,
-         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
-                                                       z, x, y, y.parent)
-   return z
+  check_parent(x, y)
+  z = parent(y)()
+  ccall((:fq_nmod_mul, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, y, y.parent)
+  return z
 end
 
 ###############################################################################
@@ -224,28 +214,24 @@ end
 ###############################################################################
 
 function *(x::Int, y::fqPolyRepFieldElem)
-   z = parent(y)()
-   ccall((:fq_nmod_mul_si, libflint), Nothing,
-         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Int, Ref{fqPolyRepField}),
-                                               z, y, x, y.parent)
-   return z
+  z = parent(y)()
+  ccall((:fq_nmod_mul_si, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Int, Ref{fqPolyRepField}), z, y, x, y.parent)
+  return z
 end
 
-*(x::fqPolyRepFieldElem, y::Int) = y*x
+*(x::fqPolyRepFieldElem, y::Int) = y * x
 
-*(x::Integer, y::fqPolyRepFieldElem) = ZZRingElem(x)*y
+*(x::Integer, y::fqPolyRepFieldElem) = ZZRingElem(x) * y
 
-*(x::fqPolyRepFieldElem, y::Integer) = y*x
+*(x::fqPolyRepFieldElem, y::Integer) = y * x
 
 function *(x::ZZRingElem, y::fqPolyRepFieldElem)
-   z = parent(y)()
-   ccall((:fq_nmod_mul_fmpz, libflint), Nothing,
-         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{ZZRingElem}, Ref{fqPolyRepField}),
-                                                    z, y, x, y.parent)
-   return z
+  z = parent(y)()
+  ccall((:fq_nmod_mul_fmpz, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{ZZRingElem}, Ref{fqPolyRepField}), z, y, x, y.parent)
+  return z
 end
 
-*(x::fqPolyRepFieldElem, y::ZZRingElem) = y*x
+*(x::fqPolyRepFieldElem, y::ZZRingElem) = y * x
 
 +(x::fqPolyRepFieldElem, y::Integer) = x + parent(x)(y)
 
@@ -270,27 +256,23 @@ end
 ###############################################################################
 
 function ^(x::fqPolyRepFieldElem, y::Int)
-   if y < 0
-      x = inv(x)
-      y = -y
-   end
-   z = parent(x)()
-   ccall((:fq_nmod_pow_ui, libflint), Nothing,
-         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Int, Ref{fqPolyRepField}),
-                                               z, x, y, x.parent)
-   return z
+  if y < 0
+    x = inv(x)
+    y = -y
+  end
+  z = parent(x)()
+  ccall((:fq_nmod_pow_ui, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Int, Ref{fqPolyRepField}), z, x, y, x.parent)
+  return z
 end
 
 function ^(x::fqPolyRepFieldElem, y::ZZRingElem)
-   if y < 0
-      x = inv(x)
-      y = -y
-   end
-   z = parent(x)()
-   ccall((:fq_nmod_pow, libflint), Nothing,
-         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{ZZRingElem}, Ref{fqPolyRepField}),
-                                                    z, x, y, x.parent)
-   return z
+  if y < 0
+    x = inv(x)
+    y = -y
+  end
+  z = parent(x)()
+  ccall((:fq_nmod_pow, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{ZZRingElem}, Ref{fqPolyRepField}), z, x, y, x.parent)
+  return z
 end
 
 ###############################################################################
@@ -300,9 +282,8 @@ end
 ###############################################################################
 
 function ==(x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
-   check_parent(x, y)
-   ccall((:fq_nmod_equal, libflint), Bool,
-       (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), x, y, y.parent)
+  check_parent(x, y)
+  ccall((:fq_nmod_equal, libflint), Bool, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), x, y, y.parent)
 end
 
 ###############################################################################
@@ -326,11 +307,10 @@ end
 ###############################################################################
 
 function inv(x::fqPolyRepFieldElem)
-   iszero(x) && throw(DivideError())
-   z = parent(x)()
-   ccall((:fq_nmod_inv, libflint), Nothing,
-       (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, x.parent)
-   return z
+  iszero(x) && throw(DivideError())
+  z = parent(x)()
+  ccall((:fq_nmod_inv, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, x.parent)
+  return z
 end
 
 ###############################################################################
@@ -340,23 +320,21 @@ end
 ###############################################################################
 
 function divexact(x::fqPolyRepFieldElem, y::fqPolyRepFieldElem; check::Bool=true)
-   check_parent(x, y)
-   iszero(y) && throw(DivideError())
-   z = parent(y)()
-   ccall((:fq_nmod_div, libflint), Nothing,
-         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
-                                                       z, x, y, y.parent)
-   return z
+  check_parent(x, y)
+  iszero(y) && throw(DivideError())
+  z = parent(y)()
+  ccall((:fq_nmod_div, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, y, y.parent)
+  return z
 end
 
 function divides(a::fqPolyRepFieldElem, b::fqPolyRepFieldElem)
-   if iszero(a)
-      return true, zero(parent(a))
-   end
-   if iszero(b)
-      return false, zero(parent(a))
-   end
-   return true, divexact(a, b)
+  if iszero(a)
+    return true, zero(parent(a))
+  end
+  if iszero(b)
+    return false, zero(parent(a))
+  end
+  return true, divexact(a, b)
 end
 
 ###############################################################################
@@ -380,55 +358,44 @@ divexact(x::ZZRingElem, y::fqPolyRepFieldElem; check::Bool=true) = divexact(pare
 ###############################################################################
 
 function sqrt(x::fqPolyRepFieldElem; check::Bool=true)
-   z = parent(x)()
-   res = Bool(ccall((:fq_nmod_sqrt, libflint), Cint,
-                    (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
-                    z, x, x.parent))
-   check && !res && error("Not a square")
-   return z
+  z = parent(x)()
+  res = Bool(ccall((:fq_nmod_sqrt, libflint), Cint, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, x.parent))
+  check && !res && error("Not a square")
+  return z
 end
 
 function is_square(x::fqPolyRepFieldElem)
-   return Bool(ccall((:fq_nmod_is_square, libflint), Cint,
-                     (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
-                     x, x.parent))
+  return Bool(ccall((:fq_nmod_is_square, libflint), Cint, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), x, x.parent))
 end
 
 function is_square_with_sqrt(x::fqPolyRepFieldElem)
-   z = parent(x)()
-   flag = ccall((:fq_nmod_sqrt, libflint), Cint,
-                (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
-                z, x, x.parent)
-   return (Bool(flag), z)
+  z = parent(x)()
+  flag = ccall((:fq_nmod_sqrt, libflint), Cint, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, x.parent)
+  return (Bool(flag), z)
 end
 
 function pth_root(x::fqPolyRepFieldElem)
-   z = parent(x)()
-   ccall((:fq_nmod_pth_root, libflint), Nothing,
-       (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, x.parent)
-   return z
+  z = parent(x)()
+  ccall((:fq_nmod_pth_root, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, x.parent)
+  return z
 end
 
 function tr(x::fqPolyRepFieldElem)
-   z = ZZRingElem()
-   ccall((:fq_nmod_trace, libflint), Nothing,
-         (Ref{ZZRingElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, x.parent)
-   return parent(x)(z)
+  z = ZZRingElem()
+  ccall((:fq_nmod_trace, libflint), Nothing, (Ref{ZZRingElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, x.parent)
+  return parent(x)(z)
 end
 
 function norm(x::fqPolyRepFieldElem)
-   z = ZZRingElem()
-   ccall((:fq_nmod_norm, libflint), Nothing,
-         (Ref{ZZRingElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, x.parent)
-   return parent(x)(z)
+  z = ZZRingElem()
+  ccall((:fq_nmod_norm, libflint), Nothing, (Ref{ZZRingElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, x.parent)
+  return parent(x)(z)
 end
 
-function frobenius(x::fqPolyRepFieldElem, n = 1)
-   z = parent(x)()
-   ccall((:fq_nmod_frobenius, libflint), Nothing,
-         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Int, Ref{fqPolyRepField}),
-                                               z, x, n, x.parent)
-   return z
+function frobenius(x::fqPolyRepFieldElem, n=1)
+  z = parent(x)()
+  ccall((:fq_nmod_frobenius, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Int, Ref{fqPolyRepField}), z, x, n, x.parent)
+  return z
 end
 
 ###############################################################################
@@ -438,11 +405,9 @@ end
 ###############################################################################
 
 function lift(R::fpPolyRing, x::fqPolyRepFieldElem)
-   c = R()
-   ccall((:fq_nmod_get_nmod_poly, libflint), Nothing,
-         (Ref{fpPolyRingElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
-                                                      c, x, parent(x))
-   return c
+  c = R()
+  ccall((:fq_nmod_get_nmod_poly, libflint), Nothing, (Ref{fpPolyRingElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), c, x, parent(x))
+  return c
 end
 
 ###############################################################################
@@ -452,30 +417,23 @@ end
 ###############################################################################
 
 function zero!(z::fqPolyRepFieldElem)
-   ccall((:fq_nmod_zero, libflint), Nothing,
-        (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, z.parent)
-   return z
+  ccall((:fq_nmod_zero, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, z.parent)
+  return z
 end
 
 function mul!(z::fqPolyRepFieldElem, x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
-   ccall((:fq_nmod_mul, libflint), Nothing,
-         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
-                                                       z, x, y, y.parent)
-   return z
+  ccall((:fq_nmod_mul, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, y, y.parent)
+  return z
 end
 
 function addeq!(z::fqPolyRepFieldElem, x::fqPolyRepFieldElem)
-   ccall((:fq_nmod_add, libflint), Nothing,
-         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
-                                                       z, z, x, x.parent)
-   return z
+  ccall((:fq_nmod_add, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, z, x, x.parent)
+  return z
 end
 
 function add!(z::fqPolyRepFieldElem, x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
-   ccall((:fq_nmod_add, libflint), Nothing,
-         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
-                                                       z, x, y, x.parent)
-   return z
+  ccall((:fq_nmod_add, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, y, x.parent)
+  return z
 end
 
 ###############################################################################
@@ -486,22 +444,21 @@ end
 
 # define rand(::fqPolyRepField)
 
-Random.Sampler(::Type{RNG}, R::fqPolyRepField, n::Random.Repetition) where {RNG<:AbstractRNG} =
-   Random.SamplerSimple(R, Random.Sampler(RNG, BigInt(0):BigInt(order(R))-1, n))
+Random.Sampler(::Type{RNG}, R::fqPolyRepField, n::Random.Repetition) where {RNG<:AbstractRNG} = Random.SamplerSimple(R, Random.Sampler(RNG, BigInt(0):(BigInt(order(R)) - 1), n))
 
 function rand(rng::AbstractRNG, R::Random.SamplerSimple{fqPolyRepField})
-   F = R[]
-   x = gen(F)
-   z = zero(F)
-   p = characteristic(F)
-   n = ZZRingElem(rand(rng, R.data))
-   xi = one(F)
-   while !iszero(n)
-      n, r = divrem(n, p)
-      z += r*xi
-      xi *= x
-   end
-   return z
+  F = R[]
+  x = gen(F)
+  z = zero(F)
+  p = characteristic(F)
+  n = ZZRingElem(rand(rng, R.data))
+  xi = one(F)
+  while !iszero(n)
+    n, r = divrem(n, p)
+    z += r * xi
+    xi *= x
+  end
+  return z
 end
 
 Random.gentype(::Type{fqPolyRepField}) = elem_type(fqPolyRepField)
@@ -510,8 +467,7 @@ Random.gentype(::Type{fqPolyRepField}) = elem_type(fqPolyRepField)
 
 RandomExtensions.maketype(R::fqPolyRepField, _) = elem_type(R)
 
-rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{fqPolyRepFieldElem,fqPolyRepField,<:AbstractArray{<:IntegerUnion}}}) =
-   sp[][1](rand(rng, sp[][2]))
+rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{fqPolyRepFieldElem,fqPolyRepField,<:AbstractArray{<:IntegerUnion}}}) = sp[][1](rand(rng, sp[][2]))
 
 # define rand(::fqPolyRepField, arr), where arr is any abstract array with integer or ZZRingElem entries
 
@@ -527,39 +483,37 @@ rand(R::fqPolyRepField, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
 
 # the two definitions are merged (with `Union`) so that this doesn't produce a compilation
 # warning due to similar definitions in Hecke
-Base.iterate(F::Union{fqPolyRepField,FqPolyRepField}) =
-   zero(F), zeros(F isa fqPolyRepField ? UInt : ZZRingElem, degree(F))
+Base.iterate(F::Union{fqPolyRepField,FqPolyRepField}) = zero(F), zeros(F isa fqPolyRepField ? UInt : ZZRingElem, degree(F))
 
 function Base.iterate(F::Union{fqPolyRepField,FqPolyRepField}, coeffs::Vector)
-   deg = length(coeffs)
-   char = F isa fqPolyRepField ? F.p : # cheaper than calling characteristic(F)::ZZRingElem
-                                    characteristic(F)
-   allzero = true
-   for d = 1:deg
-      if allzero
-         coeffs[d] += 1
-         if coeffs[d] == char
-            coeffs[d] = 0
-         else
-            allzero = false
-         end
+  deg = length(coeffs)
+  char =
+    F isa fqPolyRepField ? F.p : # cheaper than calling characteristic(F)::ZZRingElem
+    characteristic(F)
+  allzero = true
+  for d in 1:deg
+    if allzero
+      coeffs[d] += 1
+      if coeffs[d] == char
+        coeffs[d] = 0
       else
-         break
+        allzero = false
       end
-   end
-   allzero && return nothing
+    else
+      break
+    end
+  end
+  allzero && return nothing
 
-   elt = F()
-   for d = 1:deg
-      if F isa fqPolyRepField
-         ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-               (Ref{fqPolyRepFieldElem}, Int, UInt), elt, d - 1, coeffs[d])
-      else
-         ccall((:fmpz_poly_set_coeff_fmpz, libflint), Nothing,
-               (Ref{FqPolyRepFieldElem}, Int, Ref{ZZRingElem}), elt, d - 1, coeffs[d])
-      end
-   end
-   elt, coeffs
+  elt = F()
+  for d in 1:deg
+    if F isa fqPolyRepField
+      ccall((:nmod_poly_set_coeff_ui, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Int, UInt), elt, d - 1, coeffs[d])
+    else
+      ccall((:fmpz_poly_set_coeff_fmpz, libflint), Nothing, (Ref{FqPolyRepFieldElem}, Int, Ref{ZZRingElem}), elt, d - 1, coeffs[d])
+    end
+  end
+  elt, coeffs
 end
 
 # Base.length(F) and Base.eltype(F) are defined in AbstractAlgebra
@@ -576,16 +530,13 @@ end
 Return the modulus defining the finite field $k$.
 """
 function modulus(k::fqPolyRepField, var::VarName=:T)
-    p::Int = characteristic(k)
-    Q = polynomial(Native.GF(p), [], var)
-    GC.@preserve k begin
-        P = ccall((:fq_nmod_ctx_modulus, libflint), Ptr{fpPolyRingElem},
-                     (Ref{fqPolyRepField},), k)
-        ccall((:nmod_poly_set, libflint), Nothing,
-              (Ref{fpPolyRingElem}, Ptr{fpPolyRingElem}),
-              Q, P)
-    end
-    return Q
+  p::Int = characteristic(k)
+  Q = polynomial(Native.GF(p), [], var)
+  GC.@preserve k begin
+    P = ccall((:fq_nmod_ctx_modulus, libflint), Ptr{fpPolyRingElem}, (Ref{fqPolyRepField},), k)
+    ccall((:nmod_poly_set, libflint), Nothing, (Ref{fpPolyRingElem}, Ptr{fpPolyRingElem}), Q, P)
+  end
+  return Q
 end
 
 #function defining_polynomial(k::fqPolyRepField)
@@ -612,7 +563,7 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{fqPolyRepFieldElem}, ::Type{T}) where {T <: Integer} = fqPolyRepFieldElem
+promote_rule(::Type{fqPolyRepFieldElem}, ::Type{T}) where {T<:Integer} = fqPolyRepFieldElem
 
 promote_rule(::Type{fqPolyRepFieldElem}, ::Type{ZZRingElem}) = fqPolyRepFieldElem
 
@@ -623,64 +574,64 @@ promote_rule(::Type{fqPolyRepFieldElem}, ::Type{ZZRingElem}) = fqPolyRepFieldEle
 ###############################################################################
 
 function (a::fqPolyRepField)()
-   z = fqPolyRepFieldElem(a)
-   z.parent = a
-   return z
+  z = fqPolyRepFieldElem(a)
+  z.parent = a
+  return z
 end
 
 (a::fqPolyRepField)(b::Integer) = a(ZZRingElem(b))
 
 function (a::fqPolyRepField)(b::Int)
-   z = fqPolyRepFieldElem(a, b)
-   z.parent = a
-   return z
+  z = fqPolyRepFieldElem(a, b)
+  z.parent = a
+  return z
 end
 
 function (a::fqPolyRepField)(b::ZZRingElem)
-   z = fqPolyRepFieldElem(a, b)
-   z.parent = a
-   return z
+  z = fqPolyRepFieldElem(a, b)
+  z.parent = a
+  return z
 end
 
 function (a::fqPolyRepField)(b::fqPolyRepFieldElem)
-    k = parent(b)
-    da = degree(a)
-    dk = degree(k)
-    if k == a
-        return b
-    elseif dk < da
-        da % dk != 0 && error("Coercion impossible")
-        f = embed(k, a)
-        return f(b)
-    else
-        dk % da != 0 && error("Coercion impossible")
-        f = preimage_map(a, k)
-        return f(b)
-    end
+  k = parent(b)
+  da = degree(a)
+  dk = degree(k)
+  if k == a
+    return b
+  elseif dk < da
+    da % dk != 0 && error("Coercion impossible")
+    f = embed(k, a)
+    return f(b)
+  else
+    dk % da != 0 && error("Coercion impossible")
+    f = preimage_map(a, k)
+    return f(b)
+  end
 end
 
 function (a::fqPolyRepField)(b::Vector{<:IntegerUnion})
-   da = degree(a)
-   db = length(b)
-   da == db || error("Coercion impossible")
-   F = Native.GF(Int(characteristic(a)), cached = false)
-   z = fqPolyRepFieldElem(a, polynomial(F, b))
-   z.parent = a
-   return z
+  da = degree(a)
+  db = length(b)
+  da == db || error("Coercion impossible")
+  F = Native.GF(Int(characteristic(a)); cached=false)
+  z = fqPolyRepFieldElem(a, polynomial(F, b))
+  z.parent = a
+  return z
 end
 
 function fqPolyRepFieldElem(a::fqPolyRepField, b::Vector{UInt})
-   r = a()
-   len = degree(a)
-   length(b) != len && error("Vector does not have correct length")
-   norm = 0
-   V = unsafe_wrap(Vector{UInt}, reinterpret(Ptr{UInt}, r.coeffs), len)
-   for i = 1:len
-      V[i] = b[i]
-      if b[i] != 0
-         norm = i
-      end
-   end
-   r.length = norm
-   return r
+  r = a()
+  len = degree(a)
+  length(b) != len && error("Vector does not have correct length")
+  norm = 0
+  V = unsafe_wrap(Vector{UInt}, reinterpret(Ptr{UInt}, r.coeffs), len)
+  for i in 1:len
+    V[i] = b[i]
+    if b[i] != 0
+      norm = i
+    end
+  end
+  r.length = norm
+  return r
 end
