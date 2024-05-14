@@ -56,11 +56,6 @@ end
 #
 ################################################################################
 
-function (k::fqPolyRepField)(a::Vector)
-  return k(polynomial(Native.GF(Int(characteristic(k))), a))
-end
-
-
 (F::fqPolyRepField)(a::zzModRingElem) = F(a.data)
 
 #TODO/ think: 
