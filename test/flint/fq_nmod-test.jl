@@ -44,6 +44,8 @@
   @test isa(e, fqPolyRepFieldElem)
   @test isone(e)
 
+  @test isa(R(QQ(1)), fqPolyRepFieldElem)
+
   # check for primality
   T3, z3 = Native.finite_field(yy^2 + 1, "z", check=false)
   @test isa(T2, fqPolyRepField)

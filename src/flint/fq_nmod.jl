@@ -674,6 +674,10 @@ function (A::fqPolyRepField)(x::fpFieldElem)
    return A(lift(x))
 end
 
+function (k::fqPolyRepField)(a::QQFieldElem)
+   return k(numerator(a)) // k(denominator(a))
+end
+
 function fqPolyRepFieldElem(a::fqPolyRepField, b::Vector{UInt})
   r = a()
   len = degree(a)

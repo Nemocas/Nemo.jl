@@ -56,10 +56,6 @@ end
 #
 ################################################################################
 
-function (k::fqPolyRepField)(a::QQFieldElem)
-  return k(numerator(a)) // k(denominator(a))
-end
-
 function (k::FpField)(a::QQFieldElem)
   return k(numerator(a)) // k(denominator(a))
 end
