@@ -1,28 +1,5 @@
 ################################################################################
 #
-#  Missing ad hoc operations
-#
-################################################################################
-
-#TODO/ think: 
-# - should those be zzModMatrix of fpMatrix
-# - base_ring/ coeff_field needs to be unique?
-function representation_matrix(a::fpFieldElem)
-  return matrix(parent(a), 1, 1, [a])
-end
-
-function representation_matrix(a::fqPolyRepFieldElem)
-  F = parent(a)
-  k = quo(ZZ, Int(characteristic(F)))[1]
-  k = Native.GF(Int(characteristic(F)))
-  m = zero_matrix(k, degree(F), degree(F))
-  ccall((:fq_nmod_embed_mul_matrix, libflint), Nothing, (Ref{fpMatrix}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), m, a, F)
-  ccall((:nmod_mat_transpose, libflint), Nothing, (Ref{fpMatrix}, Ref{fpMatrix}), m, m)
-  return m
-end
-
-################################################################################
-#
 #  Defining polynomial for finite fields
 #
 ################################################################################

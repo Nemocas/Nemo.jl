@@ -471,3 +471,13 @@ function (R::fpField)(a::Vector{<:IntegerUnion})
   is_one(length(a)) || error("Coercion impossible")
   return R(a[1])
 end
+
+###############################################################################
+#
+#   Representation matrix
+#
+###############################################################################
+
+function representation_matrix(a::fpFieldElem)
+  return matrix(parent(a), 1, 1, [a])
+end

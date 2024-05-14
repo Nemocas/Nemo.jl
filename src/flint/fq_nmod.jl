@@ -751,3 +751,18 @@ function charpoly(Rx::fpPolyRing, a::fqPolyRepFieldElem)
   g = minpoly(Rx, a)
   return g^div(degree(parent(a)), degree(g))
 end
+
+###############################################################################
+#
+#   Representation matrix
+#
+###############################################################################
+
+function representation_matrix(a::fqPolyRepFieldElem)
+  F = parent(a)
+  k = Native.GF(Int(characteristic(F)))
+  m = zero_matrix(k, degree(F), degree(F))
+  ccall((:fq_nmod_embed_mul_matrix, libflint), Nothing, (Ref{fpMatrix}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), m, a, F)
+  ccall((:nmod_mat_transpose, libflint), Nothing, (Ref{fpMatrix}, Ref{fpMatrix}), m, m)
+  return m
+end

@@ -313,3 +313,18 @@ end
   @test degree(g) == degree(F)
   @test is_monic(g)
 end
+
+@testset "fqPolyRepFieldElem.representation_matrix" begin
+  F, a = Native.finite_field(7, 5, "a")
+
+  @test is_one(representation_matrix(one(F)))
+  @test is_zero(representation_matrix(zero(F)))
+
+  M = representation_matrix(a)
+  @test nrows(M) == degree(F)
+  @test ncols(M) == degree(F)
+
+  f = minpoly(M)
+  g = minpoly(parent(f), a)
+  @test f == g
+end

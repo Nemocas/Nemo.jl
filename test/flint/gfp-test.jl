@@ -527,3 +527,8 @@ end
   R = Native.GF(19)
   @test R([5]) == R(5)
 end
+
+@testset "gfp.representation_matrix" begin
+  F = Native.GF(19)
+  @test is_one(representation_matrix(one(F)))
+end
