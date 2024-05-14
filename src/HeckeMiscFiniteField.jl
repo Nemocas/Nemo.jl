@@ -56,8 +56,6 @@ end
 #
 ################################################################################
 
-(F::fqPolyRepField)(a::zzModRingElem) = F(a.data)
-
 #TODO/ think: 
 # - should those be zzModMatrix of fpMatrix
 # - base_ring/ coeff_field needs to be unique?

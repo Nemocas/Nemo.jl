@@ -46,12 +46,16 @@
 
   @test isa(R(QQ(1)), fqPolyRepFieldElem)
 
-  # check for primality
-  T3, z3 = Native.finite_field(yy^2 + 1, "z", check=false)
-  @test isa(T2, fqPolyRepField)
-  Syyy, yyy = polynomial_ring(residue_ring(ZZ, 4)[1], "y")
-  @test yyy isa zzModPolyRingElem
-  @test_throws DomainError Native.finite_field(yyy^2+1, "z")
+   S, = residue_ring(ZZ, 14)
+   @test isa(R(S(8)), fqPolyRepFieldElem)
+   @test is_one(R(S(8)))
+
+   # check for primality
+   T3, z3 = Native.finite_field(yy^2 + 1, "z", check=false)
+   @test isa(T2, fqPolyRepField)
+   Syyy, yyy = polynomial_ring(residue_ring(ZZ, 4)[1], "y")
+   @test yyy isa zzModPolyRingElem
+   @test_throws DomainError Native.finite_field(yyy^2+1, "z")
 end
 
 @testset "fqPolyRepFieldElem.rand" begin

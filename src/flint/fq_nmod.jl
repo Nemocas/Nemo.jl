@@ -674,6 +674,11 @@ function (A::fqPolyRepField)(x::fpFieldElem)
    return A(lift(x))
 end
 
+function (F::fqPolyRepField)(a::zzModRingElem)
+  @assert is_divisible_by(characteristic(parent(a)), characteristic(F)) "incompatible parents"
+  return F(a.data)
+end
+
 function (k::fqPolyRepField)(a::QQFieldElem)
    return k(numerator(a)) // k(denominator(a))
 end
