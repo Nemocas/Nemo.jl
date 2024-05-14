@@ -711,3 +711,43 @@ function fqPolyRepFieldElem(a::fqPolyRepField, b::Vector{UInt})
   r.length = norm
   return r
 end
+
+###############################################################################
+#
+#   Minimal polynomial and characteristic polynomial
+#
+###############################################################################
+
+function minpoly(a::fqPolyRepFieldElem)
+  Fp = Native.GF(Int(characteristic(parent(a))), cached=false)
+  Rx, _ = polynomial_ring(Fp, cached=false)
+  return minpoly(Rx, a)
+end
+
+function minpoly(Rx::fpPolyRing, a::fqPolyRepFieldElem)
+  @assert characteristic(base_ring(Rx)) == characteristic(parent(a))
+  c = fqPolyRepFieldElem[a]
+  fa = frobenius(a)
+  while !(fa in c)
+    push!(c, fa)
+    fa = frobenius(fa)
+  end
+  St = polynomial_ring(parent(a), cached=false)[1]
+  f = prod([gen(St) - x for x = c], init=one(St))
+  g = Rx()
+  for i = 0:degree(f)
+    setcoeff!(g, i, coeff(coeff(f, i), 0))
+  end
+  return g
+end
+
+function charpoly(a::fqPolyRepFieldElem)
+  Fp = Native.GF(Int(characteristic(parent(a))), cached=false)
+  Rx, _ = polynomial_ring(Fp, cached=false)
+  return charpoly(Rx, a)
+end
+
+function charpoly(Rx::fpPolyRing, a::fqPolyRepFieldElem)
+  g = minpoly(Rx, a)
+  return g^div(degree(parent(a)), degree(g))
+end

@@ -289,3 +289,27 @@ end
   S, y = polynomial_ring(Native.GF(23), "y")
   @test lift(S, f) == 8y + 9
 end
+
+@testset "fqPolyRepFieldElem.minpoly" begin
+  F, a = Native.finite_field(7, 5, "a")
+
+  f = minpoly(a)
+  @test is_zero(f(a))
+  @test degree(f) == degree(F)
+  @test is_monic(f)
+
+  f = charpoly(a)
+  @test is_zero(f(a))
+  @test degree(f) == degree(F)
+  @test is_monic(f)
+
+  g = minpoly(F(3))
+  @test is_zero(g(F(3)))
+  @test degree(g) == 1
+  @test is_monic(g)
+
+  g = charpoly(F(3))
+  @test is_zero(g(F(3)))
+  @test degree(g) == degree(F)
+  @test is_monic(g)
+end
