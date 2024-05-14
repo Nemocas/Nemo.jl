@@ -608,3 +608,7 @@ function (a::FqPolyRepField)(b::Vector{<:IntegerUnion})
   F = Native.GF(characteristic(a), cached = false)
   return FqPolyRepFieldElem(a, polynomial(F, b))
 end
+
+function (k::FqPolyRepField)(a::QQFieldElem)
+   return k(numerator(a)) // k(denominator(a))
+end

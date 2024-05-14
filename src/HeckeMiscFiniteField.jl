@@ -56,10 +56,6 @@ end
 #
 ################################################################################
 
-function (k::FqPolyRepField)(a::QQFieldElem)
-  return k(numerator(a)) // k(denominator(a))
-end
-
 function (k::Nemo.fpField)(a::Vector)
   @assert length(a) == 1
   return k(a[1])
