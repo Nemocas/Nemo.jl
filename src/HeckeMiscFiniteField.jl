@@ -56,11 +56,6 @@ end
 #
 ################################################################################
 
-function (R::zzModRing)(a::fpFieldElem)
-  @assert modulus(R) == characteristic(parent(a))
-  return R(data(a))
-end
-
 function (k::fqPolyRepField)(a::QQFieldElem)
   return k(numerator(a)) // k(denominator(a))
 end
