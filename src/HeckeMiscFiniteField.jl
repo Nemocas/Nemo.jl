@@ -83,12 +83,6 @@ function frobenius_matrix(F::fqPolyRepField, n::Int=1)
   return m
 end
 
-function frobenius!(a::fqPolyRepFieldElem, b::fqPolyRepFieldElem, i::Int=1)
-  ccall((:fq_nmod_frobenius, libflint), Nothing,
-        (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Int, Ref{fqPolyRepField}),
-        a, b, i, a.parent)
-end
-
 ################################################################################
 #
 #  Defining polynomial for finite fields

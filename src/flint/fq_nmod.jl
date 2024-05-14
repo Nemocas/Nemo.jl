@@ -424,11 +424,15 @@ function norm(x::fqPolyRepFieldElem)
 end
 
 function frobenius(x::fqPolyRepFieldElem, n = 1)
-  z = parent(x)()
-  ccall((:fq_nmod_frobenius, libflint), Nothing,
-        (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Int, Ref{fqPolyRepField}),
-        z, x, n, x.parent)
-  return z
+   z = parent(x)()
+   return frobenius!(z, x, n)
+end
+
+function frobenius!(a::fqPolyRepFieldElem, b::fqPolyRepFieldElem, i::Int = 1)
+   ccall((:fq_nmod_frobenius, libflint), Nothing,
+         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Int, Ref{fqPolyRepField}),
+         a, b, i, parent(a))
+   return a
 end
 
 ###############################################################################
