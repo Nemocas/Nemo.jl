@@ -435,6 +435,15 @@ function frobenius!(a::fqPolyRepFieldElem, b::fqPolyRepFieldElem, i::Int = 1)
    return a
 end
 
+function frobenius_matrix(F::fqPolyRepField, n::Int=1)
+   a = frobenius(gen(F), n)
+   k = Native.GF(Int(characteristic(F)))
+   m = zero_matrix(k, degree(F), degree(F))
+   ccall((:fq_nmod_embed_composition_matrix_sub, libflint), Nothing, (Ref{fpMatrix}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}, Int), m, a, F, degree(F))
+   ccall((:nmod_mat_transpose, libflint), Nothing, (Ref{fpMatrix}, Ref{fpMatrix}), m, m)
+   return m
+end
+
 ###############################################################################
 #
 #   Lift

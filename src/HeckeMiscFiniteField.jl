@@ -73,16 +73,6 @@ function representation_matrix(a::fqPolyRepFieldElem)
   return m
 end
 
-function frobenius_matrix(F::fqPolyRepField, n::Int=1)
-  a = frobenius(gen(F), n)
-  k = quo(ZZ, Int(characteristic(F)))[1]
-  k = Native.GF(Int(characteristic(F)))
-  m = zero_matrix(k, degree(F), degree(F))
-  ccall((:fq_nmod_embed_composition_matrix_sub, libflint), Nothing, (Ref{fpMatrix}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}, Int), m, a, F, degree(F))
-  ccall((:nmod_mat_transpose, libflint), Nothing, (Ref{fpMatrix}, Ref{fpMatrix}), m, m)
-  return m
-end
-
 ################################################################################
 #
 #  Defining polynomial for finite fields

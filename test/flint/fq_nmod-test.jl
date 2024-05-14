@@ -248,7 +248,15 @@ end
 
   @test frobenius(a, 3) == 3*x^4+3*x^3+3*x^2+x+4
 
-  @test pth_root(a) == 4*x^4+3*x^3+4*x^2+5*x+2
+   M = frobenius_matrix(R)
+   @test M == matrix(base_ring(M), [1 0 0 0 0;
+                                    0 0 3 6 0;
+                                    3 2 6 0 2;
+                                    3 3 4 5 2;
+                                    5 6 2 1 2])
+
+
+   @test pth_root(a) == 4*x^4+3*x^3+4*x^2+5*x+2
 
   @test is_square(a^2)
 
