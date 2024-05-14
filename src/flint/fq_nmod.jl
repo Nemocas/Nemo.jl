@@ -542,18 +542,18 @@ Base.iterate(F::Union{fqPolyRepField,FqPolyRepField}) =
 zero(F), zeros(F isa fqPolyRepField ? UInt : ZZRingElem, degree(F))
 
 function Base.iterate(F::Union{fqPolyRepField,FqPolyRepField}, coeffs::Vector)
-  deg = length(coeffs)
-  char = F isa fqPolyRepField ? F.p : # cheaper than calling characteristic(F)::ZZRingElem
-  characteristic(F)
-  allzero = true
-  for d = 1:deg
-    if allzero
-      coeffs[d] += 1
-      if coeffs[d] == char
-        coeffs[d] = 0
-      else
-        allzero = false
-      end
+   deg = length(coeffs)
+   char = characteristic(F)
+
+   allzero = true
+   for d = 1:deg
+      if allzero
+         coeffs[d] += 1
+         if coeffs[d] == char
+            coeffs[d] = 0
+         else
+            allzero = false
+         end
     else
       break
     end
@@ -599,23 +599,23 @@ function modulus(k::fqPolyRepField, var::VarName=:T)
   return Q
 end
 
-#function defining_polynomial(k::fqPolyRepField)
-#   F = fpField(UInt(characteristic(k)))
-#   Fx, = polynomial_ring(F, "x", cached = false)
-#   return defining_polynomial(Fx, k)
-#end
-#
-#function defining_polynomial(R::fpPolyRing, k::fqPolyRepField)
-#   Q = R()
-#   GC.@preserve k begin
-#      P = ccall((:fq_nmod_ctx_modulus, libflint), Ptr{fpPolyRingElem},
-#                (Ref{fqPolyRepField},), k)
-#      ccall((:nmod_poly_set, libflint), Nothing,
-#            (Ref{fpPolyRingElem}, Ptr{fpPolyRingElem}),
-#            Q, P)
-#   end
-#   return Q
-#end
+function defining_polynomial(k::fqPolyRepField)
+   F = fpField(UInt(characteristic(k)))
+   Fx, = polynomial_ring(F, "x", cached = false)
+   return defining_polynomial(Fx, k)
+end
+
+function defining_polynomial(R::fpPolyRing, k::fqPolyRepField)
+   Q = R()
+   GC.@preserve k begin
+      P = ccall((:fq_nmod_ctx_modulus, libflint), Ptr{fpPolyRingElem},
+                (Ref{fqPolyRepField},), k)
+      ccall((:nmod_poly_set, libflint), Nothing,
+            (Ref{fpPolyRingElem}, Ptr{fpPolyRingElem}),
+            Q, P)
+   end
+   return Q
+end
 
 ###############################################################################
 #

@@ -130,9 +130,15 @@ end
 
   @test isa(modulus(R), fpPolyRingElem)
 
+<<<<<<< HEAD
   #@test defining_polynomial(R) isa fpPolyRingElem
   #kt, t = Native.GF(7)["t"]
   #@test parent(defining_polynomial(kt, R)) === kt
+=======
+   @test defining_polynomial(R) isa fpPolyRingElem
+   kt, t = Native.GF(7)["t"]
+   @test parent(defining_polynomial(kt, R)) === kt
+>>>>>>> 548378bee (Merge/reenable `defining_polynomial`)
 end
 
 @testset "fqPolyRepFieldElem.unary_ops" begin

@@ -65,7 +65,7 @@ end
   @test isa(e, FqPolyRepFieldElem)
   @test isone(e)
 
-   @test isa(R(QQ(1)), fqPolyRepFieldElem)
+   @test isa(R(QQ(1)), FqPolyRepFieldElem)
 
    # check for primality
    T3, z3 = Native.finite_field(yy^2 + 1, "z", check=false)
@@ -108,9 +108,15 @@ end
 
   @test isa(modulus(R), FpPolyRingElem)
 
+<<<<<<< HEAD
   #@test defining_polynomial(R) isa FpPolyRingElem
   #kt, t = Native.GF(ZZ(7))["t"]
   #@test parent(defining_polynomial(kt, R)) === kt
+=======
+   @test defining_polynomial(R) isa FpPolyRingElem
+   kt, t = Native.GF(ZZ(7))["t"]
+   @test parent(defining_polynomial(kt, R)) === kt
+>>>>>>> 548378bee (Merge/reenable `defining_polynomial`)
 end
 
 @testset "FqPolyRepFieldElem.unary_ops" begin
