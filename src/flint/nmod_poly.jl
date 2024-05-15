@@ -366,7 +366,7 @@ end
 ###############################################################################
 
 function reverse(x::T, len::Int) where T <: Zmodn_poly
-  len < 0 && throw(DomainError(n, "Index must be non-negative"))
+  len < 0 && throw(DomainError(len, "Index must be non-negative"))
   z = parent(x)()
   ccall((:nmod_poly_reverse, libflint), Nothing,
         (Ref{T}, Ref{T}, Int), z, x, len)
@@ -877,9 +877,9 @@ function det(M::Generic.Mat{zzModPolyRingElem})
   end
 
   try
-    return det_fflu(M)
+    return AbstractAlgebra.det_fflu(M)
   catch
-    return det_df(M)
+    return AbstractAlgebra.det_df(M)
   end
 end
 

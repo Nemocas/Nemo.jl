@@ -424,7 +424,7 @@ function *(a::ZZMatrix, b::Matrix{BigFloat})
   ncols(a) == s[1] || error("dimensions do not match")
 
   c = Array{BigFloat}(undef, nrows(a), s[2])
-  return mult!(c, a, b)
+  return mul!(c, a, b)
 end
 
 function Base.setprecision(x::BigFloat, p::Int)
@@ -1161,7 +1161,7 @@ end
 function Base.setprecision(a::Generic.MatSpaceElem{QadicFieldElem}, N::Int)
   b = deepcopy(a)
   setprecision!(b, N)
-  return B
+  return b
 end
 
 function tr(r::QadicFieldElem)

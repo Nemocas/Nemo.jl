@@ -331,7 +331,7 @@ Base.:(:)(a::ZZRingElem, b::ZZRingElem) = ZZRingElemUnitRange(a, b)
 
 @inline function getindex(r::ZZRingElemUnitRange, i::ZZRingElem)
   val = r.start + (i - 1)
-  @boundscheck _in_unit_range(r, val) || throw_boundserror(r, i)
+  @boundscheck _in_unit_range(r, val) || Base.throw_boundserror(r, i)
   val
 end
 _in_unit_range(r::ZZRingElemUnitRange, val::ZZRingElem) = r.start <= val <= r.stop

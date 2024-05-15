@@ -495,7 +495,7 @@ end
 
 function AbstractAlgebra._solve_triu(x::T, y::T) where T <: Zmodn_mat
   (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
-  is_upper_trangular(x) || error("Matrix must be upper triangular")
+  is_upper_triangular(x) || error("Matrix must be upper triangular")
   z = similar(x, nrows(x), ncols(y))
   _solve_triu!(z, x, y, 0)
   return z

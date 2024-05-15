@@ -1136,7 +1136,7 @@ function add!(c::ZZLaurentSeriesRingElem, a::ZZLaurentSeriesRingElem, b::ZZLaure
   t = base_ring(a)()
   zc = base_ring(a)()
   for i = 0: lenr - 1
-    pi = valr + sc*i
+    pi = valr + sc*i  # FIXME: there is no sc, perhaps sz is meant? Or zc? Or what?
     if pi == pa && pi < mina
       if pi == pb && pi < minb
         add!(t, polcoeff(a, j), polcoeff(b, k))
