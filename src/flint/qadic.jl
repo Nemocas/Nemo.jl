@@ -94,9 +94,12 @@ end
 # TODO: For the next minor/breaking release, rename this to base_field and
 # deprecate coefficient_ring (and remove the corresponding base_field in Hecke)
 function coefficient_ring(K::QadicField)
-  return get_attribute!(K, :base_field) do
+  L = get_attribute!(K, :base_field) do
     return PadicField(prime(K), precision(K), cached = false)
   end::PadicField
+  # Should not be here, but Hecke needs it
+  setprecision!(L, precision(K))
+  return L
 end
 
 ###############################################################################
@@ -847,10 +850,6 @@ end
 
 function coeff(x::QadicFieldElem, i::Int)
   R = coefficient_ring(parent(x))
-  # TODO: This setprecision! call should go; it is only here because in Hecke
-  # parent(x).prec_max is directly modified at at least one place (as of 15 May 2024),
-  # so we cannot adjust the precision of base_field(parent(x)) accordingly.
-  setprecision!(R, precision(parent(x)))
   c = R()
   ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
         (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Int, Ref{QadicField}), c, x, i, parent(x))
