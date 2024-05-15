@@ -10,7 +10,7 @@ end
 P-adic fields are provided in Nemo by Flint. This allows construction of
 $p$-adic fields for any prime $p$.
 
-P-adic fields are constructed using the `padic_field` function. 
+P-adic fields are constructed using the `padic_field` function.
 
 The types of $p$-adic fields in Nemo are given in the following table, along
 with the libraries that provide them and the associated types of the parent

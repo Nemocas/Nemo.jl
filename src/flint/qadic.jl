@@ -233,9 +233,7 @@ function expressify(b::QadicFieldElem, x = var(parent(b)); context = nothing)
     return 0
   end
   sum = Expr(:call, :+)
-  c = with_precision(R, precision(parent(b))) do
-    R()
-  end
+  c = R(precision = precision(parent(b)))
   for i in degree(parent(b)):-1:0
     ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
           (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Int, Ref{QadicField}),
