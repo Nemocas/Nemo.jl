@@ -836,7 +836,7 @@ function setprecision!(f::Generic.Poly{PadicFieldElem}, N::Int)
   return f
 end
 
-function with_precision(f::Function, K::PadicField, n::Int)
+function with_precision(f, K::PadicField, n::Int)
   @assert n >= 0
   old = precision(K)
   setprecision!(K, n)
@@ -848,4 +848,4 @@ function with_precision(f::Function, K::PadicField, n::Int)
   return v
 end
 
-Base.setprecision(f, K::PadicField, n::Int) = with_precision(f, K, n)
+Base.setprecision(f::Function, K::PadicField, n::Int) = with_precision(f, K, n)

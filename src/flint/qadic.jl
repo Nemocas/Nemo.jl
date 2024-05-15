@@ -975,4 +975,4 @@ function with_precision(f, K::QadicField, n::Int)
   return v
 end
 
-Base.setprecision(f, K::QadicField, n::Int) = with_precision(f, K, n)
+Base.setprecision(f::Function, K::QadicField, n::Int) = with_precision(f, K, n)
