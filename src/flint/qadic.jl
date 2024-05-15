@@ -847,6 +847,10 @@ end
 
 function coeff(x::QadicFieldElem, i::Int)
   R = coefficient_ring(parent(x))
+  # TODO: This setprecision! call should go; it is only here because in Hecke
+  # parent(x).prec_max is directly modified at at least one place (as of 15 May 2024),
+  # so we cannot adjust the precision of base_field(parent(x)) accordingly.
+  setprecision!(R, precision(parent(x)))
   c = R()
   ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
         (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Int, Ref{QadicField}), c, x, i, parent(x))
@@ -940,6 +944,7 @@ end
 
 function setprecision!(Q::QadicField, n::Int)
   Q.prec_max = n
+  setprecision!(coefficient_ring(Q), n)
   return Q
 end
 

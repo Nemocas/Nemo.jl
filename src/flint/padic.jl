@@ -94,6 +94,9 @@ degree(::PadicField) = 1
 
 base_field(k::PadicField) = k
 
+# TODO: Remove in the next minor/breaking release
+coefficient_ring(k::PadicField) = base_field(k)
+
 # Return generators of k "over" K
 function gens(k::PadicField, K::PadicField)
   @assert k === K
