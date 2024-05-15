@@ -65,14 +65,14 @@ end
   @test isa(e, FqPolyRepFieldElem)
   @test isone(e)
 
-   @test isa(R(QQ(1)), FqPolyRepFieldElem)
+  @test isa(R(QQ(1)), FqPolyRepFieldElem)
 
-   # check for primality
-   T3, z3 = Native.finite_field(yy^2 + 1, "z", check=false)
-   @test isa(T2, FqPolyRepField)
-   Syyy, yyy = polynomial_ring(residue_ring(ZZ, ZZ(4))[1], "y")
-   @test yyy isa ZZModPolyRingElem
-   @test_throws DomainError Native.finite_field(yyy^2+1, "z")
+  # check for primality
+  T3, z3 = Native.finite_field(yy^2 + 1, "z", check=false)
+  @test isa(T2, FqPolyRepField)
+  Syyy, yyy = polynomial_ring(residue_ring(ZZ, ZZ(4))[1], "y")
+  @test yyy isa ZZModPolyRingElem
+  @test_throws DomainError Native.finite_field(yyy^2+1, "z")
 end
 
 @testset "FqPolyRepFieldElem.printing" begin
@@ -108,15 +108,9 @@ end
 
   @test isa(modulus(R), FpPolyRingElem)
 
-<<<<<<< HEAD
-  #@test defining_polynomial(R) isa FpPolyRingElem
-  #kt, t = Native.GF(ZZ(7))["t"]
-  #@test parent(defining_polynomial(kt, R)) === kt
-=======
-   @test defining_polynomial(R) isa FpPolyRingElem
-   kt, t = Native.GF(ZZ(7))["t"]
-   @test parent(defining_polynomial(kt, R)) === kt
->>>>>>> 548378bee (Merge/reenable `defining_polynomial`)
+  @test defining_polynomial(R) isa FpPolyRingElem
+  kt, t = Native.GF(ZZ(7))["t"]
+  @test parent(defining_polynomial(kt, R)) === kt
 end
 
 @testset "FqPolyRepFieldElem.unary_ops" begin

@@ -87,12 +87,12 @@ end
     f = preimage_map(ka, kab)
     g = embed(ka, kab)
 
-        for j in 1:20
-            x = rand(ka)
-            @test @inferred f(g(x)) == x
-            @test @inferred preimage(g, g(x)) == x
-            @test @inferred ka(kab(x)) == x
-        end
+    for j in 1:20
+      x = rand(ka)
+      @test @inferred f(g(x)) == x
+      @test @inferred preimage(g, g(x)) == x
+      @test @inferred ka(kab(x)) == x
+    end
   end
 end
 

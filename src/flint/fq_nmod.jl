@@ -424,24 +424,24 @@ function norm(x::fqPolyRepFieldElem)
 end
 
 function frobenius(x::fqPolyRepFieldElem, n = 1)
-   z = parent(x)()
-   return frobenius!(z, x, n)
+  z = parent(x)()
+  return frobenius!(z, x, n)
 end
 
 function frobenius!(a::fqPolyRepFieldElem, b::fqPolyRepFieldElem, i::Int = 1)
-   ccall((:fq_nmod_frobenius, libflint), Nothing,
-         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Int, Ref{fqPolyRepField}),
-         a, b, i, parent(a))
-   return a
+  ccall((:fq_nmod_frobenius, libflint), Nothing,
+        (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Int, Ref{fqPolyRepField}),
+        a, b, i, parent(a))
+  return a
 end
 
 function frobenius_matrix(F::fqPolyRepField, n::Int=1)
-   a = frobenius(gen(F), n)
-   k = Native.GF(Int(characteristic(F)))
-   m = zero_matrix(k, degree(F), degree(F))
-   ccall((:fq_nmod_embed_composition_matrix_sub, libflint), Nothing, (Ref{fpMatrix}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}, Int), m, a, F, degree(F))
-   ccall((:nmod_mat_transpose, libflint), Nothing, (Ref{fpMatrix}, Ref{fpMatrix}), m, m)
-   return m
+  a = frobenius(gen(F), n)
+  k = Native.GF(Int(characteristic(F)))
+  m = zero_matrix(k, degree(F), degree(F))
+  ccall((:fq_nmod_embed_composition_matrix_sub, libflint), Nothing, (Ref{fpMatrix}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}, Int), m, a, F, degree(F))
+  ccall((:nmod_mat_transpose, libflint), Nothing, (Ref{fpMatrix}, Ref{fpMatrix}), m, m)
+  return m
 end
 
 ###############################################################################
@@ -542,18 +542,18 @@ Base.iterate(F::Union{fqPolyRepField,FqPolyRepField}) =
 zero(F), zeros(F isa fqPolyRepField ? UInt : ZZRingElem, degree(F))
 
 function Base.iterate(F::Union{fqPolyRepField,FqPolyRepField}, coeffs::Vector)
-   deg = length(coeffs)
-   char = characteristic(F)
+  deg = length(coeffs)
+  char = characteristic(F)
 
-   allzero = true
-   for d = 1:deg
-      if allzero
-         coeffs[d] += 1
-         if coeffs[d] == char
-            coeffs[d] = 0
-         else
-            allzero = false
-         end
+  allzero = true
+  for d = 1:deg
+    if allzero
+      coeffs[d] += 1
+      if coeffs[d] == char
+        coeffs[d] = 0
+      else
+        allzero = false
+      end
     else
       break
     end
@@ -600,21 +600,21 @@ function modulus(k::fqPolyRepField, var::VarName=:T)
 end
 
 function defining_polynomial(k::fqPolyRepField)
-   F = fpField(UInt(characteristic(k)))
-   Fx, = polynomial_ring(F, "x", cached = false)
-   return defining_polynomial(Fx, k)
+  F = fpField(UInt(characteristic(k)))
+  Fx, = polynomial_ring(F, "x", cached = false)
+  return defining_polynomial(Fx, k)
 end
 
 function defining_polynomial(R::fpPolyRing, k::fqPolyRepField)
-   Q = R()
-   GC.@preserve k begin
-      P = ccall((:fq_nmod_ctx_modulus, libflint), Ptr{fpPolyRingElem},
-                (Ref{fqPolyRepField},), k)
-      ccall((:nmod_poly_set, libflint), Nothing,
-            (Ref{fpPolyRingElem}, Ptr{fpPolyRingElem}),
-            Q, P)
-   end
-   return Q
+  Q = R()
+  GC.@preserve k begin
+    P = ccall((:fq_nmod_ctx_modulus, libflint), Ptr{fpPolyRingElem},
+              (Ref{fqPolyRepField},), k)
+    ccall((:nmod_poly_set, libflint), Nothing,
+          (Ref{fpPolyRingElem}, Ptr{fpPolyRingElem}),
+          Q, P)
+  end
+  return Q
 end
 
 ###############################################################################
@@ -683,8 +683,8 @@ function (a::fqPolyRepField)(b::Vector{<:IntegerUnion})
 end
 
 function (A::fqPolyRepField)(x::fpFieldElem)
-   @assert characteristic(A) == characteristic(parent(x))
-   return A(lift(x))
+  @assert characteristic(A) == characteristic(parent(x))
+  return A(lift(x))
 end
 
 function (F::fqPolyRepField)(a::zzModRingElem)
@@ -693,7 +693,7 @@ function (F::fqPolyRepField)(a::zzModRingElem)
 end
 
 function (k::fqPolyRepField)(a::QQFieldElem)
-   return k(numerator(a)) // k(denominator(a))
+  return k(numerator(a)) // k(denominator(a))
 end
 
 function fqPolyRepFieldElem(a::fqPolyRepField, b::Vector{UInt})

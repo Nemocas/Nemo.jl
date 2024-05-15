@@ -461,5 +461,5 @@ function (R::FpField)(a::Vector{<:IntegerUnion})
 end
 
 function (k::FpField)(a::QQFieldElem)
-   return k(numerator(a)) // k(denominator(a))
+  return k(numerator(a)) // k(denominator(a))
 end

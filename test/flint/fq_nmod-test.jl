@@ -46,16 +46,16 @@
 
   @test isa(R(QQ(1)), fqPolyRepFieldElem)
 
-   S, = residue_ring(ZZ, 14)
-   @test isa(R(S(8)), fqPolyRepFieldElem)
-   @test is_one(R(S(8)))
+  S, = residue_ring(ZZ, 14)
+  @test isa(R(S(8)), fqPolyRepFieldElem)
+  @test is_one(R(S(8)))
 
-   # check for primality
-   T3, z3 = Native.finite_field(yy^2 + 1, "z", check=false)
-   @test isa(T2, fqPolyRepField)
-   Syyy, yyy = polynomial_ring(residue_ring(ZZ, 4)[1], "y")
-   @test yyy isa zzModPolyRingElem
-   @test_throws DomainError Native.finite_field(yyy^2+1, "z")
+  # check for primality
+  T3, z3 = Native.finite_field(yy^2 + 1, "z", check=false)
+  @test isa(T2, fqPolyRepField)
+  Syyy, yyy = polynomial_ring(residue_ring(ZZ, 4)[1], "y")
+  @test yyy isa zzModPolyRingElem
+  @test_throws DomainError Native.finite_field(yyy^2+1, "z")
 end
 
 @testset "fqPolyRepFieldElem.rand" begin
@@ -130,15 +130,9 @@ end
 
   @test isa(modulus(R), fpPolyRingElem)
 
-<<<<<<< HEAD
-  #@test defining_polynomial(R) isa fpPolyRingElem
-  #kt, t = Native.GF(7)["t"]
-  #@test parent(defining_polynomial(kt, R)) === kt
-=======
-   @test defining_polynomial(R) isa fpPolyRingElem
-   kt, t = Native.GF(7)["t"]
-   @test parent(defining_polynomial(kt, R)) === kt
->>>>>>> 548378bee (Merge/reenable `defining_polynomial`)
+  @test defining_polynomial(R) isa fpPolyRingElem
+  kt, t = Native.GF(7)["t"]
+  @test parent(defining_polynomial(kt, R)) === kt
 end
 
 @testset "fqPolyRepFieldElem.unary_ops" begin
@@ -254,15 +248,15 @@ end
 
   @test frobenius(a, 3) == 3*x^4+3*x^3+3*x^2+x+4
 
-   M = frobenius_matrix(R)
-   @test M == matrix(base_ring(M), [1 0 0 0 0;
-                                    0 0 3 6 0;
-                                    3 2 6 0 2;
-                                    3 3 4 5 2;
-                                    5 6 2 1 2])
+  M = frobenius_matrix(R)
+  @test M == matrix(base_ring(M), [1 0 0 0 0;
+                                   0 0 3 6 0;
+                                   3 2 6 0 2;
+                                   3 3 4 5 2;
+                                   5 6 2 1 2])
 
 
-   @test pth_root(a) == 4*x^4+3*x^3+4*x^2+5*x+2
+  @test pth_root(a) == 4*x^4+3*x^3+4*x^2+5*x+2
 
   @test is_square(a^2)
 

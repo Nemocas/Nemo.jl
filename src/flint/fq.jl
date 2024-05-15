@@ -525,21 +525,21 @@ function modulus(k::FqPolyRepField, var::VarName=:T)
 end
 
 function defining_polynomial(k::FqPolyRepField)
-   F = FpField(characteristic(k))
-   Fx, = polynomial_ring(F, "x", cached = false)
-   return defining_polynomial(Fx, k)
+  F = FpField(characteristic(k))
+  Fx, = polynomial_ring(F, "x", cached = false)
+  return defining_polynomial(Fx, k)
 end
 
 function defining_polynomial(R::FpPolyRing, k::FqPolyRepField)
-   Q = R()
-   GC.@preserve k begin
-      P = ccall((:fq_ctx_modulus, libflint), Ptr{FpPolyRingElem},
-                (Ref{FqPolyRepField},), k)
-      ccall((:fmpz_mod_poly_set, libflint), Nothing,
-            (Ref{FpPolyRingElem}, Ptr{FpPolyRingElem}),
-            Q, P)
-   end
-   return Q
+  Q = R()
+  GC.@preserve k begin
+    P = ccall((:fq_ctx_modulus, libflint), Ptr{FpPolyRingElem},
+              (Ref{FqPolyRepField},), k)
+    ccall((:fmpz_mod_poly_set, libflint), Nothing,
+          (Ref{FpPolyRingElem}, Ptr{FpPolyRingElem}),
+          Q, P)
+  end
+  return Q
 end
 
 ###############################################################################
@@ -597,8 +597,8 @@ function (a::FqPolyRepField)(b::FqPolyRepFieldElem)
 end
 
 function (A::FqPolyRepField)(x::FpFieldElem)
-   @assert characteristic(A) == characteristic(parent(x))
-   return A(lift(x))
+  @assert characteristic(A) == characteristic(parent(x))
+  return A(lift(x))
 end
 
 function (a::FqPolyRepField)(b::Vector{<:IntegerUnion})
@@ -610,7 +610,7 @@ function (a::FqPolyRepField)(b::Vector{<:IntegerUnion})
 end
 
 function (k::FqPolyRepField)(a::QQFieldElem)
-   return k(numerator(a)) // k(denominator(a))
+  return k(numerator(a)) // k(denominator(a))
 end
 
 ###############################################################################
