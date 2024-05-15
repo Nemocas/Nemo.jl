@@ -18,6 +18,11 @@
 
   @test_throws DomainError qadic_field(4, 2)
 
+  Qp = padic_field(7, cached = false)
+  K, _ = unramified_extension(Qp, 2)
+  @test isa(K, QadicField)
+  @test coefficient_ring(K) === Qp
+
   R, _ = qadic_field(7, 1, precision = 30)
 
   @test isa(R, QadicField)

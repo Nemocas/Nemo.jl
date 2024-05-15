@@ -879,14 +879,16 @@ function QadicField(p::Integer, d::Int, prec::Int = 64, var::String = "a"; cache
 end
 
 @doc raw"""
-    qadic_field(p::Integer, d::Int; precision::Int=64, cached::Bool=true, check::Bool=true)
-    qadic_field(p::ZZRingElem, d::Int; precision::Int=64, cached::Bool=true, check::Bool=true)
+    qadic_field(p::Integer, d::Int, var::String = "a"; precision::Int=64, cached::Bool=true, check::Bool=true)
+    qadic_field(p::ZZRingElem, d::Int, var::String = "a"; precision::Int=64, cached::Bool=true, check::Bool=true)
 
 Return an unramified extension $K$ of degree $d$ of a $p$-adic field for the given
 prime $p$.
 The generator of $K$ is printed as `var`.
 
 The default absolute precision of elements of $K$ may be set with `precision`.
+
+See also [`unramified_extension`](@ref).
 """
 qadic_field
 
@@ -896,6 +898,19 @@ end
 
 function qadic_field(p::ZZRingElem, d::Int, var::String = "a"; precision::Int=64, cached::Bool=true, check::Bool=true)
   return QadicField(p, d, precision, var; cached=cached, check=check)
+end
+
+@doc raw"""
+    unramified_extension(Qp::PadicField, d::Int, var::String = "a"; precision::Int=64, cached::Bool=true)
+
+Return an unramified extension $K$ of degree $d$ of the given $p$-adic field `Qp`.
+The generator of $K$ is printed as `var`.
+
+The default absolute precision of elements of $K$ may be set with `precision`.
+"""
+function unramified_extension(K::PadicField, d::Int, var::String = "a"; precision::Int=precision(K), cached::Bool = true)
+  L, a = QadicField(prime(K), d, precision, var, cached = cached, check = false, base_field = K)
+  return L, a
 end
 
 ###############################################################################

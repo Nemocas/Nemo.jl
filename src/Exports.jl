@@ -627,6 +627,7 @@ export undefined
 export unique_integer
 export unit
 export unknown
+export unramified_extension
 export unsigned_infinity
 export valuation!
 export var
