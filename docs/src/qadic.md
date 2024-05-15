@@ -42,7 +42,7 @@ constructors.
 
 ```@docs
 qadic_field
-unramifield_extension
+unramified_extension
 ```
 
 Here are some examples of creating $q$-adic fields and making use of the
