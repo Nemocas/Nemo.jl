@@ -13,17 +13,17 @@
 
   @test isa(S, QadicField)
 
-   R, _ = qadic_field(7, 1)
-   @test isa(R, QadicField)
+  R, _ = qadic_field(7, 1)
+  @test isa(R, QadicField)
 
-   @test_throws DomainError qadic_field(4, 2)
+  @test_throws DomainError qadic_field(4, 2)
 
-   R, _ = qadic_field(7, 1, precision = 30)
+  R, _ = qadic_field(7, 1, precision = 30)
 
-   @test isa(R, QadicField)
-   @test precision(R) == 30
+  @test isa(R, QadicField)
+  @test precision(R) == 30
 
-   @test isa(R(), QadicFieldElem)
+  @test isa(R(), QadicFieldElem)
 
   @test isa(R(1), QadicFieldElem)
 
@@ -47,14 +47,14 @@
 
   @test isa(t, QadicFieldElem)
 
-   R, _ = QadicField(13, 1, 10)
-   a = gen(R)
-   @test a isa QadicFieldElem
-   a = gen(R; precision = 20)
-   @test a isa QadicFieldElem
-   @test precision(a) == 20
+  R, _ = QadicField(13, 1, 10)
+  a = gen(R)
+  @test a isa QadicFieldElem
+  a = gen(R; precision = 20)
+  @test a isa QadicFieldElem
+  @test precision(a) == 20
 
-   b = R(prime(R))
+  b = R(prime(R))
 
   Q, _ = QadicField(13, 3, 10)
   _, t = polynomial_ring(ZZ, "t")
@@ -85,21 +85,21 @@ end
   b = 7^2 + 3*7^3 + O(R, 7^5)
   c = R(2)
 
-   @test isone(one(R))
-   @test isone(one(R, precision = 60))
-   @test precision(one(R, precision = 60)) == 60
+  @test isone(one(R))
+  @test isone(one(R, precision = 60))
+  @test precision(one(R, precision = 60)) == 60
 
-   @test iszero(zero(R))
-   @test iszero(zero(R, precision = 60))
-   @test precision(zero(R, precision = 60)) == 60
+  @test iszero(zero(R))
+  @test iszero(zero(R, precision = 60))
+  @test precision(zero(R, precision = 60)) == 60
 
-   d = one(R)
-   @test !iszero(d)
-   zero!(d, precision = 60)
-   @test iszero(d)
-   @test precision(d) == 60
+  d = one(R)
+  @test !iszero(d)
+  zero!(d, precision = 60)
+  @test iszero(d)
+  @test precision(d) == 60
 
-   @test precision(a) == 3
+  @test precision(a) == 3
 
   @test prime(R) == 7
 
@@ -107,10 +107,10 @@ end
 
   @test valuation(R(0)) == precision(R(0))
 
-   @test characteristic(R) == 0
+  @test characteristic(R) == 0
 
-   @test shift_right(a, 2) == R(7)^-2 + 2*R(7)^-1 + 4*7^0 + O(R, 7^3)
-   @test shift_left(a, 2) == 7^2 + 2*7^3 + 4*7^4 + O(R, 7^5)
+  @test shift_right(a, 2) == R(7)^-2 + 2*R(7)^-1 + 4*7^0 + O(R, 7^3)
+  @test shift_left(a, 2) == 7^2 + 2*7^3 + 4*7^4 + O(R, 7^5)
 end
 
 @testset "QadicFieldElem.unary_ops" begin
@@ -248,8 +248,8 @@ end
   c = 7^2 + 2*7^3 + O(R, 7^4)
   d = 7 + 2*7^2 + O(R, 7^5)
 
-   @test divexact(a, b) == 4 + 1*7^1 + 2*7^2 + O(R, 7^3)
-   @test a//b == 4 + 1*7^1 + 2*7^2 + O(R, 7^3)
+  @test divexact(a, b) == 4 + 1*7^1 + 2*7^2 + O(R, 7^3)
+  @test a//b == 4 + 1*7^1 + 2*7^2 + O(R, 7^3)
 
   @test divexact(c, d) == 1*7^1 + O(R, 7^3)
 

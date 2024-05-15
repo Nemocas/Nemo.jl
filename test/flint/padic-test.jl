@@ -25,17 +25,17 @@ end
 
   @test isa(S, PadicField)
 
-   R = padic_field(7)
-   @test isa(R, PadicField)
+  R = padic_field(7)
+  @test isa(R, PadicField)
 
-   @test_throws DomainError padic_field(4)
+  @test_throws DomainError padic_field(4)
 
-   R = padic_field(7, precision = 30)
+  R = padic_field(7, precision = 30)
 
-   @test isa(R, PadicField)
-   @test precision(R) == 30
+  @test isa(R, PadicField)
+  @test precision(R) == 30
 
-   @test isa(R(), PadicFieldElem)
+  @test isa(R(), PadicFieldElem)
 
   @test isa(R(1), PadicFieldElem)
 
@@ -93,30 +93,30 @@ end
   b = 7^2 + 3*7^3 + O(R, 7^5)
   c = R(2)
 
-   @test isone(one(R))
-   @test isone(one(R, precision = 60))
-   @test precision(one(R, precision = 60)) == 60
+  @test isone(one(R))
+  @test isone(one(R, precision = 60))
+  @test precision(one(R, precision = 60)) == 60
 
-   @test iszero(zero(R))
-   @test iszero(zero(R, precision = 60))
-   @test precision(zero(R, precision = 60)) == 60
+  @test iszero(zero(R))
+  @test iszero(zero(R, precision = 60))
+  @test precision(zero(R, precision = 60)) == 60
 
-   d = one(R)
-   @test !iszero(d)
-   zero!(d, precision = 60)
-   @test iszero(d)
-   @test precision(d) == 60
+  d = one(R)
+  @test !iszero(d)
+  zero!(d, precision = 60)
+  @test iszero(d)
+  @test precision(d) == 60
 
-   @test precision(a) == 3
+  @test precision(a) == 3
 
-   @test prime(R) == 7
-   @test prime(R, 3) == 7^3
+  @test prime(R) == 7
+  @test prime(R, 3) == 7^3
 
   @test valuation(b) == 2
 
 
-   @test lift(ZZ, a) == 211
-   @test is_zero(lift(ZZ, R()))
+  @test lift(ZZ, a) == 211
+  @test is_zero(lift(ZZ, R()))
 
   @test lift(QQ, divexact(a, b)) == QQFieldElem(337, 49)
 

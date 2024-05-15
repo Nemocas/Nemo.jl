@@ -124,10 +124,10 @@ end
 Return the prime $p$ for the given $p$-adic field.
 """
 function prime(R::PadicField, i::Int = 1)
-   z = ZZRingElem()
-   ccall((:padic_ctx_pow_ui, libflint), Nothing,
-         (Ref{ZZRingElem}, Int, Ref{PadicField}), z, i, R)
-   return z
+  z = ZZRingElem()
+  ccall((:padic_ctx_pow_ui, libflint), Nothing,
+        (Ref{ZZRingElem}, Int, Ref{PadicField}), z, i, R)
+  return z
 end
 
 @doc raw"""
@@ -166,28 +166,28 @@ end
 Return a lift of the given $p$-adic field element to $\mathbb{Z}$.
 """
 function lift(R::ZZRing, a::PadicFieldElem)
-    ctx = parent(a)
-    r = ZZRingElem()
-    if iszero(a)
-        return r
-    end
-    ccall((:padic_get_fmpz, libflint), Nothing,
-          (Ref{ZZRingElem}, Ref{PadicFieldElem}, Ref{PadicField}), r, a, ctx)
+  ctx = parent(a)
+  r = ZZRingElem()
+  if iszero(a)
     return r
+  end
+  ccall((:padic_get_fmpz, libflint), Nothing,
+        (Ref{ZZRingElem}, Ref{PadicFieldElem}, Ref{PadicField}), r, a, ctx)
+  return r
 end
 
 function zero(R::PadicField; precision::Int=precision(R))
-   z = PadicFieldElem(precision)
-   ccall((:padic_zero, libflint), Nothing, (Ref{PadicFieldElem},), z)
-   z.parent = R
-   return z
+  z = PadicFieldElem(precision)
+  ccall((:padic_zero, libflint), Nothing, (Ref{PadicFieldElem},), z)
+  z.parent = R
+  return z
 end
 
 function one(R::PadicField; precision::Int=precision(R))
-   z = PadicFieldElem(precision)
-   ccall((:padic_one, libflint), Nothing, (Ref{PadicFieldElem},), z)
-   z.parent = R
-   return z
+  z = PadicFieldElem(precision)
+  ccall((:padic_one, libflint), Nothing, (Ref{PadicFieldElem},), z)
+  z.parent = R
+  return z
 end
 
 iszero(a::PadicFieldElem) = Bool(ccall((:padic_is_zero, libflint), Cint,
@@ -668,11 +668,11 @@ end
 ###############################################################################
 
 function zero!(z::PadicFieldElem; precision::Int=precision(parent(z)))
-   z.N = precision
-   ctx = parent(z)
-   ccall((:padic_zero, libflint), Nothing,
-         (Ref{PadicFieldElem}, Ref{PadicField}), z, ctx)
-   return z
+  z.N = precision
+  ctx = parent(z)
+  ccall((:padic_zero, libflint), Nothing,
+        (Ref{PadicFieldElem}, Ref{PadicField}), z, ctx)
+  return z
 end
 
 function mul!(z::PadicFieldElem, x::PadicFieldElem, y::PadicFieldElem)
@@ -721,41 +721,41 @@ promote_rule(::Type{PadicFieldElem}, ::Type{QQFieldElem}) = PadicFieldElem
 ###############################################################################
 
 function (R::PadicField)(; precision::Int=precision(R))
-   z = PadicFieldElem(precision)
-   z.parent = R
-   return z
+  z = PadicFieldElem(precision)
+  z.parent = R
+  return z
 end
 
 function (R::PadicField)(n::ZZRingElem; precision::Int=precision(R))
-   if is_one(n) || is_zero(n)
-      N = 0
-   else
-      p = prime(R)
-      N, = remove(n, p)
-   end
-   z = PadicFieldElem(N + precision)
-   ccall((:padic_set_fmpz, libflint), Nothing,
-         (Ref{PadicFieldElem}, Ref{ZZRingElem}, Ref{PadicField}), z, n, R)
-   z.parent = R
-   return z
+  if is_one(n) || is_zero(n)
+    N = 0
+  else
+    p = prime(R)
+    N, = remove(n, p)
+  end
+  z = PadicFieldElem(N + precision)
+  ccall((:padic_set_fmpz, libflint), Nothing,
+        (Ref{PadicFieldElem}, Ref{ZZRingElem}, Ref{PadicField}), z, n, R)
+  z.parent = R
+  return z
 end
 
 function (R::PadicField)(n::QQFieldElem; precision::Int=precision(R))
-   m = denominator(n)
-   if isone(m)
-      return R(numerator(n); precision=precision)
-   end
-   p = prime(R)
-   if m == p
-      N = -1
-   else
-     N = -remove(m, p)[1]
-   end
-   z = PadicFieldElem(N + precision)
-   ccall((:padic_set_fmpq, libflint), Nothing,
-         (Ref{PadicFieldElem}, Ref{QQFieldElem}, Ref{PadicField}), z, n, R)
-   z.parent = R
-   return z
+  m = denominator(n)
+  if isone(m)
+    return R(numerator(n); precision=precision)
+  end
+  p = prime(R)
+  if m == p
+    N = -1
+  else
+    N = -remove(m, p)[1]
+  end
+  z = PadicFieldElem(N + precision)
+  ccall((:padic_set_fmpq, libflint), Nothing,
+        (Ref{PadicFieldElem}, Ref{QQFieldElem}, Ref{PadicField}), z, n, R)
+  z.parent = R
+  return z
 end
 
 (R::PadicField)(n::Integer; precision::Int=precision(R)) = R(ZZRingElem(n); precision)
@@ -773,7 +773,7 @@ end
 
 # Kept for backwards compatibility; the user facing constructor is `padic_field`
 function PadicField(p::Integer, prec::Int = 64; kw...)
-   return PadicField(ZZRingElem(p), prec; kw...)
+  return PadicField(ZZRingElem(p), prec; kw...)
 end
 
 @doc raw"""

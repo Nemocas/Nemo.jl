@@ -3001,18 +3001,19 @@ A $p$-adic field for some prime $p$.
   mode::Cint
   prec_max::Int
 
-   function PadicField(p::ZZRingElem, prec::Int = 64; cached::Bool = true, check::Bool = true)
-      check && !is_probable_prime(p) && throw(DomainError(p, "Integer must be prime"))
+  function PadicField(p::ZZRingElem, prec::Int = 64; cached::Bool = true, check::Bool = true)
+    check && !is_probable_prime(p) && throw(DomainError(p, "Integer must be prime"))
 
-    return get_cached!(PadicBase, (p, prec), cached) do
+    Qp = get_cached!(PadicBase, p, cached) do
       d = new()
       ccall((:padic_ctx_init, libflint), Nothing,
             (Ref{PadicField}, Ref{ZZRingElem}, Int, Int, Cint),
             d, p, 0, 0, 0)
       finalizer(_padic_ctx_clear_fn, d)
-      d.prec_max = prec
       return d
     end
+    Qp.prec_max = prec
+    return Qp
   end
 end
 
@@ -3069,21 +3070,21 @@ A $p^n$-adic field for some prime power $p^n$.
   var::Cstring   # char*
   prec_max::Int
 
-   function QadicField(p::ZZRingElem, d::Int, prec::Int = 64, var::String = "a"; cached::Bool = true, check::Bool = true, base_field::PadicField = PadicField(p, prec, cached = cached))
+  function QadicField(p::ZZRingElem, d::Int, prec::Int = 64, var::String = "a"; cached::Bool = true, check::Bool = true, base_field::PadicField = PadicField(p, prec, cached = cached))
 
-      @assert p == prime(base_field)
-      check && !is_probable_prime(p) && throw(DomainError(p, "Integer must be prime"))
+    @assert p == prime(base_field)
+    check && !is_probable_prime(p) && throw(DomainError(p, "Integer must be prime"))
 
-      z = get_cached!(QadicBase, (base_field, d), cached) do
-         zz = new()
-         ccall((:qadic_ctx_init, libflint), Nothing,
-              (Ref{QadicField}, Ref{ZZRingElem}, Int, Int, Int, Cstring, Cint),
-                                        zz, p, d, 0, 0, var, 0)
-         finalizer(_qadic_ctx_clear_fn, zz)
-         return zz
-      end
-      z.prec_max = prec
-      set_attribute!(z, :base_field, base_field)
+    z = get_cached!(QadicBase, (base_field, d), cached) do
+      zz = new()
+      ccall((:qadic_ctx_init, libflint), Nothing,
+            (Ref{QadicField}, Ref{ZZRingElem}, Int, Int, Int, Cstring, Cint),
+            zz, p, d, 0, 0, var, 0)
+      finalizer(_qadic_ctx_clear_fn, zz)
+      return zz
+    end
+    z.prec_max = prec
+    set_attribute!(z, :base_field, base_field)
 
     return z, gen(z)
   end
