@@ -381,6 +381,12 @@ end
 
 //(a::QadicFieldElem, b::QadicFieldElem) = divexact(a, b)
 
+# TODO: As of 15 May 2024 the following two methods don't work in Nemo because
+# `(::QadicField)(::PadicFieldElem)` which is needed for the promotion is in
+# Hecke
+//(a::PadicFieldElem, b::QadicFieldElem) = divexact(a, b)
+//(a::QadicFieldElem, b::PadicFieldElem) = divexact(a, b)
+
 ###############################################################################
 #
 #   Comparison
