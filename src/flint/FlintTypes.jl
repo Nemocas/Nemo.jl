@@ -3069,25 +3069,27 @@ A $p^n$-adic field for some prime power $p^n$.
   var::Cstring   # char*
   prec_max::Int
 
-   function QadicField(p::ZZRingElem, d::Int, prec::Int = 64, var::String = "a"; cached::Bool = true, check::Bool = true)
+   function QadicField(p::ZZRingElem, d::Int, prec::Int = 64, var::String = "a"; cached::Bool = true, check::Bool = true, base_field::PadicField = PadicField(p, prec, cached = cached))
 
+      @assert p == prime(base_field)
       check && !is_probable_prime(p) && throw(DomainError(p, "Integer must be prime"))
 
-    z = get_cached!(QadicBase, (p, d, prec), cached) do
-      zz = new()
-      ccall((:qadic_ctx_init, libflint), Nothing,
-            (Ref{QadicField}, Ref{ZZRingElem}, Int, Int, Int, Cstring, Cint),
-            zz, p, d, 0, 0, var, 0)
-      finalizer(_qadic_ctx_clear_fn, zz)
-      zz.prec_max = prec
-      return zz
-    end
+      z = get_cached!(QadicBase, (base_field, d), cached) do
+         zz = new()
+         ccall((:qadic_ctx_init, libflint), Nothing,
+              (Ref{QadicField}, Ref{ZZRingElem}, Int, Int, Int, Cstring, Cint),
+                                        zz, p, d, 0, 0, var, 0)
+         finalizer(_qadic_ctx_clear_fn, zz)
+         return zz
+      end
+      z.prec_max = prec
+      set_attribute!(z, :base_field, base_field)
 
     return z, gen(z)
   end
 end
 
-const QadicBase = CacheDictType{Tuple{ZZRingElem, Int, Int}, QadicField}()
+const QadicBase = CacheDictType{Tuple{PadicField, Int}, QadicField}()
 
 function _qadic_ctx_clear_fn(a::QadicField)
   ccall((:qadic_ctx_clear, libflint), Nothing, (Ref{QadicField},), a)
