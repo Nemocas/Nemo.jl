@@ -599,7 +599,7 @@ GaussianRationals() = FlintQQi
 ###############################################################################
 
 @doc qqbar_field_doc
-const QQBar = CalciumQQBar
+const CalciumQQBar = QQBar # TODO: remove in next breaking release
 
 
 ###############################################################################

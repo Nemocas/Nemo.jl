@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-parent(a::QQBarFieldElem) = CalciumQQBar
+parent(a::QQBarFieldElem) = QQBar
 
 parent_type(::Type{QQBarFieldElem}) = QQBarField
 
@@ -178,9 +178,9 @@ zero(a::QQBarField) = a(0)
 
 one(a::QQBarField) = a(1)
 
-zero(::Type{QQBarFieldElem}) = CalciumQQBar(0)
+zero(::Type{QQBarFieldElem}) = QQBar(0)
 
-one(::Type{QQBarFieldElem}) = CalciumQQBar(1)
+one(::Type{QQBarFieldElem}) = QQBar(1)
 
 @doc raw"""
     degree(x::QQBarFieldElem)
@@ -1176,7 +1176,9 @@ Throws if this value is transcendental.
 # Examples
 
 ```jldoctest
-julia> x = sinpi(QQBar(1)//3)
+julia> QQBar = algebraic_closure(QQ);
+
+julia> x = sinpi(QQBar(1//3))
 Root 0.866025 of 4x^2 - 3
 
 julia> sinpi(x)
@@ -1202,7 +1204,9 @@ Throws if this value is transcendental.
 # Examples
 
 ```jldoctest
-julia> x = cospi(QQBar(1)//6)
+julia> QQBar = algebraic_closure(QQ);
+
+julia> x = cospi(QQBar(1//6))
 Root 0.866025 of 4x^2 - 3
 
 julia> cospi(x)
@@ -1228,7 +1232,9 @@ Throws if either value is transcendental.
 # Examples
 
 ```jldoctest
-julia> s, c = sincospi(QQBar(1)//3)
+julia> QQBar = algebraic_closure(QQ);
+
+julia> s, c = sincospi(QQBar(1//3))
 (Root 0.866025 of 4x^2 - 3, Root 0.500000 of 2x - 1)
 
 julia> sincospi(s)

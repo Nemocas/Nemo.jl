@@ -237,6 +237,7 @@ end
 
 @testset "CalciumFieldElem.conversions" begin
   C = CalciumField()
+  QQBar = algebraic_closure(QQ)
 
   n = C(3)
   h = C(1) // 2

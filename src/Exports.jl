@@ -63,7 +63,7 @@ export bits
 export bound_inf_norm
 export CalciumField
 export CalciumFieldElem
-export CalciumQQBar
+export CalciumQQBar   # TODO: remove in next breaking release
 export canonical_unit
 export cdiv
 export cdivpow2
@@ -502,7 +502,7 @@ export QadicFieldElem
 export QQ
 export QQAbsPowerSeriesRing
 export QQAbsPowerSeriesRingElem
-export QQBar
+export QQBar    # TODO: remove in next breaking release
 export QQBarField
 export QQBarFieldElem
 export QQField

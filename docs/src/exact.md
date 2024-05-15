@@ -165,7 +165,7 @@ value because of evaluation limits.
 julia> QQ(C(1))
 1
 
-julia> QQBar(sqrt(C(2)) // 2)
+julia> algebraic_closure(QQ)(sqrt(C(2)) // 2)
 Root 0.707107 of 2x^2 - 1
 
 julia> QQ(C(pi))
