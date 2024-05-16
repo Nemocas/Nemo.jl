@@ -91,6 +91,17 @@ function _prime(R::QadicField, n::Int = 1)
   return z
 end
 
+# TODO: For the next minor/breaking release, rename this to base_field and
+# deprecate coefficient_ring (and remove the corresponding base_field in Hecke)
+function coefficient_ring(K::QadicField)
+  L = get_attribute!(K, :base_field) do
+    return PadicField(prime(K), precision(K), cached = false)
+  end::PadicField
+  # Should not be here, but Hecke needs it
+  setprecision!(L, precision(K))
+  return L
+end
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -172,15 +183,15 @@ function lift(R::ZZPolyRing, a::QadicFieldElem)
   return r
 end
 
-function zero(R::QadicField)
-  z = QadicFieldElem(R.prec_max)
+function zero(R::QadicField; precision::Int=precision(R))
+  z = QadicFieldElem(precision)
   ccall((:qadic_zero, libflint), Nothing, (Ref{QadicFieldElem},), z)
   z.parent = R
   return z
 end
 
-function one(R::QadicField)
-  z = QadicFieldElem(R.prec_max)
+function one(R::QadicField; precision::Int=precision(R))
+  z = QadicFieldElem(precision)
   ccall((:qadic_one, libflint), Nothing, (Ref{QadicFieldElem},), z)
   z.parent = R
   return z
@@ -197,6 +208,18 @@ is_unit(a::QadicFieldElem) = !Bool(ccall((:qadic_is_zero, libflint), Cint,
 
 characteristic(R::QadicField) = 0
 
+function shift_right(a::QadicFieldElem, n::Int)
+  b = deepcopy(a)
+  b.val -= n
+  return b
+end
+
+function shift_left(a::QadicFieldElem, n::Int)
+  b = deepcopy(a)
+  b.val += n
+  return b
+end
+
 ###############################################################################
 #
 #   AbstractString I/O
@@ -208,12 +231,12 @@ function var(Q::QadicField)
 end
 
 function expressify(b::QadicFieldElem, x = var(parent(b)); context = nothing)
-  R = PadicField(prime(parent(b)), parent(b).prec_max)
+  R = coefficient_ring(parent(b))
   if iszero(b)
     return 0
   end
   sum = Expr(:call, :+)
-  c = R()
+  c = R(precision = precision(parent(b)))
   for i in degree(parent(b)):-1:0
     ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
           (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Int, Ref{QadicField}),
@@ -354,6 +377,16 @@ end
 *(a::ZZRingElem, b::QadicFieldElem) = b*a
 
 *(a::QQFieldElem, b::QadicFieldElem) = b*a
+
+^(a::QadicFieldElem, b::QadicFieldElem) = exp(b * log(a))
+
+//(a::QadicFieldElem, b::QadicFieldElem) = divexact(a, b)
+
+# TODO: As of 15 May 2024 the following two methods don't work in Nemo because
+# `(::QadicField)(::PadicFieldElem)` which is needed for the promotion is in
+# Hecke
+//(a::PadicFieldElem, b::QadicFieldElem) = divexact(a, b)
+//(a::QadicFieldElem, b::PadicFieldElem) = divexact(a, b)
 
 ###############################################################################
 #
@@ -523,6 +556,12 @@ end
 #
 ###############################################################################
 
+@doc raw"""
+    exp(a::QadicFieldElem)
+
+Return the $p$-adic exponential of $a$, assuming the $p$-adic exponential
+function converges at $a$.
+"""
 function Base.exp(a::QadicFieldElem)
   !iszero(a) && valuation(a) <= 0 && throw(DomainError(a, "Valuation must be positive"))
   ctx = parent(a)
@@ -534,6 +573,12 @@ function Base.exp(a::QadicFieldElem)
   return z
 end
 
+@doc raw"""
+    log(a::QadicFieldElem)
+
+Return the $p$-adic logarithm of $a$, assuming the $p$-adic logarithm
+converges at $a$.
+"""
 function log(a::QadicFieldElem)
   av = valuation(a)
   (av > 0 || av < 0 || iszero(a)) && throw(DomainError(a, "Valuation must be zero"))
@@ -596,8 +641,8 @@ end
 #
 ###############################################################################
 
-function zero!(z::QadicFieldElem)
-  z.N = parent(z).prec_max
+function zero!(z::QadicFieldElem; precision::Int=precision(parent(z)))
+  z.N = precision
   ctx = parent(z)
   ccall((:qadic_zero, libflint), Nothing,
         (Ref{QadicFieldElem}, Ref{QadicField}), z, ctx)
@@ -633,6 +678,24 @@ end
 
 ###############################################################################
 #
+#   Trace and norm
+#
+###############################################################################
+
+function tr(r::QadicFieldElem)
+  t = coefficient_ring(parent(r))()
+  ccall((:qadic_trace, libflint), Nothing, (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}), t, r, parent(r))
+  return t
+end
+
+function norm(r::QadicFieldElem)
+  t = coefficient_ring(parent(r))()
+  ccall((:qadic_norm, libflint), Nothing, (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}), t, r, parent(r))
+  return t
+end
+
+###############################################################################
+#
 #   Conversions and promotions
 #
 ###############################################################################
@@ -653,77 +716,66 @@ promote_rule(::Type{QadicFieldElem}, ::Type{PadicFieldElem}) = QadicFieldElem
 #
 ###############################################################################
 
-function (R::QadicField)()
-  z = QadicFieldElem(R.prec_max)
+function (R::QadicField)(; precision::Int=precision(R))
+  z = QadicFieldElem(precision)
   z.parent = R
   return z
 end
 
-function gen(R::QadicField)
-  if degree(R) == 1
-    # Work around flint limitation
-    # https://github.com/wbhart/flint2/issues/898
-    a = ZZRingElem()
-    GC.@preserve R begin
-      ccall((:fmpz_set, libflint), Nothing, (Ref{ZZRingElem}, Ptr{ZZRingElem}),
-            a, reinterpret(Ptr{ZZRingElem}, R.a))
-    end
-    return R(-a)
-  end
-
-  z = QadicFieldElem(R.prec_max)
+function gen(R::QadicField; precision::Int=precision(R))
+  z = QadicFieldElem(precision)
   ccall((:qadic_gen, libflint), Nothing,
         (Ref{QadicFieldElem}, Ref{QadicField}), z, R)
   z.parent = R
   return z
 end
 
-function (R::QadicField)(a::UInt)
+function (R::QadicField)(a::UInt; precision::Int=precision(R))
   if a == 0
-    z = QadicFieldElem(R.prec_max)
+    z = QadicFieldElem(precision)
     z.parent = R
     return z
   end
   v = valuation(a, prime(R))
-  z = QadicFieldElem(R.prec_max + v)
+  z = QadicFieldElem(precision + v)
   ccall((:qadic_set_ui, libflint), Nothing,
         (Ref{QadicFieldElem}, UInt, Ref{QadicField}), z, a, R)
   z.parent = R
   return z
 end
 
-function (R::QadicField)(a::Int)
+function (R::QadicField)(a::Int; precision::Int=precision(R))
   if a == 0
-    z = QadicFieldElem(R.prec_max)
+    z = QadicFieldElem(precision)
     z.parent = R
     return z
   end
   v = valuation(a, prime(R))
-  z = QadicFieldElem(R.prec_max + v)
+  z = QadicFieldElem(precision + v)
   ccall((:padic_poly_set_si, libflint), Nothing,
         (Ref{QadicFieldElem}, Int, Ref{QadicField}), z,a, R)
   z.parent = R
   return z
 end
 
-function (R::QadicField)(n::ZZRingElem)
+function (R::QadicField)(n::ZZRingElem; precision::Int=precision(R))
   if iszero(n) || isone(n)
     N = 0
   else
     p = prime(R)
     N = valuation(n, p)
   end
-  z = QadicFieldElem(N + R.prec_max)
+  z = QadicFieldElem(N + precision)
   ccall((:padic_poly_set_fmpz, libflint), Nothing,
         (Ref{QadicFieldElem}, Ref{ZZRingElem}, Ref{QadicField}), z, n, R)
   z.parent = R
   return z
 end
 
-function (R::QadicField)(n::QQFieldElem)
+function (R::QadicField)(n::QQFieldElem; precision::Int=precision(R))
   m = denominator(n)
   if isone(m)
-    return R(numerator(n))
+    return R(numerator(n); precision = precision)
   end
   p = prime(R)
   if m == p
@@ -731,22 +783,22 @@ function (R::QadicField)(n::QQFieldElem)
   else
     N = -remove(m, p)[1]
   end
-  z = QadicFieldElem(N + R.prec_max)
+  z = QadicFieldElem(N + precision)
   ccall((:padic_poly_set_fmpq, libflint), Nothing,
         (Ref{QadicFieldElem}, Ref{QQFieldElem}, Ref{QadicField}), z, n, R)
   z.parent = R
   return z
 end
 
-function (R::QadicField)(n::ZZPolyRingElem, pr::Int = R.prec_max)
-  z = QadicFieldElem(pr)
+function (R::QadicField)(n::ZZPolyRingElem; precision::Int=precision(R))
+  z = QadicFieldElem(precision)
   ccall((:qadic_set_fmpz_poly, libflint), Nothing,
         (Ref{QadicFieldElem}, Ref{ZZPolyRingElem}, Ref{QadicField}), z, n, R)
   z.parent = R
   return z
 end
 
-function (R::QadicField)(n::QQPolyRingElem)
+function (R::QadicField)(n::QQPolyRingElem; precision::Int=precision(R))
 
   if degree(n) > degree(R) + 1
     error("Polynomial degree larger than degree of qadic field.")
@@ -758,18 +810,18 @@ function (R::QadicField)(n::QQPolyRingElem)
   else
     N = -remove(m, p)[1]
   end
-  z = QadicFieldElem(N + R.prec_max)
+  z = QadicFieldElem(N + precision)
   ccall((:padic_poly_set_fmpq_poly, libflint), Nothing,
         (Ref{QadicFieldElem}, Ref{QQPolyRingElem}, Ref{QadicField}), z, n, R)
   z.parent = R
   return z
 end
 
-function (R::QadicField)(b::Rational{<:Integer})
-  return R(QQFieldElem(b))
+function (R::QadicField)(b::Rational{<:Integer}; precision::Int=precision(R))
+  return R(QQFieldElem(b); precision)
 end
 
-(R::QadicField)(n::Integer) = R(ZZRingElem(n))
+(R::QadicField)(n::Integer; precision::Int=precision(R)) = R(ZZRingElem(n); precision)
 
 function (R::QadicField)(n::QadicFieldElem)
   parent(n) != R && error("Unable to coerce into q-adic field")
@@ -778,19 +830,153 @@ end
 
 ###############################################################################
 #
+#   As p-adic polynomial
+#
+###############################################################################
+
+function (Rx::Generic.PolyRing{PadicFieldElem})(a::QadicFieldElem)
+  Qq = parent(a)
+  #@assert Rx === parent(defining_polynomial(Qq))
+  R = base_ring(Rx)
+  coeffs = Vector{PadicFieldElem}(undef, degree(Qq))
+  for i = 1:length(coeffs)
+    c = R()
+    ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
+          (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Int, Ref{QadicField}), c, a, i - 1, parent(a))
+    coeffs[i] = c
+  end
+  return Rx(coeffs)
+end
+
+function coeff(x::QadicFieldElem, i::Int)
+  R = coefficient_ring(parent(x))
+  c = R()
+  ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
+        (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Int, Ref{QadicField}), c, x, i, parent(x))
+  return c
+end
+
+function setcoeff!(x::QadicFieldElem, i::Int, y::PadicFieldElem)
+  ccall((:padic_poly_set_coeff_padic, libflint), Nothing,
+        (Ref{QadicFieldElem}, Int, Ref{PadicFieldElem}, Ref{QadicField}), x, i, y, parent(x))
+end
+
+function setcoeff!(x::QadicFieldElem, i::Int, y::UInt)
+  return setcoeff!(x, i, ZZRingElem(y))
+end
+
+function setcoeff!(x::QadicFieldElem, i::Int, y::ZZRingElem)
+  R = coefficient_ring(parent(x))
+  Y = R(ZZRingElem(y))
+  ccall((:padic_poly_set_coeff_padic, libflint), Nothing,
+        (Ref{QadicFieldElem}, Int, Ref{PadicFieldElem}, Ref{QadicField}), x, i, Y, parent(x))
+end
+
+Base.length(a::QadicFieldElem) = a.length
+
+###############################################################################
+#
 #   QadicField constructor
 #
 ###############################################################################
 
-# inner constructor is also used directly
-
-@doc raw"""
-    QadicField(p::Integer, d::Int, prec::Int, var::String = "a")
-
-Returns the parent object for the $q$-adic field for given prime $p$ and
-degree $d$, where the default absolute precision of elements of the field
-is given by `prec` and the generator is printed as `var`.
-"""
-function QadicField(p::Integer, d::Int, prec::Int, var::String = "a"; cached::Bool = true)
+# Kept for backwards compatibility; the user facing constructor is `qadic_field`
+function QadicField(p::Integer, d::Int, prec::Int = 64, var::String = "a"; cached::Bool = true)
   return QadicField(ZZRingElem(p), d, prec, var, cached = cached)
 end
+
+@doc raw"""
+    qadic_field(p::Integer, d::Int, var::String = "a"; precision::Int=64, cached::Bool=true, check::Bool=true)
+    qadic_field(p::ZZRingElem, d::Int, var::String = "a"; precision::Int=64, cached::Bool=true, check::Bool=true)
+
+Return an unramified extension $K$ of degree $d$ of a $p$-adic field for the given
+prime $p$.
+The generator of $K$ is printed as `var`.
+
+The default absolute precision of elements of $K$ may be set with `precision`.
+
+See also [`unramified_extension`](@ref).
+"""
+qadic_field
+
+function qadic_field(p::Integer, d::Int, var::String = "a"; precision::Int=64, cached::Bool=true, check::Bool=true)
+  return qadic_field(ZZRingElem(p), d, var; precision=precision, cached=cached, check=check)
+end
+
+function qadic_field(p::ZZRingElem, d::Int, var::String = "a"; precision::Int=64, cached::Bool=true, check::Bool=true)
+  return QadicField(p, d, precision, var; cached=cached, check=check)
+end
+
+@doc raw"""
+    unramified_extension(Qp::PadicField, d::Int, var::String = "a"; precision::Int=64, cached::Bool=true)
+
+Return an unramified extension $K$ of degree $d$ of the given $p$-adic field `Qp`.
+The generator of $K$ is printed as `var`.
+
+The default absolute precision of elements of $K$ may be set with `precision`.
+"""
+function unramified_extension(K::PadicField, d::Int, var::String = "a"; precision::Int=precision(K), cached::Bool = true)
+  L, a = QadicField(prime(K), d, precision, var, cached = cached, check = false, base_field = K)
+  return L, a
+end
+
+###############################################################################
+#
+#   Precision handling
+#
+###############################################################################
+
+precision(Q::QadicField) = Q.prec_max
+
+function Base.setprecision(q::QadicFieldElem, N::Int)
+  r = parent(q)()
+  r.N = N
+  ccall((:padic_poly_set, libflint), Nothing, (Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}), r, q, parent(q))
+  return r
+end
+
+function setprecision!(q::QadicFieldElem, N::Int)
+  q.N = N
+  ccall((:qadic_reduce, libflint), Nothing, (Ref{QadicFieldElem}, Ref{QadicField}), q, parent(q))
+  return q
+end
+
+function setprecision!(Q::QadicField, n::Int)
+  Q.prec_max = n
+  setprecision!(coefficient_ring(Q), n)
+  return Q
+end
+
+function setprecision!(f::Generic.Poly{QadicFieldElem}, N::Int)
+  for i = 1:length(f)
+    setprecision!(f.coeffs[i], N)
+  end
+  set_length!(f, normalise(f, length(f)))
+  return f
+end
+
+function Base.setprecision(f::Generic.Poly{QadicFieldElem}, N::Int)
+  # map_coefficients handles the coefficient 0 weirdly, so we have to set the
+  # 'global' precision
+  g = with_precision(base_ring(f), N) do
+    map_coefficients(x -> setprecision(x, N), f, parent=parent(f))
+  end
+  return g
+end
+
+function with_precision(f, K::QadicField, n::Int)
+  @assert n >= 0
+  old = precision(K)
+  old_base = precision(coefficient_ring(K))
+  setprecision!(K, n)
+  setprecision!(coefficient_ring(K), n)
+  v = try
+    f()
+  finally
+    setprecision!(K, old)
+    setprecision!(coefficient_ring(K), old_base)
+  end
+  return v
+end
+
+Base.setprecision(f::Function, K::QadicField, n::Int) = with_precision(f, K, n)

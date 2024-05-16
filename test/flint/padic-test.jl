@@ -25,6 +25,16 @@ end
 
   @test isa(S, PadicField)
 
+  R = padic_field(7)
+  @test isa(R, PadicField)
+
+  @test_throws DomainError padic_field(4)
+
+  R = padic_field(7, precision = 30)
+
+  @test isa(R, PadicField)
+  @test precision(R) == 30
+
   @test isa(R(), PadicFieldElem)
 
   @test isa(R(1), PadicFieldElem)
@@ -84,16 +94,29 @@ end
   c = R(2)
 
   @test isone(one(R))
+  @test isone(one(R, precision = 60))
+  @test precision(one(R, precision = 60)) == 60
 
   @test iszero(zero(R))
+  @test iszero(zero(R, precision = 60))
+  @test precision(zero(R, precision = 60)) == 60
+
+  d = one(R)
+  @test !iszero(d)
+  zero!(d, precision = 60)
+  @test iszero(d)
+  @test precision(d) == 60
 
   @test precision(a) == 3
 
   @test prime(R) == 7
+  @test prime(R, 3) == 7^3
 
   @test valuation(b) == 2
 
+
   @test lift(ZZ, a) == 211
+  @test is_zero(lift(ZZ, R()))
 
   @test lift(QQ, divexact(a, b)) == QQFieldElem(337, 49)
 
@@ -380,4 +403,71 @@ end
   @test teichmuller(b) == 2 + 4*7^1 + 6*7^2 + O(R, 7^3)
 
   @test_throws DomainError teichmuller(R(7)^-1)
+end
+
+@testset "PadicFieldElem.parent_overloading" begin
+  K = padic_field(7)
+
+  for a in [K(), K(0), K(ZZ(0)), K(QQ(0))]
+    a = K()
+    @test is_zero(a)
+    @test precision(a) == precision(K)
+  end
+  for a in [K(precision = 30), K(0, precision = 30), K(ZZ(0), precision = 30), K(QQ(0), precision = 30)]
+    @test is_zero(a)
+    @test precision(a) == 30
+  end
+
+  for a in [K(1, precision = 30), K(ZZ(1), precision = 30), K(QQ(1), precision = 30)]
+    @test is_one(a)
+    @test precision(a) == 30
+  end
+
+  a = K(7, precision = 30)
+  @test precision(a) == 31
+
+  a = K(QQ(1//7), precision = 30)
+  @test precision(a) == 29
+end
+
+@testset "PadicField.feature_parity" begin
+  R = PadicField(2, 10)
+  @test degree(R) == 1
+  @test base_field(R) === R
+  @test gens(R, R) == [one(R)]
+  @test_throws AssertionError gens(R, PadicField(3, 10))
+end
+
+@testset "PadicField.setprecision" begin
+  K = PadicField(2, 10)
+  @test precision(K) == 10
+  setprecision!(K, 20)
+  @test precision(K) == 20
+  a = with_precision(K, 30) do
+    zero(K)
+  end
+  @test precision(a) == 30
+  @test precision(K) == 20
+  a = with_precision(K, 10) do
+    zero(K)
+  end
+  @test precision(a) == 10
+  @test precision(K) == 20
+
+  a = 1 + 2 + 2^2 + O(K, 2^3)
+  @test precision(a) == 3
+  b = setprecision(a, 5)
+  @test precision(b) == 5
+  @test precision(a) == 3
+  setprecision!(a, 5)
+  @test precision(a) == 5
+
+  Kx, x = K["x"]
+  f = x^2 + 1
+  @test all(x -> precision(x) == precision(K), coefficients(f))
+  g = setprecision(f, 30)
+  @test all(x -> precision(x) == precision(K), coefficients(f))
+  @test all(x -> precision(x) == 30, coefficients(g))
+  setprecision!(f, 30)
+  @test all(x -> precision(x) == 30, coefficients(f))
 end

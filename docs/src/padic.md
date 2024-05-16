@@ -10,7 +10,7 @@ end
 P-adic fields are provided in Nemo by Flint. This allows construction of
 $p$-adic fields for any prime $p$.
 
-P-adic fields are constructed using the `PadicField` function. 
+P-adic fields are constructed using the `padic_field` function.
 
 The types of $p$-adic fields in Nemo are given in the following table, along
 with the libraries that provide them and the associated types of the parent
@@ -39,18 +39,8 @@ the $p$-adic field itself. This is accomplished with one of the following
 constructors.
 
 ```@docs
-PadicField(::Integer, ::Int)
+padic_field
 ```
-
-It is also possible to call the inner constructor directly. It has the following
-form.
-
-```
-PadicField(p::ZZRingElem, prec::Int)
-```
-
-Returns the parent object for the $p$-adic field for given prime $p$, where
-the default absolute precision of elements of the field is given by `prec`.
 
 Here are some examples of creating $p$-adic fields and making use of the
 resulting parent objects to coerce various elements into those fields.
@@ -58,10 +48,10 @@ resulting parent objects to coerce various elements into those fields.
 **Examples**
 
 ```jldoctest
-julia> R = PadicField(7, 30)
+julia> R = padic_field(7, precision = 30)
 Field of 7-adic numbers
 
-julia> S = PadicField(ZZ(65537), 30)
+julia> S = padic_field(ZZ(65537), precision = 30)
 Field of 65537-adic numbers
 
 julia> a = R()
@@ -95,10 +85,10 @@ $p^n$ as in the examples.
 **Examples**
 
 ```jldoctest
-julia> R = PadicField(7, 30)
+julia> R = padic_field(7, precision = 30)
 Field of 7-adic numbers
 
-julia> S = PadicField(ZZ(65537), 30)
+julia> S = padic_field(ZZ(65537), precision = 30)
 Field of 65537-adic numbers
 
 julia> c = 1 + 2*7 + 4*7^2 + O(R, 7^3)
@@ -138,7 +128,7 @@ lift(::QQField, ::PadicFieldElem)
 **Examples**
 
 ```jldoctest
-julia> R = PadicField(7, 30)
+julia> R = padic_field(7, precision = 30)
 Field of 7-adic numbers
 
 julia> a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
@@ -175,7 +165,7 @@ Base.sqrt(::PadicFieldElem)
 **Examples**
 
 ```jldoctest
-julia> R = PadicField(7, 30)
+julia> R = padic_field(7, precision = 30)
 Field of 7-adic numbers
 
 julia> a = 1 + 7 + 2*7^2 + O(R, 7^3)
@@ -220,7 +210,7 @@ teichmuller(::PadicFieldElem)
 **Examples**
 
 ```jldoctest
-julia> R = PadicField(7, 30)
+julia> R = padic_field(7, precision = 30)
 Field of 7-adic numbers
 
 julia> a = 1 + 7 + 2*7^2 + O(R, 7^3)

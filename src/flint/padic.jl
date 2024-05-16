@@ -86,6 +86,25 @@ parent_type(::Type{PadicFieldElem}) = PadicField
 
 ###############################################################################
 #
+#   Feature parity
+#
+###############################################################################
+
+degree(::PadicField) = 1
+
+base_field(k::PadicField) = k
+
+# TODO: Remove in the next minor/breaking release
+coefficient_ring(k::PadicField) = base_field(k)
+
+# Return generators of k "over" K
+function gens(k::PadicField, K::PadicField)
+  @assert k === K
+  return [one(k)]
+end
+
+###############################################################################
+#
 #   Basic manipulation
 #
 ###############################################################################
@@ -107,10 +126,10 @@ end
 
 Return the prime $p$ for the given $p$-adic field.
 """
-function prime(R::PadicField)
+function prime(R::PadicField, i::Int = 1)
   z = ZZRingElem()
   ccall((:padic_ctx_pow_ui, libflint), Nothing,
-        (Ref{ZZRingElem}, Int, Ref{PadicField}), z, 1, R)
+        (Ref{ZZRingElem}, Int, Ref{PadicField}), z, i, R)
   return z
 end
 
@@ -152,20 +171,23 @@ Return a lift of the given $p$-adic field element to $\mathbb{Z}$.
 function lift(R::ZZRing, a::PadicFieldElem)
   ctx = parent(a)
   r = ZZRingElem()
+  if iszero(a)
+    return r
+  end
   ccall((:padic_get_fmpz, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{PadicFieldElem}, Ref{PadicField}), r, a, ctx)
   return r
 end
 
-function zero(R::PadicField)
-  z = PadicFieldElem(R.prec_max)
+function zero(R::PadicField; precision::Int=precision(R))
+  z = PadicFieldElem(precision)
   ccall((:padic_zero, libflint), Nothing, (Ref{PadicFieldElem},), z)
   z.parent = R
   return z
 end
 
-function one(R::PadicField)
-  z = PadicFieldElem(R.prec_max)
+function one(R::PadicField; precision::Int=precision(R))
+  z = PadicFieldElem(precision)
   ccall((:padic_one, libflint), Nothing, (Ref{PadicFieldElem},), z)
   z.parent = R
   return z
@@ -376,6 +398,8 @@ end
 
 *(a::QQFieldElem, b::PadicFieldElem) = b*a
 
+^(a::PadicFieldElem, b::PadicFieldElem) = exp(b * log(a))
+
 ###############################################################################
 #
 #   Comparison
@@ -579,6 +603,12 @@ end
 #
 ###############################################################################
 
+@doc raw"""
+    exp(a::PadicFieldElem)
+
+Return the $p$-adic exponential of $a$, assuming the $p$-adic exponential
+function converges at $a$.
+"""
 function Base.exp(a::PadicFieldElem)
   !iszero(a) && a.v <= 0 && throw(DomainError(a, "Valuation must be positive"))
   ctx = parent(a)
@@ -590,6 +620,12 @@ function Base.exp(a::PadicFieldElem)
   return z
 end
 
+@doc raw"""
+    log(a::PadicFieldElem)
+
+Return the $p$-adic logarithm of $a$, assuming the $p$-adic logarithm
+converges at $a$.
+"""
 function log(a::PadicFieldElem)
   ctx = parent(a)
   z = PadicFieldElem(a.N)
@@ -634,8 +670,8 @@ end
 #
 ###############################################################################
 
-function zero!(z::PadicFieldElem)
-  z.N = parent(z).prec_max
+function zero!(z::PadicFieldElem; precision::Int=precision(parent(z)))
+  z.N = precision
   ctx = parent(z)
   ccall((:padic_zero, libflint), Nothing,
         (Ref{PadicFieldElem}, Ref{PadicField}), z, ctx)
@@ -687,30 +723,30 @@ promote_rule(::Type{PadicFieldElem}, ::Type{QQFieldElem}) = PadicFieldElem
 #
 ###############################################################################
 
-function (R::PadicField)()
-  z = PadicFieldElem(R.prec_max)
+function (R::PadicField)(; precision::Int=precision(R))
+  z = PadicFieldElem(precision)
   z.parent = R
   return z
 end
 
-function (R::PadicField)(n::ZZRingElem)
-  if isone(n)
+function (R::PadicField)(n::ZZRingElem; precision::Int=precision(R))
+  if is_one(n) || is_zero(n)
     N = 0
   else
     p = prime(R)
     N, = remove(n, p)
   end
-  z = PadicFieldElem(N + R.prec_max)
+  z = PadicFieldElem(N + precision)
   ccall((:padic_set_fmpz, libflint), Nothing,
         (Ref{PadicFieldElem}, Ref{ZZRingElem}, Ref{PadicField}), z, n, R)
   z.parent = R
   return z
 end
 
-function (R::PadicField)(n::QQFieldElem)
+function (R::PadicField)(n::QQFieldElem; precision::Int=precision(R))
   m = denominator(n)
   if isone(m)
-    return R(numerator(n))
+    return R(numerator(n); precision=precision)
   end
   p = prime(R)
   if m == p
@@ -718,14 +754,14 @@ function (R::PadicField)(n::QQFieldElem)
   else
     N = -remove(m, p)[1]
   end
-  z = PadicFieldElem(N + R.prec_max)
+  z = PadicFieldElem(N + precision)
   ccall((:padic_set_fmpq, libflint), Nothing,
         (Ref{PadicFieldElem}, Ref{QQFieldElem}, Ref{PadicField}), z, n, R)
   z.parent = R
   return z
 end
 
-(R::PadicField)(n::Integer) = R(ZZRingElem(n))
+(R::PadicField)(n::Integer; precision::Int=precision(R)) = R(ZZRingElem(n); precision)
 
 function (R::PadicField)(n::PadicFieldElem)
   parent(n) != R && error("Unable to coerce into p-adic field")
@@ -738,14 +774,81 @@ end
 #
 ###############################################################################
 
-# inner constructor is also used directly
-
-@doc raw"""
-    PadicField(p::Integer, prec::Int; kw...)
-
-Returns the parent object for the $p$-adic field for given prime $p$, where
-the default absolute precision of elements of the field is given by `prec`.
-"""
-function PadicField(p::Integer, prec::Int; kw...)
+# Kept for backwards compatibility; the user facing constructor is `padic_field`
+function PadicField(p::Integer, prec::Int = 64; kw...)
   return PadicField(ZZRingElem(p), prec; kw...)
 end
+
+@doc raw"""
+    padic_field(p::Integer; precision::Int=64, cached::Bool=true, check::Bool=true)
+    padic_field(p::ZZRingElem; precision::Int=64, cached::Bool=true, check::Bool=true)
+
+Return the $p$-adic field for the given prime $p$.
+The default absolute precision of elements of the field may be set with `precision`.
+"""
+padic_field
+
+function padic_field(p::Integer; precision::Int=64, cached::Bool=true, check::Bool=true)
+  return padic_field(ZZRingElem(p), precision=precision, cached=cached, check=check)
+end
+
+function padic_field(p::ZZRingElem; precision::Int=64, cached::Bool=true, check::Bool=true)
+  return PadicField(p, precision, cached=cached, check=check)
+end
+
+###############################################################################
+#
+#   Precision handling
+#
+###############################################################################
+
+Base.precision(Q::PadicField) = Q.prec_max
+
+function Base.setprecision(q::PadicFieldElem, N::Int)
+  r = parent(q)()
+  r.N = N
+  ccall((:padic_set, libflint), Nothing, (Ref{PadicFieldElem}, Ref{PadicFieldElem}, Ref{PadicField}), r, q, parent(q))
+  return r
+end
+
+function setprecision!(a::PadicFieldElem, n::Int)
+  a.N = n
+  ccall((:padic_reduce, libflint), Nothing, (Ref{PadicFieldElem}, Ref{PadicField}), a, parent(a))
+  return a
+end
+
+function setprecision!(Q::PadicField, n::Int)
+  Q.prec_max = n
+  return Q
+end
+
+function Base.setprecision(f::Generic.Poly{PadicFieldElem}, N::Int)
+  g = parent(f)()
+  fit!(g, length(f))
+  for i = 1:length(f)
+    g.coeffs[i] = setprecision(f.coeffs[i], N)
+  end
+  set_length!(g, normalise(g, length(f)))
+  return g
+end
+
+function setprecision!(f::Generic.Poly{PadicFieldElem}, N::Int)
+  for i = 1:length(f)
+    f.coeffs[i] = setprecision!(f.coeffs[i], N)
+  end
+  return f
+end
+
+function with_precision(f, K::PadicField, n::Int)
+  @assert n >= 0
+  old = precision(K)
+  setprecision!(K, n)
+  v = try
+    f()
+  finally
+    setprecision!(K, old)
+  end
+  return v
+end
+
+Base.setprecision(f::Function, K::PadicField, n::Int) = with_precision(f, K, n)

@@ -11,7 +11,7 @@ Q-adic fields, that is, unramified extensions of p-adic fields, are provided in
 Nemo by Flint. This allows construction of $q$-adic fields for any prime power
 $q$.
 
-Q-adic fields are constructed using the `QadicField` function.
+Q-adic fields are constructed using the `qadic_field` function.
 
 The types of $q$-adic fields in Nemo are given in the following table, along
 with the libraries that provide them and the associated types of the parent
@@ -41,19 +41,9 @@ the $q$-adic field itself. This is accomplished with one of the following
 constructors.
 
 ```@docs
-QadicField(::Integer, ::Int, ::Int)
+qadic_field
+unramified_extension
 ```
-
-It is also possible to call the inner constructor directly. It has the following
-form.
-
-```
-QadicField(p::ZZRingElem, d::Int, prec::Int)
-```
-
-Returns the parent object for the $q$-adic field for given prime $p$ and degree
-$d$, where the default absolute precision of elements of the field is given by
-`prec`. It also return the uniformizer `p` with the default precision.
 
 Here are some examples of creating $q$-adic fields and making use of the
 resulting parent objects to coerce various elements into those fields.
@@ -61,9 +51,9 @@ resulting parent objects to coerce various elements into those fields.
 **Examples**
 
 ```jldoctest
-julia> R, p = QadicField(7, 1, 30);
+julia> R, p = qadic_field(7, 1, precision = 30);
 
-julia> S, _ = QadicField(ZZ(65537), 1, 30);
+julia> S, _ = qadic_field(ZZ(65537), 1, precision = 30);
 
 julia> a = R()
 0
@@ -96,9 +86,9 @@ $p^n$ as in the examples.
 **Examples**
 
 ```jldoctest
-julia> R, _ = QadicField(7, 1, 30);
+julia> R, _ = qadic_field(7, 1, precision = 30);
 
-julia> S, _ = QadicField(ZZ(65537), 1, 30);
+julia> S, _ = qadic_field(ZZ(65537), 1, precision = 30);
 
 julia> c = 1 + 2*7 + 4*7^2 + O(R, 7^3)
 7^0 + 2*7^1 + 4*7^2 + O(7^3)
@@ -137,7 +127,7 @@ lift(::ZZPolyRing, ::QadicFieldElem)
 **Examples**
 
 ```julia
-R, _ = QadicField(7, 1, 30);
+R, _ = qadic_field(7, 1, precision = 30);
 
 a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
 b = 7^2 + 3*7^3 + O(R, 7^5)
@@ -161,7 +151,7 @@ Base.sqrt(::QadicFieldElem)
 **Examples**
 
 ```jldoctest
-julia> R, _ = QadicField(7, 1, 30);
+julia> R, _ = qadic_field(7, 1, precision = 30);
 
 julia> a = 1 + 7 + 2*7^2 + O(R, 7^3)
 7^0 + 7^1 + 2*7^2 + O(7^3)
@@ -206,7 +196,7 @@ frobenius(::QadicFieldElem, ::Int)
 **Examples**
 
 ```jldoctest
-julia> R, _ = QadicField(7, 1, 30);
+julia> R, _ = qadic_field(7, 1, precision = 30);
 
 julia> a = 1 + 7 + 2*7^2 + O(R, 7^3)
 7^0 + 7^1 + 2*7^2 + O(7^3)
