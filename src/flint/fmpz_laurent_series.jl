@@ -1121,14 +1121,14 @@ function add!(c::ZZLaurentSeriesRingElem, a::ZZLaurentSeriesRingElem, b::ZZLaure
   elseif lenb == 1
     sb = sa
   end
-  sz = gcd(gcd(sa, sb), abs(vala - valb))
+  sc = gcd(gcd(sa, sb), abs(vala - valb))
   mina = min(vala + lena*sa, prec)
   minb = min(valb + lenb*sb, prec)
   lenr = max(mina, minb) - valr
   R = base_ring(c)
   c = set_precision!(c, prec)
   c = set_valuation!(c, valr)
-  c = set_scale!(c, sz)
+  c = set_scale!(c, sc)
   pa = vala
   pb = valb
   j = 0
@@ -1136,7 +1136,7 @@ function add!(c::ZZLaurentSeriesRingElem, a::ZZLaurentSeriesRingElem, b::ZZLaure
   t = base_ring(a)()
   zc = base_ring(a)()
   for i = 0: lenr - 1
-    pi = valr + sc*i  # FIXME: there is no sc, perhaps sz is meant? Or zc? Or what?
+    pi = valr + sc*i
     if pi == pa && pi < mina
       if pi == pb && pi < minb
         add!(t, polcoeff(a, j), polcoeff(b, k))
