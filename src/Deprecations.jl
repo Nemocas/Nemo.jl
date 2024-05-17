@@ -64,10 +64,10 @@ end
 
 # Deprecated in 0.45.*
 @deprecate defining_polynomial(Q::fqPolyRepField, P::Ring) defining_polynomial(P, Q)
-@deprecate lift(a::PadicFieldElem) lift(ZZ, a)
-@deprecate prime_field(k::PadicField) base_field(k)
+lift(a::PadicFieldElem) = lift(ZZ, a)
+prime_field(k::PadicField) = base_field(k)
 
 function (R::QadicField)(n::ZZPolyRingElem, pr::Int)
-  Base.depwarn("`(::QadicField)(::ZZPolyRingElem, ::Int)` is deprecated, use `(::QadicField)(::ZZPolyRingElem; precision::Int)` instead.", :QadicField)
+  #Base.depwarn("`(::QadicField)(::ZZPolyRingElem, ::Int)` is deprecated, use `(::QadicField)(::ZZPolyRingElem; precision::Int)` instead.", :QadicField)
   return (R::QadicField)(n::ZZPolyRingElem; precision=pr)
 end
