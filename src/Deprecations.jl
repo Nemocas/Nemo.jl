@@ -83,3 +83,6 @@ export QQBar
 @doc qqbar_field_doc
 const CalciumQQBar = QQBarField()
 export CalciumQQBar
+
+@deprecate coefficient_ring(k::PadicField) base_field(k)
+@deprecate coefficient_ring(k::QadicField) base_field(k)
