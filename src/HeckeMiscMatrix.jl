@@ -377,41 +377,6 @@ function snf_with_transform(A::ZZMatrix, l::Bool=true, r::Bool=true)
   end
 end
 
-################################################################################
-#
-#  IsUpper\Lower triangular
-#
-################################################################################
-
-function is_upper_triangular(M::ZZMatrix)
-  GC.@preserve M begin
-    for i = 2:nrows(M)
-      for j = 1:min(i - 1, ncols(M))
-        t = ccall((:fmpz_mat_entry, libflint), Ptr{ZZRingElem}, (Ref{ZZMatrix}, Int, Int), M, i - 1, j - 1)
-        fl = ccall((:fmpz_is_zero, libflint), Bool, (Ref{ZZRingElem},), t)
-        if !fl
-          return false
-        end
-      end
-    end
-  end
-  return true
-end
-
-function is_lower_triangular(M::ZZMatrix)
-  GC.@preserve M begin
-    for i = 1:nrows(M)
-      for j = i+1:ncols(M)
-        t = ccall((:fmpz_mat_entry, libflint), Ptr{ZZRingElem}, (Ref{ZZMatrix}, Int, Int), M, i - 1, j - 1)
-        fl = ccall((:fmpz_is_zero, libflint), Bool, (Ref{ZZRingElem},), t)
-        if !fl
-          return false
-        end
-      end
-    end
-  end
-  return true
-end
 
 #Returns a positive integer if A[i, j] > b, negative if A[i, j] < b, 0 otherwise
 function compare_index(A::ZZMatrix, i::Int, j::Int, b::ZZRingElem)
@@ -442,43 +407,6 @@ function shift!(g::ZZMatrix, l::Int)
     end
   end
   return g
-end
-
-################################################################################
-#
-#  Is diagonal
-#
-################################################################################
-
-@doc raw"""
-is_diagonal(A::Mat)
-
-Tests if $A$ is diagonal.
-"""
-function is_diagonal(A::MatElem)
-  for i = 1:ncols(A)
-    for j = 1:nrows(A)
-      if i != j && !iszero(A[j, i])
-        return false
-      end
-    end
-  end
-  return true
-end
-
-function is_diagonal(A::ZZMatrix)
-  for i = 1:ncols(A)
-    for j = 1:nrows(A)
-      if i != j
-        t = ccall((:fmpz_mat_entry, libflint), Ptr{ZZRingElem}, (Ref{ZZMatrix}, Int, Int), A, j - 1, i - 1)
-        fl = ccall((:fmpz_is_zero, libflint), Bool, (Ref{ZZRingElem},), t)
-        if !fl
-          return false
-        end
-      end
-    end
-  end
-  return true
 end
 
 ################################################################################
