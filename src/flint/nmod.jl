@@ -160,11 +160,16 @@ function -(x::zzModRingElem, y::zzModRingElem)
   end
 end
 
+# ni needs to be an 'inverse' of n computing using :n_preinvert_limb in flint
+function mulmod(a::UInt, b::UInt, n::UInt, ni::UInt)
+  return ccall((:n_mulmod2_preinv, libflint), UInt,
+               (UInt, UInt, UInt, UInt), a, b, n, ni)
+end
+
 function *(x::zzModRingElem, y::zzModRingElem)
   check_parent(x, y)
   R = parent(x)
-  d = ccall((:n_mulmod2_preinv, libflint), UInt, (UInt, UInt, UInt, UInt),
-            x.data, y.data, R.n, R.ninv)
+  d = mulmod(x.data, y.data, R.n, R.ninv)
   return zzModRingElem(d, R)
 end
 
@@ -184,12 +189,10 @@ end
 function *(x::Int, y::zzModRingElem)
   R = parent(y)
   if x < 0
-    d = ccall((:n_mulmod2_preinv, libflint), UInt, (UInt, UInt, UInt, UInt),
-              UInt(-x), y.data, R.n, R.ninv)
+    d = mulmod(UInt(-x), y.data, R.n, R.ninv)
     return -zzModRingElem(d, R)
   else
-    d = ccall((:n_mulmod2_preinv, libflint), UInt, (UInt, UInt, UInt, UInt),
-              UInt(x), y.data, R.n, R.ninv)
+    d = mulmod(UInt(x), y.data, R.n, R.inv)
     return zzModRingElem(d, R)
   end
 end
@@ -198,8 +201,7 @@ end
 
 function *(x::UInt, y::zzModRingElem)
   R = parent(y)
-  d = ccall((:n_mulmod2_preinv, libflint), UInt, (UInt, UInt, UInt, UInt),
-            UInt(x), y.data, R.n, R.ninv)
+  d = mulmod(x, y.data, R.n, R.ninv)
   return zzModRingElem(d, R)
 end
 

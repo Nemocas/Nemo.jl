@@ -152,8 +152,7 @@ end
 function *(x::fpFieldElem, y::fpFieldElem)
   check_parent(x, y)
   R = parent(x)
-  d = ccall((:n_mulmod2_preinv, libflint), UInt, (UInt, UInt, UInt, UInt),
-            x.data, y.data, R.n, R.ninv)
+  d = mulmod(x.data, y.data, R.n, R.ninv)
   return fpFieldElem(d, R)
 end
 
@@ -173,12 +172,10 @@ end
 function *(x::Int, y::fpFieldElem)
   R = parent(y)
   if x < 0
-    d = ccall((:n_mulmod2_preinv, libflint), UInt, (UInt, UInt, UInt, UInt),
-              UInt(-x), y.data, R.n, R.ninv)
+    d = mulmod(UInt(-x), y.data, R.n, R.ninv)
     return -fpFieldElem(d, R)
   else
-    d = ccall((:n_mulmod2_preinv, libflint), UInt, (UInt, UInt, UInt, UInt),
-              UInt(x), y.data, R.n, R.ninv)
+    d = mulmod(UInt(x), y.data, R.n, R.ninv)
     return fpFieldElem(d, R)
   end
 end
@@ -187,8 +184,7 @@ end
 
 function *(x::UInt, y::fpFieldElem)
   R = parent(y)
-  d = ccall((:n_mulmod2_preinv, libflint), UInt, (UInt, UInt, UInt, UInt),
-            UInt(x), y.data, R.n, R.ninv)
+  d = mulmod(x, y.data, R.n, R.ninv)
   return fpFieldElem(d, R)
 end
 
@@ -282,8 +278,7 @@ function divexact(x::fpFieldElem, y::fpFieldElem; check::Bool=true)
   R = parent(x)
   yinv = ccall((:n_invmod, libflint), UInt, (UInt, UInt),
                y.data, R.n)
-  d = ccall((:n_mulmod2_preinv, libflint), UInt, (UInt, UInt, UInt, UInt),
-            x.data, yinv, R.n, R.ninv)
+  d = mulmod(x.data, yinv, R.n, R.ninv)
   return fpFieldElem(d, R)
 end
 

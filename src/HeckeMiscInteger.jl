@@ -4,10 +4,6 @@
 #
 ################################################################################
 
-function mulmod(a::UInt, b::UInt, n::UInt, ni::UInt)
-  ccall((:n_mulmod2_preinv, libflint), UInt, (UInt, UInt, UInt, UInt), a, b, n, ni)
-end
-
 @inline __get_rounding_mode() = Base.MPFR.rounding_raw(BigFloat)
 
 function BigFloat(a::QQFieldElem)

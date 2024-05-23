@@ -1044,8 +1044,7 @@ end
 function mul!(z::fpFieldElem, x::fpFieldElem, y::ZZRingElem)
   R = parent(x)
   d = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), y, R.n)
-  r = ccall((:n_mulmod2_preinv, libflint), UInt, (UInt, UInt, UInt, UInt),
-            x.data, d, R.n, R.ninv)
+  r = mulmod(x.data, d, R.n, R.ninv)
   z.data = r
   return z
 end
