@@ -115,6 +115,8 @@ end
 
   @test ZZ(QQFieldElem(3)) isa ZZRingElem
   @test_throws Exception ZZ(QQFieldElem(3, 2))
+
+  @test BigFloat(QQFieldElem(3, 7)) == BigFloat(0.75)
 end
 
 @testset "QQFieldElem.vector_arithmetics" begin

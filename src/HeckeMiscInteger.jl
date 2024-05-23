@@ -4,14 +4,6 @@
 #
 ################################################################################
 
-@inline __get_rounding_mode() = Base.MPFR.rounding_raw(BigFloat)
-
-function BigFloat(a::QQFieldElem)
-  r = BigFloat(0)
-  ccall((:fmpq_get_mpfr, libflint), Nothing, (Ref{BigFloat}, Ref{QQFieldElem}, Int32), r, a, __get_rounding_mode())
-  return r
-end
-
 function isless(a::Float64, b::QQFieldElem)
   return a < BigFloat(b)
 end

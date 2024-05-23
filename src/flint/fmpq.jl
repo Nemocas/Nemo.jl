@@ -1224,6 +1224,13 @@ end
 
 Rational(z::ZZRingElem) = Rational{BigInt}(z)
 
+@inline __get_rounding_mode() = Base.MPFR.rounding_raw(BigFloat)
+
+function BigFloat(a::QQFieldElem)
+  r = BigFloat(0)
+  ccall((:fmpq_get_mpfr, libflint), Cint, (Ref{BigFloat}, Ref{QQFieldElem}, Int32), r, a, __get_rounding_mode())
+  return r
+end
 
 ###############################################################################
 #
