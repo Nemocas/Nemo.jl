@@ -4,15 +4,6 @@
 #
 ################################################################################
 
-function isless(a::BigFloat, b::ZZRingElem)
-  if _fmpz_is_small(b)
-    c = ccall((:mpfr_cmp_si, :libmpfr), Int32, (Ref{BigFloat}, Int), a, b.d)
-  else
-    c = ccall((:mpfr_cmp_z, :libmpfr), Int32, (Ref{BigFloat}, UInt), a, unsigned(b.d) << 2)
-  end
-  return c < 0
-end
-
 function mulmod(a::UInt, b::UInt, n::UInt, ni::UInt)
   ccall((:n_mulmod2_preinv, libflint), UInt, (UInt, UInt, UInt, UInt), a, b, n, ni)
 end

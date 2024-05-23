@@ -814,6 +814,21 @@ end
 
 <(x::Rational, y::ZZRingElem) = numerator(x) < y*denominator(x)
 
+function cmp(a::BigFloat, b::ZZRingElem)
+  if _fmpz_is_small(b)
+    return Int(ccall((:mpfr_cmp_si, :libmpfr), Cint, (Ref{BigFloat}, Int), a, b.d))
+  end
+  return Int(ccall((:mpfr_cmp_z, :libmpfr), Cint, (Ref{BigFloat}, UInt), a, unsigned(b.d) << 2))
+end
+
+==(x::ZZRingElem, y::BigFloat) = cmp(y, x) == 0
+
+isless(x::ZZRingElem, y::BigFloat) = cmp(y, x) > 0
+
+==(x::BigFloat, y::ZZRingElem) = cmp(x, y) == 0
+
+isless(x::BigFloat, y::ZZRingElem) = cmp(x, y) < 0
+
 ###############################################################################
 #
 #   Shifting

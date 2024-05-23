@@ -544,13 +544,13 @@ end
   a = ZZRingElem(12)
 
   # values less than a
-  lt = [-40, UInt(3), 3, 3//1, big(5)//big(3)]
+  lt = [-40, UInt(3), 3, 3//1, big(5)//big(3), BigFloat(-40)]
 
   # values equal to a
-  eq = [12, UInt(12), 12//1, big(12), big(12)//1]
+  eq = [12, UInt(12), 12//1, big(12), big(12)//1, BigFloat(12)]
 
   # values greater than a
-  gt = [40, UInt(40), 40//1, big(40)//big(3)]
+  gt = [40, UInt(40), 40//1, big(40)//big(3), BigFloat(40)]
 
   @testset "lt $b" for b in lt
     @test b < a
@@ -602,6 +602,23 @@ end
     @test a != b
     @test b != a
   end
+
+  # Additional test for non-small a
+  a = ZZ(2)^200
+  b = BigFloat(2)
+  @test b < a
+  @test !(b > a)
+  @test b != a
+
+  b = BigFloat(2)^200
+  @test !(b < a)
+  @test !(b > a)
+  @test b == a
+
+  b = BigFloat(2)^201
+  @test b > a
+  @test !(b < a)
+  @test b != a
 end
 
 @testset "ZZRingElem.unary_ops" begin
