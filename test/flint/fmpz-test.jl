@@ -1455,6 +1455,27 @@ end
 end
 
 @testset "ZZRingElem.range" begin
+  # UnitRange
+  r = ZZ(-2):ZZ(10)
+  @test r isa ZZRingElemUnitRange
+  @test r[1] == ZZ(-2)
+  @test r[ZZ(3)] == ZZ(0)
+  @test_throws BoundsError r[ZZ(100)]
+  @test 1 in r
+  @test !(-3 in r)
+  @test ZZ(1) in r
+  @test !(ZZ(-3) in r)
+  @test length(r) == 13
+
+  @test mod(ZZ(6), ZZ(1):ZZ(3)) == ZZ(3)
+  @test mod(6, ZZ(1):ZZ(3)) == ZZ(3)
+
+  @test 2:ZZ(3) isa ZZRingElemUnitRange
+  @test BigInt(2):ZZ(3) isa ZZRingElemUnitRange
+  @test ZZ(2):3 isa ZZRingElemUnitRange
+  @test ZZ(2):BigInt(3) isa ZZRingElemUnitRange
+
+  # StepRange
   r = ZZ(-2):ZZ(2):ZZ(10)
   @test length(r) == 7
   @test length(r) isa BigInt
@@ -1471,4 +1492,7 @@ end
   @test !(1 in r)
   @test !(ZZ(1) in r)
   @test_throws BoundsError r[ZZ(2)]
+
+  @test ZZ(-2):2:2 isa StepRange{ZZRingElem}
+  @test BigInt(-2):2:ZZ(2) isa StepRange{ZZRingElem}
 end

@@ -213,45 +213,6 @@ function mod_sym(a::ZZRingElem, b::ZZRingElem)
   end
 end
 
-##
-## Ranges
-##
-# Note, we cannot get a UnitRange as this is only legal for subtypes of Real.
-# So, we use an AbstractUnitRange here mostly copied from `base/range.jl`.
-# `StepRange`s on the other hand work out of the box thanks to duck typing.
-
-struct ZZRingElemUnitRange <: AbstractUnitRange{ZZRingElem}
-  start::ZZRingElem
-  stop::ZZRingElem
-  ZZRingElemUnitRange(start, stop) = new(start, fmpz_unitrange_last(start, stop))
-end
-fmpz_unitrange_last(start::ZZRingElem, stop::ZZRingElem) =
-ifelse(stop >= start, stop, start - one(ZZRingElem))
-
-Base.:(:)(a::ZZRingElem, b::ZZRingElem) = ZZRingElemUnitRange(a, b)
-
-@inline function getindex(r::ZZRingElemUnitRange, i::ZZRingElem)
-  val = r.start + (i - 1)
-  @boundscheck _in_unit_range(r, val) || Base.throw_boundserror(r, i)
-  val
-end
-_in_unit_range(r::ZZRingElemUnitRange, val::ZZRingElem) = r.start <= val <= r.stop
-
-show(io::IO, r::ZZRingElemUnitRange) = print(io, repr(first(r)), ':', repr(last(r)))
-
-in(x::IntegerUnion, r::ZZRingElemUnitRange) = first(r) <= x <= last(r)
-
-mod(i::IntegerUnion, r::ZZRingElemUnitRange) = mod(i - first(r), length(r)) + first(r)
-
-Base.:(:)(a::ZZRingElem, b::Integer) = (:)(promote(a, b)...)
-Base.:(:)(a::Integer, b::ZZRingElem) = (:)(promote(a, b)...)
-
-Base.:(:)(x::Int, y::ZZRingElem) = ZZRingElem(x):y
-
-# Construct StepRange{ZZRingElem, T} where +(::ZZRingElem, zero(::T)) must be defined
-Base.:(:)(a::ZZRingElem, s, b::Integer) = ((a_, b_) = promote(a, b); a_:s:b_)
-Base.:(:)(a::Integer, s, b::ZZRingElem) = ((a_, b_) = promote(a, b); a_:s:b_)
-
 #TODO
 # need to be mapped onto proper Flint primitives
 # flints needs a proper interface to randomness - I think

@@ -66,6 +66,40 @@ is_domain_type(::Type{ZZRingElem}) = true
 Base.iterate(x::ZZRingElem) = (x, nothing)
 Base.iterate(x::ZZRingElem, i::Any) = nothing
 
+# Note that we cannot get a UnitRange as this is only legal for subtypes of Real.
+# So, we use an AbstractUnitRange here mostly copied from `base/range.jl`.
+# `StepRange`s on the other hand work out of the box thanks to duck typing.
+
+# See FlintTypes.jl for the struct ZZRingElemUnitRange
+
+fmpz_unitrange_last(start::ZZRingElem, stop::ZZRingElem) =
+ifelse(stop >= start, stop, start - one(ZZRingElem))
+
+Base.:(:)(a::ZZRingElem, b::ZZRingElem) = ZZRingElemUnitRange(a, b)
+
+@inline function getindex(r::ZZRingElemUnitRange, i::ZZRingElem)
+  val = r.start + (i - 1)
+  @boundscheck _in_unit_range(r, val) || Base.throw_boundserror(r, i)
+  val
+end
+_in_unit_range(r::ZZRingElemUnitRange, val::ZZRingElem) = r.start <= val <= r.stop
+
+show(io::IO, r::ZZRingElemUnitRange) = print(io, repr(first(r)), ':', repr(last(r)))
+
+in(x::IntegerUnion, r::ZZRingElemUnitRange) = first(r) <= x <= last(r)
+
+mod(i::IntegerUnion, r::ZZRingElemUnitRange) = mod(i - first(r), length(r)) + first(r)
+
+Base.:(:)(a::ZZRingElem, b::Integer) = (:)(promote(a, b)...)
+Base.:(:)(a::Integer, b::ZZRingElem) = (:)(promote(a, b)...)
+
+Base.:(:)(x::Int, y::ZZRingElem) = ZZRingElem(x):y
+Base.:(:)(x::ZZRingElem, y::Int) = x:ZZRingElem(y)
+
+# Construct StepRange{ZZRingElem, T} where +(::ZZRingElem, zero(::T)) must be defined
+Base.:(:)(a::ZZRingElem, s, b::Integer) = ((a_, b_) = promote(a, b); a_:s:b_)
+Base.:(:)(a::Integer, s, b::ZZRingElem) = ((a_, b_) = promote(a, b); a_:s:b_)
+
 # `length` should return an Integer, so BigInt seems appropriate as ZZRingElem is not <: Integer
 # this method is useful in particular to enable rand(ZZ(n):ZZ(m))
 function Base.length(r::StepRange{ZZRingElem})
@@ -80,7 +114,7 @@ function Base.in(x::IntegerUnion, r::AbstractRange{ZZRingElem})
   return mod(convert(ZZRingElem, x), step(r)) == mod(first(r), step(r))
 end
 
-function Base.getindex(a::StepRange{ZZRingElem, <: IntegerUnion}, i::ZZRingElem)
+function Base.getindex(a::StepRange{ZZRingElem}, i::ZZRingElem)
   res = first(a) + (i - 1) * Base.step(a)
   ok = false
   if step(a) > 0

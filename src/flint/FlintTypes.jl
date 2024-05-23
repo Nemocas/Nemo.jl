@@ -116,6 +116,12 @@ function _fmpz_factor_clear_fn(a::fmpz_factor)
         (Ref{fmpz_factor}, ), a)
 end
 
+struct ZZRingElemUnitRange <: AbstractUnitRange{ZZRingElem}
+  start::ZZRingElem
+  stop::ZZRingElem
+  ZZRingElemUnitRange(start, stop) = new(start, fmpz_unitrange_last(start, stop))
+end
+
 ###############################################################################
 #
 #   n_factor
