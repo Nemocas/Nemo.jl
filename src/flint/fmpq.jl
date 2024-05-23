@@ -373,6 +373,9 @@ end
 
 *(a::Rational{T}, b::QQFieldElem) where {T <: Integer} = b * a
 
+*(a::QQFieldElem, b::AbstractFloat) = Rational(a) * b
+*(a::AbstractFloat, b::QQFieldElem) = a * Rational(b)
+
 ###############################################################################
 #
 #   Comparison
