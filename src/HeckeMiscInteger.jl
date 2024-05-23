@@ -4,14 +4,6 @@
 #
 ################################################################################
 
-function *(a::ZZRingElem, b::AbstractFloat)
-  return BigInt(a) * b
-end
-
-function *(a::AbstractFloat, b::ZZRingElem)
-  return a * BigInt(b)
-end
-
 function *(a::QQFieldElem, b::AbstractFloat)
   return Rational(a) * b
 end
