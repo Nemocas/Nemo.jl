@@ -4,13 +4,6 @@
 #
 ################################################################################
 
-function isless(a::Float64, b::QQFieldElem)
-  return a < BigFloat(b)
-end
-function isless(a::QQFieldElem, b::Float64)
-  return BigFloat(a) < b
-end
-
 function isless(a::Float64, b::ZZRingElem)
   return a < BigFloat(b)
 end

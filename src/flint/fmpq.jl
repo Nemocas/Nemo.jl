@@ -440,6 +440,10 @@ isless(a::Rational{T}, b::QQFieldElem) where {T <: Integer} = isless(QQFieldElem
 
 isless(a::QQFieldElem, b::Rational{T}) where {T <: Integer} = isless(a, QQFieldElem(b))
 
+isless(a::Float64, b::QQFieldElem) = isless(a, BigFloat(b))
+
+isless(a::QQFieldElem, b::Float64) = isless(BigFloat(a), b)
+
 ###############################################################################
 #
 #   Powering

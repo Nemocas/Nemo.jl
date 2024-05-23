@@ -408,6 +408,11 @@ end
   @test QQFieldElem(1, 2) == BigInt(1)//BigInt(2)
 
   @test BigInt(1)//BigInt(2) == QQFieldElem(1, 2)
+
+  @test QQ(1) > 0.7
+  @test 0.7 < QQ(1)
+  @test QQ(3//4) < 1.0
+  @test 1.0 > QQ(3//4)
 end
 
 @testset "QQFieldElem.shifting" begin
