@@ -1,20 +1,5 @@
 ################################################################################
 #
-#  Integer functions
-#
-################################################################################
-
-Base.in(x::IntegerUnion, r::AbstractRange{ZZRingElem}) =
-!isempty(r) && first(r) <= x <= last(r) &&
-mod(convert(ZZRingElem, x), step(r)) == mod(first(r), step(r))
-
-function Base.getindex(a::StepRange{ZZRingElem,ZZRingElem}, i::ZZRingElem)
-  a.start + (i - 1) * Base.step(a)
-end
-
-
-################################################################################
-#
 #  power detection
 #
 ################################################################################

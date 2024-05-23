@@ -57,15 +57,39 @@ is_domain_type(::Type{ZZRingElem}) = true
 
 ###############################################################################
 #
-#   Misc.
+#   Ranges
 #
 ###############################################################################
+
+# ZZRingElem needs to be iterable for
+# Base.throw_boundserror(something, ::ZZRingElem) to print correctly
+Base.iterate(x::ZZRingElem) = (x, nothing)
+Base.iterate(x::ZZRingElem, i::Any) = nothing
 
 # `length` should return an Integer, so BigInt seems appropriate as ZZRingElem is not <: Integer
 # this method is useful in particular to enable rand(ZZ(n):ZZ(m))
 function Base.length(r::StepRange{ZZRingElem})
   n = div((last(r) - first(r)) + step(r), step(r))
   isempty(r) ? zero(BigInt) : BigInt(n)
+end
+
+function Base.in(x::IntegerUnion, r::AbstractRange{ZZRingElem})
+  if isempty(r) || first(r) > x || x > last(r)
+    return false
+  end
+  return mod(convert(ZZRingElem, x), step(r)) == mod(first(r), step(r))
+end
+
+function Base.getindex(a::StepRange{ZZRingElem, <: IntegerUnion}, i::ZZRingElem)
+  res = first(a) + (i - 1) * Base.step(a)
+  ok = false
+  if step(a) > 0
+    ok = res <= last(a) && res >= first(a)
+  else
+    ok = res >= last(a) && res <= first(a)
+  end
+  @boundscheck ((i > 0) && ok) || Base.throw_boundserror(a, i)
+  return res
 end
 
 ################################################################################

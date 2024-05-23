@@ -1453,3 +1453,22 @@ end
   print(PrettyPrinting.terse(io), PrettyPrinting.Lowercase(), ZZ)
   @test String(take!(io)) == "ZZ"
 end
+
+@testset "ZZRingElem.range" begin
+  r = ZZ(-2):ZZ(2):ZZ(10)
+  @test length(r) == 7
+  @test length(r) isa BigInt
+  @test 2 in r
+  @test !(3 in r)
+  @test ZZ(2) in r
+  @test !(ZZ(3) in r)
+  @test r[ZZ(2)] == ZZ(0)
+  @test_throws BoundsError r[ZZ(20)]
+
+  r = ZZ(-2):ZZ(-2):ZZ(10)
+  @test length(r) == 0
+  @test length(r) isa BigInt
+  @test !(1 in r)
+  @test !(ZZ(1) in r)
+  @test_throws BoundsError r[ZZ(2)]
+end
