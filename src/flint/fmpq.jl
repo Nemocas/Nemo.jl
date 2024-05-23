@@ -564,24 +564,24 @@ end
 ###############################################################################
 
 @doc raw"""
-    is_power(a::QQFieldElem) -> Int, QQFieldElem
-    is_power(a::Rational) -> Int, Rational
+    is_perfect_power_with_data(a::QQFieldElem) -> Int, QQFieldElem
+    is_perfect_power_with_data(a::Rational) -> Int, Rational
 
 Return $e$, $r$ such that $a = r^e$ with $e$ maximal. Note: $1 = 1^0$.
 """
-function is_power(a::QQFieldElem)
-  e, r = is_power(numerator(a))
+function is_perfect_power_with_data(a::QQFieldElem)
+  e, r = is_perfect_power_with_data(numerator(a))
   if e == 1
     return e, a
   end
-  f, s = is_power(denominator(a))
+  f, s = is_perfect_power_with_data(denominator(a))
   g = gcd(e, f)
   return g, r^Base.div(e, g) // s^Base.div(f, g)
 end
 
-function is_power(a::Rational)
+function is_perfect_power_with_data(a::Rational)
   T = typeof(denominator(a))
-  e, r = is_power(QQFieldElem(a))
+  e, r = is_perfect_power_with_data(QQFieldElem(a))
   return e, T(numerator(r)) // T(denominator(r))
 end
 

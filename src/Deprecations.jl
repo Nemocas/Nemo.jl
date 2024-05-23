@@ -71,3 +71,7 @@ function (R::QadicField)(n::ZZPolyRingElem, pr::Int)
   #Base.depwarn("`(::QadicField)(::ZZPolyRingElem, ::Int)` is deprecated, use `(::QadicField)(::ZZPolyRingElem; precision::Int)` instead.", :QadicField)
   return (R::QadicField)(n::ZZPolyRingElem; precision=pr)
 end
+
+is_power(x::IntegerUnion) = is_perfect_power_with_data(x)
+is_power(x::QQFieldElem) = is_perfect_power_with_data(x)
+is_power(x::Rational) = is_perfect_power_with_data(x)

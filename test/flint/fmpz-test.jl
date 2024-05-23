@@ -1246,13 +1246,13 @@ end
   end
   @test is_perfect_power(ZZRingElem(10940293781057873954324736))
 
-  # Perfect power / maximal integer root / is_power
+  # Perfect power with data
   for T in [Int, BigInt, ZZRingElem]
-    @test @inferred is_power(T(5)) == (1, 5)
-    @test @inferred is_power(T(-5)) == (1, -5)
-    @test @inferred is_power(T(64)) == (6, 2)
-    @test @inferred is_power(T(-64)) == (3, -4)
-    @test @inferred is_power(T(1)) == (0, 1)
+    @test @inferred is_perfect_power_with_data(T(5)) == (1, 5)
+    @test @inferred is_perfect_power_with_data(T(-5)) == (1, -5)
+    @test @inferred is_perfect_power_with_data(T(64)) == (6, 2)
+    @test @inferred is_perfect_power_with_data(T(-64)) == (3, -4)
+    @test @inferred is_perfect_power_with_data(T(1)) == (0, 1)
   end
 
   # is_power(::ZZRingElem, n::Int)

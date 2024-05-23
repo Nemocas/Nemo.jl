@@ -663,10 +663,10 @@ end
   @test String(take!(io)) == "QQ"
 end
 
-@testset "QQFieldElem.is_power" begin
+@testset "QQFieldElem.is_perfect_power_with_data" begin
   for T in [Rational{Int}, Rational{BigInt}, QQFieldElem]
-    @test @inferred is_power(T(5//9)) == (1, 5//9)
-    @test @inferred is_power(T(4//9)) == (2, 2//3)
+    @test @inferred is_perfect_power_with_data(T(5//9)) == (1, 5//9)
+    @test @inferred is_perfect_power_with_data(T(4//9)) == (2, 2//3)
   end
 
   @test is_power(QQ(2), 2)[1] == false

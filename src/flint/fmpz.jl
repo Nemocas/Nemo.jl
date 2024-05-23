@@ -3039,12 +3039,12 @@ is_perfect_power(a::Integer) = is_perfect_power(ZZRingElem(a))
 #far superior over gmp/ fmpz_is_perfect_power
 
 @doc raw"""
-    is_power(a::ZZRingElem) -> Int, ZZRingElem
-    is_power(a::Integer) -> Int, Integer
+    is_perfect_power_with_data(a::ZZRingElem) -> Int, ZZRingElem
+    is_perfect_power_with_data(a::Integer) -> Int, Integer
 
 Return $e$, $r$ such that $a = r^e$ with $e$ maximal. Note: $1 = 1^0$.
 """
-function is_power(a::ZZRingElem)
+function is_perfect_power_with_data(a::ZZRingElem)
   if iszero(a)
     error("must not be zero")
   end
@@ -3052,7 +3052,7 @@ function is_power(a::ZZRingElem)
     return 0, a
   end
   if a < 0
-    e, r = is_power(-a)
+    e, r = is_perfect_power_with_data(-a)
     if isone(e)
       return 1, a
     end
@@ -3071,8 +3071,8 @@ function is_power(a::ZZRingElem)
   end
 end
 
-function is_power(a::Integer)
-  e, r = is_power(ZZRingElem(a))
+function is_perfect_power_with_data(a::Integer)
+  e, r = is_perfect_power_with_data(ZZRingElem(a))
   return e, typeof(a)(r)
 end
 
@@ -3091,12 +3091,6 @@ function is_power(a::ZZRingElem, n::Int)
   return b^n == a, b
 end
 
-# TODO: kept here for 'historical' reasons. Nemo and Hecke implemented the same
-# function under different names.
-# One should probably rename `is_power(::ZZRingElem)` to
-# `is_perfect_power_with_data` and remove `_maximal_integer_root`.
-_maximal_integer_root(a::ZZRingElem) = is_power(a)
-
 @doc raw"""
     is_prime_power(q::IntegerUnion) -> Bool
 
@@ -3106,7 +3100,7 @@ is_prime_power(::IntegerUnion)
 
 function is_prime_power(q::ZZRingElem)
   iszero(q) && return false
-  e, a = _maximal_integer_root(q)
+  e, a = is_perfect_power_with_data(q)
   return is_prime(a)
 end
 
@@ -3122,12 +3116,12 @@ is_prime_power_with_data(::IntegerUnion)
 
 function is_prime_power_with_data(q::ZZRingElem)
   iszero(q) && return false, 1, q
-  e, a = _maximal_integer_root(q)
+  e, a = is_perfect_power_with_data(q)
   return is_prime(a), e, a
 end
 
 function is_prime_power_with_data(q::Integer)
-  e, a = _maximal_integer_root(ZZRingElem(q))
+  e, a = is_perfect_power_with_data(ZZRingElem(q))
   return is_prime(a), e, typeof(q)(a)
 end
 

@@ -361,6 +361,7 @@ export is_nonpositive
 export is_nonzero
 export is_number
 export is_perfect_power
+export is_perfect_power_with_data
 export is_positive
 export is_positive_entry
 export is_prime
