@@ -559,6 +559,40 @@ end
 
 ###############################################################################
 #
+#   Rounding
+#
+###############################################################################
+
+for sym in (:trunc, :round, :ceil, :floor)
+  @eval begin
+    # support `trunc(ZZRingElem, 1.23)` etc. for arbitrary reals
+    Base.$sym(::Type{ZZRingElem}, a::Real) = ZZRingElem(Base.$sym(BigInt, a))
+    Base.$sym(::Type{ZZRingElem}, a::Rational) = ZZRingElem(Base.$sym(BigInt, a))
+    Base.$sym(::Type{ZZRingElem}, a::Rational{T}) where T = ZZRingElem(Base.$sym(BigInt, a))
+    Base.$sym(::Type{ZZRingElem}, a::Rational{Bool}) = ZZRingElem(Base.$sym(BigInt, a))
+
+    # for integers we don't need to round in between
+    Base.$sym(::Type{ZZRingElem}, a::Integer) = ZZRingElem(a)
+
+    # support `trunc(ZZRingElem, m)` etc. where m is a matrix of reals
+    function Base.$sym(::Type{ZZMatrix}, a::Matrix{<:Real})
+      s = Base.size(a)
+      m = zero_matrix(ZZ, s[1], s[2])
+      for i = 1:s[1], j = 1:s[2]
+        m[i, j] = Base.$sym(ZZRingElem, a[i, j])
+      end
+      return m
+    end
+
+    # rounding QQFieldElem to integer via ZZRingElem
+    function Base.$sym(::Type{T}, a::QQFieldElem) where T <: Integer
+      return T(Base.$sym(ZZRingElem, a))
+    end
+  end
+end
+
+###############################################################################
+#
 #   Ad hoc exact division
 #
 ###############################################################################

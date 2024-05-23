@@ -209,7 +209,7 @@ end
   @test characteristic(ZZ) == 0
 end
 
-@testset "QQFieldElem.rounding" begin
+@testset "ZZRingElem.rounding" begin
   @test floor(ZZRingElem(12)) == ZZRingElem(12)
   @test ceil(ZZRingElem(12)) == ZZRingElem(12)
   @test trunc(ZZRingElem(12)) == ZZRingElem(12)
@@ -217,7 +217,6 @@ end
   @test floor(ZZRingElem, ZZRingElem(12)) == ZZRingElem(12)
   @test ceil(ZZRingElem, ZZRingElem(12)) == ZZRingElem(12)
   @test trunc(ZZRingElem, ZZRingElem(12)) == ZZRingElem(12)
-
 
   @testset "$func" for func in (trunc, round, ceil, floor)
     for val in -5:5
@@ -227,8 +226,22 @@ end
       @test func(ZZRingElem, valZ) isa ZZRingElem
       @test func(ZZRingElem, valZ) == func(ZZRingElem, val)
     end
+
+    for val in [3.4, 2//3, big(2)//3, 2, big(3), false//true]
+      @test func(ZZRingElem, val) isa ZZRingElem
+      @test func(ZZRingElem, val) == func(Int, val)
+    end
+
+    for T in [Int, BigInt]
+      @test @inferred func(T, QQ(2//3)) == func(T, 2//3)
+    end
   end
 
+  a = [1.2 3.4; -1.2 -3.4]
+  @test trunc(ZZMatrix, a) == ZZ[1 3; -1 -3]
+  @test round(ZZMatrix, a) == ZZ[1 3; -1 -3]
+  @test ceil(ZZMatrix, a) == ZZ[2 4; -1 -3]
+  @test floor(ZZMatrix, a) == ZZ[1 3; -2 -4]
 end
 
 @testset "ZZRingElem.binary_ops" begin
