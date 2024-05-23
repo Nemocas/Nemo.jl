@@ -432,6 +432,11 @@ end
   @test isapprox(a * big"1.5", big"1.5")
   @test big"1.5" * a isa BigFloat
   @test isapprox(big"1.5" * a, big"1.5") 
+
+  @test 1.5/a isa BigFloat
+  @test isapprox(1.5/a, 1.5)
+  @test big"1.5"/a isa BigFloat
+  @test isapprox(big"1.5"/a, 1.5)
 end
 
 @testset "ZZRingElem.adhoc_division" begin

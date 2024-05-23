@@ -555,6 +555,8 @@ end
 *(a::ZZRingElem, b::AbstractFloat) = BigInt(a) * b
 *(a::AbstractFloat, b::ZZRingElem) = a * BigInt(b)
 
+/(a::AbstractFloat, b::ZZRingElem) = a / BigInt(b)
+
 ###############################################################################
 #
 #   Ad hoc exact division
