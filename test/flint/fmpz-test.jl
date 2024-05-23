@@ -803,6 +803,8 @@ end
   @test base(a, 13) == "c"
 
   @test nbits(a) == 4
+  @test nbits(12) == 4
+  @test nbits(BigInt(12)) == 4
 
   @test ndigits(a, 3) == 3
 

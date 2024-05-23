@@ -1,12 +1,3 @@
-@doc raw"""
-    nbits(a::Integer) -> Int
-
-Returns the number of bits necessary to represent $a$.
-"""
-function nbits(a::Integer)
-  return ndigits(a, base=2)
-end
-
 function (::ZZRing)(x::Rational{Int})
   @assert denominator(x) == 1
   return ZZRingElem(numerator(x))

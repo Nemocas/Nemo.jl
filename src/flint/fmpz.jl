@@ -2381,6 +2381,15 @@ julia> nbits(ZZ(12))
 nbits(x::ZZRingElem) = iszero(x) ? 0 : Int(ccall((:fmpz_bits, libflint), Clong,
                                                  (Ref{ZZRingElem},), x))  
 
+@doc raw"""
+    nbits(a::Integer) -> Int
+
+Return the number of bits necessary to represent $a$.
+"""
+function nbits(a::Integer)
+  return ndigits(a, base=2)
+end
+
 ###############################################################################
 #
 #   Bit fiddling
