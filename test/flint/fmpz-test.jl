@@ -401,6 +401,9 @@ end
   @test clog(b, 12) == 2
 
   @test_throws DomainError clog(b, -12)
+
+  @test log(ZZ(2), ZZ(4)) == 2.0
+  @test_throws DomainError log(ZZ(-2))
 end
 
 @testset "ZZRingElem.adhoc_binary" begin

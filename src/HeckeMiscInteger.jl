@@ -4,12 +4,7 @@
 #
 ################################################################################
 
-log(a::ZZRingElem) = log(BigInt(a))
 log(a::QQFieldElem) = log(numerator(a)) - log(denominator(a))
-
-function log(a::ZZRingElem, b::ZZRingElem)
-  log(b) / log(a)
-end
 
 Base.in(x::IntegerUnion, r::AbstractRange{ZZRingElem}) =
 !isempty(r) && first(r) <= x <= last(r) &&
