@@ -26,28 +26,6 @@ function isless(a::ZZRingElem, b::Float64)
   return BigFloat(a) < b
 end
 
-#function ^(a::ZZRingElem, k::ZZRingElem)
-#  if a == 0
-#    if k == 0
-#      return ZZRingElem(1)
-#    end
-#    return ZZRingElem(0)
-#  end
-#
-#  if a == 1
-#    return ZZRingElem(1)
-#  end
-#  if a == -1
-#    if isodd(k)
-#      return ZZRingElem(-1)
-#    else
-#      return ZZRingElem(1)
-#    end
-#  end
-#  return a^Int(k)
-#end
-
-
 function *(a::ZZRingElem, b::AbstractFloat)
   return BigInt(a) * b
 end
