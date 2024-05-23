@@ -119,6 +119,12 @@ end
   @test ZZ(QQFieldElem(3)) isa ZZRingElem
   @test_throws Exception ZZ(QQFieldElem(3, 2))
 
+  @test ZZ(3//1) isa ZZRingElem
+  @test_throws Exception ZZ(3//2)
+
+  @test ZZ(big(3)//1) isa ZZRingElem
+  @test_throws Exception ZZ(big(3)//2)
+
   @test BigFloat(QQFieldElem(3, 7)) == BigFloat(0.75)
 end
 

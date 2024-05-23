@@ -1201,6 +1201,10 @@ function (a::ZZRing)(b::QQFieldElem)
   return z
 end
 
+function (::ZZRing)(x::Rational{<:IntegerUnion})
+  @assert denominator(x) == 1
+  return ZZRingElem(numerator(x))
+end
 
 ###############################################################################
 #

@@ -1,8 +1,3 @@
-function (::ZZRing)(x::Rational{Int})
-  @assert denominator(x) == 1
-  return ZZRingElem(numerator(x))
-end
-
 /(a::BigFloat, b::ZZRingElem) = a / BigInt(b)
 
 
