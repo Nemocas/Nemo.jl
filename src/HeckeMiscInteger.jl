@@ -1,28 +1,5 @@
 ################################################################################
 #
-#  is_squarefree
-#
-################################################################################
-
-#TODO (Hard): Implement this properly.
-@doc raw"""
-    is_squarefree(n::Union{Int, ZZRingElem}) -> Bool
-
-Returns true if $n$ is squarefree, false otherwise.
-"""
-function is_squarefree(n::Union{Int,ZZRingElem})
-  iszero(n) && return false
-  is_unit(n) && return true
-  e, b = is_perfect_power_with_data(n)
-  if e > 1
-    return false
-  end
-  return isone(maximum(values(factor(n).fac); init = 1))
-end
-
-
-################################################################################
-#
 #  Rounding and friends
 #
 ################################################################################

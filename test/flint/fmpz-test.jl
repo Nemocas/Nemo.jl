@@ -699,6 +699,15 @@ end
   @test_throws DomainError iroot(ZZRingElem(1000), -3)
 end
 
+@testset "ZZRingElem.is_squarefree" begin
+  for T in [Int, ZZRingElem]
+    @test !is_squarefree(T(0))
+    @test is_squarefree(T(1))
+    @test is_squarefree(T(3))
+    @test !is_squarefree(T(-4))
+  end
+end
+
 @testset "ZZRingElem.extended_gcd" begin
   @test gcdx(ZZRingElem(12), ZZRingElem(5)) == (1, -2, 5)
   @test gcdx(ZZRingElem(12), 5) == (1, -2, 5)
