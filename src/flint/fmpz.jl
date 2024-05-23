@@ -3025,7 +3025,7 @@ end
 @doc raw"""
     is_perfect_power(a::IntegerUnion)
 
-Returns whether $a$ is a perfect power, that is, whether $a = m^r$ for some
+Return whether $a$ is a perfect power, that is, whether $a = m^r$ for some
 integer $m$ and $r > 1$.
 """
 function is_perfect_power(a::ZZRingElem)
@@ -3035,8 +3035,16 @@ end
 
 is_perfect_power(a::Integer) = is_perfect_power(ZZRingElem(a))
 
-# Returns $e$, $r$ such that $a = r^e$ with $e$ maximal. Note: $1 = 1^0$.
-function _maximal_integer_root(a::ZZRingElem)
+#compare to Oscar/examples/PerfectPowers.jl which is, for large input,
+#far superior over gmp/ fmpz_is_perfect_power
+
+@doc raw"""
+    is_power(a::ZZRingElem) -> Int, ZZRingElem
+    is_power(a::Integer) -> Int, Integer
+
+Return $e$, $r$ such that $a = r^e$ with $e$ maximal. Note: $1 = 1^0$.
+"""
+function is_power(a::ZZRingElem)
   if iszero(a)
     error("must not be zero")
   end
@@ -3044,7 +3052,7 @@ function _maximal_integer_root(a::ZZRingElem)
     return 0, a
   end
   if a < 0
-    e, r = _maximal_integer_root(-a)
+    e, r = is_power(-a)
     if isone(e)
       return 1, a
     end
@@ -3062,6 +3070,32 @@ function _maximal_integer_root(a::ZZRingElem)
     a = rt
   end
 end
+
+function is_power(a::Integer)
+  e, r = is_power(ZZRingElem(a))
+  return e, typeof(a)(r)
+end
+
+@doc raw"""
+    is_power(a::ZZRingElem, n::Int) -> Bool, ZZRingElem
+    is_power(a::QQFieldElem, n::Int) -> Bool, QQFieldElem
+    is_power(a::Integer, n::Int) -> Bool, Integer
+
+Return `true` and the root if $a$ is an $n$-th power.
+"""
+function is_power(a::ZZRingElem, n::Int)
+  if a < 0 && is_even(n)
+    return false, a
+  end
+  b = iroot(a, n)
+  return b^n == a, b
+end
+
+# TODO: kept here for 'historical' reasons. Nemo and Hecke implemented the same
+# function under different names.
+# One should probably rename `is_power(::ZZRingElem)` to
+# `is_perfect_power_with_data` and remove `_maximal_integer_root`.
+_maximal_integer_root(a::ZZRingElem) = is_power(a)
 
 @doc raw"""
     is_prime_power(q::IntegerUnion) -> Bool

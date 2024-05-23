@@ -662,3 +662,14 @@ end
   print(PrettyPrinting.terse(io), PrettyPrinting.Lowercase(), QQ)
   @test String(take!(io)) == "QQ"
 end
+
+@testset "QQFieldElem.is_power" begin
+  for T in [Rational{Int}, Rational{BigInt}, QQFieldElem]
+    @test @inferred is_power(T(5//9)) == (1, 5//9)
+    @test @inferred is_power(T(4//9)) == (2, 2//3)
+  end
+
+  @test is_power(QQ(2), 2)[1] == false
+  @test is_power(QQ(1//2), 2)[1] == false
+  @test is_power(QQ(4//9), 2) == (true, 2//3)
+end

@@ -559,10 +559,46 @@ end
 
 ###############################################################################
 #
-#   Inversion
+#   Power detection
 #
 ###############################################################################
 
+@doc raw"""
+    is_power(a::QQFieldElem) -> Int, QQFieldElem
+    is_power(a::Rational) -> Int, Rational
+
+Return $e$, $r$ such that $a = r^e$ with $e$ maximal. Note: $1 = 1^0$.
+"""
+function is_power(a::QQFieldElem)
+  e, r = is_power(numerator(a))
+  if e == 1
+    return e, a
+  end
+  f, s = is_power(denominator(a))
+  g = gcd(e, f)
+  return g, r^Base.div(e, g) // s^Base.div(f, g)
+end
+
+function is_power(a::Rational)
+  T = typeof(denominator(a))
+  e, r = is_power(QQFieldElem(a))
+  return e, T(numerator(r)) // T(denominator(r))
+end
+
+function is_power(a::QQFieldElem, n::Int)
+  fl, nu = is_power(numerator(a), n)
+  if !fl
+    return fl, a
+  end
+  fl, de = is_power(denominator(a), n)
+  return fl, QQFieldElem(nu, de)
+end
+
+###############################################################################
+#
+#   Inversion
+#
+###############################################################################
 
 function inv(a::QQFieldElem)
   if iszero(a)

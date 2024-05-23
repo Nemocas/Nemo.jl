@@ -1246,6 +1246,19 @@ end
   end
   @test is_perfect_power(ZZRingElem(10940293781057873954324736))
 
+  # Perfect power / maximal integer root / is_power
+  for T in [Int, BigInt, ZZRingElem]
+    @test @inferred is_power(T(5)) == (1, 5)
+    @test @inferred is_power(T(-5)) == (1, -5)
+    @test @inferred is_power(T(64)) == (6, 2)
+    @test @inferred is_power(T(-64)) == (3, -4)
+    @test @inferred is_power(T(1)) == (0, 1)
+  end
+
+  # is_power(::ZZRingElem, n::Int)
+  @test is_power(ZZ(-64), 6)[1] == false
+  @test is_power(ZZ(64), 6) == (true, 2)
+
   # Prime power
   for T in [Int, BigInt, ZZRingElem]
     @test @inferred Nemo.is_prime_power(T(2))
