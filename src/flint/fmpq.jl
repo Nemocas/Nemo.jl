@@ -998,6 +998,9 @@ dedekind_sum(h::Integer, k::ZZRingElem) = dedekind_sum(ZZRingElem(h), k)
 
 dedekind_sum(h::Integer, k::Integer) = dedekind_sum(ZZRingElem(h), ZZRingElem(k))
 
+log(a::QQFieldElem) = log(numerator(a)) - log(denominator(a))
+log(a::ZZRingElem, b::QQFieldElem) = log(b) / log(a)
+
 ###############################################################################
 #
 #  Simplest between

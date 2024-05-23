@@ -4,8 +4,6 @@
 #
 ################################################################################
 
-log(a::QQFieldElem) = log(numerator(a)) - log(denominator(a))
-
 Base.in(x::IntegerUnion, r::AbstractRange{ZZRingElem}) =
 !isempty(r) && first(r) <= x <= last(r) &&
 mod(convert(ZZRingElem, x), step(r)) == mod(first(r), step(r))

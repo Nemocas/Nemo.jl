@@ -596,6 +596,9 @@ end
   @test dedekind_sum(-120, ZZRingElem(1305)) == -ZZRingElem(575)//522
 
   @test dedekind_sum(ZZRingElem(-120), 1305) == -ZZRingElem(575)//522
+
+  @test log(ZZ(2), QQ(1//4)) == -2.0
+  @test_throws DomainError log(QQ(-2))
 end
 
 @testset "QQFieldElem.adhoc_remove_valuation" begin
