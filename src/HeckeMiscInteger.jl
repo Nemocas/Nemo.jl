@@ -4,13 +4,6 @@
 #
 ################################################################################
 
-function isless(a::Float64, b::ZZRingElem)
-  return a < BigFloat(b)
-end
-function isless(a::ZZRingElem, b::Float64)
-  return BigFloat(a) < b
-end
-
 function *(a::ZZRingElem, b::AbstractFloat)
   return BigInt(a) * b
 end

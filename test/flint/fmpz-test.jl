@@ -544,13 +544,13 @@ end
   a = ZZRingElem(12)
 
   # values less than a
-  lt = [-40, UInt(3), 3, 3//1, big(5)//big(3), BigFloat(-40)]
+  lt = [-40, UInt(3), 3, 3//1, big(5)//big(3), Float64(-40), BigFloat(-40)]
 
   # values equal to a
-  eq = [12, UInt(12), 12//1, big(12), big(12)//1, BigFloat(12)]
+  eq = [12, UInt(12), 12//1, big(12), big(12)//1, Float64(12), BigFloat(12)]
 
   # values greater than a
-  gt = [40, UInt(40), 40//1, big(40)//big(3), BigFloat(40)]
+  gt = [40, UInt(40), 40//1, big(40)//big(3), Float64(40), BigFloat(40)]
 
   @testset "lt $b" for b in lt
     @test b < a

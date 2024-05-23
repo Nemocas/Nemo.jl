@@ -829,6 +829,9 @@ isless(x::ZZRingElem, y::BigFloat) = cmp(y, x) > 0
 
 isless(x::BigFloat, y::ZZRingElem) = cmp(x, y) < 0
 
+isless(a::Float64, b::ZZRingElem) = isless(a, BigFloat(b))
+isless(a::ZZRingElem, b::Float64) = isless(BigFloat(a), b)
+
 ###############################################################################
 #
 #   Shifting
