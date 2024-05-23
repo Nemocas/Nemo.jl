@@ -109,6 +109,9 @@ end
   @test Rational{Int}(ZZRingElem(12)) == 12
   @test Rational{BigInt}(ZZRingElem(12)) == 12
 
+  @test convert(Rational{Int}, ZZRingElem(12)) == 12
+  @test convert(Rational{BigInt}, ZZRingElem(12)) == 12
+
   @test Rational(QQFieldElem(3, 7)) == 3//7
   @test Rational{Int}(QQFieldElem(3, 7)) == 3//7
   @test Rational{BigInt}(QQFieldElem(3, 7)) == 3//7

@@ -4,10 +4,6 @@
 #
 ################################################################################
 
-function convert(R::Type{Rational{Base.GMP.BigInt}}, a::ZZRingElem)
-  return R(BigInt(a))
-end
-
 log(a::ZZRingElem) = log(BigInt(a))
 log(a::QQFieldElem) = log(numerator(a)) - log(denominator(a))
 
