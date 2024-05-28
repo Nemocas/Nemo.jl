@@ -222,7 +222,7 @@ function roots(K::FqPolyRepField, f::FpPolyRingElem)
   return roots(ff)
 end
 
-function is_power(a::Union{fpField, FpFieldElem, fqPolyRepFieldElem,FqPolyRepFieldElem,FqFieldElem}, m::Int)
+function is_power(a::Union{fpFieldElem, FpFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem, FqFieldElem}, m::Int)
   if iszero(a)
     return true, a
   end
@@ -240,7 +240,7 @@ function is_power(a::Union{fpField, FpFieldElem, fqPolyRepFieldElem,FqPolyRepFie
   end
 end
 
-function roots(f::T) where {T<:Union{fqPolyRepPolyRingElem,FqPolyRepPolyRingElem}} # should be in Nemo and
+function roots(f::Union{fqPolyRepPolyRingElem,FqPolyRepPolyRingElem}) # should be in Nemo and
   # made available for all finite fields I guess.
   q = size(base_ring(f))
   x = gen(parent(f))

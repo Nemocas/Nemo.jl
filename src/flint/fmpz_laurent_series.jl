@@ -1149,7 +1149,7 @@ function add!(c::ZZLaurentSeriesRingElem, a::ZZLaurentSeriesRingElem, b::ZZLaure
       j += 1
       pa += sa
     elseif pi == pb && pi < minb
-      setcoeff(c, i, polcoeff(b, k))
+      setcoeff!(c, i, polcoeff(b, k))
       k += 1
       pb += sb
     else

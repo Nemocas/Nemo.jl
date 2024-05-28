@@ -221,7 +221,7 @@ end
 
 +(x::ZZModPolyRingElem, y::Integer) = x + ZZRingElem(y)
 
-+(x::Integer, y::ZZModPolyRingElem) = ZZRingElem(y) + x
++(x::Integer, y::ZZModPolyRingElem) = ZZRingElem(x) + y
 
 function +(x::ZZModPolyRingElem, y::ZZModRingElem)
   (base_ring(x) != parent(y)) && error("Elements must have same parent")

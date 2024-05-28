@@ -65,7 +65,7 @@ end
 
 
 function norm(v::ArbMatrix)
-  return sqrt(sum([a^2 for a in v]))
+  return sqrt(sum(a^2 for a in v; init=zero(base_ring(v))))
 end
 
 function real(tau::AcbMatrix)
@@ -105,7 +105,7 @@ end
 Return the minimum valuation of the entries of `G`.
 """
 function valuation(G::QQMatrix, p)
-  return minimum([x == 0 ? inf : valuation(x, p) for x in G])
+  return minimum(x == 0 ? inf : valuation(x, p) for x in G)
 end
 
 function roots(f::ZZModPolyRingElem, p::ZZRingElem, e::Int)

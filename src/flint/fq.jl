@@ -634,7 +634,7 @@ function minpoly(Rx::FpPolyRing, a::FqPolyRepFieldElem)
     fa = frobenius(fa)
   end
   St = polynomial_ring(parent(a), cached=false)[1]
-  f = prod([gen(St) - x for x = c])
+  f = prod(gen(St) - x for x = c; init=one(St))
   g = Rx()
   for i = 0:degree(f)
     setcoeff!(g, i, coeff(coeff(f, i), 0))

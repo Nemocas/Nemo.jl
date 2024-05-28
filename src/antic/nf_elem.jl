@@ -836,14 +836,14 @@ sub!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::Integer) = sub!(c, a
 function sub!(c::AbsSimpleNumFieldElem, a::QQFieldElem, b::AbsSimpleNumFieldElem)
   ccall((:nf_elem_fmpq_sub, libflint), Nothing,
         (Ref{AbsSimpleNumFieldElem}, Ref{QQFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}),
-        c, a, b, a.parent)
+        c, a, b, parent(b))
   return c
 end
 
 function sub!(c::AbsSimpleNumFieldElem, a::ZZRingElem, b::AbsSimpleNumFieldElem)
   ccall((:nf_elem_fmpz_sub, libflint), Nothing,
         (Ref{AbsSimpleNumFieldElem}, Ref{ZZRingElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}),
-        c, a, b, a.parent)
+        c, a, b, parent(b))
   return c
 end
 

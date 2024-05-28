@@ -12,7 +12,7 @@
 
 dense_matrix_type(::Type{fqPolyRepFieldElem}) = fqPolyRepMatrix
 
-function check_parent(x::fqPolyRepMatrix, y::fqPolyRepMatrix)
+function check_parent(x::fqPolyRepMatrix, y::fqPolyRepMatrix, throw::Bool = true)
   fl = base_ring(x) != base_ring(y)
   fl && throw && error("Residue rings must be equal")
   fl && return false

@@ -141,7 +141,7 @@ function native_string(x::QQBarFieldElem)
   number = unsafe_string(cstr)
   ccall((:flint_free, libflint), Nothing, (Ptr{UInt8},), cstr)
 
-  number = number[1:first(findfirst(" (", number))-1]
+  number = number[1:first(findfirst(" (", number)::UnitRange)-1]
   number = replace(number, "I" => "im")
 
   R, Rx = polynomial_ring(ZZ, "x")
