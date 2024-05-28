@@ -380,7 +380,7 @@ end
 ###############################################################################
 
 function shift_left(x::T, len::Int) where T <: Zmodn_poly
-  len < 0 && throw(DomainError(len, "Shift must be non-negative."))
+  len < 0 && throw(DomainError(len, "Shift must be non-negative"))
   z = parent(x)()
   ccall((:nmod_poly_shift_left, libflint), Nothing,
         (Ref{T}, Ref{T}, Int), z, x, len)
@@ -388,7 +388,7 @@ function shift_left(x::T, len::Int) where T <: Zmodn_poly
 end
 
 function shift_right(x::T, len::Int) where T <: Zmodn_poly
-  len < 0 && throw(DomainError(len, "Shift must be non-negative."))
+  len < 0 && throw(DomainError(len, "Shift must be non-negative"))
   z = parent(x)()
   ccall((:nmod_poly_shift_right, libflint), Nothing,
         (Ref{T}, Ref{T}, Int), z, x, len)

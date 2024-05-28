@@ -17,10 +17,7 @@ end
 
 transpose!(A::Union{ZZMatrix,QQMatrix}) = is_square(A) ? transpose!(A, A) : transpose(A)
 
-function matrix(A::Matrix{ZZRingElem})
-  m = matrix(ZZ, A)
-  return m
-end
+matrix(A::Matrix{ZZRingElem}) = matrix(ZZ, A)
 
 function Array(a::ZZMatrix; S::Type{T}=ZZRingElem) where {T}
   A = Array{T}(undef, nrows(a), ncols(a))
@@ -249,16 +246,9 @@ end
 
 ################################################################################
 #
-#  Special map entries
+#  In-place HNF
 #
 ################################################################################
-
-function map_entries(R::zzModRing, M::ZZMatrix)
-  MR = zero_matrix(R, nrows(M), ncols(M))
-  ccall((:fmpz_mat_get_nmod_mat, libflint), Cvoid, (Ref{zzModMatrix}, Ref{ZZMatrix}), MR, M)
-  return MR
-end
-
 
 function hnf!(x::ZZMatrix)
   if nrows(x) * ncols(x) > 100
@@ -587,13 +577,17 @@ end
 
 
 
-
-
 ################################################################################
 #
 #  Map Entries
 #
 ################################################################################
+
+function map_entries(R::zzModRing, M::ZZMatrix)
+  MR = zero_matrix(R, nrows(M), ncols(M))
+  ccall((:fmpz_mat_get_nmod_mat, libflint), Cvoid, (Ref{zzModMatrix}, Ref{ZZMatrix}), MR, M)
+  return MR
+end
 
 function map_entries(F::fpField, M::ZZMatrix)
   MR = zero_matrix(F, nrows(M), ncols(M))
