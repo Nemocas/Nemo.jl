@@ -664,6 +664,12 @@ end
   F = GF(101)
   A = matrix(F, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
   C = solve_init(A)
+  @test C isa AbstractAlgebra.solve_context_type(FqFieldElem)
+  @test C isa AbstractAlgebra.solve_context_type(F())
+  @test C isa AbstractAlgebra.solve_context_type(FqField)
+  @test C isa AbstractAlgebra.solve_context_type(F)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(A))
+  @test C isa AbstractAlgebra.solve_context_type(A)
 
   @test_throws ErrorException solve(C, [ F(1) ])
   @test_throws ErrorException solve(C, [ F(1) ], side = :right)

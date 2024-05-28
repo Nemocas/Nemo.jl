@@ -603,9 +603,7 @@ end
 #
 ################################################################################
 
-function solve_init(A::AcbMatrix)
-  return Solve.SolveCtx{AcbFieldElem, AcbMatrix, AcbMatrix, AcbMatrix}(A)
-end
+AbstractAlgebra.solve_context_type(::Type{AcbFieldElem}) = Solve.SolveCtx{AcbFieldElem, AcbMatrix, AcbMatrix, AcbMatrix}
 
 function Solve._init_reduce(C::Solve.SolveCtx{AcbFieldElem})
   if isdefined(C, :red) && isdefined(C, :lu_perm)

@@ -56,8 +56,9 @@ end
 #
 ################################################################################
 
-function solve_init(A::_FieldMatTypes)
-  return Solve.SolveCtx{elem_type(base_ring(A)), typeof(A), typeof(A), typeof(A)}(A)
+function AbstractAlgebra.solve_context_type(::Type{T}) where {T <: Union{QQFieldElem, fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
+  MatType = dense_matrix_type(T)
+  return Solve.SolveCtx{T, MatType, MatType, MatType}
 end
 
 ################################################################################

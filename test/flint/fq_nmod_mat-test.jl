@@ -652,6 +652,12 @@ end
   F, _ = Native.finite_field(101, 1, "a")
   A = matrix(F, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
   C = solve_init(A)
+  @test C isa AbstractAlgebra.solve_context_type(fqPolyRepFieldElem)
+  @test C isa AbstractAlgebra.solve_context_type(F())
+  @test C isa AbstractAlgebra.solve_context_type(fqPolyRepField)
+  @test C isa AbstractAlgebra.solve_context_type(F)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(A))
+  @test C isa AbstractAlgebra.solve_context_type(A)
 
   @test_throws ErrorException solve(C, [ F(1) ])
   @test_throws ErrorException solve(C, [ F(1) ], side = :right)

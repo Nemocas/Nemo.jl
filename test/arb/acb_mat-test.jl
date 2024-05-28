@@ -475,6 +475,13 @@ end
   @test contains(transpose(y), ZZ[1 1 1])
 
   C = solve_init(A)
+  @test C isa AbstractAlgebra.solve_context_type(elem_type(CC))
+  @test C isa AbstractAlgebra.solve_context_type(CC())
+  @test C isa AbstractAlgebra.solve_context_type(typeof(CC))
+  @test C isa AbstractAlgebra.solve_context_type(CC)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(A))
+  @test C isa AbstractAlgebra.solve_context_type(A)
+
   fl, y, K = can_solve_with_solution_and_kernel(C, b, side = :right)
   @test fl
   @test overlaps(A*y, b)

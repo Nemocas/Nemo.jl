@@ -542,9 +542,7 @@ end
 #
 ################################################################################
 
-function solve_init(A::RealMat)
-  return Solve.SolveCtx{RealFieldElem, RealMat, RealMat, RealMat}(A)
-end
+AbstractAlgebra.solve_context_type(::Type{RealFieldElem}) = Solve.SolveCtx{RealFieldElem, RealMat, RealMat, RealMat}
 
 function Solve._init_reduce(C::Solve.SolveCtx{RealFieldElem})
   if isdefined(C, :red) && isdefined(C, :lu_perm)

@@ -600,9 +600,7 @@ end
 #
 ################################################################################
 
-function solve_init(A::ComplexMat)
-  return Solve.SolveCtx{ComplexFieldElem, ComplexMat, ComplexMat, ComplexMat}(A)
-end
+AbstractAlgebra.solve_context_type(::Type{ComplexFieldElem}) = Solve.SolveCtx{ComplexFieldElem, ComplexMat, ComplexMat, ComplexMat}
 
 function Solve._init_reduce(C::Solve.SolveCtx{ComplexFieldElem})
   if isdefined(C, :red) && isdefined(C, :lu_perm)

@@ -736,6 +736,13 @@ end
   @test nrows(K) + rank(A) == nrows(A)
 
   C = solve_init(A)
+  @test C isa AbstractAlgebra.solve_context_type(ZZRingElem)
+  @test C isa AbstractAlgebra.solve_context_type(ZZ())
+  @test C isa AbstractAlgebra.solve_context_type(ZZRing)
+  @test C isa AbstractAlgebra.solve_context_type(ZZ)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(A))
+  @test C isa AbstractAlgebra.solve_context_type(A)
+
   B = matrix(ZZ, 2, 1, [1, 1])
   fl, x, K = can_solve_with_solution_and_kernel(C, B, side = :right)
   @test fl

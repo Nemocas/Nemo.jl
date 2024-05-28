@@ -1314,9 +1314,7 @@ end
 # Overwrite some solve context functionality so that it uses `transpose` and not
 # `lazy_transpose`
 
-function solve_init(A::ZZMatrix)
-  return Solve.SolveCtx{ZZRingElem, ZZMatrix, ZZMatrix, ZZMatrix}(A)
-end
+AbstractAlgebra.solve_context_type(::Type{ZZRingElem}) = Solve.SolveCtx{ZZRingElem, ZZMatrix, ZZMatrix, ZZMatrix}
 
 function Solve._init_reduce_transpose(C::Solve.SolveCtx{ZZRingElem})
   if isdefined(C, :red_transp) && isdefined(C, :trafo_transp)

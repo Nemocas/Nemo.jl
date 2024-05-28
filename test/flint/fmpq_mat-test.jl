@@ -700,6 +700,12 @@ end
 @testset "QQMatrix.solve_context" begin
   A = matrix(QQ, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
   C = solve_init(A)
+  @test C isa AbstractAlgebra.solve_context_type(QQFieldElem)
+  @test C isa AbstractAlgebra.solve_context_type(QQ())
+  @test C isa AbstractAlgebra.solve_context_type(QQField)
+  @test C isa AbstractAlgebra.solve_context_type(QQ)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(A))
+  @test C isa AbstractAlgebra.solve_context_type(A)
 
   @test_throws ErrorException solve(C, [ QQ(1) ])
   @test_throws ErrorException solve(C, [ QQ(1) ], side = :right)
