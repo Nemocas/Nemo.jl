@@ -64,10 +64,6 @@ function evaluate!(z::fqPolyRepFieldElem, f::ZZPolyRingElem, r::fqPolyRepFieldEl
 end
 
 
-function norm(v::ArbMatrix)
-  return sqrt(sum([a^2 for a in v]))
-end
-
 function real(tau::AcbMatrix)
   return map(real, tau)
 end
