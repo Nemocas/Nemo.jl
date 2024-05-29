@@ -11,7 +11,8 @@ Nemo allows working with exact real and complex algebraic numbers.
 
 The default algebraic number type in Nemo is provided by Calcium. The
 associated field of algebraic numbers can be constructed using
-`QQBar = algebraic_closure(QQ)`.
+`QQBar = algebraic_closure(QQ)`. We will leave out this line from
+all code blocks on this page for brevity.
 
  Library        | Element type     | Parent type
 ----------------|------------------|--------------------
