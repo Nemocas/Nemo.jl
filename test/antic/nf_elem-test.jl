@@ -202,6 +202,25 @@ end
   end
 end
 
+@testset "AbsSimpleNumFieldElem.mutable_adhoc_binary" begin
+  R, x = polynomial_ring(QQ, "x")
+  K, a = number_field(x^3 + 3x + 1, "a")
+
+  d = 3a^2 - a + 1
+  cache1 = zero(K)
+  cache2 = zero(K)
+
+  @test add!(cache1, d, 3) == add!(cache2, 3, d)
+  @test add!(cache1, d, ZZRingElem(3)) == add!(cache2, ZZRingElem(3), d)
+  @test add!(cache1, d, QQFieldElem(2, 3)) == add!(cache2, QQFieldElem(2, 3), d)
+  @test sub!(cache1, d, 3) == -sub!(cache2, 3, d)
+  @test sub!(cache1, d, ZZRingElem(3)) == -sub!(cache2, ZZRingElem(3), d)
+  @test sub!(cache1, d, QQFieldElem(2, 3)) == -sub!(cache2, QQFieldElem(2, 3), d)
+  @test mul!(cache1, d, 3) == mul!(cache2, 3, d)
+  @test mul!(cache1, d, ZZRingElem(3)) == mul!(cache2, ZZRingElem(3), d)
+  @test mul!(cache1, d, QQFieldElem(2, 3)) == mul!(cache2, QQFieldElem(2, 3), d)
+end
+
 @testset "AbsSimpleNumFieldElem.powering" begin
   R, x = polynomial_ring(QQ, "x")
   K, a = number_field(x^3 + 3x + 1, "a")
