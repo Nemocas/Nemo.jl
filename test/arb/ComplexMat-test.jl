@@ -559,3 +559,11 @@ end
 
   @test_throws ErrorException @inferred eigenvalues_simple(A)
 end
+
+@testset "ComplexMat.norm" begin
+  A = matrix(CC, [2 3 5; 1 4 7; 9 6 3])
+  @test contains(norm(A), sqrt(CC(230)))
+
+  A = zero_matrix(CC, 0, 0)
+  @test contains_zero(norm(A))
+end

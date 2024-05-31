@@ -487,3 +487,11 @@ end
     end
   end
 end
+
+@testset "RealMat.norm" begin
+  A = matrix(RR, [2 3 5; 1 4 7; 9 6 3])
+  @test contains(norm(A), sqrt(RR(230)))
+
+  A = zero_matrix(RR, 0, 0)
+  @test contains_zero(norm(A))
+end
