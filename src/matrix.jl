@@ -362,3 +362,13 @@ function *(x::_FieldMatTypes, P::Perm)
   end
   return z
 end
+
+###############################################################################
+#
+#  Norm
+#
+###############################################################################
+
+function norm(v::Union{AcbMatrix, ArbMatrix, ComplexMat, RealMat})
+  return sqrt(sum(a^2 for a in v; init=zero(base_ring(v))))
+end
