@@ -580,6 +580,11 @@ end
 
 divexact(x::ZZMatrix, y::Integer; check::Bool=true) = divexact(x, ZZRingElem(y); check=check)
 
+function divexact!(a::ZZMatrix, b::ZZMatrix, d::ZZRingElem)
+  ccall((:fmpz_mat_scalar_divexact_fmpz, libflint), Nothing,
+        (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}), a, b, d)
+end
+
 ###############################################################################
 #
 #   Kronecker product
@@ -617,6 +622,58 @@ end
 Reduce the entries of $x$ modulo $y$ and return the result.
 """
 reduce_mod(x::ZZMatrix, y::Integer) = reduce_mod(x, ZZRingElem(y))
+
+@doc raw"""
+    mod!(M::ZZMatrix, p::ZZRingElem)
+
+Reduces every entry modulo $p$ in-place, i.e. applies the mod function to every entry.
+Positive residue system.
+"""
+function mod!(M::ZZMatrix, p::ZZRingElem)
+  GC.@preserve M begin
+    for i = 1:nrows(M)
+      for j = 1:ncols(M)
+        z = ccall((:fmpz_mat_entry, libflint), Ptr{ZZRingElem}, (Ref{ZZMatrix}, Int, Int), M, i - 1, j - 1)
+        ccall((:fmpz_mod, libflint), Nothing, (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), z, z, p)
+      end
+    end
+  end
+  return nothing
+end
+
+@doc raw"""
+    mod(M::ZZMatrix, p::ZZRingElem) -> ZZMatrix
+
+Reduces every entry modulo $p$, i.e. applies the mod function to every entry.
+"""
+function mod(M::ZZMatrix, p::ZZRingElem)
+  N = deepcopy(M)
+  mod!(N, p)
+  return N
+end
+
+@doc raw"""
+    mod_sym!(M::ZZMatrix, p::ZZRingElem)
+
+Reduces every entry modulo $p$ in-place, into the symmetric residue system.
+"""
+function mod_sym!(M::ZZMatrix, B::ZZRingElem)
+  @assert !iszero(B)
+  ccall((:fmpz_mat_scalar_smod, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}), M, M, B)
+end
+mod_sym!(M::ZZMatrix, B::Integer) = mod_sym!(M, ZZRingElem(B))
+
+@doc raw"""
+    mod_sym(M::ZZMatrix, p::ZZRingElem) -> ZZMatrix
+
+Reduces every entry modulo $p$ into the symmetric residue system.
+"""
+function mod_sym(M::ZZMatrix, B::ZZRingElem)
+  N = zero_matrix(ZZ, nrows(M), ncols(M))
+  ccall((:fmpz_mat_scalar_smod, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}), N, M, B)
+  return N
+end
+mod_sym(M::ZZMatrix, B::Integer) = mod_sym(M, ZZRingElem(B))
 
 ###############################################################################
 #
@@ -862,6 +919,17 @@ function __hnf(x)
   ccall((:fmpz_mat_hnf, libflint), Nothing,
         (Ref{ZZMatrix}, Ref{ZZMatrix}), z, x)
   return z
+end
+
+function hnf!(x::ZZMatrix)
+  if nrows(x) * ncols(x) > 100
+    z = hnf(x)
+    ccall((:fmpz_mat_set, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}), x, z)
+
+    return x
+  end
+  ccall((:fmpz_mat_hnf, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}), x, x)
+  return x
 end
 
 @doc raw"""
@@ -1214,6 +1282,122 @@ Return `true` if $x$ is in Smith normal form, otherwise return `false`.
 function is_snf(x::ZZMatrix)
   return ccall((:fmpz_mat_is_in_snf, libflint), Bool,
                (Ref{ZZMatrix},), x)
+end
+
+################################################################################
+#
+#  Smith normal form with trafo
+#
+################################################################################
+
+#=
+g, e,f = gcdx(a, b)
+U = [1 0 ; -divexact(b, g)*f 1]*[1 1; 0 1];
+V = [e -divexact(b, g) ; f divexact(a, g)];
+
+then U*[ a 0; 0 b] * V = [g 0 ; 0 l]
+=#
+@doc raw"""
+    snf_with_transform(A::ZZMatrix, l::Bool = true, r::Bool = true) -> ZZMatrix, ZZMatrix, ZZMatrix
+
+Given some integer matrix $A$, compute the Smith normal form (elementary
+divisor normal form) of $A$. If `l` and/ or `r` are true, then the corresponding
+left and/ or right transformation matrices are computed as well.
+"""
+function snf_with_transform(A::ZZMatrix, l::Bool=true, r::Bool=true)
+  if r
+    R = identity_matrix(ZZ, ncols(A))
+  end
+
+  if l
+    L = identity_matrix(ZZ, nrows(A))
+  end
+  # TODO: if only one trafo is required, start with the HNF that does not
+  #       compute the trafo
+  #       Rationale: most of the work is on the 1st HNF..
+  S = deepcopy(A)
+  while !is_diagonal(S)
+    if l
+      S, T = hnf_with_transform(S)
+      L = T * L
+    else
+      S = hnf!(S)
+    end
+
+    if is_diagonal(S)
+      break
+    end
+    if r
+      S, T = hnf_with_transform(transpose(S))
+      R = T * R
+    else
+      S = hnf!(transpose(S))
+    end
+    S = transpose(S)
+  end
+  #this is probably not really optimal...
+  for i = 1:min(nrows(S), ncols(S))
+    if S[i, i] == 1
+      continue
+    end
+    for j = i+1:min(nrows(S), ncols(S))
+      if S[j, j] == 0
+        continue
+      end
+      if S[i, i] != 0 && S[j, j] % S[i, i] == 0
+        continue
+      end
+      g, e, f = gcdx(S[i, i], S[j, j])
+      a = divexact(S[i, i], g)
+      S[i, i] = g
+      b = divexact(S[j, j], g)
+      S[j, j] *= a
+      if l
+        # U = [1 0; -b*f 1] * [ 1 1; 0 1] = [1 1; -b*f -b*f+1]
+        # so row i and j of L will be transformed. We do it naively
+        # those 2x2 transformations of 2 rows should be a c-primitive
+        # or at least a Nemo/Hecke primitive
+        for k = 1:ncols(L)
+          x = -b * f
+          #          L[i,k], L[j,k] = L[i,k]+L[j,k], x*L[i,k]+(x+1)*L[j,k]
+          L[i, k], L[j, k] = L[i, k] + L[j, k], x * (L[i, k] + L[j, k]) + L[j, k]
+        end
+      end
+      if r
+        # V = [e -b ; f a];
+        # so col i and j of R will be transformed. We do it naively
+        # careful: at this point, R is still transposed
+        for k = 1:nrows(R)
+          R[i, k], R[j, k] = e * R[i, k] + f * R[j, k], -b * R[i, k] + a * R[j, k]
+        end
+      end
+    end
+  end
+
+  # It might be the case that S was diagonal with negative diagonal entries.
+  for i in 1:min(nrows(S), ncols(S))
+    if S[i, i] < 0
+      if l
+        multiply_row!(L, ZZRingElem(-1), i)
+      end
+      S[i, i] = -S[i, i]
+    end
+  end
+
+  if l
+    if r
+      return S, L, transpose(R)
+    else
+      # last is dummy
+      return S, L, L
+    end
+  elseif r
+    # second is dummy
+    return S, R, transpose(R)
+  else
+    # last two are dummy
+    return S, S, S
+  end
 end
 
 ###############################################################################
@@ -1674,6 +1858,12 @@ function mul!(y::ZZMatrix, x::ZZRingElem)
   ccall((:fmpz_mat_scalar_mul_fmpz, libflint), Nothing,
         (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}), y, y, x)
   return y
+end
+
+function mul!(z::ZZMatrix, y::ZZMatrix, x::ZZRingElem)
+  ccall((:fmpz_mat_scalar_mul_fmpz, libflint), Nothing,
+        (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}), z, y, x)
+  return z
 end
 
 function addmul!(z::ZZMatrix, y::ZZMatrix, x::ZZRingElem)
