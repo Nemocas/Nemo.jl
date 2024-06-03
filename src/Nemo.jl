@@ -455,8 +455,9 @@ include("Rings.jl")
 
 include("matrix.jl")
 
+include("Infinity.jl")
+
 include("HeckeMiscFiniteField.jl")
-include("HeckeMiscInfinity.jl")
 include("HeckeMiscInteger.jl")
 include("HeckeMiscMatrix.jl")
 include("HeckeMiscPoly.jl")
