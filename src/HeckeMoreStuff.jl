@@ -698,7 +698,7 @@ function Base.Int128(x::ZZRingElem)
   return Base.Int128(BigInt(x))
 end
 
-## Make zzModRing iteratible
+## Make zzModRing iterable
 
 Base.iterate(R::zzModRing) = (zero(R), zero(UInt))
 
@@ -716,7 +716,7 @@ Base.eltype(::Type{zzModRing}) = zzModRingElem
 Base.IteratorSize(::Type{zzModRing}) = Base.HasLength()
 Base.length(R::zzModRing) = R.n
 
-## Make ZZModRing iteratible
+## Make ZZModRing iterable
 
 Base.iterate(R::ZZModRing) = (zero(R), zero(ZZRingElem))
 
@@ -734,7 +734,7 @@ Base.eltype(::Type{ZZModRing}) = ZZModRingElem
 Base.IteratorSize(::Type{ZZModRing}) = Base.HasLength()
 Base.length(R::ZZModRing) = Integer(R.n)
 
-## Make fpField iteratible
+## Make fpField iterable
 
 Base.iterate(R::fpField) = (zero(R), zero(UInt))
 
