@@ -1,4 +1,18 @@
-for T in [zzModPolyRingElem, fpPolyRingElem, ZZModPolyRingElem, FpPolyRingElem, QQPolyRingElem, ZZPolyRingElem, FqPolyRepPolyRingElem, fqPolyRepPolyRingElem, FqPolyRingElem]
+for T in [
+  zzModPolyRingElem,
+  fpPolyRingElem,
+  ZZModPolyRingElem,
+  FpPolyRingElem,
+  QQPolyRingElem,
+  ZZPolyRingElem,
+  FqPolyRepPolyRingElem,
+  fqPolyRepPolyRingElem,
+  FqPolyRingElem,
+  AcbPolyRingElem,
+  ArbPolyRingElem,
+  ComplexPoly,
+  RealPoly,
+  ]
   (f::T)(a) = subst(f, a)
 
   function (f::T)(a::T)

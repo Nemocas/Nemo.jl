@@ -407,10 +407,6 @@ function mulhigh(a::PolyRingElem{T}, b::PolyRingElem{T}, n::Int) where {T}
   return mulhigh_n(a, b, degree(a) + degree(b) - n)
 end
 
-function (f::AcbPolyRingElem)(x::AcbFieldElem)
-  return evaluate(f, x)
-end
-
 function mod(f::AbstractAlgebra.PolyRingElem{T}, g::AbstractAlgebra.PolyRingElem{T}) where {T<:RingElem}
   check_parent(f, g)
   if length(g) == 0
