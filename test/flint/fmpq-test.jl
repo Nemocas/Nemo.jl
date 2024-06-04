@@ -125,7 +125,7 @@ end
   @test ZZ(big(3)//1) isa ZZRingElem
   @test_throws Exception ZZ(big(3)//2)
 
-  @test BigFloat(QQFieldElem(3, 7)) == BigFloat(0.75)
+  @test BigFloat(QQFieldElem(3, 4)) == BigFloat(0.75)
 end
 
 @testset "QQFieldElem.vector_arithmetics" begin

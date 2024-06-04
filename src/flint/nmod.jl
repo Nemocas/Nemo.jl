@@ -192,7 +192,7 @@ function *(x::Int, y::zzModRingElem)
     d = mulmod(UInt(-x), y.data, R.n, R.ninv)
     return -zzModRingElem(d, R)
   else
-    d = mulmod(UInt(x), y.data, R.n, R.inv)
+    d = mulmod(UInt(x), y.data, R.n, R.ninv)
     return zzModRingElem(d, R)
   end
 end
