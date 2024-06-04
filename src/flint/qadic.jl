@@ -255,9 +255,7 @@ function expressify(b::QadicFieldElem, x = var(parent(b)); context = nothing)
   return sum
 end
 
-function show(io::IO, a::QadicFieldElem)
-  print(io, AbstractAlgebra.obj_to_string(a, context = io))
-end
+@enable_all_show_via_expressify QadicFieldElem
 
 function show(io::IO, R::QadicField)
   @show_name(io, R)

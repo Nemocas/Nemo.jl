@@ -275,9 +275,7 @@ function expressify(x::PadicFieldElem; context = nothing)
   return sum
 end
 
-function show(io::IO, a::PadicFieldElem)
-  print(io, AbstractAlgebra.obj_to_string(a, context = io))
-end
+@enable_all_show_via_expressify PadicFieldElem
 
 function show(io::IO, R::PadicField)
   @show_name(io, R)
