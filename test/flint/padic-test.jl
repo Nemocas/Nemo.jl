@@ -62,6 +62,7 @@ end
 
 @testset "PadicFieldElem.printing" begin
   R = PadicField(7, 30)
+  Rx, x = R[:x]
 
   a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
 
@@ -69,6 +70,7 @@ end
   @test get_printing_mode(PadicField) == :series
 
   @test string(a) == "7^0 + 2*7^1 + 4*7^2 + O(7^3)"
+  @test string(a*x) == "(7^0 + 2*7^1 + 4*7^2 + O(7^3))*x"
 
   set_printing_mode(PadicField, :terse)
   @test get_printing_mode(PadicField) == :terse
