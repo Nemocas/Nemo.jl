@@ -71,3 +71,6 @@ function (R::QadicField)(n::ZZPolyRingElem, pr::Int)
   #Base.depwarn("`(::QadicField)(::ZZPolyRingElem, ::Int)` is deprecated, use `(::QadicField)(::ZZPolyRingElem; precision::Int)` instead.", :QadicField)
   return (R::QadicField)(n::ZZPolyRingElem; precision=pr)
 end
+
+@deprecate coefficient_ring(k::PadicField) base_field(k)
+@deprecate coefficient_ring(k::QadicField) base_field(k)
