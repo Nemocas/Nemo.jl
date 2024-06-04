@@ -214,13 +214,12 @@ function flint_abort()
   error("Problem in the Flint-Subsystem")
 end
 
-_ptr = Libdl.dlopen(libflint)
-if Libdl.dlsym(_ptr, :flint_rand_init; throw_error = false) !== nothing
-  const NEW_FLINT = true
-else
-  const NEW_FLINT = false
-end
-Libdl.dlclose(_ptr)
+const NEW_FLINT =
+      let ptr = Libdl.dlopen(libflint)
+        v = Libdl.dlsym(ptr, :flint_rand_init; throw_error = false) !== nothing
+        Libdl.dlclose(ptr)
+        v
+      end
 
 ################################################################################
 #
