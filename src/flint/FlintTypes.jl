@@ -4795,8 +4795,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
     finalizer(_fmpq_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:fmpq_mat_entry, libflint), Ptr{QQFieldElem},
-                   (Ref{QQMatrix}, Int, Int), z, i - 1, j - 1)
+        el = mat_entry_ptr(z, i, j)
         ccall((:fmpq_set, libflint), Nothing,
               (Ptr{QQFieldElem}, Ref{QQFieldElem}), el, arr[i, j])
       end
@@ -4812,8 +4811,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
     b = ZZRingElem(1)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:fmpq_mat_entry, libflint), Ptr{QQFieldElem},
-                   (Ref{QQMatrix}, Int, Int), z, i - 1, j - 1)
+        el = mat_entry_ptr(z, i, j)
         ccall((:fmpq_set_fmpz_frac, libflint), Nothing,
               (Ptr{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), el, arr[i, j], b)
       end
@@ -4829,8 +4827,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
     finalizer(_fmpq_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:fmpq_mat_entry, libflint), Ptr{QQFieldElem},
-                   (Ref{QQMatrix}, Int, Int), z, i - 1, j - 1)
+        el = mat_entry_ptr(z, i, j)
         ccall((:fmpq_set, libflint), Nothing,
               (Ptr{QQFieldElem}, Ref{QQFieldElem}), el, arr[(i-1)*c+j])
       end
@@ -4846,8 +4843,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
     b = ZZRingElem(1)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:fmpq_mat_entry, libflint), Ptr{QQFieldElem},
-                   (Ref{QQMatrix}, Int, Int), z, i - 1, j - 1)
+        el = mat_entry_ptr(z, i, j)
         ccall((:fmpq_set_fmpz_frac, libflint), Nothing,
               (Ptr{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), el, arr[(i-1)*c+j], b)
       end
@@ -4863,8 +4859,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
     finalizer(_fmpq_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:fmpq_mat_entry, libflint), Ptr{QQFieldElem},
-                   (Ref{QQMatrix}, Int, Int), z, i - 1, j - 1)
+        el = mat_entry_ptr(z, i, j)
         ccall((:fmpq_set, libflint), Nothing,
               (Ptr{QQFieldElem}, Ref{QQFieldElem}), el, QQFieldElem(arr[i, j]))
       end
@@ -4879,8 +4874,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
     finalizer(_fmpq_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:fmpq_mat_entry, libflint), Ptr{QQFieldElem},
-                   (Ref{QQMatrix}, Int, Int), z, i - 1, j - 1)
+        el = mat_entry_ptr(z, i, j)
         ccall((:fmpq_set, libflint), Nothing,
               (Ptr{QQFieldElem}, Ref{QQFieldElem}), el, QQFieldElem(arr[(i-1)*c+j]))
       end
@@ -4894,8 +4888,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
           (Ref{QQMatrix}, Int, Int), z, r, c)
     finalizer(_fmpq_mat_clear_fn, z)
     GC.@preserve z for i = 1:min(r, c)
-      el = ccall((:fmpq_mat_entry, libflint), Ptr{QQFieldElem},
-                 (Ref{QQMatrix}, Int, Int), z, i - 1, i - 1)
+      el = mat_entry_ptr(z, i, i)
       ccall((:fmpq_set, libflint), Nothing,
             (Ptr{QQFieldElem}, Ref{QQFieldElem}), el, d)
     end
@@ -4952,8 +4945,7 @@ mutable struct ZZMatrix <: MatElem{ZZRingElem}
     finalizer(_fmpz_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:fmpz_mat_entry, libflint), Ptr{ZZRingElem},
-                   (Ref{ZZMatrix}, Int, Int), z, i - 1, j - 1)
+        el = mat_entry_ptr(z, i, j)
         ccall((:fmpz_set, libflint), Nothing,
               (Ptr{ZZRingElem}, Ref{ZZRingElem}), el, arr[i, j])
       end
@@ -4968,8 +4960,7 @@ mutable struct ZZMatrix <: MatElem{ZZRingElem}
     finalizer(_fmpz_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:fmpz_mat_entry, libflint), Ptr{ZZRingElem},
-                   (Ref{ZZMatrix}, Int, Int), z, i - 1, j - 1)
+        el = mat_entry_ptr(z, i, j)
         ccall((:fmpz_set, libflint), Nothing,
               (Ptr{ZZRingElem}, Ref{ZZRingElem}), el, arr[(i-1)*c+j])
       end
@@ -4984,8 +4975,7 @@ mutable struct ZZMatrix <: MatElem{ZZRingElem}
     finalizer(_fmpz_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:fmpz_mat_entry, libflint), Ptr{ZZRingElem},
-                   (Ref{ZZMatrix}, Int, Int), z, i - 1, j - 1)
+        el = mat_entry_ptr(z, i, j)
         ccall((:fmpz_set, libflint), Nothing,
               (Ptr{ZZRingElem}, Ref{ZZRingElem}), el, ZZRingElem(arr[i, j]))
       end
@@ -5000,8 +4990,7 @@ mutable struct ZZMatrix <: MatElem{ZZRingElem}
     finalizer(_fmpz_mat_clear_fn, z)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:fmpz_mat_entry, libflint), Ptr{ZZRingElem},
-                   (Ref{ZZMatrix}, Int, Int), z, i - 1, j - 1)
+        el = mat_entry_ptr(z, i, j)
         ccall((:fmpz_set, libflint), Nothing,
               (Ptr{ZZRingElem}, Ref{ZZRingElem}), el, ZZRingElem(arr[(i-1)*c+j]))
       end
@@ -5015,8 +5004,7 @@ mutable struct ZZMatrix <: MatElem{ZZRingElem}
           (Ref{ZZMatrix}, Int, Int), z, r, c)
     finalizer(_fmpz_mat_clear_fn, z)
     GC.@preserve z for i = 1:min(r, c)
-      el = ccall((:fmpz_mat_entry, libflint), Ptr{ZZRingElem},
-                 (Ref{ZZMatrix}, Int, Int), z, i - 1, i- 1)
+      el = mat_entry_ptr(z, i, i)
       ccall((:fmpz_set, libflint), Nothing,
             (Ptr{ZZRingElem}, Ref{ZZRingElem}), el, d)
     end
@@ -6390,8 +6378,7 @@ mutable struct FqPolyRepMatrix <: MatElem{FqPolyRepFieldElem}
           (Ref{FqPolyRepMatrix}, Int, Int, Ref{FqPolyRepField}), z, r, c, ctx)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:fq_mat_entry, libflint), Ptr{FqPolyRepFieldElem},
-                   (Ref{FqPolyRepMatrix}, Int, Int), z, i - 1, j - 1)
+        el = mat_entry_ptr(z, i, j)
         ccall((:fq_set_fmpz, libflint), Nothing,
               (Ptr{FqPolyRepFieldElem}, Ref{ZZRingElem}, Ref{FqPolyRepField}), el, arr[i, j], ctx)
       end
@@ -6407,8 +6394,7 @@ mutable struct FqPolyRepMatrix <: MatElem{FqPolyRepFieldElem}
           (Ref{FqPolyRepMatrix}, Int, Int, Ref{FqPolyRepField}), z, r, c, ctx)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:fq_mat_entry, libflint), Ptr{FqPolyRepFieldElem},
-                   (Ref{FqPolyRepMatrix}, Int, Int), z, i - 1, j - 1)
+        el = mat_entry_ptr(z, i, j)
         ccall((:fq_set_fmpz, libflint), Nothing,
               (Ptr{FqPolyRepFieldElem}, Ref{ZZRingElem}, Ref{FqPolyRepField}), el, arr[(i - 1) * c + j], ctx)
       end
@@ -6472,10 +6458,8 @@ mutable struct FqPolyRepMatrix <: MatElem{FqPolyRepFieldElem}
           (Ref{FqPolyRepMatrix}, Int, Int, Ref{FqPolyRepField}), z, r, c, ctx)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el1 = ccall((:fq_mat_entry, libflint), Ptr{FqPolyRepFieldElem},
-                    (Ref{FqPolyRepMatrix}, Int, Int), z, i - 1, j - 1)
-        el2 = ccall((:fmpz_mat_entry, libflint), Ptr{ZZRingElem},
-                    (Ref{ZZMatrix}, Int, Int), m, i - 1, j - 1)
+        el1 = mat_entry_ptr(z, i, j)
+        el2 = mat_entry_ptr(m, i, j)
 
         ccall((:fq_set_fmpz, libflint), Nothing,
               (Ptr{FqPolyRepFieldElem}, Ptr{ZZRingElem}, Ref{FqPolyRepField}), el1, el2, ctx)
@@ -6559,8 +6543,7 @@ mutable struct fqPolyRepMatrix <: MatElem{fqPolyRepFieldElem}
           (Ref{fqPolyRepMatrix}, Int, Int, Ref{fqPolyRepField}), z, r, c, ctx)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:fq_nmod_mat_entry, libflint), Ptr{fqPolyRepFieldElem},
-                   (Ref{fqPolyRepMatrix}, Int, Int), z, i - 1, j - 1)
+        el = mat_entry_ptr(z, i, j)
         ccall((:fq_nmod_set_fmpz, libflint), Nothing,
               (Ptr{fqPolyRepFieldElem}, Ref{ZZRingElem}, Ref{fqPolyRepField}), el, arr[i, j], ctx)
       end
@@ -6576,8 +6559,7 @@ mutable struct fqPolyRepMatrix <: MatElem{fqPolyRepFieldElem}
           (Ref{fqPolyRepMatrix}, Int, Int, Ref{fqPolyRepField}), z, r, c, ctx)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:fq_nmod_mat_entry, libflint), Ptr{fqPolyRepFieldElem},
-                   (Ref{fqPolyRepMatrix}, Int, Int), z, i - 1, j - 1)
+        el = mat_entry_ptr(z, i, j)
         ccall((:fq_nmod_set_fmpz, libflint), Nothing,
               (Ptr{fqPolyRepFieldElem}, Ref{ZZRingElem}, Ref{fqPolyRepField}), el, arr[(i - 1) * c + j], ctx)
       end
@@ -6641,10 +6623,8 @@ mutable struct fqPolyRepMatrix <: MatElem{fqPolyRepFieldElem}
           (Ref{fqPolyRepMatrix}, Int, Int, Ref{fqPolyRepField}), z, r, c, ctx)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el1 = ccall((:fq_nmod_mat_entry, libflint), Ptr{fqPolyRepFieldElem},
-                    (Ref{fqPolyRepMatrix}, Int, Int), z, i - 1, j - 1)
-        el2 = ccall((:fmpz_mat_entry, libflint), Ptr{ZZRingElem},
-                    (Ref{ZZMatrix}, Int, Int), m, i - 1, j - 1)
+        el1 = mat_entry_ptr(z, i, j)
+        el2 = mat_entry_ptr(m, i, j)
 
         ccall((:fq_nmod_set_fmpz, libflint), Nothing,
               (Ptr{fqPolyRepFieldElem}, Ptr{ZZRingElem}, Ref{fqPolyRepField}), el1, el2, ctx)

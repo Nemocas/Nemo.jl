@@ -33,8 +33,7 @@ end
 function getindex!(v::FpFieldElem, a::FpMatrix, i::Int, j::Int)
   @boundscheck Generic._checkbounds(a, i, j)
   GC.@preserve a begin
-    z = ccall((:fmpz_mod_mat_entry, libflint), Ptr{ZZRingElem},
-              (Ref{FpMatrix}, Int, Int), a, i - 1, j - 1)
+    z = mat_entry_ptr(a, i, j)
     ccall((:fmpz_mod_set_fmpz, libflint), Nothing,
           (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ref{FpField}), v.data, z, base_ring(a))
   end

@@ -111,8 +111,7 @@ getindex(x::ZZMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) = su
 
 function getindex!(v::ZZRingElem, a::ZZMatrix, r::Int, c::Int)
   GC.@preserve a begin
-    z = ccall((:fmpz_mat_entry, libflint), Ptr{ZZRingElem},
-              (Ref{ZZMatrix}, Int, Int), a, r - 1, c - 1)
+    z = mat_entry_ptr(a, r, c)
     ccall((:fmpz_set, libflint), Nothing, (Ref{ZZRingElem}, Ptr{ZZRingElem}), v, z)
   end
 end
@@ -121,8 +120,7 @@ end
   @boundscheck Generic._checkbounds(a, r, c)
   v = ZZRingElem()
   GC.@preserve a begin
-    z = ccall((:fmpz_mat_entry, libflint), Ptr{ZZRingElem},
-              (Ref{ZZMatrix}, Int, Int), a, r - 1, c - 1)
+    z = mat_entry_ptr(a, r, c)
     ccall((:fmpz_set, libflint), Nothing, (Ref{ZZRingElem}, Ptr{ZZRingElem}), v, z)
   end
   return v
@@ -131,8 +129,7 @@ end
 @inline function setindex!(a::ZZMatrix, d::ZZRingElem, r::Int, c::Int)
   @boundscheck Generic._checkbounds(a, r, c)
   GC.@preserve a begin
-    z = ccall((:fmpz_mat_entry, libflint), Ptr{ZZRingElem},
-              (Ref{ZZMatrix}, Int, Int), a, r - 1, c - 1)
+    z = mat_entry_ptr(a, r, c)
     ccall((:fmpz_set, libflint), Nothing, (Ptr{ZZRingElem}, Ref{ZZRingElem}), z, d)
   end
 end
@@ -142,8 +139,7 @@ end
 @inline function setindex!(a::ZZMatrix, d::Int, r::Int, c::Int)
   @boundscheck Generic._checkbounds(a, r, c)
   GC.@preserve a begin
-    z = ccall((:fmpz_mat_entry, libflint), Ptr{ZZRingElem},
-              (Ref{ZZMatrix}, Int, Int), a, r - 1, c - 1)
+    z = mat_entry_ptr(a, r, c)
     ccall((:fmpz_set_si, libflint), Nothing, (Ptr{ZZRingElem}, Int), z, d)
   end
 end
@@ -633,7 +629,7 @@ function mod!(M::ZZMatrix, p::ZZRingElem)
   GC.@preserve M begin
     for i = 1:nrows(M)
       for j = 1:ncols(M)
-        z = ccall((:fmpz_mat_entry, libflint), Ptr{ZZRingElem}, (Ref{ZZMatrix}, Int, Int), M, i - 1, j - 1)
+        z = mat_entry_ptr(M, i, j)
         ccall((:fmpz_mod, libflint), Nothing, (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), z, z, p)
       end
     end

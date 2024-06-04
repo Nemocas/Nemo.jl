@@ -39,8 +39,7 @@ zero(m::FqPolyRepMatrix, R::FqPolyRepField, r::Int, c::Int) = FqPolyRepMatrix(r,
 function getindex!(v::FqPolyRepFieldElem, a::FqPolyRepMatrix, i::Int, j::Int)
   @boundscheck Generic._checkbounds(a, i, j)
   GC.@preserve a begin
-    z = ccall((:fq_mat_entry, libflint), Ptr{FqPolyRepFieldElem},
-              (Ref{FqPolyRepMatrix}, Int, Int), a, i - 1, j - 1)
+    z = mat_entry_ptr(a, i, j)
     ccall((:fq_set, libflint), Nothing,
           (Ref{FqPolyRepFieldElem}, Ptr{FqPolyRepFieldElem}), v, z)
   end
@@ -50,8 +49,7 @@ end
 @inline function getindex(a::FqPolyRepMatrix, i::Int, j::Int)
   @boundscheck Generic._checkbounds(a, i, j)
   GC.@preserve a begin
-    el = ccall((:fq_mat_entry, libflint), Ptr{FqPolyRepFieldElem},
-               (Ref{FqPolyRepMatrix}, Int, Int), a, i - 1 , j - 1)
+    el = mat_entry_ptr(a, i, j)
     z = base_ring(a)()
     ccall((:fq_set, libflint), Nothing, (Ref{FqPolyRepFieldElem}, Ptr{FqPolyRepFieldElem}), z, el)
   end
@@ -68,8 +66,7 @@ end
 @inline function setindex!(a::FqPolyRepMatrix, u::ZZRingElem, i::Int, j::Int)
   @boundscheck Generic._checkbounds(a, i, j)
   GC.@preserve a begin
-    el = ccall((:fq_mat_entry, libflint), Ptr{FqPolyRepFieldElem},
-               (Ref{FqPolyRepMatrix}, Int, Int), a, i - 1, j - 1)
+    el = mat_entry_ptr(a, i, j)
     ccall((:fq_set_fmpz, libflint), Nothing,
           (Ptr{FqPolyRepFieldElem}, Ref{ZZRingElem}, Ref{FqPolyRepField}), el, u, base_ring(a))
   end
