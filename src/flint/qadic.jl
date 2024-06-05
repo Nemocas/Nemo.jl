@@ -77,11 +77,6 @@ is_domain_type(::Type{QadicFieldElem}) = true
 
 is_exact_type(R::Type{QadicFieldElem}) = false
 
-function check_parent(a::QadicFieldElem, b::QadicFieldElem)
-  parent(a) != parent(b) &&
-  error("Incompatible qadic rings in qadic operation")
-end
-
 parent_type(::Type{QadicFieldElem}) = QadicField
 
 function _prime(R::QadicField, n::Int = 1)

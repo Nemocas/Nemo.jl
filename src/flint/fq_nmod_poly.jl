@@ -22,11 +22,6 @@ parent(a::fqPolyRepPolyRingElem) = a.parent
 
 var(a::fqPolyRepPolyRing) = a.S
 
-function check_parent(a::fqPolyRepPolyRingElem, b::fqPolyRepPolyRingElem)
-  a.parent != b.parent &&
-  error("Operations on distinct polynomial rings not supported")
-end
-
 ################################################################################
 #
 #   Basic manipulation

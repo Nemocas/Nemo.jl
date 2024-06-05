@@ -14,12 +14,6 @@ base_ring(a::QQMatrix) = QQ
 
 dense_matrix_type(::Type{QQFieldElem}) = QQMatrix
 
-function check_parent(a::QQMatrix, b::QQMatrix, throw::Bool = true)
-  fl = (nrows(a) != nrows(b) || ncols(a) != ncols(b) || base_ring(a) != base_ring(b))
-  fl && throw && error("Incompatible matrices")
-  return !fl
-end
-
 ###############################################################################
 #
 #   Similar & zero

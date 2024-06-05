@@ -30,12 +30,6 @@ dense_matrix_type(::Type{AcbFieldElem}) = AcbMatrix
 
 precision(x::AcbMatSpace) = precision(base_ring(x))
 
-function check_parent(x::AcbMatrix, y::AcbMatrix, throw::Bool = true)
-  fl = (nrows(x) != nrows(y) || ncols(x) != ncols(y) || base_ring(x) != base_ring(y))
-  fl && throw && error("Incompatible matrices")
-  return !fl
-end
-
 function getindex!(z::AcbFieldElem, x::AcbMatrix, r::Int, c::Int)
   GC.@preserve x begin
     v = ccall((:acb_mat_entry_ptr, libflint), Ptr{AcbFieldElem},

@@ -20,11 +20,6 @@ elem_type(::Type{zzModPolyRing}) = zzModPolyRingElem
 
 dense_poly_type(::Type{zzModRingElem}) = zzModPolyRingElem
 
-function check_parent(x::T, y::T) where T <: Zmodn_poly
-  parent(x) != parent(y) && error("Parents must coincide")
-  nothing
-end
-
 ################################################################################
 #
 #   Basic helper

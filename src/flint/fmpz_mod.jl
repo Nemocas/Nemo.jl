@@ -20,10 +20,6 @@ base_ring(a::ZZModRing) = ZZ
 
 parent(a::ZZModRingElem) = a.parent
 
-function check_parent(a::ZZModRingElem, b::ZZModRingElem)
-  a.parent != b.parent && error("Operations on distinct residue rings not supported")
-end
-
 ###############################################################################
 #
 #   Basic manipulation

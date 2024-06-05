@@ -22,10 +22,6 @@ parent(a::fqPolyRepFieldElem) = a.parent
 
 is_domain_type(::Type{fqPolyRepFieldElem}) = true
 
-function check_parent(a::fqPolyRepFieldElem, b::fqPolyRepFieldElem)
-  a.parent != b.parent && error("Operations on distinct finite fields not supported")
-end
-
 ###############################################################################
 #
 #   Basic manipulation

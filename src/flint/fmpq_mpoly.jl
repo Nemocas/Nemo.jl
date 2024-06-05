@@ -20,10 +20,6 @@ symbols(a::QQMPolyRing) = a.S
 
 parent(a::QQMPolyRingElem) = a.parent
 
-function check_parent(a::QQMPolyRingElem, b::QQMPolyRingElem)
-  parent(a) != parent(b) &&
-  error("Incompatible polynomial rings in polynomial operation")
-end
 
 number_of_variables(a::QQMPolyRing) = ccall((:fmpq_mpoly_ctx_nvars, libflint), Int,
                                             (Ref{QQMPolyRing}, ), a)

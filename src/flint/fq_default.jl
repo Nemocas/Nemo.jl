@@ -22,10 +22,6 @@ parent(a::FqFieldElem) = a.parent
 
 is_domain_type(::Type{FqFieldElem}) = true
 
-function check_parent(a::FqFieldElem, b::FqFieldElem)
-  a.parent != b.parent && error("Operations on distinct finite fields not supported")
-end
-
 ###############################################################################
 #
 #   Basic manipulation

@@ -14,12 +14,6 @@ base_ring(a::ZZMatrix) = ZZ
 
 dense_matrix_type(::Type{ZZRingElem}) = ZZMatrix
 
-function check_parent(a::ZZMatrix, b::ZZMatrix, throw::Bool = true)
-  b = (nrows(a) != nrows(b) || ncols(a) != ncols(b))
-  b && throw && error("Incompatible matrices")
-  return !b
-end
-
 ###############################################################################
 #
 #   similar & zero

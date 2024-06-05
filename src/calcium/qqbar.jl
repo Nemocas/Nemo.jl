@@ -22,8 +22,6 @@ base_ring(::QQBarField) = Union{}
 
 is_domain_type(::Type{QQBarFieldElem}) = true
 
-check_parent(a::QQBarFieldElem, b::QQBarFieldElem, throw::Bool = true) = true
-
 characteristic(::QQBarField) = 0
 
 ###############################################################################

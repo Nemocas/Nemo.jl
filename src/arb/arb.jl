@@ -54,11 +54,6 @@ function canonical_unit(x::ArbFieldElem)
   return x
 end
 
-function check_parent(a::ArbFieldElem, b::ArbFieldElem)
-  parent(a) != parent(b) &&
-  error("Incompatible ArbFieldElem elements")
-end
-
 characteristic(::ArbField) = 0
 
 ################################################################################

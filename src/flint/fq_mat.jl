@@ -12,15 +12,6 @@
 
 dense_matrix_type(::Type{FqPolyRepFieldElem}) = FqPolyRepMatrix
 
-function check_parent(x::FqPolyRepMatrix, y::FqPolyRepMatrix, throw::Bool = true)
-  fl = base_ring(x) != base_ring(y)
-  fl && throw && error("Residue rings must be equal")
-  fl && return false
-  fl = (ncols(x) != ncols(y)) && (nrows(x) != nrows(y))
-  fl && throw && error("Matrices have wrong dimensions")
-  return !fl
-end
-
 ###############################################################################
 #
 #   Similar & zero

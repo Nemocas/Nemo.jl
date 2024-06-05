@@ -20,11 +20,6 @@ symbols(a::ZZMPolyRing) = a.S
 
 parent(a::ZZMPolyRingElem) = a.parent
 
-function check_parent(a::ZZMPolyRingElem, b::ZZMPolyRingElem)
-  parent(a) != parent(b) &&
-  error("Incompatible polynomial rings in polynomial operation")
-end
-
 number_of_variables(a::ZZMPolyRing) = ccall((:fmpz_mpoly_ctx_nvars, libflint), Int,
                                             (Ref{ZZMPolyRing}, ), a)
 

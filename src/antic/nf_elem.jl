@@ -35,10 +35,6 @@ the generator of the given number field.
 """
 var(a::AbsSimpleNumField) = a.S
 
-function check_parent(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem)
-  a.parent != b.parent && error("Incompatible number field elements")
-end
-
 characteristic(::AbsSimpleNumField) = 0
 
 defining_polynomial(K::AbsSimpleNumField) = K.pol

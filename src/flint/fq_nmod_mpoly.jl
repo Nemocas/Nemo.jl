@@ -20,11 +20,6 @@ symbols(a::fqPolyRepMPolyRing) = a.S
 
 parent(a::fqPolyRepMPolyRingElem) = a.parent
 
-function check_parent(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
-  parent(a) != parent(b) &&
-  error("Incompatible polynomial rings in polynomial operation")
-end
-
 number_of_variables(a::fqPolyRepMPolyRing) = a.nvars
 
 base_ring(a::fqPolyRepMPolyRing) = a.base_ring

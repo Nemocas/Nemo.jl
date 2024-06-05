@@ -75,11 +75,6 @@ end
 
 # TODO: implement hash
 
-function check_parent(a::AcbFieldElem, b::AcbFieldElem)
-  parent(a) != parent(b) &&
-  error("Incompatible AcbFieldElem elements")
-end
-
 characteristic(::AcbField) = 0
 
 ################################################################################

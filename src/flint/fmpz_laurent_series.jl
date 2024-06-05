@@ -38,11 +38,6 @@ is_exact_type(a::Type{ZZLaurentSeriesRingElem}) = false
 
 var(a::ZZLaurentSeriesRing) = a.S
 
-function check_parent(a::ZZLaurentSeriesRingElem, b::ZZLaurentSeriesRingElem)
-  parent(a) != parent(b) &&
-  error("Incompatible power series rings in Laurent series operation")
-end
-
 ###############################################################################
 #
 #   Basic manipulation

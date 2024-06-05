@@ -77,11 +77,6 @@ is_domain_type(::Type{PadicFieldElem}) = true
 
 is_exact_type(R::Type{PadicFieldElem}) = false
 
-function check_parent(a::PadicFieldElem, b::PadicFieldElem)
-  parent(a) != parent(b) &&
-  error("Incompatible padic rings in padic operation")
-end
-
 parent_type(::Type{PadicFieldElem}) = PadicField
 
 ###############################################################################

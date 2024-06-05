@@ -30,12 +30,6 @@ function deepcopy_internal(a::CalciumFieldElem, dict::IdDict)
   return r
 end
 
-function check_parent(a::CalciumFieldElem, b::CalciumFieldElem, throw::Bool = true)
-  b = (parent(a) != parent(b))
-  b && throw && error("Different parents")
-  return !b
-end
-
 function _isspecial(a::CalciumFieldElem)
   return (a.field & 3) != 0
 end

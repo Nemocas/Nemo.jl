@@ -20,10 +20,6 @@ base_ring(a::fpField) = Union{}
 
 parent(a::fpFieldElem) = a.parent
 
-function check_parent(a::fpFieldElem, b::fpFieldElem)
-  a.parent != b.parent && error("Operations on distinct Galois fields not supported")
-end
-
 is_domain_type(::Type{fpFieldElem}) = true
 
 ###############################################################################

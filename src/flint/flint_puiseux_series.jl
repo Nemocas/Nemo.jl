@@ -58,11 +58,6 @@ end
 
 is_exact_type(a::Type{T}) where T <: FlintPuiseuxSeriesElem = false
 
-function check_parent(a::FlintPuiseuxSeriesElem, b::FlintPuiseuxSeriesElem)
-  parent(a) != parent(b) &&
-  error("Incompatible Puiseux series rings in Puiseux series operation")
-end
-
 function characteristic(R::FlintPuiseuxSeriesRing{T}) where T <: RingElem
   return characteristic(base_ring(R))
 end

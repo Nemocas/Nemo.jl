@@ -20,11 +20,6 @@ parent_type(::Type{ZZModPolyRingElem}) = ZZModPolyRing
 
 dense_poly_type(::Type{ZZModRingElem}) = ZZModPolyRingElem
 
-function check_parent(x::T, y::T) where {T <: Zmodn_fmpz_poly}
-  parent(x) != parent(y) && error("Parents must coincide")
-  nothing
-end
-
 function _is_one_or_throw(f, y)
   R = base_ring(y)
   if !isone(f)

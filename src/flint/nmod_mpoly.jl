@@ -25,11 +25,6 @@ for (etype, rtype, ftype, ctype, utype) in (
 
     parent(a::($etype)) = a.parent
 
-    function check_parent(a::($etype), b::($etype))
-      parent(a) != parent(b) &&
-      error("Incompatible polynomial rings in polynomial operation")
-    end
-
     number_of_variables(a::($rtype)) = a.nvars
 
     base_ring(a::($rtype)) = a.base_ring

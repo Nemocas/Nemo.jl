@@ -20,10 +20,6 @@ base_ring(a::FpField) = Union{}
 
 parent(a::FpFieldElem) = a.parent
 
-function check_parent(a::FpFieldElem, b::FpFieldElem)
-  a.parent != b.parent && error("Operations on distinct residue rings not supported")
-end
-
 is_domain_type(::Type{FpFieldElem}) = true
 
 ###############################################################################

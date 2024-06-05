@@ -27,12 +27,6 @@ base_ring(a::ComplexMat) = ComplexField()
 
 dense_matrix_type(::Type{ComplexFieldElem}) = ComplexMat
 
-function check_parent(x::ComplexMat, y::ComplexMat, throw::Bool = true)
-  fl = (nrows(x) != nrows(y) || ncols(x) != ncols(y) || base_ring(x) != base_ring(y))
-  fl && throw && error("Incompatible matrices")
-  return !fl
-end
-
 function getindex!(z::ComplexFieldElem, x::ComplexMat, r::Int, c::Int)
   GC.@preserve x begin
     v = ccall((:acb_mat_entry_ptr, libflint), Ptr{ComplexFieldElem},

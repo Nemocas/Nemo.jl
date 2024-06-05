@@ -53,10 +53,6 @@ function canonical_unit(x::RealFieldElem)
   return x
 end
 
-function check_parent(a::RealFieldElem, b::RealFieldElem)
-  return true
-end
-
 characteristic(::RealField) = 0
 
 ################################################################################

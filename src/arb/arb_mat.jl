@@ -30,12 +30,6 @@ dense_matrix_type(::Type{ArbFieldElem}) = ArbMatrix
 
 precision(x::ArbMatSpace) = precision(x.base_ring)
 
-function check_parent(x::ArbMatrix, y::ArbMatrix, throw::Bool = true)
-  fl = (nrows(x) != nrows(y) || ncols(x) != ncols(y) || base_ring(x) != base_ring(y))
-  fl && throw && error("Incompatible matrices")
-  return !fl
-end
-
 function getindex!(z::ArbFieldElem, x::ArbMatrix, r::Int, c::Int)
   GC.@preserve x begin
     v = ccall((:arb_mat_entry_ptr, libflint), Ptr{ArbFieldElem},

@@ -72,10 +72,6 @@ end
 
 # TODO: implement hash
 
-function check_parent(a::ComplexFieldElem, b::ComplexFieldElem)
-  return true
-end
-
 characteristic(::ComplexField) = 0
 
 ################################################################################
