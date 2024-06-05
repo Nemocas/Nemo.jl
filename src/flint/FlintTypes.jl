@@ -65,27 +65,21 @@ mutable struct ZZRingElem <: RingElem
   end
 
   function ZZRingElem(x::BigInt)
-    z = new()
-    ccall((:fmpz_init, libflint), Nothing, (Ref{ZZRingElem},), z)
+    z = ZZRingElem()
     ccall((:fmpz_set_mpz, libflint), Nothing, (Ref{ZZRingElem}, Ref{BigInt}), z, x)
-    finalizer(_fmpz_clear_fn, z)
     return z
   end
 
   function ZZRingElem(x::Ptr{Culong}, len::Clong)
-    z = new()
-    ccall((:fmpz_init, libflint), Nothing, (Ref{ZZRingElem},), z)
+    z = ZZRingElem()
     ccall((:fmpz_set_ui_array, libflint), Nothing, (Ref{ZZRingElem}, Ptr{Culong}, Clong), z, x, len)
-    finalizer(_fmpz_clear_fn, z)
     return z
   end
 
   function ZZRingElem(x::Float64)
     !isinteger(x) && throw(InexactError(:convert, ZZRingElem, x))
-    z = new()
-    ccall((:fmpz_init, libflint), Nothing, (Ref{ZZRingElem},), z)
+    z = ZZRingElem()
     ccall((:fmpz_set_d, libflint), Nothing, (Ref{ZZRingElem}, Cdouble), z, x)
-    finalizer(_fmpz_clear_fn, z)
     return z
   end
 
@@ -187,31 +181,26 @@ mutable struct QQFieldElem <: FracElem{ZZRingElem}
 
   function QQFieldElem(a::ZZRingElem, b::ZZRingElem)
     iszero(b) && throw(DivideError())
-    z = new()
-    ccall((:fmpq_init, libflint), Nothing, (Ref{QQFieldElem},), z)
+    z = QQFieldElem()
     ccall((:fmpq_set_fmpz_frac, libflint), Nothing,
           (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, a, b)
-    finalizer(_fmpq_clear_fn, z)
     return z
   end
 
   function QQFieldElem(a::ZZRingElem)
-    z = new()
-    ccall((:fmpq_init, libflint), Nothing, (Ref{QQFieldElem},), z)
+    z = QQFieldElem()
     b = ZZRingElem(1)
     ccall((:fmpq_set_fmpz_frac, libflint), Nothing,
           (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, a, b)
-    finalizer(_fmpq_clear_fn, z)
     return z
   end
 
   function QQFieldElem(a::Int, b::Int)
     b == 0 && throw(DivideError())
-    z = new()
+    z = QQFieldElem()
     if b == typemin(Int) || (b < 0 && a == typemin(Int))
       bz = -ZZ(b)
       az = -ZZ(a)
-      ccall((:fmpq_init, libflint), Nothing, (Ref{QQFieldElem},), z)
       ccall((:fmpq_set_fmpz_frac, libflint), Nothing,
             (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, az, bz)
     else
@@ -219,20 +208,16 @@ mutable struct QQFieldElem <: FracElem{ZZRingElem}
         b = -b
         a = -a
       end
-      ccall((:fmpq_init, libflint), Nothing, (Ref{QQFieldElem},), z)
       ccall((:fmpq_set_si, libflint), Nothing,
             (Ref{QQFieldElem}, Int, Int), z, a, b)
     end
-    finalizer(_fmpq_clear_fn, z)
     return z
   end
 
   function QQFieldElem(a::Int)
-    z = new()
-    ccall((:fmpq_init, libflint), Nothing, (Ref{QQFieldElem},), z)
+    z = QQFieldElem()
     ccall((:fmpq_set_si, libflint), Nothing,
           (Ref{QQFieldElem}, Int, Int), z, a, 1)
-    finalizer(_fmpq_clear_fn, z)
     return z
   end
 
@@ -285,28 +270,22 @@ mutable struct ZZPolyRingElem <: PolyRingElem{ZZRingElem}
   end
 
   function ZZPolyRingElem(a::Int)
-    z = new()
-    ccall((:fmpz_poly_init, libflint), Nothing, (Ref{ZZPolyRingElem},), z)
+    z = ZZPolyRingElem()
     ccall((:fmpz_poly_set_si, libflint), Nothing, (Ref{ZZPolyRingElem}, Int), z, a)
-    finalizer(_fmpz_poly_clear_fn, z)
     return z
   end
 
   function ZZPolyRingElem(a::ZZRingElem)
-    z = new()
-    ccall((:fmpz_poly_init, libflint), Nothing, (Ref{ZZPolyRingElem},), z)
+    z = ZZPolyRingElem()
     ccall((:fmpz_poly_set_fmpz, libflint), Nothing,
           (Ref{ZZPolyRingElem}, Ref{ZZRingElem}), z, a)
-    finalizer(_fmpz_poly_clear_fn, z)
     return z
   end
 
   function ZZPolyRingElem(a::ZZPolyRingElem)
-    z = new()
-    ccall((:fmpz_poly_init, libflint), Nothing, (Ref{ZZPolyRingElem},), z)
+    z = ZZPolyRingElem()
     ccall((:fmpz_poly_set, libflint), Nothing,
           (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}), z, a)
-    finalizer(_fmpz_poly_clear_fn, z)
     return z
   end
 end
@@ -384,46 +363,36 @@ mutable struct QQPolyRingElem <: PolyRingElem{QQFieldElem}
   end
 
   function QQPolyRingElem(a::Int)
-    z = new()
-    ccall((:fmpq_poly_init, libflint), Nothing, (Ref{QQPolyRingElem},), z)
+    z = QQPolyRingElem()
     ccall((:fmpq_poly_set_si, libflint), Nothing, (Ref{QQPolyRingElem}, Int), z, a)
-    finalizer(_fmpq_poly_clear_fn, z)
     return z
   end
 
   function QQPolyRingElem(a::ZZRingElem)
-    z = new()
-    ccall((:fmpq_poly_init, libflint), Nothing, (Ref{QQPolyRingElem},), z)
+    z = QQPolyRingElem()
     ccall((:fmpq_poly_set_fmpz, libflint), Nothing,
           (Ref{QQPolyRingElem}, Ref{ZZRingElem}), z, a)
-    finalizer(_fmpq_poly_clear_fn, z)
     return z
   end
 
   function QQPolyRingElem(a::QQFieldElem)
-    z = new()
-    ccall((:fmpq_poly_init, libflint), Nothing, (Ref{QQPolyRingElem},), z)
+    z = QQPolyRingElem()
     ccall((:fmpq_poly_set_fmpq, libflint), Nothing,
           (Ref{QQPolyRingElem}, Ref{QQFieldElem}), z, a)
-    finalizer(_fmpq_poly_clear_fn, z)
     return z
   end
 
   function QQPolyRingElem(a::ZZPolyRingElem)
-    z = new()
-    ccall((:fmpq_poly_init, libflint), Nothing, (Ref{QQPolyRingElem},), z)
+    z = QQPolyRingElem()
     ccall((:fmpq_poly_set_fmpz_poly, libflint), Nothing,
           (Ref{QQPolyRingElem}, Ref{ZZPolyRingElem}), z, a)
-    finalizer(_fmpq_poly_clear_fn, z)
     return z
   end
 
   function QQPolyRingElem(a::QQPolyRingElem)
-    z = new()
-    ccall((:fmpq_poly_init, libflint), Nothing, (Ref{QQPolyRingElem},), z)
+    z = QQPolyRingElem()
     ccall((:fmpq_poly_set, libflint), Nothing,
           (Ref{QQPolyRingElem}, Ref{QQPolyRingElem}), z, a)
-    finalizer(_fmpq_poly_clear_fn, z)
     return z
   end
 end
