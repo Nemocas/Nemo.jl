@@ -1181,7 +1181,7 @@ function number_field(f::QQPolyRingElem, s::VarName = "_a"; cached::Bool = true,
 end
 
 @doc raw"""
-    cyclotomic_field(n::Int, s::VarName = "z_$n", t = "_\$"; cached = true)
+    cyclotomic_field(n::Int, s::VarName = "z_$n", t = "_\$"; cached::Bool = true)
 
 Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$
 of the $n$-th cyclotomic field, $\mathbb{Q}(\zeta_n)$. The supplied string
@@ -1190,7 +1190,7 @@ provided, the string `t` specifies how the generator of the polynomial ring
 from which the number field is constructed, should be printed. If it is not
 supplied, a default dollar sign will be used to represent the variable.
 """
-function cyclotomic_field(n::Int, s::VarName = "z_$n", t = "_\$"; cached = true)
+function cyclotomic_field(n::Int, s::VarName = "z_$n", t = "_\$"; cached::Bool = true)
   n > 0 || throw(ArgumentError("conductor must be positive, not $n"))
   Zx, x = polynomial_ring(ZZ, gensym(); cached = false)
   Qx, = polynomial_ring(QQ, t; cached = cached)

@@ -724,7 +724,7 @@ end
 #
 ###############################################################################
 
-function power_series_ring(R::FqField, prec::Int, s::VarName; model=:capped_relative, cached = true)
+function power_series_ring(R::FqField, prec::Int, s::VarName; model::Symbol=:capped_relative, cached::Bool = true)
   S = Symbol(s)
 
   if model == :capped_relative

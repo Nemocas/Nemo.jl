@@ -33,7 +33,7 @@ function GF(n::ZZRingElem; cached::Bool=true, check::Bool=true)
   return FpField(n, cached)
 end
 
-function finite_field(char::ZZRingElem, deg::Int, s::VarName = :o; cached = true, check::Bool = true)
+function finite_field(char::ZZRingElem, deg::Int, s::VarName = :o; cached::Bool = true, check::Bool = true)
   parent_obj = FqPolyRepField(char, deg, Symbol(s), cached, check = check)
   return parent_obj, gen(parent_obj)
 end

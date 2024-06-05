@@ -820,7 +820,7 @@ end
 #
 ###############################################################################
 
-function power_series_ring(R::ZZModRing, prec::Int, s::VarName; model=:capped_relative, cached = true)
+function power_series_ring(R::ZZModRing, prec::Int, s::VarName; model::Symbol=:capped_relative, cached::Bool = true)
   if model == :capped_relative
     parent_obj = ZZModRelPowerSeriesRing(R, prec, Symbol(s), cached)
   elseif model == :capped_absolute
@@ -839,7 +839,7 @@ function RelPowerSeriesRing(R::ZZModRing, prec::Int)
   return ZZModRelPowerSeriesRing(R, prec, :x, false)
 end
 
-function power_series_ring(R::FpField, prec::Int, s::VarName; model=:capped_relative, cached = true)
+function power_series_ring(R::FpField, prec::Int, s::VarName; model::Symbol=:capped_relative, cached::Bool = true)
   if model == :capped_relative
     parent_obj = FpRelPowerSeriesRing(R, prec, Symbol(s), cached)
   elseif model == :capped_absolute

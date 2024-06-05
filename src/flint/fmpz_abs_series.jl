@@ -666,7 +666,7 @@ end
 #
 ###############################################################################
 
-function power_series_ring(R::ZZRing, prec::Int, s::VarName;  model=:capped_relative, cached = true)
+function power_series_ring(R::ZZRing, prec::Int, s::VarName;  model::Symbol=:capped_relative, cached::Bool = true)
   if model == :capped_relative
     parent_obj = ZZRelPowerSeriesRing(prec, Symbol(s), cached)
   elseif model == :capped_absolute

@@ -874,7 +874,7 @@ julia> L, b = finite_field(x^3 + x^2 + x + 2, "b")
 """
 finite_field
 
-function finite_field(char::IntegerUnion, deg::Int, s::VarName = :o; cached = true, check::Bool = true)
+function finite_field(char::IntegerUnion, deg::Int, s::VarName = :o; cached::Bool = true, check::Bool = true)
   check && !is_prime(char) && error("Characteristic must be prime")
   _char = ZZRingElem(char)
   S = Symbol(s)
@@ -944,7 +944,7 @@ end
 ################################################################################
 
 # The following code is used in the intersection code
-similar(F::FqField, deg::Int, s::VarName = :o; cached = true) = finite_field(characteristic(F), deg, s, cached = cached)[1]
+similar(F::FqField, deg::Int, s::VarName = :o; cached::Bool = true) = finite_field(characteristic(F), deg, s, cached = cached)[1]
 
 ################################################################################
 #

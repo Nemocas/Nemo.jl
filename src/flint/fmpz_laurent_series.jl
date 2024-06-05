@@ -1287,7 +1287,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    laurent_series_ring(R::ZZRing, prec::Int, s::VarName; cached=true)
+    laurent_series_ring(R::ZZRing, prec::Int, s::VarName; cached::Bool=true)
 
 Return a tuple $(S, x)$ consisting of the parent object `S` of a Laurent series
 ring over ZZ and a generator `x` for the Laurent series ring.
@@ -1298,7 +1298,7 @@ object `S` will be cached so that supplying the same base ring, string and
 precision in future will return the same parent object and generator. If
 caching of the parent object is not required, `cached` can be set to `false`.
 """
-function laurent_series_ring(R::ZZRing, prec::Int, s::VarName; cached=true)
+function laurent_series_ring(R::ZZRing, prec::Int, s::VarName; cached::Bool=true)
   parent_obj = ZZLaurentSeriesRing(prec, Symbol(s), cached)
   return parent_obj, gen(parent_obj)
 end
