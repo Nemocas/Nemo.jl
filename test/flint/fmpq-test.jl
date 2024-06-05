@@ -290,7 +290,7 @@ end
 
   @test a*3 == -2
 
-  @test 3a == -2
+  @test 3*a == -2
 
   @test a + ZZRingElem(3) == QQFieldElem(7, 3)
 

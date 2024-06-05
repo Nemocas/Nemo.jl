@@ -362,6 +362,15 @@ end
 
 *(a::ZZRingElem, b::QQFieldElem) = b*a
 
+function *(a::QQFieldElem, b::Int)
+  z = QQFieldElem()
+  ccall((:fmpq_mul_si, libflint), Nothing,
+        (Ref{QQFieldElem}, Ref{QQFieldElem}, Int), z, a, b)
+  return z
+end
+
+*(a::Int, b::QQFieldElem) = b*a
+
 function -(a::ZZRingElem, b::QQFieldElem)
   n = a*denominator(b) - numerator(b)
   d = denominator(b)
