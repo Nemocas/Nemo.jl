@@ -865,21 +865,6 @@ function zero_matrix(R::ZZModRing, r::Int, c::Int)
   return z
 end
 
-###############################################################################
-#
-#  Identity matrix
-#
-###############################################################################
-
-function identity_matrix(R::ZZModRing, n::Int)
-  z = zero_matrix(R, n, n)
-  for i in 1:n
-    z[i, i] = one(R)
-  end
-  z.base_ring = R
-  return z
-end
-
 ################################################################################
 #
 #  Kernel
