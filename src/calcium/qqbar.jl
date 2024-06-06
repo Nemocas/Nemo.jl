@@ -1553,4 +1553,4 @@ julia> sqrt(K(2))
 Root 1.41421 of x^2 - 2
 ```
 """
-algebraic_closure(::QQField) = QQBar
+algebraic_closure(::QQField) = QQBarField()

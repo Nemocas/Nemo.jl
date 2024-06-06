@@ -1482,7 +1482,7 @@ end
 
 # todo: optimize
 function (C::CalciumField)(v::Complex{Int})
-  return C(QQBar(v))
+  return C(QQBarFieldElem(v))
 end
 
 function (C::CalciumField)(x::Irrational)
