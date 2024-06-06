@@ -5,8 +5,8 @@
   @test elem_type(QQBarField) == QQBarFieldElem
   @test parent_type(QQBarFieldElem) == QQBarField
   @test is_domain_type(QQBarFieldElem) == true
-  @test base_ring(R) == R
-  @test base_ring(QQBarFieldElem(3)) == R
+  @test base_ring(R) == Union{}
+  @test base_ring(QQBarFieldElem(3)) == Union{}
 
   @test isa(R, QQBarField)
 
@@ -39,39 +39,39 @@
 end
 
 @testset "QQBarFieldElem.printing" begin
-  QQBar = algebraic_closure(QQ)
-  a = QQBar(1)
+  R = algebraic_closure(QQ)
+  a = R(1)
 
   @test string(a) == "Root 1.00000 of x - 1"
   @test string(parent(a)) == "Field of algebraic numbers"
 
   @test string(-(QQBarFieldElem(10) ^ 20)) == "Root -1.00000e+20 of x + 100000000000000000000"
-  @test string(root_of_unity(QQBar, 3)) == "Root -0.500000 + 0.866025*im of x^2 + x + 1"
+  @test string(root_of_unity(R, 3)) == "Root -0.500000 + 0.866025*im of x^2 + x + 1"
   @test string(sqrt(QQBarFieldElem(-1)) // 3) == "Root 0.333333*im of 9x^2 + 1"
 end
 
 
 @testset "QQBarFieldElem.manipulation" begin
-  QQBar = algebraic_closure(QQ)
+  R = algebraic_closure(QQ)
 
-  @test zero(QQBar) == 0
-  @test one(QQBar) == 1
-  @test isa(zero(QQBar), QQBarFieldElem)
-  @test isa(one(QQBar), QQBarFieldElem)
-  @test zero(QQBar) == zero(QQBarFieldElem)
-  @test one(QQBar) == one(QQBarFieldElem)
+  @test zero(R) == 0
+  @test one(R) == 1
+  @test isa(zero(R), QQBarFieldElem)
+  @test isa(one(R), QQBarFieldElem)
+  @test zero(R) == zero(QQBarFieldElem)
+  @test one(R) == one(QQBarFieldElem)
 
-  @test iszero(QQBar(0))
-  @test isone(QQBar(1))
-  @test is_rational(QQBar(1))
-  @test isreal(QQBar(1))
-  @test degree(QQBar(1)) == 1
+  @test iszero(R(0))
+  @test isone(R(1))
+  @test is_rational(R(1))
+  @test isreal(R(1))
+  @test degree(R(1)) == 1
 
-  u = sqrt(QQBar(2))
-  i = sqrt(QQBar(-1))
+  u = sqrt(R(2))
+  i = sqrt(R(-1))
 
-  @test i == QQBar(0+1im)
-  @test 3+4*i == QQBar(3+4im)
+  @test i == R(0+1im)
+  @test 3+4*i == R(3+4im)
 
   @test canonical_unit(u) == u
   @test hash(u) != hash(i)
@@ -117,9 +117,9 @@ end
   @test evaluate(x^2, u) == QQBarFieldElem(2)
   @test evaluate(y^2, u) == QQBarFieldElem(2)
 
-  @test root(QQBarFieldElem(-1), 3) == root_of_unity(QQBar, 6)
-  @test root_of_unity(QQBar, 4) == i
-  @test root_of_unity(QQBar, 4, 3) == -i
+  @test root(QQBarFieldElem(-1), 3) == root_of_unity(R, 6)
+  @test root_of_unity(R, 4) == i
+  @test root_of_unity(R, 4, 3) == -i
 
   @test sinpi(QQBarFieldElem(1)//6) == QQBarFieldElem(1)//2
   @test cospi(QQBarFieldElem(1)//3) == QQBarFieldElem(1)//2
@@ -139,39 +139,39 @@ end
   @test_throws DomainError acospi(QQBarFieldElem(2))
   @test_throws DomainError log_pi_i(QQBarFieldElem(2))
 
-  @test_throws DivideError (QQBar(1) // QQBar(0))
-  @test_throws DomainError (QQBar(0) ^ QQBar(-1))
-  @test_throws DomainError (root(QQBar(1), 0))
+  @test_throws DivideError (R(1) // R(0))
+  @test_throws DomainError (R(0) ^ R(-1))
+  @test_throws DomainError (root(R(1), 0))
   @test_throws DomainError (u ^ u)
-  @test_throws DomainError (root_of_unity(QQBar, 0))
-  @test_throws DomainError (root_of_unity(QQBar, 0, 1))
+  @test_throws DomainError (root_of_unity(R, 0))
+  @test_throws DomainError (root_of_unity(R, 0, 1))
 
   @test is_root_of_unity(i)
   @test !is_root_of_unity(QQBarFieldElem(2))
   @test root_of_unity_as_args(-i) == (4, 3)
   @test_throws DomainError root_of_unity_as_args(QQBarFieldElem(2))
 
-  v = roots(QQBar, x^5-x-1)
+  v = roots(R, x^5-x-1)
   @test v[1]^5 - v[1] - 1 == 0
 
-  v = roots(QQBar, y^2+1)
+  v = roots(R, y^2+1)
   @test v == [i, -i]
 
-  @test roots(QQBar, ZZx(0)) == []
-  @test roots(QQBar, ZZx(1)) == []
-  @test roots(QQBar, QQy(0)) == []
-  @test roots(QQBar, QQy(1)) == []
+  @test roots(R, ZZx(0)) == []
+  @test roots(R, ZZx(1)) == []
+  @test roots(R, QQy(0)) == []
+  @test roots(R, QQy(1)) == []
 
-  @test eigenvalues(QQBar, zero(matrix_space(ZZ, 0, 0))) == []
-  @test eigenvalues(QQBar, zero(matrix_space(QQ, 0, 0))) == []
-  @test eigenvalues(QQBar, ZZ[1 1; 1 -1]) == [u, -u]
-  @test eigenvalues_with_multiplicities(QQBar, ZZ[1 1; 1 -1]) == [(u, 1), (-u, 1)]
-  @test eigenvalues(QQBar, diagonal_matrix(ZZ[1 1; 1 -1], ZZ[1 1; 1 -1])) == [u, -u]
-  @test eigenvalues_with_multiplicities(QQBar, diagonal_matrix(ZZ[1 1; 1 -1], ZZ[1 1; 1 -1])) == [(u, 2), (-u, 2)]
-  @test eigenvalues(QQBar, QQ[1 1; 1 -1]) == [u, -u]
-  @test eigenvalues_with_multiplicities(QQBar, QQ[1 1; 1 -1]) == [(u, 1), (-u, 1)]
-  @test eigenvalues(QQBar, diagonal_matrix(QQ[1 1; 1 -1], QQ[1 1; 1 -1])) == [u, -u]
-  @test eigenvalues_with_multiplicities(QQBar, diagonal_matrix(QQ[1 1; 1 -1], QQ[1 1; 1 -1])) == [(u, 2), (-u, 2)]
+  @test eigenvalues(R, zero(matrix_space(ZZ, 0, 0))) == []
+  @test eigenvalues(R, zero(matrix_space(QQ, 0, 0))) == []
+  @test eigenvalues(R, ZZ[1 1; 1 -1]) == [u, -u]
+  @test eigenvalues_with_multiplicities(R, ZZ[1 1; 1 -1]) == [(u, 1), (-u, 1)]
+  @test eigenvalues(R, diagonal_matrix(ZZ[1 1; 1 -1], ZZ[1 1; 1 -1])) == [u, -u]
+  @test eigenvalues_with_multiplicities(R, diagonal_matrix(ZZ[1 1; 1 -1], ZZ[1 1; 1 -1])) == [(u, 2), (-u, 2)]
+  @test eigenvalues(R, QQ[1 1; 1 -1]) == [u, -u]
+  @test eigenvalues_with_multiplicities(R, QQ[1 1; 1 -1]) == [(u, 1), (-u, 1)]
+  @test eigenvalues(R, diagonal_matrix(QQ[1 1; 1 -1], QQ[1 1; 1 -1])) == [u, -u]
+  @test eigenvalues_with_multiplicities(R, diagonal_matrix(QQ[1 1; 1 -1], QQ[1 1; 1 -1])) == [(u, 2), (-u, 2)]
 
   @test conjugates(QQBarFieldElem(3)) == [QQBarFieldElem(3)]
   @test conjugates(u) == [u, -u]
@@ -188,38 +188,38 @@ end
     @test_throws DomainError (RR(i))
 
     v = sqrt(RR(2)) + sqrt(RR(3))
-    @test guess(QQBar, v, 4) == sqrt(QQBarFieldElem(2)) + sqrt(QQBarFieldElem(3))
-    @test guess(QQBar, v, 4, 10) == sqrt(QQBarFieldElem(2)) + sqrt(QQBarFieldElem(3))
-    @test_throws ErrorException guess(QQBar, v, 2)
+    @test guess(R, v, 4) == sqrt(QQBarFieldElem(2)) + sqrt(QQBarFieldElem(3))
+    @test guess(R, v, 4, 10) == sqrt(QQBarFieldElem(2)) + sqrt(QQBarFieldElem(3))
+    @test_throws ErrorException guess(R, v, 2)
 
-    @test guess(QQBar, CC(2+i), 2, 10) == 2+i
+    @test guess(R, CC(2+i), 2, 10) == 2+i
 
-    Rx, x = polynomial_ring(QQBar, "x")
-    @test gcd(x^4 - 4*x^2 + 4, x^2 + sqrt(QQBar(18))*x + 4) == x + sqrt(QQBar(2))
+    Rx, x = polynomial_ring(R, "x")
+    @test gcd(x^4 - 4*x^2 + 4, x^2 + sqrt(R(18))*x + 4) == x + sqrt(R(2))
   end
 
   # floor, ceil, round
-  a = sqrt(QQBar(2))
+  a = sqrt(R(2))
   test_data = [(a, 1, 2, 1, 1, 2, 1),
-              (QQBar(1), 1, 1, 1, 1, 1, 1),
-              (QQBar(0), 0, 0, 0, 0, 0, 0),
-              (QQBar(1//2), 0, 1, 1, 0, 1, 0),
-              (QQBar(3//2), 1, 2, 2, 1, 2, 2),
-              (QQBar(-1//2), -1, 0, -1, -1, 0, 0),
-              (sqrt(QQBar(3)), 1, 2, 2, 1, 2, 2),
+               (R(1), 1, 1, 1, 1, 1, 1),
+               (R(0), 0, 0, 0, 0, 0, 0),
+               (R(1//2), 0, 1, 1, 0, 1, 0),
+               (R(3//2), 1, 2, 2, 1, 2, 2),
+               (R(-1//2), -1, 0, -1, -1, 0, 0),
+               (sqrt(R(3)), 1, 2, 2, 1, 2, 2),
               ]
   for (e, f, c, r, rd, ru, rn) in test_data
-    @test floor(e) == f && parent(floor(e)) === QQBar
+    @test floor(e) == f && parent(floor(e)) === R
     @test floor(ZZRingElem, e) == f && floor(ZZRingElem, e) isa ZZRingElem
-    @test ceil(e) == QQBar(c) && parent(ceil(e)) === QQBar
+    @test ceil(e) == R(c) && parent(ceil(e)) === R
     @test ceil(ZZRingElem, e) == c && ceil(ZZRingElem, e) isa ZZRingElem
-    @test round(e) == r && parent(round(e)) === QQBar
+    @test round(e) == r && parent(round(e)) === R
     @test round(ZZRingElem, e) == r && round(ZZRingElem, e) isa ZZRingElem
-    @test round(e, RoundDown) == rd && parent(round(e, RoundDown)) === QQBar
+    @test round(e, RoundDown) == rd && parent(round(e, RoundDown)) === R
     @test round(ZZRingElem, e, RoundDown) == rd && round(ZZRingElem, e, RoundDown) isa ZZRingElem
-    @test round(e, RoundUp) == ru && parent(round(e, RoundUp)) === QQBar
+    @test round(e, RoundUp) == ru && parent(round(e, RoundUp)) === R
     @test round(ZZRingElem, e, RoundUp) == ru && round(ZZRingElem, e, RoundUp) isa ZZRingElem
-    @test round(e, RoundNearest) == rn && parent(round(e, RoundNearest)) === QQBar
+    @test round(e, RoundNearest) == rn && parent(round(e, RoundNearest)) === R
     @test round(ZZRingElem, e, RoundNearest) == rn && round(ZZRingElem, e, RoundNearest) isa ZZRingElem
   end
 
@@ -231,14 +231,14 @@ end
   @test_throws DomainError (RR(i))
 
   v = sqrt(RR(2)) + sqrt(RR(3))
-  @test guess(QQBar, v, 4) == sqrt(QQBarFieldElem(2)) + sqrt(QQBarFieldElem(3))
-  @test guess(QQBar, v, 4, 10) == sqrt(QQBarFieldElem(2)) + sqrt(QQBarFieldElem(3))
-  @test_throws ErrorException guess(QQBar, v, 2)
+  @test guess(R, v, 4) == sqrt(QQBarFieldElem(2)) + sqrt(QQBarFieldElem(3))
+  @test guess(R, v, 4, 10) == sqrt(QQBarFieldElem(2)) + sqrt(QQBarFieldElem(3))
+  @test_throws ErrorException guess(R, v, 2)
 
-  @test guess(QQBar, CC(2+i), 2, 10) == 2+i
+  @test guess(R, CC(2+i), 2, 10) == 2+i
 
-  Rx, x = polynomial_ring(QQBar, "x")
-  @test gcd(x^4 - 4*x^2 + 4, x^2 + sqrt(QQBar(18))*x + 4) == x + sqrt(QQBar(2))
+  Rx, x = polynomial_ring(R, "x")
+  @test gcd(x^4 - 4*x^2 + 4, x^2 + sqrt(R(18))*x + 4) == x + sqrt(R(2))
 
 end
 
@@ -371,25 +371,25 @@ end
 end
 
 @testset "QQBarFieldElem.rand" begin
-  QQBar = algebraic_closure(QQ)
+  R = algebraic_closure(QQ)
 
   for i=1:10
-    x = rand(QQBar, degree=5, bits=5)
+    x = rand(R, degree=5, bits=5)
     @test degree(x) <= 5
   end
 
   for i=1:10
-    x = rand(QQBar, degree=5, bits=5, randtype=:real)
+    x = rand(R, degree=5, bits=5, randtype=:real)
     @test isreal(x)
   end
 
   for i=1:10
-    x = rand(QQBar, degree=5, bits=5, randtype=:nonreal)
+    x = rand(R, degree=5, bits=5, randtype=:nonreal)
     # todo: need to upgrade Calcium
     # @test !isreal(x)
   end
 
-  @test_throws ErrorException rand(QQBar, degree=2, bits=5, randtype=:gollum)
+  @test_throws ErrorException rand(R, degree=2, bits=5, randtype=:gollum)
 
 end
 
