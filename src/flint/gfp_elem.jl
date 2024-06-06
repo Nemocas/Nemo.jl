@@ -348,6 +348,14 @@ function mul!(z::fpFieldElem, x::fpFieldElem, y::fpFieldElem)
   return x*y
 end
 
+function mul!(z::fpFieldElem, x::fpFieldElem, y::ZZRingElem)
+  R = parent(x)
+  d = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), y, R.n)
+  r = mulmod(x.data, d, R.n, R.ninv)
+  z.data = r
+  return z
+end
+
 function addeq!(z::fpFieldElem, x::fpFieldElem)
   return z + x
 end
@@ -480,3 +488,25 @@ end
 function representation_matrix(a::fpFieldElem)
   return matrix(parent(a), 1, 1, [a])
 end
+
+###############################################################################
+#
+#   Iterator interface
+#
+###############################################################################
+
+Base.iterate(R::fpField) = (zero(R), zero(UInt))
+
+function Base.iterate(R::fpField, st::UInt)
+  if st == R.n - 1
+    return nothing
+  end
+
+  return R(st + 1), st + 1
+end
+
+Base.IteratorEltype(::Type{fpField}) = Base.HasEltype()
+Base.eltype(::Type{fpField}) = fpFieldElem
+
+Base.IteratorSize(::Type{fpField}) = Base.HasLength()
+Base.length(R::fpField) = R.n

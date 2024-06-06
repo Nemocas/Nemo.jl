@@ -868,7 +868,7 @@ function fit!(z::ZZPolyRingElem, n::Int)
   return nothing
 end
 
-function setcoeff!(z::ZZPolyRingElem, n::Int, x::ZZRingElem)
+function setcoeff!(z::ZZPolyRingElem, n::Int, x::ZZRingElemOrPtr)
   ccall((:fmpz_poly_set_coeff_fmpz, libflint), Nothing,
         (Ref{ZZPolyRingElem}, Int, Ref{ZZRingElem}), z, n, x)
   return z

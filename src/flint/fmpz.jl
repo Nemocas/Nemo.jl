@@ -188,6 +188,8 @@ function deepcopy_internal(a::ZZRingElem, dict::IdDict)
   return z
 end
 
+Base.copy(a::ZZRingElem) = deepcopy(a)
+
 characteristic(R::ZZRing) = 0
 
 one(::ZZRing) = ZZRingElem(1)
@@ -250,6 +252,10 @@ size(a::ZZRingElem) = Int(ccall((:fmpz_size, libflint), Cint, (Ref{ZZRingElem},)
 is_unit(a::ZZRingElem) = ccall((:fmpz_is_pm1, libflint), Bool, (Ref{ZZRingElem},), a)
 
 iszero(a::ZZRingElem) = ccall((:fmpz_is_zero, libflint), Bool, (Ref{ZZRingElem},), a)
+
+function iszero(a::Ref{ZZRingElem})
+  return unsafe_load(reinterpret(Ptr{Int}, a)) == 0
+end
 
 isone(a::ZZRingElem) = ccall((:fmpz_is_one, libflint), Bool, (Ref{ZZRingElem},), a)
 
@@ -2712,6 +2718,10 @@ function mul!(z::ZZRingElem, x::ZZRingElem, y::ZZRingElem)
   return z
 end
 
+function mul!(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, c::ZZRingElem)
+  ccall((:fmpz_mul, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), a, b, c)
+end
+
 function mul!(z::ZZRingElem, x::ZZRingElem, y::Int)
   ccall((:fmpz_mul_si, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), z, x, y)
@@ -2793,6 +2803,8 @@ function divexact!(z::ZZRingElem, a::ZZRingElem, b::ZZRingElem)
         z, a, b)
   return z
 end
+
+divexact!(z::ZZRingElem, b::ZZRingElem) = divexact!(z, z, b)
 
 function pow!(z::ZZRingElem, a::ZZRingElem, b::Union{Int, UInt})
   ccall((:fmpz_pow_ui, libflint), Nothing,
@@ -3049,6 +3061,8 @@ end
 (::Type{T})(a::ZZRingElem) where T <: Union{Int8, Int16, Int32} = T(Int(a))
 
 (::Type{T})(a::ZZRingElem) where T <: Union{UInt8, UInt16, UInt32} = T(UInt(a))
+
+(::Type{Int128})(a::ZZRingElem) = Int128(BigInt(a))
 
 convert(::Type{T}, a::ZZRingElem) where T <: Integer = T(a)
 

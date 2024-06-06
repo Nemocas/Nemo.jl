@@ -460,6 +460,11 @@ include("HeckeMiscMatrix.jl")
 include("HeckeMiscPoly.jl")
 include("HeckeMoreStuff.jl")
 
+# More functionality for Julia types
+include("julia/Integer.jl")
+include("julia/Rational.jl")
+include("julia/Float.jl")
+
 ###############################################################################
 #
 #   satellite functionality

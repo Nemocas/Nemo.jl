@@ -31,61 +31,6 @@ end
 
 ################################################################################
 #
-################################################################################
-
-function maximum(f::typeof(abs), a::ZZMatrix)
-  r = ZZRingElem()
-  GC.@preserve a r begin
-    m = mat_entry_ptr(a, 1, 1)
-    for i = 1:nrows(a)
-      for j = 1:ncols(a)
-        z = mat_entry_ptr(a, i, j)
-        if ccall((:fmpz_cmpabs, libflint), Cint, (Ptr{ZZRingElem}, Ptr{ZZRingElem}), m, z) < 0
-          m = z
-        end
-      end
-    end
-    ccall((:fmpz_abs, libflint), Nothing, (Ref{ZZRingElem}, Ptr{ZZRingElem}), r, m)
-  end
-  return r
-end
-
-function maximum(a::ZZMatrix)
-  r = ZZRingElem()
-  GC.@preserve a r begin
-    m = mat_entry_ptr(a, 1, 1)
-    for i = 1:nrows(a)
-      for j = 1:ncols(a)
-        z = mat_entry_ptr(a, i, j)
-        if ccall((:fmpz_cmp, libflint), Cint, (Ptr{ZZRingElem}, Ptr{ZZRingElem}), m, z) < 0
-          m = z
-        end
-      end
-    end
-    set!(r, m)
-  end
-  return r
-end
-
-function minimum(a::ZZMatrix)
-  r = ZZRingElem()
-  GC.@preserve a r begin
-    m = mat_entry_ptr(a, 1, 1)
-    for i = 1:nrows(a)
-      for j = 1:ncols(a)
-        z = mat_entry_ptr(a, i, j)
-        if ccall((:fmpz_cmp, libflint), Cint, (Ptr{ZZRingElem}, Ptr{ZZRingElem}), m, z) > 0
-          m = z
-        end
-      end
-    end
-    set!(r, m)
-  end
-  return r
-end
-
-################################################################################
-#
 #  Lift of matrices to overrings
 #
 ################################################################################

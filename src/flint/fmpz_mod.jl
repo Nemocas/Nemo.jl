@@ -458,3 +458,25 @@ end
 function residue_ring(R::ZZRing, n::Integer; cached::Bool=true)
   return residue_ring(R, ZZRingElem(n))
 end
+
+###############################################################################
+#
+#   Iterator interface
+#
+###############################################################################
+
+Base.iterate(R::ZZModRing) = (zero(R), zero(ZZRingElem))
+
+function Base.iterate(R::ZZModRing, st::ZZRingElem)
+  if st == R.n - 1
+    return nothing
+  end
+
+  return R(st + 1), st + 1
+end
+
+Base.IteratorEltype(::Type{ZZModRing}) = Base.HasEltype()
+Base.eltype(::Type{ZZModRing}) = ZZModRingElem
+
+Base.IteratorSize(::Type{ZZModRing}) = Base.HasLength()
+Base.length(R::ZZModRing) = Integer(R.n)

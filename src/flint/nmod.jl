@@ -482,3 +482,25 @@ function residue_ring(R::ZZRing, n::UInt; cached::Bool=true)
   f = Generic.EuclideanRingResidueMap(R, S)
   return S, f
 end
+
+###############################################################################
+#
+#   Iterator interface
+#
+###############################################################################
+
+Base.iterate(R::zzModRing) = (zero(R), zero(UInt))
+
+function Base.iterate(R::zzModRing, st::UInt)
+  if st == R.n - 1
+    return nothing
+  end
+
+  return R(st + 1), st + 1
+end
+
+Base.IteratorEltype(::Type{zzModRing}) = Base.HasEltype()
+Base.eltype(::Type{zzModRing}) = zzModRingElem
+
+Base.IteratorSize(::Type{zzModRing}) = Base.HasLength()
+Base.length(R::zzModRing) = R.n

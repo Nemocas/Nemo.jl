@@ -1,5 +1,3 @@
-clog(a::Int, b::Int) = clog(ZZRingElem(a), b)
-
 function Float64(a::QQFieldElem)
   b = a * ZZRingElem(2)^53
   Float64(div(numerator(b), denominator(b))) / (Float64(2)^53) #CF 2^53 is bad in 32bit

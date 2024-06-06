@@ -222,6 +222,8 @@ function deepcopy_internal(d::AbsSimpleNumFieldElem, dict::IdDict)
   return z
 end
 
+Base.copy(d::AbsSimpleNumFieldElem) = deepcopy(d)
+
 function is_cyclo_type(K::AbsSimpleNumField)
   return has_attribute(K, :cyclo)
 end
@@ -625,6 +627,21 @@ divexact(a::Integer, b::AbsSimpleNumFieldElem; check::Bool=true) = inv(b)*a
 divexact(a::ZZRingElem, b::AbsSimpleNumFieldElem; check::Bool=true) = inv(b)*a
 
 divexact(a::QQFieldElem, b::AbsSimpleNumFieldElem; check::Bool=true) = inv(b)*a
+
+###############################################################################
+#
+#   Ad hoc division
+#
+###############################################################################
+
+#to make the MPoly module happy, divrem needs it...
+function Base.div(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem)
+  return a // b
+end
+
+function rem(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem)
+  return parent(a)(0)
+end
 
 ###############################################################################
 #
@@ -1259,3 +1276,106 @@ function preimage(f::Generic.EuclideanRingResidueMap{QQPolyRing, AbsSimpleNumFie
   parent(x) !== codomain(f) && error("Not an element of the codomain")
   return domain(f)(x)
 end
+
+################################################################################
+#
+#  Characteristic polynomial
+#
+################################################################################
+
+function charpoly(Qx::QQPolyRing, a::AbsSimpleNumFieldElem)
+  f = charpoly(Qx, representation_matrix(a))
+  return f
+end
+
+function charpoly(a::AbsSimpleNumFieldElem)
+  f = charpoly(parent(parent(a).pol), a)
+  return f
+end
+
+function charpoly(a::AbsSimpleNumFieldElem, ::QQField)
+  return charpoly(a)
+end
+
+function charpoly(Zx::ZZPolyRing, a::AbsSimpleNumFieldElem)
+  f = charpoly(a)
+  if !isone(denominator(f))
+    error("Element is not integral")
+  end
+  return Zx(f)
+end
+
+function charpoly(a::AbsSimpleNumFieldElem, Z::ZZRing)
+  return charpoly(polynomial_ring(Z, cached=false)[1], a)
+end
+
+################################################################################
+#
+#  Minimal polynomial
+#
+################################################################################
+
+@doc raw"""
+    minpoly(a::AbsSimpleNumFieldElem) -> QQPolyRingElem
+
+The minimal polynomial of $a$.
+"""
+function minpoly(Qx::QQPolyRing, a::AbsSimpleNumFieldElem)
+  f = minpoly(Qx, representation_matrix(a))
+  return f
+end
+
+function minpoly(a::AbsSimpleNumFieldElem)
+  f = minpoly(parent(parent(a).pol), a)
+  return f
+end
+
+function minpoly(a::AbsSimpleNumFieldElem, ::QQField)
+  return minpoly(a)
+end
+
+function minpoly(a::AbsSimpleNumFieldElem, ZZ::ZZRing)
+  return minpoly(polynomial_ring(ZZ, cached=false)[1], a)
+end
+
+function minpoly(Zx::ZZPolyRing, a::AbsSimpleNumFieldElem)
+  f = minpoly(a)
+  if !isone(denominator(f))
+    error("Element is not integral")
+  end
+  return Zx(f)
+end
+
+################################################################################
+#
+#  Miscellaneous
+#
+################################################################################
+
+function degree(a::AbsSimpleNumFieldElem)
+  return degree(minpoly(a))
+end
+
+
+function Base.:(^)(a::AbsSimpleNumFieldElem, e::UInt)
+  b = parent(a)()
+  ccall((:nf_elem_pow, libflint), Nothing,
+        (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, UInt, Ref{AbsSimpleNumField}),
+        b, a, e, parent(a))
+  return b
+end
+
+function basis(K::AbsSimpleNumField)
+  n = degree(K)
+  g = gen(K)
+  d = Array{typeof(g)}(undef, n)
+  b = K(1)
+  for i = 1:n-1
+    d[i] = b
+    b *= g
+  end
+  d[n] = b
+  return d
+end
+
+base_field(::AbsSimpleNumField) = QQ

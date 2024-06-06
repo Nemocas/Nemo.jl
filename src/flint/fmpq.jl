@@ -1212,6 +1212,11 @@ end
   return z
 end
 
+@inline function divexact!(z::QQFieldElem, a::QQFieldElem, b::QQFieldElem)
+  ccall((:fmpq_div, libflint), Nothing, (Ref{QQFieldElem}, Ref{QQFieldElem}, Ref{QQFieldElem}), z, a, b)
+  return z
+end
+
 ###############################################################################
 #
 #   Parent object call overloads

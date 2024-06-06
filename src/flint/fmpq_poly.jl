@@ -73,6 +73,8 @@ function deepcopy_internal(a::QQPolyRingElem, dict::IdDict)
   return z
 end
 
+Base.copy(f::QQPolyRingElem) = parent(f)(f)
+
 ###############################################################################
 #
 #   Similar

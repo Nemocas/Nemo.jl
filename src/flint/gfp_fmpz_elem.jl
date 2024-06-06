@@ -362,6 +362,17 @@ function mul!(z::FpFieldElem, x::FpFieldElem, y::FpFieldElem)
   return z
 end
 
+function mul!(z::FpFieldElem, x::FpFieldElem, y::ZZRingElem)
+  R = parent(x)
+  ccall((:fmpz_mod, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}),
+        z.data, y, R.n)
+
+  ccall((:fmpz_mod_mul, libflint), Nothing,
+        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{fmpz_mod_ctx_struct}),
+        z.data, x.data, z.data, R.ninv)
+  return z
+end
+
 function addeq!(z::FpFieldElem, x::FpFieldElem)
   R = parent(z)
   ccall((:fmpz_mod_add, libflint), Nothing,

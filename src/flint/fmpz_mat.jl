@@ -823,7 +823,7 @@ function hadamard_bound2(M::ZZMatrix)
   return H
 end
 
-function Base.maximum(::typeof(nbits), M::ZZMatrix)
+function maximum(::typeof(nbits), M::ZZMatrix)
   mx = 0
   n = nrows(M)
   m = ncols(M)
@@ -843,6 +843,57 @@ function Base.maximum(::typeof(nbits), M::ZZMatrix)
     end
   end
   return Int(mx)
+end
+
+function maximum(f::typeof(abs), a::ZZMatrix)
+  r = ZZRingElem()
+  GC.@preserve a r begin
+    m = mat_entry_ptr(a, 1, 1)
+    for i = 1:nrows(a)
+      for j = 1:ncols(a)
+        z = mat_entry_ptr(a, i, j)
+        if ccall((:fmpz_cmpabs, libflint), Cint, (Ptr{ZZRingElem}, Ptr{ZZRingElem}), m, z) < 0
+          m = z
+        end
+      end
+    end
+    ccall((:fmpz_abs, libflint), Nothing, (Ref{ZZRingElem}, Ptr{ZZRingElem}), r, m)
+  end
+  return r
+end
+
+function maximum(a::ZZMatrix)
+  r = ZZRingElem()
+  GC.@preserve a r begin
+    m = mat_entry_ptr(a, 1, 1)
+    for i = 1:nrows(a)
+      for j = 1:ncols(a)
+        z = mat_entry_ptr(a, i, j)
+        if ccall((:fmpz_cmp, libflint), Cint, (Ptr{ZZRingElem}, Ptr{ZZRingElem}), m, z) < 0
+          m = z
+        end
+      end
+    end
+    set!(r, m)
+  end
+  return r
+end
+
+function minimum(a::ZZMatrix)
+  r = ZZRingElem()
+  GC.@preserve a r begin
+    m = mat_entry_ptr(a, 1, 1)
+    for i = 1:nrows(a)
+      for j = 1:ncols(a)
+        z = mat_entry_ptr(a, i, j)
+        if ccall((:fmpz_cmp, libflint), Cint, (Ptr{ZZRingElem}, Ptr{ZZRingElem}), m, z) > 0
+          m = z
+        end
+      end
+    end
+    set!(r, m)
+  end
+  return r
 end
 
 ###############################################################################
@@ -1882,6 +1933,11 @@ function zero!(z::ZZMatrix)
   ccall((:fmpz_mat_zero, libflint), Nothing,
         (Ref{ZZMatrix},), z)
   return z
+end
+
+function neg!(w::ZZMatrix)
+  ccall((:fmpz_mat_neg, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}), w, w)
+  return w
 end
 
 function mul!(z::Vector{ZZRingElem}, a::ZZMatrix, b::Vector{ZZRingElem})

@@ -825,6 +825,12 @@ function zero!(a::QQMPolyRingElem)
   return a
 end
 
+function one!(a::QQMPolyRingElem)
+  ccall((:fmpq_mpoly_one, libflint), Nothing,
+        (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), a, parent(a))
+  return a
+end
+
 function add!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::QQMPolyRingElem)
   ccall((:fmpq_mpoly_add, libflint), Nothing,
         (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem},

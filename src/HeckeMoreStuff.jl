@@ -1,7 +1,3 @@
-function Base.copy(a::ZZRingElem)
-  return deepcopy(a)
-end
-
 function QQMatrix(x::ZZMatrix)
   z = zero_matrix(QQ, nrows(x), ncols(x))
   ccall((:fmpq_mat_set_fmpz_mat, libflint), Nothing, (Ref{QQMatrix}, Ref{ZZMatrix}), z, x)
@@ -140,17 +136,6 @@ function sub!(z::Vector{QQFieldElem}, x::Vector{QQFieldElem}, y::Vector{ZZRingEl
   return z
 end
 
-function valuation(a::UInt, b::UInt)
-  return ccall((:n_remove, libflint), Int, (Ref{UInt}, UInt), a, b)
-end
-
-fits(::Type{Int}, a::Int) = true
-
-function fits(::Type{Int}, a::Integer)
-  #TODO: possibly not optimal?
-  return a % Int == a
-end
-
 function (Zx::ZZPolyRing)(a::AbsSimpleNumFieldElem)
   b = Zx()
   @assert denominator(a) == 1
@@ -207,15 +192,6 @@ function Base.hash(f::zzModMPolyRingElem, h::UInt)
   return UInt(1) # TODO: enhance or throw error
 end
 
-#to make the MPoly module happy, divrem needs it...
-function Base.div(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem)
-  return a // b
-end
-
-function rem(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem)
-  return parent(a)(0)
-end
-
 function AbstractAlgebra.map_coefficients(F::fpField, f::QQMPolyRingElem; parent=polynomial_ring(F, nvars(parent(f)), cached=false)[1])
   dF = denominator(f)
   d = F(dF)
@@ -259,114 +235,10 @@ function is_squarefree(x::Generic.Poly{AbsSimpleNumFieldElem})
   return isone(gcd(x, derivative(x), true))
 end
 
-function degree(a::AbsSimpleNumFieldElem)
-  return degree(minpoly(a))
-end
-
-################################################################################
-#
-#  Characteristic polynomial
-#
-################################################################################
-
-function charpoly(Qx::QQPolyRing, a::AbsSimpleNumFieldElem)
-  f = charpoly(Qx, representation_matrix(a))
-  return f
-end
-
-function charpoly(a::AbsSimpleNumFieldElem)
-  f = charpoly(parent(parent(a).pol), a)
-  return f
-end
-
-function charpoly(a::AbsSimpleNumFieldElem, ::QQField)
-  return charpoly(a)
-end
-
-function charpoly(Zx::ZZPolyRing, a::AbsSimpleNumFieldElem)
-  f = charpoly(a)
-  if !isone(denominator(f))
-    error("Element is not integral")
-  end
-  return Zx(f)
-end
-
-function charpoly(a::AbsSimpleNumFieldElem, Z::ZZRing)
-  return charpoly(polynomial_ring(Z, cached=false)[1], a)
-end
-
-################################################################################
-#
-#  Minimal polynomial
-#
-################################################################################
-
-@doc raw"""
-    minpoly(a::AbsSimpleNumFieldElem) -> QQPolyRingElem
-
-The minimal polynomial of $a$.
-"""
-function minpoly(Qx::QQPolyRing, a::AbsSimpleNumFieldElem)
-  f = minpoly(Qx, representation_matrix(a))
-  return f
-end
-
-function minpoly(a::AbsSimpleNumFieldElem)
-  f = minpoly(parent(parent(a).pol), a)
-  return f
-end
-
-function minpoly(a::AbsSimpleNumFieldElem, ::QQField)
-  return minpoly(a)
-end
-
-function minpoly(a::AbsSimpleNumFieldElem, ZZ::ZZRing)
-  return minpoly(polynomial_ring(ZZ, cached=false)[1], a)
-end
-
-function minpoly(Zx::ZZPolyRing, a::AbsSimpleNumFieldElem)
-  f = minpoly(a)
-  if !isone(denominator(f))
-    error("Element is not integral")
-  end
-  return Zx(f)
-end
-
 ###
-
-function one!(a::QQMPolyRingElem)
-  ccall((:fmpq_mpoly_one, libflint), Nothing,
-        (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), a, parent(a))
-  return a
-end
 
 (::QQField)(a::AbsSimpleNumFieldElem) = (is_rational(a) && return coeff(a, 0)) || error("not a rational")
 (::ZZRing)(a::AbsSimpleNumFieldElem) = (is_integer(a) && return numerator(coeff(a, 0))) || error("not an integer")
-
-function Base.:(^)(a::AbsSimpleNumFieldElem, e::UInt)
-  b = parent(a)()
-  ccall((:nf_elem_pow, libflint), Nothing,
-        (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, UInt, Ref{AbsSimpleNumField}),
-        b, a, e, parent(a))
-  return b
-end
-
-Base.copy(f::QQPolyRingElem) = parent(f)(f)
-
-function basis(K::AbsSimpleNumField)
-  n = degree(K)
-  g = gen(K)
-  d = Array{typeof(g)}(undef, n)
-  b = K(1)
-  for i = 1:n-1
-    d[i] = b
-    b *= g
-  end
-  d[n] = b
-  return d
-end
-
-base_field(_::AbsSimpleNumField) = QQ
 
 ################################################################################
 #
@@ -430,10 +302,6 @@ function Base.setprecision(x::BigFloat, p::Int)
   end
 end
 
-function setprecision!(x::BigFloat, p::Int)
-  ccall((:mpfr_prec_round, :libmpfr), Nothing, (Ref{BigFloat}, Clong, Int32), x, p, Base.MPFR.ROUNDING_MODE[])
-end
-
 function evaluate(f::QQPolyRingElem, r::T) where {T<:RingElem}
   R = parent(r)
   if iszero(f)
@@ -445,18 +313,6 @@ function evaluate(f::QQPolyRingElem, r::T) where {T<:RingElem}
     s = s * r + R(coeff(f, i))
   end
   return s
-end
-
-function neg!(w::ZZMatrix)
-  ccall((:fmpz_mat_neg, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}), w, w)
-  return w
-end
-
-divexact!(z::Rational{Int}, x::Rational{Int}, y::Rational{Int}) = divexact(x, y)
-
-@inline function divexact!(z::QQFieldElem, a::QQFieldElem, b::QQFieldElem)
-  ccall((:fmpq_div, libflint), Nothing, (Ref{QQFieldElem}, Ref{QQFieldElem}, Ref{QQFieldElem}), z, a, b)
-  return z
 end
 
 function mod!(f::ZZPolyRingElem, p::ZZRingElem)
@@ -530,13 +386,6 @@ function sub!(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem, c::AbsSimpleNu
   ccall((:nf_elem_sub, libflint), Nothing,
         (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}),
         a, b, c, a.parent)
-end
-
-Base.copy(d::AbsSimpleNumFieldElem) = deepcopy(d)
-
-function addmul!(A::fpMatrix, B::fpMatrix, C::fpFieldElem, D::fpMatrix)
-  ccall((:nmod_mat_scalar_addmul_ui, libflint), Nothing, (Ref{fpMatrix}, Ref{fpMatrix}, Ref{fpMatrix}, UInt), A, B, D, C.data)
-  return A
 end
 
 function lift(R::ZZAbsPowerSeriesRing, f::ZZModAbsPowerSeriesRingElem)
@@ -660,12 +509,6 @@ function invmod(f::ZZModPolyRingElem, M::ZZModPolyRingElem)
   return g
 end
 
-function divexact!(a::ZZRingElem, b::ZZRingElem)
-  ccall((:fmpz_divexact, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), a, a, b)
-  return a
-end
-
 function round!(z::ArbFieldElem, x::ArbFieldElem, p::Int)
   ccall((:arb_set_round, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, p)
   z.parent = ArbField(p, cached=false)
@@ -694,84 +537,12 @@ function bits(x::AcbFieldElem)
   return ccall((:acb_bits, libflint), Int, (Ref{AcbFieldElem},), x)
 end
 
-function Base.Int128(x::ZZRingElem)
-  return Base.Int128(BigInt(x))
-end
-
-## Make zzModRing iterable
-
-Base.iterate(R::zzModRing) = (zero(R), zero(UInt))
-
-function Base.iterate(R::zzModRing, st::UInt)
-  if st == R.n - 1
-    return nothing
-  end
-
-  return R(st + 1), st + 1
-end
-
-Base.IteratorEltype(::Type{zzModRing}) = Base.HasEltype()
-Base.eltype(::Type{zzModRing}) = zzModRingElem
-
-Base.IteratorSize(::Type{zzModRing}) = Base.HasLength()
-Base.length(R::zzModRing) = R.n
-
-## Make ZZModRing iterable
-
-Base.iterate(R::ZZModRing) = (zero(R), zero(ZZRingElem))
-
-function Base.iterate(R::ZZModRing, st::ZZRingElem)
-  if st == R.n - 1
-    return nothing
-  end
-
-  return R(st + 1), st + 1
-end
-
-Base.IteratorEltype(::Type{ZZModRing}) = Base.HasEltype()
-Base.eltype(::Type{ZZModRing}) = ZZModRingElem
-
-Base.IteratorSize(::Type{ZZModRing}) = Base.HasLength()
-Base.length(R::ZZModRing) = Integer(R.n)
-
-## Make fpField iterable
-
-Base.iterate(R::fpField) = (zero(R), zero(UInt))
-
-function Base.iterate(R::fpField, st::UInt)
-  if st == R.n - 1
-    return nothing
-  end
-
-  return R(st + 1), st + 1
-end
-
-Base.IteratorEltype(::Type{fpField}) = Base.HasEltype()
-Base.eltype(::Type{fpField}) = fpFieldElem
-
-Base.IteratorSize(::Type{fpField}) = Base.HasLength()
-Base.length(R::fpField) = R.n
-
 function order(x::EuclideanRingResidueRingElem{ZZRingElem}, fp::Dict{ZZRingElem,Int64})
   error("missing")
 end
 
 fit!(::QQRelPowerSeriesRingElem, Int) = nothing
 fit!(::QQAbsPowerSeriesRingElem, Int) = nothing
-
-function setcoeff!(z::ZZPolyRingElem, n::Int, x::Ptr{ZZRingElem})
-  ccall((:fmpz_poly_set_coeff_fmpz, libflint), Nothing,
-        (Ref{ZZPolyRingElem}, Int, Ptr{ZZRingElem}), z, n, x)
-  return z
-end
-
-function mul!(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, c::ZZRingElem)
-  ccall((:fmpz_mul, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), a, b, c)
-end
-
-function iszero(a::Ref{ZZRingElem})
-  return unsafe_load(reinterpret(Ptr{Int}, a)) == 0
-end
 
 function gen(R::Union{EuclideanRingResidueRing{fqPolyRepPolyRingElem},EuclideanRingResidueField{fqPolyRepPolyRingElem}}) ## this is not covered by above
   return R(gen(base_ring(R)))              ## and I don't know why
@@ -932,18 +703,6 @@ end
 
 characteristic(F::EuclideanRingResidueField{ZZRingElem}) = abs(F.modulus)
 
-function is_prime(x::Integer)
-  return is_prime(ZZRingElem(x))
-end
-
-function next_prime(x::BigInt, proved::Bool=true)
-  return BigInt(next_prime(ZZRingElem(x), proved))
-end
-
-function next_prime(x::T, proved::Bool=true) where {T<:Integer}
-  return T(next_prime(BigInt(x), proved))
-end
-
 function mul!(res::QQMPolyRingElem, a::QQMPolyRingElem, c::ZZRingElem)
   ccall((:fmpq_mpoly_scalar_mul_fmpz, libflint), Nothing,
         (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{ZZRingElem}, Ref{QQMPolyRing}), res, a, c, parent(a))
@@ -1039,25 +798,6 @@ function evaluate(f::QQPolyRingElem, a::AbsSimpleNumFieldElem)
     add!(s, s, coeff(f, i))
   end
   return s
-end
-
-function mul!(z::fpFieldElem, x::fpFieldElem, y::ZZRingElem)
-  R = parent(x)
-  d = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), y, R.n)
-  r = mulmod(x.data, d, R.n, R.ninv)
-  z.data = r
-  return z
-end
-
-function mul!(z::FpFieldElem, x::FpFieldElem, y::ZZRingElem)
-  R = parent(x)
-  ccall((:fmpz_mod, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}),
-        z.data, y, R.n)
-
-  ccall((:fmpz_mod_mul, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{fmpz_mod_ctx_struct}),
-        z.data, x.data, z.data, R.ninv)
-  return z
 end
 
 function rem!(z::fpPolyRingElem, a::fpPolyRingElem, b::fpPolyRingElem)

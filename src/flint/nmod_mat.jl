@@ -298,6 +298,11 @@ function mul!(A::fpMatrix, B::fpFieldElem, D::fpMatrix)
   return A
 end
 
+function addmul!(A::fpMatrix, B::fpMatrix, C::fpFieldElem, D::fpMatrix)
+  ccall((:nmod_mat_scalar_addmul_ui, libflint), Nothing, (Ref{fpMatrix}, Ref{fpMatrix}, Ref{fpMatrix}, UInt), A, B, D, C.data)
+  return A
+end
+
 function Generic.add_one!(a::T, i::Int, j::Int) where T <: Zmodn_mat
   @boundscheck _checkbounds(a, i, j)
   x = getindex_raw(a, i, j)
