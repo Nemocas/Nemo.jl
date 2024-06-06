@@ -75,3 +75,9 @@ end
 is_power(x::IntegerUnion) = is_perfect_power_with_data(x)
 is_power(x::QQFieldElem) = is_perfect_power_with_data(x)
 is_power(x::Rational) = is_perfect_power_with_data(x)
+
+const QQBar = QQBarField()
+export QQBar
+
+const CalciumQQBar = QQBarField()
+export CalciumQQBar

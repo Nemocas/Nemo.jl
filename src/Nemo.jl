@@ -594,16 +594,6 @@ GaussianRationals() = FlintQQi
 
 ###############################################################################
 #
-#   Set domain for QQBar to Calcium
-#
-###############################################################################
-
-@doc qqbar_field_doc
-const CalciumQQBar = QQBar # TODO: remove in next breaking release
-
-
-###############################################################################
-#
 #   Some explicit type piracy against AbstractAlgebra
 #
 ###############################################################################

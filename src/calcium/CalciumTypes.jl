@@ -86,8 +86,6 @@ Root 0.866025 of 4x^2 - 3
 struct QQBarField <: Field
 end
 
-const QQBar = QQBarField()
-
 @doc qq_field_doc
 mutable struct QQBarFieldElem <: FieldElem
   coeffs::Ptr{Nothing}
