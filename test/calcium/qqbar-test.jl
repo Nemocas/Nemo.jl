@@ -1,8 +1,6 @@
 @testset "QQBarFieldElem.constructors" begin
   R = algebraic_closure(QQ)
 
-  @test R == Nemo.QQBar
-
   @test elem_type(R) == QQBarFieldElem
   @test elem_type(QQBarField) == QQBarFieldElem
   @test parent_type(QQBarFieldElem) == QQBarField

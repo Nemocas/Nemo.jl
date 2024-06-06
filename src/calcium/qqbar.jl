@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-parent(a::QQBarFieldElem) = QQBar
+parent(a::QQBarFieldElem) = QQBarField()
 
 parent_type(::Type{QQBarFieldElem}) = QQBarField
 
@@ -178,9 +178,9 @@ zero(a::QQBarField) = a(0)
 
 one(a::QQBarField) = a(1)
 
-zero(::Type{QQBarFieldElem}) = QQBar(0)
+zero(::Type{QQBarFieldElem}) = QQBarFieldElem(0)
 
-one(::Type{QQBarFieldElem}) = QQBar(1)
+one(::Type{QQBarFieldElem}) = QQBarFieldElem(1)
 
 @doc raw"""
     degree(x::QQBarFieldElem)
