@@ -82,11 +82,11 @@ Root 0.866025 of 4x^2 - 3
 ```
 """
 
-@doc qq_field_doc
+@doc qqbar_field_doc
 struct QQBarField <: Field
 end
 
-@doc qq_field_doc
+@doc qqbar_field_doc
 mutable struct QQBarFieldElem <: FieldElem
   coeffs::Ptr{Nothing}
   alloc::Int
