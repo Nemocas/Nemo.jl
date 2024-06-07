@@ -110,6 +110,7 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{T}) where {T <: Union{fp
 end
 
 function Solve._can_solve_internal_no_check(C::Solve.SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
+  @assert base_ring(matrix(C)) === base_ring(b) "Base rings do not match"
   # Split up in separate functions to make the compiler happy
   if side === :right
     return Solve._can_solve_internal_no_check_right(C, b, task)

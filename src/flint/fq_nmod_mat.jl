@@ -443,7 +443,7 @@ end
 ################################################################################
 
 function Solve._can_solve_internal_no_check(A::fqPolyRepMatrix, b::fqPolyRepMatrix, task::Symbol; side::Symbol = :left)
-  check_parent(A, b)
+  @assert base_ring(A) === base_ring(b) "Base rings do not match"
   if side === :left
     fl, sol, K = Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
     return fl, transpose(sol), transpose(K)
