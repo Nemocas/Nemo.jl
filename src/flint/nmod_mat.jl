@@ -19,8 +19,7 @@ dense_matrix_type(::Type{zzModRingElem}) = zzModMatrix
 ###############################################################################
 
 function similar(::zzModMatrix, R::zzModRing, r::Int, c::Int)
-  z = zzModMatrix(r, c, R.n)
-  z.base_ring = R
+  z = zzModMatrix(R, r, c)
   return z
 end
 
@@ -720,8 +719,7 @@ promote_rule(::Type{zzModMatrix}, ::Type{ZZRingElem}) = zzModMatrix
 ################################################################################
 
 function (a::zzModMatrixSpace)()
-  z = zzModMatrix(nrows(a), ncols(a), modulus(base_ring(a)))
-  z.base_ring = a.base_ring
+  z = zzModMatrix(base_ring(a), nrows(a), ncols(a))
   return z
 end
 
@@ -819,8 +817,7 @@ function zero_matrix(R::zzModRing, r::Int, c::Int)
   if r < 0 || c < 0
     error("dimensions must not be negative")
   end
-  z = zzModMatrix(r, c, R.n)
-  z.base_ring = R
+  z = zzModMatrix(R, r, c)
   return z
 end
 

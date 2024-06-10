@@ -11,8 +11,7 @@
 ###############################################################################
 
 function similar(::AcbMatrix, R::AcbField, r::Int, c::Int)
-  z = AcbMatrix(r, c)
-  z.base_ring = R
+  z = AcbMatrix(R, r, c)
   return z
 end
 
@@ -694,8 +693,7 @@ end
 ###############################################################################
 
 function (x::AcbMatrixSpace)()
-  z = AcbMatrix(nrows(x), ncols(x))
-  z.base_ring = x.base_ring
+  z = AcbMatrix(base_ring(x), nrows(x), ncols(x))
   return z
 end
 
@@ -840,8 +838,7 @@ function zero_matrix(R::AcbField, r::Int, c::Int)
   if r < 0 || c < 0
     error("dimensions must not be negative")
   end
-  z = AcbMatrix(r, c)
-  z.base_ring = R
+  z = AcbMatrix(R, r, c)
   return z
 end
 
@@ -855,9 +852,7 @@ function identity_matrix(R::AcbField, n::Int)
   if n < 0
     error("dimension must not be negative")
   end
-  z = one!(AcbMatrix(n, n))
-  z.base_ring = R
-  return z
+  return one!(AcbMatrix(R, n, n))
 end
 
 ################################################################################
