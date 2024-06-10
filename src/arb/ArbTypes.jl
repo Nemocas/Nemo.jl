@@ -796,6 +796,9 @@ mutable struct RealMat <: MatElem{RealFieldElem}
   rows::Ptr{Nothing}
   #base_ring::ArbField
 
+  # MatElem interface
+  RealMat(::RealField, r::Int, c::Int) = RealMat(r, c)
+
   function RealMat(r::Int, c::Int)
     z = new()
     ccall((:arb_mat_init, libflint), Nothing, (Ref{RealMat}, Int, Int), z, r, c)
@@ -887,6 +890,13 @@ mutable struct ArbMatrix <: MatElem{ArbFieldElem}
   c::Int
   rows::Ptr{Nothing}
   base_ring::ArbField
+
+  # MatElem interface
+  function ArbMatrix(R::ArbField, r::Int, c::Int)
+    z = ArbMatrix(r, c)
+    z.base_ring = R
+    return z
+  end
 
   function ArbMatrix(r::Int, c::Int)
     z = new()
@@ -983,6 +993,9 @@ mutable struct ComplexMat <: MatElem{ComplexFieldElem}
   c::Int
   rows::Ptr{Nothing}
   #base_ring::AcbField
+
+  # MatElem interface
+  ComplexMat(::ComplexField, r::Int, c::Int) = ComplexMat(r, c)
 
   function ComplexMat(r::Int, c::Int)
     z = new()
@@ -1185,6 +1198,13 @@ mutable struct AcbMatrix <: MatElem{AcbFieldElem}
   c::Int
   rows::Ptr{Nothing}
   base_ring::AcbField
+
+  # MatElem interface
+  function AcbMatrix(R::AcbField, r::Int, c::Int)
+    z = AcbMatrix(r, c)
+    z.base_ring = R
+    return z
+  end
 
   function AcbMatrix(r::Int, c::Int)
     z = new()
