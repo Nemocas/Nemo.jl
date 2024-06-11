@@ -1330,7 +1330,7 @@ function convert(R::Type{Rational{T}}, a::ZZRingElem) where T <: Integer
   return R(T(a))
 end
 
-@inline __get_rounding_mode() = Base.MPFR.rounding_raw(BigFloat)
+@inline __get_rounding_mode() = Base.Rounding.rounding_raw(BigFloat)
 
 function BigFloat(a::QQFieldElem)
   r = BigFloat(0)

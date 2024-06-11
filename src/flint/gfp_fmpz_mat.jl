@@ -31,7 +31,7 @@ end
 ################################################################################
 
 function getindex!(v::FpFieldElem, a::FpMatrix, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   GC.@preserve a begin
     z = mat_entry_ptr(a, i, j)
     ccall((:fmpz_mod_set_fmpz, libflint), Nothing,
@@ -50,18 +50,18 @@ end
 end
 
 @inline function getindex(a::FpMatrix, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   return FpFieldElem(getindex_raw(a, i, j), base_ring(a)) # no reduction needed
 end
 
 @inline function setindex!(a::FpMatrix, u::ZZRingElem, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   R = base_ring(a)
   setindex_raw!(a, mod(u, R.n), i, j)
 end
 
 @inline function setindex!(a::FpMatrix, u::FpFieldElem, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   (base_ring(a) != parent(u)) && error("Parent objects must coincide")
   setindex_raw!(a, u.data, i, j) # no reduction needed
 end
@@ -117,7 +117,7 @@ function iszero(a::FpMatrix)
 end
 
 @inline function is_zero_entry(A::FpMatrix, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(A, i, j)
+  @boundscheck _checkbounds(A, i, j)
   GC.@preserve A begin
     x = mat_entry_ptr(A, i, j)
     return ccall((:fmpz_is_zero, libflint), Bool, (Ptr{ZZRingElem},), x)
@@ -144,7 +144,7 @@ end
 ################################################################################
 
 function Generic.add_one!(a::FpMatrix, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   GC.@preserve a begin
     x = mat_entry_ptr(a, i, j)
     ccall((:fmpz_mod_add_si, libflint), Nothing,
@@ -424,7 +424,7 @@ end
 #
 ################################################################################
 
-function lu!(P::Generic.Perm, x::FpMatrix)
+function lu!(P::Perm, x::FpMatrix)
   P.d .-= 1
 
   rank = ccall((:fmpz_mod_mat_lu, libflint), Int,

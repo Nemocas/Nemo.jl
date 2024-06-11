@@ -197,7 +197,7 @@ function denominator(a::AbsSimpleNumFieldElem)
 end
 
 function elem_from_mat_row(a::AbsSimpleNumField, b::ZZMatrix, i::Int, d::ZZRingElem)
-  Generic._checkbounds(nrows(b), i) || throw(BoundsError())
+  _checkbounds(nrows(b), i) || throw(BoundsError())
   ncols(b) == degree(a) || error("Wrong number of columns")
   z = a()
   ccall((:nf_elem_set_fmpz_mat_row, libflint), Nothing,

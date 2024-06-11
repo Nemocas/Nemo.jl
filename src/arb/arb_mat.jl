@@ -46,7 +46,7 @@ function getindex!(z::ArbFieldElem, x::ArbMatrix, r::Int, c::Int)
 end
 
 @inline function getindex(x::ArbMatrix, r::Int, c::Int)
-  @boundscheck Generic._checkbounds(x, r, c)
+  @boundscheck _checkbounds(x, r, c)
 
   z = base_ring(x)()
   GC.@preserve x begin
@@ -60,7 +60,7 @@ end
 for T in [Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AbstractString]
   @eval begin
     @inline function setindex!(x::ArbMatrix, y::$T, r::Int, c::Int)
-      @boundscheck Generic._checkbounds(x, r, c)
+      @boundscheck _checkbounds(x, r, c)
 
       GC.@preserve x begin
         z = ccall((:arb_mat_entry_ptr, libflint), Ptr{ArbFieldElem},
@@ -495,7 +495,7 @@ function cholesky(x::ArbMatrix)
   return z
 end
 
-function lu!(P::Generic.Perm, x::ArbMatrix)
+function lu!(P::Perm, x::ArbMatrix)
   parent(P).n != nrows(x) && error("Permutation does not match matrix")
   P.d .-= 1
   r = ccall((:arb_mat_lu, libflint), Cint,
@@ -515,7 +515,7 @@ function _solve!(z::ArbMatrix, x::ArbMatrix, y::ArbMatrix)
   nothing
 end
 
-function _solve_lu_precomp!(z::ArbMatrix, P::Generic.Perm, LU::ArbMatrix, y::ArbMatrix)
+function _solve_lu_precomp!(z::ArbMatrix, P::Perm, LU::ArbMatrix, y::ArbMatrix)
   Q = inv(P)
   ccall((:arb_mat_solve_lu_precomp, libflint), Nothing,
         (Ref{ArbMatrix}, Ptr{Int}, Ref{ArbMatrix}, Ref{ArbMatrix}, Int),
@@ -523,7 +523,7 @@ function _solve_lu_precomp!(z::ArbMatrix, P::Generic.Perm, LU::ArbMatrix, y::Arb
   nothing
 end
 
-function _solve_lu_precomp(P::Generic.Perm, LU::ArbMatrix, y::ArbMatrix)
+function _solve_lu_precomp(P::Perm, LU::ArbMatrix, y::ArbMatrix)
   ncols(LU) != nrows(y) && error("Matrix dimensions are wrong")
   z = similar(y)
   _solve_lu_precomp!(z, P, LU, y)
@@ -579,7 +579,7 @@ function Solve._init_reduce(C::Solve.SolveCtx{ArbFieldElem})
   nrows(C) != ncols(C) && error("Only implemented for square matrices")
 
   A = matrix(C)
-  P = Generic.Perm(nrows(C))
+  P = Perm(nrows(C))
   x = similar(A, nrows(A), ncols(A))
   P.d .-= 1
   fl = ccall((:arb_mat_lu, libflint), Cint,
@@ -602,7 +602,7 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{ArbFieldElem})
   nrows(C) != ncols(C) && error("Only implemented for square matrices")
 
   A = transpose(matrix(C))
-  P = Generic.Perm(nrows(C))
+  P = Perm(nrows(C))
   x = similar(A, nrows(A), ncols(A))
   P.d .-= 1
   fl = ccall((:arb_mat_lu, libflint), Cint,
@@ -654,8 +654,8 @@ end
 ################################################################################
 
 function swap_rows(x::ArbMatrix, i::Int, j::Int)
-  Generic._checkbounds(nrows(x), i) || throw(BoundsError())
-  Generic._checkbounds(nrows(x), j) || throw(BoundsError())
+  _checkbounds(nrows(x), i) || throw(BoundsError())
+  _checkbounds(nrows(x), j) || throw(BoundsError())
   z = deepcopy(x)
   swap_rows!(z, i, j)
   return z

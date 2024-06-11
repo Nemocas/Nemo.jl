@@ -43,7 +43,7 @@ function getindex!(z::ArbFieldElem, x::RealMat, r::Int, c::Int)
 end
 
 @inline function getindex(x::RealMat, r::Int, c::Int)
-  @boundscheck Generic._checkbounds(x, r, c)
+  @boundscheck _checkbounds(x, r, c)
 
   z = base_ring(x)()
   GC.@preserve x begin
@@ -57,7 +57,7 @@ end
 for T in [Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, AbstractString]
   @eval begin
     @inline function setindex!(x::RealMat, y::$T, r::Int, c::Int)
-      @boundscheck Generic._checkbounds(x, r, c)
+      @boundscheck _checkbounds(x, r, c)
 
       GC.@preserve x begin
         z = ccall((:arb_mat_entry_ptr, libflint), Ptr{RealFieldElem},
@@ -482,7 +482,7 @@ end
 #
 ###############################################################################
 
-function lu!(P::Generic.Perm, x::RealMat)
+function lu!(P::Perm, x::RealMat)
   parent(P).n != nrows(x) && error("Permutation does not match matrix")
   P.d .-= 1
   r = ccall((:arb_mat_lu, libflint), Cint,
@@ -502,7 +502,7 @@ function _solve!(z::RealMat, x::RealMat, y::RealMat)
   nothing
 end
 
-function _solve_lu_precomp!(z::RealMat, P::Generic.Perm, LU::RealMat, y::RealMat)
+function _solve_lu_precomp!(z::RealMat, P::Perm, LU::RealMat, y::RealMat)
   Q = inv(P)
   ccall((:arb_mat_solve_lu_precomp, libflint), Nothing,
         (Ref{RealMat}, Ptr{Int}, Ref{RealMat}, Ref{RealMat}, Int),
@@ -510,7 +510,7 @@ function _solve_lu_precomp!(z::RealMat, P::Generic.Perm, LU::RealMat, y::RealMat
   nothing
 end
 
-function _solve_lu_precomp(P::Generic.Perm, LU::RealMat, y::RealMat)
+function _solve_lu_precomp(P::Perm, LU::RealMat, y::RealMat)
   ncols(LU) != nrows(y) && error("Matrix dimensions are wrong")
   z = similar(y)
   _solve_lu_precomp!(z, P, LU, y)
@@ -552,7 +552,7 @@ function Solve._init_reduce(C::Solve.SolveCtx{RealFieldElem})
   nrows(C) != ncols(C) && error("Only implemented for square matrices")
 
   A = matrix(C)
-  P = Generic.Perm(nrows(C))
+  P = Perm(nrows(C))
   x = similar(A, nrows(A), ncols(A))
   P.d .-= 1
   fl = ccall((:arb_mat_lu, libflint), Cint,
@@ -575,7 +575,7 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{RealFieldElem})
   nrows(C) != ncols(C) && error("Only implemented for square matrices")
 
   A = transpose(matrix(C))
-  P = Generic.Perm(nrows(C))
+  P = Perm(nrows(C))
   x = similar(A, nrows(A), ncols(A))
   P.d .-= 1
   fl = ccall((:arb_mat_lu, libflint), Cint,
@@ -627,8 +627,8 @@ end
 ################################################################################
 
 function swap_rows(x::RealMat, i::Int, j::Int)
-  Generic._checkbounds(nrows(x), i) || throw(BoundsError())
-  Generic._checkbounds(nrows(x), j) || throw(BoundsError())
+  _checkbounds(nrows(x), i) || throw(BoundsError())
+  _checkbounds(nrows(x), j) || throw(BoundsError())
   z = deepcopy(x)
   swap_rows!(z, i, j)
   return z

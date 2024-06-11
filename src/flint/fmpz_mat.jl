@@ -41,8 +41,8 @@ zero(m::ZZMatrix, R::ZZRing, r::Int, c::Int) = similar(m, R, r, c)
 
 function _checkrange_or_empty(l::Int, start::Int, stop::Int)
   (stop < start) ||
-  (Generic._checkbounds(l, start) &&
-   Generic._checkbounds(l, stop))
+  (_checkbounds(l, start) &&
+   _checkbounds(l, stop))
 end
 
 function Base.view(x::ZZMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
@@ -117,7 +117,7 @@ function getindex!(v::ZZRingElem, a::ZZMatrix, r::Int, c::Int)
 end
 
 @inline function getindex(a::ZZMatrix, r::Int, c::Int)
-  @boundscheck Generic._checkbounds(a, r, c)
+  @boundscheck _checkbounds(a, r, c)
   v = ZZRingElem()
   GC.@preserve a begin
     z = mat_entry_ptr(a, r, c)
@@ -127,7 +127,7 @@ end
 end
 
 @inline function setindex!(a::ZZMatrix, d::ZZRingElem, r::Int, c::Int)
-  @boundscheck Generic._checkbounds(a, r, c)
+  @boundscheck _checkbounds(a, r, c)
   GC.@preserve a begin
     z = mat_entry_ptr(a, r, c)
     set!(z, d)
@@ -137,7 +137,7 @@ end
 @inline setindex!(a::ZZMatrix, d::Integer, r::Int, c::Int) = setindex!(a, ZZRingElem(d), r, c)
 
 @inline function setindex!(a::ZZMatrix, d::Int, r::Int, c::Int)
-  @boundscheck Generic._checkbounds(a, r, c)
+  @boundscheck _checkbounds(a, r, c)
   GC.@preserve a begin
     z = mat_entry_ptr(a, r, c)
     set!(z, d)
@@ -163,7 +163,7 @@ isone(a::ZZMatrix) = ccall((:fmpz_mat_is_one, libflint), Bool,
                            (Ref{ZZMatrix},), a)
 
 @inline function is_zero_entry(A::ZZMatrix, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(A, i, j)
+  @boundscheck _checkbounds(A, i, j)
   GC.@preserve A begin
     x = mat_entry_ptr(A, i, j)
     return ccall((:fmpz_is_zero, libflint), Bool, (Ptr{ZZRingElem},), x)
@@ -1904,7 +1904,7 @@ function mul!(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::ZZMatrix)
 end
 
 function Generic.add_one!(a::ZZMatrix, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   GC.@preserve a begin
     x = mat_entry_ptr(a, i, j)
     ccall((:fmpz_add_si, libflint), Nothing,

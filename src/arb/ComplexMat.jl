@@ -43,7 +43,7 @@ function getindex!(z::ComplexFieldElem, x::ComplexMat, r::Int, c::Int)
 end
 
 @inline function getindex(x::ComplexMat, r::Int, c::Int)
-  @boundscheck Generic._checkbounds(x, r, c)
+  @boundscheck _checkbounds(x, r, c)
 
   z = base_ring(x)()
   GC.@preserve x begin
@@ -57,7 +57,7 @@ end
 for T in [Integer, Float64, ZZRingElem, QQFieldElem, RealFieldElem, BigFloat, ComplexFieldElem, AbstractString]
   @eval begin
     @inline function setindex!(x::ComplexMat, y::$T, r::Int, c::Int)
-      @boundscheck Generic._checkbounds(x, r, c)
+      @boundscheck _checkbounds(x, r, c)
 
       GC.@preserve x begin
         z = ccall((:acb_mat_entry_ptr, libflint), Ptr{ComplexFieldElem},
@@ -75,7 +75,7 @@ setindex!(x, QQFieldElem(y), r, c)
 for T in [Integer, Float64, ZZRingElem, QQFieldElem, RealFieldElem, BigFloat, AbstractString]
   @eval begin
     @inline function setindex!(x::ComplexMat, y::Tuple{$T, $T}, r::Int, c::Int)
-      @boundscheck Generic._checkbounds(x, r, c)
+      @boundscheck _checkbounds(x, r, c)
 
       GC.@preserve x begin
         z = ccall((:acb_mat_entry_ptr, libflint), Ptr{ComplexFieldElem},
@@ -541,7 +541,7 @@ end
 #
 ###############################################################################
 
-function lu!(P::Generic.Perm, x::ComplexMat)
+function lu!(P::Perm, x::ComplexMat)
   P.d .-= 1
   r = ccall((:acb_mat_lu, libflint), Cint,
             (Ptr{Int}, Ref{ComplexMat}, Ref{ComplexMat}, Int),
@@ -560,7 +560,7 @@ function _solve!(z::ComplexMat, x::ComplexMat, y::ComplexMat)
   nothing
 end
 
-function _solve_lu_precomp!(z::ComplexMat, P::Generic.Perm, LU::ComplexMat, y::ComplexMat)
+function _solve_lu_precomp!(z::ComplexMat, P::Perm, LU::ComplexMat, y::ComplexMat)
   Q = inv(P)
   ccall((:acb_mat_solve_lu_precomp, libflint), Nothing,
         (Ref{ComplexMat}, Ptr{Int}, Ref{ComplexMat}, Ref{ComplexMat}, Int),
@@ -568,7 +568,7 @@ function _solve_lu_precomp!(z::ComplexMat, P::Generic.Perm, LU::ComplexMat, y::C
   nothing
 end
 
-function _solve_lu_precomp(P::Generic.Perm, LU::ComplexMat, y::ComplexMat)
+function _solve_lu_precomp(P::Perm, LU::ComplexMat, y::ComplexMat)
   ncols(LU) != nrows(y) && error("Matrix dimensions are wrong")
   z = similar(y)
   _solve_lu_precomp!(z, P, LU, y)
@@ -610,7 +610,7 @@ function Solve._init_reduce(C::Solve.SolveCtx{ComplexFieldElem})
   nrows(C) != ncols(C) && error("Only implemented for square matrices")
 
   A = matrix(C)
-  P = Generic.Perm(nrows(C))
+  P = Perm(nrows(C))
   x = similar(A, nrows(A), ncols(A))
   P.d .-= 1
   fl = ccall((:acb_mat_lu, libflint), Cint,
@@ -633,7 +633,7 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{ComplexFieldElem})
   nrows(C) != ncols(C) && error("Only implemented for square matrices")
 
   A = transpose(matrix(C))
-  P = Generic.Perm(nrows(C))
+  P = Perm(nrows(C))
   x = similar(A, nrows(A), ncols(A))
   P.d .-= 1
   fl = ccall((:acb_mat_lu, libflint), Cint,
@@ -685,8 +685,8 @@ end
 ################################################################################
 
 function swap_rows(x::ComplexMat, i::Int, j::Int)
-  Generic._checkbounds(nrows(x), i) || throw(BoundsError())
-  Generic._checkbounds(nrows(x), j) || throw(BoundsError())
+  _checkbounds(nrows(x), i) || throw(BoundsError())
+  _checkbounds(nrows(x), j) || throw(BoundsError())
   z = deepcopy(x)
   swap_rows!(z, i, j)
   return z

@@ -42,7 +42,7 @@ zero(m::zzModMatrix, R::zzModRing, r::Int, c::Int) = similar(m, R, r, c)
 ################################################################################
 
 @inline function getindex(a::zzModMatrix, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   u = ccall((:nmod_mat_get_entry, libflint), UInt,
             (Ref{zzModMatrix}, Int, Int), a, i - 1 , j - 1)
   return zzModRingElem(u, base_ring(a)) # no reduction needed
@@ -55,18 +55,18 @@ function getindex_raw(a::T, i::Int, j::Int) where T <: Zmodn_mat
 end
 
 @inline function setindex!(a::T, u::UInt, i::Int, j::Int) where T <: Zmodn_mat
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   R = base_ring(a)
   setindex_raw!(a, mod(u, R.n), i, j)
 end
 
 @inline function setindex!(a::T, u::ZZRingElem, i::Int, j::Int) where T <: Zmodn_mat
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   setindex_raw!(a, u, i, j)
 end
 
 @inline function setindex!(a::zzModMatrix, u::zzModRingElem, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   (base_ring(a) != parent(u)) && error("Parent objects must coincide")
   setindex_raw!(a, u.data, i, j) # no reduction necessary
 end
@@ -300,7 +300,7 @@ function mul!(A::fpMatrix, B::fpFieldElem, D::fpMatrix)
 end
 
 function Generic.add_one!(a::zzModMatrix, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   x = ccall((:nmod_mat_get_entry, libflint), UInt,
             (Ref{zzModMatrix}, Int, Int), a, i - 1, j - 1)
   x += 1
@@ -543,7 +543,7 @@ end
 #
 ################################################################################
 
-function lu!(P::Generic.Perm, x::T) where T <: Zmodn_mat
+function lu!(P::Perm, x::T) where T <: Zmodn_mat
   P.d .-= 1
 
   rank = Int(ccall((:nmod_mat_lu, libflint), Cint, (Ptr{Int}, Ref{T}, Cint),

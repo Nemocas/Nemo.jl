@@ -73,7 +73,7 @@ function Solve._init_reduce(C::Solve.SolveCtx{T}) where {T <: Union{fpFieldElem,
   end
 
   LU = deepcopy(matrix(C))
-  p = Generic.Perm(1:nrows(LU))
+  p = Perm(1:nrows(LU))
   r = lu!(p, LU)
 
   Solve.set_rank!(C, r)
@@ -94,7 +94,7 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{T}) where {T <: Union{fp
   end
 
   LU = transpose(matrix(C))
-  p = Generic.Perm(1:nrows(LU))
+  p = Perm(1:nrows(LU))
   r = lu!(p, LU)
 
   Solve.set_rank!(C, r)

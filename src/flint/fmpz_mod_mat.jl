@@ -40,7 +40,7 @@ end
 ################################################################################
 
 @inline function getindex(a::T, i::Int, j::Int) where T <: Zmod_fmpz_mat
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   u = ZZRingElem()
   ccall((:fmpz_mod_mat_get_entry, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{T}, Int, Int, Ref{fmpz_mod_ctx_struct}),
@@ -58,13 +58,13 @@ function getindex_raw(a::T, i::Int, j::Int) where T <: Zmod_fmpz_mat
 end
 
 @inline function setindex!(a::T, u::ZZRingElem, i::Int, j::Int) where T <: Zmod_fmpz_mat
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   R = base_ring(a)
   setindex_raw!(a, _reduce(u, R.ninv), i, j)
 end
 
 @inline function setindex!(a::T, u::ZZModRingElem, i::Int, j::Int) where T <: Zmod_fmpz_mat
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   (base_ring(a) != parent(u)) && error("Parent objects must coincide")
   setindex_raw!(a, u.data, i, j) # no reduction needed
 end
@@ -290,7 +290,7 @@ function mul!(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::T) where T <: Zmo
 end
 
 function Generic.add_one!(a::ZZModMatrix, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   GC.@preserve a begin
     x = mat_entry_ptr(a, i, j)
     ccall((:fmpz_mod_add_si, libflint), Nothing,
@@ -536,7 +536,7 @@ end
 
 #= Not implemented in Flint yet
 
-function lu!(P::Generic.Perm, x::T) where T <: Zmod_fmpz_mat
+function lu!(P::Perm, x::T) where T <: Zmod_fmpz_mat
 P.d .-= 1
 
 rank = Int(ccall((:fmpz_mod_mat_lu, libflint), Cint, (Ptr{Int}, Ref{T}, Cint),

@@ -37,7 +37,7 @@ zero(m::FqPolyRepMatrix, R::FqPolyRepField, r::Int, c::Int) = FqPolyRepMatrix(r,
 ################################################################################
 
 function getindex!(v::FqPolyRepFieldElem, a::FqPolyRepMatrix, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   GC.@preserve a begin
     z = mat_entry_ptr(a, i, j)
     ccall((:fq_set, libflint), Nothing,
@@ -47,7 +47,7 @@ function getindex!(v::FqPolyRepFieldElem, a::FqPolyRepMatrix, i::Int, j::Int)
 end
 
 @inline function getindex(a::FqPolyRepMatrix, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   GC.@preserve a begin
     el = mat_entry_ptr(a, i, j)
     z = base_ring(a)()
@@ -57,14 +57,14 @@ end
 end
 
 @inline function setindex!(a::FqPolyRepMatrix, u::FqPolyRepFieldElem, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   ccall((:fq_mat_entry_set, libflint), Nothing,
         (Ref{FqPolyRepMatrix}, Int, Int, Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}),
         a, i - 1, j - 1, u, base_ring(a))
 end
 
 @inline function setindex!(a::FqPolyRepMatrix, u::ZZRingElem, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   GC.@preserve a begin
     el = mat_entry_ptr(a, i, j)
     ccall((:fq_set_fmpz, libflint), Nothing,
@@ -108,7 +108,7 @@ function iszero(a::FqPolyRepMatrix)
 end
 
 @inline function is_zero_entry(A::FqPolyRepMatrix, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(A, i, j)
+  @boundscheck _checkbounds(A, i, j)
   GC.@preserve A begin
     x = mat_entry_ptr(A, i, j)
     return ccall((:fq_is_zero, libflint), Bool,
@@ -300,7 +300,7 @@ function mul!(z::Vector{FqPolyRepFieldElem}, a::Vector{FqPolyRepFieldElem}, b::F
 end
 
 function Generic.add_one!(a::FqPolyRepMatrix, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   F = base_ring(a)
   GC.@preserve a begin
     x = mat_entry_ptr(a, i, j)
@@ -495,7 +495,7 @@ end
 #
 ################################################################################
 
-function lu!(P::Generic.Perm, x::FqPolyRepMatrix)
+function lu!(P::Perm, x::FqPolyRepMatrix)
   P.d .-= 1
 
   rank = Int(ccall((:fq_mat_lu, libflint), Cint,

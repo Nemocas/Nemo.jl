@@ -37,7 +37,7 @@ zero(m::FqMatrix, R::FqField, r::Int, c::Int) = FqMatrix(r, c, R)
 ################################################################################
 
 function getindex!(v::FqFieldElem, a::FqMatrix, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   ccall((:fq_default_mat_entry, libflint), Ptr{FqFieldElem},
         (Ref{FqFieldElem}, Ref{FqMatrix}, Int, Int, Ref{FqField}),
         v, a, i - 1 , j - 1, base_ring(a))
@@ -45,7 +45,7 @@ function getindex!(v::FqFieldElem, a::FqMatrix, i::Int, j::Int)
 end
 
 @inline function getindex(a::FqMatrix, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   z = base_ring(a)()
   ccall((:fq_default_mat_entry, libflint), Ptr{FqFieldElem},
         (Ref{FqFieldElem}, Ref{FqMatrix}, Int, Int,
@@ -55,7 +55,7 @@ end
 end
 
 @inline function setindex!(a::FqMatrix, u::FqFieldElem, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   ccall((:fq_default_mat_entry_set, libflint), Nothing,
         (Ref{FqMatrix}, Int, Int, Ref{FqFieldElem}, Ref{FqField}),
         a, i - 1, j - 1, u, base_ring(a))
@@ -63,7 +63,7 @@ end
 end
 
 @inline function setindex!(a::FqMatrix, u::ZZRingElem, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   ccall((:fq_default_mat_entry_set_fmpz, libflint), Nothing,
         (Ref{FqMatrix}, Int, Int, Ref{ZZRingElem},
          Ref{FqField}),
@@ -115,7 +115,7 @@ function iszero(a::FqMatrix)
 end
 
 @inline function is_zero_entry(A::FqMatrix, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(A, i, j)
+  @boundscheck _checkbounds(A, i, j)
   GC.@preserve A begin
     x = fq_default_mat_entry_ptr(A, i, j)
     return ccall((:fq_default_is_zero, libflint), Bool,
@@ -289,7 +289,7 @@ function zero!(a::FqMatrix)
 end
 
 function Generic.add_one!(a::FqMatrix, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   F = base_ring(a)
   GC.@preserve a begin
     x = fq_default_mat_entry_ptr(a, i, j)
@@ -480,7 +480,7 @@ end
 #
 ################################################################################
 
-function lu!(P::Generic.Perm, x::FqMatrix)
+function lu!(P::Perm, x::FqMatrix)
   P.d .-= 1
 
   rank = Int(ccall((:fq_default_mat_lu, libflint), Cint,

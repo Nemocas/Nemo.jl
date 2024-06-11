@@ -46,7 +46,7 @@ function getindex!(z::AcbFieldElem, x::AcbMatrix, r::Int, c::Int)
 end
 
 @inline function getindex(x::AcbMatrix, r::Int, c::Int)
-  @boundscheck Generic._checkbounds(x, r, c)
+  @boundscheck _checkbounds(x, r, c)
 
   z = base_ring(x)()
   GC.@preserve x begin
@@ -60,7 +60,7 @@ end
 for T in [Integer, Float64, ZZRingElem, QQFieldElem, ArbFieldElem, BigFloat, AcbFieldElem, AbstractString]
   @eval begin
     @inline function setindex!(x::AcbMatrix, y::$T, r::Int, c::Int)
-      @boundscheck Generic._checkbounds(x, r, c)
+      @boundscheck _checkbounds(x, r, c)
 
       GC.@preserve x begin
         z = ccall((:acb_mat_entry_ptr, libflint), Ptr{AcbFieldElem},
@@ -78,7 +78,7 @@ setindex!(x, QQFieldElem(y), r, c)
 for T in [Integer, Float64, ZZRingElem, QQFieldElem, ArbFieldElem, BigFloat, AbstractString]
   @eval begin
     @inline function setindex!(x::AcbMatrix, y::Tuple{$T, $T}, r::Int, c::Int)
-      @boundscheck Generic._checkbounds(x, r, c)
+      @boundscheck _checkbounds(x, r, c)
 
       GC.@preserve x begin
         z = ccall((:acb_mat_entry_ptr, libflint), Ptr{AcbFieldElem},
@@ -544,7 +544,7 @@ end
 #
 ###############################################################################
 
-function lu!(P::Generic.Perm, x::AcbMatrix)
+function lu!(P::Perm, x::AcbMatrix)
   P.d .-= 1
   r = ccall((:acb_mat_lu, libflint), Cint,
             (Ptr{Int}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
@@ -563,7 +563,7 @@ function _solve!(z::AcbMatrix, x::AcbMatrix, y::AcbMatrix)
   nothing
 end
 
-function _solve_lu_precomp!(z::AcbMatrix, P::Generic.Perm, LU::AcbMatrix, y::AcbMatrix)
+function _solve_lu_precomp!(z::AcbMatrix, P::Perm, LU::AcbMatrix, y::AcbMatrix)
   Q = inv(P)
   ccall((:acb_mat_solve_lu_precomp, libflint), Nothing,
         (Ref{AcbMatrix}, Ptr{Int}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
@@ -571,7 +571,7 @@ function _solve_lu_precomp!(z::AcbMatrix, P::Generic.Perm, LU::AcbMatrix, y::Acb
   nothing
 end
 
-function _solve_lu_precomp(P::Generic.Perm, LU::AcbMatrix, y::AcbMatrix)
+function _solve_lu_precomp(P::Perm, LU::AcbMatrix, y::AcbMatrix)
   ncols(LU) != nrows(y) && error("Matrix dimensions are wrong")
   z = similar(y)
   _solve_lu_precomp!(z, P, LU, y)
@@ -613,7 +613,7 @@ function Solve._init_reduce(C::Solve.SolveCtx{AcbFieldElem})
   nrows(C) != ncols(C) && error("Only implemented for square matrices")
 
   A = matrix(C)
-  P = Generic.Perm(nrows(C))
+  P = Perm(nrows(C))
   x = similar(A, nrows(A), ncols(A))
   P.d .-= 1
   fl = ccall((:acb_mat_lu, libflint), Cint,
@@ -636,7 +636,7 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{AcbFieldElem})
   nrows(C) != ncols(C) && error("Only implemented for square matrices")
 
   A = transpose(matrix(C))
-  P = Generic.Perm(nrows(C))
+  P = Perm(nrows(C))
   x = similar(A, nrows(A), ncols(A))
   P.d .-= 1
   fl = ccall((:acb_mat_lu, libflint), Cint,
@@ -688,8 +688,8 @@ end
 ################################################################################
 
 function swap_rows(x::AcbMatrix, i::Int, j::Int)
-  Generic._checkbounds(nrows(x), i) || throw(BoundsError())
-  Generic._checkbounds(nrows(x), j) || throw(BoundsError())
+  _checkbounds(nrows(x), i) || throw(BoundsError())
+  _checkbounds(nrows(x), j) || throw(BoundsError())
   z = deepcopy(x)
   swap_rows!(z, i, j)
   return z

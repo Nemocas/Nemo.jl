@@ -36,14 +36,14 @@ zero(m::fpMatrix, R::fpField, r::Int, c::Int) = similar(m, R, r, c)
 getindex!(v::fpFieldElem, a::fpMatrix, i::Int, j::Int) = getindex(a, i, j)
 
 @inline function getindex(a::fpMatrix, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   u = ccall((:nmod_mat_get_entry, libflint), UInt,
             (Ref{fpMatrix}, Int, Int), a, i - 1 , j - 1)
   return fpFieldElem(u, base_ring(a)) # no reduction needed
 end
 
 @inline function setindex!(a::fpMatrix, u::fpFieldElem, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   (base_ring(a) != parent(u)) && error("Parent objects must coincide")
   setindex_raw!(a, u.data, i, j) # no reduction necessary
 end
@@ -74,7 +74,7 @@ function one(a::fpMatrixSpace)
 end
 
 @inline function is_zero_entry(A::fpMatrix, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(A, i, j)
+  @boundscheck _checkbounds(A, i, j)
   x = ccall((:nmod_mat_get_entry, libflint), UInt,
             (Ref{fpMatrix}, Int, Int), A, i - 1, j - 1)
   return x == 0
@@ -100,7 +100,7 @@ end
 ################################################################################
 
 function Generic.add_one!(a::fpMatrix, i::Int, j::Int)
-  @boundscheck Generic._checkbounds(a, i, j)
+  @boundscheck _checkbounds(a, i, j)
   x = ccall((:nmod_mat_get_entry, libflint), UInt,
             (Ref{fpMatrix}, Int, Int), a, i - 1, j - 1)
   x += 1
@@ -478,7 +478,7 @@ end
 #
 ################################################################################
 
-function lu!(P::Generic.Perm, x::fpMatrix)
+function lu!(P::Perm, x::fpMatrix)
   P.d .-= 1
 
   rank = ccall((:nmod_mat_lu, libflint), Int,
