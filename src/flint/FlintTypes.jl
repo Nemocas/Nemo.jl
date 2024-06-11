@@ -2676,7 +2676,7 @@ mutable struct FqPolyRepFieldElem <: FinFieldElem
           (Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}), d, ctx)
     finalizer(_fq_clear_fn, d)
     ccall((:fq_set_fmpz_mod_poly, libflint), Nothing,
-          (Ref{Nemo.FqPolyRepFieldElem}, Ref{Nemo.FpPolyRingElem}, Ref{FqPolyRepField}),
+          (Ref{FqPolyRepFieldElem}, Ref{FpPolyRingElem}, Ref{FqPolyRepField}),
           d, x, ctx)
     d.parent = ctx
     return d

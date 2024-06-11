@@ -468,7 +468,7 @@ function gcd_with_cofactors(a::QQMPolyRingElem, b::QQMPolyRingElem)
   z = parent(a)()
   abar = parent(a)()
   bbar = parent(a)()
-  r = ccall((:fmpq_mpoly_gcd_cofactors, Nemo.libflint), Cint,
+  r = ccall((:fmpq_mpoly_gcd_cofactors, libflint), Cint,
             (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem},
              Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
             z, abar, bbar, a, b, a.parent)

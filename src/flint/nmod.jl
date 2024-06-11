@@ -107,7 +107,7 @@ function show(io::IO, R::zzModRing)
   end
 end
 
-function expressify(a::Nemo.zzModRingElem; context = nothing)
+function expressify(a::zzModRingElem; context = nothing)
   return a.data
 end
 

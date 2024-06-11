@@ -841,7 +841,7 @@ function Base.maximum(::typeof(nbits), M::ZZMatrix)
         #this is not going through the "correct" order of the rows, but 
         #for this is does not matter
         if !iszero(unsafe_load(reinterpret(Ptr{Int}, M_ptr)))
-          mx = max(mx, ccall((:fmpz_bits, Nemo.libflint), Culong, (Ptr{ZZRingElem},), M_ptr))
+          mx = max(mx, ccall((:fmpz_bits, libflint), Culong, (Ptr{ZZRingElem},), M_ptr))
         end
         M_ptr += sizeof(ZZRingElem)
       end
@@ -1669,17 +1669,17 @@ function _solve_triu_left(U::ZZMatrix, b::ZZMatrix)
         tmp_p += sizeof(ZZRingElem)
       end
       for j = 1:n
-        ccall((:fmpz_zero, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, ), s) 
+        ccall((:fmpz_zero, libflint), Cvoid, (Ref{ZZRingElem}, ), s) 
 
         tmp_p = mat_entry_ptr(tmp, 1, 1)
         for k = 1:j-1
           U_p = mat_entry_ptr(U, k, j)
-          ccall((:fmpz_addmul, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}), s, U_p, tmp_p)
+          ccall((:fmpz_addmul, libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}), s, U_p, tmp_p)
           tmp_p += sizeof(ZZRingElem)
         end
-        ccall((:fmpz_sub, Nemo.libflint), Cvoid, 
+        ccall((:fmpz_sub, libflint), Cvoid, 
               (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), s, mat_entry_ptr(b, i, j), s)
-        ccall((:fmpz_divexact, Nemo.libflint), Cvoid, 
+        ccall((:fmpz_divexact, libflint), Cvoid, 
               (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), mat_entry_ptr(tmp, 1, j), s, mat_entry_ptr(U, j, j))
       end
       tmp_p = mat_entry_ptr(tmp, 1, 1)
@@ -1710,20 +1710,20 @@ function _solve_triu(U::ZZMatrix, b::ZZMatrix)
         tmp_ptr += sizeof(ZZRingElem)
       end
       for j = n:-1:1
-        ccall((:fmpz_zero, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, ), s)
+        ccall((:fmpz_zero, libflint), Cvoid, (Ref{ZZRingElem}, ), s)
         tmp_ptr = mat_entry_ptr(tmp, 1, j+1)
         for k = j + 1:n
           U_ptr = mat_entry_ptr(U, j, k)
-          ccall((:fmpz_addmul, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}), s, U_ptr, tmp_ptr)
+          ccall((:fmpz_addmul, libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}), s, U_ptr, tmp_ptr)
           tmp_ptr += sizeof(ZZRingElem)
           #           s = addmul!(s, U[j, k], tmp[k])
         end
         b_ptr = mat_entry_ptr(b, j, i)
-        ccall((:fmpz_sub, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), s, b_ptr, s)
+        ccall((:fmpz_sub, libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), s, b_ptr, s)
         #         s = b[j, i] - s
         tmp_ptr = mat_entry_ptr(tmp, 1, j)
         U_ptr = mat_entry_ptr(U, j, j)
-        ccall((:fmpz_divexact, Nemo.libflint), Cvoid, (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), tmp_ptr, s, U_ptr)
+        ccall((:fmpz_divexact, libflint), Cvoid, (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), tmp_ptr, s, U_ptr)
 
         #           tmp[j] = divexact(s, U[j,j])
       end

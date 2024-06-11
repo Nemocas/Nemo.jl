@@ -1094,7 +1094,7 @@ which is only defined for $D < 0$ and $D \equiv 0, 1 \pmod 4$.
 function hilbert_class_polynomial(D::Int, R::ZZPolyRing)
   D < 0 && mod(D, 4) < 2 || throw(ArgumentError("$D is not a negative discriminant"))
   z = R()
-  ccall((:acb_modular_hilbert_class_poly, Nemo.libflint), Nothing,
+  ccall((:acb_modular_hilbert_class_poly, libflint), Nothing,
         (Ref{ZZPolyRingElem}, Int),
         z, D)
   return z

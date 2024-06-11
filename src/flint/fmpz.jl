@@ -1683,12 +1683,12 @@ end
 function _factor_trial_range(N::ZZRingElem, start::Int = 0, np::Int = 10^5)
   F = fmpz_factor()
   ccall((:fmpz_factor_trial_range, libflint), Nothing,
-        (Ref{Nemo.fmpz_factor}, Ref{ZZRingElem}, UInt, UInt), F, N, start, np)
+        (Ref{fmpz_factor}, Ref{ZZRingElem}, UInt, UInt), F, N, start, np)
   res = Dict{ZZRingElem, Int}()
   for i in 1:F.num
     z = ZZRingElem()
     ccall((:fmpz_factor_get_fmpz, libflint), Nothing,
-          (Ref{ZZRingElem}, Ref{Nemo.fmpz_factor}, Int), z, F, i - 1)
+          (Ref{ZZRingElem}, Ref{fmpz_factor}, Int), z, F, i - 1)
     res[z] = unsafe_load(F.exp, i)
   end
   return res, canonical_unit(N)
@@ -2657,7 +2657,7 @@ function add!(z::ZZRingElem, a::ZZRingElem, b::UInt)
 end
 
 function add!(a::ZZRingElem, b::ZZRingElem, c::Ptr{Int})
-  ccall((:fmpz_add, Nemo.libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ptr{Int}), a, b, c)
+  ccall((:fmpz_add, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ptr{Int}), a, b, c)
   return a
 end
 
@@ -2730,7 +2730,7 @@ mul!(z::ZZRingElem, a::ZZRingElem, b::Integer) = mul!(z, a, ZZRingElem(b))
 mul!(z::ZZRingElem, x::Int, y::ZZRingElem) = mul!(z, y, x)
 
 function mul!(a::ZZRingElem, b::ZZRingElem, c::Ptr{Int})
-  ccall((:fmpz_mul, Nemo.libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ptr{Int}), a, b, c)
+  ccall((:fmpz_mul, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ptr{Int}), a, b, c)
   return a
 end
 

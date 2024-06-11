@@ -65,7 +65,7 @@ for T in [Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, A
       GC.@preserve x begin
         z = ccall((:arb_mat_entry_ptr, libflint), Ptr{ArbFieldElem},
                   (Ref{ArbMatrix}, Int, Int), x, r - 1, c - 1)
-        Nemo._arb_set(z, y, precision(base_ring(x)))
+        _arb_set(z, y, precision(base_ring(x)))
       end
     end
   end

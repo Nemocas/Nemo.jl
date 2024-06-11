@@ -62,7 +62,7 @@ for T in [Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, 
       GC.@preserve x begin
         z = ccall((:arb_mat_entry_ptr, libflint), Ptr{RealFieldElem},
                   (Ref{RealMat}, Int, Int), x, r - 1, c - 1)
-        Nemo._arb_set(z, y, precision(Balls))
+        _arb_set(z, y, precision(Balls))
       end
     end
   end

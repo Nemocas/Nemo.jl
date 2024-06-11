@@ -823,7 +823,7 @@ mutable struct RealMat <: MatElem{RealFieldElem}
       for j = 1:c
         el = ccall((:arb_mat_entry_ptr, libflint), Ptr{RealFieldElem},
                    (Ref{RealMat}, Int, Int), z, i - 1, j - 1)
-        Nemo._arb_set(el, arr[i, j])
+        _arb_set(el, arr[i, j])
       end
     end
     return z
@@ -835,7 +835,7 @@ mutable struct RealMat <: MatElem{RealFieldElem}
       for j = 1:c
         el = ccall((:arb_mat_entry_ptr, libflint), Ptr{RealFieldElem},
                    (Ref{RealMat}, Int, Int), z, i - 1, j - 1)
-        Nemo._arb_set(el, arr[(i-1)*c+j])
+        _arb_set(el, arr[(i-1)*c+j])
       end
     end
     return z
@@ -915,7 +915,7 @@ mutable struct ArbMatrix <: MatElem{ArbFieldElem}
       for j = 1:c
         el = ccall((:arb_mat_entry_ptr, libflint), Ptr{ArbFieldElem},
                    (Ref{ArbMatrix}, Int, Int), z, i - 1, j - 1)
-        Nemo._arb_set(el, arr[i, j])
+        _arb_set(el, arr[i, j])
       end
     end
     return z
@@ -927,7 +927,7 @@ mutable struct ArbMatrix <: MatElem{ArbFieldElem}
       for j = 1:c
         el = ccall((:arb_mat_entry_ptr, libflint), Ptr{ArbFieldElem},
                    (Ref{ArbMatrix}, Int, Int), z, i - 1, j - 1)
-        Nemo._arb_set(el, arr[(i-1)*c+j])
+        _arb_set(el, arr[(i-1)*c+j])
       end
     end
     return z

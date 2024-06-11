@@ -402,7 +402,7 @@ function gcd_with_cofactors(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem
   z = parent(a)()
   abar = parent(a)()
   bbar = parent(a)()
-  r = ccall((:fq_nmod_mpoly_gcd_cofactors, Nemo.libflint), Cint,
+  r = ccall((:fq_nmod_mpoly_gcd_cofactors, libflint), Cint,
             (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem},
              Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
             z, abar, bbar, a, b, a.parent)

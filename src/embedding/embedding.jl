@@ -426,7 +426,7 @@ function embed(k::T, K::T) where T <: FinField
   return morph
 end
 
-function embed(k::Nemo.fpField, K::fqPolyRepField)
+function embed(k::fpField, K::fqPolyRepField)
   @assert characteristic(K) == characteristic(k)
 end
 

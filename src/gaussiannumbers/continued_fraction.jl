@@ -25,7 +25,7 @@ end
 
 function steal_fmpz_data(data::Int)
   z = @new_struct(ZZRingElem, data)
-  finalizer(Nemo._fmpz_clear_fn, z)
+  finalizer(_fmpz_clear_fn, z)
   return z
 end
 

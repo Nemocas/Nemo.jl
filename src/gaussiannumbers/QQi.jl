@@ -455,10 +455,10 @@ for (A, Bs) in [
     TA = @eval Type{<:($(A))}
     TB = @eval Type{<:($(B))}
     @eval begin
-      function Nemo.AbstractAlgebra.promote_rule(::($TA), ::($TB))
+      function AbstractAlgebra.promote_rule(::($TA), ::($TB))
         return QQiFieldElem
       end
-      function Nemo.AbstractAlgebra.promote_rule(::($TB), ::($TA))
+      function AbstractAlgebra.promote_rule(::($TB), ::($TA))
         return QQiFieldElem
       end
       function +(a::($A), b::($B))

@@ -1,6 +1,6 @@
 #### QQ(i) and ZZ(i) ####
 
-struct ZZiRing <: Nemo.Ring
+struct ZZiRing <: Ring
 end
 
 const FlintZZi = ZZiRing()
@@ -10,7 +10,7 @@ struct ZZiRingElem <: RingElem
   y::ZZRingElem
 end
 
-struct QQiField <: Nemo.Field
+struct QQiField <: Field
 end
 
 const FlintQQi = QQiField()

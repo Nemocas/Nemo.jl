@@ -509,14 +509,14 @@ end
 # is done inplace, so the lower part wil be "l", the upper "u",
 # both are implicit only.
 function _solve_triu!(A::T, B::T, C::T, unit::Int = 0) where T <: Zmodn_mat
-  ccall((:nmod_mat_solve_triu, Nemo.libflint), Cvoid, (Ref{T}, Ref{T}, Ref{T}, Cint), A, B, C, unit)
+  ccall((:nmod_mat_solve_triu, libflint), Cvoid, (Ref{T}, Ref{T}, Ref{T}, Cint), A, B, C, unit)
 end
 
 #solves lower_triangular_part(B)A = C, 
 #if unit == 1, then only the strictly lower triangular part is used
 #and the diagonal is assumed to be 1
 function AbstractAlgebra._solve_tril!(A::T, B::T, C::T, unit::Int = 0) where T <: Zmodn_mat
-  ccall((:nmod_mat_solve_tril, Nemo.libflint), Cvoid, (Ref{T}, Ref{T}, Ref{T}, Cint), A, B, C, unit)
+  ccall((:nmod_mat_solve_tril, libflint), Cvoid, (Ref{T}, Ref{T}, Ref{T}, Cint), A, B, C, unit)
 end
 
 function Solve._can_solve_internal_no_check(A::zzModMatrix, b::zzModMatrix, task::Symbol; side::Symbol = :left)
