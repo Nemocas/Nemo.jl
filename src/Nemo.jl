@@ -158,8 +158,6 @@ import LinearAlgebra: transpose!
 # Set, Module, Ring, Group and Field are too generic to pollute the users namespace with
 for i in names(AbstractAlgebra)
   (i in AbstractAlgebra.import_exclude || !isdefined(AbstractAlgebra, i)) && continue
-  i == :GF && continue           # remove once Nemocas/AbstractAlgebra.jl#1538 is available
-  i == :NumberField && continue  # remove once Nemocas/AbstractAlgebra.jl#1538 is available
   @eval import AbstractAlgebra: $i
   @eval export $i
 end
