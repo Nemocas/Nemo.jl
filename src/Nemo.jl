@@ -7,14 +7,14 @@ module Nemo
 
 import AbstractAlgebra
 
-using Libdl
+import Libdl
 
 using Random: Random, AbstractRNG, SamplerTrivial
 import Random: rand!
 
 using RandomExtensions: RandomExtensions, make, Make2, Make3
 
-using Pkg
+import Pkg
 
 import SHA
 
