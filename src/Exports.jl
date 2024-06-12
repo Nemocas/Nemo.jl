@@ -217,6 +217,8 @@ export fpAbsPowerSeriesRing
 export FpAbsPowerSeriesRing
 export fpAbsPowerSeriesRingElem
 export FpAbsPowerSeriesRingElem
+export fpField
+export FpField
 export fpFieldElem
 export FpFieldElem
 export fpMatrix
