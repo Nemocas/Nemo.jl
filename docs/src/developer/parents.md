@@ -153,87 +153,38 @@ Various functions are provided for constructing parent objects. For example
 a polynomial ring is constructed by calling a `polynomial_ring` function.
 Such functions are called parent object constructors.
 
-In general parent object constructors are intended for the user and should not
-be used in library code. There are a number of reasons for this.
+In general parent object constructors are intended for the user and should only
+be used with great care in library code. There are a number of reasons for this.
 
-Firstly, inside the Generic submodule of AbstractAlgebra the only parent object
-constructors that are directly accessible are the ones inside Generic. Thus if
-a Nemo function calls a function inside Generic and it creates a parent object
-using one of the parent object constructors, it will create a parent object for
-a generic ring rather than a Nemo one.
+One issue is that parent objects are allowed to be arbitrarily large, and
+they are frequently cached by the system. They can also perform arbitrary
+precomputations for the ring/field/module etc. that is being constructed.
+This can lead to excessive memory usage. It can also have odd effects when
+a behavior affecting change is applied to a cached parent and thus has
+effects in places where one might not expect it. 
 
-One can work around this by calling `AbstractAlgebra.polynomial_ring` instead of
-simply `polynomial_ring` inside Generic, but even safer would be to find another
-way to construct the polynomials required.
+Secondly, those parent caches are global objects. This is problematic for
+any future attempts to parallelise library code. And if the caches are not
+regularly emptied, in the worst case memory usage can balloon excessively.
 
-A second issue is that parent objects are allowed to be as large as one likes
-and they are cached by the system. They can also perform arbitrary
-precomputations for the ring/field/module etc. that is being constructed. Over
-time they tend to accumulate such precomputations, slowing down all generic
-code which made use of them. Both memory usage and performance may blow out in
-previously working code.
+To deal with this, most parent object constructors take a `cached` keyword
+which specifies whether the parent object should be cached which library code
+should generally set to `false`. That said it is better overall to simply
+eschew the use of parent object constructors in library code and instead let
+parents be passed in via arguments (directly or indirectly, e.g. the parent
+or base ring of some argument might be a suitable parent for some return values
+or intermediate objects).
 
-Thirdly, parent objects must be unique across the system for a given set of
-parameters. This means they must be cached globally. This is problematic for
-any future attempts to parallelise library code and in the worst case memory
-usage can balloon due to swelling caches.
-
-Most parent object constructors take a `cached` keyword which specifies whether
-the parent object should be cached or not, but again it is better overall to
-simply eschew the use of parent object constructors in library code.
-
-Instead, it is recommended to use functions such as `similar`, `zero`,
+One may also use, where applicable, functions such as `similar`, `zero`,
 `zero_matrix`, `identity_matrix`, `change_base_ring`, `map`, etc. for
-constructing polynomials and matrices directly.
-
-There are also functions that provide alternative ways of constructing objects,
-e.g. `matrix` provides a means of creating a matrix over a given ring with
-given dimensions. The constructor `polynomial` allows creation of a polynomial
-over a given base ring with given coefficients and `abs_series` and
-`rel_series` do similar things for absolute and relative series. These should
-be used in preference to parent object constructors where possible. Additional
-functions of this type should be added in future.
+constructing polynomials and matrices directly without a parent object.
 
 However even when using these functions in library code, it is important to
 remember to pass `cached=false` so that the cache is not filled up by calls
-to the library code. But this creates an additional problem, namely that if one
+to the library code. This creates an additional problem, namely that if one
 uses `polynomial` say, to construct two polynomials over the same base ring,
 they will not be compatible in the sense that they will have different parents.
 
-When one wishes to construct multiple elements in the same group/ring/field,
-it is convenient to be able to construct a parent just as a user would. For
-this purpose various light-weight and very safe parent constructors are
-provided for use in library code.
-
-For example there are the constructors `PolyRing`, `AbsPowerSeriesRing` and
-`RelPowerSeriesRing`. These functions return the parent ring $R$ only and no
-generator (it can be obtained by calling `gen(R)`). They also set the
-variable for printing to a default (usually `x`). Moreover, these parents
-are not cached, so they are completely safe to use in library code. They
-can be thousands of times faster than the full parent constructors intended
-for users.
-
-Here is an example of their use:
-
-```jldoctest
-julia> R = PolyRing(ZZ)
-Univariate polynomial ring in x over ZZ
-
-julia> p = R([1, 2, 3])
-3*x^2 + 2*x + 1
-
-julia> q = R([2, 3, 4])
-4*x^2 + 3*x + 2
-
-julia> s = p + q
-7*x^2 + 5*x + 3
-```
-
-Naturally functions like `polynomial` and `matrix` and the light-weight parent
-constructors are missing for other modules in Nemo at present and it is hoped
-that developers will fill in such infrastructure rather than simply push the
-can down the road for someone else to fix. Forcing the creating of full parent
-objects into as few bottlenecks as possible will make it much easier for
-developers to remove problems associated with such calls when they arise in
-future.
-
+Forcing the creation of full parent objects into as few bottlenecks as
+possible will make it much easier for developers to remove problems associated
+with such calls when they arise in future.

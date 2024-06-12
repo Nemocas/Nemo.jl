@@ -456,9 +456,6 @@ to a parent constructor to avoid caching the parent object it creates. This
 parameter normally has a default value of `true` and under normal circumstances
 doesn't need to be supplied.
 
-Note that special light-weight parent constructors, `PolyRing`, `AbsPowerSeriesRing`,
-`RelPowerSeriesRing`, etc. are also provided which do not cache.
-
 ## Throw/nothrow for `check_parent`
 
 By default the `check_parent` functions throw an exception if parents do not
