@@ -340,6 +340,21 @@ end
   d = transpose(a)*a
 
   @test d == matrix_space(F17, 4, 4)([11 11 8 7; 11 0 14 6; 8 14 14 5; 7 6 5 5])
+
+  a = F17[1 2 3 1; 3 2 1 2; 1 3 2 0]
+  z = F17(2)
+  b = similar(a)
+  @test mul!(b, a, z) == a * z
+  b = similar(a)
+  @test mul!(b, z, a) == a * z
+
+  F, _ = finite_field(ZZRingElem(17), 2, "a")
+  a = F[1 2 3 1; 3 2 1 2; 1 3 2 0]
+  z = F(2)
+  b = similar(a)
+  @test mul!(b, a, z) == a * z
+  b = similar(a)
+  @test mul!(b, z, a) == a * z
 end
 
 @testset "FqMatrix.row_col_swapping" begin

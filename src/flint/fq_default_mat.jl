@@ -266,6 +266,26 @@ function mul!(a::FqMatrix, b::FqMatrix, c::FqMatrix)
   return a
 end
 
+function mul!(a::FqMatrix, b::FqMatrix, c::FqFieldElem)
+  F = base_ring(a)
+  if _fq_default_ctx_type(F) == _FQ_DEFAULT_NMOD
+    ccall((:nmod_mat_scalar_mul, libflint), Nothing, (Ref{FqMatrix}, Ref{FqMatrix}, UInt), a, b, UInt(lift(ZZ, c)))
+    return a
+  end
+  GC.@preserve a begin
+    for i in 1:nrows(a)
+      for j in 1:ncols(a)
+        x = fq_default_mat_entry_ptr(a, i, j)
+        y = fq_default_mat_entry_ptr(b, i, j)
+        ccall((:fq_default_mul, libflint), Nothing, (Ptr{FqFieldElem}, Ptr{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), x, y, c, F)
+      end
+    end
+  end
+  return a
+end
+
+mul!(a::FqMatrix, b::FqFieldElem, c::FqMatrix) = mul!(a, c, b)
+
 function add!(a::FqMatrix, b::FqMatrix, c::FqMatrix)
   ccall((:fq_default_mat_add, libflint), Nothing,
         (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}),
