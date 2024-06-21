@@ -29,6 +29,20 @@ function Array(a::ZZMatrix; S::Type{T}=ZZRingElem) where {T}
   return A
 end
 
+function is_zero_row(M::ZZMatrix, i::Int)
+  !(1 <= i <= nrows(M)) && error("Not a valid index")
+  GC.@preserve M begin
+    for j = 1:ncols(M)
+      m = ccall((:fmpz_mat_entry, libflint), Ptr{ZZRingElem}, (Ref{ZZMatrix}, Int, Int), M, i - 1, j - 1)
+      fl = ccall((:fmpz_is_zero, libflint), Bool, (Ptr{ZZRingElem},), m)
+      if !fl
+        return false
+      end
+    end
+  end
+  return true
+end
+
 function is_zero_row(M::zzModMatrix, i::Int)
   zero = UInt(0)
   for j in 1:ncols(M)

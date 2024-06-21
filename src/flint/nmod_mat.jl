@@ -286,8 +286,13 @@ function mul!(a::zzModMatrix, b::zzModMatrix, c::zzModRingElem)
   return a
 end
 
+function mul!(a::zzModMatrix, b::zzModRingElem, c::zzModMatrix)
+  return mul!(a, c, b)
+end
+
 function mul!(A::fpMatrix, B::fpFieldElem, D::fpMatrix)
-  ccall((:nmod_mat_scalar_mul_ui, libflint), Nothing, (Ref{fpMatrix}, Ref{fpMatrix}, UInt), A, D, B.data)
+  ccall((:nmod_mat_scalar_mul, libflint), Nothing, (Ref{fpMatrix}, Ref{fpMatrix}, UInt), A, D, B.data)
+  return A
 end
 
 function Generic.add_one!(a::zzModMatrix, i::Int, j::Int)
@@ -301,6 +306,10 @@ function Generic.add_one!(a::zzModMatrix, i::Int, j::Int)
   ccall((:nmod_mat_set_entry, libflint), Nothing,
         (Ref{zzModMatrix}, Int, Int, UInt), a, i - 1, j - 1, x)
   return a
+end
+
+function mul!(a::fpMatrix, b::fpMatrix, c::fpFieldElem)
+  return mul!(a, c, b)
 end
 
 ################################################################################

@@ -990,3 +990,12 @@ end
   @test A == R[0 0; 0 0]
   @test_throws BoundsError Generic.add_one!(A, 3, 1)
 end
+
+@testset "zzModMatrix.unsafe" begin
+  R, = residue_ring(ZZ, 4)
+  A = R[1 1; 0 1]
+  b = R(2)
+  C = similar(A)
+  mul!(C, b, A)
+  @test C == b * A
+end

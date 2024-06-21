@@ -1062,3 +1062,15 @@ end
   @test A == F[0 0; 0 0]
   @test_throws BoundsError Generic.add_one!(A, 3, 1)
 end
+
+@testset "fpMatrix.unsafe" begin
+  R = Native.GF(5)
+  A = R[1 1; 0 1]
+  b = R(2)
+  C = similar(A)
+  mul!(C, b, A)
+  @test C == b * A
+  mul!(C, A, b)
+  @test C == b * A
+end
+

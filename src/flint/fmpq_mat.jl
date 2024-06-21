@@ -847,17 +847,28 @@ function add!(z::QQMatrix, x::QQMatrix, y::QQMatrix)
   return z
 end
 
-function mul!(y::QQMatrix, x::Int)
-  ccall((:fmpq_mat_scalar_mul_fmpz, libflint), Nothing,
-        (Ref{QQMatrix}, Ref{QQMatrix}, Ref{QQFieldElem}), y, y, ZZRingElem(x))
-  return y
+function mul!(z::QQMatrix, y::QQMatrix, x::QQFieldElem)
+   ccall((:fmpq_mat_scalar_mul_fmpq, libflint), Nothing,
+                (Ref{QQMatrix}, Ref{QQMatrix}, Ref{QQFieldElem}), z, y, x)
+   return z
 end
 
-function mul!(y::QQMatrix, x::ZZRingElem)
+mul!(z::QQMatrix, y::QQFieldElem, x::QQMatrix) = mul!(z, x, y)
+
+mul!(x::QQMatrix, y::QQFieldElem) = mul!(x, x, y)
+
+function mul!(z::QQMatrix, y::QQMatrix, x::ZZRingElem)
   ccall((:fmpq_mat_scalar_mul_fmpz, libflint), Nothing,
-        (Ref{QQMatrix}, Ref{QQMatrix}, Ref{ZZRingElem}), y, y, x)
-  return y
+        (Ref{QQMatrix}, Ref{QQMatrix}, Ref{ZZRingElem}), z, y, x)
+  return z
 end
+
+# delegate everything integral to mul!(::QQMatrix, ::QQMatrix, ::ZZRingElem)
+mul!(z::QQMatrix, y::IntegerUnion, x::QQMatrix) = mul!(z, x, y)
+
+mul!(x::QQMatrix, y::IntegerUnion) = mul!(x, x, y)
+
+mul!(z::QQMatrix, y::QQMatrix, x::Integer) = mul!(z, y, ZZ(x))
 
 function addeq!(z::QQMatrix, x::QQMatrix)
   ccall((:fmpq_mat_add, libflint), Nothing,

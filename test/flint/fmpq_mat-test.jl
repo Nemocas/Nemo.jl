@@ -861,6 +861,23 @@ end
   @test mul!([QQ(), QQ()], A, [ZZ(1), ZZ(2), ZZ(3)]) == [9//2, 217//40]
   @test mul!([QQ(), QQ(), QQ()], [QQ(1), QQ(2)], A) == [9//4, 51//20, 8//3]
   @test mul!([QQ(), QQ(), QQ()], [ZZ(1), ZZ(2)], A) == [9//4, 51//20, 8//3]
+
+  B = similar(A)
+  for b in (Int(2), BigInt(2), ZZ(2), QQ(2))
+    C = mul!(B, A, b)
+    @test C == B && C == A * b
+    C = mul!(B, b, A)
+    @test C == B && C == A * b
+    B = deepcopy(A)
+    C = mul!(B, b)
+    @test C == B && C == A * b
+  end
+
+  A = matrix(QQ, 2, 2, [1, 1, 0, 1])
+  B = matrix(QQ, 2, 2, [1, 2, 0, 1])
+  C = similar(A)
+  mul!(C, A, B)
+  @test C == A * B
 end
 
 @testset "QQMatrix.vector_mul" begin
