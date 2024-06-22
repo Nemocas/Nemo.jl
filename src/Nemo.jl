@@ -156,8 +156,17 @@ import LinearAlgebra: transpose!
 # is the only place user friendly versions are defined
 # AbstractAlgebra/Nemo has its own promote_rule, distinct from Base
 # Set, Module, Ring, Group and Field are too generic to pollute the users namespace with
-for i in names(AbstractAlgebra)
-  (i in AbstractAlgebra.import_exclude || !isdefined(AbstractAlgebra, i)) && continue
+
+if VERSION >= v"1.12.0-DEV.766"
+  _names = names(AbstractAlgebra; usings_explicit = true, non_public = true)
+else
+  _names = names(AbstractAlgebra)
+end
+
+another_exclude_list = [:eval, :include, :transpose!, :CacheDictType, :sqrt_moduli, :sqrt_residues,]
+
+for i in _names
+  (i in AbstractAlgebra.import_exclude || i in another_exclude_list || !isdefined(AbstractAlgebra, i)) && continue
   @eval import AbstractAlgebra: $i
   @eval export $i
 end
