@@ -158,7 +158,7 @@ import LinearAlgebra: transpose!
 # Set, Module, Ring, Group and Field are too generic to pollute the users namespace with
 
 if VERSION >= v"1.12.0-DEV.766"
-  _names = names(AbstractAlgebra; usings_explicit = true, non_public = true)
+  _names = names(AbstractAlgebra; usings_explicit = true, usings_implicit = true, non_public = true)
 else
   _names = names(AbstractAlgebra)
 end
