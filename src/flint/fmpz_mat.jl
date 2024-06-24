@@ -164,9 +164,10 @@ isone(a::ZZMatrix) = ccall((:fmpz_mat_is_one, libflint), Bool,
   end
 end
 
-function is_positive_entry(M::ZZMatrix, i::Int, j::Int)
-  GC.@preserve M begin
-    m = mat_entry_ptr(M, i, j)
+@inline function is_positive_entry(A::ZZMatrix, i::Int, j::Int)
+  @boundscheck _checkbounds(A, i, j)
+  GC.@preserve A begin
+    m = mat_entry_ptr(A, i, j)
     fl = ccall((:fmpz_sgn, libflint), Int, (Ptr{ZZRingElem},), m)
     return isone(fl)
   end
