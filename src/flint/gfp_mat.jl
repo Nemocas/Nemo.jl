@@ -37,8 +37,7 @@ getindex!(v::fpFieldElem, a::fpMatrix, i::Int, j::Int) = getindex(a, i, j)
 
 @inline function getindex(a::fpMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
-  u = ccall((:nmod_mat_get_entry, libflint), UInt,
-            (Ref{fpMatrix}, Int, Int), a, i - 1 , j - 1)
+  u = getindex_raw(a, i, j)
   return fpFieldElem(u, base_ring(a)) # no reduction needed
 end
 
@@ -92,25 +91,6 @@ function *(x::fpMatrix, y::fpFieldElem)
 end
 
 *(x::fpFieldElem, y::fpMatrix) = y*x
-
-################################################################################
-#
-#  Unsafe operations
-#
-################################################################################
-
-function Generic.add_one!(a::fpMatrix, i::Int, j::Int)
-  @boundscheck _checkbounds(a, i, j)
-  x = ccall((:nmod_mat_get_entry, libflint), UInt,
-            (Ref{fpMatrix}, Int, Int), a, i - 1, j - 1)
-  x += 1
-  if x == base_ring(a).n
-    x = UInt(0)
-  end
-  ccall((:nmod_mat_set_entry, libflint), Nothing,
-        (Ref{fpMatrix}, Int, Int, UInt), a, i - 1, j - 1, x)
-  return a
-end
 
 ################################################################################
 #
@@ -234,25 +214,6 @@ function Array(b::fpMatrix)
     end
   end
   return a
-end
-
-################################################################################
-#
-#  Lifting
-#
-################################################################################
-
-@doc raw"""
-    lift(a::fpMatrix)
-
-Return a lift of the matrix $a$ to a matrix over $\mathbb{Z}$, i.e. where the
-entries of the returned matrix are those of $a$ lifted to $\mathbb{Z}$.
-"""
-function lift(a::fpMatrix)
-  z = ZZMatrix(nrows(a), ncols(a))
-  ccall((:fmpz_mat_set_nmod_mat, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{fpMatrix}), z, a)
-  return z
 end
 
 ################################################################################
