@@ -34,8 +34,7 @@ zero(m::zzModMatrix, R::zzModRing, r::Int, c::Int) = similar(m, R, r, c)
 
 @inline function getindex(a::zzModMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
-  u = ccall((:nmod_mat_get_entry, libflint), UInt,
-            (Ref{zzModMatrix}, Int, Int), a, i - 1 , j - 1)
+  u = getindex_raw(a, i, j)
   return zzModRingElem(u, base_ring(a)) # no reduction needed
 end
 
@@ -114,6 +113,11 @@ end
 function iszero(a::T) where T <: Zmodn_mat
   r = ccall((:nmod_mat_is_zero, libflint), Cint, (Ref{T}, ), a)
   return Bool(r)
+end
+
+@inline function is_zero_entry(A::T, i::Int, j::Int) where T <: Zmodn_mat
+  @boundscheck _checkbounds(A, i, j)
+  return is_zero(getindex_raw(A, i, j))
 end
 
 ################################################################################

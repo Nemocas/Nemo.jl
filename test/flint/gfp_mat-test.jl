@@ -201,6 +201,22 @@ end
   end
 end
 
+@testset "fpMatrix.is_zero_entry" begin
+  R = Native.GF(13)
+  M = matrix(R, [1 2 3;4 0 6;0 8 9])
+  for i in 1:3, j in 1:3
+    @test is_zero_entry(M, i, j) == is_zero(M[i, j])
+  end
+end
+
+@testset "fpMatrix.is_zero_row" begin
+  R = Native.GF(13)
+  M = matrix(R, [1 2 3;4 0 6;0 8 9;0 0 0])
+  for i in 1:nrows(M)
+    @test is_zero_row(M, i) == all(j -> is_zero(M[i, j]), 1:ncols(M))
+  end
+end
+
 @testset "fpMatrix.printing" begin
   Z2 = Native.GF(2)
   R = fpMatrixSpace(Z2, 2, 2)

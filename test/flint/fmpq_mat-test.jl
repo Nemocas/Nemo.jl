@@ -156,7 +156,14 @@ end
 @testset "QQMatrix.is_zero_entry" begin
   M = matrix(QQ, [1 2 3;4 0 6;0 8 9])
   for i in 1:3, j in 1:3
-    @test is_zero_entry(M, i, j) == (M[i, j] == 0)
+    @test is_zero_entry(M, i, j) == is_zero(M[i, j])
+  end
+end
+
+@testset "QQMatrix.is_zero_row" begin
+  M = matrix(QQ, [1 2 3;4 0 6;0 8 9;0 0 0])
+  for i in 1:nrows(M)
+    @test is_zero_row(M, i) == all(j -> is_zero(M[i, j]), 1:ncols(M))
   end
 end
 

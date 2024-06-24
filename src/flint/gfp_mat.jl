@@ -73,13 +73,6 @@ function one(a::fpMatrixSpace)
   return z
 end
 
-@inline function is_zero_entry(A::fpMatrix, i::Int, j::Int)
-  @boundscheck _checkbounds(A, i, j)
-  x = ccall((:nmod_mat_get_entry, libflint), UInt,
-            (Ref{fpMatrix}, Int, Int), A, i - 1, j - 1)
-  return x == 0
-end
-
 ################################################################################
 #
 #  Ad hoc binary operators
