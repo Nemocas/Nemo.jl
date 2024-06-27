@@ -703,12 +703,6 @@ end
 
 characteristic(F::EuclideanRingResidueField{ZZRingElem}) = abs(F.modulus)
 
-function mul!(res::QQMPolyRingElem, a::QQMPolyRingElem, c::ZZRingElem)
-  ccall((:fmpq_mpoly_scalar_mul_fmpz, libflint), Nothing,
-        (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{ZZRingElem}, Ref{QQMPolyRing}), res, a, c, parent(a))
-  return nothing
-end
-
 #@doc raw"""
 #    is_univariate(f::Generic.MPoly{T}) where T <: NumFieldElem -> Bool, PolyRingElem{T}
 #

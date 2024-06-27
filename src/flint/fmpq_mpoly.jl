@@ -304,37 +304,25 @@ end
 
 function -(a::QQMPolyRingElem)
   z = parent(a)()
-  ccall((:fmpq_mpoly_neg, libflint), Nothing,
-        (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
-        z, a, a.parent)
-  return z
+  return neg!(z, a)
 end
 
 function +(a::QQMPolyRingElem, b::QQMPolyRingElem)
   check_parent(a, b)
   z = parent(a)()
-  ccall((:fmpq_mpoly_add, libflint), Nothing,
-        (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
-        z, a, b, a.parent)
-  return z
+  return add!(z, a, b)
 end
 
 function -(a::QQMPolyRingElem, b::QQMPolyRingElem)
   check_parent(a, b)
   z = parent(a)()
-  ccall((:fmpq_mpoly_sub, libflint), Nothing,
-        (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
-        z, a, b, a.parent)
-  return z
+  return sub!(z, a, b)
 end
 
 function *(a::QQMPolyRingElem, b::QQMPolyRingElem)
   check_parent(a, b)
   z = parent(a)()
-  ccall((:fmpq_mpoly_mul, libflint), Nothing,
-        (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}),
-        z, a, b, a.parent)
-  return z
+  return mul!(z, a, b)
 end
 
 ###############################################################################
@@ -344,44 +332,32 @@ end
 ###############################################################################
 
 for (jT, cN, cT) in ((QQFieldElem, :fmpq, Ref{QQFieldElem}), (ZZRingElem, :fmpz, Ref{ZZRingElem}),
-                     (Int, :si, Int))
+                     (Int, :si, Int), (UInt, :ui, UInt))
   @eval begin
     function +(a::QQMPolyRingElem, b::($jT))
       z = parent(a)()
-      ccall(($(string(:fmpq_mpoly_add_, cN)), libflint), Nothing,
-            (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, ($cT), Ref{QQMPolyRing}),
-            z, a, b, parent(a))
-      return z
+      return add!(z, a, b)
     end
 
     +(a::($jT), b::QQMPolyRingElem) = b + a
 
     function -(a::QQMPolyRingElem, b::($jT))
       z = parent(a)()
-      ccall(($(string(:fmpq_mpoly_sub_, cN)), libflint), Nothing,
-            (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, ($cT), Ref{QQMPolyRing}),
-            z, a, b, parent(a))
-      return z
+      return sub!(z, a, b)
     end
 
-    -(a::($jT), b::QQMPolyRingElem) = - (b - a)
+    -(a::($jT), b::QQMPolyRingElem) = neg!(b - a)
 
     function *(a::QQMPolyRingElem, b::($jT))
       z = parent(a)()
-      ccall(($(string(:fmpq_mpoly_scalar_mul_, cN)), libflint), Nothing,
-            (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, ($cT), Ref{QQMPolyRing}),
-            z, a, b, parent(a))
-      return z
+      return mul!(z, a, b)
     end
 
     *(a::($jT), b::QQMPolyRingElem) = b * a
 
     function divexact(a::QQMPolyRingElem, b::($jT); check::Bool=true)
       z = parent(a)()
-      ccall(($(string(:fmpq_mpoly_scalar_div_, cN)), libflint), Nothing,
-            (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, ($cT), Ref{QQMPolyRing}),
-            z, a, b, parent(a))
-      return z
+      return divexact!(z, a, b)
     end
 
     //(a::QQMPolyRingElem, b::($jT)) = a//parent(a)(b)
@@ -831,6 +807,14 @@ function one!(a::QQMPolyRingElem)
   return a
 end
 
+function neg!(a::QQMPolyRingElem, b::QQMPolyRingElem)
+  ccall((:fmpq_mpoly_neg, libflint), Nothing,
+        (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), a, b, parent(a))
+  return a
+end
+
+neg!(a::QQMPolyRingElem) = neg!(a, a)
+
 function add!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::QQMPolyRingElem)
   ccall((:fmpq_mpoly_add, libflint), Nothing,
         (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem},
@@ -839,10 +823,7 @@ function add!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::QQMPolyRingElem)
 end
 
 function addeq!(a::QQMPolyRingElem, b::QQMPolyRingElem)
-  ccall((:fmpq_mpoly_add, libflint), Nothing,
-        (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem},
-         Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), a, a, b, a.parent)
-  return a
+  return add!(a, a, b)
 end
 
 function mul!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::QQMPolyRingElem)
@@ -851,6 +832,55 @@ function mul!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::QQMPolyRingElem)
          Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), a, b, c, a.parent)
   return a
 end
+
+function sub!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::QQMPolyRingElem)
+  ccall((:fmpq_mpoly_sub, libflint), Nothing,
+        (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem},
+         Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), a, b, c, a.parent)
+  return a
+end
+
+for (jT, cN, cT) in ((QQFieldElem, :fmpq, Ref{QQFieldElem}), (ZZRingElem, :fmpz, Ref{ZZRingElem}),
+                     (Int, :si, Int), (UInt, :ui, UInt))
+  @eval begin
+    function add!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::($jT))
+      ccall(($(string(:fmpq_mpoly_add_, cN)), libflint), Nothing,
+            (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, ($cT), Ref{QQMPolyRing}),
+            a, b, c, parent(a))
+      return a
+    end
+
+    add!(a::QQMPolyRingElem, b::($jT), c::QQMPolyRingElem) = add!(a, c, b)
+
+    addeq!(a::QQMPolyRingElem, b::($jT)) = add!(a, a, b)
+
+    function sub!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::($jT))
+      ccall(($(string(:fmpq_mpoly_sub_, cN)), libflint), Nothing,
+            (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, ($cT), Ref{QQMPolyRing}),
+            a, b, c, parent(a))
+      return a
+    end
+
+    sub!(a::QQMPolyRingElem, b::($jT), c::QQMPolyRingElem) = neg!(sub!(a, c, b))
+
+    function mul!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::($jT))
+      ccall(($(string(:fmpq_mpoly_scalar_mul_, cN)), libflint), Nothing,
+            (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, ($cT), Ref{QQMPolyRing}),
+            a, b, c, parent(a))
+      return a
+    end
+
+    mul!(a::QQMPolyRingElem, b::($jT), c::QQMPolyRingElem) = mul!(a, c, b)
+
+    function divexact!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::($jT))
+      ccall(($(string(:fmpq_mpoly_scalar_div_, cN)), libflint), Nothing,
+            (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, ($cT), Ref{QQMPolyRing}),
+            a, b, c, parent(b))
+      return a
+    end
+  end
+end
+
 
 # Set the n-th coefficient of a to c. If zero coefficients are inserted, they
 # must be removed with combine_like_terms!
