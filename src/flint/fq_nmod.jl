@@ -116,7 +116,6 @@ end
 
 function deepcopy_internal(d::fqPolyRepFieldElem, dict::IdDict)
   z = fqPolyRepFieldElem(parent(d), d)
-  z.parent = parent(d)
   return z
 end
 
@@ -460,6 +459,36 @@ end
 #
 ###############################################################################
 
+function set!(z::fqPolyRepFieldElem, x::fqPolyRepFieldElem)
+  ccall((:fq_nmod_set, libflint), Nothing,
+        (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
+        z, x, parent(z))
+end
+
+function set!(z::fqPolyRepFieldElem, x::ZZRingElem)
+  ccall((:fq_nmod_set_fmpz, libflint), Nothing,
+        (Ref{fqPolyRepFieldElem}, Ref{ZZRingElem}, Ref{fqPolyRepField}),
+        z, x, parent(z))
+end
+
+function set!(z::fqPolyRepFieldElem, x::Int)
+  ccall((:fq_nmod_set_si, libflint), Nothing,
+        (Ref{fqPolyRepFieldElem}, Int, Ref{fqPolyRepField}),
+        z, x, parent(z))
+end
+
+function set!(z::fqPolyRepFieldElem, x::UInt)
+  ccall((:fq_nmod_set_ui, libflint), Nothing,
+        (Ref{fqPolyRepFieldElem}, UInt, Ref{fqPolyRepField}),
+        z, x, parent(z))
+end
+
+function set!(z::fqPolyRepFieldElem, x::fpPolyRingElem)
+  ccall((:fq_nmod_set_nmod_poly, libflint), Nothing,
+        (Ref{fqPolyRepFieldElem}, Ref{fpPolyRingElem}, Ref{fqPolyRepField}),
+        z, x, parent(z))
+end
+
 function zero!(z::fqPolyRepFieldElem)
   ccall((:fq_nmod_zero, libflint), Nothing,
         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, z.parent)
@@ -633,7 +662,6 @@ promote_rule(::Type{fqPolyRepFieldElem}, ::Type{fpFieldElem}) = fqPolyRepFieldEl
 
 function (a::fqPolyRepField)()
   z = fqPolyRepFieldElem(a)
-  z.parent = a
   return z
 end
 
@@ -641,13 +669,11 @@ end
 
 function (a::fqPolyRepField)(b::Int)
   z = fqPolyRepFieldElem(a, b)
-  z.parent = a
   return z
 end
 
 function (a::fqPolyRepField)(b::ZZRingElem)
   z = fqPolyRepFieldElem(a, b)
-  z.parent = a
   return z
 end
 
@@ -674,7 +700,6 @@ function (a::fqPolyRepField)(b::Vector{<:IntegerUnion})
   da == db || error("Coercion impossible")
   F = Native.GF(Int(characteristic(a)), cached = false)
   z = fqPolyRepFieldElem(a, polynomial(F, b))
-  z.parent = a
   return z
 end
 

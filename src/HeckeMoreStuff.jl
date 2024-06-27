@@ -695,12 +695,6 @@ function ^(a::ResElem, f::ZZRingElem)
   return b
 end
 
-function set!(z::fqPolyRepFieldElem, x::fqPolyRepFieldElem)
-  ccall((:fq_nmod_set, libflint), Nothing,
-        (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
-        z, x, parent(z))
-end
-
 characteristic(F::EuclideanRingResidueField{ZZRingElem}) = abs(F.modulus)
 
 function mul!(res::QQMPolyRingElem, a::QQMPolyRingElem, c::ZZRingElem)
