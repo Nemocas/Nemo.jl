@@ -321,7 +321,7 @@ end
 #
 ###############################################################################
 
-for (jT, cN, cT) in ((ZZRingElem, :fmpz, Ref{ZZRingElem}), (Int, :si, Int))
+for (jT, cN, cT) in ((ZZRingElem, :fmpz, Ref{ZZRingElem}), (Int, :si, Int), (UInt, :ui, UInt))
   @eval begin
     function +(a::ZZMPolyRingElem, b::($jT))
       z = parent(a)()

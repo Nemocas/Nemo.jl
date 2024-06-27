@@ -216,8 +216,7 @@ canonical_unit(a::ZZMatrix) = canonical_unit(a[1, 1])
 
 function -(x::ZZMatrix)
   z = similar(x)
-  ccall((:fmpz_mat_neg, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}), z, x)
+  neg!(z, x)
   return z
 end
 
@@ -295,18 +294,14 @@ reverse_cols(x::ZZMatrix) = reverse_cols!(deepcopy(x))
 function +(x::ZZMatrix, y::ZZMatrix)
   check_parent(x, y)
   z = similar(x)
-  ccall((:fmpz_mat_add, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix},  Ref{ZZMatrix}),
-        z, x, y)
+  add!(z, x, y)
   return z
 end
 
 function -(x::ZZMatrix, y::ZZMatrix)
   check_parent(x, y)
   z = similar(x)
-  ccall((:fmpz_mat_sub, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix},  Ref{ZZMatrix}),
-        z, x, y)
+  sub!(z, x, y)
   return z
 end
 
@@ -317,9 +312,7 @@ function *(x::ZZMatrix, y::ZZMatrix)
   else
     z = similar(x, nrows(x), ncols(y))
   end
-  ccall((:fmpz_mat_mul, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix},  Ref{ZZMatrix}),
-        z, x, y)
+  mul!(z, x, y)
   return z
 end
 
@@ -1514,8 +1507,8 @@ function Solve._can_solve_internal_no_check(A::ZZMatrix, b::ZZMatrix, task::Symb
           H_ptr = mat_entry_ptr(H, j, k)
           for h = k:ncols(H)
             b_ptr = mat_entry_ptr(b, h, i)
-            ccall((:fmpz_mul, libflint), Cvoid, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), t, q, H_ptr)
-            ccall((:fmpz_sub, libflint), Cvoid, (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), b_ptr, b_ptr, t)
+            mul!(t, q, H_ptr)
+            sub!(b_ptr, b_ptr, t)
             H_ptr += sizeof(ZZRingElem)
           end
         end
@@ -1799,7 +1792,7 @@ function AbstractAlgebra._solve_tril!(A::ZZMatrix, B::ZZMatrix, C::ZZMatrix, f::
         B_ptr = mat_entry_ptr(B, j, 1)
         for k = 1:j-1
           A_ptr = mat_entry_ptr(B, k, i)
-          ccall((:fmpz_mul, libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}), s, A_ptr, B_ptr)
+          mul!(s, A_ptr, B_ptr)
           B_ptr += sizeof(ZZRingElem)
           sub!(t, t, s)
         end
@@ -1894,15 +1887,17 @@ function mul!(z::ZZMatrix, x::ZZMatrix, y::ZZMatrix, fl::Bool = false)
 end
 
 function mul!(y::ZZMatrix, x::Int)
+  mul!(y, y, x)
+end
+
+function mul!(z::ZZMatrix, y::ZZMatrix, x::Int)
   ccall((:fmpz_mat_scalar_mul_si, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Int), y, y, x)
-  return y
+        (Ref{ZZMatrix}, Ref{ZZMatrix}, Int), z, y, x)
+  return z
 end
 
 function mul!(y::ZZMatrix, x::ZZRingElem)
-  ccall((:fmpz_mat_scalar_mul_fmpz, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}), y, y, x)
-  return y
+  mul!(y, y, x)
 end
 
 function mul!(z::ZZMatrix, y::ZZMatrix, x::ZZRingElem)
@@ -1924,8 +1919,7 @@ function addmul!(z::ZZMatrix, y::ZZMatrix, x::Int)
 end
 
 function addeq!(z::ZZMatrix, x::ZZMatrix)
-  ccall((:fmpz_mat_add, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZMatrix}), z, z, x)
+  add!(z, z, x)
   return z
 end
 
@@ -1935,10 +1929,12 @@ function zero!(z::ZZMatrix)
   return z
 end
 
-function neg!(w::ZZMatrix)
-  ccall((:fmpz_mat_neg, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}), w, w)
-  return w
+function neg!(z::ZZMatrix, w::ZZMatrix)
+  ccall((:fmpz_mat_neg, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}), z, w)
+  return z
 end
+
+neg!(z::ZZMatrix) = neg!(z, z)
 
 function mul!(z::Vector{ZZRingElem}, a::ZZMatrix, b::Vector{ZZRingElem})
   ccall((:fmpz_mat_mul_fmpz_vec_ptr, libflint), Nothing,

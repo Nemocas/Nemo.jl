@@ -284,9 +284,7 @@ reverse_cols(x::QQMatrix) = reverse_cols!(deepcopy(x))
 function +(x::QQMatrix, y::QQMatrix)
   check_parent(x, y)
   z = similar(x)
-  ccall((:fmpq_mat_add, libflint), Nothing,
-        (Ref{QQMatrix}, Ref{QQMatrix},  Ref{QQMatrix}),
-        z, x, y)
+  add!(z, x, y)
   return z
 end
 
@@ -871,9 +869,7 @@ mul!(x::QQMatrix, y::IntegerUnion) = mul!(x, x, y)
 mul!(z::QQMatrix, y::QQMatrix, x::Integer) = mul!(z, y, ZZ(x))
 
 function addeq!(z::QQMatrix, x::QQMatrix)
-  ccall((:fmpq_mat_add, libflint), Nothing,
-        (Ref{QQMatrix}, Ref{QQMatrix}, Ref{QQMatrix}), z, z, x)
-  return z
+  add!(z, z, x)
 end
 
 function zero!(z::QQMatrix)

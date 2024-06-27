@@ -224,19 +224,13 @@ end
 function +(x::FqPolyRepMatrix, y::FqPolyRepMatrix)
   check_parent(x,y)
   z = similar(x)
-  ccall((:fq_mat_add, libflint), Nothing,
-        (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}),
-        z, x, y, base_ring(x))
-  return z
+  add!(z, x, y)
 end
 
 function -(x::FqPolyRepMatrix, y::FqPolyRepMatrix)
   check_parent(x,y)
   z = similar(x)
-  ccall((:fq_mat_sub, libflint), Nothing,
-        (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}),
-        z, x, y, base_ring(x))
-
+  sub!(z, x, y)
   return z
 end
 
@@ -244,8 +238,7 @@ function *(x::FqPolyRepMatrix, y::FqPolyRepMatrix)
   (base_ring(x) != base_ring(y)) && error("Base ring must be equal")
   (ncols(x) != nrows(y)) && error("Dimensions are wrong")
   z = similar(x, nrows(x), ncols(y))
-  ccall((:fq_mat_mul, libflint), Nothing,
-        (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}), z, x, y, base_ring(x))
+  mul!(z, x, y)
   return z
 end
 
@@ -265,6 +258,13 @@ end
 
 function add!(a::FqPolyRepMatrix, b::FqPolyRepMatrix, c::FqPolyRepMatrix)
   ccall((:fq_mat_add, libflint), Nothing,
+        (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}),
+        a, b, c, base_ring(a))
+  return a
+end
+
+function sub!(a::FqPolyRepMatrix, b::FqPolyRepMatrix, c::FqPolyRepMatrix)
+  ccall((:fq_mat_sub, libflint), Nothing,
         (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}),
         a, b, c, base_ring(a))
   return a

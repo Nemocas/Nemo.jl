@@ -337,7 +337,7 @@ canonical_unit(x::ZZRingElem) = x < 0 ? ZZRingElem(-1) : ZZRingElem(1)
 
 function -(x::ZZRingElem)
   z = ZZRingElem()
-  ccall((:fmpz_neg, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}), z, x)
+  neg!(z, x)
   return z
 end
 
@@ -499,13 +499,7 @@ end
 
 function +(x::ZZRingElem, c::Int)
   z = ZZRingElem()
-  if c >= 0
-    ccall((:fmpz_add_ui, libflint), Nothing,
-          (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), z, x, c)
-  else
-    ccall((:fmpz_sub_ui, libflint), Nothing,
-          (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), z, x, -c)
-  end
+  add!(z, x, c)
   return z
 end
 
@@ -513,34 +507,20 @@ end
 
 function -(x::ZZRingElem, c::Int)
   z = ZZRingElem()
-  if c >= 0
-    ccall((:fmpz_sub_ui, libflint), Nothing,
-          (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), z, x, c)
-  else
-    ccall((:fmpz_add_ui, libflint), Nothing,
-          (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), z, x, -c)
-  end
+  sub!(z, x, c)
   return z
 end
 
 function -(c::Int, x::ZZRingElem)
   z = ZZRingElem()
-  if c >= 0
-    ccall((:fmpz_sub_ui, libflint), Nothing,
-          (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), z, x, c)
-  else
-    ccall((:fmpz_add_ui, libflint), Nothing,
-          (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), z, x, -c)
-  end
-  ccall((:fmpz_neg, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}), z, z)
+  sub!(z, x, c)
+  neg!(z, z)
   return z
 end
 
 function *(x::ZZRingElem, c::Int)
   z = ZZRingElem()
-  ccall((:fmpz_mul_si, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), z, x, c)
+  mul!(z, x, c)
   return z
 end
 
@@ -990,7 +970,7 @@ end
 
 function mod(x::ZZRingElem, c::UInt)
   c == 0 && throw(DivideError())
-  ccall((:fmpz_fdiv_ui, libflint), Base.GMP.Limb, (Ref{ZZRingElem}, Base.GMP.Limb), x, c)
+  ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), x, c)
 end
 
 @doc raw"""
@@ -2111,7 +2091,7 @@ function binomial(n::ZZRingElem, k::ZZRingElem)
   else
     z = _binomial(n, n - k)
   end
-  return negz ? neg!(z, z) : z
+  return negz ? neg!(z) : z
 end
 
 @doc raw"""
@@ -2670,56 +2650,50 @@ end
 add!(z::ZZRingElem, a::ZZRingElem, b::Integer) = add!(z, a, ZZRingElem(b))
 add!(z::ZZRingElem, x::Int, y::ZZRingElem) = add!(z, y, x)
 
-function neg!(z::ZZRingElem, a::ZZRingElem)
+function neg!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
   ccall((:fmpz_neg, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}),
         z, a)
   return z
 end
 
-function neg!(a::ZZRingElem)
-  return neg!(a,a)
-end
+neg!(a::ZZRingElemOrPtr) = neg!(a, a)
 
-function sub!(z::ZZRingElem, a::ZZRingElem, b::ZZRingElem)
+function sub!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
   ccall((:fmpz_sub, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}),
         z, a, b)
   return z
 end
 
-function sub!(z::ZZRingElem, a::ZZRingElem, b::Int)
+function sub!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Int)
   ccall((:fmpz_sub_si, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}, Int),
         z, a, b)
   return z
 end
 
-function sub!(z::ZZRingElem, a::ZZRingElem, b::UInt)
+function sub!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::UInt)
   ccall((:fmpz_sub_ui, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt),
         z, a, b)
   return z
 end
 
-function sub!(z::ZZRingElem, a::ZZRingElem, b::Integer)
+function sub!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer)
   return sub!(z, a, ZZRingElem(b))
 end
 
-function sub!(z::ZZRingElem, b::Integer, a::ZZRingElem)
+function sub!(z::ZZRingElemOrPtr, b::Integer, a::ZZRingElemOrPtr)
   sub!(z, a, b)
   return neg!(z, z)
 end
 
 
-function mul!(z::ZZRingElem, x::ZZRingElem, y::ZZRingElem)
+function mul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   ccall((:fmpz_mul, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x, y)
   return z
-end
-
-function mul!(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, c::ZZRingElem)
-  ccall((:fmpz_mul, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), a, b, c)
 end
 
 function mul!(z::ZZRingElem, x::ZZRingElem, y::Int)

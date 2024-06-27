@@ -288,22 +288,19 @@ end
 
 function +(a::QQFieldElem, b::QQFieldElem)
   z = QQFieldElem()
-  ccall((:fmpq_add, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}, Ref{QQFieldElem}), z, a, b)
+  add!(z, a, b)
   return z
 end
 
 function -(a::QQFieldElem, b::QQFieldElem)
   z = QQFieldElem()
-  ccall((:fmpq_sub, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}, Ref{QQFieldElem}), z, a, b)
+  sub!(z, a, b)
   return z
 end
 
 function *(a::QQFieldElem, b::QQFieldElem)
   z = QQFieldElem()
-  ccall((:fmpq_mul, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}, Ref{QQFieldElem}), z, a, b)
+  mul!(z, a, b)
   return z
 end
 
