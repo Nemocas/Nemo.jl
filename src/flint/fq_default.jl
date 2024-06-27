@@ -842,16 +842,19 @@ end
 ###############################################################################
 
 @doc raw"""
-    finite_field(p::IntegerUnion, d::Int, s::VarName; cached = true, check = true)
-    finite_field(q::IntegerUnion, s::VarName; cached = true, check = true)
-    finite_field(f::FqPolyElem, s::VarName; cached = true, check = true)
+    finite_field(p::IntegerUnion, d::Int, s::VarName = :o; cached::Bool = true, check::Bool = true)
+    finite_field(q::IntegerUnion, s::VarName = :o; cached::Bool = true, check::Bool = true)
+    finite_field(f::FqPolyRingElem, s::VarName = :o; cached::Bool = true, check::Bool = true)
 
-Return a tuple $K, a$ consisting of a finite field $K$ of order $q = p^d$ and
-algebra generator $x$. The string $s$ is used to designate how the finite field
-generator will be printed.
+Return a tuple $(K, x)$ of a finite field $K$ of order $q = p^d$, where $p$ is a prime,
+and an algebra generator $x$ of $K$.
+The string $s$ is used to designate how the finite field generator will be printed.
 
-If a polynomial $f \in k[X]$ over a finite field $k$ is specified, the relative finite field
-$K = k[X]/(f)$ will be constructed as a finite field with base field $k$.
+If a polynomial $f \in k[X]$ over a finite field $k$ is specified,
+the finite field $K = k[X]/(f)$ will be constructed as a finite
+field with base field $k$.
+
+See also [`GF`](@ref), that only returns $K$.
 
 # Examples
 
@@ -893,16 +896,18 @@ function finite_field(f::FqPolyRingElem, s::VarName = :o; cached::Bool = true, c
 end
 
 @doc raw"""
-    GF(p::IntegerUnion, d::Int, s::String; cached::Bool, check::Bool)
-    GF(q::IntegerUnion, s::String; cached::Bool, check::Bool)
-    GF(f::FqPolyRingElem; s::String; cached::Bool, check::Bool)
+    GF(p::IntegerUnion, d::Int, s::VarName = :o; cached::Bool = true, check::Bool = true)
+    GF(q::IntegerUnion, s::VarName = :o; cached::Bool = true, check::Bool = true)
+    GF(f::FqPolyRingElem, s::VarName = :o; cached::Bool = true, check::Bool = true)
 
-Return a finite field $K$ of order $q = p^d$. The string $s$ is
-used to designate how the finite field generator will be printed.
+Return a finite field $K$ of order $q = p^d$, where $p$ is a prime.
+The string $s$ is used to designate how the finite field generator will be printed.
 
 If a polynomial $f \in k[X]$ over a finite field $k$ is specified,
 the finite field $K = k[X]/(f)$ will be constructed as a finite
 field with base field $k$.
+
+See also [`finite_field`](@ref), that additionally returns an algebra generator of $K$.
 
 # Examples
 
@@ -921,8 +926,8 @@ Finite field of degree 3 over GF(3, 2)
 """
 GF
 
-function GF(a::IntegerUnion, s::VarName = :o; cached::Bool = true, check::Bool = true)
-  return finite_field(a, s; cached = cached, check = check)[1]
+function GF(q::IntegerUnion, s::VarName = :o; cached::Bool = true, check::Bool = true)
+  return finite_field(q, s; cached = cached, check = check)[1]
 end
 
 function GF(p::IntegerUnion, d::Int, s::VarName = :o; cached::Bool = true, check::Bool = true)
