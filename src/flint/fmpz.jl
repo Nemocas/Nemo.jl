@@ -57,6 +57,16 @@ is_domain_type(::Type{ZZRingElem}) = true
 
 ###############################################################################
 #
+#   Internal data
+#
+###############################################################################
+
+data(a::ZZRingElem) = a.d
+data(a::Ref{ZZRingElem}) = a[].d
+data(a::Ptr{ZZRingElem}) = unsafe_load(reinterpret(Ptr{Int}, a))
+
+###############################################################################
+#
 #   Ranges
 #
 ###############################################################################
@@ -249,15 +259,11 @@ Return the number of limbs required to store the absolute value of $a$.
 """
 size(a::ZZRingElem) = Int(ccall((:fmpz_size, libflint), Cint, (Ref{ZZRingElem},), a))
 
-is_unit(a::ZZRingElem) = ccall((:fmpz_is_pm1, libflint), Bool, (Ref{ZZRingElem},), a)
+is_unit(a::ZZRingElemOrPtr) = data(a) == 1 || data(a) == -1
 
-iszero(a::ZZRingElem) = ccall((:fmpz_is_zero, libflint), Bool, (Ref{ZZRingElem},), a)
+is_zero(a::ZZRingElemOrPtr) = data(a) == 0
 
-function iszero(a::Ref{ZZRingElem})
-  return unsafe_load(reinterpret(Ptr{Int}, a)) == 0
-end
-
-isone(a::ZZRingElem) = ccall((:fmpz_is_one, libflint), Bool, (Ref{ZZRingElem},), a)
+is_one(a::ZZRingElemOrPtr) = data(a) == 1
 
 isinteger(::ZZRingElem) = true
 
