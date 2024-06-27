@@ -4854,10 +4854,10 @@ const ZZMatrixSpace = AbstractAlgebra.Generic.MatSpace{ZZRingElem}
 ZZMatrixSpace(r::Int, c::Int) = ZZMatrixSpace(ZZ, r, c)
 
 mutable struct ZZMatrix <: MatElem{ZZRingElem}
-  entries::Ptr{Nothing}
+  entries::Ptr{ZZRingElem}
   r::Int
   c::Int
-  rows::Ptr{Nothing}
+  rows::Ptr{Ptr{ZZRingElem}}
   view_parent
 
   # Used by view, not finalised!!
