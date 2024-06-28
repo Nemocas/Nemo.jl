@@ -6406,39 +6406,6 @@ else
   end
 end
 
-################################################################################
-#
-#   Type unions
-#
-################################################################################
-
-const IntegerUnion = Union{Integer, ZZRingElem}
-
-const ZmodNFmpzPolyRing = Union{ZZModPolyRing, FpPolyRing}
-
-const Zmodn_poly = Union{zzModPolyRingElem, fpPolyRingElem}
-
-const Zmodn_fmpz_poly = Union{ZZModPolyRingElem, FpPolyRingElem}
-
-const Zmodn_mpoly = Union{zzModMPolyRingElem, fpMPolyRingElem}
-
-const FlintPuiseuxSeriesElem{T} = Union{FlintPuiseuxSeriesRingElem{T},
-                                        FlintPuiseuxSeriesFieldElem{T}} where T <: RingElem
-
-const Zmodn_mat = Union{zzModMatrix, fpMatrix}
-
-const Zmod_fmpz_mat = Union{ZZModMatrix, FpMatrix}
-
-const FlintMPolyUnion = Union{ZZMPolyRingElem, QQMPolyRingElem, zzModMPolyRingElem, fpMPolyRingElem,
-                              fqPolyRepMPolyRingElem, FpMPolyRingElem}
-
-
-const _fq_default_mpoly_union = Union{AbstractAlgebra.Generic.MPoly{FqPolyRepFieldElem},
-                                      fqPolyRepMPolyRingElem,
-                                      fpMPolyRingElem,
-                                      #FpMPolyRingElem
-                                     }
-
 ###############################################################################
 #
 #   FqMPolyRing / FqMPolyRingElem
@@ -6511,6 +6478,40 @@ macro fq_default_mpoly_do_op(f, R, a...)
   end
   return res
 end
+
+################################################################################
+#
+#   Type unions
+#
+################################################################################
+
+const IntegerUnion = Union{Integer, ZZRingElem}
+
+const ZmodNFmpzPolyRing = Union{ZZModPolyRing, FpPolyRing}
+
+const Zmodn_poly = Union{zzModPolyRingElem, fpPolyRingElem}
+
+const Zmodn_fmpz_poly = Union{ZZModPolyRingElem, FpPolyRingElem}
+
+const Zmodn_mpoly = Union{zzModMPolyRingElem, fpMPolyRingElem}
+
+const FlintPuiseuxSeriesElem{T} = Union{FlintPuiseuxSeriesRingElem{T},
+                                        FlintPuiseuxSeriesFieldElem{T}} where T <: RingElem
+
+const Zmodn_mat = Union{zzModMatrix, fpMatrix}
+
+const Zmod_fmpz_mat = Union{ZZModMatrix, FpMatrix}
+
+const FlintMPolyUnion = Union{ZZMPolyRingElem, QQMPolyRingElem, zzModMPolyRingElem, fpMPolyRingElem,
+                              fqPolyRepMPolyRingElem, FpMPolyRingElem}
+
+
+const _fq_default_mpoly_union = Union{AbstractAlgebra.Generic.MPoly{FqPolyRepFieldElem},
+                                      fqPolyRepMPolyRingElem,
+                                      fpMPolyRingElem,
+                                      #FpMPolyRingElem
+                                     }
+
 
 ###############################################################################
 #
