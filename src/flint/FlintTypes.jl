@@ -6513,6 +6513,73 @@ const _fq_default_mpoly_union = Union{AbstractAlgebra.Generic.MPoly{FqPolyRepFie
                                      }
 
 
+const ZZRingElemOrPtr = Union{ZZRingElem, Ref{ZZRingElem}, Ptr{ZZRingElem}}
+const QQFieldElemOrPtr = Union{QQFieldElem, Ref{QQFieldElem}, Ptr{QQFieldElem}}
+const zzModRingElemOrPtr = Union{zzModRingElem, Ref{zzModRingElem}, Ptr{zzModRingElem}}
+const ZZModRingElemOrPtr = Union{ZZModRingElem, Ref{ZZModRingElem}, Ptr{ZZModRingElem}}
+const fpFieldElemOrPtr = Union{fpFieldElem, Ref{fpFieldElem}, Ptr{fpFieldElem}}
+const FpFieldElemOrPtr = Union{FpFieldElem, Ref{FpFieldElem}, Ptr{FpFieldElem}}
+const fqPolyRepFieldElemOrPtr = Union{fqPolyRepFieldElem, Ref{fqPolyRepFieldElem}, Ptr{fqPolyRepFieldElem}}
+const FqPolyRepFieldElemOrPtr = Union{FqPolyRepFieldElem, Ref{FqPolyRepFieldElem}, Ptr{FqPolyRepFieldElem}}
+const FqFieldElemOrPtr = Union{FqFieldElem, Ref{FqFieldElem}, Ptr{FqFieldElem}}
+
+const ZZPolyRingElemOrPtr = Union{ZZPolyRingElem, Ref{ZZPolyRingElem}, Ptr{ZZPolyRingElem}}
+const QQPolyRingElemOrPtr = Union{QQPolyRingElem, Ref{QQPolyRingElem}, Ptr{QQPolyRingElem}}
+const zzModPolyRingElemOrPtr = Union{zzModPolyRingElem, Ref{zzModPolyRingElem}, Ptr{zzModPolyRingElem}}
+const ZZModPolyRingElemOrPtr = Union{ZZModPolyRingElem, Ref{ZZModPolyRingElem}, Ptr{ZZModPolyRingElem}}
+const fpPolyRingElemOrPtr = Union{fpPolyRingElem, Ref{fpPolyRingElem}, Ptr{fpPolyRingElem}}
+const FpPolyRingElemOrPtr = Union{FpPolyRingElem, Ref{FpPolyRingElem}, Ptr{FpPolyRingElem}}
+const fqPolyRepPolyRingElemOrPtr = Union{fqPolyRepPolyRingElem, Ref{fqPolyRepPolyRingElem}, Ptr{fqPolyRepPolyRingElem}}
+const FqPolyRepPolyRingElemOrPtr = Union{FqPolyRepPolyRingElem, Ref{FqPolyRepPolyRingElem}, Ptr{FqPolyRepPolyRingElem}}
+const FqPolyRingElemOrPtr = Union{FqPolyRingElem, Ref{FqPolyRingElem}, Ptr{FqPolyRingElem}}
+
+const ZZMPolyRingElemOrPtr = Union{ZZMPolyRingElem, Ref{ZZMPolyRingElem}, Ptr{ZZMPolyRingElem}}
+const QQMPolyRingElemOrPtr = Union{QQMPolyRingElem, Ref{QQMPolyRingElem}, Ptr{QQMPolyRingElem}}
+const zzModMPolyRingElemOrPtr = Union{zzModMPolyRingElem, Ref{zzModMPolyRingElem}, Ptr{zzModMPolyRingElem}}
+# ZZModMPolyRingElem does not exits
+const fpMPolyRingElemOrPtr = Union{fpMPolyRingElem, Ref{fpMPolyRingElem}, Ptr{fpMPolyRingElem}}
+const FpMPolyRingElemOrPtr = Union{FpMPolyRingElem, Ref{FpMPolyRingElem}, Ptr{FpMPolyRingElem}}
+const fqPolyRepMPolyRingElemOrPtr = Union{fqPolyRepMPolyRingElem, Ref{fqPolyRepMPolyRingElem}, Ptr{fqPolyRepMPolyRingElem}}
+# FqPolyRepMPolyRingElem does not exits
+const FqMPolyRingElemOrPtr = Union{FqMPolyRingElem, Ref{FqMPolyRingElem}, Ptr{FqMPolyRingElem}}
+
+const ZZRelPowerSeriesRingElemOrPtr = Union{ZZRelPowerSeriesRingElem, Ref{ZZRelPowerSeriesRingElem}, Ptr{ZZRelPowerSeriesRingElem}}
+const ZZAbsPowerSeriesRingElemOrPtr = Union{ZZAbsPowerSeriesRingElem, Ref{ZZAbsPowerSeriesRingElem}, Ptr{ZZAbsPowerSeriesRingElem}}
+const QQRelPowerSeriesRingElemOrPtr = Union{QQRelPowerSeriesRingElem, Ref{QQRelPowerSeriesRingElem}, Ptr{QQRelPowerSeriesRingElem}}
+const QQAbsPowerSeriesRingElemOrPtr = Union{QQAbsPowerSeriesRingElem, Ref{QQAbsPowerSeriesRingElem}, Ptr{QQAbsPowerSeriesRingElem}}
+const zzModRelPowerSeriesRingElemOrPtr = Union{zzModRelPowerSeriesRingElem, Ref{zzModRelPowerSeriesRingElem}, Ptr{zzModRelPowerSeriesRingElem}}
+const zzModAbsPowerSeriesRingElemOrPtr = Union{zzModAbsPowerSeriesRingElem, Ref{zzModAbsPowerSeriesRingElem}, Ptr{zzModAbsPowerSeriesRingElem}}
+const ZZModRelPowerSeriesRingElemOrPtr = Union{ZZModRelPowerSeriesRingElem, Ref{ZZModRelPowerSeriesRingElem}, Ptr{ZZModRelPowerSeriesRingElem}}
+const ZZModAbsPowerSeriesRingElemOrPtr = Union{ZZModAbsPowerSeriesRingElem, Ref{ZZModAbsPowerSeriesRingElem}, Ptr{ZZModAbsPowerSeriesRingElem}}
+const fpRelPowerSeriesRingElemOrPtr = Union{fpRelPowerSeriesRingElem, Ref{fpRelPowerSeriesRingElem}, Ptr{fpRelPowerSeriesRingElem}}
+const fpAbsPowerSeriesRingElemOrPtr = Union{fpAbsPowerSeriesRingElem, Ref{fpAbsPowerSeriesRingElem}, Ptr{fpAbsPowerSeriesRingElem}}
+const FpRelPowerSeriesRingElemOrPtr = Union{FpRelPowerSeriesRingElem, Ref{FpRelPowerSeriesRingElem}, Ptr{FpRelPowerSeriesRingElem}}
+const FpAbsPowerSeriesRingElemOrPtr = Union{FpAbsPowerSeriesRingElem, Ref{FpAbsPowerSeriesRingElem}, Ptr{FpAbsPowerSeriesRingElem}}
+const fqPolyRepRelPowerSeriesRingElemOrPtr = Union{fqPolyRepRelPowerSeriesRingElem, Ref{fqPolyRepRelPowerSeriesRingElem}, Ptr{fqPolyRepRelPowerSeriesRingElem}}
+const fqPolyRepAbsPowerSeriesRingElemOrPtr = Union{fqPolyRepAbsPowerSeriesRingElem, Ref{fqPolyRepAbsPowerSeriesRingElem}, Ptr{fqPolyRepAbsPowerSeriesRingElem}}
+const FqPolyRepRelPowerSeriesRingElemOrPtr = Union{FqPolyRepRelPowerSeriesRingElem, Ref{FqPolyRepRelPowerSeriesRingElem}, Ptr{FqPolyRepRelPowerSeriesRingElem}}
+const FqPolyRepAbsPowerSeriesRingElemOrPtr = Union{FqPolyRepAbsPowerSeriesRingElem, Ref{FqPolyRepAbsPowerSeriesRingElem}, Ptr{FqPolyRepAbsPowerSeriesRingElem}}
+const FqRelPowerSeriesRingElemOrPtr = Union{FqRelPowerSeriesRingElem, Ref{FqRelPowerSeriesRingElem}, Ptr{FqRelPowerSeriesRingElem}}
+const FqAbsPowerSeriesRingElemOrPtr = Union{FqAbsPowerSeriesRingElem, Ref{FqAbsPowerSeriesRingElem}, Ptr{FqAbsPowerSeriesRingElem}}
+
+const ZZMatrixOrPtr = Union{ZZMatrix, Ref{ZZMatrix}, Ptr{ZZMatrix}}
+const QQMatrixOrPtr = Union{QQMatrix, Ref{QQMatrix}, Ptr{QQMatrix}}
+const zzModMatrixOrPtr = Union{zzModMatrix, Ref{zzModMatrix}, Ptr{zzModMatrix}}
+const ZZModMatrixOrPtr = Union{ZZModMatrix, Ref{ZZModMatrix}, Ptr{ZZModMatrix}}
+const fpMatrixOrPtr = Union{fpMatrix, Ref{fpMatrix}, Ptr{fpMatrix}}
+const FpMatrixOrPtr = Union{FpMatrix, Ref{FpMatrix}, Ptr{FpMatrix}}
+const fqPolyRepMatrixOrPtr = Union{fqPolyRepMatrix, Ref{fqPolyRepMatrix}, Ptr{fqPolyRepMatrix}}
+const FqPolyRepMatrixOrPtr = Union{FqPolyRepMatrix, Ref{FqPolyRepMatrix}, Ptr{FqPolyRepMatrix}}
+const FqMatrixOrPtr = Union{FqMatrix, Ref{FqMatrix}, Ptr{FqMatrix}}
+
+const ZZLaurentSeriesRingElemOrPtr = Union{ZZLaurentSeriesRingElem, Ref{ZZLaurentSeriesRingElem}, Ptr{ZZLaurentSeriesRingElem}}
+
+const FlintPuiseuxSeriesRingElemOrPtr{T <: RingElem} = Union{FlintPuiseuxSeriesRingElem{T}, Ref{FlintPuiseuxSeriesRingElem{T}}, Ptr{FlintPuiseuxSeriesRingElem{T}}}
+const FlintPuiseuxSeriesFieldElemOrPtr{T <: RingElem} = Union{FlintPuiseuxSeriesFieldElem{T}, Ref{FlintPuiseuxSeriesFieldElem{T}}, Ptr{FlintPuiseuxSeriesFieldElem{T}}}
+
+const PadicFieldElemOrPtr = Union{PadicFieldElem, Ref{PadicFieldElem}, Ptr{PadicFieldElem}}
+const QadicFieldElemOrPtr = Union{QadicFieldElem, Ref{QadicFieldElem}, Ptr{QadicFieldElem}}
+
 ###############################################################################
 #
 #   Docstrings for the systematically added types in this file
