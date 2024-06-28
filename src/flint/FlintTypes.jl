@@ -6412,6 +6412,12 @@ end
 #
 ###############################################################################
 
+const _fq_default_mpoly_union = Union{AbstractAlgebra.Generic.MPoly{FqPolyRepFieldElem},
+                                      fqPolyRepMPolyRingElem,
+                                      fpMPolyRingElem,
+                                      #FpMPolyRingElem
+                                     }
+
 @attributes mutable struct FqMPolyRing <: MPolyRing{FqFieldElem}
   data::Union{fpMPolyRing,
               #FpMPolyRing,
@@ -6504,13 +6510,6 @@ const Zmod_fmpz_mat = Union{ZZModMatrix, FpMatrix}
 
 const FlintMPolyUnion = Union{ZZMPolyRingElem, QQMPolyRingElem, zzModMPolyRingElem, fpMPolyRingElem,
                               fqPolyRepMPolyRingElem, FpMPolyRingElem}
-
-
-const _fq_default_mpoly_union = Union{AbstractAlgebra.Generic.MPoly{FqPolyRepFieldElem},
-                                      fqPolyRepMPolyRingElem,
-                                      fpMPolyRingElem,
-                                      #FpMPolyRingElem
-                                     }
 
 
 const ZZRingElemOrPtr = Union{ZZRingElem, Ref{ZZRingElem}, Ptr{ZZRingElem}}
