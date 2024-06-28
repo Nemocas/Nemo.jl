@@ -907,7 +907,7 @@ If a polynomial $f \in k[X]$ over a finite field $k$ is specified,
 the finite field $K = k[X]/(f)$ will be constructed as a finite
 field with base field $k$.
 
-See also [`finite_field`](@ref) which additionally returns a finite field generator generator of $K$.
+See also [`finite_field`](@ref) which additionally returns a finite field generator of $K$.
 
 # Examples
 
