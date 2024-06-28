@@ -60,8 +60,8 @@ end
 ################################################################################
 
 qqbar_field_doc = raw"""
-QQBarField <: Field
-QQBarFieldElem <: FieldElem
+    QQBarField <: Field
+    QQBarFieldElem <: FieldElem
 
 The algebraic closure $\overline{\mathbb Q}$ of the rationals $\mathbb Q$ and
 its elements. This is a singleton type, meaning that there is a unique global

@@ -13,8 +13,8 @@ const _err_dim_negative = ErrorException("Dimensions must be non-negative")
 ###############################################################################
 
 zz_ring_doc = raw"""
-ZZRing <: Ring
-ZZRingElem <: RingElem
+    ZZRing <: Ring
+    ZZRingElem <: RingElem
 
 The ring of integers $\mathbb Z$ and its elements.
 For convenience, we predefine the global variable `const ZZ = ZZRing()`,
@@ -142,8 +142,8 @@ end
 ###############################################################################
 
 qq_field_doc = raw"""
-QQField <: FracField{ZZRingElem}
-QQFieldElem <: FracFieldElem{ZZRingElem}
+    QQField <: FracField{ZZRingElem}
+    QQFieldElem <: FracFieldElem{ZZRingElem}
 
 The field of rationals $\mathbb Q$ and its elements.
 For convenience, we predefine the global variable `const QQ = QQField()`.
