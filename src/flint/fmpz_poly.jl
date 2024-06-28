@@ -726,6 +726,12 @@ for (factor_fn, factor_fn_inner, flint_fn) in
        end)
 end
 
+################################################################################
+#
+#  Irreducibility
+#
+################################################################################
+
 function is_irreducible(x::ZZPolyRingElem)
   if degree(x) == 0
     return is_prime(coeff(x, 0))
@@ -736,6 +742,18 @@ function is_irreducible(x::ZZPolyRingElem)
   else
     return false
   end
+end
+
+################################################################################
+#
+#  Squarefree testing
+#
+################################################################################
+
+function is_squarefree(x::ZZPolyRingElem)
+   iszero(x) && return false
+   return Bool(ccall((:fmpz_poly_is_squarefree, libflint), Int32,
+       (Ref{ZZPolyRingElem}, ), x))
 end
 
 ###############################################################################
