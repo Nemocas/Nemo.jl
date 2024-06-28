@@ -35,6 +35,7 @@ julia> ZZ(2)^100
 struct ZZRing <: Ring
 end
 
+@doc zz_ring_doc
 const ZZ = ZZRing()
 
 integer_ring() = ZZRing()
@@ -163,6 +164,7 @@ julia> QQ(1//6) - QQ(1//7)
 struct QQField <: FracField{ZZRingElem}
 end
 
+@doc qq_field_doc
 const QQ = QQField()
 
 rational_field() = QQ
