@@ -1377,3 +1377,24 @@ function _acb_mat_clear_fn(x::AcbMatrix)
   ccall((:acb_mat_clear, libflint), Nothing, (Ref{AcbMatrix}, ), x)
 end
 
+
+################################################################################
+#
+#   Type unions
+#
+################################################################################
+
+const RealFieldElemOrPtr = Union{RealFieldElem, Ref{RealFieldElem}, Ptr{RealFieldElem}}
+const ArbFieldElemOrPtr = Union{ArbFieldElem, Ref{ArbFieldElem}, Ptr{ArbFieldElem}}
+const ComplexFieldElemOrPtr = Union{ComplexFieldElem, Ref{ComplexFieldElem}, Ptr{ComplexFieldElem}}
+const AcbFieldElemOrPtr = Union{AcbFieldElem, Ref{AcbFieldElem}, Ptr{AcbFieldElem}}
+
+const RealPolyOrPtr = Union{RealPoly, Ref{RealPoly}, Ptr{RealPoly}}
+const ArbPolyRingElemOrPtr = Union{ArbPolyRingElem, Ref{ArbPolyRingElem}, Ptr{ArbPolyRingElem}}
+const ComplexPolyOrPtr = Union{ComplexPoly, Ref{ComplexPoly}, Ptr{ComplexPoly}}
+const AcbPolyRingElemOrPtr = Union{AcbPolyRingElem, Ref{AcbPolyRingElem}, Ptr{AcbPolyRingElem}}
+
+const RealMatOrPtr = Union{RealMat, Ref{RealMat}, Ptr{RealMat}}
+const ArbMatrixOrPtr = Union{ArbMatrix, Ref{ArbMatrix}, Ptr{ArbMatrix}}
+const ComplexMatOrPtr = Union{ComplexMat, Ref{ComplexMat}, Ptr{ComplexMat}}
+const AcbMatrixOrPtr = Union{AcbMatrix, Ref{AcbMatrix}, Ptr{AcbMatrix}}

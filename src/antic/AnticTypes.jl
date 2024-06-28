@@ -104,3 +104,12 @@ function _nf_elem_clear_fn(a::AbsSimpleNumFieldElem)
   ccall((:nf_elem_clear, libflint), Nothing, 
         (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}), a, a.parent)
 end
+
+
+################################################################################
+#
+#   Type unions
+#
+################################################################################
+
+const AbsSimpleNumFieldElemOrPtr = Union{AbsSimpleNumFieldElem, Ref{AbsSimpleNumFieldElem}, Ptr{AbsSimpleNumFieldElem}}
