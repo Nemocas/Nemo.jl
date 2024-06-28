@@ -2605,8 +2605,6 @@ end
 #
 ###############################################################################
 
-const ZZRingElemOrPtr = Union{ZZRingElem, Ptr{ZZRingElem}}
-
 function zero!(z::ZZRingElemOrPtr)
   @ccall libflint.fmpz_zero(z::Ref{ZZRingElem})::Nothing
   return z

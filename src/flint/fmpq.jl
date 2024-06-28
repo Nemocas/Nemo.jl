@@ -1093,10 +1093,9 @@ end
 #
 ###############################################################################
 
-const QQFieldElemOrPtr = Union{QQFieldElem, Ptr{QQFieldElem}}
-
 _num_ptr(c::QQFieldElem) = Ptr{ZZRingElem}(pointer_from_objref(c))
 _num_ptr(c::Ptr{QQFieldElem}) = Ptr{ZZRingElem}(c)
+_num_ptr(c::Ref{QQFieldElem}) = _num_ptr(c[])
 _den_ptr(c::QQFieldElemOrPtr) = _num_ptr(c) + sizeof(ZZRingElem)
 
 function zero!(c::QQFieldElemOrPtr)
