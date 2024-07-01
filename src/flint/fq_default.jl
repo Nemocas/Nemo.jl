@@ -847,7 +847,7 @@ end
     finite_field(f::FqPolyRingElem, s::VarName = :o; cached::Bool = true, check::Bool = true)
 
 Return a tuple $(K, x)$ of a finite field $K$ of order $q = p^d$, where $p$ is a prime,
-and a finite field generator $x$ of $K$.
+and a generator $x$ of $K$ (see [`gen`](@ref) for a definition).
 The identifier $s$ is used to designate how the finite field generator will be printed.
 
 If a polynomial $f \in k[X]$ over a finite field $k$ is specified,
