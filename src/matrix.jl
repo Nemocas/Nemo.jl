@@ -39,11 +39,11 @@ end
 #
 ################################################################################
 
-function kernel(A::_FieldMatTypes; side::Symbol = :left)
+function kernel(::Solve.RREFTrait, A::_FieldMatTypes; side::Symbol = :left)
   Solve.check_option(side, [:right, :left], "side")
 
   if side === :left
-    K = kernel(transpose(A), side = :right)
+    K = kernel(Solve.RREFTrait(), transpose(A), side = :right)
     return transpose(K)
   end
 
@@ -67,7 +67,7 @@ end
 #
 ################################################################################
 
-function Solve._init_reduce(C::Solve.SolveCtx{T}) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
+function Solve._init_reduce(::Solve.LUTrait, C::Solve.SolveCtx{T}) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
   if isdefined(C, :red) && isdefined(C, :lu_perm)
     return nothing
   end
@@ -88,7 +88,7 @@ function Solve._init_reduce(C::Solve.SolveCtx{T}) where {T <: Union{fpFieldElem,
   return nothing
 end
 
-function Solve._init_reduce_transpose(C::Solve.SolveCtx{T}) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
+function Solve._init_reduce_transpose(::Solve.LUTrait, C::Solve.SolveCtx{T}) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
   if isdefined(C, :red_transp) && isdefined(C, :lu_perm_transp)
     return nothing
   end
@@ -109,17 +109,17 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{T}) where {T <: Union{fp
   return nothing
 end
 
-function Solve._can_solve_internal_no_check(C::Solve.SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
+function Solve._can_solve_internal_no_check(::Solve.LUTrait, C::Solve.SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
   @assert base_ring(matrix(C)) === base_ring(b) "Base rings do not match"
   # Split up in separate functions to make the compiler happy
   if side === :right
-    return Solve._can_solve_internal_no_check_right(C, b, task)
+    return Solve._can_solve_internal_no_check_right(Solve.LUTrait(), C, b, task)
   else
-    return Solve._can_solve_internal_no_check_left(C, b, task)
+    return Solve._can_solve_internal_no_check_left(Solve.LUTrait(), C, b, task)
   end
 end
 
-function Solve._can_solve_internal_no_check_right(C::Solve.SolveCtx{T}, b::MatElem{T}, task::Symbol) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
+function Solve._can_solve_internal_no_check_right(::Solve.LUTrait, C::Solve.SolveCtx{T}, b::MatElem{T}, task::Symbol) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
   LU = Solve.reduced_matrix(C)
   p = Solve.lu_permutation(C)
   pb = p*b
@@ -175,7 +175,7 @@ function Solve._can_solve_internal_no_check_right(C::Solve.SolveCtx{T}, b::MatEl
   end
 end
 
-function Solve._can_solve_internal_no_check_left(C::Solve.SolveCtx{T}, b::MatElem{T}, task::Symbol) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
+function Solve._can_solve_internal_no_check_left(::Solve.LUTrait, C::Solve.SolveCtx{T}, b::MatElem{T}, task::Symbol) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
   LU = Solve.reduced_matrix_of_transpose(C)
   p = Solve.lu_permutation_of_transpose(C)
   pbt = p*transpose(b)

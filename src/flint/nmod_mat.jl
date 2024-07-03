@@ -525,10 +525,21 @@ function AbstractAlgebra._solve_tril!(A::T, B::T, C::T, unit::Int = 0) where T <
   ccall((:nmod_mat_solve_tril, libflint), Cvoid, (Ref{T}, Ref{T}, Ref{T}, Cint), A, B, C, unit)
 end
 
-function Solve._can_solve_internal_no_check(A::zzModMatrix, b::zzModMatrix, task::Symbol; side::Symbol = :left)
+function Solve.matrix_normal_form_type(R::zzModRing)
+  if is_prime(modulus(R))
+    return Solve.LUTrait()
+  else
+    return Solve.HowellFormTrait()
+  end
+end
+
+Solve.matrix_normal_form_type(A::zzModMatrix) = Solve.matrix_normal_form_type(base_ring(A))
+Solve.matrix_normal_form_type(C::Solve.SolveCtx{zzModRingElem}) = Solve.matrix_normal_form_type(base_ring(C))
+
+function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::zzModMatrix, b::zzModMatrix, task::Symbol; side::Symbol = :left)
   @assert base_ring(A) === base_ring(b) "Base rings do not match"
   if side === :left
-    fl, sol, K = Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
+    fl, sol, K = Solve._can_solve_internal_no_check(Solve.LUTrait(), transpose(A), transpose(b), task, side = :right)
     return fl, transpose(sol), transpose(K)
   end
 
@@ -541,6 +552,37 @@ function Solve._can_solve_internal_no_check(A::zzModMatrix, b::zzModMatrix, task
     return Bool(fl), x, zero(A, 0, 0)
   end
   return Bool(fl), x, kernel(A, side = :right)
+end
+
+# The same code as in AbstractAlgebra, but uses `transpose` instead of `lazy_transpose`
+function Solve._can_solve_internal_no_check(::Solve.HowellFormTrait, A::T, b::T, task::Symbol; side::Symbol = :left) where {T <: Union{zzModMatrix, ZZModMatrix}}
+  @assert base_ring(A) === base_ring(b) "Base rings do not match"
+  R = base_ring(A)
+
+  if side === :left
+    fl, _sol, _K = Solve._can_solve_internal_no_check(Solve.HowellFormTrait(), transpose(A), transpose(b), task, side = :right)
+    return fl, transpose(_sol), transpose(_K)
+  end
+
+  AT = transpose(A)
+  B = hcat(AT, identity_matrix(AT, nrows(AT)))
+  if nrows(B) < ncols(B)
+    B = vcat(B, zero(AT, ncols(B) - nrows(B), ncols(B)))
+  end
+
+  howell_form!(B)
+
+  m = max(nrows(AT), ncols(AT))
+  H = view(B, 1:m, 1:ncols(AT))
+  U = view(B, 1:m, ncols(AT) + 1:ncols(B))
+
+  fl, sol = Solve._can_solve_with_hnf(b, H, U, task)
+  if !fl || task !== :with_kernel
+    return fl, sol, zero(A, 0, 0)
+  end
+
+  N = Solve._kernel_of_howell_form(A, B)
+  return true, sol, N
 end
 
 ################################################################################
@@ -884,35 +926,32 @@ function nullspace(M::zzModMatrix)
   return nullity, view(N, 1:nrows(N), 1:nullity)
 end
 
-function kernel(M::zzModMatrix; side::Symbol = :left)
+function kernel(::Solve.RREFTrait, M::Union{zzModMatrix, ZZModMatrix}; side::Symbol = :left)
   Solve.check_option(side, [:right, :left], "side")
 
   if side === :left
-    K = kernel(transpose(M), side = :right)
+    K = kernel(Solve.RREFTrait(), transpose(M), side = :right)
     return transpose(K)
   end
 
-  R = base_ring(M)
-  if is_prime(modulus(R))
-    return nullspace(M)[2]
+  return nullspace(M)[2]
+end
+
+# Same as in AbstractAlgebra, but we need to use `transpose` instead of `lazy_transpose`
+function kernel(::Solve.HowellFormTrait, A::Union{zzModMatrix, ZZModMatrix}; side::Symbol = :left)
+  Solve.check_option(side, [:right, :left], "side")
+
+  if side === :left
+    K = kernel(Solve.HowellFormTrait(), transpose(A), side = :right)
+    return transpose(K)
   end
 
-  H = hcat(transpose(M), identity_matrix(R, ncols(M)))
-  if nrows(H) < ncols(H)
-    H = vcat(H, zero_matrix(R, ncols(H) - nrows(H), ncols(H)))
+  AT = transpose(A)
+  B = hcat(AT, identity_matrix(AT, nrows(AT)))
+  if nrows(B) < ncols(B)
+    B = vcat(B, zero(AT, ncols(B) - nrows(B), ncols(B)))
   end
-  howell_form!(H)
-  nr = 1
-  while nr <= nrows(H) && !is_zero_row(H, nr)
-    nr += 1
-  end
-  nr -= 1
-  h = view(H, 1:nr, 1:nrows(M))
-  for i = 1:nrows(h)
-    if is_zero_row(h, i)
-      k = view(H, i:nrows(h), nrows(M) + 1:ncols(H))
-      return transpose(k)
-    end
-  end
-  return zero_matrix(R, ncols(M), 0)
+
+  howell_form!(B)
+  return Solve._kernel_of_howell_form(A, B)
 end

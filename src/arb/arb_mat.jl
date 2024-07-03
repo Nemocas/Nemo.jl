@@ -535,10 +535,14 @@ function _solve_cholesky_precomp(cho::ArbMatrix, y::ArbMatrix)
   return z
 end
 
-function Solve._can_solve_internal_no_check(A::ArbMatrix, b::ArbMatrix, task::Symbol; side::Symbol = :left)
+Solve.matrix_normal_form_type(::ArbField) = Solve.LUTrait()
+Solve.matrix_normal_form_type(::ArbMatrix) = Solve.LUTrait()
+Solve.matrix_normal_form_type(::Solve.SolveCtx{ArbFieldElem}) = Solve.LUTrait()
+
+function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::ArbMatrix, b::ArbMatrix, task::Symbol; side::Symbol = :left)
   nrows(A) != ncols(A) && error("Only implemented for square matrices")
   if side === :left
-    fl, sol, K = Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
+    fl, sol, K = Solve._can_solve_internal_no_check(Solve.LUTrait(), transpose(A), transpose(b), task, side = :right)
     return fl, transpose(sol), transpose(K)
   end
 
@@ -562,7 +566,7 @@ end
 
 AbstractAlgebra.solve_context_type(::Type{ArbFieldElem}) = Solve.SolveCtx{ArbFieldElem, ArbMatrix, ArbMatrix, ArbMatrix}
 
-function Solve._init_reduce(C::Solve.SolveCtx{ArbFieldElem})
+function Solve._init_reduce(::Solve.LUTrait, C::Solve.SolveCtx{ArbFieldElem})
   if isdefined(C, :red) && isdefined(C, :lu_perm)
     return nothing
   end
@@ -585,7 +589,7 @@ function Solve._init_reduce(C::Solve.SolveCtx{ArbFieldElem})
   return nothing
 end
 
-function Solve._init_reduce_transpose(C::Solve.SolveCtx{ArbFieldElem})
+function Solve._init_reduce_transpose(::Solve.LUTrait, C::Solve.SolveCtx{ArbFieldElem})
   if isdefined(C, :red_transp) && isdefined(C, :lu_perm_transp)
     return nothing
   end
@@ -608,7 +612,7 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{ArbFieldElem})
   return nothing
 end
 
-function Solve._can_solve_internal_no_check(C::Solve.SolveCtx{ArbFieldElem}, b::ArbMatrix, task::Symbol; side::Symbol = :left)
+function Solve._can_solve_internal_no_check(::Solve.LUTrait, C::Solve.SolveCtx{ArbFieldElem}, b::ArbMatrix, task::Symbol; side::Symbol = :left)
   if side === :right
     LU = Solve.reduced_matrix(C)
     p = Solve.lu_permutation(C)

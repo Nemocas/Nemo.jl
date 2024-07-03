@@ -653,9 +653,18 @@ function _solve_dixon(a::QQMatrix, b::QQMatrix)
   return z
 end
 
-function Solve._can_solve_internal_no_check(A::QQMatrix, b::QQMatrix, task::Symbol; side::Symbol = :left)
+# Actually we use a modular algorithm in flint...
+Solve.matrix_normal_form_type(::QQField) = Solve.RREFTrait()
+Solve.matrix_normal_form_type(::QQMatrix) = Solve.RREFTrait()
+
+# fflu is much slower in some cases, so we do an rref (with transformation)
+# here and let flint choose an algorithm, see
+# https://github.com/Nemocas/Nemo.jl/issues/1710.
+Solve.matrix_normal_form_type(::Solve.SolveCtx{QQFieldElem}) = Solve.RREFTrait()
+
+function Solve._can_solve_internal_no_check(::Solve.RREFTrait, A::QQMatrix, b::QQMatrix, task::Symbol; side::Symbol = :left)
   if side === :left
-    fl, sol, K = Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
+    fl, sol, K = Solve._can_solve_internal_no_check(Solve.RREFTrait(), transpose(A), transpose(b), task, side = :right)
     return fl, transpose(sol), transpose(K)
   end
 
@@ -669,14 +678,11 @@ function Solve._can_solve_internal_no_check(A::QQMatrix, b::QQMatrix, task::Symb
   return Bool(fl), x, kernel(A, side = :right)
 end
 
-function Solve._init_reduce(C::Solve.SolveCtx{QQFieldElem})
+function Solve._init_reduce(::Solve.RREFTrait, C::Solve.SolveCtx{QQFieldElem})
   if isdefined(C, :red) && isdefined(C, :trafo)
     return nothing
   end
 
-  # fflu is much slower in some cases, so we do an rref (with transformation)
-  # here and let flint choose an algorithm, see
-  # https://github.com/Nemocas/Nemo.jl/issues/1710.
   A = matrix(C)
   B = hcat(deepcopy(A), identity_matrix(base_ring(A), nrows(A)))
   rref!(B)
@@ -690,24 +696,11 @@ function Solve._init_reduce(C::Solve.SolveCtx{QQFieldElem})
   return nothing
 end
 
-function Solve.reduced_matrix(C::Solve.SolveCtx{QQFieldElem})
-  Solve._init_reduce(C)
-  return C.red
-end
-
-function Solve.transformation_matrix(C::Solve.SolveCtx{QQFieldElem})
-  Solve._init_reduce(C)
-  return C.trafo
-end
-
-function Solve._init_reduce_transpose(C::Solve.SolveCtx{QQFieldElem})
+function Solve._init_reduce_transpose(::Solve.RREFTrait, C::Solve.SolveCtx{QQFieldElem})
   if isdefined(C, :red_transp) && isdefined(C, :trafo_transp)
     return nothing
   end
 
-  # fflu is much slower in some cases, so we do an rref (with transformation)
-  # here and let flint choose an algorithm, see
-  # https://github.com/Nemocas/Nemo.jl/issues/1710.
   A = matrix(C)
   B = hcat(transpose(A), identity_matrix(base_ring(A), ncols(A)))
   rref!(B)
@@ -721,17 +714,7 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{QQFieldElem})
   return nothing
 end
 
-function Solve.reduced_matrix_of_transpose(C::Solve.SolveCtx{QQFieldElem})
-  Solve._init_reduce_transpose(C)
-  return C.red_transp
-end
-
-function Solve.transformation_matrix_of_transpose(C::Solve.SolveCtx{QQFieldElem})
-  Solve._init_reduce_transpose(C)
-  return C.trafo_transp
-end
-
-function Solve._can_solve_internal_no_check(C::Solve.SolveCtx{QQFieldElem}, b::QQMatrix, task::Symbol; side::Symbol = :left)
+function Solve._can_solve_internal_no_check(::Solve.RREFTrait, C::Solve.SolveCtx{QQFieldElem}, b::QQMatrix, task::Symbol; side::Symbol = :left)
   if side === :right
     fl, sol = Solve._can_solve_with_rref(b, Solve.transformation_matrix(C), rank(C), Solve.pivot_and_non_pivot_cols(C), task)
     if !fl || task !== :with_kernel

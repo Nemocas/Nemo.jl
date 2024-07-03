@@ -1476,9 +1476,13 @@ end
 #
 ###############################################################################
 
-function Solve._can_solve_internal_no_check(A::ZZMatrix, b::ZZMatrix, task::Symbol; side::Symbol = :left)
+Solve.matrix_normal_form_type(::ZZRing) = Solve.HermiteFormTrait()
+Solve.matrix_normal_form_type(::ZZMatrix) = Solve.HermiteFormTrait()
+Solve.matrix_normal_form_type(::Solve.SolveCtx{ZZRingElem}) = Solve.HermiteFormTrait()
+
+function Solve._can_solve_internal_no_check(::Solve.HermiteFormTrait, A::ZZMatrix, b::ZZMatrix, task::Symbol; side::Symbol = :left)
   if side === :left
-    fl, sol, K = Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
+    fl, sol, K = Solve._can_solve_internal_no_check(Solve.HermiteFormTrait(), transpose(A), transpose(b), task, side = :right)
     return fl, transpose(sol), transpose(K)
   end
 
@@ -1538,7 +1542,7 @@ end
 
 AbstractAlgebra.solve_context_type(::Type{ZZRingElem}) = Solve.SolveCtx{ZZRingElem, ZZMatrix, ZZMatrix, ZZMatrix}
 
-function Solve._init_reduce_transpose(C::Solve.SolveCtx{ZZRingElem})
+function Solve._init_reduce_transpose(::Solve.HermiteFormTrait, C::Solve.SolveCtx{ZZRingElem})
   if isdefined(C, :red_transp) && isdefined(C, :trafo_transp)
     return nothing
   end
@@ -1549,7 +1553,7 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{ZZRingElem})
   return nothing
 end
 
-function Solve.kernel(C::Solve.SolveCtx{ZZRingElem}; side::Symbol = :left)
+function Solve.kernel(::Solve.HermiteFormTrait, C::Solve.SolveCtx{ZZRingElem}; side::Symbol = :left)
   Solve.check_option(side, [:right, :left], "side")
 
   if side === :right

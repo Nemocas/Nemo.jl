@@ -508,10 +508,14 @@ function _solve_lu_precomp(P::Perm, LU::RealMatrix, y::RealMatrix)
   return z
 end
 
-function Solve._can_solve_internal_no_check(A::RealMatrix, b::RealMatrix, task::Symbol; side::Symbol = :left)
+Solve.matrix_normal_form_type(::RealField) = Solve.LUTrait()
+Solve.matrix_normal_form_type(::RealMatrix) = Solve.LUTrait()
+Solve.matrix_normal_form_type(::Solve.SolveCtx{RealFieldElem}) = Solve.LUTrait()
+
+function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::RealMatrix, b::RealMatrix, task::Symbol; side::Symbol = :left)
   nrows(A) != ncols(A) && error("Only implemented for square matrices")
   if side === :left
-    fl, sol, K = Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
+    fl, sol, K = Solve._can_solve_internal_no_check(Solve.LUTrait(), transpose(A), transpose(b), task, side = :right)
     return fl, transpose(sol), transpose(K)
   end
 
@@ -535,7 +539,7 @@ end
 
 AbstractAlgebra.solve_context_type(::Type{RealFieldElem}) = Solve.SolveCtx{RealFieldElem, RealMatrix, RealMatrix, RealMatrix}
 
-function Solve._init_reduce(C::Solve.SolveCtx{RealFieldElem})
+function Solve._init_reduce(::Solve.LUTrait, C::Solve.SolveCtx{RealFieldElem})
   if isdefined(C, :red) && isdefined(C, :lu_perm)
     return nothing
   end
@@ -558,7 +562,7 @@ function Solve._init_reduce(C::Solve.SolveCtx{RealFieldElem})
   return nothing
 end
 
-function Solve._init_reduce_transpose(C::Solve.SolveCtx{RealFieldElem})
+function Solve._init_reduce_transpose(::Solve.LUTrait, C::Solve.SolveCtx{RealFieldElem})
   if isdefined(C, :red_transp) && isdefined(C, :lu_perm_transp)
     return nothing
   end
@@ -581,7 +585,7 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{RealFieldElem})
   return nothing
 end
 
-function Solve._can_solve_internal_no_check(C::Solve.SolveCtx{RealFieldElem}, b::RealMatrix, task::Symbol; side::Symbol = :left)
+function Solve._can_solve_internal_no_check(::Solve.LUTrait, C::Solve.SolveCtx{RealFieldElem}, b::RealMatrix, task::Symbol; side::Symbol = :left)
   if side === :right
     LU = Solve.reduced_matrix(C)
     p = Solve.lu_permutation(C)
