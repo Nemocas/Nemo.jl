@@ -1,600 +1,110 @@
-<!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <meta name="author" content="William Hart">
-  
-  <title>Real balls - Nemo.jl</title>
-  
-
-  <link rel="shortcut icon" href="../../img/favicon.ico">
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../../css/highlight.css">
-  <link href="../../build/assets/Documenter.css" rel="stylesheet">
-
-  
-  <script>
+<!DOCTYPE html><HTML class="no-js" lang="en"><head><meta charset="utf-8"/><meta content="IE=edge" http-equiv="X-UA-Compatible"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="William Hart" name="author"/><title>Real balls - Nemo.jl</title><link href="../../img/favicon.ico" rel="shortcut icon"/><link href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css"/><link href="../../css/theme.css" rel="stylesheet" type="text/css"/><link href="../../css/theme_extra.css" rel="stylesheet" type="text/css"/><link href="../../css/highlight.css" rel="stylesheet"/><link href="../../build/assets/Documenter.css" rel="stylesheet"/><script>
     // Current page data
     var mkdocs_page_name = "Real balls";
     var mkdocs_page_input_path = "build/arb.md";
     var mkdocs_page_url = "/build/arb/";
-  </script>
-  
-  <script src="../../js/jquery-2.1.1.min.js"></script>
-  <script src="../../js/modernizr-2.8.3.min.js"></script>
-  <script type="text/javascript" src="../../js/highlight.pack.js"></script>
-  <script src="../../js/theme.js"></script> 
-  <script src="../../mathjaxhelper.js"></script>
-  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+  </script><script src="../../js/jquery-2.1.1.min.js"></script><script src="../../js/modernizr-2.8.3.min.js"></script><script src="../../js/highlight.pack.js" type="text/javascript"></script><script src="../../js/theme.js"></script><script src="../../mathjaxhelper.js"></script><script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
 
-  
-</head>
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
 
-<body class="wy-body-for-nav" role="document">
+        head.appendChild(meta);
+    };
 
-  <div class="wy-grid-for-nav">
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
 
-    
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-      <div class="wy-side-nav-search">
-        <a href="../.." class="icon icon-home"> Nemo.jl</a>
-        <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-  </form>
-</div>
-      </div>
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-        <ul class="current">
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../..">Getting Started</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../../about/">About Nemo</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../../types/">Types in Nemo</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../../constructors/">Parent object constructors</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../polynomial/">Univariate polynomials</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../series/">Capped relative power series</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../residue/">Residue rings</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../fraction/">Fraction fields</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../matrix/">Matrices</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../integer/">Integers</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../rational/">Rationals</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../finitefield/">Finite fields</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../padic/">P-adic fields</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 current">
-        <a class="current" href="./">Real balls</a>
-        
-            <ul>
-            
-                <li class="toctree-l3"><a href="#introduction">Introduction</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#real-field-constructors">Real field constructors</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#real-ball-constructors">Real ball constructors</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#basic-functionality">Basic functionality</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#conversions">Conversions</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#basic-manipulation">Basic manipulation</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#arithmetic-operations">Arithmetic operations</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#containment">Containment</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#comparison">Comparison</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#function">Function</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#function_1">Function</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#absolute-value">Absolute value</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#inverse">Inverse</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#shifting">Shifting</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#miscellaneous-operations">Miscellaneous operations</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#constants">Constants</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#mathematical-functions">Mathematical functions</a></li>
-                
-            
-            </ul>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../acb/">Complex boxes</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../numberfield/">Number fields</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../maximalorder/">Maximal orders</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../classgroup/">Class groups</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../perm/">Permutation groups</a>
-        
-    </li>
-<li>
-          
-        </ul>
-      </div>
-      &nbsp;
-    </nav>
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body class="wy-body-for-nav" role="document"><div class="wy-grid-for-nav"><nav class="wy-nav-side stickynav" data-toggle="wy-nav-shift"><div class="wy-side-nav-search"><a class="icon icon-home" href="../.."> Nemo.jl</a><div role="search"><form action="../../search.html" class="wy-form" id="rtd-search-form" method="get"><input name="q" placeholder="Search docs" type="text"/></form></div></div><div aria-label="main navigation" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation"><ul class="current"><li></li><li class="toctree-l1 "><a class="" href="../..">Getting Started</a></li><li></li><li></li><li class="toctree-l1 "><a class="" href="../../about/">About Nemo</a></li><li></li><li></li><li class="toctree-l1 "><a class="" href="../../types/">Types in Nemo</a></li><li></li><li></li><li class="toctree-l1 "><a class="" href="../../constructors/">Parent object constructors</a></li><li></li><li></li><li class="toctree-l1 "><a class="" href="../polynomial/">Univariate polynomials</a></li><li></li><li></li><li class="toctree-l1 "><a class="" href="../series/">Capped relative power series</a></li><li></li><li></li><li class="toctree-l1 "><a class="" href="../residue/">Residue rings</a></li><li></li><li></li><li class="toctree-l1 "><a class="" href="../fraction/">Fraction fields</a></li><li></li><li></li><li class="toctree-l1 "><a class="" href="../matrix/">Matrices</a></li><li></li><li></li><li class="toctree-l1 "><a class="" href="../integer/">Integers</a></li><li></li><li></li><li class="toctree-l1 "><a class="" href="../rational/">Rationals</a></li><li></li><li></li><li class="toctree-l1 "><a class="" href="../finitefield/">Finite fields</a></li><li></li><li></li><li class="toctree-l1 "><a class="" href="../padic/">P-adic fields</a></li><li></li><li></li><li class="toctree-l1 current"><a class="current" href="./">Real balls</a><ul><li class="toctree-l3"><a href="#introduction">Introduction</a></li><li class="toctree-l3"><a href="#real-field-constructors">Real field constructors</a></li><li class="toctree-l3"><a href="#real-ball-constructors">Real ball constructors</a></li><li class="toctree-l3"><a href="#basic-functionality">Basic functionality</a></li><li class="toctree-l3"><a href="#conversions">Conversions</a></li><li class="toctree-l3"><a href="#basic-manipulation">Basic manipulation</a></li><li class="toctree-l3"><a href="#arithmetic-operations">Arithmetic operations</a></li><li class="toctree-l3"><a href="#containment">Containment</a></li><li class="toctree-l3"><a href="#comparison">Comparison</a></li><li class="toctree-l3"><a href="#function">Function</a></li><li class="toctree-l3"><a href="#function_1">Function</a></li><li class="toctree-l3"><a href="#absolute-value">Absolute value</a></li><li class="toctree-l3"><a href="#inverse">Inverse</a></li><li class="toctree-l3"><a href="#shifting">Shifting</a></li><li class="toctree-l3"><a href="#miscellaneous-operations">Miscellaneous operations</a></li><li class="toctree-l3"><a href="#constants">Constants</a></li><li class="toctree-l3"><a href="#mathematical-functions">Mathematical functions</a></li></ul></li><li></li><li></li><li class="toctree-l1 "><a class="" href="../acb/">Complex boxes</a></li><li></li><li></li><li class="toctree-l1 "><a class="" href="../numberfield/">Number fields</a></li><li></li><li></li><li class="toctree-l1 "><a class="" href="../maximalorder/">Maximal orders</a></li><li></li><li></li><li class="toctree-l1 "><a class="" href="../classgroup/">Class groups</a></li><li></li><li></li><li class="toctree-l1 "><a class="" href="../perm/">Permutation groups</a></li><li></li></ul></div>
+       
+    </nav><section class="wy-nav-content-wrap" data-toggle="wy-nav-shift"><nav aria-label="top navigation" class="wy-nav-top" role="navigation"><i class="fa fa-bars" data-toggle="wy-nav-top"></i><a href="../..">Nemo.jl</a></nav><div class="wy-nav-content"><div class="rst-content"><div aria-label="breadcrumbs navigation" role="navigation"><ul class="wy-breadcrumbs"><li><a href="../..">Docs</a> »</li><li>Real balls</li><li class="wy-breadcrumbs-aside"><a class="icon icon-github" href="https://github.com/Nemocas/Nemo.jl"> Edit on GitHub</a></li></ul><hr/></div><div role="main"><div class="section"><p><a id="Introduction-1"></a></p><h2 id="introduction">Introduction</h2><p>Arbitrary precision real ball arithmetic is supplied by Arb which provides a ball representation which tracks error bounds rigorously. Real numbers are  represented in mid-rad interval form <script type="math/tex">[m \pm r] = [m-r, m+r]</script>.</p><p>The Arb real field is constructed using the <code>ArbField</code> constructor. This constructs the parent object for the Arb real field.</p><p>However, we define</p><pre><code>RealField = ArbField
+</code></pre><p>so that one can construct the Arb real field parent object using <code>RealField</code> instead of <code>ArbField</code>.</p><p>The types of real balls in Nemo are given in the following table, along with the libraries that provide them and the associated types of the parent objects.</p><table><thead><tr><th align="right">Library</th><th align="right">Field</th><th align="right">Element type</th><th align="right">Parent type</th></tr></thead><tbody><tr><td align="right">Arb</td><td align="right"><script type="math/tex">\mathbb{R}</script> (balls)</td><td align="right"><code>arb</code></td><td align="right"><code>ArbField</code></td></tr></tbody></table><p>All the real field types belong to the <code>Field</code> abstract type and the types of elements in this field, i.e. balls in this case, belong to the <code>FieldElem</code> abstract type.</p><p><a id="Real-field-constructors-1"></a></p><h2 id="real-field-constructors">Real field constructors</h2><p>In order to construct real balls in Nemo, one must first construct the Arb real field itself. This is accomplished with the following constructor.</p><pre><code>ArbField(prec::Int)
+</code></pre><p>Return the Arb field with precision in bits <code>prec</code> used for operations on interval midpoints. The precision used for interval radii is a fixed implementation-defined constant (30 bits).</p><p>We define</p><pre><code>RealField = ArbField
+</code></pre><p>so that one can use <code>RealField</code> in place of <code>ArbField</code>.</p><p>Here is an example of creating an Arb real field and using the resulting parent object to coerce values into the resulting field.</p><pre><code>RR = RealField(64)
 
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../..">Nemo.jl</a>
-      </nav>
-
-      
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
-  <ul class="wy-breadcrumbs">
-    <li><a href="../..">Docs</a> &raquo;</li>
-    
-      
-    
-    <li>Real balls</li>
-    <li class="wy-breadcrumbs-aside">
-      
-        
-          <a href="https://github.com/Nemocas/Nemo.jl" class="icon icon-github"> Edit on GitHub</a>
-        
-      
-    </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main">
-            <div class="section">
-              
-                <p><a id='Introduction-1'></a></p>
-<h2 id="introduction">Introduction</h2>
-<p>Arbitrary precision real ball arithmetic is supplied by Arb which provides a ball representation which tracks error bounds rigorously. Real numbers are  represented in mid-rad interval form <script type="math/tex">[m \pm r] = [m-r, m+r]</script>.</p>
-<p>The Arb real field is constructed using the <code>ArbField</code> constructor. This constructs the parent object for the Arb real field.</p>
-<p>However, we define</p>
-<pre><code>RealField = ArbField
-</code></pre>
-
-<p>so that one can construct the Arb real field parent object using <code>RealField</code> instead of <code>ArbField</code>.</p>
-<p>The types of real balls in Nemo are given in the following table, along with the libraries that provide them and the associated types of the parent objects.</p>
-<table>
-<thead>
-<tr>
-<th align="right">Library</th>
-<th align="right">Field</th>
-<th align="right">Element type</th>
-<th align="right">Parent type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">Arb</td>
-<td align="right">
-<script type="math/tex">\mathbb{R}</script> (balls)</td>
-<td align="right"><code>arb</code></td>
-<td align="right"><code>ArbField</code></td>
-</tr>
-</tbody>
-</table>
-<p>All the real field types belong to the <code>Field</code> abstract type and the types of elements in this field, i.e. balls in this case, belong to the <code>FieldElem</code> abstract type.</p>
-<p><a id='Real-field-constructors-1'></a></p>
-<h2 id="real-field-constructors">Real field constructors</h2>
-<p>In order to construct real balls in Nemo, one must first construct the Arb real field itself. This is accomplished with the following constructor.</p>
-<pre><code>ArbField(prec::Int)
-</code></pre>
-
-<p>Return the Arb field with precision in bits <code>prec</code> used for operations on interval midpoints. The precision used for interval radii is a fixed implementation-defined constant (30 bits).</p>
-<p>We define</p>
-<pre><code>RealField = ArbField
-</code></pre>
-
-<p>so that one can use <code>RealField</code> in place of <code>ArbField</code>.</p>
-<p>Here is an example of creating an Arb real field and using the resulting parent object to coerce values into the resulting field.</p>
-<pre><code>RR = RealField(64)
-
-a = RR(&quot;0.25&quot;)
-b = RR(&quot;0.1&quot;)
+a = RR("0.25")
+b = RR("0.1")
 c = RR(0.5)
 d = RR(12)
-</code></pre>
-
-<p>Note that whilst one can coerce double precision floating point values into an Arb real field, unless those values can be represented exactly in double precision, the resulting ball can't be any more precise than the double precision supplied.</p>
-<p>If instead, values can be represented precisely using decimal arithmetic then one can supply them to Arb using a string. In this case, Arb will store them to the precision specified when creating the Arb field.</p>
-<p>If the values can be stored precisely as a binary floating point number, Arb will store the values exactly. See the function <code>isexact</code> below for more information.</p>
-<p><a id='Real-ball-constructors-1'></a></p>
-<h2 id="real-ball-constructors">Real ball constructors</h2>
-<p>Once an Arb real field is constructed, there are various ways to construct balls in that field.</p>
-<p>Apart from coercing elements into the Arb real field as above, we offer the following functions.</p>
-<p><a id='Base.zero-Tuple{Nemo.ArbField}' href='#Base.zero-Tuple{Nemo.ArbField}'>#</a>
-<strong><code>Base.zero</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>zero(R::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return exact zero in the given Arb field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L57' class='documenter-source'>source</a><br></p>
-<p><a id='Base.one-Tuple{Nemo.ArbField}' href='#Base.one-Tuple{Nemo.ArbField}'>#</a>
-<strong><code>Base.one</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>one(R::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return exact one in the given Arb field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L63' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.ball-Tuple{Nemo.arb,Nemo.arb}' href='#Nemo.ball-Tuple{Nemo.arb,Nemo.arb}'>#</a>
-<strong><code>Nemo.ball</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>ball(mid::arb, rad::arb)
-</code></pre>
-
-<blockquote>
-<p>Constructs an <code>arb</code> enclosing the range <script type="math/tex">[m-|r|, m+|r|]</script>, given the pair <script type="math/tex">(m, r)</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L437' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of constructing balls.</p>
-<pre><code>RR = RealField(64)
+</code></pre><p>Note that whilst one can coerce double precision floating point values into an Arb real field, unless those values can be represented exactly in double precision, the resulting ball can't be any more precise than the double precision supplied.</p><p>If instead, values can be represented precisely using decimal arithmetic then one can supply them to Arb using a string. In this case, Arb will store them to the precision specified when creating the Arb field.</p><p>If the values can be stored precisely as a binary floating point number, Arb will store the values exactly. See the function <code>isexact</code> below for more information.</p><p><a id="Real-ball-constructors-1"></a></p><h2 id="real-ball-constructors">Real ball constructors</h2><p>Once an Arb real field is constructed, there are various ways to construct balls in that field.</p><p>Apart from coercing elements into the Arb real field as above, we offer the following functions.</p><p><a href="#Base.zero-Tuple{Nemo.ArbField}" id="Base.zero-Tuple{Nemo.ArbField}">#</a><strong><code>Base.zero</code></strong> — <em>Method</em>.</p><pre><code>zero(R::ArbField)
+</code></pre><blockquote><p>Return exact zero in the given Arb field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L57" target="_blank">source</a><br/></p><p><a href="#Base.one-Tuple{Nemo.ArbField}" id="Base.one-Tuple{Nemo.ArbField}">#</a><strong><code>Base.one</code></strong> — <em>Method</em>.</p><pre><code>one(R::ArbField)
+</code></pre><blockquote><p>Return exact one in the given Arb field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L63" target="_blank">source</a><br/></p><p><a href="#Nemo.ball-Tuple{Nemo.arb,Nemo.arb}" id="Nemo.ball-Tuple{Nemo.arb,Nemo.arb}">#</a><strong><code>Nemo.ball</code></strong> — <em>Method</em>.</p><pre><code>ball(mid::arb, rad::arb)
+</code></pre><blockquote><p>Constructs an <code>arb</code> enclosing the range <script type="math/tex">[m-|r|, m+|r|]</script>, given the pair <script type="math/tex">(m, r)</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L437" target="_blank">source</a><br/></p><p>Here are some examples of constructing balls.</p><pre><code>RR = RealField(64)
 
 a = zero(RR)
 b = one(RR)
-c = ball(RR(3), RR(&quot;0.0001&quot;))
-</code></pre>
-
-<p><a id='Basic-functionality-1'></a></p>
-<h2 id="basic-functionality">Basic functionality</h2>
-<p>The following basic functionality is provided by the default Arb real field implementation in Nemo, to support construction of generic rings over real fields. Any custom real field implementation in Nemo should provide analogues of these functions along with the usual arithmetic operations.</p>
-<pre><code>parent_type(::Type{arb})
-</code></pre>
-
-<p>Gives the type of the parent object of an Arb real field element.</p>
-<pre><code>elem_type(R::ArbField)
-</code></pre>
-
-<p>Given the parent object for a Arb field, return the type of elements of the field.</p>
-<pre><code>mul!(c::arb, a::arb, b::arb)
-</code></pre>
-
-<p>Multiply <script type="math/tex">a</script> by <script type="math/tex">b</script> and set the existing Arb field element <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p>
-<pre><code>addeq!(c::arb, a::arb)
-</code></pre>
-
-<p>In-place addition. Adds <script type="math/tex">a</script> to <script type="math/tex">c</script> and sets <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p>
-<pre><code>deepcopy(a::arb)
-</code></pre>
-
-<p>Return a copy of the Arb field element <script type="math/tex">a</script>, recursively copying the internal data. Arb field elements are mutable in Nemo so a shallow copy is not sufficient.</p>
-<p>Given the parent object <code>R</code> for an Arb real field, the following coercion functions are provided to coerce various elements into the Arb field. Developers provide these by overloading the <code>call</code> operator for the real field parent objects.</p>
-<pre><code>R()
-</code></pre>
-
-<p>Coerce zero into the Arb field.</p>
-<pre><code>R(n::Integer)
+c = ball(RR(3), RR("0.0001"))
+</code></pre><p><a id="Basic-functionality-1"></a></p><h2 id="basic-functionality">Basic functionality</h2><p>The following basic functionality is provided by the default Arb real field implementation in Nemo, to support construction of generic rings over real fields. Any custom real field implementation in Nemo should provide analogues of these functions along with the usual arithmetic operations.</p><pre><code>parent_type(::Type{arb})
+</code></pre><p>Gives the type of the parent object of an Arb real field element.</p><pre><code>elem_type(R::ArbField)
+</code></pre><p>Given the parent object for a Arb field, return the type of elements of the field.</p><pre><code>mul!(c::arb, a::arb, b::arb)
+</code></pre><p>Multiply <script type="math/tex">a</script> by <script type="math/tex">b</script> and set the existing Arb field element <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p><pre><code>addeq!(c::arb, a::arb)
+</code></pre><p>In-place addition. Adds <script type="math/tex">a</script> to <script type="math/tex">c</script> and sets <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p><pre><code>deepcopy(a::arb)
+</code></pre><p>Return a copy of the Arb field element <script type="math/tex">a</script>, recursively copying the internal data. Arb field elements are mutable in Nemo so a shallow copy is not sufficient.</p><p>Given the parent object <code>R</code> for an Arb real field, the following coercion functions are provided to coerce various elements into the Arb field. Developers provide these by overloading the <code>call</code> operator for the real field parent objects.</p><pre><code>R()
+</code></pre><p>Coerce zero into the Arb field.</p><pre><code>R(n::Integer)
 R(f::fmpz)
 R(q::fmpq)
-</code></pre>
-
-<p>Coerce an integer or rational value into the Arb field.</p>
-<pre><code>R(f::Float64)
+</code></pre><p>Coerce an integer or rational value into the Arb field.</p><pre><code>R(f::Float64)
 R(f::BigFloat)
-</code></pre>
-
-<p>Coerce the given floating point number into the Arb field.</p>
-<pre><code>R(f::AbstractString)
-</code></pre>
-
-<p>Coerce the decimal number, given as a string, into the Arb field.</p>
-<pre><code>R(f::arb)
-</code></pre>
-
-<p>Take an Arb field element that is already in the Arb field and simply return it. A copy of the original is not made.</p>
-<p>Here are some examples of coercing elements into the Arb field.</p>
-<pre><code>RR = RealField(64)
+</code></pre><p>Coerce the given floating point number into the Arb field.</p><pre><code>R(f::AbstractString)
+</code></pre><p>Coerce the decimal number, given as a string, into the Arb field.</p><pre><code>R(f::arb)
+</code></pre><p>Take an Arb field element that is already in the Arb field and simply return it. A copy of the original is not made.</p><p>Here are some examples of coercing elements into the Arb field.</p><pre><code>RR = RealField(64)
 
 a = RR(3)
 b = RR(QQ(2,3))
-c = ball(RR(3), RR(&quot;0.0001&quot;))
-d = RR(&quot;3 +/- 0.0001&quot;)
-f = RR(&quot;-1.24e+12345&quot;)
-g = RR(&quot;nan +/- inf&quot;)
-</code></pre>
+c = ball(RR(3), RR("0.0001"))
+d = RR("3 +/- 0.0001")
+f = RR("-1.24e+12345")
+g = RR("nan +/- inf")
+</code></pre><p>In addition to the above, developers of custom real field types must ensure that they provide the equivalent of the function <code>base_ring(R::ArbField)</code> which should return <code>Union{}</code>. In addition to this they should ensure that each real field element contains a field <code>parent</code> specifying the parent object of the real field element, or at least supply the equivalent of the function <code>parent(a::arb)</code> to return the parent object of a real field element.</p><p><a id="Conversions-1"></a></p><h2 id="conversions">Conversions</h2><p><a href="#Base.convert-Tuple{Type{Float64},Nemo.arb}" id="Base.convert-Tuple{Type{Float64},Nemo.arb}">#</a><strong><code>Base.convert</code></strong> — <em>Method</em>.</p><pre><code>convert(::Type{Float64}, x::arb)
+</code></pre><blockquote><p>Return the midpoint of <script type="math/tex">x</script> rounded down to a machine double.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L92" target="_blank">source</a><br/></p><p><a id="Basic-manipulation-1"></a></p><h2 id="basic-manipulation">Basic manipulation</h2><p>Numerous functions are provided to manipulate Arb field elements. Also see the section on basic functionality above.</p><p><a href="#Nemo.base_ring-Tuple{Nemo.ArbField}" id="Nemo.base_ring-Tuple{Nemo.ArbField}">#</a><strong><code>Nemo.base_ring</code></strong> — <em>Method</em>.</p><pre><code>base_ring(R::ArbField)
+</code></pre><blockquote><p>Returns <code>Union{}</code> since an Arb field does not depend on any other ring.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L39" target="_blank">source</a><br/></p><p><a href="#Nemo.base_ring-Tuple{Nemo.arb}" id="Nemo.base_ring-Tuple{Nemo.arb}">#</a><strong><code>Nemo.base_ring</code></strong> — <em>Method</em>.</p><pre><code>base_ring(x::arb)
+</code></pre><blockquote><p>Returns <code>Union{}</code> since an Arb field does not depend on any other ring.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L45" target="_blank">source</a><br/></p><p><a href="#Base.parent-Tuple{Nemo.arb}" id="Base.parent-Tuple{Nemo.arb}">#</a><strong><code>Base.parent</code></strong> — <em>Method</em>.</p><pre><code>parent(x::arb)
+</code></pre><blockquote><p>Return the parent of the given Arb field element.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L51" target="_blank">source</a><br/></p><p><a href="#Nemo.iszero-Tuple{Nemo.arb}" id="Nemo.iszero-Tuple{Nemo.arb}">#</a><strong><code>Nemo.iszero</code></strong> — <em>Method</em>.</p><pre><code>iszero(x::arb)
+</code></pre><blockquote><p>Return <code>true</code> if <script type="math/tex">x</script> is certainly zero, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L347" target="_blank">source</a><br/></p><p><a href="#Nemo.isnonzero-Tuple{Nemo.arb}" id="Nemo.isnonzero-Tuple{Nemo.arb}">#</a><strong><code>Nemo.isnonzero</code></strong> — <em>Method</em>.</p><pre><code>isnonzero(x::arb)
+</code></pre><blockquote><p>Return <code>true</code> if <script type="math/tex">x</script> is certainly not equal to zero, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L355" target="_blank">source</a><br/></p><p><a href="#Nemo.isone-Tuple{Nemo.arb}" id="Nemo.isone-Tuple{Nemo.arb}">#</a><strong><code>Nemo.isone</code></strong> — <em>Method</em>.</p><pre><code>isone(x::arb)
+</code></pre><blockquote><p>Return <code>true</code> if <script type="math/tex">x</script> is certainly not equal to oneo, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L364" target="_blank">source</a><br/></p><p><a href="#Base.isfinite-Tuple{Nemo.arb}" id="Base.isfinite-Tuple{Nemo.arb}">#</a><strong><code>Base.isfinite</code></strong> — <em>Method</em>.</p><pre><code>isfinite(x::arb)
+</code></pre><blockquote><p>Return <code>true</code> if <script type="math/tex">x</script> is finite, i.e. having finite midpoint and radius, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L373" target="_blank">source</a><br/></p><p><a href="#Nemo.isexact-Tuple{Nemo.arb}" id="Nemo.isexact-Tuple{Nemo.arb}">#</a><strong><code>Nemo.isexact</code></strong> — <em>Method</em>.</p><pre><code>isexact(x::arb)
+</code></pre><blockquote><p>Return <code>true</code> if <script type="math/tex">x</script> is exact, i.e. has zero radius, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L382" target="_blank">source</a><br/></p><p><a href="#Nemo.isint-Tuple{Nemo.arb}" id="Nemo.isint-Tuple{Nemo.arb}">#</a><strong><code>Nemo.isint</code></strong> — <em>Method</em>.</p><pre><code>isint(x::arb)
+</code></pre><blockquote><p>Return <code>true</code> if <script type="math/tex">x</script> is an exact integer, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L391" target="_blank">source</a><br/></p><p><a href="#Nemo.ispositive-Tuple{Nemo.arb}" id="Nemo.ispositive-Tuple{Nemo.arb}">#</a><strong><code>Nemo.ispositive</code></strong> — <em>Method</em>.</p><pre><code>ispositive(x::arb)
+</code></pre><blockquote><p>Return <code>true</code> if <script type="math/tex">x</script> is certainly positive, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L399" target="_blank">source</a><br/></p><p><a href="#Nemo.isnonnegative-Tuple{Nemo.arb}" id="Nemo.isnonnegative-Tuple{Nemo.arb}">#</a><strong><code>Nemo.isnonnegative</code></strong> — <em>Method</em>.</p><pre><code>isnonnegative(x::arb)
+</code></pre><blockquote><p>Return <code>true</code> if <script type="math/tex">x</script> is certainly nonnegative, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L407" target="_blank">source</a><br/></p><p><a href="#Nemo.isnegative-Tuple{Nemo.arb}" id="Nemo.isnegative-Tuple{Nemo.arb}">#</a><strong><code>Nemo.isnegative</code></strong> — <em>Method</em>.</p><pre><code>isnegative(x::arb)
+</code></pre><blockquote><p>Return <code>true</code> if <script type="math/tex">x</script> is certainly negative, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L415" target="_blank">source</a><br/></p><p><a href="#Nemo.isnonpositive-Tuple{Nemo.arb}" id="Nemo.isnonpositive-Tuple{Nemo.arb}">#</a><strong><code>Nemo.isnonpositive</code></strong> — <em>Method</em>.</p><pre><code>isnonpositive(x::arb)
+</code></pre><blockquote><p>Return <code>true</code> if <script type="math/tex">x</script> is certainly nonpositive, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L423" target="_blank">source</a><br/></p><p><a href="#Nemo.midpoint-Tuple{Nemo.arb}" id="Nemo.midpoint-Tuple{Nemo.arb}">#</a><strong><code>Nemo.midpoint</code></strong> — <em>Method</em>.</p><pre><code>midpoint(x::arb)
+</code></pre><blockquote><p>Return the midpoint of the ball <script type="math/tex">x</script> as an Arb ball.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L458" target="_blank">source</a><br/></p><p><a href="#Nemo.radius-Tuple{Nemo.arb}" id="Nemo.radius-Tuple{Nemo.arb}">#</a><strong><code>Nemo.radius</code></strong> — <em>Method</em>.</p><pre><code>radius(x::arb)
+</code></pre><blockquote><p>Return the radius of the ball <script type="math/tex">x</script> as an Arb ball.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L448" target="_blank">source</a><br/></p><p><a href="#Nemo.accuracy_bits-Tuple{Nemo.arb}" id="Nemo.accuracy_bits-Tuple{Nemo.arb}">#</a><strong><code>Nemo.accuracy_bits</code></strong> — <em>Method</em>.</p><pre><code>accuracy_bits(x::arb)
+</code></pre><blockquote><p>Return the relative accuracy of <script type="math/tex">x</script> measured in bits, capped between <code>typemax(Int)</code> and <code>-typemax(Int)</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L71" target="_blank">source</a><br/></p><p>Here are some examples of basic manipulation of Arb balls.</p><pre><code>RR = RealField(64)
 
-<p>In addition to the above, developers of custom real field types must ensure that they provide the equivalent of the function <code>base_ring(R::ArbField)</code> which should return <code>Union{}</code>. In addition to this they should ensure that each real field element contains a field <code>parent</code> specifying the parent object of the real field element, or at least supply the equivalent of the function <code>parent(a::arb)</code> to return the parent object of a real field element.</p>
-<p><a id='Conversions-1'></a></p>
-<h2 id="conversions">Conversions</h2>
-<p><a id='Base.convert-Tuple{Type{Float64},Nemo.arb}' href='#Base.convert-Tuple{Type{Float64},Nemo.arb}'>#</a>
-<strong><code>Base.convert</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>convert(::Type{Float64}, x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the midpoint of <script type="math/tex">x</script> rounded down to a machine double.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L92' class='documenter-source'>source</a><br></p>
-<p><a id='Basic-manipulation-1'></a></p>
-<h2 id="basic-manipulation">Basic manipulation</h2>
-<p>Numerous functions are provided to manipulate Arb field elements. Also see the section on basic functionality above.</p>
-<p><a id='Nemo.base_ring-Tuple{Nemo.ArbField}' href='#Nemo.base_ring-Tuple{Nemo.ArbField}'>#</a>
-<strong><code>Nemo.base_ring</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>base_ring(R::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>Union{}</code> since an Arb field does not depend on any other ring.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L39' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.base_ring-Tuple{Nemo.arb}' href='#Nemo.base_ring-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.base_ring</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>base_ring(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>Union{}</code> since an Arb field does not depend on any other ring.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L45' class='documenter-source'>source</a><br></p>
-<p><a id='Base.parent-Tuple{Nemo.arb}' href='#Base.parent-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.parent</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>parent(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the parent of the given Arb field element.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L51' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.iszero-Tuple{Nemo.arb}' href='#Nemo.iszero-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.iszero</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>iszero(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if <script type="math/tex">x</script> is certainly zero, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L347' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.isnonzero-Tuple{Nemo.arb}' href='#Nemo.isnonzero-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.isnonzero</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isnonzero(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if <script type="math/tex">x</script> is certainly not equal to zero, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L355' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.isone-Tuple{Nemo.arb}' href='#Nemo.isone-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.isone</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isone(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if <script type="math/tex">x</script> is certainly not equal to oneo, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L364' class='documenter-source'>source</a><br></p>
-<p><a id='Base.isfinite-Tuple{Nemo.arb}' href='#Base.isfinite-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.isfinite</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isfinite(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if <script type="math/tex">x</script> is finite, i.e. having finite midpoint and radius, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L373' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.isexact-Tuple{Nemo.arb}' href='#Nemo.isexact-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.isexact</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isexact(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if <script type="math/tex">x</script> is exact, i.e. has zero radius, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L382' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.isint-Tuple{Nemo.arb}' href='#Nemo.isint-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.isint</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isint(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if <script type="math/tex">x</script> is an exact integer, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L391' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.ispositive-Tuple{Nemo.arb}' href='#Nemo.ispositive-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.ispositive</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>ispositive(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if <script type="math/tex">x</script> is certainly positive, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L399' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.isnonnegative-Tuple{Nemo.arb}' href='#Nemo.isnonnegative-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.isnonnegative</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isnonnegative(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if <script type="math/tex">x</script> is certainly nonnegative, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L407' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.isnegative-Tuple{Nemo.arb}' href='#Nemo.isnegative-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.isnegative</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isnegative(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if <script type="math/tex">x</script> is certainly negative, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L415' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.isnonpositive-Tuple{Nemo.arb}' href='#Nemo.isnonpositive-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.isnonpositive</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isnonpositive(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if <script type="math/tex">x</script> is certainly nonpositive, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L423' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.midpoint-Tuple{Nemo.arb}' href='#Nemo.midpoint-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.midpoint</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>midpoint(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the midpoint of the ball <script type="math/tex">x</script> as an Arb ball.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L458' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.radius-Tuple{Nemo.arb}' href='#Nemo.radius-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.radius</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>radius(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the radius of the ball <script type="math/tex">x</script> as an Arb ball.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L448' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.accuracy_bits-Tuple{Nemo.arb}' href='#Nemo.accuracy_bits-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.accuracy_bits</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>accuracy_bits(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the relative accuracy of <script type="math/tex">x</script> measured in bits, capped between <code>typemax(Int)</code> and <code>-typemax(Int)</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L71' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of basic manipulation of Arb balls.</p>
-<pre><code>RR = RealField(64)
-
-a = RR(&quot;1.2 +/- 0.001&quot;)
+a = RR("1.2 +/- 0.001")
 b = RR(3)
 
 iszero(a)
@@ -608,134 +118,7 @@ d = midpoint(b)
 f = accuracy_bits(a)
 S = parent(a)
 T = base_ring(RR)
-</code></pre>
-
-<p><a id='Arithmetic-operations-1'></a></p>
-<h2 id="arithmetic-operations">Arithmetic operations</h2>
-<p>Nemo provides all the standard field operations for Arb field elements, as follows. Note that division is represented by <code>//</code> since a field is its own fraction field and since exact division is not generally possible in an inexact field.</p>
-<table>
-<thead>
-<tr>
-<th align="right">Function</th>
-<th align="right">Operation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">-(a::arb)</td>
-<td align="right">unary minus</td>
-</tr>
-<tr>
-<td align="right">+(a::arb, b::arb)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">-(a::arb, b::arb)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">*(a::arb, b::arb)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">//(a::arb, b::arb)</td>
-<td align="right">division</td>
-</tr>
-<tr>
-<td align="right">^(a::arb, b::arb)</td>
-<td align="right">powering</td>
-</tr>
-</tbody>
-</table>
-<p>In addition, the following ad hoc field operations are defined.</p>
-<table>
-<thead>
-<tr>
-<th align="right">Function</th>
-<th align="right">Operation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">+(a::arb, b::Integer)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">+(a::Integer, b::arb)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">+(a::arb, b::fmpz)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">+(a::fmpz, b::arb)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">-(a::arb, b::Integer)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">-(a::Integer, b::arb)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">-(a::arb, b::fmpz)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">-(a::fmpz, b::arb)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">*(a::arb, b::Integer)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">*(a::Integer, b::arb)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">*(a::arb, b::fmpz)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">*(a::fmpz, b::arb)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">//(a::arb, b::Integer)</td>
-<td align="right">division</td>
-</tr>
-<tr>
-<td align="right">//(a::arb, b::fmpz)</td>
-<td align="right">division</td>
-</tr>
-<tr>
-<td align="right">//(a::Integer, b::arb)</td>
-<td align="right">division</td>
-</tr>
-<tr>
-<td align="right">//(a::fmpz, b::arb)</td>
-<td align="right">division</td>
-</tr>
-<tr>
-<td align="right">^(a::arb, b::Integer)</td>
-<td align="right">powering</td>
-</tr>
-<tr>
-<td align="right">^(a::arb, b::fmpz)</td>
-<td align="right">powering</td>
-</tr>
-<tr>
-<td align="right">^(a::arb, b::fmpq)</td>
-<td align="right">powering</td>
-</tr>
-</tbody>
-</table>
-<p>Here are some examples of arithmetic operations on Arb balls.</p>
-<pre><code>RR = RealField(64)
+</code></pre><p><a id="Arithmetic-operations-1"></a></p><h2 id="arithmetic-operations">Arithmetic operations</h2><p>Nemo provides all the standard field operations for Arb field elements, as follows. Note that division is represented by <code>//</code> since a field is its own fraction field and since exact division is not generally possible in an inexact field.</p><table><thead><tr><th align="right">Function</th><th align="right">Operation</th></tr></thead><tbody><tr><td align="right">-(a::arb)</td><td align="right">unary minus</td></tr><tr><td align="right">+(a::arb, b::arb)</td><td align="right">addition</td></tr><tr><td align="right">-(a::arb, b::arb)</td><td align="right">subtraction</td></tr><tr><td align="right">*(a::arb, b::arb)</td><td align="right">multiplication</td></tr><tr><td align="right">//(a::arb, b::arb)</td><td align="right">division</td></tr><tr><td align="right">^(a::arb, b::arb)</td><td align="right">powering</td></tr></tbody></table><p>In addition, the following ad hoc field operations are defined.</p><table><thead><tr><th align="right">Function</th><th align="right">Operation</th></tr></thead><tbody><tr><td align="right">+(a::arb, b::Integer)</td><td align="right">addition</td></tr><tr><td align="right">+(a::Integer, b::arb)</td><td align="right">addition</td></tr><tr><td align="right">+(a::arb, b::fmpz)</td><td align="right">addition</td></tr><tr><td align="right">+(a::fmpz, b::arb)</td><td align="right">addition</td></tr><tr><td align="right">-(a::arb, b::Integer)</td><td align="right">subtraction</td></tr><tr><td align="right">-(a::Integer, b::arb)</td><td align="right">subtraction</td></tr><tr><td align="right">-(a::arb, b::fmpz)</td><td align="right">subtraction</td></tr><tr><td align="right">-(a::fmpz, b::arb)</td><td align="right">subtraction</td></tr><tr><td align="right">*(a::arb, b::Integer)</td><td align="right">multiplication</td></tr><tr><td align="right">*(a::Integer, b::arb)</td><td align="right">multiplication</td></tr><tr><td align="right">*(a::arb, b::fmpz)</td><td align="right">multiplication</td></tr><tr><td align="right">*(a::fmpz, b::arb)</td><td align="right">multiplication</td></tr><tr><td align="right">//(a::arb, b::Integer)</td><td align="right">division</td></tr><tr><td align="right">//(a::arb, b::fmpz)</td><td align="right">division</td></tr><tr><td align="right">//(a::Integer, b::arb)</td><td align="right">division</td></tr><tr><td align="right">//(a::fmpz, b::arb)</td><td align="right">division</td></tr><tr><td align="right">^(a::arb, b::Integer)</td><td align="right">powering</td></tr><tr><td align="right">^(a::arb, b::fmpz)</td><td align="right">powering</td></tr><tr><td align="right">^(a::arb, b::fmpq)</td><td align="right">powering</td></tr></tbody></table><p>Here are some examples of arithmetic operations on Arb balls.</p><pre><code>RR = RealField(64)
 
 x = RR(3)
 y = RR(QQ(2,3))
@@ -745,115 +128,20 @@ b = x*y
 d = 1//y - x
 d = 3x + ZZ(100)//y
 f = (x^2 + y^2) ^ QQ(1,2)
-</code></pre>
-
-<p><a id='Containment-1'></a></p>
-<h2 id="containment">Containment</h2>
-<p>It is often necessary to determine whether a given exact value or ball is contained in a given real ball or whether two balls overlap. The following functions are provided for this purpose.</p>
-<p><a id='Nemo.overlaps-Tuple{Nemo.arb,Nemo.arb}' href='#Nemo.overlaps-Tuple{Nemo.arb,Nemo.arb}'>#</a>
-<strong><code>Nemo.overlaps</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>overlaps(x::arb, y::arb)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>true</code> if any part of the ball <script type="math/tex">x</script> overlaps any part of the ball <script type="math/tex">y</script>, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L128' class='documenter-source'>source</a><br></p>
-<p><a id='Base.contains-Tuple{Nemo.arb,Nemo.arb}' href='#Base.contains-Tuple{Nemo.arb,Nemo.arb}'>#</a>
-<strong><code>Base.contains</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>contains(x::arb, y::arb)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>true</code> if the ball <script type="math/tex">x</script> contains the ball <script type="math/tex">y</script>, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L186' class='documenter-source'>source</a><br></p>
-<p><a id='Base.contains-Tuple{Nemo.arb,Integer}' href='#Base.contains-Tuple{Nemo.arb,Integer}'>#</a>
-<strong><code>Base.contains</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>contains(x::arb, y::Integer)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>true</code> if the ball <script type="math/tex">x</script> contains the given integer value, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L168' class='documenter-source'>source</a><br></p>
-<p><a id='Base.contains-Tuple{Nemo.arb,Nemo.fmpz}' href='#Base.contains-Tuple{Nemo.arb,Nemo.fmpz}'>#</a>
-<strong><code>Base.contains</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>contains(x::arb, y::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>true</code> if the ball <script type="math/tex">x</script> contains the given integer value, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L153' class='documenter-source'>source</a><br></p>
-<p><a id='Base.contains-Tuple{Nemo.arb,Nemo.fmpq}' href='#Base.contains-Tuple{Nemo.arb,Nemo.fmpq}'>#</a>
-<strong><code>Base.contains</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>contains(x::arb, y::fmpq)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>true</code> if the ball <script type="math/tex">x</script> contains the given rational value, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L143' class='documenter-source'>source</a><br></p>
-<p><a id='Base.contains-Tuple{Nemo.arb,BigFloat}' href='#Base.contains-Tuple{Nemo.arb,BigFloat}'>#</a>
-<strong><code>Base.contains</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>contains(x::arb, y::BigFloat)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>true</code> if the ball <script type="math/tex">x</script> contains the given floating point value,  otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L175' class='documenter-source'>source</a><br></p>
-<p>The following functions are also provided for determining if a ball intersects a certain part of the real number line.</p>
-<p><a id='Nemo.contains_zero-Tuple{Nemo.arb}' href='#Nemo.contains_zero-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.contains_zero</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>contains_zero(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>true</code> if the ball <script type="math/tex">x</script> contains zero, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L196' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.contains_negative-Tuple{Nemo.arb}' href='#Nemo.contains_negative-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.contains_negative</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>contains_negative(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>true</code> if the ball <script type="math/tex">x</script> contains any negative value, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L205' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.contains_positive-Tuple{Nemo.arb}' href='#Nemo.contains_positive-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.contains_positive</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>contains_positive(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>true</code> if the ball <script type="math/tex">x</script> contains any positive value, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L215' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.contains_nonnegative-Tuple{Nemo.arb}' href='#Nemo.contains_nonnegative-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.contains_nonnegative</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>contains_nonnegative(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>true</code> if the ball <script type="math/tex">x</script> contains any nonnegative value, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L225' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.contains_nonpositive-Tuple{Nemo.arb}' href='#Nemo.contains_nonpositive-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.contains_nonpositive</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>contains_nonpositive(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>true</code> if the ball <script type="math/tex">x</script> contains any nonpositive value, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L235' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of testing containment.</p>
-<pre><code>RR = RealField(64)
-x = RR(&quot;1 +/- 0.001&quot;)
-y = RR(&quot;3&quot;)
+</code></pre><p><a id="Containment-1"></a></p><h2 id="containment">Containment</h2><p>It is often necessary to determine whether a given exact value or ball is contained in a given real ball or whether two balls overlap. The following functions are provided for this purpose.</p><p><a href="#Nemo.overlaps-Tuple{Nemo.arb,Nemo.arb}" id="Nemo.overlaps-Tuple{Nemo.arb,Nemo.arb}">#</a><strong><code>Nemo.overlaps</code></strong> — <em>Method</em>.</p><pre><code>overlaps(x::arb, y::arb)
+</code></pre><blockquote><p>Returns <code>true</code> if any part of the ball <script type="math/tex">x</script> overlaps any part of the ball <script type="math/tex">y</script>, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L128" target="_blank">source</a><br/></p><p><a href="#Base.contains-Tuple{Nemo.arb,Nemo.arb}" id="Base.contains-Tuple{Nemo.arb,Nemo.arb}">#</a><strong><code>Base.contains</code></strong> — <em>Method</em>.</p><pre><code>contains(x::arb, y::arb)
+</code></pre><blockquote><p>Returns <code>true</code> if the ball <script type="math/tex">x</script> contains the ball <script type="math/tex">y</script>, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L186" target="_blank">source</a><br/></p><p><a href="#Base.contains-Tuple{Nemo.arb,Integer}" id="Base.contains-Tuple{Nemo.arb,Integer}">#</a><strong><code>Base.contains</code></strong> — <em>Method</em>.</p><pre><code>contains(x::arb, y::Integer)
+</code></pre><blockquote><p>Returns <code>true</code> if the ball <script type="math/tex">x</script> contains the given integer value, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L168" target="_blank">source</a><br/></p><p><a href="#Base.contains-Tuple{Nemo.arb,Nemo.fmpz}" id="Base.contains-Tuple{Nemo.arb,Nemo.fmpz}">#</a><strong><code>Base.contains</code></strong> — <em>Method</em>.</p><pre><code>contains(x::arb, y::fmpz)
+</code></pre><blockquote><p>Returns <code>true</code> if the ball <script type="math/tex">x</script> contains the given integer value, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L153" target="_blank">source</a><br/></p><p><a href="#Base.contains-Tuple{Nemo.arb,Nemo.fmpq}" id="Base.contains-Tuple{Nemo.arb,Nemo.fmpq}">#</a><strong><code>Base.contains</code></strong> — <em>Method</em>.</p><pre><code>contains(x::arb, y::fmpq)
+</code></pre><blockquote><p>Returns <code>true</code> if the ball <script type="math/tex">x</script> contains the given rational value, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L143" target="_blank">source</a><br/></p><p><a href="#Base.contains-Tuple{Nemo.arb,BigFloat}" id="Base.contains-Tuple{Nemo.arb,BigFloat}">#</a><strong><code>Base.contains</code></strong> — <em>Method</em>.</p><pre><code>contains(x::arb, y::BigFloat)
+</code></pre><blockquote><p>Returns <code>true</code> if the ball <script type="math/tex">x</script> contains the given floating point value,  otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L175" target="_blank">source</a><br/></p><p>The following functions are also provided for determining if a ball intersects a certain part of the real number line.</p><p><a href="#Nemo.contains_zero-Tuple{Nemo.arb}" id="Nemo.contains_zero-Tuple{Nemo.arb}">#</a><strong><code>Nemo.contains_zero</code></strong> — <em>Method</em>.</p><pre><code>contains_zero(x::arb)
+</code></pre><blockquote><p>Returns <code>true</code> if the ball <script type="math/tex">x</script> contains zero, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L196" target="_blank">source</a><br/></p><p><a href="#Nemo.contains_negative-Tuple{Nemo.arb}" id="Nemo.contains_negative-Tuple{Nemo.arb}">#</a><strong><code>Nemo.contains_negative</code></strong> — <em>Method</em>.</p><pre><code>contains_negative(x::arb)
+</code></pre><blockquote><p>Returns <code>true</code> if the ball <script type="math/tex">x</script> contains any negative value, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L205" target="_blank">source</a><br/></p><p><a href="#Nemo.contains_positive-Tuple{Nemo.arb}" id="Nemo.contains_positive-Tuple{Nemo.arb}">#</a><strong><code>Nemo.contains_positive</code></strong> — <em>Method</em>.</p><pre><code>contains_positive(x::arb)
+</code></pre><blockquote><p>Returns <code>true</code> if the ball <script type="math/tex">x</script> contains any positive value, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L215" target="_blank">source</a><br/></p><p><a href="#Nemo.contains_nonnegative-Tuple{Nemo.arb}" id="Nemo.contains_nonnegative-Tuple{Nemo.arb}">#</a><strong><code>Nemo.contains_nonnegative</code></strong> — <em>Method</em>.</p><pre><code>contains_nonnegative(x::arb)
+</code></pre><blockquote><p>Returns <code>true</code> if the ball <script type="math/tex">x</script> contains any nonnegative value, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L225" target="_blank">source</a><br/></p><p><a href="#Nemo.contains_nonpositive-Tuple{Nemo.arb}" id="Nemo.contains_nonpositive-Tuple{Nemo.arb}">#</a><strong><code>Nemo.contains_nonpositive</code></strong> — <em>Method</em>.</p><pre><code>contains_nonpositive(x::arb)
+</code></pre><blockquote><p>Returns <code>true</code> if the ball <script type="math/tex">x</script> contains any nonpositive value, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L235" target="_blank">source</a><br/></p><p>Here are some examples of testing containment.</p><pre><code>RR = RealField(64)
+x = RR("1 +/- 0.001")
+y = RR("3")
 
 overlaps(x, y)
 contains(x, y)
@@ -861,880 +149,132 @@ contains(y, 3)
 contains(x, ZZ(1)//2)
 contains_zero(x)
 contains_positive(y)
-</code></pre>
-
-<p><a id='Comparison-1'></a></p>
-<h2 id="comparison">Comparison</h2>
-<p>Nemo provides a full range of comparison operations for Arb balls. Note that a ball is considered less than another ball if every value in the first ball is less than every value in the second ball, etc.</p>
-<p>Firstly, we introduce an exact equality which is distinct from arithmetic equality. This is distinct from arithmetic equality implemented by <code>==</code>, which merely compares up to the minimum of the precisions of its operands.</p>
-<p><a id='Base.isequal-Tuple{Nemo.arb,Nemo.arb}' href='#Base.isequal-Tuple{Nemo.arb,Nemo.arb}'>#</a>
-<strong><code>Base.isequal</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isequal(x::arb, y::arb)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if the balls <script type="math/tex">x</script> and <script type="math/tex">y</script> are precisely equal, i.e. have the same midpoints and radii.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L251' class='documenter-source'>source</a><br></p>
-<p>A full range of functions is available for comparing balls, i.e. <code>==</code>, <code>!=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;=</code>, <code>&gt;</code>. In fact, all these are implemented directly in C. In the table below we document these as though only <code>==</code> and <code>isless</code> had been provided to Julia.</p>
-<p><a id='Function-1'></a></p>
-<h2 id="function">Function</h2>
-<p><code>isless(x::arb, y::arb)</code>  <code>==(x::arb, y::arb)</code></p>
-<p>As well as these, we provide a full range of ad hoc comparison operators. Again, these are implemented directly in Julia, but we document them as though <code>isless</code> and <code>==</code> were provided.</p>
-<p><a id='Function-2'></a></p>
-<h2 id="function_1">Function</h2>
-<p><code>==(x::arb, y::Integer)</code> <code>==(x::Integer, y::arb)</code> <code>==(x::arb, y::fmpz)</code> <code>==(x::fmpz, y::arb)</code> <code>==(x::arb, y::Float64)</code> <code>==(x::Float64, y::arb)</code> <code>isless(x::arb, y::Integer)</code> <code>isless(x::Integer, y::arb)</code> <code>isless(x::arb, y::fmpz)</code> <code>isless(x::fmpz, y::arb)</code> <code>isless(x::arb, y::Float64)</code> <code>isless(x::Float64, y::arb)</code></p>
-<p>Here are some examples of comparison.</p>
-<pre><code>RR = RealField(64)
-x = RR(&quot;1 +/- 0.001&quot;)
-y = RR(&quot;3&quot;)
-z = RR(&quot;4&quot;)
+</code></pre><p><a id="Comparison-1"></a></p><h2 id="comparison">Comparison</h2><p>Nemo provides a full range of comparison operations for Arb balls. Note that a ball is considered less than another ball if every value in the first ball is less than every value in the second ball, etc.</p><p>Firstly, we introduce an exact equality which is distinct from arithmetic equality. This is distinct from arithmetic equality implemented by <code>==</code>, which merely compares up to the minimum of the precisions of its operands.</p><p><a href="#Base.isequal-Tuple{Nemo.arb,Nemo.arb}" id="Base.isequal-Tuple{Nemo.arb,Nemo.arb}">#</a><strong><code>Base.isequal</code></strong> — <em>Method</em>.</p><pre><code>isequal(x::arb, y::arb)
+</code></pre><blockquote><p>Return <code>true</code> if the balls <script type="math/tex">x</script> and <script type="math/tex">y</script> are precisely equal, i.e. have the same midpoints and radii.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L251" target="_blank">source</a><br/></p><p>A full range of functions is available for comparing balls, i.e. <code>==</code>, <code>!=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;=</code>, <code>&gt;</code>. In fact, all these are implemented directly in C. In the table below we document these as though only <code>==</code> and <code>isless</code> had been provided to Julia.</p><p><a id="Function-1"></a></p><h2 id="function">Function</h2><p><code>isless(x::arb, y::arb)</code><code>==(x::arb, y::arb)</code></p><p>As well as these, we provide a full range of ad hoc comparison operators. Again, these are implemented directly in Julia, but we document them as though <code>isless</code> and <code>==</code> were provided.</p><p><a id="Function-2"></a></p><h2 id="function_1">Function</h2><p><code>==(x::arb, y::Integer)</code><code>==(x::Integer, y::arb)</code><code>==(x::arb, y::fmpz)</code><code>==(x::fmpz, y::arb)</code><code>==(x::arb, y::Float64)</code><code>==(x::Float64, y::arb)</code><code>isless(x::arb, y::Integer)</code><code>isless(x::Integer, y::arb)</code><code>isless(x::arb, y::fmpz)</code><code>isless(x::fmpz, y::arb)</code><code>isless(x::arb, y::Float64)</code><code>isless(x::Float64, y::arb)</code></p><p>Here are some examples of comparison.</p><pre><code>RR = RealField(64)
+x = RR("1 +/- 0.001")
+y = RR("3")
+z = RR("4")
 
 isequal(y, z)
 x &lt;= z
 x == 3
 ZZ(3) &lt; z
 x != 1.23
-</code></pre>
-
-<p><a id='Absolute-value-1'></a></p>
-<h2 id="absolute-value">Absolute value</h2>
-<p><a id='Base.abs-Tuple{Nemo.arb}' href='#Base.abs-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.abs</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>abs(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the absolute value of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L683' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of taking the absolute value.</p>
-<pre><code>RR = RealField(64)
-x = RR(&quot;-1 +/- 0.001&quot;)
+</code></pre><p><a id="Absolute-value-1"></a></p><h2 id="absolute-value">Absolute value</h2><p><a href="#Base.abs-Tuple{Nemo.arb}" id="Base.abs-Tuple{Nemo.arb}">#</a><strong><code>Base.abs</code></strong> — <em>Method</em>.</p><pre><code>abs(x::arb)
+</code></pre><blockquote><p>Return the absolute value of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L683" target="_blank">source</a><br/></p><p>Here are some examples of taking the absolute value.</p><pre><code>RR = RealField(64)
+x = RR("-1 +/- 0.001")
 
 a = abs(x)
-</code></pre>
-
-<p><a id='Inverse-1'></a></p>
-<h2 id="inverse">Inverse</h2>
-<p><a id='Base.inv-Tuple{Nemo.arb}' href='#Base.inv-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.inv</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>inv(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the multiplicative inverse of <script type="math/tex">x</script>, i.e. <script type="math/tex">1/x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L699' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of taking the inverse.</p>
-<pre><code>RR = RealField(64)
-x = RR(&quot;-3 +/- 0.001&quot;)
+</code></pre><p><a id="Inverse-1"></a></p><h2 id="inverse">Inverse</h2><p><a href="#Base.inv-Tuple{Nemo.arb}" id="Base.inv-Tuple{Nemo.arb}">#</a><strong><code>Base.inv</code></strong> — <em>Method</em>.</p><pre><code>inv(x::arb)
+</code></pre><blockquote><p>Return the multiplicative inverse of <script type="math/tex">x</script>, i.e. <script type="math/tex">1/x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L699" target="_blank">source</a><br/></p><p>Here are some examples of taking the inverse.</p><pre><code>RR = RealField(64)
+x = RR("-3 +/- 0.001")
 
 a = inv(x)
-</code></pre>
-
-<p><a id='Shifting-1'></a></p>
-<h2 id="shifting">Shifting</h2>
-<p><a id='Base.Math.ldexp-Tuple{Nemo.arb,Int64}' href='#Base.Math.ldexp-Tuple{Nemo.arb,Int64}'>#</a>
-<strong><code>Base.Math.ldexp</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>ldexp(x::arb, y::Int)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">2^yx</script>. Note that <script type="math/tex">y</script> can be positive, zero or negative.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L716' class='documenter-source'>source</a><br></p>
-<p><a id='Base.Math.ldexp-Tuple{Nemo.arb,Nemo.fmpz}' href='#Base.Math.ldexp-Tuple{Nemo.arb,Nemo.fmpz}'>#</a>
-<strong><code>Base.Math.ldexp</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>ldexp(x::arb, y::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">2^yx</script>. Note that <script type="math/tex">y</script> can be positive, zero or negative.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L727' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of shifting.</p>
-<pre><code>RR = RealField(64)
-x = RR(&quot;-3 +/- 0.001&quot;)
+</code></pre><p><a id="Shifting-1"></a></p><h2 id="shifting">Shifting</h2><p><a href="#Base.Math.ldexp-Tuple{Nemo.arb,Int64}" id="Base.Math.ldexp-Tuple{Nemo.arb,Int64}">#</a><strong><code>Base.Math.ldexp</code></strong> — <em>Method</em>.</p><pre><code>ldexp(x::arb, y::Int)
+</code></pre><blockquote><p>Return <script type="math/tex">2^yx</script>. Note that <script type="math/tex">y</script> can be positive, zero or negative.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L716" target="_blank">source</a><br/></p><p><a href="#Base.Math.ldexp-Tuple{Nemo.arb,Nemo.fmpz}" id="Base.Math.ldexp-Tuple{Nemo.arb,Nemo.fmpz}">#</a><strong><code>Base.Math.ldexp</code></strong> — <em>Method</em>.</p><pre><code>ldexp(x::arb, y::fmpz)
+</code></pre><blockquote><p>Return <script type="math/tex">2^yx</script>. Note that <script type="math/tex">y</script> can be positive, zero or negative.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L727" target="_blank">source</a><br/></p><p>Here are some examples of shifting.</p><pre><code>RR = RealField(64)
+x = RR("-3 +/- 0.001")
 
 a = ldexp(x, 23)
 b = ldexp(x, -ZZ(15))
-</code></pre>
-
-<p><a id='Miscellaneous-operations-1'></a></p>
-<h2 id="miscellaneous-operations">Miscellaneous operations</h2>
-<p><a id='Nemo.trim-Tuple{Nemo.arb}' href='#Nemo.trim-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.trim</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>trim(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return an <code>arb</code> interval containing <script type="math/tex">x</script> but which may be more economical, by rounding off insignificant bits from the midpoint.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L744' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.unique_integer-Tuple{Nemo.arb}' href='#Nemo.unique_integer-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.unique_integer</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>unique_integer(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return a pair where the first value is a boolean and the second is an <code>fmpz</code> integer. The boolean indicates whether the interval <script type="math/tex">x</script> contains a unique integer. If this is the case, the second return value is set to this unique integer.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L755' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.setunion-Tuple{Nemo.arb,Nemo.arb}' href='#Nemo.setunion-Tuple{Nemo.arb,Nemo.arb}'>#</a>
-<strong><code>Nemo.setunion</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>setunion(x::arb, y::arb)
-</code></pre>
-
-<blockquote>
-<p>Return an <code>arb</code> containing the union of the intervals represented by <script type="math/tex">x</script> and <script type="math/tex">y</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L769' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of miscellaneous operations.</p>
-<pre><code>RR = RealField(64)
-x = RR(&quot;-3 +/- 0.001&quot;)
-y = RR(&quot;2 +/- 0.5&quot;)
+</code></pre><p><a id="Miscellaneous-operations-1"></a></p><h2 id="miscellaneous-operations">Miscellaneous operations</h2><p><a href="#Nemo.trim-Tuple{Nemo.arb}" id="Nemo.trim-Tuple{Nemo.arb}">#</a><strong><code>Nemo.trim</code></strong> — <em>Method</em>.</p><pre><code>trim(x::arb)
+</code></pre><blockquote><p>Return an <code>arb</code> interval containing <script type="math/tex">x</script> but which may be more economical, by rounding off insignificant bits from the midpoint.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L744" target="_blank">source</a><br/></p><p><a href="#Nemo.unique_integer-Tuple{Nemo.arb}" id="Nemo.unique_integer-Tuple{Nemo.arb}">#</a><strong><code>Nemo.unique_integer</code></strong> — <em>Method</em>.</p><pre><code>unique_integer(x::arb)
+</code></pre><blockquote><p>Return a pair where the first value is a boolean and the second is an <code>fmpz</code> integer. The boolean indicates whether the interval <script type="math/tex">x</script> contains a unique integer. If this is the case, the second return value is set to this unique integer.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L755" target="_blank">source</a><br/></p><p><a href="#Nemo.setunion-Tuple{Nemo.arb,Nemo.arb}" id="Nemo.setunion-Tuple{Nemo.arb,Nemo.arb}">#</a><strong><code>Nemo.setunion</code></strong> — <em>Method</em>.</p><pre><code>setunion(x::arb, y::arb)
+</code></pre><blockquote><p>Return an <code>arb</code> containing the union of the intervals represented by <script type="math/tex">x</script> and <script type="math/tex">y</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L769" target="_blank">source</a><br/></p><p>Here are some examples of miscellaneous operations.</p><pre><code>RR = RealField(64)
+x = RR("-3 +/- 0.001")
+y = RR("2 +/- 0.5")
 
 a = trim(x)
 b, c = unique_integer(x)
 d = setunion(x, y)
-</code></pre>
-
-<p><a id='Constants-1'></a></p>
-<h2 id="constants">Constants</h2>
-<p><a id='Nemo.const_pi-Tuple{Nemo.ArbField}' href='#Nemo.const_pi-Tuple{Nemo.ArbField}'>#</a>
-<strong><code>Nemo.const_pi</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>const_pi(r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">\pi = 3.14159\ldots</script> as an element of <script type="math/tex">r</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L787' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.const_e-Tuple{Nemo.ArbField}' href='#Nemo.const_e-Tuple{Nemo.ArbField}'>#</a>
-<strong><code>Nemo.const_e</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>const_e(r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">e = 2.71828\ldots</script> as an element of <script type="math/tex">r</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L797' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.const_log2-Tuple{Nemo.ArbField}' href='#Nemo.const_log2-Tuple{Nemo.ArbField}'>#</a>
-<strong><code>Nemo.const_log2</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>const_log2(r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">\log(2) = 0.69314\ldots</script> as an element of <script type="math/tex">r</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L807' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.const_log10-Tuple{Nemo.ArbField}' href='#Nemo.const_log10-Tuple{Nemo.ArbField}'>#</a>
-<strong><code>Nemo.const_log10</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>const_log10(r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">\log(10) = 2.302585\ldots</script> as an element of <script type="math/tex">r</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L817' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.const_euler-Tuple{Nemo.ArbField}' href='#Nemo.const_euler-Tuple{Nemo.ArbField}'>#</a>
-<strong><code>Nemo.const_euler</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>const_euler(r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return Euler's constant <script type="math/tex">\gamma = 0.577215\ldots</script> as an element of <script type="math/tex">r</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L827' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.const_catalan-Tuple{Nemo.ArbField}' href='#Nemo.const_catalan-Tuple{Nemo.ArbField}'>#</a>
-<strong><code>Nemo.const_catalan</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>const_catalan(r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return Catalan's constant <script type="math/tex">C = 0.915965\ldots</script> as an element of <script type="math/tex">r</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L837' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.const_khinchin-Tuple{Nemo.ArbField}' href='#Nemo.const_khinchin-Tuple{Nemo.ArbField}'>#</a>
-<strong><code>Nemo.const_khinchin</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>const_khinchin(r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return Khinchin's constant <script type="math/tex">K = 2.685452\ldots</script> as an element of <script type="math/tex">r</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L847' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.const_glaisher-Tuple{Nemo.ArbField}' href='#Nemo.const_glaisher-Tuple{Nemo.ArbField}'>#</a>
-<strong><code>Nemo.const_glaisher</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>const_glaisher(r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return Glaisher's constant <script type="math/tex">A = 1.282427\ldots</script> as an element of <script type="math/tex">r</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L857' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of computing real constants.</p>
-<pre><code>RR = RealField(200)
+</code></pre><p><a id="Constants-1"></a></p><h2 id="constants">Constants</h2><p><a href="#Nemo.const_pi-Tuple{Nemo.ArbField}" id="Nemo.const_pi-Tuple{Nemo.ArbField}">#</a><strong><code>Nemo.const_pi</code></strong> — <em>Method</em>.</p><pre><code>const_pi(r::ArbField)
+</code></pre><blockquote><p>Return <script type="math/tex">\pi = 3.14159\ldots</script> as an element of <script type="math/tex">r</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L787" target="_blank">source</a><br/></p><p><a href="#Nemo.const_e-Tuple{Nemo.ArbField}" id="Nemo.const_e-Tuple{Nemo.ArbField}">#</a><strong><code>Nemo.const_e</code></strong> — <em>Method</em>.</p><pre><code>const_e(r::ArbField)
+</code></pre><blockquote><p>Return <script type="math/tex">e = 2.71828\ldots</script> as an element of <script type="math/tex">r</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L797" target="_blank">source</a><br/></p><p><a href="#Nemo.const_log2-Tuple{Nemo.ArbField}" id="Nemo.const_log2-Tuple{Nemo.ArbField}">#</a><strong><code>Nemo.const_log2</code></strong> — <em>Method</em>.</p><pre><code>const_log2(r::ArbField)
+</code></pre><blockquote><p>Return <script type="math/tex">\log(2) = 0.69314\ldots</script> as an element of <script type="math/tex">r</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L807" target="_blank">source</a><br/></p><p><a href="#Nemo.const_log10-Tuple{Nemo.ArbField}" id="Nemo.const_log10-Tuple{Nemo.ArbField}">#</a><strong><code>Nemo.const_log10</code></strong> — <em>Method</em>.</p><pre><code>const_log10(r::ArbField)
+</code></pre><blockquote><p>Return <script type="math/tex">\log(10) = 2.302585\ldots</script> as an element of <script type="math/tex">r</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L817" target="_blank">source</a><br/></p><p><a href="#Nemo.const_euler-Tuple{Nemo.ArbField}" id="Nemo.const_euler-Tuple{Nemo.ArbField}">#</a><strong><code>Nemo.const_euler</code></strong> — <em>Method</em>.</p><pre><code>const_euler(r::ArbField)
+</code></pre><blockquote><p>Return Euler's constant <script type="math/tex">\gamma = 0.577215\ldots</script> as an element of <script type="math/tex">r</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L827" target="_blank">source</a><br/></p><p><a href="#Nemo.const_catalan-Tuple{Nemo.ArbField}" id="Nemo.const_catalan-Tuple{Nemo.ArbField}">#</a><strong><code>Nemo.const_catalan</code></strong> — <em>Method</em>.</p><pre><code>const_catalan(r::ArbField)
+</code></pre><blockquote><p>Return Catalan's constant <script type="math/tex">C = 0.915965\ldots</script> as an element of <script type="math/tex">r</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L837" target="_blank">source</a><br/></p><p><a href="#Nemo.const_khinchin-Tuple{Nemo.ArbField}" id="Nemo.const_khinchin-Tuple{Nemo.ArbField}">#</a><strong><code>Nemo.const_khinchin</code></strong> — <em>Method</em>.</p><pre><code>const_khinchin(r::ArbField)
+</code></pre><blockquote><p>Return Khinchin's constant <script type="math/tex">K = 2.685452\ldots</script> as an element of <script type="math/tex">r</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L847" target="_blank">source</a><br/></p><p><a href="#Nemo.const_glaisher-Tuple{Nemo.ArbField}" id="Nemo.const_glaisher-Tuple{Nemo.ArbField}">#</a><strong><code>Nemo.const_glaisher</code></strong> — <em>Method</em>.</p><pre><code>const_glaisher(r::ArbField)
+</code></pre><blockquote><p>Return Glaisher's constant <script type="math/tex">A = 1.282427\ldots</script> as an element of <script type="math/tex">r</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L857" target="_blank">source</a><br/></p><p>Here are some examples of computing real constants.</p><pre><code>RR = RealField(200)
 
 a = const_pi(RR)
 b = const_e(RR)
 c = const_euler(RR)
 d = const_glaisher(RR)
-</code></pre>
-
-<p><a id='Mathematical-functions-1'></a></p>
-<h2 id="mathematical-functions">Mathematical functions</h2>
-<p><a id='Base.floor-Tuple{Nemo.arb}' href='#Base.floor-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.floor</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>floor(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Compute the floor of <script type="math/tex">x</script>, i.e. the greatest integer not exceeding <script type="math/tex">x</script>, as an Arb.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L875' class='documenter-source'>source</a><br></p>
-<p><a id='Base.ceil-Tuple{Nemo.arb}' href='#Base.ceil-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.ceil</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>ceil(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the ceiling of <script type="math/tex">x</script>, i.e. the least integer not less than <script type="math/tex">x</script>, as an Arb.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L886' class='documenter-source'>source</a><br></p>
-<p><a id='Base.sqrt-Tuple{Nemo.arb}' href='#Base.sqrt-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.sqrt</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>sqrt(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the square root of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L897' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.rsqrt-Tuple{Nemo.arb}' href='#Nemo.rsqrt-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.rsqrt</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>rsqrt(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the reciprocal of the square root of <script type="math/tex">x</script>, i.e. <script type="math/tex">1/\sqrt{x}</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L907' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.sqrt1pm1-Tuple{Nemo.arb}' href='#Nemo.sqrt1pm1-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.sqrt1pm1</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>sqrt1pm1(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">\sqrt{1+x}-1</script>, evaluated accurately for small <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L917' class='documenter-source'>source</a><br></p>
-<p><a id='Base.log-Tuple{Nemo.arb}' href='#Base.log-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.log</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>log(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the principal branch of the logarithm of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L927' class='documenter-source'>source</a><br></p>
-<p><a id='Base.log1p-Tuple{Nemo.arb}' href='#Base.log1p-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.log1p</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>log1p(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">\log(1+x)</script>, evaluated accurately for small <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L937' class='documenter-source'>source</a><br></p>
-<p><a id='Base.exp-Tuple{Nemo.arb}' href='#Base.exp-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.exp</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>exp(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the exponential of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L947' class='documenter-source'>source</a><br></p>
-<p><a id='Base.expm1-Tuple{Nemo.arb}' href='#Base.expm1-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.expm1</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>expm1(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">\exp(x)-1</script>, evaluated accurately for small <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L957' class='documenter-source'>source</a><br></p>
-<p><a id='Base.sin-Tuple{Nemo.arb}' href='#Base.sin-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.sin</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>sin(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the sine of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L967' class='documenter-source'>source</a><br></p>
-<p><a id='Base.cos-Tuple{Nemo.arb}' href='#Base.cos-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.cos</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>cos(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the cosine of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L977' class='documenter-source'>source</a><br></p>
-<p><a id='Base.Math.sinpi-Tuple{Nemo.arb}' href='#Base.Math.sinpi-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.Math.sinpi</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>sinpi(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the sine of <script type="math/tex">\pi x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L987' class='documenter-source'>source</a><br></p>
-<p><a id='Base.Math.cospi-Tuple{Nemo.arb}' href='#Base.Math.cospi-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.Math.cospi</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>cospi(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the cosine of <script type="math/tex">\pi x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L997' class='documenter-source'>source</a><br></p>
-<p><a id='Base.tan-Tuple{Nemo.arb}' href='#Base.tan-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.tan</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>tan(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the tangent of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1007' class='documenter-source'>source</a><br></p>
-<p><a id='Base.Math.cot-Tuple{Nemo.arb}' href='#Base.Math.cot-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.Math.cot</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>cot(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the cotangent of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1017' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.tanpi-Tuple{Nemo.arb}' href='#Nemo.tanpi-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.tanpi</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>tanpi(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the tangent of <script type="math/tex">\pi x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1027' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.cotpi-Tuple{Nemo.arb}' href='#Nemo.cotpi-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.cotpi</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>cotpi(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the cotangent of <script type="math/tex">\pi x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1037' class='documenter-source'>source</a><br></p>
-<p><a id='Base.sinh-Tuple{Nemo.arb}' href='#Base.sinh-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.sinh</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>sinh(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the hyperbolic sine of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1047' class='documenter-source'>source</a><br></p>
-<p><a id='Base.cosh-Tuple{Nemo.arb}' href='#Base.cosh-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.cosh</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>cosh(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the hyperbolic cosine of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1057' class='documenter-source'>source</a><br></p>
-<p><a id='Base.tanh-Tuple{Nemo.arb}' href='#Base.tanh-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.tanh</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>tanh(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the hyperbolic tangent of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1067' class='documenter-source'>source</a><br></p>
-<p><a id='Base.Math.coth-Tuple{Nemo.arb}' href='#Base.Math.coth-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.Math.coth</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>coth(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the hyperbolic cotangent of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1077' class='documenter-source'>source</a><br></p>
-<p><a id='Base.atan-Tuple{Nemo.arb}' href='#Base.atan-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.atan</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>atan(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the arctangent of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1087' class='documenter-source'>source</a><br></p>
-<p><a id='Base.asin-Tuple{Nemo.arb}' href='#Base.asin-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.asin</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>asin(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the arcsine of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1097' class='documenter-source'>source</a><br></p>
-<p><a id='Base.acos-Tuple{Nemo.arb}' href='#Base.acos-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.acos</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>acos(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the arccosine of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1107' class='documenter-source'>source</a><br></p>
-<p><a id='Base.atanh-Tuple{Nemo.arb}' href='#Base.atanh-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.atanh</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>atanh(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the hyperbolic arctangent of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1117' class='documenter-source'>source</a><br></p>
-<p><a id='Base.asinh-Tuple{Nemo.arb}' href='#Base.asinh-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.asinh</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>asinh(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the hyperbolic arcsine of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1127' class='documenter-source'>source</a><br></p>
-<p><a id='Base.acosh-Tuple{Nemo.arb}' href='#Base.acosh-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.acosh</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>acosh(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the hyperbolic arccosine of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1137' class='documenter-source'>source</a><br></p>
-<p><a id='Base.Math.gamma-Tuple{Nemo.arb}' href='#Base.Math.gamma-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.Math.gamma</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>gamma(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the Gamma function evaluated at <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1147' class='documenter-source'>source</a><br></p>
-<p><a id='Base.Math.lgamma-Tuple{Nemo.arb}' href='#Base.Math.lgamma-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.Math.lgamma</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>lgamma(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the logarithm of the Gamma function evaluated at <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1157' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.rgamma-Tuple{Nemo.arb}' href='#Nemo.rgamma-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.rgamma</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>rgamma(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the reciprocal of the Gamma function evaluated at <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1167' class='documenter-source'>source</a><br></p>
-<p><a id='Base.Math.digamma-Tuple{Nemo.arb}' href='#Base.Math.digamma-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.Math.digamma</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>digamma(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the  logarithmic derivative of the gamma function evaluated at <script type="math/tex">x</script>, i.e. <script type="math/tex">\psi(x)</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1177' class='documenter-source'>source</a><br></p>
-<p><a id='Base.Math.zeta-Tuple{Nemo.arb}' href='#Base.Math.zeta-Tuple{Nemo.arb}'>#</a>
-<strong><code>Base.Math.zeta</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>zeta(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the Riemann zeta function evaluated at <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1188' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.sincos-Tuple{Nemo.arb}' href='#Nemo.sincos-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.sincos</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>sincos(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return a tuple <script type="math/tex">s, c</script> consisting of the sine <script type="math/tex">s</script> and cosine <script type="math/tex">c</script> of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1198' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.sincospi-Tuple{Nemo.arb}' href='#Nemo.sincospi-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.sincospi</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>sincospi(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return a tuple <script type="math/tex">s, c</script> consisting of the sine <script type="math/tex">s</script> and cosine <script type="math/tex">c</script> of <script type="math/tex">\pi x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1210' class='documenter-source'>source</a><br></p>
-<p><a id='Base.Math.sinpi-Tuple{Nemo.fmpq,Nemo.ArbField}' href='#Base.Math.sinpi-Tuple{Nemo.fmpq,Nemo.ArbField}'>#</a>
-<strong><code>Base.Math.sinpi</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>sinpi(x::fmpq, r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return the sine of <script type="math/tex">\pi x</script> in the given Arb field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1222' class='documenter-source'>source</a><br></p>
-<p><a id='Base.Math.cospi-Tuple{Nemo.fmpq,Nemo.ArbField}' href='#Base.Math.cospi-Tuple{Nemo.fmpq,Nemo.ArbField}'>#</a>
-<strong><code>Base.Math.cospi</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>cospi(x::fmpq, r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return the cosine of <script type="math/tex">\pi x</script> in the given Arb field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1233' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.sincospi-Tuple{Nemo.fmpq,Nemo.ArbField}' href='#Nemo.sincospi-Tuple{Nemo.fmpq,Nemo.ArbField}'>#</a>
-<strong><code>Nemo.sincospi</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>sincospi(x::fmpq, r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return a tuple <script type="math/tex">s, c</script> consisting of the sine and cosine of <script type="math/tex">\pi x</script> in the given Arb field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1244' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.sinhcosh-Tuple{Nemo.arb}' href='#Nemo.sinhcosh-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.sinhcosh</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>sinhcosh(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return a tuple <script type="math/tex">s, c</script> consisting of the hyperbolic sine and cosine of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1257' class='documenter-source'>source</a><br></p>
-<p><a id='Base.Math.atan2-Tuple{Nemo.arb,Nemo.arb}' href='#Base.Math.atan2-Tuple{Nemo.arb,Nemo.arb}'>#</a>
-<strong><code>Base.Math.atan2</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>atan2(x::arb, y::arb)
-</code></pre>
-
-<blockquote>
-<p>Return atan2<script type="math/tex">(b,a) = \arg(a+bi)</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1269' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.agm-Tuple{Nemo.arb,Nemo.arb}' href='#Nemo.agm-Tuple{Nemo.arb,Nemo.arb}'>#</a>
-<strong><code>Nemo.agm</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>agm(x::arb, y::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the arithmetic-geometric mean of <script type="math/tex">x</script> and <script type="math/tex">y</script>
-</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1280' class='documenter-source'>source</a><br></p>
-<p><a id='Base.Math.zeta-Tuple{Nemo.arb,Nemo.arb}' href='#Base.Math.zeta-Tuple{Nemo.arb,Nemo.arb}'>#</a>
-<strong><code>Base.Math.zeta</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>zeta(s::arb, a::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the Hurwitz zeta function <script type="math/tex">\zeta(s,a)</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1291' class='documenter-source'>source</a><br></p>
-<p><a id='Base.Math.hypot-Tuple{Nemo.arb,Nemo.arb}' href='#Base.Math.hypot-Tuple{Nemo.arb,Nemo.arb}'>#</a>
-<strong><code>Base.Math.hypot</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>hypot(x::arb, y::arb)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">\sqrt{x^2 + y^2}</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1302' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.root-Tuple{Nemo.arb,Int64}' href='#Nemo.root-Tuple{Nemo.arb,Int64}'>#</a>
-<strong><code>Nemo.root</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>root(x::arb, n::Int)
-</code></pre>
-
-<blockquote>
-<p>Return the <script type="math/tex">n</script>-th root of <script type="math/tex">x</script>. We require <script type="math/tex">x \geq 0</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1320' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.fac-Tuple{Nemo.arb}' href='#Nemo.fac-Tuple{Nemo.arb}'>#</a>
-<strong><code>Nemo.fac</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>fac(x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the factorial of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1326' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.fac-Tuple{Int64,Nemo.ArbField}' href='#Nemo.fac-Tuple{Int64,Nemo.ArbField}'>#</a>
-<strong><code>Nemo.fac</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>fac(n::Int, r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return the factorial of <script type="math/tex">n</script> in the given Arb field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1338' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.binom-Tuple{Nemo.arb,UInt64}' href='#Nemo.binom-Tuple{Nemo.arb,UInt64}'>#</a>
-<strong><code>Nemo.binom</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>binom(x::arb, n::UInt)
-</code></pre>
-
-<blockquote>
-<p>Return the binomial coefficient <script type="math/tex">{x \choose n}</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1344' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.binom-Tuple{UInt64,UInt64,Nemo.ArbField}' href='#Nemo.binom-Tuple{UInt64,UInt64,Nemo.ArbField}'>#</a>
-<strong><code>Nemo.binom</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>binom(n::UInt, k::UInt, r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return the binomial coefficient <script type="math/tex">{n \choose k}</script> in the given Arb field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1355' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.fib-Tuple{Nemo.fmpz,Nemo.ArbField}' href='#Nemo.fib-Tuple{Nemo.fmpz,Nemo.ArbField}'>#</a>
-<strong><code>Nemo.fib</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>fib(n::fmpz, r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return the <script type="math/tex">n</script>-th Fibonacci number in the given Arb field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1366' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.fib-Tuple{Int64,Nemo.ArbField}' href='#Nemo.fib-Tuple{Int64,Nemo.ArbField}'>#</a>
-<strong><code>Nemo.fib</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>fib(n::Int, r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return the <script type="math/tex">n</script>-th Fibonacci number in the given Arb field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1384' class='documenter-source'>source</a><br></p>
-<p><a id='Base.Math.gamma-Tuple{Nemo.fmpz,Nemo.ArbField}' href='#Base.Math.gamma-Tuple{Nemo.fmpz,Nemo.ArbField}'>#</a>
-<strong><code>Base.Math.gamma</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>gamma(x::fmpz, r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return the Gamma function evaluated at <script type="math/tex">x</script> in the given Arb field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1390' class='documenter-source'>source</a><br></p>
-<p><a id='Base.Math.gamma-Tuple{Nemo.fmpq,Nemo.ArbField}' href='#Base.Math.gamma-Tuple{Nemo.fmpq,Nemo.ArbField}'>#</a>
-<strong><code>Base.Math.gamma</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>gamma(x::fmpq, r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return the Gamma function evaluated at <script type="math/tex">x</script> in the given Arb field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1401' class='documenter-source'>source</a><br></p>
-<p><a id='Base.Math.zeta-Tuple{Int64,Nemo.ArbField}' href='#Base.Math.zeta-Tuple{Int64,Nemo.ArbField}'>#</a>
-<strong><code>Base.Math.zeta</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>zeta(n::Int, r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return the Riemann zeta function <script type="math/tex">\zeta(n)</script> as an element of the given Arb field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1420' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.bernoulli-Tuple{Int64,Nemo.ArbField}' href='#Nemo.bernoulli-Tuple{Int64,Nemo.ArbField}'>#</a>
-<strong><code>Nemo.bernoulli</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>bernoulli(n::Int, r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return the <script type="math/tex">n</script>-th Bernoulli number as an element of the given Arb field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1434' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.risingfac-Tuple{Nemo.arb,Int64}' href='#Nemo.risingfac-Tuple{Nemo.arb,Int64}'>#</a>
-<strong><code>Nemo.risingfac</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>risingfac(x::arb, n::Int)
-</code></pre>
-
-<blockquote>
-<p>Return the rising factorial <script type="math/tex">x(x + 1)\ldots (x + n - 1)</script> as an Arb.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1447' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.risingfac-Tuple{Nemo.fmpq,Int64,Nemo.ArbField}' href='#Nemo.risingfac-Tuple{Nemo.fmpq,Int64,Nemo.ArbField}'>#</a>
-<strong><code>Nemo.risingfac</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>risingfac(x::fmpq, n::Int, r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return the rising factorial <script type="math/tex">x(x + 1)\ldots (x + n - 1)</script> as an element of the given Arb field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1460' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.risingfac2-Tuple{Nemo.arb,Int64}' href='#Nemo.risingfac2-Tuple{Nemo.arb,Int64}'>#</a>
-<strong><code>Nemo.risingfac2</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>risingfac2(x::arb, n::Int)
-</code></pre>
-
-<blockquote>
-<p>Return a tuple containing the rising factorial <script type="math/tex">x(x + 1)\ldots (x + n - 1)</script> and its derivative.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1475' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.polylog-Tuple{Nemo.arb,Nemo.arb}' href='#Nemo.polylog-Tuple{Nemo.arb,Nemo.arb}'>#</a>
-<strong><code>Nemo.polylog</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>polylog(s::arb, a::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the polylogarithm Li<script type="math/tex">_s(a)</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1482' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.polylog-Tuple{Int64,Nemo.arb}' href='#Nemo.polylog-Tuple{Int64,Nemo.arb}'>#</a>
-<strong><code>Nemo.polylog</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>polylog(s::Int, a::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the polylogarithm Li<script type="math/tex">_s(a)</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1493' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.chebyshev_t-Tuple{Int64,Nemo.arb}' href='#Nemo.chebyshev_t-Tuple{Int64,Nemo.arb}'>#</a>
-<strong><code>Nemo.chebyshev_t</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>chebyshev_t(n::Int, x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the value of the Chebyshev polynomial <script type="math/tex">T_n(x)</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1534' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.chebyshev_u-Tuple{Int64,Nemo.arb}' href='#Nemo.chebyshev_u-Tuple{Int64,Nemo.arb}'>#</a>
-<strong><code>Nemo.chebyshev_u</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>chebyshev_u(n::Int, x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the value of the Chebyshev polynomial <script type="math/tex">U_n(x)</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1540' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.chebyshev_t2-Tuple{Int64,Nemo.arb}' href='#Nemo.chebyshev_t2-Tuple{Int64,Nemo.arb}'>#</a>
-<strong><code>Nemo.chebyshev_t2</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>chebyshev_t2(n::Int, x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the tuple <script type="math/tex">(T_{n}(x), T_{n-1}(x))</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1546' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.chebyshev_u2-Tuple{Int64,Nemo.arb}' href='#Nemo.chebyshev_u2-Tuple{Int64,Nemo.arb}'>#</a>
-<strong><code>Nemo.chebyshev_u2</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>chebyshev_u2(n::Int, x::arb)
-</code></pre>
-
-<blockquote>
-<p>Return the tuple <script type="math/tex">(U_{n}(x), U_{n-1}(x))</script>
-</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1552' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.bell-Tuple{Nemo.fmpz,Nemo.ArbField}' href='#Nemo.bell-Tuple{Nemo.fmpz,Nemo.ArbField}'>#</a>
-<strong><code>Nemo.bell</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>bell(n::fmpz, r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return the Bell number <script type="math/tex">B_n</script> as an element of <script type="math/tex">r</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1558' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.bell-Tuple{Int64,Nemo.ArbField}' href='#Nemo.bell-Tuple{Int64,Nemo.ArbField}'>#</a>
-<strong><code>Nemo.bell</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>bell(n::Int, r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return the Bell number <script type="math/tex">B_n</script> as an element of <script type="math/tex">r</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1569' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.numpart-Tuple{Nemo.fmpz,Nemo.ArbField}' href='#Nemo.numpart-Tuple{Nemo.fmpz,Nemo.ArbField}'>#</a>
-<strong><code>Nemo.numpart</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>numpart(n::fmpz, r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return the number of partitions <script type="math/tex">p(n)</script> as an element of <script type="math/tex">r</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1575' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.numpart-Tuple{Int64,Nemo.ArbField}' href='#Nemo.numpart-Tuple{Int64,Nemo.ArbField}'>#</a>
-<strong><code>Nemo.numpart</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>numpart(n::fmpz, r::ArbField)
-</code></pre>
-
-<blockquote>
-<p>Return the number of partitions <script type="math/tex">p(n)</script> as an element of <script type="math/tex">r</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1586' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of real valued mathematical functions.</p>
-<pre><code>RR = RealField(64)
+</code></pre><p><a id="Mathematical-functions-1"></a></p><h2 id="mathematical-functions">Mathematical functions</h2><p><a href="#Base.floor-Tuple{Nemo.arb}" id="Base.floor-Tuple{Nemo.arb}">#</a><strong><code>Base.floor</code></strong> — <em>Method</em>.</p><pre><code>floor(x::arb)
+</code></pre><blockquote><p>Compute the floor of <script type="math/tex">x</script>, i.e. the greatest integer not exceeding <script type="math/tex">x</script>, as an Arb.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L875" target="_blank">source</a><br/></p><p><a href="#Base.ceil-Tuple{Nemo.arb}" id="Base.ceil-Tuple{Nemo.arb}">#</a><strong><code>Base.ceil</code></strong> — <em>Method</em>.</p><pre><code>ceil(x::arb)
+</code></pre><blockquote><p>Return the ceiling of <script type="math/tex">x</script>, i.e. the least integer not less than <script type="math/tex">x</script>, as an Arb.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L886" target="_blank">source</a><br/></p><p><a href="#Base.sqrt-Tuple{Nemo.arb}" id="Base.sqrt-Tuple{Nemo.arb}">#</a><strong><code>Base.sqrt</code></strong> — <em>Method</em>.</p><pre><code>sqrt(x::arb)
+</code></pre><blockquote><p>Return the square root of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L897" target="_blank">source</a><br/></p><p><a href="#Nemo.rsqrt-Tuple{Nemo.arb}" id="Nemo.rsqrt-Tuple{Nemo.arb}">#</a><strong><code>Nemo.rsqrt</code></strong> — <em>Method</em>.</p><pre><code>rsqrt(x::arb)
+</code></pre><blockquote><p>Return the reciprocal of the square root of <script type="math/tex">x</script>, i.e. <script type="math/tex">1/\sqrt{x}</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L907" target="_blank">source</a><br/></p><p><a href="#Nemo.sqrt1pm1-Tuple{Nemo.arb}" id="Nemo.sqrt1pm1-Tuple{Nemo.arb}">#</a><strong><code>Nemo.sqrt1pm1</code></strong> — <em>Method</em>.</p><pre><code>sqrt1pm1(x::arb)
+</code></pre><blockquote><p>Return <script type="math/tex">\sqrt{1+x}-1</script>, evaluated accurately for small <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L917" target="_blank">source</a><br/></p><p><a href="#Base.log-Tuple{Nemo.arb}" id="Base.log-Tuple{Nemo.arb}">#</a><strong><code>Base.log</code></strong> — <em>Method</em>.</p><pre><code>log(x::arb)
+</code></pre><blockquote><p>Return the principal branch of the logarithm of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L927" target="_blank">source</a><br/></p><p><a href="#Base.log1p-Tuple{Nemo.arb}" id="Base.log1p-Tuple{Nemo.arb}">#</a><strong><code>Base.log1p</code></strong> — <em>Method</em>.</p><pre><code>log1p(x::arb)
+</code></pre><blockquote><p>Return <script type="math/tex">\log(1+x)</script>, evaluated accurately for small <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L937" target="_blank">source</a><br/></p><p><a href="#Base.exp-Tuple{Nemo.arb}" id="Base.exp-Tuple{Nemo.arb}">#</a><strong><code>Base.exp</code></strong> — <em>Method</em>.</p><pre><code>exp(x::arb)
+</code></pre><blockquote><p>Return the exponential of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L947" target="_blank">source</a><br/></p><p><a href="#Base.expm1-Tuple{Nemo.arb}" id="Base.expm1-Tuple{Nemo.arb}">#</a><strong><code>Base.expm1</code></strong> — <em>Method</em>.</p><pre><code>expm1(x::arb)
+</code></pre><blockquote><p>Return <script type="math/tex">\exp(x)-1</script>, evaluated accurately for small <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L957" target="_blank">source</a><br/></p><p><a href="#Base.sin-Tuple{Nemo.arb}" id="Base.sin-Tuple{Nemo.arb}">#</a><strong><code>Base.sin</code></strong> — <em>Method</em>.</p><pre><code>sin(x::arb)
+</code></pre><blockquote><p>Return the sine of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L967" target="_blank">source</a><br/></p><p><a href="#Base.cos-Tuple{Nemo.arb}" id="Base.cos-Tuple{Nemo.arb}">#</a><strong><code>Base.cos</code></strong> — <em>Method</em>.</p><pre><code>cos(x::arb)
+</code></pre><blockquote><p>Return the cosine of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L977" target="_blank">source</a><br/></p><p><a href="#Base.Math.sinpi-Tuple{Nemo.arb}" id="Base.Math.sinpi-Tuple{Nemo.arb}">#</a><strong><code>Base.Math.sinpi</code></strong> — <em>Method</em>.</p><pre><code>sinpi(x::arb)
+</code></pre><blockquote><p>Return the sine of <script type="math/tex">\pi x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L987" target="_blank">source</a><br/></p><p><a href="#Base.Math.cospi-Tuple{Nemo.arb}" id="Base.Math.cospi-Tuple{Nemo.arb}">#</a><strong><code>Base.Math.cospi</code></strong> — <em>Method</em>.</p><pre><code>cospi(x::arb)
+</code></pre><blockquote><p>Return the cosine of <script type="math/tex">\pi x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L997" target="_blank">source</a><br/></p><p><a href="#Base.tan-Tuple{Nemo.arb}" id="Base.tan-Tuple{Nemo.arb}">#</a><strong><code>Base.tan</code></strong> — <em>Method</em>.</p><pre><code>tan(x::arb)
+</code></pre><blockquote><p>Return the tangent of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1007" target="_blank">source</a><br/></p><p><a href="#Base.Math.cot-Tuple{Nemo.arb}" id="Base.Math.cot-Tuple{Nemo.arb}">#</a><strong><code>Base.Math.cot</code></strong> — <em>Method</em>.</p><pre><code>cot(x::arb)
+</code></pre><blockquote><p>Return the cotangent of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1017" target="_blank">source</a><br/></p><p><a href="#Nemo.tanpi-Tuple{Nemo.arb}" id="Nemo.tanpi-Tuple{Nemo.arb}">#</a><strong><code>Nemo.tanpi</code></strong> — <em>Method</em>.</p><pre><code>tanpi(x::arb)
+</code></pre><blockquote><p>Return the tangent of <script type="math/tex">\pi x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1027" target="_blank">source</a><br/></p><p><a href="#Nemo.cotpi-Tuple{Nemo.arb}" id="Nemo.cotpi-Tuple{Nemo.arb}">#</a><strong><code>Nemo.cotpi</code></strong> — <em>Method</em>.</p><pre><code>cotpi(x::arb)
+</code></pre><blockquote><p>Return the cotangent of <script type="math/tex">\pi x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1037" target="_blank">source</a><br/></p><p><a href="#Base.sinh-Tuple{Nemo.arb}" id="Base.sinh-Tuple{Nemo.arb}">#</a><strong><code>Base.sinh</code></strong> — <em>Method</em>.</p><pre><code>sinh(x::arb)
+</code></pre><blockquote><p>Return the hyperbolic sine of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1047" target="_blank">source</a><br/></p><p><a href="#Base.cosh-Tuple{Nemo.arb}" id="Base.cosh-Tuple{Nemo.arb}">#</a><strong><code>Base.cosh</code></strong> — <em>Method</em>.</p><pre><code>cosh(x::arb)
+</code></pre><blockquote><p>Return the hyperbolic cosine of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1057" target="_blank">source</a><br/></p><p><a href="#Base.tanh-Tuple{Nemo.arb}" id="Base.tanh-Tuple{Nemo.arb}">#</a><strong><code>Base.tanh</code></strong> — <em>Method</em>.</p><pre><code>tanh(x::arb)
+</code></pre><blockquote><p>Return the hyperbolic tangent of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1067" target="_blank">source</a><br/></p><p><a href="#Base.Math.coth-Tuple{Nemo.arb}" id="Base.Math.coth-Tuple{Nemo.arb}">#</a><strong><code>Base.Math.coth</code></strong> — <em>Method</em>.</p><pre><code>coth(x::arb)
+</code></pre><blockquote><p>Return the hyperbolic cotangent of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1077" target="_blank">source</a><br/></p><p><a href="#Base.atan-Tuple{Nemo.arb}" id="Base.atan-Tuple{Nemo.arb}">#</a><strong><code>Base.atan</code></strong> — <em>Method</em>.</p><pre><code>atan(x::arb)
+</code></pre><blockquote><p>Return the arctangent of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1087" target="_blank">source</a><br/></p><p><a href="#Base.asin-Tuple{Nemo.arb}" id="Base.asin-Tuple{Nemo.arb}">#</a><strong><code>Base.asin</code></strong> — <em>Method</em>.</p><pre><code>asin(x::arb)
+</code></pre><blockquote><p>Return the arcsine of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1097" target="_blank">source</a><br/></p><p><a href="#Base.acos-Tuple{Nemo.arb}" id="Base.acos-Tuple{Nemo.arb}">#</a><strong><code>Base.acos</code></strong> — <em>Method</em>.</p><pre><code>acos(x::arb)
+</code></pre><blockquote><p>Return the arccosine of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1107" target="_blank">source</a><br/></p><p><a href="#Base.atanh-Tuple{Nemo.arb}" id="Base.atanh-Tuple{Nemo.arb}">#</a><strong><code>Base.atanh</code></strong> — <em>Method</em>.</p><pre><code>atanh(x::arb)
+</code></pre><blockquote><p>Return the hyperbolic arctangent of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1117" target="_blank">source</a><br/></p><p><a href="#Base.asinh-Tuple{Nemo.arb}" id="Base.asinh-Tuple{Nemo.arb}">#</a><strong><code>Base.asinh</code></strong> — <em>Method</em>.</p><pre><code>asinh(x::arb)
+</code></pre><blockquote><p>Return the hyperbolic arcsine of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1127" target="_blank">source</a><br/></p><p><a href="#Base.acosh-Tuple{Nemo.arb}" id="Base.acosh-Tuple{Nemo.arb}">#</a><strong><code>Base.acosh</code></strong> — <em>Method</em>.</p><pre><code>acosh(x::arb)
+</code></pre><blockquote><p>Return the hyperbolic arccosine of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1137" target="_blank">source</a><br/></p><p><a href="#Base.Math.gamma-Tuple{Nemo.arb}" id="Base.Math.gamma-Tuple{Nemo.arb}">#</a><strong><code>Base.Math.gamma</code></strong> — <em>Method</em>.</p><pre><code>gamma(x::arb)
+</code></pre><blockquote><p>Return the Gamma function evaluated at <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1147" target="_blank">source</a><br/></p><p><a href="#Base.Math.lgamma-Tuple{Nemo.arb}" id="Base.Math.lgamma-Tuple{Nemo.arb}">#</a><strong><code>Base.Math.lgamma</code></strong> — <em>Method</em>.</p><pre><code>lgamma(x::arb)
+</code></pre><blockquote><p>Return the logarithm of the Gamma function evaluated at <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1157" target="_blank">source</a><br/></p><p><a href="#Nemo.rgamma-Tuple{Nemo.arb}" id="Nemo.rgamma-Tuple{Nemo.arb}">#</a><strong><code>Nemo.rgamma</code></strong> — <em>Method</em>.</p><pre><code>rgamma(x::arb)
+</code></pre><blockquote><p>Return the reciprocal of the Gamma function evaluated at <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1167" target="_blank">source</a><br/></p><p><a href="#Base.Math.digamma-Tuple{Nemo.arb}" id="Base.Math.digamma-Tuple{Nemo.arb}">#</a><strong><code>Base.Math.digamma</code></strong> — <em>Method</em>.</p><pre><code>digamma(x::arb)
+</code></pre><blockquote><p>Return the  logarithmic derivative of the gamma function evaluated at <script type="math/tex">x</script>, i.e. <script type="math/tex">\psi(x)</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1177" target="_blank">source</a><br/></p><p><a href="#Base.Math.zeta-Tuple{Nemo.arb}" id="Base.Math.zeta-Tuple{Nemo.arb}">#</a><strong><code>Base.Math.zeta</code></strong> — <em>Method</em>.</p><pre><code>zeta(x::arb)
+</code></pre><blockquote><p>Return the Riemann zeta function evaluated at <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1188" target="_blank">source</a><br/></p><p><a href="#Nemo.sincos-Tuple{Nemo.arb}" id="Nemo.sincos-Tuple{Nemo.arb}">#</a><strong><code>Nemo.sincos</code></strong> — <em>Method</em>.</p><pre><code>sincos(x::arb)
+</code></pre><blockquote><p>Return a tuple <script type="math/tex">s, c</script> consisting of the sine <script type="math/tex">s</script> and cosine <script type="math/tex">c</script> of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1198" target="_blank">source</a><br/></p><p><a href="#Nemo.sincospi-Tuple{Nemo.arb}" id="Nemo.sincospi-Tuple{Nemo.arb}">#</a><strong><code>Nemo.sincospi</code></strong> — <em>Method</em>.</p><pre><code>sincospi(x::arb)
+</code></pre><blockquote><p>Return a tuple <script type="math/tex">s, c</script> consisting of the sine <script type="math/tex">s</script> and cosine <script type="math/tex">c</script> of <script type="math/tex">\pi x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1210" target="_blank">source</a><br/></p><p><a href="#Base.Math.sinpi-Tuple{Nemo.fmpq,Nemo.ArbField}" id="Base.Math.sinpi-Tuple{Nemo.fmpq,Nemo.ArbField}">#</a><strong><code>Base.Math.sinpi</code></strong> — <em>Method</em>.</p><pre><code>sinpi(x::fmpq, r::ArbField)
+</code></pre><blockquote><p>Return the sine of <script type="math/tex">\pi x</script> in the given Arb field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1222" target="_blank">source</a><br/></p><p><a href="#Base.Math.cospi-Tuple{Nemo.fmpq,Nemo.ArbField}" id="Base.Math.cospi-Tuple{Nemo.fmpq,Nemo.ArbField}">#</a><strong><code>Base.Math.cospi</code></strong> — <em>Method</em>.</p><pre><code>cospi(x::fmpq, r::ArbField)
+</code></pre><blockquote><p>Return the cosine of <script type="math/tex">\pi x</script> in the given Arb field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1233" target="_blank">source</a><br/></p><p><a href="#Nemo.sincospi-Tuple{Nemo.fmpq,Nemo.ArbField}" id="Nemo.sincospi-Tuple{Nemo.fmpq,Nemo.ArbField}">#</a><strong><code>Nemo.sincospi</code></strong> — <em>Method</em>.</p><pre><code>sincospi(x::fmpq, r::ArbField)
+</code></pre><blockquote><p>Return a tuple <script type="math/tex">s, c</script> consisting of the sine and cosine of <script type="math/tex">\pi x</script> in the given Arb field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1244" target="_blank">source</a><br/></p><p><a href="#Nemo.sinhcosh-Tuple{Nemo.arb}" id="Nemo.sinhcosh-Tuple{Nemo.arb}">#</a><strong><code>Nemo.sinhcosh</code></strong> — <em>Method</em>.</p><pre><code>sinhcosh(x::arb)
+</code></pre><blockquote><p>Return a tuple <script type="math/tex">s, c</script> consisting of the hyperbolic sine and cosine of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1257" target="_blank">source</a><br/></p><p><a href="#Base.Math.atan2-Tuple{Nemo.arb,Nemo.arb}" id="Base.Math.atan2-Tuple{Nemo.arb,Nemo.arb}">#</a><strong><code>Base.Math.atan2</code></strong> — <em>Method</em>.</p><pre><code>atan2(x::arb, y::arb)
+</code></pre><blockquote><p>Return atan2<script type="math/tex">(b,a) = \arg(a+bi)</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1269" target="_blank">source</a><br/></p><p><a href="#Nemo.agm-Tuple{Nemo.arb,Nemo.arb}" id="Nemo.agm-Tuple{Nemo.arb,Nemo.arb}">#</a><strong><code>Nemo.agm</code></strong> — <em>Method</em>.</p><pre><code>agm(x::arb, y::arb)
+</code></pre><blockquote><p>Return the arithmetic-geometric mean of <script type="math/tex">x</script> and <script type="math/tex">y</script></p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1280" target="_blank">source</a><br/></p><p><a href="#Base.Math.zeta-Tuple{Nemo.arb,Nemo.arb}" id="Base.Math.zeta-Tuple{Nemo.arb,Nemo.arb}">#</a><strong><code>Base.Math.zeta</code></strong> — <em>Method</em>.</p><pre><code>zeta(s::arb, a::arb)
+</code></pre><blockquote><p>Return the Hurwitz zeta function <script type="math/tex">\zeta(s,a)</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1291" target="_blank">source</a><br/></p><p><a href="#Base.Math.hypot-Tuple{Nemo.arb,Nemo.arb}" id="Base.Math.hypot-Tuple{Nemo.arb,Nemo.arb}">#</a><strong><code>Base.Math.hypot</code></strong> — <em>Method</em>.</p><pre><code>hypot(x::arb, y::arb)
+</code></pre><blockquote><p>Return <script type="math/tex">\sqrt{x^2 + y^2}</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1302" target="_blank">source</a><br/></p><p><a href="#Nemo.root-Tuple{Nemo.arb,Int64}" id="Nemo.root-Tuple{Nemo.arb,Int64}">#</a><strong><code>Nemo.root</code></strong> — <em>Method</em>.</p><pre><code>root(x::arb, n::Int)
+</code></pre><blockquote><p>Return the <script type="math/tex">n</script>-th root of <script type="math/tex">x</script>. We require <script type="math/tex">x \geq 0</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1320" target="_blank">source</a><br/></p><p><a href="#Nemo.fac-Tuple{Nemo.arb}" id="Nemo.fac-Tuple{Nemo.arb}">#</a><strong><code>Nemo.fac</code></strong> — <em>Method</em>.</p><pre><code>fac(x::arb)
+</code></pre><blockquote><p>Return the factorial of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1326" target="_blank">source</a><br/></p><p><a href="#Nemo.fac-Tuple{Int64,Nemo.ArbField}" id="Nemo.fac-Tuple{Int64,Nemo.ArbField}">#</a><strong><code>Nemo.fac</code></strong> — <em>Method</em>.</p><pre><code>fac(n::Int, r::ArbField)
+</code></pre><blockquote><p>Return the factorial of <script type="math/tex">n</script> in the given Arb field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1338" target="_blank">source</a><br/></p><p><a href="#Nemo.binom-Tuple{Nemo.arb,UInt64}" id="Nemo.binom-Tuple{Nemo.arb,UInt64}">#</a><strong><code>Nemo.binom</code></strong> — <em>Method</em>.</p><pre><code>binom(x::arb, n::UInt)
+</code></pre><blockquote><p>Return the binomial coefficient <script type="math/tex">{x \choose n}</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1344" target="_blank">source</a><br/></p><p><a href="#Nemo.binom-Tuple{UInt64,UInt64,Nemo.ArbField}" id="Nemo.binom-Tuple{UInt64,UInt64,Nemo.ArbField}">#</a><strong><code>Nemo.binom</code></strong> — <em>Method</em>.</p><pre><code>binom(n::UInt, k::UInt, r::ArbField)
+</code></pre><blockquote><p>Return the binomial coefficient <script type="math/tex">{n \choose k}</script> in the given Arb field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1355" target="_blank">source</a><br/></p><p><a href="#Nemo.fib-Tuple{Nemo.fmpz,Nemo.ArbField}" id="Nemo.fib-Tuple{Nemo.fmpz,Nemo.ArbField}">#</a><strong><code>Nemo.fib</code></strong> — <em>Method</em>.</p><pre><code>fib(n::fmpz, r::ArbField)
+</code></pre><blockquote><p>Return the <script type="math/tex">n</script>-th Fibonacci number in the given Arb field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1366" target="_blank">source</a><br/></p><p><a href="#Nemo.fib-Tuple{Int64,Nemo.ArbField}" id="Nemo.fib-Tuple{Int64,Nemo.ArbField}">#</a><strong><code>Nemo.fib</code></strong> — <em>Method</em>.</p><pre><code>fib(n::Int, r::ArbField)
+</code></pre><blockquote><p>Return the <script type="math/tex">n</script>-th Fibonacci number in the given Arb field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1384" target="_blank">source</a><br/></p><p><a href="#Base.Math.gamma-Tuple{Nemo.fmpz,Nemo.ArbField}" id="Base.Math.gamma-Tuple{Nemo.fmpz,Nemo.ArbField}">#</a><strong><code>Base.Math.gamma</code></strong> — <em>Method</em>.</p><pre><code>gamma(x::fmpz, r::ArbField)
+</code></pre><blockquote><p>Return the Gamma function evaluated at <script type="math/tex">x</script> in the given Arb field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1390" target="_blank">source</a><br/></p><p><a href="#Base.Math.gamma-Tuple{Nemo.fmpq,Nemo.ArbField}" id="Base.Math.gamma-Tuple{Nemo.fmpq,Nemo.ArbField}">#</a><strong><code>Base.Math.gamma</code></strong> — <em>Method</em>.</p><pre><code>gamma(x::fmpq, r::ArbField)
+</code></pre><blockquote><p>Return the Gamma function evaluated at <script type="math/tex">x</script> in the given Arb field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1401" target="_blank">source</a><br/></p><p><a href="#Base.Math.zeta-Tuple{Int64,Nemo.ArbField}" id="Base.Math.zeta-Tuple{Int64,Nemo.ArbField}">#</a><strong><code>Base.Math.zeta</code></strong> — <em>Method</em>.</p><pre><code>zeta(n::Int, r::ArbField)
+</code></pre><blockquote><p>Return the Riemann zeta function <script type="math/tex">\zeta(n)</script> as an element of the given Arb field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1420" target="_blank">source</a><br/></p><p><a href="#Nemo.bernoulli-Tuple{Int64,Nemo.ArbField}" id="Nemo.bernoulli-Tuple{Int64,Nemo.ArbField}">#</a><strong><code>Nemo.bernoulli</code></strong> — <em>Method</em>.</p><pre><code>bernoulli(n::Int, r::ArbField)
+</code></pre><blockquote><p>Return the <script type="math/tex">n</script>-th Bernoulli number as an element of the given Arb field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1434" target="_blank">source</a><br/></p><p><a href="#Nemo.risingfac-Tuple{Nemo.arb,Int64}" id="Nemo.risingfac-Tuple{Nemo.arb,Int64}">#</a><strong><code>Nemo.risingfac</code></strong> — <em>Method</em>.</p><pre><code>risingfac(x::arb, n::Int)
+</code></pre><blockquote><p>Return the rising factorial <script type="math/tex">x(x + 1)\ldots (x + n - 1)</script> as an Arb.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1447" target="_blank">source</a><br/></p><p><a href="#Nemo.risingfac-Tuple{Nemo.fmpq,Int64,Nemo.ArbField}" id="Nemo.risingfac-Tuple{Nemo.fmpq,Int64,Nemo.ArbField}">#</a><strong><code>Nemo.risingfac</code></strong> — <em>Method</em>.</p><pre><code>risingfac(x::fmpq, n::Int, r::ArbField)
+</code></pre><blockquote><p>Return the rising factorial <script type="math/tex">x(x + 1)\ldots (x + n - 1)</script> as an element of the given Arb field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1460" target="_blank">source</a><br/></p><p><a href="#Nemo.risingfac2-Tuple{Nemo.arb,Int64}" id="Nemo.risingfac2-Tuple{Nemo.arb,Int64}">#</a><strong><code>Nemo.risingfac2</code></strong> — <em>Method</em>.</p><pre><code>risingfac2(x::arb, n::Int)
+</code></pre><blockquote><p>Return a tuple containing the rising factorial <script type="math/tex">x(x + 1)\ldots (x + n - 1)</script> and its derivative.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1475" target="_blank">source</a><br/></p><p><a href="#Nemo.polylog-Tuple{Nemo.arb,Nemo.arb}" id="Nemo.polylog-Tuple{Nemo.arb,Nemo.arb}">#</a><strong><code>Nemo.polylog</code></strong> — <em>Method</em>.</p><pre><code>polylog(s::arb, a::arb)
+</code></pre><blockquote><p>Return the polylogarithm Li<script type="math/tex">_s(a)</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1482" target="_blank">source</a><br/></p><p><a href="#Nemo.polylog-Tuple{Int64,Nemo.arb}" id="Nemo.polylog-Tuple{Int64,Nemo.arb}">#</a><strong><code>Nemo.polylog</code></strong> — <em>Method</em>.</p><pre><code>polylog(s::Int, a::arb)
+</code></pre><blockquote><p>Return the polylogarithm Li<script type="math/tex">_s(a)</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1493" target="_blank">source</a><br/></p><p><a href="#Nemo.chebyshev_t-Tuple{Int64,Nemo.arb}" id="Nemo.chebyshev_t-Tuple{Int64,Nemo.arb}">#</a><strong><code>Nemo.chebyshev_t</code></strong> — <em>Method</em>.</p><pre><code>chebyshev_t(n::Int, x::arb)
+</code></pre><blockquote><p>Return the value of the Chebyshev polynomial <script type="math/tex">T_n(x)</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1534" target="_blank">source</a><br/></p><p><a href="#Nemo.chebyshev_u-Tuple{Int64,Nemo.arb}" id="Nemo.chebyshev_u-Tuple{Int64,Nemo.arb}">#</a><strong><code>Nemo.chebyshev_u</code></strong> — <em>Method</em>.</p><pre><code>chebyshev_u(n::Int, x::arb)
+</code></pre><blockquote><p>Return the value of the Chebyshev polynomial <script type="math/tex">U_n(x)</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1540" target="_blank">source</a><br/></p><p><a href="#Nemo.chebyshev_t2-Tuple{Int64,Nemo.arb}" id="Nemo.chebyshev_t2-Tuple{Int64,Nemo.arb}">#</a><strong><code>Nemo.chebyshev_t2</code></strong> — <em>Method</em>.</p><pre><code>chebyshev_t2(n::Int, x::arb)
+</code></pre><blockquote><p>Return the tuple <script type="math/tex">(T_{n}(x), T_{n-1}(x))</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1546" target="_blank">source</a><br/></p><p><a href="#Nemo.chebyshev_u2-Tuple{Int64,Nemo.arb}" id="Nemo.chebyshev_u2-Tuple{Int64,Nemo.arb}">#</a><strong><code>Nemo.chebyshev_u2</code></strong> — <em>Method</em>.</p><pre><code>chebyshev_u2(n::Int, x::arb)
+</code></pre><blockquote><p>Return the tuple <script type="math/tex">(U_{n}(x), U_{n-1}(x))</script></p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1552" target="_blank">source</a><br/></p><p><a href="#Nemo.bell-Tuple{Nemo.fmpz,Nemo.ArbField}" id="Nemo.bell-Tuple{Nemo.fmpz,Nemo.ArbField}">#</a><strong><code>Nemo.bell</code></strong> — <em>Method</em>.</p><pre><code>bell(n::fmpz, r::ArbField)
+</code></pre><blockquote><p>Return the Bell number <script type="math/tex">B_n</script> as an element of <script type="math/tex">r</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1558" target="_blank">source</a><br/></p><p><a href="#Nemo.bell-Tuple{Int64,Nemo.ArbField}" id="Nemo.bell-Tuple{Int64,Nemo.ArbField}">#</a><strong><code>Nemo.bell</code></strong> — <em>Method</em>.</p><pre><code>bell(n::Int, r::ArbField)
+</code></pre><blockquote><p>Return the Bell number <script type="math/tex">B_n</script> as an element of <script type="math/tex">r</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1569" target="_blank">source</a><br/></p><p><a href="#Nemo.numpart-Tuple{Nemo.fmpz,Nemo.ArbField}" id="Nemo.numpart-Tuple{Nemo.fmpz,Nemo.ArbField}">#</a><strong><code>Nemo.numpart</code></strong> — <em>Method</em>.</p><pre><code>numpart(n::fmpz, r::ArbField)
+</code></pre><blockquote><p>Return the number of partitions <script type="math/tex">p(n)</script> as an element of <script type="math/tex">r</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1575" target="_blank">source</a><br/></p><p><a href="#Nemo.numpart-Tuple{Int64,Nemo.ArbField}" id="Nemo.numpart-Tuple{Int64,Nemo.ArbField}">#</a><strong><code>Nemo.numpart</code></strong> — <em>Method</em>.</p><pre><code>numpart(n::fmpz, r::ArbField)
+</code></pre><blockquote><p>Return the number of partitions <script type="math/tex">p(n)</script> as an element of <script type="math/tex">r</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/a7e680756720736fbf3d66de5eb23a88117eb2fa/src/arb/arb.jl#L1586" target="_blank">source</a><br/></p><p>Here are some examples of real valued mathematical functions.</p><pre><code>RR = RealField(64)
 
 a = floor(exp(RR(1)))
 b = sinpi(QQ(5,6), RR)
 c = gamma(QQ(1,3), RealField(256))
 d = bernoulli(1000, RealField(53))
 f = polylog(3, RR(-10))
-</code></pre>
-              
-            </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../acb/" class="btn btn-neutral float-right" title="Complex boxes">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../padic/" class="btn btn-neutral" title="P-adic fields"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <!-- Copyright etc -->
-    
-  </div>
+</code></pre></div></div><footer><div aria-label="footer navigation" class="rst-footer-buttons" role="navigation"><a class="btn btn-neutral float-right" href="../acb/" title="Complex boxes">Next <span class="icon icon-circle-arrow-right"></span></a><a class="btn btn-neutral" href="../padic/" title="P-adic fields"><span class="icon icon-circle-arrow-left"></span> Previous</a></div><hr/><div role="contentinfo"></div>
 
   Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
-</footer>
-	  
-        </div>
-      </div>
-
-    </section>
-
-  </div>
-
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-          <a href="https://github.com/Nemocas/Nemo.jl" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-      
-      
-        <span><a href="../padic/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../acb/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
-</div>
-
-</body>
-</html>
+</footer></div></div></section></div><div class="rst-versions" role="note" style="cursor: pointer"><span class="rst-current-version" data-toggle="rst-current-version"><a class="icon icon-github" href="https://github.com/Nemocas/Nemo.jl" style="float: left; color: #fcfcfc"> GitHub</a><span><a href="../padic/" style="color: #fcfcfc;">« Previous</a></span><span style="margin-left: 15px"><a href="../acb/" style="color: #fcfcfc">Next »</a></span></span></div></body></HTML>

@@ -1,226 +1,53 @@
-<!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <meta name="author" content="William Hart">
-  <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Types in Nemo - Nemo.jl</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-  <link href="../assets/Documenter.css" rel="stylesheet">
-  
-  <script>
+<!DOCTYPE html><HTML class="no-js" lang="en"><head><meta charset="utf-8"/><meta content="IE=edge" http-equiv="X-UA-Compatible"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="William Hart" name="author"/><link href="../img/favicon.ico" rel="shortcut icon"/><title>Types in Nemo - Nemo.jl</title><link href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css"/><link href="../css/theme.css" rel="stylesheet" type="text/css"/><link href="../css/theme_extra.css" rel="stylesheet" type="text/css"/><link href="../css/highlight.css" rel="stylesheet"/><link href="../assets/Documenter.css" rel="stylesheet"/><script>
     // Current page data
     var mkdocs_page_name = "Types in Nemo";
     var mkdocs_page_input_path = "types.md";
     var mkdocs_page_url = "/types/";
-  </script>
-  
-  <script src="../js/jquery-2.1.1.min.js"></script>
-  <script src="../js/modernizr-2.8.3.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
-  
-</head>
+  </script><script src="../js/jquery-2.1.1.min.js"></script><script src="../js/modernizr-2.8.3.min.js"></script><script src="../js/highlight.pack.js" type="text/javascript"></script><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
 
-<body class="wy-body-for-nav" role="document">
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
 
-  <div class="wy-grid-for-nav">
+        head.appendChild(meta);
+    };
 
-    
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-      <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Nemo.jl</a>
-        <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-  </form>
-</div>
-      </div>
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-	  
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="..">Getting Started</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../about/">About Nemo</a>
-	    </li>
-          
-            <li class="toctree-l1 current">
-		
-    <a class="current" href="./">Types in Nemo</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l2"><a href="#types-in-nemo">Types in Nemo</a></li>
-    
-        <ul>
-        
-            <li><a class="toctree-l3" href="#introduction">Introduction</a></li>
-        
-            <li><a class="toctree-l3" href="#the-abstract-type-hierarchy-in-nemo">The abstract type hierarchy in Nemo</a></li>
-        
-            <li><a class="toctree-l3" href="#why-types-arent-enough">Why types aren't enough</a></li>
-        
-            <li><a class="toctree-l3" href="#more-complex-example-of-parent-objects">More complex example of parent objects</a></li>
-        
-            <li><a class="toctree-l3" href="#concrete-types-in-nemo">Concrete types in Nemo</a></li>
-        
-        </ul>
-    
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
 
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../constructors/">Parent object constructors</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../polynomial/">Univariate polynomials</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../series/">Capped relative power series</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../residue/">Residue rings</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../fraction/">Fraction fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../matrix/">Matrices</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../integer/">Integers</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../rational/">Rationals</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../finitefield/">Finite fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../padic/">P-adic fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../arb/">Real balls</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../acb/">Complex boxes</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../numberfield/">Number fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../maximalorder/">Maximal orders</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../classgroup/">Class groups</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../perm/">Permutation groups</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../factor/">Factorization</a>
-	    </li>
-          
-        </ul>
-      </div>
-      &nbsp;
-    </nav>
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="..">Nemo.jl</a>
-      </nav>
-
-      
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
-  <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    
-      
-    
-    <li>Types in Nemo</li>
-    <li class="wy-breadcrumbs-aside">
-      
-        <a href="https://github.com/Nemocas/Nemo.jl/edit/master/docs/types.md"
-          class="icon icon-github"> Edit on GitHub</a>
-      
-    </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main">
-            <div class="section">
-              
-                <p><a id='Types-in-Nemo-1'></a></p>
-<h1 id="types-in-nemo">Types in Nemo</h1>
-<p>On this page we discuss the type hierarchy in Nemo and a concept known as parents. These details are quite technical and should be skipped or skimmed by new users of Julia/Nemo. Types are almost never dealt with directly when scripting Nemo to do mathematical computations. </p>
-<p>In contrast, Nemo developers will certainly want to know how we model mathematical objects and the rings, fields, groups, etc. that they belong to in Nemo.</p>
-<p><a id='Introduction-1'></a></p>
-<h2 id="introduction">Introduction</h2>
-<p>Julia provides two levels of types that we make use of</p>
-<ul>
-<li>abstract types</li>
-<li>concrete types</li>
-</ul>
-<p>Concrete types are just like the usual types everyone is familiar with from C or C++.</p>
-<p>Abstract types can be thought of as collections of types. They are used when writing generic functions that should work for any type in the given collection.</p>
-<p>To write a generic function that accepts any type in a given collection of types, we first create an abstract type. Then we create the individual concrete types that belong to that abstract type. A generic function can then be constructed with a type parameter, <code>T</code> say, similar to a template parameter in C++. The main difference is that we can specify which abstract type our type parameter <code>T</code> must belong to.</p>
-<p>We use the symbol <code>&lt;:</code> in Julia to determine that a given type belongs to a given abstract type. For example the built-in Julia type <code>Int64</code> for 64 bit machine integers belongs to the Julia abstract type <code>Integer</code>. Thus <code>Int &lt;: Integer</code> returns <code>true</code>.</p>
-<p>Here is some Julia code illustrating this with a more complex example. We create an abstract type called <code>Shape</code> and two user defined concrete types <code>square</code> and <code>circle</code> belonging to <code>Shape</code>. We then show how to write methods that accept each of the concrete types and then show how to write a generic function for any type <code>T</code> belonging to the abstract type <code>Shape</code>.</p>
-<p>Note that in the type definitions of <code>square</code> and <code>circle</code> we specify that those types belong to the abstract type <code>Shape</code> using the <code>&lt;:</code> operator.</p>
-<pre><code>abstract Shape
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body class="wy-body-for-nav" role="document"><div class="wy-grid-for-nav"><nav class="wy-nav-side stickynav" data-toggle="wy-nav-shift"><div class="wy-side-nav-search"><a class="icon icon-home" href=".."> Nemo.jl</a><div role="search"><form action="../search.html" class="wy-form" id="rtd-search-form" method="get"><input name="q" placeholder="Search docs" type="text"/></form></div></div><div aria-label="main navigation" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation"><ul class="current"><li class="toctree-l1"><a class="" href="..">Getting Started</a></li><li class="toctree-l1"><a class="" href="../about/">About Nemo</a></li><li class="toctree-l1 current"><a class="current" href="./">Types in Nemo</a><ul class="subnav"><li class="toctree-l2"><a href="#types-in-nemo">Types in Nemo</a></li><ul><li><a class="toctree-l3" href="#introduction">Introduction</a></li><li><a class="toctree-l3" href="#the-abstract-type-hierarchy-in-nemo">The abstract type hierarchy in Nemo</a></li><li><a class="toctree-l3" href="#why-types-arent-enough">Why types aren't enough</a></li><li><a class="toctree-l3" href="#more-complex-example-of-parent-objects">More complex example of parent objects</a></li><li><a class="toctree-l3" href="#concrete-types-in-nemo">Concrete types in Nemo</a></li></ul></ul></li><li class="toctree-l1"><a class="" href="../constructors/">Parent object constructors</a></li><li class="toctree-l1"><a class="" href="../polynomial/">Univariate polynomials</a></li><li class="toctree-l1"><a class="" href="../series/">Capped relative power series</a></li><li class="toctree-l1"><a class="" href="../residue/">Residue rings</a></li><li class="toctree-l1"><a class="" href="../fraction/">Fraction fields</a></li><li class="toctree-l1"><a class="" href="../matrix/">Matrices</a></li><li class="toctree-l1"><a class="" href="../integer/">Integers</a></li><li class="toctree-l1"><a class="" href="../rational/">Rationals</a></li><li class="toctree-l1"><a class="" href="../finitefield/">Finite fields</a></li><li class="toctree-l1"><a class="" href="../padic/">P-adic fields</a></li><li class="toctree-l1"><a class="" href="../arb/">Real balls</a></li><li class="toctree-l1"><a class="" href="../acb/">Complex boxes</a></li><li class="toctree-l1"><a class="" href="../numberfield/">Number fields</a></li><li class="toctree-l1"><a class="" href="../maximalorder/">Maximal orders</a></li><li class="toctree-l1"><a class="" href="../classgroup/">Class groups</a></li><li class="toctree-l1"><a class="" href="../perm/">Permutation groups</a></li><li class="toctree-l1"><a class="" href="../factor/">Factorization</a></li></ul></div>
+       
+    </nav><section class="wy-nav-content-wrap" data-toggle="wy-nav-shift"><nav aria-label="top navigation" class="wy-nav-top" role="navigation"><i class="fa fa-bars" data-toggle="wy-nav-top"></i><a href="..">Nemo.jl</a></nav><div class="wy-nav-content"><div class="rst-content"><div aria-label="breadcrumbs navigation" role="navigation"><ul class="wy-breadcrumbs"><li><a href="..">Docs</a> »</li><li>Types in Nemo</li><li class="wy-breadcrumbs-aside"><a class="icon icon-github" href="https://github.com/Nemocas/Nemo.jl/edit/master/docs/types.md"> Edit on GitHub</a></li></ul><hr/></div><div role="main"><div class="section"><p><a id="Types-in-Nemo-1"></a></p><h1 id="types-in-nemo">Types in Nemo</h1><p>On this page we discuss the type hierarchy in Nemo and a concept known as parents. These details are quite technical and should be skipped or skimmed by new users of Julia/Nemo. Types are almost never dealt with directly when scripting Nemo to do mathematical computations. </p><p>In contrast, Nemo developers will certainly want to know how we model mathematical objects and the rings, fields, groups, etc. that they belong to in Nemo.</p><p><a id="Introduction-1"></a></p><h2 id="introduction">Introduction</h2><p>Julia provides two levels of types that we make use of</p><ul><li>abstract types</li><li>concrete types</li></ul><p>Concrete types are just like the usual types everyone is familiar with from C or C++.</p><p>Abstract types can be thought of as collections of types. They are used when writing generic functions that should work for any type in the given collection.</p><p>To write a generic function that accepts any type in a given collection of types, we first create an abstract type. Then we create the individual concrete types that belong to that abstract type. A generic function can then be constructed with a type parameter, <code>T</code> say, similar to a template parameter in C++. The main difference is that we can specify which abstract type our type parameter <code>T</code> must belong to.</p><p>We use the symbol <code>&lt;:</code> in Julia to determine that a given type belongs to a given abstract type. For example the built-in Julia type <code>Int64</code> for 64 bit machine integers belongs to the Julia abstract type <code>Integer</code>. Thus <code>Int &lt;: Integer</code> returns <code>true</code>.</p><p>Here is some Julia code illustrating this with a more complex example. We create an abstract type called <code>Shape</code> and two user defined concrete types <code>square</code> and <code>circle</code> belonging to <code>Shape</code>. We then show how to write methods that accept each of the concrete types and then show how to write a generic function for any type <code>T</code> belonging to the abstract type <code>Shape</code>.</p><p>Note that in the type definitions of <code>square</code> and <code>circle</code> we specify that those types belong to the abstract type <code>Shape</code> using the <code>&lt;:</code> operator.</p><pre><code>abstract Shape
 
 type square &lt;: Shape
    width::Int
@@ -252,38 +79,11 @@ area(s)
 area(c)
 border_thickness(s)
 border_thickness(c)
-</code></pre>
-
-<p><a id='The-abstract-type-hierarchy-in-Nemo-1'></a></p>
-<h2 id="the-abstract-type-hierarchy-in-nemo">The abstract type hierarchy in Nemo</h2>
-<p>Abstract types in Julia can also belong to one another in a hierarchy. For example, the <code>Nemo.Field</code> abstract type belongs to the <code>Nemo.Ring</code> abstract type. An object representing a field in Nemo has type belonging to <code>Nemo.Field</code>. But because we define the inclusion <code>Nemo.Field &lt;: Nemo.Ring</code> in Nemo, the type of such an object also automatically belongs to <code>Nemo.Ring</code>. This means that any generic function in Nemo which is designed to work with ring objects will certainly also work with field objects.</p>
-<p>In Nemo we also distinguish between the elements of a field, say, and the field itself, and similarly for groups and rings and all other kinds of domains in Nemo. For example, we have an object of type <code>GenPolyRing</code> to model a generic polynomial ring, and elements of that polynomial ring would have type <code>GenPoly</code>. </p>
-<p>In order to model this distinction between elements and the domains they belong to, Nemo has two main branches in its abstract type hierarchy, as shown in the following diagram. One branch consists of the abstract types for the domains available in Nemo and the other branch is for the abstract types for elements of those domains. </p>
-<p><img alt="alt text" src="../img/types.png" title="Abstract type hierarchy" /></p>
-<p>All objects in Nemo, whether they represent rings, fields, groups, sets, etc. on the one hand, or ring elements, field elements, etc. on the other hand, have concrete types that belong to one of the abstract types shown above.</p>
-<p><a id='Why-types-aren't-enough-1'></a></p>
-<h2 id="why-types-arent-enough">Why types aren't enough</h2>
-<p>Naively, one may expect that rings in Nemo can be modeled as types and their elements as objects with the given type. But there are various reasons why this is not a good model.</p>
-<p>As an example, consider the ring <script type="math/tex">R = \mathbb{Z}/n\mathbb{Z}</script> for a multiprecision integer <script type="math/tex">n</script>. If we were to model the ring <script type="math/tex">R</script> as a type, then the type would somehow need to contain the modulus <script type="math/tex">n</script>. This is not possible in Julia, and in fact it is not desirable either.</p>
-<p>Julia dispatches on type, and each time we call a generic function with different types, a new version of the function is compiled at runtime for performance. But this would be a disaster if we were writing a multimodular algorithm, say. In such an algorithm many rings <script type="math/tex">\mathbb{Z}/n\mathbb{Z}</script> would be needed and every function we use would be recompiled over and over for each different <script type="math/tex">n</script>. This would result  in a huge delay as the compiler is invoked many times.</p>
-<p>For this reason, the modulus <script type="math/tex">n</script> needs to be attached to the <em>elements</em> of the ring, not to type associated with those elements.</p>
-<p>But now we have a problem. How do we create new elements of the ring <script type="math/tex">\mathbb{Z}/n\mathbb{Z}</script> given only the type? Suppose all rings <script type="math/tex">\mathbb{Z}/n\mathbb{Z}</script> were represented by the same type <code>Zmod</code> say. How would we create <script type="math/tex">a = 3 \pmod{7}</script>? We could not write <code>a = Zmod(3)</code> since the modulus <script type="math/tex">7</script> is not contained in the type <code>Zmod</code>.</p>
-<p>We could of course use the notation <code>a = Zmod(3, 7)</code>, but this would make implementation of generic algorithms very difficult, as they would need to distinguish the case where constructors take a single argument, such as <code>a = ZZ(7)</code> and cases where they take a modulus, such as <code>a = Zmod(3, 7)</code>.</p>
-<p>The way we get around this in Nemo is to have special (singleton) objects that act like types, but are really just ordinary Julia objects. These objects, called <em>parent</em> objects can contain extra information, such as the modulus <script type="math/tex">n</script>. </p>
-<p>In order to create new elements of <script type="math/tex">\mathbb{Z}/n\mathbb{Z}</script> as above, we overload the <code>call</code> operator for the parent object, making it callable. Making a parent object callable is exactly analogous to writing a constructor for a type.</p>
-<p>In the following Nemo example, we create the parent object <code>R</code> corresponding to the ring <script type="math/tex">\mathbb{Z}/7\mathbb{Z}</script>. We then create a new element <code>a</code> of this ring by calling the parent object <code>R</code>, just as though <code>R</code> were a type with a constructor accepting an <code>Int</code> parameter. </p>
-<pre><code>R = ResidueRing(ZZ, 7)
+</code></pre><p><a id="The-abstract-type-hierarchy-in-Nemo-1"></a></p><h2 id="the-abstract-type-hierarchy-in-nemo">The abstract type hierarchy in Nemo</h2><p>Abstract types in Julia can also belong to one another in a hierarchy. For example, the <code>Nemo.Field</code> abstract type belongs to the <code>Nemo.Ring</code> abstract type. An object representing a field in Nemo has type belonging to <code>Nemo.Field</code>. But because we define the inclusion <code>Nemo.Field &lt;: Nemo.Ring</code> in Nemo, the type of such an object also automatically belongs to <code>Nemo.Ring</code>. This means that any generic function in Nemo which is designed to work with ring objects will certainly also work with field objects.</p><p>In Nemo we also distinguish between the elements of a field, say, and the field itself, and similarly for groups and rings and all other kinds of domains in Nemo. For example, we have an object of type <code>GenPolyRing</code> to model a generic polynomial ring, and elements of that polynomial ring would have type <code>GenPoly</code>. </p><p>In order to model this distinction between elements and the domains they belong to, Nemo has two main branches in its abstract type hierarchy, as shown in the following diagram. One branch consists of the abstract types for the domains available in Nemo and the other branch is for the abstract types for elements of those domains. </p><p><img alt="alt text" src="../img/types.png" title="Abstract type hierarchy"/></p><p>All objects in Nemo, whether they represent rings, fields, groups, sets, etc. on the one hand, or ring elements, field elements, etc. on the other hand, have concrete types that belong to one of the abstract types shown above.</p><p><a id="Why-types-aren" t-enough-1'=""></a></p><h2 id="why-types-arent-enough">Why types aren't enough</h2><p>Naively, one may expect that rings in Nemo can be modeled as types and their elements as objects with the given type. But there are various reasons why this is not a good model.</p><p>As an example, consider the ring <script type="math/tex">R = \mathbb{Z}/n\mathbb{Z}</script> for a multiprecision integer <script type="math/tex">n</script>. If we were to model the ring <script type="math/tex">R</script> as a type, then the type would somehow need to contain the modulus <script type="math/tex">n</script>. This is not possible in Julia, and in fact it is not desirable either.</p><p>Julia dispatches on type, and each time we call a generic function with different types, a new version of the function is compiled at runtime for performance. But this would be a disaster if we were writing a multimodular algorithm, say. In such an algorithm many rings <script type="math/tex">\mathbb{Z}/n\mathbb{Z}</script> would be needed and every function we use would be recompiled over and over for each different <script type="math/tex">n</script>. This would result  in a huge delay as the compiler is invoked many times.</p><p>For this reason, the modulus <script type="math/tex">n</script> needs to be attached to the <em>elements</em> of the ring, not to type associated with those elements.</p><p>But now we have a problem. How do we create new elements of the ring <script type="math/tex">\mathbb{Z}/n\mathbb{Z}</script> given only the type? Suppose all rings <script type="math/tex">\mathbb{Z}/n\mathbb{Z}</script> were represented by the same type <code>Zmod</code> say. How would we create <script type="math/tex">a = 3 \pmod{7}</script>? We could not write <code>a = Zmod(3)</code> since the modulus <script type="math/tex">7</script> is not contained in the type <code>Zmod</code>.</p><p>We could of course use the notation <code>a = Zmod(3, 7)</code>, but this would make implementation of generic algorithms very difficult, as they would need to distinguish the case where constructors take a single argument, such as <code>a = ZZ(7)</code> and cases where they take a modulus, such as <code>a = Zmod(3, 7)</code>.</p><p>The way we get around this in Nemo is to have special (singleton) objects that act like types, but are really just ordinary Julia objects. These objects, called <em>parent</em> objects can contain extra information, such as the modulus <script type="math/tex">n</script>. </p><p>In order to create new elements of <script type="math/tex">\mathbb{Z}/n\mathbb{Z}</script> as above, we overload the <code>call</code> operator for the parent object, making it callable. Making a parent object callable is exactly analogous to writing a constructor for a type.</p><p>In the following Nemo example, we create the parent object <code>R</code> corresponding to the ring <script type="math/tex">\mathbb{Z}/7\mathbb{Z}</script>. We then create a new element <code>a</code> of this ring by calling the parent object <code>R</code>, just as though <code>R</code> were a type with a constructor accepting an <code>Int</code> parameter. </p><pre><code>R = ResidueRing(ZZ, 7)
 a = R(3)
-</code></pre>
+</code></pre><p>This example creates the element <script type="math/tex">a = 3 \pmod{7}</script>. </p><p>The important point is that unlike a type, a parent object such as <code>R</code> can contain additional information that a type cannot contain, such as the modulus <script type="math/tex">7</script> of the ring in this example, or context objects required by C libraries in other examples.</p><p><a id="More-complex-example-of-parent-objects-1"></a></p><h2 id="more-complex-example-of-parent-objects">More complex example of parent objects</h2><p>Here is some Julia/Nemo code which constructs a polynomial ring over the integers, a polynomial in that ring and then does some introspection to illustrate the various relations between the objects and types.</p><pre><code>julia&gt; using Nemo
 
-<p>This example creates the element <script type="math/tex">a = 3 \pmod{7}</script>. </p>
-<p>The important point is that unlike a type, a parent object such as <code>R</code> can contain additional information that a type cannot contain, such as the modulus <script type="math/tex">7</script> of the ring in this example, or context objects required by C libraries in other examples.</p>
-<p><a id='More-complex-example-of-parent-objects-1'></a></p>
-<h2 id="more-complex-example-of-parent-objects">More complex example of parent objects</h2>
-<p>Here is some Julia/Nemo code which constructs a polynomial ring over the integers, a polynomial in that ring and then does some introspection to illustrate the various relations between the objects and types.</p>
-<pre><code>julia&gt; using Nemo
-
-julia&gt; R, x = ZZ[&quot;x&quot;]
+julia&gt; R, x = ZZ["x"]
 (Univariate Polynomial Ring in x over Integer Ring,x)
 
 julia&gt; f = x^2 + 3x + 1
@@ -306,112 +106,7 @@ true
 
 julia&gt; parent(f) == R
 true
-</code></pre>
-
-<p><a id='Concrete-types-in-Nemo-1'></a></p>
-<h2 id="concrete-types-in-nemo">Concrete types in Nemo</h2>
-<p>Finally we come to all the concrete types in Nemo. </p>
-<p>These are of two main kinds: those for generic constructions (e.g. generic polynomials over an arbitrary ring) and those for specific implementations, usually provided by a C library (e.g. polynomials over the integers, provided by Flint).</p>
-<p>Below we give the type of each kind of element available in Nemo. In parentheses we list the types of their corresponding parent objects. Note that these are the types of the element objects and parent objects respectively, not the abstract types to which these types belong, which the reader can easily guess. </p>
-<p>For example, <code>fmpz</code> belongs to the abstract type <code>RingElem</code> and <code>FlintIntegerRing</code> belongs to <code>Ring</code>. Similarly <code>Poly{T}</code> belongs to <code>PolyElem</code> whereas <code>PolynomialRing{T}</code> belongs to <code>PolyRing</code>. We also have that <code>fmpz_poly</code> belongs to <code>PolyElem</code> and <code>FmpzPolyRing</code> belongs to <code>PolyRing</code>, and so on.</p>
-<p>All the generic types are parameterised by a type <code>T</code> which is the type of the <em>elements</em> of the ring they are defined over. </p>
-<ul>
-<li>
-<p>Generic</p>
-<ul>
-<li><code>GenPoly{T}</code> (<code>GenPolyRing{T}</code>)</li>
-<li><code>GenRelSeries{T}</code> (<code>GenRelSeriesRing{T}</code>)</li>
-<li><code>GenRes{T}</code> (<code>GenResRing{T}</code>)</li>
-<li><code>GenFrac{T}</code> (<code>GenFracField{T}</code>)</li>
-<li><code>GenMat{T}</code> (<code>GenMatSpace{T}</code>)</li>
-<li>
-<p>Flint</p>
-</li>
-<li>
-<p><code>fmpz</code> (<code>FlintIntegerRing</code>)</p>
-</li>
-<li><code>fmpq</code> (<code>FlintRationalField</code>)</li>
-<li><code>fq_nmod</code> (<code>FqNmodFiniteField</code>)</li>
-<li><code>fq</code> (<code>FqFiniteField</code>)</li>
-<li><code>padic</code> (<code>FlintPadicField</code>)</li>
-<li><code>fmpz_poly</code> (<code>FmpzPolyRing</code>)</li>
-<li><code>fmpq_poly</code> (<code>FmpqPolyRing</code>)</li>
-<li><code>nmod_poly</code> (<code>NmodPolyRing</code>)</li>
-<li><code>fmpz_mod_poly</code> (<code>FmpzModPolyRing</code>)</li>
-<li><code>fq_poly</code> (<code>FqPolyRing</code>)</li>
-<li><code>fq_nmod_poly</code> (<code>FqNmodPolyRing</code>)</li>
-<li><code>fmpz_rel_series</code> (<code>FmpzRelSeriesRing</code>)</li>
-<li><code>fmpq_rel_series</code> (<code>FmpqRelSeriesRing</code>)</li>
-<li><code>fmpz_mod_rel_series</code> (<code>FmpzModRelSeriesRing</code>)</li>
-<li><code>fq_nmod_rel_series</code> (<code>FqNmodRelSeriesRing</code>)</li>
-<li><code>fq_rel_series</code> (<code>FqRelSeriesRing</code>)</li>
-<li><code>fmpz_mat</code> (<code>FmpzMatSpace</code>)</li>
-<li><code>nmod_mat</code> (<code>NmodMatSpace</code>)</li>
-<li><code>perm</code> (<code>FlintPermGroup</code>)</li>
-<li>
-<p>Antic</p>
-</li>
-<li>
-<p><code>nf_elem</code> (<code>AnticNumberField</code>)</p>
-</li>
-<li>
-<p>Arb</p>
-</li>
-<li>
-<p><code>arb</code> (<code>ArbField</code>)</p>
-</li>
-<li><code>acb</code> (<code>AcbField</code>)</li>
-</ul>
-</li>
-</ul>
-              
-            </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../constructors/" class="btn btn-neutral float-right" title="Parent object constructors">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../about/" class="btn btn-neutral" title="About Nemo"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <!-- Copyright etc -->
-    
-  </div>
+</code></pre><p><a id="Concrete-types-in-Nemo-1"></a></p><h2 id="concrete-types-in-nemo">Concrete types in Nemo</h2><p>Finally we come to all the concrete types in Nemo. </p><p>These are of two main kinds: those for generic constructions (e.g. generic polynomials over an arbitrary ring) and those for specific implementations, usually provided by a C library (e.g. polynomials over the integers, provided by Flint).</p><p>Below we give the type of each kind of element available in Nemo. In parentheses we list the types of their corresponding parent objects. Note that these are the types of the element objects and parent objects respectively, not the abstract types to which these types belong, which the reader can easily guess. </p><p>For example, <code>fmpz</code> belongs to the abstract type <code>RingElem</code> and <code>FlintIntegerRing</code> belongs to <code>Ring</code>. Similarly <code>Poly{T}</code> belongs to <code>PolyElem</code> whereas <code>PolynomialRing{T}</code> belongs to <code>PolyRing</code>. We also have that <code>fmpz_poly</code> belongs to <code>PolyElem</code> and <code>FmpzPolyRing</code> belongs to <code>PolyRing</code>, and so on.</p><p>All the generic types are parameterised by a type <code>T</code> which is the type of the <em>elements</em> of the ring they are defined over. </p><ul><li><p>Generic</p><ul><li><code>GenPoly{T}</code> (<code>GenPolyRing{T}</code>)</li><li><code>GenRelSeries{T}</code> (<code>GenRelSeriesRing{T}</code>)</li><li><code>GenRes{T}</code> (<code>GenResRing{T}</code>)</li><li><code>GenFrac{T}</code> (<code>GenFracField{T}</code>)</li><li><code>GenMat{T}</code> (<code>GenMatSpace{T}</code>)</li><li><p>Flint</p></li><li><p><code>fmpz</code> (<code>FlintIntegerRing</code>)</p></li><li><code>fmpq</code> (<code>FlintRationalField</code>)</li><li><code>fq_nmod</code> (<code>FqNmodFiniteField</code>)</li><li><code>fq</code> (<code>FqFiniteField</code>)</li><li><code>padic</code> (<code>FlintPadicField</code>)</li><li><code>fmpz_poly</code> (<code>FmpzPolyRing</code>)</li><li><code>fmpq_poly</code> (<code>FmpqPolyRing</code>)</li><li><code>nmod_poly</code> (<code>NmodPolyRing</code>)</li><li><code>fmpz_mod_poly</code> (<code>FmpzModPolyRing</code>)</li><li><code>fq_poly</code> (<code>FqPolyRing</code>)</li><li><code>fq_nmod_poly</code> (<code>FqNmodPolyRing</code>)</li><li><code>fmpz_rel_series</code> (<code>FmpzRelSeriesRing</code>)</li><li><code>fmpq_rel_series</code> (<code>FmpqRelSeriesRing</code>)</li><li><code>fmpz_mod_rel_series</code> (<code>FmpzModRelSeriesRing</code>)</li><li><code>fq_nmod_rel_series</code> (<code>FqNmodRelSeriesRing</code>)</li><li><code>fq_rel_series</code> (<code>FqRelSeriesRing</code>)</li><li><code>fmpz_mat</code> (<code>FmpzMatSpace</code>)</li><li><code>nmod_mat</code> (<code>NmodMatSpace</code>)</li><li><code>perm</code> (<code>FlintPermGroup</code>)</li><li><p>Antic</p></li><li><p><code>nf_elem</code> (<code>AnticNumberField</code>)</p></li><li><p>Arb</p></li><li><p><code>arb</code> (<code>ArbField</code>)</p></li><li><code>acb</code> (<code>AcbField</code>)</li></ul></li></ul></div></div><footer><div aria-label="footer navigation" class="rst-footer-buttons" role="navigation"><a class="btn btn-neutral float-right" href="../constructors/" title="Parent object constructors">Next <span class="icon icon-circle-arrow-right"></span></a><a class="btn btn-neutral" href="../about/" title="About Nemo"><span class="icon icon-circle-arrow-left"></span> Previous</a></div><hr/><div role="contentinfo"></div>
 
   Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
-</footer>
-	  
-        </div>
-      </div>
-
-    </section>
-    
-  </div>
-
-  <div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-          <a href="https://github.com/Nemocas/Nemo.jl" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
-      
-      
-        <span><a href="../about/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../constructors/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
-</div>
-    <script src="../js/theme.js"></script>
-      <script src="../mathjaxhelper.js"></script>
-      <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
-
-</body>
-</html>
+</footer></div></div></section></div><div class="rst-versions" role="note" style="cursor: pointer"><span class="rst-current-version" data-toggle="rst-current-version"><a class="fa fa-github" href="https://github.com/Nemocas/Nemo.jl" style="float: left; color: #fcfcfc"> GitHub</a><span><a href="../about/" style="color: #fcfcfc;">« Previous</a></span><span style="margin-left: 15px"><a href="../constructors/" style="color: #fcfcfc">Next »</a></span></span></div><script src="../js/theme.js"></script><script src="../mathjaxhelper.js"></script><script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script></body></HTML>

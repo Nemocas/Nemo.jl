@@ -1,470 +1,88 @@
-<!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <meta name="author" content="William Hart">
-  <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Integers - Nemo.jl</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-  <link href="../assets/Documenter.css" rel="stylesheet">
-  
-  <script>
+<!DOCTYPE html><HTML class="no-js" lang="en"><head><meta charset="utf-8"/><meta content="IE=edge" http-equiv="X-UA-Compatible"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="William Hart" name="author"/><link href="../img/favicon.ico" rel="shortcut icon"/><title>Integers - Nemo.jl</title><link href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css"/><link href="../css/theme.css" rel="stylesheet" type="text/css"/><link href="../css/theme_extra.css" rel="stylesheet" type="text/css"/><link href="../css/highlight.css" rel="stylesheet"/><link href="../assets/Documenter.css" rel="stylesheet"/><script>
     // Current page data
     var mkdocs_page_name = "Integers";
     var mkdocs_page_input_path = "integer.md";
     var mkdocs_page_url = "/integer/";
-  </script>
-  
-  <script src="../js/jquery-2.1.1.min.js"></script>
-  <script src="../js/modernizr-2.8.3.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
-  
-</head>
+  </script><script src="../js/jquery-2.1.1.min.js"></script><script src="../js/modernizr-2.8.3.min.js"></script><script src="../js/highlight.pack.js" type="text/javascript"></script><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
 
-<body class="wy-body-for-nav" role="document">
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
 
-  <div class="wy-grid-for-nav">
+        head.appendChild(meta);
+    };
 
-    
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-      <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Nemo.jl</a>
-        <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-  </form>
-</div>
-      </div>
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-	  
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="..">Getting Started</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../about/">About Nemo</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../types/">Types in Nemo</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../constructors/">Parent object constructors</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../polynomial/">Univariate polynomials</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../series/">Capped relative power series</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../residue/">Residue rings</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../fraction/">Fraction fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../matrix/">Matrices</a>
-	    </li>
-          
-            <li class="toctree-l1 current">
-		
-    <a class="current" href="./">Integers</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l2"><a href="#introduction">Introduction</a></li>
-    
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
 
-    <li class="toctree-l2"><a href="#integer-element-constructors">Integer element constructors</a></li>
-    
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
 
-    <li class="toctree-l2"><a href="#basic-functionality">Basic functionality</a></li>
-    
-
-    <li class="toctree-l2"><a href="#basic-manipulation">Basic manipulation</a></li>
-    
-
-    <li class="toctree-l2"><a href="#arithmetic-operations">Arithmetic operations</a></li>
-    
-
-    <li class="toctree-l2"><a href="#euclidean-division">Euclidean division</a></li>
-    
-
-    <li class="toctree-l2"><a href="#comparison">Comparison</a></li>
-    
-
-    <li class="toctree-l2"><a href="#function">Function</a></li>
-    
-
-    <li class="toctree-l2"><a href="#function_1">Function</a></li>
-    
-
-    <li class="toctree-l2"><a href="#shifting">Shifting</a></li>
-    
-
-    <li class="toctree-l2"><a href="#modular-arithmetic">Modular arithmetic</a></li>
-    
-
-    <li class="toctree-l2"><a href="#integer-logarithm">Integer logarithm</a></li>
-    
-
-    <li class="toctree-l2"><a href="#gcd-and-lcm">GCD and LCM</a></li>
-    
-
-    <li class="toctree-l2"><a href="#integer-roots">Integer roots</a></li>
-    
-
-    <li class="toctree-l2"><a href="#number-theoretic-functionality">Number theoretic functionality</a></li>
-    
-
-    <li class="toctree-l2"><a href="#number-digits-and-bases">Number digits and bases</a></li>
-    
-        <ul>
-        
-            <li><a class="toctree-l3" href="#bit-twiddling">Bit twiddling</a></li>
-        
-        </ul>
-    
-
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../rational/">Rationals</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../finitefield/">Finite fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../padic/">P-adic fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../arb/">Real balls</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../acb/">Complex boxes</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../numberfield/">Number fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../maximalorder/">Maximal orders</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../classgroup/">Class groups</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../perm/">Permutation groups</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../factor/">Factorization</a>
-	    </li>
-          
-        </ul>
-      </div>
-      &nbsp;
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="..">Nemo.jl</a>
-      </nav>
-
-      
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
-  <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    
-      
-    
-    <li>Integers</li>
-    <li class="wy-breadcrumbs-aside">
-      
-        <a href="https://github.com/Nemocas/Nemo.jl/edit/master/docs/integer.md"
-          class="icon icon-github"> Edit on GitHub</a>
-      
-    </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main">
-            <div class="section">
-              
-                <p><a id='Introduction-1'></a></p>
-<h2 id="introduction">Introduction</h2>
-<p>The default integer type in Nemo is provided by Flint. The associated ring of integers is represented by the constant parent object called <code>FlintZZ</code>.</p>
-<p>For convenience we define</p>
-<pre><code>ZZ = FlintZZ
-</code></pre>
-
-<p>so that integers can be constructed using <code>ZZ</code> instead of <code>FlintZZ</code>. Note that this is the name of a specific parent object, not the name of its type.</p>
-<p>The types of the integer ring parent objects and elements of the asociated rings of integers are given in the following table according to the library provding them.</p>
-<table>
-<thead>
-<tr>
-<th align="right">Library</th>
-<th align="right">Element type</th>
-<th align="right">Parent type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">Flint</td>
-<td align="right"><code>fmpz</code></td>
-<td align="right"><code>FlintIntegerRing</code></td>
-</tr>
-</tbody>
-</table>
-<p>All integer element types belong directly to the abstract type <code>RingElem</code> and all the integer ring parent object types belong to the abstract type <code>Ring</code>.</p>
-<p><a id='Integer-element-constructors-1'></a></p>
-<h2 id="integer-element-constructors">Integer element constructors</h2>
-<p>There are various ways to construct integers given an integer ring parent object such as <code>ZZ</code>. As usual, one can coerce various elements into the ring of integers using the parent object. Here are some examples.</p>
-<pre><code>ZZ(123)
-ZZ(&quot;123&quot;)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body class="wy-body-for-nav" role="document"><div class="wy-grid-for-nav"><nav class="wy-nav-side stickynav" data-toggle="wy-nav-shift"><div class="wy-side-nav-search"><a class="icon icon-home" href=".."> Nemo.jl</a><div role="search"><form action="../search.html" class="wy-form" id="rtd-search-form" method="get"><input name="q" placeholder="Search docs" type="text"/></form></div></div><div aria-label="main navigation" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation"><ul class="current"><li class="toctree-l1"><a class="" href="..">Getting Started</a></li><li class="toctree-l1"><a class="" href="../about/">About Nemo</a></li><li class="toctree-l1"><a class="" href="../types/">Types in Nemo</a></li><li class="toctree-l1"><a class="" href="../constructors/">Parent object constructors</a></li><li class="toctree-l1"><a class="" href="../polynomial/">Univariate polynomials</a></li><li class="toctree-l1"><a class="" href="../series/">Capped relative power series</a></li><li class="toctree-l1"><a class="" href="../residue/">Residue rings</a></li><li class="toctree-l1"><a class="" href="../fraction/">Fraction fields</a></li><li class="toctree-l1"><a class="" href="../matrix/">Matrices</a></li><li class="toctree-l1 current"><a class="current" href="./">Integers</a><ul class="subnav"><li class="toctree-l2"><a href="#introduction">Introduction</a></li><li class="toctree-l2"><a href="#integer-element-constructors">Integer element constructors</a></li><li class="toctree-l2"><a href="#basic-functionality">Basic functionality</a></li><li class="toctree-l2"><a href="#basic-manipulation">Basic manipulation</a></li><li class="toctree-l2"><a href="#arithmetic-operations">Arithmetic operations</a></li><li class="toctree-l2"><a href="#euclidean-division">Euclidean division</a></li><li class="toctree-l2"><a href="#comparison">Comparison</a></li><li class="toctree-l2"><a href="#function">Function</a></li><li class="toctree-l2"><a href="#function_1">Function</a></li><li class="toctree-l2"><a href="#shifting">Shifting</a></li><li class="toctree-l2"><a href="#modular-arithmetic">Modular arithmetic</a></li><li class="toctree-l2"><a href="#integer-logarithm">Integer logarithm</a></li><li class="toctree-l2"><a href="#gcd-and-lcm">GCD and LCM</a></li><li class="toctree-l2"><a href="#integer-roots">Integer roots</a></li><li class="toctree-l2"><a href="#number-theoretic-functionality">Number theoretic functionality</a></li><li class="toctree-l2"><a href="#number-digits-and-bases">Number digits and bases</a></li><ul><li><a class="toctree-l3" href="#bit-twiddling">Bit twiddling</a></li></ul></ul></li><li class="toctree-l1"><a class="" href="../rational/">Rationals</a></li><li class="toctree-l1"><a class="" href="../finitefield/">Finite fields</a></li><li class="toctree-l1"><a class="" href="../padic/">P-adic fields</a></li><li class="toctree-l1"><a class="" href="../arb/">Real balls</a></li><li class="toctree-l1"><a class="" href="../acb/">Complex boxes</a></li><li class="toctree-l1"><a class="" href="../numberfield/">Number fields</a></li><li class="toctree-l1"><a class="" href="../maximalorder/">Maximal orders</a></li><li class="toctree-l1"><a class="" href="../classgroup/">Class groups</a></li><li class="toctree-l1"><a class="" href="../perm/">Permutation groups</a></li><li class="toctree-l1"><a class="" href="../factor/">Factorization</a></li></ul></div>
+       
+    </nav><section class="wy-nav-content-wrap" data-toggle="wy-nav-shift"><nav aria-label="top navigation" class="wy-nav-top" role="navigation"><i class="fa fa-bars" data-toggle="wy-nav-top"></i><a href="..">Nemo.jl</a></nav><div class="wy-nav-content"><div class="rst-content"><div aria-label="breadcrumbs navigation" role="navigation"><ul class="wy-breadcrumbs"><li><a href="..">Docs</a> »</li><li>Integers</li><li class="wy-breadcrumbs-aside"><a class="icon icon-github" href="https://github.com/Nemocas/Nemo.jl/edit/master/docs/integer.md"> Edit on GitHub</a></li></ul><hr/></div><div role="main"><div class="section"><p><a id="Introduction-1"></a></p><h2 id="introduction">Introduction</h2><p>The default integer type in Nemo is provided by Flint. The associated ring of integers is represented by the constant parent object called <code>FlintZZ</code>.</p><p>For convenience we define</p><pre><code>ZZ = FlintZZ
+</code></pre><p>so that integers can be constructed using <code>ZZ</code> instead of <code>FlintZZ</code>. Note that this is the name of a specific parent object, not the name of its type.</p><p>The types of the integer ring parent objects and elements of the asociated rings of integers are given in the following table according to the library provding them.</p><table><thead><tr><th align="right">Library</th><th align="right">Element type</th><th align="right">Parent type</th></tr></thead><tbody><tr><td align="right">Flint</td><td align="right"><code>fmpz</code></td><td align="right"><code>FlintIntegerRing</code></td></tr></tbody></table><p>All integer element types belong directly to the abstract type <code>RingElem</code> and all the integer ring parent object types belong to the abstract type <code>Ring</code>.</p><p><a id="Integer-element-constructors-1"></a></p><h2 id="integer-element-constructors">Integer element constructors</h2><p>There are various ways to construct integers given an integer ring parent object such as <code>ZZ</code>. As usual, one can coerce various elements into the ring of integers using the parent object. Here are some examples.</p><pre><code>ZZ(123)
+ZZ("123")
 ZZ(123.0)
-</code></pre>
-
-<p>Note that when coercing from floating point numbers of various kinds, the input must be exactly an integer without fractional part.</p>
-<p>Apart from coercing elements into the ring of integers, we offer the following functions.</p>
-<p><a id='Base.zero-Tuple{Nemo.FlintIntegerRing}' href='#Base.zero-Tuple{Nemo.FlintIntegerRing}'>#</a>
-<strong><code>Base.zero</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>zero(R::FlintIntegerRing)
-</code></pre>
-
-<blockquote>
-<p>Return the integer <script type="math/tex">1</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L142' class='documenter-source'>source</a><br></p>
-<p><a id='Base.one-Tuple{Nemo.FlintIntegerRing}' href='#Base.one-Tuple{Nemo.FlintIntegerRing}'>#</a>
-<strong><code>Base.one</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>one(R::FlintIntegerRing)
-</code></pre>
-
-<blockquote>
-<p>Return the integer <script type="math/tex">1</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L136' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of constructing integers.</p>
-<pre><code>a = ZZ(123)
+</code></pre><p>Note that when coercing from floating point numbers of various kinds, the input must be exactly an integer without fractional part.</p><p>Apart from coercing elements into the ring of integers, we offer the following functions.</p><p><a href="#Base.zero-Tuple{Nemo.FlintIntegerRing}" id="Base.zero-Tuple{Nemo.FlintIntegerRing}">#</a><strong><code>Base.zero</code></strong> — <em>Method</em>.</p><pre><code>zero(R::FlintIntegerRing)
+</code></pre><blockquote><p>Return the integer <script type="math/tex">1</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L142" target="_blank">source</a><br/></p><p><a href="#Base.one-Tuple{Nemo.FlintIntegerRing}" id="Base.one-Tuple{Nemo.FlintIntegerRing}">#</a><strong><code>Base.one</code></strong> — <em>Method</em>.</p><pre><code>one(R::FlintIntegerRing)
+</code></pre><blockquote><p>Return the integer <script type="math/tex">1</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L136" target="_blank">source</a><br/></p><p>Here are some examples of constructing integers.</p><pre><code>a = ZZ(123)
 b = one(ZZ)
 c = zero(ZZ)
-</code></pre>
-
-<p><a id='Basic-functionality-1'></a></p>
-<h2 id="basic-functionality">Basic functionality</h2>
-<p>The following basic functionality is provided by the default integer implementation in Nemo, to support construction of generic rings over the integers. Any custom integer implementation in Nemo should provide these  functions along with the usual arithmetic operations and greatest common divisor.</p>
-<pre><code>parent_type(::Type{fmpz})
-</code></pre>
-
-<p>Gives the type of the parent object of a Flint integer.</p>
-<pre><code>elem_type(R::FlintIntegerRing)
-</code></pre>
-
-<p>Given the parent object for the integer ring, return the type of elements of the integer ring.</p>
-<pre><code>Base.hash(a::fmpz, h::UInt)
-</code></pre>
-
-<p>Return a <code>UInt</code> hexadecimal hash of the integer <script type="math/tex">a</script>. This should be xor'd with a fixed random hexadecimal specific to the integer type. The hash of the machine words used to store the integer should be xor'd with the supplied parameter <code>h</code> as part of computing the hash.</p>
-<pre><code>deepcopy(a::fmpz)
-</code></pre>
-
-<p>Construct a copy of the given integer and return it. This function must recursively construct copies of all of the internal data in the given integer. Nemo integers are mutable and so returning shallow copies is not sufficient.</p>
-<pre><code>mul!(c::fmpz, a::fmpz, b::fmpz)
-</code></pre>
-
-<p>Multiply <script type="math/tex">a</script> by <script type="math/tex">b</script> and set the existing integer <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p>
-<pre><code>addeq!(c::fmpz, a::fmpz)
-</code></pre>
-
-<p>In-place addition. Adds <script type="math/tex">a</script> to <script type="math/tex">c</script> and sets <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p>
-<p>Given the parent object <code>ZZ</code> for the integer ring, the following coercion functions are provided to coerce various elements into the integer ring. Developers provide these by overloading the <code>call</code> operator for the integer ring parent objects.</p>
-<pre><code>ZZ()
-</code></pre>
-
-<p>Coerce zero into the integer ring.</p>
-<pre><code>ZZ(n::Integer)
-</code></pre>
-
-<p>Coerce an integer value into the integer ring.</p>
-<pre><code>ZZ(n::String)
-</code></pre>
-
-<p>Parse the given string as an integer.</p>
-<pre><code>ZZ(n::Float64)
+</code></pre><p><a id="Basic-functionality-1"></a></p><h2 id="basic-functionality">Basic functionality</h2><p>The following basic functionality is provided by the default integer implementation in Nemo, to support construction of generic rings over the integers. Any custom integer implementation in Nemo should provide these  functions along with the usual arithmetic operations and greatest common divisor.</p><pre><code>parent_type(::Type{fmpz})
+</code></pre><p>Gives the type of the parent object of a Flint integer.</p><pre><code>elem_type(R::FlintIntegerRing)
+</code></pre><p>Given the parent object for the integer ring, return the type of elements of the integer ring.</p><pre><code>Base.hash(a::fmpz, h::UInt)
+</code></pre><p>Return a <code>UInt</code> hexadecimal hash of the integer <script type="math/tex">a</script>. This should be xor'd with a fixed random hexadecimal specific to the integer type. The hash of the machine words used to store the integer should be xor'd with the supplied parameter <code>h</code> as part of computing the hash.</p><pre><code>deepcopy(a::fmpz)
+</code></pre><p>Construct a copy of the given integer and return it. This function must recursively construct copies of all of the internal data in the given integer. Nemo integers are mutable and so returning shallow copies is not sufficient.</p><pre><code>mul!(c::fmpz, a::fmpz, b::fmpz)
+</code></pre><p>Multiply <script type="math/tex">a</script> by <script type="math/tex">b</script> and set the existing integer <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p><pre><code>addeq!(c::fmpz, a::fmpz)
+</code></pre><p>In-place addition. Adds <script type="math/tex">a</script> to <script type="math/tex">c</script> and sets <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p><p>Given the parent object <code>ZZ</code> for the integer ring, the following coercion functions are provided to coerce various elements into the integer ring. Developers provide these by overloading the <code>call</code> operator for the integer ring parent objects.</p><pre><code>ZZ()
+</code></pre><p>Coerce zero into the integer ring.</p><pre><code>ZZ(n::Integer)
+</code></pre><p>Coerce an integer value into the integer ring.</p><pre><code>ZZ(n::String)
+</code></pre><p>Parse the given string as an integer.</p><pre><code>ZZ(n::Float64)
 ZZ(n::Float32)
 ZZ(n::Float16)
 ZZ(n::BigFloat)
-</code></pre>
-
-<p>Coerce the given floating point number into the integer ring, assuming that it can be exactly represented as an integer.</p>
-<pre><code>ZZ(f::fmpz)
-</code></pre>
-
-<p>Take an integer that is already in the Flint integer ring and simply return it. A copy of the original is not made.</p>
-<p>In addition to the above, developers of custom integer types must ensure that they provide the equivalent of the function <code>base_ring(R::FlintIntegerRing)</code> which should return <code>Union{}</code>. In addition to this they should ensure that each integer element contains a field <code>parent</code> specifying the parent object of the integer, or at least supply the equivalent of the function  <code>parent(a::fmpz)</code> to return the parent object of an integer.</p>
-<p><a id='Basic-manipulation-1'></a></p>
-<h2 id="basic-manipulation">Basic manipulation</h2>
-<p>Numerous functions are provided to manipulate integers. Also see the section on basic functionality above.</p>
-<p><a id='Nemo.base_ring-Tuple{Nemo.FlintIntegerRing}' href='#Nemo.base_ring-Tuple{Nemo.FlintIntegerRing}'>#</a>
-<strong><code>Nemo.base_ring</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>base_ring(a::FlintIntegerRing)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>Union{}</code> as this ring is not dependent on another ring.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L62' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.base_ring-Tuple{Nemo.fmpz}' href='#Nemo.base_ring-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Nemo.base_ring</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>base_ring(a::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>Union{}</code> as the parent ring is not dependent on another ring.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L68' class='documenter-source'>source</a><br></p>
-<p><a id='Base.parent-Tuple{Nemo.fmpz}' href='#Base.parent-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Base.parent</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>parent(a::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Returns the unique Flint integer parent object <code>FlintZZ</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L54' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.iszero-Tuple{Nemo.fmpz}' href='#Nemo.iszero-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Nemo.iszero</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>iszero(a::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if the given integer is zero, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L184' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.isone-Tuple{Nemo.fmpz}' href='#Nemo.isone-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Nemo.isone</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isone(a::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if the given integer is one, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L190' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.isunit-Tuple{Nemo.fmpz}' href='#Nemo.isunit-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Nemo.isunit</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isunit(a::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if the given integer is a unit, i.e. <script type="math/tex">\pm 1</script>, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L177' class='documenter-source'>source</a><br></p>
-<p><a id='Base.sign-Tuple{Nemo.fmpz}' href='#Base.sign-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Base.sign</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>sign(a::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Returns the sign of <script type="math/tex">a</script>, i.e. <script type="math/tex">+1</script>, <script type="math/tex">0</script> or <script type="math/tex">-1</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L149' class='documenter-source'>source</a><br></p>
-<p><a id='Base.size-Tuple{Nemo.fmpz}' href='#Base.size-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Base.size</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>size(a::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Returns the number of limbs required to store the absolute value of <script type="math/tex">a</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L171' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.fits-Tuple{Type{UInt64},Nemo.fmpz}' href='#Nemo.fits-Tuple{Type{UInt64},Nemo.fmpz}'>#</a>
-<strong><code>Nemo.fits</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>fits(::Type{UInt}, a::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>true</code> if the given integer fits into a <code>UInt</code>, otherwise returns <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L163' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.fits-Tuple{Type{Int64},Nemo.fmpz}' href='#Nemo.fits-Tuple{Type{Int64},Nemo.fmpz}'>#</a>
-<strong><code>Nemo.fits</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>fits(::Type{Int}, a::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>true</code> if the given integer fits into an <code>Int</code>, otherwise returns <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L155' class='documenter-source'>source</a><br></p>
-<p><a id='Base.den-Tuple{Nemo.fmpz}' href='#Base.den-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Base.den</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>den(a::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Returns the denominator of <script type="math/tex">a</script> thought of as a rational. Always returns <script type="math/tex">1</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L196' class='documenter-source'>source</a><br></p>
-<p><a id='Base.num-Tuple{Nemo.fmpz}' href='#Base.num-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Base.num</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>num(a::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Returns the numerator of <script type="math/tex">a</script> thought of as a rational. Always returns <script type="math/tex">a</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L204' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of basic manipulation of integers.</p>
-<pre><code>a = ZZ(12)
+</code></pre><p>Coerce the given floating point number into the integer ring, assuming that it can be exactly represented as an integer.</p><pre><code>ZZ(f::fmpz)
+</code></pre><p>Take an integer that is already in the Flint integer ring and simply return it. A copy of the original is not made.</p><p>In addition to the above, developers of custom integer types must ensure that they provide the equivalent of the function <code>base_ring(R::FlintIntegerRing)</code> which should return <code>Union{}</code>. In addition to this they should ensure that each integer element contains a field <code>parent</code> specifying the parent object of the integer, or at least supply the equivalent of the function  <code>parent(a::fmpz)</code> to return the parent object of an integer.</p><p><a id="Basic-manipulation-1"></a></p><h2 id="basic-manipulation">Basic manipulation</h2><p>Numerous functions are provided to manipulate integers. Also see the section on basic functionality above.</p><p><a href="#Nemo.base_ring-Tuple{Nemo.FlintIntegerRing}" id="Nemo.base_ring-Tuple{Nemo.FlintIntegerRing}">#</a><strong><code>Nemo.base_ring</code></strong> — <em>Method</em>.</p><pre><code>base_ring(a::FlintIntegerRing)
+</code></pre><blockquote><p>Returns <code>Union{}</code> as this ring is not dependent on another ring.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L62" target="_blank">source</a><br/></p><p><a href="#Nemo.base_ring-Tuple{Nemo.fmpz}" id="Nemo.base_ring-Tuple{Nemo.fmpz}">#</a><strong><code>Nemo.base_ring</code></strong> — <em>Method</em>.</p><pre><code>base_ring(a::fmpz)
+</code></pre><blockquote><p>Returns <code>Union{}</code> as the parent ring is not dependent on another ring.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L68" target="_blank">source</a><br/></p><p><a href="#Base.parent-Tuple{Nemo.fmpz}" id="Base.parent-Tuple{Nemo.fmpz}">#</a><strong><code>Base.parent</code></strong> — <em>Method</em>.</p><pre><code>parent(a::fmpz)
+</code></pre><blockquote><p>Returns the unique Flint integer parent object <code>FlintZZ</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L54" target="_blank">source</a><br/></p><p><a href="#Nemo.iszero-Tuple{Nemo.fmpz}" id="Nemo.iszero-Tuple{Nemo.fmpz}">#</a><strong><code>Nemo.iszero</code></strong> — <em>Method</em>.</p><pre><code>iszero(a::fmpz)
+</code></pre><blockquote><p>Return <code>true</code> if the given integer is zero, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L184" target="_blank">source</a><br/></p><p><a href="#Nemo.isone-Tuple{Nemo.fmpz}" id="Nemo.isone-Tuple{Nemo.fmpz}">#</a><strong><code>Nemo.isone</code></strong> — <em>Method</em>.</p><pre><code>isone(a::fmpz)
+</code></pre><blockquote><p>Return <code>true</code> if the given integer is one, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L190" target="_blank">source</a><br/></p><p><a href="#Nemo.isunit-Tuple{Nemo.fmpz}" id="Nemo.isunit-Tuple{Nemo.fmpz}">#</a><strong><code>Nemo.isunit</code></strong> — <em>Method</em>.</p><pre><code>isunit(a::fmpz)
+</code></pre><blockquote><p>Return <code>true</code> if the given integer is a unit, i.e. <script type="math/tex">\pm 1</script>, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L177" target="_blank">source</a><br/></p><p><a href="#Base.sign-Tuple{Nemo.fmpz}" id="Base.sign-Tuple{Nemo.fmpz}">#</a><strong><code>Base.sign</code></strong> — <em>Method</em>.</p><pre><code>sign(a::fmpz)
+</code></pre><blockquote><p>Returns the sign of <script type="math/tex">a</script>, i.e. <script type="math/tex">+1</script>, <script type="math/tex">0</script> or <script type="math/tex">-1</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L149" target="_blank">source</a><br/></p><p><a href="#Base.size-Tuple{Nemo.fmpz}" id="Base.size-Tuple{Nemo.fmpz}">#</a><strong><code>Base.size</code></strong> — <em>Method</em>.</p><pre><code>size(a::fmpz)
+</code></pre><blockquote><p>Returns the number of limbs required to store the absolute value of <script type="math/tex">a</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L171" target="_blank">source</a><br/></p><p><a href="#Nemo.fits-Tuple{Type{UInt64},Nemo.fmpz}" id="Nemo.fits-Tuple{Type{UInt64},Nemo.fmpz}">#</a><strong><code>Nemo.fits</code></strong> — <em>Method</em>.</p><pre><code>fits(::Type{UInt}, a::fmpz)
+</code></pre><blockquote><p>Returns <code>true</code> if the given integer fits into a <code>UInt</code>, otherwise returns <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L163" target="_blank">source</a><br/></p><p><a href="#Nemo.fits-Tuple{Type{Int64},Nemo.fmpz}" id="Nemo.fits-Tuple{Type{Int64},Nemo.fmpz}">#</a><strong><code>Nemo.fits</code></strong> — <em>Method</em>.</p><pre><code>fits(::Type{Int}, a::fmpz)
+</code></pre><blockquote><p>Returns <code>true</code> if the given integer fits into an <code>Int</code>, otherwise returns <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L155" target="_blank">source</a><br/></p><p><a href="#Base.den-Tuple{Nemo.fmpz}" id="Base.den-Tuple{Nemo.fmpz}">#</a><strong><code>Base.den</code></strong> — <em>Method</em>.</p><pre><code>den(a::fmpz)
+</code></pre><blockquote><p>Returns the denominator of <script type="math/tex">a</script> thought of as a rational. Always returns <script type="math/tex">1</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L196" target="_blank">source</a><br/></p><p><a href="#Base.num-Tuple{Nemo.fmpz}" id="Base.num-Tuple{Nemo.fmpz}">#</a><strong><code>Base.num</code></strong> — <em>Method</em>.</p><pre><code>num(a::fmpz)
+</code></pre><blockquote><p>Returns the numerator of <script type="math/tex">a</script> thought of as a rational. Always returns <script type="math/tex">a</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L204" target="_blank">source</a><br/></p><p>Here are some examples of basic manipulation of integers.</p><pre><code>a = ZZ(12)
 
 R = base_ring(ZZ)
 S = base_ring(a)
@@ -477,90 +95,7 @@ s = size(a)
 fits(Int, a)
 n = num(a)
 d = den(a)
-</code></pre>
-
-<p><a id='Arithmetic-operations-1'></a></p>
-<h2 id="arithmetic-operations">Arithmetic operations</h2>
-<p>Nemo provides all the standard ring operations for integers, as follows.</p>
-<table>
-<thead>
-<tr>
-<th align="right">Function</th>
-<th align="right">Operation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">-(a::fmpz)</td>
-<td align="right">unary minus</td>
-</tr>
-<tr>
-<td align="right">+(a::fmpz, b::fmpz)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">-(a::fmpz, b::fmpz)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">*(a::fmpz, b::fmpz)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">divexact(a::fmpz, b::fmpz)</td>
-<td align="right">exact division</td>
-</tr>
-</tbody>
-</table>
-<p>In addition, the following ad hoc ring operations are defined.</p>
-<table>
-<thead>
-<tr>
-<th align="right">Function</th>
-<th align="right">Operation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">+(a::fmpz, b::Integer)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">+(a::Integer, b::fmpz)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">-(a::fmpz, b::Integer)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">-(a::Integer, b::fmpz)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">*(a::fmpz, b::Integer)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">*(a::Integer, b::fmpz)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">divexact(a::fmpz, b::Integer)</td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right">divexact(a::Integer, b::fmpz)</td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right">^(a::fmpz, b::Int)</td>
-<td align="right">powering</td>
-</tr>
-</tbody>
-</table>
-<p>Here are some examples of arithmetic operations on integers.</p>
-<pre><code>a = fmpz(12)
+</code></pre><p><a id="Arithmetic-operations-1"></a></p><h2 id="arithmetic-operations">Arithmetic operations</h2><p>Nemo provides all the standard ring operations for integers, as follows.</p><table><thead><tr><th align="right">Function</th><th align="right">Operation</th></tr></thead><tbody><tr><td align="right">-(a::fmpz)</td><td align="right">unary minus</td></tr><tr><td align="right">+(a::fmpz, b::fmpz)</td><td align="right">addition</td></tr><tr><td align="right">-(a::fmpz, b::fmpz)</td><td align="right">subtraction</td></tr><tr><td align="right">*(a::fmpz, b::fmpz)</td><td align="right">multiplication</td></tr><tr><td align="right">divexact(a::fmpz, b::fmpz)</td><td align="right">exact division</td></tr></tbody></table><p>In addition, the following ad hoc ring operations are defined.</p><table><thead><tr><th align="right">Function</th><th align="right">Operation</th></tr></thead><tbody><tr><td align="right">+(a::fmpz, b::Integer)</td><td align="right">addition</td></tr><tr><td align="right">+(a::Integer, b::fmpz)</td><td align="right">addition</td></tr><tr><td align="right">-(a::fmpz, b::Integer)</td><td align="right">subtraction</td></tr><tr><td align="right">-(a::Integer, b::fmpz)</td><td align="right">subtraction</td></tr><tr><td align="right">*(a::fmpz, b::Integer)</td><td align="right">multiplication</td></tr><tr><td align="right">*(a::Integer, b::fmpz)</td><td align="right">multiplication</td></tr><tr><td align="right">divexact(a::fmpz, b::Integer)</td><td align="right">exact division</td></tr><tr><td align="right">divexact(a::Integer, b::fmpz)</td><td align="right">exact division</td></tr><tr><td align="right">^(a::fmpz, b::Int)</td><td align="right">powering</td></tr></tbody></table><p>Here are some examples of arithmetic operations on integers.</p><pre><code>a = fmpz(12)
 b = fmpz(3)
 
 c = a + b
@@ -570,110 +105,7 @@ g = a*ZZ(7)
 h = 3 - a
 k = divexact(a, 4)
 m = a^7
-</code></pre>
-
-<p><a id='Euclidean-division-1'></a></p>
-<h2 id="euclidean-division">Euclidean division</h2>
-<p>Nemo also provides a large number of Euclidean division operations. Recall that for a dividend <script type="math/tex">a</script> and divisor <script type="math/tex">b</script>, we can write <script type="math/tex">a = bq + r</script> with <script type="math/tex">0 \leq |r| < |b|</script>. We call <script type="math/tex">q</script> the quotient and <script type="math/tex">r</script> the remainder.</p>
-<p>We distinguish three cases. If <script type="math/tex">q</script> is rounded towards zero, <script type="math/tex">r</script> will have the same sign as <script type="math/tex">a</script>. If <script type="math/tex">q</script> is rounded towards plus infinity, <script type="math/tex">r</script> will have the opposite sign to <script type="math/tex">b</script>. Finally, if <script type="math/tex">q</script> is rounded towards minus infinity, <script type="math/tex">r</script> will have the same sign as <script type="math/tex">b</script>.</p>
-<p>In the following table we list the division functions and their rounding behaviour. We also give the return value of the function, with <script type="math/tex">q</script> representing return of the quotient and <script type="math/tex">r</script> representing return of the remainder.</p>
-<table>
-<thead>
-<tr>
-<th align="right">Function</th>
-<th align="right">Return</th>
-<th align="right">Rounding</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">divrem(a::fmpz, b::fmpz)</td>
-<td align="right">q, r</td>
-<td align="right">towards zero</td>
-</tr>
-<tr>
-<td align="right">tdivrem(a::fmpz, b::fmpz)</td>
-<td align="right">q, r</td>
-<td align="right">towards zero</td>
-</tr>
-<tr>
-<td align="right">fdivrem(a::fmpz, b::fmpz)</td>
-<td align="right">q, r</td>
-<td align="right">towards minus infinity</td>
-</tr>
-</tbody>
-</table>
-<p>Nemo also offers the following ad hoc division operators. The notation and description is as for the other Euclidean division functions.</p>
-<table>
-<thead>
-<tr>
-<th align="right">Function</th>
-<th align="right">Return</th>
-<th align="right">Rounding</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">rem(a::fmpz, b::Int)</td>
-<td align="right">r</td>
-<td align="right">towards zero</td>
-</tr>
-<tr>
-<td align="right">div(a::fmpz, b::Int)</td>
-<td align="right">q</td>
-<td align="right">towards zero</td>
-</tr>
-<tr>
-<td align="right">tdiv(a::fmpz, b::Int)</td>
-<td align="right">q</td>
-<td align="right">towards zero</td>
-</tr>
-<tr>
-<td align="right">fdiv(a::fmpz, b::Int)</td>
-<td align="right">q</td>
-<td align="right">towards minus infinity</td>
-</tr>
-<tr>
-<td align="right">cdiv(a::fmpz, b::Int)</td>
-<td align="right">q</td>
-<td align="right">towards plus infinity</td>
-</tr>
-</tbody>
-</table>
-<p>The following functions are also available, for the case where one is dividing by a power of <script type="math/tex">2</script>. In other words, for Euclidean division of the form <script type="math/tex">a = b2^{d} + r</script>. These are useful for bit twiddling.</p>
-<table>
-<thead>
-<tr>
-<th align="right">Function</th>
-<th align="right">Return</th>
-<th align="right">Rounding</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">tdivpow2(a::fmpz, d::Int)</td>
-<td align="right">q</td>
-<td align="right">towards zero</td>
-</tr>
-<tr>
-<td align="right">fdivpow2(a::fmpz, d::Int)</td>
-<td align="right">q</td>
-<td align="right">towards minus infinity</td>
-</tr>
-<tr>
-<td align="right">fmodpow2(a::fmpz, d::Int)</td>
-<td align="right">r</td>
-<td align="right">towards minus infinity</td>
-</tr>
-<tr>
-<td align="right">cdivpow2(a::fmpz, d::Int)</td>
-<td align="right">q</td>
-<td align="right">towards plus infinity</td>
-</tr>
-</tbody>
-</table>
-<p>Here are some examples of Euclidean division.</p>
-<pre><code>a = fmpz(12)
+</code></pre><p><a id="Euclidean-division-1"></a></p><h2 id="euclidean-division">Euclidean division</h2><p>Nemo also provides a large number of Euclidean division operations. Recall that for a dividend <script type="math/tex">a</script> and divisor <script type="math/tex">b</script>, we can write <script type="math/tex">a = bq + r</script> with <script type="math/tex">0 \leq |r| < |b|</script>. We call <script type="math/tex">q</script> the quotient and <script type="math/tex">r</script> the remainder.</p><p>We distinguish three cases. If <script type="math/tex">q</script> is rounded towards zero, <script type="math/tex">r</script> will have the same sign as <script type="math/tex">a</script>. If <script type="math/tex">q</script> is rounded towards plus infinity, <script type="math/tex">r</script> will have the opposite sign to <script type="math/tex">b</script>. Finally, if <script type="math/tex">q</script> is rounded towards minus infinity, <script type="math/tex">r</script> will have the same sign as <script type="math/tex">b</script>.</p><p>In the following table we list the division functions and their rounding behaviour. We also give the return value of the function, with <script type="math/tex">q</script> representing return of the quotient and <script type="math/tex">r</script> representing return of the remainder.</p><table><thead><tr><th align="right">Function</th><th align="right">Return</th><th align="right">Rounding</th></tr></thead><tbody><tr><td align="right">divrem(a::fmpz, b::fmpz)</td><td align="right">q, r</td><td align="right">towards zero</td></tr><tr><td align="right">tdivrem(a::fmpz, b::fmpz)</td><td align="right">q, r</td><td align="right">towards zero</td></tr><tr><td align="right">fdivrem(a::fmpz, b::fmpz)</td><td align="right">q, r</td><td align="right">towards minus infinity</td></tr></tbody></table><p>Nemo also offers the following ad hoc division operators. The notation and description is as for the other Euclidean division functions.</p><table><thead><tr><th align="right">Function</th><th align="right">Return</th><th align="right">Rounding</th></tr></thead><tbody><tr><td align="right">rem(a::fmpz, b::Int)</td><td align="right">r</td><td align="right">towards zero</td></tr><tr><td align="right">div(a::fmpz, b::Int)</td><td align="right">q</td><td align="right">towards zero</td></tr><tr><td align="right">tdiv(a::fmpz, b::Int)</td><td align="right">q</td><td align="right">towards zero</td></tr><tr><td align="right">fdiv(a::fmpz, b::Int)</td><td align="right">q</td><td align="right">towards minus infinity</td></tr><tr><td align="right">cdiv(a::fmpz, b::Int)</td><td align="right">q</td><td align="right">towards plus infinity</td></tr></tbody></table><p>The following functions are also available, for the case where one is dividing by a power of <script type="math/tex">2</script>. In other words, for Euclidean division of the form <script type="math/tex">a = b2^{d} + r</script>. These are useful for bit twiddling.</p><table><thead><tr><th align="right">Function</th><th align="right">Return</th><th align="right">Rounding</th></tr></thead><tbody><tr><td align="right">tdivpow2(a::fmpz, d::Int)</td><td align="right">q</td><td align="right">towards zero</td></tr><tr><td align="right">fdivpow2(a::fmpz, d::Int)</td><td align="right">q</td><td align="right">towards minus infinity</td></tr><tr><td align="right">fmodpow2(a::fmpz, d::Int)</td><td align="right">r</td><td align="right">towards minus infinity</td></tr><tr><td align="right">cdivpow2(a::fmpz, d::Int)</td><td align="right">q</td><td align="right">towards plus infinity</td></tr></tbody></table><p>Here are some examples of Euclidean division.</p><pre><code>a = fmpz(12)
 b = fmpz(5)
 
 q, r = divrem(a, b)
@@ -681,23 +113,7 @@ c = cdiv(a, b)
 d = fdiv(a, b)
 f = tdivpow2(a, 2)
 g = fmodpow2(a, 3)
-</code></pre>
-
-<p><a id='Comparison-1'></a></p>
-<h2 id="comparison">Comparison</h2>
-<p>Nemo provides a full complement of comparison operators for integers. This includes the usual <script type="math/tex"><, >, \leq, \geq, ==, !=</script> operators. These are usually provided via Julia once Nemo provides the <code>isless</code> function and the <code>==</code> function. However, to avoid two calls to Flint for such comparisons we implement them differently.</p>
-<p>Instead of <code>isless</code> we implement a function <code>cmp(a, b)</code> which returns a positive value if <script type="math/tex">a > b</script>, zero if <script type="math/tex">a == b</script> and a negative value if <script type="math/tex">a < b</script>. We then implement all the other operators, including <code>==</code> in terms of <code>cmp</code>.</p>
-<p>For convenience we also implement a <code>cmpabs(a, b)</code> function which returns a positive value if <script type="math/tex">|a| > |b|</script>, zero if <script type="math/tex">|a| == |b|</script> and a negative value if <script type="math/tex">|a| < |b|</script>. This can be slightly faster than a call to <code>cmp</code> or one of the comparison operators when comparing nonnegative values for example.</p>
-<p>Here is a list of the comparison functions implemented, with the understanding that <code>cmp</code> provides all of the comparison operators listed above.</p>
-<p><a id='Function-1'></a></p>
-<h2 id="function">Function</h2>
-<p>cmp(a::fmpz, b::fmpz) cmpabs(a::fmpz, b::fmpz)</p>
-<p>We also provide the following ad hoc comparisons which again provide all of the comparison operators mentioned above.</p>
-<p><a id='Function-2'></a></p>
-<h2 id="function_1">Function</h2>
-<p>cmp(a::fmpz, b::Int) cmp(a::Int, b::fmpz) cmp(a::fmpz, b::UInt) cmp(a::UInt, b::fmpz)</p>
-<p>Here are some examples of comparisons.</p>
-<pre><code>a = ZZ(12)
+</code></pre><p><a id="Comparison-1"></a></p><h2 id="comparison">Comparison</h2><p>Nemo provides a full complement of comparison operators for integers. This includes the usual <script type="math/tex"><, >, \leq, \geq, ==, !=</script> operators. These are usually provided via Julia once Nemo provides the <code>isless</code> function and the <code>==</code> function. However, to avoid two calls to Flint for such comparisons we implement them differently.</p><p>Instead of <code>isless</code> we implement a function <code>cmp(a, b)</code> which returns a positive value if <script type="math/tex">a > b</script>, zero if <script type="math/tex">a == b</script> and a negative value if <script type="math/tex">a < b</script>. We then implement all the other operators, including <code>==</code> in terms of <code>cmp</code>.</p><p>For convenience we also implement a <code>cmpabs(a, b)</code> function which returns a positive value if <script type="math/tex">|a| > |b|</script>, zero if <script type="math/tex">|a| == |b|</script> and a negative value if <script type="math/tex">|a| < |b|</script>. This can be slightly faster than a call to <code>cmp</code> or one of the comparison operators when comparing nonnegative values for example.</p><p>Here is a list of the comparison functions implemented, with the understanding that <code>cmp</code> provides all of the comparison operators listed above.</p><p><a id="Function-1"></a></p><h2 id="function">Function</h2><p>cmp(a::fmpz, b::fmpz) cmpabs(a::fmpz, b::fmpz)</p><p>We also provide the following ad hoc comparisons which again provide all of the comparison operators mentioned above.</p><p><a id="Function-2"></a></p><h2 id="function_1">Function</h2><p>cmp(a::fmpz, b::Int) cmp(a::Int, b::fmpz) cmp(a::fmpz, b::UInt) cmp(a::UInt, b::fmpz)</p><p>Here are some examples of comparisons.</p><pre><code>a = ZZ(12)
 b = ZZ(3)
 
 a &lt; b
@@ -705,646 +121,109 @@ a != b
 a &gt; 4
 5 &lt;= b
 cmpabs(a, b)
-</code></pre>
-
-<p><a id='Shifting-1'></a></p>
-<h2 id="shifting">Shifting</h2>
-<p><a id='Base.:<<-Tuple{Nemo.fmpz,Int64}' href='#Base.:<<-Tuple{Nemo.fmpz,Int64}'>#</a>
-<strong><code>Base.:&lt;&lt;</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>&lt;&lt;(x::fmpz, c::Int)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">2^cx</script> where <script type="math/tex">c \geq 0</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L615' class='documenter-source'>source</a><br></p>
-<p><a id='Base.:>&gt;-Tuple{Nemo.fmpz,Int64}' href='#Base.:&gt;&gt;-Tuple{Nemo.fmpz,Int64}'&gt;#</a>
-<strong><code>Base.:&gt;&gt;</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>&gt;&gt;(x::fmpz, c::Int)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">x/2^c</script>, discarding any remainder, where <script type="math/tex">c \geq 0</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L628' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of shifting.</p>
-<pre><code>a = fmpz(12)
+</code></pre><p><a id="Shifting-1"></a></p><h2 id="shifting">Shifting</h2><p><a href="#Base.:&lt;&lt;-Tuple{Nemo.fmpz,Int64}" id="Base.:&lt;&lt;-Tuple{Nemo.fmpz,Int64}">#</a><strong><code>Base.:&lt;&lt;</code></strong> — <em>Method</em>.</p><pre><code>&lt;&lt;(x::fmpz, c::Int)
+</code></pre><blockquote><p>Return <script type="math/tex">2^cx</script> where <script type="math/tex">c \geq 0</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L615" target="_blank">source</a><br/></p><p><a &gt;#<="" a="" href="#Base.:&gt;&gt;-Tuple{Nemo.fmpz,Int64}" id="Base.:&gt;&gt;-Tuple{Nemo.fmpz,Int64}"><strong><code>Base.:&gt;&gt;</code></strong> — <em>Method</em>.</a></p><a &gt;#<="" a="" href="#Base.:&gt;&gt;-Tuple{Nemo.fmpz,Int64}" id="Base.:&gt;&gt;-Tuple{Nemo.fmpz,Int64}"><pre><code>&gt;&gt;(x::fmpz, c::Int)
+</code></pre><blockquote><p>Return <script type="math/tex">x/2^c</script>, discarding any remainder, where <script type="math/tex">c \geq 0</script>.</p></blockquote></a><p><a &gt;#<="" a="" href="#Base.:&gt;&gt;-Tuple{Nemo.fmpz,Int64}" id="Base.:&gt;&gt;-Tuple{Nemo.fmpz,Int64}"></a><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L628" target="_blank">source</a><br/></p><p>Here are some examples of shifting.</p><pre><code>a = fmpz(12)
 
 a &lt;&lt; 3
 a &gt;&gt; 5
-</code></pre>
-
-<p><a id='Modular-arithmetic-1'></a></p>
-<h2 id="modular-arithmetic">Modular arithmetic</h2>
-<p><a id='Base.mod-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Base.mod-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
-<strong><code>Base.mod</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>mod(x::fmpz, y::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return the remainder after division of <script type="math/tex">x</script> by <script type="math/tex">y</script>. The remainder will be the least nonnegative remainder.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L647' class='documenter-source'>source</a><br></p>
-<p><a id='Base.mod-Tuple{Nemo.fmpz,Int64}' href='#Base.mod-Tuple{Nemo.fmpz,Int64}'>#</a>
-<strong><code>Base.mod</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>mod(x::fmpz, y::Int)
-</code></pre>
-
-<blockquote>
-<p>Return the remainder after division of <script type="math/tex">x</script> by <script type="math/tex">y</script>. The remainder will be the least nonnegative remainder.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L659' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.powmod-Tuple{Nemo.fmpz,Nemo.fmpz,Nemo.fmpz}' href='#Nemo.powmod-Tuple{Nemo.fmpz,Nemo.fmpz,Nemo.fmpz}'>#</a>
-<strong><code>Nemo.powmod</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>powmod(x::fmpz, p::fmpz, m::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">x^p (\mod m)</script>. The remainder will be in the range <script type="math/tex">[0, m)</script>
-</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L674' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.powmod-Tuple{Nemo.fmpz,Int64,Nemo.fmpz}' href='#Nemo.powmod-Tuple{Nemo.fmpz,Int64,Nemo.fmpz}'>#</a>
-<strong><code>Nemo.powmod</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>powmod(x::fmpz, p::Int, m::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">x^p (\mod m)</script>. The remainder will be in the range <script type="math/tex">[0, m)</script>
-</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L691' class='documenter-source'>source</a><br></p>
-<p><a id='Base.invmod-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Base.invmod-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
-<strong><code>Base.invmod</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>invmod(x::fmpz, m::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">x^{-1} (\mod m)</script>. The remainder will be in the range <script type="math/tex">[0, m)</script>
-</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L708' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.sqrtmod-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Nemo.sqrtmod-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
-<strong><code>Nemo.sqrtmod</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>sqrtmod(x::fmpz, m::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return a square root of <script type="math/tex">x (\mod m)</script> if one exists. The remainder will be in the range <script type="math/tex">[0, m)</script>. We require that <script type="math/tex">m</script> is prime, otherwise the algorithm may not terminate.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L725' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.crt-Tuple{Nemo.fmpz,Nemo.fmpz,Nemo.fmpz,Nemo.fmpz,Bool}' href='#Nemo.crt-Tuple{Nemo.fmpz,Nemo.fmpz,Nemo.fmpz,Nemo.fmpz,Bool}'>#</a>
-<strong><code>Nemo.crt</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>crt(r1::fmpz, m1::fmpz, r2::fmpz, m2::fmpz, signed=false)
-</code></pre>
-
-<blockquote>
-<p>Find <script type="math/tex">r</script> such that <script type="math/tex">r \equiv r_1 (\mod m_1)</script> and <script type="math/tex">r \equiv r_2 (\mod m_2)</script>. If <code>signed = true</code>, <script type="math/tex">r</script> will be in the range <script type="math/tex">-m_1m_2/2 < r \leq m_1m_2/2</script>. If <code>signed = false</code> the value will be in the range <script type="math/tex">0 \leq r < m_1m_2</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L741' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.crt-Tuple{Nemo.fmpz,Nemo.fmpz,Int64,Int64,Bool}' href='#Nemo.crt-Tuple{Nemo.fmpz,Nemo.fmpz,Int64,Int64,Bool}'>#</a>
-<strong><code>Nemo.crt</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>crt(r1::fmpz, m1::fmpz, r2::Int, m2::Int, signed=false)
-</code></pre>
-
-<blockquote>
-<p>Find <script type="math/tex">r</script> such that <script type="math/tex">r \equiv r_1 (\mod m_1)</script> and <script type="math/tex">r \equiv r_2 (\mod m_2)</script>. If <code>signed = true</code>, <script type="math/tex">r</script> will be in the range <script type="math/tex">-m_1m_2/2 < r \leq m_1m_2/2</script>. If <code>signed = false</code> the value will be in the range <script type="math/tex">0 \leq r < m_1m_2</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L755' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of modular arithmetic.</p>
-<pre><code>a = powmod(ZZ(12), ZZ(110), ZZ(13))
+</code></pre><p><a id="Modular-arithmetic-1"></a></p><h2 id="modular-arithmetic">Modular arithmetic</h2><p><a href="#Base.mod-Tuple{Nemo.fmpz,Nemo.fmpz}" id="Base.mod-Tuple{Nemo.fmpz,Nemo.fmpz}">#</a><strong><code>Base.mod</code></strong> — <em>Method</em>.</p><pre><code>mod(x::fmpz, y::fmpz)
+</code></pre><blockquote><p>Return the remainder after division of <script type="math/tex">x</script> by <script type="math/tex">y</script>. The remainder will be the least nonnegative remainder.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L647" target="_blank">source</a><br/></p><p><a href="#Base.mod-Tuple{Nemo.fmpz,Int64}" id="Base.mod-Tuple{Nemo.fmpz,Int64}">#</a><strong><code>Base.mod</code></strong> — <em>Method</em>.</p><pre><code>mod(x::fmpz, y::Int)
+</code></pre><blockquote><p>Return the remainder after division of <script type="math/tex">x</script> by <script type="math/tex">y</script>. The remainder will be the least nonnegative remainder.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L659" target="_blank">source</a><br/></p><p><a href="#Nemo.powmod-Tuple{Nemo.fmpz,Nemo.fmpz,Nemo.fmpz}" id="Nemo.powmod-Tuple{Nemo.fmpz,Nemo.fmpz,Nemo.fmpz}">#</a><strong><code>Nemo.powmod</code></strong> — <em>Method</em>.</p><pre><code>powmod(x::fmpz, p::fmpz, m::fmpz)
+</code></pre><blockquote><p>Return <script type="math/tex">x^p (\mod m)</script>. The remainder will be in the range <script type="math/tex">[0, m)</script></p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L674" target="_blank">source</a><br/></p><p><a href="#Nemo.powmod-Tuple{Nemo.fmpz,Int64,Nemo.fmpz}" id="Nemo.powmod-Tuple{Nemo.fmpz,Int64,Nemo.fmpz}">#</a><strong><code>Nemo.powmod</code></strong> — <em>Method</em>.</p><pre><code>powmod(x::fmpz, p::Int, m::fmpz)
+</code></pre><blockquote><p>Return <script type="math/tex">x^p (\mod m)</script>. The remainder will be in the range <script type="math/tex">[0, m)</script></p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L691" target="_blank">source</a><br/></p><p><a href="#Base.invmod-Tuple{Nemo.fmpz,Nemo.fmpz}" id="Base.invmod-Tuple{Nemo.fmpz,Nemo.fmpz}">#</a><strong><code>Base.invmod</code></strong> — <em>Method</em>.</p><pre><code>invmod(x::fmpz, m::fmpz)
+</code></pre><blockquote><p>Return <script type="math/tex">x^{-1} (\mod m)</script>. The remainder will be in the range <script type="math/tex">[0, m)</script></p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L708" target="_blank">source</a><br/></p><p><a href="#Nemo.sqrtmod-Tuple{Nemo.fmpz,Nemo.fmpz}" id="Nemo.sqrtmod-Tuple{Nemo.fmpz,Nemo.fmpz}">#</a><strong><code>Nemo.sqrtmod</code></strong> — <em>Method</em>.</p><pre><code>sqrtmod(x::fmpz, m::fmpz)
+</code></pre><blockquote><p>Return a square root of <script type="math/tex">x (\mod m)</script> if one exists. The remainder will be in the range <script type="math/tex">[0, m)</script>. We require that <script type="math/tex">m</script> is prime, otherwise the algorithm may not terminate.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L725" target="_blank">source</a><br/></p><p><a href="#Nemo.crt-Tuple{Nemo.fmpz,Nemo.fmpz,Nemo.fmpz,Nemo.fmpz,Bool}" id="Nemo.crt-Tuple{Nemo.fmpz,Nemo.fmpz,Nemo.fmpz,Nemo.fmpz,Bool}">#</a><strong><code>Nemo.crt</code></strong> — <em>Method</em>.</p><pre><code>crt(r1::fmpz, m1::fmpz, r2::fmpz, m2::fmpz, signed=false)
+</code></pre><blockquote><p>Find <script type="math/tex">r</script> such that <script type="math/tex">r \equiv r_1 (\mod m_1)</script> and <script type="math/tex">r \equiv r_2 (\mod m_2)</script>. If <code>signed = true</code>, <script type="math/tex">r</script> will be in the range <script type="math/tex">-m_1m_2/2 < r \leq m_1m_2/2</script>. If <code>signed = false</code> the value will be in the range <script type="math/tex">0 \leq r < m_1m_2</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L741" target="_blank">source</a><br/></p><p><a href="#Nemo.crt-Tuple{Nemo.fmpz,Nemo.fmpz,Int64,Int64,Bool}" id="Nemo.crt-Tuple{Nemo.fmpz,Nemo.fmpz,Int64,Int64,Bool}">#</a><strong><code>Nemo.crt</code></strong> — <em>Method</em>.</p><pre><code>crt(r1::fmpz, m1::fmpz, r2::Int, m2::Int, signed=false)
+</code></pre><blockquote><p>Find <script type="math/tex">r</script> such that <script type="math/tex">r \equiv r_1 (\mod m_1)</script> and <script type="math/tex">r \equiv r_2 (\mod m_2)</script>. If <code>signed = true</code>, <script type="math/tex">r</script> will be in the range <script type="math/tex">-m_1m_2/2 < r \leq m_1m_2/2</script>. If <code>signed = false</code> the value will be in the range <script type="math/tex">0 \leq r < m_1m_2</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L755" target="_blank">source</a><br/></p><p>Here are some examples of modular arithmetic.</p><pre><code>a = powmod(ZZ(12), ZZ(110), ZZ(13))
 a = powmod(ZZ(12), 110, ZZ(13))
 b = invmod(ZZ(12), ZZ(13))
 c = sqrtmod(ZZ(12), ZZ(13))
 d = crt(ZZ(5), ZZ(13), ZZ(7), ZZ(37), true)
-</code></pre>
-
-<p><a id='Integer-logarithm-1'></a></p>
-<h2 id="integer-logarithm">Integer logarithm</h2>
-<p><a id='Nemo.flog-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Nemo.flog-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
-<strong><code>Nemo.flog</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>flog(x::fmpz, c::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return the floor of the logarithm of <script type="math/tex">x</script> to base <script type="math/tex">c</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L777' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.flog-Tuple{Nemo.fmpz,Int64}' href='#Nemo.flog-Tuple{Nemo.fmpz,Int64}'>#</a>
-<strong><code>Nemo.flog</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>flog(x::fmpz, c::Int)
-</code></pre>
-
-<blockquote>
-<p>Return the floor of the logarithm of <script type="math/tex">x</script> to base <script type="math/tex">c</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L799' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.clog-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Nemo.clog-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
-<strong><code>Nemo.clog</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>clog(x::fmpz, c::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return the ceiling of the logarithm of <script type="math/tex">x</script> to base <script type="math/tex">c</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L788' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.clog-Tuple{Nemo.fmpz,Int64}' href='#Nemo.clog-Tuple{Nemo.fmpz,Int64}'>#</a>
-<strong><code>Nemo.clog</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>clog(x::fmpz, c::Int)
-</code></pre>
-
-<blockquote>
-<p>Return the ceiling of the logarithm of <script type="math/tex">x</script> to base <script type="math/tex">c</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L809' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of computing integer logarithms.</p>
-<pre><code>a = fmpz(12)
+</code></pre><p><a id="Integer-logarithm-1"></a></p><h2 id="integer-logarithm">Integer logarithm</h2><p><a href="#Nemo.flog-Tuple{Nemo.fmpz,Nemo.fmpz}" id="Nemo.flog-Tuple{Nemo.fmpz,Nemo.fmpz}">#</a><strong><code>Nemo.flog</code></strong> — <em>Method</em>.</p><pre><code>flog(x::fmpz, c::fmpz)
+</code></pre><blockquote><p>Return the floor of the logarithm of <script type="math/tex">x</script> to base <script type="math/tex">c</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L777" target="_blank">source</a><br/></p><p><a href="#Nemo.flog-Tuple{Nemo.fmpz,Int64}" id="Nemo.flog-Tuple{Nemo.fmpz,Int64}">#</a><strong><code>Nemo.flog</code></strong> — <em>Method</em>.</p><pre><code>flog(x::fmpz, c::Int)
+</code></pre><blockquote><p>Return the floor of the logarithm of <script type="math/tex">x</script> to base <script type="math/tex">c</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L799" target="_blank">source</a><br/></p><p><a href="#Nemo.clog-Tuple{Nemo.fmpz,Nemo.fmpz}" id="Nemo.clog-Tuple{Nemo.fmpz,Nemo.fmpz}">#</a><strong><code>Nemo.clog</code></strong> — <em>Method</em>.</p><pre><code>clog(x::fmpz, c::fmpz)
+</code></pre><blockquote><p>Return the ceiling of the logarithm of <script type="math/tex">x</script> to base <script type="math/tex">c</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L788" target="_blank">source</a><br/></p><p><a href="#Nemo.clog-Tuple{Nemo.fmpz,Int64}" id="Nemo.clog-Tuple{Nemo.fmpz,Int64}">#</a><strong><code>Nemo.clog</code></strong> — <em>Method</em>.</p><pre><code>clog(x::fmpz, c::Int)
+</code></pre><blockquote><p>Return the ceiling of the logarithm of <script type="math/tex">x</script> to base <script type="math/tex">c</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L809" target="_blank">source</a><br/></p><p>Here are some examples of computing integer logarithms.</p><pre><code>a = fmpz(12)
 b = fmpz(2)
 
 c = flog(a, b)
 d = clog(a, 3)
-</code></pre>
-
-<p><a id='GCD-and-LCM-1'></a></p>
-<h2 id="gcd-and-lcm">GCD and LCM</h2>
-<p><a id='Base.gcd-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Base.gcd-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
-<strong><code>Base.gcd</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>gcd(x::fmpz, y::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return the greatest common divisor of <script type="math/tex">x</script> and <script type="math/tex">y</script>. The returned result will always be nonnegative and will be zero iff <script type="math/tex">x</script> and <script type="math/tex">y</script> are zero.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L825' class='documenter-source'>source</a><br></p>
-<p><a id='Base.gcd-Tuple{Array{Nemo.fmpz,1}}' href='#Base.gcd-Tuple{Array{Nemo.fmpz,1}}'>#</a>
-<strong><code>Base.gcd</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>gcd(x::Array{fmpz, 1})
-</code></pre>
-
-<blockquote>
-<p>Return the greatest common divisor of the elements of <script type="math/tex">x</script>. The returned result will always be nonnegative and will be zero iff all elements of <script type="math/tex">x</script> are zero.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L837' class='documenter-source'>source</a><br></p>
-<p><a id='Base.lcm-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Base.lcm-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
-<strong><code>Base.lcm</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>lcm(x::fmpz, y::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return the least common multiple of <script type="math/tex">x</script> and <script type="math/tex">y</script>. The returned result will always be nonnegative and will be zero iff <script type="math/tex">x</script> and <script type="math/tex">y</script> are zero.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L865' class='documenter-source'>source</a><br></p>
-<p><a id='Base.lcm-Tuple{Array{Nemo.fmpz,1}}' href='#Base.lcm-Tuple{Array{Nemo.fmpz,1}}'>#</a>
-<strong><code>Base.lcm</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>lcm(x::Array{fmpz, 1})
-</code></pre>
-
-<blockquote>
-<p>Return the least common multiple of the elements of <script type="math/tex">x</script>. The returned result will always be nonnegative and will be zero iff the elements of <script type="math/tex">x</script> are zero.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L877' class='documenter-source'>source</a><br></p>
-<p><a id='Base.gcdx-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Base.gcdx-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
-<strong><code>Base.gcdx</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>gcdx(a::fmpz, b::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return a tuple <script type="math/tex">g, s, t</script> such that <script type="math/tex">g</script> is the greatest common divisor of <script type="math/tex">a</script> and <script type="math/tex">b</script> and integers <script type="math/tex">s</script> and <script type="math/tex">t</script> such that <script type="math/tex">g = as + bt</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L907' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.gcdinv-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Nemo.gcdinv-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
-<strong><code>Nemo.gcdinv</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>gcdinv(a::fmpz, b::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return a tuple <script type="math/tex">g, s</script> where <script type="math/tex">g</script> is the greatest common divisor of <script type="math/tex">a</script> and <script type="math/tex">b</script> and where <script type="math/tex">s</script> is the inverse of <script type="math/tex">a</script> modulo <script type="math/tex">b</script> if <script type="math/tex">g = 1</script>. This function can be used to detect impossible inverses, i.e. where <script type="math/tex">a</script> and <script type="math/tex">b</script> are not coprime, and to yield the common factor of <script type="math/tex">a</script> and <script type="math/tex">b</script> if they are not coprime. We require <script type="math/tex">b \geq a \geq 0</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L925' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of GCD and LCM.</p>
-<pre><code>a = ZZ(3)
+</code></pre><p><a id="GCD-and-LCM-1"></a></p><h2 id="gcd-and-lcm">GCD and LCM</h2><p><a href="#Base.gcd-Tuple{Nemo.fmpz,Nemo.fmpz}" id="Base.gcd-Tuple{Nemo.fmpz,Nemo.fmpz}">#</a><strong><code>Base.gcd</code></strong> — <em>Method</em>.</p><pre><code>gcd(x::fmpz, y::fmpz)
+</code></pre><blockquote><p>Return the greatest common divisor of <script type="math/tex">x</script> and <script type="math/tex">y</script>. The returned result will always be nonnegative and will be zero iff <script type="math/tex">x</script> and <script type="math/tex">y</script> are zero.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L825" target="_blank">source</a><br/></p><p><a href="#Base.gcd-Tuple{Array{Nemo.fmpz,1}}" id="Base.gcd-Tuple{Array{Nemo.fmpz,1}}">#</a><strong><code>Base.gcd</code></strong> — <em>Method</em>.</p><pre><code>gcd(x::Array{fmpz, 1})
+</code></pre><blockquote><p>Return the greatest common divisor of the elements of <script type="math/tex">x</script>. The returned result will always be nonnegative and will be zero iff all elements of <script type="math/tex">x</script> are zero.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L837" target="_blank">source</a><br/></p><p><a href="#Base.lcm-Tuple{Nemo.fmpz,Nemo.fmpz}" id="Base.lcm-Tuple{Nemo.fmpz,Nemo.fmpz}">#</a><strong><code>Base.lcm</code></strong> — <em>Method</em>.</p><pre><code>lcm(x::fmpz, y::fmpz)
+</code></pre><blockquote><p>Return the least common multiple of <script type="math/tex">x</script> and <script type="math/tex">y</script>. The returned result will always be nonnegative and will be zero iff <script type="math/tex">x</script> and <script type="math/tex">y</script> are zero.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L865" target="_blank">source</a><br/></p><p><a href="#Base.lcm-Tuple{Array{Nemo.fmpz,1}}" id="Base.lcm-Tuple{Array{Nemo.fmpz,1}}">#</a><strong><code>Base.lcm</code></strong> — <em>Method</em>.</p><pre><code>lcm(x::Array{fmpz, 1})
+</code></pre><blockquote><p>Return the least common multiple of the elements of <script type="math/tex">x</script>. The returned result will always be nonnegative and will be zero iff the elements of <script type="math/tex">x</script> are zero.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L877" target="_blank">source</a><br/></p><p><a href="#Base.gcdx-Tuple{Nemo.fmpz,Nemo.fmpz}" id="Base.gcdx-Tuple{Nemo.fmpz,Nemo.fmpz}">#</a><strong><code>Base.gcdx</code></strong> — <em>Method</em>.</p><pre><code>gcdx(a::fmpz, b::fmpz)
+</code></pre><blockquote><p>Return a tuple <script type="math/tex">g, s, t</script> such that <script type="math/tex">g</script> is the greatest common divisor of <script type="math/tex">a</script> and <script type="math/tex">b</script> and integers <script type="math/tex">s</script> and <script type="math/tex">t</script> such that <script type="math/tex">g = as + bt</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L907" target="_blank">source</a><br/></p><p><a href="#Nemo.gcdinv-Tuple{Nemo.fmpz,Nemo.fmpz}" id="Nemo.gcdinv-Tuple{Nemo.fmpz,Nemo.fmpz}">#</a><strong><code>Nemo.gcdinv</code></strong> — <em>Method</em>.</p><pre><code>gcdinv(a::fmpz, b::fmpz)
+</code></pre><blockquote><p>Return a tuple <script type="math/tex">g, s</script> where <script type="math/tex">g</script> is the greatest common divisor of <script type="math/tex">a</script> and <script type="math/tex">b</script> and where <script type="math/tex">s</script> is the inverse of <script type="math/tex">a</script> modulo <script type="math/tex">b</script> if <script type="math/tex">g = 1</script>. This function can be used to detect impossible inverses, i.e. where <script type="math/tex">a</script> and <script type="math/tex">b</script> are not coprime, and to yield the common factor of <script type="math/tex">a</script> and <script type="math/tex">b</script> if they are not coprime. We require <script type="math/tex">b \geq a \geq 0</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L925" target="_blank">source</a><br/></p><p>Here are some examples of GCD and LCM.</p><pre><code>a = ZZ(3)
 b = ZZ(12)
 
 c = gcd(a, b)
 d = lcm(a, b)
 g, s, t = gcdx(a, b)
 g, s = gcdinv(a, b)
-</code></pre>
-
-<p><a id='Integer-roots-1'></a></p>
-<h2 id="integer-roots">Integer roots</h2>
-<p><a id='Base.isqrt-Tuple{Nemo.fmpz}' href='#Base.isqrt-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Base.isqrt</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isqrt(x::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return the floor of the square root of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L950' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.isqrtrem-Tuple{Nemo.fmpz}' href='#Nemo.isqrtrem-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Nemo.isqrtrem</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isqrtrem(x::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return a tuple <script type="math/tex">s, r</script> consisting of the floor <script type="math/tex">s</script> of the square root of <script type="math/tex">x</script> and the remainder <script type="math/tex">r</script>, i.e. such that <script type="math/tex">x = s^2 + r</script>. We require <script type="math/tex">x \geq 0</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L961' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.root-Tuple{Nemo.fmpz,Int64}' href='#Nemo.root-Tuple{Nemo.fmpz,Int64}'>#</a>
-<strong><code>Nemo.root</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>root(x::fmpz, n::Int)
-</code></pre>
-
-<blockquote>
-<p>Return the floor of the <script type="math/tex">n</script>-the root of <script type="math/tex">x</script>. We require <script type="math/tex">n > 0</script> and that <script type="math/tex">x \geq 0</script> if <script type="math/tex">n</script> is even.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L975' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of integer roots.</p>
-<pre><code>a = ZZ(13)
+</code></pre><p><a id="Integer-roots-1"></a></p><h2 id="integer-roots">Integer roots</h2><p><a href="#Base.isqrt-Tuple{Nemo.fmpz}" id="Base.isqrt-Tuple{Nemo.fmpz}">#</a><strong><code>Base.isqrt</code></strong> — <em>Method</em>.</p><pre><code>isqrt(x::fmpz)
+</code></pre><blockquote><p>Return the floor of the square root of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L950" target="_blank">source</a><br/></p><p><a href="#Nemo.isqrtrem-Tuple{Nemo.fmpz}" id="Nemo.isqrtrem-Tuple{Nemo.fmpz}">#</a><strong><code>Nemo.isqrtrem</code></strong> — <em>Method</em>.</p><pre><code>isqrtrem(x::fmpz)
+</code></pre><blockquote><p>Return a tuple <script type="math/tex">s, r</script> consisting of the floor <script type="math/tex">s</script> of the square root of <script type="math/tex">x</script> and the remainder <script type="math/tex">r</script>, i.e. such that <script type="math/tex">x = s^2 + r</script>. We require <script type="math/tex">x \geq 0</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L961" target="_blank">source</a><br/></p><p><a href="#Nemo.root-Tuple{Nemo.fmpz,Int64}" id="Nemo.root-Tuple{Nemo.fmpz,Int64}">#</a><strong><code>Nemo.root</code></strong> — <em>Method</em>.</p><pre><code>root(x::fmpz, n::Int)
+</code></pre><blockquote><p>Return the floor of the <script type="math/tex">n</script>-the root of <script type="math/tex">x</script>. We require <script type="math/tex">n > 0</script> and that <script type="math/tex">x \geq 0</script> if <script type="math/tex">n</script> is even.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L975" target="_blank">source</a><br/></p><p>Here are some examples of integer roots.</p><pre><code>a = ZZ(13)
 
 b = sqrt(a)
 s, r = sqrtrem(a)
 c = root(a, 3)
-</code></pre>
-
-<p><a id='Number-theoretic-functionality-1'></a></p>
-<h2 id="number-theoretic-functionality">Number theoretic functionality</h2>
-<p><a id='Nemo.divisible-Tuple{Nemo.fmpz,Int64}' href='#Nemo.divisible-Tuple{Nemo.fmpz,Int64}'>#</a>
-<strong><code>Nemo.divisible</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>divisible(x::fmpz, y::Int)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if <script type="math/tex">x</script> is divisible by <script type="math/tex">y</script>, otherwise return <code>false</code>. We require <script type="math/tex">x \neq 0</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1036' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.divisible-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Nemo.divisible-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
-<strong><code>Nemo.divisible</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>divisible(x::fmpz, y::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if <script type="math/tex">x</script> is divisible by <script type="math/tex">y</script>, otherwise return <code>false</code>. We require <script type="math/tex">x \neq 0</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1025' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.issquare-Tuple{Nemo.fmpz}' href='#Nemo.issquare-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Nemo.issquare</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>issquare(x::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if <script type="math/tex">x</script> is a square, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1047' class='documenter-source'>source</a><br></p>
-<pre><code>isprime(::UInt)
+</code></pre><p><a id="Number-theoretic-functionality-1"></a></p><h2 id="number-theoretic-functionality">Number theoretic functionality</h2><p><a href="#Nemo.divisible-Tuple{Nemo.fmpz,Int64}" id="Nemo.divisible-Tuple{Nemo.fmpz,Int64}">#</a><strong><code>Nemo.divisible</code></strong> — <em>Method</em>.</p><pre><code>divisible(x::fmpz, y::Int)
+</code></pre><blockquote><p>Return <code>true</code> if <script type="math/tex">x</script> is divisible by <script type="math/tex">y</script>, otherwise return <code>false</code>. We require <script type="math/tex">x \neq 0</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1036" target="_blank">source</a><br/></p><p><a href="#Nemo.divisible-Tuple{Nemo.fmpz,Nemo.fmpz}" id="Nemo.divisible-Tuple{Nemo.fmpz,Nemo.fmpz}">#</a><strong><code>Nemo.divisible</code></strong> — <em>Method</em>.</p><pre><code>divisible(x::fmpz, y::fmpz)
+</code></pre><blockquote><p>Return <code>true</code> if <script type="math/tex">x</script> is divisible by <script type="math/tex">y</script>, otherwise return <code>false</code>. We require <script type="math/tex">x \neq 0</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1025" target="_blank">source</a><br/></p><p><a href="#Nemo.issquare-Tuple{Nemo.fmpz}" id="Nemo.issquare-Tuple{Nemo.fmpz}">#</a><strong><code>Nemo.issquare</code></strong> — <em>Method</em>.</p><pre><code>issquare(x::fmpz)
+</code></pre><blockquote><p>Return <code>true</code> if <script type="math/tex">x</script> is a square, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1047" target="_blank">source</a><br/></p><pre><code>isprime(::UInt)
 isprime(::fmpz)
-</code></pre>
-
-<p><a id='Nemo.isprobabprime-Tuple{Nemo.fmpz}' href='#Nemo.isprobabprime-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Nemo.isprobabprime</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isprobabprime(x::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if <script type="math/tex">x</script> is a very probably a prime number, otherwise return <code>false</code>. No counterexamples are known to this test, but it is conjectured that infinitely many exist.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1068' class='documenter-source'>source</a><br></p>
-<pre><code>factor(::fmpz)
-</code></pre>
-
-<pre><code>remove(::fmpz, y:fmpz)
-</code></pre>
-
-<p><a id='Nemo.divisor_lenstra-Tuple{Nemo.fmpz,Nemo.fmpz,Nemo.fmpz}' href='#Nemo.divisor_lenstra-Tuple{Nemo.fmpz,Nemo.fmpz,Nemo.fmpz}'>#</a>
-<strong><code>Nemo.divisor_lenstra</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>divisor_lenstra(n::fmpz, r::fmpz, m::fmpz)
-</code></pre>
-
-<blockquote>
-<p>If <script type="math/tex">n</script> has a factor which lies in the residue class <script type="math/tex">r (\mod m)</script> for <script type="math/tex">0 < r < m < n</script>, this function returns such a factor. Otherwise it returns <script type="math/tex">0</script>. This is only efficient if <script type="math/tex">m</script> is at least the cube root of <script type="math/tex">n</script>. We require gcd<script type="math/tex">(r, m) = 1</script> and this condition is not checked.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1110' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.fac-Tuple{Int64}' href='#Nemo.fac-Tuple{Int64}'>#</a>
-<strong><code>Nemo.fac</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>fac(x::Int)
-</code></pre>
-
-<blockquote>
-<p>Return the factorial of <script type="math/tex">x</script>, i.e. <script type="math/tex">x! = 1.2.3\ldots x</script>. We require <script type="math/tex">x \geq 0</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1129' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.risingfac-Tuple{Nemo.fmpz,Int64}' href='#Nemo.risingfac-Tuple{Nemo.fmpz,Int64}'>#</a>
-<strong><code>Nemo.risingfac</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>risingfac(x::fmpz, y::Int)
-</code></pre>
-
-<blockquote>
-<p>Return the rising factorial of <script type="math/tex">x</script>, i.e. <script type="math/tex">x(x + 1)(x + 2)\ldots (x + n - 1)</script>. If <script type="math/tex">n < 0</script> we throw a <code>DomainError()</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1141' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.risingfac-Tuple{Int64,Int64}' href='#Nemo.risingfac-Tuple{Int64,Int64}'>#</a>
-<strong><code>Nemo.risingfac</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>risingfac(x::Int, y::Int)
-</code></pre>
-
-<blockquote>
-<p>Return the rising factorial of <script type="math/tex">x</script>, i.e. <script type="math/tex">x(x + 1)(x + 2)\ldots (x + n - 1)</script>. If <script type="math/tex">n < 0</script> we throw a <code>DomainError()</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1154' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.primorial-Tuple{Int64}' href='#Nemo.primorial-Tuple{Int64}'>#</a>
-<strong><code>Nemo.primorial</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>primorial(x::Int)
-</code></pre>
-
-<blockquote>
-<p>Return the primorial of <script type="math/tex">n</script>, i.e. the product of all primes less than or equal to <script type="math/tex">n</script>. If <script type="math/tex">n < 0</script> we throw a <code>DomainError()</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1174' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.fib-Tuple{Int64}' href='#Nemo.fib-Tuple{Int64}'>#</a>
-<strong><code>Nemo.fib</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>fib(x::Int)
-</code></pre>
-
-<blockquote>
-<p>Return the <script type="math/tex">n</script>-th Fibonacci number <script type="math/tex">F_n</script>. We define <script type="math/tex">F_1 = 1</script>, <script type="math/tex">F_2 = 1</script> and <script type="math/tex">F_{i + 1} = F_i + F_{i - 1}</script> for all <script type="math/tex">i > 2</script>. We require <script type="math/tex">n \geq 0</script>. For convenience, we define <script type="math/tex">F_0 = 0</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1187' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.bell-Tuple{Int64}' href='#Nemo.bell-Tuple{Int64}'>#</a>
-<strong><code>Nemo.bell</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>bell(x::Int)
-</code></pre>
-
-<blockquote>
-<p>Return the Bell number <script type="math/tex">B_n</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1201' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.binom-Tuple{Int64,Int64}' href='#Nemo.binom-Tuple{Int64,Int64}'>#</a>
-<strong><code>Nemo.binom</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>binom(n::Int, k::Int)
-</code></pre>
-
-<blockquote>
-<p>Return the binomial coefficient <script type="math/tex">\frac{n!}{(n - k)!k!}</script>. If <script type="math/tex">n, k < 0</script> or <script type="math/tex">k > n</script> we return <script type="math/tex">0</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1213' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.moebiusmu-Tuple{Nemo.fmpz}' href='#Nemo.moebiusmu-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Nemo.moebiusmu</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>moebiusmu(x::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Returns the Moebius mu function of <script type="math/tex">x</script> as an \code{Int}. The value returned is either <script type="math/tex">-1</script>, <script type="math/tex">0</script> or <script type="math/tex">1</script>. If <script type="math/tex">x < 0</script> we throw a <code>DomainError()</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1227' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.jacobi-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Nemo.jacobi-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
-<strong><code>Nemo.jacobi</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>jacobi(x::fmpz, y::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return the value of the Jacobi symbol <script type="math/tex">\left(\frac{x}{y}\right)</script>. If <script type="math/tex">y \leq x</script> or <script type="math/tex">x < 0</script>, we throw a <code>DomainError()</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1238' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.sigma-Tuple{Nemo.fmpz,Int64}' href='#Nemo.sigma-Tuple{Nemo.fmpz,Int64}'>#</a>
-<strong><code>Nemo.sigma</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>sigma(x::fmpz, y::Int)
-</code></pre>
-
-<blockquote>
-<p>Return the value of the sigma function, i.e. <script type="math/tex">\sum_{0 < d \;| x} d^y</script>. If <script type="math/tex">y < 0</script> we throw a <code>DomainError()</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1250' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.eulerphi-Tuple{Nemo.fmpz}' href='#Nemo.eulerphi-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Nemo.eulerphi</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>eulerphi(x::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return the value of the Euler phi function at <script type="math/tex">x</script>, i.e. the number of positive integers less than <script type="math/tex">x</script> that are coprime with <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1263' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.numpart-Tuple{Int64}' href='#Nemo.numpart-Tuple{Int64}'>#</a>
-<strong><code>Nemo.numpart</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>numpart(x::Int)
-</code></pre>
-
-<blockquote>
-<p>Return the number of partitions of <script type="math/tex">x</script>. This function is not available on Windows 64.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1276' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.numpart-Tuple{Nemo.fmpz}' href='#Nemo.numpart-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Nemo.numpart</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>numpart(x::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return the number of partitions of <script type="math/tex">x</script>. This function is not available on Windows 64.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1292' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of number theoretic functionality.</p>
-<pre><code>isprime(ZZ(13))
+</code></pre><p><a href="#Nemo.isprobabprime-Tuple{Nemo.fmpz}" id="Nemo.isprobabprime-Tuple{Nemo.fmpz}">#</a><strong><code>Nemo.isprobabprime</code></strong> — <em>Method</em>.</p><pre><code>isprobabprime(x::fmpz)
+</code></pre><blockquote><p>Return <code>true</code> if <script type="math/tex">x</script> is a very probably a prime number, otherwise return <code>false</code>. No counterexamples are known to this test, but it is conjectured that infinitely many exist.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1068" target="_blank">source</a><br/></p><pre><code>factor(::fmpz)
+</code></pre><pre><code>remove(::fmpz, y:fmpz)
+</code></pre><p><a href="#Nemo.divisor_lenstra-Tuple{Nemo.fmpz,Nemo.fmpz,Nemo.fmpz}" id="Nemo.divisor_lenstra-Tuple{Nemo.fmpz,Nemo.fmpz,Nemo.fmpz}">#</a><strong><code>Nemo.divisor_lenstra</code></strong> — <em>Method</em>.</p><pre><code>divisor_lenstra(n::fmpz, r::fmpz, m::fmpz)
+</code></pre><blockquote><p>If <script type="math/tex">n</script> has a factor which lies in the residue class <script type="math/tex">r (\mod m)</script> for <script type="math/tex">0 < r < m < n</script>, this function returns such a factor. Otherwise it returns <script type="math/tex">0</script>. This is only efficient if <script type="math/tex">m</script> is at least the cube root of <script type="math/tex">n</script>. We require gcd<script type="math/tex">(r, m) = 1</script> and this condition is not checked.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1110" target="_blank">source</a><br/></p><p><a href="#Nemo.fac-Tuple{Int64}" id="Nemo.fac-Tuple{Int64}">#</a><strong><code>Nemo.fac</code></strong> — <em>Method</em>.</p><pre><code>fac(x::Int)
+</code></pre><blockquote><p>Return the factorial of <script type="math/tex">x</script>, i.e. <script type="math/tex">x! = 1.2.3\ldots x</script>. We require <script type="math/tex">x \geq 0</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1129" target="_blank">source</a><br/></p><p><a href="#Nemo.risingfac-Tuple{Nemo.fmpz,Int64}" id="Nemo.risingfac-Tuple{Nemo.fmpz,Int64}">#</a><strong><code>Nemo.risingfac</code></strong> — <em>Method</em>.</p><pre><code>risingfac(x::fmpz, y::Int)
+</code></pre><blockquote><p>Return the rising factorial of <script type="math/tex">x</script>, i.e. <script type="math/tex">x(x + 1)(x + 2)\ldots (x + n - 1)</script>. If <script type="math/tex">n < 0</script> we throw a <code>DomainError()</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1141" target="_blank">source</a><br/></p><p><a href="#Nemo.risingfac-Tuple{Int64,Int64}" id="Nemo.risingfac-Tuple{Int64,Int64}">#</a><strong><code>Nemo.risingfac</code></strong> — <em>Method</em>.</p><pre><code>risingfac(x::Int, y::Int)
+</code></pre><blockquote><p>Return the rising factorial of <script type="math/tex">x</script>, i.e. <script type="math/tex">x(x + 1)(x + 2)\ldots (x + n - 1)</script>. If <script type="math/tex">n < 0</script> we throw a <code>DomainError()</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1154" target="_blank">source</a><br/></p><p><a href="#Nemo.primorial-Tuple{Int64}" id="Nemo.primorial-Tuple{Int64}">#</a><strong><code>Nemo.primorial</code></strong> — <em>Method</em>.</p><pre><code>primorial(x::Int)
+</code></pre><blockquote><p>Return the primorial of <script type="math/tex">n</script>, i.e. the product of all primes less than or equal to <script type="math/tex">n</script>. If <script type="math/tex">n < 0</script> we throw a <code>DomainError()</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1174" target="_blank">source</a><br/></p><p><a href="#Nemo.fib-Tuple{Int64}" id="Nemo.fib-Tuple{Int64}">#</a><strong><code>Nemo.fib</code></strong> — <em>Method</em>.</p><pre><code>fib(x::Int)
+</code></pre><blockquote><p>Return the <script type="math/tex">n</script>-th Fibonacci number <script type="math/tex">F_n</script>. We define <script type="math/tex">F_1 = 1</script>, <script type="math/tex">F_2 = 1</script> and <script type="math/tex">F_{i + 1} = F_i + F_{i - 1}</script> for all <script type="math/tex">i > 2</script>. We require <script type="math/tex">n \geq 0</script>. For convenience, we define <script type="math/tex">F_0 = 0</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1187" target="_blank">source</a><br/></p><p><a href="#Nemo.bell-Tuple{Int64}" id="Nemo.bell-Tuple{Int64}">#</a><strong><code>Nemo.bell</code></strong> — <em>Method</em>.</p><pre><code>bell(x::Int)
+</code></pre><blockquote><p>Return the Bell number <script type="math/tex">B_n</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1201" target="_blank">source</a><br/></p><p><a href="#Nemo.binom-Tuple{Int64,Int64}" id="Nemo.binom-Tuple{Int64,Int64}">#</a><strong><code>Nemo.binom</code></strong> — <em>Method</em>.</p><pre><code>binom(n::Int, k::Int)
+</code></pre><blockquote><p>Return the binomial coefficient <script type="math/tex">\frac{n!}{(n - k)!k!}</script>. If <script type="math/tex">n, k < 0</script> or <script type="math/tex">k > n</script> we return <script type="math/tex">0</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1213" target="_blank">source</a><br/></p><p><a href="#Nemo.moebiusmu-Tuple{Nemo.fmpz}" id="Nemo.moebiusmu-Tuple{Nemo.fmpz}">#</a><strong><code>Nemo.moebiusmu</code></strong> — <em>Method</em>.</p><pre><code>moebiusmu(x::fmpz)
+</code></pre><blockquote><p>Returns the Moebius mu function of <script type="math/tex">x</script> as an \code{Int}. The value returned is either <script type="math/tex">-1</script>, <script type="math/tex">0</script> or <script type="math/tex">1</script>. If <script type="math/tex">x < 0</script> we throw a <code>DomainError()</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1227" target="_blank">source</a><br/></p><p><a href="#Nemo.jacobi-Tuple{Nemo.fmpz,Nemo.fmpz}" id="Nemo.jacobi-Tuple{Nemo.fmpz,Nemo.fmpz}">#</a><strong><code>Nemo.jacobi</code></strong> — <em>Method</em>.</p><pre><code>jacobi(x::fmpz, y::fmpz)
+</code></pre><blockquote><p>Return the value of the Jacobi symbol <script type="math/tex">\left(\frac{x}{y}\right)</script>. If <script type="math/tex">y \leq x</script> or <script type="math/tex">x < 0</script>, we throw a <code>DomainError()</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1238" target="_blank">source</a><br/></p><p><a href="#Nemo.sigma-Tuple{Nemo.fmpz,Int64}" id="Nemo.sigma-Tuple{Nemo.fmpz,Int64}">#</a><strong><code>Nemo.sigma</code></strong> — <em>Method</em>.</p><pre><code>sigma(x::fmpz, y::Int)
+</code></pre><blockquote><p>Return the value of the sigma function, i.e. <script type="math/tex">\sum_{0 < d \;| x} d^y</script>. If <script type="math/tex">y < 0</script> we throw a <code>DomainError()</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1250" target="_blank">source</a><br/></p><p><a href="#Nemo.eulerphi-Tuple{Nemo.fmpz}" id="Nemo.eulerphi-Tuple{Nemo.fmpz}">#</a><strong><code>Nemo.eulerphi</code></strong> — <em>Method</em>.</p><pre><code>eulerphi(x::fmpz)
+</code></pre><blockquote><p>Return the value of the Euler phi function at <script type="math/tex">x</script>, i.e. the number of positive integers less than <script type="math/tex">x</script> that are coprime with <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1263" target="_blank">source</a><br/></p><p><a href="#Nemo.numpart-Tuple{Int64}" id="Nemo.numpart-Tuple{Int64}">#</a><strong><code>Nemo.numpart</code></strong> — <em>Method</em>.</p><pre><code>numpart(x::Int)
+</code></pre><blockquote><p>Return the number of partitions of <script type="math/tex">x</script>. This function is not available on Windows 64.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1276" target="_blank">source</a><br/></p><p><a href="#Nemo.numpart-Tuple{Nemo.fmpz}" id="Nemo.numpart-Tuple{Nemo.fmpz}">#</a><strong><code>Nemo.numpart</code></strong> — <em>Method</em>.</p><pre><code>numpart(x::fmpz)
+</code></pre><blockquote><p>Return the number of partitions of <script type="math/tex">x</script>. This function is not available on Windows 64.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1292" target="_blank">source</a><br/></p><p>Here are some examples of number theoretic functionality.</p><pre><code>isprime(ZZ(13))
 n = fac(100)
 s = sigma(ZZ(128), 10)
 a = eulerphi(ZZ(12480))
 p = numpart(1000)
 f = factor(ZZ(12))
-</code></pre>
-
-<p><a id='Number-digits-and-bases-1'></a></p>
-<h2 id="number-digits-and-bases">Number digits and bases</h2>
-<p><a id='Base.bin-Tuple{Nemo.fmpz}' href='#Base.bin-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Base.bin</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>bin(n::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">n</script> as a binary string.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1314' class='documenter-source'>source</a><br></p>
-<p><a id='Base.oct-Tuple{Nemo.fmpz}' href='#Base.oct-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Base.oct</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>oct(n::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">n</script> as a octal string.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1320' class='documenter-source'>source</a><br></p>
-<p><a id='Base.dec-Tuple{Nemo.fmpz}' href='#Base.dec-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Base.dec</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>dec(n::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">n</script> as a decimal string.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1326' class='documenter-source'>source</a><br></p>
-<p><a id='Base.hex-Tuple{Nemo.fmpz}' href='#Base.hex-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Base.hex</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>hex(n::fmpz) = base(n, 16)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">n</script> as a hexadecimal string.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1332' class='documenter-source'>source</a><br></p>
-<p><a id='Base.base-Tuple{Nemo.fmpz,Integer}' href='#Base.base-Tuple{Nemo.fmpz,Integer}'>#</a>
-<strong><code>Base.base</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>base(n::fmpz, b::Integer)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">n</script> as a string in base <script type="math/tex">b</script>. We require <script type="math/tex">2 \leq b \leq 62</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1338' class='documenter-source'>source</a><br></p>
-<p><a id='Base.ndigits-Tuple{Nemo.fmpz,Integer}' href='#Base.ndigits-Tuple{Nemo.fmpz,Integer}'>#</a>
-<strong><code>Base.ndigits</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>ndigits(x::fmpz, b::Integer = 10)
-</code></pre>
-
-<blockquote>
-<p>Return the number of digits of <script type="math/tex">x</script> in the base <script type="math/tex">b</script> (default is <script type="math/tex">b = 10</script>).</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1358' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.nbits-Tuple{Nemo.fmpz}' href='#Nemo.nbits-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Nemo.nbits</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>nbits(x::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return the number of binary bits of <script type="math/tex">x</script>. We return zero if <script type="math/tex">x = 0</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1364' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of writing numbers in various bases.</p>
-<pre><code>a = fmpz(12)
+</code></pre><p><a id="Number-digits-and-bases-1"></a></p><h2 id="number-digits-and-bases">Number digits and bases</h2><p><a href="#Base.bin-Tuple{Nemo.fmpz}" id="Base.bin-Tuple{Nemo.fmpz}">#</a><strong><code>Base.bin</code></strong> — <em>Method</em>.</p><pre><code>bin(n::fmpz)
+</code></pre><blockquote><p>Return <script type="math/tex">n</script> as a binary string.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1314" target="_blank">source</a><br/></p><p><a href="#Base.oct-Tuple{Nemo.fmpz}" id="Base.oct-Tuple{Nemo.fmpz}">#</a><strong><code>Base.oct</code></strong> — <em>Method</em>.</p><pre><code>oct(n::fmpz)
+</code></pre><blockquote><p>Return <script type="math/tex">n</script> as a octal string.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1320" target="_blank">source</a><br/></p><p><a href="#Base.dec-Tuple{Nemo.fmpz}" id="Base.dec-Tuple{Nemo.fmpz}">#</a><strong><code>Base.dec</code></strong> — <em>Method</em>.</p><pre><code>dec(n::fmpz)
+</code></pre><blockquote><p>Return <script type="math/tex">n</script> as a decimal string.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1326" target="_blank">source</a><br/></p><p><a href="#Base.hex-Tuple{Nemo.fmpz}" id="Base.hex-Tuple{Nemo.fmpz}">#</a><strong><code>Base.hex</code></strong> — <em>Method</em>.</p><pre><code>hex(n::fmpz) = base(n, 16)
+</code></pre><blockquote><p>Return <script type="math/tex">n</script> as a hexadecimal string.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1332" target="_blank">source</a><br/></p><p><a href="#Base.base-Tuple{Nemo.fmpz,Integer}" id="Base.base-Tuple{Nemo.fmpz,Integer}">#</a><strong><code>Base.base</code></strong> — <em>Method</em>.</p><pre><code>base(n::fmpz, b::Integer)
+</code></pre><blockquote><p>Return <script type="math/tex">n</script> as a string in base <script type="math/tex">b</script>. We require <script type="math/tex">2 \leq b \leq 62</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1338" target="_blank">source</a><br/></p><p><a href="#Base.ndigits-Tuple{Nemo.fmpz,Integer}" id="Base.ndigits-Tuple{Nemo.fmpz,Integer}">#</a><strong><code>Base.ndigits</code></strong> — <em>Method</em>.</p><pre><code>ndigits(x::fmpz, b::Integer = 10)
+</code></pre><blockquote><p>Return the number of digits of <script type="math/tex">x</script> in the base <script type="math/tex">b</script> (default is <script type="math/tex">b = 10</script>).</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1358" target="_blank">source</a><br/></p><p><a href="#Nemo.nbits-Tuple{Nemo.fmpz}" id="Nemo.nbits-Tuple{Nemo.fmpz}">#</a><strong><code>Nemo.nbits</code></strong> — <em>Method</em>.</p><pre><code>nbits(x::fmpz)
+</code></pre><blockquote><p>Return the number of binary bits of <script type="math/tex">x</script>. We return zero if <script type="math/tex">x = 0</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1364" target="_blank">source</a><br/></p><p>Here are some examples of writing numbers in various bases.</p><pre><code>a = fmpz(12)
 
 s1 = bin(a)
 s2 = base(a, 13)
 n1 = nbits(a)
 n2 = ndigits(a, 3)
-</code></pre>
-
-<p><a id='Bit-twiddling-1'></a></p>
-<h3 id="bit-twiddling">Bit twiddling</h3>
-<p><a id='Nemo.popcount-Tuple{Nemo.fmpz}' href='#Nemo.popcount-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Nemo.popcount</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>popcount(x::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return the number of ones in the binary representation of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1378' class='documenter-source'>source</a><br></p>
-<p><a id='Base.prevpow2-Tuple{Nemo.fmpz}' href='#Base.prevpow2-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Base.prevpow2</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>prevpow2(x::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return the previous power of <script type="math/tex">2</script> up to including <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1385' class='documenter-source'>source</a><br></p>
-<p><a id='Base.nextpow2-Tuple{Nemo.fmpz}' href='#Base.nextpow2-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Base.nextpow2</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>nextpow2(x::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return the next power of <script type="math/tex">2</script> that is at least <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1392' class='documenter-source'>source</a><br></p>
-<p><a id='Base.trailing_zeros-Tuple{Nemo.fmpz}' href='#Base.trailing_zeros-Tuple{Nemo.fmpz}'>#</a>
-<strong><code>Base.trailing_zeros</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>trailing_zeros(x::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Count the trailing zeros in the binary representation of <script type="math/tex">x</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1399' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.clrbit!-Tuple{Nemo.fmpz,Int64}' href='#Nemo.clrbit!-Tuple{Nemo.fmpz,Int64}'>#</a>
-<strong><code>Nemo.clrbit!</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>clrbit!(x::fmpz, c::Int)
-</code></pre>
-
-<blockquote>
-<p>Clear bit <script type="math/tex">c</script> of <script type="math/tex">x</script>, where the least significant bit is the <script type="math/tex">0</script>-th bit. Note that this function modifies its input in-place.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1412' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.setbit!-Tuple{Nemo.fmpz,Int64}' href='#Nemo.setbit!-Tuple{Nemo.fmpz,Int64}'>#</a>
-<strong><code>Nemo.setbit!</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>setbit!(x::fmpz, c::Int)
-</code></pre>
-
-<blockquote>
-<p>Set bit <script type="math/tex">c</script> of <script type="math/tex">x</script>, where the least significant bit is the <script type="math/tex">0</script>-th bit. Note that this function modifies its input in-place.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1422' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.combit!-Tuple{Nemo.fmpz,Int64}' href='#Nemo.combit!-Tuple{Nemo.fmpz,Int64}'>#</a>
-<strong><code>Nemo.combit!</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>combit!(x::fmpz, c::Int)
-</code></pre>
-
-<blockquote>
-<p>Complement bit <script type="math/tex">c</script> of <script type="math/tex">x</script>, where the least significant bit is the <script type="math/tex">0</script>-th bit. Note that this function modifies its input in-place.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1432' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of bit twiddling.</p>
-<pre><code>a = fmpz(12)
+</code></pre><p><a id="Bit-twiddling-1"></a></p><h3 id="bit-twiddling">Bit twiddling</h3><p><a href="#Nemo.popcount-Tuple{Nemo.fmpz}" id="Nemo.popcount-Tuple{Nemo.fmpz}">#</a><strong><code>Nemo.popcount</code></strong> — <em>Method</em>.</p><pre><code>popcount(x::fmpz)
+</code></pre><blockquote><p>Return the number of ones in the binary representation of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1378" target="_blank">source</a><br/></p><p><a href="#Base.prevpow2-Tuple{Nemo.fmpz}" id="Base.prevpow2-Tuple{Nemo.fmpz}">#</a><strong><code>Base.prevpow2</code></strong> — <em>Method</em>.</p><pre><code>prevpow2(x::fmpz)
+</code></pre><blockquote><p>Return the previous power of <script type="math/tex">2</script> up to including <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1385" target="_blank">source</a><br/></p><p><a href="#Base.nextpow2-Tuple{Nemo.fmpz}" id="Base.nextpow2-Tuple{Nemo.fmpz}">#</a><strong><code>Base.nextpow2</code></strong> — <em>Method</em>.</p><pre><code>nextpow2(x::fmpz)
+</code></pre><blockquote><p>Return the next power of <script type="math/tex">2</script> that is at least <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1392" target="_blank">source</a><br/></p><p><a href="#Base.trailing_zeros-Tuple{Nemo.fmpz}" id="Base.trailing_zeros-Tuple{Nemo.fmpz}">#</a><strong><code>Base.trailing_zeros</code></strong> — <em>Method</em>.</p><pre><code>trailing_zeros(x::fmpz)
+</code></pre><blockquote><p>Count the trailing zeros in the binary representation of <script type="math/tex">x</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1399" target="_blank">source</a><br/></p><p><a href="#Nemo.clrbit!-Tuple{Nemo.fmpz,Int64}" id="Nemo.clrbit!-Tuple{Nemo.fmpz,Int64}">#</a><strong><code>Nemo.clrbit!</code></strong> — <em>Method</em>.</p><pre><code>clrbit!(x::fmpz, c::Int)
+</code></pre><blockquote><p>Clear bit <script type="math/tex">c</script> of <script type="math/tex">x</script>, where the least significant bit is the <script type="math/tex">0</script>-th bit. Note that this function modifies its input in-place.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1412" target="_blank">source</a><br/></p><p><a href="#Nemo.setbit!-Tuple{Nemo.fmpz,Int64}" id="Nemo.setbit!-Tuple{Nemo.fmpz,Int64}">#</a><strong><code>Nemo.setbit!</code></strong> — <em>Method</em>.</p><pre><code>setbit!(x::fmpz, c::Int)
+</code></pre><blockquote><p>Set bit <script type="math/tex">c</script> of <script type="math/tex">x</script>, where the least significant bit is the <script type="math/tex">0</script>-th bit. Note that this function modifies its input in-place.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1422" target="_blank">source</a><br/></p><p><a href="#Nemo.combit!-Tuple{Nemo.fmpz,Int64}" id="Nemo.combit!-Tuple{Nemo.fmpz,Int64}">#</a><strong><code>Nemo.combit!</code></strong> — <em>Method</em>.</p><pre><code>combit!(x::fmpz, c::Int)
+</code></pre><blockquote><p>Complement bit <script type="math/tex">c</script> of <script type="math/tex">x</script>, where the least significant bit is the <script type="math/tex">0</script>-th bit. Note that this function modifies its input in-place.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/58e80e13410c968f12caa8f0771d19da9e5ff645/src/flint/fmpz.jl#L1432" target="_blank">source</a><br/></p><p>Here are some examples of bit twiddling.</p><pre><code>a = fmpz(12)
 
 p = popcount(a)
 b = nextpow2(a)
 combit!(a, 2)
-</code></pre>
-              
-            </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../rational/" class="btn btn-neutral float-right" title="Rationals">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../matrix/" class="btn btn-neutral" title="Matrices"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <!-- Copyright etc -->
-    
-  </div>
+</code></pre></div></div><footer><div aria-label="footer navigation" class="rst-footer-buttons" role="navigation"><a class="btn btn-neutral float-right" href="../rational/" title="Rationals">Next <span class="icon icon-circle-arrow-right"></span></a><a class="btn btn-neutral" href="../matrix/" title="Matrices"><span class="icon icon-circle-arrow-left"></span> Previous</a></div><hr/><div role="contentinfo"></div>
 
   Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
-</footer>
-	  
-        </div>
-      </div>
-
-    </section>
-    
-  </div>
-
-  <div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-          <a href="https://github.com/Nemocas/Nemo.jl" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
-      
-      
-        <span><a href="../matrix/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../rational/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
-</div>
-    <script src="../js/theme.js"></script>
-      <script src="../mathjaxhelper.js"></script>
-      <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
-
-</body>
-</html>
+</footer></div></div></section></div><div class="rst-versions" role="note" style="cursor: pointer"><span class="rst-current-version" data-toggle="rst-current-version"><a class="fa fa-github" href="https://github.com/Nemocas/Nemo.jl" style="float: left; color: #fcfcfc"> GitHub</a><span><a href="../matrix/" style="color: #fcfcfc;">« Previous</a></span><span style="margin-left: 15px"><a href="../rational/" style="color: #fcfcfc">Next »</a></span></span></div><script src="../js/theme.js"></script><script src="../mathjaxhelper.js"></script><script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script></body></HTML>

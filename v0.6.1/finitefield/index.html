@@ -1,489 +1,95 @@
-<!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <meta name="author" content="William Hart">
-  <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Finite fields - Nemo.jl</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-  <link href="../assets/Documenter.css" rel="stylesheet">
-  
-  <script>
+<!DOCTYPE html><HTML class="no-js" lang="en"><head><meta charset="utf-8"/><meta content="IE=edge" http-equiv="X-UA-Compatible"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="William Hart" name="author"/><link href="../img/favicon.ico" rel="shortcut icon"/><title>Finite fields - Nemo.jl</title><link href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css"/><link href="../css/theme.css" rel="stylesheet" type="text/css"/><link href="../css/theme_extra.css" rel="stylesheet" type="text/css"/><link href="../css/highlight.css" rel="stylesheet"/><link href="../assets/Documenter.css" rel="stylesheet"/><script>
     // Current page data
     var mkdocs_page_name = "Finite fields";
     var mkdocs_page_input_path = "finitefield.md";
     var mkdocs_page_url = "/finitefield/";
-  </script>
-  
-  <script src="../js/jquery-2.1.1.min.js"></script>
-  <script src="../js/modernizr-2.8.3.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
-  
-</head>
+  </script><script src="../js/jquery-2.1.1.min.js"></script><script src="../js/modernizr-2.8.3.min.js"></script><script src="../js/highlight.pack.js" type="text/javascript"></script><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
 
-<body class="wy-body-for-nav" role="document">
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
 
-  <div class="wy-grid-for-nav">
+        head.appendChild(meta);
+    };
 
-    
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-      <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Nemo.jl</a>
-        <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-  </form>
-</div>
-      </div>
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-	  
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="..">Getting Started</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../about/">About Nemo</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../types/">Types in Nemo</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../constructors/">Parent object constructors</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../polynomial/">Univariate polynomials</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../series/">Capped relative power series</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../residue/">Residue rings</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../fraction/">Fraction fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../matrix/">Matrices</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../integer/">Integers</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../rational/">Rationals</a>
-	    </li>
-          
-            <li class="toctree-l1 current">
-		
-    <a class="current" href="./">Finite fields</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l2"><a href="#introduction">Introduction</a></li>
-    
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
 
-    <li class="toctree-l2"><a href="#finite-field-constructors">Finite field constructors</a></li>
-    
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
 
-    <li class="toctree-l2"><a href="#finite-field-element-constructors">Finite field element constructors</a></li>
-    
-
-    <li class="toctree-l2"><a href="#basic-functionality">Basic functionality</a></li>
-    
-
-    <li class="toctree-l2"><a href="#basic-manipulation">Basic manipulation</a></li>
-    
-
-    <li class="toctree-l2"><a href="#arithmetic-operations">Arithmetic operations</a></li>
-    
-
-    <li class="toctree-l2"><a href="#comparison">Comparison</a></li>
-    
-
-    <li class="toctree-l2"><a href="#function">Function</a></li>
-    
-
-    <li class="toctree-l2"><a href="#function_1">Function</a></li>
-    
-
-    <li class="toctree-l2"><a href="#inversion">Inversion</a></li>
-    
-
-    <li class="toctree-l2"><a href="#special-functions">Special functions</a></li>
-    
-
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../padic/">P-adic fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../arb/">Real balls</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../acb/">Complex boxes</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../numberfield/">Number fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../maximalorder/">Maximal orders</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../classgroup/">Class groups</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../perm/">Permutation groups</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../factor/">Factorization</a>
-	    </li>
-          
-        </ul>
-      </div>
-      &nbsp;
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="..">Nemo.jl</a>
-      </nav>
-
-      
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
-  <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    
-      
-    
-    <li>Finite fields</li>
-    <li class="wy-breadcrumbs-aside">
-      
-        <a href="https://github.com/Nemocas/Nemo.jl/edit/master/docs/finitefield.md"
-          class="icon icon-github"> Edit on GitHub</a>
-      
-    </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main">
-            <div class="section">
-              
-                <p><a id='Introduction-1'></a></p>
-<h2 id="introduction">Introduction</h2>
-<p>Finite fields are provided in Nemo by Flint. This allows construction of finite fields of any characteristic and degree for which there are Conway polynomials. It is also possible for the user to specify their own irreducible polynomial generating a finite field.</p>
-<p>Finite fields are constructed using the <code>FlintFiniteField</code> function. However, for convenience we define</p>
-<pre><code>FiniteField = FlintFiniteField
-</code></pre>
-
-<p>so that finite fields can be constructed using <code>FiniteField</code> rather than <code>FlintFiniteField</code>. Note that this is the name of the constructor, but not of finite field type.</p>
-<p>The types of finite field elements in Nemo are given in the following table, along with the libraries that provide them and the associated types of the parent objects.</p>
-<table>
-<thead>
-<tr>
-<th align="right">Library</th>
-<th align="right">Field</th>
-<th align="right">Element type</th>
-<th align="right">Parent type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">Flint</td>
-<td align="right">
-<script type="math/tex">\mathbb{F}_{p^n}</script> (small <script type="math/tex">p</script>)</td>
-<td align="right"><code>fq_nmod</code></td>
-<td align="right"><code>FqNmodFiniteField</code></td>
-</tr>
-<tr>
-<td align="right">Flint</td>
-<td align="right">
-<script type="math/tex">\mathbb{F}_{p^n}</script> (large <script type="math/tex">p</script>)</td>
-<td align="right"><code>fq</code></td>
-<td align="right"><code>FqFiniteField</code></td>
-</tr>
-</tbody>
-</table>
-<p>The only difference between the <code>fq</code> and <code>fq_nmod</code> types is the representation. The former is for finite fields with multiprecision characteristic and the latter is for characteristics that fit into a single unsigned machine word. The <code>FlintFiniteField</code> constructor automatically picks the correct representation for the user, and so the average user doesn't need to know about the actual types.</p>
-<p>All the finite field types belong to the <code>FinField</code> abstract type and the finite field element types belong to the <code>FinFieldElem</code> abstract type.</p>
-<p>Since all the functionality for the <code>fq</code> finite field type is identical to that provided for the <code>fq_nmod</code> finite field type, we simply document the former.</p>
-<p><a id='Finite-field-constructors-1'></a></p>
-<h2 id="finite-field-constructors">Finite field constructors</h2>
-<p>In order to construct finite field elements in Nemo, one must first construct the finite field itself. This is accomplished with one of the following constructors.</p>
-<p><a id='Nemo.FlintFiniteField-Tuple{Nemo.fmpz,Int64,AbstractString}' href='#Nemo.FlintFiniteField-Tuple{Nemo.fmpz,Int64,AbstractString}'>#</a>
-<strong><code>Nemo.FlintFiniteField</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>FlintFiniteField(char::fmpz, deg::Int, s::AbstractString)
-</code></pre>
-
-<blockquote>
-<p>Returns a tuple <script type="math/tex">S, x</script> consisting of a finite field parent object <script type="math/tex">S</script> and generator <script type="math/tex">x</script> for the finite field of the given characteristic and degree. The string <script type="math/tex">s</script> is used to designate how the finite field generator will be printed. The characteristic must be prime. When a Conway polynomial is known, the field is generated using the Conway polynomial. Otherwise a random sparse, irreducible polynomial is used. The generator of the field is  guaranteed to be a multiplicative generator only if the field is generated by a Conway polynomial. We require the degree to be positive.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L521' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.FlintFiniteField-Tuple{Integer,Int64,AbstractString}' href='#Nemo.FlintFiniteField-Tuple{Integer,Int64,AbstractString}'>#</a>
-<strong><code>Nemo.FlintFiniteField</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>FlintFiniteField(char::Integer, deg::Int, s::AbstractString)
-</code></pre>
-
-<blockquote>
-<p>Returns a tuple <script type="math/tex">S, x</script> consisting of a finite field parent object <script type="math/tex">S</script> and generator <script type="math/tex">x</script> for the finite field of the given characteristic and degree. The string <script type="math/tex">s</script> is used to designate how the finite field generator will be printed. The characteristic must be prime. When a Conway polynomial is known, the field is generated using the Conway polynomial. Otherwise a random sparse, irreducible polynomial is used. The generator of the field is  guaranteed to be a multiplicative generator only if the field is generated by a Conway polynomial. We require the degree to be positive.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L538' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.FlintFiniteField-Tuple{Nemo.fmpz_mod_poly,AbstractString}' href='#Nemo.FlintFiniteField-Tuple{Nemo.fmpz_mod_poly,AbstractString}'>#</a>
-<strong><code>Nemo.FlintFiniteField</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>FlintFiniteField(pol::fmpz_mod_poly, s::AbstractString)
-</code></pre>
-
-<blockquote>
-<p>Returns a tuple <script type="math/tex">S, x</script> consisting of a finite field parent object <script type="math/tex">S</script> and generator <script type="math/tex">x</script> for the finite field over <script type="math/tex">F_p</script> defined by the given polynomial, i.e. <script type="math/tex">\mathbb{F}_p[t]/(pol)</script>. The characteristic is specified by the modulus of <code>pol</code>. The polynomial is required to be irreducible, but this is not checked. The string <script type="math/tex">s</script> is used to designate how the finite field generator will be printed. The generator will not be multiplicative in general.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L553' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of creating finite fields and making use of the resulting parent objects to coerce various elements into those fields.</p>
-<pre><code>R, x = FiniteField(7, 3, &quot;x&quot;)
-S, y = FiniteField(ZZ(12431351431561), 2, &quot;y&quot;)
-T, t = PolynomialRing(ResidueRing(ZZ, 12431351431561), &quot;t&quot;)
-U, z = FiniteField(t^2 + 7, &quot;z&quot;)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body class="wy-body-for-nav" role="document"><div class="wy-grid-for-nav"><nav class="wy-nav-side stickynav" data-toggle="wy-nav-shift"><div class="wy-side-nav-search"><a class="icon icon-home" href=".."> Nemo.jl</a><div role="search"><form action="../search.html" class="wy-form" id="rtd-search-form" method="get"><input name="q" placeholder="Search docs" type="text"/></form></div></div><div aria-label="main navigation" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation"><ul class="current"><li class="toctree-l1"><a class="" href="..">Getting Started</a></li><li class="toctree-l1"><a class="" href="../about/">About Nemo</a></li><li class="toctree-l1"><a class="" href="../types/">Types in Nemo</a></li><li class="toctree-l1"><a class="" href="../constructors/">Parent object constructors</a></li><li class="toctree-l1"><a class="" href="../polynomial/">Univariate polynomials</a></li><li class="toctree-l1"><a class="" href="../series/">Capped relative power series</a></li><li class="toctree-l1"><a class="" href="../residue/">Residue rings</a></li><li class="toctree-l1"><a class="" href="../fraction/">Fraction fields</a></li><li class="toctree-l1"><a class="" href="../matrix/">Matrices</a></li><li class="toctree-l1"><a class="" href="../integer/">Integers</a></li><li class="toctree-l1"><a class="" href="../rational/">Rationals</a></li><li class="toctree-l1 current"><a class="current" href="./">Finite fields</a><ul class="subnav"><li class="toctree-l2"><a href="#introduction">Introduction</a></li><li class="toctree-l2"><a href="#finite-field-constructors">Finite field constructors</a></li><li class="toctree-l2"><a href="#finite-field-element-constructors">Finite field element constructors</a></li><li class="toctree-l2"><a href="#basic-functionality">Basic functionality</a></li><li class="toctree-l2"><a href="#basic-manipulation">Basic manipulation</a></li><li class="toctree-l2"><a href="#arithmetic-operations">Arithmetic operations</a></li><li class="toctree-l2"><a href="#comparison">Comparison</a></li><li class="toctree-l2"><a href="#function">Function</a></li><li class="toctree-l2"><a href="#function_1">Function</a></li><li class="toctree-l2"><a href="#inversion">Inversion</a></li><li class="toctree-l2"><a href="#special-functions">Special functions</a></li></ul></li><li class="toctree-l1"><a class="" href="../padic/">P-adic fields</a></li><li class="toctree-l1"><a class="" href="../arb/">Real balls</a></li><li class="toctree-l1"><a class="" href="../acb/">Complex boxes</a></li><li class="toctree-l1"><a class="" href="../numberfield/">Number fields</a></li><li class="toctree-l1"><a class="" href="../maximalorder/">Maximal orders</a></li><li class="toctree-l1"><a class="" href="../classgroup/">Class groups</a></li><li class="toctree-l1"><a class="" href="../perm/">Permutation groups</a></li><li class="toctree-l1"><a class="" href="../factor/">Factorization</a></li></ul></div>
+       
+    </nav><section class="wy-nav-content-wrap" data-toggle="wy-nav-shift"><nav aria-label="top navigation" class="wy-nav-top" role="navigation"><i class="fa fa-bars" data-toggle="wy-nav-top"></i><a href="..">Nemo.jl</a></nav><div class="wy-nav-content"><div class="rst-content"><div aria-label="breadcrumbs navigation" role="navigation"><ul class="wy-breadcrumbs"><li><a href="..">Docs</a> »</li><li>Finite fields</li><li class="wy-breadcrumbs-aside"><a class="icon icon-github" href="https://github.com/Nemocas/Nemo.jl/edit/master/docs/finitefield.md"> Edit on GitHub</a></li></ul><hr/></div><div role="main"><div class="section"><p><a id="Introduction-1"></a></p><h2 id="introduction">Introduction</h2><p>Finite fields are provided in Nemo by Flint. This allows construction of finite fields of any characteristic and degree for which there are Conway polynomials. It is also possible for the user to specify their own irreducible polynomial generating a finite field.</p><p>Finite fields are constructed using the <code>FlintFiniteField</code> function. However, for convenience we define</p><pre><code>FiniteField = FlintFiniteField
+</code></pre><p>so that finite fields can be constructed using <code>FiniteField</code> rather than <code>FlintFiniteField</code>. Note that this is the name of the constructor, but not of finite field type.</p><p>The types of finite field elements in Nemo are given in the following table, along with the libraries that provide them and the associated types of the parent objects.</p><table><thead><tr><th align="right">Library</th><th align="right">Field</th><th align="right">Element type</th><th align="right">Parent type</th></tr></thead><tbody><tr><td align="right">Flint</td><td align="right"><script type="math/tex">\mathbb{F}_{p^n}</script> (small <script type="math/tex">p</script>)</td><td align="right"><code>fq_nmod</code></td><td align="right"><code>FqNmodFiniteField</code></td></tr><tr><td align="right">Flint</td><td align="right"><script type="math/tex">\mathbb{F}_{p^n}</script> (large <script type="math/tex">p</script>)</td><td align="right"><code>fq</code></td><td align="right"><code>FqFiniteField</code></td></tr></tbody></table><p>The only difference between the <code>fq</code> and <code>fq_nmod</code> types is the representation. The former is for finite fields with multiprecision characteristic and the latter is for characteristics that fit into a single unsigned machine word. The <code>FlintFiniteField</code> constructor automatically picks the correct representation for the user, and so the average user doesn't need to know about the actual types.</p><p>All the finite field types belong to the <code>FinField</code> abstract type and the finite field element types belong to the <code>FinFieldElem</code> abstract type.</p><p>Since all the functionality for the <code>fq</code> finite field type is identical to that provided for the <code>fq_nmod</code> finite field type, we simply document the former.</p><p><a id="Finite-field-constructors-1"></a></p><h2 id="finite-field-constructors">Finite field constructors</h2><p>In order to construct finite field elements in Nemo, one must first construct the finite field itself. This is accomplished with one of the following constructors.</p><p><a href="#Nemo.FlintFiniteField-Tuple{Nemo.fmpz,Int64,AbstractString}" id="Nemo.FlintFiniteField-Tuple{Nemo.fmpz,Int64,AbstractString}">#</a><strong><code>Nemo.FlintFiniteField</code></strong> — <em>Method</em>.</p><pre><code>FlintFiniteField(char::fmpz, deg::Int, s::AbstractString)
+</code></pre><blockquote><p>Returns a tuple <script type="math/tex">S, x</script> consisting of a finite field parent object <script type="math/tex">S</script> and generator <script type="math/tex">x</script> for the finite field of the given characteristic and degree. The string <script type="math/tex">s</script> is used to designate how the finite field generator will be printed. The characteristic must be prime. When a Conway polynomial is known, the field is generated using the Conway polynomial. Otherwise a random sparse, irreducible polynomial is used. The generator of the field is  guaranteed to be a multiplicative generator only if the field is generated by a Conway polynomial. We require the degree to be positive.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L521" target="_blank">source</a><br/></p><p><a href="#Nemo.FlintFiniteField-Tuple{Integer,Int64,AbstractString}" id="Nemo.FlintFiniteField-Tuple{Integer,Int64,AbstractString}">#</a><strong><code>Nemo.FlintFiniteField</code></strong> — <em>Method</em>.</p><pre><code>FlintFiniteField(char::Integer, deg::Int, s::AbstractString)
+</code></pre><blockquote><p>Returns a tuple <script type="math/tex">S, x</script> consisting of a finite field parent object <script type="math/tex">S</script> and generator <script type="math/tex">x</script> for the finite field of the given characteristic and degree. The string <script type="math/tex">s</script> is used to designate how the finite field generator will be printed. The characteristic must be prime. When a Conway polynomial is known, the field is generated using the Conway polynomial. Otherwise a random sparse, irreducible polynomial is used. The generator of the field is  guaranteed to be a multiplicative generator only if the field is generated by a Conway polynomial. We require the degree to be positive.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L538" target="_blank">source</a><br/></p><p><a href="#Nemo.FlintFiniteField-Tuple{Nemo.fmpz_mod_poly,AbstractString}" id="Nemo.FlintFiniteField-Tuple{Nemo.fmpz_mod_poly,AbstractString}">#</a><strong><code>Nemo.FlintFiniteField</code></strong> — <em>Method</em>.</p><pre><code>FlintFiniteField(pol::fmpz_mod_poly, s::AbstractString)
+</code></pre><blockquote><p>Returns a tuple <script type="math/tex">S, x</script> consisting of a finite field parent object <script type="math/tex">S</script> and generator <script type="math/tex">x</script> for the finite field over <script type="math/tex">F_p</script> defined by the given polynomial, i.e. <script type="math/tex">\mathbb{F}_p[t]/(pol)</script>. The characteristic is specified by the modulus of <code>pol</code>. The polynomial is required to be irreducible, but this is not checked. The string <script type="math/tex">s</script> is used to designate how the finite field generator will be printed. The generator will not be multiplicative in general.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L553" target="_blank">source</a><br/></p><p>Here are some examples of creating finite fields and making use of the resulting parent objects to coerce various elements into those fields.</p><pre><code>R, x = FiniteField(7, 3, "x")
+S, y = FiniteField(ZZ(12431351431561), 2, "y")
+T, t = PolynomialRing(ResidueRing(ZZ, 12431351431561), "t")
+U, z = FiniteField(t^2 + 7, "z")
 
 a = R(5)
 b = R(x)
 c = S(ZZ(11))
 d = U(7)
-</code></pre>
-
-<p><a id='Finite-field-element-constructors-1'></a></p>
-<h2 id="finite-field-element-constructors">Finite field element constructors</h2>
-<p>Once a finite field is constructed, there are various ways to construct elements in that field.</p>
-<p>Apart from coercing elements into the finite field as above, we offer the following functions.</p>
-<p><a id='Base.zero-Tuple{Nemo.FqFiniteField}' href='#Base.zero-Tuple{Nemo.FqFiniteField}'>#</a>
-<strong><code>Base.zero</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>zero(a::FqFiniteField)
-</code></pre>
-
-<blockquote>
-<p>Return the additive identity, zero, in the given finite field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L70' class='documenter-source'>source</a><br></p>
-<p><a id='Base.one-Tuple{Nemo.FqFiniteField}' href='#Base.one-Tuple{Nemo.FqFiniteField}'>#</a>
-<strong><code>Base.one</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>one(a::FqFiniteField)
-</code></pre>
-
-<blockquote>
-<p>Return the multiplicative identity, one, in the given finite field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L80' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.gen-Tuple{Nemo.FqFiniteField}' href='#Nemo.gen-Tuple{Nemo.FqFiniteField}'>#</a>
-<strong><code>Nemo.gen</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>gen(a::FqFiniteField)
-</code></pre>
-
-<blockquote>
-<p>Return the generator of the finite field. Note that this is only guaranteed to be a multiplicative generator if the finite field is generated by a Conway polynomial automatically.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L90' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of constructing finite field elements.</p>
-<pre><code>R, x = FiniteField(ZZ(7), 5, &quot;x&quot;)
+</code></pre><p><a id="Finite-field-element-constructors-1"></a></p><h2 id="finite-field-element-constructors">Finite field element constructors</h2><p>Once a finite field is constructed, there are various ways to construct elements in that field.</p><p>Apart from coercing elements into the finite field as above, we offer the following functions.</p><p><a href="#Base.zero-Tuple{Nemo.FqFiniteField}" id="Base.zero-Tuple{Nemo.FqFiniteField}">#</a><strong><code>Base.zero</code></strong> — <em>Method</em>.</p><pre><code>zero(a::FqFiniteField)
+</code></pre><blockquote><p>Return the additive identity, zero, in the given finite field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L70" target="_blank">source</a><br/></p><p><a href="#Base.one-Tuple{Nemo.FqFiniteField}" id="Base.one-Tuple{Nemo.FqFiniteField}">#</a><strong><code>Base.one</code></strong> — <em>Method</em>.</p><pre><code>one(a::FqFiniteField)
+</code></pre><blockquote><p>Return the multiplicative identity, one, in the given finite field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L80" target="_blank">source</a><br/></p><p><a href="#Nemo.gen-Tuple{Nemo.FqFiniteField}" id="Nemo.gen-Tuple{Nemo.FqFiniteField}">#</a><strong><code>Nemo.gen</code></strong> — <em>Method</em>.</p><pre><code>gen(a::FqFiniteField)
+</code></pre><blockquote><p>Return the generator of the finite field. Note that this is only guaranteed to be a multiplicative generator if the finite field is generated by a Conway polynomial automatically.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L90" target="_blank">source</a><br/></p><p>Here are some examples of constructing finite field elements.</p><pre><code>R, x = FiniteField(ZZ(7), 5, "x")
 
 a = zero(R)
 b = one(R)
 c = gen(R)
-</code></pre>
-
-<p><a id='Basic-functionality-1'></a></p>
-<h2 id="basic-functionality">Basic functionality</h2>
-<p>The following basic functionality is provided by the default finite field implementation in Nemo, to support construction of generic rings over finite fields. Any custom finite field implementation in Nemo should provide these  functions along with the usual arithmetic operations.</p>
-<pre><code>parent_type(::Type{fq})
-</code></pre>
-
-<p>Gives the type of the parent object of a Flint finite field element.</p>
-<pre><code>elem_type(R::FqFiniteField)
-</code></pre>
-
-<p>Given the parent object for a finite field, return the type of elements of the field.</p>
-<pre><code>Base.hash(a::fq, h::UInt)
-</code></pre>
-
-<p>Return a <code>UInt</code> hexadecimal hash of the finite field element <script type="math/tex">a</script>. This should be xor'd with a fixed random hexadecimal specific to the finite field type. The hash of the coefficients of the finite field representation should be xor'd with the supplied parameter <code>h</code> as part of computing the hash.</p>
-<pre><code>deepcopy(a::fq)
-</code></pre>
-
-<p>Construct a copy of the given finite field element and return it. This function must recursively construct copies of all of the internal data in the given element. Nemo finite field elements are mutable and so returning shallow copies is not sufficient.</p>
-<pre><code>mul!(c::fq, a::fq, b::fq)
-</code></pre>
-
-<p>Multiply <script type="math/tex">a</script> by <script type="math/tex">b</script> and set the existing finite field element <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p>
-<pre><code>addeq!(c::fq, a::fq)
-</code></pre>
-
-<p>In-place addition. Adds <script type="math/tex">a</script> to <script type="math/tex">c</script> and sets <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p>
-<p>Given the parent object <code>R</code> for a finite field, the following coercion functions are provided to coerce various elements into the finite field. Developers provide these by overloading the <code>call</code> operator for the finite field parent objects.</p>
-<pre><code>R()
-</code></pre>
-
-<p>Coerce zero into the finite field.</p>
-<pre><code>R(n::Integer)
+</code></pre><p><a id="Basic-functionality-1"></a></p><h2 id="basic-functionality">Basic functionality</h2><p>The following basic functionality is provided by the default finite field implementation in Nemo, to support construction of generic rings over finite fields. Any custom finite field implementation in Nemo should provide these  functions along with the usual arithmetic operations.</p><pre><code>parent_type(::Type{fq})
+</code></pre><p>Gives the type of the parent object of a Flint finite field element.</p><pre><code>elem_type(R::FqFiniteField)
+</code></pre><p>Given the parent object for a finite field, return the type of elements of the field.</p><pre><code>Base.hash(a::fq, h::UInt)
+</code></pre><p>Return a <code>UInt</code> hexadecimal hash of the finite field element <script type="math/tex">a</script>. This should be xor'd with a fixed random hexadecimal specific to the finite field type. The hash of the coefficients of the finite field representation should be xor'd with the supplied parameter <code>h</code> as part of computing the hash.</p><pre><code>deepcopy(a::fq)
+</code></pre><p>Construct a copy of the given finite field element and return it. This function must recursively construct copies of all of the internal data in the given element. Nemo finite field elements are mutable and so returning shallow copies is not sufficient.</p><pre><code>mul!(c::fq, a::fq, b::fq)
+</code></pre><p>Multiply <script type="math/tex">a</script> by <script type="math/tex">b</script> and set the existing finite field element <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p><pre><code>addeq!(c::fq, a::fq)
+</code></pre><p>In-place addition. Adds <script type="math/tex">a</script> to <script type="math/tex">c</script> and sets <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p><p>Given the parent object <code>R</code> for a finite field, the following coercion functions are provided to coerce various elements into the finite field. Developers provide these by overloading the <code>call</code> operator for the finite field parent objects.</p><pre><code>R()
+</code></pre><p>Coerce zero into the finite field.</p><pre><code>R(n::Integer)
 R(f::fmpz)
-</code></pre>
-
-<p>Coerce an integer value into the finite field.</p>
-<pre><code>R(f::fq)
-</code></pre>
-
-<p>Take a finite field element that is already in the finite field and simply return it. A copy of the original is not made.</p>
-<p>In addition to the above, developers of custom finite field types must ensure that they provide the equivalent of the function <code>base_ring(R::FqFiniteField)</code> which should return <code>Union{}</code>. In addition to this they should ensure that each finite field element contains a field <code>parent</code> specifying the parent object of the finite field element, or at least supply the equivalent of the function <code>parent(a::fq)</code> to return the parent object of a finite field element.</p>
-<p><a id='Basic-manipulation-1'></a></p>
-<h2 id="basic-manipulation">Basic manipulation</h2>
-<p>Numerous functions are provided to manipulate finite field elements. Also see the section on basic functionality above.</p>
-<p><a id='Nemo.base_ring-Tuple{Nemo.FqFiniteField}' href='#Nemo.base_ring-Tuple{Nemo.FqFiniteField}'>#</a>
-<strong><code>Nemo.base_ring</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>base_ring(a::FqFiniteField)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>Union{}</code> as this field is not dependent on another field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L20' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.base_ring-Tuple{Nemo.fq}' href='#Nemo.base_ring-Tuple{Nemo.fq}'>#</a>
-<strong><code>Nemo.base_ring</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>base_ring(a::fq)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>Union{}</code> as this field is not dependent on another field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L26' class='documenter-source'>source</a><br></p>
-<p><a id='Base.parent-Tuple{Nemo.fq}' href='#Base.parent-Tuple{Nemo.fq}'>#</a>
-<strong><code>Base.parent</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>parent(a::fq)
-</code></pre>
-
-<blockquote>
-<p>Returns the parent of the given finite field element.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L32' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.iszero-Tuple{Nemo.fq}' href='#Nemo.iszero-Tuple{Nemo.fq}'>#</a>
-<strong><code>Nemo.iszero</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>iszero(a::fq)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if the given finite field element is zero, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L102' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.isone-Tuple{Nemo.fq}' href='#Nemo.isone-Tuple{Nemo.fq}'>#</a>
-<strong><code>Nemo.isone</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isone(a::fq)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if the given finite field element is one, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L110' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.isunit-Tuple{Nemo.fq}' href='#Nemo.isunit-Tuple{Nemo.fq}'>#</a>
-<strong><code>Nemo.isunit</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isunit(a::fq)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if the given finite field element is invertible, i.e. nonzero, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L125' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.isgen-Tuple{Nemo.fq}' href='#Nemo.isgen-Tuple{Nemo.fq}'>#</a>
-<strong><code>Nemo.isgen</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isgen(a::fq)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if the given finite field element is the generator of the finite field, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L118' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.coeff-Tuple{Nemo.fq,Int64}' href='#Nemo.coeff-Tuple{Nemo.fq,Int64}'>#</a>
-<strong><code>Nemo.coeff</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>coeff(x::fq, n::Int)
-</code></pre>
-
-<blockquote>
-<p>Return the degree <script type="math/tex">n</script> coefficient of the polynomial representing the given finite field element.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L57' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.degree-Tuple{Nemo.FqFiniteField}' href='#Nemo.degree-Tuple{Nemo.FqFiniteField}'>#</a>
-<strong><code>Nemo.degree</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>degree(a::FqFiniteField)
-</code></pre>
-
-<blockquote>
-<p>Return the degree of the given finite field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L155' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.characteristic-Tuple{Nemo.FqFiniteField}' href='#Nemo.characteristic-Tuple{Nemo.FqFiniteField}'>#</a>
-<strong><code>Nemo.characteristic</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>characteristic(a::FqFiniteField)
-</code></pre>
-
-<blockquote>
-<p>Return the characteristic of the given finite field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L133' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.order-Tuple{Nemo.FqFiniteField}' href='#Nemo.order-Tuple{Nemo.FqFiniteField}'>#</a>
-<strong><code>Nemo.order</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>order(a::FqFiniteField)
-</code></pre>
-
-<blockquote>
-<p>Return the order, i.e. the number of elements in, the given finite field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L144' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of basic manipulation of finite field elements.</p>
-<pre><code>R, x = FiniteField(ZZ(7), 5, &quot;x&quot;)
+</code></pre><p>Coerce an integer value into the finite field.</p><pre><code>R(f::fq)
+</code></pre><p>Take a finite field element that is already in the finite field and simply return it. A copy of the original is not made.</p><p>In addition to the above, developers of custom finite field types must ensure that they provide the equivalent of the function <code>base_ring(R::FqFiniteField)</code> which should return <code>Union{}</code>. In addition to this they should ensure that each finite field element contains a field <code>parent</code> specifying the parent object of the finite field element, or at least supply the equivalent of the function <code>parent(a::fq)</code> to return the parent object of a finite field element.</p><p><a id="Basic-manipulation-1"></a></p><h2 id="basic-manipulation">Basic manipulation</h2><p>Numerous functions are provided to manipulate finite field elements. Also see the section on basic functionality above.</p><p><a href="#Nemo.base_ring-Tuple{Nemo.FqFiniteField}" id="Nemo.base_ring-Tuple{Nemo.FqFiniteField}">#</a><strong><code>Nemo.base_ring</code></strong> — <em>Method</em>.</p><pre><code>base_ring(a::FqFiniteField)
+</code></pre><blockquote><p>Returns <code>Union{}</code> as this field is not dependent on another field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L20" target="_blank">source</a><br/></p><p><a href="#Nemo.base_ring-Tuple{Nemo.fq}" id="Nemo.base_ring-Tuple{Nemo.fq}">#</a><strong><code>Nemo.base_ring</code></strong> — <em>Method</em>.</p><pre><code>base_ring(a::fq)
+</code></pre><blockquote><p>Returns <code>Union{}</code> as this field is not dependent on another field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L26" target="_blank">source</a><br/></p><p><a href="#Base.parent-Tuple{Nemo.fq}" id="Base.parent-Tuple{Nemo.fq}">#</a><strong><code>Base.parent</code></strong> — <em>Method</em>.</p><pre><code>parent(a::fq)
+</code></pre><blockquote><p>Returns the parent of the given finite field element.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L32" target="_blank">source</a><br/></p><p><a href="#Nemo.iszero-Tuple{Nemo.fq}" id="Nemo.iszero-Tuple{Nemo.fq}">#</a><strong><code>Nemo.iszero</code></strong> — <em>Method</em>.</p><pre><code>iszero(a::fq)
+</code></pre><blockquote><p>Return <code>true</code> if the given finite field element is zero, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L102" target="_blank">source</a><br/></p><p><a href="#Nemo.isone-Tuple{Nemo.fq}" id="Nemo.isone-Tuple{Nemo.fq}">#</a><strong><code>Nemo.isone</code></strong> — <em>Method</em>.</p><pre><code>isone(a::fq)
+</code></pre><blockquote><p>Return <code>true</code> if the given finite field element is one, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L110" target="_blank">source</a><br/></p><p><a href="#Nemo.isunit-Tuple{Nemo.fq}" id="Nemo.isunit-Tuple{Nemo.fq}">#</a><strong><code>Nemo.isunit</code></strong> — <em>Method</em>.</p><pre><code>isunit(a::fq)
+</code></pre><blockquote><p>Return <code>true</code> if the given finite field element is invertible, i.e. nonzero, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L125" target="_blank">source</a><br/></p><p><a href="#Nemo.isgen-Tuple{Nemo.fq}" id="Nemo.isgen-Tuple{Nemo.fq}">#</a><strong><code>Nemo.isgen</code></strong> — <em>Method</em>.</p><pre><code>isgen(a::fq)
+</code></pre><blockquote><p>Return <code>true</code> if the given finite field element is the generator of the finite field, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L118" target="_blank">source</a><br/></p><p><a href="#Nemo.coeff-Tuple{Nemo.fq,Int64}" id="Nemo.coeff-Tuple{Nemo.fq,Int64}">#</a><strong><code>Nemo.coeff</code></strong> — <em>Method</em>.</p><pre><code>coeff(x::fq, n::Int)
+</code></pre><blockquote><p>Return the degree <script type="math/tex">n</script> coefficient of the polynomial representing the given finite field element.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L57" target="_blank">source</a><br/></p><p><a href="#Nemo.degree-Tuple{Nemo.FqFiniteField}" id="Nemo.degree-Tuple{Nemo.FqFiniteField}">#</a><strong><code>Nemo.degree</code></strong> — <em>Method</em>.</p><pre><code>degree(a::FqFiniteField)
+</code></pre><blockquote><p>Return the degree of the given finite field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L155" target="_blank">source</a><br/></p><p><a href="#Nemo.characteristic-Tuple{Nemo.FqFiniteField}" id="Nemo.characteristic-Tuple{Nemo.FqFiniteField}">#</a><strong><code>Nemo.characteristic</code></strong> — <em>Method</em>.</p><pre><code>characteristic(a::FqFiniteField)
+</code></pre><blockquote><p>Return the characteristic of the given finite field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L133" target="_blank">source</a><br/></p><p><a href="#Nemo.order-Tuple{Nemo.FqFiniteField}" id="Nemo.order-Tuple{Nemo.FqFiniteField}">#</a><strong><code>Nemo.order</code></strong> — <em>Method</em>.</p><pre><code>order(a::FqFiniteField)
+</code></pre><blockquote><p>Return the order, i.e. the number of elements in, the given finite field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L144" target="_blank">source</a><br/></p><p>Here are some examples of basic manipulation of finite field elements.</p><pre><code>R, x = FiniteField(ZZ(7), 5, "x")
 
 a = zero(R)
 b = one(R)
@@ -498,126 +104,7 @@ m = isunit(x + 1)
 n = isgen(x)
 U = parent(x + 1)
 V = base_ring(R)
-</code></pre>
-
-<p><a id='Arithmetic-operations-1'></a></p>
-<h2 id="arithmetic-operations">Arithmetic operations</h2>
-<p>Nemo provides all the standard field operations for finite field elements, as follows.</p>
-<table>
-<thead>
-<tr>
-<th align="right">Function</th>
-<th align="right">Operation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">-(a::fq)</td>
-<td align="right">unary minus</td>
-</tr>
-<tr>
-<td align="right">+(a::fq, b::fq)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">-(a::fq, b::fq)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">*(a::fq, b::fq)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">divexact(a::fq, b::fq)</td>
-<td align="right">exact division</td>
-</tr>
-</tbody>
-</table>
-<p>In addition, the following ad hoc field operations are defined.</p>
-<table>
-<thead>
-<tr>
-<th align="right">Function</th>
-<th align="right">Operation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">+(a::fq, b::Integer)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">+(a::Integer, b::fq)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">+(a::fq, b::fmpz)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">+(a::fmpz, b::fq)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">-(a::fq, b::Integer)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">-(a::Integer, b::fq)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">-(a::fq, b::fmpz)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">-(a::fmpz, b::fq)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">*(a::fq, b::Integer)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">*(a::Integer, b::fq)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">*(a::fq, b::fmpz)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">*(a::fmpz, b::fq)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">divexact(a::fq, b::Integer)</td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right">divexact(a::fq, b::fmpz)</td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right">divexact(a::Integer, b::fq)</td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right">divexact(a::fmpz, b::fq)</td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right">^(a::fq, b::Int)</td>
-<td align="right">powering</td>
-</tr>
-<tr>
-<td align="right">^(a::fq, b::fmpz)</td>
-<td align="right">powering</td>
-</tr>
-</tbody>
-</table>
-<p>Here are some examples of arithmetic operations on finite fields.</p>
-<pre><code>R, x = FiniteField(ZZ(7), 5, &quot;x&quot;)
+</code></pre><p><a id="Arithmetic-operations-1"></a></p><h2 id="arithmetic-operations">Arithmetic operations</h2><p>Nemo provides all the standard field operations for finite field elements, as follows.</p><table><thead><tr><th align="right">Function</th><th align="right">Operation</th></tr></thead><tbody><tr><td align="right">-(a::fq)</td><td align="right">unary minus</td></tr><tr><td align="right">+(a::fq, b::fq)</td><td align="right">addition</td></tr><tr><td align="right">-(a::fq, b::fq)</td><td align="right">subtraction</td></tr><tr><td align="right">*(a::fq, b::fq)</td><td align="right">multiplication</td></tr><tr><td align="right">divexact(a::fq, b::fq)</td><td align="right">exact division</td></tr></tbody></table><p>In addition, the following ad hoc field operations are defined.</p><table><thead><tr><th align="right">Function</th><th align="right">Operation</th></tr></thead><tbody><tr><td align="right">+(a::fq, b::Integer)</td><td align="right">addition</td></tr><tr><td align="right">+(a::Integer, b::fq)</td><td align="right">addition</td></tr><tr><td align="right">+(a::fq, b::fmpz)</td><td align="right">addition</td></tr><tr><td align="right">+(a::fmpz, b::fq)</td><td align="right">addition</td></tr><tr><td align="right">-(a::fq, b::Integer)</td><td align="right">subtraction</td></tr><tr><td align="right">-(a::Integer, b::fq)</td><td align="right">subtraction</td></tr><tr><td align="right">-(a::fq, b::fmpz)</td><td align="right">subtraction</td></tr><tr><td align="right">-(a::fmpz, b::fq)</td><td align="right">subtraction</td></tr><tr><td align="right">*(a::fq, b::Integer)</td><td align="right">multiplication</td></tr><tr><td align="right">*(a::Integer, b::fq)</td><td align="right">multiplication</td></tr><tr><td align="right">*(a::fq, b::fmpz)</td><td align="right">multiplication</td></tr><tr><td align="right">*(a::fmpz, b::fq)</td><td align="right">multiplication</td></tr><tr><td align="right">divexact(a::fq, b::Integer)</td><td align="right">exact division</td></tr><tr><td align="right">divexact(a::fq, b::fmpz)</td><td align="right">exact division</td></tr><tr><td align="right">divexact(a::Integer, b::fq)</td><td align="right">exact division</td></tr><tr><td align="right">divexact(a::fmpz, b::fq)</td><td align="right">exact division</td></tr><tr><td align="right">^(a::fq, b::Int)</td><td align="right">powering</td></tr><tr><td align="right">^(a::fq, b::fmpz)</td><td align="right">powering</td></tr></tbody></table><p>Here are some examples of arithmetic operations on finite fields.</p><pre><code>R, x = FiniteField(ZZ(7), 5, "x")
 
 a = x^4 + 3x^2 + 6x + 1
 b = 3x^4 + 2x^2 + x + 1
@@ -631,20 +118,7 @@ k = divexact(a, b)
 m = divexact(1, b)
 n = divexact(a, ZZ(2))
 p = a^3
-</code></pre>
-
-<p><a id='Comparison-1'></a></p>
-<h2 id="comparison">Comparison</h2>
-<p>Nemo provides the comparison operation <code>==</code> for finite field elements. Julia then automatically provides the corresponding <code>!=</code> operation. Here are the functions provided.</p>
-<p><a id='Function-1'></a></p>
-<h2 id="function">Function</h2>
-<p>==(a::fq, b::fq)</p>
-<p>In addition, the following ad hoc comparisons are provided, Julia again providing the corresponding <code>!=</code> operators.</p>
-<p><a id='Function-2'></a></p>
-<h2 id="function_1">Function</h2>
-<p>==(a::fq, b::Integer) ==(a::fq, b::fmpz) ==(a::Integer, b::fq) ==(a::fmpz, b::fq)</p>
-<p>Here are some examples of comparisons.</p>
-<pre><code>R, x = FiniteField(ZZ(7), 5, &quot;x&quot;)
+</code></pre><p><a id="Comparison-1"></a></p><h2 id="comparison">Comparison</h2><p>Nemo provides the comparison operation <code>==</code> for finite field elements. Julia then automatically provides the corresponding <code>!=</code> operation. Here are the functions provided.</p><p><a id="Function-1"></a></p><h2 id="function">Function</h2><p>==(a::fq, b::fq)</p><p>In addition, the following ad hoc comparisons are provided, Julia again providing the corresponding <code>!=</code> operators.</p><p><a id="Function-2"></a></p><h2 id="function_1">Function</h2><p>==(a::fq, b::Integer) ==(a::fq, b::fmpz) ==(a::Integer, b::fq) ==(a::fmpz, b::fq)</p><p>Here are some examples of comparisons.</p><pre><code>R, x = FiniteField(ZZ(7), 5, "x")
 
 a = x^4 + 3x^2 + 6x + 1
 b = 3x^4 + 2x^2 + 2
@@ -652,68 +126,17 @@ b = 3x^4 + 2x^2 + 2
 b != a
 a == 3
 ZZ(5) == b
-</code></pre>
-
-<p><a id='Inversion-1'></a></p>
-<h2 id="inversion">Inversion</h2>
-<p><a id='Base.inv-Tuple{Nemo.fq}' href='#Base.inv-Tuple{Nemo.fq}'>#</a>
-<strong><code>Base.inv</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>inv(x::fq)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">x^{-1}</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L383' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of inversion.</p>
-<pre><code>R, x = FiniteField(ZZ(7), 5, &quot;x&quot;)
+</code></pre><p><a id="Inversion-1"></a></p><h2 id="inversion">Inversion</h2><p><a href="#Base.inv-Tuple{Nemo.fq}" id="Base.inv-Tuple{Nemo.fq}">#</a><strong><code>Base.inv</code></strong> — <em>Method</em>.</p><pre><code>inv(x::fq)
+</code></pre><blockquote><p>Return <script type="math/tex">x^{-1}</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L383" target="_blank">source</a><br/></p><p>Here are some examples of inversion.</p><pre><code>R, x = FiniteField(ZZ(7), 5, "x")
 
 a = x^4 + 3x^2 + 6x + 1
 
 b = inv(a)
-</code></pre>
-
-<p><a id='Special-functions-1'></a></p>
-<h2 id="special-functions">Special functions</h2>
-<p>Various special functions with finite field specific behaviour are defined.</p>
-<p><a id='Base.LinAlg.trace-Tuple{Nemo.fq}' href='#Base.LinAlg.trace-Tuple{Nemo.fq}'>#</a>
-<strong><code>Base.LinAlg.trace</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>trace(x::fq)
-</code></pre>
-
-<blockquote>
-<p>Return the trace of <script type="math/tex">a</script>. This is an element of <script type="math/tex">\F_p</script>, but the value returned is this value embedded in the original finite field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L413' class='documenter-source'>source</a><br></p>
-<p><a id='Base.LinAlg.norm-Tuple{Nemo.fq}' href='#Base.LinAlg.norm-Tuple{Nemo.fq}'>#</a>
-<strong><code>Base.LinAlg.norm</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>norm(x::fq)
-</code></pre>
-
-<blockquote>
-<p>Return the norm of <script type="math/tex">a</script>. This is an element of <script type="math/tex">\F_p</script>, but the value returned is this value embedded in the original finite field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L425' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.frobenius-Tuple{Nemo.fq,Int64}' href='#Nemo.frobenius-Tuple{Nemo.fq,Int64}'>#</a>
-<strong><code>Nemo.frobenius</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>frobenius(x::fq, n = 1)
-</code></pre>
-
-<blockquote>
-<p>Return the iterated Frobenius <script type="math/tex">\sigma_p^n(a)</script> where <script type="math/tex">\sigma_p</script> is the  Frobenius map sending the element <script type="math/tex">a</script> to <script type="math/tex">a^p</script> in the finite field of  characteristic <script type="math/tex">p</script>. By default the Frobenius map is applied <script type="math/tex">n = 1</script> times if <script type="math/tex">n</script> is not specified.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L437' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.pth_root-Tuple{Nemo.fq}' href='#Nemo.pth_root-Tuple{Nemo.fq}'>#</a>
-<strong><code>Nemo.pth_root</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>pth_root(x::fq)
-</code></pre>
-
-<blockquote>
-<p>Return the <script type="math/tex">p</script>-th root of <script type="math/tex">a</script> in the finite field of characteristic <script type="math/tex">p</script>. This is the inverse operation to the Frobenius map <script type="math/tex">\sigma_p</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L401' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of special functions.</p>
-<pre><code>R, x = FiniteField(ZZ(7), 5, &quot;x&quot;)
+</code></pre><p><a id="Special-functions-1"></a></p><h2 id="special-functions">Special functions</h2><p>Various special functions with finite field specific behaviour are defined.</p><p><a href="#Base.LinAlg.trace-Tuple{Nemo.fq}" id="Base.LinAlg.trace-Tuple{Nemo.fq}">#</a><strong><code>Base.LinAlg.trace</code></strong> — <em>Method</em>.</p><pre><code>trace(x::fq)
+</code></pre><blockquote><p>Return the trace of <script type="math/tex">a</script>. This is an element of <script type="math/tex">\F_p</script>, but the value returned is this value embedded in the original finite field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L413" target="_blank">source</a><br/></p><p><a href="#Base.LinAlg.norm-Tuple{Nemo.fq}" id="Base.LinAlg.norm-Tuple{Nemo.fq}">#</a><strong><code>Base.LinAlg.norm</code></strong> — <em>Method</em>.</p><pre><code>norm(x::fq)
+</code></pre><blockquote><p>Return the norm of <script type="math/tex">a</script>. This is an element of <script type="math/tex">\F_p</script>, but the value returned is this value embedded in the original finite field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L425" target="_blank">source</a><br/></p><p><a href="#Nemo.frobenius-Tuple{Nemo.fq,Int64}" id="Nemo.frobenius-Tuple{Nemo.fq,Int64}">#</a><strong><code>Nemo.frobenius</code></strong> — <em>Method</em>.</p><pre><code>frobenius(x::fq, n = 1)
+</code></pre><blockquote><p>Return the iterated Frobenius <script type="math/tex">\sigma_p^n(a)</script> where <script type="math/tex">\sigma_p</script> is the  Frobenius map sending the element <script type="math/tex">a</script> to <script type="math/tex">a^p</script> in the finite field of  characteristic <script type="math/tex">p</script>. By default the Frobenius map is applied <script type="math/tex">n = 1</script> times if <script type="math/tex">n</script> is not specified.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L437" target="_blank">source</a><br/></p><p><a href="#Nemo.pth_root-Tuple{Nemo.fq}" id="Nemo.pth_root-Tuple{Nemo.fq}">#</a><strong><code>Nemo.pth_root</code></strong> — <em>Method</em>.</p><pre><code>pth_root(x::fq)
+</code></pre><blockquote><p>Return the <script type="math/tex">p</script>-th root of <script type="math/tex">a</script> in the finite field of characteristic <script type="math/tex">p</script>. This is the inverse operation to the Frobenius map <script type="math/tex">\sigma_p</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/flint/fq.jl#L401" target="_blank">source</a><br/></p><p>Here are some examples of special functions.</p><pre><code>R, x = FiniteField(ZZ(7), 5, "x")
 
 a = x^4 + 3x^2 + 6x + 1
 
@@ -722,55 +145,7 @@ c = norm(a)
 d = frobenius(a)
 f = frobenius(a, 3)
 g = pth_root(a)
-</code></pre>
-              
-            </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../padic/" class="btn btn-neutral float-right" title="P-adic fields">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../rational/" class="btn btn-neutral" title="Rationals"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <!-- Copyright etc -->
-    
-  </div>
+</code></pre></div></div><footer><div aria-label="footer navigation" class="rst-footer-buttons" role="navigation"><a class="btn btn-neutral float-right" href="../padic/" title="P-adic fields">Next <span class="icon icon-circle-arrow-right"></span></a><a class="btn btn-neutral" href="../rational/" title="Rationals"><span class="icon icon-circle-arrow-left"></span> Previous</a></div><hr/><div role="contentinfo"></div>
 
   Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
-</footer>
-	  
-        </div>
-      </div>
-
-    </section>
-    
-  </div>
-
-  <div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-          <a href="https://github.com/Nemocas/Nemo.jl" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
-      
-      
-        <span><a href="../rational/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../padic/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
-</div>
-    <script src="../js/theme.js"></script>
-      <script src="../mathjaxhelper.js"></script>
-      <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
-
-</body>
-</html>
+</footer></div></div></section></div><div class="rst-versions" role="note" style="cursor: pointer"><span class="rst-current-version" data-toggle="rst-current-version"><a class="fa fa-github" href="https://github.com/Nemocas/Nemo.jl" style="float: left; color: #fcfcfc"> GitHub</a><span><a href="../rational/" style="color: #fcfcfc;">« Previous</a></span><span style="margin-left: 15px"><a href="../padic/" style="color: #fcfcfc">Next »</a></span></span></div><script src="../js/theme.js"></script><script src="../mathjaxhelper.js"></script><script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script></body></HTML>
