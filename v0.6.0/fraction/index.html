@@ -1,558 +1,106 @@
-<!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <meta name="author" content="William Hart">
-  <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Fraction fields - Nemo.jl</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-  <link href="../assets/Documenter.css" rel="stylesheet">
-  
-  <script>
+<!DOCTYPE html><HTML class="no-js" lang="en"><head><meta charset="utf-8"/><meta content="IE=edge" http-equiv="X-UA-Compatible"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="William Hart" name="author"/><link href="../img/favicon.ico" rel="shortcut icon"/><title>Fraction fields - Nemo.jl</title><link href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css"/><link href="../css/theme.css" rel="stylesheet" type="text/css"/><link href="../css/theme_extra.css" rel="stylesheet" type="text/css"/><link href="../css/highlight.css" rel="stylesheet"/><link href="../assets/Documenter.css" rel="stylesheet"/><script>
     // Current page data
     var mkdocs_page_name = "Fraction fields";
     var mkdocs_page_input_path = "fraction.md";
     var mkdocs_page_url = "/fraction/";
-  </script>
-  
-  <script src="../js/jquery-2.1.1.min.js"></script>
-  <script src="../js/modernizr-2.8.3.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
-  
-</head>
+  </script><script src="../js/jquery-2.1.1.min.js"></script><script src="../js/modernizr-2.8.3.min.js"></script><script src="../js/highlight.pack.js" type="text/javascript"></script><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
 
-<body class="wy-body-for-nav" role="document">
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
 
-  <div class="wy-grid-for-nav">
+        head.appendChild(meta);
+    };
 
-    
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-      <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Nemo.jl</a>
-        <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-  </form>
-</div>
-      </div>
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-	  
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="..">Getting Started</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../about/">About Nemo</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../types/">Types in Nemo</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../constructors/">Parent object constructors</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../polynomial/">Univariate polynomials</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../series/">Capped relative power series</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../residue/">Residue rings</a>
-	    </li>
-          
-            <li class="toctree-l1 current">
-		
-    <a class="current" href="./">Fraction fields</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l2"><a href="#introduction">Introduction</a></li>
-    
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
 
-    <li class="toctree-l2"><a href="#fraction-field-constructors">Fraction field constructors</a></li>
-    
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
 
-    <li class="toctree-l2"><a href="#fraction-constructors">Fraction constructors</a></li>
-    
-
-    <li class="toctree-l2"><a href="#basic-functionality">Basic functionality</a></li>
-    
-
-    <li class="toctree-l2"><a href="#basic-manipulation">Basic manipulation</a></li>
-    
-
-    <li class="toctree-l2"><a href="#arithmetic-operators">Arithmetic operators</a></li>
-    
-
-    <li class="toctree-l2"><a href="#remove-and-valuation">Remove and valuation</a></li>
-    
-
-    <li class="toctree-l2"><a href="#comparison-operators">Comparison operators</a></li>
-    
-
-    <li class="toctree-l2"><a href="#function">Function</a></li>
-    
-
-    <li class="toctree-l2"><a href="#function_1">Function</a></li>
-    
-
-    <li class="toctree-l2"><a href="#inversion">Inversion</a></li>
-    
-
-    <li class="toctree-l2"><a href="#greatest-common-divisor">Greatest common divisor</a></li>
-    
-
-    <li class="toctree-l2"><a href="#modular-arithmetic">Modular arithmetic</a></li>
-    
-        <ul>
-        
-            <li><a class="toctree-l3" href="#rational-reconstruction">Rational Reconstruction</a></li>
-        
-        </ul>
-    
-
-    <li class="toctree-l2"><a href="#rational-enumeration">Rational enumeration</a></li>
-    
-
-    <li class="toctree-l2"><a href="#special-functions">Special functions</a></li>
-    
-
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../matrix/">Matrices</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../integer/">Integers</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../rational/">Rationals</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../finitefield/">Finite fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../padic/">P-adic fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../arb/">Real balls</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../acb/">Complex boxes</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../numberfield/">Number fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../maximalorder/">Maximal orders</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../classgroup/">Class groups</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../perm/">Permutation groups</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../factor/">Factorization</a>
-	    </li>
-          
-        </ul>
-      </div>
-      &nbsp;
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="..">Nemo.jl</a>
-      </nav>
-
-      
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
-  <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    
-      
-    
-    <li>Fraction fields</li>
-    <li class="wy-breadcrumbs-aside">
-      
-        <a href="https://github.com/Nemocas/Nemo.jl/edit/master/docs/fraction.md"
-          class="icon icon-github"> Edit on GitHub</a>
-      
-    </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main">
-            <div class="section">
-              
-                <p><a id='Introduction-1'></a></p>
-<h2 id="introduction">Introduction</h2>
-<p>Nemo allows the creation of fraction fields over any ring <script type="math/tex">R</script>. We don't require <script type="math/tex">R</script> to be an integral domain, however no attempt is made to deal with the general case. Two fractions <script type="math/tex">a/b</script> and <script type="math/tex">c/d</script> are equal in Nemo iff <script type="math/tex">ad = bc</script>. Thus, in practice, a greatest common divisor function is currently required for the ring <script type="math/tex">R</script>.</p>
-<p>In order to make the representation <script type="math/tex">a/b</script> unique for printing, we have a notion of canonical unit for elements of a ring <script type="math/tex">R</script>. When canonicalising <script type="math/tex">a/b</script>, each of the elements <script type="math/tex">a</script> and <script type="math/tex">b</script> is first divided by the canonical unit of <script type="math/tex">b</script>.</p>
-<p>The <code>canonical_unit</code> function is defined for elements of every Nemo ring. It must have the properties</p>
-<pre><code>canonical_unit(u) == u
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body class="wy-body-for-nav" role="document"><div class="wy-grid-for-nav"><nav class="wy-nav-side stickynav" data-toggle="wy-nav-shift"><div class="wy-side-nav-search"><a class="icon icon-home" href=".."> Nemo.jl</a><div role="search"><form action="../search.html" class="wy-form" id="rtd-search-form" method="get"><input name="q" placeholder="Search docs" type="text"/></form></div></div><div aria-label="main navigation" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation"><ul class="current"><li class="toctree-l1"><a class="" href="..">Getting Started</a></li><li class="toctree-l1"><a class="" href="../about/">About Nemo</a></li><li class="toctree-l1"><a class="" href="../types/">Types in Nemo</a></li><li class="toctree-l1"><a class="" href="../constructors/">Parent object constructors</a></li><li class="toctree-l1"><a class="" href="../polynomial/">Univariate polynomials</a></li><li class="toctree-l1"><a class="" href="../series/">Capped relative power series</a></li><li class="toctree-l1"><a class="" href="../residue/">Residue rings</a></li><li class="toctree-l1 current"><a class="current" href="./">Fraction fields</a><ul class="subnav"><li class="toctree-l2"><a href="#introduction">Introduction</a></li><li class="toctree-l2"><a href="#fraction-field-constructors">Fraction field constructors</a></li><li class="toctree-l2"><a href="#fraction-constructors">Fraction constructors</a></li><li class="toctree-l2"><a href="#basic-functionality">Basic functionality</a></li><li class="toctree-l2"><a href="#basic-manipulation">Basic manipulation</a></li><li class="toctree-l2"><a href="#arithmetic-operators">Arithmetic operators</a></li><li class="toctree-l2"><a href="#remove-and-valuation">Remove and valuation</a></li><li class="toctree-l2"><a href="#comparison-operators">Comparison operators</a></li><li class="toctree-l2"><a href="#function">Function</a></li><li class="toctree-l2"><a href="#function_1">Function</a></li><li class="toctree-l2"><a href="#inversion">Inversion</a></li><li class="toctree-l2"><a href="#greatest-common-divisor">Greatest common divisor</a></li><li class="toctree-l2"><a href="#modular-arithmetic">Modular arithmetic</a></li><ul><li><a class="toctree-l3" href="#rational-reconstruction">Rational Reconstruction</a></li></ul><li class="toctree-l2"><a href="#rational-enumeration">Rational enumeration</a></li><li class="toctree-l2"><a href="#special-functions">Special functions</a></li></ul></li><li class="toctree-l1"><a class="" href="../matrix/">Matrices</a></li><li class="toctree-l1"><a class="" href="../integer/">Integers</a></li><li class="toctree-l1"><a class="" href="../rational/">Rationals</a></li><li class="toctree-l1"><a class="" href="../finitefield/">Finite fields</a></li><li class="toctree-l1"><a class="" href="../padic/">P-adic fields</a></li><li class="toctree-l1"><a class="" href="../arb/">Real balls</a></li><li class="toctree-l1"><a class="" href="../acb/">Complex boxes</a></li><li class="toctree-l1"><a class="" href="../numberfield/">Number fields</a></li><li class="toctree-l1"><a class="" href="../maximalorder/">Maximal orders</a></li><li class="toctree-l1"><a class="" href="../classgroup/">Class groups</a></li><li class="toctree-l1"><a class="" href="../perm/">Permutation groups</a></li><li class="toctree-l1"><a class="" href="../factor/">Factorization</a></li></ul></div>
+       
+    </nav><section class="wy-nav-content-wrap" data-toggle="wy-nav-shift"><nav aria-label="top navigation" class="wy-nav-top" role="navigation"><i class="fa fa-bars" data-toggle="wy-nav-top"></i><a href="..">Nemo.jl</a></nav><div class="wy-nav-content"><div class="rst-content"><div aria-label="breadcrumbs navigation" role="navigation"><ul class="wy-breadcrumbs"><li><a href="..">Docs</a> »</li><li>Fraction fields</li><li class="wy-breadcrumbs-aside"><a class="icon icon-github" href="https://github.com/Nemocas/Nemo.jl/edit/master/docs/fraction.md"> Edit on GitHub</a></li></ul><hr/></div><div role="main"><div class="section"><p><a id="Introduction-1"></a></p><h2 id="introduction">Introduction</h2><p>Nemo allows the creation of fraction fields over any ring <script type="math/tex">R</script>. We don't require <script type="math/tex">R</script> to be an integral domain, however no attempt is made to deal with the general case. Two fractions <script type="math/tex">a/b</script> and <script type="math/tex">c/d</script> are equal in Nemo iff <script type="math/tex">ad = bc</script>. Thus, in practice, a greatest common divisor function is currently required for the ring <script type="math/tex">R</script>.</p><p>In order to make the representation <script type="math/tex">a/b</script> unique for printing, we have a notion of canonical unit for elements of a ring <script type="math/tex">R</script>. When canonicalising <script type="math/tex">a/b</script>, each of the elements <script type="math/tex">a</script> and <script type="math/tex">b</script> is first divided by the canonical unit of <script type="math/tex">b</script>.</p><p>The <code>canonical_unit</code> function is defined for elements of every Nemo ring. It must have the properties</p><pre><code>canonical_unit(u) == u
 canonical_unit(a*b) == canonical_unit(a)*canonical_unit(b)
-</code></pre>
-
-<p>for any unit <script type="math/tex">u</script> of the ring in question, and <script type="math/tex">a</script> and <script type="math/tex">b</script> arbitrary elements of the ring.</p>
-<p>For example, the canonical unit of an integer is its sign. Thus a fraction of integers always has positive denominator after canonicalisation.</p>
-<p>The canonical unit of a polynomial is the canonical unit of its leading coefficient, etc.</p>
-<p>There are two different kinds of implementation of fraction fields in Nemo: a generic one for the case where no specific implementation exists, and efficient implementations of fractions over specific rings, usually provided by C/C++ libraries.</p>
-<p>The following table shows each of the fraction types available in Nemo, the base ring <script type="math/tex">R</script>, and the Julia/Nemo types for that kind of fraction (the type information is mainly of concern to developers).</p>
-<table>
-<thead>
-<tr>
-<th align="right">Base ring</th>
-<th align="right">Library</th>
-<th align="right">Element type</th>
-<th align="right">Parent type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">Generic ring <script type="math/tex">R</script>
-</td>
-<td align="right">Nemo</td>
-<td align="right"><code>GenFrac{T}</code></td>
-<td align="right"><code>GenFracField{T}</code></td>
-</tr>
-<tr>
-<td align="right">
-<script type="math/tex">\mathbb{Z}</script>
-</td>
-<td align="right">Flint</td>
-<td align="right"><code>fmpq</code></td>
-<td align="right"><code>FlintRationalField</code></td>
-</tr>
-</tbody>
-</table>
-<p>All fraction element types belong to the abstract type <code>FracElem</code> and all of the fraction field types belong to the abstract type <code>FracField</code>. This enables one to write generic functions that can accept any Nemo fraction type.</p>
-<p><a id='Fraction-field-constructors-1'></a></p>
-<h2 id="fraction-field-constructors">Fraction field constructors</h2>
-<p>In order to construct fractions in Nemo, one must first construct the fraction field itself. This can be accomplished manually with the following constructor.</p>
-<pre><code>FractionField(::Ring, ::Bool)
-</code></pre>
-
-<p>Note: it is also possible to construct fractions directly in Nemo without manually constructing the fraction field. In such cases, Nemo creates the relevant fraction field internally.</p>
-<p>For convenience, the rational fraction field is constructed automatically in Nemo. We have the definition</p>
-<pre><code>QQ = FractionField(ZZ)
-</code></pre>
-
-<p>Here are some examples of creating fraction fields and making use of the resulting parent objects to coerce various elements into those fields.</p>
-<pre><code>R = FractionField(ZZ)
-S, x = PolynomialRing(ZZ, &quot;x&quot;)
+</code></pre><p>for any unit <script type="math/tex">u</script> of the ring in question, and <script type="math/tex">a</script> and <script type="math/tex">b</script> arbitrary elements of the ring.</p><p>For example, the canonical unit of an integer is its sign. Thus a fraction of integers always has positive denominator after canonicalisation.</p><p>The canonical unit of a polynomial is the canonical unit of its leading coefficient, etc.</p><p>There are two different kinds of implementation of fraction fields in Nemo: a generic one for the case where no specific implementation exists, and efficient implementations of fractions over specific rings, usually provided by C/C++ libraries.</p><p>The following table shows each of the fraction types available in Nemo, the base ring <script type="math/tex">R</script>, and the Julia/Nemo types for that kind of fraction (the type information is mainly of concern to developers).</p><table><thead><tr><th align="right">Base ring</th><th align="right">Library</th><th align="right">Element type</th><th align="right">Parent type</th></tr></thead><tbody><tr><td align="right">Generic ring <script type="math/tex">R</script></td><td align="right">Nemo</td><td align="right"><code>GenFrac{T}</code></td><td align="right"><code>GenFracField{T}</code></td></tr><tr><td align="right"><script type="math/tex">\mathbb{Z}</script></td><td align="right">Flint</td><td align="right"><code>fmpq</code></td><td align="right"><code>FlintRationalField</code></td></tr></tbody></table><p>All fraction element types belong to the abstract type <code>FracElem</code> and all of the fraction field types belong to the abstract type <code>FracField</code>. This enables one to write generic functions that can accept any Nemo fraction type.</p><p><a id="Fraction-field-constructors-1"></a></p><h2 id="fraction-field-constructors">Fraction field constructors</h2><p>In order to construct fractions in Nemo, one must first construct the fraction field itself. This can be accomplished manually with the following constructor.</p><pre><code>FractionField(::Ring, ::Bool)
+</code></pre><p>Note: it is also possible to construct fractions directly in Nemo without manually constructing the fraction field. In such cases, Nemo creates the relevant fraction field internally.</p><p>For convenience, the rational fraction field is constructed automatically in Nemo. We have the definition</p><pre><code>QQ = FractionField(ZZ)
+</code></pre><p>Here are some examples of creating fraction fields and making use of the resulting parent objects to coerce various elements into those fields.</p><pre><code>R = FractionField(ZZ)
+S, x = PolynomialRing(ZZ, "x")
 T = FractionField(S)
 
 a = R(1)
 b = T(fmpz(3))
 c = T(x)
 d = QQ(11)
-</code></pre>
-
-<p><a id='Fraction-constructors-1'></a></p>
-<h2 id="fraction-constructors">Fraction constructors</h2>
-<p>Once a fraction field is constructed, there are various ways to construct fractions in that field.</p>
-<p>Apart from coercing elements into the fraction field as above, we offer the following functions.</p>
-<p><a id='Base.zero-Tuple{Nemo.FracField}' href='#Base.zero-Tuple{Nemo.FracField}'>#</a>
-<strong><code>Base.zero</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>zero(R::FracField)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">0/1</script> in the given fraction field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/generic/Fraction.jl#L92' class='documenter-source'>source</a><br></p>
-<p><a id='Base.one-Tuple{Nemo.FracField}' href='#Base.one-Tuple{Nemo.FracField}'>#</a>
-<strong><code>Base.one</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>one(R::FracField)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">1/1</script> in the given fraction field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/generic/Fraction.jl#L98' class='documenter-source'>source</a><br></p>
-<p>It is also possible to construct fractions directly in Nemo, without first manually constructing the relevant fraction field. For this purpose we overload Julia's fraction operator <code>//</code>.</p>
-<p>Here are some examples of constructing fractions.</p>
-<pre><code>S, x = PolynomialRing(ZZ, &quot;x&quot;)
+</code></pre><p><a id="Fraction-constructors-1"></a></p><h2 id="fraction-constructors">Fraction constructors</h2><p>Once a fraction field is constructed, there are various ways to construct fractions in that field.</p><p>Apart from coercing elements into the fraction field as above, we offer the following functions.</p><p><a href="#Base.zero-Tuple{Nemo.FracField}" id="Base.zero-Tuple{Nemo.FracField}">#</a><strong><code>Base.zero</code></strong> — <em>Method</em>.</p><pre><code>zero(R::FracField)
+</code></pre><blockquote><p>Return <script type="math/tex">0/1</script> in the given fraction field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/generic/Fraction.jl#L92" target="_blank">source</a><br/></p><p><a href="#Base.one-Tuple{Nemo.FracField}" id="Base.one-Tuple{Nemo.FracField}">#</a><strong><code>Base.one</code></strong> — <em>Method</em>.</p><pre><code>one(R::FracField)
+</code></pre><blockquote><p>Return <script type="math/tex">1/1</script> in the given fraction field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/generic/Fraction.jl#L98" target="_blank">source</a><br/></p><p>It is also possible to construct fractions directly in Nemo, without first manually constructing the relevant fraction field. For this purpose we overload Julia's fraction operator <code>//</code>.</p><p>Here are some examples of constructing fractions.</p><pre><code>S, x = PolynomialRing(ZZ, "x")
 T = FractionField(S)
 
 a = zero(T)
 b = one(T)
 c = (x + 3)//(x^2 + 2)
-</code></pre>
-
-<p><a id='Basic-functionality-1'></a></p>
-<h2 id="basic-functionality">Basic functionality</h2>
-<p>All fraction field modules in Nemo must provide the functionality listed in this section. (Note that only some of these functions are useful to a user.)</p>
-<p>Developers who are writing their own fraction field module, whether as an interface to a C library, or as some kind of generic module, must provide all of these functions for custom fraction field types in Nemo. </p>
-<p>We write <code>U</code> for the type of fraction elements in the fraction field and <code>T</code> for the type of elements of the base ring.</p>
-<p>All of these functions are provided for all existing fraction types in Nemo.</p>
-<pre><code>parent_type{U &lt;: FracElem}(::Type{U})
-</code></pre>
-
-<p>Given the type of fraction elements, should return the type of the corresponding parent object.</p>
-<pre><code>elem_type(R::FracField)
-</code></pre>
-
-<p>Given a parent object for the fraction field, return the type of elements of the fraction field.</p>
-<pre><code>Base.hash(a::FracElem, h::UInt)
-</code></pre>
-
-<p>Return a <code>UInt</code> hexadecimal hash of the fraction <script type="math/tex">a</script>. This should be xor'd with a fixed random hexadecimal specific to the fraction type. The hash of the numerator and denominator of a fraction should be xor'd with the supplied parameter <code>h</code> as part of computing the hash.</p>
-<pre><code>num(a::FracElem)
-</code></pre>
-
-<p>Return the numerator of the given fraction element, i.e. for <script type="math/tex">a = b/c</script> return <script type="math/tex">b</script>. The returned numerator will be divided by the canonical unit of the denominator.</p>
-<pre><code>den(a::FracElem)
-</code></pre>
-
-<p>Return the denominator of the given fraction element, i.e. for <script type="math/tex">a = b/c</script> return <script type="math/tex">c</script>. The returned denominator will be divided by the canonical unit of the denominator.</p>
-<pre><code>deepcopy(a::FracElem)
-</code></pre>
-
-<p>Construct a copy of the given fraction and return it. This function must recursively construct copies of all of the internal data in the given fraction. Nemo fractions are mutable and so returning shallow copies is not sufficient.</p>
-<pre><code>mul!(c::FracElem, a::FracElem, b::FracElem)
-</code></pre>
-
-<p>Multiply <script type="math/tex">a</script> by <script type="math/tex">b</script> and set the existing fraction <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p>
-<pre><code>addeq!(c::FracElem, a::FracElem)
-</code></pre>
-
-<p>In-place addition. Adds <script type="math/tex">a</script> to <script type="math/tex">c</script> and sets <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p>
-<p>Given a parent object <code>S</code> for a fraction field, the following coercion functions are provided to coerce various elements into the fraction field.  Developers provide these by overloading the <code>call</code> operator for the fraction field parent objects.</p>
-<pre><code>S()
-</code></pre>
-
-<p>Coerce zero into the field <script type="math/tex">S</script>.</p>
-<pre><code>S(n::Integer)
+</code></pre><p><a id="Basic-functionality-1"></a></p><h2 id="basic-functionality">Basic functionality</h2><p>All fraction field modules in Nemo must provide the functionality listed in this section. (Note that only some of these functions are useful to a user.)</p><p>Developers who are writing their own fraction field module, whether as an interface to a C library, or as some kind of generic module, must provide all of these functions for custom fraction field types in Nemo. </p><p>We write <code>U</code> for the type of fraction elements in the fraction field and <code>T</code> for the type of elements of the base ring.</p><p>All of these functions are provided for all existing fraction types in Nemo.</p><pre><code>parent_type{U &lt;: FracElem}(::Type{U})
+</code></pre><p>Given the type of fraction elements, should return the type of the corresponding parent object.</p><pre><code>elem_type(R::FracField)
+</code></pre><p>Given a parent object for the fraction field, return the type of elements of the fraction field.</p><pre><code>Base.hash(a::FracElem, h::UInt)
+</code></pre><p>Return a <code>UInt</code> hexadecimal hash of the fraction <script type="math/tex">a</script>. This should be xor'd with a fixed random hexadecimal specific to the fraction type. The hash of the numerator and denominator of a fraction should be xor'd with the supplied parameter <code>h</code> as part of computing the hash.</p><pre><code>num(a::FracElem)
+</code></pre><p>Return the numerator of the given fraction element, i.e. for <script type="math/tex">a = b/c</script> return <script type="math/tex">b</script>. The returned numerator will be divided by the canonical unit of the denominator.</p><pre><code>den(a::FracElem)
+</code></pre><p>Return the denominator of the given fraction element, i.e. for <script type="math/tex">a = b/c</script> return <script type="math/tex">c</script>. The returned denominator will be divided by the canonical unit of the denominator.</p><pre><code>deepcopy(a::FracElem)
+</code></pre><p>Construct a copy of the given fraction and return it. This function must recursively construct copies of all of the internal data in the given fraction. Nemo fractions are mutable and so returning shallow copies is not sufficient.</p><pre><code>mul!(c::FracElem, a::FracElem, b::FracElem)
+</code></pre><p>Multiply <script type="math/tex">a</script> by <script type="math/tex">b</script> and set the existing fraction <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p><pre><code>addeq!(c::FracElem, a::FracElem)
+</code></pre><p>In-place addition. Adds <script type="math/tex">a</script> to <script type="math/tex">c</script> and sets <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p><p>Given a parent object <code>S</code> for a fraction field, the following coercion functions are provided to coerce various elements into the fraction field.  Developers provide these by overloading the <code>call</code> operator for the fraction field parent objects.</p><pre><code>S()
+</code></pre><p>Coerce zero into the field <script type="math/tex">S</script>.</p><pre><code>S(n::Integer)
 S(n::fmpz)
-</code></pre>
-
-<p>Coerce an integer value or Flint integer into the fraction field <script type="math/tex">S</script>.</p>
-<pre><code>S(n::T)
-</code></pre>
-
-<p>Coerces an element of the base ring, of type <code>T</code> into <script type="math/tex">S</script>.</p>
-<pre><code>S(f::FracElem)
-</code></pre>
-
-<p>Take a fraction that is already in the field <script type="math/tex">S</script> and simply return it. A copy of the original is not made.</p>
-<pre><code>S(c::RingElem)
-</code></pre>
-
-<p>Try to coerce the given ring element into the fraction field. This only succeeds if <script type="math/tex">c</script> can be coerced into the base ring.</p>
-<p>There are also the followin constructors for creatinf fracions from a numerator and denominator.</p>
-<pre><code>S(n::T, d::T)
+</code></pre><p>Coerce an integer value or Flint integer into the fraction field <script type="math/tex">S</script>.</p><pre><code>S(n::T)
+</code></pre><p>Coerces an element of the base ring, of type <code>T</code> into <script type="math/tex">S</script>.</p><pre><code>S(f::FracElem)
+</code></pre><p>Take a fraction that is already in the field <script type="math/tex">S</script> and simply return it. A copy of the original is not made.</p><pre><code>S(c::RingElem)
+</code></pre><p>Try to coerce the given ring element into the fraction field. This only succeeds if <script type="math/tex">c</script> can be coerced into the base ring.</p><p>There are also the followin constructors for creatinf fracions from a numerator and denominator.</p><pre><code>S(n::T, d::T)
 S(n::Integer, d::T)
 S(n::T, d::Integer)
-</code></pre>
-
-<p>Create the fraction <script type="math/tex">n/d</script> in the fraction field <script type="math/tex">S</script>.</p>
-<p>In addition to the above, developers of custom fractions must ensure the parent object of a fraction type constains a field <code>base_ring</code> specifying the base ring. They must also ensure that each fraction element contains a field <code>parent</code> specifying the parent object of the fraction.</p>
-<p>Typically a developer will also overload the <code>FractionField</code> generic function to create fractions of the custom type they are implementing.</p>
-<p><a id='Basic-manipulation-1'></a></p>
-<h2 id="basic-manipulation">Basic manipulation</h2>
-<p>Numerous functions are provided to manipulate fractions. Also see the section on basic functionality above.</p>
-<p><a id='Nemo.base_ring-Tuple{Nemo.FracField}' href='#Nemo.base_ring-Tuple{Nemo.FracField}'>#</a>
-<strong><code>Nemo.base_ring</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>base_ring{T}(S::FracField{T})
-</code></pre>
-
-<blockquote>
-<p>Return the base ring <script type="math/tex">R</script> of the given fraction field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/generic/Fraction.jl#L19' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.base_ring-Tuple{Nemo.FracElem}' href='#Nemo.base_ring-Tuple{Nemo.FracElem}'>#</a>
-<strong><code>Nemo.base_ring</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>base_ring{T}(r::FracElem)
-</code></pre>
-
-<blockquote>
-<p>Return the base ring <script type="math/tex">R</script> of the fraction field that the supplied element <script type="math/tex">a</script> belongs to.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/generic/Fraction.jl#L25' class='documenter-source'>source</a><br></p>
-<p><a id='Base.parent-Tuple{Nemo.FracElem}' href='#Base.parent-Tuple{Nemo.FracElem}'>#</a>
-<strong><code>Base.parent</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>parent(a::FracElem)
-</code></pre>
-
-<blockquote>
-<p>Return the parent object of the given fraction element.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/generic/Fraction.jl#L32' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.iszero-Tuple{Nemo.FracElem}' href='#Nemo.iszero-Tuple{Nemo.FracElem}'>#</a>
-<strong><code>Nemo.iszero</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>iszero(a::FracElem)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if the supplied element <script type="math/tex">a</script> is zero in the fraction field it belongs to, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/generic/Fraction.jl#L104' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.isone-Tuple{Nemo.FracElem}' href='#Nemo.isone-Tuple{Nemo.FracElem}'>#</a>
-<strong><code>Nemo.isone</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isone(a::FracElem)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if the supplied element <script type="math/tex">a</script> is one in the fraction field it belongs to, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/generic/Fraction.jl#L111' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.isunit-Tuple{Nemo.FracElem}' href='#Nemo.isunit-Tuple{Nemo.FracElem}'>#</a>
-<strong><code>Nemo.isunit</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isunit(a::FracElem)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if the supplied element <script type="math/tex">a</script> is invertible in the fraction field it belongs to, i.e. the numerator is nonzero, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/generic/Fraction.jl#L118' class='documenter-source'>source</a><br></p>
-<p>Some functions are only available for certain rings.</p>
-<p><a id='Base.abs-Tuple{Nemo.fmpq}' href='#Base.abs-Tuple{Nemo.fmpq}'>#</a>
-<strong><code>Base.abs</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>abs(a::fmpq)
-</code></pre>
-
-<blockquote>
-<p>Return the absolute value of <script type="math/tex">a</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L90' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.height-Tuple{Nemo.fmpq}' href='#Nemo.height-Tuple{Nemo.fmpq}'>#</a>
-<strong><code>Nemo.height</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>height(a::fmpq)
-</code></pre>
-
-<blockquote>
-<p>Return the height of the fraction <script type="math/tex">a</script>, namely the largest of the absolute values of the numerator and denominator.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L110' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.height_bits-Tuple{Nemo.fmpq}' href='#Nemo.height_bits-Tuple{Nemo.fmpq}'>#</a>
-<strong><code>Nemo.height_bits</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>height_bits(a::fmpq)
-</code></pre>
-
-<blockquote>
-<p>Return the number of bits of the height of the fraction <script type="math/tex">a</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L121' class='documenter-source'>source</a><br></p>
-<p><a id='Base.:<<-Tuple{Nemo.fmpq,Int64}' href='#Base.:<<-Tuple{Nemo.fmpq,Int64}'>#</a>
-<strong><code>Base.:&lt;&lt;</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>&lt;&lt;(a::fmpq, b::Int)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">2^b\times a</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L390' class='documenter-source'>source</a><br></p>
-<p><a id='Base.:>&gt;-Tuple{Nemo.fmpq,Int64}' href='#Base.:&gt;&gt;-Tuple{Nemo.fmpq,Int64}'&gt;#</a>
-<strong><code>Base.:&gt;&gt;</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>&lt;&lt;(a::fmpq, b::Int)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">2^b/a</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L379' class='documenter-source'>source</a><br></p>
-<p>Rational fractions can be compared with each other and with integers. Julia provides the full range of operators <script type="math/tex"><, >, \leq, \geq</script> which depend on the following functions.</p>
-<p><a id='Base.isless-Tuple{Nemo.fmpq,Nemo.fmpq}' href='#Base.isless-Tuple{Nemo.fmpq,Nemo.fmpq}'>#</a>
-<strong><code>Base.isless</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isless(a::fmpq, b::fmpq)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if <script type="math/tex">a < b</script>, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L284' class='documenter-source'>source</a><br></p>
-<p><a id='Base.isless-Tuple{Integer,Nemo.fmpq}' href='#Base.isless-Tuple{Integer,Nemo.fmpq}'>#</a>
-<strong><code>Base.isless</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isless(a::Integer, b::fmpq)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if <script type="math/tex">a < b</script>, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L326' class='documenter-source'>source</a><br></p>
-<p><a id='Base.isless-Tuple{Nemo.fmpq,Integer}' href='#Base.isless-Tuple{Nemo.fmpq,Integer}'>#</a>
-<strong><code>Base.isless</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isless(a::fmpq, b::Integer)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if <script type="math/tex">a < b</script>, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L316' class='documenter-source'>source</a><br></p>
-<p><a id='Base.isless-Tuple{Nemo.fmpq,Nemo.fmpz}' href='#Base.isless-Tuple{Nemo.fmpq,Nemo.fmpz}'>#</a>
-<strong><code>Base.isless</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isless(a::fmpq, b::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if <script type="math/tex">a < b</script>, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L336' class='documenter-source'>source</a><br></p>
-<p><a id='Base.isless-Tuple{Nemo.fmpz,Nemo.fmpq}' href='#Base.isless-Tuple{Nemo.fmpz,Nemo.fmpq}'>#</a>
-<strong><code>Base.isless</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isless(a::fmpz, b::fmpq)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if <script type="math/tex">a < b</script>, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L346' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of basic manipulation of fractions.</p>
-<pre><code>S, x = PolynomialRing(ZZ, &quot;x&quot;)
+</code></pre><p>Create the fraction <script type="math/tex">n/d</script> in the fraction field <script type="math/tex">S</script>.</p><p>In addition to the above, developers of custom fractions must ensure the parent object of a fraction type constains a field <code>base_ring</code> specifying the base ring. They must also ensure that each fraction element contains a field <code>parent</code> specifying the parent object of the fraction.</p><p>Typically a developer will also overload the <code>FractionField</code> generic function to create fractions of the custom type they are implementing.</p><p><a id="Basic-manipulation-1"></a></p><h2 id="basic-manipulation">Basic manipulation</h2><p>Numerous functions are provided to manipulate fractions. Also see the section on basic functionality above.</p><p><a href="#Nemo.base_ring-Tuple{Nemo.FracField}" id="Nemo.base_ring-Tuple{Nemo.FracField}">#</a><strong><code>Nemo.base_ring</code></strong> — <em>Method</em>.</p><pre><code>base_ring{T}(S::FracField{T})
+</code></pre><blockquote><p>Return the base ring <script type="math/tex">R</script> of the given fraction field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/generic/Fraction.jl#L19" target="_blank">source</a><br/></p><p><a href="#Nemo.base_ring-Tuple{Nemo.FracElem}" id="Nemo.base_ring-Tuple{Nemo.FracElem}">#</a><strong><code>Nemo.base_ring</code></strong> — <em>Method</em>.</p><pre><code>base_ring{T}(r::FracElem)
+</code></pre><blockquote><p>Return the base ring <script type="math/tex">R</script> of the fraction field that the supplied element <script type="math/tex">a</script> belongs to.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/generic/Fraction.jl#L25" target="_blank">source</a><br/></p><p><a href="#Base.parent-Tuple{Nemo.FracElem}" id="Base.parent-Tuple{Nemo.FracElem}">#</a><strong><code>Base.parent</code></strong> — <em>Method</em>.</p><pre><code>parent(a::FracElem)
+</code></pre><blockquote><p>Return the parent object of the given fraction element.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/generic/Fraction.jl#L32" target="_blank">source</a><br/></p><p><a href="#Nemo.iszero-Tuple{Nemo.FracElem}" id="Nemo.iszero-Tuple{Nemo.FracElem}">#</a><strong><code>Nemo.iszero</code></strong> — <em>Method</em>.</p><pre><code>iszero(a::FracElem)
+</code></pre><blockquote><p>Return <code>true</code> if the supplied element <script type="math/tex">a</script> is zero in the fraction field it belongs to, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/generic/Fraction.jl#L104" target="_blank">source</a><br/></p><p><a href="#Nemo.isone-Tuple{Nemo.FracElem}" id="Nemo.isone-Tuple{Nemo.FracElem}">#</a><strong><code>Nemo.isone</code></strong> — <em>Method</em>.</p><pre><code>isone(a::FracElem)
+</code></pre><blockquote><p>Return <code>true</code> if the supplied element <script type="math/tex">a</script> is one in the fraction field it belongs to, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/generic/Fraction.jl#L111" target="_blank">source</a><br/></p><p><a href="#Nemo.isunit-Tuple{Nemo.FracElem}" id="Nemo.isunit-Tuple{Nemo.FracElem}">#</a><strong><code>Nemo.isunit</code></strong> — <em>Method</em>.</p><pre><code>isunit(a::FracElem)
+</code></pre><blockquote><p>Return <code>true</code> if the supplied element <script type="math/tex">a</script> is invertible in the fraction field it belongs to, i.e. the numerator is nonzero, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/generic/Fraction.jl#L118" target="_blank">source</a><br/></p><p>Some functions are only available for certain rings.</p><p><a href="#Base.abs-Tuple{Nemo.fmpq}" id="Base.abs-Tuple{Nemo.fmpq}">#</a><strong><code>Base.abs</code></strong> — <em>Method</em>.</p><pre><code>abs(a::fmpq)
+</code></pre><blockquote><p>Return the absolute value of <script type="math/tex">a</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L90" target="_blank">source</a><br/></p><p><a href="#Nemo.height-Tuple{Nemo.fmpq}" id="Nemo.height-Tuple{Nemo.fmpq}">#</a><strong><code>Nemo.height</code></strong> — <em>Method</em>.</p><pre><code>height(a::fmpq)
+</code></pre><blockquote><p>Return the height of the fraction <script type="math/tex">a</script>, namely the largest of the absolute values of the numerator and denominator.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L110" target="_blank">source</a><br/></p><p><a href="#Nemo.height_bits-Tuple{Nemo.fmpq}" id="Nemo.height_bits-Tuple{Nemo.fmpq}">#</a><strong><code>Nemo.height_bits</code></strong> — <em>Method</em>.</p><pre><code>height_bits(a::fmpq)
+</code></pre><blockquote><p>Return the number of bits of the height of the fraction <script type="math/tex">a</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L121" target="_blank">source</a><br/></p><p><a href="#Base.:&lt;&lt;-Tuple{Nemo.fmpq,Int64}" id="Base.:&lt;&lt;-Tuple{Nemo.fmpq,Int64}">#</a><strong><code>Base.:&lt;&lt;</code></strong> — <em>Method</em>.</p><pre><code>&lt;&lt;(a::fmpq, b::Int)
+</code></pre><blockquote><p>Return <script type="math/tex">2^b\times a</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L390" target="_blank">source</a><br/></p><p><a &gt;#<="" a="" href="#Base.:&gt;&gt;-Tuple{Nemo.fmpq,Int64}" id="Base.:&gt;&gt;-Tuple{Nemo.fmpq,Int64}"><strong><code>Base.:&gt;&gt;</code></strong> — <em>Method</em>.</a></p><a &gt;#<="" a="" href="#Base.:&gt;&gt;-Tuple{Nemo.fmpq,Int64}" id="Base.:&gt;&gt;-Tuple{Nemo.fmpq,Int64}"><pre><code>&lt;&lt;(a::fmpq, b::Int)
+</code></pre><blockquote><p>Return <script type="math/tex">2^b/a</script>.</p></blockquote></a><p><a &gt;#<="" a="" href="#Base.:&gt;&gt;-Tuple{Nemo.fmpq,Int64}" id="Base.:&gt;&gt;-Tuple{Nemo.fmpq,Int64}"></a><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L379" target="_blank">source</a><br/></p><p>Rational fractions can be compared with each other and with integers. Julia provides the full range of operators <script type="math/tex"><, >, \leq, \geq</script> which depend on the following functions.</p><p><a href="#Base.isless-Tuple{Nemo.fmpq,Nemo.fmpq}" id="Base.isless-Tuple{Nemo.fmpq,Nemo.fmpq}">#</a><strong><code>Base.isless</code></strong> — <em>Method</em>.</p><pre><code>isless(a::fmpq, b::fmpq)
+</code></pre><blockquote><p>Return <code>true</code> if <script type="math/tex">a < b</script>, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L284" target="_blank">source</a><br/></p><p><a href="#Base.isless-Tuple{Integer,Nemo.fmpq}" id="Base.isless-Tuple{Integer,Nemo.fmpq}">#</a><strong><code>Base.isless</code></strong> — <em>Method</em>.</p><pre><code>isless(a::Integer, b::fmpq)
+</code></pre><blockquote><p>Return <code>true</code> if <script type="math/tex">a < b</script>, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L326" target="_blank">source</a><br/></p><p><a href="#Base.isless-Tuple{Nemo.fmpq,Integer}" id="Base.isless-Tuple{Nemo.fmpq,Integer}">#</a><strong><code>Base.isless</code></strong> — <em>Method</em>.</p><pre><code>isless(a::fmpq, b::Integer)
+</code></pre><blockquote><p>Return <code>true</code> if <script type="math/tex">a < b</script>, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L316" target="_blank">source</a><br/></p><p><a href="#Base.isless-Tuple{Nemo.fmpq,Nemo.fmpz}" id="Base.isless-Tuple{Nemo.fmpq,Nemo.fmpz}">#</a><strong><code>Base.isless</code></strong> — <em>Method</em>.</p><pre><code>isless(a::fmpq, b::fmpz)
+</code></pre><blockquote><p>Return <code>true</code> if <script type="math/tex">a < b</script>, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L336" target="_blank">source</a><br/></p><p><a href="#Base.isless-Tuple{Nemo.fmpz,Nemo.fmpq}" id="Base.isless-Tuple{Nemo.fmpz,Nemo.fmpq}">#</a><strong><code>Base.isless</code></strong> — <em>Method</em>.</p><pre><code>isless(a::fmpz, b::fmpq)
+</code></pre><blockquote><p>Return <code>true</code> if <script type="math/tex">a < b</script>, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L346" target="_blank">source</a><br/></p><p>Here are some examples of basic manipulation of fractions.</p><pre><code>S, x = PolynomialRing(ZZ, "x")
 
 f = zero(S)
 g = one(S)
@@ -565,156 +113,7 @@ U = base_ring(S)
 V = base_ring((x + 1)//(-x^2 + 1))
 W = parent(S(x))
 4 &lt;= ZZ(7)//ZZ(3)
-</code></pre>
-
-<p><a id='Arithmetic-operators-1'></a></p>
-<h2 id="arithmetic-operators">Arithmetic operators</h2>
-<p>All the usual arithmetic operators are overloaded for Nemo fractions. Note that Julia uses the single slash for floating point division. Therefore to perform exact division in a ring we use <code>divexact</code>. To construct an element of a fraction field one can use the double slash operator <code>//</code>.</p>
-<p>The following operators and functions are provided.</p>
-<table>
-<thead>
-<tr>
-<th align="right">Function</th>
-<th align="right">Operation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right"><code>-(a::FracElem)</code></td>
-<td align="right">unary minus</td>
-</tr>
-<tr>
-<td align="right"><code>+{T &lt;: RingElem}(a::FracElem{T}, b::FracElem{T})</code></td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right"><code>-{T &lt;: RingElem}(a::FracElem{T}, b::FracElem{T})</code></td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right"><code>*{T &lt;: RingElem}(a::FracElem{T}, b::FracElem{T})</code></td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right"><code>divexact{T &lt;: RingElem}(a::FracElem{T}, b::FracElem{T})</code></td>
-<td align="right">exact division</td>
-</tr>
-</tbody>
-</table>
-<p>The following ad hoc operators are also provided.</p>
-<table>
-<thead>
-<tr>
-<th align="right">Function</th>
-<th align="right">Operation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right"><code>+(a::Integer, b::FracElem)</code></td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right"><code>+(a::FracElem, b::Integer)</code></td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right"><code>+(a::fmpz, b::FracElem)</code></td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right"><code>+(a::FracElem, b::fmpz)</code></td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right"><code>+{T &lt;: RingElem}(a::T, b::FracElem{T})</code></td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right"><code>+{T &lt;: RingElem}(a::FracElem{T}, b::T)</code></td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right"><code>-(a::Integer, b::FracElem)</code></td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right"><code>-(a::FracElem, b::Integer)</code></td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right"><code>-(a::fmpz, b::FracElem)</code></td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right"><code>-(a::FracElem, b::fmpz)</code></td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right"><code>-{T &lt;: RingElem}(a::T, b::FracElem{T})</code></td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right"><code>-{T &lt;: RingElem}(a::FracElem{T}, b::T)</code></td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right"><code>*(a::Integer, b::FracElem)</code></td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right"><code>*(a::FracElem, b::Integer)</code></td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right"><code>*(a::fmpz, b::FracElem)</code></td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right"><code>*(a::FracElem, b::fmpz)</code></td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right"><code>*{T &lt;: RingElem}(a::T, b::FracElem{T})</code></td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right"><code>*{T &lt;: RingElem}(a::FracElem{T}, b::T)</code></td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right"><code>divexact(a::Integer, b::FracElem)</code></td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right"><code>divexact(a::FracElem, b::Integer)</code></td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right"><code>divexact(a::fmpz, b::FracElem)</code></td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right"><code>divexact(a::FracElem, b::fmpz)</code></td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right"><code>divexact{T &lt;: RingElem}(a::T, b::FracElem{T})</code></td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right"><code>divexact{T &lt;: RingElem}(a::FracElem{T}, b::T)</code></td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right"><code>^(a::FracElem, n::Int)</code></td>
-<td align="right">powering</td>
-</tr>
-</tbody>
-</table>
-<p>If the appropriate <code>promote_rule</code> and coercion exists, these operators can also be used with elements of other rings. Nemo will try to coerce the operands to the dominating type and then apply the operator.</p>
-<p>Here are some examples of arithmetic operations on fractions.</p>
-<pre><code>S, x = PolynomialRing(ZZ, &quot;x&quot;)
+</code></pre><p><a id="Arithmetic-operators-1"></a></p><h2 id="arithmetic-operators">Arithmetic operators</h2><p>All the usual arithmetic operators are overloaded for Nemo fractions. Note that Julia uses the single slash for floating point division. Therefore to perform exact division in a ring we use <code>divexact</code>. To construct an element of a fraction field one can use the double slash operator <code>//</code>.</p><p>The following operators and functions are provided.</p><table><thead><tr><th align="right">Function</th><th align="right">Operation</th></tr></thead><tbody><tr><td align="right"><code>-(a::FracElem)</code></td><td align="right">unary minus</td></tr><tr><td align="right"><code>+{T &lt;: RingElem}(a::FracElem{T}, b::FracElem{T})</code></td><td align="right">addition</td></tr><tr><td align="right"><code>-{T &lt;: RingElem}(a::FracElem{T}, b::FracElem{T})</code></td><td align="right">subtraction</td></tr><tr><td align="right"><code>*{T &lt;: RingElem}(a::FracElem{T}, b::FracElem{T})</code></td><td align="right">multiplication</td></tr><tr><td align="right"><code>divexact{T &lt;: RingElem}(a::FracElem{T}, b::FracElem{T})</code></td><td align="right">exact division</td></tr></tbody></table><p>The following ad hoc operators are also provided.</p><table><thead><tr><th align="right">Function</th><th align="right">Operation</th></tr></thead><tbody><tr><td align="right"><code>+(a::Integer, b::FracElem)</code></td><td align="right">addition</td></tr><tr><td align="right"><code>+(a::FracElem, b::Integer)</code></td><td align="right">addition</td></tr><tr><td align="right"><code>+(a::fmpz, b::FracElem)</code></td><td align="right">addition</td></tr><tr><td align="right"><code>+(a::FracElem, b::fmpz)</code></td><td align="right">addition</td></tr><tr><td align="right"><code>+{T &lt;: RingElem}(a::T, b::FracElem{T})</code></td><td align="right">addition</td></tr><tr><td align="right"><code>+{T &lt;: RingElem}(a::FracElem{T}, b::T)</code></td><td align="right">addition</td></tr><tr><td align="right"><code>-(a::Integer, b::FracElem)</code></td><td align="right">subtraction</td></tr><tr><td align="right"><code>-(a::FracElem, b::Integer)</code></td><td align="right">subtraction</td></tr><tr><td align="right"><code>-(a::fmpz, b::FracElem)</code></td><td align="right">subtraction</td></tr><tr><td align="right"><code>-(a::FracElem, b::fmpz)</code></td><td align="right">subtraction</td></tr><tr><td align="right"><code>-{T &lt;: RingElem}(a::T, b::FracElem{T})</code></td><td align="right">subtraction</td></tr><tr><td align="right"><code>-{T &lt;: RingElem}(a::FracElem{T}, b::T)</code></td><td align="right">subtraction</td></tr><tr><td align="right"><code>*(a::Integer, b::FracElem)</code></td><td align="right">multiplication</td></tr><tr><td align="right"><code>*(a::FracElem, b::Integer)</code></td><td align="right">multiplication</td></tr><tr><td align="right"><code>*(a::fmpz, b::FracElem)</code></td><td align="right">multiplication</td></tr><tr><td align="right"><code>*(a::FracElem, b::fmpz)</code></td><td align="right">multiplication</td></tr><tr><td align="right"><code>*{T &lt;: RingElem}(a::T, b::FracElem{T})</code></td><td align="right">multiplication</td></tr><tr><td align="right"><code>*{T &lt;: RingElem}(a::FracElem{T}, b::T)</code></td><td align="right">multiplication</td></tr><tr><td align="right"><code>divexact(a::Integer, b::FracElem)</code></td><td align="right">exact division</td></tr><tr><td align="right"><code>divexact(a::FracElem, b::Integer)</code></td><td align="right">exact division</td></tr><tr><td align="right"><code>divexact(a::fmpz, b::FracElem)</code></td><td align="right">exact division</td></tr><tr><td align="right"><code>divexact(a::FracElem, b::fmpz)</code></td><td align="right">exact division</td></tr><tr><td align="right"><code>divexact{T &lt;: RingElem}(a::T, b::FracElem{T})</code></td><td align="right">exact division</td></tr><tr><td align="right"><code>divexact{T &lt;: RingElem}(a::FracElem{T}, b::T)</code></td><td align="right">exact division</td></tr><tr><td align="right"><code>^(a::FracElem, n::Int)</code></td><td align="right">powering</td></tr></tbody></table><p>If the appropriate <code>promote_rule</code> and coercion exists, these operators can also be used with elements of other rings. Nemo will try to coerce the operands to the dominating type and then apply the operator.</p><p>Here are some examples of arithmetic operations on fractions.</p><pre><code>S, x = PolynomialRing(ZZ, "x")
 
 a = -((x + 1)//(-x^2 + 1))
 b = -(x + 3)//(x + 1) + (2x + 3)//(x^2 + 4)
@@ -728,35 +127,13 @@ m = divexact(a, x + 1)
 n = divexact(b, 23)
 p = divexact(ZZ(2), b)
 q = a^3
-</code></pre>
-
-<p><a id='Remove-and-valuation-1'></a></p>
-<h2 id="remove-and-valuation">Remove and valuation</h2>
-<p>In case the base ring supports the functions <code>remove</code> and <code>valuation</code>, the same is true for fractions.</p>
-<pre><code>remove{T &lt;: RingElem}(::T, ::T)
+</code></pre><p><a id="Remove-and-valuation-1"></a></p><h2 id="remove-and-valuation">Remove and valuation</h2><p>In case the base ring supports the functions <code>remove</code> and <code>valuation</code>, the same is true for fractions.</p><pre><code>remove{T &lt;: RingElem}(::T, ::T)
 valuation{T &lt;: RingElem}(::T, ::T)
-</code></pre>
-
-<p>Here is an example:</p>
-<pre><code>a = QQ(2, 3)
+</code></pre><p>Here is an example:</p><pre><code>a = QQ(2, 3)
 b = ZZ(3)
 remove(a, b)
 valuation(a, b)
-</code></pre>
-
-<p><a id='Comparison-operators-1'></a></p>
-<h2 id="comparison-operators">Comparison operators</h2>
-<p>The following comparison operators are implemented for fractions in Nemo. Julia provides the corresponding <code>!=</code> operator automatically.</p>
-<p><a id='Function-1'></a></p>
-<h2 id="function">Function</h2>
-<p><code>isequal{T &lt;: RingElem}(a::FracElem{T}, b::FracElem{T})</code> <code>=={T &lt;: RingElem}(a::FracElem{T}, b::FracElem{T})</code></p>
-<p>The <code>isequal</code> operation returns <code>true</code> if and only if numerator and denominator of the fraction are precisely equal as compared by <code>isequal</code>. This is a stronger form of equality, used for comparing inexact ring elements, such as elements of a power series ring, the <script type="math/tex">p</script>-adics, or the reals or complex numbers. Two elements are precisely equal only if they have the same precision or bounds in addition to being arithmetically equal. </p>
-<p>In addition we have the following ad hoc comparison operators.</p>
-<p><a id='Function-2'></a></p>
-<h2 id="function_1">Function</h2>
-<p><code>=={T &lt;: RingElem}(a::FracElem{T}, b::T)</code> <code>=={T &lt;: RingElem}(a::T, b::FracElem{T})</code> <code>==(a::FracElem, b::Integer)</code> <code>==(a::Integer, b::FracElem)</code> <code>==(a::FracElem, b::fmpz)</code> <code>==(a::fmpz, b::FracElem)</code></p>
-<p>Here are some examples of comparisons.</p>
-<pre><code>S, x = PolynomialRing(ZZ, &quot;x&quot;)
+</code></pre><p><a id="Comparison-operators-1"></a></p><h2 id="comparison-operators">Comparison operators</h2><p>The following comparison operators are implemented for fractions in Nemo. Julia provides the corresponding <code>!=</code> operator automatically.</p><p><a id="Function-1"></a></p><h2 id="function">Function</h2><p><code>isequal{T &lt;: RingElem}(a::FracElem{T}, b::FracElem{T})</code><code>=={T &lt;: RingElem}(a::FracElem{T}, b::FracElem{T})</code></p><p>The <code>isequal</code> operation returns <code>true</code> if and only if numerator and denominator of the fraction are precisely equal as compared by <code>isequal</code>. This is a stronger form of equality, used for comparing inexact ring elements, such as elements of a power series ring, the <script type="math/tex">p</script>-adics, or the reals or complex numbers. Two elements are precisely equal only if they have the same precision or bounds in addition to being arithmetically equal. </p><p>In addition we have the following ad hoc comparison operators.</p><p><a id="Function-2"></a></p><h2 id="function_1">Function</h2><p><code>=={T &lt;: RingElem}(a::FracElem{T}, b::T)</code><code>=={T &lt;: RingElem}(a::T, b::FracElem{T})</code><code>==(a::FracElem, b::Integer)</code><code>==(a::Integer, b::FracElem)</code><code>==(a::FracElem, b::fmpz)</code><code>==(a::fmpz, b::FracElem)</code></p><p>Here are some examples of comparisons.</p><pre><code>S, x = PolynomialRing(ZZ, "x")
 
 a = -(ZZ(4)//ZZ(6))
 b = -((x + 1)//(-x^2 + 1))
@@ -766,231 +143,48 @@ b == 1//(x - 1)
 a == 4
 ZZ(2) == b
 b == x + 1
-</code></pre>
-
-<p><a id='Inversion-1'></a></p>
-<h2 id="inversion">Inversion</h2>
-<p><a id='Base.inv-Tuple{Nemo.FracElem}' href='#Base.inv-Tuple{Nemo.FracElem}'>#</a>
-<strong><code>Base.inv</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>inv(a::FracElem)
-</code></pre>
-
-<blockquote>
-<p>Return the inverse of the fraction <script type="math/tex">a</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/generic/Fraction.jl#L513' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of computing inverses.</p>
-<pre><code>S, x = PolynomialRing(ZZ, &quot;x&quot;)
+</code></pre><p><a id="Inversion-1"></a></p><h2 id="inversion">Inversion</h2><p><a href="#Base.inv-Tuple{Nemo.FracElem}" id="Base.inv-Tuple{Nemo.FracElem}">#</a><strong><code>Base.inv</code></strong> — <em>Method</em>.</p><pre><code>inv(a::FracElem)
+</code></pre><blockquote><p>Return the inverse of the fraction <script type="math/tex">a</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/generic/Fraction.jl#L513" target="_blank">source</a><br/></p><p>Here are some examples of computing inverses.</p><pre><code>S, x = PolynomialRing(ZZ, "x")
 
 a = (x + 1)//(-x^2 + 1)
 
 b = inv(a)
-</code></pre>
-
-<p><a id='Greatest-common-divisor-1'></a></p>
-<h2 id="greatest-common-divisor">Greatest common divisor</h2>
-<p><a id='Base.gcd-Tuple{Nemo.FracElem{T<:Nemo.RingElem},Nemo.FracElem{T<:Nemo.RingElem}}' href='#Base.gcd-Tuple{Nemo.FracElem{T<:Nemo.RingElem},Nemo.FracElem{T<:Nemo.RingElem}}'>#</a>
-<strong><code>Base.gcd</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>gcd{T &lt;: RingElem}(a::FracElem{T}, b::FracElem{T})
-</code></pre>
-
-<blockquote>
-<p>Return a greatest common divisor of <script type="math/tex">a</script> and <script type="math/tex">b</script> if one exists. N.B: we define the GCD of <script type="math/tex">a/b</script> and <script type="math/tex">c/d</script> to be gcd<script type="math/tex">(ad, bc)/bd</script>, reduced to lowest terms. This requires the existence of a greatest common divisor function for the base ring.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/generic/Fraction.jl#L658' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of computing a greatest common divisor.</p>
-<pre><code>S, x = PolynomialRing(ZZ, &quot;x&quot;)
+</code></pre><p><a id="Greatest-common-divisor-1"></a></p><h2 id="greatest-common-divisor">Greatest common divisor</h2><p><a href="#Base.gcd-Tuple{Nemo.FracElem{T&lt;:Nemo.RingElem},Nemo.FracElem{T&lt;:Nemo.RingElem}}" id="Base.gcd-Tuple{Nemo.FracElem{T&lt;:Nemo.RingElem},Nemo.FracElem{T&lt;:Nemo.RingElem}}">#</a><strong><code>Base.gcd</code></strong> — <em>Method</em>.</p><pre><code>gcd{T &lt;: RingElem}(a::FracElem{T}, b::FracElem{T})
+</code></pre><blockquote><p>Return a greatest common divisor of <script type="math/tex">a</script> and <script type="math/tex">b</script> if one exists. N.B: we define the GCD of <script type="math/tex">a/b</script> and <script type="math/tex">c/d</script> to be gcd<script type="math/tex">(ad, bc)/bd</script>, reduced to lowest terms. This requires the existence of a greatest common divisor function for the base ring.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/generic/Fraction.jl#L658" target="_blank">source</a><br/></p><p>Here are some examples of computing a greatest common divisor.</p><pre><code>S, x = PolynomialRing(ZZ, "x")
 
 a = -x//(2x + 1)
 
 f = gcd(a, (x + 1)//(x - 1))
-</code></pre>
-
-<p><a id='Modular-arithmetic-1'></a></p>
-<h2 id="modular-arithmetic">Modular arithmetic</h2>
-<p>The following functions are available for rationals.</p>
-<p><a id='Base.mod-Tuple{Nemo.fmpq,Nemo.fmpz}' href='#Base.mod-Tuple{Nemo.fmpq,Nemo.fmpz}'>#</a>
-<strong><code>Base.mod</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>mod(a::fmpq, b::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">a \pmod{b}</script> where <script type="math/tex">b</script> is an integer coprime to the denominator of <script type="math/tex">a</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L462' class='documenter-source'>source</a><br></p>
-<p><a id='Base.mod-Tuple{Nemo.fmpq,Integer}' href='#Base.mod-Tuple{Nemo.fmpq,Integer}'>#</a>
-<strong><code>Base.mod</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>mod(a::fmpq, b::Integer)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">a \pmod{b}</script> where <script type="math/tex">b</script> is an integer coprime to the denominator of <script type="math/tex">a</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L474' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of modular arithmetic.</p>
-<pre><code>a = -fmpz(2)//3
+</code></pre><p><a id="Modular-arithmetic-1"></a></p><h2 id="modular-arithmetic">Modular arithmetic</h2><p>The following functions are available for rationals.</p><p><a href="#Base.mod-Tuple{Nemo.fmpq,Nemo.fmpz}" id="Base.mod-Tuple{Nemo.fmpq,Nemo.fmpz}">#</a><strong><code>Base.mod</code></strong> — <em>Method</em>.</p><pre><code>mod(a::fmpq, b::fmpz)
+</code></pre><blockquote><p>Return <script type="math/tex">a \pmod{b}</script> where <script type="math/tex">b</script> is an integer coprime to the denominator of <script type="math/tex">a</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L462" target="_blank">source</a><br/></p><p><a href="#Base.mod-Tuple{Nemo.fmpq,Integer}" id="Base.mod-Tuple{Nemo.fmpq,Integer}">#</a><strong><code>Base.mod</code></strong> — <em>Method</em>.</p><pre><code>mod(a::fmpq, b::Integer)
+</code></pre><blockquote><p>Return <script type="math/tex">a \pmod{b}</script> where <script type="math/tex">b</script> is an integer coprime to the denominator of <script type="math/tex">a</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L474" target="_blank">source</a><br/></p><p>Here are some examples of modular arithmetic.</p><pre><code>a = -fmpz(2)//3
 b = fmpz(1)//2
 
 c = mod(a, 7)
 d = mod(b, fmpz(5))
-</code></pre>
-
-<p><a id='Rational-Reconstruction-1'></a></p>
-<h3 id="rational-reconstruction">Rational Reconstruction</h3>
-<p>Rational reconstruction is available for rational numbers.</p>
-<p><a id='Nemo.reconstruct-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Nemo.reconstruct-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
-<strong><code>Nemo.reconstruct</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>reconstruct(a::fmpz, b::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Attempt to find a rational number <script type="math/tex">n/d</script> such that  <script type="math/tex">0 \leq |n| \leq \lfloor\sqrt{m/2}\rfloor</script> and  <script type="math/tex">0 < d \leq \lfloor\sqrt{m/2}\rfloor</script> such that gcd<script type="math/tex">(n, d) = 1</script> and <script type="math/tex">a \equiv nd^{-1} \pmod{m}</script>. If no solution exists, an exception is thrown.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L510' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.reconstruct-Tuple{Nemo.fmpz,Integer}' href='#Nemo.reconstruct-Tuple{Nemo.fmpz,Integer}'>#</a>
-<strong><code>Nemo.reconstruct</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>reconstruct(a::fmpz, b::Integer)
-</code></pre>
-
-<blockquote>
-<p>Attempt to find a rational number <script type="math/tex">n/d</script> such that  <script type="math/tex">0 \leq |n| \leq \lfloor\sqrt{m/2}\rfloor</script> and  <script type="math/tex">0 < d \leq \lfloor\sqrt{m/2}\rfloor</script> such that gcd<script type="math/tex">(n, d) = 1</script> and <script type="math/tex">a \equiv nd^{-1} \pmod{m}</script>. If no solution exists, an exception is thrown.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L526' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.reconstruct-Tuple{Integer,Nemo.fmpz}' href='#Nemo.reconstruct-Tuple{Integer,Nemo.fmpz}'>#</a>
-<strong><code>Nemo.reconstruct</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>reconstruct(a::Integer, b::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Attempt to find a rational number <script type="math/tex">n/d</script> such that  <script type="math/tex">0 \leq |n| \leq \lfloor\sqrt{m/2}\rfloor</script> and  <script type="math/tex">0 < d \leq \lfloor\sqrt{m/2}\rfloor</script> such that gcd<script type="math/tex">(n, d) = 1</script> and <script type="math/tex">a \equiv nd^{-1} \pmod{m}</script>. If no solution exists, an exception is thrown.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L535' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.reconstruct-Tuple{Integer,Integer}' href='#Nemo.reconstruct-Tuple{Integer,Integer}'>#</a>
-<strong><code>Nemo.reconstruct</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>reconstruct(a::Integer, b::Integer)
-</code></pre>
-
-<blockquote>
-<p>Attempt to find a rational number <script type="math/tex">n/d</script> such that  <script type="math/tex">0 \leq |n| \leq \lfloor\sqrt{m/2}\rfloor</script> and  <script type="math/tex">0 < d \leq \lfloor\sqrt{m/2}\rfloor</script> such that gcd<script type="math/tex">(n, d) = 1</script> and <script type="math/tex">a \equiv nd^{-1} \pmod{m}</script>. If no solution exists, an exception is thrown.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L544' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of rational reconstruction.</p>
-<pre><code>a = reconstruct(7, 13)
+</code></pre><p><a id="Rational-Reconstruction-1"></a></p><h3 id="rational-reconstruction">Rational Reconstruction</h3><p>Rational reconstruction is available for rational numbers.</p><p><a href="#Nemo.reconstruct-Tuple{Nemo.fmpz,Nemo.fmpz}" id="Nemo.reconstruct-Tuple{Nemo.fmpz,Nemo.fmpz}">#</a><strong><code>Nemo.reconstruct</code></strong> — <em>Method</em>.</p><pre><code>reconstruct(a::fmpz, b::fmpz)
+</code></pre><blockquote><p>Attempt to find a rational number <script type="math/tex">n/d</script> such that  <script type="math/tex">0 \leq |n| \leq \lfloor\sqrt{m/2}\rfloor</script> and  <script type="math/tex">0 < d \leq \lfloor\sqrt{m/2}\rfloor</script> such that gcd<script type="math/tex">(n, d) = 1</script> and <script type="math/tex">a \equiv nd^{-1} \pmod{m}</script>. If no solution exists, an exception is thrown.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L510" target="_blank">source</a><br/></p><p><a href="#Nemo.reconstruct-Tuple{Nemo.fmpz,Integer}" id="Nemo.reconstruct-Tuple{Nemo.fmpz,Integer}">#</a><strong><code>Nemo.reconstruct</code></strong> — <em>Method</em>.</p><pre><code>reconstruct(a::fmpz, b::Integer)
+</code></pre><blockquote><p>Attempt to find a rational number <script type="math/tex">n/d</script> such that  <script type="math/tex">0 \leq |n| \leq \lfloor\sqrt{m/2}\rfloor</script> and  <script type="math/tex">0 < d \leq \lfloor\sqrt{m/2}\rfloor</script> such that gcd<script type="math/tex">(n, d) = 1</script> and <script type="math/tex">a \equiv nd^{-1} \pmod{m}</script>. If no solution exists, an exception is thrown.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L526" target="_blank">source</a><br/></p><p><a href="#Nemo.reconstruct-Tuple{Integer,Nemo.fmpz}" id="Nemo.reconstruct-Tuple{Integer,Nemo.fmpz}">#</a><strong><code>Nemo.reconstruct</code></strong> — <em>Method</em>.</p><pre><code>reconstruct(a::Integer, b::fmpz)
+</code></pre><blockquote><p>Attempt to find a rational number <script type="math/tex">n/d</script> such that  <script type="math/tex">0 \leq |n| \leq \lfloor\sqrt{m/2}\rfloor</script> and  <script type="math/tex">0 < d \leq \lfloor\sqrt{m/2}\rfloor</script> such that gcd<script type="math/tex">(n, d) = 1</script> and <script type="math/tex">a \equiv nd^{-1} \pmod{m}</script>. If no solution exists, an exception is thrown.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L535" target="_blank">source</a><br/></p><p><a href="#Nemo.reconstruct-Tuple{Integer,Integer}" id="Nemo.reconstruct-Tuple{Integer,Integer}">#</a><strong><code>Nemo.reconstruct</code></strong> — <em>Method</em>.</p><pre><code>reconstruct(a::Integer, b::Integer)
+</code></pre><blockquote><p>Attempt to find a rational number <script type="math/tex">n/d</script> such that  <script type="math/tex">0 \leq |n| \leq \lfloor\sqrt{m/2}\rfloor</script> and  <script type="math/tex">0 < d \leq \lfloor\sqrt{m/2}\rfloor</script> such that gcd<script type="math/tex">(n, d) = 1</script> and <script type="math/tex">a \equiv nd^{-1} \pmod{m}</script>. If no solution exists, an exception is thrown.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L544" target="_blank">source</a><br/></p><p>Here are some examples of rational reconstruction.</p><pre><code>a = reconstruct(7, 13)
 b = reconstruct(fmpz(15), 31)
 c = reconstruct(fmpz(123), fmpz(237))
-</code></pre>
-
-<p><a id='Rational-enumeration-1'></a></p>
-<h2 id="rational-enumeration">Rational enumeration</h2>
-<p>Various methods exist to enumerator rationals.</p>
-<p><a id='Nemo.next_minimal-Tuple{Nemo.fmpq}' href='#Nemo.next_minimal-Tuple{Nemo.fmpq}'>#</a>
-<strong><code>Nemo.next_minimal</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>next_minimal(a::fmpq)
-</code></pre>
-
-<blockquote>
-<p>Given <script type="math/tex">x</script>, returns the next rational number in the sequence obtained by enumerating all positive denominators <script type="math/tex">q</script>, and for each <script type="math/tex">q</script> enumerating the numerators <script type="math/tex">1 \le p < q</script> in order and generating both <script type="math/tex">p/q</script> and <script type="math/tex">q/p</script>, but skipping all gcd<script type="math/tex">(p,q) \neq 1</script>. Starting with zero, this generates every nonnegative rational number once and only once, with the first few entries being <script type="math/tex">0, 1, 1/2, 2, 1/3, 3, 2/3, 3/2, 1/4, 4, 3/4, 4/3, \ldots</script>. This enumeration produces the rational numbers in order of minimal height.  It has the disadvantage of being somewhat slower to compute than the Calkin-Wilf enumeration. If <script type="math/tex">x < 0</script> we throw a <code>DomainError()</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L559' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.next_signed_minimal-Tuple{Nemo.fmpq}' href='#Nemo.next_signed_minimal-Tuple{Nemo.fmpq}'>#</a>
-<strong><code>Nemo.next_signed_minimal</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>next_signed_minimal(a::fmpq)
-</code></pre>
-
-<blockquote>
-<p>Given a signed rational number <script type="math/tex">x</script> assumed to be in canonical form,  returns the next element in the minimal-height sequence generated by  <code>next_minimal</code> but with negative numbers interleaved. The sequence begins <script type="math/tex">0, 1, -1, 1/2, -1/2, 2, -2, 1/3, -1/3, \ldots</script>. Starting with zero, this generates every rational number once and only once, in order of minimal height.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L578' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.next_calkin_wilf-Tuple{Nemo.fmpq}' href='#Nemo.next_calkin_wilf-Tuple{Nemo.fmpq}'>#</a>
-<strong><code>Nemo.next_calkin_wilf</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>next_calkin_wilf(a::fmpq)
-</code></pre>
-
-<blockquote>
-<p>Given <script type="math/tex">x</script> return the next number in the breadth-first traversal of the Calkin-Wilf tree. Starting with zero, this generates every nonnegative rational number once and only once, with the first few entries being <script type="math/tex">0, 1, 1/2, 2, 1/3, 3/2, 2/3, 3, 1/4, 4/3, 3/5, 5/2, 2/5, \ldots</script>. Despite the appearance of the initial entries, the Calkin-Wilf enumeration  does not produce the rational numbers in order of height: some small fractions will appear late in the sequence. This order has the advantage of being faster to produce than the minimal-height order.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L594' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.next_signed_calkin_wilf-Tuple{Nemo.fmpq}' href='#Nemo.next_signed_calkin_wilf-Tuple{Nemo.fmpq}'>#</a>
-<strong><code>Nemo.next_signed_calkin_wilf</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>next_signed_calkin_wilf(a::fmpq)
-</code></pre>
-
-<blockquote>
-<p>Given a signed rational number <script type="math/tex">x</script> returns the next element in the Calkin-Wilf sequence with negative numbers interleaved. The sequence begins <script type="math/tex">0, 1, -1, 1/2, -1/2, 2, -2, 1/3, -1/3, \ldots</script>. Starting with zero, this generates every rational number once and only once, but not in order of minimal height.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L613' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of rational enumeration.</p>
-<pre><code>next_minimal(fmpz(2)//3)
+</code></pre><p><a id="Rational-enumeration-1"></a></p><h2 id="rational-enumeration">Rational enumeration</h2><p>Various methods exist to enumerator rationals.</p><p><a href="#Nemo.next_minimal-Tuple{Nemo.fmpq}" id="Nemo.next_minimal-Tuple{Nemo.fmpq}">#</a><strong><code>Nemo.next_minimal</code></strong> — <em>Method</em>.</p><pre><code>next_minimal(a::fmpq)
+</code></pre><blockquote><p>Given <script type="math/tex">x</script>, returns the next rational number in the sequence obtained by enumerating all positive denominators <script type="math/tex">q</script>, and for each <script type="math/tex">q</script> enumerating the numerators <script type="math/tex">1 \le p < q</script> in order and generating both <script type="math/tex">p/q</script> and <script type="math/tex">q/p</script>, but skipping all gcd<script type="math/tex">(p,q) \neq 1</script>. Starting with zero, this generates every nonnegative rational number once and only once, with the first few entries being <script type="math/tex">0, 1, 1/2, 2, 1/3, 3, 2/3, 3/2, 1/4, 4, 3/4, 4/3, \ldots</script>. This enumeration produces the rational numbers in order of minimal height.  It has the disadvantage of being somewhat slower to compute than the Calkin-Wilf enumeration. If <script type="math/tex">x < 0</script> we throw a <code>DomainError()</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L559" target="_blank">source</a><br/></p><p><a href="#Nemo.next_signed_minimal-Tuple{Nemo.fmpq}" id="Nemo.next_signed_minimal-Tuple{Nemo.fmpq}">#</a><strong><code>Nemo.next_signed_minimal</code></strong> — <em>Method</em>.</p><pre><code>next_signed_minimal(a::fmpq)
+</code></pre><blockquote><p>Given a signed rational number <script type="math/tex">x</script> assumed to be in canonical form,  returns the next element in the minimal-height sequence generated by  <code>next_minimal</code> but with negative numbers interleaved. The sequence begins <script type="math/tex">0, 1, -1, 1/2, -1/2, 2, -2, 1/3, -1/3, \ldots</script>. Starting with zero, this generates every rational number once and only once, in order of minimal height.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L578" target="_blank">source</a><br/></p><p><a href="#Nemo.next_calkin_wilf-Tuple{Nemo.fmpq}" id="Nemo.next_calkin_wilf-Tuple{Nemo.fmpq}">#</a><strong><code>Nemo.next_calkin_wilf</code></strong> — <em>Method</em>.</p><pre><code>next_calkin_wilf(a::fmpq)
+</code></pre><blockquote><p>Given <script type="math/tex">x</script> return the next number in the breadth-first traversal of the Calkin-Wilf tree. Starting with zero, this generates every nonnegative rational number once and only once, with the first few entries being <script type="math/tex">0, 1, 1/2, 2, 1/3, 3/2, 2/3, 3, 1/4, 4/3, 3/5, 5/2, 2/5, \ldots</script>. Despite the appearance of the initial entries, the Calkin-Wilf enumeration  does not produce the rational numbers in order of height: some small fractions will appear late in the sequence. This order has the advantage of being faster to produce than the minimal-height order.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L594" target="_blank">source</a><br/></p><p><a href="#Nemo.next_signed_calkin_wilf-Tuple{Nemo.fmpq}" id="Nemo.next_signed_calkin_wilf-Tuple{Nemo.fmpq}">#</a><strong><code>Nemo.next_signed_calkin_wilf</code></strong> — <em>Method</em>.</p><pre><code>next_signed_calkin_wilf(a::fmpq)
+</code></pre><blockquote><p>Given a signed rational number <script type="math/tex">x</script> returns the next element in the Calkin-Wilf sequence with negative numbers interleaved. The sequence begins <script type="math/tex">0, 1, -1, 1/2, -1/2, 2, -2, 1/3, -1/3, \ldots</script>. Starting with zero, this generates every rational number once and only once, but not in order of minimal height.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L613" target="_blank">source</a><br/></p><p>Here are some examples of rational enumeration.</p><pre><code>next_minimal(fmpz(2)//3)
 next_signed_minimal(-fmpz(21)//31)
 next_calkin_wilf(fmpz(321)//113)
 next_signed_calkin_wilf(-fmpz(51)//(17))
-</code></pre>
-
-<p><a id='Special-functions-1'></a></p>
-<h2 id="special-functions">Special functions</h2>
-<p>The following special functions are available for specific rings in Nemo.</p>
-<p><a id='Nemo.harmonic-Tuple{Int64}' href='#Nemo.harmonic-Tuple{Int64}'>#</a>
-<strong><code>Nemo.harmonic</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>harmonic(n::Int)
-</code></pre>
-
-<blockquote>
-<p>Computes the harmonic number <script type="math/tex">H_n = 1 + 1/2 + 1/3 + \cdots + 1/n</script>. Table lookup is used for <script type="math/tex">H_n</script> whose numerator and denominator  fit in a single limb. For larger <script type="math/tex">n</script>, a divide and conquer strategy is used.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L634' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.bernoulli-Tuple{Int64}' href='#Nemo.bernoulli-Tuple{Int64}'>#</a>
-<strong><code>Nemo.bernoulli</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>bernoulli(n::Int)
-</code></pre>
-
-<blockquote>
-<p>Computes the Bernoulli number <script type="math/tex">B_n</script> for nonnegative <script type="math/tex">n</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L647' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.bernoulli_cache-Tuple{Int64}' href='#Nemo.bernoulli_cache-Tuple{Int64}'>#</a>
-<strong><code>Nemo.bernoulli_cache</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>bernoulli_cache(n::Int)
-</code></pre>
-
-<blockquote>
-<p>Precomputes and caches all the Bernoulli numbers up to <script type="math/tex">B_n</script>. This is much faster than repeatedly calling <code>bernoulli(k)</code>. Once cached, subsequent calls to <code>bernoulli(k)</code> for any <script type="math/tex">k \le n</script> will read from the cache, making them virtually free.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L658' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.dedekind_sum-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Nemo.dedekind_sum-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
-<strong><code>Nemo.dedekind_sum</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>dedekind_sum(h::fmpz, k::fmpz)
-</code></pre>
-
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L671' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.dedekind_sum-Tuple{Nemo.fmpz,Integer}' href='#Nemo.dedekind_sum-Tuple{Nemo.fmpz,Integer}'>#</a>
-<strong><code>Nemo.dedekind_sum</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>dedekind_sum(h::fmpz, k::Integer)
-</code></pre>
-
-<blockquote>
-<p>Computes the Dedekind sum <script type="math/tex">s(h,k)</script> for arbitrary <script type="math/tex">h</script> and <script type="math/tex">k</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L681' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.dedekind_sum-Tuple{Integer,Nemo.fmpz}' href='#Nemo.dedekind_sum-Tuple{Integer,Nemo.fmpz}'>#</a>
-<strong><code>Nemo.dedekind_sum</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>dedekind_sum(h::Integer, k::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Computes the Dedekind sum <script type="math/tex">s(h,k)</script> for arbitrary <script type="math/tex">h</script> and <script type="math/tex">k</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L687' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.dedekind_sum-Tuple{Integer,Integer}' href='#Nemo.dedekind_sum-Tuple{Integer,Integer}'>#</a>
-<strong><code>Nemo.dedekind_sum</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>dedekind_sum(h::Integer, k::Integer)
-</code></pre>
-
-<blockquote>
-<p>Computes the Dedekind sum <script type="math/tex">s(h,k)</script> for arbitrary <script type="math/tex">h</script> and <script type="math/tex">k</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L693' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of special functions.</p>
-<pre><code>a = harmonic(12)
+</code></pre><p><a id="Special-functions-1"></a></p><h2 id="special-functions">Special functions</h2><p>The following special functions are available for specific rings in Nemo.</p><p><a href="#Nemo.harmonic-Tuple{Int64}" id="Nemo.harmonic-Tuple{Int64}">#</a><strong><code>Nemo.harmonic</code></strong> — <em>Method</em>.</p><pre><code>harmonic(n::Int)
+</code></pre><blockquote><p>Computes the harmonic number <script type="math/tex">H_n = 1 + 1/2 + 1/3 + \cdots + 1/n</script>. Table lookup is used for <script type="math/tex">H_n</script> whose numerator and denominator  fit in a single limb. For larger <script type="math/tex">n</script>, a divide and conquer strategy is used.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L634" target="_blank">source</a><br/></p><p><a href="#Nemo.bernoulli-Tuple{Int64}" id="Nemo.bernoulli-Tuple{Int64}">#</a><strong><code>Nemo.bernoulli</code></strong> — <em>Method</em>.</p><pre><code>bernoulli(n::Int)
+</code></pre><blockquote><p>Computes the Bernoulli number <script type="math/tex">B_n</script> for nonnegative <script type="math/tex">n</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L647" target="_blank">source</a><br/></p><p><a href="#Nemo.bernoulli_cache-Tuple{Int64}" id="Nemo.bernoulli_cache-Tuple{Int64}">#</a><strong><code>Nemo.bernoulli_cache</code></strong> — <em>Method</em>.</p><pre><code>bernoulli_cache(n::Int)
+</code></pre><blockquote><p>Precomputes and caches all the Bernoulli numbers up to <script type="math/tex">B_n</script>. This is much faster than repeatedly calling <code>bernoulli(k)</code>. Once cached, subsequent calls to <code>bernoulli(k)</code> for any <script type="math/tex">k \le n</script> will read from the cache, making them virtually free.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L658" target="_blank">source</a><br/></p><p><a href="#Nemo.dedekind_sum-Tuple{Nemo.fmpz,Nemo.fmpz}" id="Nemo.dedekind_sum-Tuple{Nemo.fmpz,Nemo.fmpz}">#</a><strong><code>Nemo.dedekind_sum</code></strong> — <em>Method</em>.</p><pre><code>dedekind_sum(h::fmpz, k::fmpz)
+</code></pre><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L671" target="_blank">source</a><br/></p><p><a href="#Nemo.dedekind_sum-Tuple{Nemo.fmpz,Integer}" id="Nemo.dedekind_sum-Tuple{Nemo.fmpz,Integer}">#</a><strong><code>Nemo.dedekind_sum</code></strong> — <em>Method</em>.</p><pre><code>dedekind_sum(h::fmpz, k::Integer)
+</code></pre><blockquote><p>Computes the Dedekind sum <script type="math/tex">s(h,k)</script> for arbitrary <script type="math/tex">h</script> and <script type="math/tex">k</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L681" target="_blank">source</a><br/></p><p><a href="#Nemo.dedekind_sum-Tuple{Integer,Nemo.fmpz}" id="Nemo.dedekind_sum-Tuple{Integer,Nemo.fmpz}">#</a><strong><code>Nemo.dedekind_sum</code></strong> — <em>Method</em>.</p><pre><code>dedekind_sum(h::Integer, k::fmpz)
+</code></pre><blockquote><p>Computes the Dedekind sum <script type="math/tex">s(h,k)</script> for arbitrary <script type="math/tex">h</script> and <script type="math/tex">k</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L687" target="_blank">source</a><br/></p><p><a href="#Nemo.dedekind_sum-Tuple{Integer,Integer}" id="Nemo.dedekind_sum-Tuple{Integer,Integer}">#</a><strong><code>Nemo.dedekind_sum</code></strong> — <em>Method</em>.</p><pre><code>dedekind_sum(h::Integer, k::Integer)
+</code></pre><blockquote><p>Computes the Dedekind sum <script type="math/tex">s(h,k)</script> for arbitrary <script type="math/tex">h</script> and <script type="math/tex">k</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/fmpq.jl#L693" target="_blank">source</a><br/></p><p>Here are some examples of special functions.</p><pre><code>a = harmonic(12)
 
 b = dedekind_sum(12, 13)
 c = dedekind_sum(-120, fmpz(1305))
@@ -999,55 +193,7 @@ d = bernoulli(12)
 
 bernoulli_cache(100)
 e = bernoulli(100)
-</code></pre>
-              
-            </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../matrix/" class="btn btn-neutral float-right" title="Matrices">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../residue/" class="btn btn-neutral" title="Residue rings"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <!-- Copyright etc -->
-    
-  </div>
+</code></pre></div></div><footer><div aria-label="footer navigation" class="rst-footer-buttons" role="navigation"><a class="btn btn-neutral float-right" href="../matrix/" title="Matrices">Next <span class="icon icon-circle-arrow-right"></span></a><a class="btn btn-neutral" href="../residue/" title="Residue rings"><span class="icon icon-circle-arrow-left"></span> Previous</a></div><hr/><div role="contentinfo"></div>
 
   Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
-</footer>
-	  
-        </div>
-      </div>
-
-    </section>
-    
-  </div>
-
-  <div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-          <a href="https://github.com/Nemocas/Nemo.jl" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
-      
-      
-        <span><a href="../residue/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../matrix/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
-</div>
-    <script src="../js/theme.js"></script>
-      <script src="../mathjaxhelper.js"></script>
-      <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
-
-</body>
-</html>
+</footer></div></div></section></div><div class="rst-versions" role="note" style="cursor: pointer"><span class="rst-current-version" data-toggle="rst-current-version"><a class="fa fa-github" href="https://github.com/Nemocas/Nemo.jl" style="float: left; color: #fcfcfc"> GitHub</a><span><a href="../residue/" style="color: #fcfcfc;">« Previous</a></span><span style="margin-left: 15px"><a href="../matrix/" style="color: #fcfcfc">Next »</a></span></span></div><script src="../js/theme.js"></script><script src="../mathjaxhelper.js"></script><script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script></body></HTML>

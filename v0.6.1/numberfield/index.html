@@ -1,535 +1,112 @@
-<!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <meta name="author" content="William Hart">
-  <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Number fields - Nemo.jl</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-  <link href="../assets/Documenter.css" rel="stylesheet">
-  
-  <script>
+<!DOCTYPE html><HTML class="no-js" lang="en"><head><meta charset="utf-8"/><meta content="IE=edge" http-equiv="X-UA-Compatible"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="William Hart" name="author"/><link href="../img/favicon.ico" rel="shortcut icon"/><title>Number fields - Nemo.jl</title><link href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css"/><link href="../css/theme.css" rel="stylesheet" type="text/css"/><link href="../css/theme_extra.css" rel="stylesheet" type="text/css"/><link href="../css/highlight.css" rel="stylesheet"/><link href="../assets/Documenter.css" rel="stylesheet"/><script>
     // Current page data
     var mkdocs_page_name = "Number fields";
     var mkdocs_page_input_path = "numberfield.md";
     var mkdocs_page_url = "/numberfield/";
-  </script>
-  
-  <script src="../js/jquery-2.1.1.min.js"></script>
-  <script src="../js/modernizr-2.8.3.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
-  
-</head>
+  </script><script src="../js/jquery-2.1.1.min.js"></script><script src="../js/modernizr-2.8.3.min.js"></script><script src="../js/highlight.pack.js" type="text/javascript"></script><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
 
-<body class="wy-body-for-nav" role="document">
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
 
-  <div class="wy-grid-for-nav">
+        head.appendChild(meta);
+    };
 
-    
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-      <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Nemo.jl</a>
-        <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-  </form>
-</div>
-      </div>
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-	  
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="..">Getting Started</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../about/">About Nemo</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../types/">Types in Nemo</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../constructors/">Parent object constructors</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../polynomial/">Univariate polynomials</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../series/">Capped relative power series</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../residue/">Residue rings</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../fraction/">Fraction fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../matrix/">Matrices</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../integer/">Integers</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../rational/">Rationals</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../finitefield/">Finite fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../padic/">P-adic fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../arb/">Real balls</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../acb/">Complex boxes</a>
-	    </li>
-          
-            <li class="toctree-l1 current">
-		
-    <a class="current" href="./">Number fields</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l2"><a href="#introduction">Introduction</a></li>
-    
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
 
-    <li class="toctree-l2"><a href="#number-field-constructors">Number field constructors</a></li>
-    
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
 
-    <li class="toctree-l2"><a href="#number-field-element-constructors">Number field element constructors</a></li>
-    
-
-    <li class="toctree-l2"><a href="#basic-functionality">Basic functionality</a></li>
-    
-
-    <li class="toctree-l2"><a href="#conversions">Conversions</a></li>
-    
-
-    <li class="toctree-l2"><a href="#basic-manipulation">Basic manipulation</a></li>
-    
-
-    <li class="toctree-l2"><a href="#arithmetic-operations">Arithmetic operations</a></li>
-    
-
-    <li class="toctree-l2"><a href="#comparison">Comparison</a></li>
-    
-
-    <li class="toctree-l2"><a href="#function">Function</a></li>
-    
-
-    <li class="toctree-l2"><a href="#function_1">Function</a></li>
-    
-
-    <li class="toctree-l2"><a href="#divisibility">Divisibility</a></li>
-    
-
-    <li class="toctree-l2"><a href="#inversion">Inversion</a></li>
-    
-
-    <li class="toctree-l2"><a href="#norm-and-trace">Norm and trace</a></li>
-    
-
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../maximalorder/">Maximal orders</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../classgroup/">Class groups</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../perm/">Permutation groups</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../factor/">Factorization</a>
-	    </li>
-          
-        </ul>
-      </div>
-      &nbsp;
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="..">Nemo.jl</a>
-      </nav>
-
-      
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
-  <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    
-      
-    
-    <li>Number fields</li>
-    <li class="wy-breadcrumbs-aside">
-      
-        <a href="https://github.com/Nemocas/Nemo.jl/edit/master/docs/numberfield.md"
-          class="icon icon-github"> Edit on GitHub</a>
-      
-    </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main">
-            <div class="section">
-              
-                <p><a id='Introduction-1'></a></p>
-<h2 id="introduction">Introduction</h2>
-<p>Number fields are provided in Nemo by Antic. This allows construction of absolute number fields and basic arithmetic computations therein.</p>
-<p>Number fields are constructed using the <code>AnticNumberField</code> function. However, for convenience we define</p>
-<pre><code>NumberField = AnticNumberField
-</code></pre>
-
-<p>so that number fields can be constructed using <code>NumberField</code> rather than <code>AnticNumberField</code>. </p>
-<p>The types of number field elements in Nemo are given in the following table, along with the libraries that provide them and the associated types of the parent objects.</p>
-<table>
-<thead>
-<tr>
-<th align="right">Library</th>
-<th align="right">Field</th>
-<th align="right">Element type</th>
-<th align="right">Parent type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">Antic</td>
-<td align="right">
-<script type="math/tex">\mathbb{Q}[x]/(f)</script>
-</td>
-<td align="right"><code>nf_elem</code></td>
-<td align="right"><code>AnticNumberField</code></td>
-</tr>
-</tbody>
-</table>
-<p>All the number field types belong to the <code>Field</code> abstract type and the number field element types belong to the <code>FieldElem</code> abstract type.</p>
-<p><a id='Number-field-constructors-1'></a></p>
-<h2 id="number-field-constructors">Number field constructors</h2>
-<p>In order to construct number field elements in Nemo, one must first construct the number field itself. This is accomplished with one of the following constructors.</p>
-<p><a id='Nemo.AnticNumberField-Tuple{Nemo.fmpq_poly,AbstractString}' href='#Nemo.AnticNumberField-Tuple{Nemo.fmpq_poly,AbstractString}'>#</a>
-<strong><code>Nemo.AnticNumberField</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>AnticNumberField(f::fmpq_poly, s::AbstractString)
-</code></pre>
-
-<blockquote>
-<p>Return a tuple <script type="math/tex">R, x</script> consisting of the parent object <script type="math/tex">R</script> and generator <script type="math/tex">x</script> of the number field <script type="math/tex">\mathbb{Q}/(f)</script> where <script type="math/tex">f</script> is the supplied polynomial. The supplied string <code>s</code> specifies how the generator of the number field should be printed.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L944' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.AnticCyclotomicField-Tuple{Int64,AbstractString,Any}' href='#Nemo.AnticCyclotomicField-Tuple{Int64,AbstractString,Any}'>#</a>
-<strong><code>Nemo.AnticCyclotomicField</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>AnticCyclotomicField(n::Int, s::AbstractString, t = &quot;\$&quot;)
-</code></pre>
-
-<blockquote>
-<p>Return a tuple <script type="math/tex">R, x</script> consisting of the parent object <script type="math/tex">R</script> and generator <script type="math/tex">x</script> of the <script type="math/tex">n</script>-th cyclotomic field, <script type="math/tex">\mathbb{Q}(\zeta_n)</script>. The supplied string <code>s</code> specifies how the generator of the number field should be printed. If provided, the string <code>t</code> specifies how the generator of the polynomial ring from which the number field is constructed, should be printed. If it is not supplied, a default dollar sign will be used to represent the variable.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L958' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.AnticMaximalRealSubfield-Tuple{Int64,AbstractString,AbstractString}' href='#Nemo.AnticMaximalRealSubfield-Tuple{Int64,AbstractString,AbstractString}'>#</a>
-<strong><code>Nemo.AnticMaximalRealSubfield</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>AnticMaximalRealSubfield(n::Int, s::AbstractString, t = &quot;\$&quot;)
-</code></pre>
-
-<blockquote>
-<p>Return a tuple <script type="math/tex">R, x</script> consisting of the parent object <script type="math/tex">R</script> and generator <script type="math/tex">x</script> of the totally real subfield of the <script type="math/tex">n</script>-th cyclotomic field, <script type="math/tex">\mathbb{Q}(\zeta_n)</script>. The supplied string <code>s</code> specifies how the generator of the number field should be printed. If provided, the string <code>t</code> specifies how the generator of the polynomial ring from which the number field is constructed, should be printed. If it is not supplied, a default dollar sign will be used to represent the variable.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L974' class='documenter-source'>source</a><br></p>
-<p>For convenience we define</p>
-<pre><code>NumberField = AnticNumberField
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body class="wy-body-for-nav" role="document"><div class="wy-grid-for-nav"><nav class="wy-nav-side stickynav" data-toggle="wy-nav-shift"><div class="wy-side-nav-search"><a class="icon icon-home" href=".."> Nemo.jl</a><div role="search"><form action="../search.html" class="wy-form" id="rtd-search-form" method="get"><input name="q" placeholder="Search docs" type="text"/></form></div></div><div aria-label="main navigation" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation"><ul class="current"><li class="toctree-l1"><a class="" href="..">Getting Started</a></li><li class="toctree-l1"><a class="" href="../about/">About Nemo</a></li><li class="toctree-l1"><a class="" href="../types/">Types in Nemo</a></li><li class="toctree-l1"><a class="" href="../constructors/">Parent object constructors</a></li><li class="toctree-l1"><a class="" href="../polynomial/">Univariate polynomials</a></li><li class="toctree-l1"><a class="" href="../series/">Capped relative power series</a></li><li class="toctree-l1"><a class="" href="../residue/">Residue rings</a></li><li class="toctree-l1"><a class="" href="../fraction/">Fraction fields</a></li><li class="toctree-l1"><a class="" href="../matrix/">Matrices</a></li><li class="toctree-l1"><a class="" href="../integer/">Integers</a></li><li class="toctree-l1"><a class="" href="../rational/">Rationals</a></li><li class="toctree-l1"><a class="" href="../finitefield/">Finite fields</a></li><li class="toctree-l1"><a class="" href="../padic/">P-adic fields</a></li><li class="toctree-l1"><a class="" href="../arb/">Real balls</a></li><li class="toctree-l1"><a class="" href="../acb/">Complex boxes</a></li><li class="toctree-l1 current"><a class="current" href="./">Number fields</a><ul class="subnav"><li class="toctree-l2"><a href="#introduction">Introduction</a></li><li class="toctree-l2"><a href="#number-field-constructors">Number field constructors</a></li><li class="toctree-l2"><a href="#number-field-element-constructors">Number field element constructors</a></li><li class="toctree-l2"><a href="#basic-functionality">Basic functionality</a></li><li class="toctree-l2"><a href="#conversions">Conversions</a></li><li class="toctree-l2"><a href="#basic-manipulation">Basic manipulation</a></li><li class="toctree-l2"><a href="#arithmetic-operations">Arithmetic operations</a></li><li class="toctree-l2"><a href="#comparison">Comparison</a></li><li class="toctree-l2"><a href="#function">Function</a></li><li class="toctree-l2"><a href="#function_1">Function</a></li><li class="toctree-l2"><a href="#divisibility">Divisibility</a></li><li class="toctree-l2"><a href="#inversion">Inversion</a></li><li class="toctree-l2"><a href="#norm-and-trace">Norm and trace</a></li></ul></li><li class="toctree-l1"><a class="" href="../maximalorder/">Maximal orders</a></li><li class="toctree-l1"><a class="" href="../classgroup/">Class groups</a></li><li class="toctree-l1"><a class="" href="../perm/">Permutation groups</a></li><li class="toctree-l1"><a class="" href="../factor/">Factorization</a></li></ul></div>
+       
+    </nav><section class="wy-nav-content-wrap" data-toggle="wy-nav-shift"><nav aria-label="top navigation" class="wy-nav-top" role="navigation"><i class="fa fa-bars" data-toggle="wy-nav-top"></i><a href="..">Nemo.jl</a></nav><div class="wy-nav-content"><div class="rst-content"><div aria-label="breadcrumbs navigation" role="navigation"><ul class="wy-breadcrumbs"><li><a href="..">Docs</a> »</li><li>Number fields</li><li class="wy-breadcrumbs-aside"><a class="icon icon-github" href="https://github.com/Nemocas/Nemo.jl/edit/master/docs/numberfield.md"> Edit on GitHub</a></li></ul><hr/></div><div role="main"><div class="section"><p><a id="Introduction-1"></a></p><h2 id="introduction">Introduction</h2><p>Number fields are provided in Nemo by Antic. This allows construction of absolute number fields and basic arithmetic computations therein.</p><p>Number fields are constructed using the <code>AnticNumberField</code> function. However, for convenience we define</p><pre><code>NumberField = AnticNumberField
+</code></pre><p>so that number fields can be constructed using <code>NumberField</code> rather than <code>AnticNumberField</code>. </p><p>The types of number field elements in Nemo are given in the following table, along with the libraries that provide them and the associated types of the parent objects.</p><table><thead><tr><th align="right">Library</th><th align="right">Field</th><th align="right">Element type</th><th align="right">Parent type</th></tr></thead><tbody><tr><td align="right">Antic</td><td align="right"><script type="math/tex">\mathbb{Q}[x]/(f)</script></td><td align="right"><code>nf_elem</code></td><td align="right"><code>AnticNumberField</code></td></tr></tbody></table><p>All the number field types belong to the <code>Field</code> abstract type and the number field element types belong to the <code>FieldElem</code> abstract type.</p><p><a id="Number-field-constructors-1"></a></p><h2 id="number-field-constructors">Number field constructors</h2><p>In order to construct number field elements in Nemo, one must first construct the number field itself. This is accomplished with one of the following constructors.</p><p><a href="#Nemo.AnticNumberField-Tuple{Nemo.fmpq_poly,AbstractString}" id="Nemo.AnticNumberField-Tuple{Nemo.fmpq_poly,AbstractString}">#</a><strong><code>Nemo.AnticNumberField</code></strong> — <em>Method</em>.</p><pre><code>AnticNumberField(f::fmpq_poly, s::AbstractString)
+</code></pre><blockquote><p>Return a tuple <script type="math/tex">R, x</script> consisting of the parent object <script type="math/tex">R</script> and generator <script type="math/tex">x</script> of the number field <script type="math/tex">\mathbb{Q}/(f)</script> where <script type="math/tex">f</script> is the supplied polynomial. The supplied string <code>s</code> specifies how the generator of the number field should be printed.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L944" target="_blank">source</a><br/></p><p><a href="#Nemo.AnticCyclotomicField-Tuple{Int64,AbstractString,Any}" id="Nemo.AnticCyclotomicField-Tuple{Int64,AbstractString,Any}">#</a><strong><code>Nemo.AnticCyclotomicField</code></strong> — <em>Method</em>.</p><pre><code>AnticCyclotomicField(n::Int, s::AbstractString, t = "\$")
+</code></pre><blockquote><p>Return a tuple <script type="math/tex">R, x</script> consisting of the parent object <script type="math/tex">R</script> and generator <script type="math/tex">x</script> of the <script type="math/tex">n</script>-th cyclotomic field, <script type="math/tex">\mathbb{Q}(\zeta_n)</script>. The supplied string <code>s</code> specifies how the generator of the number field should be printed. If provided, the string <code>t</code> specifies how the generator of the polynomial ring from which the number field is constructed, should be printed. If it is not supplied, a default dollar sign will be used to represent the variable.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L958" target="_blank">source</a><br/></p><p><a href="#Nemo.AnticMaximalRealSubfield-Tuple{Int64,AbstractString,AbstractString}" id="Nemo.AnticMaximalRealSubfield-Tuple{Int64,AbstractString,AbstractString}">#</a><strong><code>Nemo.AnticMaximalRealSubfield</code></strong> — <em>Method</em>.</p><pre><code>AnticMaximalRealSubfield(n::Int, s::AbstractString, t = "\$")
+</code></pre><blockquote><p>Return a tuple <script type="math/tex">R, x</script> consisting of the parent object <script type="math/tex">R</script> and generator <script type="math/tex">x</script> of the totally real subfield of the <script type="math/tex">n</script>-th cyclotomic field, <script type="math/tex">\mathbb{Q}(\zeta_n)</script>. The supplied string <code>s</code> specifies how the generator of the number field should be printed. If provided, the string <code>t</code> specifies how the generator of the polynomial ring from which the number field is constructed, should be printed. If it is not supplied, a default dollar sign will be used to represent the variable.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L974" target="_blank">source</a><br/></p><p>For convenience we define</p><pre><code>NumberField = AnticNumberField
 CyclotomicField = AnticCyclotomicField
 MaximalRealSubfield = AnticMaximalRealSubfield
-</code></pre>
-
-<p>so that one can use the names on the left instead of those on the right.</p>
-<p>Here are some examples of creating number fields and making use of the resulting parent objects to coerce various elements into those fields.</p>
-<pre><code>R, x = PolynomialRing(QQ, &quot;x&quot;)
-K, a = NumberField(x^3 + 3x + 1, &quot;a&quot;)
-L, b = CyclotomicField(5, &quot;b&quot;)
-M, c = MaximalRealSubfield(5, &quot;c&quot;, &quot;y&quot;)
+</code></pre><p>so that one can use the names on the left instead of those on the right.</p><p>Here are some examples of creating number fields and making use of the resulting parent objects to coerce various elements into those fields.</p><pre><code>R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+L, b = CyclotomicField(5, "b")
+M, c = MaximalRealSubfield(5, "c", "y")
 
 d = K(3)
 f = L(b)
 g = L(ZZ(11))
 h = L(ZZ(11)//3)
 k = M(x)
-</code></pre>
-
-<p><a id='Number-field-element-constructors-1'></a></p>
-<h2 id="number-field-element-constructors">Number field element constructors</h2>
-<p>Once a number field is constructed, there are various ways to construct elements in that field.</p>
-<p>Apart from coercing elements into the number field as above, we offer the following functions.</p>
-<p><a id='Base.zero-Tuple{Nemo.AnticNumberField}' href='#Base.zero-Tuple{Nemo.AnticNumberField}'>#</a>
-<strong><code>Base.zero</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>zero(a::AnticNumberField)
-</code></pre>
-
-<blockquote>
-<p>Return the multiplicative identity, i.e. one, in the given number field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L113' class='documenter-source'>source</a><br></p>
-<p><a id='Base.one-Tuple{Nemo.AnticNumberField}' href='#Base.one-Tuple{Nemo.AnticNumberField}'>#</a>
-<strong><code>Base.one</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>one(a::AnticNumberField)
-</code></pre>
-
-<blockquote>
-<p>Return the multiplicative identity, i.e. one, in the given number field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L102' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.gen-Tuple{Nemo.AnticNumberField}' href='#Nemo.gen-Tuple{Nemo.AnticNumberField}'>#</a>
-<strong><code>Nemo.gen</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>gen(a::AnticNumberField)
-</code></pre>
-
-<blockquote>
-<p>Return the generator of the given number field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L91' class='documenter-source'>source</a><br></p>
-<p>The easiest way of constructing number field elements is to use element arithmetic with the generator, to construct the desired element by its representation as a polynomial. See the following examples for how to do this.</p>
-<p>Here are some examples of constructing number field elements.</p>
-<pre><code>R, x = PolynomialRing(QQ, &quot;x&quot;)
-K, a = NumberField(x^3 + 3x + 1, &quot;a&quot;)
+</code></pre><p><a id="Number-field-element-constructors-1"></a></p><h2 id="number-field-element-constructors">Number field element constructors</h2><p>Once a number field is constructed, there are various ways to construct elements in that field.</p><p>Apart from coercing elements into the number field as above, we offer the following functions.</p><p><a href="#Base.zero-Tuple{Nemo.AnticNumberField}" id="Base.zero-Tuple{Nemo.AnticNumberField}">#</a><strong><code>Base.zero</code></strong> — <em>Method</em>.</p><pre><code>zero(a::AnticNumberField)
+</code></pre><blockquote><p>Return the multiplicative identity, i.e. one, in the given number field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L113" target="_blank">source</a><br/></p><p><a href="#Base.one-Tuple{Nemo.AnticNumberField}" id="Base.one-Tuple{Nemo.AnticNumberField}">#</a><strong><code>Base.one</code></strong> — <em>Method</em>.</p><pre><code>one(a::AnticNumberField)
+</code></pre><blockquote><p>Return the multiplicative identity, i.e. one, in the given number field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L102" target="_blank">source</a><br/></p><p><a href="#Nemo.gen-Tuple{Nemo.AnticNumberField}" id="Nemo.gen-Tuple{Nemo.AnticNumberField}">#</a><strong><code>Nemo.gen</code></strong> — <em>Method</em>.</p><pre><code>gen(a::AnticNumberField)
+</code></pre><blockquote><p>Return the generator of the given number field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L91" target="_blank">source</a><br/></p><p>The easiest way of constructing number field elements is to use element arithmetic with the generator, to construct the desired element by its representation as a polynomial. See the following examples for how to do this.</p><p>Here are some examples of constructing number field elements.</p><pre><code>R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
 
 b = zero(K)
 c = one(K)
 d = gen(K)
 f = a^2 + 2a - 7
-</code></pre>
-
-<p><a id='Basic-functionality-1'></a></p>
-<h2 id="basic-functionality">Basic functionality</h2>
-<p>The following basic functionality is provided by the default number field implementation in Nemo, to support construction of generic rings over number fields. Any custom number field implementation in Nemo should provide these  functions along with the usual arithmetic operations.</p>
-<pre><code>parent_type(::Type{nf_elem})
-</code></pre>
-
-<p>Gives the type of the parent object of an Antic number field element.</p>
-<pre><code>elem_type(R::AnticNumberField)
-</code></pre>
-
-<p>Given the parent object for a number field, return the type of elements of the field.</p>
-<pre><code>Base.hash(a::nf_elem, h::UInt)
-</code></pre>
-
-<p>Return a <code>UInt</code> hexadecimal hash of the number field element <script type="math/tex">a</script>. This should be xor'd with a fixed random hexadecimal specific to the number field type. The hash of the coefficients of the number field element representation should be xor'd with the supplied parameter <code>h</code> as part of computing the hash.</p>
-<pre><code>deepcopy(a::nf_elem)
-</code></pre>
-
-<p>Construct a copy of the given number field element and return it. This function must recursively construct copies of all of the internal data in the given element. Nemo number field elements are mutable and so returning shallow copies is not sufficient.</p>
-<pre><code>mul!(c::nf_elem, a::nf_elem, b::nf_elem)
-</code></pre>
-
-<p>Multiply <script type="math/tex">a</script> by <script type="math/tex">b</script> and set the existing number field element <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p>
-<pre><code>mul_red!(c::nf_elem, a::nf_elem, b::nf_elem, red::Bool)
-</code></pre>
-
-<p>Multiply <script type="math/tex">a</script> by <script type="math/tex">b</script> and set the existing number field element <script type="math/tex">c</script> to the result. Reduction modulo the defining polynomial is only performed if <code>red</code> is set to <code>true</code>. Note that <script type="math/tex">a</script> and <script type="math/tex">b</script> must be reduced. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p>
-<pre><code>reduce!(x::nf_elem)
-</code></pre>
-
-<p>Reduce the given number field element by the defining polynomial, in-place. This only needs to be done after accumulating values computed by <code>mul_red!</code> where reduction has not been performed. All standard Nemo number field functions automatically reduce their outputs.</p>
-<pre><code>addeq!(c::nf_elem, a::nf_elem)
-</code></pre>
-
-<p>In-place addition. Adds <script type="math/tex">a</script> to <script type="math/tex">c</script> and sets <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p>
-<p>Given the parent object <code>R</code> for a number field, the following coercion functions are provided to coerce various elements into the number field. Developers provide these by overloading the <code>call</code> operator for the number field parent objects.</p>
-<pre><code>R()
-</code></pre>
-
-<p>Coerce zero into the number field.</p>
-<pre><code>R(n::Integer)
+</code></pre><p><a id="Basic-functionality-1"></a></p><h2 id="basic-functionality">Basic functionality</h2><p>The following basic functionality is provided by the default number field implementation in Nemo, to support construction of generic rings over number fields. Any custom number field implementation in Nemo should provide these  functions along with the usual arithmetic operations.</p><pre><code>parent_type(::Type{nf_elem})
+</code></pre><p>Gives the type of the parent object of an Antic number field element.</p><pre><code>elem_type(R::AnticNumberField)
+</code></pre><p>Given the parent object for a number field, return the type of elements of the field.</p><pre><code>Base.hash(a::nf_elem, h::UInt)
+</code></pre><p>Return a <code>UInt</code> hexadecimal hash of the number field element <script type="math/tex">a</script>. This should be xor'd with a fixed random hexadecimal specific to the number field type. The hash of the coefficients of the number field element representation should be xor'd with the supplied parameter <code>h</code> as part of computing the hash.</p><pre><code>deepcopy(a::nf_elem)
+</code></pre><p>Construct a copy of the given number field element and return it. This function must recursively construct copies of all of the internal data in the given element. Nemo number field elements are mutable and so returning shallow copies is not sufficient.</p><pre><code>mul!(c::nf_elem, a::nf_elem, b::nf_elem)
+</code></pre><p>Multiply <script type="math/tex">a</script> by <script type="math/tex">b</script> and set the existing number field element <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p><pre><code>mul_red!(c::nf_elem, a::nf_elem, b::nf_elem, red::Bool)
+</code></pre><p>Multiply <script type="math/tex">a</script> by <script type="math/tex">b</script> and set the existing number field element <script type="math/tex">c</script> to the result. Reduction modulo the defining polynomial is only performed if <code>red</code> is set to <code>true</code>. Note that <script type="math/tex">a</script> and <script type="math/tex">b</script> must be reduced. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p><pre><code>reduce!(x::nf_elem)
+</code></pre><p>Reduce the given number field element by the defining polynomial, in-place. This only needs to be done after accumulating values computed by <code>mul_red!</code> where reduction has not been performed. All standard Nemo number field functions automatically reduce their outputs.</p><pre><code>addeq!(c::nf_elem, a::nf_elem)
+</code></pre><p>In-place addition. Adds <script type="math/tex">a</script> to <script type="math/tex">c</script> and sets <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p><p>Given the parent object <code>R</code> for a number field, the following coercion functions are provided to coerce various elements into the number field. Developers provide these by overloading the <code>call</code> operator for the number field parent objects.</p><pre><code>R()
+</code></pre><p>Coerce zero into the number field.</p><pre><code>R(n::Integer)
 R(f::fmpz)
 R(f::fmpq)
-</code></pre>
-
-<p>Coerce an integer or rational value into the number field.</p>
-<pre><code>R(f::fmpq_poly)
-</code></pre>
-
-<p>Coerce the given rational polynomial into the number field, i.e. consider the polynomial to be the representation of a number field element and return it.</p>
-<pre><code>R(f::nf_elem)
-</code></pre>
-
-<p>Take a number field element that is already in the number field and simply return it. A copy of the original is not made.</p>
-<p>In addition to the above, developers of custom number field types must ensure that they provide the equivalent of the function <code>base_ring(R::AnticNumberField)</code> which should return <code>Union{}</code>. In addition to this they should ensure that each number field element contains a field <code>parent</code> specifying the parent object of the number field element, or at least supply the equivalent of the function <code>parent(a::nf_elem)</code> to return the parent object of a number field element.</p>
-<p><a id='Conversions-1'></a></p>
-<h2 id="conversions">Conversions</h2>
-<p>If <script type="math/tex">R</script> is the polynomial ring to which the generating polynomial of a number field belongs, then we can coerce number field elements into the ring <script type="math/tex">R</script> using the following function.</p>
-<pre><code>R(b::nf_elem)
-</code></pre>
-
-<p>Coerce the given number field element into the polynomial ring <script type="math/tex">R</script> of which the number field is a quotient.</p>
-<p>Here are some examples of conversions from number field elements.</p>
-<pre><code>R, x = PolynomialRing(QQ, &quot;x&quot;)
-K, a = NumberField(x^3 + 3x + 1, &quot;a&quot;)
+</code></pre><p>Coerce an integer or rational value into the number field.</p><pre><code>R(f::fmpq_poly)
+</code></pre><p>Coerce the given rational polynomial into the number field, i.e. consider the polynomial to be the representation of a number field element and return it.</p><pre><code>R(f::nf_elem)
+</code></pre><p>Take a number field element that is already in the number field and simply return it. A copy of the original is not made.</p><p>In addition to the above, developers of custom number field types must ensure that they provide the equivalent of the function <code>base_ring(R::AnticNumberField)</code> which should return <code>Union{}</code>. In addition to this they should ensure that each number field element contains a field <code>parent</code> specifying the parent object of the number field element, or at least supply the equivalent of the function <code>parent(a::nf_elem)</code> to return the parent object of a number field element.</p><p><a id="Conversions-1"></a></p><h2 id="conversions">Conversions</h2><p>If <script type="math/tex">R</script> is the polynomial ring to which the generating polynomial of a number field belongs, then we can coerce number field elements into the ring <script type="math/tex">R</script> using the following function.</p><pre><code>R(b::nf_elem)
+</code></pre><p>Coerce the given number field element into the polynomial ring <script type="math/tex">R</script> of which the number field is a quotient.</p><p>Here are some examples of conversions from number field elements.</p><pre><code>R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
 
 f = R(a^2 + 2a + 3)
-</code></pre>
-
-<p><a id='Basic-manipulation-1'></a></p>
-<h2 id="basic-manipulation">Basic manipulation</h2>
-<p>Numerous functions are provided to manipulate number field elements. Also see the section on basic functionality above.</p>
-<p><a id='Nemo.base_ring-Tuple{Nemo.AnticNumberField}' href='#Nemo.base_ring-Tuple{Nemo.AnticNumberField}'>#</a>
-<strong><code>Nemo.base_ring</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>base_ring(a::AnticNumberField)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>Union{}</code> since a number field doesn't depend on any ring.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L26' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.base_ring-Tuple{Nemo.nf_elem}' href='#Nemo.base_ring-Tuple{Nemo.nf_elem}'>#</a>
-<strong><code>Nemo.base_ring</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>base_ring(a::nf_elem)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>Union{}</code> since a number field doesn't depend on any ring.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L32' class='documenter-source'>source</a><br></p>
-<p><a id='Base.parent-Tuple{Nemo.nf_elem}' href='#Base.parent-Tuple{Nemo.nf_elem}'>#</a>
-<strong><code>Base.parent</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>parent(a::nf_elem)
-</code></pre>
-
-<blockquote>
-<p>Return the parent of the given number field element.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L18' class='documenter-source'>source</a><br></p>
-<p><a id='Base.var-Tuple{Nemo.AnticNumberField}' href='#Base.var-Tuple{Nemo.AnticNumberField}'>#</a>
-<strong><code>Base.var</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>var(a::AnticNumberField)
-</code></pre>
-
-<blockquote>
-<p>Returns the identifier (as a symbol, not a string), that is used for printing the generator of the given number field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L38' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.iszero-Tuple{Nemo.nf_elem}' href='#Nemo.iszero-Tuple{Nemo.nf_elem}'>#</a>
-<strong><code>Nemo.iszero</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>iszero(a::nf_elem)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if the given number field element is the additive identity of the number field, i.e. zero, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L144' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.isone-Tuple{Nemo.nf_elem}' href='#Nemo.isone-Tuple{Nemo.nf_elem}'>#</a>
-<strong><code>Nemo.isone</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isone(a::nf_elem)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if the given number field element is the multiplicative identity of the number field, i.e. one, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L134' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.isunit-Tuple{Nemo.nf_elem}' href='#Nemo.isunit-Tuple{Nemo.nf_elem}'>#</a>
-<strong><code>Nemo.isunit</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isunit(a::nf_elem)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if the given number field element is invertible, i.e. nonzero, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L154' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.isgen-Tuple{Nemo.nf_elem}' href='#Nemo.isgen-Tuple{Nemo.nf_elem}'>#</a>
-<strong><code>Nemo.isgen</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isgen(a::nf_elem)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if the given number field element is the generator of the number field, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L124' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.coeff-Tuple{Nemo.nf_elem,Int64}' href='#Nemo.coeff-Tuple{Nemo.nf_elem,Int64}'>#</a>
-<strong><code>Nemo.coeff</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>coeff(x::nf_elem, n::Int)
-</code></pre>
-
-<blockquote>
-<p>Return the <script type="math/tex">n</script>-th coefficient of the polynomial representation of the given number field element. Coefficients are numbered from <script type="math/tex">0</script>, starting with the constant coefficient.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L70' class='documenter-source'>source</a><br></p>
-<p><a id='Base.den-Tuple{Nemo.nf_elem}' href='#Base.den-Tuple{Nemo.nf_elem}'>#</a>
-<strong><code>Base.den</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>den(a::nf_elem)
-</code></pre>
-
-<blockquote>
-<p>Return the denominator of the polynomial representation of the given number field element.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L161' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.degree-Tuple{Nemo.AnticNumberField}' href='#Nemo.degree-Tuple{Nemo.AnticNumberField}'>#</a>
-<strong><code>Nemo.degree</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>degree(a::AnticNumberField)
-</code></pre>
-
-<blockquote>
-<p>Return the degree of the given number field, i.e. the degree of its defining polynomial.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L191' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.signature-Tuple{Nemo.AnticNumberField}' href='#Nemo.signature-Tuple{Nemo.AnticNumberField}'>#</a>
-<strong><code>Nemo.signature</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>signature(a::AnticNumberField)
-</code></pre>
-
-<blockquote>
-<p>Return the signature of the given number field, i.e. a tuple <script type="math/tex">r, s</script> consisting of <script type="math/tex">r</script>, the number of real embeddings and <script type="math/tex">s</script>, half the number of complex embeddings.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L198' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of basic manipulation of number field elements.</p>
-<pre><code>R, x = PolynomialRing(QQ, &quot;x&quot;)
-K, a = NumberField(x^3 + 3x + 1, &quot;a&quot;)
+</code></pre><p><a id="Basic-manipulation-1"></a></p><h2 id="basic-manipulation">Basic manipulation</h2><p>Numerous functions are provided to manipulate number field elements. Also see the section on basic functionality above.</p><p><a href="#Nemo.base_ring-Tuple{Nemo.AnticNumberField}" id="Nemo.base_ring-Tuple{Nemo.AnticNumberField}">#</a><strong><code>Nemo.base_ring</code></strong> — <em>Method</em>.</p><pre><code>base_ring(a::AnticNumberField)
+</code></pre><blockquote><p>Returns <code>Union{}</code> since a number field doesn't depend on any ring.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L26" target="_blank">source</a><br/></p><p><a href="#Nemo.base_ring-Tuple{Nemo.nf_elem}" id="Nemo.base_ring-Tuple{Nemo.nf_elem}">#</a><strong><code>Nemo.base_ring</code></strong> — <em>Method</em>.</p><pre><code>base_ring(a::nf_elem)
+</code></pre><blockquote><p>Returns <code>Union{}</code> since a number field doesn't depend on any ring.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L32" target="_blank">source</a><br/></p><p><a href="#Base.parent-Tuple{Nemo.nf_elem}" id="Base.parent-Tuple{Nemo.nf_elem}">#</a><strong><code>Base.parent</code></strong> — <em>Method</em>.</p><pre><code>parent(a::nf_elem)
+</code></pre><blockquote><p>Return the parent of the given number field element.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L18" target="_blank">source</a><br/></p><p><a href="#Base.var-Tuple{Nemo.AnticNumberField}" id="Base.var-Tuple{Nemo.AnticNumberField}">#</a><strong><code>Base.var</code></strong> — <em>Method</em>.</p><pre><code>var(a::AnticNumberField)
+</code></pre><blockquote><p>Returns the identifier (as a symbol, not a string), that is used for printing the generator of the given number field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L38" target="_blank">source</a><br/></p><p><a href="#Nemo.iszero-Tuple{Nemo.nf_elem}" id="Nemo.iszero-Tuple{Nemo.nf_elem}">#</a><strong><code>Nemo.iszero</code></strong> — <em>Method</em>.</p><pre><code>iszero(a::nf_elem)
+</code></pre><blockquote><p>Return <code>true</code> if the given number field element is the additive identity of the number field, i.e. zero, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L144" target="_blank">source</a><br/></p><p><a href="#Nemo.isone-Tuple{Nemo.nf_elem}" id="Nemo.isone-Tuple{Nemo.nf_elem}">#</a><strong><code>Nemo.isone</code></strong> — <em>Method</em>.</p><pre><code>isone(a::nf_elem)
+</code></pre><blockquote><p>Return <code>true</code> if the given number field element is the multiplicative identity of the number field, i.e. one, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L134" target="_blank">source</a><br/></p><p><a href="#Nemo.isunit-Tuple{Nemo.nf_elem}" id="Nemo.isunit-Tuple{Nemo.nf_elem}">#</a><strong><code>Nemo.isunit</code></strong> — <em>Method</em>.</p><pre><code>isunit(a::nf_elem)
+</code></pre><blockquote><p>Return <code>true</code> if the given number field element is invertible, i.e. nonzero, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L154" target="_blank">source</a><br/></p><p><a href="#Nemo.isgen-Tuple{Nemo.nf_elem}" id="Nemo.isgen-Tuple{Nemo.nf_elem}">#</a><strong><code>Nemo.isgen</code></strong> — <em>Method</em>.</p><pre><code>isgen(a::nf_elem)
+</code></pre><blockquote><p>Return <code>true</code> if the given number field element is the generator of the number field, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L124" target="_blank">source</a><br/></p><p><a href="#Nemo.coeff-Tuple{Nemo.nf_elem,Int64}" id="Nemo.coeff-Tuple{Nemo.nf_elem,Int64}">#</a><strong><code>Nemo.coeff</code></strong> — <em>Method</em>.</p><pre><code>coeff(x::nf_elem, n::Int)
+</code></pre><blockquote><p>Return the <script type="math/tex">n</script>-th coefficient of the polynomial representation of the given number field element. Coefficients are numbered from <script type="math/tex">0</script>, starting with the constant coefficient.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L70" target="_blank">source</a><br/></p><p><a href="#Base.den-Tuple{Nemo.nf_elem}" id="Base.den-Tuple{Nemo.nf_elem}">#</a><strong><code>Base.den</code></strong> — <em>Method</em>.</p><pre><code>den(a::nf_elem)
+</code></pre><blockquote><p>Return the denominator of the polynomial representation of the given number field element.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L161" target="_blank">source</a><br/></p><p><a href="#Nemo.degree-Tuple{Nemo.AnticNumberField}" id="Nemo.degree-Tuple{Nemo.AnticNumberField}">#</a><strong><code>Nemo.degree</code></strong> — <em>Method</em>.</p><pre><code>degree(a::AnticNumberField)
+</code></pre><blockquote><p>Return the degree of the given number field, i.e. the degree of its defining polynomial.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L191" target="_blank">source</a><br/></p><p><a href="#Nemo.signature-Tuple{Nemo.AnticNumberField}" id="Nemo.signature-Tuple{Nemo.AnticNumberField}">#</a><strong><code>Nemo.signature</code></strong> — <em>Method</em>.</p><pre><code>signature(a::AnticNumberField)
+</code></pre><blockquote><p>Return the signature of the given number field, i.e. a tuple <script type="math/tex">r, s</script> consisting of <script type="math/tex">r</script>, the number of real embeddings and <script type="math/tex">s</script>, half the number of complex embeddings.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L198" target="_blank">source</a><br/></p><p>Here are some examples of basic manipulation of number field elements.</p><pre><code>R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
 
 d = a^2 + 2a - 7
 k = zero(K)
@@ -544,155 +121,8 @@ r, s = signature(K)
 v = var(R)
 S = parent(a + 1)
 T = base_ring(K)
-</code></pre>
-
-<p><a id='Arithmetic-operations-1'></a></p>
-<h2 id="arithmetic-operations">Arithmetic operations</h2>
-<p>Nemo provides all the standard field operations for number field elements, as follows.</p>
-<table>
-<thead>
-<tr>
-<th align="right">Function</th>
-<th align="right">Operation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">-(a::nf_elem)</td>
-<td align="right">unary minus</td>
-</tr>
-<tr>
-<td align="right">+(a::nf_elem, b::nf_elem)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">-(a::nf_elem, b::nf_elem)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">*(a::nf_elem, b::nf_elem)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">divexact(a::nf_elem, b::nf_elem)</td>
-<td align="right">exact division</td>
-</tr>
-</tbody>
-</table>
-<p>In addition, the following ad hoc field operations are defined.</p>
-<table>
-<thead>
-<tr>
-<th align="right">Function</th>
-<th align="right">Operation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">+(a::nf_elem, b::Integer)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">+(a::Integer, b::nf_elem)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">+(a::nf_elem, b::fmpz)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">+(a::fmpz, b::nf_elem)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">+(a::nf_elem, b::fmpq)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">+(a::fmpq, b::nf_elem)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">-(a::nf_elem, b::Integer)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">-(a::Integer, b::nf_elem)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">-(a::nf_elem, b::fmpz)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">-(a::fmpz, b::nf_elem)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">-(a::nf_elem, b::fmpq)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">-(a::fmpq, b::nf_elem)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">*(a::nf_elem, b::Integer)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">*(a::Integer, b::nf_elem)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">*(a::nf_elem, b::fmpz)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">*(a::fmpz, b::nf_elem)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">*(a::nf_elem, b::fmpq)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">*(a::fmpq, b::nf_elem)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">divexact(a::nf_elem, b::Integer)</td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right">divexact(a::nf_elem, b::fmpz)</td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right">divexact(a::nf_elem, b::fmpq)</td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right">divexact(a::Integer, b::nf_elem)</td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right">divexact(a::fmpz, b::nf_elem)</td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right">divexact(a::fmpq, b::nf_elem)</td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right">^(a::nf_elem, b::Int)</td>
-<td align="right">powering</td>
-</tr>
-</tbody>
-</table>
-<p>Here are some examples of arithmetic operations on number fields.</p>
-<pre><code>R, x = PolynomialRing(QQ, &quot;x&quot;)
-K, a = NumberField(x^3 + 3x + 1, &quot;a&quot;)
+</code></pre><p><a id="Arithmetic-operations-1"></a></p><h2 id="arithmetic-operations">Arithmetic operations</h2><p>Nemo provides all the standard field operations for number field elements, as follows.</p><table><thead><tr><th align="right">Function</th><th align="right">Operation</th></tr></thead><tbody><tr><td align="right">-(a::nf_elem)</td><td align="right">unary minus</td></tr><tr><td align="right">+(a::nf_elem, b::nf_elem)</td><td align="right">addition</td></tr><tr><td align="right">-(a::nf_elem, b::nf_elem)</td><td align="right">subtraction</td></tr><tr><td align="right">*(a::nf_elem, b::nf_elem)</td><td align="right">multiplication</td></tr><tr><td align="right">divexact(a::nf_elem, b::nf_elem)</td><td align="right">exact division</td></tr></tbody></table><p>In addition, the following ad hoc field operations are defined.</p><table><thead><tr><th align="right">Function</th><th align="right">Operation</th></tr></thead><tbody><tr><td align="right">+(a::nf_elem, b::Integer)</td><td align="right">addition</td></tr><tr><td align="right">+(a::Integer, b::nf_elem)</td><td align="right">addition</td></tr><tr><td align="right">+(a::nf_elem, b::fmpz)</td><td align="right">addition</td></tr><tr><td align="right">+(a::fmpz, b::nf_elem)</td><td align="right">addition</td></tr><tr><td align="right">+(a::nf_elem, b::fmpq)</td><td align="right">addition</td></tr><tr><td align="right">+(a::fmpq, b::nf_elem)</td><td align="right">addition</td></tr><tr><td align="right">-(a::nf_elem, b::Integer)</td><td align="right">subtraction</td></tr><tr><td align="right">-(a::Integer, b::nf_elem)</td><td align="right">subtraction</td></tr><tr><td align="right">-(a::nf_elem, b::fmpz)</td><td align="right">subtraction</td></tr><tr><td align="right">-(a::fmpz, b::nf_elem)</td><td align="right">subtraction</td></tr><tr><td align="right">-(a::nf_elem, b::fmpq)</td><td align="right">subtraction</td></tr><tr><td align="right">-(a::fmpq, b::nf_elem)</td><td align="right">subtraction</td></tr><tr><td align="right">*(a::nf_elem, b::Integer)</td><td align="right">multiplication</td></tr><tr><td align="right">*(a::Integer, b::nf_elem)</td><td align="right">multiplication</td></tr><tr><td align="right">*(a::nf_elem, b::fmpz)</td><td align="right">multiplication</td></tr><tr><td align="right">*(a::fmpz, b::nf_elem)</td><td align="right">multiplication</td></tr><tr><td align="right">*(a::nf_elem, b::fmpq)</td><td align="right">multiplication</td></tr><tr><td align="right">*(a::fmpq, b::nf_elem)</td><td align="right">multiplication</td></tr><tr><td align="right">divexact(a::nf_elem, b::Integer)</td><td align="right">exact division</td></tr><tr><td align="right">divexact(a::nf_elem, b::fmpz)</td><td align="right">exact division</td></tr><tr><td align="right">divexact(a::nf_elem, b::fmpq)</td><td align="right">exact division</td></tr><tr><td align="right">divexact(a::Integer, b::nf_elem)</td><td align="right">exact division</td></tr><tr><td align="right">divexact(a::fmpz, b::nf_elem)</td><td align="right">exact division</td></tr><tr><td align="right">divexact(a::fmpq, b::nf_elem)</td><td align="right">exact division</td></tr><tr><td align="right">^(a::nf_elem, b::Int)</td><td align="right">powering</td></tr></tbody></table><p>Here are some examples of arithmetic operations on number fields.</p><pre><code>R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
 
 c = a^2 + 2a - 7
 d = 3a^2 - a + 1
@@ -707,21 +137,8 @@ n = 4 - c
 p = divexact(c, 5)
 q = divexact(ZZ(4)//5, d)
 r = c^4
-</code></pre>
-
-<p><a id='Comparison-1'></a></p>
-<h2 id="comparison">Comparison</h2>
-<p>Nemo provides the comparison operation <code>==</code> for number field elements. Julia then automatically provides the corresponding <code>!=</code> operation. Here are the functions provided.</p>
-<p><a id='Function-1'></a></p>
-<h2 id="function">Function</h2>
-<p>==(a::nf_elem, b::nf_elem)</p>
-<p>In addition, the following ad hoc comparisons are provided, Julia again providing the corresponding <code>!=</code> operators.</p>
-<p><a id='Function-2'></a></p>
-<h2 id="function_1">Function</h2>
-<p>==(a::nf_elem, b::Integer) ==(a::nf_elem, b::fmpz) ==(a::nf_elem, b::fmpq) ==(a::Integer, b::nf_elem) ==(a::fmpz, b::nf_elem) ==(a::fmpq, b::nf_elem)</p>
-<p>Here are some examples of comparisons.</p>
-<pre><code>R, x = PolynomialRing(QQ, &quot;x&quot;)
-K, a = NumberField(x^3 + 3x + 1, &quot;a&quot;)
+</code></pre><p><a id="Comparison-1"></a></p><h2 id="comparison">Comparison</h2><p>Nemo provides the comparison operation <code>==</code> for number field elements. Julia then automatically provides the corresponding <code>!=</code> operation. Here are the functions provided.</p><p><a id="Function-1"></a></p><h2 id="function">Function</h2><p>==(a::nf_elem, b::nf_elem)</p><p>In addition, the following ad hoc comparisons are provided, Julia again providing the corresponding <code>!=</code> operators.</p><p><a id="Function-2"></a></p><h2 id="function_1">Function</h2><p>==(a::nf_elem, b::Integer) ==(a::nf_elem, b::fmpz) ==(a::nf_elem, b::fmpq) ==(a::Integer, b::nf_elem) ==(a::fmpz, b::nf_elem) ==(a::fmpq, b::nf_elem)</p><p>Here are some examples of comparisons.</p><pre><code>R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
 
 c = 3a^2 - a + 1
 d = a^2 + 2a - 7
@@ -731,126 +148,31 @@ c == 3a^2 - a + 1
 c == 3
 ZZ(4) == d
 ZZ(5)//7 != c
-</code></pre>
-
-<p><a id='Divisibility-1'></a></p>
-<h2 id="divisibility">Divisibility</h2>
-<p><a id='Nemo.divides-Tuple{Nemo.nf_elem,Nemo.nf_elem}' href='#Nemo.divides-Tuple{Nemo.nf_elem,Nemo.nf_elem}'>#</a>
-<strong><code>Nemo.divides</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>divides(f::nf_elem, g::nf_elem)
-</code></pre>
-
-<blockquote>
-<p>Returns a pair consisting of a flag which is set to <code>true</code> if <script type="math/tex">g</script> divides <script type="math/tex">f</script> and <code>false</code> otherwise, and a number field element <script type="math/tex">h</script> such that <script type="math/tex">f = gh</script> if such exists. If not, the value of <script type="math/tex">h</script> is undetermined.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L562' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of divisibility testing.</p>
-<pre><code>R, x = PolynomialRing(QQ, &quot;x&quot;)
-K, a = NumberField(x^3 + 3x + 1, &quot;a&quot;)
+</code></pre><p><a id="Divisibility-1"></a></p><h2 id="divisibility">Divisibility</h2><p><a href="#Nemo.divides-Tuple{Nemo.nf_elem,Nemo.nf_elem}" id="Nemo.divides-Tuple{Nemo.nf_elem,Nemo.nf_elem}">#</a><strong><code>Nemo.divides</code></strong> — <em>Method</em>.</p><pre><code>divides(f::nf_elem, g::nf_elem)
+</code></pre><blockquote><p>Returns a pair consisting of a flag which is set to <code>true</code> if <script type="math/tex">g</script> divides <script type="math/tex">f</script> and <code>false</code> otherwise, and a number field element <script type="math/tex">h</script> such that <script type="math/tex">f = gh</script> if such exists. If not, the value of <script type="math/tex">h</script> is undetermined.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L562" target="_blank">source</a><br/></p><p>Here are some examples of divisibility testing.</p><pre><code>R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
 
 c = 3a^2 - a + 1
 d = a^2 + 2a - 7
 
 flag, q = divides(c*d, c)
-</code></pre>
-
-<p><a id='Inversion-1'></a></p>
-<h2 id="inversion">Inversion</h2>
-<p><a id='Base.inv-Tuple{Nemo.nf_elem}' href='#Base.inv-Tuple{Nemo.nf_elem}'>#</a>
-<strong><code>Base.inv</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>inv(a::nf_elem)
-</code></pre>
-
-<blockquote>
-<p>Return <script type="math/tex">a^{-1}</script>. Requires <script type="math/tex">a \neq 0</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L486' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of inversion.</p>
-<pre><code>R, x = PolynomialRing(QQ, &quot;x&quot;)
-K, a = NumberField(x^3 + 3x + 1, &quot;a&quot;)
+</code></pre><p><a id="Inversion-1"></a></p><h2 id="inversion">Inversion</h2><p><a href="#Base.inv-Tuple{Nemo.nf_elem}" id="Base.inv-Tuple{Nemo.nf_elem}">#</a><strong><code>Base.inv</code></strong> — <em>Method</em>.</p><pre><code>inv(a::nf_elem)
+</code></pre><blockquote><p>Return <script type="math/tex">a^{-1}</script>. Requires <script type="math/tex">a \neq 0</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L486" target="_blank">source</a><br/></p><p>Here are some examples of inversion.</p><pre><code>R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
 
 c = 3a^2 - a + 1
 
 d = inv(c)
-</code></pre>
-
-<p><a id='Norm-and-trace-1'></a></p>
-<h2 id="norm-and-trace">Norm and trace</h2>
-<p><a id='Base.LinAlg.norm-Tuple{Nemo.nf_elem}' href='#Base.LinAlg.norm-Tuple{Nemo.nf_elem}'>#</a>
-<strong><code>Base.LinAlg.norm</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>norm(a::nf_elem)
-</code></pre>
-
-<blockquote>
-<p>Return the absolute norm of <script type="math/tex">a</script>. The result will be a rational number.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L579' class='documenter-source'>source</a><br></p>
-<p><a id='Base.LinAlg.trace-Tuple{Nemo.nf_elem}' href='#Base.LinAlg.trace-Tuple{Nemo.nf_elem}'>#</a>
-<strong><code>Base.LinAlg.trace</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>norm(a::nf_elem)
-</code></pre>
-
-<blockquote>
-<p>Return the absolute trace of <script type="math/tex">a</script>. The result will be a rational number.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L591' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of computing the norm and trace.</p>
-<pre><code>R, x = PolynomialRing(QQ, &quot;x&quot;)
-K, a = NumberField(x^3 + 3x + 1, &quot;a&quot;)
+</code></pre><p><a id="Norm-and-trace-1"></a></p><h2 id="norm-and-trace">Norm and trace</h2><p><a href="#Base.LinAlg.norm-Tuple{Nemo.nf_elem}" id="Base.LinAlg.norm-Tuple{Nemo.nf_elem}">#</a><strong><code>Base.LinAlg.norm</code></strong> — <em>Method</em>.</p><pre><code>norm(a::nf_elem)
+</code></pre><blockquote><p>Return the absolute norm of <script type="math/tex">a</script>. The result will be a rational number.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L579" target="_blank">source</a><br/></p><p><a href="#Base.LinAlg.trace-Tuple{Nemo.nf_elem}" id="Base.LinAlg.trace-Tuple{Nemo.nf_elem}">#</a><strong><code>Base.LinAlg.trace</code></strong> — <em>Method</em>.</p><pre><code>norm(a::nf_elem)
+</code></pre><blockquote><p>Return the absolute trace of <script type="math/tex">a</script>. The result will be a rational number.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/c501ab953d0541fe900ffcf800a8a1d712eee50f/src/antic/nf_elem.jl#L591" target="_blank">source</a><br/></p><p>Here are some examples of computing the norm and trace.</p><pre><code>R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
 
 c = 3a^2 - a + 1
 
 d = norm(c)
 f = trace(c)
-</code></pre>
-              
-            </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../maximalorder/" class="btn btn-neutral float-right" title="Maximal orders">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../acb/" class="btn btn-neutral" title="Complex boxes"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <!-- Copyright etc -->
-    
-  </div>
+</code></pre></div></div><footer><div aria-label="footer navigation" class="rst-footer-buttons" role="navigation"><a class="btn btn-neutral float-right" href="../maximalorder/" title="Maximal orders">Next <span class="icon icon-circle-arrow-right"></span></a><a class="btn btn-neutral" href="../acb/" title="Complex boxes"><span class="icon icon-circle-arrow-left"></span> Previous</a></div><hr/><div role="contentinfo"></div>
 
   Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
-</footer>
-	  
-        </div>
-      </div>
-
-    </section>
-    
-  </div>
-
-  <div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-          <a href="https://github.com/Nemocas/Nemo.jl" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
-      
-      
-        <span><a href="../acb/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../maximalorder/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
-</div>
-    <script src="../js/theme.js"></script>
-      <script src="../mathjaxhelper.js"></script>
-      <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
-
-</body>
-</html>
+</footer></div></div></section></div><div class="rst-versions" role="note" style="cursor: pointer"><span class="rst-current-version" data-toggle="rst-current-version"><a class="fa fa-github" href="https://github.com/Nemocas/Nemo.jl" style="float: left; color: #fcfcfc"> GitHub</a><span><a href="../acb/" style="color: #fcfcfc;">« Previous</a></span><span style="margin-left: 15px"><a href="../maximalorder/" style="color: #fcfcfc">Next »</a></span></span></div><script src="../js/theme.js"></script><script src="../mathjaxhelper.js"></script><script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script></body></HTML>

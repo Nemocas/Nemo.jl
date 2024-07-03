@@ -1,249 +1,63 @@
-<!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Nemo">
-  <meta name="author" content="William Hart">
-  <link rel="shortcut icon" href="./img/favicon.ico">
-  <title>Getting Started - Nemo.jl</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="./css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="./css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="./css/highlight.css">
-  <link href="./assets/Documenter.css" rel="stylesheet">
-  
-  <script>
+<!DOCTYPE html><HTML class="no-js" lang="en"><head><meta charset="utf-8"/><meta content="IE=edge" http-equiv="X-UA-Compatible"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="Nemo" name="description"/><meta content="William Hart" name="author"/><link href="./img/favicon.ico" rel="shortcut icon"/><title>Getting Started - Nemo.jl</title><link href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css"/><link href="./css/theme.css" rel="stylesheet" type="text/css"/><link href="./css/theme_extra.css" rel="stylesheet" type="text/css"/><link href="./css/highlight.css" rel="stylesheet"/><link href="./assets/Documenter.css" rel="stylesheet"/><script>
     // Current page data
     var mkdocs_page_name = "Getting Started";
     var mkdocs_page_input_path = "index.md";
     var mkdocs_page_url = "/";
-  </script>
-  
-  <script src="./js/jquery-2.1.1.min.js"></script>
-  <script src="./js/modernizr-2.8.3.min.js"></script>
-  <script type="text/javascript" src="./js/highlight.pack.js"></script> 
-  
-</head>
+  </script><script src="./js/jquery-2.1.1.min.js"></script><script src="./js/modernizr-2.8.3.min.js"></script><script src="./js/highlight.pack.js" type="text/javascript"></script><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
 
-<body class="wy-body-for-nav" role="document">
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
 
-  <div class="wy-grid-for-nav">
+        head.appendChild(meta);
+    };
 
-    
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-      <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Nemo.jl</a>
-        <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-  </form>
-</div>
-      </div>
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-	  
-          
-            <li class="toctree-l1 current">
-		
-    <a class="current" href=".">Getting Started</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l2"><a href="#nemo">Nemo</a></li>
-    
-        <ul>
-        
-            <li><a class="toctree-l3" href="#introduction">Introduction</a></li>
-        
-            <li><a class="toctree-l3" href="#installation">Installation</a></li>
-        
-            <li><a class="toctree-l3" href="#quick-start">Quick start</a></li>
-        
-        </ul>
-    
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
 
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="about/">About Nemo</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="types/">Types in Nemo</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="constructors/">Parent object constructors</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="polynomial/">Univariate polynomials</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="series/">Capped relative power series</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="residue/">Residue rings</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="fraction/">Fraction fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="matrix/">Matrices</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="integer/">Integers</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="rational/">Rationals</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="finitefield/">Finite fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="padic/">P-adic fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="arb/">Real balls</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="acb/">Complex boxes</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="numberfield/">Number fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="maximalorder/">Maximal orders</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="classgroup/">Class groups</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="perm/">Permutation groups</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="factor/">Factorization</a>
-	    </li>
-          
-        </ul>
-      </div>
-      &nbsp;
-    </nav>
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body class="wy-body-for-nav" role="document"><div class="wy-grid-for-nav"><nav class="wy-nav-side stickynav" data-toggle="wy-nav-shift"><div class="wy-side-nav-search"><a class="icon icon-home" href="."> Nemo.jl</a><div role="search"><form action="./search.html" class="wy-form" id="rtd-search-form" method="get"><input name="q" placeholder="Search docs" type="text"/></form></div></div><div aria-label="main navigation" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation"><ul class="current"><li class="toctree-l1 current"><a class="current" href=".">Getting Started</a><ul class="subnav"><li class="toctree-l2"><a href="#nemo">Nemo</a></li><ul><li><a class="toctree-l3" href="#introduction">Introduction</a></li><li><a class="toctree-l3" href="#installation">Installation</a></li><li><a class="toctree-l3" href="#quick-start">Quick start</a></li></ul></ul></li><li class="toctree-l1"><a class="" href="about/">About Nemo</a></li><li class="toctree-l1"><a class="" href="types/">Types in Nemo</a></li><li class="toctree-l1"><a class="" href="constructors/">Parent object constructors</a></li><li class="toctree-l1"><a class="" href="polynomial/">Univariate polynomials</a></li><li class="toctree-l1"><a class="" href="series/">Capped relative power series</a></li><li class="toctree-l1"><a class="" href="residue/">Residue rings</a></li><li class="toctree-l1"><a class="" href="fraction/">Fraction fields</a></li><li class="toctree-l1"><a class="" href="matrix/">Matrices</a></li><li class="toctree-l1"><a class="" href="integer/">Integers</a></li><li class="toctree-l1"><a class="" href="rational/">Rationals</a></li><li class="toctree-l1"><a class="" href="finitefield/">Finite fields</a></li><li class="toctree-l1"><a class="" href="padic/">P-adic fields</a></li><li class="toctree-l1"><a class="" href="arb/">Real balls</a></li><li class="toctree-l1"><a class="" href="acb/">Complex boxes</a></li><li class="toctree-l1"><a class="" href="numberfield/">Number fields</a></li><li class="toctree-l1"><a class="" href="maximalorder/">Maximal orders</a></li><li class="toctree-l1"><a class="" href="classgroup/">Class groups</a></li><li class="toctree-l1"><a class="" href="perm/">Permutation groups</a></li><li class="toctree-l1"><a class="" href="factor/">Factorization</a></li></ul></div>
+       
+    </nav><section class="wy-nav-content-wrap" data-toggle="wy-nav-shift"><nav aria-label="top navigation" class="wy-nav-top" role="navigation"><i class="fa fa-bars" data-toggle="wy-nav-top"></i><a href=".">Nemo.jl</a></nav><div class="wy-nav-content"><div class="rst-content"><div aria-label="breadcrumbs navigation" role="navigation"><ul class="wy-breadcrumbs"><li><a href=".">Docs</a> »</li><li>Getting Started</li><li class="wy-breadcrumbs-aside"><a class="icon icon-github" href="https://github.com/Nemocas/Nemo.jl/edit/master/docs/index.md"> Edit on GitHub</a></li></ul><hr/></div><div role="main"><div class="section"><p><a id="Nemo-1"></a></p><h1 id="nemo">Nemo</h1><p><a id="Introduction-1"></a></p><h2 id="introduction">Introduction</h2><p>Nemo is a computer algebra package for the Julia programming language, maintained by William Hart,  Tommy Hofmann, Claus Fieker, Fredrik Johansson with additional code by Oleksandr Motsak and other contributors.</p><ul><li><a href="http://nemocas.org">http://nemocas.org</a> (Website)</li><li><a href="https://github.com/Nemocas/Nemo.jl">https://github.com/Nemocas/Nemo.jl</a> (Source code)</li><li><a href="http://nemocas.github.io/Nemo.jl/latest/">http://nemocas.github.io/Nemo.jl/latest/</a> (Online documentation)</li></ul><p>The features of Nemo so far include:</p><ul><li>Multiprecision integers and rationals</li><li>Integers modulo n</li><li>p-adic numbers</li><li>Finite fields (prime and non-prime order)</li><li>Number field arithmetic</li><li>Maximal orders of number fields</li><li>Arithmetic of ideals in maximal orders</li><li>Arbitrary precision real and complex balls</li><li>Univariate polynomials and matrices over the above</li><li>Generic polynomials, power series, fraction fields, residue rings and matrices</li></ul><p><a id="Installation-1"></a></p><h2 id="installation">Installation</h2><p>To use Nemo we require Julia 0.4 or higher. Please see <a href="http://julialang.org/downloads/">http://julialang.org/downloads</a> for instructions on how to obtain julia for your system.</p><p>At the Julia prompt simply type</p><pre><code>julia&gt; Pkg.add("Nemo")
+julia&gt; Pkg.build("Nemo")
+</code></pre><p>Alternatively, if you don't want to set Julia up yourself, Julia and Nemo are available on <a href="https://cloud.sagemath.com/">https://cloud.sagemath.com/</a>.</p><p><a id="Quick-start-1"></a></p><h2 id="quick-start">Quick start</h2><p>Here are some examples of using Nemo.</p><p>This example computes recursive univariate polynomials.</p><pre><code>julia&gt; using Nemo
 
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href=".">Nemo.jl</a>
-      </nav>
-
-      
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
-  <ul class="wy-breadcrumbs">
-    <li><a href=".">Docs</a> &raquo;</li>
-    
-      
-    
-    <li>Getting Started</li>
-    <li class="wy-breadcrumbs-aside">
-      
-        <a href="https://github.com/Nemocas/Nemo.jl/edit/master/docs/index.md"
-          class="icon icon-github"> Edit on GitHub</a>
-      
-    </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main">
-            <div class="section">
-              
-                <p><a id='Nemo-1'></a></p>
-<h1 id="nemo">Nemo</h1>
-<p><a id='Introduction-1'></a></p>
-<h2 id="introduction">Introduction</h2>
-<p>Nemo is a computer algebra package for the Julia programming language, maintained by William Hart,  Tommy Hofmann, Claus Fieker, Fredrik Johansson with additional code by Oleksandr Motsak and other contributors.</p>
-<ul>
-<li><a href="http://nemocas.org">http://nemocas.org</a> (Website)</li>
-<li><a href="https://github.com/Nemocas/Nemo.jl">https://github.com/Nemocas/Nemo.jl</a> (Source code)</li>
-<li><a href="http://nemocas.github.io/Nemo.jl/latest/">http://nemocas.github.io/Nemo.jl/latest/</a> (Online documentation)</li>
-</ul>
-<p>The features of Nemo so far include:</p>
-<ul>
-<li>Multiprecision integers and rationals</li>
-<li>Integers modulo n</li>
-<li>p-adic numbers</li>
-<li>Finite fields (prime and non-prime order)</li>
-<li>Number field arithmetic</li>
-<li>Maximal orders of number fields</li>
-<li>Arithmetic of ideals in maximal orders</li>
-<li>Arbitrary precision real and complex balls</li>
-<li>Univariate polynomials and matrices over the above</li>
-<li>Generic polynomials, power series, fraction fields, residue rings and matrices</li>
-</ul>
-<p><a id='Installation-1'></a></p>
-<h2 id="installation">Installation</h2>
-<p>To use Nemo we require Julia 0.4 or higher. Please see <a href="http://julialang.org/downloads/">http://julialang.org/downloads</a> for instructions on how to obtain julia for your system.</p>
-<p>At the Julia prompt simply type</p>
-<pre><code>julia&gt; Pkg.add(&quot;Nemo&quot;)
-julia&gt; Pkg.build(&quot;Nemo&quot;)
-</code></pre>
-
-<p>Alternatively, if you don't want to set Julia up yourself, Julia and Nemo are available on <a href="https://cloud.sagemath.com/">https://cloud.sagemath.com/</a>.</p>
-<p><a id='Quick-start-1'></a></p>
-<h2 id="quick-start">Quick start</h2>
-<p>Here are some examples of using Nemo.</p>
-<p>This example computes recursive univariate polynomials.</p>
-<pre><code>julia&gt; using Nemo
-
-julia&gt; R, x = PolynomialRing(ZZ, &quot;x&quot;)
+julia&gt; R, x = PolynomialRing(ZZ, "x")
 (Univariate Polynomial Ring in x over Integer Ring,x)
 
-julia&gt; S, y = PolynomialRing(R, &quot;y&quot;)
+julia&gt; S, y = PolynomialRing(R, "y")
 (Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integer Ring,y)
 
-julia&gt; T, z = PolynomialRing(S, &quot;z&quot;)
+julia&gt; T, z = PolynomialRing(S, "z")
 (Univariate Polynomial Ring in z over Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integer Ring,z)
 
 julia&gt; f = x + y + z + 1
@@ -253,21 +67,18 @@ julia&gt; p = f^30; # semicolon supresses output
 
 julia&gt; @time q = p*(p+1);
   0.325521 seconds (140.64 k allocations: 3.313 MB)
-</code></pre>
+</code></pre><p>Here is an example using generic recursive ring constructions.</p><pre><code>julia&gt; using Nemo
 
-<p>Here is an example using generic recursive ring constructions.</p>
-<pre><code>julia&gt; using Nemo
-
-julia&gt; R, x = FiniteField(7, 11, &quot;x&quot;)
+julia&gt; R, x = FiniteField(7, 11, "x")
 (Finite field of degree 11 over F_7,x)
 
-julia&gt; S, y = PolynomialRing(R, &quot;y&quot;)
+julia&gt; S, y = PolynomialRing(R, "y")
 (Univariate Polynomial Ring in y over Finite field of degree 11 over F_7,y)
 
 julia&gt; T = ResidueRing(S, y^3 + 3x*y + 1)
 Residue ring of Univariate Polynomial Ring in y over Finite field of degree 11 over F_7 modulo y^3+(3*x)*y+(1)
 
-julia&gt; U, z = PolynomialRing(T, &quot;z&quot;)
+julia&gt; U, z = PolynomialRing(T, "z")
 (Univariate Polynomial Ring in z over Residue ring of Univariate Polynomial Ring in y over Finite field of degree 11 over F_7 modulo y^3+(3*x)*y+(1),z)
 
 julia&gt; f = (3y^2 + y + x)*z^2 + ((x + 2)*y^2 + x + 1)*z + 4x*y + 3;
@@ -281,14 +92,11 @@ julia&gt; t = (s + g)^12;
 julia&gt; @time resultant(s, t)
   0.426612 seconds (705.88 k allocations: 52.346 MB, 2.79% gc time)
 (x^10+4*x^8+6*x^7+3*x^6+4*x^5+x^4+6*x^3+5*x^2+x)*y^2+(5*x^10+x^8+4*x^7+3*x^5+5*x^4+3*x^3+x^2+x+6)*y+(2*x^10+6*x^9+5*x^8+5*x^7+x^6+6*x^5+5*x^4+4*x^3+x+3)
-</code></pre>
-
-<p>Here is an example using matrices.</p>
-<pre><code>julia&gt; using Nemo
+</code></pre><p>Here is an example using matrices.</p><pre><code>julia&gt; using Nemo
 
 julia&gt; M = MatrixSpace(R, 40, 40)();
 
-julia&gt; R, x = PolynomialRing(ZZ, &quot;x&quot;)
+julia&gt; R, x = PolynomialRing(ZZ, "x")
 (Univariate Polynomial Ring in x over Integer Ring,x)
 
 julia&gt; M = MatrixSpace(R, 40, 40)();
@@ -301,15 +109,12 @@ julia&gt; for i in 1:40
 
 julia&gt; @time det(M);
   0.174888 seconds (268.40 k allocations: 26.537 MB, 4.47% gc time)
-</code></pre>
+</code></pre><p>And here is an example with power series.</p><pre><code>julia&gt; using Nemo
 
-<p>And here is an example with power series.</p>
-<pre><code>julia&gt; using Nemo
-
-julia&gt; R, x = QQ[&quot;x&quot;]
+julia&gt; R, x = QQ["x"]
 (Univariate Polynomial Ring in x over Rational Field,x)
 
-julia&gt; S, t = PowerSeriesRing(R, 100, &quot;t&quot;)
+julia&gt; S, t = PowerSeriesRing(R, 100, "t")
 (Univariate power series ring in t over Univariate Polynomial Ring in x over Rational Field,t+O(t^101))
 
 julia&gt; u = t + O(t^100)
@@ -317,56 +122,7 @@ t+O(t^100)
 
 julia&gt; @time divexact((u*exp(x*u)), (exp(u)-1));
   0.042663 seconds (64.01 k allocations: 1.999 MB, 15.40% gc time)
-</code></pre>
-              
-            </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="about/" class="btn btn-neutral float-right" title="About Nemo">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <!-- Copyright etc -->
-    
-  </div>
+</code></pre></div></div><footer><div aria-label="footer navigation" class="rst-footer-buttons" role="navigation"><a class="btn btn-neutral float-right" href="about/" title="About Nemo">Next <span class="icon icon-circle-arrow-right"></span></a></div><hr/><div role="contentinfo"></div>
 
   Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
-</footer>
-	  
-        </div>
-      </div>
-
-    </section>
-    
-  </div>
-
-  <div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-          <a href="https://github.com/Nemocas/Nemo.jl" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
-      
-      
-      
-        <span style="margin-left: 15px"><a href="about/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
-</div>
-    <script src="./js/theme.js"></script>
-      <script src="./mathjaxhelper.js"></script>
-      <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
-
-</body>
-</html>
-
-<!--
-MkDocs version : 0.16.3
-Build Date UTC : 2017-05-27 10:42:37
--->
+</footer></div></div></section></div><div class="rst-versions" role="note" style="cursor: pointer"><span class="rst-current-version" data-toggle="rst-current-version"><a class="fa fa-github" href="https://github.com/Nemocas/Nemo.jl" style="float: left; color: #fcfcfc"> GitHub</a><span style="margin-left: 15px"><a href="about/" style="color: #fcfcfc">Next »</a></span></span></div><script src="./js/theme.js"></script><script src="./mathjaxhelper.js"></script><script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script></body></HTML>

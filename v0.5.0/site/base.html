@@ -1,27 +1,58 @@
-<!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  {% if page_description %}<meta name="description" content="{{ page_description }}">{% endif %}
-  {% if site_author %}<meta name="author" content="{{ site_author }}">{% endif %}
+<!DOCTYPE html><HTML class="no-js" lang="en"><head><meta charset="utf-8"/><meta content="IE=edge" http-equiv="X-UA-Compatible"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
+
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
+
+        head.appendChild(meta);
+    };
+
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
+
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
+
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body class="wy-body-for-nav" role="document">{% if page_description %}<meta content="{{ page_description }}" name="description"/>{% endif %}
+  {% if site_author %}<meta content="{{ site_author }}" name="author"/>{% endif %}
   {% block htmltitle %}
   <title>{% if page_title %}{{ page_title }} - {% endif %}{{ site_name }}</title>
   {% endblock %}
 
-  {% if favicon %}<link rel="shortcut icon" href="{{ favicon }}">
-  {% else %}<link rel="shortcut icon" href="{{ base_url }}/img/favicon.ico">{% endif %}
+  {% if favicon %}<link href="{{ favicon }}" rel="shortcut icon"/>
+  {% else %}<link href="{{ base_url }}/img/favicon.ico" rel="shortcut icon"/>{% endif %}
 
   {# CSS #}
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="{{ base_url }}/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="{{ base_url }}/css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="{{ base_url }}/css/highlight.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css"/><link href="{{ base_url }}/css/theme.css" rel="stylesheet" type="text/css"/><link href="{{ base_url }}/css/theme_extra.css" rel="stylesheet" type="text/css"/><link href="{{ base_url }}/css/highlight.css" rel="stylesheet"/>
   {%- for path in extra_css %}
-  <link href="{{ path }}" rel="stylesheet">
+  <link href="{{ path }}" rel="stylesheet"/>
   {%- endfor %}
 
   {% if current_page %}
@@ -32,10 +63,7 @@
     var mkdocs_page_url = "{{ current_page.abs_url }}";
   </script>
   {% endif %}
-  <script src="{{ base_url }}/js/jquery-2.1.1.min.js"></script>
-  <script src="{{ base_url }}/js/modernizr-2.8.3.min.js"></script>
-  <script type="text/javascript" src="{{ base_url }}/js/highlight.pack.js"></script>
-  <script src="{{ base_url }}/js/theme.js"></script>
+  <script src="{{ base_url }}/js/jquery-2.1.1.min.js"></script><script src="{{ base_url }}/js/modernizr-2.8.3.min.js"></script><script src="{{ base_url }}/js/highlight.pack.js" type="text/javascript"></script><script src="{{ base_url }}/js/theme.js"></script>
 
   {%- block extrahead %} {% endblock %}
 
@@ -54,65 +82,44 @@
       ga('send', 'pageview');
   </script>
   {% endif %}
-</head>
 
-<body class="wy-body-for-nav" role="document">
+
+
 
   <div class="wy-grid-for-nav">
 
     {# SIDE NAV, TOGGLES ON MOBILE #}
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-      <div class="wy-side-nav-search">
-        <a href="{{ homepage_url }}" class="icon icon-home"> {{ site_name }}</a>
+    <nav class="wy-nav-side stickynav" data-toggle="wy-nav-shift"><div class="wy-side-nav-search"><a class="icon icon-home" href="{{ homepage_url }}"> {{ site_name }}</a>
         {% include "searchbox.html" %}
-      </div>
-
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-        <ul class="current">
+      </div><div aria-label="main navigation" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation"><ul class="current">
           {% for nav_item in nav %}
-            <li>{% include "toc.html" %}<li>
+            <li>{% include "toc.html" %}</li><li>
           {% endfor %}
-        </ul>
-      </div>
-      &nbsp;
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        </li></ul></div>
+       
+    </nav><section class="wy-nav-content-wrap" data-toggle="wy-nav-shift">
 
       {# MOBILE NAV, TRIGGLES SIDE NAV ON TOGGLE #}
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="{{ homepage_url }}">{{ site_name }}</a>
-      </nav>
+      <nav aria-label="top navigation" class="wy-nav-top" role="navigation"><i class="fa fa-bars" data-toggle="wy-nav-top"></i><a href="{{ homepage_url }}">{{ site_name }}</a></nav>
 
       {# PAGE CONTENT #}
-      <div class="wy-nav-content">
-        <div class="rst-content">
+      <div class="wy-nav-content"><div class="rst-content">
           {% include "breadcrumbs.html" %}
-          <div role="main">
-            <div class="section">
+          <div role="main"><div class="section">
               {% block content %}
                 {{ content }}
               {% endblock %}
-            </div>
-          </div>
+            </div></div>
 	  {%- block footer %}
           {% include "footer.html" %}
 	  {% endblock %}
-        </div>
-      </div>
-
-    </section>
-
-  </div>
+        </div></div></section></div>
 
 {% include "versions.html" %}
 
-</body>
-</html>
+
+
 {% if current_page and current_page.is_homepage %}
-<!--
-MkDocs version : {{ mkdocs_version }}
-Build Date UTC : {{ build_date_utc }}
--->
+
 {% endif %}
+</body></HTML>

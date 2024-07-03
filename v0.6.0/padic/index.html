@@ -1,343 +1,68 @@
-<!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <meta name="author" content="William Hart">
-  <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>P-adic fields - Nemo.jl</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-  <link href="../assets/Documenter.css" rel="stylesheet">
-  
-  <script>
+<!DOCTYPE html><HTML class="no-js" lang="en"><head><meta charset="utf-8"/><meta content="IE=edge" http-equiv="X-UA-Compatible"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="William Hart" name="author"/><link href="../img/favicon.ico" rel="shortcut icon"/><title>P-adic fields - Nemo.jl</title><link href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" rel="stylesheet" type="text/css"/><link href="../css/theme.css" rel="stylesheet" type="text/css"/><link href="../css/theme_extra.css" rel="stylesheet" type="text/css"/><link href="../css/highlight.css" rel="stylesheet"/><link href="../assets/Documenter.css" rel="stylesheet"/><script>
     // Current page data
     var mkdocs_page_name = "P-adic fields";
     var mkdocs_page_input_path = "padic.md";
     var mkdocs_page_url = "/padic/";
-  </script>
-  
-  <script src="../js/jquery-2.1.1.min.js"></script>
-  <script src="../js/modernizr-2.8.3.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
-  
-</head>
+  </script><script src="../js/jquery-2.1.1.min.js"></script><script src="../js/modernizr-2.8.3.min.js"></script><script src="../js/highlight.pack.js" type="text/javascript"></script><script data-outdated-warner="">function maybeAddWarning () {
+    const head = document.getElementsByTagName('head')[0];
 
-<body class="wy-body-for-nav" role="document">
+    // Add a noindex meta tag (unless one exists) so that search engines don't index this version of the docs.
+    if (document.body.querySelector('meta[name="robots"]') === null) {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex';
 
-  <div class="wy-grid-for-nav">
+        head.appendChild(meta);
+    };
 
-    
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-      <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Nemo.jl</a>
-        <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-  </form>
-</div>
-      </div>
+    // Add a stylesheet to avoid inline styling
+    const style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode('.outdated-warning-overlay {  position: fixed;  top: 0;  left: 0;  right: 0;  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  z-index: 999;  background-color: #ffaba7;  color: rgba(0, 0, 0, 0.7);  border-bottom: 3px solid #da0b00;  padding: 10px 35px;  text-align: center;  font-size: 15px; }  .outdated-warning-overlay .outdated-warning-closer {    position: absolute;    top: calc(50% - 10px);    right: 18px;    cursor: pointer;    width: 12px; }  .outdated-warning-overlay a {    color: #2e63b8; }    .outdated-warning-overlay a:hover {      color: #363636; }'));
+    head.appendChild(style);
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-	  
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="..">Getting Started</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../about/">About Nemo</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../types/">Types in Nemo</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../constructors/">Parent object constructors</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../polynomial/">Univariate polynomials</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../series/">Capped relative power series</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../residue/">Residue rings</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../fraction/">Fraction fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../matrix/">Matrices</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../integer/">Integers</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../rational/">Rationals</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../finitefield/">Finite fields</a>
-	    </li>
-          
-            <li class="toctree-l1 current">
-		
-    <a class="current" href="./">P-adic fields</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l2"><a href="#introduction">Introduction</a></li>
-    
+    const div = document.createElement('div');
+    div.classList.add('outdated-warning-overlay');
+    const closer = document.createElement('div');
+    closer.classList.add('outdated-warning-closer');
 
-    <li class="toctree-l2"><a href="#p-adic-field-constructors">P-adic field constructors</a></li>
-    
+    // Icon by font-awesome (license: https://fontawesome.com/license, link: https://fontawesome.com/icons/times?style=solid)
+    closer.innerHTML = '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>';
+    closer.addEventListener('click', function () {
+        document.body.removeChild(div);
+    });
+    let href = '/stable';
+    if (window.documenterBaseURL) {
+        href = window.documenterBaseURL + '/../stable';
+    }
+    div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
+    div.appendChild(closer);
+    document.body.appendChild(div);
+};
 
-    <li class="toctree-l2"><a href="#p-adic-field-element-constructors">P-adic field element constructors</a></li>
-    
-
-    <li class="toctree-l2"><a href="#basic-functionality">Basic functionality</a></li>
-    
-
-    <li class="toctree-l2"><a href="#basic-manipulation">Basic manipulation</a></li>
-    
-
-    <li class="toctree-l2"><a href="#arithmetic-operations">Arithmetic operations</a></li>
-    
-
-    <li class="toctree-l2"><a href="#comparison">Comparison</a></li>
-    
-
-    <li class="toctree-l2"><a href="#function">Function</a></li>
-    
-
-    <li class="toctree-l2"><a href="#function_1">Function</a></li>
-    
-
-    <li class="toctree-l2"><a href="#inversion">Inversion</a></li>
-    
-
-    <li class="toctree-l2"><a href="#divisibility">Divisibility</a></li>
-    
-
-    <li class="toctree-l2"><a href="#gcd">GCD</a></li>
-    
-
-    <li class="toctree-l2"><a href="#square-root">Square root</a></li>
-    
-
-    <li class="toctree-l2"><a href="#special-functions">Special functions</a></li>
-    
-
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../arb/">Real balls</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../acb/">Complex boxes</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../numberfield/">Number fields</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../maximalorder/">Maximal orders</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../classgroup/">Class groups</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../perm/">Permutation groups</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../factor/">Factorization</a>
-	    </li>
-          
-        </ul>
-      </div>
-      &nbsp;
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="..">Nemo.jl</a>
-      </nav>
-
-      
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
-  <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    
-      
-    
-    <li>P-adic fields</li>
-    <li class="wy-breadcrumbs-aside">
-      
-        <a href="https://github.com/Nemocas/Nemo.jl/edit/master/docs/padic.md"
-          class="icon icon-github"> Edit on GitHub</a>
-      
-    </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main">
-            <div class="section">
-              
-                <p><a id='Introduction-1'></a></p>
-<h2 id="introduction">Introduction</h2>
-<p>P-adic fields are provided in Nemo by Flint. This allows construction of <script type="math/tex">p</script>-adic fields for any prime <script type="math/tex">p</script>.</p>
-<p>P-adic fields are constructed using the <code>FlintPadicField</code> function. However, for convenience we define</p>
-<pre><code>PadicField = FlintPadicField
-</code></pre>
-
-<p>so that <script type="math/tex">p</script>-adic fields can be constructed using <code>PadicField</code> rather than <code>FlintPadicField</code>. Note that this is the name of the constructor, but not of padic field type.</p>
-<p>The types of <script type="math/tex">p</script>-adic fields in Nemo are given in the following table, along with the libraries that provide them and the associated types of the parent objects.</p>
-<table>
-<thead>
-<tr>
-<th align="right">Library</th>
-<th align="right">Field</th>
-<th align="right">Element type</th>
-<th align="right">Parent type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">Flint</td>
-<td align="right">
-<script type="math/tex">\mathbb{Q}_p</script>
-</td>
-<td align="right"><code>padic</code></td>
-<td align="right"><code>PadicField</code></td>
-</tr>
-</tbody>
-</table>
-<p>All the <script type="math/tex">p</script>-adic field types belong to the <code>Field</code> abstract type and the <script type="math/tex">p</script>-adic field element types belong to the <code>FieldElem</code> abstract type.</p>
-<p><a id='P-adic-field-constructors-1'></a></p>
-<h2 id="p-adic-field-constructors">P-adic field constructors</h2>
-<p>In order to construct <script type="math/tex">p</script>-adic field elements in Nemo, one must first construct the <script type="math/tex">p</script>-adic field itself. This is accomplished with one of the following constructors.</p>
-<p><a id='Nemo.FlintPadicField-Tuple{Integer,Int64}' href='#Nemo.FlintPadicField-Tuple{Integer,Int64}'>#</a>
-<strong><code>Nemo.FlintPadicField</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>FlintPadicField(p::Integer, prec::Int)
-</code></pre>
-
-<blockquote>
-<p>Returns the parent object for the <script type="math/tex">p</script>-adic field for given prime <script type="math/tex">p</script>, where the default absolute precision of elements of the field is given by <code>prec</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L680' class='documenter-source'>source</a><br></p>
-<p>It is also possible to call the inner constructor directly. It has the following form.</p>
-<pre><code>FlintPadicField(p::fmpz, prec::Int)
-</code></pre>
-
-<p>Returns the parent object for the <script type="math/tex">p</script>-adic field for given prime <script type="math/tex">p</script>, where the default absolute precision of elements of the field is given by <code>prec</code>.</p>
-<p>Here are some examples of creating <script type="math/tex">p</script>-adic fields and making use of the resulting parent objects to coerce various elements into those fields.</p>
-<pre><code>R = PadicField(7, 30)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', maybeAddWarning);
+} else {
+    maybeAddWarning();
+};
+</script></head><body class="wy-body-for-nav" role="document"><div class="wy-grid-for-nav"><nav class="wy-nav-side stickynav" data-toggle="wy-nav-shift"><div class="wy-side-nav-search"><a class="icon icon-home" href=".."> Nemo.jl</a><div role="search"><form action="../search.html" class="wy-form" id="rtd-search-form" method="get"><input name="q" placeholder="Search docs" type="text"/></form></div></div><div aria-label="main navigation" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation"><ul class="current"><li class="toctree-l1"><a class="" href="..">Getting Started</a></li><li class="toctree-l1"><a class="" href="../about/">About Nemo</a></li><li class="toctree-l1"><a class="" href="../types/">Types in Nemo</a></li><li class="toctree-l1"><a class="" href="../constructors/">Parent object constructors</a></li><li class="toctree-l1"><a class="" href="../polynomial/">Univariate polynomials</a></li><li class="toctree-l1"><a class="" href="../series/">Capped relative power series</a></li><li class="toctree-l1"><a class="" href="../residue/">Residue rings</a></li><li class="toctree-l1"><a class="" href="../fraction/">Fraction fields</a></li><li class="toctree-l1"><a class="" href="../matrix/">Matrices</a></li><li class="toctree-l1"><a class="" href="../integer/">Integers</a></li><li class="toctree-l1"><a class="" href="../rational/">Rationals</a></li><li class="toctree-l1"><a class="" href="../finitefield/">Finite fields</a></li><li class="toctree-l1 current"><a class="current" href="./">P-adic fields</a><ul class="subnav"><li class="toctree-l2"><a href="#introduction">Introduction</a></li><li class="toctree-l2"><a href="#p-adic-field-constructors">P-adic field constructors</a></li><li class="toctree-l2"><a href="#p-adic-field-element-constructors">P-adic field element constructors</a></li><li class="toctree-l2"><a href="#basic-functionality">Basic functionality</a></li><li class="toctree-l2"><a href="#basic-manipulation">Basic manipulation</a></li><li class="toctree-l2"><a href="#arithmetic-operations">Arithmetic operations</a></li><li class="toctree-l2"><a href="#comparison">Comparison</a></li><li class="toctree-l2"><a href="#function">Function</a></li><li class="toctree-l2"><a href="#function_1">Function</a></li><li class="toctree-l2"><a href="#inversion">Inversion</a></li><li class="toctree-l2"><a href="#divisibility">Divisibility</a></li><li class="toctree-l2"><a href="#gcd">GCD</a></li><li class="toctree-l2"><a href="#square-root">Square root</a></li><li class="toctree-l2"><a href="#special-functions">Special functions</a></li></ul></li><li class="toctree-l1"><a class="" href="../arb/">Real balls</a></li><li class="toctree-l1"><a class="" href="../acb/">Complex boxes</a></li><li class="toctree-l1"><a class="" href="../numberfield/">Number fields</a></li><li class="toctree-l1"><a class="" href="../maximalorder/">Maximal orders</a></li><li class="toctree-l1"><a class="" href="../classgroup/">Class groups</a></li><li class="toctree-l1"><a class="" href="../perm/">Permutation groups</a></li><li class="toctree-l1"><a class="" href="../factor/">Factorization</a></li></ul></div>
+       
+    </nav><section class="wy-nav-content-wrap" data-toggle="wy-nav-shift"><nav aria-label="top navigation" class="wy-nav-top" role="navigation"><i class="fa fa-bars" data-toggle="wy-nav-top"></i><a href="..">Nemo.jl</a></nav><div class="wy-nav-content"><div class="rst-content"><div aria-label="breadcrumbs navigation" role="navigation"><ul class="wy-breadcrumbs"><li><a href="..">Docs</a> »</li><li>P-adic fields</li><li class="wy-breadcrumbs-aside"><a class="icon icon-github" href="https://github.com/Nemocas/Nemo.jl/edit/master/docs/padic.md"> Edit on GitHub</a></li></ul><hr/></div><div role="main"><div class="section"><p><a id="Introduction-1"></a></p><h2 id="introduction">Introduction</h2><p>P-adic fields are provided in Nemo by Flint. This allows construction of <script type="math/tex">p</script>-adic fields for any prime <script type="math/tex">p</script>.</p><p>P-adic fields are constructed using the <code>FlintPadicField</code> function. However, for convenience we define</p><pre><code>PadicField = FlintPadicField
+</code></pre><p>so that <script type="math/tex">p</script>-adic fields can be constructed using <code>PadicField</code> rather than <code>FlintPadicField</code>. Note that this is the name of the constructor, but not of padic field type.</p><p>The types of <script type="math/tex">p</script>-adic fields in Nemo are given in the following table, along with the libraries that provide them and the associated types of the parent objects.</p><table><thead><tr><th align="right">Library</th><th align="right">Field</th><th align="right">Element type</th><th align="right">Parent type</th></tr></thead><tbody><tr><td align="right">Flint</td><td align="right"><script type="math/tex">\mathbb{Q}_p</script></td><td align="right"><code>padic</code></td><td align="right"><code>PadicField</code></td></tr></tbody></table><p>All the <script type="math/tex">p</script>-adic field types belong to the <code>Field</code> abstract type and the <script type="math/tex">p</script>-adic field element types belong to the <code>FieldElem</code> abstract type.</p><p><a id="P-adic-field-constructors-1"></a></p><h2 id="p-adic-field-constructors">P-adic field constructors</h2><p>In order to construct <script type="math/tex">p</script>-adic field elements in Nemo, one must first construct the <script type="math/tex">p</script>-adic field itself. This is accomplished with one of the following constructors.</p><p><a href="#Nemo.FlintPadicField-Tuple{Integer,Int64}" id="Nemo.FlintPadicField-Tuple{Integer,Int64}">#</a><strong><code>Nemo.FlintPadicField</code></strong> — <em>Method</em>.</p><pre><code>FlintPadicField(p::Integer, prec::Int)
+</code></pre><blockquote><p>Returns the parent object for the <script type="math/tex">p</script>-adic field for given prime <script type="math/tex">p</script>, where the default absolute precision of elements of the field is given by <code>prec</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L680" target="_blank">source</a><br/></p><p>It is also possible to call the inner constructor directly. It has the following form.</p><pre><code>FlintPadicField(p::fmpz, prec::Int)
+</code></pre><p>Returns the parent object for the <script type="math/tex">p</script>-adic field for given prime <script type="math/tex">p</script>, where the default absolute precision of elements of the field is given by <code>prec</code>.</p><p>Here are some examples of creating <script type="math/tex">p</script>-adic fields and making use of the resulting parent objects to coerce various elements into those fields.</p><pre><code>R = PadicField(7, 30)
 S = PadicField(ZZ(65537), 30)
 
 a = R()
 b = S(1)
 c = S(ZZ(123))
 d = R(ZZ(1)//7^2)
-</code></pre>
-
-<p><a id='P-adic-field-element-constructors-1'></a></p>
-<h2 id="p-adic-field-element-constructors">P-adic field element constructors</h2>
-<p>Once a <script type="math/tex">p</script>-adic field is constructed, there are various ways to construct elements in that field.</p>
-<p>Apart from coercing elements into the <script type="math/tex">p</script>-adic field as above, we offer the following functions.</p>
-<p><a id='Base.zero-Tuple{Nemo.FlintPadicField}' href='#Base.zero-Tuple{Nemo.FlintPadicField}'>#</a>
-<strong><code>Base.zero</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>zero(R::FlintPadicField)
-</code></pre>
-
-<blockquote>
-<p>Return zero in the given <script type="math/tex">p</script>-adic field, to the default precision.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L152' class='documenter-source'>source</a><br></p>
-<p><a id='Base.one-Tuple{Nemo.FlintPadicField}' href='#Base.one-Tuple{Nemo.FlintPadicField}'>#</a>
-<strong><code>Base.one</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>one(R::FlintPadicField)
-</code></pre>
-
-<blockquote>
-<p>Return zero in the given <script type="math/tex">p</script>-adic field, to the default precision.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L163' class='documenter-source'>source</a><br></p>
-<p>Elements can also be constructed using the big-oh notation. For this purpose we define the following functions.</p>
-<p><a id='Nemo.O-Tuple{Nemo.FlintPadicField,Integer}' href='#Nemo.O-Tuple{Nemo.FlintPadicField,Integer}'>#</a>
-<strong><code>Nemo.O</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>O(R::FlintPadicField, m::Integer)
-</code></pre>
-
-<blockquote>
-<p>Construct the value <script type="math/tex">0 + O(p^n)</script> given <script type="math/tex">m = p^n</script>. An exception results if <script type="math/tex">m</script> is not found to be a power of <code>p = prime(R)</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L60' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.O-Tuple{Nemo.FlintPadicField,Nemo.fmpz}' href='#Nemo.O-Tuple{Nemo.FlintPadicField,Nemo.fmpz}'>#</a>
-<strong><code>Nemo.O</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>O(R::FlintPadicField, m::fmpz)
-</code></pre>
-
-<blockquote>
-<p>Construct the value <script type="math/tex">0 + O(p^n)</script> given <script type="math/tex">m = p^n</script>. An exception results if <script type="math/tex">m</script> is not found to be a power of <code>p = prime(R)</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L15' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.O-Tuple{Nemo.FlintPadicField,Nemo.fmpq}' href='#Nemo.O-Tuple{Nemo.FlintPadicField,Nemo.fmpq}'>#</a>
-<strong><code>Nemo.O</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>O(R::FlintPadicField, m::fmpq)
-</code></pre>
-
-<blockquote>
-<p>Construct the value <script type="math/tex">0 + O(p^n)</script> given <script type="math/tex">m = p^n</script>. An exception results if <script type="math/tex">m</script> is not found to be a power of <code>p = prime(R)</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L37' class='documenter-source'>source</a><br></p>
-<p>The <script type="math/tex">O(p^n)</script> construction can be used to construct <script type="math/tex">p</script>-adic values of precision <script type="math/tex">n</script> by adding it to integer values representing the <script type="math/tex">p</script>-adic value modulo <script type="math/tex">p^n</script> as in the examples.</p>
-<p>Here are some examples of constructing <script type="math/tex">p</script>-adic field elements.</p>
-<pre><code>R = PadicField(7, 30)
+</code></pre><p><a id="P-adic-field-element-constructors-1"></a></p><h2 id="p-adic-field-element-constructors">P-adic field element constructors</h2><p>Once a <script type="math/tex">p</script>-adic field is constructed, there are various ways to construct elements in that field.</p><p>Apart from coercing elements into the <script type="math/tex">p</script>-adic field as above, we offer the following functions.</p><p><a href="#Base.zero-Tuple{Nemo.FlintPadicField}" id="Base.zero-Tuple{Nemo.FlintPadicField}">#</a><strong><code>Base.zero</code></strong> — <em>Method</em>.</p><pre><code>zero(R::FlintPadicField)
+</code></pre><blockquote><p>Return zero in the given <script type="math/tex">p</script>-adic field, to the default precision.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L152" target="_blank">source</a><br/></p><p><a href="#Base.one-Tuple{Nemo.FlintPadicField}" id="Base.one-Tuple{Nemo.FlintPadicField}">#</a><strong><code>Base.one</code></strong> — <em>Method</em>.</p><pre><code>one(R::FlintPadicField)
+</code></pre><blockquote><p>Return zero in the given <script type="math/tex">p</script>-adic field, to the default precision.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L163" target="_blank">source</a><br/></p><p>Elements can also be constructed using the big-oh notation. For this purpose we define the following functions.</p><p><a href="#Nemo.O-Tuple{Nemo.FlintPadicField,Integer}" id="Nemo.O-Tuple{Nemo.FlintPadicField,Integer}">#</a><strong><code>Nemo.O</code></strong> — <em>Method</em>.</p><pre><code>O(R::FlintPadicField, m::Integer)
+</code></pre><blockquote><p>Construct the value <script type="math/tex">0 + O(p^n)</script> given <script type="math/tex">m = p^n</script>. An exception results if <script type="math/tex">m</script> is not found to be a power of <code>p = prime(R)</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L60" target="_blank">source</a><br/></p><p><a href="#Nemo.O-Tuple{Nemo.FlintPadicField,Nemo.fmpz}" id="Nemo.O-Tuple{Nemo.FlintPadicField,Nemo.fmpz}">#</a><strong><code>Nemo.O</code></strong> — <em>Method</em>.</p><pre><code>O(R::FlintPadicField, m::fmpz)
+</code></pre><blockquote><p>Construct the value <script type="math/tex">0 + O(p^n)</script> given <script type="math/tex">m = p^n</script>. An exception results if <script type="math/tex">m</script> is not found to be a power of <code>p = prime(R)</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L15" target="_blank">source</a><br/></p><p><a href="#Nemo.O-Tuple{Nemo.FlintPadicField,Nemo.fmpq}" id="Nemo.O-Tuple{Nemo.FlintPadicField,Nemo.fmpq}">#</a><strong><code>Nemo.O</code></strong> — <em>Method</em>.</p><pre><code>O(R::FlintPadicField, m::fmpq)
+</code></pre><blockquote><p>Construct the value <script type="math/tex">0 + O(p^n)</script> given <script type="math/tex">m = p^n</script>. An exception results if <script type="math/tex">m</script> is not found to be a power of <code>p = prime(R)</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L37" target="_blank">source</a><br/></p><p>The <script type="math/tex">O(p^n)</script> construction can be used to construct <script type="math/tex">p</script>-adic values of precision <script type="math/tex">n</script> by adding it to integer values representing the <script type="math/tex">p</script>-adic value modulo <script type="math/tex">p^n</script> as in the examples.</p><p>Here are some examples of constructing <script type="math/tex">p</script>-adic field elements.</p><pre><code>R = PadicField(7, 30)
 S = PadicField(fmpz(65537), 30)
 
 a = one(R)
@@ -345,156 +70,29 @@ b = zero(S)
 c = 1 + 2*7 + 4*7^2 + O(R, 7^3)
 d = 13 + 357*ZZ(65537) + O(S, ZZ(65537)^12)
 f = ZZ(1)//7^2 + ZZ(2)//7 + 3 + 4*7 + O(R, 7^2)
-</code></pre>
-
-<p>Beware that the expression <code>1 + 2*p + 3*p^2 + O(R, p^n)</code> is actually computed as a normal Julia expression. Therefore if \code{Int} values are used instead of Flint integers or Julia bignums, overflow may result in evaluating the value.</p>
-<p><a id='Basic-functionality-1'></a></p>
-<h2 id="basic-functionality">Basic functionality</h2>
-<p>The following basic functionality is provided by the default <script type="math/tex">p</script>-adic field implementation in Nemo, to support construction of generic rings over <script type="math/tex">p</script>-adic fields. Any custom <script type="math/tex">p</script>-adic field implementation in Nemo should provide these  functions along with the usual arithmetic operations.</p>
-<pre><code>parent_type(::Type{padic})
-</code></pre>
-
-<p>Gives the type of the parent object of a Flint <script type="math/tex">p</script>-adic field element.</p>
-<pre><code>elem_type(R::FlintPadicField)
-</code></pre>
-
-<p>Given the parent object for a <script type="math/tex">p</script>-adic field, return the type of elements of the field.</p>
-<pre><code>Base.hash(a::padic, h::UInt)
-</code></pre>
-
-<p>Return a <code>UInt</code> hexadecimal hash of the <script type="math/tex">p</script>-adic field element <script type="math/tex">a</script>. This should be xor'd with a fixed random hexadecimal specific to the <script type="math/tex">p</script>-adic field type. The hash of the representative of the <script type="math/tex">p</script>-adic field element (lifted to <script type="math/tex">\mathbb{Q}</script> and the prime <script type="math/tex">p</script> for the field, should be xor'd with the supplied parameter <code>h</code> as part of computing the hash.</p>
-<pre><code>deepcopy(a::padic)
-</code></pre>
-
-<p>Construct a copy of the given <script type="math/tex">p</script>-adic field element and return it. This function must recursively construct copies of all of the internal data in the given element. Nemo <script type="math/tex">p</script>-adic field elements are mutable and so returning shallow copies is not sufficient.</p>
-<pre><code>mul!(c::padic, a::padic, b::padic)
-</code></pre>
-
-<p>Multiply <script type="math/tex">a</script> by <script type="math/tex">b</script> and set the existing <script type="math/tex">p</script>-adic field element <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p>
-<pre><code>addeq!(c::padic, a::padic)
-</code></pre>
-
-<p>In-place addition. Adds <script type="math/tex">a</script> to <script type="math/tex">c</script> and sets <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p>
-<p>Given the parent object <code>R</code> for a <script type="math/tex">p</script>-adic field, the following coercion functions are provided to coerce various elements into the <script type="math/tex">p</script>-adic field. Developers provide these by overloading the <code>call</code> operator for the <script type="math/tex">p</script>-adic field parent objects.</p>
-<pre><code>R()
-</code></pre>
-
-<p>Coerce zero into the <script type="math/tex">p</script>-adic field.</p>
-<pre><code>R(n::Integer)
+</code></pre><p>Beware that the expression <code>1 + 2*p + 3*p^2 + O(R, p^n)</code> is actually computed as a normal Julia expression. Therefore if \code{Int} values are used instead of Flint integers or Julia bignums, overflow may result in evaluating the value.</p><p><a id="Basic-functionality-1"></a></p><h2 id="basic-functionality">Basic functionality</h2><p>The following basic functionality is provided by the default <script type="math/tex">p</script>-adic field implementation in Nemo, to support construction of generic rings over <script type="math/tex">p</script>-adic fields. Any custom <script type="math/tex">p</script>-adic field implementation in Nemo should provide these  functions along with the usual arithmetic operations.</p><pre><code>parent_type(::Type{padic})
+</code></pre><p>Gives the type of the parent object of a Flint <script type="math/tex">p</script>-adic field element.</p><pre><code>elem_type(R::FlintPadicField)
+</code></pre><p>Given the parent object for a <script type="math/tex">p</script>-adic field, return the type of elements of the field.</p><pre><code>Base.hash(a::padic, h::UInt)
+</code></pre><p>Return a <code>UInt</code> hexadecimal hash of the <script type="math/tex">p</script>-adic field element <script type="math/tex">a</script>. This should be xor'd with a fixed random hexadecimal specific to the <script type="math/tex">p</script>-adic field type. The hash of the representative of the <script type="math/tex">p</script>-adic field element (lifted to <script type="math/tex">\mathbb{Q}</script> and the prime <script type="math/tex">p</script> for the field, should be xor'd with the supplied parameter <code>h</code> as part of computing the hash.</p><pre><code>deepcopy(a::padic)
+</code></pre><p>Construct a copy of the given <script type="math/tex">p</script>-adic field element and return it. This function must recursively construct copies of all of the internal data in the given element. Nemo <script type="math/tex">p</script>-adic field elements are mutable and so returning shallow copies is not sufficient.</p><pre><code>mul!(c::padic, a::padic, b::padic)
+</code></pre><p>Multiply <script type="math/tex">a</script> by <script type="math/tex">b</script> and set the existing <script type="math/tex">p</script>-adic field element <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p><pre><code>addeq!(c::padic, a::padic)
+</code></pre><p>In-place addition. Adds <script type="math/tex">a</script> to <script type="math/tex">c</script> and sets <script type="math/tex">c</script> to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.</p><p>Given the parent object <code>R</code> for a <script type="math/tex">p</script>-adic field, the following coercion functions are provided to coerce various elements into the <script type="math/tex">p</script>-adic field. Developers provide these by overloading the <code>call</code> operator for the <script type="math/tex">p</script>-adic field parent objects.</p><pre><code>R()
+</code></pre><p>Coerce zero into the <script type="math/tex">p</script>-adic field.</p><pre><code>R(n::Integer)
 R(f::fmpz)
 R(f::fmpq)
-</code></pre>
-
-<p>Coerce an integer or rational value into the <script type="math/tex">p</script>-adic field.</p>
-<pre><code>R(f::padic)
-</code></pre>
-
-<p>Take a <script type="math/tex">p</script>-adic field element that is already in the <script type="math/tex">p</script>-adic field and simply return it. A copy of the original is not made.</p>
-<p>In addition to the above, developers of custom <script type="math/tex">p</script>-adic field types must ensure that they provide the equivalent of the function <code>base_ring(R::FlintPadicField)</code> which should return <code>Union{}</code>. In addition to this they should ensure that each <script type="math/tex">p</script>-adic field element contains a field <code>parent</code> specifying the parent object of the <script type="math/tex">p</script>-adic field element, or at least supply the equivalent of the function <code>parent(a::padic)</code> to return the parent object of a <script type="math/tex">p</script>-adic field element.</p>
-<p><a id='Basic-manipulation-1'></a></p>
-<h2 id="basic-manipulation">Basic manipulation</h2>
-<p>Numerous functions are provided to manipulate <script type="math/tex">p</script>-adic field elements. Also see the section on basic functionality above.</p>
-<p><a id='Nemo.base_ring-Tuple{Nemo.FlintPadicField}' href='#Nemo.base_ring-Tuple{Nemo.FlintPadicField}'>#</a>
-<strong><code>Nemo.base_ring</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>base_ring(a::FlintPadicField)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>Union{}</code> as this field is not dependent on another field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L69' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.base_ring-Tuple{Nemo.padic}' href='#Nemo.base_ring-Tuple{Nemo.padic}'>#</a>
-<strong><code>Nemo.base_ring</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>base_ring(a::padic)
-</code></pre>
-
-<blockquote>
-<p>Returns <code>Union{}</code> as this field is not dependent on another field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L75' class='documenter-source'>source</a><br></p>
-<p><a id='Base.parent-Tuple{Nemo.padic}' href='#Base.parent-Tuple{Nemo.padic}'>#</a>
-<strong><code>Base.parent</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>parent(a::padic)
-</code></pre>
-
-<blockquote>
-<p>Returns the parent of the given p-adic field element.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L81' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.iszero-Tuple{Nemo.padic}' href='#Nemo.iszero-Tuple{Nemo.padic}'>#</a>
-<strong><code>Nemo.iszero</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>iszero(a::padic)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if the given p-adic field element is zero, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L174' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.isone-Tuple{Nemo.padic}' href='#Nemo.isone-Tuple{Nemo.padic}'>#</a>
-<strong><code>Nemo.isone</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isone(a::padic)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if the given p-adic field element is one, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L182' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.isunit-Tuple{Nemo.padic}' href='#Nemo.isunit-Tuple{Nemo.padic}'>#</a>
-<strong><code>Nemo.isunit</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>isunit(a::padic)
-</code></pre>
-
-<blockquote>
-<p>Return <code>true</code> if the given p-adic field element is invertible, i.e. nonzero, otherwise return <code>false</code>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L190' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.prime-Tuple{Nemo.FlintPadicField}' href='#Nemo.prime-Tuple{Nemo.FlintPadicField}'>#</a>
-<strong><code>Nemo.prime</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>prime(R::FlintPadicField)
-</code></pre>
-
-<blockquote>
-<p>Return the prime <script type="math/tex">p</script> for the given <script type="math/tex">p</script>-adic field.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L102' class='documenter-source'>source</a><br></p>
-<p><a id='Base.precision-Tuple{Nemo.padic}' href='#Base.precision-Tuple{Nemo.padic}'>#</a>
-<strong><code>Base.precision</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>precision(a::padic)
-</code></pre>
-
-<blockquote>
-<p>Return the precision of the given <script type="math/tex">p</script>-adic field element, i.e. if the element is known to <script type="math/tex">O(p^n)</script> this function will return <script type="math/tex">n</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L113' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.valuation-Tuple{Nemo.padic}' href='#Nemo.valuation-Tuple{Nemo.padic}'>#</a>
-<strong><code>Nemo.valuation</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>valuation(a::padic)
-</code></pre>
-
-<blockquote>
-<p>Return the valuation of the given <script type="math/tex">p</script>-adic field element, i.e. if the given element is divisible by <script type="math/tex">p^n</script> but not a higher power of <script type="math/tex">p</script> then the function will return <script type="math/tex">n</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L120' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.lift-Tuple{Nemo.FlintIntegerRing,Nemo.padic}' href='#Nemo.lift-Tuple{Nemo.FlintIntegerRing,Nemo.padic}'>#</a>
-<strong><code>Nemo.lift</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>lift(R::FlintIntegerRing, a::padic)
-</code></pre>
-
-<blockquote>
-<p>Return a lift of the given <script type="math/tex">p</script>-adic field element to <script type="math/tex">\mathbb{Z}</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L140' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.lift-Tuple{Nemo.FlintRationalField,Nemo.padic}' href='#Nemo.lift-Tuple{Nemo.FlintRationalField,Nemo.padic}'>#</a>
-<strong><code>Nemo.lift</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>lift(R::FlintRationalField, a::padic)
-</code></pre>
-
-<blockquote>
-<p>Return a lift of the given <script type="math/tex">p</script>-adic field element to <script type="math/tex">\mathbb{Q}</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L128' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of basic manipulation of <script type="math/tex">p</script>-adic field elements.</p>
-<pre><code>R = PadicField(7, 30)
+</code></pre><p>Coerce an integer or rational value into the <script type="math/tex">p</script>-adic field.</p><pre><code>R(f::padic)
+</code></pre><p>Take a <script type="math/tex">p</script>-adic field element that is already in the <script type="math/tex">p</script>-adic field and simply return it. A copy of the original is not made.</p><p>In addition to the above, developers of custom <script type="math/tex">p</script>-adic field types must ensure that they provide the equivalent of the function <code>base_ring(R::FlintPadicField)</code> which should return <code>Union{}</code>. In addition to this they should ensure that each <script type="math/tex">p</script>-adic field element contains a field <code>parent</code> specifying the parent object of the <script type="math/tex">p</script>-adic field element, or at least supply the equivalent of the function <code>parent(a::padic)</code> to return the parent object of a <script type="math/tex">p</script>-adic field element.</p><p><a id="Basic-manipulation-1"></a></p><h2 id="basic-manipulation">Basic manipulation</h2><p>Numerous functions are provided to manipulate <script type="math/tex">p</script>-adic field elements. Also see the section on basic functionality above.</p><p><a href="#Nemo.base_ring-Tuple{Nemo.FlintPadicField}" id="Nemo.base_ring-Tuple{Nemo.FlintPadicField}">#</a><strong><code>Nemo.base_ring</code></strong> — <em>Method</em>.</p><pre><code>base_ring(a::FlintPadicField)
+</code></pre><blockquote><p>Returns <code>Union{}</code> as this field is not dependent on another field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L69" target="_blank">source</a><br/></p><p><a href="#Nemo.base_ring-Tuple{Nemo.padic}" id="Nemo.base_ring-Tuple{Nemo.padic}">#</a><strong><code>Nemo.base_ring</code></strong> — <em>Method</em>.</p><pre><code>base_ring(a::padic)
+</code></pre><blockquote><p>Returns <code>Union{}</code> as this field is not dependent on another field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L75" target="_blank">source</a><br/></p><p><a href="#Base.parent-Tuple{Nemo.padic}" id="Base.parent-Tuple{Nemo.padic}">#</a><strong><code>Base.parent</code></strong> — <em>Method</em>.</p><pre><code>parent(a::padic)
+</code></pre><blockquote><p>Returns the parent of the given p-adic field element.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L81" target="_blank">source</a><br/></p><p><a href="#Nemo.iszero-Tuple{Nemo.padic}" id="Nemo.iszero-Tuple{Nemo.padic}">#</a><strong><code>Nemo.iszero</code></strong> — <em>Method</em>.</p><pre><code>iszero(a::padic)
+</code></pre><blockquote><p>Return <code>true</code> if the given p-adic field element is zero, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L174" target="_blank">source</a><br/></p><p><a href="#Nemo.isone-Tuple{Nemo.padic}" id="Nemo.isone-Tuple{Nemo.padic}">#</a><strong><code>Nemo.isone</code></strong> — <em>Method</em>.</p><pre><code>isone(a::padic)
+</code></pre><blockquote><p>Return <code>true</code> if the given p-adic field element is one, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L182" target="_blank">source</a><br/></p><p><a href="#Nemo.isunit-Tuple{Nemo.padic}" id="Nemo.isunit-Tuple{Nemo.padic}">#</a><strong><code>Nemo.isunit</code></strong> — <em>Method</em>.</p><pre><code>isunit(a::padic)
+</code></pre><blockquote><p>Return <code>true</code> if the given p-adic field element is invertible, i.e. nonzero, otherwise return <code>false</code>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L190" target="_blank">source</a><br/></p><p><a href="#Nemo.prime-Tuple{Nemo.FlintPadicField}" id="Nemo.prime-Tuple{Nemo.FlintPadicField}">#</a><strong><code>Nemo.prime</code></strong> — <em>Method</em>.</p><pre><code>prime(R::FlintPadicField)
+</code></pre><blockquote><p>Return the prime <script type="math/tex">p</script> for the given <script type="math/tex">p</script>-adic field.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L102" target="_blank">source</a><br/></p><p><a href="#Base.precision-Tuple{Nemo.padic}" id="Base.precision-Tuple{Nemo.padic}">#</a><strong><code>Base.precision</code></strong> — <em>Method</em>.</p><pre><code>precision(a::padic)
+</code></pre><blockquote><p>Return the precision of the given <script type="math/tex">p</script>-adic field element, i.e. if the element is known to <script type="math/tex">O(p^n)</script> this function will return <script type="math/tex">n</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L113" target="_blank">source</a><br/></p><p><a href="#Nemo.valuation-Tuple{Nemo.padic}" id="Nemo.valuation-Tuple{Nemo.padic}">#</a><strong><code>Nemo.valuation</code></strong> — <em>Method</em>.</p><pre><code>valuation(a::padic)
+</code></pre><blockquote><p>Return the valuation of the given <script type="math/tex">p</script>-adic field element, i.e. if the given element is divisible by <script type="math/tex">p^n</script> but not a higher power of <script type="math/tex">p</script> then the function will return <script type="math/tex">n</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L120" target="_blank">source</a><br/></p><p><a href="#Nemo.lift-Tuple{Nemo.FlintIntegerRing,Nemo.padic}" id="Nemo.lift-Tuple{Nemo.FlintIntegerRing,Nemo.padic}">#</a><strong><code>Nemo.lift</code></strong> — <em>Method</em>.</p><pre><code>lift(R::FlintIntegerRing, a::padic)
+</code></pre><blockquote><p>Return a lift of the given <script type="math/tex">p</script>-adic field element to <script type="math/tex">\mathbb{Z}</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L140" target="_blank">source</a><br/></p><p><a href="#Nemo.lift-Tuple{Nemo.FlintRationalField,Nemo.padic}" id="Nemo.lift-Tuple{Nemo.FlintRationalField,Nemo.padic}">#</a><strong><code>Nemo.lift</code></strong> — <em>Method</em>.</p><pre><code>lift(R::FlintRationalField, a::padic)
+</code></pre><blockquote><p>Return a lift of the given <script type="math/tex">p</script>-adic field element to <script type="math/tex">\mathbb{Q}</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L128" target="_blank">source</a><br/></p><p>Here are some examples of basic manipulation of <script type="math/tex">p</script>-adic field elements.</p><pre><code>R = PadicField(7, 30)
 
 a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
 b = 7^2 + 3*7^3 + O(R, 7^5)
@@ -509,154 +107,7 @@ m = prime(R)
 n = valuation(b)
 p = lift(FlintZZ, a)
 q = lift(FlintQQ, divexact(a, b))
-</code></pre>
-
-<p><a id='Arithmetic-operations-1'></a></p>
-<h2 id="arithmetic-operations">Arithmetic operations</h2>
-<p>Nemo provides all the standard field operations for <script type="math/tex">p</script>-adic field elements, as follows.</p>
-<table>
-<thead>
-<tr>
-<th align="right">Function</th>
-<th align="right">Operation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">-(a::padic)</td>
-<td align="right">unary minus</td>
-</tr>
-<tr>
-<td align="right">+(a::padic, b::padic)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">-(a::padic, b::padic)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">*(a::padic, b::padic)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">divexact(a::padic, b::padic)</td>
-<td align="right">exact division</td>
-</tr>
-</tbody>
-</table>
-<p>In addition, the following ad hoc field operations are defined.</p>
-<table>
-<thead>
-<tr>
-<th align="right">Function</th>
-<th align="right">Operation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">+(a::padic, b::Integer)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">+(a::Integer, b::padic)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">+(a::padic, b::fmpz)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">+(a::fmpz, b::padic)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">+(a::padic, b::fmpq)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">+(a::fmpq, b::padic)</td>
-<td align="right">addition</td>
-</tr>
-<tr>
-<td align="right">-(a::padic, b::Integer)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">-(a::Integer, b::padic)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">-(a::padic, b::fmpz)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">-(a::fmpz, b::padic)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">-(a::padic, b::fmpq)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">-(a::fmpq, b::padic)</td>
-<td align="right">subtraction</td>
-</tr>
-<tr>
-<td align="right">*(a::padic, b::Integer)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">*(a::Integer, b::padic)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">*(a::padic, b::fmpz)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">*(a::fmpz, b::padic)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">*(a::padic, b::fmpq)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">*(a::fmpq, b::padic)</td>
-<td align="right">multiplication</td>
-</tr>
-<tr>
-<td align="right">divexact(a::padic, b::Integer)</td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right">divexact(a::padic, b::fmpz)</td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right">divexact(a::padic, b::fmpq)</td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right">divexact(a::Integer, b::padic)</td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right">divexact(a::fmpz, b::padic)</td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right">divexact(a::fmpq, b::padic)</td>
-<td align="right">exact division</td>
-</tr>
-<tr>
-<td align="right">^(a::padic, b::Int)</td>
-<td align="right">powering</td>
-</tr>
-</tbody>
-</table>
-<p>Here are some examples of arithmetic operations on <script type="math/tex">p</script>-adic field elements.</p>
-<pre><code>R = PadicField(7, 30)
+</code></pre><p><a id="Arithmetic-operations-1"></a></p><h2 id="arithmetic-operations">Arithmetic operations</h2><p>Nemo provides all the standard field operations for <script type="math/tex">p</script>-adic field elements, as follows.</p><table><thead><tr><th align="right">Function</th><th align="right">Operation</th></tr></thead><tbody><tr><td align="right">-(a::padic)</td><td align="right">unary minus</td></tr><tr><td align="right">+(a::padic, b::padic)</td><td align="right">addition</td></tr><tr><td align="right">-(a::padic, b::padic)</td><td align="right">subtraction</td></tr><tr><td align="right">*(a::padic, b::padic)</td><td align="right">multiplication</td></tr><tr><td align="right">divexact(a::padic, b::padic)</td><td align="right">exact division</td></tr></tbody></table><p>In addition, the following ad hoc field operations are defined.</p><table><thead><tr><th align="right">Function</th><th align="right">Operation</th></tr></thead><tbody><tr><td align="right">+(a::padic, b::Integer)</td><td align="right">addition</td></tr><tr><td align="right">+(a::Integer, b::padic)</td><td align="right">addition</td></tr><tr><td align="right">+(a::padic, b::fmpz)</td><td align="right">addition</td></tr><tr><td align="right">+(a::fmpz, b::padic)</td><td align="right">addition</td></tr><tr><td align="right">+(a::padic, b::fmpq)</td><td align="right">addition</td></tr><tr><td align="right">+(a::fmpq, b::padic)</td><td align="right">addition</td></tr><tr><td align="right">-(a::padic, b::Integer)</td><td align="right">subtraction</td></tr><tr><td align="right">-(a::Integer, b::padic)</td><td align="right">subtraction</td></tr><tr><td align="right">-(a::padic, b::fmpz)</td><td align="right">subtraction</td></tr><tr><td align="right">-(a::fmpz, b::padic)</td><td align="right">subtraction</td></tr><tr><td align="right">-(a::padic, b::fmpq)</td><td align="right">subtraction</td></tr><tr><td align="right">-(a::fmpq, b::padic)</td><td align="right">subtraction</td></tr><tr><td align="right">*(a::padic, b::Integer)</td><td align="right">multiplication</td></tr><tr><td align="right">*(a::Integer, b::padic)</td><td align="right">multiplication</td></tr><tr><td align="right">*(a::padic, b::fmpz)</td><td align="right">multiplication</td></tr><tr><td align="right">*(a::fmpz, b::padic)</td><td align="right">multiplication</td></tr><tr><td align="right">*(a::padic, b::fmpq)</td><td align="right">multiplication</td></tr><tr><td align="right">*(a::fmpq, b::padic)</td><td align="right">multiplication</td></tr><tr><td align="right">divexact(a::padic, b::Integer)</td><td align="right">exact division</td></tr><tr><td align="right">divexact(a::padic, b::fmpz)</td><td align="right">exact division</td></tr><tr><td align="right">divexact(a::padic, b::fmpq)</td><td align="right">exact division</td></tr><tr><td align="right">divexact(a::Integer, b::padic)</td><td align="right">exact division</td></tr><tr><td align="right">divexact(a::fmpz, b::padic)</td><td align="right">exact division</td></tr><tr><td align="right">divexact(a::fmpq, b::padic)</td><td align="right">exact division</td></tr><tr><td align="right">^(a::padic, b::Int)</td><td align="right">powering</td></tr></tbody></table><p>Here are some examples of arithmetic operations on <script type="math/tex">p</script>-adic field elements.</p><pre><code>R = PadicField(7, 30)
 
 a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
 b = 7^2 + 3*7^3 + O(R, 7^5)
@@ -678,21 +129,7 @@ t = d - ZZ(2)
 u = a + ZZ(1)//7^2
 v = (ZZ(12)//11)*b
 w = c*(ZZ(1)//7)
-</code></pre>
-
-<p><a id='Comparison-1'></a></p>
-<h2 id="comparison">Comparison</h2>
-<p>Nemo provides the comparison operation <code>==</code> for <script type="math/tex">p</script>-adic field elements. Julia then automatically provides the corresponding <code>!=</code> operation. Here are the functions provided.</p>
-<p><a id='Function-1'></a></p>
-<h2 id="function">Function</h2>
-<p>==(a::padic, b::padic) isequal(a::padic, b::padic)</p>
-<p>Note that <code>==</code> returns <code>true</code> if its arguments are arithmetically equal to the minimum of the two precisions. The <code>isequal</code> function requires them to both be the same precision, as for power series.</p>
-<p>In addition, the following ad hoc comparisons are provided, Julia again providing the corresponding <code>!=</code> operators.</p>
-<p><a id='Function-2'></a></p>
-<h2 id="function_1">Function</h2>
-<p>==(a::padic, b::Integer) ==(a::padic, b::fmpz) ==(a::padic, b::fmpq) ==(a::Integer, b::padic) ==(a::fmpz, b::padic) ==(a::fmpq, b::padic)</p>
-<p>Here are some examples of comparisons.</p>
-<pre><code>R = PadicField(7, 30)
+</code></pre><p><a id="Comparison-1"></a></p><h2 id="comparison">Comparison</h2><p>Nemo provides the comparison operation <code>==</code> for <script type="math/tex">p</script>-adic field elements. Julia then automatically provides the corresponding <code>!=</code> operation. Here are the functions provided.</p><p><a id="Function-1"></a></p><h2 id="function">Function</h2><p>==(a::padic, b::padic) isequal(a::padic, b::padic)</p><p>Note that <code>==</code> returns <code>true</code> if its arguments are arithmetically equal to the minimum of the two precisions. The <code>isequal</code> function requires them to both be the same precision, as for power series.</p><p>In addition, the following ad hoc comparisons are provided, Julia again providing the corresponding <code>!=</code> operators.</p><p><a id="Function-2"></a></p><h2 id="function_1">Function</h2><p>==(a::padic, b::Integer) ==(a::padic, b::fmpz) ==(a::padic, b::fmpq) ==(a::Integer, b::padic) ==(a::fmpz, b::padic) ==(a::fmpq, b::padic)</p><p>Here are some examples of comparisons.</p><pre><code>R = PadicField(7, 30)
 
 a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
 b = 3*7^3 + O(R, 7^5)
@@ -706,21 +143,8 @@ c == R(0)
 d == R(2)
 ZZ(3) == d
 ZZ(3)//7 == c
-</code></pre>
-
-<p><a id='Inversion-1'></a></p>
-<h2 id="inversion">Inversion</h2>
-<p><a id='Base.inv-Tuple{Nemo.padic}' href='#Base.inv-Tuple{Nemo.padic}'>#</a>
-<strong><code>Base.inv</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>inv(a::padic)
-</code></pre>
-
-<blockquote>
-<p>Returns <script type="math/tex">a^{-1}</script>. If <script type="math/tex">a = 0</script> a <code>DivideError()</code> is thrown.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L436' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of inversion.</p>
-<pre><code>R = PadicField(7, 30)
+</code></pre><p><a id="Inversion-1"></a></p><h2 id="inversion">Inversion</h2><p><a href="#Base.inv-Tuple{Nemo.padic}" id="Base.inv-Tuple{Nemo.padic}">#</a><strong><code>Base.inv</code></strong> — <em>Method</em>.</p><pre><code>inv(a::padic)
+</code></pre><blockquote><p>Returns <script type="math/tex">a^{-1}</script>. If <script type="math/tex">a = 0</script> a <code>DivideError()</code> is thrown.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L436" target="_blank">source</a><br/></p><p>Here are some examples of inversion.</p><pre><code>R = PadicField(7, 30)
 
 a = 1 + 7 + 2*7^2 + O(R, 7^3)
 b = 2 + 3*7 + O(R, 7^5)
@@ -732,62 +156,23 @@ g = inv(b)
 h = inv(c)
 k = inv(d)
 l = inv(R(1))
-</code></pre>
-
-<p><a id='Divisibility-1'></a></p>
-<h2 id="divisibility">Divisibility</h2>
-<p><a id='Nemo.divides-Tuple{Nemo.padic,Nemo.padic}' href='#Nemo.divides-Tuple{Nemo.padic,Nemo.padic}'>#</a>
-<strong><code>Nemo.divides</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>divides(f::padic, g::padic)
-</code></pre>
-
-<blockquote>
-<p>Returns a pair consisting of a flag which is set to <code>true</code> if <script type="math/tex">g</script> divides <script type="math/tex">f</script> and <code>false</code> otherwise, and a value <script type="math/tex">h</script> such that <script type="math/tex">f = gh</script> if such a value exists. If not, the value of <script type="math/tex">h</script> is undetermined.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L456' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of divisibility testing.</p>
-<pre><code>R = PadicField(7, 30)
+</code></pre><p><a id="Divisibility-1"></a></p><h2 id="divisibility">Divisibility</h2><p><a href="#Nemo.divides-Tuple{Nemo.padic,Nemo.padic}" id="Nemo.divides-Tuple{Nemo.padic,Nemo.padic}">#</a><strong><code>Nemo.divides</code></strong> — <em>Method</em>.</p><pre><code>divides(f::padic, g::padic)
+</code></pre><blockquote><p>Returns a pair consisting of a flag which is set to <code>true</code> if <script type="math/tex">g</script> divides <script type="math/tex">f</script> and <code>false</code> otherwise, and a value <script type="math/tex">h</script> such that <script type="math/tex">f = gh</script> if such a value exists. If not, the value of <script type="math/tex">h</script> is undetermined.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L456" target="_blank">source</a><br/></p><p>Here are some examples of divisibility testing.</p><pre><code>R = PadicField(7, 30)
 
 a = 1 + 7 + 2*7^2 + O(R, 7^3)
 b = 2 + 3*7 + O(R, 7^5)
 
 flag, q = divides(a, b)
-</code></pre>
-
-<p><a id='GCD-1'></a></p>
-<h2 id="gcd">GCD</h2>
-<p><a id='Base.gcd-Tuple{Nemo.padic,Nemo.padic}' href='#Base.gcd-Tuple{Nemo.padic,Nemo.padic}'>#</a>
-<strong><code>Base.gcd</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>gcd(x::padic, y::padic)
-</code></pre>
-
-<blockquote>
-<p>Returns the greatest common divisor of <script type="math/tex">x</script> and <script type="math/tex">y</script>, i.e. the function returns <script type="math/tex">1</script> unless both <script type="math/tex">a</script> and <script type="math/tex">b</script> are <script type="math/tex">0</script>, in which case it returns <script type="math/tex">0</script>.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L473' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of greatest common divisor.</p>
-<pre><code>R = PadicField(7, 30)
+</code></pre><p><a id="GCD-1"></a></p><h2 id="gcd">GCD</h2><p><a href="#Base.gcd-Tuple{Nemo.padic,Nemo.padic}" id="Base.gcd-Tuple{Nemo.padic,Nemo.padic}">#</a><strong><code>Base.gcd</code></strong> — <em>Method</em>.</p><pre><code>gcd(x::padic, y::padic)
+</code></pre><blockquote><p>Returns the greatest common divisor of <script type="math/tex">x</script> and <script type="math/tex">y</script>, i.e. the function returns <script type="math/tex">1</script> unless both <script type="math/tex">a</script> and <script type="math/tex">b</script> are <script type="math/tex">0</script>, in which case it returns <script type="math/tex">0</script>.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L473" target="_blank">source</a><br/></p><p>Here are some examples of greatest common divisor.</p><pre><code>R = PadicField(7, 30)
 
 a = 1 + 7 + 2*7^2 + O(R, 7^3)
 b = 2 + 3*7 + O(R, 7^5)
 
 d = gcd(a, b)
 f = gcd(R(0), R(0))
-</code></pre>
-
-<p><a id='Square-root-1'></a></p>
-<h2 id="square-root">Square root</h2>
-<p><a id='Base.sqrt-Tuple{Nemo.padic}' href='#Base.sqrt-Tuple{Nemo.padic}'>#</a>
-<strong><code>Base.sqrt</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>sqrt(a::padic)
-</code></pre>
-
-<blockquote>
-<p>Return the <script type="math/tex">p</script>-adic square root of <script type="math/tex">a</script>. We define this only when the valuation of <script type="math/tex">a</script> is even. The precision of the output will be precision<script type="math/tex">(a) -</script> valuation<script type="math/tex">(a)/2</script>. If the square root does not exist, an exception is thrown.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L494' class='documenter-source'>source</a><br></p>
-<p>Here are some examples of taking the square root.</p>
-<pre><code>R = PadicField(7, 30)
+</code></pre><p><a id="Square-root-1"></a></p><h2 id="square-root">Square root</h2><p><a href="#Base.sqrt-Tuple{Nemo.padic}" id="Base.sqrt-Tuple{Nemo.padic}">#</a><strong><code>Base.sqrt</code></strong> — <em>Method</em>.</p><pre><code>sqrt(a::padic)
+</code></pre><blockquote><p>Return the <script type="math/tex">p</script>-adic square root of <script type="math/tex">a</script>. We define this only when the valuation of <script type="math/tex">a</script> is even. The precision of the output will be precision<script type="math/tex">(a) -</script> valuation<script type="math/tex">(a)/2</script>. If the square root does not exist, an exception is thrown.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L494" target="_blank">source</a><br/></p><p>Here are some examples of taking the square root.</p><pre><code>R = PadicField(7, 30)
 
 a = 1 + 7 + 2*7^2 + O(R, 7^3)
 b = 2 + 3*7 + O(R, 7^5)
@@ -797,88 +182,10 @@ d = sqrt(a)
 f = sqrt(b)
 f = sqrt(c)
 g = sqrt(R(121))
-</code></pre>
-
-<p><a id='Special-functions-1'></a></p>
-<h2 id="special-functions">Special functions</h2>
-<p><a id='Base.exp-Tuple{Nemo.padic}' href='#Base.exp-Tuple{Nemo.padic}'>#</a>
-<strong><code>Base.exp</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>exp(a::padic)
-</code></pre>
-
-<blockquote>
-<p>Return the <script type="math/tex">p</script>-adic exponential of <script type="math/tex">a</script>. We define this only when the valuation of <script type="math/tex">a</script> is positive (unless <script type="math/tex">a = 0</script>). The precision of the output will be the same as the precision of the input. If the input is not valid an exception is thrown.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L518' class='documenter-source'>source</a><br></p>
-<p><a id='Base.log-Tuple{Nemo.padic}' href='#Base.log-Tuple{Nemo.padic}'>#</a>
-<strong><code>Base.log</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>log(a::padic)
-</code></pre>
-
-<blockquote>
-<p>Return the <script type="math/tex">p</script>-adic logarithm of <script type="math/tex">a</script>. We define this only when the valuation of <script type="math/tex">a</script> is zero (but not for <script type="math/tex">a == 0</script>). The precision of the output will be the same as the precision of the input. If the input is not valid an exception is thrown.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L536' class='documenter-source'>source</a><br></p>
-<p><a id='Nemo.teichmuller-Tuple{Nemo.padic}' href='#Nemo.teichmuller-Tuple{Nemo.padic}'>#</a>
-<strong><code>Nemo.teichmuller</code></strong> &mdash; <em>Method</em>.</p>
-<pre><code>teichmuller(a::padic)
-</code></pre>
-
-<blockquote>
-<p>Return the Teichmuller lift of the <script type="math/tex">p</script>-adic value <script type="math/tex">a</script>. We require the valuation of <script type="math/tex">a</script> to be nonnegative. The precision of the output will be the same as the precision of the input. For convenience, if <script type="math/tex">a</script> is congruent to zero modulo <script type="math/tex">p</script> we return zero. If the input is not valid an exception is thrown.</p>
-</blockquote>
-<p><a target='_blank' href='https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L554' class='documenter-source'>source</a><br></p>
-<p>R = PadicField(7, 30)</p>
-<p>a = 1 + 7 + 2<em>7^2 + O(R, 7^3) b = 2 + 5</em>7 + 3<em>7^2 + O(R, 7^3) c = 3</em>7 + 2*7^2 + O(R, 7^5)</p>
-<p>c = exp(c) d = log(a) c = exp(R(0)) d = log(R(1)) f = teichmuller(b) </p>
-              
-            </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../arb/" class="btn btn-neutral float-right" title="Real balls">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../finitefield/" class="btn btn-neutral" title="Finite fields"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <!-- Copyright etc -->
-    
-  </div>
+</code></pre><p><a id="Special-functions-1"></a></p><h2 id="special-functions">Special functions</h2><p><a href="#Base.exp-Tuple{Nemo.padic}" id="Base.exp-Tuple{Nemo.padic}">#</a><strong><code>Base.exp</code></strong> — <em>Method</em>.</p><pre><code>exp(a::padic)
+</code></pre><blockquote><p>Return the <script type="math/tex">p</script>-adic exponential of <script type="math/tex">a</script>. We define this only when the valuation of <script type="math/tex">a</script> is positive (unless <script type="math/tex">a = 0</script>). The precision of the output will be the same as the precision of the input. If the input is not valid an exception is thrown.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L518" target="_blank">source</a><br/></p><p><a href="#Base.log-Tuple{Nemo.padic}" id="Base.log-Tuple{Nemo.padic}">#</a><strong><code>Base.log</code></strong> — <em>Method</em>.</p><pre><code>log(a::padic)
+</code></pre><blockquote><p>Return the <script type="math/tex">p</script>-adic logarithm of <script type="math/tex">a</script>. We define this only when the valuation of <script type="math/tex">a</script> is zero (but not for <script type="math/tex">a == 0</script>). The precision of the output will be the same as the precision of the input. If the input is not valid an exception is thrown.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L536" target="_blank">source</a><br/></p><p><a href="#Nemo.teichmuller-Tuple{Nemo.padic}" id="Nemo.teichmuller-Tuple{Nemo.padic}">#</a><strong><code>Nemo.teichmuller</code></strong> — <em>Method</em>.</p><pre><code>teichmuller(a::padic)
+</code></pre><blockquote><p>Return the Teichmuller lift of the <script type="math/tex">p</script>-adic value <script type="math/tex">a</script>. We require the valuation of <script type="math/tex">a</script> to be nonnegative. The precision of the output will be the same as the precision of the input. For convenience, if <script type="math/tex">a</script> is congruent to zero modulo <script type="math/tex">p</script> we return zero. If the input is not valid an exception is thrown.</p></blockquote><p><a class="documenter-source" href="https://github.com/Nemocas/Nemo.jl/tree/67d7a754995dcec5a17dc3e2cc763c793a6eb68b/src/flint/padic.jl#L554" target="_blank">source</a><br/></p><p>R = PadicField(7, 30)</p><p>a = 1 + 7 + 2<em>7^2 + O(R, 7^3) b = 2 + 5</em>7 + 3<em>7^2 + O(R, 7^3) c = 3</em>7 + 2*7^2 + O(R, 7^5)</p><p>c = exp(c) d = log(a) c = exp(R(0)) d = log(R(1)) f = teichmuller(b) </p></div></div><footer><div aria-label="footer navigation" class="rst-footer-buttons" role="navigation"><a class="btn btn-neutral float-right" href="../arb/" title="Real balls">Next <span class="icon icon-circle-arrow-right"></span></a><a class="btn btn-neutral" href="../finitefield/" title="Finite fields"><span class="icon icon-circle-arrow-left"></span> Previous</a></div><hr/><div role="contentinfo"></div>
 
   Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
-</footer>
-	  
-        </div>
-      </div>
-
-    </section>
-    
-  </div>
-
-  <div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-          <a href="https://github.com/Nemocas/Nemo.jl" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
-      
-      
-        <span><a href="../finitefield/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../arb/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
-</div>
-    <script src="../js/theme.js"></script>
-      <script src="../mathjaxhelper.js"></script>
-      <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
-
-</body>
-</html>
+</footer></div></div></section></div><div class="rst-versions" role="note" style="cursor: pointer"><span class="rst-current-version" data-toggle="rst-current-version"><a class="fa fa-github" href="https://github.com/Nemocas/Nemo.jl" style="float: left; color: #fcfcfc"> GitHub</a><span><a href="../finitefield/" style="color: #fcfcfc;">« Previous</a></span><span style="margin-left: 15px"><a href="../arb/" style="color: #fcfcfc">Next »</a></span></span></div><script src="../js/theme.js"></script><script src="../mathjaxhelper.js"></script><script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script></body></HTML>
