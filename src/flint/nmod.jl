@@ -370,14 +370,18 @@ Random.gentype(::Type{zzModRing}) = elem_type(zzModRing)
 
 RandomExtensions.maketype(R::zzModRing, _) = elem_type(R)
 
-rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{zzModRingElem,zzModRing,<:AbstractArray{<:IntegerUnion}}}) =
-sp[][1](rand(rng, sp[][2]))
+RandomExtensions.make(x::zzModRing) = RandomExtensions.MakeWrap{RandomExtensions.gentype(x),typeof(x)}(x)
+
+function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{<:zzModRingElem,<:zzModRing}})
+   S, v = sp[][1:end]
+   S(rand(rng, v))
+end
 
 # define rand(R::zzModRing, arr), where arr is any abstract array with integer or ZZRingElem entries
 
-rand(r::Random.AbstractRNG, R::zzModRing, b::AbstractArray) = rand(r, make(R, b))
+rand(r::Random.AbstractRNG, R::zzModRing, v...) = rand(r, make(R, v...))
 
-rand(R::zzModRing, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
+rand(R::zzModRing, v...) = rand(Random.GLOBAL_RNG, R, v...)
 
 ###############################################################################
 #

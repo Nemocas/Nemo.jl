@@ -362,7 +362,7 @@ The ring $\mathbb Z/n\mathbb Z$ for some $n$. See [`residue_ring`](@ref).
 Implementation for the modulus being a machine integer [`Int`](@ref).
 For the modulus being a [`ZZRingElem`](@ref) see [`ZZModRing`](@ref).
 """
-@attributes mutable struct zzModRing <: Ring
+@attributes mutable struct zzModRing <: ResidueRing{UInt}
   n::UInt
   ninv::UInt
 
@@ -458,7 +458,7 @@ The ring $\mathbb Z/n\mathbb Z$ for some $n$. See [`residue_ring`](@ref).
 Implementation for the modulus being a big integer [`ZZRingElem`](@ref).
 For the modulus being an [`Int`](@ref) see [`zzModRing`](@ref).
 """
-@attributes mutable struct ZZModRing <: Ring
+@attributes mutable struct ZZModRing <: ResidueRing{ZZRingElem}
   n::ZZRingElem
   ninv::fmpz_mod_ctx_struct
 
