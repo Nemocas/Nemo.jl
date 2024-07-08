@@ -379,9 +379,12 @@ end
 
 # define rand(R::zzModRing, arr), where arr is any abstract array with integer or ZZRingElem entries
 
-rand(r::Random.AbstractRNG, R::zzModRing, v...) = rand(r, make(R, v...))
+rand(r::Random.AbstractRNG, R::zzModRing, b::AbstractArray) = rand(r, make(R, b))
 
-rand(R::zzModRing, v...) = rand(Random.GLOBAL_RNG, R, v...)
+rand(R::zzModRing, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
+#rand(r::Random.AbstractRNG, R::zzModRing, v...) = rand(r, make(R, v...))
+#
+#rand(R::zzModRing, v...) = rand(Random.GLOBAL_RNG, R, v...)
 
 ###############################################################################
 #
