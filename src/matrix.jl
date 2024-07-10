@@ -35,23 +35,6 @@ end
 
 ################################################################################
 #
-#  Generic kernel (calling nullspace in flint)
-#
-################################################################################
-
-function kernel(::Solve.RREFTrait, A::_FieldMatTypes; side::Symbol = :left)
-  Solve.check_option(side, [:right, :left], "side")
-
-  if side === :left
-    K = kernel(Solve.RREFTrait(), transpose(A), side = :right)
-    return transpose(K)
-  end
-
-  return nullspace(A)[2]
-end
-
-################################################################################
-#
 #  Solve context functionality
 #
 ################################################################################
@@ -63,54 +46,21 @@ end
 
 ################################################################################
 #
+#  (No) lazy transpose
+#
+################################################################################
+
+# Producing a LazyTransposedMatElem from a flint matrix should always be
+# unintended because the resulting matrix will use generic code and not flint
+Solve.lazy_transpose(A::_MatTypes) = transpose(A)
+
+################################################################################
+#
 #  Solve context for matrices over finite fields
 #
 ################################################################################
 
-function Solve._init_reduce(::Solve.LUTrait, C::Solve.SolveCtx{T}) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
-  if isdefined(C, :red) && isdefined(C, :lu_perm)
-    return nothing
-  end
-
-  LU = deepcopy(matrix(C))
-  p = Perm(1:nrows(LU))
-  r = lu!(p, LU)
-
-  Solve.set_rank!(C, r)
-  C.red = LU
-  C.lu_perm = p
-  if r < nrows(C)
-    pA = p*matrix(C)
-    C.permuted_matrix = view(pA, r + 1:nrows(C), :)
-  else
-    C.permuted_matrix = zero(matrix(C), 0, ncols(C))
-  end
-  return nothing
-end
-
-function Solve._init_reduce_transpose(::Solve.LUTrait, C::Solve.SolveCtx{T}) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
-  if isdefined(C, :red_transp) && isdefined(C, :lu_perm_transp)
-    return nothing
-  end
-
-  LU = transpose(matrix(C))
-  p = Perm(1:nrows(LU))
-  r = lu!(p, LU)
-
-  Solve.set_rank!(C, r)
-  C.red_transp = LU
-  C.lu_perm_transp = p
-  if r < ncols(C)
-    Ap = matrix(C)*p
-    C.permuted_matrix_transp = view(Ap, :, r + 1:ncols(C))
-  else
-    C.permuted_matrix_transp = zero(matrix(C), nrows(C), 0)
-  end
-  return nothing
-end
-
 function Solve._can_solve_internal_no_check(::Solve.LUTrait, C::Solve.SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
-  @assert base_ring(matrix(C)) === base_ring(b) "Base rings do not match"
   # Split up in separate functions to make the compiler happy
   if side === :right
     return Solve._can_solve_internal_no_check_right(Solve.LUTrait(), C, b, task)

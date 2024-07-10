@@ -1220,27 +1220,6 @@ function nullspace(x::ZZMatrix)
   return ncols(x), identity_matrix(x, ncols(x))
 end
 
-function kernel(A::ZZMatrix; side::Symbol = :left)
-  Solve.check_option(side, [:right, :left], "side")
-
-  if side === :left
-    K = kernel(transpose(A), side = :right)
-    return transpose(K)
-  end
-
-  A = transpose(hnf(A))
-  H, U = hnf_with_transform(A)
-  r = nrows(H)
-  while r > 0 && is_zero_row(H, r)
-    r -= 1
-  end
-  if is_zero(r)
-    return transpose(U)
-  else
-    return transpose(view(U, r + 1:nrows(U), 1:ncols(U)))
-  end
-end
-
 @doc raw"""
     nullspace_right_rational(x::ZZMatrix)
 
@@ -1533,7 +1512,7 @@ function Solve._can_solve_internal_no_check(::Solve.HermiteFormTrait, A::ZZMatri
   if task === :with_solution
     return true, sol, zero(A, 0, 0)
   end
-  _, K = Solve._kernel_of_hnf(A, H, T)
+  K = transpose(Solve._kernel_of_hnf(H, T))
   return fl, sol, K
 end
 
@@ -1541,28 +1520,6 @@ end
 # `lazy_transpose`
 
 AbstractAlgebra.solve_context_type(::Type{ZZRingElem}) = Solve.SolveCtx{ZZRingElem, ZZMatrix, ZZMatrix, ZZMatrix}
-
-function Solve._init_reduce_transpose(::Solve.HermiteFormTrait, C::Solve.SolveCtx{ZZRingElem})
-  if isdefined(C, :red_transp) && isdefined(C, :trafo_transp)
-    return nothing
-  end
-
-  R, U = hnf_with_transform(transpose(matrix(C)))
-  C.red_transp = R
-  C.trafo_transp = U
-  return nothing
-end
-
-function Solve.kernel(::Solve.HermiteFormTrait, C::Solve.SolveCtx{ZZRingElem}; side::Symbol = :left)
-  Solve.check_option(side, [:right, :left], "side")
-
-  if side === :right
-    return Solve._kernel_of_hnf(matrix(C), Solve.reduced_matrix_of_transpose(C), Solve.transformation_matrix_of_transpose(C))[2]
-  else
-    nullity, X = Solve._kernel_of_hnf(matrix(C), Solve.reduced_matrix(C), Solve.transformation_matrix(C))
-    return transpose(X)
-  end
-end
 
 Base.reduce(::typeof(hcat), A::AbstractVector{ZZMatrix}) = AbstractAlgebra._hcat(A)
 

@@ -678,43 +678,40 @@ function Solve._can_solve_internal_no_check(::Solve.RREFTrait, A::QQMatrix, b::Q
   return Bool(fl), x, kernel(A, side = :right)
 end
 
-function Solve._init_reduce(::Solve.RREFTrait, C::Solve.SolveCtx{QQFieldElem})
+# The following functions are generic code, but we can't test them in AbstractAlgebra
+function Solve._init_reduce(::Solve.RREFTrait, C::Solve.SolveCtx)
   if isdefined(C, :red) && isdefined(C, :trafo)
     return nothing
   end
 
-  A = matrix(C)
-  B = hcat(deepcopy(A), identity_matrix(base_ring(A), nrows(A)))
-  rref!(B)
+  B, U = echelon_form_with_transformation(matrix(C))
   r = nrows(B)
-  while r > 0 && is_zero(view(B, r:r, 1:ncols(A)))
+  while r > 0 && is_zero_row(B, r)
     r -= 1
   end
   Solve.set_rank!(C, r)
-  C.red = view(B, 1:nrows(A), 1:ncols(A))
-  C.trafo = view(B, 1:nrows(A), ncols(A) + 1:ncols(B))
+  C.red = B
+  C.trafo = U
   return nothing
 end
 
-function Solve._init_reduce_transpose(::Solve.RREFTrait, C::Solve.SolveCtx{QQFieldElem})
+function Solve._init_reduce_transpose(::Solve.RREFTrait, C::Solve.SolveCtx)
   if isdefined(C, :red_transp) && isdefined(C, :trafo_transp)
     return nothing
   end
 
-  A = matrix(C)
-  B = hcat(transpose(A), identity_matrix(base_ring(A), ncols(A)))
-  rref!(B)
+  B, U = echelon_form_with_transformation(transpose(matrix(C)))
   r = nrows(B)
-  while r > 0 && is_zero(view(B, r:r, 1:nrows(A)))
+  while r > 0 && is_zero_row(B, r)
     r -= 1
   end
   Solve.set_rank!(C, r)
-  C.red_transp = view(B, 1:ncols(A), 1:nrows(A))
-  C.trafo_transp = view(B, 1:ncols(A), nrows(A) + 1:ncols(B))
+  C.red_transp = B
+  C.trafo_transp = U
   return nothing
 end
 
-function Solve._can_solve_internal_no_check(::Solve.RREFTrait, C::Solve.SolveCtx{QQFieldElem}, b::QQMatrix, task::Symbol; side::Symbol = :left)
+function Solve._can_solve_internal_no_check(::Solve.RREFTrait, C::Solve.SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
   if side === :right
     fl, sol = Solve._can_solve_with_rref(b, Solve.transformation_matrix(C), rank(C), Solve.pivot_and_non_pivot_cols(C), task)
     if !fl || task !== :with_kernel

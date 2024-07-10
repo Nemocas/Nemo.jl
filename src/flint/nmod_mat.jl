@@ -537,7 +537,6 @@ Solve.matrix_normal_form_type(A::zzModMatrix) = Solve.matrix_normal_form_type(ba
 Solve.matrix_normal_form_type(C::Solve.SolveCtx{zzModRingElem}) = Solve.matrix_normal_form_type(base_ring(C))
 
 function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::zzModMatrix, b::zzModMatrix, task::Symbol; side::Symbol = :left)
-  @assert base_ring(A) === base_ring(b) "Base rings do not match"
   if side === :left
     fl, sol, K = Solve._can_solve_internal_no_check(Solve.LUTrait(), transpose(A), transpose(b), task, side = :right)
     return fl, transpose(sol), transpose(K)
@@ -556,7 +555,6 @@ end
 
 # The same code as in AbstractAlgebra, but uses `transpose` instead of `lazy_transpose`
 function Solve._can_solve_internal_no_check(::Solve.HowellFormTrait, A::T, b::T, task::Symbol; side::Symbol = :left) where {T <: Union{zzModMatrix, ZZModMatrix}}
-  @assert base_ring(A) === base_ring(b) "Base rings do not match"
   R = base_ring(A)
 
   if side === :left

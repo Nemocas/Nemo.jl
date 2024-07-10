@@ -514,7 +514,6 @@ Solve.matrix_normal_form_type(A::ZZModMatrix) = Solve.matrix_normal_form_type(ba
 Solve.matrix_normal_form_type(C::Solve.SolveCtx{ZZModRingElem}) = Solve.matrix_normal_form_type(base_ring(C))
 
 function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::ZZModMatrix, b::ZZModMatrix, task::Symbol; side::Symbol = :left)
-  @assert base_ring(A) === base_ring(b) "Base rings do not match"
   if side === :left
     fl, sol, K = Solve._can_solve_internal_no_check(Solve.LUTrait(), transpose(A), transpose(b), task, side = :right)
     return fl, transpose(sol), transpose(K)
