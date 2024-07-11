@@ -27,8 +27,15 @@
         document.body.removeChild(div);
     });
     let href = '/stable';
-    if (window.documenterBaseURL) {
-        href = window.documenterBaseURL + '/../stable';
+    if (window.mkdocs_page_url) {
+        let level = window.mkdocs_page_url.split('/').length;
+        if (window.mkdocs_page_url[0] === '/') {
+            level -= 1;
+        }
+        if (window.mkdocs_page_url.slice(-1) === '/') {
+            level -= 1;
+        }
+        href = "." + "/..".repeat(level) + '/../stable';
     }
     div.innerHTML = 'This documentation is not for the latest version. <br> <a href="' + href + '">Go to the latest documentation</a>.';
     div.appendChild(closer);
