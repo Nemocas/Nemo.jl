@@ -553,35 +553,8 @@ function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::zzModMatrix, b::
   return Bool(fl), x, kernel(A, side = :right)
 end
 
-# The same code as in AbstractAlgebra, but uses `transpose` instead of `lazy_transpose`
-function Solve._can_solve_internal_no_check(::Solve.HowellFormTrait, A::T, b::T, task::Symbol; side::Symbol = :left) where {T <: Union{zzModMatrix, ZZModMatrix}}
-  R = base_ring(A)
-
-  if side === :left
-    fl, _sol, _K = Solve._can_solve_internal_no_check(Solve.HowellFormTrait(), transpose(A), transpose(b), task, side = :right)
-    return fl, transpose(_sol), transpose(_K)
-  end
-
-  AT = transpose(A)
-  B = hcat(AT, identity_matrix(AT, nrows(AT)))
-  if nrows(B) < ncols(B)
-    B = vcat(B, zero(AT, ncols(B) - nrows(B), ncols(B)))
-  end
-
-  howell_form!(B)
-
-  m = max(nrows(AT), ncols(AT))
-  H = view(B, 1:m, 1:ncols(AT))
-  U = view(B, 1:m, ncols(AT) + 1:ncols(B))
-
-  fl, sol = Solve._can_solve_with_hnf(b, H, U, task)
-  if !fl || task !== :with_kernel
-    return fl, sol, zero(A, 0, 0)
-  end
-
-  N = Solve._kernel_of_howell_form(A, B)
-  return true, sol, N
-end
+# For _can_solve_internal_no_check(::HowellFormTrait, ...) we use generic
+# AbstractAlgebra code
 
 ################################################################################
 #
@@ -935,21 +908,4 @@ function kernel(::Solve.RREFTrait, M::Union{zzModMatrix, ZZModMatrix}; side::Sym
   return nullspace(M)[2]
 end
 
-# Same as in AbstractAlgebra, but we need to use `transpose` instead of `lazy_transpose`
-function kernel(::Solve.HowellFormTrait, A::Union{zzModMatrix, ZZModMatrix}; side::Symbol = :left)
-  Solve.check_option(side, [:right, :left], "side")
-
-  if side === :left
-    K = kernel(Solve.HowellFormTrait(), transpose(A), side = :right)
-    return transpose(K)
-  end
-
-  AT = transpose(A)
-  B = hcat(AT, identity_matrix(AT, nrows(AT)))
-  if nrows(B) < ncols(B)
-    B = vcat(B, zero(AT, ncols(B) - nrows(B), ncols(B)))
-  end
-
-  howell_form!(B)
-  return Solve._kernel_of_howell_form(A, B)
-end
+# For kernel(::HowellFormTrait, ...) we use generic AbstractAlgebra code

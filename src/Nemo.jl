@@ -178,6 +178,7 @@ import AbstractAlgebra: force_op
 import AbstractAlgebra: get_attribute
 import AbstractAlgebra: get_cached!
 import AbstractAlgebra: Group
+import AbstractAlgebra: howell_form!
 import AbstractAlgebra: Indent
 import AbstractAlgebra: is_terse
 import AbstractAlgebra: Lowercase

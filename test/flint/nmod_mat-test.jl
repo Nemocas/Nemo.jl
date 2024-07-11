@@ -627,22 +627,19 @@ end
   @test_throws ErrorException inv(matrix(R, 2, 1, [1, 1]))
 end
 
-@testset "zzModMatrix.solve" begin
-  Z17, = residue_ring(ZZ, 17)
-  R = matrix_space(Z17, 3, 3)
-  S = matrix_space(Z17, 3, 4)
+@testset "zzModMatrix.solve over $R" for R in [residue_ring(ZZ, 17)[1], residue_ring(ZZ, 18)[1]]
 
-  a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
+  a = R[1 2 3; 3 2 1; 0 0 2]
 
-  b = S([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
+  b = R[2 1 0 1; 0 0 0 0; 0 1 2 0]
 
   c = a*b
 
   d = solve(a, c, side = :right)
 
-  @test d == b
+  @test a*d == c
 
-  a = zero(R)
+  a = zero_matrix(R, 3, 3)
 
   @test_throws ArgumentError solve(a, c, side = :right)
 
@@ -651,8 +648,8 @@ end
     n = rand(0:10)
     k = rand(0:10)
 
-    M = matrix_space(Z17, n, k)
-    N = matrix_space(Z17, n, m)
+    M = matrix_space(R, n, k)
+    N = matrix_space(R, n, m)
 
     A = rand(M)
     B = rand(N)
@@ -662,56 +659,58 @@ end
     if fl
       @test A * X == B
       @test is_zero(A*K)
-      @test rank(A) + ncols(K) == ncols(A)
+      if is_prime(modulus(R))
+        @test rank(A) + ncols(K) == ncols(A)
+      end
     end
   end
 
-  A = matrix(Z17, 2, 2, [1, 2, 2, 5])
-  B = matrix(Z17, 2, 1, [1, 2])
+  A = matrix(R, 2, 2, [1, 2, 2, 5])
+  B = matrix(R, 2, 1, [1, 2])
   fl, X = can_solve_with_solution(A, B, side = :right)
   @test fl
   @test A * X == B
   @test can_solve(A, B, side = :right)
 
-  A = matrix(Z17, 2, 2, [1, 2, 2, 4])
-  B = matrix(Z17, 2, 1, [1, 2])
+  A = matrix(R, 2, 2, [1, 2, 2, 4])
+  B = matrix(R, 2, 1, [1, 2])
   fl, X = can_solve_with_solution(A, B, side = :right)
   @test fl
   @test A * X == B
   @test can_solve(A, B, side = :right)
 
-  A = matrix(Z17, 2, 2, [1, 2, 2, 4])
-  B = matrix(Z17, 2, 1, [1, 3])
+  A = matrix(R, 2, 2, [1, 2, 2, 4])
+  B = matrix(R, 2, 1, [1, 3])
   fl, X = can_solve_with_solution(A, B, side = :right)
   @test !fl
   @test !can_solve(A, B, side = :right)
 
-  A = zero_matrix(Z17, 2, 3)
-  B = identity_matrix(Z17, 3)
+  A = zero_matrix(R, 2, 3)
+  B = identity_matrix(R, 3)
   @test_throws ErrorException can_solve_with_solution(A, B, side = :right)
 
-  A = transpose(matrix(Z17, 2, 2, [1, 2, 2, 5]))
-  B = transpose(matrix(Z17, 2, 1, [1, 2]))
+  A = transpose(matrix(R, 2, 2, [1, 2, 2, 5]))
+  B = transpose(matrix(R, 2, 1, [1, 2]))
   fl, X = can_solve_with_solution(A, B)
   @test fl
   @test X * A == B
   @test can_solve(A, B)
 
-  A = transpose(matrix(Z17, 2, 2, [1, 2, 2, 4]))
-  B = transpose(matrix(Z17, 2, 1, [1, 2]))
+  A = transpose(matrix(R, 2, 2, [1, 2, 2, 4]))
+  B = transpose(matrix(R, 2, 1, [1, 2]))
   fl, X = can_solve_with_solution(A, B)
   @test fl
   @test X * A == B
   @test can_solve(A, B)
 
-  A = transpose(matrix(Z17, 2, 2, [1, 2, 2, 4]))
-  B = transpose(matrix(Z17, 2, 1, [1, 3]))
+  A = transpose(matrix(R, 2, 2, [1, 2, 2, 4]))
+  B = transpose(matrix(R, 2, 1, [1, 3]))
   fl, X = can_solve_with_solution(A, B)
   @test !fl
   @test !can_solve(A, B)
 
-  A = transpose(zero_matrix(Z17, 2, 3))
-  B = transpose(identity_matrix(Z17, 3))
+  A = transpose(zero_matrix(R, 2, 3))
+  B = transpose(identity_matrix(R, 3))
   @test_throws ErrorException can_solve_with_solution(A, B)
 
   @test_throws ArgumentError can_solve_with_solution(A, B, side = :garbage)

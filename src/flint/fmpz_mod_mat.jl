@@ -529,8 +529,8 @@ function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::ZZModMatrix, b::
   return Bool(fl), x, kernel(A, side = :right)
 end
 
-# Solve._can_solve_internal_no_check(::HowellFormTrait, ::ZZModMatrix, ...) is
-# in src/flint/nmod_mat.jl
+# For _can_solve_internal_no_check(::HowellFormTrait, ...) we use generic
+# AbstractAlgebra code
 
 ################################################################################
 #
