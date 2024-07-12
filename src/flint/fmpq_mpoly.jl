@@ -139,6 +139,11 @@ function denominator(a::QQMPolyRingElem)
   return c
 end
 
+function fit!(a::QQMPolyRingElem, n::Int)
+  # needs to exist for the MPoly interface
+  return nothing
+end
+
 ################################################################################
 #
 #  Getting coefficients

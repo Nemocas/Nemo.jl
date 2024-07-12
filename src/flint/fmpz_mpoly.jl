@@ -124,6 +124,11 @@ function is_constant(a::ZZMPolyRingElem)
   return Bool(b)
 end
 
+function fit!(a::ZZMPolyRingElem, n::Int)
+  # needs to exist for the MPoly interface
+  return nothing
+end
+
 ################################################################################
 #
 #  Getting coefficients

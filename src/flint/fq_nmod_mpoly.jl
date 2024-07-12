@@ -130,6 +130,11 @@ function is_constant(a::fqPolyRepMPolyRingElem)
   return Bool(b)
 end
 
+function fit!(a::fqPolyRepMPolyRingElem, n::Int)
+  # needs to exist for the MPoly interface
+  return nothing
+end
+
 ################################################################################
 #
 #  Getting coefficients
