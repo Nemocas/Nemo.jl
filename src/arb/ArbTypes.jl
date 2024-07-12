@@ -441,68 +441,68 @@ end
 
 const RealPolyRingID = CacheDictType{Tuple{Symbol}, RealPolyRing}()
 
-mutable struct RealPoly <: PolyRingElem{RealFieldElem}
+mutable struct RealPolyRingElem <: PolyRingElem{RealFieldElem}
   coeffs::Ptr{Nothing}
   length::Int
   alloc::Int
   parent::RealPolyRing
 
-  function RealPoly()
+  function RealPolyRingElem()
     z = new()
-    ccall((:arb_poly_init, libflint), Nothing, (Ref{RealPoly}, ), z)
+    ccall((:arb_poly_init, libflint), Nothing, (Ref{RealPolyRingElem}, ), z)
     finalizer(_RealPoly_clear_fn, z)
     return z
   end
 
-  function RealPoly(x::RealFieldElem, p::Int)
-    z = RealPoly()
+  function RealPolyRingElem(x::RealFieldElem, p::Int)
+    z = RealPolyRingElem()
     ccall((:arb_poly_set_coeff_arb, libflint), Nothing,
-          (Ref{RealPoly}, Int, Ref{RealFieldElem}), z, 0, x)
+          (Ref{RealPolyRingElem}, Int, Ref{RealFieldElem}), z, 0, x)
     return z
   end
 
-  function RealPoly(x::Vector{RealFieldElem}, p::Int)
-    z = RealPoly()
+  function RealPolyRingElem(x::Vector{RealFieldElem}, p::Int)
+    z = RealPolyRingElem()
     for i = 1:length(x)
       ccall((:arb_poly_set_coeff_arb, libflint), Nothing,
-            (Ref{RealPoly}, Int, Ref{RealFieldElem}), z, i - 1, x[i])
+            (Ref{RealPolyRingElem}, Int, Ref{RealFieldElem}), z, i - 1, x[i])
     end
     return z
   end
 
-  function RealPoly(x::RealPoly)
-    z = RealPoly()
-    ccall((:arb_poly_set, libflint), Nothing, (Ref{RealPoly}, Ref{RealPoly}), z, x)
+  function RealPolyRingElem(x::RealPolyRingElem)
+    z = RealPolyRingElem()
+    ccall((:arb_poly_set, libflint), Nothing, (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}), z, x)
     return z
   end
 
-  function RealPoly(x::RealPoly, p::Int)
-    z = RealPoly()
+  function RealPolyRingElem(x::RealPolyRingElem, p::Int)
+    z = RealPolyRingElem()
     ccall((:arb_poly_set_round, libflint), Nothing,
-          (Ref{RealPoly}, Ref{RealPoly}, Int), z, x, p)
+          (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Int), z, x, p)
     return z
   end
 
-  function RealPoly(x::ZZPolyRingElem, p::Int)
-    z = RealPoly()
+  function RealPolyRingElem(x::ZZPolyRingElem, p::Int)
+    z = RealPolyRingElem()
     ccall((:arb_poly_set_fmpz_poly, libflint), Nothing,
-          (Ref{RealPoly}, Ref{ZZPolyRingElem}, Int), z, x, p)
+          (Ref{RealPolyRingElem}, Ref{ZZPolyRingElem}, Int), z, x, p)
     return z
   end
 
-  function RealPoly(x::QQPolyRingElem, p::Int)
-    z = RealPoly()
+  function RealPolyRingElem(x::QQPolyRingElem, p::Int)
+    z = RealPolyRingElem()
     ccall((:arb_poly_set_fmpq_poly, libflint), Nothing,
-          (Ref{RealPoly}, Ref{QQPolyRingElem}, Int), z, x, p)
+          (Ref{RealPolyRingElem}, Ref{QQPolyRingElem}, Int), z, x, p)
     return z
   end
 end
 
-function _RealPoly_clear_fn(x::RealPoly)
-  ccall((:arb_poly_clear, libflint), Nothing, (Ref{RealPoly}, ), x)
+function _RealPoly_clear_fn(x::RealPolyRingElem)
+  ccall((:arb_poly_clear, libflint), Nothing, (Ref{RealPolyRingElem}, ), x)
 end
 
-parent(x::RealPoly) = x.parent
+parent(x::RealPolyRingElem) = x.parent
 
 var(x::RealPolyRing) = x.S
 
@@ -645,7 +645,7 @@ mutable struct ComplexPolyRingElem <: PolyRingElem{ComplexFieldElem}
     return z
   end
 
-  function ComplexPolyRingElem(x::RealPoly, p::Int)
+  function ComplexPolyRingElem(x::RealPolyRingElem, p::Int)
     z = ComplexPolyRingElem()
     ccall((:acb_poly_set_arb_poly, libflint), Nothing,
           (Ref{ComplexPolyRingElem}, Ref{ArbPolyRingElem}, Int), z, x, p)
@@ -1357,7 +1357,7 @@ const ArbFieldElemOrPtr = Union{ArbFieldElem, Ref{ArbFieldElem}, Ptr{ArbFieldEle
 const ComplexFieldElemOrPtr = Union{ComplexFieldElem, Ref{ComplexFieldElem}, Ptr{ComplexFieldElem}}
 const AcbFieldElemOrPtr = Union{AcbFieldElem, Ref{AcbFieldElem}, Ptr{AcbFieldElem}}
 
-const RealPolyOrPtr = Union{RealPoly, Ref{RealPoly}, Ptr{RealPoly}}
+const RealPolyRingElemOrPtr = Union{RealPolyRingElem, Ref{RealPolyRingElem}, Ptr{RealPolyRingElem}}
 const ArbPolyRingElemOrPtr = Union{ArbPolyRingElem, Ref{ArbPolyRingElem}, Ptr{ArbPolyRingElem}}
 const ComplexPolyRingElemOrPtr = Union{ComplexPolyRingElem, Ref{ComplexPolyRingElem}, Ptr{ComplexPolyRingElem}}
 const AcbPolyRingElemOrPtr = Union{AcbPolyRingElem, Ref{AcbPolyRingElem}, Ptr{AcbPolyRingElem}}

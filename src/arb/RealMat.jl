@@ -435,7 +435,7 @@ function charpoly(x::RealPolyRing, y::RealMat, prec::Int = precision(Balls))
   base_ring(y) != base_ring(x) && error("Base rings must coincide")
   z = x()
   ccall((:arb_mat_charpoly, libflint), Nothing,
-        (Ref{RealPoly}, Ref{RealMat}, Int), z, y, prec)
+        (Ref{RealPolyRingElem}, Ref{RealMat}, Int), z, y, prec)
   return z
 end
 

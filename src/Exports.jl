@@ -527,8 +527,8 @@ export RealField
 export RealFieldElem
 export RealMat
 export RealMatSpace
-export RealPoly
 export RealPolyRing
+export RealPolyRingElem
 export reconstruct
 export reduce_mod
 export reduce_mod!

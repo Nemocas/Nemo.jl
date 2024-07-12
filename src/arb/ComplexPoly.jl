@@ -810,7 +810,7 @@ function (a::ComplexPolyRing)(b::QQPolyRingElem)
   return z
 end
 
-function (a::ComplexPolyRing)(b::RealPoly)
+function (a::ComplexPolyRing)(b::RealPolyRingElem)
   z = ComplexPolyRingElem(b, precision(Balls))
   z.parent = a
   return z

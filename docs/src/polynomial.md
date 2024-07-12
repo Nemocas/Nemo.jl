@@ -30,7 +30,7 @@ $\mathbb{Z}/p\mathbb{Z}$ (small prime $p$)  | Flint               | `fpPolyRingE
 $\mathbb{Z}/p\mathbb{Z}$ (large prime $p$)  | Flint               | `FpPolyRingElem`        | `FpPolyRing`
 $\mathbb{F}_{p^n}$ (small $p$)              | Flint               | `fqPolyRepPolyRingElem` | `fqPolyRepPolyRing`
 $\mathbb{F}_{p^n}$ (large $p$)              | Flint               | `FqPolyRepPolyRingElem` | `FqPolyRepPolyRing`
-$\mathbb{R}$ (arbitrary precision)          | Arb                 | `RealPoly`              | `RealPolyRing`
+$\mathbb{R}$ (arbitrary precision)          | Arb                 | `RealPolyRingElem`      | `RealPolyRing`
 $\mathbb{C}$ (arbitrary precision)          | Arb                 | `ComplexPolyRingElem`   | `ComplexPolyRing`
 $\mathbb{R}$ (fixed precision)              | Arb                 | `ArbPolyRingElem`       | `ArbPolyRing`
 $\mathbb{C}$ (fixed precision)              | Arb                 | `AcbPolyRingElem`       | `AcbPolyRing`
@@ -57,7 +57,7 @@ AbstractAlgebra.jl, for specific coefficient rings.
 ### Remove and valuation
 
 ```@docs
-evaluate2(::RealPoly, ::RealFieldElem)
+evaluate2(::RealPolyRingElem, ::RealFieldElem)
 ```
 
 ```@docs
@@ -160,7 +160,7 @@ true
 ### Bounding absolute values of roots
 
 ```@docs
-roots_upper_bound(::RealPoly)
+roots_upper_bound(::RealPolyRingElem)
 roots_upper_bound(::ComplexPolyRingElem)
 ```
 
@@ -202,18 +202,18 @@ or contain other exact or inexact polynomials. The following functions are
 provided for this purpose.
 
 ```@docs
-overlaps(::RealPoly, ::RealPoly)
+overlaps(::RealPolyRingElem, ::RealPolyRingElem)
 overlaps(::ComplexPolyRingElem, ::ComplexPolyRingElem)
 ```
 
 ```@docs
-contains(::RealPoly, ::RealPoly)
+contains(::RealPolyRingElem, ::RealPolyRingElem)
 contains(::ComplexPolyRingElem, ::ComplexPolyRingElem)
 ```
 
 ```@docs
-contains(::RealPoly, ::ZZPolyRingElem)
-contains(::RealPoly, ::QQPolyRingElem)
+contains(::RealPolyRingElem, ::ZZPolyRingElem)
+contains(::RealPolyRingElem, ::QQPolyRingElem)
 contains(::ComplexPolyRingElem, ::ZZPolyRingElem)
 contains(::ComplexPolyRingElem, ::QQPolyRingElem)
 ```
@@ -222,7 +222,7 @@ It is sometimes also useful to be able to determine if there is a unique
 integer contained in the coefficient of an inexact constant polynomial.
 
 ```@docs
-unique_integer(::RealPoly)
+unique_integer(::RealPolyRingElem)
 unique_integer(::ComplexPolyRingElem)
 ```
 

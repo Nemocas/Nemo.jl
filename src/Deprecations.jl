@@ -8,6 +8,7 @@
 # they will be replaced by deprecations eventually
 
 @alias ComplexPoly ComplexPolyRingElem
+@alias RealPoly RealPolyRingElem
 
 ###############################################################################
 #
