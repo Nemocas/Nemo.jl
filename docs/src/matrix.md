@@ -27,10 +27,10 @@ $\mathbb{Q}$                          | Flint               | `QQMatrix`        
 $\mathbb{Z}/p\mathbb{Z}$ (small $p$)  | Flint               | `fpMatrix`          | `fpMatrixSpace`
 $\mathbb{F}_{p^n}$ (small $p$)        | Flint               | `fqPolyRepMatrix`   | `fqPolyRepMatrixSpace`
 $\mathbb{F}_{p^n}$ (large $p$)        | Flint               | `FqPolyRepMatrix`   | `FqPolyRepMatrixSpace`
-$\mathbb{R}$ (arbitrary precision)    | Arb                 | `RealMatrix`        | `RealMatSpace`
-$\mathbb{C}$ (arbitrary precision)    | Arb                 | `ComplexMatrix`     | `ComplexMatSpace`
-$\mathbb{R}$ (fixed precision)        | Arb                 | `ArbMatrix`         | `ArbMatSpace`
-$\mathbb{C}$ (fixed precision)        | Arb                 | `AcbMatrix`         | `AcbMatSpace`
+$\mathbb{R}$ (arbitrary precision)    | Arb                 | `RealMatrix`        | `RealMatrixSpace`
+$\mathbb{C}$ (arbitrary precision)    | Arb                 | `ComplexMatrix`     | `ComplexMatrixSpace`
+$\mathbb{R}$ (fixed precision)        | Arb                 | `ArbMatrix`         | `ArbMatrixSpace`
+$\mathbb{C}$ (fixed precision)        | Arb                 | `AcbMatrix`         | `AcbMatrixSpace`
 
 The dimensions and base ring $R$ of a generic matrix are stored in its parent
 object.

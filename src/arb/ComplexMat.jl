@@ -79,7 +79,7 @@ end
 setindex!(x::ComplexMatrix, y::Tuple{Rational{T}, Rational{T}}, r::Int, c::Int) where {T <: Integer} =
 setindex!(x, map(QQFieldElem, y), r, c)
 
-function one(x::ComplexMatSpace)
+function one(x::ComplexMatrixSpace)
   z = x()
   ccall((:acb_mat_one, libflint), Nothing, (Ref{ComplexMatrix}, ), z)
   return z
@@ -739,19 +739,19 @@ end
 #
 ###############################################################################
 
-function (x::ComplexMatSpace)()
+function (x::ComplexMatrixSpace)()
   z = ComplexMatrix(nrows(x), ncols(x))
   return z
 end
 
-function (x::ComplexMatSpace)(y::ZZMatrix)
+function (x::ComplexMatrixSpace)(y::ZZMatrix)
   (ncols(x) != ncols(y) || nrows(x) != nrows(y)) &&
   error("Dimensions are wrong")
   z = ComplexMatrix(y, precision(Balls))
   return z
 end
 
-function (x::ComplexMatSpace)(y::RealMatrix)
+function (x::ComplexMatrixSpace)(y::RealMatrix)
   (ncols(x) != ncols(y) || nrows(x) != nrows(y)) &&
   error("Dimensions are wrong")
   z = ComplexMatrix(y, precision(Balls))
@@ -760,13 +760,13 @@ end
 
 for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, RealFieldElem, ComplexFieldElem, String]
   @eval begin
-    function (x::ComplexMatSpace)(y::AbstractMatrix{$T})
+    function (x::ComplexMatrixSpace)(y::AbstractMatrix{$T})
       _check_dim(nrows(x), ncols(x), y)
       z = ComplexMatrix(nrows(x), ncols(x), y, precision(Balls))
       return z
     end
 
-    function (x::ComplexMatSpace)(y::AbstractVector{$T})
+    function (x::ComplexMatrixSpace)(y::AbstractVector{$T})
       _check_dim(nrows(x), ncols(x), y)
       z = ComplexMatrix(nrows(x), ncols(x), y, precision(Balls))
       return z
@@ -774,23 +774,23 @@ for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, RealFieldElem, ComplexFiel
   end
 end
 
-(x::ComplexMatSpace)(y::AbstractMatrix{T}) where {T <: Integer} = x(map(ZZRingElem, y))
+(x::ComplexMatrixSpace)(y::AbstractMatrix{T}) where {T <: Integer} = x(map(ZZRingElem, y))
 
-(x::ComplexMatSpace)(y::AbstractVector{T}) where {T <: Integer} = x(map(ZZRingElem, y))
+(x::ComplexMatrixSpace)(y::AbstractVector{T}) where {T <: Integer} = x(map(ZZRingElem, y))
 
-(x::ComplexMatSpace)(y::AbstractMatrix{Rational{T}}) where {T <: Integer} = x(map(QQFieldElem, y))
+(x::ComplexMatrixSpace)(y::AbstractMatrix{Rational{T}}) where {T <: Integer} = x(map(QQFieldElem, y))
 
-(x::ComplexMatSpace)(y::AbstractVector{Rational{T}}) where {T <: Integer} = x(map(QQFieldElem, y))
+(x::ComplexMatrixSpace)(y::AbstractVector{Rational{T}}) where {T <: Integer} = x(map(QQFieldElem, y))
 
 for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, RealFieldElem, String]
   @eval begin
-    function (x::ComplexMatSpace)(y::AbstractMatrix{Tuple{$T, $T}})
+    function (x::ComplexMatrixSpace)(y::AbstractMatrix{Tuple{$T, $T}})
       _check_dim(nrows(x), ncols(x), y)
       z = ComplexMatrix(nrows(x), ncols(x), y, precision(Balls))
       return z
     end
 
-    function (x::ComplexMatSpace)(y::AbstractVector{Tuple{$T, $T}})
+    function (x::ComplexMatrixSpace)(y::AbstractVector{Tuple{$T, $T}})
       _check_dim(nrows(x), ncols(x), y)
       z = ComplexMatrix(nrows(x), ncols(x), y, precision(Balls))
       return z
@@ -798,21 +798,21 @@ for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, RealFieldElem, String]
   end
 end
 
-(x::ComplexMatSpace)(y::AbstractMatrix{Tuple{T, T}}) where {T <: Integer} =
+(x::ComplexMatrixSpace)(y::AbstractMatrix{Tuple{T, T}}) where {T <: Integer} =
 x(map(z -> (ZZRingElem(z[1]), ZZRingElem(z[2])), y))
 
-(x::ComplexMatSpace)(y::AbstractVector{Tuple{T, T}}) where {T <: Integer} =
+(x::ComplexMatrixSpace)(y::AbstractVector{Tuple{T, T}}) where {T <: Integer} =
 x(map(z -> (ZZRingElem(z[1]), ZZRingElem(z[2])), y))
 
-(x::ComplexMatSpace)(y::AbstractMatrix{Tuple{Rational{T}, Rational{T}}}) where {T <: Integer} =
+(x::ComplexMatrixSpace)(y::AbstractMatrix{Tuple{Rational{T}, Rational{T}}}) where {T <: Integer} =
 x(map(z -> (QQFieldElem(z[1]), QQFieldElem(z[2])), y))
 
-(x::ComplexMatSpace)(y::AbstractVector{Tuple{Rational{T}, Rational{T}}}) where {T <: Integer} =
+(x::ComplexMatrixSpace)(y::AbstractVector{Tuple{Rational{T}, Rational{T}}}) where {T <: Integer} =
 x(map(z -> (QQFieldElem(z[1]), QQFieldElem(z[2])), y))
 
 for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, ComplexFieldElem, String]
   @eval begin
-    function (x::ComplexMatSpace)(y::$T)
+    function (x::ComplexMatrixSpace)(y::$T)
       z = x()
       for i in 1:nrows(z)
         for j = 1:ncols(z)
@@ -828,7 +828,7 @@ for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, Co
   end
 end
 
-(x::ComplexMatSpace)(y::Rational{T}) where {T <: Integer} = x(QQFieldElem(y))
+(x::ComplexMatrixSpace)(y::Rational{T}) where {T <: Integer} = x(QQFieldElem(y))
 
 ###############################################################################
 #

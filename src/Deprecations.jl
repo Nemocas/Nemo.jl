@@ -11,6 +11,10 @@
 @alias RealPoly RealPolyRingElem
 @alias ComplexMat ComplexMatrix
 @alias RealMat RealMatrix
+@alias AcbMatSpace AcbMatrixSpace
+@alias ComplexMatSpace ComplexMatrixSpace
+@alias ArbMatSpace ArbMatrixSpace
+@alias RealMatSpace RealMatrixSpace
 
 ###############################################################################
 #

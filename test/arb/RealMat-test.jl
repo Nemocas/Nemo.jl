@@ -4,20 +4,20 @@ RR = RealField()
   @test_throws ErrorException matrix_space(RR, -1, 5)
   @test_throws ErrorException matrix_space(RR, 0, -2)
   @test_throws ErrorException matrix_space(RR, -3, -4)
-  @test_throws ErrorException RealMatSpace(RR, 2, -1)
-  @test_throws ErrorException RealMatSpace(RR, -1, 2)
-  @test_throws ErrorException RealMatSpace(RR, -1, -1)
+  @test_throws ErrorException RealMatrixSpace(RR, 2, -1)
+  @test_throws ErrorException RealMatrixSpace(RR, -1, 2)
+  @test_throws ErrorException RealMatrixSpace(RR, -1, -1)
 
   S = matrix_space(RR, 3, 3)
   R = matrix_space(ZZ, 3, 3)
 
   @test elem_type(S) == RealMatrix
-  @test elem_type(RealMatSpace) == RealMatrix
-  @test parent_type(RealMatrix) == RealMatSpace
+  @test elem_type(RealMatrixSpace) == RealMatrix
+  @test parent_type(RealMatrix) == RealMatrixSpace
   @test nrows(S) == 3
   @test ncols(S) == 3
 
-  @test isa(S, RealMatSpace)
+  @test isa(S, RealMatrixSpace)
 
   f = S(ZZRingElem(3))
 

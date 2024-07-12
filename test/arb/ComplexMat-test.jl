@@ -5,20 +5,20 @@ RR = RealField()
   @test_throws ErrorException matrix_space(CC, -1, 5)
   @test_throws ErrorException matrix_space(CC, 0, -2)
   @test_throws ErrorException matrix_space(CC, -3, -4)
-  @test_throws ErrorException ComplexMatSpace(CC, 2, -1)
-  @test_throws ErrorException ComplexMatSpace(CC, -1, 2)
-  @test_throws ErrorException ComplexMatSpace(CC, -1, -1)
+  @test_throws ErrorException ComplexMatrixSpace(CC, 2, -1)
+  @test_throws ErrorException ComplexMatrixSpace(CC, -1, 2)
+  @test_throws ErrorException ComplexMatrixSpace(CC, -1, -1)
 
   S = matrix_space(CC, 3, 3)
   R = matrix_space(ZZ, 3, 3)
 
   @test elem_type(S) == ComplexMatrix
-  @test elem_type(ComplexMatSpace) == ComplexMatrix
-  @test parent_type(ComplexMatrix) == ComplexMatSpace
+  @test elem_type(ComplexMatrixSpace) == ComplexMatrix
+  @test parent_type(ComplexMatrix) == ComplexMatrixSpace
   @test nrows(S) == 3
   @test ncols(S) == 3
 
-  @test isa(S, ComplexMatSpace)
+  @test isa(S, ComplexMatrixSpace)
 
   f = S(ZZRingElem(3))
 

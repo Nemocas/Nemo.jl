@@ -5,20 +5,20 @@ RR = ArbField(64)
   @test_throws ErrorException matrix_space(CC, -1, 5)
   @test_throws ErrorException matrix_space(CC, 0, -2)
   @test_throws ErrorException matrix_space(CC, -3, -4)
-  @test_throws ErrorException AcbMatSpace(CC, 2, -1)
-  @test_throws ErrorException AcbMatSpace(CC, -1, 2)
-  @test_throws ErrorException AcbMatSpace(CC, -1, -1)
+  @test_throws ErrorException AcbMatrixSpace(CC, 2, -1)
+  @test_throws ErrorException AcbMatrixSpace(CC, -1, 2)
+  @test_throws ErrorException AcbMatrixSpace(CC, -1, -1)
 
   S = matrix_space(CC, 3, 3)
   R = matrix_space(ZZ, 3, 3)
 
   @test elem_type(S) == AcbMatrix
-  @test elem_type(AcbMatSpace) == AcbMatrix
-  @test parent_type(AcbMatrix) == AcbMatSpace
+  @test elem_type(AcbMatrixSpace) == AcbMatrix
+  @test parent_type(AcbMatrix) == AcbMatrixSpace
   @test nrows(S) == 3
   @test ncols(S) == 3
 
-  @test isa(S, AcbMatSpace)
+  @test isa(S, AcbMatrixSpace)
 
   f = S(ZZRingElem(3))
 

@@ -67,7 +67,7 @@ Base.@propagate_inbounds setindex!(x::RealMatrix, y::Rational{T},
                                    r::Int, c::Int) where {T <: Integer} =
 setindex!(x, ZZRingElem(y), r, c)
 
-function one(x::RealMatSpace)
+function one(x::RealMatrixSpace)
   z = x()
   ccall((:arb_mat_one, libflint), Nothing, (Ref{RealMatrix}, ), z)
   return z
@@ -682,31 +682,31 @@ end
 #
 ###############################################################################
 
-function (x::RealMatSpace)()
+function (x::RealMatrixSpace)()
   z = RealMatrix(nrows(x), ncols(x))
   return z
 end
 
-function (x::RealMatSpace)(y::ZZMatrix)
+function (x::RealMatrixSpace)(y::ZZMatrix)
   (ncols(x) != ncols(y) || nrows(x) != nrows(y)) &&
   error("Dimensions are wrong")
   z = RealMatrix(y, precision(Balls))
   return z
 end
 
-function (x::RealMatSpace)(y::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, AbstractString}}
+function (x::RealMatrixSpace)(y::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, AbstractString}}
   _check_dim(nrows(x), ncols(x), y)
   z = RealMatrix(nrows(x), ncols(x), y, precision(Balls))
   return z
 end
 
-function (x::RealMatSpace)(y::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, AbstractString}}
+function (x::RealMatrixSpace)(y::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, AbstractString}}
   _check_dim(nrows(x), ncols(x), y)
   z = RealMatrix(nrows(x), ncols(x), y, precision(Balls))
   return z
 end
 
-function (x::RealMatSpace)(y::Union{Int, UInt, ZZRingElem, QQFieldElem, Float64,
+function (x::RealMatrixSpace)(y::Union{Int, UInt, ZZRingElem, QQFieldElem, Float64,
                                     BigFloat, RealFieldElem, AbstractString})
   z = x()
   for i in 1:nrows(z)

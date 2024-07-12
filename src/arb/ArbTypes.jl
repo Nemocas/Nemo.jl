@@ -783,11 +783,11 @@ base_ring(a::AcbPolyRing) = a.base_ring
 
 ################################################################################
 #
-#  Types and memory management for ArbMatSpace
+#  Types and memory management for ArbMatrixSpace
 #
 ################################################################################
 
-const RealMatSpace = AbstractAlgebra.Generic.MatSpace{RealFieldElem}
+const RealMatrixSpace = AbstractAlgebra.Generic.MatSpace{RealFieldElem}
 
 mutable struct RealMatrix <: MatElem{RealFieldElem}
   entries::Ptr{Nothing}
@@ -875,7 +875,7 @@ end
 
 # fixed precision
 
-const ArbMatSpace = AbstractAlgebra.Generic.MatSpace{ArbFieldElem}
+const ArbMatrixSpace = AbstractAlgebra.Generic.MatSpace{ArbFieldElem}
 
 mutable struct ArbMatrix <: MatElem{ArbFieldElem}
   entries::Ptr{Nothing}
@@ -963,11 +963,11 @@ end
 
 ################################################################################
 #
-#  Types and memory management for AcbMatSpace
+#  Types and memory management for AcbMatrixSpace
 #
 ################################################################################
 
-const ComplexMatSpace = AbstractAlgebra.Generic.MatSpace{ComplexFieldElem}
+const ComplexMatrixSpace = AbstractAlgebra.Generic.MatSpace{ComplexFieldElem}
 
 mutable struct ComplexMatrix <: MatElem{ComplexFieldElem}
   entries::Ptr{Nothing}
@@ -1157,7 +1157,7 @@ end
 
 # fixed precision
 
-const AcbMatSpace = AbstractAlgebra.Generic.MatSpace{AcbFieldElem}
+const AcbMatrixSpace = AbstractAlgebra.Generic.MatSpace{AcbFieldElem}
 
 mutable struct AcbMatrix <: MatElem{AcbFieldElem}
   entries::Ptr{Nothing}
