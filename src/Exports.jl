@@ -89,8 +89,8 @@ export ComplexField
 export ComplexFieldElem
 export ComplexMat
 export ComplexMatSpace
-export ComplexPoly
 export ComplexPolyRing
+export ComplexPolyRingElem
 export compose
 export conj
 export conjugates

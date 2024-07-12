@@ -610,77 +610,77 @@ end
 
 const ComplexPolyRingID = CacheDictType{Tuple{Symbol}, ComplexPolyRing}()
 
-mutable struct ComplexPoly <: PolyRingElem{ComplexFieldElem}
+mutable struct ComplexPolyRingElem <: PolyRingElem{ComplexFieldElem}
   coeffs::Ptr{Nothing}
   length::Int
   alloc::Int
   parent::ComplexPolyRing
 
-  function ComplexPoly()
+  function ComplexPolyRingElem()
     z = new()
-    ccall((:acb_poly_init, libflint), Nothing, (Ref{ComplexPoly}, ), z)
+    ccall((:acb_poly_init, libflint), Nothing, (Ref{ComplexPolyRingElem}, ), z)
     finalizer(_acb_poly_clear_fn, z)
     return z
   end
 
-  function ComplexPoly(x::ComplexFieldElem, p::Int)
-    z = ComplexPoly()
+  function ComplexPolyRingElem(x::ComplexFieldElem, p::Int)
+    z = ComplexPolyRingElem()
     ccall((:acb_poly_set_coeff_acb, libflint), Nothing,
-          (Ref{ComplexPoly}, Int, Ref{ComplexFieldElem}), z, 0, x)
+          (Ref{ComplexPolyRingElem}, Int, Ref{ComplexFieldElem}), z, 0, x)
     return z
   end
 
-  function ComplexPoly(x::Vector{ComplexFieldElem}, p::Int)
-    z = ComplexPoly()
+  function ComplexPolyRingElem(x::Vector{ComplexFieldElem}, p::Int)
+    z = ComplexPolyRingElem()
     for i = 1:length(x)
       ccall((:acb_poly_set_coeff_acb, libflint), Nothing,
-            (Ref{ComplexPoly}, Int, Ref{ComplexFieldElem}), z, i - 1, x[i])
+            (Ref{ComplexPolyRingElem}, Int, Ref{ComplexFieldElem}), z, i - 1, x[i])
     end
     return z
   end
 
-  function ComplexPoly(x::ComplexPoly)
-    z = ComplexPoly()
-    ccall((:acb_poly_set, libflint), Nothing, (Ref{ComplexPoly}, Ref{ComplexPoly}), z, x)
+  function ComplexPolyRingElem(x::ComplexPolyRingElem)
+    z = ComplexPolyRingElem()
+    ccall((:acb_poly_set, libflint), Nothing, (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}), z, x)
     return z
   end
 
-  function ComplexPoly(x::RealPoly, p::Int)
-    z = ComplexPoly()
+  function ComplexPolyRingElem(x::RealPoly, p::Int)
+    z = ComplexPolyRingElem()
     ccall((:acb_poly_set_arb_poly, libflint), Nothing,
-          (Ref{ComplexPoly}, Ref{ArbPolyRingElem}, Int), z, x, p)
+          (Ref{ComplexPolyRingElem}, Ref{ArbPolyRingElem}, Int), z, x, p)
     ccall((:acb_poly_set_round, libflint), Nothing,
-          (Ref{ComplexPoly}, Ref{ComplexPoly}, Int), z, z, p)
+          (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Int), z, z, p)
     return z
   end
 
-  function ComplexPoly(x::ComplexPoly, p::Int)
-    z = ComplexPoly()
+  function ComplexPolyRingElem(x::ComplexPolyRingElem, p::Int)
+    z = ComplexPolyRingElem()
     ccall((:acb_poly_set_round, libflint), Nothing,
-          (Ref{ComplexPoly}, Ref{ComplexPoly}, Int), z, x, p)
+          (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Int), z, x, p)
     return z
   end
 
-  function ComplexPoly(x::ZZPolyRingElem, p::Int)
-    z = ComplexPoly()
+  function ComplexPolyRingElem(x::ZZPolyRingElem, p::Int)
+    z = ComplexPolyRingElem()
     ccall((:acb_poly_set_fmpz_poly, libflint), Nothing,
-          (Ref{ComplexPoly}, Ref{ZZPolyRingElem}, Int), z, x, p)
+          (Ref{ComplexPolyRingElem}, Ref{ZZPolyRingElem}, Int), z, x, p)
     return z
   end
 
-  function ComplexPoly(x::QQPolyRingElem, p::Int)
-    z = ComplexPoly()
+  function ComplexPolyRingElem(x::QQPolyRingElem, p::Int)
+    z = ComplexPolyRingElem()
     ccall((:acb_poly_set_fmpq_poly, libflint), Nothing,
-          (Ref{ComplexPoly}, Ref{QQPolyRingElem}, Int), z, x, p)
+          (Ref{ComplexPolyRingElem}, Ref{QQPolyRingElem}, Int), z, x, p)
     return z
   end
 end
 
-function _acb_poly_clear_fn(x::ComplexPoly)
-  ccall((:acb_poly_clear, libflint), Nothing, (Ref{ComplexPoly}, ), x)
+function _acb_poly_clear_fn(x::ComplexPolyRingElem)
+  ccall((:acb_poly_clear, libflint), Nothing, (Ref{ComplexPolyRingElem}, ), x)
 end
 
-parent(x::ComplexPoly) = x.parent
+parent(x::ComplexPolyRingElem) = x.parent
 
 var(x::ComplexPolyRing) = x.S
 
@@ -1359,7 +1359,7 @@ const AcbFieldElemOrPtr = Union{AcbFieldElem, Ref{AcbFieldElem}, Ptr{AcbFieldEle
 
 const RealPolyOrPtr = Union{RealPoly, Ref{RealPoly}, Ptr{RealPoly}}
 const ArbPolyRingElemOrPtr = Union{ArbPolyRingElem, Ref{ArbPolyRingElem}, Ptr{ArbPolyRingElem}}
-const ComplexPolyOrPtr = Union{ComplexPoly, Ref{ComplexPoly}, Ptr{ComplexPoly}}
+const ComplexPolyRingElemOrPtr = Union{ComplexPolyRingElem, Ref{ComplexPolyRingElem}, Ptr{ComplexPolyRingElem}}
 const AcbPolyRingElemOrPtr = Union{AcbPolyRingElem, Ref{AcbPolyRingElem}, Ptr{AcbPolyRingElem}}
 
 const RealMatOrPtr = Union{RealMat, Ref{RealMat}, Ptr{RealMat}}
