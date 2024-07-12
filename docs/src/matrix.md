@@ -26,7 +26,7 @@ $\mathbb{Z}/n\mathbb{Z}$ (large $n$)  | Flint               | `ZZModMatrix`     
 $\mathbb{Q}$                          | Flint               | `QQMatrix`          | `QQMatrixSpace`
 $\mathbb{Z}/p\mathbb{Z}$ (small $p$)  | Flint               | `fpMatrix`          | `fpMatrixSpace`
 $\mathbb{F}_{p^n}$ (small $p$)        | Flint               | `fqPolyRepMatrix`   | `fqPolyRepMatrixSpace`
-$\mathbb{F}_{p^n}$ (large $p$)        | Flint               | `FqPolyRepMatrix`   | `FqPolyRepMatrixSpace
+$\mathbb{F}_{p^n}$ (large $p$)        | Flint               | `FqPolyRepMatrix`   | `FqPolyRepMatrixSpace`
 $\mathbb{R}$ (arbitrary precision)    | Arb                 | `RealMat`           | `RealMatSpace`
 $\mathbb{C}$ (arbitrary precision)    | Arb                 | `ComplexMat`        | `ComplexMatSpace`
 $\mathbb{R}$ (fixed precision)        | Arb                 | `ArbMatrix`         | `ArbMatSpace`
