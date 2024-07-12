@@ -789,36 +789,36 @@ base_ring(a::AcbPolyRing) = a.base_ring
 
 const RealMatSpace = AbstractAlgebra.Generic.MatSpace{RealFieldElem}
 
-mutable struct RealMat <: MatElem{RealFieldElem}
+mutable struct RealMatrix <: MatElem{RealFieldElem}
   entries::Ptr{Nothing}
   r::Int
   c::Int
   rows::Ptr{Nothing}
   #base_ring::ArbField
 
-  function RealMat(r::Int, c::Int)
+  function RealMatrix(r::Int, c::Int)
     z = new()
-    ccall((:arb_mat_init, libflint), Nothing, (Ref{RealMat}, Int, Int), z, r, c)
+    ccall((:arb_mat_init, libflint), Nothing, (Ref{RealMatrix}, Int, Int), z, r, c)
     finalizer(_arb_mat_clear_fn, z)
     return z
   end
 
-  function RealMat(a::ZZMatrix)
-    z = RealMat(a.r, a.c)
+  function RealMatrix(a::ZZMatrix)
+    z = RealMatrix(a.r, a.c)
     ccall((:arb_mat_set_fmpz_mat, libflint), Nothing,
-          (Ref{RealMat}, Ref{ZZMatrix}), z, a)
+          (Ref{RealMatrix}, Ref{ZZMatrix}), z, a)
     return z
   end
 
-  function RealMat(a::ZZMatrix, prec::Int)
-    z = RealMat(a.r, a.c)
+  function RealMatrix(a::ZZMatrix, prec::Int)
+    z = RealMatrix(a.r, a.c)
     ccall((:arb_mat_set_round_fmpz_mat, libflint), Nothing,
-          (Ref{RealMat}, Ref{ZZMatrix}, Int), z, a, prec)
+          (Ref{RealMatrix}, Ref{ZZMatrix}, Int), z, a, prec)
     return z
   end
 
-  function RealMat(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, Float64, BigFloat, RealFieldElem}}
-    z = RealMat(r, c)
+  function RealMatrix(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, Float64, BigFloat, RealFieldElem}}
+    z = RealMatrix(r, c)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
@@ -828,8 +828,8 @@ mutable struct RealMat <: MatElem{RealFieldElem}
     return z
   end
 
-  function RealMat(r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, Float64, BigFloat, RealFieldElem}}
-    z = RealMat(r, c)
+  function RealMatrix(r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, Float64, BigFloat, RealFieldElem}}
+    z = RealMatrix(r, c)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
@@ -839,8 +839,8 @@ mutable struct RealMat <: MatElem{RealFieldElem}
     return z
   end
 
-  function RealMat(r::Int, c::Int, arr::AbstractMatrix{T}, prec::Int) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, AbstractString}}
-    z = RealMat(r, c)
+  function RealMatrix(r::Int, c::Int, arr::AbstractMatrix{T}, prec::Int) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, AbstractString}}
+    z = RealMatrix(r, c)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
@@ -850,8 +850,8 @@ mutable struct RealMat <: MatElem{RealFieldElem}
     return z
   end
 
-  function RealMat(r::Int, c::Int, arr::AbstractVector{T}, prec::Int) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, AbstractString}}
-    z = RealMat(r, c)
+  function RealMatrix(r::Int, c::Int, arr::AbstractVector{T}, prec::Int) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, AbstractString}}
+    z = RealMatrix(r, c)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
@@ -861,16 +861,16 @@ mutable struct RealMat <: MatElem{RealFieldElem}
     return z
   end
 
-  function RealMat(a::QQMatrix, prec::Int)
-    z = RealMat(a.r, a.c)
+  function RealMatrix(a::QQMatrix, prec::Int)
+    z = RealMatrix(a.r, a.c)
     ccall((:arb_mat_set_fmpq_mat, libflint), Nothing,
-          (Ref{RealMat}, Ref{QQMatrix}, Int), z, a, prec)
+          (Ref{RealMatrix}, Ref{QQMatrix}, Int), z, a, prec)
     return z
   end
 end
 
-function _arb_mat_clear_fn(x::RealMat)
-  ccall((:arb_mat_clear, libflint), Nothing, (Ref{RealMat}, ), x)
+function _arb_mat_clear_fn(x::RealMatrix)
+  ccall((:arb_mat_clear, libflint), Nothing, (Ref{RealMatrix}, ), x)
 end
 
 # fixed precision
@@ -997,7 +997,7 @@ mutable struct ComplexMat <: MatElem{ComplexFieldElem}
     return z
   end
 
-  function ComplexMat(a::RealMat)
+  function ComplexMat(a::RealMatrix)
     z = ComplexMat(a.r, a.c)
     ccall((:acb_mat_set_arb_mat, libflint), Nothing,
           (Ref{ComplexMat}, Ref{ArbMatrix}), z, a)
@@ -1362,7 +1362,7 @@ const ArbPolyRingElemOrPtr = Union{ArbPolyRingElem, Ref{ArbPolyRingElem}, Ptr{Ar
 const ComplexPolyRingElemOrPtr = Union{ComplexPolyRingElem, Ref{ComplexPolyRingElem}, Ptr{ComplexPolyRingElem}}
 const AcbPolyRingElemOrPtr = Union{AcbPolyRingElem, Ref{AcbPolyRingElem}, Ptr{AcbPolyRingElem}}
 
-const RealMatOrPtr = Union{RealMat, Ref{RealMat}, Ptr{RealMat}}
+const RealMatrixOrPtr = Union{RealMatrix, Ref{RealMatrix}, Ptr{RealMatrix}}
 const ArbMatrixOrPtr = Union{ArbMatrix, Ref{ArbMatrix}, Ptr{ArbMatrix}}
 const ComplexMatOrPtr = Union{ComplexMat, Ref{ComplexMat}, Ptr{ComplexMat}}
 const AcbMatrixOrPtr = Union{AcbMatrix, Ref{AcbMatrix}, Ptr{AcbMatrix}}

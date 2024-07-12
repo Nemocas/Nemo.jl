@@ -385,9 +385,9 @@ end
 
 ==(x::ZZMatrix, y::ComplexMat) = y == x
 
-==(x::ComplexMat, y::RealMat) = x == parent(x)(y)
+==(x::ComplexMat, y::RealMatrix) = x == parent(x)(y)
 
-==(x::RealMat, y::ComplexMat) = y == x
+==(x::RealMatrix, y::ComplexMat) = y == x
 
 ################################################################################
 #
@@ -751,7 +751,7 @@ function (x::ComplexMatSpace)(y::ZZMatrix)
   return z
 end
 
-function (x::ComplexMatSpace)(y::RealMat)
+function (x::ComplexMatSpace)(y::RealMatrix)
   (ncols(x) != ncols(y) || nrows(x) != nrows(y)) &&
   error("Dimensions are wrong")
   z = ComplexMat(y, precision(Balls))

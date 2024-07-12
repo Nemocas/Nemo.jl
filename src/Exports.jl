@@ -525,7 +525,7 @@ export rational_field
 export real
 export RealField
 export RealFieldElem
-export RealMat
+export RealMatrix
 export RealMatSpace
 export RealPolyRing
 export RealPolyRingElem

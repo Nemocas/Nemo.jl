@@ -6,7 +6,7 @@ const ring_to_mat = Dict(ZZ                         => ZZMatrix,
                          finite_field(ZZRingElem(3), 2, "b")[1] => FqPolyRepMatrix,
                          ArbField()                      => ArbMatrix,
                          AcbField()                      => AcbMatrix,
-                         RealField()                     => RealMat,
+                         RealField()                     => RealMatrix,
                          ComplexField()                  => ComplexMat,
                         )
 

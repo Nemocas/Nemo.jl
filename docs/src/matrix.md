@@ -27,7 +27,7 @@ $\mathbb{Q}$                          | Flint               | `QQMatrix`        
 $\mathbb{Z}/p\mathbb{Z}$ (small $p$)  | Flint               | `fpMatrix`          | `fpMatrixSpace`
 $\mathbb{F}_{p^n}$ (small $p$)        | Flint               | `fqPolyRepMatrix`   | `fqPolyRepMatrixSpace`
 $\mathbb{F}_{p^n}$ (large $p$)        | Flint               | `FqPolyRepMatrix`   | `FqPolyRepMatrixSpace`
-$\mathbb{R}$ (arbitrary precision)    | Arb                 | `RealMat`           | `RealMatSpace`
+$\mathbb{R}$ (arbitrary precision)    | Arb                 | `RealMatrix`        | `RealMatSpace`
 $\mathbb{C}$ (arbitrary precision)    | Arb                 | `ComplexMat`        | `ComplexMatSpace`
 $\mathbb{R}$ (fixed precision)        | Arb                 | `ArbMatrix`         | `ArbMatSpace`
 $\mathbb{C}$ (fixed precision)        | Arb                 | `AcbMatrix`         | `AcbMatSpace`
@@ -59,7 +59,7 @@ matrix functionality, for specific rings in Nemo.
 ### Comparison operators
 
 ```@docs
-overlaps(::RealMat, ::RealMat)
+overlaps(::RealMatrix, ::RealMatrix)
 ```
 
 ```@docs
@@ -67,7 +67,7 @@ overlaps(::ComplexMat, ::ComplexMat)
 ```
 
 ```@docs
-contains(::RealMat, ::RealMat)
+contains(::RealMatrix, ::RealMatrix)
 ```
 
 ```@docs
@@ -488,7 +488,7 @@ julia> B = exp(A)
 ### Norm
 
 ```@docs
-bound_inf_norm(::RealMat)
+bound_inf_norm(::RealMatrix)
 ```
 
 ```@docs

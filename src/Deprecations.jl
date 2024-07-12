@@ -9,6 +9,7 @@
 
 @alias ComplexPoly ComplexPolyRingElem
 @alias RealPoly RealPolyRingElem
+@alias RealMat RealMatrix
 
 ###############################################################################
 #
