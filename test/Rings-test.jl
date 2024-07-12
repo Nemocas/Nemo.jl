@@ -7,7 +7,7 @@ const ring_to_mat = Dict(ZZ                         => ZZMatrix,
                          ArbField()                      => ArbMatrix,
                          AcbField()                      => AcbMatrix,
                          RealField()                     => RealMatrix,
-                         ComplexField()                  => ComplexMat,
+                         ComplexField()                  => ComplexMatrix,
                         )
 
 include("flint/fmpz-test.jl")

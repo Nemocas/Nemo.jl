@@ -28,7 +28,7 @@ $\mathbb{Z}/p\mathbb{Z}$ (small $p$)  | Flint               | `fpMatrix`        
 $\mathbb{F}_{p^n}$ (small $p$)        | Flint               | `fqPolyRepMatrix`   | `fqPolyRepMatrixSpace`
 $\mathbb{F}_{p^n}$ (large $p$)        | Flint               | `FqPolyRepMatrix`   | `FqPolyRepMatrixSpace`
 $\mathbb{R}$ (arbitrary precision)    | Arb                 | `RealMatrix`        | `RealMatSpace`
-$\mathbb{C}$ (arbitrary precision)    | Arb                 | `ComplexMat`        | `ComplexMatSpace`
+$\mathbb{C}$ (arbitrary precision)    | Arb                 | `ComplexMatrix`     | `ComplexMatSpace`
 $\mathbb{R}$ (fixed precision)        | Arb                 | `ArbMatrix`         | `ArbMatSpace`
 $\mathbb{C}$ (fixed precision)        | Arb                 | `AcbMatrix`         | `AcbMatSpace`
 
@@ -63,7 +63,7 @@ overlaps(::RealMatrix, ::RealMatrix)
 ```
 
 ```@docs
-overlaps(::ComplexMat, ::ComplexMat)
+overlaps(::ComplexMatrix, ::ComplexMatrix)
 ```
 
 ```@docs
@@ -71,7 +71,7 @@ contains(::RealMatrix, ::RealMatrix)
 ```
 
 ```@docs
-contains(::ComplexMat, ::ComplexMat)
+contains(::ComplexMatrix, ::ComplexMatrix)
 ```
 
 In addition we have the following ad hoc comparison operators.
@@ -492,7 +492,7 @@ bound_inf_norm(::RealMatrix)
 ```
 
 ```@docs
-bound_inf_norm(::ComplexMat)
+bound_inf_norm(::ComplexMatrix)
 ```
 
 **Examples**
@@ -559,9 +559,9 @@ In case the matrix cannot be converted without loss, an `InexactError` is thrown
 ### Eigenvalues and Eigenvectors (experimental)
 
 ```@docs
-eigenvalues(::ComplexMat)
-eigenvalues_with_multiplicities(::ComplexMat)
-eigenvalues_simple(a::ComplexMat)
+eigenvalues(::ComplexMatrix)
+eigenvalues_with_multiplicities(::ComplexMatrix)
+eigenvalues_simple(a::ComplexMatrix)
 ```
 
 ```jldoctest; setup = :(CC = ComplexField())

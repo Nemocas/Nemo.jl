@@ -969,50 +969,50 @@ end
 
 const ComplexMatSpace = AbstractAlgebra.Generic.MatSpace{ComplexFieldElem}
 
-mutable struct ComplexMat <: MatElem{ComplexFieldElem}
+mutable struct ComplexMatrix <: MatElem{ComplexFieldElem}
   entries::Ptr{Nothing}
   r::Int
   c::Int
   rows::Ptr{Nothing}
   #base_ring::AcbField
 
-  function ComplexMat(r::Int, c::Int)
+  function ComplexMatrix(r::Int, c::Int)
     z = new()
-    ccall((:acb_mat_init, libflint), Nothing, (Ref{ComplexMat}, Int, Int), z, r, c)
+    ccall((:acb_mat_init, libflint), Nothing, (Ref{ComplexMatrix}, Int, Int), z, r, c)
     finalizer(_acb_mat_clear_fn, z)
     return z
   end
 
-  function ComplexMat(a::ZZMatrix)
-    z = ComplexMat(a.r, a.c)
+  function ComplexMatrix(a::ZZMatrix)
+    z = ComplexMatrix(a.r, a.c)
     ccall((:acb_mat_set_fmpz_mat, libflint), Nothing,
-          (Ref{ComplexMat}, Ref{ZZMatrix}), z, a)
+          (Ref{ComplexMatrix}, Ref{ZZMatrix}), z, a)
     return z
   end
 
-  function ComplexMat(a::ZZMatrix, prec::Int)
-    z = ComplexMat(a.r, a.c)
+  function ComplexMatrix(a::ZZMatrix, prec::Int)
+    z = ComplexMatrix(a.r, a.c)
     ccall((:acb_mat_set_round_fmpz_mat, libflint), Nothing,
-          (Ref{ComplexMat}, Ref{ZZMatrix}, Int), z, a, prec)
+          (Ref{ComplexMatrix}, Ref{ZZMatrix}, Int), z, a, prec)
     return z
   end
 
-  function ComplexMat(a::RealMatrix)
-    z = ComplexMat(a.r, a.c)
+  function ComplexMatrix(a::RealMatrix)
+    z = ComplexMatrix(a.r, a.c)
     ccall((:acb_mat_set_arb_mat, libflint), Nothing,
-          (Ref{ComplexMat}, Ref{ArbMatrix}), z, a)
+          (Ref{ComplexMatrix}, Ref{ArbMatrix}), z, a)
     return z
   end
 
-  function ComplexMat(a::ArbMatrix, prec::Int)
-    z = ComplexMat(a.r, a.c)
+  function ComplexMatrix(a::ArbMatrix, prec::Int)
+    z = ComplexMatrix(a.r, a.c)
     ccall((:acb_mat_set_round_arb_mat, libflint), Nothing,
-          (Ref{ComplexMat}, Ref{ArbMatrix}, Int), z, a, prec)
+          (Ref{ComplexMatrix}, Ref{ArbMatrix}, Int), z, a, prec)
     return z
   end
 
-  function ComplexMat(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, Float64, ZZRingElem}}
-    z = ComplexMat(r, c)
+  function ComplexMatrix(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: Union{Int, UInt, Float64, ZZRingElem}}
+    z = ComplexMatrix(r, c)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
@@ -1022,8 +1022,8 @@ mutable struct ComplexMat <: MatElem{ComplexFieldElem}
     return z
   end
 
-  function ComplexMat(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: Union{BigFloat, ComplexFieldElem, RealFieldElem}}
-    z = ComplexMat(r, c)
+  function ComplexMatrix(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: Union{BigFloat, ComplexFieldElem, RealFieldElem}}
+    z = ComplexMatrix(r, c)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
@@ -1033,8 +1033,8 @@ mutable struct ComplexMat <: MatElem{ComplexFieldElem}
     return z
   end
 
-  function ComplexMat(r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, Float64, ZZRingElem}}
-    z = ComplexMat(r, c)
+  function ComplexMatrix(r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{Int, UInt, Float64, ZZRingElem}}
+    z = ComplexMatrix(r, c)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
@@ -1044,8 +1044,8 @@ mutable struct ComplexMat <: MatElem{ComplexFieldElem}
     return z
   end
 
-  function ComplexMat(r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{BigFloat, ComplexFieldElem, RealFieldElem}}
-    z = ComplexMat(r, c)
+  function ComplexMatrix(r::Int, c::Int, arr::AbstractVector{T}) where {T <: Union{BigFloat, ComplexFieldElem, RealFieldElem}}
+    z = ComplexMatrix(r, c)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
@@ -1055,8 +1055,8 @@ mutable struct ComplexMat <: MatElem{ComplexFieldElem}
     return z
   end
 
-  function ComplexMat(r::Int, c::Int, arr::AbstractMatrix{T}, prec::Int) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64}}
-    z = ComplexMat(r, c)
+  function ComplexMatrix(r::Int, c::Int, arr::AbstractMatrix{T}, prec::Int) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64}}
+    z = ComplexMatrix(r, c)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
@@ -1066,8 +1066,8 @@ mutable struct ComplexMat <: MatElem{ComplexFieldElem}
     return z
   end
 
-  function ComplexMat(r::Int, c::Int, arr::AbstractMatrix{T}, prec::Int) where {T <: Union{BigFloat, RealFieldElem, AbstractString, ComplexFieldElem}}
-    z = ComplexMat(r, c)
+  function ComplexMatrix(r::Int, c::Int, arr::AbstractMatrix{T}, prec::Int) where {T <: Union{BigFloat, RealFieldElem, AbstractString, ComplexFieldElem}}
+    z = ComplexMatrix(r, c)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
@@ -1077,8 +1077,8 @@ mutable struct ComplexMat <: MatElem{ComplexFieldElem}
     return z
   end
 
-  function ComplexMat(r::Int, c::Int, arr::AbstractVector{T}, prec::Int) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64}}
-    z = ComplexMat(r, c)
+  function ComplexMatrix(r::Int, c::Int, arr::AbstractVector{T}, prec::Int) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64}}
+    z = ComplexMatrix(r, c)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
@@ -1088,8 +1088,8 @@ mutable struct ComplexMat <: MatElem{ComplexFieldElem}
     return z
   end
 
-  function ComplexMat(r::Int, c::Int, arr::AbstractVector{T}, prec::Int) where {T <: Union{BigFloat, RealFieldElem, AbstractString, ComplexFieldElem}}
-    z = ComplexMat(r, c)
+  function ComplexMatrix(r::Int, c::Int, arr::AbstractVector{T}, prec::Int) where {T <: Union{BigFloat, RealFieldElem, AbstractString, ComplexFieldElem}}
+    z = ComplexMatrix(r, c)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
@@ -1099,8 +1099,8 @@ mutable struct ComplexMat <: MatElem{ComplexFieldElem}
     return z
   end
 
-  function ComplexMat(r::Int, c::Int, arr::AbstractMatrix{Tuple{T, T}}, prec::Int) where {T <: Union{Int, UInt, Float64, ZZRingElem}}
-    z = ComplexMat(r, c)
+  function ComplexMatrix(r::Int, c::Int, arr::AbstractMatrix{Tuple{T, T}}, prec::Int) where {T <: Union{Int, UInt, Float64, ZZRingElem}}
+    z = ComplexMatrix(r, c)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
@@ -1110,8 +1110,8 @@ mutable struct ComplexMat <: MatElem{ComplexFieldElem}
     return z
   end
 
-  function ComplexMat(r::Int, c::Int, arr::AbstractMatrix{Tuple{T, T}}, prec::Int) where {T <: Union{QQFieldElem, BigFloat, RealFieldElem, AbstractString}}
-    z = ComplexMat(r, c)
+  function ComplexMatrix(r::Int, c::Int, arr::AbstractMatrix{Tuple{T, T}}, prec::Int) where {T <: Union{QQFieldElem, BigFloat, RealFieldElem, AbstractString}}
+    z = ComplexMatrix(r, c)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
@@ -1121,8 +1121,8 @@ mutable struct ComplexMat <: MatElem{ComplexFieldElem}
     return z
   end
 
-  function ComplexMat(r::Int, c::Int, arr::AbstractVector{Tuple{T, T}}, prec::Int) where {T <: Union{Int, UInt, Float64, ZZRingElem}}
-    z = ComplexMat(r, c)
+  function ComplexMatrix(r::Int, c::Int, arr::AbstractVector{Tuple{T, T}}, prec::Int) where {T <: Union{Int, UInt, Float64, ZZRingElem}}
+    z = ComplexMatrix(r, c)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
@@ -1132,8 +1132,8 @@ mutable struct ComplexMat <: MatElem{ComplexFieldElem}
     return z
   end
 
-  function ComplexMat(r::Int, c::Int, arr::AbstractVector{Tuple{T, T}}, prec::Int) where {T <: Union{QQFieldElem, BigFloat, RealFieldElem, AbstractString}}
-    z = ComplexMat(r, c)
+  function ComplexMatrix(r::Int, c::Int, arr::AbstractVector{Tuple{T, T}}, prec::Int) where {T <: Union{QQFieldElem, BigFloat, RealFieldElem, AbstractString}}
+    z = ComplexMatrix(r, c)
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
@@ -1143,16 +1143,16 @@ mutable struct ComplexMat <: MatElem{ComplexFieldElem}
     return z
   end
 
-  function ComplexMat(a::QQMatrix, prec::Int)
-    z = ComplexMat(a.r, a.c)
+  function ComplexMatrix(a::QQMatrix, prec::Int)
+    z = ComplexMatrix(a.r, a.c)
     ccall((:acb_mat_set_fmpq_mat, libflint), Nothing,
-          (Ref{ComplexMat}, Ref{QQMatrix}, Int), z, a, prec)
+          (Ref{ComplexMatrix}, Ref{QQMatrix}, Int), z, a, prec)
     return z
   end
 end
 
-function _acb_mat_clear_fn(x::ComplexMat)
-  ccall((:acb_mat_clear, libflint), Nothing, (Ref{ComplexMat}, ), x)
+function _acb_mat_clear_fn(x::ComplexMatrix)
+  ccall((:acb_mat_clear, libflint), Nothing, (Ref{ComplexMatrix}, ), x)
 end
 
 # fixed precision
@@ -1364,5 +1364,5 @@ const AcbPolyRingElemOrPtr = Union{AcbPolyRingElem, Ref{AcbPolyRingElem}, Ptr{Ac
 
 const RealMatrixOrPtr = Union{RealMatrix, Ref{RealMatrix}, Ptr{RealMatrix}}
 const ArbMatrixOrPtr = Union{ArbMatrix, Ref{ArbMatrix}, Ptr{ArbMatrix}}
-const ComplexMatOrPtr = Union{ComplexMat, Ref{ComplexMat}, Ptr{ComplexMat}}
+const ComplexMatrixOrPtr = Union{ComplexMatrix, Ref{ComplexMatrix}, Ptr{ComplexMatrix}}
 const AcbMatrixOrPtr = Union{AcbMatrix, Ref{AcbMatrix}, Ptr{AcbMatrix}}

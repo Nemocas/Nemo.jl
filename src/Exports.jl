@@ -87,7 +87,7 @@ export compare_index
 export complex_normal_form
 export ComplexField
 export ComplexFieldElem
-export ComplexMat
+export ComplexMatrix
 export ComplexMatSpace
 export ComplexPolyRing
 export ComplexPolyRingElem
