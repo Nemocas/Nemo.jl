@@ -59,7 +59,7 @@ end
 #
 ################################################################################
 
-qqbar_field_doc = raw"""
+const qqbar_field_doc = raw"""
     QQBarField <: Field
     QQBarFieldElem <: FieldElem
 
@@ -123,7 +123,7 @@ end
 #
 ################################################################################
 
-ca_ctx_options = [
+const ca_ctx_options = [
                   :verbose,
                   :print_flags,
                   :mpoly_ord,

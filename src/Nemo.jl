@@ -225,7 +225,7 @@ const NEW_FLINT =
 #
 ################################################################################
 
-active_mem = Dict{UInt, Tuple{Symbol, UInt, Any}}()
+const active_mem = Dict{UInt, Tuple{Symbol, UInt, Any}}()
 
 function trace_malloc(n::UInt)
   u = ccall(:jl_malloc, UInt, (UInt, ), n)
@@ -382,7 +382,7 @@ end
 #
 ################################################################################
 
-deps = Pkg.dependencies()
+const deps = Pkg.dependencies()
 if !haskey(deps, Base.UUID("2edaba10-b0f1-5616-af89-8c11ac63239a"))
   version() = "building"
 else

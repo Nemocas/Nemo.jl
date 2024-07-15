@@ -1439,8 +1439,8 @@ gcdinv(a::Integer, b::ZZRingElem) = gcdinv(ZZRingElem(a), b)
 #
 ###############################################################################
 
-sqrt_moduli = [3, 5, 7, 8]
-sqrt_residues = [[0, 1], [0, 1, 4], [0, 1, 2, 4], [0, 1, 4]]
+const sqrt_moduli = [3, 5, 7, 8]
+const sqrt_residues = [[0, 1], [0, 1, 4], [0, 1, 2, 4], [0, 1, 4]]
 
 @doc raw"""
     isqrt(x::ZZRingElem)

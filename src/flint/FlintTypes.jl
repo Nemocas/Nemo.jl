@@ -12,7 +12,7 @@ const _err_dim_negative = ErrorException("Dimensions must be non-negative")
 #
 ###############################################################################
 
-zz_ring_doc = raw"""
+const zz_ring_doc = raw"""
     ZZRing <: Ring
     ZZRingElem <: RingElem
 
@@ -142,7 +142,7 @@ end
 #
 ###############################################################################
 
-qq_field_doc = raw"""
+const qq_field_doc = raw"""
     QQField <: FracField{ZZRingElem}
     QQFieldElem <: FracFieldElem{ZZRingElem}
 

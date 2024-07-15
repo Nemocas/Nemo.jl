@@ -233,11 +233,11 @@ end
 #
 ################################################################################
 
-_FQ_DEFAULT_FQ_ZECH   = 1
-_FQ_DEFAULT_FQ_NMOD   = 2
-_FQ_DEFAULT_FQ        = 3
-_FQ_DEFAULT_NMOD      = 4
-_FQ_DEFAULT_FMPZ_NMOD = 5
+const _FQ_DEFAULT_FQ_ZECH   = 1
+const _FQ_DEFAULT_FQ_NMOD   = 2
+const _FQ_DEFAULT_FQ        = 3
+const _FQ_DEFAULT_NMOD      = 4
+const _FQ_DEFAULT_FMPZ_NMOD = 5
 
 mutable struct CanonicalFqDefaultMap{T}# <: Map{FqField, T, SetMap, CanonicalFqDefaultMap}
   D::FqField
