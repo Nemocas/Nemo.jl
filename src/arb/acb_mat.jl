@@ -32,8 +32,7 @@ precision(x::AcbMatSpace) = precision(base_ring(x))
 
 function getindex!(z::AcbFieldElem, x::AcbMatrix, r::Int, c::Int)
   GC.@preserve x begin
-    v = ccall((:acb_mat_entry_ptr, libflint), Ptr{AcbFieldElem},
-              (Ref{AcbMatrix}, Int, Int), x, r - 1, c - 1)
+    v = mat_entry_ptr(x, r, c)
     ccall((:acb_set, libflint), Nothing, (Ref{AcbFieldElem}, Ptr{AcbFieldElem}), z, v)
   end
   return z
@@ -44,8 +43,7 @@ end
 
   z = base_ring(x)()
   GC.@preserve x begin
-    v = ccall((:acb_mat_entry_ptr, libflint), Ptr{AcbFieldElem},
-              (Ref{AcbMatrix}, Int, Int), x, r - 1, c - 1)
+    v = mat_entry_ptr(x, r, c)
     ccall((:acb_set, libflint), Nothing, (Ref{AcbFieldElem}, Ptr{AcbFieldElem}), z, v)
   end
   return z
@@ -57,8 +55,7 @@ for T in [Integer, Float64, ZZRingElem, QQFieldElem, ArbFieldElem, BigFloat, Acb
       @boundscheck _checkbounds(x, r, c)
 
       GC.@preserve x begin
-        z = ccall((:acb_mat_entry_ptr, libflint), Ptr{AcbFieldElem},
-                  (Ref{AcbMatrix}, Int, Int), x, r - 1, c - 1)
+        z = mat_entry_ptr(x, r, c)
         _acb_set(z, y, precision(base_ring(x)))
       end
     end
@@ -75,8 +72,7 @@ for T in [Integer, Float64, ZZRingElem, QQFieldElem, ArbFieldElem, BigFloat, Abs
       @boundscheck _checkbounds(x, r, c)
 
       GC.@preserve x begin
-        z = ccall((:acb_mat_entry_ptr, libflint), Ptr{AcbFieldElem},
-                  (Ref{AcbMatrix}, Int, Int), x, r - 1, c - 1)
+        z = mat_entry_ptr(x, r, c)
         _acb_set(z, y[1], y[2], precision(base_ring(x)))
       end
     end
@@ -913,6 +909,16 @@ function identity_matrix(R::AcbField, n::Int)
   z.base_ring = R
   return z
 end
+
+################################################################################
+#
+#  Entry pointers
+#
+################################################################################
+
+@inline mat_entry_ptr(A::AcbMatrix, i::Int, j::Int) = 
+ccall((:acb_mat_entry_ptr, libflint), 
+      Ptr{AcbFieldElem}, (Ref{AcbMatrix}, Int, Int), A, i-1, j-1)
 
 ###############################################################################
 #
