@@ -1052,10 +1052,8 @@ function finish(M::MPolyBuildCtx{ZZMPolyRingElem})
   res = M.poly
   R = parent(res)
   M.poly = zero(R)
-  ccall((:fmpz_mpoly_sort_terms, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), res, R)
-  ccall((:fmpz_mpoly_combine_like_terms, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), res, R)
+  sort_terms!(res)
+  combine_like_terms!(res)
   return res
 end
 

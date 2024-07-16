@@ -1289,10 +1289,8 @@ mutable struct ZZMPolyRingElem <: MPolyRingElem{ZZRingElem}
             z, a[i], b[i], ctx)
     end
 
-    ccall((:fmpz_mpoly_sort_terms, libflint), Nothing,
-          (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), z, ctx)
-    ccall((:fmpz_mpoly_combine_like_terms, libflint), Nothing,
-          (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), z, ctx)
+    sort_terms!(z)
+    combine_like_terms!(z)
     return z
   end
 
@@ -1309,10 +1307,8 @@ mutable struct ZZMPolyRingElem <: MPolyRingElem{ZZRingElem}
             z, a[i], b[i], ctx)
     end
 
-    ccall((:fmpz_mpoly_sort_terms, libflint), Nothing,
-          (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), z, ctx)
-    ccall((:fmpz_mpoly_combine_like_terms, libflint), Nothing,
-          (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), z, ctx)
+    sort_terms!(z)
+    combine_like_terms!(z)
     return z
   end
 
@@ -1329,10 +1325,8 @@ mutable struct ZZMPolyRingElem <: MPolyRingElem{ZZRingElem}
             z, a[i], b[i], ctx)
     end
 
-    ccall((:fmpz_mpoly_sort_terms, libflint), Nothing,
-          (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), z, ctx)
-    ccall((:fmpz_mpoly_combine_like_terms, libflint), Nothing,
-          (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), z, ctx)
+    sort_terms!(z)
+    combine_like_terms!(z)
     return z
   end
 
@@ -1484,10 +1478,8 @@ mutable struct QQMPolyRingElem <: MPolyRingElem{QQFieldElem}
             z, a[i], b[i], ctx)
     end
 
-    ccall((:fmpq_mpoly_sort_terms, libflint), Nothing,
-          (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), z, ctx)
-    ccall((:fmpq_mpoly_combine_like_terms, libflint), Nothing,
-          (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), z, ctx)
+    sort_terms!(z)
+    combine_like_terms!(z)
     return z
   end
 
@@ -1504,10 +1496,8 @@ mutable struct QQMPolyRingElem <: MPolyRingElem{QQFieldElem}
             z, a[i], b[i], ctx)
     end
 
-    ccall((:fmpq_mpoly_sort_terms, libflint), Nothing,
-          (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), z, ctx)
-    ccall((:fmpq_mpoly_combine_like_terms, libflint), Nothing,
-          (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), z, ctx)
+    sort_terms!(z)
+    combine_like_terms!(z)
     return z
   end
 
@@ -1524,10 +1514,8 @@ mutable struct QQMPolyRingElem <: MPolyRingElem{QQFieldElem}
             z, a[i], b[i], ctx)
     end
 
-    ccall((:fmpq_mpoly_sort_terms, libflint), Nothing,
-          (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), z, ctx)
-    ccall((:fmpq_mpoly_combine_like_terms, libflint), Nothing,
-          (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), z, ctx)
+    sort_terms!(z)
+    combine_like_terms!(z)
     return z
   end
 
@@ -1696,10 +1684,8 @@ mutable struct zzModMPolyRingElem <: MPolyRingElem{zzModRingElem}
             z, a[i].data, b[i], ctx)
     end
 
-    ccall((:nmod_mpoly_sort_terms, libflint), Nothing,
-          (Ref{zzModMPolyRingElem}, Ref{zzModMPolyRing}), z, ctx)
-    ccall((:nmod_mpoly_combine_like_terms, libflint), Nothing,
-          (Ref{zzModMPolyRingElem}, Ref{zzModMPolyRing}), z, ctx)
+    sort_terms!(z)
+    combine_like_terms!(z)
     return z
   end
 
@@ -1716,10 +1702,8 @@ mutable struct zzModMPolyRingElem <: MPolyRingElem{zzModRingElem}
             z, a[i].data, b[i], ctx)
     end
 
-    ccall((:nmod_mpoly_sort_terms, libflint), Nothing,
-          (Ref{zzModMPolyRingElem}, Ref{zzModMPolyRing}), z, ctx)
-    ccall((:nmod_mpoly_combine_like_terms, libflint), Nothing,
-          (Ref{zzModMPolyRingElem}, Ref{zzModMPolyRing}), z, ctx)
+    sort_terms!(z)
+    combine_like_terms!(z)
     return z
   end
 
@@ -1736,10 +1720,8 @@ mutable struct zzModMPolyRingElem <: MPolyRingElem{zzModRingElem}
             z, a[i].data, b[i], ctx)
     end
 
-    ccall((:nmod_mpoly_sort_terms, libflint), Nothing,
-          (Ref{zzModMPolyRingElem}, Ref{zzModMPolyRing}), z, ctx)
-    ccall((:nmod_mpoly_combine_like_terms, libflint), Nothing,
-          (Ref{zzModMPolyRingElem}, Ref{zzModMPolyRing}), z, ctx)
+    sort_terms!(z)
+    combine_like_terms!(z)
     return z
   end
 
@@ -1887,12 +1869,8 @@ mutable struct fpMPolyRingElem <: MPolyRingElem{fpFieldElem}
             z, a[i].data, b[i], ctx)
     end
 
-    ccall((:nmod_mpoly_sort_terms, libflint), Nothing,
-          (Ref{fpMPolyRingElem}, Ref{fpMPolyRing}),
-          z, ctx)
-    ccall((:nmod_mpoly_combine_like_terms, libflint), Nothing,
-          (Ref{fpMPolyRingElem}, Ref{fpMPolyRing}),
-          z, ctx)
+    sort_terms!(z)
+    combine_like_terms!(z)
     return z
   end
 
@@ -1910,12 +1888,8 @@ mutable struct fpMPolyRingElem <: MPolyRingElem{fpFieldElem}
             z, a[i].data, b[i], ctx)
     end
 
-    ccall((:nmod_mpoly_sort_terms, libflint), Nothing,
-          (Ref{fpMPolyRingElem}, Ref{fpMPolyRing}),
-          z, ctx)
-    ccall((:nmod_mpoly_combine_like_terms, libflint), Nothing,
-          (Ref{fpMPolyRingElem}, Ref{fpMPolyRing}),
-          z, ctx)
+    sort_terms!(z)
+    combine_like_terms!(z)
     return z
   end
 
@@ -1933,12 +1907,8 @@ mutable struct fpMPolyRingElem <: MPolyRingElem{fpFieldElem}
             z, a[i].data, b[i], ctx)
     end
 
-    ccall((:nmod_mpoly_sort_terms, libflint), Nothing,
-          (Ref{fpMPolyRingElem}, Ref{fpMPolyRing}),
-          z, ctx)
-    ccall((:nmod_mpoly_combine_like_terms, libflint), Nothing,
-          (Ref{fpMPolyRingElem}, Ref{fpMPolyRing}),
-          z, ctx)
+    sort_terms!(z)
+    combine_like_terms!(z)
     return z
   end
 
@@ -2104,12 +2074,8 @@ mutable struct FpMPolyRingElem <: MPolyRingElem{FpFieldElem}
       end
     end
 
-    ccall((:fmpz_mod_mpoly_sort_terms, libflint), Nothing,
-          (Ref{FpMPolyRingElem}, Ref{FpMPolyRing}),
-          z, ctx)
-    ccall((:fmpz_mod_mpoly_combine_like_terms, libflint), Nothing,
-          (Ref{FpMPolyRingElem}, Ref{FpMPolyRing}),
-          z, ctx)
+    sort_terms!(z)
+    combine_like_terms!(z)
     return z
   end
 
@@ -2819,10 +2785,8 @@ mutable struct fqPolyRepMPolyRingElem <: MPolyRingElem{fqPolyRepFieldElem}
             z, a[i], b[i], ctx)
     end
 
-    ccall((:fq_nmod_mpoly_sort_terms, libflint), Nothing,
-          (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}), z, ctx)
-    ccall((:fq_nmod_mpoly_combine_like_terms, libflint), Nothing,
-          (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}), z, ctx)
+    sort_terms!(z)
+    combine_like_terms!(z)
     return z
   end
 
@@ -2839,10 +2803,8 @@ mutable struct fqPolyRepMPolyRingElem <: MPolyRingElem{fqPolyRepFieldElem}
             z, a[i], b[i], ctx)
     end
 
-    ccall((:fq_nmod_mpoly_sort_terms, libflint), Nothing,
-          (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}), z, ctx)
-    ccall((:fq_nmod_mpoly_combine_like_terms, libflint), Nothing,
-          (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}), z, ctx)
+    sort_terms!(z)
+    combine_like_terms!(z)
     return z
   end
 
@@ -2859,10 +2821,8 @@ mutable struct fqPolyRepMPolyRingElem <: MPolyRingElem{fqPolyRepFieldElem}
             z, a[i], b[i], ctx)
     end
 
-    ccall((:fq_nmod_mpoly_sort_terms, libflint), Nothing,
-          (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}), z, ctx)
-    ccall((:nmod_mpoly_combine_like_terms, libflint), Nothing,
-          (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}), z, ctx)
+    sort_terms!(z)
+    combine_like_terms!(z)
     return z
   end
 

@@ -1074,10 +1074,8 @@ for (etype, rtype, ftype, ctype, utype) in (
       res = M.poly
       R = parent(res)
       M.poly = zero(R)
-      ccall((:nmod_mpoly_sort_terms, libflint), Nothing,
-            (Ref{$etype}, Ref{$rtype}), res, R)
-      ccall((:nmod_mpoly_combine_like_terms, libflint), Nothing,
-            (Ref{$etype}, Ref{$rtype}), res, R)
+      sort_terms!(res)
+      combine_like_terms!(res)
       return res
     end
 

@@ -1171,10 +1171,8 @@ function finish(M::MPolyBuildCtx{QQMPolyRingElem})
   res = M.poly
   R = parent(res)
   M.poly = zero(R)
-  ccall((:fmpq_mpoly_sort_terms, libflint), Nothing,
-        (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), res, R)
-  ccall((:fmpq_mpoly_combine_like_terms, libflint), Nothing,
-        (Ref{QQMPolyRingElem}, Ref{QQMPolyRing}), res, R)
+  sort_terms!(res)
+  combine_like_terms!(res)
   return res
 end
 
