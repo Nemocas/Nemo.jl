@@ -29,8 +29,7 @@ dense_matrix_type(::Type{ComplexFieldElem}) = ComplexMat
 
 function getindex!(z::ComplexFieldElem, x::ComplexMat, r::Int, c::Int)
   GC.@preserve x begin
-    v = ccall((:acb_mat_entry_ptr, libflint), Ptr{ComplexFieldElem},
-              (Ref{ComplexMat}, Int, Int), x, r - 1, c - 1)
+    v = mat_entry_ptr(x, r, c)
     ccall((:acb_set, libflint), Nothing, (Ref{ComplexFieldElem}, Ptr{ComplexFieldElem}), z, v)
   end
   return z
@@ -41,8 +40,7 @@ end
 
   z = base_ring(x)()
   GC.@preserve x begin
-    v = ccall((:acb_mat_entry_ptr, libflint), Ptr{ComplexFieldElem},
-              (Ref{ComplexMat}, Int, Int), x, r - 1, c - 1)
+    v = mat_entry_ptr(x, r, c)
     ccall((:acb_set, libflint), Nothing, (Ref{ComplexFieldElem}, Ptr{ComplexFieldElem}), z, v)
   end
   return z
@@ -54,8 +52,7 @@ for T in [Integer, Float64, ZZRingElem, QQFieldElem, RealFieldElem, BigFloat, Co
       @boundscheck _checkbounds(x, r, c)
 
       GC.@preserve x begin
-        z = ccall((:acb_mat_entry_ptr, libflint), Ptr{ComplexFieldElem},
-                  (Ref{ComplexMat}, Int, Int), x, r - 1, c - 1)
+        z = mat_entry_ptr(x, r, c)
         _acb_set(z, y, precision(Balls))
       end
     end
@@ -72,8 +69,7 @@ for T in [Integer, Float64, ZZRingElem, QQFieldElem, RealFieldElem, BigFloat, Ab
       @boundscheck _checkbounds(x, r, c)
 
       GC.@preserve x begin
-        z = ccall((:acb_mat_entry_ptr, libflint), Ptr{ComplexFieldElem},
-                  (Ref{ComplexMat}, Int, Int), x, r - 1, c - 1)
+        z = mat_entry_ptr(x, r, c)
         _acb_set(z, y[1], y[2], precision(Balls))
       end
     end
@@ -899,6 +895,18 @@ function identity_matrix(R::ComplexField, n::Int)
   ccall((:acb_mat_one, libflint), Nothing, (Ref{ComplexMat}, ), z)
   return z
 end
+
+################################################################################
+#
+#  Entry pointers
+#
+################################################################################
+
+@inline mat_entry_ptr(A::ComplexMat, i::Int, j::Int) = 
+ccall((:acb_mat_entry_ptr, libflint), 
+      Ptr{ComplexFieldElem}, (Ref{ComplexMat}, Int, Int), A, i-1, j-1)
+
+
 
 ###############################################################################
 #
