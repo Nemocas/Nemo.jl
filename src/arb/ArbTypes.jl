@@ -821,8 +821,7 @@ mutable struct RealMat <: MatElem{RealFieldElem}
     z = RealMat(r, c)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:arb_mat_entry_ptr, libflint), Ptr{RealFieldElem},
-                   (Ref{RealMat}, Int, Int), z, i - 1, j - 1)
+        el = mat_entry_ptr(z, i, j)
         _arb_set(el, arr[i, j])
       end
     end
@@ -833,8 +832,7 @@ mutable struct RealMat <: MatElem{RealFieldElem}
     z = RealMat(r, c)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:arb_mat_entry_ptr, libflint), Ptr{RealFieldElem},
-                   (Ref{RealMat}, Int, Int), z, i - 1, j - 1)
+        el = mat_entry_ptr(z, i, j)
         _arb_set(el, arr[(i-1)*c+j])
       end
     end
@@ -845,8 +843,7 @@ mutable struct RealMat <: MatElem{RealFieldElem}
     z = RealMat(r, c)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:arb_mat_entry_ptr, libflint), Ptr{RealFieldElem},
-                   (Ref{RealMat}, Int, Int), z, i - 1, j - 1)
+        el = mat_entry_ptr(z, i, j)
         _arb_set(el, arr[i, j], prec)
       end
     end
@@ -857,8 +854,7 @@ mutable struct RealMat <: MatElem{RealFieldElem}
     z = RealMat(r, c)
     GC.@preserve z for i = 1:r
       for j = 1:c
-        el = ccall((:arb_mat_entry_ptr, libflint), Ptr{RealFieldElem},
-                   (Ref{RealMat}, Int, Int), z, i - 1, j - 1)
+        el = mat_entry_ptr(z, i, j)
         _arb_set(el, arr[(i-1)*c+j], prec)
       end
     end

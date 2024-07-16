@@ -29,8 +29,7 @@ dense_matrix_type(::Type{RealFieldElem}) = RealMat
 
 function getindex!(z::ArbFieldElem, x::RealMat, r::Int, c::Int)
   GC.@preserve x begin
-    v = ccall((:arb_mat_entry_ptr, libflint), Ptr{RealFieldElem},
-              (Ref{RealMat}, Int, Int), x, r - 1, c - 1)
+    v = mat_entry_ptr(x, r, c)
     ccall((:arb_set, libflint), Nothing, (Ref{RealFieldElem}, Ptr{RealFieldElem}), z, v)
   end
   return z
@@ -41,8 +40,7 @@ end
 
   z = base_ring(x)()
   GC.@preserve x begin
-    v = ccall((:arb_mat_entry_ptr, libflint), Ptr{RealFieldElem},
-              (Ref{RealMat}, Int, Int), x, r - 1, c - 1)
+    v = mat_entry_ptr(x, r, c)
     ccall((:arb_set, libflint), Nothing, (Ref{RealFieldElem}, Ptr{RealFieldElem}), z, v)
   end
   return z
@@ -54,8 +52,7 @@ for T in [Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, 
       @boundscheck _checkbounds(x, r, c)
 
       GC.@preserve x begin
-        z = ccall((:arb_mat_entry_ptr, libflint), Ptr{RealFieldElem},
-                  (Ref{RealMat}, Int, Int), x, r - 1, c - 1)
+        z = mat_entry_ptr(x, r, c)
         _arb_set(z, y, precision(Balls))
       end
     end
@@ -789,6 +786,16 @@ function identity_matrix(R::RealField, n::Int)
   ccall((:arb_mat_one, libflint), Nothing, (Ref{RealMat}, ), z)
   return z
 end
+
+################################################################################
+#
+#  Entry pointers
+#
+################################################################################
+
+@inline mat_entry_ptr(A::RealMat, i::Int, j::Int) = 
+ccall((:arb_mat_entry_ptr, libflint), 
+      Ptr{RealFieldElem}, (Ref{RealMat}, Int, Int), A, i-1, j-1)
 
 ###############################################################################
 #
