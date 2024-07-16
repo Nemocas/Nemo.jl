@@ -32,8 +32,7 @@ precision(x::ArbMatSpace) = precision(x.base_ring)
 
 function getindex!(z::ArbFieldElem, x::ArbMatrix, r::Int, c::Int)
   GC.@preserve x begin
-    v = ccall((:arb_mat_entry_ptr, libflint), Ptr{ArbFieldElem},
-              (Ref{ArbMatrix}, Int, Int), x, r - 1, c - 1)
+    v = mat_entry_ptr(x, r, c)
     ccall((:arb_set, libflint), Nothing, (Ref{ArbFieldElem}, Ptr{ArbFieldElem}), z, v)
   end
   return z
@@ -44,8 +43,7 @@ end
 
   z = base_ring(x)()
   GC.@preserve x begin
-    v = ccall((:arb_mat_entry_ptr, libflint), Ptr{ArbFieldElem},
-              (Ref{ArbMatrix}, Int, Int), x, r - 1, c - 1)
+    v = mat_entry_ptr(x, r, c)
     ccall((:arb_set, libflint), Nothing, (Ref{ArbFieldElem}, Ptr{ArbFieldElem}), z, v)
   end
   return z
@@ -57,8 +55,7 @@ for T in [Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, A
       @boundscheck _checkbounds(x, r, c)
 
       GC.@preserve x begin
-        z = ccall((:arb_mat_entry_ptr, libflint), Ptr{ArbFieldElem},
-                  (Ref{ArbMatrix}, Int, Int), x, r - 1, c - 1)
+        z = mat_entry_ptr(x, r, c)
         _arb_set(z, y, precision(base_ring(x)))
       end
     end
@@ -809,6 +806,16 @@ function identity_matrix(R::ArbField, n::Int)
   z.base_ring = R
   return z
 end
+
+################################################################################
+#
+#  Entry pointers
+#
+################################################################################
+
+@inline mat_entry_ptr(A::ArbMatrix, i::Int, j::Int) = 
+ccall((:arb_mat_entry_ptr, libflint), 
+      Ptr{ArbFieldElem}, (Ref{ArbMatrix}, Int, Int), A, i-1, j-1)
 
 ###############################################################################
 #
