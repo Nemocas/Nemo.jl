@@ -1457,7 +1457,6 @@ end
 
 Solve.matrix_normal_form_type(::ZZRing) = Solve.HermiteFormTrait()
 Solve.matrix_normal_form_type(::ZZMatrix) = Solve.HermiteFormTrait()
-Solve.matrix_normal_form_type(::Solve.SolveCtx{ZZRingElem}) = Solve.HermiteFormTrait()
 
 function Solve._can_solve_internal_no_check(::Solve.HermiteFormTrait, A::ZZMatrix, b::ZZMatrix, task::Symbol; side::Symbol = :left)
   if side === :left
@@ -1515,11 +1514,6 @@ function Solve._can_solve_internal_no_check(::Solve.HermiteFormTrait, A::ZZMatri
   K = transpose(Solve._kernel_of_hnf(H, T))
   return fl, sol, K
 end
-
-# Overwrite some solve context functionality so that it uses `transpose` and not
-# `lazy_transpose`
-
-AbstractAlgebra.solve_context_type(::Type{ZZRingElem}) = Solve.SolveCtx{ZZRingElem, ZZMatrix, ZZMatrix, ZZMatrix}
 
 Base.reduce(::typeof(hcat), A::AbstractVector{ZZMatrix}) = AbstractAlgebra._hcat(A)
 

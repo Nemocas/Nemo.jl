@@ -660,7 +660,9 @@ Solve.matrix_normal_form_type(::QQMatrix) = Solve.RREFTrait()
 # fflu is much slower in some cases, so we do an rref (with transformation)
 # here and let flint choose an algorithm, see
 # https://github.com/Nemocas/Nemo.jl/issues/1710.
-Solve.matrix_normal_form_type(::Solve.SolveCtx{QQFieldElem}) = Solve.RREFTrait()
+function Solve.solve_context_type(::QQField)
+  return Solve.solve_context_type(Solve.RREFTrait(), QQFieldElem)
+end
 
 function Solve._can_solve_internal_no_check(::Solve.RREFTrait, A::QQMatrix, b::QQMatrix, task::Symbol; side::Symbol = :left)
   if side === :left
@@ -676,60 +678,6 @@ function Solve._can_solve_internal_no_check(::Solve.RREFTrait, A::QQMatrix, b::Q
     return Bool(fl), x, zero(A, 0, 0)
   end
   return Bool(fl), x, kernel(A, side = :right)
-end
-
-# The following functions are generic code, but we can't test them in AbstractAlgebra
-function Solve._init_reduce(::Solve.RREFTrait, C::Solve.SolveCtx)
-  if isdefined(C, :red) && isdefined(C, :trafo)
-    return nothing
-  end
-
-  B, U = echelon_form_with_transformation(matrix(C))
-  r = nrows(B)
-  while r > 0 && is_zero_row(B, r)
-    r -= 1
-  end
-  Solve.set_rank!(C, r)
-  C.red = B
-  C.trafo = U
-  return nothing
-end
-
-function Solve._init_reduce_transpose(::Solve.RREFTrait, C::Solve.SolveCtx)
-  if isdefined(C, :red_transp) && isdefined(C, :trafo_transp)
-    return nothing
-  end
-
-  B, U = echelon_form_with_transformation(transpose(matrix(C)))
-  r = nrows(B)
-  while r > 0 && is_zero_row(B, r)
-    r -= 1
-  end
-  Solve.set_rank!(C, r)
-  C.red_transp = B
-  C.trafo_transp = U
-  return nothing
-end
-
-function Solve._can_solve_internal_no_check(::Solve.RREFTrait, C::Solve.SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where T
-  if side === :right
-    fl, sol = Solve._can_solve_with_rref(b, Solve.transformation_matrix(C), rank(C), Solve.pivot_and_non_pivot_cols(C), task)
-    if !fl || task !== :with_kernel
-      return fl, sol, zero(b, 0, 0)
-    end
-
-    _, K = Solve._kernel_of_rref(Solve.reduced_matrix(C), rank(C), Solve.pivot_and_non_pivot_cols(C))
-    return fl, sol, K
-  else# side === :left
-    fl, sol_transp = Solve._can_solve_with_rref(transpose(b), Solve.transformation_matrix_of_transpose(C), rank(C), Solve.pivot_and_non_pivot_cols_of_transpose(C), task)
-    sol = transpose(sol_transp)
-    if !fl || task !== :with_kernel
-      return fl, sol, zero(b, 0, 0)
-    end
-
-    _, K = Solve._kernel_of_rref(Solve.reduced_matrix_of_transpose(C), rank(C), Solve.pivot_and_non_pivot_cols_of_transpose(C))
-    return fl, sol, transpose(K)
-  end
 end
 
 ###############################################################################

@@ -447,7 +447,6 @@ end
 
 Solve.matrix_normal_form_type(::FqPolyRepField) = Solve.LUTrait()
 Solve.matrix_normal_form_type(::FqPolyRepMatrix) = Solve.LUTrait()
-Solve.matrix_normal_form_type(::Solve.SolveCtx{FqPolyRepFieldElem}) = Solve.LUTrait()
 
 function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::FqPolyRepMatrix, b::FqPolyRepMatrix, task::Symbol; side::Symbol = :left)
   if side === :left

@@ -441,12 +441,16 @@ end
   @test contains(transpose(y), ZZ[1 1 1])
 
   C = solve_init(A)
-  @test C isa AbstractAlgebra.solve_context_type(elem_type(RR))
-  @test C isa AbstractAlgebra.solve_context_type(RR())
-  @test C isa AbstractAlgebra.solve_context_type(typeof(RR))
   @test C isa AbstractAlgebra.solve_context_type(RR)
-  @test C isa AbstractAlgebra.solve_context_type(typeof(A))
   @test C isa AbstractAlgebra.solve_context_type(A)
+
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.LUTrait()
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), elem_type(RR))
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), RR())
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), typeof(RR))
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), RR)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), typeof(A))
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), A)
 
   fl, y, K = can_solve_with_solution_and_kernel(C, b, side = :right)
   @test fl

@@ -525,17 +525,6 @@ function AbstractAlgebra._solve_tril!(A::T, B::T, C::T, unit::Int = 0) where T <
   ccall((:nmod_mat_solve_tril, libflint), Cvoid, (Ref{T}, Ref{T}, Ref{T}, Cint), A, B, C, unit)
 end
 
-function Solve.matrix_normal_form_type(R::zzModRing)
-  if is_prime(modulus(R))
-    return Solve.LUTrait()
-  else
-    return Solve.HowellFormTrait()
-  end
-end
-
-Solve.matrix_normal_form_type(A::zzModMatrix) = Solve.matrix_normal_form_type(base_ring(A))
-Solve.matrix_normal_form_type(C::Solve.SolveCtx{zzModRingElem}) = Solve.matrix_normal_form_type(base_ring(C))
-
 function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::zzModMatrix, b::zzModMatrix, task::Symbol; side::Symbol = :left)
   if side === :left
     fl, sol, K = Solve._can_solve_internal_no_check(Solve.LUTrait(), transpose(A), transpose(b), task, side = :right)

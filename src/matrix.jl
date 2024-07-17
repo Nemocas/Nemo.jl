@@ -39,9 +39,15 @@ end
 #
 ################################################################################
 
-function AbstractAlgebra.solve_context_type(::Type{T}) where {T <: Union{QQFieldElem, fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
+# Make sure we don't use lazy_transpose for any flint backed type
+function Solve.solve_context_type(NF::Solve.MatrixNormalFormTrait,
+                                            ::Type{T}) where {T <: Union{
+  ZZRingElem, QQFieldElem,
+  fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem,
+  zzModRingElem, ZZModRingElem,
+  RealFieldElem, ArbFieldElem, ComplexFieldElem, AcbFieldElem}}
   MatType = dense_matrix_type(T)
-  return Solve.SolveCtx{T, MatType, MatType, MatType}
+  return Solve.SolveCtx{T, typeof(NF), MatType, MatType, MatType}
 end
 
 ################################################################################
@@ -60,7 +66,7 @@ Solve.lazy_transpose(A::_MatTypes) = transpose(A)
 #
 ################################################################################
 
-function Solve._can_solve_internal_no_check(::Solve.LUTrait, C::Solve.SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
+function Solve._can_solve_internal_no_check(::Solve.LUTrait, C::Solve.SolveCtx{T, Solve.LUTrait}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
   # Split up in separate functions to make the compiler happy
   if side === :right
     return Solve._can_solve_internal_no_check_right(Solve.LUTrait(), C, b, task)
@@ -69,7 +75,7 @@ function Solve._can_solve_internal_no_check(::Solve.LUTrait, C::Solve.SolveCtx{T
   end
 end
 
-function Solve._can_solve_internal_no_check_right(::Solve.LUTrait, C::Solve.SolveCtx{T}, b::MatElem{T}, task::Symbol) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
+function Solve._can_solve_internal_no_check_right(::Solve.LUTrait, C::Solve.SolveCtx{T, Solve.LUTrait}, b::MatElem{T}, task::Symbol) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
   LU = Solve.reduced_matrix(C)
   p = Solve.lu_permutation(C)
   pb = p*b
@@ -125,7 +131,7 @@ function Solve._can_solve_internal_no_check_right(::Solve.LUTrait, C::Solve.Solv
   end
 end
 
-function Solve._can_solve_internal_no_check_left(::Solve.LUTrait, C::Solve.SolveCtx{T}, b::MatElem{T}, task::Symbol) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
+function Solve._can_solve_internal_no_check_left(::Solve.LUTrait, C::Solve.SolveCtx{T, Solve.LUTrait}, b::MatElem{T}, task::Symbol) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
   LU = Solve.reduced_matrix_of_transpose(C)
   p = Solve.lu_permutation_of_transpose(C)
   pbt = p*transpose(b)

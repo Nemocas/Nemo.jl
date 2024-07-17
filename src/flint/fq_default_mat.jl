@@ -454,7 +454,6 @@ end
 
 Solve.matrix_normal_form_type(::FqField) = Solve.LUTrait()
 Solve.matrix_normal_form_type(::FqMatrix) = Solve.LUTrait()
-Solve.matrix_normal_form_type(::Solve.SolveCtx{FqFieldElem}) = Solve.LUTrait()
 
 function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::FqMatrix, b::FqMatrix, task::Symbol; side::Symbol = :left)
   if side === :left

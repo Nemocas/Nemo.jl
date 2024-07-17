@@ -271,7 +271,6 @@ end
 
 Solve.matrix_normal_form_type(::fpField) = Solve.LUTrait()
 Solve.matrix_normal_form_type(::fpMatrix) = Solve.LUTrait()
-Solve.matrix_normal_form_type(::Solve.SolveCtx{fpFieldElem}) = Solve.LUTrait()
 
 function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::fpMatrix, b::fpMatrix, task::Symbol; side::Symbol = :left)
   if side === :left

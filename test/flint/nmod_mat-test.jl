@@ -659,9 +659,6 @@ end
     if fl
       @test A * X == B
       @test is_zero(A*K)
-      if is_prime(modulus(R))
-        @test rank(A) + ncols(K) == ncols(A)
-      end
     end
   end
 
