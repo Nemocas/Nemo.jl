@@ -7,14 +7,7 @@
 # ALL aliases here are only a temporary measure to allow for a smooth transition downstream.
 # they will be replaced by deprecations eventually
 
-@alias ComplexPoly ComplexPolyRingElem
-@alias RealPoly RealPolyRingElem
-@alias ComplexMat ComplexMatrix
-@alias RealMat RealMatrix
-@alias AcbMatSpace AcbMatrixSpace
-@alias ComplexMatSpace ComplexMatrixSpace
-@alias ArbMatSpace ArbMatrixSpace
-@alias RealMatSpace RealMatrixSpace
+
 
 ###############################################################################
 #
@@ -53,6 +46,18 @@ macro include_deprecated_bindings()
                Base.@deprecate_binding AnticNumberField AbsSimpleNumField
                Base.@deprecate_binding nf_elem AbsSimpleNumFieldElem
 
+               # depreacted in 0.46
+               Base.@deprecate_binding QQBar QQBarField()
+               Base.@deprecate_binding CalciumQQBar QQBarField()
+
+               Base.@deprecate_binding ComplexPoly ComplexPolyRingElem
+               Base.@deprecate_binding RealPoly RealPolyRingElem
+               Base.@deprecate_binding ComplexMat ComplexMatrix
+               Base.@deprecate_binding RealMat RealMatrix
+               Base.@deprecate_binding AcbMatSpace AcbMatrixSpace
+               Base.@deprecate_binding ComplexMatSpace ComplexMatrixSpace
+               Base.@deprecate_binding ArbMatSpace ArbMatrixSpace
+               Base.@deprecate_binding RealMatSpace RealMatrixSpace
              end)
 end
 
@@ -71,22 +76,16 @@ end
 
 # Deprecated in 0.45.*
 @deprecate defining_polynomial(Q::fqPolyRepField, P::Ring) defining_polynomial(P, Q)
-lift(a::PadicFieldElem) = lift(ZZ, a)
-prime_field(k::PadicField) = base_field(k)
+
+# Deprecated in 0.46
+@deprecate lift(a::PadicFieldElem) lift(ZZ, a)
+@deprecate prime_field(k::PadicField) base_field(k)
 
 function (R::QadicField)(n::ZZPolyRingElem, pr::Int)
-  #Base.depwarn("`(::QadicField)(::ZZPolyRingElem, ::Int)` is deprecated, use `(::QadicField)(::ZZPolyRingElem; precision::Int)` instead.", :QadicField)
+  Base.depwarn("`(::QadicField)(::ZZPolyRingElem, ::Int)` is deprecated, use `(::QadicField)(::ZZPolyRingElem; precision::Int)` instead.", :QadicField)
   return (R::QadicField)(n::ZZPolyRingElem; precision=pr)
 end
 
-is_power(x::IntegerUnion) = is_perfect_power_with_data(x)
-is_power(x::QQFieldElem) = is_perfect_power_with_data(x)
-is_power(x::Rational) = is_perfect_power_with_data(x)
-
-@doc qqbar_field_doc
-const QQBar = QQBarField()
-export QQBar
-
-@doc qqbar_field_doc
-const CalciumQQBar = QQBarField()
-export CalciumQQBar
+@deprecate is_power(x::IntegerUnion) is_perfect_power_with_data(x)
+@deprecate is_power(x::QQFieldElem) is_perfect_power_with_data(x)
+@deprecate is_power(x::Rational) is_perfect_power_with_data(x)
