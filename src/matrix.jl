@@ -371,6 +371,6 @@ end
 #
 ###############################################################################
 
-function norm(v::Union{AcbMatrix, ArbMatrix, ComplexMat, RealMat})
+function norm(v::Union{AcbMatrix, ArbMatrix, ComplexMatrix, RealMatrix})
   return sqrt(sum(a^2 for a in v; init=zero(base_ring(v))))
 end

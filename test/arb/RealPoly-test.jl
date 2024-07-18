@@ -4,7 +4,7 @@ coeff_types = [Int8, Int, UInt, BigInt,
                Rational{Int8}, Rational{Int}, Rational{BigInt},
                ZZRingElem, QQFieldElem]
 
-@testset "RealPoly.constructors" begin
+@testset "RealPolyRingElem.constructors" begin
   S1 = PolyRing(RR)
   S2 = PolyRing(RR)
 
@@ -13,10 +13,10 @@ coeff_types = [Int8, Int, UInt, BigInt,
 
   R, x = polynomial_ring(RR, "x")
 
-  @test elem_type(R) == RealPoly
-  @test elem_type(RealPolyRing) == RealPoly
-  @test parent_type(RealPoly) == RealPolyRing
-  @test dense_poly_type(RealFieldElem) == RealPoly
+  @test elem_type(R) == RealPolyRingElem
+  @test elem_type(RealPolyRing) == RealPolyRingElem
+  @test parent_type(RealPolyRingElem) == RealPolyRing
+  @test dense_poly_type(RealFieldElem) == RealPolyRingElem
 
   @test typeof(R) <: RealPolyRing
 
@@ -46,14 +46,14 @@ coeff_types = [Int8, Int, UInt, BigInt,
   end
 end
 
-@testset "RealPoly.printing" begin
+@testset "RealPolyRingElem.printing" begin
   R, x = polynomial_ring(RR, "x")
   f = x^3 + 2x^2 + x + 1
 
   @test sprint(show, "text/plain", f) == "x^3 + 2.0000000000000000000*x^2 + x + 1"
 end
 
-@testset "RealPoly.manipulation" begin
+@testset "RealPolyRingElem.manipulation" begin
   R, x = polynomial_ring(RR, "x")
 
   @test iszero(zero(R))
@@ -83,7 +83,7 @@ end
   @test characteristic(R) == 0
 end
 
-@testset "RealPoly.polynomial" begin
+@testset "RealPolyRingElem.polynomial" begin
   R = RealField()
 
   f = polynomial(R, [])
@@ -92,33 +92,33 @@ end
   k = polynomial(R, [R(1), R(2), R(3)])
   p = polynomial(R, [1, 2, 3], "y")
 
-  @test isa(f, RealPoly)
-  @test isa(g, RealPoly)
-  @test isa(h, RealPoly)
-  @test isa(k, RealPoly)
-  @test isa(p, RealPoly)
+  @test isa(f, RealPolyRingElem)
+  @test isa(g, RealPolyRingElem)
+  @test isa(h, RealPolyRingElem)
+  @test isa(k, RealPolyRingElem)
+  @test isa(p, RealPolyRingElem)
 
   q = polynomial(R, [1, 2, 3], cached=false)
 
   @test parent(g) != parent(q)
 end
 
-@testset "RealPoly.similar" begin
+@testset "RealPolyRingElem.similar" begin
   R = RealField()
 
   f = polynomial(R, [1, 2, 3])
   g = similar(f)
   h = similar(f, "y")
 
-  @test isa(g, RealPoly)
-  @test isa(h, RealPoly)
+  @test isa(g, RealPolyRingElem)
+  @test isa(h, RealPolyRingElem)
 
   q = similar(g, cached=false)
 
   @test parent(g) != parent(q)
 end
 
-@testset "RealPoly.binary_ops" begin
+@testset "RealPolyRingElem.binary_ops" begin
   R, x = polynomial_ring(RR, "x")
 
   f = x^2 + 2x + 1
@@ -131,7 +131,7 @@ end
   @test f - g == -x^3+x^2-x-1
 end
 
-@testset "RealPoly.adhoc_binary" begin
+@testset "RealPolyRingElem.adhoc_binary" begin
   R, x = polynomial_ring(RR, "x")
 
   f = x^2 + 2x + 1
@@ -158,7 +158,7 @@ end
   end
 end
 
-@testset "RealPoly.comparison" begin
+@testset "RealPolyRingElem.comparison" begin
   R, x = polynomial_ring(RR, "x")
   Zx, zx = polynomial_ring(ZZ, "x")
   Qx, qx = polynomial_ring(QQ, "x")
@@ -204,7 +204,7 @@ end
   @test !uniq
 end
 
-@testset "RealPoly.adhoc_comparison" begin
+@testset "RealPolyRingElem.adhoc_comparison" begin
   R, x = polynomial_ring(RR, "x")
 
   f = x^2 + 2x + 1
@@ -226,7 +226,7 @@ end
   @test QQ(7) != f
 end
 
-@testset "RealPoly.unary_ops" begin
+@testset "RealPolyRingElem.unary_ops" begin
   R, x = polynomial_ring(RR, "x")
 
   f = x^2 + 2x + 1
@@ -234,7 +234,7 @@ end
   @test -f == -x^2 - 2x - 1
 end
 
-@testset "RealPoly.truncation" begin
+@testset "RealPolyRingElem.truncation" begin
   R, x = polynomial_ring(RR, "x")
 
   f = x^2 + 2x + 1
@@ -249,7 +249,7 @@ end
   @test_throws DomainError mullow(f, g, -1)
 end
 
-@testset "RealPoly.reverse" begin
+@testset "RealPolyRingElem.reverse" begin
   R, x = polynomial_ring(RR, "x")
 
   f = x^2 + 2x + 3
@@ -257,7 +257,7 @@ end
   #@test reverse(f) == 3x^2 + 2x + 1
 end
 
-@testset "RealPoly.shift" begin
+@testset "RealPolyRingElem.shift" begin
   R, x = polynomial_ring(RR, "x")
 
   f = x^2 + 2x + 1
@@ -271,7 +271,7 @@ end
   @test_throws DomainError shift_right(f, -1)
 end
 
-@testset "RealPoly.powering" begin
+@testset "RealPolyRingElem.powering" begin
   R, x = polynomial_ring(RR, "x")
 
   f = x^2 + 2x + 1
@@ -281,7 +281,7 @@ end
   @test_throws DomainError f^-1
 end
 
-@testset "RealPoly.exact_division" begin
+@testset "RealPolyRingElem.exact_division" begin
   R, x = polynomial_ring(RR, "x")
 
   f = x^2 + 2x + 1
@@ -306,7 +306,7 @@ end
   @test divexact(2*f, 2.0) == f
 end
 
-@testset "RealPoly.evaluation" begin
+@testset "RealPolyRingElem.evaluation" begin
   R, x = polynomial_ring(RR, "x")
 
   f = x^2 + 2x + 1
@@ -332,7 +332,7 @@ end
   @test evaluate2(f, RR(10)) == (121, 22)
 end
 
-@testset "RealPoly.composition" begin
+@testset "RealPolyRingElem.composition" begin
   R, x = polynomial_ring(RR, "x")
 
   f = x^2 + 2x + 1
@@ -341,7 +341,7 @@ end
   @test compose(f, g; inner = :second) == x^6+6*x^4+4*x^3+9*x^2+12*x+4
 end
 
-@testset "RealPoly.derivative_integral" begin
+@testset "RealPolyRingElem.derivative_integral" begin
   R, x = polynomial_ring(RR, "x")
 
   f = x^2 + 2x + 1
@@ -351,7 +351,7 @@ end
   @test contains(derivative(integral(f)), f)
 end
 
-@testset "RealPoly.evaluation_interpolation" begin
+@testset "RealPolyRingElem.evaluation_interpolation" begin
   R, x = polynomial_ring(RR, "x")
 
   n = 5
@@ -395,7 +395,7 @@ end
   end
 end
 
-@testset "RealPoly.root_bound" begin
+@testset "RealPolyRingElem.root_bound" begin
   Rx, x = polynomial_ring(RR, "x")
 
   for i in 1:2

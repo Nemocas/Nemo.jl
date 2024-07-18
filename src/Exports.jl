@@ -11,7 +11,7 @@ export AbsSimpleNumFieldElem
 export AcbField
 export AcbFieldElem
 export AcbMatrix
-export AcbMatSpace
+export AcbMatrixSpace
 export AcbPolyRing
 export AcbPolyRingElem
 export accuracy_bits
@@ -34,7 +34,7 @@ export angle
 export ArbField
 export ArbFieldElem
 export ArbMatrix
-export ArbMatSpace
+export ArbMatrixSpace
 export ArbPolyRing
 export ArbPolyRingElem
 export Array
@@ -87,10 +87,10 @@ export compare_index
 export complex_normal_form
 export ComplexField
 export ComplexFieldElem
-export ComplexMat
-export ComplexMatSpace
-export ComplexPoly
+export ComplexMatrix
+export ComplexMatrixSpace
 export ComplexPolyRing
+export ComplexPolyRingElem
 export compose
 export conj
 export conjugates
@@ -525,10 +525,10 @@ export rational_field
 export real
 export RealField
 export RealFieldElem
-export RealMat
-export RealMatSpace
-export RealPoly
+export RealMatrix
+export RealMatrixSpace
 export RealPolyRing
+export RealPolyRingElem
 export reconstruct
 export reduce_mod
 export reduce_mod!

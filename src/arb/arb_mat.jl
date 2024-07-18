@@ -28,7 +28,7 @@ base_ring(a::ArbMatrix) = a.base_ring
 
 dense_matrix_type(::Type{ArbFieldElem}) = ArbMatrix
 
-precision(x::ArbMatSpace) = precision(x.base_ring)
+precision(x::ArbMatrixSpace) = precision(x.base_ring)
 
 function getindex!(z::ArbFieldElem, x::ArbMatrix, r::Int, c::Int)
   GC.@preserve x begin
@@ -70,7 +70,7 @@ Base.@propagate_inbounds setindex!(x::ArbMatrix, y::Rational{T},
                                    r::Int, c::Int) where {T <: Integer} =
 setindex!(x, ZZRingElem(y), r, c)
 
-function one(x::ArbMatSpace)
+function one(x::ArbMatrixSpace)
   z = x()
   ccall((:arb_mat_one, libflint), Nothing, (Ref{ArbMatrix}, ), z)
   return z
@@ -709,13 +709,13 @@ end
 #
 ###############################################################################
 
-function (x::ArbMatSpace)()
+function (x::ArbMatrixSpace)()
   z = ArbMatrix(nrows(x), ncols(x))
   z.base_ring = x.base_ring
   return z
 end
 
-function (x::ArbMatSpace)(y::ZZMatrix)
+function (x::ArbMatrixSpace)(y::ZZMatrix)
   (ncols(x) != ncols(y) || nrows(x) != nrows(y)) &&
   error("Dimensions are wrong")
   z = ArbMatrix(y, precision(x))
@@ -723,14 +723,14 @@ function (x::ArbMatSpace)(y::ZZMatrix)
   return z
 end
 
-function (x::ArbMatSpace)(y::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AbstractString}}
+function (x::ArbMatrixSpace)(y::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AbstractString}}
   _check_dim(nrows(x), ncols(x), y)
   z = ArbMatrix(nrows(x), ncols(x), y, precision(x))
   z.base_ring = x.base_ring
   return z
 end
 
-function (x::ArbMatSpace)(y::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AbstractString}}
+function (x::ArbMatrixSpace)(y::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AbstractString}}
   _check_dim(nrows(x), ncols(x), y)
   z = ArbMatrix(nrows(x), ncols(x), y, precision(x))
   z.base_ring = x.base_ring

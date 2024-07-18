@@ -1,24 +1,24 @@
 CC = ComplexField()
 RR = RealField()
 
-@testset "ComplexMat.constructors" begin
+@testset "ComplexMatrix.constructors" begin
   @test_throws ErrorException matrix_space(CC, -1, 5)
   @test_throws ErrorException matrix_space(CC, 0, -2)
   @test_throws ErrorException matrix_space(CC, -3, -4)
-  @test_throws ErrorException ComplexMatSpace(CC, 2, -1)
-  @test_throws ErrorException ComplexMatSpace(CC, -1, 2)
-  @test_throws ErrorException ComplexMatSpace(CC, -1, -1)
+  @test_throws ErrorException ComplexMatrixSpace(CC, 2, -1)
+  @test_throws ErrorException ComplexMatrixSpace(CC, -1, 2)
+  @test_throws ErrorException ComplexMatrixSpace(CC, -1, -1)
 
   S = matrix_space(CC, 3, 3)
   R = matrix_space(ZZ, 3, 3)
 
-  @test elem_type(S) == ComplexMat
-  @test elem_type(ComplexMatSpace) == ComplexMat
-  @test parent_type(ComplexMat) == ComplexMatSpace
+  @test elem_type(S) == ComplexMatrix
+  @test elem_type(ComplexMatrixSpace) == ComplexMatrix
+  @test parent_type(ComplexMatrix) == ComplexMatrixSpace
   @test nrows(S) == 3
   @test ncols(S) == 3
 
-  @test isa(S, ComplexMatSpace)
+  @test isa(S, ComplexMatrixSpace)
 
   f = S(ZZRingElem(3))
 
@@ -70,13 +70,13 @@ RR = RealField()
 
   for T in [ZZRingElem, QQFieldElem, Int, BigInt, Float64, BigFloat, RR, CC, string, Rational{Int}, Rational{BigInt}]
     M = matrix(CC, map(T, arr))
-    @test isa(M, ComplexMat)
+    @test isa(M, ComplexMatrix)
     @test base_ring(M) == CC
     @test nrows(M) == 2
     @test ncols(M) == 2
 
     M2 = matrix(CC, 2, 3, map(T, arr2))
-    @test isa(M2, ComplexMat)
+    @test isa(M2, ComplexMatrix)
     @test base_ring(M2) == CC
     @test nrows(M2) == 2
     @test ncols(M2) == 3
@@ -86,12 +86,12 @@ RR = RealField()
 
   M3 = zero_matrix(CC, 2, 3)
 
-  @test isa(M3, ComplexMat)
+  @test isa(M3, ComplexMatrix)
   @test base_ring(M3) == CC
 
   M4 = identity_matrix(CC, 3)
 
-  @test isa(M4, ComplexMat)
+  @test isa(M4, ComplexMatrix)
   @test base_ring(M4) == CC
 
   a = zero_matrix(CC, 2, 2)
@@ -101,16 +101,16 @@ RR = RealField()
   @test !(a in [b])
 end
 
-@testset "ComplexMat.similar" begin
+@testset "ComplexMatrix.similar" begin
   S = matrix_space(CC, 3, 3)
   s = S(ZZRingElem(3))
 
   t = similar(s)
-  @test t isa ComplexMat
+  @test t isa ComplexMatrix
   @test size(t) == size(s)
 
   t = similar(s, 2, 3)
-  @test t isa ComplexMat
+  @test t isa ComplexMatrix
   @test size(t) == (2, 3)
 
   for (R, M) in ring_to_mat
@@ -128,7 +128,7 @@ end
   end
 end
 
-@testset "ComplexMat.printing" begin
+@testset "ComplexMatrix.printing" begin
   S = matrix_space(CC, 3, 3)
   f = S(ZZRingElem(3))
 
@@ -136,7 +136,7 @@ end
   @test !occursin(string(typeof(f)), string(f))
 end
 
-@testset "ComplexMat.manipulation" begin
+@testset "ComplexMatrix.manipulation" begin
   S = matrix_space(CC, 3, 3)
   A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
   B = S([ZZRingElem(1) 4 7; 9 6 7; 4 3 3])
@@ -154,7 +154,7 @@ end
   @test deepcopy(A) == A
 end
 
-@testset "ComplexMat.unary_ops" begin
+@testset "ComplexMatrix.unary_ops" begin
   S = matrix_space(CC, 3, 3)
   R = matrix_space(ZZ, 3, 3)
 
@@ -164,7 +164,7 @@ end
   @test contains(-A, B)
 end
 
-@testset "ComplexMat.transpose" begin
+@testset "ComplexMatrix.transpose" begin
   S = matrix_space(CC, 3, 3)
   T = matrix_space(ZZ, 3, 3)
 
@@ -179,7 +179,7 @@ end
   @test overlaps(transpose(C), C)
 end
 
-@testset "ComplexMat.binary_ops" begin
+@testset "ComplexMatrix.binary_ops" begin
   S = matrix_space(CC, 3, 3)
   R = matrix_space(ZZ, 3, 3)
 
@@ -193,7 +193,7 @@ end
   @test contains(A*B, R([49 41 50; 65 49 56; 75 81 114]))
 end
 
-@testset "ComplexMat.adhoc_binary" begin
+@testset "ComplexMatrix.adhoc_binary" begin
   S = matrix_space(CC, 3, 3)
   R = matrix_space(ZZ, 3, 3)
   T = matrix_space(QQ, 3, 3)
@@ -254,7 +254,7 @@ end
   end
 end
 
-@testset "ComplexMat.shifting" begin
+@testset "ComplexMatrix.shifting" begin
   S = matrix_space(CC, 3, 3)
   R = matrix_space(ZZ, 3, 3)
 
@@ -267,7 +267,7 @@ end
   @test contains(C, 16*B)
 end
 
-@testset "ComplexMat.comparison" begin
+@testset "ComplexMatrix.comparison" begin
   S = matrix_space(CC, 3, 3)
   R = matrix_space(ZZ, 3, 3)
 
@@ -289,7 +289,7 @@ end
   @test contains(C, A)
 end
 
-@testset "ComplexMat.adhoc_comparison" begin
+@testset "ComplexMatrix.adhoc_comparison" begin
   S = matrix_space(CC, 3, 3)
   R = matrix_space(ZZ, 3, 3)
   T = matrix_space(QQ, 3, 3)
@@ -310,7 +310,7 @@ end
   @test B == A
 end
 
-@testset "ComplexMat.predicates" begin
+@testset "ComplexMatrix.predicates" begin
   S = matrix_space(CC, 3, 3)
   A = S([1 2 1000; 0 3 1; 0 2 1])
 
@@ -321,7 +321,7 @@ end
   @test !isreal(A)
 end
 
-@testset "ComplexMat.inversion" begin
+@testset "ComplexMatrix.inversion" begin
   S = matrix_space(CC, 3, 3)
   R = matrix_space(ZZ, 3, 3)
 
@@ -342,7 +342,7 @@ end
   @test_throws ErrorException inv(A)
 end
 
-@testset "ComplexMat.divexact" begin
+@testset "ComplexMatrix.divexact" begin
   S = matrix_space(CC, 3, 3)
   R = matrix_space(ZZ, 3, 3)
 
@@ -353,7 +353,7 @@ end
   @test contains(divexact(one(S), A), B)
 end
 
-@testset "ComplexMat.adhoc_divexact" begin
+@testset "ComplexMatrix.adhoc_divexact" begin
   S = matrix_space(CC, 3, 3)
   R = matrix_space(ZZ, 3, 3)
 
@@ -368,7 +368,7 @@ end
   @test contains(divexact(A, CC("3.0 +/- 0.5")), B)
 end
 
-@testset "ComplexMat.charpoly" begin
+@testset "ComplexMatrix.charpoly" begin
   S = matrix_space(CC, 3, 3)
   R, x = polynomial_ring(CC, "x")
   ZZy, y = polynomial_ring(ZZ, "y")
@@ -384,7 +384,7 @@ end
   @test contains(g, f)
 end
 
-@testset "ComplexMat.det" begin
+@testset "ComplexMatrix.det" begin
   S = matrix_space(CC, 3, 3)
 
   A = S(["2.0 +/- 0.1" "3.0 +/- 0.1" "5.0 +/- 0.1";
@@ -396,7 +396,7 @@ end
   @test contains(d, 24)
 end
 
-@testset "ComplexMat.exp" begin
+@testset "ComplexMatrix.exp" begin
   S = matrix_space(CC, 3, 3)
 
   A = S(["2.0 +/- 0.1" "0.0 +/- 0.1" "0.0 +/- 0.1";
@@ -410,7 +410,7 @@ end
   @test overlaps(B, C)
 end
 
-@testset "ComplexMat.lu_nonsquare" begin
+@testset "ComplexMatrix.lu_nonsquare" begin
   S = matrix_space(CC, 2, 3)
 
   A = S(["1.0 +/- 0.01" "1.0 +/- 0.01" "1.0 +/- 0.01";
@@ -422,7 +422,7 @@ end
   @test r == 2
 end
 
-@testset "ComplexMat.linear_solving" begin
+@testset "ComplexMatrix.linear_solving" begin
   S = matrix_space(CC, 3, 3)
   T = matrix_space(ZZ, 3, 3)
 
@@ -448,7 +448,7 @@ end
   @test contains(transpose(y), ZZ[1 1 1])
 end
 
-@testset "ComplexMat.Solve.solve" begin
+@testset "ComplexMatrix.Solve.solve" begin
   S = matrix_space(CC, 3, 3)
 
   A = S(["1.0 +/- 0.01" "2.0 +/- 0.01" "3.0 +/- 0.01";
@@ -515,7 +515,7 @@ end
   @test contains(transpose(y), ZZ[2 2 2])
 end
 
-@testset "ComplexMat.bound_inf_norm" begin
+@testset "ComplexMatrix.bound_inf_norm" begin
   S = matrix_space(CC, 3, 3)
 
   A = S([2 3 5; 1 4 7; 9 6 3])
@@ -529,7 +529,7 @@ end
   end
 end
 
-@testset "ComplexMat.eigenvalues" begin
+@testset "ComplexMatrix.eigenvalues" begin
   A = matrix(CC, 3, 3, [1, 2, 3, 0, 4, 5, 0, 0, 6])
 
   E = @inferred eigenvalues(A)
@@ -567,7 +567,7 @@ end
   @test_throws ErrorException @inferred eigenvalues_simple(A)
 end
 
-@testset "ComplexMat.norm" begin
+@testset "ComplexMatrix.norm" begin
   A = matrix(CC, [2 3 5; 1 4 7; 9 6 3])
   @test contains(norm(A), sqrt(CC(230)))
 

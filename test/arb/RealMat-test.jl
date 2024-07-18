@@ -1,23 +1,23 @@
 RR = RealField()
 
-@testset "RealMat.constructors" begin
+@testset "RealMatrix.constructors" begin
   @test_throws ErrorException matrix_space(RR, -1, 5)
   @test_throws ErrorException matrix_space(RR, 0, -2)
   @test_throws ErrorException matrix_space(RR, -3, -4)
-  @test_throws ErrorException RealMatSpace(RR, 2, -1)
-  @test_throws ErrorException RealMatSpace(RR, -1, 2)
-  @test_throws ErrorException RealMatSpace(RR, -1, -1)
+  @test_throws ErrorException RealMatrixSpace(RR, 2, -1)
+  @test_throws ErrorException RealMatrixSpace(RR, -1, 2)
+  @test_throws ErrorException RealMatrixSpace(RR, -1, -1)
 
   S = matrix_space(RR, 3, 3)
   R = matrix_space(ZZ, 3, 3)
 
-  @test elem_type(S) == RealMat
-  @test elem_type(RealMatSpace) == RealMat
-  @test parent_type(RealMat) == RealMatSpace
+  @test elem_type(S) == RealMatrix
+  @test elem_type(RealMatrixSpace) == RealMatrix
+  @test parent_type(RealMatrix) == RealMatrixSpace
   @test nrows(S) == 3
   @test ncols(S) == 3
 
-  @test isa(S, RealMatSpace)
+  @test isa(S, RealMatrixSpace)
 
   f = S(ZZRingElem(3))
 
@@ -69,13 +69,13 @@ RR = RealField()
 
   for T in [ZZRingElem, QQFieldElem, Int, BigInt, Float64, BigFloat, RR, string, Rational{Int}, Rational{BigInt}]
     M = matrix(RR, map(T, arr))
-    @test isa(M, RealMat)
+    @test isa(M, RealMatrix)
     @test base_ring(M) == RR
     @test nrows(M) == 2
     @test ncols(M) == 2
 
     M2 = matrix(RR, 2, 3, map(T, arr2))
-    @test isa(M2, RealMat)
+    @test isa(M2, RealMatrix)
     @test base_ring(M2) == RR
     @test nrows(M2) == 2
     @test ncols(M2) == 3
@@ -85,12 +85,12 @@ RR = RealField()
 
   M3 = zero_matrix(RR, 2, 3)
 
-  @test isa(M3, RealMat)
+  @test isa(M3, RealMatrix)
   @test base_ring(M3) == RR
 
   M4 = identity_matrix(RR, 3)
 
-  @test isa(M4, RealMat)
+  @test isa(M4, RealMatrix)
   @test base_ring(M4) == RR
 
   a = zero_matrix(RR, 2, 2)
@@ -100,16 +100,16 @@ RR = RealField()
   @test !(a in [b])
 end
 
-@testset "RealMat.similar" begin
+@testset "RealMatrix.similar" begin
   S = matrix_space(RR, 3, 3)
   s = S(ZZRingElem(3))
 
   t = similar(s)
-  @test t isa RealMat
+  @test t isa RealMatrix
   @test size(t) == size(s)
 
   t = similar(s, 2, 3)
-  @test t isa RealMat
+  @test t isa RealMatrix
   @test size(t) == (2, 3)
 
   for (R, M) in ring_to_mat
@@ -127,7 +127,7 @@ end
   end
 end
 
-@testset "RealMat.printing" begin
+@testset "RealMatrix.printing" begin
   S = matrix_space(RR, 3, 3)
   f = S(ZZRingElem(3))
 
@@ -135,7 +135,7 @@ end
   @test !occursin(string(typeof(f)), string(f))
 end
 
-@testset "RealMat.manipulation" begin
+@testset "RealMatrix.manipulation" begin
   S = matrix_space(RR, 3, 3)
   A = S([ZZRingElem(2) 3 5; 1 4 7; 9 6 3])
   B = S([ZZRingElem(1) 4 7; 9 6 7; 4 3 3])
@@ -157,7 +157,7 @@ end
   @test deepcopy(A) == A
 end
 
-@testset "RealMat.unary_ops" begin
+@testset "RealMatrix.unary_ops" begin
   S = matrix_space(RR, 3, 3)
   R = matrix_space(ZZ, 3, 3)
 
@@ -167,7 +167,7 @@ end
   @test contains(-A, B)
 end
 
-@testset "RealMat.transpose" begin
+@testset "RealMatrix.transpose" begin
   S = matrix_space(RR, 3, 3)
   T = matrix_space(ZZ, 3, 3)
 
@@ -182,7 +182,7 @@ end
   @test overlaps(transpose(C), C)
 end
 
-@testset "RealMat.binary_ops" begin
+@testset "RealMatrix.binary_ops" begin
   S = matrix_space(RR, 3, 3)
   R = matrix_space(ZZ, 3, 3)
 
@@ -196,7 +196,7 @@ end
   @test contains(A*B, R([49 41 50; 65 49 56; 75 81 114]))
 end
 
-@testset "RealMat.adhoc_binary" begin
+@testset "RealMatrix.adhoc_binary" begin
   S = matrix_space(RR, 3, 3)
   R = matrix_space(ZZ, 3, 3)
   T = matrix_space(QQ, 3, 3)
@@ -234,7 +234,7 @@ end
   @test contains(A*q, C*q)
 end
 
-@testset "RealMat.shifting" begin
+@testset "RealMatrix.shifting" begin
   S = matrix_space(RR, 3, 3)
   R = matrix_space(ZZ, 3, 3)
 
@@ -247,7 +247,7 @@ end
   @test contains(C, 16*B)
 end
 
-@testset "RealMat.comparison" begin
+@testset "RealMatrix.comparison" begin
   S = matrix_space(RR, 3, 3)
   R = matrix_space(ZZ, 3, 3)
 
@@ -269,7 +269,7 @@ end
   @test contains(C, A)
 end
 
-@testset "RealMat.adhoc_comparison" begin
+@testset "RealMatrix.adhoc_comparison" begin
   S = matrix_space(RR, 3, 3)
   R = matrix_space(ZZ, 3, 3)
   T = matrix_space(QQ, 3, 3)
@@ -290,7 +290,7 @@ end
   @test B == A
 end
 
-@testset "RealMat.inversion" begin
+@testset "RealMatrix.inversion" begin
   S = matrix_space(RR, 3, 3)
   R = matrix_space(ZZ, 3, 3)
 
@@ -311,7 +311,7 @@ end
   @test_throws ErrorException inv(A)
 end
 
-@testset "RealMat.divexact" begin
+@testset "RealMatrix.divexact" begin
   S = matrix_space(RR, 3, 3)
   R = matrix_space(ZZ, 3, 3)
 
@@ -322,7 +322,7 @@ end
   @test contains(divexact(one(S), A), B)
 end
 
-@testset "RealMat.adhoc_divexact" begin
+@testset "RealMatrix.adhoc_divexact" begin
   S = matrix_space(RR, 3, 3)
   R = matrix_space(ZZ, 3, 3)
 
@@ -334,7 +334,7 @@ end
   @test contains(divexact(A, RR("3.0 +/- 0.5")), B)
 end
 
-@testset "RealMat.charpoly" begin
+@testset "RealMatrix.charpoly" begin
   S = matrix_space(RR, 3, 3)
   R, x = polynomial_ring(RR, "x")
   ZZy, y = polynomial_ring(ZZ, "y")
@@ -350,7 +350,7 @@ end
   @test contains(g, f)
 end
 
-@testset "RealMat.det" begin
+@testset "RealMatrix.det" begin
   S = matrix_space(RR, 3, 3)
 
   A = S(["2.0 +/- 0.1" "3.0 +/- 0.1" "5.0 +/- 0.1";
@@ -362,7 +362,7 @@ end
   @test contains(d, 24)
 end
 
-@testset "RealMat.exp" begin
+@testset "RealMatrix.exp" begin
   S = matrix_space(RR, 3, 3)
 
   A = S(["2.0 +/- 0.1" "0.0 +/- 0.1" "0.0 +/- 0.1";
@@ -376,7 +376,7 @@ end
   @test overlaps(B, C)
 end
 
-@testset "RealMat.lu_nonsquare" begin
+@testset "RealMatrix.lu_nonsquare" begin
   S = matrix_space(RR, 2, 3)
 
   A = S(["1.0 +/- 0.01" "1.0 +/- 0.01" "1.0 +/- 0.01";
@@ -388,7 +388,7 @@ end
   @test r == 2
 end
 
-@testset "RealMat.linear_solving" begin
+@testset "RealMatrix.linear_solving" begin
   S = matrix_space(RR, 3, 3)
   T = matrix_space(ZZ, 3, 3)
 
@@ -414,7 +414,7 @@ end
   @test contains(transpose(y), ZZ[1 1 1])
 end
 
-@testset "RealMat.Solve.solve" begin
+@testset "RealMatrix.Solve.solve" begin
   S = matrix_space(RR, 3, 3)
 
   A = S(["1.0 +/- 0.01" "2.0 +/- 0.01" "3.0 +/- 0.01";
@@ -481,7 +481,7 @@ end
   @test contains(transpose(y), ZZ[2 2 2])
 end
 
-@testset "RealMat.bound_inf_norm" begin
+@testset "RealMatrix.bound_inf_norm" begin
   S = matrix_space(RR, 3, 3)
 
   A = S([2 3 5; 1 4 7; 9 6 3])
@@ -495,7 +495,7 @@ end
   end
 end
 
-@testset "RealMat.norm" begin
+@testset "RealMatrix.norm" begin
   A = matrix(RR, [2 3 5; 1 4 7; 9 6 3])
   @test contains(norm(A), sqrt(RR(230)))
 

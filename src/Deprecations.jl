@@ -7,7 +7,14 @@
 # ALL aliases here are only a temporary measure to allow for a smooth transition downstream.
 # they will be replaced by deprecations eventually
 
-#= currently none =#
+@alias ComplexPoly ComplexPolyRingElem
+@alias RealPoly RealPolyRingElem
+@alias ComplexMat ComplexMatrix
+@alias RealMat RealMatrix
+@alias AcbMatSpace AcbMatrixSpace
+@alias ComplexMatSpace ComplexMatrixSpace
+@alias ArbMatSpace ArbMatrixSpace
+@alias RealMatSpace RealMatrixSpace
 
 ###############################################################################
 #
