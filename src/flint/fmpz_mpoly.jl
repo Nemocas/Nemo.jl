@@ -1061,25 +1061,10 @@ function (R::ZZMPolyRing)()
   return z
 end
 
-function (R::ZZMPolyRing)(b::ZZRingElem)
+function (R::ZZMPolyRing)(b::IntegerUnion)
   z = ZZMPolyRingElem(R, b)
   return z
 end
-
-function (R::ZZMPolyRing)(b::Int)
-  z = ZZMPolyRingElem(R, b)
-  return z
-end
-
-function (R::ZZMPolyRing)(b::UInt)
-  z = ZZMPolyRingElem(R, b)
-  return z
-end
-
-function (R::ZZMPolyRing)(b::Integer)
-  return R(ZZRingElem(b))
-end
-
 
 function (R::ZZMPolyRing)(a::ZZMPolyRingElem)
   parent(a) != R && error("Unable to coerce polynomial")

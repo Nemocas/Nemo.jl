@@ -1362,6 +1362,8 @@ mutable struct ZZMPolyRingElem <: MPolyRingElem{ZZRingElem}
     z.parent = ctx
     return z
   end
+
+  ZZMPolyRingElem(ctx::ZZMPolyRing, a::Integer) = ZZMPolyRingElem(ctx, FlintInt(a))
 end
 
 function _fmpz_mpoly_clear_fn(a::ZZMPolyRingElem)
@@ -6453,7 +6455,78 @@ end
 #
 ################################################################################
 
+"""
+    IntegerUnion = Union{Integer, ZZRingElem}
+
+The `IntegerUnion` type union allows convenient and compact declaration
+of methods that accept both Julia and Nemo integers.
+"""
 const IntegerUnion = Union{Integer, ZZRingElem}
+
+"""
+    RationalUnion = Union{Integer, ZZRingElem, Rational, QQFieldElem}
+
+The `RationalUnion` type union allows convenient and compact declaration
+of methods that accept both Julia and Nemo integers or rationals.
+"""
+const RationalUnion = Union{Integer, ZZRingElem, Rational, QQFieldElem}
+
+"""
+    FlintInt = Union{Int, ZZRingElem}
+
+The `FlintInt` type union is an internal helper for cleanly and compactly
+implementing efficient dispatch for arithmetics that involve native Nemo
+objects plus a Julia integer.
+
+Many internal arithmetics functions in FLINT have optimize variants for
+the case when one operand is an `ZZRingElem` or an `Int` (sometimes also
+`UInt` is supported). E.g. there are special methods for adding
+one of these to a `ZZRingPolyElem`.
+
+In order to handling adding an arbitrary Julia integer to a
+`ZZRingPolyElem`, further dispatch is needed. The easiest is to
+provide a method
+
+    +(a::ZZRingPolyElem, b::Integer) = a + ZZ(b)
+
+However this is inefficient when `b` is e.g. an `UInt16`. So we could
+do this (at least on a 64 bit machine):
+
+    +(a::ZZRingPolyElem, b::Integer) = a + ZZ(b)
+    +(a::ZZRingPolyElem, b::{Int64,Int32,Int16,Int8,UInt32,UInt16,UInt8}) = a + Int(b)
+
+Doing this repeatedly is cumbersome and error prone. This can be avoided by
+using `FlintInt`, which allows us to write
+
+    +(a::ZZRingPolyElem, b::Integer) = a + FlintInt(b)
+
+to get optimal dispatch.
+
+This also works for Nemo types that also have special handlers for `UInt`,
+as their method for `b::UInt` takes precedence over the fallback method.
+"""
+const FlintInt = Union{Int, ZZRingElem}
+
+FlintInt(x::ZZRingElem) = x
+FlintInt(x::Integer) = ZZRingElem(x)::ZZRingElem
+if Int === Int64
+  FlintInt(x::Union{Int64,Int32,Int16,Int8,UInt32,UInt16,UInt8}) = Int(x)
+else
+  FlintInt(x::Union{Int32,Int16,Int8,UInt16,UInt8}) = Int(x)
+end
+
+"""
+    FlintRat = Union{FlintInt, QQFieldElem}
+
+The `FlintRat` type union is an internal helper similar to [`FlintInt`](@ref)
+but also accepting `QQFieldElem` and `Rational{<:Integer}` arguments.
+"""
+const FlintRat = Union{FlintInt, QQFieldElem}
+
+FlintRat(x::QQFieldElem) = x
+FlintRat(x::Rational{<:Integer}) = QQFieldElem(x)::QQFieldElem
+FlintRat(x::Integer) = FlintInt(x)
+
 
 const ZmodNFmpzPolyRing = Union{ZZModPolyRing, FpPolyRing}
 
