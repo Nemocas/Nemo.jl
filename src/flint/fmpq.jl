@@ -280,6 +280,8 @@ function -(a::QQFieldElem)
   return z
 end
 
+conj(x::QQFieldElem) = x
+
 ###############################################################################
 #
 #   Binary operators

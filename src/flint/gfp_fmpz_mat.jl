@@ -386,10 +386,12 @@ end
 #
 ################################################################################
 
-function Solve._can_solve_internal_no_check(A::FpMatrix, b::FpMatrix, task::Symbol; side::Symbol = :left)
-  @assert base_ring(A) === base_ring(b) "Base rings do not match"
+Solve.matrix_normal_form_type(::FpField) = Solve.LUTrait()
+Solve.matrix_normal_form_type(::FpMatrix) = Solve.LUTrait()
+
+function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::FpMatrix, b::FpMatrix, task::Symbol; side::Symbol = :left)
   if side === :left
-    fl, sol, K = Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
+    fl, sol, K = Solve._can_solve_internal_no_check(Solve.LUTrait(), transpose(A), transpose(b), task, side = :right)
     return fl, transpose(sol), transpose(K)
   end
 

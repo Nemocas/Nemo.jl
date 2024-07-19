@@ -502,10 +502,9 @@ end
 #
 ################################################################################
 
-function Solve._can_solve_internal_no_check(A::ZZModMatrix, b::ZZModMatrix, task::Symbol; side::Symbol = :left)
-  @assert base_ring(A) === base_ring(b) "Base rings do not match"
+function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::ZZModMatrix, b::ZZModMatrix, task::Symbol; side::Symbol = :left)
   if side === :left
-    fl, sol, K = Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
+    fl, sol, K = Solve._can_solve_internal_no_check(Solve.LUTrait(), transpose(A), transpose(b), task, side = :right)
     return fl, transpose(sol), transpose(K)
   end
 
@@ -518,6 +517,9 @@ function Solve._can_solve_internal_no_check(A::ZZModMatrix, b::ZZModMatrix, task
   end
   return Bool(fl), x, kernel(A, side = :right)
 end
+
+# For _can_solve_internal_no_check(::HowellFormTrait, ...) we use generic
+# AbstractAlgebra code
 
 ################################################################################
 #
@@ -862,39 +864,7 @@ end
 #
 ################################################################################
 
-function kernel(M::ZZModMatrix; side::Symbol = :left)
-  Solve.check_option(side, [:right, :left], "side")
-
-  if side === :left
-    K = kernel(transpose(M), side = :right)
-    return transpose(K)
-  end
-
-  R = base_ring(M)
-  if is_prime(modulus(R))
-    return nullspace(M)[2]
-  end
-
-  N = hcat(transpose(M), identity_matrix(R, ncols(M)))
-  if nrows(N) < ncols(N)
-    N = vcat(N, zero_matrix(R, ncols(N) - nrows(N), ncols(N)))
-  end
-  howell_form!(N)
-  H = N
-  nr = 1
-  while nr <= nrows(H) && !is_zero_row(H, nr)
-    nr += 1
-  end
-  nr -= 1
-  h = view(H, 1:nr, 1:nrows(M))
-  for i = 1:nrows(h)
-    if is_zero_row(h, i)
-      k = view(H, i:nrows(h), nrows(M) + 1:ncols(H))
-      return transpose(k)
-    end
-  end
-  return zero_matrix(R, ncols(M), 0)
-end
+# kernel(::ZZModMatrix) is in src/flint/nmod_mat.jl
 
 function nullspace(M::ZZModMatrix)
   # Apparently this only works correctly if base_ring(M) is a field

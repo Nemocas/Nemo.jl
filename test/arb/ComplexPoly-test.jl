@@ -6,7 +6,7 @@ coeff_types = [Int8, Int, UInt, BigInt,
                Complex{Int8}, Complex{Float32}, Complex{BigInt}, Complex{Rational{BigInt}},
                ZZRingElem, QQFieldElem]
 
-@testset "ComplexPoly.constructors" begin
+@testset "ComplexPolyRingElem.constructors" begin
   S1 = PolyRing(CC)
   S2 = PolyRing(CC)
 
@@ -15,10 +15,10 @@ coeff_types = [Int8, Int, UInt, BigInt,
 
   R, x = polynomial_ring(CC, "x")
 
-  @test elem_type(R) == ComplexPoly
-  @test elem_type(ComplexPolyRing) == ComplexPoly
-  @test parent_type(ComplexPoly) == ComplexPolyRing
-  @test dense_poly_type(ComplexFieldElem) == ComplexPoly
+  @test elem_type(R) == ComplexPolyRingElem
+  @test elem_type(ComplexPolyRing) == ComplexPolyRingElem
+  @test parent_type(ComplexPolyRingElem) == ComplexPolyRing
+  @test dense_poly_type(ComplexFieldElem) == ComplexPolyRingElem
 
   @test typeof(R) <: ComplexPolyRing
 
@@ -53,7 +53,7 @@ coeff_types = [Int8, Int, UInt, BigInt,
   end
 end
 
-@testset "ComplexPoly.printing" begin
+@testset "ComplexPolyRingElem.printing" begin
   R, x = polynomial_ring(CC, "x")
   f = x^3 + 2x^2 + x + 1
 
@@ -61,7 +61,7 @@ end
   @test occursin(r"2.[0]+", string(f))
 end
 
-@testset "ComplexPoly.manipulation" begin
+@testset "ComplexPolyRingElem.manipulation" begin
   R, x = polynomial_ring(CC, "x")
 
   @test iszero(zero(R))
@@ -91,7 +91,7 @@ end
   @test characteristic(R) == 0
 end
 
-@testset "ComplexPoly.binary_ops" begin
+@testset "ComplexPolyRingElem.binary_ops" begin
   R, x = polynomial_ring(CC, "x")
 
   f = x^2 + 2x + 1
@@ -104,7 +104,7 @@ end
   @test f - g == -x^3+x^2-x-1
 end
 
-@testset "ComplexPoly.adhoc_binary" begin
+@testset "ComplexPolyRingElem.adhoc_binary" begin
   R, x = polynomial_ring(CC, "x")
 
   f = x^2 + 2x + 1
@@ -131,7 +131,7 @@ end
   end
 end
 
-@testset "ComplexPoly.comparison" begin
+@testset "ComplexPolyRingElem.comparison" begin
   R, x = polynomial_ring(CC, "x")
   Zx, zx = polynomial_ring(ZZ, "x")
   Qx, qx = polynomial_ring(QQ, "x")
@@ -177,7 +177,7 @@ end
   @test !uniq
 end
 
-@testset "ComplexPoly.adhoc_comparison" begin
+@testset "ComplexPolyRingElem.adhoc_comparison" begin
   R, x = polynomial_ring(CC, "x")
 
   f = x^2 + 2x + 1
@@ -201,7 +201,7 @@ end
   @test R(7) == RR(7.0)
 end
 
-@testset "ComplexPoly.unary_ops" begin
+@testset "ComplexPolyRingElem.unary_ops" begin
   R, x = polynomial_ring(CC, "x")
 
   f = x^2 + 2x + 1
@@ -209,7 +209,7 @@ end
   @test -f == -x^2 - 2x - 1
 end
 
-@testset "ComplexPoly.truncation" begin
+@testset "ComplexPolyRingElem.truncation" begin
   R, x = polynomial_ring(CC, "x")
 
   f = x^2 + 2x + 1
@@ -224,7 +224,7 @@ end
   @test_throws DomainError mullow(f, g, -1)
 end
 
-@testset "ComplexPoly.reverse" begin
+@testset "ComplexPolyRingElem.reverse" begin
   R, x = polynomial_ring(CC, "x")
 
   f = x^2 + 2x + 3
@@ -232,7 +232,7 @@ end
   #@test reverse(f) == 3x^2 + 2x + 1
 end
 
-@testset "ComplexPoly.shift" begin
+@testset "ComplexPolyRingElem.shift" begin
   R, x = polynomial_ring(CC, "x")
 
   f = x^2 + 2x + 1
@@ -246,7 +246,7 @@ end
   @test_throws DomainError shift_right(f, -1)
 end
 
-@testset "ComplexPoly.powering" begin
+@testset "ComplexPolyRingElem.powering" begin
   R, x = polynomial_ring(CC, "x")
 
   f = x^2 + 2x + 1
@@ -256,7 +256,7 @@ end
   @test_throws DomainError f^-1
 end
 
-@testset "ComplexPoly.exact_division" begin
+@testset "ComplexPolyRingElem.exact_division" begin
   R, x = polynomial_ring(CC, "x")
 
   f = x^2 + 2x + 1
@@ -265,7 +265,7 @@ end
   @test divexact(f*g, f) == g
 end
 
-@testset "ComplexPoly.scalar_division" begin
+@testset "ComplexPolyRingElem.scalar_division" begin
   R, x = polynomial_ring(CC, "x")
 
   f = x^2 + 2x + 1
@@ -281,7 +281,7 @@ end
   @test divexact(2*f, 2.0) == f
 end
 
-@testset "ComplexPoly.evaluation" begin
+@testset "ComplexPolyRingElem.evaluation" begin
   R, x = polynomial_ring(CC, "x")
 
   f = x^2 + 2x + 1
@@ -307,7 +307,7 @@ end
   @test evaluate2(f, CC(10)) == (121, 22)
 end
 
-@testset "ComplexPoly.roots" begin
+@testset "ComplexPolyRingElem.roots" begin
   R, x = polynomial_ring(CC, "x")
 
   f = (x - 1)*(x - 2)*(x - CC("5 +/- 0.001"))
@@ -319,7 +319,7 @@ end
   @test contains(r[3], 5)
 end
 
-@testset "ComplexPoly.composition" begin
+@testset "ComplexPolyRingElem.composition" begin
   R, x = polynomial_ring(CC, "x")
 
   f = x^2 + 2x + 1
@@ -328,7 +328,7 @@ end
   @test compose(f, g; inner = :second) == x^6+6*x^4+4*x^3+9*x^2+12*x+4
 end
 
-@testset "ComplexPoly.derivative_integral" begin
+@testset "ComplexPolyRingElem.derivative_integral" begin
   R, x = polynomial_ring(CC, "x")
 
   f = x^2 + 2x + 1
@@ -338,7 +338,7 @@ end
   @test contains(derivative(integral(f)), f)
 end
 
-@testset "ComplexPoly.evaluation_interpolation" begin
+@testset "ComplexPolyRingElem.evaluation_interpolation" begin
   R, x = polynomial_ring(CC, "x")
 
   n = 5
@@ -382,7 +382,7 @@ end
   end
 end
 
-@testset "ComplexPoly.root_bound" begin
+@testset "ComplexPolyRingElem.root_bound" begin
   Rx, x = polynomial_ring(CC, "x")
 
   for i in 1:2
@@ -399,5 +399,5 @@ end
   R, t = polynomial_ring(CC, "t")
   D, Dt = polynomial_ring(R, "Dt")
   A_scalarform = t^3 * (32 * t^2 - 1) * (32 * t^2 + 1) * Dt^4 + 2 * t^2 * (7168 * t^4 - 3) * Dt^3 + t * (55296 * t^4 - 7) * Dt^2 + (61440 * t^4 - 1) * Dt + 12288 * t^3
-  @test A_scalarform isa PolyRingElem{ComplexPoly}
+  @test A_scalarform isa PolyRingElem{ComplexPolyRingElem}
 end

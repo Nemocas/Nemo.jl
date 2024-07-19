@@ -10,8 +10,8 @@ for T in [
   FqPolyRingElem,
   AcbPolyRingElem,
   ArbPolyRingElem,
-  ComplexPoly,
-  RealPoly,
+  ComplexPolyRingElem,
+  RealPolyRingElem,
   ]
   (f::T)(a) = subst(f, a)
 

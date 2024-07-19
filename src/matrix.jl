@@ -35,31 +35,30 @@ end
 
 ################################################################################
 #
-#  Generic kernel (calling nullspace in flint)
-#
-################################################################################
-
-function kernel(A::_FieldMatTypes; side::Symbol = :left)
-  Solve.check_option(side, [:right, :left], "side")
-
-  if side === :left
-    K = kernel(transpose(A), side = :right)
-    return transpose(K)
-  end
-
-  return nullspace(A)[2]
-end
-
-################################################################################
-#
 #  Solve context functionality
 #
 ################################################################################
 
-function AbstractAlgebra.solve_context_type(::Type{T}) where {T <: Union{QQFieldElem, fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
+# Make sure we don't use lazy_transpose for any flint backed type
+function Solve.solve_context_type(NF::Solve.MatrixNormalFormTrait,
+                                            ::Type{T}) where {T <: Union{
+  ZZRingElem, QQFieldElem,
+  fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem,
+  zzModRingElem, ZZModRingElem,
+  RealFieldElem, ArbFieldElem, ComplexFieldElem, AcbFieldElem}}
   MatType = dense_matrix_type(T)
-  return Solve.SolveCtx{T, MatType, MatType, MatType}
+  return Solve.SolveCtx{T, typeof(NF), MatType, MatType, MatType}
 end
+
+################################################################################
+#
+#  (No) lazy transpose
+#
+################################################################################
+
+# Producing a LazyTransposedMatElem from a flint matrix should always be
+# unintended because the resulting matrix will use generic code and not flint
+Solve.lazy_transpose(A::_MatTypes) = transpose(A)
 
 ################################################################################
 #
@@ -67,59 +66,16 @@ end
 #
 ################################################################################
 
-function Solve._init_reduce(C::Solve.SolveCtx{T}) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
-  if isdefined(C, :red) && isdefined(C, :lu_perm)
-    return nothing
-  end
-
-  LU = deepcopy(matrix(C))
-  p = Perm(1:nrows(LU))
-  r = lu!(p, LU)
-
-  Solve.set_rank!(C, r)
-  C.red = LU
-  C.lu_perm = p
-  if r < nrows(C)
-    pA = p*matrix(C)
-    C.permuted_matrix = view(pA, r + 1:nrows(C), :)
-  else
-    C.permuted_matrix = zero(matrix(C), 0, ncols(C))
-  end
-  return nothing
-end
-
-function Solve._init_reduce_transpose(C::Solve.SolveCtx{T}) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
-  if isdefined(C, :red_transp) && isdefined(C, :lu_perm_transp)
-    return nothing
-  end
-
-  LU = transpose(matrix(C))
-  p = Perm(1:nrows(LU))
-  r = lu!(p, LU)
-
-  Solve.set_rank!(C, r)
-  C.red_transp = LU
-  C.lu_perm_transp = p
-  if r < ncols(C)
-    Ap = matrix(C)*p
-    C.permuted_matrix_transp = view(Ap, :, r + 1:ncols(C))
-  else
-    C.permuted_matrix_transp = zero(matrix(C), nrows(C), 0)
-  end
-  return nothing
-end
-
-function Solve._can_solve_internal_no_check(C::Solve.SolveCtx{T}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
-  @assert base_ring(matrix(C)) === base_ring(b) "Base rings do not match"
+function Solve._can_solve_internal_no_check(::Solve.LUTrait, C::Solve.SolveCtx{T, Solve.LUTrait}, b::MatElem{T}, task::Symbol; side::Symbol = :left) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
   # Split up in separate functions to make the compiler happy
   if side === :right
-    return Solve._can_solve_internal_no_check_right(C, b, task)
+    return Solve._can_solve_internal_no_check_right(Solve.LUTrait(), C, b, task)
   else
-    return Solve._can_solve_internal_no_check_left(C, b, task)
+    return Solve._can_solve_internal_no_check_left(Solve.LUTrait(), C, b, task)
   end
 end
 
-function Solve._can_solve_internal_no_check_right(C::Solve.SolveCtx{T}, b::MatElem{T}, task::Symbol) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
+function Solve._can_solve_internal_no_check_right(::Solve.LUTrait, C::Solve.SolveCtx{T, Solve.LUTrait}, b::MatElem{T}, task::Symbol) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
   LU = Solve.reduced_matrix(C)
   p = Solve.lu_permutation(C)
   pb = p*b
@@ -175,7 +131,7 @@ function Solve._can_solve_internal_no_check_right(C::Solve.SolveCtx{T}, b::MatEl
   end
 end
 
-function Solve._can_solve_internal_no_check_left(C::Solve.SolveCtx{T}, b::MatElem{T}, task::Symbol) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
+function Solve._can_solve_internal_no_check_left(::Solve.LUTrait, C::Solve.SolveCtx{T, Solve.LUTrait}, b::MatElem{T}, task::Symbol) where {T <: Union{fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem}}
   LU = Solve.reduced_matrix_of_transpose(C)
   p = Solve.lu_permutation_of_transpose(C)
   pbt = p*transpose(b)
@@ -371,6 +327,6 @@ end
 #
 ###############################################################################
 
-function norm(v::Union{AcbMatrix, ArbMatrix, ComplexMat, RealMat})
+function norm(v::Union{AcbMatrix, ArbMatrix, ComplexMatrix, RealMatrix})
   return sqrt(sum(a^2 for a in v; init=zero(base_ring(v))))
 end

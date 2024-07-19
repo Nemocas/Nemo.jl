@@ -627,95 +627,190 @@ end
   @test_throws ErrorException inv(matrix(R, 2, 1, [1, 1]))
 end
 
-@testset "zzModMatrix.solve" begin
-  Z17, = residue_ring(ZZ, 17)
-  R = matrix_space(Z17, 3, 3)
-  S = matrix_space(Z17, 3, 4)
+@testset "ZZModMatrix.solve over $R with $NFTrait" for (R, NFTrait) in [
+    (residue_ring(ZZ, 18)[1], AbstractAlgebra.Solve.HowellFormTrait()),
+    (residue_ring(ZZ, 17)[1], AbstractAlgebra.Solve.LUTrait())
+   ]
+  a = R[1 2 3; 3 2 1; 0 0 2]
 
-  a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(R) === AbstractAlgebra.Solve.HowellFormTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(a) === AbstractAlgebra.Solve.HowellFormTrait()
 
-  b = S([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
+  b = R[2 1 0 1; 0 0 0 0; 0 1 2 0]
 
   c = a*b
 
-  d = solve(a, c, side = :right)
+  d = solve(NFTrait, a, c, side = :right)
 
-  @test d == b
+  @test a*d == c
 
-  a = zero(R)
+  a = zero_matrix(R, 3, 3)
 
-  @test_throws ArgumentError solve(a, c, side = :right)
+  @test_throws ArgumentError solve(NFTrait, a, c, side = :right)
 
   for i in 1:10
     m = rand(0:10)
     n = rand(0:10)
     k = rand(0:10)
 
-    M = matrix_space(Z17, n, k)
-    N = matrix_space(Z17, n, m)
+    M = matrix_space(R, n, k)
+    N = matrix_space(R, n, m)
 
     A = rand(M)
     B = rand(N)
 
-    fl, X, K = can_solve_with_solution_and_kernel(A, B, side = :right)
+    fl, X, K = can_solve_with_solution_and_kernel(NFTrait, A, B, side = :right)
 
     if fl
       @test A * X == B
       @test is_zero(A*K)
-      @test rank(A) + ncols(K) == ncols(A)
     end
   end
 
-  A = matrix(Z17, 2, 2, [1, 2, 2, 5])
-  B = matrix(Z17, 2, 1, [1, 2])
-  fl, X = can_solve_with_solution(A, B, side = :right)
+  A = matrix(R, 2, 2, [1, 2, 2, 5])
+  B = matrix(R, 2, 1, [1, 2])
+  fl, X = can_solve_with_solution(NFTrait, A, B, side = :right)
   @test fl
   @test A * X == B
-  @test can_solve(A, B, side = :right)
+  @test can_solve(NFTrait, A, B, side = :right)
 
-  A = matrix(Z17, 2, 2, [1, 2, 2, 4])
-  B = matrix(Z17, 2, 1, [1, 2])
-  fl, X = can_solve_with_solution(A, B, side = :right)
+  A = matrix(R, 2, 2, [1, 2, 2, 4])
+  B = matrix(R, 2, 1, [1, 2])
+  fl, X = can_solve_with_solution(NFTrait, A, B, side = :right)
   @test fl
   @test A * X == B
-  @test can_solve(A, B, side = :right)
+  @test can_solve(NFTrait, A, B, side = :right)
 
-  A = matrix(Z17, 2, 2, [1, 2, 2, 4])
-  B = matrix(Z17, 2, 1, [1, 3])
-  fl, X = can_solve_with_solution(A, B, side = :right)
+  A = matrix(R, 2, 2, [1, 2, 2, 4])
+  B = matrix(R, 2, 1, [1, 3])
+  fl, X = can_solve_with_solution(NFTrait, A, B, side = :right)
   @test !fl
-  @test !can_solve(A, B, side = :right)
+  @test !can_solve(NFTrait, A, B, side = :right)
 
-  A = zero_matrix(Z17, 2, 3)
-  B = identity_matrix(Z17, 3)
-  @test_throws ErrorException can_solve_with_solution(A, B, side = :right)
+  A = zero_matrix(R, 2, 3)
+  B = identity_matrix(R, 3)
+  @test_throws ErrorException can_solve_with_solution(NFTrait, A, B, side = :right)
 
-  A = transpose(matrix(Z17, 2, 2, [1, 2, 2, 5]))
-  B = transpose(matrix(Z17, 2, 1, [1, 2]))
-  fl, X = can_solve_with_solution(A, B)
+  A = transpose(matrix(R, 2, 2, [1, 2, 2, 5]))
+  B = transpose(matrix(R, 2, 1, [1, 2]))
+  fl, X = can_solve_with_solution(NFTrait, A, B)
   @test fl
   @test X * A == B
-  @test can_solve(A, B)
+  @test can_solve(NFTrait, A, B)
 
-  A = transpose(matrix(Z17, 2, 2, [1, 2, 2, 4]))
-  B = transpose(matrix(Z17, 2, 1, [1, 2]))
-  fl, X = can_solve_with_solution(A, B)
+  A = transpose(matrix(R, 2, 2, [1, 2, 2, 4]))
+  B = transpose(matrix(R, 2, 1, [1, 2]))
+  fl, X = can_solve_with_solution(NFTrait, A, B)
   @test fl
   @test X * A == B
-  @test can_solve(A, B)
+  @test can_solve(NFTrait, A, B)
 
-  A = transpose(matrix(Z17, 2, 2, [1, 2, 2, 4]))
-  B = transpose(matrix(Z17, 2, 1, [1, 3]))
-  fl, X = can_solve_with_solution(A, B)
+  A = transpose(matrix(R, 2, 2, [1, 2, 2, 4]))
+  B = transpose(matrix(R, 2, 1, [1, 3]))
+  fl, X = can_solve_with_solution(NFTrait, A, B)
   @test !fl
-  @test !can_solve(A, B)
+  @test !can_solve(NFTrait, A, B)
 
-  A = transpose(zero_matrix(Z17, 2, 3))
-  B = transpose(identity_matrix(Z17, 3))
-  @test_throws ErrorException can_solve_with_solution(A, B)
+  A = transpose(zero_matrix(R, 2, 3))
+  B = transpose(identity_matrix(R, 3))
+  @test_throws ErrorException can_solve_with_solution(NFTrait, A, B)
 
-  @test_throws ArgumentError can_solve_with_solution(A, B, side = :garbage)
-  @test_throws ArgumentError can_solve(A, B, side = :garbage)
+  @test_throws ArgumentError can_solve_with_solution(NFTrait, A, B, side = :garbage)
+  @test_throws ArgumentError can_solve(NFTrait, A, B, side = :garbage)
+end
+
+@testset "zzModMatrix.solve_context" begin
+  R, _ = residue_ring(ZZ, 18)
+  A = matrix(R, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
+  C = solve_init(A)
+  @test C isa AbstractAlgebra.solve_context_type(R)
+  @test C isa AbstractAlgebra.solve_context_type(A)
+
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.HowellFormTrait()
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.HowellFormTrait(), zzModRingElem)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.HowellFormTrait(), R())
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.HowellFormTrait(), zzModRing)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.HowellFormTrait(), R)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.HowellFormTrait(), typeof(A))
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.HowellFormTrait(), A)
+
+  @test_throws ErrorException solve(C, [ R(1) ])
+  @test_throws ErrorException solve(C, [ R(1) ], side = :right)
+  @test_throws ErrorException solve(C, matrix(R, 1, 1, [ R(1) ]))
+  @test_throws ErrorException solve(C, matrix(R, 1, 1, [ R(1) ]), side = :right)
+  @test_throws ArgumentError solve(C, [ R(1), R(2), R(3) ], side = :test)
+  @test_throws ArgumentError solve(C, matrix(R, 3, 1, [ R(1), R(2), R(3) ]), side = :test)
+
+  for b in [ [ R(1), R(2), R(3) ],
+            matrix(R, 3, 1, [ R(1), R(2), R(3) ]),
+            matrix(R, 3, 2, [ R(1), R(2), R(3), R(4), R(5), R(6) ]) ]
+    @test @inferred can_solve(C, b, side = :right)
+    x = @inferred solve(C, b, side = :right)
+    @test A*x == b
+    fl, x = @inferred can_solve_with_solution(C, b, side = :right)
+    @test fl
+    @test A*x == b
+    fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b, side = :right)
+    @test fl
+    @test A*x == b
+    @test is_zero(A*K)
+    @test ncols(K) == 2
+    K = @inferred kernel(C, side = :right)
+    @test is_zero(A*K)
+    @test ncols(K) == 2
+  end
+
+  for b in [ [ R(1), R(1), R(1), R(1), R(1) ],
+            matrix(R, 1, 5, [ R(1), R(1), R(1), R(1), R(1) ]),
+            matrix(R, 2, 5, [ R(1), R(1), R(1), R(1), R(1),
+                             R(1), R(1), R(1), R(1), R(1) ]) ]
+    @test_throws ArgumentError solve(C, b)
+    @test @inferred !can_solve(C, b)
+    fl, x = @inferred can_solve_with_solution(C, b)
+    @test !fl
+    fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b)
+    @test !fl
+  end
+
+  for b in [ [ R(1), R(2), R(3), R(4), R(5) ],
+            matrix(R, 1, 5, [ R(1), R(2), R(3), R(4), R(5)]),
+            matrix(R, 2, 5, [ R(1), R(2), R(3), R(4), R(5),
+                             R(0), R(0), R(8), R(9), R(10) ]) ]
+    @test @inferred can_solve(C, b)
+    x = @inferred solve(C, b)
+    @test x*A == b
+    fl, x = @inferred can_solve_with_solution(C, b)
+    @test fl
+    @test x*A == b
+    fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b)
+    @test fl
+    @test x*A == b
+    @test is_zero(K*A)
+    @test nrows(K) == 0
+    K = @inferred kernel(C)
+    @test is_zero(K*A)
+    @test nrows(K) == 0
+  end
+
+  N = zero_matrix(R, 2, 1)
+  C = solve_init(N)
+  b = zeros(R, 2)
+  fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b, side = :right)
+  @test fl
+  @test N*x == b
+  @test K == identity_matrix(R, 1)
+  K = @inferred kernel(C, side = :right)
+  @test K == identity_matrix(R, 1)
+
+  N = zero_matrix(R, 1, 2)
+  C = solve_init(N)
+  b = zeros(R, 1)
+  fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b, side = :right)
+  @test fl
+  @test N*x == b
+  @test K == identity_matrix(R, 2) || K == swap_cols!(identity_matrix(R, 2), 1, 2)
+  K = @inferred kernel(C, side = :right)
+  @test K == identity_matrix(R, 2) || K == swap_cols!(identity_matrix(R, 2), 1, 2)
 end
 
 @testset "zzModMatrix.lu" begin
@@ -956,16 +1051,16 @@ end
   R, _ = residue_ring(ZZ, 17)
   M = matrix(R, [ 1 2 3 ; 4 5 6 ])
 
-  K = @inferred kernel(M, side = :right)
+  K = @inferred kernel(AbstractAlgebra.Solve.RREFTrait(), M, side = :right)
   @test is_zero(M*K)
   @test ncols(K) == 1
 
-  K = @inferred kernel(M)
+  K = @inferred kernel(AbstractAlgebra.Solve.RREFTrait(), M)
   @test is_zero(K*M)
   @test nrows(K) == 0
 
   M = transpose(M)
-  K = @inferred kernel(M)
+  K = @inferred kernel(AbstractAlgebra.Solve.RREFTrait(), M)
   @test is_zero(K*M)
   @test nrows(K) == 1
 

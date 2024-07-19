@@ -525,10 +525,9 @@ function AbstractAlgebra._solve_tril!(A::T, B::T, C::T, unit::Int = 0) where T <
   ccall((:nmod_mat_solve_tril, libflint), Cvoid, (Ref{T}, Ref{T}, Ref{T}, Cint), A, B, C, unit)
 end
 
-function Solve._can_solve_internal_no_check(A::zzModMatrix, b::zzModMatrix, task::Symbol; side::Symbol = :left)
-  @assert base_ring(A) === base_ring(b) "Base rings do not match"
+function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::zzModMatrix, b::zzModMatrix, task::Symbol; side::Symbol = :left)
   if side === :left
-    fl, sol, K = Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
+    fl, sol, K = Solve._can_solve_internal_no_check(Solve.LUTrait(), transpose(A), transpose(b), task, side = :right)
     return fl, transpose(sol), transpose(K)
   end
 
@@ -542,6 +541,9 @@ function Solve._can_solve_internal_no_check(A::zzModMatrix, b::zzModMatrix, task
   end
   return Bool(fl), x, kernel(A, side = :right)
 end
+
+# For _can_solve_internal_no_check(::HowellFormTrait, ...) we use generic
+# AbstractAlgebra code
 
 ################################################################################
 #
@@ -884,35 +886,15 @@ function nullspace(M::zzModMatrix)
   return nullity, view(N, 1:nrows(N), 1:nullity)
 end
 
-function kernel(M::zzModMatrix; side::Symbol = :left)
+function kernel(::Solve.RREFTrait, M::Union{zzModMatrix, ZZModMatrix}; side::Symbol = :left)
   Solve.check_option(side, [:right, :left], "side")
 
   if side === :left
-    K = kernel(transpose(M), side = :right)
+    K = kernel(Solve.RREFTrait(), transpose(M), side = :right)
     return transpose(K)
   end
 
-  R = base_ring(M)
-  if is_prime(modulus(R))
-    return nullspace(M)[2]
-  end
-
-  H = hcat(transpose(M), identity_matrix(R, ncols(M)))
-  if nrows(H) < ncols(H)
-    H = vcat(H, zero_matrix(R, ncols(H) - nrows(H), ncols(H)))
-  end
-  howell_form!(H)
-  nr = 1
-  while nr <= nrows(H) && !is_zero_row(H, nr)
-    nr += 1
-  end
-  nr -= 1
-  h = view(H, 1:nr, 1:nrows(M))
-  for i = 1:nrows(h)
-    if is_zero_row(h, i)
-      k = view(H, i:nrows(h), nrows(M) + 1:ncols(H))
-      return transpose(k)
-    end
-  end
-  return zero_matrix(R, ncols(M), 0)
+  return nullspace(M)[2]
 end
+
+# For kernel(::HowellFormTrait, ...) we use generic AbstractAlgebra code

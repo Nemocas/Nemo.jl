@@ -369,6 +369,8 @@ ceil(::Type{ZZRingElem}, x::ZZRingElem) = x
 trunc(::Type{ZZRingElem}, x::ZZRingElem) = x
 round(::Type{ZZRingElem}, x::ZZRingElem) = x
 
+conj(x::ZZRingElem) = x
+
 ###############################################################################
 #
 #   Binary operators and functions

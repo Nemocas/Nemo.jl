@@ -28,7 +28,7 @@ base_ring(a::AcbMatrix) = a.base_ring
 
 dense_matrix_type(::Type{AcbFieldElem}) = AcbMatrix
 
-precision(x::AcbMatSpace) = precision(base_ring(x))
+precision(x::AcbMatrixSpace) = precision(base_ring(x))
 
 function getindex!(z::AcbFieldElem, x::AcbMatrix, r::Int, c::Int)
   GC.@preserve x begin
@@ -82,7 +82,7 @@ end
 setindex!(x::AcbMatrix, y::Tuple{Rational{T}, Rational{T}}, r::Int, c::Int) where {T <: Integer} =
 setindex!(x, map(QQFieldElem, y), r, c)
 
-function one(x::AcbMatSpace)
+function one(x::AcbMatrixSpace)
   z = x()
   ccall((:acb_mat_one, libflint), Nothing, (Ref{AcbMatrix}, ), z)
   return z
@@ -568,10 +568,13 @@ function _solve_lu_precomp(P::Perm, LU::AcbMatrix, y::AcbMatrix)
   return z
 end
 
-function Solve._can_solve_internal_no_check(A::AcbMatrix, b::AcbMatrix, task::Symbol; side::Symbol = :left)
+Solve.matrix_normal_form_type(::AcbField) = Solve.LUTrait()
+Solve.matrix_normal_form_type(::AcbMatrix) = Solve.LUTrait()
+
+function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::AcbMatrix, b::AcbMatrix, task::Symbol; side::Symbol = :left)
   nrows(A) != ncols(A) && error("Only implemented for square matrices")
   if side === :left
-    fl, sol, K = Solve._can_solve_internal_no_check(transpose(A), transpose(b), task, side = :right)
+    fl, sol, K = Solve._can_solve_internal_no_check(Solve.LUTrait(), transpose(A), transpose(b), task, side = :right)
     return fl, transpose(sol), transpose(K)
   end
 
@@ -593,9 +596,7 @@ end
 #
 ################################################################################
 
-AbstractAlgebra.solve_context_type(::Type{AcbFieldElem}) = Solve.SolveCtx{AcbFieldElem, AcbMatrix, AcbMatrix, AcbMatrix}
-
-function Solve._init_reduce(C::Solve.SolveCtx{AcbFieldElem})
+function Solve._init_reduce(C::Solve.SolveCtx{AcbFieldElem, Solve.LUTrait})
   if isdefined(C, :red) && isdefined(C, :lu_perm)
     return nothing
   end
@@ -618,7 +619,7 @@ function Solve._init_reduce(C::Solve.SolveCtx{AcbFieldElem})
   return nothing
 end
 
-function Solve._init_reduce_transpose(C::Solve.SolveCtx{AcbFieldElem})
+function Solve._init_reduce_transpose(C::Solve.SolveCtx{AcbFieldElem, Solve.LUTrait})
   if isdefined(C, :red_transp) && isdefined(C, :lu_perm_transp)
     return nothing
   end
@@ -641,7 +642,7 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{AcbFieldElem})
   return nothing
 end
 
-function Solve._can_solve_internal_no_check(C::Solve.SolveCtx{AcbFieldElem}, b::AcbMatrix, task::Symbol; side::Symbol = :left)
+function Solve._can_solve_internal_no_check(::Solve.LUTrait, C::Solve.SolveCtx{AcbFieldElem, Solve.LUTrait}, b::AcbMatrix, task::Symbol; side::Symbol = :left)
   if side === :right
     LU = Solve.reduced_matrix(C)
     p = Solve.lu_permutation(C)
@@ -742,13 +743,13 @@ end
 #
 ###############################################################################
 
-function (x::AcbMatSpace)()
+function (x::AcbMatrixSpace)()
   z = AcbMatrix(nrows(x), ncols(x))
   z.base_ring = x.base_ring
   return z
 end
 
-function (x::AcbMatSpace)(y::ZZMatrix)
+function (x::AcbMatrixSpace)(y::ZZMatrix)
   (ncols(x) != ncols(y) || nrows(x) != nrows(y)) &&
   error("Dimensions are wrong")
   z = AcbMatrix(y, precision(x))
@@ -756,7 +757,7 @@ function (x::AcbMatSpace)(y::ZZMatrix)
   return z
 end
 
-function (x::AcbMatSpace)(y::ArbMatrix)
+function (x::AcbMatrixSpace)(y::ArbMatrix)
   (ncols(x) != ncols(y) || nrows(x) != nrows(y)) &&
   error("Dimensions are wrong")
   z = AcbMatrix(y, precision(x))
@@ -766,14 +767,14 @@ end
 
 for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, ArbFieldElem, AcbFieldElem, String]
   @eval begin
-    function (x::AcbMatSpace)(y::AbstractMatrix{$T})
+    function (x::AcbMatrixSpace)(y::AbstractMatrix{$T})
       _check_dim(nrows(x), ncols(x), y)
       z = AcbMatrix(nrows(x), ncols(x), y, precision(x))
       z.base_ring = x.base_ring
       return z
     end
 
-    function (x::AcbMatSpace)(y::AbstractVector{$T})
+    function (x::AcbMatrixSpace)(y::AbstractVector{$T})
       _check_dim(nrows(x), ncols(x), y)
       z = AcbMatrix(nrows(x), ncols(x), y, precision(x))
       z.base_ring = x.base_ring
@@ -782,24 +783,24 @@ for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, ArbFieldElem, AcbFieldElem
   end
 end
 
-(x::AcbMatSpace)(y::AbstractMatrix{T}) where {T <: Integer} = x(map(ZZRingElem, y))
+(x::AcbMatrixSpace)(y::AbstractMatrix{T}) where {T <: Integer} = x(map(ZZRingElem, y))
 
-(x::AcbMatSpace)(y::AbstractVector{T}) where {T <: Integer} = x(map(ZZRingElem, y))
+(x::AcbMatrixSpace)(y::AbstractVector{T}) where {T <: Integer} = x(map(ZZRingElem, y))
 
-(x::AcbMatSpace)(y::AbstractMatrix{Rational{T}}) where {T <: Integer} = x(map(QQFieldElem, y))
+(x::AcbMatrixSpace)(y::AbstractMatrix{Rational{T}}) where {T <: Integer} = x(map(QQFieldElem, y))
 
-(x::AcbMatSpace)(y::AbstractVector{Rational{T}}) where {T <: Integer} = x(map(QQFieldElem, y))
+(x::AcbMatrixSpace)(y::AbstractVector{Rational{T}}) where {T <: Integer} = x(map(QQFieldElem, y))
 
 for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, ArbFieldElem, String]
   @eval begin
-    function (x::AcbMatSpace)(y::AbstractMatrix{Tuple{$T, $T}})
+    function (x::AcbMatrixSpace)(y::AbstractMatrix{Tuple{$T, $T}})
       _check_dim(nrows(x), ncols(x), y)
       z = AcbMatrix(nrows(x), ncols(x), y, precision(x))
       z.base_ring = x.base_ring
       return z
     end
 
-    function (x::AcbMatSpace)(y::AbstractVector{Tuple{$T, $T}})
+    function (x::AcbMatrixSpace)(y::AbstractVector{Tuple{$T, $T}})
       _check_dim(nrows(x), ncols(x), y)
       z = AcbMatrix(nrows(x), ncols(x), y, precision(x))
       z.base_ring = x.base_ring
@@ -808,21 +809,21 @@ for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, ArbFieldElem, String]
   end
 end
 
-(x::AcbMatSpace)(y::AbstractMatrix{Tuple{T, T}}) where {T <: Integer} =
+(x::AcbMatrixSpace)(y::AbstractMatrix{Tuple{T, T}}) where {T <: Integer} =
 x(map(z -> (ZZRingElem(z[1]), ZZRingElem(z[2])), y))
 
-(x::AcbMatSpace)(y::AbstractVector{Tuple{T, T}}) where {T <: Integer} =
+(x::AcbMatrixSpace)(y::AbstractVector{Tuple{T, T}}) where {T <: Integer} =
 x(map(z -> (ZZRingElem(z[1]), ZZRingElem(z[2])), y))
 
-(x::AcbMatSpace)(y::AbstractMatrix{Tuple{Rational{T}, Rational{T}}}) where {T <: Integer} =
+(x::AcbMatrixSpace)(y::AbstractMatrix{Tuple{Rational{T}, Rational{T}}}) where {T <: Integer} =
 x(map(z -> (QQFieldElem(z[1]), QQFieldElem(z[2])), y))
 
-(x::AcbMatSpace)(y::AbstractVector{Tuple{Rational{T}, Rational{T}}}) where {T <: Integer} =
+(x::AcbMatrixSpace)(y::AbstractVector{Tuple{Rational{T}, Rational{T}}}) where {T <: Integer} =
 x(map(z -> (QQFieldElem(z[1]), QQFieldElem(z[2])), y))
 
 for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AcbFieldElem, String]
   @eval begin
-    function (x::AcbMatSpace)(y::$T)
+    function (x::AcbMatrixSpace)(y::$T)
       z = x()
       for i in 1:nrows(z)
         for j = 1:ncols(z)
@@ -838,7 +839,7 @@ for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, Acb
   end
 end
 
-(x::AcbMatSpace)(y::Rational{T}) where {T <: Integer} = x(QQFieldElem(y))
+(x::AcbMatrixSpace)(y::Rational{T}) where {T <: Integer} = x(QQFieldElem(y))
 
 ###############################################################################
 #

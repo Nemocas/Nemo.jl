@@ -687,6 +687,10 @@ end
 
 @testset "ZZMatrix.solve" begin
   A = matrix(ZZ, 2, 2, [1,2,3,4])
+
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(ZZ) === AbstractAlgebra.Solve.HermiteFormTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(A) === AbstractAlgebra.Solve.HermiteFormTrait()
+
   b = matrix(ZZ, 1, 2, [1, 6])
   @test Nemo._solve_triu_left(A, b) == matrix(ZZ, 1, 2, [1, 1])
   b = matrix(ZZ, 2, 1, [3, 4])
@@ -743,12 +747,16 @@ end
   @test nrows(K) + rank(A) == nrows(A)
 
   C = solve_init(A)
-  @test C isa AbstractAlgebra.solve_context_type(ZZRingElem)
-  @test C isa AbstractAlgebra.solve_context_type(ZZ())
-  @test C isa AbstractAlgebra.solve_context_type(ZZRing)
   @test C isa AbstractAlgebra.solve_context_type(ZZ)
-  @test C isa AbstractAlgebra.solve_context_type(typeof(A))
   @test C isa AbstractAlgebra.solve_context_type(A)
+
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.HermiteFormTrait()
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.HermiteFormTrait(), ZZRingElem)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.HermiteFormTrait(), ZZ())
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.HermiteFormTrait(), ZZRing)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.HermiteFormTrait(), ZZ)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.HermiteFormTrait(), typeof(A))
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.HermiteFormTrait(), A)
 
   B = matrix(ZZ, 2, 1, [1, 1])
   fl, x, K = can_solve_with_solution_and_kernel(C, B, side = :right)

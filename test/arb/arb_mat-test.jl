@@ -4,20 +4,20 @@ RR = ArbField(64)
   @test_throws ErrorException matrix_space(RR, -1, 5)
   @test_throws ErrorException matrix_space(RR, 0, -2)
   @test_throws ErrorException matrix_space(RR, -3, -4)
-  @test_throws ErrorException ArbMatSpace(RR, 2, -1)
-  @test_throws ErrorException ArbMatSpace(RR, -1, 2)
-  @test_throws ErrorException ArbMatSpace(RR, -1, -1)
+  @test_throws ErrorException ArbMatrixSpace(RR, 2, -1)
+  @test_throws ErrorException ArbMatrixSpace(RR, -1, 2)
+  @test_throws ErrorException ArbMatrixSpace(RR, -1, -1)
 
   S = matrix_space(RR, 3, 3)
   R = matrix_space(ZZ, 3, 3)
 
   @test elem_type(S) == ArbMatrix
-  @test elem_type(ArbMatSpace) == ArbMatrix
-  @test parent_type(ArbMatrix) == ArbMatSpace
+  @test elem_type(ArbMatrixSpace) == ArbMatrix
+  @test parent_type(ArbMatrix) == ArbMatrixSpace
   @test nrows(S) == 3
   @test ncols(S) == 3
 
-  @test isa(S, ArbMatSpace)
+  @test isa(S, ArbMatrixSpace)
 
   f = S(ZZRingElem(3))
 
@@ -441,6 +441,9 @@ end
          "4.0 +/- 0.01" "5.0 +/- 0.01" "6.0 +/- 0.01";
          "8.0 +/- 0.01" "8.0 +/- 0.01" "9.0 +/- 0.01"])
 
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(RR) === AbstractAlgebra.Solve.LUTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(A) === AbstractAlgebra.Solve.LUTrait()
+
   b = transpose(RR["6.0 +/- 0.1" "15.0 +/- 0.1" "25.0 +/- 0.1"])
   b2 = 2*b
 
@@ -461,12 +464,16 @@ end
   @test contains(transpose(y), ZZ[1 1 1])
 
   C = solve_init(A)
-  @test C isa AbstractAlgebra.solve_context_type(elem_type(RR))
-  @test C isa AbstractAlgebra.solve_context_type(RR())
-  @test C isa AbstractAlgebra.solve_context_type(typeof(RR))
   @test C isa AbstractAlgebra.solve_context_type(RR)
-  @test C isa AbstractAlgebra.solve_context_type(typeof(A))
   @test C isa AbstractAlgebra.solve_context_type(A)
+
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.LUTrait()
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), elem_type(RR))
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), RR())
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), typeof(RR))
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), RR)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), typeof(A))
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), A)
 
   fl, y, K = can_solve_with_solution_and_kernel(C, b, side = :right)
   @test fl

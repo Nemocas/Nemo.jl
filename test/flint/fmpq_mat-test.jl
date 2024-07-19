@@ -581,6 +581,9 @@ end
 
   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 2 2])
 
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(QQ) === AbstractAlgebra.Solve.RREFTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(A) === AbstractAlgebra.Solve.RREFTrait()
+
   T = matrix_space(QQ, 3, 1)
 
   B = T([QQFieldElem(4), 5, 7])
@@ -707,12 +710,16 @@ end
 @testset "QQMatrix.solve_context" begin
   A = matrix(QQ, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
   C = solve_init(A)
-  @test C isa AbstractAlgebra.solve_context_type(QQFieldElem)
-  @test C isa AbstractAlgebra.solve_context_type(QQ())
-  @test C isa AbstractAlgebra.solve_context_type(QQField)
   @test C isa AbstractAlgebra.solve_context_type(QQ)
-  @test C isa AbstractAlgebra.solve_context_type(typeof(A))
   @test C isa AbstractAlgebra.solve_context_type(A)
+
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.RREFTrait()
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), QQFieldElem)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), QQ())
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), QQField)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), QQ)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), typeof(A))
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), A)
 
   @test_throws ErrorException solve(C, [ QQ(1) ])
   @test_throws ErrorException solve(C, [ QQ(1) ], side = :right)

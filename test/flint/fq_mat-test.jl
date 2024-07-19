@@ -564,6 +564,9 @@ end
 
   a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
 
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(F17) === AbstractAlgebra.Solve.LUTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(a) === AbstractAlgebra.Solve.LUTrait()
+
   b = S([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
 
   c = a*b
@@ -652,12 +655,16 @@ end
   F, _ = Native.finite_field(ZZRingElem(101), 1, "a")
   A = matrix(F, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
   C = solve_init(A)
-  @test C isa AbstractAlgebra.solve_context_type(FqPolyRepFieldElem)
-  @test C isa AbstractAlgebra.solve_context_type(F())
-  @test C isa AbstractAlgebra.solve_context_type(FqPolyRepField)
   @test C isa AbstractAlgebra.solve_context_type(F)
-  @test C isa AbstractAlgebra.solve_context_type(typeof(A))
   @test C isa AbstractAlgebra.solve_context_type(A)
+
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.LUTrait()
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), FqPolyRepFieldElem)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), F())
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), FqPolyRepField)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), F)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), typeof(A))
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), A)
 
   @test_throws ErrorException solve(C, [ F(1) ])
   @test_throws ErrorException solve(C, [ F(1) ], side = :right)
