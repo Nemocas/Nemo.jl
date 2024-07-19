@@ -1051,16 +1051,16 @@ end
   R, _ = residue_ring(ZZ, 17)
   M = matrix(R, [ 1 2 3 ; 4 5 6 ])
 
-  K = @inferred kernel(M, side = :right)
+  K = @inferred kernel(AbstractAlgebra.Solve.RREFTrait(), M, side = :right)
   @test is_zero(M*K)
   @test ncols(K) == 1
 
-  K = @inferred kernel(M)
+  K = @inferred kernel(AbstractAlgebra.Solve.RREFTrait(), M)
   @test is_zero(K*M)
   @test nrows(K) == 0
 
   M = transpose(M)
-  K = @inferred kernel(M)
+  K = @inferred kernel(AbstractAlgebra.Solve.RREFTrait(), M)
   @test is_zero(K*M)
   @test nrows(K) == 1
 
