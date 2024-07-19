@@ -631,6 +631,9 @@ end
 
   a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
 
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(Z17) === AbstractAlgebra.Solve.LUTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(a) === AbstractAlgebra.Solve.LUTrait()
+
   b = S([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
 
   c = a*b

@@ -579,25 +579,32 @@ end
   @test_throws ErrorException inv(matrix(R, 2, 1, [1, 1]))
 end
 
-@testset "ZZModMatrix.solve over $R" for R in [residue_ring(ZZ, ZZ(17))[1], residue_ring(ZZ, ZZ(18))[1]]
+@testset "ZZModMatrix.solve over $R with $NFTrait" for (R, NFTrait) in [
+    (residue_ring(ZZ, ZZ(18))[1], AbstractAlgebra.Solve.HowellFormTrait()),
+    (residue_ring(ZZ, ZZ(17))[1], AbstractAlgebra.Solve.LUTrait())
+   ]
   a = matrix(R, [1 2 3; 3 2 1; 0 0 2])
+
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(R) === AbstractAlgebra.Solve.HowellFormTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(a) === AbstractAlgebra.Solve.HowellFormTrait()
+
   b = matrix(R, [2 1 0 1; 0 0 0 0; 0 1 2 0])
   c = a*b
-  d = solve(a, c, side = :right)
+  d = solve(NFTrait, a, c, side = :right)
   @test a*d == c
 
   a = zero(a, 3, 3)
-  @test_throws ArgumentError solve(a, c, side = :right)
+  @test_throws ArgumentError solve(NFTrait, a, c, side = :right)
 
   A = matrix(R, [1 2 3; 4 5 6])
   B = matrix(R, 2, 1, [1, 1])
-  fl, x, K = can_solve_with_solution_and_kernel(A, B, side = :right)
+  fl, x, K = can_solve_with_solution_and_kernel(NFTrait, A, B, side = :right)
   @test fl
   @test A*x == B
   @test is_zero(A*K)
 
   B = matrix(R, 1, 3, [1, 2, 3])
-  fl, x, K = can_solve_with_solution_and_kernel(A, B)
+  fl, x, K = can_solve_with_solution_and_kernel(NFTrait, A, B)
   @test fl
   @test x*A == B
   @test is_zero(K*A)

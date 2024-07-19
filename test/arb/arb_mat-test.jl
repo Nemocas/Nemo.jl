@@ -441,6 +441,9 @@ end
          "4.0 +/- 0.01" "5.0 +/- 0.01" "6.0 +/- 0.01";
          "8.0 +/- 0.01" "8.0 +/- 0.01" "9.0 +/- 0.01"])
 
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(RR) === AbstractAlgebra.Solve.LUTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(A) === AbstractAlgebra.Solve.LUTrait()
+
   b = transpose(RR["6.0 +/- 0.1" "15.0 +/- 0.1" "25.0 +/- 0.1"])
   b2 = 2*b
 

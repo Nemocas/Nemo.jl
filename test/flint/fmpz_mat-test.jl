@@ -687,6 +687,10 @@ end
 
 @testset "ZZMatrix.solve" begin
   A = matrix(ZZ, 2, 2, [1,2,3,4])
+
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(ZZ) === AbstractAlgebra.Solve.HermiteFormTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(A) === AbstractAlgebra.Solve.HermiteFormTrait()
+
   b = matrix(ZZ, 1, 2, [1, 6])
   @test Nemo._solve_triu_left(A, b) == matrix(ZZ, 1, 2, [1, 1])
   b = matrix(ZZ, 2, 1, [3, 4])

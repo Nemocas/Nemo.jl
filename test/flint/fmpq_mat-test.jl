@@ -581,6 +581,9 @@ end
 
   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 2 2])
 
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(QQ) === AbstractAlgebra.Solve.RREFTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(A) === AbstractAlgebra.Solve.RREFTrait()
+
   T = matrix_space(QQ, 3, 1)
 
   B = T([QQFieldElem(4), 5, 7])
