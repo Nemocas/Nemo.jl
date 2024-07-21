@@ -3195,3 +3195,71 @@ end
 //(v::Vector{ZZRingElem}, x::ZZRingElem) = v .// x
 *(x::ZZRingElem, v::Vector{ZZRingElem}) = x .* v
 *(v::Vector{ZZRingElem}, x::ZZRingElem) = v .* x
+
+################################################################################
+#
+#  Auto-generated bindings (DO NOT EDIT)
+#
+################################################################################
+
+function neg!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr)
+  ccall((:fmpz_neg, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}), z, x)
+  return z
+end
+
+function add!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
+  ccall((:fmpz_add, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x, y)
+  return z
+end
+
+function add!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::UInt)
+  ccall((:fmpz_add_ui, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt), z, x, y)
+  return z
+end
+
+add!(z::ZZRingElemOrPtr, x::UInt, y::ZZRingElemOrPtr) = add!(z, y, x)
+
+function add!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Int)
+  ccall((:fmpz_add_si, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), z, x, y)
+  return z
+end
+
+add!(z::ZZRingElemOrPtr, x::Int, y::ZZRingElemOrPtr) = add!(z, y, x)
+
+function sub!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
+  ccall((:fmpz_sub, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x, y)
+  return z
+end
+
+function sub!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::UInt)
+  ccall((:fmpz_sub_ui, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt), z, x, y)
+  return z
+end
+
+sub!(z::ZZRingElemOrPtr, x::UInt, y::ZZRingElemOrPtr) = neg!(sub!(z, y, x))
+
+function sub!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Int)
+  ccall((:fmpz_sub_si, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), z, x, y)
+  return z
+end
+
+sub!(z::ZZRingElemOrPtr, x::Int, y::ZZRingElemOrPtr) = neg!(sub!(z, y, x))
+
+function mul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
+  ccall((:fmpz_mul, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x, y)
+  return z
+end
+
+function mul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::UInt)
+  ccall((:fmpz_mul_ui, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt), z, x, y)
+  return z
+end
+
+mul!(z::ZZRingElemOrPtr, x::UInt, y::ZZRingElemOrPtr) = mul!(z, y, x)
+
+function mul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Int)
+  ccall((:fmpz_mul_si, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), z, x, y)
+  return z
+end
+
+mul!(z::ZZRingElemOrPtr, x::Int, y::ZZRingElemOrPtr) = mul!(z, y, x)
