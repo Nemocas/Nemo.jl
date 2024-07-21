@@ -1499,21 +1499,9 @@ function zero!(z::QQBarFieldElem)
   return z
 end
 
-function mul!(z::QQBarFieldElem, x::QQBarFieldElem, y::QQBarFieldElem)
-  ccall((:qqbar_mul, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, x, y)
-  return z
-end
-
 function addeq!(z::QQBarFieldElem, x::QQBarFieldElem)
   ccall((:qqbar_add, libflint), Nothing,
         (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, z, x)
-  return z
-end
-
-function add!(z::QQBarFieldElem, x::QQBarFieldElem, y::QQBarFieldElem)
-  ccall((:qqbar_add, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, x, y)
   return z
 end
 
