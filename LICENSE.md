@@ -1,21 +1,13 @@
 Various parts of Nemo are licensed differently. 
 
-As Nemo links dynamically at runtime with various libraries all of whose licenses are compatible with GPL v3+, you may safely distribute Nemo *as a whole* under the terms of that license (see the MPFR or MPIR source trees downloaded as part of the Nemo package installation for copies of this license, or refer to it online here: 
-
-https://www.gnu.org/copyleft/gpl.txt
-
 Individual parts of Nemo may be distributed according to more permissive terms as laid out below:
 
-* The MPIR and MPFR libraries are licensed LGPL v3+. The license texts are distributed with the libraries, which are downloaded as part of the Nemo package installation.
+* Parts of the file src/flint/fmpz.jl is licensed with the MIT license (see ZZ.jl for precise conditions of the license).
 
-* The Flint library is licensed LGPL v2.1+. The license text is supplied with the library, which is downloaded as part of the Nemo package installation.
+* The individual .jl files (other than src/flint/fmpz.jl) in the Nemo.jl package are licensed under the Simplified "2-clause" BSD License:
 
-* The file ZZ.jl is licensed with the MIT license (see ZZ.jl for precise conditions of the license).
-
-* The individual .jl files (other than ZZ.jl) in the Nemo.jl package are licensed under the Simplified "2-clause" BSD License:
-
-> Copyright (c) 2014-2016: William Hart, Tommy Hofmann, Claus Fieker, Fredrik
-> Johansson.
+> Copyright (c) 2014-2024: William Hart, Tommy Hofmann, Claus Fieker, Fredrik
+> Johansson, and Nemo developers.
 >
 > Redistribution and use in source and binary forms, with or without
 > modification, are permitted provided that the following conditions are
@@ -38,9 +30,6 @@ Individual parts of Nemo may be distributed according to more permissive terms a
 > THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 > (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 > OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-External libraries include their own licenses:
-
 - [GMP](https://gmplib.org/manual/Copying.html#Copying)
 - [MPFR](https://www.mpfr.org/mpfr-current/mpfr.html#Copying)
 - [MPIR](http://mpir.org/)
