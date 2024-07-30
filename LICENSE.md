@@ -30,8 +30,5 @@ Individual parts of Nemo may be distributed according to more permissive terms a
 > THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 > (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 > OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- [GMP](https://gmplib.org/manual/Copying.html#Copying)
-- [MPFR](https://www.mpfr.org/mpfr-current/mpfr.html#Copying)
-- [MPIR](http://mpir.org/)
 - [FLINT](http://flintlib.org/)
 
