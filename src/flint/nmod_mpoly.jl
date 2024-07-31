@@ -139,6 +139,11 @@ for (etype, rtype, ftype, ctype, utype) in (
                         a, parent(a)))
     end
 
+    function fit!(a::($etype), n::Int)
+      # needs to exist for the MPoly interface
+      return nothing
+    end
+
     ################################################################################
     #
     #  Getting coefficients

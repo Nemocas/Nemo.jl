@@ -78,6 +78,11 @@ function is_constant(a::FqMPolyRingElem)
   return is_constant(a.data)
 end
 
+function fit!(a::FqMPolyRingElem, n::Int)
+  # needs to exist for the MPoly interface
+  return nothing
+end
+
 ###############################################################################
 #
 #   AbstractString I/O

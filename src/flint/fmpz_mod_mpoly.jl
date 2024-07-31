@@ -145,6 +145,11 @@ for (etype, rtype, ftype, ctype) in (
                         a, parent(a)))
     end
 
+    function fit!(a::($etype), n::Int)
+      # needs to exist for the MPoly interface
+      return nothing
+    end
+
     # TODO move this
     function expressify(a::($rtype); context = nothing)
       return Expr(:sequence, Expr(:text, "Multivariate Polynomial Ring in "),
