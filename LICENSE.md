@@ -2,7 +2,7 @@ Various parts of Nemo are licensed differently.
 
 Individual parts of Nemo may be distributed according to more permissive terms as laid out below:
 
-* Parts of the file src/flint/fmpz.jl is licensed with the MIT license (see the top of that file for precise conditions of the license).
+* Parts of the file src/flint/fmpz.jl are licensed under the MIT license (see the top of that file for precise conditions of the license).
 
 * The individual .jl files (other than src/flint/fmpz.jl) in the Nemo.jl package are licensed under the Simplified "2-clause" BSD License:
 
