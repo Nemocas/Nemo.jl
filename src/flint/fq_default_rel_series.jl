@@ -806,29 +806,11 @@ function (a::FqRelPowerSeriesRing)()
 end
 
 function (a::FqRelPowerSeriesRing)(b::Integer)
-  ctx = base_ring(a)
-  if b == 0
-    z = FqRelPowerSeriesRingElem(ctx)
-    z.prec = a.prec_max
-    z.val = a.prec_max
-  else
-    z = FqRelPowerSeriesRingElem(ctx, [ctx(b)], 1, a.prec_max, 0)
-  end
-  z.parent = a
-  return z
+  return a(base_ring(a)(b))
 end
 
 function (a::FqRelPowerSeriesRing)(b::ZZRingElem)
-  ctx = base_ring(a)
-  if iszero(b)
-    z = FqRelPowerSeriesRingElem(ctx)
-    z.prec = a.prec_max
-    z.val = a.prec_max
-  else
-    z = FqRelPowerSeriesRingElem(ctx, [ctx(b)], 1, a.prec_max, 0)
-  end
-  z.parent = a
-  return z
+  return a(base_ring(a)(b))
 end
 
 function (a::FqRelPowerSeriesRing)(b::FqFieldElem)

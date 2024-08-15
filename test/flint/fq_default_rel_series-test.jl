@@ -35,6 +35,11 @@ end
   l = S(t)
 
   @test isa(l, SeriesElem)
+
+  @test is_zero(S(23))
+  @test valuation(S(23)) == max_precision(S)
+  @test is_zero(S(ZZ(23)))
+  @test valuation(S(ZZ(23))) == max_precision(S)
 end
 
 @testset "FqRelPowerSeriesRingElem.printing" begin

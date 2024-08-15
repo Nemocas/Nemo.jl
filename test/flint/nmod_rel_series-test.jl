@@ -49,6 +49,11 @@ end
   l = S(R(4))
 
   @test isa(l, SeriesElem)
+
+  @test is_zero(S(17))
+  @test valuation(S(17)) == max_precision(S)
+  @test is_zero(S(ZZ(17)))
+  @test valuation(S(ZZ(17))) == max_precision(S)
 end
 
 @testset "zzModRelPowerSeriesRingElem.printing" begin

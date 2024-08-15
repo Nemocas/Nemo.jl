@@ -26,6 +26,11 @@ end
   @test isa(R(ZZ(2)), SeriesElem)
 
   @test isa(R(), SeriesElem)
+
+  @test is_zero(R(23))
+  @test valuation(R(23)) == max_precision(R)
+  @test is_zero(R(ZZ(23)))
+  @test valuation(R(ZZ(23))) == max_precision(R)
 end
 
 @testset "FqAbsPowerSeriesRingElem.printing" begin

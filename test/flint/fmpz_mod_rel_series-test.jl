@@ -51,6 +51,13 @@ end
   @test isa(S(0), SeriesElem)
   @test isa(S(R(0)), SeriesElem)
   @test isa(S(ZZRingElem(0)), SeriesElem)
+
+  R, = residue_ring(ZZ, ZZ(12))
+  S, x = power_series_ring(R, 30, "x")
+  @test is_zero(S(12))
+  @test valuation(S(12)) == max_precision(S)
+  @test is_zero(S(ZZ(12)))
+  @test valuation(S(ZZ(12))) == max_precision(S)
 end
 
 @testset "ZZModRelPowerSeriesRingElem.printing" begin

@@ -671,27 +671,11 @@ for (etype, rtype, ctype, mtype, brtype, flint_fn) in (
     end
 
     function (a::($rtype))(b::Integer)
-      m = base_ring(a)
-      if b == 0
-        z = ($etype)(m)
-        z.prec = a.prec_max
-      else
-        z = ($etype)(m, [ZZRingElem(b)], 1, a.prec_max)
-      end
-      z.parent = a
-      return z
+      return a(base_ring(a)(b))
     end
 
     function (a::($rtype))(b::ZZRingElem)
-      m = base_ring(a)
-      if iszero(b)
-        z = ($etype)(m)
-        z.prec = a.prec_max
-      else
-        z = ($etype)(m, [b], 1, a.prec_max)
-      end
-      z.parent = a
-      return z
+      return a(base_ring(a)(b))
     end
 
     function (a::($rtype))(b::$(mtype))

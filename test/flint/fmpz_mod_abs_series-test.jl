@@ -33,6 +33,13 @@ end
   @test isa(R(ZZ(2)), SeriesElem)
 
   @test isa(R(), SeriesElem)
+
+  R, = residue_ring(ZZ, ZZ(12))
+  S, x = power_series_ring(R, 30, "x", model = :capped_absolute)
+  @test is_zero(S(12))
+  @test valuation(S(12)) == max_precision(S)
+  @test is_zero(S(ZZ(12)))
+  @test valuation(S(ZZ(12))) == max_precision(S)
 end
 
 @testset "ZZModAbsPowerSeriesRingElem.printing" begin
