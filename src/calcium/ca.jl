@@ -22,6 +22,8 @@ base_ring(a::CalciumField) = Union{}
 
 is_domain_type(::Type{CalciumFieldElem}) = true
 
+characteristic(a::CalciumField) = 0
+
 function deepcopy_internal(a::CalciumFieldElem, dict::IdDict)
   C = a.parent
   r = C()

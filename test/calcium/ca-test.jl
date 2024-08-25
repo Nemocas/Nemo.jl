@@ -32,6 +32,7 @@
   @test deepcopy(t) !== t
   @test deepcopy(t).parent === t.parent
 
+  @test characteristic(C) == 0
 end
 
 @testset "CalciumFieldElem.options" begin
@@ -419,4 +420,3 @@ end
   @test_throws ErrorException rand(C, depth=2, bits=5, randtype=:gollum)
 
 end
-
