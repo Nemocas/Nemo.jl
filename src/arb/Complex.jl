@@ -568,7 +568,7 @@ end
 @doc raw"""
     trim(x::ComplexFieldElem)
 
-Return an `AcbFieldElem` box containing $x$ but which may be more economical,
+Return an `ComplexFieldElem` box containing $x$ but which may be more economical,
 by rounding off insignificant bits from midpoints.
 """
 function trim(x::ComplexFieldElem)
