@@ -192,6 +192,7 @@ import AbstractAlgebra: Set
 import AbstractAlgebra: set_attribute!
 import AbstractAlgebra: Solve
 import AbstractAlgebra: terse
+import AbstractAlgebra: truncate!
 
 AbstractAlgebra.@include_deprecated_bindings()
 

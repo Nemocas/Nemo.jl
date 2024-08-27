@@ -122,13 +122,6 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
 
     characteristic(R::($rtype)) = characteristic(base_ring(R))
 
-    function set_precision!(z::($etype), k::Int)
-      k < 0 && throw(DomainError(k, "Precision must be non-negative"))
-      z = truncate!(z, k)
-      z.prec = k
-      return z
-    end
-
     ###############################################################################
     #
     #   Similar

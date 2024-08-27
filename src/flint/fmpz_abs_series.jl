@@ -115,13 +115,6 @@ end
 
 characteristic(::ZZAbsPowerSeriesRing) = 0
 
-function set_precision!(z::ZZAbsPowerSeriesRingElem, k::Int)
-  k < 0 && throw(DomainError(k, "Precision must be non-negative"))
-  z = truncate!(z, k)
-  z.prec = k
-  return z
-end
-
 ###############################################################################
 #
 #   Similar
