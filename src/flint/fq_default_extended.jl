@@ -856,7 +856,11 @@ function _try_promote(K::FqField, a::FqFieldElem)
     return true, K(lift(ZZ, a))
   end
 
-  if degree(K) == 1 && K !== L
+  # we have to break the base_field recursion at the prime field
+  # apparently, the only way to know if K is *the* prime field, is the property
+  # base_field(K) === K
+
+  if base_field(K) === K && K !== L
     return false, a
   end
 

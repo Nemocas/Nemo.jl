@@ -301,4 +301,12 @@ end
   @test parent(a) === FF && is_one(a)
   a = one(FF) * one(F)
   @test parent(a) === FF && is_one(a)
+
+  # some issue with recursion
+  L = GF(5);
+  Lx, x = L["x"];
+  LL, = finite_field(x - 2);
+  LLx, x = LL["x"];
+  LLL, = finite_field(x - 2);
+  @test one(LLL) + one(prime_field(LL)) == 2
 end
