@@ -21,7 +21,7 @@
   Qp = padic_field(7, cached = false)
   K, _ = unramified_extension(Qp, 2)
   @test isa(K, QadicField)
-  @test coefficient_ring(K) === Qp
+  @test base_field(K) === Qp
 
   R, _ = qadic_field(7, 1, precision = 30)
 
@@ -396,8 +396,8 @@ end
 
 @testset "QadicFieldElem.base_field" begin
   L, _ = QadicField(7, 2, 10)
-  @test coefficient_ring(L) isa PadicField
-  @test prime(coefficient_ring(L)) == 7
+  @test base_field(L) isa PadicField
+  @test prime(base_field(L)) == 7
 end
 
 @testset "QadicField.setprecision" begin
@@ -421,7 +421,7 @@ end
     a = one(K)
     return coeff(a, 0) + 1
   end
-  @test parent(b) === coefficient_ring(K)
+  @test parent(b) === base_field(K)
   @test precision(b) == 30
 
   a = 1 + 2 + 2^2 + O(K, 2^3)
@@ -444,7 +444,7 @@ end
 
 @testset "QadicField.as_polynomial" begin
   L, _ = qadic_field(5, 4)
-  K = coefficient_ring(L)
+  K = base_field(L)
   Kx, x = K["x"]
 
   for i in 1:100

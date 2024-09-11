@@ -89,3 +89,6 @@ end
 @deprecate is_power(x::IntegerUnion) is_perfect_power_with_data(x)
 @deprecate is_power(x::QQFieldElem) is_perfect_power_with_data(x)
 @deprecate is_power(x::Rational) is_perfect_power_with_data(x)
+
+@deprecate coefficient_ring(k::PadicField) base_field(k)
+@deprecate coefficient_ring(k::QadicField) base_field(k)
