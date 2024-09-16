@@ -47,9 +47,11 @@ end
 
 @inline function setindex!(a::FqMatrix, u::FqFieldElem, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
+  K = base_ring(a)
+  uu = K(u)
   ccall((:fq_default_mat_entry_set, libflint), Nothing,
         (Ref{FqMatrix}, Int, Int, Ref{FqFieldElem}, Ref{FqField}),
-        a, i - 1, j - 1, u, base_ring(a))
+        a, i - 1, j - 1, uu, base_ring(a))
   nothing
 end
 

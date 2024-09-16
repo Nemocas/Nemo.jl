@@ -176,6 +176,13 @@
 
     @test isa(S(M), MatElem)
   end
+
+  F, a = finite_field(5, 2)
+  K = base_field(F);
+  A = zero_matrix(K, 1, 1);
+  A[1, 1] = F(2)
+  @test A == K[2;]
+  @test_throws ArgumentError A[1, 1] = a
 end
 
 @testset "FqMatrix.similar" begin
