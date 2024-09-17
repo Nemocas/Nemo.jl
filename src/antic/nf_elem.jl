@@ -1372,3 +1372,27 @@ function basis(K::AbsSimpleNumField)
 end
 
 base_field(::AbsSimpleNumField) = QQ
+
+###############################################################################
+#
+#   mod
+#
+###############################################################################
+
+function mod_sym!(a::AbsSimpleNumFieldElem, b::ZZRingElem)
+  ccall((:nf_elem_smod_fmpz, libflint), Nothing,
+        (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{ZZRingElem}, Ref{AbsSimpleNumField}),
+        a, a, b, parent(a))
+  return a
+end
+
+mod_sym(a::AbsSimpleNumFieldElem, b::ZZRingElem) = mod_sym!(deepcopy(a), b)
+
+function mod_sym!(A::MatElem{AbsSimpleNumFieldElem}, m::ZZRingElem)
+  for i = 1:nrows(A)
+    for j = 1:ncols(A)
+      mod_sym!(A[i, j], m)
+    end
+  end
+  return A
+end

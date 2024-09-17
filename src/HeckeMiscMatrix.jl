@@ -1,22 +1,3 @@
-################################################################################
-#
-#  Reduce the entries of a matrix modulo p
-#
-################################################################################
-
-@doc raw"""
-    mod_sym!(A::Generic.Mat{AbsSimpleNumFieldElem}, m::ZZRingElem)
-
-Inplace: reduce all entries of $A$ modulo $m$, into the symmetric residue system.
-"""
-function mod_sym!(A::Generic.Mat{AbsSimpleNumFieldElem}, m::ZZRingElem)
-  for i = 1:nrows(A)
-    for j = 1:ncols(A)
-      mod_sym!(A[i, j], m)
-    end
-  end
-end
-
 #Returns a positive integer if A[i, j] > b, negative if A[i, j] < b, 0 otherwise
 function compare_index(A::ZZMatrix, i::Int, j::Int, b::ZZRingElem)
   GC.@preserve A begin

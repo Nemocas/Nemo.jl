@@ -966,14 +966,6 @@ degree(::QQField) = 1
 
 Base.:(*)(x::QQFieldElem, y::AbstractAlgebra.Generic.MatSpaceElem{AbsSimpleNumFieldElem}) = base_ring(y)(x) * y
 
-
-function mod_sym!(a::AbsSimpleNumFieldElem, b::ZZRingElem)
-  ccall((:nf_elem_smod_fmpz, libflint), Nothing,
-        (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{ZZRingElem}, Ref{AbsSimpleNumField}),
-        a, a, b, parent(a))
-  return a
-end
-
 function mod_sym(a::T, b::T) where {T}
   return mod(a, b)
 end
@@ -1104,12 +1096,6 @@ function mod_sym(a::AbsSimpleNumFieldElem, b::ZZRingElem, b2::ZZRingElem)
   # TODO: this is not correct
   return mod_sym(a, b)
   return z
-end
-
-function mod_sym(a::AbsSimpleNumFieldElem, b::ZZRingElem)
-  c = deepcopy(a)
-  mod_sym!(c, b)
-  return c
 end
 
 function ^(x::NumFieldElem, y::ZZRingElem)
