@@ -1,20 +1,3 @@
-################################################################################
-#
-#  Denominator
-#
-################################################################################
-
-# This function is really slow...
-function denominator(M::QQMatrix)
-  d = one(ZZ)
-  for i in 1:nrows(M)
-    for j in 1:ncols(M)
-      d = lcm!(d, d, denominator(M[i, j]))
-    end
-  end
-  return d
-end
-
 transpose!(A::Union{ZZMatrix,QQMatrix}) = is_square(A) ? transpose!(A, A) : transpose(A)
 
 matrix(A::Matrix{ZZRingElem}) = matrix(ZZ, A)

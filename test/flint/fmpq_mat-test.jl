@@ -908,3 +908,8 @@ end
   @test A == QQ[1 0; 0 0]
   @test_throws BoundsError Generic.add_one!(A, 3, 1)
 end
+
+@testset "QQMatrix.denominator" begin
+  M = QQ[1//2 3//4; 5//6 0]
+  @test @inferred denominator(M) == 12
+end
