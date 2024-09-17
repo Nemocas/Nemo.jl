@@ -1,11 +1,3 @@
-#Returns a positive integer if A[i, j] > b, negative if A[i, j] < b, 0 otherwise
-function compare_index(A::ZZMatrix, i::Int, j::Int, b::ZZRingElem)
-  GC.@preserve A begin
-    a = mat_entry_ptr(A, i, j)
-    return ccall((:fmpz_cmp, libflint), Int32, (Ptr{ZZRingElem}, Ref{ZZRingElem}), a, b)
-  end
-end
-
 function round!(b::ZZMatrix, a::ArbMatrix)
   s = size(a)
   for i = 1:s[1]

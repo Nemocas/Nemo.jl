@@ -476,6 +476,14 @@ end
 
 ==(x::ZZRingElem, y::ZZMatrix) = parent(y)(x) == y
 
+# Return a positive integer if A[i, j] > b, negative if A[i, j] < b, 0 otherwise
+function compare_index(A::ZZMatrix, i::Int, j::Int, b::ZZRingElem)
+  GC.@preserve A begin
+    a = mat_entry_ptr(A, i, j)
+    return ccall((:fmpz_cmp, libflint), Cint, (Ptr{ZZRingElem}, Ref{ZZRingElem}), a, b)
+  end
+end
+
 ###############################################################################
 #
 #   Inversion

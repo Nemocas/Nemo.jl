@@ -315,6 +315,10 @@ end
   @test A == B
 
   @test A != one(S)
+
+  @test compare_index(A, 1, 1, ZZ(0)) > 0
+  @test compare_index(A, 1, 1, ZZ(2)) == 0
+  @test compare_index(A, 1, 1, ZZ(3)) < 0
 end
 
 @testset "ZZMatrix.adhoc_comparison" begin
