@@ -1,5 +1,3 @@
-Integer(a::ZZRingElem) = BigInt(a)
-
 ^(a::T, n::IntegerUnion) where {T<:RingElem} = _generic_power(a, n)
 
 function _generic_power(a, n::IntegerUnion)

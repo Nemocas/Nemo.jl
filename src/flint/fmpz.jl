@@ -3048,6 +3048,8 @@ end
 
 (::Type{Int128})(a::ZZRingElem) = Int128(BigInt(a))
 
+Integer(a::ZZRingElem) = BigInt(a)
+
 convert(::Type{T}, a::ZZRingElem) where T <: Integer = T(a)
 
 function (::Type{Float64})(n::ZZRingElem)

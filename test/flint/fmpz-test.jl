@@ -124,6 +124,10 @@ end
     @test x == -123
   end
 
+  x = @inferred Integer(a)
+  @test x isa BigInt
+  @test x == -123
+
   @testset "ZZRingElem.convert for $T" for T in [UInt8, UInt16, UInt32, UInt]
     x = @inferred T(b)
     @test x isa T
