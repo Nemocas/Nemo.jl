@@ -1,21 +1,3 @@
-^(a::T, n::IntegerUnion) where {T<:RingElem} = _generic_power(a, n)
-
-function _generic_power(a, n::IntegerUnion)
-  fits(Int, n) && return a^Int(n)
-  if is_negative(n)
-    a = inv(a)
-    n = -n
-  end
-  r = one(parent(a))
-  for b = bits(n)
-    r = mul!(r, r, r)
-    if b
-      r = mul!(r, r, a)
-    end
-  end
-  return r
-end
-
 ################################################################################
 #
 #  Modular reduction with symmetric residue system
