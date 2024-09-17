@@ -1,5 +1,3 @@
-matrix(A::Matrix{ZZRingElem}) = matrix(ZZ, A)
-
 function Array(a::ZZMatrix; S::Type{T}=ZZRingElem) where {T}
   A = Array{T}(undef, nrows(a), ncols(a))
   for i = 1:nrows(a)
