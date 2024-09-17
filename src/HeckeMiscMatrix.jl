@@ -19,25 +19,6 @@ function lift(a::Generic.Mat{EuclideanRingResidueRingElem{ZZRingElem}})
   return z
 end
 
-function lift(a::ZZModMatrix)
-  z = zero_matrix(ZZ, nrows(a), ncols(a))
-  GC.@preserve a z begin
-    for i in 1:nrows(a)
-      for j in 1:ncols(a)
-        m = mat_entry_ptr(z, i, j)
-        n = mat_entry_ptr(a, i, j)
-        set!(m, n)
-        #z[i, j] = lift(a[i, j])
-      end
-    end
-  end
-  return z
-end
-
-function lift(x::FpMatrix)
-  return map_entries(lift, x)
-end
-
 function lift(a::Generic.Mat{ZZModRingElem})
   z = zero_matrix(ZZ, nrows(a), ncols(a))
   for i in 1:nrows(a)

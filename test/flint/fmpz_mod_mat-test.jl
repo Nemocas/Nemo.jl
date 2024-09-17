@@ -931,17 +931,16 @@ end
                      Z17(3) Z17(2) Z17(1);
                      Z17(0) Z17(0) Z17(2) ]
 
-  #= Not implemented in Flint yet
   b = lift(a)
 
   @test b == S([ 1 2 3; 3 2 1; 0 0 2])
   @test parent(b) == S
 
+  #= Not implemented in Flint yet
   lift!(c,a)
 
   @test c == S([ 1 2 3; 3 2 1; 0 0 2])
   =#
-
 end
 
 @testset "ZZModMatrix.charpoly" begin

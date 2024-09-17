@@ -697,6 +697,26 @@ end
 
 =#
 
+@doc raw"""
+    lift(a::T) where {T <: Zmod_fmpz_mat}
+
+Return a lift of the matrix $a$ to a matrix over $\mathbb{Z}$, i.e. where the
+entries of the returned matrix are those of $a$ lifted to $\mathbb{Z}$.
+"""
+function lift(a::Zmod_fmpz_mat)
+  z = zero_matrix(ZZ, nrows(a), ncols(a))
+  GC.@preserve a z begin
+    for i in 1:nrows(a)
+      for j in 1:ncols(a)
+        m = mat_entry_ptr(z, i, j)
+        n = mat_entry_ptr(a, i, j)
+        set!(m, n)
+      end
+    end
+  end
+  return z
+end
+
 ################################################################################
 #
 #  Characteristic polynomial
