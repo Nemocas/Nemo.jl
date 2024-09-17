@@ -4,18 +4,6 @@
 #
 ################################################################################
 
-function mod_sym(a::ZZRingElem, b::ZZRingElem)
-  c = mod(a, b)
-  @assert c >= 0
-  if b > 0 && 2 * c > b
-    return c - b
-  elseif b < 0 && 2 * c > -b
-    return c + b
-  else
-    return c
-  end
-end
-
 #TODO
 # need to be mapped onto proper Flint primitives
 # flints needs a proper interface to randomness - I think

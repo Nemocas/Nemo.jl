@@ -999,11 +999,23 @@ function mod(x::ZZRingElem, y::ZZRingElem)
   return mod!(r, x, y)
 end
 
-
 function mod(x::ZZRingElem, c::UInt)
   c == 0 && throw(DivideError())
   ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), x, c)
 end
+
+function mod_sym(a::ZZRingElem, b::ZZRingElem)
+  return mod_sym!(deepcopy(a), b)
+end
+
+function mod_sym!(a::ZZRingElem, b::ZZRingElem)
+  mod!(a, a, b)
+  if (b > 0 && a > div(b, 2)) || (b < 0 && a < div(b, 2))
+    sub!(a, a, b)
+  end
+  return a
+end
+
 
 @doc raw"""
     powermod(x::ZZRingElem, p::ZZRingElem, m::ZZRingElem)

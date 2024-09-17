@@ -897,6 +897,17 @@ end
   @test_throws DomainError sqrtmod(ZZRingElem(12), ZZRingElem(-13))
 
   @test_throws ErrorException sqrtmod(ZZRingElem(-7), ZZRingElem(1024))
+
+  @test mod_sym(ZZ(0), ZZ(5)) == ZZ(0)
+  @test mod_sym(ZZ(0), ZZ(-5)) == ZZ(0)
+  @test mod_sym(ZZ(1), ZZ(5)) == ZZ(1)
+  @test mod_sym(ZZ(1), ZZ(-5)) == ZZ(1)
+  @test mod_sym(ZZ(-1), ZZ(5)) == ZZ(-1)
+  @test mod_sym(ZZ(-1), ZZ(-5)) == ZZ(-1)
+  @test mod_sym(ZZ(4), ZZ(5)) == ZZ(-1)
+  @test mod_sym(ZZ(4), ZZ(-5)) == ZZ(-1)
+  @test mod_sym(ZZ(-4), ZZ(5)) == ZZ(1)
+  @test mod_sym(ZZ(-4), ZZ(-5)) == ZZ(1)
 end
 
 @testset "ZZRingElem.crt" begin

@@ -998,14 +998,6 @@ function mod_sym!(a::T, b::T) where {T}
   return mod!(a, b)
 end
 
-function mod_sym!(a::ZZRingElem, b::ZZRingElem)
-  mod!(a, a, b)
-  if a > div(b, 2)
-    sub!(a, a, b)
-  end
-  return a
-end
-
 Base.replace!(::typeof(-), m::ZZMatrix) = -m
 
 function (A::AbsSimpleNumField)(a::ZZPolyRingElem)
