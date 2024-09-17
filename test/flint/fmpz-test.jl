@@ -106,6 +106,32 @@ end
     end
     @test_throws DomainError Nemo.randseed!(-rand(1:1234))
   end
+
+  @testset "ZZRingElemUnitRange.rand" begin
+    r = ZZ(-4):ZZ(2)^64
+    for _ in 1:10
+      s = @inferred rand(r)
+      @test s >= -4 && s <= ZZ(2)^64
+      @test s isa ZZRingElem
+    end
+
+    r = ZZ(-4):ZZ(2):ZZ(10)
+    rg = Random.RangeGenerator(r)
+    for _ in 1:10
+      s = @inferred rand(rg)
+      @test s >= -4 && s <= 10
+      @test s isa ZZRingElem
+      @test is_even(s)
+    end
+
+    a = [one(ZZ) for _ in 1:10]
+    @inferred rand!(a, r)
+    for s in a
+      @test s >= -4 && s <= 10
+      @test s isa ZZRingElem
+      @test is_even(s)
+    end
+  end
 end
 
 @testset "ZZRingElem.printing" begin
