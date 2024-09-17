@@ -1,13 +1,3 @@
-function Array(a::ZZMatrix; S::Type{T}=ZZRingElem) where {T}
-  A = Array{T}(undef, nrows(a), ncols(a))
-  for i = 1:nrows(a)
-    for j = 1:ncols(a)
-      A[i, j] = T(a[i, j])
-    end
-  end
-  return A
-end
-
 ################################################################################
 #
 #  Lift of matrices to overrings
