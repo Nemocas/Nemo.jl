@@ -1,36 +1,5 @@
 ################################################################################
 #
-#  Lift of matrices to overrings
-#
-################################################################################
-
-@doc raw"""
-    lift(a::Generic.Mat{EuclideanRingResidueRingElem{ZZRingElem}}) -> ZZMatrix
-
-It returns a lift of the matrix to the integers.
-"""
-function lift(a::Generic.Mat{EuclideanRingResidueRingElem{ZZRingElem}})
-  z = zero_matrix(ZZ, nrows(a), ncols(a))
-  for i in 1:nrows(a)
-    for j in 1:ncols(a)
-      z[i, j] = lift(a[i, j])
-    end
-  end
-  return z
-end
-
-function lift(a::Generic.Mat{ZZModRingElem})
-  z = zero_matrix(ZZ, nrows(a), ncols(a))
-  for i in 1:nrows(a)
-    for j in 1:ncols(a)
-      z[i, j] = lift(a[i, j])
-    end
-  end
-  return z
-end
-
-################################################################################
-#
 #  Reduce the entries of a matrix modulo p
 #
 ################################################################################
