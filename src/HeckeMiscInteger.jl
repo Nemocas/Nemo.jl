@@ -1,7 +1,3 @@
-function euler_phi(x::Fac{ZZRingElem})
-  return prod((p - 1) * p^(v - 1) for (p, v) = x.fac)
-end
-
 Integer(a::ZZRingElem) = BigInt(a)
 
 ^(a::T, n::IntegerUnion) where {T<:RingElem} = _generic_power(a, n)

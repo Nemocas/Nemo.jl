@@ -1108,6 +1108,7 @@ end
   @test_throws DomainError divisor_sigma(ZZRingElem(1), -1)
 
   @test euler_phi(ZZRingElem(12480)) == 3072
+  @test euler_phi(factor(ZZ(12480))) == 3072
 
   @test fibonacci(2) == 1
 

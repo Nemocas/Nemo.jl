@@ -2242,6 +2242,10 @@ end
 
 euler_phi(x::Int) = Int(euler_phi(ZZRingElem(x)))
 
+function euler_phi(x::Fac{ZZRingElem})
+  return prod((p - 1) * p^(v - 1) for (p, v) in x)
+end
+
 @doc raw"""
     number_of_partitions(x::Int)
     number_of_partitions(x::ZZRingElem)
