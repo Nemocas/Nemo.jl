@@ -1612,3 +1612,10 @@ end
   @test all(x -> x in rlarge, rand(rlarge, 20))
   @test all(x -> x in rlargejumps, rand(rlargejumps, 20))
 end
+
+@testset "ZZRingElem.bits" begin
+  @test @inferred collect(bits(ZZ(-4))) == [true, false, false]
+  @test @inferred collect(bits(ZZ(0))) == Bool[]
+  @test @inferred collect(bits(ZZ(5))) == Bool[true, false, true]
+  @test @inferred collect(bits(ZZ(2)^64)) == append!([true], falses(64))
+end

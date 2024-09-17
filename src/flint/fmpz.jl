@@ -3311,6 +3311,7 @@ module BitsMod
 using ..Nemo
 
 import Base: ^
+import Base: eltype
 import Base: getindex
 import Base: iterate
 import Base: length
@@ -3354,6 +3355,7 @@ end
 end
 
 function iterate(L::Limbs)
+  is_zero(L.a) && return nothing # nbits(ZZ()) == 0
   L.len < 0 && return L[1], 1
 
   return L[L.len], L.len
@@ -3368,7 +3370,12 @@ function iterate(L::Limbs, i::Int)
   return L[i-1], i - 1
 end
 
-length(L::Limbs) = L.len + 1
+function length(L::Limbs)
+  is_zero(L.a) && return 0 # nbits(ZZ()) == 0
+  return L.len + 1
+end
+
+eltype(L::Limbs) = UInt
 
 #=
 #from https://github.com/JuliaLang/julia/issues/11592
@@ -3392,6 +3399,7 @@ end
 
 function iterate(B::BitsFmpz)
   L = B.L
+  is_zero(L.a) && return nothing
   a = L[L.len]
   b = UInt(1) << (nbits(a) - 1)
   return true, (b, L.len)
@@ -3412,10 +3420,12 @@ end
 end
 
 function show(io::IO, B::BitsFmpz)
-  print(io, "bit iterator for:", B.L.a)
+  print(io, "bit iterator for: ", B.L.a)
 end
 
 length(B::BitsFmpz) = nbits(B.L.a)
+
+eltype(B::BitsFmpz) = Bool
 
 Nemo.bits(a::ZZRingElem) = BitsFmpz(a)
 #= wrong order, thus disabled
