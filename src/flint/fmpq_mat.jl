@@ -240,6 +240,8 @@ function transpose(x::QQMatrix)
   return z
 end
 
+transpose!(A::Union{ZZMatrix,QQMatrix}) = is_square(A) ? transpose!(A, A) : transpose(A)
+
 function transpose!(A::QQMatrix, B::QQMatrix)
   ccall((:fmpq_mat_transpose, libflint), Nothing,
         (Ref{QQMatrix}, Ref{QQMatrix}), A, B)

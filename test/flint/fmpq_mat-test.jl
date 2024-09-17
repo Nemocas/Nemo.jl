@@ -439,6 +439,12 @@ end
   C = transpose(A)*A
 
   @test transpose(C) == C
+
+  D = deepcopy(A)
+  transpose!(D, A)
+  @test D == transpose(A)
+  transpose!(A)
+  @test D == A
 end
 
 @testset "QQMatrix.row_col_swapping" begin

@@ -1,5 +1,3 @@
-transpose!(A::Union{ZZMatrix,QQMatrix}) = is_square(A) ? transpose!(A, A) : transpose(A)
-
 matrix(A::Matrix{ZZRingElem}) = matrix(ZZ, A)
 
 function Array(a::ZZMatrix; S::Type{T}=ZZRingElem) where {T}
