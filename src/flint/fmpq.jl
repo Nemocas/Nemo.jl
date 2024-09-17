@@ -1341,6 +1341,8 @@ function BigFloat(a::QQFieldElem)
   return r
 end
 
+Float64(a::QQFieldElem) = Float64(BigFloat(a))
+
 ###############################################################################
 #
 #   Convenience methods for arithmetics (since `QQFieldElem` and `ZZRingElem` are not `Number` types)

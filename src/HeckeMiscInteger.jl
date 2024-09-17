@@ -1,8 +1,3 @@
-function Float64(a::QQFieldElem)
-  b = a * ZZRingElem(2)^53
-  Float64(div(numerator(b), denominator(b))) / (Float64(2)^53) #CF 2^53 is bad in 32bit
-end
-
 function euler_phi(x::Fac{ZZRingElem})
   return prod((p - 1) * p^(v - 1) for (p, v) = x.fac)
 end
