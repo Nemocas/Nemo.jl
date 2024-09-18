@@ -930,12 +930,6 @@ function add!(z::T, x::T, y::T) where T <: Zmodn_poly
   return z
 end
 
-function addeq!(z::T, y::T) where T <: Zmodn_poly
-  ccall((:nmod_poly_add, libflint), Nothing,
-        (Ref{T}, Ref{T},  Ref{T}), z, z, y)
-  return z
-end
-
 function sub!(z::T, x::T, y::T) where T <: Zmodn_poly
   ccall((:nmod_poly_sub, libflint), Nothing,
         (Ref{T}, Ref{T},  Ref{T}), z, x, y)

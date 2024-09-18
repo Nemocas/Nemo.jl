@@ -20,7 +20,7 @@ work for all types of the specified kind, instead of just the generic types.
 In order for this to work in practice, such implementations can only use
 functions in the relevant official interface. These are the functions required
 to be implemented by all types of that kind. For example, matrix
-implementations make heavy use of `addeq!` and `mul!` to accumulate entries, but
+implementations make heavy use of `add!` and `mul!` to accumulate entries, but
 they cannot make use of functions such as `subeq!` as it is not part of the
 official interface.
 

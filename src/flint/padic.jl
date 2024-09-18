@@ -89,9 +89,6 @@ degree(::PadicField) = 1
 
 base_field(k::PadicField) = k
 
-# TODO: Remove in the next minor/breaking release
-coefficient_ring(k::PadicField) = base_field(k)
-
 # Return generators of k "over" K
 function gens(k::PadicField, K::PadicField)
   @assert k === K
@@ -680,15 +677,6 @@ function mul!(z::PadicFieldElem, x::PadicFieldElem, y::PadicFieldElem)
         (Ref{PadicFieldElem}, Ref{PadicFieldElem}, Ref{PadicFieldElem}, Ref{PadicField}),
         z, x, y, ctx)
   return z
-end
-
-function addeq!(x::PadicFieldElem, y::PadicFieldElem)
-  x.N = min(x.N, y.N)
-  ctx = parent(x)
-  ccall((:padic_add, libflint), Nothing,
-        (Ref{PadicFieldElem}, Ref{PadicFieldElem}, Ref{PadicFieldElem}, Ref{PadicField}),
-        x, x, y, ctx)
-  return x
 end
 
 function add!(z::PadicFieldElem, x::PadicFieldElem, y::PadicFieldElem)

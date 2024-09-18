@@ -355,7 +355,7 @@ end
 function +(x::ZZMatrix, y::ZZRingElem)
   z = deepcopy(x)
   for i = 1:min(nrows(x), ncols(x))
-    z[i, i] = addeq!(z[i, i], y)
+    z[i, i] = add!(z[i, i], y)
   end
   return z
 end
@@ -379,7 +379,7 @@ end
 function -(x::ZZRingElem, y::ZZMatrix)
   z = -y
   for i = 1:min(nrows(y), ncols(y))
-    z[i, i] = addeq!(z[i, i], x)
+    z[i, i] = add!(z[i, i], x)
   end
   return z
 end
@@ -1870,11 +1870,6 @@ end
 function addmul!(z::ZZMatrix, y::ZZMatrix, x::Int)
   ccall((:fmpz_mat_scalar_addmul_si, libflint), Nothing,
         (Ref{ZZMatrix}, Ref{ZZMatrix}, Int), z, y, x)
-  return z
-end
-
-function addeq!(z::ZZMatrix, x::ZZMatrix)
-  add!(z, z, x)
   return z
 end
 

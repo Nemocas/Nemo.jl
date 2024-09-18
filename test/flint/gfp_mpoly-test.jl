@@ -768,7 +768,7 @@ end
 
   add!(f, y^2, x*y)
   @test f == y^2 + x*y
-  addeq!(f, x^2)
+  f = add!(f, x^2)
   @test f == y^2 + x*y + x^2
   mul!(f, f, x)
   @test f == (y^2 + x*y + x^2)*x

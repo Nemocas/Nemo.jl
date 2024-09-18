@@ -344,24 +344,12 @@ function zero!(z::fpFieldElem)
   return fpFieldElem(UInt(0), R)
 end
 
-function mul!(z::fpFieldElem, x::fpFieldElem, y::fpFieldElem)
-  return x*y
-end
-
 function mul!(z::fpFieldElem, x::fpFieldElem, y::ZZRingElem)
   R = parent(x)
   d = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), y, R.n)
   r = mulmod(x.data, d, R.n, R.ninv)
   z.data = r
   return z
-end
-
-function addeq!(z::fpFieldElem, x::fpFieldElem)
-  return z + x
-end
-
-function add!(z::fpFieldElem, x::fpFieldElem, y::fpFieldElem)
-  return x + y
 end
 
 ###############################################################################

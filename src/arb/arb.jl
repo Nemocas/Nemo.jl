@@ -1947,12 +1947,6 @@ for (s,f) in (("add!","arb_add"), ("mul!","arb_mul"), ("div!", "arb_div"),
   end
 end
 
-function addeq!(z::ArbFieldElem, x::ArbFieldElem)
-  ccall((:arb_add, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int),
-        z, z, x, parent(x).prec)
-  return z
-end
-
 function addmul!(z::ArbFieldElem, x::ArbFieldElem, y::ZZRingElem)
   q = max(bits(z), bits(x))
   ccall((:arb_addmul_fmpz, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ZZRingElem}, Int), z, x, y, q)

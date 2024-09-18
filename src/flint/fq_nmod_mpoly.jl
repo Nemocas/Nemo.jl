@@ -768,14 +768,6 @@ function add!(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem, c::fqPolyRep
   return a
 end
 
-function addeq!(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
-  ccall((:fq_nmod_mpoly_add, libflint), Nothing,
-        (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem},
-         Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
-        a, a, b, a.parent)
-  return a
-end
-
 function mul!(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem, c::fqPolyRepMPolyRingElem)
   ccall((:fq_nmod_mpoly_mul, libflint), Nothing,
         (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem},

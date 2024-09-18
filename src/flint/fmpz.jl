@@ -2518,12 +2518,6 @@ function swap!(a::ZZRingElem, b::ZZRingElem)
         a, b)
 end
 
-function addeq!(z::ZZRingElem, x::ZZRingElem)
-  ccall((:fmpz_add, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, z, x)
-  return z
-end
-
 function add!(z::ZZRingElem, x::ZZRingElem, y::ZZRingElem)
   ccall((:fmpz_add, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x, y)

@@ -632,13 +632,6 @@ function mul!(z::ArbPolyRingElem, x::ArbPolyRingElem, y::ArbPolyRingElem)
   return z
 end
 
-function addeq!(z::ArbPolyRingElem, x::ArbPolyRingElem)
-  ccall((:arb_poly_add, libflint), Nothing,
-        (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int),
-        z, z, x, precision(parent(z)))
-  return z
-end
-
 function add!(z::ArbPolyRingElem, x::ArbPolyRingElem, y::ArbPolyRingElem)
   ccall((:arb_poly_add, libflint), Nothing,
         (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int),

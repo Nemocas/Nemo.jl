@@ -20,7 +20,6 @@ export acosh
 export acospi
 export add_error!
 export add!
-export addeq!
 export addmul!
 export agm
 export airy_ai

@@ -485,12 +485,6 @@ function mul!(z::FqPolyRepFieldElem, x::FqPolyRepFieldElem, y::FqPolyRepFieldEle
   return z
 end
 
-function addeq!(z::FqPolyRepFieldElem, x::FqPolyRepFieldElem)
-  ccall((:fq_add, libflint), Nothing,
-        (Ref{FqPolyRepFieldElem}, Ref{FqPolyRepFieldElem}, Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}), z, z, x, x.parent)
-  return z
-end
-
 function add!(z::FqPolyRepFieldElem, x::FqPolyRepFieldElem, y::FqPolyRepFieldElem)
   ccall((:fq_add, libflint), Nothing,
         (Ref{FqPolyRepFieldElem}, Ref{FqPolyRepFieldElem}, Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}), z, x, y, x.parent)

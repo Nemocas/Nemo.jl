@@ -766,13 +766,6 @@ function mul_red!(z::AbsSimpleNumFieldElem, x::AbsSimpleNumFieldElem, y::AbsSimp
   return z
 end
 
-function addeq!(z::AbsSimpleNumFieldElem, x::AbsSimpleNumFieldElem)
-  ccall((:nf_elem_add, libflint), Nothing,
-        (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}),
-        z, z, x, parent(x))
-  return z
-end
-
 function add!(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem, c::AbsSimpleNumFieldElem)
   ccall((:nf_elem_add, libflint), Nothing,
         (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}),
@@ -917,8 +910,8 @@ function sqr_classical(a::Generic.Poly{AbsSimpleNumFieldElem})
   for i = 1:lena
     for j = i + 1:lena
       t = mul_red!(t, coeff(a, i - 1), coeff(a, j - 1), false)
-      d[i + j - 1] = addeq!(d[i + j - 1], t)
-      d[i + j - 1] = addeq!(d[i + j - 1], t)
+      d[i + j - 1] = add!(d[i + j - 1], t)
+      d[i + j - 1] = add!(d[i + j - 1], t)
     end
   end
 
@@ -964,7 +957,7 @@ function mul_classical(a::Generic.Poly{AbsSimpleNumFieldElem}, b::Generic.Poly{A
   for i = 1:lena - 1
     for j = 2:lenb
       t = mul_red!(t, coeff(a, i - 1), b.coeffs[j], false)
-      d[i + j - 1] = addeq!(d[i + j - 1], t)
+      d[i + j - 1] = add!(d[i + j - 1], t)
     end
   end
 

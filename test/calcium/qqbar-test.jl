@@ -350,24 +350,20 @@ end
   R = algebraic_closure(QQ)
 
   x = R(7)
-  zero!(x)
-  @test x == 0
+  x = zero!(x)
+  @test iszero(x)
 
   x = R(7)
-  y = mul!(x, R(3), R(5))
+  x = mul!(x, R(3), R(5))
   @test x == 15
-  @test x === y
 
   x = R(7)
-  y = addeq!(x, R(3))
+  x = add!(x, R(3))
   @test x == 10
-  @test x === y
 
   x = R(7)
-  y = add!(x, R(3), R(5))
+  x = add!(x, R(3), R(5))
   @test x == 8
-  @test x === y
-
 end
 
 @testset "QQBarFieldElem.rand" begin

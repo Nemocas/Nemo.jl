@@ -256,7 +256,7 @@ number of temporary objects the garbage collector must allocate and clean up.
 
 To speed up such accumulations, Nemo provides numerous unsafe operators, which
 mutate the existing elements of the polynomial, matrix, etc. These include
-functions such as `add!`, `addeq!`, `mul!`, `zero!` and `addmul!`.
+functions such as `add!`, `mul!`, `zero!` and `addmul!`.
 
 These functions take as their first argument the object that should be modified
 with the return value.
@@ -294,17 +294,18 @@ on the part of the developer using unsafe operators.
 For example, to set the existing value `a` to `a + b` one must write
 
 ```julia
-a = addeq!(a, b)
+a = add(a, b)
 ```
 
-i.e. one must have an explicit assignment to the left of the `addeq!` call and
+i.e. one must have an explicit assignment to the left of the `add` call and
 indeed all the unsafe operator calls.
 
-In the case of a mutable type, `addeq!` will simply modify the original `a`.
+In the case of a mutable type (and the existence of a specialized method),
+`add` will simply modify the original `a`.
 The modified object will be returned and assigned to the exact same variable,
 which has no effect.
 
-In the case of an immutable type, `addeq!` does not modify the original object
+In the case of an immutable type, `add` does not modify the original object
 `a` as this is impossible, but it still returns the new value and assigns it
 to `a` which is what one wants.
 
@@ -388,7 +389,7 @@ code given the constraints mentioned above.
   another. Other objects, e.g. polynomials, series, etc., are constructed from
   objects that do not alias one another, *even in part*
 
-* standard unsafe operators, addeq!, mul!, addmul!, zero!, add! which mutate
+* standard unsafe operators, mul!, addmul!, zero!, add! which mutate
   their outputs are allow to be used iff that output is entirely under the
   control of the caller, i.e. it was created for the purpose of accumulation,
   but otherwise must not be used
@@ -500,7 +501,7 @@ reduce!(x::AbsSimpleNumFieldElem)
 This function must perform reduction on an unreduced element (mutating it).
 Note that it must return the mutated value as per all unsafe operators.
 
-Finally, the `add!` and `addeq!` operators must be able to add nonreduced
+Finally, the `add!` and operators must be able to add nonreduced
 values.
 
 If one wishes to speed up generic code for rings that provide delayed
@@ -525,6 +526,6 @@ accumulation loop has finished.
 Note that `mul_red!` is never called directly but is called inside the generic
 implementation of `addmul_delayed_reduction!` for rings that support delayed
 reduction. That generic code falls back to a call to `addmul!` which in turn
-falls back to `mul!` and `addeq!` where delayed reduction or `addmul!` are not
+falls back to `mul!` and `add!` where delayed reduction or `addmul!` are not
 available.
 

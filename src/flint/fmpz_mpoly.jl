@@ -783,13 +783,6 @@ function add!(a::ZZMPolyRingElem, b::ZZMPolyRingElem, c::ZZMPolyRingElem)
   return a
 end
 
-function addeq!(a::ZZMPolyRingElem, b::ZZMPolyRingElem)
-  ccall((:fmpz_mpoly_add, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem},
-         Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), a, a, b, a.parent)
-  return a
-end
-
 function mul!(a::ZZMPolyRingElem, b::ZZMPolyRingElem, c::ZZMPolyRingElem)
   ccall((:fmpz_mpoly_mul, libflint), Nothing,
         (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem},

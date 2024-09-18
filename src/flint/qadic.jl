@@ -86,9 +86,7 @@ function _prime(R::QadicField, n::Int = 1)
   return z
 end
 
-# TODO: For the next minor/breaking release, rename this to base_field and
-# deprecate coefficient_ring (and remove the corresponding base_field in Hecke)
-function coefficient_ring(K::QadicField)
+function base_field(K::QadicField)
   L = get_attribute!(K, :base_field) do
     return PadicField(prime(K), precision(K), cached = false)
   end::PadicField
@@ -226,7 +224,7 @@ function var(Q::QadicField)
 end
 
 function expressify(b::QadicFieldElem, x = var(parent(b)); context = nothing)
-  R = coefficient_ring(parent(b))
+  R = base_field(parent(b))
   if iszero(b)
     return 0
   end
@@ -653,15 +651,6 @@ function mul!(z::QadicFieldElem, x::QadicFieldElem, y::QadicFieldElem)
   return z
 end
 
-function addeq!(x::QadicFieldElem, y::QadicFieldElem)
-  x.N = min(x.N, y.N)
-  ctx = parent(x)
-  ccall((:qadic_add, libflint), Nothing,
-        (Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}),
-        x, x, y, ctx)
-  return x
-end
-
 function add!(z::QadicFieldElem, x::QadicFieldElem, y::QadicFieldElem)
   z.N = min(x.N, y.N)
   ctx = parent(x)
@@ -678,13 +667,13 @@ end
 ###############################################################################
 
 function tr(r::QadicFieldElem)
-  t = coefficient_ring(parent(r))()
+  t = base_field(parent(r))()
   ccall((:qadic_trace, libflint), Nothing, (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}), t, r, parent(r))
   return t
 end
 
 function norm(r::QadicFieldElem)
-  t = coefficient_ring(parent(r))()
+  t = base_field(parent(r))()
   ccall((:qadic_norm, libflint), Nothing, (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}), t, r, parent(r))
   return t
 end
@@ -844,7 +833,7 @@ function (Rx::Generic.PolyRing{PadicFieldElem})(a::QadicFieldElem)
 end
 
 function coeff(x::QadicFieldElem, i::Int)
-  R = coefficient_ring(parent(x))
+  R = base_field(parent(x))
   c = R()
   ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
         (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Int, Ref{QadicField}), c, x, i, parent(x))
@@ -861,7 +850,7 @@ function setcoeff!(x::QadicFieldElem, i::Int, y::UInt)
 end
 
 function setcoeff!(x::QadicFieldElem, i::Int, y::ZZRingElem)
-  R = coefficient_ring(parent(x))
+  R = base_field(parent(x))
   Y = R(ZZRingElem(y))
   ccall((:padic_poly_set_coeff_padic, libflint), Nothing,
         (Ref{QadicFieldElem}, Int, Ref{PadicFieldElem}, Ref{QadicField}), x, i, Y, parent(x))
@@ -938,7 +927,7 @@ end
 
 function setprecision!(Q::QadicField, n::Int)
   Q.prec_max = n
-  setprecision!(coefficient_ring(Q), n)
+  setprecision!(base_field(Q), n)
   return Q
 end
 
@@ -962,14 +951,14 @@ end
 function with_precision(f, K::QadicField, n::Int)
   @assert n >= 0
   old = precision(K)
-  old_base = precision(coefficient_ring(K))
+  old_base = precision(base_field(K))
   setprecision!(K, n)
-  setprecision!(coefficient_ring(K), n)
+  setprecision!(base_field(K), n)
   v = try
     f()
   finally
     setprecision!(K, old)
-    setprecision!(coefficient_ring(K), old_base)
+    setprecision!(base_field(K), old_base)
   end
   return v
 end

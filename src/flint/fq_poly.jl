@@ -768,14 +768,6 @@ function sub!(z::FqPolyRepPolyRingElem, x::FqPolyRepPolyRingElem, y::FqPolyRepPo
   return z
 end
 
-
-function addeq!(z::FqPolyRepPolyRingElem, x::FqPolyRepPolyRingElem)
-  ccall((:fq_poly_add, libflint), Nothing,
-        (Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepPolyRingElem},
-         Ref{FqPolyRepField}), z, z, x, base_ring(parent(x)))
-  return z
-end
-
 ################################################################################
 #
 #  Promotion rules

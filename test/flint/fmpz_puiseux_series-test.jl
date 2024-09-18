@@ -253,14 +253,14 @@ end
 @testset "fmpz_puiseux_series.unsafe" begin
   R, x = puiseux_series_ring(ZZ, 10, "x")
   a = x
-  zero!(a)
+  a = zero!(a)
   @test iszero(a)
-  mul!(a, a, x)
+  a = mul!(a, a, x)
   @test iszero(a)
-  add!(a, a, x)
+  a = add!(a, a, x)
   @test a == x
-  addeq!(a, x^2)
+  a = add!(a, x^2)
   @test a == x+x^2
-  mul!(a, a, x)
+  a = mul!(a, a, x)
   @test a == x*(x+x^2)
 end

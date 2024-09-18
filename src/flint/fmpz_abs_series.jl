@@ -115,13 +115,6 @@ end
 
 characteristic(::ZZAbsPowerSeriesRing) = 0
 
-function set_precision!(z::ZZAbsPowerSeriesRingElem, k::Int)
-  k < 0 && throw(DomainError(k, "Precision must be non-negative"))
-  z = truncate!(z, k)
-  z.prec = k
-  return z
-end
-
 ###############################################################################
 #
 #   Similar
@@ -572,23 +565,6 @@ function mul!(z::ZZAbsPowerSeriesRingElem, a::ZZAbsPowerSeriesRingElem, b::ZZAbs
         (Ref{ZZAbsPowerSeriesRingElem}, Ref{ZZAbsPowerSeriesRingElem}, Ref{ZZAbsPowerSeriesRingElem}, Int),
         z, a, b, lenz)
   return z
-end
-
-function addeq!(a::ZZAbsPowerSeriesRingElem, b::ZZAbsPowerSeriesRingElem)
-  lena = length(a)
-  lenb = length(b)
-
-  prec = min(a.prec, b.prec)
-
-  lena = min(lena, prec)
-  lenb = min(lenb, prec)
-
-  lenz = max(lena, lenb)
-  a.prec = prec
-  ccall((:fmpz_poly_add_series, libflint), Nothing,
-        (Ref{ZZAbsPowerSeriesRingElem}, Ref{ZZAbsPowerSeriesRingElem}, Ref{ZZAbsPowerSeriesRingElem}, Int),
-        a, a, b, lenz)
-  return a
 end
 
 function add!(c::ZZAbsPowerSeriesRingElem, a::ZZAbsPowerSeriesRingElem, b::ZZAbsPowerSeriesRingElem)
