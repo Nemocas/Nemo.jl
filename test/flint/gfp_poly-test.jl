@@ -646,6 +646,11 @@ end
 
   @test fac == Dict(2=>x^4+3*x^2+2,1=>x^2 + x)
 
+  f = (x + 1) * x * (x - 1)
+  fac = factor_equal_deg(f, 1)
+  @test length(fac) == 3
+  @test prod(fac) == f
+
   @test issetequal(roots(5 * x * (x^2 + 1)*(x^2 + 2)*(x+1)^10), R.([0, -1]))
 
   K = Native.GF(3)

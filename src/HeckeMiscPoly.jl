@@ -1,39 +1,3 @@
-function factor_equal_deg(x::fpPolyRingElem, d::Int)
-  if degree(x) == d
-    return fpPolyRingElem[x]
-  end
-  fac = gfp_poly_factor(x.mod_n)
-  ccall((:nmod_poly_factor_equal_deg, libflint), UInt,
-        (Ref{gfp_poly_factor}, Ref{fpPolyRingElem}, Int),
-        fac, x, d)
-  res = Vector{fpPolyRingElem}(undef, fac.num)
-  for i in 1:fac.num
-    f = parent(x)()
-    ccall((:nmod_poly_factor_get_poly, libflint), Nothing,
-          (Ref{fpPolyRingElem}, Ref{gfp_poly_factor}, Int), f, fac, i - 1)
-    res[i] = f
-  end
-  return res
-end
-
-function factor_equal_deg(x::FpPolyRingElem, d::Int)
-  if degree(x) == d
-    return FpPolyRingElem[x]
-  end
-  fac = gfp_fmpz_poly_factor(base_ring(x))
-  ccall((:fmpz_mod_poly_factor_equal_deg, libflint), UInt,
-        (Ref{gfp_fmpz_poly_factor}, Ref{FpPolyRingElem}, Int, Ref{fmpz_mod_ctx_struct}),
-        fac, x, d, x.parent.base_ring.ninv)
-  res = Vector{FpPolyRingElem}(undef, fac.num)
-  for i in 1:fac.num
-    f = parent(x)()
-    ccall((:fmpz_mod_poly_factor_get_fmpz_mod_poly, libflint), Nothing,
-          (Ref{FpPolyRingElem}, Ref{gfp_fmpz_poly_factor}, Int, Ref{fmpz_mod_ctx_struct}), f, fac, i - 1, x.parent.base_ring.ninv)
-    res[i] = f
-  end
-  return res
-end
-
 function mulhigh_n(a::ZZPolyRingElem, b::ZZPolyRingElem, n::Int)
   c = parent(a)()
   #careful: as part of the interface, the coeffs 0 - (n-1) are random garbage
