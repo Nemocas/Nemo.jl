@@ -926,18 +926,6 @@ function (Rx::fpPolyRing)(f::ZZPolyRingElem)
   return r
 end
 
-function fmpz_poly_to_fmpz_mod_poly_raw!(r::ZZModPolyRingElem, a::ZZPolyRingElem)
-  ccall((:fmpz_poly_get_fmpz_mod_poly, libflint), Nothing,
-        (Ref{ZZModPolyRingElem}, Ref{ZZPolyRingElem}, Ref{fmpz_mod_ctx_struct}), r, a, base_ring(parent(r)).ninv)
-  return r
-end
-
-function (Rx::ZZModPolyRing)(f::ZZPolyRingElem)
-  r = Rx()
-  fmpz_poly_to_fmpz_mod_poly_raw!(r, f)
-  return r
-end
-
 ###############################################################################
 #
 #   Parent object call overloads

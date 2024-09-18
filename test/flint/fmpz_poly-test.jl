@@ -517,7 +517,6 @@ end
   S, y = polynomial_ring(ZZ, "y")
   f = 7*y^2 + 3*y + 2
   for R in [residue_ring(ZZ, 13)[1],
-            residue_ring(ZZ, ZZ(13))[1],
             Native.GF(13)]
     Rx, x = R["x"]
     g = @inferred Rx(f)
