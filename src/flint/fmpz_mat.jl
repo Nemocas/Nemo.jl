@@ -632,7 +632,7 @@ Reduces every entry modulo $p$, i.e. applies the mod function to every entry.
 """
 function mod(M::ZZMatrix, p::ZZRingElem)
   N = deepcopy(M)
-  mod!(N, p)
+  N = mod!(N, p)
   return N
 end
 

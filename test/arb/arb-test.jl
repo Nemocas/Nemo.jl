@@ -303,7 +303,7 @@ end
   mul!(z, x, y)
   @test z == 6
 
-  div!(z, y, x)
+  z = div!(z, y, x)
   @test z == 1.5
 end
 

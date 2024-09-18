@@ -499,12 +499,12 @@ function invmod(f::ZZModPolyRingElem, M::ZZModPolyRingElem)
   # starting with this g, and using the fact that all coeffs are nilpotent
   # we have an inverse modulo s.th. nilpotent. Hence it works
   c = f * g
-  rem!(c, c, M)
+  c = rem!(c, c, M)
   while !isone(c)
     mul!(g, g, 2 - c)
-    rem!(g, g, M)
+    g = rem!(g, g, M)
     mul!(c, f, g)
-    rem!(c, c, M)
+    c = rem!(c, c, M)
   end
   return g
 end
@@ -867,7 +867,7 @@ Inplace: reduce all entries of $A$ modulo $m$, into the positive residue system.
 function mod!(A::Generic.Mat{AbsSimpleNumFieldElem}, m::ZZRingElem)
   for i = 1:nrows(A)
     for j = 1:ncols(A)
-      mod!(A[i, j], m)
+      A[i, j] = mod!(A[i, j], m)
     end
   end
 end
@@ -999,7 +999,7 @@ function mod_sym!(a::T, b::T) where {T}
 end
 
 function mod_sym!(a::ZZRingElem, b::ZZRingElem)
-  mod!(a, a, b)
+  a = mod!(a, b)
   if a > div(b, 2)
     a = sub!(a, b)
   end
