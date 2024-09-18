@@ -238,7 +238,7 @@ function *(x::FqPolyRepMatrix, y::FqPolyRepMatrix)
   (base_ring(x) != base_ring(y)) && error("Base ring must be equal")
   (ncols(x) != nrows(y)) && error("Dimensions are wrong")
   z = similar(x, nrows(x), ncols(y))
-  mul!(z, x, y)
+  z = mul!(z, x, y)
   return z
 end
 
@@ -403,7 +403,7 @@ function det(a::FqPolyRepMatrix)
   else
     d = one(R)
     for i in 1:nrows(u)
-      mul!(d, d, u[i, i])
+      d = mul!(d, d, u[i, i])
     end
     return (parity(p) == 0 ? d : -d)
   end

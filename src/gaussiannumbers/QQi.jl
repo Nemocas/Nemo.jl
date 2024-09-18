@@ -277,21 +277,21 @@ end
 
 function add!(z::QQiFieldElem, a::QQiFieldElem)
   if z !== a
-    mul!(z.num, z.num, a.den)
+    z.num = mul!(z.num, z.num, a.den)
     addmul!(z.num, a.num, z.den)
-    mul!(z.den, a.den, z.den)
+    z.den = mul!(z.den, a.den, z.den)
     reduce!(z)
   else
-    mul!(z, z, 2)
+    z = mul!(z, 2)
   end
   return z
 end
 
 function add!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem)
   if z !== b
-    mul!(z.num, a.num, b.den)
+    z.num = mul!(z.num, a.num, b.den)
     addmul!(z.num, b.num, a.den)
-    mul!(z.den, a.den, b.den)
+    z.den = mul!(z.den, a.den, b.den)
     reduce!(z)
   else
     z = add!(z, a)
@@ -305,9 +305,9 @@ end
 
 function subeq!(z::QQiFieldElem, a::QQiFieldElem)
   if z !== a
-    mul!(z.num, z.num, a.den)
+    z.num = mul!(z.num, z.num, a.den)
     submul!(z.num, a.num, z.den)
-    mul!(z.den, z.den, a.den)
+    z.den = mul!(z.den, z.den, a.den)
     reduce!(z)
   else
     z = zero!(z)
@@ -317,9 +317,9 @@ end
 
 function sub!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem)
   if z !== b
-    mul!(z.num, a.num, b.den)
+    z.num = mul!(z.num, a.num, b.den)
     submul!(z.num, b.num, a.den)
-    mul!(z.den, a.den, b.den)
+    z.den = mul!(z.den, a.den, b.den)
     reduce!(z)
   else
     subeq!(z, a)
@@ -343,14 +343,14 @@ function -(a::QQiFieldElem)
 end
 
 function mul!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem)
-  mul!(z.num, a.num, b.num)
-  mul!(z.den, a.den, b.den)
+  z.num = mul!(z.num, a.num, b.num)
+  z.den = mul!(z.den, a.den, b.den)
   reduce!(z)
   return z
 end
 
 function mul!(z::QQiFieldElem, a::QQiFieldElem, b::Union{Integer, ZZRingElem, ZZiRingElem})
-  mul!(z.num, a.num, b)
+  z.num = mul!(z.num, a.num, b)
   set!(z.den, a.den)
   reduce!(z)
   return z
@@ -361,7 +361,7 @@ function *(a::QQiFieldElem, b::QQiFieldElem)
 end
 
 function addmul!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem, t::QQiFieldElem)
-  mul!(t, a, b)
+  t = mul!(t, a, b)
   z = add!(z, t)
   return z
 end
@@ -371,7 +371,7 @@ function addmul!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem)
 end
 
 function submul!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem, t::QQiFieldElem)
-  mul!(t, a, b)
+  t = mul!(t, a, b)
   z = sub!(z, t)
   return z
 end
@@ -392,8 +392,8 @@ end
 
 function inv!(z::QQiFieldElem, a::QQiFieldElem)
   d = abs2(a.num)
-  mul!(z.num.x, a.num.x, a.den)
-  mul!(z.num.y, a.num.y, a.den)
+  z.num = mul!(z.num.x, a.num.x, a.den)
+  z.num = mul!(z.num.y, a.num.y, a.den)
   neg!(z.num.y, z.num.y)
   swap!(z.den, d)
   reduce!(z)

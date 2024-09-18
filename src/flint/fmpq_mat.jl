@@ -1028,7 +1028,7 @@ function nullspace(A::QQMatrix)
     for i in nrows(NQQ):-1:1
       is_zero_entry(NQQ, i, j) && continue
       getindex!(t, NQQ, i, j)
-      mul!(t, t, s)
+      t = mul!(t, t, s)
       NQQ[i, j] = t # creates a copy of t
     end
   end

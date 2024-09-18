@@ -351,7 +351,7 @@ end
 # output does not alias input
 function _muleq!(z::ZZiRingElem, b::ZZiRingElem)
   zx = submul!(mul!(ZZRingElem(), z.x, b.x), z.y, b.y)
-  mul!(z.y, z.y, b.x)
+  z.y = mul!(z.y, z.y, b.x)
   addmul!(z.y, z.x, b.y)
   swap!(z.x, zx)
   return z
@@ -371,9 +371,9 @@ end
 
 # output does not alias either input
 function _mul!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem)
-  mul!(z.x, a.x, b.x)
+  z.x = mul!(z.x, a.x, b.x)
   submul!(z.x, a.y, b.y)
-  mul!(z.y, a.y, b.x)
+  z.y = mul!(z.y, a.y, b.x)
   addmul!(z.y, a.x, b.y)
   return z
 end
@@ -391,8 +391,8 @@ function mul!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem)
 end
 
 function mul!(z::ZZiRingElem, a::ZZiRingElem, b::IntegerUnion)
-  mul!(z.x, a.x, b)
-  mul!(z.y, a.y, b)
+  z.x = mul!(z.x, a.x, b)
+  z.y = mul!(z.y, a.y, b)
   return z
 end
 
@@ -543,20 +543,20 @@ end
 ###############################################################################
 
 function sqr!(z::ZZiRingElem, a::ZZiRingElem, t::ZZiRingElem)
-  mul!(t.x, a.x, a.x)
-  mul!(t.y, a.y, a.y)
+  t.x = mul!(t.x, a.x, a.x)
+  t.y = mul!(t.y, a.y, a.y)
   nx = size(a.x)
   ny = size(a.y)
   if 5 < nx < 2*ny && 5 < ny < 2*nx
     # (x+y)^2-x^2-y^2
     z.x = add!(z.x, a.x, a.y)
-    mul!(z.y, z.x, z.x)
+    z.y = mul!(z.y, z.x, z.x)
     z.y = sub!(z.y, t.x)
     z.y = sub!(z.y, t.y)
     # x^2-y^2
     z.x = sub!(z.x, t.x, t.y)
   else
-    mul!(z.y, a.x, a.y)
+    z.y = mul!(z.y, a.x, a.y)
     z.x = sub!(z.x, t.x, t.y)
     ccall((:fmpz_mul_2exp, libflint), Nothing,
           (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt),

@@ -770,7 +770,7 @@ end
   @test f == y^2 + x*y
   f = add!(f, x^2)
   @test f == y^2 + x*y + x^2
-  mul!(f, f, x)
+  f = mul!(f, f, x)
   @test f == (y^2 + x*y + x^2)*x
 end
 

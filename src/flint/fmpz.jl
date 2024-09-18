@@ -528,7 +528,7 @@ end
 
 function *(x::ZZRingElem, c::Int)
   z = ZZRingElem()
-  mul!(z, x, c)
+  z = mul!(z, x, c)
   return z
 end
 
@@ -1959,7 +1959,7 @@ function _binomial(n::ZZRingElem, k::ZZRingElem)
     _binomial!(z, Culong(n), Culong(k))
   elseif fits(UInt, k)
     for K in UInt(1):UInt(k)
-      mul!(z, z, n - (K - 1))
+      z = mul!(z, n - (K - 1))
       divexact!(z, z, K)
     end
   else
@@ -2874,7 +2874,7 @@ function rand(rng::AbstractRNG, sp::SamplerFmpz)
     unsafe_store!(Ptr{Cint}(z.d << 2) + sizeof(Cint), sz)
   end
   if !isone(sp.step)
-    mul!(z, z, sp.step)
+    z = mul!(z, sp.step)
   end
   z = add!(z, sp.a)
 end

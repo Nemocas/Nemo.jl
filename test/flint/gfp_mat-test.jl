@@ -1091,9 +1091,9 @@ end
   A = R[1 1; 0 1]
   b = R(2)
   C = similar(A)
-  mul!(C, b, A)
+  C = mul!(C, b, A)
   @test C == b * A
-  mul!(C, A, b)
+  C = mul!(C, A, b)
   @test C == b * A
 end
 

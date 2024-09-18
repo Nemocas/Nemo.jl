@@ -412,7 +412,7 @@ function det(a::FqMatrix)
   else
     d = one(R)
     for i in 1:nrows(u)
-      mul!(d, d, u[i, i])
+      d = mul!(d, d, u[i, i])
     end
     return (parity(p) == 0 ? d : -d)
   end

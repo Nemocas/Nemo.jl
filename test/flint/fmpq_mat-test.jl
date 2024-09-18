@@ -890,7 +890,7 @@ end
   A = matrix(QQ, 2, 2, [1, 1, 0, 1])
   B = matrix(QQ, 2, 2, [1, 2, 0, 1])
   C = similar(A)
-  mul!(C, A, B)
+  C = mul!(C, A, B)
   @test C == A * B
 end
 

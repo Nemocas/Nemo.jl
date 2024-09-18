@@ -302,7 +302,7 @@ end
 
 function *(a::QQFieldElem, b::QQFieldElem)
   z = QQFieldElem()
-  mul!(z, a, b)
+  z = mul!(z, a, b)
   return z
 end
 

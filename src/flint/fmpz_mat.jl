@@ -312,7 +312,7 @@ function *(x::ZZMatrix, y::ZZMatrix)
   else
     z = similar(x, nrows(x), ncols(y))
   end
-  mul!(z, x, y)
+  z = mul!(z, x, y)
   return z
 end
 
@@ -810,7 +810,7 @@ function hadamard_bound2(M::ZZMatrix)
       if iszero(r)
         return r
       end
-      mul!(H, H, r)
+      H = mul!(H, H, r)
     end
   end
   return H
@@ -1489,7 +1489,7 @@ function Solve._can_solve_internal_no_check(::Solve.HermiteFormTrait, A::ZZMatri
           H_ptr = mat_entry_ptr(H, j, k)
           for h = k:ncols(H)
             b_ptr = mat_entry_ptr(b, h, i)
-            mul!(t, q, H_ptr)
+            t = mul!(t, q, H_ptr)
             b_ptr = sub!(b_ptr, b_ptr, t)
             H_ptr += sizeof(ZZRingElem)
           end
@@ -1747,7 +1747,7 @@ function AbstractAlgebra._solve_tril!(A::ZZMatrix, B::ZZMatrix, C::ZZMatrix, f::
         B_ptr = mat_entry_ptr(B, j, 1)
         for k = 1:j-1
           A_ptr = mat_entry_ptr(B, k, i)
-          mul!(s, A_ptr, B_ptr)
+          s = mul!(s, A_ptr, B_ptr)
           B_ptr += sizeof(ZZRingElem)
           t = sub!(t, s)
         end
@@ -1842,7 +1842,7 @@ function mul!(z::ZZMatrix, x::ZZMatrix, y::ZZMatrix, fl::Bool = false)
 end
 
 function mul!(y::ZZMatrix, x::Int)
-  mul!(y, y, x)
+  y = mul!(y, y, x)
 end
 
 function mul!(z::ZZMatrix, y::ZZMatrix, x::Int)
@@ -1852,7 +1852,7 @@ function mul!(z::ZZMatrix, y::ZZMatrix, x::Int)
 end
 
 function mul!(y::ZZMatrix, x::ZZRingElem)
-  mul!(y, y, x)
+  y = mul!(y, y, x)
 end
 
 function mul!(z::ZZMatrix, y::ZZMatrix, x::ZZRingElem)

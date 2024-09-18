@@ -157,7 +157,7 @@ function prod_diagonal(A::ZZMatrix)
   GC.@preserve a A begin
     for i = 1:min(nrows(A),ncols(A))
       b = mat_entry_ptr(A, i, i)
-      mul!(a, a, b)
+      a = mul!(a, b)
     end
   end
   return a

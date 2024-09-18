@@ -52,7 +52,7 @@ function evaluate!(z::fqPolyRepFieldElem, f::ZZPolyRingElem, r::fqPolyRepFieldEl
   set!(z, parent(r)(coeff(f, l)))
   #s = parent(r)(coeff(f, l))
   for i = l-1:-1:0
-    mul!(z, z, r)
+    z = mul!(z, z, r)
     z = add!(z, parent(r)(coeff(f, i)))
     #s = s*r + parent(r)(coeff(f, i))
   end
@@ -256,7 +256,7 @@ function dot(a::Vector{<:NumFieldElem}, b::Vector{ZZRingElem})
   d = zero(parent(a[1]))
   t = zero(d)
   for i = 1:length(a)
-    mul!(t, a[i], b[i])
+    t = mul!(t, a[i], b[i])
     d = add!(d, t)
   end
   return d
@@ -472,10 +472,10 @@ function inv(f::T) where {T<:Union{ZZModPolyRingElem,zzModPolyRingElem}}
   # starting with this g, and using the fact that all coeffs are nilpotent
   # we have an inverse modulo s.th. nilpotent. Hence it works
   c = Rx()
-  mul!(c, f, g)
+  c = mul!(c, f, g)
   while !isone(c)
-    mul!(g, g, 2 - c)
-    mul!(c, f, g)
+    g = mul!(g, g, 2 - c)
+    c = mul!(c, f, g)
   end
   return g
 end
@@ -501,9 +501,9 @@ function invmod(f::ZZModPolyRingElem, M::ZZModPolyRingElem)
   c = f * g
   c = rem!(c, c, M)
   while !isone(c)
-    mul!(g, g, 2 - c)
+    g = mul!(g, 2 - c)
     g = rem!(g, g, M)
-    mul!(c, f, g)
+    c = mul!(c, f, g)
     c = rem!(c, c, M)
   end
   return g
@@ -782,7 +782,7 @@ function evaluate(f::QQPolyRingElem, a::AbsSimpleNumFieldElem)
   s = R(coeff(f, l))
   for i in l-1:-1:0
     #s = s*a + R(coeff(f, i))
-    mul!(s, s, a)
+    s = mul!(s, s, a)
     s = add!(s, coeff(f, i))
   end
   return s

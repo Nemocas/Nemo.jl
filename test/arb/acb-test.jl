@@ -198,7 +198,7 @@ end
   z = sub!(z, x, y)
   @test z == -1
 
-  mul!(z, x, y)
+  z = mul!(z, x, y)
   @test z == 6
 
   z = div!(z, y, x)
