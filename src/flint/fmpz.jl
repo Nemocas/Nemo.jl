@@ -343,7 +343,7 @@ canonical_unit(x::ZZRingElem) = x < 0 ? ZZRingElem(-1) : ZZRingElem(1)
 
 function -(x::ZZRingElem)
   z = ZZRingElem()
-  neg!(z, x)
+  z = neg!(z, x)
   return z
 end
 
@@ -522,7 +522,7 @@ end
 function -(c::Int, x::ZZRingElem)
   z = ZZRingElem()
   sub!(z, x, c)
-  neg!(z, z)
+  z = neg!(z)
   return z
 end
 
@@ -2581,7 +2581,7 @@ end
 
 function sub!(z::ZZRingElemOrPtr, b::Integer, a::ZZRingElemOrPtr)
   sub!(z, a, b)
-  return neg!(z, z)
+  return neg!(z)
 end
 
 

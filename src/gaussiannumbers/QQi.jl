@@ -240,7 +240,7 @@ function reduce!(z::QQiFieldElem)
         (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}),
         g, z.num.x, z.den, z.num.y)
   if ccall((:fmpz_sgn, libflint), Cint, (Ref{ZZRingElem},), z.den) < 0
-    neg!(g, g)
+    g = neg!(g)
   end
   divexact!(z.num, z.num, g)
   divexact!(z.den, z.den, g)
@@ -323,7 +323,7 @@ function sub!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem)
     reduce!(z)
   else
     subeq!(z, a)
-    neg!(z, z)
+    z = neg!(z)
   end
   return z
 end

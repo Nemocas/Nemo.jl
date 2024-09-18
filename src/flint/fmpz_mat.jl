@@ -216,7 +216,7 @@ canonical_unit(a::ZZMatrix) = canonical_unit(a[1, 1])
 
 function -(x::ZZMatrix)
   z = similar(x)
-  neg!(z, x)
+  z = neg!(z, x)
   return z
 end
 

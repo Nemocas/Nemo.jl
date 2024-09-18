@@ -228,13 +228,13 @@ end
 function mul_i_pow!(z::ZZiRingElem, k::Int)
   k = mod(k%UInt, 4)
   if k == 1
-    neg!(z.y, z.y)
+    z.y = neg!(z.y)
     swap!(z.x, z.y)
   elseif k == 2
-    neg!(z.x, z.x)
-    neg!(z.y, z.y)
+    z.x = neg!(z.x)
+    z.y = neg!(z.y)
   elseif k == 3
-    neg!(z.x, z.x)
+    z.x = neg!(z.x)
     swap!(z.x, z.y)
   end
   return z
@@ -325,7 +325,7 @@ end
 
 function sub!(z::ZZiRingElem, a::IntegerUnion, b::ZZiRingElem)
   sub!(z.x, a, b.x)
-  neg!(z.y, b.y)
+  z.y = neg!(z.y, b.y)
   return z
 end
 
@@ -339,8 +339,8 @@ end
 
 
 function neg!(z::ZZiRingElem, a::ZZiRingElem)
-  neg!(z.x, a.x)
-  neg!(z.y, a.y)
+  z.x = neg!(z.x, a.x)
+  z.y = neg!(z.y, a.y)
   return z
 end
 
