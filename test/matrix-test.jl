@@ -52,3 +52,10 @@ end
   @test prod_diagonal(A) == QQ(5)
   @test prod_diagonal(zero_matrix(QQ, 0, 0)) == QQ(1)
 end
+
+@testset "Reduce mod RREF" begin
+  A = QQ[1 2 3; 4 5 6]
+  B = echelon_form(A)
+  @test is_zero(reduce_mod(A, B))
+  @test is_zero(reduce_mod(A, 2*B))
+end
