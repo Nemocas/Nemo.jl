@@ -529,3 +529,10 @@ end
   A = zero_matrix(RR, 0, 0)
   @test contains_zero(norm(A))
 end
+
+@testset "ArbMatrix.rounding" begin
+  A = RR[2.2 3.1 5.4; 1.5 4.7 7.2]
+  B = zero_matrix(ZZ, 2, 3)
+  round!(B, A)
+  @test B == ZZ[2 3 5; 2 5 7]
+end

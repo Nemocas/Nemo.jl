@@ -1,14 +1,3 @@
-function round!(b::ZZMatrix, a::ArbMatrix)
-  s = size(a)
-  for i = 1:s[1]
-    for j = 1:s[2]
-      b[i, j] = round(ZZRingElem, a[i, j])
-    end
-  end
-  return b
-end
-
-
 function shift!(g::ZZMatrix, l::Int)
   GC.@preserve g begin
     for i = 1:nrows(g)

@@ -788,6 +788,21 @@ function identity_matrix(R::RealField, n::Int)
   return z
 end
 
+###############################################################################
+#
+#  Rounding
+#
+###############################################################################
+
+function round!(b::ZZMatrix, a::ArbMatrix)
+  for i = 1:nrows(a)
+    for j = 1:ncols(a)
+      b[i, j] = round(ZZRingElem, a[i, j])
+    end
+  end
+  return b
+end
+
 ################################################################################
 #
 #  Entry pointers
