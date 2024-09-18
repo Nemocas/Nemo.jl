@@ -339,3 +339,18 @@ end
   @test x isa ZZRingElem && x == 1
 
 end
+
+@testset "FqFieldElem.is_power" begin
+  F = GF(11)
+  a = F(0)
+  @test is_power(a, 2) == (true, F(0))
+  a = F(2)
+  fl, b = is_power(a^3, 3)
+  @test fl
+  @test a^3 == b^3
+  fl, b = is_power(a^2, 2)
+  @test fl
+  @test a^2 == b^2
+  fl, b = is_power(a, 2)
+  @test !fl
+end

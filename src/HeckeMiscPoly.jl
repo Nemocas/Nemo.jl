@@ -1,24 +1,3 @@
-##############################################################
-# all of this should be in Nemo/AbstractAlgebra
-#
-function is_power(a::Union{fpFieldElem, FpFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem, FqFieldElem}, m::Int)
-  if iszero(a)
-    return true, a
-  end
-  s = order(parent(a))
-  if gcd(s - 1, m) == 1
-    return true, a^invmod(ZZ(m), s - 1)
-  end
-  St, t = polynomial_ring(parent(a), "t", cached=false)
-  f = t^m - a
-  rt = roots(f)
-  if length(rt) > 0
-    return true, rt[1]
-  else
-    return false, a
-  end
-end
-
 function setcoeff!(z::fqPolyRepPolyRingElem, n::Int, x::ZZRingElem)
   ccall((:fq_nmod_poly_set_coeff_fmpz, libflint), Nothing,
         (Ref{fqPolyRepPolyRingElem}, Int, Ref{ZZRingElem}, Ref{fqPolyRepField}),
