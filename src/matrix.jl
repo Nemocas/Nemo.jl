@@ -345,7 +345,7 @@ Return the diagonal of `A` as an array.
 diagonal(A::MatrixElem{T}) where {T} = T[A[i, i] for i in 1:min(nrows(A), ncols(A))]
 
 function prod_diagonal(A::MatrixElem{T}) where {T}
-  return prod(T[A[i, i] for i = 1:nrows(A)])
+  return prod(diagonal(A))
 end
 
 ################################################################################
