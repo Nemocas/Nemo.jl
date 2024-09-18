@@ -124,16 +124,6 @@ for (etype, rtype, ctype, mtype, brtype, flint_fn) in (
 
     characteristic(R::($rtype)) = modulus(R)
 
-    function set_precision!(z::($etype), k::Int)
-      k < 0 && throw(DomainError(k, "Precision must be non-negative"))
-      z = truncate!(z, k)
-      z.prec = k
-      if is_zero(z)
-        z.val = k
-      end
-      return z
-    end
-
     ###############################################################################
     #
     #   Similar
