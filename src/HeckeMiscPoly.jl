@@ -1,13 +1,3 @@
-function mulhigh_n(a::ZZPolyRingElem, b::ZZPolyRingElem, n::Int)
-  c = parent(a)()
-  #careful: as part of the interface, the coeffs 0 - (n-1) are random garbage
-  ccall((:fmpz_poly_mulhigh_n, libflint), Nothing, (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Cint), c, a, b, n)
-  return c
-end
-function mulhigh(a::PolyRingElem{T}, b::PolyRingElem{T}, n::Int) where {T}
-  return mulhigh_n(a, b, degree(a) + degree(b) - n)
-end
-
 normalise(f::ZZPolyRingElem, ::Int) = degree(f) + 1
 set_length!(f::ZZPolyRingElem, ::Int) = nothing
 

@@ -62,3 +62,13 @@ function _factor_squarefree_char_0(f::PolyRingElem)
   end
   return Fac(parent(f)(c), res)
 end
+
+################################################################################
+#
+#  Mulhigh
+#
+################################################################################
+
+function mulhigh(a::PolyRingElem{T}, b::PolyRingElem{T}, n::Int) where {T}
+  return mulhigh_n(a, b, degree(a) + degree(b) - n)
+end

@@ -1004,3 +1004,18 @@ function sturm_sequence(f::ZZPolyRingElem)
   end
   return seq
 end
+
+###############################################################################
+#
+#   Mulhigh
+#
+###############################################################################
+
+function mulhigh_n(a::ZZPolyRingElem, b::ZZPolyRingElem, n::Int)
+  c = parent(a)()
+  #careful: as part of the interface, the coeffs 0 - (n-1) are random garbage
+  ccall((:fmpz_poly_mulhigh_n, libflint), Nothing,
+        (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Cint),
+        c, a, b, n)
+  return c
+end
