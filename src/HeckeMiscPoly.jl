@@ -1,17 +1,3 @@
-################################################################################
-#
-#  QQPolyRingElem with denominator 1 to ZZPolyRingElem
-#
-################################################################################
-
-function (a::ZZPolyRing)(b::QQPolyRingElem)
-  (!isone(denominator(b))) && error("Denominator has to be 1")
-  z = a()
-  ccall((:fmpq_poly_get_numerator, libflint), Nothing,
-        (Ref{ZZPolyRingElem}, Ref{QQPolyRingElem}), z, b)
-  return z
-end
-
 ##############################################################
 # all of this should be in Nemo/AbstractAlgebra
 #

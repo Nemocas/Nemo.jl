@@ -622,4 +622,9 @@ end
     g = @inferred Rx(f)
     @test g == 4*x^2 + 8*x + 2
   end
+
+  R, x = polynomial_ring(ZZ, "x")
+  @test_throws ErrorException R(f)
+  f = 7*y^2 + 3*y + 2
+  @test @inferred R(f) == 7*x^2 + 3*x + 2
 end
