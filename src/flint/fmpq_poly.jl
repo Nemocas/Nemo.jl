@@ -839,6 +839,129 @@ promote_rule(::Type{QQPolyRingElem}, ::Type{Rational{T}}) where T <: Union{Int, 
 
 ###############################################################################
 #
+#   Conversion
+#
+###############################################################################
+
+function fmpq_poly_to_nmod_poly_raw!(r::zzModPolyRingElem, a::QQPolyRingElem)
+  ccall((:fmpq_poly_get_nmod_poly, libflint), Nothing,
+        (Ref{zzModPolyRingElem}, Ref{QQPolyRingElem}), r, a)
+  return r
+end
+
+function fmpq_poly_to_nmod_poly(Rx::zzModPolyRing, f::QQPolyRingElem)
+  g = Rx()
+  fmpq_poly_to_nmod_poly_raw!(g, f)
+  return g
+end
+
+function (R::zzModPolyRing)(g::QQPolyRingElem)
+  return fmpq_poly_to_nmod_poly(R, g)
+end
+
+function fmpq_poly_to_gfp_poly_raw!(r::fpPolyRingElem, a::QQPolyRingElem)
+  ccall((:fmpq_poly_get_nmod_poly, libflint), Nothing,
+        (Ref{fpPolyRingElem}, Ref{QQPolyRingElem}), r, a)
+  return r
+end
+
+function fmpq_poly_to_gfp_poly(Rx::fpPolyRing, f::QQPolyRingElem)
+  g = Rx()
+  fmpq_poly_to_gfp_poly_raw!(g, f)
+  return g
+end
+
+function (R::fpPolyRing)(g::QQPolyRingElem)
+  return fmpq_poly_to_gfp_poly(R, g)
+end
+
+function fmpq_poly_to_fq_default_poly_raw!(r::FqPolyRingElem, a::QQPolyRingElem, t1::ZZPolyRingElem=ZZPolyRingElem(), t2::ZZRingElem=ZZRingElem())
+  ccall((:fmpq_poly_get_numerator, libflint), Nothing,
+        (Ref{ZZPolyRingElem}, Ref{QQPolyRingElem}), t1, a)
+  ccall((:fq_default_poly_set_fmpz_poly, libflint), Nothing,
+        (Ref{FqPolyRingElem}, Ref{ZZPolyRingElem}, Ref{FqField}),
+        r, t1, base_ring(parent(r)))
+  ccall((:fmpq_poly_get_denominator, libflint), Nothing,
+        (Ref{ZZRingElem}, Ref{QQPolyRingElem}), t2, a)
+  if !isone(t2)
+    ccall((:fq_default_poly_scalar_div_fq_default, libflint), Nothing,
+          (Ref{FqPolyRingElem}, Ref{FqPolyRingElem}, Ref{FqFieldElem}, Ref{FqField}),
+          r, r, coefficient_ring(r)(t2), coefficient_ring(r))
+  end
+  return r
+end
+
+function fmpq_poly_to_fq_default_poly(Rx::FqPolyRing, f::QQPolyRingElem)
+  g = Rx()
+  fmpq_poly_to_fq_default_poly_raw!(g, f)
+  return g
+end
+
+function (R::FqPolyRing)(g::QQPolyRingElem)
+  return fmpq_poly_to_fq_default_poly(R, g)
+end
+
+function fmpq_poly_to_fmpz_mod_poly_raw!(r::ZZModPolyRingElem, a::QQPolyRingElem, t1::ZZPolyRingElem=ZZPolyRingElem(), t2::ZZRingElem=ZZRingElem())
+  ccall((:fmpq_poly_get_numerator, libflint), Nothing,
+        (Ref{ZZPolyRingElem}, Ref{QQPolyRingElem}), t1, a)
+  ccall((:fmpz_mod_poly_set_fmpz_poly, libflint), Nothing,
+        (Ref{ZZModPolyRingElem}, Ref{ZZPolyRingElem}, Ref{fmpz_mod_ctx_struct}), r, t1, base_ring(parent(r)).ninv)
+  ccall((:fmpq_poly_get_denominator, libflint), Nothing,
+        (Ref{ZZRingElem}, Ref{QQPolyRingElem}), t2, a)
+  if !isone(t2)
+    res = ccall((:fmpz_invmod, libflint), Cint,
+                (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}),
+                t2, t2, modulus(base_ring(r)))
+    @assert res != 0
+    ccall((:fmpz_mod_poly_scalar_mul_fmpz, libflint), Nothing,
+          (Ref{ZZModPolyRingElem}, Ref{ZZModPolyRingElem}, Ref{ZZRingElem}, Ref{fmpz_mod_ctx_struct}),
+          r, r, t2, base_ring(parent(r)).ninv)
+  end
+  return r
+end
+
+function fmpq_poly_to_fmpz_mod_poly(Rx::ZZModPolyRing, f::QQPolyRingElem)
+  g = Rx()
+  fmpq_poly_to_fmpz_mod_poly_raw!(g, f)
+  return g
+end
+
+function (R::ZZModPolyRing)(g::QQPolyRingElem)
+  return fmpq_poly_to_fmpz_mod_poly(R, g)
+end
+
+
+function fmpq_poly_to_gfp_fmpz_poly_raw!(r::FpPolyRingElem, a::QQPolyRingElem, t1::ZZPolyRingElem=ZZPolyRingElem(), t2::ZZRingElem=ZZRingElem())
+  ccall((:fmpq_poly_get_numerator, libflint), Nothing,
+        (Ref{ZZPolyRingElem}, Ref{QQPolyRingElem}), t1, a)
+  ccall((:fmpz_mod_poly_set_fmpz_poly, libflint), Nothing,
+        (Ref{FpPolyRingElem}, Ref{ZZPolyRingElem}, Ref{fmpz_mod_ctx_struct}), r, t1, base_ring(parent(r)).ninv)
+  ccall((:fmpq_poly_get_denominator, libflint), Nothing,
+        (Ref{ZZRingElem}, Ref{QQPolyRingElem}), t2, a)
+  if !isone(t2)
+    res = ccall((:fmpz_invmod, libflint), Cint,
+                (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}),
+                t2, t2, modulus(base_ring(r)))
+    @assert res != 0
+    ccall((:fmpz_mod_poly_scalar_mul_fmpz, libflint), Nothing,
+          (Ref{FpPolyRingElem}, Ref{FpPolyRingElem}, Ref{ZZRingElem}, Ref{fmpz_mod_ctx_struct}),
+          r, r, t2, base_ring(parent(r)).ninv)
+  end
+  return r
+end
+
+function fmpq_poly_to_gfp_fmpz_poly(Rx::FpPolyRing, f::QQPolyRingElem)
+  g = Rx()
+  fmpq_poly_to_gfp_fmpz_poly_raw!(g, f)
+  return g
+end
+
+function (R::FpPolyRing)(g::QQPolyRingElem)
+  return fmpq_poly_to_gfp_fmpz_poly(R, g)
+end
+
+###############################################################################
+#
 #   Parent object call overloads
 #
 ###############################################################################

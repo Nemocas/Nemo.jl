@@ -262,26 +262,6 @@ function dot(a::Vector{<:NumFieldElem}, b::Vector{ZZRingElem})
   return d
 end
 
-function (R::zzModPolyRing)(g::QQPolyRingElem)
-  return fmpq_poly_to_nmod_poly(R, g)
-end
-
-function (R::fpPolyRing)(g::QQPolyRingElem)
-  return fmpq_poly_to_gfp_poly(R, g)
-end
-
-function (R::ZZModPolyRing)(g::QQPolyRingElem)
-  return fmpq_poly_to_fmpz_mod_poly(R, g)
-end
-
-function (R::FpPolyRing)(g::QQPolyRingElem)
-  return fmpq_poly_to_gfp_fmpz_poly(R, g)
-end
-
-function (R::FqPolyRing)(g::QQPolyRingElem)
-  return fmpq_poly_to_fq_default_poly(R, g)
-end
-
 function bits(x::ArbFieldElem)
   return ccall((:arb_bits, libflint), Int, (Ref{ArbFieldElem},), x)
 end
