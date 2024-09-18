@@ -294,7 +294,7 @@ function add!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem)
     mul!(z.den, a.den, b.den)
     reduce!(z)
   else
-    add!(z, a)
+    z = add!(z, a)
   end
   return z
 end
@@ -362,7 +362,7 @@ end
 
 function addmul!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem, t::QQiFieldElem)
   mul!(t, a, b)
-  add!(z, z, t)
+  z = add!(z, t)
   return z
 end
 

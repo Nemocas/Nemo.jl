@@ -53,7 +53,7 @@ function evaluate!(z::fqPolyRepFieldElem, f::ZZPolyRingElem, r::fqPolyRepFieldEl
   #s = parent(r)(coeff(f, l))
   for i = l-1:-1:0
     mul!(z, z, r)
-    add!(z, z, parent(r)(coeff(f, i)))
+    z = add!(z, parent(r)(coeff(f, i)))
     #s = s*r + parent(r)(coeff(f, i))
   end
   return z
@@ -257,7 +257,7 @@ function dot(a::Vector{<:NumFieldElem}, b::Vector{ZZRingElem})
   t = zero(d)
   for i = 1:length(a)
     mul!(t, a[i], b[i])
-    add!(d, d, t)
+    d = add!(d, t)
   end
   return d
 end
@@ -783,7 +783,7 @@ function evaluate(f::QQPolyRingElem, a::AbsSimpleNumFieldElem)
   for i in l-1:-1:0
     #s = s*a + R(coeff(f, i))
     mul!(s, s, a)
-    add!(s, s, coeff(f, i))
+    s = add!(s, coeff(f, i))
   end
   return s
 end

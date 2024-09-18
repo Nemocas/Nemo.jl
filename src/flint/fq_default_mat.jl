@@ -388,7 +388,7 @@ function tr(a::FqMatrix)
   n = nrows(a)
   t = zero(base_ring(a))
   for i in 1:nrows(a)
-    add!(t, t, a[i, i])
+    t = add!(t, a[i, i])
   end
   return t
 end

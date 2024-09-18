@@ -210,7 +210,7 @@ end
 function +(x::fqPolyRepMatrix, y::fqPolyRepMatrix)
   check_parent(x,y)
   z = similar(x)
-  add!(z, x, y)
+  z = add!(z, x, y)
   return z
 end
 
@@ -368,7 +368,7 @@ function tr(a::fqPolyRepMatrix)
   n = nrows(a)
   t = zero(base_ring(a))
   for i in 1:nrows(a)
-    add!(t, t, a[i, i])
+    t = add!(t, a[i, i])
   end
   return t
 end

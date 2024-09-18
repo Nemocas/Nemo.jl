@@ -72,7 +72,7 @@ function rand(rng::AbstractRNG, a::ZZRingElemUnitRange)
     for i = 1:nl
       ccall((:fmpz_mul_2exp, libflint), Nothing,
             (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), s, s, c)
-      add!(s, s, rand(rng, Base.GMP.Limb))
+      s = add!(s, s, rand(rng, Base.GMP.Limb))
     end
     if high > 0
       s = s << high

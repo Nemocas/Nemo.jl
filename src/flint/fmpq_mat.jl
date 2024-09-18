@@ -284,7 +284,7 @@ reverse_cols(x::QQMatrix) = reverse_cols!(deepcopy(x))
 function +(x::QQMatrix, y::QQMatrix)
   check_parent(x, y)
   z = similar(x)
-  add!(z, x, y)
+  z = add!(z, x, y)
   return z
 end
 

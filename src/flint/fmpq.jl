@@ -290,7 +290,7 @@ conj(x::QQFieldElem) = x
 
 function +(a::QQFieldElem, b::QQFieldElem)
   z = QQFieldElem()
-  add!(z, a, b)
+  z = add!(z, a, b)
   return z
 end
 

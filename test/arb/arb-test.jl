@@ -294,7 +294,7 @@ end
   x = RR(2)
   y = RR(3)
 
-  add!(z, x, y)
+  z = add!(z, x, y)
   @test z == 5
 
   sub!(z, x, y)

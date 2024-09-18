@@ -287,13 +287,13 @@ end
 ###############################################################################
 
 function add!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem)
-  add!(z.x, a.x, b.x)
-  add!(z.y, a.y, b.y)
+  z.x = add!(z.x, a.x, b.x)
+  z.y = add!(z.y, a.y, b.y)
   return z
 end
 
 function add!(z::ZZiRingElem, a::ZZiRingElem, b::IntegerUnion)
-  add!(z.x, a.x, b)
+  z.x = add!(z.x, a.x, b)
   set!(z.y, a.y)
   return z
 end
@@ -549,7 +549,7 @@ function sqr!(z::ZZiRingElem, a::ZZiRingElem, t::ZZiRingElem)
   ny = size(a.y)
   if 5 < nx < 2*ny && 5 < ny < 2*nx
     # (x+y)^2-x^2-y^2
-    add!(z.x, a.x, a.y)
+    z.x = add!(z.x, a.x, a.y)
     mul!(z.y, z.x, z.x)
     sub!(z.y, z.y, t.x)
     sub!(z.y, z.y, t.y)

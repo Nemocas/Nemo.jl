@@ -1134,7 +1134,7 @@ function add!(c::ZZLaurentSeriesRingElem, a::ZZLaurentSeriesRingElem, b::ZZLaure
     pi = valr + sc*i
     if pi == pa && pi < mina
       if pi == pb && pi < minb
-        add!(t, polcoeff(a, j), polcoeff(b, k))
+        t = add!(t, polcoeff(a, j), polcoeff(b, k))
         setcoeff!(c, i, t)
         pb += sb
         k += 1

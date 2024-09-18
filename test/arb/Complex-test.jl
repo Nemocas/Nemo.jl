@@ -199,7 +199,7 @@ end
   x = CC(2)
   y = CC(3)
 
-  add!(z, x, y)
+  z = add!(z, x, y)
   @test z == 5
 
   sub!(z, x, y)

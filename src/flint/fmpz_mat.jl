@@ -294,7 +294,7 @@ reverse_cols(x::ZZMatrix) = reverse_cols!(deepcopy(x))
 function +(x::ZZMatrix, y::ZZMatrix)
   check_parent(x, y)
   z = similar(x)
-  add!(z, x, y)
+  z = add!(z, x, y)
   return z
 end
 
@@ -1833,7 +1833,7 @@ function mul!(z::ZZMatrix, x::ZZMatrix, y::ZZMatrix, fl::Bool = false)
     n = similar(z)
     ccall((:fmpz_mat_mul, libflint), Nothing,
           (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZMatrix}), n, x, y)
-    add!(z, z, n)             
+    z = add!(z, n)             
   else
     ccall((:fmpz_mat_mul, libflint), Nothing,
           (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZMatrix}), z, x, y)

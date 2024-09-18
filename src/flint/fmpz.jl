@@ -507,7 +507,7 @@ end
 
 function +(x::ZZRingElem, c::Int)
   z = ZZRingElem()
-  add!(z, x, c)
+  z = add!(z, x, c)
   return z
 end
 
@@ -754,9 +754,9 @@ function nfdivrem(a::ZZRingElem, b::ZZRingElem)
   if c <= 0
     if sign(Int, b) != sign(Int, r)
       sub!(q, q, UInt(1))
-      add!(r, r, b)
+      r = add!(r, b)
     elseif c < 0
-      add!(q, q, UInt(1))
+      q = add!(q, UInt(1))
       sub!(r, r, b)
     end
   end
@@ -768,11 +768,11 @@ function ncdivrem(a::ZZRingElem, b::ZZRingElem)
   c = ccall((:fmpz_cmp2abs, libflint), Cint, (Ref{ZZRingElem}, Ref{ZZRingElem}), b, r)
   if c <= 0
     if sign(Int, b) == sign(Int, r)
-      add!(q, q, UInt(1))
+      q = add!(q, UInt(1))
       sub!(r, r, b)
     elseif c < 0
       sub!(q, q, UInt(1))
-      add!(r, r, b)
+      r = add!(r, b)
     end
   end
   return (q, r)
@@ -2876,7 +2876,7 @@ function rand(rng::AbstractRNG, sp::SamplerFmpz)
   if !isone(sp.step)
     mul!(z, z, sp.step)
   end
-  add!(z, z, sp.a)
+  z = add!(z, sp.a)
 end
 
 
