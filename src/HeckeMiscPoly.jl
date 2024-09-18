@@ -1,11 +1,3 @@
-function resultant(f::ZZPolyRingElem, g::ZZPolyRingElem, d::ZZRingElem, nb::Int)
-  z = ZZRingElem()
-  ccall((:fmpz_poly_resultant_modular_div, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Ref{ZZRingElem}, Int),
-        z, f, g, d, nb)
-  return z
-end
-
 function fmpq_poly_to_nmod_poly_raw!(r::zzModPolyRingElem, a::QQPolyRingElem)
   ccall((:fmpq_poly_get_nmod_poly, libflint), Nothing, (Ref{zzModPolyRingElem}, Ref{QQPolyRingElem}), r, a)
 end

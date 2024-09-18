@@ -3328,3 +3328,21 @@ end
 end
 
 using .BitsMod
+
+###############################################################################
+#
+#   Resultant
+#
+###############################################################################
+
+# From the flint docs:
+# Computes the resultant of f and g divided by d [...]. It is assumed that the
+# resultant is exactly divisible by d and the result res has at most nb bits.
+# This bypasses the computation of general bounds.
+function resultant(f::ZZPolyRingElem, g::ZZPolyRingElem, d::ZZRingElem, nb::Int)
+  z = ZZRingElem()
+  ccall((:fmpz_poly_resultant_modular_div, libflint), Nothing,
+        (Ref{ZZRingElem}, Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Ref{ZZRingElem}, Int),
+        z, f, g, d, nb)
+  return z
+end
