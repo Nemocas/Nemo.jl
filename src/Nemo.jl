@@ -453,6 +453,7 @@ include("embedding/embedding.jl")
 include("Rings.jl")
 
 include("matrix.jl")
+include("poly.jl")
 
 include("Infinity.jl")
 

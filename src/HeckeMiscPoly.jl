@@ -1,25 +1,8 @@
-function rem!(z::T, f::T, g::T) where {T<:PolyRingElem}
-  z = rem(f, g)
-  return z
-end
-
 function resultant(f::ZZPolyRingElem, g::ZZPolyRingElem, d::ZZRingElem, nb::Int)
   z = ZZRingElem()
   ccall((:fmpz_poly_resultant_modular_div, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Ref{ZZRingElem}, Int),
         z, f, g, d, nb)
-  return z
-end
-
-function rem!(z::fqPolyRepPolyRingElem, x::fqPolyRepPolyRingElem, y::fqPolyRepPolyRingElem)
-  ccall((:fq_nmod_poly_rem, libflint), Nothing, (Ref{fqPolyRepPolyRingElem}, Ref{fqPolyRepPolyRingElem}, Ref{fqPolyRepPolyRingElem}, Ref{fqPolyRepField}),
-        z, x, y, base_ring(parent(x)))
-  return z
-end
-
-function rem!(z::FqPolyRepPolyRingElem, x::FqPolyRepPolyRingElem, y::FqPolyRepPolyRingElem)
-  ccall((:fq_poly_rem, libflint), Nothing, (Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepPolyRing}),
-        z, x, y, parent(x))
   return z
 end
 
