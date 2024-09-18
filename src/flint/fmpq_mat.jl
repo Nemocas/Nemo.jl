@@ -1054,3 +1054,19 @@ function nullspace(A::QQMatrix)
 
   return nullity, NQQ
 end
+
+################################################################################
+#
+#  Convert a matrix to array
+#
+################################################################################
+
+function to_array(M::QQMatrix)
+  A = Vector{QQFieldElem}(undef, ncols(M) * nrows(M))
+  for i = 1:nrows(M)
+    for j = 1:ncols(M)
+      A[(i - 1) * ncols(M) + j] = M[i, j]
+    end
+  end
+  return A
+end
