@@ -1908,6 +1908,22 @@ function Generic.add_one!(a::ZZMatrix, i::Int, j::Int)
   return a
 end
 
+function shift!(g::ZZMatrix, l::Int)
+  GC.@preserve g begin
+    for i = 1:nrows(g)
+      for j = 1:ncols(g)
+        z = mat_entry_ptr(g, i, j)
+        if l > 0
+          ccall((:fmpz_mul_2exp, libflint), Nothing, (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Int), z, z, l)
+        else
+          ccall((:fmpz_tdiv_q_2exp, libflint), Nothing, (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Int), z, z, -l)
+        end
+      end
+    end
+  end
+  return g
+end
+
 ###############################################################################
 #
 #   Parent object call overloads

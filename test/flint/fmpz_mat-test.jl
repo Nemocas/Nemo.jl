@@ -844,3 +844,11 @@ end
   @test A == ZZ[1 0; 0 0]
   @test_throws BoundsError Generic.add_one!(A, 3, 1)
 end
+
+@testset "ZZMatrix.shift!" begin
+  A = ZZ[2 3 5; 4 6 3]
+  shift!(A, 2)
+  @test A == ZZ[8 12 20; 16 24 12]
+  shift!(A, -2)
+  @test A == ZZ[2 3 5; 4 6 3]
+end
