@@ -574,23 +574,6 @@ function mul!(z::ZZAbsPowerSeriesRingElem, a::ZZAbsPowerSeriesRingElem, b::ZZAbs
   return z
 end
 
-function addeq!(a::ZZAbsPowerSeriesRingElem, b::ZZAbsPowerSeriesRingElem)
-  lena = length(a)
-  lenb = length(b)
-
-  prec = min(a.prec, b.prec)
-
-  lena = min(lena, prec)
-  lenb = min(lenb, prec)
-
-  lenz = max(lena, lenb)
-  a.prec = prec
-  ccall((:fmpz_poly_add_series, libflint), Nothing,
-        (Ref{ZZAbsPowerSeriesRingElem}, Ref{ZZAbsPowerSeriesRingElem}, Ref{ZZAbsPowerSeriesRingElem}, Int),
-        a, a, b, lenz)
-  return a
-end
-
 function add!(c::ZZAbsPowerSeriesRingElem, a::ZZAbsPowerSeriesRingElem, b::ZZAbsPowerSeriesRingElem)
   lena = length(a)
   lenb = length(b)

@@ -625,21 +625,6 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
       return z
     end
 
-    function addeq!(a::($etype), b::($etype))
-      lena = length(a)
-      lenb = length(b)
-      prec = min(a.prec, b.prec)
-      lena = min(lena, prec)
-      lenb = min(lenb, prec)
-      lenz = max(lena, lenb)
-      a.prec = prec
-      ccall(($(flint_fn*"_add_series"), libflint), Nothing,
-            (Ref{($etype)}, Ref{($etype)},
-             Ref{($etype)}, Int, Ref{($ctype)}),
-            a, a, b, lenz, base_ring(a))
-      return a
-    end
-
     function add!(c::($etype), a::($etype), b::($etype))
       lena = length(a)
       lenb = length(b)

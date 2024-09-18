@@ -755,7 +755,7 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
       return z
     end
 
-    function addeq!(a::($etype), b::($etype))
+    function add!(a::($etype), b::($etype))
       lena = pol_length(a)
       lenb = pol_length(b)
       prec = min(a.prec, b.prec)
@@ -801,9 +801,9 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
 
     function add!(c::($etype), a::($etype), b::($etype))
       if c === a
-        return addeq!(c, b)
+        return add!(c, b)
       elseif c === b
-        return addeq!(c, a)
+        return add!(c, a)
       end
       lena = pol_length(a)
       lenb = pol_length(b)

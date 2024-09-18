@@ -634,7 +634,7 @@ function mul!(z::ZZRelPowerSeriesRingElem, a::ZZRelPowerSeriesRingElem, b::ZZRel
   return z
 end
 
-function addeq!(a::ZZRelPowerSeriesRingElem, b::ZZRelPowerSeriesRingElem)
+function add!(a::ZZRelPowerSeriesRingElem, b::ZZRelPowerSeriesRingElem)
   lena = pol_length(a)
   lenb = pol_length(b)
   prec = min(a.prec, b.prec)
@@ -679,9 +679,9 @@ end
 
 function add!(c::ZZRelPowerSeriesRingElem, a::ZZRelPowerSeriesRingElem, b::ZZRelPowerSeriesRingElem)
   if c === a
-    return addeq!(c, b)
+    return add!(c, b)
   elseif c === b
-    return addeq!(c, a)
+    return add!(c, a)
   end
   lena = pol_length(a)
   lenb = pol_length(b)

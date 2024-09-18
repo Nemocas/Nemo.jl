@@ -1592,12 +1592,6 @@ function add!(z::ComplexFieldElem, x::ComplexFieldElem, y::ComplexFieldElem, pre
   return z
 end
 
-function addeq!(z::ComplexFieldElem, y::ComplexFieldElem, prec::Int = precision(Balls))
-  ccall((:acb_add, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int),
-        z, z, y, prec)
-  return z
-end
-
 function sub!(z::ComplexFieldElem, x::ComplexFieldElem, y::ComplexFieldElem, prec::Int = precision(Balls))
   ccall((:acb_sub, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int),
         z, x, y, prec)

@@ -807,12 +807,6 @@ function mul!(z::QQPolyRingElem, x::QQPolyRingElem, y::QQPolyRingElem)
   return z
 end
 
-function addeq!(z::QQPolyRingElem, x::QQPolyRingElem)
-  ccall((:fmpq_poly_add, libflint), Nothing,
-        (Ref{QQPolyRingElem}, Ref{QQPolyRingElem}, Ref{QQPolyRingElem}), z, z, x)
-  return z
-end
-
 function add!(z::QQPolyRingElem, x::QQPolyRingElem, y::QQPolyRingElem)
   ccall((:fmpq_poly_add, libflint), Nothing,
         (Ref{QQPolyRingElem}, Ref{QQPolyRingElem}, Ref{QQPolyRingElem}), z, x, y)

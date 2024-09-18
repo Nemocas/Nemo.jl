@@ -356,14 +356,13 @@ function mul!(z::zzModRingElem, x::zzModRingElem, y::zzModRingElem)
   return x*y
 end
 
-function addeq!(z::zzModRingElem, x::zzModRingElem)
+function add!(z::zzModRingElem, x::zzModRingElem)
   return z + x
 end
 
 function add!(z::zzModRingElem, x::zzModRingElem, y::zzModRingElem)
   return x + y
 end
-
 ###############################################################################
 #
 #   Random functions

@@ -766,24 +766,6 @@ function mul!(z::QQAbsPowerSeriesRingElem, a::QQAbsPowerSeriesRingElem, b::QQAbs
   return z
 end
 
-function addeq!(a::QQAbsPowerSeriesRingElem, b::QQAbsPowerSeriesRingElem)
-  lena = length(a)
-  lenb = length(b)
-
-  prec = min(a.prec, b.prec)
-
-  lena = min(lena, prec)
-  lenb = min(lenb, prec)
-
-  lenz = max(lena, lenb)
-  a.prec = prec
-  ccall((:fmpq_poly_add_series, libflint), Nothing,
-        (Ref{QQAbsPowerSeriesRingElem}, Ref{QQAbsPowerSeriesRingElem},
-         Ref{QQAbsPowerSeriesRingElem}, Int),
-        a, a, b, lenz)
-  return a
-end
-
 function add!(c::QQAbsPowerSeriesRingElem, a::QQAbsPowerSeriesRingElem, b::QQAbsPowerSeriesRingElem)
   lena = length(a)
   lenb = length(b)

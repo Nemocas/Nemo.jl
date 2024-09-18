@@ -1090,16 +1090,16 @@ function mul!(c::ZZLaurentSeriesRingElem, a::ZZLaurentSeriesRingElem, b::ZZLaure
   return c
 end
 
-function addeq!(c::ZZLaurentSeriesRingElem, a::ZZLaurentSeriesRingElem)
+function add!(c::ZZLaurentSeriesRingElem, a::ZZLaurentSeriesRingElem)
   b = deepcopy(c)
   return add!(c, b, a)
 end
 
 function add!(c::ZZLaurentSeriesRingElem, a::ZZLaurentSeriesRingElem, b::ZZLaurentSeriesRingElem)
   if c === a
-    return addeq!(c, b)
+    return add!(c, b)
   elseif c === b
-    return addeq!(c, a)
+    return add!(c, a)
   end
   lena = pol_length(a)
   lenb = pol_length(b)

@@ -822,10 +822,6 @@ function add!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::QQMPolyRingElem)
   return a
 end
 
-function addeq!(a::QQMPolyRingElem, b::QQMPolyRingElem)
-  return add!(a, a, b)
-end
-
 function mul!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::QQMPolyRingElem)
   ccall((:fmpq_mpoly_mul, libflint), Nothing,
         (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem},
@@ -851,8 +847,6 @@ for (jT, cN, cT) in ((QQFieldElem, :fmpq, Ref{QQFieldElem}), (ZZRingElem, :fmpz,
     end
 
     add!(a::QQMPolyRingElem, b::($jT), c::QQMPolyRingElem) = add!(a, c, b)
-
-    addeq!(a::QQMPolyRingElem, b::($jT)) = add!(a, a, b)
 
     function sub!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::($jT))
       ccall(($(string(:fmpq_mpoly_sub_, cN)), libflint), Nothing,

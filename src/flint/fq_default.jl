@@ -682,13 +682,6 @@ function mul!(z::FqFieldElem, x::FqFieldElem, y::FqFieldElem)
   return z
 end
 
-function addeq!(z::FqFieldElem, x::FqFieldElem)
-  ccall((:fq_default_add, libflint), Nothing,
-        (Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), z, z, x, x.parent)
-  z.poly = nothing
-  return z
-end
-
 function add!(z::FqFieldElem, x::FqFieldElem, y::FqFieldElem)
   ccall((:fq_default_add, libflint), Nothing,
         (Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), z, x, y, x.parent)

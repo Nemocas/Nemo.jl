@@ -1169,9 +1169,6 @@ function addmul!(c::QQFieldElem, a::QQFieldElem, b::QQFieldElem)
   return c
 end
 
-
-addeq!(c::QQFieldElem, a::QQFieldElem) = add!(c, c, a)
-
 function add!(c::QQFieldElem, a::QQFieldElem, b::QQFieldElem)
   ccall((:fmpq_add, libflint), Nothing,
         (Ref{QQFieldElem}, Ref{QQFieldElem}, Ref{QQFieldElem}), c, a, b)

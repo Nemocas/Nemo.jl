@@ -1945,12 +1945,6 @@ for (s,f) in (("add!","arb_add"), ("mul!","arb_mul"), ("div!", "arb_div"),
   end
 end
 
-function addeq!(z::RealFieldElem, x::RealFieldElem, prec::Int = precision(Balls))
-  ccall((:arb_add, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int),
-        z, z, x, prec)
-  return z
-end
-
 ################################################################################
 #
 #  Unsafe setting

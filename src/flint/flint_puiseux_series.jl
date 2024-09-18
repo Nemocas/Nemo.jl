@@ -499,18 +499,6 @@ function add!(c::FlintPuiseuxSeriesElem{T}, a::FlintPuiseuxSeriesElem{T}, b::Fli
   return c
 end
 
-function addeq!(c::FlintPuiseuxSeriesElem{T}, a::FlintPuiseuxSeriesElem{T}) where T <: RingElem
-  s = gcd(c.scale, a.scale)
-  zscale = div(c.scale*a.scale, s)
-  ainf = div(a.scale, s)
-  cinf = div(c.scale, s)
-  cnew = inflate(c.data, ainf)
-  c.data = addeq!(cnew, inflate(a.data, cinf))
-  c.scale = zscale
-  c = rescale!(c)
-  return c
-end
-
 ###############################################################################
 #
 #   Promotion rules

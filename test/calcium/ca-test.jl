@@ -304,11 +304,11 @@ end
   @test_throws ErrorException mul!(x, C(3), C2(5))
 
   x = C(7)
-  y = addeq!(x, C(3))
+  y = add!(x, C(3))
   @test x == 10
   @test x === y
 
-  @test_throws ErrorException addeq!(x, C2(3))
+  @test_throws ErrorException add!(x, C2(3))
 
   x = C(7)
   y = add!(x, C(3), C(5))

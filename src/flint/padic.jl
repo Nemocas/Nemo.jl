@@ -682,15 +682,6 @@ function mul!(z::PadicFieldElem, x::PadicFieldElem, y::PadicFieldElem)
   return z
 end
 
-function addeq!(x::PadicFieldElem, y::PadicFieldElem)
-  x.N = min(x.N, y.N)
-  ctx = parent(x)
-  ccall((:padic_add, libflint), Nothing,
-        (Ref{PadicFieldElem}, Ref{PadicFieldElem}, Ref{PadicFieldElem}, Ref{PadicField}),
-        x, x, y, ctx)
-  return x
-end
-
 function add!(z::PadicFieldElem, x::PadicFieldElem, y::PadicFieldElem)
   z.N = min(x.N, y.N)
   ctx = parent(x)

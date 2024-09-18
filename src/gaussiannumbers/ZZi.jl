@@ -286,12 +286,6 @@ end
 #
 ###############################################################################
 
-function addeq!(z::ZZiRingElem, a::ZZiRingElem)
-  add!(z.x, z.x, a.x)
-  add!(z.y, z.y, a.y)
-  return z
-end
-
 function add!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem)
   add!(z.x, a.x, b.x)
   add!(z.y, a.y, b.y)

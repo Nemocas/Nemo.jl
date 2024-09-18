@@ -796,10 +796,6 @@ mul!(x::QQMatrix, y::IntegerUnion) = mul!(x, x, y)
 
 mul!(z::QQMatrix, y::QQMatrix, x::Integer) = mul!(z, y, ZZ(x))
 
-function addeq!(z::QQMatrix, x::QQMatrix)
-  add!(z, z, x)
-end
-
 function zero!(z::QQMatrix)
   ccall((:fmpq_mat_zero, libflint), Nothing,
         (Ref{QQMatrix},), z)

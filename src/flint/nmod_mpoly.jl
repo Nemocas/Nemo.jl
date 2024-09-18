@@ -810,13 +810,6 @@ for (etype, rtype, ftype, ctype, utype) in (
       return a
     end
 
-    function addeq!(a::($etype), b::($etype))
-      ccall((:nmod_mpoly_add, libflint), Nothing,
-            (Ref{($etype)}, Ref{($etype)}, Ref{($etype)}, Ref{($rtype)}),
-            a, a, b, parent(a))
-      return a
-    end
-
     function mul!(a::($etype), b::($etype), c::($etype))
       ccall((:nmod_mpoly_mul, libflint), Nothing,
             (Ref{($etype)}, Ref{($etype)}, Ref{($etype)}, Ref{($rtype)}),

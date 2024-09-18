@@ -347,14 +347,6 @@ function mul!(z::ZZModRingElem, x::ZZModRingElem, y::ZZModRingElem)
   return z
 end
 
-function addeq!(z::ZZModRingElem, x::ZZModRingElem)
-  R = parent(z)
-  ccall((:fmpz_mod_add, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{fmpz_mod_ctx_struct}),
-        z.data, z.data, x.data, R.ninv)
-  return z
-end
-
 function add!(z::ZZModRingElem, x::ZZModRingElem, y::ZZModRingElem)
   R = parent(z)
   ccall((:fmpz_mod_add, libflint), Nothing,

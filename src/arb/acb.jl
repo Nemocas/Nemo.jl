@@ -1580,12 +1580,6 @@ function add!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem)
   return z
 end
 
-function addeq!(z::AcbFieldElem, y::AcbFieldElem)
-  ccall((:acb_add, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int),
-        z, z, y, parent(z).prec)
-  return z
-end
-
 function sub!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem)
   ccall((:acb_sub, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int),
         z, x, y, parent(z).prec)

@@ -880,12 +880,6 @@ function mul!(z::ZZPolyRingElem, x::ZZPolyRingElem, y::ZZPolyRingElem)
   return z
 end
 
-function addeq!(z::ZZPolyRingElem, x::ZZPolyRingElem)
-  ccall((:fmpz_poly_add, libflint), Nothing,
-        (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}), z, z, x)
-  return z
-end
-
 function add!(z::ZZPolyRingElem, x::ZZPolyRingElem, y::ZZPolyRingElem)
   ccall((:fmpz_poly_add, libflint), Nothing,
         (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}), z, x, y)

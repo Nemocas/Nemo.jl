@@ -915,13 +915,6 @@ function add!(z::T, x::T, y::T) where {T <: Zmodn_fmpz_poly}
   return z
 end
 
-function addeq!(z::T, y::T) where {T <: Zmodn_fmpz_poly}
-  ccall((:fmpz_mod_poly_add, libflint), Nothing,
-        (Ref{T}, Ref{T}, Ref{T}, Ref{fmpz_mod_ctx_struct}),
-        z, z, y, z.parent.base_ring.ninv)
-  return z
-end
-
 function sub!(z::T, x::T, y::T) where {T <: Zmodn_fmpz_poly}
   ccall((:fmpz_mod_poly_sub, libflint), Nothing,
         (Ref{T}, Ref{T}, Ref{T}, Ref{fmpz_mod_ctx_struct}),

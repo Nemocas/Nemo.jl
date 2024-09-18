@@ -785,11 +785,11 @@ end
   sort_terms!(f)
   @test f == 1*x+2*y+3*x^2+4*y^2
 
-  add!(f, y^2, x*y)
+  f = add!(f, y^2, x*y)
   @test f == y^2 + x*y
-  addeq!(f, x^2)
+  f = add!(f, x^2)
   @test f == y^2 + x*y + x^2
-  mul!(f, f, x)
+  f = mul!(f, f, x)
   @test f == (y^2 + x*y + x^2)*x
 end
 

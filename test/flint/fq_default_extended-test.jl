@@ -140,13 +140,13 @@ end
   w = R()
   @test coeff(w, 3) == 0
   @test coeff(w, 3) == 0
-  mul!(w, u, v)
+  w = mul!(w, u, v)
   @test coeff(w, 3) == 1
-  add!(w, u, v)
+  w = add!(w, u, v)
   @test coeff(w, 1) == 1
-  zero!(w)
+  w = zero!(w)
   @test coeff(w, 1) == 0
-  addeq!(w, u)
+  w = add!(w, u)
   @test coeff(w, 1) == 1
 
   @test basis(R) == [a^i for i in 0:4]

@@ -155,7 +155,7 @@ follows:
 * Functions for mapping between different types, coercion, changing base ring,
   etc.
 
-* Unsafe operators, e.g. `mul!`, `add!`, `addeq!` etc.
+* Unsafe operators, e.g. `mul!`, `add!`, etc.
 
 * Random generation
 

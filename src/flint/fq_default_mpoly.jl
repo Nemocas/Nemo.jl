@@ -441,11 +441,6 @@ function add!(a::FqMPolyRingElem, b::FqMPolyRingElem, c::FqMPolyRingElem)
   return a
 end
 
-function addeq!(a::FqMPolyRingElem, b::FqMPolyRingElem)
-  a.data = addeq!(a.data, b.data)
-  return a
-end
-
 function mul!(a::FqMPolyRingElem, b::FqMPolyRingElem, c::FqMPolyRingElem)
   a.data = mul!(a.data, b.data, c.data)
   return a

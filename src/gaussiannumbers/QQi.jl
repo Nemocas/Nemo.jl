@@ -275,7 +275,7 @@ end
 #
 ###############################################################################
 
-function addeq!(z::QQiFieldElem, a::QQiFieldElem)
+function add!(z::QQiFieldElem, a::QQiFieldElem)
   if z !== a
     mul!(z.num, z.num, a.den)
     addmul!(z.num, a.num, z.den)
@@ -294,7 +294,7 @@ function add!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem)
     mul!(z.den, a.den, b.den)
     reduce!(z)
   else
-    addeq!(z, a)
+    add!(z, a)
   end
   return z
 end

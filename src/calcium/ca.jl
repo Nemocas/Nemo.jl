@@ -1402,17 +1402,6 @@ function mul!(z::CalciumFieldElem, x::CalciumFieldElem, y::CalciumFieldElem)
   return z
 end
 
-function addeq!(z::CalciumFieldElem, x::CalciumFieldElem)
-  if z.parent != x.parent
-    error("different parents in in-place operation")
-  end
-  C = z.parent
-  ccall((:ca_add, libflint), Nothing,
-        (Ref{CalciumFieldElem}, Ref{CalciumFieldElem}, Ref{CalciumFieldElem}, Ref{CalciumField}), z, z, x, C)
-  check_special(z)
-  return z
-end
-
 function add!(z::CalciumFieldElem, x::CalciumFieldElem, y::CalciumFieldElem)
   if z.parent != x.parent || x.parent != y.parent
     error("different parents in in-place operation")

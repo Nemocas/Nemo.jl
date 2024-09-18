@@ -124,14 +124,6 @@ allocating a new object for the result and eliminates associated garbage
 collection.
 
 ```
-addeq!(c::ComplexFieldElem, a::ComplexFieldElem)
-```
-
-In-place addition adds $a$ to $c$ and sets $c$ to the result. This function
-is provided for performance reasons as it saves allocating a new object for
-the result and eliminates associated garbage collection.
-
-```
 deepcopy(a::ComplexFieldElem)
 ```
 

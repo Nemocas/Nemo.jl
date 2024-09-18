@@ -588,7 +588,7 @@ end
     @test isequal(f, f0)
 
     f1 = deepcopy(f)
-    f1 = addeq!(f1, g)
+    f1 = add!(f1, g)
     @test isequal(h, k)
     @test isequal(g, g0)
 
