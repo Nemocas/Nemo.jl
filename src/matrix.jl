@@ -330,3 +330,16 @@ end
 function norm(v::Union{AcbMatrix, ArbMatrix, ComplexMatrix, RealMatrix})
   return sqrt(sum(a^2 for a in v; init=zero(base_ring(v))))
 end
+
+################################################################################
+#
+#  Diagonal
+#
+################################################################################
+
+@doc raw"""
+    diagonal(A::MatElem{T}) -> Vector{T}
+
+Return the diagonal of `A` as an array.
+"""
+diagonal(A::MatElem{T}) where {T} = T[A[i, i] for i in 1:min(nrows(A), ncols(A))]
