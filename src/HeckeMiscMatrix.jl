@@ -1,26 +1,3 @@
-################################################################################
-#
-#  Product of the diagonal entries
-#
-################################################################################
-
-function prod_diagonal(A::ZZMatrix)
-  a = one(ZZRingElem)
-  GC.@preserve a A begin
-    for i = 1:min(nrows(A),ncols(A))
-      b = mat_entry_ptr(A, i, i)
-      mul!(a, a, b)
-    end
-  end
-  return a
-end
-
-function prod_diagonal(A::MatrixElem{T}) where {T}
-  @assert nrows(A) == ncols(A)
-  return prod(T[A[i, i] for i = 1:nrows(A)])
-end
-
-
 @doc raw"""
     reduce_mod!(A::MatElem{T}, B::MatElem{T}) where T <: FieldElem
 

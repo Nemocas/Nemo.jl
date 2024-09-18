@@ -338,8 +338,12 @@ end
 ################################################################################
 
 @doc raw"""
-    diagonal(A::MatElem{T}) -> Vector{T}
+    diagonal(A::MatrixElem{T}) -> Vector{T}
 
 Return the diagonal of `A` as an array.
 """
-diagonal(A::MatElem{T}) where {T} = T[A[i, i] for i in 1:min(nrows(A), ncols(A))]
+diagonal(A::MatrixElem{T}) where {T} = T[A[i, i] for i in 1:min(nrows(A), ncols(A))]
+
+function prod_diagonal(A::MatrixElem{T}) where {T}
+  return prod(T[A[i, i] for i = 1:nrows(A)])
+end

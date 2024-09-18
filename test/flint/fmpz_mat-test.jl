@@ -852,3 +852,9 @@ end
   shift!(A, -2)
   @test A == ZZ[2 3 5; 4 6 3]
 end
+
+@testset "ZZMatrix.prod_diagonal" begin
+  A = ZZ[2 3 5; 4 6 3]
+  @test prod_diagonal(A) == ZZ(12)
+  @test prod_diagonal(zero_matrix(ZZ, 0, 0)) == ZZ(1)
+end

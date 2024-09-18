@@ -48,4 +48,7 @@ end
   @test @inferred diagonal(A) == [QQ(1), QQ(5)]
   A = transpose(A)
   @test @inferred diagonal(A) == [QQ(1), QQ(5)]
+
+  @test prod_diagonal(A) == QQ(5)
+  @test prod_diagonal(zero_matrix(QQ, 0, 0)) == QQ(1)
 end
