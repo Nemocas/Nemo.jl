@@ -1010,3 +1010,23 @@ function (a::QQPolyRing)(b::ZZPolyRingElem)
   z.parent = a
   return z
 end
+
+###############################################################################
+#
+#   Roots mod p
+#
+###############################################################################
+
+#TODO:
+# expand systematically for all finite fields
+# and for ZZRingElem/QQFieldElem poly
+
+# TODO: Can't we use the generic AbstractAlgebra `roots(::Field, ::PolyRingElem)`?
+# It doesn't multiply by the denominator, but if the denominator is 0 in R, then
+# then this function builds the zero polynomial and gives the root 0?
+function roots(R::T, f::QQPolyRingElem) where {T<:Union{fqPolyRepField, fpField}}
+  Rt, t = polynomial_ring(R, "t", cached=false)
+  fp = polynomial_ring(ZZ, cached=false)[1](f * denominator(f))
+  fpp = Rt(fp)
+  return roots(fpp)
+end

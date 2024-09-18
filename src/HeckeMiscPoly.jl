@@ -1,24 +1,6 @@
 ##############################################################
 # all of this should be in Nemo/AbstractAlgebra
 #
-#TODO:
-# expand systematically for all finite fields
-# and for ZZRingElem/QQFieldElem poly
-# for fun: is_power(a::AbsSimpleNumFieldElem)
-#
-
-function factor(R::T, f::QQPolyRingElem) where {T<:Union{fqPolyRepField,fpField}}
-  Rt, t = polynomial_ring(R, "t", cached=false)
-  return factor(Rt(f))
-end
-
-function roots(R::T, f::QQPolyRingElem) where {T<:Union{fqPolyRepField,fpField}}
-  Rt, t = polynomial_ring(R, "t", cached=false)
-  fp = polynomial_ring(ZZ, cached=false)[1](f * denominator(f))
-  fpp = Rt(fp)
-  return roots(fpp)
-end
-
 function roots(K::fqPolyRepField, f::fpPolyRingElem)
   @assert characteristic(K) == characteristic(base_ring(f))
   Kx = polynomial_ring(K, cached=false)[1]
