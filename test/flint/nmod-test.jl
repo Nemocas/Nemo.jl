@@ -107,6 +107,12 @@ end
   @test data(R(3)) == 3
   @test lift(R(3)) == 3
   @test isa(lift(R(3)), ZZRingElem)
+  @test lift(ZZ, R(3)) == 3
+  @test isa(lift(ZZ, R(3)), ZZRingElem)
+  @test ZZ(R(3)) == 3
+  @test isa(ZZ(R(3)), ZZRingElem)
+  @test ZZRingElem(R(3)) == 3
+  @test isa(ZZRingElem(R(3)), ZZRingElem)
 
   R2,  = residue_ring(ZZ, 2)
   R3,  = residue_ring(ZZ, 3)

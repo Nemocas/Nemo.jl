@@ -32,6 +32,9 @@ function Base.hash(a::zzModRingElem, h::UInt)
 end
 
 lift(a::zzModRingElem) = ZZRingElem(data(a))
+lift(::ZZRing, a::zzModRingElem) = lift(a)
+(::ZZRing)(a::zzModRingElem) = lift(a)
+ZZRingElem(a::zzModRingElem) = lift(a)
 
 function zero(R::zzModRing)
   return zzModRingElem(UInt(0), R)

@@ -1,27 +1,3 @@
-function ZZRingElem(a::zzModRingElem)
-  return ZZRingElem(a.data)
-end
-
-function lift(::ZZRing, a::zzModRingElem)
-  return ZZRingElem(a.data)
-end
-
-function (::ZZRing)(a::zzModRingElem)
-  return ZZRingElem(a.data)
-end
-
-function ZZRingElem(a::ZZModRingElem)
-  return a.data
-end
-
-function lift(::ZZRing, a::ZZModRingElem)
-  return a.data
-end
-
-function (::ZZRing)(a::ZZModRingElem)
-  return a.data
-end
-
 function rem!(z::T, f::T, g::T) where {T<:PolyRingElem}
   z = rem(f, g)
   return z
