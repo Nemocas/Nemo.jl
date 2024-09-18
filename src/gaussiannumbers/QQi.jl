@@ -206,8 +206,8 @@ function nbits(a::QQiFieldElem)
 end
 
 function zero!(z::QQiFieldElem)
-  zero!(z.num)
-  one!(z.den)
+  z.num = zero!(z.num)
+  z.den = one!(z.den)
   return z
 end
 
@@ -310,7 +310,7 @@ function subeq!(z::QQiFieldElem, a::QQiFieldElem)
     mul!(z.den, z.den, a.den)
     reduce!(z)
   else
-    zero!(z)
+    z = zero!(z)
   end
   return z
 end

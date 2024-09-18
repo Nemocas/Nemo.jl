@@ -773,7 +773,7 @@ end
   S, (x, y) = polynomial_ring(R23, ["x", "y"])
 
   f = one(S)
-  zero!(f)
+  f = zero!(f)
   setcoeff!(f, 1, 1)
   set_exponent_vector!(f, 1, [ZZRingElem(1), ZZRingElem(0)])
   set_exponent_vector!(f, 2, [UInt(0), UInt(1)])

@@ -335,7 +335,7 @@ end
 ###############################################################################
 
 function zero!(z::ZZModRingElem)
-  zero!(z.data)
+  z.data = zero!(z.data)
   return z
 end
 

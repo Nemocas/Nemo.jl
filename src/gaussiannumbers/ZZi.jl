@@ -181,14 +181,14 @@ function nbits(a::ZZiRingElem)
 end
 
 function zero!(z::ZZiRingElem)
-  zero!(z.x)
-  zero!(z.y)
+  z.x = zero!(z.x)
+  z.y = zero!(z.y)
   return z
 end
 
 function one!(z::ZZiRingElem)
-  one!(z.x)
-  zero!(z.y)
+  z.x = one!(z.x)
+  z.y = zero!(z.y)
   return z
 end
 

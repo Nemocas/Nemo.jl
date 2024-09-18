@@ -801,7 +801,7 @@ function hadamard_bound2(M::ZZMatrix)
   n = nrows(M)
   GC.@preserve M begin
     for i in 1:n
-      zero!(r)
+      r = (r)
       M_ptr = mat_entry_ptr(M, i, 1)
       for j in 1:n
         ccall((:fmpz_addmul, libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}), r, M_ptr, M_ptr)

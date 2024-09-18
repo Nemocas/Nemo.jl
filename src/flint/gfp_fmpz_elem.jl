@@ -350,7 +350,7 @@ end
 ###############################################################################
 
 function zero!(z::FpFieldElem)
-  zero!(z.data)
+  z.data = zero!(z.data)
   return z
 end
 

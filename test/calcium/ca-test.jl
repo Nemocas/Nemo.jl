@@ -292,7 +292,7 @@ end
   C2 = CalciumField()
 
   x = C(7)
-  zero!(x)
+  x = zero!(x)
   @test x == 0
 
   x = C(7)

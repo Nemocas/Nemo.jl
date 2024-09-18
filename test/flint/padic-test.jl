@@ -103,7 +103,7 @@ end
 
   d = one(R)
   @test !iszero(d)
-  zero!(d, precision = 60)
+  d = zero!(d, precision = 60)
   @test iszero(d)
   @test precision(d) == 60
 

@@ -472,7 +472,7 @@ rand(Random.GLOBAL_RNG, S, val_range, scale_range, v...)
 ###############################################################################
 
 function zero!(a::FlintPuiseuxSeriesElem{T}) where T <: RingElem
-  zero!(a.data)
+  a.data = zero!(a.data)
   a.data = set_scale!(a.data, 1)
   return a
 end

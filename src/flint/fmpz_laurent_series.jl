@@ -291,7 +291,7 @@ function renormalize!(z::ZZLaurentSeriesRingElem)
     i += 1
   end
   if i == zlen
-    zero!(z)
+    z = zero!(z)
     z = set_precision!(z, zprec)
     z = set_valuation!(z, zprec)
     z = set_scale!(z, 1)
