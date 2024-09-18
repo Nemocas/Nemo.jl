@@ -584,9 +584,3 @@ function (R::fpPolyRing)(arr::Vector{fpFieldElem})
   z.parent = R
   return z
 end
-
-function (R::fpPolyRing)(x::ZZPolyRingElem)
-  z = fpPolyRingElem(R.n, x)
-  z.parent = R
-  return z
-end
