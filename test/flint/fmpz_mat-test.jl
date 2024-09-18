@@ -152,6 +152,14 @@ end
   # Tests when elements do not fit a simple Int.
   B[1, 1] = 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   @test_throws ErrorException Matrix{Int}(B)
+
+  A = ZZ[1 2 3; 4 5 6]
+  R, _ = residue_ring(ZZ, 10)
+  @test map_entries(R, A) == R[1 2 3; 4 5 6]
+  F = Native.GF(11)
+  @test map_entries(F, A) == F[1 2 3; 4 5 6]
+  R, _ = residue_ring(ZZ, ZZ(10))
+  @test map_entries(R, A) == R[1 2 3; 4 5 6]
 end
 
 @testset "ZZMatrix.manipulation" begin
