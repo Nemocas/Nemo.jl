@@ -1,6 +1,3 @@
-normalise(f::ZZPolyRingElem, ::Int) = degree(f) + 1
-set_length!(f::ZZPolyRingElem, ::Int) = nothing
-
 ################################################################################
 #
 #  Random polynomial

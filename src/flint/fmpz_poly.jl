@@ -66,6 +66,10 @@ function height(a::ZZPolyRingElem)
   return z
 end
 
+normalise(f::ZZPolyRingElem, ::Int) = degree(f) + 1
+
+set_length!(f::ZZPolyRingElem, ::Int) = nothing
+
 ###############################################################################
 #
 #   Similar and zero
