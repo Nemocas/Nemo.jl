@@ -1,33 +1,3 @@
-function fmpz_poly_to_nmod_poly_raw!(r::zzModPolyRingElem, a::ZZPolyRingElem)
-  ccall((:fmpz_poly_get_nmod_poly, libflint), Nothing,
-        (Ref{zzModPolyRingElem}, Ref{ZZPolyRingElem}), r, a)
-
-end
-
-function fmpz_poly_to_gfp_poly_raw!(r::fpPolyRingElem, a::ZZPolyRingElem)
-  ccall((:fmpz_poly_get_nmod_poly, libflint), Nothing,
-        (Ref{fpPolyRingElem}, Ref{ZZPolyRingElem}), r, a)
-
-end
-
-function fmpz_poly_to_nmod_poly(Rx::zzModPolyRing, f::ZZPolyRingElem)
-  g = Rx()
-  fmpz_poly_to_nmod_poly_raw!(g, f)
-  return g
-end
-
-function fmpz_poly_to_fmpz_mod_poly_raw!(r::ZZModPolyRingElem, a::ZZPolyRingElem)
-  ccall((:fmpz_poly_get_fmpz_mod_poly, libflint), Nothing,
-        (Ref{ZZModPolyRingElem}, Ref{ZZPolyRingElem}, Ref{fmpz_mod_ctx_struct}), r, a, r.parent.base_ring.ninv)
-
-end
-
-function fmpz_poly_to_fmpz_mod_poly(Rx::ZZModPolyRing, f::ZZPolyRingElem)
-  g = Rx()
-  fmpz_poly_to_fmpz_mod_poly_raw!(g, f)
-  return g
-end
-
 ################################################################################
 #
 #  QQPolyRingElem with denominator 1 to ZZPolyRingElem
