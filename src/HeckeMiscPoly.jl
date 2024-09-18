@@ -1,10 +1,3 @@
-function setcoeff!(z::fqPolyRepPolyRingElem, n::Int, x::ZZRingElem)
-  ccall((:fq_nmod_poly_set_coeff_fmpz, libflint), Nothing,
-        (Ref{fqPolyRepPolyRingElem}, Int, Ref{ZZRingElem}, Ref{fqPolyRepField}),
-        z, n, x, base_ring(parent(z)))
-  return z
-end
-
 ###############################################################################
 #
 #  Sturm sequence

@@ -754,6 +754,13 @@ function setcoeff!(z::fqPolyRepPolyRingElem, n::Int, x::fqPolyRepFieldElem)
   return z
 end
 
+function setcoeff!(z::fqPolyRepPolyRingElem, n::Int, x::ZZRingElem)
+  ccall((:fq_nmod_poly_set_coeff_fmpz, libflint), Nothing,
+        (Ref{fqPolyRepPolyRingElem}, Int, Ref{ZZRingElem}, Ref{fqPolyRepField}),
+        z, n, x, base_ring(parent(z)))
+  return z
+end
+
 function mul!(z::fqPolyRepPolyRingElem, x::fqPolyRepPolyRingElem, y::fqPolyRepPolyRingElem)
   ccall((:fq_nmod_poly_mul, libflint), Nothing,
         (Ref{fqPolyRepPolyRingElem}, Ref{fqPolyRepPolyRingElem}, Ref{fqPolyRepPolyRingElem},
