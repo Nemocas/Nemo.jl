@@ -1591,83 +1591,6 @@ function is_squarefree(n::Union{Int, ZZRingElem})
   end
   return isone(maximum(values(factor(n).fac); init = 1))
 end
-
-###############################################################################
-#
-#   Factorization
-#
-###############################################################################
-
-function _factor(a::ZZRingElem)
-  F = fmpz_factor()
-  ccall((:fmpz_factor, libflint), Nothing, (Ref{fmpz_factor}, Ref{ZZRingElem}), F, a)
-  res = Dict{ZZRingElem, Int}()
-  for i in 1:F.num
-    z = ZZRingElem()
-    ccall((:fmpz_factor_get_fmpz, libflint), Nothing,
-          (Ref{ZZRingElem}, Ref{fmpz_factor}, Int), z, F, i - 1)
-    res[z] = unsafe_load(F.exp, i)
-  end
-  return res, canonical_unit(a)
-end
-
-function factor(a::T) where T <: Union{Int, UInt}
-  iszero(a) && throw(ArgumentError("Argument must be non-zero"))
-  u = sign(a)
-  a = u < 0 ? -a : a
-  F = n_factor()
-  ccall((:n_factor, libflint), Nothing, (Ref{n_factor}, UInt), F, a)
-  res = Dict{T, Int}()
-  for i in 1:F.num
-    z = F.p[i]
-    res[z] = F.exp[i]
-  end
-  return Fac(u, res)
-end
-
-################################################################################
-#
-#   ECM
-#
-################################################################################
-
-function _ecm(a::ZZRingElem, B1::UInt, B2::UInt, ncrv::UInt,
-    rnd = _flint_rand_states[Threads.threadid()])
-  f = ZZRingElem()
-  r = ccall((:fmpz_factor_ecm, libflint), Int32,
-            (Ref{ZZRingElem}, UInt, UInt, UInt, Ref{rand_ctx}, Ref{ZZRingElem}),
-            f, ncrv, B1, B2, rnd, a)
-  return r, f
-end
-
-function _ecm(a::ZZRingElem, B1::Int, B2::Int, ncrv::Int,
-    rnd = _flint_rand_states[Threads.threadid()])
-  return _ecm(a, UInt(B1), UInt(B2), UInt(ncrv), rnd)
-end
-
-function ecm(a::ZZRingElem, max_digits::Int = div(ndigits(a), 2) + 1,
-    rnd = _flint_rand_states[Threads.threadid()],
-    B1 = _ecm_B1s[Threads.threadid()],
-    nC = _ecm_nCs[Threads.threadid()])
-  n = ndigits(a, 10)
-  B1s = 15
-
-  i = 1
-  s = div(max_digits-15, 5) + 2
-  s = max(i, s)
-  while i <= s
-    e, f = _ecm(a, B1[i]*1000, B1[i]*1000*100, nC[i], rnd)
-    if e != 0
-      return (e,f)
-    end
-    i += 1
-    if i > length(B1)
-      return (e, f)
-    end
-  end
-  return (Int32(0), a)
-end
-
 ################################################################################
 #
 #   Factor trial range
@@ -1686,34 +1609,6 @@ function _factor_trial_range(N::ZZRingElem, start::Int = 0, np::Int = 10^5)
     res[z] = unsafe_load(F.exp, i)
   end
   return res, canonical_unit(N)
-end
-
-@doc raw"""
-    factor(a::ZZRingElem)
-    factor(a::UInt)
-    factor(a::Int)
-
-Return a factorisation of $a$ using a `Fac` struct (see the documentation on
-factorisation in Nemo).
-
-# Examples
-
-```jldoctest
-julia> factor(ZZ(12))
-1 * 2^2 * 3
-
-julia> factor(UInt(12))
-1 * 2^2 * 3
-
-julia> factor(12)
-1 * 2^2 * 3
-
-```
-"""
-function factor(a::ZZRingElem)
-  iszero(a) && throw(ArgumentError("Argument must be non-zero"))
-  fac, z = _factor(a)
-  return Fac(z, fac)
 end
 
 ###############################################################################

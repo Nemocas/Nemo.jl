@@ -6,6 +6,8 @@
 
 include("flint/fmpz.jl")
 
+include("flint/fmpz_factor.jl")
+
 include("flint/fmpz_poly.jl")
 
 include("flint/nmod_poly.jl")

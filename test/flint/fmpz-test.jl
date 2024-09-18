@@ -1064,6 +1064,12 @@ end
   d, u = Nemo._factor_trial_range(n, 0, 50)
   @test isone(u)
   @test prod(p^e for (p, e) in d) == n
+
+  let 
+    a = ZZ(65261404486168272596469055321032207458900347428758158658012236487063743080177113810110282680249226184903475017526897956542827985941267684646505051975441057446672916412353515625)
+    fact = factor(a)
+    @test a == prod(p^e for (p, e) in fact)
+  end
 end
 
 @testset "ZZRingElem.number_theoretic" begin
