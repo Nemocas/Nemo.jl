@@ -230,7 +230,7 @@ end
 function -(x::FqPolyRepMatrix, y::FqPolyRepMatrix)
   check_parent(x,y)
   z = similar(x)
-  sub!(z, x, y)
+  z = sub!(z, x, y)
   return z
 end
 

@@ -515,13 +515,13 @@ end
 
 function -(x::ZZRingElem, c::Int)
   z = ZZRingElem()
-  sub!(z, x, c)
+  z = sub!(z, x, c)
   return z
 end
 
 function -(c::Int, x::ZZRingElem)
   z = ZZRingElem()
-  sub!(z, x, c)
+  z = sub!(z, x, c)
   z = neg!(z)
   return z
 end
@@ -753,11 +753,11 @@ function nfdivrem(a::ZZRingElem, b::ZZRingElem)
   c = ccall((:fmpz_cmp2abs, libflint), Cint, (Ref{ZZRingElem}, Ref{ZZRingElem}), b, r)
   if c <= 0
     if sign(Int, b) != sign(Int, r)
-      sub!(q, q, UInt(1))
+      q = sub!(q, q, UInt(1))
       r = add!(r, b)
     elseif c < 0
       q = add!(q, UInt(1))
-      sub!(r, r, b)
+      r = sub!(r, r, b)
     end
   end
   return (q, r)
@@ -769,9 +769,9 @@ function ncdivrem(a::ZZRingElem, b::ZZRingElem)
   if c <= 0
     if sign(Int, b) == sign(Int, r)
       q = add!(q, UInt(1))
-      sub!(r, r, b)
+      r = sub!(r, r, b)
     elseif c < 0
-      sub!(q, q, UInt(1))
+      q = sub!(q, q, UInt(1))
       r = add!(r, b)
     end
   end
@@ -2580,7 +2580,7 @@ function sub!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer)
 end
 
 function sub!(z::ZZRingElemOrPtr, b::Integer, a::ZZRingElemOrPtr)
-  sub!(z, a, b)
+  z = sub!(z, a, b)
   return neg!(z)
 end
 

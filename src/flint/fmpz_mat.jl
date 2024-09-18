@@ -301,7 +301,7 @@ end
 function -(x::ZZMatrix, y::ZZMatrix)
   check_parent(x, y)
   z = similar(x)
-  sub!(z, x, y)
+  z = sub!(z, x, y)
   return z
 end
 
@@ -1490,7 +1490,7 @@ function Solve._can_solve_internal_no_check(::Solve.HermiteFormTrait, A::ZZMatri
           for h = k:ncols(H)
             b_ptr = mat_entry_ptr(b, h, i)
             mul!(t, q, H_ptr)
-            sub!(b_ptr, b_ptr, t)
+            b_ptr = sub!(b_ptr, b_ptr, t)
             H_ptr += sizeof(ZZRingElem)
           end
         end
@@ -1749,7 +1749,7 @@ function AbstractAlgebra._solve_tril!(A::ZZMatrix, B::ZZMatrix, C::ZZMatrix, f::
           A_ptr = mat_entry_ptr(B, k, i)
           mul!(s, A_ptr, B_ptr)
           B_ptr += sizeof(ZZRingElem)
-          sub!(t, t, s)
+          t = sub!(t, s)
         end
         if f == 1
           A[j,i] = t

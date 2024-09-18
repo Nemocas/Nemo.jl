@@ -296,7 +296,7 @@ end
 
 function -(a::QQFieldElem, b::QQFieldElem)
   z = QQFieldElem()
-  sub!(z, a, b)
+  z = sub!(z, a, b)
   return z
 end
 

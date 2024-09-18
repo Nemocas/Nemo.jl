@@ -195,7 +195,7 @@ end
   z = add!(z, x, y)
   @test z == 5
 
-  sub!(z, x, y)
+  z = sub!(z, x, y)
   @test z == -1
 
   mul!(z, x, y)

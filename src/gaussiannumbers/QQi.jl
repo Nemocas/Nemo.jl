@@ -372,7 +372,7 @@ end
 
 function submul!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem, t::QQiFieldElem)
   mul!(t, a, b)
-  sub!(z, z, t)
+  z = sub!(z, t)
   return z
 end
 

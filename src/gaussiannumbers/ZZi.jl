@@ -312,19 +312,19 @@ end
 
 
 function sub!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem)
-  sub!(z.x, a.x, b.x)
-  sub!(z.y, a.y, b.y)
+  z.x = sub!(z.x, a.x, b.x)
+  z.y = sub!(z.y, a.y, b.y)
   return z
 end
 
 function sub!(z::ZZiRingElem, a::ZZiRingElem, b::IntegerUnion)
-  sub!(z.x, a.x, b)
+  z.x = sub!(z.x, a.x, b)
   set!(z.y, a.y)
   return z
 end
 
 function sub!(z::ZZiRingElem, a::IntegerUnion, b::ZZiRingElem)
-  sub!(z.x, a, b.x)
+  z.x = sub!(z.x, a, b.x)
   z.y = neg!(z.y, b.y)
   return z
 end
@@ -551,13 +551,13 @@ function sqr!(z::ZZiRingElem, a::ZZiRingElem, t::ZZiRingElem)
     # (x+y)^2-x^2-y^2
     z.x = add!(z.x, a.x, a.y)
     mul!(z.y, z.x, z.x)
-    sub!(z.y, z.y, t.x)
-    sub!(z.y, z.y, t.y)
+    z.y = sub!(z.y, t.x)
+    z.y = sub!(z.y, t.y)
     # x^2-y^2
-    sub!(z.x, t.x, t.y)
+    z.x = sub!(z.x, t.x, t.y)
   else
     mul!(z.y, a.x, a.y)
-    sub!(z.x, t.x, t.y)
+    z.x = sub!(z.x, t.x, t.y)
     ccall((:fmpz_mul_2exp, libflint), Nothing,
           (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt),
           z.y, z.y, 1)

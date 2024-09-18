@@ -131,7 +131,7 @@ order(::ZZRingElem) = ZZ
 
 function sub!(z::Vector{QQFieldElem}, x::Vector{QQFieldElem}, y::Vector{ZZRingElem})
   for i in 1:length(z)
-    sub!(z[i], x[i], y[i])
+    z[i] = sub!(z[i], x[i], y[i])
   end
   return z
 end
@@ -1001,7 +1001,7 @@ end
 function mod_sym!(a::ZZRingElem, b::ZZRingElem)
   mod!(a, a, b)
   if a > div(b, 2)
-    sub!(a, a, b)
+    a = sub!(a, b)
   end
   return a
 end
