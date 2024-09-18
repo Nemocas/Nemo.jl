@@ -297,6 +297,13 @@ end
       end
     end
   end
+
+  R, _ = residue_ring(ZZ, 10)
+  a = R(3)
+  @test a^ZZ(2) == R(9)
+  @test a^ZZ(-2) == R(9)
+  @test a^(ZZ(2)^64) == R(1)
+  @test a^(-ZZ(2)^64) == R(1)
 end
 
 @testset "zzModRingElem.comparison" begin
