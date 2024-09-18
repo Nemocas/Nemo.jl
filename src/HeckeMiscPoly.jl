@@ -1,28 +1,6 @@
 ##############################################################
 # all of this should be in Nemo/AbstractAlgebra
 #
-function roots(K::fqPolyRepField, f::fpPolyRingElem)
-  @assert characteristic(K) == characteristic(base_ring(f))
-  Kx = polynomial_ring(K, cached=false)[1]
-  coeffsff = Vector{elem_type(K)}(undef, degree(f) + 1)
-  for i = 0:degree(f)
-    coeffsff[i+1] = K(lift(coeff(f, i)))
-  end
-  ff = Kx(coeffsff)
-  return roots(ff)
-end
-
-function roots(K::FqPolyRepField, f::FpPolyRingElem)
-  @assert characteristic(K) == characteristic(base_ring(f))
-  Kx = polynomial_ring(K, cached=false)[1]
-  coeffsff = Vector{FqPolyRepFieldElem}(undef, degree(f) + 1)
-  for i = 0:degree(f)
-    coeffsff[i+1] = K(lift(coeff(f, i)))
-  end
-  ff = Kx(coeffsff)
-  return roots(ff)
-end
-
 function is_power(a::Union{fpFieldElem, FpFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem, FqFieldElem}, m::Int)
   if iszero(a)
     return true, a
@@ -39,20 +17,6 @@ function is_power(a::Union{fpFieldElem, FpFieldElem, fqPolyRepFieldElem, FqPolyR
   else
     return false, a
   end
-end
-
-function roots(f::Union{fqPolyRepPolyRingElem,FqPolyRepPolyRingElem}) # should be in Nemo and
-  # made available for all finite fields I guess.
-  q = size(base_ring(f))
-  x = gen(parent(f))
-  if degree(f) < q
-    x = powermod(x, q, f) - x
-  else
-    x = x^Int(q) - x
-  end
-  f = gcd(f, x)
-  l = factor(f).fac
-  return elem_type(base_ring(f))[-divexact(constant_coefficient(x), leading_coefficient(x)) for x = keys(l) if degree(x) == 1]
 end
 
 function setcoeff!(z::fqPolyRepPolyRingElem, n::Int, x::ZZRingElem)

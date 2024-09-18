@@ -647,6 +647,13 @@ end
   @test fac == Dict(2=>x^4+3*x^2+2,1=>x^2 + x)
 
   @test issetequal(roots(5 * x * (x^2 + 1)*(x^2 + 2)*(x+1)^10), R.([0, -1]))
+
+  K = Native.GF(3)
+  Kx, x = K["x"]
+  f = x^2 + 1
+  @test isempty(roots(f))
+  L = Native.GF(3, 2)
+  @test length(roots(L, f)) == 2
 end
 
 @testset "fpPolyRingElem.canonicalization" begin
