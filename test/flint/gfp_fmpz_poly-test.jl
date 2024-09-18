@@ -541,6 +541,10 @@ end
   fac = factor_equal_deg(f, 1)
   @test length(fac) == 3
   @test prod(fac) == f
+  f = x + 1
+  fac = factor_equal_deg(f, 1)
+  @test length(fac) == 1
+  @test prod(fac) == f
 
   @test issetequal(roots(5 * x * (x^2 + 1)*(x^2 + 2)*(x+1)^2), F.([0, 123456789012345678948, 32539196700765078531, 90917592311580600418]))
 

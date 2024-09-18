@@ -7,6 +7,13 @@
   # This is broken in AbstractAlgebra https://github.com/Nemocas/AbstractAlgebra.jl/pull/1799
   #@test all(is_squarefree, keys(sf.fac))
   @test evaluate(sf) == f
+
+  sf = factor_squarefree(Kx(1))
+  @test length(sf) == 0
+  @test evaluate(sf) == Kx(1)
+  sf = factor_squarefree(x)
+  @test length(sf) == 1
+  @test evaluate(sf) == x
 end
 
 @testset "Squarefreeness" begin
