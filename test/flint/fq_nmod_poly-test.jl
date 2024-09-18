@@ -580,3 +580,11 @@ end
 
   @test_throws ErrorException x+a
 end
+
+@testset "setcoeff!" begin
+  F = Native.GF(3, 2)
+  Fx, x = F["x"]
+  f = x^2 + x + 1
+  setcoeff!(f, 1, ZZ(2))
+  @test f == x^2 + 2*x + 1
+end
