@@ -125,10 +125,6 @@ function fmpz_poly_to_fmpz_mod_poly(Rx::ZZModPolyRing, f::ZZPolyRingElem)
   return g
 end
 
-modulus(F::EuclideanRingResidueRing{ZZRingElem}) = F.modulus
-
-modulus(F::EuclideanRingResidueField{ZZRingElem}) = F.modulus
-
 ################################################################################
 #
 #  QQPolyRingElem with denominator 1 to ZZPolyRingElem
