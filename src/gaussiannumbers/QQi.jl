@@ -392,8 +392,8 @@ end
 
 function inv!(z::QQiFieldElem, a::QQiFieldElem)
   d = abs2(a.num)
-  z.num = mul!(z.num.x, a.num.x, a.den)
-  z.num = mul!(z.num.y, a.num.y, a.den)
+  z.num.x = mul!(z.num.x, a.num.x, a.den)
+  z.num.y = mul!(z.num.y, a.num.y, a.den)
   neg!(z.num.y, z.num.y)
   swap!(z.den, d)
   reduce!(z)
