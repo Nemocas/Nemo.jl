@@ -849,14 +849,10 @@ function fmpq_poly_to_nmod_poly_raw!(r::zzModPolyRingElem, a::QQPolyRingElem)
   return r
 end
 
-function fmpq_poly_to_nmod_poly(Rx::zzModPolyRing, f::QQPolyRingElem)
-  g = Rx()
-  fmpq_poly_to_nmod_poly_raw!(g, f)
-  return g
-end
-
 function (R::zzModPolyRing)(g::QQPolyRingElem)
-  return fmpq_poly_to_nmod_poly(R, g)
+  r = R()
+  fmpq_poly_to_nmod_poly_raw!(r, g)
+  return r
 end
 
 function fmpq_poly_to_gfp_poly_raw!(r::fpPolyRingElem, a::QQPolyRingElem)
@@ -865,14 +861,10 @@ function fmpq_poly_to_gfp_poly_raw!(r::fpPolyRingElem, a::QQPolyRingElem)
   return r
 end
 
-function fmpq_poly_to_gfp_poly(Rx::fpPolyRing, f::QQPolyRingElem)
-  g = Rx()
-  fmpq_poly_to_gfp_poly_raw!(g, f)
-  return g
-end
-
 function (R::fpPolyRing)(g::QQPolyRingElem)
-  return fmpq_poly_to_gfp_poly(R, g)
+  r = R()
+  fmpq_poly_to_gfp_poly_raw!(r, g)
+  return r
 end
 
 function fmpq_poly_to_fq_default_poly_raw!(r::FqPolyRingElem, a::QQPolyRingElem, t1::ZZPolyRingElem=ZZPolyRingElem(), t2::ZZRingElem=ZZRingElem())
@@ -891,14 +883,10 @@ function fmpq_poly_to_fq_default_poly_raw!(r::FqPolyRingElem, a::QQPolyRingElem,
   return r
 end
 
-function fmpq_poly_to_fq_default_poly(Rx::FqPolyRing, f::QQPolyRingElem)
-  g = Rx()
-  fmpq_poly_to_fq_default_poly_raw!(g, f)
-  return g
-end
-
 function (R::FqPolyRing)(g::QQPolyRingElem)
-  return fmpq_poly_to_fq_default_poly(R, g)
+  r = R()
+  fmpq_poly_to_fq_default_poly_raw!(r, g)
+  return r
 end
 
 function fmpq_poly_to_fmpz_mod_poly_raw!(r::ZZModPolyRingElem, a::QQPolyRingElem, t1::ZZPolyRingElem=ZZPolyRingElem(), t2::ZZRingElem=ZZRingElem())
@@ -920,16 +908,11 @@ function fmpq_poly_to_fmpz_mod_poly_raw!(r::ZZModPolyRingElem, a::QQPolyRingElem
   return r
 end
 
-function fmpq_poly_to_fmpz_mod_poly(Rx::ZZModPolyRing, f::QQPolyRingElem)
-  g = Rx()
-  fmpq_poly_to_fmpz_mod_poly_raw!(g, f)
-  return g
-end
-
 function (R::ZZModPolyRing)(g::QQPolyRingElem)
-  return fmpq_poly_to_fmpz_mod_poly(R, g)
+  r = R()
+  fmpq_poly_to_fmpz_mod_poly_raw!(r, g)
+  return r
 end
-
 
 function fmpq_poly_to_gfp_fmpz_poly_raw!(r::FpPolyRingElem, a::QQPolyRingElem, t1::ZZPolyRingElem=ZZPolyRingElem(), t2::ZZRingElem=ZZRingElem())
   ccall((:fmpq_poly_get_numerator, libflint), Nothing,
@@ -950,14 +933,10 @@ function fmpq_poly_to_gfp_fmpz_poly_raw!(r::FpPolyRingElem, a::QQPolyRingElem, t
   return r
 end
 
-function fmpq_poly_to_gfp_fmpz_poly(Rx::FpPolyRing, f::QQPolyRingElem)
-  g = Rx()
-  fmpq_poly_to_gfp_fmpz_poly_raw!(g, f)
-  return g
-end
-
 function (R::FpPolyRing)(g::QQPolyRingElem)
-  return fmpq_poly_to_gfp_fmpz_poly(R, g)
+  r = R()
+  fmpq_poly_to_gfp_fmpz_poly_raw!(r, g)
+  return r
 end
 
 ###############################################################################
