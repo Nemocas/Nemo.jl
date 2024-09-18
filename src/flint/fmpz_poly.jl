@@ -965,3 +965,42 @@ end
 (a::ZZPolyRing)(b::Vector{T}) where {T <: Integer} = a(map(ZZRingElem, b))
 
 (a::ZZPolyRing)(b::ZZPolyRingElem) = b
+
+###############################################################################
+#
+#  Sturm sequence
+#
+###############################################################################
+
+function _divide_by_content(f::ZZPolyRingElem)
+  p = primpart(f)
+  if sign(leading_coefficient(f)) == sign(leading_coefficient(p))
+    return p
+  else
+    return -p
+  end
+end
+
+function sturm_sequence(f::ZZPolyRingElem)
+  g = f
+  h = _divide_by_content(derivative(g))
+  seq = ZZPolyRingElem[g, h]
+  while true
+    r = _divide_by_content(pseudorem(g, h))
+    # r has the same sign as pseudorem(g, h)
+    # To get a pseudo remainder sequence for the Sturm sequence,
+    # we need r to be the pseudo remainder of |lc(b)|^(a - b + 1),
+    # so we need some adjustment. See
+    # https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#Sturm_sequence_with_pseudo-remainders
+    if leading_coefficient(h) < 0 && isodd(degree(g) - degree(h) + 1)
+      r = -r
+    end
+    if r != 0
+      push!(seq, -r)
+      g, h = h, -r
+    else
+      break
+    end
+  end
+  return seq
+end
