@@ -494,7 +494,7 @@ function lu!(P::Perm, x::ArbMatrix)
             P.d, x, x, precision(base_ring(x)))
   r == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
   P.d .+= 1
-  inv!(P)
+  P = inv!(P)
   return nrows(x)
 end
 
@@ -579,7 +579,7 @@ function Solve._init_reduce(C::Solve.SolveCtx{ArbFieldElem, Solve.LUTrait})
              P.d, x, A, precision(base_ring(A)))
   fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
   P.d .+= 1
-  inv!(P)
+  P = inv!(P)
 
   C.red = x
   C.lu_perm = P
@@ -602,7 +602,7 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{ArbFieldElem, Solve.LUTr
              P.d, x, A, precision(base_ring(A)))
   fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
   P.d .+= 1
-  inv!(P)
+  P = inv!(P)
 
   C.red_transp = x
   C.lu_perm_transp = P

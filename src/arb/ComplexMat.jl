@@ -538,7 +538,7 @@ function lu!(P::Perm, x::ComplexMatrix)
             P.d, x, x, precision(Balls))
   r == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
   P.d .+= 1
-  inv!(P)
+  P = inv!(P)
   return min(nrows(x), ncols(x))
 end
 
@@ -610,7 +610,7 @@ function Solve._init_reduce(C::Solve.SolveCtx{ComplexFieldElem, Solve.LUTrait})
              P.d, x, A, precision(Balls))
   fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
   P.d .+= 1
-  inv!(P)
+  P = inv!(P)
 
   C.red = x
   C.lu_perm = P
@@ -633,7 +633,7 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{ComplexFieldElem, Solve.
              P.d, x, A, precision(Balls))
   fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
   P.d .+= 1
-  inv!(P)
+  P = inv!(P)
 
   C.red_transp = x
   C.lu_perm_transp = P

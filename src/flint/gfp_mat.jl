@@ -444,7 +444,7 @@ function lu!(P::Perm, x::fpMatrix)
   P.d .+= 1
 
   # flint does x == PLU instead of Px == LU (docs are wrong)
-  inv!(P)
+  P = inv!(P)
 
   return rank
 end
