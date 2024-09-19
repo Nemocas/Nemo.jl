@@ -2044,6 +2044,8 @@ function jacobi_symbol(x::ZZRingElem, y::ZZRingElem)
                    (Ref{ZZRingElem}, Ref{ZZRingElem}), x, y))
 end
 
+jacobi_symbol(x::IntegerUnion, y::IntegerUnion) = jacobi_symbol(ZZ(x), ZZ(y))
+
 @doc raw"""
     jacobi_symbol(x::Int, y::Int)
 

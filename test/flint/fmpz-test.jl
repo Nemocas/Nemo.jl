@@ -1221,11 +1221,17 @@ end
 
   @test jacobi_symbol(2, 3) == -1
 
+  for T in (Int, Integer, ZZRingElem)
+    for S in (Int, Integer, ZZRingElem)
+      @test jacobi_symbol(T(2), S(3)) == -1
+    end
+  end
+
   @test_throws DomainError jacobi_symbol(2, 0)
 
   @test_throws DomainError jacobi_symbol(-5, 4)
 
-  for T in [Int, ZZRingElem]
+  for T in (Int, ZZRingElem)
     for iters = 1:1000
       m1 = T(rand(-100:100))
       n1 = T(rand(-100:100))
