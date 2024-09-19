@@ -531,6 +531,8 @@ end
   for e = [-2, 0, 2, 4]
     @test isone(a^e) && isone(a^ZZRingElem(e))
   end
+
+  @test 4^ZZ(3) == 4^3
 end
 
 @testset "ZZRingElem.comparison" begin
