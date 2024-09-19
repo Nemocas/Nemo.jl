@@ -826,6 +826,10 @@ function ^(x::ZZRingElem, y::Union{Int, UInt, ZZRingElem})
   end
 end
 
+function ^(x::Integer, y::ZZRingElem)
+  return ZZ(x)^y
+end
+
 ###############################################################################
 #
 #   Comparison
