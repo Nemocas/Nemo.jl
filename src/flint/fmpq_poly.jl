@@ -1025,7 +1025,7 @@ end
 # It doesn't multiply by the denominator, but if the denominator is 0 in R, then
 # then this function builds the zero polynomial and gives the root 0?
 function roots(R::T, f::QQPolyRingElem) where {T<:Union{fqPolyRepField, fpField}}
-  Rt, t = polynomial_ring(R, "t", cached=false)
+  Rt, t = polynomial_ring(R, :t, cached=false)
   fp = polynomial_ring(ZZ, cached=false)[1](f * denominator(f))
   fpp = Rt(fp)
   return roots(fpp)

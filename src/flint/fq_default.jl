@@ -971,7 +971,7 @@ function is_power(a::Union{fpFieldElem, FpFieldElem, fqPolyRepFieldElem, FqPolyR
   if gcd(s - 1, m) == 1
     return true, a^invmod(ZZ(m), s - 1)
   end
-  St, t = polynomial_ring(parent(a), "t", cached=false)
+  St, t = polynomial_ring(parent(a), :t, cached=false)
   f = t^m - a
   rt = roots(f)
   if length(rt) > 0
