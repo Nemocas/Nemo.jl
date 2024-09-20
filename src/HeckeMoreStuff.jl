@@ -883,6 +883,7 @@ function divexact!(A::Generic.Mat{AbsSimpleNumFieldElem}, p::ZZRingElem)
       A[i, j] = A[i, j] // p
     end
   end
+  return A
 end
 
 #

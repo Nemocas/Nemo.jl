@@ -555,18 +555,14 @@ function divexact(x::ZZMatrix, y::Int; check::Bool=true)
   return z
 end
 
-function divexact(x::ZZMatrix, y::ZZRingElem; check::Bool=true)
-  z = similar(x)
-  ccall((:fmpz_mat_scalar_divexact_fmpz, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}), z, x, y)
-  return z
-end
+divexact(x::ZZMatrix, y::ZZRingElem; check::Bool=true) = divexact!(similar(x), x, y)
 
 divexact(x::ZZMatrix, y::Integer; check::Bool=true) = divexact(x, ZZRingElem(y); check=check)
 
 function divexact!(a::ZZMatrix, b::ZZMatrix, d::ZZRingElem)
   ccall((:fmpz_mat_scalar_divexact_fmpz, libflint), Nothing,
         (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}), a, b, d)
+  return a
 end
 
 ###############################################################################
