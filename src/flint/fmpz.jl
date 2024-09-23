@@ -2572,10 +2572,9 @@ function add!(z::ZZRingElem, x::ZZRingElem, y::Int)
   return z
 end
 
-function add!(z::ZZRingElem, a::ZZRingElem, b::UInt)
+function add!(z::ZZRingElem, x::ZZRingElem, y::UInt)
   ccall((:fmpz_add_ui, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt),
-        z, a, b)
+        (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt), z, x, y)
   return z
 end
 
@@ -2633,50 +2632,68 @@ function mul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   return z
 end
 
-function mul!(z::ZZRingElem, x::ZZRingElem, y::Int)
+function mul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Int)
   ccall((:fmpz_mul_si, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), z, x, y)
   return z
 end
 
-function mul!(z::ZZRingElem, a::ZZRingElem, b::UInt)
+function mul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::UInt)
   ccall((:fmpz_mul_ui, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt),
-        z, a, b)
+        (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt), z, x, y)
   return z
 end
 
-mul!(z::ZZRingElem, a::ZZRingElem, b::Integer) = mul!(z, a, ZZRingElem(b))
+mul!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer) = mul!(z, a, ZZRingElem(b))
 
-mul!(z::ZZRingElem, x::Int, y::ZZRingElem) = mul!(z, y, x)
+mul!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr) = mul!(z, y, x)
 
-function mul!(a::ZZRingElem, b::ZZRingElem, c::Ptr{Int})
+function mul!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr, c::Ptr{Int})
   ccall((:fmpz_mul, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ptr{Int}), a, b, c)
   return a
 end
 
-function addmul!(z::ZZRingElem, x::ZZRingElem, y::ZZRingElem)
+function addmul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   ccall((:fmpz_addmul, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x, y)
   return z
 end
 
-addmul!(z::ZZRingElem, x::ZZRingElem, y::ZZRingElem, ::ZZRingElem) = addmul!(z, x, y)
-
-function addmul!(z::ZZRingElem, x::ZZRingElem, y::Int)
+function addmul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Int)
   ccall((:fmpz_addmul_si, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), z, x, y)
   return z
 end
 
-addmul!(z::ZZRingElem, x::ZZRingElem, y::Int, ::ZZRingElem) = addmul!(z, x, y)
-
-function submul!(z::ZZRingElem, a::ZZRingElem, b::ZZRingElem)
-  ccall((:fmpz_submul, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}),
-        z, a, b)
+function addmul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::UInt)
+  ccall((:fmpz_addmul_ui, libflint), Nothing,
+        (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt), z, x, y)
   return z
 end
+
+# ignore fourth argument
+addmul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Union{ZZRingElemOrPtr,Integer}, ::ZZRingElemOrPtr) = addmul!(z, x, y)
+
+function submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
+  ccall((:fmpz_submul, libflint), Nothing,
+        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x, y)
+  return z
+end
+
+function submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Int)
+  ccall((:fmpz_submul_si, libflint), Nothing,
+        (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), z, x, y)
+  return z
+end
+
+function submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::UInt)
+  ccall((:fmpz_submul_ui, libflint), Nothing,
+        (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt), z, x, y)
+  return z
+end
+
+# ignore fourth argument
+submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Union{ZZRingElemOrPtr,Integer}, ::ZZRingElemOrPtr) = submul!(z, x, y)
 
 @doc raw"""
     fmma!(r::ZZRingElem, a::ZZRingElem, b::ZZRingElem, c::ZZRingElem, d::ZZRingElem)
