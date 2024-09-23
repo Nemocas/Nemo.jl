@@ -1,1 +1,5 @@
-divexact!(z::Rational{Int}, x::Rational{Int}, y::Rational{Int}) = divexact(x, y)
+divexact!(z::T, x::T, y::T) where T <: Rational = divexact(x, y)
+
+numerator!(z::T, x::Rational{T}) where T <: Integer = numerator(x)
+
+denominator!(z::T, x::Rational{T}) where T <: Integer = denominator(x)

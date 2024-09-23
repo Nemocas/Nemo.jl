@@ -505,45 +505,31 @@ end
 #
 ###############################################################################
 
-function +(x::ZZRingElem, c::Int)
-  z = ZZRingElem()
-  add!(z, x, c)
-  return z
-end
++(a::ZZRingElem, b::Int) = add!(ZZRingElem(), a, b)
++(a::Int, b::ZZRingElem) = b + a
 
-+(c::Int, x::ZZRingElem) = x + c
-
-function -(x::ZZRingElem, c::Int)
-  z = ZZRingElem()
-  sub!(z, x, c)
-  return z
-end
-
-function -(c::Int, x::ZZRingElem)
-  z = ZZRingElem()
-  sub!(z, x, c)
-  neg!(z, z)
-  return z
-end
-
-function *(x::ZZRingElem, c::Int)
-  z = ZZRingElem()
-  mul!(z, x, c)
-  return z
-end
-
-*(c::Int, x::ZZRingElem) = x * c
++(a::ZZRingElem, b::UInt) = add!(ZZRingElem(), a, b)
++(a::UInt, b::ZZRingElem) = b + a
 
 +(a::ZZRingElem, b::Integer) = a + ZZRingElem(b)
-
 +(a::Integer, b::ZZRingElem) = ZZRingElem(a) + b
 
--(a::ZZRingElem, b::Integer) = a - ZZRingElem(b)
+-(a::ZZRingElem, b::Int) = sub!(ZZRingElem(), a, b)
+-(a::Int, b::ZZRingElem) = neg!(b - a)
 
+-(a::ZZRingElem, b::UInt) = sub!(ZZRingElem(), a, b)
+-(a::UInt, b::ZZRingElem) = neg!(b - a)
+
+-(a::ZZRingElem, b::Integer) = a - ZZRingElem(b)
 -(a::Integer, b::ZZRingElem) = ZZRingElem(a) - b
 
-*(a::ZZRingElem, b::Integer) = a*ZZRingElem(b)
+*(a::ZZRingElem, b::Int) = mul!(ZZRingElem(), a, b)
+*(a::Int, b::ZZRingElem) = b * a
 
+*(a::ZZRingElem, b::UInt) = mul!(ZZRingElem(), a, b)
+*(a::UInt, b::ZZRingElem) = b * a
+
+*(a::ZZRingElem, b::Integer) = a*ZZRingElem(b)
 *(a::Integer, b::ZZRingElem) = ZZRingElem(a)*b
 
 *(a::ZZRingElem, b::AbstractFloat) = BigInt(a) * b
@@ -856,7 +842,7 @@ end
 #
 ###############################################################################
 
-function cmp(x::ZZRingElem, y::ZZRingElem)
+function cmp(x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   Int(ccall((:fmpz_cmp, libflint), Cint,
             (Ref{ZZRingElem}, Ref{ZZRingElem}), x, y))
 end
@@ -867,7 +853,7 @@ end
 
 <(x::ZZRingElem, y::ZZRingElem) = cmp(x,y) < 0
 
-function cmpabs(x::ZZRingElem, y::ZZRingElem)
+function cmpabs(x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   Int(ccall((:fmpz_cmpabs, libflint), Cint,
             (Ref{ZZRingElem}, Ref{ZZRingElem}), x, y))
 end
@@ -884,7 +870,7 @@ isless(x::Integer, y::ZZRingElem) = ZZRingElem(x) < y
 #
 ###############################################################################
 
-function cmp(x::ZZRingElem, y::Int)
+function cmp(x::ZZRingElemOrPtr, y::Int)
   Int(ccall((:fmpz_cmp_si, libflint), Cint, (Ref{ZZRingElem}, Int), x, y))
 end
 
@@ -900,7 +886,7 @@ end
 
 <(x::Int, y::ZZRingElem) = cmp(y,x) > 0
 
-function cmp(x::ZZRingElem, y::UInt)
+function cmp(x::ZZRingElemOrPtr, y::UInt)
   Int(ccall((:fmpz_cmp_ui, libflint), Cint, (Ref{ZZRingElem}, UInt), x, y))
 end
 
@@ -2718,36 +2704,36 @@ function fmms!(r::ZZRingElem, a::ZZRingElem, b::ZZRingElem, c::ZZRingElem, d::ZZ
 end
 
 
-function divexact!(z::ZZRingElem, a::ZZRingElem, b::UInt)
+function divexact!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::UInt)
   ccall((:fmpz_divexact_ui, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt),
         z, a, b)
   return z
 end
 
-function divexact!(z::ZZRingElem, a::ZZRingElem, b::ZZRingElem)
+function divexact!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
   ccall((:fmpz_divexact, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}),
         z, a, b)
   return z
 end
 
-divexact!(z::ZZRingElem, b::ZZRingElem) = divexact!(z, z, b)
+divexact!(z::ZZRingElemOrPtr, b::ZZRingElemOrPtr) = divexact!(z, z, b)
 
-function pow!(z::ZZRingElem, a::ZZRingElem, b::Union{Int, UInt})
+function pow!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Union{Int, UInt})
   ccall((:fmpz_pow_ui, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt),
         z, a, UInt(b))
   return z
 end
 
-function lcm!(z::ZZRingElem, x::ZZRingElem, y::ZZRingElem)
+function lcm!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   ccall((:fmpz_lcm, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x, y)
   return z
 end
 
-function gcd!(z::ZZRingElem, x::ZZRingElem, y::ZZRingElem)
+function gcd!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   ccall((:fmpz_gcd, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x, y)
   return z
