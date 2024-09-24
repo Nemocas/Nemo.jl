@@ -415,8 +415,8 @@ function tr(a::T) where T <: Zmod_fmpz_mat
   r = ZZRingElem()
   ccall((:fmpz_mod_mat_trace, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{T}, Ref{fmpz_mod_ctx_struct}),
-        r, a, base_ring(a).ninv)
-  return ZZModRingElem(r, R)
+        r, a, R.ninv)
+  return elem_type(R)(r, R)
 end
 
 ################################################################################

@@ -357,9 +357,14 @@ end
 function rem(x::fqPolyRepPolyRingElem, y::fqPolyRepPolyRingElem)
   check_parent(x,y)
   z = parent(x)()
+  rem!(z, x, y)
+  return z
+end
+
+function rem!(z::fqPolyRepPolyRingElem, x::fqPolyRepPolyRingElem, y::fqPolyRepPolyRingElem)
   ccall((:fq_nmod_poly_rem, libflint), Nothing,
-        (Ref{fqPolyRepPolyRingElem}, Ref{fqPolyRepPolyRingElem}, Ref{fqPolyRepPolyRingElem},
-         Ref{fqPolyRepField}), z, x, y, base_ring(parent(x)))
+        (Ref{fqPolyRepPolyRingElem}, Ref{fqPolyRepPolyRingElem}, Ref{fqPolyRepPolyRingElem}, Ref{fqPolyRepField}),
+        z, x, y, base_ring(parent(x)))
   return z
 end
 
@@ -745,6 +750,13 @@ end
 function setcoeff!(z::fqPolyRepPolyRingElem, n::Int, x::fqPolyRepFieldElem)
   ccall((:fq_nmod_poly_set_coeff, libflint), Nothing,
         (Ref{fqPolyRepPolyRingElem}, Int, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
+        z, n, x, base_ring(parent(z)))
+  return z
+end
+
+function setcoeff!(z::fqPolyRepPolyRingElem, n::Int, x::ZZRingElem)
+  ccall((:fq_nmod_poly_set_coeff_fmpz, libflint), Nothing,
+        (Ref{fqPolyRepPolyRingElem}, Int, Ref{ZZRingElem}, Ref{fqPolyRepField}),
         z, n, x, base_ring(parent(z)))
   return z
 end

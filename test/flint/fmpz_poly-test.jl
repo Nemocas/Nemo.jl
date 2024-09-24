@@ -512,3 +512,14 @@ end
 
   @test f^40*f^60 == f^50*f^50
 end
+
+@testset "ZZPolyRingElem.conversion" begin
+  S, y = polynomial_ring(ZZ, "y")
+  f = 7*y^2 + 3*y + 2
+  for R in [residue_ring(ZZ, 13)[1],
+            Native.GF(13)]
+    Rx, x = R["x"]
+    g = @inferred Rx(f)
+    @test g == 7*x^2 + 3*x + 2
+  end
+end

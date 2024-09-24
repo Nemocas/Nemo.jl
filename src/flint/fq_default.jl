@@ -956,3 +956,27 @@ function preimage(f::Generic.EuclideanRingResidueMap{ZZRing, FqField}, x)
   parent(x) !== codomain(f) && error("Not an element of the codomain")
   return lift(ZZ, x)
 end
+
+###############################################################################
+#
+#   Power detection
+#
+###############################################################################
+
+function is_power(a::Union{fpFieldElem, FpFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem, FqFieldElem}, m::Int)
+  if iszero(a)
+    return true, a
+  end
+  s = order(parent(a))
+  if gcd(s - 1, m) == 1
+    return true, a^invmod(ZZ(m), s - 1)
+  end
+  St, t = polynomial_ring(parent(a), :t, cached=false)
+  f = t^m - a
+  rt = roots(f)
+  if length(rt) > 0
+    return true, rt[1]
+  else
+    return false, a
+  end
+end

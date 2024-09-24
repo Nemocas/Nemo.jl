@@ -357,9 +357,14 @@ end
 function rem(x::FqPolyRepPolyRingElem, y::FqPolyRepPolyRingElem)
   check_parent(x,y)
   z = parent(x)()
+  rem!(z, x, y)
+  return z
+end
+
+function rem!(z::FqPolyRepPolyRingElem, x::FqPolyRepPolyRingElem, y::FqPolyRepPolyRingElem)
   ccall((:fq_poly_rem, libflint), Nothing,
-        (Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepPolyRingElem},
-         Ref{FqPolyRepField}), z, x, y, base_ring(parent(x)))
+        (Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepField}),
+        z, x, y, base_ring(parent(x)))
   return z
 end
 

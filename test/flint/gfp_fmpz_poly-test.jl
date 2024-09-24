@@ -537,7 +537,23 @@ end
   @test length(R) == 2
   @test R == Dict(3=>1, 1=>2)
 
+  f = (x + 1) * x * (x - 1)
+  fac = factor_equal_deg(f, 1)
+  @test length(fac) == 3
+  @test prod(fac) == f
+  f = x + 1
+  fac = factor_equal_deg(f, 1)
+  @test length(fac) == 1
+  @test prod(fac) == f
+
   @test issetequal(roots(5 * x * (x^2 + 1)*(x^2 + 2)*(x+1)^2), F.([0, 123456789012345678948, 32539196700765078531, 90917592311580600418]))
+
+  K = Native.GF(ZZ(3))
+  Kx, x = K["x"]
+  f = x^2 + 1
+  @test isempty(roots(f))
+  L = Native.GF(ZZ(3), 2)
+  @test length(roots(L, f)) == 2
 end
 
 @testset "FpPolyRingElem.remove_valuation" begin

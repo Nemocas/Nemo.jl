@@ -452,6 +452,25 @@ function factor_distinct_deg(x::fpPolyRingElem)
   return res
 end
 
+# Factor x assuming that all irreducible factors are of degree d
+function factor_equal_deg(x::fpPolyRingElem, d::Int)
+  if degree(x) == d
+    return fpPolyRingElem[x]
+  end
+  fac = gfp_poly_factor(x.mod_n)
+  ccall((:nmod_poly_factor_equal_deg, libflint), UInt,
+        (Ref{gfp_poly_factor}, Ref{fpPolyRingElem}, Int),
+        fac, x, d)
+  res = Vector{fpPolyRingElem}(undef, fac.num)
+  for i in 1:fac.num
+    f = parent(x)()
+    ccall((:nmod_poly_factor_get_poly, libflint), Nothing,
+          (Ref{fpPolyRingElem}, Ref{gfp_poly_factor}, Int), f, fac, i - 1)
+    res[i] = f
+  end
+  return res
+end
+
 function roots(a::fpPolyRingElem)
   R = parent(a)
   n = R.n
@@ -581,12 +600,6 @@ function (R::fpPolyRing)(arr::Vector{fpFieldElem})
     (base_ring(R) != parent(arr[1])) && error("Wrong parents")
   end
   z = fpPolyRingElem(R.n, arr)
-  z.parent = R
-  return z
-end
-
-function (R::fpPolyRing)(x::ZZPolyRingElem)
-  z = fpPolyRingElem(R.n, x)
   z.parent = R
   return z
 end

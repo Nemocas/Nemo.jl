@@ -609,3 +609,22 @@ end
 
   @test !v
 end
+
+@testset "QQPolyRingElem.conversion" begin
+  S, y = polynomial_ring(QQ, "y")
+  f = 7//5*y^2 + 3//2*y + 2
+  for R in [residue_ring(ZZ, 13)[1],
+            residue_ring(ZZ, ZZ(13))[1],
+            Native.GF(13),
+            Native.GF(ZZ(13)),
+            GF(13)]
+    Rx, x = R["x"]
+    g = @inferred Rx(f)
+    @test g == 4*x^2 + 8*x + 2
+  end
+
+  R, x = polynomial_ring(ZZ, "x")
+  @test_throws ErrorException R(f)
+  f = 7*y^2 + 3*y + 2
+  @test @inferred R(f) == 7*x^2 + 3*x + 2
+end

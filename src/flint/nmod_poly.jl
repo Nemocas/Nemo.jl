@@ -1038,9 +1038,3 @@ function (R::zzModPolyRing)(arr::Vector{zzModRingElem})
   z.parent = R
   return z
 end
-
-function (R::zzModPolyRing)(x::ZZPolyRingElem)
-  z = zzModPolyRingElem(R.n, x)
-  z.parent = R
-  return z
-end
