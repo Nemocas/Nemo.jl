@@ -156,23 +156,6 @@ end
 
 ################################################################################
 #
-#  Trace
-#
-################################################################################
-
-function tr(a::FpMatrix)
-  !is_square(a) && error("Matrix must be a square matrix")
-  R = base_ring(a)
-  r = ZZRingElem()
-  ccall((:fmpz_mod_mat_trace, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{FpMatrix}, Ref{fmpz_mod_ctx_struct}),
-        r, a, base_ring(a).ninv)
-  return FpFieldElem(r, R)
-end
-
-
-################################################################################
-#
 #  Windowing
 #
 ################################################################################

@@ -377,22 +377,6 @@ function rref!(a::FqMatrix)
   return r
 end
 
-#################################################################################
-#
-#  Trace
-#
-#################################################################################
-
-function tr(a::FqMatrix)
-  !is_square(a) && error("Non-square matrix")
-  n = nrows(a)
-  t = zero(base_ring(a))
-  for i in 1:nrows(a)
-    add!(t, t, a[i, i])
-  end
-  return t
-end
-
 ################################################################################
 #
 #  Determinant

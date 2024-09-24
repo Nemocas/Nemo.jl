@@ -368,22 +368,6 @@ function rref!(a::FqPolyRepMatrix)
   return r
 end
 
-#################################################################################
-#
-#  Trace
-#
-#################################################################################
-
-function tr(a::FqPolyRepMatrix)
-  !is_square(a) && error("Non-square matrix")
-  n = nrows(a)
-  t = zero(base_ring(a))
-  for i in 1:nrows(a)
-    add!(t, t, a[i, i])
-  end
-  return t
-end
-
 ################################################################################
 #
 #  Determinant
