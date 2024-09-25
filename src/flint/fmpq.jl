@@ -345,7 +345,7 @@ function cmp(a::QQFieldElemOrPtr, b::QQFieldElemOrPtr)
 end
 
 function cmp(a::QQFieldElemOrPtr, b::ZZRingElemOrPtr)
-  @ccall libflint.fmpq_cmp_fmpz(a::Ref{QQFieldElem}, b::Ref{QQFieldElem})::Cint
+  @ccall libflint.fmpq_cmp_fmpz(a::Ref{QQFieldElem}, b::Ref{ZZRingElem})::Cint
 end
 
 function cmp(a::QQFieldElemOrPtr, b::Int)
