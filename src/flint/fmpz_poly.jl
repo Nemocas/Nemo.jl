@@ -225,17 +225,17 @@ end
 
 *(x::ZZPolyRingElem, y::ZZRingElem) = y*x
 
-+(x::Integer, y::ZZPolyRingElem) = y + FlintInt(x)
++(x::Integer, y::ZZPolyRingElem) = y + flintify(x)
 
--(x::Integer, y::ZZPolyRingElem) = FlintInt(x) - y
+-(x::Integer, y::ZZPolyRingElem) = flintify(x) - y
 
-*(x::Integer, y::ZZPolyRingElem) = FlintInt(x)*y
+*(x::Integer, y::ZZPolyRingElem) = flintify(x)*y
 
-+(x::ZZPolyRingElem, y::Integer) = x + FlintInt(y)
++(x::ZZPolyRingElem, y::Integer) = x + flintify(y)
 
--(x::ZZPolyRingElem, y::Integer) = x - FlintInt(y)
+-(x::ZZPolyRingElem, y::Integer) = x - flintify(y)
 
-*(x::ZZPolyRingElem, y::Integer) = FlintInt(y)*x
+*(x::ZZPolyRingElem, y::Integer) = flintify(y)*x
 
 ###############################################################################
 #
@@ -943,7 +943,7 @@ function (a::ZZPolyRing)()
 end
 
 function (a::ZZPolyRing)(b::IntegerUnion)
-  z = ZZPolyRingElem(FlintInt(b))
+  z = ZZPolyRingElem(flintify(b))
   z.parent = a
   return z
 end

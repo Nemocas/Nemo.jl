@@ -364,11 +364,11 @@ for (jT, cN, cT) in ((QQFieldElem, :fmpq, Ref{QQFieldElem}), (ZZRingElem, :fmpz,
   end
 end
 
-+(a::QQMPolyRingElem, b::Integer) = a + FlintInt(b)
++(a::QQMPolyRingElem, b::Integer) = a + flintify(b)
 
 +(a::Integer, b::QQMPolyRingElem) = b + a
 
--(a::QQMPolyRingElem, b::Integer) = a - FlintInt(b)
+-(a::QQMPolyRingElem, b::Integer) = a - flintify(b)
 
 -(a::Integer, b::QQMPolyRingElem) = neg!(b - a)
 
@@ -380,7 +380,7 @@ end
 
 -(a::Rational{<:Integer}, b::QQMPolyRingElem) = neg!(b - a)
 
-*(a::QQMPolyRingElem, b::Integer) = a * FlintInt(b)
+*(a::QQMPolyRingElem, b::Integer) = a * flintify(b)
 
 *(a::Integer, b::QQMPolyRingElem) = b * a
 
@@ -388,11 +388,11 @@ end
 
 *(a::Rational{<:Integer}, b::QQMPolyRingElem) = b * a
 
-divexact(a::QQMPolyRingElem, b::Integer; check::Bool=true) = divexact(a, FlintInt(b); check=check)
+divexact(a::QQMPolyRingElem, b::Integer; check::Bool=true) = divexact(a, flintify(b); check=check)
 
 divexact(a::QQMPolyRingElem, b::Rational{<:Integer}; check::Bool=true) = divexact(a, QQFieldElem(b); check=check)
 
-//(a::QQMPolyRingElem, b::Integer) = //(a, FlintInt(b))
+//(a::QQMPolyRingElem, b::Integer) = //(a, flintify(b))
 
 //(a::QQMPolyRingElem, b::Rational{<:Integer}) = //(a, QQFieldElem(b))
 
@@ -573,7 +573,7 @@ end
 
 ==(a::Int, b::QQMPolyRingElem) = b == a
 
-==(a::QQMPolyRingElem, b::Integer) = a == FlintInt(b)
+==(a::QQMPolyRingElem, b::Integer) = a == flintify(b)
 
 ==(a::Integer, b::QQMPolyRingElem) = b == a
 
@@ -1186,7 +1186,7 @@ function (R::QQMPolyRing)(b::RationalUnion)
   return z
 end
 
-QQMPolyRingElem(ctx::QQMPolyRing, a::RationalUnion) = QQMPolyRingElem(ctx, FlintRat(a))
+QQMPolyRingElem(ctx::QQMPolyRing, a::RationalUnion) = QQMPolyRingElem(ctx, flintify(a))
 
 function (R::QQMPolyRing)(a::QQMPolyRingElem)
   parent(a) != R && error("Unable to coerce polynomial")
