@@ -356,7 +356,9 @@ function cmp(a::QQFieldElemOrPtr, b::UInt)
   @ccall libflint.fmpq_cmp_ui(a::Ref{QQFieldElem}, b::UInt)::Cint
 end
 
-cmp(a::Union{ZZRingElemOrPtr, Int, UInt}, b::QQFieldElemOrPtr) = -cmp(b, a)
+cmp(a::QQFieldElemOrPtr, b::Integer) = cmp(a, ZZRingElem(b))
+
+cmp(a::Union{ZZRingElemOrPtr, Integer}, b::QQFieldElemOrPtr) = -cmp(b, a)
 
 function ==(a::QQFieldElem, b::QQFieldElem)
   return ccall((:fmpq_equal, libflint), Bool,
