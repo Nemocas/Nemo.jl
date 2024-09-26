@@ -6509,7 +6509,7 @@ const FlintInt = Union{Int, ZZRingElem}
 
 FlintInt(x::ZZRingElem) = x
 FlintInt(x::Integer) = ZZRingElem(x)::ZZRingElem
-if Int === Int64
+@static if Int === Int64
   FlintInt(x::Union{Int64,Int32,Int16,Int8,UInt32,UInt16,UInt8}) = Int(x)
 else
   FlintInt(x::Union{Int32,Int16,Int8,UInt16,UInt8}) = Int(x)
