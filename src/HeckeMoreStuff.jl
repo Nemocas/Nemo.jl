@@ -1,9 +1,3 @@
-function QQMatrix(x::ZZMatrix)
-  z = zero_matrix(QQ, nrows(x), ncols(x))
-  ccall((:fmpq_mat_set_fmpz_mat, libflint), Nothing, (Ref{QQMatrix}, Ref{ZZMatrix}), z, x)
-  return z
-end
-
 function round(::Type{Int}, a::QQFieldElem)
   return round(Int, Rational{BigInt}(a))
 end

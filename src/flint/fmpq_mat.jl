@@ -969,6 +969,12 @@ function matrix(R::QQField, r::Int, c::Int, arr::AbstractVector{Rational{T}}) wh
   return z
 end
 
+function QQMatrix(x::ZZMatrix)
+  z = QQMatrix(nrows(x), ncols(x))
+  @ccall libflint.fmpq_mat_set_fmpz_mat(z::Ref{QQMatrix}, x::Ref{ZZMatrix})::Nothing
+  return z
+end
+
 ###############################################################################
 #
 #  Zero matrix
