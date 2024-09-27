@@ -360,11 +360,7 @@ end
 #
 ###############################################################################
 
-function -(a::QQBarFieldElem)
-  z = QQBarFieldElem()
-  ccall((:qqbar_neg, libflint), Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
-  return z
-end
+-(a::QQBarFieldElem) = neg!(QQBarFieldElem(), a)
 
 ###############################################################################
 #
@@ -1496,6 +1492,16 @@ end
 
 function zero!(z::QQBarFieldElem)
   ccall((:qqbar_zero, libflint), Nothing, (Ref{QQBarFieldElem},), z)
+  return z
+end
+
+function one!(z::QQBarFieldElem)
+  ccall((:qqbar_one, libflint), Nothing, (Ref{QQBarFieldElem},), z)
+  return z
+end
+
+function neg!(z::QQBarFieldElem, a::QQBarFieldElem)
+  ccall((:qqbar_neg, libflint), Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
   return z
 end
 

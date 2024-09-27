@@ -125,13 +125,7 @@ canonical_unit(a::Zmodn_fmpz_poly) = canonical_unit(leading_coefficient(a))
 #
 ################################################################################
 
-function -(x::T) where {T <: Zmodn_fmpz_poly}
-  z = parent(x)()
-  ccall((:fmpz_mod_poly_neg, libflint), Nothing,
-        (Ref{T}, Ref{T}, Ref{fmpz_mod_ctx_struct}),
-        z, x, x.parent.base_ring.ninv)
-  return z
-end
+-(x::T) where {T <: Zmodn_fmpz_poly} = neg!(parent(x)(), x)
 
 ################################################################################
 #
@@ -874,6 +868,20 @@ function zero!(x::T) where {T <: Zmodn_fmpz_poly}
         (Ref{T}, Ref{fmpz_mod_ctx_struct}),
         x, x.parent.base_ring.ninv)
   return x
+end
+
+function one!(x::T) where {T <: Zmodn_fmpz_poly}
+  ccall((:fmpz_mod_poly_one, libflint), Nothing,
+        (Ref{T}, Ref{fmpz_mod_ctx_struct}),
+        x, x.parent.base_ring.ninv)
+  return x
+end
+
+function neg!(z::T, x::T) where {T <: Zmodn_fmpz_poly}
+  ccall((:fmpz_mod_poly_neg, libflint), Nothing,
+        (Ref{T}, Ref{T}, Ref{fmpz_mod_ctx_struct}),
+        z, x, x.parent.base_ring.ninv)
+  return z
 end
 
 function fit!(x::T, n::Int) where {T <: Zmodn_fmpz_poly}

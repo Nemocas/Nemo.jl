@@ -120,12 +120,7 @@ canonical_unit(a::QQPolyRingElem) = canonical_unit(leading_coefficient(a))
 #
 ###############################################################################
 
-function -(x::QQPolyRingElem)
-  z = parent(x)()
-  ccall((:fmpq_poly_neg, libflint), Nothing,
-        (Ref{QQPolyRingElem}, Ref{QQPolyRingElem}), z, x)
-  return z
-end
+-(x::QQPolyRingElem) = neg!(parent(x)(), x)
 
 ###############################################################################
 #
@@ -780,6 +775,18 @@ end
 function zero!(z::QQPolyRingElem)
   ccall((:fmpq_poly_zero, libflint), Nothing,
         (Ref{QQPolyRingElem},), z)
+  return z
+end
+
+function one!(z::QQPolyRingElem)
+  ccall((:fmpq_poly_one, libflint), Nothing,
+        (Ref{QQPolyRingElem},), z)
+  return z
+end
+
+function neg!(z::QQPolyRingElem, a::QQPolyRingElem)
+  ccall((:fmpq_poly_neg, libflint), Nothing,
+        (Ref{QQPolyRingElem}, Ref{QQPolyRingElem}), z, a)
   return z
 end
 

@@ -98,10 +98,7 @@ base_ring(a::T) where T <: Zmod_fmpz_mat = a.base_ring
 
 function one(a::ZZModMatrixSpace)
   (nrows(a) != ncols(a)) && error("Matrices must be square")
-  z = a()
-  ccall((:fmpz_mod_mat_one, libflint), Nothing,
-        (Ref{ZZModMatrix}, Ref{fmpz_mod_ctx_struct}), z, base_ring(a).ninv)
-  return z
+  return one!(a())
 end
 
 function iszero(a::T) where T <: Zmod_fmpz_mat
@@ -198,12 +195,7 @@ reverse_cols(x::T) where T <: Zmod_fmpz_mat = reverse_cols!(deepcopy(x))
 #
 ################################################################################
 
-function -(x::T) where T <: Zmod_fmpz_mat
-  z = similar(x)
-  ccall((:fmpz_mod_mat_neg, libflint), Nothing,
-        (Ref{T}, Ref{T}, Ref{fmpz_mod_ctx_struct}), z, x, base_ring(x).ninv)
-  return z
-end
+-(x::T) where T <: Zmod_fmpz_mat = neg!(similar(x), x)
 
 ################################################################################
 #
@@ -246,6 +238,24 @@ end
 #
 ################################################################################
 
+function zero!(a::T) where T <: Zmod_fmpz_mat
+  ccall((:fmpz_mod_mat_zero, libflint), Nothing,
+        (Ref{T}, Ref{fmpz_mod_ctx_struct}), a, base_ring(a).ninv)
+  return a
+end
+
+function one!(a::T) where T <: Zmod_fmpz_mat
+  ccall((:fmpz_mod_mat_one, libflint), Nothing,
+        (Ref{T}, Ref{fmpz_mod_ctx_struct}), a, base_ring(a).ninv)
+  return a
+end
+
+function neg!(z::T, a::T) where T <: Zmod_fmpz_mat
+  ccall((:fmpz_mod_mat_neg, libflint), Nothing,
+        (Ref{T}, Ref{T}, Ref{fmpz_mod_ctx_struct}), z, a, base_ring(a).ninv)
+  return z
+end
+
 function mul!(a::T, b::T, c::T) where T <: Zmod_fmpz_mat
   ccall((:fmpz_mod_mat_mul, libflint), Nothing,
         (Ref{T}, Ref{T}, Ref{T}, Ref{fmpz_mod_ctx_struct}),
@@ -257,12 +267,6 @@ function add!(a::T, b::T, c::T) where T <: Zmod_fmpz_mat
   ccall((:fmpz_mod_mat_add, libflint), Nothing,
         (Ref{T}, Ref{T}, Ref{T}, Ref{fmpz_mod_ctx_struct}),
         a, b, c, base_ring(b).ninv)
-  return a
-end
-
-function zero!(a::T) where T <: Zmod_fmpz_mat
-  ccall((:fmpz_mod_mat_zero, libflint), Nothing,
-        (Ref{T}, Ref{fmpz_mod_ctx_struct}), a, base_ring(a).ninv)
   return a
 end
 

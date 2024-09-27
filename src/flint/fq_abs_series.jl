@@ -583,6 +583,13 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
       return z
     end
 
+    function one!(z::($etype))
+      ccall(($(flint_fn*"_one"), libflint), Nothing,
+            (Ref{($etype)}, Ref{($ctype)}), z, base_ring(z))
+      z.prec = parent(z).prec_max
+      return z
+    end
+
     function fit!(z::($etype), n::Int)
       ccall(($(flint_fn*"_fit_length"), libflint), Nothing,
             (Ref{($etype)}, Int, Ref{($ctype)}),

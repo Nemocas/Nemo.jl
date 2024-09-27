@@ -607,6 +607,12 @@ function zero!(z::ArbPolyRingElem)
   return z
 end
 
+function one!(z::ArbPolyRingElem)
+  ccall((:arb_poly_one, libflint), Nothing,
+        (Ref{ArbPolyRingElem}, ), z)
+  return z
+end
+
 function fit!(z::ArbPolyRingElem, n::Int)
   ccall((:arb_poly_fit_length, libflint), Nothing,
         (Ref{ArbPolyRingElem}, Int), z, n)

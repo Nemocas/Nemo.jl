@@ -111,19 +111,9 @@ function gen(a::AbsSimpleNumField)
   return r
 end
 
-function one(a::AbsSimpleNumField)
-  r = AbsSimpleNumFieldElem(a)
-  ccall((:nf_elem_one, libflint), Nothing,
-        (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}), r, a)
-  return r
-end
+one(a::AbsSimpleNumField) = one!(AbsSimpleNumFieldElem(a))
 
-function zero(a::AbsSimpleNumField)
-  r = AbsSimpleNumFieldElem(a)
-  ccall((:nf_elem_zero, libflint), Nothing,
-        (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}), r, a)
-  return r
-end
+zero(a::AbsSimpleNumField) = zero!(AbsSimpleNumFieldElem(a))
 
 @doc raw"""
     is_gen(a::AbsSimpleNumFieldElem)
@@ -274,13 +264,7 @@ canonical_unit(x::AbsSimpleNumFieldElem) = x
 #
 ###############################################################################
 
-function -(a::AbsSimpleNumFieldElem)
-  r = a.parent()
-  ccall((:nf_elem_neg, libflint), Nothing,
-        (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}),
-        r, a, a.parent)
-  return r
-end
+-(a::AbsSimpleNumFieldElem) = neg!(a.parent(), a)
 
 ###############################################################################
 #
@@ -741,6 +725,18 @@ function zero!(a::AbsSimpleNumFieldElem)
   ccall((:nf_elem_zero, libflint), Nothing,
         (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}), a, parent(a))
   return a
+end
+
+function one!(a::AbsSimpleNumFieldElem)
+  ccall((:nf_elem_one, libflint), Nothing,
+        (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}), a, parent(a))
+  return a
+end
+
+function neg!(z::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem)
+  ccall((:nf_elem_neg, libflint), Nothing,
+        (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}), z, a, parent(a))
+  return z
 end
 
 function mul!(z::AbsSimpleNumFieldElem, x::AbsSimpleNumFieldElem, y::AbsSimpleNumFieldElem)

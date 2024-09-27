@@ -529,6 +529,13 @@ function zero!(z::ZZAbsPowerSeriesRingElem)
   return z
 end
 
+function one!(z::ZZAbsPowerSeriesRingElem)
+  ccall((:fmpz_poly_one, libflint), Nothing,
+        (Ref{ZZAbsPowerSeriesRingElem},), z)
+  z.prec = parent(z).prec_max
+  return z
+end
+
 function fit!(z::ZZAbsPowerSeriesRingElem, n::Int)
   ccall((:fmpz_poly_fit_length, libflint), Nothing,
         (Ref{ZZAbsPowerSeriesRingElem}, Int), z, n)

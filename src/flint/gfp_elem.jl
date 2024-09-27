@@ -344,6 +344,15 @@ function zero!(z::fpFieldElem)
   return fpFieldElem(UInt(0), R)
 end
 
+function one!(z::fpFieldElem)
+  R = parent(z)
+  return fpFieldElem(UInt(0), R)
+end
+
+function neg!(z::fpFieldElem, x::fpFieldElem)
+  return -x
+end
+
 function mul!(z::fpFieldElem, x::fpFieldElem, y::ZZRingElem)
   R = parent(x)
   d = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), y, R.n)

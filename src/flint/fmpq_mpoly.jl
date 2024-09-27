@@ -818,8 +818,6 @@ function neg!(a::QQMPolyRingElem, b::QQMPolyRingElem)
   return a
 end
 
-neg!(a::QQMPolyRingElem) = neg!(a, a)
-
 function add!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::QQMPolyRingElem)
   ccall((:fmpq_mpoly_add, libflint), Nothing,
         (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem},

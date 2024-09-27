@@ -54,17 +54,9 @@ function coeff(x::FqPolyRepFieldElem, n::Int)
   return z
 end
 
-function zero(a::FqPolyRepField)
-  d = a()
-  ccall((:fq_zero, libflint), Nothing, (Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}), d, a)
-  return d
-end
+zero(a::FqPolyRepField) = zero!(a())
 
-function one(a::FqPolyRepField)
-  d = a()
-  ccall((:fq_one, libflint), Nothing, (Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}), d, a)
-  return d
-end
+one(a::FqPolyRepField) = one!(a())
 
 @doc raw"""
     gen(a::FqPolyRepField)
@@ -177,12 +169,7 @@ end
 #
 ###############################################################################
 
-function -(x::FqPolyRepFieldElem)
-  z = parent(x)()
-  ccall((:fq_neg, libflint), Nothing,
-        (Ref{FqPolyRepFieldElem}, Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}), z, x, x.parent)
-  return z
-end
+-(x::FqPolyRepFieldElem) = neg!(parent(x)(), x)
 
 ###############################################################################
 #
@@ -476,6 +463,18 @@ end
 function zero!(z::FqPolyRepFieldElem)
   ccall((:fq_zero, libflint), Nothing,
         (Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}), z, z.parent)
+  return z
+end
+
+function one!(z::FqPolyRepFieldElem)
+  ccall((:fq_one, libflint), Nothing,
+        (Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}), z, z.parent)
+  return z
+end
+
+function neg!(z::FqPolyRepFieldElem, a::FqPolyRepFieldElem)
+  ccall((:fq_neg, libflint), Nothing,
+        (Ref{FqPolyRepFieldElem}, Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}), z, a, a.parent)
   return z
 end
 

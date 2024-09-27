@@ -702,6 +702,11 @@ function zero!(z::AcbPolyRingElem)
   return z
 end
 
+function one!(z::AcbPolyRingElem)
+  ccall((:acb_poly_one, libflint), Nothing, (Ref{AcbPolyRingElem},), z)
+  return z
+end
+
 function fit!(z::AcbPolyRingElem, n::Int)
   ccall((:acb_poly_fit_length, libflint), Nothing,
         (Ref{AcbPolyRingElem}, Int), z, n)

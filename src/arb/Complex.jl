@@ -1586,6 +1586,11 @@ function zero!(z::ComplexFieldElem)
   return z
 end
 
+function one!(z::ComplexFieldElem)
+  ccall((:acb_one, libflint), Nothing, (Ref{ComplexFieldElem},), z)
+  return z
+end
+
 function add!(z::ComplexFieldElem, x::ComplexFieldElem, y::ComplexFieldElem, prec::Int = precision(Balls))
   ccall((:acb_add, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int),
         z, x, y, prec)

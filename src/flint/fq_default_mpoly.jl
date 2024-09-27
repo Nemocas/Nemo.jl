@@ -441,6 +441,16 @@ function zero!(a::FqMPolyRingElem)
   return a
 end
 
+function one!(a::FqMPolyRingElem)
+  a.data = one!(a.data)
+  return a
+end
+
+function neg!(z::FqMPolyRingElem, a::FqMPolyRingElem)
+  z.data = neg!(z.data, a.data)
+  return z
+end
+
 function add!(a::FqMPolyRingElem, b::FqMPolyRingElem, c::FqMPolyRingElem)
   a.data = add!(a.data, b.data, c.data)
   return a

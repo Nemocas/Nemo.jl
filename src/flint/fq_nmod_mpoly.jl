@@ -81,21 +81,9 @@ function length(a::fqPolyRepMPolyRingElem)
   return n
 end
 
-function one(R::fqPolyRepMPolyRing)
-  z = R()
-  ccall((:fq_nmod_mpoly_one, libflint), Nothing,
-        (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
-        z, R)
-  return z
-end
+one(R::fqPolyRepMPolyRing) = one!(R())
 
-function zero(R::fqPolyRepMPolyRing)
-  z = R()
-  ccall((:fq_nmod_mpoly_zero, libflint), Nothing,
-        (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
-        z, R)
-  return z
-end
+zero(R::fqPolyRepMPolyRing) = zero!(R())
 
 function isone(a::fqPolyRepMPolyRingElem)
   b = ccall((:fq_nmod_mpoly_is_one, libflint), Cint,
@@ -295,13 +283,7 @@ end
 #
 ###############################################################################
 
-function -(a::fqPolyRepMPolyRingElem)
-  z = parent(a)()
-  ccall((:fq_nmod_mpoly_neg, libflint), Nothing,
-        (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
-        z, a, a.parent)
-  return z
-end
+-(a::fqPolyRepMPolyRingElem) = neg!(parent(a)(), a)
 
 function +(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
   check_parent(a, b)
@@ -763,6 +745,20 @@ function zero!(a::fqPolyRepMPolyRingElem)
         (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
         a, a.parent)
   return a
+end
+
+function one!(a::fqPolyRepMPolyRingElem)
+  ccall((:fq_nmod_mpoly_one, libflint), Nothing,
+        (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
+        a, a.parent)
+  return a
+end
+
+function neg!(z::fqPolyRepMPolyRingElem, a::fqPolyRepMPolyRingElem)
+  ccall((:fq_nmod_mpoly_neg, libflint), Nothing,
+        (Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRingElem}, Ref{fqPolyRepMPolyRing}),
+        z, a, a.parent)
+  return z
 end
 
 function add!(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem, c::fqPolyRepMPolyRingElem)

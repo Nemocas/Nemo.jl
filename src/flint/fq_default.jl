@@ -46,17 +46,9 @@ function _coeff(x::FqFieldElem, n::Int)
   return z
 end
 
-function zero(a::FqField)
-  d = a()
-  ccall((:fq_default_zero, libflint), Nothing, (Ref{FqFieldElem}, Ref{FqField}), d, a)
-  return d
-end
+zero(a::FqField) = zero!(a())
 
-function one(a::FqField)
-  d = a()
-  ccall((:fq_default_one, libflint), Nothing, (Ref{FqFieldElem}, Ref{FqField}), d, a)
-  return d
-end
+one(a::FqField) = one!(a())
 
 function _gen(a::FqField)
   d = a()
@@ -400,12 +392,7 @@ end
 #
 ###############################################################################
 
-function -(x::FqFieldElem)
-  z = parent(x)()
-  ccall((:fq_default_neg, libflint), Nothing,
-        (Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), z, x, x.parent)
-  return z
-end
+-(x::FqFieldElem) = neg!(parent(x)(), x)
 
 ###############################################################################
 #
@@ -672,6 +659,19 @@ function zero!(z::FqFieldElem)
   ccall((:fq_default_zero, libflint), Nothing,
         (Ref{FqFieldElem}, Ref{FqField}), z, z.parent)
   z.poly = nothing
+  return z
+end
+
+function one!(z::FqFieldElem)
+  ccall((:fq_default_one, libflint), Nothing,
+        (Ref{FqFieldElem}, Ref{FqField}), z, z.parent)
+  z.poly = nothing
+  return z
+end
+
+function neg!(z::FqFieldElem, a::FqFieldElem)
+  ccall((:fq_default_neg, libflint), Nothing,
+        (Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), z, a, a.parent)
   return z
 end
 

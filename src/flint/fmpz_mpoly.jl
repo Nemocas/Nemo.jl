@@ -80,19 +80,9 @@ function length(a::ZZMPolyRingElem)
   return n
 end
 
-function one(R::ZZMPolyRing)
-  z = R()
-  ccall((:fmpz_mpoly_one, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), z, R)
-  return z
-end
+one(R::ZZMPolyRing) = one!(R())
 
-function zero(R::ZZMPolyRing)
-  z = R()
-  ccall((:fmpz_mpoly_zero, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), z, R)
-  return z
-end
+zero(R::ZZMPolyRing) = zero!(R())
 
 function isone(a::ZZMPolyRingElem)
   b = ccall((:fmpz_mpoly_is_one, libflint), Cint,
@@ -779,6 +769,18 @@ function zero!(a::ZZMPolyRingElem)
   ccall((:fmpz_mpoly_zero, libflint), Nothing,
         (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), a, a.parent)
   return a
+end
+
+function one!(a::ZZMPolyRingElem)
+  ccall((:fmpz_mpoly_one, libflint), Nothing,
+        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), a, a.parent)
+  return a
+end
+
+function neg!(z::ZZMPolyRingElem, a::ZZMPolyRingElem)
+  ccall((:fmpz_mpoly_neg, libflint), Nothing,
+        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), z, a, a.parent)
+  return z
 end
 
 function add!(a::ZZMPolyRingElem, b::ZZMPolyRingElem, c::ZZMPolyRingElem)

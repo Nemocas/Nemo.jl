@@ -115,12 +115,7 @@ canonical_unit(a::ZZPolyRingElem) = canonical_unit(leading_coefficient(a))
 #
 ###############################################################################
 
-function -(x::ZZPolyRingElem)
-  z = parent(x)()
-  ccall((:fmpz_poly_neg, libflint), Nothing,
-        (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}), z, x)
-  return z
-end
+-(x::ZZPolyRingElem) = neg!(parent(x)(), x)
 
 ###############################################################################
 #
@@ -860,9 +855,21 @@ end
 #
 ###############################################################################
 
-function zero!(z::ZZPolyRingElem)
+function zero!(z::ZZPolyRingElemOrPtr)
   ccall((:fmpz_poly_zero, libflint), Nothing,
         (Ref{ZZPolyRingElem},), z)
+  return z
+end
+
+function one!(z::ZZPolyRingElemOrPtr)
+  ccall((:fmpz_poly_one, libflint), Nothing,
+        (Ref{ZZPolyRingElem},), z)
+  return z
+end
+
+function neg!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr)
+  ccall((:fmpz_poly_neg, libflint), Nothing,
+        (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}), z, a)
   return z
 end
 

@@ -113,11 +113,7 @@ end
 
 zero(C::CalciumField) = C()
 
-function one(C::CalciumField)
-  z = CalciumFieldElem(C)
-  ccall((:ca_one, libflint), Nothing, (Ref{CalciumFieldElem}, Ref{CalciumField}), z, C)
-  return z
-end
+one(C::CalciumField) = one!(CalciumFieldElem(C))
 
 ###############################################################################
 #
@@ -350,10 +346,7 @@ end
 ###############################################################################
 
 function -(a::CalciumFieldElem)
-  C = a.parent
-  r = C()
-  ccall((:ca_neg, libflint), Nothing,
-        (Ref{CalciumFieldElem}, Ref{CalciumFieldElem}, Ref{CalciumField}), r, a, C)
+  r = neg!(a.parent(), a)
   check_special(r)
   return r
 end
@@ -1388,6 +1381,18 @@ end
 function zero!(z::CalciumFieldElem)
   C = z.parent
   ccall((:ca_zero, libflint), Nothing, (Ref{CalciumFieldElem}, Ref{CalciumField}), z, C)
+  return z
+end
+
+function one!(z::CalciumFieldElem)
+  C = z.parent
+  ccall((:ca_one, libflint), Nothing, (Ref{CalciumFieldElem}, Ref{CalciumField}), z, C)
+  return z
+end
+
+function neg!(z::CalciumFieldElem, a::CalciumFieldElem)
+  C = z.parent
+  ccall((:ca_neg, libflint), Nothing, (Ref{CalciumFieldElem}, Ref{CalciumFieldElem}, Ref{CalciumField}), z, a, C)
   return z
 end
 

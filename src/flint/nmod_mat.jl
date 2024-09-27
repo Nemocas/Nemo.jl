@@ -104,9 +104,7 @@ base_ring(a::T) where T <: Zmodn_mat = a.base_ring
 
 function one(a::zzModMatrixSpace)
   (nrows(a) != ncols(a)) && error("Matrices must be square")
-  z = a()
-  ccall((:nmod_mat_one, libflint), Nothing, (Ref{zzModMatrix}, ), z)
-  return z
+  return one!(a())
 end
 
 function iszero(a::T) where T <: Zmodn_mat
@@ -202,12 +200,7 @@ reverse_cols(x::T) where T <: Zmodn_mat = reverse_cols!(deepcopy(x))
 #
 ################################################################################
 
-function -(x::T) where T <: Zmodn_mat
-  z = similar(x)
-  ccall((:nmod_mat_neg, libflint), Nothing,
-        (Ref{T}, Ref{T}), z, x)
-  return z
-end
+-(x::T) where T <: Zmodn_mat = neg!(similar(x), x)
 
 ################################################################################
 #
@@ -247,6 +240,21 @@ end
 #
 ################################################################################
 
+function zero!(a::T) where T <: Zmodn_mat
+  ccall((:nmod_mat_zero, libflint), Nothing, (Ref{T}, ), a)
+  return a
+end
+
+function one!(a::T) where T <: Zmodn_mat
+  ccall((:nmod_mat_one, libflint), Nothing, (Ref{T}, ), a)
+  return a
+end
+
+function neg!(z::T, a::T) where T <: Zmodn_mat
+  ccall((:nmod_mat_neg, libflint), Nothing, (Ref{T}, Ref{T}), z, a)
+  return z
+end
+
 function mul!(a::T, b::T, c::T) where T <: Zmodn_mat
   ccall((:nmod_mat_mul, libflint), Nothing, (Ref{T}, Ref{T}, Ref{T}), a, b, c)
   return a
@@ -259,11 +267,6 @@ end
 
 function sub!(a::T, b::T, c::T) where T <: Zmodn_mat
   ccall((:nmod_mat_sub, libflint), Nothing, (Ref{T}, Ref{T}, Ref{T}), a, b, c)
-  return a
-end
-
-function zero!(a::T) where T <: Zmodn_mat
-  ccall((:nmod_mat_zero, libflint), Nothing, (Ref{T}, ), a)
   return a
 end
 

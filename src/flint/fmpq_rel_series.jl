@@ -900,6 +900,14 @@ function zero!(z::QQRelPowerSeriesRingElem)
   return z
 end
 
+function one!(z::QQRelPowerSeriesRingElem)
+  ccall((:fmpq_poly_one, libflint), Nothing,
+        (Ref{QQRelPowerSeriesRingElem},), z)
+  z.prec = parent(z).prec_max
+  z.val = parent(z).prec_max
+  return z
+end
+
 function fit!(z::QQRelPowerSeriesRingElem, n::Int)
   ccall((:fmpq_poly_fit_length, libflint), Nothing,
         (Ref{QQRelPowerSeriesRingElem}, Int), z, n)

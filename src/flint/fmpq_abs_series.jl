@@ -721,6 +721,13 @@ function zero!(z::QQAbsPowerSeriesRingElem)
   return z
 end
 
+function one!(z::QQAbsPowerSeriesRingElem)
+  ccall((:fmpq_poly_one, libflint), Nothing,
+        (Ref{QQAbsPowerSeriesRingElem},), z)
+  z.prec = parent(z).prec_max
+  return z
+end
+
 function fit!(z::QQAbsPowerSeriesRingElem, n::Int)
   ccall((:fmpq_poly_fit_length, libflint), Nothing,
         (Ref{QQAbsPowerSeriesRingElem}, Int), z, n)

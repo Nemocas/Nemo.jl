@@ -355,6 +355,15 @@ function zero!(z::zzModRingElem)
   return zzModRingElem(UInt(0), R)
 end
 
+function one!(z::zzModRingElem)
+  R = parent(z)
+  return zzModRingElem(UInt(1), R)
+end
+
+function neg!(z::zzModRingElem, x::zzModRingElem)
+  return -x
+end
+
 function mul!(z::zzModRingElem, x::zzModRingElem, y::zzModRingElem)
   return x*y
 end

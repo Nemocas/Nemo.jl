@@ -194,12 +194,7 @@ reverse_cols(x::fqPolyRepMatrix) = reverse_cols!(deepcopy(x))
 #
 ################################################################################
 
-function -(x::fqPolyRepMatrix)
-  z = similar(x)
-  ccall((:fq_nmod_mat_neg, libflint), Nothing,
-        (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), z, x, base_ring(x))
-  return z
-end
+-(x::fqPolyRepMatrix) = neg!(similar(x), x)
 
 ################################################################################
 #
@@ -236,6 +231,24 @@ end
 #
 ################################################################################
 
+function zero!(a::fqPolyRepMatrix)
+  ccall((:fq_nmod_mat_zero, libflint), Nothing,
+        (Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), a, base_ring(a))
+  return a
+end
+
+function one!(a::fqPolyRepMatrix)
+  ccall((:fq_nmod_mat_one, libflint), Nothing,
+        (Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), a, base_ring(a))
+  return a
+end
+
+function neg!(z::fqPolyRepMatrix, a::fqPolyRepMatrix)
+  ccall((:fq_nmod_mat_neg, libflint), Nothing,
+        (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), z, a, base_ring(a))
+  return z
+end
+
 function mul!(a::fqPolyRepMatrix, b::fqPolyRepMatrix, c::fqPolyRepMatrix)
   ccall((:fq_nmod_mat_mul, libflint), Nothing,
         (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}),
@@ -254,12 +267,6 @@ function sub!(a::fqPolyRepMatrix, b::fqPolyRepMatrix, c::fqPolyRepMatrix)
   ccall((:fq_nmod_mat_sub, libflint), Nothing,
         (Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}),
         a, b, c, base_ring(a))
-  return a
-end
-
-function zero!(a::fqPolyRepMatrix)
-  ccall((:fq_nmod_mat_zero, libflint), Nothing,
-        (Ref{fqPolyRepMatrix}, Ref{fqPolyRepField}), a, base_ring(a))
   return a
 end
 

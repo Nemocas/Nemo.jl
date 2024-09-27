@@ -2512,6 +2512,13 @@ function one!(z::ZZRingElemOrPtr)
   set!(z, UInt(1))
 end
 
+function neg!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
+  ccall((:fmpz_neg, libflint), Nothing,
+        (Ref{ZZRingElem}, Ref{ZZRingElem}),
+        z, a)
+  return z
+end
+
 function set!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
   @ccall libflint.fmpz_set(z::Ref{ZZRingElem}, a::Ref{ZZRingElem})::Nothing
   return z
@@ -2558,15 +2565,6 @@ end
 
 add!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer) = add!(z, a, flintify(b))
 add!(z::ZZRingElemOrPtr, x::Int, y::ZZRingElemOrPtr) = add!(z, y, x)
-
-function neg!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
-  ccall((:fmpz_neg, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}),
-        z, a)
-  return z
-end
-
-neg!(a::ZZRingElemOrPtr) = neg!(a, a)
 
 function sub!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
   ccall((:fmpz_sub, libflint), Nothing,

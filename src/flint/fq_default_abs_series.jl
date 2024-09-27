@@ -165,14 +165,7 @@ end
 #
 ###############################################################################
 
-function -(x::FqAbsPowerSeriesRingElem)
-  z = parent(x)()
-  ccall((:fq_default_poly_neg, libflint), Nothing,
-        (Ref{FqAbsPowerSeriesRingElem}, Ref{FqAbsPowerSeriesRingElem}, Ref{FqField}),
-        z, x, base_ring(x))
-  z.prec = x.prec
-  return z
-end
+-(x::FqAbsPowerSeriesRingElem) = neg!(parent(x)(), x)
 
 ###############################################################################
 #
@@ -606,6 +599,21 @@ function zero!(z::FqAbsPowerSeriesRingElem)
   ccall((:fq_default_poly_zero, libflint), Nothing,
         (Ref{FqAbsPowerSeriesRingElem}, Ref{FqField}), z, base_ring(z))
   z.prec = parent(z).prec_max
+  return z
+end
+
+function one!(z::FqAbsPowerSeriesRingElem)
+  ccall((:fq_default_poly_one, libflint), Nothing,
+        (Ref{FqAbsPowerSeriesRingElem}, Ref{FqField}), z, base_ring(z))
+  z.prec = parent(z).prec_max
+  return z
+end
+
+function neg!(z::FqAbsPowerSeriesRingElem, a::FqAbsPowerSeriesRingElem)
+  ccall((:fq_default_poly_neg, libflint), Nothing,
+        (Ref{FqAbsPowerSeriesRingElem}, Ref{FqAbsPowerSeriesRingElem}, Ref{FqField}),
+        z, a, base_ring(a))
+  z.prec = a.prec
   return z
 end
 

@@ -213,12 +213,7 @@ reverse_cols(x::FqMatrix) = reverse_cols!(deepcopy(x))
 #
 ################################################################################
 
-function -(x::FqMatrix)
-  z = similar(x)
-  ccall((:fq_default_mat_neg, libflint), Nothing,
-        (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), z, x, base_ring(x))
-  return z
-end
+-(x::FqMatrix) = neg!(similar(x), x)
 
 ################################################################################
 #
@@ -261,6 +256,24 @@ end
 #
 ################################################################################
 
+function zero!(a::FqMatrix)
+  ccall((:fq_default_mat_zero, libflint), Nothing,
+        (Ref{FqMatrix}, Ref{FqField}), a, base_ring(a))
+  return a
+end
+
+function one!(a::FqMatrix)
+  ccall((:fq_default_mat_one, libflint), Nothing,
+        (Ref{FqMatrix}, Ref{FqField}), a, base_ring(a))
+  return a
+end
+
+function neg!(z::FqMatrix, a::FqMatrix)
+  ccall((:fq_default_mat_neg, libflint), Nothing,
+        (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), z, a, base_ring(a))
+  return z
+end
+
 function mul!(a::FqMatrix, b::FqMatrix, c::FqMatrix)
   ccall((:fq_default_mat_mul, libflint), Nothing,
         (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}),
@@ -292,12 +305,6 @@ function add!(a::FqMatrix, b::FqMatrix, c::FqMatrix)
   ccall((:fq_default_mat_add, libflint), Nothing,
         (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}),
         a, b, c, base_ring(a))
-  return a
-end
-
-function zero!(a::FqMatrix)
-  ccall((:fq_default_mat_zero, libflint), Nothing,
-        (Ref{FqMatrix}, Ref{FqField}), a, base_ring(a))
   return a
 end
 

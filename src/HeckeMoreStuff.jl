@@ -325,13 +325,6 @@ function numerator(a::AbsSimpleNumFieldElem)
   return z
 end
 
-function one!(r::AbsSimpleNumFieldElem)
-  a = parent(r)
-  ccall((:nf_elem_one, libflint), Nothing,
-        (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}), r, a)
-  return r
-end
-
 function divexact!(z::AbsSimpleNumFieldElem, x::AbsSimpleNumFieldElem, y::ZZRingElem)
   ccall((:nf_elem_scalar_div_fmpz, libflint), Nothing,
         (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{ZZRingElem}, Ref{AbsSimpleNumField}),

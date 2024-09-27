@@ -354,6 +354,16 @@ function zero!(z::FpFieldElem)
   return z
 end
 
+function one!(z::FpFieldElem)
+  one!(z.data)
+  return z
+end
+
+function neg!(z::FpFieldElem, x::FpFieldElem)
+  z.data = R.n - x.data
+  return z
+end
+
 function mul!(z::FpFieldElem, x::FpFieldElem, y::FpFieldElem)
   R = parent(z)
   ccall((:fmpz_mod_mul, libflint), Nothing,

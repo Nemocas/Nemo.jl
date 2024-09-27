@@ -67,19 +67,9 @@ function setindex_raw!(x::fqPolyRepFieldElem, c::UInt, i::Int)
   return x
 end
 
-function zero(a::fqPolyRepField)
-  d = a()
-  ccall((:fq_nmod_zero, libflint), Nothing,
-        (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), d, a)
-  return d
-end
+zero(a::fqPolyRepField) = zero!(a())
 
-function one(a::fqPolyRepField)
-  d = a()
-  ccall((:fq_nmod_one, libflint), Nothing,
-        (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), d, a)
-  return d
-end
+one(a::fqPolyRepField) = one!(a())
 
 function gen(a::fqPolyRepField)
   d = a()
@@ -172,12 +162,7 @@ end
 #
 ###############################################################################
 
-function -(x::fqPolyRepFieldElem)
-  z = parent(x)()
-  ccall((:fq_nmod_neg, libflint), Nothing,
-        (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, x, x.parent)
-  return z
-end
+-(x::fqPolyRepFieldElem) = neg!(parent(x)(), x)
 
 ###############################################################################
 #
@@ -459,6 +444,24 @@ end
 #
 ###############################################################################
 
+function zero!(z::fqPolyRepFieldElem)
+  ccall((:fq_nmod_zero, libflint), Nothing,
+        (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, z.parent)
+  return z
+end
+
+function one!(z::fqPolyRepFieldElem)
+  ccall((:fq_nmod_one, libflint), Nothing,
+        (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, z.parent)
+  return z
+end
+
+function neg!(z::fqPolyRepFieldElem, a::fqPolyRepFieldElem)
+  ccall((:fq_nmod_neg, libflint), Nothing,
+        (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, a, a.parent)
+  return z
+end
+
 function set!(z::fqPolyRepFieldElem, x::fqPolyRepFieldElemOrPtr)
   ccall((:fq_nmod_set, libflint), Nothing,
         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
@@ -487,12 +490,6 @@ function set!(z::fqPolyRepFieldElem, x::fpPolyRingElemOrPtr)
   ccall((:fq_nmod_set_nmod_poly, libflint), Nothing,
         (Ref{fqPolyRepFieldElem}, Ref{fpPolyRingElem}, Ref{fqPolyRepField}),
         z, x, parent(z))
-end
-
-function zero!(z::fqPolyRepFieldElem)
-  ccall((:fq_nmod_zero, libflint), Nothing,
-        (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), z, z.parent)
-  return z
 end
 
 function mul!(z::fqPolyRepFieldElem, x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)

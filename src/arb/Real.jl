@@ -1934,6 +1934,11 @@ function zero!(z::RealFieldElem)
   return z
 end
 
+function one!(z::RealFieldElem)
+  ccall((:arb_one, libflint), Nothing, (Ref{RealFieldElem},), z)
+  return z
+end
+
 for (s,f) in (("add!","arb_add"), ("mul!","arb_mul"), ("div!", "arb_div"),
               ("sub!","arb_sub"))
   @eval begin

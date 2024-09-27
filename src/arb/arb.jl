@@ -1936,6 +1936,11 @@ function zero!(z::ArbFieldElem)
   return z
 end
 
+function one!(z::ArbFieldElem)
+  ccall((:arb_one, libflint), Nothing, (Ref{ArbFieldElem},), z)
+  return z
+end
+
 for (s,f) in (("add!","arb_add"), ("mul!","arb_mul"), ("div!", "arb_div"),
               ("sub!","arb_sub"))
   @eval begin

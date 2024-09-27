@@ -1574,6 +1574,11 @@ function zero!(z::AcbFieldElem)
   return z
 end
 
+function one!(z::AcbFieldElem)
+  ccall((:acb_one, libflint), Nothing, (Ref{AcbFieldElem},), z)
+  return z
+end
+
 function add!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem)
   ccall((:acb_add, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int),
         z, x, y, parent(z).prec)

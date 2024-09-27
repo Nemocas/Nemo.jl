@@ -93,21 +93,9 @@ for (etype, rtype, ftype, ctype, utype) in (
       #                a, a.parent)
     end
 
-    function one(R::($rtype))
-      z = R()
-      ccall((:nmod_mpoly_one, libflint), Nothing,
-            (Ref{($etype)}, Ref{($rtype)}),
-            z, R)
-      return z
-    end
+    one(R::($rtype)) = one!(R())
 
-    function zero(R::($rtype))
-      z = R()
-      ccall((:nmod_mpoly_zero, libflint), Nothing,
-            (Ref{($etype)}, Ref{($rtype)}),
-            z, R)
-      return z
-    end
+    zero(R::($rtype)) = zero!(R())
 
     function isone(a::($etype))
       return Bool(ccall((:nmod_mpoly_is_one, libflint), Cint,
@@ -297,13 +285,7 @@ for (etype, rtype, ftype, ctype, utype) in (
     #
     ###############################################################################
 
-    function -(a::($etype))
-      z = parent(a)()
-      ccall((:nmod_mpoly_neg, libflint), Nothing,
-            (Ref{($etype)}, Ref{($etype)}, Ref{($rtype)}),
-            z, a, parent(a))
-      return z
-    end
+    -(a::($etype)) = neg!(parent(a)(), a)
 
     function +(a::($etype), b::($etype))
       check_parent(a, b)
@@ -806,6 +788,20 @@ for (etype, rtype, ftype, ctype, utype) in (
             (Ref{($etype)}, Ref{($rtype)}),
             a, parent(a))
       return a
+    end
+
+    function one!(a::($etype))
+      ccall((:nmod_mpoly_one, libflint), Nothing,
+            (Ref{($etype)}, Ref{($rtype)}),
+            a, parent(a))
+      return a
+    end
+
+    function neg!(z::($etype), a::($etype))
+      ccall((:nmod_mpoly_neg, libflint), Nothing,
+            (Ref{($etype)}, Ref{($etype)}, Ref{($rtype)}),
+            z, a, parent(a))
+      return z
     end
 
     function add!(a::($etype), b::($etype), c::($etype))

@@ -179,12 +179,7 @@ canonical_unit(a::QQMatrix) = canonical_unit(a[1, 1])
 #
 ###############################################################################
 
-function -(x::QQMatrix)
-  z = similar(x)
-  ccall((:fmpq_mat_neg, libflint), Nothing,
-        (Ref{QQMatrix}, Ref{QQMatrix}), z, x)
-  return z
-end
+-(x::QQMatrix) = neg!(similar(x), x)
 
 ###############################################################################
 #
@@ -728,6 +723,24 @@ end
 #
 ###############################################################################
 
+function zero!(z::QQMatrix)
+  ccall((:fmpq_mat_zero, libflint), Nothing,
+        (Ref{QQMatrix},), z)
+  return z
+end
+
+function one!(z::QQMatrix)
+  ccall((:fmpq_mat_one, libflint), Nothing,
+        (Ref{QQMatrix},), z)
+  return z
+end
+
+function neg!(z::QQMatrix, a::QQMatrix)
+  ccall((:fmpq_mat_neg, libflint), Nothing,
+        (Ref{QQMatrix}, Ref{QQMatrix}), z, a)
+  return z
+end
+
 function mul!(z::QQMatrix, x::QQMatrix, y::QQMatrix)
   ccall((:fmpq_mat_mul, libflint), Nothing,
         (Ref{QQMatrix}, Ref{QQMatrix}, Ref{QQMatrix}), z, x, y)
@@ -790,12 +803,6 @@ mul!(z::QQMatrix, y::IntegerUnion, x::QQMatrix) = mul!(z, x, y)
 mul!(x::QQMatrix, y::IntegerUnion) = mul!(x, x, y)
 
 mul!(z::QQMatrix, y::QQMatrix, x::Integer) = mul!(z, y, ZZ(x))
-
-function zero!(z::QQMatrix)
-  ccall((:fmpq_mat_zero, libflint), Nothing,
-        (Ref{QQMatrix},), z)
-  return z
-end
 
 function Generic.add_one!(a::QQMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)

@@ -161,15 +161,7 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
     #
     ###############################################################################
 
-    function -(x::($etype))
-      z = parent(x)()
-      ccall(($(flint_fn*"_neg"), libflint), Nothing,
-            (Ref{($etype)}, Ref{($etype)}),
-            z, x)
-      z.prec = x.prec
-      z.val = x.val
-      return z
-    end
+    -(x::($etype)) = neg!(parent(x)(), x)
 
     ###############################################################################
     #
@@ -693,6 +685,23 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
       x.prec = parent(x).prec_max
       x.val = parent(x).prec_max
       return x
+    end
+
+    function one!(x::($etype))
+      ccall(($(flint_fn*"_one"), libflint), Nothing,
+            (Ref{($etype)},), x)
+      x.prec = parent(x).prec_max
+      x.val = parent(x).prec_max
+      return x
+    end
+
+    function neg!(z::($etype), x::($etype))
+      ccall(($(flint_fn*"_neg"), libflint), Nothing,
+            (Ref{($etype)}, Ref{($etype)}),
+            z, x)
+      z.prec = x.prec
+      z.val = x.val
+      return z
     end
 
     function fit!(x::($etype), n::Int)

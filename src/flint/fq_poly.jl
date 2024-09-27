@@ -117,13 +117,7 @@ canonical_unit(a::FqPolyRepPolyRingElem) = canonical_unit(leading_coefficient(a)
 #
 ################################################################################
 
-function -(x::FqPolyRepPolyRingElem)
-  z = parent(x)()
-  ccall((:fq_poly_neg, libflint), Nothing,
-        (Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepField}),
-        z, x, base_ring(parent(x)))
-  return z
-end
+-(x::FqPolyRepPolyRingElem) = neg!(parent(x)(), x)
 
 ################################################################################
 #
@@ -724,6 +718,20 @@ function zero!(z::FqPolyRepPolyRingElem)
   ccall((:fq_poly_zero, libflint), Nothing,
         (Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepField}),
         z, base_ring(parent(z)))
+  return z
+end
+
+function one!(z::FqPolyRepPolyRingElem)
+  ccall((:fq_poly_one, libflint), Nothing,
+        (Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepField}),
+        z, base_ring(parent(z)))
+  return z
+end
+
+function neg!(z::FqPolyRepPolyRingElem, a::FqPolyRepPolyRingElem)
+  ccall((:fq_poly_neg, libflint), Nothing,
+        (Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepField}),
+        z, a, base_ring(parent(a)))
   return z
 end
 

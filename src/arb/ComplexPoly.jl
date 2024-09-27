@@ -707,6 +707,11 @@ function zero!(z::ComplexPolyRingElem)
   return z
 end
 
+function one!(z::ComplexPolyRingElem)
+  ccall((:acb_poly_one, libflint), Nothing, (Ref{ComplexPolyRingElem},), z)
+  return z
+end
+
 function fit!(z::ComplexPolyRingElem, n::Int)
   ccall((:acb_poly_fit_length, libflint), Nothing,
         (Ref{ComplexPolyRingElem}, Int), z, n)

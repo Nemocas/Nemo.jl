@@ -342,6 +342,20 @@ function zero!(z::ZZModRingElem)
   return z
 end
 
+function one!(z::ZZModRingElem)
+  one!(z.data)
+  return z
+end
+
+function neg!(z::ZZModRingElem, a::ZZModRingElem)
+  if iszero(a.data)
+    z.data = zero!(z.data)
+  else
+    z.data = sub!(z.data, R.n, a.data)
+  end
+  return z
+end
+
 function mul!(z::ZZModRingElem, x::ZZModRingElem, y::ZZModRingElem)
   R = parent(z)
   ccall((:fmpz_mod_mul, libflint), Nothing,

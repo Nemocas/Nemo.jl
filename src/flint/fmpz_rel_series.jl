@@ -591,6 +591,14 @@ function zero!(x::ZZRelPowerSeriesRingElem)
   return x
 end
 
+function one!(x::ZZRelPowerSeriesRingElem)
+  ccall((:fmpz_poly_one, libflint), Nothing,
+        (Ref{ZZRelPowerSeriesRingElem},), x)
+  x.prec = parent(x).prec_max
+  x.val = parent(x).prec_max
+  return x
+end
+
 function fit!(z::ZZRelPowerSeriesRingElem, n::Int)
   ccall((:fmpz_poly_fit_length, libflint), Nothing,
         (Ref{ZZRelPowerSeriesRingElem}, Int), z, n)

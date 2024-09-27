@@ -1039,6 +1039,11 @@ function one!(c::QQFieldElemOrPtr)
   set!(c, 1)
 end
 
+function neg!(z::QQFieldElemOrPtr, a::QQFieldElemOrPtr)
+  ccall((:fmpq_neg, libflint), Nothing, (Ref{QQFieldElem}, Ref{QQFieldElem}), z, a)
+  return z
+end
+
 function set!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr)
   @ccall libflint.fmpq_set(c::Ref{QQFieldElem}, a::Ref{QQFieldElem})::Nothing
   return c
@@ -1167,11 +1172,6 @@ end
 function sub!(z::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::UInt)
   ccall((:fmpq_sub_ui, libflint), Nothing,
         (Ref{QQFieldElem}, Ref{QQFieldElem}, UInt), z, a, b)
-  return z
-end
-
-function neg!(z::QQFieldElemOrPtr, a::QQFieldElemOrPtr)
-  ccall((:fmpq_neg, libflint), Nothing, (Ref{QQFieldElem}, Ref{QQFieldElem}), z, a)
   return z
 end
 

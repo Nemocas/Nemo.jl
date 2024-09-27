@@ -140,12 +140,7 @@ end
 #
 ################################################################################
 
-function -(x::T) where T <: Zmodn_poly
-  z = parent(x)()
-  ccall((:nmod_poly_neg, libflint), Nothing,
-        (Ref{T}, Ref{T}), z, x)
-  return z
-end
+-(x::T) where T <: Zmodn_poly = neg!(parent(x)(), x)
 
 ################################################################################
 #
@@ -893,6 +888,11 @@ end
 function one!(a::T) where T <: Zmodn_poly
   ccall((:nmod_poly_one, libflint), Nothing, (Ref{T}, ), a)
   return a
+end
+
+function neg!(z::T, a::T) where T <: Zmodn_poly
+  ccall((:nmod_poly_neg, libflint), Nothing, (Ref{T}, Ref{T}), z, a)
+  return z
 end
 
 function fit!(x::T, n::Int) where T <: Zmodn_poly

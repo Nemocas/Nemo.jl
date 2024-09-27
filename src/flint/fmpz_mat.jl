@@ -1810,6 +1810,23 @@ end
 #
 ###############################################################################
 
+function zero!(z::ZZMatrix)
+  ccall((:fmpz_mat_zero, libflint), Nothing,
+        (Ref{ZZMatrix},), z)
+  return z
+end
+
+function one!(z::ZZMatrix)
+  ccall((:fmpz_mat_one, libflint), Nothing,
+        (Ref{ZZMatrix},), z)
+  return z
+end
+
+function neg!(z::ZZMatrix, w::ZZMatrix)
+  ccall((:fmpz_mat_neg, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}), z, w)
+  return z
+end
+
 function add!(z::ZZMatrix, x::ZZMatrix, y::ZZMatrix)
   ccall((:fmpz_mat_add, libflint), Nothing,
         (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZMatrix}), z, x, y)
@@ -1859,19 +1876,6 @@ function addmul!(z::ZZMatrix, y::ZZMatrix, x::Int)
         (Ref{ZZMatrix}, Ref{ZZMatrix}, Int), z, y, x)
   return z
 end
-
-function zero!(z::ZZMatrix)
-  ccall((:fmpz_mat_zero, libflint), Nothing,
-        (Ref{ZZMatrix},), z)
-  return z
-end
-
-function neg!(z::ZZMatrix, w::ZZMatrix)
-  ccall((:fmpz_mat_neg, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}), z, w)
-  return z
-end
-
-neg!(z::ZZMatrix) = neg!(z, z)
 
 function mul!(z::Vector{ZZRingElem}, a::ZZMatrix, b::Vector{ZZRingElem})
   ccall((:fmpz_mat_mul_fmpz_vec_ptr, libflint), Nothing,
@@ -2077,9 +2081,7 @@ function identity_matrix(R::ZZRing, n::Int)
   if n < 0
     error("dimension must not be negative")
   end
-  z = ZZMatrix(n, n)
-  ccall((:fmpz_mat_one, libflint), Nothing, (Ref{ZZMatrix}, ), z)
-  return z
+  return one!(ZZMatrix(n, n))
 end
 
 ################################################################################
