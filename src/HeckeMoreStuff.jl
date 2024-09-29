@@ -340,15 +340,6 @@ function one!(r::AbsSimpleNumFieldElem)
   return r
 end
 
-function one(r::AbsSimpleNumFieldElem)
-  a = parent(r)
-  return one(a)
-end
-
-function zero(r::AbsSimpleNumFieldElem)
-  return zero(parent(r))
-end
-
 function divexact!(z::AbsSimpleNumFieldElem, x::AbsSimpleNumFieldElem, y::ZZRingElem)
   ccall((:nf_elem_scalar_div_fmpz, libflint), Nothing,
         (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{ZZRingElem}, Ref{AbsSimpleNumField}),

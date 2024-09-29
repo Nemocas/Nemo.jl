@@ -210,10 +210,6 @@ one(::Type{ZZRingElem}) = ZZRingElem(1)
 
 zero(::Type{ZZRingElem}) = ZZRingElem(0)
 
-one(::ZZRingElem) = ZZRingElem(1)
-
-zero(::ZZRingElem) = ZZRingElem(0)
-
 @doc raw"""
     sign(a::ZZRingElem)
 
