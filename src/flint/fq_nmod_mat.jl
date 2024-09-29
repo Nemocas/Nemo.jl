@@ -753,6 +753,4 @@ end
 #
 ################################################################################
 
-@inline mat_entry_ptr(A::fqPolyRepMatrix, i::Int, j::Int) =
-ccall((:fq_nmod_mat_entry, libflint), Ptr{fqPolyRepFieldElem},
-      (Ref{fqPolyRepMatrix}, Int, Int), A, i - 1, j - 1)
+mat_entry_ptr(A::fqPolyRepMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*(sizeof(Ptr)+5*sizeof(Int))

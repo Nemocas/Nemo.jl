@@ -457,6 +457,4 @@ end
 #
 ################################################################################
 
-@inline mat_entry_ptr(A::FpMatrix, i::Int, j::Int) =
-ccall((:fmpz_mod_mat_entry, libflint), Ptr{ZZRingElem},
-      (Ref{FpMatrix}, Int, Int), A, i - 1, j - 1)
+mat_entry_ptr(A::FpMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*sizeof(Ptr)

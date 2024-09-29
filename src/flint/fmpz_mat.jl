@@ -2107,4 +2107,4 @@ end
 #
 ################################################################################
 
-@inline mat_entry_ptr(A::ZZMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*sizeof(UInt)
+mat_entry_ptr(A::ZZMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*sizeof(Ptr)

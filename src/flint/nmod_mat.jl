@@ -898,3 +898,11 @@ function kernel(::Solve.RREFTrait, M::Union{zzModMatrix, ZZModMatrix}; side::Sym
 end
 
 # For kernel(::HowellFormTrait, ...) we use generic AbstractAlgebra code
+
+################################################################################
+#
+#  Entry pointers
+#
+################################################################################
+
+mat_entry_ptr(A::Zmodn_mat, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*sizeof(UInt)
