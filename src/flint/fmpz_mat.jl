@@ -120,21 +120,11 @@ end
   return v
 end
 
-@inline function setindex!(a::ZZMatrix, d::ZZRingElem, r::Int, c::Int)
+@inline function setindex!(a::ZZMatrix, d::IntegerUnion, r::Int, c::Int)
   @boundscheck _checkbounds(a, r, c)
   GC.@preserve a begin
     z = mat_entry_ptr(a, r, c)
-    set!(z, d)
-  end
-end
-
-@inline setindex!(a::ZZMatrix, d::Integer, r::Int, c::Int) = setindex!(a, ZZRingElem(d), r, c)
-
-@inline function setindex!(a::ZZMatrix, d::Int, r::Int, c::Int)
-  @boundscheck _checkbounds(a, r, c)
-  GC.@preserve a begin
-    z = mat_entry_ptr(a, r, c)
-    set!(z, d)
+    set!(z, flintify(d))
   end
 end
 

@@ -100,31 +100,11 @@ end
   return v
 end
 
-@inline function setindex!(a::QQMatrix, d::ZZRingElem, r::Int, c::Int)
+@inline function setindex!(a::QQMatrix, d::RationalUnion, r::Int, c::Int)
   @boundscheck _checkbounds(a, r, c)
   GC.@preserve a begin
     z = mat_entry_ptr(a, r, c)
-    set!(z, d)
-  end
-end
-
-@inline function setindex!(a::QQMatrix, d::QQFieldElem, r::Int, c::Int)
-  @boundscheck _checkbounds(a, r, c)
-  GC.@preserve a begin
-    z = mat_entry_ptr(a, r, c)
-    set!(z, d)
-  end
-end
-
-Base.@propagate_inbounds setindex!(a::QQMatrix, d::Integer,
-                                   r::Int, c::Int) =
-  setindex!(a, ZZRingElem(d), r, c)
-
-@inline function setindex!(a::QQMatrix, d::Int, r::Int, c::Int)
-  @boundscheck _checkbounds(a, r, c)
-  GC.@preserve a begin
-    z = mat_entry_ptr(a, r, c)
-    set!(z, d)
+    set!(z, flintify(d))
   end
 end
 
@@ -135,10 +115,6 @@ function setindex!(a::QQMatrix, b::QQMatrix, r::UnitRange{Int64}, c::UnitRange{I
   ccall((:fmpq_mat_set, libflint), Nothing,
         (Ref{QQMatrix}, Ref{QQMatrix}), A, b)
 end
-
-Base.@propagate_inbounds setindex!(a::QQMatrix, d::Rational,
-                                   r::Int, c::Int) =
-setindex!(a, QQFieldElem(d), r, c)
 
 number_of_rows(a::QQMatrix) = a.r
 

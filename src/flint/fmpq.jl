@@ -299,7 +299,7 @@ for T in (ZZRingElem, Int, UInt)
   end
 end
 
-+(a::QQFieldElem, b::Integer) = a + ZZRingElem(b)
++(a::QQFieldElem, b::Integer) = a + flintify(b)
 +(a::Integer, b::QQFieldElem) = b + a
 
 +(a::QQFieldElem, b::Rational{T}) where {T <: Integer} = a + QQFieldElem(b)
@@ -312,8 +312,8 @@ for T in (ZZRingElem, Int, UInt)
   end
 end
 
--(a::QQFieldElem, b::Integer) = a - ZZRingElem(b)
--(a::Integer, b::QQFieldElem) = ZZRingElem(a) - b
+-(a::QQFieldElem, b::Integer) = a - flintify(b)
+-(a::Integer, b::QQFieldElem) = flintify(a) - b
 
 -(a::QQFieldElem, b::Rational{T}) where {T <: Integer} = a - QQFieldElem(b)
 -(a::Rational{T}, b::QQFieldElem) where {T <: Integer} = QQFieldElem(a) - b
@@ -325,7 +325,7 @@ for T in (ZZRingElem, Int, UInt)
   end
 end
 
-*(a::QQFieldElem, b::Integer) = a * ZZRingElem(b)
+*(a::QQFieldElem, b::Integer) = a * flintify(b)
 *(a::Integer, b::QQFieldElem) = b * a
 
 *(a::QQFieldElem, b::Rational{T}) where {T <: Integer} = a * QQFieldElem(b)
@@ -356,7 +356,7 @@ function cmp(a::QQFieldElemOrPtr, b::UInt)
   @ccall libflint.fmpq_cmp_ui(a::Ref{QQFieldElem}, b::UInt)::Cint
 end
 
-cmp(a::QQFieldElemOrPtr, b::Integer) = cmp(a, ZZRingElem(b))
+cmp(a::QQFieldElemOrPtr, b::Integer) = cmp(a, flintify(b))
 
 cmp(a::Union{ZZRingElemOrPtr, Integer}, b::QQFieldElemOrPtr) = -cmp(b, a)
 
