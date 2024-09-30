@@ -459,13 +459,13 @@ end
 #
 ###############################################################################
 
-function set!(z::fqPolyRepFieldElem, x::fqPolyRepFieldElem)
+function set!(z::fqPolyRepFieldElem, x::fqPolyRepFieldElemOrPtr)
   ccall((:fq_nmod_set, libflint), Nothing,
         (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
         z, x, parent(z))
 end
 
-function set!(z::fqPolyRepFieldElem, x::ZZRingElem)
+function set!(z::fqPolyRepFieldElem, x::ZZRingElemOrPtr)
   ccall((:fq_nmod_set_fmpz, libflint), Nothing,
         (Ref{fqPolyRepFieldElem}, Ref{ZZRingElem}, Ref{fqPolyRepField}),
         z, x, parent(z))
@@ -483,7 +483,7 @@ function set!(z::fqPolyRepFieldElem, x::UInt)
         z, x, parent(z))
 end
 
-function set!(z::fqPolyRepFieldElem, x::fpPolyRingElem)
+function set!(z::fqPolyRepFieldElem, x::fpPolyRingElemOrPtr)
   ccall((:fq_nmod_set_nmod_poly, libflint), Nothing,
         (Ref{fqPolyRepFieldElem}, Ref{fpPolyRingElem}, Ref{fqPolyRepField}),
         z, x, parent(z))

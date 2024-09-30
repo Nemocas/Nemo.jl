@@ -151,7 +151,7 @@ iszero(a::QQMatrix) = ccall((:fmpq_mat_is_zero, libflint), Bool,
   @boundscheck _checkbounds(A, i, j)
   GC.@preserve A begin
     x = mat_entry_ptr(A, i, j)
-    return ccall((:fmpz_is_zero, libflint), Bool, (Ptr{QQFieldElem},), x)
+    return is_zero(x)
   end
 end
 
@@ -825,9 +825,7 @@ function Generic.add_one!(a::QQMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
   GC.@preserve a begin
     x = mat_entry_ptr(a, i, j)
-    ccall((:fmpq_add_si, libflint), Nothing,
-          (Ptr{QQFieldElem}, Ptr{QQFieldElem}, Int),
-          x, x, 1)
+    add!(x, 1)
   end
   return a
 end

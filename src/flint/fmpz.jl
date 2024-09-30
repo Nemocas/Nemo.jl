@@ -221,12 +221,12 @@ Return the sign of $a$, i.e. $+1$, $0$ or $-1$.
 """
 sign(a::ZZRingElem) = ZZRingElem(ccall((:fmpz_sgn, libflint), Cint, (Ref{ZZRingElem},), a))
 
-sign(::Type{Int}, a::ZZRingElem) = Int(ccall((:fmpz_sgn, libflint), Cint, (Ref{ZZRingElem},), a))
+sign(::Type{Int}, a::ZZRingElemOrPtr) = Int(ccall((:fmpz_sgn, libflint), Cint, (Ref{ZZRingElem},), a))
 
-Base.signbit(a::ZZRingElem) = signbit(sign(Int, a))
+Base.signbit(a::ZZRingElemOrPtr) = signbit(sign(Int, a))
 
-is_negative(n::ZZRingElem) = sign(Int, n) < 0
-is_positive(n::ZZRingElem) = sign(Int, n) > 0
+is_negative(n::ZZRingElemOrPtr) = sign(Int, n) < 0
+is_positive(n::ZZRingElemOrPtr) = sign(Int, n) > 0
 
 @doc raw"""
     fits(::Type{Int}, a::ZZRingElem)
@@ -289,8 +289,8 @@ function numerator(a::ZZRingElem)
   return a
 end
 
-isodd(a::ZZRingElem)  = ccall((:fmpz_is_odd,  libflint), Cint, (Ref{ZZRingElem},), a) % Bool
-iseven(a::ZZRingElem) = ccall((:fmpz_is_even, libflint), Cint, (Ref{ZZRingElem},), a) % Bool
+isodd(a::ZZRingElemOrPtr)  = ccall((:fmpz_is_odd,  libflint), Cint, (Ref{ZZRingElem},), a) % Bool
+iseven(a::ZZRingElemOrPtr) = ccall((:fmpz_is_even, libflint), Cint, (Ref{ZZRingElem},), a) % Bool
 
 ###############################################################################
 #
@@ -2540,37 +2540,37 @@ function set!(z::ZZRingElemOrPtr, a::UInt)
   return z
 end
 
-function swap!(a::ZZRingElem, b::ZZRingElem)
+function swap!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
   ccall((:fmpz_swap, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}),
         a, b)
 end
 
-function add!(z::ZZRingElem, x::ZZRingElem, y::ZZRingElem)
+function add!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   ccall((:fmpz_add, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x, y)
   return z
 end
 
-function add!(z::ZZRingElem, x::ZZRingElem, y::Int)
+function add!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Int)
   ccall((:fmpz_add_si, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), z, x, y)
   return z
 end
 
-function add!(z::ZZRingElem, x::ZZRingElem, y::UInt)
+function add!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::UInt)
   ccall((:fmpz_add_ui, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt), z, x, y)
   return z
 end
 
-function add!(a::ZZRingElem, b::ZZRingElem, c::Ptr{Int})
+function add!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr, c::Ptr{Int})
   ccall((:fmpz_add, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ptr{Int}), a, b, c)
   return a
 end
 
-add!(z::ZZRingElem, a::ZZRingElem, b::Integer) = add!(z, a, ZZRingElem(b))
-add!(z::ZZRingElem, x::Int, y::ZZRingElem) = add!(z, y, x)
+add!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer) = add!(z, a, flintify(b))
+add!(z::ZZRingElemOrPtr, x::Int, y::ZZRingElemOrPtr) = add!(z, y, x)
 
 function neg!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
   ccall((:fmpz_neg, libflint), Nothing,
@@ -2686,7 +2686,7 @@ submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Union{ZZRingElemOrPtr,Integer
 
 Return $r = a b + c d$, changing $r$ in-place.
 """
-function fmma!(r::ZZRingElem, a::ZZRingElem, b::ZZRingElem, c::ZZRingElem, d::ZZRingElem)
+function fmma!(r::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr, c::ZZRingElemOrPtr, d::ZZRingElemOrPtr)
   ccall((:fmpz_fmma, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), r, a, b, c, d)
   return r
@@ -2697,7 +2697,7 @@ end
 
 Return $r = a b - c d$, changing $r$ in-place.
 """
-function fmms!(r::ZZRingElem, a::ZZRingElem, b::ZZRingElem, c::ZZRingElem, d::ZZRingElem)
+function fmms!(r::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr, c::ZZRingElemOrPtr, d::ZZRingElemOrPtr)
   ccall((:fmpz_fmms, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), r, a, b, c, d)
   return r
