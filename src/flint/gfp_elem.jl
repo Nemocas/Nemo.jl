@@ -346,7 +346,7 @@ end
 
 function one!(z::fpFieldElem)
   R = parent(z)
-  return fpFieldElem(UInt(0), R)
+  return fpFieldElem(UInt(1), R)
 end
 
 function neg!(z::fpFieldElem, x::fpFieldElem)
