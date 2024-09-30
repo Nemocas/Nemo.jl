@@ -753,4 +753,13 @@ end
 #
 ################################################################################
 
+# each matrix entry consists of 
+#   coeffs :: Ptr{Nothing}
+#   alloc :: Int
+#   length :: Int
+#   n :: Int
+#   ninv :: Int
+#   norm :: Int
+# The `parent` member of struct fqPolyRepFieldElem is not replicated in each
+# struct member, so we cannot simply use `sizeof(fqPolyRepFieldElem)`.
 mat_entry_ptr(A::fqPolyRepMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*(sizeof(Ptr)+5*sizeof(Int))

@@ -457,4 +457,4 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::FpMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*sizeof(Ptr)
+mat_entry_ptr(A::FpMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*sizeof(ZZRingElem)
