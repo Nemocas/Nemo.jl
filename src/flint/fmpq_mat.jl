@@ -910,36 +910,45 @@ promote_rule(::Type{QQMatrix}, ::Type{Rational{T}}) where T <: Union{Int, BigInt
 #
 ###############################################################################
 
-function matrix(R::QQField, arr::AbstractMatrix{QQFieldElem})
+function matrix(R::QQField, arr::AbstractMatrix{T}) where {T <: RationalUnion}
   z = QQMatrix(size(arr, 1), size(arr, 2), arr)
   return z
 end
 
-function matrix(R::QQField, arr::AbstractMatrix{<: Union{ZZRingElem, Int, BigInt}})
-  z = QQMatrix(size(arr, 1), size(arr, 2), arr)
-  return z
-end
-
-function matrix(R::QQField, arr::AbstractMatrix{Rational{T}}) where {T <: Integer}
-  z = QQMatrix(size(arr, 1), size(arr, 2), map(QQFieldElem, arr))
-  return z
-end
-
-function matrix(R::QQField, r::Int, c::Int, arr::AbstractVector{QQFieldElem})
+function matrix(R::QQField, r::Int, c::Int, arr::AbstractVector{T}) where {T <: RationalUnion}
   _check_dim(r, c, arr)
   z = QQMatrix(r, c, arr)
   return z
 end
 
-function matrix(R::QQField, r::Int, c::Int, arr::AbstractVector{<: Union{ZZRingElem, Int, BigInt}})
-  _check_dim(r, c, arr)
-  z = QQMatrix(r, c, arr)
+function QQMatrix(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: RationalUnion}
+  z = QQMatrix(r, c)
+  GC.@preserve z for i = 1:r
+    for j = 1:c
+      el = mat_entry_ptr(z, i, j)
+      set!(el, flintify(arr[i, j]))
+    end
+  end
   return z
 end
 
-function matrix(R::QQField, r::Int, c::Int, arr::AbstractVector{Rational{T}}) where {T <: Union{ZZRingElem, Int, BigInt}}
-  _check_dim(r, c, arr)
-  z = QQMatrix(r, c, map(QQFieldElem, arr))
+function QQMatrix(r::Int, c::Int, arr::AbstractVector{T}) where {T <: RationalUnion}
+  z = QQMatrix(r, c)
+  GC.@preserve z for i = 1:r
+    for j = 1:c
+      el = mat_entry_ptr(z, i, j)
+      set!(el, flintify(arr[(i-1)*c+j]))
+    end
+  end
+  return z
+end
+
+function QQMatrix(r::Int, c::Int, d::RationalUnion)
+  z = QQMatrix(r, c)
+  GC.@preserve z for i = 1:min(r, c)
+    el = mat_entry_ptr(z, i, i)
+    set!(el, d)
+  end
   return z
 end
 

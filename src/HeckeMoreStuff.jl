@@ -886,8 +886,6 @@ function Base.rem(a::ZZModRingElem, b::ZZModRingElem)
   return r
 end
 
-jacobi_symbol(x::Integer, y::ZZRingElem) = jacobi_symbol(ZZRingElem(x), y)
-
 @doc raw"""
     zeros(f::ZZPolyRingElem) -> Vector{ZZRingElem}
 

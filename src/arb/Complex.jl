@@ -264,21 +264,21 @@ function -(x::RealFieldElem, y::ComplexFieldElem)
   return z
 end
 
-+(x::ComplexFieldElem, y::Integer) = x + ZZRingElem(y)
++(x::ComplexFieldElem, y::Integer) = x + flintify(y)
 
--(x::ComplexFieldElem, y::Integer) = x - ZZRingElem(y)
+-(x::ComplexFieldElem, y::Integer) = x - flintify(y)
 
-*(x::ComplexFieldElem, y::Integer) = x*ZZRingElem(y)
+*(x::ComplexFieldElem, y::Integer) = x*flintify(y)
 
-//(x::ComplexFieldElem, y::Integer) = x//ZZRingElem(y)
+//(x::ComplexFieldElem, y::Integer) = x//flintify(y)
 
-+(x::Integer, y::ComplexFieldElem) = ZZRingElem(x) + y
++(x::Integer, y::ComplexFieldElem) = flintify(x) + y
 
--(x::Integer, y::ComplexFieldElem) = ZZRingElem(x) - y
+-(x::Integer, y::ComplexFieldElem) = flintify(x) - y
 
-*(x::Integer, y::ComplexFieldElem) = ZZRingElem(x)*y
+*(x::Integer, y::ComplexFieldElem) = flintify(x)*y
 
-//(x::Integer, y::ComplexFieldElem) = ZZRingElem(x)//y
+//(x::Integer, y::ComplexFieldElem) = flintify(x)//y
 
 divexact(x::ComplexFieldElem, y::ComplexFieldElem; check::Bool=true) = x // y
 divexact(x::ZZRingElem, y::ComplexFieldElem; check::Bool=true) = x // y
@@ -352,8 +352,8 @@ end
 ==(x::ComplexFieldElem,y::ZZRingElem) = (x == parent(x)(y))
 ==(x::ZZRingElem,y::ComplexFieldElem) = (y == parent(y)(x))
 
-==(x::ComplexFieldElem,y::Integer) = x == ZZRingElem(y)
-==(x::Integer,y::ComplexFieldElem) = ZZRingElem(x) == y
+==(x::ComplexFieldElem,y::Integer) = x == flintify(y)
+==(x::Integer,y::ComplexFieldElem) = flintify(x) == y
 
 ==(x::ComplexFieldElem,y::Float64) = (x == parent(x)(y))
 ==(x::Float64,y::ComplexFieldElem) = (y == parent(y)(x))

@@ -262,17 +262,17 @@ end
 
 *(x::QQPolyRingElem, y::QQFieldElem) = y*x
 
-+(x::Integer, y::QQPolyRingElem) = y + ZZRingElem(x)
++(x::Integer, y::QQPolyRingElem) = y + flintify(x)
 
--(x::Integer, y::QQPolyRingElem) = ZZRingElem(x) - y
+-(x::Integer, y::QQPolyRingElem) = flintify(x) - y
 
-*(x::Integer, y::QQPolyRingElem) = ZZRingElem(x)*y
+*(x::Integer, y::QQPolyRingElem) = flintify(x)*y
 
-+(x::QQPolyRingElem, y::Integer) = x + ZZRingElem(y)
++(x::QQPolyRingElem, y::Integer) = x + flintify(y)
 
--(x::QQPolyRingElem, y::Integer) = x - ZZRingElem(y)
+-(x::QQPolyRingElem, y::Integer) = x - flintify(y)
 
-*(x::QQPolyRingElem, y::Integer) = ZZRingElem(y)*x
+*(x::QQPolyRingElem, y::Integer) = flintify(y)*x
 
 +(x::Rational, y::QQPolyRingElem) = QQFieldElem(x) + y
 
@@ -488,7 +488,7 @@ function divexact(x::QQPolyRingElem, y::Int; check::Bool=true)
   return z
 end
 
-divexact(x::QQPolyRingElem, y::Integer; check::Bool=true) = divexact(x, ZZRingElem(y); check=check)
+divexact(x::QQPolyRingElem, y::Integer; check::Bool=true) = divexact(x, flintify(y); check=check)
 
 divexact(x::QQPolyRingElem, y::Rational{T}; check::Bool=true) where T <: Union{Int, BigInt} = divexact(x, QQFieldElem(y); check=check)
 

@@ -396,11 +396,11 @@ function -(a::QQFieldElem, b::AbsSimpleNumFieldElem)
   return r
 end
 
-+(a::AbsSimpleNumFieldElem, b::Integer) = a + ZZRingElem(b)
++(a::AbsSimpleNumFieldElem, b::Integer) = a + flintify(b)
 
--(a::AbsSimpleNumFieldElem, b::Integer) = a - ZZRingElem(b)
+-(a::AbsSimpleNumFieldElem, b::Integer) = a - flintify(b)
 
--(a::Integer, b::AbsSimpleNumFieldElem) = ZZRingElem(a) - b
+-(a::Integer, b::AbsSimpleNumFieldElem) = flintify(a) - b
 
 +(a::Integer, b::AbsSimpleNumFieldElem) = b + a
 
@@ -444,7 +444,7 @@ end
 
 *(a::AbsSimpleNumFieldElem, b::Rational) = b * a
 
-*(a::AbsSimpleNumFieldElem, b::Integer) = a * ZZRingElem(b)
+*(a::AbsSimpleNumFieldElem, b::Integer) = a * flintify(b)
 
 *(a::Integer, b::AbsSimpleNumFieldElem) = b * a
 
@@ -456,7 +456,7 @@ end
 
 //(a::AbsSimpleNumFieldElem, b::ZZRingElem) = divexact(a, b)
 
-//(a::AbsSimpleNumFieldElem, b::Integer) = a//ZZRingElem(b)
+//(a::AbsSimpleNumFieldElem, b::Integer) = a//flintify(b)
 
 //(a::AbsSimpleNumFieldElem, b::QQFieldElem) = divexact(a, b)
 
@@ -534,7 +534,7 @@ function ==(a::AbsSimpleNumFieldElem, b::UInt)
   return Bool(b)
 end
 
-==(a::AbsSimpleNumFieldElem, b::Integer) = a == ZZRingElem(b)
+==(a::AbsSimpleNumFieldElem, b::Integer) = a == flintify(b)
 
 ==(a::AbsSimpleNumFieldElem, b::Rational) = a == QQFieldElem(b)
 
@@ -611,7 +611,7 @@ function divexact(a::AbsSimpleNumFieldElem, b::ZZRingElem; check::Bool=true)
   return r
 end
 
-divexact(a::AbsSimpleNumFieldElem, b::Integer; check::Bool=true) = divexact(a, ZZRingElem(b); check=check)
+divexact(a::AbsSimpleNumFieldElem, b::Integer; check::Bool=true) = divexact(a, flintify(b); check=check)
 
 function divexact(a::AbsSimpleNumFieldElem, b::QQFieldElem; check::Bool=true)
   iszero(b) && throw(DivideError())
@@ -814,7 +814,7 @@ function add!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::Int)
   return c
 end
 
-add!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::Integer) = add!(c, a, ZZRingElem(b))
+add!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::Integer) = add!(c, a, flintify(b))
 
 function sub!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::QQFieldElem)
   ccall((:nf_elem_sub_fmpq, libflint), Nothing,
@@ -837,7 +837,7 @@ function sub!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::Int)
   return c
 end
 
-sub!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::Integer) = sub!(c, a, ZZRingElem(b))
+sub!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::Integer) = sub!(c, a, flintify(b))
 
 function sub!(c::AbsSimpleNumFieldElem, a::QQFieldElem, b::AbsSimpleNumFieldElem)
   ccall((:nf_elem_fmpq_sub, libflint), Nothing,
@@ -860,7 +860,7 @@ function sub!(c::AbsSimpleNumFieldElem, a::Int, b::AbsSimpleNumFieldElem)
   return c
 end
 
-sub!(c::AbsSimpleNumFieldElem, a::Integer, b::AbsSimpleNumFieldElem) = sub!(c, ZZRingElem(a), b)
+sub!(c::AbsSimpleNumFieldElem, a::Integer, b::AbsSimpleNumFieldElem) = sub!(c, flintify(a), b)
 
 function mul!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::QQFieldElem)
   ccall((:nf_elem_scalar_mul_fmpq, libflint), Nothing,
@@ -883,7 +883,7 @@ function mul!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::Int)
   return c
 end
 
-mul!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::Integer) = mul!(c, a, ZZRingElem(b))
+mul!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::Integer) = mul!(c, a, flintify(b))
 
 ###############################################################################
 #
@@ -1090,7 +1090,7 @@ function (a::AbsSimpleNumField)(c::Int)
   return z
 end
 
-(a::AbsSimpleNumField)(c::Integer) = a(ZZRingElem(c))
+(a::AbsSimpleNumField)(c::Integer) = a(flintify(c))
 
 function (a::AbsSimpleNumField)(c::ZZRingElem)
   z = AbsSimpleNumFieldElem(a)

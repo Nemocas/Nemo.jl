@@ -375,15 +375,15 @@ for (jT, cN, cT) in ((ZZRingElem, :fmpz, Ref{ZZRingElem}), (Int, :si, Int), (UIn
   end
 end
 
-+(a::ZZMPolyRingElem, b::Integer) = a + ZZRingElem(b)
++(a::ZZMPolyRingElem, b::Integer) = a + flintify(b)
 
 +(a::Integer, b::ZZMPolyRingElem) = b + a
 
--(a::ZZMPolyRingElem, b::Integer) = a - ZZRingElem(b)
+-(a::ZZMPolyRingElem, b::Integer) = a - flintify(b)
 
 -(a::Integer, b::ZZMPolyRingElem) = -(b - a)
 
-*(a::ZZMPolyRingElem, b::Integer) = a * ZZRingElem(b)
+*(a::ZZMPolyRingElem, b::Integer) = a * flintify(b)
 
 *(a::Integer, b::ZZMPolyRingElem) = b * a
 
@@ -572,7 +572,7 @@ end
 
 ==(a::Int, b::ZZMPolyRingElem) = b == a
 
-==(a::ZZMPolyRingElem, b::Integer) = a == ZZRingElem(b)
+==(a::ZZMPolyRingElem, b::Integer) = a == flintify(b)
 
 ==(a::Integer, b::ZZMPolyRingElem) = b == a
 

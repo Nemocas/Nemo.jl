@@ -330,9 +330,9 @@ end
 
 *(x::ZZMatrix, y::ZZRingElem) = y*x
 
-*(x::Integer, y::ZZMatrix) = ZZRingElem(x)*y
+*(x::Integer, y::ZZMatrix) = flintify(x)*y
 
-*(x::ZZMatrix, y::Integer) = ZZRingElem(y)*x
+*(x::ZZMatrix, y::Integer) = flintify(y)*x
 
 function +(x::ZZMatrix, y::Integer)
   z = deepcopy(x)
@@ -1925,25 +1925,13 @@ function (a::ZZMatrixSpace)()
   return z
 end
 
-function (a::ZZMatrixSpace)(arr::AbstractMatrix{ZZRingElem})
+function (a::ZZMatrixSpace)(arr::AbstractMatrix{T}) where {T <: IntegerUnion}
   _check_dim(nrows(a), ncols(a), arr)
   z = ZZMatrix(nrows(a), ncols(a), arr)
   return z
 end
 
-function (a::ZZMatrixSpace)(arr::AbstractMatrix{T}) where {T <: Integer}
-  _check_dim(nrows(a), ncols(a), arr)
-  z = ZZMatrix(nrows(a), ncols(a), arr)
-  return z
-end
-
-function (a::ZZMatrixSpace)(arr::AbstractVector{ZZRingElem})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = ZZMatrix(nrows(a), ncols(a), arr)
-  return z
-end
-
-function (a::ZZMatrixSpace)(arr::AbstractVector{T}) where {T <: Integer}
+function (a::ZZMatrixSpace)(arr::AbstractVector{T}) where {T <: IntegerUnion}
   _check_dim(nrows(a), ncols(a), arr)
   z = ZZMatrix(nrows(a), ncols(a), arr)
   return z
@@ -1955,7 +1943,7 @@ function (a::ZZMatrixSpace)(d::ZZRingElem)
 end
 
 function (a::ZZMatrixSpace)(d::Integer)
-  z = ZZMatrix(nrows(a), ncols(a), ZZRingElem(d))
+  z = ZZMatrix(nrows(a), ncols(a), flintify(d))
   return z
 end
 
@@ -2023,25 +2011,45 @@ end
 #
 ###############################################################################
 
-function matrix(R::ZZRing, arr::AbstractMatrix{ZZRingElem})
+function matrix(R::ZZRing, arr::AbstractMatrix{<: IntegerUnion})
   z = ZZMatrix(size(arr, 1), size(arr, 2), arr)
   return z
 end
 
-function matrix(R::ZZRing, arr::AbstractMatrix{<: Integer})
-  z = ZZMatrix(size(arr, 1), size(arr, 2), arr)
-  return z
-end
-
-function matrix(R::ZZRing, r::Int, c::Int, arr::AbstractVector{ZZRingElem})
+function matrix(R::ZZRing, r::Int, c::Int, arr::AbstractVector{<: IntegerUnion})
   _check_dim(r, c, arr)
   z = ZZMatrix(r, c, arr)
   return z
 end
 
-function matrix(R::ZZRing, r::Int, c::Int, arr::AbstractVector{<: Integer})
-  _check_dim(r, c, arr)
-  z = ZZMatrix(r, c, arr)
+function ZZMatrix(r::Int, c::Int, arr::AbstractMatrix{T}) where {T <: IntegerUnion}
+  z = ZZMatrix(r, c)
+  GC.@preserve z for i = 1:r
+    for j = 1:c
+      el = mat_entry_ptr(z, i, j)
+      set!(el, flintify(arr[i, j]))
+    end
+  end
+  return z
+end
+
+function ZZMatrix(r::Int, c::Int, arr::AbstractVector{T}) where {T <: IntegerUnion}
+  z = ZZMatrix(r, c)
+  GC.@preserve z for i = 1:r
+    for j = 1:c
+      el = mat_entry_ptr(z, i, j)
+      set!(el, flintify(arr[(i-1)*c+j]))
+    end
+  end
+  return z
+end
+
+function ZZMatrix(r::Int, c::Int, d::IntegerUnion)
+  z = ZZMatrix(r, c)
+  GC.@preserve z for i = 1:min(r, c)
+    el = mat_entry_ptr(z, i, i)
+    set!(el, d)
+  end
   return z
 end
 

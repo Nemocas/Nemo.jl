@@ -421,7 +421,7 @@ function divexact(x::ZZPolyRingElem, y::Int; check::Bool=true)
   return z
 end
 
-divexact(x::ZZPolyRingElem, y::Integer; check::Bool=true) = divexact(x, ZZRingElem(y); check=check)
+divexact(x::ZZPolyRingElem, y::Integer; check::Bool=true) = divexact(x, flintify(y); check=check)
 
 ###############################################################################
 #

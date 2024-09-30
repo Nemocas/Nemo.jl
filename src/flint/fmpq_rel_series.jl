@@ -322,9 +322,9 @@ end
 
 *(x::QQRelPowerSeriesRingElem, y::QQFieldElem) = y * x
 
-*(x::QQRelPowerSeriesRingElem, y::Integer) = x * ZZRingElem(y)
+*(x::QQRelPowerSeriesRingElem, y::Integer) = x * flintify(y)
 
-*(x::Integer, y::QQRelPowerSeriesRingElem) = ZZRingElem(x) * y
+*(x::Integer, y::QQRelPowerSeriesRingElem) = flintify(x) * y
 
 *(x::QQRelPowerSeriesRingElem, y::Rational) = x * QQFieldElem(y)
 

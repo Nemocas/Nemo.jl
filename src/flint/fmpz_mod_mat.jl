@@ -317,9 +317,7 @@ end
 
 *(x::ZZRingElem, y::T) where T <: Zmod_fmpz_mat = y*x
 
-function *(x::T, y::Integer) where T <: Zmod_fmpz_mat
-  return x*ZZRingElem(y)
-end
+*(x::T, y::Integer) where T <: Zmod_fmpz_mat = x*flintify(y)
 
 *(x::Integer, y::T) where T <: Zmod_fmpz_mat = y*x
 

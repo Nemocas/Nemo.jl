@@ -507,8 +507,8 @@ end
 +(a::ZZRingElem, b::UInt) = add!(ZZRingElem(), a, b)
 +(a::UInt, b::ZZRingElem) = b + a
 
-+(a::ZZRingElem, b::Integer) = a + ZZRingElem(b)
-+(a::Integer, b::ZZRingElem) = ZZRingElem(a) + b
++(a::ZZRingElem, b::Integer) = a + flintify(b)
++(a::Integer, b::ZZRingElem) = flintify(a) + b
 
 -(a::ZZRingElem, b::Int) = sub!(ZZRingElem(), a, b)
 -(a::Int, b::ZZRingElem) = neg!(b - a)
@@ -516,8 +516,8 @@ end
 -(a::ZZRingElem, b::UInt) = sub!(ZZRingElem(), a, b)
 -(a::UInt, b::ZZRingElem) = neg!(b - a)
 
--(a::ZZRingElem, b::Integer) = a - ZZRingElem(b)
--(a::Integer, b::ZZRingElem) = ZZRingElem(a) - b
+-(a::ZZRingElem, b::Integer) = a - flintify(b)
+-(a::Integer, b::ZZRingElem) = flintify(a) - b
 
 *(a::ZZRingElem, b::Int) = mul!(ZZRingElem(), a, b)
 *(a::Int, b::ZZRingElem) = b * a
@@ -525,8 +525,8 @@ end
 *(a::ZZRingElem, b::UInt) = mul!(ZZRingElem(), a, b)
 *(a::UInt, b::ZZRingElem) = b * a
 
-*(a::ZZRingElem, b::Integer) = a*ZZRingElem(b)
-*(a::Integer, b::ZZRingElem) = ZZRingElem(a)*b
+*(a::ZZRingElem, b::Integer) = a*flintify(b)
+*(a::Integer, b::ZZRingElem) = flintify(a)*b
 
 *(a::ZZRingElem, b::AbstractFloat) = BigInt(a) * b
 *(a::AbstractFloat, b::ZZRingElem) = a * BigInt(b)
