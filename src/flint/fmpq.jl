@@ -20,7 +20,7 @@ end
 
 QQFieldElem(a::Rational{T}) where {T <: Integer} = QQFieldElem(numerator(a), denominator(a))
 
-QQFieldElem(a::Integer) = QQFieldElem(ZZRingElem(a), ZZRingElem(1))
+QQFieldElem(a::Integer) = QQFieldElem(flintify(a))
 
 QQFieldElem(a::Integer, b::Integer) = QQFieldElem(ZZRingElem(a), ZZRingElem(b))
 
@@ -1191,7 +1191,7 @@ end
 #
 ###############################################################################
 
-(a::QQField)() = QQFieldElem(ZZRingElem(0), ZZRingElem(1))
+(a::QQField)() = zero(a)
 
 function (a::QQField)(b::Rational)
   # work around Julia bug, https://github.com/JuliaLang/julia/issues/32569
