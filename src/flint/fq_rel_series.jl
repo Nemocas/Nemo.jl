@@ -639,7 +639,7 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
       ccall(($(flint_fn*"_one"), libflint), Nothing,
             (Ref{($etype)}, Ref{($ctype)}), x, base_ring(x))
       x.prec = parent(x).prec_max
-      x.val = parent(x).prec_max
+      x.val = 0
       return x
     end
 

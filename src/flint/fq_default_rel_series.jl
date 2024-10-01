@@ -665,7 +665,7 @@ function one!(x::FqRelPowerSeriesRingElem)
   ccall((:fq_default_poly_one, libflint), Nothing,
         (Ref{FqRelPowerSeriesRingElem}, Ref{FqField}), x, base_ring(x))
   x.prec = parent(x).prec_max
-  x.val = parent(x).prec_max
+  x.val = 0
   return x
 end
 

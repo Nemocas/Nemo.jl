@@ -595,7 +595,7 @@ function one!(x::ZZRelPowerSeriesRingElem)
   ccall((:fmpz_poly_one, libflint), Nothing,
         (Ref{ZZRelPowerSeriesRingElem},), x)
   x.prec = parent(x).prec_max
-  x.val = parent(x).prec_max
+  x.val = 0
   return x
 end
 

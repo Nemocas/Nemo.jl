@@ -699,7 +699,7 @@ for (etype, rtype, ctype, mtype, brtype, flint_fn) in (
             (Ref{($etype)}, Ref{($ctype)}),
             x, x.parent.base_ring.ninv)
       x.prec = parent(x).prec_max
-      x.val = parent(x).prec_max
+      x.val = 0
       return x
     end
 
