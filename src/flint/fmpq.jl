@@ -369,6 +369,13 @@ function isless(a::QQFieldElem, b::QQFieldElem)
   return cmp(a, b) < 0
 end
 
+function Base.isapprox(x::QQFieldElem, y::QQFieldElem;
+                       atol::Real=0, rtol::Real=0,
+                       nans::Bool=false, norm::Function=abs)
+    return x == y ||
+        (norm(x - y) <= max(atol, rtol*max(norm(x), norm(y))))
+end
+
 ###############################################################################
 #
 #   Ad hoc comparison
