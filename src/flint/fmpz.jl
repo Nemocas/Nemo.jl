@@ -1425,15 +1425,6 @@ function gcdx(a::ZZRingElem, b::ZZRingElem)
   return d, x, y
 end
 
-@doc raw"""
-    gcdinv(a::ZZRingElem, b::ZZRingElem)
-
-Return a tuple $g, s$ where $g$ is the greatest common divisor of $a$ and
-$b$ and where $s$ is the inverse of $a$ modulo $b$ if $g = 1$. This function
-can be used to detect impossible inverses, i.e. where $a$ and $b$ are not
-coprime, and to yield the common factor of $a$ and $b$ if they are not
-coprime. We require $b \geq a \geq 0$.
-"""
 function gcdinv(a::ZZRingElem, b::ZZRingElem)
   a < 0 && throw(DomainError(a, "First argument must be non-negative"))
   b < a && throw(DomainError((a, b), "First argument must be smaller than second argument"))

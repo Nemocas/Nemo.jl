@@ -627,11 +627,6 @@ function invmod(a::ZZiRingElem, b::ZZiRingElem)
   return x
 end
 
-function gcdinv(a::ZZiRingElem, b::ZZiRingElem)
-  g, x, y = gcdx(a, b)
-  return (g, x)
-end
-
 function remove(a::ZZiRingElem, b::ZZiRingElem)
   if (iszero(b) || is_unit(b))
     throw(ArgumentError("Second argument must be a non-zero non-unit"))

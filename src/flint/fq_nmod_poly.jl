@@ -515,18 +515,6 @@ function gcd(x::fqPolyRepPolyRingElem, y::fqPolyRepPolyRingElem)
   return z
 end
 
-function gcdinv(x::fqPolyRepPolyRingElem, y::fqPolyRepPolyRingElem)
-  check_parent(x,y)
-  z = parent(x)()
-  s = parent(x)()
-  t = parent(x)()
-  ccall((:fq_nmod_poly_xgcd, libflint), Nothing,
-        (Ref{fqPolyRepPolyRingElem}, Ref{fqPolyRepPolyRingElem}, Ref{fqPolyRepPolyRingElem},
-         Ref{fqPolyRepPolyRingElem}, Ref{fqPolyRepPolyRingElem},
-         Ref{fqPolyRepField}), z, s, t, x, y, base_ring(parent(x)))
-  return z, s
-end
-
 function gcdx(x::fqPolyRepPolyRingElem, y::fqPolyRepPolyRingElem)
   check_parent(x,y)
   z = parent(x)()
