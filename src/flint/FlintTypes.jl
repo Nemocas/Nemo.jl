@@ -754,13 +754,8 @@ mutable struct fpPolyRingElem <: PolyRingElem{fpFieldElem}
     return z
   end
 
-  function fpPolyRingElem(n::UInt, a::Int)
-    z = new()
-    ccall((:nmod_poly_init, libflint), Nothing, (Ref{fpPolyRingElem}, UInt), z, n)
-    ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-          (Ref{fpPolyRingElem}, Int, UInt), z, 0, mod(a, n))
-    finalizer(_gfp_poly_clear_fn, z)
-    return z
+  function fpPolyRingElem(n::UInt, a::Integer)
+    return fpPolyRingElem(n, mod(a, n) % UInt)
   end
 
   function fpPolyRingElem(n::UInt, arr::Vector{ZZRingElem})
