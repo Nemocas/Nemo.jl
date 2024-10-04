@@ -860,6 +860,16 @@ isless(x::ZZRingElem, y::Integer) = x < ZZRingElem(y)
 
 isless(x::Integer, y::ZZRingElem) = ZZRingElem(x) < y
 
+function Base.isapprox(x::ZZRingElem, y::ZZRingElem;
+                       atol::Real=0, rtol::Real=0,
+                       nans::Bool=false, norm::Function=abs)
+  if norm === abs && atol < 1 && rtol == 0
+    return x == y
+  else
+    return norm(x - y) <= max(atol, rtol*max(norm(x), norm(y)))
+  end
+end
+
 ###############################################################################
 #
 #   Ad hoc comparison
