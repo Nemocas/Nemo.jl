@@ -589,7 +589,7 @@ It is assumed that $x$ is squarefree.
 function roots(x::ComplexPolyRingElem; target=0, isolate_real=false, initial_prec=0, max_prec=0, max_iter=0)
   deg = degree(x)
   if deg <= 0
-    return Array{ComplexFieldElem}(undef, 0)
+    return ComplexFieldElem[]
   end
 
   initial_prec = (initial_prec >= 2) ? initial_prec : 32

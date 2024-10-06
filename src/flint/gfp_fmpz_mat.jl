@@ -192,23 +192,6 @@ function _gfp_fmpz_mat_window_clear_fn(a::FpMatrix)
         (Ref{FpMatrix}, Ref{fmpz_mod_ctx_struct}), a, base_ring(a).ninv)
 end
 
-
-################################################################################
-#
-#  Conversion
-#
-################################################################################
-
-function Array(b::FpMatrix)
-  a = Array{FpFieldElem}(undef, b.r, b.c)
-  for i = 1:b.r
-    for j = 1:b.c
-      a[i, j] = b[i, j]
-    end
-  end
-  return a
-end
-
 ###############################################################################
 #
 #   Promotion rules

@@ -37,7 +37,7 @@ end
 
 function (a::Generic.AbsPowerSeriesRing{T})(b::ZZRingElem) where {T <: RingElement}
   if iszero(b)
-    z = Generic.AbsSeries{T}(Array{T}(undef, 0), 0, a.prec_max)
+    z = Generic.AbsSeries{T}(T[], 0, a.prec_max)
   else
     z = Generic.AbsSeries{T}([base_ring(a)(b)], 1, a.prec_max)
   end
@@ -88,7 +88,7 @@ end
 
 function (a::Generic.RelPowerSeriesRing{T})(b::ZZRingElem) where {T <: RingElement}
   if iszero(b)
-    z = Generic.RelSeries{T}(Array{T}(undef, 0), 0, a.prec_max, a.prec_max)
+    z = Generic.RelSeries{T}(T[], 0, a.prec_max, a.prec_max)
   else
     z = Generic.RelSeries{T}([base_ring(a)(b)], 1, a.prec_max, 0)
   end

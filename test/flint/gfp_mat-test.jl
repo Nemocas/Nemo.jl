@@ -351,8 +351,8 @@ end
   @test d == matrix_space(Z17, 4, 4)([11 11 8 7; 11 0 14 6; 8 14 14 5; 7 6 5 5])
 
   a = matrix(Z17, [1 2; 3 4])
-  @test mul!(Array{UInt}(undef, 2), a, UInt[1, 2]) == [Z17(5), Z17(11)]
-  @test mul!(Array{UInt}(undef, 2), UInt[1, 2], a) == [Z17(7), Z17(10)]
+  @test mul!(Vector{UInt}(undef, 2), a, UInt[1, 2]) == [Z17(5), Z17(11)]
+  @test mul!(Vector{UInt}(undef, 2), UInt[1, 2], a) == [Z17(7), Z17(10)]
 end
 
 @testset "fpMatrix.row_col_swapping" begin

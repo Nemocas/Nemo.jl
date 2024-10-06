@@ -125,7 +125,7 @@ function generator_minimum_polynomial(f::FinFieldMorphism)
 
   # We compute the recurring sequence sec(x^j) for j from 0 to 2d - 1
 
-  A = Array{typeof(x)}(undef, b)
+  A = Vector{typeof(x)}(undef, b)
 
   for j in 1:(b - 1)
     A[j] = sec(y)

@@ -36,7 +36,6 @@ export ArbMatrix
 export ArbMatrixSpace
 export ArbPolyRing
 export ArbPolyRingElem
-export Array
 export asin
 export asinh
 export asinpi

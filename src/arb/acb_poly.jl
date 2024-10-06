@@ -584,7 +584,7 @@ It is assumed that $x$ is squarefree.
 function roots(x::AcbPolyRingElem; target=0, isolate_real=false, initial_prec=0, max_prec=0, max_iter=0)
   deg = degree(x)
   if deg <= 0
-    return Array{AcbFieldElem}(undef, 0)
+    return AcbFieldElem[]
   end
 
   initial_prec = (initial_prec >= 2) ? initial_prec : 32

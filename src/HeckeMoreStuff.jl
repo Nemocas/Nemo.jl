@@ -260,14 +260,6 @@ function bits(x::ArbFieldElem)
   return ccall((:arb_bits, libflint), Int, (Ref{ArbFieldElem},), x)
 end
 
-function *(a::ZZMatrix, b::Matrix{BigFloat})
-  s = Base.size(b)
-  ncols(a) == s[1] || error("dimensions do not match")
-
-  c = Array{BigFloat}(undef, nrows(a), s[2])
-  return mul!(c, a, b)
-end
-
 function Base.setprecision(x::BigFloat, p::Int)
   setprecision(BigFloat, p) do
     y = BigFloat()

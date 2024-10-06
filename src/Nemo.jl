@@ -42,7 +42,6 @@ import Base: abs2
 import Base: acos
 import Base: acosh
 import Base: angle
-import Base: Array
 import Base: asin
 import Base: asinh
 import Base: atan

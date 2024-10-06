@@ -95,4 +95,4 @@ end
 @deprecate coefficient_ring(k::QadicField) base_field(k)
 
 # To be deprecated in 0.48
-Array(a::ZZMatrix; S::Type{T} = ZZRingElem) where {T} = Matrix{T}(a)
+Base.Array(a::ZZMatrix; S::Type{T} = ZZRingElem) where {T} = Matrix{T}(a)

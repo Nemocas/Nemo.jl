@@ -122,7 +122,7 @@ end
 function roots(R::QQBarField, f::ZZPolyRingElem)
 deg = degree(f)
 if deg <= 0
-return Array{QQBarFieldElem}(undef, 0)
+return QQBarFieldElem[]
 end
 roots = qqbar_vec(deg)
 ccall((:qqbar_roots_fmpz_poly, libflint),
@@ -966,7 +966,7 @@ according to their multiplicity.
 function roots(R::QQBarField, f::ZZPolyRingElem)
   deg = degree(f)
   if deg <= 0
-    return Array{QQBarFieldElem}(undef, 0)
+    return QQBarFieldElem[]
   end
   roots = qqbar_vec(deg)
   ccall((:qqbar_roots_fmpz_poly, libflint),
@@ -987,7 +987,7 @@ according to their multiplicity.
 function roots(R::QQBarField, f::QQPolyRingElem)
   deg = degree(f)
   if deg <= 0
-    return Array{QQBarFieldElem}(undef, 0)
+    return QQBarFieldElem[]
   end
   roots = qqbar_vec(deg)
   ccall((:qqbar_roots_fmpq_poly, libflint),
@@ -1022,7 +1022,7 @@ function _eigvals_internal(R::QQBarField, A::ZZMatrix)
   n = nrows(A)
   !is_square(A) && throw(DomainError(A, "a square matrix is required"))
   if n == 0
-    return Array{QQBarFieldElem}(undef, 0)
+    return QQBarFieldElem[]
   end
   roots = qqbar_vec(n)
   ccall((:qqbar_eigenvalues_fmpz_mat, libflint),
@@ -1037,7 +1037,7 @@ function _eigvals_internal(R::QQBarField, A::QQMatrix)
   n = nrows(A)
   !is_square(A) && throw(DomainError(A, "a square matrix is required"))
   if n == 0
-    return Array{QQBarFieldElem}(undef, 0)
+    return QQBarFieldElem[]
   end
   roots = qqbar_vec(n)
   ccall((:qqbar_eigenvalues_fmpq_mat, libflint),
