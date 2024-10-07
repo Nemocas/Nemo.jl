@@ -170,7 +170,7 @@ end
 #
 ###############################################################################
 
-is_unit(x::QQBarFieldElem) = !is_zero(x)
+is_unit(x::QQBarFieldElem) = !is_zero(x)  # TODO: remove once AA has this generically
 
 zero(a::QQBarField) = a(0)
 
