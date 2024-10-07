@@ -339,27 +339,8 @@ end
 #
 ###############################################################################
 
-function zero!(z::fpFieldElem)
-  R = parent(z)
-  return fpFieldElem(UInt(0), R)
-end
-
-function one!(z::fpFieldElem)
-  R = parent(z)
-  return fpFieldElem(UInt(1), R)
-end
-
-function neg!(z::fpFieldElem, x::fpFieldElem)
-  return -x
-end
-
-function mul!(z::fpFieldElem, x::fpFieldElem, y::ZZRingElem)
-  R = parent(x)
-  d = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), y, R.n)
-  r = mulmod(x.data, d, R.n, R.ninv)
-  z.data = r
-  return z
-end
+# Since this data type is immutable, we can not do better for the unsafe ops
+# than their default implementations.
 
 ###############################################################################
 #
