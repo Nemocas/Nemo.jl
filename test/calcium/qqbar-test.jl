@@ -1,3 +1,13 @@
+function test_elem(R::QQBarField)
+  return rand(R, degree=5, bits=5)
+end
+
+@testset "QQBarFieldElem.conformance_tests" begin
+  R = algebraic_closure(QQ)
+  test_Field_interface(R)
+  #test_Field_interface_recursive(R)
+end
+
 @testset "QQBarFieldElem.constructors" begin
   R = algebraic_closure(QQ)
 
@@ -401,12 +411,3 @@ end
     end
   end
 end
-
-function test_elem(R::QQBarField)
-  return rand(R, degree=5, bits=5)
-end
-
-@testset "QQBarFieldElem.conformance_tests" begin
-  test_Field_interface(algebraic_closure(QQ))
-end
-
