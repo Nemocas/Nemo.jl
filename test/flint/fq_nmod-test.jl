@@ -1,3 +1,7 @@
+@testset "fqPolyRepFieldElem.conformance_tests" begin
+  test_Field_interface_recursive(Native.finite_field(7, 5, "z")[1])
+end
+
 @testset "fqPolyRepFieldElem.constructors" begin
   R, x = Native.finite_field(7, 5, "x")
 

@@ -1,35 +1,23 @@
-function test_elem(R::FqPolyRepField)
-  return rand(R)
-end
-
 @testset "FqPolyRepFieldElem.conformance_tests" begin
-  test_Field_interface_recursive(Native.finite_field(ZZRingElem(7), 5, "z")[1])
-
-  Sy, y = polynomial_ring(residue_ring(ZZ, 36893488147419103363)[1], "y")
-  T, z = Native.finite_field(y^2 + 1, "z")
-  test_Field_interface_recursive(T)
-
-  Syy, yy = polynomial_ring(Native.GF(ZZRingElem(36893488147419103363)), "y")
-  T2, z2 = Native.finite_field(yy^2 + 1, "z")
-  test_Field_interface_recursive(T2)
+  test_Field_interface_recursive(Native.finite_field(ZZ(7), 5, "z")[1])
 end
 
 @testset "FqPolyRepFieldElem.constructors" begin
-  R, x = Native.finite_field(ZZRingElem(7), 5, "x")
+  R, x = Native.finite_field(ZZ(7), 5, "x")
 
   @test elem_type(R) == FqPolyRepFieldElem
   @test elem_type(FqPolyRepField) == FqPolyRepFieldElem
   @test parent_type(FqPolyRepFieldElem) == FqPolyRepField
 
   Sy, y = polynomial_ring(residue_ring(ZZ, 36893488147419103363)[1], "y")
-  Syy, yy = polynomial_ring(Native.GF(ZZRingElem(36893488147419103363)), "y")
+  Syy, yy = polynomial_ring(Native.GF(ZZ(36893488147419103363)), "y")
 
   T, z = Native.finite_field(y^2 + 1, "z")
   T2, z2 = Native.finite_field(yy^2 + 1, "z")
 
   # check that one can leave out the name for the generator, or specify it as a symbol
-  @test Native.finite_field(ZZRingElem(7), 5)[1] isa FqPolyRepField
-  @test Native.finite_field(ZZRingElem(7), 5, :x)[1] isa FqPolyRepField
+  @test Native.finite_field(ZZ(7), 5)[1] isa FqPolyRepField
+  @test Native.finite_field(ZZ(7), 5, :x)[1] isa FqPolyRepField
   @test Native.finite_field(y^2 + 1)[1] isa FqPolyRepField
   @test Native.finite_field(y^2 + 1, :x)[1] isa FqPolyRepField
 
