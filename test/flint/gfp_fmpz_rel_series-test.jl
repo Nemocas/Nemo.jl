@@ -1,3 +1,9 @@
+@testset "FpRelPowerSeriesRingElem.conformance_tests" begin
+  S = Native.GF(ZZ(123456789012345678949))
+  R, x = power_series_ring(S, 30, "x")
+  test_Ring_interface(R)
+end
+
 @testset "FpRelPowerSeriesRingElem.types" begin
   @test rel_series_type(FpFieldElem) == FpRelPowerSeriesRingElem
 end

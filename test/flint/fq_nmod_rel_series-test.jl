@@ -1,3 +1,9 @@
+@testset "fqPolyRepRelPowerSeriesRingElem.conformance_tests" begin
+  S, t = Native.finite_field(23, 5, "t")
+  R, x = power_series_ring(S, 30, "x")
+  test_Ring_interface(R)
+end
+
 @testset "fqPolyRepRelPowerSeriesRingElem.types" begin
   @test rel_series_type(fqPolyRepFieldElem) == fqPolyRepRelPowerSeriesRingElem
 end

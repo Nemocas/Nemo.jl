@@ -1,3 +1,9 @@
+@testset "FqPolyRepAbsPowerSeriesRingElem.conformance_tests" begin
+  S, t = Native.finite_field(ZZRingElem(23), 5, "t")
+  R, x = power_series_ring(S, 30, "x"; model=:capped_absolute)
+  test_Ring_interface(R)
+end
+
 @testset "FqPolyRepAbsPowerSeriesRingElem.types" begin
   @test abs_series_type(FqPolyRepFieldElem) == FqPolyRepAbsPowerSeriesRingElem
 end
