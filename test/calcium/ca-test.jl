@@ -1,3 +1,13 @@
+function test_elem(R::CalciumField)
+  return rand(R, depth=5, bits=5)
+end
+
+@testset "CalciumFieldElem.conformance_tests" begin
+  R = CalciumField()
+  test_Field_interface(R)
+  #test_Field_interface_recursive(R)
+end
+
 @testset "CalciumFieldElem.constructors" begin
   C = CalciumField()
 
