@@ -224,11 +224,7 @@ end
 #
 ################################################################################
 
-function -(x::ComplexPolyRingElem)
-  z = parent(x)()
-  ccall((:acb_poly_neg, libflint), Nothing, (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}), z, x)
-  return z
-end
+-(x::ComplexPolyRingElem) = neg!(parent(x)(), x)
 
 ################################################################################
 #
@@ -635,10 +631,10 @@ function roots(x::ComplexPolyRingElem; target=0, isolate_real=false, initial_pre
 
         if real_ok
           for i = 0 : deg - 1
-            im = ccall((:acb_imag_ptr, libflint), Ptr{arb_struct},
+            im = ccall((:acb_imag_ptr, libflint), Ptr{RealFieldElem},
                        (Ptr{ComplexFieldElem}, ), roots + i * sizeof(acb_struct))
-            if ccall((:arb_contains_zero, libflint), Bool, (Ptr{arb_struct}, ), im)
-              ccall((:arb_zero, libflint), Nothing, (Ptr{arb_struct}, ), im)
+            if ccall((:arb_contains_zero, libflint), Bool, (Ptr{RealFieldElem}, ), im)
+              zero!(im)
             end
           end
         end
@@ -702,13 +698,18 @@ end
 #
 ###############################################################################
 
-function zero!(z::ComplexPolyRingElem)
-  ccall((:acb_poly_zero, libflint), Nothing, (Ref{ComplexPolyRingElem},), z)
+function zero!(z::ComplexPolyRingElemOrPtr)
+  @ccall libflint.acb_poly_zero(z::Ref{ComplexPolyRingElem})::Nothing
   return z
 end
 
-function one!(z::ComplexPolyRingElem)
-  ccall((:acb_poly_one, libflint), Nothing, (Ref{ComplexPolyRingElem},), z)
+function one!(z::ComplexPolyRingElemOrPtr)
+  @ccall libflint.acb_poly_one(z::Ref{ComplexPolyRingElem})::Nothing
+  return z
+end
+
+function neg!(z::ComplexPolyRingElemOrPtr, a::ComplexPolyRingElemOrPtr)
+  @ccall libflint.acb_poly_neg(z::Ref{ComplexPolyRingElem}, a::Ref{ComplexPolyRingElem})::Nothing
   return z
 end
 

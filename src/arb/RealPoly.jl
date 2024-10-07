@@ -210,11 +210,7 @@ end
 #
 ################################################################################
 
-function -(x::RealPolyRingElem)
-  z = parent(x)()
-  ccall((:arb_poly_neg, libflint), Nothing, (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}), z, x)
-  return z
-end
+-(x::RealPolyRingElem) = neg!(parent(x)(), x)
 
 ################################################################################
 #
@@ -601,15 +597,18 @@ end
 #
 ###############################################################################
 
-function zero!(z::RealPolyRingElem)
-  ccall((:arb_poly_zero, libflint), Nothing,
-        (Ref{RealPolyRingElem}, ), z)
+function zero!(z::RealPolyRingElemOrPtr)
+  @ccall libflint.arb_poly_zero(z::Ref{RealPolyRingElem})::Nothing
   return z
 end
 
-function one!(z::RealPolyRingElem)
-  ccall((:arb_poly_one, libflint), Nothing,
-        (Ref{RealPolyRingElem}, ), z)
+function one!(z::RealPolyRingElemOrPtr)
+  @ccall libflint.arb_poly_one(z::Ref{RealPolyRingElem})::Nothing
+  return z
+end
+
+function neg!(z::RealPolyRingElemOrPtr, a::RealPolyRingElemOrPtr)
+  @ccall libflint.arb_poly_neg(z::Ref{RealPolyRingElem}, a::Ref{RealPolyRingElem})::Nothing
   return z
 end
 

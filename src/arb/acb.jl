@@ -35,7 +35,7 @@ end
 
 function one(r::AcbField)
   z = AcbFieldElem()
-  ccall((:acb_one, libflint), Nothing, (Ref{AcbFieldElem}, ), z)
+  one!(z)
   z.parent = r
   return z
 end
@@ -47,7 +47,7 @@ Return exact one times $i$ in the given Arb complex field.
 """
 function onei(r::AcbField)
   z = AcbFieldElem()
-  ccall((:acb_onei, libflint), Nothing, (Ref{AcbFieldElem}, ), z)
+  onei!(z)
   z.parent = r
   return z
 end
@@ -160,11 +160,7 @@ end
 #
 ################################################################################
 
-function -(x::AcbFieldElem)
-  z = parent(x)()
-  ccall((:acb_neg, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), z, x)
-  return z
-end
+-(x::AcbFieldElem) = neg!(parent(x)(), x)
 
 ################################################################################
 #
@@ -243,29 +239,25 @@ end
 function -(x::UInt, y::AcbFieldElem)
   z = parent(y)()
   ccall((:acb_sub_ui, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, UInt, Int), z, y, x, parent(y).prec)
-  ccall((:acb_neg, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), z, z)
-  return z
+  return neg!(z)
 end
 
 function -(x::Int, y::AcbFieldElem)
   z = parent(y)()
   ccall((:acb_sub_si, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int), z, y, x, parent(y).prec)
-  ccall((:acb_neg, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), z, z)
-  return z
+  return neg!(z)
 end
 
 function -(x::ZZRingElem, y::AcbFieldElem)
   z = parent(y)()
   ccall((:acb_sub_fmpz, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ZZRingElem}, Int), z, y, x, parent(y).prec)
-  ccall((:acb_neg, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), z, z)
-  return z
+  return neg!(z)
 end
 
 function -(x::ArbFieldElem, y::AcbFieldElem)
   z = parent(y)()
   ccall((:acb_sub_arb, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ArbFieldElem}, Int), z, y, x, parent(y).prec)
-  ccall((:acb_neg, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), z, z)
-  return z
+  return neg!(z)
 end
 
 +(x::AcbFieldElem, y::Integer) = x + ZZRingElem(y)
@@ -1569,13 +1561,23 @@ end
 #
 ################################################################################
 
-function zero!(z::AcbFieldElem)
-  ccall((:acb_zero, libflint), Nothing, (Ref{AcbFieldElem},), z)
+function zero!(z::AcbFieldElemOrPtr)
+  @ccall libflint.acb_zero(z::Ref{AcbFieldElem})::Nothing
   return z
 end
 
-function one!(z::AcbFieldElem)
-  ccall((:acb_one, libflint), Nothing, (Ref{AcbFieldElem},), z)
+function one!(z::AcbFieldElemOrPtr)
+  @ccall libflint.acb_one(z::Ref{AcbFieldElem})::Nothing
+  return z
+end
+
+function onei!(z::AcbFieldElemOrPtr)
+  @ccall libflint.acb_onei(z::Ref{AcbFieldElem})::Nothing
+  return z
+end
+
+function neg!(z::AcbFieldElemOrPtr, a::AcbFieldElemOrPtr)
+  @ccall libflint.acb_neg(z::Ref{AcbFieldElem}, a::Ref{AcbFieldElem})::Nothing
   return z
 end
 
@@ -1663,21 +1665,21 @@ for (typeofx, passtoc) in ((AcbFieldElem, Ref{AcbFieldElem}), (Ptr{AcbFieldElem}
       r = ccall((:acb_real_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
       _arb_set(r, y, p)
       i = ccall((:acb_imag_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
-      ccall((:arb_zero, libflint), Nothing, (Ptr{ArbFieldElem}, ), i)
+      zero!(i)
     end
 
     function _acb_set(x::($typeofx), y::BigFloat)
       r = ccall((:acb_real_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
       _arb_set(r, y)
       i = ccall((:acb_imag_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
-      ccall((:arb_zero, libflint), Nothing, (Ptr{ArbFieldElem}, ), i)
+      zero!(i)
     end
 
     function _acb_set(x::($typeofx), y::BigFloat, p::Int)
       r = ccall((:acb_real_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
       _arb_set(r, y, p)
       i = ccall((:acb_imag_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
-      ccall((:arb_zero, libflint), Nothing, (Ptr{ArbFieldElem}, ), i)
+      zero!(i)
     end
 
     function _acb_set(x::($typeofx), y::Int, z::Int, p::Int)
@@ -1716,7 +1718,7 @@ for (typeofx, passtoc) in ((AcbFieldElem, Ref{AcbFieldElem}), (Ptr{AcbFieldElem}
       r = ccall((:acb_real_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
       _arb_set(r, y, p)
       i = ccall((:acb_imag_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
-      ccall((:arb_zero, libflint), Nothing, (Ptr{ArbFieldElem}, ), i)
+      zero!(i)
     end
 
     function _acb_set(x::($typeofx), y::Complex, p::Int)

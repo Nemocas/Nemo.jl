@@ -83,9 +83,7 @@ setindex!(x::AcbMatrix, y::Tuple{Rational{T}, Rational{T}}, r::Int, c::Int) wher
 setindex!(x, map(QQFieldElem, y), r, c)
 
 function one(x::AcbMatrixSpace)
-  z = x()
-  ccall((:acb_mat_one, libflint), Nothing, (Ref{AcbMatrix}, ), z)
-  return z
+  return one!(x())
 end
 
 number_of_rows(a::AcbMatrix) = a.r
@@ -104,11 +102,7 @@ end
 #
 ################################################################################
 
-function -(x::AcbMatrix)
-  z = similar(x)
-  ccall((:acb_mat_neg, libflint), Nothing, (Ref{AcbMatrix}, Ref{AcbMatrix}), z, x)
-  return z
-end
+-(x::AcbMatrix)= neg!(similar(x), x)
 
 ################################################################################
 #
@@ -725,6 +719,21 @@ end
 #
 ################################################################################
 
+function zero!(z::AcbMatrixOrPtr)
+  @ccall libflint.acb_mat_zero(z::Ref{AcbMatrix})::Nothing
+  return z
+end
+
+function one!(z::AcbMatrixOrPtr)
+  @ccall libflint.acb_mat_one(z::Ref{AcbMatrix})::Nothing
+  return z
+end
+
+function neg!(z::AcbMatrix, a::AcbMatrixOrPtr)
+  @ccall libflint.acb_mat_neg(z::Ref{AcbMatrix}, a::Ref{AcbMatrix})::Nothing
+  return z
+end
+
 for (s,f) in (("add!","acb_mat_add"), ("mul!","acb_mat_mul"),
               ("sub!","acb_mat_sub"))
   @eval begin
@@ -905,8 +914,7 @@ function identity_matrix(R::AcbField, n::Int)
   if n < 0
     error("dimension must not be negative")
   end
-  z = AcbMatrix(n, n)
-  ccall((:acb_mat_one, libflint), Nothing, (Ref{AcbMatrix}, ), z)
+  z = one!(AcbMatrix(n, n))
   z.base_ring = R
   return z
 end

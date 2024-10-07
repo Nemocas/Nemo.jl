@@ -71,9 +71,7 @@ Base.@propagate_inbounds setindex!(x::ArbMatrix, y::Rational{T},
 setindex!(x, ZZRingElem(y), r, c)
 
 function one(x::ArbMatrixSpace)
-  z = x()
-  ccall((:arb_mat_one, libflint), Nothing, (Ref{ArbMatrix}, ), z)
-  return z
+  return one!(x())
 end
 
 number_of_rows(a::ArbMatrix) = a.r
@@ -93,11 +91,7 @@ end
 #
 ################################################################################
 
-function -(x::ArbMatrix)
-  z = similar(x)
-  ccall((:arb_mat_neg, libflint), Nothing, (Ref{ArbMatrix}, Ref{ArbMatrix}), z, x)
-  return z
-end
+-(x::ArbMatrix) = neg!(similar(x), x)
 
 ################################################################################
 #
@@ -692,6 +686,21 @@ end
 #
 ################################################################################
 
+function zero!(z::ArbMatrixOrPtr)
+  @ccall libflint.arb_mat_zero(z::Ref{ArbMatrix})::Nothing
+  return z
+end
+
+function one!(z::ArbMatrixOrPtr)
+  @ccall libflint.arb_mat_one(z::Ref{ArbMatrix})::Nothing
+  return z
+end
+
+function neg!(z::ArbMatrixOrPtr, a::ArbMatrixOrPtr)
+  @ccall libflint.arb_mat_neg(z::Ref{ArbMatrix}, a::Ref{ArbMatrix})::Nothing
+  return z
+end
+
 for (s,f) in (("add!","arb_mat_add"), ("mul!","arb_mat_mul"),
               ("sub!","arb_mat_sub"))
   @eval begin
@@ -802,8 +811,7 @@ function identity_matrix(R::ArbField, n::Int)
   if n < 0
     error("dimension must not be negative")
   end
-  z = ArbMatrix(n, n)
-  ccall((:arb_mat_one, libflint), Nothing, (Ref{ArbMatrix}, ), z)
+  z = one!(ArbMatrix(n, n))
   z.base_ring = R
   return z
 end

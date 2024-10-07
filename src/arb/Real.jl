@@ -586,11 +586,7 @@ end
 #
 ################################################################################
 
-function -(x::RealFieldElem)
-  z = RealFieldElem()
-  ccall((:arb_neg, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}), z, x)
-  return z
-end
+-(x::RealFieldElem) = neg!(RealFieldElem(), x)
 
 ################################################################################
 #
@@ -1929,20 +1925,25 @@ end
 #
 ################################################################################
 
-function zero!(z::RealFieldElem)
-  ccall((:arb_zero, libflint), Nothing, (Ref{RealFieldElem},), z)
+function zero!(z::RealFieldElemOrPtr)
+  @ccall libflint.arb_zero(z::Ref{RealFieldElem})::Nothing
   return z
 end
 
-function one!(z::RealFieldElem)
-  ccall((:arb_one, libflint), Nothing, (Ref{RealFieldElem},), z)
+function one!(z::RealFieldElemOrPtr)
+  @ccall libflint.arb_one(z::Ref{RealFieldElem})::Nothing
+  return z
+end
+
+function neg!(z::RealFieldElemOrPtr, a::RealFieldElemOrPtr)
+  @ccall libflint.arb_neg(z::Ref{RealFieldElem}, a::Ref{RealFieldElem})::Nothing
   return z
 end
 
 for (s,f) in (("add!","arb_add"), ("mul!","arb_mul"), ("div!", "arb_div"),
               ("sub!","arb_sub"))
   @eval begin
-    function ($(Symbol(s)))(z::RealFieldElem, x::RealFieldElem, y::RealFieldElem, prec::Int = precision(Balls))
+    function ($(Symbol(s)))(z::RealFieldElemOrPtr, x::RealFieldElemOrPtr, y::RealFieldElemOrPtr, prec::Int = precision(Balls))
       ccall(($f, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int),
             z, x, y, prec)
       return z
