@@ -1,3 +1,17 @@
+@testset "FqFieldElem.conformance_tests" begin
+  F1, = finite_field(7, 1)
+  test_Field_interface_recursive(F1)
+
+  F2, = finite_field(ZZ(18446744073709551629), 1)
+  test_Field_interface_recursive(F2)
+
+  F3, = finite_field(7, 10) # avoid zech
+  test_Field_interface_recursive(F3)
+
+  F4, = finite_field(ZZ(18446744073709551629), 4)
+  test_Field_interface_recursive(F4)
+end
+
 @testset "FqFieldElem.constructors" begin
   R, x = finite_field(ZZRingElem(7), 5, "x")
 

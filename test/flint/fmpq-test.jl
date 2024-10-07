@@ -5,7 +5,6 @@ function test_elem(R::QQField)
 end
 
 @testset "QQFieldElem.conformance_tests" begin
-  # TODO: make this work with test_Field_interface_recursive
   test_Field_interface_recursive(QQ)
 end
 

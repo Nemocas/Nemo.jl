@@ -1,3 +1,8 @@
+@testset "QQAbsPowerSeriesRingElem.conformance_tests" begin
+  R, x = power_series_ring(QQ, 30, "x"; model=:capped_absolute)
+  test_Ring_interface(R)
+end
+
 @testset "QQAbsPowerSeriesRingElem.types" begin
   @test abs_series_type(QQFieldElem) == QQAbsPowerSeriesRingElem
 end

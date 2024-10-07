@@ -1,3 +1,8 @@
+@testset "ZZRelPowerSeriesRingElem.conformance_tests" begin
+  R, x = power_series_ring(ZZ, 30, "x")
+  test_Ring_interface(R)
+end
+
 @testset "ZZRelPowerSeriesRingElem.types" begin
   @test rel_series_type(ZZRingElem) == ZZRelPowerSeriesRingElem
 end
