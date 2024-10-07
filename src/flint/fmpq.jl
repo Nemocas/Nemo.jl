@@ -1067,12 +1067,6 @@ function set!(c::QQFieldElemOrPtr, a::ZZRingElemOrPtr)
   return c
 end
 
-function set!(c::Ptr{QQFieldElem}, a::ZZRingElemOrPtr)
-  set!(_num_ptr(c), a)
-  one!(_den_ptr(c))
-  return c
-end
-
 function numerator!(z::ZZRingElem, y::QQFieldElem)
   ccall((:fmpq_numerator, libflint), Cvoid, (Ref{ZZRingElem}, Ref{QQFieldElem}), z, y)
   return z

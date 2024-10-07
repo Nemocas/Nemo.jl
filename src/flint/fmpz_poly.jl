@@ -131,28 +131,19 @@ end
 function +(x::ZZPolyRingElem, y::ZZPolyRingElem)
   check_parent(x, y)
   z = parent(x)()
-  ccall((:fmpz_poly_add, libflint), Nothing,
-        (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem},  Ref{ZZPolyRingElem}),
-        z, x, y)
-  return z
+  return add!(z, x, y)
 end
 
 function -(x::ZZPolyRingElem, y::ZZPolyRingElem)
   check_parent(x, y)
   z = parent(x)()
-  ccall((:fmpz_poly_sub, libflint), Nothing,
-        (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem},  Ref{ZZPolyRingElem}),
-        z, x, y)
-  return z
+  return sub!(z, x, y)
 end
 
 function *(x::ZZPolyRingElem, y::ZZPolyRingElem)
   check_parent(x, y)
   z = parent(x)()
-  ccall((:fmpz_poly_mul, libflint), Nothing,
-        (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem},  Ref{ZZPolyRingElem}),
-        z, x, y)
-  return z
+  return mul!(z, x, y)
 end
 
 ###############################################################################
@@ -161,80 +152,33 @@ end
 #
 ###############################################################################
 
-function *(x::Int, y::ZZPolyRingElem)
-  z = parent(y)()
-  ccall((:fmpz_poly_scalar_mul_si, libflint), Nothing,
-        (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Int), z, y, x)
-  return z
-end
-
-function *(x::ZZRingElem, y::ZZPolyRingElem)
-  z = parent(y)()
-  ccall((:fmpz_poly_scalar_mul_fmpz, libflint), Nothing,
-        (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Ref{ZZRingElem}), z, y, x)
-  return z
-end
-
-function +(x::ZZPolyRingElem, y::Int)
-  z = parent(x)()
-  ccall((:fmpz_poly_add_si, libflint), Nothing,
-        (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Int), z, x, y)
-  return z
-end
-
-function +(x::ZZPolyRingElem, y::ZZRingElem)
-  z = parent(x)()
-  ccall((:fmpz_poly_add_fmpz, libflint), Nothing,
-        (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Ref{ZZRingElem}), z, x, y)
-  return z
-end
-
-function -(x::ZZPolyRingElem, y::Int)
-  z = parent(x)()
-  ccall((:fmpz_poly_sub_si, libflint), Nothing,
-        (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Int), z, x, y)
-  return z
-end
-
-function -(x::ZZPolyRingElem, y::ZZRingElem)
-  z = parent(x)()
-  ccall((:fmpz_poly_sub_fmpz, libflint), Nothing,
-        (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Ref{ZZRingElem}), z, x, y)
-  return z
-end
-
-function -(x::Int, y::ZZPolyRingElem)
-  z = parent(y)()
-  ccall((:fmpz_poly_si_sub, libflint), Nothing,
-        (Ref{ZZPolyRingElem}, Int, Ref{ZZPolyRingElem}), z, x, y)
-  return z
-end
-
-function -(x::ZZRingElem, y::ZZPolyRingElem)
-  z = parent(y)()
-  ccall((:fmpz_poly_fmpz_sub, libflint), Nothing,
-        (Ref{ZZPolyRingElem}, Ref{ZZRingElem}, Ref{ZZPolyRingElem}), z, x, y)
-  return z
-end
++(x::ZZPolyRingElem, y::Int) = add!(parent(x)(), x, y)
++(x::ZZPolyRingElem, y::ZZRingElem) = add!(parent(x)(), x, y)
 
 +(x::Int, y::ZZPolyRingElem) = y + x
-
 +(x::ZZRingElem, y::ZZPolyRingElem) = y + x
 
-*(x::ZZPolyRingElem, y::Int) = y*x
-
-*(x::ZZPolyRingElem, y::ZZRingElem) = y*x
-
 +(x::Integer, y::ZZPolyRingElem) = y + flintify(x)
-
--(x::Integer, y::ZZPolyRingElem) = flintify(x) - y
-
-*(x::Integer, y::ZZPolyRingElem) = flintify(x)*y
-
 +(x::ZZPolyRingElem, y::Integer) = x + flintify(y)
 
+
+-(x::ZZPolyRingElem, y::Int) = sub!(parent(x)(), x, y)
+-(x::ZZPolyRingElem, y::ZZRingElem) = sub!(parent(x)(), x, y)
+
+-(x::Int, y::ZZPolyRingElem) = sub!(parent(y)(), x, y)
+-(x::ZZRingElem, y::ZZPolyRingElem) = sub!(parent(y)(), x, y)
+
+-(x::Integer, y::ZZPolyRingElem) = flintify(x) - y
 -(x::ZZPolyRingElem, y::Integer) = x - flintify(y)
 
+
+*(x::Int, y::ZZPolyRingElem) = mul!(parent(y)(), y, x)
+*(x::ZZRingElem, y::ZZPolyRingElem) = mul!(parent(y)(), y, x)
+
+*(x::ZZPolyRingElem, y::Int) = y*x
+*(x::ZZPolyRingElem, y::ZZRingElem) = y*x
+
+*(x::Integer, y::ZZPolyRingElem) = flintify(x)*y
 *(x::ZZPolyRingElem, y::Integer) = flintify(y)*x
 
 ###############################################################################
@@ -878,15 +822,69 @@ function setcoeff!(z::ZZPolyRingElem, n::Int, x::ZZRingElemOrPtr)
   return z
 end
 
+function add!(z::ZZPolyRingElem, x::ZZPolyRingElem, y::ZZPolyRingElem)
+  ccall((:fmpz_poly_add, libflint), Nothing,
+        (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}), z, x, y)
+  return z
+end
+
+function add!(z::ZZPolyRingElem, x::ZZPolyRingElem, y::ZZRingElemOrPtr)
+  ccall((:fmpz_poly_add_fmpz, libflint), Nothing,
+        (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Ref{ZZRingElem}), z, x, y)
+  return z
+end
+
+function add!(z::ZZPolyRingElem, x::ZZPolyRingElem, y::Int)
+  ccall((:fmpz_poly_add_si, libflint), Nothing,
+        (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Int), z, x, y)
+  return z
+end
+
+function sub!(z::ZZPolyRingElem, x::ZZPolyRingElem, y::ZZPolyRingElem)
+  ccall((:fmpz_poly_sub, libflint), Nothing,
+        (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}), z, x, y)
+  return z
+end
+
+function sub!(z::ZZPolyRingElem, x::ZZPolyRingElem, y::ZZRingElemOrPtr)
+  ccall((:fmpz_poly_sub_fmpz, libflint), Nothing,
+        (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Ref{ZZRingElem}), z, x, y)
+  return z
+end
+
+function sub!(z::ZZPolyRingElem, x::ZZPolyRingElem, y::Int)
+  ccall((:fmpz_poly_sub_si, libflint), Nothing,
+        (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Int), z, x, y)
+  return z
+end
+
+function sub!(z::ZZPolyRingElem, x::ZZRingElemOrPtr, y::ZZPolyRingElem)
+  ccall((:fmpz_poly_fmpz_sub, libflint), Nothing,
+        (Ref{ZZPolyRingElem}, Ref{ZZRingElem}, Ref{ZZPolyRingElem}), z, x, y)
+  return z
+end
+
+function sub!(z::ZZPolyRingElem, x::Int, y::ZZPolyRingElem)
+  ccall((:fmpz_poly_si_sub, libflint), Nothing,
+        (Ref{ZZPolyRingElem}, Int, Ref{ZZPolyRingElem}), z, x, y)
+  return z
+end
+
 function mul!(z::ZZPolyRingElem, x::ZZPolyRingElem, y::ZZPolyRingElem)
   ccall((:fmpz_poly_mul, libflint), Nothing,
         (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}), z, x, y)
   return z
 end
 
-function add!(z::ZZPolyRingElem, x::ZZPolyRingElem, y::ZZPolyRingElem)
-  ccall((:fmpz_poly_add, libflint), Nothing,
-        (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}), z, x, y)
+function mul!(z::ZZPolyRingElem, x::ZZPolyRingElem, y::ZZRingElemOrPtr)
+  ccall((:fmpz_poly_scalar_mul_fmpz, libflint), Nothing,
+        (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Ref{ZZRingElem}), z, x, y)
+  return z
+end
+
+function mul!(z::ZZPolyRingElem, x::ZZPolyRingElem, y::Int)
+  ccall((:fmpz_poly_scalar_mul_si, libflint), Nothing,
+        (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}, Int), z, x, y)
   return z
 end
 

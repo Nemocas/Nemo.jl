@@ -314,16 +314,12 @@ end
 
 function *(x::Int, y::ZZMatrix)
   z = similar(y)
-  ccall((:fmpz_mat_scalar_mul_si, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Int), z, y, x)
-  return z
+  return mul!(z, y, x)
 end
 
 function *(x::ZZRingElem, y::ZZMatrix)
   z = similar(y)
-  ccall((:fmpz_mat_scalar_mul_fmpz, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}), z, y, x)
-  return z
+  return mul!(z, y, x)
 end
 
 *(x::ZZMatrix, y::Int) = y*x
@@ -1828,27 +1824,19 @@ function mul!(z::ZZMatrix, x::ZZMatrix, y::ZZMatrix)
   return z
 end
 
-function mul!(y::ZZMatrix, x::Int)
-  mul!(y, y, x)
-end
-
 function mul!(z::ZZMatrix, y::ZZMatrix, x::Int)
   ccall((:fmpz_mat_scalar_mul_si, libflint), Nothing,
         (Ref{ZZMatrix}, Ref{ZZMatrix}, Int), z, y, x)
   return z
 end
 
-function mul!(y::ZZMatrix, x::ZZRingElem)
-  mul!(y, y, x)
-end
-
-function mul!(z::ZZMatrix, y::ZZMatrix, x::ZZRingElem)
+function mul!(z::ZZMatrix, y::ZZMatrix, x::ZZRingElemOrPtr)
   ccall((:fmpz_mat_scalar_mul_fmpz, libflint), Nothing,
         (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}), z, y, x)
   return z
 end
 
-function addmul!(z::ZZMatrix, y::ZZMatrix, x::ZZRingElem)
+function addmul!(z::ZZMatrix, y::ZZMatrix, x::ZZRingElemOrPtr)
   ccall((:fmpz_mat_scalar_addmul_fmpz, libflint), Nothing,
         (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}), z, y, x)
   return z
@@ -1891,9 +1879,7 @@ function Generic.add_one!(a::ZZMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
   GC.@preserve a begin
     x = mat_entry_ptr(a, i, j)
-    ccall((:fmpz_add_si, libflint), Nothing,
-          (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Int),
-          x, x, 1)
+    add!(x, 1)
   end
   return a
 end

@@ -279,26 +279,19 @@ reverse_cols(x::QQMatrix) = reverse_cols!(deepcopy(x))
 function +(x::QQMatrix, y::QQMatrix)
   check_parent(x, y)
   z = similar(x)
-  add!(z, x, y)
-  return z
+  return add!(z, x, y)
 end
 
 function -(x::QQMatrix, y::QQMatrix)
   check_parent(x, y)
   z = similar(x)
-  ccall((:fmpq_mat_sub, libflint), Nothing,
-        (Ref{QQMatrix}, Ref{QQMatrix},  Ref{QQMatrix}),
-        z, x, y)
-  return z
+  return sub!(z, x, y)
 end
 
 function *(x::QQMatrix, y::QQMatrix)
   ncols(x) != nrows(y) && error("Incompatible matrix dimensions")
   z = similar(x, nrows(x), ncols(y))
-  ccall((:fmpq_mat_mul, libflint), Nothing,
-        (Ref{QQMatrix}, Ref{QQMatrix},  Ref{QQMatrix}),
-        z, x, y)
-  return z
+  return mul!(z, x, y)
 end
 
 ###############################################################################
@@ -307,19 +300,22 @@ end
 #
 ###############################################################################
 
+function *(x::Int, y::QQMatrix)
+  z = similar(y)
+  return mul!(z, y, x)
+end
+
 function *(x::ZZRingElem, y::QQMatrix)
   z = similar(y)
-  ccall((:fmpq_mat_scalar_mul_fmpz, libflint), Nothing,
-        (Ref{QQMatrix}, Ref{QQMatrix}, Ref{ZZRingElem}), z, y, x)
-  return z
+  return mul!(z, y, x)
 end
 
 function *(x::QQFieldElem, y::QQMatrix)
   z = similar(y)
-  ccall((:fmpq_mat_scalar_mul_fmpz, libflint), Nothing,
-        (Ref{QQMatrix}, Ref{QQMatrix}, Ref{QQFieldElem}), z, y, numerator(x))
-  ccall((:fmpq_mat_scalar_div_fmpz, libflint), Nothing,
-        (Ref{QQMatrix}, Ref{QQMatrix}, Ref{QQFieldElem}), z, z, denominator(x))
+  GC.@preserve x begin
+    mul!(z, y, _num_ptr(x))
+    divexact!(z, z, _den_ptr(x))
+  end
   return z
 end
 
@@ -327,9 +323,9 @@ end
 
 *(x::QQMatrix, y::ZZRingElem) = y*x
 
-*(x::Integer, y::QQMatrix) = ZZRingElem(x)*y
+*(x::Integer, y::QQMatrix) = flintify(x)*y
 
-*(x::QQMatrix, y::Integer) = ZZRingElem(y)*x
+*(x::QQMatrix, y::Integer) = flintify(y)*x
 
 *(x::Rational, y::QQMatrix) = QQFieldElem(x)*y
 
@@ -467,17 +463,13 @@ end
 
 function divexact(x::QQMatrix, y::QQFieldElem; check::Bool=true)
   z = similar(x)
-  ccall((:fmpq_mat_scalar_div_fmpz, libflint), Nothing,
-        (Ref{QQMatrix}, Ref{QQMatrix}, Ref{ZZRingElem}), z, x, numerator(y))
-  ccall((:fmpq_mat_scalar_mul_fmpz, libflint), Nothing,
-        (Ref{QQMatrix}, Ref{QQMatrix}, Ref{ZZRingElem}), z, z, denominator(y))
+  divexact!(z, x, y)
   return z
 end
 
 function divexact(x::QQMatrix, y::ZZRingElem; check::Bool=true)
   z = similar(x)
-  ccall((:fmpq_mat_scalar_div_fmpz, libflint), Nothing,
-        (Ref{QQMatrix}, Ref{QQMatrix}, Ref{ZZRingElem}), z, x, y)
+  divexact!(z, x, y)
   return z
 end
 
@@ -768,32 +760,52 @@ function add!(z::QQMatrix, x::QQMatrix, y::QQMatrix)
   return z
 end
 
-function mul!(z::QQMatrix, y::QQMatrix, x::QQFieldElem)
+function sub!(z::QQMatrix, x::QQMatrix, y::QQMatrix)
+  ccall((:fmpq_mat_sub, libflint), Nothing,
+        (Ref{QQMatrix}, Ref{QQMatrix}, Ref{QQMatrix}), z, x, y)
+  return z
+end
+
+function mul!(z::QQMatrix, y::QQMatrix, x::QQFieldElemOrPtr)
    ccall((:fmpq_mat_scalar_mul_fmpq, libflint), Nothing,
                 (Ref{QQMatrix}, Ref{QQMatrix}, Ref{QQFieldElem}), z, y, x)
    return z
 end
 
-mul!(z::QQMatrix, y::QQFieldElem, x::QQMatrix) = mul!(z, x, y)
+mul!(z::QQMatrix, y::QQFieldElemOrPtr, x::QQMatrix) = mul!(z, x, y)
 
-mul!(x::QQMatrix, y::QQFieldElem) = mul!(x, x, y)
+mul!(x::QQMatrix, y::QQFieldElemOrPtr) = mul!(x, x, y)
 
-function mul!(z::QQMatrix, y::QQMatrix, x::ZZRingElem)
+function mul!(z::QQMatrix, y::QQMatrix, x::ZZRingElemOrPtr)
   ccall((:fmpq_mat_scalar_mul_fmpz, libflint), Nothing,
         (Ref{QQMatrix}, Ref{QQMatrix}, Ref{ZZRingElem}), z, y, x)
   return z
 end
 
 # delegate everything integral to mul!(::QQMatrix, ::QQMatrix, ::ZZRingElem)
-mul!(z::QQMatrix, y::IntegerUnion, x::QQMatrix) = mul!(z, x, y)
+mul!(z::QQMatrix, y::Union{Integer, ZZRingElemOrPtr}, x::QQMatrix) = mul!(z, x, y)
 
-mul!(x::QQMatrix, y::IntegerUnion) = mul!(x, x, y)
+mul!(x::QQMatrix, y::Union{Integer, ZZRingElemOrPtr}) = mul!(x, x, y)
 
 mul!(z::QQMatrix, y::QQMatrix, x::Integer) = mul!(z, y, ZZ(x))
 
 function zero!(z::QQMatrix)
   ccall((:fmpq_mat_zero, libflint), Nothing,
         (Ref{QQMatrix},), z)
+  return z
+end
+
+function divexact!(z::QQMatrix, x::QQMatrix, y::QQFieldElemOrPtr)
+  GC.@preserve y begin
+    divexact!(z, x, _num_ptr(y))
+    mul!(z, z, _den_ptr(y))
+  end
+  return z
+end
+
+function divexact!(z::QQMatrix, x::QQMatrix, y::ZZRingElemOrPtr)
+  ccall((:fmpq_mat_scalar_div_fmpz, libflint), Nothing,
+        (Ref{QQMatrix}, Ref{QQMatrix}, Ref{ZZRingElem}), z, x, y)
   return z
 end
 
@@ -982,9 +994,7 @@ function identity_matrix(R::QQField, n::Int)
   if n < 0
     error("dimension must not be negative")
   end
-  z = QQMatrix(n, n)
-  ccall((:fmpq_mat_one, libflint), Nothing, (Ref{QQMatrix}, ), z)
-  return z
+  return one!(QQMatrix(n, n))
 end
 
 ################################################################################
