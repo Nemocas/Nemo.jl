@@ -1,3 +1,9 @@
+@testset "ZZModRelPowerSeriesRingElem.conformance_tests" begin
+  S, = residue_ring(ZZ, 123456789012345678949)
+  R, x = power_series_ring(S, 30, "x")
+  test_Ring_interface(R)
+end
+
 @testset "ZZModRelPowerSeriesRingElem.types" begin
   @test rel_series_type(ZZModRingElem) == ZZModRelPowerSeriesRingElem
 end

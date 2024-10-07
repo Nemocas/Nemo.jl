@@ -1,3 +1,9 @@
+@testset "FqAbsPowerSeriesRingElem.conformance_tests" begin
+  S, t = finite_field(ZZRingElem(23), 5, "t")
+  R, x = power_series_ring(S, 30, "x"; model=:capped_absolute)
+  test_Ring_interface(R)
+end
+
 @testset "FqAbsPowerSeriesRingElem.types" begin
   @test abs_series_type(FqFieldElem) == FqAbsPowerSeriesRingElem
 end
