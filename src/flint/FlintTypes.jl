@@ -3430,7 +3430,7 @@ end
 #
 ###############################################################################
 
-@attributes mutable struct fpRelPowerSeriesRing <: SeriesRing{zzModRingElem}
+@attributes mutable struct fpRelPowerSeriesRing <: SeriesRing{fpFieldElem}
   base_ring::fpField
   prec_max::Int
   S::Symbol
