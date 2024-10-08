@@ -28,8 +28,6 @@ parent(a::ZZLaurentSeriesRingElem) = a.parent
 
 elem_type(::Type{ZZLaurentSeriesRing}) = ZZLaurentSeriesRingElem
 
-base_ring_type(::Type{ZZLaurentSeriesRing}) = ZZRing
-
 base_ring(R::ZZLaurentSeriesRing) = ZZ
 
 is_domain_type(::Type{ZZLaurentSeriesRingElem}) = true

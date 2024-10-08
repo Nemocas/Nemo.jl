@@ -22,8 +22,6 @@ elem_type(::Type{ZZRelPowerSeriesRing}) = ZZRelPowerSeriesRingElem
 
 parent_type(::Type{ZZRelPowerSeriesRingElem}) = ZZRelPowerSeriesRing
 
-base_ring_type(::Type{ZZRelPowerSeriesRing}) = ZZRing
-
 base_ring(R::ZZRelPowerSeriesRing) = ZZ
 
 rel_series_type(::Type{ZZRingElem}) = ZZRelPowerSeriesRingElem
