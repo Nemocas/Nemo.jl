@@ -1,6 +1,23 @@
 RR = RealField()
 CC = ComplexField()
 
+function test_elem(R::ComplexField)
+    randtype = rand((
+    :urandom,
+    :randtest,
+    :randtest_exact,
+    :randtest_precise,
+    :randtest_wide,
+    :randtest_special,
+    ))
+  return rand(R; randtype)
+end
+
+@testset "ComplexFieldElem.conformance_tests" begin
+  test_Field_interface(CC)
+  #test_Field_interface_recursive(CC)
+end
+
 @testset "ComplexFieldElem.constructors" begin
   @test isa(CC, ComplexField)
   @test isa(CC(2), FieldElem)
