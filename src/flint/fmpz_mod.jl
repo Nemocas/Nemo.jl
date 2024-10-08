@@ -343,15 +343,21 @@ function zero!(z::ZZModRingElem)
 end
 
 function one!(z::ZZModRingElem)
-  one!(z.data)
+  R = parent(z)
+  if R.n == 1
+    zero!(z.data)
+  else
+    one!(z.data)
+  end
   return z
 end
 
-function neg!(z::ZZModRingElem, a::ZZModRingElem)
-  if iszero(a.data)
-    z.data = zero!(z.data)
+function neg!(z::ZZModRingElem, x::ZZModRingElem)
+  R = parent(z)
+  if is_zero(x.data)
+    zero!(z.data)
   else
-    z.data = sub!(z.data, R.n, a.data)
+    sub!(z.data, R.n, x.data)
   end
   return z
 end

@@ -360,7 +360,12 @@ function one!(z::FpFieldElem)
 end
 
 function neg!(z::FpFieldElem, x::FpFieldElem)
-  z.data = R.n - x.data
+  R = parent(z)
+  if is_zero(x.data)
+    zero!(z.data)
+  else
+    sub!(z.data, R.n, x.data)
+  end
   return z
 end
 

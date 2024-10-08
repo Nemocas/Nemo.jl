@@ -1470,6 +1470,10 @@ function (C::CalciumField)(v::QQBarFieldElem)
   return z
 end
 
+function (C::CalciumField)(v::RationalUnion)
+  return C(flintify(v))
+end
+
 # todo: optimize
 function (C::CalciumField)(v::Complex{Int})
   return C(QQBarFieldElem(v))
