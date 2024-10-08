@@ -300,9 +300,9 @@ function (a::fpMatrixSpace)()
   return z
 end
 
-function (a::fpMatrixSpace)(arr::AbstractMatrix{BigInt}, transpose::Bool = false)
-  _check_dim(nrows(a), ncols(a), arr, transpose)
-  z = fpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr, transpose)
+function (a::fpMatrixSpace)(arr::AbstractMatrix{BigInt})
+  _check_dim(nrows(a), ncols(a), arr)
+  z = fpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
   z.base_ring = a.base_ring
   return z
 end
@@ -314,9 +314,9 @@ function (a::fpMatrixSpace)(arr::AbstractVector{BigInt})
   return z
 end
 
-function (a::fpMatrixSpace)(arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
-  _check_dim(nrows(a), ncols(a), arr, transpose)
-  z = fpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr, transpose)
+function (a::fpMatrixSpace)(arr::AbstractMatrix{ZZRingElem})
+  _check_dim(nrows(a), ncols(a), arr)
+  z = fpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
   z.base_ring = a.base_ring
   return z
 end
@@ -328,9 +328,9 @@ function (a::fpMatrixSpace)(arr::AbstractVector{ZZRingElem})
   return z
 end
 
-function (a::fpMatrixSpace)(arr::AbstractMatrix{Int}, transpose::Bool = false)
-  _check_dim(nrows(a), ncols(a), arr, transpose)
-  z = fpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr, transpose)
+function (a::fpMatrixSpace)(arr::AbstractMatrix{Int})
+  _check_dim(nrows(a), ncols(a), arr)
+  z = fpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
   z.base_ring = a.base_ring
   return z
 end
@@ -342,10 +342,10 @@ function (a::fpMatrixSpace)(arr::AbstractVector{Int})
   return z
 end
 
-function (a::fpMatrixSpace)(arr::AbstractMatrix{fpFieldElem}, transpose::Bool = false)
-  _check_dim(nrows(a), ncols(a), arr, transpose)
+function (a::fpMatrixSpace)(arr::AbstractMatrix{fpFieldElem})
+  _check_dim(nrows(a), ncols(a), arr)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
-  z = fpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr, transpose)
+  z = fpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
   z.base_ring = a.base_ring
   return z
 end

@@ -4799,11 +4799,8 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
     return z
   end
 
-  function zzModMatrix(r::Int, c::Int, n::UInt, arr::AbstractMatrix{UInt}, transpose::Bool = false)
+  function zzModMatrix(r::Int, c::Int, n::UInt, arr::AbstractMatrix{UInt})
     z = zzModMatrix(r, c, n)
-    if transpose
-      arr = Base.transpose(arr)
-    end
     for i = 1:r
       for j = 1:c
         setindex_raw!(z, mod(arr[i, j], n), i, j)
@@ -4822,11 +4819,8 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
     return z
   end
 
-  function zzModMatrix(r::Int, c::Int, n::UInt, arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
+  function zzModMatrix(r::Int, c::Int, n::UInt, arr::AbstractMatrix{ZZRingElem})
     z = zzModMatrix(r, c, n)
-    if transpose
-      arr = Base.transpose(arr)
-    end
     t = ZZRingElem()
     for i = 1:r
       for j = 1:c
@@ -4851,9 +4845,9 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
     return z
   end
 
-  function zzModMatrix(r::Int, c::Int, n::UInt, arr::AbstractMatrix{T}, transpose::Bool = false) where {T <: Integer}
+  function zzModMatrix(r::Int, c::Int, n::UInt, arr::AbstractMatrix{T}) where {T <: Integer}
     arr_fmpz = map(ZZRingElem, arr)
-    return zzModMatrix(r, c, n, arr_fmpz, transpose)
+    return zzModMatrix(r, c, n, arr_fmpz)
   end
 
   function zzModMatrix(r::Int, c::Int, n::UInt, arr::AbstractVector{T}) where {T <: Integer}
@@ -4861,11 +4855,8 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
     return zzModMatrix(r, c, n, arr_fmpz)
   end
 
-  function zzModMatrix(r::Int, c::Int, n::UInt, arr::AbstractMatrix{zzModRingElem}, transpose::Bool = false)
+  function zzModMatrix(r::Int, c::Int, n::UInt, arr::AbstractMatrix{zzModRingElem})
     z = zzModMatrix(r, c, n)
-    if transpose
-      arr = Base.transpose(arr)
-    end
     for i = 1:r
       for j = 1:c
         setindex_raw!(z, arr[i, j].data, i, j) # no reduction necessary
@@ -4947,11 +4938,8 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
     ZZModMatrix(r, c, R.ninv)
   end
 
-  function ZZModMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
+  function ZZModMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{ZZRingElem})
     z = ZZModMatrix(r, c, ctx)
-    if transpose
-      arr = Base.transpose(arr)
-    end
     for i = 1:r
       for j = 1:c
         setindex_raw!(z, _reduce(arr[i, j], ctx), i, j)
@@ -4960,15 +4948,12 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
     return z
   end
 
-  function ZZModMatrix(r::Int, c::Int, R::ZZModRing, arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
-    ZZModMatrix(r, c, R.ninv, arr, transpose)
+  function ZZModMatrix(r::Int, c::Int, R::ZZModRing, arr::AbstractMatrix{ZZRingElem})
+    ZZModMatrix(r, c, R.ninv, arr)
   end
 
-  function ZZModMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{T}, transpose::Bool = false) where T <: Integer
+  function ZZModMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{T}) where T <: Integer
     z = ZZModMatrix(r, c, ctx)
-    if transpose
-      arr = Base.transpose(arr)
-    end
     for i = 1:r
       for j = 1:c
         setindex_raw!(z, _reduce(ZZRingElem(arr[i, j]), ctx), i, j)
@@ -4977,16 +4962,13 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
     return z
   end
 
-  function ZZModMatrix(r::Int, c::Int, R::ZZModRing, arr::AbstractMatrix{T}, transpose::Bool = false) where T <: Integer
-    ZZModMatrix(r, c, R.ninv, arr, transpose)
+  function ZZModMatrix(r::Int, c::Int, R::ZZModRing, arr::AbstractMatrix{T}) where T <: Integer
+    ZZModMatrix(r, c, R.ninv, arr)
   end
 
-  function ZZModMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{ZZModRingElem}, transpose::Bool = false)
+  function ZZModMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{ZZModRingElem})
     # FIXME: Check compatibility between ctx and arr?
     z = ZZModMatrix(r, c, ctx)
-    if transpose
-      arr = Base.transpose(arr)
-    end
     for i = 1:r
       for j = 1:c
         setindex_raw!(z, arr[i, j].data, i, j)
@@ -4995,8 +4977,8 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
     return z
   end
 
-  function ZZModMatrix(r::Int, c::Int, R::ZZModRing, arr::AbstractMatrix{ZZModRingElem}, transpose::Bool = false)
-    ZZModMatrix(r, c, R, arr, transpose)
+  function ZZModMatrix(r::Int, c::Int, R::ZZModRing, arr::AbstractMatrix{ZZModRingElem})
+    ZZModMatrix(r, c, R, arr)
   end
 
   function ZZModMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractVector{ZZRingElem})
@@ -5101,11 +5083,8 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
     return z
   end
 
-  function FpMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
+  function FpMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{ZZRingElem})
     z = FpMatrix(r, c, ctx)
-    if transpose
-      arr = Base.transpose(arr)
-    end
     for i = 1:r
       for j = 1:c
         setindex_raw!(z, _reduce(arr[i, j], ctx), i, j)
@@ -5114,11 +5093,8 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
     return z
   end
 
-  function FpMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{T}, transpose::Bool = false) where T <: Integer
+  function FpMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{T}) where T <: Integer
     z = FpMatrix(r, c, ctx)
-    if transpose
-      arr = Base.transpose(arr)
-    end
     for i = 1:r
       for j = 1:c
         setindex_raw!(z, _reduce(ZZRingElem(arr[i, j]), ctx), i, j)
@@ -5127,12 +5103,9 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
     return z
   end
 
-  function FpMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{FpFieldElem}, transpose::Bool = false)
+  function FpMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{FpFieldElem})
     # FIXME: Check compatibility between ctx and arr?
     z = FpMatrix(r, c, ctx)
-    if transpose
-      arr = Base.transpose(arr)
-    end
     for i = 1:r
       for j = 1:c
         setindex_raw!(z, arr[i, j].data, i, j)
@@ -5211,11 +5184,8 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
     return z
   end
 
-  function fpMatrix(r::Int, c::Int, n::UInt, arr::AbstractMatrix{UInt}, transpose::Bool = false)
+  function fpMatrix(r::Int, c::Int, n::UInt, arr::AbstractMatrix{UInt})
     z = fpMatrix(r, c, n)
-    if transpose
-      arr = Base.transpose(arr)
-    end
     for i = 1:r
       for j = 1:c
         setindex_raw!(z, mod(arr[i, j], n), i, j)
@@ -5234,11 +5204,8 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
     return z
   end
 
-  function fpMatrix(r::Int, c::Int, n::UInt, arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
+  function fpMatrix(r::Int, c::Int, n::UInt, arr::AbstractMatrix{ZZRingElem})
     z = fpMatrix(r, c, n)
-    if transpose
-      arr = Base.transpose(arr)
-    end
     t = ZZRingElem()
     for i = 1:r
       for j = 1:c
@@ -5263,9 +5230,9 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
     return z
   end
 
-  function fpMatrix(r::Int, c::Int, n::UInt, arr::AbstractMatrix{T}, transpose::Bool = false) where {T <: Integer}
+  function fpMatrix(r::Int, c::Int, n::UInt, arr::AbstractMatrix{T}) where {T <: Integer}
     arr_fmpz = map(ZZRingElem, arr)
-    return fpMatrix(r, c, n, arr_fmpz, transpose)
+    return fpMatrix(r, c, n, arr_fmpz)
   end
 
   function fpMatrix(r::Int, c::Int, n::UInt, arr::AbstractVector{T}) where {T <: Integer}
@@ -5273,11 +5240,8 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
     return fpMatrix(r, c, n, arr_fmpz)
   end
 
-  function fpMatrix(r::Int, c::Int, n::UInt, arr::AbstractMatrix{fpFieldElem}, transpose::Bool = false)
+  function fpMatrix(r::Int, c::Int, n::UInt, arr::AbstractMatrix{fpFieldElem})
     z = fpMatrix(r, c, n)
-    if transpose
-      arr = Base.transpose(arr)
-    end
     for i = 1:r
       for j = 1:c
         setindex_raw!(z, arr[i, j].data, i, j) # no reduction necessary
