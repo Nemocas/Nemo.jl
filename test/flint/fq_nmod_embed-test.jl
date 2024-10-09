@@ -130,32 +130,32 @@ end
     Z, = residue_ring(ZZ, p)
     R, x = polynomial_ring(Z, "x")
 
-    P1 = R(rand(Z, 4)) + x^4
+    P1 = R(rand(0:p-1, 4)) + x^4
     F1 = factor(P1)
-    P2 = R(rand(Z, 4)) + x^4
+    P2 = R(rand(0:p-1, 4)) + x^4
     F2 = factor(P2)
-    P3 = R(rand(Z, 4)) + x^4
+    P3 = R(rand(0:p-1, 4)) + x^4
     F3 = factor(P3)
-    P4 = R(rand(Z, 4)) + x^4
+    P4 = R(rand(0:p-1, 4)) + x^4
     F4 = factor(P4)
 
     while length(F1) != 1 || F1[collect(keys(F1.fac))[1]] != 1
-      P1 = R(rand(Z, 4)) + x^4
+      P1 = R(rand(0:p-1, 4)) + x^4
       F1 = factor(P1)
     end
 
     while length(F2) != 1 || F2[collect(keys(F2.fac))[1]] != 1
-      P2 = R(rand(Z, 4)) + x^4
+      P2 = R(rand(0:p-1, 4)) + x^4
       F2 = factor(P2)
     end
 
     while length(F3) != 1 || F3[collect(keys(F3.fac))[1]] != 1
-      P3 = R(rand(Z, 4)) + x^4
+      P3 = R(rand(0:p-1, 4)) + x^4
       F3 = factor(P3)
     end
 
     while length(F4) != 1 || F4[collect(keys(F4.fac))[1]] != 1
-      P4 = R(rand(Z, 4)) + x^4
+      P4 = R(rand(0:p-1, 4)) + x^4
       F4 = factor(P4)
     end
 
