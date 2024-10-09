@@ -1,3 +1,9 @@
+@testset "FqRelPowerSeriesRingElem.conformance_tests" begin
+  S, t = finite_field(ZZRingElem(23), 5, "t")
+  R, x = power_series_ring(S, 30, "x")
+  test_Ring_interface(R)
+end
+
 @testset "FqRelPowerSeriesRingElem.types" begin
   @test rel_series_type(FqFieldElem) == FqRelPowerSeriesRingElem
 end

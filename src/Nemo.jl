@@ -651,4 +651,10 @@ include("Deprecations.jl")
 
 include("Native.jl")
 
+function Base.isapprox(x::T, y::T;
+                       atol::Real=0, rtol::Real=0,
+                       nans::Bool=false, norm::Function=abs) where {T <: NCRingElem}
+    return x == y
+end
+
 end # module
