@@ -111,8 +111,6 @@ end
 #
 ###############################################################################
 
-is_unit(x::CalciumFieldElem) = !is_zero(x)  # TODO: remove once AA has this generically
-
 zero(C::CalciumField) = C()
 
 one(C::CalciumField) = one!(CalciumFieldElem(C))
