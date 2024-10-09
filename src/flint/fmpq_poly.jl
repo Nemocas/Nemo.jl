@@ -706,10 +706,10 @@ for (factor_fn, factor_fn_inner, flint_fn) in
            ccall((:fmpz_poly_factor_get_fmpz, libflint), Nothing,
                  (Ref{ZZRingElem}, Ref{fmpz_poly_factor}), z, fac)
            f = ZZPolyRingElem()
-           for i in 1:fac.num
+           for i in 1:fac.data.num
              ccall((:fmpz_poly_factor_get_fmpz_poly, libflint), Nothing,
                    (Ref{ZZPolyRingElem}, Ref{fmpz_poly_factor}, Int), f, fac, i - 1)
-             e = unsafe_load(fac.exp, i)
+             e = unsafe_load(fac.data.exp, i)
              res[parent(x)(f)] = e
            end
            return res, QQFieldElem(z, denominator(x))
