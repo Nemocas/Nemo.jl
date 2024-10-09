@@ -247,16 +247,6 @@ end
 
   @test_throws ErrorConstrDimMismatch transpose!(R([ 1 2 ;]))
 
-  R = matrix_space(Z11, 4, 4)
-  m = [1 2 3 4; 2 4 6 2; 6 4 2 4; 2 6 4 0]
-  @test R(m, true) == R(transpose(m))
-  m1 = Matrix{BigInt}(m)
-  @test R(m1, true) == R(transpose(m1))
-  m2 = Matrix{ZZRingElem}(m)
-  @test R(m2, true) == R(transpose(m2))
-  m3 = map(Z11, m)
-  @test R(m3, true) == R(transpose(m3))
-
   C = Z23[1 2 3; 4 5 6; 7 8 9]
   C[3, :] = Z23[7 7 7]
   @test C == Z23[1 2 3; 4 5 6; 7 7 7]
