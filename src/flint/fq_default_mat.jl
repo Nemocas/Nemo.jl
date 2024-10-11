@@ -131,8 +131,6 @@ function ==(a::FqMatrix, b::FqMatrix)
   return Bool(r)
 end
 
-isequal(a::FqMatrix, b::FqMatrix) = ==(a, b)
-
 ################################################################################
 #
 #  Transpose

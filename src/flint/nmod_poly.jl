@@ -300,8 +300,6 @@ function ==(x::T, y::T) where T <: Zmodn_poly
                     (Ref{T}, Ref{T}), x, y))
 end
 
-isequal(x::T, y::T) where T <: Zmodn_poly = x == y
-
 ################################################################################
 #
 #  Ad hoc comparisons

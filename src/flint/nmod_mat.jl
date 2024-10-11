@@ -127,8 +127,6 @@ end
 Bool(ccall((:nmod_mat_equal, libflint), Cint,
            (Ref{T}, Ref{T}), a, b))
 
-isequal(a::T, b::T) where T <: Zmodn_mat = ==(a, b)
-
 ################################################################################
 #
 #  Transpose

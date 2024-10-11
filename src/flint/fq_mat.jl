@@ -122,8 +122,6 @@ function ==(a::FqPolyRepMatrix, b::FqPolyRepMatrix)
   return Bool(r)
 end
 
-isequal(a::FqPolyRepMatrix, b::FqPolyRepMatrix) = ==(a, b)
-
 ################################################################################
 #
 #  Transpose

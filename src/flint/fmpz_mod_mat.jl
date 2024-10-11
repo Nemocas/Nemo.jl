@@ -118,8 +118,6 @@ Bool(ccall((:fmpz_mod_mat_equal, libflint), Cint,
            (Ref{T}, Ref{T}, Ref{fmpz_mod_ctx_struct}),
            a, b, base_ring(a).ninv))
 
-isequal(a::T, b::T) where T <: Zmod_fmpz_mat = ==(a, b)
-
 ################################################################################
 #
 #  Transpose
