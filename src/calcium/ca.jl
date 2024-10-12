@@ -1363,13 +1363,17 @@ end
 
 function (::Type{ComplexF64})(x::CalciumFieldElem)
   z = AcbField(53, cached = false)(x)
-  x = ArbFieldElem()
-  ccall((:acb_get_real, libflint), Nothing, (Ref{ArbFieldElem}, Ref{AcbFieldElem}), x, z)
+  x = real(z)
   xx = Float64(x)
-  y = ArbFieldElem()
-  ccall((:acb_get_imag, libflint), Nothing, (Ref{ArbFieldElem}, Ref{AcbFieldElem}), y, z)
+  y = imag(z)
   yy = Float64(y)
   return ComplexF64(xx, yy)
+end
+
+function (::Type{Float64})(a::CalciumFieldElem)
+  isreal(a) || throw(InexactError(:Float64, Float64, a))
+  x = ArbField(53, cached = false)(a)
+  return Float64(x)
 end
 
 ###############################################################################
