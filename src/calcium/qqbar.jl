@@ -1484,6 +1484,17 @@ function ZZRingElem(a::QQBarFieldElem)
   return z
 end
 
+function (::Type{ComplexF64})(x::QQBarFieldElem)
+  z = AcbField(53, cached = false)(x)
+  x = ArbFieldElem()
+  ccall((:acb_get_real, libflint), Nothing, (Ref{ArbFieldElem}, Ref{AcbFieldElem}), x, z)
+  xx = Float64(x)
+  y = ArbFieldElem()
+  ccall((:acb_get_imag, libflint), Nothing, (Ref{ArbFieldElem}, Ref{AcbFieldElem}), y, z)
+  yy = Float64(y)
+  return ComplexF64(xx, yy)
+end
+
 ###############################################################################
 #
 #   Unsafe functions

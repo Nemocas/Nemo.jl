@@ -389,6 +389,19 @@ end
 
 end
 
+@testset "QQBarFieldElem.conversions" begin
+  R = algebraic_closure(QQ)
+
+  # precision must be < 53, otherwise the test is wrong
+  set_precision!(Balls, 50) do
+    for i in 1:10
+      a = rand(R, degree=5, bits=5)
+      b = ComplexF64(a)
+      @test contains(ComplexField()(a), ComplexField()(b))
+    end
+  end
+end
+
 function test_elem(R::QQBarField)
   return rand(R, degree=5, bits=5)
 end
