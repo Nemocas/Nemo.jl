@@ -5,7 +5,7 @@ end
 @testset "QQBarFieldElem.conformance_tests" begin
   R = algebraic_closure(QQ)
   test_Field_interface(R)
-  #test_Field_interface_recursive(R)
+  #test_Field_interface_recursive(R)  # polynomial ring tests too slow
 end
 
 @testset "QQBarFieldElem.constructors" begin
