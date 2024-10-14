@@ -1,8 +1,6 @@
 @testset "gfp_fmpz.conformance_tests" begin
-  # TODO: make this work with test_Field_interface_recursive
   for p in [13, next_prime(2^8), next_prime(2^16), next_prime(2^32)]
-    test_Field_interface(Native.GF(ZZ(p)))
-    #test_Field_interface_recursive(Native.GF(ZZ(p)))
+    test_Field_interface_recursive(Native.GF(ZZ(p)))
   end
 end
 
