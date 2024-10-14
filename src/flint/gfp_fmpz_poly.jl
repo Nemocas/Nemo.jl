@@ -268,7 +268,15 @@ end
 
 function gcdinv(x::FpPolyRingElem, y::FpPolyRingElem)
   check_parent(x,y)
-  length(y) >= 2 || error("Length of second argument must be >= 2")
+  if is_zero(x)
+    is_zero(y) && return y, x
+    ly = leading_coefficient(y)
+    if !is_one(ly)
+      y = divexact(y,ly)
+    end
+    return y, x
+  end
+  length(y) <= 1 && return gcdx(x, y)[1:2]
   g = parent(x)()
   s = parent(x)()
   ccall((:fmpz_mod_poly_gcdinv, libflint), Nothing,
