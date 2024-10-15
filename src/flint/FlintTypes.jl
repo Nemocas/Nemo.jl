@@ -4571,7 +4571,10 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
   rows::Ptr{Ptr{QQFieldElem}}
   view_parent
 
-  # used by windows, not finalised!!
+  # MatElem interface
+  QQMatrix(::QQField, r::Int, c::Int) = QQMatrix(r, c)
+
+  # Used by view, not finalised!!
   function QQMatrix()
     return new()
   end
@@ -4613,6 +4616,9 @@ mutable struct ZZMatrix <: MatElem{ZZRingElem}
   c::Int
   rows::Ptr{Ptr{ZZRingElem}}
   view_parent
+
+  # MatElem interface
+  ZZMatrix(::ZZRing, r::Int, c::Int) = ZZMatrix(r, c)
 
   # Used by view, not finalised!!
   function ZZMatrix()
@@ -4659,10 +4665,16 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
   base_ring::zzModRing
   view_parent
 
+  # MatElem interface
+  function zzModMatrix(R::zzModRing, r::Int, c::Int)
+    z = zzModMatrix(r, c, R.n)
+    z.base_ring = R
+    return z
+  end
+
   # Used by view, not finalised!!
   function zzModMatrix()
-    z = new()
-    return z
+    return new()
   end
 
   function zzModMatrix(r::Int, c::Int, n::UInt)
@@ -4794,10 +4806,16 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
   base_ring::ZZModRing
   view_parent
 
+  # MatElem interface
+  function ZZModMatrix(R::ZZModRing, r::Int, c::Int)
+    z = ZZModMatrix(r, c, R.ninv)
+    z.base_ring = R
+    return z
+  end
+
   # Used by view, not finalised!!
   function ZZModMatrix()
-    z = new()
-    return z
+    return new()
   end
 
   function ZZModMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct)
@@ -4943,10 +4961,16 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
   base_ring::FpField
   view_parent
 
+  # MatElem interface
+  function FpMatrix(R::FpField, r::Int, c::Int)
+    z = FpMatrix(r, c, R.ninv)
+    z.base_ring = R
+    return z
+  end
+
   # Used by view, not finalised!!
   function FpMatrix()
-    z = new()
-    return z
+    return new()
   end
 
   function FpMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct)
@@ -5044,10 +5068,16 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
   base_ring::fpField
   view_parent
 
+  # MatElem interface
+  function fpMatrix(R::fpField, r::Int, c::Int)
+    z = fpMatrix(r, c, R.n)
+    z.base_ring = R
+    return z
+  end
+
   # Used by view, not finalised!!
   function fpMatrix()
-    z = new()
-    return z
+    return new()
   end
 
   function fpMatrix(r::Int, c::Int, n::UInt)
@@ -5610,7 +5640,12 @@ mutable struct FqMatrix <: MatElem{FqFieldElem}
   base_ring::FqField
   view_parent
 
-  # used by windows, not finalised!!
+  # MatElem interface
+  function FqMatrix(R::FqField, r::Int, c::Int)
+    return FqMatrix(r, c, R)
+  end
+
+  # Used by view, not finalised!!
   function FqMatrix()
     return new()
   end
@@ -5776,7 +5811,12 @@ mutable struct FqPolyRepMatrix <: MatElem{FqPolyRepFieldElem}
   base_ring::FqPolyRepField
   view_parent
 
-  # used by windows, not finalised!!
+  # MatElem interface
+  function FqPolyRepMatrix(R::FqPolyRepField, r::Int, c::Int)
+    return FqPolyRepMatrix(r, c, R)
+  end
+
+  # Used by view, not finalised!!
   function FqPolyRepMatrix()
     return new()
   end
@@ -5909,7 +5949,12 @@ mutable struct fqPolyRepMatrix <: MatElem{fqPolyRepFieldElem}
   base_ring::fqPolyRepField
   view_parent
 
-  # used by windows, not finalised!!
+  # MatElem interface
+  function fqPolyRepMatrix(R::fqPolyRepField, r::Int, c::Int)
+    return fqPolyRepMatrix(r, c, R)
+  end
+
+  # Used by view, not finalised!!
   function fqPolyRepMatrix()
     return new()
   end

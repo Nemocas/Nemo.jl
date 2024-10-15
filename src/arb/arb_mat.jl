@@ -11,8 +11,7 @@
 ###############################################################################
 
 function similar(::ArbMatrix, R::ArbField, r::Int, c::Int)
-  z = ArbMatrix(r, c)
-  z.base_ring = R
+  z = ArbMatrix(R, r, c)
   return z
 end
 
@@ -81,9 +80,8 @@ number_of_rows(a::ArbMatrix) = a.r
 number_of_columns(a::ArbMatrix) = a.c
 
 function deepcopy_internal(x::ArbMatrix, dict::IdDict)
-  z = ArbMatrix(nrows(x), ncols(x))
+  z = ArbMatrix(base_ring(x), nrows(x), ncols(x))
   ccall((:arb_mat_set, libflint), Nothing, (Ref{ArbMatrix}, Ref{ArbMatrix}), z, x)
-  z.base_ring = x.base_ring
   return z
 end
 
@@ -711,8 +709,7 @@ end
 ###############################################################################
 
 function (x::ArbMatrixSpace)()
-  z = ArbMatrix(nrows(x), ncols(x))
-  z.base_ring = x.base_ring
+  z = ArbMatrix(base_ring(x), nrows(x), ncols(x))
   return z
 end
 
@@ -787,8 +784,7 @@ function zero_matrix(R::ArbField, r::Int, c::Int)
   if r < 0 || c < 0
     error("dimensions must not be negative")
   end
-  z = ArbMatrix(r, c)
-  z.base_ring = R
+  z = ArbMatrix(R, r, c)
   return z
 end
 
@@ -802,9 +798,8 @@ function identity_matrix(R::ArbField, n::Int)
   if n < 0
     error("dimension must not be negative")
   end
-  z = ArbMatrix(n, n)
+  z = ArbMatrix(R, n, n)
   ccall((:arb_mat_one, libflint), Nothing, (Ref{ArbMatrix}, ), z)
-  z.base_ring = R
   return z
 end
 
