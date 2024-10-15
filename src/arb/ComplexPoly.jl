@@ -224,11 +224,7 @@ end
 #
 ################################################################################
 
-function -(x::ComplexPolyRingElem)
-  z = parent(x)()
-  ccall((:acb_poly_neg, libflint), Nothing, (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}), z, x)
-  return z
-end
+-(x::ComplexPolyRingElem) = neg!(parent(x)(), x)
 
 ################################################################################
 #
@@ -709,6 +705,11 @@ end
 
 function one!(z::ComplexPolyRingElem)
   ccall((:acb_poly_one, libflint), Nothing, (Ref{ComplexPolyRingElem},), z)
+  return z
+end
+
+function neg!(z::ComplexPolyRingElem, a::ComplexPolyRingElem)
+  ccall((:acb_poly_neg, libflint), Nothing, (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}), z, a)
   return z
 end
 

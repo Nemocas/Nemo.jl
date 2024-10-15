@@ -233,11 +233,7 @@ end
 #
 ################################################################################
 
-function -(x::AcbPolyRingElem)
-  z = parent(x)()
-  ccall((:acb_poly_neg, libflint), Nothing, (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}), z, x)
-  return z
-end
+-(x::AcbPolyRingElem) = neg!(parent(x)(), x)
 
 ################################################################################
 #
@@ -704,6 +700,11 @@ end
 
 function one!(z::AcbPolyRingElem)
   ccall((:acb_poly_one, libflint), Nothing, (Ref{AcbPolyRingElem},), z)
+  return z
+end
+
+function neg!(z::AcbPolyRingElem, a::AcbPolyRingElem)
+  ccall((:acb_poly_neg, libflint), Nothing, (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}), z, a)
   return z
 end
 

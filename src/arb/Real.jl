@@ -586,11 +586,7 @@ end
 #
 ################################################################################
 
-function -(x::RealFieldElem)
-  z = RealFieldElem()
-  ccall((:arb_neg, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}), z, x)
-  return z
-end
+-(x::RealFieldElem) = neg!(RealFieldElem(), x)
 
 ################################################################################
 #
@@ -1936,6 +1932,11 @@ end
 
 function one!(z::RealFieldElem)
   ccall((:arb_one, libflint), Nothing, (Ref{RealFieldElem},), z)
+  return z
+end
+
+function neg!(z::RealFieldElem, a::RealFieldElem)
+  ccall((:arb_neg, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}), z, a)
   return z
 end
 

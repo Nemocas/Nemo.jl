@@ -68,9 +68,7 @@ Base.@propagate_inbounds setindex!(x::RealMatrix, y::Rational{T},
 setindex!(x, ZZRingElem(y), r, c)
 
 function one(x::RealMatrixSpace)
-  z = x()
-  ccall((:arb_mat_one, libflint), Nothing, (Ref{RealMatrix}, ), z)
-  return z
+  return one!(x())
 end
 
 number_of_rows(a::RealMatrix) = a.r
@@ -89,11 +87,7 @@ end
 #
 ################################################################################
 
-function -(x::RealMatrix)
-  z = similar(x)
-  ccall((:arb_mat_neg, libflint), Nothing, (Ref{RealMatrix}, Ref{RealMatrix}), z, x)
-  return z
-end
+-(x::RealMatrix) = neg!(similar(x), x)
 
 ################################################################################
 #
@@ -665,6 +659,21 @@ end
 #
 ################################################################################
 
+function zero!(z::RealMatrix)
+  ccall((:arb_mat_zero, libflint), Nothing, (Ref{RealMatrix},), z)
+  return z
+end
+
+function one!(z::RealMatrix)
+  ccall((:arb_mat_one, libflint), Nothing, (Ref{RealMatrix},), z)
+  return z
+end
+
+function neg!(z::RealMatrix, a::RealMatrix)
+  ccall((:arb_mat_neg, libflint), Nothing, (Ref{RealMatrix}, Ref{RealMatrix}), z, a)
+  return z
+end
+
 for (s,f) in (("add!","arb_mat_add"), ("mul!","arb_mat_mul"),
               ("sub!","arb_mat_sub"))
   @eval begin
@@ -783,9 +792,7 @@ function identity_matrix(R::RealField, n::Int)
   if n < 0
     error("dimension must not be negative")
   end
-  z = RealMatrix(n, n)
-  ccall((:arb_mat_one, libflint), Nothing, (Ref{RealMatrix}, ), z)
-  return z
+  return one!(RealMatrix(n, n))
 end
 
 ###############################################################################

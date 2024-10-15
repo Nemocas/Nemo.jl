@@ -160,11 +160,7 @@ end
 #
 ################################################################################
 
-function -(x::AcbFieldElem)
-  z = parent(x)()
-  ccall((:acb_neg, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), z, x)
-  return z
-end
+-(x::AcbFieldElem) = neg!(parent(x)(), x)
 
 ################################################################################
 #
@@ -243,29 +239,25 @@ end
 function -(x::UInt, y::AcbFieldElem)
   z = parent(y)()
   ccall((:acb_sub_ui, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, UInt, Int), z, y, x, parent(y).prec)
-  ccall((:acb_neg, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), z, z)
-  return z
+  return neg!(z)
 end
 
 function -(x::Int, y::AcbFieldElem)
   z = parent(y)()
   ccall((:acb_sub_si, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int), z, y, x, parent(y).prec)
-  ccall((:acb_neg, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), z, z)
-  return z
+  return neg!(z)
 end
 
 function -(x::ZZRingElem, y::AcbFieldElem)
   z = parent(y)()
   ccall((:acb_sub_fmpz, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ZZRingElem}, Int), z, y, x, parent(y).prec)
-  ccall((:acb_neg, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), z, z)
-  return z
+  return neg!(z)
 end
 
 function -(x::ArbFieldElem, y::AcbFieldElem)
   z = parent(y)()
   ccall((:acb_sub_arb, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ArbFieldElem}, Int), z, y, x, parent(y).prec)
-  ccall((:acb_neg, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), z, z)
-  return z
+  return neg!(z)
 end
 
 +(x::AcbFieldElem, y::Integer) = x + ZZRingElem(y)
@@ -1576,6 +1568,11 @@ end
 
 function one!(z::AcbFieldElem)
   ccall((:acb_one, libflint), Nothing, (Ref{AcbFieldElem},), z)
+  return z
+end
+
+function neg!(z::AcbFieldElem, a::AcbFieldElem)
+  ccall((:acb_neg, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), z, a)
   return z
 end
 

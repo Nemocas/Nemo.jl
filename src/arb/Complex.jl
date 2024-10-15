@@ -156,11 +156,7 @@ end
 #
 ################################################################################
 
-function -(x::ComplexFieldElem)
-  z = ComplexFieldElem()
-  ccall((:acb_neg, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}), z, x)
-  return z
-end
+-(x::ComplexFieldElem) = neg!(ComplexFieldElem(), x)
 
 ################################################################################
 #
@@ -239,29 +235,25 @@ end
 function -(x::UInt, y::ComplexFieldElem)
   z = ComplexFieldElem()
   ccall((:acb_sub_ui, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, UInt, Int), z, y, x, precision(Balls))
-  ccall((:acb_neg, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}), z, z)
-  return z
+  return neg!(z)
 end
 
 function -(x::Int, y::ComplexFieldElem)
   z = ComplexFieldElem()
   ccall((:acb_sub_si, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int, Int), z, y, x, precision(Balls))
-  ccall((:acb_neg, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}), z, z)
-  return z
+  return neg!(z)
 end
 
 function -(x::ZZRingElem, y::ComplexFieldElem)
   z = ComplexFieldElem()
   ccall((:acb_sub_fmpz, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ZZRingElem}, Int), z, y, x, precision(Balls))
-  ccall((:acb_neg, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}), z, z)
-  return z
+  return neg!(z)
 end
 
 function -(x::RealFieldElem, y::ComplexFieldElem)
   z = ComplexFieldElem()
   ccall((:acb_sub_arb, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{RealFieldElem}, Int), z, y, x, precision(Balls))
-  ccall((:acb_neg, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}), z, z)
-  return z
+  return neg!(z)
 end
 
 +(x::ComplexFieldElem, y::Integer) = x + flintify(y)
@@ -1591,6 +1583,11 @@ function one!(z::ComplexFieldElem)
   return z
 end
 
+function neg!(z::ComplexFieldElem, a::ComplexFieldElem)
+  ccall((:acb_neg, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}), z, a)
+  return z
+end
+
 function add!(z::ComplexFieldElem, x::ComplexFieldElem, y::ComplexFieldElem, prec::Int = precision(Balls))
   ccall((:acb_add, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int),
         z, x, y, prec)
@@ -1675,21 +1672,21 @@ for (typeofx, passtoc) in ((ComplexFieldElem, Ref{ComplexFieldElem}), (Ptr{Compl
       r = ccall((:acb_real_ptr, libflint), Ptr{RealFieldElem}, (($passtoc), ), x)
       _arb_set(r, y, p)
       i = ccall((:acb_imag_ptr, libflint), Ptr{RealFieldElem}, (($passtoc), ), x)
-      ccall((:arb_zero, libflint), Nothing, (Ptr{RealFieldElem}, ), i)
+      zero!(i)
     end
 
     function _acb_set(x::($typeofx), y::BigFloat)
       r = ccall((:acb_real_ptr, libflint), Ptr{RealFieldElem}, (($passtoc), ), x)
       _arb_set(r, y)
       i = ccall((:acb_imag_ptr, libflint), Ptr{RealFieldElem}, (($passtoc), ), x)
-      ccall((:arb_zero, libflint), Nothing, (Ptr{RealFieldElem}, ), i)
+      zero!(i)
     end
 
     function _acb_set(x::($typeofx), y::BigFloat, p::Int)
       r = ccall((:acb_real_ptr, libflint), Ptr{RealFieldElem}, (($passtoc), ), x)
       _arb_set(r, y, p)
       i = ccall((:acb_imag_ptr, libflint), Ptr{RealFieldElem}, (($passtoc), ), x)
-      ccall((:arb_zero, libflint), Nothing, (Ptr{RealFieldElem}, ), i)
+      zero!(i)
     end
 
     function _acb_set(x::($typeofx), y::Int, z::Int, p::Int)

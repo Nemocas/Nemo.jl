@@ -625,11 +625,7 @@ Base.signbit(x::ArbFieldElem) = signbit(sign(Int, x))
 #
 ################################################################################
 
-function -(x::ArbFieldElem)
-  z = parent(x)()
-  ccall((:arb_neg, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), z, x)
-  return z
-end
+-(x::ArbFieldElem) = neg!(parent(x)(), x)
 
 ################################################################################
 #
@@ -1938,6 +1934,11 @@ end
 
 function one!(z::ArbFieldElem)
   ccall((:arb_one, libflint), Nothing, (Ref{ArbFieldElem},), z)
+  return z
+end
+
+function neg!(z::ArbFieldElem, a::ArbFieldElem)
+  ccall((:arb_neg, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), z, a)
   return z
 end
 

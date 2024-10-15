@@ -80,9 +80,7 @@ setindex!(x::ComplexMatrix, y::Tuple{Rational{T}, Rational{T}}, r::Int, c::Int) 
 setindex!(x, map(QQFieldElem, y), r, c)
 
 function one(x::ComplexMatrixSpace)
-  z = x()
-  ccall((:acb_mat_one, libflint), Nothing, (Ref{ComplexMatrix}, ), z)
-  return z
+  return one!(x())
 end
 
 number_of_rows(a::ComplexMatrix) = a.r
@@ -101,11 +99,7 @@ end
 #
 ################################################################################
 
-function -(x::ComplexMatrix)
-  z = similar(x)
-  ccall((:acb_mat_neg, libflint), Nothing, (Ref{ComplexMatrix}, Ref{ComplexMatrix}), z, x)
-  return z
-end
+-(x::ComplexMatrix) = neg!(similar(x), x)
 
 ################################################################################
 #
@@ -723,6 +717,21 @@ end
 #
 ################################################################################
 
+function zero!(z::ComplexMatrix)
+  ccall((:acb_mat_zero, libflint), Nothing, (Ref{ComplexMatrix},), z)
+  return z
+end
+
+function one!(z::ComplexMatrix)
+  ccall((:acb_mat_one, libflint), Nothing, (Ref{ComplexMatrix},), z)
+  return z
+end
+
+function neg!(z::ComplexMatrix, a::ComplexMatrix)
+  ccall((:acb_mat_neg, libflint), Nothing, (Ref{ComplexMatrix}, Ref{ComplexMatrix}), z, a)
+  return z
+end
+
 for (s,f) in (("add!","acb_mat_add"), ("mul!","acb_mat_mul"),
               ("sub!","acb_mat_sub"))
   @eval begin
@@ -893,9 +902,7 @@ function identity_matrix(R::ComplexField, n::Int)
   if n < 0
     error("dimension must not be negative")
   end
-  z = ComplexMatrix(n, n)
-  ccall((:acb_mat_one, libflint), Nothing, (Ref{ComplexMatrix}, ), z)
-  return z
+  return one!(ComplexMatrix(n, n))
 end
 
 ################################################################################
