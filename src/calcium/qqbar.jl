@@ -1450,7 +1450,6 @@ function (R::ComplexField)(a::QQBarFieldElem)
   return z
 end
 
-# todo: provide qqbar_get_fmpq, qqbar_get_fmpz in C
 @doc raw"""
     QQFieldElem(a::QQBarFieldElem)
 
@@ -1459,14 +1458,9 @@ Throws if `a` is not a rational number.
 """
 function QQFieldElem(a::QQBarFieldElem)
   !is_rational(a) && throw(DomainError(a, "nonrational algebraic number"))
-  p = ZZRingElem()
-  q = ZZRingElem()
-  ccall((:fmpz_poly_get_coeff_fmpz, libflint),
-        Nothing, (Ref{ZZRingElem}, Ref{QQBarFieldElem}, Int), p, a, 0)
-  ccall((:fmpz_poly_get_coeff_fmpz, libflint),
-        Nothing, (Ref{ZZRingElem}, Ref{QQBarFieldElem}, Int), q, a, 1)
-  ccall((:fmpz_neg, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}), p, p)
-  return p // q
+  z = QQFieldElem()
+  @ccall libflint.qqbar_get_fmpq(z::Ref{QQFieldElem}, a::Ref{QQBarFieldElem})::Nothing
+  return z
 end
 
 @doc raw"""
@@ -1478,9 +1472,7 @@ Throws if `a` is not an integer.
 function ZZRingElem(a::QQBarFieldElem)
   !isinteger(a) && throw(DomainError(a, "noninteger algebraic number"))
   z = ZZRingElem()
-  ccall((:fmpz_poly_get_coeff_fmpz, libflint),
-        Nothing, (Ref{ZZRingElem}, Ref{QQBarFieldElem}, Int), z, a, 0)
-  ccall((:fmpz_neg, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}), z, z)
+  @ccall libflint.qqbar_get_fmpz(z::Ref{ZZRingElem}, a::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
