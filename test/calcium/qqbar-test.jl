@@ -400,6 +400,12 @@ end
       @test contains(ComplexField()(a), ComplexField()(b))
     end
   end
+
+  x = sqrt(R(2))
+  @test isapprox(Float64(x), sqrt(2))
+
+  x = sqrt(R(-2))
+  @test_throws InexactError Float64(x)
 end
 
 function test_elem(R::QQBarField)
