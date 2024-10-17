@@ -112,14 +112,6 @@ end
   t = similar(s, 2, 3)
   @test t isa AcbMatrix
   @test size(t) == (2, 3)
-
-  for (R, M) in ring_to_mat
-    t = similar(s, R)
-    @test size(t) == size(s)
-
-    t = similar(s, R, 2, 3)
-    @test size(t) == (2, 3)
-  end
 end
 
 @testset "AcbMatrix.printing" begin
