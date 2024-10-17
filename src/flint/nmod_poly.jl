@@ -708,7 +708,7 @@ end
 
 function _factor(x::zzModPolyRingElem)
   !is_prime(modulus(x)) && error("Modulus not prime in factor")
-  fac = nmod_poly_factor(x.mod_n)
+  fac = nmod_poly_factor(x.data.mod.n)
   z = ccall((:nmod_poly_factor, libflint), UInt,
             (Ref{nmod_poly_factor}, Ref{zzModPolyRingElem}), fac, x)
   res = Dict{zzModPolyRingElem,Int}()
@@ -729,7 +729,7 @@ function factor_squarefree(x::zzModPolyRingElem)
 end
 
 function _factor_squarefree(x::zzModPolyRingElem)
-  fac = nmod_poly_factor(x.mod_n)
+  fac = nmod_poly_factor(x.data.mod.n)
   ccall((:nmod_poly_factor_squarefree, libflint), UInt,
         (Ref{nmod_poly_factor}, Ref{zzModPolyRingElem}), fac, x)
   res = Dict{zzModPolyRingElem,Int}()
@@ -753,7 +753,7 @@ function factor_distinct_deg(x::zzModPolyRingElem)
   !is_prime(modulus(x)) && error("Modulus not prime in factor_distinct_deg")
   degs = Vector{Int}(undef, degree(x))
   degss = [ pointer(degs) ]
-  fac = nmod_poly_factor(x.mod_n)
+  fac = nmod_poly_factor(x.data.mod.n)
   ccall((:nmod_poly_factor_distinct_deg, libflint), UInt,
         (Ref{nmod_poly_factor}, Ref{zzModPolyRingElem}, Ptr{Ptr{Int}}),
         fac, x, degss)
