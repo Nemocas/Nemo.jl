@@ -336,70 +336,22 @@ end
 #
 ###############################################################################
 
-for (jT, cN, cT) in ((QQFieldElem, :fmpq, Ref{QQFieldElem}), (ZZRingElem, :fmpz, Ref{ZZRingElem}),
-                     (Int, :si, Int), (UInt, :ui, UInt))
+for jT in (QQFieldElem, ZZRingElem, Integer, Rational)
   @eval begin
-    function +(a::QQMPolyRingElem, b::($jT))
-      z = parent(a)()
-      return add!(z, a, b)
-    end
+    +(a::QQMPolyRingElem, b::($jT)) = add!(parent(a)(), a, b)
+    +(a::($jT), b::QQMPolyRingElem) = add!(parent(b)(), a, b)
 
-    +(a::($jT), b::QQMPolyRingElem) = b + a
+    -(a::QQMPolyRingElem, b::($jT)) = sub!(parent(a)(), a, b)
+    -(a::($jT), b::QQMPolyRingElem) = sub!(parent(b)(), a, b)
 
-    function -(a::QQMPolyRingElem, b::($jT))
-      z = parent(a)()
-      return sub!(z, a, b)
-    end
+    *(a::QQMPolyRingElem, b::($jT)) = mul!(parent(a)(), a, b)
+    *(a::($jT), b::QQMPolyRingElem) = mul!(parent(b)(), a, b)
 
-    -(a::($jT), b::QQMPolyRingElem) = neg!(b - a)
-
-    function *(a::QQMPolyRingElem, b::($jT))
-      z = parent(a)()
-      return mul!(z, a, b)
-    end
-
-    *(a::($jT), b::QQMPolyRingElem) = b * a
-
-    function divexact(a::QQMPolyRingElem, b::($jT); check::Bool=true)
-      z = parent(a)()
-      return divexact!(z, a, b)
-    end
+    divexact(a::QQMPolyRingElem, b::($jT); check::Bool=true) = divexact!(parent(a)(), a, b)
 
     //(a::QQMPolyRingElem, b::($jT)) = a//parent(a)(b)
   end
 end
-
-+(a::QQMPolyRingElem, b::Integer) = a + flintify(b)
-
-+(a::Integer, b::QQMPolyRingElem) = b + a
-
--(a::QQMPolyRingElem, b::Integer) = a - flintify(b)
-
--(a::Integer, b::QQMPolyRingElem) = neg!(b - a)
-
-+(a::QQMPolyRingElem, b::Rational{<:Integer}) = a + QQFieldElem(b)
-
-+(a::Rational{<:Integer}, b::QQMPolyRingElem) = b + a
-
--(a::QQMPolyRingElem, b::Rational{<:Integer}) = a - QQFieldElem(b)
-
--(a::Rational{<:Integer}, b::QQMPolyRingElem) = neg!(b - a)
-
-*(a::QQMPolyRingElem, b::Integer) = a * flintify(b)
-
-*(a::Integer, b::QQMPolyRingElem) = b * a
-
-*(a::QQMPolyRingElem, b::Rational{<:Integer}) = a * QQFieldElem(b)
-
-*(a::Rational{<:Integer}, b::QQMPolyRingElem) = b * a
-
-divexact(a::QQMPolyRingElem, b::Integer; check::Bool=true) = divexact(a, flintify(b); check=check)
-
-divexact(a::QQMPolyRingElem, b::Rational{<:Integer}; check::Bool=true) = divexact(a, QQFieldElem(b); check=check)
-
-//(a::QQMPolyRingElem, b::Integer) = //(a, flintify(b))
-
-//(a::QQMPolyRingElem, b::Rational{<:Integer}) = //(a, QQFieldElem(b))
 
 ###############################################################################
 #
@@ -849,8 +801,6 @@ for (jT, cN, cT) in ((QQFieldElem, :fmpq, Ref{QQFieldElem}), (ZZRingElem, :fmpz,
       return a
     end
 
-    add!(a::QQMPolyRingElem, b::($jT), c::QQMPolyRingElem) = add!(a, c, b)
-
     function sub!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::($jT))
       ccall(($(string(:fmpq_mpoly_sub_, cN)), libflint), Nothing,
             (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, ($cT), Ref{QQMPolyRing}),
@@ -858,16 +808,12 @@ for (jT, cN, cT) in ((QQFieldElem, :fmpq, Ref{QQFieldElem}), (ZZRingElem, :fmpz,
       return a
     end
 
-    sub!(a::QQMPolyRingElem, b::($jT), c::QQMPolyRingElem) = neg!(sub!(a, c, b))
-
     function mul!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::($jT))
       ccall(($(string(:fmpq_mpoly_scalar_mul_, cN)), libflint), Nothing,
             (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, ($cT), Ref{QQMPolyRing}),
             a, b, c, parent(a))
       return a
     end
-
-    mul!(a::QQMPolyRingElem, b::($jT), c::QQMPolyRingElem) = mul!(a, c, b)
 
     function divexact!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::($jT))
       ccall(($(string(:fmpq_mpoly_scalar_div_, cN)), libflint), Nothing,
@@ -878,6 +824,16 @@ for (jT, cN, cT) in ((QQFieldElem, :fmpq, Ref{QQFieldElem}), (ZZRingElem, :fmpz,
   end
 end
 
+add!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::RationalUnion) = add!(a, b, flintify(c))
+add!(a::QQMPolyRingElem, b::RationalUnion, c::QQMPolyRingElem) = add!(a, c, b)
+
+sub!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::RationalUnion) = sub!(a, b, flintify(c))
+sub!(a::QQMPolyRingElem, b::RationalUnion, c::QQMPolyRingElem) = neg!(sub!(a, c, b))
+
+mul!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::RationalUnion) = mul!(a, b, flintify(c))
+mul!(a::QQMPolyRingElem, b::RationalUnion, c::QQMPolyRingElem) = mul!(a, c, b)
+
+divexact!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::RationalUnion) = divexact!(a, b, flintify(c))
 
 # Set the n-th coefficient of a to c. If zero coefficients are inserted, they
 # must be removed with combine_like_terms!
@@ -1047,19 +1003,8 @@ function setcoeff!(a::QQMPolyRingElem, exps::Vector{Int}, b::QQFieldElem)
 end
 
 # Set the coefficient of the term with the given exponent vector to the
-# given integer. Removal of a zero term is performed.
-setcoeff!(a::QQMPolyRingElem, exps::Vector{Int}, b::Rational{<:Integer}) =
-setcoeff!(a, exps, QQFieldElem(b))
-
-# Set the coefficient of the term with the given exponent vector to the
-# given ZZRingElem. Removal of a zero term is performed.
-setcoeff!(a::QQMPolyRingElem, exps::Vector{Int}, b::ZZRingElem) =
-setcoeff!(a, exps, QQFieldElem(b))
-
-# Set the coefficient of the term with the given exponent vector to the
-# given integer. Removal of a zero term is performed.
-setcoeff!(a::QQMPolyRingElem, exps::Vector{Int}, b::Integer) =
-setcoeff!(a, exps, QQFieldElem(b))
+# given value. Removal of a zero term is performed.
+setcoeff!(a::QQMPolyRingElem, exps::Vector{Int}, b::RationalUnion) = setcoeff!(a, exps, QQ(b))
 
 # Sort the terms according to the ordering. This is only needed if unsafe
 # functions such as those above have been called and terms have been inserted
