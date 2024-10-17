@@ -1,3 +1,9 @@
+@testset "zzModAbsPowerSeriesRingElem.conformance_tests" begin
+  S, = residue_ring(ZZ, 23)
+  R, x = power_series_ring(S, 30, "x"; model=:capped_absolute)
+  test_Ring_interface(R)
+end
+
 @testset "zzModAbsPowerSeriesRingElem.types" begin
   @test abs_series_type(zzModRingElem) == zzModAbsPowerSeriesRingElem
 end
