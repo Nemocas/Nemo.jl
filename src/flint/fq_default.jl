@@ -403,9 +403,7 @@ end
 function +(x::FqFieldElem, y::FqFieldElem)
   if parent(x) === parent(y)
     z = parent(y)()
-    ccall((:fq_default_add, libflint), Nothing,
-          (Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), z, x, y, y.parent)
-    return z
+    return add!(z, x, y)
   end
   return +(_promote(x, y)...)
 end
@@ -413,9 +411,7 @@ end
 function -(x::FqFieldElem, y::FqFieldElem)
   if parent(x) === parent(y)
     z = parent(y)()
-    ccall((:fq_default_sub, libflint), Nothing,
-          (Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), z, x, y, y.parent)
-    return z
+    return sub!(z, x, y)
   end
   return -(_promote(x, y)...)
 end
@@ -423,9 +419,7 @@ end
 function *(x::FqFieldElem, y::FqFieldElem)
   if parent(x) === parent(y)
     z = parent(y)()
-    ccall((:fq_default_mul, libflint), Nothing,
-          (Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), z, x, y, y.parent)
-    return z
+    return mul!(z, x, y)
   end
   return *(_promote(x, y)...)
 end
@@ -436,42 +430,18 @@ end
 #
 ###############################################################################
 
-function *(x::Int, y::FqFieldElem)
-  z = parent(y)()
-  ccall((:fq_default_mul_si, libflint), Nothing,
-        (Ref{FqFieldElem}, Ref{FqFieldElem}, Int, Ref{FqField}), z, y, x, y.parent)
-  return z
+for jT in (Integer, ZZRingElem)
+  @eval begin
+    *(x::FqFieldElem, y::$jT) = mul!(parent(x)(), x, y)
+    *(x::$jT, y::FqFieldElem) = mul!(parent(y)(), x, y)
+    
+    +(x::FqFieldElem, y::$jT) = x + parent(x)(y)
+    +(x::$jT, y::FqFieldElem) = y + x
+    
+    -(x::FqFieldElem, y::$jT) = x - parent(x)(y)
+    -(x::$jT, y::FqFieldElem) = parent(y)(x) - y
+  end
 end
-
-*(x::Integer, y::FqFieldElem) = ZZRingElem(x)*y
-
-*(x::FqFieldElem, y::Integer) = y*x
-
-function *(x::ZZRingElem, y::FqFieldElem)
-  z = parent(y)()
-  ccall((:fq_default_mul_fmpz, libflint), Nothing,
-        (Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{ZZRingElem}, Ref{FqField}),
-        z, y, x, y.parent)
-  return z
-end
-
-*(x::FqFieldElem, y::ZZRingElem) = y*x
-
-+(x::FqFieldElem, y::Integer) = x + parent(x)(y)
-
-+(x::Integer, y::FqFieldElem) = y + x
-
-+(x::FqFieldElem, y::ZZRingElem) = x + parent(x)(y)
-
-+(x::ZZRingElem, y::FqFieldElem) = y + x
-
--(x::FqFieldElem, y::Integer) = x - parent(x)(y)
-
--(x::Integer, y::FqFieldElem) = parent(y)(x) - y
-
--(x::FqFieldElem, y::ZZRingElem) = x - parent(x)(y)
-
--(x::ZZRingElem, y::FqFieldElem) = parent(y)(x) - y
 
 ###############################################################################
 #
@@ -675,19 +645,49 @@ function neg!(z::FqFieldElem, a::FqFieldElem)
   return z
 end
 
-function mul!(z::FqFieldElem, x::FqFieldElem, y::FqFieldElem)
-  ccall((:fq_default_mul, libflint), Nothing,
-        (Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), z, x, y, y.parent)
+#
+
+function add!(z::FqFieldElem, x::FqFieldElem, y::FqFieldElem)
+  @ccall libflint.fq_default_add(z::Ref{FqFieldElem}, x::Ref{FqFieldElem}, y::Ref{FqFieldElem}, x.parent::Ref{FqField})::Nothing
   z.poly = nothing
   return z
 end
 
-function add!(z::FqFieldElem, x::FqFieldElem, y::FqFieldElem)
-  ccall((:fq_default_add, libflint), Nothing,
-        (Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), z, x, y, x.parent)
+#
+
+function sub!(z::FqFieldElem, x::FqFieldElem, y::FqFieldElem)
+  @ccall libflint.fq_default_sub(z::Ref{FqFieldElem}, x::Ref{FqFieldElem}, y::Ref{FqFieldElem}, x.parent::Ref{FqField})::Nothing
   z.poly = nothing
   return z
 end
+
+#
+
+function mul!(z::FqFieldElem, x::FqFieldElem, y::FqFieldElem)
+  @ccall libflint.fq_default_mul(z::Ref{FqFieldElem}, x::Ref{FqFieldElem}, y::Ref{FqFieldElem}, y.parent::Ref{FqField})::Nothing
+  z.poly = nothing
+  return z
+end
+
+function mul!(z::FqFieldElem, x::FqFieldElem, y::ZZRingElemOrPtr)
+  @ccall libflint.fq_default_mul_fmpz(z::Ref{FqFieldElem}, x::Ref{FqFieldElem}, y::Ref{ZZRingElem}, x.parent::Ref{FqField})::Nothing
+  return z
+end
+
+function mul!(z::FqFieldElem, x::FqFieldElem, y::Int)
+  @ccall libflint.fq_default_mul_si(z::Ref{FqFieldElem}, x::Ref{FqFieldElem}, y::Int, x.parent::Ref{FqField})::Nothing
+  return z
+end
+
+function mul!(z::FqFieldElem, x::FqFieldElem, y::UInt)
+  @ccall libflint.fq_default_mul_ui(z::Ref{FqFieldElem}, x::Ref{FqFieldElem}, y::Int, x.parent::Ref{FqField})::Nothing
+  return z
+end
+
+mul!(z::FqFieldElem, x::FqFieldElem, y::Integer) = mul!(z, x, flintify(y))
+
+mul!(z::FqFieldElem, x::ZZRingElemOrPtr, y::FqFieldElem) = mul!(z, y, x)
+mul!(z::FqFieldElem, x::Integer, y::FqFieldElem) = mul!(z, y, x)
 
 ###############################################################################
 #
