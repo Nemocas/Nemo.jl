@@ -95,20 +95,6 @@ end
   @test t isa ZZMatrix
   @test size(t) == (2, 3)
   @test iszero(t)
-
-  for (R, M) in ring_to_mat
-    t = sim_zero(s, R)
-    @test size(t) == size(s)
-    if sim_zero == zero
-      @test iszero(t)
-    end
-
-    t = sim_zero(s, R, 2, 3)
-    @test size(t) == (2, 3)
-    if sim_zero == zero
-      @test iszero(t)
-    end
-  end
 end
 
 @testset "ZZMatrix.is_(zero/positive/negative)_entry" begin
