@@ -2544,11 +2544,15 @@ function set!(z::ZZRingElemOrPtr, a::UInt)
   return z
 end
 
+set!(z::ZZRingElemOrPtr, a::Integer) = set!(z, flintify(a))
+
 function swap!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
   ccall((:fmpz_swap, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}),
         a, b)
 end
+
+#
 
 function add!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   ccall((:fmpz_add, libflint), Nothing,
@@ -2574,7 +2578,9 @@ function add!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr, c::Ptr{Int})
 end
 
 add!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer) = add!(z, a, flintify(b))
-add!(z::ZZRingElemOrPtr, x::Int, y::ZZRingElemOrPtr) = add!(z, y, x)
+add!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr) = add!(z, y, x)
+
+#
 
 function sub!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
   ccall((:fmpz_sub, libflint), Nothing,
@@ -2597,15 +2603,10 @@ function sub!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::UInt)
   return z
 end
 
-function sub!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer)
-  return sub!(z, a, flintify(b))
-end
+sub!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer) = sub!(z, a, flintify(b))
+sub!(z::ZZRingElemOrPtr, a::Integer, b::ZZRingElemOrPtr) = neg!(sub!(z, b, a))
 
-function sub!(z::ZZRingElemOrPtr, b::Integer, a::ZZRingElemOrPtr)
-  sub!(z, a, b)
-  return neg!(z, z)
-end
-
+#
 
 function mul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   ccall((:fmpz_mul, libflint), Nothing,
@@ -2626,13 +2627,14 @@ function mul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::UInt)
 end
 
 mul!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer) = mul!(z, a, flintify(b))
-
 mul!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr) = mul!(z, y, x)
 
 function mul!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr, c::Ptr{Int})
   ccall((:fmpz_mul, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ptr{Int}), a, b, c)
   return a
 end
+
+#
 
 function addmul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   ccall((:fmpz_addmul, libflint), Nothing,
@@ -2651,6 +2653,9 @@ function addmul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::UInt)
         (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt), z, x, y)
   return z
 end
+
+addmul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Integer) = addmul!(z, x, flintify(y))
+addmul!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr) = addmul!(z, y, x)
 
 # ignore fourth argument
 addmul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Union{ZZRingElemOrPtr,Integer}, ::ZZRingElemOrPtr) = addmul!(z, x, y)
@@ -2672,6 +2677,8 @@ function submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::UInt)
         (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt), z, x, y)
   return z
 end
+
+submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Integer) = submul!(z, x, flintify(y))
 
 # ignore fourth argument
 submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Union{ZZRingElemOrPtr,Integer}, ::ZZRingElemOrPtr) = submul!(z, x, y)
@@ -2698,24 +2705,28 @@ function fmms!(r::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr, c::ZZ
   return r
 end
 
-
-function divexact!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::UInt)
-  ccall((:fmpz_divexact_ui, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt),
-        z, a, b)
-  return z
-end
+#
 
 function divexact!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
-  ccall((:fmpz_divexact, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}),
-        z, a, b)
+  @ccall libflint.fmpz_divexact(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem})::Nothing
   return z
 end
 
-divexact!(z::ZZRingElemOrPtr, b::ZZRingElemOrPtr) = divexact!(z, z, b)
+function divexact!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Int)
+  @ccall libflint.fmpz_divexact_si(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Int)::Nothing
+  return z
+end
 
-function pow!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Union{Int, UInt})
+function divexact!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::UInt)
+  @ccall libflint.fmpz_divexact_ui(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::UInt)::Nothing
+  return z
+end
+
+divexact!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer) = divexact!(z, a, flintify(b))
+
+#
+
+function pow!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer)
   ccall((:fmpz_pow_ui, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt),
         z, a, UInt(b))
