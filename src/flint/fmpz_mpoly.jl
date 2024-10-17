@@ -286,28 +286,19 @@ end
 function +(a::ZZMPolyRingElem, b::ZZMPolyRingElem)
   check_parent(a, b)
   z = parent(a)()
-  ccall((:fmpz_mpoly_add, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
-        z, a, b, a.parent)
-  return z
+  return add!(z, a, b)
 end
 
 function -(a::ZZMPolyRingElem, b::ZZMPolyRingElem)
   check_parent(a, b)
   z = parent(a)()
-  ccall((:fmpz_mpoly_sub, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
-        z, a, b, a.parent)
-  return z
+  return sub!(z, a, b)
 end
 
 function *(a::ZZMPolyRingElem, b::ZZMPolyRingElem)
   check_parent(a, b)
   z = parent(a)()
-  ccall((:fmpz_mpoly_mul, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
-        z, a, b, a.parent)
-  return z
+  return mul!(z, a, b)
 end
 
 ###############################################################################
@@ -316,68 +307,29 @@ end
 #
 ###############################################################################
 
-for (jT, cN, cT) in ((ZZRingElem, :fmpz, Ref{ZZRingElem}), (Int, :si, Int), (UInt, :ui, UInt))
+for jT in (ZZRingElem, Integer)
   @eval begin
-    function +(a::ZZMPolyRingElem, b::($jT))
-      z = parent(a)()
-      ccall(($(string(:fmpz_mpoly_add_, cN)), libflint), Nothing,
-            (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, ($cT), Ref{ZZMPolyRing}),
-            z, a, b, parent(a))
-      return z
-    end
+    +(a::ZZMPolyRingElem, b::($jT)) = add!(parent(a)(), a, b)
+    +(a::($jT), b::ZZMPolyRingElem) = add!(parent(b)(), a, b)
 
-    +(a::($jT), b::ZZMPolyRingElem) = b + a
+    -(a::ZZMPolyRingElem, b::($jT)) = sub!(parent(a)(), a, b)
+    -(a::($jT), b::ZZMPolyRingElem) = sub!(parent(b)(), a, b)
 
-    function -(a::ZZMPolyRingElem, b::($jT))
-      z = parent(a)()
-      ccall(($(string(:fmpz_mpoly_sub_, cN)), libflint), Nothing,
-            (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, ($cT), Ref{ZZMPolyRing}),
-            z, a, b, parent(a))
-      return z
-    end
-
-    -(a::($jT), b::ZZMPolyRingElem) = - (b - a)
-
-    function *(a::ZZMPolyRingElem, b::($jT))
-      z = parent(a)()
-      ccall(($(string(:fmpz_mpoly_scalar_mul_, cN)), libflint), Nothing,
-            (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, ($cT), Ref{ZZMPolyRing}),
-            z, a, b, parent(a))
-      return z
-    end
-
-    *(a::($jT), b::ZZMPolyRingElem) = b * a
+    *(a::ZZMPolyRingElem, b::($jT)) = mul!(parent(a)(), a, b)
+    *(a::($jT), b::ZZMPolyRingElem) = mul!(parent(b)(), a, b)
 
     function divexact(a::ZZMPolyRingElem, b::($jT); check::Bool=true)
       z = parent(a)()
       if check
-        divides = Bool(ccall(($(string(:fmpz_mpoly_scalar_divides_, cN)), libflint), Cint,
-                             (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, ($cT), Ref{ZZMPolyRing}),
-                             z, a, b, parent(a)))
-        divides || error("Division is not exact in divexact")
+        d, z = divides!(z, a, b)
+        d || error("Division is not exact in divexact")
       else
-        ccall(($(string(:fmpz_mpoly_scalar_divexact_, cN)), libflint), Nothing,
-              (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, ($cT), Ref{ZZMPolyRing}),
-              z, a, b, parent(a))
+        z = divexact!(z, a, b)
       end
       return z
     end
   end
 end
-
-+(a::ZZMPolyRingElem, b::Integer) = a + flintify(b)
-
-+(a::Integer, b::ZZMPolyRingElem) = b + a
-
--(a::ZZMPolyRingElem, b::Integer) = a - flintify(b)
-
--(a::Integer, b::ZZMPolyRingElem) = -(b - a)
-
-*(a::ZZMPolyRingElem, b::Integer) = a * flintify(b)
-
-*(a::Integer, b::ZZMPolyRingElem) = b * a
-
-divexact(a::ZZMPolyRingElem, b::Integer; check::Bool=true) = divexact(a, ZZRingElem(b); check=check)
 
 ###############################################################################
 #
@@ -572,19 +524,12 @@ end
 #
 ###############################################################################
 
-function divides(a::ZZMPolyRingElem, b::ZZMPolyRingElem)
+function divides(a::ZZMPolyRingElem, b::Union{IntegerUnion, ZZMPolyRingElem})
   check_parent(a, b)
-  if iszero(a)
-    return true, zero(parent(a))
-  end
-  if iszero(b)
-    return false, zero(parent(a))
-  end
-  z = parent(a)()
-  d = ccall((:fmpz_mpoly_divides, libflint), Cint,
-            (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
-            z, a, b, a.parent)
-  return isone(d), z
+  z = zero(parent(a))
+  iszero(a) && return true, z
+  iszero(b) && return false, z
+  return divides!(z, a, b)
 end
 
 ###############################################################################
@@ -783,19 +728,80 @@ function neg!(z::ZZMPolyRingElem, a::ZZMPolyRingElem)
   return z
 end
 
-function add!(a::ZZMPolyRingElem, b::ZZMPolyRingElem, c::ZZMPolyRingElem)
+function add!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, b::ZZMPolyRingElem)
   ccall((:fmpz_mpoly_add, libflint), Nothing,
         (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem},
-         Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), a, b, c, a.parent)
-  return a
+         Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), z, a, b, a.parent)
+  return z
 end
 
-function mul!(a::ZZMPolyRingElem, b::ZZMPolyRingElem, c::ZZMPolyRingElem)
+function sub!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, b::ZZMPolyRingElem)
+  ccall((:fmpz_mpoly_sub, libflint), Nothing,
+        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem},
+         Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), z, a, b, a.parent)
+  return z
+end
+
+function mul!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, b::ZZMPolyRingElem)
   ccall((:fmpz_mpoly_mul, libflint), Nothing,
         (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem},
-         Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), a, b, c, a.parent)
-  return a
+         Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), z, a, b, a.parent)
+  return z
 end
+
+function divides!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, b::ZZMPolyRingElem)
+  d = ccall((:fmpz_mpoly_divides, libflint), Cint,
+            (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
+            z, a, b, parent(a))
+  return Bool(d), z
+end
+
+for (jT, cN, cT) in ((ZZRingElem, :fmpz, Ref{ZZRingElem}), (Int, :si, Int), (UInt, :ui, UInt))
+  @eval begin
+    function add!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, b::$jT)
+      @ccall libflint.$(string(:fmpz_mpoly_add_, cN))(z::Ref{ZZMPolyRingElem},
+                a::Ref{ZZMPolyRingElem}, b::$cT, parent(a)::Ref{ZZMPolyRing})::Nothing
+      return z
+    end
+
+    function sub!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, b::($jT))
+      @ccall libflint.$(string(:fmpz_mpoly_sub_, cN))(z::Ref{ZZMPolyRingElem},
+                a::Ref{ZZMPolyRingElem}, b::$cT, parent(a)::Ref{ZZMPolyRing})::Nothing
+      return z
+    end
+
+    function mul!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, b::($jT))
+      @ccall libflint.$(string(:fmpz_mpoly_scalar_mul_, cN))(z::Ref{ZZMPolyRingElem},
+                a::Ref{ZZMPolyRingElem}, b::$cT, parent(a)::Ref{ZZMPolyRing})::Nothing
+      return z
+    end
+
+    function divexact!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, b::($jT))
+      @ccall libflint.$(string(:fmpz_mpoly_scalar_divexact_, cN))(z::Ref{ZZMPolyRingElem},
+                a::Ref{ZZMPolyRingElem}, b::$cT, parent(a)::Ref{ZZMPolyRing})::Nothing
+      return z
+    end
+
+    function divides!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, b::($jT))
+      d = @ccall libflint.$(string(:fmpz_mpoly_scalar_divides_, cN))(z::Ref{ZZMPolyRingElem},
+                    a::Ref{ZZMPolyRingElem}, b::$cT, parent(a)::Ref{ZZMPolyRing})::Cint
+      return Bool(d), z
+    end
+  end
+end
+
+add!(a::ZZMPolyRingElem, b::ZZMPolyRingElem, c::IntegerUnion) = add!(a, b, flintify(c))
+add!(a::ZZMPolyRingElem, b::IntegerUnion, c::ZZMPolyRingElem) = add!(a, c, b)
+
+sub!(a::ZZMPolyRingElem, b::ZZMPolyRingElem, c::IntegerUnion) = sub!(a, b, flintify(c))
+sub!(a::ZZMPolyRingElem, b::IntegerUnion, c::ZZMPolyRingElem) = neg!(sub!(a, c, b))
+
+mul!(a::ZZMPolyRingElem, b::ZZMPolyRingElem, c::IntegerUnion) = mul!(a, b, flintify(c))
+mul!(a::ZZMPolyRingElem, b::IntegerUnion, c::ZZMPolyRingElem) = mul!(a, c, b)
+
+divexact!(a::ZZMPolyRingElem, b::ZZMPolyRingElem, c::RationalUnion) = divexact!(a, b, flintify(c))
+
+divides!(a::ZZMPolyRingElem, b::ZZMPolyRingElem, c::RationalUnion) = divides!(a, b, flintify(c))
 
 # Set the n-th coefficient of a to c. If zero coefficients are inserted, they
 # must be removed with combine_like_terms!
