@@ -1162,7 +1162,7 @@ end
 
 function mul!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::UInt)
   ccall((:fmpq_mul_ui, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}, Int), c, a, b)
+        (Ref{QQFieldElem}, Ref{QQFieldElem}, UInt), c, a, b)
   return c
 end
 
