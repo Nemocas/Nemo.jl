@@ -253,37 +253,20 @@ mutable struct ZZPolyRingElem <: PolyRingElem{ZZRingElem}
     return z
   end
 
-  function ZZPolyRingElem(a::Vector{ZZRingElem})
+  function ZZPolyRingElem(a::Vector{<:Union{Integer,ZZRingElem}})
     z = new()
     ccall((:fmpz_poly_init2, libflint), Nothing,
           (Ref{ZZPolyRingElem}, Int), z, length(a))
     for i = 1:length(a)
-      ccall((:fmpz_poly_set_coeff_fmpz, libflint), Nothing,
-            (Ref{ZZPolyRingElem}, Int, Ref{ZZRingElem}), z, i - 1, a[i])
+      setcoeff!(z, i - 1, a[i])
     end
     finalizer(_fmpz_poly_clear_fn, z)
     return z
   end
 
-  function ZZPolyRingElem(a::Int)
-    z = ZZPolyRingElem()
-    ccall((:fmpz_poly_set_si, libflint), Nothing, (Ref{ZZPolyRingElem}, Int), z, a)
-    return z
-  end
-
-  function ZZPolyRingElem(a::ZZRingElem)
-    z = ZZPolyRingElem()
-    ccall((:fmpz_poly_set_fmpz, libflint), Nothing,
-          (Ref{ZZPolyRingElem}, Ref{ZZRingElem}), z, a)
-    return z
-  end
-
-  function ZZPolyRingElem(a::ZZPolyRingElem)
-    z = ZZPolyRingElem()
-    ccall((:fmpz_poly_set, libflint), Nothing,
-          (Ref{ZZPolyRingElem}, Ref{ZZPolyRingElem}), z, a)
-    return z
-  end
+  ZZPolyRingElem(a::Integer) = set!(ZZPolyRingElem(), a)
+  ZZPolyRingElem(a::ZZRingElem) = set!(ZZPolyRingElem(), a)
+  ZZPolyRingElem(a::ZZPolyRingElem) = set!(ZZPolyRingElem(), a)
 end
 
 function _fmpz_poly_clear_fn(a::ZZPolyRingElem)
@@ -346,51 +329,25 @@ mutable struct QQPolyRingElem <: PolyRingElem{QQFieldElem}
     return z
   end
 
-  function QQPolyRingElem(a::Vector{QQFieldElem})
+  function QQPolyRingElem(a::Vector{<:Union{Integer,Rational,ZZRingElem,QQFieldElem}})
     z = new()
     ccall((:fmpq_poly_init2, libflint), Nothing,
           (Ref{QQPolyRingElem}, Int), z, length(a))
     for i = 1:length(a)
-      ccall((:fmpq_poly_set_coeff_fmpq, libflint), Nothing,
-            (Ref{QQPolyRingElem}, Int, Ref{QQFieldElem}), z, i - 1, a[i])
+      setcoeff!(z, i - 1, a[i])
     end
     finalizer(_fmpq_poly_clear_fn, z)
     return z
   end
 
-  function QQPolyRingElem(a::Int)
-    z = QQPolyRingElem()
-    ccall((:fmpq_poly_set_si, libflint), Nothing, (Ref{QQPolyRingElem}, Int), z, a)
-    return z
-  end
+  QQPolyRingElem(a::Integer) = set!(QQPolyRingElem(), a)
+  QQPolyRingElem(a::Rational) = set!(QQPolyRingElem(), a)
 
-  function QQPolyRingElem(a::ZZRingElem)
-    z = QQPolyRingElem()
-    ccall((:fmpq_poly_set_fmpz, libflint), Nothing,
-          (Ref{QQPolyRingElem}, Ref{ZZRingElem}), z, a)
-    return z
-  end
+  QQPolyRingElem(a::ZZRingElem) = set!(QQPolyRingElem(), a)
+  QQPolyRingElem(a::QQFieldElem) = set!(QQPolyRingElem(), a)
 
-  function QQPolyRingElem(a::QQFieldElem)
-    z = QQPolyRingElem()
-    ccall((:fmpq_poly_set_fmpq, libflint), Nothing,
-          (Ref{QQPolyRingElem}, Ref{QQFieldElem}), z, a)
-    return z
-  end
-
-  function QQPolyRingElem(a::ZZPolyRingElem)
-    z = QQPolyRingElem()
-    ccall((:fmpq_poly_set_fmpz_poly, libflint), Nothing,
-          (Ref{QQPolyRingElem}, Ref{ZZPolyRingElem}), z, a)
-    return z
-  end
-
-  function QQPolyRingElem(a::QQPolyRingElem)
-    z = QQPolyRingElem()
-    ccall((:fmpq_poly_set, libflint), Nothing,
-          (Ref{QQPolyRingElem}, Ref{QQPolyRingElem}), z, a)
-    return z
-  end
+  QQPolyRingElem(a::ZZPolyRingElem) = set!(QQPolyRingElem(), a)
+  QQPolyRingElem(a::QQPolyRingElem) = set!(QQPolyRingElem(), a)
 end
 
 function _fmpq_poly_clear_fn(a::QQPolyRingElem)
@@ -6301,6 +6258,9 @@ const FlintPuiseuxSeriesFieldElemOrPtr{T <: RingElem} = Union{FlintPuiseuxSeries
 
 const PadicFieldElemOrPtr = Union{PadicFieldElem, Ref{PadicFieldElem}, Ptr{PadicFieldElem}}
 const QadicFieldElemOrPtr = Union{QadicFieldElem, Ref{QadicFieldElem}, Ptr{QadicFieldElem}}
+
+const IntegerUnionOrPtr = Union{Integer, ZZRingElemOrPtr}
+const RationalUnionOrPtr = Union{Integer, ZZRingElemOrPtr, Rational, QQFieldElemOrPtr}
 
 ###############################################################################
 #
