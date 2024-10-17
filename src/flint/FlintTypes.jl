@@ -608,8 +608,7 @@ mutable struct zzModPolyRingElem <: PolyRingElem{zzModRingElem}
 
   function zzModPolyRingElem(n::UInt, a::UInt)
     z = zzModPolyRingElem(n)
-    ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-          (Ref{zzModPolyRingElem}, Int, UInt), z, 0, a)
+    setcoeff!(z, 0, a)
     return z
   end
 
@@ -621,12 +620,10 @@ mutable struct zzModPolyRingElem <: PolyRingElem{zzModRingElem}
     z = new()
     ccall((:nmod_poly_init2, libflint), Nothing,
           (Ref{zzModPolyRingElem}, UInt, Int), z, n, length(arr))
-    for i in 1:length(arr)
-      tt = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), arr[i], n)
-      ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-            (Ref{zzModPolyRingElem}, Int, UInt), z, i - 1, tt)
-    end
     finalizer(_nmod_poly_clear_fn, z)
+    for i in 1:length(arr)
+      setcoeff!(z, i - 1, arr[i])
+    end
     return z
   end
 
@@ -634,11 +631,10 @@ mutable struct zzModPolyRingElem <: PolyRingElem{zzModRingElem}
     z = new()
     ccall((:nmod_poly_init2, libflint), Nothing,
           (Ref{zzModPolyRingElem}, UInt, Int), z, n, length(arr))
-    for i in 1:length(arr)
-      ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-            (Ref{zzModPolyRingElem}, Int, UInt), z, i - 1, arr[i])
-    end
     finalizer(_nmod_poly_clear_fn, z)
+    for i in 1:length(arr)
+      setcoeff!(z, i - 1, arr[i])
+    end
     return z
   end
 
@@ -646,11 +642,10 @@ mutable struct zzModPolyRingElem <: PolyRingElem{zzModRingElem}
     z = new()
     ccall((:nmod_poly_init2, libflint), Nothing,
           (Ref{zzModPolyRingElem}, UInt, Int), z, n, length(arr))
-    for i in 1:length(arr)
-      ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-            (Ref{zzModPolyRingElem}, Int, UInt), z, i-1, arr[i].data)
-    end
     finalizer(_nmod_poly_clear_fn, z)
+    for i in 1:length(arr)
+      setcoeff!(z, i-1, arr[i].data)
+    end
     return z
   end
 
@@ -740,8 +735,7 @@ mutable struct fpPolyRingElem <: PolyRingElem{fpFieldElem}
 
   function fpPolyRingElem(n::UInt, a::UInt)
     z = fpPolyRingElem(n)
-    ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-          (Ref{fpPolyRingElem}, Int, UInt), z, 0, a)
+    setcoeff!(z, 0, a)
     return z
   end
 
@@ -753,12 +747,10 @@ mutable struct fpPolyRingElem <: PolyRingElem{fpFieldElem}
     z = new()
     ccall((:nmod_poly_init2, libflint), Nothing,
           (Ref{fpPolyRingElem}, UInt, Int), z, n, length(arr))
-    for i in 1:length(arr)
-      tt = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), arr[i], n)
-      ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-            (Ref{fpPolyRingElem}, Int, UInt), z, i - 1, tt)
-    end
     finalizer(_gfp_poly_clear_fn, z)
+    for i in 1:length(arr)
+      setcoeff!(z, i - 1, arr[i])
+    end
     return z
   end
 
@@ -766,11 +758,10 @@ mutable struct fpPolyRingElem <: PolyRingElem{fpFieldElem}
     z = new()
     ccall((:nmod_poly_init2, libflint), Nothing,
           (Ref{fpPolyRingElem}, UInt, Int), z, n, length(arr))
-    for i in 1:length(arr)
-      ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-            (Ref{fpPolyRingElem}, Int, UInt), z, i - 1, arr[i])
-    end
     finalizer(_gfp_poly_clear_fn, z)
+    for i in 1:length(arr)
+      setcoeff!(z, i - 1, arr[i])
+    end
     return z
   end
 
@@ -778,11 +769,10 @@ mutable struct fpPolyRingElem <: PolyRingElem{fpFieldElem}
     z = new()
     ccall((:nmod_poly_init2, libflint), Nothing,
           (Ref{fpPolyRingElem}, UInt, Int), z, n, length(arr))
-    for i in 1:length(arr)
-      ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-            (Ref{fpPolyRingElem}, Int, UInt), z, i-1, arr[i].data)
-    end
     finalizer(_gfp_poly_clear_fn, z)
+    for i in 1:length(arr)
+      setcoeff!(z, i-1, arr[i].data)
+    end
     return z
   end
 

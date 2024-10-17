@@ -915,8 +915,7 @@ end
 
 function setcoeff!(x::T, n::Int, y::ZZRingElem) where T <: Zmodn_poly
   r = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), y, x.mod_n)
-  ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-        (Ref{T}, Int, UInt), x, n, r)
+  setcoeff!(x, n, r)
   return x
 end
 
