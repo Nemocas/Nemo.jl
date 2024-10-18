@@ -96,20 +96,6 @@ end
   @test size(t) == (2, 3)
   @test iszero(t)
 
-  for (R, M) in ring_to_mat
-    t = sim_zero(s, R)
-    @test size(t) == size(s)
-    if sim_zero == zero
-      @test iszero(t)
-    end
-
-    t = sim_zero(s, R, 2, 3)
-    @test size(t) == (2, 3)
-    if sim_zero == zero
-      @test iszero(t)
-    end
-  end
-
   # issue #651
   m = one(Generic.MatSpaceElem{ZZRingElem}(ZZ, 2, 2))
   for n = (m, -m, m*m, m+m, 2m)

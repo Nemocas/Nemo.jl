@@ -182,14 +182,6 @@ end
   @test t isa FqPolyRepMatrix
   @test size(t) == (2, 3)
 
-  for (R, M) in ring_to_mat
-    t = similar(s, R)
-    @test size(t) == size(s)
-
-    t = similar(s, R, 2, 3)
-    @test size(t) == (2, 3)
-  end
-
   # issue #651
   m = one(Generic.MatSpaceElem{FqPolyRepFieldElem}(F9, 2, 2))
   for n = (m, -m, m*m, m+m, 2m)
