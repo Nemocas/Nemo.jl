@@ -557,14 +557,10 @@ mutable struct zzModPolyRingElem <: PolyRingElem{zzModRingElem}
     return z
   end
 
-  function zzModPolyRingElem(n::UInt, a::UInt)
+  function zzModPolyRingElem(n::UInt, a::Union{Integer,ZZRingElem,zzModRingElem})
     z = zzModPolyRingElem(n)
     setcoeff!(z, 0, a)
     return z
-  end
-
-  function zzModPolyRingElem(n::UInt, a::Integer)
-    return zzModPolyRingElem(n, mod(a, n) % UInt)
   end
 
   function zzModPolyRingElem(n::UInt, a::Vector{<:Union{Integer,ZZRingElem,zzModRingElem}})
@@ -655,14 +651,10 @@ mutable struct fpPolyRingElem <: PolyRingElem{fpFieldElem}
     return z
   end
 
-  function fpPolyRingElem(n::UInt, a::UInt)
+  function fpPolyRingElem(n::UInt, a::Union{Integer,ZZRingElem,fpFieldElem})
     z = fpPolyRingElem(n)
     setcoeff!(z, 0, a)
     return z
-  end
-
-  function fpPolyRingElem(n::UInt, a::Integer)
-    return fpPolyRingElem(n, mod(a, n) % UInt)
   end
 
   function fpPolyRingElem(n::UInt, a::Vector{<:Union{Integer,ZZRingElem,fpFieldElem}})
@@ -756,23 +748,13 @@ mutable struct ZZModPolyRingElem <: PolyRingElem{ZZModRingElem}
     return ZZModPolyRingElem(R.ninv)
   end
 
-  function ZZModPolyRingElem(n::fmpz_mod_ctx_struct, a::ZZRingElem)
+  function ZZModPolyRingElem(n::fmpz_mod_ctx_struct, a::Union{Integer,ZZRingElem,ZZModRingElem})
     z = ZZModPolyRingElem(n)
-    @ccall libflint.fmpz_mod_poly_set_coeff_fmpz(z::Ref{ZZModPolyRingElem}, 0::Int, a::Ref{ZZRingElem}, n::Ref{fmpz_mod_ctx_struct})::Nothing
+    setcoeff!(z, 0, a)
     return z
   end
 
-  function ZZModPolyRingElem(R::ZZModRing, a::ZZRingElem)
-    return ZZModPolyRingElem(R.ninv, a)
-  end
-
-  function ZZModPolyRingElem(n::fmpz_mod_ctx_struct, a::UInt)
-    z = ZZModPolyRingElem(n)
-    @ccall libflint.fmpz_mod_poly_set_coeff_ui(z::Ref{ZZModPolyRingElem}, 0::Int, a::UInt, n::Ref{fmpz_mod_ctx_struct})::Nothing
-    return z
-  end
-
-  function ZZModPolyRingElem(R::ZZModRing, a::UInt)
+  function ZZModPolyRingElem(R::ZZModRing, a::Union{Integer,ZZRingElem,ZZModRingElem})
     return ZZModPolyRingElem(R.ninv, a)
   end
 
@@ -886,20 +868,14 @@ mutable struct FpPolyRingElem <: PolyRingElem{FpFieldElem}
     return FpPolyRingElem(R.ninv)
   end
 
-  function FpPolyRingElem(n::fmpz_mod_ctx_struct, a::ZZRingElem)
+  function FpPolyRingElem(n::fmpz_mod_ctx_struct, a::Union{Integer,ZZRingElem,FpFieldElem})
     z = FpPolyRingElem(n)
-    @ccall libflint.fmpz_mod_poly_set_coeff_fmpz(z::Ref{FpPolyRingElem}, 0::Int, a::Ref{ZZRingElem}, n::Ref{fmpz_mod_ctx_struct})::Nothing
+    setcoeff!(z, 0, a)
     return z
   end
 
-  function FpPolyRingElem(R::FpField, a::ZZRingElem)
+  function FpPolyRingElem(R::FpField, a::Union{Integer,ZZRingElem,FpFieldElem})
     return FpPolyRingElem(R.ninv, a)
-  end
-
-  function FpPolyRingElem(n::fmpz_mod_ctx_struct, a::UInt)
-    z = FpPolyRingElem(n)
-    @ccall libflint.fmpz_mod_poly_set_coeff_ui(z::Ref{FpPolyRingElem}, 0::Int, a::UInt, n::Ref{fmpz_mod_ctx_struct})::Nothing
-    return z
   end
 
   function FpPolyRingElem(R::FpField, a::UInt)
