@@ -30,7 +30,7 @@ dense_matrix_type(::Type{RealFieldElem}) = RealMatrix
 function getindex!(z::ArbFieldElem, x::RealMatrix, r::Int, c::Int)
   GC.@preserve x begin
     v = mat_entry_ptr(x, r, c)
-    ccall((:arb_set, libflint), Nothing, (Ref{RealFieldElem}, Ptr{RealFieldElem}), z, v)
+    set!(z, v)
   end
   return z
 end
@@ -41,7 +41,7 @@ end
   z = base_ring(x)()
   GC.@preserve x begin
     v = mat_entry_ptr(x, r, c)
-    ccall((:arb_set, libflint), Nothing, (Ref{RealFieldElem}, Ptr{RealFieldElem}), z, v)
+    set!(z, v)
   end
   return z
 end
@@ -53,7 +53,7 @@ for T in [Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, 
 
       GC.@preserve x begin
         z = mat_entry_ptr(x, r, c)
-        _arb_set(z, y, precision(Balls))
+        set!(z, y, precision(Balls))
       end
     end
   end
