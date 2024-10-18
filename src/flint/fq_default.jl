@@ -642,6 +642,7 @@ end
 function neg!(z::FqFieldElem, a::FqFieldElem)
   ccall((:fq_default_neg, libflint), Nothing,
         (Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), z, a, a.parent)
+  z.poly = nothing
   return z
 end
 
@@ -671,16 +672,19 @@ end
 
 function mul!(z::FqFieldElem, x::FqFieldElem, y::ZZRingElemOrPtr)
   @ccall libflint.fq_default_mul_fmpz(z::Ref{FqFieldElem}, x::Ref{FqFieldElem}, y::Ref{ZZRingElem}, x.parent::Ref{FqField})::Nothing
+  z.poly = nothing
   return z
 end
 
 function mul!(z::FqFieldElem, x::FqFieldElem, y::Int)
   @ccall libflint.fq_default_mul_si(z::Ref{FqFieldElem}, x::Ref{FqFieldElem}, y::Int, x.parent::Ref{FqField})::Nothing
+  z.poly = nothing
   return z
 end
 
 function mul!(z::FqFieldElem, x::FqFieldElem, y::UInt)
   @ccall libflint.fq_default_mul_ui(z::Ref{FqFieldElem}, x::Ref{FqFieldElem}, y::Int, x.parent::Ref{FqField})::Nothing
+  z.poly = nothing
   return z
 end
 
