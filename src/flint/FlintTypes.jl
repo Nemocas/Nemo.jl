@@ -2427,39 +2427,17 @@ mutable struct FqPolyRepFieldElem <: FinFieldElem
     return d
   end
 
-  function FqPolyRepFieldElem(ctx::FqPolyRepField, x::Int)
+  function FqPolyRepFieldElem(
+    ctx::FqPolyRepField,
+    x::Union{
+      FqPolyRepFieldElem,
+      Integer,ZZRingElem,
+      ZZPolyRingElem,
+      ZZModPolyRingElem,FpPolyRingElem
+    },
+  )
     d = FqPolyRepFieldElem(ctx)
-    ccall((:fq_set_si, libflint), Nothing,
-          (Ref{FqPolyRepFieldElem}, Int, Ref{FqPolyRepField}), d, x, ctx)
-    return d
-  end
-
-  function FqPolyRepFieldElem(ctx::FqPolyRepField, x::ZZRingElem)
-    d = FqPolyRepFieldElem(ctx)
-    ccall((:fq_set_fmpz, libflint), Nothing,
-          (Ref{FqPolyRepFieldElem}, Ref{ZZRingElem}, Ref{FqPolyRepField}), d, x, ctx)
-    return d
-  end
-
-  function FqPolyRepFieldElem(ctx::FqPolyRepField, x::FpPolyRingElem)
-    d = FqPolyRepFieldElem(ctx)
-    ccall((:fq_set_fmpz_mod_poly, libflint), Nothing,
-          (Ref{FqPolyRepFieldElem}, Ref{FpPolyRingElem}, Ref{FqPolyRepField}),
-          d, x, ctx)
-    return d
-  end
-
-  function FqPolyRepFieldElem(ctx::FqPolyRepField, x::FqPolyRepFieldElem)
-    d = FqPolyRepFieldElem(ctx)
-    ccall((:fq_set, libflint), Nothing,
-          (Ref{FqPolyRepFieldElem}, Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}), d, x, ctx)
-    return d
-  end
-
-  function FqPolyRepFieldElem(ctx::FqPolyRepField, x::ZZPolyRingElem)
-    d = FqPolyRepFieldElem(ctx)
-    ccall((:fq_set_fmpz_poly, libflint), Nothing,
-          (Ref{FqPolyRepFieldElem}, Ref{ZZPolyRingElem}, Ref{FqPolyRepField}), d, x, ctx)
+    set!(d, x)
     return d
   end
 end
