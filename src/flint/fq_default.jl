@@ -648,6 +648,55 @@ end
 
 #
 
+function set!(z::FqFieldElem, a::FqFieldElemOrPtr)
+  @ccall libflint.fq_default_set(z::Ref{FqFieldElem}, a::Ref{FqFieldElem}, parent(z)::Ref{FqField})::Nothing
+  z.poly = nothing
+end
+
+function set!(z::FqFieldElem, a::Int)
+  @ccall libflint.fq_default_set_si(z::Ref{FqFieldElem}, a::Int, parent(z)::Ref{FqField})::Nothing
+  z.poly = nothing
+end
+
+function set!(z::FqFieldElem, a::UInt)
+  @ccall libflint.fq_default_set_ui(z::Ref{FqFieldElem}, a::UInt, parent(z)::Ref{FqField})::Nothing
+  z.poly = nothing
+end
+
+function set!(z::FqFieldElem, a::ZZRingElemOrPtr)
+  @ccall libflint.fq_default_set_fmpz(z::Ref{FqFieldElem}, a::Ref{ZZRingElem}, parent(z)::Ref{FqField})::Nothing
+  z.poly = nothing
+end
+
+set!(z::FqFieldElem, a::Integer) = set!(z, flintify(a))
+
+function set!(z::FqFieldElem, a::ZZPolyRingElemOrPtr)
+  @ccall libflint.fq_default_set_fmpz_poly(z::Ref{FqFieldElem}, a::Ref{ZZPolyRingElem}, parent(z)::Ref{FqField})::Nothing
+  z.poly = nothing
+end
+
+function set!(z::FqFieldElem, a::zzModPolyRingElemOrPtr)
+  @ccall libflint.fq_default_set_nmod_poly(z::Ref{FqFieldElem}, a::Ref{zzModPolyRingElem}, parent(z)::Ref{FqField})::Nothing
+  z.poly = nothing
+end
+
+function set!(z::FqFieldElem, a::fpPolyRingElemOrPtr)
+  @ccall libflint.fq_default_set_nmod_poly(z::Ref{FqFieldElem}, a::Ref{fpPolyRingElem}, parent(z)::Ref{FqField})::Nothing
+  z.poly = nothing
+end
+
+function set!(z::FqFieldElem, a::ZZModPolyRingElemOrPtr)
+  @ccall libflint.fq_default_set_fmpz_mod_poly(z::Ref{FqFieldElem}, a::Ref{ZZModPolyRingElem}, parent(z)::Ref{FqField})::Nothing
+  z.poly = nothing
+end
+
+function set!(z::FqFieldElem, a::FpPolyRingElemOrPtr)
+  @ccall libflint.fq_default_set_fmpz_mod_poly(z::Ref{FqFieldElem}, a::Ref{FpPolyRingElem}, parent(z)::Ref{FqField})::Nothing
+  z.poly = nothing
+end
+
+#
+
 function add!(z::FqFieldElem, x::FqFieldElem, y::FqFieldElem)
   @ccall libflint.fq_default_add(z::Ref{FqFieldElem}, x::Ref{FqFieldElem}, y::Ref{FqFieldElem}, x.parent::Ref{FqField})::Nothing
   z.poly = nothing

@@ -2294,59 +2294,18 @@ mutable struct FqFieldElem <: FinFieldElem
     return d
   end
 
-  function FqFieldElem(ctx::FqField, x::Int)
+  function FqFieldElem(
+    ctx::FqField,
+    x::Union{
+      FqFieldElem,
+      Integer, ZZRingElem,
+      ZZPolyRingElem,
+      zzModPolyRingElem, fpPolyRingElem,
+      ZZModPolyRingElem, FpPolyRingElem,
+    },
+  )
     d = FqFieldElem(ctx)
-    ccall((:fq_default_set_si, libflint), Nothing,
-          (Ref{FqFieldElem}, Int, Ref{FqField}), d, x, ctx)
-    return d
-  end
-
-  function FqFieldElem(ctx::FqField, x::ZZRingElem)
-    d = FqFieldElem(ctx)
-    ccall((:fq_default_set_fmpz, libflint), Nothing,
-          (Ref{FqFieldElem}, Ref{ZZRingElem}, Ref{FqField}), d, x, ctx)
-    return d
-  end
-
-  function FqFieldElem(ctx::FqField, x::ZZPolyRingElem)
-    d = FqFieldElem(ctx)
-    ccall((:fq_default_set_fmpz_poly, libflint), Nothing,
-          (Ref{FqFieldElem}, Ref{ZZPolyRingElem}, Ref{FqField}), d, x, ctx)
-    return d
-  end
-
-  function FqFieldElem(ctx::FqField, x::zzModPolyRingElem)
-    d = FqFieldElem(ctx)
-    ccall((:fq_default_set_nmod_poly, libflint), Nothing,
-          (Ref{FqFieldElem}, Ref{zzModPolyRingElem}, Ref{FqField}), d, x, ctx)
-    return d
-  end
-
-  function FqFieldElem(ctx::FqField, x::fpPolyRingElem)
-    d = FqFieldElem(ctx)
-    ccall((:fq_default_set_nmod_poly, libflint), Nothing,
-          (Ref{FqFieldElem}, Ref{fpPolyRingElem}, Ref{FqField}), d, x, ctx)
-    return d
-  end
-
-  function FqFieldElem(ctx::FqField, x::ZZModPolyRingElem)
-    d = FqFieldElem(ctx)
-    ccall((:fq_default_set_fmpz_mod_poly, libflint), Nothing,
-          (Ref{FqFieldElem}, Ref{ZZModPolyRingElem}, Ref{FqField}), d, x, ctx)
-    return d
-  end
-
-  function FqFieldElem(ctx::FqField, x::FpPolyRingElem)
-    d = FqFieldElem(ctx)
-    ccall((:fq_default_set_fmpz_mod_poly, libflint), Nothing,
-          (Ref{FqFieldElem}, Ref{FpPolyRingElem}, Ref{FqField}), d, x, ctx)
-    return d
-  end
-
-  function FqFieldElem(ctx::FqField, x::FqFieldElem)
-    d = FqFieldElem(ctx)
-    ccall((:fq_default_set, libflint), Nothing,
-          (Ref{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), d, x, ctx)
+    set!(d, x)
     return d
   end
 end
