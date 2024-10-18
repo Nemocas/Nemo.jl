@@ -641,22 +641,23 @@ for (etype, rtype, mtype, brtype) in (
       return nothing
     end
 
-    function setcoeff!(z::($etype), n::Int, x::ZZRingElem)
-      r = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, modulus(z)::UInt)::UInt
-      @ccall libflint.nmod_poly_set_coeff_ui(z::Ref{($etype)}, n::Int, r::UInt)::Nothing
-      return z
-    end
-
     function setcoeff!(z::($etype), n::Int, x::UInt)
-      r = mod(x, modulus(z))
-      @ccall libflint.nmod_poly_set_coeff_ui(z::Ref{($etype)}, n::Int, r::UInt)::Nothing
+      @ccall libflint.nmod_poly_set_coeff_ui(z::Ref{($etype)}, n::Int, x::UInt)::Nothing
       return z
     end
 
-    function setcoeff!(z::($etype), n::Int, x::($mtype))
-      @ccall libflint.nmod_poly_set_coeff_ui(z::Ref{($etype)}, n::Int, data(x)::UInt)::Nothing
-      return z
+    function setcoeff!(z::($etype), n::Int, x::Int)
+      return setcoeff!(z, n, mod(x, modulus(z)))
     end
+
+    function setcoeff!(z::($etype), n::Int, x::ZZRingElem)
+      xx = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, modulus(z)::UInt)::UInt
+      return setcoeff!(z, n, xx)
+    end
+
+    setcoeff!(z::($etype), n::Int, x::Integer) = setcoeff!(z, n, flintify(x))
+
+    setcoeff!(z::($etype), n::Int, x::($mtype)) = setcoeff!(z, n, data(x))
 
     function mul!(z::($etype), a::($etype), b::($etype))
       lena = pol_length(a)

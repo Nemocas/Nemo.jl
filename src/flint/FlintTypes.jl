@@ -567,32 +567,12 @@ mutable struct zzModPolyRingElem <: PolyRingElem{zzModRingElem}
     return zzModPolyRingElem(n, mod(a, n) % UInt)
   end
 
-  function zzModPolyRingElem(n::UInt, arr::Vector{ZZRingElem})
+  function zzModPolyRingElem(n::UInt, a::Vector{<:Union{Integer,ZZRingElem,zzModRingElem}})
     z = new()
-    @ccall libflint.nmod_poly_init2(z::Ref{zzModPolyRingElem}, n::UInt, length(arr)::Int)::Nothing
+    @ccall libflint.nmod_poly_init2(z::Ref{zzModPolyRingElem}, n::UInt, length(a)::Int)::Nothing
     finalizer(_nmod_poly_clear_fn, z)
-    for i in 1:length(arr)
-      setcoeff!(z, i - 1, arr[i])
-    end
-    return z
-  end
-
-  function zzModPolyRingElem(n::UInt, arr::Vector{UInt})
-    z = new()
-    @ccall libflint.nmod_poly_init2(z::Ref{zzModPolyRingElem}, n::UInt, length(arr)::Int)::Nothing
-    finalizer(_nmod_poly_clear_fn, z)
-    for i in 1:length(arr)
-      setcoeff!(z, i - 1, arr[i])
-    end
-    return z
-  end
-
-  function zzModPolyRingElem(n::UInt, arr::Vector{zzModRingElem})
-    z = new()
-    @ccall libflint.nmod_poly_init2(z::Ref{zzModPolyRingElem}, n::UInt, length(arr)::Int)::Nothing
-    finalizer(_nmod_poly_clear_fn, z)
-    for i in 1:length(arr)
-      setcoeff!(z, i-1, arr[i].data)
+    for i in 1:length(a)
+      setcoeff!(z, i - 1, a[i])
     end
     return z
   end
@@ -685,32 +665,12 @@ mutable struct fpPolyRingElem <: PolyRingElem{fpFieldElem}
     return fpPolyRingElem(n, mod(a, n) % UInt)
   end
 
-  function fpPolyRingElem(n::UInt, arr::Vector{ZZRingElem})
+  function fpPolyRingElem(n::UInt, a::Vector{<:Union{Integer,ZZRingElem,fpFieldElem}})
     z = new()
-    @ccall libflint.nmod_poly_init2(z::Ref{fpPolyRingElem}, n::UInt, length(arr)::Int)::Nothing
+    @ccall libflint.nmod_poly_init2(z::Ref{fpPolyRingElem}, n::UInt, length(a)::Int)::Nothing
     finalizer(_gfp_poly_clear_fn, z)
-    for i in 1:length(arr)
-      setcoeff!(z, i - 1, arr[i])
-    end
-    return z
-  end
-
-  function fpPolyRingElem(n::UInt, arr::Vector{UInt})
-    z = new()
-    @ccall libflint.nmod_poly_init2(z::Ref{fpPolyRingElem}, n::UInt, length(arr)::Int)::Nothing
-    finalizer(_gfp_poly_clear_fn, z)
-    for i in 1:length(arr)
-      setcoeff!(z, i - 1, arr[i])
-    end
-    return z
-  end
-
-  function fpPolyRingElem(n::UInt, arr::Vector{fpFieldElem})
-    z = new()
-    @ccall libflint.nmod_poly_init2(z::Ref{fpPolyRingElem}, n::UInt, length(arr)::Int)::Nothing
-    finalizer(_gfp_poly_clear_fn, z)
-    for i in 1:length(arr)
-      setcoeff!(z, i-1, arr[i].data)
+    for i in 1:length(a)
+      setcoeff!(z, i - 1, a[i])
     end
     return z
   end
@@ -2957,36 +2917,11 @@ mutable struct fpRelPowerSeriesRingElem <: RelPowerSeriesRingElem{fpFieldElem}
     return z
   end
 
-  function fpRelPowerSeriesRingElem(p::UInt, a::Vector{ZZRingElem}, len::Int, prec::Int, val::Int)
+  function fpRelPowerSeriesRingElem(p::UInt, a::Vector{<:Union{Integer,ZZRingElem,fpFieldElem}}, len::Int, prec::Int, val::Int)
     z = new()
     @ccall libflint.nmod_poly_init2(z::Ref{fpRelPowerSeriesRingElem}, p::UInt, len::Int)::Nothing
-    for i = 1:len
-      tt = @ccall libflint.fmpz_fdiv_ui(a[i]::Ref{ZZRingElem}, p::UInt)::UInt
-      @ccall libflint.nmod_poly_set_coeff_ui(z::Ref{fpRelPowerSeriesRingElem}, (i - 1)::Int, tt::UInt)::Nothing
-    end
-    z.prec = prec
-    z.val = val
-    finalizer(_gfp_rel_series_clear_fn, z)
-    return z
-  end
-
-  function fpRelPowerSeriesRingElem(p::UInt, a::Vector{UInt}, len::Int, prec::Int, val::Int)
-    z = new()
-    @ccall libflint.nmod_poly_init2(z::Ref{fpRelPowerSeriesRingElem}, p::UInt, len::Int)::Nothing
-    for i = 1:len
-      @ccall libflint.nmod_poly_set_coeff_ui(z::Ref{fpRelPowerSeriesRingElem}, (i - 1)::Int, a[i]::UInt)::Nothing
-    end
-    z.prec = prec
-    z.val = val
-    finalizer(_gfp_rel_series_clear_fn, z)
-    return z
-  end
-
-  function fpRelPowerSeriesRingElem(p::UInt, a::Vector{fpFieldElem}, len::Int, prec::Int, val::Int)
-    z = new()
-    @ccall libflint.nmod_poly_init2(z::Ref{fpRelPowerSeriesRingElem}, p::UInt, len::Int)::Nothing
-    for i = 1:len
-      @ccall libflint.nmod_poly_set_coeff_ui(z::Ref{fpRelPowerSeriesRingElem}, (i - 1)::Int, data(a[i])::UInt)::Nothing
+    for i in 1:len
+      setcoeff!(z, i-1, a[i])
     end
     z.prec = prec
     z.val = val
@@ -3049,36 +2984,11 @@ mutable struct zzModRelPowerSeriesRingElem <: RelPowerSeriesRingElem{zzModRingEl
     return z
   end
 
-  function zzModRelPowerSeriesRingElem(p::UInt, a::Vector{ZZRingElem}, len::Int, prec::Int, val::Int)
+  function zzModRelPowerSeriesRingElem(p::UInt, a::Vector{<:Union{Integer,ZZRingElem,zzModRingElem}}, len::Int, prec::Int, val::Int)
     z = new()
     @ccall libflint.nmod_poly_init2(z::Ref{zzModRelPowerSeriesRingElem}, p::UInt, len::Int)::Nothing
-    for i = 1:len
-      tt = @ccall libflint.fmpz_fdiv_ui(a[i]::Ref{ZZRingElem}, p::UInt)::UInt
-      @ccall libflint.nmod_poly_set_coeff_ui(z::Ref{zzModRelPowerSeriesRingElem}, (i - 1)::Int, tt::UInt)::Nothing
-    end
-    z.prec = prec
-    z.val = val
-    finalizer(_nmod_rel_series_clear_fn, z)
-    return z
-  end
-
-  function zzModRelPowerSeriesRingElem(p::UInt, a::Vector{UInt}, len::Int, prec::Int, val::Int)
-    z = new()
-    @ccall libflint.nmod_poly_init2(z::Ref{zzModRelPowerSeriesRingElem}, p::UInt, len::Int)::Nothing
-    for i = 1:len
-      @ccall libflint.nmod_poly_set_coeff_ui(z::Ref{zzModRelPowerSeriesRingElem}, (i - 1)::Int, a[i]::UInt)::Nothing
-    end
-    z.prec = prec
-    z.val = val
-    finalizer(_nmod_rel_series_clear_fn, z)
-    return z
-  end
-
-  function zzModRelPowerSeriesRingElem(p::UInt, a::Vector{zzModRingElem}, len::Int, prec::Int, val::Int)
-    z = new()
-    @ccall libflint.nmod_poly_init2(z::Ref{zzModRelPowerSeriesRingElem}, p::UInt, len::Int)::Nothing
-    for i = 1:len
-      @ccall libflint.nmod_poly_set_coeff_ui(z::Ref{zzModRelPowerSeriesRingElem}, (i - 1)::Int, data(a[i])::UInt)::Nothing
+    for i in 1:len
+      setcoeff!(z, i-1, a[i])
     end
     z.prec = prec
     z.val = val
@@ -3426,34 +3336,11 @@ mutable struct zzModAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{zzModRingEl
     return z
   end
 
-  function zzModAbsPowerSeriesRingElem(n::UInt, arr::Vector{ZZRingElem}, len::Int, prec::Int)
+  function zzModAbsPowerSeriesRingElem(n::UInt, a::Vector{<:Union{Integer,ZZRingElem,zzModRingElem}}, len::Int, prec::Int)
     z = new()
-    @ccall libflint.nmod_poly_init2(z::Ref{zzModAbsPowerSeriesRingElem}, n::UInt, length(arr)::Int)::Nothing
+    @ccall libflint.nmod_poly_init2(z::Ref{zzModAbsPowerSeriesRingElem}, n::UInt, length(a)::Int)::Nothing
     for i in 1:len
-      tt = @ccall libflint.fmpz_fdiv_ui(arr[i]::Ref{ZZRingElem}, n::UInt)::UInt
-      @ccall libflint.nmod_poly_set_coeff_ui(z::Ref{zzModAbsPowerSeriesRingElem}, (i - 1)::Int, tt::UInt)::Nothing
-    end
-    z.prec = prec
-    finalizer(_nmod_abs_series_clear_fn, z)
-    return z
-  end
-
-  function zzModAbsPowerSeriesRingElem(n::UInt, arr::Vector{UInt}, len::Int, prec::Int)
-    z = new()
-    @ccall libflint.nmod_poly_init2(z::Ref{zzModAbsPowerSeriesRingElem}, n::UInt, length(arr)::Int)::Nothing
-    for i in 1:len
-      @ccall libflint.nmod_poly_set_coeff_ui(z::Ref{zzModAbsPowerSeriesRingElem}, (i - 1)::Int, arr[i]::UInt)::Nothing
-    end
-    z.prec = prec
-    finalizer(_nmod_abs_series_clear_fn, z)
-    return z
-  end
-
-  function zzModAbsPowerSeriesRingElem(n::UInt, arr::Vector{zzModRingElem}, len::Int, prec::Int)
-    z = new()
-    @ccall libflint.nmod_poly_init2(z::Ref{zzModAbsPowerSeriesRingElem}, n::UInt, length(arr)::Int)::Nothing
-    for i in 1:len
-      @ccall libflint.nmod_poly_set_coeff_ui(z::Ref{zzModAbsPowerSeriesRingElem}, (i-1)::Int, arr[i].data::UInt)::Nothing
+      setcoeff!(z, i-1, a[i])
     end
     z.prec = prec
     finalizer(_nmod_abs_series_clear_fn, z)
@@ -3518,34 +3405,11 @@ mutable struct fpAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{fpFieldElem}
     return z
   end
 
-  function fpAbsPowerSeriesRingElem(n::UInt, arr::Vector{ZZRingElem}, len::Int, prec::Int)
+  function fpAbsPowerSeriesRingElem(n::UInt, a::Vector{<:Union{Integer,ZZRingElem,fpFieldElem}}, len::Int, prec::Int)
     z = new()
-    @ccall libflint.nmod_poly_init2(z::Ref{fpAbsPowerSeriesRingElem}, n::UInt, length(arr)::Int)::Nothing
+    @ccall libflint.nmod_poly_init2(z::Ref{fpAbsPowerSeriesRingElem}, n::UInt, length(a)::Int)::Nothing
     for i in 1:len
-      tt = @ccall libflint.fmpz_fdiv_ui(arr[i]::Ref{ZZRingElem}, n::UInt)::UInt
-      @ccall libflint.nmod_poly_set_coeff_ui(z::Ref{fpAbsPowerSeriesRingElem}, (i - 1)::Int, tt::UInt)::Nothing
-    end
-    z.prec = prec
-    finalizer(_gfp_abs_series_clear_fn, z)
-    return z
-  end
-
-  function fpAbsPowerSeriesRingElem(n::UInt, arr::Vector{UInt}, len::Int, prec::Int)
-    z = new()
-    @ccall libflint.nmod_poly_init2(z::Ref{fpAbsPowerSeriesRingElem}, n::UInt, length(arr)::Int)::Nothing
-    for i in 1:len
-      @ccall libflint.nmod_poly_series_set_coeff_ui(z::Ref{fpAbsPowerSeriesRingElem}, (i - 1)::Int, arr[i]::UInt)::Nothing
-    end
-    z.prec = prec
-    finalizer(_gfp_abs_series_clear_fn, z)
-    return z
-  end
-
-  function fpAbsPowerSeriesRingElem(n::UInt, arr::Vector{fpFieldElem}, len::Int, prec::Int)
-    z = new()
-    @ccall libflint.nmod_poly_init2(z::Ref{fpAbsPowerSeriesRingElem}, n::UInt, length(arr)::Int)::Nothing
-    for i in 1:len
-      @ccall libflint.nmod_poly_set_coeff_ui(z::Ref{fpAbsPowerSeriesRingElem}, (i-1)::Int, arr[i].data::UInt)::Nothing
+      setcoeff!(z, i-1, a[i])
     end
     z.prec = prec
     finalizer(_gfp_abs_series_clear_fn, z)

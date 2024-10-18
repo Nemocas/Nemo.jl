@@ -844,25 +844,27 @@ function fit!(x::T, n::Int) where T <: Zmodn_poly
   return nothing
 end
 
-function setcoeff!(x::T, n::Int, y::UInt) where T <: Zmodn_poly
-  @ccall libflint.nmod_poly_set_coeff_ui(x::Ref{T}, n::Int, y::UInt)::Nothing
-  return x
+#
+
+function setcoeff!(z::T, n::Int, x::UInt) where T <: Zmodn_poly
+  @ccall libflint.nmod_poly_set_coeff_ui(z::Ref{T}, n::Int, x::UInt)::Nothing
+  return z
 end
 
-function setcoeff!(x::T, n::Int, y::Int) where T <: Zmodn_poly
-  @ccall libflint.nmod_poly_set_coeff_ui(x::Ref{T}, n::Int, mod(y, x.mod_n)::UInt)::Nothing
-  return x
+function setcoeff!(z::T, n::Int, x::Int) where T <: Zmodn_poly
+  return setcoeff!(z, n, mod(x, modulus(z)))
 end
 
-function setcoeff!(x::T, n::Int, y::ZZRingElem) where T <: Zmodn_poly
-  r = @ccall libflint.fmpz_fdiv_ui(y::Ref{ZZRingElem}, x.mod_n::UInt)::UInt
-  setcoeff!(x, n, r)
-  return x
+function setcoeff!(z::T, n::Int, x::ZZRingElem) where T <: Zmodn_poly
+  xx = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), x, modulus(z))
+  return setcoeff!(z, n, xx)
 end
 
-setcoeff!(x::T, n::Int, y::Integer) where T <: Zmodn_poly = setcoeff!(x, n, ZZRingElem(y))
+setcoeff!(z::T, n::Int, x::Integer) where T <: Zmodn_poly = setcoeff!(z, n, flintify(x))
 
-setcoeff!(x::zzModPolyRingElem, n::Int, y::zzModRingElem) = setcoeff!(x, n, y.data)
+setcoeff!(z::zzModPolyRingElem, n::Int, x::zzModRingElem) = setcoeff!(z, n, data(x))
+
+#
 
 function add!(z::T, x::T, y::T) where T <: Zmodn_poly
   @ccall libflint.nmod_poly_add(z::Ref{T}, x::Ref{T}, y::Ref{T})::Nothing
