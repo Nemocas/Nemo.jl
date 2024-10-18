@@ -340,8 +340,6 @@ function ==(x::QQMatrix, y::QQMatrix)
               (Ref{QQMatrix}, Ref{QQMatrix}), x, y)
 end
 
-isequal(x::QQMatrix, y::QQMatrix) = ==(x, y)
-
 ###############################################################################
 #
 #   Ad hoc comparisons

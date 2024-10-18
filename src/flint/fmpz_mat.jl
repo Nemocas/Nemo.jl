@@ -407,8 +407,6 @@ function ==(x::ZZMatrix, y::ZZMatrix)
              (Ref{ZZMatrix}, Ref{ZZMatrix}), x, y)
 end
 
-isequal(x::ZZMatrix, y::ZZMatrix) = ==(x, y)
-
 ###############################################################################
 #
 #   Ad hoc comparisons
