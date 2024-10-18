@@ -1,5 +1,22 @@
 RR = RealField()
 
+function test_elem(R::RealField)
+    randtype = rand((
+    :urandom,
+    :randtest,
+    :randtest_exact,
+    :randtest_precise,
+    :randtest_wide,
+    :randtest_special,
+    ))
+  return rand(R; randtype)
+end
+
+@testset "RealFieldElem.conformance_tests" begin
+  test_Field_interface(RR)
+  #test_Field_interface_recursive(RR)
+end
+
 @testset "RealFieldElem.precision" begin
   old_prec = precision(RealField)
 
