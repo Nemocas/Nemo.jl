@@ -47,11 +47,11 @@ end
   return z
 end
 
-@inline function setindex!(a::fqPolyRepMatrix, u::fqPolyRepFieldElem, i::Int, j::Int)
+@inline function setindex!(a::fqPolyRepMatrix, u::fqPolyRepFieldElemOrPtr, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
-  ccall((:fq_nmod_mat_entry_set, libflint), Nothing,
-        (Ref{fqPolyRepMatrix}, Int, Int, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
-        a, i - 1, j - 1, u, base_ring(a))
+  @ccall libflint.fq_nmod_mat_entry_set(
+    a::Ref{fqPolyRepMatrix}, (i-1)::Int, (j-1)::Int, u::Ref{fqPolyRepFieldElem}, base_ring(a)::Ref{fqPolyRepField}
+  )::Nothing
 end
 
 @inline function setindex!(a::fqPolyRepMatrix, u::ZZRingElem, i::Int, j::Int)
