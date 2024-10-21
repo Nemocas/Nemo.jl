@@ -45,7 +45,7 @@ end
 
 function deepcopy_internal(a::RealFieldElem, dict::IdDict)
   b = parent(a)()
-  ccall((:arb_set, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}), b, a)
+  _arb_set(b, a)
   return b
 end
 

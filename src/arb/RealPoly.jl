@@ -466,19 +466,17 @@ end
 
 function arb_vec(b::Vector{RealFieldElem})
   v = ccall((:_arb_vec_init, libflint), Ptr{arb_struct}, (Int,), length(b))
-  for i=1:length(b)
-    ccall((:arb_set, libflint), Nothing, (Ptr{arb_struct}, Ref{RealFieldElem}),
-          v + (i-1)*sizeof(arb_struct), b[i])
+  for i in 1:length(b)
+    _arb_set(v + (i-1)*sizeof(arb_struct), b[i])
   end
   return v
 end
 
 function array(R::RealField, v::Ptr{arb_struct}, n::Int)
   r = Vector{RealFieldElem}(undef, n)
-  for i=1:n
+  for i in 1:n
     r[i] = R()
-    ccall((:arb_set, libflint), Nothing, (Ref{RealFieldElem}, Ptr{arb_struct}),
-          r[i], v + (i-1)*sizeof(arb_struct))
+    _arb_set(r[i], v + (i-1)*sizeof(arb_struct))
   end
   return r
 end
