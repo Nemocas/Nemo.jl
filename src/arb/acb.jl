@@ -65,7 +65,7 @@ end
 
 function deepcopy_internal(a::AcbFieldElem, dict::IdDict)
   b = parent(a)()
-  ccall((:acb_set, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}), b, a)
+  _acb_set(b, a)
   return b
 end
 

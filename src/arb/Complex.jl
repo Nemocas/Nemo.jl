@@ -55,7 +55,7 @@ end
 
 function deepcopy_internal(a::ComplexFieldElem, dict::IdDict)
   b = ComplexFieldElem()
-  ccall((:acb_set, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}), b, a)
+  _acb_set(b, a)
   return b
 end
 

@@ -33,7 +33,7 @@ precision(x::AcbMatrixSpace) = precision(base_ring(x))
 function getindex!(z::AcbFieldElem, x::AcbMatrix, r::Int, c::Int)
   GC.@preserve x begin
     v = mat_entry_ptr(x, r, c)
-    ccall((:acb_set, libflint), Nothing, (Ref{AcbFieldElem}, Ptr{AcbFieldElem}), z, v)
+    _acb_set(z, v)
   end
   return z
 end
@@ -44,7 +44,7 @@ end
   z = base_ring(x)()
   GC.@preserve x begin
     v = mat_entry_ptr(x, r, c)
-    ccall((:acb_set, libflint), Nothing, (Ref{AcbFieldElem}, Ptr{AcbFieldElem}), z, v)
+    _acb_set(z, v)
   end
   return z
 end
