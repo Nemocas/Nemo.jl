@@ -1652,11 +1652,19 @@ for (typeofx, passtoc) in ((AcbFieldElem, Ref{AcbFieldElem}), (Ptr{AcbFieldElem}
             (($passtoc), ($passtoc), Int), x, x, p)
     end
 
-    function _acb_set(x::($typeofx), y::AcbFieldElem)
+    function _acb_set(x::($typeofx), y::AcbFieldElemOrPtr)
       ccall((:acb_set, libflint), Nothing, (($passtoc), Ref{AcbFieldElem}), x, y)
     end
 
-    function _acb_set(x::($typeofx), y::AcbFieldElem, p::Int)
+    function _acb_set(x::($typeofx), y::Ptr{acb_struct})
+      ccall((:acb_set, libflint), Nothing, (($passtoc), Ptr{acb_struct}), x, y)
+    end
+
+    function _acb_set(x::Ptr{acb_struct}, y::($typeofx))
+      ccall((:acb_set, libflint), Nothing, (Ptr{acb_struct}, ($passtoc)) , x, y)
+    end
+
+    function _acb_set(x::($typeofx), y::AcbFieldElemOrPtr, p::Int)
       ccall((:acb_set_round, libflint), Nothing,
             (($passtoc), Ref{AcbFieldElem}, Int), x, y, p)
     end

@@ -1657,11 +1657,19 @@ for (typeofx, passtoc) in ((ComplexFieldElem, Ref{ComplexFieldElem}), (Ptr{Compl
             (($passtoc), ($passtoc), Int), x, x, p)
     end
 
-    function _acb_set(x::($typeofx), y::ComplexFieldElem)
+    function _acb_set(x::($typeofx), y::ComplexFieldElemOrPtr)
       ccall((:acb_set, libflint), Nothing, (($passtoc), Ref{ComplexFieldElem}), x, y)
     end
 
-    function _acb_set(x::($typeofx), y::ComplexFieldElem, p::Int)
+    function _acb_set(x::($typeofx), y::Ptr{acb_struct})
+      ccall((:acb_set, libflint), Nothing, (($passtoc), Ptr{acb_struct}), x, y)
+    end
+
+    function _acb_set(x::Ptr{acb_struct}, y::($typeofx))
+      ccall((:acb_set, libflint), Nothing, (Ptr{acb_struct}, ($passtoc)) , x, y)
+    end
+
+    function _acb_set(x::($typeofx), y::ComplexFieldElemOrPtr, p::Int)
       ccall((:acb_set_round, libflint), Nothing,
             (($passtoc), Ref{ComplexFieldElem}, Int), x, y, p)
     end

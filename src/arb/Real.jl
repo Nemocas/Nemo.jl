@@ -1988,11 +1988,19 @@ for (typeofx, passtoc) in ((RealFieldElem, Ref{RealFieldElem}), (Ptr{RealFieldEl
             (($passtoc), Ref{QQFieldElem}, Int), x, y, p)
     end
 
-    function _arb_set(x::($typeofx), y::RealFieldElem)
+    function _arb_set(x::($typeofx), y::RealFieldElemOrPtr)
       ccall((:arb_set, libflint), Nothing, (($passtoc), Ref{RealFieldElem}), x, y)
     end
 
-    function _arb_set(x::($typeofx), y::RealFieldElem, p::Int)
+    function _arb_set(x::($typeofx), y::Ptr{arb_struct})
+      ccall((:arb_set, libflint), Nothing, (($passtoc), Ptr{arb_struct}), x, y)
+    end
+
+    function _arb_set(x::Ptr{arb_struct}, y::($typeofx))
+      ccall((:arb_set, libflint), Nothing, (Ptr{arb_struct}, ($passtoc)) , x, y)
+    end
+
+    function _arb_set(x::($typeofx), y::RealFieldElemOrPtr, p::Int)
       ccall((:arb_set_round, libflint), Nothing,
             (($passtoc), Ref{RealFieldElem}, Int), x, y, p)
     end
