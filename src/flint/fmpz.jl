@@ -1468,7 +1468,7 @@ julia> isqrt(ZZ(13))
 ```
 """
 function isqrt(x::ZZRingElem)
-  x < 0 && throw(DomainError(x, "Argument must be non-negative"))
+  is_negative(x) && throw(DomainError(x, "Argument must be non-negative"))
   z = ZZRingElem()
   ccall((:fmpz_sqrt, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}), z, x)
   return z
@@ -1489,7 +1489,7 @@ julia> isqrtrem(ZZ(13))
 ```
 """
 function isqrtrem(x::ZZRingElem)
-  x < 0 && throw(DomainError(x, "Argument must be non-negative"))
+  is_negative(x) && throw(DomainError(x, "Argument must be non-negative"))
   s = ZZRingElem()
   r = ZZRingElem()
   ccall((:fmpz_sqrtrem, libflint), Nothing,
@@ -1498,20 +1498,16 @@ function isqrtrem(x::ZZRingElem)
 end
 
 function Base.sqrt(x::ZZRingElem; check=true)
-  x < 0 && throw(DomainError(x, "Argument must be non-negative"))
+  is_negative(x) && throw(DomainError(x, "Argument must be non-negative"))
   if check
     for i = 1:length(sqrt_moduli)
       res = mod(x, sqrt_moduli[i])
       !(res in sqrt_residues[i]) && error("Not a square")
     end
-    s = ZZRingElem()
-    r = ZZRingElem()
-    ccall((:fmpz_sqrtrem, libflint), Nothing,
-          (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), s, r, x)
+    s, r = isqrtrem(x)
     !iszero(r) && error("Not a square")
   else
-    s = ZZRingElem()
-    ccall((:fmpz_sqrt, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}), s, x)
+    s = isqrt(x)
   end
   return s
 end
@@ -1520,7 +1516,7 @@ is_square(x::ZZRingElem) = Bool(ccall((:fmpz_is_square, libflint), Cint,
                                       (Ref{ZZRingElem},), x))
 
 function is_square_with_sqrt(x::ZZRingElem)
-  if x < 0
+  if is_negative(x)
     return false, zero(ZZRingElem)
   end
   for i = 1:length(sqrt_moduli)
@@ -1529,10 +1525,7 @@ function is_square_with_sqrt(x::ZZRingElem)
       return false, zero(ZZRingElem)
     end
   end
-  s = ZZRingElem()
-  r = ZZRingElem()
-  ccall((:fmpz_sqrtrem, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), s, r, x)
+  s, r = isqrtrem(x)
   if !iszero(r)
     return false, zero(ZZRingElem)
   end
