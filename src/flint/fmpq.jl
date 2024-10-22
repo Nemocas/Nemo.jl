@@ -351,8 +351,7 @@ cmp(a::QQFieldElemOrPtr, b::Integer) = cmp(a, flintify(b))
 cmp(a::Union{ZZRingElemOrPtr, Integer}, b::QQFieldElemOrPtr) = -cmp(b, a)
 
 function ==(a::QQFieldElem, b::QQFieldElem)
-  return ccall((:fmpq_equal, libflint), Bool,
-               (Ref{QQFieldElem}, Ref{QQFieldElem}), a, b)
+  return @ccall libflint.fmpq_equal(a::Ref{QQFieldElem}, b::Ref{QQFieldElem})::Bool
 end
 
 function isless(a::QQFieldElem, b::QQFieldElem)

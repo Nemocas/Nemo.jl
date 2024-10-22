@@ -500,8 +500,7 @@ function ==(x::QQRelPowerSeriesRingElem, y::QQFieldElem)
       z = QQFieldElem()
       ccall((:fmpq_poly_get_coeff_fmpq, libflint), Nothing,
             (Ref{QQFieldElem}, Ref{QQRelPowerSeriesRingElem}, Int), z, x, 0)
-      return ccall((:fmpq_equal, libflint), Bool,
-                   (Ref{QQFieldElem}, Ref{QQFieldElem}, Int), z, y, 0)
+      return z == y
     else
       return false
     end
