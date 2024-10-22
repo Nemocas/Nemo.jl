@@ -721,9 +721,8 @@ julia> c = reconstruct(ZZ(123), ZZ(237))
 ```
 """
 function reconstruct(a::ZZRingElem, m::ZZRingElem)
-  c = QQFieldElem()
-  if !Bool(ccall((:fmpq_reconstruct_fmpz, libflint), Cint,
-                 (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), c, a, m))
+  success, c = unsafe_reconstruct(a, m)
+  if !success
     error("Impossible rational reconstruction")
   end
   return c
