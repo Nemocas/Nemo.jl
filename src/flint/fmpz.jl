@@ -1365,13 +1365,11 @@ always be non-negative and will be zero if any input is zero.
 """
 function lcm(x::ZZRingElem, y::ZZRingElem, z::ZZRingElem...)
   m = ZZRingElem()
-  ccall((:fmpz_lcm, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), m, x, y)
+  m = lcm!(m, x, y)
   length(z) == 0 && return m
 
-  for ix in 1:length(z)
-    ccall((:fmpz_lcm, libflint), Nothing,
-          (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), m, m, z[ix])
+  for zi in z
+    m = lcm!(m, zi)
   end
   return m
 end
@@ -1390,12 +1388,10 @@ function lcm(x::Vector{ZZRingElem})
   end
 
   z = ZZRingElem()
-  ccall((:fmpz_lcm, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x[1], x[2])
+  z = lcm!(z, x[1], x[2])
 
   for i in 3:length(x)
-    ccall((:fmpz_lcm, libflint), Nothing,
-          (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, z, x[i])
+    z = lcm!(z, x[i])
   end
 
   return z
