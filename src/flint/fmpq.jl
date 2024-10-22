@@ -671,25 +671,25 @@ remove(a::QQFieldElem, b::Integer) = remove(a, ZZRingElem(b))
 valuation(a::QQFieldElem, b::Integer) = valuation(a, ZZRingElem(b))
 
 function remove!(a::QQFieldElem, b::ZZRingElem)
-  nr = ccall((:fmpq_numerator_ptr, libflint), Ptr{ZZRingElem}, (Ref{QQFieldElem},), a)
+  nr = _num_ptr(a)
   vn, nr = remove!(nr, b)
   #QQFieldElem's are simplified: either num OR den will be non-trivial
-  if vn != 0
+  if !is_zero(vn)
     return vn, a
   end
-  nr = ccall((:fmpq_denominator_ptr, libflint), Ptr{ZZRingElem}, (Ref{QQFieldElem},), a)
+  nr = _den_ptr(a)
   vn, nr = remove!(nr, b)
   return -vn, a
 end
 
 function valuation!(a::QQFieldElem, b::ZZRingElem)
-  nr = ccall((:fmpq_numerator_ptr, libflint), Ptr{ZZRingElem}, (Ref{QQFieldElem},), a)
+  nr = _num_ptr(a)
   vn, nr = remove!(nr, b)
   #QQFieldElem's are simplified: either num OR den will be non-trivial
-  if vn != 0
+  if !is_zero(vn)
     return vn
   end
-  nr = ccall((:fmpq_denominator_ptr, libflint), Ptr{ZZRingElem}, (Ref{QQFieldElem},), a)
+  nr = _den_ptr(a)
   vn, nr = remove!(nr, b)
   return -vn
 end
