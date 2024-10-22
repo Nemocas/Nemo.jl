@@ -1317,13 +1317,11 @@ always be non-negative and will be zero iff all inputs are zero.
 """
 function gcd(x::ZZRingElem, y::ZZRingElem, z::ZZRingElem...)
   d = ZZRingElem()
-  ccall((:fmpz_gcd, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), d, x, y)
+  d = gcd!(d, x, y)
   length(z) == 0 && return d
 
-  for ix in 1:length(z)
-    ccall((:fmpz_gcd, libflint), Nothing,
-          (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), d, d, z[ix])
+  for zi in z
+    d = gcd!(d, zi)
   end
   return d
 end
@@ -1343,12 +1341,10 @@ function gcd(x::Vector{ZZRingElem})
   end
 
   z = ZZRingElem()
-  ccall((:fmpz_gcd, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x[1], x[2])
+  z = gcd!(z, x[1], x[2])
 
   for i in 3:length(x)
-    ccall((:fmpz_gcd, libflint), Nothing,
-          (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, z, x[i])
+    z = gcd!(z, x[i])
     if isone(z)
       return z
     end
