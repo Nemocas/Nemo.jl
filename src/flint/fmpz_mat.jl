@@ -769,7 +769,7 @@ function hadamard_bound2(M::ZZMatrix)
       zero!(r)
       M_ptr = mat_entry_ptr(M, i, 1)
       for j in 1:n
-        ccall((:fmpz_addmul, libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}), r, M_ptr, M_ptr)
+        addmul!(r, M_ptr, M_ptr)
         M_ptr += sizeof(ZZRingElem)
       end
       if iszero(r)
@@ -1395,7 +1395,7 @@ function AbstractAlgebra.add_row!(A::ZZMatrix, s::ZZRingElem, i::Int, j::Int)
     i_ptr = mat_entry_ptr(A, i, 1)
     j_ptr = mat_entry_ptr(A, j, 1)
     for k = 1:ncols(A)
-      ccall((:fmpz_addmul, libflint), Cvoid, (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), i_ptr, s, j_ptr)
+      addmul!(i_ptr, s, j_ptr)
       i_ptr += sizeof(ZZRingElem)
       j_ptr += sizeof(ZZRingElem)
     end
@@ -1409,7 +1409,7 @@ function AbstractAlgebra.add_column!(A::ZZMatrix, s::ZZRingElem, i::Int, j::Int)
     for k = 1:nrows(A)
       i_ptr = mat_entry_ptr(A, k, i)
       j_ptr = mat_entry_ptr(A, k, j)
-      ccall((:fmpz_addmul, libflint), Cvoid, (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), i_ptr, s, j_ptr)
+      addmul!(i_ptr, s, j_ptr)
     end
   end
 end
@@ -1633,7 +1633,7 @@ function _solve_triu_left(U::ZZMatrix, b::ZZMatrix)
         tmp_p = mat_entry_ptr(tmp, 1, 1)
         for k = 1:j-1
           U_p = mat_entry_ptr(U, k, j)
-          ccall((:fmpz_addmul, libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}), s, U_p, tmp_p)
+          addmul!(s, U_p, tmp_p)
           tmp_p += sizeof(ZZRingElem)
         end
         ccall((:fmpz_sub, libflint), Cvoid, 
@@ -1673,7 +1673,7 @@ function _solve_triu(U::ZZMatrix, b::ZZMatrix)
         tmp_ptr = mat_entry_ptr(tmp, 1, j+1)
         for k = j + 1:n
           U_ptr = mat_entry_ptr(U, j, k)
-          ccall((:fmpz_addmul, libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}), s, U_ptr, tmp_ptr)
+          mul!(s, U_ptr, tmp_ptr)
           tmp_ptr += sizeof(ZZRingElem)
           #           s = addmul!(s, U[j, k], tmp[k])
         end
