@@ -793,7 +793,7 @@ function maximum(::typeof(nbits), M::ZZMatrix)
         #this is not going through the "correct" order of the rows, but 
         #for this is does not matter
         if !iszero(unsafe_load(reinterpret(Ptr{Int}, M_ptr)))
-          mx = max(mx, ccall((:fmpz_bits, libflint), Culong, (Ptr{ZZRingElem},), M_ptr))
+          mx = max(mx, nbits(M_ptr))
         end
         M_ptr += sizeof(ZZRingElem)
       end

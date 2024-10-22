@@ -2328,8 +2328,7 @@ julia> nbits(ZZ(12))
 4
 ```
 """
-nbits(x::ZZRingElem) = iszero(x) ? 0 : Int(ccall((:fmpz_bits, libflint), Clong,
-                                                 (Ref{ZZRingElem},), x))  
+nbits(x::ZZRingElemOrPtr) = Int(@ccall libflint.fmpz_bits(x::Ref{ZZRingElem})::Culong)
 
 @doc raw"""
     nbits(a::Integer) -> Int
