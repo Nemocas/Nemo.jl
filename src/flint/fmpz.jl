@@ -416,14 +416,11 @@ end
 
 function divexact(x::ZZRingElem, y::ZZRingElem; check::Bool=true)
   iszero(y) && throw(DivideError())
-  z = ZZRingElem()
   if check
-    r = ZZRingElem()
-    ccall((:fmpz_tdiv_qr, libflint), Nothing,
-          (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, r, x, y)
-    r != 0 && throw(ArgumentError("Not an exact division"))
+    z, r = tdivrem(x, y)
+    is_zero(r) || throw(ArgumentError("Not an exact division"))
   else
-    z = divexact!(z, x, y)
+    z = divexact!(ZZRingElem(), x, y)
   end
   return z
 end
@@ -482,11 +479,7 @@ function is_divisible_by(x::Integer, y::ZZRingElem)
 end
 
 function rem(x::ZZRingElem, c::ZZRingElem)
-  iszero(c) && throw(DivideError())
-  q = ZZRingElem()
-  r = ZZRingElem()
-  ccall((:fmpz_tdiv_qr, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), q, r, x, c)
+  q, r = Base.divrem(x, c)
   return r
 end
 
@@ -675,22 +668,12 @@ Base.divrem(x::ZZRingElem, y::Int) = (Base.div(x, y), Base.rem(x, y))
 ###############################################################################
 
 function divrem(x::ZZRingElem, y::ZZRingElem)
-  iszero(y) && throw(DivideError())
-  z1 = ZZRingElem()
-  z2 = ZZRingElem()
-  ccall((:fmpz_fdiv_qr, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z1, z2, x, y)
-  z1, z2
+  return fdivrem(x, y)
 end
 
 # N.B. Base.divrem differs from Nemo.divrem
 function Base.divrem(x::ZZRingElem, y::ZZRingElem)
-  iszero(y) && throw(DivideError())
-  z1 = ZZRingElem()
-  z2 = ZZRingElem()
-  ccall((:fmpz_tdiv_qr, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z1, z2, x, y)
-  z1, z2
+  return tdivrem(x, y)
 end
 
 function tdivrem(x::ZZRingElem, y::ZZRingElem)
@@ -721,12 +704,8 @@ function cdivrem(x::ZZRingElem, y::ZZRingElem)
 end
 
 function ntdivrem(x::ZZRingElem, y::ZZRingElem)
-  iszero(y) && throw(DivideError())
-  z1 = ZZRingElem()
-  z2 = ZZRingElem()
-  ccall((:fmpz_ndiv_qr, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z1, z2, x, y)
-  return z1, z2
+  # ties are the only possible remainders
+  return ndivrem(x, y)
 end
 
 function nfdivrem(a::ZZRingElem, b::ZZRingElem)
