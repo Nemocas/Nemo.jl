@@ -423,8 +423,7 @@ function divexact(x::ZZRingElem, y::ZZRingElem; check::Bool=true)
           (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, r, x, y)
     r != 0 && throw(ArgumentError("Not an exact division"))
   else
-    ccall((:fmpz_divexact, libflint), Nothing,
-          (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x, y)
+    z = divexact!(z, x, y)
   end
   return z
 end

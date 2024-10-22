@@ -1636,8 +1636,7 @@ function _solve_triu_left(U::ZZMatrix, b::ZZMatrix)
           tmp_p += sizeof(ZZRingElem)
         end
         sub!(s, mat_entry_ptr(b, i, j), s)
-        ccall((:fmpz_divexact, libflint), Cvoid, 
-              (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), mat_entry_ptr(tmp, 1, j), s, mat_entry_ptr(U, j, j))
+        divexact!(mat_entry_ptr(tmp, 1, j), s, mat_entry_ptr(U, j, j))
       end
       tmp_p = mat_entry_ptr(tmp, 1, 1)
       X_p = mat_entry_ptr(X, i, 1)
@@ -1680,8 +1679,7 @@ function _solve_triu(U::ZZMatrix, b::ZZMatrix)
         #         s = b[j, i] - s
         tmp_ptr = mat_entry_ptr(tmp, 1, j)
         U_ptr = mat_entry_ptr(U, j, j)
-        ccall((:fmpz_divexact, libflint), Cvoid, (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), tmp_ptr, s, U_ptr)
-
+        divexact!(tmp_ptr, s, U_ptr)
         #           tmp[j] = divexact(s, U[j,j])
       end
       tmp_ptr = mat_entry_ptr(tmp, 1, 1)
