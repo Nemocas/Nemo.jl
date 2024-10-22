@@ -1708,7 +1708,7 @@ function next_prime(x::Int, proved::Bool = true)
   return x < 2 ? 2 : Int(next_prime(x % UInt, proved))
 end
 
-function remove!(a::ZZRingElem, b::ZZRingElem)
+function remove!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
   v = ccall((:fmpz_remove, libflint), Clong, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), a, a, b)
   return v, a
 end

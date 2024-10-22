@@ -672,25 +672,25 @@ valuation(a::QQFieldElem, b::Integer) = valuation(a, ZZRingElem(b))
 
 function remove!(a::QQFieldElem, b::ZZRingElem)
   nr = ccall((:fmpq_numerator_ptr, libflint), Ptr{ZZRingElem}, (Ref{QQFieldElem},), a)
-  vn = ccall((:fmpz_remove, libflint), Clong, (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), nr, nr, b)
+  vn, nr = remove!(nr, b)
   #QQFieldElem's are simplified: either num OR den will be non-trivial
   if vn != 0
     return vn, a
   end
   nr = ccall((:fmpq_denominator_ptr, libflint), Ptr{ZZRingElem}, (Ref{QQFieldElem},), a)
-  vn = ccall((:fmpz_remove, libflint), Clong, (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), nr, nr, b)
+  vn, nr = remove!(nr, b)
   return -vn, a
 end
 
 function valuation!(a::QQFieldElem, b::ZZRingElem)
   nr = ccall((:fmpq_numerator_ptr, libflint), Ptr{ZZRingElem}, (Ref{QQFieldElem},), a)
-  vn = ccall((:fmpz_remove, libflint), Clong, (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), nr, nr, b)
+  vn, nr = remove!(nr, b)
   #QQFieldElem's are simplified: either num OR den will be non-trivial
   if vn != 0
     return vn
   end
   nr = ccall((:fmpq_denominator_ptr, libflint), Ptr{ZZRingElem}, (Ref{QQFieldElem},), a)
-  vn = ccall((:fmpz_remove, libflint), Clong, (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), nr, nr, b)
+  vn, nr = remove!(nr, b)
   return -vn
 end
 
