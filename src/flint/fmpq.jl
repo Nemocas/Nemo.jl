@@ -79,9 +79,7 @@ function numerator(a::QQFieldElem)
 end
 
 function denominator(a::QQFieldElem)
-  z = ZZRingElem()
-  ccall((:fmpq_denominator, libflint), Nothing, (Ref{ZZRingElem}, Ref{QQFieldElem}), z, a)
-  return z
+  return denominator!(ZZRingElem(), a)
 end
 
 @doc raw"""
@@ -1078,8 +1076,8 @@ function numerator!(z::ZZRingElem, y::QQFieldElem)
   return z
 end
 
-function denominator!(z::ZZRingElem, y::QQFieldElem)
-  ccall((:fmpq_denominator, libflint), Cvoid, (Ref{ZZRingElem}, Ref{QQFieldElem}), z, y)
+function denominator!(z::ZZRingElemOrPtr, y::QQFieldElemOrPtr)
+  @ccall libflint.fmpq_denominator(z::Ref{ZZRingElem}, y::Ref{QQFieldElem})::Nothing
   return z
 end
 
