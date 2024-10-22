@@ -215,9 +215,9 @@ zero(::Type{ZZRingElem}) = ZZRingElem(0)
 
 Return the sign of $a$, i.e. $+1$, $0$ or $-1$.
 """
-sign(a::ZZRingElem) = ZZRingElem(ccall((:fmpz_sgn, libflint), Cint, (Ref{ZZRingElem},), a))
+sign(a::ZZRingElemOrPtr) = ZZRingElem(@ccall libflint.fmpz_sgn(a::Ref{ZZRingElem})::Cint)
 
-sign(::Type{Int}, a::ZZRingElemOrPtr) = Int(ccall((:fmpz_sgn, libflint), Cint, (Ref{ZZRingElem},), a))
+sign(::Type{Int}, a::ZZRingElemOrPtr) = Int(@ccall libflint.fmpz_sgn(a::Ref{ZZRingElem})::Cint)
 
 Base.signbit(a::ZZRingElemOrPtr) = signbit(sign(Int, a))
 

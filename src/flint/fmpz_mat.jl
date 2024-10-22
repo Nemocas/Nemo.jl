@@ -158,8 +158,7 @@ end
   @boundscheck _checkbounds(A, i, j)
   GC.@preserve A begin
     m = mat_entry_ptr(A, i, j)
-    fl = ccall((:fmpz_sgn, libflint), Int, (Ptr{ZZRingElem},), m)
-    return isone(fl)
+    return is_positive(m)
   end
 end
 
