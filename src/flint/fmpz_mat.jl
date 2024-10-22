@@ -1627,7 +1627,7 @@ function _solve_triu_left(U::ZZMatrix, b::ZZMatrix)
         tmp_p += sizeof(ZZRingElem)
       end
       for j = 1:n
-        ccall((:fmpz_zero, libflint), Cvoid, (Ref{ZZRingElem}, ), s) 
+        zero!(s)
 
         tmp_p = mat_entry_ptr(tmp, 1, 1)
         for k = 1:j-1
@@ -1668,7 +1668,7 @@ function _solve_triu(U::ZZMatrix, b::ZZMatrix)
         tmp_ptr += sizeof(ZZRingElem)
       end
       for j = n:-1:1
-        ccall((:fmpz_zero, libflint), Cvoid, (Ref{ZZRingElem}, ), s)
+        zero!(s)
         tmp_ptr = mat_entry_ptr(tmp, 1, j+1)
         for k = j + 1:n
           U_ptr = mat_entry_ptr(U, j, k)
