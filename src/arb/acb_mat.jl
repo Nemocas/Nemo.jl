@@ -528,15 +528,19 @@ end
 #
 ###############################################################################
 
-function lu!(P::Perm, x::AcbMatrix)
+function lu!(P::Perm, z::AcbMatrix, x::AcbMatrix)
   P.d .-= 1
   r = ccall((:acb_mat_lu, libflint), Cint,
             (Ptr{Int}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
-            P.d, x, x, precision(base_ring(x)))
+            P.d, z, x, precision(base_ring(x)))
   r == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
   P.d .+= 1
   inv!(P)
   return nrows(x)
+end
+
+function lu!(P::Perm, x::AcbMatrix)
+  return lu!(P, x, x)
 end
 
 function _solve!(z::AcbMatrix, x::AcbMatrix, y::AcbMatrix)
@@ -597,13 +601,7 @@ function Solve._init_reduce(C::Solve.SolveCtx{AcbFieldElem, Solve.LUTrait})
   A = matrix(C)
   P = Perm(nrows(C))
   x = similar(A, nrows(A), ncols(A))
-  P.d .-= 1
-  fl = ccall((:acb_mat_lu, libflint), Cint,
-             (Ptr{Int}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
-             P.d, x, A, precision(base_ring(A)))
-  fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
-  P.d .+= 1
-  inv!(P)
+  lu!(P, x, A)
 
   C.red = x
   C.lu_perm = P
@@ -620,13 +618,7 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{AcbFieldElem, Solve.LUTr
   A = transpose(matrix(C))
   P = Perm(nrows(C))
   x = similar(A, nrows(A), ncols(A))
-  P.d .-= 1
-  fl = ccall((:acb_mat_lu, libflint), Cint,
-             (Ptr{Int}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
-             P.d, x, A, precision(base_ring(A)))
-  fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
-  P.d .+= 1
-  inv!(P)
+  lu!(P, x, A)
 
   C.red_transp = x
   C.lu_perm_transp = P

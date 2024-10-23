@@ -525,15 +525,19 @@ end
 #
 ###############################################################################
 
-function lu!(P::Perm, x::ComplexMatrix)
+function lu!(P::Perm, z::ComplexMatrix, x::ComplexMatrix)
   P.d .-= 1
   r = ccall((:acb_mat_lu, libflint), Cint,
             (Ptr{Int}, Ref{ComplexMatrix}, Ref{ComplexMatrix}, Int),
-            P.d, x, x, precision(Balls))
+            P.d, z, x, precision(Balls))
   r == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
   P.d .+= 1
   inv!(P)
   return min(nrows(x), ncols(x))
+end
+
+function lu!(P::Perm, x::ComplexMatrix)
+  return lu!(P, x, x)
 end
 
 function _solve!(z::ComplexMatrix, x::ComplexMatrix, y::ComplexMatrix)
@@ -595,13 +599,7 @@ function Solve._init_reduce(C::Solve.SolveCtx{ComplexFieldElem, Solve.LUTrait})
   A = matrix(C)
   P = Perm(nrows(C))
   x = similar(A, nrows(A), ncols(A))
-  P.d .-= 1
-  fl = ccall((:acb_mat_lu, libflint), Cint,
-             (Ptr{Int}, Ref{ComplexMatrix}, Ref{ComplexMatrix}, Int),
-             P.d, x, A, precision(Balls))
-  fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
-  P.d .+= 1
-  inv!(P)
+  lu!(P, x, A)
 
   C.red = x
   C.lu_perm = P
@@ -618,13 +616,7 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{ComplexFieldElem, Solve.
   A = transpose(matrix(C))
   P = Perm(nrows(C))
   x = similar(A, nrows(A), ncols(A))
-  P.d .-= 1
-  fl = ccall((:acb_mat_lu, libflint), Cint,
-             (Ptr{Int}, Ref{ComplexMatrix}, Ref{ComplexMatrix}, Int),
-             P.d, x, A, precision(Balls))
-  fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
-  P.d .+= 1
-  inv!(P)
+  lu!(P, x, A)
 
   C.red_transp = x
   C.lu_perm_transp = P
