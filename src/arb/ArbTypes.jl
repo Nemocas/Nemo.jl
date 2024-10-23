@@ -716,16 +716,14 @@ mutable struct AcbPolyRingElem <: PolyRingElem{AcbFieldElem}
 
   function AcbPolyRingElem(x::AcbFieldElem, p::Int)
     z = AcbPolyRingElem()
-    ccall((:acb_poly_set_coeff_acb, libflint), Nothing,
-          (Ref{AcbPolyRingElem}, Int, Ref{AcbFieldElem}), z, 0, x)
+    setcoeff!(z, 0, x)
     return z
   end
 
   function AcbPolyRingElem(x::Vector{AcbFieldElem}, p::Int)
     z = AcbPolyRingElem()
-    for i = 1:length(x)
-      ccall((:acb_poly_set_coeff_acb, libflint), Nothing,
-            (Ref{AcbPolyRingElem}, Int, Ref{AcbFieldElem}), z, i - 1, x[i])
+    for i in 1:length(x)
+      setcoeff!(z, i - 1, x[i])
     end
     return z
   end
