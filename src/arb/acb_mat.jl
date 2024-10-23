@@ -573,10 +573,7 @@ function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::AcbMatrix, b::Ac
   end
 
   x = similar(A, ncols(A), ncols(b))
-  fl = ccall((:acb_mat_solve, libflint), Cint,
-             (Ref{AcbMatrix}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
-             x, A, b, precision(base_ring(A)))
-  fl == 0 && error("Matrix cannot be inverted numerically")
+  _solve!(x, A, b)
   if task === :only_check || task === :with_solution
     return true, x, zero(A, 0, 0)
   end
