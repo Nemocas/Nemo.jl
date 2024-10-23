@@ -467,16 +467,20 @@ end
 #
 ###############################################################################
 
-function lu!(P::Perm, x::RealMatrix)
+function lu!(P::Perm, z::RealMatrix, x::RealMatrix)
   parent(P).n != nrows(x) && error("Permutation does not match matrix")
   P.d .-= 1
   r = ccall((:arb_mat_lu, libflint), Cint,
             (Ptr{Int}, Ref{RealMatrix}, Ref{RealMatrix}, Int),
-            P.d, x, x, precision(Balls))
+            P.d, z, x, precision(Balls))
   r == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
   P.d .+= 1
   inv!(P)
   return min(nrows(x), ncols(x))
+end
+
+function lu!(P::Perm, x::RealMatrix)
+  return lu!(P, x, x)
 end
 
 function _solve!(z::RealMatrix, x::RealMatrix, y::RealMatrix)
@@ -537,13 +541,7 @@ function Solve._init_reduce(C::Solve.SolveCtx{RealFieldElem, Solve.LUTrait})
   A = matrix(C)
   P = Perm(nrows(C))
   x = similar(A, nrows(A), ncols(A))
-  P.d .-= 1
-  fl = ccall((:arb_mat_lu, libflint), Cint,
-             (Ptr{Int}, Ref{RealMatrix}, Ref{RealMatrix}, Int),
-             P.d, x, A, precision(Balls))
-  fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
-  P.d .+= 1
-  inv!(P)
+  lu!(P, x, A)
 
   C.red = x
   C.lu_perm = P
@@ -560,13 +558,7 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{RealFieldElem, Solve.LUT
   A = transpose(matrix(C))
   P = Perm(nrows(C))
   x = similar(A, nrows(A), ncols(A))
-  P.d .-= 1
-  fl = ccall((:arb_mat_lu, libflint), Cint,
-             (Ptr{Int}, Ref{RealMatrix}, Ref{RealMatrix}, Int),
-             P.d, x, A, precision(Balls))
-  fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
-  P.d .+= 1
-  inv!(P)
+  lu!(P, x, A)
 
   C.red_transp = x
   C.lu_perm_transp = P
