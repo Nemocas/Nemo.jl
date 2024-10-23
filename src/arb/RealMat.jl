@@ -584,9 +584,7 @@ function Solve._can_solve_internal_no_check(::Solve.LUTrait, C::Solve.SolveCtx{R
   end
 
   x = similar(b, ncols(C), ncols(b))
-  ccall((:arb_mat_solve_lu_precomp, libflint), Nothing,
-        (Ref{RealMatrix}, Ptr{Int}, Ref{RealMatrix}, Ref{RealMatrix}, Int),
-        x, inv(p).d .- 1, LU, b, precision(Balls))
+  _solve_lu_precomp!(x, p, LU, b)
 
   if side === :left
     x = transpose(x)
