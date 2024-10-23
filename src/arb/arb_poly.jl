@@ -35,9 +35,9 @@ function coeff(a::ArbPolyRingElem, n::Int)
   return t
 end
 
-zero(a::ArbPolyRing) = a(0)
+zero(a::ArbPolyRing) = a()
 
-one(a::ArbPolyRing) = a(1)
+one(a::ArbPolyRing) = one!(a())
 
 function gen(a::ArbPolyRing)
   z = ArbPolyRingElem()
@@ -235,26 +235,18 @@ end
 
 function +(x::ArbPolyRingElem, y::ArbPolyRingElem)
   z = parent(x)()
-  ccall((:arb_poly_add, libflint), Nothing,
-        (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int),
-        z, x, y, precision(parent(x)))
+  return add!(z, x, y)
+end
+
+function -(x::ArbPolyRingElem, y::ArbPolyRingElem)
+  z = parent(x)()
+  return sub!(z, x, y)
   return z
 end
 
 function *(x::ArbPolyRingElem, y::ArbPolyRingElem)
   z = parent(x)()
-  ccall((:arb_poly_mul, libflint), Nothing,
-        (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int),
-        z, x, y, precision(parent(x)))
-  return z
-end
-
-function -(x::ArbPolyRingElem, y::ArbPolyRingElem)
-  z = parent(x)()
-  ccall((:arb_poly_sub, libflint), Nothing,
-        (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int),
-        z, x, y, precision(parent(x)))
-  return z
+  return mul!(z, x, y)
 end
 
 function ^(x::ArbPolyRingElem, y::Int)
@@ -630,12 +622,7 @@ function setcoeff!(z::ArbPolyRingElem, n::Int, x::ArbFieldElem)
   return z
 end
 
-function mul!(z::ArbPolyRingElem, x::ArbPolyRingElem, y::ArbPolyRingElem)
-  ccall((:arb_poly_mul, libflint), Nothing,
-        (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int),
-        z, x, y, precision(parent(z)))
-  return z
-end
+#
 
 function add!(z::ArbPolyRingElem, x::ArbPolyRingElem, y::ArbPolyRingElem)
   ccall((:arb_poly_add, libflint), Nothing,
@@ -643,6 +630,56 @@ function add!(z::ArbPolyRingElem, x::ArbPolyRingElem, y::ArbPolyRingElem)
         z, x, y, precision(parent(z)))
   return z
 end
+
+function add!(z::ArbPolyRingElem, x::ArbPolyRingElem, y::Int)
+  ccall((:arb_poly_add_si, libflint), Nothing,
+        (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int, Int),
+        z, x, y, precision(parent(z)))
+  return z
+end
+
+add!(z::ArbPolyRingElem, x::ArbPolyRingElem, y::ArbFieldElem) = add!(z, x, parent(z)(y))
+
+add!(z::ArbPolyRingElem, x::ArbPolyRingElem, y::ZZRingElem) = add!(z, x, parent(z)(y))
+
+add!(z::ArbPolyRingElem, x::ArbPolyRingElem, y::Integer) = add!(z, x, flintify(y))
+
+add!(z::ArbPolyRingElem, x::Union{ArbFieldElem,IntegerUnion}, y::ArbPolyRingElem) = add!(z, y, x)
+
+#
+
+function sub!(z::ArbPolyRingElem, x::ArbPolyRingElem, y::ArbPolyRingElem)
+  ccall((:arb_poly_sub, libflint), Nothing,
+        (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int),
+        z, x, y, precision(parent(z)))
+  return z
+end
+
+sub!(z::ArbPolyRingElem, x::ArbPolyRingElem, y::Union{ArbFieldElem,IntegerUnion}) = sub!(z, x, parent(z)(y))
+
+sub!(z::ArbPolyRingElem, x::Union{ArbFieldElem,IntegerUnion}, y::ArbPolyRingElem) = sub!(z, parent(z)(x), y)
+
+#
+
+function mul!(z::ArbPolyRingElem, x::ArbPolyRingElem, y::ArbPolyRingElem)
+  ccall((:arb_poly_mul, libflint), Nothing,
+        (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int),
+        z, x, y, precision(parent(z)))
+  return z
+end
+
+function mul!(z::ArbPolyRingElem, x::ArbPolyRingElem, y::ArbFieldElem)
+  ccall((:arb_poly_scalar_mul, libflint), Nothing,
+        (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Ref{ArbFieldElem}, Int),
+        z, x, y, precision(parent(z)))
+  return z
+end
+
+mul!(z::ArbPolyRingElem, x::ArbPolyRingElem, y::IntegerUnion) = mul!(z, x, base_ring(z)(y))
+
+mul!(z::ArbPolyRingElem, x::Union{ArbFieldElem,IntegerUnion}, y::ArbPolyRingElem) = mul!(z, y, x)
+
+#
 
 ###############################################################################
 #
