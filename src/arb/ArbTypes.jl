@@ -456,16 +456,14 @@ mutable struct RealPolyRingElem <: PolyRingElem{RealFieldElem}
 
   function RealPolyRingElem(x::RealFieldElem, p::Int)
     z = RealPolyRingElem()
-    ccall((:arb_poly_set_coeff_arb, libflint), Nothing,
-          (Ref{RealPolyRingElem}, Int, Ref{RealFieldElem}), z, 0, x)
+    setcoeff!(z, 0, x)
     return z
   end
 
   function RealPolyRingElem(x::Vector{RealFieldElem}, p::Int)
     z = RealPolyRingElem()
-    for i = 1:length(x)
-      ccall((:arb_poly_set_coeff_arb, libflint), Nothing,
-            (Ref{RealPolyRingElem}, Int, Ref{RealFieldElem}), z, i - 1, x[i])
+    for i in 1:length(x)
+      setcoeff!(z, i - 1, x[i])
     end
     return z
   end

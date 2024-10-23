@@ -41,8 +41,7 @@ one(a::RealPolyRing) = a(1)
 
 function gen(a::RealPolyRing)
   z = RealPolyRingElem()
-  ccall((:arb_poly_set_coeff_si, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Int, Int), z, 1, 1)
+  setcoeff!(z, 1, 1)
   z.parent = a
   return z
 end
@@ -618,17 +617,23 @@ function fit!(z::RealPolyRingElem, n::Int)
   return nothing
 end
 
-function setcoeff!(z::RealPolyRingElem, n::Int, x::ZZRingElem)
-  ccall((:arb_poly_set_coeff_fmpz, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Int, Ref{ZZRingElem}), z, n, x)
-  return z
-end
-
 function setcoeff!(z::RealPolyRingElem, n::Int, x::RealFieldElem)
   ccall((:arb_poly_set_coeff_arb, libflint), Nothing,
         (Ref{RealPolyRingElem}, Int, Ref{RealFieldElem}), z, n, x)
   return z
 end
+
+function setcoeff!(z::RealPolyRingElem, n::Int, x::Int)
+  ccall((:arb_poly_set_coeff_si, libflint), Nothing,
+        (Ref{RealPolyRingElem}, Int, Int), z, n, x)
+  return z
+end
+
+function setcoeff!(z::RealPolyRingElem, n::Int, x::ZZRingElem)
+  return setcoeff!(z, n, base_ring(z)(x))
+end
+
+setcoeff!(z::RealPolyRingElem, n::Int, x::Integer) = setcoeff!(z, n, flintify(x))
 
 function mul!(z::RealPolyRingElem, x::RealPolyRingElem, y::RealPolyRingElem)
   ccall((:arb_poly_mul, libflint), Nothing,
