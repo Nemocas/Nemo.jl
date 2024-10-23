@@ -35,9 +35,9 @@ function coeff(a::ComplexPolyRingElem, n::Int)
   return t
 end
 
-zero(a::ComplexPolyRing) = a(0)
+zero(a::ComplexPolyRing) = a()
 
-one(a::ComplexPolyRing) = a(1)
+one(a::ComplexPolyRing) = one!(a())
 
 function gen(a::ComplexPolyRing)
   z = ComplexPolyRingElem()
@@ -234,26 +234,17 @@ end
 
 function +(x::ComplexPolyRingElem, y::ComplexPolyRingElem)
   z = parent(x)()
-  ccall((:acb_poly_add, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Int),
-        z, x, y, precision(Balls))
-  return z
-end
-
-function *(x::ComplexPolyRingElem, y::ComplexPolyRingElem)
-  z = parent(x)()
-  ccall((:acb_poly_mul, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Int),
-        z, x, y, precision(Balls))
-  return z
+  return add!(z, x, y)
 end
 
 function -(x::ComplexPolyRingElem, y::ComplexPolyRingElem)
   z = parent(x)()
-  ccall((:acb_poly_sub, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Int),
-        z, x, y, precision(Balls))
-  return z
+  return sub!(z, x, y)
+end
+
+function *(x::ComplexPolyRingElem, y::ComplexPolyRingElem)
+  z = parent(x)()
+  return mul!(z, x, y)
 end
 
 function ^(x::ComplexPolyRingElem, y::Int)
@@ -731,19 +722,64 @@ function setcoeff!(z::ComplexPolyRingElem, n::Int, x::ComplexFieldElem)
   return z
 end
 
-function mul!(z::ComplexPolyRingElem, x::ComplexPolyRingElem, y::ComplexPolyRingElem)
-  ccall((:acb_poly_mul, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Int),
-        z, x, y, precision(parent(z)))
-  return z
-end
+#
 
 function add!(z::ComplexPolyRingElem, x::ComplexPolyRingElem, y::ComplexPolyRingElem)
   ccall((:acb_poly_add, libflint), Nothing,
         (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Int),
-        z, x, y, precision(parent(z)))
+        z, x, y, precision(Balls))
   return z
 end
+
+function add!(z::ComplexPolyRingElem, x::ComplexPolyRingElem, y::Int)
+  ccall((:acb_poly_add_si, libflint), Nothing,
+        (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Int, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+add!(z::ComplexPolyRingElem, x::ComplexPolyRingElem, y::ComplexFieldElem) = add!(z, x, parent(z)(y))
+
+add!(z::ComplexPolyRingElem, x::ComplexPolyRingElem, y::ZZRingElem) = add!(z, x, parent(z)(y))
+
+add!(z::ComplexPolyRingElem, x::ComplexPolyRingElem, y::Integer) = add!(z, x, flintify(y))
+
+add!(z::ComplexPolyRingElem, x::Union{ComplexFieldElem,IntegerUnion}, y::ComplexPolyRingElem) = add!(z, y, x)
+
+#
+
+function sub!(z::ComplexPolyRingElem, x::ComplexPolyRingElem, y::ComplexPolyRingElem)
+  ccall((:acb_poly_sub, libflint), Nothing,
+        (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+sub!(z::ComplexPolyRingElem, x::ComplexPolyRingElem, y::Union{ComplexFieldElem,IntegerUnion}) = sub!(z, x, parent(z)(y))
+
+sub!(z::ComplexPolyRingElem, x::Union{ComplexFieldElem,IntegerUnion}, y::ComplexPolyRingElem) = sub!(z, parent(z)(x), y)
+
+#
+
+function mul!(z::ComplexPolyRingElem, x::ComplexPolyRingElem, y::ComplexPolyRingElem)
+  ccall((:acb_poly_mul, libflint), Nothing,
+        (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+function mul!(z::ComplexPolyRingElem, x::ComplexPolyRingElem, y::ComplexFieldElem)
+  ccall((:acb_poly_scalar_mul, libflint), Nothing,
+        (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Ref{ComplexFieldElem}, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+mul!(z::ComplexPolyRingElem, x::ComplexPolyRingElem, y::IntegerUnion) = mul!(z, x, base_ring(z)(y))
+
+mul!(z::ComplexPolyRingElem, x::Union{ComplexFieldElem,IntegerUnion}, y::ComplexPolyRingElem) = mul!(z, y, x)
+
+#
 
 ###############################################################################
 #
