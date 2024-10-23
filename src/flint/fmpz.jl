@@ -491,10 +491,6 @@ function rem(x::ZZRingElem, c::ZZRingElem)
   return r
 end
 
-function rem(a::ZZRingElem, b::UInt)
-  return ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), a, b)
-end
-
 ###############################################################################
 #
 #   Ad hoc binary operators
