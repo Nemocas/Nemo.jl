@@ -625,16 +625,14 @@ mutable struct ComplexPolyRingElem <: PolyRingElem{ComplexFieldElem}
 
   function ComplexPolyRingElem(x::ComplexFieldElem, p::Int)
     z = ComplexPolyRingElem()
-    ccall((:acb_poly_set_coeff_acb, libflint), Nothing,
-          (Ref{ComplexPolyRingElem}, Int, Ref{ComplexFieldElem}), z, 0, x)
+    setcoeff!(z, 0, x)
     return z
   end
 
   function ComplexPolyRingElem(x::Vector{ComplexFieldElem}, p::Int)
     z = ComplexPolyRingElem()
-    for i = 1:length(x)
-      ccall((:acb_poly_set_coeff_acb, libflint), Nothing,
-            (Ref{ComplexPolyRingElem}, Int, Ref{ComplexFieldElem}), z, i - 1, x[i])
+    for i in 1:length(x)
+      setcoeff!(z, i - 1, x[i])
     end
     return z
   end
