@@ -538,16 +538,14 @@ mutable struct ArbPolyRingElem <: PolyRingElem{ArbFieldElem}
 
   function ArbPolyRingElem(x::ArbFieldElem, p::Int)
     z = ArbPolyRingElem()
-    ccall((:arb_poly_set_coeff_arb, libflint), Nothing,
-          (Ref{ArbPolyRingElem}, Int, Ref{ArbFieldElem}), z, 0, x)
+    setcoeff!(z, 0, x)
     return z
   end
 
   function ArbPolyRingElem(x::Vector{ArbFieldElem}, p::Int)
     z = ArbPolyRingElem()
-    for i = 1:length(x)
-      ccall((:arb_poly_set_coeff_arb, libflint), Nothing,
-            (Ref{ArbPolyRingElem}, Int, Ref{ArbFieldElem}), z, i - 1, x[i])
+    for i in 1:length(x)
+      setcoeff!(z, i - 1, x[i])
     end
     return z
   end
