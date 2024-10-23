@@ -513,10 +513,7 @@ function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::RealMatrix, b::R
   end
 
   x = similar(A, ncols(A), ncols(b))
-  fl = ccall((:arb_mat_solve, libflint), Cint,
-             (Ref{RealMatrix}, Ref{RealMatrix}, Ref{RealMatrix}, Int),
-             x, A, b, precision(Balls))
-  fl == 0 && error("Matrix cannot be inverted numerically")
+  _solve!(x, A, b)
   if task === :only_check || task === :with_solution
     return true, x, zero(A, 0, 0)
   end
