@@ -456,16 +456,14 @@ mutable struct RealPolyRingElem <: PolyRingElem{RealFieldElem}
 
   function RealPolyRingElem(x::RealFieldElem, p::Int)
     z = RealPolyRingElem()
-    ccall((:arb_poly_set_coeff_arb, libflint), Nothing,
-          (Ref{RealPolyRingElem}, Int, Ref{RealFieldElem}), z, 0, x)
+    setcoeff!(z, 0, x)
     return z
   end
 
   function RealPolyRingElem(x::Vector{RealFieldElem}, p::Int)
     z = RealPolyRingElem()
-    for i = 1:length(x)
-      ccall((:arb_poly_set_coeff_arb, libflint), Nothing,
-            (Ref{RealPolyRingElem}, Int, Ref{RealFieldElem}), z, i - 1, x[i])
+    for i in 1:length(x)
+      setcoeff!(z, i - 1, x[i])
     end
     return z
   end
@@ -538,16 +536,14 @@ mutable struct ArbPolyRingElem <: PolyRingElem{ArbFieldElem}
 
   function ArbPolyRingElem(x::ArbFieldElem, p::Int)
     z = ArbPolyRingElem()
-    ccall((:arb_poly_set_coeff_arb, libflint), Nothing,
-          (Ref{ArbPolyRingElem}, Int, Ref{ArbFieldElem}), z, 0, x)
+    setcoeff!(z, 0, x)
     return z
   end
 
   function ArbPolyRingElem(x::Vector{ArbFieldElem}, p::Int)
     z = ArbPolyRingElem()
-    for i = 1:length(x)
-      ccall((:arb_poly_set_coeff_arb, libflint), Nothing,
-            (Ref{ArbPolyRingElem}, Int, Ref{ArbFieldElem}), z, i - 1, x[i])
+    for i in 1:length(x)
+      setcoeff!(z, i - 1, x[i])
     end
     return z
   end
@@ -625,16 +621,14 @@ mutable struct ComplexPolyRingElem <: PolyRingElem{ComplexFieldElem}
 
   function ComplexPolyRingElem(x::ComplexFieldElem, p::Int)
     z = ComplexPolyRingElem()
-    ccall((:acb_poly_set_coeff_acb, libflint), Nothing,
-          (Ref{ComplexPolyRingElem}, Int, Ref{ComplexFieldElem}), z, 0, x)
+    setcoeff!(z, 0, x)
     return z
   end
 
   function ComplexPolyRingElem(x::Vector{ComplexFieldElem}, p::Int)
     z = ComplexPolyRingElem()
-    for i = 1:length(x)
-      ccall((:acb_poly_set_coeff_acb, libflint), Nothing,
-            (Ref{ComplexPolyRingElem}, Int, Ref{ComplexFieldElem}), z, i - 1, x[i])
+    for i in 1:length(x)
+      setcoeff!(z, i - 1, x[i])
     end
     return z
   end
@@ -716,16 +710,14 @@ mutable struct AcbPolyRingElem <: PolyRingElem{AcbFieldElem}
 
   function AcbPolyRingElem(x::AcbFieldElem, p::Int)
     z = AcbPolyRingElem()
-    ccall((:acb_poly_set_coeff_acb, libflint), Nothing,
-          (Ref{AcbPolyRingElem}, Int, Ref{AcbFieldElem}), z, 0, x)
+    setcoeff!(z, 0, x)
     return z
   end
 
   function AcbPolyRingElem(x::Vector{AcbFieldElem}, p::Int)
     z = AcbPolyRingElem()
-    for i = 1:length(x)
-      ccall((:acb_poly_set_coeff_acb, libflint), Nothing,
-            (Ref{AcbPolyRingElem}, Int, Ref{AcbFieldElem}), z, i - 1, x[i])
+    for i in 1:length(x)
+      setcoeff!(z, i - 1, x[i])
     end
     return z
   end

@@ -41,8 +41,7 @@ one(a::AcbPolyRing) = a(1)
 
 function gen(a::AcbPolyRing)
   z = AcbPolyRingElem()
-  ccall((:acb_poly_set_coeff_si, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Int, Int), z, 1, 1)
+  setcoeff!(z, 1, 1)
   z.parent = a
   return z
 end
@@ -714,17 +713,23 @@ function fit!(z::AcbPolyRingElem, n::Int)
   return nothing
 end
 
-function setcoeff!(z::AcbPolyRingElem, n::Int, x::ZZRingElem)
-  ccall((:acb_poly_set_coeff_fmpz, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Int, Ref{ZZRingElem}), z, n, x)
-  return z
-end
-
 function setcoeff!(z::AcbPolyRingElem, n::Int, x::AcbFieldElem)
   ccall((:acb_poly_set_coeff_acb, libflint), Nothing,
         (Ref{AcbPolyRingElem}, Int, Ref{AcbFieldElem}), z, n, x)
   return z
 end
+
+function setcoeff!(z::AcbPolyRingElem, n::Int, x::Int)
+  ccall((:acb_poly_set_coeff_si, libflint), Nothing,
+        (Ref{AcbPolyRingElem}, Int, Int), z, n, x)
+  return z
+end
+
+function setcoeff!(z::AcbPolyRingElem, n::Int, x::ZZRingElem)
+  return setcoeff!(z, n, base_ring(z)(x))
+end
+
+setcoeff!(z::AcbPolyRingElem, n::Int, x::Integer) = setcoeff!(z, n, flintify(x))
 
 function mul!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::AcbPolyRingElem)
   ccall((:acb_poly_mul, libflint), Nothing,
