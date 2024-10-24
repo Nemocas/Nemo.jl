@@ -1708,18 +1708,18 @@ function next_prime(x::Int, proved::Bool = true)
   return x < 2 ? 2 : Int(next_prime(x % UInt, proved))
 end
 
-function remove!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
-  v = ccall((:fmpz_remove, libflint), Clong, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), a, a, b)
-  return v, a
+function remove!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
+  v = ccall((:fmpz_remove, libflint), Clong, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, a, b)
+  return v, z
 end
+
+remove!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr) = remove!(a, a, b)
 
 function remove(x::ZZRingElem, y::ZZRingElem)
   iszero(y) && throw(DivideError())
   y <= 1 && error("Factor <= 1")
   z = ZZRingElem()
-  num = ccall((:fmpz_remove, libflint), Int,
-              (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x, y)
-  return num, z
+  return remove!(z, x, y)
 end
 
 remove(x::ZZRingElem, y::Integer) = remove(x, ZZRingElem(y))
