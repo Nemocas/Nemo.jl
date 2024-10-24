@@ -1621,11 +1621,11 @@ function _factor_trial_range(N::ZZRingElem, start::Int = 0, np::Int = 10^5)
   ccall((:fmpz_factor_trial_range, libflint), Nothing,
         (Ref{fmpz_factor}, Ref{ZZRingElem}, UInt, UInt), F, N, start, np)
   res = Dict{ZZRingElem, Int}()
-  for i in 1:F.num
+  for i in 1:F.data.num
     z = ZZRingElem()
     ccall((:fmpz_factor_get_fmpz, libflint), Nothing,
           (Ref{ZZRingElem}, Ref{fmpz_factor}, Int), z, F, i - 1)
-    res[z] = unsafe_load(F.exp, i)
+    res[z] = unsafe_load(F.data.exp, i)
   end
   return res, canonical_unit(N)
 end
