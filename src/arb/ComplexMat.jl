@@ -53,7 +53,7 @@ for T in [Integer, Float64, ZZRingElem, QQFieldElem, RealFieldElem, BigFloat, Co
 
       GC.@preserve x begin
         z = mat_entry_ptr(x, r, c)
-        _acb_set(z, y, precision(Balls))
+        set!(z, y, precision(Balls))
       end
     end
   end
@@ -70,7 +70,7 @@ for T in [Integer, Float64, ZZRingElem, QQFieldElem, RealFieldElem, BigFloat, Ab
 
       GC.@preserve x begin
         z = mat_entry_ptr(x, r, c)
-        _acb_set(z, y[1], y[2], precision(Balls))
+        set!(z, y[1], y[2], precision(Balls))
       end
     end
   end

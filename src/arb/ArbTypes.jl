@@ -100,19 +100,19 @@ mutable struct RealFieldElem <: FieldElem
 
   function RealFieldElem(x::Union{Real, ZZRingElem, QQFieldElem, AbstractString, RealFieldElem}, p::Int)
     z = RealFieldElem()
-    _arb_set(z, x, p)
+    set!(z, x, p)
     return z
   end
 
   function RealFieldElem(x::Union{Real, ZZRingElem})
     z = RealFieldElem()
-    _arb_set(z, x)
+    set!(z, x)
     return z
   end
 
   function RealFieldElem(mid::RealFieldElem, rad::RealFieldElem)
     z = RealFieldElem()
-    ccall((:arb_set, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}), z, mid)
+    set!(z, mid)
     ccall((:arb_add_error, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}), z, rad)
     return z
   end
@@ -158,19 +158,19 @@ mutable struct ArbFieldElem <: FieldElem
 
   function ArbFieldElem(x::Union{Real, ZZRingElem, QQFieldElem, AbstractString, ArbFieldElem}, p::Int)
     z = ArbFieldElem()
-    _arb_set(z, x, p)
+    set!(z, x, p)
     return z
   end
 
   function ArbFieldElem(x::Union{Real, ZZRingElem, ArbFieldElem})
     z = ArbFieldElem()
-    _arb_set(z, x)
+    set!(z, x)
     return z
   end
 
   function ArbFieldElem(mid::ArbFieldElem, rad::ArbFieldElem)
     z = ArbFieldElem()
-    ccall((:arb_set, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), z, mid)
+    set!(z, mid)
     ccall((:arb_add_error, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), z, rad)
     return z
   end
@@ -219,19 +219,19 @@ mutable struct ComplexFieldElem <: FieldElem
 
   function ComplexFieldElem(x::Union{Number, ZZRingElem, RealFieldElem, ComplexFieldElem})
     z = ComplexFieldElem()
-    _acb_set(z, x)
+    set!(z, x)
     return z
   end
 
   function ComplexFieldElem(x::Union{Number, ZZRingElem, QQFieldElem, RealFieldElem, ComplexFieldElem, AbstractString}, p::Int)
     z = ComplexFieldElem()
-    _acb_set(z, x, p)
+    set!(z, x, p)
     return z
   end
 
   function ComplexFieldElem(x::T, y::T, p::Int) where {T <: Union{Real, ZZRingElem, QQFieldElem, AbstractString, RealFieldElem}}
     z = ComplexFieldElem()
-    _acb_set(z, x, y, p)
+    set!(z, (x, y), p)
     return z
   end
 end
@@ -370,25 +370,25 @@ mutable struct AcbFieldElem <: FieldElem
 
   function AcbFieldElem(x::Union{Number, ZZRingElem, ArbFieldElem, AcbFieldElem})
     z = AcbFieldElem()
-    _acb_set(z, x)
+    set!(z, x)
     return z
   end
 
   function AcbFieldElem(x::Union{Number, ZZRingElem, QQFieldElem, ArbFieldElem, AcbFieldElem, AbstractString}, p::Int)
     z = AcbFieldElem()
-    _acb_set(z, x, p)
+    set!(z, x, p)
     return z
   end
 
   #function AcbFieldElem{T <: Union{Int, UInt, Float64, ZZRingElem, BigFloat, ArbFieldElem}}(x::T, y::T)
   #  z = AcbFieldElem()
-  #  _acb_set(z, x, y)
+  #  set!(z, x, y)
   #  return z
   #end
 
   function AcbFieldElem(x::T, y::T, p::Int) where {T <: Union{Real, ZZRingElem, QQFieldElem, AbstractString, ArbFieldElem}}
     z = AcbFieldElem()
-    _acb_set(z, x, y, p)
+    set!(z, (x, y), p)
     return z
   end
 end
@@ -822,7 +822,7 @@ mutable struct RealMatrix <: MatElem{RealFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _arb_set(el, arr[i, j])
+        set!(el, arr[i, j])
       end
     end
     return z
@@ -833,7 +833,7 @@ mutable struct RealMatrix <: MatElem{RealFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _arb_set(el, arr[(i-1)*c+j])
+        set!(el, arr[(i-1)*c+j])
       end
     end
     return z
@@ -844,7 +844,7 @@ mutable struct RealMatrix <: MatElem{RealFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _arb_set(el, arr[i, j], prec)
+        set!(el, arr[i, j], prec)
       end
     end
     return z
@@ -855,7 +855,7 @@ mutable struct RealMatrix <: MatElem{RealFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _arb_set(el, arr[(i-1)*c+j], prec)
+        set!(el, arr[(i-1)*c+j], prec)
       end
     end
     return z
@@ -910,7 +910,7 @@ mutable struct ArbMatrix <: MatElem{ArbFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _arb_set(el, arr[i, j])
+        set!(el, arr[i, j])
       end
     end
     return z
@@ -921,7 +921,7 @@ mutable struct ArbMatrix <: MatElem{ArbFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _arb_set(el, arr[(i-1)*c+j])
+        set!(el, arr[(i-1)*c+j])
       end
     end
     return z
@@ -932,7 +932,7 @@ mutable struct ArbMatrix <: MatElem{ArbFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _arb_set(el, arr[i, j], prec)
+        set!(el, arr[i, j], prec)
       end
     end
     return z
@@ -943,7 +943,7 @@ mutable struct ArbMatrix <: MatElem{ArbFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _arb_set(el, arr[(i-1)*c+j], prec)
+        set!(el, arr[(i-1)*c+j], prec)
       end
     end
     return z
@@ -1016,7 +1016,7 @@ mutable struct ComplexMatrix <: MatElem{ComplexFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[i, j])
+        set!(el, arr[i, j])
       end
     end
     return z
@@ -1027,7 +1027,7 @@ mutable struct ComplexMatrix <: MatElem{ComplexFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[i, j])
+        set!(el, arr[i, j])
       end
     end
     return z
@@ -1038,7 +1038,7 @@ mutable struct ComplexMatrix <: MatElem{ComplexFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[(i-1)*c+j])
+        set!(el, arr[(i-1)*c+j])
       end
     end
     return z
@@ -1049,7 +1049,7 @@ mutable struct ComplexMatrix <: MatElem{ComplexFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[(i-1)*c+j])
+        set!(el, arr[(i-1)*c+j])
       end
     end
     return z
@@ -1060,7 +1060,7 @@ mutable struct ComplexMatrix <: MatElem{ComplexFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[i, j], prec)
+        set!(el, arr[i, j], prec)
       end
     end
     return z
@@ -1071,7 +1071,7 @@ mutable struct ComplexMatrix <: MatElem{ComplexFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[i, j], prec)
+        set!(el, arr[i, j], prec)
       end
     end
     return z
@@ -1082,7 +1082,7 @@ mutable struct ComplexMatrix <: MatElem{ComplexFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[(i-1)*c+j], prec)
+        set!(el, arr[(i-1)*c+j], prec)
       end
     end
     return z
@@ -1093,7 +1093,7 @@ mutable struct ComplexMatrix <: MatElem{ComplexFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[(i-1)*c+j], prec)
+        set!(el, arr[(i-1)*c+j], prec)
       end
     end
     return z
@@ -1104,7 +1104,7 @@ mutable struct ComplexMatrix <: MatElem{ComplexFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[i, j][1], arr[i,j][2], prec)
+        set!(el, arr[i, j][1], arr[i,j][2], prec)
       end
     end
     return z
@@ -1115,7 +1115,7 @@ mutable struct ComplexMatrix <: MatElem{ComplexFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[i, j][1], arr[i,j][2], prec)
+        set!(el, arr[i, j][1], arr[i,j][2], prec)
       end
     end
     return z
@@ -1126,7 +1126,7 @@ mutable struct ComplexMatrix <: MatElem{ComplexFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[(i-1)*c+j][1], arr[(i-1)*c+j][2], prec)
+        set!(el, arr[(i-1)*c+j][1], arr[(i-1)*c+j][2], prec)
       end
     end
     return z
@@ -1137,7 +1137,7 @@ mutable struct ComplexMatrix <: MatElem{ComplexFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[(i-1)*c+j][1], arr[(i-1)*c+j][2], prec)
+        set!(el, arr[(i-1)*c+j][1], arr[(i-1)*c+j][2], prec)
       end
     end
     return z
@@ -1206,7 +1206,7 @@ mutable struct AcbMatrix <: MatElem{AcbFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[i, j])
+        set!(el, arr[i, j])
       end
     end
     return z
@@ -1217,7 +1217,7 @@ mutable struct AcbMatrix <: MatElem{AcbFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[i, j])
+        set!(el, arr[i, j])
       end
     end
     return z
@@ -1228,7 +1228,7 @@ mutable struct AcbMatrix <: MatElem{AcbFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[(i-1)*c+j])
+        set!(el, arr[(i-1)*c+j])
       end
     end
     return z
@@ -1239,7 +1239,7 @@ mutable struct AcbMatrix <: MatElem{AcbFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[(i-1)*c+j])
+        set!(el, arr[(i-1)*c+j])
       end
     end
     return z
@@ -1250,7 +1250,7 @@ mutable struct AcbMatrix <: MatElem{AcbFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[i, j], prec)
+        set!(el, arr[i, j], prec)
       end
     end
     return z
@@ -1261,7 +1261,7 @@ mutable struct AcbMatrix <: MatElem{AcbFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[i, j], prec)
+        set!(el, arr[i, j], prec)
       end
     end
     return z
@@ -1272,7 +1272,7 @@ mutable struct AcbMatrix <: MatElem{AcbFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[(i-1)*c+j], prec)
+        set!(el, arr[(i-1)*c+j], prec)
       end
     end
     return z
@@ -1283,7 +1283,7 @@ mutable struct AcbMatrix <: MatElem{AcbFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[(i-1)*c+j], prec)
+        set!(el, arr[(i-1)*c+j], prec)
       end
     end
     return z
@@ -1294,7 +1294,7 @@ mutable struct AcbMatrix <: MatElem{AcbFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[i, j][1], arr[i,j][2], prec)
+        set!(el, arr[i, j][1], arr[i,j][2], prec)
       end
     end
     return z
@@ -1305,7 +1305,7 @@ mutable struct AcbMatrix <: MatElem{AcbFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[i, j][1], arr[i,j][2], prec)
+        set!(el, arr[i, j][1], arr[i,j][2], prec)
       end
     end
     return z
@@ -1316,7 +1316,7 @@ mutable struct AcbMatrix <: MatElem{AcbFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[(i-1)*c+j][1], arr[(i-1)*c+j][2], prec)
+        set!(el, arr[(i-1)*c+j][1], arr[(i-1)*c+j][2], prec)
       end
     end
     return z
@@ -1327,7 +1327,7 @@ mutable struct AcbMatrix <: MatElem{AcbFieldElem}
     GC.@preserve z for i = 1:r
       for j = 1:c
         el = mat_entry_ptr(z, i, j)
-        _acb_set(el, arr[(i-1)*c+j][1], arr[(i-1)*c+j][2], prec)
+        set!(el, arr[(i-1)*c+j][1], arr[(i-1)*c+j][2], prec)
       end
     end
     return z
