@@ -14,8 +14,6 @@ import Random: rand!
 
 using RandomExtensions: RandomExtensions, make, Make2, Make3
 
-import Pkg
-
 import SHA
 
 # N.B: do not import div, divrem from Base
@@ -383,17 +381,7 @@ end
 #
 ################################################################################
 
-const deps = Pkg.dependencies()
-if !haskey(deps, Base.UUID("2edaba10-b0f1-5616-af89-8c11ac63239a"))
-  version() = "building"
-else
-  ver = deps[Base.UUID("2edaba10-b0f1-5616-af89-8c11ac63239a")]
-  if occursin("/dev/", ver.source)
-    version() = VersionNumber("$(ver.version)-dev")
-  else
-    version() = VersionNumber("$(ver.version)")
-  end
-end
+version() = Base.get_pkgversion_from_path(pkgdir)
 
 function versioninfo()
   print("Nemo version $(version())\n")
