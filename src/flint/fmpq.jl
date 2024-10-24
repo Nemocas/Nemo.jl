@@ -666,9 +666,17 @@ end
 #
 ################################################################################
 
-remove(a::QQFieldElem, b::Integer) = remove(a, ZZRingElem(b))
+function remove(a::QQFieldElem, b::IntegerUnion)
+  b <= 1 && error("Factor <= 1")
+  a == 0 && error("Not yet implemented")
+  remove!(deepcopy(a), ZZ(b))
+end
 
-valuation(a::QQFieldElem, b::Integer) = valuation(a, ZZRingElem(b))
+function valuation(a::QQFieldElem, b::IntegerUnion)
+  b <= 1 && error("Factor <= 1")
+  a == 0 && error("Not yet implemented")
+  valuation!(deepcopy(a), ZZ(b))
+end
 
 function remove!(a::QQFieldElem, b::ZZRingElem)
   nr = _num_ptr(a)
