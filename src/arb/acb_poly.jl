@@ -461,19 +461,17 @@ end
 
 function acb_vec(b::Vector{AcbFieldElem})
   v = ccall((:_acb_vec_init, libflint), Ptr{acb_struct}, (Int,), length(b))
-  for i=1:length(b)
-    ccall((:acb_set, libflint), Nothing, (Ptr{acb_struct}, Ref{AcbFieldElem}),
-          v + (i-1)*sizeof(acb_struct), b[i])
+  for i in 1:length(b)
+    _acb_set(v + (i-1)*sizeof(acb_struct), b[i])
   end
   return v
 end
 
 function array(R::AcbField, v::Ptr{acb_struct}, n::Int)
   r = Vector{AcbFieldElem}(undef, n)
-  for i=1:n
+  for i in 1:n
     r[i] = R()
-    ccall((:acb_set, libflint), Nothing, (Ref{AcbFieldElem}, Ptr{acb_struct}),
-          r[i], v + (i-1)*sizeof(acb_struct))
+    _acb_set(r[i], v + (i-1)*sizeof(acb_struct))
   end
   return r
 end

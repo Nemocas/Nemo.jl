@@ -30,7 +30,7 @@ dense_matrix_type(::Type{RealFieldElem}) = RealMatrix
 function getindex!(z::ArbFieldElem, x::RealMatrix, r::Int, c::Int)
   GC.@preserve x begin
     v = mat_entry_ptr(x, r, c)
-    ccall((:arb_set, libflint), Nothing, (Ref{RealFieldElem}, Ptr{RealFieldElem}), z, v)
+    _arb_set(z, v)
   end
   return z
 end
@@ -41,7 +41,7 @@ end
   z = base_ring(x)()
   GC.@preserve x begin
     v = mat_entry_ptr(x, r, c)
-    ccall((:arb_set, libflint), Nothing, (Ref{RealFieldElem}, Ptr{RealFieldElem}), z, v)
+    _arb_set(z, v)
   end
   return z
 end

@@ -30,7 +30,7 @@ dense_matrix_type(::Type{ComplexFieldElem}) = ComplexMatrix
 function getindex!(z::ComplexFieldElem, x::ComplexMatrix, r::Int, c::Int)
   GC.@preserve x begin
     v = mat_entry_ptr(x, r, c)
-    ccall((:acb_set, libflint), Nothing, (Ref{ComplexFieldElem}, Ptr{ComplexFieldElem}), z, v)
+    _acb_set(z, v)
   end
   return z
 end
@@ -41,7 +41,7 @@ end
   z = base_ring(x)()
   GC.@preserve x begin
     v = mat_entry_ptr(x, r, c)
-    ccall((:acb_set, libflint), Nothing, (Ref{ComplexFieldElem}, Ptr{ComplexFieldElem}), z, v)
+    _acb_set(z, v)
   end
   return z
 end

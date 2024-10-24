@@ -33,7 +33,7 @@ precision(x::ArbMatrixSpace) = precision(x.base_ring)
 function getindex!(z::ArbFieldElem, x::ArbMatrix, r::Int, c::Int)
   GC.@preserve x begin
     v = mat_entry_ptr(x, r, c)
-    ccall((:arb_set, libflint), Nothing, (Ref{ArbFieldElem}, Ptr{ArbFieldElem}), z, v)
+    _arb_set(z, v)
   end
   return z
 end
@@ -44,7 +44,7 @@ end
   z = base_ring(x)()
   GC.@preserve x begin
     v = mat_entry_ptr(x, r, c)
-    ccall((:arb_set, libflint), Nothing, (Ref{ArbFieldElem}, Ptr{ArbFieldElem}), z, v)
+    _arb_set(z, v)
   end
   return z
 end

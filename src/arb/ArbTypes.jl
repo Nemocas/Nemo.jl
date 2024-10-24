@@ -112,7 +112,7 @@ mutable struct RealFieldElem <: FieldElem
 
   function RealFieldElem(mid::RealFieldElem, rad::RealFieldElem)
     z = RealFieldElem()
-    ccall((:arb_set, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}), z, mid)
+    _arb_set(z, mid)
     ccall((:arb_add_error, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}), z, rad)
     return z
   end
@@ -170,7 +170,7 @@ mutable struct ArbFieldElem <: FieldElem
 
   function ArbFieldElem(mid::ArbFieldElem, rad::ArbFieldElem)
     z = ArbFieldElem()
-    ccall((:arb_set, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), z, mid)
+    _arb_set(z, mid)
     ccall((:arb_add_error, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), z, rad)
     return z
   end

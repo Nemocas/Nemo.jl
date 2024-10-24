@@ -462,19 +462,17 @@ end
 
 function acb_vec(b::Vector{ComplexFieldElem})
   v = ccall((:_acb_vec_init, libflint), Ptr{acb_struct}, (Int,), length(b))
-  for i=1:length(b)
-    ccall((:acb_set, libflint), Nothing, (Ptr{acb_struct}, Ref{ComplexFieldElem}),
-          v + (i-1)*sizeof(acb_struct), b[i])
+  for i in 1:length(b)
+    _acb_set(v + (i-1)*sizeof(acb_struct), b[i])
   end
   return v
 end
 
 function array(R::ComplexField, v::Ptr{acb_struct}, n::Int)
   r = Vector{ComplexFieldElem}(undef, n)
-  for i=1:n
+  for i in 1:n
     r[i] = R()
-    ccall((:acb_set, libflint), Nothing, (Ref{ComplexFieldElem}, Ptr{acb_struct}),
-          r[i], v + (i-1)*sizeof(acb_struct))
+    _acb_set(r[i], v + (i-1)*sizeof(acb_struct))
   end
   return r
 end
