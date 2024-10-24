@@ -35,9 +35,9 @@ function coeff(a::RealPolyRingElem, n::Int)
   return t
 end
 
-zero(a::RealPolyRing) = a(0)
+zero(a::RealPolyRing) = a()
 
-one(a::RealPolyRing) = a(1)
+one(a::RealPolyRing) = one!(a())
 
 function gen(a::RealPolyRing)
   z = RealPolyRingElem()
@@ -220,26 +220,18 @@ end
 
 function +(x::RealPolyRingElem, y::RealPolyRingElem)
   z = parent(x)()
-  ccall((:arb_poly_add, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Int),
-        z, x, y, precision(Balls))
+  return add!(z, x, y)
+end
+
+function -(x::RealPolyRingElem, y::RealPolyRingElem)
+  z = parent(x)()
+  return sub!(z, x, y)
   return z
 end
 
 function *(x::RealPolyRingElem, y::RealPolyRingElem)
   z = parent(x)()
-  ccall((:arb_poly_mul, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Int),
-        z, x, y, precision(Balls))
-  return z
-end
-
-function -(x::RealPolyRingElem, y::RealPolyRingElem)
-  z = parent(x)()
-  ccall((:arb_poly_sub, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Int),
-        z, x, y, precision(Balls))
-  return z
+  return mul!(z, x, y)
 end
 
 function ^(x::RealPolyRingElem, y::Int)
@@ -630,19 +622,64 @@ function setcoeff!(z::RealPolyRingElem, n::Int, x::RealFieldElem)
   return z
 end
 
-function mul!(z::RealPolyRingElem, x::RealPolyRingElem, y::RealPolyRingElem)
-  ccall((:arb_poly_mul, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Int),
-        z, x, y, precision(parent(z)))
-  return z
-end
+#
 
 function add!(z::RealPolyRingElem, x::RealPolyRingElem, y::RealPolyRingElem)
   ccall((:arb_poly_add, libflint), Nothing,
         (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Int),
-        z, x, y, precision(parent(z)))
+        z, x, y, precision(Balls))
   return z
 end
+
+function add!(z::RealPolyRingElem, x::RealPolyRingElem, y::Int)
+  ccall((:arb_poly_add_si, libflint), Nothing,
+        (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Int, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+add!(z::RealPolyRingElem, x::RealPolyRingElem, y::RealFieldElem) = add!(z, x, parent(z)(y))
+
+add!(z::RealPolyRingElem, x::RealPolyRingElem, y::ZZRingElem) = add!(z, x, parent(z)(y))
+
+add!(z::RealPolyRingElem, x::RealPolyRingElem, y::Integer) = add!(z, x, flintify(y))
+
+add!(z::RealPolyRingElem, x::Union{RealFieldElem,IntegerUnion}, y::RealPolyRingElem) = add!(z, y, x)
+
+#
+
+function sub!(z::RealPolyRingElem, x::RealPolyRingElem, y::RealPolyRingElem)
+  ccall((:arb_poly_sub, libflint), Nothing,
+        (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+sub!(z::RealPolyRingElem, x::RealPolyRingElem, y::Union{RealFieldElem,IntegerUnion}) = sub!(z, x, parent(z)(y))
+
+sub!(z::RealPolyRingElem, x::Union{RealFieldElem,IntegerUnion}, y::RealPolyRingElem) = sub!(z, parent(z)(x), y)
+
+#
+
+function mul!(z::RealPolyRingElem, x::RealPolyRingElem, y::RealPolyRingElem)
+  ccall((:arb_poly_mul, libflint), Nothing,
+        (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+function mul!(z::RealPolyRingElem, x::RealPolyRingElem, y::RealFieldElem)
+  ccall((:arb_poly_scalar_mul, libflint), Nothing,
+        (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Ref{RealFieldElem}, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+mul!(z::RealPolyRingElem, x::RealPolyRingElem, y::IntegerUnion) = mul!(z, x, base_ring(z)(y))
+
+mul!(z::RealPolyRingElem, x::Union{RealFieldElem,IntegerUnion}, y::RealPolyRingElem) = mul!(z, y, x)
+
+#
 
 ###############################################################################
 #
