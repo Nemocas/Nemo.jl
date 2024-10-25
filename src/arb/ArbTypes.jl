@@ -74,11 +74,16 @@ mutable struct acb_struct
   imag_rad_man::UInt
 end
 
-_mid_ptr(x::arb_struct) = @ccall libflint.arb_mid_ptr(x::Ref{arb_struct})::Ptr{arf_struct}
-_rad_ptr(x::arb_struct) = @ccall libflint.arb_rad_ptr(x::Ref{arb_struct})::Ptr{mag_struct}
+const arf_structOrPtr = Union{arf_struct, Ref{arf_struct}, Ptr{arf_struct}}
+const mag_structOrPtr = Union{mag_struct, Ref{mag_struct}, Ptr{mag_struct}}
+const arb_structOrPtr = Union{arb_struct, Ref{arb_struct}, Ptr{arb_struct}}
+const acb_structOrPtr = Union{acb_struct, Ref{acb_struct}, Ptr{acb_struct}}
 
-_real_ptr(x::acb_struct) = @ccall libflint.acb_real_ptr(x::Ref{acb_struct})::Ptr{arb_struct}
-_imag_ptr(x::acb_struct) = @ccall libflint.acb_imag_ptr(x::Ref{acb_struct})::Ptr{arb_struct}
+_mid_ptr(x::arb_structOrPtr) = @ccall libflint.arb_mid_ptr(x::Ref{arb_struct})::Ptr{arf_struct}
+_rad_ptr(x::arb_structOrPtr) = @ccall libflint.arb_rad_ptr(x::Ref{arb_struct})::Ptr{mag_struct}
+
+_real_ptr(x::acb_structOrPtr) = @ccall libflint.acb_real_ptr(x::Ref{acb_struct})::Ptr{arb_struct}
+_imag_ptr(x::acb_structOrPtr) = @ccall libflint.acb_imag_ptr(x::Ref{acb_struct})::Ptr{arb_struct}
 
 ################################################################################
 #
