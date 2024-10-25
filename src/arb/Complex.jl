@@ -157,113 +157,86 @@ end
 #
 ################################################################################
 
-# AcbFieldElem - AcbFieldElem
+# ComplexFieldElem - ComplexFieldElem
 
-for (s,f) in ((:+,"acb_add"), (:*,"acb_mul"), (://, "acb_div"), (:-,"acb_sub"), (:^,"acb_pow"))
-  @eval begin
-    function ($s)(x::ComplexFieldElem, y::ComplexFieldElem, prec::Int = precision(Balls))
-      z = ComplexFieldElem()
-      ccall(($f, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int),
-            z, x, y, prec)
-      return z
-    end
-  end
+function +(x::ComplexFieldElem, y::ComplexFieldElem)
+  z = ComplexFieldElem()
+  return add!(z, x, y)
 end
 
-for (f,s) in ((:+, "add"), (:-, "sub"), (:*, "mul"), (://, "div"), (:^, "pow"))
-  @eval begin
-
-    function ($f)(x::ComplexFieldElem, y::UInt, prec::Int = precision(Balls))
-      z = ComplexFieldElem()
-      ccall(($("acb_"*s*"_ui"), libflint), Nothing,
-            (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, UInt, Int),
-            z, x, y, prec)
-      return z
-    end
-
-    function ($f)(x::ComplexFieldElem, y::Int, prec::Int = precision(Balls))
-      z = ComplexFieldElem()
-      ccall(($("acb_"*s*"_si"), libflint), Nothing,
-            (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int, Int), z, x, y, prec)
-      return z
-    end
-
-    function ($f)(x::ComplexFieldElem, y::ZZRingElem, prec::Int = precision(Balls))
-      z = ComplexFieldElem()
-      ccall(($("acb_"*s*"_fmpz"), libflint), Nothing,
-            (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ZZRingElem}, Int),
-            z, x, y, prec)
-      return z
-    end
-
-    function ($f)(x::ComplexFieldElem, y::RealFieldElem, prec::Int = precision(Balls))
-      z = ComplexFieldElem()
-      ccall(($("acb_"*s*"_arb"), libflint), Nothing,
-            (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{RealFieldElem}, Int),
-            z, x, y, prec)
-      return z
-    end
-  end
+function -(x::ComplexFieldElem, y::ComplexFieldElem)
+  z = ComplexFieldElem()
+  return sub!(z, x, y)
 end
 
+function *(x::ComplexFieldElem, y::ComplexFieldElem)
+  z = ComplexFieldElem()
+  return mul!(z, x, y)
+end
 
-+(x::UInt,y::ComplexFieldElem) = +(y,x)
-+(x::Int,y::ComplexFieldElem) = +(y,x)
-+(x::ZZRingElem,y::ComplexFieldElem) = +(y,x)
-+(x::RealFieldElem,y::ComplexFieldElem) = +(y,x)
+function //(x::ComplexFieldElem, y::ComplexFieldElem)
+  z = ComplexFieldElem()
+  return div!(z, x, y)
+end
 
-*(x::UInt,y::ComplexFieldElem) = *(y,x)
-*(x::Int,y::ComplexFieldElem) = *(y,x)
-*(x::ZZRingElem,y::ComplexFieldElem) = *(y,x)
-*(x::RealFieldElem,y::ComplexFieldElem) = *(y,x)
+function ^(x::ComplexFieldElem, y::ComplexFieldElem)
+  z = ComplexFieldElem()
+  ccall((:acb_pow, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int),
+        z, x, y, precision(Balls))
+  return z
+end
 
-//(x::UInt,y::ComplexFieldElem) = (x == 1) ? inv(y) : parent(y)(x) // y
-//(x::Int,y::ComplexFieldElem) = (x == 1) ? inv(y) : parent(y)(x) // y
-//(x::ZZRingElem,y::ComplexFieldElem) = isone(x) ? inv(y) : parent(y)(x) // y
-//(x::RealFieldElem,y::ComplexFieldElem) = isone(x) ? inv(y) : parent(y)(x) // y
+################################################################################
+#
+#  Ad-hoc binary operations
+#
+################################################################################
+
++(x::ComplexFieldElem, y::Union{RealFieldElem, IntegerUnion}) = add!(ComplexFieldElem(), x, y)
++(x::Union{RealFieldElem, IntegerUnion}, y::ComplexFieldElem) = add!(parent(y)(), x, y)
+
+-(x::ComplexFieldElem, y::Union{RealFieldElem, IntegerUnion}) = sub!(ComplexFieldElem(), x, y)
+-(x::Union{RealFieldElem, IntegerUnion}, y::ComplexFieldElem) = sub!(parent(y)(), x, y)
+
+*(x::ComplexFieldElem, y::Union{RealFieldElem, IntegerUnion}) = mul!(ComplexFieldElem(), x, y)
+*(x::Union{RealFieldElem, IntegerUnion}, y::ComplexFieldElem) = mul!(parent(y)(), x, y)
+
+//(x::ComplexFieldElem, y::Union{RealFieldElem, IntegerUnion}) = div!(ComplexFieldElem(), x, y)
+//(x::Union{RealFieldElem, IntegerUnion}, y::ComplexFieldElem) = div!(parent(y)(), x, y)
+
+function ^(x::ComplexFieldElem, y::UInt)
+  z = ComplexFieldElem()
+  ccall((:acb_pow_ui, libflint), Nothing,
+        (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, UInt, Int),
+        z, x, y, parent(x).prec)
+  return z
+end
+
+function ^(x::ComplexFieldElem, y::Int)
+  z = ComplexFieldElem()
+  ccall((:acb_pow_si, libflint), Nothing,
+        (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int, Int), z, x, y, parent(x).prec)
+  return z
+end
+
+function ^(x::ComplexFieldElem, y::ZZRingElem)
+  z = ComplexFieldElem()
+  ccall((:acb_pow_fmpz, libflint), Nothing,
+        (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ZZRingElem}, Int),
+        z, x, y, parent(x).prec)
+  return z
+end
+
+function ^(x::ComplexFieldElem, y::RealFieldElem)
+  z = ComplexFieldElem()
+  ccall((:acb_pow_arb, libflint), Nothing,
+        (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{RealFieldElem}, Int),
+        z, x, y, parent(x).prec)
+  return z
+end
 
 ^(x::ZZRingElem,y::ComplexFieldElem) = parent(y)(x) ^ y
 ^(x::RealFieldElem,y::ComplexFieldElem) = parent(y)(x) ^ y
-
-function -(x::UInt, y::ComplexFieldElem)
-  z = ComplexFieldElem()
-  ccall((:acb_sub_ui, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, UInt, Int), z, y, x, precision(Balls))
-  return neg!(z)
-end
-
-function -(x::Int, y::ComplexFieldElem)
-  z = ComplexFieldElem()
-  ccall((:acb_sub_si, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int, Int), z, y, x, precision(Balls))
-  return neg!(z)
-end
-
-function -(x::ZZRingElem, y::ComplexFieldElem)
-  z = ComplexFieldElem()
-  ccall((:acb_sub_fmpz, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ZZRingElem}, Int), z, y, x, precision(Balls))
-  return neg!(z)
-end
-
-function -(x::RealFieldElem, y::ComplexFieldElem)
-  z = ComplexFieldElem()
-  ccall((:acb_sub_arb, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{RealFieldElem}, Int), z, y, x, precision(Balls))
-  return neg!(z)
-end
-
-+(x::ComplexFieldElem, y::Integer) = x + flintify(y)
-
--(x::ComplexFieldElem, y::Integer) = x - flintify(y)
-
-*(x::ComplexFieldElem, y::Integer) = x*flintify(y)
-
-//(x::ComplexFieldElem, y::Integer) = x//flintify(y)
-
-+(x::Integer, y::ComplexFieldElem) = flintify(x) + y
-
--(x::Integer, y::ComplexFieldElem) = flintify(x) - y
-
-*(x::Integer, y::ComplexFieldElem) = flintify(x)*y
-
-//(x::Integer, y::ComplexFieldElem) = flintify(x)//y
 
 divexact(x::ComplexFieldElem, y::ComplexFieldElem; check::Bool=true) = x // y
 divexact(x::ZZRingElem, y::ComplexFieldElem; check::Bool=true) = x // y
@@ -518,10 +491,9 @@ end
 #
 ################################################################################
 
-function inv(x::ComplexFieldElem, prec::Int = precision(Balls))
+function inv(x::ComplexFieldElem)
   z = ComplexFieldElem()
-  ccall((:acb_inv, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int), z, x, prec)
-  return z
+  return inv!(z, x)
 end
 
 ################################################################################
@@ -1586,29 +1558,238 @@ function neg!(z::ComplexFieldElemOrPtr, a::ComplexFieldElemOrPtr)
   return z
 end
 
-function add!(z::ComplexFieldElem, x::ComplexFieldElem, y::ComplexFieldElem, prec::Int = precision(Balls))
+
+function inv!(z::ComplexFieldElem, x::ComplexFieldElem)
+  ccall((:acb_inv, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int),
+        z, x, precision(Balls))
+  return z
+end
+
+#
+
+function add!(z::ComplexFieldElem, x::ComplexFieldElem, y::ComplexFieldElem)
   ccall((:acb_add, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int),
-        z, x, y, prec)
+        z, x, y, precision(Balls))
   return z
 end
 
-function sub!(z::ComplexFieldElem, x::ComplexFieldElem, y::ComplexFieldElem, prec::Int = precision(Balls))
+function add!(z::ComplexFieldElem, x::ComplexFieldElem, y::RealFieldElem)
+  ccall((:acb_add_arb, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{RealFieldElem}, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+function add!(z::ComplexFieldElem, x::ComplexFieldElem, y::Int)
+  ccall((:acb_add_si, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+function add!(z::ComplexFieldElem, x::ComplexFieldElem, y::UInt)
+  ccall((:acb_add_ui, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, UInt, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+function add!(z::ComplexFieldElem, x::ComplexFieldElem, y::ZZRingElem)
+  ccall((:acb_add_fmpz, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ZZRingElem}, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+add!(z::ComplexFieldElem, x::ComplexFieldElem, y::Integer) = add!(z, x, flintify(y))
+
+add!(z::ComplexFieldElem, x::Union{RealFieldElem,IntegerUnion}, y::ComplexFieldElem) = add!(z, y, x)
+
+#
+
+function sub!(z::ComplexFieldElem, x::ComplexFieldElem, y::ComplexFieldElem)
   ccall((:acb_sub, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int),
-        z, x, y, prec)
+        z, x, y, precision(Balls))
   return z
 end
 
-function mul!(z::ComplexFieldElem, x::ComplexFieldElem, y::ComplexFieldElem, prec::Int = precision(Balls))
+function sub!(z::ComplexFieldElem, x::ComplexFieldElem, y::RealFieldElem)
+  ccall((:acb_sub_arb, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{RealFieldElem}, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+function sub!(z::ComplexFieldElem, x::ComplexFieldElem, y::Int)
+  ccall((:acb_sub_si, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+function sub!(z::ComplexFieldElem, x::ComplexFieldElem, y::UInt)
+  ccall((:acb_sub_ui, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, UInt, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+function sub!(z::ComplexFieldElem, x::ComplexFieldElem, y::ZZRingElem)
+  ccall((:acb_sub_fmpz, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ZZRingElem}, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+sub!(z::ComplexFieldElem, x::ComplexFieldElem, y::Integer) = sub!(z, x, flintify(y))
+
+sub!(z::ComplexFieldElem, x::Union{RealFieldElem,IntegerUnion}, y::ComplexFieldElem) = neg!(sub!(z, y, x))
+
+#
+
+function mul!(z::ComplexFieldElem, x::ComplexFieldElem, y::ComplexFieldElem)
   ccall((:acb_mul, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int),
-        z, x, y, prec)
+        z, x, y, precision(Balls))
   return z
 end
 
-function div!(z::ComplexFieldElem, x::ComplexFieldElem, y::ComplexFieldElem, prec::Int = precision(Balls))
-  ccall((:acb_div, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int),
-        z, x, y, prec)
+function mul!(z::ComplexFieldElem, x::ComplexFieldElem, y::RealFieldElem)
+  ccall((:acb_mul_arb, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{RealFieldElem}, Int),
+        z, x, y, precision(Balls))
   return z
 end
+
+function mul!(z::ComplexFieldElem, x::ComplexFieldElem, y::Int)
+  ccall((:acb_mul_si, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+function mul!(z::ComplexFieldElem, x::ComplexFieldElem, y::UInt)
+  ccall((:acb_mul_ui, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, UInt, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+function mul!(z::ComplexFieldElem, x::ComplexFieldElem, y::ZZRingElem)
+  ccall((:acb_mul_fmpz, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ZZRingElem}, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+mul!(z::ComplexFieldElem, x::ComplexFieldElem, y::Integer) = mul!(z, x, flintify(y))
+
+mul!(z::ComplexFieldElem, x::Union{RealFieldElem,IntegerUnion}, y::ComplexFieldElem) = mul!(z, y, x)
+
+#
+
+function div!(z::ComplexFieldElem, x::ComplexFieldElem, y::ComplexFieldElem)
+  ccall((:acb_div, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+function div!(z::ComplexFieldElem, x::ComplexFieldElem, y::RealFieldElem)
+  ccall((:acb_div_arb, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{RealFieldElem}, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+function div!(z::ComplexFieldElem, x::ComplexFieldElem, y::Int)
+  ccall((:acb_div_si, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+function div!(z::ComplexFieldElem, x::ComplexFieldElem, y::UInt)
+  ccall((:acb_div_ui, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, UInt, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+function div!(z::ComplexFieldElem, x::ComplexFieldElem, y::ZZRingElem)
+  ccall((:acb_div_fmpz, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ZZRingElem}, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+div!(z::ComplexFieldElem, x::ComplexFieldElem, y::Integer) = div!(z, x, flintify(y))
+
+div!(z::ComplexFieldElem, x::Union{RealFieldElem,IntegerUnion}, y::ComplexFieldElem) = inv!(div!(z, y, x))
+
+#
+
+function addmul!(z::ComplexFieldElem, x::ComplexFieldElem, y::ComplexFieldElem)
+  ccall((:acb_addmul, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+function addmul!(z::ComplexFieldElem, x::ComplexFieldElem, y::RealFieldElem)
+  ccall((:acb_addmul_arb, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{RealFieldElem}, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+function addmul!(z::ComplexFieldElem, x::ComplexFieldElem, y::Int)
+  ccall((:acb_addmul_si, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+function addmul!(z::ComplexFieldElem, x::ComplexFieldElem, y::UInt)
+  ccall((:acb_addmul_ui, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, UInt, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+function addmul!(z::ComplexFieldElem, x::ComplexFieldElem, y::ZZRingElem)
+  ccall((:acb_addmul_fmpz, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ZZRingElem}, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+addmul!(z::ComplexFieldElem, x::ComplexFieldElem, y::Integer) = addmul!(z, x, flintify(y))
+
+addmul!(z::ComplexFieldElem, x::Union{RealFieldElem,IntegerUnion}, y::ComplexFieldElem) = addmul!(z, y, x)
+
+# ignore temp variable
+addmul!(z::ComplexFieldElem, x::ComplexFieldElem, y::ComplexFieldElem, t) = addmul!(z, x, y)
+addmul!(z::ComplexFieldElem, x::ComplexFieldElem, y::Union{RealFieldElem,IntegerUnion}, t) = addmul!(z, x, y)
+addmul!(z::ComplexFieldElem, x::Union{RealFieldElem,IntegerUnion}, y::ComplexFieldElem, t) = addmul!(z, x, y)
+
+#
+
+function submul!(z::ComplexFieldElem, x::ComplexFieldElem, y::ComplexFieldElem)
+  ccall((:acb_submul, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+function submul!(z::ComplexFieldElem, x::ComplexFieldElem, y::RealFieldElem)
+  ccall((:acb_submul_arb, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{RealFieldElem}, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+function submul!(z::ComplexFieldElem, x::ComplexFieldElem, y::Int)
+  ccall((:acb_submul_si, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+function submul!(z::ComplexFieldElem, x::ComplexFieldElem, y::UInt)
+  ccall((:acb_submul_ui, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, UInt, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+function submul!(z::ComplexFieldElem, x::ComplexFieldElem, y::ZZRingElem)
+  ccall((:acb_submul_fmpz, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ZZRingElem}, Int),
+        z, x, y, precision(Balls))
+  return z
+end
+
+submul!(z::ComplexFieldElem, x::ComplexFieldElem, y::Integer) = submul!(z, x, flintify(y))
+
+submul!(z::ComplexFieldElem, x::Union{RealFieldElem,IntegerUnion}, y::ComplexFieldElem) = submul!(z, y, x)
+
+# ignore temp variable
+submul!(z::ComplexFieldElem, x::ComplexFieldElem, y::ComplexFieldElem, t) = submul!(z, x, y)
+submul!(z::ComplexFieldElem, x::ComplexFieldElem, y::Union{RealFieldElem,IntegerUnion}, t) = submul!(z, x, y)
+submul!(z::ComplexFieldElem, x::Union{RealFieldElem,IntegerUnion}, y::ComplexFieldElem, t) = submul!(z, x, y)
 
 ################################################################################
 #
