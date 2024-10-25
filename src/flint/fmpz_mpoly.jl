@@ -412,7 +412,7 @@ function (::Type{Fac{ZZMPolyRingElem}})(fac::fmpz_mpoly_factor, preserve_input::
   ccall((:fmpz_mpoly_factor_get_constant_fmpz, libflint), Nothing,
         (Ref{ZZRingElem}, Ref{fmpz_mpoly_factor}),
         c, fac)
-  sgnc = ccall((:fmpz_sgn, libflint), Cint, (Ref{ZZRingElem},), c)
+  sgnc = sign(Int, c)
   if sgnc != 0
     G = fmpz_factor()
     ccall((:fmpz_factor, libflint), Nothing, (Ref{fmpz_factor}, Ref{ZZRingElem}), G, c)

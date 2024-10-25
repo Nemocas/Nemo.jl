@@ -124,6 +124,13 @@ end
   end
 end
 
+@testset "ZZMatrix.is_positive_entry" begin
+  M = matrix(ZZ, [1 2 3;-4 0 6;0 8 9])
+  for i in 1:3, j in 1:3
+    @test is_positive_entry(M, i, j) == is_positive(M[i, j])
+  end
+end
+
 @testset "ZZMatrix.is_zero_row" begin
   M = matrix(ZZ, [1 2 3;4 0 6;0 8 9;0 0 0])
   for i in 1:nrows(M)
@@ -521,6 +528,11 @@ end
   @test is_hadamard(hadamard(S))
 end
 
+@testset "ZZMatrix.hadamard_bound2" begin
+  A = matrix(ZZ, [1 2; 3 4])
+  @test hadamard_bound2(A) == (1^2+2^2)*(3^2+4^2)
+end
+
 @testset "ZZMatrix.fflu" begin
   for iters = 1:100
     m = rand(0:20)
@@ -865,4 +877,30 @@ end
   A = ZZ[2 3 5; 4 6 3]
   @test prod_diagonal(A) == ZZ(12)
   @test prod_diagonal(zero_matrix(ZZ, 0, 0)) == ZZ(1)
+end
+
+@testset "ZZMatrix.add_row!" begin
+  A = ZZ[2 3 5; 4 6 3]
+
+  add_row!(A, ZZ(0), 1, 1)
+  @test A == ZZ[2 3 5; 4 6 3]
+
+  add_row!(A, ZZ(-1), 1, 1)
+  @test Nemo.is_zero_row(A, 1)
+
+  add_row!(A, ZZ(3), 1, 2)
+  @test A == ZZ[12 18 9; 4 6 3]
+end
+
+@testset "ZZMatrix.add_column!" begin
+  A = ZZ[2 3 5; 4 6 3]
+
+  add_column!(A, ZZ(0), 1, 1)
+  @test A == ZZ[2 3 5; 4 6 3]
+
+  add_column!(A, ZZ(-1), 1, 1)
+  @test Nemo.is_zero_column(A, 1)
+
+  add_column!(A, ZZ(3), 1, 2)
+  @test A == ZZ[9 3 5; 18 6 3]
 end

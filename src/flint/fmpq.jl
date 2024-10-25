@@ -661,31 +661,39 @@ end
 #
 ################################################################################
 
-remove(a::QQFieldElem, b::Integer) = remove(a, ZZRingElem(b))
+function remove(a::QQFieldElem, b::IntegerUnion)
+  b <= 1 && error("Factor <= 1")
+  a == 0 && error("Not yet implemented")
+  remove!(deepcopy(a), ZZ(b))
+end
 
-valuation(a::QQFieldElem, b::Integer) = valuation(a, ZZRingElem(b))
+function valuation(a::QQFieldElem, b::IntegerUnion)
+  b <= 1 && error("Factor <= 1")
+  a == 0 && error("Not yet implemented")
+  valuation!(deepcopy(a), ZZ(b))
+end
 
 function remove!(a::QQFieldElem, b::ZZRingElem)
   nr = _num_ptr(a)
-  vn = ccall((:fmpz_remove, libflint), Clong, (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), nr, nr, b)
+  vn, nr = remove!(nr, b)
   #QQFieldElem's are simplified: either num OR den will be non-trivial
   if !is_zero(vn)
     return vn, a
   end
   nr = _den_ptr(a)
-  vn = ccall((:fmpz_remove, libflint), Clong, (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), nr, nr, b)
+  vn, nr = remove!(nr, b)
   return -vn, a
 end
 
 function valuation!(a::QQFieldElem, b::ZZRingElem)
   nr = _num_ptr(a)
-  vn = ccall((:fmpz_remove, libflint), Clong, (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), nr, nr, b)
+  vn, nr = remove!(nr, b)
   #QQFieldElem's are simplified: either num OR den will be non-trivial
   if !is_zero(vn)
     return vn
   end
   nr = _den_ptr(a)
-  vn = ccall((:fmpz_remove, libflint), Clong, (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), nr, nr, b)
+  vn, nr = remove!(nr, b)
   return -vn
 end
 
