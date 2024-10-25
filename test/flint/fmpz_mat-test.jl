@@ -890,9 +890,6 @@ end
 
   add_row!(A, ZZ(3), 1, 2)
   @test A == ZZ[12 18 9; 4 6 3]
-
-  @test A == ZZ[1 0; 0 0]
-  @test_throws BoundsError Generic.add_one!(A, 3, 1)
 end
 
 @testset "ZZMatrix.add_column!" begin
@@ -906,7 +903,4 @@ end
 
   add_column!(A, ZZ(3), 1, 2)
   @test A == ZZ[9 3 5; 18 6 3]
-
-  @test A == ZZ[1 0; 0 0]
-  @test_throws BoundsError Generic.add_one!(A, 3, 1)
 end
