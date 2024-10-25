@@ -1966,95 +1966,94 @@ end
 #
 ################################################################################
 
-for (typeofx, passtoc) in ((ArbFieldElem, Ref{ArbFieldElem}), (Ptr{ArbFieldElem}, Ptr{ArbFieldElem}))
-  for (f,t) in (("arb_set_si", Int), ("arb_set_ui", UInt),
-                ("arb_set_d", Float64))
-    @eval begin
-      function _arb_set(x::($typeofx), y::($t))
-        ccall(($f, libflint), Nothing, (($passtoc), ($t)), x, y)
-      end
+function _arb_set(x::ArbFieldElemOrPtr, y::Int)
+  ccall((:arb_set_si, libflint), Nothing, (Ref{ArbFieldElem}, Int), x, y)
+end
 
-      function _arb_set(x::($typeofx), y::($t), p::Int)
-        _arb_set(x, y)
-        ccall((:arb_set_round, libflint), Nothing,
-              (($passtoc), ($passtoc), Int), x, x, p)
-      end
-    end
-  end
+function _arb_set(x::ArbFieldElemOrPtr, y::UInt)
+  ccall((:arb_set_ui, libflint), Nothing, (Ref{ArbFieldElem}, UInt), x, y)
+end
 
-  @eval begin
-    function _arb_set(x::($typeofx), y::ZZRingElem)
-      ccall((:arb_set_fmpz, libflint), Nothing, (($passtoc), Ref{ZZRingElem}), x, y)
-    end
+function _arb_set(x::ArbFieldElemOrPtr, y::Float64)
+  ccall((:arb_set_d, libflint), Nothing, (Ref{ArbFieldElem}, Float64), x, y)
+end
 
-    function _arb_set(x::($typeofx), y::ZZRingElem, p::Int)
-      ccall((:arb_set_round_fmpz, libflint), Nothing,
-            (($passtoc), Ref{ZZRingElem}, Int), x, y, p)
-    end
+function _arb_set(x::ArbFieldElemOrPtr, y::Union{Int,UInt,Float64}, p::Int)
+  _arb_set(x, y)
+  ccall((:arb_set_round, libflint), Nothing,
+        (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), x, x, p)
+end
 
-    function _arb_set(x::($typeofx), y::QQFieldElem, p::Int)
-      ccall((:arb_set_fmpq, libflint), Nothing,
-            (($passtoc), Ref{QQFieldElem}, Int), x, y, p)
-    end
+function _arb_set(x::ArbFieldElemOrPtr, y::ZZRingElem)
+  ccall((:arb_set_fmpz, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ZZRingElem}), x, y)
+end
 
-    function _arb_set(x::($typeofx), y::ArbFieldElemOrPtr)
-      ccall((:arb_set, libflint), Nothing, (($passtoc), Ref{ArbFieldElem}), x, y)
-    end
+function _arb_set(x::ArbFieldElemOrPtr, y::ZZRingElem, p::Int)
+  ccall((:arb_set_round_fmpz, libflint), Nothing,
+        (Ref{ArbFieldElem}, Ref{ZZRingElem}, Int), x, y, p)
+end
 
-    function _arb_set(x::($typeofx), y::Ptr{arb_struct})
-      ccall((:arb_set, libflint), Nothing, (($passtoc), Ptr{arb_struct}), x, y)
-    end
+function _arb_set(x::ArbFieldElemOrPtr, y::QQFieldElem, p::Int)
+  ccall((:arb_set_fmpq, libflint), Nothing,
+        (Ref{ArbFieldElem}, Ref{QQFieldElem}, Int), x, y, p)
+end
 
-    function _arb_set(x::Ptr{arb_struct}, y::($typeofx))
-      ccall((:arb_set, libflint), Nothing, (Ptr{arb_struct}, ($passtoc)) , x, y)
-    end
+function _arb_set(x::ArbFieldElemOrPtr, y::ArbFieldElemOrPtr)
+  ccall((:arb_set, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), x, y)
+end
 
-    function _arb_set(x::($typeofx), y::ArbFieldElemOrPtr, p::Int)
-      ccall((:arb_set_round, libflint), Nothing,
-            (($passtoc), Ref{ArbFieldElem}, Int), x, y, p)
-    end
+function _arb_set(x::ArbFieldElemOrPtr, y::Ptr{arb_struct})
+  ccall((:arb_set, libflint), Nothing, (Ref{ArbFieldElem}, Ptr{arb_struct}), x, y)
+end
 
-    function _arb_set(x::($typeofx), y::AbstractString, p::Int)
-      s = string(y)
-      err = ccall((:arb_set_str, libflint), Int32,
-                  (($passtoc), Ptr{UInt8}, Int), x, s, p)
-      err == 0 || error("Invalid real string: $(repr(s))")
-    end
+function _arb_set(x::Ptr{arb_struct}, y::ArbFieldElemOrPtr)
+  ccall((:arb_set, libflint), Nothing, (Ptr{arb_struct}, Ref{ArbFieldElem}) , x, y)
+end
 
-    function _arb_set(x::($typeofx), y::BigFloat)
-      m = _mid_ptr(x)
-      r = _rad_ptr(x)
-      ccall((:arf_set_mpfr, libflint), Nothing,
-            (Ptr{arf_struct}, Ref{BigFloat}), m, y)
-      ccall((:mag_zero, libflint), Nothing, (Ptr{mag_struct}, ), r)
-    end
+function _arb_set(x::ArbFieldElemOrPtr, y::ArbFieldElemOrPtr, p::Int)
+  ccall((:arb_set_round, libflint), Nothing,
+        (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), x, y, p)
+end
 
-    function _arb_set(x::($typeofx), y::BigFloat, p::Int)
-      m = _mid_ptr(x)
-      r = _rad_ptr(x)
-      ccall((:arf_set_mpfr, libflint), Nothing,
-            (Ptr{arf_struct}, Ref{BigFloat}), m, y)
-      ccall((:mag_zero, libflint), Nothing, (Ptr{mag_struct}, ), r)
-      ccall((:arb_set_round, libflint), Nothing,
-            (($passtoc), ($passtoc), Int), x, x, p)
-    end
+function _arb_set(x::ArbFieldElemOrPtr, y::AbstractString, p::Int)
+  s = string(y)
+  err = ccall((:arb_set_str, libflint), Int32,
+              (Ref{ArbFieldElem}, Ptr{UInt8}, Int), x, s, p)
+  err == 0 || error("Invalid real string: $(repr(s))")
+end
 
-    function _arb_set(x::($typeofx), y::Integer)
-      _arb_set(x, ZZRingElem(y))
-    end
+function _arb_set(x::ArbFieldElemOrPtr, y::BigFloat)
+  m = _mid_ptr(x)
+  r = _rad_ptr(x)
+  ccall((:arf_set_mpfr, libflint), Nothing,
+        (Ptr{arf_struct}, Ref{BigFloat}), m, y)
+  ccall((:mag_zero, libflint), Nothing, (Ptr{mag_struct}, ), r)
+end
 
-    function _arb_set(x::($typeofx), y::Integer, p::Int)
-      _arb_set(x, ZZRingElem(y), p)
-    end
+function _arb_set(x::ArbFieldElemOrPtr, y::BigFloat, p::Int)
+  m = _mid_ptr(x)
+  r = _rad_ptr(x)
+  ccall((:arf_set_mpfr, libflint), Nothing,
+        (Ptr{arf_struct}, Ref{BigFloat}), m, y)
+  ccall((:mag_zero, libflint), Nothing, (Ptr{mag_struct}, ), r)
+  ccall((:arb_set_round, libflint), Nothing,
+        (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), x, x, p)
+end
 
-    function _arb_set(x::($typeofx), y::Real)
-      _arb_set(x, BigFloat(y))
-    end
+function _arb_set(x::ArbFieldElemOrPtr, y::Integer)
+  _arb_set(x, ZZRingElem(y))
+end
 
-    function _arb_set(x::($typeofx), y::Real, p::Int)
-      _arb_set(x, BigFloat(y), p)
-    end
-  end
+function _arb_set(x::ArbFieldElemOrPtr, y::Integer, p::Int)
+  _arb_set(x, ZZRingElem(y), p)
+end
+
+function _arb_set(x::ArbFieldElemOrPtr, y::Real)
+  _arb_set(x, BigFloat(y))
+end
+
+function _arb_set(x::ArbFieldElemOrPtr, y::Real, p::Int)
+  _arb_set(x, BigFloat(y), p)
 end
 
 ################################################################################
