@@ -6,9 +6,9 @@
 #
 ###############################################################################
 
-for (etype, rtype, mtype, brtype, flint_fn) in (
-                                                (zzModAbsPowerSeriesRingElem, zzModAbsPowerSeriesRing, zzModRingElem, zzModRing, "nmod_poly"),
-                                                (fpAbsPowerSeriesRingElem, fpAbsPowerSeriesRing, fpFieldElem, fpField, "nmod_poly"))
+for (etype, rtype, mtype, brtype) in (
+                                      (zzModAbsPowerSeriesRingElem, zzModAbsPowerSeriesRing, zzModRingElem, zzModRing),
+                                      (fpAbsPowerSeriesRingElem, fpAbsPowerSeriesRing, fpFieldElem, fpField))
   @eval begin
 
     ###############################################################################
@@ -48,7 +48,7 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
 
     function normalise(a::($etype), len::Int)
       while len > 0
-        c = ccall(($(flint_fn*"_get_coeff_ui"), libflint), UInt,
+        c = ccall((:nmod_poly_get_coeff_ui, libflint), UInt,
                   (Ref{($etype)}, Int), a, len - 1)
         if !iszero(c)
           break
@@ -69,7 +69,7 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
       if n < 0
         return zero(UInt)
       end
-      return ccall(($(flint_fn*"_get_coeff_ui"), libflint), UInt,
+      return ccall((:nmod_poly_get_coeff_ui, libflint), UInt,
                    (Ref{($etype)}, Int), x, n)
     end
 
@@ -106,7 +106,7 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
 
     function isone(a::($etype))
       return precision(a) == 0 ||
-      Bool(ccall(($(flint_fn*"_is_one"), libflint), Cint,
+      Bool(ccall((:nmod_poly_is_one, libflint), Cint,
                  (Ref{($etype)},), a))
     end
 
@@ -188,7 +188,7 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
       lenz = max(lena, lenb)
       z = parent(a)()
       z.prec = prec
-      ccall(($(flint_fn*"_add_series"), libflint), Nothing,
+      ccall((:nmod_poly_add_series, libflint), Nothing,
             (Ref{($etype)}, Ref{($etype)}, Ref{($etype)}, Int),
             z, a, b, lenz)
       return z
@@ -207,7 +207,7 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
       lenz = max(lena, lenb)
       z = parent(a)()
       z.prec = prec
-      ccall(($(flint_fn*"_sub_series"), libflint), Nothing,
+      ccall((:nmod_poly_sub_series, libflint), Nothing,
             (Ref{($etype)}, Ref{($etype)}, Ref{($etype)}, Int),
             z, a, b, lenz)
       return z
@@ -236,7 +236,7 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
 
       lenz = min(lena + lenb - 1, prec)
 
-      ccall(($(flint_fn*"_mullow"), libflint), Nothing,
+      ccall((:nmod_poly_mullow, libflint), Nothing,
             (Ref{($etype)}, Ref{($etype)}, Ref{($etype)}, Int),
             z, a, b, lenz)
       return z
@@ -251,7 +251,7 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
     function *(x::$(mtype), y::($etype))
       z = parent(y)()
       z.prec = y.prec
-      ccall(($(flint_fn*"_scalar_mul_nmod"), libflint), Nothing,
+      ccall((:nmod_poly_scalar_mul_nmod, libflint), Nothing,
             (Ref{($etype)}, Ref{($etype)}, UInt),
             z, y, x.data)
       return z
@@ -286,10 +286,10 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
       z.prec = x.prec + len
       z.prec = min(z.prec, max_precision(parent(x)))
       zlen = min(z.prec, xlen + len)
-      ccall(($(flint_fn*"_shift_left"), libflint), Nothing,
+      ccall((:nmod_poly_shift_left, libflint), Nothing,
             (Ref{($etype)}, Ref{($etype)}, Int),
             z, x, len)
-      ccall(($(flint_fn*"_set_trunc"), libflint), Nothing,
+      ccall((:nmod_poly_set_trunc, libflint), Nothing,
             (Ref{($etype)}, Ref{($etype)}, Int),
             z, z, zlen)
       return z
@@ -303,7 +303,7 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
         z.prec = max(0, x.prec - len)
       else
         z.prec = x.prec - len
-        ccall(($(flint_fn*"_shift_right"), libflint), Nothing,
+        ccall((:nmod_poly_shift_right, libflint), Nothing,
               (Ref{($etype)}, Ref{($etype)}, Int),
               z, x, len)
       end
@@ -325,7 +325,7 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
       if precision(x) <= k
         return x
       end
-      ccall(($(flint_fn*"_truncate"), libflint), Nothing,
+      ccall((:nmod_poly_truncate, libflint), Nothing,
             (Ref{($etype)}, Int),
             x, k)
       x.prec = k
@@ -352,7 +352,7 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
         z = parent(a)()
         z.prec = a.prec + (b - 1)*valuation(a)
         z.prec = min(z.prec, max_precision(parent(a)))
-        ccall(($(flint_fn*"_pow_trunc"), libflint), Nothing,
+        ccall((:nmod_poly_pow_trunc, libflint), Nothing,
               (Ref{($etype)}, Ref{($etype)}, UInt, Int),
               z, a, b, z.prec)
       end
@@ -372,7 +372,7 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
       n = max(length(x), length(y))
       n = min(n, prec)
 
-      return Bool(ccall(($(flint_fn*"_equal_trunc"), libflint), Cint,
+      return Bool(ccall((:nmod_poly_equal_trunc, libflint), Cint,
                         (Ref{($etype)}, Ref{($etype)}, Int),
                         x, y, n))
     end
@@ -384,7 +384,7 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
       if x.prec != y.prec || length(x) != length(y)
         return false
       end
-      return Bool(ccall(($(flint_fn*"_equal"), libflint), Cint,
+      return Bool(ccall((:nmod_poly_equal, libflint), Cint,
                         (Ref{($etype)}, Ref{($etype)}, Int),
                         x, y, length(x)))
     end
@@ -399,7 +399,7 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
       if length(x) > 1
         return false
       elseif length(x) == 1
-        z = ccall(($(flint_fn*"_get_coeff_ui"), libflint), UInt,
+        z = ccall((:nmod_poly_get_coeff_ui, libflint), UInt,
                   (Ref{($etype)}, Int), x, 0)
         return z == y.data
       else
@@ -444,7 +444,7 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
       prec = min(x.prec, y.prec - v2 + v1)
       z = parent(x)()
       z.prec = prec
-      ccall(($(flint_fn*"_div_series"), libflint), Nothing,
+      ccall((:nmod_poly_div_series, libflint), Nothing,
             (Ref{($etype)}, Ref{($etype)}, Ref{($etype)}, Int),
             z, x, y, prec)
       return z
@@ -461,7 +461,7 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
       z = parent(x)()
       z.prec = x.prec
       yinv = inv(y)
-      ccall(($(flint_fn*"_scalar_mul_nmod"), libflint), Nothing,
+      ccall((:nmod_poly_scalar_mul_nmod, libflint), Nothing,
             (Ref{($etype)}, Ref{($etype)}, UInt),
             z, x, yinv.data)
       return z
@@ -485,7 +485,7 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
       !is_unit(a) && error("Unable to invert power series")
       ainv = parent(a)()
       ainv.prec = a.prec
-      ccall(($(flint_fn*"_inv_series"), libflint), Nothing,
+      ccall((:nmod_poly_inv_series, libflint), Nothing,
             (Ref{($etype)}, Ref{($etype)}, Int),
             ainv, a, a.prec)
       return ainv
@@ -498,34 +498,34 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
     ###############################################################################
 
     function zero!(z::($etype))
-      ccall(($(flint_fn*"_zero"), libflint), Nothing,
+      ccall((:nmod_poly_zero, libflint), Nothing,
             (Ref{($etype)},), z)
       z.prec = parent(z).prec_max
       return z
     end
 
     function one!(z::($etype))
-      ccall(($(flint_fn*"_one"), libflint), Nothing,
+      ccall((:nmod_poly_one, libflint), Nothing,
             (Ref{($etype)},), z)
       z.prec = parent(z).prec_max
       return z
     end
 
     function neg!(z::($etype), x::($etype))
-      ccall(($(flint_fn*"_neg"), libflint), Nothing,
+      ccall((:nmod_poly_neg, libflint), Nothing,
             (Ref{($etype)}, Ref{($etype)}), z, x)
       z.prec = x.prec
       return z
     end
 
     function fit!(z::($etype), n::Int)
-      ccall(($(flint_fn*"_fit_length"), libflint), Nothing,
+      ccall((:nmod_poly_fit_length, libflint), Nothing,
             (Ref{($etype)}, Int), z, n)
       return nothing
     end
 
     function setcoeff!(z::($etype), n::Int, x::($mtype))
-      ccall(($(flint_fn*"_set_coeff_ui"), libflint), Nothing,
+      ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
             (Ref{($etype)}, Int, UInt), z, n, x.data)
       return z
     end
@@ -554,7 +554,7 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
       end
 
       z.prec = prec
-      ccall(($(flint_fn*"_mullow"), libflint), Nothing,
+      ccall((:nmod_poly_mullow, libflint), Nothing,
             (Ref{($etype)}, Ref{($etype)},
              Ref{($etype)}, Int), z, a, b, lenz)
       return z
@@ -571,7 +571,7 @@ for (etype, rtype, mtype, brtype, flint_fn) in (
 
       lenc = max(lena, lenb)
       c.prec = prec
-      ccall(($(flint_fn*"_add_series"), libflint), Nothing,
+      ccall((:nmod_poly_add_series, libflint), Nothing,
             (Ref{($etype)}, Ref{($etype)}, Ref{($etype)}, Int),
             c, a, b, lenc)
       return c
