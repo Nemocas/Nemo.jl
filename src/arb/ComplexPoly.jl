@@ -628,8 +628,8 @@ function roots(x::ComplexPolyRingElem; target=0, isolate_real=false, initial_pre
         if real_ok
           for i = 0 : deg - 1
             im = _imag_ptr(roots + i * sizeof(acb_struct))
-            if ccall((:arb_contains_zero, libflint), Bool, (Ptr{RealFieldElem}, ), im)
-              zero!(im)
+            if ccall((:arb_contains_zero, libflint), Bool, (Ptr{arb_struct}, ), im)
+              ccall((:arb_zero, libflint), Nothing, (Ptr{arb_struct}, ), im)
             end
           end
         end
