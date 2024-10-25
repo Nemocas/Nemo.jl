@@ -667,22 +667,12 @@ function (a::FqPolyRepMatrixSpace)(b::FqPolyRepFieldElem)
   return FqPolyRepMatrix(nrows(a), ncols(a), b)
 end
 
-function (a::FqPolyRepMatrixSpace)(arr::AbstractMatrix{T}) where {T <: Integer}
+function (a::FqPolyRepMatrixSpace)(arr::AbstractMatrix{<:IntegerUnion})
   _check_dim(nrows(a), ncols(a), arr)
-  return FqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
+  return FqPolyRepMatrix(arr, base_ring(a))
 end
 
-function (a::FqPolyRepMatrixSpace)(arr::AbstractVector{T}) where {T <: Integer}
-  _check_dim(nrows(a), ncols(a), arr)
-  return FqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
-end
-
-function (a::FqPolyRepMatrixSpace)(arr::AbstractMatrix{ZZRingElem})
-  _check_dim(nrows(a), ncols(a), arr)
-  return FqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
-end
-
-function (a::FqPolyRepMatrixSpace)(arr::AbstractVector{ZZRingElem})
+function (a::FqPolyRepMatrixSpace)(arr::AbstractVector{<:IntegerUnion})
   _check_dim(nrows(a), ncols(a), arr)
   return FqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
 end
@@ -690,7 +680,7 @@ end
 function (a::FqPolyRepMatrixSpace)(arr::AbstractMatrix{FqPolyRepFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
-  return FqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
+  return FqPolyRepMatrix(arr, base_ring(a))
 end
 
 function (a::FqPolyRepMatrixSpace)(arr::AbstractVector{FqPolyRepFieldElem})
@@ -711,7 +701,8 @@ end
 ###############################################################################
 
 function matrix(R::FqPolyRepField, arr::AbstractMatrix{<: Union{FqPolyRepFieldElem, ZZRingElem, Integer}})
-  z = FqPolyRepMatrix(size(arr, 1), size(arr, 2), arr, R)
+  Base.require_one_based_indexing(arr)
+  z = FqPolyRepMatrix(arr, R)
   return z
 end
 

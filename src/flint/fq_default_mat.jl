@@ -674,22 +674,12 @@ function (a::FqMatrixSpace)(b::FqFieldElem)
   return FqMatrix(nrows(a), ncols(a), b)
 end
 
-function (a::FqMatrixSpace)(arr::AbstractMatrix{T}) where {T <: Integer}
+function (a::FqMatrixSpace)(arr::AbstractMatrix{<:IntegerUnion})
   _check_dim(nrows(a), ncols(a), arr)
-  return FqMatrix(nrows(a), ncols(a), arr, base_ring(a))
+  return FqMatrix(arr, base_ring(a))
 end
 
-function (a::FqMatrixSpace)(arr::AbstractVector{T}) where {T <: Integer}
-  _check_dim(nrows(a), ncols(a), arr)
-  return FqMatrix(nrows(a), ncols(a), arr, base_ring(a))
-end
-
-function (a::FqMatrixSpace)(arr::AbstractMatrix{ZZRingElem})
-  _check_dim(nrows(a), ncols(a), arr)
-  return FqMatrix(nrows(a), ncols(a), arr, base_ring(a))
-end
-
-function (a::FqMatrixSpace)(arr::AbstractVector{ZZRingElem})
+function (a::FqMatrixSpace)(arr::AbstractVector{<:IntegerUnion})
   _check_dim(nrows(a), ncols(a), arr)
   return FqMatrix(nrows(a), ncols(a), arr, base_ring(a))
 end
@@ -697,7 +687,7 @@ end
 function (a::FqMatrixSpace)(arr::AbstractMatrix{FqFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
-  return FqMatrix(nrows(a), ncols(a), arr, base_ring(a))
+  return FqMatrix(arr, base_ring(a))
 end
 
 function (a::FqMatrixSpace)(arr::AbstractVector{FqFieldElem})
@@ -732,7 +722,8 @@ end
 ###############################################################################
 
 function matrix(R::FqField, arr::AbstractMatrix{<: Union{FqFieldElem, ZZRingElem, Integer}})
-  z = FqMatrix(size(arr, 1), size(arr, 2), arr, R)
+  Base.require_one_based_indexing(arr)
+  z = FqMatrix(arr, R)
   return z
 end
 

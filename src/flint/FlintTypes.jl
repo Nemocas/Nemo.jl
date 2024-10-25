@@ -5572,11 +5572,12 @@ mutable struct FqMatrix <: MatElem{FqFieldElem}
     return z
   end
 
-  function FqMatrix(r::Int, c::Int, arr::AbstractMatrix{<:Union{FqFieldElem,ZZRingElem,Integer}}, ctx::FqField)
+  function FqMatrix(arr::AbstractMatrix{<:Union{FqFieldElem,ZZRingElem,Integer}}, ctx::FqField)
+    r = nrows(arr)
+    c = ncols(arr)
     z = FqMatrix(r, c, ctx)
     for i = 1:r, j = 1:c
-      el = arr[i, j]
-      @inbounds z[i, j] = el
+      @inbounds z[i, j] = arr[i, j]
     end
     return z
   end
@@ -5675,11 +5676,12 @@ mutable struct FqPolyRepMatrix <: MatElem{FqPolyRepFieldElem}
     return z
   end
 
-  function FqPolyRepMatrix(r::Int, c::Int, arr::AbstractMatrix{<:Union{FqPolyRepFieldElem,ZZRingElem,Integer}}, ctx::FqPolyRepField)
+  function FqPolyRepMatrix(arr::AbstractMatrix{<:Union{FqPolyRepFieldElem,ZZRingElem,Integer}}, ctx::FqPolyRepField)
+    r = nrows(arr)
+    c = ncols(arr)
     z = FqPolyRepMatrix(r, c, ctx)
     for i = 1:r, j = 1:c
-      el = arr[i, j]
-      @inbounds z[i, j] = el
+      @inbounds z[i, j] = arr[i, j]
     end
     return z
   end
@@ -5753,11 +5755,12 @@ mutable struct fqPolyRepMatrix <: MatElem{fqPolyRepFieldElem}
     return z
   end
 
-  function fqPolyRepMatrix(r::Int, c::Int, arr::AbstractMatrix{<:Union{fqPolyRepFieldElem,ZZRingElem,Integer}}, ctx::fqPolyRepField)
+  function fqPolyRepMatrix(arr::AbstractMatrix{<:Union{fqPolyRepFieldElem,ZZRingElem,Integer}}, ctx::fqPolyRepField)
+    r = nrows(arr)
+    c = ncols(arr)
     z = fqPolyRepMatrix(r, c, ctx)
     for i = 1:r, j = 1:c
-      el = arr[i, j]
-      @inbounds z[i, j] = el
+      @inbounds z[i, j] = arr[i, j]
     end
     return z
   end
