@@ -580,7 +580,7 @@ function roots_upper_bound(x::RealPolyRingElem)
     t = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (Ref{RealFieldElem}, ), z)
     ccall((:arb_poly_root_bound_fujiwara, libflint), Nothing,
           (Ptr{mag_struct}, Ref{RealPolyRingElem}), t, x)
-    s = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (Ref{RealFieldElem}, ), z)
+    s = _mid_ptr(z)
     ccall((:arf_set_mag, libflint), Nothing, (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
     ccall((:arf_set_round, libflint), Nothing,
           (Ptr{arf_struct}, Ptr{arf_struct}, Int, Cint), s, s, p, ARB_RND_CEIL)

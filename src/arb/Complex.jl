@@ -77,8 +77,8 @@ function convert(::Type{ComplexF64}, x::ComplexFieldElem)
   GC.@preserve x begin
     re = _real_ptr(x)
     im = _imag_ptr(x)
-    t = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (Ptr{RealFieldElem}, ), re)
-    u = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (Ptr{RealFieldElem}, ), im)
+    t = _mid_ptr(re)
+    u = _mid_ptr(im)
     # 4 == round to nearest
     v = ccall((:arf_get_d, libflint), Float64, (Ptr{arf_struct}, Int), t, 4)
     w = ccall((:arf_get_d, libflint), Float64, (Ptr{arf_struct}, Int), u, 4)

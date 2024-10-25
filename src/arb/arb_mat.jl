@@ -658,7 +658,7 @@ function bound_inf_norm(x::ArbMatrix)
     t = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (Ref{ArbFieldElem}, ), z)
     ccall((:arb_mat_bound_inf_norm, libflint), Nothing,
           (Ptr{mag_struct}, Ref{ArbMatrix}), t, x)
-    s = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (Ref{ArbFieldElem}, ), z)
+    s = _mid_ptr(z)
     ccall((:arf_set_mag, libflint), Nothing,
           (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
     ccall((:mag_zero, libflint), Nothing,
