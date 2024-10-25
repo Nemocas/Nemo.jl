@@ -62,8 +62,7 @@ end
   nothing
 end
 
-setindex!(a::FqMatrix, u::Integer, i::Int, j::Int) =
-setindex!(a, base_ring(a)(u), i, j)
+setindex!(a::FqMatrix, u::Integer, i::Int, j::Int) = setindex!(a, base_ring(a)(u), i, j)
 
 function setindex!(a::FqMatrix, b::FqMatrix, r::UnitRange{Int64}, c::UnitRange{Int64})
   _checkbounds(a, r, c)

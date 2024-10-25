@@ -63,8 +63,7 @@ end
   end
 end
 
-setindex!(a::FqPolyRepMatrix, u::Integer, i::Int, j::Int) =
-setindex!(a, base_ring(a)(u), i, j)
+setindex!(a::FqPolyRepMatrix, u::Integer, i::Int, j::Int) = setindex!(a, base_ring(a)(u), i, j)
 
 function setindex!(a::FqPolyRepMatrix, b::FqPolyRepMatrix, r::UnitRange{Int64}, c::UnitRange{Int64})
   _checkbounds(a, r, c)
