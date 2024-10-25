@@ -75,6 +75,7 @@ mutable struct acb_struct
 end
 
 _mid_ptr(x::arb_struct) = @ccall libflint.arb_mid_ptr(x::Ref{arb_struct})::Ptr{arf_struct}
+_rad_ptr(x::arb_struct) = @ccall libflint.arb_rad_ptr(x::Ref{arb_struct})::Ptr{mag_struct}
 
 _real_ptr(x::acb_struct) = @ccall libflint.acb_real_ptr(x::Ref{acb_struct})::Ptr{arb_struct}
 _imag_ptr(x::acb_struct) = @ccall libflint.acb_imag_ptr(x::Ref{acb_struct})::Ptr{arb_struct}

@@ -655,7 +655,7 @@ bound for the infinity norm for every matrix in $x$
 function bound_inf_norm(x::ArbMatrix)
   z = ArbFieldElem()
   GC.@preserve x z begin
-    t = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (Ref{ArbFieldElem}, ), z)
+    t = _rad_ptr(z)
     ccall((:arb_mat_bound_inf_norm, libflint), Nothing,
           (Ptr{mag_struct}, Ref{ArbMatrix}), t, x)
     s = _mid_ptr(z)

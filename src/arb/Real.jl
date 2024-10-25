@@ -56,6 +56,7 @@ end
 characteristic(::RealField) = 0
 
 _mid_ptr(x::RealFieldElemOrPtr) = @ccall libflint.arb_mid_ptr(x::Ref{RealFieldElem})::Ptr{arf_struct}
+_rad_ptr(x::RealFieldElemOrPtr) = @ccall libflint.arb_rad_ptr(x::Ref{RealFieldElem})::Ptr{mag_struct}
 
 ################################################################################
 #
@@ -2014,8 +2015,7 @@ for (typeofx, passtoc) in ((RealFieldElem, Ref{RealFieldElem}), (Ptr{RealFieldEl
 
     function _arb_set(x::($typeofx), y::BigFloat)
       m = _mid_ptr(x)
-      r = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct},
-                (($passtoc), ), x)
+      r = _rad_ptr(x)
       ccall((:arf_set_mpfr, libflint), Nothing,
             (Ptr{arf_struct}, Ref{BigFloat}), m, y)
       ccall((:mag_zero, libflint), Nothing, (Ptr{mag_struct}, ), r)
@@ -2023,7 +2023,7 @@ for (typeofx, passtoc) in ((RealFieldElem, Ref{RealFieldElem}), (Ptr{RealFieldEl
 
     function _arb_set(x::($typeofx), y::BigFloat, p::Int)
       m = _mid_ptr(x)
-      r = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (($passtoc), ), x)
+      r = _rad_ptr(x)
       ccall((:arf_set_mpfr, libflint), Nothing,
             (Ptr{arf_struct}, Ref{BigFloat}), m, y)
       ccall((:mag_zero, libflint), Nothing, (Ptr{mag_struct}, ), r)

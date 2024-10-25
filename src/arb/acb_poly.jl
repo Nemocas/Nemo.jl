@@ -603,8 +603,8 @@ function roots(x::AcbPolyRingElem; target=0, isolate_real=false, initial_prec=0,
         for i = 0 : deg-1
           re = _real_ptr(roots + i * sizeof(acb_struct))
           im = _imag_ptr(roots + i * sizeof(acb_struct))
-          t = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (Ptr{ArbFieldElem}, ), re)
-          u = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (Ptr{ArbFieldElem}, ), im)
+          t = _rad_ptr(re)
+          u = _rad_ptr(im)
           ok = ok && (ccall((:mag_cmp_2exp_si, libflint), Cint,
                             (Ptr{mag_struct}, Int), t, -target) <= 0)
           ok = ok && (ccall((:mag_cmp_2exp_si, libflint), Cint,
@@ -670,7 +670,7 @@ function roots_upper_bound(x::AcbPolyRingElem)
   z = ArbField(precision(base_ring(x)))()
   p = precision(base_ring(x))
   GC.@preserve x z begin
-    t = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (Ref{ArbFieldElem}, ), z)
+    t = _rad_ptr(z)
     ccall((:acb_poly_root_bound_fujiwara, libflint), Nothing,
           (Ptr{mag_struct}, Ref{AcbPolyRingElem}), t, x)
     s = _mid_ptr(z)
