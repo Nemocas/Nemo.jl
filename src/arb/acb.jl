@@ -85,8 +85,8 @@ characteristic(::AcbField) = 0
 
 function convert(::Type{ComplexF64}, x::AcbFieldElem)
   GC.@preserve x begin
-    re = ccall((:acb_real_ptr, libflint), Ptr{arb_struct}, (Ref{AcbFieldElem}, ), x)
-    im = ccall((:acb_imag_ptr, libflint), Ptr{arb_struct}, (Ref{AcbFieldElem}, ), x)
+    re = _real_ptr(x)
+    im = _imag_ptr(x)
     t = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (Ptr{ArbFieldElem}, ), re)
     u = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (Ptr{ArbFieldElem}, ), im)
     # 4 == round to nearest
@@ -1611,6 +1611,9 @@ end
 #
 ################################################################################
 
+_real_ptr(x::AcbFieldElemOrPtr) = @ccall libflint.acb_real_ptr(x::Ref{AcbFieldElem})::Ptr{ArbFieldElem}
+_imag_ptr(x::AcbFieldElemOrPtr) = @ccall libflint.acb_imag_ptr(x::Ref{AcbFieldElem})::Ptr{ArbFieldElem}
+
 for (typeofx, passtoc) in ((AcbFieldElem, Ref{AcbFieldElem}), (Ptr{AcbFieldElem}, Ptr{AcbFieldElem}))
   for (f,t) in (("acb_set_si", Int), ("acb_set_ui", UInt),
                 ("acb_set_d", Float64))
@@ -1670,23 +1673,23 @@ for (typeofx, passtoc) in ((AcbFieldElem, Ref{AcbFieldElem}), (Ptr{AcbFieldElem}
     end
 
     function _acb_set(x::($typeofx), y::AbstractString, p::Int)
-      r = ccall((:acb_real_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
+      r = _real_ptr(x)
       _arb_set(r, y, p)
-      i = ccall((:acb_imag_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
+      i = _imag_ptr(x)
       zero!(i)
     end
 
     function _acb_set(x::($typeofx), y::BigFloat)
-      r = ccall((:acb_real_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
+      r = _real_ptr(x)
       _arb_set(r, y)
-      i = ccall((:acb_imag_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
+      i = _imag_ptr(x)
       zero!(i)
     end
 
     function _acb_set(x::($typeofx), y::BigFloat, p::Int)
-      r = ccall((:acb_real_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
+      r = _real_ptr(x)
       _arb_set(r, y, p)
-      i = ccall((:acb_imag_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
+      i = _imag_ptr(x)
       zero!(i)
     end
 
@@ -1709,30 +1712,30 @@ for (typeofx, passtoc) in ((AcbFieldElem, Ref{AcbFieldElem}), (Ptr{AcbFieldElem}
     end
 
     function _acb_set(x::($typeofx), y::QQFieldElem, z::QQFieldElem, p::Int)
-      r = ccall((:acb_real_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
+      r = _real_ptr(x)
       _arb_set(r, y, p)
-      i = ccall((:acb_imag_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
+      i = _imag_ptr(x)
       _arb_set(i, z, p)
     end
 
     function _acb_set(x::($typeofx), y::T, z::T, p::Int) where {T <: AbstractString}
-      r = ccall((:acb_real_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
+      r = _real_ptr(x)
       _arb_set(r, y, p)
-      i = ccall((:acb_imag_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
+      i = _imag_ptr(x)
       _arb_set(i, z, p)
     end
 
     function _acb_set(x::($typeofx), y::Real, p::Int)
-      r = ccall((:acb_real_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
+      r = _real_ptr(x)
       _arb_set(r, y, p)
-      i = ccall((:acb_imag_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
+      i = _imag_ptr(x)
       zero!(i)
     end
 
     function _acb_set(x::($typeofx), y::Complex, p::Int)
-      r = ccall((:acb_real_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
+      r = _real_ptr(x)
       _arb_set(r, real(y), p)
-      i = ccall((:acb_imag_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
+      i = _imag_ptr(x)
       _arb_set(i, imag(y), p)
     end
 
@@ -1741,9 +1744,9 @@ for (typeofx, passtoc) in ((AcbFieldElem, Ref{AcbFieldElem}), (Ptr{AcbFieldElem}
   for T in (Real, ZZRingElem)
     @eval begin
       function _acb_set(x::($typeofx), y::($T), z::($T), p::Int)
-        r = ccall((:acb_real_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
+        r = _real_ptr(x)
         _arb_set(r, y, p)
-        i = ccall((:acb_imag_ptr, libflint), Ptr{ArbFieldElem}, (($passtoc), ), x)
+        i = _imag_ptr(x)
         _arb_set(i, z, p)
       end
     end

@@ -74,6 +74,9 @@ mutable struct acb_struct
   imag_rad_man::UInt
 end
 
+_real_ptr(x::acb_struct) = @ccall libflint.acb_real_ptr(x::Ref{acb_struct})::Ptr{arb_struct}
+_imag_ptr(x::acb_struct) = @ccall libflint.acb_imag_ptr(x::Ref{acb_struct})::Ptr{arb_struct}
+
 ################################################################################
 #
 #  Types and memory management for ArbField

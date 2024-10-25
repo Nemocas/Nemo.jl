@@ -601,10 +601,8 @@ function roots(x::AcbPolyRingElem; target=0, isolate_real=false, initial_prec=0,
       ok = true
       if target > 0
         for i = 0 : deg-1
-          re = ccall((:acb_real_ptr, libflint), Ptr{arb_struct},
-                     (Ptr{AcbFieldElem}, ), roots + i * sizeof(acb_struct))
-          im = ccall((:acb_imag_ptr, libflint), Ptr{arb_struct},
-                     (Ptr{AcbFieldElem}, ), roots + i * sizeof(acb_struct))
+          re = _real_ptr(roots + i * sizeof(acb_struct))
+          im = _imag_ptr(roots + i * sizeof(acb_struct))
           t = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (Ptr{ArbFieldElem}, ), re)
           u = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (Ptr{ArbFieldElem}, ), im)
           ok = ok && (ccall((:mag_cmp_2exp_si, libflint), Cint,
@@ -624,8 +622,7 @@ function roots(x::AcbPolyRingElem; target=0, isolate_real=false, initial_prec=0,
 
         if real_ok
           for i = 0 : deg - 1
-            im = ccall((:acb_imag_ptr, libflint), Ptr{ArbFieldElem},
-                       (Ptr{AcbFieldElem}, ), roots + i * sizeof(acb_struct))
+            im = _imag_ptr(roots + i * sizeof(acb_struct))
             if ccall((:arb_contains_zero, libflint), Bool, (Ptr{ArbFieldElem}, ), im)
               zero!(im)
             end
