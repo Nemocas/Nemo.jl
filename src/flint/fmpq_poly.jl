@@ -201,8 +201,7 @@ function ==(x::QQPolyRingElem, y::QQFieldElem)
     z = QQFieldElem()
     ccall((:fmpq_poly_get_coeff_fmpq, libflint), Nothing,
           (Ref{QQFieldElem}, Ref{QQPolyRingElem}, Int), z, x, 0)
-    return ccall((:fmpq_equal, libflint), Bool,
-                 (Ref{QQFieldElem}, Ref{QQFieldElem}, Int), z, y, 0)
+    return z == y
   else
     return iszero(y)
   end

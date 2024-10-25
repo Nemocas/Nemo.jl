@@ -30,7 +30,7 @@ dense_matrix_type(::Type{ComplexFieldElem}) = ComplexMatrix
 function getindex!(z::ComplexFieldElem, x::ComplexMatrix, r::Int, c::Int)
   GC.@preserve x begin
     v = mat_entry_ptr(x, r, c)
-    ccall((:acb_set, libflint), Nothing, (Ref{ComplexFieldElem}, Ptr{ComplexFieldElem}), z, v)
+    _acb_set(z, v)
   end
   return z
 end
@@ -41,7 +41,7 @@ end
   z = base_ring(x)()
   GC.@preserve x begin
     v = mat_entry_ptr(x, r, c)
-    ccall((:acb_set, libflint), Nothing, (Ref{ComplexFieldElem}, Ptr{ComplexFieldElem}), z, v)
+    _acb_set(z, v)
   end
   return z
 end
@@ -525,15 +525,19 @@ end
 #
 ###############################################################################
 
-function lu!(P::Perm, x::ComplexMatrix)
+function lu!(P::Perm, z::ComplexMatrix, x::ComplexMatrix)
   P.d .-= 1
   r = ccall((:acb_mat_lu, libflint), Cint,
             (Ptr{Int}, Ref{ComplexMatrix}, Ref{ComplexMatrix}, Int),
-            P.d, x, x, precision(Balls))
+            P.d, z, x, precision(Balls))
   r == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
   P.d .+= 1
   inv!(P)
   return min(nrows(x), ncols(x))
+end
+
+function lu!(P::Perm, x::ComplexMatrix)
+  return lu!(P, x, x)
 end
 
 function _solve!(z::ComplexMatrix, x::ComplexMatrix, y::ComplexMatrix)
@@ -570,10 +574,7 @@ function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::ComplexMatrix, b
   end
 
   x = similar(A, ncols(A), ncols(b))
-  fl = ccall((:acb_mat_solve, libflint), Cint,
-             (Ref{ComplexMatrix}, Ref{ComplexMatrix}, Ref{ComplexMatrix}, Int),
-             x, A, b, precision(Balls))
-  fl == 0 && error("Matrix cannot be inverted numerically")
+  _solve!(x, A, b)
   if task === :only_check || task === :with_solution
     return true, x, zero(A, 0, 0)
   end
@@ -598,13 +599,7 @@ function Solve._init_reduce(C::Solve.SolveCtx{ComplexFieldElem, Solve.LUTrait})
   A = matrix(C)
   P = Perm(nrows(C))
   x = similar(A, nrows(A), ncols(A))
-  P.d .-= 1
-  fl = ccall((:acb_mat_lu, libflint), Cint,
-             (Ptr{Int}, Ref{ComplexMatrix}, Ref{ComplexMatrix}, Int),
-             P.d, x, A, precision(Balls))
-  fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
-  P.d .+= 1
-  inv!(P)
+  lu!(P, x, A)
 
   C.red = x
   C.lu_perm = P
@@ -621,13 +616,7 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{ComplexFieldElem, Solve.
   A = transpose(matrix(C))
   P = Perm(nrows(C))
   x = similar(A, nrows(A), ncols(A))
-  P.d .-= 1
-  fl = ccall((:acb_mat_lu, libflint), Cint,
-             (Ptr{Int}, Ref{ComplexMatrix}, Ref{ComplexMatrix}, Int),
-             P.d, x, A, precision(Balls))
-  fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
-  P.d .+= 1
-  inv!(P)
+  lu!(P, x, A)
 
   C.red_transp = x
   C.lu_perm_transp = P
@@ -645,9 +634,7 @@ function Solve._can_solve_internal_no_check(::Solve.LUTrait, C::Solve.SolveCtx{C
   end
 
   x = similar(b, ncols(C), ncols(b))
-  ccall((:acb_mat_solve_lu_precomp, libflint), Nothing,
-        (Ref{ComplexMatrix}, Ptr{Int}, Ref{ComplexMatrix}, Ref{ComplexMatrix}, Int),
-        x, inv(p).d .- 1, LU, b, precision(Balls))
+  _solve_lu_precomp!(x, p, LU, b)
 
   if side === :left
     x = transpose(x)

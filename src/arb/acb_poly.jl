@@ -35,9 +35,9 @@ function coeff(a::AcbPolyRingElem, n::Int)
   return t
 end
 
-zero(a::AcbPolyRing) = a(0)
+zero(a::AcbPolyRing) = a()
 
-one(a::AcbPolyRing) = a(1)
+one(a::AcbPolyRing) = one!(a())
 
 function gen(a::AcbPolyRing)
   z = AcbPolyRingElem()
@@ -242,26 +242,18 @@ end
 
 function +(x::AcbPolyRingElem, y::AcbPolyRingElem)
   z = parent(x)()
-  ccall((:acb_poly_add, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Int),
-        z, x, y, precision(parent(x)))
+  return add!(z, x, y)
+end
+
+function -(x::AcbPolyRingElem, y::AcbPolyRingElem)
+  z = parent(x)()
+  return sub!(z, x, y)
   return z
 end
 
 function *(x::AcbPolyRingElem, y::AcbPolyRingElem)
   z = parent(x)()
-  ccall((:acb_poly_mul, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Int),
-        z, x, y, precision(parent(x)))
-  return z
-end
-
-function -(x::AcbPolyRingElem, y::AcbPolyRingElem)
-  z = parent(x)()
-  ccall((:acb_poly_sub, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Int),
-        z, x, y, precision(parent(x)))
-  return z
+  return mul!(z, x, y)
 end
 
 function ^(x::AcbPolyRingElem, y::Int)
@@ -460,19 +452,17 @@ end
 
 function acb_vec(b::Vector{AcbFieldElem})
   v = ccall((:_acb_vec_init, libflint), Ptr{acb_struct}, (Int,), length(b))
-  for i=1:length(b)
-    ccall((:acb_set, libflint), Nothing, (Ptr{acb_struct}, Ref{AcbFieldElem}),
-          v + (i-1)*sizeof(acb_struct), b[i])
+  for i in 1:length(b)
+    _acb_set(v + (i-1)*sizeof(acb_struct), b[i])
   end
   return v
 end
 
 function array(R::AcbField, v::Ptr{acb_struct}, n::Int)
   r = Vector{AcbFieldElem}(undef, n)
-  for i=1:n
+  for i in 1:n
     r[i] = R()
-    ccall((:acb_set, libflint), Nothing, (Ref{AcbFieldElem}, Ptr{acb_struct}),
-          r[i], v + (i-1)*sizeof(acb_struct))
+    _acb_set(r[i], v + (i-1)*sizeof(acb_struct))
   end
   return r
 end
@@ -731,12 +721,7 @@ end
 
 setcoeff!(z::AcbPolyRingElem, n::Int, x::Integer) = setcoeff!(z, n, flintify(x))
 
-function mul!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::AcbPolyRingElem)
-  ccall((:acb_poly_mul, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Int),
-        z, x, y, precision(parent(z)))
-  return z
-end
+#
 
 function add!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::AcbPolyRingElem)
   ccall((:acb_poly_add, libflint), Nothing,
@@ -744,6 +729,56 @@ function add!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::AcbPolyRingElem)
         z, x, y, precision(parent(z)))
   return z
 end
+
+function add!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::Int)
+  ccall((:acb_poly_add_si, libflint), Nothing,
+        (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Int, Int),
+        z, x, y, precision(parent(z)))
+  return z
+end
+
+add!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::AcbFieldElem) = add!(z, x, parent(z)(y))
+
+add!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::ZZRingElem) = add!(z, x, parent(z)(y))
+
+add!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::Integer) = add!(z, x, flintify(y))
+
+add!(z::AcbPolyRingElem, x::Union{AcbFieldElem,IntegerUnion}, y::AcbPolyRingElem) = add!(z, y, x)
+
+#
+
+function sub!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::AcbPolyRingElem)
+  ccall((:acb_poly_sub, libflint), Nothing,
+        (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Int),
+        z, x, y, precision(parent(z)))
+  return z
+end
+
+sub!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::Union{AcbFieldElem,IntegerUnion}) = sub!(z, x, parent(z)(y))
+
+sub!(z::AcbPolyRingElem, x::Union{AcbFieldElem,IntegerUnion}, y::AcbPolyRingElem) = sub!(z, parent(z)(x), y)
+
+#
+
+function mul!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::AcbPolyRingElem)
+  ccall((:acb_poly_mul, libflint), Nothing,
+        (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Int),
+        z, x, y, precision(parent(z)))
+  return z
+end
+
+function mul!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::AcbFieldElem)
+  ccall((:acb_poly_scalar_mul, libflint), Nothing,
+        (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Ref{AcbFieldElem}, Int),
+        z, x, y, precision(parent(z)))
+  return z
+end
+
+mul!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::IntegerUnion) = mul!(z, x, base_ring(z)(y))
+
+mul!(z::AcbPolyRingElem, x::Union{AcbFieldElem,IntegerUnion}, y::AcbPolyRingElem) = mul!(z, y, x)
+
+#
 
 ###############################################################################
 #

@@ -33,7 +33,7 @@ precision(x::ArbMatrixSpace) = precision(x.base_ring)
 function getindex!(z::ArbFieldElem, x::ArbMatrix, r::Int, c::Int)
   GC.@preserve x begin
     v = mat_entry_ptr(x, r, c)
-    ccall((:arb_set, libflint), Nothing, (Ref{ArbFieldElem}, Ptr{ArbFieldElem}), z, v)
+    _arb_set(z, v)
   end
   return z
 end
@@ -44,7 +44,7 @@ end
   z = base_ring(x)()
   GC.@preserve x begin
     v = mat_entry_ptr(x, r, c)
-    ccall((:arb_set, libflint), Nothing, (Ref{ArbFieldElem}, Ptr{ArbFieldElem}), z, v)
+    _arb_set(z, v)
   end
   return z
 end
@@ -480,16 +480,20 @@ function cholesky(x::ArbMatrix)
   return z
 end
 
-function lu!(P::Perm, x::ArbMatrix)
+function lu!(P::Perm, z::ArbMatrix, x::ArbMatrix)
   parent(P).n != nrows(x) && error("Permutation does not match matrix")
   P.d .-= 1
   r = ccall((:arb_mat_lu, libflint), Cint,
             (Ptr{Int}, Ref{ArbMatrix}, Ref{ArbMatrix}, Int),
-            P.d, x, x, precision(base_ring(x)))
+            P.d, z, x, precision(base_ring(x)))
   r == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
   P.d .+= 1
   inv!(P)
   return nrows(x)
+end
+
+function lu!(P::Perm, x::ArbMatrix)
+  return lu!(P, x, x)
 end
 
 function _solve!(z::ArbMatrix, x::ArbMatrix, y::ArbMatrix)
@@ -540,10 +544,7 @@ function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::ArbMatrix, b::Ar
   end
 
   x = similar(A, ncols(A), ncols(b))
-  fl = ccall((:arb_mat_solve, libflint), Cint,
-             (Ref{ArbMatrix}, Ref{ArbMatrix}, Ref{ArbMatrix}, Int),
-             x, A, b, precision(base_ring(A)))
-  fl == 0 && error("Matrix cannot be inverted numerically")
+  _solve!(x, A, b)
   if task === :only_check || task === :with_solution
     return true, x, zero(A, 0, 0)
   end
@@ -567,13 +568,7 @@ function Solve._init_reduce(C::Solve.SolveCtx{ArbFieldElem, Solve.LUTrait})
   A = matrix(C)
   P = Perm(nrows(C))
   x = similar(A, nrows(A), ncols(A))
-  P.d .-= 1
-  fl = ccall((:arb_mat_lu, libflint), Cint,
-             (Ptr{Int}, Ref{ArbMatrix}, Ref{ArbMatrix}, Int),
-             P.d, x, A, precision(base_ring(A)))
-  fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
-  P.d .+= 1
-  inv!(P)
+  lu!(P, x, A)
 
   C.red = x
   C.lu_perm = P
@@ -590,13 +585,7 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{ArbFieldElem, Solve.LUTr
   A = transpose(matrix(C))
   P = Perm(nrows(C))
   x = similar(A, nrows(A), ncols(A))
-  P.d .-= 1
-  fl = ccall((:arb_mat_lu, libflint), Cint,
-             (Ptr{Int}, Ref{ArbMatrix}, Ref{ArbMatrix}, Int),
-             P.d, x, A, precision(base_ring(A)))
-  fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
-  P.d .+= 1
-  inv!(P)
+  lu!(P, x, A)
 
   C.red_transp = x
   C.lu_perm_transp = P
@@ -614,9 +603,7 @@ function Solve._can_solve_internal_no_check(::Solve.LUTrait, C::Solve.SolveCtx{A
   end
 
   x = similar(b, ncols(C), ncols(b))
-  ccall((:arb_mat_solve_lu_precomp, libflint), Nothing,
-        (Ref{ArbMatrix}, Ptr{Int}, Ref{ArbMatrix}, Ref{ArbMatrix}, Int),
-        x, inv(p).d .- 1, LU, b, precision(base_ring(LU)))
+  _solve_lu_precomp!(x, p, LU, b)
 
   if side === :left
     x = transpose(x)

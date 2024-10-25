@@ -609,9 +609,21 @@ end
 
 @testset "QQFieldElem.adhoc_remove_valuation" begin
   a = QQFieldElem(2, 3)
-
   @test remove(a, 3) == (-1, QQFieldElem(2, 1))
   @test valuation(a, 3) == -1
+
+  a = QQFieldElem(3, 2)
+  @test remove(a, 3) == (1, QQFieldElem(1, 2))
+  @test valuation(a, 3) == 1
+
+  a = QQFieldElem(1)
+  @test remove(a, 3) == (0, QQFieldElem(1))
+  @test valuation(a, 3) == 0
+
+  # "not yet implemented"
+#  a = QQFieldElem(0)
+#  @test remove(a, 3) == (-1, QQFieldElem(2, 1))
+#  @test valuation(a, 3) == -1
 end
 
 @testset "QQFieldElem.simplest_between" begin

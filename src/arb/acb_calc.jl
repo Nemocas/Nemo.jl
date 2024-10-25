@@ -2,7 +2,7 @@ function acb_calc_func_wrap(res::Ptr{ComplexFieldElem}, x::Ptr{ComplexFieldElem}
   xx = unsafe_load(x)
   F = unsafe_pointer_to_objref(param)
   w = F(xx)
-  ccall((:acb_set, libflint), Ptr{Nothing}, (Ptr{ComplexFieldElem}, Ref{ComplexFieldElem}), res, w)
+  _acb_set(res, w)
   return zero(Cint)
 end
 

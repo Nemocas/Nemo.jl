@@ -45,7 +45,7 @@ end
 
 function deepcopy_internal(a::ArbFieldElem, dict::IdDict)
   b = parent(a)()
-  ccall((:arb_set, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}), b, a)
+  _arb_set(b, a)
   return b
 end
 
@@ -1996,11 +1996,19 @@ for (typeofx, passtoc) in ((ArbFieldElem, Ref{ArbFieldElem}), (Ptr{ArbFieldElem}
             (($passtoc), Ref{QQFieldElem}, Int), x, y, p)
     end
 
-    function _arb_set(x::($typeofx), y::ArbFieldElem)
+    function _arb_set(x::($typeofx), y::ArbFieldElemOrPtr)
       ccall((:arb_set, libflint), Nothing, (($passtoc), Ref{ArbFieldElem}), x, y)
     end
 
-    function _arb_set(x::($typeofx), y::ArbFieldElem, p::Int)
+    function _arb_set(x::($typeofx), y::Ptr{arb_struct})
+      ccall((:arb_set, libflint), Nothing, (($passtoc), Ptr{arb_struct}), x, y)
+    end
+
+    function _arb_set(x::Ptr{arb_struct}, y::($typeofx))
+      ccall((:arb_set, libflint), Nothing, (Ptr{arb_struct}, ($passtoc)) , x, y)
+    end
+
+    function _arb_set(x::($typeofx), y::ArbFieldElemOrPtr, p::Int)
       ccall((:arb_set_round, libflint), Nothing,
             (($passtoc), Ref{ArbFieldElem}, Int), x, y, p)
     end

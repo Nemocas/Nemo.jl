@@ -206,8 +206,7 @@ end
 
 function transpose(x::QQMatrix)
   z = similar(x, ncols(x), nrows(x))
-  ccall((:fmpq_mat_transpose, libflint), Nothing,
-        (Ref{QQMatrix}, Ref{QQMatrix}), z, x)
+  transpose!(z, x)
   return z
 end
 
