@@ -73,15 +73,11 @@ end
 ###############################################################################
 
 function numerator(a::QQFieldElem)
-  z = ZZRingElem()
-  ccall((:fmpq_numerator, libflint), Nothing, (Ref{ZZRingElem}, Ref{QQFieldElem}), z, a)
-  return z
+  return numerator!(ZZRingElem(), a)
 end
 
 function denominator(a::QQFieldElem)
-  z = ZZRingElem()
-  ccall((:fmpq_denominator, libflint), Nothing, (Ref{ZZRingElem}, Ref{QQFieldElem}), z, a)
-  return z
+  return denominator!(ZZRingElem(), a)
 end
 
 @doc raw"""
@@ -355,8 +351,7 @@ cmp(a::QQFieldElemOrPtr, b::Integer) = cmp(a, flintify(b))
 cmp(a::Union{ZZRingElemOrPtr, Integer}, b::QQFieldElemOrPtr) = -cmp(b, a)
 
 function ==(a::QQFieldElem, b::QQFieldElem)
-  return ccall((:fmpq_equal, libflint), Bool,
-               (Ref{QQFieldElem}, Ref{QQFieldElem}), a, b)
+  return @ccall libflint.fmpq_equal(a::Ref{QQFieldElem}, b::Ref{QQFieldElem})::Bool
 end
 
 function isless(a::QQFieldElem, b::QQFieldElem)
@@ -733,9 +728,8 @@ julia> c = reconstruct(ZZ(123), ZZ(237))
 ```
 """
 function reconstruct(a::ZZRingElem, m::ZZRingElem)
-  c = QQFieldElem()
-  if !Bool(ccall((:fmpq_reconstruct_fmpz, libflint), Cint,
-                 (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), c, a, m))
+  success, c = unsafe_reconstruct(a, m)
+  if !success
     error("Impossible rational reconstruction")
   end
   return c
@@ -1082,12 +1076,12 @@ function set!(c::QQFieldElemOrPtr, a::Union{Integer,ZZRingElemOrPtr})
 end
 
 function numerator!(z::ZZRingElem, y::QQFieldElem)
-  ccall((:fmpq_numerator, libflint), Cvoid, (Ref{ZZRingElem}, Ref{QQFieldElem}), z, y)
+  @ccall libflint.fmpq_numerator(z::Ref{ZZRingElem}, y::Ref{QQFieldElem})::Nothing
   return z
 end
 
-function denominator!(z::ZZRingElem, y::QQFieldElem)
-  ccall((:fmpq_denominator, libflint), Cvoid, (Ref{ZZRingElem}, Ref{QQFieldElem}), z, y)
+function denominator!(z::ZZRingElemOrPtr, y::QQFieldElemOrPtr)
+  @ccall libflint.fmpq_denominator(z::Ref{ZZRingElem}, y::Ref{QQFieldElem})::Nothing
   return z
 end
 
