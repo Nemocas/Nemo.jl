@@ -78,12 +78,6 @@ function _acb_mat(A::ArbMatrix)
   return change_base_ring(Cc, A)
 end
 
-function mul!(z::AcbFieldElem, x::AcbFieldElem, y::ArbFieldElem)
-  ccall((:acb_mul_arb, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ArbFieldElem}, Int),
-        z, x, y, parent(z).prec)
-  return z
-end
-
 @doc raw"""
     valuation(G::QQMatrix, p)
 

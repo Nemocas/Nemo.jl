@@ -170,111 +170,84 @@ end
 
 # AcbFieldElem - AcbFieldElem
 
-for (s,f) in ((:+,"acb_add"), (:*,"acb_mul"), (://, "acb_div"), (:-,"acb_sub"), (:^,"acb_pow"))
-  @eval begin
-    function ($s)(x::AcbFieldElem, y::AcbFieldElem)
-      z = parent(x)()
-      ccall(($f, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int),
-            z, x, y, parent(x).prec)
-      return z
-    end
-  end
+function +(x::AcbFieldElem, y::AcbFieldElem)
+  z = parent(x)()
+  return add!(z, x, y)
 end
 
-for (f,s) in ((:+, "add"), (:-, "sub"), (:*, "mul"), (://, "div"), (:^, "pow"))
-  @eval begin
-
-    function ($f)(x::AcbFieldElem, y::UInt)
-      z = parent(x)()
-      ccall(($("acb_"*s*"_ui"), libflint), Nothing,
-            (Ref{AcbFieldElem}, Ref{AcbFieldElem}, UInt, Int),
-            z, x, y, parent(x).prec)
-      return z
-    end
-
-    function ($f)(x::AcbFieldElem, y::Int)
-      z = parent(x)()
-      ccall(($("acb_"*s*"_si"), libflint), Nothing,
-            (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int), z, x, y, parent(x).prec)
-      return z
-    end
-
-    function ($f)(x::AcbFieldElem, y::ZZRingElem)
-      z = parent(x)()
-      ccall(($("acb_"*s*"_fmpz"), libflint), Nothing,
-            (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ZZRingElem}, Int),
-            z, x, y, parent(x).prec)
-      return z
-    end
-
-    function ($f)(x::AcbFieldElem, y::ArbFieldElem)
-      z = parent(x)()
-      ccall(($("acb_"*s*"_arb"), libflint), Nothing,
-            (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ArbFieldElem}, Int),
-            z, x, y, parent(x).prec)
-      return z
-    end
-  end
+function -(x::AcbFieldElem, y::AcbFieldElem)
+  z = parent(x)()
+  return sub!(z, x, y)
 end
 
+function *(x::AcbFieldElem, y::AcbFieldElem)
+  z = parent(x)()
+  return mul!(z, x, y)
+end
 
-+(x::UInt,y::AcbFieldElem) = +(y,x)
-+(x::Int,y::AcbFieldElem) = +(y,x)
-+(x::ZZRingElem,y::AcbFieldElem) = +(y,x)
-+(x::ArbFieldElem,y::AcbFieldElem) = +(y,x)
+function //(x::AcbFieldElem, y::AcbFieldElem)
+  z = parent(x)()
+  return div!(z, x, y)
+end
 
-*(x::UInt,y::AcbFieldElem) = *(y,x)
-*(x::Int,y::AcbFieldElem) = *(y,x)
-*(x::ZZRingElem,y::AcbFieldElem) = *(y,x)
-*(x::ArbFieldElem,y::AcbFieldElem) = *(y,x)
+function ^(x::AcbFieldElem, y::AcbFieldElem)
+  z = parent(x)()
+  ccall((:acb_pow, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int),
+        z, x, y, parent(x).prec)
+  return z
+end
 
-//(x::UInt,y::AcbFieldElem) = (x == 1) ? inv(y) : parent(y)(x) // y
-//(x::Int,y::AcbFieldElem) = (x == 1) ? inv(y) : parent(y)(x) // y
-//(x::ZZRingElem,y::AcbFieldElem) = isone(x) ? inv(y) : parent(y)(x) // y
-//(x::ArbFieldElem,y::AcbFieldElem) = isone(x) ? inv(y) : parent(y)(x) // y
+################################################################################
+#
+#  Ad-hoc binary operations
+#
+################################################################################
+
++(x::AcbFieldElem, y::Union{ArbFieldElem, IntegerUnion}) = add!(parent(x)(), x, y)
++(x::Union{ArbFieldElem, IntegerUnion}, y::AcbFieldElem) = add!(parent(y)(), x, y)
+
+-(x::AcbFieldElem, y::Union{ArbFieldElem, IntegerUnion}) = sub!(parent(x)(), x, y)
+-(x::Union{ArbFieldElem, IntegerUnion}, y::AcbFieldElem) = sub!(parent(y)(), x, y)
+
+*(x::AcbFieldElem, y::Union{ArbFieldElem, IntegerUnion}) = mul!(parent(x)(), x, y)
+*(x::Union{ArbFieldElem, IntegerUnion}, y::AcbFieldElem) = mul!(parent(y)(), x, y)
+
+//(x::AcbFieldElem, y::Union{ArbFieldElem, IntegerUnion}) = div!(parent(x)(), x, y)
+//(x::Union{ArbFieldElem, IntegerUnion}, y::AcbFieldElem) = div!(parent(y)(), x, y)
+
+function ^(x::AcbFieldElem, y::UInt)
+  z = parent(x)()
+  ccall((:acb_pow_ui, libflint), Nothing,
+        (Ref{AcbFieldElem}, Ref{AcbFieldElem}, UInt, Int),
+        z, x, y, parent(x).prec)
+  return z
+end
+
+function ^(x::AcbFieldElem, y::Int)
+  z = parent(x)()
+  ccall((:acb_pow_si, libflint), Nothing,
+        (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int), z, x, y, parent(x).prec)
+  return z
+end
+
+function ^(x::AcbFieldElem, y::ZZRingElem)
+  z = parent(x)()
+  ccall((:acb_pow_fmpz, libflint), Nothing,
+        (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ZZRingElem}, Int),
+        z, x, y, parent(x).prec)
+  return z
+end
+
+function ^(x::AcbFieldElem, y::ArbFieldElem)
+  z = parent(x)()
+  ccall((:acb_pow_arb, libflint), Nothing,
+        (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ArbFieldElem}, Int),
+        z, x, y, parent(x).prec)
+  return z
+end
 
 ^(x::ZZRingElem,y::AcbFieldElem) = parent(y)(x) ^ y
 ^(x::ArbFieldElem,y::AcbFieldElem) = parent(y)(x) ^ y
-
-function -(x::UInt, y::AcbFieldElem)
-  z = parent(y)()
-  ccall((:acb_sub_ui, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, UInt, Int), z, y, x, parent(y).prec)
-  return neg!(z)
-end
-
-function -(x::Int, y::AcbFieldElem)
-  z = parent(y)()
-  ccall((:acb_sub_si, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int), z, y, x, parent(y).prec)
-  return neg!(z)
-end
-
-function -(x::ZZRingElem, y::AcbFieldElem)
-  z = parent(y)()
-  ccall((:acb_sub_fmpz, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ZZRingElem}, Int), z, y, x, parent(y).prec)
-  return neg!(z)
-end
-
-function -(x::ArbFieldElem, y::AcbFieldElem)
-  z = parent(y)()
-  ccall((:acb_sub_arb, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ArbFieldElem}, Int), z, y, x, parent(y).prec)
-  return neg!(z)
-end
-
-+(x::AcbFieldElem, y::Integer) = x + ZZRingElem(y)
-
--(x::AcbFieldElem, y::Integer) = x - ZZRingElem(y)
-
-*(x::AcbFieldElem, y::Integer) = x*ZZRingElem(y)
-
-//(x::AcbFieldElem, y::Integer) = x//ZZRingElem(y)
-
-+(x::Integer, y::AcbFieldElem) = ZZRingElem(x) + y
-
--(x::Integer, y::AcbFieldElem) = ZZRingElem(x) - y
-
-*(x::Integer, y::AcbFieldElem) = ZZRingElem(x)*y
-
-//(x::Integer, y::AcbFieldElem) = ZZRingElem(x)//y
 
 divexact(x::AcbFieldElem, y::AcbFieldElem; check::Bool=true) = x // y
 divexact(x::ZZRingElem, y::AcbFieldElem; check::Bool=true) = x // y
@@ -532,8 +505,7 @@ end
 
 function inv(x::AcbFieldElem)
   z = parent(x)()
-  ccall((:acb_inv, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, parent(x).prec)
-  return z
+  return inv!(z, x)
 end
 
 ################################################################################
@@ -1581,11 +1553,49 @@ function neg!(z::AcbFieldElemOrPtr, a::AcbFieldElemOrPtr)
   return z
 end
 
+function inv!(z::AcbFieldElem, x::AcbFieldElem)
+  ccall((:acb_inv, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int),
+        z, x, parent(z).prec)
+  return z
+end
+
+#
+
 function add!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem)
   ccall((:acb_add, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int),
         z, x, y, parent(z).prec)
   return z
 end
+
+function add!(z::AcbFieldElem, x::AcbFieldElem, y::ArbFieldElem)
+  ccall((:acb_add_arb, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ArbFieldElem}, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+function add!(z::AcbFieldElem, x::AcbFieldElem, y::Int)
+  ccall((:acb_add_si, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+function add!(z::AcbFieldElem, x::AcbFieldElem, y::UInt)
+  ccall((:acb_add_ui, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, UInt, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+function add!(z::AcbFieldElem, x::AcbFieldElem, y::ZZRingElem)
+  ccall((:acb_add_fmpz, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ZZRingElem}, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+add!(z::AcbFieldElem, x::AcbFieldElem, y::Integer) = add!(z, x, flintify(y))
+
+add!(z::AcbFieldElem, x::Union{ArbFieldElem,IntegerUnion}, y::AcbFieldElem) = add!(z, y, x)
+
+#
 
 function sub!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem)
   ccall((:acb_sub, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int),
@@ -1593,17 +1603,187 @@ function sub!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem)
   return z
 end
 
+function sub!(z::AcbFieldElem, x::AcbFieldElem, y::ArbFieldElem)
+  ccall((:acb_sub_arb, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ArbFieldElem}, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+function sub!(z::AcbFieldElem, x::AcbFieldElem, y::Int)
+  ccall((:acb_sub_si, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+function sub!(z::AcbFieldElem, x::AcbFieldElem, y::UInt)
+  ccall((:acb_sub_ui, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, UInt, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+function sub!(z::AcbFieldElem, x::AcbFieldElem, y::ZZRingElem)
+  ccall((:acb_sub_fmpz, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ZZRingElem}, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+sub!(z::AcbFieldElem, x::AcbFieldElem, y::Integer) = sub!(z, x, flintify(y))
+
+sub!(z::AcbFieldElem, x::Union{ArbFieldElem,IntegerUnion}, y::AcbFieldElem) = neg!(sub!(z, y, x))
+
+#
+
 function mul!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem)
   ccall((:acb_mul, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int),
         z, x, y, parent(z).prec)
   return z
 end
 
+function mul!(z::AcbFieldElem, x::AcbFieldElem, y::ArbFieldElem)
+  ccall((:acb_mul_arb, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ArbFieldElem}, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+function mul!(z::AcbFieldElem, x::AcbFieldElem, y::Int)
+  ccall((:acb_mul_si, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+function mul!(z::AcbFieldElem, x::AcbFieldElem, y::UInt)
+  ccall((:acb_mul_ui, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, UInt, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+function mul!(z::AcbFieldElem, x::AcbFieldElem, y::ZZRingElem)
+  ccall((:acb_mul_fmpz, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ZZRingElem}, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+mul!(z::AcbFieldElem, x::AcbFieldElem, y::Integer) = mul!(z, x, flintify(y))
+
+mul!(z::AcbFieldElem, x::Union{ArbFieldElem,IntegerUnion}, y::AcbFieldElem) = mul!(z, y, x)
+
+#
+
 function div!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem)
   ccall((:acb_div, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int),
         z, x, y, parent(z).prec)
   return z
 end
+
+function div!(z::AcbFieldElem, x::AcbFieldElem, y::ArbFieldElem)
+  ccall((:acb_div_arb, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ArbFieldElem}, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+function div!(z::AcbFieldElem, x::AcbFieldElem, y::Int)
+  ccall((:acb_div_si, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+function div!(z::AcbFieldElem, x::AcbFieldElem, y::UInt)
+  ccall((:acb_div_ui, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, UInt, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+function div!(z::AcbFieldElem, x::AcbFieldElem, y::ZZRingElem)
+  ccall((:acb_div_fmpz, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ZZRingElem}, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+div!(z::AcbFieldElem, x::AcbFieldElem, y::Integer) = div!(z, x, flintify(y))
+
+div!(z::AcbFieldElem, x::Union{ArbFieldElem,IntegerUnion}, y::AcbFieldElem) = inv!(div!(z, y, x))
+
+#
+
+function addmul!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem)
+  ccall((:acb_addmul, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+function addmul!(z::AcbFieldElem, x::AcbFieldElem, y::ArbFieldElem)
+  ccall((:acb_addmul_arb, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ArbFieldElem}, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+function addmul!(z::AcbFieldElem, x::AcbFieldElem, y::Int)
+  ccall((:acb_addmul_si, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+function addmul!(z::AcbFieldElem, x::AcbFieldElem, y::UInt)
+  ccall((:acb_addmul_ui, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, UInt, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+function addmul!(z::AcbFieldElem, x::AcbFieldElem, y::ZZRingElem)
+  ccall((:acb_addmul_fmpz, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ZZRingElem}, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+addmul!(z::AcbFieldElem, x::AcbFieldElem, y::Integer) = addmul!(z, x, flintify(y))
+
+addmul!(z::AcbFieldElem, x::Union{ArbFieldElem,IntegerUnion}, y::AcbFieldElem) = addmul!(z, y, x)
+
+# ignore temp variable
+addmul!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem, t) = addmul!(z, x, y)
+addmul!(z::AcbFieldElem, x::AcbFieldElem, y::Union{ArbFieldElem,IntegerUnion}, t) = addmul!(z, x, y)
+addmul!(z::AcbFieldElem, x::Union{ArbFieldElem,IntegerUnion}, y::AcbFieldElem, t) = addmul!(z, x, y)
+
+#
+
+function submul!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem)
+  ccall((:acb_submul, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+function submul!(z::AcbFieldElem, x::AcbFieldElem, y::ArbFieldElem)
+  ccall((:acb_submul_arb, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ArbFieldElem}, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+function submul!(z::AcbFieldElem, x::AcbFieldElem, y::Int)
+  ccall((:acb_submul_si, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+function submul!(z::AcbFieldElem, x::AcbFieldElem, y::UInt)
+  ccall((:acb_submul_ui, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, UInt, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+function submul!(z::AcbFieldElem, x::AcbFieldElem, y::ZZRingElem)
+  ccall((:acb_submul_fmpz, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ZZRingElem}, Int),
+        z, x, y, parent(z).prec)
+  return z
+end
+
+submul!(z::AcbFieldElem, x::AcbFieldElem, y::Integer) = submul!(z, x, flintify(y))
+
+submul!(z::AcbFieldElem, x::Union{ArbFieldElem,IntegerUnion}, y::AcbFieldElem) = submul!(z, y, x)
+
+# ignore temp variable
+submul!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem, t) = submul!(z, x, y)
+submul!(z::AcbFieldElem, x::AcbFieldElem, y::Union{ArbFieldElem,IntegerUnion}, t) = submul!(z, x, y)
+submul!(z::AcbFieldElem, x::Union{ArbFieldElem,IntegerUnion}, y::AcbFieldElem, t) = submul!(z, x, y)
 
 ################################################################################
 #
