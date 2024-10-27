@@ -1,11 +1,11 @@
 ###############################################################################
 #
-#   fq_rel_series.jl: Relative series over finite fields
+#   fq_nmod_rel_series.jl: Relative series over finite fields
 #
 ###############################################################################
 
 for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
-                                                           (FqPolyRepRelPowerSeriesRingElem, FqPolyRepRelPowerSeriesRing, FqPolyRepField, FqPolyRepFieldElem, "fq_poly", "fq"))
+                                                           (fqPolyRepRelPowerSeriesRingElem, fqPolyRepRelPowerSeriesRing, fqPolyRepField, fqPolyRepFieldElem, "fq_nmod_poly", "fq_nmod"))
   @eval begin
 
     ###############################################################################

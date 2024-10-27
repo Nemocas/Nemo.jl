@@ -1,11 +1,11 @@
 ###############################################################################
 #
-#   fq_abs_series.jl: Absolute series over finite fields
+#   fq_nmod_abs_series.jl: Absolute series over finite fields
 #
 ###############################################################################
 
 for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
-                                                           (FqPolyRepAbsPowerSeriesRingElem, FqPolyRepAbsPowerSeriesRing, FqPolyRepField, FqPolyRepFieldElem, "fq_poly", "fq"))
+                                                           (fqPolyRepAbsPowerSeriesRingElem, fqPolyRepAbsPowerSeriesRing, fqPolyRepField, fqPolyRepFieldElem, "fq_nmod_poly", "fq_nmod"))
   @eval begin
 
     ###############################################################################
@@ -711,11 +711,11 @@ end # for
 #
 ###############################################################################
 
-function power_series_ring(R::FqPolyRepField, prec::Int, s::VarName; model::Symbol=:capped_relative, cached::Bool = true)
+function power_series_ring(R::fqPolyRepField, prec::Int, s::VarName; model::Symbol=:capped_relative, cached::Bool = true)
   if model == :capped_relative
-    parent_obj = FqPolyRepRelPowerSeriesRing(R, prec, Symbol(s), cached)
+    parent_obj = fqPolyRepRelPowerSeriesRing(R, prec, Symbol(s), cached)
   elseif model == :capped_absolute
-    parent_obj = FqPolyRepAbsPowerSeriesRing(R, prec, Symbol(s), cached)
+    parent_obj = fqPolyRepAbsPowerSeriesRing(R, prec, Symbol(s), cached)
   else
     error("Unknown model")
   end
@@ -723,10 +723,10 @@ function power_series_ring(R::FqPolyRepField, prec::Int, s::VarName; model::Symb
   return parent_obj, gen(parent_obj)
 end
 
-function AbsPowerSeriesRing(R::FqPolyRepField, prec::Int)
-  return FqPolyRepAbsPowerSeriesRing(R, prec, :x, false)
+function AbsPowerSeriesRing(R::fqPolyRepField, prec::Int)
+  return fqPolyRepAbsPowerSeriesRing(R, prec, :x, false)
 end
 
-function RelPowerSeriesRing(R::FqPolyRepField, prec::Int)
-  return FqPolyRepRelPowerSeriesRing(R, prec, :x, false)
+function RelPowerSeriesRing(R::fqPolyRepField, prec::Int)
+  return fqPolyRepRelPowerSeriesRing(R, prec, :x, false)
 end
