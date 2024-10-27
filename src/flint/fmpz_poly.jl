@@ -875,7 +875,13 @@ function sub!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::ZZPolyRingElemO
 end
 
 function sub!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::ZZRingElemOrPtr)
-  @ccall libflint.fmpz_poly_sub_fmpz(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Ref{ZZRingElem})::Nothing
+  if is_zero(y)
+    # HACK HACK HACK: workaround a crash in fmpz_poly_sub_fmpz when subtracting
+    # 0 from a zero polynomial; see https://github.com/flintlib/flint/pull/2102
+    set!(z, x)
+  else
+    @ccall libflint.fmpz_poly_sub_fmpz(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Ref{ZZRingElem})::Nothing
+  end
   return z
 end
 
