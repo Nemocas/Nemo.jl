@@ -4,36 +4,32 @@
 #
 ###############################################################################
 
-for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
-                                                           (fqPolyRepAbsPowerSeriesRingElem, fqPolyRepAbsPowerSeriesRing, fqPolyRepField, fqPolyRepFieldElem, "fq_nmod_poly", "fq_nmod"))
-  @eval begin
-
     ###############################################################################
     #
     #   Data type and parent object methods
     #
     ###############################################################################
 
-    function O(a::($etype))
+    function O(a::fqPolyRepAbsPowerSeriesRingElem)
       if iszero(a)
         return deepcopy(a)    # 0 + O(x^n)
       end
       prec = length(a) - 1
       prec < 0 && throw(DomainError(prec, "Valuation must be non-negative"))
-      z = ($etype)(base_ring(a), Vector{$(btype)}(undef, 0), 0, prec)
+      z = fqPolyRepAbsPowerSeriesRingElem(base_ring(a), Vector{fqPolyRepFieldElem}(undef, 0), 0, prec)
       z.parent = parent(a)
       return z
     end
 
-    elem_type(::Type{($rtype)}) = ($etype)
+    elem_type(::Type{fqPolyRepAbsPowerSeriesRing}) = fqPolyRepAbsPowerSeriesRingElem
 
-    parent_type(::Type{($etype)}) = ($rtype)
+    parent_type(::Type{fqPolyRepAbsPowerSeriesRingElem}) = fqPolyRepAbsPowerSeriesRing
 
-    base_ring(R::($rtype)) = R.base_ring
+    base_ring(R::fqPolyRepAbsPowerSeriesRing) = R.base_ring
 
-    abs_series_type(::Type{($btype)}) = ($etype)
+    abs_series_type(::Type{fqPolyRepFieldElem}) = fqPolyRepAbsPowerSeriesRingElem
 
-    var(a::($rtype)) = a.S
+    var(a::fqPolyRepAbsPowerSeriesRing) = a.S
 
     ###############################################################################
     #
@@ -41,21 +37,21 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
     #
     ###############################################################################
 
-    max_precision(R::($rtype)) = R.prec_max
+    max_precision(R::fqPolyRepAbsPowerSeriesRing) = R.prec_max
 
-    function normalise(a::($etype), len::Int)
+    function normalise(a::fqPolyRepAbsPowerSeriesRingElem, len::Int)
       ctx = base_ring(a)
       if len > 0
         c = base_ring(a)()
-        ccall(($(flint_fn*"_get_coeff"), libflint), Nothing,
-              (Ref{($btype)}, Ref{($etype)}, Int, Ref{($ctype)}),
+        ccall((:fq_nmod_poly_get_coeff, libflint), Nothing,
+              (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepField}),
               c, a, len - 1, ctx)
       end
       while len > 0 && iszero(c)
         len -= 1
         if len > 0
-          ccall(($(flint_fn*"_get_coeff"), libflint), Nothing,
-                (Ref{($btype)}, Ref{($etype)}, Int, Ref{($ctype)}),
+          ccall((:fq_nmod_poly_get_coeff, libflint), Nothing,
+                (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepField}),
                 c, a, len - 1, ctx)
         end
       end
@@ -63,58 +59,58 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
       return len
     end
 
-    function length(x::($etype))
-      return ccall(($(flint_fn*"_length"), libflint), Int,
-                   (Ref{($etype)}, Ref{($ctype)}), x, base_ring(x))
+    function length(x::fqPolyRepAbsPowerSeriesRingElem)
+      return ccall((:fq_nmod_poly_length, libflint), Int,
+                   (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepField}), x, base_ring(x))
     end
 
-    precision(x::($etype)) = x.prec
+    precision(x::fqPolyRepAbsPowerSeriesRingElem) = x.prec
 
-    function coeff(x::($etype), n::Int)
+    function coeff(x::fqPolyRepAbsPowerSeriesRingElem, n::Int)
       if n < 0
         return base_ring(x)()
       end
       z = base_ring(x)()
-      ccall(($(flint_fn*"_get_coeff"), libflint), Nothing,
-            (Ref{($btype)}, Ref{($etype)}, Int, Ref{($ctype)}),
+      ccall((:fq_nmod_poly_get_coeff, libflint), Nothing,
+            (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepField}),
             z, x, n, base_ring(x))
       return z
     end
 
-    zero(R::($rtype)) = R(0)
+    zero(R::fqPolyRepAbsPowerSeriesRing) = R(0)
 
-    one(R::($rtype)) = R(1)
+    one(R::fqPolyRepAbsPowerSeriesRing) = R(1)
 
-    function gen(R::($rtype))
+    function gen(R::fqPolyRepAbsPowerSeriesRing)
       S = base_ring(R)
-      z = ($etype)(S, [S(0), S(1)], 2, max_precision(R))
+      z = fqPolyRepAbsPowerSeriesRingElem(S, [S(0), S(1)], 2, max_precision(R))
       z.parent = R
       return z
     end
 
-    function deepcopy_internal(a::($etype), dict::IdDict)
-      z = ($etype)(base_ring(a), a)
+    function deepcopy_internal(a::fqPolyRepAbsPowerSeriesRingElem, dict::IdDict)
+      z = fqPolyRepAbsPowerSeriesRingElem(base_ring(a), a)
       z.prec = a.prec
       z.parent = parent(a)
       return z
     end
 
-    function is_gen(a::($etype))
-      return precision(a) == 0 || ccall(($(flint_fn*"_is_gen"), libflint), Bool,
-                                        (Ref{($etype)}, Ref{($ctype)}), a, base_ring(a))
+    function is_gen(a::fqPolyRepAbsPowerSeriesRingElem)
+      return precision(a) == 0 || ccall((:fq_nmod_poly_is_gen, libflint), Bool,
+                                        (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepField}), a, base_ring(a))
     end
 
-    iszero(a::($etype)) = length(a) == 0
+    iszero(a::fqPolyRepAbsPowerSeriesRingElem) = length(a) == 0
 
-    is_unit(a::($etype)) = valuation(a) == 0 && is_unit(coeff(a, 0))
+    is_unit(a::fqPolyRepAbsPowerSeriesRingElem) = valuation(a) == 0 && is_unit(coeff(a, 0))
 
-    function isone(a::($etype))
-      return precision(a) == 0 || ccall(($(flint_fn*"_is_one"), libflint), Bool,
-                                        (Ref{($etype)}, Ref{($ctype)}), a, base_ring(a))
+    function isone(a::fqPolyRepAbsPowerSeriesRingElem)
+      return precision(a) == 0 || ccall((:fq_nmod_poly_is_one, libflint), Bool,
+                                        (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepField}), a, base_ring(a))
     end
 
     # todo: write an fq_poly_valuation
-    function valuation(a::($etype))
+    function valuation(a::fqPolyRepAbsPowerSeriesRingElem)
       for i = 1:length(a)
         if !iszero(coeff(a, i - 1))
           return i - 1
@@ -123,7 +119,7 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
       return precision(a)
     end
 
-    characteristic(R::($rtype)) = characteristic(base_ring(R))
+    characteristic(R::fqPolyRepAbsPowerSeriesRing) = characteristic(base_ring(R))
 
     ###############################################################################
     #
@@ -131,12 +127,12 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
     #
     ###############################################################################
 
-    function similar(f::AbsPowerSeriesRingElem, R::($ctype), max_prec::Int,
+    function similar(f::AbsPowerSeriesRingElem, R::fqPolyRepField, max_prec::Int,
         s::Symbol=var(parent(f)); cached::Bool=true)
-      par = ($rtype)(R, max_prec, s, cached)
-      z = ($etype)(R)
+      par = fqPolyRepAbsPowerSeriesRing(R, max_prec, s, cached)
+      z = fqPolyRepAbsPowerSeriesRingElem(R)
       if base_ring(f) === R && s == var(parent(f)) &&
-        f isa ($etype) && max_precision(parent(f)) == max_prec
+        f isa fqPolyRepAbsPowerSeriesRingElem && max_precision(parent(f)) == max_prec
         # steal parent in case it is not cached
         z.parent = parent(f)
       else
@@ -152,14 +148,14 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
     #
     ###############################################################################
 
-    function abs_series(R::($ctype), arr::Vector{T},
+    function abs_series(R::fqPolyRepField, arr::Vector{T},
         len::Int, prec::Int, var::VarName=:x;
         max_precision::Int=prec, cached::Bool=true) where T
       prec < len && error("Precision too small for given data")
-      coeffs = T == ($btype) ? arr : map(R, arr)
-      coeffs = length(coeffs) == 0 ? ($btype)[] : coeffs
-      par = ($rtype)(R, max_precision, Symbol(var), cached)
-      z = ($etype)(R, coeffs, len, prec)
+      coeffs = T == fqPolyRepFieldElem ? arr : map(R, arr)
+      coeffs = length(coeffs) == 0 ? fqPolyRepFieldElem[] : coeffs
+      par = fqPolyRepAbsPowerSeriesRing(R, max_precision, Symbol(var), cached)
+      z = fqPolyRepAbsPowerSeriesRingElem(R, coeffs, len, prec)
       z.parent = par
       return z
     end
@@ -170,10 +166,10 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
     #
     ###############################################################################
 
-    function -(x::($etype))
+    function -(x::fqPolyRepAbsPowerSeriesRingElem)
       z = parent(x)()
-      ccall(($(flint_fn*"_neg"), libflint), Nothing,
-            (Ref{($etype)}, Ref{($etype)}, Ref{($ctype)}),
+      ccall((:fq_nmod_poly_neg, libflint), Nothing,
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepField}),
             z, x, base_ring(x))
       z.prec = x.prec
       return z
@@ -185,7 +181,7 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
     #
     ###############################################################################
 
-    function +(a::($etype), b::($etype))
+    function +(a::fqPolyRepAbsPowerSeriesRingElem, b::fqPolyRepAbsPowerSeriesRingElem)
       check_parent(a, b)
       lena = length(a)
       lenb = length(b)
@@ -195,14 +191,14 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
       lenz = max(lena, lenb)
       z = parent(a)()
       z.prec = prec
-      ccall(($(flint_fn*"_add_series"), libflint), Nothing,
-            (Ref{($etype)}, Ref{($etype)},
-             Ref{($etype)}, Int, Ref{($ctype)}),
+      ccall((:fq_nmod_poly_add_series, libflint), Nothing,
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepAbsPowerSeriesRingElem},
+             Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepField}),
             z, a, b, lenz, base_ring(a))
       return z
     end
 
-    function -(a::($etype), b::($etype))
+    function -(a::fqPolyRepAbsPowerSeriesRingElem, b::fqPolyRepAbsPowerSeriesRingElem)
       check_parent(a, b)
       lena = length(a)
       lenb = length(b)
@@ -212,14 +208,14 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
       lenz = max(lena, lenb)
       z = parent(a)()
       z.prec = prec
-      ccall(($(flint_fn*"_sub_series"), libflint), Nothing,
-            (Ref{($etype)}, Ref{($etype)},
-             Ref{($etype)}, Int, Ref{($ctype)}),
+      ccall((:fq_nmod_poly_sub_series, libflint), Nothing,
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepAbsPowerSeriesRingElem},
+             Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepField}),
             z, a, b, lenz, base_ring(a))
       return z
     end
 
-    function *(a::($etype), b::($etype))
+    function *(a::fqPolyRepAbsPowerSeriesRingElem, b::fqPolyRepAbsPowerSeriesRingElem)
       check_parent(a, b)
       lena = length(a)
       lenb = length(b)
@@ -235,9 +231,9 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
         return z
       end
       lenz = min(lena + lenb - 1, prec)
-      ccall(($(flint_fn*"_mullow"), libflint), Nothing,
-            (Ref{($etype)}, Ref{($etype)},
-             Ref{($etype)}, Int, Ref{($ctype)}),
+      ccall((:fq_nmod_poly_mullow, libflint), Nothing,
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepAbsPowerSeriesRingElem},
+             Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepField}),
             z, a, b, lenz, base_ring(a))
       return z
     end
@@ -248,16 +244,16 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
     #
     ###############################################################################
 
-    function *(x::($btype), y::($etype))
+    function *(x::fqPolyRepFieldElem, y::fqPolyRepAbsPowerSeriesRingElem)
       z = parent(y)()
       z.prec = y.prec
-      ccall(($(flint_fn*"_scalar_mul_"*flint_tail), libflint), Nothing,
-            (Ref{($etype)}, Ref{($etype)}, Ref{($btype)}, Ref{($ctype)}),
+      ccall((:fq_nmod_poly_scalar_mul_fq_nmod, libflint), Nothing,
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
             z, y, x, base_ring(y))
       return z
     end
 
-    *(x::($etype), y::($btype)) = y * x
+    *(x::fqPolyRepAbsPowerSeriesRingElem, y::fqPolyRepFieldElem) = y * x
 
     ###############################################################################
     #
@@ -265,23 +261,23 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
     #
     ###############################################################################
 
-    function shift_left(x::($etype), len::Int)
+    function shift_left(x::fqPolyRepAbsPowerSeriesRingElem, len::Int)
       len < 0 && throw(DomainError(len, "Shift must be non-negative"))
       xlen = length(x)
       z = parent(x)()
       z.prec = x.prec + len
       z.prec = min(z.prec, max_precision(parent(x)))
       zlen = min(z.prec, xlen + len)
-      ccall(($(flint_fn*"_shift_left"), libflint), Nothing,
-            (Ref{($etype)}, Ref{($etype)}, Int, Ref{($ctype)}),
+      ccall((:fq_nmod_poly_shift_left, libflint), Nothing,
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepField}),
             z, x, len, base_ring(x))
-      ccall(($(flint_fn*"_set_trunc"), libflint), Nothing,
-            (Ref{($etype)}, Ref{($etype)}, Int, Ref{($ctype)}),
+      ccall((:fq_nmod_poly_set_trunc, libflint), Nothing,
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepField}),
             z, z, zlen, base_ring(x))
       return z
     end
 
-    function shift_right(x::($etype), len::Int)
+    function shift_right(x::fqPolyRepAbsPowerSeriesRingElem, len::Int)
       len < 0 && throw(DomainError(len, "Shift must be non-negative"))
       xlen = length(x)
       z = parent(x)()
@@ -289,8 +285,8 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
         z.prec = max(0, x.prec - len)
       else
         z.prec = x.prec - len
-        ccall(($(flint_fn*"_shift_right"), libflint), Nothing,
-              (Ref{($etype)}, Ref{($etype)}, Int, Ref{($ctype)}),
+        ccall((:fq_nmod_poly_shift_right, libflint), Nothing,
+              (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepField}),
               z, x, len, base_ring(x))
       end
       return z
@@ -302,17 +298,17 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
     #
     ###############################################################################
 
-    function truncate(x::($etype), k::Int)
+    function truncate(x::fqPolyRepAbsPowerSeriesRingElem, k::Int)
       return truncate!(deepcopy(x), k)
     end
 
-    function truncate!(x::($etype), k::Int)
+    function truncate!(x::fqPolyRepAbsPowerSeriesRingElem, k::Int)
       k < 0 && throw(DomainError(k, "Index must be non-negative"))
       if precision(x) <= k
         return x
       end
-      ccall(($(flint_fn*"_truncate"), libflint), Nothing,
-            (Ref{($etype)}, Int, Ref{($ctype)}),
+      ccall((:fq_nmod_poly_truncate, libflint), Nothing,
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepField}),
             x, k, base_ring(x))
       x.prec = k
       return x
@@ -324,7 +320,7 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
     #
     ###############################################################################
 
-    function ^(a::($etype), b::Int)
+    function ^(a::fqPolyRepAbsPowerSeriesRingElem, b::Int)
       b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
       if precision(a) > 0 && is_gen(a) && b > 0
         return shift_left(a, b - 1)
@@ -357,25 +353,25 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
     #
     ###############################################################################
 
-    function ==(x::($etype), y::($etype))
+    function ==(x::fqPolyRepAbsPowerSeriesRingElem, y::fqPolyRepAbsPowerSeriesRingElem)
       check_parent(x, y)
       prec = min(x.prec, y.prec)
       n = max(length(x), length(y))
       n = min(n, prec)
-      return Bool(ccall(($(flint_fn*"_equal_trunc"), libflint), Cint,
-                        (Ref{($etype)}, Ref{($etype)}, Int, Ref{($ctype)}),
+      return Bool(ccall((:fq_nmod_poly_equal_trunc, libflint), Cint,
+                        (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepField}),
                         x, y, n, base_ring(x)))
     end
 
-    function isequal(x::($etype), y::($etype))
+    function isequal(x::fqPolyRepAbsPowerSeriesRingElem, y::fqPolyRepAbsPowerSeriesRingElem)
       if parent(x) != parent(y)
         return false
       end
       if x.prec != y.prec || length(x) != length(y)
         return false
       end
-      return Bool(ccall(($(flint_fn*"_equal"), libflint), Cint,
-                        (Ref{($etype)}, Ref{($etype)}, Ref{($ctype)}),
+      return Bool(ccall((:fq_nmod_poly_equal, libflint), Cint,
+                        (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepField}),
                         x, y, base_ring(x)))
     end
 
@@ -385,13 +381,13 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
     #
     ###############################################################################
 
-    function ==(x::($etype), y::($btype))
+    function ==(x::fqPolyRepAbsPowerSeriesRingElem, y::fqPolyRepFieldElem)
       if length(x) > 1
         return false
       elseif length(x) == 1
         z = base_ring(x)()
-        ccall(($(flint_fn*"_get_coeff"), libflint), Nothing,
-              (Ref{($btype)}, Ref{($etype)}, Int, Ref{($ctype)}),
+        ccall((:fq_nmod_poly_get_coeff, libflint), Nothing,
+              (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepField}),
               z, x, 0, base_ring(x))
         return z == y
       else
@@ -399,15 +395,15 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
       end
     end
 
-    ==(x::($btype), y::($etype)) = y == x
+    ==(x::fqPolyRepFieldElem, y::fqPolyRepAbsPowerSeriesRingElem) = y == x
 
-    function ==(x::($etype), y::ZZRingElem)
+    function ==(x::fqPolyRepAbsPowerSeriesRingElem, y::ZZRingElem)
       if length(x) > 1
         return false
       elseif length(x) == 1
         z = base_ring(x)()
-        ccall(($(flint_fn*"_get_coeff"), libflint), Nothing,
-              (Ref{($btype)}, Ref{($etype)}, Int, Ref{($ctype)}),
+        ccall((:fq_nmod_poly_get_coeff, libflint), Nothing,
+              (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepField}),
               z, x, 0, base_ring(x))
         return z == y
       else
@@ -415,11 +411,11 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
       end
     end
 
-    ==(x::ZZRingElem, y::($etype)) = y == x
+    ==(x::ZZRingElem, y::fqPolyRepAbsPowerSeriesRingElem) = y == x
 
-    ==(x::($etype), y::Integer) = x == ZZRingElem(y)
+    ==(x::fqPolyRepAbsPowerSeriesRingElem, y::Integer) = x == ZZRingElem(y)
 
-    ==(x::Integer, y::($etype)) = y == x
+    ==(x::Integer, y::fqPolyRepAbsPowerSeriesRingElem) = y == x
 
     ###############################################################################
     #
@@ -427,7 +423,7 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
     #
     ###############################################################################
 
-    function divexact(x::($etype), y::($etype); check::Bool=true)
+    function divexact(x::fqPolyRepAbsPowerSeriesRingElem, y::fqPolyRepAbsPowerSeriesRingElem; check::Bool=true)
       check_parent(x, y)
       iszero(y) && throw(DivideError())
       v2 = valuation(y)
@@ -442,9 +438,9 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
       prec = min(x.prec, y.prec - v2 + v1)
       z = parent(x)()
       z.prec = prec
-      ccall(($(flint_fn*"_div_series"), libflint), Nothing,
-            (Ref{($etype)}, Ref{($etype)},
-             Ref{($etype)}, Int, Ref{($ctype)}),
+      ccall((:fq_nmod_poly_div_series, libflint), Nothing,
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepAbsPowerSeriesRingElem},
+             Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepField}),
             z, x, y, prec, base_ring(x))
       return z
     end
@@ -455,12 +451,12 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
     #
     ###############################################################################
 
-    function divexact(x::($etype), y::($btype); check::Bool=true)
+    function divexact(x::fqPolyRepAbsPowerSeriesRingElem, y::fqPolyRepFieldElem; check::Bool=true)
       iszero(y) && throw(DivideError())
       z = parent(x)()
       z.prec = x.prec
-      ccall(($(flint_fn*"_scalar_div_"*flint_tail), libflint), Nothing,
-            (Ref{($etype)}, Ref{($etype)}, Ref{($btype)}, Ref{($ctype)}),
+      ccall((:fq_nmod_poly_scalar_div_fq_nmod, libflint), Nothing,
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
             z, x, y, base_ring(x))
       return z
     end
@@ -471,13 +467,13 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
     #
     ###############################################################################
 
-    function inv(a::($etype))
+    function inv(a::fqPolyRepAbsPowerSeriesRingElem)
       iszero(a) && throw(DivideError())
       !is_unit(a) && error("Unable to invert power series")
       ainv = parent(a)()
       ainv.prec = a.prec
-      ccall(($(flint_fn*"_inv_series"), libflint), Nothing,
-            (Ref{($etype)}, Ref{($etype)}, Int, Ref{($ctype)}),
+      ccall((:fq_nmod_poly_inv_series, libflint), Nothing,
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepField}),
             ainv, a, a.prec, base_ring(a))
       return ainv
     end
@@ -488,7 +484,7 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
     #
     ###############################################################################
 
-    function sqrt_classical_char2(a::($etype); check::Bool=true)
+    function sqrt_classical_char2(a::fqPolyRepAbsPowerSeriesRingElem; check::Bool=true)
       S = parent(a)
       asqrt = S()
       prec = div(precision(a) + 1, 2)
@@ -513,7 +509,7 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
       return true, asqrt
     end
 
-    function sqrt_classical(a::($etype); check::Bool=true)
+    function sqrt_classical(a::fqPolyRepAbsPowerSeriesRingElem; check::Bool=true)
       R = base_ring(a)
       S = parent(a)
       if characteristic(R) == 2
@@ -540,8 +536,8 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
       end
       a = divexact(a, c)
       z.prec = a.prec - div(v, 2)
-      ccall(($(flint_fn*"_sqrt_series"), libflint), Nothing,
-            (Ref{($etype)}, Ref{($etype)}, Int, Ref{($ctype)}),
+      ccall((:fq_nmod_poly_sqrt_series, libflint), Nothing,
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepField}),
             z, a, a.prec, base_ring(a))
       if !isone(s)
         z *= s
@@ -552,18 +548,18 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
       return true, z
     end
 
-    function Base.sqrt(a::($etype); check::Bool=true)
+    function Base.sqrt(a::fqPolyRepAbsPowerSeriesRingElem; check::Bool=true)
       flag, s = sqrt_classical(a; check=check)
       check && !flag && error("Not a square")
       return s
     end
 
-    function is_square(a::($etype))
+    function is_square(a::fqPolyRepAbsPowerSeriesRingElem)
       flag, s = sqrt_classical(a; check=true)
       return flag
     end
 
-    function is_square_with_sqrt(a::($etype))
+    function is_square_with_sqrt(a::fqPolyRepAbsPowerSeriesRingElem)
       return sqrt_classical(a; check=true)
     end
 
@@ -573,35 +569,35 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
     #
     ###############################################################################
 
-    function zero!(z::($etype))
-      ccall(($(flint_fn*"_zero"), libflint), Nothing,
-            (Ref{($etype)}, Ref{($ctype)}), z, base_ring(z))
+    function zero!(z::fqPolyRepAbsPowerSeriesRingElem)
+      ccall((:fq_nmod_poly_zero, libflint), Nothing,
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepField}), z, base_ring(z))
       z.prec = parent(z).prec_max
       return z
     end
 
-    function one!(z::($etype))
-      ccall(($(flint_fn*"_one"), libflint), Nothing,
-            (Ref{($etype)}, Ref{($ctype)}), z, base_ring(z))
+    function one!(z::fqPolyRepAbsPowerSeriesRingElem)
+      ccall((:fq_nmod_poly_one, libflint), Nothing,
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepField}), z, base_ring(z))
       z.prec = parent(z).prec_max
       return z
     end
 
-    function fit!(z::($etype), n::Int)
-      ccall(($(flint_fn*"_fit_length"), libflint), Nothing,
-            (Ref{($etype)}, Int, Ref{($ctype)}),
+    function fit!(z::fqPolyRepAbsPowerSeriesRingElem, n::Int)
+      ccall((:fq_nmod_poly_fit_length, libflint), Nothing,
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepField}),
             z, n, base_ring(z))
       return nothing
     end
 
-    function setcoeff!(z::($etype), n::Int, x::($btype))
-      ccall(($(flint_fn*"_set_coeff"), libflint), Nothing,
-            (Ref{($etype)}, Int, Ref{($btype)}, Ref{($ctype)}),
+    function setcoeff!(z::fqPolyRepAbsPowerSeriesRingElem, n::Int, x::fqPolyRepFieldElem)
+      ccall((:fq_nmod_poly_set_coeff, libflint), Nothing,
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}),
             z, n, x, base_ring(z))
       return z
     end
 
-    function mul!(z::($etype), a::($etype), b::($etype))
+    function mul!(z::fqPolyRepAbsPowerSeriesRingElem, a::fqPolyRepAbsPowerSeriesRingElem, b::fqPolyRepAbsPowerSeriesRingElem)
       lena = length(a)
       lenb = length(b)
       aval = valuation(a)
@@ -615,14 +611,14 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
         lenz = 0
       end
       z.prec = prec
-      ccall(($(flint_fn*"_mullow"), libflint), Nothing,
-            (Ref{($etype)}, Ref{($etype)},
-             Ref{($etype)}, Int, Ref{($ctype)}),
+      ccall((:fq_nmod_poly_mullow, libflint), Nothing,
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepAbsPowerSeriesRingElem},
+             Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepField}),
             z, a, b, lenz, base_ring(z))
       return z
     end
 
-    function add!(c::($etype), a::($etype), b::($etype))
+    function add!(c::fqPolyRepAbsPowerSeriesRingElem, a::fqPolyRepAbsPowerSeriesRingElem, b::fqPolyRepAbsPowerSeriesRingElem)
       lena = length(a)
       lenb = length(b)
       prec = min(a.prec, b.prec)
@@ -630,16 +626,16 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
       lenb = min(lenb, prec)
       lenc = max(lena, lenb)
       c.prec = prec
-      ccall(($(flint_fn*"_add_series"), libflint), Nothing,
-            (Ref{($etype)}, Ref{($etype)},
-             Ref{($etype)}, Int, Ref{($ctype)}),
+      ccall((:fq_nmod_poly_add_series, libflint), Nothing,
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Ref{fqPolyRepAbsPowerSeriesRingElem},
+             Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepField}),
             c, a, b, lenc, base_ring(a))
       return c
     end
 
-    function set_length!(a::($etype), n::Int)
-      ccall(($("_"*flint_fn*"_set_length"), libflint), Nothing,
-            (Ref{($etype)}, Int, Ref{($ctype)}),
+    function set_length!(a::fqPolyRepAbsPowerSeriesRingElem, n::Int)
+      ccall((:_fq_nmod_poly_set_length, libflint), Nothing,
+            (Ref{fqPolyRepAbsPowerSeriesRingElem}, Int, Ref{fqPolyRepField}),
             a, n, base_ring(a))
       return a
     end
@@ -650,11 +646,11 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
     #
     ###############################################################################
 
-    promote_rule(::Type{($etype)}, ::Type{T}) where {T <: Integer} = ($etype)
+    promote_rule(::Type{fqPolyRepAbsPowerSeriesRingElem}, ::Type{T}) where {T <: Integer} = fqPolyRepAbsPowerSeriesRingElem
 
-    promote_rule(::Type{($etype)}, ::Type{$(btype)}) = ($etype)
+    promote_rule(::Type{fqPolyRepAbsPowerSeriesRingElem}, ::Type{fqPolyRepFieldElem}) = fqPolyRepAbsPowerSeriesRingElem
 
-    promote_rule(::Type{($etype)}, ::Type{ZZRingElem}) = ($etype)
+    promote_rule(::Type{fqPolyRepAbsPowerSeriesRingElem}, ::Type{ZZRingElem}) = fqPolyRepAbsPowerSeriesRingElem
 
     ###############################################################################
     #
@@ -662,48 +658,46 @@ for (etype, rtype, ctype, btype, flint_fn, flint_tail) in (
     #
     ###############################################################################
 
-    function (a::($rtype))()
+    function (a::fqPolyRepAbsPowerSeriesRing)()
       ctx = base_ring(a)
-      z = ($etype)(ctx)
+      z = fqPolyRepAbsPowerSeriesRingElem(ctx)
       z.prec = a.prec_max
       z.parent = a
       return z
     end
 
-    function (a::($rtype))(b::Integer)
+    function (a::fqPolyRepAbsPowerSeriesRing)(b::Integer)
       return a(base_ring(a)(b))
     end
 
-    function (a::($rtype))(b::ZZRingElem)
+    function (a::fqPolyRepAbsPowerSeriesRing)(b::ZZRingElem)
       return a(base_ring(a)(b))
     end
 
-    function (a::($rtype))(b::($btype))
+    function (a::fqPolyRepAbsPowerSeriesRing)(b::fqPolyRepFieldElem)
       ctx = base_ring(a)
       if iszero(b)
-        z = ($etype)(ctx)
+        z = fqPolyRepAbsPowerSeriesRingElem(ctx)
         z.prec = a.prec_max
       else
-        z = ($etype)(ctx, [b], 1, a.prec_max)
+        z = fqPolyRepAbsPowerSeriesRingElem(ctx, [b], 1, a.prec_max)
       end
       z.parent = a
       return z
     end
 
-    function (a::($rtype))(b::($etype))
+    function (a::fqPolyRepAbsPowerSeriesRing)(b::fqPolyRepAbsPowerSeriesRingElem)
       parent(b) != a && error("Unable to coerce power series")
       return b
     end
 
-    function (a::($rtype))(b::Vector{$(btype)}, len::Int, prec::Int)
+    function (a::fqPolyRepAbsPowerSeriesRing)(b::Vector{fqPolyRepFieldElem}, len::Int, prec::Int)
       ctx = base_ring(a)
-      z = ($etype)(ctx, b, len, prec)
+      z = fqPolyRepAbsPowerSeriesRingElem(ctx, b, len, prec)
       z.parent = a
       return z
     end
 
-  end # eval
-end # for
 
 ###############################################################################
 #
