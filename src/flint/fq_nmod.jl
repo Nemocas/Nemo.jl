@@ -44,7 +44,7 @@ function coeff(x::fqPolyRepFieldElem, n::Int)
 end
 
 function coeffs_raw(x::fqPolyRepFieldElem)
-  @GC.preserve x begin
+  GC.@preserve x begin
     len = degree(parent(x))
     V = unsafe_wrap(Vector{UInt}, reinterpret(Ptr{UInt}, x.coeffs), x.length)
     Vcopy = Vector{UInt}(undef, len)

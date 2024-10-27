@@ -950,7 +950,7 @@ function set_exponent_vector!(a::QQMPolyRingElem, n::Int, exps::Vector{ZZRingEle
     ccall((:fmpq_mpoly_resize, libflint), Nothing,
           (Ref{QQMPolyRingElem}, Int, Ref{QQMPolyRing}), a, n, a.parent)
   end
-  @GC.preserve exps ccall((:fmpq_mpoly_set_term_exp_fmpz, libflint), Nothing,
+  GC.@preserve exps ccall((:fmpq_mpoly_set_term_exp_fmpz, libflint), Nothing,
                           (Ref{QQMPolyRingElem}, Int, Ptr{ZZRingElem}, Ref{QQMPolyRing}),
                           a, n - 1, exps, parent(a))
   return a

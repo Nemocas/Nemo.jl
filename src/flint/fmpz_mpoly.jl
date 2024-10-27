@@ -910,7 +910,7 @@ function set_exponent_vector!(a::ZZMPolyRingElem, n::Int, exps::Vector{ZZRingEle
           (Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}), a, n, a.parent)
     return a
   end
-  @GC.preserve exps ccall((:fmpz_mpoly_set_term_exp_fmpz, libflint), Nothing,
+  GC.@preserve exps ccall((:fmpz_mpoly_set_term_exp_fmpz, libflint), Nothing,
                           (Ref{ZZMPolyRingElem}, Int, Ptr{ZZRingElem}, Ref{ZZMPolyRing}),
                           a, n - 1, exps, parent(a))
   return a
