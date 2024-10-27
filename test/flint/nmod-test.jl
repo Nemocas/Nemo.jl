@@ -200,7 +200,7 @@ end
 
       a = rand(R)
       t = typemin(Int)
-      @test a * t == a * (t % p)
+      @test a * t == a * R(t)
 
       c1 = rand(-100:100)
       c2 = rand(-100:100)
