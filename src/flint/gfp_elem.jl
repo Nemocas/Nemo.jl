@@ -175,7 +175,7 @@ end
 function *(x::Int, y::fpFieldElem)
   R = parent(y)
   if x < 0
-    d = mulmod(UInt(-x), y.data, R.n, R.ninv)
+    d = mulmod(reinterpret(UInt, -x), y.data, R.n, R.ninv)
     return -fpFieldElem(d, R)
   else
     d = mulmod(UInt(x), y.data, R.n, R.ninv)

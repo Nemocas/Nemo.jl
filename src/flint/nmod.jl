@@ -188,7 +188,7 @@ end
 function *(x::Int, y::zzModRingElem)
   R = parent(y)
   if x < 0
-    d = mulmod(UInt(-x), y.data, R.n, R.ninv)
+    d = mulmod(reinterpret(UInt, -x), y.data, R.n, R.ninv)
     return -zzModRingElem(d, R)
   else
     d = mulmod(UInt(x), y.data, R.n, R.ninv)
