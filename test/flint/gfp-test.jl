@@ -222,7 +222,7 @@ end
 
       a = rand(R)
       t = typemin(Int)
-      @test a * t = a * (t % p)
+      @test a * t == a * (t % p)
 
       for iter = 1:100
         a = rand(R)
