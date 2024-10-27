@@ -1694,36 +1694,36 @@ function _acb_set(x::AcbFieldElemOrPtr, y::BigFloat, p::Int)
   zero!(i)
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, y::Int, z::Int, p::Int)
+function _acb_set(x::AcbFieldElemOrPtr, yz::Tuple{Int,Int}, p::Int)
   ccall((:acb_set_si_si, libflint), Nothing,
-        (Ref{AcbFieldElem}, Int, Int), x, y, z)
+        (Ref{AcbFieldElem}, Int, Int), x, yz[1], yz[2])
   ccall((:acb_set_round, libflint), Nothing,
         (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), x, x, p)
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, y::ArbFieldElem, z::ArbFieldElem)
+function _acb_set(x::AcbFieldElemOrPtr, yz::Tuple{ArbFieldElem,ArbFieldElem})
   ccall((:acb_set_arb_arb, libflint), Nothing,
-        (Ref{AcbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}), x, y, z)
+        (Ref{AcbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}), x, yz[1], yz[2])
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, y::ArbFieldElem, z::ArbFieldElem, p::Int)
-  _acb_set(x, y, z)
+function _acb_set(x::AcbFieldElemOrPtr, yz::Tuple{ArbFieldElem,ArbFieldElem}, p::Int)
+  _acb_set(x, yz)
   ccall((:acb_set_round, libflint), Nothing,
         (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), x, x, p)
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, y::QQFieldElem, z::QQFieldElem, p::Int)
+function _acb_set(x::AcbFieldElemOrPtr, yz::Tuple{QQFieldElem,QQFieldElem}, p::Int)
   r = _real_ptr(x)
-  _arb_set(r, y, p)
+  _arb_set(r, yz[1], p)
   i = _imag_ptr(x)
-  _arb_set(i, z, p)
+  _arb_set(i, yz[2], p)
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, y::T, z::T, p::Int) where {T <: AbstractString}
+function _acb_set(x::AcbFieldElemOrPtr, yz::Tuple{AbstractString,AbstractString}, p::Int)
   r = _real_ptr(x)
-  _arb_set(r, y, p)
+  _arb_set(r, yz[1], p)
   i = _imag_ptr(x)
-  _arb_set(i, z, p)
+  _arb_set(i, yz[2], p)
 end
 
 function _acb_set(x::AcbFieldElemOrPtr, y::Real, p::Int)
@@ -1740,11 +1740,11 @@ function _acb_set(x::AcbFieldElemOrPtr, y::Complex, p::Int)
   _arb_set(i, imag(y), p)
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, y::IntegerUnion, z::IntegerUnion, p::Int)
+function _acb_set(x::AcbFieldElemOrPtr, yz::Tuple{IntegerUnion,IntegerUnion}, p::Int)
   r = _real_ptr(x)
-  _arb_set(r, y, p)
+  _arb_set(r, yz[1], p)
   i = _imag_ptr(x)
-  _arb_set(i, z, p)
+  _arb_set(i, yz[2], p)
 end
 
 ###############################################################################

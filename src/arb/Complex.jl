@@ -1699,36 +1699,36 @@ function _acb_set(x::ComplexFieldElemOrPtr, y::BigFloat, p::Int)
   zero!(i)
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::Int, z::Int, p::Int)
+function _acb_set(x::ComplexFieldElemOrPtr, yz::Tuple{Int,Int}, p::Int)
   ccall((:acb_set_si_si, libflint), Nothing,
-        (Ref{ComplexFieldElem}, Int, Int), x, y, z)
+        (Ref{ComplexFieldElem}, Int, Int), x, yz[1], yz[2])
   ccall((:acb_set_round, libflint), Nothing,
         (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int), x, x, p)
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::RealFieldElem, z::RealFieldElem)
+function _acb_set(x::ComplexFieldElemOrPtr, yz::Tuple{RealFieldElem,RealFieldElem})
   ccall((:acb_set_arb_arb, libflint), Nothing,
-        (Ref{ComplexFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}), x, y, z)
+        (Ref{ComplexFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}), x, yz[1], yz[2])
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::RealFieldElem, z::RealFieldElem, p::Int)
-  _acb_set(x, y, z)
+function _acb_set(x::ComplexFieldElemOrPtr, yz::Tuple{RealFieldElem,RealFieldElem}, p::Int)
+  _acb_set(x, yz)
   ccall((:acb_set_round, libflint), Nothing,
         (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int), x, x, p)
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::QQFieldElem, z::QQFieldElem, p::Int)
+function _acb_set(x::ComplexFieldElemOrPtr, yz::Tuple{QQFieldElem,QQFieldElem}, p::Int)
   r = _real_ptr(x)
-  _arb_set(r, y, p)
+  _arb_set(r, yz[1], p)
   i = _imag_ptr(x)
-  _arb_set(i, z, p)
+  _arb_set(i, yz[2], p)
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::T, z::T, p::Int) where {T <: AbstractString}
+function _acb_set(x::ComplexFieldElemOrPtr, yz::Tuple{AbstractString,AbstractString}, p::Int)
   r = _real_ptr(x)
-  _arb_set(r, y, p)
+  _arb_set(r, yz[1], p)
   i = _imag_ptr(x)
-  _arb_set(i, z, p)
+  _arb_set(i, yz[2], p)
 end
 
 function _acb_set(x::ComplexFieldElemOrPtr, y::Real, p::Int)
@@ -1745,11 +1745,11 @@ function _acb_set(x::ComplexFieldElemOrPtr, y::Complex, p::Int)
   _arb_set(i, imag(y), p)
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::IntegerUnion, z::IntegerUnion, p::Int)
+function _acb_set(x::ComplexFieldElemOrPtr, yz::Tuple{IntegerUnion,IntegerUnion}, p::Int)
   r = _real_ptr(x)
-  _arb_set(r, y, p)
+  _arb_set(r, yz[1], p)
   i = _imag_ptr(x)
-  _arb_set(i, z, p)
+  _arb_set(i, yz[2], p)
 end
 
 ###############################################################################

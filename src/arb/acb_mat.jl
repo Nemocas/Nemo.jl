@@ -73,7 +73,7 @@ for T in [Integer, Float64, ZZRingElem, QQFieldElem, ArbFieldElem, BigFloat, Abs
 
       GC.@preserve x begin
         z = mat_entry_ptr(x, r, c)
-        _acb_set(z, y[1], y[2], precision(base_ring(x)))
+        _acb_set(z, y, precision(base_ring(x)))
       end
     end
   end
