@@ -237,6 +237,9 @@ end
 
 function gcdinv(x::FpPolyRingElem, y::FpPolyRingElem)
   check_parent(x,y)
+  if length(x) >= length(y)
+    x = rem(x,y)
+  end
   if is_zero(x)
     is_zero(y) && return y, x
     ly = leading_coefficient(y)
