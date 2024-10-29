@@ -37,10 +37,10 @@ function integrate(C::ComplexField, F, a, b;
   end
 
   ctol = mag_struct(0, 0)
-  ccall((:mag_init, libflint), Nothing, (Ref{mag_struct},), ctol)
+  @ccall libflint.mag_init(ctol::Ref{mag_struct})::Nothing
 
   if abs_tol === -1.0
-    ccall((:mag_set_ui_2exp_si, libflint), Nothing, (Ref{mag_struct}, UInt, Int), ctol, 1, -precision(Balls))
+    @ccall libflint.mag_set_ui_2exp_si(ctol::Ref{mag_struct}, 1::UInt, (-precision(Balls))::Int)::Nothing
   else
     t = BigFloat(abs_tol, RoundDown)
     expo = Ref{Clong}()
@@ -48,26 +48,23 @@ function integrate(C::ComplexField, F, a, b;
               (Ref{Clong}, Ref{BigFloat}, Cint),
               expo, t,
               Base.convert(Base.MPFR.MPFRRoundingMode, RoundDown))
-    ccall((:mag_set_d, libflint), Nothing, (Ref{mag_struct}, Float64), ctol, d)
-    ccall((:mag_mul_2exp_si, libflint), Nothing,
-          (Ref{mag_struct}, Ref{mag_struct}, Int), ctol, ctol, Int(expo[]))
+    @ccall libflint.mag_set_d(ctol::Ref{mag_struct}, d::Float64)::Nothing
+    @ccall libflint.mag_mul_2exp_si(ctol::Ref{mag_struct}, ctol::Ref{mag_struct}, Int(expo[])::Int)::Nothing
   end
 
   res = C()
 
-  status = ccall((:acb_calc_integrate, libflint), UInt,
-                 (Ref{ComplexFieldElem},                       #res
-                  Ptr{Nothing},                      #func
-                  Any,                            #params
-                  Ref{ComplexFieldElem},                       #a
-                  Ref{ComplexFieldElem},                       #b
-                  Int,                            #rel_goal
-                  Ref{mag_struct},                #abs_tol
-                  Ref{acb_calc_integrate_opts},   #opts
-                  Int),
-                 res, acb_calc_func_wrap_c(), F, lower, upper, cgoal, ctol, opts, precision(Balls))
+  status = @ccall libflint.acb_calc_integrate(res::Ref{ComplexFieldElem}, acb_calc_func_wrap_c()::#res
+                  Ptr{Nothing}, F::#func
+                  Any, lower::#params
+                  Ref{ComplexFieldElem}, upper::#a
+                  Ref{ComplexFieldElem}, cgoal::#b
+                  Int, ctol::#rel_goal
+                  Ref{mag_struct}, opts::#abs_tol
+                  Ref{acb_calc_integrate_opts}, precision(Balls)::#opts
+                  Int)::UInt
 
-  ccall((:mag_clear, libflint), Nothing, (Ref{mag_struct},), ctol)
+  @ccall libflint.mag_clear(ctol::Ref{mag_struct})::Nothing
 
   if status == ARB_CALC_SUCCESS
     nothing

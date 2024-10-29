@@ -87,7 +87,7 @@ Return the sign of $a$ ($-1$, $0$ or $1$) as a fraction.
 """
 sign(a::QQFieldElem) = QQFieldElem(sign(numerator(a)))
 
-sign(::Type{Int}, a::QQFieldElem) = Int(ccall((:fmpq_sgn, libflint), Cint, (Ref{QQFieldElem},), a))
+sign(::Type{Int}, a::QQFieldElem) = Int(@ccall libflint.fmpq_sgn(a::Ref{QQFieldElem})::Cint)
 
 Base.signbit(a::QQFieldElem) = signbit(sign(Int, a))
 
@@ -96,7 +96,7 @@ is_positive(n::QQFieldElem) = sign(Int, n) > 0
 
 function abs(a::QQFieldElem)
   z = QQFieldElem()
-  ccall((:fmpq_abs, libflint), Nothing, (Ref{QQFieldElem}, Ref{QQFieldElem}), z, a)
+  @ccall libflint.fmpq_abs(z::Ref{QQFieldElem}, a::Ref{QQFieldElem})::Nothing
   return z
 end
 
@@ -130,7 +130,7 @@ values of the numerator and denominator.
 """
 function height(a::QQFieldElem)
   temp = ZZRingElem()
-  ccall((:fmpq_height, libflint), Nothing, (Ref{ZZRingElem}, Ref{QQFieldElem}), temp, a)
+  @ccall libflint.fmpq_height(temp::Ref{ZZRingElem}, a::Ref{QQFieldElem})::Nothing
   return temp
 end
 
@@ -140,7 +140,7 @@ end
 Return the number of bits of the height of the fraction $a$.
 """
 function height_bits(a::QQFieldElem)
-  return ccall((:fmpq_height_bits, libflint), Int, (Ref{QQFieldElem},), a)
+  return @ccall libflint.fmpq_height_bits(a::Ref{QQFieldElem})::Int
 end
 
 function deepcopy_internal(a::QQFieldElem, dict::IdDict)
@@ -372,14 +372,13 @@ end
 ###############################################################################
 
 function ==(a::QQFieldElem, b::Int)
-  return ccall((:fmpq_equal_si, libflint), Bool, (Ref{QQFieldElem}, Int), a, b)
+  return @ccall libflint.fmpq_equal_si(a::Ref{QQFieldElem}, b::Int)::Bool
 end
 
 ==(a::Int, b::QQFieldElem) = b == a
 
 function ==(a::QQFieldElem, b::ZZRingElem)
-  return ccall((:fmpq_equal_fmpz, libflint), Bool,
-               (Ref{QQFieldElem}, Ref{ZZRingElem}), a, b)
+  return @ccall libflint.fmpq_equal_fmpz(a::Ref{QQFieldElem}, b::Ref{ZZRingElem})::Bool
 end
 
 ==(a::ZZRingElem, b::QQFieldElem) = b == a
@@ -413,8 +412,7 @@ isless(a::QQFieldElem, b::Float64) = isless(BigFloat(a), b)
 function ^(a::QQFieldElem, b::Int)
   iszero(a) && b < 0 && throw(DivideError())
   temp = QQFieldElem()
-  ccall((:fmpq_pow_si, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}, Int), temp, a, b)
+  @ccall libflint.fmpq_pow_si(temp::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Int)::Nothing
   return temp
 end
 
@@ -438,8 +436,7 @@ Return $a/2^b$.
 """
 function >>(a::QQFieldElem, b::Int)
   z = QQFieldElem()
-  ccall((:fmpq_div_2exp, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}, Int), z, a, b)
+  @ccall libflint.fmpq_div_2exp(z::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Int)::Nothing
   return z
 end
 
@@ -450,8 +447,7 @@ Return $a \times 2^b$.
 """
 function <<(a::QQFieldElem, b::Int)
   z = QQFieldElem()
-  ccall((:fmpq_mul_2exp, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}, Int), z, a, b)
+  @ccall libflint.fmpq_mul_2exp(z::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Int)::Nothing
   return z
 end
 
@@ -548,7 +544,7 @@ function inv(a::QQFieldElem)
     error("Element not invertible")
   end
   z = QQFieldElem()
-  ccall((:fmpq_inv, libflint), Nothing, (Ref{QQFieldElem}, Ref{QQFieldElem}), z, a)
+  @ccall libflint.fmpq_inv(z::Ref{QQFieldElem}, a::Ref{QQFieldElem})::Nothing
   return z
 end
 
@@ -635,8 +631,7 @@ julia> mod(ZZ(1)//2, ZZ(5))
 function mod(a::QQFieldElem, b::ZZRingElem)
   iszero(b) && throw(DivideError())
   z = ZZRingElem()
-  ccall((:fmpq_mod_fmpz, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{QQFieldElem}, Ref{ZZRingElem}), z, a, b)
+  @ccall libflint.fmpq_mod_fmpz(z::Ref{ZZRingElem}, a::Ref{QQFieldElem}, b::Ref{ZZRingElem})::Nothing
   return z
 end
 
@@ -650,8 +645,7 @@ mod(a::QQFieldElem, b::Integer) = mod(a, ZZRingElem(b))
 
 function gcd(a::QQFieldElem, b::QQFieldElem)
   z = QQFieldElem()
-  ccall((:fmpq_gcd, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}, Ref{QQFieldElem}), z, a, b)
+  @ccall libflint.fmpq_gcd(z::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{QQFieldElem})::Nothing
   return z
 end
 
@@ -751,9 +745,7 @@ Returns a tuple (`success`, `n/d`), where `success` signals the success of recon
 """
 function reconstruct(a::ZZRingElem, m::ZZRingElem, N::ZZRingElem, D::ZZRingElem)
   c = QQFieldElem()
-  success = Bool(ccall((:fmpq_reconstruct_fmpz_2, libflint), Cint,
-    (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}),
-    c, a, m, N, D))
+  success = Bool(@ccall libflint.fmpq_reconstruct_fmpz_2(c::Ref{QQFieldElem}, a::Ref{ZZRingElem}, m::Ref{ZZRingElem}, N::Ref{ZZRingElem}, D::Ref{ZZRingElem})::Cint)
   return success, c
 end
 
@@ -765,8 +757,7 @@ Returns a tuple (`success`, `n/d`), where `success` signals the success of recon
 """
 function unsafe_reconstruct(a::ZZRingElem, m::ZZRingElem)
   c = QQFieldElem()
-  success = Bool(ccall((:fmpq_reconstruct_fmpz, libflint), Cint,
-                       (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), c, a, m))
+  success = Bool(@ccall libflint.fmpq_reconstruct_fmpz(c::Ref{QQFieldElem}, a::Ref{ZZRingElem}, m::Ref{ZZRingElem})::Cint)
   return success, c
 end
 
@@ -799,7 +790,7 @@ julia> next_minimal(ZZ(2)//3)
 function next_minimal(a::QQFieldElem)
   a < 0 && throw(DomainError(a, "Argument must be non-negative"))
   c = QQFieldElem()
-  ccall((:fmpq_next_minimal, libflint), Nothing, (Ref{QQFieldElem}, Ref{QQFieldElem}), c, a)
+  @ccall libflint.fmpq_next_minimal(c::Ref{QQFieldElem}, a::Ref{QQFieldElem})::Nothing
   return c
 end
 
@@ -822,8 +813,7 @@ julia> next_signed_minimal(-ZZ(21)//31)
 """
 function next_signed_minimal(a::QQFieldElem)
   c = QQFieldElem()
-  ccall((:fmpq_next_signed_minimal, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}), c, a)
+  @ccall libflint.fmpq_next_signed_minimal(c::Ref{QQFieldElem}, a::Ref{QQFieldElem})::Nothing
   return c
 end
 
@@ -849,8 +839,7 @@ julia> next_calkin_wilf(ZZ(321)//113)
 function next_calkin_wilf(a::QQFieldElem)
   a < 0 && throw(DomainError(a, "Argument must be non-negative"))
   c = QQFieldElem()
-  ccall((:fmpq_next_calkin_wilf, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}), c, a)
+  @ccall libflint.fmpq_next_calkin_wilf(c::Ref{QQFieldElem}, a::Ref{QQFieldElem})::Nothing
   return c
 end
 
@@ -872,8 +861,7 @@ julia> next_signed_calkin_wilf(-ZZ(51)//(17))
 """
 function next_signed_calkin_wilf(a::QQFieldElem)
   c = QQFieldElem()
-  ccall((:fmpq_next_signed_calkin_wilf, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}), c, a)
+  @ccall libflint.fmpq_next_signed_calkin_wilf(c::Ref{QQFieldElem}, a::Ref{QQFieldElem})::Nothing
   return c
 end
 
@@ -900,7 +888,7 @@ julia> a = harmonic(12)
 function harmonic(n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
   c = QQFieldElem()
-  ccall((:fmpq_harmonic_ui, libflint), Nothing, (Ref{QQFieldElem}, Int), c, n)
+  @ccall libflint.fmpq_harmonic_ui(c::Ref{QQFieldElem}, n::Int)::Nothing
   return c
 end
 
@@ -921,7 +909,7 @@ julia> d = bernoulli(12)
 function bernoulli(n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
   c = QQFieldElem()
-  ccall((:bernoulli_fmpq_ui, libflint), Nothing, (Ref{QQFieldElem}, Int), c, n)
+  @ccall libflint.bernoulli_fmpq_ui(c::Ref{QQFieldElem}, n::Int)::Nothing
   return c
 end
 
@@ -947,7 +935,7 @@ julia> e = bernoulli(100)
 function bernoulli_cache(n::Int)
   n = n + 1
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
-  ccall((:bernoulli_cache_compute, libflint), Nothing, (Int,), n)
+  @ccall libflint.bernoulli_cache_compute(n::Int)::Nothing
 end
 
 @doc raw"""
@@ -967,8 +955,7 @@ julia> c = dedekind_sum(-120, ZZ(1305))
 """
 function dedekind_sum(h::ZZRingElem, k::ZZRingElem)
   c = QQFieldElem()
-  ccall((:fmpq_dedekind_sum, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), c, h, k)
+  @ccall libflint.fmpq_dedekind_sum(c::Ref{QQFieldElem}, h::Ref{ZZRingElem}, k::Ref{ZZRingElem})::Nothing
   return c
 end
 
@@ -992,9 +979,7 @@ function _fmpq_simplest_between(l_num::ZZRingElem, l_den::ZZRingElem,
   n = ZZRingElem()
   d = ZZRingElem()
 
-  ccall((:_fmpq_simplest_between, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}),
-        n, d, l_num, l_den, r_num, r_den)
+  @ccall libflint._fmpq_simplest_between(n::Ref{ZZRingElem}, d::Ref{ZZRingElem}, l_num::Ref{ZZRingElem}, l_den::Ref{ZZRingElem}, r_num::Ref{ZZRingElem}, r_den::Ref{ZZRingElem})::Nothing
 
   return n//d
 end
@@ -1016,8 +1001,7 @@ julia> simplest_between(QQ(1//10), QQ(3//10))
 """
 function simplest_between(l::QQFieldElem, r::QQFieldElem)
   z = QQFieldElem()
-  ccall((:fmpq_simplest_between, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}, Ref{QQFieldElem}), z, l, r)
+  @ccall libflint.fmpq_simplest_between(z::Ref{QQFieldElem}, l::Ref{QQFieldElem}, r::Ref{QQFieldElem})::Nothing
   return z
 end
 
@@ -1043,7 +1027,7 @@ function one!(c::QQFieldElemOrPtr)
 end
 
 function neg!(z::QQFieldElemOrPtr, a::QQFieldElemOrPtr)
-  ccall((:fmpq_neg, libflint), Nothing, (Ref{QQFieldElem}, Ref{QQFieldElem}), z, a)
+  @ccall libflint.fmpq_neg(z::Ref{QQFieldElem}, a::Ref{QQFieldElem})::Nothing
   return z
 end
 
@@ -1088,26 +1072,22 @@ end
 #
 
 function add!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::QQFieldElemOrPtr)
-  ccall((:fmpq_add, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}, Ref{QQFieldElem}), c, a, b)
+  @ccall libflint.fmpq_add(c::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{QQFieldElem})::Nothing
   return c
 end
 
 function add!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::ZZRingElemOrPtr)
-  ccall((:fmpq_add_fmpz, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}, Ref{ZZRingElem}), c, a, b)
+  @ccall libflint.fmpq_add_fmpz(c::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{ZZRingElem})::Nothing
   return c
 end
 
 function add!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::Int)
-  ccall((:fmpq_add_si, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}, Int), c, a, b)
+  @ccall libflint.fmpq_add_si(c::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Int)::Nothing
   return c
 end
 
 function add!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::UInt)
-  ccall((:fmpq_add_ui, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}, Int), c, a, b)
+  @ccall libflint.fmpq_add_ui(c::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Int)::Nothing
   return c
 end
 
@@ -1117,25 +1097,22 @@ add!(c::QQFieldElemOrPtr, a::Union{ZZRingElemOrPtr, Integer, Rational}, b::QQFie
 #
 
 function sub!(z::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::QQFieldElemOrPtr)
-  ccall((:fmpq_sub, libflint), Nothing, (Ref{QQFieldElem}, Ref{QQFieldElem}, Ref{QQFieldElem}), z, a, b)
+  @ccall libflint.fmpq_sub(z::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{QQFieldElem})::Nothing
   return z
 end
 
 function sub!(z::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::ZZRingElemOrPtr)
-  ccall((:fmpq_sub_fmpz, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}, Ref{ZZRingElem}), z, a, b)
+  @ccall libflint.fmpq_sub_fmpz(z::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{ZZRingElem})::Nothing
   return z
 end
 
 function sub!(z::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::Int)
-  ccall((:fmpq_sub_si, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}, Int), z, a, b)
+  @ccall libflint.fmpq_sub_si(z::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Int)::Nothing
   return z
 end
 
 function sub!(z::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::UInt)
-  ccall((:fmpq_sub_ui, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}, UInt), z, a, b)
+  @ccall libflint.fmpq_sub_ui(z::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::UInt)::Nothing
   return z
 end
 
@@ -1145,26 +1122,22 @@ sub!(c::QQFieldElemOrPtr, a::Union{ZZRingElemOrPtr, Integer, Rational}, b::QQFie
 #
 
 function mul!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::QQFieldElemOrPtr)
-  ccall((:fmpq_mul, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}, Ref{QQFieldElem}), c, a, b)
+  @ccall libflint.fmpq_mul(c::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{QQFieldElem})::Nothing
   return c
 end
 
 function mul!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::ZZRingElemOrPtr)
-  ccall((:fmpq_mul_fmpz, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}, Ref{ZZRingElem}), c, a, b)
+  @ccall libflint.fmpq_mul_fmpz(c::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{ZZRingElem})::Nothing
   return c
 end
 
 function mul!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::Int)
-  ccall((:fmpq_mul_si, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}, Int), c, a, b)
+  @ccall libflint.fmpq_mul_si(c::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Int)::Nothing
   return c
 end
 
 function mul!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::UInt)
-  ccall((:fmpq_mul_ui, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}, UInt), c, a, b)
+  @ccall libflint.fmpq_mul_ui(c::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::UInt)::Nothing
   return c
 end
 
@@ -1174,26 +1147,24 @@ mul!(c::QQFieldElemOrPtr, a::Union{ZZRingElemOrPtr, Integer, Rational}, b::QQFie
 #
 
 function addmul!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::QQFieldElemOrPtr)
-  ccall((:fmpq_addmul, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}, Ref{QQFieldElem}), c, a, b)
+  @ccall libflint.fmpq_addmul(c::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{QQFieldElem})::Nothing
   return c
 end
 
 function submul!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::QQFieldElemOrPtr)
-  ccall((:fmpq_submul, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQFieldElem}, Ref{QQFieldElem}), c, a, b)
+  @ccall libflint.fmpq_submul(c::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{QQFieldElem})::Nothing
   return c
 end
 
 #
 
 function divexact!(z::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::QQFieldElemOrPtr)
-  ccall((:fmpq_div, libflint), Nothing, (Ref{QQFieldElem}, Ref{QQFieldElem}, Ref{QQFieldElem}), z, a, b)
+  @ccall libflint.fmpq_div(z::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{QQFieldElem})::Nothing
   return z
 end
 
 function divexact!(z::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::ZZRingElemOrPtr)
-  ccall((:fmpq_div_fmpz, libflint), Nothing, (Ref{QQFieldElem}, Ref{QQFieldElem}, Ref{ZZRingElem}), z, a, b)
+  @ccall libflint.fmpq_div_fmpz(z::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{ZZRingElem})::Nothing
   return z
 end
 
@@ -1256,8 +1227,7 @@ denominator can be smaller than $b$ bits.
 function rand_bits(::QQField, b::Int)
   b > 0 || throw(DomainError(b, "Bit count must be positive"))
   z = QQFieldElem()
-  ccall((:fmpq_randbits, libflint), Nothing, (Ref{QQFieldElem}, Ref{rand_ctx}, Int),
-        z, _flint_rand_states[Threads.threadid()], b)
+  @ccall libflint.fmpq_randbits(z::Ref{QQFieldElem}, _flint_rand_states[Threads.threadid()]::Ref{rand_ctx}, b::Int)::Nothing
   return z
 end
 
@@ -1295,8 +1265,7 @@ end
 
 function Base.Rational{BigInt}(z::QQFieldElem)
   r = Rational{BigInt}(0)
-  ccall((:fmpq_get_mpz_frac, libflint), Nothing,
-        (Ref{BigInt}, Ref{BigInt}, Ref{QQFieldElem}), r.num, r.den, z)
+  @ccall libflint.fmpq_get_mpz_frac(r.num::Ref{BigInt}, r.den::Ref{BigInt}, z::Ref{QQFieldElem})::Nothing
   return r
 end
 
@@ -1316,7 +1285,7 @@ end
 
 function BigFloat(a::QQFieldElem)
   r = BigFloat(0)
-  ccall((:fmpq_get_mpfr, libflint), Cint, (Ref{BigFloat}, Ref{QQFieldElem}, Int32), r, a, __get_rounding_mode())
+  @ccall libflint.fmpq_get_mpfr(r::Ref{BigFloat}, a::Ref{QQFieldElem}, __get_rounding_mode()::Int32)::Cint
   return r
 end
 

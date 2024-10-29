@@ -124,8 +124,7 @@ function polcoeff(a::ZZLaurentSeriesRingElem, n::Int)
     return ZZRingElem(0)
   end
   z = ZZRingElem()
-  ccall((:fmpz_poly_get_coeff_fmpz, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZLaurentSeriesRingElem}, Int), z, a, n)
+  @ccall libflint.fmpz_poly_get_coeff_fmpz(z::Ref{ZZRingElem}, a::Ref{ZZLaurentSeriesRingElem}, n::Int)::Nothing
   return z
 end
 
@@ -511,9 +510,7 @@ function *(a::ZZLaurentSeriesRingElem, b::ZZLaurentSeriesRingElem)
   lenb = pol_length(b)
   lenz = div(prec + sz - 1, sz)
   z = parent(a)()
-  ccall((:fmpz_poly_mullow, libflint), Nothing,
-        (Ref{ZZLaurentSeriesRingElem}, Ref{ZZLaurentSeriesRingElem}, Ref{ZZLaurentSeriesRingElem}, Int),
-        z, a, b, lenz)
+  @ccall libflint.fmpz_poly_mullow(z::Ref{ZZLaurentSeriesRingElem}, a::Ref{ZZLaurentSeriesRingElem}, b::Ref{ZZLaurentSeriesRingElem}, lenz::Int)::Nothing
   z = set_precision!(z, prec + zval)
   z = set_valuation!(z, zval)
   z = set_scale!(z, sz)
@@ -626,9 +623,7 @@ function mullow(a::ZZLaurentSeriesRingElem, b::ZZLaurentSeriesRingElem, n::Int)
   prec = min(precision(a), precision(b))
   z = parent(a)()
   lenz = min(lena + lenb - 1, div(n + s - 1, s))
-  ccall((:fmpz_poly_mullow, libflint), Nothing,
-        (Ref{ZZLaurentSeriesRingElem}, Ref{ZZLaurentSeriesRingElem}, Ref{ZZLaurentSeriesRingElem}, Int),
-        z, a, b, lenz)
+  @ccall libflint.fmpz_poly_mullow(z::Ref{ZZLaurentSeriesRingElem}, a::Ref{ZZLaurentSeriesRingElem}, b::Ref{ZZLaurentSeriesRingElem}, lenz::Int)::Nothing
   z = set_precision!(z, prec)
   z = set_valuation!(z, valuation(a) + valuation(b))
   z = set_scale!(z, s)
@@ -867,9 +862,7 @@ function divexact(a::ZZLaurentSeriesRingElem, b::ZZLaurentSeriesRingElem; check:
   lenb = pol_length(b)
   lenz = div(prec + sz - 1, sz)
   z = parent(a)()
-  ccall((:fmpz_poly_div_series, libflint), Nothing,
-        (Ref{ZZLaurentSeriesRingElem}, Ref{ZZLaurentSeriesRingElem}, Ref{ZZLaurentSeriesRingElem}, Int),
-        z, a, b, lenz)
+  @ccall libflint.fmpz_poly_div_series(z::Ref{ZZLaurentSeriesRingElem}, a::Ref{ZZLaurentSeriesRingElem}, b::Ref{ZZLaurentSeriesRingElem}, lenz::Int)::Nothing
   z = set_precision!(z, prec + zval)
   z = set_valuation!(z, zval)
   z = set_scale!(z, sz)
@@ -926,9 +919,7 @@ function inv(a::ZZLaurentSeriesRingElem)
   ainv = set_scale!(ainv, sa)
   !is_unit(a1) && error("Unable to invert power series")
   z = parent(a)()
-  ccall((:fmpz_poly_inv_series, libflint), Nothing,
-        (Ref{ZZLaurentSeriesRingElem}, Ref{ZZLaurentSeriesRingElem}, Int),
-        ainv, a, lenz)
+  @ccall libflint.fmpz_poly_inv_series(ainv::Ref{ZZLaurentSeriesRingElem}, a::Ref{ZZLaurentSeriesRingElem}, lenz::Int)::Nothing
   ainv = rescale!(ainv)
   return ainv
 end
@@ -958,9 +949,7 @@ function sqrt(a::ZZLaurentSeriesRingElem; check::Bool=true)
   zlen = div(prec + s - 1, s)
   asqrt = set_precision!(asqrt, prec + aval2)
   asqrt = set_valuation!(asqrt, aval2)
-  flag = Bool(ccall((:fmpz_poly_sqrt_series, libflint), Cint,
-                    (Ref{ZZLaurentSeriesRingElem}, Ref{ZZLaurentSeriesRingElem}, Int),
-                    asqrt, a, zlen))
+  flag = Bool(@ccall libflint.fmpz_poly_sqrt_series(asqrt::Ref{ZZLaurentSeriesRingElem}, a::Ref{ZZLaurentSeriesRingElem}, zlen::Int)::Cint)
   check && flag == false && error("Not a square in sqrt")
   asqrt = set_scale!(asqrt, s)
   asqrt = rescale!(asqrt)
@@ -1027,8 +1016,7 @@ end
 ###############################################################################
 
 function zero!(a::ZZLaurentSeriesRingElem)
-  ccall((:fmpz_poly_zero, libflint), Nothing,
-        (Ref{ZZLaurentSeriesRingElem},), a)
+  @ccall libflint.fmpz_poly_zero(a::Ref{ZZLaurentSeriesRingElem})::Nothing
   a = set_precision!(a, parent(a).prec_max)
   a = set_valuation!(a, parent(a).prec_max)
   a = set_scale!(a, 1)
@@ -1036,9 +1024,7 @@ function zero!(a::ZZLaurentSeriesRingElem)
 end
 
 function setcoeff!(c::ZZLaurentSeriesRingElem, n::Int, a::ZZRingElem)
-  ccall((:fmpz_poly_set_coeff_fmpz, libflint), Nothing,
-        (Ref{ZZLaurentSeriesRingElem}, Int, Ref{ZZRingElem}),
-        c, n, a)
+  @ccall libflint.fmpz_poly_set_coeff_fmpz(c::Ref{ZZLaurentSeriesRingElem}, n::Int, a::Ref{ZZRingElem})::Nothing
   return c
 end
 
@@ -1062,8 +1048,7 @@ function mul!(c::ZZLaurentSeriesRingElem, a::ZZLaurentSeriesRingElem, b::ZZLaure
   lena = min(lena*sa, prec)
   lenb = min(lenb*sb, prec)
   if lena == 0 || lenb == 0
-    ccall((:fmpz_poly_zero, libflint), Nothing,
-          (Ref{ZZLaurentSeriesRingElem},), c)
+    @ccall libflint.fmpz_poly_zero(c::Ref{ZZLaurentSeriesRingElem})::Nothing
     c = set_precision!(c, prec + aval + bval)
     c = set_valuation!(c, aval + bval)
     c = set_scale!(c, 1)
@@ -1077,8 +1062,7 @@ function mul!(c::ZZLaurentSeriesRingElem, a::ZZLaurentSeriesRingElem, b::ZZLaure
     lena = pol_length(a)
     lenb = pol_length(b)
     lenc = min(lena + lenb - 1, div(prec + sz - 1, sz))
-    ccall((:fmpz_poly_mullow, libflint), Nothing,
-          (Ref{ZZLaurentSeriesRingElem}, Ref{ZZLaurentSeriesRingElem}, Ref{ZZLaurentSeriesRingElem}, Int), c, a, b, lenc)
+    @ccall libflint.fmpz_poly_mullow(c::Ref{ZZLaurentSeriesRingElem}, a::Ref{ZZLaurentSeriesRingElem}, b::Ref{ZZLaurentSeriesRingElem}, lenc::Int)::Nothing
   end
   c = set_valuation!(c, aval + bval)
   c = set_precision!(c, prec + c.val)

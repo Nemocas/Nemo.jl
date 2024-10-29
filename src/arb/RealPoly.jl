@@ -16,12 +16,10 @@ elem_type(::Type{RealPolyRing}) = RealPolyRingElem
 
 dense_poly_type(::Type{RealFieldElem}) = RealPolyRingElem
 
-length(x::RealPolyRingElem) = ccall((:arb_poly_length, libflint), Int,
-                            (Ref{RealPolyRingElem},), x)
+length(x::RealPolyRingElem) = @ccall libflint.arb_poly_length(x::Ref{RealPolyRingElem})::Int
 
 function set_length!(x::RealPolyRingElem, n::Int)
-  ccall((:_arb_poly_set_length, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Int), x, n)
+  @ccall libflint._arb_poly_set_length(x::Ref{RealPolyRingElem}, n::Int)::Nothing
   return x
 end
 
@@ -30,8 +28,7 @@ degree(x::RealPolyRingElem) = length(x) - 1
 function coeff(a::RealPolyRingElem, n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
   t = base_ring(parent(a))()
-  ccall((:arb_poly_get_coeff_arb, libflint), Nothing,
-        (Ref{RealFieldElem}, Ref{RealPolyRingElem}, Int), t, a, n)
+  @ccall libflint.arb_poly_get_coeff_arb(t::Ref{RealFieldElem}, a::Ref{RealPolyRingElem}, n::Int)::Nothing
   return t
 end
 
@@ -98,8 +95,7 @@ end
 ###############################################################################
 
 function isequal(x::RealPolyRingElem, y::RealPolyRingElem)
-  return ccall((:arb_poly_equal, libflint), Bool,
-               (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}), x, y)
+  return @ccall libflint.arb_poly_equal(x::Ref{RealPolyRingElem}, y::Ref{RealPolyRingElem})::Bool
 end
 
 @doc raw"""
@@ -109,8 +105,7 @@ Return `true` if the coefficient balls of $x$ overlap the coefficient balls
 of $y$, otherwise return `false`.
 """
 function overlaps(x::RealPolyRingElem, y::RealPolyRingElem)
-  return ccall((:arb_poly_overlaps, libflint), Bool,
-               (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}), x, y)
+  return @ccall libflint.arb_poly_overlaps(x::Ref{RealPolyRingElem}, y::Ref{RealPolyRingElem})::Bool
 end
 
 @doc raw"""
@@ -120,8 +115,7 @@ Return `true` if the coefficient balls of $x$ contain the corresponding
 coefficient balls of $y$, otherwise return `false`.
 """
 function contains(x::RealPolyRingElem, y::RealPolyRingElem)
-  return ccall((:arb_poly_contains, libflint), Bool,
-               (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}), x, y)
+  return @ccall libflint.arb_poly_contains(x::Ref{RealPolyRingElem}, y::Ref{RealPolyRingElem})::Bool
 end
 
 @doc raw"""
@@ -131,8 +125,7 @@ Return `true` if the coefficient balls of $x$ contain the corresponding
 exact coefficients of $y$, otherwise return `false`.
 """
 function contains(x::RealPolyRingElem, y::ZZPolyRingElem)
-  return ccall((:arb_poly_contains_fmpz_poly, libflint), Bool,
-               (Ref{RealPolyRingElem}, Ref{ZZPolyRingElem}), x, y)
+  return @ccall libflint.arb_poly_contains_fmpz_poly(x::Ref{RealPolyRingElem}, y::Ref{ZZPolyRingElem})::Bool
 end
 
 @doc raw"""
@@ -142,8 +135,7 @@ Return `true` if the coefficient balls of $x$ contain the corresponding
 exact coefficients of $y$, otherwise return `false`.
 """
 function contains(x::RealPolyRingElem, y::QQPolyRingElem)
-  return ccall((:arb_poly_contains_fmpq_poly, libflint), Bool,
-               (Ref{RealPolyRingElem}, Ref{QQPolyRingElem}), x, y)
+  return @ccall libflint.arb_poly_contains_fmpq_poly(x::Ref{RealPolyRingElem}, y::Ref{QQPolyRingElem})::Bool
 end
 
 function ==(x::RealPolyRingElem, y::RealPolyRingElem)
@@ -176,8 +168,7 @@ In the former case, $z$ is set to the integer polynomial.
 """
 function unique_integer(x::RealPolyRingElem)
   z = ZZPolyRing(ZZ, var(parent(x)))()
-  unique = ccall((:arb_poly_get_unique_fmpz_poly, libflint), Int,
-                 (Ref{ZZPolyRingElem}, Ref{RealPolyRingElem}), z, x)
+  unique = @ccall libflint.arb_poly_get_unique_fmpz_poly(z::Ref{ZZPolyRingElem}, x::Ref{RealPolyRingElem})::Int
   return (unique != 0, z)
 end
 
@@ -190,16 +181,14 @@ end
 function shift_left(x::RealPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Shift must be non-negative"))
   z = parent(x)()
-  ccall((:arb_poly_shift_left, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Int), z, x, len)
+  @ccall libflint.arb_poly_shift_left(z::Ref{RealPolyRingElem}, x::Ref{RealPolyRingElem}, len::Int)::Nothing
   return z
 end
 
 function shift_right(x::RealPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Shift must be non-negative"))
   z = parent(x)()
-  ccall((:arb_poly_shift_right, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Int), z, x, len)
+  @ccall libflint.arb_poly_shift_right(z::Ref{RealPolyRingElem}, x::Ref{RealPolyRingElem}, len::Int)::Nothing
   return z
 end
 
@@ -236,9 +225,7 @@ end
 function ^(x::RealPolyRingElem, y::Int)
   y < 0 && throw(DomainError(y, "Exponent must be non-negative"))
   z = parent(x)()
-  ccall((:arb_poly_pow_ui, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, UInt, Int),
-        z, x, y, precision(Balls))
+  @ccall libflint.arb_poly_pow_ui(z::Ref{RealPolyRingElem}, x::Ref{RealPolyRingElem}, y::UInt, precision(Balls)::Int)::Nothing
   return z
 end
 
@@ -322,17 +309,14 @@ function truncate(a::RealPolyRingElem, n::Int)
   end
   # todo: implement set_trunc in ArbFieldElem
   z = deepcopy(a)
-  ccall((:arb_poly_truncate, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Int), z, n)
+  @ccall libflint.arb_poly_truncate(z::Ref{RealPolyRingElem}, n::Int)::Nothing
   return z
 end
 
 function mullow(x::RealPolyRingElem, y::RealPolyRingElem, n::Int, prec::Int = precision(Balls))
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
   z = parent(x)()
-  ccall((:arb_poly_mullow, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Int, Int),
-        z, x, y, n, prec)
+  @ccall libflint.arb_poly_mullow(z::Ref{RealPolyRingElem}, x::Ref{RealPolyRingElem}, y::Ref{RealPolyRingElem}, n::Int, prec::Int)::Nothing
   return z
 end
 
@@ -358,17 +342,13 @@ end
 
 function evaluate(x::RealPolyRingElem, y::RealFieldElem, prec::Int = precision(Balls))
   z = parent(y)()
-  ccall((:arb_poly_evaluate, libflint), Nothing,
-        (Ref{RealFieldElem}, Ref{RealPolyRingElem}, Ref{RealFieldElem}, Int),
-        z, x, y, prec)
+  @ccall libflint.arb_poly_evaluate(z::Ref{RealFieldElem}, x::Ref{RealPolyRingElem}, y::Ref{RealFieldElem}, prec::Int)::Nothing
   return z
 end
 
 function evaluate(x::RealPolyRingElem, y::AcbFieldElem, prec::Int = precision(Balls))
   z = parent(y)()
-  ccall((:arb_poly_evaluate_acb, libflint), Nothing,
-        (Ref{AcbFieldElem}, Ref{RealPolyRingElem}, Ref{AcbFieldElem}, Int),
-        z, x, y, prec)
+  @ccall libflint.arb_poly_evaluate_acb(z::Ref{AcbFieldElem}, x::Ref{RealPolyRingElem}, y::Ref{AcbFieldElem}, prec::Int)::Nothing
   return z
 end
 
@@ -387,18 +367,14 @@ its derivative evaluated at $y$.
 function evaluate2(x::RealPolyRingElem, y::RealFieldElem, prec::Int = precision(Balls))
   z = parent(y)()
   w = parent(y)()
-  ccall((:arb_poly_evaluate2, libflint), Nothing,
-        (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealPolyRingElem}, Ref{RealFieldElem}, Int),
-        z, w, x, y, prec)
+  @ccall libflint.arb_poly_evaluate2(z::Ref{RealFieldElem}, w::Ref{RealFieldElem}, x::Ref{RealPolyRingElem}, y::Ref{RealFieldElem}, prec::Int)::Nothing
   return z, w
 end
 
 function evaluate2(x::RealPolyRingElem, y::ComplexFieldElem, prec::Int = precision(Balls))
   z = parent(y)()
   w = parent(y)()
-  ccall((:arb_poly_evaluate2_acb, libflint), Nothing,
-        (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{RealPolyRingElem}, Ref{AcbFieldElem}, Int),
-        z, w, x, y, prec)
+  @ccall libflint.arb_poly_evaluate2_acb(z::Ref{AcbFieldElem}, w::Ref{AcbFieldElem}, x::Ref{RealPolyRingElem}, y::Ref{AcbFieldElem}, prec::Int)::Nothing
   return z, w
 end
 
@@ -419,9 +395,7 @@ function compose(x::RealPolyRingElem, y::RealPolyRingElem, prec::Int = precision
   @assert inner == :second
 
   z = parent(x)()
-  ccall((:arb_poly_compose, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Int),
-        z, x, y, prec)
+  @ccall libflint.arb_poly_compose(z::Ref{RealPolyRingElem}, x::Ref{RealPolyRingElem}, y::Ref{RealPolyRingElem}, prec::Int)::Nothing
   return z
 end
 
@@ -433,15 +407,13 @@ end
 
 function derivative(x::RealPolyRingElem, prec::Int = precision(Balls))
   z = parent(x)()
-  ccall((:arb_poly_derivative, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Int), z, x, prec)
+  @ccall libflint.arb_poly_derivative(z::Ref{RealPolyRingElem}, x::Ref{RealPolyRingElem}, prec::Int)::Nothing
   return z
 end
 
 function integral(x::RealPolyRingElem, prec::Int = precision(Balls))
   z = parent(x)()
-  ccall((:arb_poly_integral, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Int), z, x, prec)
+  @ccall libflint.arb_poly_integral(z::Ref{RealPolyRingElem}, x::Ref{RealPolyRingElem}, prec::Int)::Nothing
   return z
 end
 
@@ -452,11 +424,11 @@ end
 ###############################################################################
 
 function arb_vec(n::Int)
-  return ccall((:_arb_vec_init, libflint), Ptr{arb_struct}, (Int,), n)
+  return @ccall libflint._arb_vec_init(n::Int)::Ptr{arb_struct}
 end
 
 function arb_vec(b::Vector{RealFieldElem})
-  v = ccall((:_arb_vec_init, libflint), Ptr{arb_struct}, (Int,), length(b))
+  v = @ccall libflint._arb_vec_init(length(b)::Int)::Ptr{arb_struct}
   for i in 1:length(b)
     _arb_set(v + (i-1)*sizeof(arb_struct), b[i])
   end
@@ -473,7 +445,7 @@ function array(R::RealField, v::Ptr{arb_struct}, n::Int)
 end
 
 function arb_vec_clear(v::Ptr{arb_struct}, n::Int)
-  ccall((:_arb_vec_clear, libflint), Nothing, (Ptr{arb_struct}, Int), v, n)
+  @ccall libflint._arb_vec_clear(v::Ptr{arb_struct}, n::Int)::Nothing
 end
 
 @doc raw"""
@@ -484,8 +456,7 @@ Construct a polynomial in the given polynomial ring from a list of its roots.
 function from_roots(R::RealPolyRing, b::Vector{RealFieldElem}, prec::Int = precision(Balls))
   z = R()
   tmp = arb_vec(b)
-  ccall((:arb_poly_product_roots, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Ptr{arb_struct}, Int, Int), z, tmp, length(b), prec)
+  @ccall libflint.arb_poly_product_roots(z::Ref{RealPolyRingElem}, tmp::Ptr{arb_struct}, length(b)::Int, prec::Int)::Nothing
   arb_vec_clear(tmp, length(b))
   return z
 end
@@ -496,9 +467,7 @@ end
 
 function evaluate_fast(x::RealPolyRingElem, b::Vector{RealFieldElem}, prec::Int = precision(Balls))
   tmp = arb_vec(b)
-  ccall((:arb_poly_evaluate_vec_fast, libflint), Nothing,
-        (Ptr{arb_struct}, Ref{RealPolyRingElem}, Ptr{arb_struct}, Int, Int),
-        tmp, x, tmp, length(b), prec)
+  @ccall libflint.arb_poly_evaluate_vec_fast(tmp::Ptr{arb_struct}, x::Ref{RealPolyRingElem}, tmp::Ptr{arb_struct}, length(b)::Int, prec::Int)::Nothing
   res = array(base_ring(parent(x)), tmp, length(b))
   arb_vec_clear(tmp, length(b))
   return res
@@ -509,9 +478,7 @@ function interpolate_newton(R::RealPolyRing, xs::Vector{RealFieldElem}, ys::Vect
   z = R()
   xsv = arb_vec(xs)
   ysv = arb_vec(ys)
-  ccall((:arb_poly_interpolate_newton, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Ptr{arb_struct}, Ptr{arb_struct}, Int, Int),
-        z, xsv, ysv, length(xs), prec)
+  @ccall libflint.arb_poly_interpolate_newton(z::Ref{RealPolyRingElem}, xsv::Ptr{arb_struct}, ysv::Ptr{arb_struct}, length(xs)::Int, prec::Int)::Nothing
   arb_vec_clear(xsv, length(xs))
   arb_vec_clear(ysv, length(ys))
   return z
@@ -522,9 +489,7 @@ function interpolate_barycentric(R::RealPolyRing, xs::Vector{RealFieldElem}, ys:
   z = R()
   xsv = arb_vec(xs)
   ysv = arb_vec(ys)
-  ccall((:arb_poly_interpolate_barycentric, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Ptr{arb_struct}, Ptr{arb_struct}, Int, Int),
-        z, xsv, ysv, length(xs), prec)
+  @ccall libflint.arb_poly_interpolate_barycentric(z::Ref{RealPolyRingElem}, xsv::Ptr{arb_struct}, ysv::Ptr{arb_struct}, length(xs)::Int, prec::Int)::Nothing
   arb_vec_clear(xsv, length(xs))
   arb_vec_clear(ysv, length(ys))
   return z
@@ -535,9 +500,7 @@ function interpolate_fast(R::RealPolyRing, xs::Vector{RealFieldElem}, ys::Vector
   z = R()
   xsv = arb_vec(xs)
   ysv = arb_vec(ys)
-  ccall((:arb_poly_interpolate_fast, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Ptr{arb_struct}, Ptr{arb_struct}, Int, Int),
-        z, xsv, ysv, length(xs), prec)
+  @ccall libflint.arb_poly_interpolate_fast(z::Ref{RealPolyRingElem}, xsv::Ptr{arb_struct}, ysv::Ptr{arb_struct}, length(xs)::Int, prec::Int)::Nothing
   arb_vec_clear(xsv, length(xs))
   arb_vec_clear(ysv, length(ys))
   return z
@@ -569,13 +532,11 @@ function roots_upper_bound(x::RealPolyRingElem)
   p = precision(Balls)
   GC.@preserve x z begin
     t = _rad_ptr(z)
-    ccall((:arb_poly_root_bound_fujiwara, libflint), Nothing,
-          (Ptr{mag_struct}, Ref{RealPolyRingElem}), t, x)
+    @ccall libflint.arb_poly_root_bound_fujiwara(t::Ptr{mag_struct}, x::Ref{RealPolyRingElem})::Nothing
     s = _mid_ptr(z)
-    ccall((:arf_set_mag, libflint), Nothing, (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
-    ccall((:arf_set_round, libflint), Nothing,
-          (Ptr{arf_struct}, Ptr{arf_struct}, Int, Cint), s, s, p, ARB_RND_CEIL)
-    ccall((:mag_zero, libflint), Nothing, (Ptr{mag_struct},), t)
+    @ccall libflint.arf_set_mag(s::Ptr{arf_struct}, t::Ptr{mag_struct})::Nothing
+    @ccall libflint.arf_set_round(s::Ptr{arf_struct}, s::Ptr{arf_struct}, p::Int, ARB_RND_CEIL::Cint)::Nothing
+    @ccall libflint.mag_zero(t::Ptr{mag_struct})::Nothing
   end
   return z
 end
@@ -602,20 +563,17 @@ function neg!(z::RealPolyRingElemOrPtr, a::RealPolyRingElemOrPtr)
 end
 
 function fit!(z::RealPolyRingElem, n::Int)
-  ccall((:arb_poly_fit_length, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Int), z, n)
+  @ccall libflint.arb_poly_fit_length(z::Ref{RealPolyRingElem}, n::Int)::Nothing
   return nothing
 end
 
 function setcoeff!(z::RealPolyRingElem, n::Int, x::RealFieldElem)
-  ccall((:arb_poly_set_coeff_arb, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Int, Ref{RealFieldElem}), z, n, x)
+  @ccall libflint.arb_poly_set_coeff_arb(z::Ref{RealPolyRingElem}, n::Int, x::Ref{RealFieldElem})::Nothing
   return z
 end
 
 function setcoeff!(z::RealPolyRingElem, n::Int, x::Int)
-  ccall((:arb_poly_set_coeff_si, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Int, Int), z, n, x)
+  @ccall libflint.arb_poly_set_coeff_si(z::Ref{RealPolyRingElem}, n::Int, x::Int)::Nothing
   return z
 end
 
@@ -628,16 +586,12 @@ setcoeff!(z::RealPolyRingElem, n::Int, x::Integer) = setcoeff!(z, n, flintify(x)
 #
 
 function add!(z::RealPolyRingElem, x::RealPolyRingElem, y::RealPolyRingElem)
-  ccall((:arb_poly_add, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Int),
-        z, x, y, precision(Balls))
+  @ccall libflint.arb_poly_add(z::Ref{RealPolyRingElem}, x::Ref{RealPolyRingElem}, y::Ref{RealPolyRingElem}, precision(Balls)::Int)::Nothing
   return z
 end
 
 function add!(z::RealPolyRingElem, x::RealPolyRingElem, y::Int)
-  ccall((:arb_poly_add_si, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Int, Int),
-        z, x, y, precision(Balls))
+  @ccall libflint.arb_poly_add_si(z::Ref{RealPolyRingElem}, x::Ref{RealPolyRingElem}, y::Int, precision(Balls)::Int)::Nothing
   return z
 end
 
@@ -652,9 +606,7 @@ add!(z::RealPolyRingElem, x::Union{RealFieldElem,IntegerUnion}, y::RealPolyRingE
 #
 
 function sub!(z::RealPolyRingElem, x::RealPolyRingElem, y::RealPolyRingElem)
-  ccall((:arb_poly_sub, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Int),
-        z, x, y, precision(Balls))
+  @ccall libflint.arb_poly_sub(z::Ref{RealPolyRingElem}, x::Ref{RealPolyRingElem}, y::Ref{RealPolyRingElem}, precision(Balls)::Int)::Nothing
   return z
 end
 
@@ -665,16 +617,12 @@ sub!(z::RealPolyRingElem, x::Union{RealFieldElem,IntegerUnion}, y::RealPolyRingE
 #
 
 function mul!(z::RealPolyRingElem, x::RealPolyRingElem, y::RealPolyRingElem)
-  ccall((:arb_poly_mul, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Int),
-        z, x, y, precision(Balls))
+  @ccall libflint.arb_poly_mul(z::Ref{RealPolyRingElem}, x::Ref{RealPolyRingElem}, y::Ref{RealPolyRingElem}, precision(Balls)::Int)::Nothing
   return z
 end
 
 function mul!(z::RealPolyRingElem, x::RealPolyRingElem, y::RealFieldElem)
-  ccall((:arb_poly_scalar_mul, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Ref{RealPolyRingElem}, Ref{RealFieldElem}, Int),
-        z, x, y, precision(Balls))
+  @ccall libflint.arb_poly_scalar_mul(z::Ref{RealPolyRingElem}, x::Ref{RealPolyRingElem}, y::Ref{RealFieldElem}, precision(Balls)::Int)::Nothing
   return z
 end
 

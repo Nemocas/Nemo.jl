@@ -20,13 +20,12 @@ symbols(a::ZZMPolyRing) = a.S
 
 parent(a::ZZMPolyRingElem) = a.parent
 
-number_of_variables(a::ZZMPolyRing) = ccall((:fmpz_mpoly_ctx_nvars, libflint), Int,
-                                            (Ref{ZZMPolyRing}, ), a)
+number_of_variables(a::ZZMPolyRing) = @ccall libflint.fmpz_mpoly_ctx_nvars(a::Ref{ZZMPolyRing})::Int
 
 base_ring(a::ZZMPolyRing) = ZZ
 
 function internal_ordering(a::ZZMPolyRing)
-  b = ccall((:fmpz_mpoly_ctx_ord, libflint), Cint, (Ref{ZZMPolyRing}, ), a)
+  b = @ccall libflint.fmpz_mpoly_ctx_ord(a::Ref{ZZMPolyRing})::Cint
   return flint_orderings[b + 1]
 end
 
@@ -34,8 +33,7 @@ function gens(R::ZZMPolyRing)
   A = Vector{ZZMPolyRingElem}(undef, R.nvars)
   for i = 1:R.nvars
     z = R()
-    ccall((:fmpz_mpoly_gen, libflint), Nothing,
-          (Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}), z, i - 1, R)
+    @ccall libflint.fmpz_mpoly_gen(z::Ref{ZZMPolyRingElem}, (i - 1)::Int, R::Ref{ZZMPolyRing})::Nothing
     A[i] = z
   end
   return A
@@ -45,8 +43,7 @@ function gen(R::ZZMPolyRing, i::Int)
   n = nvars(R)
   (i <= 0 || i > n) && error("Index must be between 1 and $n")
   z = R()
-  ccall((:fmpz_mpoly_gen, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}), z, i - 1, R)
+  @ccall libflint.fmpz_mpoly_gen(z::Ref{ZZMPolyRingElem}, (i - 1)::Int, R::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
@@ -54,9 +51,7 @@ function is_gen(a::ZZMPolyRingElem, i::Int)
   n = nvars(parent(a))
   (i <= 0 || i > n) && error("Index must be between 1 and $n")
   R = parent(a)
-  return Bool(ccall((:fmpz_mpoly_is_gen, libflint), Cint,
-                    (Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}),
-                    a, i - 1, a.parent))
+  return Bool(@ccall libflint.fmpz_mpoly_is_gen(a::Ref{ZZMPolyRingElem}, (i - 1)::Int, a.parent::Ref{ZZMPolyRing})::Cint)
 end
 
 function is_gen(a::ZZMPolyRingElem)
@@ -69,14 +64,12 @@ end
 
 function deepcopy_internal(a::ZZMPolyRingElem, dict::IdDict)
   z = parent(a)()
-  ccall((:fmpz_mpoly_set, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
-        z, a, a.parent)
+  @ccall libflint.fmpz_mpoly_set(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
 function length(a::ZZMPolyRingElem)
-  n = ccall((:fmpz_mpoly_length, libflint), Int, (Ref{ZZMPolyRingElem}, ), a)
+  n = @ccall libflint.fmpz_mpoly_length(a::Ref{ZZMPolyRingElem})::Int
   return n
 end
 
@@ -85,14 +78,12 @@ one(R::ZZMPolyRing) = one!(R())
 zero(R::ZZMPolyRing) = zero!(R())
 
 function isone(a::ZZMPolyRingElem)
-  b = ccall((:fmpz_mpoly_is_one, libflint), Cint,
-            (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), a, a.parent)
+  b = @ccall libflint.fmpz_mpoly_is_one(a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Cint
   return Bool(b)
 end
 
 function iszero(a::ZZMPolyRingElem)
-  b = ccall((:fmpz_mpoly_is_zero, libflint), Cint,
-            (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), a, a.parent)
+  b = @ccall libflint.fmpz_mpoly_is_zero(a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Cint
   return Bool(b)
 end
 
@@ -109,8 +100,7 @@ function is_unit(a::ZZMPolyRingElem)
 end
 
 function is_constant(a::ZZMPolyRingElem)
-  b = ccall((:fmpz_mpoly_is_fmpz, libflint), Cint,
-            (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), a, parent(a))
+  b = @ccall libflint.fmpz_mpoly_is_fmpz(a::Ref{ZZMPolyRingElem}, parent(a)::Ref{ZZMPolyRing})::Cint
   return Bool(b)
 end
 
@@ -130,9 +120,7 @@ function coeff(a::ZZMPolyRingElem, i::Int)
   n = length(a)
   # this check is not needed as fmpz_mpoly_get_term_coeff_fmpz throws
   (i < 1 || i > n) && error("Index must be between 1 and $(length(a))")
-  ccall((:fmpz_mpoly_get_term_coeff_fmpz, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}),
-        z, a, i - 1, a.parent)
+  @ccall libflint.fmpz_mpoly_get_term_coeff_fmpz(z::Ref{ZZRingElem}, a::Ref{ZZMPolyRingElem}, (i - 1)::Int, a.parent::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
@@ -140,9 +128,7 @@ function coeff(a::ZZMPolyRingElem, b::ZZMPolyRingElem)
   check_parent(a, b)
   !isone(length(b)) && error("Second argument must be a monomial")
   z = ZZRingElem()
-  ccall((:fmpz_mpoly_get_coeff_fmpz_monomial, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
-        z, a, b, parent(a))
+  @ccall libflint.fmpz_mpoly_get_coeff_fmpz_monomial(z::Ref{ZZRingElem}, a::Ref{ZZMPolyRingElem}, b::Ref{ZZMPolyRingElem}, parent(a)::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
@@ -165,8 +151,7 @@ function degree(a::ZZMPolyRingElem, i::Int)
   n = nvars(parent(a))
   (i <= 0 || i > n) && error("Index must be between 1 and $n")
   if degrees_fit_int(a)
-    d = ccall((:fmpz_mpoly_degree_si, libflint), Int,
-              (Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}), a, i - 1, a.parent)
+    d = @ccall libflint.fmpz_mpoly_degree_si(a::Ref{ZZMPolyRingElem}, (i - 1)::Int, a.parent::Ref{ZZMPolyRing})::Int
     return d
   else
     return Int(degree_fmpz(a, i))
@@ -178,16 +163,13 @@ function degree_fmpz(a::ZZMPolyRingElem, i::Int)
   n = nvars(parent(a))
   (i <= 0 || i > n) && error("Index must be between 1 and $n")
   d = ZZRingElem()
-  ccall((:fmpz_mpoly_degree_fmpz, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}),
-        d, a, i - 1, a.parent)
+  @ccall libflint.fmpz_mpoly_degree_fmpz(d::Ref{ZZRingElem}, a::Ref{ZZMPolyRingElem}, (i - 1)::Int, a.parent::Ref{ZZMPolyRing})::Nothing
   return d
 end
 
 # Return true if degrees fit into an Int
 function degrees_fit_int(a::ZZMPolyRingElem)
-  b = ccall((:fmpz_mpoly_degrees_fit_si, libflint), Cint,
-            (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), a, a.parent)
+  b = @ccall libflint.fmpz_mpoly_degrees_fit_si(a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Cint
   return Bool(b)
 end
 
@@ -197,9 +179,7 @@ function degrees(a::ZZMPolyRingElem)
     throw(OverflowError("degrees of polynomial do not fit into Int"))
   end
   degs = Vector{Int}(undef, nvars(parent(a)))
-  ccall((:fmpz_mpoly_degrees_si, libflint), Nothing,
-        (Ptr{Int}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
-        degs, a, a.parent)
+  @ccall libflint.fmpz_mpoly_degrees_si(degs::Ptr{Int}, a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Nothing
   return degs
 end
 
@@ -210,16 +190,13 @@ function degrees_fmpz(a::ZZMPolyRingElem)
   for i in 1:n
     degs[i] = ZZRingElem()
   end
-  ccall((:fmpz_mpoly_degrees_fmpz, libflint), Nothing,
-        (Ptr{Ref{ZZRingElem}}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
-        degs, a, a.parent)
+  @ccall libflint.fmpz_mpoly_degrees_fmpz(degs::Ptr{Ref{ZZRingElem}}, a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Nothing
   return degs
 end
 
 # Return true if degree fits into an Int
 function total_degree_fits_int(a::ZZMPolyRingElem)
-  b = ccall((:fmpz_mpoly_total_degree_fits_si, libflint), Cint,
-            (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), a, a.parent)
+  b = @ccall libflint.fmpz_mpoly_total_degree_fits_si(a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Cint
   return Bool(b)
 end
 
@@ -228,17 +205,14 @@ function total_degree(a::ZZMPolyRingElem)
   if !total_degree_fits_int(a)
     throw(OverflowError("Total degree of polynomial does not fit into Int"))
   end
-  d = ccall((:fmpz_mpoly_total_degree_si, libflint), Int,
-            (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), a, a.parent)
+  d = @ccall libflint.fmpz_mpoly_total_degree_si(a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Int
   return d
 end
 
 # Total degree as an ZZRingElem
 function total_degree_fmpz(a::ZZMPolyRingElem)
   d = ZZRingElem()
-  ccall((:fmpz_mpoly_total_degree_fmpz, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
-        d, a, a.parent)
+  @ccall libflint.fmpz_mpoly_total_degree_fmpz(d::Ref{ZZRingElem}, a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Nothing
   return d
 end
 
@@ -262,10 +236,7 @@ function coeff(a::ZZMPolyRingElem, vars::Vector{Int}, exps::Vector{Int})
       error("Exponent cannot be negative")
     end
   end
-  ccall((:fmpz_mpoly_get_coeff_vars_ui, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ptr{Int},
-         Ptr{Int}, Int, Ref{ZZMPolyRing}),
-        z, a, vars, exps, length(vars), a.parent)
+  @ccall libflint.fmpz_mpoly_get_coeff_vars_ui(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, vars::Ptr{Int}, exps::Ptr{Int}, length(vars)::Int, a.parent::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
@@ -277,9 +248,7 @@ end
 
 function -(a::ZZMPolyRingElem)
   z = parent(a)()
-  ccall((:fmpz_mpoly_neg, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
-        z, a, a.parent)
+  @ccall libflint.fmpz_mpoly_neg(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
@@ -340,18 +309,14 @@ end
 function ^(a::ZZMPolyRingElem, b::Int)
   b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
   z = parent(a)()
-  ccall((:fmpz_mpoly_pow_ui, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}),
-        z, a, b, parent(a))
+  @ccall libflint.fmpz_mpoly_pow_ui(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, b::Int, parent(a)::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
 function ^(a::ZZMPolyRingElem, b::ZZRingElem)
   b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
   z = parent(a)()
-  ccall((:fmpz_mpoly_pow_fmpz, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZRingElem}, Ref{ZZMPolyRing}),
-        z, a, b, parent(a))
+  @ccall libflint.fmpz_mpoly_pow_fmpz(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, b::Ref{ZZRingElem}, parent(a)::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
@@ -364,9 +329,7 @@ end
 function gcd(a::ZZMPolyRingElem, b::ZZMPolyRingElem)
   check_parent(a, b)
   z = parent(a)()
-  r = ccall((:fmpz_mpoly_gcd, libflint), Cint,
-            (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
-            z, a, b, a.parent)
+  r = @ccall libflint.fmpz_mpoly_gcd(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, b::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Cint
   r == 0 && error("Unable to compute gcd")
   return z
 end
@@ -375,10 +338,7 @@ function gcd_with_cofactors(a::ZZMPolyRingElem, b::ZZMPolyRingElem)
   z = parent(a)()
   abar = parent(a)()
   bbar = parent(a)()
-  r = ccall((:fmpz_mpoly_gcd_cofactors, libflint), Cint,
-            (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem},
-             Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
-            z, abar, bbar, a, b, a.parent)
+  r = @ccall libflint.fmpz_mpoly_gcd_cofactors(z::Ref{ZZMPolyRingElem}, abar::Ref{ZZMPolyRingElem}, bbar::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, b::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Cint
   r == 0 && error("Unable to compute gcd")
   return z, abar, bbar
 end
@@ -396,29 +356,20 @@ function (::Type{Fac{ZZMPolyRingElem}})(fac::fmpz_mpoly_factor, preserve_input::
   for i in 0:fac.num-1
     f = R()
     if preserve_input
-      ccall((:fmpz_mpoly_factor_get_base, libflint), Nothing,
-            (Ref{ZZMPolyRingElem}, Ref{fmpz_mpoly_factor}, Int, Ref{ZZMPolyRing}),
-            f, fac, i, R)
+      @ccall libflint.fmpz_mpoly_factor_get_base(f::Ref{ZZMPolyRingElem}, fac::Ref{fmpz_mpoly_factor}, i::Int, R::Ref{ZZMPolyRing})::Nothing
     else
-      ccall((:fmpz_mpoly_factor_swap_base, libflint), Nothing,
-            (Ref{ZZMPolyRingElem}, Ref{fmpz_mpoly_factor}, Int, Ref{ZZMPolyRing}),
-            f, fac, i, R)
+      @ccall libflint.fmpz_mpoly_factor_swap_base(f::Ref{ZZMPolyRingElem}, fac::Ref{fmpz_mpoly_factor}, i::Int, R::Ref{ZZMPolyRing})::Nothing
     end
-    F.fac[f] = ccall((:fmpz_mpoly_factor_get_exp_si, libflint), Int,
-                     (Ref{fmpz_mpoly_factor}, Int, Ref{ZZMPolyRing}),
-                     fac, i, R)
+    F.fac[f] = @ccall libflint.fmpz_mpoly_factor_get_exp_si(fac::Ref{fmpz_mpoly_factor}, i::Int, R::Ref{ZZMPolyRing})::Int
   end
   c = ZZRingElem()
-  ccall((:fmpz_mpoly_factor_get_constant_fmpz, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{fmpz_mpoly_factor}),
-        c, fac)
+  @ccall libflint.fmpz_mpoly_factor_get_constant_fmpz(c::Ref{ZZRingElem}, fac::Ref{fmpz_mpoly_factor})::Nothing
   sgnc = sign(Int, c)
   if sgnc != 0
     G = fmpz_factor()
-    ccall((:fmpz_factor, libflint), Nothing, (Ref{fmpz_factor}, Ref{ZZRingElem}), G, c)
+    @ccall libflint.fmpz_factor(G::Ref{fmpz_factor}, c::Ref{ZZRingElem})::Nothing
     for i in 1:G.num
-      ccall((:fmpz_factor_get_fmpz, libflint), Nothing,
-            (Ref{ZZRingElem}, Ref{fmpz_factor}, Int), c, G, i - 1)
+      @ccall libflint.fmpz_factor_get_fmpz(c::Ref{ZZRingElem}, G::Ref{fmpz_factor}, (i - 1)::Int)::Nothing
       F.fac[R(c)] = unsafe_load(G.exp, i)
     end
   end
@@ -430,9 +381,7 @@ function factor(a::ZZMPolyRingElem)
   iszero(a) && throw(ArgumentError("Argument must be non-zero"))
   R = parent(a)
   fac = fmpz_mpoly_factor(R)
-  ok = ccall((:fmpz_mpoly_factor, libflint), Cint,
-             (Ref{fmpz_mpoly_factor}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
-             fac, a, R)
+  ok = @ccall libflint.fmpz_mpoly_factor(fac::Ref{fmpz_mpoly_factor}, a::Ref{ZZMPolyRingElem}, R::Ref{ZZMPolyRing})::Cint
   ok == 0 && error("unable to compute factorization")
   return Fac{ZZMPolyRingElem}(fac, false)
 end
@@ -441,9 +390,7 @@ function factor_squarefree(a::ZZMPolyRingElem)
   iszero(a) && throw(ArgumentError("Argument must be non-zero"))
   R = parent(a)
   fac = fmpz_mpoly_factor(R)
-  ok = ccall((:fmpz_mpoly_factor_squarefree, libflint), Cint,
-             (Ref{fmpz_mpoly_factor}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
-             fac, a, R)
+  ok = @ccall libflint.fmpz_mpoly_factor_squarefree(fac::Ref{fmpz_mpoly_factor}, a::Ref{ZZMPolyRingElem}, R::Ref{ZZMPolyRing})::Cint
   ok == 0 && error("unable to compute factorization")
   return Fac{ZZMPolyRingElem}(fac, false)
 end
@@ -451,24 +398,18 @@ end
 
 function sqrt(a::ZZMPolyRingElem; check::Bool=true)
   q = parent(a)()
-  flag = Bool(ccall((:fmpz_mpoly_sqrt_heap, libflint), Cint,
-                    (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}, Cint),
-                    q, a, a.parent, Cint(check)))
+  flag = Bool(@ccall libflint.fmpz_mpoly_sqrt_heap(q::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing}, Cint(check)::Cint)::Cint)
   check && !flag && error("Not a square")
   return q
 end
 
 function is_square(a::ZZMPolyRingElem)
-  return Bool(ccall((:fmpz_mpoly_is_square, libflint), Cint,
-                    (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
-                    a, a.parent))
+  return Bool(@ccall libflint.fmpz_mpoly_is_square(a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Cint)
 end
 
 function is_square_with_sqrt(a::ZZMPolyRingElem)
   q = parent(a)()
-  flag = ccall((:fmpz_mpoly_sqrt, libflint), Cint,
-               (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
-               q, a, a.parent)
+  flag = @ccall libflint.fmpz_mpoly_sqrt(q::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Cint
   return (Bool(flag), q)
 end
 
@@ -480,16 +421,12 @@ end
 
 function ==(a::ZZMPolyRingElem, b::ZZMPolyRingElem)
   check_parent(a, b)
-  return Bool(ccall((:fmpz_mpoly_equal, libflint), Cint,
-                    (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
-                    a, b, a.parent))
+  return Bool(@ccall libflint.fmpz_mpoly_equal(a::Ref{ZZMPolyRingElem}, b::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Cint)
 end
 
 function Base.isless(a::ZZMPolyRingElem, b::ZZMPolyRingElem)
   (!is_monomial(a) || !is_monomial(b)) && error("Not monomials in comparison")
-  return ccall((:fmpz_mpoly_cmp, libflint), Cint,
-               (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
-               a, b, a.parent) < 0
+  return @ccall libflint.fmpz_mpoly_cmp(a::Ref{ZZMPolyRingElem}, b::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Cint < 0
 end
 
 ###############################################################################
@@ -499,17 +436,13 @@ end
 ###############################################################################
 
 function ==(a::ZZMPolyRingElem, b::ZZRingElem)
-  return Bool(ccall((:fmpz_mpoly_equal_fmpz, libflint), Cint,
-                    (Ref{ZZMPolyRingElem}, Ref{ZZRingElem}, Ref{ZZMPolyRing}),
-                    a, b, a.parent))
+  return Bool(@ccall libflint.fmpz_mpoly_equal_fmpz(a::Ref{ZZMPolyRingElem}, b::Ref{ZZRingElem}, a.parent::Ref{ZZMPolyRing})::Cint)
 end
 
 ==(a::ZZRingElem, b::ZZMPolyRingElem) = b == a
 
 function ==(a::ZZMPolyRingElem, b::Int)
-  return Bool(ccall((:fmpz_mpoly_equal_si, libflint), Cint,
-                    (Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}),
-                    a, b, a.parent))
+  return Bool(@ccall libflint.fmpz_mpoly_equal_si(a::Ref{ZZMPolyRingElem}, b::Int, a.parent::Ref{ZZMPolyRing})::Cint)
 end
 
 ==(a::Int, b::ZZMPolyRingElem) = b == a
@@ -541,10 +474,7 @@ end
 function Base.div(a::ZZMPolyRingElem, b::ZZMPolyRingElem)
   check_parent(a, b)
   q = parent(a)()
-  ccall((:fmpz_mpoly_div, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem},
-         Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
-        q, a, b, a.parent)
+  @ccall libflint.fmpz_mpoly_div(q::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, b::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Nothing
   return q
 end
 
@@ -552,10 +482,7 @@ function Base.divrem(a::ZZMPolyRingElem, b::ZZMPolyRingElem)
   check_parent(a, b)
   q = parent(a)()
   r = parent(a)()
-  ccall((:fmpz_mpoly_divrem, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem},
-         Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
-        q, r, a, b, a.parent)
+  @ccall libflint.fmpz_mpoly_divrem(q::Ref{ZZMPolyRingElem}, r::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, b::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Nothing
   return q, r
 end
 
@@ -563,10 +490,7 @@ function Base.divrem(a::ZZMPolyRingElem, b::Vector{ZZMPolyRingElem})
   len = length(b)
   q = [parent(a)() for i in 1:len]
   r = parent(a)()
-  ccall((:fmpz_mpoly_divrem_ideal, libflint), Nothing,
-        (Ptr{Ref{ZZMPolyRingElem}}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem},
-         Ptr{Ref{ZZMPolyRingElem}}, Int, Ref{ZZMPolyRing}),
-        q, r, a, b, len, a.parent)
+  @ccall libflint.fmpz_mpoly_divrem_ideal(q::Ptr{Ref{ZZMPolyRingElem}}, r::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, b::Ptr{Ref{ZZMPolyRingElem}}, len::Int, a.parent::Ref{ZZMPolyRing})::Nothing
   return q, r
 end
 
@@ -593,9 +517,7 @@ function derivative(a::ZZMPolyRingElem, i::Int)
   n = nvars(parent(a))
   (i <= 0 || i > n) && error("Index must be between 1 and $n")
   z = parent(a)()
-  ccall((:fmpz_mpoly_derivative, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}),
-        z, a, i - 1, parent(a))
+  @ccall libflint.fmpz_mpoly_derivative(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, (i - 1)::Int, parent(a)::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
@@ -608,9 +530,7 @@ end
 function evaluate(a::ZZMPolyRingElem, b::Vector{ZZRingElem})
   length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
   z = ZZRingElem()
-  GC.@preserve b ccall((:fmpz_mpoly_evaluate_all_fmpz, libflint), Nothing,
-                       (Ref{ZZRingElem}, Ref{ZZMPolyRingElem}, Ptr{ZZRingElem}, Ref{ZZMPolyRing}),
-                       z, a, b, parent(a))
+  GC.@preserve b @ccall libflint.fmpz_mpoly_evaluate_all_fmpz(z::Ref{ZZRingElem}, a::Ref{ZZMPolyRingElem}, b::Ptr{ZZRingElem}, parent(a)::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
@@ -681,10 +601,7 @@ function evaluate(a::ZZMPolyRingElem, bs::Vector{ZZMPolyRingElem})
   error("Number of variables does not match number of values")
 
   c = S()
-  fl = ccall((:fmpz_mpoly_compose_fmpz_mpoly, libflint), Cint,
-             (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ptr{Ref{ZZMPolyRingElem}},
-              Ref{ZZMPolyRing}, Ref{ZZMPolyRing}),
-             c, a, bs, R, S)
+  fl = @ccall libflint.fmpz_mpoly_compose_fmpz_mpoly(c::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, bs::Ptr{Ref{ZZMPolyRingElem}}, R::Ref{ZZMPolyRing}, S::Ref{ZZMPolyRing})::Cint
   fl == 0 && error("Something wrong in evaluation.")
   return c
 end
@@ -697,9 +614,7 @@ function evaluate(a::ZZMPolyRingElem, bs::Vector{ZZPolyRingElem})
   error("Number of variables does not match number of values")
 
   c = S()
-  fl = ccall((:fmpz_mpoly_compose_fmpz_poly, libflint), Cint,
-             (Ref{ZZPolyRingElem}, Ref{ZZMPolyRingElem}, Ptr{Ref{ZZPolyRingElem}},
-              Ref{ZZMPolyRing}), c, a, bs, R)
+  fl = @ccall libflint.fmpz_mpoly_compose_fmpz_poly(c::Ref{ZZPolyRingElem}, a::Ref{ZZMPolyRingElem}, bs::Ptr{Ref{ZZPolyRingElem}}, R::Ref{ZZMPolyRing})::Cint
   fl == 0 && error("Something wrong in evaluation.")
   return c
 end
@@ -711,48 +626,37 @@ end
 ###############################################################################
 
 function zero!(a::ZZMPolyRingElem)
-  ccall((:fmpz_mpoly_zero, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), a, a.parent)
+  @ccall libflint.fmpz_mpoly_zero(a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Nothing
   return a
 end
 
 function one!(a::ZZMPolyRingElem)
-  ccall((:fmpz_mpoly_one, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), a, a.parent)
+  @ccall libflint.fmpz_mpoly_one(a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Nothing
   return a
 end
 
 function neg!(z::ZZMPolyRingElem, a::ZZMPolyRingElem)
-  ccall((:fmpz_mpoly_neg, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), z, a, a.parent)
+  @ccall libflint.fmpz_mpoly_neg(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
 function add!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, b::ZZMPolyRingElem)
-  ccall((:fmpz_mpoly_add, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem},
-         Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), z, a, b, a.parent)
+  @ccall libflint.fmpz_mpoly_add(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, b::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
 function sub!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, b::ZZMPolyRingElem)
-  ccall((:fmpz_mpoly_sub, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem},
-         Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), z, a, b, a.parent)
+  @ccall libflint.fmpz_mpoly_sub(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, b::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
 function mul!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, b::ZZMPolyRingElem)
-  ccall((:fmpz_mpoly_mul, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem},
-         Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), z, a, b, a.parent)
+  @ccall libflint.fmpz_mpoly_mul(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, b::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
 function divides!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, b::ZZMPolyRingElem)
-  d = ccall((:fmpz_mpoly_divides, libflint), Cint,
-            (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}),
-            z, a, b, parent(a))
+  d = @ccall libflint.fmpz_mpoly_divides(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, b::Ref{ZZMPolyRingElem}, parent(a)::Ref{ZZMPolyRing})::Cint
   return Bool(d), z
 end
 
@@ -807,12 +711,9 @@ divides!(a::ZZMPolyRingElem, b::ZZMPolyRingElem, c::RationalUnion) = divides!(a,
 # must be removed with combine_like_terms!
 function setcoeff!(a::ZZMPolyRingElem, n::Int, c::ZZRingElem)
   if n > length(a)
-    ccall((:fmpz_mpoly_resize, libflint), Nothing,
-          (Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}), a, n, a.parent)
+    @ccall libflint.fmpz_mpoly_resize(a::Ref{ZZMPolyRingElem}, n::Int, a.parent::Ref{ZZMPolyRing})::Nothing
   end
-  ccall((:fmpz_mpoly_set_term_coeff_fmpz, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Int, Ref{ZZRingElem}, Ref{ZZMPolyRing}),
-        a, n - 1, c, a.parent)
+  @ccall libflint.fmpz_mpoly_set_term_coeff_fmpz(a::Ref{ZZMPolyRingElem}, (n - 1)::Int, c::Ref{ZZRingElem}, a.parent::Ref{ZZMPolyRing})::Nothing
   return a
 end
 
@@ -823,8 +724,7 @@ setcoeff!(a::ZZMPolyRingElem, i::Int, c::Integer) = setcoeff!(a, i, ZZRingElem(c
 # Remove zero terms and combine adjacent terms if they have the same monomial
 # no sorting is performed
 function combine_like_terms!(a::ZZMPolyRingElem)
-  ccall((:fmpz_mpoly_combine_like_terms, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), a, a.parent)
+  @ccall libflint.fmpz_mpoly_combine_like_terms(a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Nothing
   return a
 end
 
@@ -835,37 +735,27 @@ end
 ###############################################################################
 
 function exponent_vector_fits(::Type{Int}, a::ZZMPolyRingElem, i::Int)
-  b = ccall((:fmpz_mpoly_term_exp_fits_ui, libflint), Cint,
-            (Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}),
-            a, i - 1, a.parent)
+  b = @ccall libflint.fmpz_mpoly_term_exp_fits_ui(a::Ref{ZZMPolyRingElem}, (i - 1)::Int, a.parent::Ref{ZZMPolyRing})::Cint
   return Bool(b)
 end
 
 function exponent_vector_fits(::Type{UInt}, a::ZZMPolyRingElem, i::Int)
-  b = ccall((:fmpz_mpoly_term_exp_fits_si, libflint), Cint,
-            (Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}),
-            a, i - 1, a.parent)
+  b = @ccall libflint.fmpz_mpoly_term_exp_fits_si(a::Ref{ZZMPolyRingElem}, (i - 1)::Int, a.parent::Ref{ZZMPolyRing})::Cint
   return Bool(b)
 end
 
 function exponent_vector!(z::Vector{Int}, a::ZZMPolyRingElem, i::Int)
-  ccall((:fmpz_mpoly_get_term_exp_si, libflint), Nothing,
-        (Ptr{Int}, Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}),
-        z, a, i - 1, parent(a))
+  @ccall libflint.fmpz_mpoly_get_term_exp_si(z::Ptr{Int}, a::Ref{ZZMPolyRingElem}, (i - 1)::Int, parent(a)::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
 function exponent_vector!(z::Vector{UInt}, a::ZZMPolyRingElem, i::Int)
-  ccall((:fmpz_mpoly_get_term_exp_ui, libflint), Nothing,
-        (Ptr{UInt}, Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}),
-        z, a, i - 1, parent(a))
+  @ccall libflint.fmpz_mpoly_get_term_exp_ui(z::Ptr{UInt}, a::Ref{ZZMPolyRingElem}, (i - 1)::Int, parent(a)::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
 function exponent_vector!(z::Vector{ZZRingElem}, a::ZZMPolyRingElem, i::Int)
-  ccall((:fmpz_mpoly_get_term_exp_fmpz, libflint), Nothing,
-        (Ptr{Ref{ZZRingElem}}, Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}),
-        z, a, i - 1, parent(a))
+  @ccall libflint.fmpz_mpoly_get_term_exp_fmpz(z::Ptr{Ref{ZZRingElem}}, a::Ref{ZZMPolyRingElem}, (i - 1)::Int, parent(a)::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
@@ -879,12 +769,9 @@ end
 # they don't fit into 31/63 bits
 function set_exponent_vector!(a::ZZMPolyRingElem, n::Int, exps::Vector{UInt})
   if n > length(a)
-    ccall((:fmpz_mpoly_resize, libflint), Nothing,
-          (Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}), a, n, a.parent)
+    @ccall libflint.fmpz_mpoly_resize(a::Ref{ZZMPolyRingElem}, n::Int, a.parent::Ref{ZZMPolyRing})::Nothing
   end
-  ccall((:fmpz_mpoly_set_term_exp_ui, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Int, Ptr{UInt}, Ref{ZZMPolyRing}),
-        a, n - 1, exps, parent(a))
+  @ccall libflint.fmpz_mpoly_set_term_exp_ui(a::Ref{ZZMPolyRingElem}, (n - 1)::Int, exps::Ptr{UInt}, parent(a)::Ref{ZZMPolyRing})::Nothing
   return a
 end
 
@@ -893,12 +780,9 @@ end
 # no check is performed
 function set_exponent_vector!(a::ZZMPolyRingElem, n::Int, exps::Vector{Int})
   if n > length(a)
-    ccall((:fmpz_mpoly_resize, libflint), Nothing,
-          (Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}), a, n, a.parent)
+    @ccall libflint.fmpz_mpoly_resize(a::Ref{ZZMPolyRingElem}, n::Int, a.parent::Ref{ZZMPolyRing})::Nothing
   end
-  ccall((:fmpz_mpoly_set_term_exp_ui, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Int, Ptr{Int}, Ref{ZZMPolyRing}),
-        a, n - 1, exps, parent(a))
+  @ccall libflint.fmpz_mpoly_set_term_exp_ui(a::Ref{ZZMPolyRingElem}, (n - 1)::Int, exps::Ptr{Int}, parent(a)::Ref{ZZMPolyRing})::Nothing
   return a
 end
 
@@ -906,31 +790,24 @@ end
 # No sort is performed, so this is unsafe
 function set_exponent_vector!(a::ZZMPolyRingElem, n::Int, exps::Vector{ZZRingElem})
   if n > length(a)
-    ccall((:fmpz_mpoly_resize, libflint), Nothing,
-          (Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}), a, n, a.parent)
+    @ccall libflint.fmpz_mpoly_resize(a::Ref{ZZMPolyRingElem}, n::Int, a.parent::Ref{ZZMPolyRing})::Nothing
     return a
   end
-  GC.@preserve exps ccall((:fmpz_mpoly_set_term_exp_fmpz, libflint), Nothing,
-                          (Ref{ZZMPolyRingElem}, Int, Ptr{ZZRingElem}, Ref{ZZMPolyRing}),
-                          a, n - 1, exps, parent(a))
+  GC.@preserve exps @ccall libflint.fmpz_mpoly_set_term_exp_fmpz(a::Ref{ZZMPolyRingElem}, (n - 1)::Int, exps::Ptr{ZZRingElem}, parent(a)::Ref{ZZMPolyRing})::Nothing
   return a
 end
 
 # Return j-th coordinate of i-th exponent vector
 function exponent(a::ZZMPolyRingElem, i::Int, j::Int)
   (j < 1 || j > nvars(parent(a))) && error("Invalid variable index")
-  return ccall((:fmpz_mpoly_get_term_var_exp_ui, libflint), Int,
-               (Ref{ZZMPolyRingElem}, Int, Int, Ref{ZZMPolyRing}),
-               a, i - 1, j - 1, a.parent)
+  return @ccall libflint.fmpz_mpoly_get_term_var_exp_ui(a::Ref{ZZMPolyRingElem}, (i - 1)::Int, (j - 1)::Int, a.parent::Ref{ZZMPolyRing})::Int
 end
 
 # Return the coefficient of the term with the given exponent vector
 # Return zero if there is no such term
 function coeff(a::ZZMPolyRingElem, exps::Vector{UInt})
   z = ZZRingElem()
-  ccall((:fmpz_mpoly_get_coeff_fmpz_ui, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZMPolyRingElem}, Ptr{UInt}, Ref{ZZMPolyRing}),
-        z, a, exps, parent(a))
+  @ccall libflint.fmpz_mpoly_get_coeff_fmpz_ui(z::Ref{ZZRingElem}, a::Ref{ZZMPolyRingElem}, exps::Ptr{UInt}, parent(a)::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
@@ -938,27 +815,21 @@ end
 # Return zero if there is no such term
 function coeff(a::ZZMPolyRingElem, exps::Vector{Int})
   z = ZZRingElem()
-  ccall((:fmpz_mpoly_get_coeff_fmpz_ui, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZMPolyRingElem}, Ptr{Int}, Ref{ZZMPolyRing}),
-        z, a, exps, parent(a))
+  @ccall libflint.fmpz_mpoly_get_coeff_fmpz_ui(z::Ref{ZZRingElem}, a::Ref{ZZMPolyRingElem}, exps::Ptr{Int}, parent(a)::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
 # Set the coefficient of the term with the given exponent vector to the
 # given ZZRingElem. Removal of a zero term is performed.
 function setcoeff!(a::ZZMPolyRingElem, exps::Vector{UInt}, b::ZZRingElem)
-  ccall((:fmpz_mpoly_set_coeff_fmpz_ui, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZRingElem}, Ptr{UInt}, Ref{ZZMPolyRing}),
-        a, b, exps, parent(a))
+  @ccall libflint.fmpz_mpoly_set_coeff_fmpz_ui(a::Ref{ZZMPolyRingElem}, b::Ref{ZZRingElem}, exps::Ptr{UInt}, parent(a)::Ref{ZZMPolyRing})::Nothing
   return a
 end
 
 # Set the coefficient of the term with the given exponent vector to the
 # given ZZRingElem. Removal of a zero term is performed.
 function setcoeff!(a::ZZMPolyRingElem, exps::Vector{Int}, b::ZZRingElem)
-  ccall((:fmpz_mpoly_set_coeff_fmpz_ui, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZRingElem}, Ptr{Int}, Ref{ZZMPolyRing}),
-        a, b, exps, parent(a))
+  @ccall libflint.fmpz_mpoly_set_coeff_fmpz_ui(a::Ref{ZZMPolyRingElem}, b::Ref{ZZRingElem}, exps::Ptr{Int}, parent(a)::Ref{ZZMPolyRing})::Nothing
   return a
 end
 
@@ -971,34 +842,27 @@ setcoeff!(a, exps, ZZRingElem(b))
 # out of order. Note that like terms are not combined and zeros are not
 # removed. For that, call combine_like_terms!
 function sort_terms!(a::ZZMPolyRingElem)
-  ccall((:fmpz_mpoly_sort_terms, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRing}), a, a.parent)
+  @ccall libflint.fmpz_mpoly_sort_terms(a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Nothing
   return a
 end
 
 # Return the i-th term of the polynomial, as a polynomial
 function term(a::ZZMPolyRingElem, i::Int)
   z = parent(a)()
-  ccall((:fmpz_mpoly_get_term, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}),
-        z, a, i - 1, a.parent)
+  @ccall libflint.fmpz_mpoly_get_term(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, (i - 1)::Int, a.parent::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
 # Return the i-th monomial of the polynomial, as a polynomial
 function monomial(a::ZZMPolyRingElem, i::Int)
   z = parent(a)()
-  ccall((:fmpz_mpoly_get_term_monomial, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}),
-        z, a, i - 1, a.parent)
+  @ccall libflint.fmpz_mpoly_get_term_monomial(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, (i - 1)::Int, a.parent::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
 # Sets the given polynomial m to the i-th monomial of the polynomial
 function monomial!(m::ZZMPolyRingElem, a::ZZMPolyRingElem, i::Int)
-  ccall((:fmpz_mpoly_get_term_monomial, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZMPolyRingElem}, Int, Ref{ZZMPolyRing}),
-        m, a, i - 1, a.parent)
+  @ccall libflint.fmpz_mpoly_get_term_monomial(m::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, (i - 1)::Int, a.parent::Ref{ZZMPolyRing})::Nothing
   return m
 end
 
@@ -1019,23 +883,17 @@ promote_rule(::Type{ZZMPolyRingElem}, ::Type{ZZRingElem}) = ZZMPolyRingElem
 ###############################################################################
 
 function _push_term!(z::ZZMPolyRingElem, c::ZZRingElem, exp::Vector{Int})
-  ccall((:fmpz_mpoly_push_term_fmpz_ui, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Ref{ZZRingElem}, Ptr{UInt}, Ref{ZZMPolyRing}),
-        z, c, exp, parent(z))
+  @ccall libflint.fmpz_mpoly_push_term_fmpz_ui(z::Ref{ZZMPolyRingElem}, c::Ref{ZZRingElem}, exp::Ptr{UInt}, parent(z)::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
 function _push_term!(z::ZZMPolyRingElem, c::Int, exp::Vector{Int})
-  ccall((:fmpz_mpoly_push_term_si_ui, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, Int, Ptr{UInt}, Ref{ZZMPolyRing}),
-        z, c, exp, parent(z))
+  @ccall libflint.fmpz_mpoly_push_term_si_ui(z::Ref{ZZMPolyRingElem}, c::Int, exp::Ptr{UInt}, parent(z)::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
 function _push_term!(z::ZZMPolyRingElem, c::UInt, exp::Vector{Int})
-  ccall((:fmpz_mpoly_push_term_ui_ui, libflint), Nothing,
-        (Ref{ZZMPolyRingElem}, UInt, Ptr{UInt}, Ref{ZZMPolyRing}),
-        z, c, exp, parent(z))
+  @ccall libflint.fmpz_mpoly_push_term_ui_ui(z::Ref{ZZMPolyRingElem}, c::UInt, exp::Ptr{UInt}, parent(z)::Ref{ZZMPolyRing})::Nothing
   return z
 end
 

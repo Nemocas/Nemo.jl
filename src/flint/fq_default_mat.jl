@@ -29,19 +29,14 @@ zero(m::FqMatrix, R::FqField, r::Int, c::Int) = FqMatrix(r, c, R)
 
 function getindex!(v::FqFieldElem, a::FqMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
-  ccall((:fq_default_mat_entry, libflint), Ptr{FqFieldElem},
-        (Ref{FqFieldElem}, Ref{FqMatrix}, Int, Int, Ref{FqField}),
-        v, a, i - 1 , j - 1, base_ring(a))
+  @ccall libflint.fq_default_mat_entry(v::Ref{FqFieldElem}, a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int, base_ring(a)::Ref{FqField})::Ptr{FqFieldElem}
   return v
 end
 
 @inline function getindex(a::FqMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
   z = base_ring(a)()
-  ccall((:fq_default_mat_entry, libflint), Ptr{FqFieldElem},
-        (Ref{FqFieldElem}, Ref{FqMatrix}, Int, Int,
-         Ref{FqField}),
-        z, a, i - 1 , j - 1, base_ring(a))
+  @ccall libflint.fq_default_mat_entry(z::Ref{FqFieldElem}, a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int, base_ring(a)::Ref{FqField})::Ptr{FqFieldElem}
   return z
 end
 
@@ -55,10 +50,7 @@ end
 
 @inline function setindex!(a::FqMatrix, u::ZZRingElem, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
-  ccall((:fq_default_mat_entry_set_fmpz, libflint), Nothing,
-        (Ref{FqMatrix}, Int, Int, Ref{ZZRingElem},
-         Ref{FqField}),
-        a, i - 1, j - 1, u, base_ring(a))
+  @ccall libflint.fq_default_mat_entry_set_fmpz(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int, u::Ref{ZZRingElem}, base_ring(a)::Ref{FqField})::Nothing
   nothing
 end
 
@@ -68,27 +60,21 @@ function setindex!(a::FqMatrix, b::FqMatrix, r::UnitRange{Int64}, c::UnitRange{I
   _checkbounds(a, r, c)
   size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
   A = view(a, r, c)
-  ccall((:fq_default_mat_set, libflint), Nothing,
-        (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), A, b, base_ring(a))
+  @ccall libflint.fq_default_mat_set(A::Ref{FqMatrix}, b::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
 end
 
 function deepcopy_internal(a::FqMatrix, dict::IdDict)
   z = FqMatrix(nrows(a), ncols(a), base_ring(a))
-  ccall((:fq_default_mat_set, libflint), Nothing,
-        (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), z, a, base_ring(a))
+  @ccall libflint.fq_default_mat_set(z::Ref{FqMatrix}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
   return z
 end
 
 function number_of_rows(a::FqMatrix)
-  return ccall((:fq_default_mat_nrows, libflint), Int,
-               (Ref{FqMatrix}, Ref{FqField}),
-               a, base_ring(a))
+  return @ccall libflint.fq_default_mat_nrows(a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Int
 end
 
 function number_of_columns(a::FqMatrix)
-  return ccall((:fq_default_mat_ncols, libflint), Int,
-               (Ref{FqMatrix}, Ref{FqField}),
-               a, base_ring(a))
+  return @ccall libflint.fq_default_mat_ncols(a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Int
 end
 
 base_ring(a::FqMatrix) = a.base_ring
@@ -99,8 +85,7 @@ function one(a::FqMatrixSpace)
 end
 
 function iszero(a::FqMatrix)
-  r = ccall((:fq_default_mat_is_zero, libflint), Cint,
-            (Ref{FqMatrix}, Ref{FqField}), a, base_ring(a))
+  r = @ccall libflint.fq_default_mat_is_zero(a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Cint
   return Bool(r)
 end
 
@@ -108,8 +93,7 @@ end
   @boundscheck _checkbounds(A, i, j)
   GC.@preserve A begin
     x = fq_default_mat_entry_ptr(A, i, j)
-    return ccall((:fq_default_is_zero, libflint), Bool,
-                 (Ptr{FqFieldElem}, Ref{FqField}), x, base_ring(A))
+    return @ccall libflint.fq_default_is_zero(x::Ptr{FqFieldElem}, base_ring(A)::Ref{FqField})::Bool
   end
 end
 
@@ -123,8 +107,7 @@ function ==(a::FqMatrix, b::FqMatrix)
   if !(a.base_ring == b.base_ring)
     return false
   end
-  r = ccall((:fq_default_mat_equal, libflint), Cint,
-            (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), a, b, base_ring(a))
+  r = @ccall libflint.fq_default_mat_equal(a::Ref{FqMatrix}, b::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Cint
   return Bool(r)
 end
 
@@ -139,10 +122,10 @@ isequal(a::FqMatrix, b::FqMatrix) = ==(a, b)
 function transpose(a::FqMatrix)
   z = similar(a, ncols(a), nrows(a))
   if _fq_default_ctx_type(base_ring(a)) == _FQ_DEFAULT_NMOD
-    ccall((:nmod_mat_transpose, libflint), Nothing, (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), z, a, base_ring(a))
+    @ccall libflint.nmod_mat_transpose(z::Ref{FqMatrix}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
     return z
   elseif _fq_default_ctx_type(base_ring(a)) == _FQ_DEFAULT_FMPZ_NMOD
-    ccall((:fmpz_mod_mat_transpose, libflint), Nothing, (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), z, a, base_ring(a))
+    @ccall libflint.fmpz_mod_mat_transpose(z::Ref{FqMatrix}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
     return z
   end
   # There is no flint functionality for the other cases
@@ -163,9 +146,7 @@ end
 ###############################################################################
 
 function swap_rows!(x::FqMatrix, i::Int, j::Int)
-  ccall((:fq_default_mat_swap_rows, libflint), Nothing,
-        (Ref{FqMatrix}, Ptr{Nothing}, Int, Int, Ref{FqField}),
-        x, C_NULL, i - 1, j - 1, base_ring(x))
+  @ccall libflint.fq_default_mat_swap_rows(x::Ref{FqMatrix}, C_NULL::Ptr{Nothing}, (i - 1)::Int, (j - 1)::Int, base_ring(x)::Ref{FqField})::Nothing
   return x
 end
 
@@ -176,9 +157,7 @@ function swap_rows(x::FqMatrix, i::Int, j::Int)
 end
 
 function swap_cols!(x::FqMatrix, i::Int, j::Int)
-  ccall((:fq_default_mat_swap_cols, libflint), Nothing,
-        (Ref{FqMatrix}, Ptr{Nothing}, Int, Int, Ref{FqField}),
-        x, C_NULL, i - 1, j - 1, base_ring(x))
+  @ccall libflint.fq_default_mat_swap_cols(x::Ref{FqMatrix}, C_NULL::Ptr{Nothing}, (i - 1)::Int, (j - 1)::Int, base_ring(x)::Ref{FqField})::Nothing
   return x
 end
 
@@ -189,16 +168,14 @@ function swap_cols(x::FqMatrix, i::Int, j::Int)
 end
 
 function reverse_rows!(x::FqMatrix)
-  ccall((:fq_default_mat_invert_rows, libflint), Nothing,
-        (Ref{FqMatrix}, Ptr{Nothing}, Ref{FqField}), x, C_NULL, base_ring(x))
+  @ccall libflint.fq_default_mat_invert_rows(x::Ref{FqMatrix}, C_NULL::Ptr{Nothing}, base_ring(x)::Ref{FqField})::Nothing
   return x
 end
 
 reverse_rows(x::FqMatrix) = reverse_rows!(deepcopy(x))
 
 function reverse_cols!(x::FqMatrix)
-  ccall((:fq_default_mat_invert_cols, libflint), Nothing,
-        (Ref{FqMatrix}, Ptr{Nothing}, Ref{FqField}), x, C_NULL, base_ring(x))
+  @ccall libflint.fq_default_mat_invert_cols(x::Ref{FqMatrix}, C_NULL::Ptr{Nothing}, base_ring(x)::Ref{FqField})::Nothing
   return x
 end
 
@@ -221,18 +198,14 @@ reverse_cols(x::FqMatrix) = reverse_cols!(deepcopy(x))
 function +(x::FqMatrix, y::FqMatrix)
   check_parent(x,y)
   z = similar(x)
-  ccall((:fq_default_mat_add, libflint), Nothing,
-        (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}),
-        z, x, y, base_ring(x))
+  @ccall libflint.fq_default_mat_add(z::Ref{FqMatrix}, x::Ref{FqMatrix}, y::Ref{FqMatrix}, base_ring(x)::Ref{FqField})::Nothing
   return z
 end
 
 function -(x::FqMatrix, y::FqMatrix)
   check_parent(x,y)
   z = similar(x)
-  ccall((:fq_default_mat_sub, libflint), Nothing,
-        (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}),
-        z, x, y, base_ring(x))
+  @ccall libflint.fq_default_mat_sub(z::Ref{FqMatrix}, x::Ref{FqMatrix}, y::Ref{FqMatrix}, base_ring(x)::Ref{FqField})::Nothing
 
   return z
 end
@@ -241,8 +214,7 @@ function *(x::FqMatrix, y::FqMatrix)
   (base_ring(x) != base_ring(y)) && error("Base ring must be equal")
   (ncols(x) != nrows(y)) && error("Dimensions are wrong")
   z = similar(x, nrows(x), ncols(y))
-  ccall((:fq_default_mat_mul, libflint), Nothing,
-        (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), z, x, y, base_ring(x))
+  @ccall libflint.fq_default_mat_mul(z::Ref{FqMatrix}, x::Ref{FqMatrix}, y::Ref{FqMatrix}, base_ring(x)::Ref{FqField})::Nothing
   return z
 end
 
@@ -254,27 +226,22 @@ end
 ################################################################################
 
 function zero!(a::FqMatrix)
-  ccall((:fq_default_mat_zero, libflint), Nothing,
-        (Ref{FqMatrix}, Ref{FqField}), a, base_ring(a))
+  @ccall libflint.fq_default_mat_zero(a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
   return a
 end
 
 function one!(a::FqMatrix)
-  ccall((:fq_default_mat_one, libflint), Nothing,
-        (Ref{FqMatrix}, Ref{FqField}), a, base_ring(a))
+  @ccall libflint.fq_default_mat_one(a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
   return a
 end
 
 function neg!(z::FqMatrix, a::FqMatrix)
-  ccall((:fq_default_mat_neg, libflint), Nothing,
-        (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), z, a, base_ring(a))
+  @ccall libflint.fq_default_mat_neg(z::Ref{FqMatrix}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
   return z
 end
 
 function mul!(a::FqMatrix, b::FqMatrix, c::FqMatrix)
-  ccall((:fq_default_mat_mul, libflint), Nothing,
-        (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}),
-        a, b, c, base_ring(a))
+  @ccall libflint.fq_default_mat_mul(a::Ref{FqMatrix}, b::Ref{FqMatrix}, c::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
   return a
 end
 
@@ -289,7 +256,7 @@ function mul!(a::FqMatrix, b::FqMatrix, c::FqFieldElem)
       for j in 1:ncols(a)
         x = fq_default_mat_entry_ptr(a, i, j)
         y = fq_default_mat_entry_ptr(b, i, j)
-        ccall((:fq_default_mul, libflint), Nothing, (Ptr{FqFieldElem}, Ptr{FqFieldElem}, Ref{FqFieldElem}, Ref{FqField}), x, y, c, F)
+        @ccall libflint.fq_default_mul(x::Ptr{FqFieldElem}, y::Ptr{FqFieldElem}, c::Ref{FqFieldElem}, F::Ref{FqField})::Nothing
       end
     end
   end
@@ -299,9 +266,7 @@ end
 mul!(a::FqMatrix, b::FqFieldElem, c::FqMatrix) = mul!(a, c, b)
 
 function add!(a::FqMatrix, b::FqMatrix, c::FqMatrix)
-  ccall((:fq_default_mat_add, libflint), Nothing,
-        (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}),
-        a, b, c, base_ring(a))
+  @ccall libflint.fq_default_mat_add(a::Ref{FqMatrix}, b::Ref{FqMatrix}, c::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
   return a
 end
 
@@ -311,15 +276,9 @@ function Generic.add_one!(a::FqMatrix, i::Int, j::Int)
   GC.@preserve a begin
     x = fq_default_mat_entry_ptr(a, i, j)
     # There is no fq_default_add_one, but only ...sub_one
-    ccall((:fq_default_neg, libflint), Nothing,
-          (Ptr{FqFieldElem}, Ptr{FqFieldElem}, Ref{FqField}),
-          x, x, F)
-    ccall((:fq_default_sub_one, libflint), Nothing,
-          (Ptr{FqFieldElem}, Ptr{FqFieldElem}, Ref{FqField}),
-          x, x, F)
-    ccall((:fq_default_neg, libflint), Nothing,
-          (Ptr{FqFieldElem}, Ptr{FqFieldElem}, Ref{FqField}),
-          x, x, F)
+    @ccall libflint.fq_default_neg(x::Ptr{FqFieldElem}, x::Ptr{FqFieldElem}, F::Ref{FqField})::Nothing
+    @ccall libflint.fq_default_sub_one(x::Ptr{FqFieldElem}, x::Ptr{FqFieldElem}, F::Ref{FqField})::Nothing
+    @ccall libflint.fq_default_neg(x::Ptr{FqFieldElem}, x::Ptr{FqFieldElem}, F::Ref{FqField})::Nothing
   end
   return a
 end
@@ -370,14 +329,12 @@ end
 
 function rref(a::FqMatrix)
   z = similar(a)
-  r = ccall((:fq_default_mat_rref, libflint), Int,
-            (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), z, a, base_ring(a))
+  r = @ccall libflint.fq_default_mat_rref(z::Ref{FqMatrix}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Int
   return r, z
 end
 
 function rref!(a::FqMatrix)
-  r = ccall((:fq_default_mat_rref, libflint), Int,
-            (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), a, a, base_ring(a))
+  r = @ccall libflint.fq_default_mat_rref(a::Ref{FqMatrix}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Int
   return r
 end
 
@@ -430,8 +387,7 @@ end
 function inv(a::FqMatrix)
   !is_square(a) && error("Matrix must be a square matrix")
   z = similar(a)
-  r = ccall((:fq_default_mat_inv, libflint), Int,
-            (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), z, a, base_ring(a))
+  r = @ccall libflint.fq_default_mat_inv(z::Ref{FqMatrix}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Int
   !Bool(r) && error("Matrix not invertible")
   return z
 end
@@ -452,9 +408,7 @@ function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::FqMatrix, b::FqM
   end
 
   x = similar(A, ncols(A), ncols(b))
-  fl = ccall((:fq_default_mat_can_solve, libflint), Cint,
-             (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqMatrix},
-              Ref{FqField}), x, A, b, base_ring(A))
+  fl = @ccall libflint.fq_default_mat_can_solve(x::Ref{FqMatrix}, A::Ref{FqMatrix}, b::Ref{FqMatrix}, base_ring(A)::Ref{FqField})::Cint
   if task === :only_check || task === :with_solution
     return Bool(fl), x, zero(A, 0, 0)
   end
@@ -464,16 +418,12 @@ end
 # Direct interface to the C functions to be able to write 'generic' code for
 # different matrix types
 function _solve_tril_right_flint!(x::FqMatrix, L::FqMatrix, B::FqMatrix, unit::Bool)
-  ccall((:fq_default_mat_solve_tril, libflint), Nothing,
-        (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqMatrix}, Cint, Ref{FqField}),
-        x, L, B, Cint(unit), base_ring(L))
+  @ccall libflint.fq_default_mat_solve_tril(x::Ref{FqMatrix}, L::Ref{FqMatrix}, B::Ref{FqMatrix}, Cint(unit)::Cint, base_ring(L)::Ref{FqField})::Nothing
   return nothing
 end
 
 function _solve_triu_right_flint!(x::FqMatrix, U::FqMatrix, B::FqMatrix, unit::Bool)
-  ccall((:fq_default_mat_solve_triu, libflint), Nothing,
-        (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqMatrix}, Cint, Ref{FqField}),
-        x, U, B, Cint(unit), base_ring(U))
+  @ccall libflint.fq_default_mat_solve_triu(x::Ref{FqMatrix}, U::Ref{FqMatrix}, B::Ref{FqMatrix}, Cint(unit)::Cint, base_ring(U)::Ref{FqField})::Nothing
   return nothing
 end
 
@@ -486,9 +436,7 @@ end
 function lu!(P::Perm, x::FqMatrix)
   P.d .-= 1
 
-  rank = Int(ccall((:fq_default_mat_lu, libflint), Cint,
-                   (Ptr{Int}, Ref{FqMatrix}, Cint, Ref{FqField}),
-                   P.d, x, 0, base_ring(x)))
+  rank = Int(@ccall libflint.fq_default_mat_lu(P.d::Ptr{Int}, x::Ref{FqMatrix}, 0::Cint, base_ring(x)::Ref{FqField})::Cint)
 
   P.d .+= 1
 
@@ -551,9 +499,7 @@ function Base.view(x::FqMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
   z = FqMatrix()
   z.base_ring = x.base_ring
   z.view_parent = x
-  ccall((:fq_default_mat_window_init, libflint), Nothing,
-        (Ref{FqMatrix}, Ref{FqMatrix}, Int, Int, Int, Int, Ref{FqField}),
-        z, x, r1 - 1, c1 - 1, r2, c2, base_ring(x))
+  @ccall libflint.fq_default_mat_window_init(z::Ref{FqMatrix}, x::Ref{FqMatrix}, (r1 - 1)::Int, (c1 - 1)::Int, r2::Int, c2::Int, base_ring(x)::Ref{FqField})::Nothing
   finalizer(_fq_default_mat_window_clear_fn, z)
   return z
 end
@@ -563,8 +509,7 @@ function Base.view(x::FqMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{
 end
 
 function _fq_default_mat_window_clear_fn(a::FqMatrix)
-  ccall((:fq_default_mat_window_clear, libflint), Nothing,
-        (Ref{FqMatrix}, Ref{FqField}), a, base_ring(a))
+  @ccall libflint.fq_default_mat_window_clear(a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
 end
 
 function sub(x::FqMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
@@ -587,10 +532,7 @@ function hcat(x::FqMatrix, y::FqMatrix)
   (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
   (nrows(x) != nrows(y)) && error("Matrices must have same number of rows")
   z = similar(x, nrows(x), ncols(x) + ncols(y))
-  ccall((:fq_default_mat_concat_horizontal, libflint), Nothing,
-        (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqMatrix},
-         Ref{FqField}),
-        z, x, y, base_ring(x))
+  @ccall libflint.fq_default_mat_concat_horizontal(z::Ref{FqMatrix}, x::Ref{FqMatrix}, y::Ref{FqMatrix}, base_ring(x)::Ref{FqField})::Nothing
   return z
 end
 
@@ -598,10 +540,7 @@ function vcat(x::FqMatrix, y::FqMatrix)
   (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
   (ncols(x) != ncols(y)) && error("Matrices must have same number of columns")
   z = similar(x, nrows(x) + nrows(y), ncols(x))
-  ccall((:fq_default_mat_concat_vertical, libflint), Nothing,
-        (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqMatrix},
-         Ref{FqField}),
-        z, x, y, base_ring(x))
+  @ccall libflint.fq_default_mat_concat_vertical(z::Ref{FqMatrix}, x::Ref{FqMatrix}, y::Ref{FqMatrix}, base_ring(x)::Ref{FqField})::Nothing
   return z
 end
 
@@ -615,8 +554,7 @@ function charpoly(R::FqPolyRing, a::FqMatrix)
   !is_square(a) && error("Matrix must be square")
   base_ring(R) != base_ring(a) && error("Must have common base ring")
   p = R()
-  ccall((:fq_default_mat_charpoly, libflint), Nothing,
-        (Ref{FqPolyRingElem}, Ref{FqMatrix}, Ref{FqField}), p, a, base_ring(a))
+  @ccall libflint.fq_default_mat_charpoly(p::Ref{FqPolyRingElem}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
   return p
 end
 
@@ -624,8 +562,7 @@ function charpoly_danivlesky!(R::FqPolyRing, a::FqMatrix)
   !is_square(a) && error("Matrix must be square")
   base_ring(R) != base_ring(a) && error("Must have common base ring")
   p = R()
-  ccall((:fq_default_mat_charpoly_danilevsky, libflint), Nothing,
-        (Ref{FqPolyRingElem}, Ref{FqMatrix}, Ref{FqField}), p, a, base_ring(a))
+  @ccall libflint.fq_default_mat_charpoly_danilevsky(p::Ref{FqPolyRingElem}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
   return p
 end
 
@@ -641,8 +578,7 @@ function minpoly(R::FqPolyRing, a::FqMatrix)
   base_ring(R) != base_ring(a) && error("Must have common base ring")
   m = deepcopy(a)
   p = R()
-  ccall((:fq_default_mat_minpoly, libflint), Nothing,
-        (Ref{FqPolyRingElem}, Ref{FqMatrix}, Ref{FqField}), p, m, base_ring(a))
+  @ccall libflint.fq_default_mat_minpoly(p::Ref{FqPolyRingElem}, m::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
   return p
 end
 
@@ -757,20 +693,15 @@ function fq_default_mat_entry_ptr(a::FqMatrix, i, j)
   t = _fq_default_ctx_type(base_ring(a))
   ptr = pointer_from_objref(a)
   if t == _FQ_DEFAULT_FQ_ZECH
-    pptr = ccall((:fq_zech_mat_entry, libflint), Ptr{FqFieldElem},
-                 (Ptr{Cvoid}, Int, Int), ptr, i - 1, j - 1)
+    pptr = @ccall libflint.fq_zech_mat_entry(ptr::Ptr{Cvoid}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
   elseif t == _FQ_DEFAULT_FQ_NMOD
-    pptr = ccall((:fq_nmod_mat_entry, libflint), Ptr{FqFieldElem},
-                 (Ptr{Cvoid}, Int, Int), ptr, i - 1, j - 1)
+    pptr = @ccall libflint.fq_nmod_mat_entry(ptr::Ptr{Cvoid}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
   elseif t == _FQ_DEFAULT_FQ
-    pptr = ccall((:fq_mat_entry, libflint), Ptr{FqFieldElem},
-                 (Ptr{Cvoid}, Int, Int), ptr, i - 1, j - 1)
+    pptr = @ccall libflint.fq_mat_entry(ptr::Ptr{Cvoid}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
   elseif t == _FQ_DEFAULT_NMOD
-    pptr = ccall((:nmod_mat_entry_ptr, libflint), Ptr{FqFieldElem},
-                 (Ptr{Cvoid}, Int, Int), ptr, i - 1, j - 1)
+    pptr = @ccall libflint.nmod_mat_entry_ptr(ptr::Ptr{Cvoid}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
   else#if t == _FQ_DEFAULT_FMPZ_NMOD
-    pptr = ccall((:fmpz_mod_mat_entry, libflint), Ptr{FqFieldElem},
-                 (Ptr{Cvoid}, Int, Int), ptr, i - 1, j - 1)
+    pptr = @ccall libflint.fmpz_mod_mat_entry(ptr::Ptr{Cvoid}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
   end
   return pptr
 end
@@ -783,7 +714,6 @@ end
 
 function nullspace(M::FqMatrix)
   N = similar(M, ncols(M), ncols(M))
-  nullity = ccall((:fq_default_mat_nullspace, libflint), Int,
-                  (Ref{FqMatrix}, Ref{FqMatrix}, Ref{FqField}), N, M, base_ring(M))
+  nullity = @ccall libflint.fq_default_mat_nullspace(N::Ref{FqMatrix}, M::Ref{FqMatrix}, base_ring(M)::Ref{FqField})::Int
   return nullity, view(N, 1:nrows(N), 1:nullity)
 end

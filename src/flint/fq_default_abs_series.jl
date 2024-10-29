@@ -43,16 +43,12 @@ function normalise(a::FqAbsPowerSeriesRingElem, len::Int)
   ctx = base_ring(a)
   if len > 0
     c = base_ring(a)()
-    ccall((:fq_default_poly_get_coeff, libflint), Nothing,
-          (Ref{FqFieldElem}, Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqField}),
-          c, a, len - 1, ctx)
+    @ccall libflint.fq_default_poly_get_coeff(c::Ref{FqFieldElem}, a::Ref{FqAbsPowerSeriesRingElem}, (len - 1)::Int, ctx::Ref{FqField})::Nothing
   end
   while len > 0 && iszero(c)
     len -= 1
     if len > 0
-      ccall((:fq_default_poly_get_coeff, libflint), Nothing,
-            (Ref{FqFieldElem}, Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqField}),
-            c, a, len - 1, ctx)
+      @ccall libflint.fq_default_poly_get_coeff(c::Ref{FqFieldElem}, a::Ref{FqAbsPowerSeriesRingElem}, (len - 1)::Int, ctx::Ref{FqField})::Nothing
     end
   end
 
@@ -60,8 +56,7 @@ function normalise(a::FqAbsPowerSeriesRingElem, len::Int)
 end
 
 function length(x::FqAbsPowerSeriesRingElem)
-  return ccall((:fq_default_poly_length, libflint), Int,
-               (Ref{FqAbsPowerSeriesRingElem}, Ref{FqField}), x, base_ring(x))
+  return @ccall libflint.fq_default_poly_length(x::Ref{FqAbsPowerSeriesRingElem}, base_ring(x)::Ref{FqField})::Int
 end
 
 precision(x::FqAbsPowerSeriesRingElem) = x.prec
@@ -71,9 +66,7 @@ function coeff(x::FqAbsPowerSeriesRingElem, n::Int)
     return base_ring(x)()
   end
   z = base_ring(x)()
-  ccall((:fq_default_poly_get_coeff, libflint), Nothing,
-        (Ref{FqFieldElem}, Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqField}),
-        z, x, n, base_ring(x))
+  @ccall libflint.fq_default_poly_get_coeff(z::Ref{FqFieldElem}, x::Ref{FqAbsPowerSeriesRingElem}, n::Int, base_ring(x)::Ref{FqField})::Nothing
   return z
 end
 
@@ -96,8 +89,7 @@ function deepcopy_internal(a::FqAbsPowerSeriesRingElem, dict::IdDict)
 end
 
 function is_gen(a::FqAbsPowerSeriesRingElem)
-  return precision(a) == 0 || ccall((:fq_default_poly_is_gen, libflint), Bool,
-                                    (Ref{FqAbsPowerSeriesRingElem}, Ref{FqField}), a, base_ring(a))
+  return precision(a) == 0 || @ccall libflint.fq_default_poly_is_gen(a::Ref{FqAbsPowerSeriesRingElem}, base_ring(a)::Ref{FqField})::Bool
 end
 
 iszero(a::FqAbsPowerSeriesRingElem) = length(a) == 0
@@ -105,8 +97,7 @@ iszero(a::FqAbsPowerSeriesRingElem) = length(a) == 0
 is_unit(a::FqAbsPowerSeriesRingElem) = valuation(a) == 0 && is_unit(coeff(a, 0))
 
 function isone(a::FqAbsPowerSeriesRingElem)
-  return precision(a) == 0 || ccall((:fq_default_poly_is_one, libflint), Bool,
-                                    (Ref{FqAbsPowerSeriesRingElem}, Ref{FqField}), a, base_ring(a))
+  return precision(a) == 0 || @ccall libflint.fq_default_poly_is_one(a::Ref{FqAbsPowerSeriesRingElem}, base_ring(a)::Ref{FqField})::Bool
 end
 
 # todo: write an fq_default_poly_valuation
@@ -183,10 +174,7 @@ function +(a::FqAbsPowerSeriesRingElem, b::FqAbsPowerSeriesRingElem)
   lenz = max(lena, lenb)
   z = parent(a)()
   z.prec = prec
-  ccall((:fq_default_poly_add_series, libflint), Nothing,
-        (Ref{FqAbsPowerSeriesRingElem}, Ref{FqAbsPowerSeriesRingElem},
-         Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqField}),
-        z, a, b, lenz, base_ring(a))
+  @ccall libflint.fq_default_poly_add_series(z::Ref{FqAbsPowerSeriesRingElem}, a::Ref{FqAbsPowerSeriesRingElem}, b::Ref{FqAbsPowerSeriesRingElem}, lenz::Int, base_ring(a)::Ref{FqField})::Nothing
   return z
 end
 
@@ -200,10 +188,7 @@ function -(a::FqAbsPowerSeriesRingElem, b::FqAbsPowerSeriesRingElem)
   lenz = max(lena, lenb)
   z = parent(a)()
   z.prec = prec
-  ccall((:fq_default_poly_sub_series, libflint), Nothing,
-        (Ref{FqAbsPowerSeriesRingElem}, Ref{FqAbsPowerSeriesRingElem},
-         Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqField}),
-        z, a, b, lenz, base_ring(a))
+  @ccall libflint.fq_default_poly_sub_series(z::Ref{FqAbsPowerSeriesRingElem}, a::Ref{FqAbsPowerSeriesRingElem}, b::Ref{FqAbsPowerSeriesRingElem}, lenz::Int, base_ring(a)::Ref{FqField})::Nothing
   return z
 end
 
@@ -223,10 +208,7 @@ function *(a::FqAbsPowerSeriesRingElem, b::FqAbsPowerSeriesRingElem)
     return z
   end
   lenz = min(lena + lenb - 1, prec)
-  ccall((:fq_default_poly_mullow, libflint), Nothing,
-        (Ref{FqAbsPowerSeriesRingElem}, Ref{FqAbsPowerSeriesRingElem},
-         Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqField}),
-        z, a, b, lenz, base_ring(a))
+  @ccall libflint.fq_default_poly_mullow(z::Ref{FqAbsPowerSeriesRingElem}, a::Ref{FqAbsPowerSeriesRingElem}, b::Ref{FqAbsPowerSeriesRingElem}, lenz::Int, base_ring(a)::Ref{FqField})::Nothing
   return z
 end
 
@@ -239,9 +221,7 @@ end
 function *(x::FqFieldElem, y::FqAbsPowerSeriesRingElem)
   z = parent(y)()
   z.prec = y.prec
-  ccall((:fq_default_poly_scalar_mul_fq_default, libflint), Nothing,
-        (Ref{FqAbsPowerSeriesRingElem}, Ref{FqAbsPowerSeriesRingElem}, Ref{FqFieldElem}, Ref{FqField}),
-        z, y, x, base_ring(y))
+  @ccall libflint.fq_default_poly_scalar_mul_fq_default(z::Ref{FqAbsPowerSeriesRingElem}, y::Ref{FqAbsPowerSeriesRingElem}, x::Ref{FqFieldElem}, base_ring(y)::Ref{FqField})::Nothing
   return z
 end
 
@@ -292,12 +272,8 @@ function shift_left(x::FqAbsPowerSeriesRingElem, len::Int)
   z.prec = x.prec + len
   z.prec = min(z.prec, max_precision(parent(x)))
   zlen = min(z.prec, xlen + len)
-  ccall((:fq_default_poly_shift_left, libflint), Nothing,
-        (Ref{FqAbsPowerSeriesRingElem}, Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqField}),
-        z, x, len, base_ring(x))
-  ccall((:fq_default_poly_set_trunc, libflint), Nothing,
-        (Ref{FqAbsPowerSeriesRingElem}, Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqField}),
-        z, z, zlen, base_ring(x))
+  @ccall libflint.fq_default_poly_shift_left(z::Ref{FqAbsPowerSeriesRingElem}, x::Ref{FqAbsPowerSeriesRingElem}, len::Int, base_ring(x)::Ref{FqField})::Nothing
+  @ccall libflint.fq_default_poly_set_trunc(z::Ref{FqAbsPowerSeriesRingElem}, z::Ref{FqAbsPowerSeriesRingElem}, zlen::Int, base_ring(x)::Ref{FqField})::Nothing
   return z
 end
 
@@ -309,9 +285,7 @@ function shift_right(x::FqAbsPowerSeriesRingElem, len::Int)
     z.prec = max(0, x.prec - len)
   else
     z.prec = x.prec - len
-    ccall((:fq_default_poly_shift_right, libflint), Nothing,
-          (Ref{FqAbsPowerSeriesRingElem}, Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqField}),
-          z, x, len, base_ring(x))
+    @ccall libflint.fq_default_poly_shift_right(z::Ref{FqAbsPowerSeriesRingElem}, x::Ref{FqAbsPowerSeriesRingElem}, len::Int, base_ring(x)::Ref{FqField})::Nothing
   end
   return z
 end
@@ -331,9 +305,7 @@ function truncate!(x::FqAbsPowerSeriesRingElem, k::Int)
   if precision(x) <= k
     return x
   end
-  ccall((:fq_default_poly_truncate, libflint), Nothing,
-        (Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqField}),
-        x, k, base_ring(x))
+  @ccall libflint.fq_default_poly_truncate(x::Ref{FqAbsPowerSeriesRingElem}, k::Int, base_ring(x)::Ref{FqField})::Nothing
   x.prec = k
   return x
 end
@@ -382,9 +354,7 @@ function ==(x::FqAbsPowerSeriesRingElem, y::FqAbsPowerSeriesRingElem)
   prec = min(x.prec, y.prec)
   n = max(length(x), length(y))
   n = min(n, prec)
-  return Bool(ccall((:fq_default_poly_equal_trunc, libflint), Cint,
-                    (Ref{FqAbsPowerSeriesRingElem}, Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqField}),
-                    x, y, n, base_ring(x)))
+  return Bool(@ccall libflint.fq_default_poly_equal_trunc(x::Ref{FqAbsPowerSeriesRingElem}, y::Ref{FqAbsPowerSeriesRingElem}, n::Int, base_ring(x)::Ref{FqField})::Cint)
 end
 
 function isequal(x::FqAbsPowerSeriesRingElem, y::FqAbsPowerSeriesRingElem)
@@ -394,10 +364,7 @@ function isequal(x::FqAbsPowerSeriesRingElem, y::FqAbsPowerSeriesRingElem)
   if x.prec != y.prec || length(x) != length(y)
     return false
   end
-  return Bool(ccall((:fq_default_poly_equal, libflint), Cint,
-                    (Ref{FqAbsPowerSeriesRingElem}, Ref{FqAbsPowerSeriesRingElem},
-                     Ref{FqField}),
-                    x, y, base_ring(x)))
+  return Bool(@ccall libflint.fq_default_poly_equal(x::Ref{FqAbsPowerSeriesRingElem}, y::Ref{FqAbsPowerSeriesRingElem}, base_ring(x)::Ref{FqField})::Cint)
 end
 
 ###############################################################################
@@ -411,9 +378,7 @@ function ==(x::FqAbsPowerSeriesRingElem, y::FqFieldElem)
     return false
   elseif length(x) == 1
     z = base_ring(x)()
-    ccall((:fq_default_poly_get_coeff, libflint), Nothing,
-          (Ref{FqFieldElem}, Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqField}),
-          z, x, 0, base_ring(x))
+    @ccall libflint.fq_default_poly_get_coeff(z::Ref{FqFieldElem}, x::Ref{FqAbsPowerSeriesRingElem}, 0::Int, base_ring(x)::Ref{FqField})::Nothing
     return z == y
   else
     return precision(x) == 0 || iszero(y)
@@ -427,9 +392,7 @@ function ==(x::FqAbsPowerSeriesRingElem, y::ZZRingElem)
     return false
   elseif length(x) == 1
     z = base_ring(x)()
-    ccall((:fq_default_poly_get_coeff, libflint), Nothing,
-          (Ref{FqFieldElem}, Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqField}),
-          z, x, 0, base_ring(x))
+    @ccall libflint.fq_default_poly_get_coeff(z::Ref{FqFieldElem}, x::Ref{FqAbsPowerSeriesRingElem}, 0::Int, base_ring(x)::Ref{FqField})::Nothing
     return z == y
   else
     return precision(x) == 0 || iszero(y)
@@ -463,10 +426,7 @@ function divexact(x::FqAbsPowerSeriesRingElem, y::FqAbsPowerSeriesRingElem; chec
   prec = min(x.prec, y.prec - v2 + v1)
   z = parent(x)()
   z.prec = prec
-  ccall((:fq_default_poly_div_series, libflint), Nothing,
-        (Ref{FqAbsPowerSeriesRingElem}, Ref{FqAbsPowerSeriesRingElem},
-         Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqField}),
-        z, x, y, prec, base_ring(x))
+  @ccall libflint.fq_default_poly_div_series(z::Ref{FqAbsPowerSeriesRingElem}, x::Ref{FqAbsPowerSeriesRingElem}, y::Ref{FqAbsPowerSeriesRingElem}, prec::Int, base_ring(x)::Ref{FqField})::Nothing
   return z
 end
 
@@ -480,9 +440,7 @@ function divexact(x::FqAbsPowerSeriesRingElem, y::FqFieldElem; check::Bool=true)
   iszero(y) && throw(DivideError())
   z = parent(x)()
   z.prec = x.prec
-  ccall((:fq_default_poly_scalar_div_fq_default, libflint), Nothing,
-        (Ref{FqAbsPowerSeriesRingElem}, Ref{FqAbsPowerSeriesRingElem}, Ref{FqFieldElem}, Ref{FqField}),
-        z, x, y, base_ring(x))
+  @ccall libflint.fq_default_poly_scalar_div_fq_default(z::Ref{FqAbsPowerSeriesRingElem}, x::Ref{FqAbsPowerSeriesRingElem}, y::Ref{FqFieldElem}, base_ring(x)::Ref{FqField})::Nothing
   return z
 end
 
@@ -497,9 +455,7 @@ function inv(a::FqAbsPowerSeriesRingElem)
   !is_unit(a) && error("Unable to invert power series")
   ainv = parent(a)()
   ainv.prec = a.prec
-  ccall((:fq_default_poly_inv_series, libflint), Nothing,
-        (Ref{FqAbsPowerSeriesRingElem}, Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqField}),
-        ainv, a, a.prec, base_ring(a))
+  @ccall libflint.fq_default_poly_inv_series(ainv::Ref{FqAbsPowerSeriesRingElem}, a::Ref{FqAbsPowerSeriesRingElem}, a.prec::Int, base_ring(a)::Ref{FqField})::Nothing
   return ainv
 end
 
@@ -561,10 +517,7 @@ function sqrt_classical(a::FqAbsPowerSeriesRingElem; check::Bool=true)
   end
   a = divexact(a, c)
   z.prec = a.prec - div(v, 2)
-  ccall((:fq_default_poly_sqrt_series, libflint), Nothing,
-        (Ref{FqAbsPowerSeriesRingElem}, Ref{FqAbsPowerSeriesRingElem},
-         Int, Ref{FqField}),
-        z, a, a.prec, base_ring(a))
+  @ccall libflint.fq_default_poly_sqrt_series(z::Ref{FqAbsPowerSeriesRingElem}, a::Ref{FqAbsPowerSeriesRingElem}, a.prec::Int, base_ring(a)::Ref{FqField})::Nothing
   if !isone(s)
     z *= s
   end
@@ -596,38 +549,30 @@ end
 ###############################################################################
 
 function zero!(z::FqAbsPowerSeriesRingElem)
-  ccall((:fq_default_poly_zero, libflint), Nothing,
-        (Ref{FqAbsPowerSeriesRingElem}, Ref{FqField}), z, base_ring(z))
+  @ccall libflint.fq_default_poly_zero(z::Ref{FqAbsPowerSeriesRingElem}, base_ring(z)::Ref{FqField})::Nothing
   z.prec = parent(z).prec_max
   return z
 end
 
 function one!(z::FqAbsPowerSeriesRingElem)
-  ccall((:fq_default_poly_one, libflint), Nothing,
-        (Ref{FqAbsPowerSeriesRingElem}, Ref{FqField}), z, base_ring(z))
+  @ccall libflint.fq_default_poly_one(z::Ref{FqAbsPowerSeriesRingElem}, base_ring(z)::Ref{FqField})::Nothing
   z.prec = parent(z).prec_max
   return z
 end
 
 function neg!(z::FqAbsPowerSeriesRingElem, a::FqAbsPowerSeriesRingElem)
-  ccall((:fq_default_poly_neg, libflint), Nothing,
-        (Ref{FqAbsPowerSeriesRingElem}, Ref{FqAbsPowerSeriesRingElem}, Ref{FqField}),
-        z, a, base_ring(a))
+  @ccall libflint.fq_default_poly_neg(z::Ref{FqAbsPowerSeriesRingElem}, a::Ref{FqAbsPowerSeriesRingElem}, base_ring(a)::Ref{FqField})::Nothing
   z.prec = a.prec
   return z
 end
 
 function fit!(z::FqAbsPowerSeriesRingElem, n::Int)
-  ccall((:fq_default_poly_fit_length, libflint), Nothing,
-        (Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqField}),
-        z, n, base_ring(z))
+  @ccall libflint.fq_default_poly_fit_length(z::Ref{FqAbsPowerSeriesRingElem}, n::Int, base_ring(z)::Ref{FqField})::Nothing
   return nothing
 end
 
 function setcoeff!(z::FqAbsPowerSeriesRingElem, n::Int, x::FqFieldElem)
-  ccall((:fq_default_poly_set_coeff, libflint), Nothing,
-        (Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqFieldElem}, Ref{FqField}),
-        z, n, x, base_ring(z))
+  @ccall libflint.fq_default_poly_set_coeff(z::Ref{FqAbsPowerSeriesRingElem}, n::Int, x::Ref{FqFieldElem}, base_ring(z)::Ref{FqField})::Nothing
   return z
 end
 
@@ -645,10 +590,7 @@ function mul!(z::FqAbsPowerSeriesRingElem, a::FqAbsPowerSeriesRingElem, b::FqAbs
     lenz = 0
   end
   z.prec = prec
-  ccall((:fq_default_poly_mullow, libflint), Nothing,
-        (Ref{FqAbsPowerSeriesRingElem}, Ref{FqAbsPowerSeriesRingElem},
-         Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqField}),
-        z, a, b, lenz, base_ring(z))
+  @ccall libflint.fq_default_poly_mullow(z::Ref{FqAbsPowerSeriesRingElem}, a::Ref{FqAbsPowerSeriesRingElem}, b::Ref{FqAbsPowerSeriesRingElem}, lenz::Int, base_ring(z)::Ref{FqField})::Nothing
   return z
 end
 
@@ -660,10 +602,7 @@ function add!(a::FqAbsPowerSeriesRingElem, b::FqAbsPowerSeriesRingElem)
   lenb = min(lenb, prec)
   lenz = max(lena, lenb)
   a.prec = prec
-  ccall((:fq_default_poly_add_series, libflint), Nothing,
-        (Ref{FqAbsPowerSeriesRingElem}, Ref{FqAbsPowerSeriesRingElem},
-         Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqField}),
-        a, a, b, lenz, base_ring(a))
+  @ccall libflint.fq_default_poly_add_series(a::Ref{FqAbsPowerSeriesRingElem}, a::Ref{FqAbsPowerSeriesRingElem}, b::Ref{FqAbsPowerSeriesRingElem}, lenz::Int, base_ring(a)::Ref{FqField})::Nothing
   return a
 end
 
@@ -680,17 +619,12 @@ function add!(c::FqAbsPowerSeriesRingElem, a::FqAbsPowerSeriesRingElem, b::FqAbs
   lenb = min(lenb, prec)
   lenc = max(lena, lenb)
   c.prec = prec
-  ccall((:fq_default_poly_add_series, libflint), Nothing,
-        (Ref{FqAbsPowerSeriesRingElem}, Ref{FqAbsPowerSeriesRingElem},
-         Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqField}),
-        c, a, b, lenc, base_ring(a))
+  @ccall libflint.fq_default_poly_add_series(c::Ref{FqAbsPowerSeriesRingElem}, a::Ref{FqAbsPowerSeriesRingElem}, b::Ref{FqAbsPowerSeriesRingElem}, lenc::Int, base_ring(a)::Ref{FqField})::Nothing
   return c
 end
 
 function set_length!(a::FqAbsPowerSeriesRingElem, n::Int64)
-  ccall((:_fq_default_poly_set_length, libflint), Nothing,
-        (Ref{FqAbsPowerSeriesRingElem}, Int, Ref{FqField}),
-        a, n, base_ring(a))
+  @ccall libflint._fq_default_poly_set_length(a::Ref{FqAbsPowerSeriesRingElem}, n::Int, base_ring(a)::Ref{FqField})::Nothing
   return a
 end
 

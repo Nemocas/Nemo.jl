@@ -37,16 +37,12 @@ end
 
 function copy_data(a::ZZRingElem)
   z = Ref(0)
-  ccall((:fmpz_init_set, libflint), Nothing,
-        (Ref{Int}, Ref{ZZRingElem}),
-        z, a)
+  @ccall libflint.fmpz_init_set(z::Ref{Int}, a::Ref{ZZRingElem})::Nothing
   return z[]
 end
 
 function shift_right!(z::ZZRingElem, a::ZZRingElem, b::Union{Int, UInt})
-  ccall((:fmpz_fdiv_q_2exp, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt),
-        z, a, UInt(b))
+  @ccall libflint.fmpz_fdiv_q_2exp(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, UInt(b)::UInt)::Nothing
   return z
 end
 
@@ -78,9 +74,7 @@ function _shortest_l_infinity(c::ZZRingElem, b::ZZRingElem, a::ZZRingElem)
   # will cleanup x while stealing its enties later
   x = _fmpq_ball(copy_data(a), steal_data!(b_plus_c),
                  copy_data(a), steal_data!(b_minus_c), 0)
-  ccall((:_fmpq_ball_get_cfrac, libflint), Nothing,
-        (Ref{_fmpq_cfrac_list}, Ref{_fmpz_mat22}, Cint, Ref{_fmpq_ball}),
-        s, m, 1, x)
+  @ccall libflint._fmpq_ball_get_cfrac(s::Ref{_fmpq_cfrac_list}, m::Ref{_fmpz_mat22}, 1::Cint, x::Ref{_fmpq_ball})::Nothing
 
   m11 = steal_fmpz_data(m._11)
   m12 = steal_fmpz_data(m._12)
@@ -176,9 +170,9 @@ function _push_and_clear!(v::Vector{ZZRingElem}, s::_fmpq_cfrac_list)
     push!(v, steal_fmpz_data(unsafe_load(s.array, i)))
   end
   for i in s.length:s.alloc-1
-    ccall((:fmpz_clear, libflint), Nothing, (Ptr{Int},), s.array + sizeof(Int)*i)
+    @ccall libflint.fmpz_clear((s.array + sizeof(Int)*i)::Ptr{Int})::Nothing
   end
-  ccall((:flint_free, libflint), Nothing, (Ptr{Int},), s.array)
+  @ccall libflint.flint_free(s.array::Ptr{Int})::Nothing
 end
 
 function _doit_exact!(xn::ZZRingElem, xd::ZZRingElem, v::Vector{ZZRingElem}, lim::Int, wantM::Bool)
@@ -187,9 +181,7 @@ function _doit_exact!(xn::ZZRingElem, xd::ZZRingElem, v::Vector{ZZRingElem}, lim
   m = _fmpz_mat22(1,0,0,1,1)
   if ok
     s = _fmpq_cfrac_list(C_NULL, 0, 0, lim, 0, 0)
-    ccall((:_fmpq_ball_get_cfrac, libflint), Nothing,
-          (Ref{_fmpq_cfrac_list}, Ref{_fmpz_mat22}, Cint, Ref{_fmpq_ball}),
-          s, m, wantM, x)
+    @ccall libflint._fmpq_ball_get_cfrac(s::Ref{_fmpq_cfrac_list}, m::Ref{_fmpz_mat22}, wantM::Cint, x::Ref{_fmpq_ball})::Nothing
     _push_and_clear!(v, s)
   end
   xn.d = x.left_num; x.left_num = 0
@@ -242,9 +234,7 @@ function _doit_ball!(
                  steal_data!(xrn), steal_data!(xrd), 0)
   m = _fmpz_mat22(1,0,0,1,1)
   s = _fmpq_cfrac_list(C_NULL, 0, 0, lim, 0, 0)
-  ccall((:_fmpq_ball_get_cfrac, libflint), Nothing,
-        (Ref{_fmpq_cfrac_list}, Ref{_fmpz_mat22}, Cint, Ref{_fmpq_ball}),
-        s, m, wantM, x)
+  @ccall libflint._fmpq_ball_get_cfrac(s::Ref{_fmpq_cfrac_list}, m::Ref{_fmpz_mat22}, wantM::Cint, x::Ref{_fmpq_ball})::Nothing
   _push_and_clear!(v, s)
   xln.d = x.left_num; x.left_num = 0
   xld.d = x.left_den; x.left_den = 0
@@ -301,9 +291,7 @@ function _left_and_right(x::ArbFieldElem)
   a = ZZRingElem()
   b = ZZRingElem()
   f = ZZRingElem()
-  ccall((:arb_get_interval_fmpz_2exp, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ArbFieldElem}),
-        a, b, f, x)
+  @ccall libflint.arb_get_interval_fmpz_2exp(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, f::Ref{ZZRingElem}, x::Ref{ArbFieldElem})::Nothing
   fits(Int, f) || error("Ball endpoints do not fit into QQFieldElem")
   e = Int(f)
   if f >= 0

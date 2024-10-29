@@ -12,8 +12,7 @@
 
 function linear_factor(x::fqPolyRepPolyRingElem)
   y = parent(x)()
-  ccall((:fq_nmod_poly_factor_split_single, libflint), Nothing, (Ref{fqPolyRepPolyRingElem},
-                                                                 Ref{fqPolyRepPolyRingElem}, Ref{fqPolyRepField}), y, x, base_ring(x))
+  @ccall libflint.fq_nmod_poly_factor_split_single(y::Ref{fqPolyRepPolyRingElem}, x::Ref{fqPolyRepPolyRingElem}, base_ring(x)::Ref{fqPolyRepField})::Nothing
   return y
 end
 
@@ -55,9 +54,7 @@ function embed_matrices(k::fqPolyRepField, K::fqPolyRepField)
   s1 = zero_matrix(R, n, m)
   s2 = zero_matrix(R, m, n)
 
-  ccall((:fq_nmod_embed_matrices, libflint), Nothing, (Ref{fpMatrix},
-                                                       Ref{fpMatrix}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}, Ref{fqPolyRepFieldElem},
-                                                       Ref{fqPolyRepField}, Ref{fpPolyRingElem}), s1, s2, a, k, b, K, P)
+  @ccall libflint.fq_nmod_embed_matrices(s1::Ref{fpMatrix}, s2::Ref{fpMatrix}, a::Ref{fqPolyRepFieldElem}, k::Ref{fqPolyRepField}, b::Ref{fqPolyRepFieldElem}, K::Ref{fqPolyRepField}, P::Ref{fpPolyRingElem})::Nothing
   return s1, s2
 end
 
@@ -69,15 +66,12 @@ function embed_matrices_pre(a::fqPolyRepFieldElem, b::fqPolyRepFieldElem, P::fpP
   s1 = zero_matrix(R, n, m)
   s2 = zero_matrix(R, m, n)
 
-  ccall((:fq_nmod_embed_matrices, libflint), Nothing, (Ref{fpMatrix},
-                                                       Ref{fpMatrix}, Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}, Ref{fqPolyRepFieldElem},
-                                                       Ref{fqPolyRepField}, Ref{fpPolyRingElem}), s1, s2, a, k, b, K, P)
+  @ccall libflint.fq_nmod_embed_matrices(s1::Ref{fpMatrix}, s2::Ref{fpMatrix}, a::Ref{fqPolyRepFieldElem}, k::Ref{fqPolyRepField}, b::Ref{fqPolyRepFieldElem}, K::Ref{fqPolyRepField}, P::Ref{fpPolyRingElem})::Nothing
   return s1, s2
 end
 
 function setcoeff!(x::fqPolyRepFieldElem, j::Int, c::Int)
-  ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-        (Ref{fqPolyRepFieldElem}, Int, UInt), x, j, c)
+  @ccall libflint.nmod_poly_set_coeff_ui(x::Ref{fqPolyRepFieldElem}, j::Int, c::UInt)::Nothing
 end
 
 function embed_pre_mat(x::fqPolyRepFieldElem, K::fqPolyRepField, M::fpMatrix)

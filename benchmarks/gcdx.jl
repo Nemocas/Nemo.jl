@@ -7,8 +7,7 @@ function gcdx_fmpz(a::ZZRingElem, b::ZZRingElem)
   d = ZZ()
   x = ZZ()
   y = ZZ()
-  ccall((:fmpz_xgcd_canonical_bezout, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), d, x, y, a, b)
+  @ccall libflint.fmpz_xgcd_canonical_bezout(d::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem})::Nothing
   return d, x, y
 end
 

@@ -81,8 +81,7 @@ parent_type(::Type{QadicFieldElem}) = QadicField
 
 function _prime(R::QadicField, n::Int = 1)
   z = ZZRingElem()
-  ccall((:padic_ctx_pow_ui, libflint), Nothing,
-        (Ref{ZZRingElem}, UInt, Ref{QadicField}), z, n, R)
+  @ccall libflint.padic_ctx_pow_ui(z::Ref{ZZRingElem}, n::UInt, R::Ref{QadicField})::Nothing
   return z
 end
 
@@ -104,8 +103,7 @@ end
 function Base.deepcopy_internal(a::QadicFieldElem, dict::IdDict{Any, Any})
   z = parent(a)()
   z.N = a.N
-  ccall((:qadic_set, libflint), Nothing,
-        (Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}), z, a, parent(a))
+  @ccall libflint.qadic_set(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, parent(a)::Ref{QadicField})::Nothing
   return z
 end
 
@@ -115,7 +113,7 @@ function Base.hash(a::QadicFieldElem, h::UInt)
 end
 
 function degree(R::QadicField)
-  return ccall((:qadic_ctx_degree, libflint), Int, (Ref{QadicField}, ), R)
+  return @ccall libflint.qadic_ctx_degree(R::Ref{QadicField})::Int
 end
 
 @doc raw"""
@@ -125,8 +123,7 @@ Return the prime $p$ for the given $q$-adic field.
 """
 function prime(R::QadicField)
   z = ZZRingElem()
-  ccall((:padic_ctx_pow_ui, libflint), Nothing,
-        (Ref{ZZRingElem}, UInt, Ref{QadicField}), z, 1, R)
+  @ccall libflint.padic_ctx_pow_ui(z::Ref{ZZRingElem}, 1::UInt, R::Ref{QadicField})::Nothing
   return z
 end
 
@@ -146,7 +143,7 @@ element is divisible by $p^n$ but not a higher power of $q$ then the function
 will return $n$.
 """
 function valuation(a::QadicFieldElem)
-  iszero(a) ? precision(a) : ccall((:qadic_val, libflint), Int, (Ref{QadicFieldElem}, ), a)
+  iszero(a) ? precision(a) : @ccall libflint.qadic_val(a::Ref{QadicFieldElem})::Int
 end
 
 @doc raw"""
@@ -157,8 +154,7 @@ Return a lift of the given $q$-adic field element to $\mathbb{Q}[x]$.
 function lift(R::QQPolyRing, a::QadicFieldElem)
   ctx = parent(a)
   r = R()
-  ccall((:padic_poly_get_fmpq_poly, libflint), Nothing,
-        (Ref{QQPolyRingElem}, Ref{QadicFieldElem}, Ref{QadicField}), r, a, ctx)
+  @ccall libflint.padic_poly_get_fmpq_poly(r::Ref{QQPolyRingElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Nothing
   return r
 end
 
@@ -170,34 +166,30 @@ Return a lift of the given $q$-adic field element to $\mathbb{Z}[x]$ if possible
 function lift(R::ZZPolyRing, a::QadicFieldElem)
   ctx = parent(a)
   r = R()
-  res = Bool(ccall((:padic_poly_get_fmpz_poly, libflint), Cint,
-                   (Ref{ZZPolyRingElem}, Ref{QadicFieldElem}, Ref{QadicField}), r, a, ctx))
+  res = Bool(@ccall libflint.padic_poly_get_fmpz_poly(r::Ref{ZZPolyRingElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Cint)
   !res && error("Unable to lift")
   return r
 end
 
 function zero(R::QadicField; precision::Int=precision(R))
   z = QadicFieldElem(precision)
-  ccall((:qadic_zero, libflint), Nothing, (Ref{QadicFieldElem},), z)
+  @ccall libflint.qadic_zero(z::Ref{QadicFieldElem})::Nothing
   z.parent = R
   return z
 end
 
 function one(R::QadicField; precision::Int=precision(R))
   z = QadicFieldElem(precision)
-  ccall((:qadic_one, libflint), Nothing, (Ref{QadicFieldElem},), z)
+  @ccall libflint.qadic_one(z::Ref{QadicFieldElem})::Nothing
   z.parent = R
   return z
 end
 
-iszero(a::QadicFieldElem) = Bool(ccall((:qadic_is_zero, libflint), Cint,
-                                       (Ref{QadicFieldElem},), a))
+iszero(a::QadicFieldElem) = Bool(@ccall libflint.qadic_is_zero(a::Ref{QadicFieldElem})::Cint)
 
-isone(a::QadicFieldElem) = Bool(ccall((:qadic_is_one, libflint), Cint,
-                                      (Ref{QadicFieldElem},), a))
+isone(a::QadicFieldElem) = Bool(@ccall libflint.qadic_is_one(a::Ref{QadicFieldElem})::Cint)
 
-is_unit(a::QadicFieldElem) = !Bool(ccall((:qadic_is_zero, libflint), Cint,
-                                         (Ref{QadicFieldElem},), a))
+is_unit(a::QadicFieldElem) = !Bool(@ccall libflint.qadic_is_zero(a::Ref{QadicFieldElem})::Cint)
 
 characteristic(R::QadicField) = 0
 
@@ -231,9 +223,7 @@ function expressify(b::QadicFieldElem, x = var(parent(b)); context = nothing)
   sum = Expr(:call, :+)
   c = R(precision = precision(parent(b)))
   for i in degree(parent(b)):-1:0
-    ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
-          (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Int, Ref{QadicField}),
-          c, b, i, parent(b))
+    @ccall libflint.padic_poly_get_coeff_padic(c::Ref{PadicFieldElem}, b::Ref{QadicFieldElem}, i::Int, parent(b)::Ref{QadicField})::Nothing
     ec = expressify(c, context = context)
     if !iszero(c)
       if iszero(i)
@@ -283,9 +273,7 @@ function -(x::QadicFieldElem)
   end
   ctx = parent(x)
   z = QadicFieldElem(x.N)
-  ccall((:qadic_neg, libflint), Nothing,
-        (Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}),
-        z, x, ctx)
+  @ccall libflint.qadic_neg(z::Ref{QadicFieldElem}, x::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Nothing
   z.parent = ctx
   return z
 end
@@ -301,9 +289,7 @@ function +(x::QadicFieldElem, y::QadicFieldElem)
   ctx = parent(x)
   z = QadicFieldElem(min(x.N, y.N))
   z.parent = ctx
-  ccall((:qadic_add, libflint), Nothing,
-        (Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}),
-        z, x, y, ctx)
+  @ccall libflint.qadic_add(z::Ref{QadicFieldElem}, x::Ref{QadicFieldElem}, y::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Nothing
   return z
 end
 
@@ -312,9 +298,7 @@ function -(x::QadicFieldElem, y::QadicFieldElem)
   ctx = parent(x)
   z = QadicFieldElem(min(x.N, y.N))
   z.parent = ctx
-  ccall((:qadic_sub, libflint), Nothing,
-        (Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}),
-        z, x, y, ctx)
+  @ccall libflint.qadic_sub(z::Ref{QadicFieldElem}, x::Ref{QadicFieldElem}, y::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Nothing
   return z
 end
 
@@ -323,9 +307,7 @@ function *(x::QadicFieldElem, y::QadicFieldElem)
   ctx = parent(x)
   z = QadicFieldElem(min(x.N + valuation(y), y.N + valuation(x)))
   z.parent = ctx
-  ccall((:qadic_mul, libflint), Nothing,
-        (Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}),
-        z, x, y, ctx)
+  @ccall libflint.qadic_mul(z::Ref{QadicFieldElem}, x::Ref{QadicFieldElem}, y::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Nothing
   return z
 end
 
@@ -391,11 +373,8 @@ function ==(a::QadicFieldElem, b::QadicFieldElem)
   check_parent(a, b)
   ctx = parent(a)
   z = QadicFieldElem(min(a.N, b.N))
-  ccall((:qadic_sub, libflint), Nothing,
-        (Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}),
-        z, a, b, ctx)
-  return Bool(ccall((:qadic_is_zero, libflint), Cint,
-                    (Ref{QadicFieldElem},), z))
+  @ccall libflint.qadic_sub(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, b::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Nothing
+  return Bool(@ccall libflint.qadic_is_zero(z::Ref{QadicFieldElem})::Cint)
 end
 
 function isequal(a::QadicFieldElem, b::QadicFieldElem)
@@ -442,9 +421,7 @@ function ^(a::QadicFieldElem, n::ZZRingElem)
     z = QadicFieldElem(a.N + (Int(n) - 1)*valuation(a))
   end
   z.parent = ctx
-  ccall((:qadic_pow, libflint), Nothing,
-        (Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{ZZRingElem}, Ref{QadicField}),
-        z, a, n, ctx)
+  @ccall libflint.qadic_pow(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, n::Ref{ZZRingElem}, ctx::Ref{QadicField})::Nothing
   return z
 end
 
@@ -488,8 +465,7 @@ function inv(a::QadicFieldElem)
   ctx = parent(a)
   z = QadicFieldElem(a.N - 2*valuation(a))
   z.parent = ctx
-  ccall((:qadic_inv, libflint), Cint,
-        (Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}), z, a, ctx)
+  @ccall libflint.qadic_inv(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Cint
   return z
 end
 
@@ -537,8 +513,7 @@ function Base.sqrt(a::QadicFieldElem; check::Bool=true)
   ctx = parent(a)
   z = QadicFieldElem(a.N - div(av, 2))
   z.parent = ctx
-  res = Bool(ccall((:qadic_sqrt, libflint), Cint,
-                   (Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}), z, a, ctx))
+  res = Bool(@ccall libflint.qadic_sqrt(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Cint)
   check && !res && error("Square root of p-adic does not exist")
   return z
 end
@@ -560,8 +535,7 @@ function Base.exp(a::QadicFieldElem)
   ctx = parent(a)
   z = QadicFieldElem(a.N)
   z.parent = ctx
-  res = Bool(ccall((:qadic_exp, libflint), Cint,
-                   (Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}), z, a, ctx))
+  res = Bool(@ccall libflint.qadic_exp(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Cint)
   !res && error("Unable to compute exponential")
   return z
 end
@@ -585,8 +559,7 @@ function log(a::QadicFieldElem)
   ctx = parent(a)
   z = QadicFieldElem(a.N)
   z.parent = ctx
-  res = Bool(ccall((:qadic_log, libflint), Cint,
-                   (Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}), z, a, ctx))
+  res = Bool(@ccall libflint.qadic_log(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Cint)
   !res && error("Unable to compute logarithm")
   if av == 0
     z = divexact(z, qm1)
@@ -608,8 +581,7 @@ function teichmuller(a::QadicFieldElem)
   ctx = parent(a)
   z = QadicFieldElem(a.N)
   z.parent = ctx
-  ccall((:qadic_teichmuller, libflint), Nothing,
-        (Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}), z, a, ctx)
+  @ccall libflint.qadic_teichmuller(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Nothing
   return z
 end
 
@@ -623,8 +595,7 @@ function frobenius(a::QadicFieldElem, e::Int = 1)
   ctx = parent(a)
   z = QadicFieldElem(a.N)
   z.parent = ctx
-  ccall((:qadic_frobenius, libflint), Nothing,
-        (Ref{QadicFieldElem}, Ref{QadicFieldElem}, Int, Ref{QadicField}), z, a, e, ctx)
+  @ccall libflint.qadic_frobenius(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, e::Int, ctx::Ref{QadicField})::Nothing
   return z
 end
 
@@ -637,26 +608,21 @@ end
 function zero!(z::QadicFieldElem; precision::Int=precision(parent(z)))
   z.N = precision
   ctx = parent(z)
-  ccall((:qadic_zero, libflint), Nothing,
-        (Ref{QadicFieldElem}, Ref{QadicField}), z, ctx)
+  @ccall libflint.qadic_zero(z::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Nothing
   return z
 end
 
 function mul!(z::QadicFieldElem, x::QadicFieldElem, y::QadicFieldElem)
   z.N = min(x.N + valuation(y), y.N + valuation(x))
   ctx = parent(x)
-  ccall((:qadic_mul, libflint), Nothing,
-        (Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}),
-        z, x, y, ctx)
+  @ccall libflint.qadic_mul(z::Ref{QadicFieldElem}, x::Ref{QadicFieldElem}, y::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Nothing
   return z
 end
 
 function add!(z::QadicFieldElem, x::QadicFieldElem, y::QadicFieldElem)
   z.N = min(x.N, y.N)
   ctx = parent(x)
-  ccall((:qadic_add, libflint), Nothing,
-        (Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}),
-        z, x, y, ctx)
+  @ccall libflint.qadic_add(z::Ref{QadicFieldElem}, x::Ref{QadicFieldElem}, y::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Nothing
   return z
 end
 
@@ -668,13 +634,13 @@ end
 
 function tr(r::QadicFieldElem)
   t = base_field(parent(r))()
-  ccall((:qadic_trace, libflint), Nothing, (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}), t, r, parent(r))
+  @ccall libflint.qadic_trace(t::Ref{PadicFieldElem}, r::Ref{QadicFieldElem}, parent(r)::Ref{QadicField})::Nothing
   return t
 end
 
 function norm(r::QadicFieldElem)
   t = base_field(parent(r))()
-  ccall((:qadic_norm, libflint), Nothing, (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}), t, r, parent(r))
+  @ccall libflint.qadic_norm(t::Ref{PadicFieldElem}, r::Ref{QadicFieldElem}, parent(r)::Ref{QadicField})::Nothing
   return t
 end
 
@@ -708,8 +674,7 @@ end
 
 function gen(R::QadicField; precision::Int=precision(R))
   z = QadicFieldElem(precision)
-  ccall((:qadic_gen, libflint), Nothing,
-        (Ref{QadicFieldElem}, Ref{QadicField}), z, R)
+  @ccall libflint.qadic_gen(z::Ref{QadicFieldElem}, R::Ref{QadicField})::Nothing
   z.parent = R
   return z
 end
@@ -722,8 +687,7 @@ function (R::QadicField)(a::UInt; precision::Int=precision(R))
   end
   v = valuation(a, prime(R))
   z = QadicFieldElem(precision + v)
-  ccall((:qadic_set_ui, libflint), Nothing,
-        (Ref{QadicFieldElem}, UInt, Ref{QadicField}), z, a, R)
+  @ccall libflint.qadic_set_ui(z::Ref{QadicFieldElem}, a::UInt, R::Ref{QadicField})::Nothing
   z.parent = R
   return z
 end
@@ -736,8 +700,7 @@ function (R::QadicField)(a::Int; precision::Int=precision(R))
   end
   v = valuation(a, prime(R))
   z = QadicFieldElem(precision + v)
-  ccall((:padic_poly_set_si, libflint), Nothing,
-        (Ref{QadicFieldElem}, Int, Ref{QadicField}), z,a, R)
+  @ccall libflint.padic_poly_set_si(z::Ref{QadicFieldElem}, a::Int, R::Ref{QadicField})::Nothing
   z.parent = R
   return z
 end
@@ -750,8 +713,7 @@ function (R::QadicField)(n::ZZRingElem; precision::Int=precision(R))
     N = valuation(n, p)
   end
   z = QadicFieldElem(N + precision)
-  ccall((:padic_poly_set_fmpz, libflint), Nothing,
-        (Ref{QadicFieldElem}, Ref{ZZRingElem}, Ref{QadicField}), z, n, R)
+  @ccall libflint.padic_poly_set_fmpz(z::Ref{QadicFieldElem}, n::Ref{ZZRingElem}, R::Ref{QadicField})::Nothing
   z.parent = R
   return z
 end
@@ -768,16 +730,14 @@ function (R::QadicField)(n::QQFieldElem; precision::Int=precision(R))
     N = -remove(m, p)[1]
   end
   z = QadicFieldElem(N + precision)
-  ccall((:padic_poly_set_fmpq, libflint), Nothing,
-        (Ref{QadicFieldElem}, Ref{QQFieldElem}, Ref{QadicField}), z, n, R)
+  @ccall libflint.padic_poly_set_fmpq(z::Ref{QadicFieldElem}, n::Ref{QQFieldElem}, R::Ref{QadicField})::Nothing
   z.parent = R
   return z
 end
 
 function (R::QadicField)(n::ZZPolyRingElem; precision::Int=precision(R))
   z = QadicFieldElem(precision)
-  ccall((:qadic_set_fmpz_poly, libflint), Nothing,
-        (Ref{QadicFieldElem}, Ref{ZZPolyRingElem}, Ref{QadicField}), z, n, R)
+  @ccall libflint.qadic_set_fmpz_poly(z::Ref{QadicFieldElem}, n::Ref{ZZPolyRingElem}, R::Ref{QadicField})::Nothing
   z.parent = R
   return z
 end
@@ -795,8 +755,7 @@ function (R::QadicField)(n::QQPolyRingElem; precision::Int=precision(R))
     N = -remove(m, p)[1]
   end
   z = QadicFieldElem(N + precision)
-  ccall((:padic_poly_set_fmpq_poly, libflint), Nothing,
-        (Ref{QadicFieldElem}, Ref{QQPolyRingElem}, Ref{QadicField}), z, n, R)
+  @ccall libflint.padic_poly_set_fmpq_poly(z::Ref{QadicFieldElem}, n::Ref{QQPolyRingElem}, R::Ref{QadicField})::Nothing
   z.parent = R
   return z
 end
@@ -825,8 +784,7 @@ function (Rx::Generic.PolyRing{PadicFieldElem})(a::QadicFieldElem)
   coeffs = Vector{PadicFieldElem}(undef, degree(Qq))
   for i = 1:length(coeffs)
     c = R()
-    ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
-          (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Int, Ref{QadicField}), c, a, i - 1, parent(a))
+    @ccall libflint.padic_poly_get_coeff_padic(c::Ref{PadicFieldElem}, a::Ref{QadicFieldElem}, (i - 1)::Int, parent(a)::Ref{QadicField})::Nothing
     coeffs[i] = c
   end
   return Rx(coeffs)
@@ -835,14 +793,12 @@ end
 function coeff(x::QadicFieldElem, i::Int)
   R = base_field(parent(x))
   c = R()
-  ccall((:padic_poly_get_coeff_padic, libflint), Nothing,
-        (Ref{PadicFieldElem}, Ref{QadicFieldElem}, Int, Ref{QadicField}), c, x, i, parent(x))
+  @ccall libflint.padic_poly_get_coeff_padic(c::Ref{PadicFieldElem}, x::Ref{QadicFieldElem}, i::Int, parent(x)::Ref{QadicField})::Nothing
   return c
 end
 
 function setcoeff!(x::QadicFieldElem, i::Int, y::PadicFieldElem)
-  ccall((:padic_poly_set_coeff_padic, libflint), Nothing,
-        (Ref{QadicFieldElem}, Int, Ref{PadicFieldElem}, Ref{QadicField}), x, i, y, parent(x))
+  @ccall libflint.padic_poly_set_coeff_padic(x::Ref{QadicFieldElem}, i::Int, y::Ref{PadicFieldElem}, parent(x)::Ref{QadicField})::Nothing
 end
 
 function setcoeff!(x::QadicFieldElem, i::Int, y::UInt)
@@ -852,8 +808,7 @@ end
 function setcoeff!(x::QadicFieldElem, i::Int, y::ZZRingElem)
   R = base_field(parent(x))
   Y = R(ZZRingElem(y))
-  ccall((:padic_poly_set_coeff_padic, libflint), Nothing,
-        (Ref{QadicFieldElem}, Int, Ref{PadicFieldElem}, Ref{QadicField}), x, i, Y, parent(x))
+  @ccall libflint.padic_poly_set_coeff_padic(x::Ref{QadicFieldElem}, i::Int, Y::Ref{PadicFieldElem}, parent(x)::Ref{QadicField})::Nothing
 end
 
 Base.length(a::QadicFieldElem) = a.length
@@ -915,13 +870,13 @@ precision(Q::QadicField) = Q.prec_max
 function Base.setprecision(q::QadicFieldElem, N::Int)
   r = parent(q)()
   r.N = N
-  ccall((:padic_poly_set, libflint), Nothing, (Ref{QadicFieldElem}, Ref{QadicFieldElem}, Ref{QadicField}), r, q, parent(q))
+  @ccall libflint.padic_poly_set(r::Ref{QadicFieldElem}, q::Ref{QadicFieldElem}, parent(q)::Ref{QadicField})::Nothing
   return r
 end
 
 function setprecision!(q::QadicFieldElem, N::Int)
   q.N = N
-  ccall((:qadic_reduce, libflint), Nothing, (Ref{QadicFieldElem}, Ref{QadicField}), q, parent(q))
+  @ccall libflint.qadic_reduce(q::Ref{QadicFieldElem}, parent(q)::Ref{QadicField})::Nothing
   return q
 end
 

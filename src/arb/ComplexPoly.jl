@@ -16,12 +16,10 @@ elem_type(::Type{ComplexPolyRing}) = ComplexPolyRingElem
 
 dense_poly_type(::Type{ComplexFieldElem}) = ComplexPolyRingElem
 
-length(x::ComplexPolyRingElem) = ccall((:acb_poly_length, libflint), Int,
-                               (Ref{ComplexPolyRingElem},), x)
+length(x::ComplexPolyRingElem) = @ccall libflint.acb_poly_length(x::Ref{ComplexPolyRingElem})::Int
 
 function set_length!(x::ComplexPolyRingElem, n::Int)
-  ccall((:_acb_poly_set_length, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Int), x, n)
+  @ccall libflint._acb_poly_set_length(x::Ref{ComplexPolyRingElem}, n::Int)::Nothing
   return x
 end
 
@@ -30,8 +28,7 @@ degree(x::ComplexPolyRingElem) = length(x) - 1
 function coeff(a::ComplexPolyRingElem, n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
   t = ComplexFieldElem()
-  ccall((:acb_poly_get_coeff_acb, libflint), Nothing,
-        (Ref{ComplexFieldElem}, Ref{ComplexPolyRingElem}, Int), t, a, n)
+  @ccall libflint.acb_poly_get_coeff_acb(t::Ref{ComplexFieldElem}, a::Ref{ComplexPolyRingElem}, n::Int)::Nothing
   return t
 end
 
@@ -108,8 +105,7 @@ end
 ###############################################################################
 
 function isequal(x::ComplexPolyRingElem, y::ComplexPolyRingElem)
-  return ccall((:acb_poly_equal, libflint), Bool,
-               (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}), x, y)
+  return @ccall libflint.acb_poly_equal(x::Ref{ComplexPolyRingElem}, y::Ref{ComplexPolyRingElem})::Bool
 end
 
 @doc raw"""
@@ -119,8 +115,7 @@ Return `true` if the coefficient boxes of $x$ overlap the coefficient boxes
 of $y$, otherwise return `false`.
 """
 function overlaps(x::ComplexPolyRingElem, y::ComplexPolyRingElem)
-  return ccall((:acb_poly_overlaps, libflint), Bool,
-               (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}), x, y)
+  return @ccall libflint.acb_poly_overlaps(x::Ref{ComplexPolyRingElem}, y::Ref{ComplexPolyRingElem})::Bool
 end
 
 @doc raw"""
@@ -130,8 +125,7 @@ Return `true` if the coefficient boxes of $x$ contain the corresponding
 coefficient boxes of $y$, otherwise return `false`.
 """
 function contains(x::ComplexPolyRingElem, y::ComplexPolyRingElem)
-  return ccall((:acb_poly_contains, libflint), Bool,
-               (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}), x, y)
+  return @ccall libflint.acb_poly_contains(x::Ref{ComplexPolyRingElem}, y::Ref{ComplexPolyRingElem})::Bool
 end
 
 @doc raw"""
@@ -141,8 +135,7 @@ Return `true` if the coefficient boxes of $x$ contain the corresponding
 exact coefficients of $y$, otherwise return `false`.
 """
 function contains(x::ComplexPolyRingElem, y::ZZPolyRingElem)
-  return ccall((:acb_poly_contains_fmpz_poly, libflint), Bool,
-               (Ref{ComplexPolyRingElem}, Ref{ZZPolyRingElem}), x, y)
+  return @ccall libflint.acb_poly_contains_fmpz_poly(x::Ref{ComplexPolyRingElem}, y::Ref{ZZPolyRingElem})::Bool
 end
 
 @doc raw"""
@@ -152,8 +145,7 @@ Return `true` if the coefficient boxes of $x$ contain the corresponding
 exact coefficients of $y$, otherwise return `false`.
 """
 function contains(x::ComplexPolyRingElem, y::QQPolyRingElem)
-  return ccall((:acb_poly_contains_fmpq_poly, libflint), Bool,
-               (Ref{ComplexPolyRingElem}, Ref{QQPolyRingElem}), x, y)
+  return @ccall libflint.acb_poly_contains_fmpq_poly(x::Ref{ComplexPolyRingElem}, y::Ref{QQPolyRingElem})::Bool
 end
 
 function ==(x::ComplexPolyRingElem, y::ComplexPolyRingElem)
@@ -186,13 +178,12 @@ in case it is, otherwise sets $t$ to `false`.
 """
 function unique_integer(x::ComplexPolyRingElem)
   z = ZZPolyRing(ZZ, var(parent(x)))()
-  unique = ccall((:acb_poly_get_unique_fmpz_poly, libflint), Int,
-                 (Ref{ZZPolyRingElem}, Ref{ComplexPolyRingElem}), z, x)
+  unique = @ccall libflint.acb_poly_get_unique_fmpz_poly(z::Ref{ZZPolyRingElem}, x::Ref{ComplexPolyRingElem})::Int
   return (unique != 0, z)
 end
 
 function isreal(x::ComplexPolyRingElem)
-  return ccall((:acb_poly_is_real, libflint), Cint, (Ref{ComplexPolyRingElem}, ), x) != 0
+  return @ccall libflint.acb_poly_is_real(x::Ref{ComplexPolyRingElem})::Cint != 0
 end
 
 ###############################################################################
@@ -204,16 +195,14 @@ end
 function shift_left(x::ComplexPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Shift must be non-negative"))
   z = parent(x)()
-  ccall((:acb_poly_shift_left, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Int), z, x, len)
+  @ccall libflint.acb_poly_shift_left(z::Ref{ComplexPolyRingElem}, x::Ref{ComplexPolyRingElem}, len::Int)::Nothing
   return z
 end
 
 function shift_right(x::ComplexPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Shift must be non-negative"))
   z = parent(x)()
-  ccall((:acb_poly_shift_right, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Int), z, x, len)
+  @ccall libflint.acb_poly_shift_right(z::Ref{ComplexPolyRingElem}, x::Ref{ComplexPolyRingElem}, len::Int)::Nothing
   return z
 end
 
@@ -249,9 +238,7 @@ end
 function ^(x::ComplexPolyRingElem, y::Int)
   y < 0 && throw(DomainError(y, "Exponent must be non-negative"))
   z = parent(x)()
-  ccall((:acb_poly_pow_ui, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, UInt, Int),
-        z, x, y, precision(Balls))
+  @ccall libflint.acb_poly_pow_ui(z::Ref{ComplexPolyRingElem}, x::Ref{ComplexPolyRingElem}, y::UInt, precision(Balls)::Int)::Nothing
   return z
 end
 
@@ -335,17 +322,14 @@ function truncate(a::ComplexPolyRingElem, n::Int)
   end
   # todo: implement set_trunc in ArbFieldElem
   z = deepcopy(a)
-  ccall((:acb_poly_truncate, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Int), z, n)
+  @ccall libflint.acb_poly_truncate(z::Ref{ComplexPolyRingElem}, n::Int)::Nothing
   return z
 end
 
 function mullow(x::ComplexPolyRingElem, y::ComplexPolyRingElem, n::Int, prec::Int = precision(Balls))
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
   z = parent(x)()
-  ccall((:acb_poly_mullow, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Int, Int),
-        z, x, y, n, prec)
+  @ccall libflint.acb_poly_mullow(z::Ref{ComplexPolyRingElem}, x::Ref{ComplexPolyRingElem}, y::Ref{ComplexPolyRingElem}, n::Int, prec::Int)::Nothing
   return z
 end
 
@@ -371,9 +355,7 @@ end
 
 function evaluate(x::ComplexPolyRingElem, y::ComplexFieldElem, prec::Int = precision(Balls))
   z = parent(y)()
-  ccall((:acb_poly_evaluate, libflint), Nothing,
-        (Ref{ComplexFieldElem}, Ref{ComplexPolyRingElem}, Ref{ComplexFieldElem}, Int),
-        z, x, y, prec)
+  @ccall libflint.acb_poly_evaluate(z::Ref{ComplexFieldElem}, x::Ref{ComplexPolyRingElem}, y::Ref{ComplexFieldElem}, prec::Int)::Nothing
   return z
 end
 
@@ -392,9 +374,7 @@ its derivative evaluated at $y$.
 function evaluate2(x::ComplexPolyRingElem, y::ComplexFieldElem, prec::Int = precision(Balls))
   z = ComplexFieldElem()
   w = ComplexFieldElem()
-  ccall((:acb_poly_evaluate2, libflint), Nothing,
-        (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ComplexPolyRingElem}, Ref{ComplexFieldElem}, Int),
-        z, w, x, y, prec)
+  @ccall libflint.acb_poly_evaluate2(z::Ref{ComplexFieldElem}, w::Ref{ComplexFieldElem}, x::Ref{ComplexPolyRingElem}, y::Ref{ComplexFieldElem}, prec::Int)::Nothing
   return z, w
 end
 
@@ -414,9 +394,7 @@ function compose(x::ComplexPolyRingElem, y::ComplexPolyRingElem, prec::Int = pre
   end
   @assert inner == :second
   z = parent(x)()
-  ccall((:acb_poly_compose, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Int),
-        z, x, y, prec)
+  @ccall libflint.acb_poly_compose(z::Ref{ComplexPolyRingElem}, x::Ref{ComplexPolyRingElem}, y::Ref{ComplexPolyRingElem}, prec::Int)::Nothing
   return z
 end
 
@@ -428,15 +406,13 @@ end
 
 function derivative(x::ComplexPolyRingElem, prec::Int = precision(Balls))
   z = parent(x)()
-  ccall((:acb_poly_derivative, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Int), z, x, prec)
+  @ccall libflint.acb_poly_derivative(z::Ref{ComplexPolyRingElem}, x::Ref{ComplexPolyRingElem}, prec::Int)::Nothing
   return z
 end
 
 function integral(x::ComplexPolyRingElem, prec::Int = precision(Balls))
   z = parent(x)()
-  ccall((:acb_poly_integral, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Int), z, x, prec)
+  @ccall libflint.acb_poly_integral(z::Ref{ComplexPolyRingElem}, x::Ref{ComplexPolyRingElem}, prec::Int)::Nothing
   return z
 end
 
@@ -447,11 +423,11 @@ end
 ###############################################################################
 
 function acb_vec(n::Int)
-  return ccall((:_acb_vec_init, libflint), Ptr{acb_struct}, (Int,), n)
+  return @ccall libflint._acb_vec_init(n::Int)::Ptr{acb_struct}
 end
 
 function acb_vec(b::Vector{ComplexFieldElem})
-  v = ccall((:_acb_vec_init, libflint), Ptr{acb_struct}, (Int,), length(b))
+  v = @ccall libflint._acb_vec_init(length(b)::Int)::Ptr{acb_struct}
   for i in 1:length(b)
     _acb_set(v + (i-1)*sizeof(acb_struct), b[i])
   end
@@ -468,7 +444,7 @@ function array(R::ComplexField, v::Ptr{acb_struct}, n::Int)
 end
 
 function acb_vec_clear(v::Ptr{acb_struct}, n::Int)
-  ccall((:_acb_vec_clear, libflint), Nothing, (Ptr{acb_struct}, Int), v, n)
+  @ccall libflint._acb_vec_clear(v::Ptr{acb_struct}, n::Int)::Nothing
 end
 
 @doc raw"""
@@ -479,8 +455,7 @@ Construct a polynomial in the given polynomial ring from a list of its roots.
 function from_roots(R::ComplexPolyRing, b::Vector{ComplexFieldElem}, prec::Int = precision(Balls))
   z = R()
   tmp = acb_vec(b)
-  ccall((:acb_poly_product_roots, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Ptr{acb_struct}, Int, Int), z, tmp, length(b), prec)
+  @ccall libflint.acb_poly_product_roots(z::Ref{ComplexPolyRingElem}, tmp::Ptr{acb_struct}, length(b)::Int, prec::Int)::Nothing
   acb_vec_clear(tmp, length(b))
   return z
 end
@@ -491,9 +466,7 @@ end
 
 function evaluate_fast(x::ComplexPolyRingElem, b::Vector{ComplexFieldElem}, prec::Int = precision(Balls))
   tmp = acb_vec(b)
-  ccall((:acb_poly_evaluate_vec_fast, libflint), Nothing,
-        (Ptr{acb_struct}, Ref{ComplexPolyRingElem}, Ptr{acb_struct}, Int, Int),
-        tmp, x, tmp, length(b), prec)
+  @ccall libflint.acb_poly_evaluate_vec_fast(tmp::Ptr{acb_struct}, x::Ref{ComplexPolyRingElem}, tmp::Ptr{acb_struct}, length(b)::Int, prec::Int)::Nothing
   res = array(base_ring(parent(x)), tmp, length(b))
   acb_vec_clear(tmp, length(b))
   return res
@@ -504,9 +477,7 @@ function interpolate_newton(R::ComplexPolyRing, xs::Vector{ComplexFieldElem}, ys
   z = R()
   xsv = acb_vec(xs)
   ysv = acb_vec(ys)
-  ccall((:acb_poly_interpolate_newton, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Ptr{acb_struct}, Ptr{acb_struct}, Int, Int),
-        z, xsv, ysv, length(xs), prec)
+  @ccall libflint.acb_poly_interpolate_newton(z::Ref{ComplexPolyRingElem}, xsv::Ptr{acb_struct}, ysv::Ptr{acb_struct}, length(xs)::Int, prec::Int)::Nothing
   acb_vec_clear(xsv, length(xs))
   acb_vec_clear(ysv, length(ys))
   return z
@@ -517,9 +488,7 @@ function interpolate_barycentric(R::ComplexPolyRing, xs::Vector{ComplexFieldElem
   z = R()
   xsv = acb_vec(xs)
   ysv = acb_vec(ys)
-  ccall((:acb_poly_interpolate_barycentric, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Ptr{acb_struct}, Ptr{acb_struct}, Int, Int),
-        z, xsv, ysv, length(xs), prec)
+  @ccall libflint.acb_poly_interpolate_barycentric(z::Ref{ComplexPolyRingElem}, xsv::Ptr{acb_struct}, ysv::Ptr{acb_struct}, length(xs)::Int, prec::Int)::Nothing
   acb_vec_clear(xsv, length(xs))
   acb_vec_clear(ysv, length(ys))
   return z
@@ -530,9 +499,7 @@ function interpolate_fast(R::ComplexPolyRing, xs::Vector{ComplexFieldElem}, ys::
   z = R()
   xsv = acb_vec(xs)
   ysv = acb_vec(ys)
-  ccall((:acb_poly_interpolate_fast, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Ptr{acb_struct}, Ptr{acb_struct}, Int, Int),
-        z, xsv, ysv, length(xs), prec)
+  @ccall libflint.acb_poly_interpolate_fast(z::Ref{ComplexPolyRingElem}, xsv::Ptr{acb_struct}, ysv::Ptr{acb_struct}, length(xs)::Int, prec::Int)::Nothing
   acb_vec_clear(xsv, length(xs))
   acb_vec_clear(ysv, length(ys))
   return z
@@ -586,9 +553,7 @@ function roots(x::ComplexPolyRingElem; target=0, isolate_real=false, initial_pre
   while true
     in_roots = (wp == initial_prec) ? C_NULL : roots
     step_max_iter = (max_iter >= 1) ? max_iter : min(max(deg, 32), wp)
-    isolated = ccall((:acb_poly_find_roots, libflint), Int,
-                     (Ptr{acb_struct}, Ref{ComplexPolyRingElem}, Ptr{acb_struct}, Int, Int),
-                     roots, x, in_roots, step_max_iter, wp)
+    isolated = @ccall libflint.acb_poly_find_roots(roots::Ptr{acb_struct}, x::Ref{ComplexPolyRingElem}, in_roots::Ptr{acb_struct}, step_max_iter::Int, wp::Int)::Int
 
     wp = wp * 2
 
@@ -608,8 +573,7 @@ function roots(x::ComplexPolyRingElem; target=0, isolate_real=false, initial_pre
       end
 
       if isreal(x)
-        real_ok = ccall((:acb_poly_validate_real_roots, libflint),
-                        Bool, (Ptr{acb_struct}, Ref{ComplexPolyRingElem}, Int), roots, x, wp)
+        real_ok = @ccall libflint.acb_poly_validate_real_roots(roots::Ptr{acb_struct}, x::Ref{ComplexPolyRingElem}, wp::Int)::Bool
 
         if isolate_real && !real_ok
           ok = false
@@ -618,8 +582,8 @@ function roots(x::ComplexPolyRingElem; target=0, isolate_real=false, initial_pre
         if real_ok
           for i = 0 : deg - 1
             im = _imag_ptr(roots + i * sizeof(acb_struct))
-            if ccall((:arb_contains_zero, libflint), Bool, (Ptr{arb_struct}, ), im)
-              ccall((:arb_zero, libflint), Nothing, (Ptr{arb_struct}, ), im)
+            if @ccall libflint.arb_contains_zero(im::Ptr{arb_struct})::Bool
+              @ccall libflint.arb_zero(im::Ptr{arb_struct})::Nothing
             end
           end
         end
@@ -636,8 +600,7 @@ function roots(x::ComplexPolyRingElem; target=0, isolate_real=false, initial_pre
   end
 
   if isolated == deg
-    ccall((:_acb_vec_sort_pretty, libflint), Nothing,
-          (Ptr{acb_struct}, Int), roots, deg)
+    @ccall libflint._acb_vec_sort_pretty(roots::Ptr{acb_struct}, deg::Int)::Nothing
     res = array(base_ring(parent(x)), roots, deg)
   end
 
@@ -666,13 +629,11 @@ function roots_upper_bound(x::ComplexPolyRingElem)
   p = precision(Balls)
   GC.@preserve x z begin
     t = _rad_ptr(z)
-    ccall((:acb_poly_root_bound_fujiwara, libflint), Nothing,
-          (Ptr{mag_struct}, Ref{ComplexPolyRingElem}), t, x)
+    @ccall libflint.acb_poly_root_bound_fujiwara(t::Ptr{mag_struct}, x::Ref{ComplexPolyRingElem})::Nothing
     s = _mid_ptr(z)
-    ccall((:arf_set_mag, libflint), Nothing, (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
-    ccall((:arf_set_round, libflint), Nothing,
-          (Ptr{arf_struct}, Ptr{arf_struct}, Int, Cint), s, s, p, ARB_RND_CEIL)
-    ccall((:mag_zero, libflint), Nothing, (Ptr{mag_struct},), t)
+    @ccall libflint.arf_set_mag(s::Ptr{arf_struct}, t::Ptr{mag_struct})::Nothing
+    @ccall libflint.arf_set_round(s::Ptr{arf_struct}, s::Ptr{arf_struct}, p::Int, ARB_RND_CEIL::Cint)::Nothing
+    @ccall libflint.mag_zero(t::Ptr{mag_struct})::Nothing
   end
   return z
 end
@@ -699,20 +660,17 @@ function neg!(z::ComplexPolyRingElemOrPtr, a::ComplexPolyRingElemOrPtr)
 end
 
 function fit!(z::ComplexPolyRingElem, n::Int)
-  ccall((:acb_poly_fit_length, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Int), z, n)
+  @ccall libflint.acb_poly_fit_length(z::Ref{ComplexPolyRingElem}, n::Int)::Nothing
   return nothing
 end
 
 function setcoeff!(z::ComplexPolyRingElem, n::Int, x::ComplexFieldElem)
-  ccall((:acb_poly_set_coeff_acb, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Int, Ref{ComplexFieldElem}), z, n, x)
+  @ccall libflint.acb_poly_set_coeff_acb(z::Ref{ComplexPolyRingElem}, n::Int, x::Ref{ComplexFieldElem})::Nothing
   return z
 end
 
 function setcoeff!(z::ComplexPolyRingElem, n::Int, x::Int)
-  ccall((:acb_poly_set_coeff_si, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Int, Int), z, n, x)
+  @ccall libflint.acb_poly_set_coeff_si(z::Ref{ComplexPolyRingElem}, n::Int, x::Int)::Nothing
   return z
 end
 
@@ -725,16 +683,12 @@ setcoeff!(z::ComplexPolyRingElem, n::Int, x::Integer) = setcoeff!(z, n, flintify
 #
 
 function add!(z::ComplexPolyRingElem, x::ComplexPolyRingElem, y::ComplexPolyRingElem)
-  ccall((:acb_poly_add, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Int),
-        z, x, y, precision(Balls))
+  @ccall libflint.acb_poly_add(z::Ref{ComplexPolyRingElem}, x::Ref{ComplexPolyRingElem}, y::Ref{ComplexPolyRingElem}, precision(Balls)::Int)::Nothing
   return z
 end
 
 function add!(z::ComplexPolyRingElem, x::ComplexPolyRingElem, y::Int)
-  ccall((:acb_poly_add_si, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Int, Int),
-        z, x, y, precision(Balls))
+  @ccall libflint.acb_poly_add_si(z::Ref{ComplexPolyRingElem}, x::Ref{ComplexPolyRingElem}, y::Int, precision(Balls)::Int)::Nothing
   return z
 end
 
@@ -749,9 +703,7 @@ add!(z::ComplexPolyRingElem, x::Union{ComplexFieldElem,IntegerUnion}, y::Complex
 #
 
 function sub!(z::ComplexPolyRingElem, x::ComplexPolyRingElem, y::ComplexPolyRingElem)
-  ccall((:acb_poly_sub, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Int),
-        z, x, y, precision(Balls))
+  @ccall libflint.acb_poly_sub(z::Ref{ComplexPolyRingElem}, x::Ref{ComplexPolyRingElem}, y::Ref{ComplexPolyRingElem}, precision(Balls)::Int)::Nothing
   return z
 end
 
@@ -762,16 +714,12 @@ sub!(z::ComplexPolyRingElem, x::Union{ComplexFieldElem,IntegerUnion}, y::Complex
 #
 
 function mul!(z::ComplexPolyRingElem, x::ComplexPolyRingElem, y::ComplexPolyRingElem)
-  ccall((:acb_poly_mul, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Int),
-        z, x, y, precision(Balls))
+  @ccall libflint.acb_poly_mul(z::Ref{ComplexPolyRingElem}, x::Ref{ComplexPolyRingElem}, y::Ref{ComplexPolyRingElem}, precision(Balls)::Int)::Nothing
   return z
 end
 
 function mul!(z::ComplexPolyRingElem, x::ComplexPolyRingElem, y::ComplexFieldElem)
-  ccall((:acb_poly_scalar_mul, libflint), Nothing,
-        (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Ref{ComplexFieldElem}, Int),
-        z, x, y, precision(Balls))
+  @ccall libflint.acb_poly_scalar_mul(z::Ref{ComplexPolyRingElem}, x::Ref{ComplexPolyRingElem}, y::Ref{ComplexFieldElem}, precision(Balls)::Int)::Nothing
   return z
 end
 

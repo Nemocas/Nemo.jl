@@ -161,8 +161,7 @@ end
 
 # ni needs to be an 'inverse' of n computing using :n_preinvert_limb in flint
 function mulmod(a::UInt, b::UInt, n::UInt, ni::UInt)
-  return ccall((:n_mulmod2_preinv, libflint), UInt,
-               (UInt, UInt, UInt, UInt), a, b, n, ni)
+  return @ccall libflint.n_mulmod2_preinv(a::UInt, b::UInt, n::UInt, ni::UInt)::UInt
 end
 
 function *(x::zzModRingElem, y::zzModRingElem)
@@ -226,8 +225,7 @@ function ^(x::zzModRingElem, y::Int)
     x = inv(x)
     y = -y
   end
-  d = ccall((:n_powmod2_preinv, libflint), UInt, (UInt, Int, UInt, UInt),
-            UInt(x.data), y, R.n, R.ninv)
+  d = @ccall libflint.n_powmod2_preinv(UInt(x.data)::UInt, y::Int, R.n::UInt, R.ninv::UInt)::UInt
   return zzModRingElem(d, R)
 end
 
@@ -270,8 +268,7 @@ function inv(x::zzModRingElem)
   end
   #s = [UInt(0)]
   s = Ref{UInt}()
-  g = ccall((:n_gcdinv, libflint), UInt, (Ptr{UInt}, UInt, UInt),
-            s, x.data, R.n)
+  g = @ccall libflint.n_gcdinv(s::Ptr{UInt}, x.data::UInt, R.n::UInt)::UInt
   g != 1 && error("Impossible inverse in ", R)
   return zzModRingElem(s[], R)
 end
@@ -421,8 +418,7 @@ function (R::zzModRing)(a::Int)
     d += n
   end
   if d >= n
-    d = ccall((:n_mod2_preinv, libflint), UInt, (UInt, UInt, UInt),
-              d, n, ninv)
+    d = @ccall libflint.n_mod2_preinv(d::UInt, n::UInt, ninv::UInt)::UInt
   end
   return zzModRingElem(d, R)
 end
@@ -430,14 +426,12 @@ end
 function (R::zzModRing)(a::UInt)
   n = R.n
   ninv = R.ninv
-  a = ccall((:n_mod2_preinv, libflint), UInt, (UInt, UInt, UInt),
-            a, n, ninv)
+  a = @ccall libflint.n_mod2_preinv(a::UInt, n::UInt, ninv::UInt)::UInt
   return zzModRingElem(a, R)
 end
 
 function (R::zzModRing)(a::ZZRingElem)
-  d = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt),
-            a, R.n)
+  d = @ccall libflint.fmpz_fdiv_ui(a::Ref{ZZRingElem}, R.n::UInt)::UInt
   return zzModRingElem(d, R)
 end
 
