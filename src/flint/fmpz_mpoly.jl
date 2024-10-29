@@ -426,7 +426,7 @@ end
 
 function Base.isless(a::ZZMPolyRingElem, b::ZZMPolyRingElem)
   (!is_monomial(a) || !is_monomial(b)) && error("Not monomials in comparison")
-  return @ccall libflint.fmpz_mpoly_cmp(a::Ref{ZZMPolyRingElem}, b::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Cint < 0
+  return (@ccall libflint.fmpz_mpoly_cmp(a::Ref{ZZMPolyRingElem}, b::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Cint) < 0
 end
 
 ###############################################################################

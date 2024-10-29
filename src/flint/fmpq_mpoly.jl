@@ -435,7 +435,7 @@ end
 
 function Base.isless(a::QQMPolyRingElem, b::QQMPolyRingElem)
   (!is_monomial(a) || !is_monomial(b)) && error("Not monomials in comparison")
-  return @ccall libflint.fmpq_mpoly_cmp(a::Ref{QQMPolyRingElem}, b::Ref{QQMPolyRingElem}, a.parent::Ref{QQMPolyRing})::Cint < 0
+  return (@ccall libflint.fmpq_mpoly_cmp(a::Ref{QQMPolyRingElem}, b::Ref{QQMPolyRingElem}, a.parent::Ref{QQMPolyRing})::Cint) < 0
 end
 
 ###############################################################################

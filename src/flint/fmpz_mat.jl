@@ -776,7 +776,7 @@ function maximum(f::typeof(abs), a::ZZMatrix)
     for i = 1:nrows(a)
       for j = 1:ncols(a)
         z = mat_entry_ptr(a, i, j)
-        if @ccall libflint.fmpz_cmpabs(m::Ptr{ZZRingElem}, z::Ptr{ZZRingElem})::Cint < 0
+        if (@ccall libflint.fmpz_cmpabs(m::Ptr{ZZRingElem}, z::Ptr{ZZRingElem})::Cint) < 0
           m = z
         end
       end
@@ -793,7 +793,7 @@ function maximum(a::ZZMatrix)
     for i = 1:nrows(a)
       for j = 1:ncols(a)
         z = mat_entry_ptr(a, i, j)
-        if @ccall libflint.fmpz_cmp(m::Ptr{ZZRingElem}, z::Ptr{ZZRingElem})::Cint < 0
+        if (@ccall libflint.fmpz_cmp(m::Ptr{ZZRingElem}, z::Ptr{ZZRingElem})::Cint) < 0
           m = z
         end
       end
@@ -810,7 +810,7 @@ function minimum(a::ZZMatrix)
     for i = 1:nrows(a)
       for j = 1:ncols(a)
         z = mat_entry_ptr(a, i, j)
-        if @ccall libflint.fmpz_cmp(m::Ptr{ZZRingElem}, z::Ptr{ZZRingElem})::Cint > 0
+        if (@ccall libflint.fmpz_cmp(m::Ptr{ZZRingElem}, z::Ptr{ZZRingElem})::Cint) > 0
           m = z
         end
       end

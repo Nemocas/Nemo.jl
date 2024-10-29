@@ -477,7 +477,7 @@ for (etype, rtype, ftype, ctype) in (
 
     function Base.isless(a::($etype), b::($etype))
       (!is_monomial(a) || !is_monomial(b)) && error("Not monomials in comparison")
-      return @ccall libflint.fmpz_mod_mpoly_cmp(a::Ref{($etype)}, b::Ref{($etype)}, a.parent::Ref{($rtype)})::Cint < 0
+      return (@ccall libflint.fmpz_mod_mpoly_cmp(a::Ref{($etype)}, b::Ref{($etype)}, a.parent::Ref{($rtype)})::Cint) < 0
     end
 
     ###############################################################################

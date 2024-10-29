@@ -397,12 +397,12 @@ end
 
 function ==(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
   check_parent(a, b)
-  return @ccall libflint.fq_nmod_mpoly_equal(a::Ref{fqPolyRepMPolyRingElem}, b::Ref{fqPolyRepMPolyRingElem}, a.parent::Ref{fqPolyRepMPolyRing})::Cint != 0
+  return Bool(@ccall libflint.fq_nmod_mpoly_equal(a::Ref{fqPolyRepMPolyRingElem}, b::Ref{fqPolyRepMPolyRingElem}, a.parent::Ref{fqPolyRepMPolyRing})::Cint)
 end
 
 function Base.isless(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
   (!is_monomial(a) || !is_monomial(b)) && error("Not monomials in comparison")
-  return @ccall libflint.fq_nmod_mpoly_cmp(a::Ref{fqPolyRepMPolyRingElem}, b::Ref{fqPolyRepMPolyRingElem}, a.parent::Ref{fqPolyRepMPolyRing})::Cint < 0
+  return (@ccall libflint.fq_nmod_mpoly_cmp(a::Ref{fqPolyRepMPolyRingElem}, b::Ref{fqPolyRepMPolyRingElem}, a.parent::Ref{fqPolyRepMPolyRing})::Cint) < 0
 end
 
 ###############################################################################

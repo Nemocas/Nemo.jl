@@ -284,8 +284,8 @@ function numerator(a::ZZRingElem)
   return a
 end
 
-isodd(a::ZZRingElemOrPtr)  = @ccall libflint.fmpz_is_odd(a::Ref{ZZRingElem})::Cint % Bool
-iseven(a::ZZRingElemOrPtr) = @ccall libflint.fmpz_is_even(a::Ref{ZZRingElem})::Cint % Bool
+isodd(a::ZZRingElemOrPtr)  = (@ccall libflint.fmpz_is_odd(a::Ref{ZZRingElem})::Cint) % Bool
+iseven(a::ZZRingElemOrPtr) = (@ccall libflint.fmpz_is_even(a::Ref{ZZRingElem})::Cint) % Bool
 
 ###############################################################################
 #
@@ -1029,7 +1029,7 @@ function invmod(x::ZZRingElem, m::ZZRingElem)
   if isone(m)
     return ZZRingElem(0)
   end
-  if @ccall libflint.fmpz_invmod(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, m::Ref{ZZRingElem})::Cint == 0
+  if (@ccall libflint.fmpz_invmod(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, m::Ref{ZZRingElem})::Cint) == 0
     error("Impossible inverse in invmod")
   end
   return z
@@ -2892,7 +2892,7 @@ end
 if Culong !== UInt
   function (::Type{Culong})(a::ZZRingElem)
     fits(Culong, a) || throw(InexactError(:convert, Culong, a))
-    return @ccall libflint.fmpz_get_ui(a::Ref{ZZRingElem})::UInt%Culong
+    return (@ccall libflint.fmpz_get_ui(a::Ref{ZZRingElem})::UInt) % Culong
   end
 end
 

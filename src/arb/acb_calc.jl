@@ -54,15 +54,17 @@ function integrate(C::ComplexField, F, a, b;
 
   res = C()
 
-  status = @ccall libflint.acb_calc_integrate(res::Ref{ComplexFieldElem}, acb_calc_func_wrap_c()::#res
-                  Ptr{Nothing}, F::#func
-                  Any, lower::#params
-                  Ref{ComplexFieldElem}, upper::#a
-                  Ref{ComplexFieldElem}, cgoal::#b
-                  Int, ctol::#rel_goal
-                  Ref{mag_struct}, opts::#abs_tol
-                  Ref{acb_calc_integrate_opts}, precision(Balls)::#opts
-                  Int)::UInt
+  status = @ccall libflint.acb_calc_integrate(
+    res::Ref{ComplexFieldElem}, #res
+    acb_calc_func_wrap_c()::Ptr{Nothing}, #func
+    F::Any, #params
+    lower::Ref{ComplexFieldElem}, #a
+    upper::Ref{ComplexFieldElem}, #b
+    cgoal::Int, #rel_goal
+    ctol::Ref{mag_struct}, #abs_tol
+    opts::Ref{acb_calc_integrate_opts}, #opts
+    precision(Balls)::Int
+  )::UInt
 
   @ccall libflint.mag_clear(ctol::Ref{mag_struct})::Nothing
 

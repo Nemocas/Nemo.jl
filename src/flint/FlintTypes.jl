@@ -1773,7 +1773,7 @@ mutable struct FpMPolyRingElem <: MPolyRingElem{FpFieldElem}
 
   function FpMPolyRingElem(ctx::FpMPolyRing, a::Union{ZZRingElem, FpFieldElem})
     z = FpMPolyRingElem(ctx)
-    @ccall libflint.fmpz_mod_mpoly_set_fmpz(z::Ref{FpMPolyRingElem}, a isa ZZRingElem ? a : data(a)::Ref{ZZRingElem}, ctx::Ref{FpMPolyRing})::Nothing
+    @ccall libflint.fmpz_mod_mpoly_set_fmpz(z::Ref{FpMPolyRingElem}, (a isa ZZRingElem ? a : data(a))::Ref{ZZRingElem}, ctx::Ref{FpMPolyRing})::Nothing
     return z
   end
 end

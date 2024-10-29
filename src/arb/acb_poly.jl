@@ -192,7 +192,7 @@ function unique_integer(x::AcbPolyRingElem)
 end
 
 function isreal(x::AcbPolyRingElem)
-  return @ccall libflint.acb_poly_is_real(x::Ref{AcbPolyRingElem})::Cint != 0
+  return Bool(@ccall libflint.acb_poly_is_real(x::Ref{AcbPolyRingElem})::Cint)
 end
 
 ###############################################################################
