@@ -959,19 +959,6 @@ promote_rule(::Type{zzModPolyRingElem}, ::Type{ZZRingElem}) = zzModPolyRingElem
 
 promote_rule(::Type{zzModPolyRingElem}, ::Type{zzModRingElem}) = zzModPolyRingElem
 
-###############################################################################
-#
-#   Polynomial substitution
-#
-###############################################################################
-
-function (f::zzModPolyRingElem)(a::zzModRingElem)
-  if parent(a) != base_ring(f)
-    return subst(f, a)
-  end
-  return evaluate(f, a)
-end
-
 ################################################################################
 #
 #  Parent object call overloads
