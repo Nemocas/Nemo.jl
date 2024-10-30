@@ -5744,40 +5744,22 @@ end
 #
 ################################################################################
 
-if NEW_FLINT
-  mutable struct rand_ctx
-    gmp_state::Ptr{Cvoid}
-    randval::UInt
-    randval2::UInt
+mutable struct rand_ctx
+  gmp_state::Ptr{Cvoid}
+  randval::UInt
+  randval2::UInt
 
-    function rand_ctx()
-      a = new()
-      ccall((:flint_rand_init, libflint), Cvoid, (Ref{rand_ctx},), a)
-      finalizer(_rand_ctx_clear_fn, a)
-      return a
-    end
+  function rand_ctx()
+    a = new()
+    @ccall libflint.flint_rand_init(a::Ref{rand_ctx})::Cvoid
+    finalizer(_rand_ctx_clear_fn, a)
+    return a
   end
+end
 
-  function _rand_ctx_clear_fn(a::rand_ctx)
-    ccall((:flint_rand_clear, libflint), Cvoid, (Ref{rand_ctx},), a)
-    nothing
-  end
-else
-  mutable struct rand_ctx
-    data::NTuple{56, Int8}
-
-    function rand_ctx()
-      a = new()
-      ccall((:flint_randinit, libflint), Cvoid, (Ref{rand_ctx},), a)
-      finalizer(_rand_ctx_clear_fn, a)
-      return a
-    end
-  end
-
-  function _rand_ctx_clear_fn(a::rand_ctx)
-    ccall((:flint_randclear, libflint), Cvoid, (Ref{rand_ctx},), a)
-    nothing
-  end
+function _rand_ctx_clear_fn(a::rand_ctx)
+  @ccall libflint.flint_rand_clear(a::Ref{rand_ctx})::Cvoid
+  nothing
 end
 
 ###############################################################################

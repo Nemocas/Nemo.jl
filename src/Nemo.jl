@@ -7,8 +7,6 @@ module Nemo
 
 import AbstractAlgebra
 
-import Libdl
-
 using Random: Random, AbstractRNG, SamplerTrivial
 import Random: rand!
 
@@ -212,13 +210,6 @@ const pkgdir = realpath(joinpath(dirname(@__DIR__)))
 function flint_abort()
   error("Problem in the Flint-Subsystem")
 end
-
-const NEW_FLINT =
-      let ptr = Libdl.dlopen(libflint)
-        v = Libdl.dlsym(ptr, :flint_rand_init; throw_error = false) !== nothing
-        Libdl.dlclose(ptr)
-        v
-      end
 
 ################################################################################
 #
@@ -535,27 +526,15 @@ end
 
 Random.seed!(a::rand_ctx, s::Nothing=nothing) = Random.seed!(a, rand(UInt128))
 
-if NEW_FLINT
-  flint_randseed!(a::rand_ctx, seed1::UInt, seed2::UInt) =
-  ccall((:flint_rand_set_seed, libflint), Cvoid, (Ref{rand_ctx}, UInt, UInt), a, seed1, seed2)
+flint_randseed!(a::rand_ctx, seed1::UInt, seed2::UInt) =
+  @ccall libflint.flint_rand_set_seed(a::Ref{rand_ctx}, seed1::UInt, seed2::UInt)::Cvoid
 
-  function flint_gmp_randseed!(a::rand_ctx, seed::BigInt)
-    if a.gmp_state == C_NULL
-      # gmp_state needs to be initialised
-      ccall((:_flint_rand_init_gmp_state, libflint), Cvoid, (Ref{rand_ctx},), a)
-    end
-    ccall((:__gmp_randseed, :libgmp), Cvoid, (Ptr{Cvoid}, Ref{BigInt}), a.gmp_state, seed)
+function flint_gmp_randseed!(a::rand_ctx, seed::BigInt)
+  if a.gmp_state == C_NULL
+    # gmp_state needs to be initialised
+    @ccall libflint._flint_rand_init_gmp_state(a::Ref{rand_ctx})::Cvoid
   end
-else
-  flint_randseed!(a::rand_ctx, seed1::UInt, seed2::UInt) =
-  ccall((:flint_randseed, libflint), Cvoid, (Ref{rand_ctx}, UInt, UInt), a, seed1, seed2)
-
-  function flint_gmp_randseed!(a::rand_ctx, seed::BigInt)
-    ccall((:_flint_rand_init_gmp, libflint), Cvoid, (Ref{rand_ctx},), a)
-    ccall((:__gmp_randseed, :libgmp), Cvoid, (Ref{rand_ctx}, Ref{BigInt}),
-          a, # gmp_state is the first field of flint_rand_s
-          seed)
-  end
+  @ccall :libgmp.__gmp_randseed(a.gmp_state::Ptr{Cvoid}, seed::Ref{BigInt})::Cvoid
 end
 
 ################################################################################
