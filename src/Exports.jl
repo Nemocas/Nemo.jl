@@ -204,7 +204,6 @@ export FlintPuiseuxSeriesFieldElem
 export FlintPuiseuxSeriesRing
 export FlintPuiseuxSeriesRingElem
 export FlintQQi
-export FlintZZ
 export FlintZZi
 export flog
 export floor
