@@ -3,8 +3,6 @@
 struct ZZiRing <: Ring
 end
 
-const FlintZZi = ZZiRing()
-
 struct ZZiRingElem <: RingElem
   x::ZZRingElem
   y::ZZRingElem

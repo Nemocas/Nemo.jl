@@ -8,7 +8,7 @@ elem_type(::Type{ZZiRing}) = ZZiRingElem
 
 parent_type(::Type{ZZiRingElem}) = ZZiRing
 
-parent(a::ZZiRingElem) = FlintZZi
+parent(a::ZZiRingElem) = ZZiRing()
 
 base_ring_type(::Type{ZZiRing}) = ZZRing
 
@@ -70,7 +70,7 @@ function (a::ZZiRing)(b::IntegerUnion, c::IntegerUnion)
 end
 
 function (R::ZZiRing)(a::Complex{T}) where T <: Integer
-  return FlintZZi(ZZRingElem(real(a)), ZZRingElem(imag(a)))
+  return R(ZZRingElem(real(a)), ZZRingElem(imag(a)))
 end
 
 ###############################################################################
@@ -164,7 +164,15 @@ function zero(a::ZZiRing)
   return ZZiRingElem(ZZRingElem(0), ZZRingElem(0))
 end
 
+function zero(::Type{ZZiRing})
+  return ZZiRingElem(ZZRingElem(0), ZZRingElem(0))
+end
+
 function one(a::ZZiRing)
+  return ZZiRingElem(ZZRingElem(1), ZZRingElem(0))
+end
+
+function one(::Type{ZZiRing})
   return ZZiRingElem(ZZRingElem(1), ZZRingElem(0))
 end
 
@@ -739,14 +747,14 @@ end
 function gcdx(a::ZZiRingElem, b::ZZiRingElem)
   if iszero(a)
     if iszero(b)
-      return (zero(FlintZZi), zero(FlintZZi), zero(FlintZZi))
+      return (zero(ZZiRing), zero(ZZiRing), zero(ZZiRing))
     else
       u = canonical_unit(b)
-      return (divexact(b, u), zero(FlintZZi), inv(u))
+      return (divexact(b, u), zero(ZZiRing), inv(u))
     end
   elseif iszero(b)
     u = canonical_unit(a)
-    return (divexact(a, u), inv(u), zero(FlintZZi))
+    return (divexact(a, u), inv(u), zero(ZZiRing))
   end
   m = zero_matrix(ZZ, 4, 2)
   m[1,1] =  a.x; m[1,2] = a.y
@@ -847,8 +855,8 @@ promote_rule(a::Type{<:Complex{<:Integer}}, b::Type{ZZRingElem}) = ZZiRingElem
 
 promote_rule(a::Type{ZZiRingElem}, b::Type{<:Complex{<:Integer}}) = ZZiRingElem
 promote_rule(a::Type{<:Complex{<:Integer}}, b::Type{ZZiRingElem}) = ZZiRingElem
-*(a::ZZiRingElem, b::Complex{<:Integer}) = a*FlintZZi(b)
-*(b::Complex{<:Integer}, a::ZZiRingElem) = a*FlintZZi(b)
+*(a::ZZiRingElem, b::Complex{<:Integer}) = a*parent(a)(b)
+*(b::Complex{<:Integer}, a::ZZiRingElem) = a*parent(a)(b)
 +(a::ZZiRingElem, b::Complex{<:Integer}) = ZZiRingElem(a.x + real(b), a.y + imag(b))
 +(b::Complex{<:Integer}, a::ZZiRingElem) = ZZiRingElem(a.x + real(b), a.y + imag(b))
 -(a::ZZiRingElem, b::Complex{<:Integer}) = ZZiRingElem(a.x - real(b), a.y - imag(b))

@@ -579,7 +579,7 @@ const _ecm_nCs = Vector{Int}[_ecm_nC]
 #
 ###############################################################################
 
-GaussianIntegers() = FlintZZi
+GaussianIntegers() = ZZiRing()
 GaussianRationals() = FlintQQi
 
 ###############################################################################
