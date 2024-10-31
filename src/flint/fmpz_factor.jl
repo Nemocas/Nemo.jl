@@ -7,12 +7,11 @@
 # raw fmpz_factor version
 function _factor(a::ZZRingElem)
   F = fmpz_factor()
-  ccall((:fmpz_factor, libflint), Nothing, (Ref{fmpz_factor}, Ref{ZZRingElem}), F, a)
+  @ccall libflint.fmpz_factor(F::Ref{fmpz_factor}, a::Ref{ZZRingElem})::Nothing
   res = Dict{ZZRingElem, Int}()
   for i in 1:F.num
     z = ZZRingElem()
-    ccall((:fmpz_factor_get_fmpz, libflint), Nothing,
-          (Ref{ZZRingElem}, Ref{fmpz_factor}, Int), z, F, i - 1)
+    @ccall libflint.fmpz_factor_get_fmpz(z::Ref{ZZRingElem}, F::Ref{fmpz_factor}, (i - 1)::Int)::Nothing
     res[z] = unsafe_load(F.exp, i)
   end
   return res, canonical_unit(a)
@@ -23,7 +22,7 @@ function factor(a::T) where T <: Union{Int, UInt}
   u = sign(a)
   a = u < 0 ? -a : a
   F = n_factor()
-  ccall((:n_factor, libflint), Nothing, (Ref{n_factor}, UInt), F, a)
+  @ccall libflint.n_factor(F::Ref{n_factor}, a::UInt)::Nothing
   res = Dict{T, Int}()
   for i in 1:F.num
     z = F.p[i]
@@ -41,9 +40,7 @@ end
 function _ecm(a::ZZRingElem, B1::UInt, B2::UInt, ncrv::UInt,
     rnd = _flint_rand_states[Threads.threadid()])
   f = ZZRingElem()
-  r = ccall((:fmpz_factor_ecm, libflint), Int32,
-            (Ref{ZZRingElem}, UInt, UInt, UInt, Ref{rand_ctx}, Ref{ZZRingElem}),
-            f, ncrv, B1, B2, rnd, a)
+  r = @ccall libflint.fmpz_factor_ecm(f::Ref{ZZRingElem}, ncrv::UInt, B1::UInt, B2::UInt, rnd::Ref{rand_ctx}, a::Ref{ZZRingElem})::Int32
   return r, f
 end
 
@@ -184,12 +181,11 @@ end
 
 function factor_trial_range(N::ZZRingElem, start::Int=0, np::Int=10^5)
   F = fmpz_factor()
-  ccall((:fmpz_factor_trial_range, libflint), Nothing, (Ref{fmpz_factor}, Ref{ZZRingElem}, UInt, UInt), F, N, start, np)
+  @ccall libflint.fmpz_factor_trial_range(F::Ref{fmpz_factor}, N::Ref{ZZRingElem}, start::UInt, np::UInt)::Nothing
   res = Dict{ZZRingElem,Int}()
   for i in 1:F.num
     z = ZZRingElem()
-    ccall((:fmpz_factor_get_fmpz, libflint), Nothing,
-      (Ref{ZZRingElem}, Ref{fmpz_factor}, Int), z, F, i - 1)
+    @ccall libflint.fmpz_factor_get_fmpz(z::Ref{ZZRingElem}, F::Ref{fmpz_factor}, (i - 1)::Int)::Nothing
     res[z] = unsafe_load(F.exp, i)
   end
   return res, canonical_unit(N)

@@ -236,10 +236,8 @@ end
 
 function reduce!(z::QQiFieldElem)
   g = ZZRingElem()
-  ccall((:fmpz_gcd3, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}),
-        g, z.num.x, z.den, z.num.y)
-  if ccall((:fmpz_sgn, libflint), Cint, (Ref{ZZRingElem},), z.den) < 0
+  @ccall libflint.fmpz_gcd3(g::Ref{ZZRingElem}, z.num.x::Ref{ZZRingElem}, z.den::Ref{ZZRingElem}, z.num.y::Ref{ZZRingElem})::Nothing
+  if is_negative(z.den)
     neg!(g, g)
   end
   divexact!(z.num, z.num, g)

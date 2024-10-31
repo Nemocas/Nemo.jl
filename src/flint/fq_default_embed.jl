@@ -11,12 +11,8 @@ end
 
 function _unchecked_coerce!(z::FqFieldElem, a::FqField, b::FqPolyRepFieldElem)
   x = ZZPolyRingElem()
-  ccall((:fq_get_fmpz_poly, libflint), Nothing,
-        (Ref{ZZPolyRingElem}, Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}),
-        x, b, parent(b))
-  ccall((:fq_default_set_fmpz_poly, libflint), Nothing,
-        (Ref{FqFieldElem}, Ref{ZZPolyRingElem}, Ref{FqField}),
-        z, x, a)
+  @ccall libflint.fq_get_fmpz_poly(x::Ref{ZZPolyRingElem}, b::Ref{FqPolyRepFieldElem}, parent(b)::Ref{FqPolyRepField})::Nothing
+  @ccall libflint.fq_default_set_fmpz_poly(z::Ref{FqFieldElem}, x::Ref{ZZPolyRingElem}, a::Ref{FqField})::Nothing
 end
 
 ###############################################################################
@@ -53,9 +49,7 @@ function _fq_default_embed_gens(
   gen_sub1 = zero(sub_ctx1)
   gen_sup1 = zero(sup_ctx1)
 
-  ccall((:fq_embed_gens, libflint), Nothing,
-        (Ref{FqPolyRepFieldElem}, Ref{FqPolyRepFieldElem}, Ref{FpPolyRingElem}, Ref{FqPolyRepField}, Ref{FqPolyRepField}),
-        gen_sub1, gen_sup1, minpoly, sub_ctx1, sup_ctx1)
+  @ccall libflint.fq_embed_gens(gen_sub1::Ref{FqPolyRepFieldElem}, gen_sup1::Ref{FqPolyRepFieldElem}, minpoly::Ref{FpPolyRingElem}, sub_ctx1::Ref{FqPolyRepField}, sup_ctx1::Ref{FqPolyRepField})::Nothing
 
   _unchecked_coerce!(gen_sub, sub_ctx, gen_sub1)
   _unchecked_coerce!(gen_sup, sup_ctx, gen_sup1)

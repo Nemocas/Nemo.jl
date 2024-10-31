@@ -79,8 +79,7 @@ function _acb_mat(A::ArbMatrix)
 end
 
 function mul!(z::AcbFieldElem, x::AcbFieldElem, y::ArbFieldElem)
-  ccall((:acb_mul_arb, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ArbFieldElem}, Int),
-        z, x, y, parent(z).prec)
+  @ccall libflint.acb_mul_arb(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{ArbFieldElem}, parent(z).prec::Int)::Nothing
   return z
 end
 
@@ -103,16 +102,13 @@ function roots(f::ZZModPolyRingElem, fac::Fac{ZZRingElem})
   res = fmpz_mod_poly_factor(base_ring(f))
   _fac = fmpz_factor()
   for (p, e) in fac
-    ccall((:_fmpz_factor_append, libflint), Nothing, (Ref{fmpz_factor}, Ref{ZZRingElem}, UInt), _fac, p, UInt(e))
+    @ccall libflint._fmpz_factor_append(_fac::Ref{fmpz_factor}, p::Ref{ZZRingElem}, UInt(e)::UInt)::Nothing
   end
-  ccall((:fmpz_mod_poly_roots_factored, libflint), Nothing, (Ref{fmpz_mod_poly_factor}, Ref{ZZModPolyRingElem}, Cint, Ref{fmpz_factor}, Ref{fmpz_mod_ctx_struct}), res, f, 1, _fac, base_ring(f).ninv)
+  @ccall libflint.fmpz_mod_poly_roots_factored(res::Ref{fmpz_mod_poly_factor}, f::Ref{ZZModPolyRingElem}, 1::Cint, _fac::Ref{fmpz_factor}, base_ring(f).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   _res = Tuple{ZZModRingElem,Int}[]
   for i in 1:res.num
     g = parent(f)()
-    ccall((:fmpz_mod_poly_factor_get_fmpz_mod_poly, libflint), Nothing,
-          (Ref{ZZModPolyRingElem}, Ref{fmpz_mod_poly_factor}, Int,
-           Ref{fmpz_mod_ctx_struct}),
-          g, res, i - 1, base_ring(f).ninv)
+    @ccall libflint.fmpz_mod_poly_factor_get_fmpz_mod_poly(g::Ref{ZZModPolyRingElem}, res::Ref{fmpz_mod_poly_factor}, (i - 1)::Int, base_ring(f).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
     e = unsafe_load(res.exp, i)
     push!(_res, (-coeff(g, 0), e))
   end
@@ -202,12 +198,12 @@ function AbstractAlgebra.map_coefficients(F::fpField, f::QQMPolyRingElem; parent
 end
 
 function tdivpow2!(B::ZZMatrix, t::Int)
-  ccall((:fmpz_mat_scalar_tdiv_q_2exp, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}, Cint), B, B, t)
+  @ccall libflint.fmpz_mat_scalar_tdiv_q_2exp(B::Ref{ZZMatrix}, B::Ref{ZZMatrix}, t::Cint)::Nothing
 end
 
 function tdivpow2(B::ZZMatrix, t::Int)
   C = similar(B)
-  ccall((:fmpz_mat_scalar_tdiv_q_2exp, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}, Cint), C, B, t)
+  @ccall libflint.fmpz_mat_scalar_tdiv_q_2exp(C::Ref{ZZMatrix}, B::Ref{ZZMatrix}, t::Cint)::Nothing
   return C
 end
 
@@ -257,7 +253,7 @@ function dot(a::Vector{<:NumFieldElem}, b::Vector{ZZRingElem})
 end
 
 function bits(x::ArbFieldElem)
-  return ccall((:arb_bits, libflint), Int, (Ref{ArbFieldElem},), x)
+  return @ccall libflint.arb_bits(x::Ref{ArbFieldElem})::Int
 end
 
 function Base.setprecision(x::BigFloat, p::Int)
@@ -303,9 +299,7 @@ end
 #Assuming that the denominator of a is one, reduces all the coefficients modulo p
 # non-symmetric (positive) residue system
 function mod!(a::AbsSimpleNumFieldElem, b::ZZRingElem)
-  ccall((:nf_elem_mod_fmpz, libflint), Nothing,
-        (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{ZZRingElem}, Ref{AbsSimpleNumField}),
-        a, a, b, parent(a))
+  @ccall libflint.nf_elem_mod_fmpz(a::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return a
 end
 
@@ -319,23 +313,17 @@ This function returns $b$.
 function numerator(a::AbsSimpleNumFieldElem)
   _one = one(ZZ)
   z = deepcopy(a)
-  ccall((:nf_elem_set_den, libflint), Nothing,
-        (Ref{AbsSimpleNumFieldElem}, Ref{ZZRingElem}, Ref{AbsSimpleNumField}),
-        z, _one, a.parent)
+  @ccall libflint.nf_elem_set_den(z::Ref{AbsSimpleNumFieldElem}, _one::Ref{ZZRingElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
   return z
 end
 
 function divexact!(z::AbsSimpleNumFieldElem, x::AbsSimpleNumFieldElem, y::ZZRingElem)
-  ccall((:nf_elem_scalar_div_fmpz, libflint), Nothing,
-        (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{ZZRingElem}, Ref{AbsSimpleNumField}),
-        z, x, y, parent(x))
+  @ccall libflint.nf_elem_scalar_div_fmpz(z::Ref{AbsSimpleNumFieldElem}, x::Ref{AbsSimpleNumFieldElem}, y::Ref{ZZRingElem}, parent(x)::Ref{AbsSimpleNumField})::Nothing
   return z
 end
 
 function sub!(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem, c::AbsSimpleNumFieldElem)
-  ccall((:nf_elem_sub, libflint), Nothing,
-        (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}),
-        a, b, c, a.parent)
+  @ccall libflint.nf_elem_sub(a::Ref{AbsSimpleNumFieldElem}, b::Ref{AbsSimpleNumFieldElem}, c::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
   return a
 end
 
@@ -351,9 +339,7 @@ function evaluate(f::fpPolyRingElem, v::Vector{fpFieldElem})
   F = base_ring(f)
   v1 = UInt[x.data for x in v]
   res = UInt[UInt(1) for x in v]
-  ccall((:nmod_poly_evaluate_nmod_vec, libflint), Nothing,
-        (Ptr{UInt}, Ref{fpPolyRingElem}, Ptr{UInt}, UInt),
-        res, f, v1, UInt(length(v)))
+  @ccall libflint.nmod_poly_evaluate_nmod_vec(res::Ptr{UInt}, f::Ref{fpPolyRingElem}, v1::Ptr{UInt}, UInt(length(v))::UInt)::Nothing
   return fpFieldElem[fpFieldElem(x, F) for x in res]
 end
 
@@ -434,7 +420,7 @@ end
 function invmod(f::ZZModPolyRingElem, M::ZZModPolyRingElem)
   if !is_unit(f)
     r = parent(f)()
-    i = ccall((:fmpz_mod_poly_invmod, libflint), Int, (Ref{ZZModPolyRingElem}, Ref{ZZModPolyRingElem}, Ref{ZZModPolyRingElem}, Ref{fmpz_mod_ctx_struct}), r, f, M, f.parent.base_ring.ninv)
+    i = @ccall libflint.fmpz_mod_poly_invmod(r::Ref{ZZModPolyRingElem}, f::Ref{ZZModPolyRingElem}, M::Ref{ZZModPolyRingElem}, f.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Int
     if iszero(i)
       error("not yet implemented")
     else
@@ -461,31 +447,31 @@ function invmod(f::ZZModPolyRingElem, M::ZZModPolyRingElem)
 end
 
 function round!(z::ArbFieldElem, x::ArbFieldElem, p::Int)
-  ccall((:arb_set_round, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, p)
+  @ccall libflint.arb_set_round(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, p::Int)::Nothing
   z.parent = ArbField(p, cached=false)
   return z
 end
 
 function round!(z::AcbFieldElem, x::AcbFieldElem, p::Int)
-  ccall((:acb_set_round, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, p)
+  @ccall libflint.acb_set_round(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, p::Int)::Nothing
   z.parent = AcbField(p, cached=false)
   return z
 end
 
 function round(x::ArbFieldElem, p::Int)
   z = ArbField(p, cached=false)()
-  ccall((:arb_set_round, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int), z, x, p)
+  @ccall libflint.arb_set_round(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, p::Int)::Nothing
   return z
 end
 
 function round(x::AcbFieldElem, p::Int)
   z = AcbField(p, cached=false)()
-  ccall((:acb_set_round, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int), z, x, p)
+  @ccall libflint.acb_set_round(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, p::Int)::Nothing
   return z
 end
 
 function bits(x::AcbFieldElem)
-  return ccall((:acb_bits, libflint), Int, (Ref{AcbFieldElem},), x)
+  return @ccall libflint.acb_bits(x::Ref{AcbFieldElem})::Int
 end
 
 function order(x::EuclideanRingResidueRingElem{ZZRingElem}, fp::Dict{ZZRingElem,Int64})
@@ -610,17 +596,17 @@ function rand(R::Union{EuclideanRingResidueRing{zzModPolyRingElem},EuclideanRing
 end
 
 function rem!(f::zzModPolyRingElem, g::zzModPolyRingElem, h::zzModPolyRingElem)
-  ccall((:nmod_poly_rem, libflint), Nothing, (Ref{zzModPolyRingElem}, Ref{zzModPolyRingElem}, Ref{zzModPolyRingElem}), f, g, h)
+  @ccall libflint.nmod_poly_rem(f::Ref{zzModPolyRingElem}, g::Ref{zzModPolyRingElem}, h::Ref{zzModPolyRingElem})::Nothing
   return f
 end
 
 function gcd!(f::zzModPolyRingElem, g::zzModPolyRingElem, h::zzModPolyRingElem)
-  ccall((:nmod_poly_gcd, libflint), Nothing, (Ref{zzModPolyRingElem}, Ref{zzModPolyRingElem}, Ref{zzModPolyRingElem}), f, g, h)
+  @ccall libflint.nmod_poly_gcd(f::Ref{zzModPolyRingElem}, g::Ref{zzModPolyRingElem}, h::Ref{zzModPolyRingElem})::Nothing
   return f
 end
 
 function gcd!(f::fpPolyRingElem, g::fpPolyRingElem, h::fpPolyRingElem)
-  ccall((:nmod_poly_gcd, libflint), Nothing, (Ref{fpPolyRingElem}, Ref{fpPolyRingElem}, Ref{fpPolyRingElem}), f, g, h)
+  @ccall libflint.nmod_poly_gcd(f::Ref{fpPolyRingElem}, g::Ref{fpPolyRingElem}, h::Ref{fpPolyRingElem})::Nothing
   return f
 end
 
@@ -722,9 +708,7 @@ function evaluate(f::QQPolyRingElem, a::AbsSimpleNumFieldElem)
 end
 
 function rem!(z::fpPolyRingElem, a::fpPolyRingElem, b::fpPolyRingElem)
-  ccall((:nmod_poly_rem, libflint), Nothing,
-        (Ref{fpPolyRingElem}, Ref{fpPolyRingElem}, Ref{fpPolyRingElem}, Ptr{Nothing}),
-        z, a, b, pointer_from_objref(base_ring(z)) + sizeof(ZZRingElem))
+  @ccall libflint.nmod_poly_rem(z::Ref{fpPolyRingElem}, a::Ref{fpPolyRingElem}, b::Ref{fpPolyRingElem}, (pointer_from_objref(base_ring(z)) + sizeof(ZZRingElem))::Ptr{Nothing})::Nothing
   return z
 end
 
@@ -750,8 +734,7 @@ function image(M::Map{D,C}, a) where {D,C}
 end
 
 function setcoeff!(x::fqPolyRepFieldElem, n::Int, u::UInt)
-  ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-        (Ref{fqPolyRepFieldElem}, Int, UInt), x, n, u)
+  @ccall libflint.nmod_poly_set_coeff_ui(x::Ref{fqPolyRepFieldElem}, n::Int, u::UInt)::Nothing
 end
 
 function basis(k::fpField)
@@ -990,9 +973,7 @@ is_cyclo_type(::NumField) = false
 
 
 function nf_elem_to_fmpz_mod_poly!(r::ZZModPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
-  ccall((:nf_elem_get_fmpz_mod_poly_den, libflint), Nothing,
-        (Ref{ZZModPolyRingElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}, Cint, Ref{fmpz_mod_ctx_struct}),
-        r, a, a.parent, Cint(useden), r.parent.base_ring.ninv)
+  @ccall libflint.nf_elem_get_fmpz_mod_poly_den(r::Ref{ZZModPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField}, Cint(useden)::Cint, r.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return nothing
 end
 
@@ -1003,9 +984,7 @@ function (R::ZZModPolyRing)(a::AbsSimpleNumFieldElem)
 end
 
 function nf_elem_to_gfp_poly!(r::fpPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
-  ccall((:nf_elem_get_nmod_poly_den, libflint), Nothing,
-        (Ref{fpPolyRingElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}, Cint),
-        r, a, a.parent, Cint(useden))
+  @ccall libflint.nf_elem_get_nmod_poly_den(r::Ref{fpPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField}, Cint(useden)::Cint)::Nothing
   return nothing
 end
 
@@ -1016,9 +995,7 @@ function (R::fpPolyRing)(a::AbsSimpleNumFieldElem)
 end
 
 function nf_elem_to_nmod_poly!(r::zzModPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
-  ccall((:nf_elem_get_nmod_poly_den, libflint), Nothing,
-        (Ref{zzModPolyRingElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}, Cint),
-        r, a, a.parent, Cint(useden))
+  @ccall libflint.nf_elem_get_nmod_poly_den(r::Ref{zzModPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField}, Cint(useden)::Cint)::Nothing
   return nothing
 end
 
@@ -1029,9 +1006,7 @@ function (R::zzModPolyRing)(a::AbsSimpleNumFieldElem)
 end
 
 function nf_elem_to_gfp_fmpz_poly!(r::FpPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
-  ccall((:nf_elem_get_fmpz_mod_poly_den, libflint), Nothing,
-        (Ref{FpPolyRingElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}, Cint, Ref{fmpz_mod_ctx_struct}),
-        r, a, a.parent, Cint(useden), r.parent.base_ring.ninv)
+  @ccall libflint.nf_elem_get_fmpz_mod_poly_den(r::Ref{FpPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField}, Cint(useden)::Cint, r.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return nothing
 end
 
@@ -1099,29 +1074,29 @@ end
 
 function (R::FqPolyRepField)(x::ZZModPolyRingElem)
   z = R()
-  ccall((:fq_set_fmpz_mod_poly, libflint), Nothing, (Ref{FqPolyRepFieldElem}, Ref{ZZModPolyRingElem}, Ref{FqPolyRepField}), z, x, R)
-  #ccall((:fq_reduce, libflint), Nothing, (Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}), z, R)
+  @ccall libflint.fq_set_fmpz_mod_poly(z::Ref{FqPolyRepFieldElem}, x::Ref{ZZModPolyRingElem}, R::Ref{FqPolyRepField})::Nothing
+  #@ccall libflint.fq_reduce(z::Ref{FqPolyRepFieldElem}, R::Ref{FqPolyRepField})::Nothing
   return z
 end
 
 function (R::FqPolyRepField)(x::FpPolyRingElem)
   z = R()
-  ccall((:fq_set_fmpz_mod_poly, libflint), Nothing, (Ref{FqPolyRepFieldElem}, Ref{FpPolyRingElem}, Ref{FqPolyRepField}), z, x, R)
-  ccall((:fq_reduce, libflint), Nothing, (Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}), z, R)
+  @ccall libflint.fq_set_fmpz_mod_poly(z::Ref{FqPolyRepFieldElem}, x::Ref{FpPolyRingElem}, R::Ref{FqPolyRepField})::Nothing
+  @ccall libflint.fq_reduce(z::Ref{FqPolyRepFieldElem}, R::Ref{FqPolyRepField})::Nothing
   return z
 end
 
 @inline function rem!(a::ZZRingElem, b::ZZRingElem, c::ZZRingElem)
-  ccall((:fmpz_mod, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), a, b, c)
+  @ccall libflint.fmpz_mod(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, c::Ref{ZZRingElem})::Nothing
   return a
 end
 
 function rem!(a::ZZModPolyRingElem, b::ZZModPolyRingElem, c::ZZModPolyRingElem)
-  ccall((:fmpz_mod_poly_rem, libflint), Nothing, (Ref{ZZModPolyRingElem}, Ref{ZZModPolyRingElem}, Ref{ZZModPolyRingElem}, Ref{fmpz_mod_ctx_struct}), a, b, c, a.parent.base_ring.ninv)
+  @ccall libflint.fmpz_mod_poly_rem(a::Ref{ZZModPolyRingElem}, b::Ref{ZZModPolyRingElem}, c::Ref{ZZModPolyRingElem}, a.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return a
 end
 
 function rem!(a::FpPolyRingElem, b::FpPolyRingElem, c::FpPolyRingElem)
-  ccall((:fmpz_mod_poly_rem, libflint), Nothing, (Ref{FpPolyRingElem}, Ref{FpPolyRingElem}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}), a, b, c, a.parent.base_ring.ninv)
+  @ccall libflint.fmpz_mod_poly_rem(a::Ref{FpPolyRingElem}, b::Ref{FpPolyRingElem}, c::Ref{FpPolyRingElem}, a.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return a
 end

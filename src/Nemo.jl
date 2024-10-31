@@ -369,7 +369,7 @@ function flint_set_num_threads(a::Int)
   if !__isthreaded[]
     error("To use threaded flint, julia has to be started with NEMO_THREADED=1")
   else
-    ccall((:flint_set_num_threads, libflint), Nothing, (Int,), a)
+    @ccall libflint.flint_set_num_threads(a::Int)::Nothing
   end
 end
 
@@ -537,21 +537,21 @@ Random.seed!(a::rand_ctx, s::Nothing=nothing) = Random.seed!(a, rand(UInt128))
 
 if NEW_FLINT
   flint_randseed!(a::rand_ctx, seed1::UInt, seed2::UInt) =
-  ccall((:flint_rand_set_seed, libflint), Cvoid, (Ref{rand_ctx}, UInt, UInt), a, seed1, seed2)
+  @ccall libflint.flint_rand_set_seed(a::Ref{rand_ctx}, seed1::UInt, seed2::UInt)::Cvoid
 
   function flint_gmp_randseed!(a::rand_ctx, seed::BigInt)
     if a.gmp_state == C_NULL
       # gmp_state needs to be initialised
-      ccall((:_flint_rand_init_gmp_state, libflint), Cvoid, (Ref{rand_ctx},), a)
+      @ccall libflint._flint_rand_init_gmp_state(a::Ref{rand_ctx})::Cvoid
     end
     ccall((:__gmp_randseed, :libgmp), Cvoid, (Ptr{Cvoid}, Ref{BigInt}), a.gmp_state, seed)
   end
 else
   flint_randseed!(a::rand_ctx, seed1::UInt, seed2::UInt) =
-  ccall((:flint_randseed, libflint), Cvoid, (Ref{rand_ctx}, UInt, UInt), a, seed1, seed2)
+  @ccall libflint.flint_randseed(a::Ref{rand_ctx}, seed1::UInt, seed2::UInt)::Cvoid
 
   function flint_gmp_randseed!(a::rand_ctx, seed::BigInt)
-    ccall((:_flint_rand_init_gmp, libflint), Cvoid, (Ref{rand_ctx},), a)
+    @ccall libflint._flint_rand_init_gmp(a::Ref{rand_ctx})::Cvoid
     ccall((:__gmp_randseed, :libgmp), Cvoid, (Ref{rand_ctx}, Ref{BigInt}),
           a, # gmp_state is the first field of flint_rand_s
           seed)

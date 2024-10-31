@@ -43,8 +43,7 @@ for some more specialized fields.
     return get_cached!(AnticNumberFieldID, (parent(pol), pol, s), cached) do
       nf = new()
       nf.pol = pol
-      ccall((:nf_init, libflint), Nothing, 
-            (Ref{AbsSimpleNumField}, Ref{QQPolyRingElem}), nf, pol)
+      @ccall libflint.nf_init(nf::Ref{AbsSimpleNumField}, pol::Ref{QQPolyRingElem})::Nothing
       finalizer(_AnticNumberField_clear_fn, nf)
       nf.S = s
       return nf
@@ -56,7 +55,7 @@ const AnticNumberFieldID = CacheDictType{Tuple{QQPolyRing, QQPolyRingElem, Symbo
 
 
 function _AnticNumberField_clear_fn(a::AbsSimpleNumField)
-  ccall((:nf_clear, libflint), Nothing, (Ref{AbsSimpleNumField},), a)
+  @ccall libflint.nf_clear(a::Ref{AbsSimpleNumField})::Nothing
 end
 
 """
@@ -81,8 +80,7 @@ mutable struct AbsSimpleNumFieldElem <: SimpleNumFieldElem{QQFieldElem}
 
   function AbsSimpleNumFieldElem(p::AbsSimpleNumField)
     r = new()
-    ccall((:nf_elem_init, libflint), Nothing, 
-          (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}), r, p)
+    @ccall libflint.nf_elem_init(r::Ref{AbsSimpleNumFieldElem}, p::Ref{AbsSimpleNumField})::Nothing
     r.parent = p
     finalizer(_nf_elem_clear_fn, r)
     return r
@@ -90,10 +88,8 @@ mutable struct AbsSimpleNumFieldElem <: SimpleNumFieldElem{QQFieldElem}
 
   function AbsSimpleNumFieldElem(p::AbsSimpleNumField, a::AbsSimpleNumFieldElem)
     r = new()
-    ccall((:nf_elem_init, libflint), Nothing, 
-          (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}), r, p)
-    ccall((:nf_elem_set, libflint), Nothing,
-          (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}), r, a, p)
+    @ccall libflint.nf_elem_init(r::Ref{AbsSimpleNumFieldElem}, p::Ref{AbsSimpleNumField})::Nothing
+    @ccall libflint.nf_elem_set(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, p::Ref{AbsSimpleNumField})::Nothing
     r.parent = p
     finalizer(_nf_elem_clear_fn, r)
     return r
@@ -101,8 +97,7 @@ mutable struct AbsSimpleNumFieldElem <: SimpleNumFieldElem{QQFieldElem}
 end
 
 function _nf_elem_clear_fn(a::AbsSimpleNumFieldElem)
-  ccall((:nf_elem_clear, libflint), Nothing, 
-        (Ref{AbsSimpleNumFieldElem}, Ref{AbsSimpleNumField}), a, a.parent)
+  @ccall libflint.nf_elem_clear(a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
 end
 
 

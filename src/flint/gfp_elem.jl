@@ -175,7 +175,7 @@ end
 function *(x::Int, y::fpFieldElem)
   R = parent(y)
   if x < 0
-    d = mulmod(UInt(-x), y.data, R.n, R.ninv)
+    d = mulmod(reinterpret(UInt, -x), y.data, R.n, R.ninv)
     return -fpFieldElem(d, R)
   else
     d = mulmod(UInt(x), y.data, R.n, R.ninv)
@@ -225,8 +225,7 @@ function ^(x::fpFieldElem, y::Int)
     x = inv(x)
     y = -y
   end
-  d = ccall((:n_powmod2_preinv, libflint), UInt, (UInt, Int, UInt, UInt),
-            UInt(x.data), y, R.n, R.ninv)
+  d = @ccall libflint.n_powmod2_preinv(UInt(x.data)::UInt, y::Int, R.n::UInt, R.ninv::UInt)::UInt
   return fpFieldElem(d, R)
 end
 
@@ -264,8 +263,7 @@ end
 function inv(x::fpFieldElem)
   R = parent(x)
   iszero(x) && throw(DivideError())
-  xinv = ccall((:n_invmod, libflint), UInt, (UInt, UInt),
-               x.data, R.n)
+  xinv = @ccall libflint.n_invmod(x.data::UInt, R.n::UInt)::UInt
   return fpFieldElem(xinv, R)
 end
 
@@ -279,8 +277,7 @@ function divexact(x::fpFieldElem, y::fpFieldElem; check::Bool=true)
   check_parent(x, y)
   y == 0 && throw(DivideError())
   R = parent(x)
-  yinv = ccall((:n_invmod, libflint), UInt, (UInt, UInt),
-               y.data, R.n)
+  yinv = @ccall libflint.n_invmod(y.data::UInt, R.n::UInt)::UInt
   d = mulmod(x.data, yinv, R.n, R.ninv)
   return fpFieldElem(d, R)
 end
@@ -307,7 +304,7 @@ function Base.sqrt(a::fpFieldElem; check::Bool=true)
   if iszero(a)
     return zero(R)
   end
-  r = ccall((:n_sqrtmod, libflint), UInt, (UInt, UInt), a.data, R.n)
+  r = @ccall libflint.n_sqrtmod(a.data::UInt, R.n::UInt)::UInt
   check && iszero(r) && error("Not a square in sqrt")
   return fpFieldElem(r, R)
 end
@@ -317,7 +314,7 @@ function is_square(a::fpFieldElem)
   if iszero(a) || R.n == 2
     return true
   end
-  r = ccall((:n_jacobi, libflint), Cint, (UInt, UInt), a.data, R.n)
+  r = @ccall libflint.n_jacobi(a.data::UInt, R.n::UInt)::Cint
   return isone(r)
 end
 
@@ -326,7 +323,7 @@ function is_square_with_sqrt(a::fpFieldElem)
   if iszero(a) || R.n == 2
     return true, a
   end
-  r = ccall((:n_sqrtmod, libflint), UInt, (UInt, UInt), a.data, R.n)
+  r = @ccall libflint.n_sqrtmod(a.data::UInt, R.n::UInt)::UInt
   if iszero(r)
     return false, zero(R)
   end
@@ -409,8 +406,7 @@ function (R::fpField)(a::Int)
     d += n
   end
   if d >= n
-    d = ccall((:n_mod2_preinv, libflint), UInt, (UInt, UInt, UInt),
-              d, n, ninv)
+    d = @ccall libflint.n_mod2_preinv(d::UInt, n::UInt, ninv::UInt)::UInt
   end
   return fpFieldElem(d, R)
 end
@@ -418,26 +414,22 @@ end
 function (R::fpField)(a::UInt)
   n = R.n
   ninv = R.ninv
-  a = ccall((:n_mod2_preinv, libflint), UInt, (UInt, UInt, UInt),
-            a, n, ninv)
+  a = @ccall libflint.n_mod2_preinv(a::UInt, n::UInt, ninv::UInt)::UInt
   return fpFieldElem(a, R)
 end
 
 function (R::fpField)(a::ZZRingElem)
-  d = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt),
-            a, R.n)
+  d = @ccall libflint.fmpz_fdiv_ui(a::Ref{ZZRingElem}, R.n::UInt)::UInt
   return fpFieldElem(d, R)
 end
 
 function (R::fpField)(a::QQFieldElem)
   num = numerator(a, false)
   den = denominator(a, false)
-  n = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt),
-            num, R.n)
-  d = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt),
-            den, R.n)
+  n = @ccall libflint.fmpz_fdiv_ui(num::Ref{ZZRingElem}, R.n::UInt)::UInt
+  d = @ccall libflint.fmpz_fdiv_ui(den::Ref{ZZRingElem}, R.n::UInt)::UInt
   V = [UInt(0)]
-  g = ccall((:n_gcdinv, libflint), UInt, (Ptr{UInt}, UInt, UInt), V, d, R.n)
+  g = @ccall libflint.n_gcdinv(V::Ptr{UInt}, d::UInt, R.n::UInt)::UInt
   g != 1 && error("Unable to coerce")
   return R(n)*R(V[1])
 end

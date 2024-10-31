@@ -58,9 +58,7 @@ function Base.view(x::ZZMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
 
   b = ZZMatrix()
   b.view_parent = x
-  ccall((:fmpz_mat_window_init, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Int, Int, Int, Int),
-        b, x, r1 - 1, c1 - 1, r2, c2)
+  @ccall libflint.fmpz_mat_window_init(b::Ref{ZZMatrix}, x::Ref{ZZMatrix}, (r1 - 1)::Int, (c1 - 1)::Int, r2::Int, c2::Int)::Nothing
   finalizer(_fmpz_mat_window_clear_fn, b)
   return b
 end
@@ -71,9 +69,7 @@ function Base.reshape(x::ZZMatrix, r::Int, c::Int)
 
   b = ZZMatrix()
   b.view_parent = x
-  ccall((:fmpz_mat_window_init, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Int, Int, Int, Int),
-        b, x, 0, 0, r, c)
+  @ccall libflint.fmpz_mat_window_init(b::Ref{ZZMatrix}, x::Ref{ZZMatrix}, 0::Int, 0::Int, r::Int, c::Int)::Nothing
   finalizer(_fmpz_mat_window_clear_fn, b)
   return b
 end
@@ -84,7 +80,7 @@ function Base.view(x::ZZMatrix, r::UnitRange{Int}, c::UnitRange{Int})
 end
 
 function _fmpz_mat_window_clear_fn(a::ZZMatrix)
-  ccall((:fmpz_mat_window_clear, libflint), Nothing, (Ref{ZZMatrix},), a)
+  @ccall libflint.fmpz_mat_window_clear(a::Ref{ZZMatrix})::Nothing
 end
 
 function sub(x::ZZMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
@@ -132,19 +128,16 @@ function setindex!(a::ZZMatrix, b::ZZMatrix, r::UnitRange{Int64}, c::UnitRange{I
   _checkbounds(a, r, c)
   size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
   A = view(a, r, c)
-  ccall((:fmpz_mat_set, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}), A, b)
+  @ccall libflint.fmpz_mat_set(A::Ref{ZZMatrix}, b::Ref{ZZMatrix})::Nothing
 end
 
 @inline number_of_rows(a::ZZMatrix) = a.r
 
 @inline number_of_columns(a::ZZMatrix) = a.c
 
-iszero(a::ZZMatrix) = ccall((:fmpz_mat_is_zero, libflint), Bool,
-                            (Ref{ZZMatrix},), a)
+iszero(a::ZZMatrix) = @ccall libflint.fmpz_mat_is_zero(a::Ref{ZZMatrix})::Bool
 
-isone(a::ZZMatrix) = ccall((:fmpz_mat_is_one, libflint), Bool,
-                           (Ref{ZZMatrix},), a)
+isone(a::ZZMatrix) = @ccall libflint.fmpz_mat_is_one(a::Ref{ZZMatrix})::Bool
 
 @inline function is_zero_entry(A::ZZMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(A, i, j)
@@ -158,8 +151,7 @@ end
   @boundscheck _checkbounds(A, i, j)
   GC.@preserve A begin
     m = mat_entry_ptr(A, i, j)
-    fl = ccall((:fmpz_sgn, libflint), Int, (Ptr{ZZRingElem},), m)
-    return isone(fl)
+    return is_positive(m)
   end
 end
 
@@ -218,14 +210,12 @@ end
 
 function transpose(x::ZZMatrix)
   z = similar(x, ncols(x), nrows(x))
-  ccall((:fmpz_mat_transpose, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}), z, x)
+  @ccall libflint.fmpz_mat_transpose(z::Ref{ZZMatrix}, x::Ref{ZZMatrix})::Nothing
   return z
 end
 
 function transpose!(A::ZZMatrix, B::ZZMatrix)
-  ccall((:fmpz_mat_transpose, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}), A, B)
+  @ccall libflint.fmpz_mat_transpose(A::Ref{ZZMatrix}, B::Ref{ZZMatrix})::Nothing
   return A
 end
 
@@ -236,8 +226,7 @@ end
 ###############################################################################
 
 function swap_rows!(x::ZZMatrix, i::Int, j::Int)
-  ccall((:fmpz_mat_swap_rows, libflint), Nothing,
-        (Ref{ZZMatrix}, Ptr{Nothing}, Int, Int), x, C_NULL, i - 1, j - 1)
+  @ccall libflint.fmpz_mat_swap_rows(x::Ref{ZZMatrix}, C_NULL::Ptr{Nothing}, (i - 1)::Int, (j - 1)::Int)::Nothing
   return x
 end
 
@@ -248,8 +237,7 @@ function swap_rows(x::ZZMatrix, i::Int, j::Int)
 end
 
 function swap_cols!(x::ZZMatrix, i::Int, j::Int)
-  ccall((:fmpz_mat_swap_cols, libflint), Nothing,
-        (Ref{ZZMatrix}, Ptr{Nothing}, Int, Int), x, C_NULL, i - 1, j - 1)
+  @ccall libflint.fmpz_mat_swap_cols(x::Ref{ZZMatrix}, C_NULL::Ptr{Nothing}, (i - 1)::Int, (j - 1)::Int)::Nothing
   return x
 end
 
@@ -260,16 +248,14 @@ function swap_cols(x::ZZMatrix, i::Int, j::Int)
 end
 
 function reverse_rows!(x::ZZMatrix)
-  ccall((:fmpz_mat_invert_rows, libflint), Nothing,
-        (Ref{ZZMatrix}, Ptr{Nothing}), x, C_NULL)
+  @ccall libflint.fmpz_mat_invert_rows(x::Ref{ZZMatrix}, C_NULL::Ptr{Nothing})::Nothing
   return x
 end
 
 reverse_rows(x::ZZMatrix) = reverse_rows!(deepcopy(x))
 
 function reverse_cols!(x::ZZMatrix)
-  ccall((:fmpz_mat_invert_cols, libflint), Nothing,
-        (Ref{ZZMatrix}, Ptr{Nothing}), x, C_NULL)
+  @ccall libflint.fmpz_mat_invert_cols(x::Ref{ZZMatrix}, C_NULL::Ptr{Nothing})::Nothing
   return x
 end
 
@@ -359,9 +345,7 @@ Return $2^yx$.
 function <<(x::ZZMatrix, y::Int)
   y < 0 && throw(DomainError(y, "Exponent must be non-negative"))
   z = similar(x)
-  ccall((:fmpz_mat_scalar_mul_2exp, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Int),
-        z, x, y)
+  @ccall libflint.fmpz_mat_scalar_mul_2exp(z::Ref{ZZMatrix}, x::Ref{ZZMatrix}, y::Int)::Nothing
   return z
 end
 
@@ -373,9 +357,7 @@ Return $x/2^y$ where rounding is towards zero.
 function >>(x::ZZMatrix, y::Int)
   y < 0 && throw(DomainError(y, "Exponent must be non-negative"))
   z = similar(x)
-  ccall((:fmpz_mat_scalar_tdiv_q_2exp, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Int),
-        z, x, y)
+  @ccall libflint.fmpz_mat_scalar_tdiv_q_2exp(z::Ref{ZZMatrix}, x::Ref{ZZMatrix}, y::Int)::Nothing
   return z
 end
 
@@ -389,9 +371,7 @@ function ^(x::ZZMatrix, y::Int)
   y < 0 && throw(DomainError(y, "Exponent must be non-negative"))
   nrows(x) != ncols(x) && error("Incompatible matrix dimensions")
   z = similar(x)
-  ccall((:fmpz_mat_pow, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Int),
-        z, x, y)
+  @ccall libflint.fmpz_mat_pow(z::Ref{ZZMatrix}, x::Ref{ZZMatrix}, y::Int)::Nothing
   return z
 end
 
@@ -403,8 +383,7 @@ end
 
 function ==(x::ZZMatrix, y::ZZMatrix)
   b = check_parent(x, y, false)
-  b && ccall((:fmpz_mat_equal, libflint), Bool,
-             (Ref{ZZMatrix}, Ref{ZZMatrix}), x, y)
+  b && @ccall libflint.fmpz_mat_equal(x::Ref{ZZMatrix}, y::Ref{ZZMatrix})::Bool
 end
 
 isequal(x::ZZMatrix, y::ZZMatrix) = ==(x, y)
@@ -441,7 +420,7 @@ end
 function compare_index(A::ZZMatrix, i::Int, j::Int, b::ZZRingElem)
   GC.@preserve A begin
     a = mat_entry_ptr(A, i, j)
-    return ccall((:fmpz_cmp, libflint), Cint, (Ptr{ZZRingElem}, Ref{ZZRingElem}), a, b)
+    return @ccall libflint.fmpz_cmp(a::Ptr{ZZRingElem}, b::Ref{ZZRingElem})::Cint
   end
 end
 
@@ -455,8 +434,7 @@ function inv(x::ZZMatrix)
   !is_square(x) && error("Matrix not invertible")
   z = similar(x)
   d = ZZRingElem()
-  ccall((:fmpz_mat_inv, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{ZZMatrix}), z, d, x)
+  @ccall libflint.fmpz_mat_inv(z::Ref{ZZMatrix}, d::Ref{ZZRingElem}, x::Ref{ZZMatrix})::Nothing
   if isone(d)
     return z
   end
@@ -492,8 +470,7 @@ julia> B, d = pseudo_inv(A)
 function pseudo_inv(x::ZZMatrix)
   z = similar(x)
   d = ZZRingElem()
-  ccall((:fmpz_mat_inv, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{ZZMatrix}), z, d, x)
+  @ccall libflint.fmpz_mat_inv(z::Ref{ZZMatrix}, d::Ref{ZZRingElem}, x::Ref{ZZMatrix})::Nothing
   if !iszero(d)
     return (z, d)
   end
@@ -519,8 +496,7 @@ end
 
 function divexact(x::ZZMatrix, y::Int; check::Bool=true)
   z = similar(x)
-  ccall((:fmpz_mat_scalar_divexact_si, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Int), z, x, y)
+  @ccall libflint.fmpz_mat_scalar_divexact_si(z::Ref{ZZMatrix}, x::Ref{ZZMatrix}, y::Int)::Nothing
   return z
 end
 
@@ -529,8 +505,7 @@ divexact(x::ZZMatrix, y::ZZRingElem; check::Bool=true) = divexact!(similar(x), x
 divexact(x::ZZMatrix, y::Integer; check::Bool=true) = divexact(x, ZZRingElem(y); check=check)
 
 function divexact!(a::ZZMatrix, b::ZZMatrix, d::ZZRingElem)
-  ccall((:fmpz_mat_scalar_divexact_fmpz, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}), a, b, d)
+  @ccall libflint.fmpz_mat_scalar_divexact_fmpz(a::Ref{ZZMatrix}, b::Ref{ZZMatrix}, d::Ref{ZZRingElem})::Nothing
   return a
 end
 
@@ -542,8 +517,7 @@ end
 
 function kronecker_product(x::ZZMatrix, y::ZZMatrix)
   z = similar(x, nrows(x)*nrows(y), ncols(x)*ncols(y))
-  ccall((:fmpz_mat_kronecker_product, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZMatrix}), z, x, y)
+  @ccall libflint.fmpz_mat_kronecker_product(z::Ref{ZZMatrix}, x::Ref{ZZMatrix}, y::Ref{ZZMatrix})::Nothing
   return z
 end
 
@@ -560,8 +534,7 @@ Reduce the entries of $x$ modulo $y$ and return the result.
 """
 function reduce_mod(x::ZZMatrix, y::ZZRingElem)
   z = similar(x)
-  ccall((:fmpz_mat_scalar_mod_fmpz, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}), z, x, y)
+  @ccall libflint.fmpz_mat_scalar_mod_fmpz(z::Ref{ZZMatrix}, x::Ref{ZZMatrix}, y::Ref{ZZRingElem})::Nothing
   return z
 end
 
@@ -583,7 +556,7 @@ function mod!(M::ZZMatrix, p::ZZRingElem)
     for i = 1:nrows(M)
       for j = 1:ncols(M)
         z = mat_entry_ptr(M, i, j)
-        ccall((:fmpz_mod, libflint), Nothing, (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), z, z, p)
+        @ccall libflint.fmpz_mod(z::Ptr{ZZRingElem}, z::Ptr{ZZRingElem}, p::Ref{ZZRingElem})::Nothing
       end
     end
   end
@@ -608,7 +581,7 @@ Reduces every entry modulo $p$ in-place, into the symmetric residue system.
 """
 function mod_sym!(M::ZZMatrix, B::ZZRingElem)
   @assert !iszero(B)
-  ccall((:fmpz_mat_scalar_smod, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}), M, M, B)
+  @ccall libflint.fmpz_mat_scalar_smod(M::Ref{ZZMatrix}, M::Ref{ZZMatrix}, B::Ref{ZZRingElem})::Nothing
 end
 mod_sym!(M::ZZMatrix, B::Integer) = mod_sym!(M, ZZRingElem(B))
 
@@ -619,7 +592,7 @@ Reduces every entry modulo $p$ into the symmetric residue system.
 """
 function mod_sym(M::ZZMatrix, B::ZZRingElem)
   N = zero_matrix(ZZ, nrows(M), ncols(M))
-  ccall((:fmpz_mat_scalar_smod, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}), N, M, B)
+  @ccall libflint.fmpz_mat_scalar_smod(N::Ref{ZZMatrix}, M::Ref{ZZMatrix}, B::Ref{ZZRingElem})::Nothing
   return N
 end
 mod_sym(M::ZZMatrix, B::Integer) = mod_sym(M, ZZRingElem(B))
@@ -640,9 +613,7 @@ function fflu(x::ZZMatrix, P = SymmetricGroup(nrows(x)))
 
   p.d .-= 1
 
-  r = ccall((:fmpz_mat_fflu, libflint), Int,
-            (Ref{ZZMatrix}, Ref{ZZRingElem}, Ptr{Int}, Ref{ZZMatrix}, Int),
-            U, d, p.d, x, 0)
+  r = @ccall libflint.fmpz_mat_fflu(U::Ref{ZZMatrix}, d::Ref{ZZRingElem}, p.d::Ptr{Int}, x::Ref{ZZMatrix}, 0::Int)::Int
 
   p.d .+= 1
 
@@ -679,8 +650,7 @@ end
 function charpoly(R::ZZPolyRing, x::ZZMatrix)
   nrows(x) != ncols(x) && error("Non-square")
   z = R()
-  ccall((:fmpz_mat_charpoly, libflint), Nothing,
-        (Ref{ZZPolyRingElem}, Ref{ZZMatrix}), z, x)
+  @ccall libflint.fmpz_mat_charpoly(z::Ref{ZZPolyRingElem}, x::Ref{ZZMatrix})::Nothing
   return z
 end
 
@@ -693,8 +663,7 @@ end
 function minpoly(R::ZZPolyRing, x::ZZMatrix)
   nrows(x) != ncols(x) && error("Non-square")
   z = R()
-  ccall((:fmpz_mat_minpoly, libflint), Nothing,
-        (Ref{ZZPolyRingElem}, Ref{ZZMatrix}), z, x)
+  @ccall libflint.fmpz_mat_minpoly(z::Ref{ZZPolyRingElem}, x::Ref{ZZMatrix})::Nothing
   return z
 end
 
@@ -707,8 +676,7 @@ end
 function det(x::ZZMatrix)
   nrows(x) != ncols(x) && error("Non-square matrix")
   z = ZZRingElem()
-  ccall((:fmpz_mat_det, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZMatrix}), z, x)
+  @ccall libflint.fmpz_mat_det(z::Ref{ZZRingElem}, x::Ref{ZZMatrix})::Nothing
   return z
 end
 
@@ -721,8 +689,7 @@ is nonzero, otherwise return zero.
 function det_divisor(x::ZZMatrix)
   nrows(x) != ncols(x) && error("Non-square matrix")
   z = ZZRingElem()
-  ccall((:fmpz_mat_det_divisor, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZMatrix}), z, x)
+  @ccall libflint.fmpz_mat_det_divisor(z::Ref{ZZRingElem}, x::Ref{ZZMatrix})::Nothing
   return z
 end
 
@@ -736,8 +703,7 @@ otherwise a heuristic algorithm is used.
 function det_given_divisor(x::ZZMatrix, d::ZZRingElem, proved=true)
   nrows(x) != ncols(x) && error("Non-square")
   z = ZZRingElem()
-  ccall((:fmpz_mat_det_modular_given_divisor, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZMatrix}, Ref{ZZRingElem}, Cint), z, x, d, proved)
+  @ccall libflint.fmpz_mat_det_modular_given_divisor(z::Ref{ZZRingElem}, x::Ref{ZZMatrix}, d::Ref{ZZRingElem}, proved::Cint)::Nothing
   return z
 end
 
@@ -769,7 +735,7 @@ function hadamard_bound2(M::ZZMatrix)
       zero!(r)
       M_ptr = mat_entry_ptr(M, i, 1)
       for j in 1:n
-        ccall((:fmpz_addmul, libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}), r, M_ptr, M_ptr)
+        addmul!(r, M_ptr, M_ptr)
         M_ptr += sizeof(ZZRingElem)
       end
       if iszero(r)
@@ -794,7 +760,7 @@ function maximum(::typeof(nbits), M::ZZMatrix)
         #this is not going through the "correct" order of the rows, but 
         #for this is does not matter
         if !iszero(unsafe_load(reinterpret(Ptr{Int}, M_ptr)))
-          mx = max(mx, ccall((:fmpz_bits, libflint), Culong, (Ptr{ZZRingElem},), M_ptr))
+          mx = max(mx, nbits(M_ptr))
         end
         M_ptr += sizeof(ZZRingElem)
       end
@@ -810,12 +776,12 @@ function maximum(f::typeof(abs), a::ZZMatrix)
     for i = 1:nrows(a)
       for j = 1:ncols(a)
         z = mat_entry_ptr(a, i, j)
-        if ccall((:fmpz_cmpabs, libflint), Cint, (Ptr{ZZRingElem}, Ptr{ZZRingElem}), m, z) < 0
+        if (@ccall libflint.fmpz_cmpabs(m::Ptr{ZZRingElem}, z::Ptr{ZZRingElem})::Cint) < 0
           m = z
         end
       end
     end
-    ccall((:fmpz_abs, libflint), Nothing, (Ref{ZZRingElem}, Ptr{ZZRingElem}), r, m)
+    @ccall libflint.fmpz_abs(r::Ref{ZZRingElem}, m::Ptr{ZZRingElem})::Nothing
   end
   return r
 end
@@ -827,7 +793,7 @@ function maximum(a::ZZMatrix)
     for i = 1:nrows(a)
       for j = 1:ncols(a)
         z = mat_entry_ptr(a, i, j)
-        if ccall((:fmpz_cmp, libflint), Cint, (Ptr{ZZRingElem}, Ptr{ZZRingElem}), m, z) < 0
+        if (@ccall libflint.fmpz_cmp(m::Ptr{ZZRingElem}, z::Ptr{ZZRingElem})::Cint) < 0
           m = z
         end
       end
@@ -844,7 +810,7 @@ function minimum(a::ZZMatrix)
     for i = 1:nrows(a)
       for j = 1:ncols(a)
         z = mat_entry_ptr(a, i, j)
-        if ccall((:fmpz_cmp, libflint), Cint, (Ptr{ZZRingElem}, Ptr{ZZRingElem}), m, z) > 0
+        if (@ccall libflint.fmpz_cmp(m::Ptr{ZZRingElem}, z::Ptr{ZZRingElem})::Cint) > 0
           m = z
         end
       end
@@ -862,8 +828,7 @@ end
 
 function gram(x::ZZMatrix)
   z = similar(x, nrows(x), nrows(x))
-  ccall((:fmpz_mat_gram, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}), z, x)
+  @ccall libflint.fmpz_mat_gram(z::Ref{ZZMatrix}, x::Ref{ZZMatrix})::Nothing
   return z
 end
 
@@ -882,8 +847,7 @@ columns must be equal.
 function hadamard(R::ZZMatrixSpace)
   nrows(R) != ncols(R) && error("Unable to create Hadamard matrix")
   z = R()
-  success = ccall((:fmpz_mat_hadamard, libflint), Bool,
-                  (Ref{ZZMatrix},), z)
+  success = @ccall libflint.fmpz_mat_hadamard(z::Ref{ZZMatrix})::Bool
   !success && error("Unable to create Hadamard matrix")
   return z
 end
@@ -894,8 +858,7 @@ end
 Return `true` if the given matrix is Hadamard, otherwise return `false`.
 """
 function is_hadamard(x::ZZMatrix)
-  return ccall((:fmpz_mat_is_hadamard, libflint), Bool,
-               (Ref{ZZMatrix},), x)
+  return @ccall libflint.fmpz_mat_is_hadamard(x::Ref{ZZMatrix})::Bool
 end
 
 ###############################################################################
@@ -919,19 +882,18 @@ Return the Hermite Normal Form of $x$.
 
 function __hnf(x)
   z = similar(x)
-  ccall((:fmpz_mat_hnf, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}), z, x)
+  @ccall libflint.fmpz_mat_hnf(z::Ref{ZZMatrix}, x::Ref{ZZMatrix})::Nothing
   return z
 end
 
 function hnf!(x::ZZMatrix)
   if nrows(x) * ncols(x) > 100
     z = hnf(x)
-    ccall((:fmpz_mat_set, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}), x, z)
+    @ccall libflint.fmpz_mat_set(x::Ref{ZZMatrix}, z::Ref{ZZMatrix})::Nothing
 
     return x
   end
-  ccall((:fmpz_mat_hnf, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}), x, x)
+  @ccall libflint.fmpz_mat_hnf(x::Ref{ZZMatrix}, x::Ref{ZZMatrix})::Nothing
   return x
 end
 
@@ -948,8 +910,7 @@ is a transformation matrix so that $H = Tx$.
 function __hnf_with_transform(x::ZZMatrix)
   z = similar(x)
   u = similar(x, nrows(x), nrows(x))
-  ccall((:fmpz_mat_hnf_transform, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZMatrix}), z, u, x)
+  @ccall libflint.fmpz_mat_hnf_transform(z::Ref{ZZMatrix}, u::Ref{ZZMatrix}, x::Ref{ZZMatrix})::Nothing
   return z, u
 end
 
@@ -961,8 +922,7 @@ determinant of the nonzero rows of $x$.
 """
 function hnf_modular(x::ZZMatrix, d::ZZRingElem)
   z = similar(x)
-  ccall((:fmpz_mat_hnf_modular, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}), z, x, d)
+  @ccall libflint.fmpz_mat_hnf_modular(z::Ref{ZZMatrix}, x::Ref{ZZMatrix}, d::Ref{ZZRingElem})::Nothing
   return z
 end
 
@@ -976,8 +936,7 @@ function hnf_modular_eldiv(x::ZZMatrix, d::ZZRingElem)
   (nrows(x) < ncols(x)) &&
   error("Matrix must have at least as many rows as columns")
   z = deepcopy(x)
-  ccall((:fmpz_mat_hnf_modular_eldiv, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZRingElem}), z, d)
+  @ccall libflint.fmpz_mat_hnf_modular_eldiv(z::Ref{ZZMatrix}, d::Ref{ZZRingElem})::Nothing
   return z
 end
 
@@ -988,8 +947,7 @@ Return `true` if the given matrix is in Hermite Normal Form, otherwise return
 `false`.
 """
 function is_hnf(x::ZZMatrix)
-  return ccall((:fmpz_mat_is_in_hnf, libflint), Bool,
-               (Ref{ZZMatrix},), x)
+  return @ccall libflint.fmpz_mat_is_in_hnf(x::Ref{ZZMatrix})::Bool
 end
 
 ###############################################################################
@@ -1030,8 +988,7 @@ function lll_with_transform(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51
   for i in 1:nrows(u)
     u[i, i] = 1
   end
-  ccall((:fmpz_lll, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{LLLContext}), z, u, ctx)
+  @ccall libflint.fmpz_lll(z::Ref{ZZMatrix}, u::Ref{ZZMatrix}, ctx::Ref{LLLContext})::Nothing
   return z, u
 end
 
@@ -1069,8 +1026,7 @@ function lll!(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51))
   if nrows(x) == 0
     return x
   end
-  ccall((:fmpz_lll, libflint), Nothing,
-        (Ref{ZZMatrix}, Ptr{nothing}, Ref{LLLContext}), x, C_NULL, ctx)
+  @ccall libflint.fmpz_lll(x::Ref{ZZMatrix}, C_NULL::Ptr{nothing}, ctx::Ref{LLLContext})::Nothing
   return x
 end
 
@@ -1091,8 +1047,7 @@ function lll_gram_with_transform(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99,
   for i in 1:nrows(u)
     u[i, i] = 1
   end
-  ccall((:fmpz_lll, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{LLLContext}), z, u, ctx)
+  @ccall libflint.fmpz_lll(z::Ref{ZZMatrix}, u::Ref{ZZMatrix}, ctx::Ref{LLLContext})::Nothing
   return z, u
 end
 
@@ -1124,8 +1079,7 @@ $\eta = 0.51$. These defaults can be overridden by specifying an optional contex
 object.
 """
 function lll_gram!(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51, :gram))
-  ccall((:fmpz_lll, libflint), Nothing,
-        (Ref{ZZMatrix}, Ptr{Nothing}, Ref{LLLContext}), x, C_NULL, ctx)
+  @ccall libflint.fmpz_lll(x::Ref{ZZMatrix}, C_NULL::Ptr{Nothing}, ctx::Ref{LLLContext})::Nothing
   return x
 end
 
@@ -1142,8 +1096,7 @@ function lll_with_removal_transform(x::ZZMatrix, b::ZZRingElem, ctx::LLLContext 
   for i in 1:nrows(u)
     u[i, i] = 1
   end
-  d = Int(ccall((:fmpz_lll_with_removal, libflint), Cint,
-                (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{LLLContext}), z, u, b, ctx))
+  d = Int(@ccall libflint.fmpz_lll_with_removal(z::Ref{ZZMatrix}, u::Ref{ZZMatrix}, b::Ref{ZZRingElem}, ctx::Ref{LLLContext})::Cint)
   return d, z, u
 end
 
@@ -1156,8 +1109,7 @@ are the rows remaining after removal.
 """
 function lll_with_removal(x::ZZMatrix, b::ZZRingElem, ctx::LLLContext = LLLContext(0.99, 0.51))
   z = deepcopy(x)
-  d = Int(ccall((:fmpz_lll_with_removal, libflint), Cint,
-                (Ref{ZZMatrix}, Ptr{Nothing}, Ref{ZZRingElem}, Ref{LLLContext}), z, C_NULL, b, ctx))
+  d = Int(@ccall libflint.fmpz_lll_with_removal(z::Ref{ZZMatrix}, C_NULL::Ptr{Nothing}, b::Ref{ZZRingElem}, ctx::Ref{LLLContext})::Cint)
   return d, z
 end
 
@@ -1196,8 +1148,7 @@ $\mathbb{Q}$.
 function nullspace_right_rational(x::ZZMatrix)
   z = similar(x)
   u = similar(x, ncols(x), ncols(x))
-  rank = ccall((:fmpz_mat_nullspace, libflint), Int,
-               (Ref{ZZMatrix}, Ref{ZZMatrix}), u, x)
+  rank = @ccall libflint.fmpz_mat_nullspace(u::Ref{ZZMatrix}, x::Ref{ZZMatrix})::Int
   return rank, u
 end
 
@@ -1208,8 +1159,7 @@ end
 ###############################################################################
 
 function rank(x::ZZMatrix)
-  return ccall((:fmpz_mat_rank, libflint), Int,
-               (Ref{ZZMatrix},), x)
+  return @ccall libflint.fmpz_mat_rank(x::Ref{ZZMatrix})::Int
 end
 
 ###############################################################################
@@ -1221,8 +1171,7 @@ end
 function rref(x::ZZMatrix)
   z = similar(x)
   d = ZZRingElem()
-  r = ccall((:fmpz_mat_rref, libflint), Int,
-            (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{ZZMatrix}), z, d, x)
+  r = @ccall libflint.fmpz_mat_rref(z::Ref{ZZMatrix}, d::Ref{ZZRingElem}, x::Ref{ZZMatrix})::Int
   return r, z, d
 end
 
@@ -1239,8 +1188,7 @@ Compute the Smith normal form of $x$.
 """
 function snf(x::ZZMatrix)
   z = similar(x)
-  ccall((:fmpz_mat_snf, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}), z, x)
+  @ccall libflint.fmpz_mat_snf(z::Ref{ZZMatrix}, x::Ref{ZZMatrix})::Nothing
   return z
 end
 
@@ -1251,8 +1199,7 @@ Given a diagonal matrix $x$ compute the Smith normal form of $x$.
 """
 function snf_diagonal(x::ZZMatrix)
   z = similar(x)
-  ccall((:fmpz_mat_snf_diagonal, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}), z, x)
+  @ccall libflint.fmpz_mat_snf_diagonal(z::Ref{ZZMatrix}, x::Ref{ZZMatrix})::Nothing
   return z
 end
 
@@ -1262,8 +1209,7 @@ end
 Return `true` if $x$ is in Smith normal form, otherwise return `false`.
 """
 function is_snf(x::ZZMatrix)
-  return ccall((:fmpz_mat_is_in_snf, libflint), Bool,
-               (Ref{ZZMatrix},), x)
+  return @ccall libflint.fmpz_mat_is_in_snf(x::Ref{ZZMatrix})::Bool
 end
 
 ################################################################################
@@ -1395,7 +1341,7 @@ function AbstractAlgebra.add_row!(A::ZZMatrix, s::ZZRingElem, i::Int, j::Int)
     i_ptr = mat_entry_ptr(A, i, 1)
     j_ptr = mat_entry_ptr(A, j, 1)
     for k = 1:ncols(A)
-      ccall((:fmpz_addmul, libflint), Cvoid, (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), i_ptr, s, j_ptr)
+      addmul!(i_ptr, s, j_ptr)
       i_ptr += sizeof(ZZRingElem)
       j_ptr += sizeof(ZZRingElem)
     end
@@ -1409,7 +1355,7 @@ function AbstractAlgebra.add_column!(A::ZZMatrix, s::ZZRingElem, i::Int, j::Int)
     for k = 1:nrows(A)
       i_ptr = mat_entry_ptr(A, k, i)
       j_ptr = mat_entry_ptr(A, k, j)
-      ccall((:fmpz_addmul, libflint), Cvoid, (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), i_ptr, s, j_ptr)
+      addmul!(i_ptr, s, j_ptr)
     end
   end
 end
@@ -1580,8 +1526,7 @@ function _solve_rational(a::ZZMatrix, b::ZZMatrix)
   nrows(b) != nrows(a) && error("Incompatible dimensions in _solve_rational")
   z = similar(b)
   d = ZZRingElem()
-  nonsing = ccall((:fmpz_mat_solve, libflint), Bool,
-                  (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{ZZMatrix}, Ref{ZZMatrix}), z, d, a, b)
+  nonsing = @ccall libflint.fmpz_mat_solve(z::Ref{ZZMatrix}, d::Ref{ZZRingElem}, a::Ref{ZZMatrix}, b::Ref{ZZMatrix})::Bool
   !nonsing && error("Singular matrix in _solve_rational")
   return z, d
 end
@@ -1603,8 +1548,7 @@ function _solve_dixon(a::ZZMatrix, b::ZZMatrix)
   nrows(b) != nrows(a) && error("Incompatible dimensions in solve")
   z = similar(b)
   d = ZZRingElem()
-  nonsing = ccall((:fmpz_mat_solve_dixon, libflint), Bool,
-                  (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{ZZMatrix}, Ref{ZZMatrix}), z, d, a, b)
+  nonsing = @ccall libflint.fmpz_mat_solve_dixon(z::Ref{ZZMatrix}, d::Ref{ZZRingElem}, a::Ref{ZZMatrix}, b::Ref{ZZMatrix})::Bool
   !nonsing && error("Singular matrix in solve")
   return z, d
 end
@@ -1628,18 +1572,16 @@ function _solve_triu_left(U::ZZMatrix, b::ZZMatrix)
         tmp_p += sizeof(ZZRingElem)
       end
       for j = 1:n
-        ccall((:fmpz_zero, libflint), Cvoid, (Ref{ZZRingElem}, ), s) 
+        zero!(s)
 
         tmp_p = mat_entry_ptr(tmp, 1, 1)
         for k = 1:j-1
           U_p = mat_entry_ptr(U, k, j)
-          ccall((:fmpz_addmul, libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}), s, U_p, tmp_p)
+          addmul!(s, U_p, tmp_p)
           tmp_p += sizeof(ZZRingElem)
         end
-        ccall((:fmpz_sub, libflint), Cvoid, 
-              (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), s, mat_entry_ptr(b, i, j), s)
-        ccall((:fmpz_divexact, libflint), Cvoid, 
-              (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), mat_entry_ptr(tmp, 1, j), s, mat_entry_ptr(U, j, j))
+        sub!(s, mat_entry_ptr(b, i, j), s)
+        divexact!(mat_entry_ptr(tmp, 1, j), s, mat_entry_ptr(U, j, j))
       end
       tmp_p = mat_entry_ptr(tmp, 1, 1)
       X_p = mat_entry_ptr(X, i, 1)
@@ -1669,21 +1611,20 @@ function _solve_triu(U::ZZMatrix, b::ZZMatrix)
         tmp_ptr += sizeof(ZZRingElem)
       end
       for j = n:-1:1
-        ccall((:fmpz_zero, libflint), Cvoid, (Ref{ZZRingElem}, ), s)
+        zero!(s)
         tmp_ptr = mat_entry_ptr(tmp, 1, j+1)
         for k = j + 1:n
           U_ptr = mat_entry_ptr(U, j, k)
-          ccall((:fmpz_addmul, libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}), s, U_ptr, tmp_ptr)
+          mul!(s, U_ptr, tmp_ptr)
           tmp_ptr += sizeof(ZZRingElem)
           #           s = addmul!(s, U[j, k], tmp[k])
         end
         b_ptr = mat_entry_ptr(b, j, i)
-        ccall((:fmpz_sub, libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), s, b_ptr, s)
+        sub!(s, b_ptr, s)
         #         s = b[j, i] - s
         tmp_ptr = mat_entry_ptr(tmp, 1, j)
         U_ptr = mat_entry_ptr(U, j, j)
-        ccall((:fmpz_divexact, libflint), Cvoid, (Ptr{ZZRingElem}, Ref{ZZRingElem}, Ptr{ZZRingElem}), tmp_ptr, s, U_ptr)
-
+        divexact!(tmp_ptr, s, U_ptr)
         #           tmp[j] = divexact(s, U[j,j])
       end
       tmp_ptr = mat_entry_ptr(tmp, 1, 1)
@@ -1735,8 +1676,7 @@ end
 function tr(x::ZZMatrix)
   nrows(x) != ncols(x) && error("Not a square matrix in trace")
   d = ZZRingElem()
-  ccall((:fmpz_mat_trace, libflint), Int,
-        (Ref{ZZRingElem}, Ref{ZZMatrix}), d, x)
+  @ccall libflint.fmpz_mat_trace(d::Ref{ZZRingElem}, x::Ref{ZZMatrix})::Int
   return d
 end
 
@@ -1748,8 +1688,7 @@ end
 
 function content(x::ZZMatrix)
   d = ZZRingElem()
-  ccall((:fmpz_mat_content, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{ZZMatrix}), d, x)
+  @ccall libflint.fmpz_mat_content(d::Ref{ZZRingElem}, x::Ref{ZZMatrix})::Nothing
   return d
 end
 
@@ -1762,16 +1701,14 @@ end
 function hcat(a::ZZMatrix, b::ZZMatrix)
   nrows(a) != nrows(b) && error("Incompatible number of rows in hcat")
   c = similar(a, nrows(a), ncols(a) + ncols(b))
-  ccall((:fmpz_mat_concat_horizontal, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZMatrix}), c, a, b)
+  @ccall libflint.fmpz_mat_concat_horizontal(c::Ref{ZZMatrix}, a::Ref{ZZMatrix}, b::Ref{ZZMatrix})::Nothing
   return c
 end
 
 function vcat(a::ZZMatrix, b::ZZMatrix)
   ncols(a) != ncols(b) && error("Incompatible number of columns in vcat")
   c = similar(a, nrows(a) + nrows(b), ncols(a))
-  ccall((:fmpz_mat_concat_vertical, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZMatrix}), c, a, b)
+  @ccall libflint.fmpz_mat_concat_vertical(c::Ref{ZZMatrix}, a::Ref{ZZMatrix}, b::Ref{ZZMatrix})::Nothing
   return c
 end
 
@@ -1782,55 +1719,47 @@ end
 ###############################################################################
 
 function zero!(z::ZZMatrixOrPtr)
-  ccall((:fmpz_mat_zero, libflint), Nothing,
-        (Ref{ZZMatrix},), z)
+  @ccall libflint.fmpz_mat_zero(z::Ref{ZZMatrix})::Nothing
   return z
 end
 
 function one!(z::ZZMatrixOrPtr)
-  ccall((:fmpz_mat_one, libflint), Nothing,
-        (Ref{ZZMatrix},), z)
+  @ccall libflint.fmpz_mat_one(z::Ref{ZZMatrix})::Nothing
   return z
 end
 
 function neg!(z::ZZMatrixOrPtr, w::ZZMatrixOrPtr)
-  ccall((:fmpz_mat_neg, libflint), Nothing, (Ref{ZZMatrix}, Ref{ZZMatrix}), z, w)
+  @ccall libflint.fmpz_mat_neg(z::Ref{ZZMatrix}, w::Ref{ZZMatrix})::Nothing
   return z
 end
 
 function add!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr, y::ZZMatrixOrPtr)
-  ccall((:fmpz_mat_add, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZMatrix}), z, x, y)
+  @ccall libflint.fmpz_mat_add(z::Ref{ZZMatrix}, x::Ref{ZZMatrix}, y::Ref{ZZMatrix})::Nothing
   return z
 end
 
 function sub!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr, y::ZZMatrixOrPtr)
-  ccall((:fmpz_mat_sub, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZMatrix}), z, x, y)
+  @ccall libflint.fmpz_mat_sub(z::Ref{ZZMatrix}, x::Ref{ZZMatrix}, y::Ref{ZZMatrix})::Nothing
   return z
 end
 
 function mul!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr, y::ZZMatrixOrPtr)
-  ccall((:fmpz_mat_mul, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZMatrix}), z, x, y)
+  @ccall libflint.fmpz_mat_mul(z::Ref{ZZMatrix}, x::Ref{ZZMatrix}, y::Ref{ZZMatrix})::Nothing
   return z
 end
 
 function mul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::Int)
-  ccall((:fmpz_mat_scalar_mul_si, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Int), z, a, b)
+  @ccall libflint.fmpz_mat_scalar_mul_si(z::Ref{ZZMatrix}, a::Ref{ZZMatrix}, b::Int)::Nothing
   return z
 end
 
 function mul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::UInt)
-  ccall((:fmpz_mat_scalar_mul_ui, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, UInt), z, a, b)
+  @ccall libflint.fmpz_mat_scalar_mul_ui(z::Ref{ZZMatrix}, a::Ref{ZZMatrix}, b::UInt)::Nothing
   return z
 end
 
 function mul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::ZZRingElemOrPtr)
-  ccall((:fmpz_mat_scalar_mul_fmpz, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}), z, a, b)
+  @ccall libflint.fmpz_mat_scalar_mul_fmpz(z::Ref{ZZMatrix}, a::Ref{ZZMatrix}, b::Ref{ZZRingElem})::Nothing
   return z
 end
 
@@ -1838,20 +1767,17 @@ mul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::Integer) = mul!(z, a, flintify(b))
 mul!(z::ZZMatrixOrPtr, a::IntegerUnionOrPtr, b::ZZMatrixOrPtr) = mul!(z, b, a)
 
 function addmul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::ZZRingElemOrPtr)
-  ccall((:fmpz_mat_scalar_addmul_fmpz, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}), z, a, b)
+  @ccall libflint.fmpz_mat_scalar_addmul_fmpz(z::Ref{ZZMatrix}, a::Ref{ZZMatrix}, b::Ref{ZZRingElem})::Nothing
   return z
 end
 
 function addmul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::Int)
-  ccall((:fmpz_mat_scalar_addmul_si, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, Int), z, a, b)
+  @ccall libflint.fmpz_mat_scalar_addmul_si(z::Ref{ZZMatrix}, a::Ref{ZZMatrix}, b::Int)::Nothing
   return z
 end
 
 function addmul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::UInt)
-  ccall((:fmpz_mat_scalar_addmul_ui, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZMatrix}, UInt), z, a, b)
+  @ccall libflint.fmpz_mat_scalar_addmul_ui(z::Ref{ZZMatrix}, a::Ref{ZZMatrix}, b::UInt)::Nothing
   return z
 end
 
@@ -1859,16 +1785,12 @@ addmul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::Integer) = addmul!(z, a, flintify
 addmul!(z::ZZMatrixOrPtr, a::IntegerUnionOrPtr, b::ZZMatrixOrPtr) = addmul!(z, b, a)
 
 function mul!(z::Vector{ZZRingElem}, a::ZZMatrixOrPtr, b::Vector{ZZRingElem})
-  ccall((:fmpz_mat_mul_fmpz_vec_ptr, libflint), Nothing,
-        (Ptr{Ref{ZZRingElem}}, Ref{ZZMatrix}, Ptr{Ref{ZZRingElem}}, Int),
-        z, a, b, length(b))
+  @ccall libflint.fmpz_mat_mul_fmpz_vec_ptr(z::Ptr{Ref{ZZRingElem}}, a::Ref{ZZMatrix}, b::Ptr{Ref{ZZRingElem}}, length(b)::Int)::Nothing
   return z
 end
 
 function mul!(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::ZZMatrixOrPtr)
-  ccall((:fmpz_mat_fmpz_vec_mul_ptr, libflint), Nothing,
-        (Ptr{Ref{ZZRingElem}}, Ptr{Ref{ZZRingElem}}, Int, Ref{ZZMatrix}),
-        z, a, length(a), b)
+  @ccall libflint.fmpz_mat_fmpz_vec_mul_ptr(z::Ptr{Ref{ZZRingElem}}, a::Ptr{Ref{ZZRingElem}}, length(a)::Int, b::Ref{ZZMatrix})::Nothing
   return z
 end
 
@@ -1887,9 +1809,9 @@ function shift!(g::ZZMatrix, l::Int)
       for j = 1:ncols(g)
         z = mat_entry_ptr(g, i, j)
         if l > 0
-          ccall((:fmpz_mul_2exp, libflint), Nothing, (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Int), z, z, l)
+          @ccall libflint.fmpz_mul_2exp(z::Ptr{ZZRingElem}, z::Ptr{ZZRingElem}, l::Int)::Nothing
         else
-          ccall((:fmpz_tdiv_q_2exp, libflint), Nothing, (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Int), z, z, -l)
+          @ccall libflint.fmpz_tdiv_q_2exp(z::Ptr{ZZRingElem}, z::Ptr{ZZRingElem}, (-l)::Int)::Nothing
         end
       end
     end
@@ -1961,15 +1883,13 @@ end
 
 function map_entries(R::zzModRing, M::ZZMatrix)
   MR = zero_matrix(R, nrows(M), ncols(M))
-  ccall((:fmpz_mat_get_nmod_mat, libflint), Nothing,
-        (Ref{zzModMatrix}, Ref{ZZMatrix}), MR, M)
+  @ccall libflint.fmpz_mat_get_nmod_mat(MR::Ref{zzModMatrix}, M::Ref{ZZMatrix})::Nothing
   return MR
 end
 
 function map_entries(F::fpField, M::ZZMatrix)
   MR = zero_matrix(F, nrows(M), ncols(M))
-  ccall((:fmpz_mat_get_nmod_mat, libflint), Nothing,
-        (Ref{fpMatrix}, Ref{ZZMatrix}), MR, M)
+  @ccall libflint.fmpz_mat_get_nmod_mat(MR::Ref{fpMatrix}, M::Ref{ZZMatrix})::Nothing
   return MR
 end
 
@@ -1980,8 +1900,7 @@ function map_entries(R::ZZModRing, M::ZZMatrix)
       for j = 1:ncols(M)
         m = mat_entry_ptr(M, i, j)
         n = mat_entry_ptr(N, i, j)
-        ccall((:fmpz_mod, libflint), Nothing,
-              (Ptr{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), n, m, R.n)
+        @ccall libflint.fmpz_mod(n::Ptr{ZZRingElem}, m::Ptr{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
       end
     end
   end
