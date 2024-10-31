@@ -580,7 +580,7 @@ const _ecm_nCs = Vector{Int}[_ecm_nC]
 ###############################################################################
 
 GaussianIntegers() = ZZiRing()
-GaussianRationals() = FlintQQi
+GaussianRationals() = QQiField()
 
 ###############################################################################
 #

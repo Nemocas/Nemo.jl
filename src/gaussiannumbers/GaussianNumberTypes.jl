@@ -11,8 +11,6 @@ end
 struct QQiField <: Field
 end
 
-const FlintQQi = QQiField()
-
 struct QQiFieldElem <: FieldElem
   num::ZZiRingElem
   den::ZZRingElem
