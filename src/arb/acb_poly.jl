@@ -16,12 +16,10 @@ elem_type(::Type{AcbPolyRing}) = AcbPolyRingElem
 
 dense_poly_type(::Type{AcbFieldElem}) = AcbPolyRingElem
 
-length(x::AcbPolyRingElem) = ccall((:acb_poly_length, libflint), Int,
-                                   (Ref{AcbPolyRingElem},), x)
+length(x::AcbPolyRingElem) = @ccall libflint.acb_poly_length(x::Ref{AcbPolyRingElem})::Int
 
 function set_length!(x::AcbPolyRingElem, n::Int)
-  ccall((:_acb_poly_set_length, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Int), x, n)
+  @ccall libflint._acb_poly_set_length(x::Ref{AcbPolyRingElem}, n::Int)::Nothing
   return x
 end
 
@@ -30,19 +28,17 @@ degree(x::AcbPolyRingElem) = length(x) - 1
 function coeff(a::AcbPolyRingElem, n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
   t = parent(a).base_ring()
-  ccall((:acb_poly_get_coeff_acb, libflint), Nothing,
-        (Ref{AcbFieldElem}, Ref{AcbPolyRingElem}, Int), t, a, n)
+  @ccall libflint.acb_poly_get_coeff_acb(t::Ref{AcbFieldElem}, a::Ref{AcbPolyRingElem}, n::Int)::Nothing
   return t
 end
 
-zero(a::AcbPolyRing) = a(0)
+zero(a::AcbPolyRing) = a()
 
-one(a::AcbPolyRing) = a(1)
+one(a::AcbPolyRing) = one!(a())
 
 function gen(a::AcbPolyRing)
   z = AcbPolyRingElem()
-  ccall((:acb_poly_set_coeff_si, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Int, Int), z, 1, 1)
+  setcoeff!(z, 1, 1)
   z.parent = a
   return z
 end
@@ -118,8 +114,7 @@ end
 ###############################################################################
 
 function isequal(x::AcbPolyRingElem, y::AcbPolyRingElem)
-  return ccall((:acb_poly_equal, libflint), Bool,
-               (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}), x, y)
+  return @ccall libflint.acb_poly_equal(x::Ref{AcbPolyRingElem}, y::Ref{AcbPolyRingElem})::Bool
 end
 
 @doc raw"""
@@ -129,8 +124,7 @@ Return `true` if the coefficient boxes of $x$ overlap the coefficient boxes
 of $y$, otherwise return `false`.
 """
 function overlaps(x::AcbPolyRingElem, y::AcbPolyRingElem)
-  return ccall((:acb_poly_overlaps, libflint), Bool,
-               (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}), x, y)
+  return @ccall libflint.acb_poly_overlaps(x::Ref{AcbPolyRingElem}, y::Ref{AcbPolyRingElem})::Bool
 end
 
 @doc raw"""
@@ -140,8 +134,7 @@ Return `true` if the coefficient boxes of $x$ contain the corresponding
 coefficient boxes of $y$, otherwise return `false`.
 """
 function contains(x::AcbPolyRingElem, y::AcbPolyRingElem)
-  return ccall((:acb_poly_contains, libflint), Bool,
-               (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}), x, y)
+  return @ccall libflint.acb_poly_contains(x::Ref{AcbPolyRingElem}, y::Ref{AcbPolyRingElem})::Bool
 end
 
 @doc raw"""
@@ -151,8 +144,7 @@ Return `true` if the coefficient boxes of $x$ contain the corresponding
 exact coefficients of $y$, otherwise return `false`.
 """
 function contains(x::AcbPolyRingElem, y::ZZPolyRingElem)
-  return ccall((:acb_poly_contains_fmpz_poly, libflint), Bool,
-               (Ref{AcbPolyRingElem}, Ref{ZZPolyRingElem}), x, y)
+  return @ccall libflint.acb_poly_contains_fmpz_poly(x::Ref{AcbPolyRingElem}, y::Ref{ZZPolyRingElem})::Bool
 end
 
 @doc raw"""
@@ -162,8 +154,7 @@ Return `true` if the coefficient boxes of $x$ contain the corresponding
 exact coefficients of $y$, otherwise return `false`.
 """
 function contains(x::AcbPolyRingElem, y::QQPolyRingElem)
-  return ccall((:acb_poly_contains_fmpq_poly, libflint), Bool,
-               (Ref{AcbPolyRingElem}, Ref{QQPolyRingElem}), x, y)
+  return @ccall libflint.acb_poly_contains_fmpq_poly(x::Ref{AcbPolyRingElem}, y::Ref{QQPolyRingElem})::Bool
 end
 
 function ==(x::AcbPolyRingElem, y::AcbPolyRingElem)
@@ -196,13 +187,12 @@ in case it is, otherwise sets $t$ to `false`.
 """
 function unique_integer(x::AcbPolyRingElem)
   z = ZZPolyRing(ZZ, var(parent(x)))()
-  unique = ccall((:acb_poly_get_unique_fmpz_poly, libflint), Int,
-                 (Ref{ZZPolyRingElem}, Ref{AcbPolyRingElem}), z, x)
+  unique = @ccall libflint.acb_poly_get_unique_fmpz_poly(z::Ref{ZZPolyRingElem}, x::Ref{AcbPolyRingElem})::Int
   return (unique != 0, z)
 end
 
 function isreal(x::AcbPolyRingElem)
-  return ccall((:acb_poly_is_real, libflint), Cint, (Ref{AcbPolyRingElem}, ), x) != 0
+  return Bool(@ccall libflint.acb_poly_is_real(x::Ref{AcbPolyRingElem})::Cint)
 end
 
 ###############################################################################
@@ -214,16 +204,14 @@ end
 function shift_left(x::AcbPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Shift must be non-negative"))
   z = parent(x)()
-  ccall((:acb_poly_shift_left, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Int), z, x, len)
+  @ccall libflint.acb_poly_shift_left(z::Ref{AcbPolyRingElem}, x::Ref{AcbPolyRingElem}, len::Int)::Nothing
   return z
 end
 
 function shift_right(x::AcbPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Shift must be non-negative"))
   z = parent(x)()
-  ccall((:acb_poly_shift_right, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Int), z, x, len)
+  @ccall libflint.acb_poly_shift_right(z::Ref{AcbPolyRingElem}, x::Ref{AcbPolyRingElem}, len::Int)::Nothing
   return z
 end
 
@@ -233,11 +221,7 @@ end
 #
 ################################################################################
 
-function -(x::AcbPolyRingElem)
-  z = parent(x)()
-  ccall((:acb_poly_neg, libflint), Nothing, (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}), z, x)
-  return z
-end
+-(x::AcbPolyRingElem) = neg!(parent(x)(), x)
 
 ################################################################################
 #
@@ -247,34 +231,24 @@ end
 
 function +(x::AcbPolyRingElem, y::AcbPolyRingElem)
   z = parent(x)()
-  ccall((:acb_poly_add, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Int),
-        z, x, y, precision(parent(x)))
+  return add!(z, x, y)
+end
+
+function -(x::AcbPolyRingElem, y::AcbPolyRingElem)
+  z = parent(x)()
+  return sub!(z, x, y)
   return z
 end
 
 function *(x::AcbPolyRingElem, y::AcbPolyRingElem)
   z = parent(x)()
-  ccall((:acb_poly_mul, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Int),
-        z, x, y, precision(parent(x)))
-  return z
-end
-
-function -(x::AcbPolyRingElem, y::AcbPolyRingElem)
-  z = parent(x)()
-  ccall((:acb_poly_sub, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Int),
-        z, x, y, precision(parent(x)))
-  return z
+  return mul!(z, x, y)
 end
 
 function ^(x::AcbPolyRingElem, y::Int)
   y < 0 && throw(DomainError(y, "Exponent must be non-negative"))
   z = parent(x)()
-  ccall((:acb_poly_pow_ui, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, UInt, Int),
-        z, x, y, precision(parent(x)))
+  @ccall libflint.acb_poly_pow_ui(z::Ref{AcbPolyRingElem}, x::Ref{AcbPolyRingElem}, y::UInt, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -358,17 +332,14 @@ function truncate(a::AcbPolyRingElem, n::Int)
   end
   # todo: implement set_trunc in ArbFieldElem
   z = deepcopy(a)
-  ccall((:acb_poly_truncate, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Int), z, n)
+  @ccall libflint.acb_poly_truncate(z::Ref{AcbPolyRingElem}, n::Int)::Nothing
   return z
 end
 
 function mullow(x::AcbPolyRingElem, y::AcbPolyRingElem, n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
   z = parent(x)()
-  ccall((:acb_poly_mullow, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Int, Int),
-        z, x, y, n, precision(parent(x)))
+  @ccall libflint.acb_poly_mullow(z::Ref{AcbPolyRingElem}, x::Ref{AcbPolyRingElem}, y::Ref{AcbPolyRingElem}, n::Int, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -394,9 +365,7 @@ end
 
 function evaluate(x::AcbPolyRingElem, y::AcbFieldElem)
   z = parent(y)()
-  ccall((:acb_poly_evaluate, libflint), Nothing,
-        (Ref{AcbFieldElem}, Ref{AcbPolyRingElem}, Ref{AcbFieldElem}, Int),
-        z, x, y, precision(parent(y)))
+  @ccall libflint.acb_poly_evaluate(z::Ref{AcbFieldElem}, x::Ref{AcbPolyRingElem}, y::Ref{AcbFieldElem}, precision(parent(y))::Int)::Nothing
   return z
 end
 
@@ -415,9 +384,7 @@ its derivative evaluated at $y$.
 function evaluate2(x::AcbPolyRingElem, y::AcbFieldElem)
   z = parent(y)()
   w = parent(y)()
-  ccall((:acb_poly_evaluate2, libflint), Nothing,
-        (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbPolyRingElem}, Ref{AcbFieldElem}, Int),
-        z, w, x, y, precision(parent(y)))
+  @ccall libflint.acb_poly_evaluate2(z::Ref{AcbFieldElem}, w::Ref{AcbFieldElem}, x::Ref{AcbPolyRingElem}, y::Ref{AcbFieldElem}, precision(parent(y))::Int)::Nothing
   return z, w
 end
 
@@ -431,9 +398,7 @@ evaluate2(x::AcbPolyRingElem, y::RingElement) = evaluate2(x, base_ring(parent(x)
 
 function AbstractAlgebra._compose_right(x::AcbPolyRingElem, y::AcbPolyRingElem)
   z = parent(x)()
-  ccall((:acb_poly_compose, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Int),
-        z, x, y, precision(parent(x)))
+  @ccall libflint.acb_poly_compose(z::Ref{AcbPolyRingElem}, x::Ref{AcbPolyRingElem}, y::Ref{AcbPolyRingElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -445,15 +410,13 @@ end
 
 function derivative(x::AcbPolyRingElem)
   z = parent(x)()
-  ccall((:acb_poly_derivative, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Int), z, x, precision(parent(x)))
+  @ccall libflint.acb_poly_derivative(z::Ref{AcbPolyRingElem}, x::Ref{AcbPolyRingElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
 function integral(x::AcbPolyRingElem)
   z = parent(x)()
-  ccall((:acb_poly_integral, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Int), z, x, precision(parent(x)))
+  @ccall libflint.acb_poly_integral(z::Ref{AcbPolyRingElem}, x::Ref{AcbPolyRingElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -464,20 +427,18 @@ end
 ###############################################################################
 
 function acb_vec(b::Vector{AcbFieldElem})
-  v = ccall((:_acb_vec_init, libflint), Ptr{acb_struct}, (Int,), length(b))
-  for i=1:length(b)
-    ccall((:acb_set, libflint), Nothing, (Ptr{acb_struct}, Ref{AcbFieldElem}),
-          v + (i-1)*sizeof(acb_struct), b[i])
+  v = @ccall libflint._acb_vec_init(length(b)::Int)::Ptr{acb_struct}
+  for i in 1:length(b)
+    _acb_set(v + (i-1)*sizeof(acb_struct), b[i])
   end
   return v
 end
 
 function array(R::AcbField, v::Ptr{acb_struct}, n::Int)
   r = Vector{AcbFieldElem}(undef, n)
-  for i=1:n
+  for i in 1:n
     r[i] = R()
-    ccall((:acb_set, libflint), Nothing, (Ref{AcbFieldElem}, Ptr{acb_struct}),
-          r[i], v + (i-1)*sizeof(acb_struct))
+    _acb_set(r[i], v + (i-1)*sizeof(acb_struct))
   end
   return r
 end
@@ -490,8 +451,7 @@ Construct a polynomial in the given polynomial ring from a list of its roots.
 function from_roots(R::AcbPolyRing, b::Vector{AcbFieldElem})
   z = R()
   tmp = acb_vec(b)
-  ccall((:acb_poly_product_roots, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Ptr{acb_struct}, Int, Int), z, tmp, length(b), precision(R))
+  @ccall libflint.acb_poly_product_roots(z::Ref{AcbPolyRingElem}, tmp::Ptr{acb_struct}, length(b)::Int, precision(R)::Int)::Nothing
   acb_vec_clear(tmp, length(b))
   return z
 end
@@ -502,9 +462,7 @@ end
 
 function evaluate_fast(x::AcbPolyRingElem, b::Vector{AcbFieldElem})
   tmp = acb_vec(b)
-  ccall((:acb_poly_evaluate_vec_fast, libflint), Nothing,
-        (Ptr{acb_struct}, Ref{AcbPolyRingElem}, Ptr{acb_struct}, Int, Int),
-        tmp, x, tmp, length(b), precision(parent(x)))
+  @ccall libflint.acb_poly_evaluate_vec_fast(tmp::Ptr{acb_struct}, x::Ref{AcbPolyRingElem}, tmp::Ptr{acb_struct}, length(b)::Int, precision(parent(x))::Int)::Nothing
   res = array(base_ring(parent(x)), tmp, length(b))
   acb_vec_clear(tmp, length(b))
   return res
@@ -515,9 +473,7 @@ function interpolate_newton(R::AcbPolyRing, xs::Vector{AcbFieldElem}, ys::Vector
   z = R()
   xsv = acb_vec(xs)
   ysv = acb_vec(ys)
-  ccall((:acb_poly_interpolate_newton, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Ptr{acb_struct}, Ptr{acb_struct}, Int, Int),
-        z, xsv, ysv, length(xs), precision(R))
+  @ccall libflint.acb_poly_interpolate_newton(z::Ref{AcbPolyRingElem}, xsv::Ptr{acb_struct}, ysv::Ptr{acb_struct}, length(xs)::Int, precision(R)::Int)::Nothing
   acb_vec_clear(xsv, length(xs))
   acb_vec_clear(ysv, length(ys))
   return z
@@ -528,9 +484,7 @@ function interpolate_barycentric(R::AcbPolyRing, xs::Vector{AcbFieldElem}, ys::V
   z = R()
   xsv = acb_vec(xs)
   ysv = acb_vec(ys)
-  ccall((:acb_poly_interpolate_barycentric, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Ptr{acb_struct}, Ptr{acb_struct}, Int, Int),
-        z, xsv, ysv, length(xs), precision(R))
+  @ccall libflint.acb_poly_interpolate_barycentric(z::Ref{AcbPolyRingElem}, xsv::Ptr{acb_struct}, ysv::Ptr{acb_struct}, length(xs)::Int, precision(R)::Int)::Nothing
   acb_vec_clear(xsv, length(xs))
   acb_vec_clear(ysv, length(ys))
   return z
@@ -541,9 +495,7 @@ function interpolate_fast(R::AcbPolyRing, xs::Vector{AcbFieldElem}, ys::Vector{A
   z = R()
   xsv = acb_vec(xs)
   ysv = acb_vec(ys)
-  ccall((:acb_poly_interpolate_fast, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Ptr{acb_struct}, Ptr{acb_struct}, Int, Int),
-        z, xsv, ysv, length(xs), precision(R))
+  @ccall libflint.acb_poly_interpolate_fast(z::Ref{AcbPolyRingElem}, xsv::Ptr{acb_struct}, ysv::Ptr{acb_struct}, length(xs)::Int, precision(R)::Int)::Nothing
   acb_vec_clear(xsv, length(xs))
   acb_vec_clear(ysv, length(ys))
   return z
@@ -597,9 +549,7 @@ function roots(x::AcbPolyRingElem; target=0, isolate_real=false, initial_prec=0,
   while true
     in_roots = (wp == initial_prec) ? C_NULL : roots
     step_max_iter = (max_iter >= 1) ? max_iter : min(max(deg, 32), wp)
-    isolated = ccall((:acb_poly_find_roots, libflint), Int,
-                     (Ptr{acb_struct}, Ref{AcbPolyRingElem}, Ptr{acb_struct}, Int, Int),
-                     roots, x, in_roots, step_max_iter, wp)
+    isolated = @ccall libflint.acb_poly_find_roots(roots::Ptr{acb_struct}, x::Ref{AcbPolyRingElem}, in_roots::Ptr{acb_struct}, step_max_iter::Int, wp::Int)::Int
 
     wp = wp * 2
 
@@ -607,12 +557,10 @@ function roots(x::AcbPolyRingElem; target=0, isolate_real=false, initial_prec=0,
       ok = true
       if target > 0
         for i = 0 : deg-1
-          re = ccall((:acb_real_ptr, libflint), Ptr{arb_struct},
-                     (Ptr{AcbFieldElem}, ), roots + i * sizeof(acb_struct))
-          im = ccall((:acb_imag_ptr, libflint), Ptr{arb_struct},
-                     (Ptr{AcbFieldElem}, ), roots + i * sizeof(acb_struct))
-          t = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (Ptr{ArbFieldElem}, ), re)
-          u = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (Ptr{ArbFieldElem}, ), im)
+          re = _real_ptr(roots + i * sizeof(acb_struct))
+          im = _imag_ptr(roots + i * sizeof(acb_struct))
+          t = _rad_ptr(re)
+          u = _rad_ptr(im)
           ok = ok && (ccall((:mag_cmp_2exp_si, libflint), Cint,
                             (Ptr{mag_struct}, Int), t, -target) <= 0)
           ok = ok && (ccall((:mag_cmp_2exp_si, libflint), Cint,
@@ -621,8 +569,7 @@ function roots(x::AcbPolyRingElem; target=0, isolate_real=false, initial_prec=0,
       end
 
       if isreal(x)
-        real_ok = ccall((:acb_poly_validate_real_roots, libflint),
-                        Bool, (Ptr{acb_struct}, Ref{AcbPolyRingElem}, Int), roots, x, wp)
+        real_ok = @ccall libflint.acb_poly_validate_real_roots(roots::Ptr{acb_struct}, x::Ref{AcbPolyRingElem}, wp::Int)::Bool
 
         if isolate_real && !real_ok
           ok = false
@@ -630,10 +577,9 @@ function roots(x::AcbPolyRingElem; target=0, isolate_real=false, initial_prec=0,
 
         if real_ok
           for i = 0 : deg - 1
-            im = ccall((:acb_imag_ptr, libflint), Ptr{arb_struct},
-                       (Ptr{AcbFieldElem}, ), roots + i * sizeof(acb_struct))
-            if ccall((:arb_contains_zero, libflint), Bool, (Ptr{arb_struct}, ), im)
-              ccall((:arb_zero, libflint), Nothing, (Ptr{arb_struct}, ), im)
+            im = _imag_ptr(roots + i * sizeof(acb_struct))
+            if @ccall libflint.arb_contains_zero(im::Ptr{arb_struct})::Bool
+              @ccall libflint.arb_zero(im::Ptr{arb_struct})::Nothing
             end
           end
         end
@@ -650,8 +596,7 @@ function roots(x::AcbPolyRingElem; target=0, isolate_real=false, initial_prec=0,
   end
 
   if isolated == deg
-    ccall((:_acb_vec_sort_pretty, libflint), Nothing,
-          (Ptr{acb_struct}, Int), roots, deg)
+    @ccall libflint._acb_vec_sort_pretty(roots::Ptr{acb_struct}, deg::Int)::Nothing
     res = array(base_ring(parent(x)), roots, deg)
   end
 
@@ -679,14 +624,12 @@ function roots_upper_bound(x::AcbPolyRingElem)
   z = ArbField(precision(base_ring(x)))()
   p = precision(base_ring(x))
   GC.@preserve x z begin
-    t = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (Ref{ArbFieldElem}, ), z)
-    ccall((:acb_poly_root_bound_fujiwara, libflint), Nothing,
-          (Ptr{mag_struct}, Ref{AcbPolyRingElem}), t, x)
-    s = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (Ref{ArbFieldElem}, ), z)
-    ccall((:arf_set_mag, libflint), Nothing, (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
-    ccall((:arf_set_round, libflint), Nothing,
-          (Ptr{arf_struct}, Ptr{arf_struct}, Int, Cint), s, s, p, ARB_RND_CEIL)
-    ccall((:mag_zero, libflint), Nothing, (Ptr{mag_struct},), t)
+    t = _rad_ptr(z)
+    @ccall libflint.acb_poly_root_bound_fujiwara(t::Ptr{mag_struct}, x::Ref{AcbPolyRingElem})::Nothing
+    s = _mid_ptr(z)
+    @ccall libflint.arf_set_mag(s::Ptr{arf_struct}, t::Ptr{mag_struct})::Nothing
+    @ccall libflint.arf_set_round(s::Ptr{arf_struct}, s::Ptr{arf_struct}, p::Int, ARB_RND_CEIL::Cint)::Nothing
+    @ccall libflint.mag_zero(t::Ptr{mag_struct})::Nothing
   end
   return z
 end
@@ -697,47 +640,90 @@ end
 #
 ###############################################################################
 
-function zero!(z::AcbPolyRingElem)
-  ccall((:acb_poly_zero, libflint), Nothing, (Ref{AcbPolyRingElem},), z)
+function zero!(z::AcbPolyRingElemOrPtr)
+  @ccall libflint.acb_poly_zero(z::Ref{AcbPolyRingElem})::Nothing
   return z
 end
 
-function one!(z::AcbPolyRingElem)
-  ccall((:acb_poly_one, libflint), Nothing, (Ref{AcbPolyRingElem},), z)
+function one!(z::AcbPolyRingElemOrPtr)
+  @ccall libflint.acb_poly_one(z::Ref{AcbPolyRingElem})::Nothing
+  return z
+end
+
+function neg!(z::AcbPolyRingElemOrPtr, a::AcbPolyRingElemOrPtr)
+  @ccall libflint.acb_poly_neg(z::Ref{AcbPolyRingElem}, a::Ref{AcbPolyRingElem})::Nothing
   return z
 end
 
 function fit!(z::AcbPolyRingElem, n::Int)
-  ccall((:acb_poly_fit_length, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Int), z, n)
+  @ccall libflint.acb_poly_fit_length(z::Ref{AcbPolyRingElem}, n::Int)::Nothing
   return nothing
 end
 
-function setcoeff!(z::AcbPolyRingElem, n::Int, x::ZZRingElem)
-  ccall((:acb_poly_set_coeff_fmpz, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Int, Ref{ZZRingElem}), z, n, x)
-  return z
-end
-
 function setcoeff!(z::AcbPolyRingElem, n::Int, x::AcbFieldElem)
-  ccall((:acb_poly_set_coeff_acb, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Int, Ref{AcbFieldElem}), z, n, x)
+  @ccall libflint.acb_poly_set_coeff_acb(z::Ref{AcbPolyRingElem}, n::Int, x::Ref{AcbFieldElem})::Nothing
   return z
 end
 
-function mul!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::AcbPolyRingElem)
-  ccall((:acb_poly_mul, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Int),
-        z, x, y, precision(parent(z)))
+function setcoeff!(z::AcbPolyRingElem, n::Int, x::Int)
+  @ccall libflint.acb_poly_set_coeff_si(z::Ref{AcbPolyRingElem}, n::Int, x::Int)::Nothing
   return z
 end
+
+function setcoeff!(z::AcbPolyRingElem, n::Int, x::ZZRingElem)
+  return setcoeff!(z, n, base_ring(z)(x))
+end
+
+setcoeff!(z::AcbPolyRingElem, n::Int, x::Integer) = setcoeff!(z, n, flintify(x))
+
+#
 
 function add!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::AcbPolyRingElem)
-  ccall((:acb_poly_add, libflint), Nothing,
-        (Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Ref{AcbPolyRingElem}, Int),
-        z, x, y, precision(parent(z)))
+  @ccall libflint.acb_poly_add(z::Ref{AcbPolyRingElem}, x::Ref{AcbPolyRingElem}, y::Ref{AcbPolyRingElem}, precision(parent(z))::Int)::Nothing
   return z
 end
+
+function add!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::Int)
+  @ccall libflint.acb_poly_add_si(z::Ref{AcbPolyRingElem}, x::Ref{AcbPolyRingElem}, y::Int, precision(parent(z))::Int)::Nothing
+  return z
+end
+
+add!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::AcbFieldElem) = add!(z, x, parent(z)(y))
+
+add!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::ZZRingElem) = add!(z, x, parent(z)(y))
+
+add!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::Integer) = add!(z, x, flintify(y))
+
+add!(z::AcbPolyRingElem, x::Union{AcbFieldElem,IntegerUnion}, y::AcbPolyRingElem) = add!(z, y, x)
+
+#
+
+function sub!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::AcbPolyRingElem)
+  @ccall libflint.acb_poly_sub(z::Ref{AcbPolyRingElem}, x::Ref{AcbPolyRingElem}, y::Ref{AcbPolyRingElem}, precision(parent(z))::Int)::Nothing
+  return z
+end
+
+sub!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::Union{AcbFieldElem,IntegerUnion}) = sub!(z, x, parent(z)(y))
+
+sub!(z::AcbPolyRingElem, x::Union{AcbFieldElem,IntegerUnion}, y::AcbPolyRingElem) = sub!(z, parent(z)(x), y)
+
+#
+
+function mul!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::AcbPolyRingElem)
+  @ccall libflint.acb_poly_mul(z::Ref{AcbPolyRingElem}, x::Ref{AcbPolyRingElem}, y::Ref{AcbPolyRingElem}, precision(parent(z))::Int)::Nothing
+  return z
+end
+
+function mul!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::AcbFieldElem)
+  @ccall libflint.acb_poly_scalar_mul(z::Ref{AcbPolyRingElem}, x::Ref{AcbPolyRingElem}, y::Ref{AcbFieldElem}, precision(parent(z))::Int)::Nothing
+  return z
+end
+
+mul!(z::AcbPolyRingElem, x::AcbPolyRingElem, y::IntegerUnion) = mul!(z, x, base_ring(z)(y))
+
+mul!(z::AcbPolyRingElem, x::Union{AcbFieldElem,IntegerUnion}, y::AcbPolyRingElem) = mul!(z, y, x)
+
+#
 
 ###############################################################################
 #

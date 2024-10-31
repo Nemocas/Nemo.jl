@@ -389,6 +389,27 @@ end
 
 end
 
+@testset "QQBarFieldElem.conversions" begin
+  R = algebraic_closure(QQ)
+
+  # precision must be < 53, otherwise the test is wrong
+  set_precision!(Balls, 50) do
+    for i in 1:10
+      a = rand(R, degree=5, bits=5)
+      b = ComplexF64(a)
+      @test contains(ComplexField()(a), ComplexField()(b))
+    end
+  end
+
+  x = sqrt(R(2))
+  @test isapprox(Float64(x), sqrt(2))
+  @test isapprox(ComplexF64(x), sqrt(2))
+
+  x = sqrt(R(-2))
+  @test_throws InexactError Float64(x)
+  @test isapprox(ComplexF64(x),sqrt(complex(-2)))
+end
+
 function test_elem(R::QQBarField)
   return rand(R, degree=5, bits=5)
 end

@@ -106,7 +106,7 @@ mutable struct QQBarFieldElem <: FieldElem
 
   function QQBarFieldElem()
     z = new()
-    ccall((:qqbar_init, libflint), Nothing, (Ref{QQBarFieldElem}, ), z)
+    @ccall libflint.qqbar_init(z::Ref{QQBarFieldElem})::Nothing
     finalizer(_qqbar_clear_fn, z)
     return z
   end
@@ -114,7 +114,7 @@ mutable struct QQBarFieldElem <: FieldElem
 end
 
 function _qqbar_clear_fn(a::QQBarFieldElem)
-  ccall((:qqbar_clear, libflint), Nothing, (Ref{QQBarFieldElem},), a)
+  @ccall libflint.qqbar_clear(a::Ref{QQBarFieldElem})::Nothing
 end
 
 ################################################################################
@@ -164,14 +164,14 @@ const ca_ctx_options = [
   function CalciumField(; extended::Bool=false, options::Dict{Symbol,Int}=Dict{Symbol,Int}())
     C = new()
 
-    ccall((:ca_ctx_init, libflint), Nothing, (Ref{CalciumField}, ), C)
+    @ccall libflint.ca_ctx_init(C::Ref{CalciumField})::Nothing
     finalizer(_CalciumField_clear_fn, C)
     C.extended = extended
 
     for (opt, value) in options
       i = findfirst(isequal(opt), ca_ctx_options)
       (i === nothing) && error("unknown option ", opt)
-      ccall((:ca_ctx_set_option, libflint), Nothing, (Ref{CalciumField}, Int, Int), C, i - 1, value)
+      @ccall libflint.ca_ctx_set_option(C::Ref{CalciumField}, (i - 1)::Int, value::Int)::Nothing
     end
 
     C.refcount = 1
@@ -182,7 +182,7 @@ end
 function options(C::CalciumField)
   d = Dict{Symbol,Int}()
   for i=1:length(ca_ctx_options)
-    d[ca_ctx_options[i]] = ccall((:ca_ctx_get_option, libflint), Int, (Ref{CalciumField}, Int), C, i - 1)
+    d[ca_ctx_options[i]] = @ccall libflint.ca_ctx_get_option(C::Ref{CalciumField}, (i - 1)::Int)::Int
   end
   return d
 end
@@ -190,7 +190,7 @@ end
 function decrement_refcount(C::CalciumField)
   C.refcount -= 1
   if C.refcount == 0
-    ccall((:ca_ctx_clear, libflint), Nothing, (Ref{CalciumField},), C)
+    @ccall libflint.ca_ctx_clear(C::Ref{CalciumField})::Nothing
   end
 end
 
@@ -210,8 +210,7 @@ mutable struct CalciumFieldElem <: FieldElem
 
   function CalciumFieldElem(ctx::CalciumField)
     z = new()
-    ccall((:ca_init, libflint), Nothing,
-          (Ref{CalciumFieldElem}, Ref{CalciumField}), z, ctx)
+    @ccall libflint.ca_init(z::Ref{CalciumFieldElem}, ctx::Ref{CalciumField})::Nothing
     z.parent = ctx
     z.parent.refcount += 1
     finalizer(_ca_clear_fn, z)
@@ -221,8 +220,7 @@ mutable struct CalciumFieldElem <: FieldElem
 end
 
 function _ca_clear_fn(a::CalciumFieldElem)
-  ccall((:ca_clear, libflint),
-        Nothing, (Ref{CalciumFieldElem}, Ref{CalciumField}), a, a.parent)
+  @ccall libflint.ca_clear(a::Ref{CalciumFieldElem}, a.parent::Ref{CalciumField})::Nothing
   decrement_refcount(a.parent)
 end
 

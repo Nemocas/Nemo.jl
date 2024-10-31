@@ -11,7 +11,7 @@ function next_prime(x::T, proved::Bool=true) where {T<:Integer}
 end
 
 function valuation(a::UInt, b::UInt)
-  return ccall((:n_remove, libflint), Int, (Ref{UInt}, UInt), a, b)
+  return @ccall libflint.n_remove(a::Ref{UInt}, b::UInt)::Int
 end
 
 fits(::Type{Int}, a::Int) = true

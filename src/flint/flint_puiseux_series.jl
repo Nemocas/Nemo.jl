@@ -385,6 +385,7 @@ end
 ###############################################################################
 
 function ==(a::FlintPuiseuxSeriesElem{T}, b::FlintPuiseuxSeriesElem{T}) where T <: RingElement
+  check_parent(a, b)
   s = gcd(a.scale, b.scale)
   zscale = div(a.scale*b.scale, s)
   ainf = div(a.scale, s)

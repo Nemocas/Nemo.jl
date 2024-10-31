@@ -44,7 +44,7 @@ end
 
 function QQBarFieldElem(a::Int)
   z = QQBarFieldElem()
-  ccall((:qqbar_set_si, libflint), Nothing, (Ref{QQBarFieldElem}, Int, ), z, a)
+  @ccall libflint.qqbar_set_si(z::Ref{QQBarFieldElem}, a::Int)::Nothing
   return z
 end
 
@@ -52,22 +52,19 @@ function QQBarFieldElem(a::Complex)
   r = QQBarFieldElem(real(a))
   s = QQBarFieldElem(imag(a))
   z = QQBarFieldElem()
-  ccall((:qqbar_set_re_im, libflint),
-        Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, r, s)
+  @ccall libflint.qqbar_set_re_im(z::Ref{QQBarFieldElem}, r::Ref{QQBarFieldElem}, s::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function QQBarFieldElem(a::ZZRingElem)
   z = QQBarFieldElem()
-  ccall((:qqbar_set_fmpz, libflint),
-        Nothing, (Ref{QQBarFieldElem}, Ref{ZZRingElem}, ), z, a)
+  @ccall libflint.qqbar_set_fmpz(z::Ref{QQBarFieldElem}, a::Ref{ZZRingElem})::Nothing
   return z
 end
 
 function QQBarFieldElem(a::QQFieldElem)
   z = QQBarFieldElem()
-  ccall((:qqbar_set_fmpq, libflint),
-        Nothing, (Ref{QQBarFieldElem}, Ref{QQFieldElem}, ), z, a)
+  @ccall libflint.qqbar_set_fmpq(z::Ref{QQBarFieldElem}, a::Ref{QQFieldElem})::Nothing
   return z
 end
 
@@ -77,7 +74,7 @@ QQBarFieldElem(a::Integer) = QQBarFieldElem(ZZRingElem(a))
 
 function deepcopy_internal(a::QQBarFieldElem, dict::IdDict)
   z = QQBarFieldElem()
-  ccall((:qqbar_set, libflint), Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
+  @ccall libflint.qqbar_set(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
@@ -101,22 +98,20 @@ canonical_unit(a::QQBarFieldElem) = a
 
 #=
 function qqbar_vec(n::Int)
-return ccall((:_qqbar_vec_init, libflint), Ptr{qqbar_struct}, (Int,), n)
+return @ccall libflint._qqbar_vec_init(n::Int)::Ptr{qqbar_struct}
 end
 
 function array(R::QQBarField, v::Ptr{qqbar_struct}, n::Int)
 r = Vector{QQBarFieldElem}(undef, n)
 for i=1:n
 r[i] = R()
-ccall((:qqbar_set, libflint), Nothing, (Ref{QQBarFieldElem}, Ptr{qqbar_struct}),
-r[i], v + (i-1)*sizeof(qqbar_struct))
+@ccall libflint.qqbar_set(r[i]::Ref{QQBarFieldElem}, (v + (i-1)*sizeof(qqbar_struct))::Ptr{qqbar_struct})::Nothing
 end
 return r
 end
 
 function qqbar_vec_clear(v::Ptr{qqbar_struct}, n::Int)
-ccall((:_qqbar_vec_clear, libflint),
-Nothing, (Ptr{qqbar_struct}, Int), v, n)
+@ccall libflint._qqbar_vec_clear(v::Ptr{qqbar_struct}, n::Int)::Nothing
 end
 
 function roots(R::QQBarField, f::ZZPolyRingElem)
@@ -125,8 +120,7 @@ if deg <= 0
 return QQBarFieldElem[]
 end
 roots = qqbar_vec(deg)
-ccall((:qqbar_roots_fmpz_poly, libflint),
-Nothing, (Ptr{qqbar_struct}, Ref{ZZPolyRingElem}, Int), roots, f, 0)
+@ccall libflint.qqbar_roots_fmpz_poly(roots::Ptr{qqbar_struct}, f::Ref{ZZPolyRingElem}, 0::Int)::Nothing
 res = array(R, roots, deg)
 qqbar_vec_clear(roots, deg)
 return res
@@ -134,10 +128,9 @@ end
 =#
 
 function native_string(x::QQBarFieldElem)
-  cstr = ccall((:qqbar_get_str_nd, libflint),
-               Ptr{UInt8}, (Ref{QQBarFieldElem}, Int), x, Int(6))
+  cstr = @ccall libflint.qqbar_get_str_nd(x::Ref{QQBarFieldElem}, Int(6)::Int)::Ptr{UInt8}
   number = unsafe_string(cstr)
-  ccall((:flint_free, libflint), Nothing, (Ptr{UInt8},), cstr)
+  @ccall libflint.flint_free(cstr::Ptr{UInt8})::Nothing
 
   number = number[1:first(findfirst(" (", number)::UnitRange)-1]
   number = replace(number, "I" => "im")
@@ -186,7 +179,7 @@ one(::Type{QQBarFieldElem}) = QQBarFieldElem(1)
 Return the degree of the minimal polynomial of `x`.
 """
 function degree(x::QQBarFieldElem)
-  return ccall((:qqbar_degree, libflint), Int, (Ref{QQBarFieldElem}, ), x)
+  return @ccall libflint.qqbar_degree(x::Ref{QQBarFieldElem})::Int
 end
 
 @doc raw"""
@@ -195,7 +188,7 @@ end
 Return whether `x` is the number 0.
 """
 function iszero(x::QQBarFieldElem)
-  return Bool(ccall((:qqbar_is_zero, libflint), Cint, (Ref{QQBarFieldElem},), x))
+  return Bool(@ccall libflint.qqbar_is_zero(x::Ref{QQBarFieldElem})::Cint)
 end
 
 @doc raw"""
@@ -204,7 +197,7 @@ end
 Return whether `x` is the number 1.
 """
 function isone(x::QQBarFieldElem)
-  return Bool(ccall((:qqbar_is_one, libflint), Cint, (Ref{QQBarFieldElem},), x))
+  return Bool(@ccall libflint.qqbar_is_one(x::Ref{QQBarFieldElem})::Cint)
 end
 
 @doc raw"""
@@ -213,7 +206,7 @@ end
 Return whether `x` is an integer.
 """
 function isinteger(x::QQBarFieldElem)
-  return Bool(ccall((:qqbar_is_integer, libflint), Cint, (Ref{QQBarFieldElem},), x))
+  return Bool(@ccall libflint.qqbar_is_integer(x::Ref{QQBarFieldElem})::Cint)
 end
 
 @doc raw"""
@@ -222,7 +215,7 @@ end
 Return whether `x` is a rational number.
 """
 function is_rational(x::QQBarFieldElem)
-  return Bool(ccall((:qqbar_is_rational, libflint), Cint, (Ref{QQBarFieldElem},), x))
+  return Bool(@ccall libflint.qqbar_is_rational(x::Ref{QQBarFieldElem})::Cint)
 end
 
 @doc raw"""
@@ -231,7 +224,7 @@ end
 Return whether `x` is a real number.
 """
 function isreal(x::QQBarFieldElem)
-  return Bool(ccall((:qqbar_is_real, libflint), Cint, (Ref{QQBarFieldElem},), x))
+  return Bool(@ccall libflint.qqbar_is_real(x::Ref{QQBarFieldElem})::Cint)
 end
 
 @doc raw"""
@@ -240,8 +233,7 @@ end
 Return whether `x` is an algebraic integer.
 """
 function is_algebraic_integer(x::QQBarFieldElem)
-  return Bool(ccall((:qqbar_is_algebraic_integer, libflint),
-                    Cint, (Ref{QQBarFieldElem},), x))
+  return Bool(@ccall libflint.qqbar_is_algebraic_integer(x::Ref{QQBarFieldElem})::Cint)
 end
 
 @doc raw"""
@@ -251,8 +243,7 @@ Return the minimal polynomial of `x` as an element of the polynomial ring `R`.
 """
 function minpoly(R::ZZPolyRing, x::QQBarFieldElem)
   z = R()
-  ccall((:fmpz_poly_set, libflint),
-        Nothing, (Ref{ZZPolyRingElem}, Ref{QQBarFieldElem}, ), z, x)
+  @ccall libflint.fmpz_poly_set(z::Ref{ZZPolyRingElem}, x::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
@@ -263,8 +254,7 @@ Return the minimal polynomial of `x` as an element of the polynomial ring `R`.
 """
 function minpoly(R::QQPolyRing, x::QQBarFieldElem)
   z = R()
-  ccall((:fmpq_poly_set_fmpz_poly, libflint),
-        Nothing, (Ref{QQPolyRingElem}, Ref{QQBarFieldElem}, ), z, x)
+  @ccall libflint.fmpq_poly_set_fmpz_poly(z::Ref{QQPolyRingElem}, x::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
@@ -277,8 +267,7 @@ minimal polynomial of `x`. The result is returned as an `ZZRingElem`.
 function denominator(x::QQBarFieldElem)
   d = degree(x)
   q = ZZRingElem()
-  ccall((:fmpz_poly_get_coeff_fmpz, libflint),
-        Nothing, (Ref{ZZRingElem}, Ref{QQBarFieldElem}, Int), q, x, d)
+  @ccall libflint.fmpz_poly_get_coeff_fmpz(q::Ref{ZZRingElem}, x::Ref{QQBarFieldElem}, d::Int)::Nothing
   return q
 end
 
@@ -299,7 +288,7 @@ Return the height of the algebraic number `x`. The result is an `ZZRingElem` int
 """
 function height(x::QQBarFieldElem)
   z = ZZRingElem()
-  ccall((:qqbar_height, libflint), Nothing, (Ref{ZZRingElem}, Ref{QQBarFieldElem}, ), z, x)
+  @ccall libflint.qqbar_height(z::Ref{ZZRingElem}, x::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
@@ -310,7 +299,7 @@ Return the height of the algebraic number `x` measured in bits.
 The result is a Julia integer.
 """
 function height_bits(x::QQBarFieldElem)
-  return ccall((:qqbar_height_bits, libflint), Int, (Ref{QQBarFieldElem}, ), x)
+  return @ccall libflint.qqbar_height_bits(x::Ref{QQBarFieldElem})::Int
 end
 
 
@@ -338,15 +327,12 @@ function rand(R::QQBarField; degree::Int, bits::Int,
   bits <= 0 && error("bits must be positive")
 
   if randtype == :null
-    ccall((:qqbar_randtest, libflint), Nothing,
-          (Ref{QQBarFieldElem}, Ref{rand_ctx}, Int, Int), x, state, degree, bits)
+    @ccall libflint.qqbar_randtest(x::Ref{QQBarFieldElem}, state::Ref{rand_ctx}, degree::Int, bits::Int)::Nothing
   elseif randtype == :real
-    ccall((:qqbar_randtest_real, libflint), Nothing,
-          (Ref{QQBarFieldElem}, Ref{rand_ctx}, Int, Int), x, state, degree, bits)
+    @ccall libflint.qqbar_randtest_real(x::Ref{QQBarFieldElem}, state::Ref{rand_ctx}, degree::Int, bits::Int)::Nothing
   elseif randtype == :nonreal
     degree < 2 && error("nonreal requires degree >= 2")
-    ccall((:qqbar_randtest_nonreal, libflint), Nothing,
-          (Ref{QQBarFieldElem}, Ref{rand_ctx}, Int, Int), x, state, degree, bits)
+    @ccall libflint.qqbar_randtest_nonreal(x::Ref{QQBarFieldElem}, state::Ref{rand_ctx}, degree::Int, bits::Int)::Nothing
   else
     error("randtype not defined")
   end
@@ -370,29 +356,25 @@ end
 
 function +(a::QQBarFieldElem, b::QQBarFieldElem)
   z = QQBarFieldElem()
-  ccall((:qqbar_add, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a, b)
+  @ccall libflint.qqbar_add(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, b::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function +(a::QQBarFieldElem, b::QQFieldElem)
   z = QQBarFieldElem()
-  ccall((:qqbar_add_fmpq, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQFieldElem}), z, a, b)
+  @ccall libflint.qqbar_add_fmpq(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, b::Ref{QQFieldElem})::Nothing
   return z
 end
 
 function +(a::QQBarFieldElem, b::ZZRingElem)
   z = QQBarFieldElem()
-  ccall((:qqbar_add_fmpz, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{ZZRingElem}), z, a, b)
+  @ccall libflint.qqbar_add_fmpz(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, b::Ref{ZZRingElem})::Nothing
   return z
 end
 
 function +(a::QQBarFieldElem, b::Int)
   z = QQBarFieldElem()
-  ccall((:qqbar_add_si, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Int), z, a, b)
+  @ccall libflint.qqbar_add_si(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, b::Int)::Nothing
   return z
 end
 
@@ -402,78 +384,67 @@ end
 
 function -(a::QQBarFieldElem, b::QQBarFieldElem)
   z = QQBarFieldElem()
-  ccall((:qqbar_sub, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a, b)
+  @ccall libflint.qqbar_sub(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, b::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function -(a::QQBarFieldElem, b::QQFieldElem)
   z = QQBarFieldElem()
-  ccall((:qqbar_sub_fmpq, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQFieldElem}), z, a, b)
+  @ccall libflint.qqbar_sub_fmpq(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, b::Ref{QQFieldElem})::Nothing
   return z
 end
 
 function -(a::QQBarFieldElem, b::ZZRingElem)
   z = QQBarFieldElem()
-  ccall((:qqbar_sub_fmpz, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{ZZRingElem}), z, a, b)
+  @ccall libflint.qqbar_sub_fmpz(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, b::Ref{ZZRingElem})::Nothing
   return z
 end
 
 function -(a::QQBarFieldElem, b::Int)
   z = QQBarFieldElem()
-  ccall((:qqbar_sub_si, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Int), z, a, b)
+  @ccall libflint.qqbar_sub_si(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, b::Int)::Nothing
   return z
 end
 
 function -(a::QQFieldElem, b::QQBarFieldElem)
   z = QQBarFieldElem()
-  ccall((:qqbar_fmpq_sub, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQFieldElem}, Ref{QQBarFieldElem}), z, a, b)
+  @ccall libflint.qqbar_fmpq_sub(z::Ref{QQBarFieldElem}, a::Ref{QQFieldElem}, b::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function -(a::ZZRingElem, b::QQBarFieldElem)
   z = QQBarFieldElem()
-  ccall((:qqbar_fmpz_sub, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{ZZRingElem}, Ref{QQBarFieldElem}), z, a, b)
+  @ccall libflint.qqbar_fmpz_sub(z::Ref{QQBarFieldElem}, a::Ref{ZZRingElem}, b::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function -(a::Int, b::QQBarFieldElem)
   z = QQBarFieldElem()
-  ccall((:qqbar_si_sub, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Int, Ref{QQBarFieldElem}), z, a, b)
+  @ccall libflint.qqbar_si_sub(z::Ref{QQBarFieldElem}, a::Int, b::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function *(a::QQBarFieldElem, b::QQBarFieldElem)
   z = QQBarFieldElem()
-  ccall((:qqbar_mul, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a, b)
+  @ccall libflint.qqbar_mul(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, b::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function *(a::QQBarFieldElem, b::QQFieldElem)
   z = QQBarFieldElem()
-  ccall((:qqbar_mul_fmpq, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQFieldElem}), z, a, b)
+  @ccall libflint.qqbar_mul_fmpq(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, b::Ref{QQFieldElem})::Nothing
   return z
 end
 
 function *(a::QQBarFieldElem, b::ZZRingElem)
   z = QQBarFieldElem()
-  ccall((:qqbar_mul_fmpz, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{ZZRingElem}), z, a, b)
+  @ccall libflint.qqbar_mul_fmpz(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, b::Ref{ZZRingElem})::Nothing
   return z
 end
 
 function *(a::QQBarFieldElem, b::Int)
   z = QQBarFieldElem()
-  ccall((:qqbar_mul_si, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Int), z, a, b)
+  @ccall libflint.qqbar_mul_si(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, b::Int)::Nothing
   return z
 end
 
@@ -483,8 +454,7 @@ end
 
 function ^(a::QQBarFieldElem, b::QQBarFieldElem)
   z = QQBarFieldElem()
-  ok = Bool(ccall((:qqbar_pow, libflint), Cint,
-                  (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a, b))
+  ok = Bool(@ccall libflint.qqbar_pow(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, b::Ref{QQBarFieldElem})::Cint)
   !ok && throw(DomainError((a, b)))
   return z
 end
@@ -506,63 +476,56 @@ end
 function inv(a::QQBarFieldElem)
   iszero(a) && throw(DivideError())
   z = QQBarFieldElem()
-  ccall((:qqbar_inv, libflint), Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
+  @ccall libflint.qqbar_inv(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function divexact(a::QQBarFieldElem, b::QQBarFieldElem; check::Bool=true)
   iszero(b) && throw(DivideError())
   z = QQBarFieldElem()
-  ccall((:qqbar_div, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a, b)
+  @ccall libflint.qqbar_div(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, b::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function divexact(a::QQBarFieldElem, b::QQFieldElem; check::Bool=true)
   iszero(b) && throw(DivideError())
   z = QQBarFieldElem()
-  ccall((:qqbar_div_fmpq, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQFieldElem}), z, a, b)
+  @ccall libflint.qqbar_div_fmpq(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, b::Ref{QQFieldElem})::Nothing
   return z
 end
 
 function divexact(a::QQBarFieldElem, b::ZZRingElem; check::Bool=true)
   iszero(b) && throw(DivideError())
   z = QQBarFieldElem()
-  ccall((:qqbar_div_fmpz, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{ZZRingElem}), z, a, b)
+  @ccall libflint.qqbar_div_fmpz(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, b::Ref{ZZRingElem})::Nothing
   return z
 end
 
 function divexact(a::QQBarFieldElem, b::Int; check::Bool=true)
   iszero(b) && throw(DivideError())
   z = QQBarFieldElem()
-  ccall((:qqbar_div_si, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Int), z, a, b)
+  @ccall libflint.qqbar_div_si(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, b::Int)::Nothing
   return z
 end
 
 function divexact(a::QQFieldElem, b::QQBarFieldElem; check::Bool=true)
   iszero(b) && throw(DivideError())
   z = QQBarFieldElem()
-  ccall((:qqbar_fmpq_div, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQFieldElem}, Ref{QQBarFieldElem}), z, a, b)
+  @ccall libflint.qqbar_fmpq_div(z::Ref{QQBarFieldElem}, a::Ref{QQFieldElem}, b::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function divexact(a::ZZRingElem, b::QQBarFieldElem; check::Bool=true)
   iszero(b) && throw(DivideError())
   z = QQBarFieldElem()
-  ccall((:qqbar_fmpz_div, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{ZZRingElem}, Ref{QQBarFieldElem}), z, a, b)
+  @ccall libflint.qqbar_fmpz_div(z::Ref{QQBarFieldElem}, a::Ref{ZZRingElem}, b::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function divexact(a::Int, b::QQBarFieldElem; check::Bool=true)
   iszero(b) && throw(DivideError())
   z = QQBarFieldElem()
-  ccall((:qqbar_si_div, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Int, Ref{QQBarFieldElem}), z, a, b)
+  @ccall libflint.qqbar_si_div(z::Ref{QQBarFieldElem}, a::Int, b::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
@@ -577,15 +540,13 @@ end
 
 function <<(a::QQBarFieldElem, b::Int)
   z = QQBarFieldElem()
-  ccall((:qqbar_mul_2exp_si, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Int), z, a, b)
+  @ccall libflint.qqbar_mul_2exp_si(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, b::Int)::Nothing
   return z
 end
 
 function >>(a::QQBarFieldElem, b::Int)
   z = QQBarFieldElem()
-  ccall((:qqbar_mul_2exp_si, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Int), z, a, -b)
+  @ccall libflint.qqbar_mul_2exp_si(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, (-b)::Int)::Nothing
   return z
 end
 
@@ -597,15 +558,13 @@ end
 
 function evaluate(x::QQPolyRingElem, y::QQBarFieldElem)
   z = QQBarFieldElem()
-  ccall((:qqbar_evaluate_fmpq_poly, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQPolyRingElem}, Ref{QQBarFieldElem}), z, x, y)
+  @ccall libflint.qqbar_evaluate_fmpq_poly(z::Ref{QQBarFieldElem}, x::Ref{QQPolyRingElem}, y::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function evaluate(x::ZZPolyRingElem, y::QQBarFieldElem)
   z = QQBarFieldElem()
-  ccall((:qqbar_evaluate_fmpz_poly, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{ZZPolyRingElem}, Ref{QQBarFieldElem}), z, x, y)
+  @ccall libflint.qqbar_evaluate_fmpz_poly(z::Ref{QQBarFieldElem}, x::Ref{ZZPolyRingElem}, y::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
@@ -616,15 +575,13 @@ end
 ###############################################################################
 
 function ==(a::QQBarFieldElem, b::QQBarFieldElem)
-  return Bool(ccall((:qqbar_equal, libflint), Cint,
-                    (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), a, b))
+  return Bool(@ccall libflint.qqbar_equal(a::Ref{QQBarFieldElem}, b::Ref{QQBarFieldElem})::Cint)
 end
 
 function cmp(a::QQBarFieldElem, b::QQBarFieldElem)
   !isreal(a) && throw(DomainError(a, "comparing nonreal numbers"))
   !isreal(b) && throw(DomainError(b, "comparing nonreal numbers"))
-  return ccall((:qqbar_cmp_re, libflint), Cint,
-               (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), a, b)
+  return @ccall libflint.qqbar_cmp_re(a::Ref{QQBarFieldElem}, b::Ref{QQBarFieldElem})::Cint
 end
 
 isless(a::QQBarFieldElem, b::QQBarFieldElem) = cmp(a, b) < 0
@@ -639,18 +596,12 @@ is_positive(a::QQBarFieldElem) = a > 0
 is_negative(a::QQBarFieldElem) = a < 0
 
 # todo: export the cmp functions?
-cmp_real(a::QQBarFieldElem, b::QQBarFieldElem) = ccall((:qqbar_cmp_re, libflint),
-                                                       Cint, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), a, b)
-cmp_imag(a::QQBarFieldElem, b::QQBarFieldElem) = ccall((:qqbar_cmp_im, libflint),
-                                                       Cint, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), a, b)
-cmpabs(a::QQBarFieldElem, b::QQBarFieldElem) = ccall((:qqbar_cmpabs, libflint),
-                                                     Cint, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), a, b)
-cmpabs_real(a::QQBarFieldElem, b::QQBarFieldElem) = ccall((:qqbar_cmpabs_re, libflint),
-                                                          Cint, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), a, b)
-cmpabs_imag(a::QQBarFieldElem, b::QQBarFieldElem) = ccall((:qqbar_cmpabs_im, libflint),
-                                                          Cint, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), a, b)
-cmp_root_order(a::QQBarFieldElem, b::QQBarFieldElem) = ccall((:qqbar_cmp_root_order, libflint),
-                                                             Cint, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), a, b)
+cmp_real(a::QQBarFieldElem, b::QQBarFieldElem) = @ccall libflint.qqbar_cmp_re(a::Ref{QQBarFieldElem}, b::Ref{QQBarFieldElem})::Cint
+cmp_imag(a::QQBarFieldElem, b::QQBarFieldElem) = @ccall libflint.qqbar_cmp_im(a::Ref{QQBarFieldElem}, b::Ref{QQBarFieldElem})::Cint
+cmpabs(a::QQBarFieldElem, b::QQBarFieldElem) = @ccall libflint.qqbar_cmpabs(a::Ref{QQBarFieldElem}, b::Ref{QQBarFieldElem})::Cint
+cmpabs_real(a::QQBarFieldElem, b::QQBarFieldElem) = @ccall libflint.qqbar_cmpabs_re(a::Ref{QQBarFieldElem}, b::Ref{QQBarFieldElem})::Cint
+cmpabs_imag(a::QQBarFieldElem, b::QQBarFieldElem) = @ccall libflint.qqbar_cmpabs_im(a::Ref{QQBarFieldElem}, b::Ref{QQBarFieldElem})::Cint
+cmp_root_order(a::QQBarFieldElem, b::QQBarFieldElem) = @ccall libflint.qqbar_cmp_root_order(a::Ref{QQBarFieldElem}, b::Ref{QQBarFieldElem})::Cint
 
 @doc raw"""
     is_equal_real(a::QQBarFieldElem, b::QQBarFieldElem)
@@ -746,7 +697,7 @@ Return the real part of `a`.
 """
 function real(a::QQBarFieldElem)
   z = QQBarFieldElem()
-  ccall((:qqbar_re, libflint), Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
+  @ccall libflint.qqbar_re(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
@@ -757,7 +708,7 @@ Return the imaginary part of `a`.
 """
 function imag(a::QQBarFieldElem)
   z = QQBarFieldElem()
-  ccall((:qqbar_im, libflint), Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
+  @ccall libflint.qqbar_im(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
@@ -768,7 +719,7 @@ Return the absolute value of `a`.
 """
 function abs(a::QQBarFieldElem)
   z = QQBarFieldElem()
-  ccall((:qqbar_abs, libflint), Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
+  @ccall libflint.qqbar_abs(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
@@ -779,7 +730,7 @@ Return the complex conjugate of `a`.
 """
 function conj(a::QQBarFieldElem)
   z = QQBarFieldElem()
-  ccall((:qqbar_conj, libflint), Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
+  @ccall libflint.qqbar_conj(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
@@ -790,7 +741,7 @@ Return the squared absolute value of `a`.
 """
 function abs2(a::QQBarFieldElem)
   z = QQBarFieldElem()
-  ccall((:qqbar_abs2, libflint), Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
+  @ccall libflint.qqbar_abs2(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
@@ -802,7 +753,7 @@ and as $a / |a|$ otherwise.
 """
 function sign(a::QQBarFieldElem)
   z = QQBarFieldElem()
-  ccall((:qqbar_sgn, libflint), Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
+  @ccall libflint.qqbar_sgn(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
@@ -845,7 +796,7 @@ end
 
 function floor(::Type{ZZRingElem}, a::QQBarFieldElem)
   z = ZZRingElem()
-  ccall((:qqbar_floor, libflint), Nothing, (Ref{ZZRingElem}, Ref{QQBarFieldElem}, ), z, a)
+  @ccall libflint.qqbar_floor(z::Ref{ZZRingElem}, a::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
@@ -855,7 +806,7 @@ end
 
 function ceil(::Type{ZZRingElem}, a::QQBarFieldElem)
   z = ZZRingElem()
-  ccall((:qqbar_ceil, libflint), Nothing, (Ref{ZZRingElem}, Ref{QQBarFieldElem}, ), z, a)
+  @ccall libflint.qqbar_ceil(z::Ref{ZZRingElem}, a::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
@@ -914,8 +865,7 @@ Return the principal square root of `a`.
 """
 function sqrt(a::QQBarFieldElem; check::Bool=true)
   z = QQBarFieldElem()
-  ccall((:qqbar_sqrt, libflint),
-        Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
+  @ccall libflint.qqbar_sqrt(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
@@ -927,28 +877,25 @@ Return the principal `n`-th root of `a`. Requires positive `n`.
 function root(a::QQBarFieldElem, n::Int)
   n <= 0 && throw(DomainError(n))
   z = QQBarFieldElem()
-  ccall((:qqbar_root_ui, libflint),
-        Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, UInt), z, a, n)
+  @ccall libflint.qqbar_root_ui(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, n::UInt)::Nothing
   return z
 end
 
 function qqbar_vec(n::Int)
-  return ccall((:_qqbar_vec_init, libflint), Ptr{qqbar_struct}, (Int,), n)
+  return @ccall libflint._qqbar_vec_init(n::Int)::Ptr{qqbar_struct}
 end
 
 function array(R::QQBarField, v::Ptr{qqbar_struct}, n::Int)
   r = Vector{QQBarFieldElem}(undef, n)
   for i=1:n
     r[i] = R()
-    ccall((:qqbar_set, libflint), Nothing, (Ref{QQBarFieldElem}, Ptr{qqbar_struct}),
-          r[i], v + (i-1)*sizeof(qqbar_struct))
+    @ccall libflint.qqbar_set(r[i]::Ref{QQBarFieldElem}, (v + (i-1)*sizeof(qqbar_struct))::Ptr{qqbar_struct})::Nothing
   end
   return r
 end
 
 function qqbar_vec_clear(v::Ptr{qqbar_struct}, n::Int)
-  ccall((:_qqbar_vec_clear, libflint),
-        Nothing, (Ptr{qqbar_struct}, Int), v, n)
+  @ccall libflint._qqbar_vec_clear(v::Ptr{qqbar_struct}, n::Int)::Nothing
 end
 
 @doc raw"""
@@ -965,8 +912,7 @@ function roots(R::QQBarField, f::ZZPolyRingElem)
     return QQBarFieldElem[]
   end
   roots = qqbar_vec(deg)
-  ccall((:qqbar_roots_fmpz_poly, libflint),
-        Nothing, (Ptr{qqbar_struct}, Ref{ZZPolyRingElem}, Int), roots, f, 0)
+  @ccall libflint.qqbar_roots_fmpz_poly(roots::Ptr{qqbar_struct}, f::Ref{ZZPolyRingElem}, 0::Int)::Nothing
   res = array(R, roots, deg)
   qqbar_vec_clear(roots, deg)
   return res
@@ -986,8 +932,7 @@ function roots(R::QQBarField, f::QQPolyRingElem)
     return QQBarFieldElem[]
   end
   roots = qqbar_vec(deg)
-  ccall((:qqbar_roots_fmpq_poly, libflint),
-        Nothing, (Ptr{qqbar_struct}, Ref{QQPolyRingElem}, Int), roots, f, 0)
+  @ccall libflint.qqbar_roots_fmpq_poly(roots::Ptr{qqbar_struct}, f::Ref{QQPolyRingElem}, 0::Int)::Nothing
   res = array(R, roots, deg)
   qqbar_vec_clear(roots, deg)
   return res
@@ -1006,8 +951,7 @@ function conjugates(a::QQBarFieldElem)
     return [a]
   end
   conjugates = qqbar_vec(deg)
-  ccall((:qqbar_conjugates, libflint),
-        Nothing, (Ptr{qqbar_struct}, Ref{QQBarFieldElem}), conjugates, a)
+  @ccall libflint.qqbar_conjugates(conjugates::Ptr{qqbar_struct}, a::Ref{QQBarFieldElem})::Nothing
   res = array(parent(a), conjugates, deg)
   qqbar_vec_clear(conjugates, deg)
   return res
@@ -1021,8 +965,7 @@ function _eigvals_internal(R::QQBarField, A::ZZMatrix)
     return QQBarFieldElem[]
   end
   roots = qqbar_vec(n)
-  ccall((:qqbar_eigenvalues_fmpz_mat, libflint),
-        Nothing, (Ptr{qqbar_struct}, Ref{ZZMatrix}, Int), roots, A, 0)
+  @ccall libflint.qqbar_eigenvalues_fmpz_mat(roots::Ptr{qqbar_struct}, A::Ref{ZZMatrix}, 0::Int)::Nothing
   res = array(R, roots, n)
   qqbar_vec_clear(roots, n)
   return res
@@ -1036,8 +979,7 @@ function _eigvals_internal(R::QQBarField, A::QQMatrix)
     return QQBarFieldElem[]
   end
   roots = qqbar_vec(n)
-  ccall((:qqbar_eigenvalues_fmpq_mat, libflint),
-        Nothing, (Ptr{qqbar_struct}, Ref{QQMatrix}, Int), roots, A, 0)
+  @ccall libflint.qqbar_eigenvalues_fmpq_mat(roots::Ptr{qqbar_struct}, A::Ref{QQMatrix}, 0::Int)::Nothing
   res = array(R, roots, n)
   qqbar_vec_clear(roots, n)
   return res
@@ -1099,8 +1041,7 @@ of algebraic numbers `C`.
 function root_of_unity(C::QQBarField, n::Int)
   n <= 0 && throw(DomainError(n))
   z = QQBarFieldElem()
-  ccall((:qqbar_root_of_unity, libflint),
-        Nothing, (Ref{QQBarFieldElem}, Int, UInt), z, 1, n)
+  @ccall libflint.qqbar_root_of_unity(z::Ref{QQBarFieldElem}, 1::Int, n::UInt)::Nothing
   return z
 end
 
@@ -1113,8 +1054,7 @@ of algebraic numbers `C`.
 function root_of_unity(C::QQBarField, n::Int, k::Int)
   n <= 0 && throw(DomainError(n))
   z = QQBarFieldElem()
-  ccall((:qqbar_root_of_unity, libflint),
-        Nothing, (Ref{QQBarFieldElem}, Int, UInt), z, k, n)
+  @ccall libflint.qqbar_root_of_unity(z::Ref{QQBarFieldElem}, k::Int, n::UInt)::Nothing
   return z
 end
 
@@ -1124,8 +1064,7 @@ end
 Return whether the given algebraic number is a root of unity.
 """
 function is_root_of_unity(a::QQBarFieldElem)
-  return Bool(ccall((:qqbar_is_root_of_unity, libflint),
-                    Cint, (Ptr{Int}, Ptr{Int}, Ref{QQBarFieldElem}), C_NULL, C_NULL, a))
+  return Bool(@ccall libflint.qqbar_is_root_of_unity(C_NULL::Ptr{Int}, C_NULL::Ptr{Int}, a::Ref{QQBarFieldElem})::Cint)
 end
 
 @doc raw"""
@@ -1138,8 +1077,7 @@ $0 \le p < q$. Throws if `a` is not a root of unity.
 function root_of_unity_as_args(a::QQBarFieldElem)
   p = Vector{Int}(undef, 1)
   q = Vector{Int}(undef, 1)
-  if !Bool(ccall((:qqbar_is_root_of_unity, libflint),
-                 Cint, (Ptr{Int}, Ptr{Int}, Ref{QQBarFieldElem}), p, q, a))
+  if !Bool(@ccall libflint.qqbar_is_root_of_unity(p::Ptr{Int}, q::Ptr{Int}, a::Ref{QQBarFieldElem})::Cint)
     throw(DomainError(a, "value is not a root of unity"))
   end
   return (q[1], p[1])
@@ -1156,8 +1094,7 @@ function exp_pi_i(a::QQBarFieldElem)
   p = Int(numerator(r))
   q = Int(denominator(r))
   z = QQBarFieldElem()
-  ccall((:qqbar_exp_pi_i, libflint),
-        Nothing, (Ref{QQBarFieldElem}, Int, Int), z, p, q)
+  @ccall libflint.qqbar_exp_pi_i(z::Ref{QQBarFieldElem}, p::Int, q::Int)::Nothing
   return z
 end
 
@@ -1185,7 +1122,7 @@ function sinpi(a::QQBarFieldElem)
   p = Int(numerator(r))
   q = Int(denominator(r))
   z = QQBarFieldElem()
-  ccall((:qqbar_sin_pi, libflint), Nothing, (Ref{QQBarFieldElem}, Int, Int), z, p, q)
+  @ccall libflint.qqbar_sin_pi(z::Ref{QQBarFieldElem}, p::Int, q::Int)::Nothing
   return z
 end
 
@@ -1213,7 +1150,7 @@ function cospi(a::QQBarFieldElem)
   p = Int(numerator(r))
   q = Int(denominator(r))
   z = QQBarFieldElem()
-  ccall((:qqbar_cos_pi, libflint), Nothing, (Ref{QQBarFieldElem}, Int, Int), z, p, q)
+  @ccall libflint.qqbar_cos_pi(z::Ref{QQBarFieldElem}, p::Int, q::Int)::Nothing
   return z
 end
 
@@ -1241,9 +1178,9 @@ function sincospi(a::QQBarFieldElem)
   p = Int(numerator(r))
   q = Int(denominator(r))
   s = QQBarFieldElem()
-  ccall((:qqbar_sin_pi, libflint), Nothing, (Ref{QQBarFieldElem}, Int, Int), s, p, q)
+  @ccall libflint.qqbar_sin_pi(s::Ref{QQBarFieldElem}, p::Int, q::Int)::Nothing
   c = QQBarFieldElem()
-  ccall((:qqbar_cos_pi, libflint), Nothing, (Ref{QQBarFieldElem}, Int, Int), c, p, q)
+  @ccall libflint.qqbar_cos_pi(c::Ref{QQBarFieldElem}, p::Int, q::Int)::Nothing
   return s, c
 end
 
@@ -1259,8 +1196,7 @@ function tanpi(a::QQBarFieldElem)
   p = Int(numerator(r))
   q = Int(denominator(r))
   z = QQBarFieldElem()
-  if !Bool(ccall((:qqbar_tan_pi, libflint),
-                 Cint, (Ref{QQBarFieldElem}, Int, Int), z, p, q))
+  if !Bool(@ccall libflint.qqbar_tan_pi(z::Ref{QQBarFieldElem}, p::Int, q::Int)::Cint)
     throw(DomainError(a, "function value is not algebraic"))
   end
   return z
@@ -1275,8 +1211,7 @@ Throws if this value is transcendental or undefined.
 function atanpi(a::QQBarFieldElem)
   p = Vector{Int}(undef, 1)
   q = Vector{Int}(undef, 1)
-  if !Bool(ccall((:qqbar_atan_pi, libflint),
-                 Cint, (Ptr{Int}, Ptr{Int}, Ref{QQBarFieldElem}), p, q, a))
+  if !Bool(@ccall libflint.qqbar_atan_pi(p::Ptr{Int}, q::Ptr{Int}, a::Ref{QQBarFieldElem})::Cint)
     throw(DomainError(a, "function value is not algebraic"))
   end
   return QQBarFieldElem(p[1]) // q[1]
@@ -1291,8 +1226,7 @@ Throws if this value is transcendental.
 function asinpi(a::QQBarFieldElem)
   p = Vector{Int}(undef, 1)
   q = Vector{Int}(undef, 1)
-  if !Bool(ccall((:qqbar_asin_pi, libflint),
-                 Cint, (Ptr{Int}, Ptr{Int}, Ref{QQBarFieldElem}), p, q, a))
+  if !Bool(@ccall libflint.qqbar_asin_pi(p::Ptr{Int}, q::Ptr{Int}, a::Ref{QQBarFieldElem})::Cint)
     throw(DomainError(a, "function value is not algebraic"))
   end
   return QQBarFieldElem(p[1]) // q[1]
@@ -1307,8 +1241,7 @@ Throws if this value is transcendental.
 function acospi(a::QQBarFieldElem)
   p = Vector{Int}(undef, 1)
   q = Vector{Int}(undef, 1)
-  if !Bool(ccall((:qqbar_acos_pi, libflint),
-                 Cint, (Ptr{Int}, Ptr{Int}, Ref{QQBarFieldElem}), p, q, a))
+  if !Bool(@ccall libflint.qqbar_acos_pi(p::Ptr{Int}, q::Ptr{Int}, a::Ref{QQBarFieldElem})::Cint)
     throw(DomainError(a, "function value is not algebraic"))
   end
   return QQBarFieldElem(p[1]) // q[1]
@@ -1323,8 +1256,7 @@ Throws if this value is transcendental or undefined.
 function log_pi_i(a::QQBarFieldElem)
   p = Vector{Int}(undef, 1)
   q = Vector{Int}(undef, 1)
-  if !Bool(ccall((:qqbar_log_pi_i, libflint),
-                 Cint, (Ptr{Int}, Ptr{Int}, Ref{QQBarFieldElem}), p, q, a))
+  if !Bool(@ccall libflint.qqbar_log_pi_i(p::Ptr{Int}, q::Ptr{Int}, a::Ref{QQBarFieldElem})::Cint)
     throw(DomainError(a, "function value is not algebraic"))
   end
   return QQBarFieldElem(p[1]) // q[1]
@@ -1369,9 +1301,7 @@ function guess(R::QQBarField, x::T, maxdeg::Int, maxbits::Int=0) where {T <: Uni
     maxbits = prec
   end
   res = QQBarFieldElem()
-  found = Bool(ccall((:qqbar_guess, libflint),
-                     Cint, (Ref{QQBarFieldElem}, Ref{T}, Int, Int, Int, Int),
-                     res, x, maxdeg, maxbits, 0, prec))
+  found = Bool(@ccall libflint.qqbar_guess(res::Ref{QQBarFieldElem}, x::Ref{T}, maxdeg::Int, maxbits::Int, 0::Int, prec::Int)::Cint)
   if !found
     error("No suitable algebraic number found")
   end
@@ -1403,8 +1333,7 @@ Throws if `a` is not a real number.
 function (R::ArbField)(a::QQBarFieldElem)
   prec = precision(R)
   z = R()
-  ccall((:qqbar_get_arb, libflint),
-        Nothing, (Ref{ArbFieldElem}, Ref{QQBarFieldElem}, Int), z, a, prec)
+  @ccall libflint.qqbar_get_arb(z::Ref{ArbFieldElem}, a::Ref{QQBarFieldElem}, prec::Int)::Nothing
   !isfinite(z) && throw(DomainError(a, "nonreal algebraic number"))
   return z
 end
@@ -1417,8 +1346,7 @@ Convert `a` to a complex ball with the precision of the parent field `R`.
 function (R::AcbField)(a::QQBarFieldElem)
   prec = precision(R)
   z = R()
-  ccall((:qqbar_get_acb, libflint),
-        Nothing, (Ref{AcbFieldElem}, Ref{QQBarFieldElem}, Int), z, a, prec)
+  @ccall libflint.qqbar_get_acb(z::Ref{AcbFieldElem}, a::Ref{QQBarFieldElem}, prec::Int)::Nothing
   return z
 end
 
@@ -1431,8 +1359,7 @@ Throws if `a` is not a real number.
 function (R::RealField)(a::QQBarFieldElem)
   prec = precision(Balls)
   z = R()
-  ccall((:qqbar_get_arb, libflint),
-        Nothing, (Ref{RealFieldElem}, Ref{QQBarFieldElem}, Int), z, a, prec)
+  @ccall libflint.qqbar_get_arb(z::Ref{RealFieldElem}, a::Ref{QQBarFieldElem}, prec::Int)::Nothing
   !isfinite(z) && throw(DomainError(a, "nonreal algebraic number"))
   return z
 end
@@ -1445,12 +1372,10 @@ Convert `a` to a complex ball with the precision of the parent field `R`.
 function (R::ComplexField)(a::QQBarFieldElem)
   prec = precision(Balls)
   z = R()
-  ccall((:qqbar_get_acb, libflint),
-        Nothing, (Ref{ComplexFieldElem}, Ref{QQBarFieldElem}, Int), z, a, prec)
+  @ccall libflint.qqbar_get_acb(z::Ref{ComplexFieldElem}, a::Ref{QQBarFieldElem}, prec::Int)::Nothing
   return z
 end
 
-# todo: provide qqbar_get_fmpq, qqbar_get_fmpz in C
 @doc raw"""
     QQFieldElem(a::QQBarFieldElem)
 
@@ -1459,14 +1384,9 @@ Throws if `a` is not a rational number.
 """
 function QQFieldElem(a::QQBarFieldElem)
   !is_rational(a) && throw(DomainError(a, "nonrational algebraic number"))
-  p = ZZRingElem()
-  q = ZZRingElem()
-  ccall((:fmpz_poly_get_coeff_fmpz, libflint),
-        Nothing, (Ref{ZZRingElem}, Ref{QQBarFieldElem}, Int), p, a, 0)
-  ccall((:fmpz_poly_get_coeff_fmpz, libflint),
-        Nothing, (Ref{ZZRingElem}, Ref{QQBarFieldElem}, Int), q, a, 1)
-  ccall((:fmpz_neg, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}), p, p)
-  return p // q
+  z = QQFieldElem()
+  @ccall libflint.qqbar_get_fmpq(z::Ref{QQFieldElem}, a::Ref{QQBarFieldElem})::Nothing
+  return z
 end
 
 @doc raw"""
@@ -1478,10 +1398,23 @@ Throws if `a` is not an integer.
 function ZZRingElem(a::QQBarFieldElem)
   !isinteger(a) && throw(DomainError(a, "noninteger algebraic number"))
   z = ZZRingElem()
-  ccall((:fmpz_poly_get_coeff_fmpz, libflint),
-        Nothing, (Ref{ZZRingElem}, Ref{QQBarFieldElem}, Int), z, a, 0)
-  ccall((:fmpz_neg, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}), z, z)
+  @ccall libflint.qqbar_get_fmpz(z::Ref{ZZRingElem}, a::Ref{QQBarFieldElem})::Nothing
   return z
+end
+
+function (::Type{ComplexF64})(a::QQBarFieldElem)
+  z = AcbField(53, cached = false)(a)
+  x = real(z)
+  xx = Float64(x)
+  y = imag(z)
+  yy = Float64(y)
+  return ComplexF64(xx, yy)
+end
+
+function (::Type{Float64})(a::QQBarFieldElem)
+  isreal(a) || throw(InexactError(:Float64, Float64, a))
+  x = ArbField(53, cached = false)(a)
+  return Float64(x)
 end
 
 ###############################################################################
@@ -1491,29 +1424,27 @@ end
 ###############################################################################
 
 function zero!(z::QQBarFieldElem)
-  ccall((:qqbar_zero, libflint), Nothing, (Ref{QQBarFieldElem},), z)
+  @ccall libflint.qqbar_zero(z::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function one!(z::QQBarFieldElem)
-  ccall((:qqbar_one, libflint), Nothing, (Ref{QQBarFieldElem},), z)
+  @ccall libflint.qqbar_one(z::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function neg!(z::QQBarFieldElem, a::QQBarFieldElem)
-  ccall((:qqbar_neg, libflint), Nothing, (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, a)
+  @ccall libflint.qqbar_neg(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function mul!(z::QQBarFieldElem, x::QQBarFieldElem, y::QQBarFieldElem)
-  ccall((:qqbar_mul, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, x, y)
+  @ccall libflint.qqbar_mul(z::Ref{QQBarFieldElem}, x::Ref{QQBarFieldElem}, y::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function add!(z::QQBarFieldElem, x::QQBarFieldElem, y::QQBarFieldElem)
-  ccall((:qqbar_add, libflint), Nothing,
-        (Ref{QQBarFieldElem}, Ref{QQBarFieldElem}, Ref{QQBarFieldElem}), z, x, y)
+  @ccall libflint.qqbar_add(z::Ref{QQBarFieldElem}, x::Ref{QQBarFieldElem}, y::Ref{QQBarFieldElem})::Nothing
   return z
 end
 

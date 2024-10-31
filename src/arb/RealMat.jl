@@ -30,7 +30,7 @@ dense_matrix_type(::Type{RealFieldElem}) = RealMatrix
 function getindex!(z::ArbFieldElem, x::RealMatrix, r::Int, c::Int)
   GC.@preserve x begin
     v = mat_entry_ptr(x, r, c)
-    ccall((:arb_set, libflint), Nothing, (Ref{RealFieldElem}, Ptr{RealFieldElem}), z, v)
+    _arb_set(z, v)
   end
   return z
 end
@@ -41,7 +41,7 @@ end
   z = base_ring(x)()
   GC.@preserve x begin
     v = mat_entry_ptr(x, r, c)
-    ccall((:arb_set, libflint), Nothing, (Ref{RealFieldElem}, Ptr{RealFieldElem}), z, v)
+    _arb_set(z, v)
   end
   return z
 end
@@ -68,9 +68,7 @@ Base.@propagate_inbounds setindex!(x::RealMatrix, y::Rational{T},
 setindex!(x, ZZRingElem(y), r, c)
 
 function one(x::RealMatrixSpace)
-  z = x()
-  ccall((:arb_mat_one, libflint), Nothing, (Ref{RealMatrix}, ), z)
-  return z
+  return one!(x())
 end
 
 number_of_rows(a::RealMatrix) = a.r
@@ -79,7 +77,7 @@ number_of_columns(a::RealMatrix) = a.c
 
 function deepcopy_internal(x::RealMatrix, dict::IdDict)
   z = RealMatrix(nrows(x), ncols(x))
-  ccall((:arb_mat_set, libflint), Nothing, (Ref{RealMatrix}, Ref{RealMatrix}), z, x)
+  @ccall libflint.arb_mat_set(z::Ref{RealMatrix}, x::Ref{RealMatrix})::Nothing
   return z
 end
 
@@ -89,11 +87,7 @@ end
 #
 ################################################################################
 
-function -(x::RealMatrix)
-  z = similar(x)
-  ccall((:arb_mat_neg, libflint), Nothing, (Ref{RealMatrix}, Ref{RealMatrix}), z, x)
-  return z
-end
+-(x::RealMatrix) = neg!(similar(x), x)
 
 ################################################################################
 #
@@ -103,8 +97,7 @@ end
 
 function transpose(x::RealMatrix)
   z = similar(x, ncols(x), nrows(x))
-  ccall((:arb_mat_transpose, libflint), Nothing,
-        (Ref{RealMatrix}, Ref{RealMatrix}), z, x)
+  @ccall libflint.arb_mat_transpose(z::Ref{RealMatrix}, x::Ref{RealMatrix})::Nothing
   return z
 end
 
@@ -117,27 +110,21 @@ end
 function +(x::RealMatrix, y::RealMatrix)
   check_parent(x, y)
   z = similar(x)
-  ccall((:arb_mat_add, libflint), Nothing,
-        (Ref{RealMatrix}, Ref{RealMatrix}, Ref{RealMatrix}, Int),
-        z, x, y, precision(Balls))
+  @ccall libflint.arb_mat_add(z::Ref{RealMatrix}, x::Ref{RealMatrix}, y::Ref{RealMatrix}, precision(Balls)::Int)::Nothing
   return z
 end
 
 function -(x::RealMatrix, y::RealMatrix)
   check_parent(x, y)
   z = similar(x)
-  ccall((:arb_mat_sub, libflint), Nothing,
-        (Ref{RealMatrix}, Ref{RealMatrix}, Ref{RealMatrix}, Int),
-        z, x, y, precision(Balls))
+  @ccall libflint.arb_mat_sub(z::Ref{RealMatrix}, x::Ref{RealMatrix}, y::Ref{RealMatrix}, precision(Balls)::Int)::Nothing
   return z
 end
 
 function *(x::RealMatrix, y::RealMatrix)
   ncols(x) != nrows(y) && error("Matrices have wrong dimensions")
   z = similar(x, nrows(x), ncols(y))
-  ccall((:arb_mat_mul, libflint), Nothing,
-        (Ref{RealMatrix}, Ref{RealMatrix}, Ref{RealMatrix}, Int),
-        z, x, y, precision(Balls))
+  @ccall libflint.arb_mat_mul(z::Ref{RealMatrix}, x::Ref{RealMatrix}, y::Ref{RealMatrix}, precision(Balls)::Int)::Nothing
   return z
 end
 
@@ -150,17 +137,13 @@ end
 function ^(x::RealMatrix, y::UInt)
   nrows(x) != ncols(x) && error("Matrix must be square")
   z = similar(x)
-  ccall((:arb_mat_pow_ui, libflint), Nothing,
-        (Ref{RealMatrix}, Ref{RealMatrix}, UInt, Int),
-        z, x, y, precision(Balls))
+  @ccall libflint.arb_mat_pow_ui(z::Ref{RealMatrix}, x::Ref{RealMatrix}, y::UInt, precision(Balls)::Int)::Nothing
   return z
 end
 
 function *(x::RealMatrix, y::Int)
   z = similar(x)
-  ccall((:arb_mat_scalar_mul_si, libflint), Nothing,
-        (Ref{RealMatrix}, Ref{RealMatrix}, Int, Int),
-        z, x, y, precision(Balls))
+  @ccall libflint.arb_mat_scalar_mul_si(z::Ref{RealMatrix}, x::Ref{RealMatrix}, y::Int, precision(Balls)::Int)::Nothing
   return z
 end
 
@@ -172,9 +155,7 @@ end
 
 function *(x::RealMatrix, y::ZZRingElem)
   z = similar(x)
-  ccall((:arb_mat_scalar_mul_fmpz, libflint), Nothing,
-        (Ref{RealMatrix}, Ref{RealMatrix}, Ref{ZZRingElem}, Int),
-        z, x, y, precision(Balls))
+  @ccall libflint.arb_mat_scalar_mul_fmpz(z::Ref{RealMatrix}, x::Ref{RealMatrix}, y::Ref{ZZRingElem}, precision(Balls)::Int)::Nothing
   return z
 end
 
@@ -182,9 +163,7 @@ end
 
 function *(x::RealMatrix, y::ArbFieldElem)
   z = similar(x)
-  ccall((:arb_mat_scalar_mul_arb, libflint), Nothing,
-        (Ref{RealMatrix}, Ref{RealMatrix}, Ref{RealFieldElem}, Int),
-        z, x, y, precision(Balls))
+  @ccall libflint.arb_mat_scalar_mul_arb(z::Ref{RealMatrix}, x::Ref{RealMatrix}, y::Ref{RealFieldElem}, precision(Balls)::Int)::Nothing
   return z
 end
 
@@ -254,8 +233,7 @@ end
 
 function ldexp(x::RealMatrix, y::Int)
   z = similar(x)
-  ccall((:arb_mat_scalar_mul_2exp_si, libflint), Nothing,
-        (Ref{RealMatrix}, Ref{RealMatrix}, Int), z, x, y)
+  @ccall libflint.arb_mat_scalar_mul_2exp_si(z::Ref{RealMatrix}, x::Ref{RealMatrix}, y::Int)::Nothing
   return z
 end
 
@@ -272,20 +250,19 @@ Return `true` if the matrices of balls $x$ and $y$ are precisely equal,
 i.e. if all matrix entries have the same midpoints and radii.
 """
 function isequal(x::RealMatrix, y::RealMatrix)
-  r = ccall((:arb_mat_equal, libflint), Cint,
-            (Ref{RealMatrix}, Ref{RealMatrix}), x, y)
+  r = @ccall libflint.arb_mat_equal(x::Ref{RealMatrix}, y::Ref{RealMatrix})::Cint
   return Bool(r)
 end
 
 function ==(x::RealMatrix, y::RealMatrix)
   fl = check_parent(x, y, false)
   !fl && return false
-  r = ccall((:arb_mat_eq, libflint), Cint, (Ref{RealMatrix}, Ref{RealMatrix}), x, y)
+  r = @ccall libflint.arb_mat_eq(x::Ref{RealMatrix}, y::Ref{RealMatrix})::Cint
   return Bool(r)
 end
 
 function !=(x::RealMatrix, y::RealMatrix)
-  r = ccall((:arb_mat_ne, libflint), Cint, (Ref{RealMatrix}, Ref{RealMatrix}), x, y)
+  r = @ccall libflint.arb_mat_ne(x::Ref{RealMatrix}, y::Ref{RealMatrix})::Cint
   return Bool(r)
 end
 
@@ -296,8 +273,7 @@ Returns `true` if all entries of $x$ overlap with the corresponding entry of
 $y$, otherwise return `false`.
 """
 function overlaps(x::RealMatrix, y::RealMatrix)
-  r = ccall((:arb_mat_overlaps, libflint), Cint,
-            (Ref{RealMatrix}, Ref{RealMatrix}), x, y)
+  r = @ccall libflint.arb_mat_overlaps(x::Ref{RealMatrix}, y::Ref{RealMatrix})::Cint
   return Bool(r)
 end
 
@@ -308,8 +284,7 @@ Returns `true` if all entries of $x$ contain the corresponding entry of
 $y$, otherwise return `false`.
 """
 function contains(x::RealMatrix, y::RealMatrix)
-  r = ccall((:arb_mat_contains, libflint), Cint,
-            (Ref{RealMatrix}, Ref{RealMatrix}), x, y)
+  r = @ccall libflint.arb_mat_contains(x::Ref{RealMatrix}, y::Ref{RealMatrix})::Cint
   return Bool(r)
 end
 
@@ -326,8 +301,7 @@ Returns `true` if all entries of $x$ contain the corresponding entry of
 $y$, otherwise return `false`.
 """
 function contains(x::RealMatrix, y::ZZMatrix)
-  r = ccall((:arb_mat_contains_fmpz_mat, libflint), Cint,
-            (Ref{RealMatrix}, Ref{ZZMatrix}), x, y)
+  r = @ccall libflint.arb_mat_contains_fmpz_mat(x::Ref{RealMatrix}, y::Ref{ZZMatrix})::Cint
   return Bool(r)
 end
 
@@ -339,8 +313,7 @@ Returns `true` if all entries of $x$ contain the corresponding entry of
 $y$, otherwise return `false`.
 """
 function contains(x::RealMatrix, y::QQMatrix)
-  r = ccall((:arb_mat_contains_fmpq_mat, libflint), Cint,
-            (Ref{RealMatrix}, Ref{QQMatrix}), x, y)
+  r = @ccall libflint.arb_mat_contains_fmpq_mat(x::Ref{RealMatrix}, y::Ref{QQMatrix})::Cint
   return Bool(r)
 end
 
@@ -378,8 +351,7 @@ end
 function is_invertible_with_inverse(x::RealMatrix)
   ncols(x) != nrows(x) && return false, x
   z = similar(x)
-  r = ccall((:arb_mat_inv, libflint), Cint,
-            (Ref{RealMatrix}, Ref{RealMatrix}, Int), z, x, precision(Balls))
+  r = @ccall libflint.arb_mat_inv(z::Ref{RealMatrix}, x::Ref{RealMatrix}, precision(Balls)::Int)::Cint
   return Bool(r), z
 end
 
@@ -403,25 +375,19 @@ end
 function divexact(x::RealMatrix, y::Int; check::Bool=true)
   y == 0 && throw(DivideError())
   z = similar(x)
-  ccall((:arb_mat_scalar_div_si, libflint), Nothing,
-        (Ref{RealMatrix}, Ref{RealMatrix}, Int, Int),
-        z, x, y, precision(Balls))
+  @ccall libflint.arb_mat_scalar_div_si(z::Ref{RealMatrix}, x::Ref{RealMatrix}, y::Int, precision(Balls)::Int)::Nothing
   return z
 end
 
 function divexact(x::RealMatrix, y::ZZRingElem; check::Bool=true)
   z = similar(x)
-  ccall((:arb_mat_scalar_div_fmpz, libflint), Nothing,
-        (Ref{RealMatrix}, Ref{RealMatrix}, Ref{ZZRingElem}, Int),
-        z, x, y, precision(Balls))
+  @ccall libflint.arb_mat_scalar_div_fmpz(z::Ref{RealMatrix}, x::Ref{RealMatrix}, y::Ref{ZZRingElem}, precision(Balls)::Int)::Nothing
   return z
 end
 
 function divexact(x::RealMatrix, y::ArbFieldElem; check::Bool=true)
   z = similar(x)
-  ccall((:arb_mat_scalar_div_arb, libflint), Nothing,
-        (Ref{RealMatrix}, Ref{RealMatrix}, Ref{RealFieldElem}, Int),
-        z, x, y, precision(Balls))
+  @ccall libflint.arb_mat_scalar_div_arb(z::Ref{RealMatrix}, x::Ref{RealMatrix}, y::Ref{RealFieldElem}, precision(Balls)::Int)::Nothing
   return z
 end
 
@@ -434,8 +400,7 @@ end
 function charpoly(x::RealPolyRing, y::RealMatrix, prec::Int = precision(Balls))
   base_ring(y) != base_ring(x) && error("Base rings must coincide")
   z = x()
-  ccall((:arb_mat_charpoly, libflint), Nothing,
-        (Ref{RealPolyRingElem}, Ref{RealMatrix}, Int), z, y, prec)
+  @ccall libflint.arb_mat_charpoly(z::Ref{RealPolyRingElem}, y::Ref{RealMatrix}, prec::Int)::Nothing
   return z
 end
 
@@ -448,8 +413,7 @@ end
 function det(x::RealMatrix, prec::Int = precision(Balls))
   ncols(x) != nrows(x) && error("Matrix must be square")
   z = base_ring(x)()
-  ccall((:arb_mat_det, libflint), Nothing,
-        (Ref{RealFieldElem}, Ref{RealMatrix}, Int), z, x, prec)
+  @ccall libflint.arb_mat_det(z::Ref{RealFieldElem}, x::Ref{RealMatrix}, prec::Int)::Nothing
   return z
 end
 
@@ -462,8 +426,7 @@ end
 function Base.exp(x::RealMatrix)
   ncols(x) != nrows(x) && error("Matrix must be square")
   z = similar(x)
-  ccall((:arb_mat_exp, libflint), Nothing,
-        (Ref{RealMatrix}, Ref{RealMatrix}, Int), z, x, precision(Balls))
+  @ccall libflint.arb_mat_exp(z::Ref{RealMatrix}, x::Ref{RealMatrix}, precision(Balls)::Int)::Nothing
   return z
 end
 
@@ -473,31 +436,29 @@ end
 #
 ###############################################################################
 
-function lu!(P::Perm, x::RealMatrix)
+function lu!(P::Perm, z::RealMatrix, x::RealMatrix)
   parent(P).n != nrows(x) && error("Permutation does not match matrix")
   P.d .-= 1
-  r = ccall((:arb_mat_lu, libflint), Cint,
-            (Ptr{Int}, Ref{RealMatrix}, Ref{RealMatrix}, Int),
-            P.d, x, x, precision(Balls))
+  r = @ccall libflint.arb_mat_lu(P.d::Ptr{Int}, z::Ref{RealMatrix}, x::Ref{RealMatrix}, precision(Balls)::Int)::Cint
   r == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
   P.d .+= 1
   inv!(P)
   return min(nrows(x), ncols(x))
 end
 
+function lu!(P::Perm, x::RealMatrix)
+  return lu!(P, x, x)
+end
+
 function _solve!(z::RealMatrix, x::RealMatrix, y::RealMatrix)
-  r = ccall((:arb_mat_solve, libflint), Cint,
-            (Ref{RealMatrix}, Ref{RealMatrix}, Ref{RealMatrix}, Int),
-            z, x, y, precision(Balls))
+  r = @ccall libflint.arb_mat_solve(z::Ref{RealMatrix}, x::Ref{RealMatrix}, y::Ref{RealMatrix}, precision(Balls)::Int)::Cint
   r == 0 && error("Matrix cannot be inverted numerically")
   nothing
 end
 
 function _solve_lu_precomp!(z::RealMatrix, P::Perm, LU::RealMatrix, y::RealMatrix)
   Q = inv(P)
-  ccall((:arb_mat_solve_lu_precomp, libflint), Nothing,
-        (Ref{RealMatrix}, Ptr{Int}, Ref{RealMatrix}, Ref{RealMatrix}, Int),
-        z, Q.d .- 1, LU, y, precision(Balls))
+  @ccall libflint.arb_mat_solve_lu_precomp(z::Ref{RealMatrix}, (Q.d .- 1)::Ptr{Int}, LU::Ref{RealMatrix}, y::Ref{RealMatrix}, precision(Balls)::Int)::Nothing
   nothing
 end
 
@@ -519,10 +480,7 @@ function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::RealMatrix, b::R
   end
 
   x = similar(A, ncols(A), ncols(b))
-  fl = ccall((:arb_mat_solve, libflint), Cint,
-             (Ref{RealMatrix}, Ref{RealMatrix}, Ref{RealMatrix}, Int),
-             x, A, b, precision(Balls))
-  fl == 0 && error("Matrix cannot be inverted numerically")
+  _solve!(x, A, b)
   if task === :only_check || task === :with_solution
     return true, x, zero(A, 0, 0)
   end
@@ -546,13 +504,7 @@ function Solve._init_reduce(C::Solve.SolveCtx{RealFieldElem, Solve.LUTrait})
   A = matrix(C)
   P = Perm(nrows(C))
   x = similar(A, nrows(A), ncols(A))
-  P.d .-= 1
-  fl = ccall((:arb_mat_lu, libflint), Cint,
-             (Ptr{Int}, Ref{RealMatrix}, Ref{RealMatrix}, Int),
-             P.d, x, A, precision(Balls))
-  fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
-  P.d .+= 1
-  inv!(P)
+  lu!(P, x, A)
 
   C.red = x
   C.lu_perm = P
@@ -569,13 +521,7 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{RealFieldElem, Solve.LUT
   A = transpose(matrix(C))
   P = Perm(nrows(C))
   x = similar(A, nrows(A), ncols(A))
-  P.d .-= 1
-  fl = ccall((:arb_mat_lu, libflint), Cint,
-             (Ptr{Int}, Ref{RealMatrix}, Ref{RealMatrix}, Int),
-             P.d, x, A, precision(Balls))
-  fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
-  P.d .+= 1
-  inv!(P)
+  lu!(P, x, A)
 
   C.red_transp = x
   C.lu_perm_transp = P
@@ -593,9 +539,7 @@ function Solve._can_solve_internal_no_check(::Solve.LUTrait, C::Solve.SolveCtx{R
   end
 
   x = similar(b, ncols(C), ncols(b))
-  ccall((:arb_mat_solve_lu_precomp, libflint), Nothing,
-        (Ref{RealMatrix}, Ptr{Int}, Ref{RealMatrix}, Ref{RealMatrix}, Int),
-        x, inv(p).d .- 1, LU, b, precision(Balls))
+  _solve_lu_precomp!(x, p, LU, b)
 
   if side === :left
     x = transpose(x)
@@ -627,9 +571,7 @@ function swap_rows(x::RealMatrix, i::Int, j::Int)
 end
 
 function swap_rows!(x::RealMatrix, i::Int, j::Int)
-  ccall((:arb_mat_swap_rows, libflint), Nothing,
-        (Ref{RealMatrix}, Ptr{Nothing}, Int, Int),
-        x, C_NULL, i - 1, j - 1)
+  @ccall libflint.arb_mat_swap_rows(x::Ref{RealMatrix}, C_NULL::Ptr{Nothing}, (i - 1)::Int, (j - 1)::Int)::Nothing
 end
 
 ################################################################################
@@ -647,14 +589,11 @@ bound for the infinity norm for every matrix in $x$
 function bound_inf_norm(x::RealMatrix)
   z = RealFieldElem()
   GC.@preserve x z begin
-    t = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (Ref{RealFieldElem}, ), z)
-    ccall((:arb_mat_bound_inf_norm, libflint), Nothing,
-          (Ptr{mag_struct}, Ref{RealMatrix}), t, x)
-    s = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (Ref{RealFieldElem}, ), z)
-    ccall((:arf_set_mag, libflint), Nothing,
-          (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
-    ccall((:mag_zero, libflint), Nothing,
-          (Ptr{mag_struct},), t)
+    t = _rad_ptr(z)
+    @ccall libflint.arb_mat_bound_inf_norm(t::Ptr{mag_struct}, x::Ref{RealMatrix})::Nothing
+    s = _mid_ptr(z)
+    @ccall libflint.arf_set_mag(s::Ptr{arf_struct}, t::Ptr{mag_struct})::Nothing
+    @ccall libflint.mag_zero(t::Ptr{mag_struct})::Nothing
   end
   return base_ring(x)(z)
 end
@@ -664,6 +603,21 @@ end
 #   Unsafe functions
 #
 ################################################################################
+
+function zero!(z::RealMatrixOrPtr)
+  @ccall libflint.arb_mat_zero(z::Ref{RealMatrix})::Nothing
+  return z
+end
+
+function one!(z::RealMatrixOrPtr)
+  @ccall libflint.arb_mat_one(z::Ref{RealMatrix})::Nothing
+  return z
+end
+
+function neg!(z::RealMatrixOrPtr, a::RealMatrixOrPtr)
+  @ccall libflint.arb_mat_neg(z::Ref{RealMatrix}, a::Ref{RealMatrix})::Nothing
+  return z
+end
 
 for (s,f) in (("add!","arb_mat_add"), ("mul!","arb_mat_mul"),
               ("sub!","arb_mat_sub"))
@@ -783,9 +737,7 @@ function identity_matrix(R::RealField, n::Int)
   if n < 0
     error("dimension must not be negative")
   end
-  z = RealMatrix(n, n)
-  ccall((:arb_mat_one, libflint), Nothing, (Ref{RealMatrix}, ), z)
-  return z
+  return one!(RealMatrix(n, n))
 end
 
 ###############################################################################
@@ -810,8 +762,7 @@ end
 ################################################################################
 
 @inline mat_entry_ptr(A::RealMatrix, i::Int, j::Int) = 
-ccall((:arb_mat_entry_ptr, libflint), 
-      Ptr{RealFieldElem}, (Ref{RealMatrix}, Int, Int), A, i-1, j-1)
+@ccall libflint.arb_mat_entry_ptr(A::Ref{RealMatrix}, (i-1)::Int, (j-1)::Int)::Ptr{RealFieldElem}
 
 ###############################################################################
 #

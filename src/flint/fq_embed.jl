@@ -12,9 +12,7 @@
 
 function linear_factor(x::FqPolyRepPolyRingElem)
   y = parent(x)()
-  ccall((:fq_poly_factor_split_single, libflint), Nothing,
-        (Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepPolyRingElem}, Ref{FqPolyRepField}),
-        y, x, base_ring(x))
+  @ccall libflint.fq_poly_factor_split_single(y::Ref{FqPolyRepPolyRingElem}, x::Ref{FqPolyRepPolyRingElem}, base_ring(x)::Ref{FqPolyRepField})::Nothing
   return y
 end
 
@@ -32,10 +30,7 @@ function embed_gens(k::FqPolyRepField, K::FqPolyRepField)
   PR = polynomial_ring(R, "T")[1]
   P = PR()
 
-  ccall((:fq_embed_gens, libflint), Nothing,
-        (Ref{FqPolyRepFieldElem}, Ref{FqPolyRepFieldElem}, Ref{FpPolyRingElem}, Ref{FqPolyRepField},
-         Ref{FqPolyRepField}),
-        a, b, P, k, K)
+  @ccall libflint.fq_embed_gens(a::Ref{FqPolyRepFieldElem}, b::Ref{FqPolyRepFieldElem}, P::Ref{FpPolyRingElem}, k::Ref{FqPolyRepField}, K::Ref{FqPolyRepField})::Nothing
 
   return a, b, P
 end
@@ -57,10 +52,7 @@ function embed_matrices(k::FqPolyRepField, K::FqPolyRepField)
   s1 = zero_matrix(R, n, m)
   s2 = zero_matrix(R, m, n)
 
-  ccall((:fq_embed_matrices, libflint), Nothing,
-        (Ref{FpMatrix}, Ref{FpMatrix}, Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField},
-         Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}, Ref{FpPolyRingElem}),
-        s1, s2, a, k, b, K, P)
+  @ccall libflint.fq_embed_matrices(s1::Ref{FpMatrix}, s2::Ref{FpMatrix}, a::Ref{FqPolyRepFieldElem}, k::Ref{FqPolyRepField}, b::Ref{FqPolyRepFieldElem}, K::Ref{FqPolyRepField}, P::Ref{FpPolyRingElem})::Nothing
   return s1, s2
 end
 
@@ -72,17 +64,13 @@ function embed_matrices_pre(a::FqPolyRepFieldElem, b::FqPolyRepFieldElem, P::FpP
   s1 = zero_matrix(R, n, m)
   s2 = zero_matrix(R, m, n)
 
-  ccall((:fq_embed_matrices, libflint), Nothing,
-        (Ref{FpMatrix}, Ref{FpMatrix}, Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField},
-         Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}, Ref{FpPolyRingElem}),
-        s1, s2, a, k, b, K, P)
+  @ccall libflint.fq_embed_matrices(s1::Ref{FpMatrix}, s2::Ref{FpMatrix}, a::Ref{FqPolyRepFieldElem}, k::Ref{FqPolyRepField}, b::Ref{FqPolyRepFieldElem}, K::Ref{FqPolyRepField}, P::Ref{FpPolyRingElem})::Nothing
   return s1, s2
 end
 
 # dirty: internally in flint an fq_struct is just an fmpz_poly_struct
 function setcoeff!(x::FqPolyRepFieldElem, j::Int, c::ZZRingElem)
-  ccall((:fmpz_poly_set_coeff_fmpz, libflint), Nothing,
-        (Ref{FqPolyRepFieldElem}, Int, Ref{ZZRingElem}), x, j, c)
+  @ccall libflint.fmpz_poly_set_coeff_fmpz(x::Ref{FqPolyRepFieldElem}, j::Int, c::Ref{ZZRingElem})::Nothing
 end
 
 function embed_pre_mat(x::FqPolyRepFieldElem, K::FqPolyRepField, M::FpMatrix)

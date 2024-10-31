@@ -22,8 +22,6 @@ elem_type(::Type{QQRelPowerSeriesRing}) = QQRelPowerSeriesRingElem
 
 parent_type(::Type{QQRelPowerSeriesRingElem}) = QQRelPowerSeriesRing
 
-base_ring_type(::Type{QQRelPowerSeriesRing}) = QQField
-
 base_ring(R::QQRelPowerSeriesRing) = QQ
 
 rel_series_type(::Type{QQFieldElem}) = QQRelPowerSeriesRingElem
@@ -41,21 +39,19 @@ max_precision(R::QQRelPowerSeriesRing) = R.prec_max
 function normalise(a::QQRelPowerSeriesRingElem, len::Int)
   if len > 0
     c = QQFieldElem()
-    ccall((:fmpq_poly_get_coeff_fmpq, libflint), Nothing,
-          (Ref{QQFieldElem}, Ref{QQRelPowerSeriesRingElem}, Int), c, a, len - 1)
+    @ccall libflint.fmpq_poly_get_coeff_fmpq(c::Ref{QQFieldElem}, a::Ref{QQRelPowerSeriesRingElem}, (len - 1)::Int)::Nothing
   end
   while len > 0 && iszero(c)
     len -= 1
     if len > 0
-      ccall((:fmpq_poly_get_coeff_fmpq, libflint), Nothing,
-            (Ref{QQFieldElem}, Ref{QQRelPowerSeriesRingElem}, Int), c, a, len - 1)
+      @ccall libflint.fmpq_poly_get_coeff_fmpq(c::Ref{QQFieldElem}, a::Ref{QQRelPowerSeriesRingElem}, (len - 1)::Int)::Nothing
     end
   end
   return len
 end
 
 function pol_length(x::QQRelPowerSeriesRingElem)
-  return ccall((:fmpq_poly_length, libflint), Int, (Ref{QQRelPowerSeriesRingElem},), x)
+  return @ccall libflint.fmpq_poly_length(x::Ref{QQRelPowerSeriesRingElem})::Int
 end
 
 precision(x::QQRelPowerSeriesRingElem) = x.prec
@@ -65,8 +61,7 @@ function polcoeff(x::QQRelPowerSeriesRingElem, n::Int)
     return QQFieldElem(0)
   end
   z = QQFieldElem()
-  ccall((:fmpq_poly_get_coeff_fmpq, libflint), Nothing,
-        (Ref{QQFieldElem}, Ref{QQRelPowerSeriesRingElem}, Int), z, x, n)
+  @ccall libflint.fmpq_poly_get_coeff_fmpq(z::Ref{QQFieldElem}, x::Ref{QQRelPowerSeriesRingElem}, n::Int)::Nothing
   return z
 end
 
@@ -101,8 +96,7 @@ function renormalize!(z::QQRelPowerSeriesRingElem)
     z.val = zprec
   else
     z.val = zval + i
-    ccall((:fmpq_poly_shift_right, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int), z, z, i)
+    @ccall libflint.fmpq_poly_shift_right(z::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem}, i::Int)::Nothing
   end
   return nothing
 end
@@ -155,9 +149,7 @@ end
 
 function -(x::QQRelPowerSeriesRingElem)
   z = parent(x)()
-  ccall((:fmpq_poly_neg, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}),
-        z, x)
+  @ccall libflint.fmpq_poly_neg(z::Ref{QQRelPowerSeriesRingElem}, x::Ref{QQRelPowerSeriesRingElem})::Nothing
   z.prec = x.prec
   z.val = x.val
   return z
@@ -183,28 +175,18 @@ function +(a::QQRelPowerSeriesRingElem, b::QQRelPowerSeriesRingElem)
     ccall((:fmpq_poly_set_trunc, libflint), Nothing,
           (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
           z, b, max(0, lenz - b.val + a.val))
-    ccall((:fmpq_poly_shift_left, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-          z, z, b.val - a.val)
-    ccall((:fmpq_poly_add_series, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-          z, z, a, lenz)
+    @ccall libflint.fmpq_poly_shift_left(z::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem}, (b.val - a.val)::Int)::Nothing
+    @ccall libflint.fmpq_poly_add_series(z::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, lenz::Int)::Nothing
   elseif b.val < a.val
     lenz = max(lena + a.val - b.val, lenb)
     ccall((:fmpq_poly_set_trunc, libflint), Nothing,
           (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
           z, a, max(0, lenz - a.val + b.val))
-    ccall((:fmpq_poly_shift_left, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-          z, z, a.val - b.val)
-    ccall((:fmpq_poly_add_series, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-          z, z, b, lenz)
+    @ccall libflint.fmpq_poly_shift_left(z::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem}, (a.val - b.val)::Int)::Nothing
+    @ccall libflint.fmpq_poly_add_series(z::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem}, b::Ref{QQRelPowerSeriesRingElem}, lenz::Int)::Nothing
   else
     lenz = max(lena, lenb)
-    ccall((:fmpq_poly_add_series, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-          z, a, b, lenz)
+    @ccall libflint.fmpq_poly_add_series(z::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, b::Ref{QQRelPowerSeriesRingElem}, lenz::Int)::Nothing
   end
   z.prec = prec
   z.val = val
@@ -227,30 +209,19 @@ function -(a::QQRelPowerSeriesRingElem, b::QQRelPowerSeriesRingElem)
     ccall((:fmpq_poly_set_trunc, libflint), Nothing,
           (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
           z, b, max(0, lenz - b.val + a.val))
-    ccall((:fmpq_poly_shift_left, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-          z, z, b.val - a.val)
-    ccall((:fmpq_poly_neg, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}), z, z)
-    ccall((:fmpq_poly_add_series, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-          z, z, a, lenz)
+    @ccall libflint.fmpq_poly_shift_left(z::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem}, (b.val - a.val)::Int)::Nothing
+    @ccall libflint.fmpq_poly_neg(z::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem})::Nothing
+    @ccall libflint.fmpq_poly_add_series(z::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, lenz::Int)::Nothing
   elseif b.val < a.val
     lenz = max(lena + a.val - b.val, lenb)
     ccall((:fmpq_poly_set_trunc, libflint), Nothing,
           (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
           z, a, max(0, lenz - a.val + b.val))
-    ccall((:fmpq_poly_shift_left, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-          z, z, a.val - b.val)
-    ccall((:fmpq_poly_sub_series, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-          z, z, b, lenz)
+    @ccall libflint.fmpq_poly_shift_left(z::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem}, (a.val - b.val)::Int)::Nothing
+    @ccall libflint.fmpq_poly_sub_series(z::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem}, b::Ref{QQRelPowerSeriesRingElem}, lenz::Int)::Nothing
   else
     lenz = max(lena, lenb)
-    ccall((:fmpq_poly_sub_series, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-          z, a, b, lenz)
+    @ccall libflint.fmpq_poly_sub_series(z::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, b::Ref{QQRelPowerSeriesRingElem}, lenz::Int)::Nothing
   end
   z.prec = prec
   z.val = val
@@ -274,9 +245,7 @@ function *(a::QQRelPowerSeriesRingElem, b::QQRelPowerSeriesRingElem)
     return z
   end
   lenz = min(lena + lenb - 1, prec)
-  ccall((:fmpq_poly_mullow, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, a, b, lenz)
+  @ccall libflint.fmpq_poly_mullow(z::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, b::Ref{QQRelPowerSeriesRingElem}, lenz::Int)::Nothing
   return z
 end
 
@@ -290,9 +259,7 @@ function *(x::Int, y::QQRelPowerSeriesRingElem)
   z = parent(y)()
   z.prec = y.prec
   z.val = y.val
-  ccall((:fmpq_poly_scalar_mul_si, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, y, x)
+  @ccall libflint.fmpq_poly_scalar_mul_si(z::Ref{QQRelPowerSeriesRingElem}, y::Ref{QQRelPowerSeriesRingElem}, x::Int)::Nothing
   return z
 end
 
@@ -302,9 +269,7 @@ function *(x::ZZRingElem, y::QQRelPowerSeriesRingElem)
   z = parent(y)()
   z.prec = y.prec
   z.val = y.val
-  ccall((:fmpq_poly_scalar_mul_fmpz, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Ref{ZZRingElem}),
-        z, y, x)
+  @ccall libflint.fmpq_poly_scalar_mul_fmpz(z::Ref{QQRelPowerSeriesRingElem}, y::Ref{QQRelPowerSeriesRingElem}, x::Ref{ZZRingElem})::Nothing
   return z
 end
 
@@ -312,9 +277,7 @@ function *(x::QQFieldElem, y::QQRelPowerSeriesRingElem)
   z = parent(y)()
   z.prec = y.prec
   z.val = y.val
-  ccall((:fmpq_poly_scalar_mul_fmpq, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Ref{QQFieldElem}),
-        z, y, x)
+  @ccall libflint.fmpq_poly_scalar_mul_fmpq(z::Ref{QQRelPowerSeriesRingElem}, y::Ref{QQRelPowerSeriesRingElem}, x::Ref{QQFieldElem})::Nothing
   return z
 end
 
@@ -374,9 +337,7 @@ function shift_right(x::QQRelPowerSeriesRingElem, len::Int)
     z.prec = max(0, x.prec - len)
     z.val = max(0, xval - len)
     zlen = min(xlen + xval - len, xlen)
-    ccall((:fmpq_poly_shift_right, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-          z, x, xlen - zlen)
+    @ccall libflint.fmpq_poly_shift_right(z::Ref{QQRelPowerSeriesRingElem}, x::Ref{QQRelPowerSeriesRingElem}, (xlen - zlen)::Int)::Nothing
     renormalize!(z)
   end
   return z
@@ -401,9 +362,7 @@ function truncate!(x::QQRelPowerSeriesRingElem, k::Int)
     x = zero!(x)
     x.val = k
   else
-    ccall((:fmpq_poly_truncate, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Int),
-          x, k - valuation(x))
+    @ccall libflint.fmpq_poly_truncate(x::Ref{QQRelPowerSeriesRingElem}, (k - valuation(x))::Int)::Nothing
   end
   x.prec = k
   return x
@@ -469,9 +428,7 @@ function ==(x::QQRelPowerSeriesRingElem, y::QQRelPowerSeriesRingElem)
   if xlen != ylen
     return false
   end
-  return Bool(ccall((:fmpq_poly_equal_trunc, libflint), Cint,
-                    (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-                    x, y, xlen))
+  return Bool(@ccall libflint.fmpq_poly_equal_trunc(x::Ref{QQRelPowerSeriesRingElem}, y::Ref{QQRelPowerSeriesRingElem}, xlen::Int)::Cint)
 end
 
 function isequal(x::QQRelPowerSeriesRingElem, y::QQRelPowerSeriesRingElem)
@@ -481,9 +438,7 @@ function isequal(x::QQRelPowerSeriesRingElem, y::QQRelPowerSeriesRingElem)
   if x.prec != y.prec || x.val != y.val || pol_length(x) != pol_length(y)
     return false
   end
-  return Bool(ccall((:fmpq_poly_equal, libflint), Cint,
-                    (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}),
-                    x, y))
+  return Bool(@ccall libflint.fmpq_poly_equal(x::Ref{QQRelPowerSeriesRingElem}, y::Ref{QQRelPowerSeriesRingElem})::Cint)
 end
 
 ###############################################################################
@@ -500,10 +455,8 @@ function ==(x::QQRelPowerSeriesRingElem, y::QQFieldElem)
   elseif pol_length(x) == 1
     if x.val == 0
       z = QQFieldElem()
-      ccall((:fmpq_poly_get_coeff_fmpq, libflint), Nothing,
-            (Ref{QQFieldElem}, Ref{QQRelPowerSeriesRingElem}, Int), z, x, 0)
-      return ccall((:fmpq_equal, libflint), Bool,
-                   (Ref{QQFieldElem}, Ref{QQFieldElem}, Int), z, y, 0)
+      @ccall libflint.fmpq_poly_get_coeff_fmpq(z::Ref{QQFieldElem}, x::Ref{QQRelPowerSeriesRingElem}, 0::Int)::Nothing
+      return z == y
     else
       return false
     end
@@ -520,10 +473,8 @@ function ==(x::QQRelPowerSeriesRingElem, y::ZZRingElem)
   elseif pol_length(x) == 1
     if x.val == 0
       z = QQFieldElem()
-      ccall((:fmpq_poly_get_coeff_fmpq, libflint), Nothing,
-            (Ref{QQFieldElem}, Ref{QQRelPowerSeriesRingElem}, Int), z, x, 0)
-      return isone(denominator(z)) && ccall((:fmpz_equal, libflint), Bool,
-                                            (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), numerator(z), y, 0)
+      @ccall libflint.fmpq_poly_get_coeff_fmpq(z::Ref{QQFieldElem}, x::Ref{QQRelPowerSeriesRingElem}, 0::Int)::Nothing
+      return isone(denominator(z)) && @ccall libflint.fmpz_equal(numerator(z)::Ref{ZZRingElem}, y::Ref{ZZRingElem}, 0::Int)::Bool
     else
       return false
     end
@@ -567,9 +518,7 @@ function divexact(x::QQRelPowerSeriesRingElem, y::QQRelPowerSeriesRingElem; chec
   z.val = xval - yval
   z.prec = prec + z.val
   if prec != 0
-    ccall((:fmpq_poly_div_series, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-          z, x, y, prec)
+    @ccall libflint.fmpq_poly_div_series(z::Ref{QQRelPowerSeriesRingElem}, x::Ref{QQRelPowerSeriesRingElem}, y::Ref{QQRelPowerSeriesRingElem}, prec::Int)::Nothing
   end
   return z
 end
@@ -585,9 +534,7 @@ function divexact(x::QQRelPowerSeriesRingElem, y::Int; check::Bool=true)
   z = parent(x)()
   z.prec = x.prec
   z.val = x.val
-  ccall((:fmpq_poly_scalar_div_si, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, x, y)
+  @ccall libflint.fmpq_poly_scalar_div_si(z::Ref{QQRelPowerSeriesRingElem}, x::Ref{QQRelPowerSeriesRingElem}, y::Int)::Nothing
   return z
 end
 
@@ -597,9 +544,7 @@ function divexact(x::QQRelPowerSeriesRingElem, y::ZZRingElem; check::Bool=true)
   z.prec = x.prec
   z.prec = x.prec
   z.val = x.val
-  ccall((:fmpq_poly_scalar_div_fmpz, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Ref{ZZRingElem}),
-        z, x, y)
+  @ccall libflint.fmpq_poly_scalar_div_fmpz(z::Ref{QQRelPowerSeriesRingElem}, x::Ref{QQRelPowerSeriesRingElem}, y::Ref{ZZRingElem})::Nothing
   return z
 end
 
@@ -609,9 +554,7 @@ function divexact(x::QQRelPowerSeriesRingElem, y::QQFieldElem; check::Bool=true)
   z.prec = x.prec
   z.prec = x.prec
   z.val = x.val
-  ccall((:fmpq_poly_scalar_div_fmpq, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Ref{QQFieldElem}),
-        z, x, y)
+  @ccall libflint.fmpq_poly_scalar_div_fmpq(z::Ref{QQRelPowerSeriesRingElem}, x::Ref{QQRelPowerSeriesRingElem}, y::Ref{QQFieldElem})::Nothing
   return z
 end
 
@@ -631,9 +574,7 @@ function inv(a::QQRelPowerSeriesRingElem)
   ainv = parent(a)()
   ainv.prec = a.prec
   ainv.val = 0
-  ccall((:fmpq_poly_inv_series, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        ainv, a, a.prec)
+  @ccall libflint.fmpq_poly_inv_series(ainv::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, a.prec::Int)::Nothing
   return ainv
 end
 
@@ -651,12 +592,8 @@ function Base.exp(a::QQRelPowerSeriesRingElem)
   z = parent(a)()
   z.prec = a.prec
   z.val = 0
-  ccall((:fmpq_poly_shift_left, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, a, a.val)
-  ccall((:fmpq_poly_exp_series, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, z, a.prec)
+  @ccall libflint.fmpq_poly_shift_left(z::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, a.val::Int)::Nothing
+  @ccall libflint.fmpq_poly_exp_series(z::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem}, a.prec::Int)::Nothing
   renormalize!(z)
   return z
 end
@@ -669,9 +606,7 @@ function log(a::QQRelPowerSeriesRingElem)
   z = parent(a)()
   z.prec = a.prec
   z.val = 0
-  ccall((:fmpq_poly_log_series, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, a, a.prec)
+  @ccall libflint.fmpq_poly_log_series(z::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, a.prec::Int)::Nothing
   renormalize!(z)
   return z
 end
@@ -684,12 +619,8 @@ function tan(a::QQRelPowerSeriesRingElem)
   z = parent(a)()
   z.prec = a.prec
   z.val = 0
-  ccall((:fmpq_poly_shift_left, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, a, a.val)
-  ccall((:fmpq_poly_tan_series, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, z, a.prec)
+  @ccall libflint.fmpq_poly_shift_left(z::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, a.val::Int)::Nothing
+  @ccall libflint.fmpq_poly_tan_series(z::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem}, a.prec::Int)::Nothing
   renormalize!(z)
   return z
 end
@@ -702,12 +633,8 @@ function tanh(a::QQRelPowerSeriesRingElem)
   z = parent(a)()
   z.prec = a.prec
   z.val = 0
-  ccall((:fmpq_poly_shift_left, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, a, a.val)
-  ccall((:fmpq_poly_tanh_series, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, z, a.prec)
+  @ccall libflint.fmpq_poly_shift_left(z::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, a.val::Int)::Nothing
+  @ccall libflint.fmpq_poly_tanh_series(z::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem}, a.prec::Int)::Nothing
   renormalize!(z)
   return z
 end
@@ -720,15 +647,9 @@ function sin(a::QQRelPowerSeriesRingElem)
   z = parent(a)()
   z.prec = a.prec
   z.val = 0
-  ccall((:fmpq_poly_shift_left, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, a, a.val)
-  ccall((:fmpq_poly_truncate, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Int),
-        z, a.prec)
-  ccall((:fmpq_poly_sin_series, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, z, a.prec)
+  @ccall libflint.fmpq_poly_shift_left(z::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, a.val::Int)::Nothing
+  @ccall libflint.fmpq_poly_truncate(z::Ref{QQRelPowerSeriesRingElem}, a.prec::Int)::Nothing
+  @ccall libflint.fmpq_poly_sin_series(z::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem}, a.prec::Int)::Nothing
   renormalize!(z)
   return z
 end
@@ -741,12 +662,8 @@ function sinh(a::QQRelPowerSeriesRingElem)
   z = parent(a)()
   z.prec = a.prec
   z.val = 0
-  ccall((:fmpq_poly_shift_left, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, a, a.val)
-  ccall((:fmpq_poly_sinh_series, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, z, a.prec)
+  @ccall libflint.fmpq_poly_shift_left(z::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, a.val::Int)::Nothing
+  @ccall libflint.fmpq_poly_sinh_series(z::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem}, a.prec::Int)::Nothing
   renormalize!(z)
   return z
 end
@@ -759,15 +676,9 @@ function cos(a::QQRelPowerSeriesRingElem)
   z = parent(a)()
   z.prec = a.prec
   z.val = 0
-  ccall((:fmpq_poly_shift_left, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, a, a.val)
-  ccall((:fmpq_poly_truncate, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Int),
-        z, a.prec)
-  ccall((:fmpq_poly_cos_series, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, z, a.prec)
+  @ccall libflint.fmpq_poly_shift_left(z::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, a.val::Int)::Nothing
+  @ccall libflint.fmpq_poly_truncate(z::Ref{QQRelPowerSeriesRingElem}, a.prec::Int)::Nothing
+  @ccall libflint.fmpq_poly_cos_series(z::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem}, a.prec::Int)::Nothing
   renormalize!(z)
   return z
 end
@@ -780,12 +691,8 @@ function cosh(a::QQRelPowerSeriesRingElem)
   z = parent(a)()
   z.prec = a.prec
   z.val = 0
-  ccall((:fmpq_poly_shift_left, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, a, a.val)
-  ccall((:fmpq_poly_cosh_series, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, z, a.prec)
+  @ccall libflint.fmpq_poly_shift_left(z::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, a.val::Int)::Nothing
+  @ccall libflint.fmpq_poly_cosh_series(z::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem}, a.prec::Int)::Nothing
   renormalize!(z)
   return z
 end
@@ -798,12 +705,8 @@ function asin(a::QQRelPowerSeriesRingElem)
   z = parent(a)()
   z.prec = a.prec
   z.val = 0
-  ccall((:fmpq_poly_shift_left, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, a, a.val)
-  ccall((:fmpq_poly_asin_series, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, z, a.prec)
+  @ccall libflint.fmpq_poly_shift_left(z::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, a.val::Int)::Nothing
+  @ccall libflint.fmpq_poly_asin_series(z::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem}, a.prec::Int)::Nothing
   renormalize!(z)
   return z
 end
@@ -816,12 +719,8 @@ function asinh(a::QQRelPowerSeriesRingElem)
   z = parent(a)()
   z.prec = a.prec
   z.val = 0
-  ccall((:fmpq_poly_shift_left, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, a, a.val)
-  ccall((:fmpq_poly_asinh_series, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, z, a.prec)
+  @ccall libflint.fmpq_poly_shift_left(z::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, a.val::Int)::Nothing
+  @ccall libflint.fmpq_poly_asinh_series(z::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem}, a.prec::Int)::Nothing
   renormalize!(z)
   return z
 end
@@ -834,12 +733,8 @@ function atan(a::QQRelPowerSeriesRingElem)
   z = parent(a)()
   z.prec = a.prec
   z.val = 0
-  ccall((:fmpq_poly_shift_left, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, a, a.val)
-  ccall((:fmpq_poly_atan_series, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, z, a.prec)
+  @ccall libflint.fmpq_poly_shift_left(z::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, a.val::Int)::Nothing
+  @ccall libflint.fmpq_poly_atan_series(z::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem}, a.prec::Int)::Nothing
   renormalize!(z)
   return z
 end
@@ -852,12 +747,8 @@ function atanh(a::QQRelPowerSeriesRingElem)
   z = parent(a)()
   z.prec = a.prec
   z.val = 0
-  ccall((:fmpq_poly_shift_left, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, a, a.val)
-  ccall((:fmpq_poly_atanh_series, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, z, a.prec)
+  @ccall libflint.fmpq_poly_shift_left(z::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, a.val::Int)::Nothing
+  @ccall libflint.fmpq_poly_atanh_series(z::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem}, a.prec::Int)::Nothing
   renormalize!(z)
   return z
 end
@@ -877,9 +768,7 @@ function Base.sqrt(a::QQRelPowerSeriesRingElem; check::Bool=true)
   c = coeff(a, v)
   s = sqrt(c; check=check)
   a = divexact(a, c)
-  ccall((:fmpq_poly_sqrt_series, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, a, a.prec)
+  @ccall libflint.fmpq_poly_sqrt_series(z::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, a.prec::Int)::Nothing
   if !isone(s)
     z *= s
   end
@@ -893,31 +782,26 @@ end
 ###############################################################################
 
 function zero!(z::QQRelPowerSeriesRingElem)
-  ccall((:fmpq_poly_zero, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem},), z)
+  @ccall libflint.fmpq_poly_zero(z::Ref{QQRelPowerSeriesRingElem})::Nothing
   z.prec = parent(z).prec_max
   z.val = parent(z).prec_max
   return z
 end
 
 function one!(z::QQRelPowerSeriesRingElem)
-  ccall((:fmpq_poly_one, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem},), z)
+  @ccall libflint.fmpq_poly_one(z::Ref{QQRelPowerSeriesRingElem})::Nothing
   z.prec = parent(z).prec_max
   z.val = 0
   return z
 end
 
 function fit!(z::QQRelPowerSeriesRingElem, n::Int)
-  ccall((:fmpq_poly_fit_length, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Int), z, n)
+  @ccall libflint.fmpq_poly_fit_length(z::Ref{QQRelPowerSeriesRingElem}, n::Int)::Nothing
   return nothing
 end
 
 function setcoeff!(z::QQRelPowerSeriesRingElem, n::Int, x::QQFieldElem)
-  ccall((:fmpq_poly_set_coeff_fmpq, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Int, Ref{QQFieldElem}),
-        z, n, x)
+  @ccall libflint.fmpq_poly_set_coeff_fmpq(z::Ref{QQRelPowerSeriesRingElem}, n::Int, x::Ref{QQFieldElem})::Nothing
   return z
 end
 
@@ -935,9 +819,7 @@ function mul!(z::QQRelPowerSeriesRingElem, a::QQRelPowerSeriesRingElem, b::QQRel
   if lena <= 0 || lenb <= 0
     lenz = 0
   end
-  ccall((:fmpq_poly_mullow, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-        z, a, b, lenz)
+  @ccall libflint.fmpq_poly_mullow(z::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, b::Ref{QQRelPowerSeriesRingElem}, lenz::Int)::Nothing
   return z
 end
 
@@ -955,28 +837,18 @@ function add!(a::QQRelPowerSeriesRingElem, b::QQRelPowerSeriesRingElem)
     ccall((:fmpq_poly_set_trunc, libflint), Nothing,
           (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
           z, b, max(0, lenz - b.val + a.val))
-    ccall((:fmpq_poly_shift_left, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-          z, z, b.val - a.val)
-    ccall((:fmpq_poly_add_series, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-          a, a, z, lenz)
+    @ccall libflint.fmpq_poly_shift_left(z::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem}, (b.val - a.val)::Int)::Nothing
+    @ccall libflint.fmpq_poly_add_series(a::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, z::Ref{QQRelPowerSeriesRingElem}, lenz::Int)::Nothing
   elseif b.val < a.val
     lenz = max(lena + a.val - b.val, lenb)
     ccall((:fmpq_poly_truncate, libflint), Nothing,
           (Ref{QQRelPowerSeriesRingElem}, Int),
           a, max(0, lenz - a.val + b.val))
-    ccall((:fmpq_poly_shift_left, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-          a, a, a.val - b.val)
-    ccall((:fmpq_poly_add_series, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-          a, a, b, lenz)
+    @ccall libflint.fmpq_poly_shift_left(a::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, (a.val - b.val)::Int)::Nothing
+    @ccall libflint.fmpq_poly_add_series(a::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, b::Ref{QQRelPowerSeriesRingElem}, lenz::Int)::Nothing
   else
     lenz = max(lena, lenb)
-    ccall((:fmpq_poly_add_series, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-          a, a, b, lenz)
+    @ccall libflint.fmpq_poly_add_series(a::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, b::Ref{QQRelPowerSeriesRingElem}, lenz::Int)::Nothing
   end
   a.prec = prec
   a.val = val
@@ -1001,28 +873,18 @@ function add!(c::QQRelPowerSeriesRingElem, a::QQRelPowerSeriesRingElem, b::QQRel
     ccall((:fmpq_poly_set_trunc, libflint), Nothing,
           (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
           c, b, max(0, lenc - b.val + a.val))
-    ccall((:fmpq_poly_shift_left, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-          c, c, b.val - a.val)
-    ccall((:fmpq_poly_add_series, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-          c, c, a, lenc)
+    @ccall libflint.fmpq_poly_shift_left(c::Ref{QQRelPowerSeriesRingElem}, c::Ref{QQRelPowerSeriesRingElem}, (b.val - a.val)::Int)::Nothing
+    @ccall libflint.fmpq_poly_add_series(c::Ref{QQRelPowerSeriesRingElem}, c::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, lenc::Int)::Nothing
   elseif b.val < a.val
     lenc = max(lena + a.val - b.val, lenb)
     ccall((:fmpq_poly_set_trunc, libflint), Nothing,
           (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
           c, a, max(0, lenc - a.val + b.val))
-    ccall((:fmpq_poly_shift_left, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-          c, c, a.val - b.val)
-    ccall((:fmpq_poly_add_series, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-          c, c, b, lenc)
+    @ccall libflint.fmpq_poly_shift_left(c::Ref{QQRelPowerSeriesRingElem}, c::Ref{QQRelPowerSeriesRingElem}, (a.val - b.val)::Int)::Nothing
+    @ccall libflint.fmpq_poly_add_series(c::Ref{QQRelPowerSeriesRingElem}, c::Ref{QQRelPowerSeriesRingElem}, b::Ref{QQRelPowerSeriesRingElem}, lenc::Int)::Nothing
   else
     lenc = max(lena, lenb)
-    ccall((:fmpq_poly_add_series, libflint), Nothing,
-          (Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Ref{QQRelPowerSeriesRingElem}, Int),
-          c, a, b, lenc)
+    @ccall libflint.fmpq_poly_add_series(c::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, b::Ref{QQRelPowerSeriesRingElem}, lenc::Int)::Nothing
   end
   c.prec = prec
   c.val = val
@@ -1031,8 +893,7 @@ function add!(c::QQRelPowerSeriesRingElem, a::QQRelPowerSeriesRingElem, b::QQRel
 end
 
 function set_length!(a::QQRelPowerSeriesRingElem, n::Int)
-  ccall((:_fmpq_poly_set_length, libflint), Nothing,
-        (Ref{QQRelPowerSeriesRingElem}, Int), a, n)
+  @ccall libflint._fmpq_poly_set_length(a::Ref{QQRelPowerSeriesRingElem}, n::Int)::Nothing
   return a
 end
 

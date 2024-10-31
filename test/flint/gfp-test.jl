@@ -220,13 +220,17 @@ end
     if Nemo.is_prime(ZZ(p))
       R = Native.GF(p)
 
+      a = rand(R)
+      t = typemin(Int)
+      @test a * t == a * R(t)
+
       for iter = 1:100
         a = rand(R)
 
-        c1 = rand(0:100)
-        c2 = rand(0:100)
-        d1 = rand(BigInt(0):BigInt(100))
-        d2 = rand(BigInt(0):BigInt(100))
+        c1 = rand(-100:100)
+        c2 = rand(-100:100)
+        d1 = rand(BigInt(-100):BigInt(100))
+        d2 = rand(BigInt(-100):BigInt(100))
 
         @test a + c1 == c1 + a
         @test a + d1 == d1 + a
@@ -250,8 +254,8 @@ end
 
         c1 = rand(Int)
         c2 = rand(Int)
-        d1 = rand(BigInt(0):BigInt(100))
-        d2 = rand(BigInt(0):BigInt(100))
+        d1 = rand(BigInt(-100):BigInt(100))
+        d2 = rand(BigInt(-100):BigInt(100))
 
         @test a + c1 == c1 + a
         @test a + d1 == d1 + a

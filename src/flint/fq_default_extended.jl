@@ -554,15 +554,13 @@ function _fq_field_from_fmpz_mod_poly_in_disguise(f::FqPolyRingElem, s::Symbol)
   z.defining_poly = f
   z.forwardmap = g -> begin
     y = FqFieldElem(z)
-    ccall((:fq_default_set_fmpz_mod_poly, libflint), Nothing,
-          (Ref{FqFieldElem}, Ref{FqPolyRingElem}, Ref{FqField}), y, g, z)
+    @ccall libflint.fq_default_set_fmpz_mod_poly(y::Ref{FqFieldElem}, g::Ref{FqPolyRingElem}, z::Ref{FqField})::Nothing
     @assert parent(y) === z
     return y
   end
   z.backwardmap = function(g, R = parent(f))
     y = R()
-    ccall((:fq_default_get_fmpz_mod_poly, libflint), Nothing,
-          (Ref{FqPolyRingElem}, Ref{FqFieldElem}, Ref{FqField}), y, g, z)
+    @ccall libflint.fq_default_get_fmpz_mod_poly(y::Ref{FqPolyRingElem}, g::Ref{FqFieldElem}, z::Ref{FqField})::Nothing
     return y
   end
   return z
@@ -578,9 +576,7 @@ function _fq_field_from_nmod_poly_in_disguise(f::FqPolyRingElem, s::Symbol)
   z.var = string(s)
   ss = string(s)
   GC.@preserve ss begin
-    ccall((:fq_default_ctx_init_modulus_nmod, libflint), Nothing,
-          (Ref{FqField}, Ref{FqPolyRingElem}, Ptr{UInt8}),
-          z, f, ss)
+    @ccall libflint.fq_default_ctx_init_modulus_nmod(z::Ref{FqField}, f::Ref{FqPolyRingElem}, ss::Ptr{UInt8})::Nothing
     finalizer(_FqDefaultFiniteField_clear_fn, z)
   end
   z.isabsolute = true
@@ -589,14 +585,12 @@ function _fq_field_from_nmod_poly_in_disguise(f::FqPolyRingElem, s::Symbol)
   z.defining_poly = f
   z.forwardmap = g -> begin
     y = FqFieldElem(z)
-    ccall((:fq_default_set_nmod_poly, libflint), Nothing,
-          (Ref{FqFieldElem}, Ref{FqPolyRingElem}, Ref{FqField}), y, g, z)
+    @ccall libflint.fq_default_set_nmod_poly(y::Ref{FqFieldElem}, g::Ref{FqPolyRingElem}, z::Ref{FqField})::Nothing
     return y
   end
   z.backwardmap = function(g, R = parent(f))
     y = R()
-    ccall((:fq_default_get_nmod_poly, libflint), Nothing,
-          (Ref{FqPolyRingElem}, Ref{FqFieldElem}, Ref{FqField}), y, g, z)
+    @ccall libflint.fq_default_get_nmod_poly(y::Ref{FqPolyRingElem}, g::Ref{FqFieldElem}, z::Ref{FqField})::Nothing
     return y
   end
   return z
@@ -782,14 +776,12 @@ function (F::FqField)(p::FqPolyRingElem)
     characteristic(base_ring(p)) != characteristic(F) && error("Polynomial has wrong coefficient ring")
     if _fq_default_ctx_type(K) == _FQ_DEFAULT_NMOD
       y = FqFieldElem(F)
-      ccall((:fq_default_set_nmod_poly, libflint), Nothing,
-            (Ref{FqFieldElem}, Ref{FqPolyRingElem}, Ref{FqField}), y, p, F)
+      @ccall libflint.fq_default_set_nmod_poly(y::Ref{FqFieldElem}, p::Ref{FqPolyRingElem}, F::Ref{FqField})::Nothing
       return y
     else
       @assert _fq_default_ctx_type(K) == _FQ_DEFAULT_FMPZ_NMOD
       y = FqFieldElem(F)
-      ccall((:fq_default_set_fmpz_mod_poly, libflint), Nothing,
-            (Ref{FqFieldElem}, Ref{FqPolyRingElem}, Ref{FqField}), y, p, F)
+      @ccall libflint.fq_default_set_fmpz_mod_poly(y::Ref{FqFieldElem}, p::Ref{FqPolyRingElem}, F::Ref{FqField})::Nothing
       return y
     end
   end
@@ -807,15 +799,11 @@ function _lift_standard(R::FqPolyRing, a::FqFieldElem)
   p = R()
   @assert F === base_field(parent(a))
   if _fq_default_ctx_type(F) == _FQ_DEFAULT_NMOD
-    ccall((:fq_default_get_nmod_poly, libflint), Nothing,
-          (Ref{FqPolyRingElem}, Ref{FqFieldElem}, Ref{FqField}),
-          p, a, K)
+    @ccall libflint.fq_default_get_nmod_poly(p::Ref{FqPolyRingElem}, a::Ref{FqFieldElem}, K::Ref{FqField})::Nothing
     return p
   else
     @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FMPZ_NMOD
-    ccall((:fq_default_get_fmpz_mod_poly, libflint), Nothing,
-          (Ref{FqPolyRingElem}, Ref{FqFieldElem}, Ref{FqField}),
-          p, a, K)
+    @ccall libflint.fq_default_get_fmpz_mod_poly(p::Ref{FqPolyRingElem}, a::Ref{FqFieldElem}, K::Ref{FqField})::Nothing
     return p
   end
 end

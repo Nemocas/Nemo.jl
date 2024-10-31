@@ -278,6 +278,14 @@ end
   s = 1 * one(C) + 2 * onei(C)
   @test ComplexF64(s) == 1 + 2 * im
 
+  x = sqrt(C(2))
+  @test isapprox(Float64(x), sqrt(2))
+  @test isapprox(ComplexF64(x), sqrt(2))
+
+  x = sqrt(C(-2))
+  @test_throws InexactError Float64(x)
+  @test isapprox(ComplexF64(x), sqrt(complex(-2)))
+
   # verify precision bug https://github.com/Nemocas/Nemo.jl/issues/1580 is fixed
   x = C(pi)
   F = ArbField(333)
