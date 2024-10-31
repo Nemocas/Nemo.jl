@@ -203,7 +203,6 @@ export FlintPuiseuxSeriesField
 export FlintPuiseuxSeriesFieldElem
 export FlintPuiseuxSeriesRing
 export FlintPuiseuxSeriesRingElem
-export FlintQQ
 export FlintQQi
 export FlintZZ
 export FlintZZi
