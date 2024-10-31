@@ -563,9 +563,6 @@ const _ecm_nCs = Vector{Int}[_ecm_nC]
 #
 ###############################################################################
 
-@doc zz_ring_doc
-const FlintZZ = ZZ
-
 const FlintZZi = ZZi
 
 const FlintQQi = QQi
