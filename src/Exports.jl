@@ -203,7 +203,6 @@ export FlintPuiseuxSeriesField
 export FlintPuiseuxSeriesFieldElem
 export FlintPuiseuxSeriesRing
 export FlintPuiseuxSeriesRingElem
-export FlintQQi
 export flog
 export floor
 export fmma!
