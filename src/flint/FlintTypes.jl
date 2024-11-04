@@ -4168,8 +4168,7 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
     t = ZZRingElem()
     for i = 1:r
       for j = 1:c
-        ccall((:fmpz_mod_ui, libflint), Nothing,
-              (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt), t, arr[i, j], n)
+        @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElem}, arr[i, j]::Ref{ZZRingElem}, n::UInt)::Nothing
         setindex_raw!(z, t, i, j)
       end
     end
@@ -4543,8 +4542,7 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
     t = ZZRingElem()
     for i = 1:r
       for j = 1:c
-        ccall((:fmpz_mod_ui, libflint), Nothing,
-              (Ref{ZZRingElem}, Ref{ZZRingElem}, UInt), t, arr[i, j], n)
+        @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElem}, arr[i, j]::Ref{ZZRingElem}, n::UInt)::Nothing
         setindex_raw!(z, t, i, j)
       end
     end

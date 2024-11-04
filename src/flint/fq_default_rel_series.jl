@@ -172,16 +172,12 @@ function +(a::FqRelPowerSeriesRingElem, b::FqRelPowerSeriesRingElem)
   ctx = base_ring(a)
   if a.val < b.val
     lenz = max(lena, lenb + b.val - a.val)
-    ccall((:fq_default_poly_set_trunc, libflint), Nothing,
-          (Ref{FqRelPowerSeriesRingElem}, Ref{FqRelPowerSeriesRingElem}, Int, Ref{FqField}),
-          z, b, max(0, lenz - b.val + a.val), ctx)
+    @ccall libflint.fq_default_poly_set_trunc(z::Ref{FqRelPowerSeriesRingElem}, b::Ref{FqRelPowerSeriesRingElem}, max(0, lenz - b.val + a.val)::Int, ctx::Ref{FqField})::Nothing
     @ccall libflint.fq_default_poly_shift_left(z::Ref{FqRelPowerSeriesRingElem}, z::Ref{FqRelPowerSeriesRingElem}, (b.val - a.val)::Int, ctx::Ref{FqField})::Nothing
     @ccall libflint.fq_default_poly_add_series(z::Ref{FqRelPowerSeriesRingElem}, z::Ref{FqRelPowerSeriesRingElem}, a::Ref{FqRelPowerSeriesRingElem}, lenz::Int, ctx::Ref{FqField})::Nothing
   elseif b.val < a.val
     lenz = max(lena + a.val - b.val, lenb)
-    ccall((:fq_default_poly_set_trunc, libflint), Nothing,
-          (Ref{FqRelPowerSeriesRingElem}, Ref{FqRelPowerSeriesRingElem}, Int, Ref{FqField}),
-          z, a, max(0, lenz - a.val + b.val), ctx)
+    @ccall libflint.fq_default_poly_set_trunc(z::Ref{FqRelPowerSeriesRingElem}, a::Ref{FqRelPowerSeriesRingElem}, max(0, lenz - a.val + b.val)::Int, ctx::Ref{FqField})::Nothing
     @ccall libflint.fq_default_poly_shift_left(z::Ref{FqRelPowerSeriesRingElem}, z::Ref{FqRelPowerSeriesRingElem}, (a.val - b.val)::Int, ctx::Ref{FqField})::Nothing
     @ccall libflint.fq_default_poly_add_series(z::Ref{FqRelPowerSeriesRingElem}, z::Ref{FqRelPowerSeriesRingElem}, b::Ref{FqRelPowerSeriesRingElem}, lenz::Int, ctx::Ref{FqField})::Nothing
   else
@@ -207,17 +203,13 @@ function -(a::FqRelPowerSeriesRingElem, b::FqRelPowerSeriesRingElem)
   ctx = base_ring(a)
   if a.val < b.val
     lenz = max(lena, lenb + b.val - a.val)
-    ccall((:fq_default_poly_set_trunc, libflint), Nothing,
-          (Ref{FqRelPowerSeriesRingElem}, Ref{FqRelPowerSeriesRingElem}, Int, Ref{FqField}),
-          z, b, max(0, lenz - b.val + a.val), ctx)
+    @ccall libflint.fq_default_poly_set_trunc(z::Ref{FqRelPowerSeriesRingElem}, b::Ref{FqRelPowerSeriesRingElem}, max(0, lenz - b.val + a.val)::Int, ctx::Ref{FqField})::Nothing
     @ccall libflint.fq_default_poly_shift_left(z::Ref{FqRelPowerSeriesRingElem}, z::Ref{FqRelPowerSeriesRingElem}, (b.val - a.val)::Int, ctx::Ref{FqField})::Nothing
     z = neg!(z)
     @ccall libflint.fq_default_poly_add_series(z::Ref{FqRelPowerSeriesRingElem}, z::Ref{FqRelPowerSeriesRingElem}, a::Ref{FqRelPowerSeriesRingElem}, lenz::Int, ctx::Ref{FqField})::Nothing
   elseif b.val < a.val
     lenz = max(lena + a.val - b.val, lenb)
-    ccall((:fq_default_poly_set_trunc, libflint), Nothing,
-          (Ref{FqRelPowerSeriesRingElem}, Ref{FqRelPowerSeriesRingElem}, Int, Ref{FqField}),
-          z, a, max(0, lenz - a.val + b.val), ctx)
+    @ccall libflint.fq_default_poly_set_trunc(z::Ref{FqRelPowerSeriesRingElem}, a::Ref{FqRelPowerSeriesRingElem}, max(0, lenz - a.val + b.val)::Int, ctx::Ref{FqField})::Nothing
     @ccall libflint.fq_default_poly_shift_left(z::Ref{FqRelPowerSeriesRingElem}, z::Ref{FqRelPowerSeriesRingElem}, (a.val - b.val)::Int, ctx::Ref{FqField})::Nothing
     @ccall libflint.fq_default_poly_sub_series(z::Ref{FqRelPowerSeriesRingElem}, z::Ref{FqRelPowerSeriesRingElem}, b::Ref{FqRelPowerSeriesRingElem}, lenz::Int, ctx::Ref{FqField})::Nothing
   else
@@ -656,16 +648,12 @@ function add!(a::FqRelPowerSeriesRingElem, b::FqRelPowerSeriesRingElem)
     z = FqRelPowerSeriesRingElem(base_ring(a))
     z.parent = parent(a)
     lenz = max(lena, lenb + b.val - a.val)
-    ccall((:fq_default_poly_set_trunc, libflint), Nothing,
-          (Ref{FqRelPowerSeriesRingElem}, Ref{FqRelPowerSeriesRingElem}, Int, Ref{FqField}),
-          z, b, max(0, lenz - b.val + a.val), ctx)
+    @ccall libflint.fq_default_poly_set_trunc(z::Ref{FqRelPowerSeriesRingElem}, b::Ref{FqRelPowerSeriesRingElem}, max(0, lenz - b.val + a.val)::Int, ctx::Ref{FqField})::Nothing
     @ccall libflint.fq_default_poly_shift_left(z::Ref{FqRelPowerSeriesRingElem}, z::Ref{FqRelPowerSeriesRingElem}, (b.val - a.val)::Int, ctx::Ref{FqField})::Nothing
     @ccall libflint.fq_default_poly_add_series(a::Ref{FqRelPowerSeriesRingElem}, a::Ref{FqRelPowerSeriesRingElem}, z::Ref{FqRelPowerSeriesRingElem}, lenz::Int, ctx::Ref{FqField})::Nothing
   elseif b.val < a.val
     lenz = max(lena + a.val - b.val, lenb)
-    ccall((:fq_default_poly_truncate, libflint), Nothing,
-          (Ref{FqRelPowerSeriesRingElem}, Int, Ref{FqField}),
-          a, max(0, lenz - a.val + b.val), ctx)
+    @ccall libflint.fq_default_poly_truncate(a::Ref{FqRelPowerSeriesRingElem}, max(0, lenz - a.val + b.val)::Int, ctx::Ref{FqField})::Nothing
     @ccall libflint.fq_default_poly_shift_left(a::Ref{FqRelPowerSeriesRingElem}, a::Ref{FqRelPowerSeriesRingElem}, (a.val - b.val)::Int, ctx::Ref{FqField})::Nothing
     @ccall libflint.fq_default_poly_add_series(a::Ref{FqRelPowerSeriesRingElem}, a::Ref{FqRelPowerSeriesRingElem}, b::Ref{FqRelPowerSeriesRingElem}, lenz::Int, ctx::Ref{FqField})::Nothing
   else
@@ -693,16 +681,12 @@ function add!(c::FqRelPowerSeriesRingElem, a::FqRelPowerSeriesRingElem, b::FqRel
   ctx = base_ring(a)
   if a.val < b.val
     lenc = max(lena, lenb + b.val - a.val)
-    ccall((:fq_default_poly_set_trunc, libflint), Nothing,
-          (Ref{FqRelPowerSeriesRingElem}, Ref{FqRelPowerSeriesRingElem}, Int, Ref{FqField}),
-          c, b, max(0, lenc - b.val + a.val), ctx)
+    @ccall libflint.fq_default_poly_set_trunc(c::Ref{FqRelPowerSeriesRingElem}, b::Ref{FqRelPowerSeriesRingElem}, max(0, lenc - b.val + a.val)::Int, ctx::Ref{FqField})::Nothing
     @ccall libflint.fq_default_poly_shift_left(c::Ref{FqRelPowerSeriesRingElem}, c::Ref{FqRelPowerSeriesRingElem}, (b.val - a.val)::Int, ctx::Ref{FqField})::Nothing
     @ccall libflint.fq_default_poly_add_series(c::Ref{FqRelPowerSeriesRingElem}, c::Ref{FqRelPowerSeriesRingElem}, a::Ref{FqRelPowerSeriesRingElem}, lenc::Int, ctx::Ref{FqField})::Nothing
   elseif b.val < a.val
     lenc = max(lena + a.val - b.val, lenb)
-    ccall((:fq_default_poly_set_trunc, libflint), Nothing,
-          (Ref{FqRelPowerSeriesRingElem}, Ref{FqRelPowerSeriesRingElem}, Int, Ref{FqField}),
-          c, a, max(0, lenc - a.val + b.val), ctx)
+    @ccall libflint.fq_default_poly_set_trunc(c::Ref{FqRelPowerSeriesRingElem}, a::Ref{FqRelPowerSeriesRingElem}, max(0, lenc - a.val + b.val)::Int, ctx::Ref{FqField})::Nothing
     @ccall libflint.fq_default_poly_shift_left(c::Ref{FqRelPowerSeriesRingElem}, c::Ref{FqRelPowerSeriesRingElem}, (a.val - b.val)::Int, ctx::Ref{FqField})::Nothing
     @ccall libflint.fq_default_poly_add_series(c::Ref{FqRelPowerSeriesRingElem}, c::Ref{FqRelPowerSeriesRingElem}, b::Ref{FqRelPowerSeriesRingElem}, lenc::Int, ctx::Ref{FqField})::Nothing
   else

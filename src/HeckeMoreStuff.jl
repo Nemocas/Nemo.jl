@@ -259,7 +259,7 @@ end
 function Base.setprecision(x::BigFloat, p::Int)
   setprecision(BigFloat, p) do
     y = BigFloat()
-    ccall((:mpfr_set, :libmpfr), Nothing, (Ref{BigFloat}, Ref{BigFloat}, Int32), y, x, Base.MPFR.ROUNDING_MODE[])
+    @ccall :libmpfr.mpfr_set(y::Ref{BigFloat}, x::Ref{BigFloat}, Base.MPFR.ROUNDING_MODE[]::Int32)::Nothing
     return y
   end
 end

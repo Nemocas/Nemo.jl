@@ -767,7 +767,7 @@ Equivalently, $\operatorname{csgn}(x) = x / \sqrt{x^2}$ except that the value is
 at zero. The value is returned as a Julia integer.
 """
 function csgn(a::QQBarFieldElem)
-  return QQBarFieldElem(Int(ccall((:qqbar_csgn, libflint), Cint, (Ref{QQBarFieldElem}, ), a)))
+  return QQBarFieldElem(Int(@ccall libflint.qqbar_csgn(a::Ref{QQBarFieldElem})::Cint))
 end
 
 @doc raw"""
@@ -776,8 +776,7 @@ end
 Return the sign of the real part of `a` as a Julia integer.
 """
 function sign_real(a::QQBarFieldElem)
-  return QQBarFieldElem(Int(ccall((:qqbar_sgn_re, libflint),
-                                  Cint, (Ref{QQBarFieldElem}, ), a)))
+  return QQBarFieldElem(Int(@ccall libflint.qqbar_sgn_re(a::Ref{QQBarFieldElem})::Cint))
 end
 
 @doc raw"""
@@ -786,8 +785,7 @@ end
 Return the sign of the imaginary part of `a` as a Julia integer.
 """
 function sign_imag(a::QQBarFieldElem)
-  return QQBarFieldElem(Int(ccall((:qqbar_sgn_im, libflint),
-                                  Cint, (Ref{QQBarFieldElem}, ), a)))
+  return QQBarFieldElem(Int(@ccall libflint.qqbar_sgn_im(a::Ref{QQBarFieldElem})::Cint))
 end
 
 function floor(a::QQBarFieldElem)

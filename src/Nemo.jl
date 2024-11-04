@@ -229,14 +229,14 @@ const NEW_FLINT =
 const active_mem = Dict{UInt, Tuple{Symbol, UInt, Any}}()
 
 function trace_malloc(n::UInt)
-  u = ccall(:jl_malloc, UInt, (UInt, ), n)
+  u = @ccall jl_malloc(n::UInt)::UInt
   global active_mem
   active_mem[u] = (:malloc, n, backtrace())
   return u
 end
 
 function trace_calloc(n::UInt, s::UInt)
-  u = ccall(:jl_calloc, UInt, (UInt, UInt), n, s)
+  u = @ccall jl_calloc(n::UInt, s::UInt)::UInt
   global active_mem
   active_mem[u] = (:calloc, n*s, backtrace())
   return u
@@ -246,12 +246,12 @@ function trace_free(n::UInt)
   global active_mem
   #  @assert haskey(active_mem, n)
   delete!(active_mem, n)
-  ccall(:jl_free, Nothing, (UInt, ), n)
+  @ccall jl_free(n::UInt)::Nothing
 end
 
 function trace_realloc(n::UInt, s::UInt)
   global active_mem
-  p = ccall(:jl_realloc, UInt, (UInt, UInt), n, s)
+  p = @ccall jl_realloc(n::UInt, s::UInt)::UInt
   #  @assert haskey(active_mem, n)
   delete!(active_mem, n)
   active_mem[p] = (:realloc, s, backtrace())
@@ -260,14 +260,14 @@ end
 
 function trace_counted_malloc(n::UInt)
   global active_mem
-  p = ccall(:jl_gc_counted_malloc, UInt, (UInt, ), n)
+  p = @ccall jl_gc_counted_malloc(n::UInt)::UInt
   active_mem[p] = (:counted_malloc, n, backtrace())
   return p
 end
 
 function trace_counted_realloc(n::UInt, m::UInt, o::UInt)
   global active_mem
-  p = ccall(:jl_gc_counted_realloc_with_old_size, UInt, (UInt, UInt, UInt), n, m, o)
+  p = @ccall jl_gc_counted_realloc_with_old_size(n::UInt, m::UInt, o::UInt)::UInt
   #  @assert n==0 || haskey(active_mem, n)
   delete!(active_mem, n)
   active_mem[p] = (:counted_realloc, o, backtrace())
@@ -278,7 +278,7 @@ function trace_counted_free(n::UInt, s::UInt)
   global active_mem
   #  @assert haskey(active_mem, n)
   delete!(active_mem, n)
-  ccall(:jl_gc_counted_free_with_size, Nothing, (UInt, UInt), n, s)
+  @ccall jl_gc_counted_free_with_size(n::UInt, s::UInt)::Nothing
 end
 
 function show_active(l::UInt = UInt(0), frames::Int = 2)
@@ -297,31 +297,31 @@ function trace_memory(b::Bool)
     return
   end
   if b
-    ccall((:__gmp_set_memory_functions, :libgmp), Nothing,
-          (Ptr{Nothing},Ptr{Nothing},Ptr{Nothing}),
-          @cfunction(trace_counted_malloc, UInt, (UInt, )),
-          @cfunction(trace_counted_realloc, UInt, (UInt, UInt, UInt)),
-          @cfunction(trace_counted_free, Nothing, (UInt, UInt)))
+    @ccall :libgmp.__gmp_set_memory_functions(
+      @cfunction(trace_counted_malloc, UInt, (UInt, ))::Ptr{Nothing},
+      @cfunction(trace_counted_realloc, UInt, (UInt, UInt, UInt))::Ptr{Nothing},
+      @cfunction(trace_counted_free, Nothing, (UInt, UInt))::Ptr{Nothing},
+    )::Nothing
 
-    ccall((:__flint_set_memory_functions, libflint), Nothing,
-          (Ptr{Nothing},Ptr{Nothing},Ptr{Nothing},Ptr{Nothing}),
-          @cfunction(trace_malloc, UInt, (UInt, )),
-          @cfunction(trace_calloc, UInt, (UInt, UInt)),
-          @cfunction(trace_realloc, UInt, (UInt, UInt)),
-          @cfunction(trace_free, Nothing, (UInt, )))
+    @ccall libflint.__flint_set_memory_functions(
+      @cfunction(trace_malloc, UInt, (UInt, ))::Ptr{Nothing},
+      @cfunction(trace_calloc, UInt, (UInt, UInt))::Ptr{Nothing},
+      @cfunction(trace_realloc, UInt, (UInt, UInt))::Ptr{Nothing},
+      @cfunction(trace_free, Nothing, (UInt, ))::Ptr{Nothing},
+    )::Nothing
   else
-    ccall((:__gmp_set_memory_functions, :libgmp), Nothing,
-          (Ptr{Nothing},Ptr{Nothing},Ptr{Nothing}),
-          cglobal(:jl_gc_counted_malloc),
-          cglobal(:jl_gc_counted_realloc_with_old_size),
-          cglobal(:jl_gc_counted_free_with_size))
+    @ccall :libgmp.__gmp_set_memory_functions(
+      cglobal(:jl_gc_counted_malloc)::Ptr{Nothing},
+      cglobal(:jl_gc_counted_realloc_with_old_size)::Ptr{Nothing},
+      cglobal(:jl_gc_counted_free_with_size)::Ptr{Nothing},
+    )::Nothing
 
-    ccall((:__flint_set_memory_functions, libflint), Nothing,
-          (Ptr{Nothing},Ptr{Nothing},Ptr{Nothing},Ptr{Nothing}),
-          cglobal(:jl_malloc),
-          cglobal(:jl_calloc),
-          cglobal(:jl_realloc),
-          cglobal(:jl_free))
+    @ccall libflint.__flint_set_memory_functions(
+      cglobal(:jl_malloc)::Ptr{Nothing},
+      cglobal(:jl_calloc)::Ptr{Nothing},
+      cglobal(:jl_realloc)::Ptr{Nothing},
+      cglobal(:jl_free)::Ptr{Nothing},
+    )::Nothing
   end
 end
 
@@ -340,12 +340,10 @@ function __init__()
   __isthreaded[] = get(ENV, "NEMO_THREADED", "") == "1"
 
   if __isthreaded[]
-    ccall((:__gmp_set_memory_functions, :libgmp), Nothing,
-          (Int, Int, Int), 0, 0, 0)
+    @ccall :libgmp.__gmp_set_memory_functions(0::Int, 0::Int, 0::Int)::Nothing
   end
 
-  ccall((:flint_set_abort, libflint), Nothing,
-        (Ptr{Nothing},), @cfunction(flint_abort, Nothing, ()))
+  @ccall libflint.flint_set_abort(@cfunction(flint_abort, Nothing, ())::Ptr{Nothing})::Nothing
 
   if AbstractAlgebra.should_show_banner() && get(ENV, "NEMO_PRINT_BANNER", "true") != "false"
     println("")
@@ -374,7 +372,7 @@ function flint_set_num_threads(a::Int)
 end
 
 function flint_cleanup()
-  ccall((:flint_cleanup, libflint), Nothing, ())
+  @ccall libflint.flint_cleanup()::Nothing
 end
 
 ###############################################################################
@@ -544,7 +542,7 @@ if NEW_FLINT
       # gmp_state needs to be initialised
       @ccall libflint._flint_rand_init_gmp_state(a::Ref{rand_ctx})::Cvoid
     end
-    ccall((:__gmp_randseed, :libgmp), Cvoid, (Ptr{Cvoid}, Ref{BigInt}), a.gmp_state, seed)
+    @ccall :libgmp.__gmp_randseed(a.gmp_state::Ptr{Cvoid}, seed::Ref{BigInt})::Cvoid
   end
 else
   flint_randseed!(a::rand_ctx, seed1::UInt, seed2::UInt) =
@@ -552,9 +550,7 @@ else
 
   function flint_gmp_randseed!(a::rand_ctx, seed::BigInt)
     @ccall libflint._flint_rand_init_gmp(a::Ref{rand_ctx})::Cvoid
-    ccall((:__gmp_randseed, :libgmp), Cvoid, (Ref{rand_ctx}, Ref{BigInt}),
-          a, # gmp_state is the first field of flint_rand_s
-          seed)
+    @ccall :libgmp.__gmp_randseed(a::Ref{rand_ctx}, seed::Ref{BigInt})::Cvoid # gmp_state is the first field of flint_rand_s
   end
 end
 

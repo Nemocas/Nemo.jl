@@ -61,9 +61,6 @@ is_gen(a::Zmodn_fmpz_poly) = (degree(a) == 1 &&
 
 function iszero(a::T) where {T <: Zmodn_fmpz_poly}
   return a.length == 0
-  #  return Bool(ccall((:fmpz_mod_poly_is_zero, libflint), Cint,
-  #                    (Ref{T}, Ref{fmpz_mod_ctx_struct}),
-  #                    a, a.parent.base_ring.ninv))
 end
 
 var(R::ZmodNFmpzPolyRing) = R.S

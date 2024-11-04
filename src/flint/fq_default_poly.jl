@@ -297,9 +297,8 @@ function Base.div(x::FqPolyRingElem, y::FqPolyRingElem)
   return divrem(x, y)[1]
   # The following function does not exist in flint
   #z = parent(x)()
-  #ccall((:fq_default_poly_div_basecase, libflint), Nothing,
-  #      (Ref{FqPolyRingElem}, Ref{FqPolyRingElem}, Ref{FqPolyRingElem},
-  #      Ref{FqField}), z, x, y, base_ring(parent(x)))
+  #@ccall libflint.fq_default_poly_div_basecase(z::Ref{FqPolyRingElem}, x::Ref{FqPolyRingElem}, y::Ref{FqPolyRingElem},
+  #      base_ring(parent(x))::Ref{FqField})::Nothing
   #return z
 end
 

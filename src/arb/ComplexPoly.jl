@@ -292,9 +292,8 @@ function Base.divrem(x::ComplexPolyRingElem, y::ComplexPolyRingElem)
   iszero(y) && throw(DivideError())
   q = parent(x)()
   r = parent(x)()
-  if (ccall((:acb_poly_divrem, libflint), Int,
-            (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Int),
-            q, r, x, y, precision(Balls)) == 1)
+  success = @ccall libflint.acb_poly_divrem(q::Ref{ComplexPolyRingElem}, r::Ref{ComplexPolyRingElem}, x::Ref{ComplexPolyRingElem}, y::Ref{ComplexPolyRingElem}, precision(Balls)::Int)::Int
+  if success == 1
     return (q, r)
   else
     throw(DivideError())
@@ -342,8 +341,7 @@ end
 #function reverse(x::ComplexPolyRingElem, len::Int)
 #   len < 0 && throw(DomainError())
 #   z = parent(x)()
-#   ccall((:acb_poly_reverse, libflint), Nothing,
-#                (Ref{ComplexPolyRingElem}, Ref{ComplexPolyRingElem}, Int), z, x, len)
+#   @ccall libflint.acb_poly_reverse(z::Ref{ComplexPolyRingElem}, x::Ref{ComplexPolyRingElem}, len::Int)::Nothing
 #   return z
 #end
 
@@ -565,10 +563,8 @@ function roots(x::ComplexPolyRingElem; target=0, isolate_real=false, initial_pre
           im = _imag_ptr(roots + i * sizeof(acb_struct))
           t = _rad_ptr(re)
           u = _rad_ptr(im)
-          ok = ok && (ccall((:mag_cmp_2exp_si, libflint), Cint,
-                            (Ptr{mag_struct}, Int), t, -target) <= 0)
-          ok = ok && (ccall((:mag_cmp_2exp_si, libflint), Cint,
-                            (Ptr{mag_struct}, Int), u, -target) <= 0)
+          ok = ok && (@ccall libflint.mag_cmp_2exp_si(t::Ptr{mag_struct}, (-target)::Int)::Cint) <= 0
+          ok = ok && (@ccall libflint.mag_cmp_2exp_si(u::Ptr{mag_struct}, (-target)::Int)::Cint) <= 0
         end
       end
 

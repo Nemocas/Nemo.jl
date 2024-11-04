@@ -845,8 +845,7 @@ function setcoeff!(x::T, n::Int, y::UInt) where T <: Zmodn_poly
 end
 
 function setcoeff!(x::T, n::Int, y::Int) where T <: Zmodn_poly
-  ccall((:nmod_poly_set_coeff_ui, libflint), Nothing,
-        (Ref{T}, Int, UInt), x, n, mod(y, x.mod_n))
+  @ccall libflint.nmod_poly_set_coeff_ui(x::Ref{T}, n::Int, mod(y, x.mod_n)::UInt)::Nothing
   return x
 end
 

@@ -30,9 +30,13 @@ function embed_gens(k::fqPolyRepField, K::fqPolyRepField)
   PR = polynomial_ring(R, "T")[1]
   P = PR()
 
-  ccall((:fq_nmod_embed_gens, libflint), Nothing, (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepFieldElem},
-                                                   Ref{fpPolyRingElem}, Ref{fqPolyRepField}, Ref{fqPolyRepField}), a, b,
-        P, k, K)
+  @ccall libflint.fq_nmod_embed_gens(
+    a::Ref{fqPolyRepFieldElem},
+    b::Ref{fqPolyRepFieldElem},
+    P::Ref{fpPolyRingElem},
+    k::Ref{fqPolyRepField},
+    K::Ref{fqPolyRepField}
+  )::Nothing
 
   return a, b, P
 end

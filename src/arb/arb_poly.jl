@@ -294,9 +294,8 @@ function Base.divrem(x::ArbPolyRingElem, y::ArbPolyRingElem)
   iszero(y) && throw(DivideError())
   q = parent(x)()
   r = parent(x)()
-  if (ccall((:arb_poly_divrem, libflint), Int,
-            (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int),
-            q, r, x, y, precision(parent(x))) == 1)
+  success = @ccall libflint.arb_poly_divrem(q::Ref{ArbPolyRingElem}, r::Ref{ArbPolyRingElem}, x::Ref{ArbPolyRingElem}, y::Ref{ArbPolyRingElem}, precision(parent(x))::Int)::Int
+  if success == 1
     return (q, r)
   else
     throw(DivideError())
@@ -344,8 +343,7 @@ end
 #function reverse(x::ArbPolyRingElem, len::Int)
 #   len < 0 && throw(DomainError())
 #   z = parent(x)()
-#   ccall((:arb_poly_reverse, libflint), Nothing,
-#                (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int), z, x, len)
+#   @ccall libflint.arb_poly_reverse(z::Ref{ArbPolyRingElem}, x::Ref{ArbPolyRingElem}, len::Int)::Nothing
 #   return z
 #end
 

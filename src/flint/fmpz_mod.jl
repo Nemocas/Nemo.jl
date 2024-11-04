@@ -287,8 +287,7 @@ function divides(a::ZZModRingElem, b::ZZModRingElem)
   end
   ub = divexact(B, gb)
   b1 = ZZRingElem()
-  ccall((:fmpz_invmod, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}),
-        b1, ub, divexact(m, gb))
+  @ccall libflint.fmpz_invmod(b1::Ref{ZZRingElem}, ub::Ref{ZZRingElem}, divexact(m, gb)::Ref{ZZRingElem})::Nothing
   rr = R(q)*b1
   return true, rr
 end

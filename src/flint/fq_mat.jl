@@ -135,15 +135,13 @@ end
 # There is no transpose for FqPolyRepMatrix
 #function transpose(a::FqPolyRepMatrix)
 #  z = FqPolyRepMatrixSpace(base_ring(a), ncols(a), nrows(a))()
-#  ccall((:fq_mat_transpose, libflint), Nothing,
-#        (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}), z, a, base_ring(a))
+#  @ccall libflint.fq_mat_transpose(z::Ref{FqPolyRepMatrix}, a::Ref{FqPolyRepMatrix}, base_ring(a)::Ref{FqPolyRepField})::Nothing
 #  return z
 #end
 #
 #function transpose!(a::FqPolyRepMatrix)
 #  !is_square(a) && error("Matrix must be a square matrix")
-#  ccall((:fq_mat_transpose, libflint), Nothing,
-#        (Ref{FqPolyRepMatrix}, Ref{FqPolyRepMatrix}, Ref{FqPolyRepField}), a, a, base_ring(a))
+#  @ccall libflint.fq_mat_transpose(a::Ref{FqPolyRepMatrix}, a::Ref{FqPolyRepMatrix}, base_ring(a)::Ref{FqPolyRepField})::Nothing
 #end
 
 ###############################################################################

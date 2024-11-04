@@ -63,9 +63,6 @@ for (etype, rtype, ctype, mtype, brtype) in (
 
     function length(x::($etype))
       return x.length
-      #   return ccall((:fmpz_mod_poly_length, libflint), Int,
-      #                (Ref{($etype)}, Ref{($ctype)}),
-      #                x, x.parent.base_ring.ninv)
     end
 
     precision(x::($etype)) = x.prec
@@ -547,9 +544,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
     end
 
     function set_length!(a::($etype), n::Int)
-      ccall((:_fmpz_mod_poly_set_length, libflint), Nothing,
-            (Ref{($etype)}, Int, Ref{$(ctype)}),
-            a, n, a.parent.base_ring.ninv)
+      @ccall libflint._fmpz_mod_poly_set_length(a::Ref{($etype)}, n::Int, a.parent.base_ring.ninv::Ref{($ctype)})::Nothing
       return a
     end
 

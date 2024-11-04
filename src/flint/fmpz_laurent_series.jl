@@ -1155,8 +1155,7 @@ function eta_qexp(x::ZZLaurentSeriesRingElem)
   z = parent(x)()
   zscale = valuation(x)
   prec = max_precision(parent(x))
-  ccall((:fmpz_poly_eta_qexp, libflint), Nothing,
-        (Ref{ZZLaurentSeriesRingElem}, Int, Int), z, 1, div(prec + zscale - 1, zscale))
+  @ccall libflint.fmpz_poly_eta_qexp(z::Ref{ZZLaurentSeriesRingElem}, 1::Int, div(prec + zscale - 1, zscale)::Int)::Nothing
   z = set_scale!(z, zscale)
   z = set_valuation!(z, 0)
   z = set_precision!(z, prec)

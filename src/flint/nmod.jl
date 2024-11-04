@@ -304,8 +304,7 @@ function divides(a::zzModRingElem, b::zzModRingElem)
   end
   ub = divexact(B, gb)
   # The Julia invmod function does not give the correct result for me
-  b1 = ccall((:n_invmod, libflint), UInt, (UInt, UInt),
-             ub, divexact(m, gb))
+  b1 = @ccall libflint.n_invmod(ub::UInt, divexact(m, gb)::UInt)::UInt
   rr = R(q)*b1
   return true, rr
 end

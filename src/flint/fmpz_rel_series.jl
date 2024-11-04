@@ -171,17 +171,13 @@ function +(a::ZZRelPowerSeriesRingElem, b::ZZRelPowerSeriesRingElem)
   lenb = min(lenb, prec - b.val)
   z = parent(a)()
   if a.val < b.val
-    lenz = max(lena, lenb + b.val - a.val)
-    ccall((:fmpz_poly_set_trunc, libflint), Nothing,
-          (Ref{ZZRelPowerSeriesRingElem}, Ref{ZZRelPowerSeriesRingElem}, Int),
-          z, b, max(0, lenz - b.val + a.val))
+    lenz = max(lena, lenb + b.val - a.val)       
+    @ccall libflint.fmpz_poly_set_trunc(z::Ref{ZZRelPowerSeriesRingElem}, b::Ref{ZZRelPowerSeriesRingElem}, max(0, lenz - b.val + a.val)::Int)::Nothing
     @ccall libflint.fmpz_poly_shift_left(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, (b.val - a.val)::Int)::Nothing
     @ccall libflint.fmpz_poly_add_series(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, lenz::Int)::Nothing
   elseif b.val < a.val
     lenz = max(lena + a.val - b.val, lenb)
-    ccall((:fmpz_poly_set_trunc, libflint), Nothing,
-          (Ref{ZZRelPowerSeriesRingElem}, Ref{ZZRelPowerSeriesRingElem}, Int),
-          z, a, max(0, lenz - a.val + b.val))
+    @ccall libflint.fmpz_poly_set_trunc(z::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, max(0, lenz - a.val + b.val)::Int)::Nothing
     @ccall libflint.fmpz_poly_shift_left(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, (a.val - b.val)::Int)::Nothing
     @ccall libflint.fmpz_poly_add_series(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, b::Ref{ZZRelPowerSeriesRingElem}, lenz::Int)::Nothing
   else
@@ -206,17 +202,13 @@ function -(a::ZZRelPowerSeriesRingElem, b::ZZRelPowerSeriesRingElem)
   z = parent(a)()
   if a.val < b.val
     lenz = max(lena, lenb + b.val - a.val)
-    ccall((:fmpz_poly_set_trunc, libflint), Nothing,
-          (Ref{ZZRelPowerSeriesRingElem}, Ref{ZZRelPowerSeriesRingElem}, Int),
-          z, b, max(0, lenz - b.val + a.val))
+    @ccall libflint.fmpz_poly_set_trunc(z::Ref{ZZRelPowerSeriesRingElem}, b::Ref{ZZRelPowerSeriesRingElem}, max(0, lenz - b.val + a.val)::Int)::Nothing
     @ccall libflint.fmpz_poly_shift_left(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, (b.val - a.val)::Int)::Nothing
     @ccall libflint.fmpz_poly_neg(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem})::Nothing
     @ccall libflint.fmpz_poly_add_series(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, lenz::Int)::Nothing
   elseif b.val < a.val
     lenz = max(lena + a.val - b.val, lenb)
-    ccall((:fmpz_poly_set_trunc, libflint), Nothing,
-          (Ref{ZZRelPowerSeriesRingElem}, Ref{ZZRelPowerSeriesRingElem}, Int),
-          z, a, max(0, lenz - a.val + b.val))
+    @ccall libflint.fmpz_poly_set_trunc(z::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, max(0, lenz - a.val + b.val)::Int)::Nothing
     @ccall libflint.fmpz_poly_shift_left(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, (a.val - b.val)::Int)::Nothing
     @ccall libflint.fmpz_poly_sub_series(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, b::Ref{ZZRelPowerSeriesRingElem}, lenz::Int)::Nothing
   else
@@ -579,16 +571,12 @@ function add!(a::ZZRelPowerSeriesRingElem, b::ZZRelPowerSeriesRingElem)
     z = ZZRelPowerSeriesRingElem()
     z.parent = parent(a)
     lenz = max(lena, lenb + b.val - a.val)
-    ccall((:fmpz_poly_set_trunc, libflint), Nothing,
-          (Ref{ZZRelPowerSeriesRingElem}, Ref{ZZRelPowerSeriesRingElem}, Int),
-          z, b, max(0, lenz - b.val + a.val))
+    @ccall libflint.fmpz_poly_set_trunc(z::Ref{ZZRelPowerSeriesRingElem}, b::Ref{ZZRelPowerSeriesRingElem}, max(0, lenz - b.val + a.val)::Int)::Nothing
     @ccall libflint.fmpz_poly_shift_left(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, (b.val - a.val)::Int)::Nothing
     @ccall libflint.fmpz_poly_add_series(a::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, lenz::Int)::Nothing
   elseif b.val < a.val
     lenz = max(lena + a.val - b.val, lenb)
-    ccall((:fmpz_poly_truncate, libflint), Nothing,
-          (Ref{ZZRelPowerSeriesRingElem}, Int),
-          a, max(0, lenz - a.val + b.val))
+    @ccall libflint.fmpz_poly_truncate(a::Ref{ZZRelPowerSeriesRingElem}, max(0, lenz - a.val + b.val)::Int)::Nothing
     @ccall libflint.fmpz_poly_shift_left(a::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, (a.val - b.val)::Int)::Nothing
     @ccall libflint.fmpz_poly_add_series(a::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, b::Ref{ZZRelPowerSeriesRingElem}, lenz::Int)::Nothing
   else
@@ -615,16 +603,12 @@ function add!(c::ZZRelPowerSeriesRingElem, a::ZZRelPowerSeriesRingElem, b::ZZRel
   lenb = min(lenb, prec - b.val)
   if a.val < b.val
     lenc = max(lena, lenb + b.val - a.val)
-    ccall((:fmpz_poly_set_trunc, libflint), Nothing,
-          (Ref{ZZRelPowerSeriesRingElem}, Ref{ZZRelPowerSeriesRingElem}, Int),
-          c, b, max(0, lenc - b.val + a.val))
+    @ccall libflint.fmpz_poly_set_trunc(c::Ref{ZZRelPowerSeriesRingElem}, b::Ref{ZZRelPowerSeriesRingElem}, max(0, lenc - b.val + a.val)::Int)::Nothing
     @ccall libflint.fmpz_poly_shift_left(c::Ref{ZZRelPowerSeriesRingElem}, c::Ref{ZZRelPowerSeriesRingElem}, (b.val - a.val)::Int)::Nothing
     @ccall libflint.fmpz_poly_add_series(c::Ref{ZZRelPowerSeriesRingElem}, c::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, lenc::Int)::Nothing
   elseif b.val < a.val
     lenc = max(lena + a.val - b.val, lenb)
-    ccall((:fmpz_poly_set_trunc, libflint), Nothing,
-          (Ref{ZZRelPowerSeriesRingElem}, Ref{ZZRelPowerSeriesRingElem}, Int),
-          c, a, max(0, lenc - a.val + b.val))
+    @ccall libflint.fmpz_poly_set_trunc(c::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, max(0, lenc - a.val + b.val)::Int)::Nothing
     @ccall libflint.fmpz_poly_shift_left(c::Ref{ZZRelPowerSeriesRingElem}, c::Ref{ZZRelPowerSeriesRingElem}, (a.val - b.val)::Int)::Nothing
     @ccall libflint.fmpz_poly_add_series(c::Ref{ZZRelPowerSeriesRingElem}, c::Ref{ZZRelPowerSeriesRingElem}, b::Ref{ZZRelPowerSeriesRingElem}, lenc::Int)::Nothing
   else

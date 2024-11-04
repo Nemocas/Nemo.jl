@@ -1,4 +1,4 @@
 function setprecision!(x::BigFloat, p::Int)
-  ccall((:mpfr_prec_round, :libmpfr), Nothing, (Ref{BigFloat}, Clong, Int32), x, p, Base.MPFR.ROUNDING_MODE[])
+  @ccall :libmpfr.mpfr_prec_round(x::Ref{BigFloat}, p::Clong, Base.MPFR.ROUNDING_MODE[]::Int32)::Nothing
 end
 

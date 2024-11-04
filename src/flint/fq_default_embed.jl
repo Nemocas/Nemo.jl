@@ -82,11 +82,15 @@ function _fq_default_embed_matrices(
   sub_ctx1 = _as_fq_finite_field(sub_ctx)
   sup_ctx1 = _as_fq_finite_field(sup_ctx)
 
-  ccall((:fq_embed_matrices, libflint), Nothing,
-        (Ref{FpMatrix}, Ref{FpMatrix}, Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField},
-         Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}, Ref{FpPolyRingElem}),
-        emb, pro, _unchecked_coerce(sub_ctx1, gen_sub), sub_ctx1,
-        _unchecked_coerce(sup_ctx1, gen_sup), sup_ctx1, gen_minpoly)
+  @ccall libflint.fq_embed_matrices(
+    emb::Ref{FpMatrix},
+    pro::Ref{FpMatrix},
+    _unchecked_coerce(sub_ctx1, gen_sub)::Ref{FqPolyRepFieldElem},
+    sub_ctx1::Ref{FqPolyRepField},
+    _unchecked_coerce(sup_ctx1, gen_sup)::Ref{FqPolyRepFieldElem},
+    sup_ctx1::Ref{FqPolyRepField},
+    gen_minpoly::Ref{FpPolyRingElem}
+  )::Nothing
 end
 
 function embed_matrices(k::FqField, K::FqField)

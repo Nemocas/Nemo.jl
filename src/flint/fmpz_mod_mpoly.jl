@@ -84,9 +84,6 @@ for (etype, rtype, ftype, ctype) in (
 
     function length(a::($etype))
       return a.length
-      #   return ccall((:fmpz_mod_mpoly_length, libflint), Int,
-      #                (Ref{T}, Ref{parent_type(T)}),
-      #                a, a.parent)
     end
 
     one(R::($rtype)) = one!(R())

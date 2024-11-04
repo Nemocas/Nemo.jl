@@ -884,9 +884,9 @@ end
 
 function cmp(a::BigFloat, b::ZZRingElem)
   if _fmpz_is_small(b)
-    return Int(ccall((:mpfr_cmp_si, :libmpfr), Cint, (Ref{BigFloat}, Int), a, b.d))
+    return Int(@ccall :libmpfr.mpfr_cmp_si(a::Ref{BigFloat}, b.d::Int)::Cint)
   end
-  return Int(ccall((:mpfr_cmp_z, :libmpfr), Cint, (Ref{BigFloat}, UInt), a, unsigned(b.d) << 2))
+  return Int(@ccall :libmpfr.mpfr_cmp_z(a::Ref{BigFloat}, (unsigned(b.d) << 2)::UInt)::Cint)
 end
 
 ==(x::ZZRingElem, y::BigFloat) = cmp(y, x) == 0
@@ -1052,8 +1052,8 @@ julia> sqrtmod(ZZ(12), ZZ(13))
 function sqrtmod(x::ZZRingElem, m::ZZRingElem)
   m <= 0 && throw(DomainError(m, "Modulus must be non-negative"))
   z = ZZRingElem()
-  if (ccall((:fmpz_sqrtmod, libflint), Cint,
-            (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x, m) == 0)
+  success = @ccall libflint.fmpz_sqrtmod(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, m::Ref{ZZRingElem})::Cint
+  if success == 0
     error("no square root exists or modulus is not prime")
   end
   return z
@@ -1700,9 +1700,7 @@ function remove(a::BigInt, b::BigInt)
   b <= 1 && error("Factor <= 1")
   a == 0 && error("Not yet implemented")
   q = BigInt()
-  v =  ccall((:__gmpz_remove, :libgmp), Culong,
-             (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}),
-             q, a, b)
+  v = @ccall :libgmp.__gmpz_remove(q::Ref{BigInt}, a::Ref{BigInt}, b::Ref{BigInt})::Culong
   return (Int(v), q)
 end
 

@@ -248,7 +248,7 @@ end
 function mul!(a::FqMatrix, b::FqMatrix, c::FqFieldElem)
   F = base_ring(a)
   if _fq_default_ctx_type(F) == _FQ_DEFAULT_NMOD
-    ccall((:nmod_mat_scalar_mul, libflint), Nothing, (Ref{FqMatrix}, Ref{FqMatrix}, UInt), a, b, UInt(lift(ZZ, c)))
+    @ccall libflint.nmod_mat_scalar_mul(a::Ref{FqMatrix}, b::Ref{FqMatrix}, UInt(lift(ZZ, c))::UInt)::Nothing
     return a
   end
   GC.@preserve a begin

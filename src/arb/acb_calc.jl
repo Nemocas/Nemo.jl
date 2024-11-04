@@ -44,10 +44,7 @@ function integrate(C::ComplexField, F, a, b;
   else
     t = BigFloat(abs_tol, RoundDown)
     expo = Ref{Clong}()
-    d = ccall((:mpfr_get_d_2exp, :libmpfr), Float64,
-              (Ref{Clong}, Ref{BigFloat}, Cint),
-              expo, t,
-              Base.convert(Base.MPFR.MPFRRoundingMode, RoundDown))
+    d = @ccall :libmpfr.mpfr_get_d_2exp(expo::Ref{Clong}, t::Ref{BigFloat},Base.convert(Base.MPFR.MPFRRoundingMode, RoundDown)::Cint)::Float64
     @ccall libflint.mag_set_d(ctol::Ref{mag_struct}, d::Float64)::Nothing
     @ccall libflint.mag_mul_2exp_si(ctol::Ref{mag_struct}, ctol::Ref{mag_struct}, Int(expo[])::Int)::Nothing
   end
