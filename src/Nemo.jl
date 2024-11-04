@@ -575,24 +575,12 @@ const _ecm_nCs = Vector{Int}[_ecm_nC]
 
 ###############################################################################
 #
-#   Set domain for ZZ, QQ to Flint
-#
-###############################################################################
-
-@doc zz_ring_doc
-const FlintZZ = ZZ
-
-@doc qq_field_doc
-const FlintQQ = QQ
-
-###############################################################################
-#
 #   Set domain for RR, CC to Arb
 #
 ###############################################################################
 
-GaussianIntegers() = FlintZZi
-GaussianRationals() = FlintQQi
+GaussianIntegers() = ZZiRing()
+GaussianRationals() = QQiField()
 
 ###############################################################################
 #
