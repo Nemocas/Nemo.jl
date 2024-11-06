@@ -8,7 +8,7 @@ elem_type(::Type{QQiField}) = QQiFieldElem
 
 parent_type(::Type{QQiFieldElem}) = QQiField
 
-parent(a::QQiFieldElem) = FlintQQi
+parent(a::QQiFieldElem) = QQi
 
 base_ring_type(::Type{QQiField}) = ZZiRing
 
@@ -460,22 +460,22 @@ for (A, Bs) in [
         return QQiFieldElem
       end
       function +(a::($A), b::($B))
-        return FlintQQi(a) + FlintQQi(b)
+        return QQi(a) + QQi(b)
       end
       function +(a::($B), b::($A))
-        return FlintQQi(a) + FlintQQi(b)
+        return QQi(a) + QQi(b)
       end
       function -(a::($A), b::($B))
-        return FlintQQi(a) - FlintQQi(b)
+        return QQi(a) - QQi(b)
       end
       function -(a::($B), b::($A))
-        return FlintQQi(a) - FlintQQi(b)
+        return QQi(a) - QQi(b)
       end
       function *(a::($A), b::($B))
-        return FlintQQi(a) * FlintQQi(b)
+        return QQi(a) * QQi(b)
       end
       function *(a::($B), b::($A))
-        return FlintQQi(a) * FlintQQi(b)
+        return QQi(a) * QQi(b)
       end
     end
   end
@@ -491,7 +491,7 @@ for (As, Bs) in [
   for A in As, B in Bs
     @eval begin
       function //(a::($A), b::($B))
-        return divexact(FlintQQi(a), FlintQQi(b))
+        return divexact(QQi(a), QQi(b))
       end
     end
   end

@@ -14,7 +14,8 @@ end
 struct QQiField <: Field
 end
 
-const FlintQQi = QQiField()
+const QQi = QQiField()
+GaussianRationals() = QQi
 
 struct QQiFieldElem <: FieldElem
   num::ZZiRingElem

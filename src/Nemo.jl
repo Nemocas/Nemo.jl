@@ -587,7 +587,7 @@ const FlintQQ = QQ
 
 const FlintZZi = ZZi
 
-GaussianRationals() = FlintQQi
+const FlintQQi = QQi
 
 ###############################################################################
 #
