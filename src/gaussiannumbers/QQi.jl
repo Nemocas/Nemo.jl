@@ -12,7 +12,7 @@ parent(a::QQiFieldElem) = FlintQQi
 
 base_ring_type(::Type{QQiField}) = ZZiRing
 
-base_ring(a::QQiField) = FlintZZi
+base_ring(a::QQiField) = ZZi
 
 is_domain_type(::Type{QQiFieldElem}) = true
 
@@ -155,7 +155,7 @@ end
 function rand_bits(a::QQiField, b::Int)
   b = max(1, b)
   t = clamp(cld(rand(0:b)^2, b), 1, b)  # average b/3 for the denominator
-  return reduce!(QQiFieldElem(rand_bits(FlintZZi, clamp(b - t, 0, b)), rand_bits(ZZ, t)))
+  return reduce!(QQiFieldElem(rand_bits(ZZi, clamp(b - t, 0, b)), rand_bits(ZZ, t)))
 end
 
 ###############################################################################
@@ -186,11 +186,11 @@ function abs2(a::QQiFieldElem)
 end
 
 function zero(a::QQiField)
-  return QQiFieldElem(zero(FlintZZi), ZZRingElem(1))
+  return QQiFieldElem(zero(ZZi), ZZRingElem(1))
 end
 
 function one(a::QQiField)
-  return QQiFieldElem(one(FlintZZi), ZZRingElem(1))
+  return QQiFieldElem(one(ZZi), ZZRingElem(1))
 end
 
 function iszero(a::QQiFieldElem)

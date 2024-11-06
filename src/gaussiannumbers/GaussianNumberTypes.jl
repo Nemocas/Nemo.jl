@@ -3,7 +3,8 @@
 struct ZZiRing <: Ring
 end
 
-const FlintZZi = ZZiRing()
+const ZZi = ZZiRing()
+GaussianIntegers() = ZZi
 
 struct ZZiRingElem <: RingElem
   x::ZZRingElem

@@ -8,7 +8,7 @@ elem_type(::Type{ZZiRing}) = ZZiRingElem
 
 parent_type(::Type{ZZiRingElem}) = ZZiRing
 
-parent(a::ZZiRingElem) = FlintZZi
+parent(a::ZZiRingElem) = ZZi
 
 base_ring_type(::Type{ZZiRing}) = ZZRing
 
@@ -70,7 +70,7 @@ function (a::ZZiRing)(b::IntegerUnion, c::IntegerUnion)
 end
 
 function (R::ZZiRing)(a::Complex{T}) where T <: Integer
-  return FlintZZi(ZZRingElem(real(a)), ZZRingElem(imag(a)))
+  return ZZi(ZZRingElem(real(a)), ZZRingElem(imag(a)))
 end
 
 ###############################################################################
@@ -736,14 +736,14 @@ end
 function gcdx(a::ZZiRingElem, b::ZZiRingElem)
   if iszero(a)
     if iszero(b)
-      return (zero(FlintZZi), zero(FlintZZi), zero(FlintZZi))
+      return (zero(ZZi), zero(ZZi), zero(ZZi))
     else
       u = canonical_unit(b)
-      return (divexact(b, u), zero(FlintZZi), inv(u))
+      return (divexact(b, u), zero(ZZi), inv(u))
     end
   elseif iszero(b)
     u = canonical_unit(a)
-    return (divexact(a, u), inv(u), zero(FlintZZi))
+    return (divexact(a, u), inv(u), zero(ZZi))
   end
   m = zero_matrix(ZZ, 4, 2)
   m[1,1] =  a.x; m[1,2] = a.y
@@ -844,8 +844,8 @@ promote_rule(a::Type{<:Complex{<:Integer}}, b::Type{ZZRingElem}) = ZZiRingElem
 
 promote_rule(a::Type{ZZiRingElem}, b::Type{<:Complex{<:Integer}}) = ZZiRingElem
 promote_rule(a::Type{<:Complex{<:Integer}}, b::Type{ZZiRingElem}) = ZZiRingElem
-*(a::ZZiRingElem, b::Complex{<:Integer}) = a*FlintZZi(b)
-*(b::Complex{<:Integer}, a::ZZiRingElem) = a*FlintZZi(b)
+*(a::ZZiRingElem, b::Complex{<:Integer}) = a*ZZi(b)
+*(b::Complex{<:Integer}, a::ZZiRingElem) = a*ZZi(b)
 +(a::ZZiRingElem, b::Complex{<:Integer}) = ZZiRingElem(a.x + real(b), a.y + imag(b))
 +(b::Complex{<:Integer}, a::ZZiRingElem) = ZZiRingElem(a.x + real(b), a.y + imag(b))
 -(a::ZZiRingElem, b::Complex{<:Integer}) = ZZiRingElem(a.x - real(b), a.y - imag(b))
