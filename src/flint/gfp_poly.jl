@@ -223,26 +223,6 @@ function gcdx(x::fpPolyRingElem, y::fpPolyRingElem)
   return g,s,t
 end
 
-function gcdinv(x::fpPolyRingElem, y::fpPolyRingElem)
-  check_parent(x,y)
-  if length(x) >= length(y)
-    x = rem(x,y)
-  end
-  if is_zero(x)
-    is_zero(y) && return y, x
-    ly = leading_coefficient(y)
-    if !is_one(ly)
-      y = divexact(y,ly)
-    end
-    return y, x
-  end
-  length(y) <= 1 && return gcdx(x, y)[1:2]
-  g = parent(x)()
-  s = parent(x)()
-  @ccall libflint.nmod_poly_gcdinv(g::Ref{fpPolyRingElem}, s::Ref{fpPolyRingElem}, x::Ref{fpPolyRingElem}, y::Ref{fpPolyRingElem})::Nothing
-  return g,s
-end
-
 ################################################################################
 #
 #  Resultant
