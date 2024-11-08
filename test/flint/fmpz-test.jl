@@ -504,6 +504,12 @@ end
   @test rem(-12, ZZRingElem(3)) == 0
 
   @test_throws ArgumentError divexact(ZZ(2), 3)
+
+  b = ZZ(123)
+  @test b % UInt == 123 % UInt
+  @test -b % UInt == -123 % UInt
+  @test b^29 % UInt == big(123)^29 % UInt
+  @test -b^29 % UInt == -big(123)^29 % UInt
 end
 
 @testset "ZZRingElem.shift.." begin
