@@ -94,7 +94,7 @@ end
 
 +(x::FpPolyRingElem, y::Integer) = x + ZZRingElem(y)
 
-+(x::Integer, y::FpPolyRingElem) = ZZRingElem(y) + x 
++(x::Integer, y::FpPolyRingElem) = ZZRingElem(x) + y
 
 function +(x::FpPolyRingElem, y::FpFieldElem)
   (base_ring(x) != parent(y)) && error("Elements must have same parent")
