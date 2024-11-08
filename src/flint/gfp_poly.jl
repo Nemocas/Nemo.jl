@@ -465,7 +465,7 @@ end
 #
 ################################################################################
 
-setcoeff!(z::fpPolyRingElem, n::Int, x::fpFieldElem) = setcoeff!(z, n, data(x))
+setcoeff!(z::fpPolyRingElem, i::Int, x::fpFieldElem, n::UInt=modulus(z)) = setcoeff!(z, i, data(x), n)
 
 ################################################################################
 #

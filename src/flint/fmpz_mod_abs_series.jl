@@ -496,23 +496,23 @@ for (etype, rtype, ctype, mtype, brtype) in (
       return nothing
     end
 
-    function setcoeff!(z::($etype), n::Int, x::ZZRingElemOrPtr)
-      @ccall libflint.fmpz_mod_poly_set_coeff_fmpz(z::Ref{($etype)}, n::Int, x::Ref{ZZRingElem}, base_ring(z).ninv::Ref{($ctype)})::Nothing
+    function setcoeff!(z::($etype), i::Int, x::ZZRingElemOrPtr, ctx::($ctype)=base_ring(z).ninv)
+      @ccall libflint.fmpz_mod_poly_set_coeff_fmpz(z::Ref{($etype)}, i::Int, x::Ref{ZZRingElem}, ctx::Ref{($ctype)})::Nothing
       return z
     end
     
-    function setcoeff!(z::($etype), n::Int, x::UInt)
-      @ccall libflint.fmpz_mod_poly_set_coeff_ui(z::Ref{($etype)}, n::Int, x::UInt, base_ring(z).ninv::Ref{($ctype)})::Nothing
+    function setcoeff!(z::($etype), i::Int, x::UInt, ctx::($ctype)=base_ring(z).ninv)
+      @ccall libflint.fmpz_mod_poly_set_coeff_ui(z::Ref{($etype)}, i::Int, x::UInt, ctx::Ref{($ctype)})::Nothing
       return z
     end
     
-    function setcoeff!(z::($etype), n::Int, x::Int)
-      @ccall libflint.fmpz_mod_poly_set_coeff_si(z::Ref{($etype)}, n::Int, x::UInt, base_ring(z).ninv::Ref{($ctype)})::Nothing
+    function setcoeff!(z::($etype), i::Int, x::Int, ctx::($ctype)=base_ring(z).ninv)
+      @ccall libflint.fmpz_mod_poly_set_coeff_si(z::Ref{($etype)}, i::Int, x::UInt, ctx::Ref{($ctype)})::Nothing
     end
     
-    setcoeff!(z::($etype), n::Int, x::Integer) = setcoeff!(z, n, flintify(x))
+    setcoeff!(z::($etype), i::Int, x::Integer, ctx::($ctype)=base_ring(z).ninv) = setcoeff!(z, i, flintify(x), ctx)
     
-    setcoeff!(z::($etype), n::Int, x::($mtype)) = setcoeff!(z, n, data(x))
+    setcoeff!(z::($etype), i::Int, x::($mtype), ctx::($ctype)=base_ring(z).ninv) = setcoeff!(z, i, data(x), ctx)
 
     function mul!(z::($etype), a::($etype), b::($etype))
       lena = length(a)

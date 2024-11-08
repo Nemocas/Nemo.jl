@@ -384,7 +384,7 @@ end
 #
 ################################################################################
 
-setcoeff!(z::FpPolyRingElem, n::Int, x::FpFieldElem) = setcoeff!(z, n, data(x))
+setcoeff!(z::FpPolyRingElem, i::Int, x::FpFieldElem, ctx::fmpz_mod_ctx_struct=base_ring(z).ninv) = setcoeff!(z, i, data(x), ctx)
 
 ################################################################################
 #

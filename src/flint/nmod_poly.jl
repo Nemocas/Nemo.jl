@@ -846,23 +846,23 @@ end
 
 #
 
-function setcoeff!(z::T, n::Int, x::UInt) where T <: Zmodn_poly
-  @ccall libflint.nmod_poly_set_coeff_ui(z::Ref{T}, n::Int, x::UInt)::Nothing
+function setcoeff!(z::T, i::Int, x::UInt, n::UInt=modulus(z)) where T <: Zmodn_poly
+  @ccall libflint.nmod_poly_set_coeff_ui(z::Ref{T}, i::Int, x::UInt)::Nothing
   return z
 end
 
-function setcoeff!(z::T, n::Int, x::Int) where T <: Zmodn_poly
-  return setcoeff!(z, n, mod(x, modulus(z)))
+function setcoeff!(z::T, i::Int, x::Int, n::UInt=modulus(z)) where T <: Zmodn_poly
+  return setcoeff!(z, i, mod(x, n), n)
 end
 
-function setcoeff!(z::T, n::Int, x::ZZRingElem) where T <: Zmodn_poly
-  xx = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), x, modulus(z))
-  return setcoeff!(z, n, xx)
+function setcoeff!(z::T, i::Int, x::ZZRingElem, n::UInt=modulus(z)) where T <: Zmodn_poly
+  xx = ccall((:fmpz_fdiv_ui, libflint), UInt, (Ref{ZZRingElem}, UInt), x, n)
+  return setcoeff!(z, i, xx, n)
 end
 
-setcoeff!(z::T, n::Int, x::Integer) where T <: Zmodn_poly = setcoeff!(z, n, flintify(x))
+setcoeff!(z::T, i::Int, x::Integer, n::UInt=modulus(z)) where T <: Zmodn_poly = setcoeff!(z, i, flintify(x), n)
 
-setcoeff!(z::zzModPolyRingElem, n::Int, x::zzModRingElem) = setcoeff!(z, n, data(x))
+setcoeff!(z::zzModPolyRingElem, i::Int, x::zzModRingElem, n::UInt=modulus(z)) = setcoeff!(z, i, data(x), n)
 
 #
 

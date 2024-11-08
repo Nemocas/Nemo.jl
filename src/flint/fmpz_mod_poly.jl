@@ -779,23 +779,23 @@ end
 
 #
 
-function setcoeff!(z::T, n::Int, x::ZZRingElemOrPtr) where T <: Zmodn_fmpz_poly
-  @ccall libflint.fmpz_mod_poly_set_coeff_fmpz(z::Ref{T}, n::Int, x::Ref{ZZRingElem}, base_ring(z).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+function setcoeff!(z::T, i::Int, x::ZZRingElemOrPtr, ctx::fmpz_mod_ctx_struct=base_ring(z).ninv) where T <: Zmodn_fmpz_poly
+  @ccall libflint.fmpz_mod_poly_set_coeff_fmpz(z::Ref{T}, i::Int, x::Ref{ZZRingElem}, ctx::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
-function setcoeff!(z::T, n::Int, x::UInt) where T <: Zmodn_fmpz_poly
-  @ccall libflint.fmpz_mod_poly_set_coeff_ui(z::Ref{T}, n::Int, x::UInt, base_ring(z).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+function setcoeff!(z::T, i::Int, x::UInt, ctx::fmpz_mod_ctx_struct=base_ring(z).ninv) where T <: Zmodn_fmpz_poly
+  @ccall libflint.fmpz_mod_poly_set_coeff_ui(z::Ref{T}, i::Int, x::UInt, ctx::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
-function setcoeff!(z::T, n::Int, x::Int) where T <: Zmodn_fmpz_poly
-  @ccall libflint.fmpz_mod_poly_set_coeff_si(z::Ref{T}, n::Int, x::UInt, base_ring(z).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+function setcoeff!(z::T, i::Int, x::Int, ctx::fmpz_mod_ctx_struct=base_ring(z).ninv) where T <: Zmodn_fmpz_poly
+  @ccall libflint.fmpz_mod_poly_set_coeff_si(z::Ref{T}, i::Int, x::UInt, ctx::Ref{fmpz_mod_ctx_struct})::Nothing
 end
 
-setcoeff!(z::T, n::Int, x::Integer) where T <: Zmodn_fmpz_poly = setcoeff!(z, n, flintify(x))
+setcoeff!(z::T, i::Int, x::Integer, ctx::fmpz_mod_ctx_struct=base_ring(z).ninv) where T <: Zmodn_fmpz_poly = setcoeff!(z, i, flintify(x), ctx)
 
-setcoeff!(z::ZZModPolyRingElem, n::Int, x::ZZModRingElem) = setcoeff!(z, n, data(x))
+setcoeff!(z::ZZModPolyRingElem, i::Int, x::ZZModRingElem, ctx::fmpz_mod_ctx_struct=base_ring(z).ninv) = setcoeff!(z, i, data(x), ctx)
 
 #
 
