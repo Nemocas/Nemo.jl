@@ -783,7 +783,7 @@ mutable struct RealMatrix <: MatElem{RealFieldElem}
   #base_ring::ArbField
 
   # MatElem interface
-  RealMatrix(::RealField, r::Int, c::Int) = RealMatrix(r, c)
+  RealMatrix(::RealField, ::UndefInitializer, r::Int, c::Int) = RealMatrix(r, c)
 
   function RealMatrix(r::Int, c::Int)
     z = new()
@@ -871,7 +871,7 @@ mutable struct ArbMatrix <: MatElem{ArbFieldElem}
   base_ring::ArbField
 
   # MatElem interface
-  function ArbMatrix(R::ArbField, r::Int, c::Int)
+  function ArbMatrix(R::ArbField, ::UndefInitializer, r::Int, c::Int)
     z = ArbMatrix(r, c)
     z.base_ring = R
     return z
@@ -967,7 +967,7 @@ mutable struct ComplexMatrix <: MatElem{ComplexFieldElem}
   #base_ring::AcbField
 
   # MatElem interface
-  ComplexMatrix(::ComplexField, r::Int, c::Int) = ComplexMatrix(r, c)
+  ComplexMatrix(::ComplexField, ::UndefInitializer, r::Int, c::Int) = ComplexMatrix(r, c)
 
   function ComplexMatrix(r::Int, c::Int)
     z = new()
@@ -1155,7 +1155,7 @@ mutable struct AcbMatrix <: MatElem{AcbFieldElem}
   base_ring::AcbField
 
   # MatElem interface
-  function AcbMatrix(R::AcbField, r::Int, c::Int)
+  function AcbMatrix(R::AcbField, ::UndefInitializer, r::Int, c::Int)
     z = AcbMatrix(r, c)
     z.base_ring = R
     return z

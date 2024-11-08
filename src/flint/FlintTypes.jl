@@ -4047,7 +4047,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
   view_parent
 
   # MatElem interface
-  QQMatrix(::QQField, r::Int, c::Int) = QQMatrix(r, c)
+  QQMatrix(::QQField, ::UndefInitializer, r::Int, c::Int) = QQMatrix(r, c)
 
   # Used by view, not finalised!!
   function QQMatrix()
@@ -4091,7 +4091,7 @@ mutable struct ZZMatrix <: MatElem{ZZRingElem}
   view_parent
 
   # MatElem interface
-  ZZMatrix(::ZZRing, r::Int, c::Int) = ZZMatrix(r, c)
+  ZZMatrix(::ZZRing, ::UndefInitializer, r::Int, c::Int) = ZZMatrix(r, c)
 
   # Used by view, not finalised!!
   function ZZMatrix()
@@ -4137,7 +4137,7 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
   view_parent
 
   # MatElem interface
-  function zzModMatrix(R::zzModRing, r::Int, c::Int)
+  function zzModMatrix(R::zzModRing, ::UndefInitializer, r::Int, c::Int)
     z = zzModMatrix(r, c, R.n)
     z.base_ring = R
     return z
@@ -4274,7 +4274,7 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
   view_parent
 
   # MatElem interface
-  function ZZModMatrix(R::ZZModRing, r::Int, c::Int)
+  function ZZModMatrix(R::ZZModRing, ::UndefInitializer, r::Int, c::Int)
     z = ZZModMatrix(r, c, R.ninv)
     z.base_ring = R
     return z
@@ -4425,7 +4425,7 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
   view_parent
 
   # MatElem interface
-  function FpMatrix(R::FpField, r::Int, c::Int)
+  function FpMatrix(R::FpField, ::UndefInitializer, r::Int, c::Int)
     z = FpMatrix(r, c, R.ninv)
     z.base_ring = R
     return z
@@ -4530,7 +4530,7 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
   view_parent
 
   # MatElem interface
-  function fpMatrix(R::fpField, r::Int, c::Int)
+  function fpMatrix(R::fpField, ::UndefInitializer, r::Int, c::Int)
     z = fpMatrix(r, c, R.n)
     z.base_ring = R
     return z
@@ -5017,7 +5017,7 @@ mutable struct FqMatrix <: MatElem{FqFieldElem}
   view_parent
 
   # MatElem interface
-  function FqMatrix(R::FqField, r::Int, c::Int)
+  function FqMatrix(R::FqField, ::UndefInitializer, r::Int, c::Int)
     return FqMatrix(r, c, R)
   end
 
@@ -5115,7 +5115,7 @@ mutable struct FqPolyRepMatrix <: MatElem{FqPolyRepFieldElem}
   view_parent
 
   # MatElem interface
-  function FqPolyRepMatrix(R::FqPolyRepField, r::Int, c::Int)
+  function FqPolyRepMatrix(R::FqPolyRepField, ::UndefInitializer, r::Int, c::Int)
     return FqPolyRepMatrix(r, c, R)
   end
 
@@ -5196,7 +5196,7 @@ mutable struct fqPolyRepMatrix <: MatElem{fqPolyRepFieldElem}
   view_parent
 
   # MatElem interface
-  function fqPolyRepMatrix(R::fqPolyRepField, r::Int, c::Int)
+  function fqPolyRepMatrix(R::fqPolyRepField, ::UndefInitializer, r::Int, c::Int)
     return fqPolyRepMatrix(r, c, R)
   end
 

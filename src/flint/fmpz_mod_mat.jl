@@ -19,7 +19,7 @@ dense_matrix_type(::Type{ZZModRingElem}) = ZZModMatrix
 ###############################################################################
 
 function similar(::MatElem, R::ZZModRing, r::Int, c::Int)
-  z = ZZModMatrix(R, r, c)
+  z = ZZModMatrix(R, undef, r, c)
   return z
 end
 
@@ -696,7 +696,7 @@ promote_rule(::Type{ZZModMatrix}, ::Type{ZZRingElem}) = ZZModMatrix
 ################################################################################
 
 function (a::ZZModMatrixSpace)()
-  z = ZZModMatrix(base_ring(a), nrows(a), ncols(a))
+  z = ZZModMatrix(base_ring(a), undef, nrows(a), ncols(a))
   return z
 end
 
@@ -760,7 +760,7 @@ end
 
 function (a::ZZModMatrixSpace)(b::ZZMatrix)
   (ncols(a) != b.c || nrows(a) != b.r) && error("Dimensions do not fit")
-  z = ZZModMatrix(base_ring(a), b.r, b.c)
+  z = ZZModMatrix(base_ring(a), undef, b.r, b.c)
   @ccall libflint.fmpz_mod_mat_set_fmpz_mat(z::Ref{ZZModMatrix}, b::Ref{ZZMatrix}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
@@ -794,7 +794,7 @@ function zero_matrix(R::ZZModRing, r::Int, c::Int)
   if r < 0 || c < 0
     error("dimensions must not be negative")
   end
-  z = ZZModMatrix(R, r, c)
+  z = ZZModMatrix(R, undef, r, c)
   return z
 end
 

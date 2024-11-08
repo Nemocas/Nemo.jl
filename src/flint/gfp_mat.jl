@@ -19,7 +19,7 @@ dense_matrix_type(::Type{fpFieldElem}) = fpMatrix
 ###############################################################################
 
 function similar(::fpMatrix, R::fpField, r::Int, c::Int)
-  z = fpMatrix(R, r, c)
+  z = fpMatrix(R, undef, r, c)
   return z
 end
 
@@ -281,7 +281,7 @@ end
 ################################################################################
 
 function (a::fpMatrixSpace)()
-  z = fpMatrix(base_ring(a), nrows(a), ncols(a))
+  z = fpMatrix(base_ring(a), undef, nrows(a), ncols(a))
   return z
 end
 
@@ -379,7 +379,7 @@ function zero_matrix(R::fpField, r::Int, c::Int)
   if r < 0 || c < 0
     error("dimensions must not be negative")
   end
-  z = fpMatrix(R, r, c)
+  z = fpMatrix(R, undef, r, c)
   return z
 end
 
