@@ -172,8 +172,7 @@ end
 
 function *(x::T, y::UInt) where T <: Zmodn_poly
   z = parent(x)()
-  @ccall libflint.nmod_poly_scalar_mul_nmod(z::Ref{T}, x::Ref{T}, y::UInt)::Nothing
-  return z
+  return mul!(z, x, y % modulus(x))
 end
 
 *(x::UInt, y::T) where T <: Zmodn_poly = y*x
@@ -202,6 +201,7 @@ end
 
 function +(x::T, y::UInt) where T <: Zmodn_poly
   z = parent(x)()
+  y %= modulus(x)
   @ccall libflint.nmod_poly_add_ui(z::Ref{T}, x::Ref{T}, y::UInt)::Nothing
   return z
 end
@@ -232,6 +232,7 @@ end
 
 function -(x::T, y::UInt) where T <: Zmodn_poly
   z = parent(x)()
+  y %= modulus(x)
   @ccall libflint.nmod_poly_sub_ui(z::Ref{T}, x::Ref{T}, y::UInt)::Nothing
   return z
 end
