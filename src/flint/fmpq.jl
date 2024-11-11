@@ -47,7 +47,7 @@ is_domain_type(::Type{QQFieldElem}) = true
 ###############################################################################
 
 function Base.hash(a::QQFieldElem, h::UInt)
-  return _hash_integer(a.num, _hash_integer(a.den, h))
+  return GC.@preserve a _hash_integer(a.num, _hash_integer(a.den, h))
 end
 
 ###############################################################################
