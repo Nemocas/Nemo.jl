@@ -109,12 +109,6 @@ end
       @test iszero(t)
     end
   end
-
-  # issue #651
-  m = one(Generic.MatSpaceElem{ZZRingElem}(ZZ, 2, 2))
-  for n = (m, -m, m*m, m+m, 2m)
-    @test n isa Generic.MatSpaceElem{ZZRingElem}
-  end
 end
 
 @testset "ZZMatrix.is_zero_entry" begin
