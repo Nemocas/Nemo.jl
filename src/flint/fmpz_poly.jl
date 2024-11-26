@@ -595,10 +595,10 @@ for (factor_fn, factor_fn_inner, flint_fn) in
            res = Dict{ZZPolyRingElem,Int}()
            z = ZZRingElem()
            @ccall libflint.fmpz_poly_factor_get_fmpz(z::Ref{ZZRingElem}, fac::Ref{fmpz_poly_factor})::Nothing
-           for i in 1:fac.num
+           for i in 1:fac.data.num
              f = parent(x)()
              @ccall libflint.fmpz_poly_factor_get_fmpz_poly(f::Ref{ZZPolyRingElem}, fac::Ref{fmpz_poly_factor}, (i - 1)::Int)::Nothing
-             e = unsafe_load(fac.exp, i)
+             e = unsafe_load(fac.data.exp, i)
              res[f] = e
            end
            return res, z

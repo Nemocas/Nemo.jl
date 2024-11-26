@@ -6,6 +6,8 @@
 
 const _err_dim_negative = ErrorException("Dimensions must be non-negative")
 
+include("CTypes.jl")
+
 ###############################################################################
 #
 #   ZZRing / ZZRingElem
@@ -42,7 +44,7 @@ integer_ring() = ZZRing()
 
 @doc zz_ring_doc
 mutable struct ZZRingElem <: RingElem
-  d::Int
+  d::Flint.fmpz
 
   function ZZRingElem()
     z = new()
@@ -92,11 +94,7 @@ function _fmpz_clear_fn(a::ZZRingElem)
 end
 
 mutable struct fmpz_factor
-  sign::Cint
-  p::Ptr{Nothing} # Array of fmpz_struct's
-  exp::Ptr{UInt}
-  alloc::Int
-  num::Int
+  data::Flint.fmpz_factor_struct
 
   function fmpz_factor()
     z = new()
@@ -123,9 +121,7 @@ end
 ###############################################################################
 
 mutable struct n_factor
-  num::Cint
-  exp::NTuple{15, Cint}
-  p::NTuple{15, UInt}
+  data::Flint.n_factor_t
 
   function n_factor()
     z = new()
@@ -240,9 +236,7 @@ end
 const FmpzPolyID = CacheDictType{Symbol, ZZPolyRing}()
 
 mutable struct ZZPolyRingElem <: PolyRingElem{ZZRingElem}
-  coeffs::Ptr{Nothing}
-  alloc::Int
-  length::Int
+  data::Flint.fmpz_poly_struct
   parent::ZZPolyRing
 
   function ZZPolyRingElem()
@@ -272,11 +266,7 @@ function _fmpz_poly_clear_fn(a::ZZPolyRingElem)
 end
 
 mutable struct fmpz_poly_factor
-  d::Int # ZZRingElem
-  p::Ptr{ZZPolyRingElem} # array of flint fmpz_poly_struct's
-  exp::Ptr{Int}
-  num::Int
-  alloc::Int
+  data::Flint.fmpz_poly_factor_struct
 
   function fmpz_poly_factor()
     z = new()
@@ -546,12 +536,7 @@ end
 const NmodPolyRingID = CacheDictType{Tuple{zzModRing, Symbol}, zzModPolyRing}()
 
 mutable struct zzModPolyRingElem <: PolyRingElem{zzModRingElem}
-  coeffs::Ptr{Nothing}
-  alloc::Int
-  length::Int
-  mod_n::UInt
-  mod_ninv::UInt
-  mod_norm::UInt
+  data::Flint.nmod_poly_struct
   parent::zzModPolyRing
 
   function zzModPolyRingElem(n::UInt)
@@ -670,6 +655,8 @@ mutable struct fpPolyRingElem <: PolyRingElem{fpFieldElem}
   mod_n::UInt
   mod_ninv::UInt
   mod_norm::UInt
+  # end of flint struct
+
   parent::fpPolyRing
 
   function fpPolyRingElem(n::UInt)
@@ -2950,6 +2937,8 @@ mutable struct fpRelPowerSeriesRingElem <: RelPowerSeriesRingElem{fpFieldElem}
   mod_n::UInt
   mod_ninv::UInt
   mod_norm::UInt
+  # end of flint struct
+
   prec::Int
   val::Int
   parent::fpRelPowerSeriesRing
@@ -3042,6 +3031,8 @@ mutable struct zzModRelPowerSeriesRingElem <: RelPowerSeriesRingElem{zzModRingEl
   mod_n::UInt
   mod_ninv::UInt
   mod_norm::UInt
+  # end of flint struct
+
   prec::Int
   val::Int
   parent::zzModRelPowerSeriesRing

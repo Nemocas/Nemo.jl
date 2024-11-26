@@ -9,7 +9,7 @@ function _factor(a::ZZRingElem)
   F = fmpz_factor()
   @ccall libflint.fmpz_factor(F::Ref{fmpz_factor}, a::Ref{ZZRingElem})::Nothing
   res = Dict{ZZRingElem, Int}()
-  for i in 1:F.num
+  for i in 1:F.data.num
     z = ZZRingElem()
     @ccall libflint.fmpz_factor_get_fmpz(z::Ref{ZZRingElem}, F::Ref{fmpz_factor}, (i - 1)::Int)::Nothing
     res[z] = unsafe_load(F.exp, i)
@@ -24,9 +24,9 @@ function factor(a::T) where T <: Union{Int, UInt}
   F = n_factor()
   @ccall libflint.n_factor(F::Ref{n_factor}, a::UInt)::Nothing
   res = Dict{T, Int}()
-  for i in 1:F.num
-    z = F.p[i]
-    res[z] = F.exp[i]
+  for i in 1:F.data.num
+    z = F.data.p[i]
+    res[z] = F.data.exp[i]
   end
   return Fac(u, res)
 end
@@ -183,10 +183,10 @@ function factor_trial_range(N::ZZRingElem, start::Int=0, np::Int=10^5)
   F = fmpz_factor()
   @ccall libflint.fmpz_factor_trial_range(F::Ref{fmpz_factor}, N::Ref{ZZRingElem}, start::UInt, np::UInt)::Nothing
   res = Dict{ZZRingElem,Int}()
-  for i in 1:F.num
+  for i in 1:F.data.num
     z = ZZRingElem()
     @ccall libflint.fmpz_factor_get_fmpz(z::Ref{ZZRingElem}, F::Ref{fmpz_factor}, (i - 1)::Int)::Nothing
-    res[z] = unsafe_load(F.exp, i)
+    res[z] = unsafe_load(F.data.exp, i)
   end
   return res, canonical_unit(N)
 end
