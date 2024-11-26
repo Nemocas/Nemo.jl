@@ -463,6 +463,10 @@ For the modulus being an [`Int`](@ref) see [`zzModRing`](@ref).
   ninv::fmpz_mod_ctx_struct
 
   function ZZModRing(n::ZZRingElem, cached::Bool=true)
+    # Modulus of zero cannot be supported. E.g. Flint library could not be expected to
+    # do matrices over Z/0 using a Z/nZ type. The former is multiprecision, the latter not.
+    n <= 0 && throw(DomainError(n, "Modulus must be positive"))
+
     return get_cached!(FmpzModRingID, n, cached) do
       ninv = fmpz_mod_ctx_struct()
       @ccall libflint.fmpz_mod_ctx_init(ninv::Ref{fmpz_mod_ctx_struct}, n::Ref{ZZRingElem})::Nothing

@@ -56,12 +56,14 @@ is_unit(a::ZZModRingElem) = a.parent.n == 1 ? iszero(a.data) : isone(gcd(a.data,
 
 modulus(R::ZZModRing) = R.n
 
+characteristic(R::ZZModRing) = modulus(R)
+
+is_trivial(a::ZZModRing) = is_one(modulus(a))  # constructor ensures the modulus is > 0
+
 function deepcopy_internal(a::ZZModRingElem, dict::IdDict)
   R = parent(a)
   return ZZModRingElem(deepcopy(a.data), R)
 end
-
-characteristic(R::ZZModRing) = modulus(R)
 
 function _reduce(a::ZZRingElem, ctx::fmpz_mod_ctx_struct)
   b = ZZRingElem()
@@ -449,9 +451,6 @@ end
 ###############################################################################
 
 function residue_ring(R::ZZRing, n::ZZRingElem; cached::Bool=true)
-  # Modulus of zero cannot be supported. E.g. Flint library could not be expected to
-  # do matrices over Z/0 using a Z/nZ type. The former is multiprecision, the latter not.
-  n <= 0 && throw(DomainError(n, "Modulus must be positive"))
   S = ZZModRing(n, cached)
   f = Generic.EuclideanRingResidueMap(R, S)
   return S, f
