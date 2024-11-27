@@ -377,7 +377,7 @@ sp[][1](rand(rng, sp[][2]))
 
 rand(r::Random.AbstractRNG, R::zzModRing, b::AbstractArray) = rand(r, make(R, b))
 
-rand(R::zzModRing, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
+rand(R::zzModRing, b::AbstractArray) = rand(Random.default_rng(), R, b)
 
 ###############################################################################
 #
