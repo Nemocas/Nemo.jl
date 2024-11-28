@@ -104,6 +104,13 @@
   @test F(ZZ["x"][2] + 1) == b + 1
   c = 2b^2 + 2b + 1
   @test lift(Rx, c) == 2x^2 + 2x + 1
+
+  # fix for caching issues
+  R = GF(3, 2)
+  Rx, x = R["x"]
+  f = x
+  F, _ = finite_field(f, "b", cached = true)
+  @test F isa FqField
 end
 
 @testset "FqFieldElem.printing" begin
