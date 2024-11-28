@@ -28,11 +28,11 @@
   F_BigInt = factor(BigInt(123456789))
   F_ZZ = factor(ZZ(123456789))
 
-  @test length(F.fac) == 3
-  @test length(F_Int128.fac) == 3
-  @test length(F_UInt128.fac) == 3
-  @test length(F_BigInt.fac) == 3
-  @test length(F_ZZ.fac) == 3
+  @test length(F) == 3
+  @test length(F_Int128) == 3
+  @test length(F_UInt128) == 3
+  @test length(F_BigInt) == 3
+  @test length(F_ZZ) == 3
 
   @test unit(F) == 1
   @test unit(F_Int128) == 1
@@ -45,14 +45,14 @@
   repunit37 = ZZ(10)^37 -1
   repunit41 = ZZ(10)^41 -1
   FF = factor(repunit37*repunit41) # trickier but still quick
-  @test length(FF.fac) == 8
+  @test length(FF) == 8
 
 
   # negative input
   F_minus1 = factor(-1)
   F_minus1_ZZ = factor(ZZ(-1))
-  @test length(F_minus1.fac) == 0
-  @test length(F_minus1_ZZ.fac) == 0
+  @test length(F_minus1) == 0
+  @test length(F_minus1_ZZ) == 0
   @test unit(F_minus1) == -1
   @test unit(F_minus1_ZZ) == -1
 
