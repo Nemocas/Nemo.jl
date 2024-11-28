@@ -2894,6 +2894,7 @@ end
 (::Type{T})(a::ZZRingElem) where T <: Union{UInt8, UInt16, UInt32} = T(UInt(a))
 
 (::Type{Int128})(a::ZZRingElem) = Int128(BigInt(a))
+(::Type{UInt128})(a::ZZRingElem) = UInt128(BigInt(a))
 
 Integer(a::ZZRingElem) = BigInt(a)
 
